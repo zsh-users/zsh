@@ -152,6 +152,11 @@ compdef() {
 
   # Get the options.
 
+  if [[ $#* -eq 0 ]]; then
+    echo "compdef needs parameters"
+    return 1
+  fi
+  
   while getopts "anpPkd" opt; do
     case "$opt" in
     a)    autol=yes;;
@@ -175,6 +180,11 @@ compdef() {
   done
   shift OPTIND-1
 
+  if [[ $#* -eq 0 ]]; then
+    echo "compdef needs parameters"
+    return 1
+  fi
+  
   if [[ -z "$delete" ]]; then
     # Adding definitions, first get the name of the function name
     # and probably do autoloading.
