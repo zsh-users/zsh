@@ -1451,7 +1451,7 @@ recursiveedit(UNUSED(char **args))
     zlecore();
 
     locerror = errflag;
-    errflag = done = 0;
+    errflag = done = eofsent = 0;
 
     return locerror;
 }
