@@ -10,6 +10,13 @@
 	module, add echoti builtin and terminfo parameter in
 	terminfo module.
 
+2000-11-30  Peter Stephenson  <pws@csr.com>
+
+	* 13209: Makefile.in, configure.in, Config/funcinst.mk,
+	Config/installfns.sh, Config/uninstallfns.sh, Src/zsh.mdd,
+	Src/Modules/zftp.mdd, Src/Zle/complete.mdd, Src/Zle/zle.mdd:
+	function installation information is now in config.modules.
+
 2000-11-27  Bart Schaefer  <schaefer@zsh.org>
 
 	* 13203: Completion/Builtins/_zstyle: Add missing quote.

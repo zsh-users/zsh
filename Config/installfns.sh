@@ -4,7 +4,7 @@ fndir=$DESTDIR$fndir
 
 $sdir_top/mkinstalldirs $fndir || exit 1;
 
-allfuncs="`grep ' functions=' ${dir_top}/config.modules |
+allfuncs="`grep ' functions=.' ${dir_top}/config.modules |
   sed -e '/^#/d' -e '/ link=no/d' -e 's/^.* functions=//'`"
 
 allfuncs="`cd $sdir_top; echo ${allfuncs}`"

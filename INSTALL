@@ -277,28 +277,23 @@ override it with --enable-fndir=directory; --disable-fndir or
 setting of a default value for $fpath/$FPATH.  Note the presence of
 $ZSH_VERSION (e.g. `3.1.7') to avoid clashes between versions of zsh.
 If you only run one version of zsh at once, installing into a common
-directory such as /usr/local/share/zsh/functions is fine.
+directory such as /usr/local/share/zsh/functions is fine --- note, however,
+that uninstallation is more likely to create problems in this case.
 
-You can control the functions which get installed by setting
-FUNCTIONS_INSTALL, either when running configure (e.g.
-`FUNCTIONS_INSTALL="..." configure ...') or when running `make install' or
-`make install.fns'.  It includes a list of files relative to either the
-Completion or Functions subdirectories.  By default, all the functions for
-the Completion system will be installed (see the zshcompsys manual page),
-plus those provide functions for the line editor, i.e.
-  FUNCTIONS_INSTALL='Core/* Base/* Builtins/* User/* Commands/* Debian/* Linux/* X/* Zle/* Prompts/* Misc/*'
-and if the --enable-dynamic option was given, the functions in
-Functions/Zftp, which require the zftp module to be available (see the
-zshzftpsys manual page), will be included as well.  Note, however, that
-some of the functions in the User subdirectory are version- and
-system-specific.
+The functions to be installed are controlled by config.modules.  These
+appear at the end of the line after `functions=': note that the rest of the
+line is taken verbatim as shell command line text, i.e. no quoting is used
+around the value as a whole and unquoted wildcards will be expanded.  To
+prevent any functions from being installed, either remove the `functions='
+entry or delete the reset of the line after it.
 
-There are also some miscellaneous functions with documentation in comments;
-the complete set of functions can be installed with
-  FUNCTIONS_INSTALL='Core/* Base/* Builtins/* User/* Commands/* \
-  Debian/* Linux/* X/* Misc/* Zftp/* Zle/*'
-Note you should set this by hand to include `Zftp/*' if you have zftp
-compiled into a statically linked shell.
+Functions not specific to a particular module are listed on the zsh/main
+line.  None of these are crucial to shell operation, so you may choose not
+to install them.  For other modules, the functions will be installed if and
+only if the module itself is installed.  This will usually be what you
+want; in particular, the zsh/complete and zsh/zftp modules are of much less
+use without the associated functions.  The functions listed with zsh/zle
+are optional. however.
 
 You can also use the configure option --enable-function-subdirs to allow
 shell functions to be installed into subdirectories of the function
