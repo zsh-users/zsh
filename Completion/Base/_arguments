@@ -158,12 +158,12 @@ else
       else
         uns=''
         if [[ -n "$single" && "$ws[1]" = [-+]* ]]; then
-          if [[ $#opts -ne 0 &&
+          if [[ ${#${(kj::)opts[(R)?*]#?}} -ne 0 &&
                 "$ws[1]" = ${ws[1][1]}*[${(kj::)opts[(R)?*]#?}] ]]; then
 	    def="$opts[${ws[1][1]}${ws[1][-1]}]"
 	    uns="${ws[1][2,-1]}"
 	    opt=''
-	  elif [[ $#mopts -ne 0 &&
+	  elif [[ ${#${(kj::)mopts[(R)?*]#?}} -ne 0 &&
                   "$ws[1]" = ${ws[1][1]}*[${(kj::)mopts[(R)?*]#?}] ]]; then
 	    def="$mopts[${ws[1][1]}${ws[1][-1]}]"
 	    uns="${ws[1][2,-1]}"
@@ -457,7 +457,7 @@ else
       [[ $#long -ne 0 &&
          ( "$compconfig[option_prefix]" != *(long|all)* ||
            "$PREFIX" = --* ) ]] && \
-          _long_options && ret=0
+	  _long_options "$long[@]" && ret=0
     fi
   fi
 

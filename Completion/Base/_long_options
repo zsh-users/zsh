@@ -135,7 +135,7 @@ if [[ "$tmp" != $_lo_cache_cmd ]]; then
 
   set -- "$@" '*=FILE*:file:_files' '*=(DIR|PATH)*:directory:_files -/' '*:unknown:'
 
-  while [[ $# -gt 1 ]]; do
+  while [[ $# -gt 0 ]]; do
 
     # First, we get the pattern and the action to use and take them
     # from the positional parameters.
@@ -265,6 +265,8 @@ if [[ "$str" = *\=* ]]; then
 	  action=($=action)
 	  ${(e)action[1]} "$expl[@]" ${(e)~action[2,-1]}
         fi
+      else
+        _message "$descr"
       fi
 
       # We found the option string, return.
