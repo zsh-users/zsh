@@ -1,3 +1,7 @@
+2000-07-16  Wayne Davison  <wayned@users.sourceforge.net>
+
+	* 12260: Src/hist.c:  Added unmeta() calls, fixed lockhistfile().
+
 2000-07-13  Peter Stephenson  <pws@cambridgesiliconradio.com>
 
 	* 12247: Src/init.c, Src/params.c, Src/prompt.c: remove hostnam
