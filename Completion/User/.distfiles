@@ -6,12 +6,14 @@ DISTFILES_SRC='
     _find _finger _fakeroot _flex _gcc _gdb  _getconf _gprof _groups
     _gs _gv _gzip _hosts _imagemagick _ispell
     _java _joe _killall _lp _look _lynx _lzop
-    _mailboxes _make _man _mh _mount _mutt _my_accounts _mysql_utils _nedit
-    _netscape _nslookup _other_accounts _pack _patch _pbm _pdf _perl
-    _perl_basepods _perl_builtin_funcs _perl_modules _perldoc
-    _ports _prcs _printers _prompt _ps _pspdf _psutils _rcs _rlogin _sh _slrn
-    _socket _ssh _strip _stty _su _sudo _tar _tar_archive _telnet _tex _texi
-    _tiff _tilde_files _urls _use_lo _user_at_host
-    _users _users_on _webbrowser _wget _whereis _whois _xargs _yodl _yp
+    _mailboxes _make _man _mere _mh _mount _mutt _my_accounts _mysql_utils
+    _nedit _netscape _nslookup _other_accounts
+    _pack _patch _pbm _pdf _perl _perl_basepods _perl_builtin_funcs
+    _perl_modules _perldoc _ports _prcs _printers _prompt _ps _pspdf
+    _psutils _rcs _rlogin
+    _sh _slrn _socket _ssh _strip _stty _su _sudo
+    _tar _tar_archive _telnet _tex _texi _tiff _tilde_files
+    _urls _use_lo _user_at_host _users _users_on
+    _webbrowser _wget _whereis _whois _xargs _yodl _yp
     _zcat _zdump
 '

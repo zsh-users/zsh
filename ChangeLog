@@ -1,5 +1,7 @@
 2000-12-16  Clint Adams  <schizo@debian.org>
 
+	* unposted: Completion/User/.distfiles: add _mere
+
 	* 13285: Src/Zle/zle_bindings.c, Src/Zle/zle_keymap.c:
 	use vi-up-line-or-history and vi-down-line-or-history in
 	the vicmd keymap (rather than their emacsy counterparts).
