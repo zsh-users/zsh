@@ -17,7 +17,7 @@ ENDHELP
 }
 
 prompt_oliver_setup() {
-  prompt_opts=( percent set )
+  prompt_opts=( percent )
   
   local pcol=$'\e['${1:-${pcolour[${HOST:=`hostname`}]:-33}}m
   local tcol=$'\e['${2:-${tcolour[$HOST]:-37}}m
