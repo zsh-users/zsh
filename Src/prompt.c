@@ -171,11 +171,13 @@ promptexpand(char *s, int ns, char *rs, char *Rs)
     *bp = 0;
     if (!ns) {
 	/* If zero, Inpar, Outpar and Nularg should be removed. */
-	for (bp = buf; *bp; bp++) {
+	for (bp = buf; *bp; ) {
 	    if (*bp == Meta)
-		bp++;
+		bp += 2;
 	    else if (*bp == Inpar || *bp == Outpar || *bp == Nularg)
 		chuck(bp);
+	    else
+		bp++;
 	}
     }
     return buf;
