@@ -311,7 +311,7 @@ for prepath in "$prepaths[@]"; do
         if [[ "$rem" = *parent* ]]; then
 	  for i in "$tmp2[@]"; do
 	    if [[ -d "$i" && "$i" = */* ]]; then
-	      remt="${i/*}"
+	      remt="${i%/*}"
 	      while [[ "$remt" = */* ]]; do
 		[[ "$remt" -ef "$i" ]] && break
 		remt="${remt%/*}"
