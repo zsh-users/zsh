@@ -103,9 +103,9 @@ displays expansions extensions files fonts functions globbed-files groups
 history-words hosts indexes jobs keymaps keysyms local-directories
 libraries limits manuals maps messages modifiers modules my-accounts
 named-directories names nicknames options original other-accounts packages
-parameters path-directories paths pods ports prefixes processes ps regex
-sequences sessions signals strings tags targets types urls users values
-warnings widgets windows zsh-options)
+parameters path-directories paths pods ports prefixes processes
+processes-names ps regex sequences sessions signals strings tags targets
+types urls users values warnings widgets windows zsh-options)
 
 _arguments -C ':context:->contexts' ':style:->styles' '*:argument:->style-arg'
 

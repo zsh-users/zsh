@@ -744,11 +744,6 @@ kindex(processes, completion tag)
 item(tt(processes))(
 for process identifiers
 )
-kindex(processes-list, completion tag)
-item(tt(processes-list))(
-used to look up the tt(command) style when generating the list to
-display for process identifiers
-)
 kindex(processes-names, completion tag)
 item(tt(processes-names))(
 used to look up the tt(command) style when generating the names of
@@ -934,11 +929,14 @@ example to avoid calling a shell function with the same name as an external
 command.
 
 As an example, the function generating process IDs as matches uses this
-style with the tt(processes) tag to generate the IDs to complete and when
-the tt(verbose) style is `true', it uses this style with the
-tt(processes-list) tag to generate the strings to display.  When using
-different values for these two tags one should ensure that the process
-IDs appear in the same order in both lists.
+style with the tt(processes) tag to generate the IDs to complete and
+the list of processes to display (if the tt(verbose) style is `true').
+The list produced by the command should look like the output of the
+tt(ps) command.  The first line is not displayed, but is searched for
+the string `tt(PID)' (or `tt(pid)') to find the position of the
+process IDs in the following lines.  If the line does not contain
+`tt(PID)', the first numbers in each of the other lines are taken as the 
+process IDs to complete.
 )
 kindex(completer, completion style)
 item(tt(completer))(

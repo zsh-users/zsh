@@ -1,5 +1,9 @@
 2000-08-15  Sven Wischnowsky  <wischnow@zsh.org>
 
+	* 12640: Completion/Builtins/_pids, Completion/Builtins/_zstyle,
+ 	Doc/Zsh/compsys.yo: call ps only once and be more intelligent when
+ 	finding the PIDs
+	
 	* 12635: Completion/Builtins/_pids: small improvement to allow
  	lists where the pid is not in the first column
 	
