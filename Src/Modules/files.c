@@ -186,10 +186,10 @@ static int
 bin_ln(char *nam, char **args, char *ops, int func)
 {
     MoveFunc move;
-    int flags, space, err = 0;
-    char **a, *ptr, *rp;
+    int flags, err = 0;
+    char **a, *ptr, *rp, *buf;
     struct stat st;
-    char buf[PATH_MAX * 2 + 1];
+    size_t blen;
 
 
     if(func == BIN_MV) {
@@ -203,7 +203,7 @@ bin_ln(char *nam, char **args, char *ops, int func)
 	    move = (MoveFunc) symlink;
 	else
 #endif
-	     {
+	{
 	    move = (MoveFunc) link;
 	    if(!ops['d'])
 		flags |= MV_NODIRS;
@@ -229,31 +229,24 @@ bin_ln(char *nam, char **args, char *ops, int func)
 	    args[1] = args[0];
     }
     return domove(nam, move, args[0], args[1], flags);
-    havedir:
-    strcpy(buf, *a);
+ havedir:
+    buf = ztrdup(*a);
     *a = NULL;
-    space = PATH_MAX - 1 - ztrlen(buf);
-    rp = strchr(buf, 0);
-    *rp++ = '/';
+    buf = appstr(buf, "/");
+    blen = strlen(buf);
     for(; *args; args++) {
-	if(ztrlen(*args) > PATH_MAX) {
-	    zwarnnam(nam, "%s: %e", *args, ENAMETOOLONG);
-	    err = 1;
-	    continue;
-	}
+
 	ptr = strrchr(*args, '/');
 	if(ptr)
 	    ptr++;
 	else
 	    ptr = *args;
-	if(ztrlen(ptr) > space) {
-	    zwarnnam(nam, "%s: %e", ptr, ENAMETOOLONG);
-	    err = 1;
-	    continue;
-	}
-	strcpy(rp, ptr);
+
+	buf[blen] = 0;
+	buf = appstr(buf, ptr);
 	err |= domove(nam, move, *args, buf, flags);
     }
+    zsfree(buf);
     return err;
 }
 

@@ -1,3 +1,8 @@
+2000-09-18  Clint Adams  <schizo@debian.org>
+
+	* 2836: Src/Modules/files.c: use ztrdup()/appstr() in lieu of
+	statically-allocated buffer in bin_ln.
+
 2000-09-18  Bart Schaefer  <schaefer@zsh.org>
 
 	* 12833: Back out the zasprintf changes from 12814, they're not
