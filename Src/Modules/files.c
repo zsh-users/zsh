@@ -628,21 +628,22 @@ bin_chown(char *nam, char **args, char *ops, int func)
 {
     struct chownmagic chm;
     char *uspec = ztrdup(*args), *p = uspec;
+    char *end;
 
     chm.nam = nam;
     if(func == BIN_CHGRP) {
 	chm.uid = -1;
 	goto dogroup;
     }
-    if(*p == ':' || *p == '.') {
+    end = strchr(uspec, ':');
+    if(!end)
+	end = strchr(uspec, '.');
+    if(end == uspec) {
 	chm.uid = -1;
 	p++;
 	goto dogroup;
     } else {
 	struct passwd *pwd;
-	char *end = strchr(p, ':');
-	if(!end)
-	    end = strchr(p, '.');
 	if(end)
 	    *end = 0;
 	pwd = getpwnam(p);
@@ -666,6 +667,8 @@ bin_chown(char *nam, char **args, char *ops, int func)
 		    return 1;
 		}
 		chm.gid = pwd->pw_gid;
+	    } else if(p[0] == ':' && !p[1]) {
+		chm.gid = -1;
 	    } else {
 		struct group *grp;
 		dogroup:

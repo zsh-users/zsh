@@ -17,12 +17,17 @@ The var(user-spec) can be in four forms:
 
 startsitem()
 sitem(var(user))(change owner to var(user); do not change group)
+sitem(var(user)tt(::))(change owner to var(user); do not change group)
 sitem(var(user)tt(:))(change owner to var(user); change group to var(user)'s primary group)
 sitem(var(user)tt(:)var(group))(change owner to var(user); change group to var(group))
 sitem(tt(:)var(group))(do not change owner; change group to var(group))
 endsitem()
 
-In each case, the `tt(:)' may instead be a `tt(.)'.
+In each case, the `tt(:)' may instead be a `tt(.)'.  The rule is that
+if there is a `tt(:)' then the separator is `tt(:)', otherwise
+if there is a `tt(.)' then the separator is `tt(.)', otherwise
+there is no separator.
+
 Each of var(user) and var(group) may be either a username (or group name, as
 appropriate) or a decimal user ID (group ID).  Interpretation as a name
 takes precedence, if there is an all-numeric username (or group name).
