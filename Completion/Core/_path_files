@@ -276,9 +276,9 @@ for prepath in "$prepaths[@]"; do
       if [[ "$sopt" = *[/f]* && ( -o globdots || "$PREFIX" = .* ) ]] &&
 	  zstyle -s ":completion:${curcontext}:paths" special-dirs atmp; then
 	if [[ "$atmp" = (yes|true|1|on) ]]; then
-	  tmp2=( "$tmp2[@]" . .. )
+	  tmp1=( "$tmp1[@]" . .. )
 	elif [[ "$atmp" = .. ]]; then
-	  tmp2=( "$tmp2[@]" .. )
+	  tmp1=( "$tmp1[@]" .. )
         fi
       fi
     fi
@@ -333,7 +333,6 @@ for prepath in "$prepaths[@]"; do
       # if none of the patterns match.
 
       if [[ -z "$tpre$tsuf" && -n "$pre$suf" ]]; then
-        tmp1=( "$tmp2[@]" )
 	pfxsfx=(-S '' "$pfxsfx[@]")
 	break;
       elif [[ "$haspats" = no && -z "$tpre$tsuf" &&

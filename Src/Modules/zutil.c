@@ -155,7 +155,7 @@ setstypat(Style s, char *pat, Patprog prog, char **vals)
 	    tmp = 2;
 	}
     }
-    p->weight = weight + tmp;
+    p->weight = (weight += tmp);
 
     for (qq = NULL, q = s->pats; q && q->weight >= weight;
 	 qq = q, q = q->next);
