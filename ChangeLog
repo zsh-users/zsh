@@ -1,3 +1,8 @@
+2004-01-09  Peter Stephenson  <pws@csr.com>
+
+	* 19354: Doc/Zsh/compctl.yo, Doc/Zsh/intro.yo: Fix section
+	names in manual which upset Docbook.
+
 2004-01-08  Peter Stephenson  <pws@csr.com>
 
 	* 19338 adapated (see following thread): .distfiles,
