@@ -1,0 +1,216 @@
+# This script is to be run by a user to setup the new function based
+# completion system.  The functions themselves are assumed to be already
+# available in some directory; they should have been installed with the
+# the shell (except we haven't written that yet).
+#
+# Run it as a script under zsh and answer the questions.
+# You can run it as `zsh compinstall $FPATH' and it will be able to check
+# your function path for the completion functions.
+#
+# Normally, this will alter ~/.zshrc (or wherever ZDOTDIR puts it),
+# but you can make that unwritable and it will leave the lines in a
+# temporary file instead.
+#
+# You can use this script to modify what compinstall previously
+# added to ~/.zshrc.
+#
+# It is safe to abort with ^C any time you are being prompted for
+# information; your .zshrc will not be altered.
+#
+# To do:
+#  - Maybe this should be sourced, then it can check the user's current
+#    setup better.  But then there is a potentially horrendous option
+#    setting/resetting problem.  (Maybe we need another way of doing that.)
+#  - Should probably offer to set different options for _approximate than
+#    for _complete if both are used.
+#  - Could add code for setting other completers and options.
+#  - Could add keys for context-sensitive help.
+#  - Probably should allow a set of directories to be added to $fpath,
+#    like Core, Base, etc.
+
+# In case a startup script changed options
+emulate zsh
+
+[[ -n $1 ]] && FPATH=$1
+
+for f in $fpath; do
+  if [[ $f != . && -f $f/compinit && -f $f/compdump ]]; then
+    fdir=$f
+    break
+  fi
+done
+
+if [[ -z $fdir ]]; then
+  print "Trying to find where the completion functions are..."
+  if [[ $0 = */* && -f $0:h/compinit && -f $0:h/compdump ]]; then
+    fdir=$0:h
+  else
+    # more guesses?
+    print \
+"Please edit the name of the directory where the completion functions are
+installed.  If they are not installed, you will need to find them in the
+Completion/* directories of the zsh distribution and install them yourself,
+or insult your system manager for incompetence."
+    vared -c fdir
+    while [[ ! -d ${~fdir} || ! -f ${~fdir}/compinit || 
+      ! -f ${~fdir}/compdump ]]; do
+      print "I can't find them in that directory.  Try again or abort."
+      vared fdir
+    done
+  fi
+  eval "fpath=($fdir \$fpath)"
+  fdir=${fdir/#$HOME/\~}
+  lines="fpath=($fdir \$fpath)\n"
+else
+  print "Found completion functions in your fpath, will not alter it."
+fi
+
+files=( ${^~fpath:/.}/_(|*[^~])(N:t) )
+if [[ $#files -lt 20 ]]; then
+  print "
+Hmmm, completion functions seem a bit thin on the ground.  There should
+be lots of files with names beginning with an underscore (_).  You should
+look and see what's happened to these.
+[Hit return to continue]"
+  read
+fi
+
+if [[ -w ${~fdir} && ( ! -f ${~fdir}/compinit.dump ||
+  -w ${~fdir}/compinit.dump ) ]]
+then
+  print "
+Using standard dumpfile
+  ${~fdir}/compinit.dump
+to speed up initialisation.
+[Hit return to continue]"
+  read
+else
+  print "
+I will force completion to dump its status, which will speed up the shell's
+start-up considerably.  However, I can't write the file I'd like to, namely
+$fdir/compinit.dump.  Please edit a replacement."
+  dumpfile='~/.compinit.dump'
+  vared dumpfile
+  while ! touch ${~dumpfile} >& /dev/null; do
+    print "Sorry, I can't write that either.  Try again."
+    vared dumpfile
+  done
+  [[ -s $dumpfile ]] || rm -f $dumpfile
+  dumpfile=" $dumpfile"
+fi
+
+fdir=${fdir/#$HOME/\~}
+
+lines="${lines}. $fdir/compinit -d$dumpfile\n"
+
+
+print "
+In addition to completion, zsh can also perform correction of the
+current word, or approximate completion, i.e. completion where the part of
+the word typed so far can be corrected; or it can try correction, then
+approximate completion if that fails.  Would you like:
+  0:  Just ordinary completion
+  C:  Correction
+  A:  Approximate completion
+  B:  Both?
+Please type one of the keys above:"
+while read -k type; do
+  print
+  case $type in
+    0*) completer=_complete
+	break
+	;;
+    [cC]*) completer=_complete:_correct
+	   break
+	   ;;
+    [aA]*) completer=_complete:_approximate
+	   break;
+	   ;;
+    [bB]*) completer=_complete:_correct:_approximate
+	   break
+	   ;;
+    *) print Try again
+       ;;
+  esac
+done
+
+lines="${lines}compconf completer=$completer"
+
+
+if [[ $completer = *(correct|approx)* ]]; then
+  print "
+Correction and approximation will normally allow up to two errors,
+and you will be able to use a numeric prefix (e.g. <Esc>4) to allow
+more.  The standard prompt is \`correct to:'. Do you want to change
+any of this? [n]"
+  if read -q; then
+    print "Number of errors to accept normally (0 is OK):"
+    read accept
+    while [[ $accept != <-> ]]; do
+      read accept"?Please enter a number: "
+    done
+    print \
+"How would you like the numeric prefix to be treated:
+  0:  Not used by correction
+  U:  Used to given the number of errors
+  I:  If present, and not 1, do not perform correction?
+Please type one of the keys above:"
+    while read -k type; do
+      print
+      case $type in
+	0*) break
+	    ;;
+	[uU]*) accept="${accept}n"
+	       break
+	       ;;
+	[Ii]*) accept="${accept}!n"
+	       break
+	       ;;
+	*) print Try again
+	   ;;
+      esac
+    done
+    lines="$lines \\\\
+  correct_accept='$accept'"
+    print "
+Instead of the prompt \`correct to:', you can have no prompt, or a
+prompt of your choosing which can display the number of errors found by
+containing the string \`%e'.  Do you wish to change the correction
+prompt? [n]"
+    if read -q; then
+      cprompt=''
+      print "Edit a new prompt (may be empty):"
+      vared cprompt
+      lines="$lines \\\\
+  correct_prompt='${cprompt//\'/\'\\\'\'}'"
+    fi
+  fi
+fi
+
+lines="$lines\n"
+
+
+startline='# The following lines were added by compinstall'
+endline='# End of lines added by compinstall'
+
+ifile=${ZDOTDIR:-~}/.zshrc
+[[ -f $ifile ]] || touch $ifile
+tmpf=${TMPPPREFIX:-/tmp/zsh}compinstall$$
+
+if [[ ! -w $ifile ]]; then
+  print "\nI can't write to $ifile.  I will leave the lines to add in
+\`$tmpf' and you must add them by hand."
+  print "\n$startline\n$lines\n$endline" >$tmpf
+  return 0
+fi
+
+if grep $endline $ifile >& /dev/null; then
+  print -- "$startline\n$lines$endline" >$tmpf
+  sed -e "/^$endline/r $tmpf
+/^$startline/,/^$endline/d" $ifile >${tmpf}2 && mv ${tmpf}2 $ifile &&
+  print "\nSuccesfully modified old compinstall lines in $ifile."
+  rm -f $tmpf ${tmpf}2
+else
+  print "\n$startline\n$lines\n$endline" >>$ifile &&
+  print "\nSuccessfully appended lines to $ifile."
+fi
