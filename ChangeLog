@@ -1,3 +1,8 @@
+2003-09-25  Wayne Davison  <wayned@users.sourceforge.net>
+
+	* unposted: Src/builtin.c: fixed old-style typeset -T (without
+	the new separator arg).
+
 2003-09-24  Peter Stephenson  <pws@csr.com>
 
 	* 19129: Doc/Zsh/builtins.yo, Src/builtin.c, Src/params.c,
