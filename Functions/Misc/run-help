@@ -45,13 +45,23 @@ do
 	[[ ${what[(w)6]:t} != ${what[(w)1]} ]] && run-help ${what[(w)6]:t}
 	;;
     (*( is a * function))
-	builtin functions ${what[(w)1]} | ${=PAGER:-more}
-	;;
+	case ${what[(w)1]} in
+	(comp*) man zshcompsys;;
+	(zf*) man zshftpsys;;
+	(*) builtin functions ${what[(w)1]} | ${=PAGER:-more};;
+	esac;;
     (*( is a * builtin))
 	case ${what[(w)1]} in
 	(compctl) man zshcompctl;;
-	(bindkey) man zshzle;;
+	(comp*) man zshcompwid;;
+	(bindkey|vared|zle) man zshzle;;
 	(*setopt) man zshoptions;;
+	(cap|getcap|setcap) ;&
+	(clone) ;&
+	(ln|mkdir|mv|rm|rmdir|sync) ;&
+	(sched) ;&
+	(stat) man zshmodules;;
+	(zftp) man zshftpsys;;
 	(*) man zshbuiltins;;
 	esac
 	;;
