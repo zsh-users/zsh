@@ -83,7 +83,7 @@ zsh.texi: zsh.yo
 	test -f $(sdir)/zsh.texi
 
 zsh.yo: zsh.yo.in
-	sed 's,@@TEXINFO@@,texinfo\($(tzsh).info\)\($(tzsh)\),' zsh.yo.in >zsh.yo
+	sed 's,@@TEXINFO@@,texinfo\($(tzsh).info\)\($(tzsh)\),' $(sdir)/zsh.yo.in >zsh.yo
 
 .yo.1:
 	case $@ in \
