@@ -3,6 +3,18 @@
         * unposted: zshconfig.ac: get rid of evil -Wno-implicit
         in CFLAGS.
 
+	* Sven: 16426: Completion/Unix/Command/_man,
+        Completion/Zsh/Command/_zstyle, Doc/Zsh/compsys.yo: allow
+        manual pages to be shown separated by section with new
+        separate-sections style
+
+	* 17266: Completion/Unix/Command/_man: check `manpath`
+        even when $MANPATH is set.
+
+        * Bart: users/4157 (plus workers/15674):
+	Completion/Unix/Command/_man: Better handling of section
+	numbers.
+
 2002-05-28  Clint Adams  <clint@zsh.org>
 
         * 17244: Completion/Debian/Command/_dpkg:

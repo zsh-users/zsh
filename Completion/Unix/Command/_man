@@ -7,30 +7,65 @@ _man() {
     _files || return 0
   fi
 
-  if (( ! $#manpath )); then
+  if (( ! $#_manpath )); then
     local mp
-    mp=($(manpath 2>/dev/null))
+    mp=( ${(s.:.)$(manpath 2>/dev/null)} )
     [[ "$mp" == *:* ]] && mp=( ${(s.:.)mp} )
-    manpath=( $mp )
+    if (( $#mp )); then
+      _manpath=( $mp )
+    elif (( $#manpath )); then
+      _manpath=( $manpath )
+    fi
   fi
 
-  (( $#manpath )) || manpath=( ${(s.:.)$(manpath 2>/dev/null)} ) ||
-      manpath=( /usr/man(-/) /(opt|usr)/(dt|share|X11R6|local)/(cat|)man(-/) )
+  (( $#_manpath )) ||
+      _manpath=( /usr/man(-/) /(opt|usr)/(dt|share|X11R6|local)/(cat|)man(-/) )
 
   # `sman' is the SGML manual directory for Solaris 7.
   # 1M is system administrator commands on SVR4
 
-  mrd=(${^manpath/\%L/${LANG:-En_US.ASCII}}/mandb(N))
+  mrd=(${^_manpath/\%L/${LANG:-En_US.ASCII}}/mandb(N))
 
-  if [[ $words[2] = (<->*|1M|l|n) ]]; then
-    dirs=( $^manpath/(sman|man|cat)${words[2]}/ )
-    awk="\$2 == \"$words[2]\" {print \$1}"
-  else
-    dirs=( $^manpath/(sman|man|cat)*/ )
-    awk='{print $1}'
+  local sect
+  if [[ $OSTYPE = solaris* ]]; then
+    sect=$words[$words[(i)-s]+1]
+  elif [[ -n ${sect:=$words[$words[(i)-S]+1]} || -n ${sect:=$MANSECT} ]]; then
+    if [[ $sect != ${sect::="${sect//:/|}"} ]]; then
+      sect="($sect)"
+    fi
+  elif (( CURRENT > 2 )); then
+    sect=$words[2]
   fi
 
-  _wanted manuals expl 'manual page' _man_pages
+  if [[ $sect = (<->*|1M|l|n) || $sect = \(*\|*\) ]]; then
+    dirs=( $^_manpath/(sman|man|cat)${~sect}/ )
+    awk="\$2 == \"$sect\" {print \$1}"
+  else
+    dirs=( $^_manpath/(sman|man|cat)*/ )
+    awk='{print $1}'
+  fi
+  if zstyle -t ":completion:${curcontext}:manuals" separate-sections; then
+    typeset -U sects
+    local ret=1
+
+    sects=( ${(o)${dirs##*(man|cat)}%/} )
+
+    (( $#sects )) || return 1
+
+    _tags manuals.${^sects}
+    while _tags; do
+      for sect in $sects; do
+        _requested manuals.$sect expl "manual page, section $sect" _man_pages &&
+            ret=0
+      done
+      (( ret )) || return 0
+    done
+
+    return 1
+  else
+    sect=
+    _wanted manuals expl 'manual page' _man_pages
+  fi
 }
 
 _man_pages() {
@@ -45,7 +80,7 @@ _man_pages() {
     matcher=
   fi
 
-  pages=( $dirs )
+  pages=( ${(M)dirs:#*$sect/} )
   compfiles -p pages '' '' "$matcher" '' dummy '*'
   pages=( ${^~pages}(N:t:r) )
 

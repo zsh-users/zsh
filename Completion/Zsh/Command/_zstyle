@@ -82,6 +82,7 @@ styles=(
   remove-all-dups	 c:bool
   select-prompt          c:
   select-scroll          c:
+  separate-sections      c:bool
   single-ignored         c:single-ignored
   sort			 c:bool
   special-dirs		 c:sdirs

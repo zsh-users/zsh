@@ -1892,6 +1892,15 @@ negative number to scroll by the number of lines of the screen minus
 that number (or plus the number, since it is negative).  The default is to
 scroll by single lines.
 )
+kindex(separate-sections, completion style)
+item(tt(separate-sections))(
+This style is used with the tt(manuals) tag when completing names of
+manual pages.  If it is `true', entries for different sections are
+added separately using tag names of the form `tt(manual.)var(X)',
+where var(X) is the section number.  This means that it is possible to
+make pages from different sections be listed separately by setting the
+tt(group-name) style.  The default for this style is `false'.
+)
 kindex(single-ignored, completion style)
 item(tt(single-ignored))(
 This is used by the tt(_ignored) completer.  It specifies what
