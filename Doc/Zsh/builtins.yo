@@ -725,9 +725,9 @@ findex(printf)
 item(tt(printf) var(format) [ var(arg) ... ])(
 Print the arguments according to the format specification. Formatting
 rules are the same as used in C. The same escape sequences as for tt(echo)
-are recognised in the format. All C format specifications ending in one of
-csdiouxXeEfgGn are handled. In addition to this, `tt(%b)' can be used
-instead of `tt(%s)' to cause escape sequences in the argument to be
+are recognised in the format. All C conversion specifications ending in
+one of csdiouxXeEfgGn are handled. In addition to this, `tt(%b)' can be
+used instead of `tt(%s)' to cause escape sequences in the argument to be
 recognised and `tt(%q)' can be used to quote the argument in such a way
 that allows it to be reused as shell input. With the numeric format
 specifiers, if the corresponding argument starts with a quote character,
@@ -736,6 +736,13 @@ print otherwise the argument is evaluated as an arithmetic expression. See
 noderef(Arithmetic Evaluation) for a description of arithmetic
 expressions. With `tt(%n)', the corresponding argument is taken as an
 identifier which is created as an integer parameter.
+
+Normally, conversion specifications are applied to each argument in order
+but they can explicitly specify the var(n)th argument is to be used by
+replacing `tt(%)' by `tt(%)var(n)tt($)' and `tt(*)' by `tt(*)var(n)tt($)'.
+It is recommended that you do not mix references of this explicit style
+with the normal style and the handling of such mixed styles may be subject
+to future change.
 
 If arguments remain unused after formatting, the format string is reused
 until all arguments have been consumed. If more arguments are required by

@@ -2892,10 +2892,11 @@ mod_export LinkList bufstack;
 int
 bin_print(char *name, char **args, char *ops, int func)
 {
-    int flen, width, prec, type, argc, n, nnl = 0, ret = 0;
+    int flen, width, prec, type, argc, n, narg;
+    int nnl = 0, ret = 0, maxarg = 0;
     int flags[5], *len;
     char *start, *endptr, *c, *d, *flag, spec[11], *fmt = NULL;
-    char **first, *flagch = "0+- #", save, nullstr = '\0';
+    char **first, *curarg, *flagch = "0+- #", save, nullstr = '\0';
     zlong count = 0;
     FILE *fout = stdout;
 
@@ -3095,6 +3096,11 @@ bin_print(char *name, char **args, char *ops, int func)
     /* printf style output */
     *spec='%';
     do {
+    	if (maxarg) {
+	    first += maxarg;
+	    argc -= maxarg;
+    	    maxarg = 0;
+	}
 	for (c = fmt;c-fmt < flen;c++) {
 	    if (*c != '%') {
 		putc(*c, fout);
@@ -3111,11 +3117,29 @@ bin_print(char *name, char **args, char *ops, int func)
 
 	    type = prec = -1;
 	    width = 0;
+	    curarg = NULL;
 	    d = spec + 1;
 
+	    if (*c >= '1' && *c <= '9') {
+	    	narg = strtoul(c, &endptr, 0);
+		if (*endptr == '$') {
+		    c = endptr + 1;
+		    DPUTS(narg <= 0, "specified zero or negative arg");
+		    if (narg > argc) {
+		    	zwarnnam(name, "%d: argument specifier out of range",
+			    0, narg);
+			return 1;
+		    } else {
+		    	if (narg > maxarg) maxarg = narg;
+		    	curarg = *(first + narg - 1);
+		    }
+		}
+	    }
+		    
+	    
 	    /* copy only one of each flag as spec has finite size */
 	    memset(flags, 0, sizeof(flags));
-	    while (flag = strchr(flagch, *c)) {
+	    while ((flag = strchr(flagch, *c))) {
 	    	if (!flags[flag - flagch]) {
 	    	    flags[flag - flagch] = 1;
 		    *d++ = *c;
@@ -3123,28 +3147,60 @@ bin_print(char *name, char **args, char *ops, int func)
 	    	c++;
 	    }
 
-	    if (*c == '*') {
-		if (*args) width = (int)mathevali(*args++);
-		if (errflag) {
-	    	    errflag = 0;
-		    ret = 1;
-		}
-		c++;
-	    } else if (idigit(*c)) {
+	    if (idigit(*c)) {
 		width = strtoul(c, &endptr, 0);
 		c = endptr;
+	    } else if (*c == '*') {
+		if (idigit(*++c)) {
+		    narg = strtoul(c, &endptr, 0);
+		    if (*endptr == '$') {
+		    	c = endptr + 1;
+			if (narg > argc || narg <= 0) {
+		    	    zwarnnam(name,
+			    	"%d: argument specifier out of range",
+				0, narg);
+			    return 1;
+			} else {
+		    	    if (narg > maxarg) maxarg = narg;
+		    	    args = first + narg - 1;
+			}
+		    }
+		}
+		if (*args) {
+		    width = (int)mathevali(*args++);
+		    if (errflag) {
+			errflag = 0;
+			ret = 1;
+		    }
+		}
 	    }
 	    *d++ = '*';
 
 	    if (*c == '.') {
-		c++;
-		if (*c == '*') {
-		    prec = (*args) ? (int)mathevali(*args++) : 0;
-		    if (errflag) {
-	    	    	errflag = 0;
-			ret = 1;
+		if (*++c == '*') {
+		    if (idigit(*++c)) {
+			narg = strtoul(c, &endptr, 0);
+			if (*endptr == '$') {
+			    c = endptr + 1;
+			    if (narg > argc || narg <= 0) {
+		    		zwarnnam(name,
+				    "%d: argument specifier out of range",
+				    0, narg);
+				return 1;
+			    } else {
+		    		if (narg > maxarg) maxarg = narg;
+		    		args = first + narg - 1;
+			    }
+			}
 		    }
-		    c++;
+		    
+		    if (*args) {
+			prec = (int)mathevali(*args++);
+			if (errflag) {
+			    errflag = 0;
+			    ret = 1;
+			}
+		    }
 		} else if (idigit(*c)) {
 		    prec = strtoul(c, &endptr, 0);
 		    c = endptr;
@@ -3155,30 +3211,30 @@ bin_print(char *name, char **args, char *ops, int func)
 	    /* ignore any size modifier */
 	    if (*c == 'l' || *c == 'L' || *c == 'h') c++;
 
+	    if (!curarg && *args) curarg = *args++;
 	    d[1] = '\0';
 	    switch (*d = *c) {
 	    case 'c':
-		if (*args) {
-		    intval = **args;
-		    args++;
+		if (curarg) {
+		    intval = *curarg;
 		} else
 		    intval = 0;
 		print_val(intval);
 		break;
 	    case 's':
-		stringval = *args ? *args++ : &nullstr;
+		stringval = curarg ? curarg : &nullstr;
 		print_val(stringval);
 		break;
 	    case 'b':
-		if (*args) {
+		if (curarg) {
 		    int l;
-		    char *b = getkeystring(*args++, &l, ops['b'] ? 2 : 0, &nnl);
+		    char *b = getkeystring(curarg, &l, ops['b'] ? 2 : 0, &nnl);
 		    fwrite(b, l, 1, fout);
 		    count += l;
 		}
 		break;
 	    case 'q':
-		stringval = *args ? bslashquote(*args++, NULL, 0) : &nullstr;
+		stringval = curarg ? bslashquote(curarg, NULL, 0) : &nullstr;
 		*d = 's';
 		print_val(stringval);
 		break;
@@ -3200,7 +3256,7 @@ bin_print(char *name, char **args, char *ops, int func)
 		type=3;
 		break;
 	    case 'n':
-		if (*args) setiparam(*args++, count);
+		if (curarg) setiparam(curarg, count);
 		break;
 	    default:
 	        if (*c) {
@@ -3208,20 +3264,21 @@ bin_print(char *name, char **args, char *ops, int func)
 	            c[1] = '\0';
 		}
 		zwarnnam(name, "%s: invalid directive", start, 0);
-		ret = 1;
 		if (*c) c[1] = save;
+		if (fout != stdout)
+		    fclose(fout);
+		return 1;
 	    }
 
 	    if (type > 0) {
-		if (*args && (**args == '\'' || **args == '"' )) {
+		if (curarg && (*curarg == '\'' || *curarg == '"' )) {
 		    if (type == 2) {
-			doubleval = (unsigned char)(*args)[1];
+			doubleval = (unsigned char)curarg[1];
 			print_val(doubleval);
 		    } else {
-			intval = (unsigned char)(*args)[1];
+			intval = (unsigned char)curarg[1];
 			print_val(intval);
 		    }
-		    args++;
 		} else {
 		    switch (type) {
 		    case 1:
@@ -3229,7 +3286,7 @@ bin_print(char *name, char **args, char *ops, int func)
  		    	*d++ = 'l';
 #endif
 		    	*d++ = 'l', *d++ = *c, *d = '\0';
-			zlongval = (*args) ? mathevali(*args++) : 0;
+			zlongval = (curarg) ? mathevali(curarg) : 0;
 			if (errflag) {
 			    zlongval = 0;
 			    errflag = 0;
@@ -3238,8 +3295,8 @@ bin_print(char *name, char **args, char *ops, int func)
 			print_val(zlongval)
 			break;
 		    case 2:
-			if (*args) {
-			    mnumval = matheval(*args++);
+			if (curarg) {
+			    mnumval = matheval(curarg);
 			    doubleval = (mnumval.type & MN_FLOAT) ?
 			    	mnumval.u.d : (double)mnumval.u.l;
 			} else doubleval = 0;
@@ -3255,9 +3312,9 @@ bin_print(char *name, char **args, char *ops, int func)
  		    	*d++ = 'l';
 #endif
 		    	*d++ = 'l', *d++ = *c, *d = '\0';
-			zulongval = (*args) ? mathevali(*args++) : 0;
+			zulongval = (curarg) ? mathevali(curarg) : 0;
 			if (errflag) {
-			    doubleval = 0;
+			    zulongval = 0;
 			    errflag = 0;
 			    ret = 1;
 			}
@@ -3265,10 +3322,13 @@ bin_print(char *name, char **args, char *ops, int func)
 		    }
 		}
 	    }
+	    if (maxarg && (args - first > maxarg))
+	    	maxarg = args - first;
 	}
 
+    	if (maxarg) args = first + maxarg;
     /* if there are remaining args, reuse format string */
-    } while (*args && args != first);
+    } while (*args && args != first && !ops['r']);
 
     if (fout != stdout)
 	fclose(fout);

@@ -50,7 +50,9 @@
 0:test b format specifier
 >	\
 
-# test %q here - it doesn't quite work yet
+ printf '%q\n' '=a=b \ c!'
+0: test q format specifier
+>\=a=b\ \\\ c!
 
  printf '%c\n' char
 0:test c format specifier
@@ -108,6 +110,19 @@
 ?(eval):1: bad math expression: operator expected at `a'
 >0
 
+ printf '%12$s' 1 2 3
+1:out of range argument specifier
+?(eval):printf:1: 12: argument specifier out of range
+
+ printf '%2$s\n' 1 2 3
+1:out of range argument specifier on format reuse
+?(eval):printf:1: 2: argument specifier out of range
+>2
+
+ printf '%*0$d'
+1:out of range argument specifier on width
+?(eval):printf:1: 0: argument specifier out of range
+
  print -m -f 'format - %s.\n' 'z' a b c
 0:format not printed if no arguments left after -m removal
 
@@ -129,7 +144,8 @@
 >two	b:0x2%
 >three	c:0x3%
 
- printf '%0+- #-08.5dx\n' 123
+# this should fill spec string with '%0+- #*.*d\0' - 11 characters
+ printf '%1$0+- #-08.5dx\n' 123
 0:maximal length format specification
 >+00123  x
 
@@ -140,3 +156,41 @@
  printf '%.*g\n' -1 .1
 0:negative precision specified
 >0.1
+
+ printf '%2$s %1$d\n' 1 2
+0:specify argument to output explicitly
+>2 1
+
+ printf '%3$.*1$d\n' 4 0 3
+0:specify output and precision arguments explicitly
+>0003
+
+ printf '%2$d%1$d\n' 1 2 3 4
+0:reuse format where arguments are explictly specified
+>21
+>43
+
+ printf '%1$*2$d' 1 2 3 4 5 6 7 8 9 10;echo
+0:reuse of specified arguments 
+> 1   3     5       7         9
+
+ printf '%1$0+.3d\n' 3
+0:flags mixed with specified argument
+>+003
+
+# The following usage, as stated in the manual, is not recommended and the
+# results are undefined. Tests are here anyway to ensure some form of
+# half-sane behaviour.
+
+ printf '%2$s %s %3$s\n' Morning Good World
+0:mixed style of argument selection
+>Good Morning World
+
+ printf '%*1$.*d\n' 1 2
+0:argument specified for width only
+>00
+
+ print -f '%*.*1$d\n' 1 2 3
+0:argument specified for precision only
+>2
+>000

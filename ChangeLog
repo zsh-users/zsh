@@ -1,3 +1,8 @@
+2001-10-18  Oliver Kiddle  <opk@zsh.org>
+
+	* 16080: Src/builtin.c, Doc/Zsh/builtins.yo, Test/B03print.ztst:
+	allow arguments to be specified in printf format specifications
+
 2001-10-17  Clint Adams  <clint@zsh.org>
 
 	* 16078: Completion/Unix/Command/_zip:
