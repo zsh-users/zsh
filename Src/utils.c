@@ -407,6 +407,15 @@ fprintdir(char *s, FILE *f)
     }
 }
 
+/* Returns the current username.  It caches the username *
+ * and uid to try to avoid requerying the password files *
+ * or NIS/NIS+ database.                                 */
+
+/**/
+uid_t cached_uid;
+/**/
+char *cached_username;
+
 /**/
 char *
 get_username(void)
