@@ -1,5 +1,6 @@
 #!/usr/bin/perl
 
+use strict;
 use IO::File;
 
 my @differ = qw(diff -bw);
@@ -9,6 +10,8 @@ my $newtmp = "/tmp/difflog$$.new";
 my $newfn = pop(@ARGV);
 my $oldfn = pop(@ARGV);
 my (%oldhash, %newhash);
+
+my $article = q[(:?(:?workers?|users?)/)?\d{4,5}];
 
 read_file($newfn, \%newhash);
 read_file($oldfn, \%oldhash);
@@ -68,6 +71,38 @@ while ($new < @newentries)
   printf("only in %s: %s\n", $newfn, $newentries[$new++]);
 }
 
+sub append_entry
+{
+  my ($hashref, $entry, $tag, $block) = @_;
+
+  if (exists($hashref->{$entry})) {
+    $hashref->{$entry} .= "$tag\n$block";
+  } else {
+    $hashref->{$entry} = '';
+    if (defined($tag) || defined($block)) {
+      $hashref->{$entry} .= "$tag\n$block";
+    }
+  }
+}
+
+sub make_entries
+{
+  my ($hashref, $entry, $tag, $block) = @_;
+
+  if ($entry =~ s/($article)/ARTICLE/) {
+    my $key = $1;
+    $key =~ s:workers?/::;
+    &append_entry($hashref, $key, $tag, $block);
+    while ($entry =~ s/($article)/ARTICLE/) {
+      $key = $1;
+      $key =~ s:workers?/::;
+      &append_entry($hashref, $key, $tag, $block);
+    }
+  } else {
+    &append_entry($hashref, $entry, $tag, $block);
+  }
+}
+
 sub read_file
 {
   my $fn = shift;
@@ -75,9 +110,8 @@ sub read_file
   my $fh = new IO::File($fn, 'r');
   my ($tag, $date, $entry, $block);
 
-  my $attrib = q[(:?(:?workers?|users?)/)?\d+];
-  $attrib = q[(?:\w+\s+)*] . $attrib;
-  $attrib = q[(?:[^/]*\D:\s*)?] . $attrib;
+  my $attrib = q[(?:\w+\s+)*] . $article;
+  $attrib = q[(?:[^/]*\D[:,]\s*)?] . $attrib;
   $attrib = qq[(?:unposted|$attrib)];
   $attrib = qq[(?:(?:$attrib,\\s*)*$attrib)];
 
@@ -89,7 +123,7 @@ sub read_file
       $date = $1;
       $block =~ s/\n*\Z/\n/;
       if ($entry) {
-	$hashref->{$entry} .= "$tag\n$block";
+	&make_entries($hashref, $entry, $tag, $block);
       } elsif ($tag) {
 	$hashref->{unattributed} .= "\n$tag$block";
       }
@@ -99,13 +133,9 @@ sub read_file
       my $next = $1;
       if ($entry) {
 	$block =~ s/\n*\Z/\n/;
-	$hashref->{$entry} .= "$tag\n$block";
+	&make_entries($hashref, $entry, $tag, $block);
       }
-      if (exists($hashref->{$next})) {
-	$hashref->{$next} .= "\n";
-      } else {
-	$hashref->{$next} = '';
-      }
+      &make_entries($hashref, $next);
       $entry = $next;
       $block = $line;
     } else {
