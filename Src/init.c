@@ -944,7 +944,7 @@ source(char *s)
 	execode(prog, 1, 0);
 	popheap();
     } else
-	loop(0, 0);		     /* loop through the file to be sourced        */
+	loop(0, 0);		     /* loop through the file to be sourced  */
     sourcelevel--;
 
     /* restore the current shell state */

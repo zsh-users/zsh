@@ -459,6 +459,7 @@ par_event(void)
 	}
     }
     if (!r) {
+	tok = LEXERR;
 	if (errflag) {
 	    yyerror(0);
 	    ecused--;
@@ -491,10 +492,8 @@ parse_list(void)
     yylex();
     init_parse();
     par_list(&c);
-#if 0 
-   if (tok == LEXERR)
-#endif
-   if (tok != ENDINPUT) {
+    if (tok != ENDINPUT) {
+	tok = LEXERR;
 	yyerror(0);
 	return NULL;
     }

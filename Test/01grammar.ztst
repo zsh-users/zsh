@@ -50,9 +50,8 @@
 #
 # Tests for `Precommand Modifiers'
 #
-  - sh -c 'echo $0'
+  - $ZTST_testdir/../Src/zsh -fc "[[ \$0 = \"-$ZTST_testdir/../Src/zsh\" ]]"
 0:`-' precommand modifier
->-sh
 
   echo f*
   noglob echo f*
@@ -106,6 +105,12 @@
   fi
 0:`if ...' (iii)
 >false
+
+  if true;
+    :
+  fi
+1d:`if ...' (iv)
+?ZTST_execchunk:-1: parse error near `fi'
 
   for name in word to term; do
     print $name
