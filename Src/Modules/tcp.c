@@ -461,7 +461,7 @@ bin_ztcp(char *nam, char **args, char *ops, int func)
 	setiparam("REPLY", sess->fd);
 
 	if (verbose)
-	    fprintf(shout, "%d listener is on fd %d\n", ntohs(sess->sock.in.sin_port), sess->fd);
+	    printf("%d listener is on fd %d\n", ntohs(sess->sock.in.sin_port), sess->fd);
 
 	return 0;
 
@@ -553,7 +553,7 @@ bin_ztcp(char *nam, char **args, char *ops, int func)
 	setiparam("REPLY", sess->fd);
 
 	if (verbose)
-	    fprintf(shout, "%d is on fd %d\n", ntohs(sess->peer.in.sin_port), sess->fd);
+	    printf("%d is on fd %d\n", ntohs(sess->peer.in.sin_port), sess->fd);
     }
     else
     {
@@ -575,7 +575,7 @@ bin_ztcp(char *nam, char **args, char *ops, int func)
 			remotename = ztpeer->h_name;
 		    else
 			remotename = ztrdup(inet_ntoa(sess->peer.in.sin_addr));
-		    fprintf(shout, "%s:%d %s %s:%d is on fd %d%s\n",
+		    printf("%s:%d %s %s:%d is on fd %d%s\n",
 			    localname, ntohs(sess->sock.in.sin_port),
 			    ((sess->flags & ZTCP_LISTEN) ? "-<" :
 			     ((sess->flags & ZTCP_INBOUND) ? "<-" : "->")),
@@ -649,7 +649,7 @@ bin_ztcp(char *nam, char **args, char *ops, int func)
 	    setiparam("REPLY", sess->fd);
 
 	    if (verbose)
-		fprintf(shout, "%s:%d is now on fd %d\n",
+		printf("%s:%d is now on fd %d\n",
 			desthost, destport, sess->fd);
 	}
 	
