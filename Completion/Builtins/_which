@@ -1,3 +1,37 @@
-#defcomp which whence where type
+#compdef which whence where type
 
-complist -caF
+local farg aarg cargs args state line curcontext="$curcontext"
+
+cargs=( \
+  '(-v -c)-w[print command type]' \
+  '-p[always do a path search]' \
+  '-m[treat the arguments as patterns]' \
+  '-s[print symlink free path as well]' \
+  '*:commands:->command' )
+farg='-f[output contents of functions]'
+aarg='-a[print all occurences in path]'
+
+case ${words[1]} in
+  whence)
+    _arguments -C -s \
+      '(-c -w)-v[verbose output]' \
+      '(-v -w)-c[csh-like output]' \
+      "${cargs[@]}" "$farg" "$aarg" && return 0
+  ;;
+  where) _arguments -C -s "${cargs[@]}" && return 0;;
+  which) _arguments -C -s "${cargs[@]}" "$aarg" && return 0;;
+  type) _arguments -C -s "${cargs[@]}" "$aarg" "$farg" && return 0;;
+esac
+
+if [[ "$state" = command ]]; then
+
+  args=( "$@" )
+
+  _alternative -O args \
+    'commands:external command:compadd - ${(k@)commands}' \
+    'builtins:builtin command:compadd - ${(k@)builtins}' \
+    'functions:shell function:compadd - ${(k@)functions}' \
+    'aliases:alias:compadd - ${(k@)aliases}' \
+    'reserved-words:reserved word:compadd - ${(k@)reswords}'
+
+fi

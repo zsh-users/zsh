@@ -1,6 +1,14 @@
-#defcomp unhash
+#compdef unhash
 
-[[ -mword 1 -*d* ]] && complist -n
-[[ -mword 1 -*a* ]] && complist -a
-[[ -mword 1 -*f* ]] && complist -F
-[[ ! -mword 1 -* ]] && complist -m
+local expl state line curcontext="$curcontext"
+
+_arguments -C -s \
+  '(-a -f *)-d[remove named directories]:*:named directory:->nameddir' \
+  '(-d -f *)-a[remove aliases]:*:aliases:_aliases' \
+  '(-d -a *)-f[remove functions]:*:functions:_functions' \
+  '-m[treat arguments as patterns]' \
+  '*:commands:_command_names -e'  && return 0
+
+if [[ "$state" = nameddir ]]; then
+  _wanted nameddir expl 'named directory' compadd - ${(@k)nameddirs}
+fi

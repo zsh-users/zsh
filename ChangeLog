@@ -1,3 +1,8 @@
+2000-05-28  Oliver Kiddle  <opk@zsh.org>
+
+	* 11615: Completion/Builtins/_which, Completion/Builtins/_unhash:
+	use of _arguments for completion of a couple more builtins
+
 2000-05-27  Bart Schaefer  <schaefer@zsh.org>
 
 	* 11606: Src/parse.c, Test/01grammar.ztst: Propagate parse errors
@@ -31,7 +36,7 @@
 2000-05-25  Oliver Kiddle  <opk@u.genie.co.uk>
 
 	* 11579: Completion/Builtins/_compdef, Completion/Builtins/_zpty:
-	Split _arguments calls into sets to avoid long mutex lists
+	split _arguments calls into sets to avoid long mutex lists
 
 2000-05-25  Sven Wischnowsky  <wischnow@zsh.org>
 
@@ -760,7 +765,7 @@
 
 	* 11184: Completion/User/.distfiles, Completion/User/_bzip2,
 	Completion/User/_compress, Completion/User/_lzop,
-	Completion/User/_pack, Completion/User/_zcat: Use one function for
+	Completion/User/_pack, Completion/User/_zcat: use one function for
 	each of compress/uncompress and pack/unpack and new lzop completion
 
 2000-05-05  Sven Wischnowsky  <wischnow@informatik.hu-berlin.de>
@@ -951,7 +956,7 @@
 2000-05-01  Oliver Kiddle  <opk@zsh.org>
 
 	* 11041: Completion/User/.distfiles, Completion/User/_bzip2:
-	Use of _arguments for bzip2 completion
+	use of _arguments for bzip2 completion
 
 	* 11037: Etc/MACHINES, Etc/NEWS, Etc/completion-style-guide,
 	Etc/zsh-development-guide: spelling corrections
