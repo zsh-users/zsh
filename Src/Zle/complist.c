@@ -1458,7 +1458,7 @@ complistmatches(Hookdef dummy, Chdata dat)
 	amatches = oamatches;
 	return 1;
     }
-    if (inselect)
+    if (inselect || mlbeg >= 0)
 	clearflag = 0;
 
     mscroll = 0;
@@ -1571,7 +1571,7 @@ domenuselect(Hookdef dummy, Chdata dat)
     Thingy cmd;
     Menustack u = NULL;
     int i = 0, acc = 0, wishcol = 0, setwish = 0, oe = onlyexpl, wasnext = 0;
-    int space, lbeg = 0, step = 1;
+    int space, lbeg = 0, step = 1, wrap;
     char *s;
 
     if (fdat || (dummy && (!(s = getsparam("MENUSELECT")) ||
@@ -1809,10 +1809,15 @@ domenuselect(Hookdef dummy, Chdata dat)
 		   cmd == Th(z_downlineorhistory) ||
 		   cmd == Th(z_downlineorsearch) ||
 		   cmd == Th(z_vidownlineorhistory)) {
+	    wrap = 0;
+
+	down:
+
 	    do {
 		if (mline == mlines - 1) {
 		    p -= mline * mcols;
 		    mline = 0;
+		    wrap |= 1;
 		} else {
 		    mline++;
 		    p += mcols;
@@ -1820,14 +1825,22 @@ domenuselect(Hookdef dummy, Chdata dat)
 		if (adjust_mcol(wishcol, &p, NULL))
 		    continue;
 	    } while (!*p);
+
+	    if (wrap == 1)
+		goto right;
 	} else if (cmd == Th(z_uphistory) ||
 		   cmd == Th(z_uplineorhistory) ||
 		   cmd == Th(z_uplineorsearch) ||
 		   cmd == Th(z_viuplineorhistory)) {
+	    wrap = 0;
+
+	up:
+
 	    do {
 		if (!mline) {
 		    mline = mlines - 1;
 		    p += mline * mcols;
+		    wrap |= 1;
 		} else {
 		    mline--;
 		    p -= mcols;
@@ -1835,6 +1848,9 @@ domenuselect(Hookdef dummy, Chdata dat)
 		if (adjust_mcol(wishcol, &p, NULL))
 		    continue;
 	    } while (!*p);
+
+	    if (wrap == 1)
+		goto left;
 	} else if (cmd == Th(z_emacsforwardword) ||
 		   cmd == Th(z_viforwardword) ||
 		   cmd == Th(z_viforwardwordend) ||
@@ -1893,7 +1909,9 @@ domenuselect(Hookdef dummy, Chdata dat)
 	} else if (cmd == Th(z_beginningofhistory)) {
 	    int ll;
 	    Cmatch **lp;
+
 	top:
+
 	    ll = mline;
 	    lp = p;
 	    while (mline) {
@@ -1911,7 +1929,9 @@ domenuselect(Hookdef dummy, Chdata dat)
 	} else if (cmd == Th(z_endofhistory)) {
 	    int ll;
 	    Cmatch **lp;
+
 	bottom:
+
 	    ll = mline;
 	    lp = p;
 	    while (mline < mlines - 1) {
@@ -1927,33 +1947,55 @@ domenuselect(Hookdef dummy, Chdata dat)
 	    mline = ll;
 	    p = lp;
 	} else if (cmd == Th(z_forwardchar) || cmd == Th(z_viforwardchar)) {
-	    int omcol = mcol;
-	    Cmatch *op = *p;
+	    int omcol;
+	    Cmatch *op;
+
+	    wrap = 0;
+
+	right:
+
+	    omcol = mcol;
+	    op = *p;
 
 	    do {
 		if (mcol == mcols - 1) {
 		    p -= mcol;
 		    mcol = 0;
+		    wrap |= 2;
 		} else {
 		    mcol++;
 		    p++;
 		}
 	    } while (!*p || (mcol != omcol && *p == op));
 	    wishcol = mcol;
+
+	    if (wrap == 2)
+		goto down;
 	} else if (cmd == Th(z_backwardchar) || cmd == Th(z_vibackwardchar)) {
-	    int omcol = mcol;
-	    Cmatch *op = *p;
+	    int omcol;
+	    Cmatch *op;
+
+	    wrap = 0;
+
+	left:
+
+	    omcol = mcol;
+	    op = *p;
 
 	    do {
 		if (!mcol) {
 		    mcol = mcols - 1;
 		    p += mcol;
+		    wrap |= 2;
 		} else {
 		    mcol--;
 		    p--;
 		}
 	    } while (!*p || (mcol != omcol && *p == op));
 	    wishcol = mcol;
+
+	    if (wrap == 2)
+		goto up;
 	} else if (cmd == Th(z_beginningofbufferorhistory) ||
 		   cmd == Th(z_beginningofline) ||
 		   cmd == Th(z_beginningoflinehist) ||
