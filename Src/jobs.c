@@ -43,12 +43,12 @@ mod_export int thisjob;
 /* the current job (+) */
  
 /**/
-int curjob;
+mod_export int curjob;
  
 /* the previous job (-) */
  
 /**/
-int prevjob;
+mod_export int prevjob;
  
 /* the job table */
  
@@ -72,6 +72,9 @@ int ttyfrozen;
 int prev_errflag, prev_breaks, errbrk_saved;
 
 static struct timeval dtimeval, now;
+
+/**/
+int numpipestats, pipestats[MAX_PIPESTATS];
 
 /* Diff two timevals for elapsed-time computations */
 
@@ -346,6 +349,18 @@ update_job(Job jn)
 	return;
     jn->stat |= (somestopped) ? STAT_CHANGED | STAT_STOPPED :
 	STAT_CHANGED | STAT_DONE;
+    if (job == thisjob && (jn->stat & STAT_DONE)) {
+	int i;
+	Process p;
+
+	for (p = jn->procs, i = 0; p && i < MAX_PIPESTATS; p = p->next, i++)
+	    pipestats[i] = ((WIFSIGNALED(p->status)) ?
+			    0200 | WTERMSIG(p->status) :
+			    WEXITSTATUS(p->status));
+	if ((jn->stat & STAT_CURSH) && i < MAX_PIPESTATS)
+	    pipestats[i++] = lastval;
+	numpipestats = i;
+    }
     if (!inforeground &&
 	(jn->stat & (STAT_SUBJOB | STAT_DONE)) == (STAT_SUBJOB | STAT_DONE)) {
 	int su;
@@ -482,6 +497,7 @@ printtime(struct timeval *real, struct timeinfo *ti, char *desc)
     percent      =  100.0 * (ti->ut + ti->st)
 	/ (clktck * real->tv_sec + clktck * real->tv_usec / 1000000.0);
 
+    queue_signals();
     if (!(s = getsparam("TIMEFMT")))
 	s = DEFAULT_TIMEFMT;
 
@@ -531,6 +547,7 @@ printtime(struct timeval *real, struct timeinfo *ti, char *desc)
 		break;
 	} else
 	    putc(*s, stderr);
+    unqueue_signals();
     putc('\n', stderr);
     fflush(stderr);
 }
@@ -565,10 +582,13 @@ should_report_time(Job j)
     if (j->stat & STAT_TIMED)
 	return 1;
 
+    queue_signals();
     if (!(v = getvalue(&vbuf, &s, 0)) ||
 	(reporttime = getintvalue(v)) < 0) {
+	unqueue_signals();
 	return 0;
     }
+    unqueue_signals();
     /* can this ever happen? */
     if (!j->procs)
 	return 0;
@@ -719,7 +739,7 @@ printjob(Job jn, int lng, int synch)
     if ((lng & 4) || (interact && job == thisjob &&
 		      jn->pwd && strcmp(jn->pwd, pwd))) {
 	fprintf(shout, "(pwd %s: ", (lng & 4) ? "" : "now");
-	fprintdir((lng & 4) ? jn->pwd : pwd, shout);
+	fprintdir(((lng & 4) && jn->pwd) ? jn->pwd : pwd, shout);
 	fprintf(shout, ")\n");
 	fflush(shout);
     }
@@ -853,9 +873,10 @@ havefiles(void)
 void
 waitforpid(pid_t pid)
 {
-    int first = 1;
+    int first = 1, q = queue_signal_level();
 
     /* child_block() around this loop in case #ifndef WNOHANG */
+    dont_queue_signals();
     child_block();		/* unblocked in child_suspend() */
     while (!errflag && (kill(pid, 0) >= 0 || errno != ESRCH)) {
 	if (first)
@@ -867,16 +888,19 @@ waitforpid(pid_t pid)
 	child_block();
     }
     child_unblock();
+    restore_queue_signals(q);
 }
 
 /* wait for a job to finish */
 
 /**/
 static void
-waitjob(int job, int sig)
+zwaitjob(int job, int sig)
 {
+    int q = queue_signal_level();
     Job jn = jobtab + job;
 
+    dont_queue_signals();
     child_block();		 /* unblocked during child_suspend() */
     if (jn->procs) {		 /* if any forks were done         */
 	jn->stat |= STAT_LOCKED;
@@ -901,9 +925,13 @@ waitjob(int job, int sig)
 		    break;
 	    child_block();
 	}
-    } else
+    } else {
 	deletejob(jn);
+	pipestats[0] = lastval;
+	numpipestats = 1;
+    }
     child_unblock();
+    restore_queue_signals(q);
 }
 
 /* wait for running job to finish */
@@ -915,9 +943,12 @@ waitjobs(void)
     Job jn = jobtab + thisjob;
 
     if (jn->procs)
-	waitjob(thisjob, 0);
-    else
+	zwaitjob(thisjob, 0);
+    else {
 	deletejob(jn);
+	pipestats[0] = lastval;
+	numpipestats = 1;
+    }
     thisjob = -1;
 }
 
@@ -930,8 +961,12 @@ clearjobtab(void)
     int i;
 
     for (i = 1; i < MAXJOB; i++)
+    {
 	if (jobtab[i].ty)
 	    zfree(jobtab[i].ty, sizeof(struct ttyinfo));
+	if (jobtab[i].pwd)
+	    zsfree(jobtab[i].pwd);
+    }
 
     memset(jobtab, 0, sizeof(jobtab)); /* zero out table */
 }
@@ -947,8 +982,10 @@ initjob(void)
     for (i = 1; i < MAXJOB; i++)
 	if (!jobtab[i].stat) {
 	    jobtab[i].stat = STAT_INUSE;
-	    if (jobtab[i].pwd)
+	    if (jobtab[i].pwd) {
 		zsfree(jobtab[i].pwd);
+		jobtab[i].pwd = NULL;
+	    }
 	    jobtab[i].gleader = 0;
 	    return i;
 	}
@@ -961,15 +998,11 @@ initjob(void)
 void
 setjobpwd(void)
 {
-    int i, l;
+    int i;
 
     for (i = 1; i < MAXJOB; i++)
-	if (jobtab[i].stat && !jobtab[i].pwd) {
-	    if ((l = strlen(pwd)) >= PATH_MAX)
-		jobtab[i].pwd = ztrdup(pwd + l - PATH_MAX);
-	    else
-		jobtab[i].pwd = ztrdup(pwd);
-	}
+	if (jobtab[i].stat && !jobtab[i].pwd)
+	    jobtab[i].pwd = ztrdup(pwd);
 }
 
 /* print pids for & */
@@ -1201,11 +1234,13 @@ bin_fg(char *name, char **argv, char *ops, int func)
 	    zwarnnam(name, "-Z requires one argument", NULL, 0);
 	    return 1;
 	}
+	queue_signals();
 	unmetafy(*argv, &len);
 	if(len > hackspace)
 	    len = hackspace;
 	memcpy(hackzero, *argv, len);
 	memset(hackzero + len, 0, hackspace - len);
+	unqueue_signals();
 	return 0;
     }
 
@@ -1219,6 +1254,7 @@ bin_fg(char *name, char **argv, char *ops, int func)
 	return 1;
     }
 
+    queue_signals();
     /* If necessary, update job table. */
     if (unset(NOTIFY))
 	scanjobs();
@@ -1238,6 +1274,7 @@ bin_fg(char *name, char **argv, char *ops, int func)
 	    point or else. */
 	    if (curjob == -1 || (jobtab[curjob].stat & STAT_NOPRINT)) {
 		zwarnnam(name, "no current job", NULL, 0);
+		unqueue_signals();
 		return 1;
 	    }
 	    firstjob = curjob;
@@ -1251,11 +1288,13 @@ bin_fg(char *name, char **argv, char *ops, int func)
 			(ops['s'] && jobtab[job].stat & STAT_STOPPED))
 			printjob(job + jobtab, lng, 2);
 		}
+	    unqueue_signals();
 	    return 0;
 	} else {   /* Must be BIN_WAIT, so wait for all jobs */
 	    for (job = 0; job != MAXJOB; job++)
 		if (job != thisjob && jobtab[job].stat)
-		    waitjob(job, SIGINT);
+		    zwaitjob(job, SIGINT);
+	    unqueue_signals();
 	    return 0;
 	}
     }
@@ -1268,7 +1307,14 @@ bin_fg(char *name, char **argv, char *ops, int func)
 
 	if (func == BIN_WAIT && isanum(*argv)) {
 	    /* wait can take a pid; the others can't. */
-	    waitforpid((long)atoi(*argv));
+	    pid_t pid = (long)atoi(*argv);
+	    Job j;
+	    Process p;
+
+	    if (findproc(pid, &j, &p))
+		waitforpid(pid);
+	    else
+		zwarnnam(name, "pid %d is not a child of this shell", 0, pid);
 	    retval = lastval2;
 	    thisjob = ocj;
 	    continue;
@@ -1283,6 +1329,7 @@ bin_fg(char *name, char **argv, char *ops, int func)
 	if (!(jobtab[job].stat & STAT_INUSE) ||
 	    (jobtab[job].stat & STAT_NOPRINT)) {
 	    zwarnnam(name, "no such job: %d", 0, job);
+	    unqueue_signals();
 	    return 1;
 	}
 	/* We have a job number.  Now decide what to do with it. */
@@ -1298,6 +1345,7 @@ bin_fg(char *name, char **argv, char *ops, int func)
 		/* Silly to bg a job already running. */
 		zwarnnam(name, "job already in background", NULL, 0);
 		thisjob = ocj;
+		unqueue_signals();
 		return 1;
 	    }
 	    /* It's time to shuffle the jobs around!  Reset the current job,
@@ -1340,7 +1388,7 @@ bin_fg(char *name, char **argv, char *ops, int func)
 		killjb(jobtab + job, SIGCONT);
 	    }
 	    if (func == BIN_WAIT)
-	        waitjob(job, SIGINT);
+		zwaitjob(job, SIGINT);
 	    if (func != BIN_BG) {
 		waitjobs();
 		retval = lastval2;
@@ -1350,11 +1398,20 @@ bin_fg(char *name, char **argv, char *ops, int func)
 	    printjob(job + jobtab, lng, 2);
 	    break;
 	case BIN_DISOWN:
+	    if (jobtab[job].stat & STAT_STOPPED)
+                zwarnnam(name,
+#ifdef USE_SUSPENDED
+                         "warning: job is suspended",
+#else
+                         "warning: job is stopped",
+#endif
+                         NULL, 0);
 	    deletejob(jobtab + job);
 	    break;
 	}
 	thisjob = ocj;
     }
+    unqueue_signals();
     return retval;
 }
 
@@ -1437,6 +1494,7 @@ bin_kill(char *nam, char **argv, char *ops, int func)
 	argv++;
     }
 
+    queue_signals();
     setcurjob();
 
     /* Remaining arguments specify processes.  Loop over them, and send the
@@ -1473,6 +1531,8 @@ bin_kill(char *nam, char **argv, char *ops, int func)
 	    returnval++;
 	}
     }
+    unqueue_signals();
+
     return returnval < 126 ? returnval : 1;
 }
 

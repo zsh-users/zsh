@@ -119,7 +119,10 @@ setstypat(Style s, char *pat, Patprog prog, char **vals, int eval)
 	errflag = ef;
 
 	if (!eprog)
+	{
+	    freepatprog(prog);
 	    return 1;
+	}
 
 	eprog = dupeprog(eprog, 0);
     }
@@ -134,6 +137,7 @@ setstypat(Style s, char *pat, Patprog prog, char **vals, int eval)
 		freeeprog(p->eval);
 	    p->vals = zarrdup(vals);
 	    p->eval = eprog;
+	    freepatprog(prog);
 
 	    return 0;
 	}

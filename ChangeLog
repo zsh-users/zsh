@@ -1,3 +1,11 @@
+2002-08-08  Peter Stephenson  <pws@csr.com>
+
+	* 17517: Src/jobs.c: Another memory leak was showing up with the
+	pwd field of the job structure, this attempts to rationalise it. 
+
+	* 17516: Src/Modules/zutil.c: Memory leak with compiled patterns
+	for zstyle shown up by Felix's valgrind test.
+
 2002-08-07  Clint Adams  <clint@zsh.org>
 
 	* 17509 &a., Completion/Unix/Command/_lynx: merge various changes from
