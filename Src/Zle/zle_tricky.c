@@ -7957,7 +7957,7 @@ unambig_data(int *cp)
 	    scache = cline_str((ainfo->count ? ainfo->line : fainfo->line),
 			       0, &ccache);
 	}
-    } else {
+    } else if (mnum != unambig_mnum || !ainfo || !scache) {
 	zsfree(scache);
 	scache = ztrdup("");
 	ccache = 0;
