@@ -308,13 +308,14 @@ struct cline {
     int min, max;
 };
 
-#define CLF_MISS  1
-#define CLF_DIFF  2
-#define CLF_SUF   4
-#define CLF_MID   8
-#define CLF_NEW  16
-#define CLF_LINE 32
-#define CLF_JOIN 64
+#define CLF_MISS      1
+#define CLF_DIFF      2
+#define CLF_SUF       4
+#define CLF_MID       8
+#define CLF_NEW      16
+#define CLF_LINE     32
+#define CLF_JOIN     64
+#define CLF_MATCHED 128
 
 /* A heap of free Cline structures. */
 
@@ -2079,6 +2080,20 @@ cline_setlens(Cline l, int both)
     }
 }
 
+/* This sets the CLF_MATCHED flag in the given clines. */
+
+static void
+cline_matched(Cline p)
+{
+    while (p) {
+	p->flags |= CLF_MATCHED;
+	cline_matched(p->prefix);
+	cline_matched(p->suffix);
+
+	p = p->next;
+    }
+}
+
 /* This reverts the order of the elements of the given cline list and
  * returns a pointer to the new head. */
 
@@ -3734,6 +3749,8 @@ add_match_data(int alt, char *str, Cline line,
 
     DPUTS(!line, "BUG: add_match_data() without cline");
 
+    cline_matched(line);
+
     /* If there is a path suffix, we build a cline list for it and
      * append it to the list for the match itself. */
     if (psuf)
@@ -3769,6 +3786,7 @@ add_match_data(int alt, char *str, Cline line,
 		    s->prefix = p->prefix;
 		    p->prefix = NULL;
 		}
+		s->flags |= (p->flags & CLF_MATCHED);
 		free_cline(p);
 		if (pp)
 		    pp->next = s;
@@ -7764,13 +7782,13 @@ static char *
 cline_str(Cline l, int ins, int *csp)
 {
     Cline s;
-    int ocs = cs, ncs, pcs, pm, pmax, sm, smax, d, b, i, j, li = 0;
-    int pl, sl, hasp, hass, ppos, spos, plen, slen;
+    int ocs = cs, ncs, pcs, pm, pmax, pmm, sm, smax, smm, d, dm, mid;
+    int pl, sl, hasp, hass, ppos, spos, plen, slen, i, j, li = 0;
 
     l = cut_cline(l);
 
-    ppos = spos = plen = slen = hasp = hass = 0;
-    pm = pmax = sm = smax = d = b = pl = sl = -1;
+    pmm = smm = dm = ppos = spos = plen = slen = hasp = hass = 0;
+    pm = pmax = sm = smax = d = mid = pl = sl = -1;
 
     /* Get the information about the brace beginning and end we have
      * to re-insert. */
@@ -7817,8 +7835,9 @@ cline_str(Cline l, int ins, int *csp)
 		    inststrlen(s->line, 1, s->llen);
 		else
 		    inststrlen(s->word, 1, s->wlen);
-		if (s->flags & CLF_DIFF)
-		    d = cs;
+		if ((s->flags & CLF_DIFF) && (!dm || (s->flags & CLF_MATCHED))) {
+		    d = cs; dm = s->flags & CLF_MATCHED;
+		}
 		if (ins) {
 		    li += s->llen;
 		    if (pl >= 0 && li >= pl) {
@@ -7833,8 +7852,9 @@ cline_str(Cline l, int ins, int *csp)
 	/* Remember the position if this is the first prefix with
 	 * missing characters. */
 	if ((l->flags & CLF_MISS) && !(l->flags & CLF_SUF) &&
-	    (pmax < (l->min - l->max))) {
-	    pm = cs; pmax = l->min - l->max;
+	    ((pmax < (l->min - l->max) && (!pmm || (l->flags & CLF_MATCHED))) ||
+	     ((l->flags & CLF_MATCHED) && !pmm))) {
+	    pm = cs; pmax = l->min - l->max; pmm = l->flags & CLF_MATCHED;
 	}
 	pcs = cs;
 	/* Insert the anchor. */
@@ -7854,9 +7874,12 @@ cline_str(Cline l, int ins, int *csp)
 	/* Remember the cursor position for suffixes and mids. */
 	if (l->flags & CLF_MISS) {
 	    if (l->flags & CLF_MID)
-		b = cs;
-	    else if ((l->flags & CLF_SUF) && smax < (l->min - l->max)) {
-		sm = cs; smax = l->min - l->max;
+		mid = cs;
+	    else if ((l->flags & CLF_SUF) && 
+		     ((smax < (l->min - l->max) &&
+		       (!smm || (l->flags & CLF_MATCHED))) ||
+		      ((l->flags & CLF_MATCHED) && !smm))) {
+		sm = cs; smax = l->min - l->max; smm = l->flags & CLF_MATCHED;
 	    }
 	}
 	/* And now insert the suffix or the original string. */
@@ -7901,8 +7924,9 @@ cline_str(Cline l, int ins, int *csp)
 	    if (hs)
 		spos += i;
 	    cs += i;
-	    if (j >= 0)
-		d = cs - j;
+	    if (j >= 0 && (!dm || (js->flags & CLF_MATCHED))) {
+		d = cs - j; dm = js->flags & CLF_MATCHED;
+	    }
 	}
 	/* If we reached the right positions, re-insert the braces. */
 	if (ins) {
@@ -7932,7 +7956,7 @@ cline_str(Cline l, int ins, int *csp)
      * with missing characters, we take this, otherwise if we have a
      * prefix with missing characters, we take that, the same for a
      * suffix, and finally a place where the matches differ. */
-    ncs = (b >= 0 ? b : (pm >= 0 ? pm : (sm >= 0 ? sm : (d >= 0 ? d : cs))));
+    ncs = (mid >= 0 ? mid : (pm >= 0 ? pm : (sm >= 0 ? sm : (d >= 0 ? d : cs))));
 
     if (!ins) {
 	/* We always inserted the string in the line. If that was not
