@@ -22,6 +22,11 @@
 
 	* 14416: Completion/Base/Core/_tags: include + options for tag order
 
+2001-05-21  Bart Schaefer  <schaefer@zsh.org>
+
+	* 14411: Test/C02cond.ztst: Move chmod from 14408 into the %clean
+	section so the right exit status is tested in the unmodish test.
+
 2001-05-21  Clint Adams  <clint@zsh.org>
 
 	* unposted: Completion/Unix/Type/_diff_options: quote $@
