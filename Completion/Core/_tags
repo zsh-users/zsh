@@ -1,7 +1,7 @@
 #autoload
 
 if (( $# )); then
-  local cmd="$words[1]" func="$funcstack[2]" defs i tags tag pat style prio
+  local cmd="$words[1]" func="$funcstack[2]" defs i ttags tag pat style prio
   local trynow
 
   while getopts 'c:f:i' i; do
@@ -38,7 +38,7 @@ if (( $# )); then
     defs=( "$defs[@]" "$prio[@]" )
   done
 
-  tags=()
+  ttags=()
   for i in "$defs[@]"; do
     tag="${i%%:*}"
     for pat in "${(s.:.)i#*:}"; do
@@ -58,7 +58,7 @@ if (( $# )); then
 
 	(( prio++ ))
 
-        tags[$prio]="${tags[$prio]}:${tag}${style}"
+        ttags[$prio]="${ttags[$prio]}:${tag}${style}"
         break
       fi
     done
@@ -66,7 +66,7 @@ if (( $# )); then
 
   prio="_prio_arr$(( _prio_num++ ))"
   _prio_names[$funcstack]="$prio"
-  eval "${prio}=( \"\${(@)tags:#}\" )"
+  eval "${prio}=( \"\${(@)ttags:#}\" )"
 
   [[ -z "$trynow" ]] && return 0
 fi
