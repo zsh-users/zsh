@@ -547,6 +547,18 @@ setupvals(void)
 #ifdef HAVE_GETRLIMIT
     int i;
 #endif
+#if defined(SITEFPATH_DIR) || defined(FPATH_DIR)
+    char **fpathptr;
+# if defined(FPATH_DIR) && defined(FPATH_SUBDIRS)
+    char *fpath_subdirs[] = FPATH_SUBDIRS;
+    int j;
+# endif
+# ifdef SITEPATH_DIR
+    int fpathlen = 1;
+# else
+    int fpathlen = 0;
+# endif
+#endif
 
     getkeyptr = NULL;
 
@@ -581,23 +593,33 @@ setupvals(void)
     cdpath   = mkarray(NULL);
     manpath  = mkarray(NULL);
     fignore  = mkarray(NULL);
-#ifdef FPATH_DIR
-# ifdef FPATH_SUBDIRS
-    {
-	char *fpath_subdirs[] = FPATH_SUBDIRS;
-	int len = sizeof(fpath_subdirs)/sizeof(char *), j;
 
-	fpath = zalloc((len+1)*sizeof(char *));
-	for (j = 0; j < len; j++)
-	    fpath[j] = tricat(FPATH_DIR, "/", fpath_subdirs[j]);
-	fpath[len] = NULL;
-    }
-# else
-    fpath    = mkarray(ztrdup(FPATH_DIR));
+#if defined(SITEFPATH_DIR) || defined(FPATH_DIR)
+# ifdef FPATH_DIR
+#  ifdef FPATH_SUBDIRS
+    fpathlen += sizeof(fpath_subdirs)/sizeof(char *);
+#  else
+    fpathlen++;
+#  endif
 # endif
+    fpath = fpathptr = (char **)zalloc((fpathlen+1)*sizeof(char *));
+# ifdef SITEFPATH_DIR
+    *fpathptr++ = ztrdup(SITEFPATH_DIR);
+    fpathlen--;
+# endif
+# ifdef FPATH_DIR
+#  ifdef FPATH_SUBDIRS
+    for (j = 0; j < fpathlen; j++)
+	*fpathptr++ = tricat(FPATH_DIR, "/", fpath_subdirs[j]);
+#  else
+    *fpathptr++ = ztrdup(FPATH_DIR);
+#  endif
+# endif
+    *fpathptr = NULL;
 #else
     fpath    = mkarray(NULL);
 #endif
+
     mailpath = mkarray(NULL);
     watch    = mkarray(NULL);
     psvar    = mkarray(NULL);

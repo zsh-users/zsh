@@ -34,6 +34,9 @@ version.h: $(sdir_top)/Config/version.mk
 
 zshpaths.h: Makemod $(CONFIG_INCS)
 	@echo '#define MODULE_DIR "'$(MODDIR)'"' > zshpaths.h.tmp
+	@if test x$(sitefndir) != xno; then \
+	  echo '#define SITEFPATH_DIR "'$(sitefndir)'"' >> zshpaths.h.tmp; \
+	fi
 	@if test x$(fndir) != xno; then \
 	  echo '#define FPATH_DIR "'$(fndir)'"' >> zshpaths.h.tmp; \
 	  if test x$(FUNCTIONS_SUBDIRS) != x -a \

@@ -41,6 +41,7 @@ infodir         = @infodir@
 mandir          = @mandir@
 datadir         = @datadir@
 fndir           = @fndir@
+sitefndir       = @sitefndir@
 htmldir         = $(datadir)/$(tzsh)/htmldoc
 
 # compilation

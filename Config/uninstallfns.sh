@@ -14,20 +14,26 @@ done
 fndir=$DESTDIR$fndir
 
 for file in $install; do
-  if test -f $sdir/$file; then
-    if test x$FUNCTIONS_SUBDIRS != x -a x$FUNCTIONS_SUBDIRS != xno; then
-      rm -f $fndir/$file;
-      if test -f $fndir.old/$file; then
-	mv $fndir.old/$file $fndir/$file
-      fi
-    else
-      bfile="`echo $file | sed -e 's%^.*/%%'`"
-      rm -f "$fndir/$bfile"; \
-      if test -f $fndir.old/$bfile; then
-        mv $fndir.old/$bfile $fndir/$bfile
-      fi
-    fi
-  fi
+  case $fndir in
+    *$VERSION*)
+       # Version specific function directory, safe to remove completely.
+       # However, we don't remove the top-level version directory since
+       # it could have other things than functions in it.  We could
+       # do that instead in the top-level Makefile on a full uninstall,
+       # if we wanted.
+       rm -rf $fndir
+       ;;
+    *)
+       if test -f $sdir/$file; then
+	 if test x$FUNCTIONS_SUBDIRS != x -a x$FUNCTIONS_SUBDIRS != xno; then
+	   rm -f $fndir/$file;
+	 else
+	   bfile="`echo $file | sed -e 's%^.*/%%'`"
+	   rm -f "$fndir/$bfile"; \
+	 fi
+       fi
+       ;;
+  esac
 done
 
 exit 0

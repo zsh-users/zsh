@@ -283,16 +283,13 @@ shell functions to be installed into subdirectories of the function
 directory, i.e. `Core/*' files will be installed into `FNDIR/Core', and so
 on. This also initialises $fpath/$FPATH appropriately.
 
-On installation, any completion function which already exists but is
-different from the new version will be moved to a corresponding place in
-FNDIR.old; for example, if a different version of User/_rcs exists when
-installing into /usr/local/share/zsh/functions/User, the old one will be
-moved into /usr/local/share/zsh/functions.old/User.  The installer is
-responsible for recovering or deleting old functions which have been moved
-in this way.  On uninstallation, any newly installed functions (including
-those which existed before but were unchanged) will be deleted and the
-files in the FNDIR.old hierarchy moved back into FNDIR.  To preserve the
-entire old hierarchy, you should move or copy it before installation.
+The option --enable-site-fndir controls whether to create and initialise
+$fpath to include a directory for site-specific functions.  By default this
+is created in the location ${datadir}/zsh/site-functions, i.e. parallel to
+the version-specific functions directory, and inserted at the start of the
+$fpath array on shell startup.  This directory will not be affected by
+`make uninstall' or `make uninstall.fns', although the version-specific
+directory and its contents will be deleted.
 
 Support for large files and integers
 ------------------------------------
@@ -366,6 +363,7 @@ Features:
      zprofile=pathname   # the full pathname of the global zprofile script
      zlogout=pathname    # the full pathname of the global zlogout script
      fndir=directory     # the directory where shell functions will go
+     site-fndir=directory# the directory where site-specific functions can go
      function-subdirs    # if functions will be installed into subdirectories
      dynamic             # allow dynamically loaded binary modules
      lfs                 # allow configure check for large files
