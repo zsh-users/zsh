@@ -1,3 +1,8 @@
+2001-09-30  Clint Adams  <clint@zsh.org>
+
+	* 15915: Completion/Debian/Command/_bts:
+	completion for bts script in devscripts.
+
 2001-09-28  Bart Schaefer  <schaefer@zsh.org>
 
 	* 15895: Src/Modules/zftp.c: Control-connection management sanity

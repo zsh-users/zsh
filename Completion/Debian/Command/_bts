@@ -1,0 +1,116 @@
+#compdef bts
+local expl
+
+compset -N '[,.]' || compset -n 2
+
+if [[ CURRENT -eq 1 ]];
+then
+ _wanted cmd expl 'bts command' \
+ compadd show bugs close reopen retitle reassign merge unmerge tag \
+         severity forwarded notforwarded help
+else
+ case "$words[1]" in
+ 	show|close|unmerge|notforwarded)
+	 if [[ CURRENT -eq 2 ]];
+	 then
+	  _wanted bugnum expl 'bug number' compadd
+	 else
+	  _wanted sep expl 'separator' compadd -S ' ' , .
+	 fi
+	;;
+	bugs)
+	 if [[ CURRENT -eq 2 ]];
+	 then
+	  _wanted package expl 'package' _deb_packages avail
+	  _wanted maintainer expl 'package maintainer' compadd $DEBEMAIL
+	 fi
+	  _wanted sep expl 'separator' compadd -S ' ' , .
+	;;
+	reopen)
+	 if [[ CURRENT -eq 2 ]];
+	 then
+	  _wanted bugnum expl 'bug number' compadd
+	 elif [[ CURRENT -eq 3 ]];
+	 then
+	  _wanted submitter expl 'new submitter' compadd $DEBEMAIL
+	 else
+	  _wanted sep expl 'separator' compadd -S ' ' , .
+	 fi
+	;;
+	retitle)
+	 if [[ CURRENT -eq 2 ]];
+	 then
+	  _wanted bugnum expl 'bug number' compadd
+	 elif [[ CURRENT -eq 3 ]];
+	 then
+	  _wanted submitter expl 'new title' compadd
+	 else
+	  _wanted sep expl 'separator' compadd -S ' ' , .
+	 fi
+	;;
+	reassign)
+	 if [[ CURRENT -eq 2 ]];
+	 then
+	  _wanted bugnum expl 'bug number' compadd
+	 elif [[ CURRENT -eq 3 ]];
+	 then
+	  _wanted submitter expl 'new package' _deb_packages avail
+	 else
+	  _wanted sep expl 'separator' compadd -S ' ' , .
+	 fi
+	;;
+	merge)
+	 _wanted bugnum expl 'bug number' compadd
+	 if [[ CURRENT -gt 2 ]];
+	 then
+	  _wanted sep expl 'separator' compadd -S ' ' , .
+	 fi
+	;;
+	tag)
+	 if [[ CURRENT -eq 2 ]];
+	 then
+	  _wanted bugnum expl 'bug number' compadd
+	 elif [[ CURRENT -eq 3 ]];
+	 then
+	  _wanted operator expl 'operator' compadd - '+' '-' '='
+	 elif [[ CURRENT -eq 4 ]];
+	 then
+	  _wanted tag expl 'tag' \
+	  compadd patch wontfix moreinfo unreproducible fixed \
+	          security potato woody sid
+	 else
+	  _wanted tag expl 'tag' \
+	  compadd patch wontfix moreinfo unreproducible fixed \
+	          security potato woody sid
+	  _wanted sep expl 'separator' compadd -S ' ' , .
+	 fi
+	;;
+	severity)
+	 if [[ CURRENT -eq 2 ]];
+	 then
+	  _wanted bugnum expl 'bug number' compadd
+	 elif [[ CURRENT -eq 3 ]];
+	 then
+	  _wanted severity expl 'severity' \
+	  compadd wishlist minor normal serious important critical grave
+	 else
+	  _wanted sep expl 'separator' compadd -S ' ' , .
+	 fi
+	;;
+	forwarded)
+	 if [[ CURRENT -eq 2 ]];
+	 then
+	  _wanted bugnum expl 'bug number' compadd
+	 elif [[ CURRENT -eq 3 ]];
+	 then
+	  _wanted upstream expl 'upstream email' compadd
+	 else
+	  _wanted sep expl 'separator' compadd -S ' ' , .
+	 fi
+	;;
+	help)
+	;&
+	*) _wanted sep expl 'separator' compadd -S ' ' , .
+	;;
+ esac
+fi
