@@ -1,0 +1,31 @@
+#compdef -value-
+
+_value () {
+  #_view_completion_parameters
+  if (( $+functions[_value:$compstate[parameter]] )); then
+    "_value:$compstate[parameter]" "$@"
+  else
+    _default
+  fi
+}
+
+_value:CPPFLAGS () {
+  compset -q
+  if compset -P '-I'; then
+    _files -/ "$@"
+  else
+    _default "$@"
+  fi
+}
+
+_value:LDFLAGS () {
+  compset -q
+  if compset -P '-L'; then
+    _files -/ "$@"
+  elif compset -P '-R'; then
+    compset -P '*:'
+    _files -/ -S/ -r ' :' "$@"
+  else
+    _default "$@"
+  fi
+}
