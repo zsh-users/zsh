@@ -4,7 +4,7 @@
 # descriptions given as arguments to this function.
 
 local long cmd="$words[1]" descr mesg subopts opt usecc autod
-local oldcontext="$curcontext" hasopts
+local oldcontext="$curcontext" hasopts rawret
 
 long=$argv[(I)--]
 if (( long )); then
@@ -173,11 +173,12 @@ if (( long )); then
 fi
 
 subopts=()
-while [[ "$1" = -(O*|C) ]]; do
+while [[ "$1" = -(O*|[CR]) ]]; do
   case "$1" in
-  -C) usecc=yes; shift ;;
-  -O) subopts=( "${(@P)2}" ); shift 2 ;;
-  -O*)  subopts=( "${(@P)1[3,-1]}" ); shift ;;
+  -C)  usecc=yes; shift ;;
+  -O)  subopts=( "${(@P)2}" ); shift 2 ;;
+  -O*) subopts=( "${(@P)1[3,-1]}" ); shift ;;
+  -R)  rawret=yes; shift;;
   esac
 done
 
@@ -394,10 +395,11 @@ if (( $# )) && comparguments -i "$autod" "$@"; then
 
   [[ -z "$aret" || -z "$usecc" ]] && curcontext="$oldcontext"
 
-  [[ -n "$aret" ]] && return 300
-
-  [[ -n "$noargs" && nm -eq "$compstate[nmatches]" ]] && _message "$noargs"
-
+  if [[ -n "$aret" ]]; then
+    [[ -n $rawret ]] && return 300
+  else
+    [[ -n "$noargs" && nm -eq "$compstate[nmatches]" ]] && _message "$noargs"
+  fi
   # Set the return value.
 
   [[ nm -ne "$compstate[nmatches]" ]]

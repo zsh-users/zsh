@@ -1,5 +1,9 @@
 2001-03-27  Sven Wischnowsky  <wischnow@zsh.org>
 
+	* 13790: Completion/Base/_arguments, Completion/X/_x_arguments,
+	Completion/X/_xt_arguments, Doc/Zsh/compsys.yo: make
+	_arguments return 300 only if given the -R option
+
 	* 13789: Completion/Base/_tilde, Completion/Builtins/_popd:
 	comment out looking up the prefix-needed style when
 	completing directory stack entries; make _tilde use _popd,

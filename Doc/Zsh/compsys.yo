@@ -3070,12 +3070,18 @@ vindex(opt_args, use of)
 An var(action) of the form `tt(->)var(string)' is used by functions
 that implement a state machine. In this case, the `var(string)'s (with
 all leading and trailing spaces and tabs removed) of all actions that
-have to be used will be stored in
-the global array tt(state) and the function returns with a return
+have to be used will be stored in the global array tt(state).  The
+function returns with a non-zero return value if the cursor is not in
+a position where options can be completed or if the current word could 
+not be completed to an option.  But if the tt(-R) option is given to
+tt(_arguments), the function will instead return with a return
 value of 300 (to make it distinguishable from other return values)
 after setting the global `tt(context)', `tt(line)' and `tt(opt_args)'
 parameters as described below, and without resetting any changes made
-to the special parameters such as tt(PREFIX) and tt(words).
+to the special parameters such as tt(PREFIX) and tt(words).  This
+allows to write wrapper functions around tt(_arguments) that have to
+be able to find out if they have to make sure that the special
+completion parameters are not reset when they return.
 
 Note that this means that a function calling tt(_arguments) with at least
 one action containing such a `tt(->)var(string)' has to declare
