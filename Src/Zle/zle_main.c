@@ -76,7 +76,10 @@ mod_export Thingy lbindk, bindk;
 /**/
 int insmode;
 
-static int eofchar, eofsent;
+/**/
+mod_export int eofchar;
+
+static int eofsent;
 static long keytimeout;
 
 #ifdef HAVE_SELECT
@@ -556,7 +559,7 @@ zleread(char *lp, char *rp, int flags)
 	reselectkeymap();
 	selectlocalmap(NULL);
 	bindk = getkeycmd();
-	if (!ll && isfirstln && c == eofchar) {
+	if (!ll && isfirstln && unset(IGNOREEOF) && c == eofchar) {
 	    eofsent = 1;
 	    break;
 	}
@@ -630,26 +633,33 @@ execzlefunc(Thingy func, char **args)
     } else if((w = func->widget)->flags & (WIDGET_INT|WIDGET_NCOMP)) {
 	int wflags = w->flags;
 
-	if(!(wflags & ZLE_KEEPSUFFIX))
-	    removesuffix();
-	if(!(wflags & ZLE_MENUCMP)) {
-	    fixsuffix();
-	    invalidatelist();
+	if (keybuf[0] == eofchar && !keybuf[1] &&
+	    !ll && isfirstln && isset(IGNOREEOF)) {
+	    showmsg((!islogin) ? "zsh: use 'exit' to exit." :
+		    "zsh: use 'logout' to logout.");
+	    ret = 1;
+	} else {
+	    if(!(wflags & ZLE_KEEPSUFFIX))
+		removesuffix();
+	    if(!(wflags & ZLE_MENUCMP)) {
+		fixsuffix();
+		invalidatelist();
+	    }
+	    if (wflags & ZLE_LINEMOVE)
+		vilinerange = 1;
+	    if(!(wflags & ZLE_LASTCOL))
+		lastcol = -1;
+	    if (wflags & WIDGET_NCOMP) {
+		int atcurhist = histline == curhist;
+		compwidget = w;
+		ret = completecall(args);
+		if (atcurhist)
+		    histline = curhist;
+	    } else
+		ret = w->u.fn(args);
+	    if (!(wflags & ZLE_NOTCOMMAND))
+		lastcmd = wflags;
 	}
-	if (wflags & ZLE_LINEMOVE)
-	    vilinerange = 1;
-	if(!(wflags & ZLE_LASTCOL))
-	    lastcol = -1;
-	if (wflags & WIDGET_NCOMP) {
-	  int atcurhist = histline == curhist;
-	    compwidget = w;
-	    ret = completecall(args);
-	    if (atcurhist)
-		histline = curhist;
-	} else
-	    ret = w->u.fn(args);
-	if (!(wflags & ZLE_NOTCOMMAND))
-	    lastcmd = wflags;
 	r = 1;
     } else {
 	Eprog prog = getshfunc(w->u.fnnam);

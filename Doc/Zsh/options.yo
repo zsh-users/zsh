@@ -573,6 +573,11 @@ Do not exit on end-of-file.  Require the use
 of tt(exit) or tt(logout) instead.
 However, ten consecutive EOFs will cause the shell to exit anyway,
 to avoid the shell hanging if its tty goes away.
+
+Also, if this option is set and the Zsh Line Editor is used, widgets
+implemented by shell functions can be bound to EOF (normally
+Control-D) without printing the normal warning message.  This works
+only for normal widgets, not for completion widgets.
 )
 pindex(INC_APPEND_HISTORY)
 cindex(history, incremental appending to a file)
