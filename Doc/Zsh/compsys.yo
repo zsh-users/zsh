@@ -1084,6 +1084,48 @@ arguments. The first one describes the first argument as a
 be completed. The last description says that all other arguments are
 `var(page numbers)' but does not give possible completions.
 )
+item(tt(_values))(
+This is used to complete values (strings) and their arguments or
+lists of such values. If the first argument is the option `tt(-s)',
+the second argument is used as the character that separates multiple
+values.
+
+The first argument (after the option and separator character if they
+are given) is used as a string to print as a description before
+listing the values.
+
+All other arguments describe the possible values and their
+arguments in the same format used for the description of options by
+the tt(_arguments) function (see above). The only difference is that
+there is no required minus or plus sign at the beginning and that
+values can have only one argument.
+
+Example:
+
+example(_values -s , '...' \
+        '*foo[bar]' \
+        '(two)*one[number]:first count:' \
+        'two[another number]::second count:(1 2 3)')
+
+This describes three possible values: `tt(foo)', `tt(one)', and
+`tt(two)'. The first one is described as `tt(bar)', gets no argument 
+and may appear more than once. The second one is described as
+`tt(number)', may appear more than once, and gets one mandatory
+argument described as `tt(first count)' for which no action is
+specified so that it will not be completed automatically. The
+`tt((one))' at the beginning says that if the value `tt(one)' is on
+the line, the value `tt(two)' will not be  considered to be a possible
+completion any more. Finally, the last value (`tt(two)') is described
+as `tt(another number)' and gets an optional argument decribed as
+`tt(second count)' which will be completed from the strings `tt(1)',
+`tt(2)', and `tt(3)'. The tt(_values) function will complete lists of
+these values separated by commas.
+
+To decide if the descriptions for the values (not those for the
+arguments) should be printed, the configuration key
+tt(describe_values) is used in the same way as the key
+tt(describe_options) is used by the tt(_arguments) function.
+)
 enditem()
 
 texinode(Completion Directories)(Bindable Commands)(Completion Functions)(Completion System)
