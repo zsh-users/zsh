@@ -48,8 +48,15 @@ typedef wint_t   ZLE_INT_T;
 #define ZWC(c)	L ## c
 
 #define ZLEEOF	WEOF
+
 #define ZS_memcpy wmemcpy
 #define ZS_memmove wmemmove
+#define ZS_memset wmemset
+#define ZS_strlen wcslen
+#define ZS_strcpy wcscpy
+#define ZS_strncpy wcsncpy
+#define ZS_strncmp wcsncmp
+
 #define ZC_icntrl iswcntrl
 
 #define LASTFULLCHAR	lastchar_wide
@@ -65,8 +72,15 @@ typedef int ZLE_INT_T;
 #define ZWC(c)	c
 
 #define ZLEEOF	EOF
+
 #define ZS_memcpy memcpy
 #define ZS_memmove memmove
+#define ZS_memset memset
+#define ZS_strlen strlen
+#define ZS_strcpy strcpy
+#define ZS_strncpy strncpy
+#define ZS_strncmp strncmp
+
 #define ZC_icntrl icntrl
 
 #define LASTFULLCHAR	lastchar

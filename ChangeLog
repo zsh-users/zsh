@@ -1,3 +1,10 @@
+2005-02-23  Andrey Borzenkov  <bor@zsh.org>
+
+	* 20857 (modified): Src/Zle/zle.h, Src/Zle/zle_refresh.c: use
+	wide characters internally. This fixed cursor position with
+	multibyte characters bug without any significant code change.
+	Is still does not use character width information.
+
 2005-02-23  Peter Stephenson  <pws@csr.com>
 
 	* 20856: Src/Zle/complist.c: use VARARR for multibyte string.
