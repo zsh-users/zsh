@@ -1,3 +1,8 @@
+2004-03-03  Wayne Davison  <wayned@users.sourceforge.net>
+
+	* 19530: Src/Zle/zle_params.c: Fixed two cases where unmetify()
+	was using an int* to store a value into a size_t variable.
+
 2004-03-03  Oliver Kiddle  <opk@zsh.org>
 
 	* 19525: Completion/Unix/Type/_groups: complete groups using
