@@ -78,6 +78,8 @@ _arguments -s \
   '(-a --archive)'{-a,--archive}'[archive mode]' \
   '(-r --recursive)'{-r,--recursive}'[recurse into directories]' \
   '(-E --relative)'{-R,--relative}'[use relative path names]' \
+  '--no-relative[turn off --relative]' \
+  '--no-implied-dirs[do not send implied dirs with --relative]' \
   '(-b --backup)'{-b,--backup}'[make backups]' \
   '--backup-dir[make backups into specified directory]:backup directory:_directories' \
   '--suffix=[override backup suffix]:suffix' \
@@ -120,6 +122,7 @@ _arguments -s \
   '--modify-window=[timestamp window for file match]:seconds:' \
   '(-T --temp-dir)'{-T,--temp-dir=}'[create temporary files in specified directory]:directory:_files -/' \
   '--compare-dest=[also compare destination files relative to specified directory]:directory:_files -/' \
+  '--link-dest=[create hardlinks relative to specified directory for unchanged files]:directory:_files -/' \
   '(--partial --progress)-P[equivalent to --partial --progress]' \
   '(-z --compress)'{-z,--compress}'[compress file data]' \
   '--exclude=[exclude files matching pattern]:pattern:' \
@@ -141,7 +144,10 @@ _arguments -s \
   '--bwlimit=[limit bandwidth]:kbytes per second:' \
   '--read-batch=[read batch file]:ext:' \
   '--write-batch[write batch file]' \
+  '--files-from=[read list of source-file names from file]:file:_files' \
+  '--checksum-seed=[set block/file checksum seed (advanced users only)]:number:' \
   '(-)'{-h,--help}'[display help information]' \
+  '(-0 --from0)'{-0,--from0}'[all *-from file lists are delimited by nulls]' \
   '(-4 --ipv4)'{-4,--ipv4}'[prefer IPv4]' \
   '(-6 --ipv6)'{-6,--ipv6}'[prefer IPv6]' \
      -- '*=COMMAND*:command:_command' \
