@@ -1,3 +1,8 @@
+2003-12-04  Oliver Kiddle  <opk@zsh.org>
+
+	* unposted: Completion/Unix/Command/_subversion: small addition to
+	output from `svn help diff' broke substitution for getting options
+
 2003-12-03  Peter Stephenson  <pws@csr.com>
 
 	* 19269: Src/pattern.c, Misc/globtests, Test/D02glob.ztst:

@@ -67,7 +67,7 @@ _svn_subcommand () {
   _svn_subcmd_usage=${${(M)${(f)"$(_call_program options svn help $1)"}:#usage:*}#usage: $1 }
 
   _svn_subcmds=(
-    ${${=${${${(M)${(f)"$(_call_program options svn help $1)"##*Valid options:}:#*:*}%% #:*}/ arg/:arg:}/(#b)-([[:alpha:]]) \[--([a-z-]##)\](:arg:)#/(--$match[2])-$match[1]$match[3] (-$match[1])--$match[2]$match[3]}[2,-1]}
+    ${${=${${${(M)${(f)"$(_call_program options svn help $1)"##*Valid options:}:#* :*}%% #:*}/ arg/:arg:}/(#b)-([[:alpha:]]) \[--([a-z-]##)\](:arg:)#/(--$match[2])-$match[1]$match[3] (-$match[1])--$match[2]$match[3]}[2,-1]}
   )
 
   case $1 in;
