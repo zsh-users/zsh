@@ -1,3 +1,8 @@
+2004-07-02  Peter Stephenson  <pws@csr.com>
+
+	* 20125: Doc/Zsh/jobs.yo: say where the output for job
+	notifications goes.
+
 2004-07-01  Peter Stephenson  <pws@csr.com>
 
 	* 7650: Doc/Zsh/zle.yo, Src/Zle/iwidgets.list, Src/Zle/zle_main.c:

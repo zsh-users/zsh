@@ -8,7 +8,7 @@ an interactive shell associates a em(job) with each pipeline.
 It keeps a table of current jobs, printed by the tt(jobs)
 command, and assigns them small integer numbers.
 When a job is started asynchronously with `tt(&)',
-the shell prints a line which looks like:
+the shell prints a line to standard error which looks like:
 
 example([1] 1234)
 
@@ -70,6 +70,8 @@ pindex(NOTIFY, use of)
 It normally informs you whenever a job becomes blocked so that
 no further progress is possible.  If the tt(NOTIFY) option is not set,
 it waits until just before it prints a prompt before it informs you.
+All such notifications are sent directly to the terminal, not to
+the standard output or standard error.
 
 When the monitor mode is on, each background job that completes
 triggers any trap set for tt(CHLD).
