@@ -1,5 +1,11 @@
 2000-07-13  Sven Wischnowsky  <wischnow@zsh.org>
 
+	* 12241: Completion/Core/_main_complete, Src/Zle/computil.c: fix
+ 	for _arguments with single-letter options: recognize
+ 	option-strings with multiple options; in _main_complete stop
+ 	trying completers when one called _message, don't display warnings
+ 	in such cases
+	
 	* 12238: Src/Zle/zle_thingy.c: fix zle widget -n num with num>9
 	
 	* 12237: Src/hist.c, Src/lex.c: slightly improved (z) flag for

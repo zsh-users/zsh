@@ -1088,7 +1088,7 @@ ca_get_opt(Cadef d, char *line, int full, char **end)
 static Caopt
 ca_get_sopt(Cadef d, char *line, char **end, LinkList *lp)
 {
-    Caopt p;
+    Caopt p, pp = NULL;
     char pre = *line++;
     LinkList l = NULL;
 
@@ -1112,11 +1112,12 @@ ca_get_sopt(Cadef d, char *line, char **end, LinkList *lp)
 	    }
 	} else if (!p || (p && !p->active))
 	    return NULL;
+	pp = p;
 	p = NULL;
     }
-    if (p && end)
+    if (pp && end)
 	*end = line;
-    return p;
+    return pp;
 }
 
 /* Return the n'th argument definition. */

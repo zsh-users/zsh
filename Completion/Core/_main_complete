@@ -156,6 +156,8 @@ for tmp in "$_completers[@]"; do
     fi
     (( _matcher_num++ ))
   done
+  [[ -n "$_comp_mesg" ]] && break
+
   (( _completer_num++ ))
 done
 
@@ -265,7 +267,7 @@ if [[ $compstate[old_list] = keep || nm -gt 1 ]]; then
 elif [[ nm -le 1 && -n "$_comp_mesg" ]]; then
   compstate[insert]=''
   compstate[list]='list force messages'
-elif [[ nm -eq 0 &&
+elif [[ nm -eq 0 && -z "$_comp_mesg" &&
         $#_lastdescr -ne 0 && $compstate[old_list] != keep ]] &&
      zstyle -s ":completion:${curcontext}:warnings" format format; then
 
