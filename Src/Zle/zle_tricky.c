@@ -978,7 +978,7 @@ get_comp_string(void)
      * this would be to pass the command line through the parser too,   *
      * and get the arguments that way.  Maybe in 3.1...                 */
     do {
-	lincmd = ((incmdpos && !ins) || (oins == 2 && i == 2) ||
+	lincmd = ((incmdpos && !ins && !incond) || (oins == 2 && i == 2) ||
 		  (ins == 3 && i == 1));
 	linredir = (inredir && !ins);
 	oins = ins;
@@ -1023,7 +1023,7 @@ get_comp_string(void)
 	if (tok == ENDINPUT)
 	    break;
 	if ((ins && (tok == DO || tok == SEPER)) ||
-	    (ins == 2 && i == 2) ||	(ins == 3 && i == 3) ||
+	    (ins == 2 && i == 2) || (ins == 3 && i == 3) ||
 	    tok == BAR    || tok == AMPER     ||
 	    tok == BARAMP || tok == AMPERBANG ||
 	    ((tok == DBAR || tok == DAMPER) && !incond)) {
@@ -1060,6 +1060,12 @@ get_comp_string(void)
 		inwhat = IN_COND;
 	} else if (linredir)
 	    continue;
+	if (incond) {
+	    if (tok == DBAR)
+		tokstr = "||";
+	    else if (tok == DAMPER)
+		tokstr = "&&";
+	}
 	if (!tokstr)
 	    continue;
 	/* Hack to allow completion after `repeat n do'. */
