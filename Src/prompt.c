@@ -579,7 +579,7 @@ putpromptchar(int doprint, int endchar)
 		    arg = 1;
 		else if (arg < 0)
 		    arg += arrlen(psvar) + 1;
-		if (arrlen(psvar) >= arg)
+		if (arg > 0 && arrlen(psvar) >= arg)
 		    stradd(psvar[arg - 1]);
 		break;
 	    case 'E':
