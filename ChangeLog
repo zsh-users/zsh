@@ -221,6 +221,11 @@
 	* 18383: Src/utils.c: Fixed zjoin() when it returns an empty
 	string that should be allocated.
 
+2003-03-20  Doug Kearns  <djkea2@mugca.its.monash.edu.au>
+
+	* 18369: Completion/Unix/Command/_tidy: update HTML Tidy completion
+	for the Tidy Classic -> TidyLib codebase transition
+
 2003-03-15  Doug Kearns  <djkea2@mugca.its.monash.edu.au>
 
 	* unposted: Completion/X/Command/_xrdb: remove _xrdb as superior
