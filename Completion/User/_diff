@@ -1,0 +1,3 @@
+#compdef diff
+
+_diff_options ':original file:_files' ':new file:_files'
