@@ -1,5 +1,8 @@
 2001-07-06  Peter Stephenson  <pws@csr.com>
 
+	* 15277: Src/glob.c: *real* bug with ${(S)...%%...}: the indices
+	for start and end of backreferences were incorrect.
+
 	* Back out 15266: it was right before, I was looking at it
 	back to front.
 

@@ -2236,16 +2236,17 @@ igetmatch(char **sp, Patprog p, int fl, int n, char *replstr)
 	    break;
 
 	case (SUB_END|SUB_SUBSTR):
-	    /* Shortest at end with substrings */
-	    patoffset = ml;
-	    set_pat_start(p, l);
-	    if (pattry(p, s + l) && !--n) {
-		*sp = get_match_ret(*sp, l, l, fl, replstr);
-		patoffset = 0;
-		return 1;
-	    } /* fall through */
 	case (SUB_END|SUB_LONG|SUB_SUBSTR):
 	    /* Longest/shortest at end, matching substrings.       */
+	    patoffset = ml;
+	    if (!(fl & SUB_LONG)) {
+		set_pat_start(p, l);
+		if (pattry(p, s + l) && !--n) {
+		    *sp = get_match_ret(*sp, l, l, fl, replstr);
+		    patoffset = 0;
+		    return 1;
+		}
+	    }
 	    patoffset--;
 	    for (t = s + l - 1; t >= s; t--, patoffset--) {
 		if (t > s && t[-1] == Meta)
