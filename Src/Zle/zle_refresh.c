@@ -304,20 +304,20 @@ zrefresh(void)
 
     if (predisplaylen || postdisplaylen) {
 	/* There is extra text to display at the start or end of the line */
-	tmpline = zalloc(ll + predisplaylen + postdisplaylen);
+	tmpline = zalloc(zlell + predisplaylen + postdisplaylen);
 	if (predisplaylen)
 	    memcpy(tmpline, predisplay, predisplaylen);
-	if (ll)
-	    memcpy(tmpline+predisplaylen, line, ll);
+	if (zlell)
+	    memcpy(tmpline+predisplaylen, zleline, zlell);
 	if (postdisplaylen)
-	    memcpy(tmpline+predisplaylen+ll, postdisplay, postdisplaylen);
-	tmpcs = cs + predisplaylen;
-	tmpll = predisplaylen + ll + postdisplaylen;
+	    memcpy(tmpline+predisplaylen+zlell, postdisplay, postdisplaylen);
+	tmpcs = zlecs + predisplaylen;
+	tmpll = predisplaylen + zlell + postdisplaylen;
 	tmpalloced = 1;
     } else {
-	tmpline = line;
-	tmpcs = cs;
-	tmpll = ll;
+	tmpline = zleline;
+	tmpcs = zlecs;
+	tmpll = zlell;
 	tmpalloced = 0;
     }
 

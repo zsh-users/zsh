@@ -635,12 +635,6 @@ extern char PC, *BC, *UP;
 extern short ospeed;
 #endif
 
-/* Rename some global zsh variables to avoid *
- * possible name clashes with libc           */
-
-#define cs zshcs
-#define ll zshll
-
 #ifndef O_NOCTTY
 # define O_NOCTTY 0
 #endif
@@ -686,4 +680,47 @@ extern short ospeed;
 #define UNUSED(x) x __attribute__((__unused__))
 #else
 #define UNUSED(x) x
+#endif
+
+/*
+ * This is a subset of ZLE_UNICODE_SUPPORT.  It is not all that likely
+ * that only the subset is supported, however it's easy to make the
+ * \u and \U escape sequences work with just the following.
+ */
+#if defined(HAVE_WCHAR_H) && defined(HAVE_WCTOMB) && defined (__STDC_ISO_10646__)
+# include <wchar.h>
+
+/*
+ * More stringent requirements to enable complete Unicode conversion
+ * between wide characters and multibyte strings.
+ */
+#if defined(HAVE_MBRTOWC) && defined(HAVE_WCRTOMB)
+/*#define ZLE_UNICODE_SUPPORT	1*/
+#endif
+#else
+# ifdef HAVE_LANGINFO_H
+#   include <langinfo.h>
+#   if defined(HAVE_ICONV) || defined(HAVE_LIBICONV)
+#     include <iconv.h>
+#   endif
+# endif
+#endif
+
+#ifdef ZLE_UNICODE_SUPPORT
+typedef wchar_t ZLE_CHAR_T;
+typedef wchar_t *ZLE_STRING_T;
+
+/*
+ * MB_CUR_MAX is the maximum number of bytes that a single wide
+ * character will convert into.  We use it to keep strings
+ * sufficiently long.  It should always be defined, but if it isn't
+ * just assume we are using Unicode which requires 6 characters.
+ * (Note that it's not necessarily defined to a constant.)
+ */
+#ifndef MB_CUR_MAX
+#define MB_CUR_MAX 6
+#endif
+#else
+typedef int ZLE_CHAR_T;
+typedef unsigned char *ZLE_STRING_T;
 #endif

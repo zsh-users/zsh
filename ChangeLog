@@ -1,3 +1,23 @@
+2005-01-14  Peter Stephenson  <pws@csr.com>
+
+	* unposted: update version to 4.2.3-dev-1.
+
+	* c.f. 20675: configure.ac, Src/builtin.c, Src/exec.c, Src/hist.c,
+	Src/init.c, Src/input.c, Src/jobs.c, Src/lex.c, Src/loop.c,
+	Src/params.c, Src/signals.c, Src/system.h, Src/utils.c, Src/zsh.h,
+	Src/Zle/compcore.c, Src/Zle/compctl.c,
+	Src/Zle/complist.c, Src/Zle/compresult.c, rc/Zle/deltochar.c,
+	Src/Zle/zle.h, Src/Zle/zle_hist.c, Src/Zle/zle_main.c,
+	Src/Zle/zle_misc.c, Src/Zle/zle_move.c, Src/Zle/zle_params.c,
+	Src/Zle/zle_refresh.c, Src/Zle/zle_tricky.c, Src/Zle/zle_utils.c,
+	Src/Zle/zle_vi.c, Src/Zle/zle_word.c: Make it easier to add
+	support for Unicode etc. to Zle. line is called zleline and is not
+	directly visible in the main shell.  cs and ll are called zlecs
+	and zlell but are still visible in the main shell (this will
+	probably need changing).  Pointers to zle functions are addressed
+	by pointer not by confusing #define's.  Add beginnings of support
+	to configure.ac and system.h.  Very many pitfalls remain.
+
 2005-01-13  Peter Stephenson  <pws@csr.com>
 
 	* 20708: Doc/Zsh/contrib.yo, Functions/Zle/replace-string:

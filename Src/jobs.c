@@ -439,7 +439,7 @@ update_job(Job jn)
     if ((isset(NOTIFY) || job == thisjob) && (jn->stat & STAT_LOCKED)) {
 	printjob(jn, !!isset(LONGLISTJOBS), 0);
 	if (zleactive)
-	    zrefresh();
+	    zrefreshptr();
     }
     if (sigtrapped[SIGCHLD] && job != thisjob)
 	dotrap(SIGCHLD);
@@ -854,7 +854,7 @@ printjob(Job jn, int lng, int synch)
 	Process qn;
 
 	if (!synch)
-	    trashzle();
+	    trashzleptr();
 	if (doputnl && !synch)
 	    putc('\n', fout);
 	for (pn = jn->procs; pn;) {

@@ -27,13 +27,6 @@
  *
  */
 
-#define trashzle()      trashzleptr()
-#define zleread(X,Y,H,C)  zlereadptr(X,Y,H,C)
-#define spaceinline(X)  spaceinlineptr(X)
-#define zrefresh()      refreshptr()
-
-#define compctlread(N,A,O,R) compctlreadptr(N,A,O,R)
-
 /* A few typical macros */
 #define minimum(a,b)  ((a) < (b) ? (a) : (b))
 
@@ -1849,7 +1842,8 @@ typedef int (*CompctlReadFn) _((char *, char **, Options, char *));
 
 typedef void (*ZleVoidFn) _((void));
 typedef void (*ZleVoidIntFn) _((int));
-typedef unsigned char * (*ZleReadFn) _((char **, char **, int, int));
+typedef unsigned char *(*ZleReadFn) _((char **, char **, int, int));
+typedef unsigned char *(*ZleGetLineFn) _((int *, int *));
 
 /***************************************/
 /* Hooks in core.                      */

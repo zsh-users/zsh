@@ -275,8 +275,8 @@ inputline(void)
 	int flags = ZLRF_HISTORY|ZLRF_NOSETTY;
 	if (isset(IGNOREEOF))
 	    flags |= ZLRF_IGNOREEOF;
-	ingetcline = (char *)zleread(ingetcpmptl, ingetcpmptr, flags,
-				     context);
+	ingetcline = (char *)zlereadptr(ingetcpmptl, ingetcpmptr, flags,
+					context);
 	histdone |= HISTFLAG_SETTY;
     }
     if (!ingetcline) {

@@ -175,14 +175,14 @@ static void
 set_buffer(UNUSED(Param pm), char *x)
 {
     if(x) {
-	unmetafy(x, &ll);
-	sizeline(ll);
-	strcpy((char *)line, x);
+	unmetafy(x, &zlell);
+	sizeline(zlell);
+	strcpy((char *)zleline, x);
 	zsfree(x);
-	if(cs > ll)
-	    cs = ll;
+	if(zlecs > zlell)
+	    zlecs = zlell;
     } else
-	cs = ll = 0;
+	zlecs = zlell = 0;
     fixsuffix();
     menucmp = 0;
 }
@@ -191,7 +191,7 @@ set_buffer(UNUSED(Param pm), char *x)
 static char *
 get_buffer(UNUSED(Param pm))
 {
-    return metafy((char *)line, ll, META_HEAPDUP);
+    return metafy((char *)zleline, zlell, META_HEAPDUP);
 }
 
 /**/
@@ -199,11 +199,11 @@ static void
 set_cursor(UNUSED(Param pm), zlong x)
 {
     if(x < 0)
-	cs = 0;
-    else if(x > ll)
-	cs = ll;
+	zlecs = 0;
+    else if(x > zlell)
+	zlecs = zlell;
     else
-	cs = x;
+	zlecs = x;
     fixsuffix();
     menucmp = 0;
 }
@@ -212,7 +212,7 @@ set_cursor(UNUSED(Param pm), zlong x)
 static zlong
 get_cursor(UNUSED(Param pm))
 {
-    return cs;
+    return zlecs;
 }
 
 /**/
@@ -221,8 +221,8 @@ set_mark(UNUSED(Param pm), zlong x)
 {
     if (x < 0)
 	mark = 0;
-    else if (x > ll)
-	mark = ll;
+    else if (x > zlell)
+	mark = zlell;
     else
 	mark = x;
 }
@@ -245,11 +245,11 @@ set_lbuffer(UNUSED(Param pm), char *x)
 	unmetafy(y = x, &len);
     else
 	y = "", len = 0;
-    sizeline(ll - cs + len);
-    memmove(line + len, line + cs, ll - cs);
-    memcpy(line, y, len);
-    ll = ll - cs + len;
-    cs = len;
+    sizeline(zlell - zlecs + len);
+    memmove(zleline + len, zleline + zlecs, zlell - zlecs);
+    memcpy(zleline, y, len);
+    zlell = zlell - zlecs + len;
+    zlecs = len;
     zsfree(x);
     fixsuffix();
     menucmp = 0;
@@ -259,7 +259,7 @@ set_lbuffer(UNUSED(Param pm), char *x)
 static char *
 get_lbuffer(UNUSED(Param pm))
 {
-    return metafy((char *)line, cs, META_HEAPDUP);
+    return metafy((char *)zleline, zlecs, META_HEAPDUP);
 }
 
 /**/
@@ -273,8 +273,8 @@ set_rbuffer(UNUSED(Param pm), char *x)
 	unmetafy(y = x, &len);
     else
 	y = "", len = 0;
-    sizeline(ll = cs + len);
-    memcpy(line + cs, y, len);
+    sizeline(zlell = zlecs + len);
+    memcpy(zleline + zlecs, y, len);
     zsfree(x);
     fixsuffix();
     menucmp = 0;
@@ -284,7 +284,7 @@ set_rbuffer(UNUSED(Param pm), char *x)
 static char *
 get_rbuffer(UNUSED(Param pm))
 {
-    return metafy((char *)line + cs, ll - cs, META_HEAPDUP);
+    return metafy((char *)zleline + zlecs, zlell - zlecs, META_HEAPDUP);
 }
 
 /**/

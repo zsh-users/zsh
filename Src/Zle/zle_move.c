@@ -46,13 +46,13 @@ beginningofline(char **args)
 	return ret;
     }
     while (n--) {
-	if (cs == 0)
+	if (zlecs == 0)
 	    return 0;
-	if (line[cs - 1] == '\n')
-	    if (!--cs)
+	if (zleline[zlecs - 1] == '\n')
+	    if (!--zlecs)
 		return 0;
-	while (cs && line[cs - 1] != '\n')
-	    cs--;
+	while (zlecs && zleline[zlecs - 1] != '\n')
+	    zlecs--;
     }
     return 0;
 }
@@ -71,15 +71,15 @@ endofline(char **args)
 	return ret;
     }
     while (n--) {
-	if (cs >= ll) {
-	    cs = ll;
+	if (zlecs >= zlell) {
+	    zlecs = zlell;
 	    return 0;
 	}
-	if (line[cs] == '\n')
-	    if (++cs == ll)
+	if (zleline[zlecs] == '\n')
+	    if (++zlecs == zlell)
 		return 0;
-	while (cs != ll && line[cs] != '\n')
-	    cs++;
+	while (zlecs != zlell && zleline[zlecs] != '\n')
+	    zlecs++;
     }
     return 0;
 }
@@ -98,13 +98,13 @@ beginningoflinehist(char **args)
 	return ret;
     }
     while (n) {
-	if (cs == 0)
+	if (zlecs == 0)
 	    break;
-	if (line[cs - 1] == '\n')
-	    if (!--cs)
+	if (zleline[zlecs - 1] == '\n')
+	    if (!--zlecs)
 		break;
-	while (cs && line[cs - 1] != '\n')
-	    cs--;
+	while (zlecs && zleline[zlecs - 1] != '\n')
+	    zlecs--;
 	n--;
     }
     if (n) {
@@ -113,7 +113,7 @@ beginningoflinehist(char **args)
 	zmult = n;
 	ret = uphistory(args);
 	zmult = m;
-	cs = 0;
+	zlecs = 0;
 	return ret;
     }
     return 0;
@@ -133,15 +133,15 @@ endoflinehist(char **args)
 	return ret;
     }
     while (n) {
-	if (cs >= ll) {
-	    cs = ll;
+	if (zlecs >= zlell) {
+	    zlecs = zlell;
 	    break;
 	}
-	if (line[cs] == '\n')
-	    if (++cs == ll)
+	if (zleline[zlecs] == '\n')
+	    if (++zlecs == zlell)
 		break;
-	while (cs != ll && line[cs] != '\n')
-	    cs++;
+	while (zlecs != zlell && zleline[zlecs] != '\n')
+	    zlecs++;
 	n--;
     }
     if (n) {
@@ -159,11 +159,11 @@ endoflinehist(char **args)
 int
 forwardchar(UNUSED(char **args))
 {
-    cs += zmult;
-    if (cs > ll)
-	cs = ll;
-    if (cs < 0)
-	cs = 0;
+    zlecs += zmult;
+    if (zlecs > zlell)
+	zlecs = zlell;
+    if (zlecs < 0)
+	zlecs = 0;
     return 0;
 }
 
@@ -171,11 +171,11 @@ forwardchar(UNUSED(char **args))
 int
 backwardchar(UNUSED(char **args))
 {
-    cs -= zmult;
-    if (cs > ll)
-	cs = ll;
-    if (cs < 0)
-	cs = 0;
+    zlecs -= zmult;
+    if (zlecs > zlell)
+	zlecs = zlell;
+    if (zlecs < 0)
+	zlecs = 0;
     return 0;
 }
 
@@ -183,7 +183,7 @@ backwardchar(UNUSED(char **args))
 int
 setmarkcommand(UNUSED(char **args))
 {
-    mark = cs;
+    mark = zlecs;
     return 0;
 }
 
@@ -194,10 +194,10 @@ exchangepointandmark(UNUSED(char **args))
     int x;
 
     x = mark;
-    mark = cs;
-    cs = x;
-    if (cs > ll)
-	cs = ll;
+    mark = zlecs;
+    zlecs = x;
+    if (zlecs > zlell)
+	zlecs = zlell;
     return 0;
 }
 
@@ -209,13 +209,13 @@ vigotocolumn(UNUSED(char **args))
 
     findline(&x, &y);
     if (zmult >= 0)
-	cs = x + zmult - (zmult > 0);
+	zlecs = x + zmult - (zmult > 0);
     else
-	cs = y + zmult;
-    if (cs > y)
-	cs = y;
-    if (cs < x)
-	cs = x;
+	zlecs = y + zmult;
+    if (zlecs > y)
+	zlecs = y;
+    if (zlecs < x)
+	zlecs = x;
     return 0;
 }
 
@@ -223,15 +223,15 @@ vigotocolumn(UNUSED(char **args))
 int
 vimatchbracket(UNUSED(char **args))
 {
-    int ocs = cs, dir, ct;
+    int ocs = zlecs, dir, ct;
     unsigned char oth, me;
 
   otog:
-    if (cs == ll || line[cs] == '\n') {
-	cs = ocs;
+    if (zlecs == zlell || zleline[zlecs] == '\n') {
+	zlecs = ocs;
 	return 1;
     }
-    switch (me = line[cs]) {
+    switch (me = zleline[zlecs]) {
     case '{':
 	dir = 1;
 	oth = '}';
@@ -260,22 +260,22 @@ vimatchbracket(UNUSED(char **args))
 	oth = '[';
 	break;
     default:
-	cs++;
+	zlecs++;
 	goto otog;
     }
     ct = 1;
-    while (cs >= 0 && cs < ll && ct) {
-	cs += dir;
-	if (line[cs] == oth)
+    while (zlecs >= 0 && zlecs < zlell && ct) {
+	zlecs += dir;
+	if (zleline[zlecs] == oth)
 	    ct--;
-	else if (line[cs] == me)
+	else if (zleline[zlecs] == me)
 	    ct++;
     }
-    if (cs < 0 || cs >= ll) {
-	cs = ocs;
+    if (zlecs < 0 || zlecs >= zlell) {
+	zlecs = ocs;
 	return 1;
     } else if(dir > 0 && virangeflag)
-	cs++;
+	zlecs++;
     return 0;
 }
 
@@ -293,10 +293,10 @@ viforwardchar(char **args)
 	zmult = n;
 	return ret;
     }
-    if (cs >= lim)
+    if (zlecs >= lim)
 	return 1;
-    while (n-- && cs < lim)
-	cs++;
+    while (n-- && zlecs < lim)
+	zlecs++;
     return 0;
 }
 
@@ -313,12 +313,12 @@ vibackwardchar(char **args)
 	zmult = n;
 	return ret;
     }
-    if (cs == findbol())
+    if (zlecs == findbol())
 	return 1;
     while (n--) {
-	cs--;
-	if (cs < 0 || line[cs] == '\n') {
-	    cs++;
+	zlecs--;
+	if (zlecs < 0 || zleline[zlecs] == '\n') {
+	    zlecs++;
 	    break;
 	}
     }
@@ -329,18 +329,18 @@ vibackwardchar(char **args)
 int
 viendofline(UNUSED(char **args))
 {
-    int oldcs = cs, n = zmult;
+    int oldcs = zlecs, n = zmult;
 
     if (n < 1)
 	return 1;
     while(n--) {
-	if (cs > ll) {
-	    cs = oldcs;
+	if (zlecs > zlell) {
+	    zlecs = oldcs;
 	    return 1;
 	}
-	cs = findeol() + 1;
+	zlecs = findeol() + 1;
     }
-    cs--;
+    zlecs--;
     lastcol = 1<<30;
     return 0;
 }
@@ -349,7 +349,7 @@ viendofline(UNUSED(char **args))
 int
 vibeginningofline(UNUSED(char **args))
 {
-    cs = findbol();
+    zlecs = findbol();
     return 0;
 }
 
@@ -407,7 +407,7 @@ vifindprevcharskip(char **args)
 int
 virepeatfind(char **args)
 {
-    int ocs = cs, n = zmult;
+    int ocs = zlecs, n = zmult;
 
     if (!vfinddir)
 	return 1;
@@ -420,16 +420,16 @@ virepeatfind(char **args)
     }
     while (n--) {
 	do
-	    cs += vfinddir;
-	while (cs >= 0 && cs < ll && line[cs] != vfindchar && line[cs] != '\n');
-	if (cs < 0 || cs >= ll || line[cs] == '\n') {
-	    cs = ocs;
+	    zlecs += vfinddir;
+	while (zlecs >= 0 && zlecs < zlell && zleline[zlecs] != vfindchar && zleline[zlecs] != '\n');
+	if (zlecs < 0 || zlecs >= zlell || zleline[zlecs] == '\n') {
+	    zlecs = ocs;
 	    return 1;
 	}
     }
-    cs += tailadd;
+    zlecs += tailadd;
     if (vfinddir == 1 && virangeflag)
-	cs++;
+	zlecs++;
     return 0;
 }
 
@@ -455,9 +455,9 @@ virevrepeatfind(char **args)
 int
 vifirstnonblank(UNUSED(char **args))
 {
-    cs = findbol();
-    while (cs != ll && iblank(line[cs]))
-	cs++;
+    zlecs = findbol();
+    while (zlecs != zlell && iblank(zleline[zlecs]))
+	zlecs++;
     return 0;
 }
 
@@ -471,7 +471,7 @@ visetmark(UNUSED(char **args))
     if (ch < 'a' || ch > 'z')
 	return 1;
     ch -= 'a';
-    vimarkcs[ch] = cs;
+    vimarkcs[ch] = zlecs;
     vimarkline[ch] = histline;
     return 0;
 }
@@ -496,9 +496,9 @@ vigotomark(UNUSED(char **args))
 	vimarkline[ch] = 0;
 	return 1;
     }
-    cs = vimarkcs[ch];
-    if (cs > ll)
-	cs = ll;
+    zlecs = vimarkcs[ch];
+    if (zlecs > zlell)
+	zlecs = zlell;
     return 0;
 }
 

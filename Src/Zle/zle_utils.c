@@ -67,8 +67,39 @@ void
 sizeline(int sz)
 {
     while (sz > linesz)
-	line = (unsigned char *)realloc(line, (linesz *= 4) + 2);
+	zleline = (unsigned char *)realloc(zleline, (linesz *= 4) + 2);
 }
+
+/*
+ * Insert a character, called from main shell.
+ *
+ * WCHAR: type is wrong, should be a genuine wide character,
+ * when available in the caller.
+ */
+
+/**/
+mod_export void
+zleaddtoline(int chr)
+{
+    spaceinline(1);
+    zleline[zlecs++] = chr;
+}
+
+/*
+    return zleline;
+    return zleline;
+ */
+
+/**/
+mod_export unsigned char *
+zlegetline(int *ll, int *cs)
+{
+    *ll = zlell;
+    *cs = zlecs;
+
+    return zleline;
+}
+
 
 /* insert space for ct chars at cursor position */
 
@@ -78,13 +109,13 @@ spaceinline(int ct)
 {
     int i;
 
-    sizeline(ct + ll);
-    for (i = ll; --i >= cs;)
-	line[i + ct] = line[i];
-    ll += ct;
-    line[ll] = '\0';
+    sizeline(ct + zlell);
+    for (i = zlell; --i >= zlecs;)
+	zleline[i + ct] = zleline[i];
+    zlell += ct;
+    zleline[zlell] = '\0';
 
-    if (mark > cs)
+    if (mark > zlecs)
 	mark += ct;
 }
 
@@ -97,18 +128,18 @@ shiftchars(int to, int cnt)
     else if (mark > to)
 	mark = to;
 
-    while (to + cnt < ll) {
-	line[to] = line[to + cnt];
+    while (to + cnt < zlell) {
+	zleline[to] = zleline[to + cnt];
 	to++;
     }
-    line[ll = to] = '\0';
+    zleline[zlell = to] = '\0';
 }
 
 /**/
 mod_export void
 backkill(int ct, int dir)
 {
-    int i = (cs -= ct);
+    int i = (zlecs -= ct);
 
     cut(i, ct, dir);
     shiftchars(i, ct);
@@ -118,7 +149,7 @@ backkill(int ct, int dir)
 mod_export void
 forekill(int ct, int dir)
 {
-    int i = cs;
+    int i = zlecs;
 
     cut(i, ct, dir);
     shiftchars(i, ct);
@@ -137,7 +168,7 @@ cut(int i, int ct, int dir)
 	if (!(zmod.flags & MOD_VIAPP) || !b->buf) {
 	    zfree(b->buf, b->len);
 	    b->buf = (char *)zalloc(ct);
-	    memcpy(b->buf, (char *) line + i, ct);
+	    memcpy(b->buf, (char *) zleline + i, ct);
 	    b->len = ct;
 	    b->flags = vilinerange ? CUTBUFFER_LINE : 0;
 	} else {
@@ -148,7 +179,7 @@ cut(int i, int ct, int dir)
 	    b->buf = realloc(b->buf, ct + len + !!(b->flags & CUTBUFFER_LINE));
 	    if (b->flags & CUTBUFFER_LINE)
 		b->buf[len++] = '\n';
-	    memcpy(b->buf + len, (char *) line + i, ct);
+	    memcpy(b->buf + len, (char *) zleline + i, ct);
 	    b->len = len + ct;
 	}
 	return;
@@ -159,7 +190,7 @@ cut(int i, int ct, int dir)
 	for(n=34; n>26; n--)
 	    vibuf[n] = vibuf[n-1];
 	vibuf[26].buf = (char *)zalloc(ct);
-	memcpy(vibuf[26].buf, (char *) line + i, ct);
+	memcpy(vibuf[26].buf, (char *) zleline + i, ct);
 	vibuf[26].len = ct;
 	vibuf[26].flags = vilinerange ? CUTBUFFER_LINE : 0;
     }
@@ -183,14 +214,14 @@ cut(int i, int ct, int dir)
     if (dir) {
 	char *s = (char *)zalloc(cutbuf.len + ct);
 
-	memcpy(s, (char *) line + i, ct);
+	memcpy(s, (char *) zleline + i, ct);
 	memcpy(s + ct, cutbuf.buf, cutbuf.len);
 	free(cutbuf.buf);
 	cutbuf.buf = s;
 	cutbuf.len += ct;
     } else {
 	cutbuf.buf = realloc(cutbuf.buf, cutbuf.len + ct);
-	memcpy(cutbuf.buf + cutbuf.len, (char *) line + i, ct);
+	memcpy(cutbuf.buf + cutbuf.len, (char *) zleline + i, ct);
 	cutbuf.len += ct;
     }
     if(vilinerange)
@@ -203,14 +234,14 @@ cut(int i, int ct, int dir)
 mod_export void
 backdel(int ct)
 {
-    shiftchars(cs -= ct, ct);
+    shiftchars(zlecs -= ct, ct);
 }
 
 /**/
 mod_export void
 foredel(int ct)
 {
-    shiftchars(cs, ct);
+    shiftchars(zlecs, ct);
 }
 
 /**/
@@ -218,19 +249,19 @@ void
 setline(char const *s)
 {
     sizeline(strlen(s));
-    strcpy((char *) line, s);
-    unmetafy((char *) line, &ll);
-    if ((cs = ll) && invicmdmode())
-	cs--;
+    strcpy((char *) zleline, s);
+    unmetafy((char *) zleline, &zlell);
+    if ((zlecs = zlell) && invicmdmode())
+	zlecs--;
 }
 
 /**/
 int
 findbol(void)
 {
-    int x = cs;
+    int x = zlecs;
 
-    while (x > 0 && line[x - 1] != '\n')
+    while (x > 0 && zleline[x - 1] != '\n')
 	x--;
     return x;
 }
@@ -239,9 +270,9 @@ findbol(void)
 int
 findeol(void)
 {
-    int x = cs;
+    int x = zlecs;
 
-    while (x != ll && line[x] != '\n')
+    while (x != zlell && zleline[x] != '\n')
 	x++;
     return x;
 }
@@ -451,8 +482,8 @@ initundo(void)
     curchange->prev = curchange->next = NULL;
     curchange->del = curchange->ins = NULL;
     lastline = zalloc(lastlinesz = linesz);
-    memcpy(lastline, line, lastll = ll);
-    lastcs = cs;
+    memcpy(lastline, zleline, lastll = zlell);
+    lastcs = zlecs;
 }
 
 /**/
@@ -512,30 +543,30 @@ void
 mkundoent(void)
 {
     int pre, suf;
-    int sh = ll < lastll ? ll : lastll;
+    int sh = zlell < lastll ? zlell : lastll;
     struct change *ch;
 
-    if(lastll == ll && !memcmp(lastline, line, ll))
+    if(lastll == zlell && !memcmp(lastline, zleline, zlell))
 	return;
-    for(pre = 0; pre < sh && line[pre] == lastline[pre]; )
+    for(pre = 0; pre < sh && zleline[pre] == lastline[pre]; )
 	pre++;
     for(suf = 0; suf < sh - pre &&
-	line[ll - 1 - suf] == lastline[lastll - 1 - suf]; )
+	zleline[zlell - 1 - suf] == lastline[lastll - 1 - suf]; )
 	suf++;
     ch = zalloc(sizeof(*ch));
     ch->next = NULL;
     ch->hist = histline;
     ch->off = pre;
     ch->old_cs = lastcs;
-    ch->new_cs = cs;
+    ch->new_cs = zlecs;
     if(suf + pre == lastll)
 	ch->del = NULL;
     else
 	ch->del = metafy(lastline + pre, lastll - pre - suf, META_DUP);
-    if(suf + pre == ll)
+    if(suf + pre == zlell)
 	ch->ins = NULL;
     else
-	ch->ins = metafy((char *)line + pre, ll - pre - suf, META_DUP);
+	ch->ins = metafy((char *)zleline + pre, zlell - pre - suf, META_DUP);
     if(nextchanges) {
 	ch->flags = CH_PREV;
 	ch->prev = endnextchanges;
@@ -557,8 +588,8 @@ setlastline(void)
 {
     if(lastlinesz != linesz)
 	lastline = realloc(lastline, lastlinesz = linesz);
-    memcpy(lastline, line, lastll = ll);
-    lastcs = cs;
+    memcpy(lastline, zleline, lastll = zlell);
+    lastcs = zlecs;
 }
 
 /* move backwards through the change list */
@@ -586,10 +617,10 @@ unapplychange(struct change *ch)
 {
     if(ch->hist != histline) {
 	zle_setline(quietgethist(ch->hist));
-	cs = ch->new_cs;
+	zlecs = ch->new_cs;
 	return 0;
     }
-    cs = ch->off;
+    zlecs = ch->off;
     if(ch->ins)
 	foredel(ztrlen(ch->ins));
     if(ch->del) {
@@ -598,11 +629,11 @@ unapplychange(struct change *ch)
 	spaceinline(ztrlen(c));
 	for(; *c; c++)
 	    if(*c == Meta)
-		line[cs++] = STOUC(*++c) ^ 32;
+		zleline[zlecs++] = STOUC(*++c) ^ 32;
 	    else
-		line[cs++] = STOUC(*c);
+		zleline[zlecs++] = STOUC(*c);
     }
-    cs = ch->old_cs;
+    zlecs = ch->old_cs;
     return 1;
 }
 
@@ -631,10 +662,10 @@ applychange(struct change *ch)
 {
     if(ch->hist != histline) {
 	zle_setline(quietgethist(ch->hist));
-	cs = ch->old_cs;
+	zlecs = ch->old_cs;
 	return 0;
     }
-    cs = ch->off;
+    zlecs = ch->off;
     if(ch->del)
 	foredel(ztrlen(ch->del));
     if(ch->ins) {
@@ -643,11 +674,11 @@ applychange(struct change *ch)
 	spaceinline(ztrlen(c));
 	for(; *c; c++)
 	    if(*c == Meta)
-		line[cs++] = STOUC(*++c) ^ 32;
+		zleline[zlecs++] = STOUC(*++c) ^ 32;
 	    else
-		line[cs++] = STOUC(*c);
+		zleline[zlecs++] = STOUC(*c);
     }
-    cs = ch->new_cs;
+    zlecs = ch->new_cs;
     return 1;
 }
 

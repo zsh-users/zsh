@@ -220,20 +220,19 @@ iaddtoline(int c)
 	return;
     if (qbang && c == bangchar && stophist < 2) {
 	exlast--;
-	spaceinline(1);
-	line[cs++] = '\\';
+	zleaddtolineptr('\\');
     }
-    if (excs > cs) {
+    if (excs > zlecs) {
 	excs += 1 + inbufct - exlast;
-	if (excs < cs)
+	if (excs < zlecs)
 	    /* this case could be handled better but it is    *
 	     * so rare that it does not worth it              */
-	    excs = cs;
+	    excs = zlecs;
     }
     exlast = inbufct;
-    spaceinline(1);
-    line[cs++] = itok(c) ? ztokens[c - Pound] : c;
+    zleaddtolineptr(itok(c) ? ztokens[c - Pound] : c);
 }
+
 
 static int
 ihgetc(void)
@@ -663,8 +662,8 @@ ihungetc(int c)
 	    hungetc('\n'), hungetc('\\');
 
 	if (expanding) {
-	    cs--;
-	    ll--;
+	    zlecs--;
+	    zlell--;
 	    exlast++;
 	}
 	DPUTS(hptr <= chline, "BUG: hungetc attempted at buffer start");
@@ -2231,7 +2230,7 @@ histfileIsLocked(void)
 mod_export LinkList
 bufferwords(LinkList list, char *buf, int *index)
 {
-    int num = 0, cur = -1, got = 0, ne = noerrs, ocs = cs, oll = ll;
+    int num = 0, cur = -1, got = 0, ne = noerrs, ocs = zlecs, oll = zlell;
     int owb = wb, owe = we, oadx = addedx, ozp = zleparse, onc = nocomments;
     int ona = noaliases;
     char *p;
@@ -2251,26 +2250,46 @@ bufferwords(LinkList list, char *buf, int *index)
 	p[l] = ' ';
 	p[l + 1] = '\0';
 	inpush(p, 0, NULL);
-	cs = strlen(p) + 1;
+	zlell = strlen(p) ;
+	zlecs = zlell + 1;
 	nocomments = 1;
-    } else if (!isfirstln && chline) {
-	p = (char *) zhalloc(hptr - chline + ll + 2);
-	memcpy(p, chline, hptr - chline);
-	memcpy(p + (hptr - chline), line, ll);
-	p[(hptr - chline) + ll] = ' ';
-	p[(hptr - chline) + ll + 1] = '\0';
-	inpush(p, 0, NULL);
-	cs += hptr - chline;
     } else {
-	p = (char *) zhalloc(ll + 2);
-	memcpy(p, line, ll);
-	p[ll] = ' ';
-	p[ll + 1] = '\0';
-	inpush(p, 0, NULL);
+	int ll, cs;
+	char *linein;
+
+	if (zlegetlineptr) {
+	    linein = zlegetlineptr(&ll, &cs);
+	} else {
+	    linein = "";
+	    ll = cs = 0;
+	}
+	zlell = ll + 1; /* length of line plus space added below */
+	zlecs = cs;
+
+	if (!isfirstln && chline) {
+	    p = (char *) zhalloc(hptr - chline + ll + 2);
+	    memcpy(p, chline, hptr - chline);
+	    memcpy(p + (hptr - chline), linein, ll);
+	    p[(hptr - chline) + ll] = ' ';
+	    p[(hptr - chline) + zlell] = '\0';
+	    inpush(p, 0, NULL);
+
+	    /*
+	     * advance line length and character position over
+	     * prepended string.
+	     */
+	    zlell += hptr - chline;
+	    zlecs += hptr - chline;
+	} else {
+	    p = (char *) zhalloc(ll + 2);
+	    memcpy(p, linein, ll);
+	    p[ll] = ' ';
+	    p[zlell] = '\0';
+	    inpush(p, 0, NULL);
+	}
     }
-    ll = strlen(p);
-    if (cs)
-	cs--;
+    if (zlecs)
+	zlecs--;
     strinbeg(0);
     noaliases = 1;
     do {
@@ -2326,8 +2345,8 @@ bufferwords(LinkList list, char *buf, int *index)
     nocomments = onc;
     noerrs = ne;
     lexrestore();
-    cs = ocs;
-    ll = oll;
+    zlecs = ocs;
+    zlell = oll;
     wb = owb;
     we = owe;
     addedx = oadx;

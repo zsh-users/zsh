@@ -4379,7 +4379,7 @@ bin_read(char *name, char **args, Options ops, UNUSED(int func))
 
     /* handle compctl case */
     if(OPT_ISSET(ops,'l') || OPT_ISSET(ops,'c'))
-	return compctlread(name, args, ops, reply);
+	return compctlreadptr(name, args, ops, reply);
 
     if ((OPT_ISSET(ops,'k') && !OPT_ISSET(ops,'u') && 
 	 !OPT_ISSET(ops,'p')) || OPT_ISSET(ops,'q')) {

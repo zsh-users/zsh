@@ -37,6 +37,11 @@
 # undef HAVE_POLL
 #endif
 
+/* The input line assembled so far */
+
+/**/
+mod_export ZLE_STRING_T zleline;
+
 /* != 0 if in a shell function called from completion, such that read -[cl]  *
  * will work (i.e., the line is metafied, and the above word arrays are OK). */
 
@@ -694,7 +699,7 @@ zlecore(void)
 	selectlocalmap(NULL);
 	bindk = getkeycmd();
 	if (bindk) {
-	    if (!ll && isfirstln && !(zlereadflags & ZLRF_IGNOREEOF) &&
+	    if (!zlell && isfirstln && !(zlereadflags & ZLRF_IGNOREEOF) &&
 		lastchar == eofchar) {
 		/*
 		 * Slight hack: this relies on getkeycmd returning
@@ -713,9 +718,9 @@ zlecore(void)
 	    }
 	    handleprefixes();
 	    /* for vi mode, make sure the cursor isn't somewhere illegal */
-	    if (invicmdmode() && cs > findbol() &&
-		(cs == ll || line[cs] == '\n'))
-		cs--;
+	    if (invicmdmode() && zlecs > findbol() &&
+		(zlecs == zlell || zleline[zlecs] == '\n'))
+		zlecs--;
 	    if (undoing)
 		handleundo();
 	} else {
@@ -814,9 +819,9 @@ zleread(char **lp, char **rp, int flags, int context)
     zlecontext = context;
     histline = curhist;
     undoing = 1;
-    line = (unsigned char *)zalloc((linesz = 256) + 2);
-    *line = '\0';
-    virangeflag = lastcmd = done = cs = ll = mark = 0;
+    zleline = (unsigned char *)zalloc((linesz = 256) + 2);
+    *zleline = '\0';
+    virangeflag = lastcmd = done = zlecs = zlell = mark = 0;
     vichgflag = 0;
     viinsbegin = 0;
     statusline = NULL;
@@ -827,10 +832,10 @@ zleread(char **lp, char **rp, int flags, int context)
 	setline((char *)s);
 	zsfree((char *)s);
 	if (stackcs != -1) {
-	    cs = stackcs;
+	    zlecs = stackcs;
 	    stackcs = -1;
-	    if (cs > ll)
-		cs = ll;
+	    if (zlecs > zlell)
+		zlecs = zlell;
 	}
 	if (stackhist != -1) {
 	    histline = stackhist;
@@ -872,15 +877,15 @@ zleread(char **lp, char **rp, int flags, int context)
 
     freeundo();
     if (eofsent) {
-	free(line);
-	line = NULL;
+	free(zleline);
+	zleline = NULL;
     } else {
-	line[ll++] = '\n';
-	line = (unsigned char *) metafy((char *) line, ll, META_REALLOC);
+	zleline[zlell++] = '\n';
+	zleline = (unsigned char *) metafy((char *) zleline, zlell, META_REALLOC);
     }
     forget_edits();
     errno = old_errno;
-    return line;
+    return zleline;
 }
 
 /* execute a widget */
@@ -911,7 +916,7 @@ execzlefunc(Thingy func, char **args)
 	 * zlenoargs placeholder.
 	 */
 	if (keybuf[0] == eofchar && !keybuf[1] && args == zlenoargs &&
-	    !ll && isfirstln && (zlereadflags & ZLRF_IGNOREEOF)) {
+	    !zlell && isfirstln && (zlereadflags & ZLRF_IGNOREEOF)) {
 	    showmsg((!islogin) ? "zsh: use 'exit' to exit." :
 		    "zsh: use 'logout' to logout.");
 	    eofsent = 1;
@@ -1433,8 +1438,9 @@ setup_(UNUSED(Module m))
 {
     /* Set up editor entry points */
     trashzleptr = trashzle;
-    refreshptr = zrefresh;
-    spaceinlineptr = spaceinline;
+    zrefreshptr = zrefresh;
+    zleaddtolineptr = zleaddtoline;
+    zlegetlineptr = zlegetline;
     zlereadptr = zleread;
     zlesetkeymapptr = zlesetkeymap;
 
@@ -1517,8 +1523,9 @@ finish_(UNUSED(Module m))
 
     /* editor entry points */
     trashzleptr = noop_function;
-    refreshptr = noop_function;
-    spaceinlineptr = noop_function_int;
+    zrefreshptr = noop_function;
+    zleaddtolineptr = noop_function_int;
+    zlegetlineptr = NULL;
     zlereadptr = fallback_zleread;
     zlesetkeymapptr= noop_function_int;
 

@@ -729,7 +729,7 @@ createparamtable(void)
 /* assign various functions used for non-special parameters */
 
 /**/
-static void
+mod_export void
 assigngetset(Param pm)
 {
     switch (PM_TYPE(pm->flags)) {

@@ -1084,7 +1084,7 @@ dotrapargs(int sig, int *sigtr, void *sigfn)
      * need to restore the display.
      */
     if (zleactive && resetneeded)
-	zrefresh();
+	zrefreshptr();
 
     if (*sigtr != ZSIG_IGNORED)
 	*sigtr &= ~ZSIG_IGNORED;

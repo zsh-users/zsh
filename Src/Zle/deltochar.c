@@ -37,18 +37,18 @@ static Widget w_zaptochar;
 static int
 deltochar(UNUSED(char **args))
 {
-    int c = getkey(0), dest = cs, ok = 0, n = zmult;
+    int c = getkey(0), dest = zlecs, ok = 0, n = zmult;
     int zap = (bindk->widget == w_zaptochar);
 
     if (n > 0) {
-	while (n-- && dest != ll) {
-	    while (dest != ll && line[dest] != c)
+	while (n-- && dest != zlell) {
+	    while (dest != zlell && zleline[dest] != c)
 		dest++;
-	    if (dest != ll) {
+	    if (dest != zlell) {
 		if (!zap || n > 0)
 		    dest++;
 		if (!n) {
-		    forekill(dest - cs, 0);
+		    forekill(dest - zlecs, 0);
 		    ok++;
 		}
 	    }
@@ -58,11 +58,11 @@ deltochar(UNUSED(char **args))
 	if (dest)
 	    dest--;
 	while (n++ && dest != 0) {
-	    while (dest != 0 && line[dest] != c)
+	    while (dest != 0 && zleline[dest] != c)
 		dest--;
-	    if (line[dest] == c) {
+	    if (zleline[dest] == c) {
 		if (!n) {
-		    backkill(cs - dest - zap, 1);
+		    backkill(zlecs - dest - zap, 1);
 		    ok++;
 		}
 		if (dest)

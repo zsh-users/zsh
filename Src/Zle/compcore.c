@@ -329,7 +329,7 @@ do_completion(UNUSED(Hookdef dummy), Compldat dat)
 		      (isset(LISTPACKED) ? "packed rows" : "rows") :
 		      (isset(LISTPACKED) ? "packed" : ""));
     startauto = isset(AUTOMENU);
-    movetoend = ((cs == we || isset(ALWAYSTOEND)) ? 2 : 1);
+    movetoend = ((zlecs == we || isset(ALWAYSTOEND)) ? 2 : 1);
     showinglist = 0;
     hasmatched = hasunmatched = 0;
     minmlen = 1000000;
@@ -341,10 +341,10 @@ do_completion(UNUSED(Hookdef dummy), Compldat dat)
     /* Make sure we have the completion list and compctl. */
     if (makecomplist(s, incmd, lst)) {
 	/* Error condition: feeeeeeeeeeeeep(). */
-	cs = 0;
-	foredel(ll);
+	zlecs = 0;
+	foredel(zlell);
 	inststr(origline);
-	cs = origcs;
+	zlecs = origcs;
 	clearlist = 1;
 	ret = 1;
 	minfo.cur = NULL;
@@ -366,10 +366,10 @@ do_completion(UNUSED(Hookdef dummy), Compldat dat)
 	ret = selfinsert(zlenoargs);
     else if (!useline && uselist) {
 	/* All this and the guy only wants to see the list, sigh. */
-	cs = 0;
-	foredel(ll);
+	zlecs = 0;
+	foredel(zlell);
 	inststr(origline);
-	cs = origcs;
+	zlecs = origcs;
 	showinglist = -2;
     } else if (useline == 2 && nmatches > 1) {
 	do_allmatches(1);
@@ -414,10 +414,10 @@ do_completion(UNUSED(Hookdef dummy), Compldat dat)
 	invalidatelist();
 	if (forcelist)
 	    clearlist = 1;
-	cs = 0;
-	foredel(ll);
+	zlecs = 0;
+	foredel(zlell);
 	inststr(origline);
-	cs = origcs;
+	zlecs = origcs;
     }
     /* Print the explanation strings if needed. */
     if (!showinglist && validlist && usemenu != 2 && uselist &&
@@ -430,9 +430,9 @@ do_completion(UNUSED(Hookdef dummy), Compldat dat)
     for (n = firstnode(matchers); n; incnode(n))
 	freecmatcher((Cmatcher) getdata(n));
 
-    ll = strlen((char *)line);
-    if (cs > ll)
-	cs = ll;
+    zlell = strlen((char *)zleline);
+    if (zlecs > zlell)
+	zlecs = zlell;
     popheap();
 
     return ret;
@@ -469,8 +469,8 @@ before_complete(UNUSED(Hookdef dummy), int *lst)
     /* We may have to reset the cursor to its position after the   *
      * string inserted by the last completion. */
 
-    if ((fromcomp & FC_INWORD) && (cs = lastend) > ll)
-	cs = ll;
+    if ((fromcomp & FC_INWORD) && (zlecs = lastend) > zlell)
+	zlecs = zlell;
 
     /* Check if we have to start a menu-completion (via automenu). */
 
@@ -499,10 +499,10 @@ after_complete(UNUSED(Hookdef dummy), int *dat)
 	    minfo.cur = NULL;
 	    if (ret >= 2) {
 		fixsuffix();
-		cs = 0;
-		foredel(ll);
+		zlecs = 0;
+		foredel(zlell);
 		inststr(origline);
-		cs = origcs;
+		zlecs = origcs;
 		if (ret == 2) {
 		    clearlist = 1;
 		    invalidatelist();
@@ -683,10 +683,10 @@ callcompfunc(char *s, char *fn)
 	    int l;
 
 	    compiprefix = (char *) zalloc((l = wb - parwb) + 1);
-	    memcpy(compiprefix, line + parwb, l);
+	    memcpy(compiprefix, zleline + parwb, l);
 	    compiprefix[l] = '\0';
 	    compisuffix = (char *) zalloc((l = parwe - we) + 1);
-	    memcpy(compisuffix, line + we, l);
+	    memcpy(compisuffix, zleline + we, l);
 	    compisuffix[l] = '\0';
 
 	    wb = parwb;
@@ -1152,7 +1152,7 @@ check_param(char *s, int set, int test)
 	    }
 	    /* And adjust wb, we, and offs again. */
 	    offs -= b - s;
-	    wb = cs - offs;
+	    wb = zlecs - offs;
 	    we = wb + e - b;
 	    ispar = (br >= 2 ? 2 : 1);
 	    b[we-wb] = '\0';
@@ -1273,11 +1273,11 @@ set_comp_sep(void)
     char *s = comp_str(&lip, &lp, 1);
     LinkList foo = newlinklist();
     LinkNode n;
-    int owe = we, owb = wb, ocs = cs, swb, swe, scs, soffs, ne = noerrs;
-    int tl, got = 0, i = 0, j, cur = -1, oll = ll, sl, css = 0;
+    int owe = we, owb = wb, ocs = zlecs, swb, swe, scs, soffs, ne = noerrs;
+    int tl, got = 0, i = 0, j, cur = -1, oll = zlell, sl, css = 0;
     int remq = 0, dq = 0, odq, sq = 0, osq, issq = 0, sqq = 0, lsq = 0, qa = 0;
     int ois = instring, oib = inbackt, noffs = lp, ona = noaliases;
-    char *tmp, *p, *ns, *ol = (char *) line, sav, *qp, *qs, *ts, qc = '\0';
+    char *tmp, *p, *ns, *ol = (char *) zleline, sav, *qp, *qs, *ts, qc = '\0';
 
     s += lip;
     wb += lip;
@@ -1295,7 +1295,7 @@ set_comp_sep(void)
     tmp = (char *) zhalloc(tl = 3 + strlen(s));
     tmp[0] = ' ';
     memcpy(tmp + 1, s, noffs);
-    tmp[(scs = cs = 1 + noffs)] = 'x';
+    tmp[(scs = zlecs = 1 + noffs)] = 'x';
     strcpy(tmp + 2 + noffs, s + noffs);
 
     switch (*compqstack) {
@@ -1318,8 +1318,8 @@ set_comp_sep(void)
             if (*p == '\\' && p[1] == '\\') {
                 dq++;
                 chuck(p);
-                if (j > cs) {
-                    cs++;
+                if (j > zlecs) {
+                    zlecs++;
                     css++;
                 }
                 if (!*p)
@@ -1329,8 +1329,8 @@ set_comp_sep(void)
     odq = dq;
     osq = sq;
     inpush(dupstrspace(tmp), 0, NULL);
-    line = (unsigned char *) tmp;
-    ll = tl - 1;
+    zleline = (unsigned char *) tmp;
+    zlell = tl - 1;
     strinbeg(0);
     noaliases = 1;
     do {
@@ -1383,7 +1383,7 @@ set_comp_sep(void)
 	    swb = wb - 1 - dq - sq;
 	    swe = we - 1 - dq - sq;
             sqq = lsq;
-	    soffs = cs - swb - css;
+	    soffs = zlecs - swb - css;
 	    chuck(p + soffs);
 	    ns = dupstring(p);
 	}
@@ -1397,9 +1397,9 @@ set_comp_sep(void)
     lexrestore();
     wb = owb;
     we = owe;
-    cs = ocs;
-    line = (unsigned char *) ol;
-    ll = oll;
+    zlecs = ocs;
+    zleline = (unsigned char *) ol;
+    zlell = oll;
     if (cur < 0 || i < 1)
 	return 1;
     owb = offs;

@@ -1772,27 +1772,27 @@ setmstatus(char *status, char *sline, int sll, int scs,
     int pl, sl, max;
 
     if (csp) {
-        *csp = cs;
-        *llp = ll;
+        *csp = zlecs;
+        *llp = zlell;
         *lenp = lastend - wb;
 
-        ret = dupstring((char *) line);
+        ret = dupstring((char *) zleline);
 
-        p = (char *) zhalloc(cs - wb + 1);
-        strncpy(p, (char *) line + wb, cs - wb);
-        p[cs - wb] = '\0';
-        if (lastend < cs)
+        p = (char *) zhalloc(zlecs - wb + 1);
+        strncpy(p, (char *) zleline + wb, zlecs - wb);
+        p[zlecs - wb] = '\0';
+        if (lastend < zlecs)
             s = "";
         else {
-            s = (char *) zhalloc(lastend - cs + 1);
-            strncpy(s, (char *) line + cs, lastend - cs);
-            s[lastend - cs] = '\0';
+            s = (char *) zhalloc(lastend - zlecs + 1);
+            strncpy(s, (char *) zleline + zlecs, lastend - zlecs);
+            s[lastend - zlecs] = '\0';
         }
-        cs = 0;
-        foredel(ll);
+        zlecs = 0;
+        foredel(zlell);
         spaceinline(sll);
-        memcpy(line, sline, sll);
-        cs = scs;
+        memcpy(zleline, sline, sll);
+        zlecs = scs;
     } else {
         p = complastprefix;
         s = complastsuffix;
@@ -1994,11 +1994,11 @@ domenuselect(Hookdef dummy, Chdata dat)
 	     * was before completion started.
 	     */
             mode = MM_INTER;
-            cs = 0;
-            foredel(ll);
+            zlecs = 0;
+            foredel(zlell);
             spaceinline(l);
-            strncpy((char *) line, origline, l);
-            cs = origcs;
+            strncpy((char *) zleline, origline, l);
+            zlecs = origcs;
             setmstatus(status, NULL, 0 , 0, NULL, NULL, NULL);
         } else if (strpfx("search", s)) {
             mode = (strstr(s, "back") ? MM_BSEARCH : MM_FSEARCH);
@@ -2092,9 +2092,9 @@ domenuselect(Hookdef dummy, Chdata dat)
 	     * completion we don't want that, we always want to
 	     * be able to type the next character.
 	     */
-	    modeline = dupstring(line);
-            modecs = cs;
-            modell = ll;
+	    modeline = dupstring(zleline);
+            modecs = zlecs;
+            modell = zlell;
             modelen = minfo.len;
         }
         first = 0;
@@ -2188,11 +2188,11 @@ domenuselect(Hookdef dummy, Chdata dat)
 		 * start.
 		 */
                 mode = MM_INTER;
-                cs = 0;
-                foredel(ll);
+                zlecs = 0;
+                foredel(zlell);
                 spaceinline(l);
-                strncpy((char *) line, origline, l);
-                cs = origcs;
+                strncpy((char *) zleline, origline, l);
+                zlecs = origcs;
                 setmstatus(status, NULL, 0, 0, NULL, NULL, NULL);
 
                 continue;
@@ -2207,8 +2207,8 @@ domenuselect(Hookdef dummy, Chdata dat)
 
 	    s->prev = u;
 	    u = s;
-	    s->line = dupstring((char *) line);
-	    s->cs = cs;
+	    s->line = dupstring((char *) zleline);
+	    s->cs = zlecs;
 	    s->mline = mline;
 	    s->mlbeg = mlbeg;
 	    memcpy(&(s->info), &minfo, sizeof(struct menuinfo));
@@ -2247,21 +2247,21 @@ domenuselect(Hookdef dummy, Chdata dat)
 		 * the command line as it is with just the
 		 * characters typed by the user.
 		 */
-                cs = 0;
-                foredel(ll);
+                zlecs = 0;
+                foredel(zlell);
                 spaceinline(l);
-                strncpy((char *) line, origline, l);
-                cs = origcs;
+                strncpy((char *) zleline, origline, l);
+                zlecs = origcs;
 
                 if (cmd == Th(z_selfinsert))
                     selfinsert(zlenoargs);
                 else
                     selfinsertunmeta(zlenoargs);
 
-                saveline = (char *) zhalloc(ll);
-                memcpy(saveline, line, ll);
-                savell = ll;
-                savecs = cs;
+                saveline = (char *) zhalloc(zlell);
+                memcpy(saveline, zleline, zlell);
+                savell = zlell;
+                savecs = zlecs;
                 iforcemenu = -1;
             } else
                 mode = 0;
@@ -2313,8 +2313,8 @@ domenuselect(Hookdef dummy, Chdata dat)
             mode = 0;
 	    s->prev = u;
 	    u = s;
-	    s->line = dupstring((char *) line);
-	    s->cs = cs;
+	    s->line = dupstring((char *) zleline);
+	    s->cs = zlecs;
 	    s->mline = mline;
 	    s->mlbeg = mlbeg;
 	    memcpy(&(s->info), &minfo, sizeof(struct menuinfo));
@@ -2368,11 +2368,11 @@ domenuselect(Hookdef dummy, Chdata dat)
 		break;
 
 	    handleundo();
-	    cs = 0;
-	    foredel(ll);
+	    zlecs = 0;
+	    foredel(zlell);
 	    spaceinline(l = strlen(u->line));
-	    strncpy((char *) line, u->line, l);
-	    cs = u->cs;
+	    strncpy((char *) zleline, u->line, l);
+	    zlecs = u->cs;
 	    menuacc = u->acc;
 	    memcpy(&minfo, &(u->info), sizeof(struct menuinfo));
 	    p = &(minfo.cur);
@@ -2750,11 +2750,11 @@ domenuselect(Hookdef dummy, Chdata dat)
                 origline = modeline;
                 origcs = modecs;
                 origll = modell;
-                cs = 0;
-                foredel(ll);
+                zlecs = 0;
+                foredel(zlell);
                 spaceinline(origll);
-                strncpy((char *) line, origline, origll);
-                cs = origcs;
+                strncpy((char *) zleline, origline, origll);
+                zlecs = origcs;
                 minfo.len = modelen;
             } else {
                 mode = 0;

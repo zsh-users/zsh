@@ -30,17 +30,6 @@
 #include "zsh.mdh"
 #include "utils.pro"
 
-#if defined(HAVE_WCHAR_H) && defined(HAVE_WCTOMB) && defined (__STDC_ISO_10646__)
-# include <wchar.h>
-#else
-# ifdef HAVE_LANGINFO_H 			       
-#   include <langinfo.h>			       
-#   if defined(HAVE_ICONV) || defined(HAVE_LIBICONV)   
-#     include <iconv.h> 			       
-#   endif					       
-# endif 					       
-#endif
-
 /* name of script being sourced */
 
 /**/
@@ -79,7 +68,7 @@ zwarn(const char *fmt, const char *str, int num)
     if (errflag || noerrs)
 	return;
     if (isatty(2))
-	trashzle();
+	trashzleptr();
     /*
      * scriptname is set when sourcing scripts, so that we get the
      * correct name instead of the generic name of whatever
@@ -102,7 +91,7 @@ zwarnnam(const char *cmd, const char *fmt, const char *str, int num)
     }
     if (errflag || noerrs)
 	return;
-    trashzle();
+    trashzleptr();
     if (unset(SHINSTDIN) || locallevel) {
 	nicezputs(scriptname ? scriptname : argzero, stderr);
 	fputc((unsigned char)':', stderr);
@@ -1054,7 +1043,7 @@ adjustwinsize(int from)
 	winchanged =
 #endif /* TIOCGWINSZ */
 	    resetneeded = 1;
-	zrefresh();
+	zrefreshptr();
     }
 }
 

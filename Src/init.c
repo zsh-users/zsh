@@ -1123,9 +1123,11 @@ noop_function_int(UNUSED(int nothing))
 /**/
 mod_export ZleVoidFn trashzleptr = noop_function;
 /**/
-mod_export ZleVoidFn refreshptr = noop_function;
+mod_export ZleVoidFn zrefreshptr = noop_function;
 /**/
-mod_export ZleVoidIntFn spaceinlineptr = noop_function_int;
+mod_export ZleVoidIntFn zleaddtolineptr = noop_function_int;
+/**/
+mod_export ZleGetLineFn zlegetlineptr = NULL;
 /**/
 mod_export ZleReadFn zlereadptr = autoload_zleread;
 /**/
@@ -1134,8 +1136,9 @@ mod_export ZleVoidIntFn zlesetkeymapptr = noop_function_int;
 #else /* !LINKED_XMOD_zshQszle */
 
 mod_export ZleVoidFn trashzleptr = noop_function;
-mod_export ZleVoidFn refreshptr = noop_function;
-mod_export ZleVoidIntFn spaceinlineptr = noop_function_int;
+mod_export ZleVoidFn zrefreshptr = noop_function;
+mod_export ZleVoidIntFn zleaddtolineptr = noop_function_int;
+mod_export ZleGetLineFn zlegetlineptr = NULL;
 # ifdef UNLINKED_XMOD_zshQszle
 mod_export ZleReadFn zlereadptr = autoload_zleread;
 mod_export ZleVoidIntFn zlesetkeymapptr = autoload_zlesetkeymap;
@@ -1153,7 +1156,7 @@ autoload_zleread(char **lp, char **rp, int ha, int con)
     zlereadptr = fallback_zleread;
     if (load_module("zsh/zle"))
 	load_module("zsh/compctl");
-    return zleread(lp, rp, ha, con);
+    return zlereadptr(lp, rp, ha, con);
 }
 
 /**/

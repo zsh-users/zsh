@@ -27,11 +27,6 @@
  *
  */
 
-#undef trashzle
-#undef zleread
-#undef spaceinline
-#undef zrefresh
-
 typedef struct widget *Widget;
 typedef struct thingy *Thingy;
 

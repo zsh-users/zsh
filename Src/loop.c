@@ -245,7 +245,7 @@ execselect(Estate state, UNUSED(int do_exec))
 		    int oef = errflag;
 
 		    isfirstln = 1;
-		    str = (char *)zleread(&prompt3, NULL, 0, ZLCON_SELECT);
+		    str = (char *)zlereadptr(&prompt3, NULL, 0, ZLCON_SELECT);
 		    if (errflag)
 			str = NULL;
 		    errflag = oef;
@@ -314,7 +314,7 @@ selectlist(LinkList l, size_t start)
     LinkNode n;
     char **arr, **ap;
 
-    trashzle();
+    trashzleptr();
     ct = countlinknodes(l);
     ap = arr = (char **) zhalloc((countlinknodes(l) + 1) * sizeof(char **));
 
