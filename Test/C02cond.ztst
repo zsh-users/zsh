@@ -19,8 +19,6 @@
   chmod u+s modish
   chmod +t modish
 
-  touch unmodish
-  chmod 000 unmodish
 %test
 
   [[ -a zerolength && ! -a nonexistent ]]
@@ -70,7 +68,11 @@
   [[ -p pipe && ! -p zerolength ]]
 0:-p cond
 
+  touch unmodish
+  chmod 000 unmodish
   [[ -r zerolength && ! -r unmodish ]]
+  # This works around a bug in rm -f in some versions of Cygwin
+  chmod 644 unmodish
 0:-r cond
 
   [[ -s nonzerolength && ! -s zerolength ]]

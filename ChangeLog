@@ -1,5 +1,8 @@
 2001-05-21  Peter Stephenson  <pws@csr.com>
 
+	* 14408: Test/C02cond.ztst: do chmod +w to work around rm -f
+	problem in Cygwin.
+
 	* unposted: Test/.distfiles: add Test/E01options.ztst.
 
 2001-05-20  Peter Stephenson  <pws@pwstephenson.fsnet.co.uk>
