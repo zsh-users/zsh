@@ -5,7 +5,7 @@
 
 2000-11-08  Sven Wischnowsky  <wischnow@zsh.org>
 
-	* ?????: Src/Modules/zpty.c: use possible read character from
+	* unposted: Src/Modules/zpty.c: use possible read character from
 	read_poll() in loop in ptyread()
 	
 	* 13128: Completion/Builtins/_zstyle, Completion/Core/_match,
