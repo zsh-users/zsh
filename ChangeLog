@@ -1,3 +1,12 @@
+2000-04-16  Peter Stephenson  <pws@pwstephenson.fsnet.co.uk>
+
+	* 10771: Etc/MACHINES: successful compilation on OpenBSD, from
+	Anthony Schneider.
+
+	* 10771: Doc/Zsh/builtins.yo, Doc/Zsh/options.yo, Src/builtin.c,
+	Src/options.c, Src/zsh.h: New option GLOBAL_EXPORT set by default
+	makes typeset -x equivalent to typeset -gx.
+
 2000-04-15  Clint Adams  <schizo@debian.org>
 
 	* 10768: configure.in: DLLDFLAGS for OpenBSD.

@@ -1160,9 +1160,10 @@ This flag has a different meaning when used with tt(-f); see above.
 )
 item(tt(-x))(
 Mark for automatic export to the environment of subsequently
-executed commands.  Currently this implies the option tt(-g), unless tt(+g)
-is also explicitly given, in other words the parameter is not made local to
-the enclosing function.  This is for compatibility with other shells.
+executed commands.  If the option tt(GLOBAL_EXPORT) is set, this implies
+the option tt(-g), unless tt(+g) is also explicitly given; in other words
+the parameter is not made local to the enclosing function.  This is for
+compatibility with previous versions of zsh.
 )
 enditem()
 )

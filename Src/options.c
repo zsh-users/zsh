@@ -38,22 +38,13 @@ int emulation;
 /* the options; e.g. if opts[SHGLOB] != 0, SH_GLOB is turned on */
  
 /**/
-char opts[OPT_SIZE];
+mod_export char opts[OPT_SIZE];
  
 /* Option name hash table */
 
 /**/
-HashTable optiontab;
+mod_export HashTable optiontab;
  
-typedef struct optname *Optname;
-
-struct optname {
-    HashNode next;		/* next in hash chain */
-    char *nam;			/* hash data */
-    int flags;
-    int optno;			/* option number */
-};
-
 /* The canonical option name table */
 
 #define OPT_CSH		EMULATE_CSH
@@ -73,12 +64,16 @@ struct optname {
 
 #define defset(X) (!!((X)->flags & emulation))
 
+/*
+ * Note that option names should usually be fewer than 20 characters long
+ * to avoid formatting problems.
+ */
 static struct optname optns[] = {
-{NULL, "allexport",	      0,			 ALLEXPORT},
+{NULL, "allexport",	      OPT_EMULATE,		 ALLEXPORT},
 {NULL, "alwayslastprompt",    OPT_ALL,			 ALWAYSLASTPROMPT},
 {NULL, "alwaystoend",	      0,			 ALWAYSTOEND},
 {NULL, "appendhistory",	      OPT_ALL,			 APPENDHISTORY},
-{NULL, "autocd",	      0,			 AUTOCD},
+{NULL, "autocd",	      OPT_EMULATE,		 AUTOCD},
 {NULL, "autolist",	      OPT_ALL,			 AUTOLIST},
 {NULL, "automenu",	      OPT_ALL,			 AUTOMENU},
 {NULL, "autonamedirs",	      0,			 AUTONAMEDIRS},
@@ -88,15 +83,18 @@ static struct optname optns[] = {
 {NULL, "autoremoveslash",     OPT_ALL,			 AUTOREMOVESLASH},
 {NULL, "autoresume",	      0,			 AUTORESUME},
 {NULL, "badpattern",	      OPT_EMULATE|OPT_NONBOURNE, BADPATTERN},
-{NULL, "banghist",	      OPT_EMULATE|OPT_NONBOURNE, BANGHIST},
+{NULL, "banghist",	      OPT_NONBOURNE,		 BANGHIST},
 {NULL, "bareglobqual",        OPT_EMULATE|OPT_ZSH,       BAREGLOBQUAL},
+{NULL, "bashautolist",	      0,                         BASHAUTOLIST},
 {NULL, "beep",		      OPT_ALL,			 BEEP},
 {NULL, "bgnice",	      OPT_EMULATE|OPT_NONBOURNE, BGNICE},
-{NULL, "braceccl",	      0,			 BRACECCL},
+{NULL, "braceccl",	      OPT_EMULATE,		 BRACECCL},
 {NULL, "bsdecho",	      OPT_EMULATE|OPT_SH,	 BSDECHO},
-{NULL, "cdablevars",	      0,			 CDABLEVARS},
-{NULL, "chaselinks",	      0,			 CHASELINKS},
-{NULL, "clobber",	      OPT_ALL,			 CLOBBER},
+{NULL, "cdablevars",	      OPT_EMULATE,		 CDABLEVARS},
+{NULL, "chasedots",	      OPT_EMULATE,		 CHASEDOTS},
+{NULL, "chaselinks",	      OPT_EMULATE,		 CHASELINKS},
+{NULL, "checkjobs",	      OPT_EMULATE|OPT_ZSH,	 CHECKJOBS},
+{NULL, "clobber",	      OPT_EMULATE|OPT_ALL,	 CLOBBER},
 {NULL, "completealiases",     0,			 COMPLETEALIASES},
 {NULL, "completeinword",      0,			 COMPLETEINWORD},
 {NULL, "correct",	      0,			 CORRECT},
@@ -104,46 +102,57 @@ static struct optname optns[] = {
 {NULL, "cshjunkiehistory",    OPT_EMULATE|OPT_CSH,	 CSHJUNKIEHISTORY},
 {NULL, "cshjunkieloops",      OPT_EMULATE|OPT_CSH,	 CSHJUNKIELOOPS},
 {NULL, "cshjunkiequotes",     OPT_EMULATE|OPT_CSH,	 CSHJUNKIEQUOTES},
+{NULL, "cshnullcmd",	      OPT_EMULATE|OPT_CSH,	 CSHNULLCMD},
 {NULL, "cshnullglob",	      OPT_EMULATE|OPT_CSH,	 CSHNULLGLOB},
 {NULL, "equals",	      OPT_EMULATE|OPT_ZSH,	 EQUALS},
-{NULL, "errexit",	      0,			 ERREXIT},
+{NULL, "errexit",	      OPT_EMULATE,		 ERREXIT},
 {NULL, "exec",		      OPT_ALL,			 EXECOPT},
-{NULL, "extendedglob",	      0,			 EXTENDEDGLOB},
-{NULL, "extendedhistory",     OPT_EMULATE|OPT_CSH,	 EXTENDEDHISTORY},
+{NULL, "extendedglob",	      OPT_EMULATE,		 EXTENDEDGLOB},
+{NULL, "extendedhistory",     OPT_CSH,			 EXTENDEDHISTORY},
 {NULL, "flowcontrol",	      OPT_ALL,			 FLOWCONTROL},
 {NULL, "functionargzero",     OPT_EMULATE|OPT_NONBOURNE, FUNCTIONARGZERO},
-{NULL, "glob",		      OPT_ALL,			 GLOBOPT},
+{NULL, "glob",		      OPT_EMULATE|OPT_ALL,	 GLOBOPT},
+{NULL, "globalexport",        OPT_EMULATE|OPT_ZSH,	 GLOBALEXPORT},
+{NULL, "globalrcs",           OPT_ALL,			 GLOBALRCS},
 {NULL, "globassign",	      OPT_EMULATE|OPT_CSH,	 GLOBASSIGN},
 {NULL, "globcomplete",	      0,			 GLOBCOMPLETE},
-{NULL, "globdots",	      0,			 GLOBDOTS},
+{NULL, "globdots",	      OPT_EMULATE,		 GLOBDOTS},
 {NULL, "globsubst",	      OPT_EMULATE|OPT_NONZSH,	 GLOBSUBST},
 {NULL, "hashcmds",	      OPT_ALL,			 HASHCMDS},
 {NULL, "hashdirs",	      OPT_ALL,			 HASHDIRS},
 {NULL, "hashlistall",	      OPT_ALL,			 HASHLISTALL},
 {NULL, "histallowclobber",    0,			 HISTALLOWCLOBBER},
 {NULL, "histbeep",	      OPT_ALL,			 HISTBEEP},
+{NULL, "histexpiredupsfirst", 0,			 HISTEXPIREDUPSFIRST},
+{NULL, "histfindnodups",      0,			 HISTFINDNODUPS},
+{NULL, "histignorealldups",   0,			 HISTIGNOREALLDUPS},
 {NULL, "histignoredups",      0,			 HISTIGNOREDUPS},
 {NULL, "histignorespace",     0,			 HISTIGNORESPACE},
 {NULL, "histnofunctions",     0,			 HISTNOFUNCTIONS},
 {NULL, "histnostore",	      0,			 HISTNOSTORE},
 {NULL, "histreduceblanks",    0,			 HISTREDUCEBLANKS},
+{NULL, "histsavenodups",      0,			 HISTSAVENODUPS},
 {NULL, "histverify",	      0,			 HISTVERIFY},
 {NULL, "hup",		      OPT_EMULATE|OPT_ZSH,	 HUP},
 {NULL, "ignorebraces",	      OPT_EMULATE|OPT_SH,	 IGNOREBRACES},
 {NULL, "ignoreeof",	      0,			 IGNOREEOF},
+{NULL, "incappendhistory",    0,			 INCAPPENDHISTORY},
 {NULL, "interactive",	      OPT_SPECIAL,		 INTERACTIVE},
-{NULL, "interactivecomments", OPT_EMULATE|OPT_BOURNE,	 INTERACTIVECOMMENTS},
+{NULL, "interactivecomments", OPT_BOURNE,		 INTERACTIVECOMMENTS},
 {NULL, "ksharrays",	      OPT_EMULATE|OPT_BOURNE,	 KSHARRAYS},
 {NULL, "kshautoload",	      OPT_EMULATE|OPT_BOURNE,	 KSHAUTOLOAD},
 {NULL, "kshglob",             OPT_EMULATE|OPT_KSH,       KSHGLOB},
 {NULL, "kshoptionprint",      OPT_EMULATE|OPT_KSH,	 KSHOPTIONPRINT},
 {NULL, "listambiguous",	      OPT_ALL,			 LISTAMBIGUOUS},
 {NULL, "listbeep",	      OPT_ALL,			 LISTBEEP},
+{NULL, "listpacked",	      0,			 LISTPACKED},
+{NULL, "listrowsfirst",	      0,			 LISTROWSFIRST},
 {NULL, "listtypes",	      OPT_ALL,			 LISTTYPES},
 {NULL, "localoptions",	      OPT_EMULATE|OPT_KSH,	 LOCALOPTIONS},
+{NULL, "localtraps",	      OPT_EMULATE|OPT_KSH,	 LOCALTRAPS},
 {NULL, "login",		      OPT_SPECIAL,		 LOGINSHELL},
 {NULL, "longlistjobs",	      0,			 LONGLISTJOBS},
-{NULL, "magicequalsubst",     0,			 MAGICEQUALSUBST},
+{NULL, "magicequalsubst",     OPT_EMULATE,		 MAGICEQUALSUBST},
 {NULL, "mailwarning",	      0,			 MAILWARNING},
 {NULL, "markdirs",	      0,			 MARKDIRS},
 {NULL, "menucomplete",	      0,			 MENUCOMPLETE},
@@ -152,33 +161,35 @@ static struct optname optns[] = {
 {NULL, "nomatch",	      OPT_EMULATE|OPT_NONBOURNE, NOMATCH},
 {NULL, "notify",	      OPT_ZSH,			 NOTIFY},
 {NULL, "nullglob",	      OPT_EMULATE,		 NULLGLOB},
-{NULL, "numericglobsort",     0,			 NUMERICGLOBSORT},
+{NULL, "numericglobsort",     OPT_EMULATE,		 NUMERICGLOBSORT},
 {NULL, "overstrike",	      0,			 OVERSTRIKE},
-{NULL, "pathdirs",	      0,			 PATHDIRS},
+{NULL, "pathdirs",	      OPT_EMULATE,		 PATHDIRS},
 {NULL, "posixbuiltins",	      OPT_EMULATE|OPT_BOURNE,	 POSIXBUILTINS},
 {NULL, "printeightbit",       0,                         PRINTEIGHTBIT},
 {NULL, "printexitvalue",      0,			 PRINTEXITVALUE},
 {NULL, "privileged",	      OPT_SPECIAL,		 PRIVILEGED},
-{NULL, "promptbang",	      OPT_EMULATE|OPT_KSH,	 PROMPTBANG},
+{NULL, "promptbang",	      OPT_KSH,			 PROMPTBANG},
 {NULL, "promptcr",	      OPT_ALL,			 PROMPTCR},
-{NULL, "promptpercent",	      OPT_EMULATE|OPT_NONBOURNE, PROMPTPERCENT},
-{NULL, "promptsubst",	      OPT_EMULATE|OPT_KSH,	 PROMPTSUBST},
-{NULL, "pushdignoredups",     0,			 PUSHDIGNOREDUPS},
-{NULL, "pushdminus",	      0,			 PUSHDMINUS},
+{NULL, "promptpercent",	      OPT_NONBOURNE,		 PROMPTPERCENT},
+{NULL, "promptsubst",	      OPT_KSH,			 PROMPTSUBST},
+{NULL, "pushdignoredups",     OPT_EMULATE,		 PUSHDIGNOREDUPS},
+{NULL, "pushdminus",	      OPT_EMULATE,		 PUSHDMINUS},
 {NULL, "pushdsilent",	      0,			 PUSHDSILENT},
-{NULL, "pushdtohome",	      0,			 PUSHDTOHOME},
-{NULL, "rcexpandparam",	      0,			 RCEXPANDPARAM},
-{NULL, "rcquotes",	      0,			 RCQUOTES},
+{NULL, "pushdtohome",	      OPT_EMULATE,		 PUSHDTOHOME},
+{NULL, "rcexpandparam",	      OPT_EMULATE,		 RCEXPANDPARAM},
+{NULL, "rcquotes",	      OPT_EMULATE,		 RCQUOTES},
 {NULL, "rcs",		      OPT_ALL,			 RCS},
 {NULL, "recexact",	      0,			 RECEXACT},
 {NULL, "restricted",	      OPT_SPECIAL,		 RESTRICTED},
 {NULL, "rmstarsilent",	      OPT_BOURNE,		 RMSTARSILENT},
 {NULL, "rmstarwait",	      0,			 RMSTARWAIT},
+{NULL, "sharehistory",	      OPT_KSH,			 SHAREHISTORY},
 {NULL, "shfileexpansion",     OPT_EMULATE|OPT_BOURNE,	 SHFILEEXPANSION},
 {NULL, "shglob",	      OPT_EMULATE|OPT_BOURNE,	 SHGLOB},
 {NULL, "shinstdin",	      OPT_SPECIAL,		 SHINSTDIN},
+{NULL, "shnullcmd",           OPT_EMULATE|OPT_BOURNE,	 SHNULLCMD},
 {NULL, "shoptionletters",     OPT_EMULATE|OPT_BOURNE,	 SHOPTIONLETTERS},
-{NULL, "shortloops",	      OPT_ALL,			 SHORTLOOPS},
+{NULL, "shortloops",	      OPT_EMULATE|OPT_NONBOURNE, SHORTLOOPS},
 {NULL, "shwordsplit",	      OPT_EMULATE|OPT_BOURNE,	 SHWORDSPLIT},
 {NULL, "singlecommand",	      OPT_SPECIAL,		 SINGLECOMMAND},
 {NULL, "singlelinezle",	      OPT_KSH,			 SINGLELINEZLE},
@@ -227,7 +238,7 @@ static short zshletters[LAST_OPT - FIRST_OPT + 1] = {
     /* > */  0,
     /* ? */  0,
     /* @ */  0,
-    /* A */  0,
+    /* A */  0,			/* use with set for arrays */
     /* B */ -BEEP,
     /* C */ -CLOBBER,
     /* D */  PUSHDTOHOME,
@@ -260,9 +271,9 @@ static short zshletters[LAST_OPT - FIRST_OPT + 1] = {
     /* _ */  0,
     /* ` */  0,
     /* a */  ALLEXPORT,
-    /* b */  0,
-    /* c */  0,
-    /* d */  0,
+    /* b */  0,			/* in non-Bourne shells, end of options */
+    /* c */  0,			/* command follows */
+    /* d */ -GLOBALRCS,
     /* e */  ERREXIT,
     /* f */ -RCS,
     /* g */  HISTIGNORESPACE,
@@ -273,7 +284,7 @@ static short zshletters[LAST_OPT - FIRST_OPT + 1] = {
     /* l */  LOGINSHELL,
     /* m */  MONITOR,
     /* n */ -EXECOPT,
-    /* o */  0,
+    /* o */  0,			/* long option name follows */
     /* p */  PRIVILEGED,
     /* q */  0,
     /* r */  RESTRICTED,
@@ -376,9 +387,9 @@ printoptionnode(HashNode hn, int set)
 	optno = -optno;
     if (isset(KSHOPTIONPRINT)) {
 	if (defset(on))
-	    printf("no%-20s%s\n", on->nam, isset(optno) ? "off" : "on");
+	    printf("no%-19s %s\n", on->nam, isset(optno) ? "off" : "on");
 	else
-	    printf("%-22s%s\n", on->nam, isset(optno) ? "on" : "off");
+	    printf("%-21s %s\n", on->nam, isset(optno) ? "on" : "off");
     } else if (set == (isset(optno) ^ defset(on))) {
 	if (set ^ isset(optno))
 	    fputs("no", stdout);
@@ -397,6 +408,7 @@ createoptiontable(void)
     optiontab->hash        = hasher;
     optiontab->emptytable  = NULL;
     optiontab->filltable   = NULL;
+    optiontab->cmpnodes    = strcmp;
     optiontab->addnode     = addhashnode;
     optiontab->getnode     = gethashnode;
     optiontab->getnode2    = gethashnode2;
@@ -520,17 +532,26 @@ bin_setopt(char *nam, char **args, char *ops, int isun)
     } else {
 	/* Globbing option (-m) set. */
 	while (*args) {
-	    Comp com;
+	    Patprog pprog;
+	    char *s, *t;
+
+	    t = s = dupstring(*args);
+	    while (*t)
+		if (*t == '_')
+		    chuck(t);
+		else {
+		    *t = tulower(*t);
+		    t++;
+		}
 
 	    /* Expand the current arg. */
-	    tokenize(*args);
-	    if (!(com = parsereg(*args))) {
-		untokenize(*args);
+	    tokenize(s);
+	    if (!(pprog = patcompile(s, PAT_STATIC, NULL))) {
 		zwarnnam(nam, "bad pattern: %s", *args, 0);
 		continue;
 	    }
 	    /* Loop over expansions. */
-	    scanmatchtable(optiontab, com, 0, OPT_ALIAS, setoption, !isun);
+	    scanmatchtable(optiontab, pprog, 0, OPT_ALIAS, setoption, !isun);
 	    args++;
 	}
     }
@@ -541,7 +562,7 @@ bin_setopt(char *nam, char **args, char *ops, int isun)
 /* Identify an option name */
 
 /**/
-int
+mod_export int
 optlookup(char const *name)
 {
     char *s, *t;
@@ -604,7 +625,7 @@ static char *rparams[] = {
  * from the usual meaning of the option.                            */
 
 /**/
-int
+mod_export int
 dosetopt(int optno, int value, int force)
 {
     if(!optno)
@@ -624,6 +645,8 @@ dosetopt(int optno, int value, int force)
 	}
     } else if(!force && (optno == INTERACTIVE || optno == SHINSTDIN ||
 	    optno == SINGLECOMMAND)) {
+	if (opts[optno] == value)
+	    return 0;
 	/* it is not permitted to change the value of these options */
 	return -1;
     } else if(!force && optno == USEZLE && value) {
@@ -636,6 +659,14 @@ dosetopt(int optno, int value, int force)
 	setuid(getuid());
 	setgid(getgid());
 #endif /* HAVE_SETUID */
+#ifndef JOB_CONTROL
+    } else if(optno == MONITOR && value) {
+	    return -1;
+#endif /* not JOB_CONTROL */
+#ifdef GETPWNAM_FAKED
+    } else if(optno == CDABLEVARS && value) {
+	    return -1;
+#endif /* GETPWNAM_FAKED */
     }
     opts[optno] = value;
     if (optno == BANGHIST || optno == SHINSTDIN)

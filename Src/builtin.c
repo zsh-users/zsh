@@ -1850,7 +1850,8 @@ bin_typeset(char *name, char **argv, char *ops, int func)
 	return 0;
     }
 
-    if ((!ops['g'] && !ops['x']) || ops['g'] == 2 || *name == 'l')
+    if ((!ops['g'] && !ops['x']) || ops['g'] == 2 || *name == 'l' ||
+	!isset(GLOBALEXPORT))
 	on |= PM_LOCAL;
 
     if (on & PM_TIED) {
