@@ -62,9 +62,14 @@ print >> $_d_file
 # argument to zle does not begin with a `_').
 
 _d_bks=()
+_d_complist=
 zle -lL |
   while read -rA _d_line; do
     if [[ ${_d_line[3]} = _* && ${_d_line[5]} = _* ]]; then
+      if [[ -z "$_d_complist" && ${_d_line[4]} = .menu-select ]]; then
+        print 'zmodload -i zsh/complist'
+	d_complist=yes
+      fi
       print -r - ${_d_line}
       _d_bks=($_d_bks ${_d_line[3]})
     fi

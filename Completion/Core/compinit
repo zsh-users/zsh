@@ -232,6 +232,7 @@ compdef() {
 	fi
 	[[ $1 = _* ]] || 1="_$1"
 	[[ $2 = .* ]] || 2=".$2"
+        [[ $2 = .menu-select ]] && zmodload -i zsh/complist
 	zle -C "$1" "$2" "$func"
 	if [[ -n $new ]]; then
 	  bindkey "$3" | read -A opt
@@ -250,8 +251,10 @@ compdef() {
 
       # Define the widget.
       if [[ $1 = .* ]]; then
+        [[ $1 = .menu-select ]] && zmodload -i zsh/complist
 	zle -C "$func" "$1" "$func"
       else
+        [[ $1 = menu-select ]] && zmodload -i zsh/complist
 	zle -C "$func" ".$1" "$func"
       fi
       shift
