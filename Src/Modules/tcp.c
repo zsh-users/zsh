@@ -35,22 +35,6 @@
  */
 #include "tcp.h"
 
-/*
- * For some reason, configure doesn't always detect netinet/in_systm.h.
- * On some systems, including linux, this seems to be because gcc is
- * throwing up a warning message about the redefinition of
- * __USE_LARGEFILE.  This means the problem is somewhere in the
- * header files where we can't get at it.  For now, revert to
- * not including this file only on systems where we know it's missing.
- * Currently this is just cygwin.
- */
-#ifndef __CYGWIN__
-# include <netinet/in_systm.h>
-#endif
-#include <netinet/in.h>
-#include <netinet/ip.h>
-#include <arpa/inet.h>
-
 /* it's a TELNET based protocol, but don't think I like doing this */
 #include <arpa/telnet.h>
 

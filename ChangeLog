@@ -1,5 +1,8 @@
 2001-10-08  Oliver Kiddle  <opk@zsh.org>
 
+	* 15987: Src/Modules/tcp.c: remove includes duplicated from tcp.h
+	which caused problems on IRIX 5.3.
+
 	* 15983: Completion/Unix/Command/_wget, Completion/Unix/Type/_urls,
 	Completion/Unix/Command/_user_admin, Completion/Unix/Command/_sysctl,
 	Completion/Unix/Command/_webbrowser: update for wget 1.7, darwin
