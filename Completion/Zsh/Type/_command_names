@@ -8,8 +8,17 @@ local args defs
 
 defs=(
   'commands:external command:compadd -k commands'
-  'executables:executable file or directory:_path_files -/g \*\(-\*\)'
 )
+
+if [[ -n "$path[(r).]" ]]; then
+  defs=( "$defs[@]"
+         'executables:executable file or directory:_path_files -/g \*\(-\*\)'
+  )
+else
+  defs=( "$defs[@]"
+         'executables:executable file or directory:_files -P/ -W/ -/g \*\(-\*\)'
+  )
+fi
 
 if [[ "$1" = -e ]]; then
   shift
