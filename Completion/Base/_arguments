@@ -154,122 +154,127 @@ fi
 if comparguments -i "$compconfig[autodescribe_options]" "$@"; then
   local nm="$compstate[nmatches]" action noargs aret expl local
   local next direct odirect equal single match matched ws tmp1 tmp2
+  local prios tags opts
 
-  if ! comparguments -D descr action; then
+  if comparguments -D descr action; then
+    if comparguments -O next direct odirect equal; then
+      opts=yes
+      _tags -f "$funcstack[2]" argument option
+    else
+      _tags -f "$funcstack[2]" argument
+    fi
+  else
     if comparguments -a; then
       noargs='no more arguments'
     else
       noargs='no arguments'
     fi
+    comparguments -O next direct odirect equal || return 1
+
+    opts=yes
+    _tags -f "$funcstack[2]" option
   fi
 
-  while true; do
+  while _tags; do
+    while true; do
+      if [[ "$tags" = *:argument* ]]; then
+        _description expl "$descr"
 
-    if [[ -z "$noargs" || -n "$matched" ]]; then
-      _description expl "$descr"
-
-      if [[ "$action" = -\>* ]]; then
-        comparguments -W line opt_args
-        state="${${action[3,-1]##[ 	]#}%%[ 	]#}"
-        compstate[restore]=''
-        aret=yes
-      else
-        if [[ -z "$local" ]]; then
-          local line
-          typeset -A opt_args
-          local=yes
-        fi
-
-        comparguments -W line opt_args
-
-        if [[ "$action" = \ # ]]; then
-
-          # An empty action means that we should just display a message.
-
-          [[ -n "$matched" ]] && compadd -n -Q -S '' -s "$SUFFIX" - "$PREFIX"
-          mesg="$descr"
-
-        elif [[ "$action" = \(\(*\)\) ]]; then
-
-          # ((...)) contains literal strings with descriptions.
-
-          eval ws\=\( "${action[3,-3]}" \)
-
-          _describe -c "$cmd" "$descr" ws -M "$match"
-
-        elif [[ "$action" = \(*\) ]]; then
-
-          # Anything inside `(...)' is added directly.
-
-          compadd "$expl[@]" - ${=action[2,-2]}
-        elif [[ "$action" = \{*\} ]]; then
-
-          # A string in braces is evaluated.
-
-          eval "$action[2,-2]"
-
-        elif [[ "$action" = \ * ]]; then
-
-          # If the action starts with a space, we just call it.
-
-          ${(e)=~action}
+        if [[ "$action" = -\>* ]]; then
+          comparguments -W line opt_args
+          state="${${action[3,-1]##[ 	]#}%%[ 	]#}"
+          compstate[restore]=''
+          aret=yes
         else
+          if [[ -z "$local" ]]; then
+            local line
+            typeset -A opt_args
+            local=yes
+          fi
 
-          # Otherwise we call it with the description-arguments built above.
+          comparguments -W line opt_args
 
-          action=( $=action )
-          ${(e)action[1]} "$expl[@]" ${(e)~action[2,-1]}
+          if [[ "$action" = \ # ]]; then
+
+            # An empty action means that we should just display a message.
+
+            [[ -n "$matched" ]] && compadd -n -Q -S '' -s "$SUFFIX" - "$PREFIX"
+            mesg="$descr"
+
+          elif [[ "$action" = \(\(*\)\) ]]; then
+
+            # ((...)) contains literal strings with descriptions.
+
+            eval ws\=\( "${action[3,-3]}" \)
+
+            _describe -c "$cmd" -f "$funcstack[2]" "$descr" ws -M "$match"
+
+          elif [[ "$action" = \(*\) ]]; then
+
+            # Anything inside `(...)' is added directly.
+
+            compadd "$expl[@]" - ${=action[2,-2]}
+          elif [[ "$action" = \{*\} ]]; then
+
+            # A string in braces is evaluated.
+
+            eval "$action[2,-2]"
+
+          elif [[ "$action" = \ * ]]; then
+
+            # If the action starts with a space, we just call it.
+
+            ${(e)=~action}
+          else
+
+            # Otherwise we call it with the description-arguments built above.
+
+            action=( $=action )
+            ${(e)action[1]} "$expl[@]" ${(e)~action[2,-1]}
+          fi
         fi
       fi
-    fi
+      if [[ "$tags" = *:option* &&
+            ( "$tags" != *\[*prefix*\]* || "$PREFIX" = [-+]* ) ]]; then
+        comparguments -M match
 
-    if [[ -z "$matched" ]] &&
-       comparguments -O next direct odirect equal &&
-       [[ ( ( nm -eq compstate[nmatches] || -n "$noargs" ) &&
-            -z "$aret" && -z "$mesg" ) ||
-          -z "$compconfig[option_prefix]" || 
-          "$compconfig[option_prefix]" = *\!${cmd}* ||
-          "$PREFIX" = [-+]* ]]; then
+        if comparguments -s single; then
 
-      comparguments -M match
+          _description expl option
 
-      if comparguments -s single; then
+          if [[ "$single" = direct ]]; then
+	    compadd "$expl[@]" -QS '' - "${PREFIX}${SUFFIX}"
+          elif [[ "$single" = next ]]; then
+	    compadd "$expl[@]" -Q - "${PREFIX}${SUFFIX}"
+          elif [[ "$single" = equal ]]; then
+	    compadd "$expl[@]" -QqS= - "${PREFIX}${SUFFIX}"
+          else
+	    tmp1=( "$next[@]" "$direct[@]" "$odirect[@]" "$equal[@]" )
+	    tmp1=( "${(M@)tmp1:#[-+]?(|:*)}" )
+	    tmp2=( "${PREFIX}${(@M)^${(@)${(@)tmp1%%:*}#[-+]}:#?}" )
 
-        _description expl option
-
-        if [[ "$single" = direct ]]; then
-	  compadd "$expl[@]" -QS '' - "${PREFIX}${SUFFIX}"
-        elif [[ "$single" = next ]]; then
-	  compadd "$expl[@]" -Q - "${PREFIX}${SUFFIX}"
-        elif [[ "$single" = equal ]]; then
-	  compadd "$expl[@]" -QqS= - "${PREFIX}${SUFFIX}"
+            _describe -o -c "$cmd" -f "$funcstack[2]" option \
+                      tmp1 tmp2 -Q -S ''
+          fi
+          single=yes
         else
-	  tmp1=( "$next[@]" "$direct[@]" "$odirect[@]" "$equal[@]" )
-	  tmp1=( "${(M@)tmp1:#[-+]?(|:*)}" )
-	  tmp2=( "${PREFIX}${(@M)^${(@)${(@)tmp1%%:*}#[-+]}:#?}" )
-
-          _describe -o -c "$cmd" option tmp1 tmp2 -Q -S ''
+          next=( "$next[@]" "$odirect[@]" )
+          _describe -o -c "$cmd" -f "$funcstack[2]" option \
+            next -Q -M "$match" -- \
+            direct -QS '' -M "$match" -- \
+            equal -QqS= -M "$match"
         fi
-        single=yes
-      else
-        next=( "$next[@]" "$odirect[@]" )
-        _describe -o -c "$cmd" option \
-          next -Q -M "$match" -- \
-          direct -QS '' -M "$match" -- \
-          equal -QqS= -M "$match"
       fi
-
-      if [[ nm -eq compstate[nmatches] && -z "$aret" &&
-            ( ( -z "$single" && "$PREFIX" = [-+]*\=* ) ||
-              "$PREFIX" = --* ) ]]; then
+      if [[ -n "$opts" && -z "$aret$matched" && nm -ne compstate[nmatches] &&
+            "$tags" = *:argument* ]]; then
 
         local prefix suffix
 
-	prefix="${PREFIX#*\=}"
-	suffix="$SUFFIX"
-	PREFIX="${PREFIX%%\=*}"
-	SUFFIX=''
-	compadd -M "$match" -D equal - "${(@)equal%%:*}"
+        prefix="${PREFIX#*\=}"
+        suffix="$SUFFIX"
+        PREFIX="${PREFIX%%\=*}"
+        SUFFIX=''
+        compadd -M "$match" -D equal - "${(@)equal%%:*}"
 
         if [[ $#equal -eq 1 ]]; then
 	  PREFIX="$prefix"
@@ -277,11 +282,13 @@ if comparguments -i "$compconfig[autodescribe_options]" "$@"; then
 	  IPREFIX="${IPREFIX}${equal[1]%%:*}="
 	  matched=yes
 	  comparguments -L "$equal[1]" descr action
+	  tags=argument
 	  continue
-	fi
+        fi
       fi
-    fi
-    break
+      break
+    done
+    [[ -n "$aret" || nm -ne compstate[nmatches] ]] && break
   done
 
   [[ -n "$aret" ]] && return 300
@@ -292,7 +299,6 @@ if comparguments -i "$compconfig[autodescribe_options]" "$@"; then
   # Set the return value.
 
   [[ nm -ne "$compstate[nmatches]" ]]
-
 else
   return 1
 fi

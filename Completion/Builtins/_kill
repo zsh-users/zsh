@@ -6,14 +6,21 @@ if compset -P 1 -; then
   _description expl signal
   compadd "$expl[@]" $signals[1,-3]
 else
-  local ret=1
-
-  _jobs && ret=0
-
-  list=("${(@M)${(f@)$(ps ${=compconfig[ps_listargs]:-$=compconfig[ps_args]} 2>/dev/null)}[2,-1]:#[ 	]#${PREFIX}[0-9]#${SUFFIX}[ 	]*}")
-  _description expl 'process ID'
-  compadd "$expl[@]" -ld list - ${${${(f)"$(ps $=compconfig[ps_args] 2>/dev/null)"}[2,-1]## #}%% *} &&
-    ret=0
+  local prios tags ret=1
+  
+  _tags job process
+  
+  while _tags; do
+    [[ "$tags" = *:job:* ]] && _jobs && ret=0
+    if [[ "$tags" = *:process:* ]]; then
+      list=("${(@M)${(f@)$(ps ${=compconfig[ps_listargs]:-$=compconfig[ps_args]} 2>/dev/null)}[2,-1]:#[ 	]#${PREFIX}[0-9]#${SUFFIX}[ 	]*}")
+      _description expl 'process ID'
+      compadd "$expl[@]" -ld list - \
+        ${${${(f)"$(ps $=compconfig[ps_args] 2>/dev/null)"}[2,-1]## #}%% *} &&
+          ret=0
+    fi
+    (( ret )) || break
+  done
 
   return ret
 fi

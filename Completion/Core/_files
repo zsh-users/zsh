@@ -1,31 +1,27 @@
 #autoload
 
-# Utility function for completing files of a given type or any file.
-# In many cases you will want to call this one instead of `_path_files'.
+local opts opt type=file prios tags
 
-local nm=$compstate[nmatches] ret=1
+opts=()
+while getopts "P:S:qr:R:W:F:J:V:X:f/g:M:" opt; do
+  case "$opt" in
+  /)    [[ "$type" = file       ]] && type=dir       ;;
+  g)    [[ "$type" = (file|dir) ]] && type="$OPTARG" ;;
+  q)    opts=("$opts[@]" -q               )          ;;
+  [^f]) opts=("$opts[@]" "-$opt" "$OPTARG")          ;;
+  esac
+done
 
-_path_files "$@" && ret=0
+case "$type" in
+file) _tags -f "$funcstack[2]" file           ;;
+dir)  _tags -f "$funcstack[2]" path file      ;;
+*)    _tags -f "$funcstack[2]" glob path file ;;
+esac
 
-if [[ $# -ne 0 && compstate[nmatches] -eq nm ]]; then
-  local opt opts
+while _tags; do
+  [[ "$tags" = *:file:* ]] && { _path_files "$opts[@]" -f         ;  return   }
+  [[ "$tags" = *:path:* ]] &&   _path_files "$opts[@]" -/         && return 0
+  [[ "$tags" = *:glob:* ]] &&   _path_files "$opts[@]" -g "$type" && return 0
+done
 
-  # We didn't get any matches for those types of files described by
-  # the `-g' or `-/' option. Now we try it again accepting all files.
-  # First we get those options that we have to use even then. If we
-  # find out that the `-f' option was given, we already accepted all
-  # files and give up immediatly.
-
-  opts=()
-  while getopts "P:S:qr:R:W:F:J:V:X:f/g:M:" opt; do
-    case "$opt" in
-    f)            return;;
-    [PSrRWFJVXM]) opts=("$opts[@]" "-$opt" "$OPTARG");;
-    q)            opts=("$opts[@]" -q);;
-    esac
-  done
-
-  _path_files "$opts[@]" && ret=0
-fi
-
-return ret
+return 1

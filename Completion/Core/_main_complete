@@ -17,7 +17,12 @@
 # state than the global one for which you are completing.
 
 
-local comp post ret=1 _compskip
+local comp post ret=1 _compskip prios tags
+typeset -U _offered_tags _tried_tags _failed_tags _used_tags _unused_tags
+
+_offered_tags=()
+_tried_tags=()
+_failed_tags=()
 
 typeset -U _lastdescr
 
@@ -45,6 +50,11 @@ for comp; do
     break;
   fi
 done
+
+# See which tags were or were not used.
+
+_used_tags=( "${(@)_tried_tags:#${(j:|:)~${(@)_failed_tags//\[/\\[}//\]/\\]}}" )
+_unused_tags=( "${(@)_offered_tags:#${(j:|:)~${(@)_used_tags//\[/\\[}//\]/\\]}}" )
 
 # Now call the post-functions.
 
@@ -82,5 +92,10 @@ _lastcomp[iprefix]="$IPREFIX"
 _lastcomp[isuffix]="$ISUFFIX"
 _lastcomp[qiprefix]="$QIPREFIX"
 _lastcomp[qisuffix]="$QISUFFIX"
+_lastcomp[offered_tags]="${(j.:.)_offered_tags}"
+_lastcomp[tried_tags]="${(j.:.)_tried_tags}"
+_lastcomp[failed_tags]="${(j.:.)_failed_tags}"
+_lastcomp[unused_tags]="${(j.:.)_unused_tags}"
+_lastcomp[used_tags]="${(j.:.)_used_tags}"
 
 return ret
