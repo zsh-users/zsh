@@ -1,0 +1,3 @@
+#autoload
+
+compadd "$@" $TMPPREFIX:h $TMPDIR /tmp

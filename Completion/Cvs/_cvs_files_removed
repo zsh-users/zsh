@@ -1,0 +1,15 @@
+#autoload
+
+local qpref pref entries
+_cvs_setup_prefix
+if [[ -d ${pref}CVS ]]; then
+  _cvs_setup_allentries
+  setopt localoptions unset
+  local omit
+  omit=(${pref}*(D:t))
+  eval 'entries=(${entries:#('${(j:|:)${(@)omit:q}}')})'
+  compadd "$@" -P "$qpref" - ${entries:q} ||
+  _cvs_directories "$@"
+else
+  _files "$@"
+fi

@@ -1,0 +1,8 @@
+#autoload
+
+if [[ -d ${pref}CVS ]]; then
+  _cvs_setup_direntries
+  (( $#entries )) && compgen "$@" -g "${(j:|:)${(@)entries:q}}"
+else
+  _files "$@"
+fi

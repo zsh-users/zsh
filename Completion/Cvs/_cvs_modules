@@ -1,0 +1,12 @@
+#autoload
+
+local root=$CVSROOT
+[[ -f CVS/Root ]] && root=$(<CVS/Root)
+
+if [[ $root = :* || ! -d $root ]]; then
+  _message "module name"
+else
+  compadd - \
+    $root/^CVSROOT(:t) \
+    ${${(M)${(f)"$(<$root/CVSROOT/modules)"}:#[^#]*}%%[ 	]*}
+fi

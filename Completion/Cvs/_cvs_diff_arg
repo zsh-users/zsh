@@ -1,0 +1,3 @@
+#autoload
+
+_cvs_files_modified || _cvs_files

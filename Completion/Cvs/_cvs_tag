@@ -1,0 +1,8 @@
+#autoload
+
+# "+FQqlRcdr:D:bf"
+_arguments -s \
+  -{F,Q,q,l,R,c,d,b,f} \
+  '-r+:tag:_cvs_revisions' \
+  '-D+:date:_cvs_D' \
+  '*:file:_cvs_files'

@@ -1,0 +1,6 @@
+#autoload
+
+# "+lR"
+_arguments -s \
+  -{l,R} \
+  '*:file:_cvs_files'

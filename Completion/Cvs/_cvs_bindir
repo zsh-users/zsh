@@ -1,0 +1,3 @@
+#autoload
+
+compadd "$@" /usr/local/bin || _files "$@" -/

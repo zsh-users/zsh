@@ -1,0 +1,6 @@
+#autoload
+
+# "+flR"
+_arguments -s \
+  -{f,l,R} \
+  '*:file:_cvs_files_removed'
