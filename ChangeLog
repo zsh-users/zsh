@@ -1,5 +1,8 @@
 2002-03-27  Oliver Kiddle  <opk@zsh.org>
 
+	* John Beppu: 16866 (tweaked): Completion/Unix/Command/_figlet:
+	new completion for figlet
+
 	* 16908: Doc/Zsh/compsys.yo: alter _generic example to be more robust
 
 2002-03-24  Wayne Davison  <wayned@users.sourceforge.net>
