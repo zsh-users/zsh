@@ -1,4 +1,4 @@
-#compdef acroread pdf2dsc pdf2ps pdfimages pdfinfo pdftopbm pdftops pdftotext xpdf pdfopt pdffonts
+#compdef pdf2dsc pdf2ps pdfimages pdfinfo pdftopbm pdftops pdftotext xpdf pdfopt pdffonts
 
 local expl ext=''
 

@@ -226,6 +226,11 @@
 	separating source and replacment text in ${foo//bar/stuff} was
 	buggy.
 
+2003-04-25  Oliver Kiddle  <opk@zsh.org>
+
+	* Haakon Riiser: 18473: Completion/X/Command/_acroread,
+	Completion/Unix/Type/_pdf: new completion for Acrobat Reader 5.0.x
+
 2003-04-24  Oliver Kiddle  <opk@zsh.org>
 
 	* unposted: Completion/Unix/Type/_perl_basepods: use _message
