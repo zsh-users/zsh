@@ -1,3 +1,8 @@
+2002-04-04  Oliver Kiddle  <opk@zsh.org>
+
+	* 16923: Completion/Base/Completer/_all_matches, Doc/Zsh/compsys.yo:
+	add insert style to insert all matches instead of adding as a match
+
 2002-03-30  Wayne Davison  <wayned@users.sourceforge.net>
 
 	* 16927: zsh/Functions/Misc/zmv: Added -W to auto-convert wildcards in

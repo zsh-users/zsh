@@ -1461,6 +1461,11 @@ Note that during the execution of completion functions, the
 tt(EXTENDED_GLOB) option is in effect, so the characters `tt(#)',
 `tt(~)' and `tt(^)' have special meanings in the patterns.
 )
+kindex(insert, completion style)
+item(tt(insert))(
+This style is used by the tt(_all_matches) completer to decide whether to
+insert the list of all matches instead of adding it as another match.
+)
 kindex(insert-ids, completion style)
 item(tt(insert-ids))(
 When completing process IDs, for example as arguments to the tt(kill) and

@@ -33,8 +33,12 @@ _all_matches_end() {
   if [[ "$compstate[nmatches]" -gt 1 && $not[(I)(|_)$_completer] -eq 0 ]]; then
     local expl
 
-    _description all-matches expl 'all matches'
-    compadd "$expl[@]" -C
+    if zstyle -t "$_all_matches_context" insert; then
+      compstate[insert]=all
+    else
+      _description all-matches expl 'all matches'
+      compadd "$expl[@]" -C
+    fi
   fi
 
   unset _all_matches_context
