@@ -582,7 +582,9 @@ of alphanumeric characters separated by non-alphanumerics, em(not) to words
 that result from field splitting.
 )
 item(tt(q))(
-Quote the resulting words with backslashes.
+Quote the resulting words with backslashes. If this flag is given
+twice, the resulting words are quoted in single quotes and if it is
+given three times, the words are quoted in double quotes.
 )
 item(tt(Q))(
 Remove one level of quotes from the resulting words.

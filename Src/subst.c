@@ -721,7 +721,7 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int ssub)
     int flnum = 0;
     int sortit = 0, casind = 0;
     int casmod = 0;
-    int quotemod = 0, quoteerr = 0;
+    int quotemod = 0, quotetype = 0, quoteerr = 0;
     char *sep = NULL, *spsep = NULL;
     char *premul = NULL, *postmul = NULL, *preone = NULL, *postone = NULL;
     char *replstr = NULL;	/* replacement string for /orig/repl */
@@ -826,7 +826,7 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int ssub)
 		    break;
 
 		case 'q':
-		    quotemod++;
+		    quotemod++, quotetype++;
 		    break;
 		case 'Q':
 		    quotemod--;
@@ -1617,6 +1617,8 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int ssub)
 	opts[PROMPTPERCENT] = opp;
     }
     if (quotemod) {
+	if (--quotetype > 2)
+	    quotetype = 2;
 	if (isarr) {
 	    char **ap;
 
@@ -1624,10 +1626,23 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int ssub)
 		aval = arrdup(aval), copied = 1;
 	    ap = aval;
 
-	    if (quotemod > 0)
-		for (; *ap; ap++)
-		    *ap = bslashquote(*ap, NULL, 0);
-	    else {
+	    if (quotemod > 0) {
+		if (quotetype) {
+		    int sl;
+		    char *tmp;
+
+		    for (; *ap; ap++) {
+			tmp = bslashquote(*ap, NULL, quotetype);
+			sl = strlen(tmp);
+			*ap = (char *) zhalloc(sl + 3);
+			strcpy((*ap) + 1, tmp);
+			ap[0][0] = ap[0][sl + 1] = (quotetype == 1 ? '\'' : '"');
+			ap[0][sl + 2] = '\0';
+		    }
+		} else
+		    for (; *ap; ap++)
+			*ap = bslashquote(*ap, NULL, 0);
+	    } else {
 		int one = noerrs, oef = errflag, haserr = 0;
 
 		if (!quoteerr)
@@ -1648,9 +1663,20 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int ssub)
 	} else {
 	    if (!copied)
 		val = dupstring(val), copied = 1;
-	    if (quotemod > 0)
-		val = bslashquote(val, NULL, 0);
-	    else {
+	    if (quotemod > 0) {
+		if (quotetype) {
+		    int sl;
+		    char *tmp;
+
+		    tmp = bslashquote(val, NULL, quotetype);
+		    sl = strlen(tmp);
+		    val = (char *) zhalloc(sl + 3);
+		    strcpy(val + 1, tmp);
+		    val[0] = val[sl + 1] = (quotetype == 1 ? '\'' : '"');
+		    val[sl + 2] = '\0';
+		} else
+		    val = bslashquote(val, NULL, 0);
+	    } else {
 		int one = noerrs, oef = errflag, haserr;
 
 		if (!quoteerr)
