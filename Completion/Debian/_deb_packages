@@ -1,6 +1,15 @@
 #autoload
 
+local opt caopts
+
 # Usage: _deb_packages installed|uninstalled|avail
+while getopts "J:" opt; do
+  case "$opt" in
+     J) caopts="-J $OPTARG"
+        shift 2			# presume that -J -default- are the first args
+        ;;
+  esac
+done
 
 if (( ! $+_deb_cache_dpkg_get_selections )); then
   _deb_cache_dpkg_get_selections=(
