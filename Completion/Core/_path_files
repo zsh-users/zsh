@@ -44,7 +44,9 @@ while getopts "P:S:qr:R:W:F:J:V:X:f/g:M:12n" opt; do
          if [[ "$tmp1[1]" = '(' ]]; then
            prepaths=( ${^=tmp1[2,-2]%/}/ )
          else
-           prepaths=( ${(P)^=tmp1%/}/ )
+	   # In this case the variable should be an array, so
+	   # don't use an extra ${=...}.
+           prepaths=( ${(P)^tmp1%/}/ )
            (( ! $#prepaths )) && prepaths=( ${tmp1%/}/ )
          fi
          (( ! $#prepaths )) && prepaths=( '' )
