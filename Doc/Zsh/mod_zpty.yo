@@ -9,6 +9,7 @@ xitem(tt(zpty) [ tt(-e) ] [ tt(-b) ] var(name) var(command) [ var(args ...) ])
 xitem(tt(zpty) tt(-d) [ var(names) ... ])
 xitem(tt(zpty) tt(-w) [ tt(-n) ] var(name) var(strings ...))
 xitem(tt(zpty) tt(-r) var(name) [ var(param) [ var(pattern) ] ])
+xitem(tt(zpty) tt(-t) var(name))
 item(tt(zpty) [ tt(-L) ])(
 In the first form, the var(command) is started with the var(args) as
 arguments.  The command runs under a newly assigned pseudo-terminal; this
@@ -34,6 +35,10 @@ printed to standard output.  With a var(param) argument, the string
 read will be put in the parameter named var(param).  If the
 var(pattern) is also given, output will be read until the whole string 
 read matches the var(pattern).
+
+The tt(-t) option can be used to test whether the command var(name) is 
+still running.  It returns a zero value if the command is running and
+a non-zero value otherwise.
 
 The last form without any arguments is used to list the commands
 currently defined.  If the tt(-L) option is given, this is done in the

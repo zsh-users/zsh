@@ -16,7 +16,7 @@ comptestinit () {
   (( OPTIND > 1 )) && shift $(( OPTIND - 1 ))
 
   export PS1="<PROMPT>"
-  zpty zsh "$comptest_zsh" -f
+  zpty -b zsh "$comptest_zsh" -f
 
   zpty -r zsh log1 "*<PROMPT>*" || { 
     print "first prompt hasn't appeared."

@@ -48,6 +48,7 @@ struct ptycmd {
     int echo;
     int block;
     int fin;
+    int read;
 };
 
 static Ptycmd ptycmds;
@@ -381,6 +382,7 @@ newptycmd(char *nam, char *pname, char **args, int echo, int block)
     p->echo = echo;
     p->block = block;
     p->fin = 0;
+    p->read = -1;
 
     p->next = ptycmds;
     ptycmds = p;
@@ -434,7 +436,9 @@ deleteallptycmds(void)
 static void
 checkptycmd(Ptycmd cmd)
 {
-    if (kill(cmd->pid, 0) < 0) {
+    if (cmd->read != -1)
+	return;
+    if (!read_poll(cmd->fd, &cmd->read, 1) && kill(cmd->pid, 0) < 0) {
 	cmd->fin = 1;
 	zclose(cmd->fd);
     }
@@ -444,7 +448,7 @@ static int
 ptyread(char *nam, Ptycmd cmd, char **args)
 {
     int blen = 256, used = 0, ret = 1;
-    char *buf = (char *) zhalloc(blen + 1);
+    char *buf = (char *) zhalloc((blen = 256) + 1);
     Patprog prog = NULL;
 
     if (*args && args[1]) {
@@ -462,6 +466,12 @@ ptyread(char *nam, Ptycmd cmd, char **args)
 	    return 1;
 	}
     }
+    if (cmd->read != -1) {
+	buf[0] = (char) cmd->read;
+	buf[1] = '\0';
+	used = 1;
+	cmd->read = -1;
+    }
     do {
 	if (!ret) {
 	    checkptycmd(cmd);
@@ -476,11 +486,10 @@ ptyread(char *nam, Ptycmd cmd, char **args)
 	}
 	buf[used] = '\0';
 
-	/**** Hm. If we leave the loop when ret < 0 the user would have
-	 *    to make sure that `zpty -r' is tried more than once if
-	 *    there will be some output and we only got the ret == -1
-	 *    because the output is not yet available.
-	 *    The same for the `write' below. */
+#if 0
+	/* This once used the following test, to make sure to return
+	 * non-zero if there are no characters to read.  That looks
+	 * like a thinko now, because it disables non-blocking ptys. */
 
 	if (ret < 0 && (cmd->block
 #ifdef EWOULDBLOCK
@@ -492,8 +501,9 @@ ptyread(char *nam, Ptycmd cmd, char **args)
 #endif
 			))
 	    break;
+#endif
 
-	if (!prog && !ret)
+	if (!prog && ret <= 0)
 	    break;
     } while (!errflag && !breaks && !retflag && !contflag &&
 	     (prog ? (used < READ_MAX && (!ret || !pattry(prog, buf))) :
@@ -514,7 +524,10 @@ ptywritestr(Ptycmd cmd, char *s, int len)
     int written;
 
     for (; len; len -= written, s += written) {
-	if ((written = write(cmd->fd, s, len)) < 0 &&
+	if ((written = write(cmd->fd, s, len)) < 0
+#if 0
+	    /* Same as above. */
+	    &&
 	    (cmd->block
 #ifdef EWOULDBLOCK
 			|| errno != EWOULDBLOCK
@@ -523,7 +536,9 @@ ptywritestr(Ptycmd cmd, char *s, int len)
 			|| errno != EAGAIN
 #endif
 #endif
-	     ))
+	     )
+#endif
+	    )
 	    return 1;
 	if (written < 0) {
 	    checkptycmd(cmd);
@@ -567,11 +582,11 @@ static int
 bin_zpty(char *nam, char **args, char *ops, int func)
 {
     if ((ops['r'] && ops['w']) ||
-	((ops['r'] || ops['w']) && (ops['d'] || ops['e'] ||
+	((ops['r'] || ops['w']) && (ops['d'] || ops['e'] || ops['t'] ||
 				    ops['b'] || ops['L'])) ||
-	(ops['n'] && (ops['b'] || ops['e'] || ops['r'] ||
+	(ops['n'] && (ops['b'] || ops['e'] || ops['r'] || ops['t'] ||
 		      ops['d'] || ops['L'])) ||
-	(ops['d'] && (ops['b'] || ops['e'] || ops['L'])) ||
+	(ops['d'] && (ops['b'] || ops['e'] || ops['L'] || ops['t'])) ||
 	(ops['L'] && (ops['b'] || ops['e']))) {
 	zwarnnam(nam, "illegal option combination", NULL, 0);
 	return 1;
@@ -607,6 +622,18 @@ bin_zpty(char *nam, char **args, char *ops, int func)
 	    deleteallptycmds();
 
 	return ret;
+    } else if (ops['t']) {
+	Ptycmd p;
+
+	if (!*args) {
+	    zwarnnam(nam, "missing pty command name", NULL, 0);
+	    return 1;
+	} else if (!(p = getptycmd(*args))) {
+	    zwarnnam(nam, "no such pty command: %s", *args, 0);
+	    return 1;
+	}
+	checkptycmd(p);
+	return p->fin;
     } else if (*args) {
 	if (!args[1]) {
 	    zwarnnam(nam, "missing command", NULL, 0);
@@ -649,7 +676,7 @@ ptyhook(Hookdef d, void *dummy)
 }
 
 static struct builtin bintab[] = {
-    BUILTIN("zpty", 0, bin_zpty, 0, -1, 0, "ebdrwLn", NULL),
+    BUILTIN("zpty", 0, bin_zpty, 0, -1, 0, "ebdrwLnt", NULL),
 };
 
 /**/

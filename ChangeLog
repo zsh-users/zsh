@@ -1,3 +1,9 @@
+2000-10-19  Sven Wischnowsky  <wischnow@zsh.org>
+
+	* 13035: Doc/Zsh/mod_zpty.yo, Functions/Misc/nslookup, Src/utils.c,
+ 	Src/Modules/zpty.c, Test/comptest: make non-blocking IO on ptys
+ 	work again; add -t option to test if command is still alive
+	
 2000-10-19  Wayne Davison  <wayned@users.sourceforge.net>
 
 	* 13034: Src/hist.c: Don't call histreduceblanks() if the line

@@ -1312,7 +1312,7 @@ setblock_stdin(void)
  */
 
 /**/
-int
+mod_export int
 read_poll(int fd, int *readchar, int polltty)
 {
     int ret = 0;
