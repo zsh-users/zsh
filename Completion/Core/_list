@@ -4,11 +4,7 @@
 # insert possible completions only after the list has been shown at
 # least once.
 
-local pre suf curcontext="$curcontext" expr
-
-# Probably set initial context.
-
-[[ -z "$curcontext" ]] && curcontext=':list'
+local pre suf curcontext="${curcontext}:list" expr
 
 # Get the strings to compare.
 

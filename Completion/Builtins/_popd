@@ -13,7 +13,7 @@ _wanted directory-stack -V expl 'directory stack' || return 1
 
 ! _style directory-stack prefix-needed || [[ $PREFIX = [-+]* ]] || return 1
 
-if _style directory-stack description; then
+if _style directory-stack verbose; then
   # get the list of directories with their canonical number
   # and turn the lines into an array, removing the current directory
   lines=("${PWD}" "${dirstack[@]}")

@@ -91,7 +91,7 @@ if [[ compstate[nmatches] -eq 0 &&
   compadd -UX "${format//\\%d/$str}" -n ''
 fi
 
-_style '' last-prompt always && compstate[last_prompt]=yes
+_style '' last-prompt && compstate[last_prompt]=yes
 
 _lastcomp=( "${(@kv)compstate}" )
 _lastcomp[completer]="$comp"

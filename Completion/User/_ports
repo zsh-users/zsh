@@ -1,7 +1,12 @@
 #autoload
 
-local expl
+local expl ports
 
-: ${(A)ports:=${${(M)${${(f)"$(</etc/services)"}:#\#*}#*/tcp}%%[ 	]*}}
+if ! _style ports ports ports; then
+  (( $+_cache_ports )) ||
+      : ${(A)ports:=${${(M)${${(f)"$(</etc/services)"}:#\#*}#*/tcp}%%[ 	]*}}
+
+  ports=( "$_cache_ports[@]" )
+fi
 
 _wanted ports expl port && compadd "$@" "$expl[@]" - "$ports[@]"

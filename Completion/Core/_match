@@ -9,8 +9,8 @@
 # expand-or-complete function because otherwise the pattern will
 # be expanded using globbing.
 
-local tmp opm="$compstate[pattern_match]" ret=0 curcontext="$curcontext"
-local orig ins
+local tmp opm="$compstate[pattern_match]" ret=0 orig ins
+local curcontext="${curcontext}:match"
 
 # Do nothing if we don't have a pattern or there are still global
 # match specifications to try.
@@ -19,12 +19,8 @@ tmp="${${:-$PREFIX$SUFFIX}#[~=]}"
 [[ "$tmp:q" = "$tmp" ||
    compstate[matcher] -ne compstate[total_matchers] ]] && return 1
 
-# Probably set initial context.
-
-[[ -z "$curcontext" ]] && curcontext=':match'
-
 _style -s '' original orig
-_style -s '' insert ins
+_style -b '' insert-unambiguous ins
 
 # Try completion without inserting a `*'?
 
@@ -36,7 +32,7 @@ if [[ -n "$orig" ]]; then
   compstate[matcher]="$compstate[total_matchers]"
 
   if (( ret )); then
-    [[ "$ins" = unambig* &&
+    [[ "$ins" = yes &&
        $#compstate[unambiguous] -ge ${#:-${PREFIX}${SUFFIX}} ]] && 
         compstate[pattern_insert]=unambiguous
     return 0
@@ -53,7 +49,7 @@ _complete && ret=1
 compstate[pattern_match]="$opm"
 compstate[matcher]="$compstate[total_matchers]"
 
-[[ ret -eq 1 && "$ins" = unambig* &&
+[[ ret -eq 1 && "$ins" = yes &&
    $#compstate[unambiguous] -ge ${#:-${PREFIX}${SUFFIX}} ]] && 
     compstate[pattern_insert]=unambiguous
 

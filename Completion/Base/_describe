@@ -16,7 +16,7 @@ fi
 
 _tags "$_type" || return 1
 
-_style "$_type" description && _showd=yes
+_style "$_type" verbose && _showd=yes
 
 _description _expl "$1"
 shift

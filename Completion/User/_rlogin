@@ -1,16 +1,6 @@
 #compdef rlogin rsh remsh rcp
 
 _rlogin () {
-  local accounts_users_hosts
-
-  local varname="$words[1]_accounts"
-
-  if (( ${(P)+varname} )); then
-    accounts_users_hosts=( ${(P)varname} )
-  else
-    accounts_users_hosts=( $my_accounts )
-  fi
-
   case "$words[1]" in
   rlogin)
     _arguments -s \
@@ -64,21 +54,21 @@ _rlogin () {
 }
 
 _rlogin_users () {
-  _tags users && _combination accounts_users_hosts users "$@"
+  _tags users && _combination my-accounts users-hosts users "$@"
 }
 
 _rlogin_hosts () {
   _tags hosts &&
       if [[ "$IPREFIX" == *@ ]]; then
-        _combination accounts_users_hosts "users=${IPREFIX/@}" hosts "$@"
+        _combination my-accounts users-hosts "users=${IPREFIX/@}" hosts "$@"
       else
-        _combination accounts_users_hosts \
+        _combination my-accounts users-hosts \
             ${opt_args[-l]:+"users=${opt_args[-l]:q}"} hosts "$@"
       fi
 }
 
 _rlogin_all_hosts () {
-  _tags hosts && _combination accounts_users_hosts hosts "$@"
+  _tags hosts && _combination my-accounts users-hosts hosts "$@"
 }
 
 _rlogin "$@"

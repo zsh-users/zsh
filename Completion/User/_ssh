@@ -4,16 +4,6 @@ _ssh () {
   local curcontext="$curcontext" state lstate line ret=1 expl args tmp
   typeset -A opt_args
 
-  local accounts_users_hosts
-
-  local varname="$words[1]_accounts"
-
-  if (( ${(P)+varname} )); then
-    accounts_users_hosts=( ${(P)varname} )
-  else
-    accounts_users_hosts=( $my_accounts )
-  fi
-
   args=()
 
   # ssh-opt is a pseudo-command used to complete ssh options for `scp -o'.
@@ -227,14 +217,14 @@ _ssh () {
 }
 
 _ssh_users () {
-  _combination accounts_users_hosts users "$@"
+  _combination my-accounts users-hosts users "$@"
 }
 
 _ssh_hosts () {
   if [[ "$IPREFIX" == *@ ]]; then
-    _combination accounts_users_hosts "users=${IPREFIX/@}" hosts "$@"
+    _combination my-accounts users-hosts "users=${IPREFIX/@}" hosts "$@"
   else
-    _combination accounts_users_hosts \
+    _combination my-accounts users-hosts \
       ${opt_args[-l]:+"users=${opt_args[-l]:q}"} hosts "$@"
   fi
 }

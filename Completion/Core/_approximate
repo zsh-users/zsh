@@ -7,7 +7,7 @@
 
 local _comp_correct _correct_prompt comax
 local cfgacc cfgorig cfgps cfgins
-local curcontext="$curcontext" oldcontext
+local curcontext="${curcontext}" oldcontext
 
 # Only if all global matchers have been tried.
 
@@ -17,23 +17,21 @@ local curcontext="$curcontext" oldcontext
 
 [[ "${#:-$PREFIX$SUFFIX}" -le 1 ]] && return 1
 
-# Probably set initial context.
-
-[[ -z "$curcontext" ]] && curcontext=':approximate'
+[[ "$curcontext" != *:correct ]] && curcontext="${curcontext}:approximate"
 
 oldcontext="$curcontext"
 
-_style -s '' accept cfgacc
+_style -s '' max-errors cfgacc
 _style -s '' original cfgorig
 _style -s '' prompt cfgps
 _style -s '' insert cfgins
 
 # Get the number of errors to accept.
 
-if [[ "$cfgacc" = *[nN]* && ${NUMERIC:-1} -ne 1 ]]; then
+if [[ "$cfgacc" = *numeric* && ${NUMERIC:-1} -ne 1 ]]; then
   # Stop if we also have a `!'.
 
-  [[ "$cfgacc" = *\!* ]] && return 1
+  [[ "$cfgacc" = *not-numeric* ]] && return 1
 
   # Prefer the numeric argument if that has a sensible value.
 

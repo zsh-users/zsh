@@ -53,9 +53,7 @@ insert-and-predict () {
 	  unsetopt automenu recexact
 	  integer curs=$CURSOR pos nchar=${#LBUFFER//[^${KEYS[-1]}]}
 	  local -a +h comppostfuncs
-	  local crs curcontext="$curcontext"
-
-	  [[ -z "$curcontext" ] && curcontext=':predict'
+	  local crs curcontext="${curcontext}:predict"
 
 	  comppostfuncs=( predict-limit-list )
 	  zle complete-word

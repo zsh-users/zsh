@@ -1,13 +1,3 @@
 #autoload
 
-local accounts_users_hosts
-
-local varname="$words[1]_accounts"
-
-if [[ ${(P)+varname} -eq 1 ]]; then
-  accounts_users_hosts=( ${(P)varname} )
-else
-  accounts_users_hosts=( $my_accounts )
-fi
-
-_user_at_host "$@"
+_user_at_host -t my-accounts "$@"

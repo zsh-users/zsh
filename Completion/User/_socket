@@ -1,9 +1,9 @@
 #compdef socket
 
-# Parameter used:
+# Style used:
 #
-#  socket_hosts_ports
-#    The array that contains paris `host:port'.
+#  hosts-ports
+#    The style that contains pairs `host:port'.
 
 local curcontext="$curcontext" state line expl
 typeset -A opt_args
@@ -41,14 +41,14 @@ arg1)
     _wanted ports expl 'port to listen' && _ports "$expl[@]"
   else
     _wanted hosts expl 'host' &&
-        _combination socket_hosts_ports hosts "$expl[@]"
+        _combination '' hosts-ports hosts "$expl[@]"
   fi
   ;;
 
 arg2)
   if (( ! $+opt_args[-s] )); then
     _wanted ports expl 'port to connect' &&
-        _combination socket_hosts_ports hosts="${line[2]:q}" ports "$expl[@]"
+        _combination '' hosts-ports hosts="${line[2]:q}" ports "$expl[@]"
   fi
   ;;
 esac

@@ -16,7 +16,7 @@ _style -a ps list-arguments listargs
 _style -a ps arguments args
 (( $#listargs )) || listargs=( "$args[@]" )
 
-if _style processes description; then
+if _style processes verbose; then
   list=("${(@Mr:COLUMNS-1:)${(f@)$(ps $listargs 2>/dev/null)}[2,-1]:#[ 	]#${PREFIX}[0-9]#${SUFFIX}[ 	]*${~match}}")
   desc=(-ld list)
 else

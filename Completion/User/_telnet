@@ -64,14 +64,14 @@ _arguments -C -s \
 case "$state" in
 hosts)
   _wanted hosts expl host &&
-      _combination telnet_hosts_ports_users \
+      _combination '' hosts-ports-users \
           ${opt_args[-l]:+users=${opt_args[-l]:q}} \
           hosts "$expl[@]"
   ;;
 
 ports)
   _wanted ports expl port &&
-      _combination telnet_hosts_ports_users \
+      _combination '' hosts-ports-users \
           ${opt_args[-l]:+users=${opt_args[-l]:q}} \
           hosts="${line[2]:q}" \
           ports "$expl[@]"
@@ -79,7 +79,7 @@ ports)
 
 users)
   _wanted users expl user &&
-      _combination telnet_hosts_ports_users \
+      _combination '' hosts-ports-users \
       ${line[2]:+hosts="${line[2]:q}"} \
       ${line[3]:+ports="${line[3]:q}"} \
       users "$expl[@]"

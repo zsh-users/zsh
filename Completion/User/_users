@@ -3,11 +3,11 @@
 # If a parameter `users' exists and it is an array, we first try to
 # complete only to its elements.
 
-local expl
+local expl users
 
 _wanted users expl user || return 1
 
-[[ "${(t)users}" = *array* ]] &&
+_style -a users users users &&
     compadd "$expl[@]" "$@" - "$users[@]" && return 0
 
 compadd "$@" "$expl[@]" - "${(@k)userdirs}"

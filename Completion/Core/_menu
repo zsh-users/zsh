@@ -1,10 +1,6 @@
 #autoload
 
-local curcontext="$curcontext"
-
-# Probably set initial context.
-
-[[ -z "$curcontext" ]] && curcontext=':menu'
+local curcontext="${curcontext}:menu"
 
 # This completer is an example showing how menucompletion can be
 # implemented with the new completion system.

@@ -8,11 +8,7 @@
 # word from the line.
 
 local exp word="$PREFIX$SUFFIX" group=-V expl expl2 disp orig menu prompt
-local curcontext="$curcontext" expr descr
-
-# Probably set initial context.
-
-[[ -z "$curcontext" ]] && curcontext=':expand'
+local curcontext="${curcontext}:expand" expr descr
 
 # First, see if we should insert all *completions*.
 
@@ -68,7 +64,7 @@ else
   expl=(-n)
 fi
 
-if [[ -n "$menu" && "$menu" != *only* && "$menu" = *showall* ]]; then
+if [[ -n "$menu" && "$menu" != *only* && "$menu" = *show-all* ]]; then
   if [[ -n "$descr" ]]; then
     expl2=(-ld disp -X "${descr//\\%d/all words}")
   else

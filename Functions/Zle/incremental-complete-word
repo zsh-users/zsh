@@ -18,9 +18,7 @@ incremental-complete-word() {
 
   local key lbuf="$LBUFFER" rbuf="$RBUFFER" pmpt word
   local lastl lastr wid twid num alt post toolong
-  local curcontext="$curcontext" stop brk
-
-  [[ -z "$curcontext" ]] && curcontext=':incremental'
+  local curcontext="${curcontext}:incremental" stop brk
 
   _style -s '' prompt pmpt || pmpt='incremental (%c): %u%s  %l}'
   _style -s '' stop stop

@@ -1,8 +1,13 @@
 #compdef ftp ncftp ping rwho rup xping traceroute host
 
-local expl
+local expl hosts
 
-: ${(A)hosts:=${(s: :)${(ps:\t:)${${(f)"$(</etc/hosts)"}%%\#*}##[:blank:]#[^[:blank:]]#}}}
+if ! _style -a hosts hosts hosts; then
+  (( $+_cache_hosts )) ||
+      : ${(A)_cache_hosts:=${(s: :)${(ps:\t:)${${(f)"$(</etc/hosts)"}%%\#*}##[:blank:]#[^[:blank:]]#}}}
+
+  hosts=( "$_cache_hosts[@]" )
+fi
 
 _wanted hosts expl host &&
     compadd -M 'm:{a-zA-Z}={A-Za-z} r:|.=* r:|=*' "$@" "$expl[@]" - "$hosts[@]"

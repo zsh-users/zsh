@@ -6,7 +6,7 @@ _tags jobs || return 1
 
 _style jobs prefix-needed && [[ "$PREFIX" != %* ]] && return 1
 _style jobs prefix-hidden && pfx=''
-_style jobs description   && desc=yes
+_style jobs verbose       && desc=yes
 
 if [[ "$1" = -r ]]; then
   jids=( "${(@k)jobstates[(R)running*]}" )

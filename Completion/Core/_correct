@@ -8,11 +8,7 @@
 # Supported configuration keys are the same as for `_approximate', only
 # starting with `correct'.
 
-local ret=1 opm="$compstate[pattern_match]" curcontext="$curcontext"
-
-# Probably set initial context.
-
-[[ -z "$curcontext" ]] && curcontext=':correct'
+local ret=1 opm="$compstate[pattern_match]" curcontext="${curcontext}:correct"
 
 compstate[pattern_match]='-'
 

@@ -349,10 +349,10 @@ Have fun
       tmp="'*:urls' local ${${(qqs.:.)val}}"
       ;;
     describe_options)
-      tmp="'*:options' description ${(qq)val}"
+      tmp="'*:options' verbose 'yes'"
       ;;
     describe_values)
-      tmp="'*:values' description ${(qq)val}"
+      tmp="'*:values' verbose 'yes'"
       ;;
     autodescribe_options)
       tmp="'*:options' auto-description ${(qq)val}"
@@ -412,7 +412,7 @@ compstyle '*:options' prefix-hidden yes"
       tmp="'*' completer ${${(qqs.:.)val}}"
       ;;
     last_prompt)
-      tmp="'*' last-prompt ${(qq)val}"
+      tmp="'*' last-prompt 'yes'"
       ;;
     esac
     [[ -n "$tmp" ]] && style="${style}${cmt}compstyle ${tmp}
@@ -426,11 +426,7 @@ compstyle '*:options' prefix-hidden yes"
 
 # Very simple interface for setting styles:
 #
-#   compstyle context -styles... context -styles ...
-#
-# Where context is of the form :ctxt-pats:...:tag-pat.
-#
-# This will be improved if needed. Promised.
+#   compstyle pattern style values...
 
 compstyle() {
   local long
@@ -490,7 +486,7 @@ compstyle() {
 
 # Default styles. This should be executed conditionally somehow.
 
-compstyle '*'        description   'yes'
+compstyle '*'        verbose       'yes'
 compstyle '*'        prefix-needed 'yes'
 compstyle '*'        prefix-hidden 'no'
 compstyle ':correct' accept        '2n'

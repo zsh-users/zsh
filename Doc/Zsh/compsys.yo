@@ -464,7 +464,7 @@ combined name and the name of a style is then compared to all patterns
 and the value of the style for the first matching pattern is used.
 
 For example, many completion functions can generate matches in a
-simple and a verbose form and use the tt(description) style to decide
+simple and a verbose form and use the tt(verbose) style to decide
 which form should be used. To make all such functions always use the
 verbose form one can simply call
 
@@ -472,7 +472,7 @@ example(compstyle '*' description yes)
 
 in one of the startup files like tt(.zshrc) (after the call to the
 tt(compinit) function). This definition simply means that the
-tt(description) style has tt(yes) as its value in every context.
+tt(verbose) style has tt(yes) as its value in every context.
 
 The completion function for the tt(kill) builtin command uses this
 style to decide if jobs and processes are listed only as job numbers
@@ -523,6 +523,9 @@ the number. Please tell us if you think that you have identified a tag
 that should be replaced by one of the more generic ones.)
 
 startitem()
+item(tt(accounts))(
+used to look up the tt(users-hosts) style
+)
 item(tt(all-files))(
 for the names of all files
 )
@@ -638,6 +641,9 @@ for names of X modifiers
 item(tt(modules))(
 for modules (e.g. tt(zsh) modules)
 )
+item(tt(my-accounts))(
+used to look up the tt(users-hosts) style
+)
 item(tt(named-directories))(
 for named directories (you wouldn't have guessed that, would you?)
 )
@@ -649,6 +655,9 @@ for nicknames of YP maps
 )
 item(tt(options))(
 for command options
+)
+item(tt(other-accounts))(
+used to look up the tt(users-hosts) style
 )
 item(tt(packages))(
 for packages (e.g. tt(rpm) packages)
@@ -738,31 +747,6 @@ explain some of them only when explaining the completers that use
 them.)
 
 startitem()
-item(tt(accept))(
-This is used by the tt(_approximate) completer function to determine
-the maximum number of errors to accept. The completer will try to
-generate completions by first allowing one error, then two errors, and
-so on, until either a match was found or the maximum number of errors
-given by this style has been reached.
-
-If the value for this style contains a lower- or upper-case `tt(n)', the 
-completer function will take any numeric argument as the
-maximum number of errors allowed. For example, with
-
-example(compstyle ':approximate' accept 2n)
-
-two errors will be allowed if no numeric argument is given. However,
-with a numeric argument of six (as in `tt(ESC-6 TAB)'), up to six
-errors are accepted.  Hence with a value of `tt(0n)', no correcting
-completion will be attempted unless a numeric argument is given.
-
-If the value contains `tt(n)' or `tt(N)' and an exclamation mark
-(`tt(!)'), tt(_approximate) will em(not) try to generate corrected
-completions when given a numeric argument, so in this case the number given
-should be greater than zero.  For example, `tt(2n!)' specifies that
-correcting completion with two errors will usually be performed, but if a
-numeric argument is given, correcting completion will not be performed.
-)
 item(tt(arguments))(
 The value of this style is given to the tt(ps) command by functions
 that call it when generating process identifiers as matches.
@@ -820,7 +804,7 @@ generating filenames as matches to find out if the cursor will be left
 after the first ambiguous pathname component even when menucompletion
 is used.
 )
-item(tt(description))(
+item(tt(verbose))(
 This is used in several contexts to decide if only a simple or a
 verbose list of matches should be generated. For example some commands 
 show descriptions for option names if this style is true.
@@ -864,14 +848,36 @@ This is used with the tt(matches) tag. If it is `true', matches of
 different types will be put in different groups, so that they are
 listed separately and not mixed when using menu completion.
 )
-item(tt(insert))(
-This is used by the tt(_match) completer function. If it is set to a
-string starting with tt(unambig), the tt(_completer) will start menu
+item(tt(groups))(
+A style holding the names of the groups that should be completed. If
+this is not set by the user, the group names from the YP database or
+the file `tt(/etc/group)' will be used.
+)
+item(tt(hosts))(
+A style holding the names of hosts that should be completed. If this
+is not set by the user the hostnames in `tt(/etc/hosts)' will be used.
+)
+item(tt(hosts-ports))(
+This style is used by commands that need or accept hostnames and
+ports. The strings in the value should be of the form
+`var(host)tt(:)var(port)'. These hostnames and ports are completed
+depending on the information already on the line, so that if, for
+example, the hostname is already typed, only those ports will be
+completed for which pairs with the hostname from the line exist.
+)
+item(tt(hosts-ports-users))(
+Like tt(hosts-ports) but used for commands like tt(telnet) and
+containing strings of the form `var(host)tt(:)var(port)tt(:)var(user)' .
+)
+item(tt(insert-unambiguous))(
+This is used by the tt(_match) completer function. If it is set to
+`true', the tt(_completer) will start menu
 completion only if no unambiguous string could be generated that is at
 least as long as the original string from the line.
 )
 item(tt(last-prompt))(
-This is used by the main completion function tt(_main_complete). If it 
+This is used by the main completion function tt(_main_complete) with
+no particular context name. If it 
 is `true', the cursor will always be moved back to the last prompt if
 that is still visible, independent of the setting of the
 tt(ALWAYS_LAST_PROMPT) option.
@@ -927,20 +933,45 @@ hostname, the path to the default web pages for the server and the
 directory name used by a user placing web pages within their home
 area.
 )
+item(tt(max-errors))(
+This is used by the tt(_approximate) completer function to determine
+the maximum number of errors to accept. The completer will try to
+generate completions by first allowing one error, then two errors, and
+so on, until either a match was found or the maximum number of errors
+given by this style has been reached.
+
+If the value for this style contains the string `tt(numeric)', the 
+completer function will take any numeric argument as the
+maximum number of errors allowed. For example, with
+
+example(compstyle ':approximate' accept 2 numeric)
+
+two errors will be allowed if no numeric argument is given. However,
+with a numeric argument of six (as in `tt(ESC-6 TAB)'), up to six
+errors are accepted.  Hence with a value of `tt(0 numeric)', no correcting
+completion will be attempted unless a numeric argument is given.
+
+If the value contains the string `tt(not-numeric)', tt(_approximate)
+will em(not) try to generate corrected
+completions when given a numeric argument, so in this case the number given
+should be greater than zero.  For example, `tt(2 not-numeric)' specifies that
+correcting completion with two errors will usually be performed, but if a
+numeric argument is given, correcting completion will not be performed.
+)
 item(tt(menu))(
 This is used by the tt(_expand) completer. If it is unset or set to
-the empty string, the words resulting from expansion (if any) will
+an empty value, the words resulting from expansion (if any) will
 simply be inserted in the command line, replacing the original
-string. However, if this style is set to a non-empty string, the user
+string. However, if this style is set to a non-empty value, the user
 can cycle through the expansion as in menucompletion. Unless the value
-contains the substring `tt(only)', the user will still be offered all
+contains the string `tt(only)', the user will still be offered all
 expansions at once as one of the strings to insert in the command
 line; normally, this possibility is offered first, but if the value
-contains the substring `tt(last)', it is offered last. Also, if the
-value contains the substring `tt(sort)', the expansions will be sorted
+contains the string `tt(last)', it is offered last. Also, if the
+value contains the string `tt(sort)', the expansions will be sorted
 alphabetically, normally they are kept in the order the expansion
-produced them in. And finally, if the value contains the substring
-`tt(showall)', the string of all words will be shown in the list of
+produced them in. And finally, if the value contains the string
+`tt(show-all)', the string of all words will be shown in the list of
 expansions.
 
 The tt(_oldlist) completer uses this, too. Here it controls how menu
@@ -948,7 +979,7 @@ completion behaves when a completion has already been inserted and the
 user types a standard completion key type such as tt(TAB). The default
 behaviour of tt(_oldlist) is that menu completion always continues
 with the existing list of completions.  If this style is set to
-tt(never), however, a new completion is started if the old list was
+`false', however, a new completion is started if the old list was
 generated by a different completion command (the behaviour without the 
 tt(_oldlist) completer).
 
@@ -962,7 +993,7 @@ item(tt(original))(
 In the tt(_approximate) completer this style is used to specify
 whether the original string on which correcting completion was
 attempted is to be included in the list of possible corrections. If it
-is set to any non-empty string, the original string will be offered
+is set to any non-empty value, the original string will be offered
 when cycling through the completions. Normally it will appear as the
 first string, so that the command line does not change immediately;
 consecutive completion attempts will cycle through the corrected
@@ -1004,6 +1035,11 @@ tt(User) sub-directory of the completion system for more information.
 Also, the function that completes color names uses this style with the 
 tt(colors) tag. Here, the value should be the pathname of a file
 containing color names in the format of an X11 tt(rgb.txt) file.
+)
+item(tt(ports))(
+A style holding the service names of ports to complete. If this is
+not set by the user, the service names from `tt(/etc/services)' will
+be used.
 )
 item(tt(prefix-hidden))(
 This is used when matches with a common prefix are added (e.g. option
@@ -1083,6 +1119,26 @@ example(compstyle ':expand' substitute '${NUMERIC:-1} != 1')
 substitution will be performed only if given an explicit numeric
 argument other than `tt(1)', as by typing `tt(ESC 2 TAB)'.
 )
+item(tt(users))(
+This may be set to a list of names that should be completed whenever 
+a username is needed. If it is not set or the string on the line
+doesn't match any of the strings in this list, all usernames will be
+completed.
+)
+item(tt(users-hosts))(
+The values of this style should be of the form
+`var(user)tt(:)var(host)'. It is used for commands that need pairs of
+user- and hostnames. For such commands, only the pairs from this style 
+are used and if, for example, the hostname is already typed, then only 
+the hostnames for which there is a pair with that username is defined.
+
+If set for the tt(my-accounts) tag, this is used for commands such as
+tt(rlogin) and tt(ssh). I.e. the style should contain the names of the 
+user's own accounts. With the tt(other-accounts) this is used for
+commands such as tt(talk) and tt(finger) and should contain other
+people's accounts. Finally, this may also used by some commands with
+the tt(accounts) tag.
+)
 item(tt(word))(
 To find out if listing should be performed on its own, the tt(_list)
 completer normally compares the contents of the line with the contents
@@ -1090,72 +1146,6 @@ the line had at the time of the last invocation. If this style is set to
 `true', comparison is done using only the current word. In this case,
 attempting completion on a word equal to the one when completion was called
 the last time will not delay the generation of matches.
-)
-enditem()
-
-subsect(Parameters)
-
-These parameters may be set by the user to change the behavior of the
-completion system:
-
-startitem()
-item(tt(users))(
-This may be set to an array of names that should be completed whenever 
-a username is needed. If it is not set or the string on the line
-doesn't match any of the strings in this array, all usernames will be
-completed.
-)
-item(tt(groups))(
-An array holding the names of the groups that should be completed. If
-this is not set by the user, it will automatically be set to a list
-of group names taken from the YP database or the file `tt(/etc/group)'.
-)
-item(tt(hosts))(
-An array holding the names of hosts that should be completed. If this
-is not set by the user it will automatically be set to a list of the
-hostnames in `tt(/etc/hosts)'.
-)
-item(tt(ports))(
-An array holding the service names of ports to complete. If this is
-not set by the user, it will be set to a list of the service names
-from `tt(/etc/services)'.
-)
-item(tt(my_accounts))(
-This array is used for completion of usernames and hostnames for many
-commands, including the tt(ssh) and tt(rlogin) family. It should
-contain elements of the form `var(host)tt(:)var(user)', corresponding
-to the user's own accounts. These pairs will be used to complete names
-of hosts and usernames depending on the information already on the
-line, so that if, for example, the username is already typed, only
-those hostnames will be completed for which pairs with the username
-from the line exist.
-)
-item(tt(other_accounts))(
-Like tt(my_accounts), except that it should contain the usernames and
-hostnames of other people's accounts, for use with commands such as
-tt(talk), tt(ytalk) and tt(finger).
-)
-item(var(command)tt(_accounts))(
-Any of the commands which use the above tt(my_accounts) and
-tt(other_accounts) arrays can have this behaviour overridden by
-specifying a username/hostname array unique to that command.
-For example, if you wanted tt(rcp) to complete usernames and hostnames
-from a different set of accounts, you could set the array
-tt(rcp_accounts) with username/hostname pairs in the same format as
-tt(my_accounts).
-)
-item(tt(telnet_hosts_ports_users))(
-This array is used by the completion function for tt(telnet). It
-should contain elements of the form
-`var(host)tt(:)var(port)tt(:)var(user)'. These triples will be used to 
-complete names of hosts, ports, and usernames depending on the
-information already on the line, so that if, for example, the hostname 
-is already typed, only those ports and usernames will be completed for 
-which triples with the hostname from the line exist.
-)
-item(tt(socket_hosts_ports))(
-Like tt(telnet_hosts_ports_users), but used for the tt(socket) command 
-and containing pairs of hostnames and ports.
 )
 enditem()
 
@@ -1309,7 +1299,7 @@ corrected completions are found, the completer will normally start
 menucompletion allowing you to cycle through these strings.
 
 The exact behavior of this completer can be changed by using the
-styles tt(accept), tt(original), tt(prompt), and tt(insert), see
+styles tt(max-errors), tt(original), tt(prompt), and tt(insert), see
 ifzman(the section `Completion System Configuration' above)\
 ifnzman(noderef(Completion System Configuration)).
 
@@ -1328,8 +1318,8 @@ different top-level context name.
 For example, with:
 
 example(compstyle '*' completer _complete _correct _approximate
-compstyle ':correct' accept '2n!'
-compstyle ':approximate' accept '3n')
+compstyle ':correct' accept 2 not-numeric'
+compstyle ':approximate' accept 3 numeric)
 
 correction will accept up to two errors. If a numeric argument is
 given, correction will not be performed, but correcting completion
@@ -2271,29 +2261,41 @@ This is alternation of two `var(spec)'s.
 enditem()
 )
 item(tt(_combination))(
-This function uses a array to represent combinations of completing texts.
-The first argument is a name of the array optionally appended completing
-field names separated by colon.  If it contains no colon, it is assumed
-that the name is formed as `var(prefix)_var(fieldname)_..._var(fieldname)'
-which `var(prefix)' and `var(fieldname)'s does not contain a underscore.
-A each element of the array should be colon-separated completing texts
-which correspond to the field names.  The option `tt(-s) var(sepchar)'
-can be given before the array name to change the delimiter in the array
-element from colon.
+This function is used to complete combinations of values such as pairs 
+of hostnames and usernames. The possible values will be taken from the 
+style whose name is given as the second argument. The first argument
+is the tag to use to do the lookup.
 
-Since second argument, zero or more arguments formed as
-`var(fieldname)tt(=)var(pattern)' can be given.  It restricts completion
-candidates from the array by maching a text that corresponds to
-`var(fieldname)' against to `var(pattern)'.  If `tt(:)var(num)' is
-specified between `var(fieldname)' and `tt(=)', `var(num)'th field in
-named as `var(fieldname)' is used instead of the first.
+The style name should consist of multiple parts separated with
+hyphens which are then used as fieldnames. Known values for such
+fields can be given after the second argument in arguments of the form 
+`var(fiels)tt(=)var(pattern)'. The first argument without a equal sign 
+is taken as the name of the field for which completions should be
+generated.
 
-After above arguments, completing field name should be given.  It may have
-suffix `tt(:)var(num)' to use a arbitrary field instead of the first as
-above.
+The matches generated will be taken from the value of the style. These 
+values should contain the possible values for the combinations where
+the values for the different fields are separated by colons or the
+character given after the tt(-s) option to tt(_combination).
 
-If there are no array element to match all of specified pattern and the
-function `tt(_)var(fieldname)' exists, the function is called.
+Only the values for the requested fields for which the patterns given
+in the `var(field)tt(=)var(pattern)' match the respective fields in
+the strings from the style value are generated as possible matches.
+
+If no style with the given name is defined for the given tag but a
+function named with the name of the requestd field preceded by an
+underscore is defined, that function will be called to generate the
+matches. This is also done if none of the strings in the value of the
+style match all the patterns given as arguments.
+
+If the same name is used for more than one field, in both the
+`var(field)tt(=)var(pattern)' and the argument that gives the field
+name to complete for, the number of the field (starting with one) may
+be given after the fieldname (separated from it by a colon).
+
+All arguments after the requested fieldname are given to the
+tt(compadd) used (when generating matches from the style value) and to 
+the functions for the fields if they are called.
 )
 enditem()
 

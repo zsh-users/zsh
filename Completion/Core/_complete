@@ -4,11 +4,7 @@
 # a normal completion function, but as one possible value for the
 # completer style.
 
-local comp name curcontext="$curcontext" oldcontext
-
-# Probably set initial context.
-
-[[ -z "$curcontext" ]] && curcontext=':complete'
+local comp name curcontext="${curcontext}:complete" oldcontext
 
 oldcontext="$curcontext"
 
