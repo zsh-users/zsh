@@ -7391,7 +7391,6 @@ freematches(void)
 	g = n;
     }
     hasperm = 0;
-    minfo.cur = NULL;
 }
 
 /* Insert the given string into the command line.  If move is non-zero, *
