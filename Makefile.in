@@ -26,10 +26,17 @@
 
 subdir = .
 dir_top = .
-SUBDIRS = Doc Etc Src
+SUBDIRS = Doc Etc Src Test
 
-@@version.mk@@
-@@defs.mk@@
+@VERSION_MK@
+
+# source/build directories
+VPATH           = @srcdir@
+sdir            = @srcdir@
+sdir_top        = @top_srcdir@
+INSTALL         = @INSTALL@
+
+@DEFS_MK@
 
 # ========== DEPENDENCIES FOR BUILDING ==========
 
@@ -38,9 +45,6 @@ all: config.h
 	@for subdir in Src Doc; do \
 	  (cd $$subdir && $(MAKE) $(MAKEDEFS) $@) || exit 1; \
 	done
-
-check test:
-	@echo zsh test suite not available yet
 
 # prepare module configuration
 prep:
@@ -51,9 +55,13 @@ META-FAQ: FORCE
 
 # ========== DEPENDENCIES FOR INSTALLING ==========
 
-# install/uninstall everything
-install: install.bin install.modules install.man install.info
-uninstall: uninstall.bin uninstall.modules uninstall.man uninstall.info
+# install stripped
+install-strip:
+	$(MAKE) install STRIPFLAGS="-s"
+
+# install/uninstall most things
+install: install.bin install.modules install.man install.fns
+uninstall: uninstall.bin uninstall.modules uninstall.man uninstall.fns
 
 # install/uninstall just the binary
 install.bin uninstall.bin:
@@ -67,41 +75,64 @@ install.modules uninstall.modules:
 install.man uninstall.man:
 	@cd Doc && $(MAKE) $(MAKEDEFS) $@
 
+# install/uninstall just the shell functions
+install.fns:
+	test x$(sitefndir) != xno && $(sdir_top)/mkinstalldirs $(DESTDIR)$(sitefndir)
+	@cd Completion && $(MAKE) $(MAKEDEFS) $@
+	@cd Functions && $(MAKE) $(MAKEDEFS) $@
+
+uninstall.fns:
+	# never attempt to remove $(sitefndir)
+	@cd Completion && $(MAKE) $(MAKEDEFS) $@
+	@cd Functions && $(MAKE) $(MAKEDEFS) $@
+
 # install/uninstall just the info pages
 install.info uninstall.info:
 	@cd Doc && $(MAKE) $(MAKEDEFS) $@
 
+# install/uninstall just the HTML manual
+install.html uninstall.html:
+	@cd Doc && $(MAKE) $(MAKEDEFS) $@
+
+# ========== DEPENDENCIES FOR TESTING ==========
+check test:
+	cd Test ; $(MAKE) check
+
 # ========== DEPENDENCIES FOR CLEANUP ==========
 
-@@clean.mk@@
+@CLEAN_MK@
 
 distclean-here:
-	rm -f Makefile config.h config.status config.log config.cache stamp-h
+	@cd Completion && $(MAKE) $(MAKEDEFS) $@
+	@cd Functions && $(MAKE) $(MAKEDEFS) $@
+	@cd Test && $(MAKE) $(MAKEDEFS) $@
+	rm -f Makefile config.h config.status config.log config.cache stamp-h Config/defs.mk
 
 realclean-here:
 	cd $(sdir) && rm -f config.h.in stamp-h.in configure
 
 # ========== DEPENDENCIES FOR MAINTENANCE ==========
 
-@@config.mk@@
+@CONFIG_MK@
 
 config: config.h
 
-config.status: configure
+config.status: $(sdir)/configure
 	./config.status --recheck
 
-configure: configure.in aclocal.m4 aczsh.m4
+$(sdir)/configure: $(sdir)/configure.in $(sdir)/aclocal.m4 $(sdir)/aczsh.m4
 	cd $(sdir) && autoconf
 
 config.h: stamp-h
-stamp-h: config.h.in config.status
+stamp-h: $(sdir)/config.h.in config.status
 	cd $(dir_top) && \
 	  CONFIG_FILES= CONFIG_HEADERS=$(subdir)/config.h ./config.status
 
-config.h.in: stamp-h.in
-stamp-h.in: configure.in acconfig.h aclocal.m4 aczsh.m4
+$(sdir)/config.h.in: $(sdir)/stamp-h.in
+$(sdir)/stamp-h.in: $(sdir)/configure.in $(sdir)/acconfig.h \
+		$(sdir)/aclocal.m4 $(sdir)/aczsh.m4
 	cd $(sdir) && autoheader
-	echo > $@
+	echo > $(sdir)/stamp-h.in
 
 # ========== DEPENDENCIES FOR DISTRIBUTION ==========
 
