@@ -1,3 +1,10 @@
+2003-10-27  Peter Stephenson  <pws@csr.com>
+
+	* zsh-users/6727: from Lloyd Zusman: Completion/Unix/Command/_w3m,
+	Completion/Unix/Command/_w3mhistory,
+	Completion/Unix/Command/.distfiles: improved w3m support inspired
+	by _lynx.
+
 2003-10-26  Bart Schaefer  <schaefer@zsh.org>
 
 	* zsh-users/6738: Functions/Zle/url-quote-magic: replacement for
