@@ -21,7 +21,7 @@ Version 4.0.1
 Clint Adams <schizo@debian.org>: Completion functions, general
 configuration and module issues.
 
-Andrej Borsenkow <Andrej.Borsenkow@mow.siemens.ru>: Cygwin support,
+Andrej Borsenkow <bor@zsh.org>: Cygwin support,
 configuration, completion functions.
 
 Chmouel Boudjnah <chmouel@mandrakesoft.com>: configuration support.

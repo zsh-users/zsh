@@ -6,6 +6,9 @@
 	matchers in matcher-list to augment as well as replace
 	previous matcher list
 
+	* unposted: Etc/CONTRIBUTORS: use zsh.org mail address (courtsy
+	of Geoff) for me :-)
+
 
 2001-03-05  Sven Wischnowsky  <wischnow@zsh.org>
 
