@@ -1,5 +1,9 @@
 2001-09-10  Clint Adams  <clint@zsh.org>
 
+	* unposted: Src/Modules/tcp.c:
+	don't segfault on -a if
+	the session table is empty.
+
 	* 15772: Src/Modules/tcp.c:
 	add -t (test) for ztcp.
 

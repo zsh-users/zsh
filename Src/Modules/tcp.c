@@ -309,13 +309,12 @@ zts_byfd(int fd)
 
     tsess = zts_head();
 
-    do {
+    while(tsess != NULL) {
 	if (tsess->fd == fd)
 	    return tsess;
 
 	tsess = zts_next(tsess);
     }
-    while(tsess != NULL);
 
     return NULL;
 }
@@ -387,7 +386,7 @@ bin_ztcp(char *nam, char **args, char *ops, int func)
     char **addrp, *desthost, *localname, *remotename;
     struct hostent *zthost = NULL, *ztpeer = NULL;
     struct servent *srv;
-    Tcp_session sess;
+    Tcp_session sess = NULL;
 
     if (ops['f'])
 	force = 1;
@@ -502,7 +501,7 @@ bin_ztcp(char *nam, char **args, char *ops, int func)
 
 	sess = zts_byfd(lfd);
 	if (!sess) {
-	    zwarnnam(nam, "fd is not registered as a tcp connection", NULL, 0);
+	    zwarnnam(nam, "fd %s is not registered as a tcp connection", args[0], 0);
 	    return 1;
 	}
 
