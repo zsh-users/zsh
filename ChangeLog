@@ -1,3 +1,9 @@
+2003-08-28  Oliver Kiddle  <opk@zsh.org>
+
+	* Completion/Unix/Command/_gcc, Completion/Unix/Command/_mh,
+	Completion/Unix/Type/_services, Completion/Unix/Command/_zdump:
+	merge back various small changes from 4.1
+
 2003-08-21  Oliver Kiddle  <opk@zsh.org>
 
 	* 18956: Completion/Unix/Command/_a2ps: update for a2ps 4.13
@@ -348,6 +354,12 @@
 	* 18402: Src/builtin.c: Prevent "print -m" from crashing (it now
 	complains about a missing pattern).
 
+2003-03-26  Oliver Kiddle  <opk@zsh.org>
+
+	* 18390: Completion/Unix/Command/_prcs,
+	Completion/Unix/Command/_xmlsoft: tidy up _prcs and update
+	_xmlsoft for latest version of xsltproc
+
 2003-03-25  Wayne Davison  <wayned@users.sourceforge.net>
 
 	* 18383: Src/utils.c: Fixed zjoin() when it returns an empty
@@ -672,7 +684,7 @@
 	* unposted: Config/version.mk: version 4.0.6.
 
 	* 17542 (Thomas Stromberg <thomas@stromberg.org>):
-	Completion/Unix/Command/_mount: most systems don't have /etc/mnt.
+	Completion/Unix/Command/_mount: most systems don't have /etc/mtab
 
 2002-08-12  Peter Stephenson  <pws@csr.com>
 
@@ -1282,7 +1294,7 @@
 	Functions/Zle/bash-down-case-word,
 	Functions/Zle/bash-up-case-word,
 	Functions/Zle/bash-transpose-words,
-	Functions/Zle/bash-forward-word, Functions/Zle/bash-bacward-word,
+	Functions/Zle/bash-forward-word, Functions/Zle/bash-backward-word,
 	Functions/Zle/bash-kill-word,
 	Functions/Zle/bash-backward-kill-word:
 	Zle widgets with bash-style word delimiting.
@@ -1730,7 +1742,7 @@
 
 2001-07-18  Sven Wischnowsky  <wischnow@zsh.org>
 
-	* 15402 (Akinora Musha): Completion/Unix/Command/_cvs: add
+	* 15402 (Akinori Musha): Completion/Unix/Command/_cvs: add
 	support for -R option on BSDs
 
 2001-07-17  Oliver Kiddle  <opk@zsh.org>

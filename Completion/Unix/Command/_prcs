@@ -1,0 +1,191 @@
+#compdef prcs
+
+local curcontext="$curcontext" state line subcmds ret=1
+typeset -A opt_args
+
+# lookup project names in the repository
+# (this does not handle subprojects)
+
+(( $+functions[_prcs_projects] )) ||
+_prcs_projects() {
+  local expl
+
+  _wanted prcs-projects expl 'project name' compadd "$@" - \
+      ${~opt_args[-R]:-${opt_args[--repository]:-${PRCS_REPOSITORY:-~/PRCS}}}/*(/:t)
+}	   
+
+# standard options for all subcommands 
+
+(( $+functions[_prcs_arguments] )) ||
+_prcs_arguments() {
+  _arguments -s \
+    '(-f --force)'{-f,--force}'[resolve interactive queries in some fixed way]' \
+    '(-h -H --help)'{-h,-H,--help}'[print out help]' \
+    '(-j --jobs)'{-j,--jobs=}'[spawn many child processes at once]:number:' \
+    '(-l -L --long-format --long-long-format)'{-l,--long-format}'[long format]' \
+    '(-l -L --long-format --long-long-format)'{-L,--long-long-format}'[longer format]' \
+    '(-n --no-action)--no-action[show what would happen but leave files unchanged]' \
+    '(-q --quiet)'{-q,--quiet}'[suppress normal informational messages]' \
+    "--plain-format[don't break lines at screen width]" \
+    '(-R --repository)'{-R,--repository=}'[specify the repository directory]:directory:_files -/' \
+    "$@"
+}
+
+_arguments -C \
+  '(* -)'{-h,-H,--help}'[print out help]' \
+  '(* -)--version[display program version]' \
+  '*:: :->subcmd' && ret=0
+
+if (( CURRENT == 1 )); then
+  subcmds=(
+    'admin:admin subcommand'
+    'checkin:checkin project revision'
+    'checkout:checkout project revision'
+    'config:verify configuration'
+    'delete:delete named revision of project'
+    'depopulate:remove named files from project descriptor'
+    'diff:show differences between two revisions'
+    'execute:execute a command for each file in a project'
+    'info:print information about versions of project'
+    'merge:reconcile differences between working files and another revision'
+    'package:package the project and all its revisions into packagefile'
+    'populate:add named files to project descriptor'
+    'rekey:set keywords in selected files'
+    'unpackage:unpackage project in packagefile'
+  )
+  
+  _describe -t commands 'prcs command' subcmds && ret=0
+  return ret
+fi
+
+curcontext="${curcontext%:*}-$words[1]:"
+
+case "$words[1]" in
+  admin)
+    if (( CURRENT == 2 )); then
+      subcmds=(
+	'access:set the access permissions on the repository'
+	'compress:instruct PRCS to save disk space for project'
+	'init:create a repository entry'
+	'pdelete:delete a repository entry'
+	'pinfo:list all projects in the repository'
+	'prename:rename a repository entry'
+	'rebuild:reconstruct PRCS data files in the repository'
+	'uncompress:instruct PRCS to save time in processing project'
+      )
+      _describe -t commands 'admin subcommand' subcmds
+    else
+      shift words
+      (( --CURRENT ))
+      curcontext="${curcontext%:*}-$words[1]:"
+      case "$words[1]" in
+	access|compress|init|pdelete|prename|rebuild)
+          _prcs_arguments ':project name:_prcs_projects'
+        ;;
+	pinfo)
+	  _prcs_arguments
+	;;
+	uncompress)
+          _prcs_arguments \
+	    '-i[expand the entire project immediately]' \
+            ':project name:_prcs_projects'
+        ;;
+	*)
+	  _message "unknown prcs administrative subfunction: $words[1]"
+	;;
+      esac
+    fi
+  ;;
+  checkin)
+    _prcs_arguments \
+      '(-r --revision)'{-r+,--revision=}'[specify version of the project]:revision:' \
+      '(-s --skilled-merge)'{-s,--skilled-merge}'[turn off most of the safety features of merge]' \
+      ':project name:_prcs_projects' \
+      '*:file or directory:_files'
+  ;;
+  checkout)
+    _prcs_arguments \
+      '(-r --revision)'{-r+,--revision=}'[specify version of the project]:revision:' \
+      '(-p --preserve)'{-p,--preserve}'[preserve permissions on files that are checked out]' \
+      '(-u --unlink)'{-u,--unlink}"[don't overwrite symbolic link references]" \
+      '(-P --exclude-project-file)'{-P,--exclude-project-file}"[don't checkout the project file]" \
+      ':project name:_prcs_projects' \
+      '*:file or directory:_files'
+  ;;
+  config)
+    _prcs_arguments
+  ;;
+  delete)
+    _prcs_arguments \
+      '(-r --revision)'{-r+,--revision=}'[specify version of the project]:revision:' \
+      ':project name:_prcs_projects'
+  ;;
+  depopulate)
+    _prcs_arguments \
+      ':project name:_prcs_projects' \
+      '*:file or directory:_files'
+  ;;
+  diff)
+    _prcs_arguments \
+      '*'{-r+,--revision=}'[specify version of the project]:revision:' \
+      '(-k --keywords)'{-k,--keywords}'[compare keywords too]' \
+      '(-N --new)'{-N,--new}'[compare new files against empty files]' \
+      '(-P --exclude-project-file)'{-P,--exclude-project-file}"[don't diff the project file]" \
+      '--[introduce diff options]:*::diff options:=  _diff_options ${PRCS_DIFF_COMMAND:-diff}' \
+      ':project name:_prcs_projects' \
+      '*:file or directory:_files'
+  ;;
+  execute)
+    _prcs_arguments \
+      '(-r --revision)'{-r+,--revision=}'[specify version of the project]:revision:' \
+      '--pre[list directories first]' \
+      '(--pipe)--all[execute command once, with all files as arguments]' \
+      '(--all)--pipe[supply file contents as the standard input]' \
+      '--match[execute command on files matching a pattern]:pattern:' \
+      '--not[execute command on files not matching a pattern]:pattern:' \
+      '--:command: _command_names -e:*::arguments: _normal' \
+      ':project name:_prcs_projects' \
+      '*:file or directory:_files'
+  ;;
+  info)
+    _prcs_arguments \
+      '(-r --revision)'{-r+,--revision=}'[specify version of the project]:revision:' \
+      '--sort=[set sorting type]:sorting type:(version date)' \
+      ':project name:_prcs_projects' \
+      '*:file or directory:_files'
+  ;;
+  merge)
+    _prcs_arguments \
+      '(-r --revision)'{-r+,--revision=}'[specify version of the project]:revision:' \
+      '(-s --skilled-merge)'{-s,--skilled-merge}'[turn off most of the safety features of merge]' \
+      '(-u --unlink)'{-u,--unlink}"[don't overwrite symbolic link references]" \
+      ':project name:_prcs_projects' \
+      '*:file or directory:_files'
+  ;;
+  package)
+    _prcs_arguments \
+      '(-r --revision)'{-r+,--revision=}'[specify version of the project]:revision:' \
+      '(-z --compress)'{-z,--compress=}'[compress the output]' \
+      ':project name:_prcs_projects' \
+      ':file:_files'
+  ;;
+  populate)
+    _prcs_arguments \
+      '(-d --delete)'{-d,--delete=}'[perform optional deletions]' \
+      ':project name:_prcs_projects' \
+      '*:file or directory:_files'
+  ;;    
+  rekey)
+    _prcs_arguments \
+      '(-u --unlink)'{-u,--unlink}"[don't overwrite symbolic link references]" \
+      ':project name:_prcs_projects'
+  ;;    
+  unpackage)
+    _prcs_arguments \
+      ':file:_files' \
+      ':project name:_prcs_projects'
+  ;;
+  *)
+    _message "unknown prcs command: $words[1]"
+  ;;
+esac
