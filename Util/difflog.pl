@@ -11,7 +11,7 @@ my $newfn = pop(@ARGV);
 my $oldfn = pop(@ARGV);
 my (%oldhash, %newhash);
 
-my $article = q[(:?(:?workers?|users?)/)?\d{4,5}];
+my $article = q[(?:(?:workers?|users?)/)?\d{4,5}];
 
 read_file($newfn, \%newhash);
 read_file($oldfn, \%oldhash);
