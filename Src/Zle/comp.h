@@ -364,7 +364,8 @@ typedef void (*CLPrintFunc)(Cmgroup, Cmatch *, int, int, int, int,
 #define INSERTMATCHHOOK     (comphooks + 0)
 #define MENUSTARTHOOK       (comphooks + 1)
 #define COMPCTLMAKEHOOK     (comphooks + 2)
-#define COMPLISTMATCHESHOOK (comphooks + 3)
+#define COMPCTLCLEANUPHOOK  (comphooks + 3)
+#define COMPLISTMATCHESHOOK (comphooks + 4)
 
 /* compctl hook data struct */
 

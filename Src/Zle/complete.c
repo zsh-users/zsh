@@ -1288,6 +1288,7 @@ struct hookdef comphooks[] = {
     HOOKDEF("insert_match", NULL, HOOKF_ALL),
     HOOKDEF("menu_start", NULL, HOOKF_ALL),
     HOOKDEF("compctl_make", NULL, 0),
+    HOOKDEF("compctl_cleanup", NULL, 0),
     HOOKDEF("comp_list_matches", ilistmatches, 0),
 };
 

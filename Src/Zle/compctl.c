@@ -1892,6 +1892,13 @@ ccmakehookfn(Hookdef dummy, struct ccmakedat *dat)
     return 0;
 }
 
+static int
+cccleanuphookfn(Hookdef dummy, void *dat)
+{
+    ccused = ccstack = NULL;
+    return 0;
+}
+
 /* This adds a match to the list of matches.  The string to add is given   *
  * in s, the type of match is given in the global variable addwhat and     *
  * the parameter t (if not NULL) is a pointer to a hash node node which    *
@@ -3906,6 +3913,7 @@ int
 boot_(Module m)
 {
     addhookfunc("compctl_make", (Hookfn) ccmakehookfn);
+    addhookfunc("compctl_cleanup", (Hookfn) cccleanuphookfn);
     return (addbuiltins(m->nam, bintab, sizeof(bintab)/sizeof(*bintab)) != 1);
 }
 
@@ -3914,6 +3922,7 @@ int
 cleanup_(Module m)
 {
     deletehookfunc("compctl_make", (Hookfn) ccmakehookfn);
+    deletehookfunc("compctl_cleanup", (Hookfn) cccleanuphookfn);
     deletebuiltins(m->nam, bintab, sizeof(bintab)/sizeof(*bintab));
     return 0;
 }

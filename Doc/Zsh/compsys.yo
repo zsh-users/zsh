@@ -1359,6 +1359,23 @@ values), tt(options), tt(globbed-files), tt(directories) and
 tt(all-files) plus all tags offered by the completion function will be 
 used.
 )
+item(tt(use-compctl))(
+If this style is set to a string not equal to tt(false), tt(0),
+tt(no), and tt(off), the completion system will use any completion
+specifications defined with the tt(compctl) builtin command. If the
+style is unset, this will only be done if the tt(zsh/compctl) module
+is loaded. The string may also contain the substring tt(first) to make
+the definition for tt(compctl -T) be used and the substring
+tt(default) to make the one for tt(compctl -D) be used.
+
+Note that this is only intended to smooth the transition from
+tt(compctl) to the new completion system and may disappear in the
+future.
+
+Note also, that the definitions from tt(compctl) will only be used if
+there is no special completion function for the command completion is
+done upon.
+)
 item(tt(users))(
 This may be set to a list of names that should be completed whenever 
 a username is needed. If it is not set or the string on the line

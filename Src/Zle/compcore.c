@@ -844,6 +844,9 @@ makecomplist(char *s, int incmd, int lst)
 	callcompfunc(s, compfunc);
 	endcmgroup(NULL);
 
+	/* Needed for compcall. */
+	runhookdef(COMPCTLCLEANUPHOOK, NULL);
+
 	if (oldlist) {
 	    nmatches = onm;
 	    validlist = 1;
@@ -891,6 +894,9 @@ makecomplist(char *s, int incmd, int lst)
 	dat.incmd = incmd;
 	dat.lst = lst;
 	runhookdef(COMPCTLMAKEHOOK, (void *) &dat);
+
+	/* Needed for compcall. */
+	runhookdef(COMPCTLCLEANUPHOOK, NULL);
 
 	return dat.lst;
     }
