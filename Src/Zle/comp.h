@@ -275,24 +275,24 @@ struct cpattern {
 typedef struct cadata *Cadata;
 
 struct cadata {
-    char *ipre;
-    char *isuf;
-    char *ppre;
-    char *psuf;
-    char *prpre;
-    char *pre;
-    char *suf;
-    char *group;
-    char *rems;
-    char *remf;
-    char *ign;
-    int flags;
-    int aflags;
-    Cmatcher match;
-    char *exp;
-    char *apar;
-    char *opar;
-    char *dpar;
+    char *ipre;			/* ignored prefix (-i) */
+    char *isuf;			/* ignored suffix (-I) */
+    char *ppre;			/* `path' prefix (-p) */
+    char *psuf;			/* `path' suffix (-s) */
+    char *prpre;		/* expanded `path' prefix (-W) */
+    char *pre;			/* prefix to insert (-P) */
+    char *suf;			/* suffix to insert (-S) */
+    char *group;		/* name of the group (-[JV]) */
+    char *rems;			/* remove suffix on chars... (-r) */
+    char *remf;			/* function to remove suffix (-R) */
+    char *ign;			/* ignored suffixes (-F) */
+    int flags;			/* CMF_* flags (-[fqn]) */
+    int aflags;			/* CAF_* flags (-[QUa]) */
+    Cmatcher match;		/* match spec (parsed from -M) */
+    char *exp;			/* explanation (-X) */
+    char *apar;			/* array to store matches in (-A) */
+    char *opar;			/* array to store originals in (-O) */
+    char *dpar;			/* array to delete non-matches in (-D) */
 };
 
 /* Flags for special parameters. */
