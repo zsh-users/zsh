@@ -1561,9 +1561,8 @@ exalias(void)
 	    if (an && !an->inuse && ((an->flags & ALIAS_GLOBAL) || incmdpos ||
 				     inalmore)) {
 		inpush(an->text, INP_ALIAS, an);
-		/* remove from history if it begins with space */
-		if (isset(HISTIGNORESPACE) && an->text[0] == ' ')
-		    remhist();
+		if (an->text[0] == ' ')
+		    aliasspaceflag = 1;
 		lexstop = 0;
 		if (yytext == copy)
 		    yytext = tokstr;
