@@ -388,7 +388,7 @@ liitem(char *name)
     nlcode = &nl_vals[0];
 
     for (element = (char **)nl_names; *element; element++, nlcode++) {
-	if ((!strncmp(*element, name, strlen(*element))))
+	if ((!strcmp(*element, name)))
 	    return nlcode;
     }
 
