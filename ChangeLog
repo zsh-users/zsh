@@ -1,3 +1,7 @@
+2000-05-03  Tanaka Akira  <akr@m17n.org>
+
+	* 11106: Completion/User/_mount: fix glob for device files.
+
 2000-05-03  Peter Stephenson  <pws@cambridgesiliconradio.com>
 
 	* 11096: Test/ztst.zsh, Test/13parameter.ztst: fix test output
@@ -30,7 +34,7 @@
 
 2000-05-02  Tanaka Akira  <akr@m17n.org>
 
-	* 11075: install completion functions for AIX and BSD.
+	* 11075: configure.in: install completion functions for AIX and BSD.
 
 2000-05-02  Andrew Main  <zefram@zsh.org>
 

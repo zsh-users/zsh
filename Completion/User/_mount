@@ -554,7 +554,7 @@ devordir)
     _message "no device or directory with option \`-a'"
   else
     _alternative \
-        'devices:device:compadd /dev/\*' \
+        'devices:device:{compadd "$expl[@]" /dev/*}' \
 	'directories:mount point:_files -/' && ret=0
   fi
   ;;
