@@ -1,35 +1,39 @@
-#compdef mozilla
+#compdef mozilla mozilla-firebird mozilla-xremote-client
 
 local curcontext="$curcontext" state line ret=1 suf
 typeset -A opt_args
 
-_x_arguments -C \
-  '-height[height of startup window]:height:' \
-  '(-h)-help[show usage message]' \
-  '(-help)-h[show usage message]' \
-  '-installer[start with 4.x migration window]' \
-  '-width[width of startup window]:width:' \
-  '(-v)-version[show the version number and build date]' \
-  '(-version)-v[show the version number and build date]' \
-  '-CreateProfile:profile:' \
-  '-P[start with profile]:profile:' \
-  '-ProfileWizard[start with profile wizard]' \
-  '-ProfileManager[start with profile manager]' \
-  '-SelectProfile[start with profile selection dialog]' \
-  '-UILocale:locale:' \
-  '-contentLocale:locale:' \
-  '-remote[execute a command in an existing Mozilla]:remote command:->remote' \
-  '-splash[enable splash screen]' \
-  '-chat[start with IRC client]' \
-  '-news[start with news]' \
-  '-jsconsole[start with JavaScript Console]' \
-  '-venkman[start with JavaScript debugger]' \
-  '-terminal[start with command line terminal]' \
-  '-edit[start with editor]:url:_urls' \
-  '-chrome[load the specified chrome]:url:_urls' \
-  '-mail[start with mail]' \
-  '-compose[start with messenger compose]:url:_urls' \
-  '*:location:->urls' && ret=0
+local popts="-installer -CreateProfile -P -ProfileWizard -ProfileManager -SelectProfile"
+
+if [[ $service = *remote* ]]; then
+  state=remote
+else
+  _x_arguments -C \
+    '-height[height of startup window]:height' \
+    '(-)'{-h,-help}'[show usage message]' \
+    "($popts)-installer[start with 4.x migration window]" \
+    '-width[width of startup window]:width' \
+    '(-)'{-v,-version}'[show the version number and build date]' \
+    "($popts)-CreateProfile:profile" \
+    "($popts)-P[start with profile]:profile:compadd ~/.mozilla/*/*.slt(\:h\:t)" \
+    "($popts)-ProfileWizard[start with profile wizard]" \
+    "($popts)-ProfileManager[start with profile manager]" \
+    "($popts)-SelectProfile[start with profile selection dialog]" \
+    '-UILocale:locale' \
+    '-contentLocale:locale' \
+    '-remote[execute a command in an existing Mozilla]:remote command:->remote' \
+    '-splash[enable splash screen]' \
+    '-chat[start with IRC client]' \
+    '-news[start with news]' \
+    '-jsconsole[start with JavaScript Console]' \
+    '-venkman[start with JavaScript debugger]' \
+    '-terminal[start with command line terminal]' \
+    '-edit[start with editor]:url:_urls' \
+    '-chrome[load the specified chrome]:url:_urls' \
+    '-mail[start with mail]' \
+    '-compose[start with messenger compose]:url:_urls' \
+    '*:location:->urls' && ret=0
+fi
 
 [[ "$state" = "urls" ]] &&
   _files "$@" && return 0
@@ -37,7 +41,7 @@ _x_arguments -C \
 # Handle mozilla remote commands
 if [[ "$state" = "remote" ]]; then  
   local -a remote_commands
-  remote_commands=(openURL openFile saveAs mailto addBookmark)
+  remote_commands=(openURL openFile saveAs mailto addBookmark ping)
 
   compset -P '*\('
   if compset -S '(|\\)\)*'; then
@@ -46,7 +50,15 @@ if [[ "$state" = "remote" ]]; then
     set - -S"${${QIPREFIX:+)}:-\)}$compstate[quote] " "$@"
   fi
   case $IPREFIX in
-    openURL*|addBookmark*) state=urls;;
+    openURL*)
+      if compset -P "*,"; then
+        _wanted option expl 'option' compadd "$@" new-tab new-window && ret=0
+      else
+        compset -S ',*'
+        state=urls
+      fi
+    ;;
+    addBookmark*) state=urls;;
     openFile*) _files "$@" -W ~;;
     saveAs*) 
       if compset -P "*,"; then
