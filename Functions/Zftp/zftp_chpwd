@@ -32,9 +32,9 @@ else
     local str=$zfconfig[lastloc_$ZFTP_SESSION]
     [[ ${#str} -lt 70 ]] && str="%m: %~  $str"
     case $TERM in
-      sun-cmd) print -n -P "\033]l$str\033\\"
+      sun-cmd) print -Pn "\033]l$str\033\\"
 	       ;;
-      *xterm*|rxvt|dtterm|Eterm) print -n -P "\033]2;$str\a"
+      *xterm*|rxvt|dtterm|Eterm|kterm) print -Pn "\033]2;$str\a"
 	     ;;
     esac
   fi
