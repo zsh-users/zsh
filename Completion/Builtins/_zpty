@@ -9,7 +9,7 @@ _arguments -C -s \
   '(-e -b -d -r -L)-w[send string to command]:name:->name:*:strings to write' \
   '(-e -b -d -w -L *)-r[read string from command]:name:->name:param:_parameters' \
   '(-e -b -d -w -r)-L[list defined commands as calls]' \
-  '(-r)*::args:_normal'
+  '(-r)*::args:_normal' && return 0
 
 if [[ $state = name ]]; then
   list=( ${${(f)"$(zpty)"}#*\) } )

@@ -1,0 +1,56 @@
+#autoload
+
+local all ret=1 end xor has_args had_args ostate ocontext oopt_args r
+local opre="$PREFIX" oipre="$IPREFIX" ocur="$CURRENT"
+local osuf="$SUFFIX" oisuf="$ISUFFIX" owords
+
+owords="$words[@]"
+
+end=$argv[(i)-]
+[[ end -gt $# ]] && return 1
+
+all=( "${(@)argv[1,end]}" )
+
+shift end
+
+xor=()
+ostate=()
+ocontext=()
+
+while true; do
+  end=$argv[(i)-]
+
+  _arguments -M xor "$1" "$all[@]" "${(@)argv[2,end-1]}"
+  r=$?
+
+  oopt_args=( "$oopt_args[@]" "${(kv)opt_args}" )
+  if [[ r -eq 300 ]]; then
+    ret=300
+    ostate=( "$ostate[@]" "$state[@]" )
+    ocontext=( "$ocontext[@]" "$context[@]" )
+    PREFIX="$opre"   SUFFIX="$osuf"
+    IPREFIX="$oipre" ISUFFIX="$oisuf"
+    CURRENT="$ocur"  words=( "$owords[@]" )
+  elif [[ "$r$ret" = 01 ]]; then
+    ret=0
+  fi
+  
+  [[ end -gt $# ]] && break
+
+  shift end
+done
+
+opt_args=( "$oopt_args[@]" )
+
+if [[ ret -eq 300 ]]; then
+  state=( "$ostate[@]" )
+  context=( "$ocontext[@]" )
+elif [[ -z "$has_args" ]]; then
+  if [[ -n "$had_args" ]]; then
+    _message "no more arguments"
+  else
+    _message "no arguments"
+  fi
+fi
+
+return ret

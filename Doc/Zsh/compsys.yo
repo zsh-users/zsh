@@ -331,7 +331,7 @@ enditemize()
 
 As an example, the context name
 
-example(tt(:completion::complete:dvips:-o-1:files))
+example(tt(:completion::complete:dvips:option-o-1:files))
 
 says that normal completion was attempted on an argument of the tt(dvips)
 command (more precisely: completion was attempted on the first argument
@@ -1501,7 +1501,7 @@ This style is used when completing arguments of the Debian `tt(dpkg)'
 program.  It contains an override for the default package set
 for a given context.  For example,
 
-example(zstyle ':completion:*:complete:dpkg:--status-1:' packageset avail)
+example(zstyle ':completion:*:complete:dpkg:option--status-1:' packageset avail)
 
 causes available packages, rather than only installed packages,
 to be completed for `dpkg --status'.
@@ -2879,11 +2879,11 @@ exclusive. Such a list is given in parentheses at the beginning, as in
 `tt((-two -three 1)-one:...)' or `tt((-foo):...)'. In the first
 example, the options `tt(-two)' and `tt(-three)' and the first
 argument will not be offered as possible completions if the option
-`tt(-one)' is on the line. Also, the list may contain a single star as
-one of its elements to specify that the description for the rest
-arguments should not be used and it may contain a colon to specify
-that the descriptions for all normal (non-option-) arguments should
-not be used.
+`tt(-one)' is on the line before the cursor. Also, the list may
+contain a single star as one of its elements to specify that the
+description for the rest arguments should not be used and it may
+contain a colon to specify that the descriptions for all normal
+(non-option-) arguments should not be used.
 
 In each of the cases above, the var(action) says how the possible
 completions should be generated. In cases where only one of a fixed
@@ -2896,9 +2896,10 @@ matches will be listed together with their descriptions if the
 tt(description) style for the tt(values) tag is set.
 
 An var(action) of the form `tt(->)var(string)' is used by functions
-that implement a state machine. In this case, the `var(string)' (with
-all leading and trailing spaces and tabs removed) will be stored in
-the global parameter tt(state) and the function returns with a return
+that implement a state machine. In this case, the `var(string)'s (with
+all leading and trailing spaces and tabs removed) of all actions that
+have to be used will be stored in
+the global array tt(state) and the function returns with a return
 value of 300 (to make it distinguishable from other return values)
 after setting the global `tt(context)', `tt(line)' and `tt(opt_args)'
 parameters as described below and without resetting any changes made
@@ -2965,13 +2966,15 @@ and their arguments. These are stored in the associative array
 `tt(opt_args)', using the option names as keys and their arguments as
 the values. For options that have more than one argument these are
 given as one string, separated by colons. All colons in the original
-arguments are preceded with backslashes. The parameter `tt(context)'
-will be set to the automatically created context name. This is either
-a string of the form `var(-opt)tt(-)var(n)' for the var(n)'th argument 
+arguments are preceded with backslashes.
+
+The parameter `tt(context)'
+will be set to the automatically created context names. This are either
+strings of the form `tt(option)var(-opt)tt(-)var(n)' for the var(n)'th argument 
 of the option var(-opt), or a string of the form `tt(argument-)var(n)' 
 for the var(n)'th argument (for rest arguments the var(n) is the
 string `tt(rest)'). For example, when completing the argument of the tt(-o)
-option, the name is `tt(-o-1)' and for the second normal (non-option-)
+option, the name is `tt(option-o-1)' and for the second normal (non-option-)
 argument it is `tt(argument-2)'.
 
 Also, during the evaluation of the var(action), the context name in
@@ -3090,6 +3093,41 @@ arguments. The first one describes the first argument as a
 `var(postscript file)' and makes files ending in `tt(ps)' or `tt(eps)' 
 be completed. The last description says that all other arguments are
 `var(page numbers)' but does not give possible completions.
+)
+findex(_argument_sets)
+item(tt(_argument_sets) var(sets) ...)(
+This is like tt(_arguments) but allows to specify multiple sets of
+options and arguments. The arguments are sets of specifications for
+tt(_arguments) separated by single hyphens. The specifications before
+the first hyphen are shared by all sets given after the first
+hyphen. The first word in every other set gives the name of the
+set. This name may appear in exclusion lists in the specifications,
+either alone or before (with a `tt(-)' between the name and the rest)
+one of the possible values described for tt(_arguments) above.
+
+For example:
+
+example(_argument_sets \
+    -a \
+  - set1 \
+    -c \
+  - set2 \
+    -d \
+    ':arg:(x2 y2)')
+
+This defines two sets. When the command line contains the option
+`tt(-c)', the `tt(-d)' option and the argument will not be considered
+possible completions. When it contains `tt(-d)' or an argument, the
+option `tt(-c)' will not be completed any more, but if `tt(-a)' is
+given, both sets will still be considered valid, because it appears
+before the first hyphen, so both sets contain this option.
+
+Don't expect too much with complicated options that get their
+arguments in the same string and `tt(->)var(state)' actions or with
+the tt(-C) option that is given to tt(_arguments), otherwise most
+things should work. Note that the contexts reported in the tt(context) 
+array and the options in the tt(opt_args) association are prefixed
+with the set names and a hyphen.
 )
 findex(_values)
 item(tt(_values) var(specs) ...)(

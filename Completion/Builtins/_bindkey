@@ -24,7 +24,7 @@ _arguments -C -s \
   '(-l -L -d -D -A -N -m -s *)-r[unbind specified in-strings]:*:in-string' \
   '(-l -L -d -D -A -N -m -r *)-s[bind each in-string to each out-string]:*:key string' \
   '(-e -v -a -M -l -L -d -D -A -N -m)-R[interpret in-strings as ranges]' \
-  '(-l -L -d -A -N -m -r -s)*::widgets:->widget'
+  '(-l -L -d -A -N -m -r -s)*::widgets:->widget' && return 0
 
 case $state in
   keymap)

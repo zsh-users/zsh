@@ -8,11 +8,19 @@ _arguments -C -s \
   '(-a -n -p -P -k -K)-d[delete]:*:completed command:->ccom' \
   '(-n -d -P -k -K)-p[completion for command matching pattern]:completion function:->cfun:pattern' \
   '(-n -d -p -k -K)-P[as -p for commands without own completion]:completion function:->cfun:pattern' \
-  '(-d -p -P -K)-k[define widget and key binding]:completion function:->cfun:widget name::style:->style:*:key' \
-  '(-d -p -P -k)-K[define multiple widgets based on function]:completion function:->cfun:widget name::style:->style:*:key' \
-  '1:completion function:->cfun' \
-  '2:commands:_command_names'
-  
+  '(-d -p -P -K)-k[define widget and key binding]:completion function:->cfun:style:->style:*:key' \
+  '(-d -p -P -k)-K[define multiple widgets based on function]:*::: :->multi' \
+  ':completion function:->cfun' \
+  '*:commands: _command_names' && return 0
+
+if [[ $state = multi ]]; then
+  case $(( CURRENT % 3 )) in
+  0) _message key
+     return 1;;
+  1) state=cfun;;
+  2) state=style;;
+  esac
+fi
 
 case $state in
   ccom)

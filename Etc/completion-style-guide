@@ -27,7 +27,7 @@ by giving it to functions like `_tags' via the `-C' options, as in:
 
   local context ...
   ...
-  _arguments ... '-foo:foo:->foo'
+  _arguments ... '-foo:foo:->foo' && return 0
   ...
   if [[ "$state" = foo ]]; then
     _tags -C "$context" ...
@@ -47,7 +47,7 @@ reported back to functions you call. E.g.:
 
   local curcontext="$curcontext" ...
   ...
-  _arguments -C ... 'foo:foo:->foo'
+  _arguments -C ... 'foo:foo:->foo' && return 0
   ...
   if [[ "$state" = foo ]]; then
     _tags ...
@@ -59,6 +59,32 @@ make that local. But make sure that `curcontext' is local so that the
 value changed by `_arguments' and `_values' is only used in your
 function (and make sure to initialise it to its old value as in the
 example).
+
+All this only works if the specifications given to `_arguments' define 
+options and arguments that are completely separate. If there is more
+than one `->state' action and more than one of them might be needed
+for the same word, you'll have to use a loop:
+
+  local state context line i expl ret=1
+  ...
+  _arguments \
+      '::arg1:->arg1' \
+      '*:args:->rest' && return 0
+
+  while (( $#state )); do
+    case "$state[1]" in
+    arg1) _wanted -C "$context[1]" foo expl 'foo' compadd - foo1 foo2 && ret=0;;
+    rest) _wanted -C "$context[1]" bar expl 'bar' compadd - bar1 bar2 && ret=0;;
+    esac
+    shift 1 state
+    shift 1 context
+  done
+
+  return ret
+
+As you can see, `state' and `context' are really arrays. In this
+example, completion for the first argument has to complete both `foo's 
+and `bar's.
 
 Then, before adding the matches, see if matches of that type are
 requested by the user in the current context. If you will add only one 

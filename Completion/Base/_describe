@@ -10,6 +10,12 @@ local _type=values _descr
 if [[ "$1" = -o ]]; then
   _type=options
   shift
+elif [[ "$1" = -t ]]; then
+  _type="$2"
+  shift 2
+elif [[ "$1" = -t* ]]; then
+  _type="${1[3,-1]}"
+  shift
 fi
 
 # Do the tests. `showd' is set if the descriptions should be shown.
