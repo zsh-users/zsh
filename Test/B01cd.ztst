@@ -77,12 +77,22 @@
 # If either or both of the '>' and '?' sets of lines is absent, it is
 # assumed the corresponding output should be empty and it is an error if it
 # is not.  If '<' is empty, stdin is an empty (but opened) file.
+#
+# It is also possible to add lines in the redirection section beginning
+# with `F:'.  The remaining text on all such lines will be concatenated
+# (with newlines in between) and displayed in the event of an error.
+# This text is useful for explaining certain frequent errors, for example
+# ones which may arise from the environment rather than from the shell
+# itself.  (The example below isn't particularly useful as errors with
+# `cd' are unusual.)
  cd cdtst.tmp/sub/fake &&
  pwd &&
  print $PWD
 0q:Preserving symbolic links in the current directory string
 >$mydir/cdtst.tmp/sub/fake
 >$mydir/cdtst.tmp/sub/fake
+F:This test shouldn't really fail.  The fact that it has indicates
+F:something is broken.  But you already knew that.
 
  cd ../../.. &&
  pwd &&

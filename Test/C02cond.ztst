@@ -135,6 +135,9 @@
     [[ -N newnewnew && ! -N unmodified ]]
   fi
 0:-N cond
+F:This test can fail on NFS-mounted filesystems as the access and
+F:modification times are not updated separately.  This does not indicate
+F:a problem in the shell.
 
   [[ newnewnew -nt zerolength && ! (unmodified -nt zerolength) ]]
 0:-nt cond

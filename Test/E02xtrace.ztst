@@ -55,32 +55,32 @@
 >Tracing: function 2>file
 >Tracing: source
 >Tracing: source 2>file
->+(eval):7> print Tracing: ( builtin ) 2>file
+>+(eval):7> print 'Tracing: ( builtin ) 2>file'
 >+(eval):9> cat
->+(eval):11> print Tracing: { builtin } 2>file
+>+(eval):11> print 'Tracing: { builtin } 2>file'
 >+(eval):13> cat
->+(eval):15> print Tracing: do builtin done 2>file
+>+(eval):15> print 'Tracing: do builtin done 2>file'
 >+(eval):17> cat
-?+(eval):2> print Tracing: builtin
-?+(eval):3> print Tracing: builtin 2>file
+?+(eval):2> print 'Tracing: builtin'
+?+(eval):3> print 'Tracing: builtin 2>file'
 ?+(eval):4> cat
 ?+(eval):5> cat
-?+(eval):6> print Tracing: ( builtin )
+?+(eval):6> print 'Tracing: ( builtin )'
 ?+(eval):8> cat
-?+(eval):10> print Tracing: { builtin }
+?+(eval):10> print 'Tracing: { builtin }'
 ?+(eval):12> cat
-?+(eval):14> print Tracing: do builtin done
+?+(eval):14> print 'Tracing: do builtin done'
 ?+(eval):16> cat
-?+(eval):18> xtf Tracing: function
+?+(eval):18> xtf 'Tracing: function'
 ?+xtf:1> local regression_test_dummy_variable
-?+xtf:2> print Tracing: function
-?+(eval):19> xtf Tracing: function 2>file
+?+xtf:2> print 'Tracing: function'
+?+(eval):19> xtf 'Tracing: function 2>file'
 ?+xtf:1> local regression_test_dummy_variable
-?+xtf:2> print Tracing: function 2>file
-?+(eval):20> . ./xt.in Tracing: source
-?+./xt.in:1> print Tracing: source
-?+(eval):21> . ./xt.in Tracing: source 2>file
-?+./xt.in:1> print Tracing: source 2>file
+?+xtf:2> print 'Tracing: function 2>file'
+?+(eval):20> . ./xt.in 'Tracing: source'
+?+./xt.in:1> print 'Tracing: source'
+?+(eval):21> . ./xt.in 'Tracing: source 2>file'
+?+./xt.in:1> print 'Tracing: source 2>file'
 ?+(eval):22> set +x
 
  typeset -ft xtf
@@ -88,4 +88,4 @@
 0:
 >Tracing: function
 ?+xtf:1> local regression_test_dummy_variable
-?+xtf:2> print Tracing: function
+?+xtf:2> print 'Tracing: function'
