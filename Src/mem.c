@@ -491,6 +491,7 @@ hrealloc(char *p, size_t old, size_t new)
 	     */
 	    size_t n = (new + sizeof(*h) + HEAPSIZE);
 	    n -= n % HEAPSIZE;
+	    fheap = NULL;
 
 #ifdef USE_MMAP
 	    {

@@ -1,3 +1,8 @@
+2004-07-17  Peter Stephenson  <pws@pwstephenson.fsnet.co.uk>
+
+	* 20173: Src/mem.c: crash when globbing lots of files; need to
+	NULLify fheap optimisation when reallocating a heap.
+
 2004-07-13  Peter Stephenson  <pws@csr.com>
 
 	* 20153: Src/Zle/zle_main.c: make zle-line-init run after
