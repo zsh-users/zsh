@@ -2165,7 +2165,10 @@ stdunsetfn(Param pm, int exp)
 	case PM_SCALAR: pm->sets.cfn(pm, NULL); break;
 	case PM_ARRAY:  pm->sets.afn(pm, NULL); break;
 	case PM_HASHED: pm->sets.hfn(pm, NULL); break;
-	default: pm->u.str = NULL; break;
+	default:
+	    if (!(pm->flags & PM_SPECIAL))
+		pm->u.str = NULL;
+	    break;
     }
     pm->flags |= PM_UNSET;
 }

@@ -1,3 +1,8 @@
+2001-12-18  Oliver Kiddle  <opk@zsh.org>
+
+	* 16364: Src/params.c: further to 16351, except specials
+	from having their value set to null
+
 2001-12-17  Oliver Kiddle  <opk@zsh.org>
 
 	* 16351: Src/params.c: fix bug in parameter unset code
