@@ -17,7 +17,8 @@ zstyle -s ':nslookup' rprompt tmp && pmpt=("$pmpt[@]" -r "$tmp")
 
 zpty nslookup nslookup
 
-zpty -r nslookup line '*> '
+zpty -r nslookup line '*
+> '
 print -nr "$line"
 
 while line=''; vared -he "$pmpt[@]" line; do
@@ -26,7 +27,8 @@ while line=''; vared -he "$pmpt[@]" line; do
 
   zpty -w nslookup "$line"
 
-  zpty -r nslookup line '*> ' || break
+  zpty -r nslookup line '*
+> '
   print -nr "$line"
 done
 

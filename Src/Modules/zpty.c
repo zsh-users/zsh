@@ -30,6 +30,13 @@
 #include "zpty.mdh"
 #include "zpty.pro"
 
+/* The number of bytes we normally read when given no pattern and the
+ * upper bound on the number of bytes we read (even if we are give a
+ * pattern). */
+
+#define READ_LEN 1024
+#define READ_MAX (1024 * 1024)
+
 typedef struct ptycmd *Ptycmd;
 
 struct ptycmd {
@@ -310,6 +317,8 @@ newptycmd(char *nam, char *pname, char **args, int echo, int block)
 
 	close(slave);
 
+	setpgrp(0L, getpid());
+
 	execve(cmd, args, environ);
 	exit(0);
     }
@@ -353,7 +362,9 @@ deleteptycmd(Ptycmd cmd)
     zsfree(p->name);
     freearray(p->args);
 
-    kill(p->pid, SIGHUP);
+    /* We kill the process group the command put itself in. */
+
+    kill(-(p->pid), SIGHUP);
 
     zclose(cmd->fd);
 
@@ -385,7 +396,7 @@ checkptycmd(Ptycmd cmd)
 static int
 ptyread(char *nam, Ptycmd cmd, char **args)
 {
-    int blen = 256, used = 0, ret;
+    int blen = 256, used = 0, ret = 1;
     char *buf = (char *) zhalloc(blen + 1);
     Patprog prog = NULL;
 
@@ -405,21 +416,76 @@ ptyread(char *nam, Ptycmd cmd, char **args)
 	}
     }
     do {
-	while ((ret = read(cmd->fd, buf + used, 1)) == 1) {
+	if (!ret) {
+	    checkptycmd(cmd);
+	    if (cmd->fin)
+		break;
+	}
+	if ((ret = read(cmd->fd, buf + used, 1)) == 1) {
 	    if (++used == blen) {
 		buf = hrealloc(buf, blen, blen << 1);
 		blen <<= 1;
 	    }
 	}
 	buf[used] = '\0';
-    } while (prog && !pattry(prog, buf));
+
+	/**** Hm. If we leave the loop when ret < 0 the user would have
+	 *    to make sure that `zpty -r' is tried more than once if
+	 *    there will be some output and we only got the ret == -1
+	 *    because the output is not yet available.
+	 *    The same for the `write' below. */
+
+	if (ret < 0 && (cmd->block
+#ifdef EWOULDBLOCK
+			|| errno != EWOULDBLOCK
+#else
+#ifdef EAGAIN
+			|| errno != EAGAIN
+#endif
+#endif
+			))
+	    break;
+
+	if (!prog && !ret)
+	    break;
+    } while (!errflag &&
+	     (prog ? (used < READ_MAX && (!ret || !pattry(prog, buf))) :
+	      (used < READ_LEN)));
 
     if (*args)
-	setsparam(*args, ztrdup(buf));
-    else
-	printf("%s", buf);
-
+	setsparam(*args, ztrdup(metafy(buf, used, META_HREALLOC)));
+    else {
+	fflush(stdout);
+	write(1, buf, used);
+    }
     return !used;
+}
+
+static int
+ptywritestr(Ptycmd cmd, char *s, int len)
+{
+    int written;
+
+    for (; len; len -= written, s += written) {
+	if ((written = write(cmd->fd, s, len)) < 0 &&
+	    (cmd->block
+#ifdef EWOULDBLOCK
+			|| errno != EWOULDBLOCK
+#else
+#ifdef EAGAIN
+			|| errno != EAGAIN
+#endif
+#endif
+	     ))
+	    return 1;
+	if (written < 0) {
+	    checkptycmd(cmd);
+	    if (cmd->fin)
+		break;
+	    written = 0;
+	}
+    }
+    return 0;
 }
 
 static int
@@ -428,22 +494,23 @@ ptywrite(Ptycmd cmd, char **args, int nonl)
     if (*args) {
 	char sp = ' ';
 
-	while (*args) {
-	    write(cmd->fd, *args, strlen(*args));
+	while (*args)
+	    if (ptywritestr(cmd, *args, strlen(*args)) ||
+		(*++args && ptywritestr(cmd, &sp, 1)))
+		return 1;
 
-	    if (*++args)
-		write(cmd->fd, &sp, 1);
-	}
 	if (!nonl) {
 	    sp = '\n';
-	    write(cmd->fd, &sp, 1);
+	    if (ptywritestr(cmd, &sp, 1))
+		return 1;
 	}
     } else {
 	int n;
 	char buf[BUFSIZ];
 
 	while ((n = read(0, buf, BUFSIZ)) > 0)
-	    write(cmd->fd, buf, n);
+	    if (ptywritestr(cmd, buf, n))
+		return 1;
     }
     return 0;
 }
