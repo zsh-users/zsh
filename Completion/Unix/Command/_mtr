@@ -1,0 +1,28 @@
+#compdef mtr
+
+_arguments -C \
+	'(--help)-h[help]' \
+	'(-h)--help' \
+	'(--version)-v[version]' \
+	'(-v)--version' \
+	'(--report)-r[report]' \
+	'(-r)--report' \
+	'(--report--cycles)-c[report cycles]:count:' \
+	'(-c)--report-cycles:count:' \
+	'(--psize)-p[packet size]:packet size in bytes:' \
+	'(-p)--psize:packet size in bytes:' \
+	'(--curses)-t[curses]' \
+	'(-t)--curses' \
+	'(--no-dns)-n[no dns]' \
+	'(-n)--no-dns' \
+	'(--gtk)-g[gtk]' \
+	'(-g)--gtk' \
+	'(--split)-s[split]' \
+	'(-s)--split' \
+	'(--raw)-l[raw]' \
+	'(-l)--raw' \
+	'(--address)-a[source IP]:source IP:' \
+	'(-a)--address:source IP:' \
+	'(--interval)-i[interval]:seconds:' \
+	'(-i)--interval:seconds:' \
+	':hostname:_hosts'

@@ -1,5 +1,8 @@
 2004-03-11  Clint Adams  <clint@zsh.org>
 
+	* 19605: Completion/Unix/Command/_mtr: completion for Matt's
+	traceroute.
+
 	* 19604: Completion/Unix/Command/_vux: completion for vux
 	and vuxctl.
 
