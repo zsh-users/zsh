@@ -1579,9 +1579,11 @@ fclist(FILE *f, Options ops, zlong first, zlong last,
 
     ent = gethistent(first, first < last? GETHIST_DOWNWARD : GETHIST_UPWARD);
     if (!ent || (first < last? ent->histnum > last : ent->histnum < last)) {
-	if (first == last)
-	    zwarnnam("fc", "no such event: %d", NULL, first);
-	else
+	if (first == last) {
+	    char buf[DIGBUFSIZE];
+	    convbase(buf, first, 10);
+	    zwarnnam("fc", "no such event: %s", buf, 0);
+	} else
 	    zwarnnam("fc", "no events in that range", NULL, 0);
 	return 1;
     }
