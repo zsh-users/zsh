@@ -1,7 +1,7 @@
 DISTFILES_SRC='
     .cvsignore .distfiles Makefile.in
-    ztst.zsh
+    ztst.zsh comptest
     01grammar.ztst 02alias.ztst 03quoting.ztst 04redirect.ztst
     05command.ztst 06arith.ztst 07cond.ztst 08traps.ztst 09funcdef.ztst
-    10prompt.ztst 50cd.ztst 51xtrace.ztst
+    10prompt.ztst 50cd.ztst 51xtrace.ztst 52zregexparse.ztst 53completion.ztst
 '

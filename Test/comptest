@@ -7,6 +7,7 @@ debug=
 dump=(-D)
 code=
 zsh=${ZSH:-zsh}
+termcap_ce="$(echotc ce)"
 
 while getopts Dd:c:z: opt; do
   case $opt in
@@ -91,7 +92,7 @@ for log in "$logs[@]"; do
     log="${log[$mend[1]+1,-1]}"
     if (( 0 <= $mbegin[2] )); then
       if [[ $match[2] != TC && $match[3] != \ # ]]; then
-	print -lr "$match[2]:{$match[3]}"
+	print -lr "$match[2]:{${match[3]%$termcap_ce}}"
       fi
     elif (( 0 <= $mbegin[4] )); then
       print -lr "DESCRIPTION:{$match[4]}"
