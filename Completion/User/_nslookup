@@ -38,7 +38,7 @@ setopts=(
   '(noignoretc)ignoretc[ignore packet truncation errors]' \
   '(ignoretc)noignoretc[don'"'"'t ignore packet truncation errors]' \
   'class[change query class]:query class:((in\:Internet\ class chaos\:CHAOS\ class hesiod\:MIT\ Athena\ Hesiod\ class any\:wildcard\ \(any\ of\ the\ above\)))'
-  'domain[change default domain]:default domain:_hosts'
+  "domain[change default domain]:default domain:_domains"
   'srchlist[change default domain and search list]: :->srchlist'
   'port[change name server port]:name server port:'
   {query,}type'[change type of information query]:query information type:((a\:internet\ address cname\:canonical\ name\ for\ alias hinfo\:CPU\ and\ operating\ system\ type minfo\:mailbox\ or\ mail\ list\ information mx\:mail\ exchanger ns\:name\ server\ for\ zone ptr\:host\ name\ or\ other\ information soa\:domain\'"'"'s\ \`start-of-authority\'"'"'\ information txt\:text\ information uinfo\:user\ information wks\:supported\ well-known\ services))'
@@ -53,8 +53,8 @@ if [[ -n "$compcontext" ]]; then
     _funcall ret _nslookup_command && return ret
 
     _alternative \
-        'commands:command:compadd server lserver root finger ls view help set' \
-	'hosts:: _host' && ret=0
+        'commands:command:(server lserver root finger ls view help set exit)' \
+	'hosts:: _hosts' && ret=0
     return ret
   elif [[ "$compstate[context]" = redirect ]]; then
 
@@ -103,7 +103,7 @@ if [[ -n "$compcontext" ]]; then
      '-d[all records]' \
      '-h[CPU and operating system information]' \
      '-s[well-known services]' \
-     ':domain:_hosts'
+     ":domain:_domains"
     return
     ;;
   view)
@@ -141,17 +141,17 @@ fi
 # This is completion after `srchlist' for both types.
 
 if [[ -n "$state" ]]; then
-  _tags hosts || return 1
+  _tags domains || return 1
 
   if compset -P '*/'; then
-    _description hosts expl 'search list entry'
+    _description domains expl 'search list entry'
   else
-    _description hosts expl 'default domain name and first search list entry'
+    _description domains expl 'default domain name and first search list entry'
   fi
   if [[ -n "$_vals_cache_multi" ]]; then
-    _hosts "$expl[@]" -qS/ -r "/\\- \\t\\n$_vals_cache_multi"
+    _domains "$expl[@]" -qS/ -r "/\\- \\t\\n$_vals_cache_multi"
   else
-    _hosts "$expl[@]" -qS/
+    _domains "$expl[@]" -qS/
   fi
   return
 fi

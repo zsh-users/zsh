@@ -453,6 +453,9 @@ for entries in the directory stack
 item(tt(displays))(
 for X display names
 )
+item(tt(domains))(
+for network domains
+)
 item(tt(expansions))(
 used by the tt(_expand) completer for possible expansions
 )
@@ -706,6 +709,11 @@ item(tt(disable-stat))(
 This is used with the tt(cvs) tag by the function completing for the
 tt(cvs) command to decide if the tt(zsh/stat) module should be used to
 generate only names of modified files in the appropriate places.
+)
+item(tt(domains))(
+If set, gives the names of network domains that should be
+completed. If this is not set by the user domain names mentioned in
+tt(/etc/resolv.conf) will be used.
 )
 item(tt(expand))(
 Like tt(cursor), this style is used with the tt(paths) tag. If its
