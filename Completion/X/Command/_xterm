@@ -1,0 +1,24 @@
+#compdef xterm
+
+_xt_arguments \
+  -+{ah,ai,aw,bc,bdc,cb,cm,cn,cu,dc,hf,ie,im,j,ls,mb,nul,pc,rw,s,sb,sf,si,sk,sp,t,u8,ulc,ut,vb,wc,wf,samename} \
+  -{version,help,132,leftbar,rightbar,C} \
+  '-b:inner border size:' \
+  '-bcf:time text cursor is off when blinking (milliseconds):' \
+  '-bcn:time text cursor is on when blinking (milliseconds):' \
+  '-cc:character class:' \
+  '-cr:text cursor color:_x_color' \
+  '-e:program: _command_names -e:*::program arguments: _normal' \
+  '-fb:bold font:_x_font' \
+  '-fi:icon font:_x_font' \
+  '-hc:background color for highlighted text:_x_color' \
+  '-mc:multi-click threshold (milliseconds):' \
+  '-ms:pointer cursor color:_x_color' \
+  '-nb:margin bell number:' \
+  '-sl:save lines:' \
+  '-ti:terminal ID:(vt52 vt100 vt101 vt102 vt220)' \
+  '-tm:terminal setting:' \
+  '-tn:terminal type:' \
+  '-ziconbeep:iconbeep (percent):' \
+  '-C' \
+  '-S-:pseudo-terminal and file descriptor:'
