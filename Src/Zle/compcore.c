@@ -2397,7 +2397,7 @@ add_match_data(int alt, char *str, Cline line,
 		comp_setunset(0, 0, CP_EXACTSTR, 0);
 	    }
 	    ai->exactm = cm;
-	} else if (useexact) {
+	} else if (useexact && !matcheq(cm, ai->exactm)) {
 	    ai->exact = 2;
 	    ai->exactm = NULL;
 	    if (incompfunc)
