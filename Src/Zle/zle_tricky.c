@@ -2294,7 +2294,7 @@ match_str(char *l, char *w, int *bp, int *rwlp, int sfx, int test)
 	for (mp = NULL, ms = mstack; !mp && ms; ms = ms->next) {
 	    for (mp = ms->matcher; mp; mp = mp->next) {
 		t = 1;
-		if (lm == mp ||
+		if ((lm && lm == mp) ||
 		    ((oll == ll || olw == lw) && test && mp->wlen < 0))
 		    /* If we were called recursively, don't use `*' patterns
 		     * at the beginning (avoiding infinite recursion). */
@@ -2335,8 +2335,9 @@ match_str(char *l, char *w, int *bp, int *rwlp, int sfx, int test)
 			continue;
 		    if (ap) {
 			if (!pattern_match(ap, l + aoff, NULL, NULL) ||
-			    (both && !pattern_match(ap, w + aoff, NULL, NULL)))
-			    continue;
+			    (both && (!pattern_match(ap, w + aoff, NULL, NULL) ||
+				      !match_parts(l + aoff, w + aoff, alen))))
+				continue;
 		    } else if (!both || il || iw)
 			continue;
 
@@ -2346,11 +2347,12 @@ match_str(char *l, char *w, int *bp, int *rwlp, int sfx, int test)
 			savl = l[-(llen + zoff)];
 			l[-(llen + zoff)] = '\0';
 		    }
-		    for (t = 0, tp = w, ct = 0, ict = lw - alen;
+		    for (t = 0, tp = w, ct = 0, ict = lw - alen + 1;
 			 ict;
 			 tp += add, ct++, ict--) {
 			if (both ||
-			    pattern_match(ap, tp - moff, NULL, NULL)) {
+			    (pattern_match(ap, tp - moff, NULL, NULL) &&
+			     match_parts(l + aoff , tp - moff, alen))) {
 			    if (sfx) {
 				savw = tp[-zoff];
 				tp[-zoff] = '\0';
@@ -2596,6 +2598,24 @@ match_str(char *l, char *w, int *bp, int *rwlp, int sfx, int test)
     /* Finally, return the number of matched characters. */
 
     return iw;
+}
+
+/* Wrapper for match_str(), only for a certain length and only doing
+ * the test. */
+
+/**/
+static int
+match_parts(char *l, char *w, int n)
+{
+    char lsav = l[n], wsav = w[n];
+    int ret;
+
+    l[n] = w[n] = '\0';
+    ret = match_str(l, w, NULL, NULL, 0, 1);
+    l[n] = lsav;
+    w[n] = wsav;
+
+    return ret;
 }
 
 /* Check if the word w is matched by the strings in pfx and sfx (the prefix
@@ -2928,7 +2948,7 @@ cmp_anchors(Cline o, Cline n, int join)
 	return 1;
     }
     /* Didn't work, try to build a string matching both anchors. */
-    if (join && !(o->flags & CLF_JOIN) &&
+    if (join && !(o->flags & CLF_JOIN) && o->word && n->word &&
 	(j = join_strs(o->wlen, o->word, n->wlen, n->word))) {
 	o->flags |= CLF_JOIN;
 	o->wlen = strlen(j);
@@ -3397,6 +3417,10 @@ join_clines(Cline o, Cline n)
 			 (o->flags  & (CLF_SUF | CLF_MID));
 		     t = tn);
 		if (tn && cmp_anchors(o, tn, 1)) {
+		    Cline t;
+
+		    t = tn->prefix; tn->prefix = n->prefix; n->prefix = t;
+		    t = tn->suffix; tn->suffix = n->suffix; n->suffix = t;
 		    n = tn;
 		    continue;
 		}
@@ -3429,20 +3453,18 @@ join_clines(Cline o, Cline n)
 	    }
 	    /* Now see if they have matching anchors. If not, cut the list. */
 	    if (!(o->flags & CLF_MID) && !cmp_anchors(o, n, 1)) {
-#if 0
-		/* This used to search forward for matching anchors.
-		 * Unfortunately this does the wrong thing if the prefixes
-		 * before the differing anchors match nicely. */
-
 		Cline t, tn;
 
 		for (t = n; (tn = t->next) && !cmp_anchors(o, tn, 1); t = tn);
 
 		if (tn) {
+		    Cline t;
+
+		    t = tn->prefix; tn->prefix = n->prefix; n->prefix = t;
+		    t = tn->suffix; tn->suffix = n->suffix; n->suffix = t;
 		    n = tn;
 		    continue;
 		} else {
-#endif
 		    if (o->flags & CLF_SUF)
 			break;
 
@@ -3451,9 +3473,7 @@ join_clines(Cline o, Cline n)
 		    free_cline(o->next);
 		    o->next = NULL;
 		    o->flags |= CLF_MISS;
-#if 0
 		}
-#endif
 	    }
 	    /* Ok, they are equal, now join the sub-lists. */
 	    if (o->flags & CLF_MID)

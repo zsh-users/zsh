@@ -4,7 +4,7 @@
 
 if [ "$words[CURRENT-1]" = "-display" ]; then
   _compskip=all
-  _hosts -S :0
+  _hosts -S ':0 ' -r :
 else
-  compadd -P- -J options - display name xrm
+  compadd -J options - -display -name -xrm
 fi
