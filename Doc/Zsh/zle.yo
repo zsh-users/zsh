@@ -1491,7 +1491,7 @@ Inside a widget function, a call to this function treats the last key of
 the key sequence which called the widget as the digit.
 )
 tindex(neg-argument)
-item(tt(neg-argument) (ESC--) (unbound) (unbound))(
+item(tt(neg-argument) (ESC-DASH()) (unbound) (unbound))(
 Changes the sign of the following argument.
 )
 tindex(universal-argument)

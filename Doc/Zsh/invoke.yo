@@ -80,8 +80,8 @@ is permitted and does not end option processing.
 
 Except when the bf(sh)/bf(ksh) emulation single-letter options are in effect,
 the option `tt(-b)' (or `tt(PLUS()b)') ends option processing.
-`tt(-b)' is like `tt(--)', except that further single-letter options can be
-stacked after the `tt(-b)' and will take effect as normal.
+`tt(-b)' is like `tt(-)tt(-)', except that further single-letter options
+can be stacked after the `tt(-b)' and will take effect as normal.
 
 startmenu()
 menu(Compatibility)

@@ -6,6 +6,11 @@
 	* 20398: Src/Zle/zle_main.c: allow clean exit from within
 	a zle widget function.
 
+2004-09-20  Bart Schaefer  <schaefer@zsh.org>
+
+	* 20397: Doc/zmacros.yo, Doc/Zsh/invoke.yo, Doc/Zsh/zle.yo: tweaks
+	to account for texinfo's tendency to condense "--" into "-".
+
 2004-09-20  Peter Stephenson  <pws@csr.com>
 
 	* 20391: Src/params.c: SHLVL didn't get updated in the
