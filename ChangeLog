@@ -1,3 +1,8 @@
+2000-12-27  Clint Adams  <schizo@debian.org>
+
+	* 13314: Completion/User/_killall: ignore commands that begin
+	with hyphens (login shells).
+
 2000-12-26  Clint Adams  <schizo@debian.org>
 
 	* 13312: Completion/User/_killall: get longer command names

@@ -3,7 +3,7 @@
 if [[ "$OSTYPE" = linux* ]]; then
   _alternative \
       'signals:: _signals -p' \
-      'processes:process:{ compadd "$expl[@]" ${${${(f)"$(_call processes-names ps ${${EUID/(#s)0(#e)/xa}//[0-9]#/} ho cmd 2> /dev/null)"//[][]/}:#(ps|COMMAND)}%%\ *} }'
+      'processes:process:{ compadd "$expl[@]" ${${${(f)"$(_call processes-names ps ${${EUID/(#s)0(#e)/xa}//[0-9]#/} ho cmd 2> /dev/null)"//[][]/}:#(ps|COMMAND|-*)}%%\ *} }'
 else
   _signals -p
 fi
