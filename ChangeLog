@@ -1,5 +1,8 @@
 2003-04-25  Oliver Kiddle  <opk@zsh.org>
 
+	* Haakon Riiser: 18473: Completion/X/Command/_acroread,
+	Completion/Unix/Type/_pdf: new completion for Acrobat Reader 5.0.x
+
 	* 18472: zshconfig.ac, Completion/Base/Core/_wanted,
 	Completion/Linux/Command/_uml, Completion/Mandrake/Command/_urpmi,
 	Completion/Unix/Command/_figlet, Completion/Unix/Command/_grep,

@@ -1,0 +1,52 @@
+#compdef acroread
+
+local context state line
+typeset -A opt_args
+
+local global_opts
+global_opts=(
+    "*:pdf_file_1 [pdf_file_2] ...:_files -g '*.(#i)pdf'"
+    "-display:host\:display:"
+    "-geometry:[<width>x<height>][{+|-}<x offset>{+|-}<y offset>]:"
+    -help
+    -helpall
+    \*-iconic
+    \*+iconic
+    "-name:application name:"
+    "*-setenv:<var>=<value>:"
+    -tempFile
+    "-tempFileTitle:title:"
+    "(+useFrontEndProgram)-useFrontEndProgram" "(-useFrontEndProgram)+useFrontEndProgram"
+    "-visual:or <visual class> [depth=<depth>]:(id= best default)"
+    "-xrm:X resource specification:"
+    "-toPostScript:*::PostScript conversion options:= ->tops"
+)
+
+local tops_opts
+tops_opts=(
+    "-pairs:*:pdf_file_1 ps_file_1 ...:_files -g '*.(#i)(pdf|ps)'"
+    -binary
+    "-start:integer:"
+    "-end:integer:"
+    -optimizeForSpeed
+    -landscape
+    -reverse
+    "(-even)-odd"
+    "(-odd)-even"
+    -commentsOff
+    "(-level2 -level3)-level1"
+    "(-level1 -level3)-level2"
+    "(-level1 -level2)-level3"
+    -printerhalftones
+    -saveVM
+    "-scale:integer:"
+    -shrink
+    "-size:page size (or custom size wxh in points):(letter tabloid ledger legal executive a3 a4 a5 b4 b5)"
+    "-transQuality:transparency flattening level:(1 2 3 4 5)"
+    "*:pdf_file ... [ps_dir]:_files -g '*.(#i)pdf'"
+)
+
+_arguments $global_opts && return 0
+[[ "$state" = tops ]] && _arguments $tops_opts && return 0
+
+return 1
