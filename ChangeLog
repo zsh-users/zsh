@@ -1,5 +1,11 @@
 2004-08-07  Oliver Kiddle  <opk@zsh.org>
 
+	* 20237: Completion/Unix/Command/_screen: rewrite completion of
+	screen sessions
+
+	* 20237: Completion/Unix/Command/_mysql_utils: complete for
+	mysqlimport and update some of the options
+
 	* 20236: Completion/Base/Completer/_expand: fix problem with
 	keep-prefix style where a modifier changes or removes the prefix
 
