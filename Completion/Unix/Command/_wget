@@ -21,15 +21,17 @@ _arguments -C -s \
   '(--tries -t)'{--tries=,-t+}'[set number of retries]:number of retries' \
   '(--output-document -O)'{--output-document=,-O+}'[specify file to write documents to]:output file:_files' \
   '(--continue -c)'{--continue,-c}'[continue getting an existing file]'  \
-  '--dot-style=[set retrieval display style]:display style:(default binary mega giga micro)' \
+  '--progress=[set progress gauge type]:gauge type:->gauge' \
   '(--timestamping -N)'{--timestamping,-N}'[retrieve only files newer than existing]' \
   '(--server-response -S)'{--server-response,-S}'[print server response]' \
   "--spider[don't download anything]" \
   '(--timeout -T)'{--timeout=,-T+}'[specify read timeout]:read timeout (seconds)' \
   '(--wait,-w)'{--wait=,-w+}'[specify wait between retrievals]:wait between retrievals (seconds)' \
-  '--waitretry=:wait between retries of a retrieval (seconds)' \
+  '(--random-wait)--waitretry=:wait between retries of a retrieval (seconds)' \
+  '(--waitretry)--random-wait[wait from 0...2*WAIT secs between retrievals]' \
   '(--proxy -Y)'{--proxy=,-Y+}'[turn proxy on or off]:proxy use:(on off)' \
   '(--quota -Q)'{--quota=,-Q+}'[set retrieval quota]:number' \
+  '--limit-rate=[specify limit to download rate]:download rate limit' \
   '(--force-directories -x)'{--force-directories,-x}'[force creation of directories]' \
   '(--directory-prefix -P)'{--directory-prefix=,-P+}'[specify prefix to save files to]:prefix:_files -/' \
   '--cut-dirs=:number:' \
@@ -80,17 +82,22 @@ _arguments -C -s \
   '--no-http-keep-alive[disable HTTP keep-alive]' \
   '--sslcertfile=[specify client certificate]:client certificate file:_files' \
   '--sslcertkey=[specify keyfile for certificate]:keyfile:_files' \
+  '--egd-file=[specify filename of EGD socket]' \
   '*:url:_urls' && return 0
 
 case "$state" in
-noflags)
-  _values -s '' 'option' \
-    'v[non verbose]' \
-    'h[no host lookup]' \
-    'H[no host directories]' \
-    'd[no directories]' \
-    'c[no clobber]' \
-    'r[don'\''t remove listing]' \
-    'p[no parent]'
+  gauge)
+    _values -S : 'progress gauge type' \
+      'dot:style:(default binary mega giga micro)' \
+      'bar:force:(force)'
+  ;;
+  noflags)
+    _values -s '' 'option' \
+      'v[non verbose]' \
+      'H[no host directories]' \
+      'd[no directories]' \
+      'c[no clobber]' \
+      'r[don'\''t remove listing]' \
+      'p[no parent]'
   ;;
 esac

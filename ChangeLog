@@ -1,5 +1,7 @@
 2001-12-11  Oliver Kiddle  <opk@zsh.org>
 
+	* 16325: Completion/Unix/Command/_wget: update for wget 1.8
+
 	* 16322: Completion/Unix/Command/_mtools,
 	Completion/Unix/Command/.distfiles: new mtools completion
 
