@@ -1,5 +1,8 @@
 2004-01-09  Clint Adams  <clint@zsh.org>
 
+	* 20655: Completion/Debian/Type/_deb_packages:
+	_deb_packages fix from Karl Chen.
+
 	* 20654: Completion/Debian/Command/_dpkg,
 	Completion/Debian/Command/_wajig,
 	Completion/Debian/Type/_deb_packages: completion for wajig, and

@@ -86,7 +86,7 @@ _deb_packages () {
     zstyle ":completion:*:*:$service:*" cache-policy _debs_caching_policy
   fi
 
-  [[ "$command" = (installed|deinstalled|xinstalled|held|uninstalled|avail) ]] || {
+  [[ "$command" = (installed|deinstalled|xinstalled|held|uninstalled|avail|available) ]] || {
     _message "unknown command: $command"
     return
   }
