@@ -1,5 +1,10 @@
 2001-03-23  Sven Wischnowsky  <wischnow@zsh.org>
 
+	* 13727: Completion/User/_init_d, Completion/User/_make,
+	Doc/Zsh/compsys.yo: add commands and call-command styles;
+	mention some of the more expensive things about completion
+	setup in the docs
+
 	* 13725: Completion/Core/_all_labels,
 	Completion/Core/_next_label: test if the colon is quoted
 

@@ -483,6 +483,16 @@ example(zstyle -e ':completion:*' completer '
       reply=(_complete _approximate)
     fi')
 
+One should be careful not to use too complicated code with this
+option, at least for the styles that are looked up quite often.  These 
+are basically those that define some global completion behaviour but
+allow that to be different for all matches or groups as matches (such
+as the tt(menu) and tt(list-rows-first) styles).  Alternatively one
+can always use a less general pattern for the context than in the
+example above and use a second call to tt(zstyle) with a generic
+pattern and without using the tt(-e) option to define the default
+behaviour.
+
 Note that the order in which styles are em(defined) does not matter; the
 style mechanism uses the most specific possible match for a particular
 style to determine the set of values.  More precisely, strings are
@@ -936,6 +946,16 @@ completion data are stored.  Defaults to `tt($DOTDIR/.zcompcache)', or
 `tt($HOME/.zcompcache)' if tt($DOTDIR) is not defined.  The completion
 layer will not be used unless the tt(use-cache) style is set.
 )
+kindex(call-command, completion style)
+item(tt(call-command))(
+Currently this is only used by the function completing tt(make)
+targets.  If it is set to `true' and the installed version of the
+tt(make) command allows it, tt(make) is called in a way to generate
+all possible targets.  The default value of this style is `false'
+because calling tt(make) can potentially take a very long time and in
+some cases may even cause actions from the makefile be executed
+despite the options given to tt(make).
+)
 kindex(command, completion style)
 item(tt(command))(
 In many places, completion functions need to call external commands to
@@ -957,6 +977,20 @@ the string `tt(PID)' (or `tt(pid)') to find the position of the
 process IDs in the following lines.  If the line does not contain
 `tt(PID)', the first numbers in each of the other lines are taken as the 
 process IDs to complete.
+
+Note that the completion function generally has to call the command
+everytime it is called.  Because of that care should be taken to
+specify only commands that take only a short time to run (and that
+will eventually stop at all).
+)
+kindex(commands, completion style)
+item(tt(commands))(
+This is used by the function completing sub-commands for the system
+initialisation scripts (residing in tt(/etc/init.d) or somewhere not
+too far away from that).  It's values give the default commands to
+complete for those commands for which the completion function isn't
+able to find them out automatically.  The default for this style are
+the two strings `tt(start)' and `tt(stop)'.
 )
 kindex(complete, completion style)
 item(tt(complete))(
@@ -1595,6 +1629,12 @@ use the match specifications at all.  However, it is always safe
 to use the simple form for this style (as in the first example above),
 since any completers which do not use match specifications will only ever
 be called once, rather than once per specification.
+
+Since the specification-strings in this style have to be tried one after
+another, it is a good idea to keep their number low.  In most cases
+one to three strings (each of which may, without to large a performance 
+hit, consist of more than one single match specification) will give
+acceptable performance.
 )
 kindex(max-errors, completion style)
 item(tt(max-errors))(
@@ -2258,6 +2298,27 @@ Hence on the first try the completer field of the context contains
 When tt(_approximate) is called from another function, the number of errors
 to accept may be given with the tt(-a) option.  Its argument should be
 the same as the value of the tt(max-errors) style, all in one string.
+
+Note that this completer (and the tt(_correct) completer mentioned
+below) can be quite expansive to call, especially when a large number
+of errors is allowed.  One way to avoid this is to set up the
+tt(completer) style using the tt(-e) option to zstyle so that some
+completers are only used when completion is attempted a second time on 
+the same string, e.g.:
+
+example(zstyle ':completion:*' completer '
+  if [[ $_last_try = "$HISTNO$BUFFER$CURSOR" ]]; then
+    reply=(_complete _match _prefix)
+  else
+    _last_try="$HISTNO$BUFFER$CURSOR"
+    reply=( _ignored _correct _approximate)
+  fi')
+
+This uses the tt(HISTNO) parameter and the tt(BUFFER) and tt(CURSOR)
+special parameters that are available inside zle and completion
+widgets to find out if the command line hasn't changed since the last
+time completion was tried.  Only then are the tt(_ignored),
+tt(_correct) and tt(_approximate) completers called.
 )
 findex(_complete)
 item(tt(_complete))(

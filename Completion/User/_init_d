@@ -17,6 +17,7 @@ read -u0k 2 magic < $words[1] && [[ $magic = '#!' ]] &&
 #
 #    cmds=( ${${(j:|:s:|:)${(M)${(f)"$(< $words[1])"}:#[[:blank:]]#(\'|)[a-z_|]##(\'|)\)}}//[^a-z_]} )
 
-(( $#cmds )) || cmds=(start stop)
+(( $#cmds )) || zstyle -a ":completion:${curcontext}:commands" commands cmds ||
+    cmds=(start stop)
 
 _sub_commands $cmds
