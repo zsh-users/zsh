@@ -555,7 +555,7 @@ acceptandmenucomplete(void)
 /* These are flags saying if we are completing in the command *
  * position, in a redirection, or in a parameter expansion.   */
 
-static int lincmd, linredir, ispar, linwhat;
+static int lincmd, linredir, ispar, linwhat, linarr;
 
 /* The string for the redirection operator. */
 
@@ -1128,7 +1128,7 @@ unmetafy_line(void)
 static char *
 get_comp_string(void)
 {
-    int t0, tt0, i, j, k, cp, rd, sl, ocs, ins, oins, inarr, ia, parct;
+    int t0, tt0, i, j, k, cp, rd, sl, ocs, ins, oins, ia, parct;
     char *s = NULL, *linptr, *tmp, *p, *tt = NULL;
 
     zsfree(brbeg);
@@ -1192,7 +1192,7 @@ get_comp_string(void)
 	inpush(dupstrspace((char *) linptr), 0, NULL);
 	strinbeg();
 	stophist = 2;
-	i = tt0 = cp = rd = ins = oins = inarr = parct = ia = 0;
+	i = tt0 = cp = rd = ins = oins = linarr = parct = ia = 0;
 
 	/* This loop is possibly the wrong way to do this.  It goes through *
 	 * the previously massaged command line using the lexer.  It stores *
@@ -1211,11 +1211,11 @@ get_comp_string(void)
 	    linredir = (inredir && !ins);
 	    oins = ins;
 	    /* Get the next token. */
-	    if (inarr)
+	    if (linarr)
 		incmdpos = 0;
 	    ctxtlex();
 	    if (tok == ENVARRAY) {
-		inarr = 1;
+		linarr = 1;
 		zsfree(varname);
 		varname = ztrdup(tokstr);
 	    } else if (tok == INPAR)
@@ -1224,7 +1224,7 @@ get_comp_string(void)
 		if (parct)
 		    parct--;
 		else
-		    inarr = 0;
+		    linarr = 0;
 	    }
 	    if (inredir)
 		rdstr = tokstrings[tok];
@@ -1267,7 +1267,7 @@ get_comp_string(void)
 		clwpos = i;
 		cp = lincmd;
 		rd = linredir;
-		ia = inarr;
+		ia = linarr;
 		if (inwhat == IN_NOTHING && incond)
 		    inwhat = IN_COND;
 	    } else if (linredir)
@@ -4257,7 +4257,7 @@ callcompfunc(char *s, char *fn)
 	} else
 	    switch (linwhat) {
 	    case IN_ENV:
-		compcontext = "array_value";
+		compcontext = (linarr ? "array_value" : "value");
 		compparameter = varname;
 		set |= CP_PARAMETER;
 		if (!clwpos) {
