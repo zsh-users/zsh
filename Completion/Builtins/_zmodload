@@ -1,11 +1,18 @@
 #compdef zmodload
 
-local fl="$words[2]" expl
+local fl="$words[2]" expl ret=1
 
 if [[ "$fl" = -*(a*u|u*a)* || "$fl" = -*a* && CURRENT -ge 4 ]]; then
   _wanted builtins expl 'builtin command' compadd "$@" -k builtins
 elif [[ "$fl" = -*u* ]]; then
   _wanted modules expl module compadd -k modules
 else
-  _wanted files expl 'module file' _files -W module_path -/g '*.s[ol](:r)'
+  _tags files aliases
+  while _tags; do
+    _requested files expl 'module file' \
+      _files -W module_path -/g '*.s[ol](:r)' && ret=0
+    _requested aliases expl 'module alias' \
+      compadd -- ${${(f)"$(zmodload -A)"}%% *} && ret=0
+    (( ret )) || break
+  done
 fi

@@ -1479,9 +1479,11 @@ findex(zmodload)
 cindex(modules, loading)
 cindex(loading modules)
 xitem(tt(zmodload) [ tt(-dL) ] [ ... ])
-xitem(tt(zmodload -e) [ ... ])
+xitem(tt(zmodload -e) [ tt(-A) ] [ ... ])
 xitem(tt(zmodload) [ tt(-a) [ tt(-bcpf) [ tt(-I) ] ] ] [ tt(-iL) ] ...)
-item(tt(zmodload) tt(-u) [ tt(-abcdpf) [ tt(-I) ] ] [ tt(-iL) ] ...)(
+xitem(tt(zmodload) tt(-u) [ tt(-abcdpf) [ tt(-I) ] ] [ tt(-iL) ] ...)
+xitem(tt(zmodload) tt(-A) [ tt(-L) ] [ var(modalias)[tt(=)var(module)] ... ])
+item(tt(zmodload) tt(-R) var(modalias) ... )(
 Performs operations relating to zsh's loadable modules.
 Loading of modules while the shell is running (`dynamical loading') is not
 available on all operating systems, or on all installations on a particular
@@ -1583,13 +1585,53 @@ xitem(tt(zmodload) tt(-a) [ tt(-i) ] var(name) [ var(builtin) ... ])
 item(tt(zmodload) tt(-ua) [ tt(-i) ] var(builtin) ...)(
 Equivalent to tt(-ab) and tt(-ub).
 )
-item(tt(zmodload -e) [ var(string) ... ])(
-The tt(-e) option without arguments lists all loaded modules.
-With arguments only the return status is set to zero
+item(tt(zmodload -e) [ tt(-A) ] [ var(string) ... ])(
+The tt(-e) option without arguments lists all loaded modules; if the tt(-A)
+option is also given, module aliases corresponding to loaded modules are
+also shown.  With arguments only the return status is set to zero
 if all var(string)s given as arguments are names of loaded modules
 and to one if at least on var(string) is not the name of a
-loaded module. This can be used to test for the availability 
-of things implemented by modules.
+loaded module.  This can be used to test for the availability 
+of things implemented by modules.  In this case, any aliases are
+automatically resolved and the tt(-A) flag is not used.
+)
+item(tt(zmodload) tt(-A) [ tt(-L) ] [ var(modalias)[tt(=)var(module)] ... ])(
+For each argument, if both var(modlias) and var(module) are given,
+define var(modalias) to be an alias for the module var(module).
+If the module var(modalias) is ever subsequently requested, either via a
+call to tt(zmodload) or implicitly, the shell will attempt to load
+var(module) instead.  If var(module) is not given, show the definition of
+var(modalias).  If no arguments are given, list all defined module aliases.
+When listing, if the tt(-L) flag was also given, list the definition as a
+tt(zmodload) command to recreate the alias.
+
+The existence of aliases for modules is completely independent of whether
+the name resolved is actually loaded as a module: while the alias exists,
+loading and unloading the module under any alias has exactly the same
+effect as using the resolved name, and does not affect the connection
+between the alias and the resolved name which can be removed either by
+tt(zmodload -R) or by redefining the alias.  Chains of aliases (i.e. where
+the first resolved name is itself an alias) are valid so long as these are
+not circular.  As the aliases take the same format as module names, they
+may include path separators:  in this case, there is no requirement for any
+part of the path named to exist as the alias will be resolved first.  For
+example, `tt(any/old/alias)' is always a valid alias.
+
+Dependencies added to aliased modules are actually added to the resolved
+module; these remain if the alias is removed.  It is valid to create an
+alias whose name is one of the standard shell modules and which resolves to
+a different module.  However, if a module has dependencies, it
+will not be possible to use the module name as an alias as the module will
+already be marked as a loadable module in its own right.
+
+Apart from the above, aliases can be used in the tt(zmodload) command
+anywhere module names are required.  However, aliases will not be
+shown in lists of loaded modules with a bare `tt(zmodload)'.
+)
+item(tt(zmodload) tt(-R) var(modalias) ... )(
+For each var(modalias) argument that was previously defined as a module
+alias via tt(zmodload -A), delete the alias.  If any was not defined, an
+error is caused and the remainder of the line is ignored.
 )
 enditem()
 

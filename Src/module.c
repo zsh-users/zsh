@@ -88,6 +88,27 @@ register_module(char *n, Module_func setup, Module_func boot,
     zaddlinknode(linkedmodules, m);
 }
 
+/* Print an alias. */
+
+/**/
+static void
+printmodalias(Module m, char *ops)
+{
+    if (ops['L']) {
+	printf("zmodload -A ");
+	if (m->nam[0] == '-')
+	    fputs("-- ", stdout);
+	quotedzputs(m->nam, stdout);
+	putchar('=');
+	quotedzputs(m->u.alias, stdout);
+    } else {
+	nicezputs(m->nam, stdout);
+	fputs(" -> ", stdout);
+	nicezputs(m->u.alias, stdout);
+    }
+    putchar('\n');
+}
+
 /* Check if a module is linked in. */
 
 /**/
@@ -163,6 +184,15 @@ mod_export int
 addwrapper(Module m, FuncWrap w)
 {
     FuncWrap p, q;
+
+    /*
+     * We can't add a wrapper to an alias, since it's supposed
+     * to behave identically to the resolved module.  This shouldn't
+     * happen since we usually add wrappers when a real module is
+     * loaded.
+     */
+    if (m->flags & MOD_ALIAS)
+	return 1;
 
     if (w->flags & WRAPF_ADDED)
 	return 1;
@@ -256,6 +286,9 @@ deletewrapper(Module m, FuncWrap w)
 {
     FuncWrap p, q;
 
+    if (m->flags & MOD_ALIAS)
+	return 1;
+
     if (w->flags & WRAPF_ADDED) {
 	for (p = wrappers, q = NULL; p && p != w; q = p, p = p->next);
 
@@ -292,7 +325,8 @@ load_and_bind(const char *fn)
 	int err = loadbind(0, (void *) addbuiltin, ret);
 	for (node = firstnode(modules); !err && node; incnode(node)) {
 	    Module m = (Module) getdata(node);
-	    if (m->u.handle && !(m->flags & MOD_LINKED))
+	    if (!(m->flags & MOD_ALIAS) &&
+		m->u.handle && !(m->flags & MOD_LINKED))
 		err |= loadbind(0, m->u.handle, ret);
 	}
 
@@ -431,19 +465,58 @@ do_load_module(char const *name)
 /**/
 #endif /* !DYNAMIC */
 
+/*
+ * Find a module in the list.
+ * If aliasp is non-zero, resolve any aliases to the underlying module.
+ * If namep is set, this is set to point to the last alias value resolved,
+ *   even if that module was not loaded. or the module name if no aliases.
+ *   Hence this is always the physical module to load in a chain of aliases.
+ * Return NULL if the module named is not stored as a structure, or if we were
+ * resolving aliases and the final module named is not stored as a
+ * structure.
+ *
+ * TODO: now we have aliases, there may be some merit in using a hash
+ * table instead of a linked list.
+ */
 /**/
 static LinkNode
-find_module(const char *name)
+find_module(const char *name, int aliasp, const char **namep)
 {
     Module m;
     LinkNode node;
 
     for (node = firstnode(modules); node; incnode(node)) {
 	m = (Module) getdata(node);
-	if (!strcmp(m->nam, name))
+	if (!strcmp(m->nam, name)) {
+	    if (aliasp && (m->flags & MOD_ALIAS)) {
+		if (namep)
+		    *namep = m->u.alias;
+		return find_module(m->u.alias, 1, namep);
+	    }
+	    if (namep)
+		*namep = m->nam;
 	    return node;
+	}
     }
     return NULL;
+}
+
+/*
+ * Unlink and free a module node from the linked list.
+ */
+
+/**/
+static void
+delete_module(LinkNode node)
+{
+    Module m = (Module) remnode(modules, node);
+
+    if (m->flags & MOD_ALIAS)
+	zsfree(m->u.alias);
+    zsfree(m->nam);
+    if (m->deps)
+	freelinklist(m->deps, freestr);
+    zfree(m, sizeof(*m));
 }
 
 /**/
@@ -453,10 +526,16 @@ module_loaded(const char *name)
     LinkNode node;
     Module m;
 
-    return ((node = find_module(name)) &&
+    return ((node = find_module(name, 1, NULL)) &&
 	    (m = ((Module) getdata(node)))->u.handle &&
 	    !(m->flags & MOD_UNLOAD));
 }
+
+/*
+ * Setup and cleanup functions:  we don't search for aliases here,
+ * since they should have been resolved before we try to load or unload
+ * the module.
+ */
 
 /**/
 #ifdef DYNAMIC
@@ -679,7 +758,12 @@ load_module(char const *name)
 	zerr("invalid module name `%s'", name, 0);
 	return 0;
     }
-    if (!(node = find_module(name))) {
+    /*
+     * The following function call may alter name to the final name in a
+     * chain of aliases.  This makes sure the actual module loaded
+     * is the right one.
+     */
+    if (!(node = find_module(name, 1, &name))) {
 	if (!(linked = module_linked(name)) &&
 	    !(handle = do_load_module(name)))
 	    return 0;
@@ -697,10 +781,7 @@ load_module(char const *name)
 	if ((set = setup_module(m)) || boot_module(m)) {
 	    if (!set)
 		finish_module(m);
-	    remnode(modules, node);
-	    zsfree(m->nam);
-	    zfree(m, sizeof(*m));
-	    m->flags &= ~MOD_SETUP;
+	    delete_module(node);
 	    return 0;
 	}
 	m->flags |= MOD_INIT_S | MOD_INIT_B;
@@ -773,12 +854,13 @@ load_module(char const *name)
 
 /**/
 mod_export int
-require_module(char *nam, char *module, int res, int test)
+require_module(char *nam, const char *module, int res, int test)
 {
     Module m = NULL;
     LinkNode node;
 
-    node = find_module(module);
+    /* Resolve aliases and actual loadable module as for load_module */
+    node = find_module(module, 1, &module);
     if (node && (m = ((Module) getdata(node)))->u.handle &&
 	!(m->flags & MOD_UNLOAD)) {
 	if (test) {
@@ -793,12 +875,24 @@ require_module(char *nam, char *module, int res, int test)
 
 /**/
 void
-add_dep(char *name, char *from)
+add_dep(const char *name, char *from)
 {
     LinkNode node;
     Module m;
 
-    if (!(node = find_module(name))) {
+    /*
+     * If we were passed an alias, we must resolve it to a final
+     * module name (and maybe add the corresponding struct), since otherwise
+     * we would need to check all modules to see if they happen
+     * to be aliased to the same thing to implement depencies properly.
+     *
+     * This should mean that an attempt to add an alias which would
+     * have the same name as a module which has dependencies is correctly
+     * rejected, because then the module named already exists as a non-alias.
+     * Better make sure.  (There's no problem making a an alias which
+     * *points* to a module with dependencies, of course.)
+     */
+    if (!(node = find_module(name, 1, &name))) {
 	m = zcalloc(sizeof(*m));
 	m->nam = ztrdup(name);
 	zaddlinknode(modules, m);
@@ -845,11 +939,20 @@ autoloadscan(HashNode hn, int printflags)
 int
 bin_zmodload(char *nam, char **args, char *ops, int func)
 {
-    if ((ops['b'] || ops['c'] || ops['p'] || ops['f']) &&
-	!(ops['a'] || ops['u'])) {
+    int ops_bcpf = ops['b'] || ops['c'] || ops['p'] || ops['f'];
+    int ops_au = ops['a'] || ops['u'];
+    if (ops_bcpf && !ops_au) {
 	zwarnnam(nam, "-b, -c, -f, and -p must be combined with -a or -u",
 		 NULL, 0);
 	return 1;
+    }
+    if (ops['A'] || ops['R']) {
+	if (ops_bcpf || ops_au || ops['d'] || (ops['R'] && ops['e'])) {
+	    zwarnnam(nam, "illegal flags combined with -A or -R", NULL, 0);
+	    return 1;
+	}
+	if (!ops['e'])
+	    return bin_zmodload_alias(nam, args, ops);
     }
     if (ops['d'] && ops['a']) {
 	zwarnnam(nam, "-d cannot be combined with -a", NULL, 0);
@@ -886,32 +989,148 @@ bin_zmodload(char *nam, char **args, char *ops, int func)
 
 /**/
 static int
+bin_zmodload_alias(char *nam, char **args, char *ops)
+{
+    /*
+     * TODO: while it would be too nasty to have aliases, as opposed
+     * to real loadable modules, with dependencies --- just what would
+     * we need to load when, exactly? --- there is in principle no objection
+     * to making it possible to force an alias onto an existing unloaded
+     * module which has dependencies.  This would simply transfer
+     * the dependencies down the line to the aliased-to module name.
+     * This is actually useful, since then you can alias zsh/zle=mytestzle
+     * to load another version of zle.  But then what happens when the
+     * alias is removed?  Do you transfer the dependencies back? And
+     * suppose other names are aliased to the same file?  It might be
+     * kettle of fish best left unwormed.
+     */
+    LinkNode node;
+    Module m;
+    int ret = 0;
+
+    if (!*args) {
+	if (ops['R']) {
+	    zwarnnam(nam, "no module alias to remove", NULL, 0);
+	    return 1;
+	}
+	for (node = firstnode(modules); node; incnode(node)) {
+	    m = (Module) getdata(node);
+	    if (m->flags & MOD_ALIAS)
+		printmodalias(m, ops);
+	}
+	return 0;
+    }
+
+    for (; !ret && *args; args++) {
+	char *eqpos = strchr(*args, '=');
+	char *aliasname = eqpos ? eqpos+1 : NULL;
+	if (eqpos)
+	    *eqpos = '\0';
+	if (!modname_ok(*args)) {
+	    zwarnnam(nam, "invalid module name `%s'", *args, 0);
+	    return 1;
+	}
+	if (ops['R']) {
+	    if (aliasname) {
+		zwarnnam(nam, "bad syntax for removing module alias: %s",
+			 *args, 0);
+		return 1;
+	    }
+	    node = find_module(*args, 0, NULL);
+	    if (node) {
+		m = (Module) getdata(node);
+		if (!(m->flags & MOD_ALIAS)) {
+		    zwarnnam(nam, "module is not an alias: %s", *args, 0);
+		    ret = 1;
+		    break;
+		}
+		delete_module(node);
+	    } else {
+		zwarnnam(nam, "no such module alias: %s", *args, 0);
+		return 1;
+	    }
+	} else {
+	    if (aliasname) {
+		const char *mname = aliasname;
+		if (!modname_ok(aliasname)) {
+		    zwarnnam(nam, "invalid module name `%s'", aliasname, 0);
+		    return 1;
+		}
+		find_module(aliasname, 1, &mname);
+		if (!strcmp(mname, *args)) {
+		    zwarnnam(nam, "module alias would refer to itself: %s",
+			     *args, 0);
+		    return 1;
+		}
+		node = find_module(*args, 0, NULL);
+		if (node) {
+		    m = (Module) getdata(node);
+		    if (!(m->flags & MOD_ALIAS)) {
+			zwarnnam(nam, "module is not an alias: %s", *args, 0);
+			return 1;
+		    }
+		    zsfree(m->u.alias);
+		} else {
+		    m = (Module) zcalloc(sizeof(*m));
+		    m->nam = ztrdup(*args);
+		    m->flags = MOD_ALIAS;
+		    zaddlinknode(modules, m);
+		}
+		m->u.alias = ztrdup(aliasname);
+	    } else {
+		if ((node = find_module(*args, 0, NULL))) {
+		    m = (Module) getdata(node);
+		    if (m->flags & MOD_ALIAS)
+			printmodalias(m, ops);
+		    else {
+			zwarnnam(nam, "module is not an alias: %s",
+				 *args, 0);
+			return 1;
+		    }
+		} else {
+		    zwarnnam(nam, "no such module alias: %s", *args, 0);
+		    return 1;
+		}
+	    }
+	}
+    }
+
+    return 0;
+}
+
+/**/
+static int
 bin_zmodload_exist(char *nam, char **args, char *ops)
 {
     LinkNode node;
     Module m;
+    char *modname;
 
     if (!*args) {
 	for (node = firstnode(modules); node; incnode(node)) {
 	    m = (Module) getdata(node);
+	    modname = m->nam;
+	    if (m->flags & MOD_ALIAS) {
+		LinkNode node2;
+		if (ops['A'] && (node2 = find_module(m->u.alias, 1, NULL)))
+		    m = (Module) getdata(node2);
+		else
+		    continue;
+	    } 
 	    if (m->u.handle && !(m->flags & MOD_UNLOAD)) {
-		nicezputs(m->nam, stdout);
+		nicezputs(modname, stdout);
 		putchar('\n');
 	    }
 	}
 	return 0;
     } else {
-	int ret = 0, f;
+	int ret = 0;
 
 	for (; !ret && *args; args++) {
-	    f = 0;
-	    for (node = firstnode(modules);
-		 !f && node; incnode(node)) {
-		m = (Module) getdata(node);
-		if (m->u.handle && !(m->flags & MOD_UNLOAD))
-		    f = !strcmp(*args, m->nam);
-	    }
-	    ret = !f;
+	    if (!(node = find_module(*args, 1, NULL))
+		|| !(m = (Module) getdata(node))->u.handle
+		|| (m->flags & MOD_UNLOAD))
+		ret = 1;
 	}
 	return ret;
     }
@@ -924,9 +1143,9 @@ bin_zmodload_dep(char *nam, char **args, char *ops)
     LinkNode node;
     Module m;
     if(ops['u']) {
-	/* remove dependencies */
-	char *tnam = *args++;
-	node = find_module(tnam);
+	/* remove dependencies, which can't pertain to aliases */
+	const char *tnam = *args++;
+	node = find_module(tnam, 1, &tnam);
 	if (!node)
 	    return 0;
 	m = (Module) getdata(node);
@@ -949,11 +1168,8 @@ bin_zmodload_dep(char *nam, char **args, char *ops)
 		m->deps = NULL;
 	    }
 	}
-	if (!m->deps && !m->u.handle) {
-	    remnode(modules, node);
-	    zsfree(m->nam);
-	    zfree(m, sizeof(*m));
-	}
+	if (!m->deps && !m->u.handle)
+	    delete_module(node);
 	return 0;
     } else if(!args[0] || !args[1]) {
 	/* list dependencies */
@@ -1216,6 +1432,15 @@ bin_zmodload_param(char *nam, char **args, char *ops)
 int
 unload_module(Module m, LinkNode node)
 {
+    /*
+     * Only unload the real module, so resolve aliases.
+     */
+    if (m->flags & MOD_ALIAS) {
+	LinkNode node = find_module(m->u.alias, 1, NULL);
+	if (!node)
+	    return 1;
+	m = (Module) getdata(node);
+    }
     if ((m->flags & MOD_INIT_S) &&
 	!(m->flags & MOD_UNLOAD) &&
 	((m->flags & MOD_LINKED) ?
@@ -1249,7 +1474,7 @@ unload_module(Module m, LinkNode node)
 	    LinkNode n;
 
 	    for (n = firstnode(m->deps); n; incnode(n)) {
-		LinkNode dn = find_module((char *) getdata(n));
+		LinkNode dn = find_module((char *) getdata(n), 1, NULL);
 		Module dm;
 
 		if (dn && (dm = (Module) getdata(dn)) &&
@@ -1287,9 +1512,7 @@ unload_module(Module m, LinkNode node)
 		if (!node)
 		    return 1;
 	    }
-	    remnode(modules, node);
-	    zsfree(m->nam);
-	    zfree(m, sizeof(*m));
+	    delete_module(node);
 	}
     }
     return 0;
@@ -1304,8 +1527,9 @@ bin_zmodload_load(char *nam, char **args, char *ops)
     int ret = 0;
     if(ops['u']) {
 	/* unload modules */
+	const char *mname = *args;
 	for(; *args; args++) {
-	    node = find_module(*args);
+	    node = find_module(*args, 1, &mname);
 	    if (node) {
 		LinkNode mn, dn;
 		int del = 0;
@@ -1314,11 +1538,11 @@ bin_zmodload_load(char *nam, char **args, char *ops)
 		    m = (Module) getdata(mn);
 		    if (m->deps && m->u.handle)
 			for (dn = firstnode(m->deps); dn; incnode(dn))
-			    if (!strcmp((char *) getdata(dn), *args)) {
+			    if (!strcmp((char *) getdata(dn), mname)) {
 				if (m->flags & MOD_UNLOAD)
 				    del = 1;
 				else {
-				    zwarnnam(nam, "module %s is in use by another module and cannot be unloaded", *args, 0);
+				    zwarnnam(nam, "module %s is in use by another module and cannot be unloaded", mname, 0);
 				    ret = 1;
 				    goto cont;
 				}
@@ -1342,7 +1566,7 @@ bin_zmodload_load(char *nam, char **args, char *ops)
 	/* list modules */
 	for (node = firstnode(modules); node; incnode(node)) {
 	    m = (Module) getdata(node);
-	    if (m->u.handle && !(m->flags & MOD_UNLOAD)) {
+	    if (m->u.handle && !(m->flags & (MOD_UNLOAD|MOD_ALIAS))) {
 		if(ops['L']) {
 		    printf("zmodload ");
 		    if(m->nam[0] == '-')

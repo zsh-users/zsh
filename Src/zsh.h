@@ -957,6 +957,7 @@ struct module {
     union {
 	void *handle;
 	Linkedmod linked;
+	char *alias;
     } u;
     LinkList deps;
     int wrapper;
@@ -968,6 +969,7 @@ struct module {
 #define MOD_LINKED  (1<<3)
 #define MOD_INIT_S  (1<<4)
 #define MOD_INIT_B  (1<<5)
+#define MOD_ALIAS   (1<<6)
 
 typedef int (*Module_func) _((Module));
 
