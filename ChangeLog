@@ -1,3 +1,7 @@
+2001-02-12  Bart Schaefer  <schaefer@zsh.org>
+
+	* 13457: Completion/Core/compinit: Add `glob' to $_comp_options.
+
 2001-02-09  Sven Wischnowsky  <wischnow@zsh.org>
 
 	* 13450: Completion/Core/_multi_parts: two small fixes to

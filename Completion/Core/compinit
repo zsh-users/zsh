@@ -124,6 +124,7 @@ fi
 # The standard options set in completion functions.
 
 _comp_options=(
+       glob
        bareglobqual
        nullglob
        rcexpandparam
