@@ -49,7 +49,7 @@ Red Hat Inc.: Cygwin
 
 DEC: Ultrix (Alpha or DECstation)
 DEC: Mach 3.0 (DECstation 5000/25)
-DEC: OSF/1 1.2, 1.3, 2.0, 3.*, DEC Unix 4.* (Alpha)
+DEC: OSF/1 1.2, 1.3, 2.0, 3.x, DEC Unix 4.x (Alpha)
 Compaq: Tru64
 	In OSF/1 3.x, there is apparently a bug in the header file
 	/usr/include/rpcsvc/ypclnt.h; the prototype for yp_all() has a
@@ -112,7 +112,7 @@ IBM: AIX 3.2, 4.x
 	very unhappy (GCC 3.0 apparently does not mind). Zsh now defaults
 	to termcap on AIX; any info about this problem is appreciated.
 
-Linux: Linux 2.* (various 32-bit and 64-bit processors)
+Linux: Linux 2.x (various 32-bit and 64-bit processors)
 	Should build `out-of-the-box'.
 
 	If you are using an early minor version of libc 5, then a bug
@@ -133,10 +133,10 @@ Linux: Linux 2.* (various 32-bit and 64-bit processors)
 	best solution is to edit config.h after running configure and
 	#define HAS_SYS_RESOURCE_H.
 
-NetBSD: NetBSD 1.*
+NetBSD: NetBSD 1.x
 	Should build `out-of-the-box'.
 
-OpenBSD: OpenBSD 2.6
+OpenBSD: OpenBSD 2.x, 3.x
 	Should build `out-of-the-box'.
 
 SIEMENS: Reliant UNIX
@@ -171,7 +171,7 @@ SGI: IRIX 6.2, 6.3, 6.5
 
 	The zpty module is not currently supported.
 
-Sun: SunOS 4.1.*
+Sun: SunOS 4.1.x
 	[This information is probably out of date.  If you know otherwise,
 	please tell zsh-workers@sunsite.dk.]
 
@@ -185,7 +185,7 @@ Sun: SunOS 4.1.*
 	This may work, but the first username completion will be _very_
 	slow (as slow as in tcsh).
 
-Sun: Solaris 2.*
+Sun: Solaris 2.x
 	The UCB versions of the routines for reading directories are not
 	usable (the struct definitions are incompatible with the ones
 	assumed by zsh).  The symptom of this is that globbed filenames in

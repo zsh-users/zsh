@@ -1,5 +1,7 @@
 2004-03-07  Oliver Kiddle  <opk@zsh.org>
 
+	* unposted: Etc/MACHINES: builds `out-of-the-box' on OpenBSD 3.4
+
 	* 19549: Src/builtin.c, Test/B03print.ztst: allow for size
 	modifiers in printf format spec's buffer
 
