@@ -1,3 +1,8 @@
+2002-02-10  Clint Adams  <clint@zsh.org>
+
+        * Sven: 16408: Src/Zle/compcore.c: make sure auto menu
+	isn't started accidentially when bashautolist is set
+
 2002-02-09  Clint Adams  <clint@zsh.org>
 
 	* unposted: Functions/Prompts/prompt_clint_setup: improve APM and
