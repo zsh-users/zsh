@@ -1,3 +1,7 @@
+2001-07-24  Sven Wischnowsky  <wischnow@zsh.org>
+
+	* 15470: Src/parse.c: remove nulargs in here strings
+
 2001-07-24  Bart Schaefer  <schaefer@zsh.org>
 
 	* 15472: Doc/Zsh/builtins.yo, Doc/Zsh/grammar.yo: Fix errors

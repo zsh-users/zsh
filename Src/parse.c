@@ -1685,6 +1685,9 @@ par_redir(int *rp)
 	if ((tokstr[0] == Inang || tokstr[0] == Outang) && tokstr[1] == Inpar)
 	    type = tokstr[0] == Inang ? REDIR_INPIPE : REDIR_OUTPIPE;
 	break;
+    case REDIR_HERESTR:
+        remnulargs(name = dupstring(name));
+        break;
     }
     yylex();
 
