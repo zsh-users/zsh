@@ -31,9 +31,11 @@ for complete details.
 
 In the parameter lists that follow, the mark `<S>' indicates that the
 parameter is special.
-Special parameters cannot have their type changed, and they stay special even
-if unset.  `<Z>' indicates that the parameter does not exist when the shell
-initializes in tt(sh) or tt(ksh) emulation mode.
+Special parameters cannot have their type changed or their
+readonly attribute turned off, and if a special parameter is unset, then
+later recreated, the special properties will be retained.  `<Z>' indicates
+that the parameter does not exist when the shell initializes in tt(sh) or
+tt(ksh) emulation mode.
 startmenu()
 menu(Array Parameters)
 menu(Positional Parameters)

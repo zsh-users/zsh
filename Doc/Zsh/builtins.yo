@@ -1192,7 +1192,9 @@ Convert the result to lower case whenever the parameter is expanded.
 The value is em(not) converted when assigned.
 )
 item(tt(-r))(
-The given var(name)s are marked readonly.
+The given var(name)s are marked readonly.  Note that if var(name) is a
+special parameter, the readonly attribute can be turned on, but cannot then
+be turned off.
 )
 item(tt(-t))(
 Tags the named parameters.  Tags have no special meaning to the shell.

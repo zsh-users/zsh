@@ -1628,7 +1628,14 @@ typeset_single(char *cname, char *pname, Param pm, int func,
 	if ((tc = chflags && chflags != (PM_EFLOAT|PM_FFLOAT)))
 	    usepm = 0;
     }
-    if (tc){
+
+    /*
+     * Extra checks if converting the type of a parameter, or if
+     * trying to remove readonlyness.  It's dangerous doing either
+     * with a special or a parameter which isn't loaded yet (which
+     * may be special when it is loaded; we can't tell yet).
+     */
+    if (tc || ((usepm || newspecial) && (off & pm->flags & PM_READONLY))) {
 	if (pm->flags & PM_SPECIAL) {
 	    zerrnam(cname, "%s: can't change type of a special parameter",
 		    pname, 0);
