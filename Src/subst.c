@@ -1031,6 +1031,8 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int ssub)
 		case PM_HASHED:  val = "association"; break;
 		}
 		val = dupstring(val);
+		if (v->pm->level)
+		    val = dyncat(val, "-local");
 		if (f & PM_LEFT)
 		    val = dyncat(val, "-left");
 		if (f & PM_RIGHT_B)

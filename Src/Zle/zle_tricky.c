@@ -565,8 +565,9 @@ acceptlast(void)
 	cs = minfo.pos + minfo.len + minfo.insc;
 	iremovesuffix(' ', 1);
 	l = cs;
-	cs = minfo.pos + minfo.len - (*(minfo.cur))->qisl;
-	foredel(l - cs);
+	cs = minfo.pos + minfo.len + minfo.insc - (*(minfo.cur))->qisl;
+	if (cs < l)
+	    foredel(l - cs);
 	inststrlen(" ", 1, 1);
 	if (parpre)
 	    inststr(parpre);
@@ -801,11 +802,12 @@ check_param(char *s, int set, int test)
 		parq = eparq = 0;
 
 	    /* Save the prefix. */
-	    sav = *b;
-	    *b = '\0';
-	    untokenize(parpre = ztrdup(s));
-	    *b = sav;
-
+	    if (incompfunc) {
+		sav = *b;
+		*b = '\0';
+		untokenize(parpre = ztrdup(s));
+		*b = sav;
+	    }
 	    /* And adjust wb, we, and offs again. */
 	    offs -= b - s;
 	    wb = cs - offs;
@@ -3527,7 +3529,9 @@ add_match_data(int alt, char *str, Cline line,
 		p->next = qsl;
 	}
     }
-    /* And the same for the prefix. */
+    /* The prefix is handled differently because the completion code
+     * is much more eager to insert the -P prefix than it is to insert
+     * the -S suffix. */
     if (qipre)
 	palen = (qipl = strlen(qipre));
     if (ipre)
@@ -3537,7 +3541,49 @@ add_match_data(int alt, char *str, Cline line,
     if (ppre)
 	palen += (ppl = strlen(ppre));
 
-    if (palen) {
+    if (pl) {
+	if (ppl) {
+	    Cline lp, p = bld_parts(ppre, ppl, ppl, &lp);
+
+	    if (lp->prefix && !(line->flags & (CLF_SUF | CLF_MID))) {
+		lp->prefix->next = line->prefix;
+		line->prefix = lp->prefix;
+		lp->prefix = NULL;
+
+		free_cline(lp);
+
+		if (p != lp) {
+		    Cline q;
+
+		    for (q = p; q->next != lp; q = q->next);
+
+		    q->next = line;
+		    line = p;
+		}
+	    } else {
+		lp->next = line;
+		line = p;
+	    }
+	}
+	if (pl) {
+	    Cline lp, p = bld_parts(pre, pl, pl, &lp);
+
+	    lp->next = line;
+	    line = p;
+	}
+	if (ipl) {
+	    Cline lp, p = bld_parts(ipre, ipl, ipl, &lp);
+
+	    lp->next = line;
+	    line = p;
+	}
+	if (qipl) {
+	    Cline lp, p = bld_parts(qipre, qipl, qipl, &lp);
+
+	    lp->next = line;
+	    line = p;
+	}
+    } else if (palen) {
 	char *apre = (char *) zhalloc(palen);
 	Cline p, lp;
 
@@ -4434,7 +4480,10 @@ docompletion(char *s, int lst, int incmd)
 		minfo.cur = NULL;
 		minfo.asked = 0;
 		do_single(m->matches[0]);
-		invalidatelist();
+		if (compforcelist && *compforcelist && uselist)
+		    showinglist = -2;
+		else
+		    invalidatelist();
 	    }
 	} else {
 	    invalidatelist();
@@ -4561,8 +4610,11 @@ callcompfunc(char *s, char *fn)
 		kset |= CP_PARAMETER;
 		if (!clwpos) {
 		    clwpos = 1;
+		    clwnum = 2;
 		    zsfree(clwords[1]);
 		    clwords[1] = ztrdup(s);
+		    zsfree(clwords[2]);
+		    clwords[2] = NULL;
 		}
 		aadd = 1;
 		break;
@@ -6697,8 +6749,9 @@ invalidatelist(void)
 	listmatches();
     if (validlist)
 	freematches();
-    lastambig = menucmp = menuacc = validlist = showinglist =
-	fromcomp = listshown = 0;
+    lastambig = menucmp = menuacc = validlist = showinglist = fromcomp = 0;
+    if (listshown < 0)
+	listshown = 0;
     minfo.cur = NULL;
     minfo.asked = 0;
     compwidget = NULL;

@@ -217,9 +217,9 @@ def(example)(1)(\
 )
 
 def(indent)(1)(\
-  NOTRANS(@display)NL()\
+  NOTRANS(@quotation)NL()\
   ARG1\
-  NL()NOTRANS(@end display)\
+  NL()NOTRANS(@end quotation)\
 )
 
 COMMENT(--- hyperlink menus ---)

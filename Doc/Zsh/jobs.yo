@@ -20,7 +20,8 @@ does not have a place in the job table, and is not subject
 to the job control features described here.
 
 If you are running a job and wish to do something else you may hit the key
-^Z (control-Z) which sends a tt(TSTP) signal to the current job.
+^Z (control-Z) which sends a tt(TSTP) signal to the current job:  this key
+may be redefined by the tt(susp) option of the external tt(stty) command.
 cindex(jobs, suspending)
 cindex(suspending jobs)
 The shell will then normally indicate that the job has been `suspended',

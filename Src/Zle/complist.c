@@ -159,17 +159,15 @@ getcoldef(Listcols c, char *s)
 	n = ++s;
 	while (*s && *s != '=')
 	    s++;
-	if (!*s )
+	if (!*s)
 	    return s;
 	*s++ = '\0';
 	p = getcolval(s);
-	if (*n) {
-	    ec = (Extcol) zhalloc(sizeof(*ec));
-	    ec->ext = n;
-	    ec->col = s;
-	    ec->next = c->exts;
-	    c->exts = ec;
-	}
+	ec = (Extcol) zhalloc(sizeof(*ec));
+	ec->ext = n;
+	ec->col = s;
+	ec->next = c->exts;
+	c->exts = ec;
 	if (*p)
 	    *p++ = '\0';
 	return p;
@@ -460,6 +458,7 @@ complistmatches(Hookdef dummy, Chdata dat)
 	}
     }
     /* Now print the matches. */
+    last_col = COL_NO - 1;
     g = amatches;
     while (g) {
 	char **pp = g->ylist;

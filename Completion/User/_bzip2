@@ -1,0 +1,3 @@
+#compdef bzip2
+
+_files -g '*~*.bz2'

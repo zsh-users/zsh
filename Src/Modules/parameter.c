@@ -91,6 +91,8 @@ paramtypestr(Param pm)
 	}
 	DPUTS(!val, "BUG: type not handled in parameter");
 	val = dupstring(val);
+	if (pm->level)
+	    val = dyncat(val, "-local");
 	if (f & PM_LEFT)
 	    val = dyncat(val, "-left");
 	if (f & PM_RIGHT_B)

@@ -29,10 +29,15 @@
 #
 #   local _set_options _unset_options
 #
-#   _set_options=("${(@f)$({ unsetopt kshoptionprint; setopt } 2>/dev/null)}")
-#   _unset_options=("${(@f)$({ unsetopt kshoptionprint; unsetopt } 2>/dev/null)}")
+#   if zmodload -e parameter; then
+#     _set_options=(${(k)options[(R)on]})
+#     _unset_options=(${(k)options[(R)off]})
+#   else
+#     _set_options=("${(@f)$({ unsetopt kshoptionprint; setopt } 2>/dev/null)}")
+#     _unset_options=("${(@f)$({ unsetopt kshoptionprint; unsetopt } 2>/dev/null)}")
+#   fi
 #
-# This is needed because completion function may set options locally
+# This is needed because completion functions may set options locally
 # which makes the output of setopt and unsetopt reflect a different
 # state than the global one for which you are completing.
 

@@ -1,3 +1,3 @@
-#compdef unalias
+#compdef alias unalias
 
 compgen -a

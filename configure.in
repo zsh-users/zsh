@@ -1187,7 +1187,7 @@ char *argv[];
   fi
   case "$host_os" in
     hpux*)        DLLDFLAGS="${DLLDFLAGS=-b}" ;;
-    linux*|irix*|osf*) DLLDFLAGS="${DLLDFLAGS=-shared}" ;;
+    freebsd*|linux*|irix*|osf*) DLLDFLAGS="${DLLDFLAGS=-shared}" ;;
     sunos*)       DLLDFLAGS="${DLLDFLAGS=-assert nodefinitions}" ;;
     sysv4*|esix*) DLLDFLAGS="${DLLDFLAGS=-G $ldflags}" ;;
     netbsd*)      DLLDFLAGS="${DLLDFLAGS=${DLLDARG}-x -shared --whole-archive}" ;;
@@ -1196,7 +1196,7 @@ char *argv[];
   esac
   case "$host" in
     *-hpux*)  EXTRA_LDFLAGS="${EXTRA_LDFLAGS=-Wl,-E}" ;;
-    *-linux*) EXTRA_LDFLAGS="${EXTRA_LDFLAGS=-rdynamic}" ;;
+    *-freebsd3*|*-freebsd4*|*-linux*) EXTRA_LDFLAGS="${EXTRA_LDFLAGS=-rdynamic}" ;;
     mips-sni-sysv4)
       #
       # unfortunately, we have different compilers

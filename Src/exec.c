@@ -2922,7 +2922,7 @@ doshfunc(char *name, List list, LinkList doshargs, int flags, int noreturnval)
 
 	tab = pparams;
 	oldscriptname = scriptname;
-	scriptname = name;
+	scriptname = dupstring(name);
 	oldzoptind = zoptind;
 	zoptind = 1;
 
@@ -3145,6 +3145,7 @@ cancd2(char *s)
 {
     struct stat buf;
     char *us, *us2 = NULL;
+    int ret;
 
     /*
      * If CHASEDOTS and CHASELINKS are not set, we want to rationalize the
@@ -3159,9 +3160,10 @@ cancd2(char *s)
 	fixdir(us2 = us);
     } else
 	us = unmeta(s);
-    return !(access(us, X_OK) || stat(us, &buf) || !S_ISDIR(buf.st_mode));
+    ret = !(access(us, X_OK) || stat(us, &buf) || !S_ISDIR(buf.st_mode));
     if (us2)
 	free(us2);
+    return ret;
 }
 
 /**/

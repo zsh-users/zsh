@@ -35,25 +35,45 @@ A function can be marked as em(undefined) using the tt(autoload) builtin
 (or `tt(functions -u)' or `tt(typeset -fu)').  Such a function has no
 body.  When the function is first executed, the tt(fpath)
 variable will be searched for a file with the same name as the
-function.
+function.  The usual alias expansion during reading will be suppressed if
+the tt(autoload) builtin or its equivalent is given the option tt(-U);
+this is recommended for the use of functions supplied with the zsh
+distribution.  Thus to define functions for autoloading, a typical sequence
+is:
+
+example(fpath=(~/myfuncs $fpath)
+autoload myfunc1 myfunc2 ...)
 
 pindex(KSH_AUTOLOAD, use of)
 If the tt(KSH_AUTOLOAD) option is set, or the file contains only a simple
 definition of the function, the file's contents will be
-executed.  It would normally define the function in question, but may
-also perform initialization.
-It is executed in the context of the function
-execution, and may therefore define local parameters.
+executed.  It will normally define the function in question, but may
+also perform initialization:  this
+is executed in the context of the function
+execution, and may therefore define local parameters.  It is an error if
+the function is not defined by loading the file.
 
-Otherwise, the function is defined such that its body is the
-complete contents of the file.  This form allows the file to be
-used directly as an executable shell script.
-Initialization code can be executed, but only as part of the first
-function execution, so the function would have to redefine itself to
-avoid reinitializing on the next execution.
+Otherwise, the function is defined such that its body is the complete
+contents of the file.  This form allows the file to be used directly as an
+executable shell script.  If processing of the file results in the function
+being re-defined, the function itself is not re-executed. To force the
+function to perform initialization and be called, the file should contain
+initialization code (which will be discarded) in addition to a complete
+function definition (which will be retained for subsequent calls to the
+function), and a call to the shell function at the end.
 
-If this processing of the file results in the function being
-fully defined, the function itself is then executed.
+For example, suppose the autoload file tt(func) contains
+
+example(func() { print This is func; }
+print func is initialized
+)
+
+then `tt(func; func)' with tt(KSH_AUTOLOAD) set will produce both messages
+on the first call, and just the message `tt(This is func)' on the second
+and any subsequent calls.  Without tt(KSH_AUTOLOAD) set, it will produce
+the initialization message on the first call, and the other message on the
+second and subsequent calls.
+
 sect(Special Functions)
 The following functions, if defined, have special meaning to
 the shell:
@@ -106,3 +126,8 @@ item(tt(TRAPZERR))(
 Executed whenever a command has a non-zero exit status.
 )
 enditem()
+
+The functions beginning `tt(TRAP)' may alternatively be defined with the
+tt(trap) builtin:  this may be preferable for some uses, as they are then
+run in the environment of the calling process, rather than in their own
+function environment.

@@ -20,7 +20,11 @@ elif [[ "$command" == */* ]]; then
   cmd2="${command:t}"
 else
   cmd1="$command"
-  cmd2=$(whence -p $command)
+  if zmodload -e parameter; then
+    cmd2="$commands[$command]"
+  else
+    cmd2=$(whence -p $command)
+  fi
 fi
 
 # See if there are any matching pattern completions.

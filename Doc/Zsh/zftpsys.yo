@@ -1,6 +1,7 @@
 texinode(Zftp Function System)()(Completion System)(Top)
 chapter(Zftp Function System)
-cindex(zftp, function system)
+cindex(zftp function system)
+cindex(FTP, functions for using shell as client)
 sect(Description)
 
 This describes the set of shell functions supplied with the source
@@ -70,6 +71,7 @@ same as that in a standard FTP client.
 
 subsect(Opening a connection)
 startitem()
+findex(zfparams)
 item(tt(zfparams [ var(host) [ var(user) [ var(password) ... ] ] ]))(
 Set or show the parameters for a future tt(zfopen) with no arguments.  If
 no arguments are given, the current parameters are displayed (the password
@@ -80,6 +82,7 @@ parameter given as `tt(?)' will be prompted for.
 As tt(zfopen) calls tt(zfparams) to store the parameters, this usually need
 not be called directly.
 )
+findex(zfopen)
 item(tt(zfopen [ -1 ] [ var(host) [ var(user) [ var(password) [ var(account) ] ] ] ]))(
 If var(host) is present, open a connection to that host under username
 var(user) with password var(password) (and, on the rare occasions when it
@@ -97,6 +100,7 @@ recorded for later re-opening, either by a tt(zfopen) with no arguments, or
 automatically (see below).  With the option `tt(-1)', no information is
 stored.
 )
+findex(zfanon)
 item(tt(zfanon [ -1 ] var(host)))(
 Open a connection var(host) for anonymous FTP.  The username used is
 tt(anonymous).  The password (which will be reported the first time) is
@@ -108,6 +112,7 @@ enditem()
 
 subsect(Directory management)
 startitem()
+findex(zfcd)
 xitem(tt(zfcd [ var(dir) ]))
 xitem(tt(zfcd -))
 item(tt(zfcd var(old) var(new)))(
@@ -137,12 +142,14 @@ tt(~/foo), so that the `tt(~)' will be expanded by the server to the
 correct remote host directory.  Other named directories of the form
 `tt(~name)' are not treated in this fashion.
 )
+findex(zfhere)
 item(tt(zfhere))(
 Change directory on the remote server to the one corresponding to the
 current local directory, with special handling of `tt(~)' as in tt(zfcd).
 For example, if the current local directory is tt(~/foo/bar), then
 tt(zfhere) performs the effect of `tt(zfcd ~/foo/bar)'.
 )
+findex(zfdir)
 item(tt(zfdir [ -rfd ] [ - ] [ var(dir-options) ] [ var(dir) ]))(
 Produce a long directory listing.  The arguments var(dir-options) and
 var(dir) are passed directly to the server and their effect is
@@ -161,6 +168,7 @@ tt(zfdir), the tt(-f) option can be used to force the cache to be flushed.
 Also, the option tt(-d) will delete both caches without showing a directory
 listing.
 )
+findex(zfdir)
 item(tt(zfls) [ var(ls-options) ] [ var(dir) ])(
 List files on the remote server.  With no arguments, this will produce a
 simple list of file names for the current remote directory.  Any arguments
@@ -170,12 +178,14 @@ enditem()
 
 subsect(Status commands)
 startitem()
+findex(zftype)
 item(tt(zftype) [ var(type) ])(
 With no arguments, show the type of data to be transferred, usually ASCII
 or binary.  With an argument, change the type: the types `tt(A)' or
 `tt(ASCII)' for ASCII data and `tt(B)' or `tt(BINARY)', `tt(I)' or
 `tt(IMAGE)' for binary data are understood case-insensitively.
 )
+findex(zfstat)
 item(tt(zfstat) [ -v ])(
 Show the status of the current or last connection, as well as the status of
 some of tt(zftp)'s status variables.  With the tt(-v) option, a more
@@ -193,12 +203,14 @@ this requires version 5 of tt(perl), see the description of the function
 tt(zfrtime) below for more information.
 
 startitem()
+findex(zfget)
 item(tt(zfget [ -Gt ] var(file1) ...))(
 Retrieve all the listed files var(file1) ... one at a time from the remote
 server.  If a file contains a `tt(/)', the full name is passed to the
 remote server, but the file is stored locally under the name given by the
 part after the final `tt(/)'.
 )
+findex(zfuget)
 item(tt(zfuget [ -Gvst ] var(file1) ...))(
 As tt(zfget), but only retrieve files where the version on the remote
 server is newer (has a later modification time), or where the local file
@@ -209,6 +221,7 @@ and will always retrieve the file in either of those two cases.  With the
 option tt(-v), the command prints more information about the files while it
 is working out whether or not to transfer them.
 )
+findex(zfcget)
 item(tt(zfcget [ -Gt ] var(file1) ...))(
 As tt(zfget), but if any of the local files exists, and is shorter than
 the corresponding remote file, the command assumes that it is the result of
@@ -218,6 +231,7 @@ file.  This is useful on a poor connection which keeps failing.
 Note that this requires a commonly implemented, but non-standard, version
 of the FTP protocol, so is not guaranteed to work on all servers.
 )
+findex(zfgcp)
 xitem(tt(zfgcp [ -Gt ] var(remote-file) var(local-file)))
 item(tt(zfgcp [ -Gt ] var(rfile1) ... var(ldir)))(
 This retrieves files from the remote server with arguments behaving
@@ -234,16 +248,19 @@ enditem()
 
 subsect(Sending files)
 startitem()
+findex(zfput)
 item(tt(zfput var(file1) ...))(
 Send all the var(file1) ... given separately to the remote server.  If a
 filename contains a `tt(/)', the full filename is used locally to find the
 file, but only the basename is used for the remote file name.
 )
+findex(zfuput)
 item(tt(zfuput [ -vs ] var(file1) ...))(
 As tt(zfput), but only send files which are newer than their local
 equivalents, or if the remote file does not exist.  The logic is the same
 as for tt(zfuget), but reversed between local and remote files.
 )
+findex(zfcput)
 item(tt(zfcput var(file1) ...))(
 As tt(zfput), but if any remote file already exists and is shorter than the
 local equivalent, assume it is the result of an incomplete transfer and
@@ -251,6 +268,7 @@ send the rest of the file to append to the existing part.  As the FTP
 append command is part of the standard set, this is in principle more
 likely to work than tt(zfcget).
 )
+findex(zfpcp)
 xitem(tt(zfpcp var(local-file) var(remote-file)))
 item(tt(zfpcp var(lfile1) ... var(rdir)))(
 This sends files to the remote server with arguments behaving similarly to
@@ -277,6 +295,7 @@ enditem()
 
 subsect(Closing the connection)
 startitem()
+findex(zfclose)
 item(tt(zfclose))(
 Close the connection.
 )
@@ -291,6 +310,7 @@ functions is called, it will be set to the file tt(.zfbfmarks) in the
 directory where your zsh startup files live (usually tt(~)).
 
 startitem()
+findex(zfmark)
 item(tt(zfmark [ )var(bookmark)tt( ]))(
 If given an argument, mark the current host, user and directory under the
 name var(bookmark) for later use by tt(zfgoto).  If there is no connection
@@ -301,6 +321,7 @@ under the same name will be silently replaced.
 If not given an argument, list the existing bookmarks and the points to
 which they refer in the form var(user)tt(@)var(host)tt(:)var(directory).
 )
+findex(zfgoto)
 item(tt(zfgoto [ -n ] )var(bookmark))(
 Return to the location given by var(bookmark), as previously set by
 tt(zfmark).  If the location has user `tt(ftp)' or `tt(anonymous)', open
@@ -323,11 +344,13 @@ tt(zfinit)), but are described here for completeness.  You may wish to
 alter tt(zftp_chpwd) and tt(zftp_progress), in particular.
 
 startitem()
+findex(zfinit)
 item(tt(zfinit [ -n ]))(
 As described above, this is used to initialize the zftp function system.
 The tt(-n) option should be used if the zftp command is already built into
 the shell.
 )
+findex(zfautocheck)
 item(tt(zfautocheck [ -dn ]))(
 This function is called to implement automatic reopening behaviour, as
 described in more detail below.  The options must appear in the first
@@ -338,6 +361,7 @@ transfer.  The host and directory for the last session are stored in the
 variable tt($zflastsession), but the internal host/user/password parameters
 must also be correctly set.
 )
+findex(zfcd_match)
 item(tt(zfcd_match var(prefix) var(suffix)))(
 This performs matching for completion of remote directory names.  If the
 remote server is UNIX, it will attempt to persuade the server to list the
@@ -346,6 +370,7 @@ guaranteed.  On other hosts it simply calls tt(zfget_match) and hence
 completes all files, not just directories.  On some systems, directories
 may not even look like filenames.
 )
+findex(zfget_match)
 item(tt(zfget_match var(prefix) var(suffix)))(
 This performs matching for completion of remote filenames.  It caches files
 for the current directory (only) in the shell parameter tt($zftp_fcache).
@@ -353,12 +378,14 @@ It is in the form to be called by the tt(-K) option of tt(compctl), but
 also works when called from a widget-style completion function with
 var(prefix) and var(suffix) set appropriately.
 )
+findex(zfrglob)
 item(tt(zfrglob var(varname)))(
 Perform remote globbing, as describes in more detail below.  var(varname)
 is the name of a variable containing the pattern to be expanded; if there
 were any matches, the same variable will be set to the expanded set of
 filenames on return.
 )
+findex(zfrtime)
 item(tt(zfrtime var(lfile) var(rfile) [ var(time) ]))(
 Set the local file var(lfile) to have the same modification time as the
 remote file var(rfile), or the explicit time var(time) in FTP format
@@ -368,6 +395,7 @@ Currently this requires tt(perl) version 5 to perform the conversion from
 GMT to local time.  This is unfortunately difficult to do using shell code
 alone.
 )
+findex(zftp_chpwd, supplied version)
 item(tt(zftp_chpwd))(
 This function is called every time a connection is opened, or closed, or
 the remote directory changes.  This version alters the title bar of an
@@ -385,6 +413,7 @@ example(chpwd() {
 
 fits in well.
 )
+findex(zftp_progress, supplied version)
 item(tt(zftp_progress))(
 This function shows the status of the transfer as the percentage of the
 total so far transferred.  It will not write anything unless the output is
@@ -399,6 +428,7 @@ texinode(Miscellaneous Features)()(Zftp Functions)(Zftp Function System)
 sect(Miscellaneous Features)
 
 subsect(Remote globbing)
+cindex(zftp function system, remote globbing)
 
 The commands for retrieving files usually perform filename expansion
 (globbing) on their arguments; this can be turned off by passing the option
@@ -422,6 +452,7 @@ patterns.  This may in some cases be faster, as it avoids retrieving the
 entire list of directory contents.
 
 subsect(Automatic and temporary reopening)
+cindex(zftp function system, automatic reopening)
 
 As described for the tt(zfopen) command, a subsequent tt(zfopen) with no
 parameters will reopen the connection to the last host (this includes

@@ -107,9 +107,6 @@ parentheses the string up to the matching closing one is considered to
 be a list of flags. The flags currently understood are:
 
 startitem()
-item(tt(e))(
-This option has no effect and retained for backward compatibility only.
-)
 item(tt(w))(
 If the parameter subscripted is a scalar than this flag makes
 subscripting work on words instead of characters.  The default word
@@ -161,6 +158,9 @@ item(tt(b:)var(expr)tt(:))(
 if combined with `tt(r)', `tt(R)', `tt(i)' or `tt(I)', makes them begin
 at the var(n)th or var(n)th last element, word, or character (if var(expr)
 evaluates to var(n)).  This flag is ignored when the array is associative.
+)
+item(tt(e))(
+This option has no effect and retained for backward compatibility only.
 )
 enditem()
 texinode(Positional Parameters)(Local Parameters)(Array Parameters)(Parameters)
@@ -431,7 +431,7 @@ The following parameters are used by the shell:
 startitem()
 vindex(ARGV0)
 item(tt(ARGV0))(
-If exported, its value is used as tt(argv[0]) of external commands.
+If exported, its value is used as the tt(argv[0]) of external commands.
 Usually used in constructs like `tt(ARGV0=emacs nethack)'.
 )
 vindex(BAUD)
@@ -888,8 +888,8 @@ vindex(ZBEEP)
 item(tt(ZBEEP))(
 If set, this gives a string of characters, which can use all the same codes
 as the tt(bindkey) command as described in
-ifzman(zmanref(zshzle))\
-ifnzman(noderef(Zsh Line Editor))\
+ifzman(the zle module entry in zmanref(zshmodules))\
+ifnzman(noderef(The zle Module))\
 , that will be output to the terminal
 instead of beeping.  This may have a visible instead of an audible effect;
 for example, the string `tt(\e[?5h\e[?5l)' on a vt100 or xterm will have

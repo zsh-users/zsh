@@ -1,4 +1,4 @@
-#compdef -k complete-word \C-xC
+#compdef -kn complete-word \C-xC
 
 # Function to correct a filename.  Can be used as a completion widget,
 # or as a function in its own right, in which case it will print the

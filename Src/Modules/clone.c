@@ -61,7 +61,7 @@ bin_clone(char *nam, char **args, char *ops, int func)
 	    zwarnnam(nam, "failed to create new session: %e", NULL, errno);
 #endif
 #ifdef TIOCNOTTY
-	    if (ioctl(SHTTY, TIOCNOTTY))
+	    if (ioctl(SHTTY, TIOCNOTTY, 0))
 		zwarnnam(nam, "%e", NULL, errno);
 	    setpgrp(0L, mypid);
 #endif

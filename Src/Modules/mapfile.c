@@ -143,6 +143,9 @@ setpmmapfile(Param pm, char *value)
 	 */
 	ftruncate(fd, len);
 	memcpy(mmptr, value, len);
+#ifndef MS_SYNC
+#define MS_SYNC 0
+#endif
 	msync(mmptr, len, MS_SYNC);
 	/*
 	 * Then we need to truncate again, since mmap() always maps complete

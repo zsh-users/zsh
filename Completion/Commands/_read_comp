@@ -1,4 +1,4 @@
-#compdef -k complete-word \C-x\C-r
+#compdef -kn complete-word \C-x\C-r
 
 # This allows an on-the-fly choice of completions.  On typing the key
 # sequence given above, you will be prompted for a string of arguments.  If

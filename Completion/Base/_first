@@ -53,9 +53,9 @@
 #         if compgen -X "%Bhistory ($n):%b" -Q -H $(( i*10 )) ''; then
 #           # We have found at least one matching word, so we switch
 #           # on menu-completion and make sure that no other
-#           # completion function is called by setting _comp_skip.
+#           # completion function is called by setting _compskip.
 #           compstate[insert]=menu
-#           _comp_skip=1
+#           _compskip=1
 #           return
 #         fi
 #         (( i++ ))

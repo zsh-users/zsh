@@ -1,6 +1,6 @@
 DISTFILES_SRC='
     .distfiles
-    _a2ps _chown _compress _configure _dd _dvi _find
+    _a2ps _bzip2 _bunzip2 _chown _compress _configure _cvs _dd _dvi _find
     _gdb _groups _gunzip _gzip
     _hosts _use_lo _make _man _mh _pdf _ps
     _rcs _rlogin _sh _strip _stty _su

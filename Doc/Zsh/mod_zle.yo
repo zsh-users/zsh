@@ -41,11 +41,9 @@ and does not otherwise count as an argument.
 )
 enditem()
 
-Some operations do not permit a keymap to be selected.
 If a keymap selection is required and none of the options above are used, the
-`tt(main)' keymap is used.  These operations do not permit a keymap to be
-selected:
-
+`tt(main)' keymap is used.  Some operations do not permit a keymap to be
+selected, namely:
 startitem()
 item(tt(-l))(
 List all existing keymap names.  If the tt(-L)
@@ -137,7 +135,10 @@ sitem(tt(^)var(X))(control character)
 endsitem()
 
 In all other cases, `tt(\)' escapes the following character.  Delete is
-written as `tt(^?)'.  Note that `tt(\M^?)' and `tt(^\M?)' are not the same.
+written as `tt(^?)'.  Note that `tt(\M^?)' and `tt(^\M?)' are not the same,
+and that (unlike emacs), the bindings `tt(\M-)var(X)' and `tt(\e)var(X)'
+are entirely distinct, although they are initialized to the same bindings
+by `tt(bindkey -m)'.
 )
 findex(vared)
 cindex(parameters, editing)
@@ -218,8 +219,9 @@ ifzman(zmanref(zshzle))\
 ifnzman(noderef(Zsh Line Editor))\
 .
 )
+citem(completion widgets, creating)
 item(tt(-C) var(widget) var(completion-widget) var(function))(
-Create a user-defined completion widget names var(widget). The 
+Create a user-defined completion widget named var(widget). The 
 completion widget will behave like the built-in completion-widget
 whose name is given as var(completion-widget). To generate the
 completions, the shell function var(function) will be called.
@@ -254,7 +256,7 @@ sets the numerical argument temporarily to var(num), while `tt(-N)' sets it
 to the default, i.e. as if there were none.
 
 Any further arguments will be passed to the widget.  If it is a shell
-function, these are passed down as postional parameters; for builtin
+function, these are passed down as positional parameters; for builtin
 widgets it is up to the widget in question what it does with them.
 Currently arguments are only handled by the incremental-search commands,
 the tt(history-search-forward) and tt(-backward) and the corresponding

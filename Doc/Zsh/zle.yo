@@ -4,9 +4,9 @@ cindex(line editor)
 cindex(editor, line)
 sect(Description)
 pindex(ZLE, use of)
-If the tt(ZLE) option is set (it is by default)
+If the tt(ZLE) option is set (which it is by default in interactive shells)
 and the shell input is attached to the terminal, the user
-is allowed to edit command lines.
+is able to edit command lines.
 
 There are two display modes.  The first, multiline mode, is the
 default.  It only works if the tt(TERM) parameter is set to a valid
@@ -67,7 +67,8 @@ that is bound to some command and is also a prefix of a longer bound string.
 In this case ZLE will wait a certain time to see if more characters
 are typed, and if not (or they don't match any longer string) it will
 execute the binding.  This timeout is defined by the tt(KEYTIMEOUT) parameter;
-its default is 0.4 sec.  No timeout is done if the prefix string is not bound.
+its default is 0.4 sec.  There is no timeout if the prefix string is not
+itself bound to a command.
 
 As well as ZLE commands, key sequences can be bound to other strings, by using
 `tt(bindkey -s)'.
@@ -83,7 +84,7 @@ simply to perform some small action.  The ZLE commands that key sequences
 in keymaps are bound to are in fact widgets.  Widgets can be user-defined
 or built in.
 
-There are 162 standard widgets built in to ZLE (see Standard Widgets below).
+The standard widgets built in to ZLE are listed in Standard Widgets below.
 Other built-in widgets can be defined by other modules (see
 ifzman(zmanref(zshmodules))\
 ifnzman(noderef(Zsh Modules))\
@@ -163,7 +164,7 @@ item(tt(NUMERIC) (integer))(
 The numeric argument. If no numeric argument was given, this parameter
 is unset. When this is set inside a widget function, builtin widgets
 called with the tt(zle) builtin command will use the value
-assigned. If it is unset inside awidget function, builtin widgets
+assigned. If it is unset inside a widget function, builtin widgets
 called behave as if no numeric argument was given.
 )
 vindex(HISTNO)
@@ -508,7 +509,10 @@ Insert the last word from the previous history event at the
 cursor position.  If a positive numeric argument is given,
 insert that word from the end of the previous history event.
 If the argument is zero or negative insert that word from the
-left (zero inserts the previous command word).
+left (zero inserts the previous command word).  Repeating this command
+replaces the word just inserted with the last word from the
+history event prior to the one just used; numeric arguments can be used in
+the same way to pick a word from that event.
 )
 tindex(vi-repeat-search)
 item(tt(vi-repeat-search) (unbound) (n) (unbound))(

@@ -24,7 +24,7 @@ Version 3.1.6
   control code changes; parameters code changes; parameter module;
   additional autoloading code; general code changes for extra efficiency;
   subscripting and ordering of globbing lists.
-  
+
 * Peter Stephenson <pws@ibmth.df.unipi.it>: zftp and mapfile modules and
   zf* functions; local parameters and typeset changes; changes in autoconf
   system; case-independent and approximate pattern matching; various
@@ -33,10 +33,10 @@ Version 3.1.6
 * Bart Schaefer <schaefer@candle.brasslantern.com>: associative array
   implementation; other parameter changes; keeping track of missing
   patches; function autoloading changes.
-  
+
 * Wayne Davison <wayne@clari.net>:  History code novelties and improvements
   with new options.
-  
+
 * Geoff Wing <mason@primenet.com.au>:  Zle display code fixes, mailing
   list and patch archive.
 
@@ -47,7 +47,11 @@ Version 3.1.6
 Other improvements, bug fixes and design suggestions from all the above
 plus Andrej Borsenkow, Oliver Kiddle, Tanaka Akira, Naoki Wakamatsu, Tatuso
 Furukawa, Ville Herva, Will Day, Lehti Rahmi, Larry P. Schrof, Helmut
-Jarausch, Phil Pennock, Wilfredo Sanchez, Bruce Stephens.
+Jarausch, Phil Pennock, Wilfredo Sanchez, Bruce Stephens, Gene Cohler,
+Ollivier Robert.
+
+Previous versions of zsh 3 were maintained by Zoltán Hidvégi and Andrew
+Main (Zefram).
 
 Version 3.0
 -----------

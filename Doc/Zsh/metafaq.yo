@@ -80,7 +80,6 @@ tt(ftp://sunsite.org.uk/packages/zsh/))
 item(USA)(
 nofill(tt(ftp://ftp.math.gatech.edu/pub/zsh/)
 tt(ftp://uiarchive.uiuc.edu/pub/packages/shells/zsh/)
-tt(ftp://ftp.sterling.com/zsh/)  em((G))  em((H))
 tt(ftp://ftp.rge.com/pub/shells/zsh/)
 tt(ftp://foad.org/pub/zsh/)
 tt(http://foad.org/zsh/))

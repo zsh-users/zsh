@@ -240,6 +240,7 @@ The following shell parameters are used by tt(zftp).  Currently none
 of them are special.
 
 startitem()
+vindex(ZFTP_TMOUT)
 item(tt(ZFTP_TMOUT))(
 Integer.  The time in seconds to wait for a network operation to
 complete before returning an error.  If this is not set when the
@@ -374,14 +375,14 @@ subsect(Functions)
 cindex(zftp, functions)
 
 startitem()
-findex(zftp_chpwd)
+findex(zftp_chpwd, specification)
 item(tt(zftp_chpwd))(
 If this function is set by the user, it is called every time the
 directory changes on the server, including when a user is logged
 in, or when a connection is closed.  In the last case, tt($ZFTP_PWD)
 will be unset; otherwise it will reflect the new directory.
 )
-findex(zftp_progress)
+findex(zftp_progress, specification)
 item(tt(zftp_progress))(
 If this function is set by the user, it will be called during
 a tt(get), tt(put) or tt(append) operation each time sufficient data

@@ -7,12 +7,11 @@ cindex(arithmetic evaluation)
 cindex(evaluation, arithmetic)
 findex(let, use of)
 The shell can perform integer arithmetic, either using the builtin tt(let),
-or via a substitution of the form tt($((...))).  Usually arithmetic is
-performed with em(long) integers; however, on certain systems where a
-em(long) has 4-byte precision, zsh may be compiled to use 8-byte precision
-instead.  This can be tested, for example, by giving the command
-`tt(print - $(( 12345678901 )))'; if the number appears unchanged, the
-precision is at least 8 bytes.
+or via a substitution of the form tt($((...))).  The shell is usually
+compiled to use 8-byte precision where this is available, otherwise
+precision is 4 bytes.  This can be tested, for example, by giving the
+command `tt(print - $(( 12345678901 )))'; if the number appears unchanged,
+the precision is at least 8 bytes.
 
 The tt(let) builtin command takes arithmetic expressions as arguments; each
 is evaluated separately.  Since many of the arithmetic operators, as well
@@ -85,7 +84,7 @@ Named parameters and subscripted arrays can be referenced by name within an
 arithmetic expression without using the parameter expansion syntax.  For
 example,
 
-example((((val2 = val1 * 2))))
+example(((val2 = val1 * 2)))
 
 assigns twice the value of tt($val1) to the parameter named tt(val2).
 

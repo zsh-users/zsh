@@ -173,11 +173,23 @@ example(echo foo > bar > baz)
 
 when tt(MULTIOS) is unset will truncate bar, and write `tt(foo)' into baz.
 
+sect(Redirections with no command)
+vindex(NULLCMD, use of)
+vindex(READNULLCMD, use of)
 If a simple command consists of one or more redirection operators
-and zero or more parameter assignments, but no command name,
-the command named in the shell variable tt(READNULLCMD) is assumed.
-(If tt(READNULLCMD) is empty or not set, `tt(cat)' is used.)  Thus
+and zero or more parameter assignments, but no command name, and the
+parameter tt(NULLCMD) is not set, an error is caused.  If the parameter
+tt(NULLCMD) is set, its value will be inserted as a command with the
+given redirections.  If both tt(NULLCMD) and tt(READNULLCMD) are set, then
+the value of the latter will be used instead of that of the former when the
+redirection is an input.  The default for tt(NULLCMD) is `tt(cat)' and for
+tt(READNULLCMD) is `tt(more)'. Thus
 
 example(< file)
 
-copies the contents of tt(file) to the standard output.
+shows the contents of tt(file) on standard output, with paging if that is a
+terminal.  tt(NULLCMD) and tt(READNULLCMD) may refer to shell functions.
+
+The standard Bourne shell behaviour is obtained by setting tt(NULLCMD) and
+tt(READNULLCMD) to `tt(:)'.  This is the default when zsh is emulating bf(sh)
+or bf(ksh).

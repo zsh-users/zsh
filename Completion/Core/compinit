@@ -114,7 +114,8 @@ fi
 # whose name is given as the first argument be autoloaded. When defining
 # a function for command names the `-n' option may be given and keeps
 # the definitions from overriding any previous definitions for the
-# commands.
+# commands; with `-k', the `-n' option prevents compdef from rebinding
+# a key sequence which is already bound.
 # For deleting definitions, the `-d' option must be given. Without the
 # `-p' option, this deletes definitions for functions for the commands
 # whose names are given as arguments. If combined with the `-p' option
@@ -202,6 +203,10 @@ compdef() {
 
       # And bind the keys...
       for i; do
+        if [[ -n $new ]]; then
+	   bindkey "$i" | read -A opt
+	   [[ $opt[-1] = undefined-key ]] || continue
+	fi
         bindkey "$i" "$func"
       done
       ;;
@@ -354,7 +359,7 @@ if [[ -z "$_i_done" ]]; then
       shift _i_line
       case $_i_tag in
       (\#compdef)
-	if [[ $_i_line[1] = -[pk] ]]; then
+	if [[ $_i_line[1] = -[pk](n|) ]]; then
 	  compdef ${_i_line[1]}a "${_i_file:t}" "${(@)_i_line[2,-1]}"
 	else
 	  compdef -na "${_i_file:t}" "${_i_line[@]}"

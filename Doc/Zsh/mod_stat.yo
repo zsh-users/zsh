@@ -85,10 +85,10 @@ item(tt(-A) var(array))(
 Instead of displaying the results on standard
 output, assign them to an var(array), one tt(struct stat) element per array
 element for each file in order.  In this case neither the name
-of the element nor the name of the files is provided unless the
-tt(-t) or tt(-n) options are provided, respectively.  In the
-former case the element name appears as a prefix to the
-appropriate array element and in the latter case the file name
+of the element nor the name of the files appears in var(array) unless the
+tt(-t) or tt(-n) options were given, respectively.  If tt(-t) is given,
+the element name appears as a prefix to the
+appropriate array element; if tt(-n) is given, the file name
 appears as a separate array element preceding all the others.
 Other formatting options are respected.
 )

@@ -1,6 +1,7 @@
 texinode(The complist Module)(The deltochar Module)(The compctl Module)(Zsh Modules)
 sect(The complist Module)
 cindex(completion, listing)
+cindex(completion, coloured listings)
 The tt(complist) module offers two extensions to completion listings:
 the ability to highlight matches in such a list and a different
 style of menu-completion.
@@ -12,6 +13,8 @@ not automatically be loaded if it is not linked in:  on systems with
 dynamic loading, `tt(zmodload complist)' is required.
 
 subsect(Parameters)
+vindex(ZLS_COLORS)
+vindex(ZLS_COLOURS)
 The parameters tt(ZLS_COLORS) and tt(ZLS_COLOURS) describe how matches
 are highlighted. To turn on highlighting an empty value suffices, in
 which case all the default values given below will be used. The format of the
@@ -78,6 +81,9 @@ vt100 compatible terminals such as tt(xterm)s. On monochrome terminals
 the default values will have no visual effect.
 
 subsect(Menu selection)
+cindex(completion, selecting by cursor)
+vindex(SELECTMIN)
+tindex(menu-select)
 The tt(complist) module also offers an alternative style of selecting
 matches from a list, called menu-selection, which can be used if the
 shell is set up to return to the last prompt after showing a

@@ -61,8 +61,9 @@ COMMENT(--- section divisions ---)
 
 def(chapter)(1)(CMT())
 
+COMMENT(--- the "" works around a yodl bug ---)
 def(sect)(1)(\
-  NOTRANS(.SH ")UPPERCASE(ARG1)(0)"NL()\
+  NOTRANS(.SH )UPPERCASE(ARG1)(0)""NL()\
   STDPAR()\
   CMT()\
 )

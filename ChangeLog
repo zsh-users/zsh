@@ -1,4 +1,121 @@
+1999-07-24  Peter Stephenson  <pws@ibmth.df.unipi.it>
+
+	* pws: version 3.1.6-test-3
+
+	* pws: lastest FAQ.yo, FAQ
+
+1999-07-23  Peter Stephenson  <pws@ibmth.df.unipi.it>
+
+	* pws: 7264: Completion/Commands/_correct_filename,
+	  Completion/Commands/_correct_word,
+	  Completion/Commands/_expand_word,
+	  Completion/Commands/_history_complete_word,
+	  Completion/Commands/_most_recent_file,
+	  Completion/Commands/_read_comp, Completion/Core/compinit,
+	  Doc/Zsh/compsys.yo: compdef -k takes -n option not to override
+	  existing keybinding; used in completion command widgets to
+	  keep user bindings during compinit.
+
+	* Sven: 7260: Completion/Core/_main_complete: commented-out
+	  option saving bit can uses parameter module
+
+	* Sven: 7259, 7261: Src/subst.c, Src/Modules/parameter.c,
+	  Doc/Zsh/expn.yo, Completion/Core/_normal,
+	  Completion/Core/_parameters: parameter module provides
+	  local information; used in _parameters; _normal uses
+	  $commands when available.
+
+	* pws: 7257: Completion/Core/_parameters: simplify.
+
+	* Tanak Akira: 7256: Completion/User/_bzip2,
+	  Completion/User/_bunzip2: new.
+
+	* Tanaka Akira: 7255: Completion/User/_make: complete after =.
+
+	* Oliver: 7254: Completion/Builtins/_aliases: do unalias.
+
+1999-07-22  Peter Stephenson  <pws@ibmth.df.unipi.it>
+
+	* pws: 7253: Doc/Zsh/arith.yo, Doc/Zsh/builtins.yo,
+	  Doc/Zsh/compctl.yo, Doc/Zsh/compsys.yo, Doc/Zsh/compwid.yo,
+	  Doc/Zsh/cond.yo, Doc/Zsh/expn.yo, Doc/Zsh/files.yo,
+	  Doc/Zsh/func.yo, Doc/Zsh/grammar.yo, Doc/Zsh/invoke.yo,
+	  Doc/Zsh/jobs.yo, Doc/Zsh/mod_stat.yo, Doc/Zsh/mod_zle.yo,
+	  Doc/Zsh/options.yo, Doc/Zsh/params.yo, Doc/Zsh/redirect.yo,
+	  Doc/Zsh/zle.yo, Doc/ztexi.yo, Util/zsh-development-guide:
+	  General documentation fixes and enhancements.
+
+	* Sven: 7251: Src/Zle/zle_tricky.c: completion words wrapper
+	  tweak thing.
+
+1999-07-21  Peter Stephenson  <pws@ibmth.df.unipi.it>
+
+	* Bart: 7246: Completion/Builtin/_functions: complete for
+	  _functions.
+
+	* Tanaka Akira, Sven: 7243, 7250: Completion/Base/_complete_opts,
+	  Completion/User_cvs: enhancements for cvs completion.
+
+	* Sven: 7241: Completion/Base/_first: typos
+
+	* pws: 7231: README, Etc/CONTRIBUTORS: notes for latest release
+	  including possible incompatibilities.
+
+	* Bart: 7230: Src/exec.c: cancd2 didn't free string properly
+	  (or at all, in fact).
+
+	* Tanaka Akira, Bart: 7228: Completion/User/_cvs,
+	  Completion/User/_complete_opts:  completion for cvs.
+	
+1999-07-20  Peter Stephenson  <pws@ibmth.df.unipi.it>
+
+	* pws: 7226: INSTALL: mention that dependent libraries of zle
+	  can't be used if zle is dynamically loaded on systems without
+	  working RTLD_GLOBAL.
+
+	* pws: 7223: Doc/Makefile.in, Doc/Zsh/compsys.yo,
+	  Doc/Zsh/compwid.yo, Doc/Zsh/mod_complist.yo,
+	  Doc/Zsh/mod_zftp.yo, Doc/Zsh/mod_zle.yo, Doc/Zsh/zftpsys.yo:
+	  dependences for texinfo manual; extra index entries.
+
+	* Sven: 7220: Src/Zle/complist.c: `*=' works and the last
+	  column is set.
+
+	* Sven: 7219: Src/Zle/zle_tricky.c, Doc/Zsh/compwid.yo:
+	  compstate[force_list] now works as documented.
+
+	* Sven: 2456: Src/Zle/zle_tricky.c, Doc/Zsh/compwid.yo: 
+	  clear explanation string; document compstate[insert]=''
+	  is same as unsetting.
+
+	* pws: 7218: Doc/Makefile.in, Doc/zman.yo: delete all manual
+	  page lines beginning .'; work around yodl .SH ""NAME problem.
+
+	* Sven: 7217: Src/exec.c: duplicate function name for scriptname.
+
+	* Sven: 7216: Src/Zle/zle_tricky.c: insertion with old and
+	  new completion.
+
+	* Tanaka Akira: 7213: Doc/Makefile.in: postprocess manual pages
+	  to remove yodl cruft.
+
+	* Ollivier: 7209, 7210: configure.in, Etc/MACHINES: Elf and a.out
+	  dynamic loading on FreeBSD (MACHINES entry adapted).
+
 1999-07-19  Peter Stephenson  <pws@ibmth.df.unipi.it>
+
+	* Tanaka Akira: 7205: Src/Modules/mapfile.c: MS_SYNC was not
+          defined on SunOS 4.
+
+	* pws: 7202: Src/Modules/clone.c: add an extra zero argument
+	  to ioctl() to make three.
+
+	* pws: from Ollivier Robert: Etc/MACHINES: FreeBSD 4.0 builds OK.
+
+	* pws: 7196: Src/Zle/zle_tricky.c: try to handle multiple supplied
+	  (-P) prefixes better.
+
+	* pws: 2446: Completion/User/_rlogin: handle user@host better.
 
 	* pws: version 3.1.6-test-2
 

@@ -1,9 +1,15 @@
 #compdef rlogin rsh ssh
 
-if [[ CURRENT -eq 2 ]]; then
-  _hosts
+if [[ CURRENT -eq 2 ]];
+  if compset -P 1 '*@'; then
+   _hosts
+  else
+    local nm=${compstate[nmatches]}
+    _hosts
+    [[ nm -eq compstate[nmatches] ]] && compgen -S @ -u
+  fi
 elif [[ CURRENT -eq 3 ]]; then
   compadd - -l
 else
-  compgen -u
+  compgen -S @ -u
 fi

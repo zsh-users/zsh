@@ -39,7 +39,8 @@ cindex(expanding parameters)
 cindex(parameters, expanding)
 cindex(doing nothing)
 item(tt(:) [ var(arg) ... ])(
-This command only expands parameters.  A zero exit code is returned.
+This command does nothing, although normal argument expansions is performed
+which may have effects on shell parameters.  A zero exit code is returned.
 )
 findex(alias)
 cindex(aliases, defining)
@@ -161,8 +162,8 @@ causes tt(disable) to act on aliases.  The tt(-f) option causes
 tt(disable) to act on shell functions.  The tt(-r) options causes
 tt(disable) to act on reserved words.  Without arguments all disabled
 hash table elements from the corresponding hash table are printed.
-With the tt(-m) flag the arguments are taken as patterns (should be
-quoted to preserve them from being taken as glob patterns), and all hash
+With the tt(-m) flag the arguments are taken as patterns (which should be
+quoted to prevent them from undergoing filename expansion), and all hash
 table elements from the corresponding hash table matching these patterns
 are disabled.  Disabled objects can be enabled with the tt(enable)
 command.
@@ -221,7 +222,16 @@ item(tt(emulate) [ tt(-LR) ] {tt(zsh)|tt(sh)|tt(ksh)|tt(csh)})(
 Set up zsh options to emulate the specified shell as much as possible.
 bf(csh) will never be fully emulated.
 If the argument is not one of the shells listed above, tt(zsh)
-will be used as a default.  If the tt(-R) option is given, all options
+will be used as a default; more precisely, the tests performed on the
+argument are the same as those used to determine the emulation at startup
+based on the shell name, see
+ifzman(\
+the section `Compatibility' in zmanref(zshmisc)
+)\
+ifnzman(\
+noderef(Compatibility)
+)\
+.  If the tt(-R) option is given, all options
 are reset to their default value corresponding to the specified emulation
 mode, except for certain options describing the interactive
 environment; otherwise, only those options likely to cause portability
@@ -407,7 +417,7 @@ and for the named directory hash table this adds all users' home directories.
 These two options cannot be used with any arguments.
 
 The tt(-m) option causes the arguments to be taken as patterns
-(they should be quoted) and the elements of the hash table
+(which should be quoted) and the elements of the hash table
 matching those patterns are printed.  This is the only way to display
 a limited selection of hash table elements.
 
@@ -603,8 +613,8 @@ item(tt(-O))(
 Print the arguments sorted in descending order.
 )
 item(tt(-i))(
-If given together with tt(-o) or tt(-O), makes them work case
-independently.
+If given together with tt(-o) or tt(-O), sorting is performed
+case-independently.
 )
 item(tt(-c))(
 Print the arguments in columns.
@@ -810,8 +820,8 @@ Set the options for the shell.  All options specified either
 with flags or by name are set.  If no arguments are supplied,
 the names of all options currently set are printed.
 If the tt(-m) flag is given the arguments are taken as patterns
-(which should be quoted to preserve them from being interpreted as glob
-patterns), and all options with names matching these patterns are set.
+(which should be quoted to protect them from filename expansion), and all
+options with names matching these patterns are set.
 )
 findex(shift)
 cindex(parameters, positional)
@@ -882,7 +892,7 @@ For example,
 
 example(trap 'print $LINENO' DEBUG)
 
-will print the line number of command executed after it has run, while
+will print the line number of a command executed after it has run, while
 
 example(TRAPDEBUG() { print $LINENO; })
 
@@ -931,7 +941,7 @@ retain their special attributes when made local.
 
 For each var(name)tt(=)var(value) assignment, the parameter
 var(name) set to var(value).  Note that arrays currently cannot be
-assigned in tt(typeset) expressions; scalars and integers only.
+assigned in tt(typeset) expressions, only scalars and integers.
 
 For each remaining var(name) that refers to a parameter that is set, the
 name and value of the parameter are printed in the form of an assignment.
@@ -968,9 +978,9 @@ those parameters that have the specified attributes, and using `tt(PLUS())'
 rather than `tt(-)' to introduce the flag suppresses printing of the values
 of parameters when there is no parameter name.  Also, if the option list
 ends with `tt(PLUS())', values will not be printed.  If only the tt(-m)
-flag is given the arguments are taken as patterns (should be quoted) and
-all parameters (or functions with the tt(-f) flag) with matching names are
-printed.  If no attribute flags and no tt(-m) flag is present, the
+flag is given the arguments are taken as patterns (which should be quoted)
+and all parameters (or functions with the tt(-f) flag) with matching names
+are printed.  If no attribute flags and no tt(-m) flag is present, the
 parameter names will be preceded by a list of any attributes (tt(array),
 tt(association), tt(exported), tt(integer), tt(readonly)).
 

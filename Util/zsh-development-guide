@@ -659,13 +659,13 @@ Documentation
     it should be included within `example(...)'.  The text will be
     indented, will not be filled and will be put into a fixed width font.
   - If the text includes mixed fonts, it should be included within
-    `indent(...)'.  As with `example()', the text is not filled, but now
-    explicit font-changing commands are required inside.
+    `indent(...)'.  The text is now filled unless `nofill(...)' is also
+    used, and explicit font-changing commands are required inside.
   - If the text appears inside some other format, such as for example the
     `item()' list structure, then the instruction `nofill(...)', which
     simply turns off filling should be used; as with `indent(...)',
-    explicit font changing commands are required.  This is also an
-    alternative to `indent()' when no identation is required, e.g. if the
+    explicit font changing commands are required.  This can be used
+    without `indent()' when no identation is required, e.g. if the
     accumulated indentation would otherwise be too long.
   All the above should appear on their own, separated by newlines from the
   surrounding text.  No extra newlines after the opening or before the

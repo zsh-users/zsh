@@ -51,20 +51,24 @@ within the completion widget) to the values they had when the function was
 entered.
 
 startitem()
+vindex(words)
 item(tt(words))(
 This array contains the words present on the command line currently being
 edited.
 )
+vindex(CURRENT)
 item(tt(CURRENT))(
 This is the number of the current word, i.e. the word the cursor is
 currently on in the tt(words) array.  Note that this value is only
 correct if the tt(ksharrays) options is not set.
 )
+vindex(PREFIX)
 item(tt(PREFIX))(
 Initially this will be set to the part of the current word from the
 beginning of the word up to the position of the cursor; it may be altered
 to give a common prefix for all matches.
 )
+vindex(IPREFIX)
 item(tt(IPREFIX))(
 Initially this will be set to the empty string.  It functions like
 tt(PREFIX), and gives a string which precedes the one in tt(PREFIX) and is
@@ -76,8 +80,10 @@ example(IPREFIX=${PREFIX%%\=*}=
 PREFIX=${PREFIX#*=})
 
 causes the part of the prefix up to and including the first equal sign not
-to be treated as part of a matched string.
+to be treated as part of a matched string.  This can be done automatically
+by the tt(compset) builtin, see below.
 )
+vindex(QIPREFIX)
 item(tt(QIPREFIX))(
 This parameter is read-only and contains the quoted string up to the
 word being completed. E.g. when completing `tt("foo)', this parameter
@@ -85,6 +91,7 @@ contains the double quote. If the tt(-q) option of tt(compset) is used
 (see below), and the original string was `tt("foo bar)' with the
 cursor on the `tt(bar)', this parameter contains `tt("foo )'.
 )
+vindex(SUFFIX)
 item(tt(SUFFIX))(
 Initially this will be set to the part of the current word from the
 cursor position to the end; it may be altered to give a common suffix for
@@ -92,14 +99,18 @@ all matches.  It is most useful when the option tt(COMPLETE_IN_WORD) is
 set, as otherwise the whole word on the command line is treated as a
 prefix.
 )
+vindex(ISUFFIX)
 item(tt(ISUFFIX))(
 As tt(IPREFIX), but for a suffix that should not be considered part
 of the matches; note that the tt(ISUFFIX) string follows the tt(SUFFIX)
 string.
 )
+vindex(QISUFFIX)
 item(tt(QISUFFIX))(
 Like tt(QIPREFIX), but containing the suffix.
 )
+vindex(compstate)
+cindex(completion widgets, examining and setting state in)
 item(tt(compstate))(
 This is an associative array with various keys and values that the
 completion code uses to exchange information with the completion widget.
@@ -212,7 +223,7 @@ would normally cause them to be.  It will be set appropriately on entry to
 a completion widget and may be changed there.
 )
 item(tt(force_list))(
-If the value for the tt(list) key is tt(ambiguous), the list will
+If the value for the tt(list) key is tt(autolist) or tt(ambiguous), the list will
 normally be shown only if there are at least two matches in the
 list. Setting tt(force_list) to an non-empty string forces the list to be
 shown even if there is only one match.
@@ -236,7 +247,8 @@ matches is to be inserted; if set to tt(menu) or tt(automenu) the usual
 behaviour of the tt(MENU_COMPLETE) or tt(AUTO_MENU) options, respectively,
 is to be used.
 
-On exit it may be set to any of the values above, or to a number, in which
+On exit it may be set to any of the values above (where setting it to
+the empty string is the same as unsetting it), or to a number, in which
 case the match whose number is given will be inserted into the command line.
 It may also be set to a string of the form `var(group):var(match)' which
 specifies a match from a group of matches to be inserted, counting from 1
@@ -326,6 +338,7 @@ enditem()
 texinode(Builtin Commands)(Condition Codes)(Special Parameters)(Completion Widgets)
 sect(Builtin Commands)
 startitem()
+cindex(completion widgets, generating matches with flags)
 findex(compgen)
 item(tt(compgen) var(flags ...))(
 
@@ -351,6 +364,8 @@ builtin command.
 The return value is zero if at least one match was added and non-zero
 otherwise.
 )
+findex(compadd)
+cindex(completion widgets, adding specified matches)
 xitem(tt(compadd) [ tt(-qQfnUam) ] [ tt(-F) var(array) ])
 xitem([ tt(-P) var(prefix) ] [ tt(-S) var(suffix) ])
 xitem([ tt(-p) var(hidden-prefix) ] [ tt(-s) var(hidden-suffix) ])
@@ -556,6 +571,8 @@ hyphens.
 )
 enditem()
 )
+findex(compset)
+cindex(completion widgets, modifying special parameters)
 xitem(tt(compset -p) var(number))
 xitem(tt(compset -P) [ var(number) ] var(pattern))
 xitem(tt(compset -s) var(number))
@@ -662,6 +679,7 @@ enditem()
 
 texinode(Condition Codes)(Examples)(Builtin Commands)(Completion Widgets)
 sect(Condition Codes)
+cindex(completion widgets, condition codes)
 
 The following additional condition codes for use within the tt([[ ... ]])
 construct are available in completion widgets.  These work on the special
@@ -687,6 +705,7 @@ enditem()
 
 texinode(Examples)()(Condition Codes)(Completion Widgets)
 sect(Examples)
+cindex(completion widgets, examples)
 
 The first step is to define the widget:
 
@@ -711,3 +730,4 @@ source code distribution, see
 ifzman(zmanref(zshcompsys))\
 ifnzman(noderef(Completion System))\
 .
+

@@ -3,7 +3,7 @@
 if [[ "$words[CURRENT-1]" = \
   (*erase|discard|status|dsusp|intr|kill|lnext|quit|reprint|start|s*p) ]]
 then
-     compadd -Q '^-' '^h' '^?' '^c' '^u'
+     compadd '^-' '^h' '^?' '^c' '^u'
 else
   compset -P '[-+]'
   compadd rows columns intr quit erase kill eof eol \

@@ -1,6 +1,6 @@
 texinode(Completion System)(Zftp Function System)(Zsh Modules)(Top)
 chapter(Completion System)
-cindex(completion, system)
+cindex(completion system)
 cindex(completion, programmable)
 cindex(completion, controlling)
 sect(Description)
@@ -22,6 +22,8 @@ endmenu()
 
 texinode(Initialization)(Control Functions)()(Completion System)
 sect(Initialization)
+findex(compinstall)
+cindex(completion system, installing)
 
 The function tt(compinstall) can be run by a user to set up the completion
 system for use, which also provides options for more advanced usage.
@@ -60,6 +62,8 @@ Should you need to, you can still bind keys to the old functions by putting
 a `tt(.)' in front, e.g. `tt(.expand-or-complete)'.
 
 subsect(Use of compinit)
+findex(compinit)
+cindex(completion system, initializing)
 
 This section describes the use of tt(compinit) to initialize completion for
 the current session when run directly by the user; if you have run
@@ -77,9 +81,9 @@ configuration which will be read in on future invocations; this is the
 default, although it can be turned off by calling tt(compinit) with the
 option tt(-D).  The dumped file is tt(.zcompdump) in the same
 directory as the startup files (i.e. tt($ZDOTDIR) or tt($HOME));
-alternatively, an explicit file name can be given following the option
-tt(-d).  On the next call to tt(compinit -d), the dumped file will be read
-instead.
+alternatively, an explicit file name can be given by `tt(compinit -d)
+var(dumpfile)'.  On the next call to tt(compinit), the dumped file will be
+read instead of a full initialization.
 
 If the number of completion files changes, tt(compinit) will recognise this
 and produce a new dump file.  However, if the name of a function or the
@@ -97,6 +101,7 @@ where completion functions can be found; this is only necessary if they are
 not already in the function search path.
 
 subsect(Autoloaded files)
+cindex(completion system, autoloaded functions)
 
 The convention for autoloaded functions used in completion is that they
 start with an underscore; as already mentioned, the tt(fpath/FPATH)
@@ -146,7 +151,9 @@ tt(menu-expand-or-complete), or tt(reverse-menu-complete). If the
 tt(complist) module is loaded (see
 ifzman(zmanref(zshmodules))\
 ifnzman(noderef(The complist Module))\
-), the tt(menu-select) widget can be used, too.
+), the tt(menu-select) widget can be used, too.  If the option tt(-n) is
+also given, the bindings will not be used if the key is already bound (that
+is, is bound to something other than tt(undefined-key)).
 
 The widget is then bound to all the var(key-sequences) given, if any: when
 one of the var(key-sequences) is typed, the function in the file will
@@ -172,6 +179,8 @@ subsect(Functions)
 The tt(compinit) file defines the following functions, which may
 also be called directly by the user.
 
+findex(compdef)
+cindex(completion system, adding definitions)
 startitem()
 xitem(tt(compdef) [ tt(-an) ] var(function names...))
 xitem(tt(compdef -d) var(names...))
@@ -195,15 +204,21 @@ and will otherwise behave like the builtin widget whose name is given as
 the var(style) argument. The widgets usable for this are:
 tt(complete-word), tt(delete-char-or-list), tt(expand-or-complete),
 tt(expand-or-complete-prefix), tt(list-choices), tt(menu-complete),
-tt(menu-expand-or-complete), and tt(reverse-menu-complete).
+tt(menu-expand-or-complete), and tt(reverse-menu-complete), as well as
+tt(menu-select) if the tt(complist) module is loaded.  The option tt(-n)
+prevents the key being bound if it is already to bound to something other
+than tt(undefined-key).
 
 In each of the forms supporting it the tt(-a) option makes the
 var(function) autoloadable (exactly equivalent to
 tt(autoload )var(function)).
 )
+findex(compconf)
+cindex(completion system, configuring)
 xitem(tt(compconf) var(definitions...))
 xitem(tt(compconf) [ tt(-L) ] )
 item(tt(compconf) [ tt(-l) ] [ tt(-L) ] var(keys...))(
+vindex(compconfig)
 Several aspects of the completion system can be configured by the
 user. The configuration values are stored under the keys described
 below in the associative array `tt(compconfig)'.  After sourcing
@@ -228,6 +243,7 @@ enditem()
 
 texinode(Control Functions)(Completion Functions)(Initialization)(Completion System)
 sect(Control Functions)
+cindex(completion system, choosing completers)
 
 The initialization script tt(compinit) redefines all the widgets
 which perform completion to call the supplied widget
@@ -257,6 +273,7 @@ argument was given.
 The following completer functions are contained in the distribution (users
 may write their own):
 
+cindex(completion system, completers)
 startitem()
 item(tt(_complete))(
 This completer generates all possible completions in a context-sensitive
@@ -587,7 +604,7 @@ otherwise, the standard completion list will be generated:  this is the
 default behaviour of tt(_oldlist). However, if there is an old list
 and this key contains the name of the completer function that
 generated the list, then the old list will be used even if it was
-generated by a widget which does not listing.
+generated by a widget which does not do listing.
 
 For example, suppose you type tt(^Xc) to use the tt(_correct_word)
 widget, which generates a list of corrections for the word under the
@@ -606,7 +623,7 @@ matches generated on the first attempt will be used again.
 )
 item(tt(oldlist_menu))(
 Controls how menu completion behaves when a completion has already been
-inserted and the user types a standard completion key type as tt(TAB).
+inserted and the user types a standard completion key type such as tt(TAB).
 The default behaviour of tt(_oldlist) is that menu completion always
 continues with the existing list of completions.  If this key is set to
 tt(never), however, a new completion is started if the old list was
@@ -625,6 +642,7 @@ enditem()
 
 texinode(Completion Functions)(Completion Directories)(Control Functions)(Completion System)
 sect(Utility Functions)
+cindex(completion system, utility functions)
 
 Descriptions follow for utility functions that may be
 useful when writing completion functions.  Most of these reside in the
@@ -798,6 +816,7 @@ enditem()
 
 texinode(Completion Directories)(Bindable Commands)(Completion Functions)(Completion System)
 sect(Completion Directories)
+cindex(completion system, directory structure)
 
 In the source distribution, the files are contained in various
 subdirectories of the tt(Completion) directory.  They may have been
@@ -832,6 +851,7 @@ enditem()
 
 texinode(Bindable Commands)()(Completion Directories)(Completion System)
 sect(Bindable Commands)
+cindex(completion system, bindable commands)
 
 In addition to the context-dependent completions provided, which are
 expected to work in an intuitively obvious way, there are a few widgets
@@ -841,8 +861,9 @@ following is a list of these and their default bindings.
 startitem()
 item(tt(_correct_filename (^XC)))(
 Correct the filename path at the cursor position.  Allows up to six errors
-in the name.  Can also be correctly called with an argument to correct
-a filepath, independently of zle.
+in the name.  Can also be called with an argument to correct
+a filepath, independently of zle; the correction is printed on standard
+output.
 )
 item(tt(_correct_word) (^Xc))(
 Performs correction of the current argument using the usual contextual

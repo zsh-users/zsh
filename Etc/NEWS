@@ -12,6 +12,8 @@ programmability and configurability:
  - control over matching for case-independence, partial word completion, etc.
  - menu selection:  choose a completion by moving the cursor
  - coloured completion lists
+ - completion of filenames in quotes is now more reliable; splitting
+   quoted strings into command arguments is also possible.
 
 Other editing changes:
   - enhancements to function/editing interface:  new parameters, numeric

@@ -13,7 +13,7 @@ def(mybf)(1)(\
   whenhtml(bf(ARG1))\
   whenlatex(bf(ARG1))\
   whenms(bf(ARG1))\
-  whensgml(bf(ARG1)))
+  whensgml(bf(ARG1)))\
 def(myem)(1)(\
   whentxt(_ARG1_)\
   whenhtml(em(ARG1))\
@@ -45,13 +45,21 @@ whenms(report(ARG1)(ARG2)(ARG3))\
 whensgml(report(ARG1)(ARG2)(ARG3)))
 myreport(Z-Shell Frequently-Asked Questions)(Peter Stephenson)(1999/05/24)
 COMMENT(-- the following are for Usenet and must appear first)\
-description(
+description(\
 mydit(Archive-Name:) unix-faq/shell/zsh
-mydit(Last-Modified:) 1999/05/24
+mydit(Last-Modified:) 1999/07/24
 mydit(Submitted-By:) email(pws@ibmth.df.unipi.it (Peter Stephenson))
-mydit(Version:) $Id: FAQ.yo,v 1.1.1.7 1999/07/03 13:17:25 akr Exp $
+mydit(Version:) $Id: FAQ.yo,v 1.1.1.8 1999/07/24 14:02:44 akr Exp $
 mydit(Posting-Frequency:) Monthly
 mydit(Copyright:) (C) P.W. Stephenson, 1995--1999 (see end of document)
+)
+
+bf(Changes since issue posted June 1999:)
+description(
+mydit(1.6)  FTP site changes
+mydit(3.9)  delete bogus claim that ttyctl code may be updated some day;
+     add note about possible termcap deinitialization sequences
+mydit(5.1)  80-column display bug.
 )
 
 This document contains a list of frequently-asked (or otherwise
@@ -356,6 +364,8 @@ url(ftp://ftp.math.technion.ac.il/mirror/ftp.zsh.org/pub/zsh/)
     mydit()          \
 url(http://www.math.technion.ac.il/mirror/ftp.zsh.org/pub/zsh/)
 (http://www.math.technion.ac.il/mirror/ftp.zsh.org/pub/zsh/)
+    mydit(Italy)     url(ftp://ftp.unina.it/pub/Unix/pkgs/shell/zsh/)
+(ftp://ftp.unina.it/pub/Unix/pkgs/shell/zsh/)
     mydit(Japan)     url(ftp://ftp.tohoku.ac.jp/mirror/zsh/)
 (ftp://ftp.tohoku.ac.jp/mirror/zsh/)
     mydit()          url(ftp://ftp.nisiq.net/pub/shells/zsh/)
@@ -379,8 +389,6 @@ url(http://www.math.technion.ac.il/mirror/ftp.zsh.org/pub/zsh/)
 (ftp://ftp.math.gatech.edu/pub/zsh/)
     mydit()          url(ftp://uiarchive.uiuc.edu/pub/packages/shells/zsh/)
 (ftp://uiarchive.uiuc.edu/pub/packages/shells/zsh/)
-    mydit()          url(ftp://ftp.sterling.com/zsh/)
-(ftp://ftp.sterling.com/zsh/)
     mydit()          url(ftp://ftp.rge.com/pub/shells/zsh/)
 (ftp://ftp.rge.com/pub/shells/zsh/)
     mydit()          url(ftp://foad.org/pub/zsh/)
@@ -1210,6 +1218,13 @@ sect(Why does my terminal act funny in some way?)
   from hiccups introduced by other programmes (kermit has been known to
   do this).
 
+  A problem I have experienced myself (on an AIX 3.2 workstation with
+  xterm) is that termcap deinitialization sequences sent by `less'
+  were causing automargins to be turned off --- not actually a shell
+  problem, but you might have thought it was.  The fix is to put `tt(X)'
+  into the environment variable tt(LESS) to stop the sequences being sent.
+  Other programs (though not zsh) may also send that sequence.
+
   If myem(that)'s not the problem, and you are having difficulties with
   external commands (not part of zsh), and you think some terminal
   setting is wrong (e.g. tt(^V) is getting interpreted as `literal next
@@ -1222,12 +1237,6 @@ sect(Why does my terminal act funny in some way?)
   that zsh doesn't reset the terminal completely afterwards: just the
   modes it uses itself and a number of special processing characters
   (see the tt(stty(1)) manual page).
-
-  At some point there may be an overhaul which allows the terminal
-  modes used by the shell to be modified separately from those seen by
-  external programmes.  This is partially implemented already: from 2.5,
-  the shell is less susceptible to mode changes inherited from
-  programmes than it used to be.
 
 
 sect(Why does zsh not work in an Emacs shell mode any more?)
@@ -1917,6 +1926,8 @@ this applies
 
   itemize(
   it() mytt(time) is ignored with builtins and can't be used with mytt({...}).
+  it() When showing completion lists with exactly 80 columns, some
+       terminals print an extra newline which messes up zsh's logic.  
   it() mytt(set -x) (mytt(setopt xtrace)) still has a few glitches; these
      are mostly fixed in 3.1.6.
   it() Zsh's notion of the current line number (via tt($LINENO)) is
@@ -1927,7 +1938,8 @@ this applies
   it() The mytt(r) command does not work inside mytt($(...)) or mytt(`...`)
      expansions.   This is fixed in 3.1.
   it() mytt(typeset) handling is non-optimal, particularly with regard to
-     flags, and is ksh-incompatible in unpredictable ways. 
+     flags, and is ksh-incompatible in unpredictable ways.  3.1.6 has
+     been overhauled, but remaining glitches are to be expected.
   it() Nested closures in extended globbing and pattern matching, such as
   verb(
       [[ fofo = (fo#)# ]]
@@ -1960,7 +1972,7 @@ this applies
      mytt(compress file) any more.  For this reason, mytt(\M-n) and
      mytt(\M-p) use tt(history-beginning-search-{forward,backward}) which
      search for a line with the same prefix up to the cursor position.
-     From 3.1.6, there is likely to be a different implementation which
+     From 3.1.6, there will be a different implementation which
      makes this closer (though not identical) to the old behaviour.
      The story for the tt({up,down}-line-or-search) commands is similar.
   it() In vi insert mode, the cursor keys no longer work.  The following

@@ -20,5 +20,5 @@ else
 
   [[ -n "$file" ]] &&
     compadd - $(awk '/^[a-zA-Z0-9][^\/ 	]+:/ {print $1}' FS=: $file) && ret=0
-  (( ret )) && _files
+  (( ret )) && { compset -P 1 '*\='; _files }
 fi

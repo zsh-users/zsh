@@ -317,7 +317,7 @@ item(tt(-i) var(function))(
 Like tt(-K), but the function is invoked in a context like that for
 completion widgets, see 
 ifzman(zmanref(zshzle))\
-ifnzman(noderef(The zle Module))\
+ifnzman(noderef(The zle Module))
 for more information.
 )
 item(tt(-H) var(num pattern))(
@@ -422,7 +422,7 @@ tt(-K) option) which can examine the word components passed to it
 (or via the tt(read) builtin's tt(-c) and tt(-l) flags) and
 use its own criteria to decide what matches.  If there is no
 completion, the original word is retained.  Since the produced 
-possible completions seldom seldom have interesting common prefixes
+possible completions seldom have interesting common prefixes
 and suffixes, menucompletion is started immediately if tt(AUTO_MENU) is
 set and this flag is used.
 )
@@ -513,7 +513,7 @@ before all variables.
 item(tt(-V) var(name))(
 Like tt(-J), but matches within the group will not be sorted in listings
 nor in menucompletion. These unsorted groups are in a different name
-space than the sorted ones, so groups defined as tt(-J files) and tt(-V
+space from the sorted ones, so groups defined as tt(-J files) and tt(-V
 files) are distinct.
 )
 item(tt(-M) var(match-spec))(
