@@ -132,6 +132,7 @@ setstypat(Style s, char *pat, Patprog prog, char **vals, int eval)
 		freearray(p->vals);
 	    if (p->eval)
 		freeeprog(p->eval);
+            freepatprog(p->prog);
 	    p->vals = zarrdup(vals);
 	    p->eval = eprog;
 

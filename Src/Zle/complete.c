@@ -1320,6 +1320,7 @@ comp_wrapper(Eprog prog, FuncWrap w, char *name)
 	    zsfree(oqs);
 	    zsfree(oaq);
 	    freearray(owords);
+	    freearray(oredirs);
 	}
 	zsfree(comprestore);
 	comprestore = orest;
