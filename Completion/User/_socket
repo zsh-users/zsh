@@ -1,0 +1,34 @@
+#compdef socket
+
+local state line expl
+typeset -A options
+
+_arguments -s \
+  -{b,c,f,q,r,v,w} \
+  -{s,l} \
+  '-p:command:->command' \
+  ':arg1:->arg1' \
+  ':arg2:->arg2'
+
+case "$state" in
+command)
+  compset -q
+  _normal
+  ;;
+
+arg1)
+  if (( $+options[-s] )); then
+    _message 'port'
+  else
+    _description expl 'host'
+    _hosts "$expl[@]"
+  fi
+  ;;
+
+arg2)
+  if (( ! $+options[-s] )); then
+    _description expl 'port'
+    _hostports $line[2] "$expl[@]"
+  fi
+  ;;
+esac

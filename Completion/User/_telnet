@@ -1,0 +1,21 @@
+#compdef telnet
+
+_arguments -s \
+  -{F,f,x} \
+  '-8[allow 8-Bit data]' \
+  '-E[disable an escape character]' \
+  '-K[no automatic login]' \
+  '-L[allow 8-Bit data on output]' \
+  '-S+:IP type-of-service:' \
+  '-X+:authentication type to disable:' \
+  '-a[attempt automatic login]' \
+  '-c[disable .telnetrc]' \
+  '-d[debug mode]' \
+  '-e+[specify escape character]:escape character:' \
+  '-k+:realm:' \
+  '-l+[specify user]:user:' \
+  '-n+[specify tracefile]:tracefile:_files' \
+  '-r[rlogin like user interface]' \
+  ':host:_hosts' \
+  ':port:{ _hostports $line[2] "$expl[@]" }'
+
