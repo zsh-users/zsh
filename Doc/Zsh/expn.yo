@@ -278,13 +278,13 @@ Each command argument of the form
 `tt(=LPAR())var(list)tt(RPAR())'
 is subject to process substitution.
 In the case of the tt(<) or tt(>) forms, the shell will run process
-var(list) asynchronously, connected to a named pipe (FIFO).
-The name of this pipe will become the argument to the command.
-If the form with tt(>)
-is selected then writing on this file will provide input for var(list).
-If tt(<) is used, then the file passed as an argument will
-be a named pipe connected to the output of the var(list) process.
-For example,
+var(list) asynchronously.  If the system supports the tt(/dev/fd)
+mechanism, the command argument is the name of the device file
+corresponding to a file descriptor; otherwise, if the system supports named
+pipes (FIFOs), the command argument will be a named pipe.  If the form with
+tt(>) is selected then writing on this special file will provide input for
+var(list).  If tt(<) is used, then the file passed as an argument will
+be connected to the output of the var(list) process.  For example,
 
 nofill(tt(paste <LPAR()cut -f1) var(file1)tt(RPAR() <LPAR()cut -f3) var(file2)tt(RPAR() |
 tee >LPAR())var(process1)tt(RPAR() >LPAR())var(process2)tt(RPAR() >/dev/null))
@@ -292,9 +292,19 @@ tee >LPAR())var(process1)tt(RPAR() >LPAR())var(process2)tt(RPAR() >/dev/null))
 cuts fields 1 and 3 from the files var(file1) and var(file2) respectively,
 pastes the results together, and sends it to the processes
 var(process1) and var(process2).
-Note that the file, which is passed as an argument to the command,
-is a system pipe, so programs that expect to lseek (see manref(lseek)(2))
-on the file will not work.
+
+Both the tt(/dev/fd) and the named pipe implementation have drawbacks.  In
+the former case, some programmes may automatically close the file
+descriptor in question before examining the file on the command line,
+particularly if this is necessary for security reasons such as when the
+programme is running setuid.  In the second case, the file passed as an
+argument to the command is a system pipe, so programs that expect to lseek
+(see manref(lseek)(2)) on the file will not work; furthermore, if the
+programme does not actually open the file the subshell attempting to read
+from or write to the pipe will (in a typical implementation, different
+operating systems may have different behaviour) block for ever and have to
+be killed explicitly.
+
 Also note that the previous example can be more compactly and
 efficiently written (provided the tt(MULTIOS) option is set) as:
 

@@ -1,5 +1,8 @@
 2000-04-17  Peter Stephenson  <pws@cambridgesiliconradio.com>
 
+	* 10789: Doc/Zsh/expn.yo: better documentation for <(...) and
+	>(...) implementations and their drawbacks.
+
 	* Chmouel: 10772: Completion/Linux/_rpm:  --target support.
 
 2000-04-17  Sven Wischnowsky <wischnow@informatik.hu-berlin.de>
