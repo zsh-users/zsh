@@ -1216,11 +1216,11 @@ struct nameddir {
 #define PRINT_INCLUDEVALUE	(1<<4)
 
 /* flags for printing for the whence builtin */
-#define PRINT_WHENCE_CSH	(1<<4)
-#define PRINT_WHENCE_VERBOSE	(1<<5)
-#define PRINT_WHENCE_SIMPLE	(1<<6)
-#define PRINT_WHENCE_FUNCDEF	(1<<7)
-#define PRINT_WHENCE_WORD	(1<<8)
+#define PRINT_WHENCE_CSH	(1<<5)
+#define PRINT_WHENCE_VERBOSE	(1<<6)
+#define PRINT_WHENCE_SIMPLE	(1<<7)
+#define PRINT_WHENCE_FUNCDEF	(1<<9)
+#define PRINT_WHENCE_WORD	(1<<10)
 
 /***********************************/
 /* Definitions for history control */
