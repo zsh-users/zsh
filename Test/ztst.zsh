@@ -64,6 +64,7 @@ fi
 
 # Set the function autoload paths to correspond to this build of zsh.
 fpath=( $ZTST_srcdir/../Functions/*~*/CVS(/)
+        $ZTST_srcdir/../Completion
         $ZTST_srcdir/../Completion/*/*~*/CVS(/) )
 
 : ${TMPPREFIX:=/tmp/zsh}

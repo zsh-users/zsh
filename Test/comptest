@@ -1,7 +1,9 @@
 comptestinit () {
   setopt extendedglob
   [[ -d $ZTST_testdir/Modules/zsh ]] && module_path=( $ZTST_testdir/Modules )
-  fpath=( $ZTST_srcdir/../(Completion|Functions)/*~*/CVS(/) )
+  fpath=( $ZTST_srcdir/../Functions/*~*/CVS(/)
+          $ZTST_srcdir/../Completion
+          $ZTST_srcdir/../Completion/*/*~*/CVS(/) )
 
   zmodload -i zsh/zpty
 
