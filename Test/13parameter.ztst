@@ -229,9 +229,9 @@
   print ${(O)foo}
   print ${(Oi)foo}
 0:${(o)...}, ${(O)...}
+>I I be could programme recorded that watching
 >be could I I programme recorded that watching
->be could I I programme recorded that watching
->watching that recorded programme I I could be
+>watching that recorded programme could be I I
 >watching that recorded programme I I could be
 
   foo=(yOU KNOW, THE ONE WITH wILLIAM dALRYMPLE)

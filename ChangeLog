@@ -1,3 +1,8 @@
+2000-05-03  Peter Stephenson  <pws@cambridgesiliconradio.com>
+
+	* 11096: Test/ztst.zsh, Test/13parameter.ztst: fix test output
+	for C locale and ensure C locale is used
+
 2000-05-03  Sven Wischnowsky  <wischnow@informatik.hu-berlin.de>
 
 	* 11094: Doc/Zsh/compsys.yo: more doc fixes

@@ -22,6 +22,11 @@
 # still not be good enough.  Maybe we should trick it somehow.
 emulate -R zsh
 
+# Ensure the locale does not screw up sorting.  Don't supply a locale
+# unless there's one set, to minimise problems.
+[[ -n $LC_ALL ]] && LC_ALL=C
+[[ -n $LANG ]] && LANG=C
+
 # Set the module load path to correspond to this build of zsh.
 # This Modules directory should have been created by "make check".
 [[ -d Modules/zsh ]] && module_path=( $PWD/Modules )
