@@ -1,9 +1,13 @@
+2000-04-12  Bart Schaefer  <schaefer@brasslantern.com>
+
+	* 10706: Andrej: Completion/User/_man: Fix quoting in awk args.
+
 2000-04-12  Oliver Kiddle  <opk@u.genie.co.uk>
 
 	* 10701: Completion/Builtins/_bindkey, Doc/Zsh/mod_zle.yo:
 	use _arguments for bindkey completion and fix typo in docs
 
-2000-04-12  Bart Schaefer  <schaefer@brasslantern.com>
+2000-04-12  Bart Schaefer  <schaefer@zsh.org>
 
 	* 10700: Andrej: Completion/User/_man: Support for Pyramid.
 
