@@ -7,6 +7,8 @@
 
 2000-04-17  Sven Wischnowsky <wischnow@informatik.hu-berlin.de>
 
+	* 10795: Functions/Misc/zstyle+: simplify definiton of styles
+
 	* 10790: Doc/Zsh/mod_complist.yo, Src/params.c, Src/Zle/compcore.c,
  	Src/Zle/complete.c, Src/Zle/complist.c, Src/Zle/compresult.c,
  	Src/Zle/zle_tricky.c, Src/Zle/zle_utils.c: scrolling in completion
