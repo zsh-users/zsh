@@ -1,9 +1,16 @@
-#compdef gzip gunzip gzcat=gunzip -redirect-,<,gunzip=gunzip -redirect-,>,gzip=gunzip -redirect-,<,gzip=gzip
+#compdef gzip gunzip gzcat=gunzip -redirect-,<,gunzip=gunzip -redirect-,>,gzip=gunzip -redirect-,<,gzip=gzip -value-,GZIP,-default-
 
-local decompress expl curcontext="$curcontext" state line
+local decompress files expl curcontext="$curcontext" state line
 typeset -A opt_args
 
+files=( '*:files:->files' )
 case "$service" in
+*GZIP*)
+  compset -q
+  words=( fake "$words[@]" )
+  (( CURRENT++ ))
+  files=()
+  ;&
 gunzip|zcat)
   decompress=yes
   ;&
@@ -51,7 +58,7 @@ gzip)
     '(--fast -1 -2 -3 -4 -5 -6 -7    -9 --best)-8' \
     '(--fast -1 -2 -3 -4 -5 -6 -7 -8    --best)-9' \
     '(--fast -1 -2 -3 -4 -5 -6 -7 -8 -9       )--best' \
-    '*:files:->files' && return 0
+    "$files[@]" && return 0
   ;;
 esac
 

@@ -1,4 +1,4 @@
-#autoload
+#compdef -value-,TERMINFO_DIRS,-default- -P -value-,*PATH,-default-
 
 # options:
 #  -s <sep> to specify the separator (default is a colon)
