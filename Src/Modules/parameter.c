@@ -1222,14 +1222,21 @@ static char *
 pmjobstate(int job)
 {
     Process pn;
-    char buf[256], buf2[128], *ret, *state;
+    char buf[256], buf2[128], *ret, *state, *cp;
+
+    if (job == curjob)
+	cp = ":+";
+    else if (job == prevjob)
+	cp = ":-";
+    else
+	cp = ":";
 
     if (jobtab[job].stat & STAT_DONE)
-	ret = dupstring("done");
+	ret = dyncat("done", cp);
     else if (jobtab[job].stat & STAT_STOPPED)
-	ret = dupstring("suspended");
+	ret = dyncat("suspended", cp);
     else
-	ret = dupstring("running");
+	ret = dyncat("running", cp);
 
     for (pn = jobtab[job].procs; pn; pn = pn->next) {
 

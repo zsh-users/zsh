@@ -1,3 +1,8 @@
+2000-11-02  Sven Wischnowsky  <wischnow@zsh.org>
+
+	* users/3503: Doc/Zsh/mod_parameter.yo, Src/jobs.c,
+	Src/Modules/parameter.c: show current/previous job in $jobstates
+	
 2000-11-01  Sven Wischnowsky  <wischnow@zsh.org>
 
 	* 13107: Functions/Misc/zed: don't reset just-edited trap function

@@ -43,12 +43,12 @@ mod_export int thisjob;
 /* the current job (+) */
  
 /**/
-int curjob;
+mod_export int curjob;
  
 /* the previous job (-) */
  
 /**/
-int prevjob;
+mod_export int prevjob;
  
 /* the job table */
  
