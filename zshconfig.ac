@@ -563,6 +563,7 @@ AC_CHECK_LIB(m, pow)
 
 dnl Prefer BSD termcap library to SysV curses library, except on certain
 dnl SYSV-derived systems.
+dnl On HPUX, Hcurses is reported to work better than curses.
 AC_ARG_WITH(curses-terminfo,
 [  --with-curses-terminfo     use terminfo support from curses library],
 [if test x$withval = xyes; then
@@ -573,7 +574,7 @@ else
 fi],
 [case "$host_os" in
   hpux10.*|hpux11.*|solaris*)
-      termcap_curses_order="curses ncurses termcap" ;;
+      termcap_curses_order="Hcurses curses ncurses termcap" ;;
   *)             termcap_curses_order="termcap curses ncurses" ;;
 esac])dnl
 
