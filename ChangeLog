@@ -1,3 +1,7 @@
+2001-05-25  Clint Adams  <schizo@debian.org>
+
+	* 14479: Completion/Debian/Command/_apt: add --reinstall.
+
 2001-05-24  Peter Stephenson  <pws@pwstephenson.fsnet.co.uk>
 
 	* from Bart: Etc/FAQ.yo: changes for 4.0.1, already installed

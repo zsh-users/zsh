@@ -408,6 +408,7 @@ _apt-get () {
     --print-uris:bool \
     --purge:bool \
     --list-cleanup:bool \
+    --reinstall:bool \
     -c,--config-file:configfile \
     -o,--option:arbitem \
     -t:release \
