@@ -1,9 +1,6 @@
 #compdef apm
 
-# this needs intelligence
-local kludge=linux
-
-if [[ $kludge == "linux" ]]
+if [[ $OSTYPE == linux* ]]
 then
 
 _arguments -C -s \
@@ -22,7 +19,7 @@ _arguments -C -s \
     '(--ignore)-i[tell the system to ignore system-generated APM message]' \
     '(-i)--ignore[tell the system to ignore system-generated APM message]'
 
-elif [[ $kludge == "freebsd4.1" ]]
+elif [[ $OSTYPE == freebsd* ]]
 then
 
 _arguments -C \
@@ -38,7 +35,7 @@ _arguments -C \
      '-Z[transition system into standby mode]' \
      '-z[suspend the system]'
 
-elif [[ $kludge == "openbsd2.7" ]]
+elif [[ $OSTYPE == openbsd* ]]
 then
 
 _arguments -C \

@@ -1,3 +1,7 @@
+2000-04-03  Clint Adams  <schizo@debian.org>
+
+	* 13899: Completion/Unix/Command/_apm: add $OSTYPE checking.
+
 2001-04-03  Oliver Kiddle  <opk@zsh.org>
 
 	* 13898, Bart: 13827: Completion/Zsh/Command/_ttyctl,
