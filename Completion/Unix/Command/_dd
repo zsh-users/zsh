@@ -1,0 +1,20 @@
+#compdef dd
+
+local expl
+
+if compset -P 1 'conv='; then
+  # If there's a comma present, ignore up to the last one.  The
+  # test alone will have that effect.
+  compset -p '*,'
+  _wanted values expl conversion \
+      compadd -qS, ascii ebcdic ibm block unblock lcase ucase swab noerror sync
+elif compset -P 1 'if='; then
+  _description files expl 'input file'
+  _tilde_files "$expl[@]"
+elif compset -P 1 'of='; then
+  _description files expl 'output file'
+  _tilde_files "$expl[@]"
+else
+  _wanted values expl option \
+      compadd -S '=' if of ibs obs bs cbs skip files seek count conv
+fi
