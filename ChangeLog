@@ -3,6 +3,12 @@
 	* 14599: Completion/Base/Utility/_multi_parts: always use
 	supplied matchers
 
+2001-05-31  Bart Schaefer  <schaefer@zsh.org>
+
+	* 14597: Doc/Zsh/builtins.yo: Back out 12724; instead, insert a
+	space on a line between paragraphs to prevent yodl from treating
+	it as paragraph break.  Still a hack, but a better hack.
+
 2001-05-30  Peter Stephenson  <pws@csr.com>
 
 	* 14573: INSTALL, README, Doc/Zsh/builtins.yo, Test/README,
