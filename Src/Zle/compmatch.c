@@ -2001,8 +2001,7 @@ join_clines(Cline o, Cline n)
 		    else
 			oo = to;
 		    o = to;
-		}
-		if (tn) {
+
 		    diff = sub_join(o, n, tn, 0);
 
 		    o->flags |= CLF_MISS;
@@ -2064,6 +2063,29 @@ join_clines(Cline o, Cline n)
 			    }
 			    continue;
 			} else {
+			    for (tn = n; tn; tn = tn->next)
+				if ((tn->flags & CLF_NEW) ==
+				    (o->flags & CLF_NEW) &&
+				    cmp_anchors(tn, o, 1)) break;
+
+			    if (tn) {
+				if ((diff = sub_join(o, n, tn, 0))) {
+				    if (po) {
+					po->flags |= CLF_MISS;
+					po->max += diff;
+				    }
+				    else {
+					o->flags |= CLF_MISS;
+					o->max += diff;
+				    }
+				}
+				n = tn;
+				po = o;
+				o = o->next;
+				pn = n;
+				n = n->next;
+				continue;
+			    }
 			    if (o->flags & CLF_SUF)
 				break;
 

@@ -253,7 +253,7 @@ cline_str(Cline l, int ins, int *csp, LinkList posl)
 		opos = npos;
 		addlinknode(posl, (void *) ((long) npos));
 	    }
-	    if (((pmax < (l->max - l->min) || (pma && l->max != l->min)) &&
+	    if (((pmax <= (l->max - l->min) || (pma && l->max != l->min)) &&
 		 (!pmm || (l->flags & CLF_MATCHED))) ||
 		((l->flags & CLF_MATCHED) && !pmm)) {
 		pm = cs; pmax = l->max - l->min; pmm = l->flags & CLF_MATCHED;
@@ -307,7 +307,7 @@ cline_str(Cline l, int ins, int *csp, LinkList posl)
 		    opos = npos;
 		    addlinknode(posl, (void *) ((long) npos));
 		}
-		if (((smax < (l->min - l->max) || (sma && l->max != l->min)) &&
+		if (((smax <= (l->min - l->max) || (sma && l->max != l->min)) &&
 		     (!smm || (l->flags & CLF_MATCHED))) ||
 		    ((l->flags & CLF_MATCHED) && !smm)) {
 		    sm = cs; smax = l->min - l->max; smm = l->flags & CLF_MATCHED;

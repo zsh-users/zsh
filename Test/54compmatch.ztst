@@ -570,7 +570,7 @@
  test_code $workers_11388_matcher workers_11388_list
  comptest $'tst :\t'
 0:Non-bug from workers 11388
->line: {tst }{.:}
+>line: {tst .:}{}
 >COMPADD:{}
 >INSERT_POSITIONS:{4:5:6}
 

@@ -1,3 +1,10 @@
+2001-03-05  Sven Wischnowsky  <wischnow@zsh.org>
+
+	* 13565: Src/Zle/compmatch.c, Src/Zle/compresult.c,
+ 	Test/54compmatch.ztst: fix for matching control, try harder to
+ 	merge separately completed parts to avoid losing user-typed
+ 	characters
+	
 2001-03-04  Peter Stephenson  <pws@pwstephenson.fsnet.co.uk>
 
 	* Unposted: Etc/FAQ.yo: latest version.
