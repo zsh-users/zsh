@@ -15,7 +15,8 @@ if [[ -n $_comp_correct ]]; then
 fi
 
 if (( ! $#manpath )); then
-  local mp=($(manpath 2>/dev/null))
+  local mp
+  mp=($(manpath 2>/dev/null))
   [[ "$mp" == *:* ]] && mp=( ${(s.:.)mp} )
   manpath=( $mp )
 fi
