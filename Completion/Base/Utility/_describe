@@ -29,7 +29,7 @@ zstyle -s ":completion:${curcontext}:$_type" list-separator _sep || _sep=--
 _descr="$1"
 shift
 
-if [[ -n "$showd" ]] &&
+if [[ -n "$_showd" ]] &&
    zstyle -T ":completion:${curcontext}:$_type" list-grouped; then
   _oargv=( "$@" )
   _grp=(-g)

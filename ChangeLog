@@ -1,5 +1,7 @@
 2001-07-25  Bart Schaefer  <schaefer@zsh.org>
 
+	* 15489: Completion/Base/Utility/_describe: Fix typo.
+
 	* 15488: Doc/Zsh/expn.yo: More index entry cleanup.  Reorder the
 	description section to look less as if it has two menus in info
 	and to add some cross-references.
