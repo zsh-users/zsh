@@ -1,3 +1,10 @@
+2002-02-12  Wayne Davison  <wayned@users.sourceforge.net>
+
+	* unposted: Src/params.c: The minimum size of histsiz (aka HISTSIZE)
+	should be 1, not 2.
+
+	* unposted: Src/builtin.c: Silenced a compiler warning.
+
 2002-02-12  Bart Schaefer  <schaefer@zsh.org>
 
 	* unposted: Doc/Zsh/compsys.yo: special-dirs example derived from
