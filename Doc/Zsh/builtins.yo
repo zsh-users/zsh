@@ -811,8 +811,8 @@ contain symbolic links.
 alias(r)(fc -e -)
 findex(read)
 vindex(IFS, use of)
-ifzman(xitem(tt(read) [ tt(-rzpqAclneEt) ] [ tt(-k) [ var(num) ] ]))
-item(ifnzman(tt(read) [ tt(-rzpqAclneEt) ] [ tt(-k) [ var(num) ] ]) [ tt(-u)var(n) ] [ var(name)[tt(?)var(prompt)] ] [ var(name) ...  ])(
+ifzman(xitem(tt(read) [ tt(-rszpqAclneEt) ] [ tt(-k) [ var(num) ] ]))
+item(ifnzman(tt(read) [ tt(-rszpqAclneEt) ] [ tt(-k) [ var(num) ] ]) [ tt(-u)var(n) ] [ var(name)[tt(?)var(prompt)] ] [ var(name) ...  ])(
 vindex(REPLY, use of)
 vindex(reply, use of)
 Read one line and break it into fields using the characters
@@ -828,6 +828,10 @@ item(tt(-r))(
 Raw mode: a `tt(\)' at the end of a line does not signify line
 continuation and backslashes in the line don't quote the following
 character and are not removed.
+)
+item(tt(-s))(
+Don't echo back characters if reading from the terminal.  Currently does
+not work with the tt(-q) option.
 )
 item(tt(-q))(
 Read only one character from the terminal and set var(name) to

@@ -1,5 +1,9 @@
 2002-08-22  Peter Stephenson  <pws@csr.com>
 
+	* 17544: Src/builtin.c, Doc/Zsh/builtins.yo: add `read -s' which
+	suppresses terminal echoing.  Doesn't work with -q, no effect if
+	not a tty.
+
 	* 17570: Src/Modules/socket.c, Doc/Zsh/Makefile.in,
 	Doc/Zsh/mod_socket.yo:  Don't use predefined name `sun'; set
 	length parameter for accept(); fix inclusion of socket module

@@ -100,7 +100,7 @@ static struct builtin builtins[] =
     BUILTIN("pushln", BINF_PRINTOPTS, bin_print, 0, -1, BIN_PRINT, NULL, "-nz"),
     BUILTIN("pwd", 0, bin_pwd, 0, 0, 0, "rLP", NULL),
     BUILTIN("r", BINF_R, bin_fc, 0, -1, BIN_FC, "nrl", NULL),
-    BUILTIN("read", 0, bin_read, 0, -1, 0, "ceklnpqrtzuAE0123456789", NULL),
+    BUILTIN("read", 0, bin_read, 0, -1, 0, "ceklnpqrstzuAE0123456789", NULL),
     BUILTIN("readonly", BINF_TYPEOPTS | BINF_MAGICEQUALS | BINF_PSPECIAL, bin_typeset, 0, -1, 0, "AEFHLRTUZafghilptux", "r"),
     BUILTIN("rehash", 0, bin_hash, 0, 0, 0, "df", "r"),
     BUILTIN("return", BINF_PSPECIAL, bin_break, 0, 1, BIN_RETURN, NULL, NULL),
@@ -3882,7 +3882,8 @@ bin_read(char *name, char **args, char *ops, int func)
     char *buf, *bptr, *firstarg, *zbuforig;
     LinkList readll = newlinklist();
     FILE *oshout = NULL;
-    int readchar = -1, val;
+    int readchar = -1, val, resettty = 0;
+    struct ttyinfo saveti;
     char d;
 
 
@@ -3955,6 +3956,18 @@ bin_read(char *name, char **args, char *ops, int func)
 	}
 	return 1;
     }
+    if (ops['s'] && SHTTY != -1) {
+	struct ttyinfo ti;
+	gettyinfo(&ti);
+	saveti = ti;
+#ifdef HAS_TIO
+	ti.tio.c_lflag &= ~ECHO;
+#else
+	ti.sgttyb.sg_flags &= ~ECHO;
+#endif
+	settyinfo(&ti);
+	resettty = 1;
+    }
 
     /* handle prompt */
     if (firstarg) {
@@ -4001,8 +4014,10 @@ bin_read(char *name, char **args, char *ops, int func)
 	    /* dispose of result appropriately, etc. */
 	    if (isem)
 		while (val > 0 && read(SHTTY, &d, 1) == 1 && d != '\n');
-	    else
+	    else {
 		settyinfo(&shttyinfo);
+		resettty = 0;
+	    }
 	    if (haso) {
 		fclose(shout);	/* close(SHTTY) */
 		shout = oshout;
@@ -4016,6 +4031,8 @@ bin_read(char *name, char **args, char *ops, int func)
 	    setsparam(reply, metafy(buf, bptr - buf, META_REALLOC));
 	else
 	    zfree(buf, bptr - buf + 1);
+	if (resettty && SHTTY != -1)
+	    settyinfo(&saveti);
 	return val <= 0;
     }
 
@@ -4046,6 +4063,8 @@ bin_read(char *name, char **args, char *ops, int func)
 	if (!ops['e'])
 	    setsparam(reply, ztrdup(readbuf));
 
+	if (resettty && SHTTY != -1)
+	    settyinfo(&saveti);
 	return readbuf[0] == 'n';
     }
 
@@ -4156,6 +4175,8 @@ bin_read(char *name, char **args, char *ops, int func)
 	    *pp++ = NULL;
 	    setaparam(reply, p);
 	}
+	if (resettty && SHTTY != -1)
+	    settyinfo(&saveti);
 	return c == EOF;
     }
     buf = bptr = (char *)zalloc(bsiz = 64);
@@ -4202,6 +4223,8 @@ bin_read(char *name, char **args, char *ops, int func)
     while (bptr > buf && iwsep(bptr[-1]))
 	bptr--;
     *bptr = '\0';
+    if (resettty && SHTTY != -1)
+	settyinfo(&saveti);
     /* final assignment of reply, etc. */
     if (ops['e'] || ops['E']) {
 	zputs(buf, stdout);
