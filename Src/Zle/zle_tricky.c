@@ -562,7 +562,7 @@ docomplete(int lst)
     if (undoing)
 	setlastline();
 
-    /* We the C-code's point of view, we can only use compctl as a default
+    /* From the C-code's point of view, we can only use compctl as a default
      * type of completion. Load it if it hasn't been loaded already and
      * no completion widgets are defined. */
 
