@@ -1,3 +1,7 @@
+2001-02-08  Oliver Kiddle  <opk@zsh.org>
+
+	* 13445: Completion/User/_gzip: fix to work for zcat again
+
 2001-02-07  Bart Schaefer  <schaefer@zsh.org>
 
 	* 13442: Test/Makefile.in, Test/comptest: Run zsh with +Z to

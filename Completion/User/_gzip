@@ -4,7 +4,7 @@ local decompress expl curcontext="$curcontext" state line
 typeset -A opt_args
 
 case "$service" in
-gunzip)
+gunzip|zcat)
   decompress=yes
   ;&
 gzip)
