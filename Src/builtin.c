@@ -1677,7 +1677,7 @@ enum {
 static Param
 typeset_single(char *cname, char *pname, Param pm, int func,
 	       int on, int off, int roff, char *value, Param altpm,
-	       Options ops, int auxlen)
+	       Options ops, int auxlen, int joinchar)
 {
     int usepm, tc, keeplocal = 0, newspecial = NS_NONE, readonly;
     char *subscript;
@@ -1997,9 +1997,17 @@ typeset_single(char *cname, char *pname, Param pm, int func,
 	 * to make sure we only ever use the colonarr functions
 	 * when u.data is correctly set.
 	 */
-	pm->sets.cfn = colonarrsetfn;
-	pm->gets.cfn = colonarrgetfn;
-	pm->u.data = &altpm->u.arr;
+	struct tieddata *tdp = (struct tieddata *)
+	    zalloc(sizeof(struct tieddata));
+	if (!tdp)
+	    return NULL;
+	tdp->joinchar = joinchar;
+	tdp->arrptr = &altpm->u.arr;
+
+	pm->sets.cfn = tiedarrsetfn;
+	pm->gets.cfn = tiedarrgetfn;
+	pm->unsetfn = tiedarrunsetfn;
+	pm->u.data = tdp;
     }
 
     if (keeplocal)
@@ -2155,6 +2163,7 @@ bin_typeset(char *name, char **argv, Options ops, int func)
 	Param apm;
 	struct asgment asg0;
 	char *oldval = NULL;
+	int joinchar;
 
 	if (OPT_ISSET(ops,'m')) {
 	    zwarnnam(name, "incompatible options for -T", NULL, 0);
@@ -2162,11 +2171,24 @@ bin_typeset(char *name, char **argv, Options ops, int func)
 	    return 1;
 	}
 	on &= ~off;
-	if (!argv[1] || argv[2]) {
+	if (!argv[1] || argv[3]) {
 	    zwarnnam(name, "-T requires names of scalar and array", NULL, 0);
 	    unqueue_signals();
 	    return 1;
 	}
+
+	/*
+	 * Third argument, if given, is character used to join
+	 * the elements of the array in the scalar.
+	 */
+	if (!argv[2])
+	    joinchar = ':';
+	else if (!*argv[2])
+	    joinchar = 0;
+	else if (*argv[2] == Meta)
+	    joinchar = argv[2][1] ^ 32;
+	else
+	    joinchar = *argv[2];
 
 	if (!(asg = getasg(argv[0]))) {
 	    unqueue_signals();
@@ -2212,7 +2234,8 @@ bin_typeset(char *name, char **argv, Options ops, int func)
 				 (Param)paramtab->getnode(paramtab,
 							  asg->name),
 				 func, (on | PM_ARRAY) & ~PM_EXPORTED,
-				 off, roff, asg->value, NULL, ops, auxlen))) {
+				 off, roff, asg->value, NULL, ops, auxlen,
+				 0))) {
 	    unqueue_signals();
 	    return 1;
 	}
@@ -2224,7 +2247,7 @@ bin_typeset(char *name, char **argv, Options ops, int func)
 				(Param)paramtab->getnode(paramtab,
 							 asg0.name),
 				func, on, off, roff, asg0.value, apm,
-				ops, auxlen))) {
+				ops, auxlen, joinchar))) {
 	    if (oldval)
 		zsfree(oldval);
 	    unsetparam_pm(apm, 1, 1);
@@ -2291,7 +2314,7 @@ bin_typeset(char *name, char **argv, Options ops, int func)
 	    for (pmnode = firstnode(pmlist); pmnode; incnode(pmnode)) {
 		pm = (Param) getdata(pmnode);
 		if (!typeset_single(name, pm->nam, pm, func, on, off, roff,
-				    asg->value, NULL, ops, auxlen))
+				    asg->value, NULL, ops, auxlen, 0))
 		    returnval = 1;
 	    }
 	}
@@ -2306,7 +2329,7 @@ bin_typeset(char *name, char **argv, Options ops, int func)
 				     gethashnode2(paramtab, asg->name) :
 				     paramtab->getnode(paramtab, asg->name)),
 			    func, on, off, roff, asg->value, NULL,
-			    ops, auxlen))
+			    ops, auxlen, 0))
 	    returnval = 1;
     }
     unqueue_signals();

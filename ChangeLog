@@ -1,5 +1,9 @@
 2003-09-24  Peter Stephenson  <pws@csr.com>
 
+	* 19129: Doc/Zsh/builtins.yo, Src/builtin.c, Src/params.c,
+	Src/utils.c, Src/zsh.h: extra tie arguemnt in
+	"typeset -T PAGER pager ' '" used for joining and splitting.
+
 	* unposted: Completion/Unix/Command/_perforce: improve handling
 	of label completion: now faster and uses filename to narrow
 	range if after `@'.

@@ -1793,14 +1793,20 @@ zjoin(char **arr, int delim, int heap)
     char **s, *ret, *ptr;
 
     for (s = arr; *s; s++)
-	len += strlen(*s) + 1;
+	len += strlen(*s) + 1 + (imeta(delim) ? 1 : 0);
     if (!len)
 	return heap? "" : ztrdup("");
     ptr = ret = (heap ? (char *) hcalloc(len) : (char *) zcalloc(len));
     for (s = arr; *s; s++) {
 	strucpy(&ptr, *s);
-	if (delim)
-	    *ptr++ = delim;
+	if (delim) {
+	    if (imeta(delim)) {
+		*ptr++ = Meta;
+		*ptr++ = delim ^ 32;
+	    }
+	    else
+		*ptr++ = delim;
+	}
     }
     ptr[-1] = '\0';
     return ret;
@@ -1856,7 +1862,15 @@ skipwsep(char **s)
     return i;
 }
 
-/* see findsep() below for handling of `quote' argument */
+/*
+ * haven't worked out what allownull does; it's passed down from
+ *   sepsplit but all the cases it's used are either 0 or 1 without
+ *   a comment.  it seems to be something to do with the `nulstring'
+ *   which i think is some kind of a metafication thing, so probably
+ *   allownull's value is associated with whether we are using
+ *   metafied strings.
+ * see findsep() below for handling of `quote' argument
+ */
 
 /**/
 mod_export char **

@@ -2595,19 +2595,74 @@ void
 colonarrsetfn(Param pm, char *x)
 {
     char ***dptr = (char ***)pm->u.data;
-
     /*
-     * If this is tied to a parameter (rather than internal) array,
-     * the array itself may be NULL.  Otherwise, we have to make
-     * sure it doesn't ever get null.
+     * We have to make sure this is never NULL, since that
+     * can cause problems.
      */
     if (*dptr)
 	freearray(*dptr);
-    *dptr = x ? colonsplit(x, pm->flags & PM_UNIQUE) :
-	(pm->flags & PM_TIED) ? NULL : mkarray(NULL);
+    if (x)
+	*dptr = colonsplit(x, pm->flags & PM_UNIQUE);
+    else
+	*dptr = mkarray(NULL);
     if (pm->ename)
 	arrfixenv(pm->nam, *dptr);
     zsfree(x);
+}
+
+/**/
+char *
+tiedarrgetfn(Param pm)
+{
+    struct tieddata *dptr = (struct tieddata *)pm->u.data;
+    return *dptr->arrptr ? zjoin(*dptr->arrptr, dptr->joinchar, 1) : "";
+}
+
+/**/
+void
+tiedarrsetfn(Param pm, char *x)
+{
+    struct tieddata *dptr = (struct tieddata *)pm->u.data;
+
+    if (*dptr->arrptr)
+	freearray(*dptr->arrptr);
+    if (x) {
+	char sepbuf[3];
+	if (imeta(dptr->joinchar))
+	{
+	    sepbuf[0] = Meta;
+	    sepbuf[1] = dptr->joinchar;
+	    sepbuf[2] = '\0';
+	}
+	else
+	{
+	    sepbuf[0] = dptr->joinchar;
+	    sepbuf[1] = '\0';
+	}
+	*dptr->arrptr = sepsplit(x, sepbuf, 0, 0);
+	if (pm->flags & PM_UNIQUE)
+	    uniqarray(*dptr->arrptr);
+    } else
+	*dptr->arrptr = NULL;
+    if (pm->ename)
+	arrfixenv(pm->nam, *dptr->arrptr);
+    zsfree(x);
+}
+
+/**/
+void
+tiedarrunsetfn(Param pm, int exp)
+{
+    /*
+     * Special unset function because we allocated a struct tieddata
+     * in typeset_single to hold the special data which we now
+     * need to delete.
+     */
+    pm->sets.cfn(pm, NULL);
+    zfree(pm->u.data, sizeof(struct tieddata));
+    /* paranoia -- shouldn't need these, but in case we reuse the struct... */
+    pm->u.data = NULL;
+    pm->flags &= ~PM_TIED;
 }
 
 /**/
@@ -3187,6 +3242,7 @@ void
 arrfixenv(char *s, char **t)
 {
     Param pm;
+    int joinchar;
 
     if (t == path)
 	cmdnamtab->emptytable(cmdnamtab);
@@ -3208,8 +3264,15 @@ arrfixenv(char *s, char **t)
      * Do not "fix" parameters that were not exported
      */
 
-    if (pm->flags & PM_EXPORTED)
-	pm->env = addenv(s, t ? zjoin(t, ':', 1) : "", pm->flags);
+    if (!(pm->flags & PM_EXPORTED))
+	return;
+
+    if (pm->flags & PM_TIED)
+	joinchar = ((struct tieddata *)pm->u.data)->joinchar;
+    else
+	joinchar = ':';
+
+    pm->env = addenv(s, t ? zjoin(t, joinchar, 1) : "", pm->flags);
 }
 
 

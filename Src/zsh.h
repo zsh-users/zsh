@@ -1156,6 +1156,12 @@ struct param {
     int level;			/* if (old != NULL), level of localness  */
 };
 
+/* structure stored in struct param's u.data by tied arrays */
+struct tieddata {
+    char ***arrptr;		/* pointer to corresponding array */
+    int joinchar;		/* character used to join arrays */
+};
+
 /* flags for parameters */
 
 /* parameter types */
@@ -1193,16 +1199,16 @@ struct param {
 #define PM_TIED 	(1<<16)	/* array tied to colon-path or v.v.         */
 
 /* Remaining flags do not correspond directly to command line arguments */
-#define PM_LOCAL	(1<<17) /* this parameter will be made local        */
-#define PM_SPECIAL	(1<<18) /* special builtin parameter                */
-#define PM_DONTIMPORT	(1<<19)	/* do not import this variable              */
-#define PM_RESTRICTED	(1<<20) /* cannot be changed in restricted mode     */
-#define PM_UNSET	(1<<21)	/* has null value                           */
-#define PM_REMOVABLE	(1<<22)	/* special can be removed from paramtab     */
-#define PM_AUTOLOAD	(1<<23) /* autoloaded from module                   */
-#define PM_NORESTORE	(1<<24)	/* do not restore value of local special    */
-#define PM_HASHELEM     (1<<25) /* is a hash-element */
-#define PM_NAMEDDIR     (1<<26) /* has a corresponding nameddirtab entry    */
+#define PM_LOCAL	(1<<21) /* this parameter will be made local        */
+#define PM_SPECIAL	(1<<22) /* special builtin parameter                */
+#define PM_DONTIMPORT	(1<<23)	/* do not import this variable              */
+#define PM_RESTRICTED	(1<<24) /* cannot be changed in restricted mode     */
+#define PM_UNSET	(1<<25)	/* has null value                           */
+#define PM_REMOVABLE	(1<<26)	/* special can be removed from paramtab     */
+#define PM_AUTOLOAD	(1<<27) /* autoloaded from module                   */
+#define PM_NORESTORE	(1<<28)	/* do not restore value of local special    */
+#define PM_HASHELEM     (1<<29) /* is a hash-element */
+#define PM_NAMEDDIR     (1<<30) /* has a corresponding nameddirtab entry    */
 
 /* The option string corresponds to the first of the variables above */
 #define TYPESET_OPTSTR "aiEFALRZlurtxUhHT"

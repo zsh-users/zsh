@@ -1160,7 +1160,7 @@ cindex(parameters, declaring)
 xitem(tt(typeset) [ {tt(PLUS())|tt(-)}tt(AEFHLRUZafghilprtuxm) [var(n)]] [ \
 var(name)[tt(=)var(value)] ... ])
 item(tt(typeset) -T [ {tt(PLUS()|tt(-))}tt(LRUZrux) ] \
-  var(SCALAR)[tt(=)var(value)] var(array))(
+  var(SCALAR)[tt(=)var(value)] var(array) tt([) var(sep) tt(]))(
 Set or display attributes and values for shell parameters.
 
 A parameter is created for each var(name) that does not already refer
@@ -1189,20 +1189,24 @@ separately for arrays and associative arrays), regardless of other flags
 and options.  Note that the tt(-h) flag on parameters is respected; no
 value will be shown for these parameters.
 
-If the tt(-T) option is given, exactly two (or zero) var(name)
-arguments must be present.  They represent a scalar and an array (in
-that order) that will be tied together in the manner of tt($PATH) and
-tt($path).  In other words, an array present in the latter variable
-appears as a scalar with the elements of the array joined by colons in
-the former.  Only the scalar may have an initial value.  Both the
-scalar and the array may otherwise be manipulated as normal.  If one
-is unset, the other will automatically be unset too.  There is no way
-of untying the variables without unsetting them, or converting the
-type of one of them with another tt(typeset) command; tt(+T) does not
-work, assigning an array to var(SCALAR) is an error, and assigning a
-scalar to var(array) sets it to be a single-element array.  Note that
-both `tt(typeset -xT ...)' and `tt(export -T ...)' work, but only the
-scalar will be marked for export.
+If the tt(-T) option is given, two or three arguments must be present (an
+exception is that zero arguments are allowed to show the list of parameters
+created in this fashion).  The first two are the name of a scalar and an
+array parameter (in that order) that will be tied together in the manner of
+tt($PATH) and tt($path).  The optional third argument is a single-character
+separator which will be used to join the elements of the array to form the
+scalar; if absent, a colon is used, as with tt($PATH).  Only the first
+character of the separator is significant; any remaining characters are
+ignored.  Only the scalar parameter may be assigned an initial value.  Both
+the scalar and the array may otherwise be manipulated as normal.  If one is
+unset, the other will automatically be unset too.  There is no way of
+untying the variables without unsetting them, or converting the type of one
+of them with another tt(typeset) command; tt(+T) does not work, assigning
+an array to var(SCALAR) is an error, and assigning a scalar to var(array)
+sets it to be a single-element array.  Note that both `tt(typeset -xT ...)'
+and `tt(export -T ...)' work, but only the scalar will be marked for
+export.  Setting the value using the scalar version causes a split on all
+separators (which cannot be quoted).
 
 The tt(-g) (global) flag is treated specially: it means that any
 resulting parameter will not be restricted to local scope.  Note that this
