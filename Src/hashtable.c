@@ -560,11 +560,14 @@ int
 bin_hashinfo(char *nam, char **args, char *ops, int func)
 {
     HashTable ht;
+
     printf("----------------------------------------------------\n");
+    queue_signals();
     for(ht = firstht; ht; ht = ht->next) {
 	ht->printinfo(ht);
 	printf("----------------------------------------------------\n");
     }
+    unqueue_signals();
     return 0;
 }
 
@@ -627,9 +630,9 @@ hashdir(char **dirp)
     Cmdnam cn;
     DIR *dir;
     char *fn;
-#ifdef _WIN32
+#if defined(_WIN32) || defined(__CYGWIN__)
     char *exe;
-#endif
+#endif /* _WIN32 || _CYGWIN__ */
 
     if (isrelative(*dirp) || !(dir = opendir(unmeta(*dirp))))
 	return;
@@ -641,7 +644,7 @@ hashdir(char **dirp)
 	    cn->u.name = dirp;
 	    cmdnamtab->addnode(cmdnamtab, ztrdup(fn), cn);
 	}
-#ifdef _WIN32
+#if defined(_WIN32) || defined(__CYGWIN__)
 	/* Hash foo.exe as foo, since when no real foo exists, foo.exe
 	   will get executed by DOS automatically.  This quiets
 	   spurious corrections when CORRECT or CORRECT_ALL is set. */
@@ -657,7 +660,7 @@ hashdir(char **dirp)
 		cmdnamtab->addnode(cmdnamtab, ztrdup(fn), cn);
 	    }
 	}
-#endif /* _WIN32 */
+#endif /* _WIN32 || __CYGWIN__ */
     }
     closedir(dir);
 }
@@ -734,6 +737,13 @@ printcmdnamnode(HashNode hn, int printflags)
 	return;
     }
 
+    if (printflags & PRINT_LIST) {
+	printf("hash ");
+
+	if(cn->nam[0] == '-')
+	    printf("-- ");
+    }
+
     if (cn->flags & HASHED) {
 	quotedzputs(cn->nam, stdout);
 	putchar('=');
@@ -787,13 +797,14 @@ static HashNode
 removeshfuncnode(HashTable ht, char *nam)
 {
     HashNode hn;
+    int signum;
 
-    if ((hn = removehashnode(shfunctab, nam))) {
-	if (!strncmp(hn->nam, "TRAP", 4))
-	    unsettrap(getsignum(hn->nam + 4));
-	return hn;
-    } else
-	return NULL;
+    if (!strncmp(nam, "TRAP", 4) && (signum = getsignum(nam + 4)) != -1)
+	hn = removetrap(signum);
+    else
+	hn = removehashnode(shfunctab, nam);
+
+    return hn;
 }
 
 /* Disable an entry in the shell function hash table.    *
@@ -822,11 +833,10 @@ static void
 enableshfuncnode(HashNode hn, int flags)
 {
     Shfunc shf = (Shfunc) hn;
-    int signum;
 
     shf->flags &= ~DISABLED;
     if (!strncmp(shf->nam, "TRAP", 4)) {
-	signum = getsignum(shf->nam + 4);
+	int signum = getsignum(shf->nam + 4);
 	if (signum != -1) {
 	    settrap(signum, shf->funcdef);
 	    sigtrapped[signum] |= ZSIG_FUNC;
@@ -890,6 +900,11 @@ printshfuncnode(HashNode hn, int printflags)
 	if (f->flags & PM_TAGGED)
 	    printf("%c traced\n\t", hashchar);
 	zputs(t, stdout);
+	if (f->funcdef && (f->funcdef->flags & EF_RUN)) {
+	    printf("\n\t");
+	    quotedzputs(f->nam, stdout);
+	    printf(" \"$@\"");
+	}
 	printf("\n}\n");
 	zsfree(t);
     } else {
@@ -1183,7 +1198,7 @@ emptynameddirtable(HashTable ht)
 static int
 add_userdir(nis_name table, nis_object *object, void *userdata)
 {
-    if (object->zo_data.objdata_u.en_data.en_cols.en_cols >= 6) {
+    if (object->zo_data.objdata_u.en_data.en_cols.en_cols_len >= 6) {
 	static char name[40], dir[PATH_MAX + 1];
 	register entry_col *ec =
 	    object->zo_data.objdata_u.en_data.en_cols.en_cols_val;
@@ -1366,6 +1381,13 @@ printnameddirnode(HashNode hn, int printflags)
 	putchar('\n');
 	return;
     }
+    
+    if (printflags & PRINT_LIST) {
+      printf("hash -d ");
+
+      if(nd->nam[0] == '-')
+	    printf("-- ");
+    }
 
     quotedzputs(nd->nam, stdout);
     putchar('=');
@@ -1460,8 +1482,9 @@ addhistnode(HashTable ht, char *nam, void *nodeptr)
     if (oldnode && oldnode != (HashNode)nodeptr) {
 	if (he->flags & HIST_MAKEUNIQUE
 	 || (he->flags & HIST_FOREIGN && (Histent)oldnode == he->up)) {
+	    (void) addhashnode2(ht, oldnode->nam, oldnode); /* restore hash */
 	    he->flags |= HIST_DUP;
-	    addhashnode(ht, oldnode->nam, oldnode); /* Remove the new dup */
+	    he->flags &= ~HIST_MAKEUNIQUE;
 	}
 	else {
 	    oldnode->flags |= HIST_DUP;
@@ -1488,7 +1511,7 @@ freehistdata(Histent he, int unlink)
     if (!he)
 	return;
 
-    if (!(he->flags & HIST_DUP))
+    if (!(he->flags & (HIST_DUP | HIST_TMPSTORE)))
 	removehashnode(histtab, he->text);
 
     zsfree(he->text);
