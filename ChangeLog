@@ -1,3 +1,8 @@
+2001-03-08  Sven Wischnowsky  <wischnow@zsh.org>
+
+	* 13591: Completion/User/_init_d: try to find out the sub commands
+ 	to complete in _init_d
+	
 2001-03-07 Felix Rosencrantz <f_rosencrantz@yahoo.com>
 
 	* 13590: Test/54compmatch.ztst: Added another test case
