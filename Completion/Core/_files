@@ -61,7 +61,7 @@ for def in "$pats[@]"; do ###"${(@)${(@)pats#*[^\\]:}%%:*}"; do
   if _wanted "$tag"; then
     _comp_ignore=()
     while _next_label "$tag" expl "$descr"; do
-      _comp_ignore=( $_comp_ignored $ign )
+      _comp_ignore=( $_comp_ignore $ign )
       if [[ -n "$end" ]]; then
         _path_files -g "$pat" "$opts[@]" "$expl[@]" && ret=0
       else
