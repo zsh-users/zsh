@@ -420,7 +420,8 @@ The supported flags are:
 startitem()
 item(tt(-P) var(prefix))(
 This gives a string to be inserted before the given var(words).  The
-string given is not considered as part of the match.
+string given is not considered as part of the match and any shell
+metacharacters in it will not be quoted when the string is inserted.
 )
 item(tt(-S) var(suffix))(
 Like tt(-P) but gives a string to be inserted after the match.

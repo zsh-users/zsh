@@ -1629,9 +1629,7 @@ addmatches(Cadata dat, char **argv)
 		llsl = strlen(lsuf);
 		/* Test if there is an existing -P prefix. */
 		if (dat->pre && *dat->pre) {
-		    char *dp = rembslash(dat->pre);
-
-		    pl = pfxlen(dp, lpre);
+		    pl = pfxlen(dat->pre, lpre);
 		    llpl -= pl;
 		    lpre += pl;
 		}
