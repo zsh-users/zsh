@@ -1,6 +1,5 @@
 #compdef pmpath pmvers pmdesc pmload pmexp pmeth pmls pmcat pman pmfunc podgrep podtoc podpath
 #
-#
 # _perl_modules - zsh completion function
 #
 # Adam Spiers <adam@spiers.net>
@@ -8,8 +7,6 @@
 # Calculate all installed Perl modules.  The result is cached
 # for future use.
 #
-# Bugs:
-#   - can't cope with multiple installs of Perl
 
 # Change this if you have pminst and want to use it.  The zsh code
 # actually produces better results because pminst misses modules of
@@ -44,4 +41,6 @@ if [[ ${+_perl_modules} -eq 0 ]]; then
   fi
 fi
 
-compadd - $_perl_modules
+local expl
+_description expl "Perl modules"
+compadd "$expl[@]" - $_perl_modules

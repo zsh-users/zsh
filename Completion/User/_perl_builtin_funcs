@@ -26,4 +26,6 @@ if [[ ${+_perl_builtin_funcs} -eq 0 ]]; then
   fi
 fi
 
-compadd - $_perl_builtin_funcs
+local expl
+_description expl "Perl built-in functions"
+compadd "$expl[@]" - $_perl_builtin_funcs

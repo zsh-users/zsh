@@ -27,4 +27,6 @@ if [[ ${+_perl_basepods} -eq 0 ]]; then
   fi
 fi
 
-compadd - $_perl_basepods
+local expl
+_description expl "Perl base pods"
+compadd "$expl[@]" - $_perl_basepods

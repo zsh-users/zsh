@@ -1,23 +1,26 @@
 #compdef perldoc
 #
-#
 # _perldoc - zsh completion function for perldoc
 #
 # Adam Spiers <adam@spiers.net>
 #
-# Behaviour should be roughly equivalent to:
-# compctl -k perl_modules -k perl_basepods -f 
-#           -x 'c[-1,-f]' -k perl_funcs --
-#	  + -k man_pages
-#     perldoc
 
-if [[ $CURRENT -eq 3 && $words[2] == '-f' ]]; then
-  _perl_builtin_funcs
-elif [[ $CURRENT -eq 3 && $words[2] == '-q' ]]; then
-  zle -R "I can't read your mind!"
-  return 1
-else
-  _perl_modules
-  _perl_basepods
-  _path_files -/ -g '*.(pod|pm)'
-fi
+_perldoc () {
+    _arguments -s \
+        '-h:help:' \
+        '(-q)-f:Perl built-in function:_perl_builtin_funcs:*:' \
+        '(-f)-q:Perl FAQ keyword:' \
+        '*:Perl pod pages:_perl_pods'
+}
+
+_perl_pods () {
+    local nm="$compstate[nmatches]"
+
+   _perl_modules
+   _perl_basepods
+   _path_files -J 'Perl modules and .pods' -/ -g '*.(pod|pm)'
+
+    [[ nm -ne "$compstate[nmatches]" ]]
+}
+
+_perldoc "$@"
