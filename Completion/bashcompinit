@@ -168,5 +168,5 @@ complete() {
 }
 
 unfunction bashcompinit
-autoload -U bashcompinit
+autoload -Uz bashcompinit
 return 0

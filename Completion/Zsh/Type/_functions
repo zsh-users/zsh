@@ -1,4 +1,4 @@
-#compdef functions unfunction
+#compdef unfunction
 
 local expl
 

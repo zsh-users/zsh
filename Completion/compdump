@@ -88,7 +88,7 @@ zle -lL |
 	d_complist=yes
       fi
       print -r - ${_d_line}
-      _d_bks=($_d_bks ${_d_line[3]})
+      _d_bks+=(${_d_line[3]})
     fi
   done >> $_d_file
 bindkey |
@@ -108,7 +108,7 @@ _d_als=(${(o)$(typeset +fm '_*')})
 # print them out:  about five to a line looks neat
 
 _i=5
-print -n autoload -U >> $_d_file
+print -n autoload -Uz >> $_d_file
 while (( $#_d_als )); do
   if (( ! $+_compautos[$_d_als[1]] )); then
     print -n " $_d_als[1]"
@@ -123,7 +123,7 @@ done >> $_d_file
 print >> $_d_file
 
 for _i in "${(ok@)_compautos}"; do
-  print "autoload -U $_compautos[$_i] $_i" >> $_d_file
+  print "autoload -Uz $_compautos[$_i] $_i" >> $_d_file
 done
 
 print >> $_d_file
@@ -134,4 +134,4 @@ print "_comp_assocs=( ${(q)_comp_assocs} )" >> $_d_file
 mv $_d_file ${_d_file%.$HOST.$$}
 
 unfunction compdump
-autoload -U compdump
+autoload -Uz compdump

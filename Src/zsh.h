@@ -1197,6 +1197,9 @@ struct tieddata {
 #define PM_HIDEVAL	(1<<15)	/* Value not shown in `typeset' commands    */
 #define PM_TIED 	(1<<16)	/* array tied to colon-path or v.v.         */
 
+#define PM_KSHSTORED	(1<<17) /* function stored in ksh form              */
+#define PM_ZSHSTORED	(1<<18) /* function stored in zsh form              */
+
 /* Remaining flags do not correspond directly to command line arguments */
 #define PM_LOCAL	(1<<21) /* this parameter will be made local        */
 #define PM_SPECIAL	(1<<22) /* special builtin parameter                */
@@ -1210,7 +1213,7 @@ struct tieddata {
 #define PM_NAMEDDIR     (1<<30) /* has a corresponding nameddirtab entry    */
 
 /* The option string corresponds to the first of the variables above */
-#define TYPESET_OPTSTR "aiEFALRZlurtxUhHT"
+#define TYPESET_OPTSTR "aiEFALRZlurtxUhHTkz"
 
 /* These typeset options take an optional numeric argument */
 #define TYPESET_OPTNUM "LRZiEF"

@@ -7,7 +7,7 @@ local compcontext=-default-
 __ci_tidyup() {
   unfunction -m __ci_\* 2>/dev/null
   unfunction compinstall
-  autoload -U compinstall
+  autoload -Uz compinstall
 }
 
 __ci_newline() {
@@ -119,7 +119,7 @@ ${match[3]}"
     then
       compinit_args=$match[1]
     elif [[ $line != [[:blank:]]# &&
-      $line != [[:blank:]]#'autoload -U compinit' &&
+      $line != [[:blank:]]#'autoload -Uz compinit' &&
       $line != [[:blank:]]#compinit &&
       $line != [[:blank:]]#zstyle[[:blank:]]#:compinstall* ]]; then
       warn_unknown="${warn_unknown:+$warn_unknown
@@ -1886,7 +1886,7 @@ $output"
   [[ -n $fpath_line ]] && print -r "$fpath_line"
 
   print -r "
-autoload -U compinit
+autoload -Uz compinit
 compinit${compinit_args:+ $compinit_args}"
 
   print -r "$endline"

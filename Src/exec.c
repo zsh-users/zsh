@@ -3398,8 +3398,12 @@ loadautofn(Shfunc shf, int fksh, int autol)
     prog = getfpfunc(shf->nam, &ksh);
     noaliases = noalias;
 
-    if (ksh == 1)
+    if (ksh == 1) {
 	ksh = fksh;
+	if (ksh == 1)
+	    ksh = (shf->flags & PM_KSHSTORED) ? 2 :
+		  (shf->flags & PM_ZSHSTORED) ? 0 : 1;
+    }
 
     if (prog == &dummy_eprog) {
 	/* We're not actually in the function; decrement locallevel */

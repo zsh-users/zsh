@@ -1,5 +1,13 @@
 2004-04-20  Oliver Kiddle  <opk@zsh.org>
 
+	* 19767, 19785: Src/builtin.c, Src/exec.c, Src/hashtable.c,
+	Src/zsh.h, Completion/compinit, Completion/compdump,
+	Completion/compinstall, Completion/bashcompinit,
+	Completion/Base/Widget/_next_tags, Completion/Zsh/Type/_functions,
+	Completion/Zsh/Command/_typeset, Doc/Zsh/builtins.yo:
+	store flags for -z and -k options to autoload allowing the
+	completion system to be used with ksh_autoload set
+
 	* 19800: Test/B02typeset.ztst: reverse sense of `declare +m' test
 
 2004-04-19  Clint Adams  <clint@zsh.org>

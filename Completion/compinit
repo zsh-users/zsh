@@ -46,7 +46,7 @@
 #     generate matches, but should automatically be loaded
 #     when they are called. The <options> will be given to the
 #     autoload builtin when making the function autoloaded. Note
-#     that this need not include `-U'.
+#     that this need not include `-U' and `-z'.
 #
 # Note that no white space is allowed between the `#' and the rest of
 # the string.
@@ -292,7 +292,7 @@ compdef() {
     # and probably do autoloading.
 
     func="$1"
-    [[ -n "$autol" ]] && autoload -U "$func"
+    [[ -n "$autol" ]] && autoload -Uz "$func"
     shift
 
     case "$type" in
@@ -406,7 +406,7 @@ typeset _i_wdirs _i_wfiles
 _i_wdirs=()
 _i_wfiles=()
 
-autoload -U compaudit
+autoload -Uz compaudit
 if [[ -n "$_i_check" ]]; then
   typeset _i_q
   if ! eval compaudit; then
@@ -433,7 +433,7 @@ if [[ -n "$_i_check" ]]; then
 fi
 
 # Make sure compdump is available, even if we aren't going to use it.
-autoload -U compdump compinstall
+autoload -Uz compdump compinstall
 
 # If we have a dump file, load it.
 
@@ -473,7 +473,7 @@ if [[ -z "$_i_done" ]]; then
 	fi
 	;;
       (\#autoload)
-	autoload -U "$_i_line[@]" ${_i_name}
+	autoload -Uz "$_i_line[@]" ${_i_name}
 	[[ "$_i_line" != \ # ]] && _compautos[${_i_name}]="$_i_line"
 	;;
       esac
@@ -505,6 +505,6 @@ if [[ ${_i_line[2]} = expand-or-complete ]] &&
 fi
 
 unfunction compinit compaudit
-autoload -U compinit compaudit
+autoload -Uz compinit compaudit
 
 return 0

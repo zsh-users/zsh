@@ -2406,9 +2406,16 @@ bin_functions(char *name, char **argv, Options ops, int func)
 	on |= PM_TAGGED;
     else if (OPT_PLUS(ops,'t'))
 	off |= PM_TAGGED;
+    if (OPT_MINUS(ops,'z'))
+	on |= PM_ZSHSTORED;
+    else if (OPT_PLUS(ops,'z'))
+	off |= PM_ZSHSTORED;
+    if (OPT_MINUS(ops,'k'))
+	on |= PM_KSHSTORED;
+    else if (OPT_PLUS(ops,'k'))
+	off |= PM_KSHSTORED;
 
     if ((off & PM_UNDEFINED) || (OPT_ISSET(ops,'k') && OPT_ISSET(ops,'z')) ||
-	(!OPT_PLUS(ops,'X') && (OPT_ISSET(ops,'k') || OPT_ISSET(ops,'z'))) ||
 	(OPT_MINUS(ops,'X') && (OPT_ISSET(ops,'m') || *argv || !scriptname))) {
 	zwarnnam(name, "invalid option(s)", NULL, 0);
 	return 1;

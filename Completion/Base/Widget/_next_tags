@@ -37,7 +37,7 @@ _next_tags() {
       (( $#funcstack > _tags_level )) && _comp_tags="${_comp_tags% * }"
       _tags_level=$#funcstack
       [[ "$_next_tags_not" = *\ ${__spec}\ * ]] && continue
-      _comp_tags="$_comp_tags $__spec "
+      _comp_tags+=" $__spec "
       if [[ "$curtag" = *[^\\]:* ]]; then
         zformat -f __descr "${curtag#*:}" "d:$3"
         _description "$__gopt[@]" "${curtag%:*}" "$2" "$__descr"
@@ -64,7 +64,7 @@ _next_tags() {
       (( $#funcstack > _tags_level )) && _comp_tags="${_comp_tags% * }"
       _tags_level=$#funcstack
       [[ "$_next_tags_not" = *\ ${__spec}\ * ]] && continue
-      _comp_tags="$_comp_tags $__spec "
+      _comp_tags+=" $__spec "
       if [[ "$curtag" = *[^\\]:* ]]; then
         zformat -f __descr "${curtag#*:}" "d:$3"
         _description "$__gopt[@]" "${curtag%:*}" "$2" "$__descr"
@@ -92,7 +92,7 @@ _next_tags() {
     fi
   fi
 
-  _next_tags_not="$_next_tags_not $_lastcomp[tags]"
+  _next_tags_not+=" $_lastcomp[tags]"
   _next_tags_pfx="$PREFIX"
   _next_tags_sfx="$SUFFIX"
 
@@ -107,7 +107,7 @@ _next_tags() {
   compstate[insert]="$ins"
   compstate[list]='list force'
 
-  compprefuncs=( "$compprefuncs[@]" _next_tags_pre )
+  compprefuncs+=( _next_tags_pre )
 }
 
 # Completer, for wrap-around.
@@ -132,9 +132,9 @@ _next_tags_pre() {
     return 0
   elif [[ ${LBUFFER%${PREFIX}} != ${_next_tags_pre}* ]]; then
     unfunction _all_labels _next_label
-    autoload -U _all_labels _next_label
+    autoload -Uz _all_labels _next_label
   else
-    compprefuncs=( "$compprefuncs[@]" _next_tags_pre )
+    compprefuncs+=( _next_tags_pre )
   fi
 }
 

@@ -863,7 +863,7 @@ static void
 printshfuncnode(HashNode hn, int printflags)
 {
     Shfunc f = (Shfunc) hn;
-    char *t;
+    char *t = 0;
  
     if ((printflags & PRINT_NAMEONLY) ||
 	((printflags & PRINT_WHENCE_SIMPLE) &&
@@ -881,32 +881,35 @@ printshfuncnode(HashNode hn, int printflags)
 	return;
     }
  
-    if (f->flags & PM_UNDEFINED)
-	t = tricat("builtin autoload -X",
-		   ((f->flags & PM_UNALIASED)? "U" : ""),
-		   ((f->flags & PM_TAGGED)? "t" : ""));
-    else {
-	if (!f->funcdef)
-	    t = 0;
-	else
-	    t = getpermtext(f->funcdef, NULL);
-    }
-
     quotedzputs(f->nam, stdout);
-    if (t) {
+    if (f->funcdef || f->flags & PM_UNDEFINED) {
 	printf(" () {\n\t");
 	if (f->flags & PM_UNDEFINED)
 	    printf("%c undefined\n\t", hashchar);
+	else
+	    t = getpermtext(f->funcdef, NULL);
 	if (f->flags & PM_TAGGED)
 	    printf("%c traced\n\t", hashchar);
-	zputs(t, stdout);
-	if (f->funcdef && (f->funcdef->flags & EF_RUN)) {
-	    printf("\n\t");
-	    quotedzputs(f->nam, stdout);
-	    printf(" \"$@\"");
-	}
+	if (!t) {
+	    char *fopt = "Utkz";
+	    int flgs[] = {
+		PM_UNALIASED, PM_TAGGED, PM_KSHSTORED, PM_ZSHSTORED, 0
+	    };
+	    int fl;;
+
+	    zputs("builtin autoload -X", stdout);
+	    for (fl=0;fopt[fl];fl++)
+		if (f->flags & flgs[fl]) putchar(fopt[fl]);
+	} else {
+	    zputs(t, stdout);
+	    zsfree(t);
+	    if (f->funcdef->flags & EF_RUN) {
+		printf("\n\t");
+		quotedzputs(f->nam, stdout);
+		printf(" \"$@\"");
+	    }
+	}   
 	printf("\n}\n");
-	zsfree(t);
     } else {
 	printf(" () { }\n");
     }
