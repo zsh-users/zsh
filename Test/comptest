@@ -1,0 +1,94 @@
+#!/usr/local/bin/zsh -f
+
+zmodload zsh/zpty
+setopt extendedglob
+
+debug=
+dump=(-D)
+code=
+zsh=${ZSH:-zsh}
+
+while getopts Dd:c:z: opt; do
+  case $opt in
+    D) debug=yes;;
+    d) dump=(-d "$OPTARG");;
+    c) code="$OPTARG";;
+    z) zsh="$OPTARG";;
+  esac
+done
+(( OPTIND > 1 )) && shift $(( OPTIND - 1 ))
+
+input="$*"
+
+init=\
+'stty columns 80 rows 24
+LISTMAX=10000000
+'"ZLS_COLORS='no=<NO>:fi=<FI>:di=<DI>:ln=<LN>:pi=<PI>:so=<SO>:bd=<BD>:cd=<CD>:ex=<EX>:mi=<MI>:tc=<TC>:sp=<SP>:lc=<LC>:ec=<EC>\n:rc=<RC>'
+bindkey -e
+autoload -U compinit
+compinit $dump
+"'zstyle ":completion:*" group-name ""
+zstyle ":completion*:messages" format "<MESSAGE>%d</MESSAGE>
+"
+zstyle ":completion*:descriptions" format "<DESCRIPTION>%d</DESCRIPTION>
+"
+zstyle ":completion*:options" verbose yes
+zstyle ":completion*:values" verbose yes
+setopt noalwayslastprompt listrowsfirst completeinword
+zmodload zsh/complist
+expand-or-complete-with-report () {
+  print -lr "<WIDGET><expand-or-complete>"
+  zle expand-or-complete
+  print -lr - "<LBUFFER>$LBUFFER</LBUFFER>" "<RBUFFER>$RBUFFER</RBUFFER>"
+  zle clear-screen
+  zle -R
+}
+list-choices-with-report () {
+  print -lr "<WIDGET><list-choices>"
+  zle list-choices
+  zle clear-screen
+  zle -R
+}
+finish () {
+  print "<WIDGET><finish>"
+  exit 0
+}
+zle -N expand-or-complete-with-report
+zle -N list-choices-with-report
+zle -N finish
+bindkey "^I" expand-or-complete-with-report
+bindkey "^D" list-choices-with-report
+bindkey "^Z" finish
+'"$code"
+
+export PS1="<PROMPT>"
+zpty zsh "$zsh" -f
+
+zpty -r zsh log "*<PROMPT>*"
+
+zpty -w zsh "eval ${init:q}"
+zpty -r zsh log "*<PROMPT>*"
+
+zpty -w zsh "$input"$'\C-Z'
+zpty -r zsh log "*<WIDGET><finish>*"
+
+logs=(${(s:<WIDGET>:)log})
+shift logs
+
+for log in "$logs[@]"; do
+  if [[ "$log" = (#b)*$'<LBUFFER>'(*)$'</LBUFFER>\r\n<RBUFFER>'(*)$'</RBUFFER>'* ]]; then
+    print -lr "line: {$match[1]}{$match[2]}"
+  fi
+  while (( ${(N)log#*(#b)(<LC><(??)><RC>(*)<EC>|<DESCRIPTION>(*)</DESCRIPTION>|<MESSAGE>(*)</MESSAGE>)} )); do
+    log="${log[$mend[1]+1,-1]}"
+    if (( 0 <= $mbegin[2] )); then
+      if [[ $match[2] != TC && $match[3] != \ # ]]; then
+	print "$match[2]:{$match[3]}"
+      fi
+    elif (( 0 <= $mbegin[4] )); then
+      print "DESCRIPTION:{$match[4]}"
+    elif (( 0 <= $mbegin[5] )); then
+      print "MESSAGE:{$match[5]}"
+    fi
+  done
+done
