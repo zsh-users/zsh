@@ -1,3 +1,7 @@
+2000-06-28  Bart Schaefer  <schaefer@zsh.org>
+
+	* 12112: Src/params.c: Don't make namedirs out of hash elements.
+
 2000-06-28  Sven Wischnowsky  <wischnow@zsh.org>
 
 	* 12109: Completion/Core/_complete: make _complete return the

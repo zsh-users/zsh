@@ -2020,6 +2020,7 @@ unsetparam_pm(Param pm, int altflag, int exp)
 	oldpm = pm->old;
 	paramtab->addnode(paramtab, oldpm->nam, oldpm);
 	if ((PM_TYPE(oldpm->flags) == PM_SCALAR) &&
+	    !(pm->flags & PM_HASHELEM) &&
 	    oldpm->sets.cfn == strsetfn)
 	    adduserdir(oldpm->nam, oldpm->u.str, 0, 0);
 	if (oldpm->flags & PM_EXPORTED) {
@@ -2104,7 +2105,8 @@ strsetfn(Param pm, char *x)
 {
     zsfree(pm->u.str);
     pm->u.str = x;
-    adduserdir(pm->nam, x, 0, 0);
+    if (!(pm->flags & PM_HASHELEM))
+	adduserdir(pm->nam, x, 0, 0);
 }
 
 /* Function to get value of an array parameter */
