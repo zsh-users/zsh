@@ -464,9 +464,9 @@ while [[ cur -gt 0 ]]; do
 	  # option, we skip over the first description only if there
 	  # is something after the option name on the line.
 
-	  if [[ ( -z "$sopts" && "$ws[1]" != "$tmp[1]" ) ||
-                ( -n "$sopts" && ( ( $tmp[1] = [-+]? && "$ws[1]" != "${tmp[1][1]}"${~soptseq}"${tmp[1][2]}" ) ||
-		  		   ( $tmp[1] != [-+]? && "$ws[1]" != "$tmp[1]" ) ) ) ]]; then
+	  if [[ ( -z "$sopts" && ( "$def" = :* || "$ws[1]" != "$tmp[1]" ) ) ||
+                ( -n "$sopts" && ( ( $tmp[1] = [-+]? && ( "$def" = :* || "$ws[1]" != "${tmp[1][1]}"${~soptseq}"${tmp[1][2]}" ) ) ||
+		  		   ( $tmp[1] != [-+]? && ( "$def" = :* || "$ws[1]" != "$tmp[1]" ) ) ) ) ]]; then
 	    if [[ "$def" = [^*]*[^\\]:*[^\\]:* ]]; then
               def="${def#?*[^\\]:*[^\\]:}"
 	      optbeg="$beg"
