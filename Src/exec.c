@@ -945,7 +945,7 @@ execpline(Sublist l, int how, int last1)
 		    jn->stat & STAT_DONE &&
 		    lastval2 & 0200)
 		    killpg(mypgrp, lastval2 & ~0200);
-		if (!list_pipe_child && !lpforked && !subsh &&
+		if (!list_pipe_child && !lpforked && !subsh && jobbing &&
 		    (list_pipe || last1 || pline_level) &&
 		    ((jn->stat & STAT_STOPPED) ||
 		     (list_pipe_job && pline_level &&
