@@ -50,9 +50,9 @@
 #
 # Tests for `Precommand Modifiers'
 #
-  - perl -e 'print "$^X\n"'
+  - sh -c 'echo $0'
 0:`-' precommand modifier
->-perl
+>-sh
 
   echo f*
   noglob echo f*

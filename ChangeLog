@@ -1,19 +1,198 @@
+1999-12-23  Peter Stephenson  <pws@pwstephenson.fsnet.co.uk>
+
+	* Zefram: 9143: Util/mkdisttree.sh: same find change here.
+
+	* Andrej: 9142: Util/preconfig: work around probably find bug
+
+	* Alexandre: 9139: Functions/Zftp/zftp_chpwd, Etc/FAQ.yo:
+	kterm understands xterm sequences.
+
+	* pws: 9150: Completion/Builtins/.distfiles,
+	Completion/Builtins/_zstyle, Test/.distfiles: added _zstyle
+	for zstyle completion, also some missed .distfiles entries
+	for 9129.
+
+	* pws: 9149: Completion/Builtins/_cd, Completion/Core/_path_files:
+	_cd wouldn't complete in $cdpath and _path_files messed up
+	array entries with spaces.
+
+1999-12-22  Peter Stephenson  <pws@pwstephenson.fsnet.co.uk>
+
+	* Tanaka Akira: 9138: Util/preconfig: problem with pattern
+	matching `.' in find.
+
+	* Tanaka Akira: 9137: Test/07cond.ztst: compatibility fixes for
+	tests in 9129.
+
+	* Clint: 9136: Completion/Debian/_dpkg: handle dpkg-deb options.
+
+	* Zefram: 9134: Src/Makefile.in, Src/mkbltnmlst.sh,
+	Src/xmods.conf, Src/zsh.mdd: aliased libraries with static
+	linking.
+
+1999-12-21  Peter Stephenson  <pws@pwstephenson.fsnet.co.uk>
+
+	* pws: 9129: Src/math.c, Test/04redirect.ztst,
+	Test/05command.ztst, Test/06arith.ztst, Test/07cond.ztst,
+	Test/ztst.zsh: fix bug with `(( 4 : 3 ))'; some more tests
+	for shell basics.
+
+1999-12-20  Peter Stephenson  <pws@pwstephenson.fsnet.co.uk>
+
+	* Clint: 9121: Functions/Zftp/zfdir: some idiot messed up
+	selection of pager.
+
+	* Zefram: 9120: .distfiles, .preconfig, INSTALL, Util/.distfiles,
+	Util/preconfig: better pre-configuration support.
+
+	* Zefram: 9119: Doc/Zsh/intro.yo: zshzftpsys manual omitted.
+
+	* Zefram: 9118: Doc/Makefile.in, Doc/Zsh/builtins.yo,
+	Doc/Zsh/compsys.yo, Doc/Zsh/compwid.yo, Doc/Zsh/mod_cap.yo,
+	Doc/Zsh/mod_clone.yo, Doc/Zsh/mod_compctl.yo,
+	Doc/Zsh/mod_complete.yo, Doc/Zsh/mod_complist.yo,
+	Doc/Zsh/mod_computil.yo, Doc/Zsh/mod_deltochar.yo,
+	Doc/Zsh/mod_example.yo, Doc/Zsh/mod_files.yo,
+	Doc/Zsh/mod_mapfile.yo, Doc/Zsh/mod_mathfunc.yo,
+	Doc/Zsh/mod_parameter.yo, Doc/Zsh/mod_sched.yo,
+	Doc/Zsh/mod_stat.yo, Doc/Zsh/mod_zftp.yo, Doc/Zsh/mod_zle.yo,
+	Doc/Zsh/mod_zleparameter.yo, Doc/Zsh/mod_zprof.yo,
+	Doc/Zsh/mod_zutil.yo, Doc/Zsh/params.yo, Doc/Zsh/zftpsys.yo,
+	Doc/Zsh/zle.yo: proper names for info files.
+
+	* Zefram: 9117: Src/mkmakemod.sh: remove unnecessary blanks.
+
+	* Adam: 9109: Completion/User/_hosts: globsubst problem.
+
+	* Sven: 9107: Completion/Core/compinit: fix SELECTMIN.
+
+	* Zefram: 9105: Src/mkbltnmlst.sh: non-existent module problems.
+	
+	* Sven: 9099: Src/mem.c, Src/zsh.h: heap memory uses mmap()
+	as long as MAP_ANONYMOUS is available.
+
+	* Sven: 9098: Src/lex.c: double input buffer with inbufct as
+	maximum when more memory required.
+
+	* pws: 9123: Src/Modules/mathfunc.c, Doc/Zsh/mod_mathfunc.yo:
+	removed drem() as not present on Solaris.
+
+	* Clint: 9094: Completion/User/_tar: handle -Cf.
+
+	* Clint: 9093: Completion/User/_tar_archive: bzip2 support
+
+	* Oliver: 9088: Completion/Core/_description: failed to sort
+	listings numerically.
+
+	* Oliver: 9087: Src/module.c, Src/Modules/zutil.mdd: more
+	dependency problems with .export files.
+
+	* Sven: 9086: ./Doc/Makefile.in, Doc/Zsh/.distfiles,
+	Doc/Zsh/mod_zprof.yo: zprof doc.
+
+	* Sven: 9085: Doc/Zsh/compsys.yo: :completion missing, default tag
+	doc.
+
+	* Zefram: 9084: Src/Aliases/.cvsignore, Src/Aliases/.distfiles,
+	Src/Aliases/.exrc, Src/Aliases/.preconfig, Src/Aliases/alias.c.in,
+	Src/Aliases/alias.mdd.in, Src/xmods.conf: alias old modules to new
+	hierarchical names, zle -> zsh/zle etc.
+
+	* Zefram: 9083: Completion/User/_cvs, Doc/Makefile.in,
+	Doc/Zsh/builtins.yo, Doc/Zsh/mod_cap.yo, Doc/Zsh/mod_clone.yo,
+	Doc/Zsh/mod_compctl.yo, Doc/Zsh/mod_complete.yo,
+	Doc/Zsh/mod_complist.yo, , Doc/Zsh/mod_computil.yo,
+	Doc/Zsh/mod_deltochar.yo, Doc/Zsh/mod_example.yo,
+	Doc/Zsh/mod_files.yo, Doc/Zsh/mod_mapfile.yo,
+	Doc/Zsh/mod_mathfunc.yo, Doc/Zsh/mod_parameter.yo,
+	Doc/Zsh/mod_sched.yo, Doc/Zsh/mod_stat.yo, Doc/Zsh/mod_zftp.yo,
+	Doc/Zsh/mod_zle.yo, Doc/Zsh/mod_zleparameter.yo,
+	Doc/Zsh/mod_zutil.yo, Doc/Zsh/modules.yo, Doc/Zsh/options.yo,
+	Doc/Zsh/restricted.yo, Doc/Zsh/zftpsys.yo,
+	Etc/zsh-development-guide, Functions/Misc/zls,
+	Functions/Zftp/zfinit, Src/Builtins/rlimits.c,
+	Src/Builtins/rlimits.mdd, Src/Builtins/sched.c,
+	Src/Builtins/sched.mdd, Src/Makemod.in.in, Src/Modules/cap.c,
+	Src/Modules/cap.mdd, Src/Modules/clone.c, Src/Modules/clone.mdd,
+	Src/Modules/example.c, Src/Modules/example.mdd,
+	Src/Modules/files.c, Src/Modules/files.mdd, Src/Modules/mapfile.c,
+	Src/Modules/mapfile.mdd, Src/Modules/mathfunc.c,
+	Src/Modules/mathfunc.mdd, Src/Modules/parameter.c,
+	Src/Modules/parameter.mdd, Src/Modules/stat.c,
+	Src/Modules/stat.mdd, Src/Modules/zftp.c, Src/Modules/zftp.mdd,
+	Src/Modules/zutil.c, Src/Modules/zutil.mdd, Src/Zle/compctl.c,
+	Src/Zle/compctl.mdd, Src/Zle/complete.c, Src/Zle/complete.mdd,
+	Src/Zle/complist.c, Src/Zle/complist.mdd, Src/Zle/computil.c,
+	Src/Zle/computil.mdd, Src/Zle/deltochar.c, Src/Zle/deltochar.mdd,
+	Src/Zle/zle.mdd, Src/Zle/zle_main.c, Src/Zle/zle_thingy.c,
+	Src/Zle/zleparameter.c, Src/Zle/zleparameter.mdd, Src/init.c,
+	Src/makepro.awk, Src/mkbltnmlst.sh, Src/mkmakemod.sh,
+	Src/mkmodindex.sh, Src/module.c, Src/xmods.conf, Src/zsh.mdd,
+	Test/ztst.zsh, configure.in, Src/Modules/zprof.c,
+	Src/Modules/zprof.mdd:  Improved hierarchical naming scheme for
+	modules.
+
+	* Sven: 9019: Src/Modules/zprof.c, Src/Modules/zprof.mdd:
+	profiling module, documentation to follow.
+
+	* Zefram: 9081: Src/Modules/parameter.mdd: make sure parameter
+	jobdirs autoloads parameter module.
+
+	* Sven: 9079: Src/exec.c, Src/lex.c: memory allocation for token
+	strings and input lines changed; autoloading didn't free source
+	code; more pushing and popping of heaps; saves ca. 800KB with
+	completion loaded.
+ 
+	* Sven: 9078: Completion/Commands/.distfile,
+	Completion/Commands/_verbose_list: _verbose_list is not needed any
+	more.
+
+	* Sven: 9077: Src/Zle/compresult.c, Src/Zle/computil.c,
+	Src/Zle/zle_main.c, Src/Zle/zle_tricky.c, Src/pattern.c:
+	`unitialised' warnings and unnecessary function.
+
+	* Sven: 9076: Src/Zle/compcore.c: better handling of globbing and
+	approximation together.
+
+	* Sven: 9075: Completion/Core/compinit: use ZLS_COLORS for style
+	defaults.
+
+	* Sven: 9074: Functions/Zle/predict-on: tidier 9064
+
 1999-12-15  Peter Stephenson  <pws@pwstephenson.fsnet.co.uk>
+
+	* pws: Config/version.mk: version 3.1.6-pws-12.
+
+	* pws: 9067: Doc/Zsh/zftpsys.yo, Functions/Zftp/zfanon,
+	Functions/Zftp/zfcd, Functions/Zftp/zfcget,
+	Functions/Zftp/zfclose, Functions/Zftp/zfcput,
+	Functions/Zftp/zfdir, Functions/Zftp/zfgcp, Functions/Zftp/zfget,
+	Functions/Zftp/zfgoto, Functions/Zftp/zfhere,
+	Functions/Zftp/zfinit, Functions/Zftp/zfls, Functions/Zftp/zfmark,
+	Functions/Zftp/zfopen, Functions/Zftp/zfparams,
+	Functions/Zftp/zfpcp, Functions/Zftp/zfput,
+	Functions/Zftp/zfsession, Functions/Zftp/zfstat,
+	Functions/Zftp/zftp_chpwd, Functions/Zftp/zftp_progress,
+	Functions/Zftp/zftransfer, Functions/Zftp/zftype,
+	Functions/Zftp/zfuget, Functions/Zftp/zfuput:  use _patcomps in
+	zfinit differently due to 9035; zfput -r does recursive put;
+	use styles instead of zfconfig entries; new styles titlebar
+	and chpwd.
 
 	* Clint: 9065: Src/builtin.c: change order of tests in 9028.
 
 	* Bart: 9064: Functions/Zle/predict-on: shouldn't use _style any
 	more.
 
-	* 9058: Completion/Base/_arguments, Completion/Base/_combination,
-	Completion/Base/_command_names, Completion/Base/_jobs,
-	Completion/Base/_tilde, Completion/Builtins/_cd,
-	Completion/Builtins/_kill, Completion/Builtins/_stat,
-	Completion/Builtins/_wait, Completion/Core/_path_files,
-	Completion/Core/_sort_tags, Completion/Core/_tags,
-	Completion/Core/compinit, Doc/Zsh/compsys.yo, Src/Makemod.in:
-	Many small cleanups, plus change sort-tags to tag-order and
-	add to syntax a bit.
+	* Sven: 9058: Completion/Base/_arguments,
+	Completion/Base/_combination, Completion/Base/_command_names,
+	Completion/Base/_jobs, Completion/Base/_tilde,
+	Completion/Builtins/_cd, Completion/Builtins/_kill,
+	Completion/Builtins/_stat, Completion/Builtins/_wait,
+	Completion/Core/_path_files, Completion/Core/_sort_tags,
+	Completion/Core/_tags, Completion/Core/compinit,
+	Doc/Zsh/compsys.yo, Src/Makemod.in: Many small cleanups, plus
+	change sort-tags to tag-order and add to syntax a bit.
 
 	* Tanaka Akira: 9054: Test/50cd.ztst: get PWD without symlinks, to
 	avoid messing up cd tests.

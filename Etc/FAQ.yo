@@ -49,7 +49,7 @@ description(\
 mydit(Archive-Name:) unix-faq/shell/zsh
 mydit(Last-Modified:) 1999/07/30
 mydit(Submitted-By:) email(pws@ibmth.df.unipi.it (Peter Stephenson))
-mydit(Version:) $Id: FAQ.yo,v 1.1.1.18 1999/12/23 10:53:50 akr Exp $
+mydit(Version:) $Id: FAQ.yo,v 1.1.1.19 1999/12/23 23:01:43 akr Exp $
 mydit(Posting-Frequency:) Monthly
 mydit(Copyright:) (C) P.W. Stephenson, 1995--1999 (see end of document)
 )
