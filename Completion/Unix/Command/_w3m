@@ -1,6 +1,6 @@
 #compdef w3m
 
-local curcontext="$curcontext" state line
+local curcontext="$curcontext" state line expl ret=1
 typeset -A opt_args
 
 _arguments -C \
@@ -9,16 +9,15 @@ _arguments -C \
   '-l[preserved lines]:number of lines:' \
   '-B[load bookmark]' \
   '-bookmark:bookmark file:_files' \
-  '-T[content-type]:content type:' \
+  '-T[content-type]:content type' \
   '-m[internet message mode]' \
   '-v[visual startup mode]' \
   '-M[monochrome display]' \
   '-F[automatically render frame]' \
   '(-dump_source -dump_head)-dump' \
-  '-cols:column width:' \
+  '-cols:column width' \
   '(-dump -dump_head)-dump_source' \
   '(-dump -dump_source)-dump_head' \
-  '+:goto line:' \
   '-num[show line number]' \
   '-no-proxy' \
   '-no-mouse' \
@@ -28,13 +27,25 @@ _arguments -C \
   '-S[squeeze multiple blank lines]' \
   '-W[toggle wrap search mode]' \
   '-X[do not use termcap init/deinit]' \
-  '-o[option]:option-value:' \
+  '-o[option]:option-value' \
   '-config:config file:_files' \
   '-debug' \
-  ':url:->html' && return 0
+  ':url:->html' \
+  '+:goto line' && ret=0
 
-case $state in
-	html)
-	_alternative 'files:file:_files -g "*.x#html"' 'urls:url:_w3mhistory'
-	;;
-esac
+if [[ -n $state ]]; then
+  local w3mhistory
+
+  _tags files w3mhistory urls
+  while _tags; do
+    _requested files expl 'file' _files -g "*.x#html" && ret=0
+    _requested urls expl 'url' _urls && ret=0
+    if [[ -s ~/.w3m/history ]] && _requested w3mhistory; then
+      w3mhistory=( ${(f)"$(<~/.w3m/history)"} )
+      _all_labels w3mhistory expl 'url from history' compadd -a w3mhistory
+    fi
+    (( ret )) || break
+  done
+fi
+
+return ret

@@ -69,5 +69,5 @@ arguments=( $arguments[@]
 _pick_variant -c "$command" gnu=gnu unix --help ||
     arguments=( ${arguments:#(|*\)(\*|))--*} )
 
-_arguments -s $arguments[@]
+_arguments -S -s $arguments[@]
 

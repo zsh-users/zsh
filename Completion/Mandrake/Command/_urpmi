@@ -30,7 +30,7 @@ _urpmi_rpms() {
   _tags rpms files
 
   while _tags; do
-    if _requested rpms expl 'urpmi RPMs'; then
+    if _requested rpms expl 'urpmi RPM'; then
       local -a synthesis pkgs
       synthesis=(/var/lib/urpmi/synthesis.*(N))
       if [[ $#synthesis -gt 0 ]]; then
@@ -43,11 +43,13 @@ _urpmi_rpms() {
       fi
     fi
 
-    _requested files expl '(S)RPM files' \
+    _requested files expl '(S)RPM file' \
       _files -g '*.(#i)rpm' && ret=0
+  
+    (( ret )) || break
   done
 
-  return $ret
+  return ret
 }
 
 _urpmi_media_url() {
@@ -94,7 +96,7 @@ _urpmi() {
 	"(--distrib):name of media: " \
 	"(--distrib):media URL:_urpmi_media_url" \
 	"(--distrib): :(with)" \
-	"(--distrib):relative path to hdlist file: " \
+	"(--distrib):relative path to hdlist file" \
        && ret=0
     ;;
     urpmi.removemedia )
@@ -161,7 +163,7 @@ _urpmi() {
 	"(--help -h)-r[print version and release too with name]" \
 	"(--help -h)-u[remove package if a better version is already installed]" \
 	"(--help -h)-v[verbose mode]" \
-	"(--help -h)*:urpmi package name: " \
+	"(--help -h)*:urpmi package name" \
      && ret=0
     ;;
   esac

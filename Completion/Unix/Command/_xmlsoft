@@ -1,7 +1,7 @@
-#compdef xsltproc xmllint
+#compdef xsltproc xmllint -value-,XML_CATALOG_FILES,-default-
 
-# xmllint: using libxml version 20503
-# xsltproc: using libxslt version 10027
+# xmllint: using libxml version 20602
+# xsltproc: using libxslt version 10100
 
 case $service in
   xsltproc)
@@ -16,8 +16,8 @@ case $service in
       '--novalid[skip the DTD loading phase]' \
       '--noout[do not dump the result]' \
       '--maxdepth[increase the maximum depth]:depth' \
-      '(--docbook)--html[input document is an HTML file]' \
-      '(--html)--docbook[input document is SGML docbook]' \
+      '--maxparsedepth[increase the maximum parser depth]:depth' \
+      '--html[input document is an HTML file]' \
       '--param[pass a parameter,value pair]:name::value (xpath expression)' \
       '--stringparam[pass a parameter]:name::value' \
       '--path[provide a set of paths for resources]:paths:_files -/' \
@@ -27,6 +27,7 @@ case $service in
       '--writesubtree[allow file write only with the path subtree]:path:_files -/' \
       '--catalogs[use SGML catalogs]' \
       '--xinclude[do XInclude processing on document input]' \
+      '--load-trace[print trace of all external entites loaded]' \
       {--profile,--norman}'[dump profiling information]' \
       '1:stylesheet:_files -g \*.xsl' \
       ':file:_files -g \*.xml' && return
@@ -65,33 +66,50 @@ case $service in
       '--htmlout[output results as HTML]' \
       '--nowrap[do not put HTML doc wrapper]' \
       '--valid[validate the document in addition to std well-formed check]' \
-      '(--dtdvalid --relaxng)--postvalid[do a posteriori validation, i.e after parsing]' \
-      '(--postvalid --relaxng)--dtdvalid[do a posteriori validation against a given DTD]:DTD:_webbrowser' \
+      '(--dtdvalid --relaxng --schema)--postvalid[do a posteriori validation, i.e after parsing]' \
+      '(--postvalid --relaxng --schema --dtdvalidfpi)--dtdvalid[do a posteriori validation against a given DTD]:DTD:_webbrowser' \
+      '(--postvalid --relaxng --schema --dtdvalid)--dtdvalidfpi[as --dtdvalid but specify DTD with public identifier]:DTD identifier' \
       '--timing[print some timings]' \
       '(--noout --output -o)'{--output,-o}'[save to a given file]:output file:_files' \
       '--repeat[repeat 100 times, for timing or profiling]' \
       '--insert[ad-hoc test for valid insertions]' \
       '--compress[turn on gzip compression of output]' \
-      '(--html)--sgml[use the DocBook SGML parser]' \
-      '(--sgml)--html[use the HTML parser]' \
+      '--html[use the HTML parser]' \
+      '--xmlout[use the XML serializer when using --html]' \
       '--push[use the push mode of the parser]' \
       '--memory[parse from memory]' \
       '--nowarning[do not emit warnings from parser/validator]' \
       '--noblanks[drop (ignorable?) blanks spaces]' \
+      '--nocdata[replace cdata section with text nodes]' \
       '--format[reformat/reindent the input]' \
-      '--testIO[test user I/O support]' \
       '--encode[output in the given encoding]:encoding:(${encoding[@]})' \
+      '--dropdtd[remove the DOCTYPE of the input docs]' \
+      '--nsclean[remove redundant namespace declarations]' \
+      '--testIO[test user I/O support]' \
       '(--nocatalogs)--catalogs[use SGML catalogs]' \
       '(--catalogs)--nocatalogs[deactivate all catalogs]' \
       '--auto[generate a small doc on the fly]' \
       '--xinclude[do XInclude processing]' \
       '--loaddtd[fetch external DTD]' \
       '--dtdattr[loaddtd + populate the tree with inherited attributes]' \
-      '--dropdtd[remove the DOCTYPE of the input docs]' \
       '--stream[use the streaming interface to process very large files]' \
+      '--walker[create a reader and walk though the resulting doc]' \
       '--chkregister[verify the node registration code]' \
-      '(--dtdvalid --postvalid)--relaxng[do RelaxNG validation against the schema]:schema:_webbrowser' \
+      '(--dtdvalid --postvalid --schema)--relaxng[do RelaxNG validation against specified schema]:schema:_webbrowser' \
+      '(--dtdvalid --postvalid --relaxng)--schema[do validation against specified WXS schema]:schema:_webbrowser' \
       '*:XML file:_webbrowser' && return
+  ;;
+  *XML_CATALOG_FILES*)
+    compset -q
+    if [[ -prefix *: ]]; then
+      _urls
+      return
+    fi
+    
+    compset -S ':*'
+    _alternative \
+      'files:catalog file:_files' \
+      'url-schemas:URL schema:compadd -S "" file:///' && return
   ;;
 esac
 

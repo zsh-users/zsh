@@ -17,21 +17,27 @@ _arguments -C -s \
   '(--input-file -i)'{--input-file=,-i+}'[specify input file]:file containing URLs:_files' \
   '(--force-html -F)'{--force-html,-F}'[treat input file as html]' \
   '(--base -B)'{--base=,-B+}'[prepend URL to relative links]:base URL:_urls' \
-  '--bind-address=:address to bind to (hostname or IP):_hosts' \
   '(--tries -t)'{--tries=,-t+}'[set number of retries]:number of retries' \
+  '--retry-connrefused[retry even if connection is refused]' \
   '(--output-document -O)'{--output-document=,-O+}'[specify file to write documents to]:output file:_files' \
   '(--continue -c)'{--continue,-c}'[continue getting an existing file]'  \
   '--progress=[set progress gauge type]:gauge type:->gauge' \
   '(--timestamping -N)'{--timestamping,-N}'[retrieve only files newer than existing]' \
   '(--server-response -S)'{--server-response,-S}'[print server response]' \
   "--spider[don't download anything]" \
-  '(--timeout -T)'{--timeout=,-T+}'[specify read timeout]:read timeout (seconds)' \
+  '(--timeout -T)'{--timeout=,-T+}'[set all timeout values]:timeout (seconds)' \
+  '(--timeout -T)--dns-timeout=[set the DNS lookup timeout]:DNS lookup timeout (seconds)' \
+  '(--timeout -T)--connect-timeout=[set the connect timeout]:connect timeout (seconds)' \
+  '(--timeout -T)--read-timeout=[set the read timeout]:read timeout (seconds)' \
   '(--wait,-w)'{--wait=,-w+}'[specify wait between retrievals]:wait between retrievals (seconds)' \
   '(--random-wait)--waitretry=:wait between retries of a retrieval (seconds)' \
   '(--waitretry)--random-wait[wait from 0...2*WAIT secs between retrievals]' \
   '(--proxy -Y)'{--proxy=,-Y+}'[turn proxy on or off]:proxy use:(on off)' \
   '(--quota -Q)'{--quota=,-Q+}'[set retrieval quota]:number' \
+  '--bind-address=:address to bind to (hostname or IP):_hosts' \
   '--limit-rate=[specify limit to download rate]:download rate limit' \
+  '--dns-cache=off[disable caching DNS lookups]' \
+  '--restrict-file-names=[restrict chars in file names to ones OS allows]:OS:(unix windows)' \
   '(--force-directories -x)'{--force-directories,-x}'[force creation of directories]' \
   '(--directory-prefix -P)'{--directory-prefix=,-P+}'[specify prefix to save files to]:prefix:_files -/' \
   '--cut-dirs=:number:' \
@@ -55,6 +61,7 @@ _arguments -C -s \
   '(--backup-converted -K)'{--backup-converted,-K}'[backup files before conversion]' \
   '(--mirror -m -r -N -l)'{--mirror,-m}'[mirror (-r -N -l inf -nr)]' \
   '(--page-requisites -p)'{--page-requisites,-p}'[get all images needed to display page]' \
+  '--strict-comments[turn on strict (SGML) handling of HTML comments]' \
   '(--accept -A)'{--accept=,-A+}'[specify accepted extensions]:extensions' \
   '(--reject -R)'{--reject=,-R+}'[specify rejected extensions]:extensions' \
   '(--domains -D)'{--domains=,-D+}'[specify accepted domains]:domains' \
@@ -79,10 +86,17 @@ _arguments -C -s \
   '--cookies=[turn cookies on or off]:cookies:(on off)' \
   '--load-cookies=[specify file to load cookies from]:cookie file:_files' \
   '--save-cookies=[specify file to save cookies to]:cookie file:_files' \
+  '--post-data=[use the POST method with specified data]:data to send' \
+  '--post-file=[use the POST method; sending contents of a file]:file:_files' \
   '--no-http-keep-alive[disable HTTP keep-alive]' \
   '--sslcertfile=[specify client certificate]:client certificate file:_files' \
   '--sslcertkey=[specify keyfile for certificate]:keyfile:_files' \
   '--egd-file=[specify filename of EGD socket]' \
+  "--sslcadir=[specify dir where hash list of CA's are stored]:directory:_directories" \
+  "--sslcafile=[specify file with bundle of CA's]:file:_files" \
+  '--sslcerttype=[specify client cert type]:certificate type:((0\:PEM 1\:ASN1))' \
+  '--sslcheckcert=[check the server cert against given CA]: :(0 1)' \
+  '--sslprotocol=[choose SSL protocol]:protocol version:((0\:automatic 1\:SSLv2 2\:SSLv3 3\:TLSv1))' \
   '*:url:_urls' && return 0
 
 case "$state" in

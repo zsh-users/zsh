@@ -8,15 +8,15 @@ if [[ -prefix *::*/ ]]; then
 
   compset -P '*::*/'
 
-  remfiles=(${(f)"$(rsync ${words[CURRENT]%/*}/)"})
+  remfiles=(${(f)"$(_call_program files rsync ${words[CURRENT]%/*}/)"})
 
   remdispf=(${remfiles:#d*})
   remdispd=(${(M)remfiles:#d*})
 
-    _wanted files expl 'remote files and directories' \
+  _wanted files expl 'remote file or directory' \
       compadd -d remdispf ${remdispf##* }
 
-    _wanted files expl 'remote files and directories' \
+  _wanted files expl 'remote file or directory' \
       compadd -S/ -d remdispd ${remdispd##* }
 
 elif [[ -prefix 1 *:: ]]; then
@@ -24,7 +24,7 @@ elif [[ -prefix 1 *:: ]]; then
 
   compset -P 1 '*::'
 
-  remfiles=(${(f)"$(rsync ${words[CURRENT]%::*}::)"})
+  remfiles=(${(f)"$(_call_program files rsync ${words[CURRENT]%::*}::)"})
 
   remmodules=(${remfiles/[ 	]#/:})
 
@@ -37,17 +37,17 @@ elif [[ -prefix 1 *: ]]; then
 
   if zstyle -T ":completion:${curcontext}:" remote-access; then
     slash=/
-    remfiles=(${(f)"$(ssh -a -x ${words[CURRENT]%:*} ls -d1F ${${${words[CURRENT
+    remfiles=(${(f)"$(_call_program files ssh -a -x ${words[CURRENT]%:*} ls -d1F ${${${words[CURRENT
 ]#*:}:h}/${slash}(#e)/}/\* 2>/dev/null)"})
 
     remdispf=(${remfiles:#*/})
     remdispd=(${(M)remfiles:#*/})
 
-    _wanted files expl 'remote files and directories' \
-      compadd -d remdispf ${${remfiles:#*/}/[*=@|](#e)/}
+    _wanted files expl 'remote file or directory' \
+        compadd -d remdispf ${${remfiles:#*/}/[*=@|](#e)/}
 
-    _wanted files expl 'remote files and directories' \
-      compadd -S/ -d remdispd ${${(M)remfiles:#*/}/${slash}(#e)/}
+    _wanted files expl 'remote file or directory' \
+        compadd -S/ -d remdispd ${${(M)remfiles:#*/}/${slash}(#e)/}
   else
     _message -e remote-files 'remote files'
   fi
@@ -65,14 +65,14 @@ else
     _wanted users expl "user" \
 	_combination -s '[:@]' "${tag}" users-hosts users -q "$@" -
   else
-    _alternative 'user:users:_users -S @' 'host:hosts:_hosts -S:'
+    _alternative 'users:user:_users -S @' 'hosts:host:_hosts -S:'
   fi
 fi
 
 }
 
 _rsync_files() {
-  _alternative "file:files:_files" "remote-files:remote files:_rsync_remote_files"
+  _alternative "files:file:_files" "remote-files:remote file:_rsync_remote_files"
 }
 
 _arguments -s \

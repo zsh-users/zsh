@@ -1,6 +1,6 @@
 #compdef alias
 
-local curcontext="$curcontext" state line type suf
+local curcontext="$curcontext" state line expl type suf
 typeset -A opt_args
 
 _arguments -C -s -A "-*" -S \

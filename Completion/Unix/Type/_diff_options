@@ -1,6 +1,7 @@
 #autoload
 
 local of ofwuc ouc oss ofwy ofwg ofwl cmd
+local -a args
 
 cmd="$1"
 shift
@@ -10,12 +11,13 @@ if _pick_variant -c $cmd gnu=GNU unix -v; then
   of="-y --side-by-side -n --rcs -e -f --ed -q --brief -c -C --context -u -U \
   --unified --old-group-format --new-group-format --changed-group-format \
   --unchanged-group-format --line-format --old-line-format --new-line-format \
-  --unchanged-line-format --normal"
+  --unchanged-line-format --normal -D --ifdef"
 
   # output formats w/o unified and context
   ofwuc="-y --side-by-side -n --rcs -e -f --ed -q --brief --old-group-format \
   --new-group-format --changed-group-format --unchanged-group-format --normal \
-  --line-format --old-line-format --new-line-format --unchanged-line-format"
+  --line-format --old-line-format --new-line-format --unchanged-line-format \
+  -D --ifdef"
 
   # option specific to unified or context diff
   ouc='-L --label -p --show-c-function -F --show-function-line'
@@ -27,11 +29,12 @@ if _pick_variant -c $cmd gnu=GNU unix -v; then
   ofwy="-n --rcs -e -f --ed -q --brief -c -C --context -u -U --unified \
   --old-group-format --new-group-format --changed-group-format \
   --unchanged-group-format --line-format --old-line-format \
-  --new-line-format --unchanged-line-format --normal"
+  --new-line-format --unchanged-line-format --normal -D --ifdef"
 
   # output formats w/o group format
   ofwg="-n --rcs -e -f --ed -q --brief -c -C --context -u -U --unified --normal \
-  --line-format --old-line-format --new-line-format --unchanged-line-format"
+  --line-format --old-line-format --new-line-format --unchanged-line-format
+  -D --ifdef"
 
   # output formats w/o line format
   ofwl="-n --rcs -e -f --ed -q --brief -c -C --context -u -U --unified \
@@ -39,30 +42,24 @@ if _pick_variant -c $cmd gnu=GNU unix -v; then
   --unchanged-group-format"
 
   _arguments -s \
-    '(--ignore-case -i)'{--ignore-case,-i}'[case insensitive]' \
-    '--ignore-file-name-case[ignore case when comparing file names]' \
-    '--no-ignore-file-name-case[consider case when comparing file names]' \
-    '(--ignore-tab-expansion -E)'{--ignore-tab-expansion,-E}'[ignore changes due to tab expansion]' \
-    '(-b)--ignore-space-change[ignore changes in the amount of white space]' \
+    '(-i --ignore-case)'{-i,--ignore-case}'[case insensitive]' \
+    '(--no-ignore-file-name-case)--ignore-file-name-case[ignore case when comparing file names]' \
+    '(--ignore-file-name-case)--no-ignore-file-name-case[consider case when comparing file names]' \
+    '(-E --ignore-tab-expansion)'{-E,--ignore-tab-expansion}'[ignore changes due to tab expansion]' \
+    '(-b --ignore-space-change)'{-b,--ignore-space-change}'[ignore changes in the amount of white space]' \
     '(--ignore-space-change)-b[ignore changes in the amount of white space]' \
     '(--ignore-all-space -w)'{--ignore-all-space,-w}'[ignore all white space]' \
-    '(-B)--ignore-blank-lines[ignore lines that are all blank]' \
-    '(--ignore-blank-lines)-B[ignore lines that are all blank]' \
-    '(--ignore-matching-lines -I)'{--ignore-matching-lines=,-I+}'[ignore lines that match regex]:line exclusion regex:' \
+    '(-B --ignore-blank-lines)'{-B,--ignore-blank-lines}'[ignore lines that are all blank]' \
+    '(-I --ignore-matching-lines)'{-I+,--ignore-matching-lines=}'[ignore lines that match regex]:line exclusion regex:' \
     '--strip-trailing-cr[strip trailing carriage return on input]' \
-    '(--text -a)'{--text,-a}'[treat all files as text]' \
-    "($of $oss)--context=-[output a context diff]:number of lines of copied context:" \
-    "($of $oss)-C+[output a context diff]:number of lines of copied context:" \
+    '(-a --text)'{-a,--text}'[treat all files as text]' \
+    "($of $oss)"{-C+,--context=-}'[output a context diff]:number of lines of copied context' \
     "($of $oss)-c[output a context diff]" \
-    "($of $oss)--unified=-[output a unified diff]:number of lines of unified context:" \
-    "($of $oss)-U+[output a unified diff]:number of lines of unified context:" \
+    "($of $oss)"{-U+,-unified=-}'[output a unified diff]:number of lines of unified context' \
     "($of $oss)-u[output a unified diff]" \
-    "($ofwuc $oss)*--label=[set label to use instead of file name]:label:" \
-    "($ofwuc $oss)*-L+[set label to use instead of file name]:label:" \
-    "($ofwuc $oss -p)--show-c-function[show C function of each change]" \
-    "($ofwuc $oss --show-c-function)-p[show C function of each change]" \
-    "($ofwuc $oss -F)--show-function-line=[show the most recent line matching regex]:regex:" \
-    "($ofwuc $oss --show-function-line)-F+[show the most recent line matching regex]:regex:" \
+    "($ofwuc $oss)*"{-L+,--label=}'[set label to use instead of file name]:label' \
+    "($ofwuc $oss -p --show-c-function)"{-p,--show-c-function}'[show C function of each change]' \
+    "($ofwuc $oss -F --show-function-line)"{-F+,--show-function-line=}'[show the most recent line matching regex]:regex' \
     "($of $ouc $oss)--brief[output only whether files differ]" \
     "($of $ouc $oss)-q[output only whether files differ]" \
     "($of $ouc $oss -e --ed)"{--ed,-e}'[output an ed script]' \
@@ -73,45 +70,62 @@ if _pick_variant -c $cmd gnu=GNU unix -v; then
     "($of $ouc $oss)-n[RCS format diff]" \
     "($of $ouc)--side-by-side[output in two columns]" \
     "($of $ouc)-y[output in two columns]" \
-    "($ofwy $ouc --width -W)"{--width=,-W+}'[set size of line]:number of characters per line:' \
+    "($ofwy $ouc --width -W)"{--width=,-W+}'[set size of line]:number of characters per line' \
     "($ofwy $ouc)--left-column[output only left column of common lines]" \
     "($ofwy $ouc)--suppress-common-lines[do not output common lines]" \
-    "($ofwg $ouc $oss)--old-group-format=[set old group format]:old group format:" \
-    "($ofwg $ouc $oss)--new-group-format=[set new group format]:new group format:" \
-    "($ofwg $ouc $oss)--changed-group-format=[set changed group format]:changed group format:" \
-    "($ofwg $ouc $oss)--unchanged-group-format=[set unchanged group format]:unchanged group format:" \
-    "($ofwl $ouc $oss)--line-format=[set line format]:line format:" \
-    "($ofwl $ouc $oss)--old-line-format=[set old line format]:old line format:" \
-    "($ofwl $ouc $oss)--new-line-format=[set new line format]:new line format:" \
-    "($ofwl $ouc $oss)--unchanged-line-format=[set unchanged line format]:unchanged line format:" \
-    '(--paginate -l)'{--paginate,-l}'[output through pr]' \
-    '(--expand-tabs -t)'{--expand-tabs,-t}'[expand tabs to spaces]' \
-    '(--initial-tab -T)'{--initial-tab,-T}'[prepend a tab]' \
-    '(--recursive -r)'{--recursive,-r}'[recursively compare subdirectories]' \
-    '(--new-file -N)'{--new-file,-N}'[treat absent files as empty]' \
-    '(-P)--unidirectional-new-file[treat absent first files as empty]' \
-    '(--unidirectional-new-file)-P[treat absent first files as empty]' \
-    '(-s)--report-identical-files[report when two files are the same]' \
-    '(--report-identical-files)-s[report when two files are the same]' \
-    '(-x)--exclude=[exclude files matching pattern]:exclusion pattern:' \
-    '(--exclude)-x+[exclude files matching pattern]:exclusion pattern:' \
-    '(-X)--exclude-from=[exclude files matching pattern in file]:exclude file:_files' \
-    '(--exclude-from)-X+[exclude files matching pattern in file]:exclude file:_files' \
-    '(-S)--starting-file=[set first file in comparison]:start with file:_files' \
-    '(--starting-file)-S+[set first file in comparison]:start with file:_files' \
+    "($of $oss)"{-D,--ifdef=}'[output merged file with preprocessor directives]:preprocessor symbol' \
+    "($ofwg $ouc $oss)--old-group-format=[set old group format]:old group format" \
+    "($ofwg $ouc $oss)--new-group-format=[set new group format]:new group format" \
+    "($ofwg $ouc $oss)--changed-group-format=[set changed group format]:changed group format" \
+    "($ofwg $ouc $oss)--unchanged-group-format=[set unchanged group format]:unchanged group format" \
+    "($ofwl $ouc $oss)--line-format=[set line format]:line format" \
+    "($ofwl $ouc $oss)--old-line-format=[set old line format]:old line format" \
+    "($ofwl $ouc $oss)--new-line-format=[set new line format]:new line format" \
+    "($ofwl $ouc $oss)--unchanged-line-format=[set unchanged line format]:unchanged line format" \
+    '(-l --paginate)'{-l,--paginate}'[output through pr]' \
+    '(-t --expand-tabs)'{-t,--expand-tabs}'[expand tabs to spaces]' \
+    '(-T --initial-tab)'{-T,--initial-tab}'[prepend a tab]' \
+    '--tabsize=[specify width of tab]:width' \
+    '(-r --recursive)'{-r,--recursive}'[recursively compare subdirectories]' \
+    '(-N --new-file)'{-N,--new-file}'[treat absent files as empty]' \
+    '(-P --unidirectional-new-file)'{-P,--unidirectional-new-file}'[treat absent first files as empty]' \
+    '(-s --report-identical-files)'{-s,--report-identical-files}'[report when two files are the same]' \
+    '(-x --exclude)'{-x+,--exclude=}'[exclude files matching pattern]:exclusion pattern' \
+    '(-X --exclude-from)'{-X+,--exclude-from=}'[exclude files matching pattern in file]:exclude file:_files' \
+    '(-S --starting-file)'{-S+,--starting-file=}'[set first file in comparison]:start with file:_files' \
     '(--to-file)--from-file=[compare specified file to all operands]:from file:_files' \
     '(--from-file)--to-file=[compare all operands to specified file]:to file:_files' \
-    '--horizon-lines=[set number of lines to keep in prefix and suffix]:number of horizon lines:' \
-    '(--minimal -d)'{--minimal,-d}'[try to find a smaller set of changes]' \
-    '(--speed-large-files -H)'{--speed-large-files,-H}'[assume large files and many small changes]' \
-    '(--version -v)'{--version,-v}'[output version info]' \
-    '--help[help text]' \
+    '--horizon-lines=[set number of lines to keep in prefix and suffix]:number of horizon lines' \
+    '(-d --minimal)'{-d,--minimal}'[try to find a smaller set of changes]' \
+    '(-H --speed-large-files)'{-H,--speed-large-files}'[assume large files and many small changes]' \
+    '(-v --version)'{-v,--version}'[display version info]' \
+    '--help[display help info]' \
     "$@"
 else
-  _arguments \
-    "(-e -f)-c[output a context diff]" \
-    "(-c -f)-e[output an ed script]" \
-    "(-c -e)-f[output a reversed ed script]" \
+  case $OSTYPE in
+    solaris2.9)
+      args=( '(-c -e -f -C)-u[output a unified diff]' )
+    ;&
+    solaris*)
+      args+=(
+	'-i[case insensitive]'
+        '-t[expand tabs to spaces]'
+	'-w[ignore all white space]'
+        '(-c -e -f -n -u -h -D)-C+[output a context diff]:number of lines of copied context'
+	'(-c -e -f -n -u -C -D)-h[do a fast, half-hearted job]'
+	'(-c -e -f -u -h -C -D)-n[reversed ed script]'
+	'(-c -e -f -n -u -h -C)-D[output merged file with preprocessor directives]:preprocessor symbol'
+        '-l[output through pr]'
+	'-s[report on identical files]'
+        '-S+[set first file in comparison]:start with file:_files'
+      )
+    ;;
+  esac
+  
+  _arguments "$args[@]" \
+    "(-e -f -u -n)-c[output a context diff]" \
+    "(-c -f -u -n)-e[output an ed script]" \
+    "(-c -e -u -n)-f[output a reversed ed script]" \
     '-b[skip trailing white spaces]' \
     '-r[recursively compare subdirectories]' \
     "$@"

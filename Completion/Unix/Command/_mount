@@ -4,29 +4,19 @@ if [[ "$OSTYPE" == cygwin ]]; then
   if [[ "$service" == mount ]] ; then
     _arguments -s \
       - mount \
-        '(-b -t --text)--binary[Unix line endings LF]' \
-        '(--binary -t --text)-b[Unix line endings LF]' \
-        '(-f)--force[be silent]' \
-        '(--force)-f[be silent]' \
-        '(-s -u --user)--system[system-wide mount point]' \
-        '(--system -u --user)-s[system-wide mount point]' \
-        '(-t -b --binary)--text[(default) DOS line endings CR-LF]' \
-        '(--text -b --binary)-t[(default) DOS line endings CR-LF]' \
-        '(-u -s --system)--user[(default)user private mount point]' \
-        '(--user -s --system)-u[(default)user private mount point]' \
-        '(-x -X --cygwin-executable)--executable[all files under mountpoint are executables]' \
-        '(--executable -X --cygwin-executable)-x[all files under mountpoint are executables]' \
-        '(-X -x --executable)--cygwin-executable[all files under mountpoint are cygwin executables]' \
-        '(--cygwin-executable -x --executable)-X[all files under mountpoint are cygwin executables]' \
-        ':Windows path:' \
-        ':Unix path:_path_files -P/ -W "(/)" -/' \
+	'(-b -t --text --binary)'{-b,--binary}'[Unix line endings LF]' \
+	'(-f --force)'{-f,--force}'[be silent]' \
+	'(-s -u --user --system)'{-s,--system}'[system-wide mount point]' \
+	'(-t -b --binary --text)'{-t,--text}'[DOS line endings CR-LF]' \
+	'(-u -s --system --user)'{-u,--user}'[user private mount point]' \
+	'(-x -X --executable --cygwin-executable)'{-x,--executable}'[all files under mountpoint are executables]' \
+	'(-x -X --executable --cygwin-executable)'{-X,--cygwin-executable}'[all files under mountpoint are cygwin executables]' \
+	':Windows path:' \
+	':Unix path:_path_files -P/ -W "(/)" -/' \
       - control \
-        '(-i -p --show-cygdrive-prefix -c --change-cygdrive-prefix)--import-old-mounts[import old mounts]' \
-        '(--import-old-mounts -p --show-cygdrive-prefix -c --change-cygdrive-prefix)-i[import old mounts]' \
-        '(-p -i --import-old-mounts -c --change-cygdrive-prefix)--show-cygdrive-prefix[show cygdrive prefix]' \
-        '(--show-cygdrive-prefix -i --import-old-mounts -c --change-cygdrive-prefix)-p[show cygdrive prefix]' \
-        '(-c -i --import-old-mounts -p --show-cygdrive-prefix)--change-cygdrive-prefix[cygdrive prefix]:cygdrive prefix (POSIX path):_files -P/ -W "(/)" -/' \
-        '(--change-cygdrive-prefix -i --import-old-mounts -p --show-cygdrive-prefix)-c[cygdrive prefix]:cygdrive prefix (POSIX path):_files -P/ -W "(/)" -/' 
+	'(-)'{-i,--import-old-mounts}'[import old mounts]' \
+	'(-)'{-p,--show-cygdrive-prefix}'[show cygdrive prefix]' \
+	'(-)'{-c,--change-cygdrive-prefix}'[cygdrive prefix]:cygdrive prefix (POSIX path):_files -P/ -W "(/)" -/' \
   
     return
   else
@@ -69,11 +59,11 @@ if (( ! $+_fs_any )); then
     '(ro)rw[mount file system read-write]'
   )
   _nfs_access=(
-    'acregmin[specify cached file attributes minimum hold time]:cached file attributes minimum hold time:'
-    'acregmax[specify cached file attributes maximum hold time]:cached file attributes maximum hold time:'
-    'acdirmin[specify cached directory attributes minimum hold time]:cached directory attributes minimum hold time:'
-    'acdirmax[specify cached directory attributes maximum hold time]:cached directory attributes maximum hold time:'
-    'actimeo[set all attributes'"'"' cache timeout]:set all attributes'"'"' cache timeout:'
+    'acregmin[specify cached file attributes minimum hold time]:cached file attributes minimum hold time'
+    'acregmax[specify cached file attributes maximum hold time]:cached file attributes maximum hold time'
+    'acdirmin[specify cached directory attributes minimum hold time]:cached directory attributes minimum hold time'
+    'acdirmax[specify cached directory attributes maximum hold time]:cached directory attributes maximum hold time'
+    "actimeo[set all attributes' cache timeout]:cache timeout"
   )
   _fs_nfs=(
     'rsize[specify read buffer size]:read buffer size:(8192)'
@@ -81,10 +71,10 @@ if (( ! $+_fs_any )); then
     '(soft)hard[hang process on server crash (so to say)]'
     '(hard)soft[allow time out on server crash]'
     '(nolock)lock[use locking]'
-    '(lock)nolock[don'"'"'t use locking]'
-    'timeo[specify initial timeout for UDP]:initial timeout for UDP:'
-    'retrans[set number of NFS retransmissions]:number of NFS retransmissions:'
-    'retry[specify number of mount failure retries]:mount failure retries:'
+    "(lock)nolock[don't use locking]"
+    'timeo[specify initial timeout for UDP]:initial timeout for UDP'
+    'retrans[set number of NFS retransmissions]:number of NFS retransmissions'
+    'retry[specify number of mount failure retries]:mount failure retries'
     '(fg)bg[retry in the background]'
     '(bg)fg[retry in the foreground]'
     '(nintr)intr[allow operations to be interrupted]'
@@ -92,21 +82,21 @@ if (( ! $+_fs_any )); then
     '(nfsv3)nfsv2[use NFS version 2]'
     '(nfsv2)nfsv3[use NFS version 3]'
     'proto[specify protocol]:protocol:(udp tcp)'
-    'port[specify server port number]:server port number:'
+    'port[specify server port number]:server port number'
     'proplist[allow property lists]'
     "$_nfs_access[@]"
-    'nocto[don'"'"'t get fresh attributes on open]'
-    'noac[don'"'"'t set attribute caching]'
+    "nocto[don't get fresh attributes on open]"
+    "noac[don't set attribute caching]"
   )
   _nfs_ufs=(
     '(nodev)dev[interpret devices]'
-    '(dev)nodev[don'"'"'t interpret devices]'
+    "(dev)nodev[don't interpret devices]"
     '(nosuid)suid[use suid and sgib bits]'
     '(suid)nosuid[ignore suid and sgid bits]'
     '(nosync)sync[do I/O synchronously]'
     '(sync)nosync[do all I/O asynchronously]'
     '(noexec)exec[permit execution of binaries]'
-    '(exec)noexec[don'"'"'t allow execution of binaries]'
+    "(exec)noexec[don't allow execution of binaries]"
     '(nogrpid)grpid[new file gets group ID of directory]'
     '(grpid)nogrpid[new file gets fsgid of current process]'
   )
@@ -144,7 +134,7 @@ if (( ! $+_fs_any )); then
       'posix[exchange pathconf info on NFS version 2 mount]'
       'secure[use DES encryption]'
       'grpid[inherit group id of parent directory]'
-      '(acl)noacl[don'"'"'t use access control lists]'
+      "(acl)noacl[don't use access control lists]"
       '(noacl)acl[use access control lists for this mount]'
       'noac[no attribute or directory caching]'
       'shortdev[server lack support for 32-bit device special files]'
@@ -219,33 +209,33 @@ if (( ! $+_fs_any )); then
       '(nosuid)suid[use suid and sgib bits]'
     )
     _fs_ufs=(
-      '(atime)noatime[don'"'"'t update access time]'
+      "(atime)noatime[don't update access time]"
       'f[fake an /etc/mnttab entry]'
-      'm[don'"'"'t make an /etc/mnttab entry]'
+      "m[don't make an /etc/mnttab entry]"
       '(noforcedirection)forcedirection[do I/O synchronously]'
       '(forcedirection)noforcedirection[do all I/O asynchronously]'
       '(nointr)intr[allow operations to be interrupted]'
       '(intr)nointr[prevent operations from being interrupted]'
-      '(nolargefiles)largefiles[don'"'"' restrict file size]'
+      "(nolargefiles)largefiles[don't restrict file size]"
       '(largefiles)nolargefiles[restrict file size]'
       '(nologging)logging[log transactions]'
       '(logging)nologging[log transactions]'
-      'onerror[action to recover from error]:action(panic lock umount)'
+      'onerror[action to recover from error]:action:(panic lock umount)'
       'quota[turn on quotas]'
       '(ro rw)rq[mount file system read-write with quotas]'
       "$_fs_s5fs[@]"
     )
     _fs_tmpfs=(
-      'size[set file system size]:size:'
+      'size[set file system size]:size'
     )
     _fs_pcfs=(
       '(nofoldcase)foldcase[force filenames to lowercase]'
-      '(foldcase)nofoldcase[don'"'"'t force filenames to lowercase]'
+      "(foldcase)nofoldcase[don't force filenames to lowercase]"
     )
     _fs_hsfs=(
       'nrr[no rock ridge]'
       'notraildot[no trail dot when no extension]'
-      'nomaplcase[don'"'"'t force lowercase]'
+      "nomaplcase[don't force lowercase]"
       'nosuid[ignore suid and sgid bits]'
     )
     _fs_nfs=(
@@ -257,13 +247,13 @@ if (( ! $+_fs_any )); then
       '(intr)nointr[prevent operations from being interrupted]'
       '(sec secure)kerberos[use kerberos authentication]'
       'noac[no attribute caching]'
-      'port[server IP port number]:port:'
+      'port[server IP port number]:port'
       'posix[posix semantics]'
       'proto[specify protocol]:protocol:'\("$(grep -v '^#' /etc/netconfig 2> /dev/null | cut -d ' ' -f 1)"\)
       'public[force public file handle]'
       '(noquota)quota[enable quotas]'
       '(quota)noquota[disable quotas]'
-      'timeo[specify initial timeout for UDP]:initial timeout for UDP:'
+      'timeo[specify initial timeout for UDP]:initial timeout for UDP'
       'retrans[set number of NFS retransmissions]:number of NFS retransmissions:(5)'
       'retry[specify number of mount failure retries]:mount failure retries:(10000)'
       'rsize[specify read buffer size]:read buffer size:(8192)'
@@ -277,7 +267,7 @@ if (( ! $+_fs_any )); then
     _fs_cachefs=(
       'backfstype[type of the back file system]:back file system type:(nfs hsfs)'
       'backpath[specify back file system location]:back file system location:_files -/'
-      'cacheid[specify a cache ID]:cache ID:'
+      'cacheid[specify a cache ID]:cache ID'
       'local-access[check permissions locally]'
       'noconst[disable cache consistency checking]'
       'purge[purge any cached information]'
@@ -313,10 +303,10 @@ if (( ! $+_fs_any )); then
       '(rw suid dev exec auto nouser async)defaults[use default options]'
       '(nodev)dev[interpret devices]'
       '(noexec)exec[permit execution of binaries]'
-      '(atime)noatime[don'"'"'t update access time]'
+      "(atime)noatime[don't update access time]"
       '(auto)noauto[can only be mounted explicitly]'
-      '(dev)nodev[don'"'"'t interpret devices]'
-      '(exec)noexec[don'"'"'t allow execution of binaries]'
+      "(dev)nodev[don't interpret devices]"
+      "(exec)noexec[don't allow execution of binaries]"
       '(suid)nosuid[ignore suid and sgid bits]'
       '(user)nouser[can only be mounted by root]'
       'remount[mount already mounted file system]'
@@ -324,45 +314,58 @@ if (( ! $+_fs_any )); then
       '(ro)rw[mount file system read-write]'
       '(nosuid)suid[use suid and sgib bits]'
       '(async)sync[do I/O synchronously]'
-      '(nouser noexec nosuid nodev)user[allow normal users to mount]'
+      'dirsync[perform directory updates synchronously]'
+      'loop[use loopback device]:loopback device:_files'
+      'encryption[enable encryption]:cypher'
+      'keybits[set number of bits in encryption key]:key size:(64 128 160 192 256)'
+      'offset[specify data start for loopback mount]:offset (bytes)'
     )
     _fs_affs=(
-      'uid[set owner of root]:user ID:'
-      'gid[set group of root]:group ID:'
-      'setuid[set owner of all files]:user ID:'
-      'setgid[set group of all files]:group ID:'
-      'mode[set file permissions]:file permission bits:'
-      'protect[don'"'"'t allow changes to permissions]'
+      'uid[set owner of root]:user ID'
+      'gid[set group of root]:group ID'
+      'setuid[set owner of all files]:user ID'
+      'setgid[set group of all files]:group ID'
+      'mode[set file permissions]:file permission bits'
+      "protect[don't allow changes to permissions]"
       'usemp[set owner of root to owner of mount point]'
       'verbose[print message per mount]'
-      'prefix[prefix before volume name (link)]:prefix string:'
-      'volume[prefix before '"'"'/'"'"' (symlink)]:prefix string:'
-      'reserved[set number of unused blocks at start of device]:number of unused blocks:'
-      'root[specify location of the root block]:root block location:'
+      'prefix[prefix before volume name when following link]:prefix string'
+      "volume[prefix before '/' when following link]:prefix string"
+      'reserved[set number of unused blocks at start of device]:number of unused blocks'
+      'root[specify location of the root block]:root block location'
       'bs[specify block size]:block size:(512 1024 2048 4192)'
     )
     _fs_ext2=(
       '(minixdf)bsddf[select bsddf behavior]'
       '(bsddf)minixdf[select bsddf behavior]'
       '(nocheck)check[set checking level]::checking level:((normal\:check\ inode\ and\ block\ bitmaps\ on\ mount strict\:check\ on block\ deallocation none\:no\ checking))'
+      'debug[print debugging info upon each (re)mount]'
       'errors[specify behavior on error]:error behavior:((continue\:ignore\ errors remount-ro\:remount\ file\ system\ read-only panic\:panic\ and\ halt\ system))'
       '(nogrpid bsdgroups sysvgroups)grpid[new file gets group ID of directory]'
       '(grpid nogrpid sysvgroups)bsdgroups[new file gets group ID of directory]'
       '(grpid bsdgroups sysvgroups)nogrpid[new file gets fsgid of current process]'
       '(grpid bsdgroups nogrpid)sysvgroups[new file gets fsgid of current process]'
-      'resgid[specify access to reserved space (group ID)]:group ID:'
-      'resuid[specify access to reserved space (user ID)]:user ID:'
-      'sb[specify super block number]:super block number:'
+      'resgid[specify access to reserved space (group ID)]:group ID'
+      'resuid[specify access to reserved space (user ID)]:user ID'
+      'sb[specify super block number]:super block number'
+      'nouid32[disable 32-bit UIDs and GIDs]'
     )
     _fs_fat=(
-      'blocksize[specify block size]:block size:(512 1024)'
-      'uid[specify user ID of all files]:user ID:'
-      'gid[specify group ID of all files]:group ID:'
-      'umask[specify umask]:umask value (octal):'
+      'blocksize[specify block size]:block size:(512 1024 2048)'
+      'uid[specify user ID of all files]:user ID'
+      'gid[specify group ID of all files]:group ID'
+      'umask[specify umask]:umask value (octal)'
+      'dmask[specify umask for directories only]:umask value (octal)'
+      'fmask[specify umask for files only]:umask value (octal)'
       'check[specify checking level]:checking level:((relaxed\:accept\ upper\ and\ lower\ case,\ truncate\ long\ name normal\:like\ '"'\`'"'relaxed'"\\'"',\ but\ reject\ special\ characters strict\:like\ '"'\`'"'normal'"\\'"',\ but\ no\ long\ parts))'
+      'codepage[specify codepage for converting filenames to short form]:codepage'
       'conf[specify CR/NL conversion]:CR/NL conversion mode:((binary\:no\ translation text\:conversion\ on\ all\ files auto\:perform\ translation\ on\ file\ without\ binary\ extension))'
+      'conv[convert form of text files]:mode:(binary text auto)'
+      'cvf_format[use specified compressed volume format module]:module'
+      'cvf_option[pass option to CVF module]:option'
       'debug[debug mode]'
-      'fat[specify fat type]:fat type (bit):(12 16)'
+      'fat[specify fat type]:fat type (bit):(12 16 32)'
+      'iocharset[character set to use for converting from 8 bit to unicode]:character set'
       'quiet[quiet mode]'
     )
     _fs_ext3=(
@@ -378,38 +381,70 @@ if (( ! $+_fs_any )); then
       'posix[allow file names only differing in case]'
       'nonumtail[try short name before number extension]'
       '(uni_xlate)utf8[mount the filesystem in UTF8 mode]'
+      'shortname[specify handling of 8.3 filenames]:mode:(lower win95 winnt mixed)'
     )
     _fs_hpfs=(
-      'uid[specify user ID of all files]:user ID:'
-      'gid[specify group ID of all files]:group ID:'
-      'umask[specify umask]:umask value (octal):'
+      'uid[specify user ID of all files]:user ID'
+      'gid[specify group ID of all files]:group ID'
+      'umask[specify umask]:umask value (octal)'
       'case[specify file name conversion]:file name conversion:((lower\:convert\ to\ lower\ case asis\:no\ conversion))'
       'conv[specify CR elimination]:CR elimination:((binary\:no\ elimination test\:delete\ CRs\ \(e.g.\ before\ NL\) auto\:sometimes\ yes,\ sometimes\ not))'
-      'nocheck[don'"'"'t abort mount on consistency check failure]'
+      "nocheck[don't abort mount on consistency check failure]"
     )
     _fs_iso9660=(
       'norock[disable Rock Ridge extensions]'
+      'nojoliet[disable Microsoft Joliet extensions]'
       'check[specify file name conversion]:file name conversion:((relaxed\:convert\ to\ lower\ case\ before\ lookup strict\:no\ conversion))'
-      'uid[specify user ID of all files]:user ID:'
-      'gid[specify group ID of all files]:group ID:'
+      'uid[specify user ID of all files]:user ID'
+      'gid[specify group ID of all files]:group ID'
       'map[specify non-Rock Ridge name conversion]:file name conversion:((normal\:map\ upper\ to\ lower,\ ignore\ \;1,\ map\ \;\ to\ . off\:no\ conversion))'
-      'mode[specify permissions]:file access permissions:'
+      'mode[specify permissions]:file access permissions'
       'unhide[show hidden and associated files]'
       'block[specify block size]:block size:(512 1024 2048)'
       'cruft[ignore high bits of file length]'
+      'session[select session number on multisession CD]:session'
+      'sbsector[specify starting sector]:sector'
+      'iocharset[character set when converting from 8 bit to unicode (Joliet)]:character set'
+      'utf8[mount the filesystem in UTF8 mode (Joliet)]'
+    )
+    _fs_ntfs=(
+      'iocharset[character set to use when returning file names]:character set'
+      '(uni_xlate)utf8[use UTF-8 for converting file names]'
+      '(utf8)uni_xlate[translate unicode to escaped sequences]:type:(0 1 2)'
+      'posix[distinguish upper and lower case]:state:((0\:off 1\:on))'
+      'uid[specify user ID of all files]:user ID'
+      'gid[specify group ID of all files]:group ID'
+      'umask[specify umask]:umask value (octal)'
+    )      
+    _fs_reiserfs=(
+      'conv[mount 3.5 fs using 3.6 format for new objects]'
+      'hash[choose hash type]:hash function:(rupasov tea r5 detect)'
+      '(no_unhashed_relocation)hashed_relocation[tune the block allocator]'
+      'noborder[disable border allocator algorithm]'
+      'nolog[disable journalling]'
+      'notail[disable packing of files into the tree]'
+      '(hashed_relocation)no_unhashed_relocation[tune the block allocator]'
+      'replayonly[replay but do not mount]'
+      'resize[assume the device has this many blocks]:number of blocks'
     )
     _fs_smbfs=( "$_fs_nfs[@]" )
+    _fs_tmpfs=(
+      'size[set file system size]:size (bytes)'
+      'mode[set root directory permissions]:mode'
+      'nr_blocks[set number of blocks]:blocks'
+      'nr_inodes[set number of inodes]:inodes'
+    )
     _fs_udf=(
-      'uid[specify user ID of all files]:user ID:'
-      'gid[specify group ID of all files]:group ID:'
-      'umask[specify umask]:umask value (octal):'
+      'uid[specify user ID of all files]:user ID'
+      'gid[specify group ID of all files]:group ID'
+      'umask[specify umask]:umask value (octal)'
       'unhide[show hidden and associated files]'
       'undelete[show deleted files]'
       'bs[set the block size]:block size:2048'
       'novrs[skip volume sequence recognition]'
-      'session[set the CDROM session]:session:'
+      'session[set the CDROM session]:session'
       'anchor[override standard anchor location]:anchor location:256'
-      'lastblock[set the last block of the file system]:last block:'
+      'lastblock[set the last block of the file system]:last block'
     )
     _fs_ufs=(
       'ufstype[set ufs type]:ufs type:(old 44bsd sun sunx86 nextstep nextstep-cd openstep)'
@@ -432,19 +467,8 @@ if (( ! $+_fs_any )); then
       '(quota usrquota)uqnoenforce[enable user quotas without enforcement]'
       '(gqnoenforce)grpquota[enable group quotas]'
       '(grpquota)gqnoenforce[enable group quotas without enforcement]'
-      'sunit[specify stripe unit]:size:'
-      'swidth[specify stripe width]:size:'
-    )
-    _fs_reiserfs=(
-    'conv[mount 3.5 fs using 3.6 format for new objects]'
-    'hash[choose hash type]:hash function:(rupasov tea r5 detect)'
-    '(no_unhashed_relocation)hashed_relocation[tune the block allocator]'
-    'noborder[disable border allocator algorithm]'
-    'nolog[disable journalling]'
-    'notail[disable packing of files into the tree]'
-    '(hashed_relocation)no_unhashed_relocation[tune the block allocator]'
-    'replayonly[replay but do not mount]'
-    'resize[assume the device has this many blocks]:number of blocks:'
+      'sunit[specify stripe unit]:size'
+      'swidth[specify stripe width]:size'
     )
     ;;
   freebsd*)
@@ -454,14 +478,14 @@ if (( ! $+_fs_any )); then
       'force[force R/W mount of unclean filesystem]'
       'fstab[use options listed in /etc/fstab]'
       'noasync[do I/O synchronously]'
-      'noatime[don'"'"'t update access time]'
+      "noatime[don't update access time]"
       'noauto[can only be mounted explicitly]'
       'noclusterr[disable read clustering]'
       'noclusterw[disable write clustering]'
-      'nodev[don'"'"'t interpret devices]'
-      'noexec[don'"'"'t allow execution of binaries]'
+      "nodev[don't interpret devices]"
+      "noexec[don't allow execution of binaries]"
       'nosuid[ignore suid and sgid bits]'
-      'nosymfollow[don'"'"'t follow symlinks]'
+      "nosymfollow[don't follow symlinks]"
       'rdonly[mount file system read-only]'
       '(async)sync[do all I/O synchronously]'
       'suiddir[allow suid bits on directories]'
@@ -470,14 +494,14 @@ if (( ! $+_fs_any )); then
     )
     _fs_iso9660=(
       'extatt[enable use of extended attributes]'
-      'gens[don'"'"'t strip version number on files]'
-      'joliet[don'"'"'t use any Joliet extensions]'
-      'rrip[don'"'"'t use any Rockridge extensions]'
+      "gens[don't strip version number on files]"
+      "joliet[don't use any Joliet extensions]"
+      "rrip[don't use any Rockridge extensions]"
       'strictjoliet[relax checking for Supplementary Volume Descriptor Flags field which is set to a wrong value on some Joliet formatted disks]'
     )
     _fs_std=(
-      'nodev[don'"'"'t interpret devices]'
-      'noexec[don'"'"'t allow execution of binaries]'
+      "nodev[don't interpret devices]"
+      "noexec[don't allow execution of binaries]"
       'nosuid[ignore suid and sgid bits]'
       'rdonly[mount file system read-only]'
       'union[cause the namespace at the mount point to appear as the union of the mounted filesystem and the existing directory]'
@@ -508,7 +532,7 @@ if [[ "$service" = mount ]]; then
   case "$OSTYPE" in
   aix*)
     args=( -s
-      '-a[mount all filesystems in /etc/fstab]'
+      '(:)-a[mount all filesystems in /etc/fstab]'
       '-f[forced mount]'
       '-n[remote node]:remote node:_hosts'
       '-p[mount as removable file system]'
@@ -526,7 +550,7 @@ if [[ "$service" = mount ]]; then
       '-a[mount all filesystems in /etc/fstab]'
       '-b[mount all filesystems in /etc/fstab except those listed]:list of directories:_dir_list -s,'
       '-c[check any dirty filesystems before mounting]'
-      '-f[fake a new /etc/mtab entry, but don'\''t mount any filesystems]'
+      "-f[fake a new /etc/mtab entry, but don't mount any filesystems]"
       '-h[mount all filesystems associated with host]:hostnames:_hosts'
       '-n[mount filesystem without making entry in /etc/mtab]'
       '-o[specify file system options]:file system option:->fsopt'
@@ -541,25 +565,34 @@ if [[ "$service" = mount ]]; then
     ;;
   linux*)
     args=( -s
-      '-h[show help]'
-      '-V[show version]'
-      '-v[verbose mode]'
-      '(-o)-a[mount all filesystems in fstab]'
-      '-F[fork off one child per device]'
-      '-f[fake mount]'
-      '-n[don'"'"'t write /etc/mtab]'
-      '-s[tolerate sloppy mount options]'
-      '-r[mount read-only]'
-      '-w[mount read/write]'
-      '-t[specify file system type]:file system type:->fslist'
-      '-o[specify file system options]:file system option:->fsopt'
+      '(- :)-h[show help]'
+      '(- :)-V[show version]'
+      '(-V -h)-v[verbose mode]'
+      '(-V -h)-p[specify file descriptor from which to read passphrase]:file descriptor:_file_descriptors'
+      '(-V -h -o :)-a[mount all filesystems in fstab]'
+      '(-V -h)-F[fork off one child per device]'
+      '(-V -h)-f[fake mount]'
+      "(-V -h)-i[don't call /sbin/mount.<fs> helper]"
+      '(-V -h)-l[output ext2, ext3 and XFS labels]'
+      "(-V -h)-n[don't write /etc/mtab]"
+      '(-V -h)-s[tolerate sloppy mount options]'
+      '(-V -h -w)-r[mount read-only]'
+      '(-V -h -r)-w[mount read/write]'
+      '(-V -h)-L[mount partition with specified label]:label'
+      '(-V -h)-U[mount partition with specified uuid]:uuid'
+      '(-V -h)-t[specify file system type]:file system type:->fslist'
+      '(-V -h)-O[with -a, restrict filesystems by options]:file system option:->fsopt'
+      '(-V -h -a -O)-o[specify file system options]:file system option:->fsopt'
+      '(: -)--bind[remount part of filesystem elsewhere]:old directory:_directories:new directory:_directories'
+      '(: -)--rbind[remount part of filesystem including submounts elsewhere]:old directory:_directories:new directory:_directories'
+      '(: -)--move[move part of filesystem elsewhere]:old directory:_directories:new directory:_directories'
       ':dev or dir:->devordir'
       ':mount point:_files -/'
     )
     ;;
   osf*)
     args=( -s
-      '(-o)-a[mount all filesystems in fstab]'
+      '(-o :)-a[mount all filesystems in fstab]'
       '-d[mount even if not unmounted]'
       '-e[list all mount points]'
       '-f[fake mount]'
@@ -581,8 +614,8 @@ if [[ "$service" = mount ]]; then
       '(-p -v)-F[specify file system type]:file system type:_file_systems'
       '(-a -v)-p[print mounted file systems]'
       '(-p -a)-v[print mounted file systems verbosely]'
-      '(-p -v)-V[fake mount]'
-      '(-p -v)-m[don'"'"'t write /etc/mnttab]'
+      '(-p -v)-V[echo command-line but do not execute]'
+      "(-p -v)-m[don't write /etc/mnttab]"
       '(-p -v)-g[mount globally]'
       '(-p -v)-o[specify file system options]:file system option:->fsopt'
       '(-p -v)-O[overlay mount]'
@@ -595,7 +628,7 @@ if [[ "$service" = mount ]]; then
     ;;
   freebsd*)
     args=( -s
-      '-a[mount all filesystems in fstab]'
+      '(:)-a[mount all filesystems in fstab]'
       '-d[cause everything to be done except for the actual system call]'      
       '-f[forced mount]'
       '-o[specify file system options]:file system option:->fsopt'
@@ -614,7 +647,7 @@ if [[ "$service" = mount ]]; then
     # Default for all other systems. Dunno.
 
     args=( -s
-      '(-o)-a[mount all filesystems in fstab]'
+      '(-o :)-a[mount all filesystems in fstab]'
       '-t[specify file system type]:file system type:_file_systems'
       '-o[specify file system options]:file system option:->fsopt'
       '-f[fake mount]'
@@ -634,7 +667,7 @@ else
   case "$OSTYPE" in
     aix*)
       args=(
-	'-a[unmount all mounted file systems]'
+	'(*)-a[unmount all mounted file systems]'
 	'-f[force unmount]'
 	'-n[remote node]:remote node:_hosts'
 	'-t[specify file system type]:file system type:_file_systems'
@@ -651,25 +684,46 @@ else
 	'-v[verbose]'
       )
     ;;  
+    linux*)
+      args=(
+	'(- *)-h[show help]'
+	'(- *)-V[show version]'
+	'(-V -h)-v[verbose mode]'
+	"(-V -h)-n[don't write /etc/mtab]"
+	'(-V -h)-r[remount read-only on failure]'
+	'(-V -h)-d[for loopback mount, free loop device]'
+	'(-V -h *)-a[unmount all file systems from /etc/mtab]'
+	'(-V -h)-t[specify file system type]:file system type:_file_systems'
+	'(-V -h *)-O[with -a, restrict filesystems by options]:file system option:->fsopt'
+	'(-V -h)-f[force unmount]'
+	'(-V -h)-l[lazy unmount]'
+	'*:dev or dir:->udevordir'
+      )
+    ;;
     freebsd*)
       args=(
-        '-a[unmount all mounted file systems]'
-        '-A[unmount all mounted file systems except the root]'
-        '-f[force unmount]'
-        '-h[unmount all filesystems associated with host]:hostnames:_hosts'
+	'(*)-a[unmount all mounted file systems]'
+	'-A[unmount all mounted file systems except the root]'
+	'-f[force unmount]'
+	'-h[unmount all filesystems associated with host]:hostnames:_hosts'
 	'-t[unmount all filesystems of specified type]:file system type:->fslist'
 	'-v[verbose mode]'
 	'*:dev or dir:->udevordir'
       )
     ;;
+    solaris*)
+      args=(
+        '-a[unmount all mounted file systems]'
+	'-f[force unmount]'
+        '-V[echo command-line but do not execute]'
+        '-o[specify file system options]:file system option:->fsopt'
+	'*:dev or dir:->udevordir'
+      )
+    ;;
     *)
-      args=( \
-	'-h[show help]'
-	'-V[show version]'
+      args=(
 	'-v[verbose mode]'
-	'-n[don'"'"'t write /etc/mtab]'
-	'-r[remount read-only on failure]'
-	'-a[unmount all file systems from /etc/mtab]'
+	'(*)-a[unmount all file systems from /etc/mtab]'
 	'-t[specify file system type]:file system type:_file_systems'
 	'*:dev or dir:->udevordir'
       )
@@ -691,66 +745,58 @@ fsopt)
 
   eval 'tmp=(' '"$_fs_'${(s:,:)^${opt_args[$typeops]:-${deffs}}}'[@]"' ')'
   tmp=( "$_fs_any[@]" "${(@)tmp:#}" )
-  _values -s , 'file system options' "$tmp[@]" && ret=0
+  _values -s , 'file system option' "$tmp[@]" && ret=0
   ;;
 devordir)
-  if (( $+opt_args[-a] )); then
-    _message "no device or directory with option \`-a'"
-  else
-    local dev_tmp mp_tmp mline
+  local dev_tmp mp_tmp mline
 
-    case "$OSTYPE" in
-    freebsd*)
-      while read mline; do 
-        case $mline[(w)1] in
-          \#* )
-            ;;
-          proc)
-            ;;
-          *)
-            [[ $mline[(w)3] == swap ]] || \
-              dev_tmp=( $dev_tmp $mline[(w)1] ) \
-              mp_tmp=( $mp_tmp $mline[(w)2] )
-            ;;
-        esac
-      done < /etc/fstab
-      
-      _alternative \
-          'devices:device:compadd -a dev_tmp' \
-          'directories:mount point:compadd -a mp_tmp' && ret=0
-      ;;
-    *)
-      _alternative \
-          'devices:device:{compadd "$expl[@]" /dev/*}' \
-	  'directories:mount point:_files -/' && ret=0
-    ;;
-    esac
-  fi
-  ;;
-udevordir)
-  if (( $+opt_args[-a] )); then
-    _message "no device or directory with option \`-a'"
-  else
-    local dev_tmp mp_tmp mline
-
-    case "$OSTYPE" in
-    linux*|irix*)
-      tmp=( "${(@f)$(< /etc/mtab)}" )
-      dev_tmp=( "${(@)${(@)tmp%% *}:#none}" )
-      mp_tmp=( "${(@)${(@)tmp#* }%% *}" )
-      ;;
-    *)
-      /sbin/mount | while read mline; do
-        dev_tmp=( $dev_tmp $mline[(w)1] )
-        mp_tmp=( $mp_tmp $mline[(w)3] )
-      done
-      ;;
-    esac
+  case "$OSTYPE" in
+  freebsd*)
+    while read mline; do 
+      case $mline[(w)1] in
+	\#* )
+	  ;;
+	proc)
+	  ;;
+	*)
+	  [[ $mline[(w)3] == swap ]] || \
+	    dev_tmp=( $dev_tmp $mline[(w)1] ) \
+	    mp_tmp=( $mp_tmp $mline[(w)2] )
+	  ;;
+      esac
+    done < /etc/fstab
 
     _alternative \
-        'devices:device:compadd -a dev_tmp' \
-	'directories:mount point:compadd -a mp_tmp' && ret=0
-  fi
+      'devices:device:compadd -a dev_tmp' \
+      'directories:mount point:compadd -a mp_tmp' && ret=0
+    ;;
+  *)
+    _alternative \
+      'devices:device:_files -P /dev/ -W /dev' \
+      'directories:mount point:_directories' && ret=0
+    ;;
+  esac
+  ;;
+udevordir)
+  local dev_tmp mp_tmp mline
+
+  case "$OSTYPE" in
+  linux*|irix*)
+    tmp=( "${(@f)$(< /etc/mtab)}" )
+    dev_tmp=( "${(@)${(@)tmp%% *}:#none}" )
+    mp_tmp=( "${(@)${(@)tmp#* }%% *}" )
+    ;;
+  *)
+    /sbin/mount | while read mline; do
+      mp_tmp=( $mp_tmp $mline[(w)1] )
+      dev_tmp=( $dev_tmp $mline[(w)3] )
+    done
+    ;;
+  esac
+
+  _alternative \
+    'devices:device:compadd -a dev_tmp' \
+    'directories:mount point:compadd -a mp_tmp' && ret=0
   ;;
 esac
 

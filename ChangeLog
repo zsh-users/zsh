@@ -1,3 +1,14 @@
+2003-11-14  Oliver Kiddle  <opk@zsh.org>
+
+	* 19244: Completion/Linux/Command/_mondo,
+	Completion/Mandrake/Command/_urpmi, Completion/Unix/Command/_grep,
+	Completion/Unix/Command/_mh, Completion/Unix/Command/_mount,
+	Completion/Unix/Command/_rsync, Completion/Unix/Command/_subversion,
+	Completion/Unix/Command/_w3m, Completion/Unix/Command/_wget,
+	Completion/Unix/Command/_xmlsoft, Completion/Unix/Type/_diff_options,
+	Completion/Zsh/Command/_alias, Completion/Zsh/Command/_precommand:
+	various completion function fixes and updates
+
 2003-11-14  Doug Kearns  <djkea2@mugca.its.monash.edu.au>
 
 	* unposted: Completion/Unix/Command/_w3m: fix typo
