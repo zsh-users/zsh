@@ -1199,9 +1199,7 @@ if it is set to tt(..), only `tt(..)' will be added.
 )
 item(tt(squeeze-slashes))(
 If set to `true', sequences of slashes (like in `tt(foo//bar)') will be
-rewritten with a single slash (`tt(foo/bar)') when completing directory
-names.  Using this style can confuse tt(zsh) if slashes get squeezed 
-before braces completion (e.g. when trying to complete `tt(//{etc)').
+treated as if they were only one slash when completing pathnames.
 )
 item(tt(stop))(
 If set to `true', the tt(_history_complete_word) bindable

@@ -3,7 +3,7 @@
 # Utility function for in-path completion. This allows `/u/l/b<TAB>'
 # to complete to `/usr/local/bin'.
 
-local linepath realpath donepath prepath testpath exppath
+local linepath realpath donepath prepath testpath exppath skips
 local tmp1 tmp2 tmp3 tmp4 i orig eorig pre suf tpre tsuf opre osuf cpre
 local pats haspats=no ignore group expl addpfx addsfx remsfx rem remt
 local nm=$compstate[nmatches] menu mspec matcher mopts atmp sort match
@@ -157,13 +157,9 @@ if zstyle -s ":completion${curcontext}:files" sort tmp1; then
   fi
 fi
 
-# Squeeze sequences of slashes
-if zstyle -t ":completion${curcontext}:paths" squeeze-slashes
-then
-  PREFIX="${PREFIX//(\\/)#//}"
-  SUFFIX="${SUFFIX//(\\/)#//}"
-  [[ $PREFIX = */ ]] && SUFFIX=${SUFFIX#/}
-fi
+# Skip over sequences of slashes.
+
+zstyle -t ":completion${curcontext}:paths" squeeze-slashes && skips=yes
 
 # We get the prefix and the suffix from the line and save the whole
 # original string. Then we see if we will do menucompletion.
@@ -269,6 +265,14 @@ for prepath in "$prepaths[@]"; do
     if [[ "$tpre" = (.|..)/* ]]; then
       tmp1=( ${^tmp1}${tpre%%/*}/ )
       tpre="${tpre#*/}"
+      continue
+    fi
+
+    # Skip over multiple slashes?
+
+    if [[ -n "$skips" && "$tpre" = /* ]]; then
+      tmp1=( ${^tmp1}/ )
+      tpre="${tpre#/}"
       continue
     fi
 
