@@ -47,6 +47,7 @@ int dolastprompt;
 /* Non-zero if we should keep an old list. */
 
 /**/
+mod_export
 int oldlist, oldins;
 
 /* This is used to decide when the cursor should be moved to the end of    *
@@ -59,7 +60,7 @@ int movetoend;
 /* The match and group number to insert when starting menucompletion.   */
 
 /**/
-int insmnum, insgnum, insgroup, insspace;
+mod_export int insmnum, insgnum, insgroup, insspace;
 
 /* Information about menucompletion. */
 
@@ -133,12 +134,12 @@ mod_export int hasoldlist, hasperm;
 /* Non-zero if we have newly added matches. */
 
 /**/
-int newmatches;
+mod_export int newmatches;
 
 /* Number of permanently allocated matches and groups. */
 
 /**/
-int permmnum, permgnum, lastpermmnum, lastpermgnum;
+mod_export int permmnum, permgnum, lastpermmnum, lastpermgnum;
 
 /* The total number of matches and the number of matches to be listed. */
 
@@ -180,7 +181,7 @@ mod_export int mnum;
 /* The match counter when unambig_data() was called. */
 
 /**/
-int unambig_mnum;
+mod_export int unambig_mnum;
 
 /* Length of longest/shortest match. */
 
@@ -214,12 +215,12 @@ mod_export LinkList matchers;
 /* A heap of free Cline structures. */
 
 /**/
-Cline freecl;
+mod_export Cline freecl;
 
 /* Ambiguous information. */
 
 /**/
-Aminfo ainfo, fainfo;
+mod_export Aminfo ainfo, fainfo;
 
 /* The memory heap to use for new style completion generation. */
 
@@ -2523,7 +2524,7 @@ dupmatch(Cmatch m, int nbeg, int nend)
 /* This duplicates all groups of matches. */
 
 /**/
-int
+mod_export int
 permmatches(int last)
 {
     Cmgroup g = amatches, n;

@@ -71,7 +71,7 @@ char *compiprefix,
 Param *comprpms, *compkpms;
 
 /**/
-void
+mod_export void
 freecmlist(Cmlist l)
 {
     Cmlist n;

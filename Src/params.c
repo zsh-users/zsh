@@ -40,6 +40,7 @@ mod_export int locallevel;
 /* Variables holding values of special parameters */
  
 /**/
+mod_export
 char **pparams,		/* $argv        */
      **cdpath,		/* $cdpath      */
      **fpath,		/* $fpath       */
