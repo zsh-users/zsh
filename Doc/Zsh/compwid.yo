@@ -282,7 +282,7 @@ option being set); if set to tt(menu) or tt(automenu) menucompletion
 will be started for the matches currently generated (in the
 latter case this will happen because the tt(AUTO_MENU) is set). The
 value may also contain the string `tt(tab)' when the completion code
-woul normally not really do completion, but only insert the TAB
+would normally not really do completion, but only insert the TAB
 character.
 
 On exit it may be set to any of the values above (where setting it to

@@ -88,7 +88,7 @@ is selected with the tt(-f) option. If this is given, the var(format)
 string will be modified by replacing sequences starting with a percent 
 sign in it with strings from the var(specs). Each var(spec) has to be
 of the form `var(char)tt(:)var(string)' and this will make every
-appearence of the sequence `tt(%)var(char)' in var(format) be replaced 
+appearance of the sequence `tt(%)var(char)' in var(format) be replaced 
 with the var(string). The `tt(%)' sequence may also contain optional
 minimum and maximum field width specifications between the `tt(%)' and 
 the `var(char)' in the form `tt(%)var(min)tt(.)var(max)tt(c)',

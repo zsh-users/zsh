@@ -170,7 +170,7 @@ the prompt to display at the left.  If the tt(-r) flag is given,
 the following string gives the prompt to display at the right.  If the
 tt(-h) flag is specified, the history can be accessed from ZLE. If the 
 tt(-e) flag is given, typing tt(^D) (Control-D) on an empty line
-causes tt(vared) to exit immediatly with a non-zero return value.
+causes tt(vared) to exit immediately with a non-zero return value.
 )
 findex(zle)
 cindex(widgets, rebinding)
@@ -254,8 +254,8 @@ var(string)s are given but the tt(-c) option is used such a list is
 cleared.
 
 Note that this option is only useful for widgets that do not exit
-immediatly after using it because the strings displayed will be erased 
-immediatly after return from the widget.
+immediately after using it because the strings displayed will be erased 
+immediately after return from the widget.
 )
 item(tt(-M) var(string))(
 As with the tt(-R) option, the var(string) will be displayed below the 

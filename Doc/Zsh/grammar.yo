@@ -25,6 +25,11 @@ If a command name is given, the parameter assignments modify
 the environment of the command when it is executed.
 The value of a simple command is its exit status,
 or 128 plus the signal number if terminated by a signal.
+For example,
+
+example(echo foo)
+
+is a simple command with arguments.
 
 cindex(pipeline)
 A em(pipeline) is either a simple command, or a sequence of two or more
@@ -37,6 +42,12 @@ command to the standard input of the next.  The value of a pipeline
 is the value of the last command, unless the pipeline is preceded by
 `tt(!)' in which case the value is the logical inverse of the value of the
 last command.
+For example,
+
+example(echo foo | sed 's/foo/bar/')
+
+is a pipeline, where the output (`tt(foo)' plus a newline) of the first
+command will be passed to the input of the second.
 
 findex(coproc)
 cindex(coprocess)
@@ -45,6 +56,8 @@ a two-way pipe is established between it and the parent shell.  The
 shell can read from or write to the coprocess by means of the `tt(>&p)'
 and `tt(<&p)' redirection operators or with `tt(print -p)' and `tt(read -p)'.
 A pipeline cannot be preceded by both `tt(coproc)' and `tt(!)'.
+If job control is active, the coprocess can be treated in other than input
+and output as an ordinary background job.
 
 cindex(sublist)
 A em(sublist) is either a single pipeline, or a sequence of two or more
@@ -54,6 +67,14 @@ by `tt(&&)', the second pipeline is executed only if the first succeeds
 second is executed only if the first fails (returns a nonzero value).
 Both operators have equal precedence and are left associative.
 The value of the sublist is the value of the last pipeline executed.
+For example,
+
+example(dmesg | grep panic && print yes)
+
+is a sublist consisting of two pipelines, the second just a simple command
+which will be executed if and only if the tt(grep) command returns a zero
+value.  If it does not, the value of the sublist is that return value, else
+it is the value returned by the tt(print) (almost certainly zero).
 
 cindex(list)
 A em(list) is a sequence of zero or more sublists, in which each sublist
@@ -65,9 +86,15 @@ or `tt({)...tt(})'.  When a
 sublist is terminated by `tt(;)' or newline, the shell waits for it to
 finish before executing the next sublist.  If a sublist is terminated
 by a `tt(&)', `tt(&|)', or `tt(&!)',
-the shell executes it in the background, and
-does not wait for it to finish.
-A backgrounded sublist returns a status of zero.
+the shell executes the last pipeline in it in the background, and
+does not wait for it to finish (note the difference from other shells
+which execute the whole sublist in the background).
+A backgrounded pipeline returns a status of zero.
+
+More generally, a list can be seen as a set of any shell commands
+whatsoever, including the complex commands below; this is implied wherever
+the word `list' appears in later descriptions.  For example, the commands
+in a shell function form a special sort of list.
 texinode(Precommand Modifiers)(Complex Commands)(Simple Commands & Pipelines)(Shell Grammar)
 sect(Precommand Modifiers)
 cindex(precommand modifiers)
@@ -87,7 +114,9 @@ Filename generation (globbing) is not performed on any of
 the words.
 )
 item(tt(nocorrect))(
-Spelling correction is not done on any of the words.
+Spelling correction is not done on any of the words.  This must appear
+before any other precommand modifier, as it is interpreted immediately,
+before any parsing is done.  It has no effect in non-interactive shells.
 )
 item(tt(exec))(
 The command is executed in the parent shell without forking.
@@ -173,12 +202,13 @@ findex(select)
 cindex(user selection)
 cindex(selection, user)
 item(tt(select) var(name) [ tt(in) var(word) ... var(term) ] tt(do) var(list) tt(done))(
-where var(term) is one ore more newline or tt(;).
+where var(term) is one or more newline or tt(;) to terminate the var(word)s.
 Print the set of var(word)s, each preceded by a number.
 If the tt(in) var(word) is omitted, use the positional parameters.
-The tt(PROMPT3) prompt is printed and a line is read from standard
-input.  If this line consists of the number of one of the listed
-var(word)s, then the parameter var(name)
+The tt(PROMPT3) prompt is printed and a line is read from the line editor
+if the shell is interactive and that is active, or else standard input.
+If this line consists of the
+number of one of the listed var(word)s, then the parameter var(name)
 is set to the var(word) corresponding to this number.
 If this line is empty, the selection list is printed again.
 Otherwise, the value of the parameter var(name) is set to null.
@@ -203,6 +233,11 @@ Normally, only one var(word) is provided; multiple var(word)s
 are usually only useful for setting traps.
 The body of the function is the var(list) between
 the tt({) and tt(}).  See noderef(Functions).
+
+If the option tt(SH_GLOB) is set for compatibility with other shells, then
+whitespace may appear between between the left and right parentheses when
+there is a single var(word);  otherwise, the parentheses will be treated as
+forming a globbing pattern in that case.
 )
 cindex(timing)
 item(tt(time) [ var(pipeline) ])(
@@ -229,11 +264,26 @@ versions of complex commands should be considered deprecated and may be
 removed in the future.  The versions in the previous section should be
 preferred instead.  The short versions below only work if var(sublist)
 is of the form `tt({) var(list) tt(})' or if the tt(SHORT_LOOPS)
-option is set.
+option is set.  In this case, the test part of the loop must also be
+suitably delimited, such as by `tt([[ ... ]])' or `tt((( ... )))', else
+the end of the test will not be recognized.
 
 startitem()
 item(tt(if) var(list) tt({) var(list) tt(}) [ tt(elif) var(list) tt({) var(list) tt(}) ] ... [ tt(else {) var(list) tt(}) ])(
-An alternate form of tt(if).
+An alternate form of tt(if).  The rules mean that
+
+example(if [[ -o ignorebraces ]] {
+  print yes
+})
+
+works, but
+
+example(if true {  # Does not work!
+  print yes
+}
+)
+
+does em(not), since the test is not suitably delimited.
 )
 item(tt(if) var(list) var(sublist))(
 A short form of the alternate `if'.
@@ -307,9 +357,9 @@ cindex(aliases, global)
 An alias is defined using the tt(alias) builtin; global aliases
 may be defined using the tt(-g) option to that builtin.
 
-Alias substitution is done on the shell input before any
-other substitution except history substitution.  Therefore,
-if an alias is defined for the word tt(foo), alias substitution
+Alias expansion is done on the shell input before any
+other expansion except history expansion.  Therefore,
+if an alias is defined for the word tt(foo), alias expansion
 may be avoided by quoting part of the word, e.g. tt(\foo).
 But there is nothing to prevent an alias being defined
 for tt(\foo) as well.
@@ -328,7 +378,13 @@ string by using the `tt(\')' escape.
 
 All characters enclosed between a pair of single quotes (tt('')) that
 is not preceded by a `tt($)' are quoted.  A single quote cannot appear
-within single quotes.
+within single quotes unless the option tt(RC_QUOTES) is set, in which case
+a pair of single quotes are turned into a single quote.  For example,
+
+example(print '''')
+
+outputs nothing apart from a newline if tt(RC_QUOTES) is not set, but one
+single quote if it is set.
 
 Inside double quotes (tt("")), parameter and
 command substitution occurs, and `tt(\)' quotes the characters

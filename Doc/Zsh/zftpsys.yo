@@ -358,7 +358,7 @@ item(tt(zftransfer) var(sess1)tt(:)var(file1) var(sess2)tt(:)var(file2))(
 Transfer files between two sessions; no local copy is made.  The file
 is read from the session var(sess1) as var(file1) and written to session
 var(sess1) as file var(file2); var(file1) and var(file2) may be relative to
-the current directories of the sesssion.  Either var(sess1) or var(sess2)
+the current directories of the session.  Either var(sess1) or var(sess2)
 may be omitted (though the colon should be retained if there is a
 possibility of a colon appearing in the file name) and defaults to the
 current session; var(file2) may be omitted or may end with a slash, in

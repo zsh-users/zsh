@@ -1,8 +1,10 @@
-texinode(The mathfunc Module)(The parameter Module)(The mapfile Module)(Zsh Modules)
-sect(The mathfunc Module)
+COMMENT(!MOD!zsh/mathfunc
+Standard scientific functions for use in mathematical evaluations.
+!MOD!)
 cindex(functions, mathematical)
 cindex(mathematical functions)
-The tt(mathfunc) module provides standard mathematical functions for use when
+The tt(zsh/mathfunc) module provides standard
+mathematical functions for use when
 evaluating mathematical formulae.  The syntax agrees with normal C and
 FORTRAN conventions, for example,
 
@@ -32,10 +34,10 @@ The function tt(signgam) takes no arguments, and returns an integer, which
 is the C variable of the same name, as described in manref(gamma)(3).  Note
 that it is therefore only useful immediately after a call to tt(gamma) or
 tt(lgamma).  Note also that `tt(signgam())' and `tt(signgam)' are distinct
-expresssions.
+expressions.
 
 The following functions take two floating point arguments: tt(copysign),
-tt(drem), tt(fmod), tt(hypot), tt(nextafter).
+tt(fmod), tt(hypot), tt(nextafter).
 
 The following take an integer first argument and a floating point second
 argument: tt(jn), tt(yn).

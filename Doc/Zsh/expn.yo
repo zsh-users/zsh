@@ -102,7 +102,7 @@ nearest other history reference preceding them on the current command
 line, or to the previous command if there is no preceding reference.
 
 The character sequence `tt(^)var(foo)tt(^)var(bar)' (where `tt(^)' is
-actually the second charcter of the tt(histchars) parameter)
+actually the second character of the tt(histchars) parameter)
 repeats the last command, replacing the string var(foo) with var(bar).
 More precisely, the sequence `tt(^)var(foo)tt(^)var(bar)tt(^)' is
 synonymous with `tt(!!:s)tt(^)var(foo)tt(^)var(bar)tt(^)', hence other

@@ -104,7 +104,7 @@ the function be loaded using ksh-style or zsh-style autoloading,
 respectively. If neither is given, the current setting of the
 tt(KSH_AUTOLOAD) options determines how the function is loaded. With
 ksh-style autoloading, the contents of the file will not be executed
-immediatly. Instead, the function created will contain the contents of 
+immediately. Instead, the function created will contain the contents of 
 the file plus a call to the function itself appended to it, thus given 
 normal ksh autoloading behaviour on the first call to the function.
 

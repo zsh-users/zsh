@@ -713,7 +713,7 @@ for makefile targets
 )
 kindex(types, completion tag)
 item(tt(types))(
-for types of whatever (e.g. adress types for the tt(xhost) command)
+for types of whatever (e.g. address types for the tt(xhost) command)
 )
 kindex(urls, completion tag)
 item(tt(urls))(
@@ -2596,13 +2596,13 @@ and, if there is at least one, zero is returned. If no more tag
 labels are to be used, a non-zero status is returned.
 
 The tt(-12JV) options and the first three arguments are given to the
-tt(_desciption) function using the tag label instead of the first
+tt(_description) function using the tag label instead of the first
 argument as appropriate. The var(options) given after the var(descr)
 should be other options to be used for tt(compadd) or whatever
 function is to be called to add the matches. tt(_next_label) will store these 
 var(options) in the parameter whose var(name) is given as the second
 argument. This is done in such a way that the description given by the 
-user to the tt(tag-order) style is prefered over the one given to
+user to the tt(tag-order) style is preferred over the one given to
 tt(_next_label).
 
 Note that this function must not be called without a previous call to
@@ -2675,7 +2675,7 @@ If the var(name) and the var(descr) are given, tt(_requested) calls the
 tt(_description) function with these arguments, including the options.
 
 If the var(command) is given, the tt(_all_labels) function will be called
-immediatly with the same arguments.
+immediately with the same arguments.
 
 This is often useful to do both the testing of the tag,
 getting the description for the matches and adding the matches at
@@ -3292,7 +3292,7 @@ specified so that it will not be completed automatically. The
 `tt((two))' at the beginning says that if the value `tt(one)' is on
 the line, the value `tt(two)' will not be  considered to be a possible
 completion anymore. Finally, the last value (`tt(two)') is described
-as `tt(another number)' and gets an optional argument decribed as
+as `tt(another number)' and gets an optional argument described as
 `tt(second count)' which will be completed from the strings `tt(1)',
 `tt(2)', and `tt(3)'. The tt(_values) function will complete lists of
 these values separated by commas.
@@ -3332,7 +3332,7 @@ remaining arguments specify a completion as a set of regular
 expressions with actions.  The generated function has the structure of a
 finite-state machine whose states corresponds to the state (i.e. the
 context) of the completion. This state machine uses a command line,
-which comes from concatentating the tt(words) array up to the current
+which comes from concatenating the tt(words) array up to the current
 cursor position using null characters as separators with no extra
 quotation.  This is analysed and at the end the appropriate action is
 executed.

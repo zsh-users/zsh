@@ -1,6 +1,13 @@
 2000-05-11  Oliver Kiddle  <opk@zsh.org>
 
-	* 11xxx: Src/params.c: remove return value from uniqarray which
+	* 11315: Doc/Zsh/builtins.yo, Doc/Zsh/compsys.yo, Doc/Zsh/compwid.yo,
+	Doc/Zsh/expn.yo, Doc/Zsh/grammar.yo, Doc/Zsh/mod_complist.yo,
+	Doc/Zsh/mod_computil.yo, Doc/Zsh/mod_deltochar.yo,
+	Doc/Zsh/mod_mathfunc.yo, Doc/Zsh/mod_parameter.yo, Doc/Zsh/mod_zle.yo,
+	Doc/Zsh/mod_zutil.yo, Doc/Zsh/options.yo, Doc/Zsh/params.yo,
+	Doc/Zsh/zftpsys.yo: Fix spelling in docs
+
+	* 11316: Src/params.c: remove return value from uniqarray which
 	caused a compiler error on IRIX
 
 2000-05-10  Peter Stephenson  <pws@pwstephenson.fsnet.co.uk>

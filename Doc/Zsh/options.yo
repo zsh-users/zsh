@@ -218,7 +218,7 @@ pindex(CHASE_DOTS)
 cindex(cd, with .. in argument)
 item(tt(CHASE_DOTS))(
 When changing to a directory containing a path segment `tt(..)' which would
-otherwise be treated as cancelling the previous segment in the path (in
+otherwise be treated as canceling the previous segment in the path (in
 other words, `tt(foo/..)' would be removed from the path, or if `tt(..)' is
 the first part of the path, the last part of tt($PWD) would be deleted),
 instead resolve the path to the physical directory.  This option is

@@ -212,7 +212,7 @@ control sequence as for the `tt(%S)' escape in prompts is used.
 
 If there are more matches than fit on the screen and the parameter
 tt(MENUPROMPT) is set, its value will be shown below the matches. It
-supports the sames escape sequences as tt(LISTPROMPT), but the number
+supports the same escape sequences as tt(LISTPROMPT), but the number
 of the match or line shown will be that of the one where the mark is
 placed. If its value is the empty string, a default prompt will be
 used.
@@ -316,7 +316,7 @@ xitem(tt(complete-word), tt(menu-complete), tt(expand-or-complete))
 item(tt(expand-or-complete-prefix), tt(menu-expand-or-complete))(
 moves the mark to the next match
 )
-item(tt(reverse-menu-omplete))(
+item(tt(reverse-menu-complete))(
 moves the mark to the previous match
 )
 enditem()

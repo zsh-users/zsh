@@ -146,7 +146,7 @@ makes the keys be interpreted as patterns and returns the first value
 whose key matches the var(exp).
 )
 item(tt(K))(
-On an associtation this is like `tt(k)' but returns all values whose
+On an association this is like `tt(k)' but returns all values whose
 keys match the var(exp). On other types of parameters this has the
 same effect as `tt(R)'.
 )
@@ -216,7 +216,7 @@ any outer parameter of the same name remains hidden.
 Special parameters may also be made local; they retain their special
 attributes unless either the existing or the newly-created parameter
 has the tt(-h) (hide) attribute.  This may have unexpected effects:
-there is no default value, so if there is no assigment at the
+there is no default value, so if there is no assignment at the
 point the variable is made local, it will be set to an empty value (or zero
 in the case of integers).  
 The following:
@@ -342,7 +342,7 @@ The line number of the current line within the current script, sourced
 file, or shell function being executed, whichever was started most
 recently.  Note that in the case of shell functions the line
 number refers to the function as it appeared in the original definition,
-not necesarily as displayed by the tt(functions) builtin.
+not necessarily as displayed by the tt(functions) builtin.
 )
 vindex(LOGNAME)
 item(tt(LOGNAME))(
