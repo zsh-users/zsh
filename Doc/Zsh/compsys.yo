@@ -935,10 +935,6 @@ depending on the information already on the line, so that if, for
 example, the hostname is already typed, only those ports will be
 completed for which pairs with the hostname from the line exist.
 )
-item(tt(hosts-ports-users))(
-Like tt(hosts-ports) but used for commands like tt(telnet) and
-containing strings of the form `var(host)tt(:)var(port)tt(:)var(user)'.
-)
 item(tt(ignore-parents))(
 When completing files it is possible to make names of directories
 already mentioned on the line or the current working directory be
@@ -1468,6 +1464,10 @@ user's own accounts. With the tt(other-accounts) tag this is used for
 commands such as tt(talk) and tt(finger) and should contain other
 people's accounts. Finally, this may also be used by some commands with
 the tt(accounts) tag.
+)
+item(tt(users-hosts-ports))(
+Like tt(users-hosts) but used for commands like tt(telnet) and
+containing strings of the form `var(user)tt(@)var(host)tt(:)var(port)'.
 )
 item(tt(verbose))(
 This is used in several contexts to decide if only a simple or a

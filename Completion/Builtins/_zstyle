@@ -30,7 +30,7 @@ styles=(
   hidden		 c:bool
   hosts			 c:_hosts
   hosts-ports		 c:host-port
-  hosts-ports-users	 c:host-port-user
+  users-hosts-ports	 c:user-host-port
   ignore-parents         c:ignorepar
   ignored-patterns	 c:
   insert-unambiguous	 c:bool
@@ -155,15 +155,24 @@ while [[ -n $state ]]; do
           _expand _list _menu _oldlist
       ;;
 
-    host-port*)
-      if [[ $PREFIX != *:* ]]; then
-	_hosts -S :
-      elif [[ $ostate != *user || $PREFIX != *:*:* ]]; then
-	compset -P 1 '*:'
+    user-host-port)
+      if [[ $PREFIX != *[@:]* ]]; then
+	_users -S @
+      elif [[ $PREFIX = *[@:]*[[@:]* ]]; then
+	compset -P 2 '*[:@]'
 	_ports
       else
-	compset -P 2 '*:'
-        _users
+	compset -P 1 '*[:@]'
+	_hosts -S :
+      fi
+      ;;
+
+    host-port)
+      if [[ $PREFIX != *:* ]]; then
+	_hosts -S :
+      else
+	compset -P 1 '*:'
+	_ports
       fi
       ;;
 
@@ -197,11 +206,11 @@ while [[ -n $state ]]; do
       ;;
 
     user-host)
-      if [[ $PREFIX = *:* ]]; then
-	compset -P '*:'
+      if [[ $PREFIX = *[@:]* ]]; then
+	compset -P '*[@:]'
 	_hosts
       else
-	_users
+	_users -S @
       fi
       ;;
 

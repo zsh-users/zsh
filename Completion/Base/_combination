@@ -8,19 +8,19 @@
 #
 # Example: telnet
 #
-#  Assume an user sets the style `hosts-ports-users' as for the my-accounts
+#  Assume an user sets the style `users-hosts-ports' as for the my-accounts
 #  tag:
 #
-#    zstyle ':completion:*:*:telnet:*:my-accounts' hosts-ports-users \
-#      host0:: host1::user1 host2::user2
-#      mail-server:{smtp,pop3}:
-#      news-server:nntp:
-#      proxy-server:8000:
+#    zstyle ':completion:*:*:telnet:*:my-accounts' users-hosts-ports \
+#      @host0: user1@host1: user2@host2:
+#      @mail-server:{smtp,pop3}
+#      @news-server:nntp
+#      @proxy-server:8000
 # 
 #
 #  `_telnet' completes hosts as:
 #
-#    _combination my-accounts hosts-ports-users \
+#    _combination my-accounts users-hosts-ports \
 #      ${opt_args[-l]:+users=${opt_args[-l]:q}} \
 #      hosts "$expl[@]"
 #
@@ -30,7 +30,7 @@
 # 
 #  `_telnet' completes ports as:
 #
-#    _combination my-accounts hosts-ports-users \
+#    _combination my-accounts users-hosts-ports \
 #      ${opt_args[-l]:+users=${opt_args[-l]:q}} \
 #      hosts="${line[2]:q}" \
 #      ports "$expl[@]"
@@ -41,7 +41,7 @@
 #
 #  `_telnet' completes users for an argument of option `-l' as:
 #
-#    _combination my-accounts hosts-ports-users \
+#    _combination my-accounts users-hosts-ports \
 #      ${line[2]:+hosts="${line[2]:q}"} \
 #      ${line[3]:+ports="${line[3]:q}"} \
 #      users "$expl[@]"
