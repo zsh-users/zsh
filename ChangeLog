@@ -506,7 +506,7 @@
 	* users/6367: Doc/Zsh/contrib.yo: match-words-by-style was
 	wrongly called match-word-by-style.
 
-	* 19696: Completion/Unix/Command/_cvs: quoting of characters
+	* 18796: Completion/Unix/Command/_cvs: quoting of characters
 	when completing existing CVS-managed files (in particular
 	spaces) was flakey.  The same problem probably exists for
 	completing modified files, but the code is indecipherable.
