@@ -1680,6 +1680,7 @@ addmatches(Cadata dat, char **argv)
 			p[1] = sav;
 
 			lpre = p + 1;
+			llpl -= gfl;
 		    }
 		}
 		s = dat->ppre ? dat->ppre : "";
