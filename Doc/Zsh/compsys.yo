@@ -1467,6 +1467,13 @@ generate words from the history as possible matches sort these words
 alphabetically instead of keeping them in the order in which they
 appear in the history (from youngest to oldest).
 )
+item(tt(history_stop))(
+If this is set to a non-empty string, the tt(_history_complete_word)
+bindable command will always insert matches as if menu-completion were 
+started and it will stop when the last match is inserted. If this key
+is set to tt(verbose) a message will be displayed when the last match
+is reached.
+)
 item(tt(cvs_disable_stat))(
 This is used by the completion function for the tt(cvs) command. If it 
 is set to a non-empty value, this function will not try to use the
