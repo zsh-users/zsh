@@ -49,7 +49,7 @@ description(\
 mydit(Archive-Name:) unix-faq/shell/zsh
 mydit(Last-Modified:) 1999/07/30
 mydit(Submitted-By:) email(pws@ibmth.df.unipi.it (Peter Stephenson))
-mydit(Version:) $Id: FAQ.yo,v 1.1.1.15 1999/11/30 06:12:09 akr Exp $
+mydit(Version:) $Id: FAQ.yo,v 1.1.1.16 1999/12/10 18:42:38 akr Exp $
 mydit(Posting-Frequency:) Monthly
 mydit(Copyright:) (C) P.W. Stephenson, 1995--1999 (see end of document)
 )
@@ -1122,7 +1122,7 @@ sect(How do I automatically display the directory in my xterm title bar?)
   You should use the special function mytt(chpwd), which is called when
   the directory changes.  The following checks that standard output is
   a terminal, then puts the directory in the title bar if the terminal
-  is an tt(xterm) or a tt(sun-cmd).
+  is compatible with tt(xterm) or is a tt(sun-cmd).
   
   verb(
   chpwd() {
@@ -1130,7 +1130,7 @@ sect(How do I automatically display the directory in my xterm title bar?)
     case $TERM in
       sun-cmd+CHAR(41) print -Pn "\e]l%~\e\\"
         ;;
-      xterm+CHAR(41) print -Pn "\e]2;%~\a"
+      *xterm*|rxvt|dtterm|Eterm+CHAR(41) print -Pn "\e]2;%~\a"
         ;;
     esac
   }

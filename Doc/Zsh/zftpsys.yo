@@ -97,10 +97,10 @@ is necessary, account var(account)).  If a necessary parameter is missing or
 given as `tt(?)' it will be prompted for.  If var(host) is not present, use
 a previously stored set of parameters.
 
-If the command was successful, and the terminal is an tt(xterm), a summary
-will appear in the title bar, giving the local tt(host:directory) and the
-remote tt(host:directory); this is handled by the function tt(zftp_chpwd),
-described below.
+If the command was successful, and the terminal is compatible with
+tt(xterm) or is tt(sun-cmd), a summary will appear in the title bar,
+giving the local tt(host:directory) and the remote tt(host:directory);
+this is handled by the function tt(zftp_chpwd), described below.
 
 Normally, the var(host), var(user) and var(password) are internally
 recorded for later re-opening, either by a tt(zfopen) with no arguments, or
@@ -466,9 +466,10 @@ findex(zftp_chpwd, supplied version)
 item(tt(zftp_chpwd))(
 This function is called every time a connection is opened, or closed, or
 the remote directory changes.  This version alters the title bar of an
-tt(xterm) or tt(sun-cmd) terminal emulator to reflect the local and remote
-hostnames and current directories.  It works best when combined with the
-function tt(chpwd).  In particular, a function of the form
+tt(xterm) compatible or tt(sun-cmd) terminal emulator to reflect the 
+local and remote hostnames and current directories.  It works best when
+combined with the function tt(chpwd).  In particular, a function of 
+the form
 
 example(chpwd() {
   if [[ -n $ZFTP_USER ]]; then
