@@ -25,6 +25,7 @@ DEFINECHARTABLE(standard)(
 )
 USECHARTABLE(standard)
 SUBST('')(NOTRANS(@value{dsq}))
+SUBST(``)(NOTRANS(@value{dsbq}))
 
 def(STDPAR)(0)(redef(PARAGRAPH)(0)(NL()NL()NOTRANS(@noindent)NL()))
 
@@ -56,9 +57,11 @@ def(texinfo)(2)(\
   NL()\
   NOTRANS(@ifinfo)NL()\
   NOTRANS(@set dsq '@:')NL()\
+  NOTRANS(@set dsbq `@:`)NL()\
   NOTRANS(@end ifinfo)NL()\
   NOTRANS(@iftex)NL()\
   NOTRANS(@set dsq '{}')NL()\
+  NOTRANS(@set dsbq `{}`)NL()\
   NOTRANS(@end iftex)NL()\
   NOTRANS(@ifinfo)NL()\
   NOTRANS(@dircategory Utilities)NL()\
