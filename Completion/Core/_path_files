@@ -39,10 +39,10 @@ while getopts "P:S:qr:R:W:F:J:V:X:f/g:M:" opt; do
          ;;
   W)     tmp1="$OPTARG"
          if [[ "$tmp1[1]" = '(' ]]; then
-           prepaths=( ${^=tmp1[2,-2]}/ )
+           prepaths=( ${^=tmp1[2,-2]%/}/ )
          else
-           prepaths=( ${(P)=${tmp1}} )
-           (( ! $#prepaths )) && prepaths=( ${tmp1}/ )
+           prepaths=( ${(P)^=tmp1%/}/ )
+           (( ! $#prepaths )) && prepaths=( ${tmp1%/}/ )
          fi
          (( ! $#prepaths )) && prepaths=( '' )
          ;;
