@@ -1,3 +1,7 @@
+2000-04-03  Sven Wischnowsky <wischnow@informatik.hu-berlin.de>
+
+	* 10456: Src/Zle/compcore.c: Copy QIPREFIX/QISUFFIX.
+
 2000-04-04  Andrew Main  <zefram@zsh.org>
 
 	* 10444: Src/lex.c, Src/pattern.c: Insist on proper syntax
@@ -5,6 +9,7 @@
 	"echo 1<2-3>" would lose the "1".
 
 2000-04-03  Sven Wischnowsky <wischnow@informatik.hu-berlin.de>
+
 	* 10408: Completion/Core/_path_files: better quoting
 
 	* 10409: Completion/Core/_path_files: completion after ~+<num>

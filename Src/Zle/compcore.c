@@ -1982,7 +1982,7 @@ add_match_data(int alt, char *str, Cline line,
 	    sl = tsl;
 	}
 	if (qisl) {
-	    Cline qsl = bld_parts(qisuf, qisl, qisl, NULL);
+	    Cline qsl = bld_parts(dupstring(qisuf), qisl, qisl, NULL);
 
 	    qsl->flags |= CLF_SUF;
 	    qsl->suffix = qsl->prefix;
@@ -2065,7 +2065,7 @@ add_match_data(int alt, char *str, Cline line,
 	    line = p;
 	}
 	if (qipl) {
-	    Cline lp, p = bld_parts(qipre, qipl, qipl, &lp);
+	    Cline lp, p = bld_parts(dupstring(qipre), qipl, qipl, &lp);
 
 	    lp->next = line;
 	    line = p;
