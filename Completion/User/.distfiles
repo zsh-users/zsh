@@ -6,7 +6,7 @@ DISTFILES_SRC='
     _enscript _find _finger _fakeroot _fetchmail _flex
     _gcc _gdb  _getconf _gprof _grep _groups _gs _gv _gzip
     _hosts _imagemagick _iconv _init_d _ispell
-    _java _joe _killall _look _lp _ls _lynx _lzop
+    _java _joe _killall _lftp _look _lp _ls _lynx _lzop
     _mailboxes _make _man _mere _mh _mount _mutt _my_accounts _mysql_utils
     _ncftp _nedit _netscape _newsgroups _nslookup _other_accounts
     _pack _patch _pbm _pdf _perl _perl_basepods _perl_builtin_funcs
