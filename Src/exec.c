@@ -3249,7 +3249,7 @@ doshfunc(char *name, Eprog prog, LinkList doshargs, int flags, int noreturnval)
 {
     char **tab, **x, *oargv0;
     int oldzoptind, oldlastval, oldoptcind;
-    char saveopts[OPT_SIZE], *oldscriptname = NULL, *fname = dupstring(name);
+    char saveopts[OPT_SIZE], *oldscriptname = scriptname, *fname = dupstring(name);
     int obreaks;
     struct funcstack fstack;
 #ifdef MAX_FUNCTION_DEPTH
@@ -3267,10 +3267,8 @@ doshfunc(char *name, Eprog prog, LinkList doshargs, int flags, int noreturnval)
     starttrapscope();
 
     tab = pparams;
-    if (!(flags & PM_UNDEFINED)) {
-	oldscriptname = scriptname;
+    if (!(flags & PM_UNDEFINED))
 	scriptname = dupstring(name);
-    }
     oldzoptind = zoptind;
     zoptind = 1;
     oldoptcind = optcind;
@@ -3308,6 +3306,8 @@ doshfunc(char *name, Eprog prog, LinkList doshargs, int flags, int noreturnval)
     if(++funcdepth > MAX_FUNCTION_DEPTH)
     {
         zerr("maximum nested function level reached", NULL, 0);
+	scriptname = oldscriptname;
+	popheap();
 	return;
     }
 #endif
@@ -3328,6 +3328,7 @@ doshfunc(char *name, Eprog prog, LinkList doshargs, int flags, int noreturnval)
 	    if (!noreturnval)
 		lastval = 1;
 	    popheap();
+	    scriptname = oldscriptname;
 	    return;
 	}
 	prog = shf->funcdef;
@@ -3349,8 +3350,7 @@ doshfunc(char *name, Eprog prog, LinkList doshargs, int flags, int noreturnval)
     pparams = tab;
     optcind = oldoptcind;
     zoptind = oldzoptind;
-    if (oldscriptname)
-	scriptname = oldscriptname;
+    scriptname = oldscriptname;
 
     if (isset(LOCALOPTIONS)) {
 	/* restore all shell options except PRIVILEGED and RESTRICTED */

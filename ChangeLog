@@ -1,5 +1,7 @@
 2000-04-10  Sven Wischnowsky <wischnow@informatik.hu-berlin.de>
 
+	* 10620: Src/exec.c: properly restore scriptname in doshfunc()
+
 	* users/3019: Completion/Core/_path_files: use special-dirs with
  	_path_files -g
 	
