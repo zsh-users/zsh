@@ -223,16 +223,25 @@ scrollwindow(int tline)
     if (ln != winh - 1)					\
 	ln++;						\
     else						\
-	if (tosln < 3) {				\
+	if (tosln > ln) {				\
+	    tosln--;					\
+	    if (nvln > 1) {				\
+		scrollwindow(0);			\
+		nvln--;					\
+	    } else					\
+		more_end = 1;				\
+	} else if (tosln > 2 && nvln > 1) {		\
+	    tosln--;					\
+	    if (tosln <= nvln) {			\
+		scrollwindow(0);			\
+		nvln--;					\
+	    } else {					\
+		scrollwindow(tosln);			\
+		more_end = 1;				\
+	    }						\
+	} else {					\
 	    more_status = 1;				\
 	    scrollwindow(tosln + 1);			\
-	} else if (tosln - 1 <= nvln) {			\
-	    scrollwindow(0);				\
-	    if (nvln)					\
-		nvln--, tosln--;			\
-	} else {					\
-	    tosln--;					\
-	    scrollwindow(tosln);			\
 	}						\
     if (!nbuf[ln])					\
 	nbuf[ln] = (char *)zalloc(winw + 2);		\
@@ -341,7 +350,7 @@ zrefresh(void)
 		listshown = 0;
 	}
         if (t0 > -1)
-            olnct = t0;
+            olnct = (t0 < winh) ? t0 : winh;
         if (termflags & TERM_SHORT)
             vcs = 0;
         else if (!clearflag && lpromptbuf[0]) {
@@ -435,13 +444,6 @@ zrefresh(void)
 
     if (statusline) {
 	tosln = ln + 1;
-        if (ln == winh - 1) {
-	    if (nvln > 0) {
-		scrollwindow(0);
-		nvln--;
-	    }
-	    tosln--;
-	}
 	nbuf[ln][winw + 1] = '\0';	/* text not wrapped */
 	snextline
 	t = (unsigned char *)statusline;
@@ -460,23 +462,43 @@ zrefresh(void)
 		snextline
 	    }
 	}
+	if (s == sen)
+	    snextline
     }
+    *s = '\0';
 
 /* insert <.... at end of last line if there is more text past end of screen */
     if (more_end) {
 	if (!statusline)
 	    tosln = winh;
-	strncpy(nbuf[tosln - 1] + winw - 7, " <.... ", 7);
+	s = nbuf[tosln - 1];
+	sen = s + winw - 7;
+	for (; s < sen; s++) {
+	    if (*s == '\0') {
+		for (; s < sen; )
+		    *s++ = ' ';
+		break;
+	    }
+	}
+	strncpy(sen, " <.... ", 7);
 	nbuf[tosln - 1][winw] = nbuf[tosln - 1][winw + 1] = '\0';
     }
 
 /* insert <....> at end of first status line if status is too big */
     if (more_status) {
-	strncpy(nbuf[tosln] + winw - 8, " <....> ", 8);
+	s = nbuf[tosln];
+	sen = s + winw - 8;
+	for (; s < sen; s++) {
+	    if (*s == '\0') {
+		for (; s < sen; )
+		    *s++ = ' ';
+		break;
+	    }
+	}
+	strncpy(sen, " <....> ", 8);
 	nbuf[tosln][winw] = nbuf[tosln][winw + 1] = '\0';
     }
 
-    *s = '\0';
     nlnct = ln + 1;
     for (ln = nlnct; ln < winh; ln++)
 	zfree(nbuf[ln], winw + 2), nbuf[ln] = NULL;
