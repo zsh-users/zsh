@@ -1,5 +1,7 @@
 2000-05-29  Bart Schaefer  <schaefer@zsh.org>
 
+	* 11644: Use `print -s' in _complete_debug, now that it works.
+	
 	* 11643: Completion/Linux/_rpm: Factor out option sets that are
 	repeated in several states; add more options from RPM v3.
 	
