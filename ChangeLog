@@ -35,6 +35,11 @@
 	* 20358: Completion/Unix/Command/_make: avoid potential gawk
 	  locale bug by not using awk.
 
+2004-09-29  Bart Schaefer  <schaefer@zsh.org>
+
+	* 20418: Src/parse.c: fix crash-inducing bug with mis-parsing of
+	incomplete pipeline expressions (e.g. "zsh -c 'echo |').
+
 2004-09-28  Clint Adams  <clint@zsh.org>
 
 	* 20414: Completion/Unix/Type/_diff_options: correct missing

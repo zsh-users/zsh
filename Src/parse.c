@@ -729,7 +729,9 @@ par_pline(int *complex)
 	ecbuf[p] = WCB_PIPE(WC_PIPE_MID, (line >= 0 ? line + 1 : 0));
 	ecispace(p + 1, 1);
 	ecbuf[p + 1] = ecused - 1 - p;
-	par_pline(complex);
+	if (!par_pline(complex)) {
+	    tok = LEXERR;
+	}
 	cmdpop();
 	return 1;
     } else if (tok == BARAMP) {
@@ -750,7 +752,9 @@ par_pline(int *complex)
 	ecbuf[p] = WCB_PIPE(WC_PIPE_MID, (line >= 0 ? line + 1 : 0));
 	ecispace(p + 1, 1);
 	ecbuf[p + 1] = ecused - 1 - p;
-	par_pline(complex);
+	if (!par_pline(complex)) {
+	    tok = LEXERR;
+	}
 	cmdpop();
 	return 1;
     } else {
