@@ -768,9 +768,12 @@ prompttrunc(int arg, int truncchar, int doprint, int endchar)
 	truncstr = ztrduppfx(ptr, bp - ptr);
 
 	bp = ptr;
+	w = bp - buf;
 	fm++;
 	putpromptchar(doprint, endchar);
+	ptr = buf + w;		/* putpromptchar() may have realloc()'d */
 	*bp = '\0';
+
 	countprompt(ptr, &w, 0, -1);
 	if (w > trunclen) {
 	    /*
