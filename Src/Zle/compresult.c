@@ -1573,10 +1573,10 @@ calclist(int showall)
 			if (!(m->flags & CMF_HIDE)) {
 			    if (m->disp) {
 				if (!(m->flags & CMF_DISPLINE))
-				    glines += 1 + (mlens[m->gnum] / columns);
+				    glines += 1 + ((mlens[m->gnum] - 1) / columns);
 			    } else if (showall ||
 				       !(m->flags & (CMF_NOLIST | CMF_MULT)))
-				glines += 1 + ((mlens[m->gnum]) / columns);
+				glines += 1 + (((mlens[m->gnum]) - 1) / columns);
 			}
 		}
 	    }

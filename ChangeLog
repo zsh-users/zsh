@@ -1,3 +1,9 @@
+2004-03-05  Geoff Wing  <gcw@zsh.org>
+
+	* 19474: Src/Zle/compresult.c: fix a calculation when displaying
+	completions which are screen width or multiples of that wide, and
+	option always_last_prompt is used.
+
 2004-03-04  Peter Stephenson  <pws@csr.com>
 
 	* 19535: configure.ac, INSTALL: Add --enable-cap flag
