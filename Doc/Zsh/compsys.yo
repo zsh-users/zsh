@@ -897,9 +897,9 @@ complete arguments of options whose description in the output of the
 command from the line with the `tt(-)tt(-help)' option matches the
 var(pattern). For example:
 
-example(_arguments -- '*\*'     '(yes no)' \ 
-              '*=FILE*' '_files' \ 
-              '*=DIR*'  '_files -/')
+example(_arguments -- '*\*:toggle:(yes no)' \ 
+              '*=FILE*:file:_files' \ 
+              '*=DIR*:directory:_files -/')
 
 Here, `tt(yes)' and `tt(no)' will be completed as the argument of
 options whose description ends in a star, file names for options that
