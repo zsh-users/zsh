@@ -188,7 +188,10 @@ while [[ -n "$state" ]]; do
     ;&
   package)
     _description expl 'RPM package'
-    compadd "$expl[@]" -M 'r:|-=* r:|=*' - $(rpm -qa) && ret=0
+    if (( ! $+installed_rpms )); then
+      installed_rpms=( $(rpm -qa) )
+    fi
+    compadd "$expl[@]" -M 'r:|-=* r:|=*' - $installed_rpms && ret=0
     ;;
   package_file)
     if compset -P ftp://; then
