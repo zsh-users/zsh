@@ -39,95 +39,108 @@ static char *condstr[COND_MOD] = {
 
 /**/
 int
-evalcond(Cond c)
+evalcond(Estate state)
 {
     struct stat *st;
     char *left, *right = NULL;
+    wordcode code = *state->pc++;
+    int ctype = WC_COND_TYPE(code);
 
-    switch (c->type) {
+    switch (ctype) {
     case COND_NOT:
 	if (tracingcond)
-	    fprintf(stderr, " %s", condstr[c->type]);
-	return !evalcond(c->left);
+	    fprintf(stderr, " %s", condstr[ctype]);
+	return !evalcond(state);
     case COND_AND:
-	if (evalcond(c->left)) {
+	if (evalcond(state)) {
 	    if (tracingcond)
-		fprintf(stderr, " %s", condstr[c->type]);
-	    return evalcond(c->right);
-	} else
+		fprintf(stderr, " %s", condstr[ctype]);
+	    return evalcond(state);
+	} else {
+	    state->pc += WC_COND_SKIP(code) - 1;
 	    return 0;
+	}
     case COND_OR:
-	if (!evalcond(c->left)) {
+	if (!evalcond(state)) {
 	    if (tracingcond)
-		fprintf(stderr, " %s", condstr[c->type]);
-	    return evalcond(c->right);
-	} else
+		fprintf(stderr, " %s", condstr[ctype]);
+	    return evalcond(state);
+	} else {
+	    state->pc += WC_COND_SKIP(code) - 1;
 	    return 1;
+	}
     case COND_MOD:
     case COND_MODI:
 	{
 	    Conddef cd;
+	    char *name = ecgetstr(state, 0), **strs;
+	    int l = WC_COND_SKIP(code);
 
-	    if ((cd = getconddef((c->type == COND_MODI),
-				 ((char *) c->left) + 1, 1))) {
-		if (c->type == COND_MOD) {
-		    int l = arrlen((char **) c->right);
+	    if (ctype == COND_MOD)
+		strs = ecgetarr(state, l, 1);
+	    else {
+		char *sbuf[3];
 
-		    if (l < cd->min || (cd->max >= 0 && l > cd->max)) {
-			zerr("unrecognized condition: `%s'", (char *) c->left, 0);
-			return 0;
-		    }
+		sbuf[0] = ecgetstr(state, 0);
+		sbuf[1] = ecgetstr(state, 0);
+		sbuf[2] = NULL;
+
+		strs = arrdup(sbuf);
+		l = 2;
+	    }
+	    if ((cd = getconddef((ctype == COND_MODI), name + 1, 1))) {
+		if (ctype == COND_MOD &&
+		    (l < cd->min || (cd->max >= 0 && l > cd->max))) {
+		    zerr("unrecognized condition: `%s'", name, 0);
+		    return 0;
 		}
 		if (tracingcond)
-		    tracemodcond((char *)c->left, (char **)c->right,
-				 c->type == COND_MODI);
-		return cd->handler((char **) c->right, cd->condid);
+		    tracemodcond(name, strs, ctype == COND_MODI);
+		return cd->handler(strs, cd->condid);
 	    }
 	    else {
-		char **a = (char **) c->right, *s = a[0];
+		char *s = strs[0];
 
-		if (s && s[0] == '-' &&
-		    (cd = getconddef(0, s + 1, 1))) {
-		    int l = arrlen(a);
+		strs[0] = dupstring(name);
+		name = s;
 
+		if (name && name[0] == '-' &&
+		    (cd = getconddef(0, name + 1, 1))) {
 		    if (l < cd->min || (cd->max >= 0 && l > cd->max)) {
-			zerr("unrecognized condition: `%s'", (char *) c->left, 0);
+			zerr("unrecognized condition: `%s'", name, 0);
 			return 0;
 		    }
 		    if (tracingcond)
-			tracemodcond((char *)c->left, a, c->type == COND_MODI);
-		    a[0] = (char *) c->left;
-		    return cd->handler(a, cd->condid);
+			tracemodcond(name, strs, ctype == COND_MODI);
+		    return cd->handler(strs, cd->condid);
 		} else
-		    zerr("unrecognized condition: `%s'", (char *) c->left, 0);
+		    zerr("unrecognized condition: `%s'", name, 0);
 	    }
 	    return 0;
 	}
     }
-    left = dupstring((char *) c->left);
+    left = ecgetstr(state, 1);
     singsub(&left);
     untokenize(left);
-    if (c->right && c->type != COND_STREQ && c->type != COND_STRNEQ) {
-	right = dupstring((char *) c->right);
+    if (ctype <= COND_GE && ctype != COND_STREQ && ctype != COND_STRNEQ) {
+	right = ecgetstr(state, 1);
 	singsub(&right);
 	untokenize(right);
     }
-
     if (tracingcond) {
-	if (c->type < COND_MOD) {
+	if (ctype < COND_MOD) {
 	    char *rt = (char *) right;
-	    if (c->type == COND_STREQ || c->type == COND_STRNEQ) {
-		rt = dupstring(c->right);
+	    if (ctype == COND_STREQ || ctype == COND_STRNEQ) {
+		rt = dupstring(ecrawstr(state->prog, state->pc));
 		singsub(&rt);
 		untokenize(rt);
 	    }
-	    fprintf(stderr, " %s %s %s", (char *)left, condstr[c->type],
-		    rt);
+	    fprintf(stderr, " %s %s %s", left, condstr[ctype], rt);
 	} else
-	    fprintf(stderr, " -%c %s", c->type, (char *)left);
+	    fprintf(stderr, " -%c %s", ctype, left);
     }
 
-    if (c->type >= COND_EQ && c->type <= COND_GE) {
+    if (ctype >= COND_EQ && ctype <= COND_GE) {
 	mnumber mn1, mn2;
 	mn1 = matheval(left);
 	mn2 = matheval(right);
@@ -144,7 +157,7 @@ evalcond(Cond c)
 		mn2.u.d = (double)mn2.u.l;
 	    }
 	}
-	switch(c->type) {
+	switch(ctype) {
 	case COND_EQ:
 	    return (mn1.type & MN_FLOAT) ? (mn1.u.d == mn2.u.d) :
 		(mn1.u.l == mn2.u.l);
@@ -166,30 +179,32 @@ evalcond(Cond c)
 	}
     }
 
-    switch (c->type) {
+    switch (ctype) {
     case COND_STREQ:
     case COND_STRNEQ:
 	{
-	    Patprog pprog = c->prog;
-	    int test;
+	    int test, npat = state->pc[1];
+	    Patprog pprog = state->prog->pats[npat];
 
 	    if (pprog == dummy_patprog1 || pprog == dummy_patprog2) {
 		char *opat;
 		int save;
 
-		right = opat = dupstring((char *) c->right);
+		right = opat = dupstring(ecrawstr(state->prog, state->pc));
 		singsub(&right);
-		save = (!strcmp(opat, right) && pprog != dummy_patprog2);
+		save = (!state->prog->heap &&
+			!strcmp(opat, right) && pprog != dummy_patprog2);
 
 		if (!(pprog = patcompile(right, (save ? PAT_ZDUP : PAT_STATIC),
 					 NULL)))
 		    zerr("bad pattern: %s", right, 0);
 		else if (save)
-		    c->prog = pprog;
-	    }		
+		    state->prog->pats[npat] = pprog;
+	    }
+	    state->pc += 2;
 	    test = (pprog && pattry(pprog, left));
 
-	    return (c->type == COND_STREQ ? test : !test);
+	    return (ctype == COND_STREQ ? test : !test);
 	}
     case COND_STRLT:
 	return strcmp(left, right) < 0;
@@ -255,7 +270,7 @@ evalcond(Cond c)
 	    a = st->st_mtime;
 	    if (!(st = getstat(right)))
 		return 0;
-	    return (c->type == COND_NT) ? a > st->st_mtime : a < st->st_mtime;
+	    return (ctype == COND_NT) ? a > st->st_mtime : a < st->st_mtime;
 	}
     case COND_EF:
 	{
@@ -271,7 +286,7 @@ evalcond(Cond c)
 	    return d == st->st_dev && i == st->st_ino;
 	}
     default:
-	zerr("bad cond structure", NULL, 0);
+	zerr("bad cond code", NULL, 0);
     }
     return 0;
 }
@@ -390,7 +405,7 @@ tracemodcond(char *name, char **args, int inf)
 {
     char **aptr;
     MUSTUSEHEAP("tracemodcond");
-    args = duparray(args, (VFunc) dupstring);
+    args = arrdup(args);
     for (aptr = args; *aptr; aptr++)
 	untokenize(*aptr);
     if (inf) {

@@ -630,7 +630,7 @@ preprompt(void)
 {
     static time_t lastperiodic;
     LinkNode ln;
-    List list;
+    Eprog prog;
     int period = getiparam("PERIOD");
     int mailcheck = getiparam("MAILCHECK");
 
@@ -643,11 +643,11 @@ preprompt(void)
 
     /* If a shell function named "precmd" exists, *
      * then execute it.                           */
-    if ((list = getshfunc("precmd")) != &dummy_list) {
+    if ((prog = getshfunc("precmd")) != &dummy_eprog) {
 	int osc = sfcontext;
 
 	sfcontext = SFC_HOOK;
-	doshfunc("precmd", list, NULL, 0, 1);
+	doshfunc("precmd", prog, NULL, 0, 1);
 	sfcontext = osc;
     }
     if (errflag)
@@ -657,11 +657,11 @@ preprompt(void)
      * "periodic" exists, 3) it's been greater than PERIOD since we *
      * executed "periodic", then execute it now.                    */
     if (period && (time(NULL) > lastperiodic + period) &&
-	(list = getshfunc("periodic")) != &dummy_list) {
+	(prog = getshfunc("periodic")) != &dummy_eprog) {
 	int osc = sfcontext;
 
 	sfcontext = SFC_HOOK;
-	doshfunc("periodic", list, NULL, 0, 1);
+	doshfunc("periodic", prog, NULL, 0, 1);
 	sfcontext = osc;
 	lastperiodic = time(NULL);
     }
@@ -1890,273 +1890,15 @@ sepsplit(char *s, char *sep, int allownull)
 /* Get the definition of a shell function */
 
 /**/
-mod_export List
+mod_export Eprog
 getshfunc(char *nam)
 {
     Shfunc shf;
 
     if (!(shf = (Shfunc) shfunctab->getnode(shfunctab, nam)))
-	return &dummy_list;
+	return &dummy_eprog;
 
     return shf->funcdef;
-}
-
-/* allocate a tree element */
-
-static int sizetab[N_COUNT] = {
-    sizeof(struct list),
-    sizeof(struct sublist),
-    sizeof(struct pline),
-    sizeof(struct cmd),
-    sizeof(struct redir),
-    sizeof(struct cond),
-    sizeof(struct forcmd),
-    sizeof(struct casecmd),
-    sizeof(struct ifcmd),
-    sizeof(struct whilecmd),
-    sizeof(struct varasg),
-    sizeof(struct autofn),
-};
-
-static int offstab[N_COUNT] = {
-    offsetof(struct list, left),
-    offsetof(struct sublist, left),
-    offsetof(struct pline, left),
-    offsetof(struct cmd, u),
-    offsetof(struct redir, name),
-    offsetof(struct cond, left),
-    offsetof(struct forcmd, name),
-    offsetof(struct casecmd, pats),
-    offsetof(struct ifcmd, ifls),
-    offsetof(struct whilecmd, cont),
-    offsetof(struct varasg, name),
-    sizeof(struct autofn),
-};
-
-static int flagtab[N_COUNT] = {
-    NT_SET(N_LIST, NT_NODE, NT_NODE, 0, 0),
-    NT_SET(N_SUBLIST, NT_NODE, NT_NODE, 0, 0),
-    NT_SET(N_PLINE, NT_NODE, NT_NODE, 0, 0),
-    NT_SET(N_CMD, NT_NODE, NT_STR | NT_LIST, NT_NODE | NT_LIST, NT_NODE | NT_LIST),
-    NT_SET(N_REDIR, NT_STR, 0, 0, 0),
-    NT_SET(N_COND, NT_NODE, NT_NODE, NT_PAT, 0),
-    NT_SET(N_FOR, NT_STR, NT_STR, NT_STR, NT_NODE),
-    NT_SET(N_CASE, NT_STR | NT_ARR, NT_PAT | NT_ARR, NT_NODE | NT_ARR, 0),
-    NT_SET(N_IF, NT_NODE | NT_ARR, NT_NODE | NT_ARR, 0, 0),
-    NT_SET(N_WHILE, NT_NODE, NT_NODE, 0, 0),
-    NT_SET(N_VARASG, NT_STR, NT_STR, NT_STR | NT_LIST, 0),
-    NT_SET(N_AUTOFN, 0, 0, 0, 0),
-};
-
-/**/
-void *
-allocnode(int type)
-{
-    struct node *n;
-
-    n = (struct node *) ncalloc(sizetab[type]);
-    memset((void *) n, 0, sizetab[type]);
-    n->ntype = flagtab[type];
-
-    return (void *) n;
-}
- 
-/* duplicate a syntax tree */
-
-/**/
-mod_export void *
-dupstruct(void *a)
-{
-    void **onodes, **nnodes, *ret, *n, *on;
-    int type;
-    size_t nodeoffs;
-
-    if (!a || ((List) a) == &dummy_list)
-	return a;
-    type = *(int *)a;
-    ret = alloc(sizetab[NT_TYPE(type)]);
-    memcpy(ret, a, nodeoffs = offstab[NT_TYPE(type)]);
-    onodes = (void **) ((char *)a + nodeoffs);
-    nnodes = (void **) ((char *)ret + nodeoffs);
-    for (type = (type & 0xffff00) >> 4; (type >>= 4); *nnodes++ = n) {
-	if (!(on = *onodes++))
-	    n = NULL;
-	else {
-	    switch (type & 0xf) {
-	    case NT_NODE:
-		n = dupstruct(on);
-		break;
-	    case NT_STR:
-		n = dupstring(on);
-		break;
-	    case NT_PAT:
-		n = duppatprog(on);
-		break;
-	    case NT_LIST | NT_NODE:
-		n = duplist(on, (VFunc) dupstruct);
-		break;
-	    case NT_LIST | NT_STR:
-		n = duplist(on, (VFunc) (useheap ? dupstring : ztrdup));
-		break;
-	    case NT_LIST | NT_PAT:
-		n = duplist(on, (VFunc) duppatprog);
-		break;
-	    case NT_NODE | NT_ARR:
-		n = duparray(on, (VFunc) dupstruct);
-		break;
-	    case NT_STR | NT_ARR:
-		n = duparray(on, (VFunc) (useheap ? dupstring : ztrdup));
-		break;
-	    case NT_PAT | NT_ARR:
-		n = duparray(on, (VFunc) duppatprog);
-		break;
-	    default:
-		DPUTS(1, "BUG: bad node type in dupstruct()");
-		abort();
-	    }
-	}
-    }
-    return ret;
-}
-
-/* Free a syntax tree. Now, freestruct() only registers everything that
- * has to be freed. Later, freestructs() will be called to do the real
- * work. This is to avoid having functions that are currently executed
- * free themselves by re-defining themselves. */
-
-static LinkList freeslist = NULL;
-
-/**/
-mod_export void
-freestruct(void *a)
-{
-    if (!a || ((List) a) == &dummy_list)
-	return;
-
-    PERMALLOC {
-	if (!freeslist)
-	    freeslist = newlinklist();
-	addlinknode(freeslist, a);
-    } LASTALLOC;
-}
-
-/**/
-void
-freestructs(void)
-{
-    void *a;
-
-    if (freeslist)
-	while ((a = getlinknode(freeslist)))
-	    ifreestruct(a);
-}
-
-/**/
-static void
-ifreestruct(void *a)
-{
-    void **nodes, *n;
-    int type, size;
-
-    type = *(int *) a;
-    nodes = (void **) ((char *)a + offstab[NT_TYPE(type)]);
-    size = sizetab[NT_TYPE(type)];
-    for (type = (type & 0xffff00) >> 4; (type >>= 4);) {
-	if ((n = *nodes++)) {
-	    switch (type & 0xf) {
-	    case NT_NODE:
-		freestruct(n);
-		break;
-	    case NT_STR:
-		zsfree((char *) n);
-		break;
-	    case NT_PAT:
-		freepatprog((Patprog) n);
-		break;
-	    case NT_LIST | NT_NODE:
-		freelinklist((LinkList) n, (FreeFunc) freestruct);
-		break;
-	    case NT_LIST | NT_STR:
-		freelinklist((LinkList) n, (FreeFunc) zsfree);
-		break;
-	    case NT_LIST | NT_PAT:
-		freelinklist((LinkList) n, (FreeFunc) freepatprog);
-		break;
-	    case NT_NODE | NT_ARR:
-		{
-		    void **p = (void **) n;
-
-		    while (*p)
-			freestruct(*p++);
-		    zfree(n, sizeof(void *) * (p + 1 - (void **) n));
-		    break;
-		}
-	    case NT_STR | NT_ARR:
-		freearray((char **) n);
-		break;
-	    case NT_PAT | NT_ARR:
-		{
-		    Patprog *p = (Patprog *) n;
-
-		    while (*p)
-			freepatprog(*p++);
-		    zfree(n, sizeof(void *) * ((void **) p + 1 - (void **) n));
-		    break;
-		}
-	    default:
-		DPUTS(1, "BUG: bad node type in freenode()");
-		abort();
-	    }
-	}
-    }
-#if 0
-    DPUTS(size != ((char *) nodes) - ((char *) a),
-	"BUG: size wrong in freenode()");
-#endif
-    zfree(a, size);
-}
-
-/**/
-LinkList
-dupheaplist(LinkList l)
-{
-    if (!l)
-	return NULL;
-
-    return duplist(l, (VFunc) dupstruct);
-}
-
-/**/
-static LinkList
-duplist(LinkList l, VFunc func)
-{
-    if (l && nonempty(l)) {
-	LinkList ret;
-	LinkNode node;
-
-	ret = newlinklist();
-	for (node = firstnode(l); node; incnode(node))
-	    addlinknode(ret, func(getdata(node)));
-	return ret;
-    }
-    return NULL;
-}
-
-/**/
-mod_export char **
-duparray(char **arr, VFunc func)
-{
-    if (arr && *arr) {
-	char **ret, **rr, *p;
-
-	ret = (char **) alloc((arrlen(arr) + 1) * sizeof(char *));
-	for (rr = ret; (p = *arr++);)
-	    *rr++ = (char *)func(p);
-	*rr = NULL;
-
-	return ret;
-    }
-    return NULL;
 }
 
 /**/

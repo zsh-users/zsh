@@ -306,20 +306,12 @@ typedef struct patprog   *Patprog;
 typedef struct process   *Process;
 typedef struct job       *Job;
 typedef struct value     *Value;
-typedef struct varasg    *Varasg;
-typedef struct cond      *Cond;
 typedef struct conddef   *Conddef;
-typedef struct cmd       *Cmd;
-typedef struct pline     *Pline;
-typedef struct sublist   *Sublist;
-typedef struct list      *List;
 typedef struct redir     *Redir;
 typedef struct complist  *Complist;
 typedef struct heap      *Heap;
 typedef struct heapstack *Heapstack;
 typedef struct histent   *Histent;
-typedef struct forcmd    *Forcmd;
-typedef struct autofn    *AutoFn;
 typedef struct hookdef   *Hookdef;
 
 typedef struct asgment   *Asgment;
@@ -365,147 +357,15 @@ struct linklist {
 /* Definitions for syntax trees */
 /********************************/
 
-/* struct list, struct sublist, struct pline, etc.  all fit the form *
- * of this structure and are used interchangably. The ptrs may hold  *
- * integers or pointers, depending on the type of the node.          */
-
-/* Generic node structure for syntax trees */
-struct node {
-    int ntype;			/* node type */
-};
-
-#define N_LIST    0
-#define N_SUBLIST 1
-#define N_PLINE   2
-#define N_CMD     3
-#define N_REDIR   4
-#define N_COND    5
-#define N_FOR     6
-#define N_CASE    7
-#define N_IF      8
-#define N_WHILE   9
-#define N_VARASG 10
-#define N_AUTOFN 11
-#define N_COUNT  12
-
-/* values for types[4] */
-
-#define NT_EMPTY 0
-#define NT_NODE  1
-#define NT_STR   2
-#define NT_PAT   3
-#define NT_LIST  4
-#define NT_ARR   8
-
-#define NT_TYPE(T) ((T) & 0xff)
-#define NT_N(T, N) (((T) >> (8 + (N) * 4)) & 0xf)
-#define NT_SET(T0, T1, T2, T3, T4) \
-    ((T0) | ((T1) << 8) | ((T2) << 12) | ((T3) << 16) | ((T4) << 20))
-
-/* tree element for lists */
-
-struct list {
-    int ntype;			/* node type */
-    int type;
-    Sublist left;
-    List right;
-};
-
 /* These are control flags that are passed *
  * down the execution pipeline.            */
-#define Z_TIMED	(1<<0)	/* pipeline is being timed                   */
-#define Z_SYNC	(1<<1)	/* run this sublist synchronously       (;)  */
-#define Z_ASYNC	(1<<2)	/* run this sublist asynchronously      (&)  */
+#define Z_TIMED	 (1<<0)	/* pipeline is being timed                   */
+#define Z_SYNC	 (1<<1)	/* run this sublist synchronously       (;)  */
+#define Z_ASYNC  (1<<2)	/* run this sublist asynchronously      (&)  */
 #define Z_DISOWN (1<<3)	/* run this sublist without job control (&|) */
-
-/* tree element for sublists */
-
-struct sublist {
-    int ntype;			/* node type */
-    int type;
-    int flags;			/* see PFLAGs below */
-    Pline left;
-    Sublist right;
-};
-
-#define ORNEXT  10		/* || */
-#define ANDNEXT 11		/* && */
-
-#define PFLAG_NOT     1		/* ! ... */
-#define PFLAG_COPROC 32		/* coproc ... */
-
-/* tree element for pipes */
-
-struct pline {
-    int ntype;			/* node type */
-    int type;
-    Cmd left;
-    Pline right;
-};
-
-#define END	0		/* pnode *right is null                     */
-#define PIPE	1		/* pnode *right is the rest of the pipeline */
-
-/* tree element for commands */
-
-struct cmd {
-    int ntype;			/* node type                    */
-    int type;
-    int flags;			/* see CFLAGs below             */
-    int lineno;			/* lineno of script for command */
-    union {
-	List list;		/* for SUBSH/CURSH/SHFUNC       */
-	Forcmd forcmd;
-	struct casecmd *casecmd;
-	struct ifcmd *ifcmd;
-	struct whilecmd *whilecmd;
-	Sublist pline;
-	Cond cond;
-	AutoFn autofn;
-	void *generic;
-    } u;
-    LinkList args;		/* command & argmument List (char *'s)   */
-    LinkList redir;		/* i/o redirections (struct redir *'s)   */
-    LinkList vars;		/* param assignments (struct varasg *'s) */
-};
-
-/* cmd types */
-#define SIMPLE   0
-#define SUBSH    1
-#define CURSH    2
-#define ZCTIME   3
-#define FUNCDEF  4
-#define CFOR     5
-#define CWHILE   6
-#define CREPEAT  7
-#define CIF      8
-#define CCASE    9
-#define CSELECT 10
-#define COND    11
-#define CARITH  12
-#define AUTOFN  13
 
 /* flags for command modifiers */
 #define CFLAG_EXEC	(1<<0)	/* exec ...    */
-
-/* tree element for redirection lists */
-
-struct redir {
-    int ntype;			/* node type */
-    int type;
-    int fd1, fd2;
-    char *name;
-};
-
-/* tree element for conditionals */
-
-struct cond {
-    int ntype;		/* node type                     */
-    int type;		/* can be cond_type, or a single */
-			/* letter (-a, -b, ...)          */
-    void *left, *right;
-    Patprog prog;	/* compiled pattern for `==' and `!=' */
-};
 
 #define COND_NOT    0
 #define COND_AND    1
@@ -545,42 +405,12 @@ struct conddef {
 #define CONDDEF(name, flags, handler, min, max, condid) \
     { NULL, name, flags, handler, min, max, condid, NULL }
 
-struct forcmd {			/* for/select */
-/* Cmd->args contains list of words to loop thru */
-    int ntype;			/* node type                          */
-    int inflag;			/* if there is an in ... clause       */
-    char *name;			/* initializer or parameter name      */
-    char *condition;		/* arithmetic terminating condition   */
-    char *advance;		/* evaluated after each loop          */
-    List list;			/* list to look through for each name */
-};
+/* tree element for redirection lists */
 
-struct casecmd {
-/* Cmd->args contains word to test */
-    int ntype;			/* node type       */
-    char **pats;		/* pattern strings */
-    Patprog *progs;		/* compiled patterns (on demand) */
-    List *lists;		/* list to execute */
-};
-
-struct ifcmd {
-    int ntype;			/* node type */
-    List *ifls;
-    List *thenls;
-};
-
-struct whilecmd {
-    int ntype;			/* node type                           */
-    int cond;			/* 0 for while, 1 for until            */
-    List cont;			/* condition                           */
-    List loop;			/* list to execute until condition met */
-};
-
-/* node for autoloading functions */
-
-struct autofn {
-    int ntype;			/* node type                             */
-    Shfunc shf;			/* the shell function to define	         */
+struct redir {
+    int type;
+    int fd1, fd2;
+    char *name;
 };
 
 /* The number of fds space is allocated for  *
@@ -602,14 +432,12 @@ struct multio {
     int fds[MULTIOUNIT];	/* list of src/dests redirected to/from this fd */
 };
 
-/* variable assignment tree element */
+/* structure for foo=bar assignments */
 
-struct varasg {
-    int ntype;			/* node type                             */
-    int type;			/* nonzero means array                   */
+struct asgment {
+    struct asgment *next;
     char *name;
-    char *str;			/* should've been a union here.  oh well */
-    LinkList arr;
+    char *value;
 };
 
 /* lvalue for variable assignment/expansion */
@@ -623,16 +451,152 @@ struct value {
     char **arr;		/* cache for hash turned into array */
 };
 
-/* structure for foo=bar assignments */
-
-struct asgment {
-    struct asgment *next;
-    char *name;
-    char *value;
-};
-
 #define MAX_ARRLEN    262144
 
+/********************************************/
+/* Defintions for byte code                 */
+/********************************************/
+
+typedef unsigned int wordcode;
+typedef wordcode *Wordcode;
+
+typedef struct eprog *Eprog;
+
+struct eprog {
+    int heap;			/* != 0 if this is in heap memory */
+    int len;			/* total block length */
+    int npats;			/* Patprog cache size */
+    Patprog *pats;		/* the memory block, the patterns */
+    Wordcode prog;		/* memory block ctd, the code */
+    char *strs;			/* memory block ctd, the strings */
+    Shfunc shf;			/* shell function for autoload */
+};
+
+typedef struct estate *Estate;
+
+struct estate {
+    Eprog prog;			/* the eprog executed */
+    Wordcode pc;		/* program counter, current pos */
+    char *strs;			/* strings from prog */
+};
+
+#define WC_CODEBITS 5
+
+#define wc_code(C)   ((C) & ((wordcode) ((1 << WC_CODEBITS) - 1)))
+#define wc_data(C)   ((C) >> WC_CODEBITS)
+#define wc_bld(C, D) (((wordcode) (C)) | (((wordcode) (D)) << WC_CODEBITS))
+
+#define WC_END      0
+#define WC_LIST     1
+#define WC_SUBLIST  2
+#define WC_PIPE     3
+#define WC_REDIR    4
+#define WC_ASSIGN   5
+#define WC_SIMPLE   6
+#define WC_SUBSH    7
+#define WC_CURSH    8
+#define WC_TIMED    9
+#define WC_FUNCDEF 10
+#define WC_FOR     11
+#define WC_SELECT  12
+#define WC_WHILE   13
+#define WC_REPEAT  14
+#define WC_CASE    15
+#define WC_IF      16
+#define WC_COND    17
+#define WC_ARITH   18
+#define WC_AUTOFN  19
+
+#define WCB_END()           wc_bld(WC_END, 0)
+
+#define WC_LIST_TYPE(C)     wc_data(C)
+#define Z_END               (1<<4) 
+#define WCB_LIST(T)         wc_bld(WC_LIST, (T))
+
+#define WC_SUBLIST_TYPE(C)  (wc_data(C) & ((wordcode) 3))
+#define WC_SUBLIST_END      0
+#define WC_SUBLIST_AND      1
+#define WC_SUBLIST_OR       2
+#define WC_SUBLIST_FLAGS(C) (wc_data(C) & ((wordcode) 12))
+#define WC_SUBLIST_COPROC   4
+#define WC_SUBLIST_NOT      8
+#define WC_SUBLIST_SKIP(C)  (wc_data(C) >> 4)
+#define WCB_SUBLIST(T,F,O)  wc_bld(WC_SUBLIST, ((T) | (F) | ((O) << 4)))
+
+#define WC_PIPE_TYPE(C)     (wc_data(C) & ((wordcode) 1))
+#define WC_PIPE_END         0
+#define WC_PIPE_MID         1
+#define WC_PIPE_LINENO(C)   (wc_data(C) >> 1)
+#define WCB_PIPE(T,L)       wc_bld(WC_PIPE, ((T) | ((L) << 1)))
+
+#define WC_REDIR_TYPE(C)    wc_data(C)
+#define WCB_REDIR(T)        wc_bld(WC_REDIR, (T))
+
+#define WC_ASSIGN_TYPE(C)   (wc_data(C) & ((wordcode) 1))
+#define WC_ASSIGN_SCALAR    0
+#define WC_ASSIGN_ARRAY     1
+#define WC_ASSIGN_NUM(C)    (wc_data(C) >> 1)
+#define WCB_ASSIGN(T,N)     wc_bld(WC_ASSIGN, ((T) | ((N) << 1)))
+
+#define WC_SIMPLE_ARGC(C)   wc_data(C)
+#define WCB_SIMPLE(N)       wc_bld(WC_SIMPLE, (N))
+
+#define WCB_SUBSH()         wc_bld(WC_SUBSH, 0)
+
+#define WCB_CURSH()         wc_bld(WC_CURSH, 0)
+
+#define WC_TIMED_TYPE(C)    wc_data(C)
+#define WC_TIMED_EMPTY      0
+#define WC_TIMED_PIPE       1
+#define WCB_TIMED(T)        wc_bld(WC_TIMED, (T))
+
+#define WC_FUNCDEF_SKIP(C)  wc_data(C)
+#define WCB_FUNCDEF(O)      wc_bld(WC_FUNCDEF, (O))
+
+#define WC_FOR_TYPE(C)      (wc_data(C) & 3)
+#define WC_FOR_PPARAM       0
+#define WC_FOR_LIST         1
+#define WC_FOR_COND         2
+#define WC_FOR_SKIP(C)      (wc_data(C) >> 2)
+#define WCB_FOR(T,O)        wc_bld(WC_FOR, ((T) | ((O) << 2)))
+
+#define WC_SELECT_TYPE(C)   (wc_data(C) & 1)
+#define WC_SELECT_PPARAM    0
+#define WC_SELECT_LIST      1
+#define WC_SELECT_SKIP(C)   (wc_data(C) >> 1)
+#define WCB_SELECT(T,O)     wc_bld(WC_SELECT, ((T) | ((O) << 1)))
+
+#define WC_WHILE_TYPE(C)    (wc_data(C) & 1)
+#define WC_WHILE_WHILE      0
+#define WC_WHILE_UNTIL      1
+#define WC_WHILE_SKIP(C)    (wc_data(C) >> 1)
+#define WCB_WHILE(T,O)      wc_bld(WC_WHILE, ((T) | ((O) << 1)))
+
+#define WC_REPEAT_SKIP(C)   wc_data(C)
+#define WCB_REPEAT(O)       wc_bld(WC_REPEAT, (O))
+
+#define WC_CASE_TYPE(C)     (wc_data(C) & 3)
+#define WC_CASE_HEAD        0
+#define WC_CASE_OR          1
+#define WC_CASE_AND         2
+#define WC_CASE_SKIP(C)     (wc_data(C) >> 2)
+#define WCB_CASE(T,O)       wc_bld(WC_CASE, ((T) | ((O) << 2)))
+
+#define WC_IF_TYPE(C)       (wc_data(C) & 3)
+#define WC_IF_HEAD          0
+#define WC_IF_IF            1
+#define WC_IF_ELIF          2
+#define WC_IF_ELSE          3
+#define WC_IF_SKIP(C)       (wc_data(C) >> 2)
+#define WCB_IF(T,O)         wc_bld(WC_IF, ((T) | ((O) << 2)))
+
+#define WC_COND_TYPE(C)     (wc_data(C) & 127)
+#define WC_COND_SKIP(C)     (wc_data(C) >> 7)
+#define WCB_COND(T,O)       wc_bld(WC_COND, ((T) | ((O) << 7)))
+
+#define WCB_ARITH()         wc_bld(WC_ARITH, 0)
+
+#define WCB_AUTOFN()        wc_bld(WC_AUTOFN, 0)
 
 /********************************************/
 /* Defintions for job table and job control */
@@ -845,7 +809,7 @@ struct shfunc {
     HashNode next;		/* next in hash chain     */
     char *nam;			/* name of shell function */
     int flags;			/* various flags          */
-    List funcdef;		/* function definition    */
+    Eprog funcdef;		/* function definition    */
 };
 
 /* Shell function context types. */
@@ -860,7 +824,7 @@ struct shfunc {
 
 /* node in list of function call wrappers */
 
-typedef int (*WrapFunc) _((List, FuncWrap, char *));
+typedef int (*WrapFunc) _((Eprog, FuncWrap, char *));
 
 struct funcwrap {
     FuncWrap next;
@@ -996,7 +960,7 @@ struct patprog {
 #define GF_MATCHREF	0x0800
 
 /* Dummy Patprog pointers. Used mainly in executions trees, but the
- * pattern code needs to knwo about it, too. */
+ * pattern code needs to know about it, too. */
 
 #define dummy_patprog1 ((Patprog) 1)
 #define dummy_patprog2 ((Patprog) 2)

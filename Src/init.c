@@ -95,7 +95,7 @@ mod_export int alloc_stackp;
 void
 loop(int toplevel, int justonce)
 {
-    List list;
+    Eprog prog;
 #ifdef DEBUG
     int oasp = toplevel ? 0 : alloc_stackp;
 #endif
@@ -112,7 +112,7 @@ loop(int toplevel, int justonce)
 	hbegin(1);		/* init history mech        */
 	intr();			/* interrupts on            */
 	lexinit();              /* initialize lexical state */
-	if (!(list = parse_event())) {	/* if we couldn't parse a list */
+	if (!(prog = parse_event())) {	/* if we couldn't parse a list */
 	    hend();
 	    if ((tok == ENDINPUT && !errflag) ||
 		(tok == LEXERR && (!isset(SHINSTDIN) || !toplevel)) ||
@@ -122,9 +122,9 @@ loop(int toplevel, int justonce)
 	}
 	if (hend()) {
 	    int toksav = tok;
-	    List prelist;
+	    Eprog preprog;
 
-	    if (toplevel && (prelist = getshfunc("preexec")) != &dummy_list) {
+	    if (toplevel && (preprog = getshfunc("preexec")) != &dummy_eprog) {
 		LinkList args;
 		int osc = sfcontext;
 
@@ -135,16 +135,16 @@ loop(int toplevel, int justonce)
 			addlinknode(args, hist_ring->text);
 		} LASTALLOC;
 		sfcontext = SFC_HOOK;
-		doshfunc("preexec", prelist, args, 0, 1);
+		doshfunc("preexec", preprog, args, 0, 1);
 		sfcontext = osc;
 		freelinklist(args, (FreeFunc) NULL);
 		errflag = 0;
 	    }
 	    if (stopmsg)	/* unset 'you have stopped jobs' flag */
 		stopmsg--;
-	    execlist(list, 0, 0);
+	    execode(prog, 0, 0);
 	    if (toplevel)
-		freestructs();
+		freeeprogs();
 	    tok = toksav;
 	    if (toplevel)
 		noexitct = 0;
@@ -559,6 +559,8 @@ setupvals(void)
     int fpathlen = 0;
 # endif
 #endif
+
+    init_eprog();
 
     getkeyptr = NULL;
 

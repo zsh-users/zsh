@@ -214,7 +214,7 @@ bin_zprof(char *nam, char **args, char *ops, int func)
 
 /**/
 static int
-zprof_wrapper(List list, FuncWrap w, char *name)
+zprof_wrapper(Eprog prog, FuncWrap w, char *name)
 {
     struct sfunc sf, *sp;
     Pfunc f;
@@ -257,7 +257,7 @@ zprof_wrapper(List list, FuncWrap w, char *name)
     gettimeofday(&tv, &dummy);
     sf.beg = prev = ((((double) tv.tv_sec) * 1000.0) +
 		     (((double) tv.tv_usec) / 1000.0));
-    runshfunc(list, w, name);
+    runshfunc(prog, w, name);
     tv.tv_sec = tv.tv_usec = 0;
     gettimeofday(&tv, &dummy);
 

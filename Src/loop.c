@@ -47,15 +47,20 @@ mod_export int breaks;
 
 /**/
 int
-execfor(Cmd cmd, LinkList args, int flags)
+execfor(Estate state, int do_exec)
 {
-    Forcmd node;
-    char *str;
+    Wordcode end, loop;
+    wordcode code = state->pc[-1];
+    int iscond = (WC_FOR_TYPE(code) == WC_FOR_COND);
+    char *name, *str, *cond, *advance;
     zlong val = 0;
+    LinkList args;
 
-    node = cmd->u.forcmd;
-    if (node->condition) {
-	str = dupstring(node->name);
+    name = ecgetstr(state, 0);
+    end = state->pc + WC_FOR_SKIP(code);
+
+    if (iscond) {
+	str = dupstring(name);
 	singsub(&str);
 	if (isset(XTRACE)) {
 	    char *str2 = dupstring(str);
@@ -66,9 +71,19 @@ execfor(Cmd cmd, LinkList args, int flags)
 	}
 	if (!errflag)
 	    matheval(str);
-	if (errflag)
+	if (errflag) {
+	    state->pc = end;
 	    return lastval = errflag;
-    } else if (!node->inflag) {
+	}
+	cond = ecgetstr(state, 0);
+	advance = ecgetstr(state, 0);
+    } else if (WC_FOR_TYPE(code) == WC_FOR_LIST) {
+	if (!(args = ecgetlist(state, *state->pc++, 1))) {
+	    state->pc = end;
+	    return 0;
+	}
+	execsubst(args);
+    } else {
 	char **x;
 
 	args = newlinklist();
@@ -79,9 +94,10 @@ execfor(Cmd cmd, LinkList args, int flags)
     loops++;
     pushheap();
     cmdpush(CS_FOR);
+    loop = state->pc;
     for (;;) {
-	if (node->condition) {
-	    str = dupstring(node->condition);
+	if (iscond) {
+	    str = dupstring(cond);
 	    singsub(&str);
 	    if (!errflag) {
 		while (iblank(*str))
@@ -109,21 +125,21 @@ execfor(Cmd cmd, LinkList args, int flags)
 		break;
 	    if (isset(XTRACE)) {
 		printprompt4();
-		fprintf(stderr, "%s=%s\n", node->name, str);
+		fprintf(stderr, "%s=%s\n", name, str);
 		fflush(stderr);
 	    }
-	    setsparam(node->name, ztrdup(str));
+	    setsparam(name, ztrdup(str));
 	}
-	execlist(node->list, 1,
-		 (flags & CFLAG_EXEC) && args && empty(args));
+	state->pc = loop;
+	execlist(state, 1, do_exec && args && empty(args));
 	if (breaks) {
 	    breaks--;
 	    if (breaks || !contflag)
 		break;
 	    contflag = 0;
 	}
-	if (node->condition && !errflag) {
-	    str = dupstring(node->advance);
+	if (iscond && !errflag) {
+	    str = dupstring(advance);
 	    if (isset(XTRACE)) {
 		printprompt4();
 		fprintf(stderr, "%s\n", str);
@@ -149,25 +165,37 @@ execfor(Cmd cmd, LinkList args, int flags)
 
 /**/
 int
-execselect(Cmd cmd, LinkList args, int flags)
+execselect(Estate state, int do_exec)
 {
-    Forcmd node;
-    char *str, *s;
+    Wordcode end, loop;
+    wordcode code = state->pc[-1];
+    char *str, *s, *name;
     LinkNode n;
     int i, usezle;
     FILE *inp;
     size_t more;
+    LinkList args;
 
-    node = cmd->u.forcmd;
-    if (!node->inflag) {
+    end = state->pc + WC_FOR_SKIP(code);
+    name = ecgetstr(state, 0);
+
+    if (WC_SELECT_TYPE(code) == WC_SELECT_PPARAM) {
 	char **x;
 
 	args = newlinklist();
 	for (x = pparams; *x; x++)
 	    addlinknode(args, dupstring(*x));
+    } else {
+	if (!(args = ecgetlist(state, *state->pc++, 1))) {
+	    state->pc = end;
+	    return 0;
+	}
+	execsubst(args);
     }
-    if (!args || empty(args))
+    if (!args || empty(args)) {
+	state->pc = end;
 	return 1;
+    }
     loops++;
     lastval = 0;
     pushheap();
@@ -175,6 +203,7 @@ execselect(Cmd cmd, LinkList args, int flags)
     usezle = interact && SHTTY != -1 && isset(USEZLE);
     inp = fdopen(dup(usezle ? SHTTY : 0), "r");
     more = selectlist(args, 0);
+    loop = state->pc;
     for (;;) {
 	for (;;) {
 	    if (empty(bufstack)) {
@@ -219,8 +248,9 @@ execselect(Cmd cmd, LinkList args, int flags)
 	    else
 		str = "";
 	}
-	setsparam(node->name, ztrdup(str));
-	execlist(node->list, 1, 0);
+	setsparam(name, ztrdup(str));
+	state->pc = loop;
+	execlist(state, 1, 0);
 	freeheap();
 	if (breaks) {
 	    breaks--;
@@ -236,6 +266,7 @@ execselect(Cmd cmd, LinkList args, int flags)
     popheap();
     fclose(inp);
     loops--;
+    state->pc = end;
     return lastval;
 }
 
@@ -302,28 +333,31 @@ selectlist(LinkList l, size_t start)
 
 /**/
 int
-execwhile(Cmd cmd, LinkList args, int flags)
+execwhile(Estate state, int do_exec)
 {
-    struct whilecmd *node;
-    int olderrexit, oldval;
+    Wordcode end, loop;
+    wordcode code = state->pc[-1];
+    int olderrexit, oldval, isuntil = (WC_WHILE_TYPE(code) == WC_WHILE_UNTIL);
 
+    end = state->pc + WC_WHILE_SKIP(code);
     olderrexit = noerrexit;
-    node = cmd->u.whilecmd;
     oldval = 0;
     pushheap();
-    cmdpush(node->cond ? CS_UNTIL : CS_WHILE);
+    cmdpush(isuntil ? CS_UNTIL : CS_WHILE);
     loops++;
+    loop = state->pc;
     for (;;) {
+	state->pc = loop;
 	noerrexit = 1;
-	execlist(node->cont, 1, 0);
+	execlist(state, 1, 0);
 	noerrexit = olderrexit;
-	if (!((lastval == 0) ^ node->cond)) {
+	if (!((lastval == 0) ^ isuntil)) {
 	    if (breaks)
 		breaks--;
 	    lastval = oldval;
 	    break;
 	}
-	execlist(node->loop, 1, 0);
+	execlist(state, 1, 0);
 	if (breaks) {
 	    breaks--;
 	    if (breaks || !contflag)
@@ -345,21 +379,26 @@ execwhile(Cmd cmd, LinkList args, int flags)
 
 /**/
 int
-execrepeat(Cmd cmd, LinkList args, int flags)
+execrepeat(Estate state, int do_exec)
 {
+    Wordcode end, loop;
+    wordcode code = state->pc[-1];
     int count;
+    char *tmp;
+
+    end = state->pc + WC_REPEAT_SKIP(code);
 
     lastval = 0;
-    if (!args || empty(args) || nextnode(firstnode(args))) {
-	zerr("bad argument for repeat", NULL, 0);
-	return 1;
-    }
-    count = atoi(peekfirst(args));
+    tmp = ecgetstr(state, 1);
+    singsub(&tmp);
+    count = atoi(tmp);
     pushheap();
     cmdpush(CS_REPEAT);
     loops++;
+    loop = state->pc;
     while (count-- > 0) {
-	execlist(cmd->u.list, 1, 0);
+	state->pc = loop;
+	execlist(state, 1, 0);
 	freeheap();
 	if (breaks) {
 	    breaks--;
@@ -375,114 +414,140 @@ execrepeat(Cmd cmd, LinkList args, int flags)
     cmdpop();
     popheap();
     loops--;
+    state->pc = end;
     return lastval;
 }
 
 /**/
 int
-execif(Cmd cmd, LinkList args, int flags)
+execif(Estate state, int do_exec)
 {
-    struct ifcmd *node;
-    int olderrexit, s = 0;
-    List *i, *t;
+    Wordcode end, next;
+    wordcode code = state->pc[-1];
+    int olderrexit, s = 0, run = 0;
 
     olderrexit = noerrexit;
-    node = cmd->u.ifcmd;
-    i = node->ifls;
-    t = node->thenls;
+    end = state->pc + WC_IF_SKIP(code);
 
     if (!noerrexit)
 	noerrexit = 1;
-    while (*i) {
-	cmdpush(s ? CS_ELIF : CS_IF);
-	execlist(*i, 1, 0);
-	cmdpop();
-	if (!lastval)
+    while (state->pc < end) {
+	code = *state->pc++;
+	if (wc_code(code) != WC_IF ||
+	    (run = (WC_IF_TYPE(code) == WC_IF_ELSE))) {
+	    if (run)
+		run = 2;
 	    break;
+	}
+	next = state->pc + WC_IF_SKIP(code);
+	cmdpush(s ? CS_ELIF : CS_IF);
+	execlist(state, 1, 0);
+	cmdpop();
+	if (!lastval) {
+	    run = 1;
+	    break;
+	}
 	s = 1;
-	i++;
-	t++;
+	state->pc = next;
     }
     noerrexit = olderrexit;
 
-    if (*t) {
-	cmdpush(*i ? (s ? CS_ELIFTHEN : CS_IFTHEN) : CS_ELSE);
-	execlist(*t, 1, flags & CFLAG_EXEC);
+    if (run) {
+	cmdpush(run == 2 ? CS_ELSE : (s ? CS_ELIFTHEN : CS_IFTHEN));
+	execlist(state, 1, do_exec);
 	cmdpop();
     } else
 	lastval = 0;
+    state->pc = end;
 
     return lastval;
 }
 
 /**/
 int
-execcase(Cmd cmd, LinkList args, int flags)
+execcase(Estate state, int do_exec)
 {
-    struct casecmd *node;
-    char *word;
-    List *l;
-    char **p;
-    Patprog *pp, pprog;
-    int save;
+    Wordcode end, next;
+    wordcode code = state->pc[-1];
+    char *word, *pat;
+    int npat, save;
+    Patprog *spprog, pprog;
 
-    node = cmd->u.casecmd;
-    l = node->lists;
-    p = node->pats;
-    pp = node->progs;
+    end = state->pc + WC_CASE_SKIP(code);
 
-    word = dupstring(*p++);
+    word = ecgetstr(state, 1);
     singsub(&word);
     untokenize(word);
     lastval = 0;
 
-    if (node) {
-	cmdpush(CS_CASE);
-	while (*p) {
-	    char *pat = NULL, *opat;
+    cmdpush(CS_CASE);
+    while (state->pc < end) {
+	code = *state->pc++;
+	if (wc_code(code) != WC_CASE)
+	    break;
 
-	    pprog = NULL;
-	    save = 0;
+	pat = NULL;
+	pprog = NULL;
+	save = 0;
+	npat = state->pc[1];
+	spprog = state->prog->pats + npat;
 
-	    if (isset(XTRACE)) {
-		char *pat2;
+	next = state->pc + WC_CASE_SKIP(code);
 
-		opat = pat = dupstring(*p + 1);
+	if (isset(XTRACE)) {
+	    char *pat2, *opat;
+
+	    opat = pat = ecgetstr(state, 1);
+	    singsub(&pat);
+	    save = (!state->prog->heap &&
+		    !strcmp(pat, opat) && *spprog != dummy_patprog2);
+
+	    pat2 = dupstring(pat);
+	    untokenize(pat2);
+	    printprompt4();
+	    fprintf(stderr, "case %s (%s)\n", word, pat2);
+	    fflush(stderr);
+	    state->pc++;
+	} else
+	    state->pc += 2;
+
+	if (*spprog != dummy_patprog1 && *spprog != dummy_patprog2)
+	    pprog = *spprog;
+
+	if (!pprog) {
+	    if (!pat) {
+		char *opat;
+
+		opat = pat = dupstring(ecrawstr(state->prog, state->pc - 2));
 		singsub(&pat);
-		save = (!strcmp(pat, opat) && *pp != dummy_patprog2);
-
-		pat2 = dupstring(pat);
-		untokenize(pat2);
-		printprompt4();
-		fprintf(stderr, "case %s (%s)\n", word, pat2);
-		fflush(stderr);
+		save = (!state->prog->heap &&
+			!strcmp(pat, opat) && *spprog != dummy_patprog2);
 	    }
-	    if (*pp != dummy_patprog1 && *pp != dummy_patprog2)
-		pprog = *pp;
-
-	    if (!pprog) {
-		if (!pat) {
-		    opat = pat = dupstring(*p + 1);
-		    singsub(&pat);
-		    save = (!strcmp(pat, opat) && *pp != dummy_patprog2);
-		}
-		if (!(pprog = patcompile(pat, (save ? PAT_ZDUP : PAT_STATIC),
-				      NULL)))
-		    zerr("bad pattern: %s", pat, 0);
-		else if (save)
-		    *pp = pprog;
-	    }
-	    if (pprog && pattry(pprog, word)) {
-		do {
-		    execlist(*l++, 1, **p == ';' && (flags & CFLAG_EXEC));
-		} while(**p++ == '&' && *p);
-		break;
-	    }
-	    p++;
-	    pp++;
-	    l++;
+	    if (!(pprog = patcompile(pat, (save ? PAT_ZDUP : PAT_STATIC),
+				     NULL)))
+		zerr("bad pattern: %s", pat, 0);
+	    else if (save)
+		*spprog = pprog;
 	}
-	cmdpop();
+	if (pprog && pattry(pprog, word)) {
+	    execlist(state, 1, ((WC_CASE_TYPE(code) == WC_CASE_OR) &&
+				do_exec));
+	    while (wc_code(code) == WC_CASE &&
+		   WC_CASE_TYPE(code) == WC_CASE_AND) {
+		state->pc = next;
+		code = *state->pc;
+		state->pc += 3;
+		next = state->pc + WC_CASE_SKIP(code) - 1;
+		execlist(state, 1, ((WC_CASE_TYPE(code) == WC_CASE_OR) &&
+				    do_exec));
+	    }
+	    break;
+	} else
+	    state->pc = next;
     }
+    cmdpop();
+
+    state->pc = end;
+
     return lastval;
 }

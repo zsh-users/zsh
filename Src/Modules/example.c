@@ -143,7 +143,7 @@ math_length(char *name, char *arg, int id)
 
 /**/
 static int
-ex_wrapper(List list, FuncWrap w, char *name)
+ex_wrapper(Eprog prog, FuncWrap w, char *name)
 {
     if (strncmp(name, "example", 7))
 	return 1;
@@ -151,7 +151,7 @@ ex_wrapper(List list, FuncWrap w, char *name)
 	int ogd = opts[GLOBDOTS];
 
 	opts[GLOBDOTS] = 1;
-	runshfunc(list, w, name);
+	runshfunc(prog, w, name);
 	opts[GLOBDOTS] = ogd;
 
 	return 0;

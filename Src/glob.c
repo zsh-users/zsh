@@ -2551,15 +2551,15 @@ qualtime(char *name, struct stat *buf, off_t days, char *dummy)
 static int
 qualsheval(char *name, struct stat *buf, off_t days, char *str)
 {
-    List list;
+    Eprog prog;
 
-    if ((list = parse_string(str, 0))) {
+    if ((prog = parse_string(str, 0))) {
 	int ef = errflag, lv = lastval, ret;
 
 	unsetparam("reply");
 	setsparam("REPLY", ztrdup(name));
 
-	execlist(list, 1, 0);
+	execode(prog, 1, 0);
 
 	ret = lastval;
 	errflag = ef;

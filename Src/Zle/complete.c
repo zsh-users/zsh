@@ -1177,7 +1177,7 @@ comp_setunset(int rset, int runset, int kset, int kunset)
 
 /**/
 static int
-comp_wrapper(List list, FuncWrap w, char *name)
+comp_wrapper(Eprog prog, FuncWrap w, char *name)
 {
     if (incompfunc != 1)
 	return 1;
@@ -1214,7 +1214,7 @@ comp_wrapper(List list, FuncWrap w, char *name)
 	    owords = arrdup(compwords);
 	} LASTALLOC;
 
-	runshfunc(list, w, name);
+	runshfunc(prog, w, name);
 
 	if (comprestore && !strcmp(comprestore, "auto")) {
 	    compcurrent = ocur;

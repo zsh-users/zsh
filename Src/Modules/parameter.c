@@ -339,23 +339,23 @@ setfunction(char *name, char *val, int dis)
 {
     char *value = dupstring(val);
     Shfunc shf;
-    List list;
+    Eprog prog;
     int sn;
 
     val = metafy(val, strlen(val), META_REALLOC);
 
     HEAPALLOC {
-	list = parse_string(val, 1);
+	prog = parse_string(val, 1);
     } LASTALLOC;
 
-    if (!list || list == &dummy_list) {
+    if (!prog || prog == &dummy_eprog) {
 	zwarn("invalid function definition", value, 0);
 	zsfree(val);
 	return;
     }
     PERMALLOC {
 	shf = (Shfunc) zalloc(sizeof(*shf));
-	shf->funcdef = (List) dupstruct(list);
+	shf->funcdef = dupeprog(prog);
 	shf->flags = dis;
 
 	if (!strncmp(name, "TRAP", 4) &&
@@ -463,8 +463,7 @@ getfunction(HashTable ht, char *name, int dis)
 				    ((shf->flags & PM_TAGGED) ? "Ut" : "U") :
 				    ((shf->flags & PM_TAGGED) ? "t" : "")));
 	    } else {
-		char *t = getpermtext((void *) dupstruct((void *)
-							 shf->funcdef)), *h;
+		char *t = getpermtext(shf->funcdef, NULL), *h;
 
 		h = dupstring(t);
 		zsfree(t);
@@ -528,8 +527,7 @@ scanfunctions(HashTable ht, ScanFunc func, int flags, int dis)
 				    ((shf->flags & PM_TAGGED) ? "Ut" : "U") :
 				    ((shf->flags & PM_TAGGED) ? "t" : "")));
 		    } else {
-			char *t = getpermtext((void *)
-					      dupstruct((void *) ((Shfunc) hn)->funcdef));
+			char *t = getpermtext(((Shfunc) hn)->funcdef, NULL);
 
 			pm.u.str = dupstring(t);
 			unmetafy(pm.u.str, NULL);
@@ -577,13 +575,13 @@ funcstackgetfn(Param pm)
 
 /**/
 static int
-func_wrapper(List list, FuncWrap w, char *name)
+func_wrapper(Eprog prog, FuncWrap w, char *name)
 {
     PERMALLOC {
 	pushnode(funcstack, ztrdup(name));
     } LASTALLOC;
 
-    runshfunc(list, w, name);
+    runshfunc(prog, w, name);
 
     DPUTS(strcmp(name, (char *) getdata(firstnode(funcstack))),
 	  "funcstack wrapper with wrong function");

@@ -971,7 +971,7 @@ cd_try_chdir(char *pfix, char *dest, int hard)
 static void
 cd_new_pwd(int func, LinkNode dir)
 {
-    List l;
+    Eprog prog;
     char *new_pwd, *s;
     int dirstacksize;
 
@@ -1015,13 +1015,13 @@ cd_new_pwd(int func, LinkNode dir)
     }
 
     /* execute the chpwd function */
-    if ((l = getshfunc("chpwd")) != &dummy_list) {
+    if ((prog = getshfunc("chpwd")) != &dummy_eprog) {
 	int osc = sfcontext;
 
 	fflush(stdout);
 	fflush(stderr);
 	sfcontext = SFC_HOOK;
-	doshfunc("chpwd", l, NULL, 0, 1);
+	doshfunc("chpwd", prog, NULL, 0, 1);
 	sfcontext = osc;
     }
 
@@ -2003,7 +2003,7 @@ eval_autoload(Shfunc shf, char *name, char *ops, int func)
 	return 1;
 
     if (shf->funcdef)
-	freestruct(shf->funcdef);
+	freeeprog(shf->funcdef);
 
     if (ops['X'] == 1) {
 	char *fargv[3];
@@ -2140,30 +2140,27 @@ bin_functions(char *name, char **argv, char *ops, int func)
 }
 
 /**/
-static List
+static Eprog
 mkautofn(Shfunc shf)
 {
-    List l;
-    Sublist s;
-    Pline p;
-    Cmd c;
-    AutoFn a;
-    PERMALLOC {
-	a = (AutoFn)allocnode(N_AUTOFN);
-	a->shf = shf;
-	c = (Cmd)allocnode(N_CMD);
-	c->type = AUTOFN;
-	c->u.autofn = a;
-	p = (Pline)allocnode(N_PLINE);
-	p->left = c;
-	p->type = END;
-	s = (Sublist)allocnode(N_SUBLIST);
-	s->left = p;
-	l = (List)allocnode(N_LIST);
-	l->left = s;
-	l->type = Z_SYNC;
-    } LASTALLOC;
-    return l;
+    Eprog p;
+
+    p = (Eprog) zalloc(sizeof(*p));
+    p->len = 5 * sizeof(wordcode);
+    p->prog = (Wordcode) zalloc(p->len);
+    p->strs = NULL;
+    p->shf = shf;
+    p->npats = 0;
+    p->pats = NULL;
+    p->heap = 0;
+
+    p->prog[0] = WCB_LIST(Z_SYNC | Z_END);
+    p->prog[1] = WCB_SUBLIST(WC_SUBLIST_END, 0, 3);
+    p->prog[2] = WCB_PIPE(WC_PIPE_END, 0);
+    p->prog[3] = WCB_AUTOFN();
+    p->prog[4] = WCB_END();
+
+    return p;
 }
 
 /* unset: unset parameters */
@@ -3328,14 +3325,14 @@ bin_emulate(char *nam, char **argv, char *ops, int func)
 int
 bin_eval(char *nam, char **argv, char *ops, int func)
 {
-    List list;
+    Eprog prog;
 
-    list = parse_string(zjoin(argv, ' '), 0);
-    if (!list) {
+    prog = parse_string(zjoin(argv, ' '), 0);
+    if (!prog) {
 	errflag = 0;
 	return 1;
     }
-    execlist(list, 1, 0);
+    execode(prog, 1, 0);
     if (errflag) {
 	lastval = errflag;
 	errflag = 0;
@@ -3761,7 +3758,8 @@ int
 bin_test(char *name, char **argv, char *ops, int func)
 {
     char **s;
-    Cond c;
+    Eprog prog;
+    struct estate state;
 
     /* if "test" was invoked as "[", it needs a matching "]" *
      * which is subsequently ignored                         */
@@ -3781,7 +3779,7 @@ bin_test(char *name, char **argv, char *ops, int func)
     tok = NULLTOK;
     condlex = testlex;
     testlex();
-    c = par_cond();
+    prog = parse_cond();
     condlex = yylex;
 
     if (errflag) {
@@ -3789,13 +3787,19 @@ bin_test(char *name, char **argv, char *ops, int func)
 	return 1;
     }
 
-    if (!c || tok == LEXERR) {
+    if (!prog || tok == LEXERR) {
 	zwarnnam(name, tokstr ? "parse error" : "argument expected", NULL, 0);
 	return 1;
     }
 
     /* syntax is OK, so evaluate */
-    return !evalcond(c);
+
+    state.prog = prog;
+    state.pc = prog->prog;
+    state.strs = prog->strs;
+
+
+    return !evalcond(&state);
 }
 
 /* display a time, provided in units of 1/60s, as minutes and seconds */
@@ -3830,7 +3834,7 @@ bin_times(char *name, char **argv, char *ops, int func)
 int
 bin_trap(char *name, char **argv, char *ops, int func)
 {
-    List l;
+    Eprog prog;
     char *arg, *s;
     int sig;
 
@@ -3852,7 +3856,7 @@ bin_trap(char *name, char **argv, char *ops, int func)
 		if (!sigfuncs[sig])
 		    printf("trap -- '' %s\n", sigs[sig]);
 		else {
-		    s = getpermtext((void *) sigfuncs[sig]);
+		    s = getpermtext(sigfuncs[sig], NULL);
 		    printf("trap -- ");
 		    quotedzputs(s, stdout);
 		    printf(" %s\n", sigs[sig]);
@@ -3878,15 +3882,15 @@ bin_trap(char *name, char **argv, char *ops, int func)
     /* Sort out the command to execute on trap */
     arg = *argv++;
     if (!*arg)
-	l = NULL;
-    else if (!(l = parse_string(arg, 0))) {
+	prog = NULL;
+    else if (!(prog = parse_string(arg, 0))) {
 	zwarnnam(name, "couldn't parse trap command", NULL, 0);
 	return 1;
     }
 
     /* set traps */
     for (; *argv; argv++) {
-	List t;
+	Eprog t;
 
 	sig = getsignum(*argv);
 	if (sig == -1) {
@@ -3894,10 +3898,10 @@ bin_trap(char *name, char **argv, char *ops, int func)
 	    break;
 	}
 	PERMALLOC {
-	    t = (List) dupstruct(l);
+	    t = dupeprog(prog);
 	} LASTALLOC;
 	if (settrap(sig, t))
-	    freestruct(t);
+	    freeeprog(t);
     }
     return *argv != NULL;
 }

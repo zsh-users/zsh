@@ -491,11 +491,11 @@ after_complete(Hookdef dummy, Compldat dat)
 static void
 callcompfunc(char *s, char *fn)
 {
-    List list;
+    Eprog prog;
     int lv = lastval;
     char buf[20];
 
-    if ((list = getshfunc(fn)) != &dummy_list) {
+    if ((prog = getshfunc(fn)) != &dummy_eprog) {
 	char **p, *tmp;
 	int aadd = 0, usea = 1, icf = incompfunc, osc = sfcontext;
 	unsigned int rset, kset;
@@ -724,7 +724,7 @@ callcompfunc(char *s, char *fn)
 		while (*p)
 		    addlinknode(largs, dupstring(*p++));
 	    }
-	    doshfunc(fn, list, largs, 0, 0);
+	    doshfunc(fn, prog, largs, 0, 0);
 	    cfret = lastval;
 	    lastval = olv;
 	} OLDHEAPS;

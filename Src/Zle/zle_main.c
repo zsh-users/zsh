@@ -649,9 +649,9 @@ execzlefunc(Thingy func, char **args)
 	    lastcmd = wflags;
 	r = 1;
     } else {
-	List l = getshfunc(w->u.fnnam);
+	Eprog prog = getshfunc(w->u.fnnam);
 
-	if(l == &dummy_list) {
+	if(prog == &dummy_eprog) {
 	    /* the shell function doesn't exist */
 	    char *nm = niceztrdup(w->u.fnnam);
 	    char *msg = tricat("No such shell function `", nm, "'");
@@ -673,7 +673,7 @@ execzlefunc(Thingy func, char **args)
 	    startparamscope();
 	    makezleparams(0);
 	    sfcontext = SFC_WIDGET;
-	    doshfunc(w->u.fnnam, l, largs, 0, 0);
+	    doshfunc(w->u.fnnam, prog, largs, 0, 0);
 	    ret = lastval;
 	    lastval = olv;
 	    sfcontext = osc;

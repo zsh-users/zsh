@@ -31,7 +31,7 @@
 #include "text.pro"
 
 static char *tptr, *tbuf, *tlim;
-static int tsiz, tindent, tnewlins;
+static int tsiz, tindent, tnewlins, tjob;
 
 /* add a character to the text buffer */
 
@@ -72,18 +72,18 @@ taddstr(char *s)
     tptr += sl;
 }
 
-/* add an integer to the text buffer */
-
-#if 0 /**/
-void
-taddint(int x)
+/**/
+static void
+taddlist(Estate state, int num)
 {
-    char buf[DIGBUFSIZE];
-
-    sprintf(buf, "%d", x);
-    taddstr(buf);
+    if (num) {
+	while (num--) {
+	    taddstr(ecgetstr(state, 0));
+	    taddchr(' ');
+	}
+	tptr--;
+    }
 }
-#endif
 
 /* add a newline, or something equivalent, to the text buffer */
 
@@ -105,14 +105,24 @@ taddnl(void)
 
 /**/
 mod_export char *
-getpermtext(struct node *n)
+getpermtext(Eprog prog, Wordcode c)
 {
+    struct estate s;
+
+    if (!c)
+	c = prog->prog;
+
+    s.prog = prog;
+    s.pc = c;
+    s.strs = prog->strs;
+
     tnewlins = 1;
     tbuf = (char *)zalloc(tsiz = 32);
     tptr = tbuf;
     tlim = tbuf + tsiz;
     tindent = 1;
-    gettext2(n);
+    tjob = 0;
+    gettext2(&s);
     *tptr = '\0';
     untokenize(tbuf);
     return tbuf;
@@ -122,366 +132,566 @@ getpermtext(struct node *n)
 
 /**/
 char *
-getjobtext(struct node *n)
+getjobtext(Eprog prog, Wordcode c)
 {
     static char jbuf[JOBTEXTSIZE];
+
+    struct estate s;
+
+    if (!c)
+	c = prog->prog;
+
+    s.prog = prog;
+    s.pc = c;
+    s.strs = prog->strs;
 
     tnewlins = 0;
     tbuf = NULL;
     tptr = jbuf;
     tlim = tptr + JOBTEXTSIZE - 1;
     tindent = 1;
-    gettext2(n);
+    tjob = 1;
+    gettext2(&s);
     *tptr = '\0';
     untokenize(jbuf);
     return jbuf;
 }
 
-#define gt2(X) gettext2((struct node *) (X))
-
 /*
-	"gettext2" or "type checking and how to avoid it"
-	an epic function by Paul Falstad
-*/
+ * gettext2() shows one way to walk through the word code without
+ * recursion. We start by reading a word code and executing the
+ * action for it. Some codes have sub-structures (like, e.g. WC_FOR)
+ * and require something to be done after the sub-structure has been
+ * handled. For these codes a tstack structure which describes what
+ * has to be done is pushed onto a stack. Codes without sub-structures
+ * arrange for the next structure being taken from the stack so that
+ * the action for it is executed instead of the one for the next
+ * word code. If the stack is empty at this point, we have handled
+ * the whole structure we were called for.
+ */
 
-#define _Cond(X) ((Cond) (X))
-#define _Cmd(X) ((Cmd) (X))
-#define _Pline(X) ((Pline) (X))
-#define _Sublist(X) ((Sublist) (X))
-#define _List(X) ((List) (X))
-#define _casecmd(X) ((struct casecmd *) (X))
-#define _ifcmd(X) ((struct ifcmd *) (X))
-#define _whilecmd(X) ((struct whilecmd *) (X))
+typedef struct tstack *Tstack;
+
+struct tstack {
+    Tstack prev;
+    wordcode code;
+    int pop;
+    union {
+	struct {
+	    LinkList list;
+	} _redir;
+	struct {
+	    char *strs;
+	} _funcdef;
+	struct {
+	    Wordcode end;
+	} _case;
+	struct {
+	    int cond;
+	    Wordcode end;
+	} _if;
+	struct {
+	    int par;
+	} _cond;
+    } u;
+};
+
+static Tstack tstack, tfree;
+
+static Tstack
+tpush(wordcode code, int pop)
+{
+    Tstack s;
+
+    if ((s = tfree))
+	tfree = s->prev;
+    else
+	s = (Tstack) zalloc(sizeof(*s));
+
+    s->prev = tstack;
+    tstack = s;
+    s->code = code;
+    s->pop = pop;
+
+    return s;
+}
 
 /**/
 static void
-gettext2(struct node *n)
+gettext2(Estate state)
 {
-    Cmd nn;
+    Tstack s, n;
+    int stack = 0;
+    wordcode code;
 
-    if (!n || ((List) n) == &dummy_list)
-	return;
-    switch (NT_TYPE(n->ntype)) {
-    case N_LIST:
-	gt2(_List(n)->left);
-	if (_List(n)->type & Z_ASYNC) {
-	    taddstr(" &");
-	    if (_List(n)->type & Z_DISOWN)
-		taddstr("|");
+    while (1) {
+	if (stack) {
+	    if (!(s = tstack))
+		return;
+	    if (s->pop) {
+		tstack = s->prev;
+		s->prev = tfree;
+		tfree = s;
+	    }
+	    code = s->code;
+	    stack = 0;
+	} else {
+	    s = NULL;
+	    code = *state->pc++;
 	}
-	if (_List(n)->right) {
-	    if (tnewlins)
-		taddnl();
-	    else
-		taddstr((_List(n)->type & Z_ASYNC) ? " " : "; ");
-	    gt2(_List(n)->right);
-	}
-	break;
-    case N_SUBLIST:
-	if (_Sublist(n)->flags & PFLAG_NOT)
-	    taddstr("! ");
-	if (_Sublist(n)->flags & PFLAG_COPROC)
-	    taddstr("coproc ");
-	gt2(_Sublist(n)->left);
-	if (_Sublist(n)->right) {
-	    taddstr((_Sublist(n)->type == ORNEXT) ? " || " : " && ");
-	    gt2(_Sublist(n)->right);
-	}
-	break;
-    case N_PLINE:
-	gt2(_Pline(n)->left);
-	if (_Pline(n)->type == PIPE) {
-	    taddstr(" | ");
-	    gt2(_Pline(n)->right);
-	}
-	break;
-    case N_CMD:
-	nn = _Cmd(n);
-	switch (nn->type) {
-	case SIMPLE:
-	    getsimptext(nn);
-	    break;
-	case SUBSH:
-	    taddstr("( ");
-	    tindent++;
-	    gt2(nn->u.list);
-	    tindent--;
-	    taddstr(" )");
-	    break;
-	case ZCTIME:
-	    taddstr("time ");
-	    tindent++;
-	    gt2(nn->u.pline);
-	    tindent--;
-	    break;
-	case FUNCDEF:
-	    taddlist(nn->args);
-	    taddstr(" () {");
-	    tindent++;
-	    taddnl();
-	    gt2(nn->u.list);
-	    tindent--;
-	    taddnl();
-	    taddstr("}");
-	    break;
-	case CURSH:
-	    taddstr("{ ");
-	    tindent++;
-	    gt2(nn->u.list);
-	    tindent--;
-	    taddstr(" }");
-	    break;
-	case CFOR:
-	case CSELECT:
-	    taddstr((nn->type == CFOR) ? "for " : "select ");
-	    if (nn->u.forcmd->condition) {
-		taddstr("((");
-		taddstr(nn->u.forcmd->name);
-		taddstr("; ");
-		taddstr(nn->u.forcmd->condition);
-		taddstr("; ");
-		taddstr(nn->u.forcmd->advance);
-		taddstr(")) do");
+	switch (wc_code(code)) {
+	case WC_LIST:
+	    if (!s) {
+		tpush(code, (WC_LIST_TYPE(code) & Z_END));
+		stack = 0;
 	    } else {
-		taddstr(nn->u.forcmd->name);
-		if (nn->u.forcmd->inflag) {
-		    taddstr(" in ");
-		    taddlist(nn->args);
+		if (WC_LIST_TYPE(code) & Z_ASYNC) {
+		    taddstr(" &");
+		    if (WC_LIST_TYPE(code) & Z_DISOWN)
+			taddstr("|");
 		}
+		if (!(stack = (WC_LIST_TYPE(code) & Z_END))) {
+		    if (tnewlins)
+			taddnl();
+		    else
+			taddstr((WC_LIST_TYPE(code) & Z_ASYNC) ? " " : "; ");
+		    s->code = *state->pc++;
+		    s->pop = (WC_LIST_TYPE(s->code) & Z_END);
+		}
+	    }
+	    break;
+	case WC_SUBLIST:
+	    if (!s) {
+		if (WC_SUBLIST_FLAGS(code) & WC_SUBLIST_NOT)
+		    taddstr("! ");
+		if (WC_SUBLIST_FLAGS(code) & WC_SUBLIST_COPROC)
+		    taddstr("coproc ");
+		tpush(code, (WC_SUBLIST_TYPE(code) == WC_SUBLIST_END));
+	    } else {
+		if (!(stack = (WC_SUBLIST_TYPE(code) == WC_SUBLIST_END))) {
+		    taddstr((WC_SUBLIST_TYPE(code) == WC_SUBLIST_OR) ?
+			    " || " : " && ");
+		    s->code = *state->pc++;
+		    s->pop = (WC_SUBLIST_TYPE(s->code) == WC_SUBLIST_END);
+		    if (WC_SUBLIST_FLAGS(s->code) & WC_SUBLIST_NOT)
+			taddstr("! ");
+		    if (WC_SUBLIST_FLAGS(s->code) & WC_SUBLIST_COPROC)
+			taddstr("coproc ");
+		}
+	    }
+	    break;
+	case WC_PIPE:
+	    if (!s) {
+		tpush(code, (WC_PIPE_TYPE(code) == WC_PIPE_END));
+		if (WC_PIPE_TYPE(code) == WC_PIPE_MID)
+		    state->pc++;
+	    } else {
+		if (!(stack = (WC_PIPE_TYPE(code) == WC_PIPE_END))) {
+		    taddstr(" | ");
+		    s->code = *state->pc++;
+		    if (!(s->pop = (WC_PIPE_TYPE(s->code) == WC_PIPE_END)))
+			state->pc++;
+		}
+	    }
+	    break;
+	case WC_REDIR:
+	    if (!s) {
+		state->pc--;
+		n = tpush(code, 1);
+		n->u._redir.list = ecgetredirs(state);
+	    } else {
+		getredirs(s->u._redir.list);
+		stack = 1;
+	    }
+	    break;
+	case WC_ASSIGN:
+	    taddstr(ecgetstr(state, 0));
+	    taddchr('=');
+	    if (WC_ASSIGN_TYPE(code) == WC_ASSIGN_ARRAY) {
+		taddchr('(');
+		taddlist(state, WC_ASSIGN_NUM(code));
+		taddstr(") ");
+	    } else {
+		taddstr(ecgetstr(state, 0));
+		taddchr(' ');
+	    }
+	    break;
+	case WC_SIMPLE:
+	    taddlist(state, WC_SIMPLE_ARGC(code));
+	    stack = 1;
+	    break;
+	case WC_SUBSH:
+	    if (!s) {
+		taddstr("( ");
+		tindent++;
+		tpush(code, 1);
+	    } else {
+		tindent--;
+		taddstr(" )");
+		stack = 1;
+	    }
+	    break;
+	case WC_CURSH:
+	    if (!s) {
+		taddstr("{ ");
+		tindent++;
+		tpush(code, 1);
+	    } else {
+		tindent--;
+		taddstr(" }");
+		stack = 1;
+	    }
+	    break;
+	case WC_TIMED:
+	    if (!s) {
+		taddstr("time");
+		if (WC_TIMED_TYPE(code) == WC_TIMED_PIPE) {
+		    taddchr(' ');
+		    tindent++;
+		    tpush(code, 1);
+		} else
+		    stack = 1;
+	    } else {
+		tindent--;
+		stack = 1;
+	    }
+	    break;
+	case WC_FUNCDEF:
+	    if (!s) {
+		Wordcode p = state->pc;
+		Wordcode end = p + WC_FUNCDEF_SKIP(code);
+
+		taddlist(state, *state->pc++);
+		if (tjob) {
+		    taddstr(" () { ... }");
+		    state->pc = end;
+		    stack = 1;
+		} else {
+		    taddstr(" () {");
+		    tindent++;
+		    taddnl();
+		    n = tpush(code, 1);
+		    n->u._funcdef.strs = state->strs;
+		    state->strs = (char *) (p + (*state->pc));
+		    state->pc += 2;
+		}
+	    } else {
+		state->strs = s->u._funcdef.strs;
+		tindent--;
+		taddnl();
+		taddstr("}");
+		stack = 1;
+	    }
+	    break;
+	case WC_FOR:
+	    if (!s) {
+		taddstr("for ");
+		if (WC_FOR_TYPE(code) == WC_FOR_COND) {
+		    taddstr("((");
+		    taddstr(ecgetstr(state, 0));
+		    taddstr("; ");
+		    taddstr(ecgetstr(state, 0));
+		    taddstr("; ");
+		    taddstr(ecgetstr(state, 0));
+		    taddstr(")) do");
+		} else {
+		    taddstr(ecgetstr(state, 0));
+		    if (WC_FOR_TYPE(code) == WC_FOR_LIST) {
+			taddstr(" in ");
+			taddlist(state, *state->pc++);
+		    }
+		    taddnl();
+		    taddstr("do");
+		}
+		tindent++;
+		taddnl();
+		tpush(code, 1);
+	    } else {
+		tindent--;
+		taddnl();
+		taddstr("done");
+		stack = 1;
+	    }
+	    break;
+	case WC_SELECT:
+	    if (!s) {
+		taddstr("select ");
+		taddstr(ecgetstr(state, 0));
+		if (WC_SELECT_TYPE(code) == WC_SELECT_LIST) {
+		    taddstr(" in ");
+		    taddlist(state, *state->pc++);
+		}
+		tindent++;
+		taddnl();
+		tpush(code, 1);
+	    } else {
+		tindent--;
+		taddnl();
+		taddstr("done");
+		stack = 1;
+	    }
+	    break;
+	case WC_WHILE:
+	    if (!s) {
+		taddstr(WC_WHILE_TYPE(code) == WC_WHILE_UNTIL ?
+			"until " : "while ");
+		tindent++;
+		tpush(code, 0);
+	    } else if (!s->pop) {
+		tindent--;
 		taddnl();
 		taddstr("do");
+		tindent++;
+		taddnl();
+		s->pop = 1;
+	    } else {
+		tindent--;
+		taddnl();
+		taddstr("done");
+		stack = 1;
 	    }
-	    tindent++;
-	    taddnl();
-	    gt2(nn->u.forcmd->list);
-	    tindent--;
-	    taddnl();
-	    taddstr("done");
 	    break;
-	case CIF:
-	    gt2(nn->u.ifcmd);
-	    taddstr("fi");
+	case WC_REPEAT:
+	    if (!s) {
+		taddstr("repeat ");
+		taddstr(ecgetstr(state, 0));
+		taddnl();
+		taddstr("do");
+		tindent++;
+		taddnl();
+		tpush(code, 1);
+	    } else {
+		tindent--;
+		taddnl();
+		taddstr("done");
+		stack = 1;
+	    }
 	    break;
-	case CCASE:
-	    gt2(nn->u.casecmd);
-	    break;
-	case COND:
-	    taddstr("[[ ");
-	    gt2(nn->u.cond);
-	    taddstr(" ]]");
-	    break;
-	case CARITH:
-	    taddstr("((");
-	    taddlist(nn->args);
-	    taddstr("))");
-	    break;
-	case CREPEAT:
-	    taddstr("repeat ");
-	    taddlist(nn->args);
-	    taddnl();
-	    taddstr("do");
-	    tindent++;
-	    taddnl();
-	    gt2(nn->u.list);
-	    tindent--;
-	    taddnl();
-	    taddstr("done");
-	    break;
-	case CWHILE:
-	    gt2(nn->u.whilecmd);
-	    break;
-	}
-	getredirs(nn);
-	break;
-    case N_COND:
-	getcond(_Cond(n), 0);
-	break;
-    case N_CASE:
-	{
-	    List *l;
-	    char **p;
+	case WC_CASE:
+	    if (!s) {
+		Wordcode end = state->pc + WC_CASE_SKIP(code);
 
-	    l = _casecmd(n)->lists;
-	    p = _casecmd(n)->pats;
+		taddstr("case ");
+		taddstr(ecgetstr(state, 0));
+		taddstr(" in");
 
-	    taddstr("case ");
-	    taddstr(*p++);
-	    taddstr(" in");
-	    tindent++;
-	    for (; l && *l; p++, l++) {
+		if (state->pc >= end) {
+		    if (tnewlins)
+			taddnl();
+		    else
+			taddchr(' ');
+		    taddstr("esac");
+		    stack = 1;
+		} else {
+		    tindent++;
+		    if (tnewlins)
+			taddnl();
+		    else
+			taddchr(' ');
+		    code = *state->pc++;
+		    taddstr(ecgetstr(state, 0));
+		    state->pc++;
+		    taddstr(") ");
+		    tindent++;
+		    n = tpush(code, 0);
+		    n->u._case.end = end;
+		    n->pop = (state->pc - 2 + WC_CASE_SKIP(code) >= end);
+		}
+	    } else if (state->pc < s->u._case.end) {
+		tindent--;
+		taddstr(WC_CASE_TYPE(code) == WC_CASE_OR ? " ;;" : ";&");
 		if (tnewlins)
 		    taddnl();
 		else
 		    taddchr(' ');
-		taddstr(*p + 1);
+		code = *state->pc++;
+		taddstr(ecgetstr(state, 0));
+		state->pc++;
 		taddstr(") ");
 		tindent++;
-		gt2(*l);
+		s->code = code;
+		s->pop = ((state->pc - 2 + WC_CASE_SKIP(code)) >=
+			  s->u._case.end);
+	    } else {
 		tindent--;
-		taddstr(" ;");
-		taddchr(**p);
+		taddstr(WC_CASE_TYPE(code) == WC_CASE_OR ? " ;;" : ";&");
+		tindent--;
+		if (tnewlins)
+		    taddnl();
+		else
+		    taddchr(' ');
+		taddstr("esac");
+		stack = 1;
 	    }
-	    tindent--;
-	    if (tnewlins)
-		taddnl();
-	    else
-		taddchr(' ');
-	    taddstr("esac");
 	    break;
-	}
-    case N_IF:
-	{
-	    List *i, *t;
+	case WC_IF:
+	    if (!s) {
+		Wordcode end = state->pc + WC_IF_SKIP(code);
 
-	    taddstr("if ");
-	    for (i = _ifcmd(n)->ifls, t = _ifcmd(n)->thenls; *i; i++, t++) {
+		taddstr("if ");
 		tindent++;
-		gt2(*i);
+		state->pc++;
+
+		n = tpush(code, 0);
+		n->u._if.end = end;
+		n->u._if.cond = 1;
+	    } else if (s->pop) {
+		stack = 1;
+	    } else if (s->u._if.cond) {
 		tindent--;
 		taddnl();
 		taddstr("then");
 		tindent++;
 		taddnl();
-		gt2(*t);
+		s->u._if.cond = 0;
+	    } else if (state->pc < s->u._if.end) {
 		tindent--;
 		taddnl();
-		if (i[1]) {
+		code = *state->pc++;
+		if (WC_IF_TYPE(code) == WC_IF_ELIF) {
 		    taddstr("elif ");
+		    tindent++;
+		    s->u._if.cond = 1;
+		} else {
+		    taddstr("else");
+		    tindent++;
+		    taddnl();
 		}
-	    }
-	    if (*t) {
-		taddstr("else");
-		tindent++;
-		taddnl();
-		gt2(*t);
+	    } else {
+		s->pop = 1;
 		tindent--;
 		taddnl();
+		taddstr("fi");
+		stack = 1;
 	    }
 	    break;
-	}
-    case N_WHILE:
-	taddstr((_whilecmd(n)->cond) ? "until " : "while ");
-	tindent++;
-	gt2(_whilecmd(n)->cont);
-	tindent--;
-	taddnl();
-	taddstr("do");
-	tindent++;
-	taddnl();
-	gt2(_whilecmd(n)->loop);
-	tindent--;
-	taddnl();
-	taddstr("done");
-	break;
-    }
-}
+	case WC_COND:
+	    {
+		static char *c1[] = {
+		    "=", "!=", "<", ">", "-nt", "-ot", "-ef", "-eq",
+		    "-ne", "-lt", "-gt", "-le", "-ge"
+		};
 
-/* Print a condition bracketed by [[ ... ]].             *
- * With addpar non-zero, parenthesise the subexpression. */
+		int ctype;
 
-/**/
-static void
-getcond(Cond nm, int addpar)
-{
-    static char *c1[] =
-    {
-	"=", "!=", "<", ">", "-nt", "-ot", "-ef", "-eq",
-	"-ne", "-lt", "-gt", "-le", "-ge"
-    };
+		if (!s) {
+		    taddstr("[[ ");
+		    n = tpush(code, 1);
+		    n->u._cond.par = 2;
+		} else if (s->u._cond.par == 2) {
+		    taddstr(" ]]");
+		    stack = 1;
+		    break;
+		} else if (s->u._cond.par == 1) {
+		    taddstr(" )");
+		    stack = 1;
+		    break;
+		} else if (WC_COND_TYPE(s->code) == COND_AND) {
+		    taddstr(" && ");
+		    code = *state->pc++;
+		    if (WC_COND_TYPE(code) == COND_OR) {
+			taddstr("( ");
+			n = tpush(code, 1);
+			n->u._cond.par = 1;
+		    }
+		} else if (WC_COND_TYPE(s->code) == COND_OR) {
+		    taddstr(" || ");
+		    code = *state->pc++;
+		    if (WC_COND_TYPE(code) == COND_AND) {
+			taddstr("( ");
+			n = tpush(code, 1);
+			n->u._cond.par = 1;
+		    }
+		}
+		while (!stack) {
+		    switch ((ctype = WC_COND_TYPE(code))) {
+		    case COND_NOT:
+			taddstr("! ");
+			code = *state->pc++;
+			if (WC_COND_TYPE(code) <= COND_OR) {
+			    taddstr("( ");
+			    n = tpush(code, 1);
+			    n->u._cond.par = 1;
+			}
+			break;
+		    case COND_AND:
+			tpush(code, 1);
+			code = *state->pc++;
+			if (WC_COND_TYPE(code) == COND_OR) {
+			    taddstr("( ");
+			    n = tpush(code, 1);
+			    n->u._cond.par = 1;
+			}
+			break;
+		    case COND_OR:
+			tpush(code, 1);
+			code = *state->pc++;
+			if (WC_COND_TYPE(code) == COND_AND) {
+			    taddstr("( ");
+			    n = tpush(code, 1);
+			    n->u._cond.par = 1;
+			}
+			break;
+		    case COND_MOD:
+			taddstr(ecgetstr(state, 0));
+			taddlist(state, WC_COND_SKIP(code));
+			stack = 1;
+			break;
+		    case COND_MODI:
+			{
+			    char *name = ecgetstr(state, 0);
 
-    if (addpar)
-	taddstr("( ");
-    switch (nm->type) {
-    case COND_NOT:
-	taddstr("! ");
-	getcond(nm->left, _Cond(nm->left)->type <= COND_OR);
-	break;
-    case COND_AND:
-	getcond(nm->left, _Cond(nm->left)->type == COND_OR);
-	taddstr(" && ");
-	getcond(nm->right, _Cond(nm->right)->type == COND_OR);
-	break;
-    case COND_OR:
-	/* This is deliberately over-generous with parentheses: *
-	 * in fact omitting them gives correct precedence.      */
-	getcond(nm->left, _Cond(nm->left)->type == COND_AND);
-	taddstr(" || ");
-	getcond(nm->right, _Cond(nm->right)->type == COND_AND);
-	break;
-    case COND_MOD:
-	{
-	    /* Module defined prefix condition. */
-	    char **p = (char **) nm->right;
+			    taddstr(ecgetstr(state, 0));
+			    taddchr(' ');
+			    taddstr(name);
+			    taddchr(' ');
+			    taddstr(ecgetstr(state, 0));
+			    stack = 1;
+			}
+			break;
+		    default:
+			if (ctype <= COND_GE) {
+			    /* Binary test: `a = b' etc. */
+			    taddstr(ecgetstr(state, 0));
+			    taddstr(" ");
+			    taddstr(c1[ctype - COND_STREQ]);
+			    taddstr(" ");
+			    taddstr(ecgetstr(state, 0));
+			    if (ctype == COND_STREQ ||
+				ctype == COND_STRNEQ)
+				state->pc++;
+			} else {
+			    /* Unary test: `-f foo' etc. */ 
+			    char c2[4];
 
-	    taddstr(nm->left);
-	    for (; *p; p++) {
-		taddstr(" ");
-		taddstr(*p);
+			    c2[0] = '-';
+			    c2[1] = ctype;
+			    c2[2] = ' ';
+			    c2[3] = '\0';
+			    taddstr(c2);
+			    taddstr(ecgetstr(state, 0));
+			}
+			stack = 1;
+			break;
+		    }
+		}
 	    }
+	    break;
+	case WC_ARITH:
+	    taddstr("((");
+	    taddstr(ecgetstr(state, 0));
+	    taddstr("))");
+	    stack = 1;
+	    break;
+	default:
+	    return;
 	}
-	break;
-    case COND_MODI:
-	/* Module defined infix condition. */
-	taddstr(((char **) nm->right)[0]);
-	taddstr(" ");
-	taddstr(nm->left);
-	taddstr(" ");
-	taddstr(((char **) nm->right)[1]);
-	break;
-    default:
-	if (nm->type <= COND_GE) {
-	    /* Binary test: `a = b' etc. */
-	    taddstr(nm->left);
-	    taddstr(" ");
-	    taddstr(c1[nm->type - COND_STREQ]);
-	    taddstr(" ");
-	    taddstr(nm->right);
-	} else {
-	    /* Unary test: `-f foo' etc. */ 
-	    char c2[4];
-
-	    c2[0] = '-';
-	    c2[1] = nm->type;
-	    c2[2] = ' ';
-	    c2[3] = '\0';
-	    taddstr(c2);
-	    taddstr(nm->left);
-	}
-	break;
     }
-    if (addpar)
-	taddstr(" )");
-}
-
-/**/
-static void
-getsimptext(Cmd cmd)
-{
-    LinkNode n;
-
-    if (cmd->vars)
-	for (n = firstnode(cmd->vars); n; incnode(n)) {
-	    struct varasg *v = (struct varasg *)getdata(n);
-
-	    taddstr(v->name);
-	    taddchr('=');
-	    if (PM_TYPE(v->type) == PM_ARRAY) {
-		taddchr('(');
-		taddlist(v->arr);
-		taddstr(") ");
-	    } else if (PM_TYPE(v->type) == PM_HASHED) {
-		/* XXX */
-	    } else {
-		taddstr(v->str);
-		taddchr(' ');
-	    }
-	}
-    taddlist(cmd->args);
 }
 
 /**/
 void
-getredirs(Cmd cmd)
+getredirs(LinkList redirs)
 {
     LinkNode n;
     static char *fstr[] =
@@ -489,12 +699,9 @@ getredirs(Cmd cmd)
 	">", ">|", ">>", ">>|", "&>", "&>|", "&>>", "&>>|", "<>", "<",
 	"<<", "<<-", "<<<", "<&", ">&", NULL /* >&- */, "<", ">"
     };
-
-    if (!cmd->redir)
-	return;
     taddchr(' ');
-    for (n = firstnode(cmd->redir); n; incnode(n)) {
-	struct redir *f = (struct redir *)getdata(n);
+    for (n = firstnode(redirs); n; incnode(n)) {
+	Redir f = (Redir) getdata(n);
 
 	switch (f->type) {
 	case WRITE:
@@ -529,21 +736,6 @@ getredirs(Cmd cmd)
 	    DPUTS(1, "BUG: unknown redirection in getredirs()");
 #endif
 	}
-    }
-    tptr--;
-}
-
-/**/
-static void
-taddlist(LinkList l)
-{
-    LinkNode n;
-
-    if (!l || !(n = firstnode(l)))
-	return;
-    for (; n; incnode(n)) {
-	taddstr(getdata(n));
-	taddchr(' ');
     }
     tptr--;
 }

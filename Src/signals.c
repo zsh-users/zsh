@@ -39,7 +39,7 @@ mod_export int sigtrapped[VSIGCOUNT];
 /* trap functions for each signal */
 
 /**/
-mod_export List sigfuncs[VSIGCOUNT];
+mod_export Eprog sigfuncs[VSIGCOUNT];
 
 /* Variables used by signal queueing */
 
@@ -674,7 +674,7 @@ dosavetrap(int sig, int level)
 
 /**/
 mod_export int
-settrap(int sig, List l)
+settrap(int sig, Eprog l)
 {
     if (sig == -1)
         return 1;
@@ -773,7 +773,7 @@ unsettrap(int sig)
 	if ((hn = removehashnode(shfunctab, func)))
 	    shfunctab->freenode(hn);
     } else if (sigfuncs[sig]) {
-	freestruct(sigfuncs[sig]);
+	freeeprog(sigfuncs[sig]);
 	sigfuncs[sig] = NULL;
     }
 }
@@ -834,12 +834,12 @@ endtrapscope(void)
 		unsettrap(sig);
 	    sigtrapped[sig] = st->flags;
 	    if (st->flags) {
-		List list = (st->flags & ZSIG_FUNC) ?
-		    ((Shfunc) st->list)->funcdef : (List) st->list;
+		Eprog prog = (st->flags & ZSIG_FUNC) ?
+		    ((Shfunc) st->list)->funcdef : (Eprog) st->list;
 		/* prevent settrap from saving this */
 		int oldlt = opts[LOCALTRAPS];
 		opts[LOCALTRAPS] = 0;
-		settrap(sig, list);
+		settrap(sig, prog);
 		opts[LOCALTRAPS] = oldlt;
 		if ((sigtrapped[sig] = st->flags) & ZSIG_FUNC)
 		    shfunctab->addnode(shfunctab, ((Shfunc)st->list)->nam,
@@ -851,11 +851,11 @@ endtrapscope(void)
 
     if (exittr) {
 	dotrapargs(SIGEXIT, &exittr, (exittr & ZSIG_FUNC) ?
-		   ((Shfunc)exitfn)->funcdef : (List) exitfn);
+		   ((Shfunc)exitfn)->funcdef : (Eprog) exitfn);
 	if (exittr & ZSIG_FUNC)
 	    shfunctab->freenode((HashNode)exitfn);
 	else
-	    freestruct(exitfn);
+	    freeeprog(exitfn);
     }
 }
 

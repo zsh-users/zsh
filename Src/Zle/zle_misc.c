@@ -925,9 +925,9 @@ mod_export void
 iremovesuffix(int c, int keep)
 {
     if (suffixfunc) {
-	List l = getshfunc(suffixfunc);
+	Eprog prog = getshfunc(suffixfunc);
 
-	if (l != &dummy_list) {
+	if (prog != &dummy_eprog) {
 	    LinkList args = newlinklist();
 	    char buf[20];
 	    int osc = sfcontext;
@@ -939,7 +939,7 @@ iremovesuffix(int c, int keep)
 	    startparamscope();
 	    makezleparams(0);
 	    sfcontext = SFC_COMPLETE;
-	    doshfunc(suffixfunc, l, args, 0, 1);
+	    doshfunc(suffixfunc, prog, args, 0, 1);
 	    sfcontext = osc;
 	    endparamscope();
 	}

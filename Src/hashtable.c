@@ -842,7 +842,7 @@ freeshfuncnode(HashNode hn)
 
     zsfree(shf->nam);
     if (shf->funcdef)
-	freestruct(shf->funcdef);
+	freeeprog(shf->funcdef);
     zfree(shf, sizeof(struct shfunc));
 }
 
@@ -879,7 +879,7 @@ printshfuncnode(HashNode hn, int printflags)
 	if (!f->funcdef)
 	    t = 0;
 	else
-	    t = getpermtext((void *) f->funcdef);
+	    t = getpermtext(f->funcdef, NULL);
     }
 
     quotedzputs(f->nam, stdout);
