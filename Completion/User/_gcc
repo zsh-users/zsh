@@ -274,7 +274,7 @@ dump)
   ;;
 library)
   _wanted libraries expl library \
-      compadd - ${^=LD_LIBRARY_PATH:-/usr/lib /usr/local/lib}/lib*.(a|so*)(N:t:fr:s/lib//) && ret=0
+      compadd - ${^=LD_LIBRARY_PATH:-/usr/lib /usr/local/lib}/lib*.(a|so*)(:t:fr:s/lib//) && ret=0
   ;;
 esac
 

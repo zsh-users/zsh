@@ -269,7 +269,7 @@ fi
 
 _rpms_caching_policy () {
   # rebuild if cache is more than a week old
-  oldp=( "$1"(Nmw+1) )
+  oldp=( "$1"(mw+1) )
   (( $#oldp )) && return 0
 
   [[ /var/lib/rpm/packages.rpm -nt "$1" ]]

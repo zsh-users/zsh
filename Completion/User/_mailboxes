@@ -67,17 +67,15 @@ _mailbox_cache () {
   typeset -aU -g _mailbox_cache
   typeset -aU -g _maildir_cache _mbox_cache _mh_cache _mutt_cache _pine_cache
 
-  setopt localoptions nullglob
-
 
   [[ -f ${~muttrc:-.} ]] &&
     _mutt_cache=( ${=${(M)${(f)"$(<${~muttrc})"}:#mailboxes *}#mailboxes *} )
 
 
-  _mbox_cache=( ${~maildirectory}/*(N^/) )
-  _pine_cache=( ${~pinedirectory}/**/*(N.) )
+  _mbox_cache=( ${~maildirectory}/*(^/) )
+  _pine_cache=( ${~pinedirectory}/**/*(.) )
 
-  dirboxes=( ${~maildirectory}/*(N/) )
+  dirboxes=( ${~maildirectory}/*(/) )
 
   while (( $#dirboxes )); do
     i=${dirboxes[1]}
@@ -87,7 +85,7 @@ _mailbox_cache () {
     elif j=( "$i"/<1-> ) && [[ -n "$j" ]]; then
       _mh_cache=( "${_mh_cache[@]}" "$i" )
     else
-      _mbox_cache=( "${_mbox_cache[@]}" "$i"/*(N.) )
+      _mbox_cache=( "${_mbox_cache[@]}" "$i"/*(.) )
       dirboxes=( $dirboxes "$i"/*(/) )
     fi
   done

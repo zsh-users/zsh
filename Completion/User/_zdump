@@ -1,7 +1,7 @@
 #compdef zdump
 
 if (( ! $+_zoneinfo_dirs )); then
-  _zoneinfo_dirs=( /usr/{share,lib,share/lib}/zoneinfo*(N/) )
+  _zoneinfo_dirs=( /usr/{share,lib,share/lib}/zoneinfo*(/) )
 fi
 
 _arguments '-v[lowest possible]' \

@@ -11,7 +11,7 @@ fi
 if (( ! $+_lp_cache )); then
   local file entry names i
 
-  file=( /etc/(printcap|printers.conf)(N) )
+  file=( /etc/(printcap|printers.conf) )
 
   _lp_cache=()
   _lp_alias_cache=()

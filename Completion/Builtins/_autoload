@@ -6,5 +6,5 @@ if (( $words[(I)[-+]*w*] )); then
   _description files expl 'zwc file'
   _files "$expl[@]" -g '*.zwc'
 else
-  _wanted functions expl 'shell function' compadd - ${^fpath}/*(N:t)
+  _wanted functions expl 'shell function' compadd - ${^fpath}/*(:t)
 fi

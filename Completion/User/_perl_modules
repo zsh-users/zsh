@@ -46,7 +46,6 @@ _perl_modules () {
         # complete Perl modules.  Maybe her $path is wrong?
         _message "Didn't find perl on \$PATH; guessing @INC ..."
   
-        setopt localoptions extendedglob
         inc=( /usr/lib/perl5{,/{site_perl/,}<5->.([0-9]##)}(N) 
               ${(s.:.)PERL5LIB} )
       fi
@@ -61,7 +60,7 @@ _perl_modules () {
         # Find all modules
         if [[ -d $libdir && -x $libdir ]]; then
         cd $libdir
-        new_pms=( {[A-Z]*/***/,}*.pm~*blib*(N) )
+        new_pms=( {[A-Z]*/***/,}*.pm~*blib* )
         cd $OLDPWD
         fi
   
@@ -84,10 +83,10 @@ _perl_modules_caching_policy () {
   local _perllocals
 
   # rebuild if cache is more than a week old
-  oldp=( "$1"(Nmw+1) )
+  oldp=( "$1"(mw+1) )
   (( $#oldp )) && return 0
 
-  _perllocals=( /usr/lib/perl5/**/perllocal.pod(N) )
+  _perllocals=( /usr/lib/perl5/**/perllocal.pod )
 
   if (( $#_perllocals )); then
     for pod in $_perllocals; do

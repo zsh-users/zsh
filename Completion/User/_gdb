@@ -5,12 +5,12 @@ local cur="$words[CURRENT]" prev w list ret=1 expl
 [[ "$PREFIX" = --* ]] &&
     _arguments -- '*=(CORE|SYM)FILE:core file:_files' \
 		  '*=EXECFILE:executable:_files -g \*\(-\*\)' \
-		  '*=TTY:terminal device:compadd /dev/tty\*\(N\)' && return 0
+		  '*=TTY:terminal device:compadd /dev/tty\*' && return 0
 
 if compset -P '-(cd|directory)='; then
   _files -/
 elif compset -P '-tty='; then
-  _wanted devices expl 'terminal device' compadd - /dev/tty*(N)
+  _wanted devices expl 'terminal device' compadd - /dev/tty*
 elif compset -P '-(exec|se)='; then
   _description files expl executable
   _files "$expl[@]" -g '*(-*)'

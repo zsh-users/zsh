@@ -1,7 +1,5 @@
 #compdef man apropos whatis
 
-setopt localoptions rcexpandparam
-
 local rep expl star approx mrd
 
 if [[ $words[1] == man ]] && (( $words[(I)-l] + $words[(I)--local-file] )); then
@@ -26,7 +24,7 @@ if (( ! $#manpath )); then
 fi
 
 (( $#manpath )) || manpath=( ${(s.:.)$(manpath 2>/dev/null)} ) ||
-    manpath=( /usr/man(-/N) /(opt|usr)/(dt|share|X11R6|local)/(cat|)man(-/N) )
+    manpath=( /usr/man(-/) /(opt|usr)/(dt|share|X11R6|local)/(cat|)man(-/) )
 
 # `sman' is the SGML manual directory for Solaris 7.
 # 1M is system administrator commands on SVR4
@@ -34,10 +32,10 @@ fi
 mrd=(${^manpath/\%L/${LANG:-En_US.ASCII}}/mandb(N))
 if [[ $words[2] = (<->*|1M|l|n) ]]; then
   rep=(
-  $manpath/(sman|man|cat)${words[2]}/${~approx}$PREFIX${~star}$SUFFIX.*(N:t) )
+  $manpath/(sman|man|cat)${words[2]}/${~approx}$PREFIX${~star}$SUFFIX.*(:t) )
   (($#mrd)) && rep[$#rep+1]=($(awk "\$2 == \"$words[2]\" {print \$1}" $mrd))
 else
-  rep=( $manpath/(sman|man|cat)*/${~approx}$PREFIX${~star}$SUFFIX.*(N:t) )
+  rep=( $manpath/(sman|man|cat)*/${~approx}$PREFIX${~star}$SUFFIX.*(:t) )
   (($#mrd)) && rep[$#rep+1]=($(awk '{print $1}' $mrd))
 fi
 

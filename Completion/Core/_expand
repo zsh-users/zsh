@@ -7,7 +7,7 @@
 # the expansions done produce no result or do not change the original
 # word from the line.
 
-setopt localoptions nullglob nonomatch
+setopt localoptions nonomatch
 
 [[ _matcher_num -gt 1 ]] && return 1
 

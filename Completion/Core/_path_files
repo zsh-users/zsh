@@ -10,9 +10,6 @@ local nm=$compstate[nmatches] menu matcher mopts sort match mid accex fake
 
 typeset -U prepaths exppaths
 
-setopt localoptions nullglob rcexpandparam
-unsetopt markdirs globsubst shwordsplit nounset
-
 exppaths=()
 
 # Get the options.
@@ -317,7 +314,7 @@ for prepath in "$prepaths[@]"; do
 
     # Force auto-mounting. There might be a better way...
 
-    : ${^tmp1}/${PREFIX}${SUFFIX}/.(N/)
+    : ${^tmp1}/${PREFIX}${SUFFIX}/.(/)
 
     # Get the matching files by globbing.
 

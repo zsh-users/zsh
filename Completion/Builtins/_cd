@@ -19,7 +19,7 @@ if [[ CURRENT -eq 3 ]]; then
   # cd old new: look for old in $PWD and see what can replace it
   local rep
   # Get possible completions using word in position 2
-  rep=(${~PWD/$words[2]/*}~$PWD(-/N))
+  rep=(${~PWD/$words[2]/*}~$PWD(-/))
   # Now remove all the common parts of $PWD and the completions from this
   rep=(${${rep#${PWD%%$words[2]*}}%${PWD#*$words[2]}})
   (( $#rep )) && _wanted -C replacement strings expl replacement compadd -a rep

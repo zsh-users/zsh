@@ -5,7 +5,7 @@
 # way round if pushdminus is set). Note that this function is also called
 # from _cd for cd and pushd.
 
-setopt extendedglob nonomatch
+setopt localoptions nonomatch
 
 local expl list lines revlines disp
 

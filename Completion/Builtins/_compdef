@@ -33,7 +33,7 @@ case $state in
     _wanted commands expl 'completed command' compadd -k _comps
   ;;
   cfun)
-    list=( ${^fpath:/.}/_(|*[^~])(N:t) )
+    list=( ${^fpath:/.}/_(|*[^~])(:t) )
     if zstyle -T ":completion:${curcontext}:functions" prefix-hidden; then
       disp=( ${list[@]#_} )
       _wanted functions expl 'completion function' \

@@ -1,3 +1,15 @@
+2000-10-06  Sven Wischnowsky  <wischnow@zsh.org>
+
+	* 12917: Completion/Bsd/_bsd_pkg, Completion/Bsd/_kld,
+ 	Completion/Builtins/_autoload, Completion/Builtins/_cd,
+ 	Completion/Builtins/_compdef, Completion/Builtins/_popd,
+ 	Completion/Core/_expand, Completion/Core/_path_files,
+ 	Completion/Linux/_rpm, Completion/User/_gcc, Completion/User/_gdb,
+ 	Completion/User/_mailboxes, Completion/User/_man,
+ 	Completion/User/_perl_modules, Completion/User/_printers,
+ 	Completion/User/_zdump: more option setting cleanup; remove some
+ 	unnecessary setopts, remove N qualifiers
+	
 2000-10-05  Bart Schaefer  <schaefer@zsh.org>
 
 	* 12912: Completion/Commands/_bash_completions,

@@ -7,7 +7,7 @@ _bsd_pkg_packages() {
   paths=( "${(@)${(@s.:.)PKG_PATH}:#}" )
   _files "$@" -g \*.tgz && ret=0
   (( $#path )) && _files "$@" -W paths -g \*.tgz && ret=0
-  compadd "$@" - /usr/ports/packages/All/*.tgz(N) && ret=0
+  compadd "$@" - /usr/ports/packages/All/*.tgz && ret=0
 
   return ret
 }
@@ -37,7 +37,7 @@ _bsd_pkg() {
 	'-d[remove empty directories]' \
 	'-f[force deinstallation]' \
         '-p:prefix directory:_files -/' \
-        '*:package to deinstall:compadd - /var/db/pkg/*(N\:t)'
+        '*:package to deinstall:compadd - /var/db/pkg/*(\:t)'
     ;;
 
   pkg_info)
@@ -57,10 +57,10 @@ _bsd_pkg() {
 	'-R[show list list of installed requiring packages]' \
 	'-m[show mtree files]' \
 	'-L[show full pathnames of files]' \
-        '-e[test if package is installed]:package name:compadd - /var/db/pkg/*(N\:t)' \
+        '-e[test if package is installed]:package name:compadd - /var/db/pkg/*(\:t)' \
         '-l:prefix directory:_files -/' \
         '-t:mktemp template:_files -/' \
-        '(-a)*:package name:compadd - /var/db/pkg/*(N\:t)'
+        '(-a)*:package name:compadd - /var/db/pkg/*(\:t)'
     ;;
   esac
 }
