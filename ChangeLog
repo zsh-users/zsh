@@ -1,5 +1,8 @@
 2003-03-07  Peter Stephenson  <pws@csr.com>
 
+	* 18325: Src/Modules/parameter.c: options on by default weren't
+	handled correctly.
+
 	* 18319: Philippe Troin: Src/exec.c, Src/init.c, Src/jobs.c:
 	Fix various process group problems associated with certain
 	versions of `su'.  In particular, this improves `suspend'
