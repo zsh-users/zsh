@@ -417,6 +417,27 @@ zle -N predict-off
 bindkey '^X^Z' predict-on
 bindkey '^Z' predict-off)
 )
+findex(smart-insert-last-word)
+item(tt(smart-insert-last-word))(
+This function may replace the tt(insert-last-word) widget, like so:
+
+example(zle -N insert-last-word smart-insert-last-word)
+
+With a numeric prefix, it behaves like tt(insert-last-word), except that
+words in comments are ignored when tt(INTERACTIVE_COMMENTS) is set.
+
+Otherwise, the rightmost ``interesting'' word from the previous command is
+found and inserted.  The default definition of ``interesting'' is that the
+word contains at least one alphabetic character, slash, or backslash.
+This definition may be overridden by use of the tt(match) style.  The
+context used to look up the style is the widget name, so usually the
+context is tt(:insert-last-word).  However, you can bind this function to
+different widgets to use different patterns:
+
+example(zle -N insert-last-assignment smart-insert-last-word
+zstyle :insert-last-assignment match '[[:alpha:]][][[:alnum:]]#=*'
+bindkey '\e=' insert-last-assignment)
+)
 enditem()
 
 subsect(Styles)
@@ -427,7 +448,7 @@ the completion system pass along their context to any completions that
 they invoke.
 
 startitem()
-kindex(break-keys, completion style)
+kindex(break-keys, widget style)
 item(tt(break-keys))(
 This style is used by the tt(incremental-complete-word) widget. Its value
 should be a pattern, and all keys matching this pattern will cause the
@@ -486,7 +507,7 @@ enditem()
 Any other value for this style unconditionally leaves the cursor at the
 position where the completion code left it.
 )
-kindex(list, completion style)
+kindex(list, widget style)
 item(tt(list))(
 When using the tt(incremental-complete-word) widget, this style says
 if the matches should be listed on every key press (if they fit on the 
@@ -497,7 +518,27 @@ completion should be shown even if there is only one possible completion.
 This is done if the value of this style is the string tt(always).  In this
 case the context is `tt(:predict)' (em(not) `tt(:completion:predict)').
 )
-kindex(prompt, completion style)
+kindex(match, widget style)
+item(tt(match))(
+This style is used by tt(smart-insert-last-word) to provide a pattern
+(using full tt(EXTENDED_GLOB) syntax) that matches an interesting word.
+The context is the name of the widget to which tt(smart-insert-last-word)
+is bound (see above).  The default behavior of tt(smart-insert-last-word)
+is equivalent to:
+
+example(zstyle :insert-last-word match '*[[:alpha:]/\\]*')
+
+However, you might want to include words that contain spaces:
+
+example(zstyle :insert-last-word match '*[[:alpha:][:space:]/\\]*')
+
+Or include numbers as long as the word is at least two characters long:
+
+example(zstyle :insert-last-word match '*([[:digit:]]?|[[:alpha:]/\\])*')
+
+The above example causes redirections like "2>" to be included.
+)
+kindex(prompt, widget style)
 item(tt(prompt))(
 The tt(incremental-complete-word) widget shows the value of this
 style in the status line during incremental completion.  The string
@@ -532,7 +573,7 @@ enditem()
 
 Like `tt(break-keys)', this uses the `tt(:incremental)' context.
 )
-kindex(stop-keys, completion style)
+kindex(stop-keys, widget style)
 item(tt(stop-keys))(
 This style is used by the tt(incremental-complete-word) widget.  Its value
 is treated similarly to the one for the tt(break-keys) style (and uses 
@@ -540,7 +581,7 @@ the same context: `tt(:incremental)').  However, in
 this case all keys matching the pattern given as its value will stop
 incremental completion and will then execute their usual function.
 )
-kindex(toggle, completion style)
+kindex(toggle, widget style)
 item(tt(toggle))(
 This boolean style is used by tt(predict-on) and its related widgets in
 the context `tt(:predict)'.  If set to one of the standard `true' values,
@@ -550,7 +591,7 @@ moving into the middle of a line and then deleting a character.  The
 default is to leave prediction turned on until an explicit call to
 tt(predict-off).
 )
-kindex(verbose, completion style)
+kindex(verbose, widget style)
 item(tt(verbose))(
 This boolean style is used by tt(predict-on) and its related widgets in
 the context `tt(:predict)'.  If set to one of the standard `true' values,
