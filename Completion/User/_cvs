@@ -7,7 +7,7 @@ _cvs () {
   _arguments -s \
     -{a,f,H,l,n,Q,q,r,t,v,w,x} \
     '--version' '--help' '--help-commands' '--help-synonyms' '--help-options' \
-    '--allow-root=:rootdir:_files -/' \
+    '*--allow-root=:rootdir:_files -/' \
     '-b+:bindir:_cvs_bindir' \
     '-T+:temporary directory:_cvs_tempdir' \
     '-d+:cvsroot:_cvs_root' \
@@ -601,6 +601,10 @@ _cvs_files_modified () {
   _cvs_setup_prefix
   if [[ -d ${pref}CVS ]]; then
     _cvs_setup_modentries
+    setopt localoptions unset
+    local omit
+    omit=($line)
+    eval 'entries=(${entries:#('${(j:|:)${(@)omit:q}}')})'
     (( $#entries )) && _files "$@" -g "${(j:|:)${(@)entries:q}}"
   else
     _files "$@"
@@ -615,7 +619,7 @@ _cvs_files_removed () {
     _cvs_setup_allentries
     setopt localoptions unset
     local omit
-    omit=(${pref}*(D:t))
+    omit=(${pref}*(D:t) $line)
     eval 'entries=(${entries:#('${(j:|:)${(@)omit:q}}')})'
     _tags directories && compadd "$@" -P "$qpref" - ${entries:q} ||
         _cvs_directories "$@"
@@ -632,7 +636,7 @@ _cvs_files_unmaintained () {
     _cvs_setup_allentries
     setopt localoptions unset
     local omit
-    omit=($_cvs_ignore_default ${entries:q} ${=cvsignore})
+    omit=($_cvs_ignore_default ${entries:q} ${=cvsignore} $line)
     [[ -r ~/.cvsignore ]] && omit=($omit $(<~/.cvsignore))
     [[ -r ${pref}.cvsignore ]] && omit=($omit $(<${pref}.cvsignore))
     _path_files "$@" -g '*~(*/|)('${(j:|:)omit}')(D)' ||

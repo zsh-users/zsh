@@ -1,5 +1,8 @@
 2000-05-05  Tanaka Akira  <akr@zsh.org>
 
+	* 11213: Completion/User/_cvs: don't complete files which is
+	already on command line for `cvs add', `cvs remove' and `cvs commit'.
+
 	* 11204: Completion/User/_look: use more precise explanation and
 	complete an optional second argument.
 
