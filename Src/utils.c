@@ -1660,20 +1660,42 @@ spckword(char **s, int hist, int cmd, int ask)
     }
 }
 
+/*
+ * Helper for ztrftime.  Called with a pointer to the length left
+ * in the buffer, and a new string length to decrement from that.
+ * Returns 0 if the new length fits, 1 otherwise.  We assume a terminating
+ * NUL and return 1 if that doesn't fit.
+ */
+
+/**/
+static int
+ztrftimebuf(int *bufsizeptr, int decr)
+{
+    if (*bufsizeptr <= decr)
+	return 1;
+    *bufsizeptr -= decr;
+    return 0;
+}
+
+/*
+ * Like the system function, this returns the number of characters
+ * copied, not including the terminating NUL.  This may be zero
+ * if the string didn't fit.
+ */
+
 /**/
 mod_export int
 ztrftime(char *buf, int bufsize, char *fmt, struct tm *tm)
 {
-    int hr12;
+    int hr12, decr;
 #ifndef HAVE_STRFTIME
     static char *astr[] =
     {"Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"};
     static char *estr[] =
     {"Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul",
      "Aug", "Sep", "Oct", "Nov", "Dec"};
-#else
-    char *origbuf = buf;
 #endif
+    char *origbuf = buf;
     char tmp[3];
 
 
@@ -1682,6 +1704,14 @@ ztrftime(char *buf, int bufsize, char *fmt, struct tm *tm)
     while (*fmt)
 	if (*fmt == '%') {
 	    fmt++;
+	    /*
+	     * Assume this format will take up at least two
+	     * characters.  Not always true, but if that matters
+	     * we are so close to the edge it's not a big deal.
+	     * Fix up some longer cases specially when we get to them.
+	     */
+	    if (ztrftimebuf(&bufsize, 2))
+		return 0;
 	    switch (*fmt++) {
 	    case 'd':
 		*buf++ = '0' + tm->tm_mday / 10;
@@ -1709,9 +1739,10 @@ ztrftime(char *buf, int bufsize, char *fmt, struct tm *tm)
 		if (hr12 == 0)
 		    hr12 = 12;
 	        if (hr12 > 9)
-		  *buf++ = '1';
+		    *buf++ = '1';
 		else if (fmt[-1] == 'l')
-		  *buf++ = ' ';
+		    *buf++ = ' ';
+
 		*buf++ = '0' + (hr12 % 10);
 		break;
 	    case 'm':
@@ -1730,11 +1761,20 @@ ztrftime(char *buf, int bufsize, char *fmt, struct tm *tm)
 		*buf++ = '0' + (tm->tm_year / 10) % 10;
 		*buf++ = '0' + tm->tm_year % 10;
 		break;
+	    case '\0':
+		/* Guard against premature end of string */
+		*buf++ = '%';
+		fmt--;
+		break;
 #ifndef HAVE_STRFTIME
 	    case 'a':
+		if (ztrftimebuf(&bufsize, strlen(astr[tm->tm_wday]) - 2))
+		    return 0;
 		strucpy(&buf, astr[tm->tm_wday]);
 		break;
 	    case 'b':
+		if (ztrftimebuf(&bufsize, strlen(estr[tm->tm_mon]) - 2))
+		    return 0;
 		strucpy(&buf, estr[tm->tm_mon]);
 		break;
 	    case 'p':
@@ -1747,17 +1787,27 @@ ztrftime(char *buf, int bufsize, char *fmt, struct tm *tm)
 		    *buf++ = fmt[-1];
 #else
 	    default:
+		/*
+		 * Remember we've already allowed for two characters
+		 * in the accounting in bufsize (but nowhere else).
+		 */
 		*buf = '\0';
 		tmp[1] = fmt[-1];
-		strftime(buf, bufsize - strlen(origbuf), tmp, tm);
-		buf += strlen(buf);
+		if (!strftime(buf, bufsize + 2, tmp, tm))
+		    return 0;
+		decr = strlen(buf);
+		buf += decr;
+		bufsize -= decr - 2;
 #endif
 		break;
 	    }
-	} else
+	} else {
+	    if (ztrftimebuf(&bufsize, 1))
+		return 0;
 	    *buf++ = *fmt++;
+	}
     *buf = '\0';
-    return 0;
+    return buf - origbuf;
 }
 
 /**/

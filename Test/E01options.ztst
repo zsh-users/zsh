@@ -154,6 +154,19 @@
 >a b c d
 >{abcd}
 
+# Don't use NUL as a field separator in the following.
+  setopt braceccl
+  print {$'\0'-$'\5'} | IFS=' ' read -A chars
+  for c in $chars; do print $(( #c )); done
+  unsetopt braceccl
+0:BRACE_CCL option starting from NUL
+>0
+>1
+>2
+>3
+>4
+>5
+
   setopt bsdecho
   echo "histon\nimpington"
   echo -e "girton\ncottenham"

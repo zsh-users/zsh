@@ -382,7 +382,13 @@ init_io(void)
 #endif
 
     if (shout) {
-	fclose(shout);
+	/*
+	 * Check if shout was set to stderr, if so don't close it.
+	 * We do this if we are interactive but don't have a
+	 * terminal.
+	 */
+	if (shout != stderr)
+	    fclose(shout);
 	shout = 0;
     }
     if (SHTTY != -1) {
@@ -451,9 +457,9 @@ init_io(void)
 
     /* We will only use zle if shell is interactive, *
      * SHTTY != -1, and shout != 0                   */
-    if (interact && SHTTY != -1) {
+    if (interact) {
 	init_shout();
-	if(!shout)
+	if(!SHTTY || !shout)
 	    opts[USEZLE] = 0;
     } else
 	opts[USEZLE] = 0;
@@ -486,6 +492,14 @@ mod_export void
 init_shout(void)
 {
     static char shoutbuf[BUFSIZ];
+
+    if (SHTTY == -1)
+    {
+	/* Since we're interative, it's nice to have somewhere to write. */
+	shout = stderr;
+	return;
+    }
+
 #if defined(JOB_CONTROL) && defined(TIOCSETD) && defined(NTTYDISC)
     int ldisc = NTTYDISC;
 

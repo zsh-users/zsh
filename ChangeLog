@@ -56,6 +56,21 @@
 	permissions on directories in the fpath; also in case of symlinks,
 	find parent with ${^fpath:h} rather than ${^fpath}/..
 
+2003-10-06  Peter Stephenson  <pws@pwstephenson.fsnet.co.uk>
+
+	* 19168: Src/prompt.c, Src/utils.c, Src/Modules/datetime.c:
+	various problems with size of buffers and pointer usage
+	in ztrftime().
+
+	* 19167: Src/glob.c, Test/E01options.ztst: NULL at start
+	of BRACE_CCL range didn't work.
+
+2003-09-22  Peter Stephenson  <pws@csr.com>
+
+	* 19105: Src/init.c, Src/jobs.c: Set shout to stderr if we
+	are interactive but have no terminal.  Prevents crash in
+	history and potentially elsewhere.
+
 2003-09-21  Oliver Kiddle  <opk@zsh.org>
 
 	* users/6606: Completion/Base/Utility/_sep_parts: handle any

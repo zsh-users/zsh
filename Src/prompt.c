@@ -479,18 +479,23 @@ putpromptchar(int doprint, int endchar)
 			tmfmt = "%m/%d/%y";
 			break;
 		    case 'D':
-			if (fm[1] == '{') /*}*/ {
+			if (fm[1] == '{' /*}*/) {
 			    for (ss = fm + 2; *ss && *ss != /*{*/ '}'; ss++)
 				if(*ss == '\\' && ss[1])
 				    ss++;
 			    dd = tmfmt = tmbuf = zalloc(ss - fm);
-			    for (ss = fm + 2; *ss && *ss != /*{*/ '}'; ss++) {
+			    for (ss = fm + 2; *ss && *ss != /*{*/ '}';
+				 ss++) {
 				if(*ss == '\\' && ss[1])
 				    ss++;
 				*dd++ = *ss;
 			    }
 			    *dd = 0;
 			    fm = ss - !*ss;
+			    if (!*tmfmt) {
+				free(tmbuf);
+				continue;
+			    }
 			} else
 			    tmfmt = "%y-%m-%d";
 			break;
@@ -502,7 +507,7 @@ putpromptchar(int doprint, int endchar)
 		    tm = localtime(&timet);
 		    for(t0=80; ; t0*=2) {
 			addbufspc(t0);
-			if(ztrftime(bp, t0, tmfmt, tm) != t0)
+			if (ztrftime(bp, t0, tmfmt, tm))
 			    break;
 		    }
 		    bp += strlen(bp);
