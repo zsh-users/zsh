@@ -49,7 +49,7 @@ elif [[ "$prev" = -(form|audit|filter) ]]; then
   mhlib=${${$(mhparam mhlproc 2>/dev/null):h}:-/usr/lib/mh}
   mhfpath=($mymhdir $mhlib)
 
-  _wanted files expl 'MH template file' _files -W mhfpath -g '*(.)'
+  _wanted files expl 'MH template file' _files -W mhfpath -g '*(-.)'
 elif [[ $service = mhmail ]]; then
   _email_addresses
 elif [[ "$prev" = -(no|)cc ]]; then
@@ -83,7 +83,7 @@ else
       compadd "$expl[@]" $(mark $foldnam 2>/dev/null | awk -F: '{ print $1 }') &&
         ret=0
       compadd "$expl[@]" reply next cur prev first last all unseen && ret=0
-      _path_files "$expl[@]" -W folddir -g '<->' && ret=0
+      _path_files "$expl[@]" -W folddir -g '<->(-.)' && ret=0
     done
     (( ret )) || return 0
   done

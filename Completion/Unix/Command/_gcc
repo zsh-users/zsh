@@ -13,7 +13,7 @@ if [[ "$service" = -value-* ]]; then
     args2=()
   fi
 else
-  args2=( '*:input file:_files -g \*.\(\[cCmisSoak\]\|cc\|cxx\|ii\|k\[ih\]\)' )
+  args2=( '*:input file:_files -g "*.([cCmisSoak]|cc|cxx|ii|k[ih])(-.)"' )
 fi
 
 args=()
@@ -179,7 +179,7 @@ esac
 _arguments -C -M 'L:|-{fW}no-=-{fW} r:|[_-]=* r:|=*' \
   "$args[@]" \
   -c -S -E -v -a -w -C -H -P -s '(-pg)-p' '(-p)-pg' \
-  '-o:output file:_files -g \^\*.\(c\|h\|cc\|C\|cxx\)' \
+  '-o:output file:_files -g "^*.(c|h|cc|C|cxx)(-.)"' \
   '-x:input file language:(c objective-c c++ c-header cpp-output c++-cpp-output assembler assembler-with-cpp none)' \
   '+e-:virtual function definitions in classes:((0\:only\ interface 1\:generate\ code))' \
   '-d-:dump:->dump' \
@@ -202,8 +202,8 @@ _arguments -C -M 'L:|-{fW}no-=-{fW} r:|[_-]=* r:|=*' \
   '-V:gcc version:' \
   '-print-file-name=:library:->library' \
   '-print-prog-name=:program:' \
-  '*-include:include file:_files -g \*.h' \
-  '*-imacros:macro input file:_files -g \*.h' \
+  '*-include:include file:_files -g \*.h\(-.\)' \
+  '*-imacros:macro input file:_files -g \*.h\(-.\)' \
   '*-idirafter:second include path directory:_files -/' \
   '*-iprefix:prefix:_files' \
   '*-iwithprefix:second include path directory:_files -/' \

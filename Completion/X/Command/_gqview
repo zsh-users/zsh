@@ -9,4 +9,4 @@ _arguments \
   '--debug[turn on debug output]' \
   '(--version -v)'{-v,--version}'[print version info]' \
   '(--help -h)'{-h,--help}'[show help]' \
-  '*:picture file:_files -/ -g \*.\(\#i\)\(jpg\|jpe\|jpeg\|png\|gif\|tif\|tiff\|bmp\)'
+  '*:picture file:_files -g "*.(#i)(jpg|jpe|jpeg|png|gif|tif|tiff|bmp)(-.)"'

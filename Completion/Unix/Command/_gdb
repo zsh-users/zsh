@@ -47,7 +47,7 @@ else
   done
 
   if [[ $#w -gt 1 ]]; then
-    _alternative "files:: _files -g '*core'" "processes:: _pids -m ${w[1]:t}"
+    _alternative "files:: _files -g '*core(-.)'" "processes:: _pids -m ${w[1]:t}"
   else
     _description files expl executable
     _files "$expl[@]" -g '*(-*)'

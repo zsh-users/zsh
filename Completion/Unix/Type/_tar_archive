@@ -15,11 +15,11 @@ _description files expl 'archive file'
 
 if [[ "$1" = *[urtx]* ]]; then
   if [[ "$1" = *[zZ]* ]]; then
-    _files "$expl[@]" -g '*.((tar|TAR).(gz|GZ|Z)|tgz)'
+    _files "$expl[@]" -g '*.((tar|TAR).(gz|GZ|Z)|tgz)(-.)'
   elif [[ "$1" = *[Ijy]* ]]; then
-    _files "$expl[@]" -g '*.(tar|TAR).bz2'
+    _files "$expl[@]" -g '*.(tar|TAR).bz2(-.)'
   else
-    _files "$expl[@]" -g '*.(tar|TAR)'
+    _files "$expl[@]" -g '*.(tar|TAR)(-.)'
   fi
 else
   _files "$expl[@]"

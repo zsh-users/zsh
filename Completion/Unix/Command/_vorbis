@@ -30,7 +30,7 @@ case $service in
       '(-N --tracknum)'{-N,--tracknum}'[set the track number comment field to the given value]:track number' \
       '(-t --title)'{-t,--title}'[set the track title comment field to title]:title' \
       '(-l --album)'{-l,--album}'[set the album comment field to album]' \
-      '*:wav file:_files -g "(#i)*.wav"' && ret=0
+      '*:wav file:_files -g "(#i)*.wav(-.)"' && ret=0
   ;;
   ogg123)
     _arguments -C -s \
@@ -76,7 +76,7 @@ esac
 case $state in
   oggfiles)
     _wanted files expl 'ogg vorbis file' \
-	_files "$expl[@]" -g '(#i)*.ogg' && return
+	_files "$expl[@]" -g '(#i)*.ogg(-.)' && return
   ;;
   devopts)
     if compset -p '*:'; then

@@ -7,13 +7,13 @@ typeset -A opt_args
 
 _dpkg_deb_actions=(
   '(--build -b)'{--build,-b}'[build archive]:directory:_files -/'
-  '(--contents -c)'{--contents,-c}'[list contents]:Debian package:_files -g \*.u\#deb'
-  '(--info -I)'{--info,-I}'[show info]:Debian package:_files -g \*.u\#deb'
-  '(--field -f)'{--field,-f}'[show fields]:Debian package:_files -g \*.u\#deb'
-  '(--control -e)'{--control,-e}'[extract control]:Debian package:_files -g \*.u\#deb'
-  '(--extract -x)'{--extract,-x}'[extract files]:Debian package:_files -g \*.u\#deb'
-  '(--vextract -X)'{--vextract,-X}'[extract and list files]:Debian package:_files -g \*.u\#deb'
-  '--fsys-tarfile[output fs tarfile]:Debian package:_files -g \*.u\#deb'
+  '(--contents -c)'{--contents,-c}'[list contents]:Debian package:_files -g "*.u#deb(-.)"'
+  '(--info -I)'{--info,-I}'[show info]:Debian package:_files -g "*.u#deb(-.)"'
+  '(--field -f)'{--field,-f}'[show fields]:Debian package:_files -g "*.u#deb(-.)"'
+  '(--control -e)'{--control,-e}'[extract control]:Debian package:_files -g "*.u#deb(-.)"'
+  '(--extract -x)'{--extract,-x}'[extract files]:Debian package:_files -g "*.u#deb(-.)"'
+  '(--vextract -X)'{--vextract,-X}'[extract and list files]:Debian package:_files -g "*.u#deb(-.)"'
+  '--fsys-tarfile[output fs tarfile]:Debian package:_files -g "*.u#deb(-.)"'
 )
 
 _dpkg_common_actions=(
@@ -24,7 +24,7 @@ _dpkg_common_actions=(
 
 _dpkg_actions=(
   '(--install -i)'{--install,-i}'[install packages]:*:Debian packages:->install'
-  '--unpack[unpack package]:Debian package:_files -g \*.deb'
+  '--unpack[unpack package]:Debian package:_files -g "*.deb(-.)"'
   '--configure[reconfigure specified packages]:*:package:->configure'
   '(--remove -r)'{--remove,-r}'[remove package]:*:package:->remove'
   '(--purge -P)'{--purge,-P}'[purge package]:*:package:->purge'
@@ -111,7 +111,7 @@ case "$state" in
 	"$_dpkg_options_recursive[@]" \
 	'*:directory:_path_files -/' \
       - nonrecur \
-	'*:Debian package:_path_files -g \*.deb'
+	'*:Debian package:_path_files -g "*.deb(-.)"'
   ;;
   remove|purge|status|listfiles)
     _call_function ret _dpkg_$state && return ret

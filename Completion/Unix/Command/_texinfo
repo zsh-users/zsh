@@ -11,12 +11,12 @@ case $service in
       '(: -)--apropos=[look up string in indices]:search string: ' \
       '(-f --file)'{\*-d,\*--directory=}'[add directory to infopath]:info dir:_files -/' \
       '--dribble=[record keystrokes]:file with keystrokes:_files' \
-      '(-f --file -d --directory)'{-f,--file=}'[info file to show]:info file:_files -g "*.info(|.gz|.bz2)"' \
+      '(-f --file -d --directory)'{-f,--file=}'[info file to show]:info file:_files -g "*.info(|.gz|.bz2)(-.)"' \
       '(: - -h --help)'{-h,--help}'[display usage]' \
       '(-o --output -O)--index-search=[go directly to node if found]:search string: ' \
-      '(--index-search -o --output -O)'{-o,--output=}'[dump selected nodes to filename]:filename:_files -g "*(^/)"' \
+      '(--index-search -o --output -O)'{-o,--output=}'[dump selected nodes to filename]:filename:_files -g "*(-.)"' \
       '(-R --raw-escapes)'{-R,--raw-escapes}'[do not remove ANSI escapes from man pages]' \
-      '--restore=[read keystrokes from file]:filename:_files -g "*(^/)"' \
+      '--restore=[read keystrokes from file]:filename:_files -g "*(-.)"' \
       '(--index-search -o --output -O --show-options --usage)'{-O,--show-options,--usage}'[go to command-line options node]' \
       '--subnodes[recursively output menu items]' \
       '--vi-keys[use Vi-like key bindings]' \
@@ -43,21 +43,21 @@ case $service in
         '--keep-old=[inhibit replacement of existing entries/removal of empty sections]' \
         '--test[do not update dir file]' \
         '--debug[enable debugging]' \
-        '*:info file:_files -g \*.info'
+        '*:info file:_files -g "*.info(-.)"'
 	return
     else
       _arguments \
         '(--delete --remove)'{--delete,--remove}'[delete existing entries]' \
-        '(2)--dir-file=[specify dir file]:dir file:_files -g dir' \
+        '(2)--dir-file=[specify dir file]:dir file:_files -g "dir(-.)"' \
         \*{--entry,--info}'[specify directory entry to add]:text' \
         '(- 1 2)--help[display help information]' \
-        '(1)--info-file=[specify info file to install in the directory]:info file:_files -g *.info' \
+        '(1)--info-file=[specify info file to install in the directory]:info file:_files -g "*.info(-.)"' \
         '(2)--info-dir=[specify directory containing dir file]:info directory:_files -/' \
         '--quiet[suppress warnings]' \
         '(--delete --remove)--section=[put new entries in specified section]' \
         '(- 1 2)--version[display version information]' \
-        '1:info file:_files -g \*.info' \
-        '2:dir file:_files -g dir'
+        '1:info file:_files -g "*.info(-.)"' \
+        '2:dir file:_files -g "dir(-.)"'
 	return
     fi
   ;;
@@ -137,7 +137,7 @@ case $service in
       '-searchlook:search match display:(color inverse underline)' \
       '-iconic' \
       '-dir:info path:_dir_list' \
-      '-file:info file:_files -g "*.info(|.gz|.bz2)"' \
+      '-file:info file:_files -g "*.info(|.gz|.bz2)(-.)"' \
       '-node:info node:->item' \
       '*::menu items:->item' && ret=0
     info=( _call_program info info ${(kv)opt_args[(I)-file]/-file/-f} )

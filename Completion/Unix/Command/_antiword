@@ -11,6 +11,6 @@ _arguments -s -S \
   '(-t -w)-L[use landscape mode (PostScript only)]' \
   '-s[show hidden (by Word) text]' \
   '(* -)-h[give a help message]' \
-  '*:MS Word file:_files -g \*.doc' && return
+  '*:MS Word file:_files -g "*.doc(-.)"' && return
 
 return 1

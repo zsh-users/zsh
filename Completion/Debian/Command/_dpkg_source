@@ -1,7 +1,7 @@
 #compdef dpkg-source
 
 _arguments \
-  '-x[specify source file]:Debian source file:_files -g \*.dsc' \
+  '-x[specify source file]:Debian source file:_files -g "*.dsc(-.)"' \
   '-b[specify source directory]:Debian source directory:_files -/' \
   '-c-[control file]:control file:_files' \
   '-l-[changelog file]:changelog file:_files' \

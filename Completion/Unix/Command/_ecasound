@@ -29,7 +29,7 @@ _arguments \
   '*-Md\:-[set the active MIDI-device]:device name:_files' \
   '*-Mms\:-[send MMC start/stop to MIDI device-id]:device id' \
   '*-mss[sends MIDI-sync to the selected MIDI-device]' \
-  '*-pf\:-[use the first preset found from file as chain operator]:preset file:_files -g *.epp' \
+  '*-pf\:-[use the first preset found from file as chain operator]:preset file:_files -g \*.epp\(-.\)' \
   '*-pn\:-[find preset from global preset database]:preset name:->pn' \
   '*-ev[analyze sample data to find max apm value without clipping]' \
   '*-ezf[find the optimal value for DC-adjusting]' \
@@ -135,7 +135,7 @@ case $state in
       fi
     else
       _alternative \
-        'files:input/output file:_files -g "*.(aif|aiff|mid|wav|ewf|mp3|mp2)"' \
+        'files:input/output file:_files -g "*.(aif|aiff|mid|wav|ewf|mp3|mp2)(-.)"' \
         'streams:stream:(stdin stdout)' \
 	'devices:realtime device:((/dev/dsp alsa\:alsa\ device null\:null\ device))'
     fi

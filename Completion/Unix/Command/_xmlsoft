@@ -29,8 +29,8 @@ case $service in
       '--xinclude[do XInclude processing on document input]' \
       '--load-trace[print trace of all external entites loaded]' \
       {--profile,--norman}'[dump profiling information]' \
-      '1:stylesheet:_files -g \*.xsl' \
-      ':file:_files -g \*.xml' && return
+      '1:stylesheet:_files -g "*.xsl(-.)"' \
+      ':file:_files -g "*.xml(-.)"' && return
   ;;
   xmllint)
     local -a encoding

@@ -5,7 +5,7 @@ typeset -A opt_args
 
 case $service in
   uml_moo)
-    _arguments '1:COW file:_files -g \*cow\*' '2:new backing file:_files'
+    _arguments '1:COW file:_files -g "*cow*(-.)"' '2:new backing file:_files'
     return
   ;;
   uml_switch)

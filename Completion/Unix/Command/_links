@@ -29,7 +29,7 @@ _arguments -C \
 
 case $state in
   html)
-    _alternative 'files:file:_files -g "*.x#html"' 'urls:url:_urls' && ret=0
+    _alternative 'files:file:_files -g "*.x#html(-.)"' 'urls:url:_urls' && ret=0
   ;;
   graphics_drivers)
     vals=(${=${${${(f)"$(_call_program links-graphics-drivers links -driver help 2>&1)"}[-1]}//','/''}} )

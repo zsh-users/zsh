@@ -44,7 +44,7 @@ _urpmi_rpms() {
     fi
 
     _requested files expl '(S)RPM file' \
-      _files -g '*.(#i)rpm' && ret=0
+      _files -g '*.(#i)rpm(-.)' && ret=0
   
     (( ret )) || break
   done

@@ -17,7 +17,7 @@ _perl_pods () {
   _alternative \
     'modules:: _perl_modules' \
     'pods:: _perl_basepods' \
-    'files:Perl modules and .pods:_files -g \*.\(pod\|pm\)'
+    'files:Perl modules and .pods:_files -g "*.(pod|pm)(-.)"'
 }
 
 _perldoc "$@"

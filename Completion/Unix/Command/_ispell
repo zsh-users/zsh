@@ -36,17 +36,17 @@ ispell)
 buildhash)
   _arguments \
     '(-c)-s[silent operation]' \
-    '(: -s)-c[count mode]:count: :affix file:_files -g \*.\(\#i\)aff' \
+    '(: -s)-c[count mode]:count: :affix file:_files -g "*.(#i)aff(-.)"' \
     ':raw dictionary file:_files:' \
-    ':affix file:_files -g \*.\(\#i\)aff' \
-    ':hashed output file:_files \*.\(\#i\)hash'
+    ':affix file:_files -g "*.(#i)aff(-.)"' \
+    ':hashed output file:_files "*.(#i)hash(-.)"'
   ;;
 munchlist)
   _arguments -s \
-    '-l[specify affix file]:affix file:_files -g \*.\(\#i\)aff' \
+    '-l[specify affix file]:affix file:_files -g "*.(#i)aff(-.)"' \
     '-c[specify converted output file name]:converted file name:_files' \
     '-T[specify string character type]:string character type:' \
-    '-s[specify strip hash file]:hash file:_files \*.\(\#i\)hash' \
+    '-s[specify strip hash file]:hash file:_files "*.(#i)hash(-.)"' \
     '-D[debug mode]' \
     '-v[verbose mode]' \
     '-w[specify additional word characters]:word characters:' \
@@ -76,7 +76,7 @@ tryaffix)
 icombine)
   _arguments \
     '-T[specify string character type]:string character type:' \
-    ':affix file:_files -g \*.\(\#i\)aff'
+    ':affix file:_files -g "*.(#i)aff(-.)"'
   ;;
 ijoin)
   _arguments -s \

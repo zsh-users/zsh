@@ -11,4 +11,4 @@ if [[ "$1" == '-z' ]]; then
 fi
 
 _description files expl 'PostScript file'
-_files "$@" "$expl[@]" -g "*.(#i)(ps|eps)$ext"
+_files "$@" "$expl[@]" -g "*.(#i)(ps|eps)$ext(-.)"

@@ -39,7 +39,7 @@ case $service in
     if (( CURRENT == 2 )); then
       _wanted commands expl 'rar command' compadd e l lt p t v vt x && return
     else
-      _arguments "$common[@]" '*:RAR files:_files -g \*.rar' && return
+      _arguments "$common[@]" '*:RAR files:_files -g \*.rar\(-.\)' && return
     fi
   ;;
   rar)

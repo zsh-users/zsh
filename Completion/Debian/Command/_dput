@@ -11,4 +11,4 @@ _arguments \
   '(-s --simulate)'{-s,--simulare}'[simulate an upload only]' \
   '(-u --unchecked)'{-u,--unchecked}'[do not check GPG signature on the changes file]' \
   '(-v --version)'{-v,--version}'[show version information]' \
-  '*:changes file:_files -g \*.changes'
+  '*:changes file:_files -g "*.changes(-.)"'

@@ -24,25 +24,25 @@ xfontsel)
   _xt_arguments \
     -{print,noscaled} \
     '-pattern:font pattern:_x_font' \
-    '-sample:sample text:' \
-    '-sample16:16-bit sample text:'
+    '-sample:sample text' \
+    '-sample16:16-bit sample text'
   ;;
 xfd)
   _xt_arguments \
     '-fn:font: _x_font' \
     -{box,center} \
-    '-start:first character number:' \
+    '-start:first character number' \
     '-bc:box border color:_x_color' \
-    '-rows:number of rows:' \
-    '-columns:number of columns:'
+    '-rows:number of rows' \
+    '-columns:number of columns'
   ;;
 xev)
   _x_arguments \
-    '-bw:border width:' \
+    '-bw:border width' \
     '-bs:type of backing store:(NotUseful WhenMapped Always)' \
     '-id:id:_x_window' \
     '-s[use save-under]' \
-    '-name:window name:' \
+    '-name:window name' \
     '-rv'
   ;;
 xhost)
@@ -103,8 +103,8 @@ xhost)
 xon)
   _arguments \
     -{access,debug,nols} \
-    '-name:window name:' \
-    '-screen:screen number:' \
+    '-name:window name' \
+    '-screen:screen number' \
     '-user:remote user name:_users' \
     ':remote host:_hosts' \
     '(-):command: _command_names -e' \
@@ -113,20 +113,20 @@ xon)
 xsetroot)
   _x_arguments \
     -{help,def,gray,grey,rv} \
-    '-cursor:cursor file:_files -g \*.\(\#i\)\(xbm\|curs\(\|or\)\):mask file:_files -g \*.\(\#i\)\(xbm\|curs\(\|or\)\|mask\)' \
+    '-cursor:cursor file:_files -g \*.\(\#i\)\(xbm\|curs\(\|or\)\):mask file:_files -g \*.\(\#i\)\(xbm\|curs\(\|or\)\|mask\)\(-.\)' \
     '-cursor_name:cursor name:_x_cursor' \
-    '-bitmap:bitmap file:_files -g \*.\(\#i\)xbm' \
-    '-mod:x grid distance (1-16): :y grid distance (1-16):' \
+    '-bitmap:bitmap file:_files -g \*.\(\#i\)xbm\(-.\)' \
+    '-mod:x grid distance (1-16): :y grid distance (1-16)' \
     '-fg:foreground color:_x_color' \
     '-bg:background color:_x_color' \
     '-solid:screen solid color:_x_color' \
-    '-name:root window name:'
+    '-name:root window name'
   ;;
 xwd)
   _x_arguments \
     -{debug,help,nobdrs,xy,frame,root,icmap,screen,silent} \
     '-out:output file:_files' \
-    '-add:pixel change value:' \
+    '-add:pixel change value' \
     '-id:id: _x_window' \
     '-name:name: _x_window -n'
   ;;
@@ -135,8 +135,8 @@ xwud)
     -{help,new,noclick,raw,rv,scale} \
     '-bg:background color:_x_color' \
     '-fg:foreground color:_x_color' \
-    '-in:input file:_files -g \*.\(\#i\)xwd' \
-    '-plane:image plane to display:' \
+    '-in:input file:_files -g \*.\(\#i\)xwd\(-.\)' \
+    '-plane:image plane to display' \
     '-std:standard colormap:(best default gray red blue green)' \
     '-vis:visual:_x_visual'
   ;;
@@ -156,9 +156,9 @@ xrdb)
     '(-query -load -override -remove)-merge' \
     '(-query -load -override -merge)-remove' \
     '-edit:output file:_files' \
-    '-backup:backup extension:' \
-    '*-D-:symbol to define:' \
-    '*-U-:symbol to undefine:' \
+    '-backup:backup extension' \
+    '*-D-:symbol to define' \
+    '*-U-:symbol to undefine' \
     '*-I-:include directory:_files -/' \
     '*:defaults file:_files'
   ;;

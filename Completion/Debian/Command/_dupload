@@ -18,4 +18,4 @@ _arguments \
   '(-p --print)'{-p,--print}'[print config legibly]' \
   '(-q --quiet)'{-q,--quiet}'[quiet]' \
   '(-V --Version)'{-V,--Version}'[display version information]' \
-  '*:changes file:_files -g \*.changes'
+  '*:changes file:_files -g "*.changes(-.)"'

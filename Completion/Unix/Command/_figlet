@@ -27,9 +27,9 @@ _arguments -s -S \
   "(-L -R)-X[use default writing direction of font]" \
   "(-t)-w+[specify output width]:output width (in columns)" \
   "-d+[specify font directory]:font directory:_path_files -/" \
-  '-f+[specify font]:font:_files -W ${~opt_args[-d]\:-$fontdir} -g \*flf\*\(\:r\)' \
+  '-f+[specify font]:font:_files -W ${~opt_args[-d]\:-$fontdir} -g \*flf\*\(-.\:r\)' \
   '(-k -S -s -o -W)-m+[specify layout mode]:layout mode' \
-  '(-N)-C+[specify control file]:control file:_files -W ${~opt_args[-d]\:-$fontdir} -g \*flc\*\(\:r\)' \
+  '(-N)-C+[specify control file]:control file:_files -W ${~opt_args[-d]\:-$fontdir} -g \*flc\*\(-.\:r\)' \
   "(-v)-I+[display info]:info code:((
     -1\:normal\ operation\ \(default\)
     0\:version,\ copyright\ and\ usage\ information

@@ -10,7 +10,7 @@ _sccs_files() {
   PREFIX="$pref"
   IPREFIX="$ipref"
   _wanted sccs-files expl 'sccs file' _files -W ${PROJECTDIR:-~+} \
-      -g 's.*' && ret=0
+      -g 's.*(-.)' && ret=0
   
   return ret
 }
@@ -49,7 +49,7 @@ subcmds=(
 
 ropt='-r+[specify sccs delta id]:sccs delta id'
 copt='-c+[specify date]:date-stamp'
-sfiles=":file:_files -g s.\*"
+sfiles=':file:_files -g "s.*(-.)"'
 
 if [[ $service = sccs ]]; then
   _arguments -C -A "-*" \

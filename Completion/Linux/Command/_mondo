@@ -26,7 +26,7 @@ _arguments -C \
   '-F[do not create floppy]' \
   '-H[create autorestore image]' \
   '-L[use lzo instead of bzip2]' \
-  '-P[post-nuke tarball]:post-nuke tarball:_files -g "*.(#i)(tar.gz|tgz)"' \
+  '-P[post-nuke tarball]:post-nuke tarball:_files -g "*.(#i)(tar.gz|tgz)(-.)"' \
   '-S[scratch directory]:scratch directory:_files -/' \
   '-T[temporary directory]:temporary directory:_files -/' \
   '-f[device with MBR]:device with MBR:_files -g "*(%b)"' \

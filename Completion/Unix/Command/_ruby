@@ -32,7 +32,7 @@ _arguments -C -s -S \
   '(1 * -)--copyright[print the copyright]' \
   '(1 * -)'{-h,--help}'[print help message]' \
   '(1 * -)--version[print the version]' \
-  '(-)1:script file:_files -g \*.rb' \
+  '(-)1:script file:_files -g "*.rb(-.)"' \
   '*:script argument:_files' && ret=0
 
 case $state in

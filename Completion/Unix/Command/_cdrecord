@@ -80,8 +80,8 @@ if [[ -n $state ]]; then
 	'mcn[set media catalog number for this CD]:text' \
 	'isrc[set isrc number for the next track]:text' \
 	'index[set the index list for the next track]:list' \
-	'textfile[set the file with CD-Text data]:name:_files -g "*.inf"' \
-	'cuefile[set the file with CDRWIN CUE data]:name:_files -g "*.cue"' && ret=0
+	'textfile[set the file with CD-Text data]:name:_files -g "*.inf(-.)"' \
+	'cuefile[set the file with CDRWIN CUE data]:name:_files -g "*.cue(-.)"' && ret=0
     fi
     _requested files expl track _files && ret=0
     (( ret )) || break

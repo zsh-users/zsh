@@ -29,7 +29,7 @@ _arguments -C -s \
   '-o-[specify output file]:output file:_files' \
   '-P-[change yy prefix]:prefix string:' \
   '-S-[override skeleton file]:skeleton file:_files' \
-  '*:input files:_files -g \*.\(\#i\)\(f\|\)lex' && ret=0
+  '*:input files:_files -g "*.(#i)(f|)lex(-.)"' && ret=0
 
 if [[ -n "$state" ]]; then
   _values -s '' 'table compression' \

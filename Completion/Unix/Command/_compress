@@ -38,10 +38,10 @@ esac
 if [[ "$state" = files ]]; then
   if [[ -z "$decompress" ]] || (( $+opt_args[-d] )); then
     _description files expl 'file to compress'
-    _files "$expl[@]" -g '*~*.Z' && return
+    _files "$expl[@]" -g '^*.Z(-.)' && return
   else
     _description files expl 'compressed file'
-    _files "$expl[@]" -g '*.Z' && return
+    _files "$expl[@]" -g '*.Z(-.)' && return
   fi
 fi
 

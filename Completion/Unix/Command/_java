@@ -22,7 +22,7 @@ javac)
     '-source[provide source compatibility with specified release]:release:(1.3 1.4)' \
     '-target[specify VM version]:release:(1.{1..4})' \
     '-help[print a synopsis of standard options]' \
-    '*:java source file:_files -g \*.java' && return 0
+    '*:java source file:_files -g \*.java\(-.\)' && return 0
   ;;
 
 jdb)
@@ -43,7 +43,7 @@ java)
     '-verbose\:jni[print JNI information]' \
     '-version[print version]' \
     '-help[print help message]' \
-    '(- 1)-jar[specify a program capsulated as jar]:jar:_files -g \*.jar' \
+    '(- 1)-jar[specify a program capsulated as jar]:jar:_files -g \*.jar\(-.\)' \
     '(-):class:_java_class -m main ${(kv)opt_args[(i)(-classpath|-cp)]}' \
     '*::args: _normal' \
      && return 0
@@ -118,7 +118,7 @@ jar)
     jar_cmd="${words[2]#-}"
     tmpassoc=(
       m ':manifest file:_files'
-      f ':archive file:_files -g \*.\([ejw]ar\|zip\)'
+      f ':archive file:_files -g "*.([ejw]ar|zip)(-.)"'
     )
     _arguments -C \
       "${jar_cmd/[^-]*/:dummy:}" \
@@ -165,7 +165,7 @@ javap)
 extcheck)
   _arguments \
     '-verbose[print verbose messages]' \
-    ':target jar file:_files -g \*.jar' && return 0
+    ':target jar file:_files -g \*.jar\(-.\)' && return 0
   ;;
 
 rmic)
@@ -336,14 +336,14 @@ jarsigner)
     '-storepass[specify password for keystore]:password:' \
     '-keypass[specify password for private key]:password:' \
     '-sigfile[specify base file name of .SF and .DSA files to be generated]:sigfile:_files' \
-    '-signedjar[specify signed JAR file]:_files -g \*.\(jar\|zip\)' \
+    '-signedjar[specify signed JAR file]:_files -g "*.(jar|zip)(-.)"' \
     '(2)-verify[verify mode]' \
     '-certs[output certificate information in verify mode]' \
     '-verbose[print verbose messages]' \
     '-internalsf[old behaviour]' \
     '-sectionsonly[omit header of hash of the whole manifest file]' \
     '-J-[specify java option]:java option:' \
-    ':jar file:_files -g \*.\(jar\|zip\)' \
+    ':jar file:_files -g "*.(jar|zip)(-.)"' \
     ':alias:' && return 0
   ;;
 
@@ -374,7 +374,7 @@ classpath|sourcepath|bootstrapclasspath|docletpath)
   compset -P '*:'
   compset -S ':*'
   _alternative \
-    "classpath:$state:_path_files -qS: -g '*.(jar|zip)'" \
+    "classpath:$state:_path_files -qS: -g '*.(jar|zip)(-.)'" \
     "classpath:$state:_path_files -r': ' -/" && return
   ;;
 
@@ -553,7 +553,7 @@ docsrc)
   if compset -P @; then
     _wanted files expl 'package/source list file' _files && return
   else
-    _wanted files expl 'package or source' _files -g '*.java' && return
+    _wanted files expl 'package or source' _files -g '*.java(-.)' && return
   fi
   ;;
 

@@ -46,7 +46,7 @@ _x_arguments "$args[@]" \
   '-default[set root background to default]' \
   '-fit[use default visual and colormap]' \
   '-fullscreen[use whole screen, surrounding image with border]' \
-  "-goto[specify image to display at end]:image name:_files -W ipath -g '*(#i)(${(j:|:)extension})(|${(j:|:)filters})'" \
+  "-goto[specify image to display at end]:image name:_files -W ipath -g '*(#i)(${(j:|:)extension})(|${(j:|:)filters})(-.)'" \
   '(*)-help[display information on options]' \
   '-identity[identify supplied images instead of displaying]' \
   '-install[forcibly install image colormap on focus]' \
@@ -84,7 +84,7 @@ _x_arguments "$args[@]" \
   '*-halftone[force halftone dithering]' \
   '*-invert[invert a monochrome image]' \
   '*-merge[merge image onto the base image]' \
-  "*-name[specify image name]:picture file:_files -W ipath -g '*(#i)(${(j:|:)extension})(|${(j:|:)filters})'" \
+  "*-name[specify image name]:picture file:_files -W ipath -g '*(#i)(${(j:|:)extension})(|${(j:|:)filters})(-.)'" \
   '*-normalize' \
   '*-rotate[rotate image clockwise]:degrees of rotation:(90 180 270)' \
-  "*:picture file:_files -W ipath -g '*(#i)(${(j:|:)extension})(|${(j:|:)filter})'"
+  "*:picture file:_files -W ipath -g '*(#i)(${(j:|:)extension})(|${(j:|:)filter})(-.)'"

@@ -14,7 +14,7 @@ _x_arguments -C -s \
   '-aofile:file:_files' \
   '(-nosound)*-aop[specify audio output filter]:audio output filter:->audio-plugins' \
   '-aspect:ratio' \
-  '-audiofile:audio file:_files -g "(#i)*.(wav|mp3|ogg)"' \
+  '-audiofile:audio file:_files -g "(#i)*.(wav|mp3|ogg)(-.)"' \
   -autoq:quality -autosync:factor \
   -bandwidth:bandwidth\ value -benchmark -bpp:depth \
   '(-nocache)-cache:cache size (kb)' \
@@ -115,7 +115,7 @@ case "$state" in
     _tags files urls
     while _tags; do
       _requested files expl 'video file' _files -g \
-          "*.(#i)(avi|mp3|mpg|mpe|mpeg|m1v|mov|asf|vob|mjpg|wma|wmv|asx|qt|rm|mkv|mka|ogm|ogg)" && ret=0
+          "*.(#i)(avi|mp3|mpg|mpe|mpeg|m1v|mov|asf|vob|mjpg|wma|wmv|asx|qt|rm|mkv|mka|ogm|ogg)(-.)" && ret=0
       if _requested urls; then
         while _next_label urls expl url; do
           _urls "$expl[@]" && ret=0

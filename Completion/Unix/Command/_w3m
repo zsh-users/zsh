@@ -38,7 +38,7 @@ if [[ -n $state ]]; then
 
   _tags files w3mhistory urls
   while _tags; do
-    _requested files expl 'file' _files -g "*.x#html" && ret=0
+    _requested files expl 'file' _files -g "*.x#html(-.)" && ret=0
     _requested urls expl 'url' _urls && ret=0
     if [[ -s ~/.w3m/history ]] && _requested w3mhistory; then
       w3mhistory=( ${(f)"$(<~/.w3m/history)"} )

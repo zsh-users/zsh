@@ -12,4 +12,4 @@ _arguments \
   '-t[GNU system type]:GNU system type' \
   '--help[display help information]' \
   '--version[display version information]' \
-  '*:changes or dsc file:_files -g "*.(changes|dsc)"'
+  '*:changes or dsc file:_files -g "*.(changes|dsc)(-.)"'

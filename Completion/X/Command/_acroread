@@ -16,10 +16,10 @@ _x_arguments -C \
   '-visual:X visual:_x_visual' \
   '-xrm:X resource specification:_x_resource' \
   '-toPostScript:*::PostScript conversion options:= ->tops' \
-  '*:pdf file:_files -g "*.(#i)pdf"' && return
+  '*:pdf file:_files -g "*.(#i)pdf(-.)"' && return
 
 [[ -n "$state" ]] && _arguments \
-  '-pairs:*:pdf_file_1 ps_file_1 ...:_files -g "*.(#i)(pdf|ps)"' \
+  '-pairs:*:pdf_file_1 ps_file_1 ...:_files -g "*.(#i)(pdf|ps)(-.)"' \
   -binary \
   '-start:integer' \
   '-end:integer' \
@@ -38,6 +38,6 @@ _x_arguments -C \
   -shrink \
   '-size:page size (or custom size wxh in points):(letter tabloid ledger legal executive a3 a4 a5 b4 b5)' \
   '-transQuality:transparency flattening level:(1 2 3 4 5)' \
-  '*:pdf file:_files -g "*.(#i)pdf"' && return
+  '*:pdf file:_files -g "*.(#i)pdf(-.)"' && return
 
 return 1

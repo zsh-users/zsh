@@ -140,7 +140,7 @@ restrictions)
     outside_telnet print shell suspend telnet_port useragent && return
   ;;
 html)
-  _alternative 'files:file:_files -g "*.x#html"' 'urls:url:_urls' && return
+  _alternative 'files:file:_files -g "*.x#html(-.)"' 'urls:url:_urls' && return
   ;;
 esac
 

@@ -16,9 +16,9 @@ _bsd_pkg_pkgfiles() {
   pkgsdir=${PACKAGES:-$portsdir/packages}/All
 
   paths=( "${(@)${(@s.:.)PKG_PATH}:#}" )
-  _files "$@" -g '*.t[bg]z' && ret=0
-  (( $#path )) && _files "$@" -W paths -g '*.t[bg]z' && ret=0
-  compadd "$@" - $pkgsdir/*.t[bg]z && ret=0
+  _files "$@" -g '*.t[bg]z(-.)' && ret=0
+  (( $#path )) && _files "$@" -W paths -g '*.t[bg]z(-.)' && ret=0
+  compadd "$@" - $pkgsdir/*.t[bg]z(-.) && ret=0
 
   return ret
 }

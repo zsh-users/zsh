@@ -172,10 +172,10 @@ _rpm () {
 	'*:package:->package' && ret=0
       ;;
     build_b)
-      tmp=( '*:spec file:_files -g \*.spec' )
+      tmp=( '*:spec file:_files -g "*.spec(-.)"' )
       ;&
     build_t)
-      (( $#tmp )) || tmp=( '*:tar file:_files -g \*.\(\#i\)tar\(.\*\|\)' )
+      (( $#tmp )) || tmp=( '*:tar file:_files -g "*.(#i)tar(.*|)(-.)"' )
 
       _arguments -s \
 	"${commonopts[@]}" "${pathopts[@]}" \
@@ -258,21 +258,21 @@ _rpm () {
       ;;
     spec_files)
       _wanted specfiles expl 'spec file' \
-	  _files -g \*.spec && ret=0
+	  _files -g '*.spec(-.)' && ret=0
       ;;
     package_file)
       _wanted files expl 'package file' \
-	  _files -g '*.(#i)rpm' && ret=0
+	  _files -g '*.(#i)rpm(-.)' && ret=0
       if [[ -prefix 1 (f|ht)tp:// ]]; then
 	_wanted urls expl 'URL of rpm package file' \
-	    _urls -f -g '*.(#i)rpm' "${expl[@]}" && ret=0
+	    _urls -f -g '*.(#i)rpm(-.)' "${expl[@]}" && ret=0
       else
 	_wanted urls expl 'URL of rpm package file' \
 	    compadd -S '' "${expl[@]}" ftp:// http:// && ret=0
       fi
       ;;
     package_src)
-      _files -g "(#i)*.src.rpm" && ret=0
+      _files -g '(#i)*.src.rpm(-.)' && ret=0
       ;;
     tags)
       local -a suf

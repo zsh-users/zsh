@@ -62,9 +62,9 @@ _regex_arguments _xwit_parse \
   \| "/-iconname$nul/" "$guard" \
      "/$word/" ':option-name:iconname:_x_name' \
   \| "/-bitmap$nul/" "$guard" \
-     "/$word/" ':option-bitmap:bitmap file:_files -g *.xbm' \
+     "/$word/" ':option-bitmap:bitmap file:_files -g *.xbm\(-.\)' \
   \| "/-mask$nul/" "$guard" \
-     "/$word/" ':option-mask:mask file:_files -g *.xbm' \
+     "/$word/" ':option-mask:mask file:_files -g *.xbm\(-.\)' \
   \| "/-iconmove$nul/" "$guard" \
      "/$word/" ':option-iconmove-x:x:' \
      "/$word/" ':option-iconmove-y:y:' \

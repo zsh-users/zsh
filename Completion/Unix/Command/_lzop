@@ -83,10 +83,10 @@ case "$state" in
 	$+opt_args[--test] || $+opt_args[-t] || $+opt_args[--list] ||
 	$+opt_args[-l] || $+opt_args[--ls] || $+opt_args[--info] )); then
       _description files expl 'compressed file'
-      _files "$expl[@]" -g '*.[tl]zo' && ret=0
+      _files "$expl[@]" -g '*.[tl]zo(-.)' && ret=0
     else
       _description files expl 'file to compress'
-      _files "$expl[@]" -g '*~*.[tl]zo' && ret=0
+      _files "$expl[@]" -g '*~*.[tl]zo(-.)' && ret=0
 
     fi
   ;;

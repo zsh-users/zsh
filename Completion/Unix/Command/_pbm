@@ -9,16 +9,16 @@
 local pat expl ret=1
 
 if [[ "$service" = pnm* ]]; then
-  pat='*.(#i)p[bgp]m'
+  pat='*.(#i)p[bgp]m(-.)'
 elif [[ "$service" = *top[bgpn]m ]]; then
-  pat="*.(#i)${service%%top[bgpn]m}"
+  pat="*.(#i)${service%%top[bgpn]m}(-.)"
 else
-  pat="*.(#i)${service[1,3]}"
+  pat="*.(#i)${service[1,3]}(-.)"
 fi
 
 if (( $# + $+_in_pbm )); then
   _wanted files expl 'picture file' _path_files "$@" -g "$pat" - ||
-      _files "$@" "$expl[@]" -g '*.(#i)p[bgp]m'
+      _files "$@" "$expl[@]" -g '*.(#i)p[bgp]m(-.)'
   return
 fi
 
@@ -114,7 +114,7 @@ pbmreduce)
 
 pbmtext)
   _arguments \
-    '(-builtin)-font[specify font file]:font file:_files -g \*.\(\#i\)pbm' \
+    '(-builtin)-font[specify font file]:font file:_files -g "*.(#i)pbm(-.)"' \
     '(-font)-builtin[select builtin font]:builtin font:(bdf fixed)' \
     '-space[add space between characters]:space (pixels)' \
     '*:text'
@@ -184,8 +184,8 @@ pbmtopk)
     '*-v[specify vertical escapement of next character]:vertical escapement' \
     '*-x[specify x offset of next character]:x offset' \
     '*-y[specify y offset of next character]:y offset' \
-    ':pk file:_files -g \*.\(\#i\)pk' \
-    ':tfm file:_files -g \*.\(\#i\)tfm' \
+    ':pk file:_files -g "*.(#i)pk(-.)"' \
+    ':tfm file:_files -g "*.(#i)tfm(-.)"' \
     '*:file:_pbm'
   ;;
 
@@ -269,7 +269,7 @@ pgmtoppm)
     return ret
   elif [[ CURRENT -eq 3 && "$words[2]" = -map ]]; then
     _description files expl 'map file'
-    _files "$expl[@]" -g '*.(#i)ppm'
+    _files "$expl[@]" -g '*.(#i)ppm(-.)'
   else
     _pbm
   fi
@@ -280,7 +280,7 @@ pktopbm)
     '*-x[set width of next bitmap]:width' \
     '*-y[set height of next bitmap]:height' \
     '*-c[set next character number]:character number' \
-    ':pk file:_files -g \*.\(\#i\)pk' \
+    ':pk file:_files -g "*.(#i)pk(-.)"' \
     '*:file:_pbm'
   ;;
 
@@ -332,7 +332,7 @@ pnmcomp)
     '(-valign)-yoff[specify overlay y offset]:y offset' \
     '(-xoff)-align=[specify horizontal alignment for overlay image]:alignment:(left center right)' \
     '(-yoff)-valign=[specify vertical alignment for overlay image]:alignment:(top middle bottom)' \
-    '-alpha[specify alpha mask file]:alpha mask file:_files -g \*.\(\#i\)pgm' \
+    '-alpha[specify alpha mask file]:alpha mask file:_files -g "*.(#i)pgm(-.)"' \
     ':overlay file:_pbm' '*:file:_pbm'
   ;;
 
@@ -384,8 +384,8 @@ pnmhisteq)
   _arguments \
     '-verbose[verbose mode]' \
     '-gray[modify only gray pixels]' \
-    '-rmap[specify input luminosity map file]:luminosity map file:_files -g \*.\(\#i\)pgm' \
-    '-wmap[specify output luminosity map file]:luminosity map file:_files -g \*.\(\#i\)pgm' \
+    '-rmap[specify input luminosity map file]:luminosity map file:_files -g "*.(#i)pgm(-.)"' \
+    '-wmap[specify output luminosity map file]:luminosity map file:_files -g "*.(#i)pgm(-.)"' \
     ':file:_pbm'
   ;;
 pnmhistmap)
@@ -470,7 +470,7 @@ pnmtile)
 pnmtoddif)
   _arguments \
     '-resolution:horizontal resolution::vertical resolution' \
-    ':file:_pbm' ':ddif file:_files -g \*.\(\#i\)ddif'
+    ':file:_pbm' ':ddif file:_files -g "*.(#i)ddif(-.)"'
   ;;
 
 pnmtofits)
@@ -664,7 +664,7 @@ ppmquant)
     return ret
   elif [[ CURRENT -eq 3 && "$words[2]" = -map ]]; then
     _description files expl 'map file'
-    _files "$expl[@]" -g '*.(#i)ppm'
+    _files "$expl[@]" -g '*.(#i)ppm(-.)'
   else
     _pbm
   fi
@@ -798,7 +798,7 @@ ppmtoyuvsplit)
 psidtopgm)
   _arguments \
     ':width' ':height' ':bits per sample' \
-    ':postscript file:_files -g "*.(#i)(ps|eps)"'
+    ':postscript file:_files -g "*.(#i)(ps|eps)(-.)"'
   ;;
 pstopnm)
   _arguments \
@@ -813,7 +813,7 @@ pstopnm)
     '-xborder:x border fraction' '-yborder:y border fraction' \
     '-xmax:maximum width' '-ymax:maximum height' \
     '-xsize:width' '-ysize:height' \
-    ':postscript file:_files -g \*.\(\#i\)\(ps\|eps\)'
+    ':postscript file:_files -g "*.(#i)(ps|eps)(-.)"'
   ;;
 
 rawtopgm)
@@ -848,7 +848,7 @@ rgb3toppm)
 
   if [[ -n "$expl" ]]; then
     _description files expl "$expl"
-    _files "$expl" -g '*.(#i)pgm'
+    _files "$expl" -g '*.(#i)pgm(-.)'
   fi
   ;;
 
@@ -887,5 +887,5 @@ zeisstopnm)
 
 *)
   _wanted files expl 'picture file' _path_files -g "$pat" ||
-      _files "$expl[@]" -g '*.(#i)p[bgp]m'
+      _files "$expl[@]" -g '*.(#i)p[bgp]m(-.)'
 esac
