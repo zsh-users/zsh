@@ -104,7 +104,8 @@ char *curkeymapname;
 
 /* the hash table of keymap names */
 
-static HashTable keymapnamtab;
+/**/
+HashTable keymapnamtab;
 
 /* key sequence reading data */
 

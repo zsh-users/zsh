@@ -6,8 +6,6 @@ _parameters -e
 # Without the `-e' option, we would use the following (see the file
 # Core/_parameters for more enlightenment).
 
-# setopt localoptions extendedglob
-
 # local lp ls n q
 
 # if [[ "$SUFFIX" = *\}* ]]; then

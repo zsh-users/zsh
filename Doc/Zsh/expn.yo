@@ -706,6 +706,12 @@ for exported parameters
 item(tt(unique))(
 for arrays which keep only the first occurrence of duplicated values
 )
+item(tt(hide))(
+for parameters with the `hide' flag
+)
+item(tt(special))(
+for special parameters defined by the shell
+)
 enditem()
 )
 enditem()

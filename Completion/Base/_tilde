@@ -2,12 +2,7 @@
 
 # We use all named directories and user names here. If this is too slow
 # for you or if there are too many of them, you may want to use
-# `compgen -k friends -qS/' or something like that. To get all user names
-# if there are no matches in the `friends' array, add
-#   `(( compstate[nmatches] )) || compgen -nu -qS/'
-# below that.
-
-setopt localoptions extendedglob
+# `compadd -qS/ - "$friends[@]"' or something like that.
 
 local d s dirs list lines revlines i
 
@@ -20,21 +15,20 @@ else
 fi
 
 if [[ -prefix [-+] ]]; then
-  lines=(${(f)"$(dirs -v)"})
+  lines=("$PWD" "$dirstack[@]")
   integer i
   if [[ ( -prefix - && ! -o pushdminus ) ||
 	( -prefix + && -o pushdminus ) ]]; then
     revlines=( $lines )
     for (( i = 1; i <= $#lines; i++ )); do
-      lines[$i]="$((i-1)) -- ${revlines[-$i]##[0-9]#[	 ]#}"
+      lines[$i]="$((i-1)) -- ${revlines[-$i]}"
     done
   else
     for (( i = 1; i <= $#lines; i++ )); do
-      lines[$i]="$((i-1)) -- ${lines[$i]##[0-9]#[	 ]#}"
+      lines[$i]="$((i-1)) -- ${lines[$i]}"
     done
   fi
   list=(${lines%% *})
-
   compset -P '[-+]'
   _description d 'directory stack'
   compadd "$d[@]" -V dirs -S/ -ld lines -Q - "$list[@]" 
@@ -45,6 +39,5 @@ else
   else
     _description d 'named directory'
   fi
-  compgen "$d[@]" -n "$s[@]"
+  compadd "$d[@]" "$s[@]" - "${(@k)nameddirs}"
 fi
-

@@ -4,24 +4,34 @@
 # complete only external commands and executable files. This and a
 # `-' as the first argument is then removed from the arguments.
 
-local nm=$compstate[nmatches] ret=1 expl type=-c
+local nm=$compstate[nmatches] ret=1 expl ext
 
 if [[ "$1" = -e ]]; then
-  type=-m
+  ext=yes
   shift
 elif [[ "$1" = - ]]; then
   shift
 fi
 
 # Complete jobs in implicit fg and bg
-if [[ $type = -c && "$PREFIX[1]" = "%" ]]; then
-  _description expl job
-  compgen "$expl[@]" "$@" -j -P '%'
+if [[ -z "$ext" && "$PREFIX[1]" = "%" ]]; then
+  _job -P '%'
   [[ nm -ne compstate[nmatches] ]] && return
 fi
 
-_description expl command
-compgen "$expl[@]" "$@" $type && ret=0
+_description expl 'external command'
+compadd "$expl[@]" "$@" - "${(k@)commands}" && ret=0
+
+if [[ -z "$ext" ]]; then
+  _description expl 'builtin command'
+  compadd "$expl[@]" "$@" - "${(k@)builtins[(R)^?disabled*]}" && ret=0
+  _description expl 'shell function'
+  compadd "$expl[@]" "$@" - "${(k@)functions[(R)^?disabled*]}" && ret=0
+  _description expl 'alias'
+  compadd "$expl[@]" "$@" - "${(k@)raliases[(R)^?disabled*]}" && ret=0
+  _description expl 'reserved word'
+  compadd "$expl[@]" "$@" - "${(k@)reswords[(R)^?disabled*]}" && ret=0
+fi
 
 if [[ nm -eq compstate[nmatches] ]]; then
   _description expl 'executable file or directory'

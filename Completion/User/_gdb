@@ -47,8 +47,7 @@ else
   if [[ $#w -gt 1 ]]; then
     _files && ret=0
     _description expl 'process ID'
-    list=("${(F)${(@Mr:COLUMNS-1:)${(f)$(ps ${=compconfig[ps_listargs]:-$=compconfig[ps_args]} 2>/dev/null)}[2,-1]:#[ 	]#${PREFIX}[0-9]#${SUFFIX}[ 	]*${w[1]:t}}}
-")
+    list=("${(@M)${(f)$(ps ${=compconfig[ps_listargs]:-$=compconfig[ps_args]} 2>/dev/null)}[2,-1]:#[ 	]#${PREFIX}[0-9]#${SUFFIX}[ 	]*${w[1]:t}*}")
     compadd "$expl[@]" -ld list - ${${${(M)${(f)"$(ps $=compconfig[ps_args] 2>/dev/null)"}:#*${w[1]:t}*}## #}%% *} && ret=0
 
     return ret

@@ -2,7 +2,7 @@ texinode(The parameter Module)(The sched Module)(The mathfunc Module)(Zsh Module
 sect(The parameter Module)
 cindex(parameters, special)
 The tt(parameter) module gives access to some of the internal hash
-tables used by the shell, by defining four special associative arrays.
+tables used by the shell by defining some special parameters.
 
 startitem()
 vindex(options)
@@ -32,6 +32,31 @@ key in it is like defining a function with the name given by the key
 and the body given by the value. Unsetting a key removes the
 definition for the function named by the key.
 )
+vindex(builtins)
+item(tt(builtins))(
+This association gives information about the builtin commands
+currently known. The keys are the names of the builtin commands and
+the values are either `tt(undefined)' for builtin commands that will
+automatically be loaded from a module if invoked or `tt(defined)' for
+builtin commands that are already loaded. Also, the string
+`tt(<disabled> )' will be prepended to the value if the builtin
+command is currently disabled.
+)
+vindex(reswords)
+item(tt(reswords))(
+This association maps the reserved words to one of `tt(<enabled>)' or
+`tt(<disabled>)' for enabled and disabled reserved words, respectively.
+)
+vindex(raliases)
+item(tt(raliases))(
+This maps the names of the regular aliases currently defined to their
+expansions. For disabled aliases the string `tt(<disabled>)' is
+prepended to their value.
+)
+vindex(galiases)
+item(tt(galiases))(
+Like tt(raliases), but for global aliases.
+)
 vindex(parameters)
 item(tt(parameters))(
 The keys in this associative array are the names of the parameters
@@ -60,5 +85,40 @@ item(tt(dirstack))(
 A normal array holding the elements of the directory stack. Note that
 the output of the tt(dirs) builtin command includes one more
 directory, the current working directory.
+)
+vindex(history)
+item(tt(history))(
+This association maps history event numbers to the full history lines.
+)
+vindex(historywords)
+item(tt(historywords))(
+A special array containing the words stored in the history.
+)
+vindex(jobtexts)
+item(tt(jobtexts))(
+This association maps job numbers to the texts of the command lines
+that were used to start the jobs.
+)
+vindex(jobstates)
+item(tt(jobstates))(
+This association gives information about the states of the jobs
+currently known. The keys are the job numbers and the values are
+strings of the form
+`var(job-state):var(pid)tt(=)var(state)tt(...)'. The var(job-state)
+gives the state the whole job is currently in, one of `tt(running)',
+`tt(suspended)', or `tt(done)'. This is follwed by one
+`var(pid)tt(=)var(state)' for every process in the job. The var(pid)s
+are, of course, the process IDs and the var(state) describes the state 
+of that process.
+)
+vindex(nameddirs)
+item(tt(nameddirs))(
+This association maps the names of named directories to the pathnames
+they stand for.
+)
+vindex(userdirs)
+item(tt(userdirs))(
+This association maps user names to the pathnames of their home
+directories.
 )
 enditem()

@@ -13,7 +13,7 @@ completion behaviour and which may be bound to keystrokes, are referred to
 as `widgets'.
 
 Note that with the function-based completions described here, it
-is also possible to use the `tt(compctl -M ...)' mechanism and the
+is also possible to use the 
 tt(compmatchers) special array to specify
 global matching control, such as case-insensitivity (`tt(abc)' will complete
 to a string beginning `tt(ABC)'), or wildcard behaviour on
@@ -21,10 +21,11 @@ certain anchors (`tt(a-d)' will complete to abc-def as if there were a
 `tt(*)' after the `a').  See
 ifzman(the section `Matching Control' in zmanref(zshcompctl))\
 ifnzman(noderef(Matching Control))
-for further details. Note that it is recommended to use the the
-tt(compmatchers) array instead of tt(compctl) to define global
-matchers when using the function based completion system, although
-using tt(compctl -M) still works.
+for further details.
+
+Also note that this completion system requires the tt(parameter) and
+tt(zleparameter) modules to be linked into the shell or to be
+dynamically loadable.
 
 startmenu()
 menu(Initialization)
@@ -595,7 +596,7 @@ item(tt(_description))(
 This function gets two arguments: the name of an array and a
 string. It tests if the configuration key tt(description_format) is
 set and if it is, it stores some options in the array that can then be 
-given to the tt(compadd) and tt(compgen) builtin commands to make the
+given to the tt(compadd) builtin command to make the
 value of the tt(description_format) key (with the sequence `tt(%d)'
 replaced by the string given as the second argument) be displayed
 above the matches added. These options also will make sure that the
@@ -704,7 +705,7 @@ completion functions is that it allows completion of partial paths. For
 example, the string `tt(/u/i/s/sig)' may be completed to
 `tt(/usr/include/sys/signal.h)'.  The options `tt(-/)', `tt(-f)', `tt(-g)',
 and `tt(-W)' are available as for the tt(compctl)
-and tt(compgen) builtins; tt(-f) is the default. Additionally, the `tt(-F)'
+and builtin command; tt(-f) is the default. Additionally, the `tt(-F)'
 option from the tt(compadd) builtin is supported, giving direct control
 over which filenames should be ignored as done by the tt(fignore)
 parameter in normal completion.
@@ -744,12 +745,11 @@ extra options of tt(compadd). All arguments are passed unchanged to
 the tt(compadd) builtin.
 )
 item(tt(_options))(
-This can be used to complete option names. The difference to the
-`tt(-o)' option of tt(compgen) is that this function uses a matching
+This can be used to complete option names. It uses a matching
 specification that ignores a leading `tt(no)', ignores underscores and 
 allows the user to type upper-case letters, making them match their
 lower-case counterparts. All arguments passed to this function are
-propagated unchanged to the tt(compgen) builtin.
+propagated unchanged to the tt(compadd) builtin.
 )
 item(tt(_set_options) and tt(_unset_options))(
 These functions complete only set or unset options, with the same
@@ -897,8 +897,8 @@ var(action) does not begin with an opening parentheses or brace, it
 will be split into separate words and executed. If the var(action)
 starts with a space, this list of words will be invoked unchanged,
 otherwise it will be invoked with some extra string placed after the
-first word which can be given as arguments to the tt(compadd) and
-tt(compgen) builtins and which make sure that the var(message) given
+first word which can be given as arguments to the tt(compadd) builtin
+command and which make sure that the var(message) given
 in the description will be shown above the matches. These arguments
 are taken from the array parameter tt(expl) which will be set up
 before executing the var(action) and hence may be used in it (normally 
@@ -1273,9 +1273,9 @@ completions.  Unambiguous parts of the function name will be completed
 automatically (normal completion is not available at this point) until a
 space is typed.
 
-Otherwise, any other string, for example `tt(-b)', will be passed as
-arguments to tt(compgen) and should hence be a set of flags specifying the
-type of completion.
+Otherwise, any other string, will be passed as
+arguments to tt(compadd) and should hence be an expression specifying
+what should be completed.
 
 A very restricted set of editing commands is available when reading the
 string:  `tt(DEL)' and `tt(^H)' delete the last character; `tt(^U)' deletes

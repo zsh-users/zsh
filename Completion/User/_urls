@@ -37,8 +37,6 @@
 #    name used by a user placing web pages within their home area.
 #    e.g. compconf urls_localhttp=www:/usr/local/apache/htdocs:public_html
 
-setopt localoptions extendedglob
-
 local ipre scheme host user hosts ret=1 expl
 local urls_path="${compconfig[urls_path]:-${ZDOTDIR:-$HOME}/.zsh/urls}"
 local localhttp_servername="${${(@s.:.)compconfig[urls_localhttp]}[1]}"

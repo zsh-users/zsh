@@ -1,9 +1,6 @@
-moddeps="comp1"
+moddeps="complete"
 
-autobins="compctl compgen compadd compset"
+autobins="compctl"
 
-autoprefixconds="prefix suffix between after"
-
-autoparams="compmatchers"
-
+headers="compctl.h"
 objects="compctl.o"

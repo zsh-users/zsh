@@ -12,7 +12,7 @@ completion functions. In short, these builtin commands are:
 
 startitem()
 item(tt(compdisplay) var(name) var(string) var(defs) ...)(
-The var(defs) are strings should be of the form
+The var(defs) are strings which should be of the form
 `var(str)tt(:)var(descr)' (the intended use is that the var(descr)
 describes the var(str)) and tt(compdisplay) will convert them to
 strings in which the colon is replaced by the var(string) given as the 

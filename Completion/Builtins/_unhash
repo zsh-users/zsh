@@ -4,19 +4,18 @@ local fl="$words[2]" ret=1 expl
 
 if [[ "$fl" = -*d* ]]; then
   _description expl 'named directory'
-  compgen "$expl[@]" -n && ret=0
+  compadd "$expl[@]" - "${(@k)nameddirs}" && ret=0
 fi
 if [[ "$fl" = -*a* ]]; then
   _description expl alias
-  compgen "$expl[@]" -a && ret=0
+  compadd "$expl[@]" - "${(@k)aliases}" && ret=0
 fi
 if [[ "$fl" = -*f* ]]; then
   _description expl 'shell function'
-  compgen "$expl[@]" -F && ret=0
+  compadd "$expl[@]" - "${(@k)functions}" && ret=0
 fi
 if [[ "$fl" != -* ]]; then
-  _description expl command
-  compgen "$expl[@]" -m && ret=0
+  _command_names -e && ret=0
 fi
 
 return ret

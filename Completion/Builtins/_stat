@@ -3,8 +3,7 @@
 local expl
 
 if [[ "$words[CURRENT-1]" = -[AH] ]]; then
-  _description expl array
-  compgen "$expl[@]" -A
+  _arrays
 else
   _description expl 'inode element'
   [[ "$PREFIX[1]" = + ]] &&

@@ -146,6 +146,17 @@ typedef struct cutbuffer *Cutbuffer;
 
 /* Convenience macros for the hooks */
 
-#define LISTMATCHESHOOK (zlehooks + 0)
-#define INSERTMATCHHOOK (zlehooks + 1)
-#define MENUSTARTHOOK   (zlehooks + 2)
+#define LISTMATCHESHOOK   (zlehooks + 0)
+#define INSERTMATCHHOOK   (zlehooks + 1)
+#define MENUSTARTHOOK     (zlehooks + 2)
+#define COMPCTLMAKEHOOK   (zlehooks + 3)
+#define COMPCTLBEFOREHOOK (zlehooks + 4)
+#define COMPCTLAFTERHOOK  (zlehooks + 5)
+
+/* compctl hook data structs */
+
+struct ccmakedat {
+    char *str;
+    int incmd;
+    int lst;
+};

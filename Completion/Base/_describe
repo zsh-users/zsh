@@ -2,8 +2,6 @@
 
 # This can be used to add options or values with descriptions as matches.
 
-setopt localoptions extendedglob
-
 local isopt cmd opt expl tmps tmpd tmpmd tmpms ret=1 showd _nm hide
 
 cmd="$words[1]"

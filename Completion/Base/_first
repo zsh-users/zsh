@@ -55,7 +55,7 @@
 #         else
 #           _description -V expl "history ($n)"
 #         fi
-#         if compgen "$expl[@]" -Q -H $(( i*10 )) ''; then
+#         if compadd "$expl[@]" -Q - "${(@)historywords:#[\$'\"]*}"; then
 #           # We have found at least one matching word, so we switch
 #           # on menu-completion and make sure that no other
 #           # completion function is called by setting _compskip.

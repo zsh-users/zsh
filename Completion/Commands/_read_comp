@@ -6,9 +6,9 @@
 # evaluate to generate the completions; unambiguous strings in the function
 # name are automatically completed.
 #
-# Else it is taken to be a set of arguments for compgen to generate a list
+# Else it is taken to be a set of arguments for compadd to generate a list
 # of choices.  The possibilities are the same as the flags for generating
-# completions given in the zshcompctl manual page.  Note the arguments are
+# completions given in the zshcompwid manual page.  Note the arguments are
 # verbatim:  include minus signs, spaces, quotes, etc.
 #
 # On subsequent calls, the same completion will be re-performed.  To
@@ -37,7 +37,7 @@ if [[ compstate[matcher] -gt 1 ||
   if [[ $_read_comp = _* ]]; then
     eval $_read_comp
   else
-    eval "compgen $_read_comp"
+    eval "compadd $_read_comp"
   fi
   return
 fi
@@ -154,5 +154,5 @@ zle -cR ''
 if [[ $str = _* ]]; then
   eval $str
 else
-  eval "compgen $str"
+  eval "compadd $str"
 fi

@@ -10,4 +10,4 @@ _description expl user
 [[ "${(t)users}" = *array* ]] &&
     compadd "$expl[@]" "$@" - "$users[@]" && return 0
 
-compgen "$@" "$expl[@]" -u
+compadd "$@" "$expl[@]" - "${(@k)userdirs}"

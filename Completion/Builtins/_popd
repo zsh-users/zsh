@@ -5,6 +5,45 @@
 # way round if pushdminus is set). Note that this function is also called
 # from _cd for cd and pushd.
 
+setopt localoptions nonomatch
+
+[[ $PREFIX = [-+]* ]] || return 1
+
+local expl list lines revlines ret=1 i
+
+IPREFIX=$PREFIX[1]
+PREFIX=$PREFIX[2,-1]
+
+# get the list of directories with their canonical number
+# and turn the lines into an array, removing the current directory
+lines=( "$dirstack[@]" )
+if [[ ( $IPREFIX = - && ! -o pushdminus ) ||
+      ( $IPREFIX = + && -o pushdminus ) ]]; then
+  integer i
+  revlines=( $lines )
+  for (( i = 1; i <= $#lines; i++ )); do
+    lines[$i]="$((i-1)) -- ${revlines[-$i]}"
+  done
+else
+  for (( i = 1; i <= $#lines; i++ )); do
+    lines[$i]="$i -- ${lines[$i]}"
+  done
+fi
+# get the array of numbers only
+list=(${lines%% *})
+_description expl 'directory stack index'
+compadd "$expl[@]" -ld lines -V dirs -Q - "$list[@]" && ret=0
+[[ -z $compstate[list] ]] && compstate[list]=list && ret=0
+[[ -n $compstate[insert] ]] && compstate[insert]=menu && ret=0
+
+return ret
+#compdef popd
+
+# This just completes the numbers after +, showing the full directory list
+# with numbers. For - we do the same thing, but reverse the numbering (other
+# way round if pushdminus is set). Note that this function is also called
+# from _cd for cd and pushd.
+
 emulate -L zsh
 setopt extendedglob nonomatch
 

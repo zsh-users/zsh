@@ -551,13 +551,13 @@ bin_zle_complete(char *name, char **args, char *ops, char func)
     Widget w, cw;
 
 #ifdef DYNAMIC
-    if (!require_module(name, "compctl", 0, 0)) {
-	zerrnam(name, "can't load compctl module", NULL, 0);
+    if (!require_module(name, "complete", 0, 0)) {
+	zerrnam(name, "can't load complete module", NULL, 0);
 	return 1;
     }
 #else
-    if (!makecompparamsptr) {
-	zerrnam(name, "compctl module not available", NULL, 0);
+    if (!module_linked("complete")) {
+	zerrnam(name, "complete module not available", NULL, 0);
 	return 1;
     }
 #endif

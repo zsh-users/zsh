@@ -1,0 +1,11 @@
+hasexport=1
+
+moddeps="zle"
+
+autobins="compgen compadd compset"
+
+autoprefixconds="prefix suffix between after"
+
+autoparams="compmatchers"
+
+objects="complete.o"

@@ -5,4 +5,5 @@
 local expl
 
 _description expl 'zsh option'
-compgen "$expl[@]" "$@" -M 'L:|[nN][oO]= M:_= M:{A-Z}={a-z}' -o
+compadd "$expl[@]" "$@" -M 'L:|[nN][oO]= M:_= M:{A-Z}={a-z}' - \
+    "${(@k)options}"

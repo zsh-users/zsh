@@ -8,5 +8,5 @@ else
   local expl
 
   _description expl 'builtin command'
-  compgen "$expl[@]" -eB
+  compadd "$expl[@]" "$@" - "${(k@)builtins[(R)^?disabled*]}"
 fi

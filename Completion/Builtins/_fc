@@ -1,10 +1,9 @@
 #compdef fc
 
-local prev="$words[CURRENT-1]" expl
+local prev="$words[CURRENT-1]"
 
 if [[ "$prev" = -*e ]]; then
-  _description expl command
-  compgen "$expl[@]" -c
+  _command_names -e
 elif [[ "$prev" = -[ARWI]## ]]; then
   _files
 fi

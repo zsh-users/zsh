@@ -3,4 +3,4 @@
 local expl
 
 _description expl array
-compgen "$expl[@]" -A
+compadd "$expl[@]" - "${(@k)parameters[(R)*array*]}"

@@ -6,6 +6,6 @@ if [[ CURRENT -ge 3 ]]; then
 else
   local expl
 
-  _description expl command
-  compgen "$expl[@]" -em
+  _description expl 'external command'
+  compadd "$expl[@]" "$@" - "${(k@)commands}"
 fi

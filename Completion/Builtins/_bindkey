@@ -3,7 +3,7 @@
 # Normally, this completes names of zle widgets, whether the builtin ones
 # or ones defined by the user.  Note that a - allows a wildcard before it,
 # so h-b-s-b will complete to history-beginning-search-backward.  You
-# can alter this by removing the -M ... from the second compgen.
+# can alter this by removing the -M ... from the second compadd.
 #
 # Where appropriate, will complete keymaps instead of widgets.
 
@@ -11,8 +11,8 @@ local expl
 
 if [[ "$words[2]" = -*[DAN]* || "$words[CURRENT-1]" = -*M ]]; then
   _description expl keymap
-  compadd "$expl[@]" - $(bindkey -l)
+  compadd "$expl[@]" - "$zlekeymaps[@]"
 else
   _description expl widget
-  compgen "$expl[@]" -b -M 'r:|-=* r:|=*'
+  compadd "$expl[@]" -M 'r:|-=* r:|=*' - "${(@k)zlewidgets}"
 fi

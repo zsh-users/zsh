@@ -2,5 +2,7 @@
 
 local expl
 
-_description expl alias
-compgen "$expl[@]" -a
+_description expl 'regular alias'
+compadd "$expl[@]" - "${(@k)raliases[(R)^?disabled*]}"
+_description expl 'global alias'
+compadd "$expl[@]" - "${(@k)galiases[(R)^?disabled*]}"

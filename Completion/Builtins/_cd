@@ -11,8 +11,7 @@
 #    it's not a lot of use.  If you don't type the + or - it will
 #    complete directories as normal.
 
-emulate -L zsh
-setopt extendedglob nonomatch
+setopt localoptions nonomatch
 
 local expl
 

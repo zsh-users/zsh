@@ -1,6 +1,6 @@
 #compdef compdef
 
-local func base=2
+local expl func base=2
 
 while [[ $words[base] = -* ]]; do
   case $words[base] in
@@ -12,11 +12,13 @@ while [[ $words[base] = -* ]]; do
 done
 
 if [ "$delete" ]; then
-  compadd ${(k)_comps}
+  _description expl 'completed command'
+  compadd "$expl[@]" - ${(k)_comps}
 else
-  if [[ CURRENT -eq base  ]]; then
-    for func in ${^~fpath:/.}/_(|*[^~])(N:t); compadd -P_ - ${func#_}
+  if [[ CURRENT -eq base ]]; then
+    _description expl 'completion function'
+    compadd "$expl[@]" - ${^fpath:/.}/_(|*[^~])(N:t)
   else
-    compgen -c
+    _command_names
   fi
 fi

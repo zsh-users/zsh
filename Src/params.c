@@ -2012,7 +2012,7 @@ strsetfn(Param pm, char *x)
 /* Function to get value of an array parameter */
 
 /**/
-static char **
+char **
 arrgetfn(Param pm)
 {
     static char *nullarray = NULL;
@@ -2023,7 +2023,7 @@ arrgetfn(Param pm)
 /* Function to set value of an array parameter */
 
 /**/
-static void
+void
 arrsetfn(Param pm, char **x)
 {
     if (pm->u.arr && pm->u.arr != x)

@@ -199,7 +199,7 @@ item(tt(matcher))(
 When completion is performed with a global match specification as defined
 by
 
-indent(tt(compctl -M) var(spec1 ... specN ...))
+indent(tt(compmatchers=)tt(LPAR()) var(spec1 ... specN ...) tt(RPAR()))
 
 this gives the number of the specification string currently in use.
 In this case, matching is performed with each specification in turn.
@@ -358,32 +358,6 @@ enditem()
 texinode(Builtin Commands)(Condition Codes)(Special Parameters)(Completion Widgets)
 sect(Builtin Commands)
 startitem()
-cindex(completion widgets, generating matches with flags)
-findex(compgen)
-item(tt(compgen) var(flags ...))(
-
-Generate matches according to the given var(flags).  These can be any of 
-the normal option flags (not those for extended completion) supported by
-the tt(compctl) builtin command (see
-ifzman(zmanref(zshcompctl))\
-ifnzman(noderef(Programmable Completion Using compctl))\
-) except for the tt(-t) and tt(-l) flags.  However, when using the tt(-K)
-flag, the function given as argument to it cannot access the command
-line with the tt(read) builtin command.
-
-The matches will be generated in the same way as if the completion code
-generated them directly from a tt(compctl)-definition with the same
-flags. The completion code will consider only those matches as
-possible completions that match the prefix and suffix from the special 
-parameters described above. These strings will be compared with the
-generated matches using the normal matching rules and any matching
-specifications given with the tt(-M) flag to tt(compgen) and the
-global matching specifications given via the tt(compctl -M )var(spec1 ...)
-builtin command.
-
-The return value is zero if at least one match was added and non-zero
-otherwise.
-)
 findex(compadd)
 cindex(completion widgets, adding specified matches)
 xitem(tt(compadd) [ tt(-qQfenUaml12) ] [ tt(-F) var(array) ])
@@ -425,8 +399,7 @@ The supported flags are:
 
 startitem()
 item(tt(-P) var(prefix))(
-As for tt(compctl) and tt(compgen), it gives a string to
-be inserted before the given var(words).  The
+This gives a string to be inserted before the given var(words).  The
 string given is not considered as part of the match.
 )
 item(tt(-S) var(suffix))(
@@ -450,12 +423,6 @@ match.
 item(tt(-I) var(ignored-suffix))(
 Like tt(-i), but gives an ignored suffix.
 )
-item(tt(-y) var(array))(
-This gives a number of strings to display instead of the matches. This
-is like the tt(-y) option of the tt(compctl) builtin command but the
-var(array) argument may only be the name of an array parameter or a
-literal array in parentheses containing the strings to display.
-)
 item(tt(-d) var(array))(
 This adds per-match display strings. The var(array) should contain one 
 element per var(word) given. The completion code will then display the 
@@ -474,8 +441,7 @@ options. If it is given, the display strings are listed one per line,
 not arrayed in columns.
 )
 item(tt(-J) var(name))(
-As for tt(compctl) and tt(compgen), this gives the name of the group
-of matches the words should be stored in.
+Gives the name of the group of matches the words should be stored in.
 )
 item(tt(-V) var(name))(
 Like tt(-J) but naming a unsorted group.
@@ -491,12 +457,10 @@ duplicates be kept. Again, groups with and without this flag are in
 different name spaces.
 )
 item(tt(-X) var(explanation))(
-As for tt(compctl) and tt(compgen), the var(explanation) string will be
-printed with the list of matches.
+The var(explanation) string will be printed with the list of matches.
 )
 item(tt(-q))(
-As for tt(compctl) and tt(compgen),
-the suffix given with tt(-S) will be automatically removed if 
+The suffix given with tt(-S) will be automatically removed if 
 the next character typed is a blank or does not insert anything, or if
 the suffix consists of only one character and the next character typed 
 is the same character.
@@ -540,17 +504,15 @@ the tt(AUTO_PARAM_SLASH) and tt(AUTO_PARAM_KEYS) options be used for
 the matches.
 )
 item(tt(-W) var(file-prefix))(
-This option has the same meaning as for the tt(compctl) and
-tt(compgen) builtin commands. Here, however, only one string may be
-given, not an array. This string is a pathname that will be
+This string is a pathname that will be
 prepended to each of the matches formed by the given var(words) together 
 with any prefix specified by the tt(-p) option to form a complete filename
 for testing.  Hence it is only useful if combined with the tt(-f) flag, as
 the tests will not otherwise be performed.
 )
 item(tt(-a))(
-In the tt(compctl) or tt(compgen) commands, the completion code normally
-builds two sets of matches: the normal one where words with one of the 
+The completion code may
+build two sets of matches: the normal one where words with one of the 
 suffixes in the array parameter tt(fignore) are not considered
 possible matches, and the alternate set where the words excluded
 from the first set are stored. Normally only the matches in the first
@@ -574,12 +536,12 @@ literal suffixes enclosed in parentheses and quoted, as in `tt(-F "(.o
 taken as the suffixes.
 )
 item(tt(-Q))(
-As for tt(compctl) and tt(compgen), this flag instructs the completion 
+This flag instructs the completion 
 code not to quote any metacharacters in the words when inserting them
 into the command line.
 )
 item(tt(-M) var(match-spec))(
-As for tt(compctl) and tt(compgen), this gives local match specifications.
+This gives local match specifications.
 Note that they will only be used if the tt(-U) option is not given.
 )
 item(tt(-n))(
@@ -593,7 +555,7 @@ functions that do the matching themselves.
 
 Note that with tt(compadd) this option does not automatically turn on
 menu completion if tt(AUTO_LIST) is set, unlike the corresponding option of
-tt(compctl) and tt(compgen) commands.
+tt(compctl).
 )
 item(tt(-O) var(array))(
 If this option is given, the var(words) are em(not) added to the set of
@@ -714,7 +676,6 @@ This forces anything up to and including the last equal sign to be
 ignored by the completion code.
 )
 item(tt(compcall) [ tt(-TD) ])(
-
 This allows the use of completions defined with the tt(compctl) builtin
 from within completion widgets.  The list of matches will be generated as
 if one of the non-widget completion function (tt(complete-word), etc.)
@@ -727,6 +688,8 @@ tt(-T) and/or tt(-D) flags can be passed to tt(compcall).
 The return value can be used to test if a matching tt(compctl)
 definition was found. It is non-zero if a tt(compctl) was found and
 zero otherwise.
+
+Note that this builtin is defined by the tt(compctl) module.
 )
 enditem()
 
@@ -773,7 +736,7 @@ After that the shell function tt(complete-history) will be invoked
 after typing control-X and TAB. The function should then generate the
 matches, e.g.:
 
-example(complete-history LPAR()RPAR() { compgen -H 0 '' })
+example(complete-history LPAR()RPAR() { compadd - $historywords })
 
 This function will complete words from the history matching the 
 current word.

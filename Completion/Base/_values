@@ -1,7 +1,5 @@
 #autoload
 
-setopt localoptions extendedglob
-
 if compvalues -i "$@"; then
 
   local noargs args opts descr action expl sep

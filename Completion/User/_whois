@@ -1,7 +1,6 @@
 #compdef whois
 
 _whois () {
-  setopt localoptions extendedglob
   _whois_setup
   $_whois_comp
 }

@@ -206,7 +206,6 @@ _ra_gen_func () {
 
   print -lr - \
     "$funcname () {" \
-      'setopt localoptions extendedglob' \
       'local _ra_state _ra_left _ra_right _ra_actions' \
       "_ra_state=$start" \
       '_ra_left=' \
@@ -323,8 +322,6 @@ _ra_gen_parse_state () {
 }
 
 _regex_arguments () {
-  setopt localoptions extendedglob
-
   local funcname="_regex_arguments_tmp"
   local funcdef
 

@@ -3,9 +3,9 @@
 local expl
 
 if [[ CURRENT -eq 2 ]]; then
-  _description expl command
-  compgen "$expl[@]" -c
+  compset -q
+  _normal
 else
   _description expl signal
-  compgen "$expl[@]" -k signals
+  compadd "$expl[@]" - "$signals[@]"
 fi

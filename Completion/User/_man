@@ -1,6 +1,6 @@
 #compdef man apropos whatis
 
-setopt localoptions rcexpandparam extendedglob
+setopt localoptions rcexpandparam
 
 local rep expl star approx
 

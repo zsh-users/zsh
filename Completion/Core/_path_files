@@ -10,7 +10,7 @@ local nm=$compstate[nmatches] menu match matcher
 
 typeset -U prepaths exppaths
 
-setopt localoptions nullglob rcexpandparam extendedglob
+setopt localoptions nullglob rcexpandparam
 unsetopt markdirs globsubst shwordsplit nounset
 
 local sopt='-' gopt='' opt
@@ -109,36 +109,6 @@ orig="${PREFIX}${SUFFIX}"
 [[ $compstate[insert] = (*menu|[0-9]*) || -n "$_comp_correct" ||
    ( $#compstate[pattern_match] -ne 0 &&
      "${orig#\~}" != "${${orig#\~}:q}" ) ]] && menu=yes
-
-# We will first try normal completion called with `compgen', but only if we
-# weren't given a `-F', `-r', or `-R' option or we are in the string.
-
-if [[ -z "$suf" && $#ignore -eq 0 && $#remsfx -eq 0 &&
-      -z "$_comp_correct" ]]; then
-  # First build an array containing the `-W' option, if there is any and we
-  # want to use it. We don't want to use it if the string from the command line
-  # is a absolute path or relative to the current directory.
-
-  if [[ -z "$prepaths[1]" || "$pre[1]" = [~/] || "$pre" = (.|..)/* ]]; then
-    tmp1=()
-  else
-    tmp1=(-W "( $prepaths )")
-  fi
-
-  # Now call compgen.
-
-  if [[ -z "$gopt" ]]; then
-    compgen "$addpfx[@]" "$addsfx[@]" "$group[@]" "$expl[@]" \
-            "$tmp1[@]" "$matcher[@]" $sopt
-  else
-    compgen "$addpfx[@]" "$addsfx[@]" "$group[@]" "$expl[@]" \
-            "$tmp1[@]" "$matcher[@]" $sopt -g "$pats"
-  fi
-
-  # If this generated any matches, we don't want to do in-path completion.
-
-  [[ compstate[nmatches] -eq nm ]] || return 0
-fi
 
 # If given no `-F' option, we want to use `fignore'.
 

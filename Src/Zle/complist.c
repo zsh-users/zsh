@@ -415,7 +415,7 @@ clprintm(Cmgroup g, Cmatch *mp, int mc, int ml, int lastc, int width,
 	    }
 	    putc(file_type(buf->st_mode), shout);
 	    len++;
-	}
+        }
 	if ((len = width - len - 2) > 0) {
 	    if (m->gnum != mselect) {
 		zcoff();

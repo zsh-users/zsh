@@ -3,8 +3,6 @@
 # Complete the arguments of the current command according to the
 # descriptions given as arguments to this function.
 
-setopt localoptions extendedglob
-
 local long cmd="$words[1]" descr mesg
 
 long=$argv[(I)--]

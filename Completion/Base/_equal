@@ -3,6 +3,6 @@
 local expl
 
 _description expl alias
-compgen "$expl[@]" -a
+compadd "$@" "$expl[@]" - "${(@k)aliases[(R)^?disabled*]}"
 _description expl command
-compgen "$expl[@]" -m
+compadd "$@" "$expl[@]" - "${(k@)commands}"

@@ -7,11 +7,11 @@ if [[ "$words[2]" = -*d* ]]; then
     _path_files -g '*(-/)'
   else
     _description expl 'named directory'
-    compgen "$expl[@]" -n -q -S '='
+    compadd "$expl[@]" -q -S '=' - "${(@k)nameddirs}"
   fi
 elif compset -P 1 '*\='; then
   _files -/g '*(*)'
 else
   _description expl command
-  compgen "$expl[@]" -m -q -S '='
+  compadd "$expl[@]" -q -S '=' - "${(@k)commands}"
 fi

@@ -70,22 +70,6 @@ compadd() {
   fi
 }
 
-compgen() {
-  [[ "$*" != *-([a-zA-Z/]#|)U* &&
-     "${#:-$PREFIX$SUFFIX}" -le _comp_correct ]] && return
-
-  if [[ "$PREFIX" = \~*/* ]]; then
-    PREFIX="${PREFIX%%/*}/(#a${_comp_correct})${PREFIX#*/}"
-  else
-    PREFIX="(#a${_comp_correct})$PREFIX"
-  fi
-  if [[ -n "$_correct_prompt" ]]; then
-    builtin compgen "$@" -X "$_correct_prompt" -J _correct
-  else
-    builtin compgen "$@" -J _correct
-  fi
-}
-
 # Now initialise our counter. We also set `compstate[matcher]'
 # to `-1'. This allows completion functions to use the simple
 # `[[ compstate[matcher] -gt 1 ]] && return' to avoid being
@@ -98,11 +82,6 @@ _comp_correct=1
 compstate[matcher]=-1
 
 _correct_prompt="${cfgps//\\%e/1}"
-
-# We also need to set `extendedglob' and make the completion
-# code behave as if globcomplete were set.
-
-setopt extendedglob
 
 [[ -z "$compstate[pattern_match]" ]] && compstate[pattern_match]='*'
 
@@ -135,7 +114,7 @@ while [[ _comp_correct -le comax ]]; do
       compstate[force_list]=list
     fi
     compstate[matcher]="$compstate[total_matchers]"
-    unfunction compadd compgen
+    unfunction compadd
 
     return 0
   fi
@@ -147,6 +126,6 @@ while [[ _comp_correct -le comax ]]; do
 done
 
 compstate[matcher]="$compstate[total_matchers]"
-unfunction compadd compgen
+unfunction compadd
 
 return 1

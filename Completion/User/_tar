@@ -13,9 +13,6 @@
 #    tar itself (GNU tar)
 #  - Things like --directory=... are also completed correctly.
 
-emulate -LR zsh
-setopt extendedglob
-
 local _tar_cmd tf tmp del
 
 # First we collect in `_tar_cmd' single letter options describing what

@@ -3,17 +3,11 @@
 # This should be used to complete parameter names if you need some of the
 # extra options of compadd. It completes only non-local parameters.
 
-setopt localoptions extendedglob
-
 local pars expl
 
 _description expl parameter
 
-if zmodload -e parameter; then
-  pars=( ${(k)parameters[(R)^*local*]} )
-else
-  pars=( ${${${(f)"$(typeset +)"}:#*local *}##* } )
-fi
+pars=( ${(k)parameters[(R)^*local*]} )
 
 compadd "$expl[@]" "$@" - $pars
 

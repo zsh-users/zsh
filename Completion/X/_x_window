@@ -1,7 +1,5 @@
 #autoload
 
-setopt localoptions extendedglob
-
 local list expl
 
 list=( "${(@)${(M@)${(@f)$(xwininfo -root -tree)}:#[ 	]#0x[0-9a-f]# \"*}##[ 	]#}" )

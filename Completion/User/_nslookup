@@ -19,8 +19,6 @@
 # other characters than lower case letters, we try to call the function
 # `_nslookup_host'.
 
-setopt localoptions extendedglob
-
 local state expl ret=1 setopts
 
 setopts=(

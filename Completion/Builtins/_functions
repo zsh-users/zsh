@@ -3,4 +3,4 @@
 local expl
 
 _description expl 'shell function'
-compgen "$expl[@]" -F
+compadd "$expl[@]" "$@" - "${(k@)functions[(R)^?disabled*]}"

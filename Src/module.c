@@ -65,6 +65,21 @@ register_module(char *n)
     } LASTALLOC;
 }
 
+/* Check if a module is linked in. */
+
+/**/
+int
+module_linked(char *name)
+{
+    LinkNode node;
+
+    for (node = firstnode(bltinmodules); node; incnode(node))
+	if (!strcmp((char *) getdata(node), name))
+	    return 1;
+
+    return 0;
+}
+
 /* addbuiltin() can be used to add a new builtin.  It returns zero on *
  * success, 1 on failure.  The only possible type of failure is that  *
  * a builtin with the specified name already exists.  An autoloaded   *
@@ -1401,7 +1416,7 @@ addhookdefs(char const *nam, Hookdef h, int size)
 
     while (size--) {
 	if (addhookdef(h)) {
-	    zwarnnam(nam, "name clash when adding condition `%s'", h->name, 0);
+	    zwarnnam(nam, "name clash when adding hook `%s'", h->name, 0);
 	    hadf = 1;
 	} else
 	    hads = 2;

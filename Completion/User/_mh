@@ -39,8 +39,7 @@ elif compset -P 1 '[+@]' || [[ "$prev" = -draftfolder ]]; then
   _description expl 'MH folder'
   _path_files "$expl[@]" -W mhpath -/
 elif [[ "$prev" = -(editor|(whatnow|rmm|show|more)proc) ]]; then
-  _description expl command
-  compgen "$expl[@]" -c
+  _command_names -e
 elif [[ "$prev" = -file ]]; then
   _files
 elif [[ "$prev" = -(form|audit|filter) ]]; then
@@ -52,7 +51,7 @@ elif [[ "$prev" = -(form|audit|filter) ]]; then
   mhfpath=($mymhdir $mhlib)
 
   _description expl 'MH template file'
-  compgen "$expl[@]" -W mhfpath -g '*(.)'
+  _files "$expl[@]" -W mhfpath -g '*(.)'
 elif [[ "$prev" = -(no|)cc ]]; then
   _description expl 'CC address'
   compadd "$expl[@]" all to cc me
@@ -79,7 +78,7 @@ else
   compadd "$expl[@]" $(mark $foldnam 2>/dev/null | awk -F: '{ print $1 }') &&
       ret=0
   compadd "$expl[@]" reply next cur prev first last all unseen && ret=0
-  compgen "$expl[@]" -W folddir -g '<->' && ret=0
+  _files "$expl[@]" -W folddir -g '<->' && ret=0
 
   return ret
 fi
