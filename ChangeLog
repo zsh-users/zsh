@@ -1,3 +1,8 @@
+2000-05-17  Bart Schaefer  <schaefer@brasslantern.com>
+
+	* 11431: Doc/Zsh/mod_zutil.yo: Chop up the zstyle entry into
+	an itemized list for easier reference.
+
 2000-05-17  Sven Wischnowsky  <wischnow@zsh.org>
 
 	* 11429: Completion/Core/_main_complete: fix completion after

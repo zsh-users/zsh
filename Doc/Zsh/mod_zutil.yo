@@ -11,12 +11,8 @@ xitem(tt(zstyle) [ tt(-L) ])
 xitem(tt(zstyle) [ tt(-) | tt(-)tt(-) ] var(pattern) var(style) var(strings) ...)
 xitem(tt(zstyle -d) [ var(pattern) [ var(styles) ... ] ])
 xitem(tt(zstyle -g) var(name) [ var(pattern) [ var(style) ] ])
-xitem(tt(zstyle -s) var(context) var(style) var(name) [ var(sep) ])
-xitem(tt(zstyle -b) var(context) var(style) var(name))
-xitem(tt(zstyle -a) var(context) var(style) var(name))
-xitem(tt(zstyle -h) var(context) var(style) var(name))
-xitem(tt(zstyle -t) var(context) var(style) [ var(strings) ...])
-xitem(tt(zstyle -T) var(context) var(style) [ var(strings) ...])
+xitem(tt(zstyle -abhs) var(context) var(style) var(name) [ var(sep) ])
+xitem(tt(zstyle -Tt) var(context) var(style) [ var(strings) ...])
 item(tt(zstyle -m) var(context) var(style) var(pattern))(
 This builtin command is used to define and lookup styles. Styles are
 pairs of names and values, where the values consist of any number of
@@ -34,51 +30,67 @@ complex patterns are considered to be more specific than the pattern
 
 The first form (without arguments) lists the definitions in the order
 tt(zstyle) will test them. If the tt(-L) option is given, listing is
-done in the form of calls to tt(zstyle).
+done in the form of calls to tt(zstyle).  Forms with arguments:
 
-In the second form this defines the given var(style) for the
-var(pattern) with the var(strings) as the value.
-
-The third form can be used to delete such definitions. Without
-arguments all definitions are deleted, with a var(pattern) all
-definitions for that pattern are deleted and if any var(styles) are
-given, then only those styles are deleted for the var(pattern).
-
-The fourth form allows to retrieve definitions. The var(name) will be
+startitem()
+item(tt(zstyle) [ tt(-) | tt(-)tt(-) ] var(pattern) var(style) var(strings) ...)(
+Defines the given var(style) for the var(pattern) with the var(strings) as
+the value.
+)
+item(tt(zstyle -d) [ var(pattern) [ var(styles) ... ] ])(
+Delete style definitions. Without arguments all definitions are deleted,
+with a var(pattern) all definitions for that pattern are deleted and if
+any var(styles) are given, then only those styles are deleted for the
+var(pattern).
+)
+item(tt(zstyle -g) var(name) [ var(pattern) [ var(style) ] ])(
+Retrieve a style definition. The var(name) is
 used as the name of an array in which the results are stored. Without
 any further arguments, all var(patterns) defined are returned. With a
 var(pattern) the styles defined for that pattern are returned and with 
 both a var(pattern) and a var(style), the value strings of that
 combination is returned.
+)
+enditem()
 
-The other forms can be used to look up or test patterns. With the
-tt(-s) option, the value of the style is returned as a string in the
-parameter var(name). For this, the strings from the value are
-concatenated with spaces (or the var(sep) string if that is given)
-between them. The tt(-b) option makes the value be returned as a
-boolean, i.e. as the string tt(yes) if the value has only one string
-and that is equal to one of tt(yes), tt(true), tt(on), or tt(1). If
-the value has more than one string or only one but that is different
-from the strings mentioned, the parameter will be set to tt(no). The
-tt(-a) option makes the value be returned as an array and the tt(-h)
-makes it be returned as an associative array (with the first, third,
-etc. string being used as the keys and the other strings being used as 
-the values).
+The other forms can be used to look up or test patterns.
 
-The tt(-t) options can be used to test the value of a style, i.e. it
-only sets the return value. Without any var(strings) arguments it is
-zero if the style is defined for at least one matching pattern, has
-only one string in its value and that is equal to one of tt(true),
-tt(yes), tt(on) or tt(1). If any var(strings) are given the return
-zero if and only if at least one of the var(strings) is equal to at
-least one of the strings in the value. If the style is not defined,
-the return value is tt(2).
+startitem()
+item(tt(zstyle -s) var(context) var(style) var(name) [ var(sep) ])(
+The parameter var(name) is set to the value of the style interpreted as a
+string.  If the value contains several strings they are concatenated with
+spaces (or with the var(sep) string if that is given) between them.
+)
+item(tt(zstyle -b) var(context) var(style) var(name))(
+The value is stored in var(name) as a boolean, i.e. as the string
+`tt(yes)' if the value has only one string and that string is equal to one
+of `tt(yes)', `tt(true)', `tt(on)', or `tt(1)'. If the value is any other
+string or has more than one string, the parameter is set to `tt(no)'.
+)
+xitem(tt(zstyle -a) var(context) var(style) var(name))
+item(tt(zstyle -h) var(context) var(style) var(name))(
+With the tt(-a) option the value is stored in var(name) as an array and
+with tt(-h) as an associative array (with the first, third, etc. string
+being used as the keys and the other strings being used as the values).
+)
+xitem(tt(zstyle -t) var(context) var(style) [ var(strings) ...])
+item(tt(zstyle -T) var(context) var(style) [ var(strings) ...])(
+Test the value of a style, i.e. the tt(-t) option only returns a status
+(sets tt($?)).  Without any var(strings) the return status is zero if the
+style is defined for at least one matching pattern, has only one string in
+its value, and that is equal to one of `tt(true)', `tt(yes)', `tt(on)' or
+`tt(1)'. If any var(strings) are given the status is zero if and only if
+at least one of the var(strings) is equal to at least one of the strings
+in the value. If the style is not defined, the status is tt(2).
 
 The tt(-T) option is like tt(-t) but returns zero if the style is not
 set for any matching pattern.
-
-The tt(-m) option can be used to match a value. It returns zero if the 
+)
+item(tt(zstyle -m) var(context) var(style) var(pattern))(
+Match a value. Returns status zero if the 
 var(pattern) matches at least one of the strings in the value.
+)
+enditem()
 )
 findex(zformat)
 xitem(tt(zformat -f) var(param) var(format) var(specs) ...)
