@@ -12,6 +12,8 @@
     split(sigtail, tmp)
     signam = substr(tmp[1], 4, 20)
     signum = tmp[2]
+    if (signam == "CHLD" && sig[signum] == "CLD")  sig[signum] = ""
+    if (signam == "POLL" && sig[signum] == "IO")  sig[signum] = ""
     if (sig[signum] == "") {
 	sig[signum] = signam
 	if (0 + max < 0 + signum && signum < 60)

@@ -1,3 +1,8 @@
+2004-11-19  Peter Stephenson  <pws@csr.com>
+
+	* 20566: Src/signames2.awk: prefer SIGCHLD to SIGCLD.
+	Also (unposted) prefer SIGPOLL to SIGIO.
+
 2004-11-18  Clint Adams  <clint@zsh.org>
 
 	* unposted: Completion/Unix/Command/_bogofilter: fix -w/-p typo, which was
