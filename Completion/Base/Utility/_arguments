@@ -186,6 +186,8 @@ while [[ "$1" = -(O*|[CRWsw]) ]]; do
   esac
 done
 
+[[ "$PREFIX" = [-+] ]] && alwopt=arg
+
 zstyle -s ":completion:${curcontext}:options" auto-description autod
 
 if (( $# )) && comparguments -i "$autod" "$singopt[@]" "$@"; then
@@ -227,106 +229,108 @@ if (( $# )) && comparguments -i "$autod" "$singopt[@]" "$@"; then
   while true; do
     while _tags; do
       anum=1
-      while [[ anum -le  $#descrs ]]; do
+      if [[ -z "$tried" ]]; then
+        while [[ anum -le  $#descrs ]]; do
 
-	action="$actions[anum]"
-	descr="$descrs[anum]"
-	subc="$subcs[anum++]"
+	  action="$actions[anum]"
+	  descr="$descrs[anum]"
+	  subc="$subcs[anum++]"
 
-        if [[ -z "$tried" ]] && { [[ -n "$matched" ]] || _requested "$subc" }; then
+          if [[ -n "$matched" ]] || _requested "$subc"; then
 
-          curcontext="${oldcontext%:*}:$subc"
+            curcontext="${oldcontext%:*}:$subc"
 
-          _description "$subc" expl "$descr"
+            _description "$subc" expl "$descr"
 
-          if [[ "$action" = \=\ * ]]; then
-            action="$action[3,-1]"
-            words=( "$subc" "$words[@]" )
-	    (( CURRENT++ ))
-          fi
-
-          if [[ "$action" = -\>* ]]; then
-	    action="${${action[3,-1]##[ 	]#}%%[ 	]#}"
-	    if (( ! $state[(I)$action] )); then
-              comparguments -W line opt_args
-              state=( "$state[@]" "$action" )
-	      if [[ -n "$usecc" ]]; then
-	        curcontext="${oldcontext%:*}:$subc"
-	      else
-	        context=( "$context[@]" "$subc" )
-	      fi
-              compstate[restore]=''
-              aret=yes
-            fi
-          else
-            if [[ -z "$local" ]]; then
-              local line
-              typeset -A opt_args
-              local=yes
+            if [[ "$action" = \=\ * ]]; then
+              action="$action[3,-1]"
+              words=( "$subc" "$words[@]" )
+	      (( CURRENT++ ))
             fi
 
-            comparguments -W line opt_args
-
-            if [[ "$action" = \ # ]]; then
-
-              # An empty action means that we should just display a message.
-
-	      _message "$descr"
-	      mesg=yes
-	      tried=yes
-
-            elif [[ "$action" = \(\(*\)\) ]]; then
-
-              # ((...)) contains literal strings with descriptions.
-
-              eval ws\=\( "${action[3,-3]}" \)
-
-              _describe -t "$subc" "$descr" ws -M "$matcher" "$subopts[@]" ||
-                  alwopt=${alwopt:-yes}
-	      tried=yes
-
-            elif [[ "$action" = \(*\) ]]; then
-
-              # Anything inside `(...)' is added directly.
-
-              eval ws\=\( "${action[2,-2]}" \)
-
-              _all_labels "$subc" expl "$descr" compadd "$subopts[@]" -a - ws ||
-                  alwopt=${alwopt:-yes}
-	      tried=yes
-            elif [[ "$action" = \{*\} ]]; then
-
-              # A string in braces is evaluated.
-
-              while _next_label "$subc" expl "$descr"; do
-                eval "$action[2,-2]" && ret=0
-              done
-              (( ret )) && alwopt=${alwopt:-yes}
-	      tried=yes
-            elif [[ "$action" = \ * ]]; then
-
-              # If the action starts with a space, we just call it.
-
-	      eval "action=( $action )"
-              while _next_label "$subc" expl "$descr"; do
-                "$action[@]" && ret=0
-              done
-              (( ret )) && alwopt=${alwopt:-yes}
-	      tried=yes
+            if [[ "$action" = -\>* ]]; then
+	      action="${${action[3,-1]##[ 	]#}%%[ 	]#}"
+	      if (( ! $state[(I)$action] )); then
+                comparguments -W line opt_args
+                state=( "$state[@]" "$action" )
+	        if [[ -n "$usecc" ]]; then
+	          curcontext="${oldcontext%:*}:$subc"
+	        else
+	          context=( "$context[@]" "$subc" )
+	        fi
+                compstate[restore]=''
+                aret=yes
+              fi
             else
+              if [[ -z "$local" ]]; then
+                local line
+                typeset -A opt_args
+                local=yes
+              fi
 
-              # Otherwise we call it with the description-arguments.
+              comparguments -W line opt_args
 
-	      eval "action=( $action )"
-              while _next_label "$subc" expl "$descr"; do
-                "$action[1]" "$subopts[@]" "$expl[@]" "${(@)action[2,-1]}" && ret=0
-	      done
-              (( ret )) && alwopt=${alwopt:-yes}
-	      tried=yes
+              if [[ "$action" = \ # ]]; then
+
+                # An empty action means that we should just display a message.
+
+	        _message "$descr"
+	        mesg=yes
+	        tried=yes
+                alwopt=${alwopt:-yes}
+              elif [[ "$action" = \(\(*\)\) ]]; then
+
+                # ((...)) contains literal strings with descriptions.
+
+                eval ws\=\( "${action[3,-3]}" \)
+
+                _describe -t "$subc" "$descr" ws -M "$matcher" "$subopts[@]" ||
+                    alwopt=${alwopt:-yes}
+	        tried=yes
+
+              elif [[ "$action" = \(*\) ]]; then
+
+                # Anything inside `(...)' is added directly.
+
+                eval ws\=\( "${action[2,-2]}" \)
+
+                _all_labels "$subc" expl "$descr" compadd "$subopts[@]" -a - ws ||
+                    alwopt=${alwopt:-yes}
+	        tried=yes
+              elif [[ "$action" = \{*\} ]]; then
+
+                # A string in braces is evaluated.
+
+                while _next_label "$subc" expl "$descr"; do
+                  eval "$action[2,-2]" && ret=0
+                done
+                (( ret )) && alwopt=${alwopt:-yes}
+	        tried=yes
+              elif [[ "$action" = \ * ]]; then
+
+                # If the action starts with a space, we just call it.
+
+	        eval "action=( $action )"
+                while _next_label "$subc" expl "$descr"; do
+                  "$action[@]" && ret=0
+                done
+                (( ret )) && alwopt=${alwopt:-yes}
+	        tried=yes
+              else
+
+                # Otherwise we call it with the description-arguments.
+
+	        eval "action=( $action )"
+                while _next_label "$subc" expl "$descr"; do
+                  "$action[1]" "$subopts[@]" "$expl[@]" "${(@)action[2,-1]}" && ret=0
+	        done
+                (( ret )) && alwopt=${alwopt:-yes}
+	        tried=yes
+              fi
             fi
           fi
-        fi
-      done
+        done
+      fi
       if [[ -z "$hasopts" &&
             -z "$matched" &&
             ( -z "$tried" || -n "$alwopt" ) &&
