@@ -668,6 +668,7 @@ dosavetrap(int sig, int level)
 	st->list = sigfuncs[sig];
 	unsettrap(sig);
     }
+    sigtrapped[sig] = 0;
     notrapfree--;
     PERMALLOC {
 	if (!savetraps)
@@ -829,6 +830,7 @@ endtrapscope(void)
 
 	    if (sigtrapped[sig])
 		unsettrap(sig);
+	    sigtrapped[sig] = st->flags;
 	    if (st->flags) {
 		List list = (st->flags & ZSIG_FUNC) ?
 		    ((Shfunc) st->list)->funcdef : (List) st->list;
