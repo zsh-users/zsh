@@ -1,6 +1,6 @@
 2002-06-02  Peter Stephenson  <pws@pwstephenson.fsnet.co.uk>
 
-	* 17272: Src/parse.c: `outer() { inner(); }' succeded; when outer
+	* 17273: Src/parse.c: `outer() { inner(); }' succeded; when outer
 	ran it created a bogus `inner' which crashed the shell.  Make
 	original command issue error.
 
