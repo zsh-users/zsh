@@ -1,4 +1,4 @@
-#compdef -P */X11/*
+#autoload
 
 local ret long xargs
 
