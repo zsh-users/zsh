@@ -46,9 +46,11 @@ if [[ ${+_perl_modules} -eq 0 ]]; then
       if [[ $libdir == '.' ]]; then break; fi
 
       # Find all modules
+      if [[ -d $libdir && -x $libdir ]]; then
       cd $libdir
       new_pms=( {[A-Z]*/***/,}*.pm~*blib*(N) )
       cd $OLDPWD
+      fi
 
       # Convert to Perl nomenclature
       new_pms=( ${new_pms:r:fs#/#::#} )

@@ -1,3 +1,9 @@
+2000-05-26  Clint Adams  <schizo@debian.org>
+
+	* 11599: Completion/User/_perl_modules: check to make sure
+	the directories in @INC exist and are executable before
+	trying to cd to them.
+
 2000-05-26  Peter Stephenson  <pws@cambridgesiliconradio.com>
 
 	* 11590: configure.in, Config/defs.mk.in, Etc/MACHINES,
