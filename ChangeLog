@@ -1,4 +1,4 @@
-2000-05-17  Bart Schaefer  <schaefer@brasslantern.com>
+2000-05-17  Bart Schaefer  <schaefer@zsh.org>
 
 	* 11435: Test/53completion.ztst: Update for 11406.
 
