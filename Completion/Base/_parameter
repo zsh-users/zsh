@@ -1,12 +1,3 @@
 #compdef -parameter-
 
 _tags parameters && _parameters -e
-
-# Without the `-e' option, we would use the following (see the file
-# Core/_parameters for more enlightenment).
-
-# if [[ "$compstate[insert]" = *menu* ]]; then
-#   _parameters -s ''
-# else
-#   _parameters -s ' '
-# fi

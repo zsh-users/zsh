@@ -22,6 +22,7 @@ else
     'aliases:alias:compadd - ${(@k)aliases}'
     'reserved-words:reserved word:compadd - ${(@k)reswords}'
     'jobs:: _jobs -t'
+    'parameters:: _parameters -qS= -r "\n\t\- =["'
   )
 fi
 
