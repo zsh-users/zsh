@@ -170,7 +170,14 @@ if [[ "$pre[1]" = \~ ]]; then
     realpath="${userdirs[$linepath]%/}/"
   elif (( $+nameddirs[$linepath] )); then
     realpath="${nameddirs[$linepath]%/}/"
-  elif [[ "$linepath" = [-+][0-9]## ]]; then
+  elif [[ "$linepath" = ([-+]|)[0-9]## ]]; then
+    if [[ "$linepath" != [-+]* ]]; then
+      if [[ -o pushdminus ]]; then
+        linepath="-$linepath"
+      else
+        linepath="+$linepath"
+      fi
+    fi
     if [[ "$linepath" = -* ]]; then
       tmp=$(( $#dirstack $linepath ))
     else
