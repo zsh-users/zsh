@@ -2372,7 +2372,7 @@ execcmd(Estate state, int input, int output, int how, int last1)
 		execute((Cmdnam) hn, cflags & BINF_DASH);
 	    } else {		/* ( ... ) */
 		DPUTS(varspc,
-		      "BUG: assigment before complex command");
+		      "BUG: assignment before complex command");
 		list_pipe = 0;
 		if (subsh_close >= 0)
 		    zclose(subsh_close);

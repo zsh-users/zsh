@@ -93,7 +93,7 @@ struct heredocs *hdocs;
  *
  *   WC_LIST
  *     - data contains type (sync, ...)
- *     - follwed by code for this list
+ *     - followed by code for this list
  *     - if not (type & Z_END), followed by next WC_LIST
  *
  *   WC_SUBLIST
@@ -139,7 +139,7 @@ struct heredocs *hdocs;
  *     - followed by offset to first string
  *     - followed by length of string table
  *     - followed by number of patterns for body
- *     - follwoed by codes for body
+ *     - followed by codes for body
  *     - followed by strings for body
  *
  *   WC_FOR

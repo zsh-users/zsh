@@ -122,7 +122,7 @@ mod_export int parend;
 /**/
 mod_export int nocomments;
 
-/* text of puctuation tokens */
+/* text of punctuation tokens */
 
 /**/
 mod_export char *tokstrings[WHILE + 1] = {

@@ -477,8 +477,8 @@ bin_set(char *nam, char **args, char *ops, int func)
 	hadplus = 0, hadend = 0, sort = 0;
     char **x;
 
-    /* Obsolecent sh compatibility: set - is the same as set +xv *
-     * and set - args is the same as set +xv -- args             */
+    /* Obsolescent sh compatibility: set - is the same as set +xv *
+     * and set - args is the same as set +xv -- args              */
     if (*args && **args == '-' && !args[0][1]) {
 	dosetopt(VERBOSE, 0, 0);
 	dosetopt(XTRACE, 0, 0);
@@ -699,7 +699,7 @@ static int chasinglinks;
 /* The main pwd changing function.  The real work is done by other     *
  * functions.  cd_get_dest() does the initial argument processing;     *
  * cd_do_chdir() actually changes directory, if possible; cd_new_pwd() *
- * does the ancilliary processing associated with actually changing    *
+ * does the ancillary processing associated with actually changing    *
  * directory.                                                          */
 
 /**/
@@ -1409,7 +1409,7 @@ fcgetcomm(char *s)
     return cmd;
 }
 
-/* Perform old=new substituions.  Uses the asgment structure from zsh.h, *
+/* Perform old=new substitutions.  Uses the asgment structure from zsh.h, *
  * which is essentially a linked list of string,replacement pairs.       */
 
 /**/
@@ -1643,7 +1643,7 @@ typeset_single(char *cname, char *pname, Param pm, int func,
 	 * If the original parameter was special and we're creating
 	 * a new one, we need to keep it special.
 	 *
-	 * The -h (hide) flags prevents an existing special being made
+	 * The -h (hide) flag prevents an existing special being made
 	 * local.  It can be applied either to the special or in the
 	 * typeset/local statement for the local variable.
 	 */
@@ -1965,7 +1965,7 @@ bin_typeset(char *name, char **argv, char *ops, int func)
 	    off |= bit;
     roff = off;
 
-    /* Sanity checks on the options.  Remove conficting options. */
+    /* Sanity checks on the options.  Remove conflicting options. */
     if (on & PM_FFLOAT) {
 	off |= PM_RIGHT_B | PM_LEFT | PM_RIGHT_Z | PM_UPPER | PM_ARRAY |
 	    PM_HASHED | PM_INTEGER | PM_EFLOAT;

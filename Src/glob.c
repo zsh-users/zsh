@@ -355,7 +355,7 @@ insert(char *s, int checked)
 
     while (!inserts || (news = dupstring(*inserts++))) {
 	if (colonmod) {
-	    /* Handle the remainder of the qualifer:  e.g. (:r:s/foo/bar/). */
+	    /* Handle the remainder of the qualifier:  e.g. (:r:s/foo/bar/). */
 	    s = colonmod;
 	    modify(&news, &s);
 	}
@@ -685,7 +685,7 @@ parsecomplist(char *instr)
 	/* parse single path component */
 	if (!(p1 = patcompile(instr, compflags|PAT_FILET, &instr)))
 	    return NULL;
-	/* then do the remaining path compoents */
+	/* then do the remaining path components */
 	if (*instr == '/' || !*instr) {
 	    int ef = *instr == '/';
 

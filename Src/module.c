@@ -903,7 +903,7 @@ add_dep(const char *name, char *from)
      * If we were passed an alias, we must resolve it to a final
      * module name (and maybe add the corresponding struct), since otherwise
      * we would need to check all modules to see if they happen
-     * to be aliased to the same thing to implement depencies properly.
+     * to be aliased to the same thing to implement dependencies properly.
      *
      * This should mean that an attempt to add an alias which would
      * have the same name as a module which has dependencies is correctly

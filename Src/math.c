@@ -648,7 +648,7 @@ op(int what)
 		   (a.type != MN_UNSET || what != EQ)) {
 	    /*
 	     * Different types, so coerce to float.
-	     * It may happen during an assigment that the LHS
+	     * It may happen during an assignment that the LHS
 	     * variable is actually an integer, but there's still
 	     * no harm in doing the arithmetic in floating point;
 	     * the assignment will do the correct conversion.

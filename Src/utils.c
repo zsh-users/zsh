@@ -2553,7 +2553,7 @@ getbaudrate(struct ttyinfo *shttyinfo)
 
 /* Escape tokens and null characters.  Buf is the string which should be     *
  * escaped.  len is the length of the string.  If len is -1, buf should be   *
- * null terminated.  If len is non-negative and the third paramerer is not   *
+ * null terminated.  If len is non-negative and the third parameter is not   *
  * META_DUP, buf should point to an at least len+1 long memory area.  The    *
  * return value points to the quoted string.  If the given string does not   *
  * contain any special character which should be quoted and the third        *

@@ -693,7 +693,7 @@ static char *m_high, *m_low;
    size of the small blocks held in a memory block, given a pointer to the
    header of it.  M_SBLEN() gives the size of a memory block that can hold
    an array of small blocks, given the size of these small blocks.  M_BSLEN()
-   caculates the size of the small blocks held in a memory block, given the
+   calculates the size of the small blocks held in a memory block, given the
    length of that block (including the header of the memory block.  M_NSMALL
    is the number of possible block sizes that small blocks should be used
    for. */
@@ -1286,7 +1286,7 @@ bin_mem(char *name, char **argv, char *ops, int func)
 	printf("\nThe list of memory blocks. For each block the following\n");
 	printf("information is shown:\n\n");
 	printf("num\tthe number of this block\n");
-	printf("tnum\tlike num but counted separatedly for used and free\n");
+	printf("tnum\tlike num but counted separately for used and free\n");
 	printf("\tblocks\n");
 	printf("addr\tthe address of this block\n");
 	printf("len\tthe length of the block\n");
@@ -1295,7 +1295,7 @@ bin_mem(char *name, char **argv, char *ops, int func)
 	printf("\t  free\tthis block is free\n");
 	printf("\t  small\tthis block is used for an array of small blocks\n");
 	printf("cum\tthe accumulated sizes of the blocks, counted\n");
-	printf("\tseparatedly for used and free blocks\n");
+	printf("\tseparately for used and free blocks\n");
 	printf("\nFor blocks holding small blocks the number of free\n");
 	printf("blocks, the number of used blocks and the size of the\n");
 	printf("blocks is shown. For otherwise used blocks the first few\n");

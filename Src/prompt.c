@@ -75,7 +75,7 @@ static char *bp;
 
 static char *bufline;
 
-/* bp1 is an auxilliary pointer into the buffer, which when non-NULL is *
+/* bp1 is an auxiliary pointer into the buffer, which when non-NULL is *
  * moved whenever the buffer is reallocated.  It is used when data is   *
  * being temporarily held in the buffer.                                */
 

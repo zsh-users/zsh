@@ -805,7 +805,7 @@ setupvals(void)
     createshfunctable();    /* create hash table for shell functions   */
     createbuiltintable();   /* create hash table for builtin commands  */
     createnameddirtable();  /* create hash table for named directories */
-    createparamtable();     /* create paramater hash table             */
+    createparamtable();     /* create parameter hash table             */
 
     condtab = NULL;
     wrappers = NULL;

@@ -70,7 +70,7 @@ typedef union upat *Upat;
 
 #include "pattern.pro"
 
-/* Number of active parenthesised expressions allowed in backreferencing */
+/* Number of active parenthesized expressions allowed in backreferencing */
 #define NSUBEXP  9
 
 /* definition	number	opnd?	meaning */
@@ -119,7 +119,7 @@ typedef union upat *Upat;
  *
  *  P_ANY, P_ANYOF:  the operand is a null terminated
  *    string.  Normal characters match as expected.  Characters
- *    in the range Meta+PP_ALPHA..Meta+PP_UNKNWN do the approprate
+ *    in the range Meta+PP_ALPHA..Meta+PP_UNKNWN do the appropriate
  *    Posix range tests.  This relies on imeta returning true for these
  *    characters.  We treat unknown POSIX ranges as never matching.
  *    PP_RANGE means the next two (possibly metafied) characters form
@@ -448,7 +448,7 @@ patcompile(char *exp, int inflags, char **endexp)
 }
 
 /*
- * Main body or parenthesised subexpression in pattern
+ * Main body or parenthesized subexpression in pattern
  * Parenthesis (and any ksh_glob gubbins) will have been removed.
  */
 
@@ -830,7 +830,7 @@ patcomppiece(int *flagp)
     for (;;) {
 	/*
 	 * Check if we have a string. First, we need to make sure
-	 * the string doesn't introduce a ksh-like parenthesised expression.
+	 * the string doesn't introduce a ksh-like parenthesized expression.
 	 */
 	kshchar = '\0';
 	if (isset(KSHGLOB) && *patparse && patparse[1] == Inpar) {
@@ -1972,7 +1972,7 @@ patmatch(Upat prog)
 	     * This is just simple cases, matching one character.
 	     * With approximations, we still handle * this way, since
 	     * no approximation is ever necessary, but other closures
-	     * are handled by the more compicated branching method
+	     * are handled by the more complicated branching method
 	     */
 	    op = P_OP(scan);
 	    /* Note that no counts possibly metafied characters */

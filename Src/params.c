@@ -225,7 +225,7 @@ IPDEF9F("@", &pparams, NULL, PM_ARRAY|PM_SPECIAL|PM_DONTIMPORT|PM_READONLY),
 {NULL, NULL},
 #define IPDEF10(A,B,C) {NULL,A,PM_ARRAY|PM_SPECIAL,BR(NULL),SFN(C),GFN(B),stdunsetfn,10,NULL,NULL,NULL,0}
 
-/* The following parameters are not avaible in sh/ksh compatibility *
+/* The following parameters are not available in sh/ksh compatibility *
  * mode. All of these have sh compatible equivalents.                */
 IPDEF1("ARGC", poundgetfn, nullintsetfn, PM_READONLY),
 IPDEF2("HISTCHARS", histcharsgetfn, histcharssetfn, PM_DONTIMPORT),
@@ -678,7 +678,7 @@ createparam(char *name, int flags)
 			 paramtab->getnode(paramtab, name));
 
 	DPUTS(oldpm && oldpm->level > locallevel,
-	      "BUG:  old local parameter not deleteed");
+	      "BUG: old local parameter not deleted");
 	if (oldpm && (oldpm->level == locallevel || !(flags & PM_LOCAL))) {
 	    if (!(oldpm->flags & PM_UNSET) || (oldpm->flags & PM_SPECIAL)) {
 		oldpm->flags &= ~PM_UNSET;
@@ -1205,7 +1205,7 @@ getindex(char **pptr, Value v, int dq)
 
     *s++ = '[';
     s = parse_subscript(s, dq);	/* Error handled after untokenizing */
-    /* Now we untokenize everthing except INULL() markers so we can check *
+    /* Now we untokenize everything except INULL() markers so we can check *
      * for the '*' and '@' special subscripts.  The INULL()s are removed  *
      * in getarg() after we know whether we're doing reverse indexing.    */
     for (tbrack = *pptr + 1; *tbrack && tbrack != s; tbrack++) {
@@ -2269,7 +2269,7 @@ unsetparam_pm(Param pm, int altflag, int exp)
 	    /*
 	     * Re-export the old value which we removed in typeset_single().
 	     * I don't think we need to test for ALL_EXPORT here, since if
-	     * it was used to export the parameter originally the parmeter
+	     * it was used to export the parameter originally the parameter
 	     * should still have the PM_EXPORTED flag.
 	     */
 	    export_param(oldpm);

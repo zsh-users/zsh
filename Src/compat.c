@@ -1,5 +1,5 @@
 /*
- * compat.c - compatibiltiy routines for the deprived
+ * compat.c - compatibility routines for the deprived
  *
  * This file is part of zsh, the Z shell.
  *
@@ -377,7 +377,7 @@ zgetcwd(void)
 }
 
 /* chdir with arbitrary long pathname.  Returns 0 on success, 0 on normal *
- * faliliure and -2 when chdir failed and the current directory is lost.  */
+ * failure and -2 when chdir failed and the current directory is lost.  */
 
 /**/
 mod_export int

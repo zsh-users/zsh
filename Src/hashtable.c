@@ -156,7 +156,7 @@ addhashnode(HashTable ht, char *nam, void *nodeptr)
 	ht->freenode(oldnode);
 }
 
-/* Add a node to a hash table, returning the old node on replacment. */
+/* Add a node to a hash table, returning the old node on replacement. */
 
 /**/
 HashNode

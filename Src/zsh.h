@@ -476,7 +476,7 @@ struct value {
 #define MAX_ARRLEN    262144
 
 /********************************************/
-/* Defintions for word code                 */
+/* Definitions for word code                 */
 /********************************************/
 
 typedef unsigned int wordcode;
@@ -680,7 +680,7 @@ struct eccstr {
 #define WCB_AUTOFN()        wc_bld(WC_AUTOFN, 0)
 
 /********************************************/
-/* Defintions for job table and job control */
+/* Definitions for job table and job control */
 /********************************************/
 
 #ifdef NEED_LINUX_TASKS_H
@@ -1181,7 +1181,7 @@ struct param {
  * could a lot of other things.
  */
 
-#define SUB_END		0x0001	/* match end instead of begining, % or %%  */
+#define SUB_END		0x0001	/* match end instead of beginning, % or %%  */
 #define SUB_LONG	0x0002	/* % or # doubled, get longest match */
 #define SUB_SUBSTR	0x0004	/* match a substring */
 #define SUB_MATCH	0x0008	/* include the matched portion */
@@ -1486,7 +1486,7 @@ enum {
 #define islogin  (isset(LOGINSHELL))
 
 /***********************************************/
-/* Defintions for terminal and display control */
+/* Definitions for terminal and display control */
 /***********************************************/
 
 /* tty state structure */
