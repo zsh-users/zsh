@@ -1799,9 +1799,8 @@ iprintm(Cmgroup g, Cmatch *mp, int mc, int ml, int lastc, int width,
 	nicezputs(m->str, shout);
 	len = niceztrlen(m->str);
 
-	if (isset(LISTTYPES)) {
-	    if (buf)
-		putc(file_type(buf->st_mode), shout);
+	if (isset(LISTTYPES) && buf) {
+	    putc(file_type(buf->st_mode), shout);
 	    len++;
 	}
     }
