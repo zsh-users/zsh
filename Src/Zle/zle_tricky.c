@@ -1158,6 +1158,7 @@ get_comp_string(void)
 		line[ll + addedx] = '\0';
 	    }
 	    lexrestore();
+	    tt = NULL;
 	    goto start;
 	}
     }

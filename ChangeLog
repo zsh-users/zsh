@@ -1,5 +1,8 @@
 2000-10-04  Sven Wischnowsky  <wischnow@zsh.org>
 
+	* 12885: Src/Zle/zle_tricky.c: don't stop parsing too early when
+ 	completing inside a command substitution
+	
 	* 12884: Src/Zle/compcore.c: don't forget a displayed list when
  	starting menu completion
 	
