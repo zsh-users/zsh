@@ -338,7 +338,8 @@ selectlist(LinkList l, size_t start)
     for (t1 = start; t1 != colsz && t1 - start < lines - 2; t1++) {
 	ap = arr + t1;
 	do {
-	    int t2 = strlen(*ap) + 2, t3;
+	    size_t t2 = strlen(*ap) + 2;
+	    int t3;
 
 	    fprintf(stderr, "%d) %s", t3 = ap - arr + 1, *ap);
 	    while (t3)
