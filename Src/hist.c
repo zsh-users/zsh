@@ -794,16 +794,19 @@ hbegin(int dohist)
 void
 histreduceblanks(void)
 {
-    int i, len, pos, needblank;
+    int i, len, pos, needblank, spacecount = 0;
 
-    for (i = 0, len = 0; i < chwordpos; i += 2) {
+    if (isset(HISTIGNORESPACE))
+	while (chline[spacecount] == ' ') spacecount++;
+
+    for (i = 0, len = spacecount; i < chwordpos; i += 2) {
 	len += chwords[i+1] - chwords[i]
 	     + (i > 0 && chwords[i] > chwords[i-1]);
     }
     if (chline[len] == '\0')
 	return;
 
-    for (i = 0, pos = 0; i < chwordpos; i += 2) {
+    for (i = 0, pos = spacecount; i < chwordpos; i += 2) {
 	len = chwords[i+1] - chwords[i];
 	needblank = (i < chwordpos-2 && chwords[i+2] > chwords[i+1]);
 	if (pos != chwords[i]) {
@@ -1044,8 +1047,10 @@ hend(Eprog prog)
 	    } else
 		save = 0;
 	}
-	if (chwordpos <= 2 || should_ignore_line(prog))
+	if (chwordpos <= 2)
 	    save = 0;
+	else if (should_ignore_line(prog))
+	    save = -1;
     }
     if (flag & (HISTFLAG_DONE | HISTFLAG_RECALL)) {
 	char *ptr;
@@ -1058,14 +1063,23 @@ hend(Eprog prog)
 	}
 	if (flag & HISTFLAG_RECALL) {
 	    zpushnode(bufstack, ptr);
-
 	    save = 0;
 	} else
 	    zsfree(ptr);
     }
+    if (save || *chline == ' ') {
+	Histent he;
+	for (he = hist_ring; he && he->flags & HIST_FOREIGN;
+	     he = up_histent(he)) ;
+	if (he && he->flags & HIST_TMPSTORE) {
+	    if (he == hist_ring)
+		curline.histnum = curhist--;
+	    freehistnode((HashNode)he);
+	}
+    }
     if (save) {
 	Histent he;
-	int keepflags;
+	int newflags;
 
 #ifdef DEBUG
 	/* debugging only */
@@ -1081,6 +1095,7 @@ hend(Eprog prog)
 	    if (isset(HISTREDUCEBLANKS))
 		histreduceblanks();
 	}
+	newflags = save > 0? 0 : HIST_OLD | HIST_TMPSTORE;
 	if ((isset(HISTIGNOREDUPS) || isset(HISTIGNOREALLDUPS)) && hist_ring
 	 && histstrcmp(chline, hist_ring->text) == 0) {
 	    /* This history entry compares the same as the previous.
@@ -1089,18 +1104,16 @@ hend(Eprog prog)
 	     * timestamp right.  Perhaps, preserve the HIST_OLD flag.
 	     */
 	    he = hist_ring;
-	    keepflags = he->flags & HIST_OLD; /* Avoid re-saving */
+	    newflags |= he->flags & HIST_OLD; /* Avoid re-saving */
 	    freehistdata(he, 0);
 	    curline.histnum = curhist;
-	} else {
-	    keepflags = 0;
+	} else
 	    he = prepnexthistent();
-	}
 
 	he->text = ztrdup(chline);
 	he->stim = time(NULL);
 	he->ftim = 0L;
-	he->flags = keepflags;
+	he->flags = newflags;
 
 	if ((he->nwords = chwordpos/2)) {
 	    he->words = (short *)zalloc(chwordpos * sizeof(short));
@@ -1893,8 +1906,10 @@ readhistfile(char *fn, int err, int readflags)
 	    } else
 		he->words = (short *)NULL;
 	    addhistnode(histtab, he->text, he);
-	    if (hist_ring != he)
-		curhist--; /* We discarded a foreign duplicate */
+	    if (he->flags & HIST_DUP) {
+		freehistnode((HashNode)he);
+		curhist--;
+	    }
 	}
 	if (start && readflags & HFILE_USE_OPTIONS) {
 	    zsfree(lasthist.text);
@@ -1962,7 +1977,8 @@ savehistfile(char *fn, int err, int writeflags)
     if (out) {
 	for (; he && he->histnum <= xcurhist; he = down_histent(he)) {
 	    if ((writeflags & HFILE_SKIPDUPS && he->flags & HIST_DUP)
-	     || (writeflags & HFILE_SKIPFOREIGN && he->flags & HIST_FOREIGN))
+	     || (writeflags & HFILE_SKIPFOREIGN && he->flags & HIST_FOREIGN)
+	     || he->flags & HIST_TMPSTORE)
 		continue;
 	    if (writeflags & HFILE_SKIPOLD) {
 		if (he->flags & HIST_OLD)
