@@ -3159,22 +3159,25 @@ checkjobs(void)
 {
     int i;
 
-    for (i = 1; i < MAXJOB; i++)
+    for (i = 1; i < MAXJOB; i++) {
 	if (i != thisjob && (jobtab[i].stat & STAT_LOCKED) &&
-	    !(jobtab[i].stat & STAT_NOPRINT))
-	    break;
-    if (i < MAXJOB) {
-	if (jobtab[i].stat & STAT_STOPPED) {
+	    !(jobtab[i].stat & STAT_NOPRINT)) {
+	    if (jobtab[i].stat & STAT_STOPPED) {
 
 #ifdef USE_SUSPENDED
-	    zerr("you have suspended jobs.", NULL, 0);
+		zerr("you have suspended jobs.", NULL, 0);
 #else
-	    zerr("you have stopped jobs.", NULL, 0);
+		zerr("you have stopped jobs.", NULL, 0);
 #endif
 
-	} else
-	    zerr("you have running jobs.", NULL, 0);
-	stopmsg = 1;
+		stopmsg = 1;
+	    } else if (isset(HUP)) {
+		zerr("you have running jobs.", NULL, 0);
+		stopmsg = 1;
+	    }
+	    if (stopmsg)
+		break;
+	}
     }
 }
 
