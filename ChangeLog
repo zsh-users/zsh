@@ -1,5 +1,8 @@
 2000-04-25  Sven Wischnowsky  <wischnow@informatik.hu-berlin.de>
 
+	* 10917: Src/Zle/complist.c, Src/Zle/compresult.c: don't show
+ 	empty hidden matches even in menu-selection
+	
 	* 10916: Completion/Core/_main_complete, Src/Zle/complist.c:
  	re-calculate number of line with mark when needed; make default
  	prompts more consistent

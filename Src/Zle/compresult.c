@@ -951,8 +951,10 @@ do_menucmp(int lst)
 	    } while (!(minfo.group)->mcount);
 	    minfo.cur = minfo.group->matches;
 	}
-    } while (menuacc &&
-	     !hasbrpsfx(*(minfo.cur), minfo.prebr, minfo.postbr));
+    } while ((menuacc &&
+	      !hasbrpsfx(*(minfo.cur), minfo.prebr, minfo.postbr)) ||
+	     (((*minfo.cur)->flags & (CMF_NOLIST | CMF_MULT)) &&
+	      (!(*minfo.cur)->str || !*(*minfo.cur)->str)));
     /* ... and insert it into the command line. */
     metafy_line();
     do_single(*(minfo.cur));
@@ -972,8 +974,10 @@ reverse_menu(Hookdef dummy, void *dummy2)
 	    minfo.cur = (minfo.group)->matches + (minfo.group)->mcount - 1;
 	} else
 	    minfo.cur--;
-    } while (menuacc &&
-	     !hasbrpsfx(*(minfo.cur), minfo.prebr, minfo.postbr));
+    } while ((menuacc &&
+	      !hasbrpsfx(*(minfo.cur), minfo.prebr, minfo.postbr)) ||
+	     (((*minfo.cur)->flags & (CMF_NOLIST | CMF_MULT)) &&
+	      (!(*minfo.cur)->str || !*(*minfo.cur)->str)));
     metafy_line();
     do_single(*(minfo.cur));
     unmetafy_line();
@@ -1244,6 +1248,11 @@ calclist(int showall)
 		    if (!(m->flags & CMF_ROWS))
 			g->flags &= ~CGF_ROWS;
 		} else if (showall || !(m->flags & (CMF_NOLIST | CMF_MULT))) {
+		    if ((m->flags & (CMF_NOLIST | CMF_MULT)) &&
+			(!m->str || !*m->str)) {
+			m->flags |= CMF_HIDE;
+			continue;
+		    }
 		    l = niceztrlen(m->str);
 		    ndisp++;
 		    if (l > glong)

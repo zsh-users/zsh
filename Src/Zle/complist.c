@@ -1589,6 +1589,12 @@ domenuselect(Hookdef dummy, Chdata dat)
     fdat = dat;
     selectlocalmap(mskeymap);
     noselect = 0;
+    while ((menuacc &&
+	    !hasbrpsfx(*(minfo.cur), minfo.prebr, minfo.postbr)) ||
+	   (((*minfo.cur)->flags & (CMF_NOLIST | CMF_MULT)) &&
+	    (!(*minfo.cur)->str || !*(*minfo.cur)->str)))
+	do_menucmp(0);
+
     mselect = (*(minfo.cur))->gnum;
     mline = 0;
     mlines = 999999;
