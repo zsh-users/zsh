@@ -1,3 +1,8 @@
+2003-08-30  Peter Stephenson  <pws@pwstephenson.fsnet.co.uk>
+
+	* c.f. somewhat terse reference in zsh-users/6493:
+	use tinfo library for curses if not found elsewhere.
+
 2003-08-28  Oliver Kiddle  <opk@zsh.org>
 
 	* Completion/Unix/Command/_gcc, Completion/Unix/Command/_mh,
@@ -267,7 +272,7 @@
 	Completion/Unix/Command/_ssh: get hostname from IPREFIX instead
 	of words[CURRENT] to avoid quote characters
 
-	* Michał Politowski: users/6080: Completion/Unix/Command/_ssh:
+	* MichaÅ Politowski: users/6080: Completion/Unix/Command/_ssh:
 	remove one level of quoting on files before using with remote ls
 
 2003-05-07  Peter Stephenson  <pws@csr.com>
@@ -629,7 +634,7 @@
 
 	* unposted: Completion/Unix/Command/_lynx: minor bug fix (missing -g)
 
-	* Thomas K�hler: 17610: Completion/Unix/Command/_ssh: also pass
+	* Thomas Köhler: 17610: Completion/Unix/Command/_ssh: also pass
 	through -F option
 
 	* 17607: Completion/Unix/Command/_ssh: pass through options such as
