@@ -1,0 +1,101 @@
+#compdef wget
+
+local curcontext="$curcontext" state line
+typeset -A opt_args
+
+local tmp1 tmp2
+
+_arguments -C -s \
+  '(--version)-V[version]' '(-V)--version' \
+  '(--help)-h[help]' '(-h)--help' \
+  '(--background)-b[background]' '(-b)--background' \
+  {'(--execute)-e+[execute]','(-e)--execute='}':.wgetrc command:' \
+  {'(--output-file)-o+[output file]','(-o)--output-file='}':log file to output:_files' \
+  {'(--append-output)-a+[append output file]','(-a)--append-output='}':log file to append:_files' \
+  '(--debug)-d[debug]' '(-d)--debug' \
+  '(--quiet)-q[quiet]' '(-q)--quiet' \
+  '(--verbose)-v[verbose]' '(-v)--verbose' \
+  '*-n+[no]:flags:->noflags' \
+  {'(--input-file)-i+[input file]','(-i)--input-file='}':file containing URLs:_files' \
+  '(--force-html)-F[force html]' '(-F)--force-html' \
+  {'(--base)-B+[prepend URL to relative links]','(-B)--base='}':base URL:_urls' \
+  '--bind-address=:address to bind to (hostname or IP):_hosts' \
+  {'(--tries)-t+[tries]','(-t)--tries='}':number of retries:(0)' \
+  {'(--output-document)-O+[output document]','(-O)--output-document='}':output file:_files' \
+  '(--continue)-c[continue]' '(-c)--continue' \
+  '--dot-style=:display style:(default binary mega giga micro)' \
+  '(--timestamping)-N[timestamping]' '(-N)--timestamping' \
+  '(--server-response)-S[server response]' '(-S)--server-response' \
+  '--spider' \
+  {'(--timeout)-T+[timeout]','(-T)--timeout='}':read timeout(seconds):' \
+  {'(--wait)-w+[wait]','(-w)--wait='}':wait between retrievals(seconds):' \
+  '--waitretry=:seconds to wait between retries of a retieval:' \
+  {'(--proxy --use-proxy)-Y+[proxy]','(-Y --use-proxy)--proxy=','(-Y --proxy)--use-proxy='}':proxy:(on off)' \
+  {'(--quota)-Q+[quota]','(-Q)--quota='}':number:' \
+  '(--force-directories)-x[force directories]' '(-x)--force-directories' \
+  {'(--directory-prefix)-P+[directory prefix]','(-P)--directory-prefix='}':prefix:_files -/' \
+  '--cut-dirs=:number:' \
+  '--http-user=:user:' \
+  '--http-passwd=:password:' \
+  '(--html-extension)-E[save all text/html files with a .html extension]' \
+  '(-E)--html-extension' \
+  '--ignore-length' \
+  '--header=:string:' \
+  '--proxy-user=:user:' \
+  '--proxy-passwd=:password:' \
+  '--referer=:url:_urls' \
+  '(--save-headers)-s[save headers]' '(-s)--save-headers' \
+  {'(--user-agent)-U+[user agent]','(-U)--user-agent='}':user-agent:' \
+  '--retr-symlinks' \
+  {'(--glob)-g+[glob]','(-g)--glob='}':glob:(on off)' \
+  '--passive-ftp' \
+  '(--recursive)-r[recursive]' '(-r)--recursive' \
+  {'(--level)-l+[level]','(-l)--level='}':level:(0)' \
+  '--delete-after' \
+  '(--convert-links)-k[convert links]' '(-k)--convert-links' \
+  '(--backup-converted)-K[backup files before conversion]' \
+  '(-K)--backup-converted' \
+  '(--mirror)-m[mirror]' '(-m)--mirror' \
+  '(--page-requisites)-p[get all images needed to display page]' \
+  '(-p)--page-requisites' \
+  {'(--accept)-A+[accept]','(-A)--accept='}':accepted extensions:' \
+  {'(--reject)-R+[reject]','(-R)--reject='}':rejected extensions:' \
+  {'(--domains)-D+[domains]','(-D)--domains='}':accepted domains:' \
+  '--exclude-domains=:rejected domains:' \
+  '--follow-ftp' \
+  '--follow-tags=:HTML tags:' \
+  {'(--ignore-tags)-G+[ignored HTML tags]','(-G)--ignore-tags='}':HTML tags:' \
+  '(--span-hosts)-H[span hosts]' '(-H)--span-hosts' \
+  '(--relative)-L[follow relative links only]' '(-L)--relative' \
+  {'(--include-directories)-I+[include directories]','(-I)--include-directories='}':allowed directories:' \
+  {'(--exclude-directories)-X+[exclude directories]','(-X)--exclude-directories='}':excluded directories:' \
+  '--no-host-lookup' \
+  '--no-parent' \
+  '--non-verbose' \
+  '--no-clobber' \
+  '--no-directories' \
+  '--no-host-directories' \
+  '--dont-remove-listing' \
+  '--cache=:cache:(on off)' \
+  '--htmlify=:htmlify:' \
+  '--no:no:->noflags' \
+  '*:url:_urls' && return 0
+
+#  '--backups:backups:' \
+#  '-W' \
+#  '(--email-address)-E+[email address]' '(-E)--email-address' \
+#  '-C+[cache]:cache:(on off)' \
+#  '--force-hier' \
+
+case "$state" in
+noflags)
+  _values -s '' 'option' \
+    'v[non verbose]' \
+    'h[no host lookup]' \
+    'H[no host directories]' \
+    'd[no directories]' \
+    'c[no clobber]' \
+    'r[don'\''t remove listing]' \
+    'p[no parent]'
+  ;;
+esac
