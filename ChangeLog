@@ -1,3 +1,8 @@
+2000-04-27  Peter Stephenson  <pws@cambridgesiliconradio.com>
+
+	* 10971: Src/pattern.c: noglobdots didn't work with the PAT_ANY
+	flag, which meant that **/ always globbed dots.
+
 2000-04-27  Sven Wischnowsky  <wischnow@informatik.hu-berlin.de>
 
 	* 10967: Completion/Base/_arguments: fix for automatic

@@ -1339,6 +1339,8 @@ pattryrefs(Patprog prog, char *string, int *nump, int *begp, int *endp)
 	    ((prog->flags & PAT_NOANCH) ? 
 	     !strncmp(progstr, string, prog->patmlen)
 	     : !strcmp(progstr, string))) {
+	    if ((prog->flags & PAT_NOGLD) && *string == '.')
+		return 0;
 	    /* in case used for ${..#..} etc. */
 	    patinput = string + prog->patmlen;
 	    /* if matching files, must update globbing flags */
