@@ -63,10 +63,13 @@
 # typing @ or # removes the space which was automatically added.
 # The context used has `at-suffix' or `hash-suffix' in the position
 # before the tag to indicate suffix completion (as always, ^Xh will
-# show you all possible contexts).  This should make it possible
+# show you all possible contexts).  This makes it possible
 # to select changes, dates, labels and clients using the tag-order
-# style, but unfortunately there is a bug which stops any tags afer
-# the first group from being displayed.
+# style.  For example,
+#    zstyle ':completion:*:p4-*:at-suffix:*' tag-order changes '*'
+# will force all completion after `@' to show changes first.  Executing
+# _next_tags (usually ^x^n) will cycle between that and the remaining
+# tags (dates, labels, clients).
 #
 # A # is automatically quoted when handled in this way; if the file is
 # typed by hand or the completion didn't finish (e.g. you typed a character

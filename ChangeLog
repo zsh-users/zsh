@@ -1,3 +1,8 @@
+2003-03-12  Peter Stephenson  <pws@csr.com>
+
+	* 18344: Completion/Unix/Command/_perforce: tag-order is now
+	useful after 18299.
+
 2003-03-12  Doug Kearns  <djkea2@mugca.its.monash.edu.au>
 
 	* unposted: Completion/Debian/Command/_debfoster,
