@@ -139,6 +139,7 @@ IPDEF1("GID", gidgetfn, gidsetfn, PM_DONTIMPORT | PM_RESTRICTED),
 IPDEF1("EGID", egidgetfn, egidsetfn, PM_DONTIMPORT | PM_RESTRICTED),
 IPDEF1("HISTSIZE", histsizegetfn, histsizesetfn, PM_RESTRICTED),
 IPDEF1("RANDOM", randomgetfn, randomsetfn, 0),
+IPDEF1("SAVEHIST", savehistsizegetfn, savehistsizesetfn, PM_RESTRICTED),
 IPDEF1("SECONDS", secondsgetfn, secondssetfn, 0),
 IPDEF1("UID", uidgetfn, uidsetfn, PM_DONTIMPORT | PM_RESTRICTED),
 IPDEF1("EUID", euidgetfn, euidsetfn, PM_DONTIMPORT | PM_RESTRICTED),
@@ -2773,6 +2774,25 @@ histsizesetfn(Param pm, zlong v)
     if ((histsiz = v) < 1)
 	histsiz = 1;
     resizehistents();
+}
+
+/* Function to get value for special parameter `SAVEHIST' */
+
+/**/
+zlong
+savehistsizegetfn(Param pm)
+{
+    return savehistsiz;
+}
+
+/* Function to set value of special parameter `SAVEHIST' */
+
+/**/
+void
+savehistsizesetfn(Param pm, zlong v)
+{
+    if ((savehistsiz = v) < 0)
+	savehistsiz = 0;
 }
 
 /* Function to get value for special parameter `ERRNO' */
