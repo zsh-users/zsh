@@ -1,3 +1,12 @@
+2001-10-12  Oliver Kiddle  <opk@zsh.org>
+
+	* 16018: acconfig.h, zshconfig.ac, Etc/MACHINES,
+	Test/C02cond.ztst: allow dynamic loading to work on MacOS X
+	if the dlcompat library is installed.
+
+	* 15882: zshconfig.ac, Etc/MACHINES, Test/C02cond.ztst: fix
+	build and test problems on MacOS X (Darwin).
+
 2001-10-08  Peter Stephenson  <pws@csr.com>
 
 	* 15974: Etc/BUGS, LICENCE: mention trap EXIT bug fixed (ish)

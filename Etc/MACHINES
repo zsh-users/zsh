@@ -1,4 +1,3 @@
-
 -----------------------------
 ZSH ON SPECIFIC ARCHITECTURES
 -----------------------------
@@ -18,19 +17,36 @@ The format of entries is thus:
 Machines
 --------
 
-Apple/NeXT OpenStep 4.2 for i386.
-	Reported to work at least with gcc 2.8.1 and gawk 2.15 patchlevel
-	6, but not with the bundled cc 2.7.2.1 and awk.
-
-Cray: Unicos (C90 and T90)
+Apple: MacOS X/Darwin 1.4
 	Should build `out-of-the-box'.
 
-Data General: DG/UX 5.4R3.10 MU01 (various AViiONs)
-	Should build `out-of-the-box'.
+	For dynamic loading to work, you need to use the dlcompat library.
+	It can be downloaded from:
+	    http://sourceforge.net/project/showfiles.php?group_id=17203
+
+Red Hat Inc.: Cygwin
+	Should build `out-of-the-box'.  The compilation directory should
+	be on a file system mounted as binary (the mount command shows
+	`binmode'). There are various issues with Cygwin versions before
+	1.3.2 - you are adviced to update to the latest release.
+
+	Dynamic loading works as of cygwin-1.1.3 and binutils-20000722-1.
+	It was not tested for earlier versions. This does not imply
+	that every module will work. New completion and in
+	particular zsh/zftp and zsh/mathfunc are known to work.
+
+	Some of the tests in the Test subdirectory are known to fail:
+	this is because the UNIX environment is not completely implemented.
+
+	Cygwin allows mount without existing mount point (e.g.
+	"mount //server/path /usr/src" where /usr/src does not exist).
+	Path completion will fail inside these mounts; make sure that
+	every mount point really exists.
 
 DEC: Ultrix (Alpha or DECstation)
 DEC: Mach 3.0 (DECstation 5000/25)
 DEC: OSF/1 1.2, 1.3, 2.0, 3.*, DEC Unix 4.* (Alpha)
+Compaq: Tru64
 	In OSF/1 3.x, there is apparently a bug in the header file
 	/usr/include/rpcsvc/ypclnt.h; the prototype for yp_all() has a
 	struct ypall_callback as its final argument, which should be a
@@ -43,10 +59,10 @@ DEC: OSF/1 1.2, 1.3, 2.0, 3.*, DEC Unix 4.* (Alpha)
 	This problem is not related to zsh.  If you have such problems,
 	remove the bogus strip and use /bin/strip instead.
 
-        On Digital UNIX 4.0, compilation with gcc and with --enable-dynamic
-        apparently needs configuring with explicit flags when compiling
-        with debugging enabled:
-          DLLD=gcc LDFLAGS='-g -rpath <path-to-.so-files>' ./configure ...
+	On Digital UNIX 4.0, compilation with gcc and with --enable-dynamic
+	apparently needs configuring with explicit flags when compiling
+	with debugging enabled:
+	 DLLD=gcc LDFLAGS='-g -rpath <path-to-.so-files>' ./configure ...
 
 FreeBSD: FreeBSD 2.2.7, 3.x, 4.x
 	Should build `out-of-the-box'.  On FreeBSD 2.2, dynamic	loading
@@ -60,17 +76,20 @@ HP: HP-UX 9, 10.20, 11.0
 	(rather than the 10.20 shl_load() function set).  More details of
 	any difficulties would be appreciated.
 
+	Compiling with gcc 2.7.1 is known to fail with header file
+	conflicts on HP-UX 11.  Use the HP ANSI C compiler.
+
 IBM: AIX 3.2, 4.1
 	Should build `out-of-the-box', but --enable-zsh-mem will not work.
 
 	On 3.2, for 64-bit integer support you need to compile with gcc, as
-	the native compiler does not support ANSI simulataneously with
+	the native compiler does not support ANSI simultaneously with
 	`long long'.  On 4.1, there appear to be problems using
 	--enable-dynamic (the default) with gcc (version was 2.7.2.3) in
 	4.1, though native cc works. More information about this problem
 	would be appreciated.
 
-Linux: Linux (i[345]86,various Pentia,AMD K6/2)
+Linux: Linux 2.* (various 32-bit and 64-bit processors)
 	Should build `out-of-the-box'.
 
 	If you are using an early minor version of libc 5, then a bug
@@ -94,34 +113,35 @@ Linux: Linux (i[345]86,various Pentia,AMD K6/2)
 NetBSD: NetBSD 1.*
 	Should build `out-of-the-box'.
 
-Next: NextStep 3.*
-	Should build `out-of-the-box', but the zsh malloc routines are
-	not recommended.
-
-SIEMENS: Reliant UNIX
-       Builds `out-of-the-box'. Dynamic loading is supported. 
-       Large Files and 64-bit integers are supported as of version 5.44
-       and CDS/CDS++ compiler.
-
-SIEMENS: SINIX
-       MX (Intel) plattform: SINIX-L/M 5.41
-       Builds out-of-the-box with EGCS. Neither dynamic loading nor
-       64-bit integers are suported. Native compiler was not tried
-       mostly because GCC/EGCS builds out-of-the-box as well. If you 
-       succeed with native compiler, send a patch for this file
-       to zsh-workers.
-
-       RM (MIPS) plattform: SINIX-N/Y 5.42
-       Should build out-of-the-box but it was not tested. Neither
-       dynamic loading nor 64-bit integers are suported.
-       Note, that this version is obsolete and users are expected to 
-       update to Reliant UNIX.
-
-SGI: IRIX 5.1.1.1, 5.2, 5.3, 6.2, 6.3, 6.5
+OpenBSD: OpenBSD 2.6
 	Should build `out-of-the-box'.
 
-        On 6.5.2, zsh malloc routines are reported not to work; also
-        full optimization (cc -O3 -OPT:Olimit=0) causes problems.
+SIEMENS: Reliant UNIX
+	Builds `out-of-the-box'. Dynamic loading is supported. 
+	Large Files and 64-bit integers are supported as of version 5.44
+	and CDS/CDS++ compiler.
+
+SIEMENS: SINIX
+	MX (Intel) platform: SINIX-L/M 5.41
+	Builds out-of-the-box with EGCS. Neither dynamic loading nor
+	64-bit integers are supported. Native compiler was not tried
+	mostly because GCC/EGCS builds out-of-the-box as well. If you 
+	succeed with native compiler, send a patch for this file
+	to zsh-workers.
+
+	RM (MIPS) platform: SINIX-N/Y 5.42
+	Should build out-of-the-box but it was not tested. Neither
+	dynamic loading nor 64-bit integers are supported.
+	Note, that this version is obsolete and users are expected to 
+	update to Reliant UNIX.
+
+SGI: IRIX 6.2, 6.3, 6.5
+	Should build `out-of-the-box'.
+
+	On 6.5.2, zsh malloc routines are reported not to work; also
+	full optimization (cc -O3 -OPT:Olimit=0) causes problems.
+
+	The zpty module is not currently supported.
 
 Sun: SunOS 4.1.*
 	Under 4.1.3 if yellow pages is used, username completion may cause
@@ -147,4 +167,30 @@ Sun: Solaris 2.*
 	enable large file system and integer support on Solaris 2 with gcc.
 	Apparently upgrading to gcc version 2.95.2 fixes this.  If this
 	is not feasible, configure with --disable-lfs.  We would be
-	grateful for more detailed information.
+	grateful for more detailed information.  The most problems seem
+	to occur on Solaris 2.6, where --disable-lfs is recommended.
+
+Other machines
+--------------
+
+Zsh has previously been compiled on the following machines, but the
+developers do not have direct access to them and the reports may be out of
+date.  We would be glad to receive any reports of success or failure on
+these OS's --- and, of course, any others not mentioned in this file.
+
+Apple/NeXT OpenStep 4.2 for i386.
+	Reported to work at least with gcc 2.8.1 and gawk 2.15 patchlevel
+	6, but not with the bundled cc 2.7.2.1 and awk.
+
+Cray: Unicos (C90 and T90)
+	Should build `out-of-the-box'.
+
+Data General: DG/UX 5.4R3.10 MU01 (various AViiONs)
+	Should build `out-of-the-box'.
+
+Next: NextStep 3.*
+	Should build `out-of-the-box', but the zsh malloc routines are
+	not recommended.
+
+SCO: UnixWare 2.1.3
+	Builds `out-of-the-box'.

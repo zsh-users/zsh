@@ -259,7 +259,7 @@
 /* Define to 1 if multiple modules defining the same symbol are OK */
 #undef DYNAMIC_NAME_CLASH_OK
 
-/* The exension used for dynamically loaded modules */
+/* The extension used for dynamically loaded modules */
 #undef DL_EXT
 
 /* Define to 1 if you want to use dynamically loaded modules */
