@@ -7,6 +7,11 @@
 
 2000-04-17  Sven Wischnowsky <wischnow@informatik.hu-berlin.de>
 
+	* 10790: Doc/Zsh/mod_complist.yo, Src/params.c, Src/Zle/compcore.c,
+ 	Src/Zle/complete.c, Src/Zle/complist.c, Src/Zle/compresult.c,
+ 	Src/Zle/zle_tricky.c, Src/Zle/zle_utils.c: scrolling in completion
+ 	lists and menu-selection, version1
+	
 	* 10788: Src/text.c: display newlines as spaces in job-texts
 	
 	* 10782: Src/Zle/computil.c: fix for exclusion lists for -+o

@@ -277,6 +277,7 @@ hstrnstr(char *haystack, int pos, char *needle, int len, int dir, int sens)
  * question is assumed to have been printed already, and the    *
  * cursor is left immediately after the response echoed.        *
  * (Might cause a problem if this takes it onto the next line.) *
+ * If yesno is non-zero:                                        *
  * <Tab> is interpreted as 'y'; any other control character is  *
  * interpreted as 'n'.  If there are any characters in the      *
  * buffer, this is taken as a negative response, and no         *
@@ -284,31 +285,35 @@ hstrnstr(char *haystack, int pos, char *needle, int len, int dir, int sens)
 
 /**/
 mod_export int
-getzlequery(void)
+getzlequery(int yesno)
 {
     int c;
 #ifdef FIONREAD
     int val;
 
-    /* check for typeahead, which is treated as a negative response */
-    ioctl(SHTTY, FIONREAD, (char *)&val);
-    if (val) {
-	putc('n', shout);
-	return 'n';
+    if (yesno) {
+	/* check for typeahead, which is treated as a negative response */
+	ioctl(SHTTY, FIONREAD, (char *)&val);
+	if (val) {
+	    putc('n', shout);
+	    return 'n';
+	}
     }
 #endif
 
     /* get a character from the tty and interpret it */
     c = getkey(0);
-    if (c == '\t')
-	c = 'y';
-    else if (icntrl(c) || c == EOF)
-	c = 'n';
-    else
-	c = tulower(c);
-
+    if (yesno) {
+	if (c == '\t')
+	    c = 'y';
+	else if (icntrl(c) || c == EOF)
+	    c = 'n';
+	else
+	    c = tulower(c);
+    }
     /* echo response and return */
-    putc(c, shout);
+    if (c != '\n')
+	putc(c, shout);
     return c;
 }
 

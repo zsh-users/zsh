@@ -54,22 +54,52 @@ static Keymap mskeymap;
 #define COL_LC 10
 #define COL_RC 11
 #define COL_EC 12
-#define COL_MA 13
+#define COL_TC 13
+#define COL_SP 14
+#define COL_MA 15
+#define COL_HI 16
+#define COL_DU 17
+#define COL_ST 18
 
-#define NUM_COLS 14
+#define NUM_COLS 19
+
+/* Maximum number of in-string colours supported. */
+
+#define MAX_POS 11
 
 /* Names of the terminal strings. */
 
 static char *colnames[] = {
     "no", "fi", "di", "ln", "pi", "so", "bd", "cd", "ex", "mi",
-    "lc", "rc", "ec", "ma", NULL
+    "lc", "rc", "ec", "tc", "sp", "ma", "hi", "du", "st", NULL
 };
 
 /* Default values. */
 
 static char *defcols[] = {
     "0", "0", "1;34", "1;36", "33", "1;35", "1;33", "1;33", "1;32", NULL,
-    "\033[", "m", NULL, "7"
+    "\033[", "m", NULL, "0", "0", "7", "0", "0", "7"
+};
+
+/* This describes a terminal string for a file type. */
+
+typedef struct filecol *Filecol;
+
+struct filecol {
+    Patprog prog;		/* group pattern */
+    char *col;			/* color string */
+    Filecol next;		/* next one */
+};
+
+/* This describes a terminal string for a pattern. */
+
+typedef struct patcol *Patcol;
+
+struct patcol {
+    Patprog prog;
+    Patprog pat;		/* pattern for match */
+    char *cols[MAX_POS + 1];
+    Patcol next;
 };
 
 /* This describes a terminal string for a filename extension. */
@@ -77,6 +107,7 @@ static char *defcols[] = {
 typedef struct extcol *Extcol;
 
 struct extcol {
+    Patprog prog;		/* group pattern or NULL */
     char *ext;			/* the extension */
     char *col;			/* the terminal color string */
     Extcol next;		/* the next one in the list */
@@ -87,7 +118,8 @@ struct extcol {
 typedef struct listcols *Listcols;
 
 struct listcols {
-    char *cols[NUM_COLS];	/* strings for file types */
+    Filecol files[NUM_COLS];	/* strings for file types */
+    Patcol pats;		/* strings for patterns */
     Extcol exts;		/* strings for extensions */
 };
 
@@ -95,11 +127,11 @@ struct listcols {
  * The return value is a pointer to the character after it. */
 
 static char *
-getcolval(char *s)
+getcolval(char *s, int multi)
 {
     char *p;
 
-    for (p = s; *s && *s != ':'; p++, s++) {
+    for (p = s; *s && *s != ':' && (!multi || *s != '='); p++, s++) {
 	if (*s == '\\' && s[1]) {
 	    switch (*++s) {
 	    case 'a': *p = '\007'; break;
@@ -150,8 +182,33 @@ getcolval(char *s)
 static char *
 getcoldef(Listcols c, char *s)
 {
+    Patprog gprog = NULL;
+
+    if (*s == '(') {
+	char *p;
+	int l = 0;
+
+	for (p = s + 1, l = 0; *p && (*p != ')' || l); p++)
+	    if (*p == '\\' && p[1])
+		p++;
+	    else if (*p == '(')
+		l++;
+	    else if (*p == ')')
+		l--;
+
+	if (*p == ')') {
+	    char sav = p[1];
+
+	    p[1] = '\0';
+	    tokenize(s);
+	    gprog = patcompile(s, 0, NULL);
+	    p[1]  =sav;
+
+	    s = p + 1;
+	}
+    }
     if (*s == '*') {
-	Extcol ec;
+	Extcol ec, eo;
 	char *n, *p;
 
 	/* This is for an extension. */
@@ -159,20 +216,67 @@ getcoldef(Listcols c, char *s)
 	n = ++s;
 	while (*s && *s != '=')
 	    s++;
-	if (!*s )
+	if (!*s)
 	    return s;
 	*s++ = '\0';
-	p = getcolval(s);
-	if (*n) {
-	    ec = (Extcol) zhalloc(sizeof(*ec));
-	    ec->ext = n;
-	    ec->col = s;
-	    ec->next = c->exts;
+	p = getcolval(s, 0);
+	ec = (Extcol) zhalloc(sizeof(*ec));
+	ec->prog = gprog;
+	ec->ext = n;
+	ec->col = s;
+	ec->next = NULL;
+	if ((eo = c->exts)) {
+	    while (eo->next)
+		eo = eo->next;
+	    eo->next = ec;
+	} else
 	    c->exts = ec;
-	}
 	if (*p)
 	    *p++ = '\0';
 	return p;
+    } else if (*s == '=') {
+	char *p = ++s, *t, *cols[MAX_POS];
+	int ncols = 0;
+	Patprog prog;
+
+	/* This is for a pattern. */
+
+	while (*s && *s != '=')
+	    s++;
+	if (!*s)
+	    return s;
+	*s++ = '\0';
+	while (1) {
+	    t = getcolval(s, 1);
+	    if (ncols < MAX_POS)
+		cols[ncols++] = s;
+	    s = t;
+	    if (*s != '=')
+		break;
+	    *s++ = '\0';
+	}
+	tokenize(p);
+	if ((prog = patcompile(p, 0, NULL))) {
+	    Patcol pc, po;
+	    int i;
+
+	    pc = (Patcol) zhalloc(sizeof(*pc));
+	    pc->prog = gprog;
+	    pc->pat = prog;
+	    for (i = 0; i < ncols; i++)
+		pc->cols[i] = cols[i];
+	    pc->cols[i] = NULL;
+	    pc->next = NULL;
+	    if ((po = c->pats)) {
+		while (po->next)
+		    po = po->next;
+		po->next = pc;
+	    } else
+		c->pats = pc;
+	}
+	if (*t)
+	    *t++ = '\0';
+	return t;
     } else {
 	char *n = s, *p, **nn;
 	int i;
@@ -185,37 +289,76 @@ getcoldef(Listcols c, char *s)
 	    return s;
 	*s++ = '\0';
 	for (i = 0, nn = colnames; *nn; i++, nn++)
-	    if (!strcmp(n ,*nn))
+	    if (!strcmp(n, *nn))
 		break;
-	p = getcolval(s);
-	if (*nn)
-	    c->cols[i] = s;
+	p = getcolval(s, 0);
+	if (*nn) {
+	    Filecol fc, fo;
+
+	    fc = (Filecol) zhalloc(sizeof(*fc));
+	    fc->prog = (i == COL_EC || i == COL_LC || i == COL_RC ?
+			NULL : gprog);
+	    fc->col = s;
+	    fc->next = NULL;
+	    if ((fo = c->files[i])) {
+		while (fo->next)
+		    fo = fo->next;
+		fo->next = fc;
+	    } else
+		c->files[i] = fc;
+	}
 	if (*p)
 	    *p++ = '\0';
 	return p;
     }
 }
 
+static Filecol
+filecol(char *col)
+{
+    Filecol fc;
+
+    fc = (Filecol) zhalloc(sizeof(*fc));
+    fc->prog = NULL;
+    fc->col = col;
+    fc->next = NULL;
+
+    return fc;
+}
+
+/* Combined length of LC and RC, maximum length of capability strings. */
+
+static int lr_caplen, max_caplen;
+
 /* This initializes the given terminal color structure. */
 
-static int
+static void
 getcols(Listcols c)
 {
     char *s;
-    int i;
+    int i, l;
 
     if (!(s = getsparam("ZLS_COLORS")) &&
 	!(s = getsparam("ZLS_COLOURS"))) {
-	if (!c)
-	    return 1;
 	for (i = 0; i < NUM_COLS; i++)
-	    c->cols[i] = "";
-	
+	    c->files[i] = filecol("");
+	c->pats = NULL;
 	c->exts = NULL;
-	return 1;
+	
+	if ((s = tcstr[TCSTANDOUTBEG]) && s[0]) {
+	    c->files[COL_MA] = filecol(s);
+	    c->files[COL_ST] = filecol(s);
+	    c->files[COL_EC] = filecol(tcstr[TCSTANDOUTEND]);
+	} else {
+	    c->files[COL_MA] = filecol(defcols[COL_MA]);
+	    c->files[COL_ST] = filecol(defcols[COL_ST]);
+	}
+	lr_caplen = 0;
+	if ((max_caplen = strlen(c->files[COL_MA]->col)) <
+	    (l = strlen(c->files[COL_EC]->col)))
+	    max_caplen = l;
+	return;
     }
-    if (!c)
-	return 0;
     /* We have one of the parameters, use it. */
     memset(c, 0, sizeof(*c));
     s = dupstring(s);
@@ -223,312 +366,796 @@ getcols(Listcols c)
 	s = getcoldef(c, s);
 
     /* Use default values for those that aren't set explicitly. */
-    for (i = 0; i < NUM_COLS; i++)
-	if (!c->cols[i])
-	    c->cols[i] = defcols[i];
-    /* Default for missing files. */
-    if (!c->cols[COL_MI])
-	c->cols[COL_MI] = c->cols[COL_FI];
-
-    if (!c->cols[COL_EC]) {
-	char *e = (char *) zhalloc(strlen(c->cols[COL_LC]) +
-				   strlen(c->cols[COL_NO]) +
-				   strlen(c->cols[COL_RC]) + 1);
-
-	/* If no `ec' was given, we is `<lc><no><rc>' as the default. */
-	strcpy(e, c->cols[COL_LC]);
-	strcat(e, c->cols[COL_NO]);
-	strcat(e, c->cols[COL_RC]);
-	c->cols[COL_EC] = e;
+    max_caplen = lr_caplen = 0;
+    for (i = 0; i < NUM_COLS; i++) {
+	if (!c->files[i] || !c->files[i]->col)
+	    c->files[i] = filecol(defcols[i]);
+	if (c->files[i] && c->files[i]->col &&
+	    (l = strlen(c->files[i]->col)) > max_caplen)
+	    max_caplen = l;
     }
+    lr_caplen = strlen(c->files[COL_LC]->col) + strlen(c->files[COL_RC]->col);
+
+    /* Default for missing files. */
+    if (!c->files[COL_MI] || !c->files[COL_MI]->col)
+	c->files[COL_MI] = c->files[COL_FI];
+
+    return;
+}
+
+/* Information about the list shown. */
+
+static int noselect, mselect, inselect, mcol, mline, mcols, mlines, mmlen;
+static int selected, mlbeg = -1, mlend = 9999999, mscroll, mrestlines;
+static int mnew, mlastcols, mlastlines, mhasstat;
+static char *mstatus;
+static Cmatch **mtab, **mmtabp;
+static Cmgroup *mgtab, *mgtabp;
+static struct listcols mcolors;
+
+/* Information for in-string colours. */
+
+static int nrefs;
+static int begpos[MAX_POS], curisbeg;
+static int endpos[MAX_POS];
+static int sendpos[MAX_POS], curissend; /* sorted end positions */
+static char **patcols, *curiscols[MAX_POS];
+static int curiscol;
+
+/* The last color used. */
+
+static char *last_cap;
+
+static void
+zlrputs(Listcols c, char *cap)
+{
+    if (!*last_cap || strcmp(last_cap, cap)) {
+	VARARR(char, buf, lr_caplen + max_caplen + 1);
+
+	strcpy(buf, c->files[COL_LC]->col);
+	strcat(buf, cap);
+	strcat(buf, c->files[COL_RC]->col);
+
+	tputs(buf, 1, putshout);
+
+	strcpy(last_cap, cap);
+    }
+}
+
+static void
+zcputs(Listcols c, char *group, int colour)
+{
+    Filecol fc;
+
+    for (fc = c->files[colour]; fc; fc = fc->next)
+	if (fc->col &&
+	    (!fc->prog || !group || pattry(fc->prog, group))) {
+	    zlrputs(c, fc->col);
+
+	    return;
+	}
+}
+
+/* Turn off colouring. */
+
+static void
+zcoff(void)
+{
+    if (mcolors.files[COL_EC] && mcolors.files[COL_EC]->col) {
+	tputs(mcolors.files[COL_EC]->col, 1, putshout);
+	*last_cap = '\0';
+    } else
+	zcputs(&mcolors, NULL, COL_NO);
+}
+
+
+static void
+initiscol(Listcols c)
+{
+    int i;
+
+    zlrputs(c, patcols[0]);
+
+    curiscols[curiscol = 0] = *patcols++;
+
+    curisbeg = curissend = 0;
+
+    for (i = 0; i < nrefs; i++)
+	sendpos[i] = 0xfffffff;
+    for (; i < MAX_POS; i++)
+	begpos[i] = endpos[i] = sendpos[i] = 0xfffffff;
+}
+
+static void
+doiscol(Listcols c, int pos)
+{
+    int fi;
+
+    while (pos > sendpos[curissend]) {
+	curissend++;
+	if (curiscol) {
+	    zcputs(c, NULL, COL_NO);
+	    zlrputs(c, curiscols[--curiscol]);
+	}
+    }
+    while (((fi = (endpos[curisbeg] < begpos[curisbeg] || 
+		  begpos[curisbeg] == -1)) ||
+	    pos == begpos[curisbeg]) && *patcols) {
+	if (!fi) {
+	    int i, j, e = endpos[curisbeg];
+	    
+	    /* insert e in sendpos */
+	    for (i = curissend; sendpos[i] <= e; ++i)
+		;
+	    for (j = i + 1; j < MAX_POS; ++j)
+		sendpos[j] = sendpos[j-1];
+	    sendpos[i] = e;
+	    
+	    zcputs(c, NULL, COL_NO);
+	    zlrputs(c, *patcols);
+	    curiscols[++curiscol] = *patcols;
+	}
+	++patcols;
+	++curisbeg;
+    }
+}
+
+/* Stripped-down version of printfmt(). But can do in-string colouring. */
+
+static int
+clprintfmt(Listcols c, char *p, int ml)
+{
+    int cc = 0, i = 0, ask, beg;
+
+    initiscol(c);
+
+    for (; *p; p++) {
+	doiscol(c, i++);
+	cc++;
+	if (*p == '\n') {
+	    if (mlbeg >= 0 && tccan(TCCLEAREOL))
+		tcout(TCCLEAREOL);
+	    cc = 0;
+	}
+	if (ml == mlend - 1 && (cc % columns) == columns - 1)
+	    return 0;
+
+	putc(*p, shout);
+	if ((beg = !(cc % columns)))
+	    ml++;
+	if (mscroll && !(cc % columns) &&
+	    !--mrestlines && (ask = asklistscroll(ml)))
+	    return ask;
+    }
+    if (mlbeg >= 0 && tccan(TCCLEAREOL))
+	tcout(TCCLEAREOL);
+    return 0;
+}
+
+/* Local version of nicezputs() with in-string colouring. */
+
+static int
+clnicezputs(Listcols c, char *s, int ml)
+{
+    int cc, i = 0, col = 0, ask;
+    char *t;
+
+    initiscol(c);
+
+    while ((cc = *s++)) {
+	doiscol(c, i++);
+	if (itok(cc)) {
+	    if (cc <= Comma)
+		cc = ztokens[cc - Pound];
+	    else 
+		continue;
+	}
+	if (cc == Meta)
+	    cc = *s++ ^ 32;
+
+	for (t = nicechar(cc); *t; t++) {
+	    if (ml == mlend - 1 && col == columns - 1)
+		return 0;
+	    putc(*t, shout);
+	    if (++col == columns) {
+		ml++;
+		if (mscroll && !--mrestlines && (ask = asklistscroll(ml)))
+		    return ask;
+
+		col = 0;
+	    }
+	}
+    }
+    return 0;
+}
+
+/* Get the terminal color string for the given match. */
+
+static int
+putmatchcol(Listcols c, char *group, char *n)
+{
+    Patcol pc;
+
+    nrefs = MAX_POS - 1;
+
+    for (pc = c->pats; pc; pc = pc->next)
+	if ((!pc->prog || !group || pattry(pc->prog, group)) &&
+	    pattryrefs(pc->pat, n, &nrefs, begpos, endpos)) {
+	    if (pc->cols[1]) {
+		patcols = pc->cols;
+
+		return 1;
+	    }
+	    zlrputs(c, pc->cols[0]);
+
+	    return 0;
+	}
+
+    zcputs(c, group, COL_NO);
+
     return 0;
 }
 
 /* Get the terminal color string for the file with the given name and
  * file modes. */
 
-static char *
-getcolstr(Listcols c, char *n, mode_t m)
+static int
+putfilecol(Listcols c, char *group, char *n, mode_t m)
 {
-    Extcol e;
+    int colour;
+    Extcol ec;
+    Patcol pc;
 
-    for (e = c->exts; e; e = e->next)
-	if (strsfx(e->ext, n))
-	    return e->col;
+    for (ec = c->exts; ec; ec = ec->next)
+	if (strsfx(ec->ext, n) &&
+	    (!ec->prog || !group || pattry(ec->prog, group))) {
+	    zlrputs(c, ec->col);
+
+	    return 0;
+	}
+
+    nrefs = MAX_POS - 1;
+
+    for (pc = c->pats; pc; pc = pc->next)
+	if ((!pc->prog || !group || pattry(pc->prog, group)) &&
+	    pattryrefs(pc->pat, n, &nrefs, begpos, endpos)) {
+	    if (pc->cols[1]) {
+		patcols = pc->cols;
+
+		return 1;
+	    }
+	    zlrputs(c, pc->cols[0]);
+
+	    return 0;
+	}
 
     if (S_ISDIR(m))
-	return c->cols[COL_DI];
+	colour = COL_DI;
     else if (S_ISLNK(m))
-	return c->cols[COL_LN];
+	colour = COL_LN;
     else if (S_ISFIFO(m))
-	return c->cols[COL_PI];
+	colour = COL_PI;
     else if (S_ISSOCK(m))
-	return c->cols[COL_SO];
+	colour = COL_SO;
     else if (S_ISBLK(m))
-	return c->cols[COL_BD];
+	colour = COL_BD;
     else if (S_ISCHR(m))
-	return c->cols[COL_CD];
+	colour = COL_CD;
     else if (S_ISREG(m) && (m & S_IXUGO))
-	return c->cols[COL_EX];
+	colour = COL_EX;
+    else
+	colour = COL_FI;
 
-    return c->cols[COL_FI];
+    zcputs(c, group, colour);
+
+    return 0;
 }
 
-/* Information about the list shown. */
+static Cmgroup last_group;
 
-static int noselect, mselect, inselect, mcol, mline, mcols, mlines;
-static Cmatch *mmatch, **mtab;
-static Cmgroup mgroup, *mgtab;
-
-/* List the matches. Most of this is just taken from ilistmatches(),
- * of course. */
-
+/**/
 static int
-complistmatches(Hookdef dummy, Chdata dat)
+asklistscroll(int ml)
 {
-    Cmgroup amatches = dat->matches, g;
+    int v, i;
+
+    compprintfmt(NULL, -1, 1, 1, ml, NULL);
+
+    fflush(shout);
+    zsetterm();
+    v = getzlequery(0);
+    settyinfo(&shttyinfo);
+    putc('\r', shout);
+    for (i = columns - 1; i--; )
+	putc(' ', shout);
+
+    putc('\r', shout);
+
+    if (v == '\n' || v == '\r') {
+	mrestlines = 1;
+	return 0;
+    }
+    mrestlines = lines - 1;
+
+    if (v == ' ' || v == '\t')
+	return 0;
+    if (v != 'q')
+	ungetkey(v);
+
+    return 1;
+}
+
+#define dolist(X)   ((X) >= mlbeg && (X) < mlend)
+#define dolistcl(X) ((X) >= mlbeg && (X) < mlend + 1)
+#define dolistnl(X) ((X) >= mlbeg && (X) < mlend - 1)
+
+/**/
+static int
+compprintnl(int ml)
+{
+    int ask;
+
+    if (mlbeg >= 0 && tccan(TCCLEAREOL))
+	tcout(TCCLEAREOL);
+    putc('\n', shout);
+
+    if (mscroll && !--mrestlines && (ask = asklistscroll(ml)))
+	return ask;
+
+    return 0;
+}
+
+/* This is used to print the strings (e.g. explanations). *
+ * It returns the number of lines printed.       */
+
+/**/
+static int
+compprintfmt(char *fmt, int n, int dopr, int doesc, int ml, int *stop)
+{
+    char *p, nc[2*DIGBUFSIZE + 12], nbuf[2*DIGBUFSIZE + 12];
+    int l = 0, cc = 0, b = 0, s = 0, u = 0, m, ask, beg, stat;
+
+    if ((stat = !fmt)) {
+	if (mlbeg >= 0) {
+	    if (!(fmt = mstatus))
+		return 0;
+	    cc = -1;
+	} else if (!(fmt = getsparam("LISTSTATUS")))
+	    fmt = "continue? ";
+    }
+    for (p = fmt; *p; p++) {
+	if (doesc && *p == '%') {
+	    if (*++p) {
+		m = 0;
+		switch (*p) {
+		case '%':
+		    if (dopr == 1)
+			putc('%', shout);
+		    cc++;
+		    break;
+		case 'n':
+		    if (!stat) {
+			sprintf(nc, "%d", n);
+			if (dopr == 1)
+			    fputs(nc, shout);
+			cc += strlen(nc);
+		    }
+		    break;
+		case 'B':
+		    b = 1;
+		    if (dopr)
+			tcout(TCBOLDFACEBEG);
+		    break;
+		case 'b':
+		    b = 0; m = 1;
+		    if (dopr)
+			tcout(TCALLATTRSOFF);
+		    break;
+		case 'S':
+		    s = 1;
+		    if (dopr)
+			tcout(TCSTANDOUTBEG);
+		    break;
+		case 's':
+		    s = 0; m = 1;
+		    if (dopr)
+			tcout(TCSTANDOUTEND);
+		    break;
+		case 'U':
+		    u = 1;
+		    if (dopr)
+			tcout(TCUNDERLINEBEG);
+		    break;
+		case 'u':
+		    u = 0; m = 1;
+		    if (dopr)
+			tcout(TCUNDERLINEEND);
+		    break;
+		case '{':
+		    for (p++; *p && (*p != '%' || p[1] != '}'); p++)
+			if (dopr)
+			    putc(*p, shout);
+		    if (*p)
+			p++;
+		    else
+			p--;
+		    break;
+		case 'm':
+		    if (stat && n >= 0) {
+			sprintf(nbuf, "%d/%d", mselect, listdat.nlist);
+			sprintf(nc, "%-9s", nbuf);
+			m = 2;
+		    }
+		    break;
+		case 'l':
+		    if (stat) {
+			sprintf(nbuf, "%d/%d", ml + 1, listdat.nlines);
+			sprintf(nc, "%-9s", nbuf);
+			m = 2;
+		    }
+		    break;
+		case 'p':
+		    if (stat && n >= 0) {
+			if (ml == listdat.nlines - 1)
+			    strcpy(nc, "Bottom");
+			else if (mlbeg || ml != n)
+			    sprintf(nc, "%d%%",
+				    ((ml + 1) * 100) / listdat.nlines);
+			else
+			    strcpy(nc, "Top");
+			m = 2;
+		    }
+		    break;
+		}
+		if (m == 2 && dopr == 1) {
+		    int l = strlen(nc);
+
+		    if (l + cc > columns - 2)
+			nc[l -= l + cc - (columns - 2)] = '\0';
+		    fputs(nc, shout);
+		    cc += l;
+		} else if (dopr && m == 1) {
+		    if (b)
+			tcout(TCBOLDFACEBEG);
+		    if (s)
+			tcout(TCSTANDOUTBEG);
+		    if (u)
+			tcout(TCUNDERLINEBEG);
+		}
+	    } else
+		break;
+	} else {
+	    if ((++cc == columns - 2 || *p == '\n') && stat)
+		dopr = 2;
+	    if (*p == '\n') {
+		if (dopr == 1 && mlbeg >= 0 && tccan(TCCLEAREOL))
+		    tcout(TCCLEAREOL);
+		l += 1 + (cc / columns);
+		cc = 0;
+	    }
+	    if (dopr == 1) {
+		if (ml == mlend - 1 && (cc % columns) == columns - 1) {
+		    dopr = 0;
+		    continue;
+		}
+		putc(*p, shout);
+		if ((beg = !(cc % columns)) && !stat)
+		    ml++;
+		if (mscroll && beg && !--mrestlines && (ask = asklistscroll(ml))) {
+		    *stop = 1;
+		    return l + (cc / columns);
+		}
+	    }
+	}
+    }
+    if (dopr && mlbeg >= 0 && tccan(TCCLEAREOL))
+	tcout(TCCLEAREOL);
+
+    return l + (cc / columns);
+}
+
+/* This is like zputs(), but allows scrolling. */
+
+/**/
+static int
+compzputs(char const *s, int ml)
+{
+    int c, col = 0, ask;
+
+    while (*s) {
+	if (*s == Meta)
+	    c = *++s ^ 32;
+	else if(itok(*s)) {
+	    s++;
+	    continue;
+	} else
+	    c = *s;
+	s++;
+	putc(c, shout);
+	if (c == '\n' && mlbeg >= 0 && tccan(TCCLEAREOL))
+	    tcout(TCCLEAREOL);
+	if (mscroll && (++col == columns || c == '\n')) {
+	    ml++;
+	    if (!--mrestlines && (ask = asklistscroll(ml)))
+		return ask;
+
+	    col = 0;
+	}
+    }
+    return 0;
+}
+
+/* This is like nicezputs(), but allows scrolling. */
+
+/**/
+static int
+compnicezputs(char *s, int ml)
+{
+    int c, col = 0, ask;
+    char *t;
+
+    while ((c = *s++)) {
+	if (itok(c)) {
+	    if (c <= Comma)
+		c = ztokens[c - Pound];
+	    else 
+		continue;
+	}
+	if (c == Meta)
+	    c = *s++ ^ 32;
+
+	for (t = nicechar(c); *t; t++) {
+	    if (ml == mlend - 1 && col == columns - 1)
+		return 0;
+	    putc(*t, shout);
+	    if (++col == columns) {
+		ml++;
+		if (mscroll && !--mrestlines && (ask = asklistscroll(ml)))
+		    return ask;
+
+		col = 0;
+	    }
+	}
+    }
+    return 0;
+}
+
+/**/
+static int
+compprintlist(int showall)
+{
+    static int lasttype = 0, lastbeg = 0, lastml = 0;
+    static lastn = 0, lastnl = 0;
+    static Cmgroup lastg = NULL;
+    static Cmatch *lastp = NULL;
+    static Cexpl *lastexpl = NULL;
+
+    Cmgroup g;
     Cmatch *p, m;
     Cexpl *e;
-    int nlines = 0, ncols, nlist = 0, longest = 1, pnl = 0, opl = 0;
-    int of = isset(LISTTYPES);
-    int mc, ml = 0, cc, hasm = 0;
-    struct listcols col;
+    int pnl = 0, cl, mc = 0, ml = 0, printed = 0, stop = 0, asked = 1;
+    int lastused = 0, fl = -1;
 
-    if (minfo.asked == 2) {
-	showinglist = 0;
-	return (noselect = 1);
+    if (mnew || lastbeg != mlbeg || mlbeg < 0) {
+	lasttype = 0;
+	lastg = NULL;
+	lastexpl = NULL;
+	lastml = 0;
     }
-    getcols(&col);
+    cl = (listdat.nlines > lines - nlnct - mhasstat ?
+	  lines - nlnct - mhasstat : listdat.nlines);
+    mrestlines = lines - 1;
 
-    /* Set the cursor below the prompt. */
-    if (inselect)
-	clearflag = 0;
-    trashzle();
-    showinglist = listshown = 0;
+    if (cl < 2) {
+	cl = -1;
+	if (tccan(TCCLEAREOD))
+	    tcout(TCCLEAREOD);
+    } else if (mlbeg >= 0 && !tccan(TCCLEAREOL) && tccan(TCCLEAREOD))
+	tcout(TCCLEAREOD);
 
-    clearflag = (isset(USEZLE) && !termflags &&
-		 complastprompt && *complastprompt);
-
-    for (g = amatches; g; g = g->next) {
-	char **pp = g->ylist;
-	int nl = 0, l;
-
-	if (pp) {
-	    /* We have an ylist, lets see, if it contains newlines. */
-	    while (!nl && *pp)
-		nl = !!strchr(*pp++, '\n');
-
-	    pp = g->ylist;
-	    if (nl) {
-		/* Yup, there are newlines, count lines. */
-		char *nlptr, *sptr;
-
-		g->flags |= CGF_LINES;
-		noselect = 1;
-		while ((sptr = *pp)) {
-		    while (sptr && *sptr) {
-			nlines += (nlptr = strchr(sptr, '\n'))
-			    ? 1 + (nlptr-sptr)/columns
-			    : strlen(sptr)/columns;
-			sptr = nlptr ? nlptr+1 : NULL;
-		    }
-		    nlines++;
-		    pp++;
-		}
-		nlines--;
-	    } else {
-		while (*pp) {
-		    if ((l = strlen(*pp)) > longest)
-			longest = l;
-		    nlist++;
-		    pp++;
-		}
-	    }
-	} else {
-	    for (p = g->matches; (m = *p); p++) {
-		if (!(m->flags & CMF_NOLIST)) {
-		    if ((l = niceztrlen(m->str)) > longest)
-			longest = l;
-		    nlist++;
-		} else
-		    noselect = 1;
-	    }
-	}
-	if ((e = g->expls)) {
-	    while (*e) {
-		if ((*e)->count)
-		    nlines += 1 + printfmt((*e)->str, (*e)->count, 0);
-		e++;
-	    }
-	}
-    }
-    longest += 2 + of;
-    if ((ncols = (columns + 1) / longest)) {
-	for (g = amatches; g; g = g->next)
-	    nlines += (g->lcount + ncols - 1) / ncols;
-    } else {
-	ncols = 1;
-	opl = 1;
-	for (g = amatches; g; g = g->next) {
-	    char **pp = g->ylist;
-
-	    if (pp) {
-		if (!(g->flags & CGF_LINES)) {
-		    while (*pp) {
-			nlines += 1 + (strlen(*pp) / columns);
-			pp++;
-		    }
-		}
-	    } else
-		for (p = g->matches; (m = *p); p++)
-		    if (!(m->flags & CMF_NOLIST))
-			nlines += 1 + ((1 + niceztrlen(m->str)) / columns);
-	}
-    }
-
-    /* Maybe we have to ask if the user wants to see the list. */
-    if ((!minfo.cur || !minfo.asked) &&
-	((complistmax && nlist > complistmax) ||
-	 (!complistmax && nlines >= lines))) {
-	int qup;
-	zsetterm();
-	qup = printfmt("zsh: do you wish to see all %n possibilities? ", nlist, 1);
-	fflush(shout);
-	if (getzlequery() != 'y') {
-	    if (clearflag) {
-		putc('\r', shout);
-		tcmultout(TCUP, TCMULTUP, qup);
-		if (tccan(TCCLEAREOD))
-		    tcout(TCCLEAREOD);
-		tcmultout(TCUP, TCMULTUP, nlnct);
-	    } else
-		putc('\n', shout);
-	    noselect = 1;
-	    if (minfo.cur)
-		minfo.asked = 2;
-	    return 1;
-	}
-	if (clearflag) {
-	    putc('\r', shout);
-	    tcmultout(TCUP, TCMULTUP, qup);
-	    if (tccan(TCCLEAREOD))
-		tcout(TCCLEAREOD);
-	} else
-	    putc('\n', shout);
-	settyinfo(&shttyinfo);
-	if (minfo.cur)
-	    minfo.asked = 1;
-    }
-    if (mselect >= 0) {
-	int i;
-
-	i = ncols * nlines;
-	free(mtab);
-	mtab = (Cmatch **) zalloc(i * sizeof(Cmatch **));
-	memset(mtab, 0, i * sizeof(Cmatch **));
-	free(mgtab);
-	mgtab = (Cmgroup *) zalloc(i * sizeof(Cmgroup));
-	memset(mgtab, 0, i * sizeof(Cmgroup));
-	mcols = ncols;
-	mlines = nlines;
-    }
-    /* Now print the matches. */
-    g = amatches;
+    g = ((lasttype && lastg) ? lastg : amatches);
     while (g) {
 	char **pp = g->ylist;
 
 	if ((e = g->expls)) {
+	    int l;
+
+	    if (!lastused && lasttype == 1) {
+		e = lastexpl;
+		ml = lastml;
+		lastused = 1;
+	    }
 	    while (*e) {
 		if ((*e)->count) {
 		    if (pnl) {
-			putc('\n', shout);
+			if (dolistnl(ml) && compprintnl(ml))
+			    goto end;
 			pnl = 0;
 			ml++;
+			if (dolistcl(ml) && cl >= 0 && --cl <= 1) {
+			    cl = -1;
+			    if (tccan(TCCLEAREOD))
+				tcout(TCCLEAREOD);
+			}
 		    }
-		    ml += printfmt((*e)->str, (*e)->count, 1);
+		    l = compprintfmt((*e)->str, (*e)->count, dolist(ml), 1,
+				     ml, &stop);
+		    if (stop)
+			goto end;
+		    if (!lasttype && ml >= mlbeg) {
+			lasttype = 1;
+			lastg = g;
+			lastbeg = mlbeg;
+			lastml = ml;
+			lastexpl = e;
+			lastp = NULL;
+			lastused = 1;
+		    }
+		    ml += l;
+		    if (dolistcl(ml) && cl >= 0 && (cl -= l) <= 1) {
+			cl = -1;
+			if (tccan(TCCLEAREOD))
+			    tcout(TCCLEAREOD);
+		    }
 		    pnl = 1;
 		}
 		e++;
+		if (!mnew && ml > mlend)
+		    goto end;
 	    }
 	}
-	if (pp && *pp) {
+	if (!listdat.onlyexpl && mlbeg < 0 && pp && *pp) {
 	    if (pnl) {
-		putc('\n', shout);
+		if (dolistnl(ml) && compprintnl(ml))
+		    goto end;
 		pnl = 0;
 		ml++;
+		if (cl >= 0 && --cl <= 1) {
+		    cl = -1;
+		    if (tccan(TCCLEAREOD))
+			tcout(TCCLEAREOD);
+		}
 	    }
 	    if (g->flags & CGF_LINES) {
 		while (*pp) {
-		    zputs(*pp, shout);
-		    if (*++pp)
-			putc('\n', shout);
+		    if (compzputs(*pp, ml))
+			goto end;
+		    if (*++pp && compprintnl(ml))
+			goto end;
 		}
 	    } else {
-		int n = g->lcount, nl = (n + ncols - 1) / ncols, nc = nl, i, a;
+		int n = g->lcount, nl, nc, i, a;
 		char **pq;
 
+		nl = nc = g->lins;
+
 		while (n && nl--) {
-		    i = ncols;
+		    i = g->cols;
 		    mc = 0;
 		    pq = pp;
 		    while (n && i--) {
 			if (pq - g->ylist >= g->lcount)
 			    break;
-			zputs(*pq, shout);
+			if (compzputs(*pq, mscroll))
+			    goto end;
 			if (i) {
-			    a = longest - strlen(*pq);
+			    a = (g->widths ? g->widths[mc] : g->width) -
+				strlen(*pq);
 			    while (a--)
 				putc(' ', shout);
 			}
-			pq += nc;
+			pq += ((g->flags & CGF_ROWS) ? 1 : nc);
+			mc++;
 			n--;
 		    }
 		    if (n) {
-			putc('\n', shout);
+			if (compprintnl(ml))
+			    goto end;
 			ml++;
+			if (cl >= 0 && --cl <= 1) {
+			    cl = -1;
+			    if (tccan(TCCLEAREOD))
+				tcout(TCCLEAREOD);
+			}
 		    }
-		    pp++;
+		    pp += ((g->flags & CGF_ROWS) ? g->cols : 1);
 		}
 	    }
-	} else if (g->lcount) {
-	    int n = g->lcount, nl = (n + ncols - 1) / ncols, nc = nl, i, j, a = 0;
-	    int zt;
+	} else if (!listdat.onlyexpl &&
+		   (g->lcount || (showall && g->mcount))) {
+	    int n = g->dcount, nl, nc, i, j, wid;
 	    Cmatch *q;
 
+	    nl = nc = g->lins;
+
+	    if ((g->flags & CGF_HASDL) &&
+		(lastused || !lasttype || lasttype == 2)) {
+		if (!lastused && lasttype == 2) {
+		    p = lastp;
+		    ml = lastml;
+		    n = lastn;
+		    nl = lastnl;
+		    lastused = 1;
+		} else
+		    p = g->matches;
+
+		for (; (m = *p); p++) {
+		    if (m->disp && (m->flags & CMF_DISPLINE)) {
+			if (!lasttype && ml >= mlbeg) {
+			    lasttype = 2;
+			    lastg = g;
+			    lastbeg = mlbeg;
+			    lastml = ml;
+			    lastp = p;
+			    lastn = n;
+			    lastnl = nl;
+			    lastused = 1;
+			}
+			if (pnl) {
+			    if (dolistnl(ml) && compprintnl(ml))
+				goto end;
+			    pnl = 0;
+			    ml++;
+			    if (dolistcl(ml) && cl >= 0 && --cl <= 1) {
+				cl = -1;
+				if (tccan(TCCLEAREOD))
+				    tcout(TCCLEAREOD);
+			    }
+			}
+			if (fl < 0)
+			    fl = ml;
+			if (dolist(ml))
+			    printed++;
+			if (clprintm(g, p, 0, ml, 1, 0, NULL, NULL))
+			    goto end;
+			pnl = 1;
+		    }
+		    if (!mnew && ml > mlend)
+			goto end;
+		}
+	    }
 	    if (n && pnl) {
-		putc('\n', shout);
+		if (dolistnl(ml) && compprintnl(ml))
+		    goto end;
 		pnl = 0;
 		ml++;
+		if (dolistcl(ml) && cl >= 0 && --cl <= 1) {
+		    cl = -1;
+		    if (tccan(TCCLEAREOD))
+			tcout(TCCLEAREOD);
+		}
 	    }
-	    for (p = skipnolist(g->matches); n && nl--;) {
-		i = ncols;
+	    if (!lastused && lasttype == 3) {
+		p = lastp;
+		n = lastn;
+		nl = lastnl;
+		ml = lastml;
+		lastused = 1;
+	    } else
+		p = skipnolist(g->matches, showall);
+
+	    while (n && nl--) {
+		if (!lasttype && ml >= mlbeg) {
+		    lasttype = 3;
+		    lastg = g;
+		    lastbeg = mlbeg;
+		    lastml = ml;
+		    lastp = p;
+		    lastn = n;
+		    lastnl = nl + 1;
+		    lastused = 1;
+		}
+		i = g->cols;
 		mc = 0;
 		q = p;
 		while (n && i--) {
-		    fputs(col.cols[COL_LC], shout);
+		    wid = (g->widths ? g->widths[mc] : g->width);
 		    if (!(m = *q)) {
-			fputs(col.cols[COL_MI], shout);
-			fputs(col.cols[COL_RC], shout);
-			a = longest - 2;
-			while (a--)
-			    putc(' ', shout);
-			fputs(col.cols[COL_EC], shout);
+			if (clprintm(g, NULL, mc, ml, (!i), wid, NULL, NULL))
+			    goto end;
 			break;
 		    }
-		    hasm = 1;
-		    if (mselect >= 0) {
-			mtab[mc + (ncols * ml)] = q;
-			mgtab[mc + (ncols * ml)] = g;
-		    }
-		    if (m->gnum == mselect) {
-			mcol = mc;
-			mline = ml;
-			mmatch = q;
-			mgroup = g;
-			cc = COL_MA;
-		    } else
-			cc = -1;
-		    if (m->flags & CMF_FILE) {
+		    if (!m->disp && (m->flags & CMF_FILE)) {
 			struct stat buf;
 			char *pb;
 
@@ -537,78 +1164,336 @@ complistmatches(Hookdef dummy, Chdata dat)
 			sprintf(pb, "%s%s", (m->prpre ? m->prpre : "./"),
 				m->str);
 
-			zt = ztat(pb, &buf, 1);
-			if (cc >= 0)
-			    fputs(col.cols[cc], shout);
-			else if (zt)
-			    fputs(col.cols[COL_NO], shout);
-			else
-			    fputs(getcolstr(&col, pb, buf.st_mode), shout);
-			fputs(col.cols[COL_RC], shout);
-			nicezputs(m->str, shout);
-			if (zt)
-			    putc(' ', shout);
-			else
-			    putc(file_type(buf.st_mode), shout);
-		    } else {
-			fputs(col.cols[cc >= 0 ? cc : COL_NO], shout);
-			fputs(col.cols[COL_RC], shout);
-			nicezputs(m->str, shout);
-			if (of)
-			    putc(' ', shout);
-		    }
-		    a = longest - niceztrlen(m->str) - 2 - of;
-		    while (a--)
-			putc(' ', shout);
-		    fputs(col.cols[COL_EC], shout);
-		    if (i) {
-			fputs(col.cols[COL_LC], shout);
-			fputs(col.cols[COL_NO], shout);
-			fputs(col.cols[COL_RC], shout);
-			fputs("  ", shout);
-			fputs(col.cols[COL_EC], shout);
-		    }
+			if (ztat(pb, &buf, 1) ?
+			    clprintm(g, q, mc, ml, (!i), wid, NULL, NULL) :
+			    clprintm(g, q, mc, ml, (!i), wid, pb, &buf))
+			    goto end;
+		    } else if (clprintm(g, q, mc, ml, (!i), wid, NULL, NULL))
+			goto end;
+
+		    if (dolist(ml))
+			printed++;
+		    if (fl < 0)
+			fl = ml;
+
 		    if (--n)
-			for (j = nc; j && *q; j--)
-			    q = skipnolist(q + 1);
+			for (j = ((g->flags & CGF_ROWS) ? 1 : nc);
+			     j && *q; j--)
+			    q = skipnolist(q + 1, showall);
 		    mc++;
 		}
-		if (i > 0) {
-		    fputs(col.cols[COL_LC], shout);
-		    fputs(col.cols[COL_MI], shout);
-		    fputs(col.cols[COL_RC], shout);
-		    a = longest - 2;
-		    while (a--)
-			putc(' ', shout);
-		    fputs(col.cols[COL_EC], shout);
+		while (i-- > 0) {
+		    if (clprintm(g, NULL, mc, ml, (!i),
+				 (g->widths ? g->widths[mc] : g->width),
+				 NULL, NULL))
+			goto end;
+		    mc++;
 		}
 		if (n) {
-		    putc('\n', shout);
+		    if (dolistnl(ml) && compprintnl(ml))
+			goto end;
 		    ml++;
-		    if (n && nl)
-			p = skipnolist(p + 1);
+		    if (dolistcl(ml) && cl >= 0 && --cl <= 1) {
+			cl = -1;
+			if (tccan(TCCLEAREOD))
+			    tcout(TCCLEAREOD);
+		    }
+		    if (nl)
+			for (j = ((g->flags & CGF_ROWS) ? g->cols : 1);
+			     j && *p; j--)
+			    p = skipnolist(p + 1, showall);
 		}
+		if (!mnew && ml > mlend)
+		    goto end;
 	    }
 	}
-	if (g->lcount)
+	if (g->lcount || (showall && g->mcount))
 	    pnl = 1;
 	g = g->next;
     }
-
+    asked = 0;
+ end:
+    lastlistlen = 0;
+    if (nlnct <= 1)
+	mscroll = 0;
     if (clearflag) {
 	/* Move the cursor up to the prompt, if always_last_prompt *
 	 * is set and all that...                                  */
-	if ((nlines += nlnct - 1) < lines) {
-	    tcmultout(TCUP, TCMULTUP, nlines);
+	if (mlbeg >= 0) {
+	    if ((ml = listdat.nlines + nlnct) >= lines) {
+		if (mhasstat) {
+		    putc('\n', shout);
+		    compprintfmt(NULL, fl, 1, 1, mline, NULL);
+		}
+		ml = lines - 1;
+	    } else
+		ml--;
+	    tcmultout(TCUP, TCMULTUP, ml);
 	    showinglist = -1;
-	    listshown = 1;
+
+	    lastlistlen = listdat.nlines;
+	} else if ((ml = listdat.nlines + nlnct - 1) < lines) {
+	    if (mlbeg >= 0 && tccan(TCCLEAREOL))
+		tcout(TCCLEAREOL);
+	    tcmultout(TCUP, TCMULTUP, ml);
+	    showinglist = -1;
+
+	    lastlistlen = listdat.nlines;
+	} else {
+	    clearflag = 0;
+	    if (!asked)
+		compprintnl(ml);
+	}
+    } else if (!asked)
+	compprintnl(ml);
+
+    listshown = (clearflag ? 1 : -1);
+    mnew = 0;
+
+    return printed;
+}
+
+/**/
+static int
+clprintm(Cmgroup g, Cmatch *mp, int mc, int ml, int lastc, int width,
+	 char *path, struct stat *buf)
+{
+    Cmatch m;
+    int len, subcols = 0, stop = 0, ret = 0;
+
+    if (g != last_group)
+        *last_cap = '\0';
+
+    last_group = g;
+
+    if (!mp) {
+	if (dolist(ml)) {
+	    zcputs(&mcolors, g->name, COL_SP);
+	    len = width - 2;
+	    while (len-- > 0)
+		putc(' ', shout);
+	    zcoff();
+	}
+	return 0;
+    }
+    m = *mp;
+    if (m->disp && (m->flags & CMF_DISPLINE)) {
+	if (mselect >= 0) {
+	    int mm = (mcols * ml), i;
+
+	    for (i = mcols; i--; ) {
+		mtab[mm + i] = mp;
+		mgtab[mm + i] = g;
+	    }
+	}
+	if (!dolist(ml))
+	    return 0;
+	if (m->gnum == mselect) {
+	    int mm = (mcols * ml);
+	    mline = ml;
+	    mcol = 0;
+	    mmtabp = mtab + mm;
+	    mgtabp = mgtab + mm;
+	    mmlen = mcols;
+	    zcputs(&mcolors, g->name, COL_MA);
+	} else if (m->flags & CMF_NOLIST)
+	    zcputs(&mcolors, g->name, COL_HI);
+	else if (mselect >= 0 && (m->flags & (CMF_MULT | CMF_FMULT)))
+	    zcputs(&mcolors, g->name, COL_DU);
+	else
+	    subcols = putmatchcol(&mcolors, g->name, m->disp);
+	if (subcols)
+	    ret = clprintfmt(&mcolors, m->disp, ml);
+	else {
+	    compprintfmt(m->disp, 0, 1, 0, ml, &stop);
+	    if (stop)
+		ret = 1;
+	}
+	zcoff();
+    } else {
+	int mx;
+
+	if (g->widths) {
+	    int i;
+
+	    for (i = mx = 0; i < mc; i++)
+		mx += g->widths[i];
 	} else
-	    clearflag = 0, putc('\n', shout);
-    } else
-	putc('\n', shout);
-    if (!hasm || nlines >= lines)
+	    mx = mc * g->width;
+
+	if (mselect >= 0) {
+	    int mm = mcols * ml, i;
+
+	    for (i = (width ? width : mcols); i--; ) {
+		mtab[mx + mm + i] = mp;
+		mgtab[mx + mm + i] = g;
+	    }
+	}
+	if (!dolist(ml))
+	    return 0;
+	if (m->gnum == mselect) {
+	    int mm = mcols * ml;
+
+	    mcol = mx;
+	    mline = ml;
+	    mmtabp = mtab + mx + mm;
+	    mgtabp = mgtab + mx + mm;
+	    mmlen = width;
+	    zcputs(&mcolors, g->name, COL_MA);
+	} else if (m->flags & CMF_NOLIST)
+	    zcputs(&mcolors, g->name, COL_HI);
+	else if (mselect >= 0 && (m->flags & (CMF_MULT | CMF_FMULT)))
+	    zcputs(&mcolors, g->name, COL_DU);
+	else if (buf)
+	    subcols = putfilecol(&mcolors, g->name, m->str, buf->st_mode);
+	else
+	    subcols = putmatchcol(&mcolors, g->name, (m->disp ? m->disp : m->str));
+
+	if (subcols)
+	    ret = clnicezputs(&mcolors, (m->disp ? m->disp : m->str), ml);
+	else
+	    ret = compnicezputs((m->disp ? m->disp : m->str), ml);
+	if (ret) {
+	    zcoff();
+	    return 1;
+	}
+	len = niceztrlen(m->disp ? m->disp : m->str);
+
+	 if (isset(LISTTYPES) && buf) {
+	    if (m->gnum != mselect) {
+		zcoff();
+		zcputs(&mcolors, g->name, COL_TC);
+	    }
+	    putc(file_type(buf->st_mode), shout);
+	    len++;
+        }
+	if ((len = width - len - 2) > 0) {
+	    if (m->gnum != mselect) {
+		zcoff();
+		zcputs(&mcolors, g->name, COL_SP);
+	    }
+	    while (len-- > 0)
+		putc(' ', shout);
+	}
+	zcoff();
+	if (!lastc) {
+	    zcputs(&mcolors, g->name, COL_SP);
+	    fputs("  ", shout);
+	    zcoff();
+	}
+    }
+    return ret;
+}
+
+static int
+complistmatches(Hookdef dummy, Chdata dat)
+{
+    Cmgroup oamatches = amatches;
+    char *p = NULL;
+
+    amatches = dat->matches;
+
+    if ((minfo.asked == 2 && mselect < 0) || nlnct >= lines) {
+	showinglist = 0;
+	amatches = oamatches;
+	return (noselect = 1);
+    }
+    getcols(&mcolors);
+
+    mnew = ((calclist(mselect >= 0) || mlastcols != columns ||
+	     mlastlines != listdat.nlines) && mselect >= 0);
+
+    if (!listdat.nlines || (mselect >= 0 &&
+			    !(isset(USEZLE) && !termflags &&
+			      complastprompt && *complastprompt))) {
+	showinglist = listshown = 0;
 	noselect = 1;
+	amatches = oamatches;
+	return 1;
+    }
+    if (inselect)
+	clearflag = 0;
+
+    mscroll = 0;
+
+    if (mselect >= 0 || mlbeg >= 0 ||
+	((p = getsparam("LISTMAX")) && !strcmp(p, "scroll"))) {
+	trashzle();
+	showinglist = listshown = 0;
+
+	lastlistlen = 0;
+
+	if (p) {
+	    clearflag = (isset(USEZLE) && !termflags && dolastprompt);
+	    mscroll = 1;
+	} else {
+	    clearflag = 1;
+	    minfo.asked = (listdat.nlines + nlnct <= lines);
+	}
+    } else if (asklist()) {
+	amatches = oamatches;
+	return (noselect = 1);
+    }
+    if (mlbeg >= 0) {
+	mlend = mlbeg + lines - nlnct - mhasstat;
+	while (mline >= mlend)
+	    mlbeg++, mlend++;
+    } else
+	mlend = 9999999;
+
+    if (mnew) {
+	int i;
+
+	i = columns * listdat.nlines;
+	free(mtab);
+	mtab = (Cmatch **) zalloc(i * sizeof(Cmatch **));
+	memset(mtab, 0, i * sizeof(Cmatch **));
+	free(mgtab);
+	mgtab = (Cmgroup *) zalloc(i * sizeof(Cmgroup));
+	memset(mgtab, 0, i * sizeof(Cmgroup));
+	mlastcols = mcols = columns;
+	mlastlines = mlines = listdat.nlines;
+    }
+    last_cap = (char *) zhalloc(max_caplen + 1);
+    *last_cap = '\0';
+
+    if (!compprintlist(mselect >= 0) || !clearflag)
+	noselect = 1;
+
+    amatches = oamatches;
+
     return noselect;
+}
+
+static int
+adjust_mcol(int wish, Cmatch ***tabp, Cmgroup **grp)
+{
+    Cmatch **tab = *tabp;
+    int p, n, c;
+
+    tab -= mcol;
+
+    for (p = wish; p >= 0 && !tab[p]; p--);
+    for (n = wish; n < mcols && !tab[n]; n++);
+    if (n == mcols)
+	n = -1;
+
+    if (p < 0) {
+	if (n < 0)
+	    return 1;
+	c = n;
+    } else if (n < 0)
+	c = p;
+    else
+	c = ((mcol - p) < (n - mcol) ? p : n);
+
+    *tabp = tab + c;
+    if (grp)
+	*grp = *grp + c - mcol;
+
+    mcol = c;
+    
+    return 0;
 }
 
 typedef struct menustack *Menustack;
@@ -616,33 +1501,82 @@ typedef struct menustack *Menustack;
 struct menustack {
     Menustack prev;
     char *line;
-    int cs;
+    Brinfo brbeg;
+    Brinfo brend;
+    int nbrbeg, nbrend;
+    int cs, acc, nmatches, mline, mlbeg;
     struct menuinfo info;
+    Cmgroup amatches, pmatches, lastmatches, lastlmatches;
 };
 
 static int
 domenuselect(Hookdef dummy, Chdata dat)
 {
+    static Chdata fdat = NULL;
     Cmatch **p;
     Cmgroup *pg;
     Thingy cmd;
     Menustack u = NULL;
-    int i = 0;
+    int i = 0, acc = 0, wishcol = 0, setwish = 0, oe = onlyexpl, wasnext = 0;
+    int space, lbeg = 0, step = 1;
     char *s;
 
-    if (getcols(NULL) || (dummy && (!(s = getsparam("SELECTMIN")) ||
-				    (dat && dat->num < atoi(s)))))
-	return 1;
-
+    if (fdat || (dummy && (!(s = getsparam("SELECTMIN")) ||
+			   (dat && dat->num < atoi(s))))) {
+	if (fdat) {
+	    fdat->matches = dat->matches;
+	    fdat->num = dat->num;
+	}
+	return 0;
+    }
+    if ((s = getsparam("SELECTSCROLL"))) {
+	if (!(step = mathevali(s)))
+	    step = (lines - nlnct) >> 1;
+	else if (step < 0)
+	    if ((step += lines - nlnct) < 0)
+		step = 1;
+    }
+    mstatus = getsparam("SELECTSTATUS");
+    mhasstat = !!mstatus;
+    fdat = dat;
     selectlocalmap(mskeymap);
     noselect = 0;
     mselect = (*(minfo.cur))->gnum;
+    mline = 0;
+    mlines = 999999;
+    mlbeg = 0;
     for (;;) {
+	space = lines - nlnct - mhasstat;
+	while (mline < mlbeg)
+	    if ((mlbeg -= step) < 0)
+		mlbeg = 0;
+
+	if (mlbeg && lbeg != mlbeg) {
+	    Cmatch **p = mtab + ((mlbeg - 1) * columns), **q;
+	    int c;
+
+	    while (mlbeg) {
+		for (q = p, c = columns; c; q++, c--)
+		    if (*q)
+			break;
+		if (c)
+		    break;
+		p -= columns;
+		mlbeg--;
+	    }
+	}
+	while (mline >= mlbeg + space)
+	    if ((mlbeg += step) + space > mlines)
+		mlbeg = mlines - space;
+
+	lbeg = mlbeg;
+	onlyexpl = 0;
 	showinglist = -2;
 	zrefresh();
 	inselect = 1;
 	if (noselect)
 	    break;
+	selected = 1;
 	if (!i) {
 	    i = mcols * mlines;
 	    while (i--)
@@ -652,28 +1586,107 @@ domenuselect(Hookdef dummy, Chdata dat)
 		break;
 	    i = 1;
 	}
-	p = mtab + mcol + (mline * mcols);
-	pg = mgtab + mcol + (mline * mcols);
+	p = mmtabp;
+	pg = mgtabp;
 	minfo.cur = *p;
 	minfo.group = *pg;
+	if (setwish)
+	    wishcol = mcol;
+	else if (mcol > wishcol) {
+	    while (mcol > 0 && p[-1] == minfo.cur)
+		mcol--, p--, pg--;
+	} else if (mcol < wishcol) {
+	    while (mcol < mcols - 1 && p[1] == minfo.cur)
+		mcol++, p++, pg++;
+	}
+	setwish = wasnext = 0;
 
     getk:
 
-	if (!(cmd = getkeycmd()) || cmd == Th(z_sendbreak) ||
-	    cmd == Th(z_acceptline))
+	if (!(cmd = getkeycmd()) || cmd == Th(z_sendbreak))
 	    break;
-	else if (cmd == Th(z_acceptandhold) ||
-		 cmd == Th(z_acceptandmenucomplete)) {
+	else if (cmd == Th(z_acceptline)) {
+	    acc = 1;
+	    break;
+	} else if (cmd == Th(z_acceptandinfernexthistory)) {
 	    Menustack s = (Menustack) zhalloc(sizeof(*s));
 
 	    s->prev = u;
 	    u = s;
 	    s->line = dupstring((char *) line);
 	    s->cs = cs;
+	    s->mline = mline;
+	    s->mlbeg = mlbeg;
 	    memcpy(&(s->info), &minfo, sizeof(struct menuinfo));
-	    acceptlast();
+	    s->amatches = amatches;
+	    s->pmatches = pmatches;
+	    s->lastmatches = lastmatches;
+	    s->lastlmatches = lastlmatches;
+	    s->acc = menuacc;
+	    s->brbeg = dupbrinfo(brbeg, NULL, 1);
+	    s->brend = dupbrinfo(brend, NULL, 1);
+	    s->nbrbeg = nbrbeg;
+	    s->nbrend = nbrend;
+	    s->nmatches = nmatches;
+	    menucmp = menuacc = hasoldlist = 0;
+	    fixsuffix();
+	    validlist = 0;
+	    amatches = pmatches = lastmatches = NULL;
+	    invalidate_list();
+	    menucomplete(zlenoargs);
+	    if (dat->num < 2 || !minfo.cur || !*(minfo.cur)) {
+		noselect = clearlist = listshown = 1;
+		onlyexpl = 0;
+		zrefresh();
+		break;
+	    }
+	    clearlist = listshown = 1;
+	    mselect = (*(minfo.cur))->gnum;
+	    setwish = wasnext = 1;
+	    mline = 0;
+	    continue;
+	} else if (cmd == Th(z_acceptandhold) ||
+		   cmd == Th(z_acceptandmenucomplete)) {
+	    Menustack s = (Menustack) zhalloc(sizeof(*s));
+	    int ol;
+
+	    s->prev = u;
+	    u = s;
+	    s->line = dupstring((char *) line);
+	    s->cs = cs;
+	    s->mline = mline;
+	    s->mlbeg = mlbeg;
+	    memcpy(&(s->info), &minfo, sizeof(struct menuinfo));
+	    s->amatches = s->pmatches =
+		s->lastmatches = s->lastlmatches = NULL;
+	    s->acc = menuacc;
+	    s->brbeg = dupbrinfo(brbeg, NULL, 1);
+	    s->brend = dupbrinfo(brend, NULL, 1);
+	    s->nbrbeg = nbrbeg;
+	    s->nbrend = nbrend;
+	    s->nmatches = nmatches;
+	    accept_last();
 	    do_menucmp(0);
 	    mselect = (*(minfo.cur))->gnum;
+
+	    p -= mcol;
+	    mcol = 0;
+	    ol = mline;
+	    do {
+		for (mcol = 0; mcol < mcols; mcol++, p++)
+		    if (*p == minfo.cur)
+			break;
+		if (mcol != mcols)
+		    break;
+		mline++;
+	    } while (mline != ol);
+	    if (*p != minfo.cur) {
+		noselect = clearlist = listshown = 1;
+		onlyexpl = 0;
+		zrefresh();
+		break;
+	    }
+	    setwish = 1;
 	    continue;
 	} else if (cmd == Th(z_undo)) {
 	    int l;
@@ -686,9 +1699,32 @@ domenuselect(Hookdef dummy, Chdata dat)
 	    spaceinline(l = strlen(u->line));
 	    strncpy((char *) line, u->line, l);
 	    cs = u->cs;
+	    menuacc = u->acc;
 	    memcpy(&minfo, &(u->info), sizeof(struct menuinfo));
 	    p = &(minfo.cur);
+	    mline = u->mline;
+	    mlbeg = u->mlbeg;
+	    if (u->lastmatches && lastmatches != u->lastmatches) {
+		if (lastmatches)
+		    freematches(lastmatches);
+		amatches = u->amatches;
+		pmatches = u->pmatches;
+		lastmatches = u->lastmatches;
+		lastlmatches = u->lastlmatches;
+		nmatches = u->nmatches;
+		hasoldlist = 1;
+	    }
+	    freebrinfo(brbeg);
+	    freebrinfo(brend);
+	    brbeg = dupbrinfo(u->brbeg, &lastbrbeg, 0);
+	    brend = dupbrinfo(u->brend, &lastbrend, 0);
+	    nbrbeg = u->nbrbeg;
+	    nbrend = u->nbrend;
+
 	    u = u->prev;
+	    clearlist = 1;
+	    setwish = 1;
+	    listdat.valid = 0;
 	} else if (cmd == Th(z_redisplay)) {
 	    redisplay(zlenoargs);
 	    continue;
@@ -707,6 +1743,8 @@ domenuselect(Hookdef dummy, Chdata dat)
 		    mline++;
 		    p += mcols;
 		}
+		if (adjust_mcol(wishcol, &p, NULL))
+		    continue;
 	    } while (!*p);
 	} else if (cmd == Th(z_uphistory) ||
 		   cmd == Th(z_uplineorhistory) ||
@@ -720,8 +1758,104 @@ domenuselect(Hookdef dummy, Chdata dat)
 		    mline--;
 		    p -= mcols;
 		}
+		if (adjust_mcol(wishcol, &p, NULL))
+		    continue;
 	    } while (!*p);
+	} else if (cmd == Th(z_emacsforwardword) ||
+		   cmd == Th(z_viforwardword) ||
+		   cmd == Th(z_viforwardwordend) ||
+		   cmd == Th(z_forwardword)) {
+	    int i = lines - nlnct - 1, oi = i, ll = 0;
+	    Cmatch **lp = NULL;
+
+	    if (mline == mlines - 1)
+		goto top;
+	    while (i > 0) {
+		if (mline == mlines - 1) {
+		    if (i != oi && lp)
+			break;
+		    goto top;
+		} else {
+		    mline++;
+		    p += mcols;
+		}
+		if (adjust_mcol(wishcol, &p, NULL))
+		    continue;
+		if (*p) {
+		    i--;
+		    lp = p;
+		    ll = mline;
+		}
+	    }
+	    p = lp;
+	    mline = ll;
+	} else if (cmd == Th(z_emacsbackwardword) ||
+		   cmd == Th(z_vibackwardword) ||
+		   cmd == Th(z_backwardword)) {
+	    int i = lines - nlnct - 1, oi = i, ll = 0;
+	    Cmatch **lp = NULL;
+
+	    if (!mline)
+		goto bottom;
+	    while (i > 0) {
+		if (!mline) {
+		    if (i != oi && lp)
+			break;
+		    goto bottom;
+		} else {
+		    mline--;
+		    p -= mcols;
+		}
+		if (adjust_mcol(wishcol, &p, NULL))
+		    continue;
+		if (*p) {
+		    i--;
+		    lp = p;
+		    ll = mline;
+		}
+	    }
+	    p = lp;
+	    mline = ll;
+	} else if (cmd == Th(z_beginningofhistory)) {
+	    int ll;
+	    Cmatch **lp;
+	top:
+	    ll = mline;
+	    lp = p;
+	    while (mline) {
+		mline--;
+		p -= mcols;
+		if (adjust_mcol(wishcol, &p, NULL))
+		    continue;
+		if (*p) {
+		    lp = p;
+		    ll = mline;
+		}
+	    }
+	    mline = ll;
+	    p = lp;
+	} else if (cmd == Th(z_endofhistory)) {
+	    int ll;
+	    Cmatch **lp;
+	bottom:
+	    ll = mline;
+	    lp = p;
+	    while (mline < mlines - 1) {
+		mline++;
+		p += mcols;
+		if (adjust_mcol(wishcol, &p, NULL))
+		    continue;
+		if (*p) {
+		    lp = p;
+		    ll = mline;
+		}
+	    }
+	    mline = ll;
+	    p = lp;
 	} else if (cmd == Th(z_forwardchar) || cmd == Th(z_viforwardchar)) {
+	    int omcol = mcol;
+	    Cmatch *op = *p;
+
 	    do {
 		if (mcol == mcols - 1) {
 		    p -= mcol;
@@ -730,8 +1864,12 @@ domenuselect(Hookdef dummy, Chdata dat)
 		    mcol++;
 		    p++;
 		}
-	    } while (!*p);
+	    } while (!*p || (mcol != omcol && *p == op));
+	    wishcol = mcol;
 	} else if (cmd == Th(z_backwardchar) || cmd == Th(z_vibackwardchar)) {
+	    int omcol = mcol;
+	    Cmatch *op = *p;
+
 	    do {
 		if (!mcol) {
 		    mcol = mcols - 1;
@@ -740,7 +1878,8 @@ domenuselect(Hookdef dummy, Chdata dat)
 		    mcol--;
 		    p--;
 		}
-	    } while (!*p);
+	    } while (!*p || (mcol != omcol && *p == op));
+	    wishcol = mcol;
 	} else if (cmd == Th(z_beginningofbufferorhistory) ||
 		   cmd == Th(z_beginningofline) ||
 		   cmd == Th(z_beginningoflinehist) ||
@@ -751,6 +1890,7 @@ domenuselect(Hookdef dummy, Chdata dat)
 		mcol++;
 		p++;
 	    }
+	    wishcol = 0;
 	} else if (cmd == Th(z_endofbufferorhistory) ||
 		   cmd == Th(z_endofline) ||
 		   cmd == Th(z_endoflinehist) ||
@@ -761,10 +1901,9 @@ domenuselect(Hookdef dummy, Chdata dat)
 		mcol--;
 		p--;
 	    }
-	} else if (cmd == Th(z_forwardword) ||
-		   cmd == Th(z_emacsforwardword) ||
-		   cmd == Th(z_viforwardword) ||
-		   cmd == Th(z_viforwardwordend)) {
+	    wishcol = mcols - 1;
+	} else if (cmd == Th(z_viforwardblankword) ||
+		   cmd == Th(z_viforwardblankwordend)) {
 	    Cmgroup g = *pg;
 	    int ol = mline;
 
@@ -778,10 +1917,10 @@ domenuselect(Hookdef dummy, Chdata dat)
 		    p += mcols;
 		    pg += mcols;
 		}
+		if (adjust_mcol(wishcol, &p, &pg))
+		    continue;
 	    } while (ol != mline && (*pg == g || !*pg));
-	} else if (cmd == Th(z_backwardword) ||
-		   cmd == Th(z_emacsbackwardword) ||
-		   cmd == Th(z_vibackwardword)) {
+	} else if (cmd == Th(z_vibackwardblankword)) {
 	    Cmgroup g = *pg;
 	    int ol = mline;
 
@@ -795,6 +1934,8 @@ domenuselect(Hookdef dummy, Chdata dat)
 		    p -= mcols;
 		    pg -= mcols;
 		}
+		if (adjust_mcol(wishcol, &p, &pg))
+		    continue;
 	    } while (ol != mline && (*pg == g || !*pg));
 	} else if (cmd == Th(z_completeword) ||
 		   cmd == Th(z_expandorcomplete) ||
@@ -809,11 +1950,13 @@ domenuselect(Hookdef dummy, Chdata dat)
 		   !strcmp(cmd->nam, "menu-expand-or-complete")) {
 	    do_menucmp(0);
 	    mselect = (*(minfo.cur))->gnum;
+	    setwish = 1;
 	    continue;
 	} else if (cmd == Th(z_reversemenucomplete) ||
 		   !strcmp(cmd->nam, "reverse-menu-complete")) {
 	    reversemenucomplete(zlenoargs);
 	    mselect = (*(minfo.cur))->gnum;
+	    setwish = 1;
 	    continue;
 	} else {
 	    ungetkeycmd();
@@ -822,14 +1965,35 @@ domenuselect(Hookdef dummy, Chdata dat)
 	do_single(**p);
 	mselect = (**p)->gnum;
     }
+    if (u)
+	for (; u; u = u->prev)
+	    if (u->lastmatches != lastmatches)
+		freematches(u->lastmatches);
+
     selectlocalmap(NULL);
-    mselect = -1;
-    inselect = 0;
+    mselect = mlastcols = mlastlines = -1;
+    mstatus = NULL;
+    inselect = mhasstat = 0;
+    if (acc) {
+	menucmp = lastambig = hasoldlist = 0;
+	do_single(*(minfo.cur));
+    }
+    if (wasnext) {
+	menucmp = 2;
+	showinglist = -2;
+	minfo.asked = 0;
+    }
     if (!noselect) {
 	showinglist = -2;
+	onlyexpl = oe;
+	if (!smatches)
+	    clearlist = 1;
 	zrefresh();
     }
-    return noselect;
+    mlbeg = -1;
+    fdat = NULL;
+
+    return (!noselect ^ acc);
 }
 
 /* The widget function. */
@@ -840,8 +2004,9 @@ menuselect(char **args)
     int d = 0;
 
     if (!minfo.cur) {
+	selected = 0;
 	menucomplete(args);
-	if ((minfo.cur && minfo.asked == 2) || getsparam("ZLS_SELECT"))
+	if ((minfo.cur && minfo.asked == 2) || selected)
 	    return 0;
 	d = 1;
     }
@@ -853,14 +2018,14 @@ menuselect(char **args)
 
 /**/
 int
-setup_complist(Module m)
+setup_(Module m)
 {
     return 0;
 }
 
 /**/
 int
-boot_complist(Module m)
+boot_(Module m)
 {
     mtab = NULL;
     mgtab = NULL;
@@ -874,7 +2039,7 @@ boot_complist(Module m)
 		 NULL, 0);
 	return -1;
     }
-    addhookfunc("list_matches", (Hookfn) complistmatches);
+    addhookfunc("comp_list_matches", (Hookfn) complistmatches);
     addhookfunc("menu_start", (Hookfn) domenuselect);
     mskeymap = newkeymap(NULL, "menuselect");
     linkkeymap(mskeymap, "menuselect", 1);
@@ -892,17 +2057,15 @@ boot_complist(Module m)
     return 0;
 }
 
-#ifdef MODULE
-
 /**/
 int
-cleanup_complist(Module m)
+cleanup_(Module m)
 {
     free(mtab);
     free(mgtab);
 
     deletezlefunction(w_menuselect);
-    deletehookfunc("list_matches", (Hookfn) complistmatches);
+    deletehookfunc("comp_list_matches", (Hookfn) complistmatches);
     deletehookfunc("menu_start", (Hookfn) domenuselect);
     unlinkkeymap("menuselect", 1);
     return 0;
@@ -910,9 +2073,7 @@ cleanup_complist(Module m)
 
 /**/
 int
-finish_complist(Module m)
+finish_(Module m)
 {
     return 0;
 }
-
-#endif

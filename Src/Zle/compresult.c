@@ -1157,7 +1157,7 @@ skipnolist(Cmatch *p, int showall)
 }
 
 /**/
-mod_export void
+mod_export int
 calclist(int showall)
 {
     Cmgroup g;
@@ -1170,7 +1170,7 @@ calclist(int showall)
     if (listdat.valid && onlyexpl == listdat.onlyexpl &&
 	menuacc == listdat.menuacc && showall == listdat.showall &&
 	lines == listdat.lines && columns == listdat.columns)
-	return;
+	return 0;
 
     for (g = amatches; g; g = g->next) {
 	char **pp = g->ylist;
@@ -1572,11 +1572,16 @@ calclist(int showall)
     listdat.columns = columns;
     listdat.lines = lines;
     listdat.showall = showall;
+
+    return 1;
 }
 
 /**/
-mod_export int asklist(void)
+mod_export int
+asklist(void)
 {
+    int lmax = (complistmax ? (int) mathevali(complistmax) : 0);
+
     /* Set the cursor below the prompt. */
     trashzle();
     showinglist = listshown = 0;
@@ -1586,9 +1591,9 @@ mod_export int asklist(void)
 
     /* Maybe we have to ask if the user wants to see the list. */
     if ((!minfo.cur || !minfo.asked) &&
-	((complistmax > 0 && listdat.nlist >= complistmax) ||
-	 (complistmax < 0 && listdat.nlines <= -complistmax) ||
-	 (!complistmax && listdat.nlines >= lines))) {
+	((lmax > 0 && listdat.nlist >= lmax) ||
+	 (lmax < 0 && listdat.nlines <= -lmax) ||
+	 (!lmax && listdat.nlines >= lines))) {
 	int qup, l;
 
 	zsetterm();
@@ -1599,7 +1604,7 @@ mod_export int asklist(void)
 		     listdat.nlines));
 	qup = ((l + columns - 1) / columns) - 1;
 	fflush(shout);
-	if (getzlequery() != 'y') {
+	if (getzlequery(1) != 'y') {
 	    if (clearflag) {
 		putc('\r', shout);
 		tcmultout(TCUP, TCMULTUP, qup);

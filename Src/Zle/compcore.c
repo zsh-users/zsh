@@ -296,7 +296,8 @@ do_completion(Hookdef dummy, Compldat dat)
     comppatinsert = ztrdup("menu");
     forcelist = 0;
     haspattern = 0;
-    complistmax = getiparam("LISTMAX");
+    zsfree(complistmax);
+    complistmax = ztrdup(getsparam("LISTMAX"));
     zsfree(complastprompt);
     complastprompt = ztrdup(((isset(ALWAYSLASTPROMPT) && zmult == 1) ||
 			     (unset(ALWAYSLASTPROMPT) && zmult != 1)) ?
