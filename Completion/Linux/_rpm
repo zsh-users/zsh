@@ -50,21 +50,26 @@ state=''
 
 # Do simple completions or get the first state.
 
-_arguments \
+_arguments -s \
   '--rcfile:resource file:_files' \
   '--ftpproxy:FTP proxy server:_hosts' \
   '--ftpport:FTP port number:' \
   '-q:*:query:->query' \
-  -{V,v,vv,y,-{setperms,setugids,querytags,initdb,showrc}} \
-  '-pipe:*:pipe command:_command_names -e' \
+  '*-v' \
+  -{V,y,-{setperms,setugids,querytags,initdb,showrc}} \
+  '-pipe:pipe command:_command_names -e' \
   '--verify:*:verify:->verify' \
-  -{i,-install}':*:install:->install' \
-  -{U,-upgrade}':*:upgrade:->upgrade' \
-  -{e,-erase}':*:uninstall:->uninstall' \
+  '-i+:*:install:->install' \
+  '--install:*:install:->install' \
+  '-U+:*:upgrade:->upgrade' \
+  '--upgrade:*:upgrade:->upgrade' \
+  '-e+:*:uninstall:->uninstall' \
+  '--erase:*:uninstall:->uninstall' \
   -'b+:build stage:((p\:execute\ \%prep\ stage l\:do\ a\ list\ check c\:execute\ build\ stage i\:execute\ install\ stage b\:build\ a\ binary\ package a\:build\ binary\ and\ source\ packages)):*:build:->build_b' \
   -'t+:build stage:((p\:execute\ \%prep\ stage l\:do\ a\ list\ check c\:execute\ build\ stage i\:execute\ install\ stage b\:build\ a\ binary\ package a\:build\ binary\ and\ source\ packages)):*:build:->build_t' \
   --{rebuild,rmsource,recompile,resign,addsign}':*:RPM package:->package' \
-  -{K,-checksig}':*:sigcheck:->sigcheck' \
+  '-K+:*:sigcheck:->sigcheck' \
+  '--checksig:*:sigcheck:->sigcheck' \
   '--rebuilddb:*:rebuild:->rebuild' && ret=0
 
 # As long as we have a state name...
@@ -85,8 +90,8 @@ while [[ -n "$state" ]]; do
 
   case "$lstate" in
   query)
-    _arguments \
-      -{v,vv} \
+    _arguments -s \
+      '*-v' \
       '--rcfile:resource file:_files' \
       '--ftpproxy:FTP proxy server:_hosts' \
       '--ftpport:FTP port number:' \
@@ -101,8 +106,8 @@ while [[ -n "$state" ]]; do
       '*:RPM package:->package_or_file' && ret=0
     ;;
   verify)
-    _arguments \
-      -{v,vv} \
+    _arguments -s \
+      '*-v' \
       '--rcfile:resource file:_files' \
       '--ftpproxy:FTP proxy server:_hosts' \
       '--ftpport:FTP port number:' \
@@ -112,11 +117,13 @@ while [[ -n "$state" ]]; do
       '*:RPM package:->package' && ret=0
     ;;
   upgrade)
-    tmp=( --oldpackage )
+    tmp=( -U --oldpackage )
     ;&
   install)
-    _arguments "$tmp[@]" \
-      -{v,vv} \
+    (( $#tmp )) || tmp=(-i)
+#set -x
+    _arguments -s "$tmp[@]" \
+      '*-v' \
       '--rcfile:resource file:_files' \
       '--ftpproxy:FTP proxy server:_hosts' \
       '--ftpport:FTP port number:' \
@@ -128,8 +135,8 @@ while [[ -n "$state" ]]; do
       '*:pkg file:->package_file' && ret=0
     ;;
   uninstall)
-    _arguments \
-      -{v,vv} \
+    _arguments -s \
+      '*-v' -e \
       '--rcfile:resource file:_files' \
       '--ftpproxy:FTP proxy server:_hosts' \
       '--ftpport:FTP port number:' \
@@ -144,8 +151,8 @@ while [[ -n "$state" ]]; do
   build_t)
     (( $#tmp )) || tmp=( '*:tar file:_files -g \*.\(\#i\)tar\(.\*\|\)' )
 
-    _arguments \
-      -{v,vv} \
+    _arguments -s \
+      '*-v' \
       '--rcfile:resource file:_files' \
       '--ftpproxy:FTP proxy server:_hosts' \
       '--ftpport:FTP port number:' \
@@ -156,8 +163,8 @@ while [[ -n "$state" ]]; do
       '--timecheck:time check (seconds):' "$tmp[1]" && ret=0
     ;;
   sigcheck)
-    _arguments \
-      -{v,vv} \
+    _arguments -s \
+      '*-v' -K \
       '--rcfile:resource file:_files' \
       '--ftpproxy:FTP proxy server:_hosts' \
       '--ftpport:FTP port number:' \
@@ -165,8 +172,8 @@ while [[ -n "$state" ]]; do
       '*:RPM package file:->package_or_file' && ret=0
     ;;
   rebuild)
-    _arguments \
-      -{v,vv} \
+    _arguments -s \
+      '*-v' \
       '--rcfile:resource file:_files' \
       '--ftpproxy:FTP proxy server:_hosts' \
       '--ftpport:FTP port number:' \
@@ -185,7 +192,8 @@ while [[ -n "$state" ]]; do
     if compset -P ftp:; then
       _hosts -S/ && ret=0
     else
-      _files -g '*.(#i)rpm' && ret=0
+      _description expl 'RPM package file'
+      _files "$expl[@]" -g '*.(#i)rpm' && ret=0
     fi
     ;;
   tags)

@@ -6,7 +6,7 @@
 setopt localoptions extendedglob
 
 local args rest ws cur nth def nm expl descr action opt arg tmp xor
-local single uns ret=1 soptseq soptseq1 sopts prefix _line odescr
+local single uns ret=1 aret soptseq soptseq1 sopts prefix _line odescr
 local beg optbeg argbeg nargbeg inopt inrest fromrest cmd="$words[1]"
 local matched curopt
 
@@ -488,7 +488,7 @@ while [[ cur -gt 0 ]]; do
           fi
 	  if [[ "$def" = [^*]*[^\\]:*[^\\]:* ]]; then
             def="${def#?*[^\\]:*[^\\]:}"
-          else
+          elif [[ "$def" != \** ]]; then
             def=''
 	  fi
         fi
@@ -548,7 +548,7 @@ while [[ cur -gt 0 ]]; do
               def="${def#?*[^\\]:*[^\\]:}"
 	      optbeg="$beg"
 	      argbeg="$beg"
-            else
+            elif [[ "$def" != \** ]]; then
               def=''
             fi
 	  fi
@@ -560,12 +560,16 @@ while [[ cur -gt 0 ]]; do
 
       if [[ -n "$uns" ]]; then
         uns="${(@j::)${(v)=xors[(I)${ws[1][1]}[$uns]]}#[-+]}"
-	tmp=(
-	  "opts[${(@)^opts[(I)${ws[1][1]}[$uns]]}]"
-	  "dopts[${(@)^dopts[(I)${ws[1][1]}[$uns]]}]"
-	  "odopts[${(@)^odopts[(I)${ws[1][1]}[$uns]]}]"
-	)
-	(( $#tmp )) && unset "$tmp[@]"
+	if  [[ -n "$uns" ]]; then
+	  tmp=(
+	    "opts[${(@)^opts[(I)${ws[1][1]}[$uns]]}]"
+	    "dopts[${(@)^dopts[(I)${ws[1][1]}[$uns]]}]"
+	    "odopts[${(@)^odopts[(I)${ws[1][1]}[$uns]]}]"
+	    "xors[${(@)^xors[(I)${ws[1][1]}[$uns]]}]"
+	  )
+	  odescr=( "${(@)odescr:#${ws[1][1]}[$uns]:*}" )
+	  (( $#tmp )) && unset "$tmp[@]"
+        fi
       fi
 
       # If we didn't find a matching option description and we were
@@ -672,12 +676,16 @@ if [[ -z "$def" || "$def" = :* ]]; then
 
   if [[ -n "$uns" ]]; then
     uns="${(@j::)${(v)=xors[(I)${ws[1][1]}[$uns]]}#[-+]}"
-    tmp=(
-      "opts[${(@)^opts[(I)${pre[1]}[$uns]]}]"
-      "dopts[${(@)^dopts[(I)${pre[1]}[$uns]]}]"
-      "odopts[${(@)^odopts[(I)${pre[1]}[$uns](|=)]}]"
-    )
-    (( $#tmp )) && unset "$tmp[@]"
+    if [[ -n "$uns" ]]; then
+      tmp=(
+        "opts[${(@)^opts[(I)${pre[1]}[$uns]]}]"
+        "dopts[${(@)^dopts[(I)${pre[1]}[$uns]]}]"
+        "odopts[${(@)^odopts[(I)${pre[1]}[$uns](|=)]}]"
+        "xors[${(@)^xors[(I)${pre[1]}[$uns]]}]"
+      )
+      odescr=( "${(@)odescr:#${pre[1]}[$uns]:*}" )
+      (( $#tmp )) && unset "$tmp[@]"
+    fi
   fi
 
   # If we aren't in an argument directly after a option name, all option
@@ -740,7 +748,7 @@ while true; do
       options=( "${(@kv)_options}" )
       state="${${action[3,-1]##[ 	]#}%%[ 	]#}"
       compstate[restore]=''
-      return 300
+      aret=yes
     else
       if [[ "${(t)line}" != *local* ]]; then
         local line
@@ -799,7 +807,7 @@ while true; do
   # Probably add the option names.
 
   if [[ -n "$opt" &&
-        ( nm -eq compstate[nmatches] ||
+        ( ( nm -eq compstate[nmatches] && -z "$aret" ) ||
           -z "$compconfig[option_prefix]" || 
           "$compconfig[option_prefix]" = *\!${cmd}* ||
           "$PREFIX" = [-+]* ) ]]; then
@@ -881,6 +889,8 @@ while true; do
 
   break
 done
+
+[[ -n "$aret" ]] && return 300
 
 # Set the return value.
 
