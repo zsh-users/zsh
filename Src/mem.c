@@ -64,6 +64,15 @@
 	guarantees that the memory for the pool is at the end of the memory
 	which means that we can give it back to the system when the pool is
 	freed.
+
+	hrealloc(char *p, size_t old, size_t new) is an optimisation
+	with a similar interface to realloc().  Typically the new size
+	will be larger than the old one, since there is no gain in
+	shrinking the allocation (indeed, that will confused hrealloc()
+	since it will forget that the unused space once belonged to this
+	pointer).  However, new == 0 is a special case; then if we
+	had to allocate a special heap for this memory it is freed at
+	that point.
 */
 
 #if defined(HAVE_SYS_MMAN_H) && defined(HAVE_MMAP) && defined(HAVE_MUNMAP)
@@ -98,8 +107,12 @@ union mem_align {
 
 #define H_ISIZE  sizeof(union mem_align)
 #define HEAPSIZE (16384 - H_ISIZE)
+/* Memory available for user data in default arena size */
 #define HEAP_ARENA_SIZE (HEAPSIZE - sizeof(struct heap))
 #define HEAPFREE (16384 - H_ISIZE)
+
+/* Memory available for user data in heap h */
+#define ARENA_SIZEOF(h) ((h)->size - sizeof(struct heap))
 
 /* list of zsh heaps */
 
@@ -215,7 +228,7 @@ freeheap(void)
 	    memset(arena(h) + h->sp->used, 0xff, h->used - h->sp->used);
 #endif
 	    h->used = h->sp->used;
-	    if (!fheap && h->used < HEAP_ARENA_SIZE)
+	    if (!fheap && h->used < ARENA_SIZEOF(h))
 		fheap = h;
 	    hl = h;
 	} else {
@@ -258,7 +271,7 @@ popheap(void)
 	    memset(arena(h) + hs->used, 0xff, h->used - hs->used);
 #endif
 	    h->used = hs->used;
-	    if (!fheap && h->used < HEAP_ARENA_SIZE)
+	    if (!fheap && h->used < ARENA_SIZEOF(h))
 		fheap = h;
 	    zfree(hs, sizeof(*hs));
 
@@ -279,6 +292,44 @@ popheap(void)
     unqueue_signals();
 }
 
+#ifdef USE_MMAP
+/*
+ * Utility function to allocate a heap area of at least *n bytes.
+ * *n will be rounded up to the next page boundary.
+ */
+static Heap
+mmap_heap_alloc(size_t *n)
+{
+    Heap h;
+    static size_t pgsz = 0;
+
+    if (!pgsz) {
+
+#ifdef _SC_PAGESIZE
+	pgsz = sysconf(_SC_PAGESIZE);     /* SVR4 */
+#else
+# ifdef _SC_PAGE_SIZE
+	pgsz = sysconf(_SC_PAGE_SIZE);    /* HPUX */
+# else
+	pgsz = getpagesize();
+# endif
+#endif
+
+	pgsz--;
+    }
+    *n = (*n + pgsz) & ~pgsz;
+    h = (Heap) mmap(NULL, *n, PROT_READ | PROT_WRITE,
+		    MMAP_FLAGS, -1, 0);
+    if (h == ((Heap) -1)) {
+	zerr("fatal error: out of heap memory", NULL, 0);
+	exit(1);
+    }
+
+    return h;
+}
+#endif
+
+
 /* allocate memory from the current memory pool */
 
 /**/
@@ -298,9 +349,10 @@ zhalloc(size_t size)
 
     /* find a heap with enough free space */
 
-    for (h = ((fheap && HEAP_ARENA_SIZE >= (size + fheap->used)) ? fheap : heaps);
+    for (h = ((fheap && ARENA_SIZEOF(fheap) >= (size + fheap->used))
+	      ? fheap : heaps);
 	 h; h = h->next) {
-	if (HEAP_ARENA_SIZE >= (n = size + h->used)) {
+	if (ARENA_SIZEOF(h) >= (n = size + h->used)) {
 	    void *ret;
 
 	    h->used = n;
@@ -322,32 +374,7 @@ zhalloc(size_t size)
 	for (hp = NULL, h = heaps; h; hp = h, h = h->next);
 
 #ifdef USE_MMAP
-	{
-	    static size_t pgsz = 0;
-
-	    if (!pgsz) {
-
-#ifdef _SC_PAGESIZE
-		pgsz = sysconf(_SC_PAGESIZE);     /* SVR4 */
-#else
-# ifdef _SC_PAGE_SIZE
-		pgsz = sysconf(_SC_PAGE_SIZE);    /* HPUX */
-# else
-		pgsz = getpagesize();
-# endif
-#endif
-
-		pgsz--;
-	    }
-	    n = (n + pgsz) & ~pgsz;
-	    h = (Heap) mmap(NULL, n, PROT_READ | PROT_WRITE,
-			    MMAP_FLAGS, -1, 0);
-	    if (h == ((Heap) -1)) {
-		zerr("fatal error: out of heap memory", NULL, 0);
-		exit(1);
-	    }
-	    h->size = n;
-	}
+	h = mmap_heap_alloc(&n);
 #else
 	h = (Heap) zalloc(n);
 #endif
@@ -358,6 +385,7 @@ zhalloc(size_t size)
 	called = 1;
 #endif
 
+	h->size = n;
 	h->used = size;
 	h->next = NULL;
 	h->sp = NULL;
@@ -391,13 +419,21 @@ hrealloc(char *p, size_t old, size_t new)
 
     queue_signals();
     for (h = heaps, ph = NULL; h; ph = h, h = h->next)
-	if (p >= arena(h) && p < arena(h) + HEAP_ARENA_SIZE)
+	if (p >= arena(h) && p < arena(h) + ARENA_SIZEOF(h))
 	    break;
 
     DPUTS(!h, "BUG: hrealloc() called for non-heap memory.");
     DPUTS(h->sp && arena(h) + h->sp->used > p,
 	  "BUG: hrealloc() wants to realloc pushed memory");
 
+    /*
+     * If the end of the old chunk is before the used pointer,
+     * more memory has been zhalloc'ed afterwards.
+     * We can't tell if that's still in use, obviously, since
+     * that's the whole point of heap memory.
+     * We have no choice other than to grab some more memory
+     * somewhere else and copy in the old stuff.
+     */
     if (p + old < arena(h) + h->used) {
 	if (new > old) {
 	    char *ptr = (char *) zhalloc(new);
@@ -415,7 +451,19 @@ hrealloc(char *p, size_t old, size_t new)
 
     DPUTS(p + old != arena(h) + h->used, "BUG: hrealloc more than allocated");
 
+    /*
+     * We now know there's nothing afterwards in the heap, now see if
+     * there's nothing before.  Then we can reallocate the whole thing.
+     * Otherwise, we need to keep the stuff at the start of the heap,
+     * then allocate a new one too; this is handled below.  (This will
+     * guarantee we occupy a full heap next time round, provided we
+     * don't use the heap for anything else.)
+     */
     if (p == arena(h)) {
+	/*
+	 * Zero new seems to be a special case saying we've finished
+	 * with the specially reallocated memory, see scanner() in glob.c.
+	 */
 	if (!new) {
 	    if (ph)
 		ph->next = h->next;
@@ -430,24 +478,51 @@ hrealloc(char *p, size_t old, size_t new)
 	    unqueue_signals();
 	    return NULL;
 	}
-#ifndef USE_MMAP
-	if (old > HEAP_ARENA_SIZE || new > HEAP_ARENA_SIZE) {
-	    size_t n = HEAP_ARENA_SIZE > new ? HEAPSIZE : new + sizeof(*h);
+	if (new > ARENA_SIZEOF(h)) {
+	    /*
+	     * Not enough memory in this heap.  Allocate a new
+	     * one of sufficient size.
+	     *
+	     * To avoid this happening too often, allocate
+	     * chunks in multiples of HEAPSIZE.
+	     * (Historical note:  there didn't used to be any
+	     * point in this since we didn't consistently record
+	     * the allocated size of the heap, but now we do.)
+	     */
+	    size_t n = (new + sizeof(*h) + HEAPSIZE);
+	    n -= n % HEAPSIZE;
 
+#ifdef USE_MMAP
+	    /*
+	     * I don't know any easy portable way of requesting
+	     * a mmap'd segment be extended, so simply allocate
+	     * a new one and copy.
+	     */
+	    Heap hnew;
+
+	    hnew = mmap_heap_alloc(&n);
+	    /* Copy the entire heap, header (with next pointer) included */
+	    memcpy(hnew, h, h->size);
+	    munmap((void *)h, h->size);
+	    h = hnew;
+#else
+	    h = (Heap) realloc(h, n);
+#endif
+
+	    h->size = n;
 	    if (ph)
-		ph->next = h = (Heap) realloc(h, n);
+		ph->next = h;
 	    else
-		heaps = h = (Heap) realloc(h, n);
+		heaps = h;
 	}
 	h->used = new;
 	unqueue_signals();
 	return arena(h);
-#endif
     }
 #ifndef USE_MMAP
-    DPUTS(h->used > HEAP_ARENA_SIZE, "BUG: hrealloc at invalid address");
+    DPUTS(h->used > ARENA_SIZEOF(h), "BUG: hrealloc at invalid address");
 #endif
-    if (h->used + (new - old) <= HEAP_ARENA_SIZE) {
+    if (h->used + (new - old) <= ARENA_SIZEOF(h)) {
 	h->used += new - old;
 	unqueue_signals();
 	return p;
