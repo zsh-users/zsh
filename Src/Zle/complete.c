@@ -442,6 +442,12 @@ bin_compadd(char *name, char **argv, char *ops, int func)
 	    case 'e':
 		dat.flags |= CMF_ISPAR;
 		break;
+	    case 'a':
+		dat.aflags |= CAF_ARRAYS;
+		break;
+	    case 'k':
+		dat.aflags |= CAF_ARRAYS|CAF_KEYS;
+		break;
 	    case 'F':
 		sp = &(dat.ign);
 		e = "string expected after -%c";

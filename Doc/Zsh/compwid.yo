@@ -415,7 +415,7 @@ sect(Builtin Commands)
 startitem()
 findex(compadd)
 cindex(completion widgets, adding specified matches)
-xitem(tt(compadd) [ tt(-qQfenUal12) ] [ tt(-F) var(array) ])
+xitem(tt(compadd) [ tt(-akqQfenUl12) ] [ tt(-F) var(array) ])
 xitem([ tt(-P) var(prefix) ] [ tt(-S) var(suffix) ])
 xitem([ tt(-p) var(hidden-prefix) ] [ tt(-s) var(hidden-suffix) ])
 xitem([ tt(-i) var(ignored-prefix) ] [ tt(-I) var(ignored-suffix) ])
@@ -479,6 +479,14 @@ match.
 )
 item(tt(-I) var(ignored-suffix))(
 Like tt(-i), but gives an ignored suffix.
+)
+item(tt(-a))(
+With this flag the var(words) are taken as names of arrays and the
+possible matches are their values.
+)
+item(tt(-k))(
+With this flag the var(words) are taken as names of associative arrays
+and the possible matches are their keys.
 )
 item(tt(-d) var(array))(
 This adds per-match display strings. The var(array) should contain one 

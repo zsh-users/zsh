@@ -233,6 +233,8 @@ struct menuinfo {
 #define CAF_MATCH    4
 #define CAF_UNIQCON  8
 #define CAF_UNIQALL 16
+#define CAF_ARRAYS  32
+#define CAF_KEYS    64
 
 /* Data for compadd and addmatches() */
 

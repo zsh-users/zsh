@@ -1741,6 +1741,21 @@ gethparam(char *s)
     return NULL;
 }
 
+/* Retrieve the keys of an assoc array parameter as an array */
+
+/**/
+mod_export char **
+gethkparam(char *s)
+{
+    struct value vbuf;
+    Value v;
+
+    if (!idigit(*s) && (v = getvalue(&vbuf, &s, 0)) &&
+	PM_TYPE(v->pm->flags) == PM_HASHED)
+	return paramvalarr(v->pm->gets.hfn(v->pm), SCANPM_WANTKEYS);
+    return NULL;
+}
+
 /**/
 mod_export Param
 setsparam(char *s, char *val)

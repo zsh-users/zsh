@@ -1538,6 +1538,17 @@ get_user_var(char *nam)
     }
 }
 
+static char **
+get_user_keys(char *nam)
+{
+    char **ret;
+
+    if ((ret = gethkparam(nam)))
+	return (incompfunc ? arrdup(ret) : ret);
+
+    return NULL;
+}
+
 /* This is used by compadd to add a couple of matches. The arguments are
  * the strings given via options. The last argument is the array with
  * the matches. */
@@ -1549,8 +1560,9 @@ addmatches(Cadata dat, char **argv)
     char *s, *ms, *lipre = NULL, *lisuf = NULL, *lpre = NULL, *lsuf = NULL;
     char **aign = NULL, **dparr = NULL, *oaq = autoq, *oppre = dat->ppre;
     char *oqp = qipre, *oqs = qisuf, qc, **disp = NULL, *ibuf = NULL;
+    char **arrays = NULL;
     int lpl, lsl, pl, sl, bcp = 0, bcs = 0, bpadd = 0, bsadd = 0;
-    int ppl = 0, psl = 0;
+    int ppl = 0, psl = 0, ilen = 0;
     int llpl = 0, llsl = 0, nm = mnum, gflags = 0, ohp = haspattern;
     int isexact, doadd, ois = instring, oib = inbackt;
     Cline lc = NULL, pline = NULL, sline = NULL;
@@ -1855,16 +1867,18 @@ addmatches(Cadata dat, char **argv)
 	/* Walk through the matches given. */
 	obpl = bpl;
 	obsl = bsl;
-	if (aign || pign) {
-	    int max = 0;
-	    char **ap = argv;
-
-	    ppl = (dat->ppre ? strlen(dat->ppre) : 0);
-	    while ((s = *ap++))
-		if ((sl = strlen(s)) > max)
-		    max = sl;
-	    psl = (dat->psuf ? strlen(dat->psuf) : 0);
-	    ibuf = (char *) zhalloc(1 + ppl + max + psl);
+	if (dat->aflags & CAF_ARRAYS) {
+	    arrays = argv;
+	    argv = NULL;
+	    while (*arrays && (!(argv = ((dat->aflags & CAF_KEYS) ?
+					 get_user_keys(*arrays) :
+					 get_user_var(*arrays))) || !*argv))
+		arrays++;
+	    arrays++;
+	    if (!argv) {
+		ms = NULL;
+		argv = &ms;
+	    }
 	}
 	for (; (s = *argv); argv++) {
 	    bpl = obpl;
@@ -1876,6 +1890,9 @@ addmatches(Cadata dat, char **argv)
 	    sl = strlen(s);
 	    if (aign || pign) {
 		int il = ppl + sl + psl, addit = 1;
+
+		if (il > ilen)
+		    ibuf = (char *) zhalloc((ilen = il) + 1);
 
 		if (ppl)
 		    memcpy(ibuf, dat->ppre, ppl);
@@ -1952,6 +1969,19 @@ addmatches(Cadata dat, char **argv)
 			dparr = NULL;
 		}
 		free_cline(lc);
+	    }
+	    if ((dat->aflags & CAF_ARRAYS) && !argv[1]) {
+		argv = NULL;
+		while (*arrays && (!(argv = ((dat->aflags & CAF_KEYS) ?
+					     get_user_keys(*arrays) :
+					     get_user_var(*arrays))) || !*argv))
+		    arrays++;
+		arrays++;
+		if (!argv) {
+		    ms = NULL;
+		    argv = &ms;
+		}
+		argv--;
 	    }
 	}
 	if (dat->apar)
