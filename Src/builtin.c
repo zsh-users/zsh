@@ -2322,6 +2322,7 @@ mkautofn(Shfunc shf)
     p->strs = NULL;
     p->shf = shf;
     p->npats = 0;
+    p->nref = 1; /* allocated from permanent storage */
     p->pats = (Patprog *) p->prog;
     p->flags = EF_REAL;
     p->dump = NULL;

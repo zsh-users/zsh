@@ -163,8 +163,6 @@ loop(int toplevel, int justonce)
 	    if (stopmsg)	/* unset 'you have stopped jobs' flag */
 		stopmsg--;
 	    execode(prog, 0, 0);
-	    if (toplevel)
-		freeeprogs();
 	    tok = toksav;
 	    if (toplevel)
 		noexitct = 0;

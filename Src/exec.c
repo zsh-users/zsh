@@ -725,8 +725,11 @@ execode(Eprog p, int dont_change_job, int exiting)
     s.prog = p;
     s.pc = p->prog;
     s.strs = p->strs;
+    useeprog(p);		/* Mark as in use */
 
     execlist(&s, dont_change_job, exiting);
+
+    freeeprog(p);		/* Free if now unused */
 }
 
 /* Execute a simplified command. This is used to execute things that
@@ -3134,6 +3137,7 @@ execfuncdef(Estate state, int do_exec)
     while ((s = (char *) ugetnode(names))) {
 	prog = (Eprog) zalloc(sizeof(*prog));
 	prog->npats = npats;
+	prog->nref = 1; /* allocated from permanent storage */
 	prog->len = len;
 	if (state->prog->dump) {
 	    prog->flags = EF_MAP;

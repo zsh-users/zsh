@@ -497,10 +497,28 @@ struct funcdump {
     char *filename;
 };
 
+/*
+ * A note on the use of reference counts in Eprogs.
+ *
+ * When an Eprog is created, nref is set to -1 if the Eprog is on the
+ * heap; then no attempt is ever made to free it.  (This information is
+ * already present in EF_HEAP; we use the redundancy for debugging
+ * checks.)
+ *
+ * Otherwise, nref is initialised to 1.  Calling freeprog() decrements
+ * nref and frees the Eprog if the count is now zero.  When the Eprog
+ * is in use, we call useeprog() at the start and freeprog() at the
+ * end to increment and decrement the reference counts.  If an attempt
+ * is made to free the Eprog from within, this will then take place
+ * when execution is finished, typically in the call to freeeprog()
+ * in execode().  If the Eprog was on the heap, neither useeprog()
+ * nor freeeprog() has any effect.
+ */
 struct eprog {
     int flags;			/* EF_* below */
     int len;			/* total block length */
     int npats;			/* Patprog cache size */
+    int nref;			/* number of references: delete when zero */
     Patprog *pats;		/* the memory block, the patterns */
     Wordcode prog;		/* memory block ctd, the code */
     char *strs;			/* memory block ctd, the strings */

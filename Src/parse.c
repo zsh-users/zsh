@@ -396,6 +396,7 @@ bld_eprog(void)
 		(ecused * sizeof(wordcode)) +
 		ecsoffs);
     ret->npats = ecnpats;
+    ret->nref = -1;		/* Eprog is on the heap */
     ret->pats = (Patprog *) zhalloc(ret->len);
     ret->prog = (Wordcode) (ret->pats + ecnpats);
     ret->strs = (char *) (ret->prog + ecused);
@@ -2085,6 +2086,12 @@ dupeprog(Eprog p, int heap)
     r->dump = NULL;
     r->len = p->len;
     r->npats = p->npats;
+    /*
+     * If Eprog is on the heap, reference count is not valid.
+     * Otherwise, initialise reference count to 1 so that a freeeprog()
+     * will delete it if it is not in use.
+     */
+    r->nref = heap ? -1 : 1;
     pp = r->pats = (heap ? (Patprog *) hcalloc(r->len) :
 		    (Patprog *) zcalloc(r->len));
     r->prog = (Wordcode) (r->pats + r->npats);
@@ -2098,33 +2105,49 @@ dupeprog(Eprog p, int heap)
     return r;
 }
 
-static LinkList eprog_free;
+
+/*
+ * Pair of functions to mark an Eprog as in use, and to delete it
+ * when it is no longer in use, by means of the reference count in
+ * then nref element.
+ *
+ * If nref is negative, the Eprog is on the heap and is never freed.
+ */
+
+/* Increase the reference count of an Eprog so it won't be deleted. */
+
+/**/
+mod_export void
+useeprog(Eprog p)
+{
+    if (p && p != &dummy_eprog && p->nref >= 0)
+	p->nref++;
+}
+
+/* Free an Eprog if we have finished with it */
 
 /**/
 mod_export void
 freeeprog(Eprog p)
 {
-    if (p && p != &dummy_eprog)
-	zaddlinknode(eprog_free, p);
-}
-
-/**/
-void
-freeeprogs(void)
-{
-    Eprog p;
     int i;
     Patprog *pp;
 
-    while ((p = (Eprog) getlinknode(eprog_free))) {
-	for (i = p->npats, pp = p->pats; i--; pp++)
-	    freepatprog(*pp);
-	if (p->dump) {
-	    decrdumpcount(p->dump);
-	    zfree(p->pats, p->npats * sizeof(Patprog));
-	} else
-	    zfree(p->pats, p->len);
-	zfree(p, sizeof(*p));
+    if (p && p != &dummy_eprog) {
+	/* paranoia */
+	DPUTS(p->nref > 0 && (p->flags & EF_HEAP), "Heap EPROG has nref > 0");
+	DPUTS(p->nref < 0 && !(p->flags & EF_HEAP), "Real EPROG has nref < 0");
+	DPUTS(p->nref < -1 || p->nref > 256, "Uninitialised EPROG nref");
+	if (p->nref > 0 && !--p->nref) {
+	    for (i = p->npats, pp = p->pats; i--; pp++)
+		freepatprog(*pp);
+	    if (p->dump) {
+		decrdumpcount(p->dump);
+		zfree(p->pats, p->npats * sizeof(Patprog));
+	    } else
+		zfree(p->pats, p->len);
+	    zfree(p, sizeof(*p));
+	}
     }
 }
 
@@ -2268,8 +2291,6 @@ init_eprog(void)
     dummy_eprog.len = sizeof(wordcode);
     dummy_eprog.prog = &dummy_eprog_code;
     dummy_eprog.strs = NULL;
-
-    eprog_free = znewlinklist();
 }
 
 /* Code for function dump files.
@@ -3057,6 +3078,7 @@ check_dump_file(char *file, struct stat *sbuf, char *name, int *ksh)
 	    prog->flags = EF_MAP;
 	    prog->len = h->len;
 	    prog->npats = np = h->npats;
+	    prog->nref = 1;	/* allocated from permanent storage */
 	    prog->pats = pp = (Patprog *) zalloc(np * sizeof(Patprog));
 	    prog->prog = f->map + h->start;
 	    prog->strs = ((char *) prog->prog) + h->strs;
@@ -3108,6 +3130,7 @@ check_dump_file(char *file, struct stat *sbuf, char *name, int *ksh)
 	    prog->flags = EF_REAL;
 	    prog->len = h->len + po;
 	    prog->npats = np = h->npats;
+	    prog->nref = 1; /* allocated from permanent storage */
 	    prog->pats = pp = (Patprog *) d;
 	    prog->prog = (Wordcode) (((char *) d) + po);
 	    prog->strs = ((char *) prog->prog) + h->strs;

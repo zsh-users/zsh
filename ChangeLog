@@ -1,5 +1,9 @@
 2002-06-07  Peter Stephenson  <pws@csr.com>
 
+	* 17299: Src/builtin.c, Src/exec.c, Src/init.c, Src/parse.c,
+	Src/text.c, Src/zsh.h: Instead of freeing Eprogs in one go
+	at the top level, use reference counts.
+
 	* 17301 (doc slightly tweaked): Src/Zle/zle_thingy.c,
 	Doc/Zsh/zle.yo: make `zle -I' only invalidate the display on the
 	first call to prevent spurious extra command lines appearing.

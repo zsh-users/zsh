@@ -117,6 +117,8 @@ getpermtext(Eprog prog, Wordcode c)
     if (!c)
 	c = prog->prog;
 
+    useeprog(prog);		/* mark as used */
+
     s.prog = prog;
     s.pc = c;
     s.strs = prog->strs;
@@ -130,6 +132,7 @@ getpermtext(Eprog prog, Wordcode c)
     if (prog->len)
 	gettext2(&s);
     *tptr = '\0';
+    freeeprog(prog);		/* mark as unused */
     untokenize(tbuf);
     return tbuf;
 }
@@ -147,6 +150,7 @@ getjobtext(Eprog prog, Wordcode c)
     if (!c)
 	c = prog->prog;
 
+    useeprog(prog);		/* mark as used */
     s.prog = prog;
     s.pc = c;
     s.strs = prog->strs;
@@ -159,6 +163,7 @@ getjobtext(Eprog prog, Wordcode c)
     tjob = 1;
     gettext2(&s);
     *tptr = '\0';
+    freeeprog(prog);		/* mark as unused */
     untokenize(jbuf);
     return jbuf;
 }
