@@ -19,6 +19,11 @@ integer TMOUT=0
 
 [[ -z "$1" ]] && echo 'Usage: "zed filename" or "zed -f function"' && return 1
 
+local curcontext=zed:::
+
+zstyle -m ":completion:zed:*" insert-tab '*' ||
+    zstyle ":completion:zed:*" insert-tab yes
+
 # catch interrupts
 cleanup="$(bindkey -L "^M"; bindkey -L -M emacs "^X^W"; bindkey -aL "ZZ"
     echo "trap - INT EXIT"; trap)"
