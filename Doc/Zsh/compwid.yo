@@ -449,7 +449,7 @@ item([ tt(-M) var(match-spec) ] [ tt(--) ] [ var(words) ... ])(
 
 This builtin command can be used to add matches directly and control
 all the information the completion code stores with each possible
-match. The return value is zero if at least one match was added and
+match. The return status is zero if at least one match was added and
 non-zero if no matches were added.
 
 The completion code breaks the string to complete into seven fields in
@@ -704,7 +704,7 @@ xitem(tt(compset -n) var(begin) [ var(end) ])
 xitem(tt(compset -N) var(beg-pat) [ var(end-pat) ])
 item(tt(compset -q))(
 This command simplifies modification of the special parameters,
-while its return value allows tests on them to be carried out.
+while its return status allows tests on them to be carried out.
 
 The options are:
 
@@ -775,7 +775,7 @@ reflect the word part that is completed.
 )
 enditem()
 
-In all the above cases the return value is zero if the test succeeded
+In all the above cases the return status is zero if the test succeeded
 and the parameters were modified and non-zero otherwise. This allows
 one to use this builtin in tests such as:
 
@@ -794,7 +794,7 @@ option of tt(compctl) and/or the default completion (whether defined by
 tt(compctl -D) or the builtin default) in the appropriate places, the
 tt(-T) and/or tt(-D) flags can be passed to tt(compcall).
 
-The return value can be used to test if a matching tt(compctl)
+The return status can be used to test if a matching tt(compctl)
 definition was found. It is non-zero if a tt(compctl) was found and
 zero otherwise.
 

@@ -194,7 +194,7 @@ The signal number will be passed as the first parameter to the function.
 If a function of this form is defined and null,
 the shell and processes spawned by it will ignore tt(SIG)var(NAL).
 
-The return value from the function is handled specially.  If it is
+The return status from the function is handled specially.  If it is
 zero, the signal is assumed to have been handled, and execution continues
 normally.  Otherwise, the normal effect of the signal is produced;
 if this causes execution to terminate, the status returned to the shell is

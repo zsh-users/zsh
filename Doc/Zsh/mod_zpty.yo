@@ -43,33 +43,33 @@ The tt(-r) option can be used to read the output of the command var(name).
 With only a var(name) argument, the output read is copied to the standard
 output.  Unless the pseudo-terminal is non-blocking, copying continues
 until the command under the pseudo-terminal exits; when non-blocking, only
-as much output as is immediately available is copied.  The return value is
+as much output as is immediately available is copied.  The return status is
 zero if any output is copied.
 
 When also given a var(param) argument, at most one line is read and stored
 in the parameter named var(param).  Less than a full line may be read if
-the pseudo-terminal is non-blocking.  The return value is zero if at least
+the pseudo-terminal is non-blocking.  The return status is zero if at least
 one character is stored in var(param).
 
 If a var(pattern) is given as well, output is read until the whole string
 read matches the var(pattern), even in the non-blocking case.  The return
-value is zero if the string read matches the pattern, or if the command
+status is zero if the string read matches the pattern, or if the command
 has exited but at least one character could still be read.  As of this
 writing, a maximum of one megabyte of output can be consumed this way; if
-a full megabyte is read without matching the pattern, the return value is
+a full megabyte is read without matching the pattern, the return status is
 non-zero.
 
-In all cases, the return value is non-zero if nothing could be read, and
+In all cases, the return status is non-zero if nothing could be read, and
 is tt(2) if this is because the command has finished.
 
 If the tt(-r) option is combined with the tt(-t) option, tt(zpty) tests
 whether output is available before trying to read.  If no output is
-available, tt(zpty) immediately returns the value tt(1).
+available, tt(zpty) immediately returns the status tt(1).
 )
 item(tt(zpty) tt(-t) var(name))(
 The tt(-t) option without the tt(-r) option can be used to test
 whether the command var(name) is still running.  It returns a zero
-value if the command is running and a non-zero value otherwise.
+status if the command is running and a non-zero value otherwise.
 )
 item(tt(zpty) [ tt(-L) ])(
 The last form, without any arguments, is used to list the commands

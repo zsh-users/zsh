@@ -179,8 +179,8 @@ between tt(-t) and tt(-T).
 The function does not print informational messages, but if the option
 tt(-q) is given, no error message is printed for a non-existent session.
 
-A return value of 2 indicates a timeout or no data to read.  Any other
-non-zero return value indicates some error condition.
+A return status of 2 indicates a timeout or no data to read.  Any other
+non-zero return status indicates some error condition.
 
 See tt(tcp_log) for how to control where data is sent by tt(tcp_read).
 )

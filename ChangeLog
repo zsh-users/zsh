@@ -1,5 +1,11 @@
 2005-04-01  Peter Stephenson  <pws@csr.com>
 
+	* c.f. 21071: Doc/Zsh/{builtins.yo,compsys.yo,compwid.yo,func.yo,
+	grammar.yo,mod_clone.yo,mod_computil.yo,mod_system.yo,mod_zftp.yo,
+	mod_zpty.yo,mod_zselect.yo,mod_zutil.yo,params.yo,prompt.yo,
+	tcpsys.yo}: use "status" for exit and return status
+	instead of "value" or "code".
+
 	* 21078: Src/init.c, Test/A01grammar.ztst: parse errors didn't
 	cause non-zero exit status.
 

@@ -73,7 +73,7 @@ innermost quoting level.  If the tt(-p) option is given, quoting is
 done as if there is some prefix before the values of the parameters,
 so that a leading equal sign will not be quoted.
 
-The return value is non-zero in case of an error and zero otherwise.
+The return status is non-zero in case of an error and zero otherwise.
 )
 findex(comptags)
 findex(comptry)

@@ -22,10 +22,10 @@ message, with no intervening space.
 If var(errvar) is supplied, the entire message, without a newline, is
 assigned to the parameter names var(errvar) and nothing is output.
 
-A return value of 0 indicates the message was successfully printed
+A return status of 0 indicates the message was successfully printed
 (although it may not be useful if the error number was out of the
-system's range), a return value of 1 indicates an error in the
-parameters, and a return value of 2 indicates the error name was
+system's range), a return status of 1 indicates an error in the
+parameters, and a return status of 2 indicates the error name was
 not recognised (no message is printed for this).
 )
 findex(sysread)
@@ -59,7 +59,7 @@ The error tt(EINTR) (interrupted system call) is handled internally so
 that shell interrupts are transparent to the caller.  Any other error
 causes a return.
 
-The possible return values are
+The possible return statuses are
 startitem()
 item(0)(
 At least one byte of data was successfully read and, if appropriate,

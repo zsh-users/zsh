@@ -80,7 +80,7 @@ at least one capability is raised in either the Effective or Inheritable
 capability vectors.
 )
 item(tt(%?))(
-The return code of the last command executed just before the prompt.
+The return status of the last command executed just before the prompt.
 )
 item(tt(%_))(
 The status of the parser, i.e. the shell constructs (like `tt(if)' and

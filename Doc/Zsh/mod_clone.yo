@@ -14,7 +14,7 @@ var(tty).  In the new shell, the tt(PID), tt(PPID) and tt(TTY) special
 parameters are changed appropriately.  tt($!) is set to zero in the new
 shell, and to the new shell's PID in the original shell.
 
-The return value of the builtin is zero in both shells if successful,
+The return status of the builtin is zero in both shells if successful,
 and non-zero on error.
 
 The target of tt(clone) should be an unused terminal, such as an unused virtual

@@ -93,7 +93,7 @@ at least one of the var(strings) is equal to at least one of the strings
 in the value. If the style is not defined, the status is tt(2).
 
 The tt(-T) option tests the values of the style like tt(-t), but it
-returns zero (rather than tt(2)) if the style is not defined for any
+returns status zero (rather than tt(2)) if the style is not defined for any
 matching pattern.
 )
 item(tt(zstyle -m) var(context) var(style) var(pattern))(

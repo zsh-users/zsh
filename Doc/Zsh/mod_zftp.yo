@@ -75,7 +75,7 @@ item(tt(params) tt(-))(
 Store the given parameters for a later tt(open) command with no
 arguments.  Only those given on the command line will be remembered.
 If no arguments are given, the parameters currently set are printed,
-although the password will appear as a line of stars; the return value is
+although the password will appear as a line of stars; the return status is
 one if no parameters were set, zero otherwise.
 
 Any of the parameters may be specified as a `tt(?)', which

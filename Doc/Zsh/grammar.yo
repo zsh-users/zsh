@@ -63,8 +63,8 @@ cindex(sublist)
 A em(sublist) is either a single pipeline, or a sequence of two or more
 pipelines separated by `tt(&&)' or `tt(||)'.  If two pipelines are separated
 by `tt(&&)', the second pipeline is executed only if the first succeeds
-(returns a zero value).  If two pipelines are separated by `tt(||)', the
-second is executed only if the first fails (returns a nonzero value).
+(returns a zero status).  If two pipelines are separated by `tt(||)', the
+second is executed only if the first fails (returns a nonzero status).
 Both operators have equal precedence and are left associative.
 The value of the sublist is the value of the last pipeline executed.
 For example,
@@ -73,8 +73,8 @@ example(dmesg | grep panic && print yes)
 
 is a sublist consisting of two pipelines, the second just a simple command
 which will be executed if and only if the tt(grep) command returns a zero
-value.  If it does not, the value of the sublist is that return value, else
-it is the value returned by the tt(print) (almost certainly zero).
+status.  If it does not, the value of the sublist is that return status, else
+it is the status returned by the tt(print) (almost certainly zero).
 
 cindex(list)
 A em(list) is a sequence of zero or more sublists, in which each sublist
@@ -142,9 +142,10 @@ cindex(if construct)
 item(tt(if) var(list) tt(then) var(list) [ tt(elif) var(list) tt(then) var(list) ] ... [ tt(else) var(list) ] tt(fi))(
 The tt(if) var(list) is executed, and if it returns a zero exit status,
 the tt(then) var(list) is executed.
-Otherwise, the tt(elif) var(list) is executed and if its value is zero,
+Otherwise, the tt(elif) var(list) is executed and if its status is zero,
 the tt(then) var(list) is executed.
-If each tt(elif) var(list) returns nonzero, the tt(else) var(list) is executed.
+If each tt(elif) var(list) returns nonzero status, the tt(else) var(list)
+is executed.
 )
 findex(for)
 cindex(for loops)

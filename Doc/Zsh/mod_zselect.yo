@@ -57,9 +57,9 @@ modified.  The keys of tt(assoc) are the file descriptors, and the
 corresponding values are any of the characters `tt(rwe)' to indicate the
 condition.
 
-The command returns 0 if some file descriptors are ready for reading.  If
-the operation timed out, or a timeout of 0 was given and no file
-descriptors were ready, or there was an error, it returns status 1 and
+The command returns status 0 if some file descriptors are ready for
+reading.  If the operation timed out, or a timeout of 0 was given and no
+file descriptors were ready, or there was an error, it returns status 1 and
 the array will not be set (nor modified in any way).  If there was an error
 in the select operation the appropriate error message is printed.
 )

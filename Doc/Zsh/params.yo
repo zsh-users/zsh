@@ -475,7 +475,7 @@ Same as tt(argv[@]), even when tt(argv) is not set.
 )
 vindex(?)
 item(tt(?) <S>)(
-The exit value returned by the last command.
+The exit status returned by the last command.
 )
 vindex(0)
 item(tt(0) <S>)(
@@ -489,7 +489,7 @@ Same as tt(?).
 )
 vindex(pipestatus)
 item(tt(pipestatus) <S> <Z>)(
-An array containing the exit values returned by all commands in the
+An array containing the exit statuses returned by all commands in the
 last pipeline.
 )
 vindex(_)

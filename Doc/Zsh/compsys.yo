@@ -2534,9 +2534,9 @@ example(zstyle ':completion:*' completer _complete _correct)
 after calling tt(compinit). The default value for this style is
 `tt(_complete _ignored)', i.e. normally only ordinary completion is tried,
 first with the effect of the tt(ignored-patterns) style and then without
-it.  The tt(_main_complete) function uses the return value of the completer
+it.  The tt(_main_complete) function uses the return status of the completer
 functions to decide if other completers should be called.  If the return
-value is zero, no other completers are tried and the tt(_main_complete)
+status is zero, no other completers are tried and the tt(_main_complete)
 function returns.
 
 If the first argument to tt(_main_complete) is a single hyphen, the
@@ -3026,7 +3026,7 @@ useful when writing completion functions.  If functions are installed in
 subdirectories, most of these reside in the
 tt(Base) subdirectory.  Like the example 
 functions for commands in the distribution, the utility functions
-generating matches all follow the convention of returning zero if they
+generating matches all follow the convention of returning status zero if they
 generated completions and non-zero if no matching completions could be 
 added.
 
@@ -3334,7 +3334,7 @@ tt(state) to the set of all var(strings)s for which an action is to be
 performed.
 
 By default and in common with all other well behaved completion
-functions, _arguments returns zero if it was able to add matches and
+functions, _arguments returns status zero if it was able to add matches and
 non-zero otherwise. However, if the tt(-R) option is given,
 tt(_arguments) will instead return a status of 300 to indicate that
 tt($state) is to be handled.
@@ -3621,7 +3621,7 @@ var(args).  The var(return) argument gives the name of a parameter in which
 the return status from the function var(name); if var(return) is empty or a
 single hyphen it is ignored.
 
-The return value of tt(_call_function) itself is zero if the function
+The return status of tt(_call_function) itself is zero if the function
 var(name) exists and was called and non-zero otherwise.
 )
 findex(_call_program)
@@ -3631,7 +3631,7 @@ external command.  It looks up the tt(command) style with the supplied
 var(tag).  If the style is set, its value is used as the command to
 execute.  The var(string)s from the call to tt(_call_program), or from the
 style if set, are concatenated with spaces between them and the resulting
-string is evaluated.  The return value is the return value of the command
+string is evaluated.  The return status is the return status of the command
 called.
 )
 findex(_combination)
@@ -3819,10 +3819,10 @@ findex(_guard)
 item(tt(_guard) [ var(options) ] var(pattern descr))(
 This function is intended to be used in the var(action) for
 the specifications passed to tt(_arguments) and similar functions.  It
-returns immediately with a non-zero return value if
+returns immediately with a non-zero return status if
 the string to be completed does not match the var(pattern).  If the
 pattern matches, the var(descr) is displayed; the function then returns
-zero if the word to complete is not empty, non-zero otherwise.
+status zero if the word to complete is not empty, non-zero otherwise.
 
 The var(pattern) may be preceded by any of the options understood by
 tt(compadd) that are passed down from tt(_description), namely tt(-M),
@@ -4168,7 +4168,7 @@ findex(_retrieve_cache)
 item(tt(_retrieve_cache) var(cache_identifier))(
 This function retrieves completion information from the file given by
 var(cache_identifier), stored in a directory specified by the
-tt(cache-path) style which defaults to tt(~/.zcompcache).  The return value
+tt(cache-path) style which defaults to tt(~/.zcompcache).  The return status
 is zero if retrieval was successful.  It will only attempt retrieval
 if the tt(use-cache) style is set, so you can call this function
 without worrying about whether the user wanted to use the caching
@@ -4221,7 +4221,7 @@ dumped to.  The file is stored in a directory specified by the
 tt(cache-path) style which defaults to tt(~/.zcompcache).  The remaining
 var(params) arguments are the parameters to dump to the file.
 
-The return value is zero if storage was successful.  The function will
+The return status is zero if storage was successful.  The function will
 only attempt storage if the tt(use-cache) style is set, so you can
 call this function without worrying about whether the user wanted to
 use the caching layer.
@@ -4243,7 +4243,7 @@ internally and sorted by using the tt(tag-order) style.
 
 Next, tt(_tags) is called repeatedly without arguments from the same
 completion function.  This successively selects the first, second,
-etc. set of tags requested by the user.  The return value is zero if at
+etc. set of tags requested by the user.  The return status is zero if at
 least one of the tags is requested and non-zero otherwise.  To test if a
 particular tag is to be tried, the tt(_requested) function should be
 called (see above).
