@@ -1097,6 +1097,11 @@ matches as described in
 ifzman(the section `Matching Control' in zmanref(zshcompwid))\
 ifnzman(noderef(Matching Control))\
 .
+
+This style is also used by the tt(_matcher) completer, see
+ifzman(the section `Control Functions' below)\
+ifnzman(noderef(Control Functions)) 
+for more information.
 )
 item(tt(max-errors))(
 This is used by the tt(_approximate) and tt(_correct) completer functions
@@ -1583,6 +1588,35 @@ could be generated that is at least as long as the original string.
 Note that the matcher specifications defined globally or used by the
 completion functions will not be used.
 )
+findex(_matcher)
+item(tt(_matcher))(
+This completer allows to define a match specification (see
+ifzman(the section `Matching Control' in zmanref(zshcompwid))\
+ifnzman(noderef(Matching Control))\
+) that is to be used by all following completers. This is comparable
+to the tt(compmatchers) special array, but gives finer control. The match
+specification to use is looked up using the tt(matcher) style. For
+this, the completer field of the context name will contain the string
+`tt(matcher-)var(n)', where `var(n)' is the number of the call to
+tt(_matcher). For example:
+
+example(zstyle ':completion:::::' completer _matcher _complete _matcher _complete
+zstyle ':completion:*:matcher-1:::' matcher 'm:{a-z-}={A-Z_}'
+zstyle ':completion:*:matcher-2:::' matcher 'm:{a-z-}={A-Z_}' 'r:|[-_./]=* r:|=*')
+
+Since tt(_matcher) is called as the first completer, the tt(_complete) 
+completer called after it will first use the match specification
+`tt(m:{a-z-}={A-Z_})'. If that doesn't generate any matches, the next
+call to tt(_matcher) will make the second call to tt(_complete) use
+the specification `tt(r:|[-_./]=* r:|=*)' in addition to the one
+already used by the first attempt (but note that the specification has 
+to be given again).
+
+If the tt(matcher) style is not set for one of the invocations of
+tt(_matcher), this has the same effect as setting it to the empty
+string: it makes the following completion function not use any match
+specifications besides those used by the functions themselves.
+)
 findex(_expand)
 item(tt(_expand))(
 This completer function does not really do completion, but instead
@@ -1639,7 +1673,10 @@ try to generate matches. If this style is unset, the completers
 currently used by the whole completion are used -- except, of course,
 the tt(_prefix) completer itself. Also, if this completer appears more
 than once in the list of completers to use only those completers not
-already tried by the last invocation of tt(_prefix) will be called.
+already tried by the last invocation of tt(_prefix) will be
+called. The completer field used to look up styles contains the string 
+`tt(prefix-)var(n)', where `var(n)' is the number of the call to
+tt(_prefix).
 
 For example, consider this global tt(completer) style:
 
@@ -1653,7 +1690,7 @@ suffix ignored. If you want to use tt(_prefix) as the last resort and
 want it to try only normal completion, you need to do:
 
 example(zstyle ':completion:::::' completer _complete ... _prefix
-zstyle ':completion::prefix:::' completer _complete)
+zstyle ':completion::prefix-1:::' completer _complete)
 
 The tt(add-space) style is used, too. If it is set to `true' then
 tt(_prefix) will insert a space between the matches generated (if any) 

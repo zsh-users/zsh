@@ -595,6 +595,7 @@ bin_compadd(char *name, char **argv, char *ops, int func)
 			mstr = tricat(mstr, " ", m);
 		    else
 			mstr = ztrdup(m);
+		    m = NULL;
 		}
 	    }
 	}

@@ -6,7 +6,7 @@
 # or get the corrected prefix.
 
 local _comp_correct _correct_expl comax cfgacc
-local curcontext="${curcontext}" oldcontext
+local curcontext="${curcontext}" oldcontext opm="$compstate[pattern_match]"
 
 # Only if all global matchers have been tried.
 
@@ -100,6 +100,7 @@ while [[ _comp_correct -le comax ]]; do
     fi
     compstate[matcher]="$compstate[total_matchers]"
     unfunction compadd
+    compstate[pattern_match]="$opm"
 
     return 0
   fi
@@ -110,5 +111,6 @@ done
 
 compstate[matcher]="$compstate[total_matchers]"
 unfunction compadd
+compstate[pattern_match]="$opm"
 
 return 1
