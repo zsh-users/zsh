@@ -6,7 +6,7 @@ DISTFILES_SRC='
     _mh _mount _mutt _my_accounts _netscape _nslookup _other_accounts
     _pack _patch _pbm _pdf _perl_basepods _perl_builtin_funcs
     _perl_modules _perldoc _ports _prompt _ps _pspdf _rcs _rlogin _sh
-    _socket _ssh _strip _stty _su _tar _tar_archive _telnet _tex _tiff
+    _socket _ssh _strip _stty _su _sudo _tar _tar_archive _telnet _tex _tiff
     _uncompress _unpack _urls _use_lo _user_at_host _users _users_on
     _webbrowser _wget _whereis _whois _xargs _yodl _yp _zdump
 '
