@@ -17,7 +17,7 @@
 
 2001-04-09  Wayne Davison  <wayned@users.sourceforge.net>
 
-	* 13934, 13936: Src/Modules/termcap.c: silence some compiler
+	* 13934, 13936: Src/Modules/terminfo.c: silence some compiler
 	warnings when HAVE_TIGETSTR is not defined.
 
 2001-04-09  Bart Schaefer  <schaefer@zsh.org>
