@@ -81,7 +81,9 @@ case "${#no_arg}-${#with_arg}" in
 esac
 
 if [[ -z "$done" ]]; then
-  compadd - -${(k)^option_pairs:gs/://}
+  if (( $+complete_opts_verbose )); then
+    compadd - -${(k)^option_pairs:gs/://}
+  fi
   false
 else
   true

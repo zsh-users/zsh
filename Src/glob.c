@@ -3023,7 +3023,7 @@ matchonce(Comp c)
 			if (exclend) {
 			     exclsav = *exclend;
 			    *exclend = '\0';
-			 }
+			}
 			if ((ret = doesmatch(c->left))) {
 			    if (exclend)
 				*exclend = exclsav;

@@ -700,7 +700,7 @@ hbegin(int dohist)
 {
     isfirstln = isfirstch = 1;
     errflag = histdone = spaceflag = 0;
-    stophist = (dohist ? ((!interact || unset(SHINSTDIN)) << 1) : 2);
+    stophist = (!dohist || !interact || unset(SHINSTDIN)) ? 2 : 0;
     if (stophist == 2 || (inbufflags & INP_ALIAS)) {
 	chline = hptr = NULL;
 	hlinesz = 0;
@@ -721,6 +721,8 @@ hbegin(int dohist)
 	hwbegin = ihwbegin;
 	hwend = ihwend;
 	addtoline = iaddtoline;
+	if (!isset(BANGHIST))
+	    stophist = 4;
     }
     chwordpos = 0;
 

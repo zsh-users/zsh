@@ -18,11 +18,12 @@ the code should generally go to the mailing list.
 texinode(Availability)(Mailing Lists)(Author)(Introduction)
 sect(Availability)
 Zsh is available from the following anonymous FTP sites.  These mirror
-sites are kept frequently up to date.  The sites marked with em((G))
-may be mirroring tt(ftp.math.gatech.edu) instead of the primary site.
-The sites marked with em((H)) may be mirroring tt(ftp.cs.elte.hu)
-instead of the primary site.
+sites are kept frequently up to date.  The sites marked with em((H)) may be
+mirroring tt(ftp.cs.elte.hu) instead of the primary site.
 
+cindex(FTP sites for zsh)
+cindex(acquiring zsh by FTP)
+cindex(availability of zsh)
 startitem()
 item(Primary site)(
 nofill(tt(ftp://ftp.zsh.org/pub/zsh/)
@@ -31,7 +32,7 @@ tt(http://www.zsh.org/pub/zsh/))
 item(Australia)(
 nofill(tt(ftp://ftp.zsh.org/pub/zsh/)
 tt(http://www.zsh.org/pub/zsh/)
-tt(ftp://ftp.ips.gov.au/pub/packages/zsh/)  em((G))  em((H)))
+tt(ftp://ftp.ips.gov.au/pub/packages/zsh/)  em((H)))
 )
 item(Denmark)(
 nofill(tt(ftp://sunsite.auc.dk/pub/unix/shells/zsh/))
@@ -56,19 +57,24 @@ item(Israel)(
 nofill(tt(ftp://ftp.math.technion.ac.il/mirror/ftp.zsh.org/pub/zsh/)
 tt(http://www.math.technion.ac.il/mirror/ftp.zsh.org/pub/zsh/))
 )
+item(Italy)(
+nofill(tt(ftp://ftp.unina.it/pub/Unix/pkgs/shell/zsh/))
+)
 item(Japan)(
-nofill(tt(ftp://ftp.tohoku.ac.jp/mirror/zsh/)  em((H))
-tt(ftp://ftp.nisiq.net/pub/shells/zsh/)  em((H))
+nofill(tt(ftp://ftp.nisiq.net/pub/shells/zsh/)  em((H))
 tt(ftp://ftp.win.ne.jp/pub/shell/zsh/))
 )
 item(Norway)(
 nofill(tt(ftp://ftp.uit.no/pub/unix/shells/zsh/))
 )
+item(Poland)(
+nofill(tt(ftp://sunsite.icm.edu.pl/pub/unix/shells/zsh/))
+)
 item(Romania)(
 nofill(tt(ftp://ftp.roedu.net/pub/mirrors/ftp.zsh.org/pub/zsh/))
 )
 item(Slovenia)(
-nofill(tt(ftp://ftp.siol.net/pub/unix/shells/zsh/)  em((H)))
+nofill(tt(ftp://ftp.siol.net/mirrors/zsh/))
 )
 item(Sweden)(
 nofill(tt(ftp://ftp.lysator.liu.se/pub/unix/zsh/))
@@ -78,8 +84,7 @@ nofill(tt(ftp://ftp.net.lut.ac.uk/zsh/)
 tt(ftp://sunsite.org.uk/packages/zsh/))
 )
 item(USA)(
-nofill(tt(ftp://ftp.math.gatech.edu/pub/zsh/)
-tt(ftp://uiarchive.uiuc.edu/pub/packages/shells/zsh/)
+nofill(tt(ftp://uiarchive.uiuc.edu/pub/packages/shells/zsh/)
 tt(ftp://ftp.rge.com/pub/shells/zsh/)
 tt(ftp://foad.org/pub/zsh/)
 tt(http://foad.org/zsh/))

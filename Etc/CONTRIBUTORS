@@ -25,20 +25,20 @@ Version 3.1.6
   additional autoloading code; general code changes for extra efficiency;
   subscripting and ordering of globbing lists.
 
-* Peter Stephenson <pws@ibmth.df.unipi.it>: zftp and mapfile modules and
-  zf* functions; local parameters and typeset changes; changes in autoconf
+* Peter Stephenson <pws@zsh.org>: zftp and mapfile modules and zf*
+  functions; local parameters and typeset changes; changes in autoconf
   system; case-independent and approximate pattern matching; various
   options; a few completion modules; some zle changes; FAQ.
 
-* Bart Schaefer <schaefer@candle.brasslantern.com>: associative array
-  implementation; other parameter changes; keeping track of missing
-  patches; function autoloading changes.
+* Bart Schaefer <schaefer@zsh.org>: associative array implementation; other
+  parameter changes; keeping track of missing patches; function autoloading
+  changes.
 
 * Wayne Davison <wayne@clari.net>:  History code novelties and improvements
   with new options.
 
-* Geoff Wing <mason@primenet.com.au>:  Zle display code fixes, mailing
-  list and patch archive.
+* Geoff Wing <gcw@zsh.org>:  Zle display code fixes, mailing list and patch
+  archive.
 
 * Zoltán Hidvégi <hzoli@cs.elte.hu>: AIX dynamic loading code.
 
@@ -48,7 +48,7 @@ Other improvements, bug fixes and design suggestions from all the above
 plus Andrej Borsenkow, Oliver Kiddle, Tanaka Akira, Naoki Wakamatsu, Tatuso
 Furukawa, Ville Herva, Will Day, Lehti Rahmi, Larry P. Schrof, Helmut
 Jarausch, Phil Pennock, Wilfredo Sanchez, Bruce Stephens, Gene Cohler,
-Ollivier Robert.
+Ollivier Robert, Felix Rosencrantz.
 
 Previous versions of zsh 3 were maintained by Zoltán Hidvégi and Andrew
 Main (Zefram).
@@ -69,13 +69,13 @@ Version 3.0
   8-bit clean.  Made some reorganizations in exec.c.  Fixed signal
   handling bugs.  Fixed lots of bugs in various places.
 
-* Peter W. Stephenson <pws@ifh.de> the maintainer of the zsh FAQ.
+* Peter W. Stephenson <pws@zsh.org> the maintainer of the zsh FAQ.
   Reorganizations in exec.c.  Rewrote and reorganized the history code.
   Rewrote the zshcompctl manual page.  Fixed several bugs related to
   programmable completion.  Fixed several signal handling bugs.  Rewrote
   test and read builtins.  Lots of other bugfixes.
 
-* Andrew Main (Zefram) <zefram@fysh.org> reorganized builtin.c.
+* Andrew Main (Zefram) <zefram@zsh.org> reorganized builtin.c.
   Rewrote large parts of the zle vi mode.  Redirection fixes.  Reorganized
   parts of the completion code, added some enhancements and fixed lots of
   bugs.  Made zle fully 8-bit clean.  Fixed several zle bugs.  Reorganized
@@ -85,21 +85,21 @@ Version 3.0
   programmable completion code in zsh-2.5.0.  Several bugfixes in exec.c
   and jobs.c.  Lots of completion bugfixes and enhancements.
 
-* Geoff Wing <mason@werple.net.au> rewrote most of zle_refresh.c.  Some
+* Geoff Wing <gcw@zsh.org> rewrote most of zle_refresh.c.  Some
   other bugfixes.
 
 * Clive Messer <clive@epos.demon.co.uk> brought the texinfo documentation
   up-to-date.
 
-* Mark Borges <mdb@cdc.noaa.gov> maintains the zsh web page
-  (http://www.mal.com/zsh/).  Several documentation fixes.  Maintains the
-  texinfo documentation together with Clive.
+* Mark Borges <mdb@cdc.noaa.gov> contributed several documentation fixes
+  including further texinfo documentation updates and maintained the zsh
+  web pages during their tenure at www.mal.com.
 
 * Wayne Davison <wayne@clari.net> improved the the zle search functions
   and made them 8-bit clean.  Some other little bugfixes.
 
-* Bart Schaefer <schaefer@candle.brasslantern.com> submitted several
-  bugfixes, reported lots of bugs and gave many very useful suggestions.
+* Bart Schaefer <schaefer@zsh.org> submitted several bugfixes, reported
+  lots of bugs and gave many very useful suggestions.
 
 Version 2.5
 -----------

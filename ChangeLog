@@ -1,3 +1,100 @@
+1999-08-01  Peter Stephenson  <pws@ibmth.df.unipi.it>
+
+	* pws: Config/version.mk: zsh 3.1.6 released.
+
+1999-07-30  Peter Stephenson  <pws@ibmth.df.unipi.it>
+
+	* pws, Bart: 7321, 7325: Src/hist.c: NO_BANG_HIST wasn't working
+	  at all, but be careful not to disable too much when it's
+	  in effect.
+
+	* Tanaka Akira: 7318: Completion/User/_cvs: more improvements
+
+1999-07-29  Peter Stephenson  <pws@ibmth.df.unipi.it>
+
+	* pws: 7316: Doc/Zsh/compsys.yo: mention that compctl -M control
+	  is available and fix some typos.
+
+	* pws: unposted: Doc/Zsh/metafaq.yo: sites in Italy and Poland
+	  (the one in Italy is not `official', but is actively mirroring
+	  ftp.zsh.org anyway).
+
+	* Felix Rosencrantz: 7311: Src/Zle/zle_tricky.c: matching control
+	  left dangling pointers.
+
+	* Tanaka Akira: 7312: Completion/User/_cvs: don't quote ignore
+	  patterns.
+
+1999-07-28  Peter Stephenson  <pws@ibmth.df.unipi.it>
+
+	* pws: 7308, 7309: Src/Zle/zle_tricky.c: glob patterns were
+	  limited to PATH_MAX and length wasn't tested.
+
+	* Tanaka Akira: 7307: Completion/User/_cvs: remove parentheses,
+	  complete argument options.
+
+	* pws: 7305: Doc/Zsh/zftpsys.yo, Functions/Zftp/zfanon,
+	  Functions/Zftp/zfget, Functions/Zftp/zfopen,
+	  Functions/Zftp/zftp_chpwd: use URL-style paths in opening;
+	  zfget -c sends output to stdout; don't delete current directory
+	  information if we haven't really changed directory.
+
+	* Bart: 7301: Completion/User/_cvs: restored .file completion
+
+1999-07-27  Peter Stephenson  <pws@ibmth.df.unipi.it>
+
+	* pws: 7300: Completion/Core/compdump: wasn't ignoring . in fpath,
+	  although compinit was.
+
+	* pws: 7299: configure.in: don't use gcc -pedantic any more, since
+	  there are too many messages about `long long' and variable-sized
+	  arrays not being available in ISO C.
+
+	* pws: 7298: Src/Zle/zle_tricky.c: missing dupstring() in
+	  comp_match.
+
+	* pws: 7297: Completion/Core/_path_files, Doc/Zsh/compsys.yo:
+	  path_keepdir config key required for 7141 to come into effect
+	  due to significant side effects.
+
+	* Tanaka Akira: 7290, 7292: Completion/User/_cvs: condensed
+	  version of all _cvs completion stuff; completes files if not
+	  under CVS control; use compgen -p to work around problem with
+	  quoted characters.
+
+	* Andrej: 7827: Etc/Machines: Siemens info
+	  
+	* Bart: 7285, applied by hand: Completion/User/_cvs: parameter
+	  fixes, commit bug.
+
+	* Tanaka Akira: 7284: Completion/Core/compdump: careful when
+	  two shells start at once.
+
+	* Tanaka Akira: 7282: Completion/User/_cvs,
+	  Completion/User/_cvsaddp, Completion/User/_cvsentries_modified,
+	  Completion/User/_cvsprefix, Completion/User/_cvsremovep,
+	  Completion/User/_cvstargets, Completion/User/_cvstargets_modified:
+	  handle modified files using stat module.
+
+1999-07-26  Peter Stephenson  <pws@ibmth.df.unipi.it>
+
+	* Tanaka Akira: 7278: Completion/Base/_complete_opts:
+	  less verbosity
+
+1999-07-25  Peter Stephenson  <pws@ibmth.df.unipi.it>
+
+	* Tanaka Akira: 7276, 7277, 7279: Completion/User/{_cvs, _cvsaddp,
+	  _cvsentries, _cvsprefix, _cvsremovep, _cvsrepositories,
+	  _cvsrevisions, _cvstargets, _cvstest}, Misc/compctl-examples:
+	  more modular cvs new completion support including CVS/Entries;
+	  bug fix for old CVS completion.
+
+	* Bart: 7275: Doc/intro.ms: now works with groff.
+
+	* Bart: 7274: Src/Zle/zle_tricky.c: don't go beyond end of line
+
+	* pws: from Bart: Etc/CONTRIBUTORS, Etc/NEWS:  updates for 3.0.6
+
 1999-07-24  Peter Stephenson  <pws@ibmth.df.unipi.it>
 
 	* pws: version 3.1.6-test-3

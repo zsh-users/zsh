@@ -9,7 +9,6 @@ clwords
 clwpos
 clwsize
 cmatcher
-compcommand
 compcontext
 compctltab
 compcurrent
@@ -33,7 +32,6 @@ compoldins
 compparameter
 comppatinsert
 comppatmatch
-comppms
 compprefix
 compredirect
 compqiprefix
@@ -55,7 +53,6 @@ freecompctl
 getcpatptr
 incompctlfunc
 incompfunc
-instring
 makecomplistcallptr
 makecomplistctlptr
 makecompparamsptr

@@ -99,6 +99,14 @@ Normally, the var(host), var(user) and var(password) are internally
 recorded for later re-opening, either by a tt(zfopen) with no arguments, or
 automatically (see below).  With the option `tt(-1)', no information is
 stored.
+
+Both tt(zfopen) and tt(zfanon) (but not tt(zfparams)) understand URLs of
+the form tt(ftp://)var(host)/var(path...) as meaning to connect to the
+var(host), then change directory to var(path) (which must be a directory,
+not a file).  The `tt(ftp://)' can be omitted; the trailing `tt(/)' is enough
+to trigger recognition of the var(path).  Note prefixes other than
+`tt(ftp:)' are not recognized, and that all characters after the first
+slash beyond tt(host) are significant in var(path).
 )
 findex(zfanon)
 item(tt(zfanon [ -1 ] var(host)))(
@@ -204,11 +212,13 @@ tt(zfrtime) below for more information.
 
 startitem()
 findex(zfget)
-item(tt(zfget [ -Gt ] var(file1) ...))(
+item(tt(zfget [ -Gtc ] var(file1) ...))(
 Retrieve all the listed files var(file1) ... one at a time from the remote
 server.  If a file contains a `tt(/)', the full name is passed to the
 remote server, but the file is stored locally under the name given by the
-part after the final `tt(/)'.
+part after the final `tt(/)'.  The option tt(-c) (cat) forces all files to
+be sent as a single stream to standard output; in this case the tt(-t)
+option has no effect.
 )
 findex(zfuget)
 item(tt(zfuget [ -Gvst ] var(file1) ...))(

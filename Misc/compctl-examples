@@ -563,7 +563,7 @@ cvsprefix() {
 cvsentries() {
     setopt localoptions nullglob unset
     if [[ -f ${pref}CVS/Entries ]]; then
-	reply=( "${pref}${^${(@)${(@)${(f@)$(<${pref}CVS/Entries)}:#D*}#/}%%/*}" )
+	reply=( "${pref}${(@)^${(@)${(@)${(f@)$(<${pref}CVS/Entries)}:#D*}#/}%%/*}" )
     fi
 }
 

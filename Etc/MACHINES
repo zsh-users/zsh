@@ -56,9 +56,15 @@ HP: HP-UX 9, 10.20, 11.0
 	(rather than the 10.20 shl_load() function set).  More details of
 	any difficulties would be appreciated.
 
-IBM: AIX
-	Should build `out-of-the-box'.  On AIX 3.x (at least),
-	--enable-zsh-mem will not work.
+IBM: AIX 3.2, 4.1
+	Should build `out-of-the-box', but --enable-zsh-mem will not work.
+
+	On 3.2, for 64-bit integer support you need to compile with gcc, as
+	the native compiler does not support ANSI simulataneously with
+	`long long'.  On 4.1, there appear to be problems using
+	--enable-dynamic (the default) with gcc (version was 2.7.2.3) in
+	4.1, though native cc works. More information about this problem
+	would be appreciated.
 
 Linux: Linux (i386) [3.1.4]
 	Should build `out-of-the-box'.
@@ -81,14 +87,24 @@ Next: NextStep 3.*
 	Should build `out-of-the-box', but the zsh malloc routines are
 	not recommended.
 
-Reliant: Reliant UNIX
-	Should build `out-of-the-box'.
+SIEMENS: Reliant UNIX
+       Builds `out-of-the-box'. Dynamic loading is supported. 
+       Large Files and 64-bit integers are supported as of version 5.44
+       and CDS/CDS++ compiler.
 
-Reliant: SINIX
-	Should build `out-of-the-box'.	There is a bad combination of
-	static and shared libraries that prevents the use of dynamic
-	linking; configure now detects this and will disable dynamic
-	linking even if you requested it.
+SIEMENS: SINIX
+       MX (Intel) plattform: SINIX-L/M 5.41
+       Builds out-of-the-box with EGCS. Neither dynamic loading nor
+       64-bit integers are suported. Native compiler was not tried
+       mostly because GCC/EGCS builds out-of-the-box as well. If you 
+       succeed with native compiler, send a patch for this file
+       to zsh-workers.
+
+       RM (MIPS) plattform: SINIX-N/Y 5.42
+       Should build out-of-the-box but it was not tested. Neither
+       dynamic loading nor 64-bit integers are suported.
+       Note, that this version is obsolete and users are expected to 
+       update to Reliant UNIX.
 
 SGI: IRIX 5.1.1.1, 5.2, 5.3, 6.2, 6.3, 6.5
 	Should build `out-of-the-box'.

@@ -63,7 +63,7 @@ cindex(subscripts)
 pindex(KSH_ARRAYS, use of)
 
 The same subscripting syntax is used for associative arrays,
-except that no arithmetic expansion is applied to var(EXP).
+except that no arithmetic expansion is applied to var(exp).
 
 A subscript of the form `tt([*])' or `tt([@])' evaluates to all
 elements of an array; there is no difference between the two

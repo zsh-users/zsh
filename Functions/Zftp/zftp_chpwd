@@ -1,13 +1,16 @@
 # function zftp_chpwd {
 # You may want to alter chpwd to call this when $ZFTP_USER is set.
 
-# Cancel the filename cache for the current directory.
-zftp_fcache=()
-# ...and also empty the stored directory listing cache.
-# As this function is called when we close the connection, this
-# is the only place we need to do these two things.
-[[ -n $zfcurdir && -f $zfcurdir ]] && rm -f $zfcurdir
-zfotherargs=
+# If the directory really changed...
+if [[ $ZFTP_PWD != $zflastdir ]]; then
+  # Cancel the filename cache for the current directory.
+  zftp_fcache=()
+  # ...and also empty the stored directory listing cache.
+  # As this function is called when we close the connection, this
+  # is the only place we need to do these two things.
+  [[ -n $zfcurdir && -f $zfcurdir ]] && rm -f $zfcurdir
+  zfotherargs=
+fi
 
 if [[ -z $ZFTP_USER ]]; then
   # last call, after an FTP logout

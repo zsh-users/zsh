@@ -260,7 +260,14 @@ for prepath in "$prepaths[@]"; do
       # original string in such a case so that the command line doesn't 
       # change but other completers still think there are matches.
 
-      if [[ -z "$tpre$tsuf" && "$pre" = */ && -z "$suf" ]]; then
+      # Problem:  this seems to stop _files from finding directory
+      # completions if there were no file completions, for
+      # example `_files *(*)' no longer completes subdirectories after
+      # a /.  For now, make this a configuration option, but
+      # probably it needs to be done better.
+
+      if [[ -n "$compconfig[path_keepdir]" && -z "$tpre$tsuf" &&
+	"$pre" = */ && -z "$suf" ]]; then
         compadd -nQS '' - "$linepath$donepath$orig"
         tmp4=-
       fi

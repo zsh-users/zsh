@@ -6,11 +6,21 @@ cindex(completion, controlling)
 sect(Description)
 
 This describes the shell code for the new completion system.  It consists
-of varsious shell functions; those beginning `tt(comp)' are to be called
+of various shell functions; those beginning `tt(comp)' are to be called
 directly by the user, while those beginning `tt(_)' are called by the
 completion code.  The shell functions of the second set which implement
 completion behaviour and which may be bound to keystrokes, are referred to
 as `widgets'.
+
+Note that with the function-based completions described here, it
+is also possible to use the `tt(compctl -M ...)' mechanism to specify
+global matching control, such as case-insensitivity (`tt(abc)' will complete
+to a string beginning `tt(ABC)'), or wildcard behaviour on
+certain anchors (`tt(a-d)' will complete to abc-def as if there were a
+`tt(*)' after the `a').  See
+ifzman(the section `Matching Control' in zmanref(zshcompctl))\
+ifnzman(noderef(Matching Control))
+for further details.
 
 startmenu()
 menu(Initialization)
@@ -728,13 +738,27 @@ These functions also accept the `tt(-J)', `tt(-V)', `tt(-X)', `tt(-P)',
 `tt(-S)', `tt(-q)', `tt(-r)', and `tt(-R)' options from the
 tt(compadd) builtin.
 
-Finally, the tt(_path_files) function supports two configuration keys.
-If tt(path_expand) is set to any non-empty string, the partially
+Finally, the tt(_path_files) function supports three configuration keys.
+startitem()
+item(tt(path_expand))(
+If this is set to any non-empty string, the partially
 typed path from the line will be expanded as far as possible even if
-trailing pathname components can not be completed. And if
-tt(path_cursor) is set to a non-empty string, the cursor will be left
+trailing pathname components can not be completed.
+)
+item(tt(path_cursor))(
+If this is set to a non-empty string, the cursor will be left
 after the first ambiguous pathname component even when menucompletion
 is used.
+)
+item(tt(path_keepdir))(
+If this is set to a non-empty string, then if completion immediately after
+a slash fails, treat the original string as a successful completion.  This
+prevents a valid directory being treated as a candidate for correction.
+However, it has the side effect that a pattern completion, such as
+`tt(files -g *(*))', will no longer try to complete directories in this
+position if there are no file matches.
+)
+enditem()
 )
 item(tt(_parameters))(
 This should be used to complete parameter names if you need some of the
@@ -804,7 +828,7 @@ with two hyphens. The option `tt(-i) var(patterns)' can be used to
 give patterns for options which should not be completed. The patterns
 can be given as the name of an array parameter or as a literal list in 
 parentheses. E.g. `tt(-i "(--(en|dis)able-FEATURE*)")' will ignore the
-options `tt(--enable-FEATURE)' and `tt(--diable-FEATURE)'. Finally,
+options `tt(--enable-FEATURE)' and `tt(--disable-FEATURE)'. Finally,
 the option `tt(-s) var(pairs)' can be used to describe options
 aliases. Each var(pair) consists of a pattern and a
 replacement. E.g. some tt(configure)-scripts describe options only as
@@ -829,7 +853,7 @@ standard directory where it appears.
 startitem()
 item(tt(Core))(
 The core scripts and functions.  You will certainly need these, though will
-probably not need to alter them.  Many of these are docmented above.
+probably not need to alter them.  Many of these are documented above.
 )
 item(tt(Base))(
 Other functions you will almost certainly want if you are going to use
@@ -862,8 +886,8 @@ startitem()
 item(tt(_correct_filename (^XC)))(
 Correct the filename path at the cursor position.  Allows up to six errors
 in the name.  Can also be called with an argument to correct
-a filepath, independently of zle; the correction is printed on standard
-output.
+a filename path, independently of zle; the correction is printed on
+standard output.
 )
 item(tt(_correct_word) (^Xc))(
 Performs correction of the current argument using the usual contextual

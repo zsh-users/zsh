@@ -76,7 +76,6 @@ file_type
 filesub
 filesubstr
 findcmd
-firsthist
 freearray
 freeheap
 freelinklist
@@ -112,8 +111,6 @@ haswilds
 hcalloc
 hgetc
 hgetline
-histentarr
-histentct
 hist_ring
 hist_skip_flags
 holdintr
@@ -196,7 +193,6 @@ promptexpand
 pushheap
 putshout
 pwd
-quietgetevent
 quietgethist
 quotedzputs
 readoutput

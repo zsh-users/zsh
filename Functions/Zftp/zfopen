@@ -7,7 +7,7 @@
 
 emulate -L zsh
 
-local optlist opt once
+local optlist opt once dir
 
 while [[ $1 = -* ]]; do
   if [[ $1 = - || $1 = -- ]]; then
@@ -31,12 +31,22 @@ done
 # both .netrc and .ncftp/bookmarks .  We could even try saving
 # the info in their for new hosts, like ncftp does.
 
+if [[ $1 = */* ]]; then
+  1=${1##ftp://}
+  dir=${1#*/}
+  1=${1%%/*}
+fi
+
 if [[ $once = 1 ]]; then
-  zftp open $*
+  zftp open $* || return 1
 else
   # set parameters, but only if there was at least a host
   (( $# > 0 )) && zfparams $*
   # now call with no parameters
-  zftp open
+  zftp open || return 1
+fi
+
+if [[ -n $dir ]]; then
+  zfcd $dir
 fi
 # }
