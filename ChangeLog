@@ -1,5 +1,8 @@
 2000-06-06  Sven Wischnowsky  <wischnow@zsh.org>
 
+	* 11776: Completion/Core/_path_files: fix for _path_files and
+ 	globcomplete, better test if word contains wildcards
+	
 	* 11768: Doc/Zsh/expn.yo, Src/lex.c, Src/subst.c: make (e) flag be
  	silent unless (X) is given, too
 	

@@ -184,7 +184,7 @@ eorig="$orig"
 
 [[ $compstate[insert] = (*menu|[0-9]*) || -n "$_comp_correct" ||
    ( -n "$compstate[pattern_match]" &&
-     "${orig#\~}" != "${${orig#\~}:q}" ) ]] && menu=yes
+     "${orig#\~}" != (|*[^\\])[][*?#~^\|\<\>]* ) ]] && menu=yes
 
 # Now let's have a closer look at the string to complete.
 
@@ -491,7 +491,8 @@ for prepath in "$prepaths[@]"; do
     fi
 
     if (( tmp4 )) ||
-       [[ -n "$compstate[pattern_match]" && "$tmp2" != "${(q)tmp2}" ]]; then
+       [[ -n "$compstate[pattern_match]" &&
+          "$tmp2" = (|*[^\\])[][*?#~^\|\<\>]* ]]; then
       # It is. For menucompletion we now add the possible completions
       # for this component with the unambigous prefix we have built
       # and the rest of the string from the line as the suffix.
