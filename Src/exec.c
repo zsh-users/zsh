@@ -1505,6 +1505,11 @@ setunderscore(char *str)
     }
 }
 
+/* These describe the type of espansions that need to be done on the words
+ * used in the thing we are about to execute. They are set in execcmd() and
+ * used in execsubst() which might be called from one of the functions
+ * called from execcmd() (like execfor() and so on). */
+
 static int esprefork, esglob = 1;
 
 /**/
