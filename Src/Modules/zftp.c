@@ -220,7 +220,7 @@ getipnodebyname(char const *name, int af, int flags, int *errorp)
 # ifndef HAVE_GETHOSTBYNAME2
 
 /**/
-static struct hostent *
+struct hostent *
 gethostbyname2(char const *name, int af)
 {
 	if(af != AF_INET) {
