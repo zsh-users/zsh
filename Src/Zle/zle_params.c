@@ -89,6 +89,8 @@ static struct zleparam {
 	zleunsetfn, NULL },
     { "POSTDISPLAY", PM_SCALAR, FN(set_postdisplay), FN(get_postdisplay),
 	zleunsetfn, NULL },
+    { "LASTSEARCH", PM_SCALAR | PM_READONLY, NULL, FN(get_lsearch),
+        zleunsetfn, NULL },
     { NULL, 0, NULL, NULL, NULL, NULL }
 };
 
@@ -525,4 +527,14 @@ free_prepostdisplay(void)
 	set_prepost(&predisplay, &predisplaylen, NULL);
     if (postdisplaylen)
 	set_prepost(&postdisplay, &postdisplaylen, NULL);
+}
+
+/**/
+static char *
+get_lsearch(Param pm)
+{
+    if (previous_search_len)
+	return metafy(previous_search, previous_search_len, META_HEAPDUP);
+    else
+	return "";
 }

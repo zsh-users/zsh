@@ -41,6 +41,14 @@ int lastcol;
 /**/
 int histline;
 
+/* Previous search string use in an incremental search */
+
+/**/
+char *previous_search = NULL;
+
+/**/
+int previous_search_len = 0;
+
 #define ZLETEXT(X) ((X)->zle_text ? (X)->zle_text : (X)->text)
 
 /**/
@@ -757,8 +765,6 @@ doisearch(char **args, int dir)
     int hl = histline, savekeys = -1, feep = 0;
     Thingy cmd;
     char *okeymap;
-    static char *previous_search = NULL;
-    static int previous_search_len = 0;
     Histent he;
 
     if (!(he = quietgethist(hl)))

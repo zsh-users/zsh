@@ -1,3 +1,9 @@
+2002-12-06  Felix Rosencrantz <f_rosencrantz@yahoo.com>
+
+	* 17983: Src/Zle/zle_hist.c, Src/Zle/zle_params.c, Doc/Zsh/zle.yo:
+	Added zle LASTSEARCH parameter, giving read access to last incremental
+	search.
+
 2002-12-06  Bart Schaefer  <schaefer@zsh.org>
 
 	* 17985: Test/B02typeset.ztst: adjust hiding/tagging test so it no

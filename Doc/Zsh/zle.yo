@@ -627,6 +627,11 @@ Unlike a normal array, only a maximum of eight elements may be written;
 any extra are ignored.  If fewer than eight elements are given, the
 remaining elements of the kill ring will be treated as undefined.
 )
+
+vindex(LASTSEARCH)
+item(tt(LASTSEARCH) (scalar))(
+The last search string used by an interactive search ; read-only.
+)
 vindex(LASTWIDGET)
 item(tt(LASTWIDGET) (scalar))(
 The name of the last widget that was executed; read-only.
