@@ -23,9 +23,9 @@ sopt="-${(@j::M)${(@)tmp1#-}#?}"
 (( $tmp1[(I)-[/g]*] )) && haspats=yes
 (( $tmp1[(I)-g*] )) && gopt=yes
 if (( $tmp1[(I)-/] )); then
-  pats=( '*(-/)' ${=${(M)tmp1:#-g*}#-g} )
+  pats=( '*(-/)' ${(z)${(M)tmp1:#-g*}#-g} )
 else
-  pats=( "${(@)=${(@M)tmp1:#-g*}#-g}" )
+  pats=( "${(@z)${(@M)tmp1:#-g*}#-g}" )
 fi
 pats=( "${(@)pats:# #}" )
 
