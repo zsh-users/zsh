@@ -1,4 +1,4 @@
-#autoload
+#compdef ifup ifdown
 
 local expl list intf sep
 local -a disp
