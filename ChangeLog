@@ -1,3 +1,7 @@
+2000-05-08  Geoff Wing  <gcw@zsh.org>
+
+	* gcw: unposted: Etc/CONTRIBUTORS fix
+
 2000-05-08  Peter Stephenson  <pws@cambridgesiliconradio.com>
 
 	* 11252: Functions/Zftp/zf*: context should be
