@@ -26,11 +26,11 @@ else
   if [[ "$command[1]" == '=' ]]; then
     eval cmd1\=$command
     cmd2="$command[2,-1]"
-    curcontext="${curcontext}::${cmd1}:"
+    curcontext="${curcontext}::${cmd2}:"
   elif [[ "$command" == */* ]]; then
     cmd1="$command"
     cmd2="${command:t}"
-    curcontext="${curcontext}::${cmd1}:"
+    curcontext="${curcontext}::${cmd2}:"
   else
     cmd1="$command"
     cmd2="$commands[$command]"
@@ -41,17 +41,22 @@ fi
 # See if there are any matching pattern completions.
 
 if [[ "$_compskip" != (all|*patterns*) ]]; then
-  for i in "$_patcomps[@]"; do
-    pat="${i% *}"
-    val="${i#* }"
-    if [[ "$cmd1" == $~pat || "$cmd2" == $~pat ]]; then
-      "$val" && ret=0
-      if [[ "$_compskip" = *patterns* ]]; then
-        break
-      elif [[ "$_compskip" = all ]]; then
-        _compskip=''
-        return ret
-      fi
+  for i in "${(@)_patcomps[(K)$cmd1]}"; do
+    "$i" && ret=0
+    if [[ "$_compskip" = *patterns* ]]; then
+      break
+    elif [[ "$_compskip" = all ]]; then
+      _compskip=''
+      return ret
+    fi
+  done
+  for i in "${(@)_patcomps[(K)$cmd2]}"; do
+    "$i" && ret=0
+    if [[ "$_compskip" = *patterns* ]]; then
+      break
+    elif [[ "$_compskip" = all ]]; then
+      _compskip=''
+      return ret
     fi
   done
 fi
@@ -80,18 +85,24 @@ else
 fi
 
 if [[ "$_compskip" != (all|*patterns*) ]]; then
-  for i in "$_postpatcomps[@]"; do
-    pat="${i% *}"
-    val="${i#* }"
-    if [[ "$cmd1" == $~pat || "$cmd2" == $~pat ]]; then
-      _compskip=default
-      "$val" && ret=0
-      if [[ "$_compskip" = *patterns* ]]; then
-	break
-      elif [[ "$_compskip" = all ]]; then
-        _compskip=''
-        return ret
-      fi
+  for i in "${(@)_postpatcomps[(K)$cmd1]}"; do
+    _compskip=default
+    "$i" && ret=0
+    if [[ "$_compskip" = *patterns* ]]; then
+      break
+    elif [[ "$_compskip" = all ]]; then
+      _compskip=''
+      return ret
+    fi
+  done
+  for i in "${(@)_postpatcomps[(K)$cmd2]}"; do
+    _compskip=default
+    "$i" && ret=0
+    if [[ "$_compskip" = *patterns* ]]; then
+      break
+    elif [[ "$_compskip" = all ]]; then
+      _compskip=''
+      return ret
     fi
   done
 fi

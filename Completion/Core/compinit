@@ -79,12 +79,10 @@ while [[ $# -gt 0 && $1 = -[dDf] ]]; do
 done
 
 # The associative array containing the definitions for the commands.
-# Definitions for patterns will be stored in the normal arrays `_patcomps'
+# Definitions for patterns will be stored in the associations `_patcomps'
 # and `_postpatcomps'.
 
-typeset -gA _comps
-_patcomps=()
-_postpatcomps=()
+typeset -gA _comps _patcomps _postpatcomps
 
 # The associative array use to report information about the last
 # cmpletion to the outside.
@@ -212,17 +210,14 @@ compdef() {
         echo "$0: only one pattern allowed"
 	return 1
       fi
-      # Patterns are stored in strings like `c* foo', with a space
-      # between the pattern and the function name.
-
-      _patcomps=("$_patcomps[@]" "$1 $func")
+      _patcomps[$1]="$func"
       ;;
     postpattern)
       if [[ $# -gt 1 ]]; then
         echo "$0: only one pattern allowed"
 	return 1
       fi
-      _postpatcomps=("$_postpatcomps[@]" "$1 $func")
+      _postpatcomps[$1]="$func"
       ;;
     widgetkey)
       while [[ -n $1 ]]; do
@@ -283,15 +278,10 @@ compdef() {
     # Handle the `-d' option, deleting.
     case "$type" in
     pattern)
-      # Note the space.
-      for i; do
-        _patcomps=("${(@)_patcomps:#$i *}")
-      done
+      unset "_patcomps[$^@]"
       ;;
     postpattern)
-      for i; do
-        _postpatcomps=("${(@)_postpatcomps:#$i *}")
-      done
+      unset "_postpatcomps[$^@]"
       ;;
     key)
       # Oops, cannot do that yet.
@@ -300,10 +290,7 @@ compdef() {
       return 1
       ;;
     *)
-      # Deleting definitons for command is even simpler.
-      for i; do
-        unset "_comps[$i]"
-      done
+      unset "_comps[$^@]"
     esac
   fi
 }

@@ -34,14 +34,14 @@ done  >> $_d_file
 print ")" >> $_d_file
 
 print "\n_patcomps=(" >> $_d_file
-for _d_f in "$_patcomps[@]"; do
-  print -r - "'${_d_f//\'/'\\''}'"
+for _d_f in "${(ok@)_patcomps}"; do
+  print -r - "'${_d_f//\'/'\\''}'" "'${_patcomps[$_d_f]//\'/'\\''}'"
 done >> $_d_file
 print ")" >> $_d_file
 
 print "\n_postpatcomps=(" >> $_d_file
-for _d_f in "$_postpatcomps[@]"; do
-  print -r - "'${_d_f//\'/'\\''}'"
+for _d_f in "${(ok@)_postpatcomps}"; do
+  print -r - "'${_d_f//\'/'\\''}'" "'${_postpatcomps[$_d_f]//\'/'\\''}'"
 done >> $_d_file
 print ")" >> $_d_file
 

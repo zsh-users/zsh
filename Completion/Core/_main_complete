@@ -69,78 +69,65 @@ for comp; do
   fi
 done
 
-# See which tags were or were not used.
+if (( $compstate[nmatches] )); then
+  [[ _last_nmatches -ge 0 && _last_nmatches -ne compstate[nmatches] ]] &&
+      _menu_style=( "$_last_menu_style[@]" "$_menu_style[@]" )
 
-_used_tags=( "${(@)_tried_tags:#${(j:|:)~${(@)_failed_tags//\[/\\[}//\]/\\]}}" )
-_unused_tags=( "${(@)_offered_tags:#${(j:|:)~${(@)_used_tags//\[/\\[}//\]/\\]}}" )
-
-# Now call the post-functions.
-
-for post in "$comppostfuncs[@]"; do
-  "$post"
-done
-comppostfuncs=()
-
-_lastdescr=( "\`${(@)^_lastdescr:#}'" )
-
-[[ _last_nmatches -ge 0 && _last_nmatches -ne compstate[nmatches] ]] &&
-    _menu_style=( "$_last_menu_style[@]" "$_menu_style[@]" )
-
-if [[ "$compstate[insert]" = "$_saved_insert" ]]; then
-  if [[ -n "$_menu_style[(r)(yes|true|1|on)]" ||
-        ( -n "$_menu_style[(r)auto*]" &&
-          "$compstate[insert]" = automenu ) ]]; then
-    compstate[insert]=menu
-  elif [[ -n "$_menu_style[(r)auto*]" &&
-          "$compstate[insert]" != automenu ]]; then
-    compstate[insert]=automenu-unambiguous
-  elif [[ -n "$_menu_style[(r)(no|false|0|off)]" ]]; then
-    compstate[insert]=unambiguous
-  elif [[ -n "$_def_menu_style[(r)(yes|true|1|on)]" ||
-        ( -n "$_def_menu_style[(r)auto*]" &&
-          "$compstate[insert]" = automenu ) ]]; then
-    compstate[insert]=menu
-  elif [[ -n "$_def_menu_style[(r)auto*]" &&
-          "$compstate[insert]" != automenu ]]; then
-    compstate[insert]=automenu-unambiguous
-  elif [[ -n "$_def_menu_style[(r)(no|false|0|off)]" ]]; then
-    compstate[insert]=unambiguous
-  fi
-fi
-
-_menu_style=( "$_menu_style[@]" "$_def_menu_style[@]" )
-
-if [[ "$compstate[insert]" = *menu ]]; then
-  if [[ -n "$_menu_style[(r)no-select*]" ]]; then
-    unset SELECTMIN
-  else
-    sel=( "${(@M)_menu_style:#select*}" )
-
-    if (( $# )); then
-      local min=9999999 i num
-
-      for i in "$sel[@]"; do
-        if [[ "$i" = *\=* ]]; then
-	  num="${i#*\=}"
-	  [[ num -lt 0 ]] && num=0
-	else
-	  num=0
-	fi
-	[[ num -lt min ]] && min="$num"
-
-	(( min )) || break
-      done
-
-      SELECTMIN="$min"
+  if [[ "$compstate[insert]" = "$_saved_insert" ]]; then
+    if [[ -n "$_menu_style[(r)(yes|true|1|on)]" ||
+          ( -n "$_menu_style[(r)auto*]" &&
+            "$compstate[insert]" = automenu ) ]]; then
+      compstate[insert]=menu
+    elif [[ -n "$_menu_style[(r)auto*]" &&
+            "$compstate[insert]" != automenu ]]; then
+      compstate[insert]=automenu-unambiguous
+    elif [[ -n "$_menu_style[(r)(no|false|0|off)]" ]]; then
+      compstate[insert]=unambiguous
+    elif [[ -n "$_def_menu_style[(r)(yes|true|1|on)]" ||
+          ( -n "$_def_menu_style[(r)auto*]" &&
+            "$compstate[insert]" = automenu ) ]]; then
+      compstate[insert]=menu
+    elif [[ -n "$_def_menu_style[(r)auto*]" &&
+            "$compstate[insert]" != automenu ]]; then
+      compstate[insert]=automenu-unambiguous
+    elif [[ -n "$_def_menu_style[(r)(no|false|0|off)]" ]]; then
+      compstate[insert]=unambiguous
     fi
   fi
-fi
 
-if [[ compstate[nmatches] -eq 0 &&
-      compstate[matcher] -eq compstate[total_matchers] &&
-      $#_lastdescr -ne 0 ]] &&
-   zstyle -s ":completion${curcontext}:warnings" format format; then
+  _menu_style=( "$_menu_style[@]" "$_def_menu_style[@]" )
+
+  if [[ "$compstate[insert]" = *menu ]]; then
+    if [[ -n "$_menu_style[(r)no-select*]" ]]; then
+      unset SELECTMIN
+    else
+      sel=( "${(@M)_menu_style:#select*}" )
+
+      if (( $# )); then
+        local min=9999999 i num
+
+        for i in "$sel[@]"; do
+          if [[ "$i" = *\=* ]]; then
+  	    num="${i#*\=}"
+  	    [[ num -lt 0 ]] && num=0
+  	  else
+  	    num=0
+  	  fi
+  	  [[ num -lt min ]] && min="$num"
+  
+	  (( min )) || break
+        done
+
+        SELECTMIN="$min"
+      fi
+    fi
+  fi
+elif [[ compstate[matcher] -eq compstate[total_matchers] &&
+        $#_lastdescr -ne 0 ]] &&
+     zstyle -s ":completion${curcontext}:warnings" format format; then
   local str
+
+  _lastdescr=( "\`${(@)^_lastdescr:#}'" )
 
   compstate[list]='list force'
   compstate[insert]=''
@@ -155,18 +142,34 @@ if [[ compstate[nmatches] -eq 0 &&
   compadd -UX "$format" -n ''
 fi
 
-_lastcomp=( "${(@kv)compstate}" )
-_lastcomp[completer]="$comp"
-_lastcomp[prefix]="$PREFIX"
-_lastcomp[suffix]="$SUFFIX"
-_lastcomp[iprefix]="$IPREFIX"
-_lastcomp[isuffix]="$ISUFFIX"
-_lastcomp[qiprefix]="$QIPREFIX"
-_lastcomp[qisuffix]="$QISUFFIX"
-_lastcomp[offered_tags]="${(j.:.)_offered_tags}"
-_lastcomp[tried_tags]="${(j.:.)_tried_tags}"
-_lastcomp[failed_tags]="${(j.:.)_failed_tags}"
-_lastcomp[unused_tags]="${(j.:.)_unused_tags}"
-_lastcomp[used_tags]="${(j.:.)_used_tags}"
+if [[ compstate[matcher] -eq compstate[total_matchers] ||
+      compstate[nmatches] -ne 0 ]]; then
+
+  # See which tags were or were not used.
+
+  _used_tags=( "${(@)_tried_tags:#${(j:|:)~${(@)_failed_tags//\[/\\[}//\]/\\]}}" )
+  _unused_tags=( "${(@)_offered_tags:#${(j:|:)~${(@)_used_tags//\[/\\[}//\]/\\]}}" )
+
+  # Now call the post-functions.
+
+  for post in "$comppostfuncs[@]"; do
+    "$post"
+  done
+  comppostfuncs=()
+
+  _lastcomp=( "${(@kv)compstate}" )
+  _lastcomp[completer]="$comp"
+  _lastcomp[prefix]="$PREFIX"
+  _lastcomp[suffix]="$SUFFIX"
+  _lastcomp[iprefix]="$IPREFIX"
+  _lastcomp[isuffix]="$ISUFFIX"
+  _lastcomp[qiprefix]="$QIPREFIX"
+  _lastcomp[qisuffix]="$QISUFFIX"
+  _lastcomp[offered_tags]="${(j.:.)_offered_tags}"
+  _lastcomp[tried_tags]="${(j.:.)_tried_tags}"
+  _lastcomp[failed_tags]="${(j.:.)_failed_tags}"
+  _lastcomp[unused_tags]="${(j.:.)_unused_tags}"
+  _lastcomp[used_tags]="${(j.:.)_used_tags}"
+fi
 
 return ret
