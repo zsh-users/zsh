@@ -146,7 +146,7 @@ elif [[ ( "$_tar_cmd" = *[xt]* || -n $del ) && -n "$tf" ]]; then
   _wanted files expl 'file from archive' _multi_parts / _tar_cache_list
 elif (( CURRENT == 2 )); then
   _values -s '' 'tar function' \
-    '(c t u x)A[append to and archive]' \
+    '(c t u x)A[append to an archive]' \
     '(A t u x)c[create a new archive]' \
     '(A c u x)t[list archive contents]' \
     '(A c t x)u[update archive]' \

@@ -1,6 +1,10 @@
+2003-02-27  Oliver Kiddle  <opk@zsh.org>
+
+	* unposted: Completion/Unix/Command/_tar: correct my typo
+
 2003-02-27  Doug Kearns  <djkea2@mugca.its.monash.edu.au>
 
-	* 18305: Completion/Zsh/Command/_python: new completion for
+	* 18305: Completion/Unix/Command/_python: new completion for
 	python.
 
 2003-02-27  Geoff Wing  <gcw@zsh.org>
