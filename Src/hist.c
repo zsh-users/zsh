@@ -2004,7 +2004,7 @@ readhistfile(char *fn, int err, int readflags)
 void
 savehistfile(char *fn, int err, int writeflags)
 {
-    char *t, *start = NULL;
+    char *t, *tmpfile, *start = NULL;
     FILE *out;
     Histent he;
     zlong xcurhist = curhist - !!(histactive & HA_ACTIVE);
@@ -2041,12 +2041,19 @@ savehistfile(char *fn, int err, int writeflags)
 	    extended_history = 1;
     }
     if (writeflags & HFILE_APPEND) {
+	tmpfile = NULL;
 	out = fdopen(open(unmeta(fn),
 			O_CREAT | O_WRONLY | O_APPEND | O_NOCTTY, 0600), "a");
-    }
-    else {
+    } else if (!isset(HISTSAVEBYCOPY)) {
+	tmpfile = NULL;
 	out = fdopen(open(unmeta(fn),
 			 O_CREAT | O_WRONLY | O_TRUNC | O_NOCTTY, 0600), "w");
+    } else {
+	tmpfile = bicat(unmeta(fn), ".new");
+	if (unlink(tmpfile) < 0 && errno != ENOENT)
+	    out = NULL;
+	else
+	    out = fdopen(open(tmpfile, O_CREAT | O_WRONLY | O_EXCL, 0600), "w");
     }
     if (out) {
 	for (; he && he->histnum <= xcurhist; he = down_histent(he)) {
@@ -2091,6 +2098,11 @@ savehistfile(char *fn, int err, int writeflags)
 	    lasthist.text = ztrdup(start);
 	}
 	fclose(out);
+	if (tmpfile) {
+	    if (rename(tmpfile, unmeta(fn)) < 0)
+		zerr("can't rename %s.new to $HISTFILE", fn, 0);
+	    free(tmpfile);
+	}
 
 	if (writeflags & HFILE_SKIPOLD
 	 && !(writeflags & (HFILE_FAST | HFILE_NO_REWRITE))) {
@@ -2110,8 +2122,13 @@ savehistfile(char *fn, int err, int writeflags)
 	    pophiststack();
 	    histactive = remember_histactive;
 	}
-    } else if (err)
-	zerr("can't write history file %s", fn, 0);
+    } else if (err) {
+	if (tmpfile) {
+	    zerr("can't write history file %s.new", fn, 0);
+	    free(tmpfile);
+	} else
+	    zerr("can't write history file %s", fn, 0);
+    }
 
     unlockhistfile(fn);
 }
