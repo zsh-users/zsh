@@ -319,7 +319,11 @@ load_and_bind(const char *fn)
 #else
 
 #ifdef HAVE_DLFCN_H
+# ifdef HAVE_DL_H
+#  include <dl.h>
+# else
 # include <dlfcn.h>
+# endif
 #else
 # ifdef HAVE_DL_H
 #  include <dl.h>
