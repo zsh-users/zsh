@@ -364,8 +364,10 @@ for prepath in "$prepaths[@]"; do
 	    else
 	      exppaths=( "$exppaths[@]" ${^tmp2}/${tpre}${tsuf} )
 	    fi
-          else
+          elif [[ ${tpre}${tsuf} = */* ]]; then
 	    exppaths=( "$exppaths[@]" ${tpre}${tsuf} )
+
+	    ### this once was in an `else' (not `elif')
 	  fi
         fi
         continue 2

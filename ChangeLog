@@ -1,3 +1,9 @@
+2001-03-23  Sven Wischnowsky  <wischnow@zsh.org>
+
+	* 13724: Completion/Core/_path_files: fixlet, complicated
+	match specs could result in incorrect words being used as
+	possible path expansions
+
 2001-03-22  Peter Stephenson  <pws@csr.com>
 
 	* 13676: Completion/User/_mh: some tweaks for nmh.
