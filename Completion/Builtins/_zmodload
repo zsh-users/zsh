@@ -1,6 +1,6 @@
 #compdef zmodload
 
-local fl="$words[2]" expl d
+local fl="$words[2]" expl
 
 if [[ "$fl" = -*(a*u|u*a)* || "$fl" = -*a* && CURRENT -ge 4 ]]; then
   _wanted builtins expl 'builtin command' &&

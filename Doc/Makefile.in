@@ -286,7 +286,6 @@ clean-here:
 	rm -f *.aux *.cp *.cps *.fn *.fns *.ky *.log
 	rm -f *.pg *.pgs *.toc *.tp *.tps *.vr *.vrs
 	rm -rf infodir
-	rm -f *.1 Zsh/modlist.yo Zsh/modmenu.yo Zsh/manmodmenu.yo
 .PHONY: clean-here
 
 distclean-here: clean-here
