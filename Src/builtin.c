@@ -1774,6 +1774,8 @@ typeset_single(char *cname, char *pname, Param pm, int func,
 	    return NULL;
 	}
     }
+    else if (newspecial != NS_NONE && strcmp(pname, "SECONDS") == 0)
+	newspecial = NS_SECONDS;
 
     /*
      * A parameter will be local if
@@ -1913,8 +1915,12 @@ typeset_single(char *cname, char *pname, Param pm, int func,
 	 * because we've checked for unpleasant surprises above.
 	 */
 	pm->flags = (PM_TYPE(pm->flags) | on | PM_SPECIAL) & ~off;
-	if (newspecial == NS_SECONDS)
+	if (newspecial == NS_SECONDS) {
+	    /* We save off the raw internal value of the SECONDS var */
+	    tpm->u.dval = getrawseconds();
 	    setsecondstype(pm, on, off);
+	}
+
 	/*
 	 * Final tweak: if we've turned on one of the flags with
 	 * numbers, we should use the appropriate integer.
@@ -1998,7 +2004,7 @@ typeset_single(char *cname, char *pname, Param pm, int func,
 		  "BUG: parameter recreated with wrong flags");
 	    unsetparam_pm(ipm, 0, 1);
 	}
-    } else if (newspecial && !(pm->old->flags & PM_NORESTORE)) {
+    } else if (newspecial != NS_NONE && !(pm->old->flags & PM_NORESTORE)) {
 	/*
 	 * We need to use the special setting function to re-initialise
 	 * the special parameter to empty.
