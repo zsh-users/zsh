@@ -2,7 +2,8 @@
 
 	* 14046: Doc/Zle/zle.yo, Src/Zle/zle_keymap.c: bindkey -rp removes
 	bindings with given prefix; minor bugfix for length of prefix with
-	bindkey -p.
+	bindkey -p.  Also, don't bind cursor keystrings if they are just
+	a single key.
 
 2001-04-19  Clint Adams  <schizo@debian.org>
 
