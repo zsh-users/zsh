@@ -67,9 +67,16 @@ void
 sizeline(int sz)
 {
     while (sz > linesz)
-	zleline = 
+    {
+	if (linesz < 256)
+	    linesz = 256;
+	else
+	    linesz *= 4;
+
+	zleline =
 	    (ZLE_STRING_T)realloc(zleline,
-				  ((linesz *= 4) + 2) * ZLE_CHAR_SIZE);
+				  (linesz + 2) * ZLE_CHAR_SIZE);
+    }
 }
 
 /*

@@ -1,3 +1,8 @@
+2005-01-26  Peter Stephenson  <pws@csr.com>
+
+	* 20750: Src/zle_utils.c: 20742 could cause hang when line
+	resized to empty.
+
 2005-01-25  Peter Stephenson  <pws@csr.com>
 
 	* 20742: Src/system.h, Src/Zle/zle.h, Src/Zle/zle_main.c,
