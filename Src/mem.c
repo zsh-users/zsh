@@ -64,14 +64,28 @@
 	to duplicate a structure in order to preserve it (i.e. a function
 	definition), call permalloc(), then dupstruct().
 
-	If we use zsh's own allocator we use a simple trick to avoid that
-	the (*real*) heap fills up with empty zsh-heaps: we allocate a
-	large block of memory before allocating a heap pool, this memory
-	is freed again immediately after the pool is allocated. If there
-	are only small blocks on the free list this guarantees that the
-	memory for the pool is at the end of the memory which means that
-	we can give it back to the system when the pool is freed.
+	If possible, the heaps are allocated using mmap() so that the
+	(*real*) heap isn't filled up with empty zsh heaps. If mmap()
+	is not available and zsh's own allocator we use a simple trick
+	to avoid that: we allocate a large block of memory before allocating
+	a heap pool, this memory is freed again immediately after the pool
+	is allocated. If there are only small blocks on the free list this
+	guarantees that the memory for the pool is at the end of the memory
+	which means that we can give it back to the system when the pool is
+	freed.
 */
+
+#if defined(HAVE_SYS_MMAN_H) && defined(HAVE_MMAP) && defined(HAVE_MUNMAP)
+
+#include <sys/mman.h>
+
+#if defined(MAP_ANONYMOUS) && defined(MAP_PRIVATE)
+
+#define USE_MMAP 1
+#define MMAP_FLAGS (MAP_ANONYMOUS | MAP_PRIVATE)
+
+#endif
+#endif
 
 /* != 0 if we are allocating in the heaplist */
  
@@ -232,8 +246,13 @@ freeheap(void)
 	    if (!fheap && h->used < HEAP_ARENA_SIZE)
 		fheap = h;
 	    hl = h;
-	} else
+	} else {
+#ifdef USE_MMAP
+	    munmap((void *) h, h->size);
+#else
 	    zfree(h, HEAPSIZE);
+#endif
+	}
     }
     if (hl)
 	hl->next = NULL;
@@ -268,8 +287,13 @@ popheap(void)
 	    zfree(hs, sizeof(*hs));
 
 	    hl = h;
-	} else
+	} else {
+#ifdef USE_MMAP
+	    munmap((void *) h, h->size);
+#else
 	    zfree(h, HEAPSIZE);
+#endif
+	}
     }
     if (hl)
 	hl->next = NULL;
@@ -303,7 +327,7 @@ zhalloc(size_t size)
     {
 	Heap hp;
         /* not found, allocate new heap */
-#ifdef ZSH_MEM
+#if defined(ZSH_MEM) && !defined(USE_MMAP)
 	static int called = 0;
 	void *foo = called ? (void *)malloc(HEAPFREE) : NULL;
             /* tricky, see above */
@@ -313,9 +337,34 @@ zhalloc(size_t size)
 	n = HEAP_ARENA_SIZE > size ? HEAPSIZE : size + sizeof(*h);
 	for (hp = NULL, h = heaps; h; hp = h, h = h->next);
 
-	h = (Heap) zalloc(n);
+#ifdef USE_MMAP
+	{
+	    static size_t pgsz = 0;
 
-#ifdef ZSH_MEM
+	    if (!pgsz) {
+
+#ifdef _SC_PAGESIZE
+		pgsz = sysconf(_SC_PAGESIZE);     /* SVR4 */
+#else
+# ifdef _SC_PAGE_SIZE
+		pgsz = sysconf(_SC_PAGE_SIZE);    /* HPUX */
+# else
+		pgsz = getpagesize();
+# endif
+#endif
+
+		pgsz--;
+	    }
+	    n = (n + pgsz) & ~pgsz;
+	    h = (Heap) mmap(NULL, n, PROT_READ | PROT_WRITE,
+			    MMAP_FLAGS, -1, 0);
+	    h->size = n;
+	}
+#else
+	h = (Heap) zalloc(n);
+#endif
+
+#if defined(ZSH_MEM) && !defined(USE_MMAP)
 	if (called)
 	    zfree(foo, HEAPFREE);
 	called = 1;
@@ -381,7 +430,11 @@ hrealloc(char *p, size_t old, size_t new)
 	    else
 		heaps = h->next;
 	    fheap = NULL;
+#ifdef USE_MMAP
+	    munmap((void *) h, h->size);
+#else
 	    zfree(h, HEAPSIZE);
+#endif
 	    return NULL;
 	}
 	if (old > HEAP_ARENA_SIZE || new > HEAP_ARENA_SIZE) {
@@ -696,7 +749,9 @@ malloc(MALLOC_ARG_T size)
 {
     struct m_hdr *m, *mp, *mt;
     long n, s, os = 0;
+#ifndef USE_MMAP
     struct heap *h, *hp, *hf = NULL, *hfp = NULL;
+#endif
 
     /* some systems want malloc to return the highest valid address plus one
        if it is called with an argument of zero */
@@ -769,12 +824,14 @@ malloc(MALLOC_ARG_T size)
     } else
 	s = 0;
 
-/* search the free list for an block of at least the requested size */
+    /* search the free list for an block of at least the requested size */
     for (mp = NULL, m = m_free; m && m->len < size; mp = m, m = m->next);
 
- /* if there is an empty zsh heap at a lower address we steal it and take
-    the memory from it, putting the rest on the free list (remember
-    that the blocks on the free list are ordered) */
+#ifndef USE_MMAP
+
+    /* if there is an empty zsh heap at a lower address we steal it and take
+       the memory from it, putting the rest on the free list (remember
+       that the blocks on the free list are ordered) */
 
     for (hp = NULL, h = heaps; h; hp = h, h = h->next)
 	if (!h->used &&
@@ -801,6 +858,7 @@ malloc(MALLOC_ARG_T size)
 
 	for (mp = NULL, m = m_free; m && m->len < size; mp = m, m = m->next);
     }
+#endif
     if (!m) {
 	long nal;
 	/* no matching free block was found, we have to request new
