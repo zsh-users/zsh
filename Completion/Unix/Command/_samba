@@ -1,0 +1,93 @@
+#compdef smbcontrol smbclient nmblookup smbstatus
+
+local expl msgs args
+
+case $service in
+  smbcontrol)
+    case $CURRENT in
+      3)
+	msgs=( debug ping profile debuglevel profilelevel )
+	case $words[CURRENT-1] in
+	  nmbd) msgs=( $msgs force-election ) ;;
+	  smbd) msgs=( $msgs printer-notify ) ;;
+	  -i) return 1 ;;
+	esac
+        _wanted message-type expl 'message types' compadd -a msgs
+      ;;
+      4)
+        case $words[CURRENT-1] in
+	  profile)
+	    _wanted parameter expl 'parameter' compadd on off flush count
+	  ;;
+	  debug) _message 'debug level' ;;
+	  ping) _message 'number of ping messages' ;;
+	esac
+      ;;
+      *)
+        _arguments \
+          '-i[run interactively]' \
+          ':destination:(nmbd smbd)'
+      ;;
+    esac
+  ;;
+  smbclient)
+    args=(
+      '(-N -A)2:password'
+      '(2)-s+[specify location of smb.conf]:smb.conf location:_files'
+      '(2)-O+[specify socket options]:socket options'
+      '(2)-R+[specify name resolution order]:name resolution order:_values -s " " lmhosts host wins bcast'
+      '(2 -L -D -T)-M+[send message]:host:_hosts'
+      '(2)-i+[specify NetBIOS scope]:scope'
+      '(2)-N[suppress password prompt]'
+      '(2)-n+[specify local NetBIOS name]:local machine name'
+      '(2)-d+[specify debug level]:debug level:(0 1 2 3 4 5 6 7 8 9 10)'
+      '(2)-p+[specify tcp port]:tcp port'
+      '(2)-l+[specify base log filename]:base log filename'
+      '(2)-I+[specify IP address of server]:IP address'
+      '(2)-E[output messages to stderr]'
+      '(2)-U+[specify username]:username:_users'
+      '(2)-A+[specify file containing username/password]:file:_files'
+      '(2 -M -D -T)-L+[list services on server]:host:_hosts'
+      '(2)-t+[specify terminal code]:terminal code'
+      '(2)-b+[specify buffersize]:transmit/send buffer size (bytes)'
+      '(2)-W+[specify workgroup]:workgroup'
+      '(2 -M -L)-T+[specify tar options]:tar options'
+      '(2 -M -L)-D+[initial directory]:initial directory'
+      '(2)-c[specify commands]:command string'
+    )
+    if (( CURRENT == 2 )); then
+      args=( $args 
+        '1:service name:_hosts -P // -S /'
+        '(-s -O -R -M -i -N -n -d -p -l -I -E -U -A -L -t -b -W -T -D -c)-h[display usage information]'
+      )
+    fi
+    _arguments -s "$args[@]"
+  ;;
+  nmblookup)
+    _arguments -s -A "-*" \
+      '(-h)-R[set recursion desired in packet]' \
+      '(-h)-M[search for a master browser]' \
+      '(-h)-S[lookup node status as well]' \
+      '(-h)-T[perform reverse DNS on IP addresses]' \
+      '(-h)-r[use root port 137]' \
+      '(-h)-A[query node status on IP address]' \
+      '(-R -M -S -T -r -A -B -U -d -s -i *)-h[print help message]' \
+      '(-h)-B+[specify broadcast address]:broadcast address' \
+      '(-h)-U+[specify unicast address]:unicast address' \
+      '(-h)-d+[specify debug level]:debug level:(0 1 2 3 4 5 6 7 8 9 10)' \
+      '(-h)-s+[specify location of smb.conf]:smb.conf location:_files' \
+      '(-h)-i+[specify NetBIOS scope]:scope' \
+      '(-h)*:NetBIOS name:_hosts'
+  ;;
+  smbstatus)
+    args='(-b -d -L -p -S)'
+    _arguments -s \
+      "$args-b[brief output]" \
+      "$args-d[detailed output]" \
+      "$args-L[list only locks]" \
+      "$args-p[list smbd(8) processes]" \
+      "$args-S[list only shares]" \
+      '-s+[specify location of smb.conf]:smb.conf location:_files' \
+      '-u+[specify user to restrict information to]:user:_users'
+   ;;
+esac
