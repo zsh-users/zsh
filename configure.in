@@ -48,7 +48,7 @@ dnl -----------------------------
 dnl Handle --program-prefix, --program-suffix, etc.
 AC_ARG_PROGRAM
 
-u_ptn=`make -f - <<EOF
+u_ptn=`make -s -f - <<EOF
 all:
 	@echo ${program_transform_name}
 EOF
