@@ -734,8 +734,9 @@ bin_vared(char *name, char **args, char *ops, int func)
     Value v;
     Param pm = 0;
     int create = 0;
-    int type = PM_SCALAR, obreaks = breaks;
+    int type = PM_SCALAR, obreaks = breaks, haso = 0;
     char *p1 = NULL, *p2 = NULL;
+    FILE *oshout;
 
     if (zleactive) {
 	zwarnnam(name, "ZLE cannot be used recursively (yet)", NULL, 0);
@@ -816,6 +817,17 @@ bin_vared(char *name, char **args, char *ops, int func)
 	return 1;
     }
 
+    if (SHTTY == -1) {
+	/* need to open /dev/tty specially */
+	if ((SHTTY = open("/dev/tty", O_RDWR|O_NOCTTY)) == -1) {
+	    zerrnam(name, "can't access terminal", NULL, 0);
+	    return 1;
+	}
+	oshout = shout;
+	init_shout();
+
+	haso = 1;
+    }
     /* edit the parameter value */
     PERMALLOC {
 	pushnode(bufstack, ztrdup(s));
@@ -823,6 +835,12 @@ bin_vared(char *name, char **args, char *ops, int func)
     varedarg = *args;
     t = (char *) zleread(p1, p2, ops['h'] ? ZLRF_HISTORY : 0);
     varedarg = ova;
+    if (haso) {
+	close(SHTTY);
+	fclose(shout);
+	shout = oshout;
+	SHTTY = -1;
+    }
     if (!t || errflag) {
 	/* error in editing */
 	errflag = 0;
