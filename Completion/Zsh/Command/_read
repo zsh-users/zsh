@@ -9,7 +9,7 @@ local pflag
 _arguments -s -A "-*" -S \
   '-r[raw mode]' \
   '(-p -k -s -u -z)-q[read y or n character from terminal]' \
-  '(-q)-k[specify number of characters to read]:number of characters' \
+  '(-q)-k+[specify number of characters to read]:number of characters' \
   '(-q -s -u -p)-z[read entry from editor buffer stack]' \
   '(-E)-e[input read is echoed and not assigned]' \
   '(-e)-E[input read is echoed]' \
