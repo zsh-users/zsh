@@ -1,3 +1,8 @@
+2000-07-27  Bart Schaefer  <schaefer@zsh.org>
+
+	* 12396: Functions/Misc/zed: The value of `$(functions $1)' for
+	autoloadable functions has changed.
+
 2000-07-27  Sven Wischnowsky  <wischnow@zsh.org>
 
 	* 12394: Completion/Core/_main_complete: don't hide possible

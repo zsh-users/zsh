@@ -41,7 +41,7 @@ bindkey -a "ZZ" accept-line
 if ((fun)) then
   var="$(functions $1)"
   # If function is undefined but autoloadable, load it
-  if [[ $var = undefined* ]] then
+  if [[ $var = *\#\ undefined* ]] then
     local dir
     for dir in $fpath; do
       if [[ -f $dir/$1 ]] then
