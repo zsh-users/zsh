@@ -3264,7 +3264,10 @@ loadautofn(Shfunc shf, int fksh, int autol)
 	    execode(prog, 1, 0);
 	    shf = (Shfunc) shfunctab->getnode(shfunctab, n);
 	    if (!shf || (shf->flags & PM_UNDEFINED)) {
+		/* We're not actually in the function; decrement locallevel */
+		locallevel--;
 		zwarn("%s: function not defined by file", n, 0);
+		locallevel++;
 		popheap();
 		return NULL;
 	    }
@@ -3350,9 +3353,7 @@ doshfunc(char *name, Eprog prog, LinkList doshargs, int flags, int noreturnval)
     if(++funcdepth > MAX_FUNCTION_DEPTH)
     {
         zerr("maximum nested function level reached", NULL, 0);
-	scriptname = oldscriptname;
-	popheap();
-	return;
+	goto undoshfunc;
     }
 #endif
     fstack.name = dupstring(name);
@@ -3373,15 +3374,15 @@ doshfunc(char *name, Eprog prog, LinkList doshargs, int flags, int noreturnval)
 		errflag = 1;
 	    else
 		lastval = 1;
-	    popheap();
-	    scriptname = oldscriptname;
-	    return;
+	    goto doneshfunc;
 	}
 	prog = shf->funcdef;
     }
     runshfunc(prog, wrappers, fstack.name);
+ doneshfunc:
     funcstack = fstack.prev;
 #ifdef MAX_FUNCTION_DEPTH
+ undoshfunc:
     --funcdepth;
 #endif
     if (retflag) {
