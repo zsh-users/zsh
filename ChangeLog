@@ -1,5 +1,8 @@
 2001-04-19  Clint Adams  <schizo@debian.org>
 
+	* unposted: configure.in: make sure all the libraries are
+	in for the function check.
+
 	* 14041: configure.in, Config/defs.mk.in, Src/Makefile.in,
 	Src/Modules/cap.mdd, Src/Modules/termcap.mdd,
 	Src/Modules/terminfo.mdd, Src/Modules/zftp.mdd:

@@ -840,7 +840,7 @@ dnl need to integrate this function
 dnl AC_FUNC_STRFTIME
 
 SAVELIBS=$LIBS
-LIBS="$LIBS_TERMCAP $LIBS_TERMINFO $LIBS"
+LIBS="$LIBS_CAP $LIBS_YP $LIBS_M $LIBS_TERMCAP $LIBS_TERMINFO $LIBS"
 
 AC_CHECK_FUNCS(strftime difftime gettimeofday \
 	       select poll \
