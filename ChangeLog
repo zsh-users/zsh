@@ -1,3 +1,7 @@
+2002-07-24  Clint Adams  <clint@zsh.org>
+
+	* 17478: Completion/Debian/Command/_bts: new tags for sarge.
+
 2002-07-22  Clint Adams  <clint@zsh.org>
 
 	* 17476: Completion/Unix/Command/.distfiles,
