@@ -1,3 +1,7 @@
+2001-06-01  Tanaka Akira  <akr@zsh.org>
+
+	* 14628: Completion/Unix/Command/_ruby: new completion function.
+
 2001-05-31  Sven Wischnowsky  <wischnow@zsh.org>
 
 	* 14607: Completion/Base/Utility/_arguments, Src/Zle/computil.c:

@@ -1,0 +1,49 @@
+#compdef ruby
+
+# completion function for Ruby.
+# http://www.ruby-lang.org/
+
+local expl curcontext="$curcontext" line state
+typeset -A opt_args
+local dirs
+
+_arguments -C -s \
+  '--version[print version]' \
+  '-c[syntax check]' \
+  '-w[verbose mode without printing version message at the beginning]' \
+  '(-d)--debug[debug mode]' \
+  '(--debug)-d[debug mode]' \
+  '(-h)--help[print help message]' \
+  '(--help)-h[print help message]' \
+  '-l[automatic line-ending processing]' \
+  '-p[loop and print]' \
+  '-n[loop]' \
+  '-a[auto-split mode]' \
+  '-s[switch parsing]' \
+  '-0-[input record separator]:input record separator in octal:' \
+  '-K-[specifies KANJI (Japanese) encoding]:KANJI encoding:((e\:EUC-JP s\:Shift_JIS u\:UTF-8 N\:None))' \
+  '-F-[input field separator]:input field separator:' \
+  '-i-[in-place-edit mode]:suffix for in-place-edit mode:(.bak)' \
+  '-I+[library directory]:library directory:_files -/' \
+  '-r+[require library]:library name:->library' \
+  '-S[search ruby script in PATH]' \
+  '(--verbose)-v[verbose mode]' \
+  '(-v)--verbose[verbose mode]' \
+  '-x-[embedded script]:directory:_files -/' \
+  '-C+[chdir]:directory:_files -/' \
+  '(--yydebug)-y[compiler debug mode]' \
+  '(-y)--yydebug[compiler debug mode]' \
+  '--copyright[copyright notice]' \
+  '-T-[taint check]:taint level:' \
+  '(1)-e+[ruby command]:ruby command:' \
+  ':script file:_files' \
+  ':script argument:_files' && return 0
+
+case $state in
+  library)
+    dirs=($(_call_program directories $words[1] -e 'print\ \$:.join\(\"\\n\"\)'))
+    _wanted directories expl library \
+      _path_files -W dirs
+  ;;
+esac
+  
