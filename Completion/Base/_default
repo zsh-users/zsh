@@ -1,7 +1,5 @@
 #compdef -default-
 
-local expl
-
 # You can first try the `compctl's by uncommenting the `compcall' line
 # below.
 # This is without first (-T) and default (-D) completion. If you want
@@ -22,4 +20,4 @@ _files && return 0
 # file name expansion after the =.  In that case, it's natural to
 # allow completion to handle file names after any equals sign.
 
-[[ -o magicequalsubst ]] && compset -P 1 '*=' && _files "$expl[@]"
+[[ -o magicequalsubst ]] && compset -P 1 '*=' && _files

@@ -435,7 +435,7 @@ static int
 bin_compadd(char *name, char **argv, char *ops, int func)
 {
     struct cadata dat;
-    char *p, **sp, *e, *m = NULL;
+    char *p, **sp, *e, *m = NULL, *mstr = NULL;
     int dm;
     Cmatcher match = NULL;
 
@@ -590,13 +590,21 @@ bin_compadd(char *name, char **argv, char *ops, int func)
 		    zerrnam(name, e, NULL, *p);
 		    return 1;
 		}
-		if (dm && (match = parse_cmatcher(name, m)) == pcm_err) {
-		    match = NULL;
-		    return 1;
+		if (dm) {
+		    if (mstr)
+			mstr = tricat(mstr, " ", m);
+		    else
+			mstr = ztrdup(m);
 		}
 	    }
 	}
     }
+    if (mstr && (match = parse_cmatcher(name, mstr)) == pcm_err) {
+	zsfree(mstr);
+	return 1;
+    }
+    zsfree(mstr);
+
  ca_args:
 
     if (!*argv && !dat.group &&

@@ -939,6 +939,14 @@ hostname, the path to the default web pages for the server and the
 directory name used by a user placing web pages within their home
 area.
 )
+item(tt(matcher))(
+This style is tested for tags used when generating matches. Its value
+is used as an additional match specification to use when adding the
+matches as described in
+ifzman(the section `Matching Control' in zmanref(zshcompwid))\
+ifnzman(noderef(Matching Control))\
+.
+)
 item(tt(max-errors))(
 This is used by the tt(_approximate) and tt(_correct) completer functions
 to determine the maximum number of errors to accept. The completer will try

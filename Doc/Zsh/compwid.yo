@@ -562,7 +562,9 @@ into the command line.
 )
 item(tt(-M) var(match-spec))(
 This gives local match specifications as described below in
-noderef(Matching Control).
+noderef(Matching Control). This option may be given more than once. In 
+this case all var(match-spec)s given are contaneted with speces
+between them to form the specification string to use.
 Note that they will only be used if the tt(-U) option is not given.
 )
 item(tt(-n))(

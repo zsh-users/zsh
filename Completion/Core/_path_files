@@ -86,6 +86,15 @@ if (( ! ( $#group + $#expl ) )); then
   else
     _description files expl file
   fi
+  tmp1=$expl[(I)-M]
+  if (( tmp1 )); then
+    match="$match $expl[1+tmp1]"
+    if (( $#matcher )); then
+      matcher[2]="$matcher[2] $expl[1+tmp1]"
+    else
+      matcher=(-M "$expl[1+tmp1]")
+    fi
+  fi
 fi
 
 [[ -n "$tmp1" && $#addsfx -ne 0 ]] && addsfx[1]=-qS
