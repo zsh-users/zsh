@@ -1,3 +1,8 @@
+2005-03-21  Peter Stephenson  <pws@pwstephenson.fsnet.co.uk>
+
+	* 21046: Completion/Base/Completer/_approximate:  use extra tests
+	and "always" block to make unfunction of compadd more reliable.
+
 2005-03-21  Peter Stephenson  <pws@csr.com>
 
 	* 21045: Src/Zle/compcore.c, Src/Zle/complete.c: more places

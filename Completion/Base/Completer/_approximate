@@ -12,6 +12,8 @@
 
 local _comp_correct _correct_expl _correct_group comax cfgacc match
 local oldcontext="${curcontext}" opm="$compstate[pattern_match]"
+local dounfunction
+integer ret=1
 
 if [[ "$1" = -a* ]]; then
   cfgacc="${1[3,-1]}"
@@ -46,8 +48,12 @@ _tags corrections original
 # the builtin that adds matches. This is used to be able
 # to stick the `(#a...)' in the right place (after an
 # ignored prefix).
-
+#
+# Current shell structure for use with "always", to make sure
+# we unfunction the compadd.
+{
 if (( ! $+functions[compadd] )); then
+  dounfunction=1
   compadd() {
     local ppre="$argv[(I)-p]"
 
@@ -65,7 +71,6 @@ if (( ! $+functions[compadd] )); then
 
     builtin compadd "$_correct_expl[@]" "$@"
   }
-  trap 'unfunction compadd' EXIT INT
 fi
 
 _comp_correct=1
@@ -101,12 +106,19 @@ while [[ _comp_correct -le comax ]]; do
     fi
     compstate[pattern_match]="$opm"
 
-    return 0
+    ret=0
+    break
   fi
 
   [[ "${#:-$PREFIX$SUFFIX}" -le _comp_correct+1 ]] && break
   (( _comp_correct++ ))
 done
+
+} always {
+    [[ -n $dounfunction ]] && (( $+functions[compadd] )) && unfunction compadd
+}
+
+(( ret == 0 )) && return 0
 
 compstate[pattern_match]="$opm"
 
