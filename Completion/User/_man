@@ -34,4 +34,4 @@ else
 fi
 
 (( $#rep )) && _wanted manuals expl 'manual page' &&
-    compadd "$expl[@]" - ${rep%%.[^.]##(.gz|)}
+    compadd "$expl[@]" - ${rep%%.[^.]##(.gz|.bz2|)}
