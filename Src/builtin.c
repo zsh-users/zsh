@@ -69,7 +69,7 @@ static struct builtin builtins[] =
      * But that's actually not useful, so it's more consistent to
      * cause an error.
      */
-    BUILTIN("fc", 0, bin_fc, 0, -1, BIN_FC, "nlre:IRWAdDfEimpP", NULL),
+    BUILTIN("fc", 0, bin_fc, 0, -1, BIN_FC, "nlre:IRWAdDfEimpPa", NULL),
     BUILTIN("fg", 0, bin_fg, 0, -1, BIN_FG, NULL, NULL),
     BUILTIN("float", BINF_PLUSOPTS | BINF_MAGICEQUALS | BINF_PSPECIAL, bin_typeset, 0, -1, 0, "E:%F:%Hghlprtux", "E"),
     BUILTIN("functions", BINF_PLUSOPTS, bin_functions, 0, -1, 0, "kmtuUz", NULL),
@@ -81,7 +81,7 @@ static struct builtin builtins[] =
     BUILTIN("hashinfo", 0, bin_hashinfo, 0, 0, 0, NULL, NULL),
 #endif
 
-    BUILTIN("history", 0, bin_fc, 0, -1, BIN_FC, "nrdDfEimpP", "l"),
+    BUILTIN("history", 0, bin_fc, 0, -1, BIN_FC, "nrdDfEimpPa", "l"),
     BUILTIN("integer", BINF_PLUSOPTS | BINF_MAGICEQUALS | BINF_PSPECIAL, bin_typeset, 0, -1, 0, "Hghi:%lprtux", "i"),
     BUILTIN("jobs", 0, bin_fg, 0, -1, BIN_JOBS, "dlpZrs", NULL),
     BUILTIN("kill", 0, bin_kill, 0, -1, 0, NULL, NULL),
@@ -1311,6 +1311,7 @@ bin_fc(char *nam, char **argv, Options ops, int func)
 	char *hf = "";
 	int hs = DEFAULT_HISTSIZE;
 	int shs = 0;
+	int level = OPT_ISSET(ops,'a') ? locallevel : -1;
 	if (*argv) {
 	    hf = *argv++;
 	    if (*argv) {
@@ -1328,7 +1329,7 @@ bin_fc(char *nam, char **argv, Options ops, int func)
 		shs = savehistsiz;
 	    }
 	}
-	if (!pushhiststack(hf, hs, shs))
+	if (!pushhiststack(hf, hs, shs, level))
 	    return 1;
 	if (*hf) {
 	    struct stat st;
@@ -4110,7 +4111,7 @@ zexit(int val, int from_where)
     }
     if (isset(RCS) && interact) {
 	if (!nohistsave) {
-	    saveandpophiststack(0);
+	    saveandpophiststack(1);
 	    savehistfile(NULL, 1, HFILE_USE_OPTIONS);
 	}
 	if (islogin && !subsh) {
