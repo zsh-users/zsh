@@ -1786,4 +1786,32 @@ item(tt(incremental_list))(
 If set to a non-empty string, the matches will be listed on every
 key-press.
 )
+item(tt(predict_completer))(
+The keys starting with tt(predict_) are used by the functions in the
+tt(predict-on) file in the tt(Functions/Zle) directory of the tt(zsh)
+source distribution.
+
+A colon separated list of completer functions (like the tt(completer)
+key for normal completion) to be used when attempting completion.
+)
+item(tt(predict_cursor))(
+This describes where the cursor should be left after completion was
+attempted. If it is set to `tt(complete)' the cursor is left where
+completion put it if it is after the character typed, otherwise this
+behaves like the value `tt(key)'. If it is set to `tt(key)' the
+prediction function will try to place the cursor after the character
+which corresponds to the last character typed. This is useful if one
+uses global match specifications with patterns for partial word
+completion. If no sensible place could be found or this configuration
+key is set to any other value (or unset), the cursor is moved back to
+the original position. With global match specifications as described
+above this sometimes means that the character typed does not appear on 
+the line.
+)
+item(tt(predict_list))(
+If this is set to `tt(always)' the list of possible matches when
+completion was tried will always be shown, even if there is only one
+match. Otherwise the listing behavior is as usual, i.e. the list will
+only be shown if there are multiple matches.
+)
 enditem()

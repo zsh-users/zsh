@@ -23,17 +23,28 @@
 # Note that all functions are defined when you first type the predict-on
 # key, which means typing the predict-off key before that gives a harmless
 # error message.
+#
+# This uses the configuration keys starting with `predict_'.
 
 predict-on() {
-    zle -N self-insert insert-and-predict
-    zle -N magic-space insert-and-predict
-    zle -N backward-delete-char delete-backward-and-predict
-    zle -N delete-char-or-list delete-no-predict
+  zle -N self-insert insert-and-predict
+  zle -N magic-space insert-and-predict
+  zle -N backward-delete-char delete-backward-and-predict
+  zle -N delete-char-or-list delete-no-predict
+
+  # Prediction doesn't work well with automenu set, so we unset it here
+  # and restore it in predict-off().
+  if [[ -o automenu ]]; then
+    unsetopt automenu
+    _predict_am=yes
+  fi
 }
 predict-off() {
-    zle -A .self-insert self-insert
-    zle -A .magic-space magic-space
-    zle -A .backward-delete-char backward-delete-char
+  zle -A .self-insert self-insert
+  zle -A .magic-space magic-space
+  zle -A .backward-delete-char backward-delete-char
+
+  [[ -n $_predict_am ]] && setopt automenu
 }
 insert-and-predict () {
   emulate -L zsh
@@ -50,11 +61,33 @@ insert-and-predict () {
 	RBUFFER=""
 	if [[ ${KEYS[-1]} != ' ' ]]
 	then
-	  integer curs=$CURSOR
+	  integer curs=$CURSOR pos nchar=${#LBUFFER//[^${KEYS[-1]}]}
 	  local -a +h comppostfuncs
 	  comppostfuncs=( predict-limit-list )
-	  zle complete-word
-	  CURSOR=$curs
+	  zle complete-word ${(s.:.)compconfig[predict_completer]}
+	  # Decide where to leave the cursor. The dummy loop is used to
+	  # get out of that `case'.
+	  while true; do
+	    case $compconfig[predict_cursor] in
+	    (complete)
+	      # At the place where the completion left it, if it is after
+	      # the character typed.
+	      [[ ${LBUFFER[-1]} = ${KEYS[-1]} ]] && break
+	      ;&
+	    (key)
+	      # Or maybe at the n'th occurrence of the character typed.
+	      pos=${BUFFER[(in:nchar:)${KEYS[-1]}]}
+	      if [[ pos -gt curs ]]; then
+	        CURSOR=$pos
+	        break
+	      fi
+	      ;&
+	    (*)
+	      # Or else at the previous position.
+	      CURSOR=$curs
+	    esac
+	    break
+	  done
 	fi
       fi
     fi
@@ -91,6 +124,7 @@ predict-limit-list() {
     compstate[list]=''
     compstate[force_list]=yes
   fi
+  [[ $compconfig[predict_list] = always ]] && compstate[force_list]=yes
 }
 
 # Handle zsh autoloading conventions
