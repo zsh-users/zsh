@@ -2554,10 +2554,10 @@ save_params(Estate state, Wordcode pc, LinkList *restore_p, LinkList *remove_p)
 		copyparam(tpm, pm, 1);
 		pm = tpm;
 	    }
-	    addlinknode(*remove_p, s);
+	    addlinknode(*remove_p, dupstring(s));
 	    addlinknode(*restore_p, pm);
 	} else
-	    addlinknode(*remove_p, s);
+	    addlinknode(*remove_p, dupstring(s));
 
 	pc += (WC_ASSIGN_TYPE(ac) == WC_ASSIGN_SCALAR ?
 	       3 : WC_ASSIGN_NUM(ac) + 2);

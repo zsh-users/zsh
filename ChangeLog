@@ -1,3 +1,8 @@
+2005-02-01  Bart Schaefer  <schaefer@zsh.org>
+
+	* 20774: Src/exec.c: fix e.g. "FOO=BAR BAR=FOO echo" failure to
+	unset FOO after finishing.
+
 2005-02-01  Clint Adams  <clint@zsh.org>
 
 	* 20773: Completion/Unix/Command/_getconf: additional variables
