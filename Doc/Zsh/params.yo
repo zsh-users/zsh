@@ -257,6 +257,16 @@ patterns used for reverse subscripting (the `tt(r)', `tt(R)', `tt(i)',
 etc. flags), but it may also affect parameter substitutions that appear
 as part of an arithmetic expression in an ordinary subscript.
 
+It is possible to avoid the use of subscripts in assignments to associative
+array elements by using the syntax:
+
+example(
+   aa+=('key with "*strange*" characters' 'value string')
+)
+
+This adds a new key/value pair if the key is not already present, and
+replaces the value for the existing key if it is.
+
 The basic rule to remember when writing a subscript expression is that all
 text between the opening `tt([)' and the closing `tt(])' is interpreted
 em(as if) it were in double quotes (\

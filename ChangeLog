@@ -1,5 +1,9 @@
 2003-07-04  Peter Stephenson  <pws@csr.com>
 
+	* 18571: Doc/Zsh/params.yo: Note easy way of replacing
+	associative array elements using +=.  (Posted ages ago
+	and forgotten about.)
+
 	* 18807: baptiste daroussin <daroussi@ece.fr>:
 	Completion/Linux/Command/.distfiles,
 	Completion/Linux/Command/_pkgtool: Completion for Slackware
