@@ -1,3 +1,8 @@
+2003-04-19  Felix Rosencrantz <f_rosencrantz@yahoo.com>
+
+	* 18455: Completion/Unix/Command/_screen,
+	Completion/Unix/Command/.distfiles: Completion function for screen.
+
 2003-04-18  Oliver Kiddle  <opk@zsh.org>
 
 	* unposted: Completion/Zsh/Context/_tilde: fix bug where 0 was
