@@ -1,3 +1,8 @@
+2002-02-21  Clint Adams  <clint@zsh.org>
+
+	* 16688: Doc/Zsh/params.yo: clarify the pseudo-randomness of
+	RANDOM.
+
 2002-02-20  Bart Schaefer  <schaefer@zsh.org>
 
 	* unposted: Completion/Unix/Command/_pine: Fix sed expression to
