@@ -365,8 +365,8 @@ set_cutbuffer(Param pm, char *x)
     if (x) {
 	unmetafy(x, &cutbuf.len);
 	cutbuf.buf = zalloc(cutbuf.len);
-	strcpy((char *)cutbuf.buf, x);
-	zsfree(x);
+	memcpy((char *)cutbuf.buf, x, cutbuf.len);
+	free(x);
     } else {
 	cutbuf.buf = NULL;
 	cutbuf.len = 0;
@@ -398,7 +398,7 @@ set_killring(Param pm, char **x)
     if (kring) {
 	for (kptr = kring, kcnt = 0; kcnt < kringsize; kcnt++, kptr++)
 	    if (kptr->buf)
-		free(kptr->buf);
+		zfree(kptr->buf, kptr->len);
 	zfree(kring, kringsize * sizeof(struct cutbuffer));
 	kring = NULL;
 	kringsize = kringnum = 0;
@@ -408,23 +408,23 @@ set_killring(Param pm, char **x)
 	 * Insert the elements into the kill ring.
 	 * Regardless of the old order, we number it with the current
 	 * entry first.
+	 *
+	 * Be careful to add elements by looping backwards; this
+	 * fits in with how we cycle the ring.
 	 */
+	int kpos = 0;
 	kringsize = arrlen(x);
 	kring = (Cutbuffer)zcalloc(kringsize * sizeof(struct cutbuffer));
-	for (p = x, kptr = kring; *p; p++, kptr++) {
+	for (p = x; *p; p++) {
 	    int len = strlen(*p);
-	    kptr->buf = (char *)zalloc(len);
-	    strcpy(kptr->buf, *p);
-	    unmetafy(kptr->buf, &kptr->len);
-	    if (len != kptr->len) {
-		/* Might as well have the lengths consistent. */
-		char *p2 = zalloc(kptr->len);
-		memcpy(p2, kptr->buf, kptr->len);
-		zfree(kptr->buf, len);
-		kptr->buf = p2;
-	    }
+	    kptr = kring + kpos;
+	    unmetafy(*p, &kptr->len);
+	    kptr->buf = (char *)zalloc(kptr->len);
+	    memcpy(kptr->buf, *p, kptr->len);
+	    zfree(*p, len+1);
+	    kpos = (kpos + kringsize -1 ) % kringsize;
 	}
-	freearray(x);
+	free(x);
     }
 }
 
@@ -441,10 +441,9 @@ get_killring(Param pm)
     char **ret, **p;
 
     /* Supposed to work even if kring is NULL */
-    for (kpos = kringnum, kcnt = 0; kcnt < kringsize; kcnt++) {
-	if (!kring[kpos].buf)
-	    break;
-	kpos = (kpos + kringsize - 1) % kringsize;
+    if (!kring) {
+	kringsize = KRINGCTDEF;
+	kring = (Cutbuffer)zcalloc(kringsize * sizeof(struct cutbuffer));
     }
 
     p = ret = (char **)zhalloc((kringsize+1) * sizeof(char *));
@@ -452,7 +451,13 @@ get_killring(Param pm)
     for (kpos = kringnum, kcnt = 0; kcnt < kringsize; kcnt++) {
 	Cutbuffer kptr = kring + kpos;
 	if (kptr->buf)
+	{
+	    /*
+	     * Need to use HEAPDUP to make sure there's room for the
+	     * terminating NULL.
+	     */
 	    *p++ = metafy((char *)kptr->buf, kptr->len, META_HEAPDUP);
+	}
 	else
 	    *p++ = dupstring("");
 	kpos = (kpos + kringsize - 1) % kringsize;

@@ -1,5 +1,10 @@
 2003-03-24  Peter Stephenson  <pws@csr.com>
 
+	* 18378: Src/Zle/params.c: memory management for $killring
+	was pathetic; setting $killring was in completely the wrong
+	order; getting $killring when empty didn't return the
+	default length.
+
 	* 18376: zshconfig.ac, Src/system.h, Src/utils.c: use of
 	wide characters needs some more header munging; also silence
 	a couple of related gcc warnings.
