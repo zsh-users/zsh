@@ -1,0 +1,7 @@
+DISTFILES_SRC='
+.distfiles
+_autocd
+_brace_parameter  _equal            _math             _subscript
+_condition        _first            _parameter        _tilde
+_default          _in_vared         _redirect         _value
+'

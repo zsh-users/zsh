@@ -1,3 +1,7 @@
+2001-06-25  Peter Stephenson  <pws@csr.com>
+
+	* unposted: Completion/Zsh/Context/.distfiles: add _autocd.
+
 2001-06-25  Sven Wischnowsky  <wischnow@zsh.org>
 
 	* user/3940: Src/Zle/zle_tricky.c: make expand-word not always
