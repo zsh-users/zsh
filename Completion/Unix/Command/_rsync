@@ -86,7 +86,7 @@ _arguments -s \
   '*: :_rsync_files' \
   '(-q --quiet)'{-q,--quiet}'[suppress non-error messages]' \
   '(-c --checksum)'{-c,--checksum}'[skip based on checksums, not mod-time & size]' \
-  '(-a --archive -r --recursive)'{-a,--archive}'[archive mode; same as -rlptgoD (no -H)]' \
+  '(-a --archive)'{-a,--archive}'[archive mode; same as -rlptgoD (no -H)]' \
   '(-r --recursive)'{-r,--recursive}'[recurse into directories]' \
   '(-R --relative --no-relative)'{-R,--relative}'[use relative path names]' \
   '(-R --relative)--no-relative[turn off --relative]' \
@@ -120,12 +120,12 @@ _arguments -s \
   '--existing[only update files that already exist on receiving side]' \
   '--ignore-existing[ignore files that already exist on receiving side]' \
   '--remove-sent-files[transferred files/symlinks are removed from sending side]' \
-  '(--delete --delete-before --delete-during --delete-after)--del[an alias for --delete-during]' \
-  '(--del --delete-before --delete-during --delete-after)--delete[delete files that do not exist on the sending side]' \
-  '(--del --delete --delete-during --delete-after)--delete-before[receiver deletes before transfer]' \
-  '(--del --delete --delete-before --delete-after)--delete-during[receiver deletes during transfer]' \
-  '(--del --delete --delete-before --delete-during)--delete-after[receiver deletes after transfer]' \
-  '(--delete)--delete-excluded[also delete excluded files on the receiving side]' \
+  '(--delete-before --delete-during --delete-after)--del[an alias for --delete-during]' \
+  '--delete[delete files that do not exist on the sending side]' \
+  '(--del --delete-during --delete-after)--delete-before[receiver deletes before transfer]' \
+  '(--del --delete-before --delete-after)--delete-during[receiver deletes during transfer]' \
+  '(--del --delete-before --delete-during)--delete-after[receiver deletes after transfer]' \
+  '--delete-excluded[also delete excluded files on the receiving side]' \
   '--ignore-errors[delete even if there are I/O errors]' \
   '--force[force deletion of directories even if not empty]' \
   '--max-delete=[do not delete more than NUM files]:number:' \
