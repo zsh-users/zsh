@@ -1233,7 +1233,7 @@ item(tt(copy-prev-word) (ESC-^_) (unbound) (unbound))(
 Duplicate the word to the left of the cursor.
 )
 tindex(copy-prev-shell-word)
-item(tt(copy-prev-shell-word) (ESC-^_) (unbound) (unbound))(
+item(tt(copy-prev-shell-word))(
 Like tt(copy-prev-word), but the word is found by using shell parsing, 
 whereas tt(copy-prev-word) looks for blanks. This makes a difference
 when the word is quoted and contains spaces.
