@@ -290,6 +290,8 @@ safeinungetc(int c)
 void
 herrflush(void)
 {
+    inpopalias();
+
     while (!lexstop && inbufct && !strin)
 	hwaddc(ingetc());
 }

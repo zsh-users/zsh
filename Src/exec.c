@@ -3272,7 +3272,7 @@ loadautofn(Shfunc shf, int fksh, int autol)
 	return NULL;
     }
     if (!prog)
-	prog = &dummy_eprog;
+	return NULL;
     if (ksh == 2 || (ksh == 1 && isset(KSHAUTOLOAD))) {
 	if (autol) {
 	    prog->flags |= EF_RUN;

@@ -72,6 +72,11 @@
 	* 18944: Completion/Unix/Command/_ruby: update ruby completion for
 	version 1.8.0 and add descriptions for -T matches
 
+2003-08-11  Peter Stephenson  <pws@csr.com>
+
+	* 18941: Src/hist.c, Src/input.c: Alias text could end up in
+	history after a parsing error during alias expansion.
+
 2003-08-05  Peter Stephenson  <pws@csr.com>
 
 	* 18926: Src/Zle/complist.c: fix (without knowing how) insertion
@@ -152,6 +157,11 @@
 
 	* 18877: Etc/completion-style-guide: add a few more points
 
+2003-07-22  Peter Stephenson  <pws@csr.com>
+
+	* 18880: Src/Modules/parameter.c: Don't return unset variables
+	in whole array value for $parameters.
+
 2003-07-21  Doug Kearns  <djkea2@mugca.its.monash.edu.au>
 
 	* 18872: Completion/Unix/Command/_java: update javac completion for
@@ -228,6 +238,10 @@
 	spaces) was flakey.  The same problem probably exists for
 	completing modified files, but the code is indecipherable.
 
+	* 18769: Src/exec.c: parse error in autoloading file causes
+	return value zero and empty function definition.  Presumed
+	to be error introduced with wordcode.
+
 2003-07-02  Oliver Kiddle  <opk@zsh.org>
 
 	* 18520, 13691 (Mario Lang), 13701 (Sven):
@@ -294,6 +308,11 @@
 2003-06-03  Peter Stephenson  <pws@csr.com>
 
 	* 18600: Src/pattern.c: bug matching against [[:xdigit:]].
+
+2003-05-19  Peter Stephenson  <pws@csr.com>
+
+	* 18548: Src/Zle/zle_main.c: memory leak when vared'ing arrays
+	spotted by valgrind (18543).
 
 2003-05-14  Peter Stephenson  <pws@csr.com>
 
@@ -407,6 +426,11 @@
 	Completion/Cygwin/Command/_mkshortcut, Completion/Cygwin/Command/_mkzsh,
 	Completion/Cygwin/Command/_pscp, Completion/Cygwin/Command/_putclip:
 	cygwin completion functions.
+
+2003-04-04  Peter Stephenson  <pws@csr.com>
+
+	* 18435: Src/builtin.c, Src/params.c: spotted by Oliver: unsetting
+	a readonly variable returned status 0.
 
 2003-03-28  Wayne Davison  <wayned@users.sourceforge.net>
 
