@@ -1,51 +1,53 @@
 #compdef tidy
 
-# HTML Tidy for Linux/x86 (release date: 1st December 2002; built on Jan 30 2003, at 20:01:07)
+# HTML Tidy for Linux/x86 released on 1st March 2003
 
-local access autobool boolean doctype encoding
+local -a access autobool boolean doctype encoding
 
 access=( 1 2 3 )
 boolean=( yes no )
 autobool=( auto $boolean )
 doctype=( auto omit strict loose transitional )
-encoding=( ascii latin1 raw utf8 iso2022 mac utf16le utf16be utf16 win1252 big5 shiftjis )
+encoding=( ascii latin1 raw utf8 iso2022 mac utf16le utf16be utf16 win1252 ibm858 big5 shiftjis )
 
 _arguments \
-  '-'{indent,i}'[indent element content]' \
-  '-'{omit,o}'[omit optional end tags]' \
+  '(-indent -i)'{-indent,-i}'[indent element content]' \
   '-wrap[wrap text at the specified <column> (default is 68)]:column:' \
-  '-'{upper,u}'[force tags to upper case (default is lower case)]' \
-  '-'{clean,c}'[replace FONT, NOBR and CENTER tags by CSS]' \
-  '-'{bare,b}'[strip out smart quotes and em dashes, etc.]' \
-  '-'{numeric,n}'[output numeric rather than named entities]' \
-  '-'{errors,e}'[only show errors]' \
-  '-'{quiet,q}'[suppress nonessential output]' \
+  '(-upper -u)'{-upper,-u}'[force tags to upper case (default is lower case)]' \
+  '(-clean -c)'{-clean,-c}'[replace FONT, NOBR and CENTER tags by CSS]' \
+  '(-bare -b)'{-bare,-b}'[strip out smart quotes and em dashes, etc.]' \
+  '(-numeric -n)'{-numeric,-n}'[output numeric rather than named entities]' \
+  '(-errors -e)'{-errors,-e}'[only show errors]' \
+  '(-quiet -q)'{-quiet,-q}'[suppress nonessential output]' \
+  '-omit[omit optional end tags]' \
   '-xml[specify the input is well formed XML]' \
-  '(-asxml -asxhtml -ashtml)-'{asxml,asxhtml}'[convert HTML to well formed XHTML]' \
+  '(-asxml -asxhtml -ashtml)'{-asxml,-asxhtml}'[convert HTML to well formed XHTML]' \
   '(-asxml -asxhtml)-ashtml[force XHTML to well formed HTML]' \
-  '-slides[burst into slides on H2 elements]' \
-  '-access[do additional accessibility checks (<level> = 1, 2, 3)]:level:(${access[@]})' \
+  '-access[do additional accessibility checks (<level> = 1, 2, 3)]:priority level:(${access[@]})' \
   '-raw[output values above 127 without conversion to entities]' \
-  '(       -latin -iso2022 -utf8 -mac -win1252 -utf16le -utf16be -utf16 -shiftjis -big5)-ascii[use US-ASCII for output, ISO-8859-1 for input]' \
-  '(-ascii        -iso2022 -utf8 -mac -win1252 -utf16le -utf16be -utf16 -shiftjis -big5)-latin1[use ISO-8859-1 for both input and output]' \
-  '(-ascii -latin          -utf8 -mac -win1252 -utf16le -utf16be -utf16 -shiftjis -big5)-iso2022[use ISO-2022 for both input and output]' \
-  '(-ascii -latin -iso2022       -mac -win1252 -utf16le -utf16be -utf16 -shiftjis -big5)-utf8[use UTF-8 for both input and output]' \
-  '(-ascii -latin -iso2022 -utf8      -win1252 -utf16le -utf16be -utf16 -shiftjis -big5)-mac[use MacRoman for input, US-ASCII for output]' \
-  '(-ascii -latin -iso2022 -utf8 -mac          -utf16le -utf16be -utf16 -shiftjis -big5)-win1252[use Windows-1252 for input, US-ASCII for output]' \
-  '(-ascii -latin -iso2022 -utf8 -mac -win1252          -utf16be -utf16 -shiftjis -big5)-utf16le[use UTF-16LE for both input and output]' \
-  '(-ascii -latin -iso2022 -utf8 -mac -win1252 -utf16le          -utf16 -shiftjis -big5)-utf16be[use UTF-16BE for both input and output]' \
-  '(-ascii -latin -iso2022 -utf8 -mac -win1252 -utf16le -utf16be        -shiftjis -big5)-utf16[use UTF-16 for both input and output]' \
-  '(-ascii -latin -iso2022 -utf8 -mac -win1252 -utf16le -utf16be -utf16           -big5)-shiftjis[use Shift_JIS for both input and output]' \
-  '(-ascii -latin -iso2022 -utf8 -mac -win1252 -utf16le -utf16be -utf16 -shiftjis      )-big5[use Big5 for both input and output]' \
+  '(       -latin0 -latin1 -iso2022 -utf8 -mac -win1252 -ibm858 -utf16le -utf16be -utf16 -shiftjis -big5)-ascii[use US-ASCII for output, ISO-8859-1 for input]' \
+  '(-ascii         -latin1 -iso2022 -utf8 -mac -win1252 -ibm858 -utf16le -utf16be -utf16 -shiftjis -big5)-latin0[use US-ASCII for output, ISO-8859-1 for input]' \
+  '(-ascii -latin0         -iso2022 -utf8 -mac -win1252 -ibm858 -utf16le -utf16be -utf16 -shiftjis -big5)-latin1[use ISO-8859-1 for both input and output]' \
+  '(-ascii -latin0 -latin1          -utf8 -mac -win1252 -ibm858 -utf16le -utf16be -utf16 -shiftjis -big5)-iso2022[use ISO-2022 for both input and output]' \
+  '(-ascii -latin0 -latin1 -iso2022       -mac -win1252 -ibm858 -utf16le -utf16be -utf16 -shiftjis -big5)-utf8[use UTF-8 for both input and output]' \
+  '(-ascii -latin0 -latin1 -iso2022 -utf8      -win1252 -ibm858 -utf16le -utf16be -utf16 -shiftjis -big5)-mac[use MacRoman for input, US-ASCII for output]' \
+  '(-ascii -latin0 -latin1 -iso2022 -utf8 -mac          -ibm858 -utf16le -utf16be -utf16 -shiftjis -big5)-win1252[use Windows-1252 for input, US-ASCII for output]' \
+  '(-ascii -latin0 -latin1 -iso2022 -utf8 -mac -win1252         -utf16le -utf16be -utf16 -shiftjis -big5)-ibm858[use IBM-858 (CP850+Euro) for input, US-ASCII for output]' \
+  '(-ascii -latin0 -latin1 -iso2022 -utf8 -mac -win1252 -ibm858          -utf16be -utf16 -shiftjis -big5)-utf16le[use UTF-16LE for both input and output]' \
+  '(-ascii -latin0 -latin1 -iso2022 -utf8 -mac -win1252 -ibm858 -utf16le          -utf16 -shiftjis -big5)-utf16be[use UTF-16BE for both input and output]' \
+  '(-ascii -latin0 -latin1 -iso2022 -utf8 -mac -win1252 -ibm858 -utf16le -utf16be        -shiftjis -big5)-utf16[use UTF-16 for both input and output]' \
+  '(-ascii -latin0 -latin1 -iso2022 -utf8 -mac -win1252 -ibm858 -utf16le -utf16be -utf16           -big5)-shiftjis[use Shift_JIS for both input and output]' \
+  '(-ascii -latin0 -latin1 -iso2022 -utf8 -mac -win1252 -ibm858 -utf16le -utf16be -utf16 -shiftjis      )-big5[use Big5 for both input and output]' \
+  '(-out -o)'{-out,-o}'[specify the output markup file]:output file:_files' \
   '-config[set configuration options from the specified <file>]:configuration file:_files' \
   '-f[write errors to the specified <file>]:error file:_files' \
-  '-'{modify,m}'[modify the original input files]' \
-  '(- *)-'{version,v}'[show the version of Tidy]' \
-  '(- *)-'{help,h,\?}'[list the command line options]' \
+  '(-modify -m)'{-modify,-m}'[modify the original input files]' \
+  '(- *)'{-version,-v}'[show the version of Tidy]' \
+  '(- *)'{-help,-h,-\?}'[list the command line options]' \
   '(- *)-help-config[list all configuration options]' \
   '(- *)-show-config[list the current configuration settings]' \
-  '--indent-spaces:integer:' \
-  '--wrap:integer:' \
+  '--indent-spaces:number of spaces:' \
+  '--wrap:column:' \
   '--wrap-attributes:boolean:(${boolean[@]})' \
   '--wrap-script-literals:boolean:(${boolean[@]})' \
   '--wrap-sections:boolean:(${boolean[@]})' \
@@ -53,7 +55,7 @@ _arguments \
   '--wrap-jste:boolean:(${boolean[@]})' \
   '--wrap-php:boolean:(${boolean[@]})' \
   '--literal-attributes:boolean:(${boolean[@]})' \
-  '--tab-size:integer:' \
+  '--tab-size:tab size:' \
   '--markup:boolean:(${boolean[@]})' \
   '--quiet:boolean:(${boolean[@]})' \
   '--tidy-mark:boolean:(${boolean[@]})' \
@@ -79,7 +81,7 @@ _arguments \
   '--drop-proprietary-attribute:boolean:(${boolean[@]})' \
   '--enclose-text:boolean:(${boolean[@]})' \
   '--enclose-block-text:boolean:(${boolean[@]})' \
-  '--alt-text:string:' \
+  '--alt-text:alternate text:' \
   '--add-xml-space:boolean:(${boolean[@]})' \
   '--fix-bad-comments:boolean:(${boolean[@]})' \
   '--split:boolean:(${boolean[@]})' \
@@ -92,8 +94,9 @@ _arguments \
   '--keep-time:boolean:(${boolean[@]})' \
   '--show-warnings:boolean:(${boolean[@]})' \
   '--error-file:error file:_files' \
+  '--output-file:output file:_files' \
   '--show-body-only:boolean:(${boolean[@]})' \
-  '--slide-style:file:_files' \
+  '--slide-style:style sheet file:_files' \
   '--new-inline-tags:tag names:' \
   '--new-blocklevel-tags:tag names:' \
   '--new-empty-tags:tag names:' \
@@ -109,7 +112,7 @@ _arguments \
   '--hide-comments:boolean:(${boolean[@]})' \
   '--indent-cdata:boolean:(${boolean[@]})' \
   '--force-output:boolean:(${boolean[@]})' \
-  '--show-errors:integer:' \
+  '--show-errors:maximum number of errors:' \
   '--ascii-chars:boolean:(${boolean[@]})' \
   '--join-classes:boolean:(${boolean[@]})' \
   '--join-styles:boolean:(${boolean[@]})' \
@@ -117,7 +120,9 @@ _arguments \
   '--repeated-attributes:value:(keep-first keep-last)' \
   '--output-bom:boolean:(${autobool[@]})' \
   '--replace-color:boolean:(${boolean[@]})' \
-  '--css-prefix:string:' \
-  '--accessibility-check:integer:(${access[@]})' \
-  '*:file:_files'
+  '--css-prefix:CSS class name:' \
+  '--accessibility-check:priority level:(${access[@]})' \
+  '--newline:newline character:(LF CRLF CR)' \
+  '*:file:_files' && return
 
+return 1
