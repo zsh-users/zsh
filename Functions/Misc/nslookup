@@ -1,34 +1,27 @@
 # Simple wrapper function for `nslookup'. With completion if you are using
 # the function based completion system.
 
-setopt localoptions completealiases
+setopt localoptions localtraps completealiases
 
-local char line compcontext=nslookup pid
+local tmp line compcontext=nslookup curcontext=':nslookup' pmpt
 
-trap 'print -p exit;return' INT
+trap 'return 130' INT
+trap 'zpty -d nslookup' EXIT
 
-coproc command nslookup
-pid=$!
+zstyle -s ':nslookup' prompt pmpt || pmpt='> '
 
-while read -pk 1 char; do
-  line="$line$char"
-  [[ "$line" = *'
-> ' ]] && break
-done
-print -nr - "$line"
+zpty nslookup nslookup
 
-line=''
-while vared -p '> ' line; do
-  print -p "$line"
-  line=''
-  while read -pk 1 char; do
-    line="$line$char"
-    [[ "$line" = *'
-> ' ]] && break
-  done
-  print -nr - "$line"
-  line=''
+zpty -r nslookup line '*> '
+print -nr "$line"
+
+while line=''; vared -p "$pmpt" line; do
+  [[ "$line" = exit ]] && break
+
+  zpty -w nslookup "$line"
+
+  zpty -r nslookup line '*> '
+  print -nr "$line"
 done
 
-print -p exit
-wait $pid
+zpty -w nslookup 'exit'
