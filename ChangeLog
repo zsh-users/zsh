@@ -1,3 +1,7 @@
+2002-10-30  Wayne Davison  <wayned@users.sourceforge.net>
+
+	* unposted: Src/math.c: Got rid of a gcc-3.2 compiler warning.
+
 2002-10-29  Peter Stephenson  <pws@csr.com>
 
 	* 17873: Src/params.c: When restoring SECONDS after a function,
