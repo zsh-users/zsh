@@ -1,5 +1,7 @@
 2004-03-11  Oliver Kiddle  <opk@zsh.org>
 
+	* 19596: Src/module.c: include dlfcn.h instead of dl.h on HP/UX 11
+
 	* 19595: Src/hashtable.c, Src/lex.c, Src/parse.c, Src/zsh.h,
 	Src/Zle/zle_tricky.c: rename DO to DOLOOP to avoid conflict with
 	a DO in curses.h on Tru64 5.1

@@ -349,7 +349,7 @@ load_and_bind(const char *fn)
 #else
 
 #ifdef HAVE_DLFCN_H
-# if defined(HAVE_DL_H) && defined(__hpux)
+# if defined(HAVE_DL_H) && defined(HPUXDYNAMIC)
 #  include <dl.h>
 # else
 #  include <dlfcn.h>
