@@ -1,3 +1,8 @@
+2000-07-26  Adam Spiers  <adam@spiers.net>
+
+	* unposted: Completion/User/_perl: -e, -I, -m and -M parameters
+	can be specified multiple times
+
 2000-07-26  Peter Stephenson  <pws@cambridgesiliconradio.com>
 
 	* Andrej/pws: 12381: configure.in: cygwin on Windows 2000 is
