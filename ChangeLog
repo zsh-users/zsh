@@ -1,3 +1,8 @@
+2001-10-16  Clint Adams  <clint@zsh.org>
+
+	* 16062: Src/Modules/zftp.c: use O_EXCL
+	when opening a temporary file.
+
 2001-10-15  Wayne Davison  <wayned@users.sourceforge.net>
 
 	* 16059: Src/hist.c: Fix HIST_NO_SPACE when

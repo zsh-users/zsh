@@ -1918,7 +1918,7 @@ zftp_open(char *name, char **args, int flags)
      */
     if (zfstatfd == -1) {
 	fname = gettempname();
-	zfstatfd = open(fname, O_RDWR|O_CREAT, 0600);
+	zfstatfd = open(fname, O_RDWR|O_CREAT|O_EXCL, 0600);
 	DPUTS(zfstatfd == -1, "zfstatfd not created");
 #if defined(F_SETFD) && defined(FD_CLOEXEC)
 	/* If the shell execs a program, we don't want this fd left open. */
