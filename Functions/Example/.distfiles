@@ -1,0 +1,5 @@
+DISTFILES_SRC='
+.distfiles
+acx       cx        pushd     yp        zless
+cat       proto     randline  yu        zls
+'
