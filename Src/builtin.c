@@ -2895,6 +2895,10 @@ bin_print(char *name, char **args, char *ops, int func)
 	Patprog pprog;
 	char **t, **p;
 
+	if (!*args) {
+	    zwarnnam(name, "no pattern specified", NULL, 0);
+	    return 1;
+	}
 	tokenize(*args);
 	if (!(pprog = patcompile(*args, PAT_STATIC, NULL))) {
 	    untokenize(*args);
