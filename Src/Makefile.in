@@ -85,7 +85,9 @@ modobjs: headers rm-modobjs-tmp
 rm-modobjs-tmp:
 	rm -f stamp-modobjs.tmp
 
-Makemod modules.index prep: modules-bltin
+@@config.mk@@
+
+Makemod modules.index prep: modules-bltin $(CONFIG_INCS)
 	( cd $(sdir_top) && $(SHELL) $(subdir)/mkmodindex.sh $(subdir) ) \
 	    > modules.index.tmp
 	@if cmp -s modules.index.tmp modules.index; then \
@@ -200,6 +202,4 @@ install.modules uninstall.modules \
 modobjs modules headers proto $(MAIN_OBJS): Makemod
 	@$(MAKE) -f Makemod $(MAKEDEFS) $@
 
-# ========== DEPENDENCIES FOR MAINTENANCE ==========
-
-@@config.mk@@
+$(MAIN_OBJS): $(sdir)/zsh.h

@@ -1,0 +1,3 @@
+#function gzip
+
+__files -g '*~*.[gG][zZ]'

@@ -792,10 +792,7 @@ describekeybriefly(void)
 
     if (statusline)
 	return;
-    invalidatelist();
-    moveto(0, 0);
-    clearflag = 0;
-    resetneeded = 1; 
+    clearlist = 1;
     statusline = "Describe key briefly: _";
     statusll = strlen(statusline);
     zrefresh();

@@ -214,7 +214,7 @@ if test -n "$auto_cflags"; then
 fi
 if test -n "$auto_ldflags"; then
   case "${enable_zsh_debug}$host_os" in
-    yesaix*|yeshpux*) ;;  # AIX ld does not accept -g
+    yesaix*|yeshpux*|yesnetbsd*) ;;  # "ld -g" is not valid on these systems
     yes*)    LDFLAGS=-g ;;
     *)       LDFLAGS=-s ;;
   esac
@@ -664,12 +664,30 @@ AC_MSG_RESULT($signals_style)
 
 dnl Where is <signal.h> located?  Needed as input for signals.awk
 AC_CACHE_CHECK(where signal.h is located, zsh_cv_path_signal_h,
-[for SIGNAL_H in /usr/include/bsd/sys/signal.h  dnl Next
-                 /usr/include/asm/signum.h      dnl alpha-Linux
-                 /usr/include/asm/signal.h      dnl Linux 1.3.0 and above
-                 /usr/include/linux/signal.h    dnl Linux up to 1.2.11
-                 /usr/include/sys/signal.h      dnl Almost everybody else
-                 /dev/null;                     dnl Just in case we fall through
+[dnl Look at the output from the preprocessor.
+dnl We should get lines of the form `# 1 "/usr/include/signal.h"'
+dnl The following assumes the real definitions are in a file which
+dnl contains the name `sig'; we could relax this if necessary,
+dnl but then you can get a rather long list of files to test.
+dnl The backslash substitution is to persuade cygwin to cough up
+dnl slashes rather than doubled backslashes in the path.
+echo "#include <signal.h>" > nametmp.c
+sigfile_list="`$CPP nametmp.c |
+sed -n -e 's/^#[ 	].*\"\(.*\)\"/\1/p' -e 's/\\\\\\\\/\//g' |
+$AWK '{ if (\$1 ~ \"sig\") files[[\$1]] = \$1 }
+  END { for (var in files) print var }'`"
+rm -f nametmp.c
+if test -z "$sigfile_list"; then
+  dnl In case we don't get the stuff from the preprocesor, use the old
+  dnl list of standard places.
+  sigfile_list="/usr/include/bsd/sys/signal.h
+/usr/include/asm/signum.h
+/usr/include/asm/signal.h
+/usr/include/linux/signal.h
+/usr/include/sys/signal.h
+/dev/null"
+fi
+for SIGNAL_H in $sigfile_list
 do
   test -f $SIGNAL_H && \
   grep '#[ 	]*define[ 	][ 	]*SIG[0-9A-Z]*[ 	]*[0-9][0-9]*' $SIGNAL_H > /dev/null && \

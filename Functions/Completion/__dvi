@@ -1,0 +1,3 @@
+#function xdvi dvips dvibook dviconcat dvicopy dvidvi dviselect dvitodvi dvitype
+
+__files -g '*.(dvi|DVI)'

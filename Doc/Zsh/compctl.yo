@@ -11,7 +11,7 @@ list(tt(compctl) [ tt(-CDT) ] var(options) \
   [ tt(PLUS()) var(options) [ tt(-x) ... tt(--) ] ... [tt(PLUS())] ] \
   [ var(command) ... ])
 list(tt(compctl) tt(-M) var(match-specs) ...)
-list(tt(compctl) tt(-L) [ tt(-CDT) ] [ var(command) ... ])
+list(tt(compctl) tt(-L) [ tt(-CDTM) ] [ var(command) ... ])
 list(tt(compctl) tt(PLUS()) var(command) ...)
 endlist()
 
@@ -99,9 +99,9 @@ not tried after the directory name is finished.
 item(tt(-L))(
 lists the existing completion behavior in a manner suitable for
 putting into a start-up script; the existing behavior is not changed.
-Any combination of the above forms may be specified, otherwise all
-defined completions are listed.  Any other flags supplied
-are ignored.
+Any combination of the above forms, or the tt(-M) flag (which must
+follow the tt(-L) flag), may be specified, otherwise all defined
+completions are listed.  Any other flags supplied are ignored.
 )
 item(em(no argument))(
 If no argument is given, tt(compctl) lists all defined completions

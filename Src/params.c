@@ -246,6 +246,10 @@ IPDEF9F("path", &path, "PATH", PM_RESTRICTED),
 };
 #undef BR
 
+#define IS_UNSET_VALUE(V) \
+	((V) && (!(V)->pm || ((V)->pm->flags & PM_UNSET) || \
+		 !(V)->pm->nam || !*(V)->pm->nam))
+
 static Param argvparam;
 
 /* hash table containing the parameters */
@@ -966,7 +970,7 @@ getindex(char **pptr, Value v)
     if (*tbrack == Outbrack)
 	*tbrack = ']';
     if ((s[0] == '*' || s[0] == '@') && s[1] == ']') {
-	if (v->isarr && s[0] == '@')
+	if ((v->isarr || IS_UNSET_VALUE(v)) && s[0] == '@')
 	    v->isarr |= SCANPM_ISVAR_AT;
 	v->a = 0;
 	v->b = -1;
@@ -1205,6 +1209,8 @@ getarrvalue(Value v)
 
     if (!v)
 	return arrdup(nular);
+    else if (IS_UNSET_VALUE(v))
+	return arrdup(&nular[1]);
     if (v->inv) {
 	char buf[DIGBUFSIZE];
 

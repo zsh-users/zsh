@@ -386,8 +386,62 @@ Sven: GLOB_COMPLETE docs, 5261, 5268
 
 Sven: compctl -M and REC_EXACT fixes, 5262
 
-Sven: rewrite of $foo:q, 5265
+Sven: rewrite of $foo:q, 5265, +doc, 5284
 
 Sven: get matcher number in new completion function, 5266
 
 Me: interrupts in getquery() weren't gracefully handled, 5281
+
+  pws-8
+
+Geoff: no ld -g for NetBSD, 5295
+
+Bart: alter local variables and $argv documentation, 5297
+
+Bart: PWD and OLDPWD export confusion (fixing, not creating), 5299
+
+Bart: trashzle() crashed shell with dynamical loading and zle builtin,
+5305
+
+Matt: CHAR(+) -> CHAR(43) in zmacros, 5311
+
+Sven: compctl matcher to use reference counts, 5316
+
+Sven: keys available in zle widget functions, 5320
+
+Me: compctl -LM, 5321
+
+Me: revamped signames.c generation, 5326, 5329, plus Matt fix, 5330
+
+Sweth, Bart, Me: Functions/allopt, basically as in 2121 with the odd
+emulate and local.
+
+Me: emulate -L, 5332
+
+Sven: printing of zle condition codes, 5335
+
+Sven: Modularisation of new completion shell code, 5341
+
+Sven: ignoring ignored prefix in new conditions, 5342; related fixes,
+5343
+
+Me: patch for completion init and __normal, 5344; Sven fix, 5351
+
+Me: "$foo[@]" didn't remove the argument if $foo wasn't set, 5349;
+Bart's fix so this works on OSes other than AIX, 5361
+
+Sven: change fignore handling, 5352
+
+Sven: redisplay of completion lists; remove display when completion
+failed, 5354
+
+Sven: compadd -R function for suffix removal, 5355
+
+Me: #key-* completions now allow 0 or more key bindings, 5362
+
+Me: Moved Misc/Completion to Functions/Completion; added some of my own
+new-style completions: not posted
+
+Me: 5281 now works, 5364
+
+Me: make dependencies for main.o, Makemod, zshpaths.h, 5365

@@ -1,0 +1,2 @@
+#array declare export integer local readonly typeset
+__varseq=(-v -q -S '=')

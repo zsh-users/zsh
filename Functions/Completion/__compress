@@ -1,0 +1,3 @@
+#function compress
+
+__files -g '*~*.Z'

@@ -56,7 +56,7 @@ static struct builtin builtins[] =
     BUILTIN("disown", 0, bin_fg, 0, -1, BIN_DISOWN, NULL, NULL),
     BUILTIN("echo", BINF_PRINTOPTS | BINF_ECHOPTS, bin_print, 0, -1, BIN_ECHO, "neE", "-"),
     BUILTIN("echotc", 0, bin_echotc, 1, -1, 0, NULL, NULL),
-    BUILTIN("emulate", 0, bin_emulate, 1, 1, 0, "R", NULL),
+    BUILTIN("emulate", 0, bin_emulate, 1, 1, 0, "LR", NULL),
     BUILTIN("enable", 0, bin_enable, 0, -1, BIN_ENABLE, "afmr", NULL),
     BUILTIN("eval", BINF_PSPECIAL, bin_eval, 0, -1, BIN_EVAL, NULL, NULL),
     BUILTIN("exit", BINF_PSPECIAL, bin_break, 0, 1, BIN_EXIT, NULL, NULL),
@@ -643,7 +643,7 @@ set_pwd_env(void)
     pm = (Param) paramtab->getnode(paramtab, "OLDPWD");
     if (!(pm->flags & PM_EXPORTED)) {
 	pm->flags |= PM_EXPORTED;
-	pm->env = addenv("PWD", pwd);
+	pm->env = addenv("OLDPWD", oldpwd);
     }
 }
 
@@ -3051,6 +3051,8 @@ int
 bin_emulate(char *nam, char **argv, char *ops, int func)
 {
     emulate(*argv, ops['R']);
+    if (ops['L'])
+	dosetopt(LOCALOPTIONS, 1, 0);
     return 0;
 }
 

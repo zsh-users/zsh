@@ -816,10 +816,7 @@ viswapcase(void)
 void
 vicapslockpanic(void)
 {
-    invalidatelist();
-    moveto(0, 0);
-    clearflag = 0;
-    resetneeded = 1; 
+    clearlist = 1;
     zbeep();
     statusline = "press a lowercase key to continue";
     statusll = strlen(statusline);

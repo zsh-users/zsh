@@ -49,7 +49,7 @@ void (*makecompparamsptr) _((void));
 /* pointers to functions required by compctl and defined by zle */
 
 /**/
-void (*addmatchesptr) _((char *, char *, char *, char *, char *, char *, char *, char *, int, int, Cmatcher, char **));
+void (*addmatchesptr) _((char *, char *, char *, char *, char *, char *, char *, char *, char *, char *, int, int, Cmatcher, char **));
 
 /**/
 char *(*comp_strptr) _((int*,int*));
@@ -61,7 +61,7 @@ int (*getcpatptr) _((char *, int, char *, int));
 void (*makecomplistcallptr) _((Compctl));
 
 /**/
-void (*makecomplistctlptr) _((int));
+int (*makecomplistctlptr) _((int));
 
 /* Hash table for completion info for commands */
  
@@ -248,6 +248,9 @@ void
 freecmatcher(Cmatcher m)
 {
     Cmatcher n;
+
+    if (!m || --(m->refc))
+	return;
 
     while (m) {
 	n = m->next;

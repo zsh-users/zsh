@@ -212,6 +212,10 @@ static LinkList ccstack;
 
 static Cmlist mstack;
 
+/* A list with references to all matcher we used. */
+
+static LinkList matchers;
+
 /* A heap of free Cline structures. */
 
 static Cline freecl;
@@ -2454,10 +2458,10 @@ instmatch(Cmatch m)
 /**/
 void
 addmatches(char *ipre, char *ppre, char *psuf, char *prpre, char *pre,
-	   char *suf, char *group, char *rems, 
+	   char *suf, char *group, char *rems, char *remf, char *ign,
 	   int flags, int aflags, Cmatcher match, char **argv)
 {
-    char *s, *t, *e, *te, *ms, *lipre = NULL, *lpre, *lsuf;
+    char *s, *t, *e, *te, *ms, *lipre = NULL, *lpre, *lsuf, **aign = NULL;
     int lpl, lsl, i, pl, sl, test, bpl, bsl, lsm, llpl;
     Aminfo ai;
     Cline lc = NULL;
@@ -2477,22 +2481,26 @@ addmatches(char *ipre, char *ppre, char *psuf, char *prpre, char *pre,
 	mst.next = mstack;
 	mst.matcher = match;
 	mstack = &mst;
+	addlinknode(matchers, match);
+	match->refc++;
     }
     if ((aflags & CAF_MENU) && isset(AUTOMENU))
 	usemenu = 1;
+    if (ign)
+	aign = get_user_var(ign);
+
     SWITCHHEAPS(compheap) {
 	HEAPALLOC {
 	    if (aflags & CAF_MATCH) {
-		ctokenize(lipre = dupstring(compiprefix));
-		remnulargs(lipre);
-		ctokenize(lpre = dupstring(compprefix));
-		remnulargs(lpre);
+		lipre = dupstring(compiprefix);
+		lpre = dupstring(compprefix);
 		llpl = strlen(lpre);
-		ctokenize(lsuf = dupstring(compsuffix));
-		remnulargs(lsuf);
+		lsuf = dupstring(compsuffix);
 	    }
 	    if (ipre)
 		ipre = (lipre ? dyncat(lipre, ipre) : dupstring(ipre));
+	    else if (lipre)
+		ipre = lipre;
 	    if (ppre) {
 		ppre = dupstring(ppre);
 		lpl = strlen(ppre);
@@ -2520,7 +2528,10 @@ addmatches(char *ipre, char *ppre, char *psuf, char *prpre, char *pre,
 		if (aflags & CAF_NOSORT)
 		    mgroup->flags |= CGF_NOSORT;
 	    }
-	    if (rems)
+	    if (remf) {
+		remf = dupstring(remf);
+		rems = NULL;
+	    } else if (rems)
 		rems = dupstring(rems);
     	    if (ai->pprefix) {
 		if (pre)
@@ -2535,8 +2546,8 @@ addmatches(char *ipre, char *ppre, char *psuf, char *prpre, char *pre,
 		ms = NULL;
 		bpl = brpl;
 		bsl = brsl;
-		if ((!psuf || !*psuf) && (aflags & CAF_FIGNORE)) {
-		    char **pt = fignore;
+		if ((!psuf || !*psuf) && aign) {
+		    char **pt = aign;
 		    int filell;
 
 		    for (test = 1; test && *pt; pt++)
@@ -2635,6 +2646,7 @@ addmatches(char *ipre, char *ppre, char *psuf, char *prpre, char *pre,
 		cm->flags = flags;
 		cm->brpl = bpl;
 		cm->brsl = bsl;
+		cm->remf = remf;
 		cm->rems = rems;
 		addlinknode(l, cm);
 
@@ -2936,7 +2948,7 @@ addmatch(char *s, char *t)
     cm->flags = mflags | isf;
     cm->brpl = bpl;
     cm->brsl = bsl;
-    cm->rems = NULL;
+    cm->rems = cm->remf = NULL;
     addlinknode(l, cm);
 
     /* One more match for this explanation. */
@@ -3259,17 +3271,20 @@ static void
 docompletion(char *s, int lst, int incmd)
 {
     HEAPALLOC {
+	LinkNode n;
+
 	pushheap();
 
 	ainfo = fainfo = NULL;
+	matchers = newlinklist();
 
 	/* Make sure we have the completion list and compctl. */
 	if (makecomplist(s, incmd, lst)) {
 	    /* Error condition: feeeeeeeeeeeeep(). */
 	    feep();
+	    clearlist = 1;
 	    goto compend;
 	}
-
 	if (lst == COMP_LIST_COMPLETE)
 	    /* All this and the guy only wants to see the list, sigh. */
 	    showinglist = -2;
@@ -3324,6 +3339,9 @@ docompletion(char *s, int lst, int incmd)
 	    }
 	}
       compend:
+	for (n = firstnode(matchers); n; incnode(n))
+	    freecmatcher((Cmatcher) getdata(n));
+
 	ll = strlen((char *)line);
 	if (cs > ll)
 	    cs = ll;
@@ -3460,13 +3478,26 @@ static int
 makecomplist(char *s, int incmd, int lst)
 {
     struct cmlist ms;
-    Cmlist m = cmatcher;
+    Cmlist m;
 
     /* If we already have a list from a previous execution of this *
      * function, skip the list building code.                      */
     if (validlist)
 	return !nmatches;
 
+    if ((m = cmatcher)) {
+	Cmlist mm, *mp = &mm;
+
+	for (; m; m = m->next) {
+	    *mp = (Cmlist) halloc(sizeof(struct cmlist));
+	    (*mp)->matcher = m->matcher;
+	    (*mp)->next = NULL;
+	    mp = &((*mp)->next);
+	    addlinknode(matchers, m->matcher);
+	    m->matcher->refc++;
+	}
+	m = mm;
+    }
     compmatcher = 1;
     for (;;) {
 	if (m) {
@@ -3613,11 +3644,13 @@ static int cdepth = 0;
 #define MAX_CDEPTH 16
 
 /**/
-void
+int
 makecomplistctl(int flags)
 {
+    int ret;
+
     if (cdepth == MAX_CDEPTH)
-	return;
+	return 0;
 
     cdepth++;
     SWITCHHEAPS(compheap) {
@@ -3641,9 +3674,10 @@ makecomplistctl(int flags)
 	    *q = NULL;
 	    offs = lip + lp;
 	    incompfunc = 2;
-	    makecomplistglobal(str,
-			       (!clwpos && !strcmp(compcontext, "command")),
-			       COMP_COMPLETE, flags);
+	    ret = makecomplistglobal(str,
+				     (!clwpos &&
+				      !strcmp(compcontext, "command")),
+				     COMP_COMPLETE, flags);
 	    incompfunc = 1;
 	    offs = ooffs;
 	    compnmatches = mnum;
@@ -3656,13 +3690,15 @@ makecomplistctl(int flags)
 	} LASTALLOC;
     } SWITCHBACKHEAPS;
     cdepth--;
+
+    return ret;
 }
 
 /* This function gets the compctls for the given command line and *
  * adds all completions for them. */
 
 /**/
-static void
+static int
 makecomplistglobal(char *os, int incmd, int lst, int flags)
 {
     Compctl cc;
@@ -3694,46 +3730,48 @@ makecomplistglobal(char *os, int incmd, int lst, int flags)
     } else if (linredir)
 	/* In redirections use default completion. */
 	cc = &cc_default;
-    else {
+    else
 	/* Otherwise get the matches for the command. */
-	makecomplistcmd(os, incmd, flags);
-	cc = NULL;
-    }
+	return makecomplistcmd(os, incmd, flags);
+
     if (cc) {
 	/* First, use the -T compctl. */
 	if (!(flags & CFN_FIRST)) {
 	    makecomplistcc(&cc_first, os, incmd);
 
 	    if (!(ccont & CC_CCCONT))
-		return;
+		return 0;
 	}
 	makecomplistcc(cc, os, incmd);
+	return 1;
     }
+    return 0;
 }
 
 /* This produces the matches for a command. */
 
 /**/
-static void
+static int
 makecomplistcmd(char *os, int incmd, int flags)
 {
     Compctl cc;
     Compctlp ccp;
     char *s;
+    int ret = 0;
 
     /* First, use the -T compctl. */
     if (!(flags & CFN_FIRST)) {
 	makecomplistcc(&cc_first, os, incmd);
 
 	if (!(ccont & CC_CCCONT))
-	    return;
+	    return 0;
     }
     /* Then search the pattern compctls, with the command name and the *
      * full pathname of the command. */
     if (cmdstr) {
-	makecomplistpc(os, incmd);
+	ret |= makecomplistpc(os, incmd);
 	if (!(ccont & CC_CCCONT))
-	    return;
+	    return ret;
     }
     /* If the command string starts with `=', try the path name of the *
      * command. */
@@ -3758,31 +3796,36 @@ makecomplistcmd(char *os, int incmd, int flags)
 	    (ccp = (Compctlp) compctltab->getnode(compctltab, s)) &&
 	    (cc = ccp->cc))))) {
 	if (flags & CFN_DEFAULT)
-	    return;
+	    return ret;
 	cc = &cc_default;
-    }
+    } else
+	ret|= 1;
     makecomplistcc(cc, os, incmd);
+    return ret;
 }
 
 /* This add the matches for the pattern compctls. */
 
 /**/
-static void
+static int
 makecomplistpc(char *os, int incmd)
 {
     Patcomp pc;
     Comp pat;
     char *s = findcmd(cmdstr, 1);
+    int ret = 0;
 
     for (pc = patcomps; pc; pc = pc->next) {
 	if ((pat = parsereg(pc->pat)) &&
 	    (domatch(cmdstr, pat, 0) ||
 	     (s && domatch(s, pat, 0)))) {
 	    makecomplistcc(pc->cc, os, incmd);
+	    ret |= 2;
 	    if (!(ccont & CC_CCCONT))
-		return;
+		return ret;
 	}
     }
+    return ret;
 }
 
 /* This produces the matches for one compctl. */
@@ -4111,6 +4154,8 @@ makecomplistflags(Compctl cc, char *s, int incmd, int compadd)
 	ms.next = mstack;
 	ms.matcher = cc->matcher;
 	mstack = &ms;
+	addlinknode(matchers, cc->matcher);
+	cc->matcher->refc++;
     }
     /* Insert the prefix (compctl -P), if any. */
     if (cc->prefix) {
@@ -5225,6 +5270,7 @@ dupmatch(Cmatch m)
     r->brpl = m->brpl;
     r->brsl = m->brsl;
     r->rems = ztrdup(m->rems);
+    r->remf = ztrdup(m->remf);
 
     return r;
 }
@@ -5337,6 +5383,7 @@ freematch(Cmatch m)
     zsfree(m->psuf);
     zsfree(m->prpre);
     zsfree(m->rems);
+    zsfree(m->remf);
 
     zfree(m, sizeof(m));
 }
@@ -5591,7 +5638,7 @@ do_single(Cmatch m)
 	if (menuwe) {
 	    menuend += menuinsc;
 	    if (m->flags & CMF_REMOVE) {
-		makesuffixstr(m->rems, menuinsc);
+		makesuffixstr(m->remf, m->rems, menuinsc);
 		if (menuinsc == 1)
 		    suffixlen[STOUC(m->suf[0])] = 1;
 	    }

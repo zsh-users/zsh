@@ -108,7 +108,9 @@ static HashTable keymapnamtab;
 
 /* key sequence reading data */
 
-static char *keybuf;
+/**/
+char *keybuf;
+
 static int keybuflen, keybufsz = 20;
 
 /* last command executed with execute-named-command */

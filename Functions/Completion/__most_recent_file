@@ -1,0 +1,2 @@
+#key-array expand-or-complete \C-xm
+__most_recent_file=(-g '*(om[1])')

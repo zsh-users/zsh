@@ -612,10 +612,7 @@ executenamedcommand(char *prmt)
     char *ptr;
     char *okeymap = curkeymapname;
 
-    invalidatelist();
-    moveto(0, 0);
-    clearflag = 0;
-    resetneeded = 1; 
+    clearlist = 1;
     cmdbuf = halloc(l + NAMLEN + 2);
     strcpy(cmdbuf, prmt);
     statusline = cmdbuf;
@@ -767,6 +764,11 @@ executenamedcommand(char *prmt)
 /**/
 int suffixlen[257];
 
+/* Shell function to call to remove the suffix. */
+
+/**/
+static char *suffixfunc;
+
 /* Set up suffix: the last n characters are a suffix that should be *
  * removed in the usual word end conditions.                        */
 
@@ -801,9 +803,13 @@ makeparamsuffix(int br, int n)
 
 /**/
 void
-makesuffixstr(char *s, int n)
+makesuffixstr(char *f, char *s, int n)
 {
-    if (s) {
+    if (f) {
+	zsfree(suffixfunc);
+	suffixfunc = ztrdup(f);
+	suffixlen[0] = n;
+    } else if (s) {
 	int inv, i, v, z = 0;
 
 	if (*s == '^' || *s == '!') {
@@ -845,10 +851,33 @@ makesuffixstr(char *s, int n)
 void
 iremovesuffix(int c)
 {
-    int sl = suffixlen[c];
-    if(sl) {
-	backdel(sl);
-	invalidatelist();
+    if (suffixfunc) {
+	List l = getshfunc(suffixfunc);
+
+	if (l != &dummy_list) {
+	    LinkList args = newlinklist();
+	    char buf[20];
+	    int osc = sfcontext;
+
+	    sprintf(buf, "%d", suffixlen[0]);
+	    addlinknode(args, suffixfunc);
+	    addlinknode(args, buf);
+
+	    startparamscope();
+	    makezleparams(0);
+	    sfcontext = SFC_COMPLETE;
+	    doshfunc(suffixfunc, l, args, 0, 1);
+	    sfcontext = osc;
+	    endparamscope();
+	}
+	zsfree(suffixfunc);
+	suffixfunc = NULL;
+    } else {
+	int sl = suffixlen[c];
+	if(sl) {
+	    backdel(sl);
+	    invalidatelist();
+	}
     }
     fixsuffix();
 }

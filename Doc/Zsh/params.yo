@@ -28,31 +28,13 @@ Special parameters cannot have their type changed, and they stay special even
 if unset.  `<Z>' indicates that the parameter does not exist when the shell
 initialises in tt(sh) or tt(ksh) emulation mode.
 startmenu()
-menu(Local Parameters)
 menu(Array Parameters)
 menu(Positional Parameters)
+menu(Local Parameters)
 menu(Parameters Set By The Shell)
 menu(Parameters Used By The Shell)
 endmenu()
-texinode(Local Parameters)(Array Parameters)()(Parameters)
-sect(Local Parameters)
-Shell function executions delimit scopes for shell parameters.
-(Parameters are dynamically scoped.)  The tt(typeset) builtin, and its
-alternative forms tt(declare), tt(integer), tt(local) and tt(readonly)
-(but not tt(export)), can be used to declare a parameter as being local
-to the innermost scope.  Note that em(special) parameters cannot be made
-local.
-
-When a parameter is read or assigned to, the
-innermost existing parameter of that name is used.  (That is, the
-local parameter hides any less-local parameter.)  However, assigning
-to a non-existent parameter, or declaring a new parameter with tt(export),
-causes it to be created in the em(outer)most scope.
-
-Local parameters disappear when their scope ends.
-tt(unset) can be used to delete a parameter while it is still in scope;
-any outer parameter of the same name remains hidden.
-texinode(Array Parameters)(Positional Parameters)(Local Parameters)(Parameters)
+texinode(Array Parameters)(Positional Parameters)()(Parameters)
 sect(Array Parameters)
 The value of an array parameter may be assigned by writing:
 
@@ -65,7 +47,10 @@ interpreted as alternating keys and values:
 
 nofill(var(name)tt(=LPAR())var(key) var(value) ...tt(RPAR()))
 
-Every var(key) must have a var(value) in this case.
+Every var(key) must have a var(value) in this case.  To create an empty
+array or associative array, use:
+
+nofill(var(name)tt(=LPAR()RPAR()))
 
 Individual elements of an array may be selected using a
 subscript.  A subscript of the form `tt([)var(exp)tt(])'
@@ -108,7 +93,14 @@ work, the subscript otherwise not being treated specially.
 If a subscript is used on the left side of an assignment the selected
 element or range is replaced by the expression on the right side.  An
 array (but not an associative array) may be created by assignment to a
-range or element.
+range or element.  Arrays do not nest, so assigning a parenthesized list
+of values to an element or range changes the number of elements in the
+array, shifting the other elements to accomodate the new values.  (This
+is not supported for associative arrays.)
+
+To delete an element of an ordinary array, assign `tt(LPAR()RPAR())' to
+that element.
+To delete an element of an associative array, use the tt(unset) command.
 
 If the opening bracket or the comma is directly followed by an opening
 parentheses the string up to the matching closing one is considered to
@@ -164,17 +156,46 @@ the var(n)th or var(n)th last match (if var(expr) evaluates to
 var(n)).  This flag is ignored when the array is associative.
 )
 enditem()
-texinode(Positional Parameters)(Parameters Set By The Shell)(Array Parameters)(Parameters)
+texinode(Positional Parameters)(Local Parameters)(Array Parameters)(Parameters)
 sect(Positional Parameters)
-Positional parameters are set by the shell on invocation,
-by the tt(set) builtin, or by direct assignment.
+The positional parameters provide access to the command-line arguments
+of a shell function, shell script, or the shell itself; see
+noderef(Invocation), and also noderef(Functions).
 The parameter var(n), where var(n) is a number,
 is the var(n)th positional parameter.
 The parameters tt(*), tt(@) and tt(argv) are
 arrays containing all the positional parameters;
 thus `tt($argv[)var(n)tt(])', etc., is equivalent to simply `tt($)var(n)'.
 
-texinode(Parameters Set By The Shell)(Parameters Used By The Shell)(Positional Parameters)(Parameters)
+Positional parameters may be changed after the shell or function starts by
+using the tt(set) builtin, by assigning to the tt(argv) array, or by direct
+assignment of the form `var(n)tt(=)var(value)' where var(n) is the number of
+the positional parameter to be changed.  This also creates (with empty
+values) any of the positions from 1 to var(n) that do not already have
+values.  Note that, because the positional parameters form an array, an
+array assignment of the form `var(n)tt(=LPAR())var(value) ...tt(RPAR())' is
+allowed, and has the effect of shifting all the values at positions greater
+than var(n) by as many positions as necessary to accomodate the new values.
+
+texinode(Local Parameters)(Parameters Set By The Shell)(Positional Parameters)(Parameters)
+sect(Local Parameters)
+Shell function executions delimit scopes for shell parameters.
+(Parameters are dynamically scoped.)  The tt(typeset) builtin, and its
+alternative forms tt(declare), tt(integer), tt(local) and tt(readonly)
+(but not tt(export)), can be used to declare a parameter as being local
+to the innermost scope.  Note that em(special) parameters cannot be made
+local.
+
+When a parameter is read or assigned to, the
+innermost existing parameter of that name is used.  (That is, the
+local parameter hides any less-local parameter.)  However, assigning
+to a non-existent parameter, or declaring a new parameter with tt(export),
+causes it to be created in the em(outer)most scope.
+
+Local parameters disappear when their scope ends.
+tt(unset) can be used to delete a parameter while it is still in scope;
+any outer parameter of the same name remains hidden.
+texinode(Parameters Set By The Shell)(Parameters Used By The Shell)(Local Parameters)(Parameters)
 sect(Parameters Set By The Shell)
 The following parameters are automatically set by the shell:
 
@@ -206,11 +227,15 @@ An array containing the positional parameters.
 )
 vindex(argv)
 item(tt(argv) <S> <Z>)(
-Same as tt(*).
+Same as tt(*).  Assigning to tt(argv) changes the local positional
+parameters, but tt(argv) is em(not) itself a local parameter.
+Deleting tt(argv) with tt(unset) in any function deletes it everywhere,
+although only the innermost positional parameter array is deleted (so
+tt(*) and tt(@) in other scopes are not affected).
 )
 vindex(@)
 item(tt(@) <S>)(
-Same as tt(argv[@]).
+Same as tt(argv[@]), even when tt(argv) is not set.
 )
 vindex(?)
 item(tt(?) <S>)(

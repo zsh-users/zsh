@@ -1,0 +1,3 @@
+#function gunzip zcat
+
+__files -g '*.[gG][z]'

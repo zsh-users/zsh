@@ -1,0 +1,6 @@
+#function enable
+
+[[ -mcurrent -1 -*a* ]] && complist -da
+[[ -mcurrent -1 -*f* ]] && complist -dF
+[[ -mcurrent -1 -*r* ]] && complist -dw
+[[ ! -mcurrent -1 -* ]] && complist -dB

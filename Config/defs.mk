@@ -44,6 +44,7 @@ mandir          = @mandir@
 
 # compilation
 CC              = @CC@
+CPP             = @CPP@
 CPPFLAGS        = @CPPFLAGS@
 DEFS            = @DEFS@
 CFLAGS          = @CFLAGS@

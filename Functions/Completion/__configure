@@ -1,0 +1,11 @@
+#function configure
+if [[ $PREFIX = *=* ]]; then
+  # Complete filenames after e.g. --prefix=
+  IPREFIX=${PREFIX%%=*}=
+  PREFIX=${PREFIX#*=}
+  complist -f
+else
+  # Generate a list of options from configure --help
+  complist -s '$($COMMAND --help |
+  sed -n -e '\''s/^ *\(--[-a-z0-9]*\)[    =,].*$/\1/p'\'')'
+fi

@@ -38,6 +38,7 @@
 #define COMP_DEFAULT	(1<<2)	/* -D */
 #define COMP_FIRST	(1<<3)	/* -T */
 #define COMP_REMOVE	(1<<4)
+#define COMP_LISTMATCH	(1<<5)	/* -L and -M */
 
 #define COMP_SPECIAL (COMP_COMMAND|COMP_DEFAULT|COMP_FIRST)
 
@@ -82,6 +83,7 @@ cpcmatcher(Cmatcher m)
     while (m) {
 	*p = n = (Cmatcher) zalloc(sizeof(struct cmatcher));
 
+	n->refc = 1;
 	n->next = NULL;
 	n->flags = m->flags;
 	n->line = cpcpattern(m->line);
@@ -712,7 +714,9 @@ get_compctl(char *name, char ***av, Compctl cc, int first, int isdef, int cl)
 		cct.mask2 |= CC_NOSORT;
 		break;
 	    case 'M':
-		if ((*argv)[1]) {
+		if (cclist & COMP_LIST) {
+		    cclist |= COMP_LISTMATCH;
+		} else if ((*argv)[1]) {
 		    if ((cct.matcher =
 			 parse_cmatcher(name, (cct.mstr = (*argv) + 1))) ==
 			pcm_err) {
@@ -1572,7 +1576,7 @@ bin_compctl(char *name, char **argv, char *ops, int func)
     /* If no commands and no -C, -T, or -D, print all the compctl's *
      * If some flags (other than -C, -T, or -D) were given, then    *
      * only print compctl containing those flags.                   */
-    if (!*argv && !(cclist & COMP_SPECIAL)) {
+    if (!*argv && !(cclist & (COMP_SPECIAL|COMP_LISTMATCH))) {
 	Patcomp pc;
 
 	for (pc = patcomps; pc; pc = pc->next)
@@ -1619,6 +1623,8 @@ bin_compctl(char *name, char **argv, char *ops, int func)
 	    printcompctl("", &cc_default, 0, 0);
 	if (cclist & COMP_FIRST)
 	    printcompctl("", &cc_first, 0, 0);
+	if (cclist & COMP_LISTMATCH)
+	    print_gmatcher(COMP_LIST);
 	return ret;
     }
 
@@ -1670,6 +1676,7 @@ bin_compadd(char *name, char **argv, char *ops, int func)
     char *p, **sp, *e;
     char *ipre = NULL, *ppre = NULL, *psuf = NULL, *prpre = NULL;
     char *pre = NULL, *suf = NULL, *group = NULL, *m = NULL, *rs = NULL;
+    char *ign = NULL, *rf = NULL;
     int f = 0, a = 0, dm;
     Cmatcher match = NULL;
 
@@ -1692,7 +1699,8 @@ bin_compadd(char *name, char **argv, char *ops, int func)
 		f |= CMF_FILE;
 		break;
 	    case 'F':
-		a |= CAF_FIGNORE;
+		sp = &ign;
+		e = "string expected after -%c";
 		break;
 	    case 'n':
 		f |= CMF_NOLIST;
@@ -1746,8 +1754,14 @@ bin_compadd(char *name, char **argv, char *ops, int func)
 		dm = 1;
 		break;
 	    case 'r':
+		f |= CMF_REMOVE;
 		sp = &rs;
 		e = "string expected after -%c";
+		break;
+	    case 'R':
+		f |= CMF_REMOVE;
+		sp = &rf;
+		e = "function name expected after -%c";
 		break;
 	    case '-':
 		argv++;
@@ -1782,8 +1796,11 @@ bin_compadd(char *name, char **argv, char *ops, int func)
     if (!*argv)
 	return 1;
 
+    match = cpcmatcher(match);
     addmatchesptr(ipre, ppre, psuf, prpre, pre, suf, group,
-		  rs, f, a, match, argv);
+		  rs, rf, ign, f, a, match, argv);
+    freecmatcher(match);
+
     return 0;
 }
 
@@ -1795,9 +1812,8 @@ bin_compcall(char *name, char **argv, char *ops, int func)
 	zerrnam(name, "can only be called from completion function", NULL, 0);
 	return 1;
     }
-    makecomplistctlptr((ops['T'] ? 0 : CFN_FIRST) |
-		       (ops['D'] ? 0 : CFN_DEFAULT));
-    return 0;
+    return makecomplistctlptr((ops['T'] ? 0 : CFN_FIRST) |
+			      (ops['D'] ? 0 : CFN_DEFAULT));
 }
 
 #define VAR(X) ((void *) (&(X)))
@@ -2016,7 +2032,7 @@ cond_strcl(char **a, int id)
 {
     if (comp_check()) {
 	char *s;
-	int i;
+	int i, ipl;
 
 	if (a[1]) {
 	    s = cond_str(a, 1);
@@ -2029,9 +2045,9 @@ cond_strcl(char **a, int id)
 	    zerr("zle not loaded, zle condition not available", NULL, 0);
 	    return 1;
 	}
-	i = getcpatptr(comp_strptr(NULL, NULL), i, s, id);
+	i = getcpatptr(comp_strptr(&ipl, NULL), i, s, id);
 	if (i != -1) {
-	    ignore_prefix(i);
+	    ignore_prefix(i - ipl);
 	    return 1;
 	}
     }

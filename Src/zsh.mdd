@@ -12,8 +12,11 @@ headers="../config.h system.h zsh.h sigcount.h signals.h \
 prototypes.h hashtable.h ztype.h"
 
 :<<\Make
-signames.c: signames.awk ../config.h @SIGNAL_H@
-	$(AWK) -f $(sdir)/signames.awk @SIGNAL_H@ > $@
+signames.c: signames1.awk signames2.awk ../config.h @SIGNAL_H@
+	$(AWK) -f $(sdir)/signames1.awk @SIGNAL_H@ >sigtmp.c
+	$(CPP) sigtmp.c >sigtmp.out
+	$(AWK) -f $(sdir)/signames2.awk sigtmp.out > $@
+	rm -f sigtmp.c sigtmp.out
 
 sigcount.h: signames.c
 	grep 'define.*SIGCOUNT' signames.c > $@
@@ -25,7 +28,7 @@ params.o: version.h
 version.h: $(sdir_top)/Config/version.mk
 	echo '#define ZSH_VERSION "'$(VERSION)'"' > $@
 
-zshpaths.h: FORCE
+zshpaths.h: FORCE Makemod
 	@echo '#define MODULE_DIR "'$(MODDIR)'"' > zshpaths.h.tmp
 	@if cmp -s zshpaths.h zshpaths.h.tmp; then \
 	    rm -f zshpaths.h.tmp; \

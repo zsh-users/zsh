@@ -139,6 +139,21 @@ The part of the buffer that lies to the right of the cursor position.
 If it is assigned to, only that part of the buffer is replaced, and the
 cursor remains between the old tt($LBUFFER) and the new tt($RBUFFER).
 )
+vindex(WIDGET)
+item(tt(WIDGET) (scalar))(
+The name of the widget currently being executed.
+)
+vindex(LASTWIDGET)
+item(tt(LASTWIDGET) (scalar))(
+The name of the last widget that was executed.
+)
+vindex(keys)
+item(tt(keys) (array))(
+The keys typed to invoke this widget, one element per
+key. Control-keys are reported with a leading `tt(^)', as in `tt(^A)',
+and meta-keys are repoted with a leading `tt(M-)', as in `tt(M-a)' and 
+`tt(M-^A)'.
+)
 enditem()
 sect(Standard Widgets)
 cindex(widgets, standard)

@@ -60,6 +60,11 @@ int showinglist;
 /**/
 int clearflag;
 
+/* Non-zero if zrefresh() should clear the list below the prompt. */
+
+/**/
+int clearlist;
+
 #ifdef HAVE_SELECT
 /* cost of last update */
 /**/
@@ -248,6 +253,13 @@ zrefresh(void)
     if (inlist)
 	return;
 
+    if (clearlist) {
+	invalidatelist();
+	moveto(0, 0);
+	clearflag = 0;
+	resetneeded = 1;
+	clearlist = 0;
+    }
 #ifdef HAVE_SELECT
     cost = 0;			/* reset */
 #endif

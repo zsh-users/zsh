@@ -415,7 +415,6 @@ getcond(Cond nm, int addpar)
 	    /* Module defined prefix condition. */
 	    char **p = (char **) nm->right;
 
-	    taddstr("-");
 	    taddstr(nm->left);
 	    for (; *p; p++) {
 		taddstr(" ");
@@ -426,7 +425,7 @@ getcond(Cond nm, int addpar)
     case COND_MODI:
 	/* Module defined infix condition. */
 	taddstr(((char **) nm->right)[0]);
-	taddstr(" -");
+	taddstr(" ");
 	taddstr(nm->left);
 	taddstr(" ");
 	taddstr(((char **) nm->right)[1]);

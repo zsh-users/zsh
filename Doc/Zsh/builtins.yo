@@ -215,13 +215,19 @@ cindex(compatibility, csh)
 cindex(sh, compatibility)
 cindex(ksh, compatibility)
 cindex(csh, compatibility)
-item(tt(emulate) [ tt(-R) ] {tt(zsh)|tt(sh)|tt(ksh)|tt(csh)})(
+item(tt(emulate) [ tt(-LR) ] {tt(zsh)|tt(sh)|tt(ksh)|tt(csh)})(
 Set up zsh options to emulate the specified shell as much as possible.
 bf(csh) will never be fully emulated.
 If the argument is not one of the shells listed above, tt(zsh)
 will be used as a default.  If the tt(-R) option is given, all options
 are reset to their default value corresponding to the specified emulation
-mode.
+mode, except for certain options describing the interactive
+environment; otherwise, only those options likely to cause portability
+problems in scripts and functions are altered.  If the tt(-L) option
+is given, the option tt(LOCAL_OPTIONS) will be set as well, causing
+the effect of the tt(emulate) command to be local to the immediately
+surrounding shell function, if any; normally this is turned off in all
+emulation modes except tt(ksh).
 )
 findex(enable)
 cindex(enabling commands)

@@ -1,0 +1,3 @@
+#function xfig
+
+__files -g '*.fig'

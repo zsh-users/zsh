@@ -1,0 +1,3 @@
+#function cd
+
+__files -W cdpath -g '*(-/)'

@@ -890,6 +890,20 @@ init_bltinmods(void)
     mod.nam = NULL;
 }
 
+/**/
+void
+noop_function(void)
+{
+    /* do nothing */
+}
+
+/**/
+void
+noop_function_int(int nothing)
+{
+    /* do nothing */
+}
+
 /* ZLE entry point pointers.  They are defined here because the initial *
  * values depend on whether ZLE is linked in or not -- if it is, we     *
  * avoid wasting space with the fallback functions.  No other source    *
@@ -898,7 +912,7 @@ init_bltinmods(void)
 #ifdef LINKED_XMOD_zle
 
 /**/
-ZleVoidFn trashzleptr;
+ZleVoidFn trashzleptr = noop_function;
 /**/
 ZleVoidFn gotwordptr;
 /**/
@@ -919,20 +933,6 @@ ZleReadFn zlereadptr = autoload_zleread;
 # else /* !UNLINKED_XMOD_zle */
 ZleReadFn zlereadptr = fallback_zleread;
 # endif /* !UNLINKED_XMOD_zle */
-
-/**/
-void
-noop_function(void)
-{
-    /* do nothing */
-}
-
-/**/
-void
-noop_function_int(int nothing)
-{
-    /* do nothing */
-}
 
 /**/
 # ifdef UNLINKED_XMOD_zle
