@@ -480,7 +480,10 @@ add(int c)
 	bsiz = newbsiz;
 #endif
 
-	int newbsiz = bsiz + 32;
+	int newbsiz = bsiz * 2;
+
+	if (newbsiz > inbufct && inbufct > bsiz)
+	    newbsiz = inbufct;
 
 	bptr = len + (tokstr = (char *)hrealloc(tokstr, bsiz, newbsiz));
 	bsiz = newbsiz;
