@@ -1951,17 +1951,6 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int ssub)
 	int i;
 	LinkNode on = n;
 
-	if (!aval[0] && !plan9) {
-	    if (aptr > (char *) getdata(n) &&
-		aptr[-1] == Dnull && *fstr == Dnull)
-		*--aptr = '\0', fstr++;
-	    y = (char *) hcalloc((aptr - ostr) + strlen(fstr) + 1);
-	    strcpy(y, ostr);
-	    *str = y + (aptr - ostr);
-	    strcpy(*str, fstr);
-	    setdata(n, y);
-	    return n;
-	}
 	if (unique) {
 	    if(!copied)
 		aval = arrdup(aval);
@@ -1969,6 +1958,24 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int ssub)
 	    i = arrlen(aval);
 	    if (i > 1)
 		zhuniqarray(aval);
+	}
+	if ((!aval[0] || !aval[1]) && !plan9) {
+	    int vallen;
+	    if (aptr > (char *) getdata(n) &&
+		aptr[-1] == Dnull && *fstr == Dnull)
+		*--aptr = '\0', fstr++;
+	    vallen = aval[0] ? strlen(aval[0]) : 0;
+	    y = (char *) hcalloc((aptr - ostr) + vallen + strlen(fstr) + 1);
+	    strcpy(y, ostr);
+	    *str = y + (aptr - ostr);
+	    if (vallen)
+	    {
+		strcpy(*str, aval[0]);
+		*str += vallen;
+	    }
+	    strcpy(*str, fstr);
+	    setdata(n, y);
+	    return n;
 	}
 	if (sortit) {
 	    if (!copied)

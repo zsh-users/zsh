@@ -589,3 +589,13 @@
 0:Parameters associated with (#m) flag
 >MATCH 16 20 MATCH
 >5
+
+  print -l JAMES${(u)${=:-$(echo yes yes)}}JOYCE
+  print -l JAMES${(u)${=:-$(echo yes yes she said yes i will yes)}}JOYCE
+0:Bug with (u) flag reducing arrays to one element
+>JAMESyesJOYCE
+>JAMESyes
+>she
+>said
+>i
+>willJOYCE
