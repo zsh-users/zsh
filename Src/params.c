@@ -381,6 +381,7 @@ scancountparams(HashNode hn, int flags)
 static Patprog scanprog;
 static char *scanstr;
 static char **paramvals;
+static Param foundparam;     
 
 /**/
 void
@@ -404,6 +405,7 @@ scanparamvals(HashNode hn, int flags)
     } else if ((flags & SCANPM_MATCHKEY) && !pattry(scanprog, v.pm->nam)) {
 	return;
     }
+    foundparam = v.pm;
     if (flags & SCANPM_WANTKEYS) {
 	paramvals[numparamvals++] = v.pm->nam;
 	if (!(flags & (SCANPM_WANTVALS|SCANPM_MATCHVAL)))
@@ -1598,7 +1600,7 @@ setstrvalue(Value v, char *val)
 	zsfree(val);
 	return;
     }
-    if (v->pm->flags & PM_HASHED) {
+    if ((v->pm->flags & PM_HASHED) && (v->isarr & SCANPM_MATCHMANY)) {
 	zerr("%s: attempt to set slice of associative array", v->pm->nam, 0);
 	zsfree(val);
 	return;
@@ -1662,6 +1664,11 @@ setstrvalue(Value v, char *val)
 	    ss[1] = NULL;
 	    setarrvalue(v, ss);
 	}
+	break;
+    case PM_HASHED:
+        {
+	    (foundparam->sets.cfn) (foundparam, val);
+        }
 	break;
     }
     if ((!v->pm->env && !(v->pm->flags & PM_EXPORTED) &&

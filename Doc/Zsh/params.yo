@@ -198,14 +198,14 @@ word (if the parameter is an array, if it is a scalar, or if it is a
 scalar and the `tt(w)' flag is given, respectively).  The subscript used
 is the number of the matching element, so that pairs of subscripts such as
 `tt($foo[(r))var(??)tt(,3])' and `tt($foo[(r))var(??)tt(,(r)f*])' are
-possible.  If the parameter is an associative array, only the value part
-of each pair is compared to the pattern, and the result is that value.
-Reverse subscripts may be used for assigning to ordinary array elements,
-but not for assigning to associative arrays.
+possible if the parameter is not an associative array.  If the
+parameter is an associative array, only the value part of each pair is
+compared to the pattern, and the result is that value.
 )
 item(tt(R))(
 Like `tt(r)', but gives the last match.  For associative arrays, gives
-all possible matches.
+all possible matches. May be used for assigning to ordinary array
+elements, but not for assigning to associative arrays.
 )
 item(tt(i))(
 Like `tt(r)', but gives the index of the match instead; this may not be
