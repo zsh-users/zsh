@@ -253,7 +253,7 @@ FUNCTIONS_INSTALL, either when running configure (e.g.
 Completion or Functions subdirectories.  By default, all the functions for
 the Completion system will be installed (see the zshcompsys manual page),
 plus those provide functions for the line editor, i.e.
-  FUNCTIONS_INSTALL='Core/* Base/* Builtins/* User/* Commands/* Debian/* Linux/* X/* Zle/*'
+  FUNCTIONS_INSTALL='Core/* Base/* Builtins/* User/* Commands/* Debian/* Linux/* X/* Zle/* Prompts/* Misc/*'
 and if the --enable-dynamic option was given, the functions in
 Functions/Zftp, which require the zftp module to be available (see the
 zshzftpsys manual page), will be included as well.  Note, however, that
