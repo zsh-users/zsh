@@ -29,7 +29,7 @@ is equivalent to
 
 example(let "val = 2 + 1")
 
-both assigning the value 3 to the shell variable tt(var) and returning a
+both assigning the value 3 to the shell variable tt(val) and returning a
 zero status.
 
 cindex(bases, in arithmetic)
