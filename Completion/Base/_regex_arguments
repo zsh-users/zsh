@@ -1,5 +1,9 @@
 #autoload
 
+## todo
+
+# imprement `guard' to more generic branch selection.
+
 ## usage: _regex_arguments funcname regex
 
 # _regex_arguments compiles `regex' and emit the result of the state
@@ -38,11 +42,6 @@
 # $'[^\0]#\0' \#	: zero or more words
 
 ## auxiliary functions definition:
-
-# fst : a * b -> a
-# snd : a * b -> b
-# fst( (x, y) ) = x
-# snd( (x, y) ) = y
 
 # nullable : regex -> bool
 # first : regex -> list of element
@@ -133,6 +132,12 @@
 
 ## Recursive decent regex parser
 
+# return status of parser functions:
+
+# 0 : success
+# 1 : parse error
+# 2 : fatal parse error
+
 _ra_parse_elt () {
   : index=$index "[$regex[$index]]"
   local state
@@ -168,8 +173,8 @@ _ra_parse_elt () {
 	  fi
 	  ;;
       \() (( index++ ))
-          _ra_parse_alt || return 1
-	  [[ $index -le $#regex && "$regex[$index]" = \) ]] || return 1
+          _ra_parse_alt || return $?
+	  [[ $index -le $#regex && "$regex[$index]" = \) ]] || return 2
 	  (( index++ ))
 	  ;;
       *)  return 1
@@ -182,7 +187,7 @@ _ra_parse_elt () {
 
 _ra_parse_clo () {
   : index=$index "[$regex[$index]]"
-  _ra_parse_elt || return 1
+  _ra_parse_elt || return $?
 
   if (( index <= $#regex )) && [[ "$regex[$index]" = \# ]]; then
     (( index++ ))
@@ -202,17 +207,27 @@ _ra_parse_seq () {
   nullable_seq=yes
 
   _ra_parse_clo || {
-    first=()
-    last=()
-    nullable=yes
-    return 0
+    if (( $? == 2 )); then
+      return 2
+    else
+      first=()
+      last=()
+      nullable=yes
+      return 0
+    fi
   }
   first_seq=($first)
   last_seq=($last)
   [[ -n "$nullable" ]] || nullable_seq=
 
   while :; do
-    _ra_parse_clo || break
+    _ra_parse_clo || {
+      if (( $? == 2 )); then
+        return 2
+      else
+        break
+      fi
+    }
     for i in $last_seq; do tbl[$i]="${tbl[$i]} $first"; done
     [[ -n "$nullable_seq" ]] && first_seq=($first_seq $first)
     [[ -n "$nullable" ]] || { nullable_seq= last_seq=() }
@@ -232,7 +247,7 @@ _ra_parse_alt () {
   first_alt=()
   nullable_alt=
 
-  _ra_parse_seq || return 1
+  _ra_parse_seq || return $?
   first_alt=($first_alt $first)
   last_alt=($last_alt $last)
   [[ -n "$nullable" ]] && nullable_alt=yes
@@ -242,7 +257,13 @@ _ra_parse_alt () {
     [[ "$regex[$index]" = \| ]] || break
     (( index++ ))
 
-    _ra_parse_seq || break
+    _ra_parse_seq || {
+      if (( $? == 2 )); then
+        return 2
+      else
+        break
+      fi
+    }
     first_alt=($first_alt $first)
     last_alt=($last_alt $last)
     [[ -n "$nullable" ]] && nullable_alt=yes
@@ -386,6 +407,15 @@ _regex_arguments () {
   parse_action=()
   complete_action=()
   _ra_parse_alt
+
+  if (( $? == 2 || index != $#regex + 1 )); then
+    if (( index != $#regex + 1 )); then
+      print "regex parse error at $index: $regex[index]" >&2
+    else
+      print "regex parse error at $index (end)" >&2
+    fi
+    return 1
+  fi
 
   funcdef="$(_ra_gen_func)"
 
