@@ -77,7 +77,7 @@ install.man uninstall.man:
 
 # install/uninstall just the shell functions
 install.fns:
-	test x$(sitefndir) != xno && $(sdir_top)/mkinstalldirs $(sitefndir)
+	test x$(sitefndir) != xno && $(sdir_top)/mkinstalldirs $(DESTDIR)$(sitefndir)
 	@cd Completion && $(MAKE) $(MAKEDEFS) $@
 	@cd Functions && $(MAKE) $(MAKEDEFS) $@
 
