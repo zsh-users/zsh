@@ -64,7 +64,7 @@ _ra_comp () {
 _regex_arguments () {
   local regex funcname="$1"
   shift
-  regex=(${@/(#b):(*)/":_ra_comp ${(qqqq)match[1]}"})
+  regex=(${@:/(#b):(*)/":_ra_comp ${(qqqq)match[1]}"})
 
   eval \
   "$funcname"' () {

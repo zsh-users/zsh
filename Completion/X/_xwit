@@ -1,0 +1,97 @@
+#compdef xwit
+
+local word=$'[^\0]#\0'
+local nul=$'\0'
+
+local guard='-_xwit_guard -${match[1]%?}'
+
+_xwit_guard () {
+  local opt="$1" o
+  (( no[$opt]-- ))
+  for o in ${=eo[$opt]}; do
+    no[$o]=0
+  done 
+  :
+}
+
+_xwit_compopts () {
+  local expl
+  _description options expl option
+  compadd "$expl[@]" - ${(k)no[(R)*~0]} || compadd "$expl[@]" - ${(k)no}
+}
+
+_regex_arguments _xwit_parse \
+  "/$word/" \
+  \( \
+    "/-/+" \
+    \( "/display$nul/" "$guard" "/$word/" ":_x_display" \
+    \| "/(sync|pop|open|iconify|unmap|root|current|select|(no|)(save|backingstore|saveunder))$nul/" "$guard" \
+    \| "/resize$nul/" "$guard" "/$word/" ":_message width" "/$word/" ":_message height" \
+    \| "/rows$nul/" "$guard" "/$word/" ":_message rows" \
+    \| "/columns$nul/" "$guard" "/$word/" ":_message columns" \
+    \| "/(r|)move$nul/" "$guard" "/$word/" ":_message x" "/$word/" ":_message y" \
+    \| "/(r|)warp$nul/" "$guard" "/$word/" ":_message x" "/$word/" ":_message y" \
+    \| "/colormap$nul/" "$guard" "/$word/" ":_x_colormapid" \
+    \| "/(name|label)$nul/" "$guard" "/$word/" ":_x_name" \
+    \| "/iconname$nul/" "$guard" "/$word/" ":_x_name" \
+    \| "/bitmap$nul/" "$guard" "/$word/" ":_files -g \\*.xbm" \
+    \| "/mask$nul/" "$guard" "/$word/" ":_files -g \\*.xbm" \
+    \| "/iconmove$nul/" "$guard" "/$word/" ":_message x" "/$word/" ":_message y" \
+    \| "/id$nul/" "$guard" "/$word/" ":_x_window" \
+    \| "/(no|)keyrepeat$nul/" "$guard" \
+        \( "/[0-9]##$nul/" ":_message keycode" \
+	  \( "/-$nul/" "/[0-9]##$nul/" ":_message 'last keycode'" \| \) \) \# \
+    \| "/names$nul/" "$guard" "/$word/" ":_x_window -n" \# \
+    \| "/[]/" ':_xwit_compopts' \
+    \) \
+  \) \#
+
+_xwit () {
+  typeset -A no eo
+
+  no=(
+    -display 1
+    -sync 1
+    -pop 1 -open 0
+    -iconify 1
+    -unmap 1
+    -root 1
+    -current 1
+    -select 1
+    -save 1
+    -backingstore 1
+    -saveunder 1
+    -nosave 1
+    -nobackingstore 1
+    -nosaveunder 1
+    -resize 1
+    -rows 1
+    -columns 1
+    -move 1
+    -rmove 1
+    -warp 1
+    -rwarp 1
+    -colormap 1
+    -name 1 -label 0
+    -iconname 1
+    -bitmap 1
+    -mask 1
+    -iconmove 1
+    -id 1
+    -keyrepeat 1
+    -nokeyrepeat 1
+    -names 1
+  )
+
+  eo=(
+    -root    '-root -current -select -id -names'
+    -current '-root -current -select -id -names'
+    -select  '-root -current -select -id -names'
+    -id      '-root -current -select -id -names'
+    -names   '-root -current -select -id -names'
+  )
+
+  _xwit_parse
+}
+
+[[ -o kshautoload ]] || _xwit "$@"
