@@ -2006,6 +2006,11 @@ bin_typeset(char *name, char **argv, char *ops, int func)
 	    zerrnam(name, "can't tie a variable to itself", NULL, 0);
 	    return 1;
 	}
+	if (strchr(asg0.name, '[') || strchr(asg->name, '[')) {
+	    unqueue_signals();
+	    zerrnam(name, "can't tie array elements", NULL, 0);
+	    return 1;
+	}
 	/*
 	 * Keep the old value of the scalar.  We need to do this
 	 * here as if it is already tied to the same array it
