@@ -1,5 +1,10 @@
 2002-06-07  Peter Stephenson  <pws@csr.com>
 
+	* 17304: Src/Zle/zle_main.c, Doc/Zsh/zle.yo: (suggested by Bart)
+	tweak the tweaked tweak in 17301 so that zle -I returns status
+	0 if zle display was successfully invalidated even if by a
+	previous cal to zle -I (user doesn't care). 
+
 	* 17299: Src/builtin.c, Src/exec.c, Src/init.c, Src/parse.c,
 	Src/text.c, Src/zsh.h: Instead of freeing Eprogs in one go
 	at the top level, use reference counts.
