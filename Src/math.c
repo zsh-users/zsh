@@ -186,6 +186,68 @@ static int type[TOKCOUNT] =
 /* 50 */  LR|OP_OPF, RL|OP_E2, LR|OP_OPF
 };
 
+static int
+lexconstant(void)
+{
+#ifdef USE_LOCALE
+    char *prev_locale;
+#endif
+    char *nptr;
+
+    nptr = ptr;
+    if (*nptr == '-')
+	nptr++;
+
+    if (*nptr == '0')
+    {
+	nptr++;
+	if (*nptr == 'x' || *nptr == 'X') {
+	    /* Let zstrtol parse number with base */
+	    yyval.u.l = zstrtol(ptr, &ptr, 0);
+	    /* Should we set lastbase here? */
+	    lastbase = 16;
+	    return NUM;
+	}
+	else if (isset(OCTALZEROES) &&
+		 (memchr(nptr, '.', strlen(nptr)) == NULL) &&
+		 idigit(*nptr)) {
+	    yyval.u.l = zstrtol(ptr, &ptr, 0);
+	    lastbase = 8;
+	    return NUM;
+	}
+    }
+
+    while (idigit(*nptr))
+	nptr++;
+
+    if (*nptr == '.' || *nptr == 'e' || *nptr == 'E') {
+	/* it's a float */
+	yyval.type = MN_FLOAT;
+#ifdef USE_LOCALE
+	prev_locale = dupstring(setlocale(LC_NUMERIC, NULL));
+	setlocale(LC_NUMERIC, "POSIX");
+#endif
+	yyval.u.d = strtod(ptr, &nptr);
+#ifdef USE_LOCALE
+	if (prev_locale) setlocale(LC_NUMERIC, prev_locale);
+#endif
+	if (ptr == nptr || *nptr == '.') {
+	    zerr("bad floating point constant", NULL, 0);
+	    return EOI;
+	}
+	ptr = nptr;
+    } else {
+	/* it's an integer */
+	yyval.u.l = zstrtol(ptr, &ptr, 10);
+
+	if (*ptr == '#') {
+	    ptr++;
+	    yyval.u.l = zstrtol(ptr, &ptr, lastbase = yyval.u.l);
+	}
+    }
+    return NUM;
+}
+
 /**/
 int outputradix;
 
@@ -193,9 +255,6 @@ int outputradix;
 static int
 zzlex(void)
 {
-#ifdef USE_LOCALE
-    char *prev_locale;
-#endif
     int cct = 0;
     yyval.type = MN_INTEGER;
 
@@ -220,7 +279,14 @@ zzlex(void)
 		ptr++;
 		return MINUSEQ;
 	    }
-	    return (unary) ? UMINUS : MINUS;
+	    if (unary) {
+		if (idigit(*ptr) || *ptr == '.') {
+		    ptr--;
+		    return lexconstant();
+		} else
+		    return UMINUS;
+	    } else
+		return MINUS;
 	case '(':
 	    return M_INPAR;
 	case ')':
@@ -376,52 +442,10 @@ zzlex(void)
 	case '\t':
 	case '\n':
 	    break;
-	case '0':
-	    if (*ptr == 'x' || *ptr == 'X') {
-		ptr++;
-		/* Should we set lastbase here? */
-		yyval.u.l = zstrtol(ptr, &ptr, lastbase = 16);
-		return NUM;
-	    }
-	    else if (isset(OCTALZEROES) &&
-		    (memchr(ptr, '.', strlen(ptr)) == NULL) &&
-		     idigit(*ptr)) {
-	        yyval.u.l = zstrtol(ptr, &ptr, lastbase = 8);
-		return NUM;
-	    }
 	/* Fall through! */
 	default:
-	    if (idigit(*--ptr) || *ptr == '.') {
-		char *nptr;
-		for (nptr = ptr; idigit(*nptr); nptr++);
-
-		if (*nptr == '.' || *nptr == 'e' || *nptr == 'E') {
-		    /* it's a float */
-		    yyval.type = MN_FLOAT;
-#ifdef USE_LOCALE
-		    prev_locale = dupstring(setlocale(LC_NUMERIC, NULL));
-		    setlocale(LC_NUMERIC, "POSIX");
-#endif
-		    yyval.u.d = strtod(ptr, &nptr);
-#ifdef USE_LOCALE
-		    if (prev_locale) setlocale(LC_NUMERIC, prev_locale);
-#endif
-		    if (ptr == nptr || *nptr == '.') {
-			zerr("bad floating point constant", NULL, 0);
-			return EOI;
-		    }
-		    ptr = nptr;
-		} else {
-		    /* it's an integer */
-		    yyval.u.l = zstrtol(ptr, &ptr, 10);
-
-		    if (*ptr == '#') {
-			ptr++;
-			yyval.u.l = zstrtol(ptr, &ptr, lastbase = yyval.u.l);
-		    }
-		}
-		return NUM;
-	    }
+	    if (idigit(*--ptr) || *ptr == '.')
+		return lexconstant();
 	    if (*ptr == '#') {
 		if (*++ptr == '\\' || *ptr == '#') {
 		    int v;

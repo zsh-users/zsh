@@ -163,13 +163,15 @@ promptexpand(char *s, int ns, char *rs, char *Rs)
 
     if (isset(PROMPTSUBST)) {
 	int olderr = errflag;
+	int oldval = lastval;
 
 	s = dupstring(s);
 	if (!parsestr(s))
 	    singsub(&s);
 
-	/* Ignore errors in prompt substitution */
+	/* Ignore errors and status change in prompt substitution */
 	errflag = olderr;
+	lastval = oldval;
     }
 
     rstring = rs;

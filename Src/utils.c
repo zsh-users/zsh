@@ -1261,7 +1261,8 @@ skipparens(char inpar, char outpar, char **s)
 mod_export zlong
 zstrtol(const char *s, char **t, int base)
 {
-    zlong ret = 0;
+    const char *inp, *trunc = NULL;
+    zulong calc = 0, newcalc = 0;
     int neg;
 
     while (inblank(*s))
@@ -1280,16 +1281,54 @@ zstrtol(const char *s, char **t, int base)
 	else
 	    base = 8;
     }
+    inp = s;
     if (base <= 10)
-	for (; *s >= '0' && *s < ('0' + base); s++)
-	    ret = ret * base + *s - '0';
+	for (; *s >= '0' && *s < ('0' + base); s++) {
+	    if (trunc)
+		continue;
+	    newcalc = calc * base + *s - '0';
+	    if (newcalc < calc)
+	    {
+	      trunc = s;
+	      continue;
+	    }
+	    calc = newcalc;
+	}
     else
 	for (; idigit(*s) || (*s >= 'a' && *s < ('a' + base - 10))
-	     || (*s >= 'A' && *s < ('A' + base - 10)); s++)
-	    ret = ret * base + (idigit(*s) ? (*s - '0') : (*s & 0x1f) + 9);
+	     || (*s >= 'A' && *s < ('A' + base - 10)); s++) {
+	    if (trunc)
+		continue;
+	    newcalc = calc*base + (idigit(*s) ? (*s - '0') : (*s & 0x1f) + 9);
+	    if (newcalc < calc)
+	    {
+		trunc = s;
+		continue;
+	    }
+	    calc = newcalc;
+	}
+
+    /*
+     * Special case: check for a number that was just too long for
+     * signed notation.
+     * Extra special case: the lowest negative number would trigger
+     * the first test, but is actually representable correctly.
+     * This is a 1 in the top bit, all others zero, so test for
+     * that explicitly.
+     */
+    if (!trunc && (zlong)calc < 0 &&
+	(!neg || calc & ~((zulong)1 << (8*sizeof(zulong)-1))))
+    {
+	trunc = s - 1;
+	calc /= base;
+    }
+
+    if (trunc)
+	zwarn("number truncated after %d digits: %s", inp, trunc - inp);
+
     if (t)
 	*t = (char *)s;
-    return neg ? -ret : ret;
+    return neg ? -(zlong)calc : (zlong)calc;
 }
 
 /**/

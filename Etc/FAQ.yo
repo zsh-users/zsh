@@ -43,20 +43,14 @@ whenlatex(report(ARG1)(ARG2)(ARG3))\
 whenman(report(ARG1)(ARG2)(ARG3))\
 whenms(report(ARG1)(ARG2)(ARG3))\
 whensgml(report(ARG1)(ARG2)(ARG3)))
-myreport(Z-Shell Frequently-Asked Questions)(Peter Stephenson)(2001/06/25)
+myreport(Z-Shell Frequently-Asked Questions)(Peter Stephenson)(2004/08/13)
 COMMENT(-- the following are for Usenet and must appear first)\
 description(\
 mydit(Archive-Name:) unix-faq/shell/zsh
-mydit(Last-Modified:) 2001/06/25
+mydit(Last-Modified:) 2001/08/13
 mydit(Submitted-By:) email(pws@pwstephenson.fsnet.co.uk (Peter Stephenson))
 mydit(Posting-Frequency:) Monthly
-mydit(Copyright:) (C) P.W. Stephenson, 1995--2001 (see end of document)
-)
-
-bf(Changes since last issue posted:)
-description(
-  mydit(1.6)  4.0.2 nearly released.
-  mydit(3.1)  typeset splitting incompatibility and tt(KSH_TYPESET) option
+mydit(Copyright:) (C) P.W. Stephenson, 1995--2004 (see end of document)
 )
 
 This document contains a list of frequently-asked (or otherwise
@@ -299,23 +293,12 @@ sect(On what machines will it run?)
 
 sect(What's the latest version?)
 
-  Zsh 4.0.2 is the latest production version.
+  Zsh 4.2.1 is the latest production version.
 
-  Zsh 3.0.8 was the previous production version.  The major number 3.0
-  largely reflected considerable internal changes in zsh to make it more
-  reliable, consistent and (where possible) compatible.  Those planning on
-  upgrading their zsh installation should take a look at the list of
-  incompatibilities at the end of link(5.1)(51).  This is longer than usual
-  due to enhanced sh, ksh and POSIX compatibility.
+  There will not be any further 4.0 releases now that 4.2 has become
+  the stable version.
 
-  There will not be any further 3.0 releases now that 4.0 has become
-  the stable version.  However, a few patches to 3.0.8 are available from
-  the patch manager at Sourceforge, \
-url(http://sourceforge.net/patch/?group_id=4068)\
-(http://www.sourceforge.net/patch/?group_id=4068)
-  Official patches are posted by Bart Schaefer (user name tt(barts)).
-
-  A beta of the next version is often available.  Development of zsh is
+  A beta of the next version is sometimes available.  Development of zsh is
   patch by patch, with each intermediate version publicly available.  Note
   that this `open' development system does mean bugs are sometimes
   introduced into the most recent archived version.  These are usually
@@ -416,7 +399,7 @@ url(http://www.math.technion.ac.il/pub/zsh/)
 (ftp://ftp.blarg.net/users/amol/zsh)  
   )
 
-  There is no port of 4.0 for Windows, but newer releases compile under
+  There is no port of version 4 for Windows, but newer releases compile under
   Cygwin, a freely available UNIX-style environment for the Win32 API.  You
   can find information about this at 
   url(http://sourceware.cygnus.com/cygwin)\
@@ -543,7 +526,7 @@ label(21)
      effect of single-letter option flags as if the shell had been
      invoked with the appropriate name.  Including the command
      `emulate sh; setopt localoptions' in a shell function will
-     turn on sh emulation for that function only.  In 4.0 (and in
+     turn on sh emulation for that function only.  In version 4 (and in
      3.0.6 through 8), this can be abbreviated as `emulate -L sh'.
    )
 
@@ -887,8 +870,8 @@ mytt(compctl)
   verb(
     bindkey '\eq' push-input
   )
-  to save the entire buffer.  In 4.0 and recent versions of zsh 3.1, you
-  have the following more sophisticated option,
+  to save the entire buffer.  In version 4 and recent versions of zsh 3.1,
+  you have the following more sophisticated option,
   verb(
     run-fg-editor() {
       zle push-input

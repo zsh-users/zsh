@@ -895,7 +895,8 @@ pindex(PROMPT_SUBST)
 cindex(prompt, parameter expansion)
 item(tt(PROMPT_SUBST) <K>)(
 If set, em(parameter expansion), em(command substitution) and
-em(arithmetic expansion) are performed in prompts.
+em(arithmetic expansion) are performed in prompts.  Substitutions
+within prompts do not affect the command status.
 )
 pindex(TRANSIENT_RPROMPT)
 item(tt(TRANSIENT_RPROMPT))(
