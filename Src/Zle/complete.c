@@ -221,7 +221,7 @@ parse_cmatcher(char *name, char *s)
 	    if (err)
 		return pcm_err;
 
-	    if ((both = (*s == '|')))
+	    if ((both = (*s && s[1] == '|')))
 		s++;
 
 	    if (!*s || !*++s) {

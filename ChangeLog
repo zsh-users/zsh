@@ -1,5 +1,8 @@
 2000-04-27  Sven Wischnowsky  <wischnow@informatik.hu-berlin.de>
 
+	* 10963: Src/Zle/complete.c: fix for parse error with
+ 	left-anchored patterns
+	
 	* 10961: Src/Zle/complist.c: make menu-selection handle
  	undefined-key
 	
