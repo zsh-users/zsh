@@ -1,0 +1,9 @@
+#compdef xrdb
+
+_arguments \
+  -{help,all,global,screen,screens,n,quiet,nocpp,symbols,query,load,merge,remove,retain} \
+  '-display:display:_x_display' \
+  '-cpp:preprocessor program:_files -g \*\(-\*\)' \
+  '-edit:file to insert:_files' \
+  '-backup:suffix for backup: ' \
+  '*:defaults file:_files'
