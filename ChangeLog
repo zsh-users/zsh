@@ -1,3 +1,8 @@
+2001-09-30  Clint Adams  <clint@zsh.org>
+
+        * 15915: Completion/Debian/Command/_bts:
+        completion for bts script in devscripts.
+
 2001-09-25  Sven Wischnowsky  <wischnow@zsh.org>
 
 	* 15868, 15869: Src/text.c: job text building code couldn't handle
