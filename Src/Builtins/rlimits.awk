@@ -45,6 +45,8 @@ BEGIN {limidx = 0}
 	    if (limnam == "STACK")   { msg[limnum] = "Mstacksize" }
 	    if (limnam == "TCACHE")  { msg[limnum] = "Ncachedthreads" }
 	    if (limnam == "VMEM")    { msg[limnum] = "Mvmemorysize" }
+	    if (limnam == "SIGPENDING") { msg[limnum] = "Nsigpending" }
+	    if (limnam == "MSGQUEUE") { msg[limnum] = "Nmsgqueue" }
         }
     }
 }

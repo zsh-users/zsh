@@ -208,13 +208,9 @@ printulimit(char *nam, int lim, int hard, int head)
 	limit = (hard) ? limits[lim].rlim_max : limits[lim].rlim_cur;
     /* display the appropriate heading */
     switch (lim) {
-    case RLIMIT_CPU:
+    case RLIMIT_CORE:
 	if (head)
-	    printf("-t: cpu time (seconds)         ");
-	break;
-    case RLIMIT_FSIZE:
-	if (head)
-	    printf("-f: file size (blocks)         ");
+	    printf("-c: core file size (blocks)    ");
 	if (limit != RLIM_INFINITY)
 	    limit /= 512;
 	break;
@@ -224,18 +220,26 @@ printulimit(char *nam, int lim, int hard, int head)
 	if (limit != RLIM_INFINITY)
 	    limit /= 1024;
 	break;
-    case RLIMIT_STACK:
+    case RLIMIT_FSIZE:
 	if (head)
-	    printf("-s: stack size (kbytes)        ");
-	if (limit != RLIM_INFINITY)
-	    limit /= 1024;
-	break;
-    case RLIMIT_CORE:
-	if (head)
-	    printf("-c: core file size (blocks)    ");
+	    printf("-f: file size (blocks)         ");
 	if (limit != RLIM_INFINITY)
 	    limit /= 512;
 	break;
+# ifdef HAVE_RLIMIT_SIGPENDING
+    case RLIMIT_SIGPENDING:
+	if (head)
+	    printf("-i: pending signals            ");
+	break;
+# endif
+# ifdef HAVE_RLIMIT_MEMLOCK
+    case RLIMIT_MEMLOCK:
+	if (head)
+	    printf("-l: locked-in-memory size (kb) ");
+	if (limit != RLIM_INFINITY)
+	    limit /= 1024;
+	break;
+# endif /* HAVE_RLIMIT_MEMLOCK */
 /* If RLIMIT_VMEM and RLIMIT_RSS are defined and equal, avoid *
  * duplicate case statement.  Observed on QNX Neutrino 6.1.0. */
 # if defined(HAVE_RLIMIT_RSS) && !defined(RLIMIT_VMEM_IS_RSS)
@@ -246,34 +250,46 @@ printulimit(char *nam, int lim, int hard, int head)
 	    limit /= 1024;
 	break;
 # endif /* HAVE_RLIMIT_RSS */
-# ifdef HAVE_RLIMIT_MEMLOCK
-    case RLIMIT_MEMLOCK:
+# if defined(HAVE_RLIMIT_VMEM) && defined(HAVE_RLIMIT_RSS) && defined(RLIMIT_VMEM_IS_RSS)
+    case RLIMIT_VMEM:
 	if (head)
-	    printf("-l: locked-in-memory size (kb) ");
+	    printf("-m: memory size (kb)           ");
 	if (limit != RLIM_INFINITY)
 	    limit /= 1024;
 	break;
-# endif /* HAVE_RLIMIT_MEMLOCK */
-# ifdef HAVE_RLIMIT_NPROC
-    case RLIMIT_NPROC:
-	if (head)
-	    printf("-u: processes                  ");
-	break;
-# endif /* HAVE_RLIMIT_NPROC */
+# endif /* HAVE_RLIMIT_VMEM */
 # ifdef HAVE_RLIMIT_NOFILE
     case RLIMIT_NOFILE:
 	if (head)
 	    printf("-n: file descriptors           ");
 	break;
 # endif /* HAVE_RLIMIT_NOFILE */
-# ifdef HAVE_RLIMIT_VMEM
+# ifdef HAVE_RLIMIT_MSGQUEUE
+    case RLIMIT_MSGQUEUE:
+	if (head)
+	    printf("-q: bytes in POSIX msg queues  ");
+	break;
+# endif
+    case RLIMIT_STACK:
+	if (head)
+	    printf("-s: stack size (kbytes)        ");
+	if (limit != RLIM_INFINITY)
+	    limit /= 1024;
+	break;
+    case RLIMIT_CPU:
+	if (head)
+	    printf("-t: cpu time (seconds)         ");
+	break;
+# ifdef HAVE_RLIMIT_NPROC
+    case RLIMIT_NPROC:
+	if (head)
+	    printf("-u: processes                  ");
+	break;
+# endif /* HAVE_RLIMIT_NPROC */
+# if defined(HAVE_RLIMIT_VMEM) && (!defined(HAVE_RLIMIT_RSS) || !defined(RLIMIT_VMEM_IS_RSS))
     case RLIMIT_VMEM:
 	if (head)
-#  if defined(HAVE_RLIMIT_RSS) && defined(RLIMIT_VMEM_IS_RSS)
-	    printf("-m: memory size (kb)           ");
-#  else
 	    printf("-v: virtual memory size (kb)   ");
-#  endif
 	if (limit != RLIM_INFINITY)
 	    limit /= 1024;
 	break;
@@ -286,18 +302,12 @@ printulimit(char *nam, int lim, int hard, int head)
 	    limit /= 1024;
 	break;
 # endif /* HAVE_RLIMIT_AS */
-# ifdef HAVE_RLIMIT_TCACHE
-    case RLIMIT_TCACHE:
+# ifdef HAVE_RLIMIT_LOCKS
+    case RLIMIT_LOCKS:
 	if (head)
-	    printf("-N %2d: cached threads          ", RLIMIT_TCACHE);
+	    printf("-x: file locks                 ");
 	break;
-# endif /* HAVE_RLIMIT_TCACHE */
-# ifdef HAVE_RLIMIT_AIO_OPS
-    case RLIMIT_AIO_OPS:
-	if (head)
-	    printf("-N %2d: AIO operations          ", RLIMIT_AIO_OPS);
-	break;
-# endif /* HAVE_RLIMIT_AIO_OPS */
+# endif /* HAVE_RLIMIT_LOCKS */
 # ifdef HAVE_RLIMIT_AIO_MEM
     case RLIMIT_AIO_MEM:
 	if (head)
@@ -306,6 +316,18 @@ printulimit(char *nam, int lim, int hard, int head)
 	    limit /= 1024;
 	break;
 # endif /* HAVE_RLIMIT_AIO_MEM */
+# ifdef HAVE_RLIMIT_AIO_OPS
+    case RLIMIT_AIO_OPS:
+	if (head)
+	    printf("-N %2d: AIO operations          ", RLIMIT_AIO_OPS);
+	break;
+# endif /* HAVE_RLIMIT_AIO_OPS */
+# ifdef HAVE_RLIMIT_TCACHE
+    case RLIMIT_TCACHE:
+	if (head)
+	    printf("-N %2d: cached threads          ", RLIMIT_TCACHE);
+	break;
+# endif /* HAVE_RLIMIT_TCACHE */
 # ifdef HAVE_RLIMIT_SBSIZE
     case RLIMIT_SBSIZE:
 	if (head)
@@ -320,12 +342,6 @@ printulimit(char *nam, int lim, int hard, int head)
 	    printf("-N %2d: threads per process     ", RLIMIT_PTHREAD);
 	break;
 # endif /* HAVE_RLIMIT_PTHREAD */
-# ifdef HAVE_RLIMIT_LOCKS
-    case RLIMIT_LOCKS:
-	if (head)
-	    printf("-N %2d: file locks              ", RLIMIT_LOCKS);
-	break;
-# endif /* HAVE_RLIMIT_LOCKS */
     default:
 	if (head)
 	    printf("-N %2d:                         ", lim);
@@ -745,6 +761,21 @@ bin_ulimit(char *name, char **argv, UNUSED(Options ops), UNUSED(int func))
 #  endif
 		    break;
 # endif /* HAVE_RLIMIT_VMEM */
+# ifdef HAVE_RLIMIT_LOCKS
+		case 'x':
+		    res = RLIMIT_LOCKS;
+		    break;
+# endif
+# ifdef HAVE_RLIMIT_SIGPENDING
+		case 'i':
+		    res = RLIMIT_SIGPENDING;
+		    break;
+# endif
+# ifdef HAVE_RLIMIT_MSGQUEUE
+		case 'q':
+		    res = RLIMIT_MSGQUEUE;
+		    break;
+# endif
 		default:
 		    /* unrecognised limit */
 		    zwarnnam(name, "bad option: -%c", NULL, *options);

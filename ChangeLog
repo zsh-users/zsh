@@ -1,3 +1,10 @@
+2005-01-19  Peter Stephenson  <pws@csr.com>
+
+	* 20728 (with typo fixed): configure.ac, Doc/Zsh/builtins.yo,
+	Src/Builtins/rlimits.awk, Src/Builtins/rlimits.c: Handle
+	RLIMIT_MSGQUEUE (-q), RLIMIT_SIGPENDING (-i), also use
+	-x for RLIMIT_LOCKS in ulimit.
+
 2005-01-17  Peter Stephenson  <pws@csr.com>
 
 	* unposted: suggested by Bart: Etc/FAQ.yo: update a few entries.
