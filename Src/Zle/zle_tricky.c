@@ -2739,7 +2739,7 @@ comp_match(char *pfx, char *sfx, char *w, Patprog cp,
 			   mpl - rpl, 0);
 	    pli = matchparts;
 	}
-	r = dupstring(matchbuf);
+	r = dupstring(matchbuf ? matchbuf : "");
 
 	*clp = pli;
 
@@ -7133,7 +7133,8 @@ permmatches(void)
 				   ((g->flags & CGF_NOSORT) ? 0 : 2),
 				   &nn, &nl);
 	    g->mcount = nn;
-	    g->lcount = nn - nl;
+	    if ((g->lcount = nn - nl) < 0)
+		g->lcount = 0;
 	    if (g->ylist) {
 		g->lcount = arrlen(g->ylist);
 		smatches = 2;
