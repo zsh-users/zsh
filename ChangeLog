@@ -1,3 +1,8 @@
+2001-08-09  Oliver Kiddle  <opk@zsh.org>
+
+	* 15599: Completion/Unix/Command/_user_admin: detect redhat or
+	mandrake before completing redhat's extensions
+
 2001-08-06  Oliver Kiddle  <opk@zsh.org>
 
 	* 15574: Completion/Unix/Command/_cvs, Completion/Unix/Type/_users,

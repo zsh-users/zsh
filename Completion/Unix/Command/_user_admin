@@ -1,6 +1,9 @@
 #compdef useradd usermod groupadd groupmod
 
-local args shells home=${${words[(r)-D]:+b}:-d} sun=" -s"
+local args shells home=${${words[(r)-D]:+b}:-d} sun redhat
+
+[[ -e /etc/redhat-release || -e /etc/mandrake-release ]]
+redhat=$?
 
 if [[ $service = user* ]]; then
   if [[ -r /etc/shells ]]; then
@@ -17,31 +20,29 @@ if [[ $service = user* ]]; then
     '(-D)-g+[initial group]:initial group:_groups'
     '(-D)-G+[supplementary groups]:supplementary groups:_groups -S,'
     "(-D)-s+[shell]:shell:( $shells /dev/null )"
-    '(-D)-m[create home directory]'
+    '(-D -M)-m[create home directory]'
     '(-D)-u[uid]:uid'
     '(-D)-o[allow non unique uid]'
   )
   [[ $OSTYPE = linux* ]] && args=( $args[@] 
-      '(-D)-p+[specify encrypted password]:encrypted password' )
+      '(-D -U -L)-p+[specify encrypted password]:encrypted password' )
 
   if [[ $service = useradd ]]; then
-    if [[ $OSTYPE = linux* ]]; then
-      args=( $args[@]
-	"(-D -k)-M[don't create home]"
-	'(-D)-r[create system account]'
-	"(-D)-n[don't create mirrored user]"
-      )
-      unset sun
-    fi
+    (( redhat )) || args=( $args[@]
+      "(-D -k -m)-M[don't create home]"
+      '(-D)-r[create system account]'
+      "(-D)-n[don't create mirrored user]"
+    )
+    [[ $OSTYPE = linux* ]] || sun=" -s"
     args=( $args[@]
       "(-c -G -m -k -M -p -u -o -n -r$sun)-D[modify or display defaults]"
       '(-D -M)-k[skeleton home directory]:skeleton directory:_directories -W /'
       ':username'
     )
   else
-    [[ $OSTYPE = linux* ]] && args=( $args[@]
-	"(-U)-L[lock user's password]"
-	"(-L)-U[unlock user's password]"
+    (( redhat )) || args=( $args[@]
+	"(-U -p)-L[lock user's password]"
+	"(-L -p)-U[unlock user's password]"
     )
     args=( $args[@]
       '-l[specify new user name]:new username'
@@ -52,7 +53,7 @@ else
   args=( '-g+[gid]:gid' '-o[allow non unique gid]' )
   if [[ $service = groupadd ]]; then
     args=( $args[@] ':group name' )
-    [[ $OSTYPE = linux* ]] && args=( $args[@]
+    (( redhat )) || args=( $args[@]
       '-r[create system group]'
       '-f[force]'
     )
