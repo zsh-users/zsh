@@ -2,7 +2,7 @@
 
 local rep expl star approx mrd
 
-if [[ $words[1] == man ]] && (( $words[(I)-l] + $words[(I)--local-file] )); then
+if [[ $service == man ]] && (( $words[(I)-l] + $words[(I)--local-file] )); then
   _files || return 0
 fi
 

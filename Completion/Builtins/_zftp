@@ -11,7 +11,7 @@ _compskip=all
 
 local subcom expl curcontext="${curcontext}"
 
-if [[ $words[1] = zftp ]]; then
+if [[ $service = zftp ]]; then
   if [[ $CURRENT -eq 2 ]]; then
     _wanted commands expl sub-command \
         compadd open params user login type ascii binary mode put \
@@ -22,7 +22,7 @@ if [[ $words[1] = zftp ]]; then
   subcom=$words[2]
   curcontext="${curcontext/:zftp:/:zftp-${words[2]}:}"
 else
-  subcom=$words[1]
+  subcom=$service
 fi
 
 case $subcom in

@@ -13,7 +13,7 @@ fc_common=( \
   '(-A -R -W -I -e)-D[print elapsed times]' \
   '(-A -R -W -I)*::commands:_command_names -e' )
 
-if [[ $words[1] = *history ]]; then
+if [[ $service = *history ]]; then
   _arguments -C -s "$fc_common[@]"
 else
   _arguments -C -s \

@@ -1,5 +1,11 @@
 2001-02-26  Sven Wischnowsky  <wischnow@zsh.org>
 
+	* 13534: Completion/Builtins/_fc, Completion/Builtins/_hash,
+ 	Completion/Builtins/_source, Completion/Builtins/_which,
+ 	Completion/Builtins/_zftp, Completion/User/_man,
+ 	Completion/User/_nedit: change $words[1] to $service in some more
+ 	places
+	
 	* 13530: Src/hist.c: properly restore noaliases in bufferwords()
 	
 2001-02-20  Sven Wischnowsky  <wischnow@zsh.org>

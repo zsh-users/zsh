@@ -11,7 +11,7 @@ cargs=( \
 farg='-f[output contents of functions]'
 aarg='-a[print all occurences in path]'
 
-case ${words[1]} in
+case ${service} in
   whence)
     _arguments -C -s \
       '(-c -w)-v[verbose output]' \

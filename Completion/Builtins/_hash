@@ -7,7 +7,7 @@ common_args=( \
   '-d[use named directory hash table]' \
   '(-r -m -v)-f[rebuild hash table]' )
 
-case ${words[1]} in
+case ${service} in
   hash)
     _arguments -C -s \
       '(-f -m -v)-r[empty hash table]' \

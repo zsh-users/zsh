@@ -14,7 +14,7 @@ nedit_common=( \
   '*-xrm:resource:_x_resource' \
   '*:file:_files' )
 
-if [[ $words[1] = *nc ]]; then
+if [[ $service = *nc ]]; then
   _x_arguments -C \
     '(-noask)-ask[prompt if no server found]' \
     '(-ask)-noask[start a new server without asking if none found]' \
