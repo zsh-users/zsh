@@ -1,3 +1,8 @@
+2002-05-31  Clint Adams  <clint@zsh.org>
+
+	* 17266: Completion/Unix/Command/_man: check `manpath`
+	even when $MANPATH is set.
+
 2002-05-30  Peter Stephenson  <pws@csr.com>
 
 	* 17253: Src/Modules/tcp.c, Doc/Zsh/mod_tcp.c: ztcp -l provides
