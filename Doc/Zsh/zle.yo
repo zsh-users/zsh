@@ -732,6 +732,16 @@ vindex(WIDGET)
 item(tt(WIDGET) (scalar))(
 The name of the widget currently being executed; read-only.
 )
+vindex(WIDGETSTYLE)
+item(tt(WIDGET) (scalar))(
+Describes the implementation behind the widget currently being executed;
+the second argument that followed tt(zle -C) or tt(zle -N) when the widget
+was defined, if any.  If the widget was defined with tt(zle -N) and there was
+no second argument this is the same as the first argument.  Hence for
+tt(zle -N) this gives the name of the function that implements the widget,
+and for tt(zle -C) this gives the internal completion widget that defines
+the type of completion.  Read-only.
+)
 enditem()
 
 subsect(Special Widget)

@@ -1,3 +1,13 @@
+2004-09-09  Peter Stephenson  <pws@csr.com>
+
+	* 20332: Src/Zle/zle_params.c, Doc/Zsh/zle.yo: add WIDGETSTYLE zle
+	parameter to reveal widget implementation: function name for zle
+	-N widgets and internal completion widget for zle -C widgets.
+
+	* 20331: Src/builtin.c, Src/hist.c, Src/params.c, Src/prompt.c,
+	Src/zsh.h, Src/Zle/compctl.c: Where possible use internal zlong
+	variables for integers that correspond to shell variables.
+
 2004-09-08  Peter Stephenson  <pws@csr.com>
 
 	* 20330: Src/Zle/zle_thingy.c, Doc/Zsh/zle.yo: rationalise status

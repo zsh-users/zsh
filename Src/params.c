@@ -2493,7 +2493,7 @@ nullintsetfn(UNUSED(Param pm), UNUSED(zlong x))
 mod_export zlong
 intvargetfn(Param pm)
 {
-    return *((zlong *)pm->u.data);
+    return *pm->u.valptr;
 }
 
 /* Function to set value of generic special integer *
@@ -2504,7 +2504,7 @@ intvargetfn(Param pm)
 mod_export void
 intvarsetfn(Param pm, zlong x)
 {
-    *((zlong *)pm->u.data) = x;
+    *pm->u.valptr = x;
 }
 
 /* Function to set value of any ZLE-related integer *
@@ -2515,7 +2515,7 @@ intvarsetfn(Param pm, zlong x)
 void
 zlevarsetfn(Param pm, zlong x)
 {
-    zlong *p = (zlong *)pm->u.data;
+    zlong *p = pm->u.valptr;
 
     *p = x;
     if (p == &lines || p == &columns)
@@ -2745,7 +2745,13 @@ randomsetfn(UNUSED(Param pm), zlong v)
 zlong
 intsecondsgetfn(Param pm)
 {
-    return (zlong)floatsecondsgetfn(pm);
+    struct timeval now;
+    struct timezone dummy_tz;
+
+    gettimeofday(&now, &dummy_tz);
+
+    return (zlong)(now.tv_sec - shtimer.tv_sec) +
+	(zlong)(now.tv_usec - shtimer.tv_usec) / (zlong)1000000;
 }
 
 /* Function to set value of special parameter `SECONDS' */
@@ -2754,7 +2760,16 @@ intsecondsgetfn(Param pm)
 void
 intsecondssetfn(Param pm, zlong x)
 {
-    floatsecondssetfn(pm, (double)x);
+    struct timeval now;
+    struct timezone dummy_tz;
+    zlong diff;
+
+    gettimeofday(&now, &dummy_tz);
+    diff = (zlong)now.tv_sec - x;
+    shtimer.tv_sec = diff;
+    if ((zlong)shtimer.tv_sec != diff)
+	zwarn("SECONDS truncated on assignment", NULL, 0);
+    shtimer.tv_usec = 0;
 }
 
 /**/
@@ -3090,6 +3105,8 @@ void
 errnosetfn(UNUSED(Param pm), zlong x)
 {
     errno = (int)x;
+    if ((zlong)errno != x)
+	zwarn("errno truncated on assignment", NULL, 0);
 }
 
 /* Function to get value for special parameter `ERRNO' */

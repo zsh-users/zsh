@@ -55,43 +55,45 @@ static struct zleparam {
 } zleparams[] = {
     { "BUFFER",  PM_SCALAR,  FN(set_buffer),  FN(get_buffer),
 	zleunsetfn, NULL },
+    { "BUFFERLINES", PM_INTEGER | PM_READONLY, NULL, FN(get_bufferlines),
+        zleunsetfn, NULL },
+    { "CONTEXT", PM_SCALAR | PM_READONLY, NULL, FN(get_context),
+	zleunsetfn, NULL },
     { "CURSOR",  PM_INTEGER, FN(set_cursor),  FN(get_cursor),
 	zleunsetfn, NULL },
-    { "MARK",  PM_INTEGER, FN(set_mark),  FN(get_mark),
-	zleunsetfn, NULL },
-    { "LBUFFER", PM_SCALAR,  FN(set_lbuffer), FN(get_lbuffer),
-	zleunsetfn, NULL },
-    { "RBUFFER", PM_SCALAR,  FN(set_rbuffer), FN(get_rbuffer),
-	zleunsetfn, NULL },
-    { "PREBUFFER",  PM_SCALAR | PM_READONLY,  NULL,  FN(get_prebuffer),
-	zleunsetfn, NULL },
-    { "WIDGET", PM_SCALAR | PM_READONLY, NULL, FN(get_widget),
-        zleunsetfn, NULL },
-    { "LASTWIDGET", PM_SCALAR | PM_READONLY, NULL, FN(get_lwidget),
+    { "CUTBUFFER", PM_SCALAR, FN(set_cutbuffer), FN(get_cutbuffer),
+	unset_cutbuffer, NULL },
+    { "HISTNO", PM_INTEGER, FN(set_histno), FN(get_histno),
         zleunsetfn, NULL },
     { "KEYMAP", PM_SCALAR | PM_READONLY, NULL, FN(get_keymap),
         zleunsetfn, NULL },
     { "KEYS", PM_SCALAR | PM_READONLY, NULL, FN(get_keys),
         zleunsetfn, NULL },
-    { "NUMERIC", PM_INTEGER | PM_UNSET, FN(set_numeric), FN(get_numeric),
-        unset_numeric, NULL },
-    { "HISTNO", PM_INTEGER, FN(set_histno), FN(get_histno),
-        zleunsetfn, NULL },
-    { "BUFFERLINES", PM_INTEGER | PM_READONLY, NULL, FN(get_bufferlines),
-        zleunsetfn, NULL },
-    { "PENDING", PM_INTEGER | PM_READONLY, NULL, FN(get_pending),
-        zleunsetfn, NULL },
-    { "CUTBUFFER", PM_SCALAR, FN(set_cutbuffer), FN(get_cutbuffer),
-	unset_cutbuffer, NULL },
     { "killring", PM_ARRAY, FN(set_killring), FN(get_killring),
 	unset_killring, NULL },
-    { "PREDISPLAY", PM_SCALAR, FN(set_predisplay), FN(get_predisplay),
-	zleunsetfn, NULL },
-    { "POSTDISPLAY", PM_SCALAR, FN(set_postdisplay), FN(get_postdisplay),
-	zleunsetfn, NULL },
     { "LASTSEARCH", PM_SCALAR | PM_READONLY, NULL, FN(get_lsearch),
         zleunsetfn, NULL },
-    { "CONTEXT", PM_SCALAR | PM_READONLY, NULL, FN(get_context),
+    { "LASTWIDGET", PM_SCALAR | PM_READONLY, NULL, FN(get_lwidget),
+        zleunsetfn, NULL },
+    { "LBUFFER", PM_SCALAR,  FN(set_lbuffer), FN(get_lbuffer),
+	zleunsetfn, NULL },
+    { "MARK",  PM_INTEGER, FN(set_mark),  FN(get_mark),
+	zleunsetfn, NULL },
+    { "NUMERIC", PM_INTEGER | PM_UNSET, FN(set_numeric), FN(get_numeric),
+        unset_numeric, NULL },
+    { "PENDING", PM_INTEGER | PM_READONLY, NULL, FN(get_pending),
+        zleunsetfn, NULL },
+    { "POSTDISPLAY", PM_SCALAR, FN(set_postdisplay), FN(get_postdisplay),
+	zleunsetfn, NULL },
+    { "PREBUFFER",  PM_SCALAR | PM_READONLY,  NULL,  FN(get_prebuffer),
+	zleunsetfn, NULL },
+    { "PREDISPLAY", PM_SCALAR, FN(set_predisplay), FN(get_predisplay),
+	zleunsetfn, NULL },
+    { "RBUFFER", PM_SCALAR,  FN(set_rbuffer), FN(get_rbuffer),
+	zleunsetfn, NULL },
+    { "WIDGET", PM_SCALAR | PM_READONLY, NULL, FN(get_widget),
+        zleunsetfn, NULL },
+    { "WIDGETSTYLE", PM_SCALAR | PM_READONLY, NULL, FN(get_widgetstyle),
 	zleunsetfn, NULL },
     { NULL, 0, NULL, NULL, NULL, NULL }
 };
@@ -276,6 +278,21 @@ static char *
 get_widget(UNUSED(Param pm))
 {
     return bindk->nam;
+}
+
+/**/
+static char *
+get_widgetstyle(UNUSED(Param pm))
+{
+    Widget widget = bindk->widget;
+    int flags = widget->flags;
+
+    if (flags & WIDGET_INT)
+	return ".internal";	/* Don't see how this can ever be returned... */
+    else if (flags & WIDGET_NCOMP)
+	return widget->u.comp.wid;
+    else
+	return widget->u.fnnam;
 }
 
 /**/

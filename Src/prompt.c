@@ -384,7 +384,7 @@ putpromptchar(int doprint, int endchar)
 	    case 'h':
 	    case '!':
 		addbufspc(DIGBUFSIZE);
-		sprintf(bp, "%d", curhist);
+		convbase(bp, curhist, 10);
 		bp += strlen(bp);
 		break;
 	    case 'j':
@@ -676,7 +676,7 @@ putpromptchar(int doprint, int endchar)
 		    pputc('!');
 		} else {
 		    addbufspc(DIGBUFSIZE);
-		    sprintf(bp, "%d", curhist);
+		    convbase(bp, curhist, 10);
 		    bp += strlen(bp);
 		}
 	    }

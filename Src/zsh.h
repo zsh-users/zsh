@@ -1129,6 +1129,7 @@ struct param {
 	char **arr;		/* value if declared array   (PM_ARRAY)   */
 	char *str;		/* value if declared string  (PM_SCALAR)  */
 	zlong val;		/* value if declared integer (PM_INTEGER) */
+	zlong *valptr;		/* value if special pointer to integer */
 	double dval;		/* value if declared float
 				                    (PM_EFLOAT|PM_FFLOAT) */
         HashTable hash;		/* value if declared assoc   (PM_HASHED)  */
@@ -1334,7 +1335,7 @@ struct histent {
     short *words;		/* Position of words in history     */
 				/*   line:  as pairs of start, end  */
     int nwords;			/* Number of words in history line  */
-    int histnum;		/* A sequential history number      */
+    zlong histnum;		/* A sequential history number      */
 };
 
 #define HIST_MAKEUNIQUE	0x00000001	/* Kill this new entry if not unique */

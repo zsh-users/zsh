@@ -1293,7 +1293,8 @@ printif(char *str, int c)
 int
 bin_fc(char *nam, char **argv, Options ops, int func)
 {
-    int first = -1, last = -1, retval;
+    zlong first = -1, last = -1;
+    int retval;
     char *s;
     struct asgment *asgf = NULL, *asgl = NULL;
     Patprog pprog = NULL;
@@ -1305,15 +1306,15 @@ bin_fc(char *nam, char **argv, Options ops, int func)
     }
     if (OPT_ISSET(ops,'p')) {
 	char *hf = "";
-	int hs = DEFAULT_HISTSIZE;
-	int shs = 0;
+	zlong hs = DEFAULT_HISTSIZE;
+	zlong shs = 0;
 	int level = OPT_ISSET(ops,'a') ? locallevel : -1;
 	if (*argv) {
 	    hf = *argv++;
 	    if (*argv) {
-		hs = atoi(*argv++);
+		hs = zstrtol(*argv++, NULL, 10);
 		if (*argv)
-		    shs = atoi(*argv++);
+		    shs = zstrtol(*argv++, NULL, 10);
 		else
 		    shs = hs;
 		if (*argv) {
@@ -1490,10 +1491,10 @@ bin_fc(char *nam, char **argv, Options ops, int func)
 /* get the history event associated with s */
 
 /**/
-static int
+static zlong
 fcgetcomm(char *s)
 {
-    int cmd;
+    zlong cmd;
 
     /* First try to match a history number.  Negative *
      * numbers indicate reversed numbering.           */
@@ -1558,9 +1559,11 @@ fcsubs(char **sp, struct asgment *sub)
 
 /**/
 static int
-fclist(FILE *f, Options ops, int first, int last, struct asgment *subs, Patprog pprog)
+fclist(FILE *f, Options ops, zlong first, zlong last,
+       struct asgment *subs, Patprog pprog)
 {
-    int fclistdone = 0, tmp;
+    int fclistdone = 0;
+    zlong tmp;
     char *s;
     Histent ent;
 
@@ -1592,7 +1595,9 @@ fclist(FILE *f, Options ops, int first, int last, struct asgment *subs, Patprog 
 
 	    /* do numbering */
 	    if (!OPT_ISSET(ops,'n')) {
-		fprintf(f, "%5d%c ", ent->histnum,
+		char buf[DIGBUFSIZE];
+		convbase(buf, ent->histnum, 10);
+		fprintf(f, "%5s%c ", buf,
 			ent->flags & HIST_FOREIGN? '*' : ' ');
 	    }
 	    /* output actual time (and possibly date) of execution of the

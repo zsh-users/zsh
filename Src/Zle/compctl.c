@@ -3692,7 +3692,7 @@ makecomplistflags(Compctl cc, char *s, int incmd, int compadd)
 	/* We have a pattern to take things from the history. */
 	Patprog pprogc = NULL;
 	char *e, *h, hpatsav;
-	int i = addhistnum(curhist,-1,HIST_FOREIGN), n = cc->hnum;
+	zlong i = addhistnum(curhist,-1,HIST_FOREIGN), n = cc->hnum;
 	Histent he = gethistent(i, GETHIST_UPWARD);
 
 	/* Parse the pattern, if it isn't the null string. */
