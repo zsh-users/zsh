@@ -1,3 +1,9 @@
+2004-10-01  Wayne Davison  <wayned@users.sourceforge.net>
+
+	* 20277 (modified): Completion/Unix/Command/_make: completer now
+	follows include files and expands variables (and does it all in
+	zsh code instead of using awk or perl).
+
 2004-10-01  Peter Stephenson  <pws@csr.com>
 
 	* 20427, 20339 (modified): Completion/Base/Core/_main_complete,
