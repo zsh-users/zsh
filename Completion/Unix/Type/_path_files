@@ -264,7 +264,15 @@ else
   linepath=
   realpath=
 
-  if [[ "$pre[1]" = / ]]; then
+  if zstyle -s ":completion:${curcontext}:" preserve-prefix tmp1 &&
+     [[ -n "$tmp1" && "$pre" = (#b)(${~tmp1})* ]]; then
+
+    pre="$pre[${#match[1]}+1,-1]"
+    orig="$orig[${#match[1]}+1,-1]"
+    donepath="$match[1]"
+    prepaths=( '' )
+
+  elif [[ "$pre[1]" = / ]]; then
     # If it is a absolute path name, we remove the first slash and put it in
     # `donepath' meaning that we treat it as the path that was already handled.
     # Also, we don't use the paths from `-W'.

@@ -1,0 +1,325 @@
+#compdef zstyle
+
+local curcontext="$curcontext" state context ostate line expl ctop
+local nm=$compstate[nmatches] mesg
+typeset -A opt_args
+
+typeset -A styles
+# Assoc array of styles; the values give the possible top-level
+# contexts (currently c for completion, z for zftp or cz for both),
+# followed by a colon, followed by a state to enter, empty if none.
+styles=(
+  accept-exact		 c:bool
+  add-space		 c:bool
+  ambiguous              c:bool
+  assign-list            c:
+  auto-description	 c:
+  avoid-completer        c:
+  break-keys             c:
+  cache-path		 'c:_wanted directories expl directory _path_files -/'
+  cache-policy           c:_functions
+  call-command           c:bool
+  command                c:command
+  commands               c:
+  complete               c:bool
+  completer		 c:completer
+  completions		 c:bool
+  condition		 c:bool
+  cursor		 c:cursor
+  disable-stat		 c:bool
+  disabled               c:bool
+  domains                c:
+  expand		 c:
+  fake-files		 c:fake-files
+  fake-parameters	 c:fake-params
+  file-patterns		 c:filepat
+  file-sort              c:fsort
+  force-list             c:
+  format		 c:
+  glob			 c:bool
+  global                 c:bool
+  group-name		 c:
+  group-order		 c:tag
+  groups		 c:_groups
+  hidden		 c:bool
+  hosts			 c:_hosts
+  hosts-ports		 c:host-port
+  users-hosts-ports	 c:user-host-port
+  ignore-line            c:ignline
+  ignore-parents         c:ignorepar
+  ignored-patterns	 c:
+  insert-ids             c:insert-ids
+  insert-tab             c:bool
+  insert-unambiguous	 c:insunambig
+  keep-prefix		 c:keep-prefix
+  last-prompt		 c:bool
+  list			 c:listwhen
+  list-colors		 c:
+  list-packed		 c:bool
+  list-prompt            c:
+  list-rows-first	 c:bool
+  list-suffixes		 c:bool
+  local			 c:
+  match-original	 c:match-orig
+  matcher		 c:
+  matcher-list		 c:
+  max-errors		 c:
+  menu			 c:boolauto
+  numbers		 c:bool
+  old-list		 c:bool
+  old-matches            c:oldmatches
+  old-menu		 c:bool 
+  original		 c:bool
+  packageset		 c:packageset
+  path			 'c:_wanted directories expl directory _path_files -/'
+  ports			 c:_ports
+  prefix-hidden		 c:bool
+  prefix-needed		 c:bool
+  preserve-prefix        c:preserve-prefix
+  range                  c:
+  regular                c:bool
+  remote-access		 c:bool
+  remove-all-dups	 c:bool
+  select-prompt          c:
+  select-scroll          c:
+  single-ignored         c:single-ignored
+  sort			 c:bool
+  special-dirs		 c:sdirs
+  squeeze-slashes	 c:bool
+  stop			 c:stop
+  stop-keys		 c:
+  subst-globs-only       c:bool
+  substitute		 c:bool
+  suffix		 c:bool
+  tag-order		 c:tag
+  try-to-use-pminst	 c:bool
+  use-cache		 c:bool
+  use-compctl		 c:urgh
+  users			 c:_users
+  users-hosts		 c:user-host
+  verbose		 c:bool
+  word			 c:bool
+
+  chpwd			 z:bool
+  progress		 z:progress
+  remote_glob		 z:bool
+  titlebar		 z:bool
+  update		 z:
+)
+
+local taglist
+taglist=(accounts all-files all-expansions arguments arrays
+association-keys bookmarks builtins characters colors commands corrections
+cursors cvs default descriptions devices directories directory-stack
+displays expansions extensions files fonts functions globbed-files groups
+history-words hosts indexes jobs keymaps keysyms local-directories
+libraries limits manuals maps messages modifiers modules my-accounts
+named-directories names nicknames options original other-accounts packages
+parameters path-directories paths pods ports prefixes processes
+processes-names ps regex sequences sessions signals strings tags targets
+types urls users values warnings widgets windows zsh-options)
+
+_arguments -C ':context:->contexts' ':style:->styles' '*:argument:->style-arg'
+
+while [[ -n $state ]]; do
+  ostate=$state
+  state=
+
+  case "$ostate" in
+    contexts)
+      if [[ $PREFIX != :*: ]]; then
+	_wanted contexts expl context compadd -P : -S : completion zftp
+      elif [[ $PREFIX = :completion:* ]] && _tags contexts; then
+        mesg=''
+        case "$PREFIX" in
+        :completion:[^:]#) mesg=function ;;
+        :completion:[^:]#:[^:]#) mesg=completer ;;
+        :completion:[^:]#:[^:]#:[^:]#) mesg='command or context' ;;
+        :completion:[^:]#:[^:]#:[^:]#:[^:]#) mesg=argument ;;
+        :completion:[^:]#:[^:]#:[^:]#:[^:]#:[^:]#) mesg=tag ;;
+	esac
+	[[ -n "$mesg" ]] && _message "$mesg"
+      fi
+      ;;
+
+    styles)
+      # Get the top-level context we're completing for, if any.
+      if [[ $words[2] = :(completion|zftp):* ]]; then
+	ctop=${words[2][2]}
+      else
+        ctop=cz
+      fi
+      _wanted styles expl style \
+         compadd -M 'r:|-=* r:|=*' -k "styles[(R)[^:]#[$ctop][^:]#:*]"
+      ;;
+      
+    style-arg)
+      state="${styles[$words[3]]#*:}"
+      ;;
+
+    bool) 
+      _wanted values expl boolean compadd true false
+      ;;
+
+    boolauto) 
+      _wanted values expl boolean compadd true false auto select
+      ;;
+
+    cursor)
+      _wanted values expl 'cursor positioning' compadd complete key default
+      ;;
+
+    completer)
+      _wanted values expl completer \
+	compadd _complete _approximate _correct _match \
+                _expand _list _menu _oldlist _ignored _prefix _history
+      ;;
+
+    fsort)
+      _wanted values expl 'how to sort files' \
+	compadd name size links time date modification access inode change reverse
+      ;;
+
+    user-host-port)
+      if [[ $PREFIX != *[@:]* ]]; then
+	_users -S @
+      elif [[ $PREFIX = *[@:]*[[@:]* ]]; then
+	compset -P 2 '*[:@]'
+	_ports
+      else
+	compset -P 1 '*[:@]'
+	_hosts -S :
+      fi
+      ;;
+
+    host-port)
+      if [[ $PREFIX != *:* ]]; then
+	_hosts -S :
+      else
+	compset -P 1 '*:'
+	_ports
+      fi
+      ;;
+
+    listwhen)
+      _wanted values expl 'when to list completions' \
+	compadd always never sometimes
+      ;;
+
+    packageset)
+      _wanted values expl 'default package set' \
+        compadd available installed uninstalled
+      ;;
+
+    progress)
+      _wanted values expl 'progress meter style' \
+        compadd none bar percent
+      ;;
+
+    sdirs)
+      _wanted values expl 'whether to complete . or ..' \
+        compadd true false ..
+      ;;
+
+    stop)
+      _wanted values expl 'when to insert matches' \
+	compadd true false verbose
+      ;;
+
+    tag)
+      compset -q
+      if compset -P '*:*:'; then
+        _message description
+      elif compset -P '*:'; then
+        _message 'tag alias'
+      else
+        _wanted tags expl tag compadd -a taglist
+      fi
+      ;;
+
+    filepat)
+      if compset -P '*:*:'; then
+        _message description
+      elif compset -P '*:'; then
+        _message tag
+      else
+        _message 'glob patterns'
+      fi
+      ;;
+
+    user-host)
+      if [[ $PREFIX = *[@:]* ]]; then
+	compset -P '*[@:]'
+	_hosts
+      else
+	_users -S @
+      fi
+      ;;
+
+    ignorepar)
+      _wanted values expl 'which parents to ignore' \
+        compadd parent pwd .. directory
+      ;;
+
+    single-ignored)
+      _wanted values expl 'how to handle a single ignored match' \
+          compadd - show menu
+      ;;
+
+    command)
+      shift 3 words
+      (( CURRENT -= 3 ))
+      _normal
+      ;;
+
+    insert-ids)
+      _wanted values expl 'when to insert process IDs' \
+          compadd - menu single longer
+      ;;
+
+    fake-files)
+      _message 'prefix and names'
+      ;;
+
+    fake-params)
+      _message 'name and optional type'
+      ;;
+
+    ignline) 
+      _wanted values expl 'ignore strings on the line' compadd true false current current-shown other
+      ;;
+
+    keep-prefix) 
+      _wanted values expl 'keep prefix' compadd true false changed
+      ;;
+
+    match-orig) 
+      _wanted values expl "match without inserting \`*'" compadd only both
+      ;;
+
+    oldmatches) 
+      _wanted values expl 'use list of old matches' compadd true false only
+      ;;
+
+    insunambig) 
+      _wanted values expl 'insert unambiguous string' compadd true false pattern
+      ;;
+
+    preserve-prefix)
+      _message 'pattern matching prefix to keep'
+      ;;
+
+    urgh) 
+      _wanted values expl no compadd no false off 0
+      ;;
+
+    _*)
+      ${=ostate}
+      ;;
+
+    *)
+      ;;
+  esac
+done
+
+[[ $compstate[nmatches] != $nm ]]

@@ -1,3 +1,9 @@
+2001-07-17  Sven Wischnowsky  <wischnow@zsh.org>
+
+	* 15400: Completion/Unix/Type/_path_files,
+	Completion/Zsh/Command/_zstyle, Doc/Zsh/compsys.yo: add
+	preserve-prefix style to keep pathname prefix unchanged
+
 2001-07-10  Sven Wischnowsky  <wischnow@zsh.org>
 
 	* 15357: Completion/Base/Completer/_prefix, Src/Zle/compcore.c,
