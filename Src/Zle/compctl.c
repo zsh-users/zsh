@@ -688,6 +688,22 @@ get_compctl(char *name, char ***av, Compctl cc, int first, int isdef, int cl)
 		    *argv = "" - 1;
 		}
 		break;
+	    case 'h':
+		if (cl) {
+		    zerrnam(name, "illegal option -%c", NULL, **argv);
+		    return 1;
+		} else if ((*argv)[1]) {
+		    cct.substr = (*argv) + 1;
+		    *argv = "" - 1;
+		} else if (!argv[1]) {
+		    zwarnnam(name, "command name expected after -%c", NULL,
+			    **argv);
+		    return 1;
+		} else {
+		    cct.substr = *++argv;
+		    *argv = "" - 1;
+		}
+		break;
 	    case 'W':
 		if ((*argv)[1]) {
 		    cct.withd = (*argv) + 1;
@@ -933,6 +949,9 @@ get_xcompctl(char *name, char ***av, Compctl cc, int isdef)
 		t++;
 	    /* First get the condition code */
 	    switch (*t) {
+	    case 'q':
+		c->type = CCT_QUOTE;
+		break;
 	    case 's':
 		c->type = CCT_CURSUF;
 		break;
@@ -1017,7 +1036,8 @@ get_xcompctl(char *name, char ***av, Compctl cc, int isdef)
 		c->u.r.a = (int *)zcalloc(n * sizeof(int));
 		c->u.r.b = (int *)zcalloc(n * sizeof(int));
 	    } else if (c->type == CCT_CURSUF ||
-		       c->type == CCT_CURPRE)
+		       c->type == CCT_CURPRE ||
+		       c->type == CCT_QUOTE)
 		c->u.s.s = (char **)zcalloc(n * sizeof(char *));
 
 	    else if (c->type == CCT_RANGESTR ||
@@ -1059,7 +1079,8 @@ get_xcompctl(char *name, char ***av, Compctl cc, int isdef)
 			c->u.r.b[l] = atoi(tt);
 		    }
 		} else if (c->type == CCT_CURSUF ||
-			   c->type == CCT_CURPRE) {
+			   c->type == CCT_CURPRE ||
+			   c->type == CCT_QUOTE) {
 		    /* -s[..] or -S[..]:  single string expected */
 		    for (; *t && *t != '\200'; t++)
 			if (*t == '\201')
@@ -1218,6 +1239,7 @@ cc_assign(char *name, Compctl *ccptr, Compctl cct, int reass)
     zsfree(cc->prefix);
     zsfree(cc->suffix);
     zsfree(cc->subcmd);
+    zsfree(cc->substr);
     zsfree(cc->withd);
     zsfree(cc->hpat);
     zsfree(cc->gname);
@@ -1239,6 +1261,7 @@ cc_assign(char *name, Compctl *ccptr, Compctl cct, int reass)
     cc->prefix = ztrdup(cct->prefix);
     cc->suffix = ztrdup(cct->suffix);
     cc->subcmd = ztrdup(cct->subcmd);
+    cc->substr = ztrdup(cct->substr);
     cc->withd = ztrdup(cct->withd);
     cc->gname = ztrdup(cct->gname);
     cc->hpat = ztrdup(cct->hpat);
@@ -1366,7 +1389,7 @@ printcompctl(char *s, Compctl cc, int printflags, int ispat)
 {
     Compctl cc2;
     char *css = "fcqovbAIFpEjrzBRGudeNOZUnQmw/";
-    char *mss = " pcCwWsSnNmrR";
+    char *mss = " pcCwWsSnNmrRq";
     unsigned long t = 0x7fffffff;
     unsigned long flags = cc->mask, flags2 = cc->mask2;
     unsigned long oldshowmask;
@@ -1448,6 +1471,7 @@ printcompctl(char *s, Compctl cc, int printflags, int ispat)
     printif(cc->glob, 'g');
     printif(cc->str, 's');
     printif(cc->subcmd, 'l');
+    printif(cc->substr, 'h');
     printif(cc->withd, 'W');
     if (cc->hpat) {
 	printf(" -H %d ", cc->hnum);
@@ -1484,6 +1508,7 @@ printcompctl(char *s, Compctl cc, int printflags, int ispat)
 			    break;
 			case CCT_CURSUF:
 			case CCT_CURPRE:
+			case CCT_QUOTE:
 			    printqt(c->u.s.s[i]);
 			    break;
 			case CCT_RANGESTR:
@@ -1702,7 +1727,7 @@ bin_compadd(char *name, char **argv, char *ops, int func)
     }
     dat.ipre = dat.isuf = dat.ppre = dat.psuf = dat.prpre =
 	dat.pre = dat.suf = dat.group = dat.rems = dat.remf =
-	dat.ign = dat.exp = dat.apar = dat.opar = dat.dpar = NULL;
+	dat.ign = dat.exp = dat.apar = dat.opar = dat.dpar = dat.ylist = NULL;
     dat.match = NULL;
     dat.flags = 0;
     dat.aflags = CAF_MATCH;
@@ -1753,6 +1778,10 @@ bin_compadd(char *name, char **argv, char *ops, int func)
 		    dat.aflags |= CAF_NOSORT;
 		sp = &(dat.group);
 		e = "group name expected after -%c";
+		break;
+	    case 'y':
+		sp = &(dat.ylist);
+		e = "string expected after -%c";
 		break;
 	    case 'i':
 		sp = &(dat.ipre);
@@ -1859,7 +1888,7 @@ ignore_prefix(int l)
     char *tmp, sav = compprefix[l];
 
     compprefix[l] = '\0';
-    tmp = tricat(compiprefix, compprefix, "");
+    tmp = tricat(compiprefix, rembslash(compprefix), "");
     zsfree(compiprefix);
     compiprefix = tmp;
     compprefix[l] = sav;
@@ -1874,7 +1903,7 @@ ignore_suffix(int l)
     char *tmp, sav;
 
     l = strlen(compsuffix) - l;
-    tmp = tricat(compsuffix + l, compisuffix, "");
+    tmp = tricat(rembslash(compsuffix + l), compisuffix, "");
     zsfree(compisuffix);
     compisuffix = tmp;
     sav = compsuffix[l];
@@ -1918,8 +1947,8 @@ do_comp_vars(int test, int na, char *sa, int nb, char *sb, int mod)
 
 	    if (compcurrent - 1 < na || compcurrent - 1 > nb)
 		return 0;
-
-	    restrict_range(na, nb);
+	    if (mod)
+		restrict_range(na, nb);
 	    return 1;
 	}
     case CVT_RANGEPAT:
@@ -1960,7 +1989,7 @@ do_comp_vars(int test, int na, char *sa, int nb, char *sb, int mod)
 	    }
 	    if (e < b)
 		t = 0;
-	    if (t)
+	    if (t && mod)
 		restrict_range(b, e);
 	    return t;
 	}
@@ -2014,8 +2043,8 @@ do_comp_vars(int test, int na, char *sa, int nb, char *sb, int mod)
 		}
 		if (!l)
 		    return 0;
-
-		ignore_prefix(p - compprefix);
+		if (mod)
+		    ignore_prefix(p - compprefix);
 	    } else {
 		int l, ol, add;
 		char *p;
@@ -2036,8 +2065,8 @@ do_comp_vars(int test, int na, char *sa, int nb, char *sb, int mod)
 
 		if (!l)
 		    return 0;
-
-		ignore_suffix(ol - (p - compsuffix));
+		if (mod)
+		    ignore_suffix(ol - (p - compsuffix));
 	    }
 	    return 1;
 	}
@@ -2067,6 +2096,7 @@ bin_compset(char *name, char **argv, char *ops, int func)
     case 'P': test = CVT_PREPAT; break;
     case 's': test = CVT_SUFNUM; break;
     case 'S': test = CVT_SUFPAT; break;
+    case 'q': return set_comp_sepptr();
     default:
 	zerrnam(name, "bad option -%c", NULL, argv[0][1]);
 	return 1;
@@ -2135,19 +2165,25 @@ bin_compcall(char *name, char **argv, char *ops, int func)
  * order of the CP_* bits in comp.h */
 
 #define VAL(X) ((void *) (&(X)))
-static struct compparam {
+struct compparam {
     char *name;
     int type;
     void *var, *set, *get;
-} compparams[] = {
+};
+
+static struct compparam comprparams[] = {
     { "words", PM_ARRAY, VAL(compwords), NULL, NULL },
     { "CURRENT", PM_INTEGER, VAL(compcurrent), NULL, NULL },
     { "PREFIX", PM_SCALAR, VAL(compprefix), NULL, NULL },
     { "SUFFIX", PM_SCALAR, VAL(compsuffix), NULL, NULL },
     { "IPREFIX", PM_SCALAR, VAL(compiprefix), NULL, NULL },
     { "ISUFFIX", PM_SCALAR, VAL(compisuffix), NULL, NULL },
-    { NULL, 0, NULL, NULL, NULL },
+    { "QIPREFIX", PM_SCALAR | PM_READONLY, VAL(compqiprefix), NULL, NULL },
+    { "QISUFFIX", PM_SCALAR | PM_READONLY, VAL(compqisuffix), NULL, NULL },
+    { NULL, 0, NULL, NULL, NULL }
+};
 
+static struct compparam compkparams[] = {
     { "nmatches", PM_INTEGER, VAL(compnmatches), NULL, NULL },
     { "matcher", PM_INTEGER, VAL(compmatcher), NULL, NULL },
     { "matcher_string", PM_SCALAR, VAL(compmatcherstr), NULL, NULL },
@@ -2155,8 +2191,8 @@ static struct compparam {
     { "context", PM_SCALAR, VAL(compcontext), NULL, NULL },
     { "parameter", PM_SCALAR, VAL(compparameter), NULL, NULL },
     { "redirect", PM_SCALAR, VAL(compredirect), NULL, NULL },
-    { "quote", PM_SCALAR, VAL(compquote), NULL, NULL },
-    { "quoting", PM_SCALAR, VAL(compquoting), NULL, NULL },
+    { "quote", PM_SCALAR | PM_READONLY, VAL(compquote), NULL, NULL },
+    { "quoting", PM_SCALAR | PM_READONLY, VAL(compquoting), NULL, NULL },
     { "restore", PM_SCALAR, VAL(comprestore), NULL, NULL },
     { "list", PM_SCALAR, VAL(complist), NULL, NULL },
     { "force_list", PM_SCALAR, VAL(compforcelist), NULL, NULL },
@@ -2173,24 +2209,25 @@ static struct compparam {
     { "to_end", PM_SCALAR, VAL(comptoend), NULL, NULL },
     { "old_list", PM_SCALAR, VAL(compoldlist), NULL, NULL },
     { "old_insert", PM_SCALAR, VAL(compoldins), NULL, NULL },
+    { "vared", PM_SCALAR, VAL(compvared), NULL, NULL },
+    { "normal_nmatches", PM_INTEGER, VAL(compnnmatches), NULL, NULL },
     { NULL, 0, NULL, NULL, NULL }
 };
 
 #define COMPSTATENAME "compstate"
 
-static struct compparam *
-addcompparams(struct compparam *cp)
+static void
+addcompparams(struct compparam *cp, Param *pp)
 {
-    Param *pp = comppms + (cp - compparams);
-
     for (; cp->name; cp++, pp++) {
-	Param pm = createparam(cp->name, cp->type | PM_SPECIAL | PM_REMOVABLE);
+	Param pm = createparam(cp->name,
+			       cp->type |PM_SPECIAL|PM_REMOVABLE|PM_LOCAL);
 	if (!pm)
 	    pm = (Param) paramtab->getnode(paramtab, cp->name);
 	DPUTS(!pm, "param not set in addcompparams");
 
 	*pp = pm;
-	pm->level = locallevel;
+	pm->level = locallevel + 1;
 	if ((pm->u.data = cp->var)) {
 	    switch(PM_TYPE(cp->type)) {
 	    case PM_SCALAR:
@@ -2213,31 +2250,30 @@ addcompparams(struct compparam *cp)
 	}
 	pm->unsetfn = compunsetfn;
     }
-    return cp;
 }
 
 /**/
 void
 makecompparams(void)
 {
-    struct compparam *cp;
     Param cpm;
     HashTable tht;
 
-    cp = addcompparams(compparams);
+    addcompparams(comprparams, comprpms);
 
-    if (!(cpm = createparam(COMPSTATENAME, PM_SPECIAL|PM_REMOVABLE|PM_HASHED)))
+    if (!(cpm = createparam(COMPSTATENAME,
+			    PM_SPECIAL|PM_REMOVABLE|PM_LOCAL|PM_HASHED)))
 	cpm = (Param) paramtab->getnode(paramtab, COMPSTATENAME);
     DPUTS(!cpm, "param not set in makecompparams");
 
-    comppms[cp - compparams] = cpm;
+    comprpms[CPN_COMPSTATE] = cpm;
     tht = paramtab;
     cpm->level = locallevel;
     cpm->gets.hfn = get_compstate;
     cpm->sets.hfn = set_compstate;
     cpm->unsetfn = compunsetfn;
-    cpm->u.hash = paramtab = newparamtable(17, COMPSTATENAME);
-    addcompparams(cp + 1);
+    cpm->u.hash = paramtab = newparamtable(31, COMPSTATENAME);
+    addcompparams(compkparams, compkpms);
     paramtab = tht;
 }
 
@@ -2261,15 +2297,15 @@ set_compstate(Param pm, HashTable ht)
 
     for (i = 0; i < ht->hsize; i++)
 	for (hn = ht->nodes[i]; hn; hn = hn->next)
-	    for (cp = compparams + CP_REALPARAMS,
-		 pp = comppms + CP_REALPARAMS; cp->name; cp++, pp++)
+	    for (cp = compkparams,
+		 pp = compkpms; cp->name; cp++, pp++)
 		if (!strcmp(hn->nam, cp->name)) {
 		    v.isarr = v.inv = v.a = 0;
 		    v.b = -1;
 		    v.arr = NULL;
 		    v.pm = (Param) hn;
 		    if (cp->type == PM_INTEGER)
-			*((long *) cp->var) = getintvalue(&v);
+			*((zlong *) cp->var) = getintvalue(&v);
 		    else if ((str = getstrvalue(&v))) {
 			zsfree(*((char **) cp->var));
 			*((char **) cp->var) = ztrdup(str);
@@ -2278,6 +2314,7 @@ set_compstate(Param pm, HashTable ht)
 
 		    break;
 		}
+    deleteparamtable(ht);
 }
 
 /**/
@@ -2288,7 +2325,7 @@ get_unambig(Param pm)
 }
 
 /**/
-static long
+static zlong
 get_unambig_curs(Param pm)
 {
     int c;
@@ -2316,20 +2353,25 @@ compunsetfn(Param pm, int exp)
 
 /**/
 void
-comp_setunset(int set, int unset)
+comp_setunset(int rset, int runset, int kset, int kunset)
 {
     Param *p;
 
-    if (!comppms)
-	return;
-
-    set &= CP_ALLMASK;
-    unset &= CP_ALLMASK;
-    for (p = comppms; set || unset; set >>= 1, unset >>= 1, p++) {
-	if (set & 1)
-	    (*p)->flags &= ~PM_UNSET;
-	if (unset & 1)
-	    (*p)->flags |= PM_UNSET;
+    if (comprpms && (rset >= 0 || runset >= 0)) {
+	for (p = comprpms; rset || runset; rset >>= 1, runset >>= 1, p++) {
+	    if (rset & 1)
+		(*p)->flags &= ~PM_UNSET;
+	    if (runset & 1)
+		(*p)->flags |= PM_UNSET;
+	}
+    }
+    if (comprpms && (kset >= 0 || kunset >= 0)) {
+	for (p = compkpms; kset || kunset; kset >>= 1, kunset >>= 1, p++) {
+	    if (kset & 1)
+		(*p)->flags &= ~PM_UNSET;
+	    if (kunset & 1)
+		(*p)->flags |= PM_UNSET;
+	}
     }
 }
 
@@ -2341,16 +2383,19 @@ comp_wrapper(List list, FuncWrap w, char *name)
 	return 1;
     else {
 	char *orest, *opre, *osuf, *oipre, *oisuf, **owords;
-	long ocur;
-	int unset = 0, m, sm;
+	char *oqipre, *oqisuf, *oq, *oqi;
+	zlong ocur;
+	unsigned int runset = 0, kunset = 0, m, sm;
 	Param *pp;
 
 	m = CP_WORDS | CP_CURRENT | CP_PREFIX | CP_SUFFIX | 
-	    CP_IPREFIX | CP_RESTORE;
-	for (pp = comppms, sm = 1; m; pp++, m >>= 1, sm <<= 1) {
+	    CP_IPREFIX | CP_ISUFFIX | CP_QIPREFIX | CP_QISUFFIX;
+	for (pp = comprpms, sm = 1; m; pp++, m >>= 1, sm <<= 1) {
 	    if ((m & 1) && ((*pp)->flags & PM_UNSET))
-		unset |= sm;
+		runset |= sm;
 	}
+	if (compkpms[CPN_RESTORE]->flags & PM_UNSET)
+	    kunset = CP_RESTORE;
 	orest = comprestore;
 	comprestore = ztrdup("auto");
 	ocur = compcurrent;
@@ -2358,6 +2403,10 @@ comp_wrapper(List list, FuncWrap w, char *name)
 	osuf = dupstring(compsuffix);
 	oipre = dupstring(compiprefix);
 	oisuf = dupstring(compisuffix);
+	oqipre = dupstring(compqiprefix);
+	oqisuf = dupstring(compqisuffix);
+	oq = dupstring(compquote);
+	oqi = dupstring(compquoting);
 
 	HEAPALLOC {
 	    owords = arrdup(compwords);
@@ -2375,17 +2424,27 @@ comp_wrapper(List list, FuncWrap w, char *name)
 	    compiprefix = ztrdup(oipre);
 	    zsfree(compisuffix);
 	    compisuffix = ztrdup(oisuf);
+	    zsfree(compqiprefix);
+	    compqiprefix = ztrdup(oqipre);
+	    zsfree(compqisuffix);
+	    compqisuffix = ztrdup(oqisuf);
+	    zsfree(compquote);
+	    compquote = ztrdup(oq);
+	    zsfree(compquoting);
+	    compquoting = ztrdup(oqi);
 	    freearray(compwords);
 	    PERMALLOC {
 		compwords = arrdup(owords);
 	    } LASTALLOC;
 	    comp_setunset(CP_COMPSTATE |
-			  (~unset & (CP_WORDS | CP_CURRENT | CP_PREFIX |
-				     CP_SUFFIX | CP_IPREFIX | CP_RESTORE)),
-			  unset);
+			  (~runset & (CP_WORDS | CP_CURRENT | CP_PREFIX |
+				     CP_SUFFIX | CP_IPREFIX | CP_ISUFFIX |
+				     CP_QIPREFIX | CP_QISUFFIX)),
+			  (runset & CP_ALLREALS),
+			  (~kunset & CP_RESTORE), (kunset & CP_ALLKEYS));
 	} else
-	    comp_setunset(CP_COMPSTATE | (~unset & CP_RESTORE),
-			  (unset & CP_RESTORE));
+	    comp_setunset(CP_COMPSTATE, 0, (~kunset & CP_RESTORE),
+			  (kunset & CP_RESTORE));
 	zsfree(comprestore);
 	comprestore = orest;
 
@@ -2410,10 +2469,10 @@ cond_psfix(char **a, int id)
 {
     if (comp_check()) {
 	if (a[1])
-	    return do_comp_vars(id, cond_val(a, 0), cond_str(a, 1),
+	    return do_comp_vars(id, cond_val(a, 0), cond_str(a, 1, 1),
 				0, NULL, 0);
 	else
-	    return do_comp_vars(id, -1, cond_str(a, 0), 0, NULL, 0);
+	    return do_comp_vars(id, -1, cond_str(a, 0, 1), 0, NULL, 0);
     }
     return 0;
 }
@@ -2422,8 +2481,8 @@ cond_psfix(char **a, int id)
 static int
 cond_range(char **a, int id)
 {
-    return do_comp_vars(CVT_RANGEPAT, 0, cond_str(a, 0), 0,
-			(id ? cond_str(a, 1) : NULL), 0);
+    return do_comp_vars(CVT_RANGEPAT, 0, cond_str(a, 0, 1), 0,
+			(id ? cond_str(a, 1, 1) : NULL), 0);
 }
 
 static struct builtin bintab[] = {

@@ -17,12 +17,13 @@ Patches
 
 * Send all patches to the mailing list rather than directly to me.
 
-* Send only context diffs "diff -c oldfile newfile".  They are much
-  easier to read and understand while also allowing the patch program
-  to patch more intelligently.  Please make sure the filenames in
-  the diff header are relative to the top-level directory of the zsh
-  distribution; for example, it should say "Src/init.c" rather than
-  "init.c" or "zsh/Src/init.c".
+* Send only context diffs "diff -c oldfile newfile" or unified diffs
+  "diff -u oldfile newfile".  They are much easier to read and
+  understand while also allowing the patch program to patch more
+  intelligently.  Please make sure the filenames in the diff header
+  are relative to the top-level directory of the zsh distribution; for
+  example, it should say "Src/init.c" rather than "init.c" or
+  "zsh/Src/init.c".
 
 * Please put only one bug fix or feature enhancement in a single patch and
   only one patch per mail message.  This helps me to multiplex the many
@@ -127,6 +128,7 @@ variables:
   - autoinfixconds  infix condition codes defined by the module, for
                     autoloading (without the leading `-')
   - autoprefixconds like autoinfixconds, but for prefix condition codes
+  - autoparams      parameters defined by the module, for autoloading
   - objects         .o files making up this module (*must* be defined)
   - proto           .pro files for this module (default generated from $objects)
   - headers         extra headers for this module (default none)
@@ -137,7 +139,7 @@ Be sure to put the values in quotes. For further enlightenment have a
 look at the `mkmakemod.sh' script in the Src directory of the
 distribution.
 
-Modules have to define four functions which will automatically called
+Modules have to define four functions which will be called automatically
 by the zsh core. The first one, named `setup_foo' for a module named
 `foo', should set up any data needed in the module, at least any data
 other modules may be interested in. The second one, named `boot_foo',
@@ -283,11 +285,12 @@ Note that no preprocessing is done on the strings. This means that
 no substitutions are performed on them and that they will be
 tokenized. There are three helper functions available:
 
-  - char *cond_str(args, num)
+  - char *cond_str(args, num, raw)
     The first argument is the array of strings the handler function
     got as an argument and the second one is an index into this array.
     The return value is the num'th string from the array with
-    substitutions performed and untokenized.
+    substitutions performed. If the last argument is zero, the string
+    will also be untokenized.
   - long cond_val(args, num)
     The arguments are the same as for cond_str(). The return value is
     the result of the mathematical evaluation of the num'th string
@@ -322,6 +325,226 @@ almost exactly the same as for builtins, using the functions
 
 Arguments and return values are the same as for the functions for
 builtins.
+
+For defining parameters, a module can call `createparam()' directly or 
+use a table to describe them, e.g.:
+
+  static struct paramdef patab[] = {
+    PARAMDEF("foo", PM_INTEGER, NULL, get_foo, set_foo, unset_foo),
+    INTPARAMDEF("exint", &intparam),
+    STRPARAMDEF("exstr", &strparam),
+    ARRPARAMDEF("exarr", &arrparam),
+  };
+
+There are four macros used:
+
+  - PARAMDEF() gets as arguments:
+    - the name of the parameter
+    - the parameter flags to set for it (from the PM_* flags defined
+      in zsh.h)
+    - optionally a pointer to a variable holding the value of the
+      parameter
+    - three functions that will be used to get the value of the
+      parameter, store a value in the parameter, and unset the
+      parameter
+  - the other macros provide simple ways to define the most common
+    types of parameters; they get the name of the parameter and a
+    pointer to a variable holding the value as arguments; they are
+    used to define integer-, scalar-, and array-parameters, so the
+    variables whose addresses are given should be of type `long',
+    `char *', and `char **', respectively
+
+For a description of how to write functions for getting or setting the 
+value of parameters, or how to write a function to unset a parameter,
+see the description of the following functions in the `params.c' file:
+
+  - `intvargetfn()' and `intvarsetfn()' for integer parameters
+  - `strvargetfn()' and `strvarsetfn()' for scalar parameters
+  - `arrvargetfn()' and `arrvarsetfn()' for array parameters
+  - `stdunsetfn()' for unsetting parameters
+
+Note that if one defines parameters using the last two macros (for
+scalars and arrays), the variable holding the value should be
+initialized to either `NULL' or to a a piece of memory created with
+`zalloc()'. But this memory should *not* be freed in the
+finish-function of the module because that will be taken care of by
+the `deleteparamdefs()' function described below.
+
+To register the parameters in the zsh core, the function
+`addparamdefs()' is called as in:
+
+  /**/
+  int
+  boot_example(Module m)
+  {
+    int ret;
+
+    ret = addparamdefs(m->nam, patab, sizeof(patab)/sizeof(*patab))
+    ...
+  }
+
+The arguments and the return value are as for the functions used to
+add builtins and condition codes and like these, it should be called
+in the boot-function of the module. To remove the parameters defined,
+the function `deleteparamdefs()' should be called, again with the same 
+arguments and the same return value as for the functions to remove
+builtins and condition codes:
+
+  /**/
+  int
+  cleanup_example(Module m)
+  {
+    deleteparamdefs(m->nam, patab, sizeof(patab)/sizeof(*patab));
+    ...
+  }
+
+Modules can also define function hooks. Other modules can then add
+functions to these hooks to make the first module call these functions
+instead of the default.
+
+Again, an array is used to define hooks:
+
+  static struct hookdef foohooks[] = {
+    HOOKDEF("foo", foofunc, 0),
+  };
+
+The first argument of the macro is the name of the hook. This name
+is used whenever the hook is used. The second argument is the default
+function for the hook or NULL if no default function exists. The
+last argument is used to define flags for the hook. Currently only one
+such flag is defined: `HOOKF_ALL'. If this flag is given and more than
+one function was added to the hook, all functions will be called
+(including the default function). Otherwise only the last function
+added will be called.
+
+The functions that can be used as default functions or that can be
+added to a hook have to be defined like:
+
+  /**/
+  static int
+  foofunc(Hookdef h, void *data)
+  {
+    ...
+  }
+
+The first argument is a pointer to the struct defining the hook. The
+second argument is an arbitrary pointer that is given to the function
+used to invoke hooks (see below).
+
+The functions to register and de-register hooks look like those for
+the other things that can be defined by modules:
+
+  /**/
+  int
+  boot_foo(Module m)
+  {
+    int ret;
+
+    ret = addhookdefs(m->nam, foohooks, sizeof(foohooks)/sizeof(*foohooks))
+    ...
+  }
+  ...
+  /**/
+  int
+  cleanup_foo(Module m)
+  {
+    deletehookdefs(m->nam, foohooks, sizeof(foohooks)/sizeof(*foohooks));
+    ...
+  }
+
+Modules that define hooks can invoke the function(s) registered for
+them by calling the function `runhook(name, data)'. The first argument 
+is the name of the hook and the second one is the pointer given to the 
+hook functions as their second argument. Hooks that have the `HOOKF_ALL' 
+flag call all function defined for them until one returns non-zero.
+The return value of `runhook()' is the return value of the last hook
+function called or zero if none was called.
+
+To add a function to a hook, the function `addhookfunc(name, func)' is 
+called with the name of the hook and a hook function as arguments.
+Deleting them is done by calling `deletehookfunc(name, func)' with the 
+same arguments as for the corresponding call to `addhookfunc()'.
+
+Alternative forms of the last three function are provided for hooks
+that are changed or called very often. These functions,
+`runhookdef(def, data)', `addhookdeffunc(def, func)', and
+`deletehookdeffunc(def, func)' get a pointer to the `hookdef'
+structure defining the hook instead of the name and otherwise behave
+like their counterparts.
+
+Modules can also define function hooks. Other modules can then add
+functions to these hooks to make the first module call these functions
+instead of the default.
+
+Again, an array is used to define hooks:
+
+  static struct hookdef foohooks[] = {
+    HOOKDEF("foo", foofunc, 0),
+  };
+
+The first argument of the macro is the name of the hook. This name
+is used whenever the hook is used. The second argument is the default
+function for the hook or NULL if no default function exists. The
+last argument is used to define flags for the hook. Currently only one
+such flag is defined: `HOOKF_ALL'. If this flag is given and more than
+one function was added to the hook, all functions will be called
+(including the default function). Otherwise only the last function
+added will be called.
+
+The functions that can be used as default functions or that can be
+added to a hook have to be defined like:
+
+  /**/
+  static int
+  foofunc(Hookdef h, void *data)
+  {
+    ...
+  }
+
+The first argument is a pointer to the struct defining the hook. The
+second argument is an arbitrary pointer that is given to the function
+used to invoke hooks (see below).
+
+The functions to register and de-register hooks look like those for
+the other things that can be defined by modules:
+
+  /**/
+  int
+  boot_foo(Module m)
+  {
+    int ret;
+
+    ret = addhookdefs(m->nam, foohooks, sizeof(foohooks)/sizeof(*foohooks))
+    ...
+  }
+  ...
+  /**/
+  int
+  cleanup_foo(Module m)
+  {
+    deletehookdefs(m->nam, foohooks, sizeof(foohooks)/sizeof(*foohooks));
+    ...
+  }
+
+Modules that define hooks can invoke the function(s) registered for
+them by calling the function `runhook(name, data)'. The first argument 
+is the name of the hook and the second one is the pointer given to the 
+hook functions as their second argument. Hooks that have the `HOOKF_ALL' 
+flag call all function defined for them until one returns non-zero.
+The return value of `runhook()' is the return value of the last hook
+function called or zero if none was called.
+
+To add a function to a hook, the function `addhookfunc(name, func)' is 
+called with the name of the hook and a hook function as arguments.
+Deleting them is done by calling `deletehookfunc(name, func)' with the 
+same arguments as for the corresponding call to `addhookfunc()'.
+
+Alternative forms of the last three function are provided for hooks
+that are changed or called very often. These functions,
+`runhookdef(def, data)', `addhookdeffunc(def, func)', and
+`deletehookdeffunc(def, func)' get a pointer to the `hookdef'
+structure defining the hook instead of the name and otherwise behave
+like their counterparts.
 
 Finally, modules can define wrapper functions. These functions are
 called whenever a shell function is to be executed.
@@ -430,3 +653,21 @@ Documentation
   ocurring in the main text, "plugh" is a normal word that is being quoted
   (it's the user that says `plugh', not the documentation), and "xyzzy"
   is some text to be typed literally that is being quoted.
+
+* For multiple-line pieces of text that should not be filled, there are
+  various models.
+  - If the text is pure example, i.e. with no metasyntactic variables etc.,
+    it should be included within `example(...)'.  The text will be
+    indented, will not be filled and will be put into a fixed width font.
+  - If the text includes mixed fonts, it should be included within
+    `indent(...)'.  The text is now filled unless `nofill(...)' is also
+    used, and explicit font-changing commands are required inside.
+  - If the text appears inside some other format, such as for example the
+    `item()' list structure, then the instruction `nofill(...)', which
+    simply turns off filling should be used; as with `indent(...)',
+    explicit font changing commands are required.  This can be used
+    without `indent()' when no identation is required, e.g. if the
+    accumulated indentation would otherwise be too long.
+  All the above should appear on their own, separated by newlines from the
+  surrounding text.  No extra newlines after the opening or before the
+  closing parenthesis are required.
