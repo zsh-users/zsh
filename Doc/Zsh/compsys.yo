@@ -2452,6 +2452,20 @@ Unlike tt(_expand) this uses a `tt(1)' (one) as the default
 value for the tt(substitute) and tt(glob) styles, so both types of
 expansion will normally be performed.
 )
+findex(_generic)
+item(tt(_generic))(
+This function is not defined as a widget and not bound by
+default. However, it can be used to define a widget and will then
+store the name of the widget in the var(function) field of the context 
+and call the completion system. This allows to easily define custom
+completion widgets with their own sets of style settings. For example, 
+to define a widget that does normal completion and starts
+menu-selection, one could do:
+
+example(zle -C foo complete-word _generic
+bindkey '...' foo
+zstyle ':completion:foo:*' menu yes select=1)
+)
 findex(_history_complete_word) (\e/))
 item(tt(_history_complete_word) (\e/))(
 Complete words from the shell's command history. This uses the

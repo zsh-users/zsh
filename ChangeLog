@@ -1,5 +1,13 @@
 2000-06-13  Sven Wischnowsky  <wischnow@zsh.org>
 
+	* ?????: Completion/Commands/_generic, Doc/Zsh/compsys.yo: new
+	_generic widget to call completion with $WIDGET in function field
+	of context
+	
+	* ?????: Completion/Core/_main_complete, Doc/Zsh/compsys.yo: allow 
+	insert-tab style to contain `pending[=num]' to handle the case
+	when there is pending input
+
 	* ?????: Completion/Core/_expand, Doc/Zsh/compsys.yo: new style
 	`suffix', use accept-exact style in _expand
 	
