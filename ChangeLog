@@ -1,3 +1,8 @@
+2002-02-18  Wayne Davison  <wayned@users.sourceforge.net>
+
+	* 16672: Src/hist.c: Fixed a just-introduced bug in prepnexthistent()
+	that made it work wrong when "curline" was in the history list.
+
 2002-02-18  Sven Wischnowsky  <wischnow@zsh.org>
 
 	* 16669: Doc/Zsh/compsys.yo, Src/Zle/computil.c: allow an
