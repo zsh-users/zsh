@@ -186,6 +186,8 @@ static int type[TOKCOUNT] =
 /* 50 */  LR|OP_OPF, RL|OP_E2, LR|OP_OPF
 };
 
+/**/
+int outputradix;
 
 /**/
 static int
@@ -340,12 +342,35 @@ zzlex(void)
 	    return EOI;
 	case '[':
 	    {
-		int base = zstrtol(ptr, &ptr, 10);
+		int n;
 
-		if (*ptr == ']')
-		    ptr++;
-		yyval.u.l = zstrtol(ptr, &ptr, lastbase = base);
-		return NUM;
+		if (idigit(*ptr)) {
+		    n = zstrtol(ptr, &ptr, 10);
+		    if (*ptr != ']' || !idigit(*++ptr)) {
+			zerr("bad base syntax", NULL, 0);
+			return EOI;
+		    }
+		    yyval.u.l = zstrtol(ptr, &ptr, lastbase = n);
+		    return NUM;
+		}
+		if (*ptr == '#') {
+		    n = 1;
+		    if (*++ptr == '#') {
+			n = -1;
+			ptr++;
+		    }
+		    if (!idigit(*ptr))
+			goto bofs;
+		    outputradix = n * zstrtol(ptr, &ptr, 10);
+		} else {
+		    bofs:
+		    zerr("bad output format specification", NULL, 0);
+		    return EOI;
+		}
+		if(*ptr != ']')
+			goto bofs;
+		ptr++;
+		break;
 	    }
 	case ' ':
 	case '\t':
@@ -355,6 +380,12 @@ zzlex(void)
 	    if (*ptr == 'x' || *ptr == 'X') {
 		/* Should we set lastbase here? */
 		yyval.u.l = zstrtol(++ptr, &ptr, lastbase = 16);
+		return NUM;
+	    }
+	    else if (isset(OCTALZEROES) &&
+		    (memchr(ptr, '.', strlen(ptr)) == NULL) &&
+		     idigit(*ptr)) {
+	        yyval.u.l = zstrtol(ptr, &ptr, lastbase = 8);
 		return NUM;
 	    }
 	/* Fall through! */
@@ -465,10 +496,12 @@ getcvar(char *s)
     mnumber mn;
     mn.type = MN_INTEGER;
 
+    queue_signals();
     if (!(t = getsparam(s)))
 	mn.u.l = 0;
     else
         mn.u.l = STOUC(*t == Meta ? t[1] ^ 32 : *t);
+    unqueue_signals();
     return mn;
 }
 
@@ -485,6 +518,7 @@ setvar(char *s, mnumber v)
     }
     if (noeval)
 	return v;
+    untokenize(s);
     setnparam(s, v);
     return v;
 }
@@ -929,6 +963,9 @@ matheval(char *s)
     char *junk;
     mnumber x;
     int xmtok = mtok;
+    /* maintain outputradix across levels of evaluation */
+    if (!mlevel)
+	outputradix = 0;
 
     if (!*s) {
 	x.type = MN_INTEGER;
@@ -943,7 +980,7 @@ matheval(char *s)
 }
 
 /**/
-zlong
+mod_export zlong
 mathevali(char *s)
 {
     mnumber x = matheval(s);
