@@ -84,8 +84,8 @@ _mysql_tables () {
 
 _mysql_variables () {
   _values -s , 'MySQL client variables' \
-    'max_allowed_packet[maximum allowed packet size]:Packet size in bytes:' \
-    'net_buffer_length[network buffer length]:Buffer length in bytes:'
+    'max_allowed_packet[maximum allowed packet size]:packet size in bytes:' \
+    'net_buffer_length[network buffer length]:buffer length in bytes:'
 }
 
 

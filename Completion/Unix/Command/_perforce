@@ -1513,8 +1513,8 @@ _perforce_cmd_passwd() {
 _perforce_cmd_print() {
     _arguments -s : \
 	'-a[display all revisions in a range]' \
-	'-o[Select output file]:output file:_files' \
-	'-q[Suppress header]' \
+	'-o[select output file]:output file:_files' \
+	'-q[suppress header]' \
 	'*::file:_perforce_files -tR'
 }
 

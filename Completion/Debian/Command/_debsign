@@ -6,7 +6,7 @@ _arguments '-r[copy .changes file from remote host]:[username@]remotehost' \
            '-e[maintainer]:maintainer name and email address' \
            '-k[key ID to use for signing]:keyid' \
            '-s[argument style for signing program]:gpg or pgp' \
-           '-S[Look for source-only .changes file]' \
+           '-S[look for source-only .changes file]' \
            '-a[architecture]:Debian architecture' \
            '-t[GNU system type]:GNU system type' \
            '--help[help]' \

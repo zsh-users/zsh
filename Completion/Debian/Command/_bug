@@ -129,9 +129,9 @@ _arguments '(--no-config-files)-c[exclude configs from report]' \
 querybts)
 _arguments '(--web)-w[launch external web browser]' \
            '(-w)--web' \
-	   '(--archive)-A[Browse archived bugs]' \
+	   '(--archive)-A[browse archived bugs]' \
 	   '(-A)--archive' \
-	   '(--source)-s[Query for source packages rather than binary]' \
+	   '(--source)-s[query for source packages rather than binary]' \
 	   '(-s)--source' \
 	   '(--version)-v[show version]' \
 	   '(-v)--version' \

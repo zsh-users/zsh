@@ -1,3 +1,12 @@
+2003-07-16  Doug Kearns  <djkea2@mugca.its.monash.edu.au>
+
+	* unposted: Completion/Debian/Command/_bug,
+	Completion/Debian/Command/_debsign, Completion/Linux/Command/_pkgtool,
+	Completion/Unix/Command/_cvs, Completion/Unix/Command/_ecasound,
+	Completion/Unix/Command/_mysql_utils,
+	Completion/Unix/Command/_perforce, Completion/Unix/Command/_screen:
+	remove initial capitalisation from option descriptions
+
 2003-07-09  Oliver Kiddle  <opk@zsh.org>
 
 	* 18841: Completion/Base/Completer/_prefix: work around problem
