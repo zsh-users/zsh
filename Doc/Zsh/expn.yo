@@ -1309,6 +1309,16 @@ are useful for matching path segments in patterns.  For example,
 `tt(*((#s)|/)test((#e)|/)*)' matches a path segment `tt(test)' in any of
 the following strings: tt(test), tt(test/at/start), tt(at/end/test),
 tt(in/test/middle).
+
+Another use is in parameter substitution; for example
+`tt(${array/(#s)A*Z(#e)})' will remove only elements of an array which
+match the complete pattern `tt(A*Z)'.  There are other ways of performing
+many operations of this type, however the combination of the substitution
+operations `tt(/)' and `tt(//)' with the `tt((#s))' and `tt((#e))' flags
+provides a single simple and memorable method.
+
+Note that assertions of the form `tt((^(#s)))' also work, i.e. match
+anywhere except at the start of the string.
 )
 enditem()
 

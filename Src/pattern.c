@@ -1757,6 +1757,9 @@ patmatch(Upat prog)
 			 * over, that doesn't matter:  we should fail anyway.
 			 * The pointer also tells us where the asserted
 			 * pattern matched for use by the exclusion.
+			 *
+			 * P.S. in case you were wondering, this code
+			 * is horrible.
 			 */
 			Upat syncstrp;
 			unsigned char *oldsyncstr;
@@ -1782,6 +1785,7 @@ patmatch(Upat prog)
 			    char savchar, *testptr;
 			    char *savpatinstart = patinstart;
 			    int savforce = forceerrs, savpatinlen = patinlen;
+			    int savpatflags = patflags;
 			    forceerrs = -1;
 			    savglobdots = globdots;
 			    matchederrs = errsfound;
@@ -1800,6 +1804,12 @@ patmatch(Upat prog)
 			    testptr = patinstart + (syncpt - syncstrp->p);
 			    DPUTS(testptr > matchpt, "BUG: EXCSYNC failed");
 			    savchar = *testptr;
+			    /*
+			     * If this isn't really the end of the string,
+			     * remember this for the (#e) assertion.
+			     */
+			    if (savchar)
+				patflags |= PAT_NOTEND;
 			    *testptr = '\0';
 			    next = PATNEXT(scan);
 			    while (next && P_ISEXCLUDE(next)) {
@@ -1848,6 +1858,7 @@ patmatch(Upat prog)
 				next = PATNEXT(next);
 			    }
 			    *testptr = savchar;
+			    patflags = savpatflags;
 			    globdots = savglobdots;
 			    forceerrs = savforce;
 			    if (ret)
@@ -2015,11 +2026,11 @@ patmatch(Upat prog)
 	     */
 	    return 0;
 	case P_ISSTART:
-	    if (patinput != patinstart)
+	    if (patinput != patinstart || (patflags & PAT_NOTSTART))
 		fail = 1;
 	    break;
 	case P_ISEND:
-	    if (*patinput)
+	    if (*patinput || (patflags & PAT_NOTEND))
 		fail = 1;
 	    break;
 	case P_END:

@@ -1024,6 +1024,8 @@ struct patprog {
 #define PAT_STATIC	0x0040	/* Don't copy pattern to heap as per default */
 #define PAT_SCAN	0x0080	/* Scanning, so don't try must-match test */
 #define PAT_ZDUP        0x0100  /* Copy pattern in real memory */
+#define PAT_NOTSTART	0x0200	/* Start of string is not real start */
+#define PAT_NOTEND	0x0400	/* End of string is not real end */
 
 /* Globbing flags: lower 8 bits gives approx count */
 #define GF_LCMATCHUC	0x0100
