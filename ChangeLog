@@ -1,5 +1,8 @@
 2002-01-27  Clint Adams  <clint@zsh.org>
 
+	* 16503: Src/builtin.c: warn on fclose or fflush
+	errors in bin_print.
+
 	* 16500: Completion/Zsh/Type/_command_names:
 	don't complete executable files in the current directory
 	if "." is not in path.
