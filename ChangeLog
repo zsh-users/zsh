@@ -1,5 +1,9 @@
 2000-10-25  Sven Wischnowsky  <wischnow@zsh.org>
 
+	* 3472: Completion/User/_rcs: use return value of _files, don't
+ 	use ${PRE,SUF}FIX for globbing, complete all files as a default
+ 	forco
+	
 	* 13084: Src/Zle/complist.c: re-display list for cleanup only if
  	we were in menu selection
 	
