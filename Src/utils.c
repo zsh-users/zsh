@@ -1156,6 +1156,47 @@ gettempname(const char *prefix, int use_heap)
     return ret;
 }
 
+/**/
+mod_export int
+gettempfile(const char *prefix, int use_heap, char **tempname)
+{
+    char *fn;
+    int fd;
+#if HAVE_MKSTEMP
+    char *suffix = prefix ? ".XXXXXX" : "XXXXXX";
+
+    if (!prefix && !(prefix = getsparam("TMPPREFIX")))
+	prefix = DEFAULT_TMPPREFIX;
+    if (use_heap)
+	fn = dyncat(unmeta(prefix), suffix);
+    else
+	fn = bicat(unmeta(prefix), suffix);
+
+    fd = mkstemp(fn);
+    if (fd < 0) {
+	if (!use_heap)
+	    free(fn);
+	fn = NULL;
+    }
+#else
+    int failures = 0;
+
+    do {
+	if (!(fn = gettempname(prefix, use_heap))) {
+	    fd = -1;
+	    break;
+	}
+	if ((fd = open(fn, O_RDWR | O_CREAT | O_EXCL, 0600)) >= 0)
+	    break;
+	if (!use_heap)
+	    free(fn);
+	fn = NULL;
+    } while (errno == EEXIST && ++failures < 16);
+#endif
+    *tempname = fn;
+    return fd;
+}
+ 
 /* Check if a string contains a token */
 
 /**/
