@@ -21,7 +21,8 @@ _netcat       _larch        _texinfo	  _figlet       _elinks       _tidy
 _global                     _ant          _lsof         _mt           _xmlsoft
 _perforce     _python       _antiword     _screen       _renice       _apm
 _ecasound     _gpg	    _subversion   _aap          _sablotron    _nmap
-_chmod        _du           _getent       _gphoto2      _raggle
-_nice	      _printenv
-_rar	      _sed          _uniq         _vorbis
+_attr         _chmod        _du
+_getent       _gphoto2      _less
+_nice	      _printenv     _raggle
+_rar	      _sed          _uniq         _vorbis       _wiggle
 '

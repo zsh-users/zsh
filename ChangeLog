@@ -1,3 +1,10 @@
+2004-03-01  Oliver Kiddle  <opk@zsh.org>
+
+	* 19507: Completion/Unix/Command/_attr,
+	Completion/Unix/Command/_less, Completion/Unix/Command/_rcs,
+	Completion/Unix/Command/_wiggle: new completions for less,
+	merge, wiggle, attr, getfattr and setfattr
+
 2004-03-01  Peter Stephenson  <pws@csr.com>
 
 	* 19505: Src/init.c: compilation with NTTYDISC defined was

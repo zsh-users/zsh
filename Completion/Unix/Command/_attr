@@ -1,0 +1,48 @@
+#compdef attr getfattr setfattr
+
+case $service in
+  attr)
+    local -a list
+    [[ $OSTYPE = irix* ]] &&
+        list=( '(-g -s -r -V)-l[list extended attributes associated with file]' )
+    _arguments -s -S "$list[@]" \
+      '(-l -r -s -V)-g[get extended attribute for file]:attribute name' \
+      '(-l -g -s -q -V)-r[remove given attribute from file]:attribute name' \
+      '(-l -g -r)-s[set named attribute for file]:attribute name' \
+      '(-r)-q[quiet output]' \
+      '(-g -r)-V[specify value of attribute]:value' \
+      '-L[dereference symbolic links]' \
+      '-R[operator in the root attribute namespace]' \
+      '1:file:_files'
+    return
+  ;;
+  getfattr)
+    _arguments -s -S \
+      '(-d --dump -n --name)'{-n+,--name=}'[dump the value of the named extended attribute]' \
+      '(-n --name -d --dump)'{-d,--dump}'[dump the values of all extended attributes]' \
+      '(-e --encoding)'{-e+,--encoding=}'[encode values after retrieving them]:encoding:(text hex base64)' \
+      '(-h --no-derference)'{-h,--no-dereference}'[do not follow symbolic links]' \
+      '(-m --match)'{-m+,--match=}'[only include attributes with names matching regex]:regular expression' \
+      '--absolute-names[do not string leasing slash characters]' \
+      '--only-values[dump only attribute values]' \
+      '(-R --recursive)'{-R,--recursive}'[list attributes of all files and directories recurively]' \
+      '(-P --physical -L --logical)'{-L,--logical}'[follow all symbolic links]' \
+      '(-L --logical -P --physical)'{-P,--physical}'[skip all symbolic links]' \
+      '(* -)--version[display version information]' \
+      '(* -)--help[display help information]' \
+      '*:file:_files'
+    return
+  ;;
+  setfattr)
+    _arguments -s -S \
+      '(-n --name)'{-n+,--name=}'[specify extended attribute to set]' \
+      '(-v --value)'{-v+,--value=}'[specify value for the attribute]' \
+      '(-x --remove)'{-x+,--remove=}'[remove specified extended attribute]' \
+      '(-n --name -v --value)--restore[restore extended attributes from dump file]:dump file:_files' \
+      '(-h --no-derference)'{-h,--no-dereference}'[do not follow symbolic links]' \
+      '(* -)--version[display version information]' \
+      '(* -)--help[display help information]' \
+      '*:file:_files'
+    return
+  ;;
+esac
