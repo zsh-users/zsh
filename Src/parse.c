@@ -1154,13 +1154,13 @@ par_if(int *complex)
 	    yylex();
 	if (tok == INBRACE && usebrace) {
 	    yylex();
-	    par_list(complex);
+	    par_save_list(complex);
 	    if (tok != OUTBRACE) {
 		cmdpop();
 		YYERRORV(oecused);
 	    }
 	} else {
-	    par_list(complex);
+	    par_save_list(complex);
 	    if (tok != FI) {
 		cmdpop();
 		YYERRORV(oecused);
@@ -1507,7 +1507,7 @@ par_simple(int *complex, int nr)
 		int c = 0;
 
 		yylex();
-		par_list(&c);
+		par_save_list(&c);
 		if (tok != OUTBRACE) {
 		    cmdpop();
 		    lineno += oldlineno;
