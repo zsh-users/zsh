@@ -1,65 +1,65 @@
 # Put standard ANSI color codes in environment for easy use
 
-reset_color="$(echo -n '\e[0m')"
-bold_color="$(echo -n '\e[1m')"
+reset_color=$'\e[0m'
+bold_color=$'\e[1m'
 
 # Foreground
 
-fg_grey="$(echo -n '\e[30m')"
-fg_red="$(echo -n '\e[31m')"
-fg_green="$(echo -n '\e[32m')"
-fg_yellow="$(echo -n '\e[33m')"
-fg_blue="$(echo -n '\e[34m')"
-fg_magenta="$(echo -n '\e[35m')"
-fg_cyan="$(echo -n '\e[36m')"
-fg_white="$(echo -n '\e[37m')"
+fg_grey=$'\e[30m'
+fg_red=$'\e[31m'
+fg_green=$'\e[32m'
+fg_yellow=$'\e[33m'
+fg_blue=$'\e[34m'
+fg_magenta=$'\e[35m'
+fg_cyan=$'\e[36m'
+fg_white=$'\e[37m'
 
-fg_no_bold_grey="$(echo -n '\e[0;30m')"
-fg_no_bold_red="$(echo -n '\e[0;31m')"
-fg_no_bold_green="$(echo -n '\e[0;32m')"
-fg_no_bold_yellow="$(echo -n '\e[0;33m')"
-fg_no_bold_blue="$(echo -n '\e[0;34m')"
-fg_no_bold_magenta="$(echo -n '\e[0;35m')"
-fg_no_bold_cyan="$(echo -n '\e[0;36m')"
-fg_no_bold_white="$(echo -n '\e[0;37m')"
+fg_no_bold_grey=$'\e[0;30m'
+fg_no_bold_red=$'\e[0;31m'
+fg_no_bold_green=$'\e[0;32m'
+fg_no_bold_yellow=$'\e[0;33m'
+fg_no_bold_blue=$'\e[0;34m'
+fg_no_bold_magenta=$'\e[0;35m'
+fg_no_bold_cyan=$'\e[0;36m'
+fg_no_bold_white=$'\e[0;37m'
 
-fg_bold_grey="$(echo -n '\e[1;30m')"
-fg_bold_red="$(echo -n '\e[1;31m')"
-fg_bold_green="$(echo -n '\e[1;32m')"
-fg_bold_yellow="$(echo -n '\e[1;33m')"
-fg_bold_blue="$(echo -n '\e[1;34m')"
-fg_bold_magenta="$(echo -n '\e[1;35m')"
-fg_bold_cyan="$(echo -n '\e[1;36m')"
-fg_bold_white="$(echo -n '\e[1;37m')"
+fg_bold_grey=$'\e[1;30m'
+fg_bold_red=$'\e[1;31m'
+fg_bold_green=$'\e[1;32m'
+fg_bold_yellow=$'\e[1;33m'
+fg_bold_blue=$'\e[1;34m'
+fg_bold_magenta=$'\e[1;35m'
+fg_bold_cyan=$'\e[1;36m'
+fg_bold_white=$'\e[1;37m'
 
 # Background
 
-bg_grey="$(echo -n '\e[40m')"
-bg_red="$(echo -n '\e[41m')"
-bg_green="$(echo -n '\e[42m')"
-bg_yellow="$(echo -n '\e[43m')"
-bg_blue="$(echo -n '\e[44m')"
-bg_magenta="$(echo -n '\e[45m')"
-bg_cyan="$(echo -n '\e[46m')"
-bg_white="$(echo -n '\e[47m')"
+bg_grey=$'\e[40m'
+bg_red=$'\e[41m'
+bg_green=$'\e[42m'
+bg_yellow=$'\e[43m'
+bg_blue=$'\e[44m'
+bg_magenta=$'\e[45m'
+bg_cyan=$'\e[46m'
+bg_white=$'\e[47m'
 
-bg_no_bold_grey="$(echo -n '\e[0;40m')"
-bg_no_bold_red="$(echo -n '\e[0;41m')"
-bg_no_bold_green="$(echo -n '\e[0;42m')"
-bg_no_bold_yellow="$(echo -n '\e[0;43m')"
-bg_no_bold_blue="$(echo -n '\e[0;44m')"
-bg_no_bold_magenta="$(echo -n '\e[0;45m')"
-bg_no_bold_cyan="$(echo -n '\e[0;46m')"
-bg_no_bold_white="$(echo -n '\e[0;47m')"
+bg_no_bold_grey=$'\e[0;40m'
+bg_no_bold_red=$'\e[0;41m'
+bg_no_bold_green=$'\e[0;42m'
+bg_no_bold_yellow=$'\e[0;43m'
+bg_no_bold_blue=$'\e[0;44m'
+bg_no_bold_magenta=$'\e[0;45m'
+bg_no_bold_cyan=$'\e[0;46m'
+bg_no_bold_white=$'\e[0;47m'
 
-bg_bold_grey="$(echo -n '\e[1;40m')"
-bg_bold_red="$(echo -n '\e[1;41m')"
-bg_bold_green="$(echo -n '\e[1;42m')"
-bg_bold_yellow="$(echo -n '\e[1;43m')"
-bg_bold_blue="$(echo -n '\e[1;44m')"
-bg_bold_magenta="$(echo -n '\e[1;45m')"
-bg_bold_cyan="$(echo -n '\e[1;46m')"
-bg_bold_white="$(echo -n '\e[1;47m')"
+bg_bold_grey=$'\e[1;40m'
+bg_bold_red=$'\e[1;41m'
+bg_bold_green=$'\e[1;42m'
+bg_bold_yellow=$'\e[1;43m'
+bg_bold_blue=$'\e[1;44m'
+bg_bold_magenta=$'\e[1;45m'
+bg_bold_cyan=$'\e[1;46m'
+bg_bold_white=$'\e[1;47m'
 
 # Stop these screwing the environment listing up
 bg_zzzz=$reset_color
