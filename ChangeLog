@@ -1,3 +1,7 @@
+2003-09-21  Oliver Kiddle  <opk@zsh.org>
+
+	* 19106: Doc/Zsh/compsys.yo: document use for _menu
+
 2003-09-17  Vin Shelton  <acs@alumni.princeton.edu>
 
 	* 19087: Doc/Zsh/mod_system.yo: Fix up makeinfo warning.

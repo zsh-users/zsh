@@ -2784,12 +2784,13 @@ not be used.
 )
 findex(_menu)
 item(tt(_menu))(
-This completer is a simple example function implemented to show how
-menu completion can be done in shell code.  It should be used as the
-first completer and has the effect of making later completers perform
-menu completion.  Note that this is independent of the setting of the
-tt(MENU_COMPLETE) option and does not work with the other
-menu completion widgets such as tt(reverse-menu-complete), or
+This completer was written as simple example function to show how menu
+completion can be enabled in shell code. However, it has the notable
+effect of disabling menu selection which can be useful with
+tt(_generic) based widgets. It should be used as the first completer in
+the list.  Note that this is independent of the setting of the
+tt(MENU_COMPLETE) option and does not work with the other menu
+completion widgets such as tt(reverse-menu-complete), or
 tt(accept-and-menu-complete).
 )
 findex(_oldlist)
