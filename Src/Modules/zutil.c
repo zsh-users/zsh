@@ -549,6 +549,148 @@ bin_zstyle(char *nam, char **args, Options ops, int func)
 
 /* Format stuff. */
 
+/*
+ * One chunk of text, to allow recursive handling of ternary
+ * expressions in zformat -f output.
+ *   instr	The input string.
+ *   specs	The format specifiers, specs[c] is the string from c:string
+ *   outp	*outp is the start of the output string
+ *   ousedp	(*outp)[*ousedp] is where to write next
+ *   olenp	*olenp is the size allocated for *outp
+ *   endchar    Terminator character in addition to `\0' (may be '\0')
+ *   skip	If 1, don't output, just parse.
+ */
+static char *zformat_substring(char* instr, char **specs, char **outp,
+			       int *ousedp, int *olenp, int endchar, int skip)
+{
+    char *s;
+
+    for (s = instr; *s && *s != endchar; s++) {
+	if (*s == '%') {
+	    int right, min = -1, max = -1, outl, testit;
+	    char *spec, *start = s;
+
+	    if ((right = (*++s == '-')))
+		s++;
+
+	    if (*s >= '0' && *s <= '9') {
+		for (min = 0; *s >= '0' && *s <= '9'; s++)
+		    min = (min * 10) + (int) STOUC(*s) - '0';
+	    }
+
+	    /* Ternary expressions */
+	    testit = (STOUC(*s) == '(');
+	    if (testit && s[1] == '-')
+	    {
+		/* Allow %(-1... etc. */
+		right = 1;
+		s++;
+	    }
+	    if ((*s == '.' || testit) && s[1] >= '0' && s[1] <= '9') {
+		for (max = 0, s++; *s >= '0' && *s <= '9'; s++)
+		    max = (max * 10) + (int) STOUC(*s) - '0';
+	    }
+	    else if (testit)
+		s++;
+
+	    if (testit && STOUC(*s)) {
+		int actval, testval, endcharl;
+
+		/*
+		 * One one number is useful for ternary expressions.
+		 * Remember to put the sign back.
+		 */
+		testval = (min >= 0) ? min : (max >= 0) ? max : 0;
+		if (right)
+		    testval *= -1;
+
+		if (specs[STOUC(*s)])
+		    actval = (int)mathevali(specs[STOUC(*s)]);
+		else
+		    actval = 0;
+		/* zero means values are equal, i.e. true */
+		actval -= testval;
+
+		/* careful about premature end of string */
+		if (!(endcharl = *++s))
+		    return NULL;
+
+		/*
+		 * Either skip true text and output false text, or
+		 * vice versa... unless we are already skipping.
+		 */
+		if (!(s = zformat_substring(s+1, specs, outp, ousedp,
+					    olenp, endcharl, skip || actval)))
+		    return NULL;
+		if (!(s = zformat_substring(s+1, specs, outp, ousedp,
+					    olenp, ')', skip || !actval)))
+		    return NULL;
+	    } else if (skip) {
+		continue;
+	    } else if ((spec = specs[STOUC(*s)])) {
+		int len;
+
+		if ((len = strlen(spec)) > max && max >= 0)
+		    len = max;
+		outl = (min >= 0 ? (min > len ? min : len) : len);
+
+		if (*ousedp + outl >= *olenp) {
+		    int nlen = *olenp + outl + 128;
+		    char *tmp = (char *) zhalloc(nlen);
+
+		    memcpy(tmp, *outp, *olenp);
+		    *olenp = nlen;
+		    *outp = tmp;
+		}
+		if (len >= outl) {
+		    memcpy(*outp + *ousedp, spec, outl);
+		    *ousedp += outl;
+		} else {
+		    int diff = outl - len;
+
+		    if (right) {
+			while (diff--)
+			    (*outp)[(*ousedp)++] = ' ';
+			memcpy(*outp + *ousedp, spec, len);
+			*ousedp += len;
+		    } else {
+			memcpy(*outp + *ousedp, spec, len);
+			*ousedp += len;
+			while (diff--)
+			    (*outp)[(*ousedp)++] = ' ';
+		    }
+		}
+	    } else {
+		int len = s - start + 1;
+
+		if (*ousedp + len >= *olenp) {
+		    int nlen = *olenp + len + 128;
+		    char *tmp = (char *) zhalloc(nlen);
+
+		    memcpy(tmp, *outp, *olenp);
+		    *olenp = nlen;
+		    *outp = tmp;
+		}
+		memcpy(*outp + *ousedp, start, len);
+		*ousedp += len;
+	    }
+	} else {
+	    if (skip)
+		continue;
+	    if (*ousedp + 1 >= *olenp) {
+		char *tmp = (char *) zhalloc((*olenp) << 1);
+
+		memcpy(tmp, *outp, *olenp);
+		*olenp <<= 1;
+		*outp = tmp;
+	    }
+	    (*outp)[(*ousedp)++] = *s;
+	}
+    }
+
+    return s;
+}
+
 static int
 bin_zformat(char *nam, char **args, Options ops, int func)
 {
@@ -563,11 +705,13 @@ bin_zformat(char *nam, char **args, Options ops, int func)
     switch (opt) {
     case 'f':
 	{
-	    char **ap, *specs[256], *out, *s;
+	    char **ap, *specs[256], *out;
 	    int olen, oused = 0;
 
 	    memset(specs, 0, 256 * sizeof(char *));
 
+	    specs['%'] = "%";
+	    specs[')'] = ")";
 	    for (ap = args + 2; *ap; ap++) {
 		if (!ap[0][0] || ap[0][0] == '-' || ap[0][0] == '.' ||
 		    (ap[0][0] >= '0' && ap[0][0] <= '9') ||
@@ -579,80 +723,7 @@ bin_zformat(char *nam, char **args, Options ops, int func)
 	    }
 	    out = (char *) zhalloc(olen = 128);
 
-	    for (s = args[1]; *s; s++) {
-		if (*s == '%') {
-		    int right, min = -1, max = -1, outl;
-		    char *spec, *start = s;
-
-		    if ((right = (*++s == '-')))
-			s++;
-
-		    if (*s >= '0' && *s <= '9') {
-			for (min = 0; *s >= '0' && *s <= '9'; s++)
-			    min = (min * 10) + (int) STOUC(*s) - '0';
-		    }
-		    if (*s == '.' && s[1] >= '0' && s[1] <= '9') {
-			for (max = 0, s++; *s >= '0' && *s <= '9'; s++)
-			    max = (max * 10) + (int) STOUC(*s) - '0';
-		    }
-		    if ((spec = specs[STOUC(*s)])) {
-			int len;
-
-			if ((len = strlen(spec)) > max && max >= 0)
-			    len = max;
-			outl = (min >= 0 ? (min > len ? min : len) : len);
-
-			if (oused + outl >= olen) {
-			    int nlen = olen + outl + 128;
-			    char *tmp = (char *) zhalloc(nlen);
-
-			    memcpy(tmp, out, olen);
-			    olen = nlen;
-			    out = tmp;
-			}
-			if (len >= outl) {
-			    memcpy(out + oused, spec, outl);
-			    oused += outl;
-			} else {
-			    int diff = outl - len;
-
-			    if (right) {
-				while (diff--)
-				    out[oused++] = ' ';
-				memcpy(out + oused, spec, len);
-				oused += len;
-			    } else {
-				memcpy(out + oused, spec, len);
-				oused += len;
-				while (diff--)
-				    out[oused++] = ' ';
-			    }				
-			}
-		    } else {
-			int len = s - start + 1;
-
-			if (oused + len >= olen) {
-			    int nlen = olen + len + 128;
-			    char *tmp = (char *) zhalloc(nlen);
-
-			    memcpy(tmp, out, olen);
-			    olen = nlen;
-			    out = tmp;
-			}
-			memcpy(out + oused, start, len);
-			oused += len;
-		    }
-		} else {
-		    if (oused + 1 >= olen) {
-			char *tmp = (char *) zhalloc(olen << 1);
-
-			memcpy(tmp, out, olen);
-			olen <<= 1;
-			out = tmp;
-		    }
-		    out[oused++] = *s;
-		}
-	    }
+	    zformat_substring(args[1], specs, &out, &oused, &olen, '\0', 0);
 	    out[oused] = '\0';
 
 	    setsparam(args[0], ztrdup(out));

@@ -124,6 +124,31 @@ many characters.  After all `tt(%)' sequences for the given var(specs)
 have been processed, the resulting string is stored in the parameter
 var(param).
 
+The tt(%)-escapes also understand ternary expressions in the form used by
+prompts.  The tt(%) is followed by a `tt(LPAR())' and then an ordinary
+format specifier character as described above.  There may be a set of
+digits either before or after the `tt(LPAR())'; these specify a test
+number, which defaults to zero.  Negative numbers are also allowed.  An
+arbitrary delimiter character follows the format specifier, which is
+followed by a piece of `true' text, the delimiter character again, a piece
+of `false' text, and a closing parenthesis.  The complete expression
+(without the digits) thus looks like
+`tt(%LPAR())var(X)tt(.)var(text1)tt(.)var(text2)tt(RPAR())', except that
+the `tt(.)' character is arbitrary.  The value given for the format
+specifier in the var(char)tt(:)var(string) expressions is evaluated as a
+mathematical expression, and compared with the test number.  If they are
+the same, var(text1) is output, else var(text2) is output.  A parenthesis
+may be escaped in var(text2) as tt(%RPAR()).  Either of var(text1) or
+var(text2) may contain nested tt(%)-escapes.
+
+For example:
+
+example(zformat -f REPLY "The answer is '%3(c.yes.no)'." c:3)
+
+outputs "The answer is 'yes'." to tt(REPLY) since the value for the format
+specifier tt(c) is 3, agreeing with the digit argument to the ternary
+expression.
+
 The second form, using the tt(-a) option, can be used for aligning
 strings.  Here, the var(specs) are of the form
 `var(left)tt(:)var(right)' where `var(left)' and `var(right)' are

@@ -1,3 +1,8 @@
+2003-06-19  Peter Stephenson  <pws@csr.com>
+
+	* 18616: Src/Modules/zutil.c, Doc/Zsh/mod_zutil.yo: Add
+	ternary expression handling to zformat.
+
 2003-06-18  Peter Stephenson  <pws@csr.com>
 
 	* unposted: README, Etc/NEWS, Config/version.mk: version 4.1.1,
