@@ -5,7 +5,7 @@ _remote_files () {
   local expl remfiles remdispf remdispd suf ret=1
 
   if zstyle -T ":completion:${curcontext}:" remote-access; then
-    remfiles=(${(M)${(f)"$(ssh -a -x ${words[CURRENT]%%:*} ls -d1F ${PREFIX%%[^/]#}\* 2>/dev/null)"}%%[^/]##(|/)})
+    remfiles=(${(M)${(f)"$(ssh -a -x ${words[CURRENT]%%:*} ls -d1F ${PREFIX%%[^./][^/]#}\* 2>/dev/null)"}%%[^/]#(|/)})
     compset -P '*/'
     compset -S '/*' || suf='remote file'
 
