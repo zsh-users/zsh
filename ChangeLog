@@ -1,5 +1,7 @@
 2000-04-03  Sven Wischnowsky <wischnow@informatik.hu-berlin.de>
 
+	* 10471: Completion/User/_imagemagick: new completion function
+
 	* 10467: Src/builtin.c, Src/parse.c: better error handling for
 	zwc files
 
