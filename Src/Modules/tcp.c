@@ -322,13 +322,14 @@ tcp_connect(Tcp_session sess, char *addrp, struct hostent *zhost, int d_port)
 # ifdef HAVE_STRUCT_SOCKADDR_IN6_SIN6_SCOPE_ID
 	sess->peer.in6.sin6_scope_id = 0;
 # endif
+	sess->peer.in6.sin6_family = zhost->h_addrtype;
 	salen = sizeof(struct sockaddr_in6);
     } else
 #endif /* SUPPORT_IPV6 */
     {
 	memcpy(&(sess->peer.in.sin_addr), addrp, zhost->h_length);
 	sess->peer.in.sin_port = d_port;
-	sess->peer.a.sa_family = zhost->h_addrtype;
+	sess->peer.in.sin_family = zhost->h_addrtype;
 	salen = sizeof(struct sockaddr_in);
     }
 
