@@ -1,3 +1,9 @@
+2001-06-10  Clint Adams  <clint@zsh.org>
+
+	* 14830: config.guess, config.sub:
+	upgrade to GNU's June 5 and 8 versions,
+	respectively.
+
 2001-06-09  Bart Schaefer  <schaefer@zsh.org>
 
 	* unposted (see 14826): Test/C02cond.ztst: Force group of new
