@@ -17,3 +17,4 @@ widgets.list
 zle_things.h
 zle_widget.h
 *.swp
+*.dll

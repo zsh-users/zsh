@@ -1,8 +1,8 @@
 2003-11-02  Felix Rosencrantz <f_rosencrantz@yahoo.com>
 
 	* unposted: Src/.cvsignore, Src/Builtins/.cvsignore,
-	Src/Modules/.cvsignore: add *.dll for cygwin builds and
-	fix typo. 
+	Src/Modules/.cvsignore, Src/Zle/.cvsignore: add *.dll for cygwin
+	builds and fix typo. 
 
 2003-10-27  Peter Stephenson  <pws@csr.com>
 
