@@ -3064,8 +3064,6 @@ getproc(char *cmd)
 	if (!out)
 	{
 	    addproc(pid, NULL, 1);
-	    fprintf(stderr, "Proc %d added\n", pid);
-	    fflush(stderr);
 	}
 	return pnam;
     }
@@ -3448,7 +3446,8 @@ doshfunc(char *name, Eprog prog, LinkList doshargs, int flags, int noreturnval)
  * was executed.                                            */
 {
     char **tab, **x, *oargv0;
-    int oldzoptind, oldlastval, oldoptcind;
+    int oldzoptind, oldlastval, oldoptcind, oldnumpipestats;
+    int *oldpipestats = NULL;
     char saveopts[OPT_SIZE], *oldscriptname = scriptname, *fname = dupstring(name);
     int obreaks;
     struct funcstack fstack;
@@ -3463,6 +3462,16 @@ doshfunc(char *name, Eprog prog, LinkList doshargs, int flags, int noreturnval)
     if (trapreturn < 0)
 	trapreturn--;
     oldlastval = lastval;
+    oldnumpipestats = numpipestats;
+    if (noreturnval) {
+	/*
+	 * Easiest to use the heap here since we're bracketed
+	 * immediately by a pushheap/popheap pair.
+	 */
+	size_t bytes = sizeof(int)*numpipestats;
+	oldpipestats = (int *)zhalloc(bytes);
+	memcpy(oldpipestats, pipestats, bytes);
+    }
 
     starttrapscope();
 
@@ -3568,8 +3577,11 @@ doshfunc(char *name, Eprog prog, LinkList doshargs, int flags, int noreturnval)
 
     if (trapreturn < -1)
 	trapreturn++;
-    if (noreturnval)
+    if (noreturnval) {
 	lastval = oldlastval;
+	numpipestats = oldnumpipestats;
+	memcpy(pipestats, oldpipestats, sizeof(int)*numpipestats);
+    }
     popheap();
 
     if (exit_pending) {

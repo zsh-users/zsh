@@ -1,8 +1,19 @@
+2003-11-03  Peter Stephenson  <pws@csr.com>
+
+	* 19216: Src/exec.c: save and restore $pipestatus on functions
+	when noreturnval flag is set.  Remove unnecessary debugging output.
+
 2003-11-02  Felix Rosencrantz <f_rosencrantz@yahoo.com>
 
 	* unposted: Src/.cvsignore, Src/Builtins/.cvsignore,
 	Src/Modules/.cvsignore, Src/Zle/.cvsignore: add *.dll for cygwin
 	builds and fix typo. 
+
+2003-10-29  Peter Stephenson  <pws@csr.com>
+
+	* c.f. 19209: Src/...: Globally replace zcalloc with zshcalloc
+	to avoid clash with zcalloc from zlib; this is linked in on
+	some systems (certainly Debian) for some database lookups.
 
 2003-10-27  Peter Stephenson  <pws@csr.com>
 
