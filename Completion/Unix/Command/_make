@@ -1,0 +1,50 @@
+#compdef make gmake pmake dmake
+
+local prev="$words[CURRENT-1]" file expl tmp
+
+(( $+_is_gnu )) || typeset -gA _is_gnu
+
+if (( ! $+_is_gnu[$words[1]] )); then
+  if [[ $(_call_program version $words[1] -v -f /dev/null </dev/null 2>/dev/null) = *GNU* ]]
+  then
+    _is_gnu[$words[1]]=yes
+  else
+    _is_gnu[$words[1]]=
+  fi
+fi
+
+if [[ "$prev" = -[CI] ]]; then
+  _files -/
+elif [[ "$prev" = -[foW] ]]; then
+  _files
+else
+  file="$words[(I)-f]"
+  if (( file )); then
+    file="$words[file+1]"
+  elif [[ -e Makefile ]]; then
+    file=Makefile
+  elif [[ -e makefile ]]; then
+    file=makefile
+  elif [[ -n "$_is_gnu[$words[1]]" && -e GNUmakefile ]]; then
+    file=GNUmakefile
+  else
+    file=''
+  fi
+
+  if [[ -n "$file" ]] && _tags targets; then
+    if [[ -n "$_is_gnu[$words[1]]" ]] &&
+       zstyle -t ":completion:${curcontext}:targets" call-command; then
+      tmp=( $(_call_program targets "$words[1]" -nsp --no-print-directory -f "$file" .PHONY 2> /dev/null | awk '/^[a-zA-Z0-9][^\/\t=]+:/ {print $1}' FS=:) )
+    else
+      tmp=(
+            $(awk '/^[a-zA-Z0-9][^\/\t=]+:/ {print $1}
+ 	      /^\.include  *<bsd\.port\.(subdir\.|pre\.)?mk>/ || /^\.include  *".*mk\/bsd\.pkg\.(subdir\.)?mk"/ {
+ 	        print "fetch fetch-list extract patch configure build install reinstall deinstall package describe checkpatch checksum makesum" }' \
+ 	     FS=: $file)
+           )
+    fi
+    _wanted targets expl 'make target' compadd -a tmp && return 0
+  fi
+  compset -P 1 '*='
+  _files
+fi
