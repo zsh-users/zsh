@@ -1,3 +1,11 @@
+2004-03-20  Bart Schaefer  <schaefer@zsh.org>
+
+	* 19666 (tweaked): Completion/Unix/Command/_ssh: fixes for remote
+	file completion for scp, suggested by Jay Berkenbilt <ejb@ql.org>.
+
+	* users/7172: Functions/Prompts/prompt_bart_setup: include "unset"
+	among the localoptions, as this relies on it.
+
 2004-03-19  Peter Stephenson  <pws@csr.com>
 
 	* unposted: Config/version.mk, Etc/NEWS, Util/.distfiles:
