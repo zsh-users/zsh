@@ -68,6 +68,14 @@
 0:#, ## and $#
 >117
 
+  print $((##))
+0:## without following character
+>0
+
+  print $((## ))
+0:## followed by a space
+>32
+
   integer i
   (( i = 3 + 5 * 1.75 ))
   print $i

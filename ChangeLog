@@ -1,3 +1,7 @@
+2003-12-17  Oliver Kiddle  <opk@zsh.org>
+
+	* 19308: Src/utils.c, Test/C01arith.ztst: zsh crashes with $((##))
+
 2003-12-16  Oliver Kiddle  <opk@zsh.org>
 
 	* 19299: Completion/Unix/Command/_mount: try to handle

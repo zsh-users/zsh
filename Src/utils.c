@@ -3643,7 +3643,10 @@ getkeystring(char *s, int *len, int fromwhere, int *misc)
     }
     DPUTS(fromwhere == 4, "BUG: unterminated $' substitution");
     *t = '\0';
-    *len = t - buf;
+    if (fromwhere == 6)
+      *misc = 0;
+    else
+      *len = t - buf;
     return buf;
 }
 
