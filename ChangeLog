@@ -1,3 +1,8 @@
+2000-06-27  Peter Stephenson  <pws@cambridgesiliconradio.com>
+
+	* Andrej: 12081: Src/Modules/zpty.c: compiles under Cygwin, but
+	still glitches.
+
 2000-06-26  Peter Stephenson  <pws@pwstephenson.fsnet.co.uk>
 
 	* unposted: Src/builtin.c, Src/utils.c: move read_poll to utils.c

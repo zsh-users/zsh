@@ -155,9 +155,11 @@ getptycmd(char *name)
 /**** maybe we should use configure here */
 /**** and we certainly need more/better #if tests */
 
-#if defined(__SVR4) || defined(sinix)
+#if defined(__SVR4) || defined(sinix) || defined(__CYGWIN__)
 
+#if !defined(__CYGWIN__)
 #include <sys/stropts.h>
+#endif
 
 static int
 get_pty(int master, int *retfd)
@@ -183,6 +185,7 @@ get_pty(int master, int *retfd)
 	close(mfd);
 	return 1;
     }
+#if !defined(__CYGWIN__)
     if ((ret = ioctl(sfd, I_FIND, "ptem")) != 1)
        if (ret == -1 || ioctl(sfd, I_PUSH, "ptem") == -1) {
 	   close(mfd);
@@ -201,13 +204,14 @@ get_pty(int master, int *retfd)
 	   close(sfd);
 	   return 1;
        }
+#endif /* !defined(__CYGWIN__) */
 
     *retfd = sfd;
 
     return 0;
 }
 
-#else /* ! (defined(__SVR4) || defined(sinix)) */
+#else /* ! (defined(__SVR4) || defined(sinix) || defined(__CYGWIN__)) */
 
 static int
 get_pty(int master, int *retfd)
