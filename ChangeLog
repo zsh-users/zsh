@@ -1,5 +1,11 @@
 2000-05-05  Peter Stephenson  <pws@cambridgesiliconradio.com>
 
+	* pws: 11196: Functions/Misc/zmv: allow (**/) to map to a
+	parameter in the obvious way; allow automatic recognition of
+	wildcards with -w flag; turn off glob qualifiers by default, use
+	-Q to turn on; fix bug with empty match eliding a positional
+	parameter; fix bug that empty `to' pattern wasn't picked up.
+
 	* pws: unposted: fixes for Etc/CONTRIBUTORS based on suggestions
 	in 11187 and 11197
 
