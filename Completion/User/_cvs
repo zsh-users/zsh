@@ -215,16 +215,16 @@ _cvs_history () {
     -{T,a,c,e,l,o,w,\?} \
     '-D+:date:_cvs_D' \
     '-b+:string:' \
-    '-f+:arg:' \
+    '-f+:file:_cvs_files' \
     '-m+:module:_cvs_modules' \
-    '-n+:arg:' \
+    '-n+:module:_cvs_modules' \
     '*-p+:repository:' \
     '-r+:rev:' \
     '-t+:tag:' \
     '-u+:user name:' \
     '-x+:type:_cvs_history_x' \
     '-X+:arg:' \
-    '-z+:arg:' \
+    '-z+:timezone:' \
     '*:file:_cvs_files'
 }
 
@@ -345,7 +345,7 @@ _cvs_unedit () {
 _cvs_update () {
   # "+ApPflRQqduk:r:D:j:I:W:"
   _arguments -s \
-    -{A,p,P,f,l,R,Q,q,d,u} \
+    -{A,C,p,P,f,l,R,Q,q,d,u} \
     '-k+:keyword substitution:_cvs_k' \
     '-r+:tag:_cvs_revisions' \
     '-D+:date:_cvs_D' \
