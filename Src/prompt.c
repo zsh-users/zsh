@@ -733,9 +733,9 @@ static int
 prompttrunc(int arg, int truncchar, int doprint, int endchar)
 {
     if (arg) {
-	char ch = *fm, *ptr = bp, *truncstr;
+	char ch = *fm, *ptr, *truncstr;
 	int truncatleft = ch == '<';
-	int w;
+	int w = bp - buf;
 
 	/*
 	 * If there is already a truncation active, return so that
@@ -760,10 +760,11 @@ prompttrunc(int arg, int truncchar, int doprint, int endchar)
 	}
 	if (!*fm)
 	    return 0;
-	if (bp == ptr && truncchar == ']') {
+	if (bp - buf == w && truncchar == ']') {
 	    addbufspc(1);
 	    *bp++ = '<';
 	}
+	ptr = buf + w;		/* addbufspc() may have realloc()'d buf */
 	truncstr = ztrduppfx(ptr, bp - ptr);
 
 	bp = ptr;
@@ -787,10 +788,13 @@ prompttrunc(int arg, int truncchar, int doprint, int endchar)
 	    if (w < fullen) {
 		/* Invisible substrings, lots of shuffling. */
 		int n = strlen(t);
+		char *p = ptr, *q = buf;
 		addbufspc(n);
+		ptr = buf + (p - q); /* addbufspc() may have realloc()'d */
 
 		if (truncatleft) {
-		    char *p = ptr + n, *q = p;
+		    p = ptr + n;
+		    q = p;
 
 		    n = fullen - w;
 
@@ -812,7 +816,7 @@ prompttrunc(int arg, int truncchar, int doprint, int endchar)
 		    bp = q;
 		} else {
 		    /* Truncate on the right, selectively */
-		    char *q = ptr + fullen;
+		    q = ptr + fullen;
 
 		    /* First skip over as much as will "fit". */
 		    while (w > 0 && maxlen > 0) {
@@ -846,6 +850,7 @@ prompttrunc(int arg, int truncchar, int doprint, int endchar)
 		/* No invisible substrings. */
 		if (tlen > fullen) {
 		    addbufspc(tlen - fullen);
+		    ptr = bp;	/* addbufspc() may have realloc()'d buf */
 		    bp += tlen - fullen;
 		} else
 		    bp -= fullen - trunclen;
