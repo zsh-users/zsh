@@ -202,7 +202,7 @@ evalcond(Estate state)
 		char *opat;
 		int save;
 
-		right = opat = dupstring(ecrawstr(state->prog, state->pc,
+		right = dupstring(opat = ecrawstr(state->prog, state->pc,
 						  &htok));
 		if (htok)
 		    singsub(&right);
