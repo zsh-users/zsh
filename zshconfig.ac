@@ -1538,7 +1538,7 @@ if test "x$aixdynamic" = xyes; then
   zsh_cv_sys_dynamic_strip_exe="${zsh_cv_sys_dynamic_strip_exe=yes}"
   zsh_cv_sys_dynamic_strip_lib="${zsh_cv_sys_dynamic_strip_lib=yes}"
   zsh_cv_sys_dynamic_broken="${zsh_cv_sys_dynamic_broken=no}"
-elif test "x$ac_cv_cygwin" = xyes; then
+elif test "$host_os" = cygwin; then
   DL_EXT="${DL_EXT=dll}"
   DLLD="${DLLD=dllwrap}"
   DLLDFLAGS="${DLLDFLAGS=--export-all-symbols}"
@@ -1738,7 +1738,7 @@ if test "x$dynamic" = xyes; then
   if $strip_libldflags && test "$zsh_cv_sys_dynamic_strip_lib" = yes; then
     LIBLDFLAGS="$LIBLDFLAGS -s"
   fi
-  if test "x$ac_cv_cygwin" = xyes; then
+  if test "$host_os" = cygwin; then
     INSTLIB="install.cygwin-lib"
     UNINSTLIB="uninstall.cygwin-lib"
   fi
@@ -1772,7 +1772,7 @@ AC_SUBST(SHORTBOOTNAMES)
 AC_SUBST(INSTLIB)dnl
 AC_SUBST(UNINSTLIB)dnl
 
-if test x"$ac_cv_cygwin" = xyes; then
+if test "$host_os" = cygwin; then
   EXTRAZSHOBJS="$EXTRAZSHOBJS zsh.res.o"
 fi
 

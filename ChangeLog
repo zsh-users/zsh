@@ -9,6 +9,9 @@
 
 2001-06-06  Andrej Borsenkow  <bor@zsh.org>
 
+	* 14758: zshconfig.ac: no more ac_cv_cygwin in autoconf-2.50;
+	use host_os instead
+
 	* unposted; based on 14679 (me) and 14693 (Bart): configure.ac,
 	zshconfig.ac, .distfiles, Makefile.in, configure.in, Src/mkmakemod.sh:
 	Allow processing by both autoconf-2.13 and autoconf-2.50; remove
