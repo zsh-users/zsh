@@ -160,7 +160,7 @@ eorig="$orig"
 
 # If given no `-F' option, we want to use the `ignored-suffixes'-style.
 
-if (( ! $#ignore )); then
+if [[ $#ignore -eq 0 && -z $gopt ]]; then
   if zstyle -a ":completion${curcontext}:files" ignored-suffixes ignore; then
     ignore=(-F "( $ignore )")
   else
