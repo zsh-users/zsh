@@ -322,8 +322,9 @@ update_job(Job jn)
 	}
     }
 
-    if (shout && !ttyfrozen && !jn->stty_in_env && !zleactive &&
-	job == thisjob && !somestopped && !(jn->stat & STAT_NOSTTY))
+    if (shout && shout != stderr && !ttyfrozen && !jn->stty_in_env &&
+	!zleactive && job == thisjob && !somestopped &&
+	!(jn->stat & STAT_NOSTTY)) 
 	gettyinfo(&shttyinfo);
 
     if (isset(MONITOR)) {

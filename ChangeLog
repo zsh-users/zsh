@@ -1,5 +1,9 @@
 2003-09-22  Peter Stephenson  <pws@csr.com>
 
+	* 19105: Src/init.c, Src/jobs.c: Set shout to stderr if we
+	are interactive but have no terminal.  Prevents crash in
+	history and potentially elsewhere.
+
 	* 19112: Completion/Unix/Command/_perforce: several improvements
 	and bug fixes.
 
