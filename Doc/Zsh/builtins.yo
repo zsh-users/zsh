@@ -348,7 +348,7 @@ Bring each specified var(job) in turn to the foreground.
 If no var(job) is specified, resume the current job.
 )
 findex(float)
-item(tt(float) [ {tt(PLUE())|tt(-)}tt(EFghlrtux) ] [ var(name)[tt(=)var(value)] ... ])(
+item(tt(float) [ {tt(PLUS())|tt(-)}tt(EFghlrtux) ] [ var(name)[tt(=)var(value)] ... ])(
 Equivalent to tt(typeset -E), except that options irrelevant to floating
 point numbers are not permitted.
 )
