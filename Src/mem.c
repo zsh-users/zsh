@@ -493,18 +493,20 @@ hrealloc(char *p, size_t old, size_t new)
 	    n -= n % HEAPSIZE;
 
 #ifdef USE_MMAP
-	    /*
-	     * I don't know any easy portable way of requesting
-	     * a mmap'd segment be extended, so simply allocate
-	     * a new one and copy.
-	     */
-	    Heap hnew;
+	    {
+		/*
+		 * I don't know any easy portable way of requesting
+		 * a mmap'd segment be extended, so simply allocate
+		 * a new one and copy.
+		 */
+		Heap hnew;
 
-	    hnew = mmap_heap_alloc(&n);
-	    /* Copy the entire heap, header (with next pointer) included */
-	    memcpy(hnew, h, h->size);
-	    munmap((void *)h, h->size);
-	    h = hnew;
+		hnew = mmap_heap_alloc(&n);
+		/* Copy the entire heap, header (with next pointer) included */
+		memcpy(hnew, h, h->size);
+		munmap((void *)h, h->size);
+		h = hnew;
+	    }
 #else
 	    h = (Heap) realloc(h, n);
 #endif
