@@ -1,3 +1,8 @@
+2002-09-06  Clint Adams  <clint@zsh.org>
+
+	* 17629: Completion/Unix/Command/_ssh: patch from Juergen Erhard
+	to handle ssh-keygen -f -p, &c.
+
 2002-09-04  Clint Adams  <clint@zsh.org>
 
 	* 17620: Completion/Unix/Command/_lynx: add new/missing
