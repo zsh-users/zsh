@@ -1,0 +1,8 @@
+# function bash-backward-kill-word {
+# This implements a bash-style backward-kill-word.
+# To use,
+#   zle -N bash-backward-kill-word
+#   bindkey '...' bash-backward-kill-word
+local WORDCHARS=''
+zle .backward-kill-word
+# }

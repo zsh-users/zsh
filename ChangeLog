@@ -1,3 +1,8 @@
+2001-06-29  Clint Adams  <clint@zsh.org>
+
+	* Bart: 15083 plus comments: Functions/Zle/bash-backward-kill-word:
+	bash-style backward-kill-word function.
+
 2001-06-28  Wayne Davison  <wayned@users.sourceforge.net>
 
 	* 15172: Src/hist.c: Have prepnexthistent() remove any HIST_TEMPSTORE
