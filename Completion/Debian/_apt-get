@@ -1,23 +1,40 @@
 #compdef apt-get
 
-_arguments -s \
-  -{,-no-}d --{,no-}download-only \
-  -{,-no-}f --{,no-}fix-broken \
-  -{,-no-}h --{,no-}help \
-  -{,-no-}v --{,no-}version \
-  -{,-no-}m --{,no-}ignore-missing \
-  --{,no-}fix-missing \
-  --{,no-}no-download \
-  \*-{,-no-}q \*--{,no-}{quiet,silent} \
-  -{,-no-}s --{,no-}{simulate,just-print,dry-run,recon,no-act} \
-  -{,-no-}y --{,no-}{yes,assume-yes} \
-  -{,-no-}u --{,no-}show-upgraded \
-  -{,-no-}b --{,no-}{compile,build} \
-  --{,no-}ignore-hold \
-  --{,no-}no-upgrade \
-  --{,no-}force-yes \
-  --{,no-}print-uris \
-  {-{,-no-}c,--{,no-}config-file}':Configuration File:_files' \
-  {-o,--option}':Foo\:\:Bar=bar:' \
-  ':command:(update upgrade dselect-upgrade dist-upgrade install remove source check clean autoclean help)' \
-  '*:package:_deb_packages'
+_apt-get () {
+  # This doesn't handle command line of apt completely since command line
+  # parsing library for apt is too complex to handle by _arguments.
+  _arguments -s \
+    -{,-no-}d --{,no-}download-only \
+    -{,-no-}f --{,no-}fix-broken \
+    -{,-no-}h --{,no-}help \
+    -{,-no-}v --{,no-}version \
+    -{,-no-}m --{,no-}ignore-missing \
+    --{,no-}fix-missing \
+    --{,no-}no-download \
+    \*-{,-no-}q \*--{,no-}{quiet,silent} \
+    -{,-no-}s --{,no-}{simulate,just-print,dry-run,recon,no-act} \
+    -{,-no-}y --{,no-}{yes,assume-yes} \
+    -{,-no-}u --{,no-}show-upgraded \
+    -{,-no-}b --{,no-}{compile,build} \
+    --{,no-}ignore-hold \
+    --{,no-}no-upgrade \
+    --{,no-}force-yes \
+    --{,no-}print-uris \
+    {-{,-no-}c,--{,no-}config-file}':Configuration File:_files' \
+    {-o,--option}':Foo\:\:Bar=bar:' \
+    '*::command and packages:_apt-get_args'
+}
+
+_apt-get_args () {
+  if (( CURRENT == 1 )); then
+    compadd "$@" - update upgrade dselect-upgrade dist-upgrade install remove source check clean autoclean help
+  else
+    case "$words[1]" in
+      install) _deb_packages uninstalled "$@";;
+      remove) _deb_packages installed "$@";;
+      *) _deb_packages avail "$@";;
+    esac
+  fi
+}
+
+_apt-get "$@"
