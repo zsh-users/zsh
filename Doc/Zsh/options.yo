@@ -1003,6 +1003,14 @@ has been executed.  This also makes the shell non-interactive, unless the
 tt(INTERACTIVE) option is explicitly set on the command line.
 The value of this option cannot be changed anywhere other than the command line.
 )
+pindex(SH_JOB_CONTROL)
+cindex(exiting, checking jobs when)
+cindex(logging out, checking jobs when)
+item(tt(SH_JOB_CONTROL) <C> <K> <S>)(
+Don't report the status of background and suspended jobs when exiting a
+shell with job control.  This is best used in combination with tt(NO_HUP),
+else such jobs will be killed automatically.
+)
 pindex(SINGLE_LINE_ZLE)
 cindex(editor, single line mode)
 item(tt(SINGLE_LINE_ZLE) (tt(-M)) <K>)(
