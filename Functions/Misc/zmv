@@ -13,9 +13,14 @@
 # path.  Note that you need to write it like this; you can't get away with
 # '(**/*).txt'.
 #   zmv -w '**/*.txt' '$1$2.lis'
-# This is the lazy version of the one above; zsh picks out the patterns
-# for you.  The catch here is that you don't need the / in the replacement
-# pattern.  (It's not really a catch, since $1 can be empty.)
+#   noglob zmv -W **/*.txt **/*.lis
+# These are the lazy version of the one above; with -w, zsh inserts the
+# parentheses for you in the search pattern, and with -W it also inserts
+# the numbered variables for you in the replacement pattern.  The catch
+# in the first version is that you don't need the / in the replacement
+# pattern.  (It's not really a catch, since $1 can be empty.)  Note that
+# -W actually inserts ${1}, ${2}, etc., so it works even if you put a
+# number after a wildcard (such as zmv -W '*1.txt' '*2.txt').
 #   zmv -C '**/(*).txt' ~/save/'$1'.lis
 # Copy, instead of move, all .txt files in subdirectories to .lis files
 # in the single directory `~/save'.  Note that the ~ was not quoted.
@@ -91,6 +96,8 @@
 #      where <oldname> and <newname> are filenames generated.
 #  -w  Pick out wildcard parts of the pattern, as described above, and
 #      implicitly add parentheses for referring to them.
+#  -W  Just like -w, with the addition of turning wildcards in the
+#      replacement pattern into sequential ${1} .. ${N} references.
 #  -C
 #  -L
 #  -M  Force cp, ln or mv, respectively, regardless of the name of the
@@ -116,12 +123,12 @@ setopt extendedglob
 
 local f g args match mbegin mend files action myname tmpf opt exec
 local opt_f opt_i opt_n opt_q opt_Q opt_s opt_M opt_C opt_L 
-local opt_o opt_p opt_v opt_w MATCH MBEGIN MEND
+local opt_o opt_p opt_v opt_w opt_W MATCH MBEGIN MEND
 local pat repl errstr fpat hasglobqual opat
 typeset -A from to
 integer stat
 
-while getopts ":o:p:MCLfinqQsvw" opt; do
+while getopts ":o:p:MCLfinqQsvwW" opt; do
   if [[ $opt = "?" ]]; then
     print -P "%N: unrecognized option: -$OPTARG" >&2
     return 1
@@ -138,12 +145,18 @@ done
 
 if (( $# != 2 )); then
   print -P "Usage:
-  %N oldpattern newpattern
+  %N [OPTIONS] oldpattern newpattern
 where oldpattern contains parenthesis surrounding patterns which will
-be replaced in turn by $1, $2, ... in newpattern.  For example,
-  %N '(*).lis' '\$1.txt'
+be replaced in turn by \$1, \$2, ... in newpattern.  For example,
+  %N '(*).lis' '\\\\\$1.txt'
 renames 'foo.lis' to 'foo.txt', 'my.old.stuff.lis' to 'my.old.stuff.txt',
-and so on." >&2
+and so on.  Something simpler (for basic commands) is the -W option:
+  %N -W '*.lis' '*.txt'
+This does the same thing as the first command, but with automatic conversion
+of the wildcards into the appropriate syntax.  If you combine this with
+noglob, you don't even need to quote the arguments.  For example,
+  alias mmv='noglob zmv -W'
+  mmv *.c.orig orig/*.c" >&2
   return 1
 fi
 
@@ -173,19 +186,32 @@ if [[ -n $opt_s && $action != ln ]]; then
   return 1
 fi
 
-if [[ -n $opt_w ]]; then
+if [[ -n $opt_w || -n $opt_W ]]; then
   # Parenthesise all wildcards.
-  local newpat
+  local tmp find
+  integer cnt=0
   # Well, this seems to work.
   # The tricky bit is getting all forms of [...] correct, but as long
   # as we require inactive bits to be backslashed its not so bad.
-  newpat="${pat//\
-(#m)(\*\*#\/|[*?]|\<[0-9]#-[0-9]#\>|\[(\[:[a-z]##:\]|\\\[|\\\]|[^\[\]]##)##\])\##\
-/($MATCH)}"
-  if [[ $newpat = $pat ]]; then
-    print -P "%N: warning: no wildcards were found" >&2
+  find='(#m)(\*\*#[/]|[*?]|\<[0-9]#-[0-9]#\>|\[(\[:[a-z]##:\]|\\\[|\\\]|[^\[\]]##)##\])\##'
+  tmp="${pat//${~find}/$[++cnt]}"
+  if [[ $cnt = 0 ]]; then
+    print -P "%N: warning: no wildcards were found in search pattern" >&2
   else
-    pat=$newpat
+    pat="${pat//${~find}/($MATCH)}"
+  fi
+  if [[ -n $opt_W ]]; then
+    # Turn wildcards into ${1} .. ${N} references.
+    local open='${' close='}'
+    integer N=0
+    repl="${repl//${~find}/$open$[++N]$close}"
+    if [[ $N != $cnt ]]; then
+      print -P "%N: error: number of wildcards in each pattern must match" >&2
+      return 1
+    fi
+    if [[ $N = 0 ]]; then
+      print -P "%N: warning: no wildcards were found in replacement pattern" >&2
+    fi
   fi
 fi
 
