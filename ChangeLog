@@ -1,3 +1,8 @@
+2001-09-11  Wayne Davison  <wayned@users.sourceforge.net>
+
+	* 15630 & 15713: Completion/Redhat/Command/_rpm: Brought over the
+	--verify package-specification options and updated caching policy.
+
 2001-09-11  Oliver Kiddle  <opk@zsh.org>
 
 	* 15781: Completion/Unix/Command/.distfiles,
