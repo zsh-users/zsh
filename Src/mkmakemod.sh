@@ -320,7 +320,7 @@ if $first_stage; then
 	    ;; esac
 	    instsubdir=`echo $name | sed 's,^,/,;s,/[^/]*$,,'`
 	    echo "install.modules.${mddname}: ${mddname}.\$(DL_EXT)"
-	    echo "	\$(sdir_top)/mkinstalldirs \$(DESTDIR)\$(MODDIR)${instsubdir}"
+	    echo "	\$(SHELL) \$(sdir_top)/mkinstalldirs \$(DESTDIR)\$(MODDIR)${instsubdir}"
 	    echo "	\$(INSTALL_PROGRAM) \$(STRIPFLAGS) ${mddname}.\$(DL_EXT) \$(DESTDIR)\$(MODDIR)/${name}.\$(DL_EXT)"
 	    echo
 	    echo "uninstall.modules.${mddname}:"
@@ -472,7 +472,7 @@ if $second_stage; then
     # tree, this is a problem.  zsh's configure script edits config.status,
     # adding the feature that an input filename starting with "!" has the
     # "!" removed and is not mangled further.
-    CONFIG_FILES=$the_subdir/${the_makefile}:\!$the_subdir/${the_makefile}.in CONFIG_HEADERS= ./config.status
+    CONFIG_FILES=$the_subdir/${the_makefile}:\!$the_subdir/${the_makefile}.in CONFIG_HEADERS= ${CONFIG_SHELL-/bin/sh} ./config.status
 
 fi
 

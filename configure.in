@@ -1913,6 +1913,7 @@ dnl So add them now.  See the comment at the end of Src/mkmakemod.sh.
 cp $CONFIG_STATUS $CONFIG_STATUS.old
 sed '1,$s@^\( *ac_file_inputs=\).*$@\1`echo $ac_file_in | sed -e "s%^%:%" -e "s%:\\([^!]\\)% $ac_given_srcdir/\\1%g" -e "s%:!% %"`@' \
  $CONFIG_STATUS.old >$CONFIG_STATUS
+ chmod +x $CONFIG_STATUS
  rm -f $CONFIG_STATUS.old]
 
 test "$real_no_create" = yes || ${CONFIG_SHELL-/bin/sh} $CONFIG_STATUS || exit 1

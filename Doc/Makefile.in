@@ -250,7 +250,7 @@ uninstall: uninstall.man
 
 # install man pages, creating install directory if necessary
 install.man: man
-	$(sdir_top)/mkinstalldirs $(DESTDIR)$(mandir)/man1
+	${SHELL} $(sdir_top)/mkinstalldirs $(DESTDIR)$(mandir)/man1
 	for file in $(MAN); do \
 	    $(INSTALL_DATA) $(sdir)/$$file $(DESTDIR)$(mandir)/man1/`echo $$file | sed 's|zsh|$(tzsh)|'` || exit 1; \
 	done
@@ -258,7 +258,7 @@ install.man: man
 
 # install info pages, creating install directory if necessary
 install.info: texi
-	$(sdir_top)/mkinstalldirs $(DESTDIR)$(infodir)
+	${SHELL} $(sdir_top)/mkinstalldirs $(DESTDIR)$(infodir)
 	rm -rf infodir
 	mkdir infodir
 	if ( \
@@ -296,7 +296,7 @@ uninstall.info:
 
 # install HTML manual
 install.html: html
-	$(sdir_top)/mkinstalldirs $(DESTDIR)$(htmldir)
+	${SHELL} $(sdir_top)/mkinstalldirs $(DESTDIR)$(htmldir)
 	for file in zsh_*.html; do \
 	    $(INSTALL_DATA) $$file $(DESTDIR)$(htmldir) || exit 1; \
 	done

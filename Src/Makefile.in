@@ -161,7 +161,7 @@ uninstall.bin: uninstall.bin-here
 
 # install binary, creating install directory if necessary
 install.bin-here: zsh$(EXEEXT) $(INSTLIB)
-	$(sdir_top)/mkinstalldirs $(DESTDIR)$(bindir)
+	${SHELL} $(sdir_top)/mkinstalldirs $(DESTDIR)$(bindir)
 	$(INSTALL_PROGRAM) $(STRIPFLAGS) zsh$(EXEEXT) $(DESTDIR)$(bindir)/$(tzsh)-$(VERSION)$(EXEEXT)
 	if test -f $(DESTDIR)$(bindir)/$(tzsh)$(EXEEXT); then \
 	    rm -f $(DESTDIR)$(bindir)/$(tzsh).old; \
@@ -174,7 +174,7 @@ install.bin-here: zsh$(EXEEXT) $(INSTLIB)
 
 install.bin-N:
 install.bin-L: $(LIBZSH)
-	$(sdir_top)/mkinstalldirs $(DESTDIR)$(libdir)/$(tzsh)
+	${SHELL} $(sdir_top)/mkinstalldirs $(DESTDIR)$(libdir)/$(tzsh)
 	$(INSTALL_PROGRAM) $(LIBZSH) $(DESTDIR)$(libdir)/$(tzsh)/$(LIBZSH)
 install.cygwin-lib: $(LIBZSH)
 	$(INSTALL_PROGRAM) $(LIBZSH) $(DESTDIR)$(bindir)/$(LIBZSH)

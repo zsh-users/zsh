@@ -79,7 +79,7 @@ install.man uninstall.man:
 install.fns:
 	if test x$(fndir) != x && test x$(fndir) != xno; then \
 	  test x$(sitefndir) != xno && \
-	    $(sdir_top)/mkinstalldirs $(DESTDIR)$(sitefndir); \
+	    $(SHELL) $(sdir_top)/mkinstalldirs $(DESTDIR)$(sitefndir); \
 	  sdir_top="$(sdir_top)" fndir="$(fndir)" dir_top="$(dir_top)" \
 	  FUNCTIONS_SUBDIRS="$(FUNCTIONS_SUBDIRS)" \
 	  INSTALL_DATA="$(INSTALL_DATA)" \
@@ -126,7 +126,7 @@ realclean-here:
 config: config.h
 
 config.status: $(sdir)/configure
-	./config.status --recheck
+	$(SHELL) ./config.status --recheck
 
 $(sdir)/configure: $(sdir)/configure.in $(sdir)/aclocal.m4 $(sdir)/aczsh.m4
 	cd $(sdir) && autoconf
@@ -134,7 +134,7 @@ $(sdir)/configure: $(sdir)/configure.in $(sdir)/aclocal.m4 $(sdir)/aczsh.m4
 config.h: stamp-h
 stamp-h: $(sdir)/config.h.in config.status
 	cd $(dir_top) && \
-	  CONFIG_FILES= CONFIG_HEADERS=$(subdir)/config.h ./config.status
+	  CONFIG_FILES= CONFIG_HEADERS=$(subdir)/config.h $(SHELL) ./config.status
 
 $(sdir)/config.h.in: $(sdir)/stamp-h.in
 $(sdir)/stamp-h.in: $(sdir)/configure.in $(sdir)/acconfig.h \
