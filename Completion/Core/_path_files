@@ -25,7 +25,7 @@
 
 local linepath realpath donepath prepath testpath exppath
 local tmp1 tmp2 tmp3 tmp4 i orig pre suf tpre tsuf
-local pats ignore group expl addpfx addsfx remsfx
+local pats haspats=no ignore group expl addpfx addsfx remsfx
 local nm=$compstate[nmatches] menu
 
 typeset -U prepaths exppaths
@@ -82,9 +82,11 @@ while getopts "P:S:qr:R:W:F:J:V:X:f/g:" opt; do
 	 ;;
   /)     sopt="${sopt}/"
          pats=("$pats[@]" '*(-/)')
+	 haspats=yes
 	 ;;
   g)     gopt='-g'
          pats=("$pats[@]" ${=OPTARG})
+	 haspats=yes
 	 ;;
   esac
 done
@@ -259,14 +261,11 @@ for prepath in "$prepaths[@]"; do
       # an attempt to correct a valid directory name. So we just add the
       # original string in such a case so that the command line doesn't 
       # change but other completers still think there are matches.
+      # We do this only if we weren't given a `-g' or `-/' option because
+      # otherwise this would keep `_files' from completing all filenames
+      # if none of the patterns match.
 
-      # Problem:  this seems to stop _files from finding directory
-      # completions if there were no file completions, for
-      # example `_files *(*)' no longer completes subdirectories after
-      # a /.  For now, make this a configuration option, but
-      # probably it needs to be done better.
-
-      if [[ -n "$compconfig[path_keepdir]" && -z "$tpre$tsuf" &&
+      if [[ "$haspats" = no && -z "$tpre$tsuf" &&
 	"$pre" = */ && -z "$suf" ]]; then
         compadd -nQS '' - "$linepath$donepath$orig"
         tmp4=-
