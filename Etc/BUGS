@@ -2,9 +2,20 @@
 KNOWN BUGS IN ZSH
 -----------------
 
+On some terminals, display of lines with exactly 80 characters is
+problematic.  zsh assumes that the terminal does not print an extra
+newline in this case, but some terminals (e.g. aixterm) do.
 ------------------------------------------------------------------------
-Completion has a habit of doing the wrong thing after a
-backslash/newline.
+When interrupting code like the following with ^C:
+  while true; do
+    sh -c '...'
+  done
+if the `sh' is executing, zsh does not know that the sh received a ^C and
+continues with the next iteration.  This happens for any program which
+handles the interrupt, then exits after tidying up; it does not happen for
+zsh, which exits directly from the signal handler.  The workaround is to
+use ^Z which forks the shell and makes the loop a separate job, then kill
+the suspended loop.
 ------------------------------------------------------------------------
 If you suspend "man", zle seems to get into cooked mode.  It works ok
 for plain "less".
@@ -26,16 +37,14 @@ Then if you suspend
 % foo less something
 from zsh/bash, zle/readline gets into cooked mode.
 ------------------------------------------------------------------------
-% zsh -c 'cat a_long_file | less ; :'
-can be interrupted with ^C. The prompt comes back and less is orphaned.
-If you go to the end of the file with less and cat terminates, ^C
-will not terminate less. The `; :' after less forces zsh to fork before
-executing less.
-------------------------------------------------------------------------
 The pattern %?* matches names beginning with %? instead of names with at
 least two characters beginning with %. This is a hack to allow %?foo job
 substitution without quoting. This behaviour is incompatible with sh
 and ksh and may be removed in the future. A good fix would be to keep
 such patterns unchanged if they do not match regardless of the state of
 the nonomatch and nullglob options.
+------------------------------------------------------------------------
+Numeric ranges are still too greedy with using characters; for example,
+<1-1000>33 will not match 633 because the 633 matches the range.  Some
+backtracking will be necessary.
 ------------------------------------------------------------------------
