@@ -1,3 +1,20 @@
+2000-11-26  Peter Stephenson  <pws@pwstephenson.fsnet.co.uk>
+
+	* 13194: INSTALL, configure.in, Config/defs.mk.in,
+	Etc/zsh-development-guide, Src/.distfiles, Src/Makefile.in,
+	Src/Makemod.in.in, Src/mkbltnmlst.sh, Src/mkmakemod.sh,
+	Src/zsh.mdd, Src/Builtins/rlimits.mdd, Src/Builtins/sched.mdd,
+	Src/Modules/cap.mdd, Src/Modules/clone.mdd,
+	Src/Modules/example.mdd, Src/Modules/files.mdd,
+	Src/Modules/mapfile.mdd, Src/Modules/mathfunc.mdd,
+	Src/Modules/parameter.mdd, Src/Modules/stat.mdd,
+	Src/Modules/zftp.mdd, Src/Modules/zprof.mdd, Src/Modules/zpty.mdd,
+	Src/Modules/zutil.mdd, Src/Zle/compctl.mdd, Src/Zle/complete.mdd,
+	Src/Zle/complist.mdd, Src/Zle/computil.mdd, Src/Zle/deltochar.mdd,
+	Src/Zle/zle.mdd, Src/Zle/zleparameter.mdd: New module
+	configuration system using file config.modules set up by
+	configure.
+
 2000-11-25  Bart Schaefer  <schaefer@zsh.org>
 
 	* 13192: Completion/Core/compinit, Src/params.c: Turn off

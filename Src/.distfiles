@@ -5,9 +5,9 @@ DISTFILES_SRC='
     ansi2knr.c modentry.c
     builtin.c compat.c cond.c exec.c glob.c hashtable.c hashtable.h
     hist.c init.c input.c jobs.c lex.c linklist.c loop.c main.c makepro.awk
-    math.c mem.c mkbltnmlst.sh mkmakemod.sh mkmodindex.sh
+    math.c mem.c mkbltnmlst.sh mkmakemod.sh
     module.c options.c params.c parse.c pattern.c prompt.c prototypes.h
     signals.c signals.h string.c subst.c system.h text.c utils.c
-    watch.c xmods.conf zsh.h zsh.mdd ztype.h
+    watch.c zsh.h zsh.mdd ztype.h
     zsh.rc zsh.ico
 '

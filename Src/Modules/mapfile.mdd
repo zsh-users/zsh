@@ -1,3 +1,7 @@
+name=zsh/mapfile
+link=dynamic
+load=no
+
 autoparams="mapfile"
 
 objects="mapfile.o"

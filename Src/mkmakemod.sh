@@ -90,6 +90,8 @@ the_makefile=$2
 
 if $first_stage; then
 
+    dir_top=`echo $the_subdir | sed 's,[^/][^/]*,..,g'`
+
     trap "rm -f $the_subdir/${the_makefile}.in" 1 2 15
     echo "creating $the_subdir/${the_makefile}.in"
     exec 3>&1 >$the_subdir/${the_makefile}.in
@@ -99,12 +101,16 @@ if $first_stage; then
     echo "##### ===== DEFINITIONS ===== #####"
     echo
     echo "makefile = ${the_makefile}"
-    echo "dir_top = "`echo $the_subdir | sed 's,[^/][^/]*,..,g'`
-    echo "subdir = $the_subdir"
+    echo "dir_top = ${dir_top}"
+    echo "subdir = ${the_subdir}"
     echo
 
-    . Src/modules.index
-    bin_mods=" zsh/main "`sed 's/^/ /;s/$/ /' Src/modules-bltin`
+    bin_mods=`grep link=static ./config.modules | \
+    sed -e '/^#/d' -e 's/ .*/ /' -e 's/^name=/ /'`
+    dyn_mods="`grep link=dynamic ./config.modules | \
+    sed -e '/^#/d' -e 's/ .*/ /' -e 's/^name=/ /'`"
+    module_list="${bin_mods}${dyn_mods}"
+
     if grep '%@D@%D%' config.status >/dev/null; then
 	is_dynamic=true
     else
@@ -120,8 +126,8 @@ if $first_stage; then
     all_proto=
     lastsub=//
     for module in $module_list; do
-	q_module=`echo $module | sed 's,Q,Qq,g;s,_,Qu,g;s,/,Qs,g'`
-	eval "modfile=\$modfile_$q_module"
+        modfile="`grep '^name='$module' ' ./config.modules | \
+	  sed -e 's/^.* modfile=//' -e 's/ .*//'`"
 	case $modfile in
 	    $the_subdir/$lastsub/*) ;;
 	    $the_subdir/*/*)
@@ -194,9 +200,10 @@ if $first_stage; then
 	imports=
 	q_moddeps=
 	for dep in $moddeps; do
+	    depfile="`grep '^name='$dep' ' ./config.modules | \
+	      sed -e 's/^.* modfile=//' -e 's/ .*//'`"
 	    q_dep=`echo $dep | sed 's,Q,Qq,g;s,_,Qu,g;s,/,Qs,g'`
 	    q_moddeps="$q_moddeps $q_dep"
-	    eval "depfile=\$modfile_$q_dep"
 	    eval `echo $depfile | sed 's,/\([^/]*\)\.mdd$,;depbase=\1,;s,^,loc=,'`
 	    case "$binmod" in
 		*" $dep "* )

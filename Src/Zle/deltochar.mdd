@@ -1,3 +1,7 @@
-moddeps="zle"
+name=zsh/deltochar
+link=dynamic
+load=no
+
+moddeps="zsh/zle"
 
 objects="deltochar.o"

@@ -1,4 +1,6 @@
 name=zsh/zpty
+link=dynamic
+load=no
 
 autobins="zpty"
 

@@ -1,3 +1,9 @@
+name=zsh/zutil
+link=either
+load=yes
+
+moddeps="zsh/complete"
+
 objects="zutil.o"
 
-autobins="zformat zstyle"
+autobins="zformat zstyle zregexparse zparseopts"

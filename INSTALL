@@ -66,53 +66,44 @@ The zsh distribution contains several modules, in the Src/Builtins,
 Src/Modules and Src/Zle directories.  If you have any additional zsh
 modules that you wish to compile for this version of zsh, create another
 subdirectory of the Src directory and put them there.  You can create
-as many extra subdirectory hierarchies as you need.  The subdirectories
-must be actual directories; symbolic links will not work.
+as many extra subdirectories as you need, but currently configure will only
+search in immediate subdirectories of Src.  The subdirectories must be
+actual directories; symbolic links will not work.  You will then need to
+rerun configure; the easiest way is to run `config.status --recheck' from
+the top-level build directory which retains the existing configuration as
+much as possible.
 
-If you wish to add or remove modules or module directories after you
-have already run make, then after adding or removing the modules run:
-    make prep
-
-You can also instruct the configuration process that a certain module
-should neither be compiled nor installed without modifying any files.  To
-do this, give the argument `--enable-omit-modules=mod1,mod2,...' to
-configure.  The module arguments are the full names of the modules,
-probably including the prefix `zsh/'.  For example,
-`configure --enable-omit-modules=zsh/zpty,zsh/example' says that the
-modules zsh/zpty and zsh/example are not to be compiled nor installed.
-Note that it is up to you to make sure the modules in question are not going
-to be compiled into the main zsh binary, as described in the next section.
-It is unlikely you would want to omit any of the modules liable to be
-compiled in by default.
-
-Controlling what is compiled into the main zsh binary
------------------------------------------------------
+The key to the module system is the file config.modules, created in the
+configuration process.  Each module has a line in the file.  It may be
+edited to change the following values for each module; be careful to retain
+the (strict) format for the file:
+link - `dynamic', if the module is to be dynamically linked -- meaningless
+           if this is not available on your system.
+       `static' if the module is to be linked directly into the executable.
+       `no' if the module is not to be linked at all.  In this case it will
+           not even be compiled.
+load - `yes' if the module is to be visible to the user.  This will make
+           builtins, parameters etc. visible to the user without any need
+           to use the zmodload builtin.
+       `no' if an explicit zmodload command is to be required to load the
+           utilities in the module.  Note that this applies both to
+	   statically and dynamically linked modules.
+auto - `yes' if the entry is to be regenerated whenever configure is run.
+       `no' if you wish to retain your hand-edited version.
+Do not edit the entry for the pseudo-module zsh/main, which is the main
+shell.  After you have edited this file, run `make prep' in the Src
+subdirectory.
 
 By default the complete, compctl, zle, computil, complist, sched, parameter,
 zleparameter and rlimits modules are compiled into non-dynamic zsh and no
 modules are compiled into the main binary if dynamic loading is available.
-This can be overridden by creating the file mymods.conf in the compilation
-directory (Src, unless you have told configure to use another directory)
-with the list of modules which are to be compiled into the main binary, one
-module name per line with no punctuation and no suffix.  See the zshmodules
-manual page for the list of available modules.
-
-Note that mymods.conf replaces the standard list of linked-in modules from
-Src/xmods.conf.  If you wish to add to the standard list, copy the lines
-that begin with "L " from xmods.conf into mymods.conf and remove the "L "
-from each such line in mymods.conf.  Then add the names of other modules
-that you want to link.  Module names typically must begin with "zsh/";
-see the ".mdd" file for the module for the actual name.  The modules must
-be listed in dependency order, e.g., "zsh/zle" must precede "zsh/complete",
-"zsh/complete" must precede "zsh/compctl", and similarly for any other
-dependencies.
 
 Note that the modules depending on zle or complete (e.g.: complist and
 deltochar) cannot be loaded dynamically on systems which do not allow symbols
 in one dynamically loaded library to be visible from another; this is true,
 for example, of version 4 of SunOS.  The most convenient workaround is to
-compile zle and complete into the base executable by including them in
-mymods.conf as described above.
+compile zle and complete into the base executable by setting their `link'
+entries in config.modules to `static' as described above.
 
 Compiler Options or Using a Different Compiler
 ----------------------------------------------

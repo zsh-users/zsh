@@ -63,9 +63,6 @@ DLLD            = @DLLD@
 EXPOPT          = @EXPOPT@
 IMPOPT          = @IMPOPT@
 
-# choose modules not to compile and install
-OMIT_MODULES    = @OMIT_MODULES@
-
 # utilities
 AWK             = @AWK@
 YODL            = @YODL@

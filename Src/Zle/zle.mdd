@@ -1,4 +1,6 @@
-moddeps="comp1"
+name=zsh/zle
+link=either
+load=yes
 
 autobins="bindkey vared zle"
 

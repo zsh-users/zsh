@@ -1,3 +1,7 @@
-moddeps="comp1 zle"
+name=zsh/complist
+link=either
+load=yes
+
+moddeps="zsh/complete zsh/zle"
 
 objects="complist.o"

@@ -109,17 +109,7 @@ rm-modobjs-tmp:
 
 @CONFIG_MK@
 
-Makemod modules.index prep: modules-bltin $(CONFIG_INCS)
-	( cd $(sdir_top) && OMIT_MODULES="$(OMIT_MODULES)" \
-	$(SHELL) $(subdir)/mkmodindex.sh $(subdir) ) \
-	    > modules.index.tmp
-	@if cmp -s modules.index.tmp modules.index; then \
-	    rm -f modules.index.tmp; \
-	    echo "\`modules.index' is up to date."; \
-	else \
-	    mv -f modules.index.tmp modules.index; \
-	    echo "Updated \`modules.index'."; \
-	fi
+Makemod prep: $(CONFIG_INCS) $(dir_top)/config.modules
 	@case $(sdir_top) in \
 	    /*) top_srcdir=$(sdir_top) ;; \
 	    *) top_srcdir=$(subdir)/$(sdir_top) ;; \
@@ -139,21 +129,6 @@ FORCE:
 
 mymods.conf:
 	@echo Linking with the standard modules.
-
-modules-bltin:: mymods.conf
-	@if test -f mymods.conf; then \
-	    echo cat mymods.conf \> $@; \
-	    cat mymods.conf > $@; \
-	fi
-
-modules-bltin:: $(dir_top)/config.status $(sdir)/xmods.conf
-	if test -f mymods.conf; then \
-	    cat mymods.conf > $@; \
-	elif test @D@ = N; then \
-	    sed -n '/L.* /{s/^.* //;p;}' < $(sdir)/xmods.conf > $@; \
-	else \
-	    echo > $@; \
-	fi
 
 modules: $(@E@NTRYOBJ)
 
@@ -228,14 +203,13 @@ mostlyclean-here:
 .PHONY: mostlyclean-here
 
 clean-here:
-	rm -f modules.index.tmp modules.stamp zsh$(EXEEXT) ansi2knr.o ansi2knr
+	rm -f modules.stamp zsh$(EXEEXT) ansi2knr.o ansi2knr
 	rm -f libzsh-*.$(DL_EXT)
 .PHONY: clean-here
 
 distclean-here:
 	rm -f TAGS tags
-	rm -f modules.index modules-bltin
-	rm -f Makefile mymods.conf
+	rm -f Makefile
 .PHONY: distclean-here
 
 mostlyclean: mostlyclean-modules
@@ -245,7 +219,7 @@ realclean: realclean-modules
 .PHONY: mostlyclean clean distclean realclean
 
 # Don't remake Makemod just to delete things, even if it doesn't exist.
-mostlyclean-modules clean-modules distclean-modules realclean-modules: modules.index
+mostlyclean-modules clean-modules distclean-modules realclean-modules:
 	if test -f Makemod; then \
 	  $(MAKE) -f Makemod $(MAKEDEFS) `echo $@ | sed 's/-modules//'`; \
 	fi; \

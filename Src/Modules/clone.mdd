@@ -1,3 +1,7 @@
+name=zsh/clone
+link=dynamic
+load=no
+
 autobins="clone"
 
 objects="clone.o"

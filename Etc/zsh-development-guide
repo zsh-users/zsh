@@ -7,7 +7,7 @@ This development takes place by mailing list.  Check the META-FAQ for the
 various zsh mailing lists and how to subscribe to them.  The development
 is very open and anyone is welcomed and encouraged to join and contribute.
 Because zsh is a very large package whose development can sometimes
-be very rapid, I kindly ask that people observe a few guidelines when
+be very rapid, we kindly ask that people observe a few guidelines when
 contributing patches and feedback to the mailing list.  These guidelines
 are very simple and hopefully should make for a more orderly development
 of zsh.
@@ -181,6 +181,17 @@ sourced when zsh is built. To describe the module it can/should set the
 following shell variables:
 
   - name            name of the module
+  - link            `static', `dynamic' or `no', as described in INSTALL.
+		    May also be a command string, which will be run within
+		    configure and whose output is used to set the value
+		    of `link' in config.modules.  This allows a
+		    system-specific choice of modules.  For example,
+		    link='case $host in *-hpux*) echo dynamic; ;;
+		                        *) echo no; ;; esac'
+  - load            `yes' or `no': whether the shell should include hooks
+		    for loading the module automatically as necessary.
+		    (This corresponds to an `L' in xmods.conf in the
+		    old mechanism.)
   - moddeps         modules on which this module depends (default none)
   - nozshdep        non-empty indicates no dependence on the `zsh/main'
                     pseudo-module

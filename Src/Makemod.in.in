@@ -177,7 +177,8 @@ $(makefile): $(makefile).in $(dir_top)/config.status
 	cd $(dir_top) && \
 	    $(SHELL) $$top_srcdir/Src/mkmakemod.sh -m $(subdir) $(makefile)
 
-$(makefile).in: $(sdir_src)/mkmakemod.sh $(sdir_src)/Makemod.in.in $(MDDS) $(dir_src)/modules-bltin
+$(makefile).in: $(sdir_src)/mkmakemod.sh $(sdir_src)/Makemod.in.in $(MDDS) \
+	$(dir_top)/config.modules
 	@case $(sdir_top) in \
 	    /*) top_srcdir=$(sdir_top) ;; \
 	    *) top_srcdir=$(subdir)/$(sdir_top) ;; \
@@ -188,5 +189,3 @@ $(makefile).in: $(sdir_src)/mkmakemod.sh $(sdir_src)/Makemod.in.in $(MDDS) $(dir
 	cd $(dir_top) && \
 	    $(SHELL) $$top_srcdir/Src/mkmakemod.sh -i $(subdir) $(makefile)
 
-$(dir_src)/modules-bltin:
-	@cd $(dir_src) && $(MAKE) $(MAKEDEFS) modules-bltin

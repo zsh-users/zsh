@@ -1,5 +1,9 @@
-moddeps="zle"
+name=zsh/zleparameter
+link=either
+load=yes
 
-autoparams="zlewidgets zlekeymaps"
+moddeps="zsh/zle"
+
+autoparams="widgets keymaps"
 
 objects="zleparameter.o"

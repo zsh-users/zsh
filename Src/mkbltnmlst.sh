@@ -4,50 +4,77 @@
 #
 # Written by Andrew Main
 #
+
 srcdir=${srcdir-`echo $0|sed 's%/[^/][^/]*$%%'`}
 test "x$srcdir" = "x$0" && srcdir=.
 test "x$srcdir" = "x"   && srcdir=.
-MODBINS=${MODBINS-modules-bltin}
-XMODCF=${XMODCF-$srcdir/xmods.conf}
+CFMOD=${CFMOD-$srcdir/../config.modules}
 
-bin_mods=" zsh "`sed 's/^/ /;s/$/ /' $MODBINS`
-x_mods=`cat $XMODCF`
-. ./modules.index
+bin_mods="`grep ' link=static' $CFMOD | sed -e '/^#/d' \
+-e 's/ .*/ /' -e 's/^name=/ /'`"
+
+x_mods="`grep ' load=yes' $CFMOD | sed -e '/^#/d' -e '/ link=no/d' \
+-e 's/ .*/ /' -e 's/^name=/ /'`"
 
 trap "rm -f $1; exit 1" 1 2 15
 
 exec > $1
 
-echo "#ifdef DYNAMIC"
 for x_mod in $x_mods; do
-    case $bin_mods in
-	*" $x_mod "*) ;;
-	*)  echo "/* non-linked-in known module \`$x_mod' */"
-	    eval "loc=\$loc_$x_mod"
-	    unset moddeps autobins
-	    . $srcdir/../$loc/${x_mod}.mdd
-	    for bin in $autobins; do
-		echo "    add_autobin(\"$bin\", \"$x_mod\");"
-	    done
-	    for dep in $moddeps; do
-		case $bin_mods in
-		    *" $dep "*)
-			echo "    /* depends on \`$dep' */" ;;
-		    *)	echo "    add_dep(\"$x_mod\", \"$dep\");" ;;
-		esac
-	    done ;;
+    modfile="`grep '^name='$x_mod' ' $CFMOD | sed -e 's/^.* modfile=//' \
+      -e 's/ .*//'`"
+    if test "x$modfile" = x; then
+	echo >&2 "WARNING: no name for \`$x_mod' in $CFMOD (ignored)"
+	continue
+    fi
+    case "$bin_mods" in
+    *" $x_mod "*)
+        echo "/* linked-in known module \`$x_mod' */"
+	linked=yes
+	;;
+    *)
+        echo "#ifdef DYNAMIC"
+        echo "/* non-linked-in known module \`$x_mod' */"
+	linked=no
     esac
+    unset moddeps autobins autoinfixconds autoprefixconds autoparams
+    unset automathfuncs
+    . $srcdir/../$modfile
+    for bin in $autobins; do
+	echo "    add_autobin(\"$bin\", \"$x_mod\");"
+    done
+    for cond in $autoinfixconds; do
+	echo "    add_autocond(\"$cond\", 1, \"$x_mod\");"
+    done
+    for cond in $autoprefixconds; do
+	echo "    add_autocond(\"$cond\", 0, \"$x_mod\");"
+    done
+    for param in $autoparams; do
+	echo "    add_autoparam(\"$param\", \"$x_mod\");"
+    done
+    for mfunc in $automathfuncs; do
+	echo "    add_automath(\"$mfunc\", \"$x_mod\");"
+    done
+    for dep in $moddeps; do
+	echo "    add_dep(\"$x_mod\", \"$dep\");"
+    done
+    test "x$linked" = xno && echo "#endif"
 done
-echo "#endif /* DYNAMIC */"
+
 echo
 done_mods=" "
 for bin_mod in $bin_mods; do
+    q_bin_mod=`echo $bin_mod | sed 's,Q,Qq,g;s,_,Qu,g;s,/,Qs,g'`
+    modfile="`grep '^name='$bin_mod' ' $CFMOD | sed -e 's/^.* modfile=//' \
+      -e 's/ .*//'`"
     echo "/* linked-in module \`$bin_mod' */"
-    eval "loc=\$loc_$bin_mod"
     unset moddeps
-    . $srcdir/../$loc/${bin_mod}.mdd
+    . $srcdir/../$modfile
     for dep in $moddeps; do
-	case $done_mods in
+	# This assumes there are no circular dependencies in the builtin
+	# modules.  Better ordering of config.modules would be necessary
+	# to enforce stricter dependency checking.
+	case $bin_mods in
 	    *" $dep "*)
 		echo "    /* depends on \`$dep' */" ;;
 	    *)	echo >&2 "ERROR: linked-in module \`$bin_mod' depends on \`$dep'"
@@ -55,6 +82,15 @@ for bin_mod in $bin_mods; do
 		exit 1 ;;
 	esac
     done
-    echo "    mod.nam = \"$bin_mod\"; boot_$bin_mod(&mod);"
+    echo "    {"
+    echo "        extern int setup_${q_bin_mod} _((Module));"
+    echo "        extern int boot_${q_bin_mod} _((Module));"
+    echo "        extern int cleanup_${q_bin_mod} _((Module));"
+    echo "        extern int finish_${q_bin_mod} _((Module));"
+    echo
+    echo "        register_module(\"$bin_mod\","
+    echo "                        setup_${q_bin_mod}, boot_${q_bin_mod},"
+    echo "                        cleanup_${q_bin_mod}, finish_${q_bin_mod});"
+    echo "    }"
     done_mods="$done_mods$bin_mod "
 done

@@ -1,3 +1,7 @@
+name=zsh/stat
+link=dynamic
+load=no
+
 autobins="stat"
 
 objects="stat.o"

@@ -1,3 +1,7 @@
-autobins="ln mkdir mv rm rmdir sync"
+name=zsh/files
+link=dynamic
+load=no
+
+autobins="chgrp chown ln mkdir mv rm rmdir sync"
 
 objects="files.o"

@@ -1,3 +1,7 @@
+name=zsh/zftp
+link=dynamic
+load=no
+
 autobins="zftp"
 
 objects="zftp.o"

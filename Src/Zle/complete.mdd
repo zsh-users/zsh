@@ -1,4 +1,6 @@
 name=zsh/complete
+link=either
+load=yes
 
 moddeps="zsh/zle"
 

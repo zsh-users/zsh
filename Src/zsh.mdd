@@ -1,4 +1,7 @@
 name=zsh/main
+link=static
+load=yes
+# load=static should replace use of alwayslink
 
 nozshdep=1
 alwayslink=1
@@ -57,24 +60,27 @@ zshpaths.h: Makemod $(CONFIG_INCS)
 	    echo "Updated \`zshpaths.h'." ; \
 	fi
 
-bltinmods.list: modules.stamp modules-bltin xmods.conf mkbltnmlst.sh
-	srcdir='$(sdir)' MODBINS='modules-bltin' \
-	XMODCF='$(sdir)/xmods.conf' $(SHELL) $(sdir)/mkbltnmlst.sh $@
+bltinmods.list: modules.stamp mkbltnmlst.sh $(dir_top)/config.modules
+	srcdir='$(sdir)' CFMOD='$(dir_top)/config.modules' \
+	  $(SHELL) $(sdir)/mkbltnmlst.sh $@
 
-zshxmods.h: modules-bltin xmods.conf
+zshxmods.h: $(dir_top)/config.modules
 	@echo "Creating \`$@'."
 	@( \
-	    binmods=`sed 's/^/ /;s/$$/ /' modules-bltin`; \
-	    for mod in `sed 's/^.* //' $(sdir_src)/xmods.conf`; do \
-		q_mod=`echo $$mod | sed 's,Q,Qq,g;s,_,Qu,g;s,/,Qs,g'`; \
-		case $$binmods in \
-		    *" $$mod "*) \
-			echo "#define    LINKED_XMOD_$$q_mod 1" ;; \
-		    *)  echo "#ifdef DYNAMIC"; \
-			echo "# define UNLINKED_XMOD_$$q_mod 1"; \
-			echo "#endif" ;; \
-		esac; \
-	    done \
+	    for q_mod in `grep ' load=yes' $(dir_top)/config.modules | \
+	      grep ' link=static' | sed -e '/^#/d' -e 's/ .*//' \
+	        -e 's/^name=//' -e 's,Q,Qq,g;s,_,Qu,g;s,/,Qs,g'`; do \
+		test x$q_mod = xzshQsmain && continue; \
+	        echo "#define LINKED_XMOD_$$q_mod 1"; \
+	    done; \
+	    for q_mod in `grep ' load=yes' $(dir_top)/config.modules | \
+	      grep ' link=dynamic' | sed -e '/^#/d' -e 's/ .*//' \
+	        -e 's/^name=//' -e 's,Q,Qq,g;s,_,Qu,g;s,/,Qs,g'`; do \
+		test x$q_mod = x && continue; \
+	        echo "#ifdef DYNAMIC"; \
+		echo "# define UNLINKED_XMOD_$$q_mod 1"; \
+		echo "#endif"; \
+	    done; \
 	) > $@
 
 clean-here: clean.zsh

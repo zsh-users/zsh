@@ -1,4 +1,6 @@
 name=zsh/compctl
+link=either
+load=yes
 
 moddeps="zsh/complete zsh/zle"
 
