@@ -8,22 +8,68 @@
 local state line expl
 typeset -A options
 
+if (( ! $+_telnet_short )); then
+  local help="$(telnet -\? < /dev/null 2>&1)"
+  _telnet_short=()
+  [[ "$help" = *"[-8]"* ]] &&
+    _telnet_short=("$_telnet_short[@]" '-8[allow 8-Bit data]')
+  [[ "$help" = *"[-E]"* ]] &&
+    _telnet_short=("$_telnet_short[@]" '-E[disable an escape character]')
+  [[ "$help" = *"[-K]"* ]] &&
+    _telnet_short=("$_telnet_short[@]" '-K[no automatic login]')
+  [[ "$help" = *"[-L]"* ]] &&
+    _telnet_short=("$_telnet_short[@]" '-L[allow 8-Bit data on output]')
+  [[ "$help" = *"[-N]"* ]] &&
+    _telnet_short=("$_telnet_short[@]" '-N[supress reverse lookup]')
+  [[ "$help" = *"[-S tos]"* ]] &&
+    _telnet_short=("$_telnet_short[@]" '-S+:IP type-of-service:')
+  [[ "$help" = *"[-X atype]"* ]] &&
+    _telnet_short=("$_telnet_short[@]" '-X+:authentication type to disable:')
+  [[ "$help" = *"[-a]"* ]] &&
+    _telnet_short=("$_telnet_short[@]" '-a[attempt automatic login]')
+  [[ "$help" = *"[-c]"* ]] &&
+    _telnet_short=("$_telnet_short[@]" '-c[disable .telnetrc]')
+  [[ "$help" = *"[-d]"* ]] &&
+    _telnet_short=("$_telnet_short[@]" '-d[debug mode]')
+  [[ "$help" = *"[-e char]"* ]] &&
+    _telnet_short=("$_telnet_short[@]" '-e+[specify escape character]:escape character:')
+  [[ "$help" = *"[-f/-F]"* ]] &&
+    _telnet_short=("$_telnet_short[@]" '-f' '-F')
+  [[ "$help" = *"[-k realm]"* ]] &&
+    _telnet_short=("$_telnet_short[@]" '-k+:realm:')
+  [[ "$help" = *"[-l user]"* ]] &&
+    _telnet_short=("$_telnet_short[@]" '-l+[specify user]:user:->users')
+  [[ "$help" = *"[-n tracefile]"* ]] &&
+    _telnet_short=("$_telnet_short[@]" '-n+[specify tracefile]:tracefile:_files')
+  [[ "$help" = *"[-r]"* ]] &&
+    _telnet_short=("$_telnet_short[@]" '-r[rlogin like user interface]')
+  [[ "$help" = *"[-s src_addr]"* ]] &&
+    _telnet_short=("$_telnet_short[@]" '-s+[set source IP address]:src_addr:')
+  [[ "$help" = *"[-x]"* ]] &&
+    _telnet_short=("$_telnet_short[@]" '-x')
+  [[ "$help" = *"[-t transcom]"* ]] &&
+    _telnet_short=("$_telnet_short[@]" '-t+:transcom:')
+
+  # _arguments cannot handle following three options.
+  _telnet_long=()
+  [[ "$help" = *"[-noasynch]"* ]] &&
+    _telnet_long=("$_telnet_long[@]" '-noasynch')
+  [[ "$help" = *"[-noasyncnet]"* ]] &&
+    _telnet_long=("$_telnet_long[@]" '-noasyncnet')
+  [[ "$help" = *"[-noasynctty]"* ]] &&
+    _telnet_long=("$_telnet_long[@]" '-noasynctty')
+fi
+
+[[ $#_telnet_long != 0 && (
+     -z "$compconfig[option_prefix]" ||
+     "$compconfig[option_prefix]" = *\!${words[1]}* ||
+     "$PREFIX" = [-+]* ) ]] && {
+  _description expl 'option'
+  _describe -o option _telnet_long "$expl[@]"
+}
+
 _arguments -s \
-  -{F,f,x} \
-  '-8[allow 8-Bit data]' \
-  '-E[disable an escape character]' \
-  '-K[no automatic login]' \
-  '-L[allow 8-Bit data on output]' \
-  '-S+:IP type-of-service:' \
-  '-X+:authentication type to disable:' \
-  '-a[attempt automatic login]' \
-  '-c[disable .telnetrc]' \
-  '-d[debug mode]' \
-  '-e+[specify escape character]:escape character:' \
-  '-k+:realm:' \
-  '-l+[specify user]:user:->users' \
-  '-n+[specify tracefile]:tracefile:_files' \
-  '-r[rlogin like user interface]' \
+  "$_telnet_short[@]" \
   ':host:->hosts' \
   ':port:->ports'
 
