@@ -874,6 +874,8 @@ docomplete(int lst)
     metafy_line();
 
     ocs = cs;
+    origline = dupstring((char *) line);
+    origcs = cs;
     if (!isfirstln && chline != NULL) {
 	/* If we are completing in a multi-line buffer (which was not  *
 	 * taken from the history), we have to prepend the stuff saved *
@@ -897,8 +899,6 @@ docomplete(int lst)
     autoq = '\0';
     /* Get the word to complete. */
     noerrs = 1;
-    origline = dupstring((char *) line);
-    origcs = cs;
     s = get_comp_string();
     DPUTS(wb < 0 || cs < wb || cs > we,
 	  "BUG: 0 <= wb <= cs <= we is not true!");
