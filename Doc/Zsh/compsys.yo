@@ -2101,9 +2101,9 @@ Example:
 
 example(_arguments '-l+:left border:' \ 
            '-format:paper size:(letter A4)' \ 
-	   '*-copy:output file:_files::resolution:(300 600)' \ 
-	   ':postscript file:_files -g *.(ps|eps)' \ 
-	   '*:page number:')
+           '*-copy:output file:_files::resolution:(300 600)' \ 
+           ':postscript file:_files -g *.(ps|eps)' \ 
+           '*:page number:')
 
 This describes three options: `tt(-l)', `tt(-format)', and
 `tt(-copy)'. The first one gets one argument described as `var(left
