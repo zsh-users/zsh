@@ -1,12 +1,9 @@
 #compdef rsync
 
 _rsync_remote_files() {
-local suf tag=accounts
+local expl remfiles remdispf remdispd remmodules suf ret=1 tag=accounts
 
-if [[ -prefix *::*/ ]]; then
-  local remfiles remdispf remdispd
-
-  compset -P '*::*/'
+if compset -P '*::*/'; then
 
   remfiles=(${(f)"$(_call_program files rsync ${words[CURRENT]%/*}/)"})
 
@@ -19,10 +16,7 @@ if [[ -prefix *::*/ ]]; then
   _wanted files expl 'remote file or directory' \
       compadd -S/ -d remdispd ${remdispd##* }
 
-elif [[ -prefix 1 *:: ]]; then
-  local remfiles remmodules
-
-  compset -P 1 '*::'
+elif compset -P 1 '*::'; then
 
   remfiles=(${(f)"$(_call_program files rsync ${words[CURRENT]%::*}::)"})
 
@@ -30,32 +24,33 @@ elif [[ -prefix 1 *:: ]]; then
 
   _describe "remote modules" remmodules -S/
 
-elif [[ -prefix 1 *: ]]; then
-  local remfiles remdispf remdispd slash
+elif compset -P 1 '*:'; then
 
-  compset -P 1 '*:'
-
-  if zstyle -T ":completion:${curcontext}:" remote-access; then
-    slash=/
-    remfiles=(${(f)"$(_call_program files ssh -a -x ${words[CURRENT]%:*} ls -d1FL "${${${words[CURRENT
-]#*:}:h}/${slash}(#e)/}/\* 2>/dev/null")"})
+  if zstyle -T ":completion:${curcontext}:files" remote-access; then
+    remfiles=(${(M)${(f)"$(_call_program files ssh -a -x ${IPREFIX%:} ls -d1FL "${(Q)PREFIX%%[^./][^/]#}\*" 2>/dev/null)"}%%[^/]#(|/)})
+    compset -P '*/'
+    compset -S '/*' || suf='remote file'
 
     remdispf=(${remfiles:#*/})
     remdispd=(${(M)remfiles:#*/})
 
-    _wanted files expl 'remote file or directory' \
-        compadd -d remdispf ${${remfiles:#*/}/[*=@|](#e)/}
-
-    _wanted files expl 'remote file or directory' \
-        compadd -S/ -d remdispd ${${(M)remfiles:#*/}/${slash}(#e)/}
+    _tags files
+    while _tags; do
+      while _next_label files expl ${suf:-remote directory}; do
+        [[ -n $suf ]] && compadd "$@" "$expl[@]" -d remdispf \
+	    ${(q)remdispf%[*=@|]} && ret=0 
+	compadd ${suf:+-S/} "$@" "$expl[@]" -d remdispd \
+	    ${(q)remdispd%/} && ret=0
+      done
+      (( ret )) || return 0
+    done
   else
-    _message -e remote-files 'remote files'
+    _message -e remote-files 'remote file'
   fi
 
-elif [[ -prefix 1 *@ ]]; then
+elif compset -P 1 '*@'; then
   local user=${PREFIX%%@*}
 
-  compset -P 1 '*@'
   compset -S ':*' || suf=":"
 
   _wanted -C user-at hosts expl "host for $user" \

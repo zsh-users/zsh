@@ -1,3 +1,8 @@
+2004-08-07  Oliver Kiddle  <opk@zsh.org>
+
+	* 20235: Completion/Unix/Command/_rsync: synched remote file
+	completion with that in _ssh. quoting needed quoting.
+
 2004-08-07  Geoff Wing  <gcw@zsh.org>
 
 	* 20196: Src/prompt.c: still allow user specified text modifiers
