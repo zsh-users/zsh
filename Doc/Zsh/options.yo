@@ -91,6 +91,14 @@ If a command is issued that can't be executed as a normal command,
 and the command is the name of a directory, perform the tt(cd)
 command to that directory.
 )
+pindex(AUTO_CONTINUE)
+cindex(jobs, continuing automatically)
+cindex(continuing jobs automatically)
+item(tt(AUTO_CONT))(
+With this option set, stopped jobs that are removed from the job table
+with the tt(disown) builtin command are automatically sent a tt(CONT)
+signal to make them running.
+)
 pindex(AUTO_LIST)
 cindex(completion, listing choices)
 item(tt(AUTO_LIST) (tt(-9)) <D>)(

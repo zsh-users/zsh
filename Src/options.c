@@ -75,6 +75,7 @@ static struct optname optns[] = {
 {NULL, "alwaystoend",	      0,			 ALWAYSTOEND},
 {NULL, "appendhistory",	      OPT_ALL,			 APPENDHISTORY},
 {NULL, "autocd",	      OPT_EMULATE,		 AUTOCD},
+{NULL, "autocontinue",	      0,			 AUTOCONTINUE},
 {NULL, "autolist",	      OPT_ALL,			 AUTOLIST},
 {NULL, "automenu",	      OPT_ALL,			 AUTOMENU},
 {NULL, "autonamedirs",	      0,			 AUTONAMEDIRS},

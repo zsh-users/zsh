@@ -1,3 +1,10 @@
+2001-06-27  Sven Wischnowsky  <wischnow@zsh.org>
+
+	* 15115: Doc/Zsh/builtins.yo, Doc/Zsh/options.yo, Src/exec.c,
+	Src/jobs.c, Src/options.c, Src/zsh.h: add autocontinue option
+	to automatically make stopped jos running when they are being
+	disowned; make that the default for `%job &!' and `%job &|'
+
 2001-06-26  Andrej Borsenkow  <bor@zsh.org>
 
 	* 15099: Test/D03procsubst.ztst, Test/ztst.zsh: add some support

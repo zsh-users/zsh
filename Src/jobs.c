@@ -1215,7 +1215,7 @@ init_hackzero(char **argv, char **envp)
 int
 bin_fg(char *name, char **argv, char *ops, int func)
 {
-    int job, lng, firstjob = -1, retval = 0;
+    int job, lng, firstjob = -1, retval = 0, ofunc = func;
 
     if (ops['Z']) {
 	int len;
@@ -1299,6 +1299,8 @@ bin_fg(char *name, char **argv, char *ops, int func)
     for (; (firstjob != -1) || *argv; (void)(*argv && argv++)) {
 	int stopped, ocj = thisjob;
 
+        func = ofunc;
+
 	if (func == BIN_WAIT && isanum(*argv)) {
 	    /* wait can take a pid; the others can't. */
 	    pid_t pid = (long)atoi(*argv);
@@ -1326,6 +1328,13 @@ bin_fg(char *name, char **argv, char *ops, int func)
 	    unqueue_signals();
 	    return 1;
 	}
+        /* If AUTO_CONTINUE is set (automatically make stopped jobs running
+         * on disown), we actually do a bg and then delete the job table entry. */
+
+        if (isset(AUTOCONTINUE) && func == BIN_DISOWN &&
+            jobtab[job].stat & STAT_STOPPED)
+            func = BIN_BG;
+
 	/* We have a job number.  Now decide what to do with it. */
 	switch (func) {
 	case BIN_FG:
@@ -1386,7 +1395,8 @@ bin_fg(char *name, char **argv, char *ops, int func)
 	    if (func != BIN_BG) {
 		waitjobs();
 		retval = lastval2;
-	    }
+	    } else if (ofunc == BIN_DISOWN)
+	        deletejob(jobtab + job);
 	    break;
 	case BIN_JOBS:
 	    printjob(job + jobtab, lng, 2);
