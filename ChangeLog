@@ -1,5 +1,7 @@
 2004-06-03  Peter Stephenson  <pws@csr.com>
 
+	* 20017: Doc/.distfiles: add zsh.html to doc distribution.
+
 	* users/7467: Completion/Base/Core/_dispatch: quoted commands
 	weren't found in dispatcher lookup.
 
