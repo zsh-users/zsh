@@ -92,7 +92,7 @@ execfor(Cmd cmd, LinkList args, int flags)
 			fprintf(stderr, "%s\n", str);
 			fflush(stderr);
 		    }
-		    val = matheval(str);
+		    val = mathevali(str);
 		} else
 		    val = 1;
 	    }
