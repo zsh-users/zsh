@@ -613,14 +613,11 @@ setupvals(void)
 #endif
     struct timezone dummy_tz;
     char *ptr;
-#ifdef HAVE_GETRLIMIT
-    int i;
-#endif
+    int i, j;
 #if defined(SITEFPATH_DIR) || defined(FPATH_DIR)
     char **fpathptr;
 # if defined(FPATH_DIR) && defined(FPATH_SUBDIRS)
     char *fpath_subdirs[] = FPATH_SUBDIRS;
-    int j;
 # endif
 # ifdef SITEFPATH_DIR
     int fpathlen = 1;
@@ -628,6 +625,47 @@ setupvals(void)
     int fpathlen = 0;
 # endif
 #endif
+    int close_fds[10], tmppipe[2];
+
+    /*
+     * Workaround a problem with NIS (in one guise or another) which
+     * grabs file descriptors and keeps them for future reference.
+     * We don't want these to be in the range where the user can
+     * open fd's, i.e. 0 to 9 inclusive.  So we make sure all
+     * fd's in that range are in use.
+     */
+    memset(close_fds, 0, 10*sizeof(int));
+    if (pipe(tmppipe) == 0) {
+	/*
+	 * Strategy:  Make sure we have at least fd 0 open (hence
+	 * the pipe).  From then on, keep dup'ing until we are
+	 * up to 9.  If we go over the top, close immediately, else
+	 * mark for later closure.
+	 */
+	i = -1;			/* max fd we have checked */
+	while (i < 9) {
+	    /* j is current fd */
+	    if (i < tmppipe[0])
+		j = tmppipe[0];
+	    else if (i < tmppipe[1])
+		j = tmppipe[1];
+	    else {
+		j = dup(0);
+		if (j == -1)
+		    break;
+	    }
+	    if (j < 10)
+		close_fds[j] = 1;
+	    else
+		close(j);
+	    if (i < j)
+		i = j;
+	}
+	if (i < tmppipe[0])
+	    close(tmppipe[0]);
+	if (i < tmppipe[1])
+	    close(tmppipe[1]);
+    }
 
     addhookdefs(argzero, zshhooks, sizeof(zshhooks)/sizeof(*zshhooks));
 
@@ -813,6 +851,11 @@ setupvals(void)
     }
 
     times(&shtms);
+
+    /* Close the file descriptors we opened to block off 0 to 9 */
+    for (i = 0; i < 10; i++)
+	if (close_fds[i])
+	    close(i);
 }
 
 /* Initialize signal handling */

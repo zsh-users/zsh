@@ -1,3 +1,9 @@
+2002-05-13  Peter Stephenson  <pws@csr.com>
+
+	* 17120, 17121: Src/init.c: work around problem that NIS ties up a
+	file descriptor by forcing it to be at least 10 so it's not in the
+	range a user can open.
+
 2002-05-13  Sven Wischnowsky  <wischnow@zsh.org>
 
 	* 17135: Src/Zle/compcore.c, Src/Zle/zle_tricky.c: fix for
