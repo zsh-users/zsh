@@ -1,6 +1,6 @@
 #autoload
 
-local opts opt type=file prios tags
+local opts opt type=file tags
 
 opts=()
 while getopts "P:S:qr:R:W:F:J:V:X:f/g:M:" opt; do

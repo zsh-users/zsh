@@ -3,7 +3,7 @@
 # This can be used to add options or values with descriptions as matches.
 
 local cmd func opt expl tmps tmpd tmpmd tmpms ret=1 showd _nm hide
-local prios tags type=value
+local tags type=value
 
 cmd="$words[1]"
 func="$funcstack[2]"

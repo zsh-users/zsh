@@ -154,7 +154,7 @@ fi
 if comparguments -i "$compconfig[autodescribe_options]" "$@"; then
   local nm="$compstate[nmatches]" action noargs aret expl local
   local next direct odirect equal single match matched ws tmp1 tmp2
-  local prios tags opts
+  local tags opts
 
   if comparguments -D descr action; then
     if comparguments -O next direct odirect equal; then

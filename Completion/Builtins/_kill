@@ -6,7 +6,7 @@ if compset -P 1 -; then
   _description expl signal
   compadd "$expl[@]" $signals[1,-3]
 else
-  local prios tags ret=1
+  local tags ret=1
   
   _tags job process
   

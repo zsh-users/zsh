@@ -63,17 +63,21 @@ if (( $# )); then
     done
   done
 
-  prios=( "${(@)tags:#}" )
+  prio="_prio_arr$(( _prio_num++ ))"
+  _prio_names[$funcstack]="$prio"
+  eval "${prio}=( \"\${(@)tags:#}\" )"
 
   return 0
 fi
 
+local prios="$_prio_names[$funcstack]"
+
 _failed_tags=( "$_failed_tags[@]" "$_last_tags[@]" )
 
-(( $#prios )) || return 1
+(( ${(P)#prios} )) || return 1
 
-tags="${prios[1]}:"
-shift 1 prios
+tags="${${(@P)prios}[1]}:"
+shift 1 "$prios"
 
 _last_tags=( "${(@s.:.)${${tags#:}%:}}" )
 _tried_tags=( "$_tried_tags[@]" "$_last_tags[@]" )

@@ -2,7 +2,7 @@
 
 if compvalues -i "$@"; then
 
-  local tags prios noargs args opts descr action expl sep
+  local tags noargs args opts descr action expl sep
 
   if ! compvalues -D descr action; then
 

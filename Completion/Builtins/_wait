@@ -1,6 +1,6 @@
 #compdef wait
 
-local prios tags list ret=1 expl
+local tags list ret=1 expl
   
 _tags job process
   

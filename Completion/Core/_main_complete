@@ -17,8 +17,9 @@
 # state than the global one for which you are completing.
 
 
-local comp post ret=1 _compskip prios tags
+local comp post ret=1 _compskip tags _prio_num=1
 typeset -U _offered_tags _tried_tags _failed_tags _used_tags _unused_tags
+typeset -A _prio_names
 
 _offered_tags=()
 _tried_tags=()
