@@ -15,29 +15,24 @@
 	* 16030: Completion/Unix/Command/_mount: Fix minor typos in option
 	descriptions.
 
-2001-10-12  Oliver Kiddle  <opk@zsh.org>
-
-	* 15594: Completion/Zsh/Context/_value,
-	Completion/Zsh/Command/_enable: use _x_display when setting
-	$DISPLAY and fix substitution mistake in enable completion
-
-	* 15983: Completion/Unix/Command/_user_admin,
-	Completion/Unix/Command/_sysctl, Completion/Unix/Type/_urls,
-	Completion/Unix/Command/_webbrowser: darwin support in _sysctl,
-	complete files for galeon
-
-	* 16018: acconfig.h, zshconfig.ac, Etc/MACHINES,
-	Test/C02cond.ztst: allow dynamic loading to work on MacOS X
-	if the dlcompat library is installed.
-
-	* 15882: zshconfig.ac, Etc/MACHINES, Test/C02cond.ztst: fix
-	build and test problems on MacOS X (Darwin).
-
 2001-10-11  Bart Schaefer  <schaefer@zsh.org>
 
 	* 16013: Src/exec.c: Properly save/restore state around the
 	DEBUG trap, so that its return value does not alter the return
 	value of current command (among other things).
+
+2001-10-10  Oliver Kiddle  <opk@zsh.org>
+
+	* 16018: acconfig.h, zshconfig.ac, Etc/MACHINES,
+	Test/C02cond.ztst: allow dynamic loading to work on MacOS X
+	if the dlcompat library is installed.
+
+2001-10-08  Oliver Kiddle  <opk@zsh.org>
+
+	* 15983: Completion/Unix/Command/_user_admin,
+	Completion/Unix/Command/_sysctl, Completion/Unix/Type/_urls,
+	Completion/Unix/Command/_webbrowser: darwin support in _sysctl,
+	complete files for galeon
 
 2001-10-08  Peter Stephenson  <pws@csr.com>
 
@@ -75,6 +70,11 @@
 
 	* 15889: Test/V01zmodload.ztst: Compute module dependencies for
 	external modules so that they can be unloaded in the right order.
+
+2001-09-27  Oliver Kiddle  <opk@zsh.org>
+
+	* 15882: zshconfig.ac, Etc/MACHINES, Test/C02cond.ztst: fix
+	build and test problems on MacOS X (Darwin).
 
 2001-09-25  Bart Schaefer  <schaefer@zsh.org>
 
@@ -240,6 +240,12 @@
 	* users/4092: Src/hist.c: Don't lose the last history line
 	when a signal causes us to rewrite the history file.
 
+2001-08-07  Oliver Kiddle  <opk@zsh.org>
+
+	* 15594: Completion/Zsh/Context/_value,
+	Completion/Zsh/Command/_enable: use _x_display when setting
+	$DISPLAY and fix substitution mistake in enable completion
+
 2001-08-07  Peter Stephenson  <pws@csr.com>
 
 	* 15583: Config/installfns.sh: ignore CVS directories for
@@ -252,12 +258,14 @@
 	Completion/Unix/Type/_directories: new _user_admin completion for
 	useradd, groupmod etc and remove redundant duplication in _cvs
 
+	* 15577: Completion/Unix/Command/_grep,
+	Completion/Unix/Command/_loadkeys: fix exclusion lists
+
+2001-08-03  Oliver Kiddle  <opk@zsh.org>
+
 	* 15562, Akinori Musha: 15559, 15563: Completion/BSD/Command/_chflags,
 	Completion/Unix/Command/_chown, Completion/Unix/Command/_sysctl:
 	new BSD completion and fix _chown for symlinks
-
-	* 15577: Completion/Unix/Command/_grep,
-	Completion/Unix/Command/_loadkeys: fix exclusion lists
 
 2001-07-31  Clint Adams  <clint@zsh.org>
 
