@@ -238,8 +238,8 @@ _cvs_diff() {
     "($ofwuc $oss -F --show-function-line=)"{-F+,--show-function-line=}'[show the most recent line matching regex]:regex' \
     "($of $ouc $oss)--brief[output only whether files differ]" \
     "($of $ouc $oss)"{-e,--ed}'[output an ed script]' \
-    "($of $ouc $oss)"{-f,--forward-ed}'[output a reversed ed script]" \
-    "($of $ouc $oss)"{-n,--rcs}'[RCS format diff]" \
+    "($of $ouc $oss)"{-f,--forward-ed}'[output a reversed ed script]' \
+    "($of $ouc $oss)"{-n,--rcs}'[RCS format diff]' \
     "($of $ouc)--side-by-side[output in two columns]" \
     "($of $ouc)-y[output in two columns]" \
     "($ofwy $ouc -W --width)"{-W+,--width=}'[set size of line]:number of characters per line' \

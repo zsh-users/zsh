@@ -1,3 +1,12 @@
+2003-08-05  Oliver Kiddle  <opk@zsh.org>
+
+	* Completion/Unix/Command/_archie: archie servers no longer exist
+	so remove redundant completion
+
+	* 18928: Completion/Unix/Command/_cdrecord: new cdrecord completion
+
+	* 18927: Completion/Unix/Command/_cvs: fix recent mistake with quoting
+
 2003-08-05  Peter Stephenson  <pws@csr.com>
 
 	* 18926: Src/Zle/complist.c: fix (without knowing how) insertion

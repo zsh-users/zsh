@@ -2,7 +2,7 @@ DISTFILES_SRC='
 .distfiles
 _a2ps         _dvi          _gzip         _man          _rcs          _w3m
 _apachectl    _enscript     _iconv        _mh           _rlogin       _webbrowser
-_archie       _fakeroot     _imagemagick  _mount        _sh           _wget
+_cdrecord     _fakeroot     _imagemagick  _mount        _sh           _wget
 _arp          _fetchmail    _init_d       _mutt         _slrn         _whereis
 _bison        _find         _ispell       _mysql_utils  _socket       _whois
 _bzip2        _finger       _java         _ncftp        _ssh          _xargs
