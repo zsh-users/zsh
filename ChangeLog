@@ -45,6 +45,12 @@
 	to no longer suggest that setting the PATH here (without proper
 	precautions) is a safe thing to do.
 
+2003-09-03  Oliver Kiddle  <opk@zsh.org>
+
+	* 19019: Completion/Zsh/Command/_alias,
+	Completion/Zsh/Command/_unhash: only complete aliases of the
+	appropriate type for the alias builtin
+
 2003-08-30  Peter Stephenson  <pws@pwstephenson.fsnet.co.uk>
 
 	* c.f. somewhat terse reference in zsh-users/6493:
