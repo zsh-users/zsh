@@ -1,0 +1,6 @@
+#compdef - nohup nice eval time rusage noglob nocorrect exec
+
+shift words
+(( CURRENT-- ))
+
+_normal
