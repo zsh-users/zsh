@@ -4,17 +4,17 @@ typeset -A opt_args
 
 _cdcd_tracks ()
 {
-    cdcd info | sed -e 1,2d -e 4d -e "s,Total tracks: *\([0-9]\+\).*,\1,"
+    print ${${${(f)"$(cdcd info)"}[3]}/Total tracks: #(#b)([0-9]##)*/$match[1]}
 }
 
 _cdcd_track_list ()
 {
-    seq 1 $(_cdcd_tracks)
+    print ${1..$(_cdcd_tracks)}
 }
 
 _cdcd_track_list_verbose ()
 {
-    cdcd tracks | grep "^[ 0-9]\+:" | sed -e 's,^ *\([0-9]\+\):[ >]*. *[^ ]* *\(.*\) \+,\1\\\:\"\2\",'
+    print ${${(M)${(f)"$(cdcd tracks)"}:#(#s) #[0-9]##:*}/(#s) #(#b)([0-9]##):[ >]#? #[^ ]# #(*) ##/$match[1]:${(qqq)match[2]}}
 }
 
 _cdcd_commands ()

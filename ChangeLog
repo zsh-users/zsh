@@ -1,3 +1,8 @@
+2002-02-17  Clint Adams  <clint@zsh.org>
+
+	* 16662: Completion/Unix/Command/_cdcd: use parameter expansion
+	instead of grep, sed, and seq.
+
 2002-02-16  Wayne Davison  <wayned@users.sourceforge.net>
 
 	* users/4678: Src/hist.c: Fixed a hard-to-trigger bug in the
