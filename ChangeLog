@@ -1,3 +1,8 @@
+2000-11-01  Sven Wischnowsky  <wischnow@zsh.org>
+
+	* 13107: Functions/Misc/zed: don't reset just-edited trap function
+ 	to old value
+	
 2000-10-30  Sven Wischnowsky  <wischnow@zsh.org>
 
 	* 13095: Src/Modules/parameter.c: make assignament to $nameddirs

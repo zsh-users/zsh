@@ -55,7 +55,7 @@ $(<$dir/$1)
     var="$1() {
 }"
   fi
-  vared var && eval function "$var"
+  vared var && eval "$cleanup ;" function "$var"
 else
   [[ -f $1 ]] && var="$(<$1)"
   while vared var
