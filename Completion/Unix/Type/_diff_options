@@ -73,7 +73,7 @@ if _pick_variant -c $cmd gnu=GNU unix -v; then
     "($of $ouc $oss)-n[RCS format diff]" \
     "($of $ouc)--side-by-side[output in two columns]" \
     "($of $ouc)-y[output in two columns]" \
-    "($ofwy $ouc --width -W){--width=,-W+}'[set size of line]:number of characters per line:' \
+    "($ofwy $ouc --width -W)"{--width=,-W+}'[set size of line]:number of characters per line:' \
     "($ofwy $ouc)--left-column[output only left column of common lines]" \
     "($ofwy $ouc)--suppress-common-lines[do not output common lines]" \
     "($ofwg $ouc $oss)--old-group-format=[set old group format]:old group format:" \
