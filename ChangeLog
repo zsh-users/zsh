@@ -1,5 +1,7 @@
 2005-03-04  Peter Stephenson  <pws@pwstephenson.fsnet.co.uk>
 
+	* unposted: Src/Zle/zle_refresh.c: correct deliberate mistake.
+
 	* 20928: Src/Zle/zle_refresh.c: null terminate lines so that they
 	can be compared reliably.
 

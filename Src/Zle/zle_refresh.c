@@ -198,7 +198,7 @@ resetvideo(void)
 	if (obuf[ln])
 	{
 	    obuf[ln][0] = ZWC('\n');
-	    obuf[ln][0] = ZWC('\0');
+	    obuf[ln][1] = ZWC('\0');
 	}
     }
 
