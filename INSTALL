@@ -19,6 +19,16 @@ that zsh is known to compile on, as well as any special instructions
 for your particular architecture.  Most architectures will not require any
 special instructions.
 
+Pre-configuration
+-----------------
+
+If you are using a normal source release, skip this section.
+
+If the `configure' script does not already exist -- e.g., if you've got
+a snapshot of the bare sources just checked out from a CVS repository
+-- some things need to be built before the configuration can proceed.
+Run the script `./Util/preconfig' to do this.
+
 Configuring Zsh
 ---------------
 

@@ -1,4 +1,5 @@
 DISTFILES_SRC='
     .distfiles
     helpfiles mkdisttree.sh reporter
+    preconfig
 '
