@@ -2672,7 +2672,9 @@ getoutput(char *cmd, int qt)
     redup(pipes[1], 1);
     opts[MONITOR] = 0;
     entersubsh(Z_SYNC, 1, 0);
+    cmdpush(CS_CMDSUBST);
     execode(prog, 0, 1);
+    cmdpop();
     close(1);
     _exit(lastval);
     zerr("exit returned in child!!", NULL, 0);
@@ -2801,7 +2803,9 @@ getoutputfile(char *cmd)
     redup(fd, 1);
     opts[MONITOR] = 0;
     entersubsh(Z_SYNC, 1, 0);
+    cmdpush(CS_CMDSUBST);
     execode(prog, 0, 1);
+    cmdpop();
     close(1);
     _exit(lastval);
     zerr("exit returned in child!!", NULL, 0);
@@ -2885,7 +2889,9 @@ getproc(char *cmd)
     redup(pipes[out], out);
     closem(0);   /* this closes pipes[!out] as well */
 #endif
+    cmdpush(CS_CMDSUBST);
     execode(prog, 0, 1);
+    cmdpop();
     zclose(out);
     _exit(lastval);
     return NULL;
@@ -2911,7 +2917,9 @@ getpipe(char *cmd)
     entersubsh(Z_ASYNC, 1, 0);
     redup(pipes[out], out);
     closem(0);	/* this closes pipes[!out] as well */
+    cmdpush(CS_CMDSUBST);
     execode(prog, 0, 1);
+    cmdpop();
     _exit(lastval);
     return 0;
 }
@@ -2963,7 +2971,9 @@ execcond(Estate state, int do_exec)
 	fprintf(xtrerr, "[[");
 	tracingcond++;
     }
+    cmdpush(CS_COND);
     stat = !evalcond(state);
+    cmdpop();
     if (isset(XTRACE)) {
 	fprintf(xtrerr, " ]]\n");
 	fflush(xtrerr);
@@ -2986,6 +2996,7 @@ execarith(Estate state, int do_exec)
 	printprompt4();
 	fprintf(xtrerr, "((");
     }
+    cmdpush(CS_MATH);
     e = ecgetstr(state, EC_DUPTOK, &htok);
     if (htok)
 	singsub(&e);
@@ -2993,6 +3004,8 @@ execarith(Estate state, int do_exec)
 	fprintf(xtrerr, " %s", e);
 
     val = mathevali(e);
+
+    cmdpop();
 
     if (isset(XTRACE)) {
 	fprintf(xtrerr, " ))\n");

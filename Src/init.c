@@ -904,6 +904,8 @@ source(char *s)
     int oldshst, osubsh, oloops;
     FILE *obshin;
     char *old_scriptname = scriptname, *us;
+    char *ocs;
+    int ocsp;
 
     if (!s || 
 	(!(prog = try_source_file((us = unmeta(s)))) &&
@@ -919,6 +921,10 @@ source(char *s)
     oldlineno = lineno;          /* store our current lineno                  */
     oloops    = loops;           /* stored the # of nested loops we are in    */
     oldshst   = opts[SHINSTDIN]; /* store current value of this option        */
+    ocs = cmdstack;
+    ocsp = cmdsp;
+    cmdstack = (unsigned char *) zalloc(CMDSTACKSZ);
+    cmdsp = 0;
 
     if (!prog) {
 	SHIN = tempfd;
@@ -957,6 +963,9 @@ source(char *s)
     errflag = 0;
     retflag = 0;
     scriptname = old_scriptname;
+    free(cmdstack);
+    cmdstack = ocs;
+    cmdsp = ocsp;
 
     return 0;
 }
