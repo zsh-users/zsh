@@ -17,8 +17,8 @@ _ispell         _java           _joe            _killall
 _last           _less           _links          _loadkeys       _look           
 _lp             _ls             _lsof           _lynx           _lzop           
 _mail           _make           _man            _mencal         _mh             
-_mount          _mt             _mtools         _mtr            _mutt           
-_mysql_utils    _mysqldiff      
+_mount          _mpc            _mt             _mtools         _mtr
+_mutt           _mysql_utils    _mysqldiff      
 _ncftp          _netcat         _nice           _nmap           _nslookup       
 _pack           _patch          _pbm            _perforce       _perl           
 _perldoc        _php            _pine           _postfix        _prcs           
