@@ -296,7 +296,7 @@ load_and_bind(const char *fn)
 	int err = loadbind(0, (void *) addbuiltin, ret);
 	for (node = firstnode(modules); !err && node; incnode(node)) {
 	    Module m = (Module) getdata(node);
-	    if (m->u.handle)
+	    if (m->u.handle && !(m->flags & MOD_LINKED))
 		err |= loadbind(0, m->u.handle, ret);
 	}
 
