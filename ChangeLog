@@ -1,5 +1,7 @@
 2002-05-21  Peter Stephenson  <pws@csr.com>
 
+	* 17201: Doc/Zsh/mod_tcp.yo: add example use of ztcp.
+
 	* 17141 plus mods: Src/utils.c, Src/Zle/zle_main.c,
 	Src/Zle/zle_thingy.c, Doc/Zsh/zle.yo: `zle -F fd handler'
 	installs shell function handler for when data becomes available

@@ -95,3 +95,35 @@ to force such a socket closed, use tt(-f).
 In order to elicit more verbose output, use tt(-v).
 )
 enditem()
+
+subsect(Example)
+cindex(TCP, example)
+Here is how to create a TCP connection between two instances of zsh.  We
+need to pick an unassigned port; here we use the randomly chosen 5123.
+
+On tt(host1),
+example(zmodload zsh/net/tcp
+ztcp -l 5123
+listenfd=$REPLY
+ztcp -a $listenfd
+fd=$REPLY)
+The second from last command blocks until there is an incoming connection.
+
+Now create a connection from tt(host2) (which may, of course, be the same
+machine):
+example(zmodload zsh/net/tcp
+ztcp host1 5123
+fd=$REPLY)
+
+Now on each host, tt($fd) contains a file descriptor for talking to the
+other.  For example, on tt(host1):
+example(print This is a message >&$fd)
+and on tt(host2):
+example(read -r line <&$fd; print -r - $line)
+prints `tt(This is a message)'.
+
+To tidy up, on tt(host1):
+example(ztcp -c $listenfd
+ztcp -c $fd)
+and on tt(host2)
+example(ztcp -c $fd)
