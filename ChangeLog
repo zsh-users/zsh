@@ -1,3 +1,7 @@
+2000-05-23  Peter Stephenson  <pws@pwstephenson.fsnet.co.uk>
+
+	* 11542: Doc/Zsh/compsys.yo: more wording `improvements'.
+
 2000-05-23  Oliver Kiddle  <opk@zsh.org>
 
 	* 11541:  Completion/User/_chown, Completion/User/_perl_basepods,
