@@ -720,9 +720,13 @@ subst_parse_str(char **sp, int single, int err)
 
     if (!(err ? parsestr(s) : parsestrnoerr(s))) {
 	if (!single) {
+            int qt = 0;
+
 	    for (; *s; s++)
-		if (*s == Qstring)
+		if (!qt && *s == Qstring)
 		    *s = String;
+                else if (*s == Dnull)
+                    qt = !qt;
 	}
 	return 0;
     }
@@ -1483,7 +1487,14 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int ssub)
 	case '#':
 	case Pound:
 	case '/':
-	    if (qt) {
+            /* This once was executed only `if (qt) ...'. But with that
+             * patterns in a expansion resulting from a ${(e)...} aren't
+             * tokenized even though this function thinks they are (it thinks
+             * they are because subst_parse_string() turns Qstring tokens
+             * into String tokens and for unquoted parameter expansions the
+             * lexer normally does tokenize patterns inside parameter
+             * expansions). */
+            {
 		int one = noerrs, oef = errflag, haserr;
 
 		if (!quoteerr)

@@ -1,3 +1,10 @@
+2001-05-18  Sven Wischnowsky  <wischnow@zsh.org>
+
+	* 14381: Src/subst.c: try to make ${(e)..} work for complicated
+	parameter expansions in the value; this means: keep Qstring
+	tokens unchanged if they are inside double quotes and
+	tokenizing patterns in parameter expansions
+
 2001-05-18  Bart Schaefer  <schaefer@zsh.org>
 
 	* unposted: Test/.distfiles, Test/V01zmodload.ztst: Add the basic
