@@ -28,6 +28,10 @@ prompt_bart_help () {
 	last command is shown in standout mode if the exit status was
 	nonzero, or underlined if the job was stopped.
 
+	If the last command is too wide to fit without truncating the
+	current directory, it is put on a line by itself.  The current
+	directory uses %~, so namedir abbreviation applies.
+
 	The "upper right prompt" looks like:
 	    date time
 	The fourth color is used for the date, and the first again for the
@@ -44,7 +48,7 @@ prompt_bart_help () {
 	displayed and reset after it.  Other color changes within RPS1, if
 	any, remain in effect.
 
-	This prompt hijacks psvar[8] and psvar[9] to avoid having to reset
+	This prompt hijacks psvar[7] through [9] to avoid having to reset
 	the entire PS1 string on every command.  It uses TRAPWINCH to set
 	the position of the upper right prompt on a window resize, so the
 	prompt may not match the window width until the next command.  No
@@ -54,28 +58,35 @@ prompt_bart_help () {
 }
 
 prompt_bart_precmd () {
-    setopt localoptions noxtrace extendedglob noksharrays
+    setopt localoptions noxtrace noksharrays
 
     # Using psvar here protects against unwanted promptsubst expansions.
-    psvar[8]="$history[$[${(%):-%h}-1]]" # Use history text, not just number
-    psvar[9]=''				 # Padding before upper right prompt
 
-    repeat $[COLUMNS-${#${(%%f)${(S)PS1//[%]\{*%\}/}}[1]}-1]
-    do
-	psvar[9]="$psvar[9] "
-    done
+    psvar[7]="$history[$[${(%):-%h}-1]]" # Use history text, not just number
+    psvar[8]=''				 # No padding until we compute it
+
+    # Compute the size of the upper left prompt and set psvar[9] if needed.
+    psvar[9]=()
+    ((${#${(f)${(%%)${(S)PS1//[%]\{*%\}/}}}[1]} > COLUMNS-2)) && psvar[9]=''
+    : ${(S)PS1//[%]\{*%\}/}		# Bug workaround, up to 4.0.1-pre-3
+
+    # Compute and set the padding between upper left and right prompts.
+    psvar[8]=${(l:COLUMNS-${#${(f)${(%%)${(S)PS1//[%]\{*%\}/}}}[1]}-1:: :)}
 }
 
 prompt_bart_ps1 () {
+    setopt localoptions noxtrace noksharrays
+
     local -ah ps1
-    local -h host hist dir space date time rs="%{$reset_color%}"
+    local -h host hist1 hist2 dir space date time rs="%{$reset_color%}"
     local -h eon="%(?.[.%20(?.[%U.%S[))" eoff="%(?.].%20(?.%u].]%s))"
 
     # Set up the components of the upper line
     host="%{$fg[%m]%}%m$rs"
-    hist="%{$fg[%h]%}$eon%8v$eoff$rs"
-    dir="%{$fg[%~]%}%~$rs"
-    space=%9v
+    hist1="%9(v. . %{$fg[%h]%}$eon%7v$eoff$rs )"
+    hist2=$'%9(v.\n'"%{$fg[%h]%}$eon%7v$eoff$rs.)"
+    dir="%{$fg[%~]%}%8~$rs"
+    space=%8v
     date="%{$fg[%D]%}%D$rs"	# Prefer "%{$fg[%D]%}%W$rs" in the USA?
     time="%{$fg[%@]%}%@$rs"
 
@@ -87,24 +98,29 @@ prompt_bart_ps1 () {
     ps1=( ${(f)PS1} )		# Split the existing prompt at newlines
     ps1=( "%$[COLUMNS-3]>..>"	# Begin truncation (upper left prompt)
 	"$host"
-	" $hist "		# I prefer spaces around this; do you?
+	"$hist1"		# Empty when too wide for one line
 	"$dir"
 	"%<<"			# End truncation (end upper left prompt)
 	"$space"		# Pad line to upper right position
 	"%$[COLUMNS-16](l.  . $date)"
 	"%$[COLUMNS-6](l.. $time)"
+	"$hist2"		# Empty when $hist1 is not empty
 	$'\n'
 	$ps1[-1] )		# Keep last line of the existing prompt
     PS1="${(j::)ps1}"
 }
 
 prompt_bart_winch () {
+    setopt localoptions noksharrays
+
     # Delete ourself from TRAPWINCH if not using our precmd insert.
     [[ $functions[precmd] = *prompt_bart_precmd* ]] && prompt_bart_ps1 ||
 	functions[TRAPWINCH]="${functions[TRAPWINCH]//prompt_bart_winch}"
 }
 
 prompt_bart_setup () {
+    setopt localoptions noksharrays
+
     # A few extra niceties ...
     repeat 1 case "$1:l" in
       (off|disable)
