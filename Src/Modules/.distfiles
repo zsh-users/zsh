@@ -12,6 +12,7 @@ DISTFILES_SRC='
     pcre.mdd pcre.c
     socket.mdd socket.c
     stat.mdd stat.c
+    system.mdd system.c errnames1.awk errnames2.awk
     tcp.mdd tcp.c tcp.h
     termcap.mdd termcap.c
     terminfo.mdd terminfo.c

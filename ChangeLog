@@ -1,3 +1,9 @@
+2003-10-06  Peter Stephenson  <pws@pwstephenson.fsnet.co.uk>
+
+	* unposted: Doc/Zsh/.distfiles, Src/zsh.mdd,
+	Src/Modules/.distfiles:  update distribution files for
+	18980 (zsh/system) and 19053 (Functions/MIME).
+
 2003-09-28  Clint Adams  <clint@zsh.org>
 
 	* 19151: Src/Modules/datetime.c: add $SECS parameter for
