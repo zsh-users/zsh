@@ -30,6 +30,10 @@
 #include "complete.mdh"
 #include "compresult.pro"
 
+/* The number of columns to leave empty between rows of matches. */
+
+#define CM_SPACE  2
+
 /* This counts how often the list of completions was invalidated.
  * Can be used to detect if we have a new list.  */
 
@@ -929,7 +933,7 @@ do_single(Cmatch m)
     int l, sr = 0, scs;
     int havesuff = 0;
     int partest = (m->ripre || ((m->flags & CMF_ISPAR) && parpre));
-    char *str = m->str, *ppre = m->ppre, *psuf = m->psuf, *prpre = m->prpre;
+    char *str = m->orig, *ppre = m->ppre, *psuf = m->psuf, *prpre = m->prpre;
 
     if (!prpre) prpre = "";
     if (!ppre) ppre = "";
@@ -1380,7 +1384,7 @@ calclist(int showall)
     Cmgroup g;
     Cmatch *p, m;
     Cexpl *e;
-    int hidden = 0, nlist = 0, nlines = 0, add;
+    int hidden = 0, nlist = 0, nlines = 0;
     int max = 0, i;
     VARARR(int, mlens, nmatches + 1);
 
@@ -1474,7 +1478,7 @@ calclist(int showall)
                         if (!(m->flags & CMF_ROWS))
                             g->flags &= ~CGF_ROWS;
                     } else {
-                        l = niceztrlen(m->str);
+                        l = niceztrlen(m->str) + !!m->modec;
                         ndisp++;
                         if (l > glong)
                             glong = l;
@@ -1503,19 +1507,16 @@ calclist(int showall)
 		e++;
 	    }
 	}
-        if (isset(LISTTYPES) && hasf) {
+        if (isset(LISTTYPES) && hasf)
             g->flags |= CGF_FILES;
-            add = 3;
-        } else
-            add = 2;
-	g->totl = totl + (ndisp * add);
+	g->totl = totl + (ndisp * CM_SPACE);
 	g->dcount = ndisp;
-	g->width = glong + add;
-	g->shortest = gshort + add;
+	g->width = glong + CM_SPACE;
+	g->shortest = gshort + CM_SPACE;
 	if ((g->cols = columns / g->width) > g->dcount)
 	    g->cols = g->dcount;
 	if (g->cols) {
-	    i = g->cols * g->width - add;
+	    i = g->cols * g->width - CM_SPACE;
 	    if (i > max)
 		max = i;
 	}
@@ -1525,7 +1526,6 @@ calclist(int showall)
 	int *ws, tlines, tcols, width, glines;
 
 	for (g = amatches; g; g = g->next) {
-            add = 2 + !!(g->flags & CGF_FILES);
 	    glines = 0;
 
 	    zfree(g->widths, 0);
@@ -1536,7 +1536,8 @@ calclist(int showall)
 		    if (g->cols) {
 			glines += (arrlen(pp) + g->cols - 1) / g->cols;
 			if (g->cols > 1)
-			    g->width += ((max - (g->width * g->cols - add)) /
+			    g->width += ((max - (g->width * g->cols -
+                                                 CM_SPACE)) /
                                          g->cols);
 		    } else {
 			g->cols = 1;
@@ -1550,7 +1551,8 @@ calclist(int showall)
 		if (g->cols) {
 		    glines += (g->dcount + g->cols - 1) / g->cols;
 		    if (g->cols > 1)
-			g->width += (max - (g->width * g->cols - add)) / g->cols;
+			g->width += ((max - (g->width * g->cols - CM_SPACE)) /
+                                     g->cols);
 		} else if (!(g->flags & CGF_LINES)) {
 		    g->cols = 1;
 		    g->width = 0;
@@ -1573,8 +1575,6 @@ calclist(int showall)
 	    if (!(g->flags & CGF_PACKED))
 		continue;
 
-            add = 2 + !!(g->flags & CGF_FILES);
-
 	    ws = g->widths = (int *) zalloc(columns * sizeof(int));
 	    memset(ws, 0, columns * sizeof(int));
 	    tlines = g->lins;
@@ -1587,12 +1587,13 @@ calclist(int showall)
 		    VARARR(int, ylens, yl);
 
 		    for (i = 0; *pp; i++, pp++)
-			ylens[i] = ztrlen(*pp) + add;
+			ylens[i] = ztrlen(*pp) + CM_SPACE;
 
 		    if (g->flags & CGF_ROWS) {
                         int nth, tcol, len;
 
-                        for (tcols = columns / (g->shortest + add); tcols > g->cols;
+                        for (tcols = columns / (g->shortest + CM_SPACE);
+                             tcols > g->cols;
                              tcols--) {
 
                             memset(ws, 0, tcols * sizeof(int));
@@ -1620,7 +1621,8 @@ calclist(int showall)
 		    } else {
                         int nth, tcol, tline, len;
 
-                        for (tcols = columns / (g->shortest + add); tcols > g->cols;
+                        for (tcols = columns / (g->shortest + CM_SPACE);
+                             tcols > g->cols;
                              tcols--) {
 
                             if ((tlines = (g->dcount + tcols - 1) / tcols) <= 0)
@@ -1658,7 +1660,8 @@ calclist(int showall)
 		if (g->flags & CGF_ROWS) {
                     int nth, tcol, len;
 
-                    for (tcols = columns / (g->shortest + add); tcols > g->cols;
+                    for (tcols = columns / (g->shortest + CM_SPACE);
+                         tcols > g->cols;
                          tcols--) {
 
                         memset(ws, 0, tcols * sizeof(int));
@@ -1675,7 +1678,7 @@ calclist(int showall)
                                 tlines++;
                             }
                             len = (mlens[m->gnum] +
-                                   (tcol == tcols - 1 ? 0 : add));
+                                   (tcol == tcols - 1 ? 0 : CM_SPACE));
 
                             if (len > ws[tcol]) {
                                 width += len - ws[tcol];
@@ -1688,7 +1691,8 @@ calclist(int showall)
 		} else {
                     int nth, tcol, tline, len;
 
-                    for (tcols = columns / (g->shortest + add); tcols > g->cols;
+                    for (tcols = columns / (g->shortest + CM_SPACE);
+                         tcols > g->cols;
                          tcols--) {
 
                         if ((tlines = (g->dcount + tcols - 1) / tcols) <= 0)
@@ -1712,7 +1716,7 @@ calclist(int showall)
                                 tlines++;
                             }
                             len = (mlens[m->gnum] +
-                                   (tcol == tcols - 1 ? 0 : add));
+                                   (tcol == tcols - 1 ? 0 : CM_SPACE));
 
                             if (len > ws[tcol]) {
                                 width += len - ws[tcol];
@@ -1737,20 +1741,19 @@ calclist(int showall)
 		g->lins = tlines;
 		g->cols = tcols;
 		g->totl = width;
-		width -= add;
+		width -= CM_SPACE;
 		if (width > max)
 		    max = width;
 	    }
 	}
 	for (g = amatches; g; g = g->next) {
-            add = 2 + !!(g->flags & CGF_FILES);
 	    if (g->widths) {
-		int *p, a = (max - g->totl + add) / g->cols;
+		int *p, a = (max - g->totl + CM_SPACE) / g->cols;
 
 		for (i = g->cols, p = g->widths; i; i--, p++)
 		    *p += a;
 	    } else if (g->width && g->cols > 1)
-		g->width += (max - (g->width * g->cols - add)) / g->cols;
+		g->width += (max - (g->width * g->cols - CM_SPACE)) / g->cols;
 	}
     }
     listdat.valid = 1;
@@ -1949,7 +1952,7 @@ printlist(int over, CLPrintFunc printm, int showall)
 			    }
 			}
 			printed++;
-			printm(g, p, 0, ml, 1, 0, NULL, NULL);
+			printm(g, p, 0, ml, 1, 0);
 			pnl = 1;
 		    }
 	    }
@@ -1970,25 +1973,10 @@ printlist(int over, CLPrintFunc printm, int showall)
 		while (n && i--) {
 		    wid = (g->widths ? g->widths[mc] : g->width);
 		    if (!(m = *q)) {
-			printm(g, NULL, mc, ml, (!i), wid, NULL, NULL);
+			printm(g, NULL, mc, ml, (!i), wid);
 			break;
 		    }
-		    if (!m->disp && (m->flags & CMF_FILE) &&
-			m->str[0] && m->str[strlen(m->str) - 1] != '/') {
-			struct stat buf;
-			char *pb;
-
-			pb = (char *) zhalloc((m->prpre ? strlen(m->prpre) : 0) +
-					     3 + strlen(m->str));
-			sprintf(pb, "%s%s", (m->prpre ? m->prpre : "./"),
-				m->str);
-
-			if (ztat(pb, &buf, 1))
-			    printm(g, q, mc, ml, (!i), wid, NULL, NULL);
-			else
-			    printm(g, q, mc, ml, (!i), wid, pb, &buf);
-		    } else
-			printm(g, q, mc, ml, (!i), wid, NULL, NULL);
+                    printm(g, q, mc, ml, (!i), wid);
 
 		    printed++;
 
@@ -2000,7 +1988,7 @@ printlist(int over, CLPrintFunc printm, int showall)
 		}
 		while (i-- > 0) {
 		    printm(g, NULL, mc, ml, (!i),
-			   (g->widths ? g->widths[mc] : g->width), NULL, NULL);
+			   (g->widths ? g->widths[mc] : g->width));
 		    mc++;
 		}
 		if (n) {
@@ -2091,8 +2079,7 @@ bld_all_str(Cmatch all)
 
 /**/
 static void
-iprintm(Cmgroup g, Cmatch *mp, int mc, int ml, int lastc, int width,
-	char *path, struct stat *buf)
+iprintm(Cmgroup g, Cmatch *mp, int mc, int ml, int lastc, int width)
 {
     Cmatch m;
     int len = 0;
@@ -2114,8 +2101,8 @@ iprintm(Cmgroup g, Cmatch *mp, int mc, int ml, int lastc, int width,
 	nicezputs(m->str, shout);
 	len = niceztrlen(m->str);
 
-	if ((g->flags & CGF_FILES) && buf) {
-	    putc(file_type(buf->st_mode), shout);
+	if ((g->flags & CGF_FILES) && m->modec) {
+	    putc(m->modec, shout);
 	    len++;
 	}
     }

@@ -2104,7 +2104,7 @@ addmatches(Cadata dat, char **argv)
 		for (bp = obsl; bp; bp = bp->next)
 		    bp->curpos += bsadd;
 
-		if ((cm = add_match_data(0, ms, lc, dat->ipre, NULL,
+		if ((cm = add_match_data(0, ms, s, lc, dat->ipre, NULL,
 					 dat->isuf, dat->pre, dat->prpre,
 					 dat->ppre, pline,
 					 dat->psuf, sline,
@@ -2184,7 +2184,7 @@ addmatches(Cadata dat, char **argv)
 
 /**/
 mod_export Cmatch
-add_match_data(int alt, char *str, Cline line,
+add_match_data(int alt, char *str, char *orig, Cline line,
 	       char *ipre, char *ripre, char *isuf,
 	       char *pre, char *prpre,
 	       char *ppre, Cline pline,
@@ -2412,6 +2412,7 @@ add_match_data(int alt, char *str, Cline line,
     /* Allocate and fill the match structure. */
     cm = (Cmatch) zhalloc(sizeof(struct cmatch));
     cm->str = str;
+    cm->orig = dupstring(orig);
     cm->ppre = (ppre && *ppre ? ppre : NULL);
     cm->psuf = (psuf && *psuf ? psuf : NULL);
     cm->prpre = ((flags & CMF_FILE) && prpre && *prpre ? prpre : NULL);
@@ -2430,7 +2431,22 @@ add_match_data(int alt, char *str, Cline line,
 		 (complist ?
 		  ((strstr(complist, "packed") ? CMF_PACKED : 0) |
 		   (strstr(complist, "rows")   ? CMF_ROWS   : 0)) : 0));
+    cm->mode = 0;
+    cm->modec = '\0';
+    if ((flags & CMF_FILE) && orig[0] && orig[strlen(orig) - 1] != '/') {
+        struct stat buf;
+        char *pb;
 
+        pb = (char *) zhalloc((cm->prpre ? strlen(cm->prpre) : 0) +
+                              3 + strlen(orig));
+        sprintf(pb, "%s%s", (cm->prpre ? cm->prpre : "./"), orig);
+
+        if (!ztat(pb, &buf, 1)) {
+            cm->mode = buf.st_mode;
+            if ((cm->modec = file_type(buf.st_mode)) == ' ')
+                cm->modec = '\0';
+        }
+    }
     if ((*compqstack == '\\' && compqstack[1]) ||
 	(autoq && *compqstack && compqstack[1] == '\\'))
 	cm->flags |= CMF_NOSPACE;
@@ -2803,6 +2819,7 @@ dupmatch(Cmatch m, int nbeg, int nend)
     r = (Cmatch) zcalloc(sizeof(struct cmatch));
 
     r->str = ztrdup(m->str);
+    r->orig = ztrdup(m->orig);
     r->ipre = ztrdup(m->ipre);
     r->ripre = ztrdup(m->ripre);
     r->isuf = ztrdup(m->isuf);
@@ -2836,6 +2853,8 @@ dupmatch(Cmatch m, int nbeg, int nend)
     r->qipl = m->qipl;
     r->qisl = m->qisl;
     r->disp = ztrdup(m->disp);
+    r->mode = m->mode;
+    r->modec = m->modec;
 
     return r;
 }
@@ -2994,6 +3013,7 @@ freematch(Cmatch m, int nbeg, int nend)
     if (!m) return;
 
     zsfree(m->str);
+    zsfree(m->orig);
     zsfree(m->ipre);
     zsfree(m->ripre);
     zsfree(m->isuf);

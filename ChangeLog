@@ -1,5 +1,10 @@
 2002-05-21  Sven Wischnowsky  <wischnow@zsh.org>
 
+	* 17195: Src/Zle/comp.h, Src/Zle/compcore.c, Src/Zle/compctl.c,
+	Src/Zle/complist.c, Src/Zle/compresult.c: fix for
+	file-type-tests in nested quotes and don't count space
+	file-type-character
+
 	* 17194: Src/Zle/computil.c: improve calculation of used
 	columns for match-max-length
 

@@ -92,6 +92,7 @@ struct cmgroup {
 
 struct cmatch {
     char *str;			/* the match itself */
+    char *orig;                 /* the match string unquoted */
     char *ipre;			/* ignored prefix, has to be re-inserted */
     char *ripre;		/* ignored prefix, unquoted */
     char *isuf;			/* ignored suffix */
@@ -111,6 +112,8 @@ struct cmatch {
     int qisl;			/* length of quote-suffix */
     int rnum;			/* group relative number */
     int gnum;			/* global number */
+    mode_t mode;                /* mode field of a stat */
+    char modec;                 /* LIST_TYPE-character for mode or nul */
 };
 
 #define CMF_FILE     (1<< 0)	/* this is a file */
@@ -286,8 +289,7 @@ struct cldata {
     int showall;		/* != 0 if hidden matches should be shown */
 };
 
-typedef void (*CLPrintFunc)(Cmgroup, Cmatch *, int, int, int, int,
-			    char *, struct stat *);
+typedef void (*CLPrintFunc)(Cmgroup, Cmatch *, int, int, int, int);
 
 /* Flags for fromcomp. */
 

@@ -1199,7 +1199,7 @@ compprintlist(int showall)
 			    mfirstl = ml;
 			if (dolist(ml))
 			    printed++;
-			if (clprintm(g, p, 0, ml, 1, 0, NULL, NULL))
+			if (clprintm(g, p, 0, ml, 1, 0))
 			    goto end;
 			ml += mlprinted;
 			if (dolistcl(ml) && (cl -= mlprinted) <= 1) {
@@ -1250,26 +1250,12 @@ compprintlist(int showall)
 		while (n && i--) {
 		    wid = (g->widths ? g->widths[mc] : g->width);
 		    if (!(m = *q)) {
-			if (clprintm(g, NULL, mc, ml, (!i), wid, NULL, NULL))
+			if (clprintm(g, NULL, mc, ml, (!i), wid))
 			    goto end;
 			break;
 		    }
-		    if (!m->disp && (m->flags & CMF_FILE) &&
-			m->str[0] && m->str[strlen(m->str) - 1] != '/') {
-			struct stat buf;
-			char *pb;
-
-			pb = (char *) zhalloc((m->prpre ? strlen(m->prpre) : 0) +
-					     3 + strlen(m->str));
-			sprintf(pb, "%s%s", (m->prpre ? m->prpre : "./"),
-				m->str);
-
-			if (ztat(pb, &buf, 1) ?
-			    clprintm(g, q, mc, ml, (!i), wid, NULL, NULL) :
-			    clprintm(g, q, mc, ml, (!i), wid, pb, &buf))
-			    goto end;
-		    } else if (clprintm(g, q, mc, ml, (!i), wid, NULL, NULL))
-			goto end;
+                    if (clprintm(g, q, mc, ml, (!i), wid))
+                        goto end;
 
 		    if (dolist(ml))
 			printed++;
@@ -1290,8 +1276,7 @@ compprintlist(int showall)
 		}
 		while (i-- > 0) {
 		    if (clprintm(g, NULL, mc, ml, (!i),
-				 (g->widths ? g->widths[mc] : g->width),
-				 NULL, NULL))
+				 (g->widths ? g->widths[mc] : g->width)))
 			goto end;
 		    mc++;
 		}
@@ -1366,8 +1351,7 @@ compprintlist(int showall)
 
 /**/
 static int
-clprintm(Cmgroup g, Cmatch *mp, int mc, int ml, int lastc, int width,
-	 char *path, struct stat *buf)
+clprintm(Cmgroup g, Cmatch *mp, int mc, int ml, int lastc, int width)
 {
     Cmatch m;
     int len, subcols = 0, stop = 0, ret = 0;
@@ -1467,8 +1451,8 @@ clprintm(Cmgroup g, Cmatch *mp, int mc, int ml, int lastc, int width,
 	    zcputs(&mcolors, g->name, COL_HI);
 	else if (mselect >= 0 && (m->flags & (CMF_MULT | CMF_FMULT)))
 	    zcputs(&mcolors, g->name, COL_DU);
-	else if (buf)
-	    subcols = putfilecol(&mcolors, g->name, m->str, buf->st_mode);
+	else if (m->mode)
+	    subcols = putfilecol(&mcolors, g->name, m->str, m->mode);
 	else
 	    subcols = putmatchcol(&mcolors, g->name, (m->disp ? m->disp : m->str));
 
@@ -1483,12 +1467,12 @@ clprintm(Cmgroup g, Cmatch *mp, int mc, int ml, int lastc, int width,
 	len = niceztrlen(m->disp ? m->disp : m->str);
 	mlprinted = len / columns;
 
-	if ((g->flags & CGF_FILES) && buf) {
+	if ((g->flags & CGF_FILES) && m->modec) {
 	    if (m->gnum != mselect) {
 		zcoff();
 		zcputs(&mcolors, g->name, COL_TC);
 	    }
-	    putc(file_type(buf->st_mode), shout);
+	    putc(m->modec, shout);
 	    len++;
         }
 	if ((len = width - len - 2) > 0) {

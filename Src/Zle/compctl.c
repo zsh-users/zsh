@@ -2025,7 +2025,7 @@ addmatch(char *s, char *t)
     }
     if (!ms)
 	return;
-    add_match_data(isalt, ms, lc, ipre, ripre, isuf, 
+    add_match_data(isalt, ms, s, lc, ipre, ripre, isuf, 
 		   (incompfunc ? dupstring(curcc->prefix) : curcc->prefix),
 		   prpre, 
 		   (isfile ? lppre : NULL), NULL,
