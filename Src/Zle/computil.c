@@ -124,7 +124,7 @@ cd_init(char *nam, char *sep, char **args, int disp)
     cd_state.showd = disp;
 
     while (*args) {
-	*setp = set = (Cdset) zcalloc(sizeof(*set));
+	*setp = set = (Cdset) zshcalloc(sizeof(*set));
 	setp = &(set->next);
 
 	if (!(ap = get_user_var(*args))) {

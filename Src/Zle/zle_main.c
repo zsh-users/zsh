@@ -76,7 +76,10 @@ mod_export Thingy lbindk, bindk;
 /**/
 int insmode;
 
-static int eofchar, eofsent;
+/**/
+mod_export int eofchar;
+
+static int eofsent;
 static long keytimeout;
 
 #ifdef HAVE_SELECT
@@ -313,6 +316,7 @@ breakread(int fd, char *buf, int n)
 
     FD_ZERO(&f);
     FD_SET(fd, &f);
+
     return (select(fd + 1, (SELECT_ARG_2_T) & f, NULL, NULL, NULL) == -1 ?
 	    EOF : read(fd, buf, n));
 }
@@ -395,7 +399,13 @@ getkey(int keytmout)
 # endif
 #endif
 	}
-	while ((r = read(SHTTY, &cc, 1)) != 1) {
+	for (;;) {
+	    int q = queue_signal_level();
+	    dont_queue_signals();
+	    r = read(SHTTY, &cc, 1);
+	    restore_queue_signals(q);
+	    if (r == 1)
+		break;
 	    if (r == 0) {
 		/* The test for IGNOREEOF was added to make zsh ignore ^Ds
 		   that were typed while commands are running.  Unfortuantely
@@ -556,7 +566,7 @@ zleread(char *lp, char *rp, int flags)
 	reselectkeymap();
 	selectlocalmap(NULL);
 	bindk = getkeycmd();
-	if (!ll && isfirstln && c == eofchar) {
+	if (!ll && isfirstln && unset(IGNOREEOF) && c == eofchar) {
 	    eofsent = 1;
 	    break;
 	}
@@ -630,23 +640,36 @@ execzlefunc(Thingy func, char **args)
     } else if((w = func->widget)->flags & (WIDGET_INT|WIDGET_NCOMP)) {
 	int wflags = w->flags;
 
-	if(!(wflags & ZLE_KEEPSUFFIX))
-	    removesuffix();
-	if(!(wflags & ZLE_MENUCMP)) {
-	    fixsuffix();
-	    invalidatelist();
+	if (keybuf[0] == eofchar && !keybuf[1] &&
+	    !ll && isfirstln && isset(IGNOREEOF)) {
+	    showmsg((!islogin) ? "zsh: use 'exit' to exit." :
+		    "zsh: use 'logout' to logout.");
+	    ret = 1;
+	} else {
+	    if(!(wflags & ZLE_KEEPSUFFIX))
+		removesuffix();
+	    if(!(wflags & ZLE_MENUCMP)) {
+		fixsuffix();
+		invalidatelist();
+	    }
+	    if (wflags & ZLE_LINEMOVE)
+		vilinerange = 1;
+	    if(!(wflags & ZLE_LASTCOL))
+		lastcol = -1;
+	    if (wflags & WIDGET_NCOMP) {
+		int atcurhist = histline == curhist;
+		compwidget = w;
+		ret = completecall(args);
+		if (atcurhist)
+		    histline = curhist;
+	    } else {
+		queue_signals();
+		ret = w->u.fn(args);
+		unqueue_signals();
+	    }
+	    if (!(wflags & ZLE_NOTCOMMAND))
+		lastcmd = wflags;
 	}
-	if (wflags & ZLE_LINEMOVE)
-	    vilinerange = 1;
-	if(!(wflags & ZLE_LASTCOL))
-	    lastcol = -1;
-	if (wflags & WIDGET_NCOMP) {
-	    compwidget = w;
-	    ret = completecall(args);
-	} else
-	    ret = w->u.fn(args);
-	if (!(wflags & ZLE_NOTCOMMAND))
-	    lastcmd = wflags;
 	r = 1;
     } else {
 	Eprog prog = getshfunc(w->u.fnnam);
@@ -735,11 +758,15 @@ bin_vared(char *name, char **args, char *ops, int func)
     struct value vbuf;
     Value v;
     Param pm = 0;
-    int create = 0, ifl;
+    int create = 0, ifl, ieof;
     int type = PM_SCALAR, obreaks = breaks, haso = 0;
     char *p1 = NULL, *p2 = NULL;
     FILE *oshout = NULL;
 
+    if ((interact && unset(USEZLE)) || !strcmp(term, "emacs")) {
+	zwarnnam(name, "ZLE not enabled", NULL, 0);
+	return 1;
+    }
     if (zleactive) {
 	zwarnnam(name, "ZLE cannot be used recursively (yet)", NULL, 0);
 	return 1;
@@ -810,17 +837,65 @@ bin_vared(char *name, char **args, char *ops, int func)
     }
     /* handle non-existent parameter */
     s = args[0];
+    queue_signals();
     v = fetchvalue(&vbuf, &s, (!create || type == PM_SCALAR),
 		   SCANPM_WANTKEYS|SCANPM_WANTVALS|SCANPM_MATCHMANY);
     if (!v && !create) {
+	unqueue_signals();
 	zwarnnam(name, "no such variable: %s", args[0], 0);
 	return 1;
     } else if (v) {
-	s = getstrvalue(v);
-	pm = v->pm;
+	if (v->isarr) {
+	    /* Array: check for separators and quote them. */
+	    char **arr = getarrvalue(v), **aptr, **tmparr, **tptr;
+	    tptr = tmparr = (char **)zhalloc(sizeof(char *)*(arrlen(arr)+1));
+	    for (aptr = arr; *aptr; aptr++) {
+		int sepcount = 0;
+		/*
+		 * See if this word contains a separator character
+		 * or backslash
+		 */
+		for (t = *aptr; *t; t++) {
+		    if (*t == Meta) {
+			if (isep(t[1] ^ 32))
+			    sepcount++;
+			t++;
+		    } else if (isep(*t) || *t == '\\')
+			sepcount++;
+		}
+		if (sepcount) {
+		    /* Yes, so allocate enough space to quote it. */
+		    char *newstr, *nptr;
+		    newstr = zhalloc(strlen(*aptr)+sepcount+1);
+		    /* Go through string quoting separators */
+		    for (t = *aptr, nptr = newstr; *t; ) {
+			if (*t == Meta) {
+			    if (isep(t[1] ^ 32))
+				*nptr++ = '\\';
+			    *nptr++ = *t++;
+			} else if (isep(*t) || *t == '\\')
+			    *nptr++ = '\\';
+			*nptr++ = *t++;
+		    }
+		    *nptr = '\0';
+		    /* Stick this into the array of words to join up */
+		    *tptr++ = newstr;
+		} else
+		    *tptr++ = *aptr; /* No, keep original array element */
+	    }
+	    *tptr = NULL;
+	    s = sepjoin(tmparr, NULL, 0);
+	} else {
+	    s = ztrdup(getstrvalue(v));
+	}
+	unqueue_signals();
     } else if (*s) {
+	unqueue_signals();
 	zwarnnam(name, "invalid parameter name: %s", args[0], 0);
 	return 1;
+    } else {
+	unqueue_signals();
+	s = ztrdup(s);
     }
 
     if (SHTTY == -1) {
@@ -835,22 +910,23 @@ bin_vared(char *name, char **args, char *ops, int func)
 	haso = 1;
     }
     /* edit the parameter value */
-    zpushnode(bufstack, ztrdup(s));
+    zpushnode(bufstack, s);
 
     varedarg = *args;
     ifl = isfirstln;
-    if (ops['e'])
-	isfirstln = 1;
     if (ops['h'])
-	hbegin(1);
+	hbegin(2);
+    isfirstln = ops['e'];
+    ieof = opts[IGNOREEOF];
+    opts[IGNOREEOF] = 0;
     t = (char *) zleread(p1, p2, ops['h'] ? ZLRF_HISTORY : 0);
+    opts[IGNOREEOF] = ieof;
     if (ops['h'])
-	hend();
+	hend(NULL);
     isfirstln = ifl;
     varedarg = ova;
     if (haso) {
-	close(SHTTY);
-	fclose(shout);
+	fclose(shout);	/* close(SHTTY) */
 	shout = oshout;
 	SHTTY = -1;
     }
@@ -864,24 +940,27 @@ bin_vared(char *name, char **args, char *ops, int func)
     if (t[strlen(t) - 1] == '\n')
 	t[strlen(t) - 1] = '\0';
     /* final assignment of parameter value */
-    if (create && (!pm || (type && PM_TYPE(pm->flags) != type))) {
-	if (pm)
-	    unsetparam(args[0]);
+    if (create) {
+	unsetparam(args[0]);
 	createparam(args[0], type);
-	pm = 0;
     }
-    if (!pm)
-	pm = (Param) paramtab->getnode(paramtab, args[0]);
+    queue_signals();
+    pm = (Param) paramtab->getnode(paramtab, args[0]);
     if (pm && (PM_TYPE(pm->flags) & (PM_ARRAY|PM_HASHED))) {
 	char **a;
 
-	a = spacesplit(t, 1, 0);
+	/*
+	 * Use spacesplit with fourth argument 1: identify quoted separators,
+	 * unquote but don't split.
+	 */
+	a = spacesplit(t, 1, 0, 1);
 	if (PM_TYPE(pm->flags) == PM_ARRAY)
 	    setaparam(args[0], a);
 	else
 	    sethparam(args[0], a);
     } else
 	setsparam(args[0], t);
+    unqueue_signals();
     return 0;
 }
 
@@ -1015,9 +1094,9 @@ zleaftertrap(Hookdef dummy, void *dat)
 }
 
 static struct builtin bintab[] = {
-    BUILTIN("bindkey", 0, bin_bindkey, 0, -1, 0, "evaMldDANmrsLR", NULL),
+    BUILTIN("bindkey", 0, bin_bindkey, 0, -1, 0, "evaMldDANmrsLRp", NULL),
     BUILTIN("vared",   0, bin_vared,   1,  7, 0, NULL,             NULL),
-    BUILTIN("zle",     0, bin_zle,     0, -1, 0, "lDANCLmMgGcRaU", NULL),
+    BUILTIN("zle",     0, bin_zle,     0, -1, 0, "lDANCLmMgGcRaUI", NULL),
 };
 
 /* The order of the entries in this table has to match the *HOOK
@@ -1040,7 +1119,6 @@ setup_(Module m)
 {
     /* Set up editor entry points */
     trashzleptr = trashzle;
-    gotwordptr = gotword;
     refreshptr = zrefresh;
     spaceinlineptr = spaceinline;
     zlereadptr = zleread;
@@ -1054,6 +1132,7 @@ setup_(Module m)
     /* miscellaneous initialisations */
     stackhist = stackcs = -1;
     kungetbuf = (char *) zalloc(kungetsz = 32);
+    comprecursive = 0;
 
     /* initialise the keymap system */
     init_keymaps();
@@ -1062,7 +1141,7 @@ setup_(Module m)
 
     incompfunc = incompctlfunc = hascompmod = 0;
 
-    clwords = (char **) zcalloc((clwsize = 16) * sizeof(char *));
+    clwords = (char **) zshcalloc((clwsize = 16) * sizeof(char *));
 
     return 0;
 }
@@ -1117,7 +1196,6 @@ finish_(Module m)
 
     /* editor entry points */
     trashzleptr = noop_function;
-    gotwordptr = noop_function;
     refreshptr = noop_function;
     spaceinlineptr = noop_function_int;
     zlereadptr = fallback_zleread;

@@ -2222,7 +2222,7 @@ zftp_params(char *name, char **args, int flags)
 	return 0;
     }
     len = arrlen(args);
-    newarr = (char **)zcalloc((len+1)*sizeof(char *));
+    newarr = (char **)zshcalloc((len+1)*sizeof(char *));
     for (aptr = args, i = 0; *aptr && !errflag; aptr++, i++) {
 	char *str;
 	if (**aptr == '?')
@@ -2935,10 +2935,10 @@ newsession(char *nm)
     }
 
     if (!nptr) {
-	zfsess = (Zftp_session) zcalloc(sizeof(struct zftp_session));
+	zfsess = (Zftp_session) zshcalloc(sizeof(struct zftp_session));
 	zfsess->name = ztrdup(nm);
 	zfsess->cfd = zfsess->dfd = -1;
-	zfsess->params = (char **) zcalloc(sizeof(zfparams));
+	zfsess->params = (char **) zshcalloc(sizeof(zfparams));
 	zaddlinknode(zfsessions, zfsess);
 
 	zfsesscnt++;

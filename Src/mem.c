@@ -32,7 +32,7 @@
 
 /*
 	There are two ways to allocate memory in zsh.  The first way is
-	to call zalloc/zcalloc, which call malloc/calloc directly.  It
+	to call zalloc/zshcalloc, which call malloc/calloc directly.  It
 	is legal to call realloc() or free() on memory allocated this way.
 	The second way is to call zhalloc/hcalloc, which allocates memory
 	from one of the memory pools on the heap stack.  Such memory pools 
@@ -105,7 +105,8 @@ union mem_align {
 
 static Heap heaps;
 
-/* first heap with free space, not always correct */
+/* a heap with free space, not always correct (it will be the last heap
+ * if that was newly allocated but it may also be another one) */
 
 static Heap fheap;
 
@@ -115,9 +116,13 @@ static Heap fheap;
 mod_export Heap
 new_heaps(void)
 {
-    Heap h = heaps;
+    Heap h;
+
+    queue_signals();
+    h = heaps;
 
     fheap = heaps = NULL;
+    unqueue_signals();
 
     return h;
 }
@@ -130,6 +135,7 @@ old_heaps(Heap old)
 {
     Heap h, n;
 
+    queue_signals();
     for (h = heaps; h; h = n) {
 	n = h->next;
 	DPUTS(h->sp, "BUG: old_heaps() with pushed heaps");
@@ -141,6 +147,7 @@ old_heaps(Heap old)
     }
     heaps = old;
     fheap = NULL;
+    unqueue_signals();
 }
 
 /* Temporarily switch to other heaps (or back again). */
@@ -149,10 +156,14 @@ old_heaps(Heap old)
 mod_export Heap
 switch_heaps(Heap new)
 {
-    Heap h = heaps;
+    Heap h;
+
+    queue_signals();
+    h = heaps;
 
     heaps = new;
     fheap = NULL;
+    unqueue_signals();
 
     return h;
 }
@@ -166,6 +177,8 @@ pushheap(void)
     Heap h;
     Heapstack hs;
 
+    queue_signals();
+
 #if defined(ZSH_MEM) && defined(ZSH_MEM_DEBUG)
     h_push++;
 #endif
@@ -177,6 +190,7 @@ pushheap(void)
 	h->sp = hs;
 	hs->used = h->used;
     }
+    unqueue_signals();
 }
 
 /* reset heaps to previous state */
@@ -186,6 +200,8 @@ mod_export void
 freeheap(void)
 {
     Heap h, hn, hl = NULL;
+
+    queue_signals();
 
 #if defined(ZSH_MEM) && defined(ZSH_MEM_DEBUG)
     h_free++;
@@ -214,6 +230,8 @@ freeheap(void)
 	hl->next = NULL;
     else
 	heaps = NULL;
+
+    unqueue_signals();
 }
 
 /* reset heap to previous state and destroy state information */
@@ -224,6 +242,8 @@ popheap(void)
 {
     Heap h, hn, hl = NULL;
     Heapstack hs;
+
+    queue_signals();
 
 #if defined(ZSH_MEM) && defined(ZSH_MEM_DEBUG)
     h_pop++;
@@ -255,6 +275,8 @@ popheap(void)
 	hl->next = NULL;
     else
 	heaps = NULL;
+
+    unqueue_signals();
 }
 
 /* allocate memory from the current memory pool */
@@ -268,16 +290,23 @@ zhalloc(size_t size)
 
     size = (size + H_ISIZE - 1) & ~(H_ISIZE - 1);
 
+    queue_signals();
+
 #if defined(ZSH_MEM) && defined(ZSH_MEM_DEBUG)
     h_m[size < (1024 * H_ISIZE) ? (size / H_ISIZE) : 1024]++;
 #endif
 
     /* find a heap with enough free space */
 
-    for (h = (fheap ? fheap : heaps); h; h = h->next) {
+    for (h = ((fheap && HEAP_ARENA_SIZE >= (size + fheap->used)) ? fheap : heaps);
+	 h; h = h->next) {
 	if (HEAP_ARENA_SIZE >= (n = size + h->used)) {
+	    void *ret;
+
 	    h->used = n;
-	    return arena(h) + n - size;
+	    ret = arena(h) + n - size;
+	    unqueue_signals();
+	    return ret;
 	}
     }
     {
@@ -289,7 +318,6 @@ zhalloc(size_t size)
             /* tricky, see above */
 #endif
 
-	queue_signals();
 	n = HEAP_ARENA_SIZE > size ? HEAPSIZE : size + sizeof(*h);
 	for (hp = NULL, h = heaps; h; hp = h, h = h->next);
 
@@ -338,7 +366,7 @@ zhalloc(size_t size)
 	    hp->next = h;
 	else
 	    heaps = h;
-	fheap = NULL;
+	fheap = h;
 
 	unqueue_signals();
 	return arena(h);
@@ -361,6 +389,7 @@ hrealloc(char *p, size_t old, size_t new)
 
     /* find the heap with p */
 
+    queue_signals();
     for (h = heaps, ph = NULL; h; ph = h, h = h->next)
 	if (p >= arena(h) && p < arena(h) + HEAP_ARENA_SIZE)
 	    break;
@@ -376,9 +405,12 @@ hrealloc(char *p, size_t old, size_t new)
 #ifdef ZSH_MEM_DEBUG
 	    memset(p, 0xff, old);
 #endif
+	    unqueue_signals();
 	    return ptr;
-	} else
+	} else {
+	    unqueue_signals();
 	    return new ? p : NULL;
+	}
     }
 
     DPUTS(p + old != arena(h) + h->used, "BUG: hrealloc more than allocated");
@@ -395,6 +427,7 @@ hrealloc(char *p, size_t old, size_t new)
 #else
 	    zfree(h, HEAPSIZE);
 #endif
+	    unqueue_signals();
 	    return NULL;
 	}
 #ifndef USE_MMAP
@@ -407,6 +440,7 @@ hrealloc(char *p, size_t old, size_t new)
 		heaps = h = (Heap) realloc(h, n);
 	}
 	h->used = new;
+	unqueue_signals();
 	return arena(h);
 #endif
     }
@@ -415,6 +449,7 @@ hrealloc(char *p, size_t old, size_t new)
 #endif
     if (h->used + (new - old) <= HEAP_ARENA_SIZE) {
 	h->used += new - old;
+	unqueue_signals();
 	return p;
     } else {
 	char *t = zhalloc(new);
@@ -423,6 +458,7 @@ hrealloc(char *p, size_t old, size_t new)
 #ifdef ZSH_MEM_DEBUG
 	memset(p, 0xff, old);
 #endif
+	unqueue_signals();
 	return t;
     }
 }
@@ -450,26 +486,30 @@ zalloc(size_t size)
 
     if (!size)
 	size = 1;
+    queue_signals();
     if (!(ptr = (void *) malloc(size))) {
 	zerr("fatal error: out of memory", NULL, 0);
 	exit(1);
     }
+    unqueue_signals();
 
     return ptr;
 }
 
 /**/
 mod_export void *
-zcalloc(size_t size)
+zshcalloc(size_t size)
 {
     void *ptr;
 
     if (!size)
 	size = 1;
+    queue_signals();
     if (!(ptr = (void *) malloc(size))) {
 	zerr("fatal error: out of memory", NULL, 0);
 	exit(1);
     }
+    unqueue_signals();
     memset(ptr, 0, size);
 
     return ptr;
@@ -485,6 +525,7 @@ zcalloc(size_t size)
 mod_export void *
 zrealloc(void *ptr, size_t size)
 {
+    queue_signals();
     if (ptr) {
 	if (size) {
 	    /* Do normal realloc */
@@ -492,44 +533,22 @@ zrealloc(void *ptr, size_t size)
 		zerr("fatal error: out of memory", NULL, 0);
 		exit(1);
 	    }
+	    unqueue_signals();
 	    return ptr;
 	}
 	else
 	    /* If ptr is not NULL, but size is zero, *
 	     * then object pointed to is freed.      */
 	    free(ptr);
+
+	ptr = NULL;
     } else {
 	/* If ptr is NULL, then behave like malloc */
-	return malloc(size);
+	ptr = malloc(size);
     }
+    unqueue_signals();
 
-    return NULL;
-}
-
-/**/
-mod_export char *
-dupstring(const char *s)
-{
-    char *t;
-
-    if (!s)
-	return NULL;
-    t = (char *) zhalloc(strlen((char *)s) + 1);
-    strcpy(t, s);
-    return t;
-}
-
-/**/
-mod_export char *
-ztrdup(const char *s)
-{
-    char *t;
-
-    if (!s)
-	return NULL;
-    t = (char *)zalloc(strlen((char *)s) + 1);
-    strcpy(t, s);
-    return t;
+    return ptr;
 }
 
 /**/
@@ -1118,7 +1137,12 @@ zfree(void *p, int sz)
 	long n = (m_lfree->len - M_MIN - M_KEEP) & ~(m_pgsz - 1);
 
 	m_lfree->len -= n;
+#ifdef HAVE_BRK
 	if (brk(m_high -= n) == -1) {
+#else
+	m_high -= n;
+	if (sbrk(-n) == (void *)-1) {
+#endif /* HAVE_BRK */
 	    DPUTS(1, "MEM: allocation error at brk.");
 	}
 
@@ -1221,6 +1245,7 @@ bin_mem(char *name, char **argv, char *ops, int func)
     char *b, *c, buf[40];
     long u = 0, f = 0, to, cu;
 
+    queue_signals();
     if (ops['v']) {
 	printf("The lower and the upper addresses of the heap. Diff gives\n");
 	printf("the difference between them, i.e. the size of the heap.\n\n");
@@ -1349,6 +1374,7 @@ bin_mem(char *name, char **argv, char *ops, int func)
     if (h_m[1024])
 	printf("big\t%d\n", h_m[1024]);
 
+    unqueue_signals();
     return 0;
 }
 

@@ -133,8 +133,8 @@ resetvideo(void)
 	    free(nbuf);
 	    free(obuf);
 	}
-	nbuf = (char **)zcalloc((winh + 1) * sizeof(char *));
-	obuf = (char **)zcalloc((winh + 1) * sizeof(char *));
+	nbuf = (char **)zshcalloc((winh + 1) * sizeof(char *));
+	obuf = (char **)zshcalloc((winh + 1) * sizeof(char *));
 	nbuf[0] = (char *)zalloc(winw + 2);
 	obuf[0] = (char *)zalloc(winw + 2);
 

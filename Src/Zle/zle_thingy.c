@@ -107,7 +107,7 @@ scanemptythingies(HashNode hn, int flags)
 static Thingy
 makethingynode(void)
 {
-    Thingy t = (Thingy) zcalloc(sizeof(*t));
+    Thingy t = (Thingy) zshcalloc(sizeof(*t));
 
     t->flags = DISABLED;
     return t;
@@ -339,6 +339,7 @@ bin_zle(char *name, char **args, char *ops, int func)
 	{ 'R', bin_zle_refresh, 0, -1 },
 	{ 'M', bin_zle_mesg, 1, 1 },
 	{ 'U', bin_zle_unget, 1, 1 },
+	{ 'I', bin_zle_invalidate, 0, 0 },
 	{ 0,   bin_zle_call, 0, -1 },
     };
     struct opn const *op, *opp;
@@ -396,10 +397,8 @@ bin_zle_refresh(char *name, char **args, char *ops, char func)
     char *s = statusline;
     int sl = statusll, ocl = clearlist;
 
-    if (!zleactive) {
-	zwarnnam(name, "can only be called from widget function", NULL, 0);
+    if (!zleactive)
 	return 1;
-    }
     statusline = NULL;
     statusll = 0;
     if (*args) {
@@ -628,7 +627,7 @@ bin_zle_call(char *name, char **args, char *ops, char func)
 		    return 1;
 		}
 		if (!args[0][1])
-		    args++;
+		    *++args = "" - 1;
 		modsave = zmod;
 		saveflag = 1;
 		zmod.mult = atoi(num);
@@ -654,6 +653,17 @@ bin_zle_call(char *name, char **args, char *ops, char func)
     if (saveflag)
 	zmod = modsave;
     return ret;
+}
+
+/**/
+static int
+bin_zle_invalidate(char *name, char **args, char *ops, char func)
+{
+    if (zleactive) {
+	trashzle();
+	return 0;
+    } else
+	return 1;
 }
 
 /*******************/

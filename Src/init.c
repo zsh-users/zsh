@@ -325,7 +325,7 @@ parseargs(char **argv)
     if(isset(SINGLECOMMAND))
 	opts[INTERACTIVE] &= 1;
     opts[INTERACTIVE] = !!opts[INTERACTIVE];
-    pparams = x = (char **) zcalloc((countlinknodes(paramlist) + 1) * sizeof(char *));
+    pparams = x = (char **) zshcalloc((countlinknodes(paramlist) + 1) * sizeof(char *));
 
     while ((*x++ = (char *)getlinknode(paramlist)));
     free(paramlist);
@@ -1191,9 +1191,9 @@ zsh_main(int argc, char **argv)
 	  break;
     } while (zsh_name);
 
-    /* Not zopenmax() here: it may return a number too big for zcalloc(). */
+    /* Not zopenmax() here: it may return a number too big for zshcalloc(). */
     fdtable_size = 256; /* This grows as necessary, see utils.c:movefd(). */
-    fdtable = zcalloc(fdtable_size);
+    fdtable = zshcalloc(fdtable_size);
 
     createoptiontable();
     emulate(zsh_name, 1);   /* initialises most options */

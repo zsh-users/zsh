@@ -688,7 +688,7 @@ hashcmd(char *arg0, char **pp)
     if (!*pp)
 	return NULL;
 
-    cn = (Cmdnam) zcalloc(sizeof *cn);
+    cn = (Cmdnam) zshcalloc(sizeof *cn);
     cn->flags = 0;
     cn->u.name = pp;
     cmdnamtab->addnode(cmdnamtab, ztrdup(arg0), cn);
@@ -3358,7 +3358,7 @@ doshfunc(char *name, Eprog prog, LinkList doshargs, int flags, int noreturnval)
 	LinkNode node;
 
 	node = doshargs->first;
-	pparams = x = (char **) zcalloc(((sizeof *x) *
+	pparams = x = (char **) zshcalloc(((sizeof *x) *
 					 (1 + countlinknodes(doshargs))));
 	if (isset(FUNCTIONARGZERO)) {
 	    oargv0 = argzero;
@@ -3368,7 +3368,7 @@ doshfunc(char *name, Eprog prog, LinkList doshargs, int flags, int noreturnval)
 	for (; node; node = node->next, x++)
 	    *x = ztrdup((char *) node->dat);
     } else {
-	pparams = (char **) zcalloc(sizeof *pparams);
+	pparams = (char **) zshcalloc(sizeof *pparams);
 	if (isset(FUNCTIONARGZERO)) {
 	    oargv0 = argzero;
 	    argzero = ztrdup(argzero);

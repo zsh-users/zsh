@@ -242,7 +242,7 @@ compctlread(char *name, char **args, char *ops, char *reply)
 	if (ops['A'] && !ops['e']) {
 	    /* the -A option means that one array is specified, instead of
 	    many parameters */
-	    char **p, **b = (char **)zcalloc((clwnum + 1) * sizeof(char *));
+	    char **p, **b = (char **)zshcalloc((clwnum + 1) * sizeof(char *));
 
 	    for (i = 0, p = b; i < clwnum; p++, i++)
 		*p = ztrdup(clwords[i]);
@@ -893,7 +893,7 @@ get_compctl(char *name, char ***av, Compctl cc, int first, int isdef, int cl)
 		    cc->xor = &cc_default;
 	    } else {
 		/* more flags follow:  prepare to loop again */
-		cc->xor = (Compctl) zcalloc(sizeof(*cc));
+		cc->xor = (Compctl) zshcalloc(sizeof(*cc));
 		cc = cc->xor;
 		memset((void *)&cct, 0, sizeof(cct));
 		cct.mask2 = CC_CCCONT;
@@ -930,7 +930,7 @@ get_xcompctl(char *name, char ***av, Compctl cc, int isdef)
 	/* o keeps track of or's, m remembers the starting condition,
 	 * c is the current condition being parsed
 	 */
-	o = m = c = (Compcond) zcalloc(sizeof(*c));
+	o = m = c = (Compcond) zshcalloc(sizeof(*c));
 	/* Loop over each condition:  something like 's[...][...], p[...]' */
 	for (t = *argv; *t;) {
 	    while (*t == ' ')
@@ -1021,20 +1021,20 @@ get_xcompctl(char *name, char ***av, Compctl cc, int isdef)
 	    /* Allocate space for all the arguments of the conditions */
 	    if (c->type == CCT_POS ||
 		c->type == CCT_NUMWORDS) {
-		c->u.r.a = (int *)zcalloc(n * sizeof(int));
-		c->u.r.b = (int *)zcalloc(n * sizeof(int));
+		c->u.r.a = (int *)zshcalloc(n * sizeof(int));
+		c->u.r.b = (int *)zshcalloc(n * sizeof(int));
 	    } else if (c->type == CCT_CURSUF ||
 		       c->type == CCT_CURPRE ||
 		       c->type == CCT_QUOTE)
-		c->u.s.s = (char **)zcalloc(n * sizeof(char *));
+		c->u.s.s = (char **)zshcalloc(n * sizeof(char *));
 
 	    else if (c->type == CCT_RANGESTR ||
 		     c->type == CCT_RANGEPAT) {
-		c->u.l.a = (char **)zcalloc(n * sizeof(char *));
-		c->u.l.b = (char **)zcalloc(n * sizeof(char *));
+		c->u.l.a = (char **)zshcalloc(n * sizeof(char *));
+		c->u.l.b = (char **)zshcalloc(n * sizeof(char *));
 	    } else {
-		c->u.s.p = (int *)zcalloc(n * sizeof(int));
-		c->u.s.s = (char **)zcalloc(n * sizeof(char *));
+		c->u.s.p = (int *)zshcalloc(n * sizeof(int));
+		c->u.s.s = (char **)zshcalloc(n * sizeof(char *));
 	    }
 	    /* Now loop over the actual arguments */
 	    for (l = 0; *t == '['; l++, t++) {
@@ -1137,17 +1137,17 @@ get_xcompctl(char *name, char ***av, Compctl cc, int isdef)
 		t++;
 	    if (*t == ',') {
 		/* Another condition to `or' */
-		o->or = c = (Compcond) zcalloc(sizeof(*c));
+		o->or = c = (Compcond) zshcalloc(sizeof(*c));
 		o = c;
 		t++;
 	    } else if (*t) {
 		/* Another condition to `and' */
-		c->and = (Compcond) zcalloc(sizeof(*c));
+		c->and = (Compcond) zshcalloc(sizeof(*c));
 		c = c->and;
 	    }
 	}
 	/* Assign condition to current compctl */
-	*next = (Compctl) zcalloc(sizeof(*cc));
+	*next = (Compctl) zshcalloc(sizeof(*cc));
 	(*next)->cond = m;
 	argv++;
 	/* End of the condition; get the flags that go with it. */
@@ -1271,7 +1271,7 @@ cc_reassign(Compctl cc)
      */
     Compctl c2;
 
-    c2 = (Compctl) zcalloc(sizeof *cc);
+    c2 = (Compctl) zshcalloc(sizeof *cc);
     c2->xor = cc->xor;
     c2->ext = cc->ext;
     c2->refc = 1;
@@ -1587,7 +1587,7 @@ bin_compctl(char *name, char **argv, char *ops, int func)
 	if ((ret = get_gmatcher(name, argv)))
 	    return ret - 1;
 
-	cc = (Compctl) zcalloc(sizeof(*cc));
+	cc = (Compctl) zshcalloc(sizeof(*cc));
 	if (get_compctl(name, &argv, cc, 1, 0, 0)) {
 	    freecompctl(cc);
 	    return 1;

@@ -1,3 +1,16 @@
+2003-10-28  Peter Stephenson  <pws@csr.com>
+
+	* 19209: Src/builtin.c, Src/exec.c, Src/hashtable.c, Src/hist.c,
+	Src/init.c, Src/input.c, Src/jobs.c, Src/mem.c, Src/module.c,
+	Src/params.c, Src/parse.c, Src/pattern.c, Src/prompt.c,
+	Src/utils.c, Src/Builtins/sched.c, Src/Modules/parameter.c,
+	Src/Modules/stat.c, Src/Modules/zftp.c, Src/Zle/compcore.c,
+	Src/Zle/compctl.c, Src/Zle/complete.c, Src/Zle/computil.c,
+	Src/Zle/zle_keymap.c, Src/Zle/zle_main.c, Src/Zle/zle_refresh.c,
+	Src/Zle/zle_thingy.c: Rename zcalloc to zshcalloc since
+	zcalloc is used in zlib; apparently this underlies some
+	of the system databases on e.g. Debian.
+
 2003-10-24  Clint Adams  <clint@zsh.org>
 
         * 19201: Completion/Unix/Command/_screen: patch from

@@ -86,6 +86,16 @@ struct bindstate {
     char *lastseq;
     Thingy bind;
     char *str;
+    char *prefix;
+    int prefixlen;
+};
+
+/* This structure is used when scanning for prefix bindings to remove */
+
+struct remprefstate {
+    Keymap km;
+    char *prefix;
+    int prefixlen;
 };
 
 #define BS_LIST (1<<0)
@@ -146,7 +156,7 @@ createkeymapnamtab(void)
 static KeymapName
 makekeymapnamnode(Keymap keymap)
 {
-    KeymapName kmn = (KeymapName) zcalloc(sizeof(*kmn));
+    KeymapName kmn = (KeymapName) zshcalloc(sizeof(*kmn));
 
     kmn->keymap = keymap;
     return kmn;
@@ -191,7 +201,7 @@ newkeytab(char *kmname)
 static Key
 makekeynode(Thingy t, char *str)
 {
-    Key k = (Key) zcalloc(sizeof(*k));
+    Key k = (Key) zshcalloc(sizeof(*k));
 
     k->bind = t;
     k->str = str;
@@ -220,7 +230,7 @@ static HashTable copyto;
 mod_export Keymap
 newkeymap(Keymap tocopy, char *kmname)
 {
-    Keymap km = zcalloc(sizeof(*km));
+    Keymap km = zshcalloc(sizeof(*km));
     int i;
 
     km->rc = 0;
@@ -834,6 +844,19 @@ bin_bindkey_bind(char *name, char *kmname, Keymap km, char **argv, char *ops, ch
 	zwarnnam(name, "keymap `%s' is protected", kmname, 0);
 	return 1;
     }
+    if (func == 'r' && ops['p']) {
+	char *useq, *bseq;
+	int len;
+	struct remprefstate rps;
+	rps.km = km;
+	while ((useq = *argv++)) {
+	    bseq = getkeystring(useq, &len, 2, NULL);
+	    rps.prefix = metafy(bseq, len, META_USEHEAP);
+	    rps.prefixlen = strlen(rps.prefix);
+	    scankeymap(km, 0, scanremoveprefix, &rps);
+	}
+	return 0;
+    }
     do {
 	char *useq = *argv, *bseq, *seq, *str;
 	int len;
@@ -878,6 +901,20 @@ bin_bindkey_bind(char *name, char *kmname, Keymap km, char **argv, char *ops, ch
     return ret;
 }
 
+/* Remove bindings for key sequences which have the given (proper) prefix. */
+
+/**/
+static void
+scanremoveprefix(char *seq, Thingy bind, char *str, void *magic)
+{
+    struct remprefstate *rps = magic;
+
+    if (strncmp(seq, rps->prefix, rps->prefixlen) || !seq[rps->prefixlen])
+	return;
+
+    bindkey(rps->km, seq, refthingy(t_undefinedkey), NULL);
+}
+
 /* List key bindings.  If an argument is given, list just that one *
  * binding, otherwise list the entire keymap.  If the -L option is *
  * given, list in the form of bindkey commands.                    */
@@ -890,7 +927,7 @@ bin_bindkey_list(char *name, char *kmname, Keymap km, char **argv, char *ops, ch
 
     bs.flags = ops['L'] ? BS_LIST : 0;
     bs.kmname = kmname;
-    if(argv[0]) {
+    if(argv[0] && !ops['p']) {
 	int len;
 	char *seq;
 
@@ -899,8 +936,23 @@ bin_bindkey_list(char *name, char *kmname, Keymap km, char **argv, char *ops, ch
 	bs.flags |= BS_ALL;
 	bs.firstseq = bs.lastseq = seq;
 	bs.bind = keybind(km, seq, &bs.str);
+	bs.prefix = NULL;
+	bs.prefixlen = 0;
 	bindlistout(&bs);
     } else {
+	/* empty prefix is equivalent to no prefix */
+	if (ops['p'] && (!argv[0] || argv[0][0])) {
+	    if (!argv[0]) {
+		zwarnnam(name, "option -p requires a prefix string", NULL, 0);
+		return 1;
+	    }
+	    bs.prefix = getkeystring(argv[0], &bs.prefixlen, 2, NULL);
+	    bs.prefix = metafy(bs.prefix, bs.prefixlen, META_HREALLOC);
+	    bs.prefixlen = strlen(bs.prefix);
+	} else {
+	    bs.prefix = NULL;
+	    bs.prefixlen = 0;
+	}
 	bs.firstseq = ztrdup("");
 	bs.lastseq = ztrdup("");
 	bs.bind = t_undefinedkey;
@@ -918,6 +970,10 @@ static void
 scanbindlist(char *seq, Thingy bind, char *str, void *magic)
 {
     struct bindstate *bs = magic;
+
+    if (bs->prefixlen &&
+	(strncmp(seq, bs->prefix, bs->prefixlen) || !seq[bs->prefixlen]))
+	return;
 
     if(bind == bs->bind && (bind || !strcmp(str, bs->str)) &&
        ztrlen(seq) == 1 && ztrlen(bs->lastseq) == 1) {
@@ -1011,6 +1067,66 @@ cleanup_keymaps(void)
     zfree(keybuf, keybufsz);
 }
 
+static char *cursorptr;
+
+/* utility function for termcap output routine to add to string */
+
+static int 
+add_cursor_char(int c)
+{
+    *cursorptr++ = c;
+    return 0;
+}
+
+/* interrogate termcap for cursor keys and add bindings to keymap */
+
+/**/
+static void
+add_cursor_key(Keymap km, int tccode, Thingy thingy, int defchar)
+{
+    char buf[2048];
+    int ok = 0;
+
+    /*
+     * Be careful not to try too hard with bindings for dubious or
+     * dysfunctional terminals.
+     */
+    if (tccan(tccode) && !(termflags & (TERM_NOUP|TERM_BAD|TERM_UNKNOWN))) {
+	/*
+	 * We can use the real termcap sequence.  We need to
+	 * persuade termcap to output `move cursor 1 char' and capture it.
+	 */
+	cursorptr = buf;
+	tputs(tcstr[tccode], 1, add_cursor_char);
+	*cursorptr = '\0';
+
+	/*
+	 * Sanity checking.  If the cursor key is zero-length (unlikely,
+	 * but this is termcap we're talking about), or it's a single
+	 * character, then we don't bind it.
+	 */
+	if (buf[0] && buf[1] && (buf[0] != Meta || buf[2]))
+	    ok = 1;
+    }
+    if (!ok) {
+	/* Assume the normal VT100-like values. */
+	sprintf(buf, "\33[%c", defchar);
+    }
+    bindkey(km, buf, refthingy(thingy), NULL);
+
+    /*
+     * If the string looked like \e[? or \eO?, bind the other one, too.
+     * This is necessary to make cursor keys work on many xterms with
+     * both normal and application modes.
+     */
+    if (buf[0] == '\33' && (buf[1] == '[' || buf[1] == 'O') && 
+	buf[2] && !buf[3])
+    {
+	buf[1] = (buf[1] == '[') ? 'O' : '[';
+	bindkey(km, buf, refthingy(thingy), NULL);
+    }
+}
+
 /* Create the default keymaps.  For efficiency reasons, this function   *
  * assigns directly to the km->first array.  It knows that there are no *
  * prefix bindings in the way, and that it is using a simple keymap.    */
@@ -1023,6 +1139,7 @@ default_bindings(void)
     Keymap emap = newkeymap(NULL, "emacs");
     Keymap amap = newkeymap(NULL, "vicmd");
     Keymap smap = newkeymap(NULL, ".safe");
+    Keymap vimaps[2], kptr;
     char buf[3], *ed;
     int i;
 
@@ -1066,25 +1183,22 @@ default_bindings(void)
     /* vt100 arrow keys are bound by default, for historical reasons. *
      * Both standard and keypad modes are supported.                  */
 
-    /* vi command mode: arrow keys */
-    bindkey(amap, "\33[A",  refthingy(t_uplineorhistory), NULL);
-    bindkey(amap, "\33[B",  refthingy(t_downlineorhistory), NULL);
-    bindkey(amap, "\33[C",  refthingy(t_viforwardchar), NULL);
-    bindkey(amap, "\33[D",  refthingy(t_vibackwardchar), NULL);
-    bindkey(amap, "\33OA",  refthingy(t_uplineorhistory), NULL);
-    bindkey(amap, "\33OB",  refthingy(t_downlineorhistory), NULL);
-    bindkey(amap, "\33OC",  refthingy(t_viforwardchar), NULL);
-    bindkey(amap, "\33OD",  refthingy(t_vibackwardchar), NULL);
+    vimaps[0] = vmap;
+    vimaps[1] = amap;
+    for (i = 0; i < 2; i++) {
+	kptr = vimaps[i];
+	/* vi command and insert modes: arrow keys */
+	add_cursor_key(kptr, TCUPCURSOR, t_uplineorhistory, 'A');
+	add_cursor_key(kptr, TCDOWNCURSOR, t_downlineorhistory, 'B');
+	add_cursor_key(kptr, TCLEFTCURSOR, t_vibackwardchar, 'D');
+	add_cursor_key(kptr, TCRIGHTCURSOR, t_viforwardchar, 'C');
+    }
 
-    /* emacs mode: arrow keys */
-    bindkey(emap, "\33[A",  refthingy(t_uplineorhistory), NULL);
-    bindkey(emap, "\33[B",  refthingy(t_downlineorhistory), NULL);
-    bindkey(emap, "\33[C",  refthingy(t_forwardchar), NULL);
-    bindkey(emap, "\33[D",  refthingy(t_backwardchar), NULL);
-    bindkey(emap, "\33OA",  refthingy(t_uplineorhistory), NULL);
-    bindkey(emap, "\33OB",  refthingy(t_downlineorhistory), NULL);
-    bindkey(emap, "\33OC",  refthingy(t_forwardchar), NULL);
-    bindkey(emap, "\33OD",  refthingy(t_backwardchar), NULL);
+    /* emacs mode: arrow keys */ 
+    add_cursor_key(emap, TCUPCURSOR, t_uplineorhistory, 'A');
+    add_cursor_key(emap, TCDOWNCURSOR, t_downlineorhistory, 'B');
+    add_cursor_key(emap, TCLEFTCURSOR, t_backwardchar, 'D');
+    add_cursor_key(emap, TCRIGHTCURSOR, t_forwardchar, 'C');
    
     /* emacs mode: ^X sequences */
     bindkey(emap, "\30*",   refthingy(t_expandword), NULL);

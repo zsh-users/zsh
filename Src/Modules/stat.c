@@ -35,7 +35,7 @@ enum statnum { ST_DEV, ST_INO, ST_MODE, ST_NLINK, ST_UID, ST_GID,
 		   ST_BLKSIZE, ST_BLOCKS, ST_READLINK, ST_COUNT };
 enum statflags { STF_NAME = 1,  STF_FILE = 2, STF_STRING = 4, STF_RAW = 8,
 		     STF_PICK = 16, STF_ARRAY = 32, STF_GMT = 64,
-		     STF_HASH = 128 };
+		     STF_HASH = 128, STF_OCTAL = 256 };
 static char *statelts[] = { "device", "inode", "mode", "nlink",
 				"uid", "gid", "rdev", "size", "atime",
 				"mtime", "ctime", "blksize", "blocks",
@@ -47,18 +47,39 @@ static void
 statmodeprint(mode_t mode, char *outbuf, int flags)
 {
     if (flags & STF_RAW) {
-	sprintf(outbuf, "%lu", (unsigned long)mode);
+	sprintf(outbuf, (flags & STF_OCTAL) ? "0%lo" : "%lu",
+		(unsigned long)mode);
 	if (flags & STF_STRING)
 	    strcat(outbuf, " (");
     }
     if (flags & STF_STRING) {
 	static const char *modes = "?rwxrwxrwx";
-	static const mode_t mflags[] = { S_IRUSR, S_IWUSR, S_IXUSR,
-					 S_IRGRP, S_IWGRP, S_IXGRP,
-					 S_IROTH, S_IWOTH, S_IXOTH };
+#ifdef __CYGWIN__
+	static mode_t mflags[9] = { 0 };
+#else
+	static const mode_t mflags[9] = {
+	    S_IRUSR, S_IWUSR, S_IXUSR,
+	    S_IRGRP, S_IWGRP, S_IXGRP,
+	    S_IROTH, S_IWOTH, S_IXOTH
+	};
+#endif
 	const mode_t *mfp = mflags;
 	char pm[11];
 	int i;
+
+#ifdef __CYGWIN__
+	if (mflags[0] == 0) {
+	    mflags[0] = S_IRUSR;
+	    mflags[1] = S_IWUSR;
+	    mflags[2] = S_IXUSR;
+	    mflags[3] = S_IRGRP;
+	    mflags[4] = S_IWGRP;
+	    mflags[5] = S_IXGRP;
+	    mflags[6] = S_IROTH;
+	    mflags[7] = S_IWOTH;
+	    mflags[8] = S_IXOTH;
+	}
+#endif
 
 	if (S_ISBLK(mode))
 	    *pm = 'b';
@@ -359,7 +380,7 @@ bin_stat(char *name, char **args, char *ops, int func)
 	    flags |= STF_PICK;
 	} else {
 	    for (; *arg; arg++) {
-		if (strchr("glLnNrstT", *arg))
+		if (strchr("glLnNorstT", *arg))
 		    ops[STOUC(*arg)] = 1;
 		else if (*arg == 'A') {
 		    if (arg[1]) {
@@ -472,6 +493,8 @@ bin_stat(char *name, char **args, char *ops, int func)
 	flags |= STF_RAW;
     if (ops['n'])
 	flags |= STF_FILE;
+    if (ops['o'])
+	flags |= STF_OCTAL;
     if (ops['t'])
 	flags |= STF_NAME;
 
@@ -495,7 +518,7 @@ bin_stat(char *name, char **args, char *ops, int func)
 	arrsize = (flags & STF_PICK) ? 1 : ST_COUNT;
 	if (flags & STF_FILE)
 	    arrsize++;
-	hashptr = hash = (char **)zcalloc((arrsize+1)*2*sizeof(char *));
+	hashptr = hash = (char **)zshcalloc((arrsize+1)*2*sizeof(char *));
     }
 
     if (arrnam) {
@@ -503,7 +526,7 @@ bin_stat(char *name, char **args, char *ops, int func)
 	if (flags & STF_FILE)
 	    arrsize++;
 	arrsize *= nargs;
-	arrptr = array = (char **)zcalloc((arrsize+1)*sizeof(char *));
+	arrptr = array = (char **)zshcalloc((arrsize+1)*sizeof(char *));
     }
 
     for (; ops['f'] || *args; args++) {

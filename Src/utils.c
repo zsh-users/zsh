@@ -293,7 +293,7 @@ slashsplit(char *s)
     int t0;
 
     if (!*s)
-	return (char **) zcalloc(sizeof(char **));
+	return (char **) zshcalloc(sizeof(char **));
 
     for (t = s, t0 = 0; *t; t++)
 	if (*t == '/')
@@ -541,7 +541,7 @@ adduserdir(char *s, char *t, int flags, int always)
     }
 
     /* add the name */
-    nd = (Nameddir) zcalloc(sizeof *nd);
+    nd = (Nameddir) zshcalloc(sizeof *nd);
     nd->flags = flags;
     nd->dir = ztrdup(t);
     /* The variables PWD and OLDPWD are not to be displayed as ~PWD etc. */
@@ -1771,7 +1771,7 @@ zjoin(char **arr, int delim, int heap)
 	len += strlen(*s) + 1;
     if (!len)
 	return heap? "" : ztrdup("");
-    ptr = ret = (heap ? (char *) hcalloc(len) : (char *) zcalloc(len));
+    ptr = ret = (heap ? (char *) hcalloc(len) : (char *) zshcalloc(len));
     for (s = arr; *s; s++) {
 	strucpy(&ptr, *s);
 	if (delim)
@@ -1841,7 +1841,7 @@ spacesplit(char *s, int allownull, int heap, int quote)
     int l = sizeof(*ret) * (wordcount(s, NULL, -!allownull) + 1);
     char *(*dup)(const char *) = (heap ? dupstring : ztrdup);
 
-    ptr = ret = (heap ? (char **) hcalloc(l) : (char **) zcalloc(l));
+    ptr = ret = (heap ? (char **) hcalloc(l) : (char **) zshcalloc(l));
 
     if (quote) {
 	/*
@@ -1868,7 +1868,7 @@ spacesplit(char *s, int allownull, int heap, int quote)
 	findsep(&s, NULL, quote);
 	if (s > t || allownull) {
 	    *ptr = (heap ? (char *) hcalloc((s - t) + 1) :
-		    (char *) zcalloc((s - t) + 1));
+		    (char *) zshcalloc((s - t) + 1));
 	    ztrncpy(*ptr++, t, s - t);
 	} else
 	    *ptr++ = dup(nulstring);
@@ -2040,7 +2040,7 @@ sepjoin(char **s, char *sep, int heap)
     }
     sl = strlen(sep);
     for (t = s, l = 1 - sl; *t; l += strlen(*t) + sl, t++);
-    r = p = (heap ? (char *) hcalloc(l) : (char *) zcalloc(l));
+    r = p = (heap ? (char *) hcalloc(l) : (char *) zshcalloc(l));
     t = s;
     while (*t) {
 	strucpy(&p, *t);
@@ -2064,13 +2064,13 @@ sepsplit(char *s, char *sep, int allownull, int heap)
     sl = strlen(sep);
     n = wordcount(s, sep, 1);
     r = p = (heap ? (char **) hcalloc((n + 1) * sizeof(char *)) :
-	     (char **) zcalloc((n + 1) * sizeof(char *)));
+	     (char **) zshcalloc((n + 1) * sizeof(char *)));
 
     for (t = s; n--;) {
 	tt = t;
 	findsep(&t, sep, 0);
 	*p = (heap ? (char *) hcalloc(t - tt + 1) :
-	      (char *) zcalloc(t - tt + 1));
+	      (char *) zshcalloc(t - tt + 1));
 	strncpy(*p, tt, t - tt);
 	(*p)[t - tt] = '\0';
 	p++;

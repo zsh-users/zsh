@@ -2207,7 +2207,7 @@ bin_functions(char *name, char **argv, char *ops, int func)
 		DPUTS(!shf->funcdef,
 		      "BUG: Calling autoload from empty function");
 	    } else {
-		shf = (Shfunc) zcalloc(sizeof *shf);
+		shf = (Shfunc) zshcalloc(sizeof *shf);
 		shfunctab->addnode(shfunctab, ztrdup(scriptname), shf);
 	    }
 	    shf->flags = on;
@@ -2278,7 +2278,7 @@ bin_functions(char *name, char **argv, char *ops, int func)
 	} else if (on & PM_UNDEFINED) {
 	    /* Add a new undefined (autoloaded) function to the *
 	     * hash table with the corresponding flags set.     */
-	    shf = (Shfunc) zcalloc(sizeof *shf);
+	    shf = (Shfunc) zshcalloc(sizeof *shf);
 	    shf->flags = on;
 	    shf->funcdef = mkautofn(shf);
 	    shfunctab->addnode(shfunctab, ztrdup(*argv), shf);
@@ -2665,11 +2665,11 @@ bin_hash(char *name, char **argv, char *ops, int func)
 		/* The argument is of the form foo=bar, *
 		 * so define an entry for the table.    */
 		if(ops['d']) {
-		    Nameddir nd = hn = zcalloc(sizeof *nd);
+		    Nameddir nd = hn = zshcalloc(sizeof *nd);
 		    nd->flags = 0;
 		    nd->dir = ztrdup(asg->value);
 		} else {
-		    Cmdnam cn = hn = zcalloc(sizeof *cn);
+		    Cmdnam cn = hn = zshcalloc(sizeof *cn);
 		    cn->flags = HASHED;
 		    cn->u.cmd = ztrdup(asg->value);
 		}
