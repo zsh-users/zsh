@@ -20,9 +20,9 @@ _fsh          _chkconfig    _cdcd         _irssi        _mysqldiff    _sccs
 _netcat       _larch        _texinfo	  _figlet       _elinks       _tidy
 _global                     _ant          _lsof         _mt           _xmlsoft
 _perforce     _python       _antiword     _screen       _renice       _apm
-_ecasound     _gpg	    _subversion   _aap          _sablotron    _nmap
-_attr         _chmod        _du
-_getent       _gphoto2      _less
-_nice	      _printenv     _raggle
-_rar	      _sed          _uniq         _vorbis       _wiggle
+_aap          _attr         _chmod        _du           _ecasound
+_getent       _gpg          _gphoto2      _less
+_nice	      _nmap         _printenv     _raggle
+_rar	      _sablotron    _sed          _subversion   _tla
+_uniq         _vorbis       _wiggle
 '
