@@ -1,5 +1,7 @@
 2004-04-14  Oliver Kiddle  <opk@zsh.org>
 
+	* unposted: Completion/Unix/Command/_cdrecord: add missing local
+
 	* 19768: Completion/compinit: suggest running compaudit to see
 	insecure files and directories and send errors to stderr
 

@@ -1,6 +1,6 @@
 #compdef cdrecord
 
-local curcontext="$curcontext" state line
+local curcontext="$curcontext" state line ret=1
 local devices btypes
 
 _arguments -C \
