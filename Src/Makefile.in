@@ -68,7 +68,7 @@ ZSH_NXPORT =
 ENTRYOBJ   = modentry..o
 NNTRYOBJ   =
 
-LDRUNPATH = LD_RUN_PATH=$(libdir)/zsh
+LDRUNPATH = LD_RUN_PATH=$(libdir)/$(tzsh)
 NDRUNPATH =
 
 zsh: $(@L@IBZSH) $(@L@STMP) $(MAIN_OBJS) zsh.export
@@ -150,8 +150,6 @@ ansi2knr: ansi2knr.o
 
 # ========== DEPENDENCIES FOR INSTALLING ==========
 
-transform = @program_transform_name@
-
 install: install.bin install.modules
 uninstall: uninstall.bin uninstall.modules
 
@@ -161,29 +159,27 @@ uninstall.bin: uninstall.bin-here
 # install binary, creating install directory if necessary
 install.bin-here: zsh install.bin-@L@
 	$(sdir_top)/mkinstalldirs $(DESTDIR)$(bindir)
-	tzsh=`echo zsh | sed '$(transform)'`; \
-	$(INSTALL_PROGRAM) $(STRIPFLAGS) zsh $(DESTDIR)$(bindir)/$$tzsh-$(VERSION) && \
-	if test -f $(DESTDIR)$(bindir)/$$tzsh; then \
-	    rm -f $(DESTDIR)$(bindir)/$$tzsh.old; \
-	    $(LN) $(DESTDIR)$(bindir)/$$tzsh $(DESTDIR)$(bindir)/$$tzsh.old; \
-	else :; fi && \
-	rm -f $(DESTDIR)$(bindir)/$$tzsh.new && \
-	$(LN) $(DESTDIR)$(bindir)/$$tzsh-$(VERSION) $(DESTDIR)$(bindir)/$$tzsh.new && \
-	mv $(DESTDIR)$(bindir)/$$tzsh.new $(DESTDIR)$(bindir)/$$tzsh
+	$(INSTALL_PROGRAM) $(STRIPFLAGS) zsh $(DESTDIR)$(bindir)/$(tzsh)-$(VERSION)
+	if test -f $(DESTDIR)$(bindir)/$(tzsh); then \
+	    rm -f $(DESTDIR)$(bindir)/$(tzsh).old; \
+	    $(LN) $(DESTDIR)$(bindir)/$(tzsh) $(DESTDIR)$(bindir)/$(tzsh).old; \
+	else :; fi
+	rm -f $(DESTDIR)$(bindir)/$(tzsh).new
+	$(LN) $(DESTDIR)$(bindir)/$(tzsh)-$(VERSION) $(DESTDIR)$(bindir)/$(tzsh).new
+	mv $(DESTDIR)$(bindir)/$(tzsh).new $(DESTDIR)$(bindir)/$(tzsh)
 
 install.bin-N:
 install.bin-L: $(LIBZSH)
-	$(sdir_top)/mkinstalldirs $(DESTDIR)$(libdir)/zsh
-	$(INSTALL_PROGRAM) $(LIBZSH) $(DESTDIR)$(libdir)/zsh/$(LIBZSH)
+	$(sdir_top)/mkinstalldirs $(DESTDIR)$(libdir)/$(tzsh)
+	$(INSTALL_PROGRAM) $(LIBZSH) $(DESTDIR)$(libdir)/$(tzsh)/$(LIBZSH)
 
 # uninstall binary
 uninstall.bin-here: uninstall.bin-@L@
-	tzsh=`echo zsh | sed '$(transform)'`; \
-	rm -f $(DESTDIR)$(bindir)/$$tzsh-$(VERSION) $(DESTDIR)$(bindir)/$$tzsh
+	rm -f $(DESTDIR)$(bindir)/$(tzsh)-$(VERSION) $(DESTDIR)$(bindir)/$(tzsh)
 
 uninstall.bin-N:
 uninstall.bin-L:
-	rm -f $(DESTDIR)$(libdir)/zsh/$(LIBZSH)
+	rm -f $(DESTDIR)$(libdir)/$(tzsh)/$(LIBZSH)
 
 # ========== DEPENDENCIES FOR CLEANUP ==========
 

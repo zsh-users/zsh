@@ -1595,6 +1595,7 @@ module linker flags       : ${LDFLAGS} ${LIBLDFLAGS} ${DLLDFLAGS}"
 fi
 echo "\
 library flags             : ${LIBS}
+installation basename     : ${tzsh_name}
 binary install path       : ${zshbin2}
 man page install path     : ${zshman}
 info install path         : ${zshinfo}"

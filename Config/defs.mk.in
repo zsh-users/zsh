@@ -28,12 +28,15 @@
 SHELL = /bin/sh
 @SET_MAKE@
 
+# install basename
+tzsh            = @tzsh@
+
 # installation directories
 prefix          = @prefix@
 exec_prefix     = @exec_prefix@
 bindir          = @bindir@
 libdir          = @libdir@
-MODDIR          = $(libdir)/@tzsh@/$(VERSION)
+MODDIR          = $(libdir)/$(tzsh)/$(VERSION)
 infodir         = @infodir@
 mandir          = @mandir@
 fndir           = @fndir@
@@ -80,7 +83,7 @@ DLCFLAGS='$(DLCFLAGS)' DLLDFLAGS='$(DLLDFLAGS)' \
 LIBLDFLAGS='$(LIBLDFLAGS)' EXELDFLAGS='$(EXELDFLAGS)' \
 LIBS='$(LIBS)' DL_EXT='$(DL_EXT)' DLLD='$(DLLD)' \
 AWK='$(AWK)' YODL='$(YODL)' YODL2TXT='$(YODL2TXT)' YODL2HTML='$(YODL2HTML)' \
-FUNCTIONS_INSTALL='$(FUNCTIONS_INSTALL)'
+FUNCTIONS_INSTALL='$(FUNCTIONS_INSTALL)' tzsh='$(tzsh)'
 
 # override built-in suffix list
 .SUFFIXES:

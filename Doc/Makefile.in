@@ -50,7 +50,7 @@ zshexpn.1 zshmisc.1 zshmodules.1 \
 zshoptions.1 zshparam.1 zshzftpsys.1 zshzle.1 zshall.1
 
 # yodl documentation
-YODLDOC = $(MAN) zsh.texi.in
+YODLDOC = $(MAN) zsh.texi
 YODLSRC = zmacros.yo zman.yo ztexi.yo Zsh/arith.yo Zsh/builtins.yo \
 Zsh/compat.yo Zsh/compctl.yo Zsh/compsys.yo Zsh/compwid.yo Zsh/cond.yo \
 Zsh/exec.yo Zsh/expn.yo \
@@ -66,29 +66,32 @@ Zsh/seealso.yo Zsh/zftpsys.yo Zsh/zle.yo
 
 # ========== DEPENDENCIES FOR BUILDING ==========
 
-transform = @program_transform_name@
-
 all: $(MAN) zsh.texi ../META-FAQ
 
 everything: all zsh.dvi zsh_us.ps zsh_a4.ps zsh_toc.html
 
 zsh.dvi: zsh.texi
-	$(TEXI2DVI) zsh.texi
+	$(TEXI2DVI) $(sdir)/zsh.texi
 
-$(sdir)/zsh.texi.in: $(sdir)/zsh.yo
-	$(YODL) -o $(sdir)/zsh.texi.in -I$(sdir) -w ztexi.yo version.yo zsh.yo
+zsh.texi:
+	case $@ in \
+	  */*) target=$@ ;; \
+	  *) target=$(sdir)/$@ ;; \
+	esac; \
+	$(YODL) -o $$target -I$(sdir) -w ztexi.yo version.yo zsh.yo; \
+	test -f $$target
 
-zsh.texi: $(sdir)/zsh.texi.in
-	@test -f $< -a -s $<
-	tzsh=`echo zsh | sed '$(transform); s/,/\\\\,/g'`; \
-	sed "/@setfilename/{s/@setfilename //; s,zsh,$$tzsh, ; s/^/@setfilename /;}" < $< > zsh.texi
+zsh.info: zsh.texi
+	$(MAKEINFO) $(sdir)/zsh.texi
 
 .yo.1:
 	case $@ in \
 	  */*) target=$@ ;; \
 	  *) target=$(sdir)/$@ ;; \
 	esac; \
-	$(YODL) -I$(sdir) -w zman.yo version.yo $< | sed -e '1s/\\-/-/g' -e '/^\.'\''/d' > $$target || exit 1; \
+	case '$(YODL)' in :*) ;; *) \
+	    $(YODL) -I$(sdir) -w zman.yo version.yo $< | sed -e '1s/\\-/-/g' -e '/^\.'\''/d' > $$target \
+	;; esac; \
 	test -f $$target
 
 zsh_us.ps: zsh.dvi
@@ -105,11 +108,15 @@ zshall.1: zsh.yo
 	  */*) target=$@ ;; \
 	  *) target=$(sdir)/$@ ;; \
 	esac; \
-	$(YODL) -I$(sdir) -DZSHALL -w zman.yo version.yo zsh.yo | sed -e '1s/\\-/-/g' -e '/^\.'\''/d' > $$target || exit 1; \
+	case '$(YODL)' in :*) ;; *) \
+	    $(YODL) -I$(sdir) -DZSHALL -w zman.yo version.yo zsh.yo | sed -e '1s/\\-/-/g' -e '/^\.'\''/d' > $$target \
+	;; esac; \
 	test -f $$target
 
 ../META-FAQ: META-FAQ.yo Zsh/metafaq.yo
-	$(YODL) -I$(sdir) META-FAQ.yo | sed -e '/NEXTLINE/N' -e '/DELLINE/d' -e '/^SECTHEAD$$/{N;s/^SECTHEAD.//;h;s/./-/g;H;g;}' -e 's/  *$$//' > $(sdir_top)/META-FAQ
+	case '$(YODL)' in :*) ;; *) \
+	    $(YODL) -I$(sdir) META-FAQ.yo | sed -e '/NEXTLINE/N' -e '/DELLINE/d' -e '/^SECTHEAD$$/{N;s/^SECTHEAD.//;h;s/./-/g;H;g;}' -e 's/  *$$//' > $(sdir_top)/META-FAQ \
+	;; esac
 	test -f $(sdir_top)/META-FAQ
 
 $(YODLDOC): version.yo
@@ -168,46 +175,40 @@ uninstall: uninstall.man
 # install man pages, creating install directory if necessary
 install.man: $(MAN)
 	$(sdir_top)/mkinstalldirs $(DESTDIR)$(mandir)/man1
-	tzsh=`echo zsh | sed '$(transform); s/,/\\\\,/g'`; \
 	for file in $(MAN); do \
-	  tfile=`echo $$file | sed "s,zsh,$$tzsh,"`; \
-	sed "s/zshall/$${tzsh}all/; s/zshmisc/$${tzsh}misc/; s/zshexpn/$${tzsh}expn/; s/zshparam/$${tzsh}param/; s/zshoptions/$${tzsh}options/; s/zshbuiltins/$${tzsh}builtins/; s/zshzle/$${tzsh}zle/; s/zshcompwid/$${tzsh}compwid/; s/zshcompctl/$${tzsh}compctl/; s/zshmodules/$${tzsh}modules/; s/zshcompsys/$${tzsh}compsys/;" \
-	$(sdir)/$$file >$(DESTDIR)$(mandir)/man1/$$tfile || exit 1; \
+	    $(INSTALL_DATA) $(sdir)/$$file $(DESTDIR)$(mandir)/man1/`echo $$file | sed 's|zsh|$(tzsh)|'` || exit 1; \
 	done
 
 # install info pages, creating install directory if necessary
 install.info: zsh.texi
-	$(MAKEINFO) zsh.texi
 	$(sdir_top)/mkinstalldirs $(DESTDIR)$(infodir)
-	tzsh=`echo zsh | sed '$(transform)'`; \
-	for file in $$tzsh.info $$tzsh.info-[1-9]*; do \
-	  if test -f $$file; then \
-	    $(INSTALL_DATA) $$file $(DESTDIR)$(infodir); \
-	  elif test -f $(sdir)/$$file; then \
-	    $(INSTALL_DATA) $(sdir)/$$file $(DESTDIR)$(infodir); \
-	  else :; \
-	   fi || exit 1; \
-	done; \
-	if $(SHELL) -c 'install-info --version' >/dev/null 2>&1; then \
-	  install-info --dir-file=$(DESTDIR)$(infodir)/dir $(DESTDIR)$(infodir)/$$tzsh.info; \
-	else true; fi
-
-install.html: zsh_toc.html
-	$(sdir_top)/mkinstalldirs $(DESTDIR)$(htmldir)
-	$(INSTALL_DATA) *.html $(DESTDIR)$(htmldir)
+	rm -rf infodir
+	mkdir infodir
+	if ( \
+	    sed '/^@setfilename/s|zsh|$(tzsh)|' \
+		< $(sdir)/zsh.texi > infodir/tzsh.texi && \
+	    (cd infodir && $(MAKEINFO) tzsh.texi) && \
+	    for file in infodir/$(tzsh).info*; do \
+		$(INSTALL_DATA) $$file $(DESTDIR)$(infodir) || exit 1; \
+	    done \
+	); then \
+	    rm -rf infodir; \
+	    exit 0; \
+	else \
+	    rm -rf infodir; \
+	    exit 1; \
+	fi
 
 # uninstall man pages
 uninstall.man:
 	for file in $(MAN); do \
-	  tzsh=`echo zsh | sed '$(transform); s/,/\\\\,/g'`; \
-	  tfile=`echo $$file | sed "s,zsh,$$tzsh,"`; \
-	  rm -f $(DESTDIR)$(mandir)/man1/$$tfile; \
+	    rm -f $(DESTDIR)$(mandir)/man1/`echo $$file | sed 's|zsh|$(tzsh)|'`; \
 	done
 
 # uninstall info pages
 uninstall.info:
-	tzsh=`echo zsh | sed '$(transform)'`; \
-	rm -f $(DESTDIR)$(infodir)/$$tzsh.info $(DESTDIR)$(infodir)/$$tzsh.info-[1-9]*
+	rm -f $(DESTDIR)$(infodir)/$(tzsh).info
+	rm -f $(DESTDIR)$(infodir)/$(tzsh).info-[1-9]*
 
 # ========== DEPENDENCIES FOR CLEANUP ==========
 
@@ -215,12 +216,13 @@ clean-here:
 	rm -f *.html *.info* *.dvi *.ps
 	rm -f *.aux *.cp *.cps *.fn *.fns *.ky *.log
 	rm -f *.pg *.pgs *.toc *.tp *.tps *.vr *.vrs
+	rm -rf infodir
 
 distclean-here: clean-here
-	rm -f Makefile *.1 *.texi
+	rm -f Makefile
 
 realclean-here: distclean-here
-	cd $(sdir) && rm -f version.yo ../META-FAQ zsh.yo
+	cd $(sdir) && rm -f version.yo ../META-FAQ zsh.texi $(MAN)
 
 @CLEAN_MK@
 

@@ -87,10 +87,6 @@ install.fns uninstall.fns:
 install.info uninstall.info:
 	@cd Doc && $(MAKE) $(MAKEDEFS) $@
 
-# install/uninstall just the html pages
-install.html uninstall.html:
-	@cd Doc && $(MAKE) $(MAKEDEFS) $@
-
 # ========== DEPENDENCIES FOR CLEANUP ==========
 
 @CLEAN_MK@
