@@ -1,3 +1,7 @@
+2000-05-19  Oliver Kiddle  <opk@zsh.org>
+
+	* 11470: Completion/User/_su: fix to use user's shell after -c
+
 2000-05-19  Bart Schaefer  <schaefer@zsh.org>
 
 	* 11469: Completion/Commands/_complete_debug,
