@@ -1,5 +1,8 @@
 2002-05-08  Peter Stephenson  <pws@csr.com>
 
+	* 17097: Src/Modules/tcp.c: closing all TCP sessions referenced
+	freed memory.
+
 	* Unposted: Src/Modules/zselect.c: remove an unused counter.
 
 	* 17095: Src/Modules/zselect.c: wrong index when appending to a

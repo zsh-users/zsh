@@ -279,10 +279,12 @@ zts_byfd(int fd)
 static void
 tcp_cleanup(void)
 {
-    LinkNode node;
+    LinkNode node, next;
 
-    for (node = firstnode(ztcp_sessions); node; incnode(node))
+    for (node = firstnode(ztcp_sessions); node; node = next) {
+	next = node->next;
 	tcp_close((Tcp_session)getdata(node));
+    }
 }
 
 /**/
