@@ -184,19 +184,11 @@ static int type[TOKCOUNT] =
 static int
 zzlex(void)
 {
-    char decimal = '.', thousands = ',';
+#ifdef USE_LOCALE
+    char *prev_locale;
+#endif
     int cct = 0;
-#ifdef USE_LOCALE
-    struct lconv *lc;
-#endif
-
     yyval.type = MN_INTEGER;
-
-#ifdef USE_LOCALE
-    lc = localeconv();
-    decimal = *(lc->decimal_point);
-    thousands = *(lc->thousands_sep);
-#endif
 
     for (;; cct = 0)
 	switch (*ptr++) {
@@ -335,9 +327,7 @@ zzlex(void)
 	case ':':
 	    return COLON;
 	case ',':
-	case '.':
-	    if (*(ptr-1) == thousands) return COMMA;
-	    else break;
+	    return COMMA;
 	case '\0':
 	    ptr--;
 	    return EOI;
@@ -362,15 +352,22 @@ zzlex(void)
 	    }
 	/* Fall through! */
 	default:
-	    if (idigit(*--ptr) || *ptr == decimal) {
+	    if (idigit(*--ptr) || *ptr == '.') {
 		char *nptr;
 		for (nptr = ptr; idigit(*nptr); nptr++);
 
-		if (*nptr == decimal || *nptr == 'e' || *nptr == 'E') {
+		if (*nptr == '.' || *nptr == 'e' || *nptr == 'E') {
 		    /* it's a float */
 		    yyval.type = MN_FLOAT;
+#ifdef USE_LOCALE
+		    prev_locale = setlocale(LC_NUMERIC, NULL);
+		    setlocale(LC_NUMERIC, "POSIX");
+#endif
 		    yyval.u.d = strtod(ptr, &nptr);
-		    if (ptr == nptr || *nptr == decimal ) {
+#ifdef USE_LOCALE
+		    setlocale(LC_NUMERIC, prev_locale);
+#endif
+		    if (ptr == nptr || *nptr == '.' ) {
 			zerr("bad floating point constant", NULL, 0);
 			return EOI;
 		    }
