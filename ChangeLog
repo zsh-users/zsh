@@ -1,3 +1,9 @@
+2000-05-28  Peter Stephenson  <pws@pwstephenson.fsnet.co.uk>
+
+	* 11616: Src/Modules/zftp.c: configure test for netinet/in_systm.h
+	is broken on several architectures, so just include it everywhere
+	except cygwin.
+
 2000-05-28  Oliver Kiddle  <opk@zsh.org>
 
 	* 11615: Completion/Builtins/_which, Completion/Builtins/_unhash:
