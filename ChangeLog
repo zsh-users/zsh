@@ -1,3 +1,7 @@
+2003-07-17  Doug Kearns  <djkea2@mugca.its.monash.edu.au>
+
+	* 18863: Completion/Unix/Command/_aap: new completion for aap
+
 2003-07-16  Doug Kearns  <djkea2@mugca.its.monash.edu.au>
 
 	* unposted: Completion/Debian/Command/_bug,
