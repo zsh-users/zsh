@@ -1,3 +1,7 @@
+2001-06-18  Bart Schaefer  <schaefer@zsh.org>
+
+	* 14965: Src/Zle/computil.c: Silence compiler warnings.
+
 2001-06-18  Sven Wischnowsky  <wischnow@zsh.org>
 
 	* 14962: Completion/Unix/Type/_path_files: make special-dirs
@@ -18,15 +22,15 @@
 	* 14951: Src/signals.c, Src/signals.h: rename handler() to
 	zhandler() because it's now exported to modules
 
+2001-06-17  Bart Schaefer  <schaefer@zsh.org>
+
+	* Jason Began: 3931 (see cvs.netbsd.org): zshconfig.ac: Use
+	-fPIC for gcc dynamic linking rather than -fpic.
+
 2001-06-14  Peter Stephenson  <pws@csr.com>
 
 	* 14921: Completion/Zsh/_zftp: autoload zfcd_match and zfget_match
 	if necessary.
-
-2001-06-13  Oliver Kiddle  <opk@zsh.org>
-
-	* 14896: Completion/Zsh/Type/_command_names: don't complete read-only
-	parameters on the left side of an assignment
 
 2001-06-13  Sven Wischnowsky  <wischnow@zsh.org>
 
@@ -51,22 +55,10 @@
 	`document' comparguments and compvalues with some comments in
 	computil.c
 
-	* 14883 (Jos Backus): Completion/Unix/Command/_mount: add code for
-	BSDish systems
+2001-06-13  Oliver Kiddle  <opk@zsh.org>
 
-	* 14841: Completion/Base/Utility/_values, Src/Zle/computil.c:
-	new word parsing for compvalues; this should now handle empty
-	separators correctly, as far as it is possible
-
-2001-06-13  Wayne Davison  <wayned@users.sourceforge.net>
-
-        * 14793: Src/hist.c: Don't mark a HIST_TMPSTORE entry with HIST_OLD
-	so that the HFILE_FAST algorithm in savehistfile() will recheck this
-	histnum later.
-
-2001-06-13  Andrej Borsenkow <bor@zsh.org>
-
-	* 14766: Src/prompt.c: uniform %l substitution
+	* 14896: Completion/Zsh/Type/_command_names: don't complete read-only
+	parameters on the left side of an assignment
 
 2001-06-13  Peter Stephenson  <pws@csr.com>
 
@@ -74,27 +66,76 @@
 	when finding $fpath if not set in current shell were completely
 	garbled.
 
+2001-06-13  Sven Wischnowsky  <wischnow@zsh.org>
+
+	* 14883 (Jos Backus): Completion/Unix/Command/_mount: add code for
+	BSDish systems
+
+2001-06-12  Bart Schaefer  <schaefer@zsh.org>
+
+	* 14849: README: Request "reporter" output only if a bug cannot
+	be reproduced with 'zsh -f'.
+
+2001-06-11  Sven Wischnowsky  <wischnow@zsh.org>
+
+	* 14841: Completion/Base/Utility/_values, Src/Zle/computil.c:
+	new word parsing for compvalues; this should now handle empty
+	separators correctly, as far as it is possible
+
 2001-06-11  Peter Stephenson  <pws@csr.com>
 
 	* 14840: Doc/Zsh/options.yo: document search behaviour with
 	PATH_DIRS option.
 
-2001-06-10  Clint Adams <clint@zsh.org>
+2001-06-10  Clint Adams  <clint@zsh.org>
 
 	* 14830: config.guess, config.sub:
-	upgrade to modern versions.
+	upgrade to GNU's June 5 and 8 versions,
+	respectively.
 
-2001-06-06  Andrej Borsenkow <bor@zsh.org>
+2001-06-09  Bart Schaefer  <schaefer@zsh.org>
+
+	* unposted (see 14826): Test/C02cond.ztst: Force group of new
+	directory created for file-mode tests to be owned by the current
+	effective group.
+
+	* 14824: Test/comptest: Avoid echotc (improvement on 14792).
+
+2001-06-08  Bart Schaefer  <schaefer@zsh.org>
+
+	* 14796: zshconfig.ac: More reliable BROKEN_KILL_ESRCH test.
+
+2001-06-07  Bart Schaefer  <schaefer@zsh.org>
+
+	* 14792: Test/comptest: Don't import the current terminal type for
+	the zpty terminal, because the current terminal might not be able
+	to run ZLE (e.g., emacs shell mode).
+
+	* 14712: Doc/Zsh/builtins.yo: Improve appearance of long hanging
+	paragraph tag for the "read" builtin.
+
+	* 14578: Src/Modules/termcap.c: Handle vagaries of tgetflag()
+	return value in new function ztgetflag().
+
+2001-06-07  Wayne Davison  <wayned@users.sourceforge.net>
+
+	* 14793: Src/hist.c: Don't mark a HIST_TMPSTORE entry with HIST_OLD
+	so that the HFILE_FAST algorithm in savehistfile() will recheck this
+	histnum later.
+
+2001-06-06  Andrej Borsenkow  <bor@zsh.org>
 
 	* 14772: David Lebel <lebel@lebel.org>: zshconfig.ac: patch
 	for dynamic linking on OpenBSD
+
+	* 14766: Src/prompt.c: uniform %l substitution
 
 	* 14679, Bart 14693, 14758, 14760: configure.ac, zshconfig.ac,
 	.distfiles, Makefile.in, configure.in, Src/mkmakemod.sh: Allow
 	processing by both autoconf-2.13 and autoconf-2.50; remove
 	config.status hack for autoconf-2.50
 
-2001-06-06  Sven Wischnowsky <wischnow@zsh.org>
+2001-06-06  Sven Wischnowsky  <wischnow@zsh.org>
 
 	* 14736: Doc/Zsh/compsys.yo: make docs for _wanted and
 	_requested clearer (command has to allow options passed to it)
@@ -103,9 +144,10 @@
 	actions that have to be tried (but only once), execute actions
 	if we aren't after an option already (in the same word)
 
-2001-06-04  Peter Stephenson  <pws@csr.com>
+2001-06-05  Chmouel Boudjnah  <chmouel@mandrakesoft.com>
 
-	* Config/version.mk: relabelled this version 4.0.1-dev-0
+	* 14550: Completion/Redhat/Command/_rpm: Add --nobuild and --nogpg
+	to rpm completion
 
 2001-06-01  Peter Stephenson  <pws@csr.com>
 

@@ -5,9 +5,7 @@ THE Z SHELL (ZSH)
 Version
 -------
 
-This is zsh version 3.1 (beta)
-
-Note that this is a beta version.  The latest stable version is zsh-3.0.6.
+This is zsh version 4.0.  This is a stable release.
 
 Installing Zsh
 --------------
@@ -19,35 +17,45 @@ are any special instructions for your particular architecture.
 Features
 --------
 
-Zsh is a shell with lots of features.  For a list of these, see the
+Zsh is a shell with lots of features.  For a list of some of these, see the
 file Etc/FEATURES, and for the latest changes see Etc/NEWS.  For more
 details, see the documentation.
 
-Possibile incompatibilities
+Possible incompatibilities
 ---------------------------
 
-If you have been using recent versions of zsh 3.1, the following changes in
-the shell may affect you:
-- The traditional bindings of \M-n (history-search-backward) and
-  \M-p (history-search-forward) in older versions of zsh have returned,
-  as has the traditional behaviour of those functions and the functions
-  up-line-or-search and down-line-or-search.  In 3.1.5, the functions
-  behaved differently and \M-n and \M-p were bound by default to
-  history-beginning-search-backward and history-beginning-search-forward.
-- Prompt truncation behaviour via %<...< and %>...> (or %[<...] etc.) has
-  changed slightly:  the string to be truncated runs to the end of the
-  prompt or to the next truncation sequence; %<< will turn off truncation.
-  Previously it only covered individual prompt escapes.  So for example the
-  prompt `%10<...<%~%% ' will now include the `%% ' in the string to be
-  truncated, and you should change the prompt to `%10<...<%~%<<%% ' to turn
-  off truncation immediately after the `%~'.
-- If for some reason you have `setopt norcs' or `unsetopt rcs' anywhere in
-  your startup files (e.g. to stop .zlogout being run), this will now
-  take effect immediately, preventing later startup files from being
-  run.  It is safe to put `setopt norcs' in .zlogin as this is always
-  the last run.
+Some particular differences you may notice between version 3.0 and 4.0
+(mostly based on 3.0.8; there are other differences from earlier versions):
 
-See the FAQ for a discussion of changes over the longer term.
+  o  The options ALWAYS_LAST_PROMPT (return to the line you were
+     editing after displaying completion lists) and LIST_AMBIGUOUS
+     (don't do AUTO_LIST if there was an unambiguous prefix that could be
+     inserted, i.e. only list if it is ambiguous what to insert next) are
+     now set by default.  This is in response to complaints that too many
+     zsh features are never noticed by many users.  To turn them off,
+     just put `unsetopt alwayslastprompt listambiguous' in your
+     .zshrc file.
+  o  The editor commands history-search-{forward,backward} are implemented
+     slightly differently, as are {up,down}-line-or-search.  You may
+     well not notice this, however.
+  o  Cursor keys are now usually bound in both vi command and insert
+     mode.  In the latter case, this may result in a slight delay after
+     hitting ESCAPE to exit insert mode.  Purists who object to this can
+     unbind the appropriate key sequences (see zshzle(1)).  Most beginning
+     users of zsh apparently find the current behaviour preferable.
+  o  History file format is incompatible with versions older than 3.0.6,
+     but this should only affect people who try to share history files
+     between the two versions -- 4.0 can read the old format, 3.0.6 and
+     later can read the new format.  Just beware of INC_APPEND_HISTORY,
+     which could conceivably mix the two.
+  o  Default compctl completions have been removed for some builtin
+     commands.  Either use the new compinit-derived system, use the
+     improved compctls from Misc/compctl-examples, or restore these
+     equivalents yourself:
+	 compctl -b bindkey
+	 compctl -v export typeset vared
+	 compctl -o setopt unsetopt
+         compctl -c which
 
 Documentation
 -------------
@@ -59,7 +67,7 @@ Doc/Zsh/*.yo	The master source for the zsh documentation is written in
 		It is not required by zsh but but it is a nice program so
 		you might want to get it anyway, especially if you are a
 		zsh developer.  It can be downloaded from
-		ftp://ftp.icce.rug.nl/pub/unix/yodl*
+		ftp://ftp.lilypond.org/pub/yodl/
 
 Doc/zsh*.1	Man pages in nroff format.  These will be installed
 		by "make install.man" or "make install".  By default,
@@ -84,9 +92,11 @@ Doc/intro.ms	An introduction to zsh in troff format using the ms
 		may not work without changes but it is still a good
 		introduction.
 
+For more information, see the website, as described in the META-FAQ.
+
 If you do not have the necessary tools to process these documents,
 PostScript, ASCII, Info and DVI versions are available in the separate
-file zsh-beta-doc.tar.gz at the archive sites listed in the META-FAQ.
+file zsh-doc.tar.gz at the archive sites listed in the META-FAQ.
 
 The distribution also contains a Perl script in Utils/helpfiles which
 can be used to extract the descriptions of builtin commands from the
@@ -95,7 +105,7 @@ script about its usage.  The files created by this script can be used
 by example function run-help located in the subdirectory Functions/Misc to
 show information about zsh builtins and run `man' on external commands.
 For this the shell variable HELPDIR should point to a directory containing
-the fileles generated by the helpfiles script.  run-help should be
+the files generated by the helpfiles script.  run-help should be
 unaliased before loading the run-help function.  After that this function
 will be executed by the run-help ZLE function which is by default bound
 to ESC-h in emacs mode.
@@ -128,18 +138,18 @@ Zsh Maintenance and Bug Reports
 -------------------------------
 
 Zsh is currently maintained by the members of the zsh-workers mailing list
-and coordinated by Peter Stephenson <pws@zsh.org>.  Please send
-any feedback and bugs reports to <zsh-workers@sunsite.auc.dk>.
+and coordinated by Peter Stephenson <coordinator@zsh.org>.  Please send
+any feedback and bugs reports to <zsh-workers@sunsite.dk>.
 
-There is a script "reporter" in the subdirectory Util which will print
-out your current shell environment/setup.  If you report a bug, please
-use this script and include the output from sourcing this file.  This way,
-the problem you are reporting can be recreated.
-
-You can help even more if you can reproduce the bug starting zsh with
+Reports are most helpful if you can reproduce the bug starting zsh with
 the -f option.  This skips the execution of local startup files except
 /etc/zshenv.  If a bug occurs only when some options set try to locate
 the option which triggers the bug.
+
+There is a script "reporter" in the subdirectory Util which will print out
+your current shell environment/setup.  If you cannot reproduce the bug
+with "zsh -f", use this script and include the output from sourcing this
+file.  This way, the problem you are reporting can be recreated.
 
 The known bugs in zsh are listed in the file Etc/BUGS.  Check this as
 well as the Frequently Asked Questions (FAQ) list before sending a bug

@@ -1,0 +1,185 @@
+# Tests corresponding to the texinfo node `Conditional Expressions'
+
+%prep
+
+  umask 077
+
+  mkdir cond.tmp
+
+  cd cond.tmp
+
+  touch	unmodified
+
+  touch zerolength
+  chgrp $EGID zerolength
+  print 'Garbuglio' >nonzerolength
+
+  mkdir modish
+  chgrp $EGID modish
+  chmod g+xs modish
+  chmod u+s modish
+  chmod +t modish
+
+  touch unmodish
+  chmod 000 unmodish
+
+  print 'MZ' > cmd.exe
+  chmod +x cmd.exe
+%test
+
+  [[ -a zerolength && ! -a nonexistent ]]
+0:-a cond
+
+  # Find a block special file system.  This is a little tricky.
+  block=$(find /dev(|ices)/ -type b -print)
+  if [[ -n $block ]]; then
+    [[ -b $block[(f)1] && ! -b zerolength ]]
+  else
+    print -u8 'Warning: Not testing [[ -b blockdevice ]] (no devices found)'
+    [[ ! -b zerolength ]]
+  fi
+0D:-b cond
+
+  # Use hardcoded /dev/tty because globbing inside /dev fails on Cygwin
+  char=/dev/tty
+  [[ -c $char && ! -c $zerolength ]]
+0:-c cond
+
+  [[ -d . && ! -d zerolength ]]
+0:-d cond
+
+  [[ -e zerolength && ! -e nonexistent ]]
+0:-e cond
+
+  [[ -f zerolength && ! -f cond && ! -f $char && ! -f $block && ! -f . ]]
+0:-f cond
+
+  [[ -g modish && ! -g zerolength ]]
+0:-g cond
+
+  ln -s zerolength link
+  [[ -h link && ! -h zerolength ]]
+0:-h cond
+
+  [[ -k modish && ! -k zerolength ]]
+0:-k cond
+
+  foo=foo
+  bar=
+  [[ -n $foo && ! -n $bar && ! -n '' ]]
+0:-n cond
+
+  [[ -o rcs && ! -o norcs && -o noerrexit && ! -o errexit ]]
+0:-o cond
+
+  if ! grep '#define HAVE_FIFOS' $ZTST_testdir/../config.h; then
+    print -u8 'Warning: Not testing [[ -p pipe ]] (FIFOs not supported)'
+    [[ ! -p zerolength ]]
+  else
+    if whence mkfifo && mkfifo pipe || mknod pipe p; then
+      [[ -p pipe && ! -p zerolength ]]
+    else
+      print -u8 'Warning: Not testing [[ -p pipe ]] (cannot create FIFO)'
+      [[ ! -p zerolength ]]
+    fi
+  fi
+0dD:-p cond
+
+  [[ -r zerolength && ! -r unmodish ]]
+0:-r cond
+
+  [[ -s nonzerolength && ! -s zerolength ]]
+0:-s cond
+
+# no simple way of guaranteeing test for -t
+
+  [[ -u modish && ! -u zerolength ]]
+0:-u cond
+
+  [[ -x cmd.exe && ! -x zerolength ]]
+0:-x cond
+
+  [[ -z $bar && -z '' && ! -z $foo ]]
+0:-z cond
+
+  [[ -L link && ! -L zerolength ]]
+0:-L cond
+
+# hard to guarantee a file not owned by current uid
+  [[ -O zerolength ]]
+0:-O cond
+
+  [[ -G zerolength ]]
+0:-G cond
+
+# can't be bothered with -S
+
+  sleep 1
+  cat unmodified
+  touch newnewnew
+  if [[ $OSTYPE == "cygwin" ]]; then
+    print -u8 "Warning: not testing [[ -N file ]] (not supported on Cygwin)"
+    true
+  else
+    [[ -N newnewnew && ! -N unmodified ]]
+  fi
+0:-N cond
+
+  [[ newnewnew -nt zerolength && ! (unmodified -nt zerolength) ]]
+0:-nt cond
+
+  [[ zerolength -ot newnewnew && ! (zerolength -ot unmodified) ]]
+0:-ot cond
+
+  [[ link -ef zerolength && ! (link -ef nonzerolength) ]]
+0:-ef cond
+
+  [[ foo = foo && foo != bar && foo == foo && foo != '' ]]
+0:=, == and != conds
+
+  [[ bar < foo && foo > bar ]]
+0:< and > conds
+
+  [[ $(( 3 + 4 )) -eq 0x07 && $(( 5 * 2 )) -ne 0x10 ]]
+0:-eq and -ne conds
+
+  [[ 3 -lt 04 && 05 -gt 2 ]]
+0:-lt and -gt conds
+
+  [[ 3 -le 3 && ! (4 -le 3) ]]
+0:-le cond
+
+  [[ 3 -ge 3 && ! (3 -ge 4) ]]
+0:-ge cond
+
+  [[ 1 -lt 2 || 2 -lt 2 && 3 -gt 4 ]]
+0:|| and && in conds
+
+  if ! grep '#define PATH_DEV_FD' $ZTST_testdir/../config.h; then
+    print -u8 "Warning: not testing [[ -e /dev/fd/0 ]] (/dev/fd not supported)"
+    true
+  else
+    [[ -e /dev/fd/0 ]]
+  fi
+0dD:/dev/fd support in conds handled by access
+
+  if ! grep '#define PATH_DEV_FD' $ZTST_testdir/../config.h; then
+    print -u8 "Warning: not testing [[ -O /dev/fd/0 ]] (/dev/fd not supported)"
+    true
+  else
+    [[ -O /dev/fd/0 ]]
+  fi
+0dD:/dev/fd support in conds handled by stat
+
+  [[ ( -z foo && -z foo ) || -z foo ]]
+1:complex conds with skipping
+
+  [ '' != bar -a '' = '' ]
+0:strings with `[' builtin
+
+  [ `echo 0` -lt `echo 1` ]
+0:substituion in `[' builtin
+
+%clean
+  # This works around a bug in rm -f in some versions of Cygwin
+  chmod 644 unmodish

@@ -515,8 +515,8 @@ putpromptchar(int doprint, int endchar)
 		break;
 	    case 'l':
 		if (*ttystrname) {
-                   ss = (strncmp(ttystrname, "/dev/", 5) ?
-                           ttystrname : ttystrname + 5);
+		    ss = (strncmp(ttystrname, "/dev/", 5) ?
+			    ttystrname : ttystrname + 5);
 		    stradd(ss);
 		} else
 		    stradd("()");
