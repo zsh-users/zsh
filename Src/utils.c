@@ -1373,7 +1373,7 @@ read_poll(int fd, int *readchar, int polltty)
 #endif
 #endif
 
-    if (ret <= 0) {
+    if (ret < 0) {
 	/*
 	 * Final attempt: set non-blocking read and try to read a character.
 	 * Praise Bill, this works under Cygwin (nothing else seems to).

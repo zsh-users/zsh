@@ -1,3 +1,8 @@
+2000-11-08  Bart Schaefer  <schaefer@zsh.org>
+
+	* 13140: Src/utils.c: Believe the non-error not-ready return value
+	from select(), in read_poll().
+
 2000-11-08  Sven Wischnowsky  <wischnow@zsh.org>
 
 	* ?????: Src/Modules/zpty.c: use possible read character from
