@@ -497,7 +497,8 @@ init_shout(void)
 static char *tccapnams[TC_COUNT] = {
     "cl", "le", "LE", "nd", "RI", "up", "UP", "do",
     "DO", "dc", "DC", "ic", "IC", "cd", "ce", "al", "dl", "ta",
-    "md", "so", "us", "me", "se", "ue", "ch"
+    "md", "so", "us", "me", "se", "ue", "ch",
+    "ku", "kd", "kl", "kr"
 };
 
 /* Initialise termcap */

@@ -1524,7 +1524,11 @@ struct ttyinfo {
 #define TCSTANDOUTEND  22
 #define TCUNDERLINEEND 23
 #define TCHORIZPOS     24
-#define TC_COUNT       25
+#define TCUPCURSOR     25
+#define TCDOWNCURSOR   26
+#define TCLEFTCURSOR   27
+#define TCRIGHTCURSOR  28
+#define TC_COUNT       29
 
 #define tccan(X) (tclen[X])
 

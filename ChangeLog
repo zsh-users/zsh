@@ -1,3 +1,10 @@
+2001-03-13  Peter Stephenson  <pws@csr.com>
+
+	* 13611, 13615: Doc/Zsh/zle.yo, Src/init.c, Src/zsh.h, 
+	Src/Zle/zle_keymap.c: Use termcap to find cursor sequences to
+	bind; default to VT100.  If ^[[? or ^[O? is being bound, bind
+	the other one too.  Also bind cursor keys in viins keymap.
+
 2001-03-12  Oliver Kiddle  <opk@zsh.org>
 
 	* 13610: INSTALL, README, Completion/Core/compinit,

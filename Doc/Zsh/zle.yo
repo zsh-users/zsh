@@ -201,6 +201,16 @@ The following is a list of all the standard widgets,
 and their default bindings in emacs mode,
 vi command mode and vi insert mode
 (the `tt(emacs)', `tt(vicmd)' and `tt(viins)' keymaps, respectively).
+
+Note that cursor keys are bound to movement keys in all three keymaps;
+the shell assumes that the cursor keys send the key sequences reported
+by the terminal-handling library (termcap or terminfo).  The key sequences
+shown in the list are those based on the VT100, common on many modern
+terminals, but in fact these are not necessarily bound.  In the case of the
+tt(viins) keymap, the initial escape character of the sequences serves also
+to return to the tt(vicmd) keymap: whether this happens is determined by
+the tt(KEYTIMEOUT) parameter, see ifzman(zmanref(zshparam))\
+ifnzman(noderef(Parameters)).
 startmenu()
 menu(Movement)
 menu(History Control)
@@ -222,7 +232,7 @@ item(tt(backward-char) (^B ESC-[D) (unbound) (unbound))(
 Move backward one character.
 )
 tindex(vi-backward-char)
-item(tt(vi-backward-char) (unbound) (^H h ^?) (unbound))(
+item(tt(vi-backward-char) (unbound) (^H h ^?) (ESC-[D))(
 Move backward one character, without changing lines.
 )
 tindex(backward-word)
@@ -273,7 +283,7 @@ item(tt(forward-char) (^F ESC-[C) (unbound) (unbound))(
 Move forward one character.
 )
 tindex(vi-forward-char)
-item(tt(vi-forward-char) (unbound) (space l) (unbound))(
+item(tt(vi-forward-char) (unbound) (space l) (ESC-[C))(
 Move forward one character.
 )
 tindex(vi-find-next-char)
@@ -357,7 +367,7 @@ item(tt(beginning-of-history))(
 Move to the first event in the history list.
 )
 tindex(down-line-or-history)
-item(tt(down-line-or-history) (^N ESC-[B) (j) (unbound))(
+item(tt(down-line-or-history) (^N ESC-[B) (j) (ESC-[B))(
 Move down a line in the buffer, or if already at the bottom line,
 move to the next event in the history list.
 )
@@ -546,7 +556,7 @@ item(tt(vi-rev-repeat-search) (unbound) (N) (unbound))(
 Repeat the last vi history search, but in reverse.
 )
 tindex(up-line-or-history)
-item(tt(up-line-or-history) (^P ESC-[A) (k) (unbound))(
+item(tt(up-line-or-history) (^P ESC-[A) (k) (ESC-[A))(
 Move up a line in the buffer, or if already at the top line,
 move to the previous event in the history list.
 )
