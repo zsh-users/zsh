@@ -29,7 +29,7 @@ fi
 # where data is coming from; also, it allows more predictable
 # behaviour in tcp_expect.
 if [[ -n $tprompt ]]; then
-  zgprintf -R -%s=$sess -%f=$read_fd -- $tprompt
+  zformat -f REPLY $tprompt "s:$sess" "f:$read_fd"
   # We will pass this back up.
   REPLY="$REPLY$*"
 else

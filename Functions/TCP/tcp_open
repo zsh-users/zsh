@@ -54,7 +54,8 @@ emulate -L zsh
 setopt extendedglob cbases
 
 zmodload -i zsh/net/tcp || return 1
-autoload -U zgprintf tcp_alias tcp_close tcp_command tcp_expect tcp_fd_handler
+zmodload -i zsh/zutil
+autoload -U tcp_alias tcp_close tcp_command tcp_expect tcp_fd_handler
 autoload -U tcp_log tcp_output tcp_proxy tcp_read tcp_rename tcp_send
 autoload -U tcp_sess tcp_spam tcp_talk tcp_wait
 

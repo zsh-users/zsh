@@ -495,24 +495,6 @@ files which are configured.
 The tt(-S) and tt(-F) options are used to pass in the session name and file
 descriptor for possible replacement in the prompt.
 )
-findex(zgprintf)
-item(tt(zgprintf) tt(-rPR -%)var(X)tt(=)var(subst) var(fmt) tt([) var(val) tt(... ]))(
-This function is used for performing tt(%)-replacement in prompts supplied
-to tt(tcp_output).  The var(fmt) string is printed to standard output.
-The option tt(-%)var(X)tt(=)var(subst) specifies that any occurrence
-of tt(%)var(X) in the var(fmt) string should be replaced by var(subst).
-These arguments may be repeated for arbitrary var(X).
-
-The option tt(-r) specifies that the normal tt(print) conventions are not
-to be used, as with the corresponding argument to the tt(print) builtin.
-
-The option tt(-R) specifies that the output is to be left in the parameter
-tt($REPLY) instead of being printed.
-
-The option tt(-P) specifies that unhandled tt(%)-escapes should be
-formatted by a call to tt(printf).  Each is assumed to consume exactly one
-additional var(val) argument.  This option is only minimally implemented.
-)
 enditem()
 
 texinode(TCP Parameters)(TCP Examples)(TCP Functions)(TCP Function System)
