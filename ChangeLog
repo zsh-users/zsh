@@ -1,5 +1,7 @@
 2003-04-04  Peter Stephenson  <pws@csr.com>
 
+	* unposted: Config/version.mk: version 4.1.1-test-1.
+
 	* 18433: INSTALL, README, Etc/CONTRIBUTORS, Etc/NEWS: information
 	for 4.1.1.
 
