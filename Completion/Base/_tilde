@@ -39,12 +39,12 @@ if [[ -prefix [-+] ]]; then
   _description d 'directory stack'
   compadd "$d[@]" -V dirs -S/ -ld lines -Q - "$list[@]" 
 else
+  _users "$@"
   if (( $# )); then
     d=( "$@" )
   else
-    _description d 'user or named directory'
+    _description d 'named directory'
   fi
-
-  compgen "$d[@]" -nu "$s[@]"
+  compgen "$d[@]" -n "$s[@]"
 fi
 

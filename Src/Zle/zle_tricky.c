@@ -4026,7 +4026,7 @@ addmatches(Cadata dat, char **argv)
     char **aign = NULL, **dparr = NULL, oaq = autoq, *oppre = dat->ppre;
     char *oqp = qipre, *oqs = qisuf, qc, **disp = NULL;
     int lpl, lsl, pl, sl, bpl, bsl, bppl = -1, bssl = -1;
-    int llpl = 0, llsl = 0, nm = mnum, gflags = 0;
+    int llpl = 0, llsl = 0, nm = mnum, gflags = 0, ohp = haspattern;
     int oisalt = 0, isalt, isexact, doadd, ois = instring, oib = inbackt;
     Cline lc = NULL;
     Cmatch cm;
@@ -4332,6 +4332,9 @@ addmatches(Cadata dat, char **argv)
     zsfree(qisuf);
     qipre = oqp;
     qisuf = oqs;
+
+    if (mnum == nm)
+	haspattern = ohp;
 
     return (mnum == nm);
 }
@@ -6258,6 +6261,7 @@ static void
 makecomplistflags(Compctl cc, char *s, int incmd, int compadd)
 {
     int t, sf1, sf2, ooffs, um = usemenu, delit, oaw, gflags;
+    int mn = mnum, ohp = haspattern;
     char *p, *sd = NULL, *tt, *s1, *s2, *os =  dupstring(s);
     struct cmlist ms;
 
@@ -7173,6 +7177,9 @@ makecomplistflags(Compctl cc, char *s, int incmd, int compadd)
     uremnode(ccstack, firstnode(ccstack));
     if (cc->matcher)
 	mstack = mstack->next;
+
+    if (mn == mnum)
+	haspattern = ohp;
 }
 
 /* Invalidate the completion list. */
