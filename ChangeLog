@@ -1,3 +1,7 @@
+2000-05-22  Oliver Kiddle  <opk@zsh.org>
+
+	* 11517: Completion/Core/_next_label: don't lose empty arguments
+
 2000-05-22  Peter Stephenson  <pws@cambridgesiliconradio.com>
 
 	* 11516: Completion/Core/compinstall: select=long-list can
