@@ -1,0 +1,30 @@
+#autoload
+
+# This should be used to complete parameter names if you need some of the
+# extra options of compadd. It completes only non-local parameters.
+
+# If you specify a -g option with a pattern, the pattern will be used to
+# restrict the type of parameters matched.
+
+local expl pattern fakes faked tmp
+
+pattern=(-g \*)
+zparseopts -D -K -E g:=pattern
+
+fakes=()
+faked=()
+if zstyle -a ":completion:${curcontext}:" fake-parameters tmp; then
+  for i in "$tmp[@]"; do
+    if [[ "$i" = *:* ]]; then
+      faked=( "$faked[@]" "$i" )
+    else
+      fakes=( "$fakes[@]" "$i" )
+    fi
+  done
+fi
+
+_wanted parameters expl parameter \
+    compadd "$@" -Q - \
+        "${(@k)parameters[(R)${pattern[2]}~*local*]}" \
+        "$fakes[@]" \
+        "${(@)${(@M)faked:#${~pattern[2]}}%%:*}"
