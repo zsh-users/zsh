@@ -6,21 +6,24 @@
 #
 
 _perldoc () {
-    _arguments -s \
-        '-h:help:' \
-        '(-q)-f:Perl built-in function:_perl_builtin_funcs:*:' \
-        '(-f)-q:Perl FAQ keyword:' \
-        '*:Perl pod pages:_perl_pods'
+  _arguments -s \
+    '-h:help:' \
+    '(-q)-f:Perl built-in function:_perl_builtin_funcs:*:' \
+    '(-f)-q:Perl FAQ keyword:' \
+    '*:Perl pod pages:_perl_pods'
 }
 
 _perl_pods () {
-    local nm="$compstate[nmatches]"
+  local nm="$compstate[nmatches]"
+  local expl
+  
+  _perl_modules
+  _perl_basepods
 
-   _perl_modules
-   _perl_basepods
-   _path_files -J 'Perl modules and .pods' -/ -g '*.(pod|pm)'
+  _description expl 'Perl modules and .pods'
+  _path_files "$expl[@]"  -/ -g '*.(pod|pm)'
 
-    [[ nm -ne "$compstate[nmatches]" ]]
+  [[ nm -ne "$compstate[nmatches]" ]]
 }
 
 _perldoc "$@"
