@@ -17,11 +17,11 @@ else
   [[ "$1" = - ]] && shift
 
   defs=( "$defs[@]"
-    'jobs:: _jobs'
     'builtins:builtin command:compadd - ${(@k)builtins}'
     'functions:shell function:compadd - ${(@k)functions}'
     'aliases:alias:compadd - ${(@k)aliases}'
     'reserved-words:reserved word:compadd - ${(@k)reswords}'
+    'jobs:: _jobs -t'
   )
 fi
 

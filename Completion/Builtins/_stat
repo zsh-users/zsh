@@ -1,19 +1,19 @@
 #compdef stat
 
-local expl
+local expl ret=1
 
 if [[ "$words[CURRENT-1]" = -[AH] ]]; then
   _arrays
 else
-  _tags options files || return 1
+  _tags files options || return 1
 
   while _tags; do
+    _requested files && _files && ret=0
     _requested options expl 'inode element' &&
         { ! zstyle -t ":completion${curcontext}:options" prefix-needed ||
-          [[ "$PREFIX[1]" = + ]] } &&
+          [[ "$PREFIX[1]" = + || ret -eq 1 ]] } &&
         compadd "$expl[@]" - +device +inode +mode +nlink +uid +gid +rdev \
                              +size +atime +mtime +ctime +blksize +block +link
     fi
-    _requested files && _files
   done
 fi

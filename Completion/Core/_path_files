@@ -4,7 +4,7 @@
 # to complete to `/usr/local/bin'.
 
 local linepath realpath donepath prepath testpath exppath
-local tmp1 tmp2 tmp3 tmp4 i orig pre suf tpre tsuf opre osuf cpre
+local tmp1 tmp2 tmp3 tmp4 i orig eorig pre suf tpre tsuf opre osuf cpre
 local pats haspats=no ignore group expl addpfx addsfx remsfx
 local nm=$compstate[nmatches] menu match matcher mopts atmp
 
@@ -108,6 +108,7 @@ suf="$SUFFIX"
 opre="$PREFIX"
 osuf="$SUFFIX"
 orig="${PREFIX}${SUFFIX}"
+eorig="$orig"
 
 [[ $compstate[insert] = (*menu|[0-9]*) || -n "$_comp_correct" ||
    ( $#compstate[pattern_match] -ne 0 &&
@@ -265,7 +266,11 @@ for prepath in "$prepaths[@]"; do
 	  if [[ "$tmp2[1]" = */* ]]; then
 	    tmp2=( "${(@)tmp2:h}" )
 	    compquote tmp2
-	    exppaths=( "$exppaths[@]" ${^tmp2}/${tpre}${tsuf} )
+	    if [[ "$tmp2" = */ ]]; then
+	      exppaths=( "$exppaths[@]" ${^tmp2}${tpre}${tsuf} )
+	    else
+	      exppaths=( "$exppaths[@]" ${^tmp2}/${tpre}${tsuf} )
+	    fi
           else
 	    exppaths=( "$exppaths[@]" ${tpre}${tsuf} )
 	  fi
@@ -453,7 +458,7 @@ done
 # expanded paths that are different from the string on the line, we add
 # them as possible matches.
 
-exppaths=( "${(@)exppaths:#$orig}" )
+exppaths=( "${(@)exppaths:#$eorig}" )
 
 if zstyle -t ":completion${curcontext}:paths" expand prefix &&
    [[ $#exppaths -gt 0 && nm -eq compstate[nmatches] ]]; then

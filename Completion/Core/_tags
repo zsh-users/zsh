@@ -4,7 +4,7 @@ if (( $# )); then
 
   # We have arguments: the tags supported in this context.
 
-  local curcontext="$curcontext" order
+  local curcontext="$curcontext" order tag nodef
 
   if [[ "$1" = -C?* ]]; then
     curcontext="${curcontext}:${1[3,-1]}"
@@ -38,9 +38,24 @@ if (( $# )); then
   _offered_tags=( "$_offered_tags[@]" "$@" )
   _last_tags=()
 
-  # Call the function that sorts the tags into sets.
+  # Sort the tags.
 
-  "${_sort_tags:-_sort_tags}" "$@"
+  if [[ -n "$_sort_tags" ]]; then
+    "$_sort_tags" "$@"
+  elif zstyle -a ":completion${curcontext}" tag-order order; then
+
+    for tag in $order; do
+      case $tag in
+      -)     nodef=yes;;
+      *\(\)) "${${tag%%[ 	]#\(\)}##[ 	]#}" "$@";;
+      ?*)    comptry ${=tag};;
+      esac
+    done
+
+    [[ -z "$nodef" ]] && comptry "$@"
+  else
+    comptry "$@"
+  fi
 
   # Return non-zero if at least one set of tags should be used.
 

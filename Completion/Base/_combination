@@ -21,7 +21,7 @@
 #  `_telnet' completes hosts as:
 #
 #    _combination my-accounts hosts-ports-users \
-#      ${options[-l]:+users=${options[-l]:q}} \
+#      ${opt_args[-l]:+users=${opt_args[-l]:q}} \
 #      hosts "$expl[@]"
 #
 #  This completes `host1', `host2', `mail-server', `news-server' and
@@ -31,7 +31,7 @@
 #  `_telnet' completes ports as:
 #
 #    _combination my-accounts hosts-ports-users \
-#      ${options[-l]:+users=${options[-l]:q}} \
+#      ${opt_args[-l]:+users=${opt_args[-l]:q}} \
 #      hosts="${line[2]:q}" \
 #      ports "$expl[@]"
 #

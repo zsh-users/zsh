@@ -4,7 +4,7 @@
 # for you or if there are too many of them, you may want to use
 # `compadd -qS/ - "$friends[@]"' or something like that.
 
-local expl suf dirs list lines revlines i ret disp
+local expl suf dirs list lines revlines i ret disp nm="$compstate[nmatches]"
 
 if [[ "$SUFFIX" = */* ]]; then
   ISUFFIX="/${SUFFIX#*/}$ISUFFIX"
@@ -23,7 +23,7 @@ while _tags; do
 
   if _requested -V directory-stack expl 'directory stack' &&
      { ! zstyle -t ":completion${curcontext}:directory-stack" prefix-needed ||
-       [[ "$PREFIX" = [-+]* ]] }; then
+       [[ "$PREFIX" = [-+]* || nm -eq compstate[nmatches] ]] }; then
     if zstyle -t ":completion${curcontext}:directory-stack" verbose; then
       integer i
 

@@ -39,7 +39,7 @@ elif _popd || [[ $PREFIX != (\~|/|./|../)* && $#cdpath -ne 0 ]]; then
   else
     _alternative \
         'local-directories:local directories:_path_files -/' \
-	'path-directories: directories in cdpath:_path_files -W \(${cdpath:#.}\) -/'
+	"path-directories: directories in cdpath:_path_files -W \\(${${(@)cdpath:#.}}\\) -/"
   fi
 else
   _path_files -/

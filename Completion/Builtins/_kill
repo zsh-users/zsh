@@ -2,5 +2,5 @@
 
 _alternative \
     'signals:: _signals -p' \
-    'jobs:: _jobs' \
-    'processes:: _pids'
+    'processes:: _pids' \
+    'jobs:: _jobs -t'

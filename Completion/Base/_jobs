@@ -1,11 +1,14 @@
 #autoload
 
-local expl disp jobs job jids pfx='%' desc
+local expl disp jobs job jids pfx='%' desc how
 
 _tags jobs || return 1
 
-zstyle -t ":completion${curcontext}:jobs" prefix-needed &&
-    [[ "$PREFIX" != %* ]] && return 1
+if [[ "$1" = -t ]]; then
+  zstyle -t ":completion${curcontext}:jobs" prefix-needed &&
+      [[ "$PREFIX" != %* || compstate[nmatches] -eq 0 ]] && return 1
+  shift
+fi
 zstyle -t ":completion${curcontext}:jobs" prefix-hidden && pfx=''
 zstyle -t ":completion${curcontext}:jobs" verbose       && desc=yes
 
@@ -31,8 +34,12 @@ if [[ -n "$desc" ]]; then
   done
 fi
 
-if zstyle -t ":completion${curcontext}:jobs" strings; then
-  local texts i text str tmp
+zstyle -s ":completion${curcontext}:jobs" numbers how
+
+if [[ "$how" = (yes|true|on|1) ]]; then
+  jobs=( "$jids[@]" )
+else
+  local texts i text str tmp num max=0
 
   # Find shortest unambiguous strings.
 
@@ -47,6 +54,7 @@ if zstyle -t ":completion${curcontext}:jobs" strings; then
       text=""
     fi
     tmp=( "${(@M)texts:#${str}*}" )
+    num=1
     while [[ -n "$text" && $#tmp -ge 2 ]]; do
       str="${str} ${text%% *}"
       if [[ "$text" = *\ * ]]; then
@@ -55,14 +63,19 @@ if zstyle -t ":completion${curcontext}:jobs" strings; then
         text=""
       fi
       tmp=( "${(@M)texts:#${str}*}" )
+      (( num++ ))
     done
+
+    [[ num -gt max ]] && max="$num"
 
     jobs=( "$jobs[@]" "$str" )
   done
 
-  [[ -n "$pfx" && -n "$desc" ]] && disp=( "${(@)disp#%}" )
-else
-  jobs=( "$jids[@]" )
+  if [[ "$how" = [0-9]## && max -gt how ]]; then
+    jobs=( "$jids[@]" )
+  else
+    [[ -z "$pfx" && -n "$desc" ]] && disp=( "${(@)disp#%}" )
+  fi
 fi
 
 if [[ -n "$desc" ]]; then
