@@ -1,3 +1,8 @@
+2000-12-06  Andrej Borsenkow <Andrej.Borsenkow@mow.siemens.ru>
+
+	* 13243: Makefile.in: we do not use Makefile in Completion and
+	Functions any more.
+
 2000-12-05  Clint Adams  <schizo@debian.org>
 
 	* 13242: Src/Modules/terminfo.c: better error-checking
