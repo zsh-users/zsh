@@ -1,0 +1,3 @@
+#compdef bunzip2 bzcat
+
+_files -g '*.bz2'

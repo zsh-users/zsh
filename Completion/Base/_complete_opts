@@ -1,0 +1,88 @@
+#autoload
+
+# Usage:
+#  _complete_opts H '' f '_files'
+
+emulate -L zsh
+setopt extendedglob
+
+local done=yes
+
+typeset -A option_pairs
+option_pairs=("$@")
+typeset -a no_arg with_arg opt_arg
+no_arg=($option_pairs[(I)?])
+opt_arg=($option_pairs[(I)?::]:s/:://)
+with_arg=($option_pairs[(I)?:]:s/:// $opt_arg)
+
+case "${#no_arg}-${#with_arg}" in
+  0-0)
+    if [[ x$PREFIX = x-* ]]; then
+      compadd -nQ - "$PREFIX$SUFFIX"
+    else
+      done=''
+    fi
+    ;;
+
+  0-*)
+    if [[ x$PREFIX = x- ]]; then
+      IPREFIX="$IPREFIX$PREFIX"
+      PREFIX=
+      compadd $with_arg
+    elif [[ x$PREFIX = x-[${(j::)with_arg}] ]]; then
+      IPREFIX="$IPREFIX$PREFIX"
+      PREFIX=
+      eval $option_pairs[$IPREFIX[-1]:]
+    elif [[ x$PREFIX = x-[${(j::)with_arg}]* ]]; then
+      local p="$PREFIX[1,(r)[${(j::)with_arg}]]"
+      IPREFIX="$IPREFIX$p"
+      PREFIX="$PREFIX[$#p + 1,-1]"
+      eval $option_pairs[$IPREFIX[-1]:]
+    elif [[ x$words[$CURRENT-1] = x-[${(j::)with_arg}] ]]; then
+      local p="$words[$CURRENT - 1]"
+      eval $option_pairs[$p[-1]:]
+    else
+      done=''
+    fi
+    ;;
+
+  *-0)
+    if [[ x$PREFIX = x-[${(j::)no_arg}]# ]]; then
+      IPREFIX="$IPREFIX$PREFIX"
+      PREFIX=
+      compadd $no_arg
+    else
+      done=''
+    fi
+    ;;
+
+  *-*)
+    if [[ x$PREFIX = x-[${(j::)no_arg}]# ]]; then
+      IPREFIX="$IPREFIX$PREFIX"
+      PREFIX=
+      compadd $no_arg
+      compadd $with_arg
+    elif [[ x$PREFIX = x-[${(j::)no_arg}]#[${(j::)with_arg}] ]]; then
+      IPREFIX="$IPREFIX$PREFIX"
+      PREFIX=
+      eval $option_pairs[$IPREFIX[-1]:]
+    elif [[ x$PREFIX = x-[${(j::)no_arg}]#[${(j::)with_arg}]* ]]; then
+      local p="$PREFIX[1,(r)[${(j::)with_arg}]]"
+      IPREFIX="$IPREFIX$p"
+      PREFIX="$PREFIX[$#p + 1,-1]"
+      eval $option_pairs[$IPREFIX[-1]:]
+    elif [[ x$words[$CURRENT-1] = x-[${(j::)no_arg}]#[${(j::)with_arg}] ]]; then
+      local p="$words[$CURRENT - 1]"
+      eval $option_pairs[$p[-1]:]
+    else
+      done=''
+    fi
+    ;;
+esac
+
+if [[ -z "$done" ]]; then
+  compadd - -${(k)^option_pairs:gs/://}
+  false
+else
+  true
+fi
