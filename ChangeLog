@@ -1,3 +1,12 @@
+2001-07-25  Sven Wischnowsky  <wischnow@zsh.org>
+
+	* 15477: Completion/Base/Utility/_describe, Doc/Zsh/compwid.yo,
+	Src/Zle/comp.h, Src/Zle/compcore.c, Src/Zle/complete.c,
+	Src/Zle/complist.c, Src/Zle/compresult.c, Src/Zle/computil.c:
+	make display for groups in _describe nicer; improve packing
+	with list_packed; leave space for type character (list_types)
+	only in groups with at least one file name
+
 2001-07-24  Sven Wischnowsky  <wischnow@zsh.org>
 
 	* 15470: Src/parse.c: remove nulargs in here strings

@@ -1394,7 +1394,7 @@ clprintm(Cmgroup g, Cmatch *mp, int mc, int ml, int lastc, int width,
 
     mlastm = m->gnum;
     if (m->disp && (m->flags & CMF_DISPLINE)) {
-	if (mselect >= 0) {
+	if (mselect >= 0 && !(m->flags & CMF_DUMMY)) {
 	    int mm = (mcols * ml), i;
 
 	    for (i = mcols; i--; ) {
@@ -1441,7 +1441,7 @@ clprintm(Cmgroup g, Cmatch *mp, int mc, int ml, int lastc, int width,
 	} else
 	    mx = mc * g->width;
 
-	if (mselect >= 0) {
+	if (mselect >= 0 && !(m->flags & CMF_DUMMY)) {
 	    int mm = mcols * ml, i;
 
 	    for (i = (width ? width : mcols); i--; ) {
@@ -1482,7 +1482,7 @@ clprintm(Cmgroup g, Cmatch *mp, int mc, int ml, int lastc, int width,
 	len = niceztrlen(m->disp ? m->disp : m->str);
 	mlprinted = len / columns;
 
-	if (isset(LISTTYPES) && buf) {
+	if ((g->flags & CGF_FILES) && buf) {
 	    if (m->gnum != mselect) {
 		zcoff();
 		zcputs(&mcolors, g->name, COL_TC);
@@ -1684,6 +1684,7 @@ domenuselect(Hookdef dummy, Chdata dat)
     noselect = 1;
     while ((menuacc &&
 	    !hasbrpsfx(*(minfo.cur), minfo.prebr, minfo.postbr)) ||
+	   ((*minfo.cur)->flags & CMF_DUMMY) ||
 	   (((*minfo.cur)->flags & (CMF_NOLIST | CMF_MULT)) &&
 	    (!(*minfo.cur)->str || !*(*minfo.cur)->str)))
 	do_menucmp(0);

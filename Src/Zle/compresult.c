@@ -1160,6 +1160,7 @@ do_menucmp(int lst)
 	}
     } while ((menuacc &&
 	      !hasbrpsfx(*(minfo.cur), minfo.prebr, minfo.postbr)) ||
+             ((*minfo.cur)->flags & CMF_DUMMY) ||
 	     (((*minfo.cur)->flags & (CMF_NOLIST | CMF_MULT)) &&
 	      (!(*minfo.cur)->str || !*(*minfo.cur)->str)));
     /* ... and insert it into the command line. */
@@ -1183,6 +1184,7 @@ reverse_menu(Hookdef dummy, void *dummy2)
 	    minfo.cur--;
     } while ((menuacc &&
 	      !hasbrpsfx(*(minfo.cur), minfo.prebr, minfo.postbr)) ||
+	     ((*minfo.cur)->flags & CMF_DUMMY) ||
 	     (((*minfo.cur)->flags & (CMF_NOLIST | CMF_MULT)) &&
 	      (!(*minfo.cur)->str || !*(*minfo.cur)->str)));
     metafy_line();
@@ -1378,7 +1380,7 @@ calclist(int showall)
     Cmgroup g;
     Cmatch *p, m;
     Cexpl *e;
-    int hidden = 0, nlist = 0, nlines = 0, add = 2 + isset(LISTTYPES);
+    int hidden = 0, nlist = 0, nlines = 0, add;
     int max = 0, i;
     VARARR(int, mlens, nmatches + 1);
 
@@ -1392,6 +1394,7 @@ calclist(int showall)
     for (g = amatches; g; g = g->next) {
 	char **pp = g->ylist;
 	int nl = 0, l, glong = 1, gshort = columns, ndisp = 0, totl = 0;
+        int hasf = 0;
 
 	g->flags |= CGF_PACKED | CGF_ROWS;
 
@@ -1437,6 +1440,8 @@ calclist(int showall)
 	    }
 	} else if (!onlyexpl) {
 	    for (p = g->matches; (m = *p); p++) {
+                if (m->flags & CMF_FILE)
+                    hasf = 1;
 		if (menuacc && !hasbrpsfx(m, minfo.prebr, minfo.postbr)) {
 		    m->flags |= CMF_HIDE;
 		    continue;
@@ -1496,6 +1501,11 @@ calclist(int showall)
 		e++;
 	    }
 	}
+        if (isset(LISTTYPES) && hasf) {
+            g->flags |= CGF_FILES;
+            add = 3;
+        } else
+            add = 2;
 	g->totl = totl + (ndisp * add);
 	g->dcount = ndisp;
 	g->width = glong + add;
@@ -1513,6 +1523,7 @@ calclist(int showall)
 	int *ws, tlines, tline, tcols, maxlen, nth, width, glines;
 
 	for (g = amatches; g; g = g->next) {
+            add = 2 + !!(g->flags & CGF_FILES);
 	    glines = 0;
 
 	    zfree(g->widths, 0);
@@ -1523,7 +1534,8 @@ calclist(int showall)
 		    if (g->cols) {
 			glines += (arrlen(pp) + g->cols - 1) / g->cols;
 			if (g->cols > 1)
-			    g->width += (max - (g->width * g->cols - add)) / g->cols;
+			    g->width += ((max - (g->width * g->cols - add)) /
+                                         g->cols);
 		    } else {
 			g->cols = 1;
 			g->width = 1;
@@ -1558,6 +1570,8 @@ calclist(int showall)
 	for (g = amatches; g; g = g->next) {
 	    if (!(g->flags & CGF_PACKED))
 		continue;
+
+            add = 2 + !!(g->flags & CGF_FILES);
 
 	    ws = g->widths = (int *) zalloc(columns * sizeof(int));
 	    memset(ws, 0, columns * sizeof(int));
@@ -1666,7 +1680,7 @@ calclist(int showall)
 	    } else if (g->width) {
 		if (g->flags & CGF_ROWS) {
 		    int addlen, count, tcol, maxlines = 0, llines, i;
-		    int beg = columns / g->shortest, end = g->cols;
+		    int beg = columns / g->shortest, end = g->cols, fe = 1;
 		    Cmatch *first;
 
 		    while (1) {
@@ -1677,7 +1691,8 @@ calclist(int showall)
 				 count = g->dcount;
 			     count > 0; count--) {
 			    m = *p;
-			    addlen = mlens[m->gnum] + add;
+			    addlen = (mlens[m->gnum] +
+                                      (tcol == tcols - 1 ? 0 : add));
 			    if (addlen > maxlen)
 				maxlen = addlen;
 			    for (i = tcols; i && *p; i--)
@@ -1706,15 +1721,21 @@ calclist(int showall)
 			    break;
 
 			if (beg == end) {
-			    beg--;
-			    end--;
+                            if (fe) {
+                                beg += 2;
+                                end += 2;
+                                fe = 0;
+                            } else {
+                                beg--;
+                                end--;
+                            }
 			} else if (width < columns) {
 			    if ((end = tcols) == beg - 1)
 				end++;
 			} else {
 			    if ((beg = tcols) - 1 == end)
 				end++;
-			}
+                        }
 		    }
 		    if (tcols > g->cols)
 			tlines = maxlines;
@@ -1723,7 +1744,7 @@ calclist(int showall)
 		    int smask = ((showall ? 0 : (CMF_NOLIST | CMF_MULT)) |
 				 CMF_HIDE);
 		    int beg = ((g->totl + columns) / columns);
-		    int end = g->lins;
+		    int end = g->lins, fe = 1;
 
 		    while (1) {
 			tlines = (beg + end) >> 1;
@@ -1755,8 +1776,14 @@ calclist(int showall)
 			    break;
 
 			if (beg == end) {
-			    beg++;
-			    end++;
+                            if (fe) {
+                                beg -= 2;
+                                end -= 2;
+                                fe = 0;
+                            } else {
+                                beg++;
+                                end++;
+                            }
 			} else if (width < columns) {
 			    if ((end = tlines) == beg + 1)
 				end--;
@@ -1783,6 +1810,7 @@ calclist(int showall)
 	    }
 	}
 	for (g = amatches; g; g = g->next) {
+            add = 2 + !!(g->flags & CGF_FILES);
 	    if (g->widths) {
 		int *p, a = (max - g->totl + add) / g->cols;
 
@@ -2152,7 +2180,7 @@ iprintm(Cmgroup g, Cmatch *mp, int mc, int ml, int lastc, int width,
 	nicezputs(m->str, shout);
 	len = niceztrlen(m->str);
 
-	if (isset(LISTTYPES) && buf) {
+	if ((g->flags & CGF_FILES) && buf) {
 	    putc(file_type(buf->st_mode), shout);
 	    len++;
 	}

@@ -435,6 +435,7 @@ bin_compadd(char *name, char **argv, char *ops, int func)
     dat.match = NULL;
     dat.flags = 0;
     dat.aflags = CAF_MATCH;
+    dat.dummies = 0;
 
     for (; *argv && **argv ==  '-'; argv++) {
 	if (!(*argv)[1]) {
@@ -564,6 +565,23 @@ bin_compadd(char *name, char **argv, char *ops, int func)
 		break;
 	    case 'l':
 		dat.flags |= CMF_DISPLINE;
+		break;
+	    case 'E':
+                if (p[1]) {
+                    dat.dummies = atoi(p + 1);
+                    p = "" - 1;
+                } else if (argv[1]) {
+                    argv++;
+                    dat.dummies = atoi(*argv);
+                    p = "" - 1;
+                } else {
+                    zwarnnam(name, "number expected after -%c", NULL, *p);
+                    return 1;
+                }
+                if (dat.dummies < 0) {
+                    zwarnnam(name, "invalid number: %d", NULL, dat.dummies);
+                    return 1;
+                }
 		break;
 	    case '-':
 		argv++;

@@ -441,6 +441,7 @@ xitem([ tt(-W) var(file-prefix) ] [ tt(-d) var(array) ])
 xitem([ tt(-J) var(name) ] [ tt(-V) var(name) ] [ tt(-X) var(explanation) ] [ tt(-x) var(message) ])
 xitem([ tt(-r) var(remove-chars) ] [ tt(-R) var(remove-func) ])
 xitem([ tt(-D) var(array) ] [ tt(-O) var(array) ] [ tt(-A) var(array) ])
+xitem([ tt(-E) var(number) ])
 item([ tt(-M) var(match-spec) ] [ tt(--) ] [ var(words) ... ])(
 
 This builtin command can be used to add matches directly and control
@@ -663,6 +664,17 @@ specify a string that should be displayed in the list for this special
 match.  If no string is given, it will be shown as a string containing 
 the strings that would be inserted for the other matches, truncated to 
 the width of the screen.
+)
+item(tt(-E))(
+This option adds var(number) empty matches after the var(words) have
+been added.  An empty match takes up space in completion listings but
+will never be inserted in the line and can't be selected with menu
+completion or menu selection.  This makes empty matches only useful to
+format completion lists and to make explanatory string be shown in
+completion lists (since empty matches can be given display strings
+with the tt(-d) option).  And because all but one empty string would
+otherwise be removed, this option implies the tt(-V) and tt(-1)
+options (even if an explicit tt(-J) option is given).
 )
 xitem(tt(-))
 item(tt(-)tt(-))(

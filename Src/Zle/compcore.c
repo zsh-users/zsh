@@ -1558,6 +1558,40 @@ get_data_arr(char *name, int keys)
     return ret;
 }
 
+static void
+addmatch(char *str, int flags, char ***dispp, int line)
+{
+    Cmatch cm = (Cmatch) zhalloc(sizeof(struct cmatch));
+    char **disp = *dispp;
+
+    memset(cm, 0, sizeof(struct cmatch));
+    cm->str = dupstring(str);
+    cm->flags = (flags |
+                 (complist ?
+                  ((strstr(complist, "packed") ? CMF_PACKED : 0) |
+                   (strstr(complist, "rows")   ? CMF_ROWS   : 0)) : 0));
+    if (disp) {
+        if (!*++disp)
+            disp = NULL;
+        if (disp)
+            cm->disp = dupstring(*disp);
+    } else if (line) {
+        cm->disp = dupstring("");
+        cm->flags |= CMF_DISPLINE;
+    }
+    mnum++;
+    ainfo->count++;
+    if (curexpl)
+        curexpl->count++;
+
+    addlinknode(matches, cm);
+
+    newmatches = 1;
+    mgroup->new = 1;
+
+    *dispp = disp;
+}
+
 /* This is used by compadd to add a couple of matches. The arguments are
  * the strings given via options. The last argument is the array with
  * the matches. */
@@ -1583,7 +1617,7 @@ addmatches(Cadata dat, char **argv)
     Brinfo bp, bpl = brbeg, obpl, bsl = brend, obsl;
     Heap oldheap;
 
-    if (!*argv && !(dat->aflags & CAF_ALL)) {
+    if (!*argv && !dat->dummies && !(dat->aflags & CAF_ALL)) {
 	SWITCHHEAPS(oldheap, compheap) {
 	    /* Select the group in which to store the matches. */
 	    gflags = (((dat->aflags & CAF_NOSORT ) ? CGF_NOSORT  : 0) |
@@ -1602,6 +1636,8 @@ addmatches(Cadata dat, char **argv)
 
 	return 1;
     }
+    if (dat->dummies)
+        dat->aflags = dat->aflags | CAF_NOSORT | CAF_UNIQALL;
     for (bp = brbeg; bp; bp = bp->next)
 	bp->curpos = ((dat->aflags & CAF_QUOTE) ? bp->pos : bp->qpos);
     for (bp = brend; bp; bp = bp->next)
@@ -2022,35 +2058,12 @@ addmatches(Cadata dat, char **argv)
 	if (dat->exp)
 	    addexpl();
 	if (!hasallmatch && (dat->aflags & CAF_ALL)) {
-	    Cmatch cm = (Cmatch) zhalloc(sizeof(struct cmatch));
-
-	    memset(cm, 0, sizeof(struct cmatch));
-	    cm->str = dupstring("<all>");
-	    cm->flags = (dat->flags | CMF_ALL |
-			 (complist ?
-			  ((strstr(complist, "packed") ? CMF_PACKED : 0) |
-			   (strstr(complist, "rows")   ? CMF_ROWS   : 0)) : 0));
-	    if (disp) {
-		if (!*++disp)
-		    disp = NULL;
-		if (disp)
-		    cm->disp = dupstring(*disp);
-	    } else {
-		cm->disp = dupstring("");
-		cm->flags |= CMF_DISPLINE;
-	    }
-	    mnum++;
-	    ainfo->count++;
-	    if (curexpl)
-		curexpl->count++;
-
-	    addlinknode(matches, cm);
-
-	    newmatches = 1;
-	    mgroup->new = 1;
-
+            addmatch("<all>", dat->flags | CMF_ALL, &disp, 1);
 	    hasallmatch = 1;
 	}
+        while (dat->dummies--)
+            addmatch("", dat->flags | CMF_DUMMY, &disp, 0);
+
     } SWITCHBACKHEAPS(oldheap);
 
     /* We switched back to the current heap, now restore the stack of

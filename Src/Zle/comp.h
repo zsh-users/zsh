@@ -85,6 +85,7 @@ struct cmgroup {
 #define CGF_UNIQCON 16		/* remove consecutive duplicates */
 #define CGF_PACKED  32		/* LIST_PACKED for this group */
 #define CGF_ROWS    64		/* LIST_ROWS_FIRST for this group */
+#define CGF_FILES   128		/* contains file names */
 
 /* This is the struct used to hold matches. */
 
@@ -125,6 +126,7 @@ struct cmatch {
 #define CMF_MULT     (1<<11)	/* string appears more than once */
 #define CMF_FMULT    (1<<12)	/* first of multiple equal strings */
 #define CMF_ALL      (1<<13)	/* a match representing all other matches */
+#define CMF_DUMMY    (1<<14)	/* unselectable dummy match */
 
 /* Stuff for completion matcher control. */
 
@@ -264,6 +266,7 @@ struct cadata {
     char *dpar;			/* array to delete non-matches in (-D) */
     char *disp;			/* array with display lists (-d) */
     char *mesg;			/* message to show unconditionally (-x) */
+    int dummies;               /* add that many dummy matches */
 };
 
 /* List data. */
