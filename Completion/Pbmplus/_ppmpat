@@ -1,0 +1,4 @@
+#compdef ppmpat
+
+_arguments -gingham{2,3} -g{2,3} -madras -tartan -poles -squig -camo -anticamo \
+           ':width:' ':height:'

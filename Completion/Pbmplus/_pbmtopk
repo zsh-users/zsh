@@ -1,0 +1,11 @@
+#compdef pbmtopk
+
+# This could be improved...
+
+_arguments '-s:design size:' '-C:coding scheme:' '-F:font family:' \
+           '-f:option file:_files' '-c:character number:' \
+           '-W:width:' '-H:height:' '-D:depth:' '-I:italic correction:' \
+           '-h:horizontal escapement:' '-v:vertical escapement:' \
+	   '-x:x offset:' '-y:y offset:' \
+           ':pk file:_files -g *.(#i)pk' ':tfm file:_files -g *.(#i)tfm' \
+	   '*:file: _pbm_file'

@@ -1,0 +1,4 @@
+#compdef giftopnm
+
+_arguments '-verbose' '-comments' '-image:image number:' \
+           ':file: _pbm_file'

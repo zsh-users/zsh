@@ -1,0 +1,3 @@
+#compdef pbmmake
+
+_arguments '-white' '-black' '-gray' ':width:' ':height:'

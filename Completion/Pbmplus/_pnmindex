@@ -1,0 +1,4 @@
+#compdef pnmindex
+
+_arguments '-size:image size:' '-across:images per row:' \
+           '-colors:number of colors:' '-black' '*:file: _pbm_file'

@@ -1,0 +1,3 @@
+#compdef pnmtosgi
+
+_arguments '-verbatim' '-rle' '-imagename:image name:' ':file: _pbm_file'

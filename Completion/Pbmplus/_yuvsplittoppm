@@ -1,0 +1,3 @@
+#compdef yuvsplittoppm
+
+_arguments ':base name:' ':width:' ':height:' '-ccir601'

@@ -1,0 +1,3 @@
+#compdef pnmcut
+
+_arguments ':x position:' ':y position:' ':width:' ':height:' ':file: _pbm_file'

@@ -1,0 +1,4 @@
+#compdef pnmhistmap
+
+_arguments '-black' '-white' '-max:maximum value:' '-verbose' \
+           ':file: _pbm_file'

@@ -1,0 +1,3 @@
+#compdef ppmtomap
+
+_arguments '-sort' '-square' ':file: _pbm_file'

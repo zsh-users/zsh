@@ -1,0 +1,5 @@
+#compdef pnmflip
+
+_arguments '-leftright' '-lr' '-topbottom' '-tb' '-transpose' '-xy' \
+           '-rotate90' '-r90' '-ccw' '-rotate270' '-r270' '-cw' \
+	   ':file: _pbm_file'

@@ -1,0 +1,3 @@
+#compdef pnmarith
+
+_arguments '-add' '-subtract' '-multiply' '*:file: _pbm_file'

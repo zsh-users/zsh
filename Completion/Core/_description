@@ -1,0 +1,22 @@
+#autoload
+
+local gropt=-J
+
+if [[ "$1" = -V ]]; then
+  gropt=-V
+  shift
+fi
+
+if [[ -n "$compconfig[group_matches]" ]]; then
+  if [[ -n "$compconfig[description_format]" ]]; then
+    eval "$1=($gropt ${(q)2} -X ${(q)compconfig[description_format]//\\%d/$2})"
+  else
+    eval "$1=($gropt ${(q)2})"
+  fi
+else
+  if [[ -n "$compconfig[description_format]" ]]; then
+    eval "$1=(-X ${(q)compconfig[description_format]//\\%d/$2})"
+  else
+    eval "$1=()"
+  fi
+fi

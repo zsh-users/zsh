@@ -1,0 +1,7 @@
+#compdef ppmdither
+
+_arguments '-dim:matrix size:' \
+           '-red:number of red shades:' \
+           '-green:number of green shades:' \
+           '-blue:number of blue shades:' \
+	   ':file: _pbm_file'

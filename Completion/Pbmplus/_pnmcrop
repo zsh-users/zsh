@@ -1,0 +1,3 @@
+#compdef pnmcrop
+
+_arguments '-white' '-black' ':file: _pbm_file'

@@ -1,0 +1,3 @@
+#compdef ppmdist
+
+_arguments '-intensity' '-frequency' ':file: _pbm_file'

@@ -1,0 +1,3 @@
+#compdef pnmconvol
+
+_arguments ':convolution file:_pbm_file' ':file: _pbm_file'

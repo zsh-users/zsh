@@ -1,0 +1,4 @@
+#compdef ppm3d
+
+_arguments ':left picture file:_pbm_file' ':right picture file:_pbm_file' \
+           ':horizontal offset:'

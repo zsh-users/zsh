@@ -1,0 +1,4 @@
+#compdef pnmtoddif
+
+_arguments '-resolution:horizontal resolution::vertical resolution:' \
+           ':file: _pbm_file' ':ddif file:_files -g *.(#i)ddif'

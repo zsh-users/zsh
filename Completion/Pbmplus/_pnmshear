@@ -1,0 +1,3 @@
+#compdef pnmshear
+
+_arguments '-noantialias' ':shearing angle:' ':file: _pbm_file'

@@ -1,0 +1,5 @@
+#compdef pgmnorm ppmnorm
+
+_arguments '-bpercent:black percentage:' '-bvalue:black pixel value:' \
+           '-wpercent:white percentage:' '-wvalue:white pixel value:' \
+	   ':file: _pbm_file'

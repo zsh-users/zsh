@@ -1,0 +1,9 @@
+#compdef ppmtopjxl
+
+_arguments '-nopack' '-gamma:gamma value:' '-presentation' '-dark' \
+           '-diffuse' '-cluster' '-dither' \
+	   '-xshift:x shift:' '-yshift:y shift:' \
+	   '-xscale:x scale factor:' '-yscale:y scale factor:' \
+	   '-xsize:width:'  '-width:width:' \
+	   '-ysize:height:' '-height:height:' \
+	   ':file: _pbm_file'
