@@ -656,4 +656,4 @@ _cvs_ignore_default=(
 
 # call real _cvs.
 
-_cvs "$@"
+[[ -o kshautoload ]] || _cvs "$@"
