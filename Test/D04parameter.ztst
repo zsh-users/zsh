@@ -146,6 +146,18 @@
 0:array ${...:/...}
 >expletive deleted boldly claws dogs expletive deleted fight
 
+  str1='a\string\with\backslashes'
+  str2='a/string/with/slashes'
+  print "${str1//\\/-}"
+  print ${str1//\\/-}
+  print "${str2//\//-}"
+  print ${str2//\//-}
+0:use of backslashes in //-substitutions
+>a-string-with-backslashes
+>a-string-with-backslashes
+>a-string-with-slashes
+>a-string-with-slashes
+
   str1='twocubed'
   array=(the number of protons in an oxygen nucleus)
   print $#str1 ${#str1} "$#str1 ${#str1}" $#array ${#array} "$#array ${#array}"
