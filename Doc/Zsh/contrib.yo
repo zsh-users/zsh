@@ -362,29 +362,141 @@ followed by an appropriate tt(bindkey) command to associate the function
 with a key sequence.  Suggested bindings are described below.
 
 startitem()
-tindex(bash-forward-word)
-tindex(bash-backward-word)
-tindex(bash-kill-word)
-tindex(bash-backward-kill-word)
-tindex(bash-transpose-words)
-tindex(bash-up-case-word)
-tindex(bash-down-case-word)
-xitem(tt(bash-forward-word), tt(bash-backward-word))
-xitem(tt(bash-kill-word), tt(bash-backward-kill-word))
-xitem(tt(bash-up-case-word), tt(bash-down-case-word))
-item(tt(bash-transpose-words))(
-These work similarly to the corresponding builtin zle functions without the
-`tt(bash-)' prefix, but a word is considered to consist of alphanumeric
-characters only.  If you wish to replace your existing bindings with these
-four widgets, the following is sufficient:
+item(bash-style word functions)(
+If you are looking for functions to implement moving over and editing
+words in the manner of bash, where only alphanumeric characters are
+considered word characters, you can use the functions described in
+the next section.  The following is sufficient:
 
-example(for widget in kill-word backward-kill-word \ 
-forward-word backward-word \ 
-up-case-word down-case-word \ 
-transpose-words; do 
-  autoload bash-$widget 
-  zle -N $widget bash-$widget
-done)
+example(autoload -U select-word-style
+select-word-style bash)
+
+)
+tindex(forward-word-match)
+tindex(backward-word-match)
+tindex(kill-word-match)
+tindex(backward-kill-word-match)
+tindex(transpose-words-match)
+tindex(capitalize-word-match)
+tindex(up-case-word-match)
+tindex(down-case-word-match)
+tindex(select-word-style)
+tindex(match-word-by-style)
+xitem(tt(forward-word-match), tt(backward-word-match))
+xitem(tt(kill-word-match), tt(backward-kill-word-match))
+xitem(tt(transpose-words-match), tt(capitalize-word-match))
+xitem(tt(up-case-word-match), tt(down-case-word-match))
+item(tt(select-word-style), tt(match-word-by-style))(
+The eight `tt(-match)' functions are drop-in replacements for the
+builtin widgets without the suffix.  By default they behave in a similar
+way.  However, by the use of styles and the function tt(select-word-style),
+the way words are matched can be altered.
+
+The simplest way of configuring the functions is to use
+tt(select-word-style), which can either be called as a normal function with
+the appropriate argument, or invoked as a user-defined widget that will
+prompt for the first character of the word style to be used.  The first
+time it is invoked, the eight tt(-match) functions will automatically
+replace the builtin versions, so they do not need to be loaded explicitly.
+
+The word styles available are as follows.  Only the first character
+is examined.
+
+startitem()
+item(tt(bash))(
+Word characters are alphanumeric characters only.
+)
+item(tt(normal))(
+As in normal shell operation:  word characters are alphanumeric characters
+plus any characters present in the string given by the parameter
+tt($WORDCHARS).
+)
+item(tt(shell))(
+Words are complete shell command arguments, possibly including complete
+quoted strings, or any tokens special to the shell.
+)
+item(tt(whitespace))(
+Words are any set of characters delimited by whitespace.
+)
+item(tt(default))(
+Restore the default settings; this is usually the same as `tt(normal)'.
+)
+enditem()
+
+More control can be obtained using the tt(zstyle) command, as described in
+ifzman(zmanref(zshmodules))\
+ifnzman(noderef(The zsh/zutil Module)).  Each style is looked up in the
+context tt(:zle:)var(widget) where var(widget) is the name of the
+user-defined widget, not the name of the function implementing it, so in
+the case of the definitions supplied by tt(select-word-style) the
+appropriate contexts are tt(:zle:forward-word), and so on.  The function
+tt(select-word-style) itself always defines styles for the context
+`tt(:zle:*)' which can be overridden by more specific (longer) patterns as
+well as explicit contexts.
+
+The style tt(word-style) specifies the rules to use.  This may have the
+following values.
+
+startitem()
+item(tt(normal))(
+Use the standard shell rules, i.e. alphanumerics and tt($WORDCHARS), unless
+overridden by the styles tt(word-chars) or tt(word-class).
+)
+item(tt(specified))(
+Similar to tt(normal), but em(only) the specified characters, and not also
+alphanumerics, are considered word characters.
+)
+item(tt(unspecified))(
+The negation of specified.  The given characters are those which will
+em(not) be considered part of a word.
+)
+item(tt(shell))(
+Words are obtained by using the syntactic rules for generating shell
+command arguments.  In addition, special tokens which are never command
+arguments such as `tt(())' are also treated as words.
+)
+item(tt(whitespace))(
+Words are whitespace-delimited strings of characters.
+)
+enditem()
+
+The first three of those styles usually use tt($WORDCHARS), but the value
+in the parameter can be overridden by the style tt(word-chars), which works
+in exactly the same way as tt($WORDCHARS).  In addition, the style
+tt(word-class) uses character class syntax to group characters and takes
+precedence over tt(word-chars) if both are set.  The tt(word-class) style
+does not include the surrounding brackets of the character class; for
+example, `tt(-:[:alnum:])' is a valid tt(word-class) to include all
+alphanumerics plus the characters `tt(-)' and `tt(:)'.  Be careful
+including `tt(])', `tt(^)' and `tt(-)' as these are special inside
+character classes.
+
+The final style is tt(skip-chars).  This is mostly useful for
+tt(transpose-words) and similar functions.  If set, it gives a count of
+characters starting at the cursor position which will not be considered
+part of the word and are treated as space, regardless of what they actually
+are.  For example, if
+
+example(zstyle ':zle:transpose-words' skip-chars 1)
+
+has been set, and tt(transpose-words-match) is called with the cursor on
+the var(X) of tt(foo)var(X)tt(bar), where var(X) can be any character, then
+the resulting expression is tt(bar)var(X)tt(foo).
+
+The word matching and all the handling of tt(zstyle) settings is actually
+implemented by the function tt(match-word-by-style).  This can be used to
+create new user-defined widgets.  The calling function should set the local
+parameter tt(curcontext) to tt(:zle:)var(widget), create the local
+parameter tt(matched_words) and call tt(match-word-by-style) with no
+arguments.  On return, tt(matched_words) will be set to an array with the
+elements: (1) the start of the line (2) the word before the cursor (3) any
+non-word characters between that word and the cursor (4) any non-word
+character at the cursor position plus any remaining non-word characters
+before the next word, including all characters specified by the
+tt(skip-chars) style, (5) the word at or following the cursor (6) any
+non-word characters following that word (7) the remainder of the line.  Any
+of the elements may be an empty string; the calling function should test
+for this to decide whether it can perform its function.
 )
 tindex(copy-earlier-word)
 item(tt(copy-earlier-word))(
@@ -600,6 +712,11 @@ editing buffer restored to its previous state.  If the read was aborted
 by a keyboard break (typically tt(^G)), the function returns status 1
 and tt($REPLY) is not set.  If an argument is supplied to the function
 it is taken as a prompt, otherwise `tt(? )' is used.
+
+One option is available: `tt(-k) var(num)' specifies that var(num)
+characters are to be read instead of a whole line.  The line editor is not
+invoked recursively in this case.  Note that unlike the tt(read) builtin
+var(num) must be given; there is no default.
 
 The name is a slight misnomer, as in fact the shell's own minibuffer is
 not used.  Hence it is still possible to call tt(executed-named-cmd) and

@@ -1,3 +1,19 @@
+2003-03-28  Peter Stephenson  <pws@csr.com>
+
+	* 18394: Doc/Zsh/contrib.yo,
+	Functions/Zle/backward-kill-word-match,
+	Functions/Zle/backward-word-match,
+	Functions/Zle/capitalize-word-match,
+	Functions/Zle/down-case-word-match,
+	Functions/Zle/forward-word-match, Functions/Zle/kill-word-match,
+	Functions/Zle/match-words-by-style,
+	Functions/Zle/read-from-minibuffer,
+	Functions/Zle/select-word-style,
+	Functions/Zle/transpose-words-match,
+	Functions/Zle/up-case-word-match: Replacement widgets for
+	word movement and editing, controlled by style and by
+	select-word-style widget/function.
+
 2003-03-26  Peter Stephenson  <pws@csr.com>
 
 	* 18392: Src/builtin.c: read with -p and -t options crashed

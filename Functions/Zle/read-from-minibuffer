@@ -1,3 +1,22 @@
+emulate -L zsh
+setopt extendedglob
+
+local opt keys
+integer stat
+
+while getopts "k:" opt; do
+    case $opt in
+	(k)
+	keys=$OPTARG
+	;;
+
+	(*)
+	return 1
+	;;
+    esac
+done
+(( OPTIND > 1 )) && shift $(( OPTIND - 1 ))
+
 local savelbuffer=$LBUFFER saverbuffer=$RBUFFER
 local savepredisplay=$PREDISPLAY savepostdisplay=$POSTDISPLAY
 
@@ -7,10 +26,15 @@ PREDISPLAY="$PREDISPLAY$savelbuffer$saverbuffer$POSTDISPLAY
 ${1:-? }"
 POSTDISPLAY=
 
-zle recursive-edit
-integer stat=$?
-
-(( stat )) || REPLY=$BUFFER
+if [[ -n $keys ]]; then
+    zle -R
+    read -k $keys
+    stat=$?
+else
+    zle recursive-edit
+    stat=$?
+    (( stat )) || REPLY=$BUFFER
+fi
 
 LBUFFER=$savelbuffer
 RBUFFER=$saverbuffer
