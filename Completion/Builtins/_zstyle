@@ -53,6 +53,8 @@ styles=(
   max-errors		 c:
   menu			 c:boolauto
   numbers		 c:bool
+  old-list		 c:bool 
+  old-menu		 c:bool 
   original		 c:bool
   packageset		 c:packageset
   path			 'c:_wanted directories expl directory _path_files -/'

@@ -1,3 +1,7 @@
+2000-05-17  Peter Stephenson  <pws@cambridgesiliconradio.com>
+
+	* pws: 11444: Completion/Builtins/_zstyle: add old-list and old-menu.
+
 2000-05-17  Tanaka Akira  <akr@zsh.org>
 
 	* 11441: Test/comptest, Test/53completion.ztst,
