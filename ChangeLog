@@ -1,3 +1,8 @@
+2001-09-13  Wayne Davison  <wayned@users.sourceforge.net>
+
+	* 15806: Src/builtin.c, Src/hist.c: Fixed "r" with an empty history
+	and the non-storing nature of "r" with HIST_NO_STORE.
+
 2001-09-12  Oliver Kiddle  <opk@zsh.org>
 
 	* 15792: Doc/Zsh/manual.yo, Doc/Zsh/metafaq.yo: update url
