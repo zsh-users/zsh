@@ -5,7 +5,7 @@ DISTFILES_SRC='
     index.yo intro.yo invoke.yo jobs.yo manual.yo metafaq.yo mod_cap.yo
     mod_clone.yo mod_compctl.yo mod_complete.yo mod_complist.yo
     mod_computil.yo mod_deltochar.yo mod_example.yo mod_files.yo
-    mod_mapfile.yo mod_mathfunc.yo mod_parameter.yo mod_sched.yo
+    mod_mapfile.yo mod_mathfunc.yo mod_parameter.yo mod_pcre.yo mod_sched.yo
     mod_stat.yo mod_termcap.yo mod_terminfo.yo mod_zftp.yo mod_zle.yo
     mod_zleparameter.yo mod_zutil.yo mod_zprof.yo mod_zpty.yo
     modules.yo modlist.yo modmenu.yo manmodmenu.yo

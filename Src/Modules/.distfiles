@@ -7,6 +7,7 @@ DISTFILES_SRC='
     mapfile.mdd mapfile.c
     mathfunc.mdd mathfunc.c
     parameter.mdd parameter.c
+    pcre.mdd pcre.c
     stat.mdd stat.c
     tcp.mdd tcp.c tcp.h
     termcap.mdd termcap.c
