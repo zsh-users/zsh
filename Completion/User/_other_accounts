@@ -1,4 +1,4 @@
-#compdef ytalk finger
+#compdef talk ntalk ytalk finger
 
 local expl nm="$compstate[nmatches]"
 local accounts_users_hosts

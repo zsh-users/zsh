@@ -1252,6 +1252,30 @@ An array holding the service names of ports to complete. If this is
 not set by the user, it will be set to a list of the service names
 from `tt(/etc/services)'.
 )
+item(tt(my_accounts))(
+This array is used for completion of usernames and hostnames for many
+commands, including the tt(ssh) and tt(rlogin) family. It should
+contain elements of the form `var(host)tt(:)var(user)', corresponding
+to the user's own accounts. These pairs will be used to complete names
+of hosts and usernames depending on the information already on the
+line, so that if, for example, the username is already typed, only
+those hostnames will be completed for which pairs with the username
+from the line exist.
+)
+item(tt(other_accounts))(
+Like tt(my_accounts), except that it should contain the usernames and
+hostnames of other people's accounts, for use with commands such as
+tt(talk), tt(ytalk) and tt(finger).
+)
+item(var(command)tt(_accounts))(
+Any of the commands which use the above tt(my_accounts) and
+tt(other_accounts) arrays can have this behaviour overridden by
+specifying a username/hostname array unique to that command.
+For example, if you wanted tt(rcp) to complete usernames and hostnames
+from a different set of accounts, you could set the array
+tt(rcp_accounts) with username/hostname pairs in the same format as
+tt(my_accounts).
+)
 item(tt(telnet_hosts_ports_users))(
 This array is used by the completion function for tt(telnet). It
 should contain elements of the form
