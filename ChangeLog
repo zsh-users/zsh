@@ -1,3 +1,8 @@
+2001-06-21  Sven Wischnowsky  <wischnow@zsh.org>
+
+	* 15029: Completion/Unix/Command/_man: improve pattern matching
+	to make match specs work for manual page completion
+
 2001-06-21  Bart Schaefer  <schaefer@zsh.org>
 
 	* 15023, 15027: Src/parse.c: Accept newlines before the "in"
