@@ -1,0 +1,112 @@
+#compdef lynx
+
+local curcontext="$curcontext" state line
+typeset -A opt_args
+
+_arguments -C \
+  '-accept_all_cookies' \
+  '-anonymous' \
+  '-assume_charset=:MIMENAME:' \
+  '-assume_local_charset=:MIMENAME:' \
+  '-assume_unrec_charset=:MIMENAME:' \
+  '-auth=:ID\:PW:' \
+  '-base' \
+  '-blink' \
+  '-book' \
+  '-buried_news' \
+  '-cache=:NUMBER:' \
+  '-case' \
+  '-cfg=:FILENAME:_files' \
+  '-child' \
+  '-color' \
+  '-cookies' \
+  '-core' \
+  '-crawl' \
+  '-display=:DISPLAY:_x_display' \
+  '-dump' \
+  '-editor=:EDITOR:_files' \
+  '-emacskeys' \
+  '-enable_scrollback' \
+  '-error_file=:FILENAME:_files' \
+  '-fileversions' \
+  '-force_html' \
+  '-force_secure' \
+  '-from' \
+  '-ftp' \
+  '-get_data' \
+  '-head' \
+  '-help' \
+  '-historical' \
+  '-homepage=:URL:->html' \
+  '-image_links' \
+  '-ismap' \
+  '-index=:URL:->html' \
+  '-link=:NUMBER:' \
+  '-localhost' \
+  '-locexec' \
+  '-mime_header' \
+  '-minimal' \
+  '-newschunksize=:NUMBER:' \
+  '-newsmaxchunk=:NUMBER:' \
+  '-nobrowse' \
+  '-nocc' \
+  '-nocolor' \
+  '-noexec' \
+  '-nofilereferer' \
+  '-nolist' \
+  '-nolog' \
+  '-nonrestarting_sigwinch' \
+  '-nopause' \
+  '-noprint' \
+  '-noredir' \
+  '-noreferer' \
+  '-nosocks' \
+  '-nostatus' \
+  '-number_links' \
+  '-partial' \
+  '-pauth=:ID\:PW:' \
+  '-popup' \
+  '-post_data' \
+  '-preparsed' \
+  '-print' \
+  '-pseudo_inlines' \
+  '-raw' \
+  '-realm' \
+  '-reload' \
+  '-restrictions=:options:->restrictions' \
+  '-resubmit_posts' \
+  '-rlogin' \
+  '-selective' \
+  '-show_cursor' \
+  '-soft_dquotes' \
+  '-source' \
+  '-startfile_ok' \
+  '-tagsoup' \
+  '-telnet' \
+  '-term=:TERM:' \
+  '-tlog' \
+  '-trace' \
+  '-traversal' \
+  '-underscore' \
+  '-useragent=:NAME:' \
+  '-use_mouse' \
+  '-validate' \
+  '-verbose' \
+  '-version' \
+  '-vikeys' \
+  '-width=:NUMBER:' \
+  ':url:->html' && return 0
+
+case "$state" in
+restrictions)
+  _values -s ',' 'restriction' \
+    all bookmark bookmark_exec change_exec_perms default dired_support \
+    disk_save dotfiles download editor exec exec_frozen externals file_url \
+    goto inside_ftp inside_news inside_rlogin inside_telnet jump mail \
+    multibook news_post options_save outside_ftp outside_news outside_rlogin \
+    outside_telnet print shell suspend telnet_port useragent
+  ;;
+html)
+  _files -g '*.html' || _urls
+  ;;
+esac
