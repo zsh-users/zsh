@@ -1,4 +1,183 @@
+2000-02-20  Peter Stephenson  <pws@pwstephenson.fsnet.co.uk>
+
+	* pws: Config/version.mk: 3.1.6-dev-19.
+
+	* Bart: 9794: Src/exec.c, Test/.distfiles, Test/51xtrace.ztst:
+	pick up some problems with 9792.
+
+2000-02-19  Peter Stephenson  <pws@pwstephenson.fsnet.co.uk>
+
+	* Bart: 9792: Src/builtin.c, Src/cond.c, Src/exec.c, Src/init.c,
+	Src/loop.c, Src/utils.c: `xtrerr' replaces stderr for output from
+	xtrace, to avoid problems with redirection.
+
+	* Sven: 9791: Completion/X/_x_arguments: complete filenames by
+	default.
+
+	* Sven: 9790: Completion/Builtins/_zstyle,
+	Completion/Core/.distfiles, Completion/Core/_message,
+	Completion/X/_x_borderwidth, Completion/X/_x_geometry,
+	Completion/X/_x_locale, Completion/X/_x_name,
+	Completion/X/_x_resource, Completion/X/_x_selection_timeout,
+	Completion/X/_x_title, Doc/Zsh/compsys.yo: arguments problem with
+	_x_geometry; matcher-list completed in zstyle.
+
+	* Sven: 9787: Completion/Core/_expand, Src/utils.c: parameter
+	expansion problems expanding; problem quoting in backquoted
+	expressions.
+
+	* Chmouel: 9784: Completion/User/_tar,
+	Completion/User/_tar_archive: obsolete -y option for bzip2 filter.
+
+	* Chmouel: 9781: Completion/Linux/_rpm: add --freshen.
+
+2000-02-17  Peter Stephenson  <pws@pwstephenson.fsnet.co.uk>
+
+	* Sven: 9777: Src/Zle/compctl.c, Src/Zle/zle_tricky.c, Src/exec.c,
+	Src/glob.c, Src/subst.c: yet more difficulties with completing
+	brace-expanded expressions.
+
+	* Sven: 9776: Completion/Core/_main_complete, Src/glob.c,
+	Src/params.c: substitution bugs: ${foo[1,1]...} was treated
+	incorrectly as a scalar rather than an array slice; extra
+	duplication required when performing replacement on parameter.
+
+	* Sven: 9775: Completion/Core/_path_files: extra array copy
+	required.
+
+	* Sven: 9774: Src/Zle/compresult.c: completion inserted some
+	incorrect strings.
+
+	* Sven: 9773: Completion/Core/_multi_parts,
+	Completion/User/_groups, Completion/User/_ports,
+	Completion/User/_users, Doc/Zsh/compsys.yo: remove some
+	unnecessary tags which are more logically expressed by an empty
+	tag field in the context.
+
+	* Sven: 9772: Completion/Core/_approximate,
+	Completion/Core/_description, Completion/Core/_expand,
+	Completion/Core/_list, Completion/Core/_main_complete,
+	Completion/Core/_match, Completion/Core/_menu,
+	Completion/Core/_oldlist, Completion/Core/_prefix,
+	Doc/Zsh/compsys.yo: matcher-list style replaces matcher;
+	_matcher completer is now defunct.
+
+	* Sven: 9770: Src/Zle/computil.c: bogus empty descriptions.
+
+	* Sven: 9768: Completion/Core/_path_files: completing empty
+	directories.
+
+2000-02-16  Peter Stephenson  <pws@pwstephenson.fsnet.co.uk>
+
+	* Oliver: 9761: Completion/Core/_expand: auto-removable suffixes.
+
+	* Oliver: 9752: Completion/Core/_expand: subst-globs-only style
+	bails out if no globs expanded.
+
+	* Sven: 9765: Completion/Core/_sep_parts: problems with separators
+	with metacharacters.
+
+	* Sven: 9764: Completion/Core/_multi_parts,
+	Completion/Core/_path_files, Doc/Zsh/compsys.yo: problems with
+	_oldlist in _multi_parts; new -i option to complete _multi_parts
+	bits in one go if possible.
+
+	* Sven: 9763: Src/subst.c: addition to 9757.
+
+	* Oliver: 9761: Completion/Core/_expand: handle suffix.
+
+	* Sven: 9759: Completion/Base/_default, Doc/Zsh/compsys.yo,
+	Src/Zle/comp.h, Src/Zle/compcore.c, Src/Zle/compctl.c,
+	Src/Zle/complete.c: use-compctl style to use existing compctls;
+	on by default if zsh/compctl is loaded; extra hook needed to allow
+	compctl to clear up if invoked via new completion.
+
+	* Sven: 9757: Src/subst.c: quoting with ${(e)...}.
+
+2000-02-15  Peter Stephenson  <pws@pwstephenson.fsnet.co.uk>
+
+	* pws: 9755: Completion/Core/_sep_parts: typo.
+
+	* Bart: 9750: Src/jobs.c, Src/signames2.awk,
+	Src/Modules/parameter.c: better handling for signals received by
+	shell which were not in the range found when configuring (e.g. if
+	OS was upgraded).
+
+	* Sven: 9749: Src/Zle/zle_tricky.c: completion in braces.
+
+	* Sven: 9746: Src/Zle/compctl.c: broken old-style completion.
+
+	* Sven: 9734: Doc/Zsh/compwid.yo: descriptions for matching.
+
+	* Sven: 9733: Completion/Core/_main_complete,
+	Completion/Core/_setup: can't set defaults ZLS_COLORS and
+	SELECTMIN inside completion functions, because they may already
+	have been set.
+
+	* Sven: 9732: Src/Zle/complist.c: bad test without
+	alwayslastprompt.
+
+	* Sven: 9731: Completion/Base/_arguments,
+	Completion/Base/_describe, Completion/Base/_jobs,
+	Completion/Base/_subscript, Completion/Base/_tilde,
+	Completion/Builtins/_pids, Completion/Builtins/_popd,
+	Completion/Builtins/_sched, Completion/Builtins/_signals,
+	Completion/Builtins/_stat, Completion/Core/_approximate,
+	Completion/Core/_files, Completion/Core/_main_complete,
+	Completion/Core/_normal, Completion/Core/_path_files,
+	Completion/Core/_setup, Completion/Core/_tags,
+	Completion/Core/compinit, Completion/Debian/_apt,
+	Completion/User/_lp, Completion/User/_socket, Doc/Zsh/compsys.yo,
+	Doc/Zsh/mod_zutil.yo, Src/Modules/zutil.c: Style defaults are now
+	hard-wired in, so all user styles take precedence without having
+	to delete existing patterns; _complete is now the default
+	completer in every context, including non-completion widgets.
+
+2000-02-14  Peter Stephenson  <pws@pwstephenson.fsnet.co.uk>
+
+	* Sven: 9722: Completion/Commands/_expand_word,
+	Src/Zle/compcore.c, Src/Zle/complist.c: last_prompt, expansion
+	problems.
+
+	* Sven: 9713: Completion/Base/_arguments, Src/Zle/computil.c: two
+	more arguments problems.
+
+	* Sven: 9711: Completion/Commands/_complete_help: number of colons
+	in context brought up to date.
+
+	* Sven: 9710: Completion/Core/_files, Completion/Core/_path_files,
+	Src/Modules/zutil.c: a few random bugs: sorting of styles, bad
+	directory completion, globbing problems.
+
+	* Zefram: 9709: Src/mkmodindex.sh: should be global subst in 9701.
+
+	* Sven: 9705: Src/exec.c: comment esprefork, esglob.
+
+	* Sven: 9704: Completion/Core/_path_files: incorrect parameter
+	name.
+
+2000-02-13  Peter Stephenson  <pws@pwstephenson.fsnet.co.uk>
+
+	* pws: 9701: INSTALL, configure.in, Config/defs.mk.in,
+	Src/Makefile.in, Src/mkmodindex.sh: allow --enable-omit-modules=foo,...
+	to omit a list of modules from compilation and installation.
+	
+	* Tanaka Akira: 9697: Completion/User/.distfiles,
+	Completion/User/_ps, Completion/User/_psutils: completion for all
+	psutils commands.
+
+	* Bart: 9694: Src/init.c: more portable attempt to force shell to
+	suspend if running interactively in background.
+
+	* Oliver: 9693: Src/params.c, Src/Zle/compcore.c,
+	Src/Zle/complete.c: AIX module exports.
+
 2000-02-11  Peter Stephenson  <pws@pwstephenson.fsnet.co.uk>
+
+	* Bart: 9684: Completion/User/_mailboxes: sort of help find
+	mailboxes with + prefix.
+
+	* Bart: 2913: Completion/User/_mutt: don't set muttrc.
 
 	* pws: Config/version.mk: 3.1.6-dev-18
 
