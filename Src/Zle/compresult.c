@@ -1717,8 +1717,11 @@ calclist(int showall)
                                 ws[tcol] = len;
                             }
                         }
-                        if (width < columns)
+                        if (width < columns) {
+                            if (++tcol < tcols)
+                                tcols = tcol;
                             break;
+                        }
                     }
 		}
 	    }

@@ -1,5 +1,8 @@
 2001-10-05  Sven Wischnowsky  <wischnow@zsh.org>
 
+	* 15946: Src/Zle/compresult.c: fix calculation of number of
+	columns needed with list_packed
+
 	* 15945: Completion/Zsh/Command/_cd: make _cd use only one call
 	to _alternative, including completions from _tilde (using the
 	named-directories tag)
