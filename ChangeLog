@@ -12,6 +12,9 @@
 
 2004-04-05  Peter Stephenson  <pws@csr.com>
 
+	* unposted, suggested by Wayne: Doc/Zsh/expn.yo:
+	make 19728 clearer.
+
 	* 19728: Doc/Zsh/expn.yo: explain that (^F) (from 19717)
 	doesn't mean `non-empty directories', you need (/^F) for that.
 
