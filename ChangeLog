@@ -1,3 +1,8 @@
+2003-04-08  Felix Rosencrantz <f_rosencrantz@yahoo.com>
+
+	* 18440: Src/Zle/complete.mdd: Add the cygwin completion functions
+	to the completion module.
+
 2003-04-07  Felix Rosencrantz <f_rosencrantz@yahoo.com>
 
 	* 18439: Completion/Cygwin/.distfiles,
