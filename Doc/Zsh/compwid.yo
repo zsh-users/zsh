@@ -158,6 +158,9 @@ item(tt(brace_parameter))(
 when completing the name of a parameter in a parameter expansion beginning
 with tt(${).
 )
+item(tt(assign_parameter))(
+when completing the name of a parameter in a parameter assignment.
+)
 item(tt(command))(
 when completing for a normal command (either in command position or for
 an argument of the command).

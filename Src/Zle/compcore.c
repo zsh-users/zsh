@@ -553,6 +553,8 @@ callcompfunc(char *s, char *fn)
 	compparameter = compredirect = "";
 	if (ispar)
 	    compcontext = (ispar == 2 ? "brace_parameter" : "parameter");
+        else if (linwhat == IN_PAR)
+            compcontext = "assign_parameter";
 	else if (linwhat == IN_MATH) {
 	    if (insubscr) {
 		compcontext = "subscript";

@@ -1318,6 +1318,8 @@ struct histent {
 #define IN_COND    3
 /* In a parameter assignment (e.g. `foo=bar'). */
 #define IN_ENV     4
+/* In a parameter name in an assignment. */
+#define IN_PAR     5
 
 
 /******************************/

@@ -1256,12 +1256,25 @@ get_comp_string(void)
 		insubscr = 2;
 	    else
 		insubscr = 1;
-	} else if (*s == '=' && cs > wb + (s - tt)) {
-	    s++;
-	    wb += s - tt;
-	    t0 = STRING;
-	    s = ztrdup(s);
-	    inwhat = IN_ENV;
+	} else if (*s == '=') {
+            if (cs > wb + (s - tt)) {
+                s++;
+                wb += s - tt;
+                s = ztrdup(s);
+                inwhat = IN_ENV;
+            } else {
+                char *p = s;
+
+                if (p[-1] == '+')
+                    p--;
+                sav = *p;
+                *p = '\0';
+                inwhat = IN_PAR;
+                s = ztrdup(tt);
+                *p = sav;
+                we = wb + p - tt;
+            }
+            t0 = STRING;
 	}
 	lincmd = 1;
     }

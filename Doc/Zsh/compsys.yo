@@ -2515,6 +2515,10 @@ item(tt(-brace-parameter-))(
 for completing the name of a parameter expansion within braces
 (`tt(${...})').
 )
+kindex(-assign-parameter-, completion context)
+item(tt(-assign-parameter-))(
+for completing the name of a parameter in an assignment.
+)
 kindex(-command-, completion context)
 item(tt(-command-))(
 for completing in a command position.
