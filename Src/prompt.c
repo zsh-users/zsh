@@ -38,7 +38,7 @@ unsigned txtattrmask;
 /* text change - attribute change made by prompts */
 
 /**/
-unsigned txtchange;
+mod_export unsigned txtchange;
 
 /* the command stack for use with %_ in prompts */
  
@@ -71,6 +71,10 @@ static int bufspc;
 
 static char *bp;
 
+/* Position of the start of the current line in the buffer */
+
+static char *bufline;
+
 /* bp1 is an auxilliary pointer into the buffer, which when non-NULL is *
  * moved whenever the buffer is reallocated.  It is used when data is   *
  * being temporarily held in the buffer.                                */
@@ -81,11 +85,9 @@ static char *bp1;
 
 static char *fm;
 
-/* Current truncation string (metafied), the length at which truncation *
- * occurs, and the direction in which it occurs.                        */
+/* Non-zero if truncating the current segment of the buffer. */
 
-static char *truncstr;
-static int trunclen, truncatleft;
+static int trunclen;
 
 /* Current level of nesting of %{ / %} sequences. */
 
@@ -95,9 +97,48 @@ static int dontcount;
 
 static char *rstring, *Rstring;
 
-/* If non-zero, Inpar, Outpar and Nularg can be added to the buffer. */
+/*
+ * Expand path p; maximum is npath segments where 0 means the whole path.
+ * If tilde is 1, try and find a named directory to use.
+ */
 
-static int nonsp;
+static void
+promptpath(char *p, int npath, int tilde)
+{
+    char *modp = p;
+    Nameddir nd;
+
+    if (tilde && ((nd = finddir(p))))
+	modp = tricat("~", nd->nam, p + strlen(nd->dir));
+
+    if (npath) {
+	char *sptr;
+	if (npath > 0) {
+	    for (sptr = modp + strlen(modp); sptr > modp; sptr--) {
+		if (*sptr == '/' && !--npath) {
+		    sptr++;
+		    break;
+		}
+	    }
+	    if (*sptr == '/' && sptr[1] && sptr != modp)
+		sptr++;
+	    stradd(sptr);
+	} else {
+	    char cbu;
+	    for (sptr = modp+1; *sptr; sptr++)
+		if (*sptr == '/' && !++npath)
+		    break;
+	    cbu = *sptr;
+	    *sptr = 0;
+	    stradd(modp);
+	    *sptr = cbu;
+	}
+    } else
+	stradd(modp);
+
+    if (p != modp)
+	zsfree(modp);
+}
 
 /* Perform prompt expansion on a string, putting the result in a *
  * permanently-allocated string.  If ns is non-zero, this string *
@@ -107,7 +148,7 @@ static int nonsp;
  * `glitch' space.                                               */
 
 /**/
-char *
+mod_export char *
 promptexpand(char *s, int ns, char *rs, char *Rs)
 {
     if(!s)
@@ -119,20 +160,18 @@ promptexpand(char *s, int ns, char *rs, char *Rs)
     if (isset(PROMPTSUBST)) {
 	int olderr = errflag;
 
-	HEAPALLOC {
-	    s = dupstring(s);
-	    if (!parsestr(s))
-		singsub(&s);
-	} LASTALLOC;
+	s = dupstring(s);
+	if (!parsestr(s))
+	    singsub(&s);
+
 	/* Ignore errors in prompt substitution */
 	errflag = olderr;
     }
 
     rstring = rs;
     Rstring = Rs;
-    nonsp = ns;
     fm = s;
-    bp = buf = zalloc(bufspc = 256);
+    bp = bufline = buf = zcalloc(bufspc = 256);
     bp1 = NULL;
     trunclen = 0;
     putpromptchar(1, '\0');
@@ -140,6 +179,17 @@ promptexpand(char *s, int ns, char *rs, char *Rs)
     if(dontcount)
 	*bp++ = Outpar;
     *bp = 0;
+    if (!ns) {
+	/* If zero, Inpar, Outpar and Nularg should be removed. */
+	for (bp = buf; *bp; ) {
+	    if (*bp == Meta)
+		bp += 2;
+	    else if (*bp == Inpar || *bp == Outpar || *bp == Nularg)
+		chuck(bp);
+	    else
+		bp++;
+	}
+    }
     return buf;
 }
 
@@ -160,14 +210,26 @@ putpromptchar(int doprint, int endchar)
     for (; *fm && *fm != endchar; fm++) {
 	arg = 0;
 	if (*fm == '%' && isset(PROMPTPERCENT)) {
-	    if (idigit(*++fm)) {
-		arg = zstrtol(fm, &fm, 10);
+	    int minus = 0;
+	    fm++;
+	    if (*fm == '-') {
+		minus = 1;
+		fm++;
 	    }
+	    if (idigit(*fm)) {
+		arg = zstrtol(fm, &fm, 10);
+		if (minus)
+		    arg *= -1;
+	    } else if (minus)
+		arg = -1;
 	    if (*fm == '(') {
-		int tc;
+		int tc, otrunclen;
 
 		if (idigit(*++fm)) {
 		    arg = zstrtol(fm, &fm, 10);
+		} else if (arg < 0) {
+		    /* negative numbers don't make sense here */
+		    arg *= -1;
 		}
 		test = 0;
 		ss = pwd;
@@ -224,6 +286,12 @@ putpromptchar(int doprint, int endchar)
 		    if (getegid() == arg)
 			test = 1;
 		    break;
+		case 'l':
+		    *bp = '\0';
+		    countprompt(bufline, &t0, 0, 0);
+		    if (t0 >= arg)
+			test = 1;
+		    break;
 		case 'L':
 		    if (shlvl >= arg)
 			test = 1;
@@ -249,10 +317,15 @@ putpromptchar(int doprint, int endchar)
 		if (!*fm || !(sep = *++fm))
 		    return 0;
 		fm++;
+		/* Don't do the current truncation until we get back */
+		otrunclen = trunclen;
+		trunclen = 0;
 		if (!putpromptchar(test == 1 && doprint, sep) || !*++fm ||
 		    !putpromptchar(test == 0 && doprint, ')')) {
+		    trunclen = otrunclen;
 		    return 0;
 		}
+		trunclen = otrunclen;
 		continue;
 	    }
 	    if (!doprint)
@@ -276,49 +349,21 @@ putpromptchar(int doprint, int endchar)
 		}
 	    switch (*fm) {
 	    case '~':
-		if ((nd = finddir(pwd))) {
-		    char *t = tricat("~", nd->nam, pwd + strlen(nd->dir));
-		    stradd(t);
-		    zsfree(t);
-		    break;
-		}
+		promptpath(pwd, arg, 1);
+		break;
 	    case 'd':
 	    case '/':
-		stradd(pwd);
+		promptpath(pwd, arg, 0);
 		break;
 	    case 'c':
 	    case '.':
-	        {
-		    char *t;
-
-		    if ((nd = finddir(pwd)))
-			t = tricat("~", nd->nam, pwd + strlen(nd->dir));
-		    else
-			t = ztrdup(pwd);
-		    if (!arg)
-			arg++;
-		    for (ss = t + strlen(t); ss > t; ss--)
-			if (*ss == '/' && !--arg) {
-			    ss++;
-			    break;
-			}
-		    if(*ss == '/' && ss[1] && ss != t)
-			ss++;
-		    stradd(ss);
-		    zsfree(t);
-		    break;
-		}
+		promptpath(pwd, arg ? arg : 1, 1);
+		break;
 	    case 'C':
-		if (!arg)
-		    arg++;
-		for (ss = pwd + strlen(pwd); ss > pwd; ss--)
-		    if (*ss == '/' && !--arg) {
-			ss++;
-			break;
-		    }
-		if (*ss == '/' && ss[1] && (ss != pwd))
-		    ss++;
-		stradd(ss);
+		promptpath(pwd, arg ? arg : 1, 0);
+		break;
+	    case 'N':
+		promptpath(scriptname ? scriptname : argzero, arg, 0);
 		break;
 	    case 'h':
 	    case '!':
@@ -332,13 +377,20 @@ putpromptchar(int doprint, int endchar)
 	    case 'm':
 		if (!arg)
 		    arg++;
-		for (ss = hostnam; *ss; ss++)
-		    if (*ss == '.' && !--arg)
-			break;
-		t0 = *ss;
-		*ss = '\0';
-		stradd(hostnam);
-		*ss = t0;
+		if (arg < 0) {
+		    for (ss = hostnam + strlen(hostnam); ss > hostnam; ss--)
+			if (ss[-1] == '.' && !++arg)
+			    break;
+		    stradd(ss);
+		} else {
+		    for (ss = hostnam; *ss; ss++)
+			if (*ss == '.' && !--arg)
+			    break;
+		    t0 = *ss;
+		    *ss = '\0';
+		    stradd(hostnam);
+		    *ss = t0;
+		}
 		break;
 	    case 'S':
 		txtchangeset(TXTSTANDOUT, TXTNOSTANDOUT);
@@ -377,72 +429,24 @@ putpromptchar(int doprint, int endchar)
 		tsetcap(TCUNDERLINEEND, 1);
 		break;
 	    case '[':
-                if (idigit(*++fm))
-                    trunclen = zstrtol(fm, &fm, 10);
-                else
-                    trunclen = arg;
-                if (trunclen) {
-		    truncatleft = *fm && *fm != ']' && *fm++ == '<';
-		    bp1 = bp;
-		    while (*fm && *fm != ']') {
-			if (*fm == '\\' && fm[1])
-			    ++fm;
-			addbufspc(1);
-			*bp++ = *fm++;
-		    }
-		    addbufspc(2);
-		    if (bp1 == bp)
-			*bp++ = '<';
-                    *bp = '\0';
-		    zsfree(truncstr);
-                    truncstr = ztrdup(bp = bp1);
-		    bp1 = NULL;
-                } else {
-		    while (*fm && *fm != ']') {
-			if (*fm == '\\' && fm[1])
-			    fm++;
-			fm++;
-		    }
-		}
-		if(!*fm)
-		    return 0;
+		if (idigit(*++fm))
+		    arg = zstrtol(fm, &fm, 10);
+		if (!prompttrunc(arg, ']', doprint, endchar))
+		    return *fm;
 		break;
 	    case '<':
 	    case '>':
-		if((trunclen = arg)) {
-		    char ch = *fm++;
-		    truncatleft = ch == '<';
-		    bp1 = bp;
-		    while (*fm && *fm != ch) {
-			if (*fm == '\\' && fm[1])
-			    ++fm;
-			addbufspc(1);
-			*bp++ = *fm++;
-		    }
-		    addbufspc(1);
-                    *bp = '\0';
-		    zsfree(truncstr);
-                    truncstr = ztrdup(bp = bp1);
-		    bp1 = NULL;
-		} else {
-		    char ch = *fm++;
-		    while(*fm && *fm != ch) {
-			if (*fm == '\\' && fm[1])
-			    fm++;
-			fm++;
-		    }
-		}
-		if(!*fm)
-		    return 0;
+		if (!prompttrunc(arg, *fm, doprint, endchar))
+		    return *fm;
 		break;
 	    case '{': /*}*/
-		if (!dontcount++ && nonsp) {
+		if (!dontcount++) {
 		    addbufspc(1);
 		    *bp++ = Inpar;
 		}
 		break;
 	    case /*{*/ '}':
-		if (dontcount && !--dontcount && nonsp) {
+		if (dontcount && !--dontcount) {
 		    addbufspc(1);
 		    *bp++ = Outpar;
 		}
@@ -535,6 +539,8 @@ putpromptchar(int doprint, int endchar)
 	    case 'v':
 		if (!arg)
 		    arg = 1;
+		else if (arg < 0)
+		    arg += arrlen(psvar) + 1;
 		if (arrlen(psvar) >= arg)
 		    stradd(psvar[arg - 1]);
 		break;
@@ -562,6 +568,11 @@ putpromptchar(int doprint, int endchar)
 		if(Rstring)
 		    stradd(Rstring);
 		break;
+	    case 'i':
+		addbufspc(DIGBUFSIZE);
+		sprintf(bp, "%ld", (long)lineno);
+		bp += strlen(bp);
+		break;
 	    case '\0':
 		return 0;
 	    case Meta:
@@ -569,7 +580,7 @@ putpromptchar(int doprint, int endchar)
 		break;
 	    }
 	} else if(*fm == '!' && isset(PROMPTBANG)) {
-	    if(doprint)
+	    if(doprint) {
 		if(fm[1] == '!') {
 		    fm++;
 		    addbufspc(1);
@@ -579,6 +590,7 @@ putpromptchar(int doprint, int endchar)
 		    sprintf(bp, "%d", curhist);
 		    bp += strlen(bp);
 		}
+	    }
 	} else {
 	    char c = *fm == Meta ? *++fm ^ 32 : *fm;
 
@@ -604,6 +616,8 @@ pputc(char c)
 	c ^= 32;
     }
     *bp++ = c;
+    if (c == '\n' && !dontcount)
+	bufline = bp;
 }
 
 /* Make sure there is room for `need' more characters in the buffer. */
@@ -627,52 +641,25 @@ addbufspc(int need)
 }
 
 /* stradd() adds a metafied string to the prompt, *
- * in a visible representation, doing truncation. */
+ * in a visible representation.                   */
 
 /**/
 void
 stradd(char *d)
 {
-    /* dlen is the full length of the string we want to add */
-    int dlen = niceztrlen(d);
-    char *ps, *pd, *pc, *t;
-    int tlen, maxlen;
-    addbufspc(dlen);
+    char *ps, *pc;
+    addbufspc(niceztrlen(d));
     /* This loop puts the nice representation of the string into the prompt *
-     * buffer.  It might be modified later.  Note that bp isn't changed.    */
-    for(ps=d, pd=bp; *ps; ps++)
+     * buffer.                                                              */
+    for(ps=d; *ps; ps++)
 	for(pc=nicechar(*ps == Meta ? STOUC(*++ps)^32 : STOUC(*ps)); *pc; pc++)
-	    *pd++ = *pc;
-    if(!trunclen || dlen <= trunclen) {
-	/* No truncation is needed, so update bp and return, *
-	 * leaving the full string in the prompt.            */
-	bp += dlen;
-	return;
-    }
-    /* We need to truncate.  t points to the truncation string -- which is *
-     * inserted literally, without nice representation.  tlen is its       *
-     * length, and maxlen is the amout of the main string that we want to  *
-     * keep.  Note that if the truncation string is longer than the        *
-     * truncation length (tlen > trunclen), the truncation string is used  *
-     * in full.                                                            */
-    addbufspc(tlen = ztrlen(t = truncstr));
-    maxlen = tlen < trunclen ? trunclen - tlen : 0;
-    if(truncatleft) {
-	memmove(bp + strlen(t), bp + dlen - maxlen, maxlen);
-	while(*t)
-	    *bp++ = *t++;
-	bp += maxlen;
-    } else {
-	bp += maxlen;
-	while(*t)
-	    *bp++ = *t++;
-    }
+	    *bp++ = *pc;
 }
 
 /* tsetcap(), among other things, can write a termcap string into the buffer. */
 
 /**/
-void
+mod_export void
 tsetcap(int cap, int flag)
 {
     if (!(termflags & TERM_SHORT) && tcstr[cap]) {
@@ -684,12 +671,12 @@ tsetcap(int cap, int flag)
 	    tputs(tcstr[cap], 1, putshout);
 	    break;
 	case 1:
-	    if (!dontcount && nonsp) {
+	    if (!dontcount) {
 		addbufspc(1);
 		*bp++ = Inpar;
 	    }
 	    tputs(tcstr[cap], 1, putstr);
-	    if (!dontcount && nonsp) {
+	    if (!dontcount) {
 		int glitch = 0;
 
 		if (cap == TCSTANDOUTBEG || cap == TCSTANDOUTEND)
@@ -729,15 +716,20 @@ putstr(int d)
 
 /* Count height etc. of a prompt string returned by promptexpand(). *
  * This depends on the current terminal width, and tabs and         *
- * newlines require nontrivial processing.                          */
+ * newlines require nontrivial processing.                          *
+ * Passing `overf' as -1 means to ignore columns (absolute width).  */
 
 /**/
-void
-countprompt(char *str, int *wp, int *hp)
+mod_export void
+countprompt(char *str, int *wp, int *hp, int overf)
 {
     int w = 0, h = 1;
     int s = 1;
     for(; *str; str++) {
+	if(w >= columns && overf >= 0) {
+	    w = 0;
+	    h++;
+	}
 	if(*str == Meta)
 	    str++;
 	if(*str == Inpar)
@@ -749,12 +741,15 @@ countprompt(char *str, int *wp, int *hp)
 	else if(s) {
 	    if(*str == '\t')
 		w = (w | 7) + 1;
-	    else if(*str == '\n')
-		w = columns;
-	    else
+	    else if(*str == '\n') {
+		w = 0;
+		h++;
+	    } else
 		w++;
 	}
-	if(w >= columns) {
+    }
+    if(w >= columns && overf >= 0) {
+	if (!overf || w > columns) {
 	    w = 0;
 	    h++;
 	}
@@ -763,4 +758,178 @@ countprompt(char *str, int *wp, int *hp)
 	*wp = w;
     if(hp)
 	*hp = h;
+}
+
+/**/
+static int
+prompttrunc(int arg, int truncchar, int doprint, int endchar)
+{
+    if (arg > 0) {
+	char ch = *fm, *ptr, *truncstr;
+	int truncatleft = ch == '<';
+	int w = bp - buf;
+
+	/*
+	 * If there is already a truncation active, return so that
+	 * can be finished, backing up so that the new truncation
+	 * can be started afterwards.
+	 */
+	if (trunclen) {
+	    while (*--fm != '%')
+		;
+	    fm--;
+	    return 0;
+	}
+
+	trunclen = arg;
+	if (*fm != ']')
+	    fm++;
+	while (*fm && *fm != truncchar) {
+	    if (*fm == '\\' && fm[1])
+		++fm;
+	    addbufspc(1);
+	    *bp++ = *fm++;
+	}
+	if (!*fm)
+	    return 0;
+	if (bp - buf == w && truncchar == ']') {
+	    addbufspc(1);
+	    *bp++ = '<';
+	}
+	ptr = buf + w;		/* addbufspc() may have realloc()'d buf */
+	truncstr = ztrduppfx(ptr, bp - ptr);
+
+	bp = ptr;
+	w = bp - buf;
+	fm++;
+	putpromptchar(doprint, endchar);
+	ptr = buf + w;		/* putpromptchar() may have realloc()'d */
+	*bp = '\0';
+
+	countprompt(ptr, &w, 0, -1);
+	if (w > trunclen) {
+	    /*
+	     * We need to truncate.  t points to the truncation string -- *
+	     * which is inserted literally, without nice representation.  *
+	     * tlen is its length, and maxlen is the amount of the main	  *
+	     * string that we want to keep.  Note that if the truncation  *
+	     * string is longer than the truncation length (tlen >	  *
+	     * trunclen), the truncation string is used in full.	  *
+	     */
+	    char *t = truncstr;
+	    int fullen = bp - ptr;
+	    int tlen = ztrlen(t), maxlen;
+	    maxlen = tlen < trunclen ? trunclen - tlen : 0;
+	    if (w < fullen) {
+		/* Invisible substrings, lots of shuffling. */
+		int n = strlen(t);
+		char *p = ptr, *q = buf;
+		addbufspc(n);
+		ptr = buf + (p - q); /* addbufspc() may have realloc()'d */
+
+		if (truncatleft) {
+		    p = ptr + n;
+		    q = p;
+
+		    n = fullen - w;
+
+		    /* Shift the whole string right, then *
+		     * selectively copy to the left.      */
+		    memmove(p, ptr, fullen);
+		    while (w > 0 || n > 0) {
+			if (*p == Inpar)
+			    do {
+				*q++ = *p;
+				--n;
+			    } while (*p++ != Outpar && *p && n);
+			else if (w) {
+			    if (--w < maxlen)
+				*q++ = *p;
+			    ++p;
+			}
+		    }
+		    bp = q;
+		} else {
+		    /* Truncate on the right, selectively */
+		    q = ptr + fullen;
+
+		    /* First skip over as much as will "fit". */
+		    while (w > 0 && maxlen > 0) {
+			if (*ptr == Inpar)
+			    while (*ptr++ != Outpar && *ptr) {;}
+			else
+			    ++ptr, --w, --maxlen;
+		    }
+		    if (ptr < q) {
+			/* We didn't reach the end of the string. *
+			 * In case there are more invisible bits, *
+			 * insert the truncstr and keep looking.  */
+			memmove(ptr + n, ptr, q - ptr);
+			q = ptr + n;
+			while (*t)
+			    *ptr++ = *t++;
+			while (*q) {
+			    if (*q == Inpar)
+				do {
+				    *ptr++ = *q;
+				} while (*q++ != Outpar && *q);
+			    else
+				++q;
+			}
+			bp = ptr;
+			*bp = 0;
+		    } else
+			bp = ptr + n;
+		}
+	    } else {
+		/* No invisible substrings. */
+		if (tlen > fullen) {
+		    addbufspc(tlen - fullen);
+		    ptr = bp;	/* addbufspc() may have realloc()'d buf */
+		    bp += tlen - fullen;
+		} else
+		    bp -= fullen - trunclen;
+		if (truncatleft) {
+		    if (maxlen)
+			memmove(ptr + strlen(t), ptr + fullen - maxlen,
+				maxlen);
+		} else
+		    ptr += maxlen;
+	    }
+	    /* Finally, copy the truncstr into place. */
+	    while (*t)
+		*ptr++ = *t++;
+	}
+	zsfree(truncstr);
+	trunclen = 0;
+	/*
+	 * We may have returned early from the previous putpromptchar *
+	 * because we found another truncation following this one.    *
+	 * In that case we need to do the rest now.                   *
+	 */
+	if (!*fm)
+	    return 0;
+	if (*fm != endchar) {
+	    fm++;
+	    /*
+	     * With trunclen set to zero, we always reach endchar *
+	     * (or the terminating NULL) this time round.         *
+	     */
+	    if (!putpromptchar(doprint, endchar))
+		return 0;
+	}
+	/* Now we have to trick it into matching endchar again */
+	fm--;
+    } else {
+	if (*fm != ']')
+	    fm++;
+	while(*fm && *fm != truncchar) {
+	    if (*fm == '\\' && fm[1])
+		fm++;
+	    fm++;
+	}
+	if (trunclen || !*fm)
+	    return 0;
+    }
+    return 1;
 }

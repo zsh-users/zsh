@@ -1,3 +1,9 @@
+2000-07-13  Peter Stephenson  <pws@cambridgesiliconradio.com>
+
+	* 12242: Fr. Br. George (George V Kouryachy) and pws:
+	Doc/Zsh/prompt.yo, Src/prompt.c: negative integers in prompt
+	escapes count from the other end of the appropriate string.
+
 2000-07-13  Sven Wischnowsky  <wischnow@zsh.org>
 
 	* 12241: Completion/Core/_main_complete, Src/Zle/computil.c: fix
