@@ -22,6 +22,8 @@ tmp="${${:-$PREFIX$SUFFIX}#[~=]}"
 
 _old_match_string="$PREFIX$SUFFIX$HISTNO"
 
+_tags matches original
+
 zstyle -s ":completion:${curcontext}:" match-original orig
 zstyle -s ":completion:${curcontext}:" insert-unambiguous ins
 
@@ -61,10 +63,19 @@ if (( ! ret )); then
 #        ins=yes compstate[insert]="$ocsi" compstate[pattern_insert]="$ocspi"
   fi
 
-  [[ "$ins" = (true|yes|on|1) &&
-     $#compstate[unambiguous] -ge ${#:-${PREFIX}${SUFFIX}} ]] && 
-      compstate[pattern_insert]=unambiguous
+  if [[ "$ins" = (true|yes|on|1) &&
+      $#compstate[unambiguous] -ge ${#:-${PREFIX}${SUFFIX}} ]]
+  then 
+    compstate[pattern_insert]=unambiguous
+  elif _requested original &&
+      { [[ compstate[nmatches] -gt 1 ]] ||
+	zstyle -t ":completion:${curcontext}:" original }; then
+    local expl
 
+    _description -V original expl original
+
+    compadd "$expl[@]" -U -Q - "$PREFIX$SUFFIX"
+  fi    
 fi
 
 return ret

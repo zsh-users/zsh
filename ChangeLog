@@ -1,5 +1,8 @@
 2002-04-04  Oliver Kiddle  <opk@zsh.org>
 
+	* 16911: Completion/Base/Completer/_match: add original string as
+	match with original style like in _approximate
+
 	* 16933; based on 16011 (Martin Ebourne) and 16906 (Bart):
 	Functions/Zle/up-line-or-beginning-search,
 	Functions/Zle/down-line-or-beginning-search:
