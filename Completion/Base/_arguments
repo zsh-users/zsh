@@ -525,6 +525,8 @@ if [[ -z "$def" || "$def" = :* ]]; then
   # We either don't have a description for an argument of an option
   # or we have a description for a optional argument.
 
+  opt=yes
+
   if [[ -z "$def" ]]; then
 
     # If we have none at all, use the one for this argument position.
@@ -535,6 +537,7 @@ if [[ -z "$def" || "$def" = :* ]]; then
       optbeg="$nargbeg"
       argbeg="$nargbeg"
       fromrest=yes
+      [[ "$def" = \*::* ]] && opt=''
     fi
   fi
 
@@ -542,8 +545,7 @@ if [[ -z "$def" || "$def" = :* ]]; then
   # be in a string that starts with an option name and continues with
   # the first argument, test that (again, two loops).
 
-  opt=yes
-  if (( $#dopts )); then
+  if [[ -n "$opt" && $#dopts -ne 0 ]]; then
 
     # Get the option names.
 
