@@ -43,6 +43,28 @@ The var(base)tt(#) may also be omitted, in which case
 base 10 is used.  For backwards compatibility the form
 `tt([)var(base)tt(])var(n)' is also accepted.
 
+It is also possible to specify a base to be used for output in the form
+`tt([#)var(base)tt(])', for example `tt([#16])'.  This is used when
+outputting arithmetical substitutions or when assigning to scalar
+parameters, but an explicitly defined integer or floating point parameter
+will not be affected.  If an integer variable is implicitly defined by an
+arithmetic expression, any base specified in this way will be set as the
+variable's output arithmetic base as if the option `tt(-i) var(base)' to
+the tt(typeset) builtin had been used.  The expression has no precedence
+and if it occurs more than once in a mathematical expression, the last
+encountered is used.  For clarity it is recommended that it appear at the
+beginning of an expression.  As an example:
+
+example(typeset -i 16 y
+print $(( [#8] x = 32, y = 32 ))
+print $x $y)
+
+outputs first `tt(8#40)', the rightmost value in the given output base, and
+then `tt(8#40 16#20)', because tt(y) has been explicitly declared to
+have output base 16, while tt(x) (assuming it does not already exist) is
+implicitly typed by the arithmetic evaluation, where it acquires the output
+base 8.
+
 Floating point constants are recognized by the presence of a decimal point
 or an exponent.  The decimal point may be the first character of the
 constant, but the exponent character tt(e) or tt(E) may not, as it will be

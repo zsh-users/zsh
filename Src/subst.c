@@ -1964,10 +1964,13 @@ arithsubst(char *a, char **bptr, char *rest)
 
     singsub(&a);
     v = matheval(a);
-    if (v.type & MN_FLOAT)
+    if ((v.type & MN_FLOAT) && !outputradix)
 	b = convfloat(v.u.d, 0, 0, NULL);
-    else
-	convbase(buf, v.u.l, 0);
+    else {
+	if (v.type & MN_FLOAT)
+	    v.u.l = (zlong) v.u.d;
+	convbase(buf, v.u.l, outputradix);
+    }
     t = *bptr = (char *) hcalloc(strlen(*bptr) + strlen(b) + 
 				 strlen(rest) + 1);
     t--;

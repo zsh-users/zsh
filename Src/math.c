@@ -186,6 +186,8 @@ static int type[TOKCOUNT] =
 /* 50 */  LR|OP_OPF, RL|OP_E2, LR|OP_OPF
 };
 
+/**/
+int outputradix;
 
 /**/
 static int
@@ -340,12 +342,22 @@ zzlex(void)
 	    return EOI;
 	case '[':
 	    {
-		int base = zstrtol(ptr, &ptr, 10);
+		int base, setradix = 0;
+		if (*ptr == '#') {
+		    ptr++;
+		    setradix = 1;
+		}
+		base = zstrtol(ptr, &ptr, 10);
 
 		if (*ptr == ']')
 		    ptr++;
-		yyval.u.l = zstrtol(ptr, &ptr, lastbase = base);
-		return NUM;
+		if (setradix)
+		    outputradix = base;
+		else {
+		    yyval.u.l = zstrtol(ptr, &ptr, lastbase = base);
+		    return NUM;
+		}
+		break;
 	    }
 	case ' ':
 	case '\t':
@@ -934,6 +946,7 @@ matheval(char *s)
     char *junk;
     mnumber x;
     int xmtok = mtok;
+    outputradix = 0;
 
     if (!*s) {
 	x.type = MN_INTEGER;

@@ -19,6 +19,7 @@ setopt extendedglob
 typeset _d_file _d_f _d_bks _d_line _d_als
 
 _d_file=${_comp_dumpfile-${0:h}/compinit.dump}.$HOST.$$
+[[ $_d_file = //* ]] && _d_file=${_d_file[2,-1]}
 
 typeset -U _d_files
 _d_files=( ${^~fpath:/.}/^([^_]*|*~|*.zwc)(N:t) )

@@ -1577,9 +1577,11 @@ setnumvalue(Value v, mnumber val)
     switch (PM_TYPE(v->pm->flags)) {
     case PM_SCALAR:
     case PM_ARRAY:
-	if (val.type & MN_INTEGER)
-	    convbase(p = buf, val.u.l, 0);
-	else
+	if ((val.type & MN_INTEGER) || outputradix) {
+	    if (!(val.type & MN_INTEGER))
+		val.u.l = (zlong) val.u.d;
+	    convbase(p = buf, val.u.l, outputradix);
+	} else
 	    p = convfloat(val.u.d, 0, 0, NULL);
 	setstrvalue(v, ztrdup(p));
 	break;
@@ -1909,9 +1911,10 @@ setnparam(char *s, mnumber val)
 	pm = createparam(t, (val.type & MN_INTEGER) ? PM_INTEGER
 			 : PM_FFLOAT);
 	DPUTS(!pm, "BUG: parameter not created");
-	if (val.type & MN_INTEGER)
+	if (val.type & MN_INTEGER) {
+	    pm->ct = outputradix;
 	    pm->u.val = val.u.l;
-	else
+	} else
 	    pm->u.dval = val.u.d;
 	return pm;
     }
