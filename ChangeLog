@@ -1,3 +1,7 @@
+2001-02-14  Clint Adams  <schizo@debian.org>
+
+	* 13323: Functions/Zle/edit-command-line: handle
+	multi-line buffers.
 
 2001-02-02  Andrej Borsenkow <Andrej.Borsenkow@mow.siemens.ru>
 
