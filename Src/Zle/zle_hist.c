@@ -252,7 +252,7 @@ acceptlineanddownhistory(char **args)
 
     if (!(he = movehistent(quietgethist(histline), 1, HIST_FOREIGN)))
 	return 1;
-    zpushnode(bufstack, ztrdup(ZLETEXT(he)));
+    zpushnode(bufstack, ztrdup(he->text));
     done = 1;
     stackhist = he->histnum;
     return 0;
@@ -720,7 +720,8 @@ doisearch(char **args, int dir)
 		    statusline = ibuf + NORM_PROMPT_POS;
 		    break;
 		}
-		if (!(he = movehistent(he, dir, hist_skip_flags))) {
+		if (!(zlereadflags & ZLRF_HISTORY)
+		 || !(he = movehistent(he, dir, hist_skip_flags))) {
 		    if (sbptr == (int)isrch_spots[top_spot-1].len
 		     && (isrch_spots[top_spot-1].flags & ISS_FAILING))
 			top_spot--;
@@ -891,23 +892,29 @@ doisearch(char **args, int dir)
 	kungetct = savekeys;
 }
 
+static Histent
+infernexthist(Histent he, char **args)
+{
+    for (he = movehistent(he, -2, HIST_FOREIGN);
+	 he; he = movehistent(he, -1, HIST_FOREIGN)) {
+	if (!metadiffer(he->text, (char *) line, ll))
+	    return movehistent(he, 1, HIST_FOREIGN);
+    }
+    return NULL;
+}
+
 /**/
 int
 acceptandinfernexthistory(char **args)
 {
     Histent he;
 
+    if (!(he = infernexthist(hist_ring, args)))
+	return 1;
+    zpushnode(bufstack, ztrdup(he->text));
     done = 1;
-    for (he = movehistent(quietgethist(histline), -2, HIST_FOREIGN);
-	 he; he = movehistent(he, -1, HIST_FOREIGN)) {
-	if (!metadiffer(ZLETEXT(he), (char *) line, ll)) {
-	    he = movehistent(he, 1, HIST_FOREIGN);
-	    zpushnode(bufstack, ztrdup(ZLETEXT(he)));
-	    stackhist = he->histnum;
-	    return 0;
-	}
-    }
-    return 1;
+    stackhist = he->histnum;
+    return 0;
 }
 
 /**/
@@ -916,15 +923,10 @@ infernexthistory(char **args)
 {
     Histent he;
 
-    for (he = movehistent(quietgethist(histline), -2, HIST_FOREIGN);
-	 he; he = movehistent(he, -1, HIST_FOREIGN)) {
-	if (!metadiffer(ZLETEXT(he), (char *) line, ll)) {
-	    he = movehistent(he, 1, HIST_FOREIGN);
-	    zle_setline(he);
-	    return 0;
-	}
-    }
-    return 1;
+    if (!(he = infernexthist(quietgethist(histline), args)))
+	return 1;
+    zle_setline(he);
+    return 0;
 }
 
 /**/
@@ -949,7 +951,7 @@ vifetchhistory(char **args)
 
 /* the last vi search */
 
-static char *visrchstr;
+static char *visrchstr, *vipenultsrchstr;
 static int visrchsense;
 
 /**/
@@ -961,8 +963,12 @@ getvisrchstr(void)
     Thingy cmd;
     char *okeymap = curkeymapname;
 
+    if (vipenultsrchstr) {
+	zsfree(vipenultsrchstr);
+    }
+
     if (visrchstr) {
-	zsfree(visrchstr);
+	vipenultsrchstr = visrchstr;
 	visrchstr = NULL;
     }
     clearlist = 1;
@@ -989,6 +995,10 @@ getvisrchstr(void)
 	    	cmd == Th(z_vicmdmode)) {
 	    sbuf[sptr] = 0;
 	    visrchstr = metafy(sbuf + 1, sptr - 1, META_DUP);
+	    if (!strlen(visrchstr)) {
+	        zsfree(visrchstr);
+		visrchstr = ztrdup(vipenultsrchstr);
+	    }
 	    ret = 1;
 	    sptr = 0;
 	} else if(cmd == Th(z_backwarddeletechar) ||
