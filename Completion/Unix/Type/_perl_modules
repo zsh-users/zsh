@@ -30,7 +30,7 @@ _perl_modules () {
       _perl_modules_caching_policy
   fi
 
-  local perl=${words[0]%doc} perl_modules
+  local perl=${words[1]%doc} perl_modules
   if whence $perl >/dev/null; then
     perl_modules=_${${perl//[^[:alnum:]]/_}#_}_modules
   elif (( ${+commands[perl]} )); then
