@@ -1,3 +1,9 @@
+2001-04-23  Clint Adams <schizo@debian.org>
+
+	* 14xxx: Doc/Zsh/mod_termcap.yo, Doc/Zsh/mod_terminfo.yo:
+	Document $termcap, change reference to termcap/terminfo
+	'strings' to 'values'.
+
 2001-04-23  Andrej Borsenkow <bor@zsh.org>
 
 	* 14077 : acconfig.h, aczsh.m4, configure.in, Config/defs.mk.in,

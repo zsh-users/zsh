@@ -5,9 +5,9 @@ The tt(zsh/terminfo) module makes available one builtin command:
 
 startitem()
 findex(echoti)
-cindex(terminfo string, printing)
+cindex(terminfo value, printing)
 item(tt(echoti) var(cap))(
-Output the terminfo string corresponding to the capability
+Output the terminfo value corresponding to the capability
 var(cap).
 )
 enditem()
