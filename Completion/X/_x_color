@@ -15,7 +15,7 @@ if (( ! $+_color_cache )); then
 
   # Cache of color names doesn't exist yet, create it.
 
-  zstyle -s ":completion${curcontext}:colors" path file
+  zstyle -s ":completion:${curcontext}:colors" path file
   if [[ -n "$file" ]]; then
     _color_cache=( "${(@)${(@f)$(< $file)}[2,-1]##*		}" )
   else

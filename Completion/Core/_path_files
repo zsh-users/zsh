@@ -82,7 +82,7 @@ while getopts "P:S:qr:R:W:F:J:V:X:f/g:M:12n" opt; do
 done
 
 if [[ -z "$_file_pat_checked" ]] &&
-   zstyle -s ":completion${curcontext}:files" file-patterns tmp1 &&
+   zstyle -s ":completion:${curcontext}:files" file-patterns tmp1 &&
    [[ -n "$tmp1" ]]; then
   if [[ "$tmp1" = '*(-/)' ]]; then
     gopt=''
@@ -126,7 +126,7 @@ if [[ "$sopt" = - ]]; then
   fi
 fi
 
-if zstyle -s ":completion${curcontext}:files" sort tmp1; then
+if zstyle -s ":completion:${curcontext}:files" sort tmp1; then
   case "$tmp1" in
   *size*)             sort=oL;;
   *links*)            sort=ol;;
@@ -159,7 +159,7 @@ fi
 
 # Skip over sequences of slashes.
 
-zstyle -t ":completion${curcontext}:paths" squeeze-slashes && skips=yes
+zstyle -t ":completion:${curcontext}:paths" squeeze-slashes && skips=yes
 
 # We get the prefix and the suffix from the line and save the whole
 # original string. Then we see if we will do menucompletion.
@@ -293,7 +293,7 @@ for prepath in "$prepaths[@]"; do
       [[ ! -o globdots && "$PREFIX" = .* ]] &&
           tmp2=( "$tmp2[@]" ${^tmp1}.*(-/) )
       if [[ -o globdots || "$PREFIX" = .* ]] &&
-         zstyle -s ":completion${curcontext}:paths" special-dirs atmp; then
+         zstyle -s ":completion:${curcontext}:paths" special-dirs atmp; then
 	if [[ "$atmp" = (yes|true|1|on) ]]; then
 	  tmp2=( "$tmp2[@]" . .. )
 	elif [[ "$atmp" = .. ]]; then
@@ -305,7 +305,7 @@ for prepath in "$prepaths[@]"; do
       [[ ! -o globdots && "$PREFIX" = .* ]] &&
           tmp2=( "$tmp2[@]" ${^tmp1}.${^~pats} )
       if (( $#tmp2 )) &&
-         zstyle -s ":completion${curcontext}:files" ignore-parents rem &&
+         zstyle -s ":completion:${curcontext}:files" ignore-parents rem &&
 	 [[ ( "$rem" != *dir* || "$pats" = '*(-/)' ) &&
 	    ( "$rem" != *..* || "$tmp1" = *../* ) ]]; then
         if [[ "$rem" = *parent* ]]; then
@@ -330,7 +330,7 @@ for prepath in "$prepaths[@]"; do
            expl=( "$expl[@]" -F _comp_ignore )
       fi
       if [[ "$sopt" = *[/f]* && ( -o globdots || "$PREFIX" = .* ) ]] &&
-	  zstyle -s ":completion${curcontext}:paths" special-dirs atmp; then
+	  zstyle -s ":completion:${curcontext}:paths" special-dirs atmp; then
 	if [[ "$atmp" = (yes|true|1|on) ]]; then
 	  tmp2=( "$tmp2[@]" . .. )
 	elif [[ "$atmp" = .. ]]; then
@@ -465,8 +465,8 @@ for prepath in "$prepaths[@]"; do
       compquote tmp1 tmp2
 
       if [[ -n $menu ]] ||
-         ! zstyle -t ":completion${curcontext}:paths" expand suffix; then
-        (( $#tmp4 )) && zstyle -t ":completion${curcontext}:paths" cursor &&
+         ! zstyle -t ":completion:${curcontext}:paths" expand suffix; then
+        (( $#tmp4 )) && zstyle -t ":completion:${curcontext}:paths" cursor &&
             compstate[to_end]=''
         if [[ "$tmp3" = */* ]]; then
 	  compadd -Qf "$mopts[@]" -p "$linepath$tmp2" -s "/${tmp3#*/}" \
@@ -555,7 +555,7 @@ done
 
 exppaths=( "${(@)exppaths:#$eorig}" )
 
-if zstyle -t ":completion${curcontext}:paths" expand prefix &&
+if zstyle -t ":completion:${curcontext}:paths" expand prefix &&
    [[ $#exppaths -gt 0 && nm -eq compstate[nmatches] ]]; then
   PREFIX="${opre}"
   SUFFIX="${osuf}"

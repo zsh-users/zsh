@@ -7,13 +7,12 @@
 # the expansions done produce no result or do not change the original
 # word from the line.
 
-local exp word="$PREFIX$SUFFIX" sort expr expl curcontext="${curcontext}"
-
-[[ "$curcontext" != :expand* ]] && curcontext="${curcontext}:expand"
+local exp word="$PREFIX$SUFFIX" sort expr expl
+local curcontext="${curcontext/:[^:]#:/:expand:}"
 
 # First, see if we should insert all *completions*.
 
-if zstyle -s ":completion${curcontext}:" completions expr &&
+if zstyle -s ":completion:${curcontext}:" completions expr &&
    [[ "${(e):-\$[$expr]}" -eq 1 ]]; then
   compstate[insert]=all
   return 1
@@ -30,7 +29,7 @@ exp=("$word")
 # First try substitution. That weird thing spanning multiple lines
 # changes quoted spaces, tabs, and newlines into spaces.
 
-zstyle -s ":completion${curcontext}:" substitute expr &&
+zstyle -s ":completion:${curcontext}:" substitute expr &&
     [[ "${(e):-\$[$expr]}" -eq 1 ]] &&
     exp=( "${(e)exp//\\[ 	
 ]/ }" )
@@ -41,7 +40,7 @@ zstyle -s ":completion${curcontext}:" substitute expr &&
 
 # Now try globbing.
 
-zstyle -s ":completion${curcontext}:" glob expr &&
+zstyle -s ":completion:${curcontext}:" glob expr &&
     [[ "${(e):-\$[$expr]}" -eq 1 ]] &&
     exp=( ${~exp}(N) )
 
@@ -53,7 +52,7 @@ zstyle -s ":completion${curcontext}:" glob expr &&
 
 # Now add as matches whatever the user requested.
 
-zstyle -s ":completion${curcontext}:" sort sort
+zstyle -s ":completion:${curcontext}:" sort sort
 
 [[ "$sort" = (yes|true|1|on) ]] && exp=( "${(@o)exp}" )
 

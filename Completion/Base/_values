@@ -20,7 +20,7 @@ if compvalues -i "$@"; then
 
     _tags values || return 1
 
-    curcontext="${oldcontext}:values"
+    curcontext="${oldcontext%:*}:values"
 
     compvalues -V noargs args opts
 
@@ -47,7 +47,7 @@ if compvalues -i "$@"; then
 	SUFFIX="$suffix"
         IPREFIX="${IPREFIX}${args[1]%%:*}="
 	compvalues -L "${args[1]%%:*}" descr action subc
-	curcontext="${oldcontext}:$subc"
+	curcontext="${oldcontext%:*}:$subc"
       fi
     else
       compvalues -d descr
@@ -68,7 +68,7 @@ if compvalues -i "$@"; then
     fi
   else
     compvalues -C subc
-    curcontext="${oldcontext}:$subc"
+    curcontext="${oldcontext%:*}:$subc"
   fi
 
   if ! _tags arguments; then
@@ -88,7 +88,7 @@ if compvalues -i "$@"; then
     compvalues -v val_args
     state="${${action[3,-1]##[ 	]#}%%[ 	]#}"
     if [[ -n "$usecc" ]]; then
-      curcontext="$subc"
+      curcontext="${oldcontext%:*}:$subc"
     else
       context="$subc"
     fi

@@ -7,10 +7,10 @@ if (( $# )); then
   local curcontext="$curcontext" order tag nodef
 
   if [[ "$1" = -C?* ]]; then
-    curcontext="${curcontext}:${1[3,-1]}"
+    curcontext="${curcontext%:*}:${1[3,-1]}"
     shift
   elif [[ "$1" = -C ]]; then
-    curcontext="${curcontext}:${2}"
+    curcontext="${curcontext%:*}:${2}"
     shift 2
   else
     targs=()
@@ -18,7 +18,7 @@ if (( $# )); then
 
   [[ "$1" = -(|-) ]] && shift
 
-  if zstyle -a ":completion${curcontext}" group-order order; then
+  if zstyle -a ":completion:${curcontext}:" group-order order; then
     local name
 
     for name in "$order[@]"; do
@@ -42,7 +42,7 @@ if (( $# )); then
 
   if [[ -n "$_sort_tags" ]]; then
     "$_sort_tags" "$@"
-  elif zstyle -a ":completion${curcontext}" tag-order order; then
+  elif zstyle -a ":completion:${curcontext}:" tag-order order; then
 
     for tag in $order; do
       case $tag in

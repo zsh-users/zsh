@@ -35,6 +35,8 @@ _failed_tags=()
 
 typeset -U _lastdescr
 
+[[ -z "$curcontext" ]] && curcontext=:::
+
 # Special completion contexts after `~' and `='.
 
 if compset -P 1 '='; then
@@ -55,7 +57,7 @@ _last_menu_style=()
 if (( ! $# )); then
   local tmp
 
-  zstyle -a ":completion${curcontext}:" completer tmp
+  zstyle -a ":completion:${curcontext}:" completer tmp
   set -- "$tmp[@]"
 fi
 
@@ -123,7 +125,7 @@ if (( $compstate[nmatches] )); then
   fi
 elif [[ compstate[matcher] -eq compstate[total_matchers] &&
         $#_lastdescr -ne 0 ]] &&
-     zstyle -s ":completion${curcontext}:warnings" format format; then
+     zstyle -s ":completion:${curcontext}:warnings" format format; then
   local str
 
   _lastdescr=( "\`${(@)^_lastdescr:#}'" )

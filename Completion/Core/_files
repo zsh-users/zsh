@@ -25,11 +25,11 @@ if [[ "$group[2]" = files ]]; then
   group=()
 fi
 
-if zstyle -s ":completion${curcontext}:all-files" file-patterns tmp &&
+if zstyle -s ":completion:${curcontext}:all-files" file-patterns tmp &&
    [[ -n "$tmp" ]]; then
   aopts=(-g "$tmp")
 fi
-if zstyle -s ":completion${curcontext}:directories" file-patterns tmp &&
+if zstyle -s ":completion:${curcontext}:directories" file-patterns tmp &&
    [[ -n "$tmp" ]]; then
   dopts=(-g "$tmp")
   if [[ "$type" = (*dir*glob*|*glob*dir*) ]]; then
@@ -38,7 +38,7 @@ if zstyle -s ":completion${curcontext}:directories" file-patterns tmp &&
     type="${type}dir"
   fi
 fi
-if zstyle -s ":completion${curcontext}:globbed-files" file-patterns tmp &&
+if zstyle -s ":completion:${curcontext}:globbed-files" file-patterns tmp &&
    [[ -n "$tmp" ]]; then
   gopts=(-g "$tmp")
   if [[ "$type" != (*dir*glob*|*glob*dir*) ]]; then
@@ -64,7 +64,7 @@ while _tags; do
       group[2]=all-files
       _setup all-files
       [[ -z "$hasign" ]] &&
-        zstyle -a ":completion${curcontext}:all-files" ignored-patterns _comp_ignore &&
+        zstyle -a ":completion:${curcontext}:all-files" ignored-patterns _comp_ignore &&
 	  ign=(-F _comp_ignore)
     fi
     _path_files "$opts[@]" "$ign[@]" "$aopts[@]"
@@ -75,7 +75,7 @@ while _tags; do
         group[2]=globbed-files
 	_setup globbed-files
         [[ -z "$hasign" ]] &&
-          zstyle -a ":completion${curcontext}:all-files" ignored-patterns _comp_ignore &&
+          zstyle -a ":completion:${curcontext}:all-files" ignored-patterns _comp_ignore &&
 	    ign=(-F _comp_ignore)
       fi
       _path_files "$opts[@]" "$ign[@]" "$dopts[@]" "$gopts[@]" && return 0
@@ -84,7 +84,7 @@ while _tags; do
         group[2]=directories
 	_setup directories
         [[ -z "$hasign" ]] &&
-          zstyle -a ":completion${curcontext}:all-files" ignored-patterns _comp_ignore &&
+          zstyle -a ":completion:${curcontext}:all-files" ignored-patterns _comp_ignore &&
 	    ign=(-F _comp_ignore)
       fi
       _path_files "$opts[@]" "$ign[@]" "$dopts[@]" && return 0
@@ -94,7 +94,7 @@ while _tags; do
       group[2]=globbed-files
       _setup globbed-files
       [[ -z "$hasign" ]] &&
-        zstyle -a ":completion${curcontext}:all-files" ignored-patterns _comp_ignore &&
+        zstyle -a ":completion:${curcontext}:all-files" ignored-patterns _comp_ignore &&
 	  ign=(-F _comp_ignore)
     fi
     if [[ "$type" = (*dir*glob*|*glob*dir*) ]]; then

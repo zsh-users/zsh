@@ -162,7 +162,7 @@ while [[ "$1" = -(O*|C) ]]; do
   esac
 done
 
-zstyle -s ":completion${curcontext}:options" auto-description autod
+zstyle -s ":completion:${curcontext}:options" auto-description autod
 
 if (( $# )) && comparguments -i "$autod" "$@"; then
   local nm="$compstate[nmatches]" action noargs aret expl local
@@ -172,7 +172,7 @@ if (( $# )) && comparguments -i "$autod" "$@"; then
 
   if comparguments -D descr action; then
     comparguments -C subc
-    curcontext="${oldcontext}:$subc"
+    curcontext="${oldcontext%:*}:$subc"
 
     if comparguments -O next direct odirect equal; then
       opts=yes
@@ -201,7 +201,7 @@ if (( $# )) && comparguments -i "$autod" "$@"; then
           comparguments -W line opt_args
           state="${${action[3,-1]##[ 	]#}%%[ 	]#}"
 	  if [[ -n "$usecc" ]]; then
-	    curcontext="${oldcontext}:$subc"
+	    curcontext="${oldcontext%:*}:$subc"
 	  else
 	    context="$subc"
 	  fi
@@ -259,7 +259,7 @@ if (( $# )) && comparguments -i "$autod" "$@"; then
       fi
 
       if [[ -z "$matched$mesg" ]] && _requested options &&
-          { ! zstyle -t ":completion${curcontext}:options" prefix-needed ||
+          { ! zstyle -t ":completion:${curcontext}:options" prefix-needed ||
             [[ "$origpre" = [-+]* ||
                ( -z "$aret$mesg" && nm -eq compstate[nmatches] ) ]] } ; then
 	local prevpre="$PREFIX" previpre="$IPREFIX"
@@ -320,7 +320,7 @@ if (( $# )) && comparguments -i "$autod" "$@"; then
 	matched=yes
 
 	comparguments -L "${equal[1]%%:*}" descr action subc
-	curcontext="${oldcontext}:$subc"
+	curcontext="${oldcontext%:*}:$subc"
 
 	_tags arguments
 

@@ -39,7 +39,7 @@ _deb_packages () {
     return
   }
 
-  zstyle -s ":completion${curcontext}" packageset pkgset
+  zstyle -s ":completion:${curcontext}:" packageset pkgset
 
   [[ "$pkgset" = (installed|uninstalled|avail|available) ]] || {
     pkgset="$command"

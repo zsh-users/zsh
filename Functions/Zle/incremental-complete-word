@@ -18,14 +18,17 @@ incremental-complete-word() {
 
   local key lbuf="$LBUFFER" rbuf="$RBUFFER" pmpt pstr word
   local lastl lastr wid twid num alt post toolong
-  local curcontext="${curcontext}:incremental" stop brk
+  local curcontext="${curcontext}" stop brk
 
-  zstyle -s ":completion${curcontext}" prompt pmpt ||
+  [[ -z "$curcontext" ]] && curcontext=:::
+  curcontext="${curcontext#*:}incremental:"
+
+  zstyle -s ":completion:${curcontext}" prompt pmpt ||
     pmpt='incremental (%c): %u%s  %l'
-  zstyle -s ":completion${curcontext}" stop stop
-  zstyle -s ":completion${curcontext}" break brk
+  zstyle -s ":completion:${curcontext}" stop stop
+  zstyle -s ":completion:${curcontext}" break brk
 
-  if zstyle -t ":completion${curcontext}" list; then
+  if zstyle -t ":completion:${curcontext}" list; then
     wid=list-choices
     post=( icw-list-helper )
   else

@@ -6,15 +6,15 @@ comptry options
 case "$curcontext" in
 # Some silly examples commented out:
 #
-# *::*p[bgpn]m:*)           # change the order for file-completion
+# *:*:*:*p[bgpn]m:*)           # change the order for file-completion
 #   comptry globbed-files directories
 #   comptry all-files
 #   ;;
-# *::dvips::-o*)            # automatic context set by _arguments
+# *:*:*:dvips:-o*)            # automatic context set by _arguments
 #   comptry all-files
 #   return
 #   ;;
-# *::kill:*)
+# *:*:*:kill:*)
 #   comptry processes
 #   return                  # this return ensures that we use only processes
 #   ;;

@@ -4,11 +4,11 @@
 # insert possible completions only after the list has been shown at
 # least once.
 
-local pre suf curcontext="${curcontext}:list" expr
+local pre suf expr curcontext="${curcontext/:[^:]#:/:list:}"
 
 # Get the strings to compare.
 
-if zstyle -t ":completion${curcontext}:" word; then
+if zstyle -t ":completion:${curcontext}:" word; then
   pre="$HISTNO$LBUFFER"
   suf="$RBUFFER"
 else
@@ -18,7 +18,7 @@ fi
 
 # Should we only show a list now?
 
-zstyle -s ":completion${curcontext}:" condition expr
+zstyle -s ":completion:${curcontext}:" condition expr
 if [[ ( -z "$expr" || "${(e):-\$[$expr]}" -eq 1 ) &&
       ( "$pre" != "$_list_prefix" || "$suf" != "$_list_suffix" ) ]]; then
 

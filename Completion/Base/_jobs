@@ -5,12 +5,12 @@ local expl disp jobs job jids pfx='%' desc how
 _tags jobs || return 1
 
 if [[ "$1" = -t ]]; then
-  zstyle -t ":completion${curcontext}:jobs" prefix-needed &&
+  zstyle -t ":completion:${curcontext}:jobs" prefix-needed &&
       [[ "$PREFIX" != %* && compstate[nmatches] -ne 0 ]] && return 1
   shift
 fi
-zstyle -t ":completion${curcontext}:jobs" prefix-hidden && pfx=''
-zstyle -t ":completion${curcontext}:jobs" verbose       && desc=yes
+zstyle -t ":completion:${curcontext}:jobs" prefix-hidden && pfx=''
+zstyle -t ":completion:${curcontext}:jobs" verbose       && desc=yes
 
 if [[ "$1" = -r ]]; then
   jids=( "${(@k)jobstates[(R)running*]}" )
@@ -34,7 +34,7 @@ if [[ -n "$desc" ]]; then
   done
 fi
 
-zstyle -s ":completion${curcontext}:jobs" numbers how
+zstyle -s ":completion:${curcontext}:jobs" numbers how
 
 if [[ "$how" = (yes|true|on|1) ]]; then
   jobs=( "$jids[@]" )

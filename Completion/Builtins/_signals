@@ -22,11 +22,11 @@ done
 
 if _wanted signals expl signal &&
        { [[ -z "$minus" ]] ||
-         ! zstyle -t ":completion${curcontext}:signals" prefix-needed ||
+         ! zstyle -t ":completion:${curcontext}:signals" prefix-needed ||
          [[ "$PREFIX" = -* ]] } ; then
   local disp tmp
 
-  if zstyle -t ":completion${curcontext}:signals" prefix-hidden; then
+  if zstyle -t ":completion:${curcontext}:signals" prefix-hidden; then
     tmp=( "${(@)signals[1,last]}" )
     disp=(-d tmp)
   else

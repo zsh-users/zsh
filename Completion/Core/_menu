@@ -1,12 +1,12 @@
 #autoload
 
-local curcontext="${curcontext}:menu"
+local curcontext="${curcontext/:[^:]#:/:menu:}"
 
 # This completer is an example showing how menucompletion can be
 # implemented with the new completion system.
 # Use this one before the normal _complete completer, as in:
 #
-#   zstyle ":completion:*" completer _menu _complete
+#   zstyle ":completion:::::" completer _menu _complete
 
 if [[ -n "$compstate[old_list]" ]]; then
 

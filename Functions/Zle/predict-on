@@ -53,7 +53,10 @@ insert-and-predict () {
 	  unsetopt automenu recexact
 	  integer curs=$CURSOR pos nchar=${#LBUFFER//[^${KEYS[-1]}]}
 	  local -a +h comppostfuncs
-	  local crs curcontext="${curcontext}:predict"
+	  local crs curcontext="${curcontext}"
+
+          [[ -z "$curcontext" ]] && curcontext=:::
+          curcontext="${curcontext#*:}predict:"
 
 	  comppostfuncs=( predict-limit-list )
 	  zle complete-word
@@ -61,7 +64,7 @@ insert-and-predict () {
 	  # get out of that `case'.
 	  repeat 1
 	  do
-	    zstyle -s ":completion${curcontext}" cursor crs
+	    zstyle -s ":completion:${curcontext}" cursor crs
 	    case $crs in
 	    (complete)
 	      # At the place where the completion left it, if it is after
@@ -119,7 +122,7 @@ predict-limit-list() {
   then
     compstate[list]=''
     compstate[force_list]=yes
-  elif zstyle -t ":completion:predict${curcontext}" list always
+  elif zstyle -t ":completion:predict::::" list always
   then
     compstate[force_list]=yes
   fi

@@ -9,7 +9,7 @@ local curcontext="$curcontext" state line expl
 typeset -A opt_args
 
 [[ $CURRENT -eq 2 ]] && _wanted options expl option &&
-    { ! zstyle -t ":completion${curcontext}:options" prefix-needed ||
+    { ! zstyle -t ":completion:${curcontext}:options" prefix-needed ||
       [[ "$PREFIX" = -* ]] } &&
     compadd -M 'r:|[_-]=* r:|=*' "$expl[@]" - -version
 

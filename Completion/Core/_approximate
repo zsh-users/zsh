@@ -16,11 +16,12 @@ local curcontext="${curcontext}" oldcontext
 
 [[ "${#:-$PREFIX$SUFFIX}" -le 1 ]] && return 1
 
-[[ "$curcontext" != *:correct* ]] && curcontext="${curcontext}:approximate"
+[[ "$curcontext" != [^:]#:correct:* ]] &&
+    curcontext="${curcontext/:[^:]#:/:approximate:}"
 
 oldcontext="$curcontext"
 
-zstyle -s ":completion${curcontext}:" max-errors cfgacc
+zstyle -s ":completion:${curcontext}:" max-errors cfgacc
 
 # Get the number of errors to accept.
 
@@ -73,18 +74,18 @@ compstate[matcher]=-1
 [[ -z "$compstate[pattern_match]" ]] && compstate[pattern_match]='*'
 
 while [[ _comp_correct -le comax ]]; do
-  curcontext="${oldcontext}:$_comp_correct"
+  curcontext="${oldcontext/(#b)([^:]#:[^:]#:)/${match[1][1,-2]}-${_comp_correct}:}"
 
   _description corrections _correct_expl corrections \
                "e:$_comp_correct" "o:$PREFIX$SUFFIX"
 
   if _complete; then
-    if zstyle -t ":completion${curcontext}:" insert-unambiguous &&
+    if zstyle -t ":completion:${curcontext}:" insert-unambiguous &&
        [[ "${#compstate[unambiguous]}" -ge "${#:-$PREFIX$SUFFIX}" ]]; then
       compstate[pattern_insert]=unambiguous
     elif _requested original &&
          ( [[ compstate[nmatches] -gt 1 ]] ||
-           zstyle -t ":completion${curcontext}:" original ); then
+           zstyle -t ":completion:${curcontext}:" original ); then
       local expl
 
       _description -V original expl original

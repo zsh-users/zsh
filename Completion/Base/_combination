@@ -11,7 +11,7 @@
 #  Assume an user sets the style `hosts-ports-users' as for the my-accounts
 #  tag:
 #
-#    zstyle ':completion:*:telnet*:my-accounts' hosts-ports-users \
+#    zstyle ':completion:*:*:telnet:*:my-accounts' hosts-ports-users \
 #      host0:: host1::user1 host2::user2
 #      mail-server:{smtp,pop3}:
 #      news-server:nntp:
@@ -78,7 +78,7 @@ key="${1%:*}"
 num="${${1##*:}:-1}"
 shift
 
-if zstyle -a ":completion${curcontext}:$tag" "$style" tmp; then
+if zstyle -a ":completion:${curcontext}:$tag" "$style" tmp; then
   eval "tmp=( \"\${(@M)tmp:#\${(j($sep))~pats}}\" )"
   if (( keys[(in:num:)$key] != 1 )); then
     eval "tmp=( \${tmp#\${(j(${sep}))~\${(@)\${(@)keys[2,(rn:num:)\$key]}/*/*}}$sep} )"

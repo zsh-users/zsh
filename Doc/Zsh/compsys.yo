@@ -286,29 +286,62 @@ was tried.  The context depends on such things as the name of the
 command when completing an argument, and possibily also
 the name of an option when completing an argument to that option.
 
-The completion system represents contexts as hierarchical name s
-with components separated by colons. For example, take the context
-`tt(:completion:complete::dvips::-o-1)'.  The tt(:completion) at the
-beginning just says that this context is used in the completion system 
-and the tt(:complete) after it is the `completer', which is in overall
-control of how completion is to be performed; `tt(complete)' is the
-basic one for ordinary completion, but completers may perform various
-related tasks such as correction, or modify the behaviour of a later
-completer (see
+The context names always consists of the following fields, separated
+by colons:
+
+startitem()
+item()(
+The literal string tt(completion), saying that this style is used by
+the completion system.
+)
+item()(
+The var(function); in many cases this field will be blank, but when
+the completion system is called from other functions, like
+tt(predict-on) or one of the functions in the tt(Command) directory of 
+the distribution, this field contains the (probably abbreviated) name
+of that function.
+)
+item()(
+The var(completer) currently active, i.e. the name of the completer
+function without the leading underscore. Such a completer is in
+overall control of how completion is to be performed; `tt(complete)'
+is the basic one for ordinary completion, but completers may perform
+various related tasks such as correction, or modify the behaviour of a
+later completer (see
 ifzman(the section `Control Functions' below)\
 ifnzman(noderef(Control Functions)) 
-for more information).  Strictly, the completer is `tt(_complete)', but the
-underscore is omitted from the context; this is also true of `tt(correct)',
-`tt(approximate)', etc.  The tt(::dvips:) shows that we are
-completing arguments for the tt(dvips) command.  The doubled colon
-will appear only before and after the name of the command, but note
-that the second colon after the command name is only added when 
-there is at least one more component (otherwise the whole name ends in 
-a colon, e.g. `tt(...dvips:)').  Finally, the string tt(-o-1) says that we
-are completing the first argument of the option `tt(-o)' to the command.
-Note that the existence of a context like this does not necessarily mean it
-is handled specially by the completion system; this is determined by trying
-to match the context as specifically as possible, as described below.
+for more information).  
+)
+item()(
+The var(context) or var(command). This is either one of the special
+context names such as tt(-condition-) as explained for the
+tt(_complete) completer below, or the name of the command we are
+completing arguments for. Commands that have sub-commands usually
+modify this field to contain the name of the command followed by a
+minus sign and the sub-command (e.g. the completion function for the
+tt(cvs) command sets this field to striings such as tt(cvs-add) when
+completing for the tt(add) sub-command).
+)
+item()(
+The var(argument), describing which argument we are
+completing. Normally this is either a string of the form
+tt(argument-)var(n), where var(n) is the number of the argument or it
+is a string of the form tt(-)var(opt)tt(-)var(n) when completing the
+var(n)'th argument of the option var(opt).
+)
+item()(
+The var(tag). Tags are used for two purposes: completion functions use 
+them to describe the types of matches they can generate for a certain
+context and they use them to simplify the definition of styles that
+are tested.
+)
+enditem()
+
+As an example, leaving out the var(tag) for the moment, the context name
+`tt(:completion::complete:dvips:-o-1:files)' says that normal
+completion was attempted on an argument of the tt(dvips)
+command. More precisely: completion was attempted on the first
+argument after the tt(-o) option.
 
 In many of the possible contexts the completion system can generate
 matches, often multiple types of matches.  These types are represented as
@@ -335,9 +368,8 @@ Completion behaviour can be modified by various other
 (see
 ifzman(zmanref(zshmodules))\
 ifnzman(noderef(The zsh/zutil Module))).
-The full context used in looking up styles is the prefix `tt(:completion)'
-followed by the context as described above, followed by another colon and
-the name of the tag currently being tried for completion.
+When looking up styles the completion system uses full context names,
+including the tag.
 
 Styles determine such things as how the matches are generated; some of them
 correspond to shell options (for example, the use of menu completion), but
@@ -366,14 +398,14 @@ listed with the full job texts and the command lines of the processes (the
 latter is achieved by calling the tt(ps) command). To make this builtin
 list the matches only as numbers one could call:
 
-example(zstyle ':completion:*::kill:*' verbose no)
+example(zstyle ':completion:*:*:kill:*' verbose no)
 
-Furhtermore, if one wanted to see the command lines for processes but not the
+Furthermore, if one wanted to see the command lines for processes but not the
 job texts one could use the fact that the tag name is appended to the
 context name when styles are looked up.  As the function for the tt(kill)
 builtin command uses the tags tt(jobs) and tt(processes), we have:
 
-example(zstyle ':completion:*::kill:*:jobs' verbose no)
+example(zstyle ':completion:*:*:kill:*:jobs' verbose no)
 
 Note that the order in which styles are em(defined) does not matter; the
 style mechanism uses the most specific possible match for a particular
@@ -439,9 +471,6 @@ corrections
 )
 item(tt(cursors))(
 for cursor names used by X programs
-)
-item(tt(cvs))(
-used only to look up the value of the tt(disable-stat) style
 )
 item(tt(default))(
 used to look up default values for various styles that may also be set 
@@ -681,9 +710,9 @@ example, to use completion, approximation and correction for normal
 completion, completion and correction for incremental completion and
 only completion for prediction one could use:
 
-example(zstyle ':completion:*' completer _complete _correct _approximate
-zstyle ':completion:incremental' completer _complete _correct
-zstyle ':completion:predict' completer _complete)
+example(zstyle ':completion:::::' completer _complete _correct _approximate
+zstyle ':completion:incremental::::' completer _complete _correct
+zstyle ':completion:predict::::' completer _complete)
 )
 item(tt(completions))(
 This style is used by the tt(_expand) completer function.
@@ -704,7 +733,7 @@ should be an expression usable inside a `tt($((...)))'
 arithmetical expression. In this case, delaying will be done if the
 expression evaluates to `tt(1)'. For example, with
 
-example(zstyle ':completion:list' condition 'NUMERIC != 1')
+example(zstyle ':completion:*:list:::' condition 'NUMERIC != 1')
 
 delaying will be done only if given an explicit numeric argument
 other than `tt(1)'.
@@ -716,7 +745,7 @@ after the first ambiguous pathname component even when menucompletion
 is used.
 )
 item(tt(disable-stat))(
-This is used with the tt(cvs) tag by the function completing for the
+This is used with the an empty tag by the function completing for the
 tt(cvs) command to decide if the tt(zsh/stat) module should be used to
 generate only names of modified files in the appropriate places.
 )
@@ -761,7 +790,7 @@ specified another order to be used with the tt(tag-order) style).
 For example, to make the completion system first try only filenames
 matching the pattern tt(*.o) for the tt(rm) command, one would use:
 
-example(zstyle ':completion:*::rm*:globbed-files' file-patterns '*.o')
+example(zstyle ':completion:*:*:rm:*:globbed-files' file-patterns '*.o')
 
 With this, using only filenames ending in tt(.o) will be the first
 choice and other filenames will only be used if what is on the line
@@ -821,8 +850,8 @@ aliases and shell functions and reserved words as possible
 completions. To have the external commands and shell functions listed
 separately, one can set:
 
-example(zstyle ':completion:*:-command-:commands' group-name commands
-zstyle ':completion:*:-command-:functions' group-name functions)
+example(zstyle ':completion:*:*:-command-:*:commands' group-name commands
+zstyle ':completion:*:*:-command-:*:functions' group-name functions)
 
 This also means that if the same name is used for different types of
 matches, then those matches will be displayed together in the same
@@ -851,7 +880,7 @@ For example, to have names of builtin commands, shell functions and
 external commands appear in this order when completing in command
 position one would set:
 
-example(zstyle ':completion:*:-command-' group-order builtins functions commands)
+example(zstyle ':completion:*:*:-command-' group-order builtins functions commands)
 )
 item(tt(groups))(
 A style holding the names of the groups that should be completed. If
@@ -924,7 +953,11 @@ item(tt(insert-unambiguous))(
 This is used by the tt(_match) and tt(_approximate) completer
 functions. If it is set to `true', the completer will start menu
 completion only if no unambiguous string could be generated that is at
-least as long as the original string from the line.
+least as long as the original string from the line. Note that the
+tt(_approximate) completer uses it after setting the completer field
+in the context name to one of tt(correct-)var(num) or
+tt(approximate-)var(num), where var(num) is the number of errors that
+were accepted.
 )
 item(tt(last-prompt))(
 This is used to determine if the completion code should try to put the
@@ -1046,7 +1079,7 @@ If the value for this style contains the string tt(numeric), the
 completer function will take any numeric argument as the
 maximum number of errors allowed. For example, with
 
-example(zstyle ':completion:approximate' accept 2 numeric)
+example(zstyle ':completion:*:approximate:::' max-errors 2 numeric)
 
 two errors will be allowed if no numeric argument is given. However,
 with a numeric argument of six (as in `tt(ESC-6 TAB)'), up to six
@@ -1116,7 +1149,10 @@ This is used by the tt(_approximate), tt(_correct) and tt(_match)
 completers. The first two use it to decide if the original string should
 be added as one possible completion. Normally, this is done only if there
 at least  two possible corrections, but if this style is set to `true', it
-will always be added.
+will always be added. Note that these completers use this style after
+setting the completer field in the context name to
+tt(correct-)var(num) or tt(approximate-)var(num), where var(num) is
+the number of errors that were accepted.
 
 For the tt(_match) completer, if this style is set to
 tt(only), it will try to generate matches without inserting a
@@ -1129,7 +1165,7 @@ item(tt(packageset))(
 A style containing an override for the default package set
 for that context.  For example,
 
-example(zstyle :completion:complete::dpkg::--status-1 packageset avail)
+example(zstyle :completion:*:complete:dpkg:--status-1: packageset avail)
 
 will cause available packages, rather than only installed packages,
 to be completed for `dpkg --status'.
@@ -1240,7 +1276,7 @@ non-empty string it should be an expression usable inside a `tt($((...)))'
 arithmetical expression. In this case, expansion of substitutions will
 be done if the expression evaluates to `tt(1)'. For example, with
 
-example(zstyle ':completion:expand' substitute '${NUMERIC:-1} != 1')
+example(zstyle ':completion:*:expand:::' substitute '${NUMERIC:-1} != 1')
 
 substitution will be performed only if given an explicit numeric
 argument other than `tt(1)', as by typing `tt(ESC 2 TAB)'.
@@ -1256,7 +1292,7 @@ found, the next value is used.
 For example,
 
 example(
-  zstyle :completion:complete::gunzip: tag-order \ 
+  zstyle ':completion:*:complete:gunzip:*' tag-order \ 
     'globbed-files directories' all-files
 )
 
@@ -1330,7 +1366,7 @@ arguments are given, the set of functions to try is taken from the
 tt(completer) style. For example, to use normal completion and
 correction if that doesn't generate any matches:
 
-example(zstyle ':completion:*' completer _complete _correct)
+example(zstyle ':completion:::::' completer _complete _correct)
 
 after calling tt(compinit). The default value for this style set up
 in tt(compinit) is `tt(_complete)', i.e. normally only ordinary
@@ -1442,7 +1478,7 @@ counted. The resulting list of corrected and completed strings is then
 presented to the user. The intended use of this completer function is to
 try after the normal tt(_complete) completer by setting:
 
-example(zstyle ':completion:*' completer _complete _approximate)
+example(zstyle ':completion:::::' completer _complete _approximate)
 
 This will give correcting completion if and only if
 normal completion doesn't yield any possible completions. When
@@ -1471,9 +1507,9 @@ different top-level context name.
 
 For example, with:
 
-example(zstyle ':completion:*' completer _complete _correct _approximate
-zstyle ':completion:correct' accept 2 not-numeric
-zstyle ':completion:approximate' accept 3 numeric)
+example(zstyle ':completion:::::' completer _complete _correct _approximate
+zstyle ':completion:*:correct:::' accept 2 not-numeric
+zstyle ':completion:*:approximate:::' accept 3 numeric)
 
 correction will accept up to two errors. If a numeric argument is
 given, correction will not be performed, but correcting completion
@@ -1783,7 +1819,7 @@ non-zero otherwise.
 
 This function also accepts the tt(-C) option followed by a
 var(name). This name is temporarily (i.e. not visible outside
-tt(_tags)) appended (with a colon before it) to the contents of the
+tt(_tags)) stored in the argument field of the context name in the
 tt(curcontext) parameter. This allows to make tt(_tags) use a more
 specific context name without having to change and reset the
 tt(curcontext) parameter (which would otherwise have the same effect).
@@ -1868,8 +1904,8 @@ example(_alternative \
 to offer usernames and hostnames as possible matches (which are
 generated by the tt(_users) and tt(_hosts) functions respectively).
 
-Like tt(_tags) this function supports the tt(-C) option to give an
-additional context name component.
+Like tt(_tags) this function supports the tt(-C) option to give a
+different name for the argument context field.
 )
 findex(_describe)
 item(tt(_describe) var(descr) var(name1) [ var(name2) ] var(opts) ... tt(-)tt(-) ...)(

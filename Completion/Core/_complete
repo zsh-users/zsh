@@ -4,16 +4,17 @@
 # a normal completion function, but as one possible value for the
 # completer style.
 
-local comp name curcontext="$curcontext" oldcontext
+local comp name oldcontext
+typeset -T curcontext="$curcontext" ccarray
 
-[[ "$funcstack[2]" = _main_complete ]] && curcontext="${curcontext}:complete"
+ccarray[2]=complete
 
 oldcontext="$curcontext"
 
 # If we have a user-supplied context name, use only that.
 
 if [[ -n "$compcontext" ]]; then
-  curcontext="${curcontext}:$compcontext"
+  ccarray[3]="$compcontext"
 
   comp="$_comps[$compcontext]"
   [[ -z "$comp" ]] || "$comp"
@@ -25,7 +26,7 @@ fi
 
 comp="$_comps[-first-]"
 if [[ ! -z "$comp" ]]; then
-  curcontext="${curcontext}:-first-"
+  ccarray[3]=-first-
   "$comp"
   if [[ "$_compskip" = all ]]; then
     _compskip=''
@@ -46,7 +47,7 @@ else
 
   local cname="-${compstate[context]:s/_/-/}-"
 
-  curcontext="${oldcontext}:$cname"
+  ccarray[3]="$cname"
 
   comp="$_comps[$cname]"
 

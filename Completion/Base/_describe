@@ -16,7 +16,7 @@ fi
 
 _tags "$_type" || return 1
 
-zstyle -t ":completion${curcontext}:$_type" verbose && _showd=yes
+zstyle -t ":completion:${curcontext}:$_type" verbose && _showd=yes
 
 _description "$_type" _expl "$1"
 shift
@@ -28,7 +28,7 @@ else
 fi
 
 [[ "$_type" = options ]] &&
-    zstyle -t ":completion${curcontext}:options" prefix-hidden && _hide=yes
+    zstyle -t ":completion:${curcontext}:options" prefix-hidden && _hide=yes
 
 while compdescribe -g _args _tmpd _tmpmd _tmps _tmpms; do
 

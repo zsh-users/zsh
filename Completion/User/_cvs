@@ -40,7 +40,7 @@ _cvs_command () {
 
     cmd="${${(k)cmds[(R)* $words[1] *]}:-${(k)cmds[(i)$words[1]]}}"
     if (( $#cmd )); then
-      curcontext="${curcontext%:*}:$cmd"
+      curcontext="${curcontext%:*:*}:cvs-${cmd}:"
       _cvs_$cmd
     else
       _message "unknown cvs command: $words[1]"
@@ -390,7 +390,7 @@ _cvs_watchers () {
 
 (( $+functions[_cvs_loadstat] )) ||
 _cvs_loadstat () {
-  zstyle -t ":completion${curcontext}:cvs" disable-stat && return
+  zstyle -t ":completion:${curcontext}:" disable-stat && return
   (( $+_cvs_loadstat_tried )) && return
   _cvs_loadstat_tried=yes
 

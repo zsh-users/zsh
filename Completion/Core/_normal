@@ -16,7 +16,7 @@ local curcontext="$curcontext"
 
 command="$words[1]"
 if [[ CURRENT -eq 1 ]]; then
-  curcontext="${curcontext}:-command-"
+  curcontext="${curcontext%:*:*}:-command-:"
 
   comp="$_comps[-command-]"
   [[ -z "$comp" ]] || "$comp" && ret=0
@@ -26,15 +26,15 @@ else
   if [[ "$command[1]" == '=' ]]; then
     eval cmd1\=$command
     cmd2="$command[2,-1]"
-    curcontext="${curcontext}::${cmd2}:"
+    curcontext="${curcontext%:*:*}:${cmd2}:"
   elif [[ "$command" == */* ]]; then
     cmd1="$command"
     cmd2="${command:t}"
-    curcontext="${curcontext}::${cmd2}:"
+    curcontext="${curcontext%:*:*}:${cmd2}:"
   else
     cmd1="$command"
     cmd2="$commands[$command]"
-    curcontext="${curcontext}::${cmd1}:"
+    curcontext="${curcontext%:*:*}:${cmd1}:"
   fi
 fi
 

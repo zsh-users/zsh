@@ -2,7 +2,7 @@
 
 local expl domains tmp
 
-if ! zstyle -a ":completion${curcontext}:domains" domains domains; then
+if ! zstyle -a ":completion:${curcontext}:domains" domains domains; then
   if (( ! $+_cache_domains )); then
     _cache_domains=()
     if [[ -f /etc/resolv.conf ]]; then

@@ -7,7 +7,7 @@ local expl users
 
 _wanted users expl user || return 1
 
-zstyle -a ":completion${curcontext}:users" users users &&
+zstyle -a ":completion:${curcontext}:users" users users &&
     compadd "$expl[@]" "$@" - "$users[@]" && return 0
 
 compadd "$@" "$expl[@]" - "${(@k)userdirs}"

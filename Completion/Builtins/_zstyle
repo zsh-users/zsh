@@ -1,7 +1,7 @@
 #compdef zstyle
 
 local curcontext="$curcontext" state context ostate line expl ctop
-local nm=$compstate[nmatches]
+local nm=$compstate[nmatches] mesg
 typeset -A opt_args
 
 typeset -A styles
@@ -17,6 +17,7 @@ styles=(
   condition		 c:
   cursor		 c:bool
   disable-stat		 c:bool
+  domains                c:
   expand		 c:
   file-patterns		 c:
   format		 c:
@@ -87,9 +88,20 @@ while [[ -n $state ]]; do
 
   case "$ostate" in
     contexts)
-      if [[ $PREFIX != :*: ]]; then
-	_wanted contexts expl context &&
-	compadd -P : -S : "$expl[@]" completion zftp
+      if _wanted contexts expl context; then
+        if [[ $PREFIX != :*: ]]; then
+	  compadd -P : -S : "$expl[@]" completion zftp
+        elif [[ $PREFIX = :completion:* ]]; then
+          mesg=''
+          case "$PREFIX" in
+          :completion:[^:]#) mesg=function ;;
+          :completion:[^:]#:[^:]#) mesg=completer ;;
+          :completion:[^:]#:[^:]#:[^:]#) mesg='command or context' ;;
+          :completion:[^:]#:[^:]#:[^:]#:[^:]#) mesg=argument ;;
+          :completion:[^:]#:[^:]#:[^:]#:[^:]#:[^:]#) mesg=tag ;;
+	  esac
+	  [[ -n "$mesg" ]] && _message "$mesg"
+        fi
       fi
       ;;
 

@@ -7,7 +7,7 @@ subopts=()
 while getopts 'O:C:' opt; do
   case "$opt" in
   O) subopts=( "${(@P)OPTARG}" ) ;;
-  C) curcontext="${curontext}:$OPTARG" ;;
+  C) curcontext="${curcontext%:*}:$OPTARG" ;;
   esac
 done
 

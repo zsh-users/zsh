@@ -12,12 +12,12 @@ if [[ "$1" = -m ]]; then
   shift 2
 fi
 
-zstyle -a ":completion${curcontext}:ps" arguments args
+zstyle -a ":completion:${curcontext}:ps" arguments args
 
 out="$(command ps $args 2>/dev/null)"
 
-if zstyle -t ":completion${curcontext}:processes" verbose; then
-  zstyle -a ":completion${curcontext}:ps" list-arguments listargs
+if zstyle -t ":completion:${curcontext}:processes" verbose; then
+  zstyle -a ":completion:${curcontext}:ps" list-arguments listargs
   (( $#listargs )) || listargs=( "$args[@]" )
   if [[ "$listargs" = "$args" ]]; then
     list=("${(@Mr:COLUMNS-1:)${(f@)out}[2,-1]:#[ 	]#${PREFIX}[0-9]#${SUFFIX}[ 	]*${~match}}")

@@ -9,7 +9,7 @@
 # Don't try any more completion after this.
 _compskip=all
 
-local subcom expl
+local subcom expl curcontext="${curcontext}"
 
 if [[ $words[1] = zftp ]]; then
   if [[ $CURRENT -eq 2 ]]; then
@@ -20,6 +20,7 @@ if [[ $words[1] = zftp ]]; then
     return
   fi
   subcom=$words[2]
+  curcontext="${curcontext/:zftp:/:zftp-${words[2]}:}"
 else
   subcom=$words[1]
 fi
@@ -27,27 +28,27 @@ fi
 case $subcom in
   *(cd|ls|dir))
     # complete remote directories
-    _tags -C "$subcom" directories && zfcd_match $PREFIX $SUFFIX
+    _tags directories && zfcd_match $PREFIX $SUFFIX
     ;;
 
   *(get(|at)|gcp|delete|remote))
     # complete remote files
-    _tags -C "$subcom" files && zfget_match $PREFIX $SUFFIX
+    _tags files && zfget_match $PREFIX $SUFFIX
     ;;
 
   *(put(|at)|pcp))
     # complete local files
-    _tags -C "$subcom" files && _files
+    _tags files && _files
     ;;
 
   *(open|anon|params))
     # complete hosts:  should do cleverer stuff with user names
-    _tags -C "$subcom" hosts && _hosts
+    _tags hosts && _hosts
     ;;
 
   *(goto|mark))
     # complete bookmarks.  First decide if ncftp mode is go.
-    _wanted -C "$subcom" bookmarks expl bookmark || return 1
+    _wanted bookmarks expl bookmark || return 1
     if [[ $words[2] = -*n* ]]; then
       if [[ -f ~/.ncftp/bookmarks ]]; then
         compadd "$expl[@]" - $(awk -F, 'NR > 2 { print $1 }' ~/.ncftp/bookmarks)
@@ -61,7 +62,7 @@ case $subcom in
 
   *session)
     # complete sessions, excluding the current one.
-    _wanted -C "$subcom" sessions expl 'another FTP session' &&
+    _wanted sessions expl 'another FTP session' &&
         compadd "$expl[@]" - ${$(zftp session):#$ZFTP_SESSION}
     ;;
 
@@ -69,7 +70,7 @@ case $subcom in
     # complete arguments like sess1:file1 sess2:file2
     if [[ $PREFIX = *:* ]]; then
       # complete file in the given session
-      _tags -C "$subcom" files || return 1
+      _tags files || return 1
       local sess=${PREFIX%%:*} oldsess=$ZFTP_SESSION
       compset -p $(( $#sess + 1 ))
       [[ -n $sess ]] && zftp session $sess
@@ -77,7 +78,7 @@ case $subcom in
       [[ -n $sess && -n $oldsess ]] && zftp session $oldsess
     else
       # note here we can complete the current session
-      _wanted -C "$subcom" sessions expl 'FTP session' &&
+      _wanted sessions expl 'FTP session' &&
           compadd "$expl[@]" -S : - $(zftp session)
     fi
     ;;

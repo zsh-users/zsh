@@ -4,8 +4,8 @@ local format
 
 _tags messages || return 1
 
-zstyle -s ":completion${curcontext}:messages" format format ||
-    zstyle -s ":completion${curcontext}:descriptions" format format
+zstyle -s ":completion:${curcontext}:messages" format format ||
+    zstyle -s ":completion:${curcontext}:descriptions" format format
 
 if [[ -n "$format" ]]; then
   zformat -f format "$format" "d:$1" "${(@)argv[2,-1]}"

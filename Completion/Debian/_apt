@@ -106,7 +106,7 @@ tmp2=("$tmp2[@]" $_ra_left${(M)^short_bool:#$~tmp1} $_ra_left${(M)^short_intleve
 tmp3=("$tmp3[@]" $_ra_left${(M)^short_hasarg:#$~tmp1} $_ra_left${(M)^short_configfile:#$~tmp1} $_ra_left${(M)^short_arbitem:#$~tmp1})
 _describe -o option tmp2 -- tmp3 -S='
 
-  comp_opt='{ ! zstyle -t ":completion${curcontext}:options" prefix-needed || [[ "$PREFIX" = -* ]] }'" && { $comp_short; $comp_long }"
+  comp_opt='{ ! zstyle -t ":completion:${curcontext}:options" prefix-needed || [[ "$PREFIX" = -* ]] }'" && { $comp_short; $comp_long }"
 
   regex_short=()
   regex_long=()

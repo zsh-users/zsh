@@ -7,7 +7,7 @@ if [[ CURRENT -eq 2 ]]; then
     _wanted -C - jobs expl 'scheduled jobs' || return 1
 
     lines=(${(f)"$(sched)"})
-    if zstyle -t ":completion${curcontext}:jobs" verbose; then
+    if zstyle -t ":completion:${curcontext}:jobs" verbose; then
       disp=( -ld lines )
     else
       disp=()

@@ -9,6 +9,10 @@
 
 local curcontext="$curcontext"
 
-[[ -z "$curcontext" ]] && curcontext=":correct-word"
+if [[ -z "$curcontext" ]]; then
+  curcontext="correct-word:::"
+else
+  curcontext="correct-word:${curcontext#*:}"
+fi
 
 _main_complete _correct

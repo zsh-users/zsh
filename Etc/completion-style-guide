@@ -3,26 +3,27 @@ Contexts, tags and all that
 
 The completion system keeps track of the current context in the
 parameter `curcontext'. It's content is the hierarchical name for the
-current context sans the tag currently tried. The tags represent
-different types of matches. So, whenever you are about to add matches, 
-you should use a tag for them and test if the user wants this type of
-matches to be generated. However, this only really needs to be done if 
-no other function in the call chain has tested that already or if you
-can offer different types of matches.
+current context sans the `:completion:' and the last colon and the tag
+currently tried. The tags represent different types of matches. So,
+whenever you are about to add matches, you should use a tag for them
+and test if the user wants this type of matches to be generated.
+However, this only really needs to be done if no other function in the
+call chain has tested that already or if you can offer different types
+of matches.
 
 Most of the utility functions do the testing themselves, so you don't
 have to worry about that at all. For example if you are adding matches 
 with `_files', `_hosts' or functions like these, you can just call
 them and they do the tests needed. The functions `_arguments' and
 `_values' do that too, but there is a small difference. These
-functions effectively add a new component to the hierarchical context
-name and if you are using the `->state' form for actions, this new
-component has to be reported back to the function calling `_arguments'
-or `_values'. This is done with the parameter `context', so you have
-to make that local in the calling function in the same way as you have 
-to make local `line', `state', and `{opt,val}_args'. This parameter
-`context' should then be used when you start adding matches by giving
-it to functions like `_tags' via the `-C' options, as in:
+functions effectively change the context name and if you are using the
+`->state' form for actions, this changed name component has to be
+reported back to the function calling `_arguments' or `_values'. This
+is done with the parameter `context', so you have to make that local
+in the calling function in the same way as you have to make local
+`line', `state', and `{opt,val}_args'. This parameter `context' should
+then be used when you start adding matches by giving it to functions
+like `_tags' via the `-C' options, as in:
 
   local context ...
   ...
@@ -33,8 +34,8 @@ it to functions like `_tags' via the `-C' options, as in:
     ...
   fi
 
-This will append the context name given to the `curcontext' parameter
-(preceding it with a colon) and this context will then be used to look 
+This will put the context name given in the argument field of the
+`curcontext' parameter and this context will then be used to look 
 up styles for the tags.
 
 But since this is often used, `_arguments' and `_values' have support
@@ -46,7 +47,7 @@ reported back to functions you call. E.g.:
 
   local curcontext="$curcontext" ...
   ...
-  _arguments ... 'foo:foo:->foo'
+  _arguments -C ... 'foo:foo:->foo'
   ...
   if [[ "$state" = foo ]]; then
     _tags ...
@@ -74,8 +75,8 @@ types is requested by the user, so you can just do:
 
 Since this sequence of command is used so often, the `_wanted'
 function was added which just calls `_tags' with its first argument
-(i.e. the first argument os a tag) and then calls `_description' with
-all other arguments. The return value is as for `_tags' -- zero if the 
+(i.e. the first argument is a tag) and then calls `_description' with
+all its arguments. The return value is as for `_tags' -- zero if the 
 matches should be added. So the example becomes:
 
   _wanted names expl 'name' && compadd "$expl[@]" alice bob
@@ -106,16 +107,16 @@ for this uses `_tags' and `_requested':
     (( ret )) || break   # leave the loop if matches were added
   done
 
-`_tags' with tags as arguments registers those tags and calls
-`_sort_tags' so that the user can say which in which order the tags
-are to be tried. This means that internally these tags are stored in
-multiple sets. The types of matches represented by the tags from the
-first set should be tried first. If that generates no matches, the
-second set is tried and so on. `_tags' without arguments just makes
-the next set be tried (on the first call it makes the first set be
-used). The function `_requested' then tests if the tag given as its
-first argument is in the set currently used and returns zero if it is, 
-i.e. if matches of that type should be added now.
+`_tags' with tags as arguments registers those tags and checks which
+of them the user wants to see and in which order the tags are to be
+tried. This means that internally these tags are stored in multiple
+sets. The types of matches represented by the tags from the first set
+should be tried first. If that generates no matches, the second set is
+tried and so on. `_tags' without arguments just makes the next set be
+tried (on the first call it makes the first set be used). The function
+`_requested' then tests if the tag given as its first argument is in
+the set currently used and returns zero if it is,  i.e. if matches of
+that type should be added now.
 
 But `_requested' can do more: since it is very common that you add
 different types of matches in different groups, with each group having 
@@ -130,7 +131,7 @@ change the example above to:
   _tags friends users hosts
 
   while _tags; do
-    _requested friends expl friend && compad "$expl[@]" alice bob && ret=0
+    _requested friends expl friend && compadd "$expl[@]" alice bob && ret=0
     _requested users && _users && ret=0
     _requested hosts && _hosts && ret=0
 
@@ -138,7 +139,7 @@ change the example above to:
   done
 
 This looks better already. But in many cases such as this one you can
-also use the function `_laternative' which simply implements a loop
+also use the function `_alternative' which simply implements a loop
 like this one. It gets arguments of the form `tag:descr:action'. E.g.:
 
   _alternative \
@@ -148,7 +149,7 @@ like this one. It gets arguments of the form `tag:descr:action'. E.g.:
 
 Which does the same as the previous examples. (Note the empty
 descriptions in the last two arguments -- the actions start with a
-space so that they are executed without giving the the description
+space so that they are executed without giving the description
 build by `_alternative', i.e. we just use the description added by
 `_users' and `_hosts').
 
@@ -162,11 +163,11 @@ For the names of the tags: choose simple (short, if at all possible)
 names in plural. Also, first have a look at the tag names already used 
 by other functions and if any of these names seem sensible for the
 type of matches you are about to add, the use those names. This will
-allow users to define styles for certain types of matches indepent of
-the place where they are added.
+allow users to define styles for certain types of matches independent
+of the place where they are added.
 
-One final comment about when to use your own sub-contexts: do this
-when the command you are writing a completion function for has
+One final comment about when to use your own argument-contexts: do
+this when the command you are writing a completion function for has
 different `modes'. E.g. if it accepts host names after a `-h' option
 and users or hosts after `-u' and for some reason you can't use
 `_arguments' to do the work for you, then use context names as in:
@@ -185,30 +186,31 @@ Styles
 ------
 
 Users can associate patterns for hierarchical context names with
-certain styles using the `compstyle' function. The completion code
+certain styles using the `zstyle' builtin. The completion code
 should then use these styles to decide how matches should be added and 
-to get user-configured values. This is done using the builtin `zstyle'.
+to get user-configured values. This, too,  is done using the builtin
+`zstyle'.
 
 Basically styles map names to a bunch of strings (the `value'). In
 many cases you want to treat the value as a boolean, so let's start
 with that. To test if, for example, the style `verbose' is set for 
 the tag `options' in the context you are currently in, you can just do:
 
-  if zstyle -t ":completion${curcontext}:options" verbose; then
+  if zstyle -t ":completion:${curcontext}:options" verbose; then
     # yes, it is set...
   fi
 
 I.e. with the -t option and two arguments `zstyle' takes the first one
-as a tag and the second one as a style name and returns zero if that
+as a context and the second one as a style name and returns zero if that
 style has the boolean value `true'. Internally it checks if the style
 is set to one of `yes', `true', `on', or `1' and interprets that as
 `true' and every other value as `false'.
 
-For more complicated style for which you want to test if the value
+For more complicated styles for which you want to test if the value
 matches a certain pattern, you can use `zstyle' with the -m option and
 three arguments:
 
-  if zstyle -m ":completion${curcontext}:foo" bar '*baz*'; then
+  if zstyle -m ":completion:${curcontext}:foo" bar '*baz*'; then
     ...
   fi
 
@@ -219,15 +221,15 @@ If you just want to see if one of the strings in the value is exactly
 equal to any of a number of a strings, you can use the -t option and
 give the strings after the style name:
 
-  if zstyle -t ":completion${curcontext}:foo" bar str1 str2; then
+  if zstyle -t ":completion:${curcontext}:foo" bar str1 str2; then
     ...
   fi
 
 But sometimes you want to actually get the value stored for a certain
 style instead of just testing it. For this `zstyle' supports four
 options: `-b', `-s', `-a', and `-h'. After these options, three
-arguments are expected, the tag, the style, and a parameter name. The
-parameter will then be set to the value of the style and the option
+arguments are expected, the context, the style, and a parameter name.
+The parameter will then be set to the value of the style and the option
 says how the strings stored as a value will be stored in the
 parameter:
 
@@ -287,8 +289,7 @@ want to use. For example:
   _description tag expl '...'
   compadd "$expl[@]" -1V foo - ...    # THIS IS WRONG!!!
 
-is *not* the right way to use a unsorted group. Instead do the
-simpler:
+is *not* the right way to use a unsorted group. Instead do:
 
   _description -1V tag expl '...'
   compadd "$expl[@]" - ...
@@ -301,7 +302,7 @@ multiple calls to `_description' and add them with multiple calls to
 different tags anyway, so, see above.
 
 And since a tag directly corresponds to a group of matches, you'll
-often be using the tags function that allow you to give the
+often be using the tags function that allows you to give the
 explanation to the same function that is used to test if the tags are
 requested (again: see above). Just as a reminder:
 
@@ -337,8 +338,8 @@ Misc. remarks
     This guarantees that your functions will be re-usable because calling
     functions may rely on the correct return value.
 5)  When writing helper functions that generate matches, the arguments
-    of these should be given unchanged to `compadd' or `compgen' (if
-    they are not used by the helper function itself).
+    of these should be given unchanged to `compadd' (if they are not
+    used by the helper function itself).
 6)  When matches with a common prefix such as option names are generated,
     add them *with* the prefix (like `-', `+', or `--' for options).
     Then check the `prefix-needed' style to see if the matches are to be
@@ -355,9 +356,9 @@ Misc. remarks
     completely different modes), it should allow users to define
     functions that separately override the behavior for these
     different types. This can easily be achieved by using the
-    `funcall' utility function, as in:
+    `_funcall' utility function, as in:
 
-      funcall ret _command_$subcommand && return ret
+      _funcall ret _command_$subcommand && return ret
 
     This will try to call the function `_command_$subcommand' and if
     it exists, it will be called and the completion function exits

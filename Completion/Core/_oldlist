@@ -1,8 +1,8 @@
 #autoload
 
-local curcontext="${curcontext}:oldlist" list
+local curcontext="${curcontext/:[^:]#:/:oldlist:}" list
 
-zstyle -s ":completion${curcontext}:" list list
+zstyle -s ":completion:${curcontext}:" list list
 
 # If this is a listing widget and there is already an old list,
 # and either the style :oldlist:list is `always', or it is not `never'
@@ -34,7 +34,7 @@ fi
 if [[ -z $compstate[old_insert] && -n $compstate[old_list] ]]; then
   compstate[old_list]=keep
 elif [[ $WIDGET = *complete(|-prefix|-word) ]] &&
-     zstyle -t ":completion${curcontext}:" menu; then
+     zstyle -t ":completion:${curcontext}:" menu; then
   if [[ -n $compstate[old_insert] ]]; then
     compstate[old_list]=keep
     if [[ $WIDGET = *reverse* ]]; then

@@ -7,6 +7,10 @@
 
 local curcontext="$curcontext"
 
-[[ -z "$curcontext" ]] && curcontext=":expand-word"
+if [[ -z "$curcontext" ]]; then
+  curcontext="correct-word:::"
+else
+  curcontext="expand-word:${curcontext#*:}"
+fi
 
 _main_complete _expand

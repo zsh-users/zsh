@@ -1,7 +1,7 @@
 #autoload
 
 # This is intended to be used as a completer function after the normal
-# completer as in: `zstyle ":completion:*" completer _complete _match'.
+# completer as in: `zstyle ":completion:::::" completer _complete _match'.
 # It temporarily switches on pattern matching, allowing you to try 
 # completion on patterns without having to setopt glob_complete.
 #
@@ -10,7 +10,7 @@
 # be expanded using globbing.
 
 local tmp opm="$compstate[pattern_match]" ret=0 orig ins
-local curcontext="${curcontext}:match"
+local curcontext="${curcontext/:[^:]#:/:match:}"
 
 # Do nothing if we don't have a pattern or there are still global
 # match specifications to try.
@@ -19,8 +19,8 @@ tmp="${${:-$PREFIX$SUFFIX}#[~=]}"
 [[ "$tmp:q" = "$tmp" ||
    compstate[matcher] -ne compstate[total_matchers] ]] && return 1
 
-zstyle -s ":completion${curcontext}:" original orig
-zstyle -b ":completion${curcontext}:" insert-unambiguous ins
+zstyle -s ":completion:${curcontext}:" original orig
+zstyle -b ":completion:${curcontext}:" insert-unambiguous ins
 
 # Try completion without inserting a `*'?
 

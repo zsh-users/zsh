@@ -12,7 +12,7 @@ _complete_help() {
 
   for i in "${(@k)help_funcs}"; do
     text="${text}
-tags in context ${i}"
+tags in context :completion:${i}"
     for j in "${(@s.:.)help_funcs[$i][2,-1]}"; do
       text="${text}${help_tags[${i}${j}]}	(${j})"
     done
