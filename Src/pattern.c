@@ -1103,13 +1103,19 @@ patcomppiece(int *flagp)
      * each time we fail on a non-empty branch, we try the empty branch,
      * which is equivalent to backtracking.
      */
-    if ((flags & P_SIMPLE) && op == P_ONEHASH &&
+    if ((flags & P_SIMPLE) && (op == P_ONEHASH || op == P_TWOHASH) &&
 	P_OP((Upat)patout+starter) == P_ANY) {
 	/* Optimize ?# to *.  Silly thing to do, since who would use
 	 * use ?# ? But it makes the later code shorter.
 	 */
 	Upat uptr = (Upat)patout + starter;
-	uptr->l = (uptr->l & ~0xff) | P_STAR;
+	if (op == P_TWOHASH) {
+	    /* ?## becomes ?* */
+	    uptr->l = (uptr->l & ~0xff) | P_ANY;
+	    pattail(starter, patnode(P_STAR));
+	} else {
+	    uptr->l = (uptr->l & ~0xff) | P_STAR;
+	}
     } else if ((flags & P_SIMPLE) && op && !(patglobflags & 0xff)) {
 	/* Don't simplify if we need to look for approximations. */
 	patinsert(op, starter, NULL, 0);

@@ -42,7 +42,7 @@ item(Finland)(
 nofill(tt(ftp://ftp.funet.fi/pub/unix/shells/zsh/))
 )
 item(France)(
-nofill(tt(ftp://ftp.cenatls.cena.dgac.fr/pub/shells/zsh/))
+nofill(tt(ftp://ftp.cenatls.cena.dgac.fr/shells/zsh/))
 )
 item(Germany)(
 nofill(tt(ftp://ftp.fu-berlin.de/pub/unix/shells/zsh/)  em((H))
