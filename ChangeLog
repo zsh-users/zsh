@@ -1,5 +1,15 @@
 2002-03-25  Oliver Kiddle  <opk@zsh.org>
 
+	* users/4561: Completion/Unix/Command/_zip: fix bug with finding
+	the zipfile's name in the current command-line.
+
+	* 16384: Completion/X/Type/.distfiles, Completion/X/Type/_x_visual,
+	Completion/X/Command/.distfiles, Completion/X/Command/_xloadimage,
+	Completion/X/Command/_netscape, Completion/X/Command/_x_utils,
+	Completion/X/Command/_xfig, Completion/X/Command/_xv:
+	new completion for xli/xloadimage and factor out completion
+	of X visuals
+
 	* 16366: Completion/X/Command/_vnc, Completion/Unix/Command/_java,
 	Completion/Unix/Command/_samba: add missing description
 	argument in _values calls
