@@ -347,7 +347,9 @@ int
 boot_(Module m)
 {
 #ifdef HAVE_TIGETSTR
+# ifdef HAVE_SETUPTERM
     setupterm((char *)0, 1, (int *)0);
+# endif
 
     if (!createtihash())
     	return 1;

@@ -362,7 +362,7 @@ int
 boot_(Module m)
 {
 #ifdef HAVE_TGETENT
-# if defined(HAVE_CURSES_H) && defined(HAVE_TERM_H)
+# ifdef HAVE_SETUPTERM
     setupterm((char *)0, 1, (int *)0);
 # endif
 

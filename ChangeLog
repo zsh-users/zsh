@@ -1,5 +1,11 @@
 2001-04-23  Bart Schaefer  <schaefer@brasslantern.com>
 
+	* 14081: configure.in, Src/termcap.c, Src/terminfo.c: Fix linking
+	yet again in the wake of 14077.  Disables echoti and the terminfo
+	parameter on systems that have the old termcap, because otherwise
+	the main zsh may be unnecessarily linked with curses even when the
+	zsh/terminfo module is not in use.
+
 	* 14080: Src/glob.c, Src/params.c, Src/subst.c, Src/zsh.h,
 	Test/D06subscript.ztst: Optimize subscript parsing slightly by
 	passing down an indication of whether the expression is in double
