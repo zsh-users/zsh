@@ -1,0 +1,111 @@
+#compdef urpmi urpmi.addmedia urpmi.removemedia urpmi.update
+local state context line
+typeset -A opt_args
+
+_urpmi_cache_policy() {
+    [[ -e "$1" && -e /var/lib/urpmi/depslist.ordered && \
+	"$1" -nt /var/lib/urpmi/depslist.ordered ]] && return 1
+    return 0
+}
+    
+case "$service" in
+    urpmi.addmedia )
+	_arguments -A '-*' \
+	    "-update[mark as update media]" \
+	    ":name of media: " \
+	    ":media URL:->media_url" \
+	    ": :(with)" \
+	    ":relative path to hdlist file: " \
+	 && return 0
+    ;;
+    urpmi.removemedia )
+	_arguments -A '-*' \
+	    "(:)-a[select all media]" \
+	    "(-a)"{,\*}": :->urpmi_media" \
+	 && return 0
+    ;;
+    urpmi.update )
+	_arguments -A '-*' \
+	    "(:)-a[select all non-removable media]" \
+	    "-c[clean /var/cache/urpmi/headers on exit]" \
+	    "*-f[force rebuild of hdlist or base files (if repeated)]" \
+	    "(-a)"{,\*}": :->urpmi_media" \
+	 && return 0
+    ;;
+    urpmi )
+	_arguments -A '-*' \
+	    "(: -)--help[print usage information]" \
+	    "(--help)--update[use only update media]" \
+	    "(--help)--allow-medium-change[allow change of removable media]" \
+	    "(--help)--auto[do not ask any questions]" \
+	    "(--help)--auto-select[select the packages to update]" \
+	    "(--help)--force[preceed even when some packages do not exist]" \
+	    "(--help)--best-output[automatically select text or X interface]" \
+	    "(--help)-a[select all packages matching command line]" \
+	    "(--help -m -M)-m[choose minimum closure of requires (default)]" \
+	    "(--help -m -M)-M[choose maximum closure of requires]" \
+	    "(--help)-c[choose complete method for resolving requires]" \
+	    "(--help)-p[allow search in provides]" \
+	    "(--help -q -v)-q[be quiet]" \
+	    "(--help -q -v)-v[verbose mode]" \
+	    "(--help)"{,\*}": :->urpmi_rpms" \
+	&& return 0
+    ;;
+esac
+
+case "$state" in
+    media_url )
+	if compset -P file://; then
+	    _files -W / -/ && return 0
+	elif compset -P 'removable_cdrom(|_?)://'; then
+	    _files -/ && return 0
+	elif compset -P removable_; then
+	    local -a devices
+	    locale dev foo
+	    while read dev foo; do
+		[[ "$dev" != none ]] && devices=($devices ${dev#/dev/})
+	    done < /etc/fstab
+	    if [[ "$(rpm -q urpmi)" == urpmi-1.* ]]; then
+		_wanted urpmi_device expl 'device for removable media' \
+		   compadd -s _ -S "" -a devices && return 0
+	    else
+		_wanted urpmi_device expl 'device for removable media' \
+		   compadd -s :// -S "" -a devices && return 0
+	    fi
+	elif [[ -prefix '(ftp|http)://' ]]; then
+	    _urls && return 0
+	else
+	    _wanted urpmi_media_type expl 'type of media' \
+		compadd -- file:// http:// ftp:// removable_
+	fi
+    ;;
+    urpmi_media )
+	local source media brace ret=1
+	while read source media brace; do
+	    [[ "$brace" != "{" ]] && continue
+	    _wanted urpmi_media expl 'available media' \
+		compadd -- "$source"
+	    ret=0
+	done < /etc/urpmi/urpmi.cfg
+	return "$ret"
+    ;;
+    urpmi_rpms )
+	local pkg foo expl
+	local -a pkgs
+	if [[ -r /var/lib/urpmi/depslist.ordered ]]; then
+	    if _cache_invalid _urpmi_rpms || ! _retrieve_cache _urpmi_rpms; then
+		while read pkg foo; do
+		    [[ "$pkg" == (#b)(*)-[^-]##-[^-]## ]] && {
+			pkgs[$#pkgs+1]=("$match[1]")
+		    }
+		done < /var/lib/urpmi/depslist.ordered
+		_store_cache _urpmi_rpms pkgs
+	    fi
+	    _wanted urpmi_rpms expl 'RPM to install' \
+		compadd -a pkgs && return 0
+	fi
+    ;;
+esac
+
+return 1
+

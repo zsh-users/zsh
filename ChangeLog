@@ -1,3 +1,8 @@
+2001-11-14  Andrej Borsenkow  <bor@zsh.org>
+
+	* 16247: Completion/Mandrake/Command/_urpmi: completion
+	for Mandrake urpmi command suit.
+
 2001-11-09  Oliver Kiddle  <opk@zsh.org>
 
 	* 16228: Src/builtin.c, Doc/Zsh/builtins.yo: allow widths
