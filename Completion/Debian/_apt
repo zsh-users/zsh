@@ -97,13 +97,13 @@ tmp3=(--${(M)^long_hasarg:#$~tmp1} --${(M)^long_configfile:#$~tmp1} --${(M)^long
 _describe -o option tmp2 -- tmp3 -S= -- bool_prefix -S ""'
 
   comp_long_prefix=\
-'tmp1="${(j:|:)${(@)${(@M)${(@s:,:)${(@kj:,:)num_options[(R)*~0]}}:#--*}#--}}"
+'{tmp1="${(j:|:)${(@)${(@M)${(@s:,:)${(@kj:,:)num_options[(R)*~0]}}:#--*}#--}}"
 tmp2=($_ra_left${(M)^long_bool:#$~tmp1} $_ra_left${(M)^long_intlevel:#$~tmp1})
 tmp3=($_ra_left${(M)^long_hasarg:#$~tmp1} $_ra_left${(M)^long_configfile:#$~tmp1} $_ra_left${(M)^long_arbitem:#$~tmp1})
 tmp1="${(j:|:)${(@)${(@M)${(@s:,:)${(@kj:,:)num_options[(R)*~0]}}:#-?}#-}}"
 tmp2=("$tmp2[@]" $_ra_left${(M)^short_bool:#$~tmp1} $_ra_left${(M)^short_intlevel:#$~tmp1})
 tmp3=("$tmp3[@]" $_ra_left${(M)^short_hasarg:#$~tmp1} $_ra_left${(M)^short_configfile:#$~tmp1} $_ra_left${(M)^short_arbitem:#$~tmp1})
-_describe -o option tmp2 -- tmp3 -S='
+_describe -o option tmp2 -- tmp3 -S=}'
 
   comp_opt='{{ ! zstyle -T ":completion:${curcontext}:options" prefix-needed || [[ "$PREFIX" = -* ]] }'" && { $comp_short; $comp_long }}"
   comp_short="{$comp_short}"

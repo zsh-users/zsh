@@ -1,3 +1,7 @@
+2000-11-22  Tanaka Akira  <akr@zsh.org>
+
+	* 13181: Completion/Debian/_apt: add an action for _alternative.
+
 2000-11-20  Bart Schaefer  <schaefer@zsh.org>
 
 	* E. Jay Birkenbilt: 13171, 13172: Completion/User/_rlogin,
