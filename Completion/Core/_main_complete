@@ -17,9 +17,10 @@
 # state than the global one for which you are completing.
 
 
-local comp post ret=1 _compskip _prio_num=1
+local comp post ret=1 _compskip _prio_num=1 _tag_context _cur_contexts
+local context state line opt_args val_args
 typeset -U _offered_tags _tried_tags _failed_tags _used_tags _unused_tags
-typeset -A _prio_names _cur_tags
+typeset -A _prio_names _prio_contexts _cur_tags _tag_contexts
 
 _offered_tags=()
 _tried_tags=()

@@ -1,6 +1,6 @@
 #compdef gcc
 
-local state line ret=1 expl args
+local context state line ret=1 expl args
 typeset -A opt_args
 
 args=()
@@ -273,6 +273,8 @@ dump)
     'p[annotate assembler output]' && ret=0
   ;;
 library)
+  _tags "${context}" libraries || return 1
+
   _description expl library
   compadd "$expl[@]" - ${^=LD_LIBRARY_PATH:-/usr/lib /usr/local/lib}/lib*.(a|so*)(:t:fr:s/lib//) && ret=0
   ;;

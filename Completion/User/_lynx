@@ -1,6 +1,6 @@
 #compdef lynx
 
-local state line
+local context state line
 typeset -A opt_args
 
 _arguments \

@@ -5,7 +5,7 @@
 # arguments for the `mount' command for different operating systems
 # are below these table.
 
-local state line ret=1 args fss deffs=iso9660 descr tmp
+local context state line ret=1 args fss deffs=iso9660 descr tmp
 typeset -A opt_args
 
 if (( ! $+_fs_any )); then
@@ -228,11 +228,15 @@ fi
 
 case "$state" in
 fstype)
+  _tags "$context" types || return 1
+
   compset -P '*,'
   _description expl 'file system type'
   compadd "$expl[@]" -qS, -M 'L:|no=' - "$fss[@]" && ret=0
   ;;
 fsopt)
+  _tags "$context" options || return 1
+
   eval 'tmp=(' '"$_fs_'${(s:,:)^${opt_args[-t]:-${deffs}}}'[@]"' ')'
   tmp=( "$_fs_any[@]" "${(@)tmp:#}" )
   _values -s , 'file system options' "$tmp[@]" && ret=0
@@ -241,25 +245,24 @@ devordir)
   if (( $+opt_args[-a] )); then
     _message "no device or directory with option \`-a'"
   else
-    _description expl device
-    compadd "$expl[@]" /dev/* && ret=0
-    if (( ! $+opt_args[-t] )); then
-      _description expl 'mount point'
-      _files "$expl[@]" -/ && ret=0
-    fi
+    _alternative "$context" \
+        'devices:device:compadd /dev/\*' \
+	'directories:mount point:_files -/' && ret=0
   fi
   ;;
 udevordir)
   if (( $+opt_args[-a] )); then
     _message "no device or directory with option \`-a'"
   else
+    local dev_tmp mp_tmp
+
     tmp=( "${(@f)$(< /etc/mtab)}" )
-    _description expl device
-    compadd "$expl[@]" - "${(@)${(@)tmp%% *}:#none}" && ret=0
-    if (( ! $+opt_args[-t] )); then
-      _description expl 'mount point'
-      compadd "$expl[@]" - "${(@)${(@)tmp#* }%% *}"
-    fi
+    dev_tmp=( "${(@)${(@)tmp%% *}:#none}" )
+    mp_tmp=( "${(@)${(@)tmp#* }%% *}" )
+
+    _alternative "$context" \
+        'devices:device:compadd - $dev_tmp[@]' \
+	'directories:mount point:compadd - $mp_tmp[@]' && ret=0
   fi
   ;;
 esac

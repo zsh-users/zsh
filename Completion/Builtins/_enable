@@ -1,22 +1,15 @@
 #compdef enable
 
-local prev="$words[CURRENT-1]" ret=1 expl
+local prev="$words[CURRENT-1]" args
 
-if [[ "$prev" = -*a* ]]; then
-  _description expl alias
-  compadd "$expl[@]" "$@" - "${(k@)dis_aliases}" "${(k@)dis_galiases}" && ret=0
-fi
-if [[ "$prev" = -*f* ]]; then
-  _description expl 'shell function'
-  compadd "$expl[@]" "$@" - "${(k@)dis_functions}" && ret=0
-fi
-if [[ "$prev" = -*r* ]]; then
-  _description expl 'reserved word'
-  compadd "$expl[@]" "$@" - "${(k@)dis_reswords}" && ret=0
-fi
-if [[ "$prev" != -* ]]; then
-  _description expl 'builtin command'
-  compadd "$expl[@]" "$@" - "${(k@)dis_builtins}" && ret=0
-fi
+args=()
+[[ "$prev" = -*a* ]] &&
+    tags=( 'aliases:alias:compadd - ${(@k)dis_aliases} ${(@k)dis_galiases} )
+[[ "$prev" = -*f* ]] &&
+    tags=( "$tags[@]" 'functions:shell function:compadd - ${(@k)dis_functions}' )
+[[ "$prev" = -*r* ]] &&
+    tags=( "$tags[@]" 'reserved-words:reserved word:compadd - ${(@k)dis_reswords}' )
+[[ "$prev" != -* ]]  &&
+    tags=( 'builtins:builtin command:compadd - ${(@k)dis_builtins} )
 
-return ret
+_alternative any "$args[@]"

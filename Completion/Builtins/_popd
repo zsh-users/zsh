@@ -5,36 +5,39 @@
 # way round if pushdminus is set). Note that this function is also called
 # from _cd for cd and pushd.
 
-emulate -L zsh
 setopt extendedglob nonomatch
 
-[[ $PREFIX = [-+]* ]] || return 1
+_tags any directory-stack || return 1
 
-local expl list lines revlines ret=1 i
+! _style directory-stack prefix-needed yes ||
+    [[ $PREFIX = [-+]* ]] || return 1
 
-IPREFIX=$PREFIX[1]
-PREFIX=$PREFIX[2,-1]
+local expl list lines revlines disp
 
-# get the list of directories with their canonical number
-# and turn the lines into an array, removing the current directory
-lines=( ${${(f)"$(dirs -v)"}##0*} )
-if [[ ( $IPREFIX = - && ! -o pushdminus ) ||
-      ( $IPREFIX = + && -o pushdminus ) ]]; then
-  integer i
-  revlines=( $lines )
-  for (( i = 1; i <= $#lines; i++ )); do
-    lines[$i]="$((i-1)) -- ${revlines[-$i]##[0-9]#[	 ]#}"
-  done
+if _style directory-stack description yes; then
+  # get the list of directories with their canonical number
+  # and turn the lines into an array, removing the current directory
+  lines=("${PWD}" "${dirstack[@]}")
+
+  if [[ ( $PREFIX[1] = - && ! -o pushdminus ) ||
+        ( $PREFIX[1] = + && -o pushdminus ) ]]; then
+    integer i
+    revlines=( $lines )
+    for (( i = 1; i <= $#lines; i++ )); do
+      lines[$i]="$((i-1)) -- ${revlines[-$i]##[0-9]#[	 ]#}"
+    done
+  else
+    for (( i = 1; i <= $#lines; i++ )); do
+      lines[$i]="$i -- ${lines[$i]##[0-9]#[	 ]#}"
+    done
+  fi
+  # get the array of numbers only
+  list=( ${PREFIX[1]}${^lines%% *} )
+  disp=( -ld lines )
 else
-  for (( i = 1; i <= $#lines; i++ )); do
-    lines[$i]="$i -- ${lines[$i]##[0-9]#[	 ]#}"
-  done
+  list=( ${PREFIX[1]}{0..${#dirstack}} )
+  disp=()
 fi
-# get the array of numbers only
-list=(${lines%% *})
-_description expl 'directory stack index'
-compadd "$expl[@]" -ld lines -V dirs -Q - "$list[@]" && ret=0
-[[ -z $compstate[list] ]] && compstate[list]=list && ret=0
-[[ -n $compstate[insert] ]] && compstate[insert]=menu && ret=0
 
-return ret
+_description -V expl 'directory stack index'
+compadd "$expl[@]" "$@" -qS/ "$disp[@]" -Q - "$list[@]"

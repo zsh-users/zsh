@@ -13,6 +13,8 @@ local subcom expl
 
 if [[ $words[1] = zftp ]]; then
   if [[ $CURRENT -eq 2 ]]; then
+    _tags command commands || return 1
+
     _description expl sub-command
     compadd "$expl[@]" open params user login type ascii binary mode put \
       putat get getat append appendat ls dir local remote mkdir rmdir \
@@ -27,26 +29,27 @@ fi
 case $subcom in
   *(cd|ls|dir))
     # complete remote directories
-    zfcd_match $PREFIX $SUFFIX
+    _tags "$subcom" directories && zfcd_match $PREFIX $SUFFIX
     ;;
 
   *(get(|at)|gcp|delete|remote))
     # complete remote files
-    zfget_match $PREFIX $SUFFIX
+    _tags "$subcom" files && zfget_match $PREFIX $SUFFIX
     ;;
 
   *(put(|at)|pcp))
     # complete local files
-    _files
+    _tags "$subcom" files && _files
     ;;
 
   *(open|anon|params))
     # complete hosts:  should do cleverer stuff with user names
-    _hosts
+    _tags "$subcom" hosts && _hosts
     ;;
 
   *(goto|mark))
     # complete bookmarks.  First decide if ncftp mode is go.
+    _tags "$subcom" bookmarks || return 1
     _description expl bookmark
     if [[ $words[2] = -*n* ]]; then
       if [[ -f ~/.ncftp/bookmarks ]]; then
@@ -61,6 +64,7 @@ case $subcom in
 
   *session)
     # complete sessions, excluding the current one.
+    _tags "$subcom" sessions || return 1
     _description expl 'another FTP session'
     compadd "$expl[@]" - ${$(zftp session):#$ZFTP_SESSION}
     ;;
@@ -69,6 +73,7 @@ case $subcom in
     # complete arguments like sess1:file1 sess2:file2
     if [[ $PREFIX = *:* ]]; then
       # complete file in the given session
+      _tags "$subcom" files || return 1
       local sess=${PREFIX%%:*} oldsess=$ZFTP_SESSION
       compset -p $(( $#sess + 1 ))
       [[ -n $sess ]] && zftp session $sess
@@ -76,6 +81,7 @@ case $subcom in
       [[ -n $sess && -n $oldsess ]] && zftp session $oldsess
     else
       # note here we can complete the current session
+      _tags "$subcom" sessions || return 1
       _description expl 'FTP session'
       compadd "$expl[@]" -S : - $(zftp session)
     fi

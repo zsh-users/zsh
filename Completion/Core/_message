@@ -2,6 +2,8 @@
 
 local format
 
+_tags any messages || return 1
+
 format="${compconfig[message_format]:-$compconfig[description_format]}"
 
 if [[ -n "$format" ]]; then

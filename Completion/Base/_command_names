@@ -4,38 +4,27 @@
 # complete only external commands and executable files. This and a
 # `-' as the first argument is then removed from the arguments.
 
-local nm=$compstate[nmatches] ret=1 expl ext
+local args defs
+
+defs=(
+  'commands:external command:compadd - ${(@k)commands}'
+  'executables:executable file or directory:_path_files -/g \*\(\*\)'
+)
 
 if [[ "$1" = -e ]]; then
-  ext=yes
   shift
-elif [[ "$1" = - ]]; then
-  shift
-fi
-
-# Complete jobs in implicit fg and bg
-if [[ -z "$ext" && "$PREFIX[1]" = "%" ]]; then
-  _jobs
-  [[ nm -ne compstate[nmatches] ]] && return
-fi
-
-_description expl 'external command'
-compadd "$expl[@]" "$@" - "${(k@)commands}" && ret=0
-
-if [[ -z "$ext" ]]; then
-  _description expl 'builtin command'
-  compadd "$expl[@]" "$@" - "${(k@)builtins}" && ret=0
-  _description expl 'shell function'
-  compadd "$expl[@]" "$@" - "${(k@)functions}" && ret=0
-  _description expl 'alias'
-  compadd "$expl[@]" "$@" - "${(k@)aliases}" && ret=0
-  _description expl 'reserved word'
-  compadd "$expl[@]" "$@" - "${(k@)reswords}" && ret=0
-fi
-
-if [[ nm -eq compstate[nmatches] ]]; then
-  _description expl 'executable file or directory'
-  _path_files "$expl[@]" "$@" -/g "*(*)"
 else
-  return ret
+  [[ "$1" = - ]] && shift
+
+  defs=( "$defs[@]"
+    'jobs:: _jobs'
+    'builtins:builtin command:compadd - ${(@k)builtins}'
+    'functions:shell function:compadd - ${(@k)functions}'
+    'aliases:alias:compadd - ${(@k)aliases}'
+    'reserved-words:reserved word:compadd - ${(@k)reswords}'
+  )
 fi
+
+args=( "$@" )
+
+_alternative -O args any "$defs[@]"

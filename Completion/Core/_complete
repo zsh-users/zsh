@@ -4,7 +4,10 @@
 # a normal completion function, but as one possible value for the
 # compconfig[completer] parameter.
 
-local comp name
+local comp name _tag_context="$_tag_context"
+
+[[ "$compstate[context]" != command || CURRENT -eq 1 ]] && 
+    _tag_context="-${compstate[context]:s/_/-/}-"
 
 # If we have a user-supplied context name, use only that.
 
@@ -36,7 +39,7 @@ else
   # Let's see if we have a special completion definition for the other
   # possible contexts.
 
-  comp="$_comps[-${compstate[context]:s/_/-/}-]"
+  comp="$_comps[$_tag_context]"
 
   # If not, we use default completion, if any.
 

@@ -1,12 +1,19 @@
 #compdef sched
 
-local expl lines
+local expl lines disp
 
 if [[ CURRENT -eq 2 ]]; then
   if compset -P -; then
+    _tags - - entries || return 1
+
     lines=(${(f)"$(sched)"})
+    if _style entries description yes; then
+      disp=( -ld lines )
+    else
+      disp=()
+    fi
     _description expl 'scheduled jobs'
-    [[ -z $lines ]] || compadd "$expl[@]" -ld lines - {1..$#lines}
+    [[ -z $lines ]] || compadd "$expl[@]" "$disp[@]" - {1..$#lines}
   else
     _message 'time specification'
     return 1

@@ -1,45 +1,50 @@
 #autoload
 
-local tags get i
+local all get val i
+
+# Should we return the value?
 
 if [[ "$1" = -g ]]; then
   get=yes
   shift
 fi
 
-if (( ${+_cur_tags[${funcstack[2,-1]}]} )); then
-  tags="${_cur_tags[${funcstack[2,-1]}]}"
-else
-  tags="${_cur_tags[${funcstack[3,-1]}]}"
-fi
+# Get all styles defined for this context.
 
-if [[ "$tags" = *:${1}\[*\]:* ]]; then
+all=()
+for i in "${(s.:.)_cur_contexts}"; do
+  all=("$all[@]" "${(@)_compstyles[(K)${i},${1}]}" )
+done
+all=":${(j.:.)${(@o)all:#}##??}:"
 
-  tags="${${tags#*:${1}\[}%%\]*}"
+if [[ "$all" = *:${2}[:\=]* ]]; then
 
-  if [[ $# -eq 2 ]]; then
+  # We have a definition for the style.
+
+  if [[ $# -eq 3 ]]; then
     if [[ -n "$get" ]]; then
-      eval "${2}=\"$tags\""
-      return 0
-    fi
 
-    [[ "$tags" = (|*,)${2}(|,*) ]]
-    return
-  fi
+      # We have to return the value.
 
-  [[ "$tags" = (|*,)${2}(|(\=|,)*) ]] || return 1
-
-  if [[ -n "$get" ]]; then
-    if [[ "$tags" = (|*,)${2}\=* ]]; then
-      eval "${3}=\"${${tags#(|*,)${2}\=}%%,*}\""
+      if [[ "$all" = *,${2}\=* ]]; then
+        eval "${3}=\"${${all#*:${2}\=}%%:*}\""
+      else
+        eval "${3}=''"
+      fi
     else
-      eval "${3}=''"
-    fi
-    return 0
-  fi
 
-  [[ "$tags" = (|*,)${2}\=(|[^,]#,)${3}(|,*) ]] 
-  return
+      # We have to test the value.
+
+      if [[ "$all" = *:${2}\=* ]]; then
+        [[ "${${all#*:${2}\=}%%:*}" = ${~3} ]]
+      else
+        [[ '' -eq ${~3} ]]
+      fi
+
+      return
+    fi
+  fi
+  return 0
 fi
 
 return 1

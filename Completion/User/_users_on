@@ -2,6 +2,8 @@
 
 local expl
 
+_tags any users || return 1
+
 if which users >/dev/null; then
   _description expl 'users logged on'
   compadd "$@" "$expl[@]" - $(users) && return 0

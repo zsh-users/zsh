@@ -1,83 +1,84 @@
 #autoload
 
+# We use the funcstack names to communicate to neighboring functions.
+
 local tname="$funcstack[2,-1]"
 
 if (( $# )); then
-  local cmd="$words[1]" defs i ttags tag pat style prio context opt
 
-  while getopts 'c:C:' opt; do
-    if [[ "$opt" = c ]]; then
-      cmd="$OPTARG"
-    else
-      context="$OPTARG"
-    fi
-  done
-  shift OPTIND-1
+  # We have arguments: the tags supported in this context.
 
-  [[ -n "$context" ]] && context="/$context"
+  local command="${_tag_context:-${words[1]}}" _tags contexts name
 
-  defs=( "${(@M)argv:#${(kj:|:)~override_tags[(R)(|+*)]}}" )
-  (( $#defs )) && set -- "$defs[@]"
+  # We are given the `-c command-name' option.
+
+  if [[ "$1" = -c?* ]]; then
+    command="${1[3,-1]}"
+    shift
+  elif [[ "$1" = -c ]]; then
+    command="$2"
+    shift 2
+  fi
+
+  [[ "$1" = -(|-) ]] && shift
+
+  # Get the context names.
+
+  if [[ -n "$_sub_context" ]]; then
+    contexts="${1}:${_sub_context}"
+  else
+    contexts="${1}"
+  fi
+  contexts=":${command},${${contexts//::/:}//:/:${command},}:"
+  shift
+
+  _tags=()
+
+  # Remember offered tags.
 
   _offered_tags=( "$_offered_tags[@]" "$@" )
   _last_tags=()
 
-  defs=()
-  for i; do
-    if [[ -n ${override_tags[$i]} && ${override_tags[$i]} != (\[|+\[)* ]]; then
-      if [[ ${override_tags[$i]} = *\[* ]]; then
-        prio=( "${i}:*=${override_tags[$i]#+}" )
-      else
-        prio=( "${i}:${(@v)^comptags[(I)(|*:)${i}(|:*)]}" )
-        (( $#prio )) || prio=( "${i}:${comptags[any]}" )
-        prio="${${${prio[(r)(|*:)\*=[^:]#\[*\](|:*)]}##(|*:)\*}%%:*}"
-        prio=( "${i}:*=${override_tags[$i]#+}${(M)prio%%\[*\]}" )
-      fi
-    else
-      prio=( "${i}:${(@v)^comptags[(I)(|*:)${i}(|:*)]}" )
-      (( $#prio )) || prio=( "${i}:${comptags[any]}" )
-    fi
-    defs=( "$defs[@]" "$prio[@]" )
-  done
+  # Call the function that sorts the tags into sets.
 
-  ttags=()
-  for i in "$defs[@]"; do
-    tag="${i%%:*}"
-    for pat in "${(s.:.)i#*:}"; do
-      if [[ "$cmd$context" = ${~pat%%\=*} ]]; then
-        prio="${pat#*\=}"
-	[[ "$prio" = -* ]] && continue 2
+  "${_sort_tags:-_sort_tags}" "$@"
 
-	if [[ "$prio" = *\[*\] ]]; then
-	  style="${(M)prio%%\[*}"
-	  prio="${prio%%\[*}"
-        else
-	  style=''
-        fi
-	[[ ${override_tags[$tag]} = (|+)\[* ]] &&
-	    style="${override_tags[$tag]#+}"
+  # The sets are reported in $_tags, one element per set. Remove 
+  # tags that weren't requested.
 
-	(( prio++ ))
+  _tags=( "${(M@)_tags:#*:(${(j:|:)~argv}):*}" )
 
-        ttags[$prio]="${ttags[$prio]}:${tag}${style}"
-        break
-      fi
-    done
-  done
+  # Store the sets in a `hidden' array.
 
-  prio="_prio_arr$(( _prio_num++ ))"
-  _prio_names[$tname]="$prio"
-  ttags=( "${(@)ttags:#}" )
-  eval "${prio}=( \"\$ttags[@]\" )"
+  name="_prio_arr$(( _prio_num++ ))"
+  _prio_names[$tname]="$name"
+  eval "${name}=( \"\$_tags[@]\" )"
 
-  return \!$#ttags
+  # Also store the context (used below and in _requested).
+
+  _cur_contexts="$contexts[2,-2]"
+  _tag_contexts[$tname]="$_cur_contexts"
+
+  # Return non-zero if at least one set of tags should be used.
+
+  return \!$#_tags
 fi
+
+# The other mode: switch to the next set of tags.
 
 local prios="$_prio_names[$tname]"
 
+# Reset the current context.
+
+_cur_contexts="${_tag_contexts[$tname]}"
+
 _failed_tags=( "$_failed_tags[@]" "$_last_tags" )
 
+# Return failure if no sets remaining.
+
 (( ${(P)#prios} )) || return 1
+
+# Otherwise get the next tags.
 
 _cur_tags[$tname]="${(@)${(@P)prios}[1]}:"
 

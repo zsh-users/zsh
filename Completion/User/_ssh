@@ -1,7 +1,7 @@
 #compdef ssh slogin scp ssh-add ssh-agent ssh-keygen
 
 _ssh () {
-  local state lstate line ret=1 expl args
+  local context state lstate line ret=1 expl args tmp
   typeset -A opt_args
 
   local accounts_users_hosts
@@ -58,23 +58,31 @@ _ssh () {
         if compset -P '*[= ]'; then
           case "$IPREFIX" in
           *(#i)(batchmode|compression|fallbacktorsh|forward(agent|x11)|keepalive|passwordauthentication|rhosts(|rsa)authentication|rsaauthentication|usersh|kerberos(authetication|tgtparsing)|usepriviledgedport)*)
-            compadd yes no && ret=0
+	    _tags "$context" values && compadd yes no && ret=0
             ;;
           *(#i)cipher*)
-            _description expl 'encryption cipher'
-            compadd "$expl[@]" idea des 3des blowfish arcfour tss none && ret=0
+	    if _tags "$context" values; then
+              _description expl 'encryption cipher'
+              compadd "$expl[@]" idea des 3des blowfish arcfour tss none && ret=0
+	    fi
             ;;
           *(#i)globalknownhostsfile*)
-            _description expl 'global file with known hosts'
-            _files "$expl[@]" && ret=0
+	    if _tags "$context" files; then
+              _description expl 'global file with known hosts'
+              _files "$expl[@]" && ret=0
+	    fi
             ;;
           *(#i)hostname*)
-            _description expl 'real host name to log into'
-            _ssh_hosts "$expl[@]" && ret=0
+	    if _tags "$context" hosts; then
+              _description expl 'real host name to log into'
+              _ssh_hosts "$expl[@]" && ret=0
+	    fi
             ;;
           *(#i)identityfile*)
-            _description expl 'SSH identity file'
-            _files "$expl[@]" && ret=0
+	    if _tags "$context" files; then
+              _description expl 'SSH identity file'
+              _files "$expl[@]" && ret=0
+	    fi
             ;;
           *(#i)(local|remote)forward*)
             state=forward
@@ -86,36 +94,44 @@ _ssh () {
             _normal && ret=0
             ;;
           *(#i)stricthostkeychecking*)
-            compadd yes no ask
+            _tags "$context" values && compadd yes no ask
             ;;
           *(#i)userknownhostsfile*)
-            _description expl 'user file with known hosts'
-            _files "$expl[@]" && ret=0
+	    if _tags "$context" files; then
+              _description expl 'user file with known hosts'
+              _files "$expl[@]" && ret=0
+	    fi
             ;;
           *(#i)user*)
-            _description expl 'user to log in as'
-            _ssh_users "$expl[@]" && ret=0
+	    if _tags "$context" files; then
+              _description expl 'user to log in as'
+              _ssh_users "$expl[@]" && ret=0
+	    fi
             ;;
           *(#i)xauthlocation*)
-            _description expl 'xauth program'
-            _files "$expl[@]" -g '*(*)' && ret=0
+	    if _tags "$context" files; then
+              _description expl 'xauth program'
+              _files "$expl[@]" -g '*(*)' && ret=0
+	    fi
             ;;
           esac
         else
-          _description expl 'configure file option'
-          compadd "$expl[@]" -M 'm:{a-z}={A-Z}' -S '=' - \
-              BatchMode ClearAllForwardings Cipher Compression \
-              CompressionLevel Host ConnectionAttempts EscapeChar \
-              FallBackToRsh ForwardAgent ForwardX11 \
-              GlobalKnownHostsFile HostName IdentityFile KeepAlive \
-              KerberosAuthentication KerberosTgtPassing LocalForward \
-              NumberOfPasswordPrompts PasswordAuthentication Port \
-              ProxyCommand RemoteForward RhostsAuthentication \
-              RhostsRSAAuthentication RSAAuthentication \
-              StrictHostKeyChecking TISAuthentication \
-              UsePriviledgedPort User UserKnownHostsFile UseRsh \
-              XAuthLocation \
-            && ret=0
+          if _tags "$context" values; then
+            _description expl 'configure file option'
+            compadd "$expl[@]" -M 'm:{a-z}={A-Z}' -S '=' - \
+                BatchMode ClearAllForwardings Cipher Compression \
+                CompressionLevel Host ConnectionAttempts EscapeChar \
+                FallBackToRsh ForwardAgent ForwardX11 \
+                GlobalKnownHostsFile HostName IdentityFile KeepAlive \
+                KerberosAuthentication KerberosTgtPassing LocalForward \
+                NumberOfPasswordPrompts PasswordAuthentication Port \
+                ProxyCommand RemoteForward RhostsAuthentication \
+                RhostsRSAAuthentication RSAAuthentication \
+                StrictHostKeyChecking TISAuthentication \
+                UsePriviledgedPort User UserKnownHostsFile UseRsh \
+                XAuthLocation \
+              && ret=0
+	  fi
         fi
         ;;
       forward)
@@ -123,7 +139,7 @@ _ssh () {
           if compset -P '*:'; then
             _message 'port number'
           else
-            _ssh_hosts -S: -q
+	    _tags "$context" hosts && _ssh_hosts -S: -q
           fi
         else
           _message 'listen-port number'
@@ -138,15 +154,19 @@ _ssh () {
         ;;
       userhost)
         if compset -P '*@'; then
-          _description expl 'remote host name'
-          _ssh_hosts "$expl[@]" && ret=0
+	  if _tags "$context" hosts; then
+            _description expl 'remote host name'
+            _ssh_hosts "$expl[@]" && ret=0
+	  fi
         else
-          _description expl 'remote host name'
-          _ssh_hosts "$expl[@]" && ret=0
-          if (( ! $+opt_args[-l] )); then
-            _description expl 'login name'
-            _ssh_users "$expl[@]" -S@ -q && ret=0
-          fi
+          if (( $+opt_args[-l] )); then
+	    tmp=()
+	  else
+	    tmp=( 'users:login name:_ssh_users -qS@' )
+	  fi
+	  _alternative "$context" \
+	      'hosts:remote host name:_ssh_hosts' \
+	      "$tmp[@]" && ret=0
         fi
         ;;
       esac
@@ -178,13 +198,14 @@ _ssh () {
       return
     elif [[ -n "$state" ]]; then
       if compset -P '*:'; then
-        _files && ret=0
+        _tags "$context" files && _files && ret=0
       elif compset -P '*@'; then
-        _ssh_hosts -S: && ret=0
+        _tags "$context" hosts && _ssh_hosts -S: && ret=0
       else
-        _files && ret=0
-        _ssh_hosts -S: && ret=0
-        _ssh_users -S@ && ret=0
+        _alternative "$context" \
+	    'files:: _files' \
+	    'hosts:: _ssh_hosts -S:' \
+	    'users:: _ssh_users -S@' && ret=0
       fi
     fi
     return ret
@@ -222,10 +243,12 @@ _ssh () {
 }
 
 _ssh_users () {
-  _combination accounts_users_hosts users "$@"
+  _tags any users && _combination accounts_users_hosts users "$@"
 }
 
 _ssh_hosts () {
+  _tags any hosts || return 1
+
   if [[ "$IPREFIX" == *@ ]]; then
     _combination accounts_users_hosts "users=${IPREFIX/@}" hosts "$@"
   else

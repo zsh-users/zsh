@@ -2,6 +2,8 @@
 
 local expl
 
+_tags any keysyms || return 1
+
 if (( ! $+_keysym_cache )); then
   local file
 

@@ -1,6 +1,6 @@
 #compdef gprof
 
-local state line ret=1
+local context state line ret=1
 typeset -A opt_args
 
 _arguments -s -{a,b,c,D,h,i,l,L,s,T,v,w,x,y,z} \
@@ -16,6 +16,8 @@ _arguments -s -{a,b,c,D,h,i,l,L,s,T,v,w,x,y,z} \
 
 if [[ -n "$state" ]]; then
   local cmd pair expl
+
+  _tags "${context}" functions || return 1
 
   [[ "$state" = pair ]] && pair=yes
 
@@ -46,7 +48,7 @@ if [[ -n "$state" ]]; then
     else
       _description expl function
     fi
-    compadd -M 'r:|_=* r:|=*' - "$_gprof_funcs[@]" && ret=0
+    compadd "$expl[@]" -M 'r:|_=* r:|=*' - "$_gprof_funcs[@]" && ret=0
   else
     return 1
   fi

@@ -1,6 +1,6 @@
 #compdef ypcat ypmatch yppasswd ypwhich ypset ypserv ypbind yppush yppoll ypxfr domainname
 
-local line state ret=1
+local context line state ret=1
 typeset -A opt_args
 
 if (( ! $+_yp_cache_maps )); then
@@ -87,20 +87,31 @@ esac
 if [[ "$state" = map* ]]; then
   local expl
 
-  _description expl 'map name'
-
-  # The `-M ...' allows `pa.n<TAB>' to complete to `passwd.byname'.
-
-  compadd "$expl[@]" -M 'l:.|by=by l:.|=by r:|.=* r:|=*' - \
-          "$_yp_cache_maps[@]" && ret=0
   if [[ $+opt_args[-t] -eq 0 && "$state" != maponly ]]; then
-    _description expl 'nicknames'
-    compadd "$expl[@]" - "$_yp_cache_nicks[@]" && ret=0
+    _tags "$context" maps nicknames
+  else
+    _tags "$context" maps
   fi
+
+  while _tags; do
+    if _requested maps; then
+      # The `-M ...' allows `pa.n<TAB>' to complete to `passwd.byname'.
+
+      _description expl 'map name'
+      compadd "$expl[@]" -M 'l:.|by=by l:.|=by r:|.=* r:|=*' - \
+              "$_yp_cache_maps[@]" && ret=0
+    fi
+    if _requested nicknames; then
+      _description expl 'nicknames'
+      compadd "$expl[@]" - "$_yp_cache_nicks[@]" && ret=0
+    fi
+  done
 elif [[ "$state" = servers ]]; then
   if compset -P '*,'; then
-    _description expl 'server'
-    _hosts -qS, && ret=0
+    if _tags "$context" hosts; then
+      _description expl 'server'
+      _hosts -qS, && ret=0
+    fi
   else
     _message 'domain name'
   fi

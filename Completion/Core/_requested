@@ -1,9 +1,9 @@
 #autoload
 
-local tag tname="$funcstack[2,-1]"
+# Reset the current context.
 
-for tag; do
-  [[ "${_cur_tags[${tname}]}" = *:${tag}(:|\[*\]:)* ]] && return 0
-done
+_cur_contexts="${_tag_contexts[$tname]}"
 
-return 1
+# Test if the tag given as argument was requested.
+
+[[ "${_cur_tags[${funcstack[2,-1]}]}" = *:${1}:* ]]

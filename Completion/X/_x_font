@@ -2,6 +2,8 @@
 
 local expl
 
+_tags any fonts || return 1
+
 # This *has* to be improved some day...
 
 if (( ! $+_font_cache )); then

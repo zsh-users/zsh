@@ -1,22 +1,15 @@
 #compdef disable
 
-local prev="$words[CURRENT-1]" ret=1 expl
+local prev="$words[CURRENT-1]" args
 
-if [[ "$prev" = -*a* ]]; then
-  _description expl alias
-  compadd "$expl[@]" "$@" - "${(k@)aliases}" && ret=0
-fi
-if [[ "$prev" = -*f* ]]; then
-  _description expl 'shell function'
-  compadd "$expl[@]" "$@" - "${(k@)functions}" && ret=0
-fi
-if [[ "$prev" = -*r* ]]; then
-  _description expl 'reserved word'
-  compadd "$expl[@]" "$@" - "${(k@)reswords}" && ret=0
-fi
-if [[ "$prev" != -* ]]; then
-  _description expl 'builtin command'
-  compadd "$expl[@]" "$@" - "${(k@)builtins}" && ret=0
-fi
+args=()
+[[ "$prev" = -*a* ]] &&
+    tags=( 'aliases:alias:compadd - ${(@k)aliases} ${(@k)galiases} )
+[[ "$prev" = -*f* ]] &&
+    tags=( "$tags[@]" 'functions:shell function:compadd - ${(@k)functions}' )
+[[ "$prev" = -*r* ]] &&
+    tags=( "$tags[@]" 'reserved-words:reserved word:compadd - ${(@k)reswords}' )
+[[ "$prev" != -* ]]  &&
+    tags=( 'builtins:builtin command:compadd - ${(@k)builtins} )
 
-return ret
+_alternative any "$args[@]"

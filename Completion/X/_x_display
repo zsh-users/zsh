@@ -1,3 +1,5 @@
 #autoload
 
+_tags any displays || return 1
+
 _hosts -S ':0 ' -r :

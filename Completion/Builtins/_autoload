@@ -2,5 +2,7 @@
 
 local expl
 
+_tags any:argument functions || return 1
+
 _description expl 'shell function'
 compadd "$expl[@]" - ${^fpath}/*(N:t)

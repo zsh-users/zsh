@@ -5,6 +5,8 @@
 
 local pars expl
 
+_tags any parameters || return 1
+
 _description expl parameter
 
 pars=( ${(k)parameters[(R)^*local*]} )

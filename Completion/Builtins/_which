@@ -1,14 +1,12 @@
 #compdef which whence where type
 
-local expl
+local args
 
-_description expl 'external command'
-compadd "$expl[@]" "$@" - "${(k@)commands}" && ret=0
-_description expl 'builtin command'
-compadd "$expl[@]" "$@" - "${(k@)builtins}" && ret=0
-_description expl 'shell function'
-compadd "$expl[@]" "$@" - "${(k@)functions}" && ret=0
-_description expl 'alias'
-compadd "$expl[@]" "$@" - "${(k@)aliases}" && ret=0
-_description expl 'reserved word'
-compadd "$expl[@]" "$@" - "${(k@)reswords}" && ret=0
+args=( "$@" )
+
+_alternative -O args any:argument \
+  'commands:external command:compadd - ${(k@)commands}' \
+  'builtins:builtin command:compadd - ${(k@)builtins}' \
+  'functions:shell function:compadd - ${(k@)functions}' \
+  'aliases:alias:compadd - ${(k@)aliases}' \
+  'reserved-words:reserved word:compadd - ${(k@)reswords}'

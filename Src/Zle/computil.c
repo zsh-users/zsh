@@ -357,6 +357,7 @@ struct caarg {
     char *action;
     int type;
     char *end;
+    char *opt;
     int num;
 };
 
@@ -395,6 +396,7 @@ free_caargs(Caarg a)
 	zsfree(a->descr);
 	zsfree(a->action);
 	zsfree(a->end);
+	zsfree(a->opt);
 	zfree(a, sizeof(*a));
     }
 }
@@ -442,7 +444,7 @@ rembslashcolon(char *s)
 }
 
 static Caarg
-parse_caarg(int mult, int type, int num, char **def)
+parse_caarg(int mult, int type, int num, char *oname, char **def)
 {
     Caarg ret = (Caarg) zalloc(sizeof(*ret));
     char *p = *def, *d, sav;
@@ -451,6 +453,7 @@ parse_caarg(int mult, int type, int num, char **def)
     ret->descr = ret->action = ret->end = NULL;
     ret->num = num;
     ret->type = type;
+    ret->opt = ztrdup(oname);
 
     for (d = p; *p && *p != ':'; p++)
 	if (*p == '\\' && p[1])
@@ -647,7 +650,7 @@ parse_cadef(char *nam, char **args)
 	    }
 	    if (c == ':') {
 		Caarg *oargp = &oargs;
-		int atype, rest;
+		int atype, rest, oanum = 1;
 		char *end;
 
 		while (c == ':') {
@@ -681,7 +684,7 @@ parse_cadef(char *nam, char **args)
 			rest = 1;
 		    } else
 			atype = CAA_NORMAL;
-		    *oargp = parse_caarg(!rest, atype, 0, &p);
+		    *oargp = parse_caarg(!rest, atype, oanum++, name, &p);
 		    oargp = &((*oargp)->next);
 		    if (rest)
 			break;
@@ -739,7 +742,7 @@ parse_cadef(char *nam, char **args)
 		} else
 		    type = CAA_RARGS;
 	    }
-	    ret->rest = parse_caarg(0, type, -1, &p);
+	    ret->rest = parse_caarg(0, type, -1, NULL, &p);
 	} else {
 	    int type = CAA_NORMAL;
 	    Caarg arg, tmp, pre;
@@ -763,7 +766,7 @@ parse_cadef(char *nam, char **args)
 		type = CAA_OPT;
 		p++;
 	    }
-	    arg = parse_caarg(0, type, anum - 1, &p);
+	    arg = parse_caarg(0, type, anum - 1, NULL, &p);
 
 	    for (tmp = ret->args, pre = NULL;
 		 tmp && tmp->num < anum - 1;
@@ -1191,8 +1194,9 @@ bin_comparguments(char *nam, char **args, char *ops, int func)
     switch (args[0][1]) {
     case 'i': min = 2; max = -1; break;
     case 'D': min = 2; max =  2; break;
+    case 'C': min = 1; max =  1; break;
     case 'O': min = 4; max =  4; break;
-    case 'L': min = 3; max =  3; break;
+    case 'L': min = 3; max =  4; break;
     case 's': min = 1; max =  1; break;
     case 'M': min = 1; max =  1; break;
     case 'a': min = 0; max =  0; break;
@@ -1248,6 +1252,24 @@ bin_comparguments(char *nam, char **args, char *ops, int func)
 	    }
 	    return 1;
 	}
+    case 'C':
+	{
+	    Caarg arg = ca_laststate.def;
+
+	    if (arg) {
+		char buf[20];
+
+		if (arg->num > 0)
+		    sprintf(buf, "%d", arg->num);
+		else
+		    strcpy(buf, "rest");
+
+		setsparam(args[1], (arg->opt ? tricat(arg->opt, "-", buf) :
+				    tricat("argument-", buf, "")));
+		return 0;
+	    }
+	    return 1;
+	}
     case 'O':
 	if (ca_laststate.opt) {
 	    LinkList next = newlinklist();
@@ -1283,8 +1305,8 @@ bin_comparguments(char *nam, char **args, char *ops, int func)
 	    set_list_array(args[4], equal);
 
 	    return 0;
-	} else
-	    return 1;
+	}
+	return 1;
     case 'L':
 	{
 	    Caopt opt = ca_get_opt(ca_laststate.d, args[1], 1, NULL);
@@ -1292,6 +1314,9 @@ bin_comparguments(char *nam, char **args, char *ops, int func)
 	    if (opt && opt->args) {
 		setsparam(args[2], ztrdup(opt->args->descr));
 		setsparam(args[3], ztrdup(opt->args->action));
+
+		if (args[4])
+		    setsparam(args[4], tricat(opt->name, "-1", NULL));
 
 		return 0;
 	    }
@@ -1306,8 +1331,8 @@ bin_comparguments(char *nam, char **args, char *ops, int func)
 			      (ca_laststate.ddef->type == CAO_EQUAL ?
 			       "equal" : "next")) : ""));
 	    return 0;
-	} else
-	    return 1;
+	}
+	return 1;
     case 'M':
 	setsparam(args[1], ztrdup(ca_laststate.d->match));
 	return 0;
@@ -1533,7 +1558,7 @@ parse_cvdef(char *nam, char **args)
 		vtype = CVV_OPT;
 	    } else
 		vtype = CVV_ARG;
-	    arg = parse_caarg(0, 0, 0, &p);
+	    arg = parse_caarg(0, 0, 0, name, &p);
 	} else {
 	    vtype = CVV_NOARG;
 	    arg = NULL;
@@ -1758,10 +1783,11 @@ bin_compvalues(char *nam, char **args, char *ops, int func)
     switch (args[0][1]) {
     case 'i': min = 2; max = -1; break;
     case 'D': min = 2; max =  2; break;
+    case 'C': min = 1; max =  1; break;
     case 'V': min = 3; max =  3; break;
     case 's': min = 1; max =  1; break;
     case 'd': min = 1; max =  1; break;
-    case 'L': min = 3; max =  3; break;
+    case 'L': min = 3; max =  4; break;
     case 'v': min = 1; max =  1; break;
     default:
 	zerrnam(nam, "invalid option: %s", args[0], 0);
@@ -1801,6 +1827,17 @@ bin_compvalues(char *nam, char **args, char *ops, int func)
 	    if (arg) {
 		setsparam(args[1], ztrdup(arg->descr));
 		setsparam(args[2], ztrdup(arg->action));
+
+		return 0;
+	    }
+	    return 1;
+	}
+    case 'C':
+	{
+	    Caarg arg = cv_laststate.def;
+
+	    if (arg) {
+		setsparam(args[1], ztrdup(arg->opt));
 
 		return 0;
 	    }
@@ -1860,6 +1897,9 @@ bin_compvalues(char *nam, char **args, char *ops, int func)
 	    if (val && val->arg) {
 		setsparam(args[2], val->arg->descr);
 		setsparam(args[3], val->arg->action);
+
+		if (args[4])
+		    setsparam(args[4], ztrdup(val->name));
 
 		return 0;
 	    }

@@ -1,22 +1,14 @@
 #compdef unhash
 
-local fl="$words[2]" ret=1 expl
+local fl="$words[2]" args
 
-if [[ "$fl" = -*d* ]]; then
-  _description expl 'named directory'
-  compadd "$expl[@]" - "${(@k)nameddirs}" && ret=0
-fi
-if [[ "$fl" = -*a* ]]; then
-  _description expl alias
-  compadd "$expl[@]" - "${(@k)aliases}" "${(@k)dis_aliases}" \
-                       "${(@k)galiases}" "${(@k)dis_galiases}" && ret=0
-fi
-if [[ "$fl" = -*f* ]]; then
-  _description expl 'shell function'
-  compadd "$expl[@]" - "${(@k)functions}" "${(@k)dis_functions}" && ret=0
-fi
-if [[ "$fl" != -* ]]; then
-  _command_names -e && ret=0
-fi
+args=()
+[[ "$fl" = -*d* ]] &&
+    args=( 'named-directories:named directory:compadd - ${(@k)nameddirs}' )
+[[ "$fl" = -*a* ]] &&
+    args=( "$args[@]"
+           'aliases:alias:compadd - ${(@k)aliases} ${(@k)galiases} ${(@k)dis-aliases} ${(@k)dis-galiases}' )
+[[ "$fl != -* ]] &&
+    args=( 'commands:: _command_names -e' )
 
-return ret
+_alternative any:argument "$args[@]"

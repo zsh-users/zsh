@@ -5,9 +5,9 @@
 #  telnet_hosts_ports_users
 #    The array that contains 3-tuples `host:port:user'.
 
-local state line expl
+local context state line expl
 typeset -A opt_args
-
+set -x
 if (( ! $+_telnet_short )); then
   local k help="$(telnet -\? < /dev/null 2>&1)"
   local -A optionmap
@@ -52,13 +52,11 @@ if (( ! $+_telnet_short )); then
   done
 fi
 
-[[ $#_telnet_long != 0 && (
-     -z "$compconfig[option_prefix]" ||
-     "$compconfig[option_prefix]" = *\!${words[1]}* ||
-     "$PREFIX" = [-+]* ) ]] && {
+if _tags any options && (( $#_telnet_long )) &&
+   { ! _style options prefix-needed yes || [[ "$PREFIX" = [-+]* ]] } ; then
   _description expl 'option'
   _describe -o option _telnet_long "$expl[@]"
-}
+fi
 
 _arguments -s \
   "$_telnet_short[@]" \
@@ -67,6 +65,8 @@ _arguments -s \
 
 case "$state" in
 hosts)
+  _tags "$context" hosts || return 1
+
   _description expl 'host'
   _combination telnet_hosts_ports_users \
     ${opt_args[-l]:+users=${opt_args[-l]:q}} \
@@ -74,6 +74,8 @@ hosts)
   ;;
 
 ports)
+  _tags "$context" ports || return 1
+
   _description expl 'port'
   _combination telnet_hosts_ports_users \
     ${opt_args[-l]:+users=${opt_args[-l]:q}} \
@@ -82,6 +84,8 @@ ports)
   ;;
 
 users)
+  _tags "$context" users || return 1
+
   _description expl 'user'
   _combination telnet_hosts_ports_users \
     ${line[2]:+hosts="${line[2]:q}"} \

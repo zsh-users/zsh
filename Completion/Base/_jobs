@@ -1,6 +1,12 @@
 #autoload
 
-local expl disp jobs job jids
+local expl disp jobs job jids pfx='%' desc
+
+_tags any jobs || return 1
+
+_style jobs prefix-needed yes && [[ "$PREFIX" != %* ]] && return 1
+_style jobs prefix-hidden yes && pfx=''
+_style jobs description yes   && desc=yes
 
 if [[ "$1" = -r ]]; then
   jids=( "${(@k)jobstates[(R)running*]}" )
@@ -19,9 +25,13 @@ fi
 disp=()
 jobs=()
 for job in "$jids[@]"; do
-  disp=( "$disp[@]" "${(l:3:: ::%:)job} -- ${jobtexts[$job]}" )
+  [[ -n "$desc" ]] &&
+      disp=( "$disp[@]" "${pfx}${(r:2:: :)job} -- ${(r:COLUMNS-8:: :)jobtexts[$job]}" )
   jobs=( "$jobs[@]" "$job" )
 done
 
-compadd "$@" "$expl[@]" -ld disp - "%$^jobs[@]"
-
+if [[ -n "$desc" ]]; then
+  compadd "$@" "$expl[@]" -ld disp - "%$^jobs[@]"
+else
+  compadd "$@" "$expl[@]" - "%$^jobs[@]"
+fi

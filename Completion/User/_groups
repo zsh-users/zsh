@@ -2,6 +2,8 @@
 
 local expl
 
+_tags any groups || return 1
+
 if (( ! $+groups )); then
   if whence -p ypcat > /dev/null; then
     : ${(A)groups:=${${(s: :)$(ypcat group.byname)}%%:*}} # If you use NIS

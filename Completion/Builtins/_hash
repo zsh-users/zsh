@@ -4,15 +4,23 @@ local expl
 
 if [[ "$words[2]" = -*d* ]]; then
   if compset -P 1 '*\='; then
+    _tags - -d-value files || return 1
+
     _path_files -g '*(-/)'
   else
+    _tags - -d named-directories || return 1
+
     _description expl 'named directory'
     compadd "$expl[@]" -q -S '=' - "${(@k)nameddirs}"
   fi
 elif compset -P 1 '*\='; then
+  _tags value executables || return 1
+
   _description expl 'executable file'
   _files "$expl[@]" -g '*(*)'
 else
+  _tags any:argument commands || return 1
+
   _description expl command
   compadd "$expl[@]" -q -S '=' - "${(@k)commands}"
 fi

@@ -45,12 +45,13 @@ local localhttp_userdir="${${(@s.:.)compconfig[urls_localhttp]}[3]}"
 
 if [[ "$1" = -f ]]; then
   shift
-  _files "$@" && return
+  _tags argument:-f files && _files "$@" && return
 fi
 
 ipre="$IPREFIX"
 
-if ! compset -P '(#b)([-+.a-z0-9]#):'; then
+if ! compset -P '(#b)([-+.a-z0-9]#):' &&
+   _tags argument prefixes; then
   _description expl 'URL prefix'
   [[ -d $urls_path/bookmark ]] &&
     compadd "$@" "$expl[@]" -S '' bookmark: && ret=0
@@ -62,12 +63,14 @@ scheme="$match[1]"
 case "$scheme" in
   http|ftp|gopher)
     if ! compset -P //; then
-      compadd "$@" -S '' //
+      _tags "$scheme" slashes && compadd "$@" -S '' //
       return
     fi
   ;;
   file)
     if ! compset -P //; then
+      _tags file files || return 1
+
       if [[ -prefix / ]]; then
 	_path_files "$@" -S '' -g '*(^/)' && ret=0
 	_path_files "$@" -S/ -r '/' -/ && ret=0
@@ -81,8 +84,12 @@ case "$scheme" in
   bookmark)
     if [[ -f "$urls_path/$scheme/$PREFIX$SUFFIX" &&
 	  -s "$urls_path/$scheme/$PREFIX$SUFFIX" ]]; then
+      _tags bookmark caches || return 1
+
       compadd "$@" -QU -- "$ipre$(<"$urls_path/$scheme/$PREFIX$SUFFIX")" && ret=0
     else
+      _tags bookmark files || return 1
+
       _description expl 'bookmark'
       _path_files -W "$urls_path/$scheme" "$expl[@]" -S '' -g '*(^/)' && ret=0
       _path_files -W "$urls_path/$scheme" -S/ -r '/' -/ && ret=0
@@ -92,7 +99,8 @@ case "$scheme" in
 esac
 
 # Complete hosts
-if ! compset -P '(#b)([^/]#)/'; then
+if ! compset -P '(#b)([^/]#)/' &&
+   _tags argument hosts; then
   uhosts=($urls_path/$scheme/$PREFIX*$SUFFIX(/:t))
   (( $#uhosts )) || _hosts -S/ && ret=0
   [[ "$scheme" = http ]] && uhosts=($uhosts $localhttp_servername)
@@ -103,6 +111,9 @@ fi
 host="$match[1]"
 
 # Complete part after hostname
+
+_tags local files || return 1
+
 if [[ "$localhttp_servername" = "$host" ]]; then
   if compset -P \~; then
     if ! compset -P '(#b)([^/]#)/'; then

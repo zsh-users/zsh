@@ -878,14 +878,14 @@ that implement a state machine. In this case, the `var(string)' (with
 all leading and trailing spaces and tabs removed) will be stored in
 the global parameter tt(state) and the function returns with a return
 value of 300 (to make it distinguishable from other return values)
-after setting the global `tt(line)' and `tt(opt_args)'
+after setting the global `tt(context)', `tt(line)' and `tt(opt_args)'
 parameters as described below and without resetting any changes made
 to the special parameters such as tt(PREFIX) and tt(words). Note that
 this means that a function calling tt(_arguments) with at least one
 action containing such a `tt(->)var(string)' has to declare
 appropriate local parameters as in:
 
-example(local state line
+example(local context state line
 typeset -A opt_args)
 
 This will ensure that tt(_arguments) does not create unused global
@@ -921,7 +921,12 @@ and their arguments. These are stored in the associative array
 `tt(opt_args)', using the option names as keys and their arguments as
 the values. For options that have more than one argument these are
 given as one string, separated by colons. All colons in the original
-arguments are preceded with backslashes.
+arguments are preceded with backslashes. The parameter `tt(context)'
+will be set to the automatically created context name. This is either
+a string of the form `var(-opt)tt(-)var(n)' for the var(n)'th argument 
+of the option var(-opt), or a string of the form `tt(argument-)var(n)' 
+for the var(n)'th argument (for rest arguments the var(n) is the
+string `tt(rest)').
 
 Normally the option names are taken as multi-character names and a
 word from the line is considered to contain only one option (or
@@ -1073,12 +1078,15 @@ One last difference is that this function uses the associative array
 tt(val_args) to report values and their arguments (but otherwise this
 is the same as the tt(opt_args) association used by
 tt(_arguments)). This also means that the function calling tt(_values) 
-should declare the tt(state) and tt(val_args) parameters as in:
+should declare the tt(state), tt(line), tt(context) and tt(val_args)
+parameters as in:
 
-example(local state line
+example(local context state line
 typeset -A val_args)
 
-when using an action of the form `tt(->)var(string)'.
+when using an action of the form `tt(->)var(string)'. With this
+function the tt(context) parameter will be set to the name of the
+value whose argument is to be completed.
 )
 item(tt(_regex_arguments))(
 This function is a compiler to generate a completion function.  The

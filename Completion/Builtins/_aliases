@@ -2,7 +2,6 @@
 
 local expl
 
-_description expl 'regular alias'
-compadd "$expl[@]" - "${(@k)aliases}"
-_description expl 'global alias'
-compadd "$expl[@]" - "${(@k)galiases}"
+_alternative any:argument \
+  'aliases:regular alias:compadd - ${(@k)aliases}' \
+  'global-aliases:global alias:compadd - ${(@k)galiases}'

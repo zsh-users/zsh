@@ -2,6 +2,8 @@
 
 local expl
 
+_tags any hosts || return 1
+
 : ${(A)hosts:=${(s: :)${(ps:\t:)${${(f)"$(</etc/hosts)"}%%\#*}##[:blank:]#[^[:blank:]]#}}}
 
 _description expl host

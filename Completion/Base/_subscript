@@ -3,10 +3,14 @@
 local expl
 
 if [[ "$PREFIX" = :* ]]; then
+  _tags any char-classes || return 1
+
   _description expl 'character class'
   compadd "$expl[@]" -p: -S ':]' alnum alpha blank cntrl digit graph \
                                  lower print punct space upper xdigit
 elif [[ ${(Pt)${compstate[parameter]}} = assoc* ]]; then
+  _tags any association-keys || return 1
+
   _description expl 'association key'
   if [[ "$RBUFFER" = \]* ]]; then
     compadd "$expl[@]" -S '' - "${(@kP)${compstate[parameter]}}"
@@ -14,22 +18,39 @@ elif [[ ${(Pt)${compstate[parameter]}} = assoc* ]]; then
     compadd "$expl[@]" -S ']' - "${(@kP)${compstate[parameter]}}"
   fi
 elif [[ ${(Pt)${compstate[parameter]}} = array* ]]; then
-  local list i j
+  local list i j ret=1 disp
 
-  _description expl 'array index'
-  ind=( {1..${#${(P)${compstate[parameter]}}}} )
-  list=()
-  for i in "$ind[@]"; do
-    [[ "$i" = ${PREFIX}*${SUFFIX} ]] &&
-        list=( "$list[@]" 
-	  "${(r:4:: ::):)i} $(print -D ${(P)${compstate[parameter]}[$i]})" )
+  _tags any indexes parameters
+
+  while _tags; do
+    if _requested indexes; then
+      _description -V expl 'array index'
+      ind=( {1..${#${(P)${compstate[parameter]}}}} )
+      if _style indexes description yes; then
+        list=()
+        for i in "$ind[@]"; do
+          [[ "$i" = ${PREFIX}*${SUFFIX} ]] &&
+              list=( "$list[@]" 
+	             "${i}:$(print -D ${(P)${compstate[parameter]}[$i]})" )
+        done
+        compdisplay list ' -- ' "$list[@]"
+	disp=( -d list)
+      else
+        disp=()
+      fi
+
+      if [[ "$RBUFFER" = \]* ]]; then
+        compadd "$expl[@]" -S '' "$disp[@]" - "$ind[@]" && ret=0
+      else
+        compadd "$expl[@]" -S ']' "$disp[@]" - "$ind[@]" && ret=0
+      fi
+    fi
+    _requested parameters && _parameters && ret=0
+
+    (( ret )) || return 0
   done
 
-  if [[ "$RBUFFER" = \]* ]]; then
-    compadd "$expl[@]" -S '' -V default -d list - "$ind[@]"
-  else
-    compadd "$expl[@]" -S ']' -V default -d list - "$ind[@]"
-  fi
+  return 1
 else
   _compalso -math-
 fi

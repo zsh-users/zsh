@@ -19,7 +19,7 @@ fi
 
 local _in_tiff=yes
 
-local state line ret=1
+local context state line ret=1
 typeset -A opt_args
 
 case "$words[1]" in
@@ -194,6 +194,8 @@ if [[ -n "$state" ]]; then
       ;;
     esac
   else
+    _tags "$context" values || return 1
+
     _description expl 'compression scheme'
     compadd "$expl[@]" - none g4 packbits && ret=0
     compadd "$expl[@]" -qS: - lzw zip jpeg g3 && ret=0

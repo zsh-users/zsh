@@ -2,6 +2,8 @@
 
 local list expl
 
+_tags any windows || return 1
+
 list=( "${(@)${(M@)${(@f)$(xwininfo -root -tree)}:#[ 	]#0x[0-9a-f]# \"*}##[ 	]#}" )
 
 if [[ "$1" = -n ]]; then

@@ -1,8 +1,9 @@
 #compdef -equal-
 
-local expl
+local args
 
-_description expl alias
-compadd "$@" "$expl[@]" - "${(@k)aliases}"
-_description expl command
-compadd "$@" "$expl[@]" - "${(k@)commands}"
+args=( "$@" )
+
+_alternative -O args any \
+    'commands:command:compadd - ${(@k)commands}' \
+    'aliases:alias:compadd - ${(@k)aliases}'

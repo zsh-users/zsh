@@ -2,5 +2,7 @@
 
 local expl
 
+_tags any:argument arrays || return 1
+
 _description expl array
 compadd "$expl[@]" - "${(@k)parameters[(R)*array*]}"

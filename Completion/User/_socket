@@ -5,13 +5,14 @@
 #  socket_hosts_ports
 #    The array that contains paris `host:port'.
 
-local state line expl
+local context state line expl
 typeset -A opt_args
 
-if [[ $CURRENT -eq 2 && (
-  -z "$compconfig[option_prefix]" ||
-  "$compconfig[option_prefix]" = *\!${words[1]}* ||
-  "$PREFIX" = -* ) ]]; then
+if _tags any options &&
+   [[ $CURRENT -eq 2 && (
+      -z "$compconfig[option_prefix]" ||
+      "$compconfig[option_prefix]" = *\!${words[1]}* ||
+      "$PREFIX" = -* ) ]]; then
   _description expl option
   compadd -M 'r:|[_-]=* r:|=*' "$expl[@]" - -version
 fi
@@ -42,9 +43,13 @@ command)
 
 arg1)
   if (( $+opt_args[-s] )); then
+    _tags "$context" ports || return 1
+
     _description expl 'port to listen'
     _ports "$expl[@]"
   else
+    _tags "$context" hosts || return 1
+
     _description expl 'host'
     _combination socket_hosts_ports hosts "$expl[@]"
   fi
@@ -52,6 +57,8 @@ arg1)
 
 arg2)
   if (( ! $+opt_args[-s] )); then
+    _tags "$context" ports || return 1
+
     _description expl 'port to connect'
     _combination socket_hosts_ports hosts="${line[2]:q}" ports "$expl[@]"
   fi

@@ -112,7 +112,7 @@ _whois_setup () {
 }
 
 _whois_single () {
-  local state line expl
+  local context state line expl
   typeset -A opt_args
   local tmp host
 
@@ -189,19 +189,25 @@ _whois_fwhois () {
 }
 
 _whois_hosts () {
-  compadd "$@" \
-    -M 'm:{a-zA-Z}={A-Za-z} r:|.=* r:|=*' \
-    - ${_whois_servers%:?} || _hosts "$@"
+  _tags any hosts &&
+    compadd "$@" \
+      -M 'm:{a-zA-Z}={A-Za-z} r:|.=* r:|=*' \
+      - ${_whois_servers%:?} || _hosts "$@"
 }
 
 _whois_ports () {
-  compadd "$@" - whois || _ports "$@"
+  _tags any ports && compadd "$@" - whois || _ports "$@"
 }
 
 (( $+functions[_whois:whois.internic.net] )) ||
 _whois:whois.internic.net () {
   if (( CURRENT == 1 )); then
-    compadd HELP DOMAIN HOST
+    local expl
+
+    _tags any string || return 1
+
+    _description expl string
+    compadd "$expl[@]" HELP DOMAIN HOST
   else
     _message 'string'
   fi
@@ -210,6 +216,11 @@ _whois:whois.internic.net () {
 (( $+functions[_whois:whois.nic.ad.jp] )) ||
 _whois:whois.nic.ad.jp () {
   if (( CURRENT == 1 )); then
+    local expl
+
+    _tags any string || return 1
+
+    _description expl string
     compadd HELP DOM NET HOST PERSON CONN COM
   else
     _message 'string'

@@ -5,6 +5,8 @@
 
 local expl
 
+_tags any users || return 1
+
 _description expl user
 
 [[ "${(t)users}" = *array* ]] &&

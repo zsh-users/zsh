@@ -20,7 +20,7 @@ _rlogin () {
       ':remote host name:_rlogin_hosts'
     ;;
   rsh|remsh)
-    local state line ret=1
+    local context state line ret=1
     typeset -A opt_args
 
     _arguments -s \
@@ -48,13 +48,18 @@ _rlogin () {
 
     if [[ -n "$state" ]]; then
       if compset -P '*:'; then
+        _tags "$context" files || return 1
+
 	_files && ret=0
       elif compset -P '*@'; then
+        _tags "$context" hosts || return 1
+
 	_rlogin_hosts -S: -q && ret=0
       else
-	_files && ret=0
-	_rlogin_all_hosts -S: -q && ret=0
-	_rlogin_users -S@ -q && ret=0
+        _alternative "$context" \
+	    'files:: _files' \
+	    'hosts:: _rlogin_all_hosts -qS:' \
+	    'users:: _rlogin_users -qS@' && ret=0
       fi
     fi
     return ret
@@ -63,10 +68,12 @@ _rlogin () {
 }
 
 _rlogin_users () {
-  _combination accounts_users_hosts users "$@"
+  _tags any users && _combination accounts_users_hosts users "$@"
 }
 
 _rlogin_hosts () {
+  _tags any hosts || return 1
+
   if [[ "$IPREFIX" == *@ ]]; then
     _combination accounts_users_hosts "users=${IPREFIX/@}" hosts "$@"
   else
@@ -76,6 +83,8 @@ _rlogin_hosts () {
 }
 
 _rlogin_all_hosts () {
+  _tags any hosts || return 1
+
   _combination accounts_users_hosts hosts "$@"
 }
 

@@ -29,6 +29,8 @@ if (( ! $+_color_cache )); then
   (( $#_color_cache )) || _color_cache=(white black gray red blue green)
 fi
 
+_tags any colors || return 1
+
 _description expl 'color specification'
 compadd "$@" "$expl[@]" -M 'm:{a-z}={A-Z} m:-=\  r:|[ A-Z0-9]=* r:|=*' - \
         "$_color_cache[@]"

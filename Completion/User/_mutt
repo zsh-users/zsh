@@ -1,6 +1,6 @@
 #compdef mutt
 
-local state line muttrc="~/.muttrc" ret=1
+local context state line muttrc="~/.muttrc" ret=1
 
  _arguments \
  '::recipient:->userhost' \
@@ -25,15 +25,16 @@ local state line muttrc="~/.muttrc" ret=1
  '-Z+:open first mailbox with new mail:' && ret=0
 
 if [[ "$state" = userhost ]]; then
-      if compset -P '*@'; then
-        _description expl 'remote host name'
-        _hosts "$expl[@]" -q -S,
-        return
-      else
-          _description expl 'login name'
-          _users "$expl[@]" -q -S@ && ret=0
-        fi
-      fi
+  _tags "$context" hosts || return 1
+
+  if compset -P '*@'; then
+    _description expl 'remote host name'
+    _hosts "$expl[@]" -q -S, && return 0
+  else
+    _description expl 'login name'
+    _users "$expl[@]" -q -S@ && return 0
+   fi
+ fi
+fi
 
 return ret
-fi

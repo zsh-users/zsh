@@ -22,10 +22,13 @@ if [[ CURRENT -eq 3 ]]; then
   rep=(${~PWD/$words[2]/*}~$PWD(-/N))
   # Now remove all the common parts of $PWD and the completions from this
   rep=(${${rep#${PWD%%$words[2]*}}%${PWD#*$words[2]}})
-  _description expl replacement
-  (( ! $#rep )) || compadd "$expl[@]" $rep
+  if (( $#rep )) && _tags replacement strings; then
+    _description expl replacement
+    compadd "$expl[@]" $rep
+  fi
 elif _popd || [[ $PREFIX != (\~|/|./|../)* && $#cdpath -ne 0 ]]; then
   local tdir tdir2
+
   # With cdablevars, we can convert foo/bar/... to ~foo/bar/... if
   # there is no directory foo.  In that case we could also complete
   # variable names, but it hardly seems worth it.

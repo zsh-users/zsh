@@ -7,6 +7,8 @@ if (( $CURRENT > 2 )); then
 else
   local expl
 
+  _tags any:command commands || return 1
+
   _description expl 'builtin command'
   compadd "$expl[@]" "$@" - "${(k@)builtins}"
 fi

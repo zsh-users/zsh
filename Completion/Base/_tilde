@@ -4,40 +4,53 @@
 # for you or if there are too many of them, you may want to use
 # `compadd -qS/ - "$friends[@]"' or something like that.
 
-local d s dirs list lines revlines i
+local expl suf dirs list lines revlines i ret disp
 
 if [[ "$SUFFIX" = */* ]]; then
   ISUFFIX="/${SUFFIX#*/}$ISUFFIX"
   SUFFIX="${SUFFIX%%/*}"
-  s=(-S '')
+  suf=(-S '')
 else
-  s=(-qS/)
+  suf=(-qS/)
 fi
 
-if [[ -prefix [-+] ]]; then
-  lines=("$PWD" "$dirstack[@]")
-  integer i
-  if [[ ( -prefix - && ! -o pushdminus ) ||
-	( -prefix + && -o pushdminus ) ]]; then
-    revlines=( $lines )
-    for (( i = 1; i <= $#lines; i++ )); do
-      lines[$i]="$((i-1)) -- ${revlines[-$i]}"
-    done
-  else
-    for (( i = 1; i <= $#lines; i++ )); do
-      lines[$i]="$((i-1)) -- ${lines[$i]}"
-    done
+_tags any users named-directoriess directory-stack
+
+while _tags; do
+  _requested users && _users "$suf[@]" "$@" && ret=0
+  if _requested named-directories; then
+    _description expl 'named directory'
+    compadd "$suf[@]" "$expl[@]" "$@" - "${(@k)nameddirs}"
   fi
-  list=(${lines%% *})
-  compset -P '[-+]'
-  _description d 'directory stack'
-  compadd "$d[@]" -V dirs -S/ -ld lines -Q - "$list[@]" 
-else
-  _users "$@"
-  if (( $# )); then
-    d=( "$@" )
-  else
-    _description d 'named directory'
+
+  if _requested directory-stack &&
+     { ! _style directory-stack prefix-needed yes ||
+       [[ "$PREFIX" = [-+]* ]] }; then
+    if _style directory-stack description yes; then
+      integer i
+
+      lines=("${PWD}" "${dirstack[@]}")
+
+      if [[ ( -prefix - && ! -o pushdminus ) ||
+	    ( -prefix + && -o pushdminus ) ]]; then
+        revlines=( $lines )
+        for (( i = 1; i <= $#lines; i++ )); do
+          lines[$i]="$((i-1)) -- ${revlines[-$i]}"
+        done
+      else
+        for (( i = 1; i <= $#lines; i++ )); do
+          lines[$i]="$((i-1)) -- ${lines[$i]}"
+        done
+      fi
+      list=( ${PREFIX[1]}${^lines%% *} )
+      disp=( -ld lines )
+    else
+      list=( ${PREFIX[1]}{0..${#dirstack}} )
+      disp=()
+    fi
+
+    _description -V expl 'directory stack'
+    compadd "$expl[@]" "$suf[@]" "$disp[@]" -Q - "$list[@]" && ret=0
   fi
-  compadd "$d[@]" "$s[@]" - "${(@k)nameddirs}"
-fi
+  (( ret )) || return 0
+done

@@ -5,6 +5,8 @@ local expl
 if [[ "$words[CURRENT-1]" = -[AH] ]]; then
   _arrays
 else
+  _tags any:argument elements || return 1
+
   _description expl 'inode element'
   [[ "$PREFIX[1]" = + ]] &&
       compadd "$expl[@]" - +device +inode +mode +nlink +uid +gid +rdev +size \

@@ -2,8 +2,8 @@
 
 # This can be used to add options or values with descriptions as matches.
 
-local cmd opt expl tmps tmpd tmpmd tmpms ret=1 showd _nm hide
-local type=value
+local cmd opt expl tmps tmpd tmpmd tmpms ret=1 showd _nm hide args
+local type=values
 
 cmd="$words[1]"
 
@@ -11,7 +11,7 @@ cmd="$words[1]"
 
 while getopts 'oc:' opt; do
   if [[ "$opt" = o ]]; then
-    type=option
+    type=options
   else
     cmd="$OPTARG"
   fi
@@ -20,9 +20,9 @@ shift OPTIND-1
 
 # Do the tests. `showd' is set if the descriptions should be shown.
 
-_tags -c "$cmd" "$type" || return 1
+_tags -c "$cmd" any "$type" || return 1
 
-_style "$type" describe && showd=yes
+_style "$type" description yes && showd=yes
 
 _description expl "$1"
 shift
@@ -33,7 +33,7 @@ else
   compdescribe -i "$@"
 fi
 
-[[ "$type" = option ]] && _style option hide && hide=yes
+[[ "$type" = options ]] && _style options prefix-hidden yes && hide=yes
 
 while compdescribe -g args tmpd tmpmd tmps tmpms; do
 

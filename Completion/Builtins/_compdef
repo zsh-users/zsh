@@ -12,10 +12,14 @@ while [[ $words[base] = -* ]]; do
 done
 
 if [ "$delete" ]; then
+  _tags any:argument commands || return 1
+
   _description expl 'completed command'
   compadd "$expl[@]" - ${(k)_comps}
 else
   if [[ CURRENT -eq base ]]; then
+    _tags any:argument functions || return 1
+
     _description expl 'completion function'
     compadd "$expl[@]" - ${^fpath:/.}/_(|*[^~])(N:t)
   else

@@ -3,14 +3,13 @@
 local prev="$words[CURRENT-1]"
 
 if [[ "$prev" = -o ]]; then
+  _tags - -o options || return 1
+
   _options
 elif [[ "$prev" = -([no]t|ef) ]]; then
+  _tags - "$prev" files || return 1
+
   _files
 else
-  local ret=1
-
-  _files && ret=0
-  _parameters && ret=0
-
-  return ret
+  _alternative any 'files:: _files' 'parameters:: _parameters'
 fi

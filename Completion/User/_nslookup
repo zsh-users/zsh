@@ -19,7 +19,7 @@
 # other characters than lower case letters, we try to call the function
 # `_nslookup_host'.
 
-local state expl ret=1 setopts
+local context state expl ret=1 setopts
 
 setopts=(
   'all[print current values]' \
@@ -52,6 +52,8 @@ if [[ -n "$compcontext" ]]; then
 
     funcall ret _nslookup_command && return ret
 
+    _tags any commands || return 1
+
     _description expl 'command'
     compadd "$expl[@]" - server lserver root finger ls view help set && ret=0
     _hosts && ret=0
@@ -59,6 +61,8 @@ if [[ -n "$compcontext" ]]; then
   elif [[ "$compstate[context]" = redirect ]]; then
 
     funcall ret _nslookup_redirect && return ret
+
+    _tags redirection files || return 1
 
     if [[ "$words[1]" != (finger|ls) ]]; then
       _message "redirection not allowed for command \`$words[1]'"
@@ -84,6 +88,8 @@ if [[ -n "$compcontext" ]]; then
 
   case "$words[1]" in
   (|l)server)
+    _tags argument hosts || return 1
+
     _description expl 'new default server'
     _hosts "$expl[@]"
     return
@@ -106,6 +112,8 @@ if [[ -n "$compcontext" ]]; then
     return
     ;;
   view)
+    _tags argument files || return 1
+
     _description expl 'view file'
     _files "$expl[@]"
     return
@@ -118,6 +126,8 @@ if [[ -n "$compcontext" ]]; then
     [[ -z "$state" ]] && return ret
     ;;
   *)
+    _tags argument hosts || return 1
+
     _description expl 'server'
     _hosts "$expl[@]"
     return
@@ -141,6 +151,8 @@ fi
 # This is completion after `srchlist' for both types.
 
 if [[ -n "$state" ]]; then
+  _tags "$context" hosts || return 1
+
   if compset -P '*/'; then
     _description expl 'search list entry'
   else

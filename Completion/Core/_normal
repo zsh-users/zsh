@@ -1,6 +1,7 @@
 #autoload
 
 local comp command cmd1 cmd2 pat val name i ret=1 _compskip="$_compskip"
+local _sub_context
 
 # If we get the option `-s', we don't reset `_compskip'. This ensures
 # that a value set in the function for the `-first-' context is kept,
