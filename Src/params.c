@@ -869,6 +869,7 @@ getarg(char **str, int *inv, Value v, int a2, zlong *w)
 		ht = newparamtable(17, v->pm->nam);
 		v->pm->sets.hfn(v->pm, ht);
 	    }
+	    untokenize(s);
 	    if (!(v->pm = (Param) ht->getnode(ht, s))) {
 		HashTable tht = paramtab;
 		paramtab = ht;
