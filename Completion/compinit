@@ -387,7 +387,8 @@ if [[ -n "$_i_check" ]]; then
   if ! eval compaudit; then
     if [[ -n "$_i_q" ]]; then
       if [[ "$_i_fail" = ask ]]; then
-        if ! read -q "?There are insecure $_i_q, use them anyway [ny]? "; then
+        if ! read -q "?Ignore insecure $_i_q and continue [ny]? "; then
+	  echo "$0: initialization aborted"
           unfunction compinit compdef
           unset _comp_dumpfile _comp_secure compprefuncs comppostfuncs \
                 _comps _patcomps _postpatcomps _compautos _lastcomp
