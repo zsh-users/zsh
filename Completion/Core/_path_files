@@ -172,9 +172,19 @@ if [[ "$pre[1]" = \~ ]]; then
   # prefix from the string to complete, set `donepath' to build the correct
   # paths and make sure that the loop below is run only once with an empty
   # prefix path by setting `prepaths'.
-  
-  linepath="${pre%%/*}/"
-  realpath=$~linepath
+
+  linepath="${pre[2,-1]%%/*}"
+  if [[ -z "$linepath" ]]; then
+    realpath="${HOME%/}/"
+  elif (( $+userdirs[$linepath] )); then
+    realpath="${userdirs[$linepath]%/}/"
+  elif (( $+nameddirs[$linepath] )); then
+    realpath="${nameddirs[$linepath]%/}/"
+  else
+    _message "unknown user \`$linepath'"
+    return 1
+  fi
+  linepath="~${linepath}/"
   [[ "$realpath" = "$linepath" ]] && return 1
   pre="${pre#*/}"
   orig="${orig#*/}"
