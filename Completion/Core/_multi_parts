@@ -83,7 +83,7 @@ while true; do
   if [[ -n "$PREFIX$SUFFIX" || "$pre" = ${sep}* ]]; then
     tmp1=( "${(@M)matches:#${PREFIX}${SUFFIX}${sep}*}" )
   else
-    tmp1=
+    tmp1=()
   fi
 
   if (( $#tmp1 )); then
@@ -233,10 +233,21 @@ while true; do
     PREFIX="${opre}${osuf}"
     SUFFIX=""
 
-    [[ -n "$pref" && "$orig" != "$pref" ]] &&
+    if [[ -n "$pref" && "$orig" != "$pref" ]]; then
+      if [[ "$pref" = *${sep} ]]; then
+        compadd "$group[@]" "$expl[@]" "$opts[@]" \
+                -p "${pref%${sep}*${sep}}${sep}" -S "$sep" \
+                -M "r:|${sep}=* r:|=* $match" - "${${pref%${sep}}##*${sep}}"
+
+      elif [[ "$pref" = *${sep}* ]]; then
+        compadd "$group[@]" "$expl[@]" -S '' "$opts[@]" \
+                -p "${pref%${sep}*}${sep}" \
+                -M "r:|${sep}=* r:|=* $match" - "${pref##*${sep}}"
+      else
         compadd "$group[@]" "$expl[@]" -S '' "$opts[@]" \
                 -M "r:|${sep}=* r:|=* $match" - "$pref"
-
+      fi
+    fi
     return
   fi
 done
