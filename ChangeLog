@@ -1,3 +1,9 @@
+2000-05-12  Sven Wischnowsky  <wischnow@zsh.org>
+
+	* 11349: Completion/Base/_arguments, Completion/Core/_message,
+ 	Src/Zle/computil.c: fix for completing options with `_arguments
+ 	-s'; fix for _message to use `builtin compadd'
+	
 2000-05-12  Oliver Kiddle  <opk@zsh.org>
 
 	* 11347: Completion/Builtins/_hash, Completion/Builtins/_vars_eq:

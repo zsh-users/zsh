@@ -1124,7 +1124,7 @@ struct castate {
     Cadef d;
     int nopts;
     Caarg def, ddef;
-    Caopt curopt;
+    Caopt curopt, dopt;
     int opt, arg, argbeg, optbeg, nargbeg, restbeg, curpos, argend;
     int inopt, inrest, inarg, nth, doff, singles, oopt, actopts;
     LinkList args;
@@ -1140,7 +1140,7 @@ static int
 ca_parse_line(Cadef d, int multi)
 {
     Caarg adef, ddef;
-    Caopt ptr, wasopt;
+    Caopt ptr, wasopt, dopt;
     struct castate state;
     char *line, *pe, **argxor = NULL;
     int cur, doff, argend;
@@ -1174,7 +1174,7 @@ ca_parse_line(Cadef d, int multi)
     state.d = d;
     state.nopts = d->nopts;
     state.def = state.ddef = NULL;
-    state.curopt = NULL;
+    state.curopt = state.dopt = NULL;
     state.argbeg = state.optbeg = state.nargbeg = state.restbeg = state.actopts =
 	state.nth = state.inopt = state.inarg = state.opt = state.arg = 1;
     state.argend = argend = arrlen(compwords) - 1;
@@ -1198,6 +1198,7 @@ ca_parse_line(Cadef d, int multi)
     for (line = compwords[1], cur = 2, state.curopt = NULL, state.def = NULL;
 	 line; line = compwords[cur++]) {
 	ddef = adef = NULL;
+	dopt = NULL;
 	doff = state.singles = 0;
 
 	if (ca_inactive(d, argxor, cur, 0) ||
@@ -1251,9 +1252,11 @@ ca_parse_line(Cadef d, int multi)
 	     (state.curopt->type == CAO_EQUAL ?
 	      (pe[-1] == '=' || !pe[0]) : 1))) {
 
-	    ddef = state.def = ((state.curopt->type != CAO_EQUAL ||
-				 pe[-1] == '=') ?
-				state.curopt->args : NULL);
+	    if ((ddef = state.def = ((state.curopt->type != CAO_EQUAL ||
+				      pe[-1] == '=') ?
+				     state.curopt->args : NULL)))
+		dopt = state.curopt;
+
 	    doff = pe - line;
 	    state.optbeg = state.argbeg = state.inopt = cur;
 	    state.argend = argend;
@@ -1296,6 +1299,7 @@ ca_parse_line(Cadef d, int multi)
 	    Caopt tmpopt;
 
 	    ddef = state.def = state.curopt->args;
+	    dopt = state.curopt;
 	    doff = pe - line;
 	    state.optbeg = state.argbeg = state.inopt = cur;
 	    state.argend = argend;
@@ -1355,6 +1359,7 @@ ca_parse_line(Cadef d, int multi)
 
 		memcpy(&ca_laststate, &state, sizeof(state));
 		ca_laststate.ddef = NULL;
+		ca_laststate.dopt = NULL;
 		ca_laststate.doff = 0;
 		break;
 	    }
@@ -1389,6 +1394,7 @@ ca_parse_line(Cadef d, int multi)
 		    zaddlinknode(l, ztrdup(line));
 
 		ca_laststate.ddef = NULL;
+		ca_laststate.dopt = NULL;
 		ca_laststate.doff = 0;
 		break;
 	    }
@@ -1402,12 +1408,14 @@ ca_parse_line(Cadef d, int multi)
 	if (cur + 1 == compcurrent) {
 	    memcpy(&ca_laststate, &state, sizeof(state));
 	    ca_laststate.ddef = NULL;
+	    ca_laststate.dopt = NULL;
 	    ca_laststate.doff = 0;
 	} else if (cur == compcurrent && !ca_laststate.def) {
 	    if ((ca_laststate.def = ddef)) {
 		ca_laststate.singles = state.singles;
 		if (state.curopt && state.curopt->type == CAO_NEXT) {
 		    ca_laststate.ddef = ddef;
+		    ca_laststate.dopt = dopt;
 		    ca_laststate.def = NULL;
 		    ca_laststate.opt = 1;
 		    state.curopt->active = 1;
@@ -1418,6 +1426,7 @@ ca_parse_line(Cadef d, int multi)
 	    } else {
 		ca_laststate.def = adef;
 		ca_laststate.ddef = NULL;
+		ca_laststate.dopt = NULL;
 		ca_laststate.optbeg = state.nargbeg;
 		ca_laststate.argbeg = state.restbeg;
 		ca_laststate.argend = state.argend;
@@ -1705,7 +1714,7 @@ bin_comparguments(char *nam, char **args, char *ops, int func)
 
 	    return 0;
 	}
-	return 1;
+	return (ca_laststate.singles ? 2 : 1);
     case 'L':
 	{
 	    Caopt opt = ca_get_opt(ca_laststate.d, args[1], 1, NULL);
@@ -1719,13 +1728,13 @@ bin_comparguments(char *nam, char **args, char *ops, int func)
 	}
     case 's':
 	if (ca_laststate.d->single && ca_laststate.singles &&
-	    ca_laststate.actopts > 1 && ca_laststate.opt) {
+	    ca_laststate.actopts && ca_laststate.opt) {
 	    setsparam(args[1],
-		      ztrdup(ca_laststate.ddef ?
-			     (ca_laststate.ddef->type == CAO_DIRECT ?
+		      ztrdup((ca_laststate.ddef && ca_laststate.dopt) ?
+			     (ca_laststate.dopt->type == CAO_DIRECT ?
 			      "direct" :
-			      ((ca_laststate.ddef->type == CAO_OEQUAL ||
-				ca_laststate.ddef->type == CAO_EQUAL) ?
+			      ((ca_laststate.dopt->type == CAO_OEQUAL ||
+				ca_laststate.dopt->type == CAO_EQUAL) ?
 			       "equal" : "next")) : ""));
 	    return 0;
 	}

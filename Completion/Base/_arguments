@@ -184,12 +184,16 @@ if (( $# )) && comparguments "$multi[@]" "$autod" "$@"; then
     else
       noargs='no arguments'
     fi
-    if ! comparguments -O next direct odirect equal; then
+    if comparguments -O next direct odirect equal; then
+      opts=yes
+      _tags options
+    elif [[ $? -eq 2 ]]; then
+        compadd -Q - "${PREFIX}${SUFFIX}"
+        return 0
+    else
       _message "$noargs"
       return 1
     fi
-    opts=yes
-    _tags options
   fi
 
   context=()
