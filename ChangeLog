@@ -1,3 +1,8 @@
+2001-06-13  Oliver Kiddle  <opk@zsh.org>
+
+	* 14896: Completion/Zsh/Type/_command_names: don't complete read-only
+	parameters on the left side of an assignment
+
 2001-06-13  Sven Wischnowsky  <wischnow@zsh.org>
 
 	* 14903: Src/Zle/complist.c, Src/Zle/zle_tricky.c: fixes for
