@@ -481,6 +481,9 @@ mod_export void
 init_shout(void)
 {
     static char shoutbuf[BUFSIZ];
+#if defined(JOB_CONTROL) && defined(TIOCSETD) && defined(NTTYDISC)
+    int ldisc;
+#endif
 
     if (SHTTY == -1)
     {
@@ -490,8 +493,7 @@ init_shout(void)
     }
 
 #if defined(JOB_CONTROL) && defined(TIOCSETD) && defined(NTTYDISC)
-    int ldisc = NTTYDISC;
-
+    ldisc = NTTYDISC;
     ioctl(SHTTY, TIOCSETD, (char *)&ldisc);
 #endif
 

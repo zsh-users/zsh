@@ -1,3 +1,8 @@
+2004-03-01  Peter Stephenson  <pws@csr.com>
+
+	* 19505: Src/init.c: compilation with NTTYDISC defined was
+	broken.
+
 2004-02-29  Doug Kearns  <djkea2@mugca.its.monash.edu.au>
 
 	* unposted: Doc/Zsh/compsys.yo: fix typo
