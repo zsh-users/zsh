@@ -4,6 +4,9 @@
 
 2000-04-05  Sven Wischnowsky <wischnow@informatik.hu-berlin.de>
 
+	* 10514: Completion/Base/_arguments, Doc/Zsh/compsys.yo:
+	support automatically inserted dummy in $words
+
 	* 10511: Completion/Debian/_apt, Completion/Debian/_bug,
 	Completion/Debian/_dpkg, Completion/User/_chown,
 	Completion/User/_dvi, Completion/User/_imagemagick,

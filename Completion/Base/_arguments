@@ -192,6 +192,12 @@ if (( $# )) && comparguments -i "$autod" "$@"; then
       if [[ -n "$matched" ]] || _requested arguments; then
         _description arguments expl "$descr"
 
+        if [[ "$action" = \=\ * ]]; then
+          action="$action[3,-1]"
+          words=( "$subc" "$words[@]" )
+	  (( CURRENT++ ))
+        fi
+
         if [[ "$action" = -\>* ]]; then
           comparguments -W line opt_args
           state="${${action[3,-1]##[ 	]#}%%[ 	]#}"

@@ -2497,7 +2497,7 @@ using the var(specs) which are of the form:
 using tt(_tags) and if the tag is requested, the var(action) is
 executed with the given var(descr) (description). The var(action)s
 supported are those used by the tt(_arguments) function (described
-below), without the `tt(->)var(state)' form.
+below), without the `tt(->)var(state)' and `tt(=)var(...)' forms.
 
 For example, the var(action) may be a simple function call. With that
 one could do:
@@ -2793,6 +2793,23 @@ in the description will be shown above the matches. These arguments
 are taken from the array parameter tt(expl) which will be set up
 before executing the var(action) and hence may be used in it (normally 
 in an expansion like `tt($expl[@])').
+
+If the var(action) starts with `tt(= )' (a equal sign followed by a
+space), tt(_arguments) will insert the contents of the var(argument)
+field of the current context as the new first element in the tt(words) 
+special array and increments the value of the tt(CURRENT) special
+parameter. In other words, it inserts a dummy element in the tt(words) 
+array and makes tt(CURRENT) still point to the word in that array
+where the cursor is. This is only really useful when used with one of
+the forms that make tt(_arguments) modify the tt(words) array to
+contain only some of the words from the line, i.e. one of the argument 
+description forms where the var(message) is preceded by two or three
+colons. For example, when the function called in the action for such
+an argument itself uses tt(_arguments), the dummy element is needed to 
+make that second call to tt(_arguments) use all words from the
+restricted range for argument parsing. Without the inserted dummy
+element, the first word in the range would be taken (by the second
+tt(_arguments)) to be the command name and hence ignored.
 
 Except for the `tt(->)var(string)' form, the var(action) will be
 executed by calling the tt(_all_labels) function to process all tag labels,
