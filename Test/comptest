@@ -19,7 +19,7 @@ comptestinit () {
   zpty zsh "$comptest_zsh" -f
 
   zpty -r zsh log1 "*<PROMPT>*" || { 
-    print "first prompt doesn't appered."
+    print "first prompt hasn't appeared."
     return 1
   }
 
@@ -75,7 +75,7 @@ comptesteval () {
   print -lr - "$@" > $tmp
   zpty -w zsh ". $tmp"
   zpty -r zsh log_eval "*<PROMPT>*" || {
-    print "prompt doesn't appered."
+    print "prompt hasn't appeared."
     return 1
   }
   rm $tmp
@@ -85,7 +85,7 @@ comptest () {
   input="$*"
   zpty -n -w zsh "$input"$'\C-Z'
   zpty -r zsh log "*<WIDGET><finish>*<PROMPT>*" || {
-    print "finish widget doesn't invoked."
+    print "failed to invoke finish widget."
     return 1
   }
 

@@ -1,3 +1,7 @@
+2000-06-05  Oliver Kiddle  <opk@zsh.org>
+
+	* 11755: test/comptest: fix wording in error messages
+
 2000-06-05  Peter Stephenson  <pws@pwstephenson.fsnet.co.uk>
 
 	* Config/version.mk: 3.1.9, already.
