@@ -1,5 +1,13 @@
 2001-07-18  Sven Wischnowsky  <wischnow@zsh.org>
 
+	* 15407: Completion/Base/Utility/_describe,
+	Completion/Zsh/Command/_zstyle, Doc/Zsh/compsys.yo,
+	Src/Zle/complist.c, Src/Zle/compresult.c, Src/Zle/computil.c:
+	add list-grouped option to make options and such be grouped
+	together if they have the same description; matches with
+	line-display strings can be hidden; hi and du capabalities in
+	complist are only used if set by the user
+
 	* 15402 (Akinora Musha): Completion/Unix/Command/_cvs: add
 	support for -R option on BSDs
 

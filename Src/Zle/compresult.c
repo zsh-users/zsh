@@ -1443,44 +1443,46 @@ calclist(int showall)
 		}
 		m->flags &= ~CMF_HIDE;
 
-		if (m->disp) {
-		    if (m->flags & CMF_DISPLINE) {
-			nlines += 1 + printfmt(m->disp, 0, 0, 0);
-			g->flags |= CGF_HASDL;
-		    } else {
-			l = niceztrlen(m->disp);
-			ndisp++;
-			if (l > glong)
-			    glong = l;
-			if (l < gshort)
-			    gshort = l;
-			totl += l;
-			mlens[m->gnum] = l;
-		    }
-		    nlist++;
-		    if (!(m->flags & CMF_PACKED))
-			g->flags &= ~CGF_PACKED;
-		    if (!(m->flags & CMF_ROWS))
-			g->flags &= ~CGF_ROWS;
-		} else if (showall || !(m->flags & (CMF_NOLIST | CMF_MULT))) {
+                if (showall || !(m->flags & (CMF_NOLIST | CMF_MULT))) {
 		    if ((m->flags & (CMF_NOLIST | CMF_MULT)) &&
 			(!m->str || !*m->str)) {
 			m->flags |= CMF_HIDE;
 			continue;
 		    }
-		    l = niceztrlen(m->str);
-		    ndisp++;
-		    if (l > glong)
-			glong = l;
-		    if (l < gshort)
-			gshort = l;
-		    totl += l;
-		    mlens[m->gnum] = l;
-		    nlist++;
-		    if (!(m->flags & CMF_PACKED))
-			g->flags &= ~CGF_PACKED;
-		    if (!(m->flags & CMF_ROWS))
-			g->flags &= ~CGF_ROWS;
+                    if (m->disp) {
+                        if (m->flags & CMF_DISPLINE) {
+                            nlines += 1 + printfmt(m->disp, 0, 0, 0);
+                            g->flags |= CGF_HASDL;
+                        } else {
+                            l = niceztrlen(m->disp);
+                            ndisp++;
+                            if (l > glong)
+                                glong = l;
+                            if (l < gshort)
+                                gshort = l;
+                            totl += l;
+                            mlens[m->gnum] = l;
+                        }
+                        nlist++;
+                        if (!(m->flags & CMF_PACKED))
+                            g->flags &= ~CGF_PACKED;
+                        if (!(m->flags & CMF_ROWS))
+                            g->flags &= ~CGF_ROWS;
+                    } else {
+                        l = niceztrlen(m->str);
+                        ndisp++;
+                        if (l > glong)
+                            glong = l;
+                        if (l < gshort)
+                            gshort = l;
+                        totl += l;
+                        mlens[m->gnum] = l;
+                        nlist++;
+                        if (!(m->flags & CMF_PACKED))
+                            g->flags &= ~CGF_PACKED;
+                        if (!(m->flags & CMF_ROWS))
+                            g->flags &= ~CGF_ROWS;
+                    }
 		} else
 		    hidden = 1;
 	    }
@@ -1972,7 +1974,8 @@ printlist(int over, CLPrintFunc printm, int showall)
 
 	    if (g->flags & CGF_HASDL) {
 		for (p = g->matches; (m = *p); p++)
-		    if (m->disp && (m->flags & CMF_DISPLINE)) {
+		    if (m->disp && (m->flags & CMF_DISPLINE) &&
+                        (showall || !(m->flags & (CMF_HIDE|CMF_NOLIST)))) {
 			if (pnl) {
 			    putc('\n', shout);
 			    pnl = 0;

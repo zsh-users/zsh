@@ -55,6 +55,7 @@ styles=(
   last-prompt		 c:bool
   list			 c:listwhen
   list-colors		 c:
+  list-grouped		 c:bool
   list-packed		 c:bool
   list-prompt            c:
   list-rows-first	 c:bool

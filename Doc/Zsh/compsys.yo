@@ -1508,6 +1508,17 @@ example(zstyle ':completion:*:default' list-colors ${(s.:.)LS_COLORS})
 The default colors are the same as for the GNU tt(ls) command and can be
 obtained by setting the style to an empty string (i.e. tt('')).
 )
+kindex(list-grouped, completion style)
+item(tt(list-grouped))(
+If this style is `true' (the default), the completion system will try to
+make some completion listings more compact by grouping matches together.
+For example, options for commands that have the same description (which
+are shown because the tt(verbose) style is set to `true') will have only
+one entry in the list, showing all options that can be used to select
+the specific behaviour.  When menu selection is done on such a list, the
+matches will appear as separate entries in the list to be able to select
+each of them.
+)
 kindex(list-packed, completion style)
 item(tt(list-packed))(
 Like the tt(list-colors) style, this is tested with the tt(default)
@@ -3462,6 +3473,9 @@ will be treated as option names (typically following a `tt(-)',
 the tt(prefix-hidden), tt(prefix-needed) and tt(verbose) styles to find out
 if the strings should be added at all and if the descriptions should be
 shown.  Without the `tt(-o)' option, only the tt(verbose) style is used.
+
+If selected by the tt(list-grouped) style, strings with the same
+description will be added in a way that they appear together in the list.
 
 tt(_describe) uses the tt(_all_labels) function to generate the matches, so
 it does not need to appear inside a loop over tag labels.

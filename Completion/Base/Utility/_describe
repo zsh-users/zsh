@@ -2,8 +2,8 @@
 
 # This can be used to add options or values with descriptions as matches.
 
-local _opt _expl _tmps _tmpd _tmpmd _tmpms _ret=1 _showd _nm _hide _args
-local _type=values _descr
+local _opt _expl _tmps _tmpd _tmph _tmpmd _tmpms _tmpmh
+local _type=values _descr _ret=1 _showd _nm _hide _args _grp
 
 # Get the option.
 
@@ -21,6 +21,11 @@ fi
 # Do the tests. `showd' is set if the descriptions should be shown.
 
 zstyle -T ":completion:${curcontext}:$_type" verbose && _showd=yes
+if zstyle -T ":completion:${curcontext}:$_type" list-grouped; then
+  _grp=(-g)
+else
+  _grp=()
+fi
 
 _descr="$1"
 shift
@@ -33,12 +38,12 @@ while _tags; do
   while _next_label "$_type" _expl "$_descr"; do
 
     if [[ -n "$_showd" ]]; then
-      compdescribe -I ' -- ' "$@"
+      compdescribe -I ' -- ' "$_grp[@]" "$@"
     else
       compdescribe -i "$@"
     fi
 
-    while compdescribe -g _args _tmpd _tmpmd _tmps _tmpms; do
+    while compdescribe -g _args _tmpd _tmpmd _tmph _tmpmh _tmps _tmpms; do
 
       # See if we should remove the option prefix characters.
 
@@ -53,6 +58,7 @@ while _tags; do
       fi
 
       compadd "$_args[@]" "$_expl[@]" -ld _tmpd -a _tmpmd && _ret=0
+      compadd -n "$_args[@]" "$_expl[@]" -ld _tmph -a _tmpmh && _ret=0
       compadd "$_args[@]" "$_expl[@]" -d _tmps  -a _tmpms && _ret=0
     done
   done

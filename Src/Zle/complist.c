@@ -77,7 +77,7 @@ static char *colnames[] = {
 
 static char *defcols[] = {
     "0", "0", "1;31", "1;36", "33", "1;35", "1;33", "1;33", "1;32", NULL,
-    "\033[", "m", NULL, "0", "0", "7", "0", "0"
+    "\033[", "m", NULL, "0", "0", "7", NULL, NULL
 };
 
 /* This describes a terminal string for a file type. */
@@ -444,6 +444,7 @@ zcputs(Listcols c, char *group, int colour)
 
 	    return;
 	}
+    zlrputs(c, "0");
 }
 
 /* Turn off colouring. */
@@ -1170,7 +1171,8 @@ compprintlist(int showall)
 		    p = g->matches;
 
 		for (; (m = *p); p++) {
-		    if (m->disp && (m->flags & CMF_DISPLINE)) {
+		    if (m->disp && (m->flags & CMF_DISPLINE) &&
+                        (showall || !(m->flags & (CMF_HIDE|CMF_NOLIST)))) {
 			if (pnl) {
 			    if (dolistnl(ml) && compprintnl(ml))
 				goto end;
@@ -1412,9 +1414,11 @@ clprintm(Cmgroup g, Cmatch *mp, int mc, int ml, int lastc, int width,
 	    mgtabp = mgtab + mm;
 	    mmlen = mcols;
 	    zcputs(&mcolors, g->name, COL_MA);
-	} else if (m->flags & CMF_NOLIST)
+	} else if ((m->flags & CMF_NOLIST) &&
+                   mcolors.files[COL_HI] && mcolors.files[COL_HI]->col)
 	    zcputs(&mcolors, g->name, COL_HI);
-	else if (mselect >= 0 && (m->flags & (CMF_MULT | CMF_FMULT)))
+	else if (mselect >= 0 && (m->flags & (CMF_MULT | CMF_FMULT)) &&
+                 mcolors.files[COL_DU] && mcolors.files[COL_DU]->col)
 	    zcputs(&mcolors, g->name, COL_DU);
 	else
 	    subcols = putmatchcol(&mcolors, g->name, m->disp);
