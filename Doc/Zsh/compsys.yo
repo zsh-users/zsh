@@ -2691,25 +2691,6 @@ tt(_alternative).
 Like tt(_tags) this function supports the tt(-C) option to give a
 different name for the argument context field.
 )
-findex(_use_lo)
-item(tt(_use_lo))(
-This function is a simple wrapper around the tt(_arguments) function
-described below.  It can be used to automatically complete long
-options for commands that understand the `tt(-)tt(-help)' option
-(`tt(_use_lo)' is for `use long options').  It is not intended to be
-used from completion functions but as a top-level completion function
-in its own right.  For example, to enable option completion for the
-commands tt(foo) and tt(bar), one would call:
-
-example(compdef _use_lo foo bar)
-
-in one of the initialization files after the call to tt(compinit).
-
-The default installation uses this function only to generate
-completions for some GNU-commands because to complete the options, the 
-command has to be called and hence it shouldn't be used if one can't
-be sure that the command understands the `tt(-)tt(-help)' option.
-)
 findex(_arguments)
 item(tt(_arguments) var(spec) ...)(
 This function can be used to complete words on the line by describing the
@@ -3283,6 +3264,16 @@ matches.  Almost all calls to tt(compadd) within the completion system use
 a similar format; this ensures that user-specified styles are correctly
 passed down to the builtins which implement the internals of completion.
 )
+findex(_files)
+item(tt(_files))(
+The function tt(_files) uses the tt(file-patterns) style and calls
+tt(_path_files) with all the arguments it was passed except for tt(-g) 
+and tt(-/).  These two options are used depending on the setting of the 
+tt(file-patterns) style.
+
+See tt(_path_files) below for a description of the full set of options
+accepted by tt(_files).
+)
 findex(_funcall)
 item(tt(_funcall) var(return) var(name) [ var(args) ... ])(
 If a function var(name) exists, it is called with the arguments
@@ -3399,17 +3390,11 @@ This should be used to complete parameter names.  All arguments are
 passed unchanged to the tt(compadd) builtin.
 )
 findex(_path_files)
-findex(_files)
-item(tt(_path_files) and tt(_files))(
+item(tt(_path_files))(
 The function tt(_path_files) is used throughout the completion system
 to complete filenames.  It allows completion of partial paths.  For
 example, the string `tt(/u/i/s/sig)' may be completed to
 `tt(/usr/include/sys/signal.h)'.
-
-The function tt(_files) uses the tt(file-patterns) style and calls
-tt(_path_files) with all the arguments it was passed except for tt(-g) 
-and tt(-/).  These two options are used depending on the setting of the 
-tt(file-patterns) style.
 
 The options accepted by both tt(_path_files) and tt(_files) are:
 
@@ -3699,6 +3684,25 @@ tt(_tags)) stored in the argument field of the context name in the
 tt(curcontext) parameter. This allows to make tt(_tags) use a more
 specific context name without having to change and reset the
 tt(curcontext) parameter (which would otherwise have the same effect).
+)
+findex(_use_lo)
+item(tt(_use_lo))(
+This function is a simple wrapper around the tt(_arguments) function
+described above.  It can be used to automatically complete long
+options for commands that understand the `tt(-)tt(-help)' option
+(`tt(_use_lo)' is for `use long options').  It is not intended to be
+used from completion functions but as a top-level completion function
+in its own right.  For example, to enable option completion for the
+commands tt(foo) and tt(bar), one would call:
+
+example(compdef _use_lo foo bar)
+
+in one of the initialization files after the call to tt(compinit).
+
+The default installation uses this function only to generate
+completions for some GNU-commands because to complete the options, the 
+command has to be called and hence it shouldn't be used if one can't
+be sure that the command understands the `tt(-)tt(-help)' option.
 )
 findex(_wanted)
 item(tt(_wanted) [ tt(-C) var(name) ]  [ tt(-12VJ) ] var(tag) var(name) var(descr) var(command) var(args) ...)(
