@@ -1,3 +1,10 @@
+2002-05-23 Andrej Borsenkow  <bor@zsh.org>
+
+	* 17125, 17159 (Oliver): Completion/Unix/Command/_texinfo,
+	Completion/Unix/Command/.distfiles: completion for info.
+	As suggested by Oliver put in _texinfo expecting more
+	related stuff.
+
 2002-05-23  Sven Wischnowsky  <wischnow@zsh.org>
 
 	* 17196: Src/Zle/computil.c: report option arguments to

@@ -1,0 +1,53 @@
+#compdef info
+
+_info () {
+  local context state line expl ret=1
+  typeset -A opt_args
+  local -a info
+
+  info=(_call_program info ${words[1]})
+
+  _arguments -s \
+    '(: -)--apropos=[look up string in indices]:search string: ' \
+    '(-f --file)'{\*-d,\*--directory=}'[add directory to infopath]:info dir:_files -/' \
+    '--dribble=[record keystrokes]:file with keystrokes:_files' \
+    '(-f --file -d --directory)'{-f,--file=}'[info file to show]:info file:_files -g "*.info(|.gz|.bz2)"' \
+    '(: - -h --help)'{-h,--help}'[display usage]' \
+    '(-o --output -O)--index-search=[go directly to node if found]:search string: ' \
+    '(--index-search -o --output -O)'{-o,--output=}'[dump selected nodes to filename]:filename:_files -g "*(^/)"' \
+    '(-R --raw-escapes)'{-R,--raw-escapes}'[do not remove ANSI escapes from man pages]' \
+    '--restore=[read keystrokes from file]:filename:_files -g "*(^/)"' \
+    '(--index-search -o --output -O --show-options --usage)'{-O,--show-options,--usage}'[go to command-line options node]' \
+    '--subnodes[recursively output menu items]' \
+    '--vi-keys[use Vi-like key bindings]' \
+    '(: -)--version[display version information]' \
+    '(--apropos -h --help -O --output --version)*::menu items:->item' && ret=0
+
+  case $state in
+    item )
+      local -a items
+
+      info=($info ${(kv)opt_args[(I)(-d|--directory|-f|--file)]})
+
+      items=(${${(M)${${(f)"$(${info} --output - ${words[1,CURRENT-1]} 2>/dev/null)"}[1,(r)[[:space:]]#--- The Detailed Node Listing ---[[:space:]]#]}:#\* *~\* Menu:*}:/(#b)\*[[:space:]]##([^:]##):(#B)( \(?##\)[^.]#.|(:|))[[:space:]]#(#b)(*)[[:space:]]#/$match[1]${match[2]:+:}$match[2]})
+
+      _describe -t items "menu items" items && ret=0
+    ;;
+  esac
+
+  return $ret
+}
+
+_texinfo () {
+  local ret=1
+
+  case $service in
+    info )
+      _info && ret=0
+    ;;
+  esac
+
+  return $ret
+}
+
+_texinfo "$@"
