@@ -11,7 +11,13 @@ setopt localoptions nullglob
 
 [[ _matcher_num -gt 1 ]] && return 1
 
-local exp word="$PREFIX$SUFFIX" sort expr expl subd suf=" "
+local exp word sort expr expl subd suf=" "
+
+if [[ "$funcstack[2]" = _prefix ]]; then
+  word="$IPREFIX$PREFIX$SUFFIX"
+else
+  word="$IPREFIX$PREFIX$SUFFIX$ISUFFIX"
+fi
 
 # First, see if we should insert all *completions*.
 
@@ -29,7 +35,7 @@ exp=("$word")
 # changes quoted spaces, tabs, and newlines into spaces.
 
 { zstyle -s ":completion:${curcontext}:" substitute expr ||
-  [[ "$curcontext" = expand-word:* ]] && expr=1 } &&
+  { [[ "$curcontext" = expand-word:* ]] && expr=1 } } &&
     [[ "${(e):-\$[$expr]}" -eq 1 ]] &&
     exp=( "${(e)exp//\\[ 	
 ]/ }" )
@@ -43,7 +49,7 @@ subd=("$exp[@]")
 # Now try globbing.
 
 { zstyle -s ":completion:${curcontext}:" glob expr ||
-  [[ "$curcontext" = expand-word:* ]] && expr=1 } &&
+  { [[ "$curcontext" = expand-word:* ]] && expr=1 } } &&
     [[ "${(e):-\$[$expr]}" -eq 1 ]] &&
     exp=( ${~exp} )
 

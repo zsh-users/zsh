@@ -492,6 +492,8 @@ after_complete(Hookdef dummy, Compldat dat)
 
 /* This calls the given completion widget function. */
 
+static int parwb, parwe, paroffs;
+
 /**/
 static void
 callcompfunc(char *s, char *fn)
@@ -637,9 +639,24 @@ callcompfunc(char *s, char *fn)
 	    compsuffix = ztrdup(ss);
 	}
 	zsfree(compiprefix);
-	compiprefix = ztrdup("");
 	zsfree(compisuffix);
-	compisuffix = ztrdup("");
+	if (parwb < 0) {
+	    compiprefix = ztrdup("");
+	    compisuffix = ztrdup("");
+	} else {
+	    int l;
+
+	    compiprefix = (char *) zalloc((l = wb - parwb) + 1);
+	    memcpy(compiprefix, line + parwb, l);
+	    compiprefix[l] = '\0';
+	    compisuffix = (char *) zalloc((l = parwe - we) + 1);
+	    memcpy(compisuffix, line + we, l);
+	    compisuffix[l] = '\0';
+
+	    wb = parwb;
+	    we = parwe;
+	    offs = paroffs;
+	}
 	zsfree(compqiprefix);
 	compqiprefix = ztrdup(qipre ? qipre : "");
 	zsfree(compqisuffix);
@@ -829,10 +846,16 @@ static int
 makecomplist(char *s, int incmd, int lst)
 {
     char *p;
+    int owb = wb, owe = we, ooffs = offs;
 
     /* Inside $... ? */
-    if (compfunc && (p = check_param(s, 0, 0)))
+    if (compfunc && (p = check_param(s, 0, 0))) {
 	s = p;
+	parwb = owb;
+	parwe = owe;
+	paroffs = ooffs;
+    } else
+	parwb = -1;
 
     linwhat = inwhat;
 
@@ -1073,7 +1096,7 @@ check_param(char *s, int set, int test)
 	    }
 	    /* Save the prefix. */
 	    if (compfunc) {
-		parflags = (br >= 2 ? CMF_PARBR : 0);
+		parflags = (br >= 2 ? CMF_PARBR | (nest ? CMF_PARNEST : 0) : 0);
 		sav = *b;
 		*b = '\0';
 		untokenize(parpre = ztrdup(s));

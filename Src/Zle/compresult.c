@@ -1030,8 +1030,6 @@ accept_last(void)
 	else if (cs > ll)
 	    cs = ll;
 	inststrlen(" ", 1, 1);
-	if (parpre)
-	    inststr(parpre);
 	minfo.insc = minfo.len = 0;
 	minfo.pos = cs;
 	minfo.we = 1;
