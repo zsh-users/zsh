@@ -1,3 +1,7 @@
+2000-08-11  Peter Stephenson  <pws@csr.com>
+
+	* Config/version.mk: 3.1.9-dev-5.
+
 2000-08-10  Oliver Kiddle  <opk@zsh.org>
 
 	* 12585: Doc/Zsh/compsys.yo, Doc/Zsh/compwid.yo, Doc/Zsh/expn.yo,
