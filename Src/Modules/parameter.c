@@ -1090,7 +1090,7 @@ scanpmhistory(UNUSED(HashTable ht), ScanFunc func, int flags)
 
     while (he) {
 	if (func != scancountparams) {
-	    sprintf(buf, "%d", he->histnum);
+	    convbase(buf, he->histnum, 10);
 	    pm.nam = dupstring(buf);
 	    if ((flags & (SCANPM_WANTVALS|SCANPM_MATCHVAL)) ||
 		!(flags & SCANPM_WANTKEYS))
