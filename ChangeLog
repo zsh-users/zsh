@@ -1,3 +1,8 @@
+2001-07-20  Sven Wischnowsky  <wischnow@zsh.org>
+
+	* 15433: Src/Zle/computil.c: don't use compsuffix when it might
+	be freed; use the right variable in that loop there, dammit
+
 2001-07-18  Sven Wischnowsky  <wischnow@zsh.org>
 
 	* 15402 (Akinora Musha): Completion/Unix/Command/_cvs: add
