@@ -5,6 +5,18 @@ CHANGES FROM PREVIOUS VERSIONS OF ZSH
 Changes since zsh version 4.2.0
 -------------------------------
 
+- The autoload and related builtins take options -k and -z to indicate
+  ksh or zsh autoloading style for given functions, making it possible
+  to mix and match.
+
+- Assignments to associative arrays can use the i and r index flags.
+  For example,
+    assoc[(i)alpha*]=bravo
+  sets the value for the element whose key matches the pattern `alpha*';
+    assoc[(r)activ*]=passive
+  sets the value for the element whose current value matches the pattern
+  `activ*'.
+
 - The glob qualifier F indicates a non-empty directory.  Hence *(F)
   indicates all subdirectories with entries, *(/^F) means all
   subdirectories with no entries.
