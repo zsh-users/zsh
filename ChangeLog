@@ -1,5 +1,8 @@
 2002-05-23 Andrej Borsenkow  <bor@zsh.org>
 
+	* unposted: Completion/Redhat/Command/_service: uncomment
+	zstyle now that it works (c.f. 17148)
+
 	* 17125, 17159 (Oliver): Completion/Unix/Command/_texinfo,
 	Completion/Unix/Command/.distfiles: completion for info.
 	As suggested by Oliver put in _texinfo expecting more
