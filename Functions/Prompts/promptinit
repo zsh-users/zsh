@@ -55,6 +55,18 @@ Use prompt -h <theme> for help on specific themes.'
 
   getopts "chlps" opt
   case "$opt" in
+    (h|p)
+      setopt localtraps
+      if [[ -z "$prompt_theme[1]" ]]; then
+        # Not using a prompt theme; save settings
+	local +h PS1=$PS1 PS2=$PS2 PS3=$PS3 PS4=$PS4 RPS1=$RPS1
+	trap "${$(functions precmd):-:} ; ${$(functions preexec):-:}" 0
+      else
+        trap 'prompt_${prompt_theme[1]}_setup "${(@)prompt_theme[2,-1]}"' 0
+      fi
+      ;;
+  esac
+  case "$opt" in
     c) if (( $+prompt_theme )); then
          print -n "Current prompt theme"
          (( $#prompt_theme > 1 )) && print -n " with parameters"
@@ -65,6 +77,12 @@ Use prompt -h <theme> for help on specific themes.'
        return
        ;;
     h) if [[ -n "$2" && -n $prompt_themes[(r)$2] ]]; then
+         if functions prompt_$2_setup >/dev/null; then
+	   # The next line is a bit ugly.  It (perhaps unnecessarily)
+	   # runs the prompt theme setup function to ensure that if
+	   # the theme has a _help function that it's been autoloaded.
+	   prompt_$2_setup
+	 fi
          if functions prompt_$2_help >/dev/null; then
            print "Help for $2 theme:\n"
            prompt_$2_help
@@ -81,13 +99,7 @@ Use prompt -h <theme> for help on specific themes.'
        print $prompt_themes
        return
        ;;
-    p) if [[ -z "$prompt_theme[1]" ]]; then
-         # Not using a prompt theme; save settings
-         prompt_non_theme=( "$PS1" "$PS2" "$PS3" "$PS4" "$RPS1" )
-         prompt_old_precmd="$(functions precmd)"
-         prompt_old_preexec="$(functions preexec)"
-       fi
-       preview=( $prompt_themes )
+    p) preview=( $prompt_themes )
        (( $#* > 1 )) && preview=( "$@[2,-1]" )
        for theme in $preview; do
          theme_args=( "$=theme" )
@@ -110,25 +122,6 @@ Use prompt -h <theme> for help on specific themes.'
          fi
        done
        print
-       if [[ -z "$prompt_theme[1]" ]]; then
-         PS1="$prompt_non_theme[1]"
-         PS2="$prompt_non_theme[2]"
-         PS3="$prompt_non_theme[3]"
-         PS4="$prompt_non_theme[4]"
-         RPS1="$prompt_non_theme[5]"
-         if [[ -z "$prompt_old_precmd" ]]; then
-           precmd () { }
-         else
-           eval "$prompt_old_precmd"
-         fi
-         if [[ -z "$prompt_old_preexec" ]]; then
-           preexec () { }
-         else
-           eval "$prompt_old_preexec"
-         fi
-       else
-         prompt_${prompt_theme[1]}_setup "${(@)prompt_theme[2,-1]}"
-       fi
        ;;
     s) print "Set and save not yet implemented.  Please ensure your ~/.zshrc"
        print "contains something similar to the following:\n"
@@ -150,8 +143,7 @@ Use prompt -h <theme> for help on specific themes.'
          print "$usage"
          return
        fi
-       prompt_$1_setup "$@[2,-1]"
-       prompt_theme=( "$@" )
+       prompt_$1_setup "$@[2,-1]" && prompt_theme=( "$@" )
 
        # Avoid screwing up the environment listing
        PSZZZZ=$reset_color
@@ -185,4 +177,4 @@ prompt_preview_theme () {
   print "command arg1 arg2 ... argn"
 }
 
-promptinit "$@"
+[[ -o kshautoload ]] || promptinit "$@"
