@@ -64,7 +64,7 @@ struct cdset {
 
 /* Maximum string length when used with descriptions. */
 
-#define CD_MAXLEN 20
+#define CD_MAXLEN 30
 
 
 static struct cdstate cd_state;
@@ -171,8 +171,8 @@ cd_calc()
             }
         }
     }
-    if (cd_state.pre > 20)
-        cd_state.pre = 20;
+    if (cd_state.pre > CD_MAXLEN)
+        cd_state.pre = CD_MAXLEN;
 }
 
 /* Initialisation. Store and calculate the string and matches and so on. */

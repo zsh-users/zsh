@@ -1,3 +1,10 @@
+2001-07-19  Sven Wischnowsky  <wischnow@zsh.org>
+
+	* 15415: Completion/Base/Utility/_describe, Src/Zle/computil.c:
+	yet another followup to 15407; make _describe filter out
+	non-matching strings before calling compdescribe, otherwise
+	some matches will be hiddens
+
 2001-07-18  Sven Wischnowsky  <wischnow@zsh.org>
 
 	* 15409: Src/Zle/computil.c: fix for 15407; there may be sets

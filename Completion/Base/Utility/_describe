@@ -21,8 +21,49 @@ fi
 # Do the tests. `showd' is set if the descriptions should be shown.
 
 zstyle -T ":completion:${curcontext}:$_type" verbose && _showd=yes
+
 if zstyle -T ":completion:${curcontext}:$_type" list-grouped; then
+  local _argv _new _strs _mats _opts _i=2
+
+  _argv=( "$@" )
   _grp=(-g)
+  _new=( "$1" )
+  shift
+
+  while (( $# )); do
+
+    _strs="_a_$_i"
+    eval local "_a_$_i;_a_$_i"'=( "${'$1'[@]}" )'
+    _argv[_i]="_a_$_i"
+    shift
+    (( _i++ ))
+
+    if [[ "$1" = (|-*) ]]; then
+      _mats=
+    else
+      _matss="_a_$_i"
+      eval local "_a_$_i;_a_$_i"'=( "${'$1'[@]}" )'
+      _argv[_i]="_a_$_i"
+      shift
+      (( _i++ ))
+    fi
+
+    _opts=( "${(@)argv[1,(i)--]:#--}" )
+    shift "$#_opts"
+    (( _i += $#_opts ))
+    if [[ $1 == -- ]]; then
+      shift
+      (( _i++ ))
+    fi
+
+    if [[ -n $_mats ]]; then
+      compadd "$_opts[@]" -O $_strs -D $_mats -a $_strs
+    else
+      compadd "$_opts[@]" -O $_strs -a $_strs
+    fi
+  done
+
+  set - "$_argv[@]"
 else
   _grp=()
 fi
@@ -50,9 +91,11 @@ while _tags; do
       if [[ -n "$_hide" ]]; then
         if [[ "$PREFIX" = --* ]]; then
           _tmpd=( "${(@)_tmpd#--}" )
+          _tmph=( "${(@)_tmph#--}" )
           _tmps=( "${(@)_tmps#--}" )
         elif [[ "$PREFIX" = [-+]* ]]; then
           _tmpd=( "${(@)_tmpd#[-+]}" )
+          _tmph=( "${(@)_tmph#[-+]}" )
           _tmps=( "${(@)_tmps#[-+]}" )
         fi
       fi
