@@ -1,5 +1,8 @@
 2001-04-02  Sven Wischnowsky  <wischnow@zsh.org>
 
+	* Config/installfns.sh, Src/zsh.mdd: more cleanup after
+	function moving
+
 	* unposted, kind of: moving functions and scripts around, renaming
 	them, accidentally deleted them and re-installing them, etc.
 

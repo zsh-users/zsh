@@ -49,7 +49,7 @@ zshpaths.h: Makemod $(CONFIG_INCS)
 	    $(dir_top)/config.modules | sed -e '/^#/d' -e '/ link=no/d' \
 	    -e 's/^.* functions=//'`"; \
 	    fpath_tmp=`for f in $$fpath_tmp; do \
-	      echo $$f | sed -e 's%^Functions/%%' -e 's%/[^/]*$$%%'; \
+	      echo $$f | sed -e 's%^Functions/%%' -e 's%/[^/]*$$%%' -e 's%/\*%%'; \
 	    done | sort | uniq`; \
 	    fpath_tmp=`echo $$fpath_tmp | sed 's/ /\", \"/g'`; \
 	    echo "#define FPATH_SUBDIRS { \"$$fpath_tmp\" }" \

@@ -1,0 +1,17 @@
+#autoload
+
+local dict dictresult dictwords j expl
+
+[[ -z $words[CURRENT] ]] && return 1
+
+dictresults=(${${(f)${"$(dict -m $words[CURRENT])":gs/    
+  / /}}:#[0-9]*matches found})
+
+for j in ${dictresults}
+do
+  dict=${j%%:*}
+  dictwords=(${(z)j#*:})
+
+  _wanted $dict expl "words from $dict" \
+       compadd -M 'm:{a-zA-Z}={A-Za-z} r:|=*' -a "$@" - dictwords
+done
