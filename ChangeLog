@@ -1,3 +1,8 @@
+2000-06-13  Clint Adams  <schizo@debian.org>
+
+	* ?????: Completion/Debian/_dpkg: more intelligence in
+	dpkg completion.
+
 2000-06-13  Sven Wischnowsky  <wischnow@zsh.org>
 
 	* 11876: Doc/Zsh/compsys.yo, Src/Zle/computil.c: make -A take a

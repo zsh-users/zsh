@@ -1,7 +1,8 @@
 #compdef dpkg dpkg-deb
 
 local _dpkg_deb_actions _dpkg_common_actions _dpkg_actions _dpkg_options
-local curcontext="$curcontext" state line expl ret
+local _dpkg_options_recursive
+local curcontext="$curcontext" context state line expl ret
 typeset -A opt_args
 
 _dpkg_deb_actions=('(--build)-b[build archive]:directory:_files -/' \
@@ -28,7 +29,7 @@ _dpkg_common_actions=('--help[show help]' \
 _dpkg_actions=('(--install)-i[install packages]:*:Debian packages:->install' \
            '(-i)--install:*:Debian packages:->install' \
            '--unpack[unpack package]:Debian package:_files -g \*.deb' \
-           '--configure:package:_deb_packages installed' \
+           '--configure:*:package:->configure' \
            '(--remove)-r[remove package]:*:package:->remove' \
            '(-r)--remove:*:package:->remove' \
            '(--purge)-P[purge package]:*:package:->purge' \
@@ -37,8 +38,8 @@ _dpkg_actions=('(--install)-i[install packages]:*:Debian packages:->install' \
            '(-p)--print-avail:packages:_deb_packages avail' \
            '--update-avail[update available]:package file:_files' \
            '--merge-avail[merge available]:package file:_files' \
-           '(--record-avail)-A[record available]:package file:_files' \
-           '(-A)--record-avail:package file:_files' \
+           '(--record-avail)-A[record available]:*:package files:->record_avail' \
+           '(-A)--record-avail:*:package files:->record_avail' \
            '--forget-old-unavail[forget uninstalled unavailable]' \
            '--clear-avail[clear available]' \
            '(--list)-l[list packages]:*:packages:->list' \
@@ -57,7 +58,7 @@ _dpkg_actions=('(--install)-i[install packages]:*:Debian packages:->install' \
            '--print-architecture[print target architecture]' \
            '--print-gnu-build-architecture[print GNU version of target architecture]' \
            '--print-installation-architecture[print host architecture]' \
-           '--compare-versions[compare version numbers]:expression:')
+           '--compare-versions[compare version numbers]:*:expression:->compare_versions')
 
 _dpkg_options=('--abort-after[abort after errors]:number of errors:' \
            '--admindir=[data directory]:directory:_files -/' \
@@ -79,12 +80,15 @@ _dpkg_options=('--abort-after[abort after errors]:number of errors:' \
            '--ignore-depends=[ignore depends involving package]:package:_deb_packages avail' \
            --{force,refuse,no-force}'--[forcing options]:what:(auto-select downgrade configure-any hold bad-path not-root overwrite overwrite-diverted depends-version depends confnew confold confdef confmiss conflicts architecture overwrite-dir remove-reinstreq remove-essential)')
 
+_dpkg_options_recursive=('(--recursive)-R[recursive]' '(-R)--recursive')
+
 case "${words[1]:t}" in
 dpkg)
 _arguments -C -s "$_dpkg_actions[@]" \
            "$_dpkg_deb_actions[@]" \
            "$_dpkg_common_actions[@]" \
-           "$_dpkg_options[@]"
+           "$_dpkg_options[@]" \
+	   "$_dpkg_options_recursive[@]"
 ;;
 
 dpkg-deb)
@@ -96,19 +100,39 @@ _arguments "$_dpkg_deb_actions[@]" \
 esac
 
 case "$state" in
-  install)
+  install|record_avail)
         _funcall ret _dpkg_$state && return ret
-        _arguments -C -s "$_dpkg_options[@]" \
-	   '*:Debian package:_files -g \*.deb'
-;;
+        _arguments -C -A "-*" -s "$_dpkg_options[@]" \
+	   - recur \
+	   '(--recursive)-R[recursive]' \
+	   '(-R)--recursive' \
+	   ':directory:_files -/' \
+	   - nonrecur \
+	   ':Debian package:_files -g \*.deb'
+  ;;
   remove|purge|status|listfiles)
         _funcall ret _dpkg_$state && return ret
-  	_arguments -C -s "$_dpkg_options[@]" \
+  	_arguments -C -A "-*" -s "$_dpkg_options[@]" \
 	   '*:package:_deb_packages installed'
-;;
+  ;;
   list)
         _funcall ret _dpkg_$state && return ret
-        _arguments -C -s "$_dpkg_options[@]" \
-           '*:packages:_deb_packages avail' \
-;;
+        _arguments -C -A "-*" -s "$_dpkg_options[@]" \
+           '*:packages:_deb_packages avail'
+  ;;
+  compare_versions)
+        _funcall ret _dpkg_$state && return ret
+        _arguments -C -A "-*" -s "$_dpkg_options[@]" \
+	'2:version A:' \
+	'3:operator:(lt le eq ne ge gt lt-nl le-nl ge-nl gt-nl)' \
+	'4:version B:'
+  ;;
+  configure)
+        _funcall ret _dpkg_$state && return ret
+        _arguments -C -A "-*" -s '--configure' \
+	   "$_dpkg_options[@]" \
+	'(--pending)-a[pending packages]' \
+	'(-a)--pending' \
+	'*:package:_deb_packages installed'
+  ;;
 esac
