@@ -155,7 +155,7 @@ bin_echotc(char *name, char **argv, UNUSED(Options ops), UNUSED(int func))
 	tputs(t, 1, putraw);
     else {
 	num = (argv[1]) ? atoi(argv[1]) : atoi(*argv);
-	tputs(tgoto(t, atoi(*argv), num), num, putraw);
+	tputs(tgoto(t, num, atoi(*argv)), num, putraw);
     }
     return 0;
 }

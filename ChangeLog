@@ -1,3 +1,8 @@
+2005-03-02  Clint Adams  <clint@zsh.org>
+
+	* 20909: Src/Modules/termcap.c: reverse row and col
+	arguments to tgoto.
+
 2005-03-01  Peter Stephenson  <pws@csr.com>
 
 	* 20897: Completion/Unix/Command/_a2ps: complete system printers
