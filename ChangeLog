@@ -1,3 +1,8 @@
+2000-04-19  Peter Stephenson  <pws@cambridgesiliconradio.com>
+
+	* Ollivier Robert: 10844: prefer curses to termcap on HPUX 11
+	like 10.
+
 2000-04-19  Oliver Kiddle  <opk@zsh.org>
 
 	* 10833: Completion/Builtins/_print, Completion/Builtins/.distfiles,
