@@ -1,0 +1,63 @@
+#compdef -value- -array-value-
+
+_value () {
+  # You can customize completion for different parameters by writing a
+  # function `_value:<name>', where <name> is the name of the parameter.
+  # When completing values of elements of associative arrays, we first
+  # search for a function `_value:<assoc>-<key>' and then for 
+  # `_value:<assoc>', so it's simple to define different functions
+  # for different keys or one function for a whole association.
+
+  if (( $+functions[_value:$compstate[parameter]] )); then
+    "_value:$compstate[parameter]" "$@"
+  elif (( $+functions[_value:${compstate[parameter]%%-*}] )); then
+    "_value:${compstate[parameter]%%-*}" "$@"
+  elif [[ "$compstate[parameter]" != *-* &&
+          "${(Pt)${compstate[parameter]}}" = assoc* ]]; then
+    if (( CURRENT & 1 )); then
+      _wanted association-keys expl 'association key' \
+          compadd -k "$compstate[parameter]"
+    else
+      compstate[parameter]="${compstate[parameter]}-${words[CURRENT-1]}"
+      _value "$@"
+    fi
+  else
+    local pats
+
+    if { zstyle -a ":completion:${curcontext}:" assign-list pats &&
+         [[ "$compstate[parameter]" = (${(j:|:)~pats}) ]] } ||
+       [[ "$PREFIX$SUFFIX" = *:* ]]; then
+      compset -P '*:'
+      compset -S ':*'
+      _default -r '\-\n\t /:' "$@"
+    else
+      _default "$@"
+    fi
+  fi
+}
+
+_value:CPPFLAGS () {
+  compset -q
+  if compset -P '-I'; then
+    _files -/ "$@"
+  else
+    _default "$@"
+  fi
+}
+
+_value:LDFLAGS () {
+  compset -q
+  if compset -P '-L'; then
+    _files -/ "$@"
+  elif compset -P '-R'; then
+    compset -P '*:'
+    compset -S ':*'
+    _files -/ -S/ -r '\n\t\- /:' "$@"
+  else
+    _default "$@"
+  fi
+}
+
+_value:DISPLAY() { _x_display "$@" }
+
+_value "$@"

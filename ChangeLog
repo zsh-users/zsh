@@ -1,5 +1,9 @@
 2001-10-12  Oliver Kiddle  <opk@zsh.org>
 
+	* 15594: Completion/Zsh/Context/_value,
+	Completion/Zsh/Command/_enable: use _x_display when setting
+	$DISPLAY and fix substitution mistake in enable completion
+
 	* 15983: Completion/Unix/Command/_user_admin,
 	Completion/Unix/Command/_sysctl, Completion/Unix/Type/_urls,
 	Completion/Unix/Command/_webbrowser: darwin support in _sysctl,
