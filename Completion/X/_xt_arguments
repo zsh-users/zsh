@@ -41,7 +41,7 @@ xargs=(
   '-selectionTimeout:selection timeout (milliseconds):_x_selection_timeout'
   '-title:title:_x_title'
   '-xnllanguage:locale:_x_locale'
-  '-xrm:resource:_x_resource'
+  '*-xrm:resource:_x_resource'
   '-xtsessionID:session ID:_xt_session_id'
 )
 
