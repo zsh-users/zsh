@@ -1,3 +1,11 @@
+2000-04-09  Peter Stephenson  <pws@pwstephenson.fsnet.co.uk>
+
+	* Config/version.mk: 3.1.6-dev-22.
+
+	* Completion/Core/compinstall, Doc/Zsh/compsys.yo:  rewrite
+	of compinstall to set styles.  Most of this was already in
+	3.1.6-dev-21.
+
 2000-04-08  Bart Schaefer  <schaefer@zsh.org>
 
 	* 10594: Functions/Prompts/prompt_bart_setup: Fix index into

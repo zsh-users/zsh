@@ -26,11 +26,10 @@ sect(Initialization)
 findex(compinstall)
 cindex(completion system, installing)
 
-The function tt(compinstall) can be run by a user to set up the completion
-system for use, which also provides options for more advanced usage.
-However, if the system was installed completely, it should be enough to
+If the system was installed completely, it should be enough to
 call the shell function tt(compinit) from your initialization file; see the
-next section.
+next section.  However, the function tt(compinstall) can be run by a user
+to configure various aspects of the completion system.
 
 Usually, tt(compinstall) will insert code into tt(.zshrc), although if
 that is not writable it will save it in another file and tell you that
@@ -40,27 +39,22 @@ them to an earlier place in the file if tt(.zshrc) usually returns early.
 So long as you keep them all together (including the comment lines at the
 start and finish), you can rerun tt(compinstall) and it will correctly
 locate and modify these lines.  Note, however, that any code you add to
-this section by hand is likely to be lost if you rerun tt(compinstall).
+this section by hand is likely to be lost if you rerun tt(compinstall),
+although lines using the command `tt(zstyle)' should be gracefully handled.
+
 The new code will take effect next time you start the shell, or run
-tt(.zshrc) by hand.
+tt(.zshrc) by hand; there is also an option to make them take effect
+immediately.  However, if tt(compinstall) has removed definitions, you will
+need to restart the shell to see the changes.
 
-To run it, you will need to make sure it is in a directory mentioned in your
-tt($fpath) parameter, and that it is autoloaded (`tt(autoload -U
-compinstall)' is recommended).  It will ask you various questions about how
-you would like completion set up.  It is in two parts; the basic part
-locates the completion files and decides where to put your personal
-dumpfile, used to speed up initialization after the first time.  After
-that, you will be asked if you wish to go on to the advanced set-up; if you
-answer tt(n), you can rerun tt(compinstall) later without having to
-re-enter any of the basic settings.
-
-You can abort the installation any time you are being prompted for
-information, and your tt(.zshrc) will not be altered at all.
-
-After initialization all the builtin completion widgets such as
-tt(expand-or-complete) will be redefined to use the new completion system.
-Should you need to, you can still bind keys to the old functions by putting
-a `tt(.)' in front, e.g. `tt(.expand-or-complete)'.
+To run tt(compinstall) you will need to make sure it is in a directory
+mentioned in your tt($fpath) parameter, which should already be the case if
+zsh was properly configured as long as your startup files do not remove the
+appropriate directories from tt($fpath).  Then it must be autoloaded
+(`tt(autoload -U compinstall)' is recommended).  You can abort the
+installation any time you are being prompted for information, and your
+tt(.zshrc) will not be altered at all; changes only take place right at the
+end, where you are specifically asked for confirmation.
 
 subsect(Use of compinit)
 findex(compinit)
@@ -79,6 +73,10 @@ new system. Note that this means that the tt(zsh/complist) module has
 to be loaded before the completion system is initialized (i.e. the
 tt(compinit) function is called) to make sure that the tt(menu-select)
 widget defined by it will be redefined, too.
+
+Should you need to use the original copmpletion commands, you can still
+bind keys to the old functions by putting a `tt(.)' in front of the
+command name, e.g. `tt(.expand-or-complete)'.
 
 To speed up the running of tt(compinit), it can be made to produce a dumped
 configuration which will be read in on future invocations; this is the

@@ -9,7 +9,7 @@ __ci_tidyup() {
   autoload -U compinstall
 }
 
-__ci_newline() { 
+__ci_newline() {
   read -k \
     key"?${1:---- Hit newline to continue or \`q' to exit without saving --- }"
   print
@@ -65,7 +65,7 @@ ${match[3]}"
       warn_old=1
     elif [[ $line = [[:blank:]]#\#* ]]; then
       warn_comment=1
-    elif [[ $line != [[:blank:]]# && 
+    elif [[ $line != [[:blank:]]# &&
       $line != [[:blank:]]#'autoload -U compinit' &&
       $line != [[:blank:]]#compinit ]]; then
       warn_unknown="${warn_unknown:+$warn_unknown
@@ -451,10 +451,11 @@ The following completers are available.  Those marked \`(*)' are already
 set for the context shown above.  Note none of these are required for
 normal completion behaviour.
 
-1. ${${completers[_list]:+(*)}:-   } _list:    $ckeys[_list]
-2. ${${completers[_oldlist]:+(*)}:-   } _oldlist: $ckeys[_oldlist]
-3. ${${completers[_match]:+(*)}:-   } _match:   $ckeys[_match]
-4. ${${completers[_prefix]:+(*)}:-   } _prefix:  $ckeys[_prefix]
+1. ${${completers[_ignored]:+(*)}:-   } _ignored: $ckeys[_ignored]
+2. ${${completers[_list]:+(*)}:-   } _list:    $ckeys[_list]
+3. ${${completers[_oldlist]:+(*)}:-   } _oldlist: $ckeys[_oldlist]
+4. ${${completers[_match]:+(*)}:-   } _match:   $ckeys[_match]
+5. ${${completers[_prefix]:+(*)}:-   } _prefix:  $ckeys[_prefix]
 
 o.     Set options for the completers above.
 q.     Return without saving.
@@ -466,13 +467,29 @@ q.     Return without saving.
     [[ $key = 0 ]] && break
 
     case $key in
-      1) __ci_toggle_completer _list
+      1) __ci_toggle_completer _ignored
+	 if [[ -n $completers[_ignored] ]]; then
+	   print "\
+I am inserting the \`ignored' completer immediately after normal
+completion.  You can move it later in the list by hand, if you prefer, so
+that ignored completions are only used after, for example, approximations.
+To do this, edit $ifile, look for the zstyle ... completers line, and
+move \`_ignored' to where you want it.  This will be retained if you use
+compinstall again provided you don't go into the completers menu.
+"
+	   # TODO: we could be more careful about keeping the user's
+	   # order, particularly with multiple completers.
+           read -k key'?--- Hit any key to continue --- '
+	   print
+	 fi
 	 ;;
-      2) __ci_toggle_completer _oldlist
+      2) __ci_toggle_completer _list
 	 ;;
-      3) __ci_toggle_completer _match
+      3) __ci_toggle_completer _oldlist
 	 ;;
-      4) __ci_toggle_completer _prefix
+      4) __ci_toggle_completer _match
+	 ;;
+      5) __ci_toggle_completer _prefix
 	 ;;
       o) __ci_do_minor_completer_options
 	 ;;
@@ -643,18 +660,20 @@ __ci_do_completers() {
   for c in ${=newc}; do
     completers[$c]=1
   done
-  clist=(_list _oldlist _menu _expand _complete _match _correct _approximate
-         _prefix)
+  clist=(_list _oldlist _menu _expand _complete _ignored 
+         _match _correct _approximate _prefix)
 
   # TODO: these are a bit brief, so could provide some more detailed help.
   ckeys=(_complete 'Basic completion.'
-         _approximate 
+         _approximate
 'Approximate completion:  completion with correction of existing word.'
          _correct
 'Correction:  correct existing word, no completion.'
          _expand
 'Expansion: use globbing and parameter substituion, if possible.'
 
+	 _ignored
+'Use patterns that were previously ignored if no matches so far.'
          _list
 'Only list matches until the second time you hit TAB.'
          _oldlist
@@ -985,7 +1004,7 @@ Many commands have options which take a single argument.  In some cases,
 completion is not set up to describe the option even though it has a
 description for the argument.  You can enter a string containing \`%d',
 which will be replaced by the description for the option.  For
-example, if you enter the string \`specify: %d', and an option -ifile 
+example, if you enter the string \`specify: %d', and an option -ifile
 exists which has an argument whose description is \`input file', then the
 description \`specify: input file' will appear when the option itself
 is listed.  As this long explanation suggests, this is only occasionally
@@ -1012,16 +1031,11 @@ Quotation will be added automatically.
   __ci_set_this_style auto-description autod
 }
 
-# TODO: I couldn't be bothered to handle sort because it does different
-#       things in different context (which I'm kind of against anyway).
 __ci_do_insertion() {
   local key insertu original # sort
 
   __ci_get_this_style insert-unambiguous insertu
   __ci_get_this_style original original
-  #  sort is too difficult, it has different meanings in different
-  #  contexts.
-  # __ci_get_this_style sort sort
 
   while true; do
     clear
@@ -1208,8 +1222,6 @@ number of completions.  Please enter:
 
 
 __ci_do_display() {
-  # use-compctl
-
   local key usec
 
   __ci_get_this_style use-compctl usec
@@ -1235,7 +1247,7 @@ q.  Return without saving.
 
     read -k key'?--- Hit selection --- '
     print
-  
+
     [[ $key = 0 ]] && break
 
     case $key in
@@ -1281,14 +1293,180 @@ completions?
 }
 
 
-# TODO: this is probably not what it ought to do.
-#       It should offer to set things for file completion,
-#       history completion, jobs, prefix-needed 'n' stuff.
+#       file-sort, special-dirs, ignore-parents,
+#       squeeze-slashes,
+__ci_do_file_styles() {
+  local key files cursor expand speciald ignorep squeezes select
+
+  __ci_get_this_style file-sort files
+  __ci_get_this_style ignore-parents ignorep
+  __ci_get_this_style special-dirs speciald
+  __ci_get_this_style squeeze-slashes squeezes
+
+  while true; do
+    clear
+    print "\
+      *** compinstall: options for filename completion ***
+
+1.  Choose how to sort the displayed list of filename matches.
+
+2.  In expressions with .., don't include directories already implied.
+
+3.  Allow completion of . and .. for the bone idle.
+
+4.  When expanding paths, \`foo//bar' is treated as \`foo/bar'.
+
+q.  Return without saving.
+0.  Done setting options for filename completion.
+"
+    read -k key'?--- Hit selection --- '
+    print
+
+    [[ $key = 0 ]] && break
+
+    case $key in
+      (1) print "\
+Filenames listed as possible completions are usually displayed in
+alphabetical order.  You can alternatively choose:
+  s  File size
+  l  Number of (hard) links
+  m  Modification time
+  a  Access time
+  i  Inode change time
+  n  File name
+  k  Keep the current setting
+You can also specify the reverse of any of the above orders (except \`k'):  to
+do this, type the appropriate letter in upper case.
+"
+         while true; do
+           read -k key'?--- Hit selection --- '
+	   print
+	   [[ $key = [sSlLmMaAiInNkK] ]] && break
+	 done
+	 case $key in
+	   ([sS]) files=size;;
+	   ([lL]) files=links;;
+	   ([mM]) files=modification;;
+	   ([aA]) files=access;;
+	   ([iI]) files=inode;;
+	   ([nN]) files=name;;
+	 esac
+	 if [[ $key = [SLAMIN] ]]; then
+	   # slam it into reverse
+	   files="$files reverse"
+	 fi
+	 ;;
+      (2) print "\
+When you type an expression containing \`..', you may usually not want to
+be offered certain directories for completion.
+  p   Don't offer parents:  in \`foo/bar/../', don't make \`bar' a completion.
+  c   Don't offer the current directory, e.g. after \`../'.
+  o   Only perform the two tests if there is a real \`..' in the word so far.
+  d   Only perform the two tests when completing directory names.
+  0   None of the above; use normal completion.
+  k   Keep the current settings.
+You may specify any combination of p, c, o, d including at least one of p
+and c, or you may specify either 0 or k.  Note that the _ignored completer
+functions in the normal way, i.e. you would be able to complete the
+directories in question if nothing else matched.
+"
+          while true; do
+	    vared -eh -p 'selection> ' select
+	    [[ ( $select = [pPcCoOdD]# && $select = *[pPcC]* )
+		    || $select = [0kK] ]] && break
+	    print "Type any combination of p, c, o, d, or type 0 or k"
+	  done
+	  case $select in
+	    (0) ignorep=
+		;;
+	    ([pPcCoOdD]#)
+		ignorep=()
+		[[ $select = *[pP]* ]] && ignorep=($ignorep parent)
+		[[ $select = *[cC]* ]] && ignorep=($ignorep pwd)
+		[[ $select = *[oO]* ]] && ignorep=($ignorep ..)
+		[[ $select = *[dD]* ]] && ignorep=($ignorep directory)
+		;;
+	  esac
+	  ;;
+      (3) print "\
+Filename completion does not usually offer the directory names \`.' and
+\`..' as choices.  However, some immensely lazy people can't even be
+bothered to type these.  Do you wish to be offered \`.' and \`..' as
+choices ([y]es, [n]o, [k]eep current setting)?
+"
+          while true; do
+            read -k key'?--- Hit selection --- '
+	    [[ $key = [yYnNkK] ]] && break
+	    print "Type y, n or k."
+	  done
+	  case $key in
+	    ([yY]) speciald=true;;
+	    ([nN]) speciald=;;
+	  esac
+	  ;;
+      (4) print "\
+Filename completion can complete sets of path segments at once, for example
+\`/u/X/l/X' to \`/usr/X11R6/lib/X11'.  Normally this means that multiple
+slashes in filenames are treated as matching multiple directories.  For
+example, \`foo//bar' could expand to \`foo/datthe/bar'.  You can, however,
+stick to the usual UNIX convention that multiple slashes are treated as
+a single slash.  Do you wish to treat multiple slashes the same as just
+one ([y]es, [n]o, [k]eep current setting)?
+"
+          while true; do
+	    read -k key'?--- Hit selection --- '
+	    [[ $key = [yYnNkK] ]] && break
+	    print "Type one of y, n or k."
+	  done
+	  case $key in
+	    ([yY]) squeezes=true;;
+	    ([nN]) squeezes=;;
+	  esac
+          ;;
+      (q) return 1
+	 ;;
+    esac
+
+  done
+
+  __ci_set_this_style file-sort files
+  __ci_set_this_style ignore-parents ignorep
+  __ci_set_this_style special-dirs speciald
+  __ci_set_this_style squeeze-slashes squeezes
+
+  return 0
+}
+
+
+# TODO: history completion, jobs, prefix-needed 'n' stuff.
 __ci_do_misc() {
   local key
-  print "I haven't got around to writing this.  Sorry."
-  read key'?--- Hit any key --- '
-  return 0;  
+
+  while true; do
+    clear
+    print "\
+      *** compinstall: options for particular types of completion ***
+
+1.  Options for file completion.
+
+q.  Return without saving.
+0.  Done setting options for particular completions.
+"
+    read -k key'?--- Hit selection --- '
+    print
+
+    [[ $key = 0 ]] && break
+
+    case $key in
+      1) __ci_do_file_styles
+	 ;;
+      q) return 1
+	 ;;
+    esac
+
+  done
+
+  return 0;
 }
 
 
@@ -1354,18 +1532,42 @@ zstyle ${(qq)stylevals[1]} $style $stylevals[2]"
   done
 fi
 
-if read -q key'?Save new settings to file? '; then
-  print -r "autoload -U compinit
+local tmpout=${TMPPREFIX:-/tmp/zsh}compinstall$$
+#
+# Assemble the complete set of lines to
+# insert.
+#
+{ print -r "$startline
+autoload -U compinit
 compinit"
 
-  if [[ -n $fpath_line ]]; then
-    print -r "$output
-$fpath_line"
-  fi
+  [[ -n $fpath_line ]] && print -r "$fpath_line"
 
-  print
-  
-  print -r $output
+  print -r "$output
+$endline" } >$tmpout
+
+if read -q key"?Save new settings to $ifile? "; then
+  #
+  # Now use sed to update the file.
+  #
+  if [[ -f $ifile ]]; then
+    cp $ifile ${ifile}\~ &&
+    print "Copied old file to ${ifile}~."
+  else
+    touch $ifile
+  fi
+  if sed -e "/^[ 	]*$endline/r $tmpout
+/^[ 	]*$startline/,/^[ 	]*$endline/d" $ifile >${tmpout}2 &&
+  mv ${tmpout}2 $ifile; then
+    print "\nSuccessfully added compinstall lines to $ifile."
+    rm -f $tmpout
+  else
+    print "\nFailure adding lines to $ifile.  Lines left in \`$tmpout'"
+  fi
+  rm -f ${tmpout}2
+elif read -q key'?Print them to stdout instead? '; then
+  cat $tmpout
+  rm -f $tmpout
 fi
 
 if read -q key'?Set new styles for immediate use? '; then
