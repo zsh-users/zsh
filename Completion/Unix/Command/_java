@@ -1,0 +1,537 @@
+#compdef javac java javadoc appletviewer jar jdb javah javap extcheck rmic rmiregistry rmid serialvar native2ascii keytool jarsigner policytool
+
+local expl tmp jdb_args jar_cmd match basedir
+local curcontext="$curcontext" state line
+typeset -A opt_args tmpassoc
+
+jdb_args=()
+
+case "$service" in
+javac)
+  _arguments \
+    '-g-[generate debugging information]:debug:->debug' \
+    '-O[optimize]' \
+    '-nowarn[suppress warnings]' \
+    '-verbose[print verbose messages]' \
+    '-deprecation[print uses of deprecated APIs]' \
+    '-classpath[specify path for user class files]:class path:->classpath' \
+    '-sourcepath[specify path for source files]:source path:->sourcepath' \
+    '-bootclasspath[specify path for bootstrap class files]:bootstrap class path:->bootstrapclasspath' \
+    '-extdirs[specify directories for extensions]:extensions directories:->extdirs' \
+    '-d[specify destination directory]:directory:_files -/' \
+    '-encoding[specify character encoding for source files]:encoding:->encoding' \
+    '-target[specify VM version]:release:(1.1 1.2)' \
+    '*:java source file:_files -g \*.java' && return 0
+  ;;
+
+jdb)
+  jdb_args=(
+    '-host[specify hostname to connect]:hostname:_hosts'
+    '-password[specify password]:password:'
+  )
+  ;&
+
+java)
+  _arguments \
+    "$jdb_args[@]" \
+    '(-cp)-classpath[specify path for user class files]:class path:->classpath' \
+    '(-classpath)-cp[specify path for user class files]:class path:->classpath' \
+    '-D-[specify a property]:property:->property' \
+    '(-verbose:class)-verbose[print class information]' \
+    '(-verbose)-verbose\:class[print class information]' \
+    '-verbose\:gc[print gc information]' \
+    '-verbose\:jni[print JNI information]' \
+    '-version[print version]' \
+    '-help[print help message]' \
+    '(- 1)-jar[specify a program capsulated as jar]:jar:_files -g \*.jar' \
+    '(-):class:->class' \
+    '*:arguments:_default' && return 0
+  ;;
+
+javadoc)
+  _arguments \
+    '-overview[specify overview file]:_files' \
+    '-public[display public classes and members only]' \
+    '-protected[display public/protected classes and members only (default)]' \
+    '-package[display pacages, public/protected classes and members only]' \
+    '-private[display all classes and members]' \
+    '-help[print help message]' \
+    '-doclet[specify a doclet]:doclet:->doclet' \
+    '-docletpath[specify a path to search doclet]:doclet path:->docletpath' \
+    '-1.1[Javadoc 1.1 compatible output]' \
+    '-sourcepath[specify path for source files]:source path:->sourcepath' \
+    '-classpath[specify path for user class files]:class path:->classpath' \
+    '-bootclasspath[specify path for bootstrap class files]:bootstrap class path:->bootstrapclasspath' \
+    '-extdirs[specify directories for extensions]:extensions directories:->extdirs' \
+    '-verbose[print verbose messages]' \
+    '-locale[specify locale]:language_country_variant:' \
+    '-encoding[specify character encoding for source files]:encoding:->encoding' \
+    '-J-[specify java option]:java option:' \
+    '-d[specify destination directory]:destination directory:_files -/' \
+    '-use[display pages for use]' \
+    '-version[include @version text]' \
+    '-author[include @author text]' \
+    '-splitindex[split index file for each alphabet]' \
+    '-windowtitle[specify HTML title element]:title element:' \
+    '-doctitle[specify title]:document title:' \
+    '-header[specify header text]:header text:' \
+    '-footer[specify footer text]:footer text:' \
+    '-bottom[specify bottom text]:bottom text:' \
+    '-link[generate a link to external reference classes]:document URL:' \
+    '-linkoffline[generate a link for external reference class names]:document URL::package list URL:' \
+    '-group[generate tables for each groupes]:group heading::package patterns:' \
+    '-nodeprecated[do not document deprecated API]' \
+    '-nodeprecatedlist[do not generate deprecated API list]' \
+    '-notree[do not generate class and interface hierarchy]' \
+    '-noindex[do not generate index]' \
+    '-nohelp[do not generate help link]' \
+    '-nonavbar[do not generate navigation bar]' \
+    '-helpfile[specify alternative help link]:helpfile path/filename:' \
+    '-stylesheet[specify alternative HTML style sheet]:stylesheet path/filename:' \
+    '-docencoding[specify character encoding for output HTML files]:encoding:->encoding' \
+    '*:package name, source file or @list:->docsrc' && return 0
+  ;;
+
+appletviewer)
+  _arguments \
+    '-debug[run applet on jdb]' \
+    '-encoding[specify character encoding for source files]:encoding:->encoding' \
+    '-J-[specify java option]:java option:' \
+    '*:url:_urls' && return 0
+  ;;
+
+jar)
+  if (( CURRENT == 2 )); then
+    compset -P -
+    _values -s '' 'jar command' \
+      '(  t x u)c[create new archive]' \
+      '(c   x u)t[list the table of archive]' \
+      '(c t   u)x[extract files from archive]' \
+      '(c t x  )u[update archive]' \
+      'f[specify archive file]' \
+      'v[verbose mode]' \
+      'm[specify manifest file]' \
+      '0[store only without using ZIP compression]' \
+      'M[do not create manifest file]'
+  else
+    jar_cmd="${words[2]#-}"
+    tmpassoc=(
+      m ':manifest file:_files'
+      f ':archive file:_files -g \*.\(jar\|zip\)'
+    )
+    _arguments \
+      "${jar_cmd/[^-]*/:dummy:}" \
+      ${${(s::)jar_cmd}/(#b)(?)/$tmpassoc[$match[1]]} \
+      '*:file:->jararg' && return 0
+  fi
+  ;;
+
+javah|javah_g)
+  _arguments \
+    '-o[specify output file]:output file:_files' \
+    '-d[specify destination directory]:directory:_files -/' \
+    '-stubs[generate stubs]' \
+    '-verbose[print verbose messages]' \
+    '-help[print help message]' \
+    '-version[print version]' \
+    '-jni[JNI-style native method function prototypes]' \
+    '-classpath[specify path for user class files]:class path:->classpath' \
+    '-bootclasspath[specify path for bootstrap class files]:bootstrap class path:->bootstrapclasspath' \
+    '-old[generate old JDK1.0-style header files]' \
+    '-force[force output]' \
+    '*:fully qualified classname:->class' && return 0
+  ;;
+
+javap)
+  _arguments \
+    '-help[print help message]' \
+    '-l[line and local variable tables]' \
+    '-b[backward compatible to JDK1.1]' \
+    '-public[only public classes and members]' \
+    '-protected[only protected and public classes and members]' \
+    '-package[only package, protected and public classes and members (default)]' \
+    '-private[all classes and members]' \
+    '-J-[specify java option]:java option:' \
+    '-s[internal type signatures]' \
+    '-c[disassemble code]' \
+    '-verbose[stack size, number of locals and args for methods]' \
+    '-classpath[specify path for user class files]:class path:->classpath' \
+    '-bootclasspath[specify path for bootstrap class files]:bootstrap class path:->bootstrapclasspath' \
+    '-extdirs[specify directories for extensions]:extensions directories:->extdirs' \
+    '*:class:->class' && return 0
+  ;;
+
+extcheck)
+  _arguments \
+    '-verbose[print verbose messages]' \
+    ':target jar file:_files -g \*.jar' && return 0
+  ;;
+
+rmic)
+  _arguments \
+    '-classpath[specify path for user class files]:class path:->classpath' \
+    '-d[specify destination directory]:directory:_files -/' \
+    '-depend[treat dependencies]' \
+    '-g[enable debugging]' \
+    '-J-[specify java option]:java option:' \
+    '-keepgenerated[retain generated source files]' \
+    '-nowarn[disable warnings]' \
+    '-show[GUI mode]' \
+    '-vcompat[compatible with JDK 1.1 and 1.2 (default)]' \
+    '-verbose[print verbose messages]' \
+    '-v1.1[JDK 1.1 stub protocol]' \
+    '-v1.2[JDK 1.2 stub protocol]' \
+    '*:package qualified class name:->class' && return 0
+  ;;
+
+rmiregistry)
+  if (( CURRENT == 2 )); then
+    _wanted ports expl 'port to listen' _ports
+  else
+    _message 'no more arguments'
+  fi
+  ;;
+
+rmid)
+  _arguments \
+    '-C-[specify command line argument for child process]:comand line argument for child process:' \
+    '-log[specify log directory]:directory to place logs:_files -/' \
+    '-port[specify port]:port:_ports' \
+    '-stop[stop rmid]:' && return 0
+  ;;
+       
+serialvar)
+  _arguments \
+    '-show[display user interface]' && return 0
+  ;;
+
+native2ascii)
+  _arguments \
+    '-reverse[convert Latin-1 (with \udddd) to native encoding]' \
+    '-encoding[specify character encoding]:encoding:->encoding' \
+    ':input file:_files' \
+    ':output file:_files' && return 0
+  ;;
+
+keytool)
+  _arguments \
+      '-J-[specify java option]:java option:' \
+    - genkey \
+      '-genkey[command to generate a key pair]' \
+      '-alias[alias]:alias:' \
+      '-keyalg[key algorithm]:key algorithm:' \
+      '-keysize[key size]:key size:' \
+      '-sigalg[signature algorithm]:signature algorithm:' \
+      '-dname[X.500 distinguish name]:X.500 distinguish name:' \
+      '-keypass[password for private key]:password for private key:' \
+      '-validity[valid days]:number of days:' \
+      '-storetype[keystore type]:store type:' \
+      '-keystore[keystore location]:keystore location:' \
+      '-storepass[password for keystore]:password:' \
+      '-v[verbose mode]' \
+    - import \
+      '-import[command to import certificate or certificate chain]' \
+      '-alias[alias]:alias:' \
+      '-file[specify certificate file]:certificate file:_files' \
+      '-keypass[password for private key]:password for private key:' \
+      '-noprompt[disable interaction with the user]' \
+      '-trustcacerts[use cacerts]' \
+      '-storetype[keystore type]:store type:' \
+      '-keystore[keystore location]:keystore location:' \
+      '-storepass[password for keystore]:password:' \
+      '-v[verbose mode]' \
+    - selfcert \
+      '-selfcert[command to generate X.509 v1 self-signed certificate]' \
+      '-alias[alias]:alias:' \
+      '-sigalg[signature algorithm]:signature algorithm:' \
+      '-dname[X.500 distinguish name]:X.500 distinguish name:' \
+      '-validity[valid days]:number of days:' \
+      '-keypass[password for private key]:password for private key:' \
+      '-storetype[keystore type]:store type:' \
+      '-keystore[keystore location]:keystore location:' \
+      '-storepass[password for keystore]:password:' \
+      '-v[verbose mode]' \
+    - identitydb \
+      '-identitydb[command to read identity database]' \
+      '-file[specify identity database file]:identity database file:_files' \
+      '-storetype[keystore type]:store type:' \
+      '-keystore[keystore location]:keystore location:' \
+      '-storepass[password for keystore]:password:' \
+      '-v[verbose mode]' \
+    - certreq \
+      '-certreq[command to generate certificate signing request]' \
+      '-alias[alias]:alias:' \
+      '-sigalg[signature algorithm]:signature algorithm:' \
+      '-file[specify certificate signing request file]:certificate signing request file:_files' \
+      '-keypass[password for private key]:password for private key:' \
+      '-storetype[keystore type]:store type:' \
+      '-keystore[keystore location]:keystore location:' \
+      '-storepass[password for keystore]:password:' \
+      '-v[verbose mode]' \
+    - export \
+      '-export[command to store certificate]' \
+      '-alias[alias]:alias:' \
+      '-file[specify certificate file]:certificate file:_files' \
+      '-rfc[make certificate format printable as RFC 1421]' \
+      '-storetype[keystore type]:store type:' \
+      '-keystore[keystore location]:keystore location:' \
+      '-storepass[password for keystore]:password:' \
+      '-v[verbose mode]' \
+    - list \
+      '-list[command to print keystore entry]' \
+      '-alias[alias]:alias:' \
+      '-storetype[keystore type]:store type:' \
+      '-keystore[keystore location]:keystore location:' \
+      '-storepass[password for keystore]:password:' \
+      '(-rfc)-v[make certificate format human-readable]' \
+      '(-v)-rfc[make certificate format printable as RFC 1421]' \
+    - printcert \
+      '-printcert[command to print certificate in a human-readable format]' \
+      '-file[specify certificate file]:certificate file:_files' \
+      '-v[verbose mode]' \
+    - keyclone \
+      '-keyclone[command to create new keystore entry]' \
+      '-alias[alias]:alias:' \
+      '-dest[destination alias]:destination alias:' \
+      '-keypass[password for private key]:password for private key:' \
+      '-new[password for private key of new entry]:password for private key of new entry:' \
+      '-storetype[keystore type]:store type:' \
+      '-keystore[keystore location]:keystore location:' \
+      '-storepass[password for keystore]:password:' \
+      '-v[verbose mode]' \
+    - storepasswd \
+      '-storepasswd[command to change password for keystore]' \
+      '-new[new password]:new password:' \
+      '-storetype[keystore type]:store type:' \
+      '-keystore[keystore location]:keystore location:' \
+      '-storepass[password for keystore]:password:' \
+      '-v[verbose mode]' \
+    - keypasswd \
+      '-keypasswd[command to change password for private key]' \
+      '-alias[alias]:alias:' \
+      '-keypass[old password for private key]:old password for private key:' \
+      '-new[nwe password for private key]:new password for private key:' \
+      '-storetype[keystore type]:store type:' \
+      '-keystore[keystore location]:keystore location:' \
+      '-storepass[password for keystore]:password:' \
+      '-v[verbose mode]' \
+    - delete \
+      '-delete[command to delete entry]' \
+      '-alias[alias]:alias:' \
+      '-storetype[keystore type]:store type:' \
+      '-keystore[keystore location]:keystore location:' \
+      '-storepass[password for keystore]:password:' \
+      '-v[verbose mode]' \
+    - help \
+      '(-J)-help[command to print help message]' && return 0
+  ;;
+
+jarsigner)
+  _arguments \
+    '-keystore[specify url for keystore location]:url for keystore location:' \
+    '-storetype[specify keystore type]:store type:' \
+    '-storepass[specify password for keystore]:password:' \
+    '-keypass[specify password for private key]:password:' \
+    '-sigfile[specify base file name of .SF and .DSA files to be generated]:sigfile:_files' \
+    '-signedjar[specify signed JAR file]:_files -g \*.\(jar\|zip\)' \
+    '(2)-verify[verify mode]' \
+    '-certs[output certificate information in verify mode]' \
+    '-verbose[print verbose messages]' \
+    '-internalsf[old behaviour]' \
+    '-sectionsonly[omit header of hash of the whole manifest file]' \
+    '-J-[specify java option]:java option:' \
+    ':jar file:_files -g \*.\(jar\|zip\)' \
+    ':alias:' && return 0
+  ;;
+
+policytool)
+  _arguments \
+    '-file:policy file:_files' && return 0
+  ;;
+
+*)
+  _message 'unknown command'
+  ;;
+esac
+
+[[ -n "$state" ]] &&
+case "$state" in
+debug)
+  if [[ -prefix :*, ]]; then
+    compset -P :
+    _values -s , lines vars source
+  else
+    compadd -P: none
+    compadd -P: -qS, lines vars source
+  fi
+  ;;
+
+classpath|sourcepath|bootstrapclasspath|docletpath)
+  compset -P '*:'
+  compset -S ':*'
+  _alternative \
+    "classpath:$state:_path_files -qS: -g '*.(jar|zip)'" \
+    "classpath:$state:_path_files -r': ' -/"
+  ;;
+
+extdirs)
+  compset -P '*:'
+  _path_files -/
+  ;;
+
+encoding)
+  tmp=(
+    '8859_1:ISO 8859-1'
+    '8859_2:ISO 8859-2'
+    '8859_3:ISO 8859-3'
+    '8859_4:ISO 8859-4'
+    '8859_5:ISO 8859-5'
+    '8859_6:ISO 8859-6'
+    '8859_7:ISO 8859-7'
+    '8859_8:ISO 8859-8'
+    '8859_9:ISO 8859-9'
+    'Big5:Big5, Traditional Chinese'
+    'CNS11643:CNS 11643, Traditional Chinese'
+    'Cp037:USA, Canada(Bilingual, French), Netherlands, Portugal, Brazil, Australia'
+    'Cp1006:IBM AIX Pakistan (Urdu)'
+    'Cp1025:IBM Multilingual Cyrillic - Bulgaria, Bosnia, Herzegovinia, Macedonia(FYR)'
+    'Cp1026:IBM Latin-5, Turkey'
+    'Cp1046:IBM Open Edition US EBCDIC'
+    'Cp1097:IBM Iran(Farsi)/Persian'
+    'Cp1098:IBM Iran(Farsi)/Persian (PC)'
+    'Cp1112:IBM Latvia, Lithuania'
+    'Cp1122:IBM Estonia'
+    'Cp1123:IBM Ukraine'
+    'Cp1124:IBM AIX Ukraine'
+    'Cp1125:IBM Ukraine (PC)'
+    'Cp1250:Windows Eastern European'
+    'Cp1251:Windows Cyrillic'
+    'Cp1252:Windows Latin-1'
+    'Cp1253:Windows Greek'
+    'Cp1254:Windows Turkish'
+    'Cp1255:Windows Hebrew'
+    'Cp1256:Windows Arabic'
+    'Cp1257:Windows Baltic'
+    'Cp1258:Windows Vietnamese'
+    'Cp1381:IBM OS/2, DOS Peopl'\''es Republic of China (PRC)'
+    'Cp1383:IBM AIX People'\''s Republic of China (PRC)'
+    'Cp273:IBM Austria, Germany'
+    'Cp277:IBM Denmark, Norway'
+    'Cp278:IBM Finland, Sweden'
+    'Cp280:IBM Italy'
+    'Cp284:IBM Catalan/Spain, Spanish Latin America'
+    'Cp285:IBM United Kingdom, Ireland'
+    'Cp297:IBM France'
+    'Cp33722:IBM-eucJP - Japanese (superset of 5050)'
+    'Cp420:IBM Arabic'
+    'Cp424:IBM Hebrew'
+    'Cp437:MS-DOS United States, Australia, New Zealand, South Africa'
+    'Cp500:EBCDIC 500V1'
+    'Cp737:PC Greek'
+    'Cp775:PC Baltic'
+    'Cp838:IBM Thailand extended SBCS'
+    'Cp850:MS-DOS Latin-1'
+    'Cp852:MS-DOS Latin-2'
+    'Cp855:IBM Cyrillic'
+    'Cp857:IBM Turkish'
+    'Cp860:MS-DOS Portuguese'
+    'Cp861:MS-DOS Icelandic'
+    'Cp862:PC Hebrew'
+    'Cp863:MS-DOS Canadian French'
+    'Cp864:PC Arabic'
+    'Cp865:MS-DOS Nordic'
+    'Cp866:MS-DOS Russian'
+    'Cp868:MS-DOS Pakistan'
+    'Cp869:IBM Modern Greek'
+    'Cp870:IBM Multilingual Latin-2'
+    'Cp871:IBM Iceland'
+    'Cp874:IBM Thai'
+    'Cp875:IBM Greek'
+    'Cp918:IBM Pakistan(Urdu)'
+    'Cp921:IBM Latvia, Lithuania (AIX, DOS)'
+    'Cp922:IBM Estonia (AIX, DOS)'
+    'Cp930:Japanese Katakana-Kanji mixed with 4370 UDC, superset of 5026'
+    'Cp933:Korean Mixed with 1880 UDC, superset of 5029'
+    'Cp935:Simplified Chinese Host mixed with 1880 UDC, superset of 5031'
+    'Cp937:Traditional Chinese Host miexed with 6204 UDC, superset of 5033'
+    'Cp939:Japanese Latin Kanji mixed with 4370 UDC, superset of 5035'
+    'Cp942:Japanese (OS/2) superset of 932'
+    'Cp948:OS/2 Chinese (Taiwan) superset of 938'
+    'Cp949:PC Korean'
+    'Cp950:PC Chinese (Hong Kong, Taiwan)'
+    'Cp964:AIX Chinese (Taiwan)'
+    'Cp970:AIX Korean'
+    'EUCJIS:JIS, EUC Encoding, Japanese'
+    'GB2312:GB2312, EUC encoding, Simplified Chinese'
+    'GBK:GBK, Simplified Chinese'
+    'ISO2022CN:ISO 2022 CN, Chinese'
+    'ISO2022CN_CNS:CNS 11643 in ISO-2022-CN form, T. Chinese'
+    'ISO2022CN_GB:GB 2312 in ISO-2022-CN form, S. Chinese'
+    'ISO2022KR:ISO 2022 KR, Korean'
+    'JIS:JIS, Japanese'
+    'JIS0208:JIS 0208, Japanese'
+    'KOI8_R:KOI8-R, Russian'
+    'KSC5601:KS C 5601, Korean'
+    'MS874:Windows Thai'
+    'MacArabic:Macintosh Arabic'
+    'MacCentralEurope:Macintosh Latin-2'
+    'MacCroatian:Macintosh Croatian'
+    'MacCyrillic:Macintosh Cyrillic'
+    'MacDingbat:Macintosh Dingbat'
+    'MacGreek:Macintosh Greek'
+    'MacHebrew:Macintosh Hebrew'
+    'MacIceland:Macintosh Iceland'
+    'MacRoman:Macintosh Roman'
+    'MacRomania:Macintosh Romania'
+    'MacSymbol:Macintosh Symbol'
+    'MacThai:Macintosh Thai'
+    'MacTurkish:Macintosh Turkish'
+    'MacUkraine:Macintosh Ukraine'
+    'SJIS:Shift-JIS, Japanese'
+    'UTF8:UTF-8'
+  )
+  _describe 'character encoding' tmp --
+  ;;
+
+property)
+  if compset -P '*='; then
+    _default
+  else
+    _message 'property name'
+  fi
+  ;;
+
+class|doclet)
+  match=()
+  compset -P '(#b)(*.)'
+  basedir=${match[1]//.//}
+  _alternative \
+    'classes:class:compadd $basedir*.class(.:t:s/.class//)' \
+    'packages:package:compadd -qS. $basedir*~$basedir*.*(/:t)'
+  ;;
+
+docsrc)
+  if compset -P @; then
+    _wanted files expl 'pacakge/source list file' _files
+  else
+    _wanted files expl 'package or source' _files -g '*.java'
+  fi
+  ;;
+
+jararg)
+  if [[ -prefix - ]]; then
+    tmp=('-C:chdir')
+    _describe -o 'option' tmp --
+  elif [[ "$words[CURRENT - 2]" == -C ]]; then
+    _wanted file expl 'input file' _files -W "($words[CURRENT - 1])"
+  elif [[ "$words[CURRENT - 1]" == -C ]]; then
+    _wanted directories expl 'chdir to' _files -/
+  else
+    _wanted files expl 'input file' _files
+  fi
+  ;;
+
+*)
+  _message "unknown state: $state"
+  ;;
+esac
