@@ -632,7 +632,17 @@ The version number of this zsh.
 enditem()
 texinode(Parameters Used By The Shell)()(Parameters Set By The Shell)(Parameters)
 sect(Parameters Used By The Shell)
-The following parameters are used by the shell:
+The following parameters are used by the shell.
+
+In cases where there are two parameters with an upper- and lowercase
+form of the same name, such as tt(path) and tt(PATH), the lowercase form
+is an array and the uppercase form is a scalar with the elements of the
+array joined together by colons.  These are similar to tied parameters
+created via `tt(typeset -T)'.  The normal use for the colon-separated
+form is for exporting to the environment, while the array form is easier
+to manipulate within the shell.  Note that unsetting either of the pair
+will unset the other; they retain their special properties when
+recreated, and recreating one of the pair will recreate the other.
 
 startitem()
 vindex(ARGV0)

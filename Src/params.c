@@ -669,6 +669,12 @@ createparam(char *name, int flags)
 	if (oldpm && (oldpm->level == locallevel || !(flags & PM_LOCAL))) {
 	    if (!(oldpm->flags & PM_UNSET) || (oldpm->flags & PM_SPECIAL)) {
 		oldpm->flags &= ~PM_UNSET;
+		if ((oldpm->flags & PM_SPECIAL) && oldpm->ename) {
+		    Param altpm = 
+			(Param) paramtab->getnode(paramtab, oldpm->ename);
+		    if (altpm)
+			altpm->flags &= ~PM_UNSET;
+		}
 		return NULL;
 	    }
 	    if ((oldpm->flags & PM_RESTRICTED) && isset(RESTRICTED)) {

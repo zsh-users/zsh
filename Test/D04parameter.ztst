@@ -526,3 +526,23 @@
 >fixed
 >the
 >shell
+
+  unset SHLVL
+  (( SHLVL++ ))
+  print $SHLVL
+0:Unsetting and recreation of numerical special parameters
+>1
+
+  unset manpath
+  print $+MANPATH
+  manpath=(/here /there)
+  print $MANPATH
+  unset MANPATH
+  print $+manpath
+  MANPATH=/elsewhere:/somewhere
+  print $manpath
+0:Unsetting and recreation of tied special parameters
+>0
+>/here:/there
+>0
+>/elsewhere /somewhere
