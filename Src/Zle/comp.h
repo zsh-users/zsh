@@ -309,70 +309,62 @@ typedef void (*CLPrintFunc)(Cmgroup, Cmatch *, int, int, int, int,
 
 #define CPN_NMATCHES   0
 #define CP_NMATCHES    (1 << CPN_NMATCHES)
-#define CPN_MATCHER    1
-#define CP_MATCHER     (1 << CPN_MATCHER)
-#define CPN_MATCHERSTR 2
-#define CP_MATCHERSTR  (1 << CPN_MATCHERSTR)
-#define CPN_MATCHERTOT 3
-#define CP_MATCHERTOT  (1 << CPN_MATCHERTOT)
-#define CPN_CONTEXT    4
+#define CPN_CONTEXT    1
 #define CP_CONTEXT     (1 << CPN_CONTEXT)
-#define CPN_PARAMETER  5
+#define CPN_PARAMETER  2
 #define CP_PARAMETER   (1 << CPN_PARAMETER)
-#define CPN_REDIRECT   6
+#define CPN_REDIRECT   3
 #define CP_REDIRECT    (1 << CPN_REDIRECT)
-#define CPN_QUOTE      7
+#define CPN_QUOTE      4
 #define CP_QUOTE       (1 << CPN_QUOTE)
-#define CPN_QUOTING    8
+#define CPN_QUOTING    5
 #define CP_QUOTING     (1 << CPN_QUOTING)
-#define CPN_RESTORE    9
+#define CPN_RESTORE    6
 #define CP_RESTORE     (1 << CPN_RESTORE)
-#define CPN_LIST       10
+#define CPN_LIST       7
 #define CP_LIST        (1 << CPN_LIST)
-#define CPN_INSERT     11
+#define CPN_INSERT     8
 #define CP_INSERT      (1 << CPN_INSERT)
-#define CPN_EXACT      12
+#define CPN_EXACT      9
 #define CP_EXACT       (1 << CPN_EXACT)
-#define CPN_EXACTSTR   13
+#define CPN_EXACTSTR   10
 #define CP_EXACTSTR    (1 << CPN_EXACTSTR)
-#define CPN_PATMATCH   14
+#define CPN_PATMATCH   11
 #define CP_PATMATCH    (1 << CPN_PATMATCH)
-#define CPN_PATINSERT  15
+#define CPN_PATINSERT  12
 #define CP_PATINSERT   (1 << CPN_PATINSERT)
-#define CPN_UNAMBIG    16
+#define CPN_UNAMBIG    13
 #define CP_UNAMBIG     (1 << CPN_UNAMBIG)
-#define CPN_UNAMBIGC   17
+#define CPN_UNAMBIGC   14
 #define CP_UNAMBIGC    (1 << CPN_UNAMBIGC)
-#define CPN_LISTMAX    18
+#define CPN_LISTMAX    15
 #define CP_LISTMAX     (1 << CPN_LISTMAX)
-#define CPN_LASTPROMPT 19
+#define CPN_LASTPROMPT 16
 #define CP_LASTPROMPT  (1 << CPN_LASTPROMPT)
-#define CPN_TOEND      20
+#define CPN_TOEND      17
 #define CP_TOEND       (1 << CPN_TOEND)
-#define CPN_OLDLIST    21
+#define CPN_OLDLIST    18
 #define CP_OLDLIST     (1 << CPN_OLDLIST)
-#define CPN_OLDINS     22
+#define CPN_OLDINS     19
 #define CP_OLDINS      (1 << CPN_OLDINS)
-#define CPN_VARED      23
+#define CPN_VARED      20
 #define CP_VARED       (1 << CPN_VARED)
-#define CPN_ANMATCHES  24
+#define CPN_ANMATCHES  21
 #define CP_ANMATCHES   (1 << CPN_ANMATCHES)
-#define CPN_LISTLINES  25
+#define CPN_LISTLINES  22
 #define CP_LISTLINES   (1 << CPN_LISTLINES)
-#define CPN_QUOTES     26
+#define CPN_QUOTES     23
 #define CP_QUOTES      (1 << CPN_QUOTES)
 
-#define CP_KEYPARAMS   27
-#define CP_ALLKEYS     ((unsigned int) 0x7ffffff)
+#define CP_KEYPARAMS   24
+#define CP_ALLKEYS     ((unsigned int) 0xffffff)
 
 /* Hooks. */
 
 #define INSERTMATCHHOOK     (comphooks + 0)
 #define MENUSTARTHOOK       (comphooks + 1)
 #define COMPCTLMAKEHOOK     (comphooks + 2)
-#define COMPCTLBEFOREHOOK   (comphooks + 3)
-#define COMPCTLAFTERHOOK    (comphooks + 4)
-#define COMPLISTMATCHESHOOK (comphooks + 5)
+#define COMPLISTMATCHESHOOK (comphooks + 3)
 
 /* compctl hook data struct */
 

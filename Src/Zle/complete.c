@@ -30,19 +30,12 @@
 #include "complete.mdh"
 #include "complete.pro"
 
-/* Global matcher. */
-
-/**/
-mod_export Cmlist cmatcher;
-
 /* global variables for shell parameters in new style completion */
 
 /**/
 mod_export zlong compcurrent;
 /**/
-zlong compmatcher,
-      compmatchertot,
-      complistmax,
+zlong complistmax,
       complistlines;
 
 /**/
@@ -59,7 +52,6 @@ char **compwords,
      *complastprompt;
 /**/
 char *compiprefix,
-     *compmatcherstr,
      *compcontext,
      *compparameter,
      *compredirect,
@@ -131,26 +123,6 @@ freecpattern(Cpattern p)
     }
 }
 
-/* Copy a list of completion matchers. */
-
-/**/
-static Cmlist
-cpcmlist(Cmlist l)
-{
-    Cmlist r = NULL, *p = &r, n;
-
-    while (l) {
-	*p = n = (Cmlist) zalloc(sizeof(struct cmlist));
-	n->next = NULL;
-	n->matcher = cpcmatcher(l->matcher);
-	n->str = ztrdup(l->str);
-
-	p = &(n->next);
-	l = l->next;
-    }
-    return r;
-}
-
 /* Copy a completion matcher list. */
 
 /**/
@@ -199,33 +171,6 @@ cpcpattern(Cpattern o)
 	o = o->next;
     }
     return r;
-}
-
-/* Set the global match specs. */
-
-/**/
-mod_export int
-set_gmatcher(char *name, char **argv)
-{
-    Cmlist l = NULL, *q = &l, n;
-    Cmatcher m;
-
-    while (*argv) {
-	if ((m = parse_cmatcher(name, *argv)) == pcm_err)
-	    return 1;
-	*q = n = (Cmlist) zhalloc(sizeof(struct cmlist));
-	n->next = NULL;
-	n->matcher = m;
-	n->str = *argv++;
-
-	q = &(n->next);
-    }
-    freecmlist(cmatcher);
-    PERMALLOC {
-	cmatcher = cpcmlist(l);
-    } LASTALLOC;
-
-    return 1;
 }
 
 /* Parse a string for matcher control, containing multiple matchers. */
@@ -943,9 +888,6 @@ static struct compparam comprparams[] = {
 
 static struct compparam compkparams[] = {
     { "nmatches", PM_INTEGER | PM_READONLY, NULL, NULL, VAL(get_nmatches) },
-    { "matcher", PM_INTEGER, VAL(compmatcher), NULL, NULL },
-    { "matcher_string", PM_SCALAR, VAL(compmatcherstr), NULL, NULL },
-    { "total_matchers", PM_INTEGER, VAL(compmatchertot), NULL, NULL },
     { "context", PM_SCALAR, VAL(compcontext), NULL, NULL },
     { "parameter", PM_SCALAR, VAL(compparameter), NULL, NULL },
     { "redirect", PM_SCALAR, VAL(compredirect), NULL, NULL },
@@ -1322,42 +1264,6 @@ cond_range(char **a, int id)
 			(id ? cond_str(a, 1, 1) : NULL), 0);
 }
 
-/**/
-static void
-cmsetfn(Param pm, char **v)
-{
-    set_gmatcher(pm->nam, v);
-}
-
-/**/
-static char **
-cmgetfn(Param pm)
-{
-    int num;
-    Cmlist p;
-    char **ret, **q;
-
-    for (num = 0, p = cmatcher; p; p = p->next, num++);
-
-    ret = (char **) zhalloc((num + 1) * sizeof(char *));
-
-    for (q = ret, p = cmatcher; p; p = p->next, q++)
-	*q = dupstring(p->str);
-    *q = NULL;
-
-    return ret;
-}
-
-/**/
-static void
-cmunsetfn(Param pm, int exp)
-{
-    char *dummy[1];
-
-    dummy[0] = NULL;
-    set_gmatcher(pm->nam, dummy);
-}
-
 static struct builtin bintab[] = {
     BUILTIN("compadd", 0, bin_compadd, 0, -1, 0, NULL, NULL),
     BUILTIN("compset", 0, bin_compset, 1, 3, 0, NULL, NULL),
@@ -1374,10 +1280,6 @@ static struct funcwrap wrapper[] = {
     WRAPDEF(comp_wrapper),
 };
 
-static struct paramdef patab[] = {
-    PARAMDEF("compmatchers", PM_ARRAY|PM_SPECIAL, NULL, cmsetfn, cmgetfn, cmunsetfn)
-};
-
 /* The order of the entries in this table has to match the *HOOK
  * macros in comp.h */
 
@@ -1386,8 +1288,6 @@ struct hookdef comphooks[] = {
     HOOKDEF("insert_match", NULL, HOOKF_ALL),
     HOOKDEF("menu_start", NULL, HOOKF_ALL),
     HOOKDEF("compctl_make", NULL, 0),
-    HOOKDEF("compctl_before", NULL, 0),
-    HOOKDEF("compctl_after", NULL, 0),
     HOOKDEF("comp_list_matches", ilistmatches, 0),
 };
 
@@ -1400,7 +1300,7 @@ setup_(Module m)
     comprpms = compkpms = NULL;
     compwords = NULL;
     compprefix = compsuffix = compiprefix = compisuffix = 
-	compqiprefix = compqisuffix = compmatcherstr = 
+	compqiprefix = compqisuffix =
 	compcontext = compparameter = compredirect = compquote =
 	compquoting = comprestore = complist = compinsert =
 	compexact = compexactstr = comppatmatch = comppatinsert =
@@ -1426,7 +1326,6 @@ boot_(Module m)
     addhookdefs(m->nam, comphooks, sizeof(comphooks)/sizeof(*comphooks));
     if (!(addbuiltins(m->nam, bintab, sizeof(bintab)/sizeof(*bintab)) |
 	  addconddefs(m->nam, cotab, sizeof(cotab)/sizeof(*cotab)) |
-	  addparamdefs(m->nam, patab, sizeof(patab)/sizeof(*patab)) |
 	  !addwrapper(m, wrapper)))
 	return 1;
     return 0;
@@ -1446,7 +1345,6 @@ cleanup_(Module m)
     deletehookdefs(m->nam, comphooks, sizeof(comphooks)/sizeof(*comphooks));
     deletebuiltins(m->nam, bintab, sizeof(bintab)/sizeof(*bintab));
     deleteconddefs(m->nam, cotab, sizeof(cotab)/sizeof(*cotab));
-    deleteparamdefs(m->nam, patab, sizeof(patab)/sizeof(*patab));
     deletewrapper(m, wrapper);
     return 0;
 }
@@ -1463,7 +1361,6 @@ finish_(Module m)
     zsfree(compisuffix);
     zsfree(compqiprefix);
     zsfree(compqisuffix);
-    zsfree(compmatcherstr);
     zsfree(compcontext);
     zsfree(compparameter);
     zsfree(compredirect);

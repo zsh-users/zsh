@@ -128,8 +128,7 @@ if (( $compstate[nmatches] )); then
       fi
     fi
   fi
-elif [[ compstate[matcher] -eq compstate[total_matchers] &&
-        $#_lastdescr -ne 0 ]] &&
+elif [[ $#_lastdescr -ne 0 ]] &&
      zstyle -s ":completion:${curcontext}:warnings" format format; then
   local str
 
@@ -148,34 +147,30 @@ elif [[ compstate[matcher] -eq compstate[total_matchers] &&
   compadd -UX "$format" -n ''
 fi
 
-if [[ compstate[matcher] -eq compstate[total_matchers] ||
-      compstate[nmatches] -ne 0 ]]; then
+# See which tags were or were not used.
 
-  # See which tags were or were not used.
+_used_tags=( "${(@)_tried_tags:#${(j:|:)~${(@)_failed_tags//\[/\\[}//\]/\\]}}" )
+_unused_tags=( "${(@)_offered_tags:#${(j:|:)~${(@)_used_tags//\[/\\[}//\]/\\]}}" )
 
-  _used_tags=( "${(@)_tried_tags:#${(j:|:)~${(@)_failed_tags//\[/\\[}//\]/\\]}}" )
-  _unused_tags=( "${(@)_offered_tags:#${(j:|:)~${(@)_used_tags//\[/\\[}//\]/\\]}}" )
+# Now call the post-functions.
 
-  # Now call the post-functions.
+for post in "$comppostfuncs[@]"; do
+  "$post"
+done
+comppostfuncs=()
 
-  for post in "$comppostfuncs[@]"; do
-    "$post"
-  done
-  comppostfuncs=()
-
-  _lastcomp=( "${(@kv)compstate}" )
-  _lastcomp[completer]="$comp"
-  _lastcomp[prefix]="$PREFIX"
-  _lastcomp[suffix]="$SUFFIX"
-  _lastcomp[iprefix]="$IPREFIX"
-  _lastcomp[isuffix]="$ISUFFIX"
-  _lastcomp[qiprefix]="$QIPREFIX"
-  _lastcomp[qisuffix]="$QISUFFIX"
-  _lastcomp[offered_tags]="${(j.:.)_offered_tags}"
-  _lastcomp[tried_tags]="${(j.:.)_tried_tags}"
-  _lastcomp[failed_tags]="${(j.:.)_failed_tags}"
-  _lastcomp[unused_tags]="${(j.:.)_unused_tags}"
-  _lastcomp[used_tags]="${(j.:.)_used_tags}"
-fi
+_lastcomp=( "${(@kv)compstate}" )
+_lastcomp[completer]="$comp"
+_lastcomp[prefix]="$PREFIX"
+_lastcomp[suffix]="$SUFFIX"
+_lastcomp[iprefix]="$IPREFIX"
+_lastcomp[isuffix]="$ISUFFIX"
+_lastcomp[qiprefix]="$QIPREFIX"
+_lastcomp[qisuffix]="$QISUFFIX"
+_lastcomp[offered_tags]="${(j.:.)_offered_tags}"
+_lastcomp[tried_tags]="${(j.:.)_tried_tags}"
+_lastcomp[failed_tags]="${(j.:.)_failed_tags}"
+_lastcomp[unused_tags]="${(j.:.)_unused_tags}"
+_lastcomp[used_tags]="${(j.:.)_used_tags}"
 
 return ret

@@ -18,10 +18,6 @@ if zstyle -s ":completion:${curcontext}:" completions expr &&
   return 1
 fi
 
-# Do this only for the first global matcher.
-
-[[ "$compstate[matcher]" -le 1 ]] || return 1
-
 # In exp we will collect the expansion.
 
 exp=("$word")

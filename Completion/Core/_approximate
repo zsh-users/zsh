@@ -8,10 +8,6 @@
 local _comp_correct _correct_expl comax cfgacc
 local curcontext="${curcontext}" oldcontext opm="$compstate[pattern_match]"
 
-# Only if all global matchers have been tried.
-
-[[ compstate[matcher] -ne compstate[total_matchers] ]] && return 1
-
 # We don't try correction if the string is too short.
 
 [[ "${#:-$PREFIX$SUFFIX}" -le 1 ]] && return 1
@@ -60,16 +56,7 @@ compadd() {
   builtin compadd "$_correct_expl[@]" "$@"
 }
 
-# Now initialise our counter. We also set `compstate[matcher]'
-# to `-1'. This allows completion functions to use the simple
-# `[[ compstate[matcher] -gt 1 ]] && return' to avoid being
-# called for multiple global match specs and still be called 
-# again when correction is done. Also, this makes it easy to
-# test if correction is attempted since `compstate[matcher]'
-# will never be set to a negative value by the completion code.
-
 _comp_correct=1
-compstate[matcher]=-1
 
 [[ -z "$compstate[pattern_match]" ]] && compstate[pattern_match]='*'
 
@@ -98,7 +85,6 @@ while [[ _comp_correct -le comax ]]; do
       [[ "$compstate[list]" != list* ]] &&
           compstate[list]="$compstate[list] force"
     fi
-    compstate[matcher]="$compstate[total_matchers]"
     unfunction compadd
     compstate[pattern_match]="$opm"
 
@@ -109,7 +95,6 @@ while [[ _comp_correct -le comax ]]; do
   (( _comp_correct++ ))
 done
 
-compstate[matcher]="$compstate[total_matchers]"
 unfunction compadd
 compstate[pattern_match]="$opm"
 

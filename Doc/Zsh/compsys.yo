@@ -12,17 +12,6 @@ completion code.  The shell functions of the second set which implement
 completion behaviour and which may be bound to keystrokes, are referred to
 as `widgets'.
 
-Note that with the function-based completions described here, it
-is also possible to use the 
-tt(compmatchers) special array to specify
-global matching control, such as case-insensitivity (`tt(abc)' will complete
-to a string beginning `tt(ABC)'), or wildcard behaviour on
-certain anchors (`tt(a-d)' will complete to abc-def as if there were a
-`tt(*)' after the `a').  See
-ifzman(the section `Matching Control' in zmanref(zshcompwid))\
-ifnzman(noderef(Matching Control))
-for further details.
-
 Note also, that it is possible to use old completion definitions using 
 the tt(compctl) builtin command together with the functions for the
 new completion system. To enable this, the tt(_default) function from
@@ -1594,7 +1583,8 @@ This completer allows to define a match specification (see
 ifzman(the section `Matching Control' in zmanref(zshcompwid))\
 ifnzman(noderef(Matching Control))\
 ) that is to be used by all following completers. This is comparable
-to the tt(compmatchers) special array, but gives finer control. The match
+to the global match specifications that can be defined for the
+tt(compctl) builtin, but gives much better control. The match
 specification to use is looked up using the tt(matcher) style. For
 this, the completer field of the context name will contain the string
 `tt(matcher-)var(n)', where `var(n)' is the number of the call to

@@ -26,14 +26,7 @@
 setopt localoptions extendedglob nobadpattern # xtrace promptsubst
 # local PS4='%N:%i:$((#key))> '
 
-# Took me ages to work this out.  If we're not on the first global
-# matcher specification, we mustn't do any I/O.
-if [[ compstate[matcher] -gt 1 && -z $_read_comp ]]; then
-  return 1
-fi
-
-if [[ compstate[matcher] -gt 1 ||
-  ( ${+NUMERIC} = 0 && -n $_read_comp ) ]]; then
+if [[ ${+NUMERIC} = 0 && -n $_read_comp ]]; then
   if [[ $_read_comp = _* ]]; then
     eval $_read_comp
   else

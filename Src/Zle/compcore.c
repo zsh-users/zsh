@@ -808,59 +808,21 @@ callcompfunc(char *s, char *fn)
 static int
 makecomplist(char *s, int incmd, int lst)
 {
-    struct cmlist ms;
-    Cmlist m;
-    char *p, *os = s;
-    int onm = nmatches, osi = movefd(0);
+    char *p;
 
     /* Inside $... ? */
     if (compfunc && (p = check_param(s, 0, 0)))
-	os = s = p;
-
-    /* We build a copy of the list of matchers to use to make sure that this
-     * works even if a shell function called from the completion code changes
-     * the global matchers. */
-
-    if ((m = cmatcher)) {
-	Cmlist mm, *mp = &mm;
-	int n;
-
-	for (n = 0; m; m = m->next, n++) {
-	    *mp = (Cmlist) zhalloc(sizeof(struct cmlist));
-	    (*mp)->matcher = m->matcher;
-	    (*mp)->next = NULL;
-	    (*mp)->str = dupstring(m->str);
-	    mp = &((*mp)->next);
-	    addlinknode(matchers, m->matcher);
-	    if (m->matcher)
-		m->matcher->refc++;
-	}
-	m = mm;
-	compmatcher = 1;
-	compmatchertot = n;
-    } else
-	compmatcher = 0;
+	s = p;
 
     linwhat = inwhat;
 
-    /* Walk through the global matchers. */
-    for (;;) {
-	bmatchers = NULL;
-	zsfree(compmatcherstr);
-	if (m) {
-	    ms.next = NULL;
-	    ms.matcher = m->matcher;
-	    mstack = &ms;
+    if (compfunc) {
+	char *os = s;
+	int onm = nmatches, osi = movefd(0);
 
-	    /* Store the matchers used in the bmatchers list which is used
-	     * when building new parts for the string to insert into the 
-	     * line. */
-	    add_bmatchers(m->matcher);
-	    compmatcherstr = ztrdup(m->str);
-	} else {
-	    mstack = NULL;
-	    compmatcherstr = ztrdup("");
-	}
+	bmatchers = NULL;
+	mstack = NULL;
+
 	ainfo = (Aminfo) hcalloc(sizeof(struct aminfo));
 	fainfo = (Aminfo) hcalloc(sizeof(struct aminfo));
 
@@ -877,23 +839,9 @@ makecomplist(char *s, int incmd, int lst)
 	begcmgroup("default", 0);
 	menucmp = menuacc = newmatches = onlyexpl = 0;
 
-	runhookdef(COMPCTLBEFOREHOOK, NULL);
-
 	s = dupstring(os);
-	if (compfunc)
-	    callcompfunc(s, compfunc);
-	else {
-	    struct ccmakedat dat;
-
-	    dat.str = s;
-	    dat.incmd = incmd;
-	    dat.lst = lst;
-	    runhookdef(COMPCTLMAKEHOOK, (void *) &dat);
-	}
+	callcompfunc(s, compfunc);
 	endcmgroup(NULL);
-
-	runhookdef(COMPCTLAFTERHOOK,
-		   (void *) ((amatches && !oldlist) ? 1L : 0L));
 
 	if (oldlist) {
 	    nmatches = onm;
@@ -933,14 +881,18 @@ makecomplist(char *s, int incmd, int lst)
 
 	    return 0;
 	}
-	if (!m || !(m = m->next))
-	    break;
+	redup(osi, 0);
+	return 1;
+    } else {
+	struct ccmakedat dat;
 
-	errflag = 0;
-	compmatcher++;
+	dat.str = s;
+	dat.incmd = incmd;
+	dat.lst = lst;
+	runhookdef(COMPCTLMAKEHOOK, (void *) &dat);
+
+	return dat.lst;
     }
-    redup(osi, 0);
-    return 1;
 }
 
 /**/

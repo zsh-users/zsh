@@ -131,10 +131,19 @@ the default.  In other words, completion will subsequently use the
 options specified by the tt(-D) flag.
 
 The form with tt(-M) as the first and only option defines global
-matching specifications, as described in 
+matching specifications (see
 ifzman(zshcompwid)\
 ifnzman(noderef(Matching Control))\
-.
+). The match specifications given will be used for every completion
+attempt (only when using tt(compctl), not with the new completion
+system) and are tried in the order in which they are defined until one 
+generates at least one match. E.g.:
+
+example(compctl -M '' 'm:{a-zA-Z}={A-Za-z}')
+
+This will first try completion without any global match specifications 
+(the empty string) and, if that generates no matches, will try case
+insensitive completion.
 
 texinode(Option Flags)(Alternative Completion)(Command Flags)(Programmable Completion Using compctl)
 sect(Option Flags)

@@ -30,6 +30,11 @@
 #include "compctl.mdh"
 #include "compctl.pro"
 
+/* Global matcher. */
+
+/**/
+static Cmlist cmatcher;
+
 /* Default completion infos */
  
 /**/
@@ -273,6 +278,53 @@ compctlread(char *name, char **args, char *ops, char *reply)
 	setsparam(reply, buf);
     }
     return 0;
+}
+
+/* Copy a list of completion matchers. */
+
+/**/
+static Cmlist
+cpcmlist(Cmlist l)
+{
+    Cmlist r = NULL, *p = &r, n;
+
+    while (l) {
+	*p = n = (Cmlist) zalloc(sizeof(struct cmlist));
+	n->next = NULL;
+	n->matcher = cpcmatcher(l->matcher);
+	n->str = ztrdup(l->str);
+
+	p = &(n->next);
+	l = l->next;
+    }
+    return r;
+}
+
+/* Set the global match specs. */
+
+/**/
+static int
+set_gmatcher(char *name, char **argv)
+{
+    Cmlist l = NULL, *q = &l, n;
+    Cmatcher m;
+
+    while (*argv) {
+	if ((m = parse_cmatcher(name, *argv)) == pcm_err)
+	    return 1;
+	*q = n = (Cmlist) zhalloc(sizeof(struct cmlist));
+	n->next = NULL;
+	n->matcher = m;
+	n->str = *argv++;
+
+	q = &(n->next);
+    }
+    freecmlist(cmatcher);
+    PERMALLOC {
+	cmatcher = cpcmlist(l);
+    } LASTALLOC;
+
+    return 1;
 }
 
 /* Try to get the global matcher from the given compctl. */
@@ -1709,39 +1761,134 @@ static int addwhat;
 static int
 ccmakehookfn(Hookdef dummy, struct ccmakedat *dat)
 {
-    makecomplistglobal(dat->str, dat->incmd, dat->lst, 0);
-
-    return 0;
-}
-
-static int
-ccbeforehookfn(Hookdef dummy, void *zdup)
-{
-    ccused = newlinklist();
-    ccstack = newlinklist();
-
-    return 0;
-}
-
-static int
-ccafterhookfn(Hookdef dummy, void *zdup)
-{
+    char *s = dat->str;
+    int incmd = dat->incmd, lst = dat->lst;
+    struct cmlist ms;
+    Cmlist m;
+    char *os = s;
+    int onm = nmatches, osi = movefd(0);
     LinkNode n;
 
-    if (zdup) {
-	if (lastccused)
-	    freelinklist(lastccused, (FreeFunc) freecompctl);
+    /* We build a copy of the list of matchers to use to make sure that this
+     * works even if a shell function called from the completion code changes
+     * the global matchers. */
 
-	PERMALLOC {
-	    lastccused = newlinklist();
+    if ((m = cmatcher)) {
+	Cmlist mm, *mp = &mm;
+	int n;
+
+	for (n = 0; m; m = m->next, n++) {
+	    *mp = (Cmlist) zhalloc(sizeof(struct cmlist));
+	    (*mp)->matcher = m->matcher;
+	    (*mp)->next = NULL;
+	    (*mp)->str = dupstring(m->str);
+	    mp = &((*mp)->next);
+	    addlinknode(matchers, m->matcher);
+	    if (m->matcher)
+		m->matcher->refc++;
+	}
+	m = mm;
+    }
+
+    /* Walk through the global matchers. */
+    for (;;) {
+	bmatchers = NULL;
+	if (m) {
+	    ms.next = NULL;
+	    ms.matcher = m->matcher;
+	    mstack = &ms;
+
+	    /* Store the matchers used in the bmatchers list which is used
+	     * when building new parts for the string to insert into the 
+	     * line. */
+	    add_bmatchers(m->matcher);
+	} else
+	    mstack = NULL;
+
+	ainfo = (Aminfo) hcalloc(sizeof(struct aminfo));
+	fainfo = (Aminfo) hcalloc(sizeof(struct aminfo));
+
+	freecl = NULL;
+
+	if (!validlist)
+	    lastambig = 0;
+	amatches = NULL;
+	mnum = 0;
+	unambig_mnum = -1;
+	isuf = NULL;
+	insmnum = insgnum = 1;
+	insgroup = oldlist = oldins = 0;
+	begcmgroup("default", 0);
+	menucmp = menuacc = newmatches = onlyexpl = 0;
+
+	ccused = newlinklist();
+	ccstack = newlinklist();
+
+	s = dupstring(os);
+	makecomplistglobal(s, incmd, lst, 0);
+	endcmgroup(NULL);
+
+	if (amatches && !oldlist) {
+	    if (lastccused)
+		freelinklist(lastccused, (FreeFunc) freecompctl);
+
+	    PERMALLOC {
+		lastccused = newlinklist();
+		for (n = firstnode(ccused); n; incnode(n))
+		    addlinknode(lastccused, getdata(n));
+	    } LASTALLOC;
+	} else
 	    for (n = firstnode(ccused); n; incnode(n))
-		addlinknode(lastccused, getdata(n));
-	} LASTALLOC;
-    } else
-	for (n = firstnode(ccused); n; incnode(n))
-	    if (((Compctl) getdata(n)) != &cc_dummy)
-		freecompctl((Compctl) getdata(n));
+		if (((Compctl) getdata(n)) != &cc_dummy)
+		    freecompctl((Compctl) getdata(n));
 
+	if (oldlist) {
+	    nmatches = onm;
+	    validlist = 1;
+	    amatches = lastmatches;
+	    lmatches = lastlmatches;
+	    if (pmatches) {
+		freematches(pmatches);
+		pmatches = NULL;
+		hasperm = 0;
+	    }
+	    redup(osi, 0);
+
+	    dat->lst = 0;
+	    return 0;
+	}
+	PERMALLOC {
+	    if (lastmatches) {
+		freematches(lastmatches);
+		lastmatches = NULL;
+	    }
+	    permmatches(1);
+	    amatches = pmatches;
+	    lastpermmnum = permmnum;
+	    lastpermgnum = permgnum;
+	} LASTALLOC;
+
+	lastmatches = pmatches;
+	lastlmatches = lmatches;
+	pmatches = NULL;
+	hasperm = 0;
+	hasoldlist = 1;
+
+	if (nmatches && !errflag) {
+	    validlist = 1;
+
+	    redup(osi, 0);
+
+	    dat->lst = 0;
+	    return 0;
+	}
+	if (!m || !(m = m->next))
+	    break;
+
+	errflag = 0;
+    }
+    redup(osi, 0);
+    dat->lst = 1;
     return 0;
 }
 
@@ -3755,8 +3902,6 @@ int
 boot_(Module m)
 {
     addhookfunc("compctl_make", (Hookfn) ccmakehookfn);
-    addhookfunc("compctl_before", (Hookfn) ccbeforehookfn);
-    addhookfunc("compctl_after", (Hookfn) ccafterhookfn);
     return (addbuiltins(m->nam, bintab, sizeof(bintab)/sizeof(*bintab)) != 1);
 }
 
@@ -3765,8 +3910,6 @@ int
 cleanup_(Module m)
 {
     deletehookfunc("compctl_make", (Hookfn) ccmakehookfn);
-    deletehookfunc("compctl_before", (Hookfn) ccbeforehookfn);
-    deletehookfunc("compctl_after", (Hookfn) ccafterhookfn);
     deletebuiltins(m->nam, bintab, sizeof(bintab)/sizeof(*bintab));
     return 0;
 }

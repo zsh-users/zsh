@@ -207,21 +207,6 @@ names with one of the suffixes from the tt(fignore) array and matches
 put into the alternate set using the tt(-a) option of the tt(compadd)
 builtin command (see below) are not counted.
 )
-item(tt(matcher))(
-When completion is performed with a global match specification as defined
-by
-
-indent(tt(compmatchers=)tt(LPAR()) var(spec1 ... specN ...) tt(RPAR()))
-
-this gives the number of the specification string currently in use.
-In this case, matching is performed with each specification in turn.
-)
-item(tt(matcher_string))(
-The global match specification string var(specN) currently used.
-)
-item(tt(total_matchers))(
-The total number of global match specifications.
-)
 item(tt(restore))(
 This is set to tt(auto) before a function is entered, which forces the
 special parameters mentioned above (tt(words), tt(CURRENT), tt(PREFIX),
@@ -741,7 +726,7 @@ enditem()
 texinode(Matching Control)(Examples)(Condition Codes)(Completion Widgets)
 sect(Matching Control)
 
-It is possible by use of the tt(compmatchers) special array and the
+It is possible by use of the 
 tt(-M) option of the tt(compadd) builtin command to specify how the
 characters in the string to be completed (referred to here as the
 command line) map onto the characters in the list of matches produced by
@@ -842,17 +827,16 @@ specification characters (tt(L) and tt(M)) guarantees that what has
 already been typed on the command line (in particular the prefix
 tt(no)) will not be deleted.
 
-The second example makes completion case insensitive.  By setting the
-tt(compmatchers) array this applies to every
-completion.  This is just the same as in the option example, except
-here we wish to retain the characters in the list of completions:
+The second example makes completion case insensitive.  This is just
+the same as in the option example, except here we wish to retain the
+characters in the list of completions:
 
-example(compmatchers=( 'm:{a-z}={A-Z}' ) )
+example(compadd -M 'm:{a-z}={A-Z}' ... )
 
 This makes lowercase letters match their uppercase counterparts.
 To make uppercase letters match the lowercase forms as well:
 
-example(compmatchers=( 'm:{a-zA-Z}={A-Za-z}' ) )
+example(compadd -M 'm:{a-zA-Z}={A-Za-z}' ... )
 
 A nice example for the use of tt(*) patterns is partial word
 completion. Sometimes you would like to make strings like tt(c.s.u)
@@ -889,37 +873,21 @@ at the end of the trial completion.
 
 More generally, the specification
 
-example(compmatchers=( 'r:|[.,_-]=* r:|=*' ) )
+example(compadd -M 'r:|[.,_-]=* r:|=*' ... )
 
 allows one to complete words with abbreviations before any of the
-characters in the square brackets in any completion.  For example, to
+characters in the square brackets.  For example, to
 complete tt(veryverylongfile.c) rather than tt(veryverylongheader.h)
 with the above in effect, you can just type tt(very.c) before attempting
 completion.
 
-The tt(compmatchers) array that defines global matching can actually 
-contain any number of specification strings, unlike the case where the
-tt(-M) option is used with the tt(compadd) builtin command.  In this case, when
-completion is attempted for any command, the code will try the
-specifications in order until one matches.  This allows one to define
-simple and fast matches to be used first, more powerful matchers as a
-second choice, and so on.
-
-For example, one can make the code match trial completions that contain
-the string on the command line as a substring, not just at the
-beginning.  Since this might produce more matches than we want,
-we arrange for it to be tried only if the matchers described above don't
-produce any matches:
-
-example(compmatchers=( 'r:|[.,_-]=* r:|=*' 'l:|=* r:|=*' ) )
-
-Here, if the string on the command line is tt(foo.bar), the completion 
-code first tries matching tt(foo)var(anything)tt(.bar)var(anything), as
-with the previous example.  If that fails, the two descriptions in the
-second string say that the blanks at the beginning
-and end of the string on the command line can match any set of
-characters at the beginning or end of the trial completion, so it will
-look for var(anything)tt(foo.bar)var(anything).
+When using the completion system (see
+ifzman(zmanref(zshcompsys))\
+ifnzman(noderef(Completion System))\
+), users can define match specifications that are to be used for
+specific contexts by using the tt(matcher) style and match
+specifications that are to be used everywhere can be defined by the
+use of the tt(_matcher) completer.
 
 texinode(Examples)()(Matching Control)(Completion Widgets)
 sect(Examples)
