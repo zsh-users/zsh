@@ -1908,7 +1908,10 @@ execcmd(Cmd cmd, int input, int output, int how, int last1)
 	    case MERGEOUT:
 		if (fn->fd2 < 10)
 		    closemn(mfds, fn->fd2);
-		if (fn->fd2 > 9 && fdtable[fn->fd2]) {
+		if (fn->fd2 > 9 &&
+		    (fdtable[fn->fd2] ||
+		     fn->fd2 == coprocin ||
+		     fn->fd2 == coprocout)) {
 		    fil = -1;
 		    errno = EBADF;
 		} else {
