@@ -3406,6 +3406,9 @@ bin_read(char *name, char **args, char *ops, int func)
 		    oshout = shout;
 		    init_shout();
 		}
+	    } else if (!shout) {
+		/* We need an output FILE* on the tty */
+		init_shout();
 	    }
 	    /* We should have a SHTTY opened by now. */
 	    if (SHTTY == -1) {
