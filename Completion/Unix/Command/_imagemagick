@@ -391,6 +391,7 @@ mogrify)
       '*-quality:JPEG/MIFF/PNG compression level:' \
       '*-raise:lighten or darken edges (<width>x<height>):' \
       '*-region:image region (<width>x<height>{+-}<x>{+-}<y>):' \
+      '*-resize:size (<width>x<height>{%}{@}{!}{<}{>}):' \
       '*-roll:image roll offset ({+-}<x>{+-}<y>):' \
       '*-rotate:rotation (degrees{<}{>}):' \
       '*-sample:scale factors (<width>x<height>):' \
@@ -399,6 +400,7 @@ mogrify)
       '*-segment:segment thresholds (<cluster>x<smoothing>):' \
       '*-shade:image shading (<azimuth>x<elevation>):' \
       '*-sharpen:sharpening factor (0.0 - 99.9%):' \
+      '*-shave:shave edges (<width>x<height>{%}):' \
       '*-shear:shearing angles (<x>x<y> in degrees):' \
       '*-size:image size (<width>x<height>+<offset>):' \
       '*-solarize:solarization threshold:' \
