@@ -971,7 +971,8 @@ prepnexthistent(void)
     }
     else {
 	putoldhistentryontop(0);
-	freehistdata(he = hist_ring, 0);
+	freehistdata(hist_ring, 0);
+	he = hist_ring;
     }
     he->histnum = ++curhist;
     if (curline_in_ring)
