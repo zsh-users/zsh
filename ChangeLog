@@ -2,6 +2,8 @@
 
 	* unposted: Config/version.mk: version zsh-4.0.2.
 
+	* zsh-users/3942: source installed as Etc/FAQ.yo: latest FAQ.
+	
 	* unposted: Completion/Zsh/Context/.distfiles: add _autocd.
 
 2001-06-25  Sven Wischnowsky  <wischnow@zsh.org>
