@@ -1,5 +1,8 @@
 2002-03-27  Oliver Kiddle  <opk@zsh.org>
 
+	* 16913: Completion/Zsh/Command/_compdef, Doc/Zsh/compsys.yo:
+	fix completion after compdef -a and correct typos
+
 	* John Beppu: 16866 (tweaked): Completion/Unix/Command/_figlet:
 	new completion for figlet
 

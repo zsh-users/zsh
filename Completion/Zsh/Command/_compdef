@@ -13,7 +13,7 @@ if (( ! ${words[2,-1][(I)[^-]*]} || ${words[(I)-[kK]]} )); then
   )
   args2=(
      - d
-      '(-a -n)-d[delete]:*:completed command:->ccom'
+      '-d[delete]:*:completed command:->ccom'
      - k
       '-k[define widget and key binding]:completion function:->cfun:style:->style:*:key'
      - K
@@ -21,14 +21,15 @@ if (( ! ${words[2,-1][(I)[^-]*]} || ${words[(I)-[kK]]} )); then
   )
 else
   args1=(
-    '-N[completion for named command]'
+    '!-a' '!-n'
+    '*-N[completion for named command]'
   )
 fi
 
 _arguments -C -s -S \
   "$args1[@]" \
-  '-p[completion for command matching pattern]' \
-  '-P[completion for command matching pattern]' \
+  '*-p[completion for command matching pattern]' \
+  '*-P[completion for command matching pattern]' \
   ':completion function:->cfun' \
   '*:commands:->com' \
   "$args2[@]" && return 0

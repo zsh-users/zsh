@@ -272,25 +272,24 @@ with the tt(#compdef) tag and an argument of the form
 `var(cmd)tt(=)var(service)'.  This kind of use makes the arguments of
 the var(cmd)s be completed as those for the var(services).
 
-In the first case and the following cases the var(function) may actually
-be a string containing any shell code and that string will be executed
-via the tt(eval) builtin command.  This allows to easily define completions
-for commands that need to call one of the completion functions with
-arguments.  For example to make files ending in `tt(.h)' be completed as
-arguments to the command tt(foo), one would use:
+The var(function) may actually be a string containing any shell code
+and that string will be executed via the tt(eval) builtin command. 
+This allows to easily define completions for commands that need to call
+one of the completion functions with arguments.  For example to make
+files ending in `tt(.h)' be completed as arguments to the command
+tt(foo), one would use:
 
 example(compdef '_files -g "*.h"' foo)
 
-If the
-tt(-n) option is given, any existing completion behaviour for particular
-contexts or commands will not be altered.  These definitions can be deleted
-by giving the tt(-d) option as in the second form.
+If the tt(-n) option is given, any existing completion behaviour for
+particular contexts or commands will not be altered.  These definitions
+can be deleted by giving the tt(-d) option as in the second form.
 
-In both of the first two cases forms and as for the tt(#compdef) tag
+In both of the first two forms and as for the tt(#compdef) tag
 described above, the var(names) may also contain tt(-p), tt(-P) and
 tt(-N) options.  The first two make the following arguments be used as
 patterns and the var(function) will be called for all commands and
-contexts matching one of the patterns.  Wtih tt(-P) this will only
+contexts matching one of the patterns.  With tt(-P) this will only
 happen if no specific function is defined for the command or context.
 The tt(-N) option toggles back to using the var(names) as described
 above.
@@ -335,7 +334,7 @@ do:
 example(compdef _pids foo)
 
 using the tt(_pids) function from the distribution to generate the
-process identifiers.  Not also the tt(_gnu_generic) function described
+process identifiers.  Note also the tt(_gnu_generic) function described
 below, which can be used to complete options for commands that
 understand the `tt(-)tt(-help)' option.
 
