@@ -190,6 +190,7 @@ struct cmgroup {
     LinkList lmatches;		/* list of matches */
     LinkList lfmatches;		/* list of matches without fignore */
     LinkList lallccs;		/* list of used compctls */
+    int num;			/* number of this group */
 };
 
 
@@ -213,6 +214,8 @@ struct cmatch {
     int brsl;			/* ...and the suffix */
     char *rems;			/* when to remove the suffix */
     char *remf;			/* shell function to call for suffix-removal */
+    int rnum;			/* group relative number */
+    int gnum;			/* global number */
 };
 
 #define CMF_FILE     1		/* this is a file */
@@ -298,7 +301,12 @@ struct cpattern {
 #define CP_PATINSERT  (1 << 23)
 #define CP_UNAMBIG    (1 << 24)
 #define CP_UNAMBIGC   (1 << 25)
+#define CP_LISTMAX    (1 << 26)
+#define CP_LASTPROMPT (1 << 27)
+#define CP_TOEND      (1 << 28)
+#define CP_OLDLIST    (1 << 29)
+#define CP_OLDINS     (1 << 30)
 
-#define CP_NUM              26
+#define CP_NUM              31
 
-#define CP_ALLMASK    ((1 << CP_NUM) - 1)
+#define CP_ALLMASK    ((int) ((((unsigned int) 1) << CP_NUM) - 1))

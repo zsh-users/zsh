@@ -3177,10 +3177,7 @@ bslashquote(const char *s, char **e, int instring)
 	*v++ = *u;
     }
     *v = '\0';
-    if (strcmp(buf, s))
-	tt = dupstring(buf);
-    else
-	tt = s;
+    tt = dupstring(buf);
     v += tt - buf;
     if (e && (sf & 1))
 	*e += tt - buf;

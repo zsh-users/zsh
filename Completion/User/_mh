@@ -1,4 +1,4 @@
-#defcomp folder folders comp inc mark refile repl scan show next prev rmm pick whom mhn mhpath
+#compdef folder folders comp inc mark refile repl scan show next prev rmm pick whom mhn mhpath
 
 # Completion for all possible MH commands.
 # Alter the following two to your own mh directory and the directory

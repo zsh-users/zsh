@@ -1,4 +1,4 @@
-#defcomp fc
+#compdef fc
 
 local prev="$words[CURRENT-1]"
 

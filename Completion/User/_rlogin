@@ -1,4 +1,4 @@
-#defcomp rlogin rsh ssh
+#compdef rlogin rsh ssh
 
 if [[ CURRENT -eq 2 ]]; then
   compgen -k hosts

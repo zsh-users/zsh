@@ -1,4 +1,4 @@
-#defpatcomp zf*
+#compdef -p zf*
 
 # Don't try any more completion after this.
 _compskip=1
@@ -10,7 +10,7 @@ _compskip=1
 local subcom
 
 if [[ $words[1] = zftp ]]; then
-  if [[ $CURRENT -eq 1 ]]; then
+  if [[ $CURRENT -eq 2 ]]; then
     compadd open params user login type ascii binary mode put \
       putat get getat append appendat ls dir local remote mkdir rmdir
     return

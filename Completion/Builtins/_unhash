@@ -1,4 +1,4 @@
-#defcomp unhash
+#compdef unhash
 
 local fl="$words[2]" ret=1
 

@@ -1,4 +1,4 @@
-#defcomp zle
+#compdef zle
 
 if [[ "$words[2]" = -N && CURRENT -eq 3 ]]; then
   compgen -F

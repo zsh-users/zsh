@@ -1,4 +1,4 @@
-#defcomp -tilde-
+#compdef -tilde-
 
 # We use all named directories and user names here. If this is too slow
 # for you or if there are too many of them, you may want to use

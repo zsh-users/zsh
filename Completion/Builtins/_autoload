@@ -1,3 +1,3 @@
-#defcomp autoload
+#compdef autoload
 
 compgen -s '${^fpath}/*(N:t)'

@@ -1,4 +1,4 @@
-#defcomp disable
+#compdef disable
 
 local prev="$words[CURRENT-1]" ret=1
 

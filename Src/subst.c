@@ -1361,16 +1361,24 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int ssub)
 			 NULL, s[-1]);
 		    return NULL;
 		}
-	    singsub(&s);
+	    {
+		char t = s[-1];
+
+		singsub(&s);
+		if (t == '/' && (flags & SUB_SUBSTR)) {
+		    if (*s == '#' || *s == '%') {
+			flags &= ~SUB_SUBSTR;
+			if (*s == '%')
+			    flags |= SUB_END;
+			s++;
+		    } else if (*s == '\\') {
+			s++;
+		    }
+		}
+	    }
 
 	    if (!vunset && isarr) {
-		char **ap = aval;
-		char **pp = aval = (char **)ncalloc(sizeof(char *) * (arrlen(aval) + 1));
-
-		while ((*pp = *ap++)) {
-		    if (getmatch(pp, s, flags, flnum, replstr))
-			pp++;
-		}
+		getmatcharr(&aval, s, flags, flnum, replstr);
 		copied = 1;
 	    } else {
 		if (vunset)

@@ -1,4 +1,4 @@
-#defcomp dd
+#compdef dd
 
 if compset -P 1 'conv\='; then
   # If there's a comma present, ignore up to the last one.  The

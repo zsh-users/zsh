@@ -1,4 +1,4 @@
-#defcomp command
+#compdef command
 
 if [[ CURRENT -ge 3 ]]; then
   compset -n 2

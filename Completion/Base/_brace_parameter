@@ -1,4 +1,4 @@
-#defcomp -brace-parameter-
+#compdef -brace-parameter-
 
 if [[ "$SUFFIX" = *\}* ]]; then
   ISUFFIX="${SUFFIX#*\}}$ISUFFIX"

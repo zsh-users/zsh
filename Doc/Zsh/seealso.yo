@@ -11,6 +11,7 @@ ifzshone(\
 zmanref(zshbuiltins),
 zmanref(zshcompctl),
 zmanref(zshcompwid),
+zmanref(zshcompsys),
 zmanref(zshexpn),
 zmanref(zshmisc),
 zmanref(zshmodules),

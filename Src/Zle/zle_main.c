@@ -883,7 +883,7 @@ trashzle(void)
 	moveto(nlnct, 0);
 	if (clearflag && tccan(TCCLEAREOD)) {
 	    tcout(TCCLEAREOD);
-	    clearflag = 0;
+	    clearflag = listshown = 0;
 	}
 	if (postedit)
 	    fprintf(shout, "%s", postedit);
@@ -927,6 +927,7 @@ setup_zle(Module m)
     /* miscellaneous initialisations */
     stackhist = stackcs = -1;
     kungetbuf = (char *) zalloc(kungetsz = 32);
+    hasperm = 0;
 
     /* initialise the keymap system */
     init_keymaps();

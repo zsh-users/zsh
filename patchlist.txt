@@ -852,6 +852,8 @@ options (code to use currently unset/set options remains in comments)
 
 pws: 5934: option GLOBAL_RCS_FIRST runs /etc/z* files before user's files.
 
+Sven: 5936: replace modifying completion tests with compset
+
 Sven: 5938, 5937: compset to replace modifying conditions
 
 Sven: 5940: move cursor
@@ -861,3 +863,73 @@ Sven: 5942: spaces in file names with old completion
 Sven: 5947: completion functions fix
 
 pws: unposted: updated .distfiles under Completion
+
+  pws-15
+
+Sven: 5955: more compstate choices: list_max, last_prompt, to_end
+
+Bruce: 5958: _make
+
+Sven: 5959: quoting characters in completion
+
+Sven: 5960: $PREBUFFER: lines before current $BUFFER
+
+pws: 5965: _correct_word
+
+Sven: 5968: fix brace re-insertion problem in completion
+
+Sven: 5969: clear to end of display optimization (may need modifying for
+some terminals)
+
+Sven: 5970: completion fix compilation; #defcomp is now #compdef
+
+Sven: 5971: shell code control over re-using existing completion lists
+
+Sven: 5972: compconf without arguments lists; _compalso takes extra
+arguments
+
+Sven: 5981: bit masks in comp.h
+
+Sven: 5982: menu behaviour
+
+Sven: 5983: documentation for Completion/ system (compsys.1).
+
+Sven: 5986: compstate[insert]
+
+Sven: 5995: should fix 5969
+
+Sven: 5996: compsys.yo, special contexts
+
+Sven: 5999: ~foo<TAB> completes with /
+
+Bart: 6002, 6003: in ${foo/#bar/thing}, the `#' can appear from
+substitution and can be quoted
+
+Sven: 6005: Misc/compctl-examples altered for latest (more consistent)
+nested parameter expansion rules
+
+Sven: 6008: %{ works in completion listings
+
+Sven: extracted from 6009: chunk for getmatcharr()
+
+Sven: 6010: _match_pattern and _match_test replaced by options to compadd
+(and deleted from distribution)
+
+Sven: 6011: compadd uses first (not last) occurrence of an option
+
+Sven: 6013: pass ignored prefix and suffix in _path_files
+
+Andrej: 6017 (ex 6014): -i and -s options for _long_options
+
+pws: 6016: compinit and _zftp
+
+pws: 6018: (#l) and friends with a trailing / on the glob pattern always
+failed
+
+Sven: 6021: _path_files expanding path fix
+
+Sven: 6026: _path_files slight rewrite for speed
+
+pws: 6030: compsys.yo
+
+Sven: 6031: defcomp -> compdef

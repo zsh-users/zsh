@@ -61,6 +61,8 @@ static struct zleparam {
 	zleunsetfn, NULL },
     { "RBUFFER", PM_SCALAR,  FN(set_rbuffer), FN(get_rbuffer),
 	zleunsetfn, NULL },
+    { "PREBUFFER",  PM_SCALAR | PM_READONLY,  NULL,  FN(get_prebuffer),
+	zleunsetfn, NULL },
     { "WIDGET", PM_SCALAR | PM_READONLY, NULL, FN(get_widget),
         zleunsetfn, NULL },
     { "LASTWIDGET", PM_SCALAR | PM_READONLY, NULL, FN(get_lwidget),
@@ -208,6 +210,16 @@ static char *
 get_rbuffer(Param pm)
 {
     return metafy((char *)line + cs, ll - cs, META_HEAPDUP);
+}
+
+/**/
+static char *
+get_prebuffer(Param pm)
+{
+    if (chline)
+	return dupstrpfx(chline, hptr - chline);
+    else
+	return dupstring("");
 }
 
 /**/

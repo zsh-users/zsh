@@ -52,7 +52,7 @@ void (*comp_setunsetptr) _((int, int));
 /* pointers to functions required by compctl and defined by zle */
 
 /**/
-int (*addmatchesptr) _((char *, char *, char *, char *, char *, char *, char *, char *, char *, char *, char *, int, int, Cmatcher, char *, char **));
+int (*addmatchesptr) _((char *, char *, char *, char *, char *, char *, char *, char *, char *, char *, char *, int, int, Cmatcher, char *, char *, char *, char **));
 
 /**/
 char *(*comp_strptr) _((int *, int *, int));
@@ -103,7 +103,8 @@ int incompfunc;
 long compcurrent,
      compnmatches,
      compmatcher,
-     compmatchertot;
+     compmatchertot,
+     complistmax;
 
 /**/
 char **compwords,
@@ -124,7 +125,11 @@ char **compwords,
      *compexact,
      *compexactstr,
      *comppatmatch,
-     *comppatinsert;
+     *comppatinsert,
+     *complastprompt,
+     *comptoend,
+     *compoldlist,
+     *compoldins;
 
 /**/
 Param *comppms;
@@ -439,7 +444,8 @@ setup_comp1(Module m)
 	compcontext = compparameter = compredirect = compquote =
 	compquoting = comprestore = complist = compinsert =
 	compexact = compexactstr = comppatmatch = comppatinsert =
-	compforcelist = NULL;
+	compforcelist = complastprompt = comptoend = 
+	compoldlist = compoldins = NULL;
     makecompparamsptr = NULL;
     comp_setunsetptr = NULL;
     return 0;
@@ -487,6 +493,10 @@ finish_comp1(Module m)
     zsfree(compexactstr);
     zsfree(comppatmatch);
     zsfree(comppatinsert);
+    zsfree(complastprompt);
+    zsfree(comptoend);
+    zsfree(compoldlist);
+    zsfree(compoldins);
     return 0;
 }
 

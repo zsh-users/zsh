@@ -1,4 +1,4 @@
-#defcomp stty
+#compdef stty
 
 if [[ "$words[CURRENT-1]" = \
   (*erase|discard|status|dsusp|intr|kill|lnext|quit|reprint|start|s*p) ]]

@@ -449,7 +449,8 @@ be shown if there was at least one match added for the explanation
 string.
 
 The sequences tt(%B), tt(%b), tt(%S), tt(%s), tt(%U), and tt(%u) specify
-output attributes (bold, standout, and underline) as in prompts.
+output attributes (bold, standout, and underline) and tt(%{...%}) can
+be used to include literal escape sequences as in prompts.
 )
 item(tt(-Y) var(explanation))(
 Identical to tt(-X), except that the var(explanation) first undergoes

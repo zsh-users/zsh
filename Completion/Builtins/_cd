@@ -1,4 +1,4 @@
-#defcomp cd pushd
+#compdef cd pushd
 
 # Handling of cd.
 #  - Normally just completes directories.  Uses cdpath if that's set
@@ -55,7 +55,7 @@ elif [[ $words[1] = pu* && $PREFIX = [-+]* ]]; then
   list=(${list%%[ 	]*})
   compgen -y '$lines' -Q -k list && ret=0
   [[ -z $compstate[list] ]] && compstate[list]=list && ret=0
-  [[ -n $compstate[insert] ]] && compstat[insert]=menu && ret=0
+  [[ -n $compstate[insert] ]] && compstate[insert]=menu && ret=0
 
   return ret
 elif [[ $PREFIX != (\~|/|./|../)* && $#cdpath -ne 0 ]]; then

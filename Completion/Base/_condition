@@ -1,4 +1,4 @@
-#defcomp -condition-
+#compdef -condition-
 
 local prev="$words[CURRENT-1]"
 

@@ -139,6 +139,12 @@ The part of the buffer that lies to the right of the cursor position.
 If it is assigned to, only that part of the buffer is replaced, and the
 cursor remains between the old tt($LBUFFER) and the new tt($RBUFFER).
 )
+vindex(PREBUFFER)
+item(tt(PREBUFFER) (scalar))(
+In a multi-line input at the secondary prompt, this read-only parameter
+contains the contents of the lines before the one the cursor is
+currently in.
+)
 vindex(WIDGET)
 item(tt(WIDGET) (scalar))(
 The name of the widget currently being executed.

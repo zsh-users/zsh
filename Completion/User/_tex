@@ -1,3 +1,3 @@
-#defcomp tex latex slitex
+#compdef tex latex slitex
 
 _files -g '*.(tex|TEX|texinfo|texi)'

@@ -1,25 +1,23 @@
 # Initialisation for new style completion. This mainly contains some helper
-# function and aliases. Everything else is split into different files in this
-# directory that will automatically be made autoloaded (see the end of this
-# file).
+# functions and aliases. Everything else is split into different files that
+# will automatically be made autoloaded (see the end of this file).
 # The names of the files that will be considered for autoloading have to
-# start with a underscores (like `_setopt).
+# start with an underscores (like `_setopt).
 # The first line of these files will be read and has to say what should be
 # done with its contents:
 #
-#   `#defcomp <names ...>'
-#     if the first line looks like this, the file is
-#     autoloaded as a function and that function will
-#     be called to generate the matches when completing
-#     for one of the commands whose <name> is given
+#   `#compdef <names ...>'
+#     If the first line looks like this, the file is autoloaded as a
+#     function and that function will be called to generate the matches
+#     when completing for one of the commands whose <names> are given.
 #
-#   `#defpatcomp <pattern>'
-#     this defines a function that should be called to generate
-#     matches for commands whose name matches <pattern>; note
-#     that only one pattern may be given
+#   `#compdef -p <pattern>'
+#     This defines a function that should be called to generate matches
+#     for commands whose name matches <pattern>. Note that only one pattern
+#     may be given.
 #
-#   `#defkeycomp <style> [ <key-sequence> ... ]
-#     this is used to bind special completions to all the given
+#   `#compdef -k <style> [ <key-sequence> ... ]
+#     This is used to bind special completions to all the given
 #     <key-sequence>(s). The <style> is the name of one of the built-in
 #     completion widgets (complete-word, delete-char-or-list,
 #     expand-or-complete, expand-or-complete-prefix, list-choices,
@@ -41,11 +39,6 @@
 # were able to add matches and non-zero otherwise.
 #
 # See the file `compdump' for how to speed up initialisation.
-#
-# If you are using global matching specifications with `compctl -M ...'
-# have a look at the files `_match_test' and `_match_pattern'. To make
-# all the example functions use matching as specified with `-M' these
-# need some editing.
 
 # If we got the `-d'-flag, we will automatically dump the new state (at
 # the end).
@@ -220,17 +213,34 @@ compdef() {
 # and sets the according values in `compconfig'.
 # Arguments may be `foo=bar' to set key `foo' to `bar' or `baz' to
 # set key `baz' to the empty string.
+# If no arguments are given, all configurations keys set are displayed.
+# With the option `-l' as the first argument, the other arguments are
+# taken to be key names and the values for theses keys are printed, one
+# per line.
 
 compconf() {
   local i
 
-  for i; do
-    if [[ "$i" = *\=* ]]; then
-      compconfig[${i%%\=*}]="${i#*\=}"
+  if (( $# )); then
+    if [[ "$1" = -l ]]; then
+      shift
+      for i; do
+        print $compconfig[$i]
+      done
     else
-      compconfig[$i]=''
+      for i; do
+        if [[ "$i" = *\=* ]]; then
+          compconfig[${i%%\=*}]="${i#*\=}"
+        else
+          compconfig[$i]=''
+        fi
+      done
     fi
-  done
+  else
+    for i in ${(k)compconfig}; do
+      print ${(r:25:)i} $compconfig[$i]
+    done
+  fi
 }
 
 # Now we automatically make the definition files autoloaded.
@@ -262,12 +272,12 @@ if [[ -z "$_i_done" ]]; then
       read -rA _i_line < $_i_file
       _i_tag=$_i_line[1]
       shift _i_line
-      if [[ $_i_tag = '#defcomp' ]]; then
-        compdef -na "${_i_file:t}" "${_i_line[@]}"
-      elif [[ $_i_tag = '#defpatcomp' ]]; then
-        compdef -pa "${_i_file:t}" "${_i_line[@]}"
-      elif [[ $_i_tag = '#defkeycomp' ]]; then
-        compdef -ka "${_i_file:t}" "${_i_line[@]}"
+      if [[ $_i_tag = '#compdef' ]]; then
+	if [[ $_i_line[1] = -[pk] ]]; then
+	  compdef ${_i_line[1]}a "${_i_file:t}" "${(@)_i_line[2,-1]}"
+	else
+	  compdef -na "${_i_file:t}" "${_i_line[@]}"
+	fi
       elif [[ $_i_tag = '#autoload' ]]; then
 	autoload ${_i_file:t}
       fi

@@ -1,4 +1,4 @@
-#defcomp co ci rcs
+#compdef co ci rcs
 
 local nm=$compstate[nmatches]
 

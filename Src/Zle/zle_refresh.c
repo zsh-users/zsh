@@ -53,6 +53,11 @@ int nlnct;
 /**/
 int showinglist;
 
+/* Non-zero if a completion list was displayed. */
+
+/**/
+int listshown;
+
 /* Non-zero if ALWAYS_LAST_PROMPT has been used, meaning that the *
  * screen below the buffer display should not be cleared by       *
  * zrefresh(), but should be by trashzle().                       */
@@ -253,13 +258,23 @@ zrefresh(void)
     if (inlist)
 	return;
 
-    if (clearlist) {
-	invalidatelist();
-	moveto(0, 0);
-	clearflag = 0;
-	resetneeded = 1;
-	clearlist = 0;
+    if (clearlist && listshown) {
+	if (tccan(TCCLEAREOD)) {
+	    int ovln = vln, ovcs = vcs;
+
+	    moveto(nlnct, 0);
+	    tcout(TCCLEAREOD);
+	    moveto(ovln, ovcs);
+	} else {
+	    invalidatelist();
+	    moveto(0, 0);
+	    clearflag = 0;
+	    resetneeded = 1;
+	}
+	listshown = 0;
     }
+    clearlist = 0;
+
 #ifdef HAVE_SELECT
     cost = 0;			/* reset */
 #endif
@@ -287,6 +302,7 @@ zrefresh(void)
 	    moveto(0, 0);
 	    t0 = olnct;		/* this is to clear extra lines even when */
 	    winchanged = 0;	/* the terminal cannot TCCLEAREOD	  */
+	    listshown = 0;
 	}
 #endif
 	resetvideo();
@@ -303,6 +319,7 @@ zrefresh(void)
                 tcout(TCCLEAREOD);
             else
                 cleareol = 1;   /* request: clear to end of line */
+	    listshown = 0;
 	}
         if (t0 > -1)
             olnct = t0;

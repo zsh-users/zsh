@@ -1,4 +1,4 @@
-#defcomp man
+#compdef man
 
 setopt localoptions rcexpandparam
 

@@ -32,12 +32,25 @@
 # for option descriptions containing `=FILE' and paths for option
 # descriptions that contain `=DIR' or `=PATH'. These builtin patterns
 # can be overridden by patterns given as arguments, though.
+# 
+# This function accepts following options:
+#
+# -t   do completion only on words starting with two hyphens
+#
+# -i   list of patterns. Options, matching these patterns, are ignored.
+#      The list may be given as array name or as literal list in braces.
+#      E.g. _long_options -i '(--(enable|disable)-FEATURE*)' will ignore
+#      --enable-FEATURE, that is listed in configure help output
+#
+# -s   list of pattern/replacement pairs. The argument is the same as above.
+#      E.g. configure often lists only --enable but accepts both
+#      --enable and --disable options.
+#      _long_options -s '(#--enable- --disable)' will accept both forms.
 #
 # This function also accepts the `-X', `-J', and `-V' options which
-# are given to `compadd'. Finally, it accepts the option `-t'. If this 
-# is given, completion is only done on words starting with two hyphens.
+# are given to `compadd'. 
 
-local opt expl group test i name action ret=1 tmp suffix
+local opt expl group test i name action ret=1 tmp suffix iopts sopts
 
 setopt extendedglob
 
@@ -46,11 +59,23 @@ setopt extendedglob
 group=()
 expl=()
 if [[ $1 = -*~--* ]]; then
-  while getopts "J:V:X:t" opt; do
+  while getopts "J:V:X:ti:s:" opt; do
     case "$opt" in
       [JV]) group=("-$opt" "$OPTARG");;
       X)    expl=(-X "$OPTARG");;
       t)    test=yes;;
+      i)    if [[ "$OPTARG[1]" = '(' ]]; then
+              iopts=( ${=OPTARG[2,-2]} )
+	    else
+              iopts=( ${(P)${OPTARG}} )
+	    fi
+      ;;
+      s)    if [[ "$OPTARG[1]" = '(' ]]; then
+              sopts=( ${=OPTARG[2,-2]} )
+	    else
+              sopts=( ${(P)${OPTARG}} )
+	    fi
+      ;;
     esac
   done
   shift OPTIND-1
@@ -77,6 +102,7 @@ if [[ "$tmp" != $_lo_cache_cmd ]]; then
   (( $+_lo_cache_actions )) && unset "$_lo_cache_names[@]" _lo_cache_actions _lo_cache_names
 
   local opts pattern anum=1 tmpo str
+  typeset -U opts
 
   # Now get the long option names by calling the command with `--help'.
   # The parameter expansion trickery first gets the lines as separate
@@ -87,11 +113,24 @@ if [[ "$tmp" != $_lo_cache_cmd ]]; then
   # the old array elements with newlines between them. Then we select
   # those elements that start with two hyphens, remove anything up to
   # those hyphens and anything from the space or comma after the
-  # option up to the end. Finally all elements with option strings
-  # that contain uppercase letters are removed.
+  # option up to the end. 
 
-  opts=("--${(@)^${(@)${(@)${(@M)${(@ps:\n:j:\n:)${(@)${(@M)${(@f)$("$words[1]" --help)}:#[ 	]#-*}//,/
-}}:#[ 	]#--*}#*--}%%[, ]*}:#(*-[A-Z]*|)}")
+  opts=("--${(@)^${(@)${(@M)${(@ps:\n:j:\n:)${(@)${(@M)${(@f)$("$words[1]" --help)}:#[ 	]#-*}//,/
+}}:#[ 	]#--*}#*--}%%[, ]*}")
+
+  # Now remove all ignored options ...
+
+  while (($#iopts)) ; do
+    opts=( ${opts:#$~iopts[1]} )
+    shift iopts
+  done
+
+  # ... and add "same" options
+
+  while (($#sopts)) ; do
+    opts=( $opts ${opts/$sopts[1]/$sopts[2]} )
+    shift 2 sopts
+  done
 
   # The interpretation of the options is completely table driven. We
   # use the positional parameters we were given and a few standard
@@ -173,7 +212,7 @@ if [[ "$tmp" != $_lo_cache_cmd ]]; then
     # Now filter out any option strings we don't like and stuff them
     # in an array, if there are still some.
 
-    tmp=("${(@)${(@)tmp%%\=*}//[^a-z0-9-]}")
+    tmp=("${(@)${(@)tmp%%\=*}//[^a-zA-Z0-9-]}")
     if (( $#tmp )); then
       _lo_cache_names[anum]="$name"
       _lo_cache_actions[anum]="$action"
@@ -200,20 +239,6 @@ if [[ "$str" = *\=* ]]; then
   osuf="$SUFFIX"
 
   pre="${str%%\=*}"
-  IPREFIX="${IPREFIX}${pre}="
-  PREFIX="${str#*\=}"
-  SUFFIX=""
-
-  # We will check if the arrays contain an option matching what's on
-  # the line. To do this good, we build a pattern.
-
-  [[ -n "$_comp_correct" && $#pre -le _comp_correct ]] && return 1
-
-  pat="${pre}*"
-  patflags=''
-  _match_pattern _long_options pat patflags
-
-  [[ -n "$_comp_correct" ]] && patflags="$patflags(#a$_comp_correct)"
 
   # Then we walk through the array names. For each array we test if it 
   # contains the option string. If so, we `invoke' the action stored
@@ -223,6 +248,9 @@ if [[ "$str" = *\=* ]]; then
   for name in "$_lo_cache_names[@]"; do
     action="$_lo_cache_actions[anum]"
     if (( ${(@)${(@P)name}[(I)$pre]} )); then
+      IPREFIX="${oipre}${pre}="
+      PREFIX="${str#*\=}"
+      SUFFIX=""
       if [[ "$action[1]" = (\[|\() ]]; then
         compadd - ${=action[2,-2]}
       elif (( $#action )); then
@@ -240,7 +268,10 @@ if [[ "$str" = *\=* ]]; then
     # element from `_lo_actions' in `parta'. If we find more than one
     # such option or if we already had one, we set `parto' to `-'.
 
-    tmp=("${(@M)${(@P)name}:#${~pat}}")
+    PREFIX="${str%%\=*}"
+    SUFFIX=""
+    compadd -O tmp -M 'r:|-=* r:|=*' - "${(@P)name}"
+
     if [[ $#tmp -eq 1 ]]; then
       if [[ -z "$parto" ]]; then
         parto="$tmp[1]"
@@ -258,8 +289,9 @@ if [[ "$str" = *\=* ]]; then
   # try to complete the string after the `='.
 
   if [[ -n "$parto" && "$parto" != - ]]; then
-    IPREFIX="${parto}="
-
+    IPREFIX="${oipre}${parto}="
+    PREFIX="${str#*\=}"
+    SUFFIX=""
     if (( $#parta )); then
       if [[ "$parta[1]" = (\[|\() ]]; then
         compadd - ${=parta[2,-2]}
@@ -281,7 +313,7 @@ fi
 
 # The string on the line did not contain a `=', or we couldn't
 # complete the option string since there were more than one matching
-# what's on the line. So we just ad the option string as possible
+# what's on the line. So we just add the option strings as possible
 # matches, giving the string from the `=' on as a suffix.
 
 if [[ "$str" = *\=* ]]; then

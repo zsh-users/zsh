@@ -11,15 +11,15 @@
 # page.
 #
 #------------------------------------------------------------------------------
-hosts=("${${(s: :)${(s:	:)${${(f)$(</etc/hosts)}%%\#*}#*[ 	]*}}:#}")
-ports=( "${${${(f)$(</etc/services)}:#\#*}%%[ 	]*}" )
+hosts=("${(@)${(@s: :)${(@s:	:)${(@)${(@f)$(</etc/hosts)}%%\#*}#*[ 	]*}}:#}")
+ports=( "${(@)${(@)${(@f)$(</etc/services)}:#\#*}%%[ 	]*}" )
 
 # groups=( $(cut -d: -f1 /etc/group) )
 # groups=( $(ypcat group.byname | cut -d: -f1) ) # if you use NIS
 
 # It can be done without forking, but it used too much memory in old zsh's:
-groups=( "${${(f)$(</etc/group)}%%:*}" )
-#groups=( "${${(f)$(ypcat groups)}%%:*}" ) # if you use NIS
+groups=( "${(@)${(@f)$(</etc/group)}%%:*}" )
+#groups=( "${(@)${(@f)$(ypcat groups)}%%:*}" ) # if you use NIS
 
 # Completion for zsh builtins.
 compctl -z -P '%' bg
@@ -251,7 +251,7 @@ compctl -k ftphosts ftp
 # Note that 'r[-exec,;]' must come first
 if [[ -r /proc/filesystems ]]; then
     # Linux
-    filesystems='"${${(f)$(</proc/filesystems)}#*	}"'
+    filesystems='"${(@)${(@f)$(</proc/filesystems)}#*	}"'
 else
     filesystems='ufs 4.2 4.3 nfs tmp mfs S51K S52K'
 fi
@@ -563,7 +563,7 @@ cvsprefix() {
 cvsentries() {
     setopt localoptions nullglob unset
     if [[ -f ${pref}CVS/Entries ]]; then
-	reply=( "${pref}${^${${${(f@)$(<${pref}CVS/Entries)}:#D*}#/}%%/*}" )
+	reply=( "${pref}${^${(@)${(@)${(f@)$(<${pref}CVS/Entries)}:#D*}#/}%%/*}" )
     fi
 }
 
@@ -574,7 +574,7 @@ cvstargets() {
 }
 
 cvsrevisions() {
-    reply=( "${${${(M)${(f)$(cvs -q status -vl .)}:#	*}##[ 	]##}%%[ 	]*}" )
+    reply=( "${(@)${(@)${(@M)${(@f)$(cvs -q status -vl .)}:#	*}##[ 	]##}%%[ 	]*}" )
 }
 
 cvsrepositories() {
@@ -582,7 +582,7 @@ cvsrepositories() {
     [[ -f CVS/Root ]] && root=$(<CVS/Root)
     reply=(
 	$root/^CVSROOT(:t)
-	"${${(M)${(f)$(<$root/CVSROOT/modules)}:#[^#]*}%%[ 	]*}"
+	"${(@)${(@M)${(@f)$(<$root/CVSROOT/modules)}:#[^#]*}%%[ 	]*}"
     )
 }
 
@@ -622,7 +622,7 @@ compctl -s '$(rpm -qa)' \
 	'c[-1,--rcfile]' -f - \
 	'p[1] s[-b]' -k '(p l c i b a)' - \
 	'c[-1,--queryformat] N[-1,{]' \
-		-s '"${${(f)$(rpm --querytags)}#RPMTAG_}"' -S '}' - \
+		-s '"${(@)${(@f)$(rpm --querytags)}#RPMTAG_}"' -S '}' - \
 	'W[1,-q*] C[-1,-([^-]*|)f*]' -f - \
 	'W[1,-i*], W[1,-q*] C[-1,-([^-]*|)p*]' \
 		-/g '*.rpm' + -f -- rpm
@@ -635,7 +635,7 @@ compctl -K talkmatch talk ytalk ytalk3
 function talkmatch {
     local u
     reply=($(users))
-    for u in "${${(f)$(rwho 2>/dev/null)}%%:*}"; do
+    for u in "${(@)${(@f)$(rwho 2>/dev/null)}%%:*}"; do
 	reply=($reply ${u%% *}@${u##* })
     done
 }

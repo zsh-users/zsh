@@ -31,6 +31,7 @@ menu(Zsh Line Editor)
 menu(Programmable Completion)
 menu(Completion Widgets)
 menu(Zsh Modules)
+menu(Completion System)
 
  --- Indices ---
 

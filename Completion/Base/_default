@@ -1,4 +1,4 @@
-#defcomp -default-
+#compdef -default-
 
 # We first try the `compctl's. This is without first (-T) and default (-D)
 # completion. If you want them add `-T' and/or `-D' to this command.

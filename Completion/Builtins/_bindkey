@@ -1,4 +1,4 @@
-#defcomp bindkey
+#compdef bindkey
 
 # Normally, this completes names of zle widgets, whether the builtin ones
 # or ones defined by the user.  Note that a - allows a wildcard before it,

@@ -1,4 +1,4 @@
-#defcomp unsetopt
+#compdef unsetopt
 
 # If you first want to complete only unset options, uncomment the lines
 # setting the _set_options  array and then use:

@@ -1,4 +1,4 @@
-#defcomp -command-
+#compdef -command-
 
 local nm=$compstate[nmatches] ret=1
 

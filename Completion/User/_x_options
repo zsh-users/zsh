@@ -1,4 +1,4 @@
-#defpatcomp */X11/*
+#compdef -p */X11/*
 
 # A simple pattern completion, just as an example.
 

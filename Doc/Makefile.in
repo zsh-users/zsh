@@ -38,7 +38,7 @@ TEXI2HTML = texi2html -expandinfo -split_chapter
 .SUFFIXES: .yo .1
 
 # man pages to install
-MAN = zsh.1 zshbuiltins.1 zshcompctl.1 zshcompwid.1 \
+MAN = zsh.1 zshbuiltins.1 zshcompctl.1 zshcompwid.1 zshcompsys.1 \
 zshexpn.1 zshmisc.1 zshmodules.1 \
 zshoptions.1 zshparam.1 zshzle.1 zshall.1
 
@@ -48,7 +48,7 @@ YODLSRC = zmacros.yo zman.yo ztexi.yo Zsh/arith.yo Zsh/builtins.yo \
 Zsh/compat.yo Zsh/compctl.yo Zsh/cond.yo Zsh/exec.yo Zsh/expn.yo \
 Zsh/filelist.yo Zsh/files.yo Zsh/func.yo Zsh/grammar.yo Zsh/guide.yo \
 Zsh/index.yo Zsh/intro.yo Zsh/invoke.yo Zsh/jobs.yo Zsh/metafaq.yo \
-Zsh/modules.yo Zsh/mod_cap.yo Zsh/compwid.yo \
+Zsh/modules.yo Zsh/mod_cap.yo Zsh/compwid.yo Zsh/compsys.yo \
 Zsh/mod_clone.yo Zsh/mod_comp1.yo Zsh/mod_compctl.yo Zsh/mod_deltochar.yo \
 Zsh/mod_example.yo Zsh/mod_files.yo Zsh/mod_stat.yo \
 Zsh/mod_zle.yo Zsh/options.yo \
@@ -114,6 +114,8 @@ zshbuiltins.1: Zsh/builtins.yo
 zshcompctl.1: Zsh/compctl.yo
 
 zshcompwid.1: Zsh/compwid.yo
+
+zshcompsys.1: Zsh/compsys.yo
 
 zshexpn.1: Zsh/expn.yo
 

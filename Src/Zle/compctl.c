@@ -1694,7 +1694,7 @@ bin_compadd(char *name, char **argv, char *ops, int func)
     char *p, **sp, *e;
     char *ipre = NULL, *isuf = NULL, *ppre = NULL, *psuf = NULL, *prpre = NULL;
     char *pre = NULL, *suf = NULL, *group = NULL, *m = NULL, *rs = NULL;
-    char *ign = NULL, *rf = NULL, *expl = NULL;
+    char *ign = NULL, *rf = NULL, *expl = NULL, *apar = NULL, *opar = NULL;
     int f = 0, a = CAF_MATCH, dm;
     Cmatcher match = NULL;
 
@@ -1791,6 +1791,14 @@ bin_compadd(char *name, char **argv, char *ops, int func)
 		sp = &rf;
 		e = "function name expected after -%c";
 		break;
+	    case 'A':
+		sp = &apar;
+		e = "parameter name expected after -%c";
+		break;
+	    case 'O':
+		sp = &opar;
+		e = "parameter name expected after -%c";
+		break;
 	    case '-':
 		argv++;
 		goto ca_args;
@@ -1799,15 +1807,13 @@ bin_compadd(char *name, char **argv, char *ops, int func)
 		return 1;
 	    }
 	    if (sp) {
-		if (*sp) {
-		    zerrnam(name, "doubled option: -%c", NULL, *p);
-		    return 1;
-		}
 		if (p[1]) {
-		    *sp = p + 1;
+		    if (!*sp)
+			*sp = p + 1;
 		    p = "" - 1;
 		} else if (argv[1]) {
-		    *sp = *++argv;
+		    if (!*sp)
+			*sp = *++argv;
 		    p = "" - 1;
 		} else {
 		    zerrnam(name, e, NULL, *p);
@@ -1826,7 +1832,7 @@ bin_compadd(char *name, char **argv, char *ops, int func)
 
     match = cpcmatcher(match);
     a = addmatchesptr(ipre, isuf, ppre, psuf, prpre, pre, suf, group,
-		      rs, rf, ign, f, a, match, expl, argv);
+		      rs, rf, ign, f, a, match, expl, apar, opar, argv);
     freecmatcher(match);
 
     return a;
@@ -2152,7 +2158,13 @@ static struct compparam {
     { "pattern_match", PM_SCALAR, VAL(comppatmatch), NULL, NULL },
     { "pattern_insert", PM_SCALAR, VAL(comppatinsert), NULL, NULL },
     { "unambiguous", PM_SCALAR | PM_READONLY, NULL, NULL, VAL(get_unambig) },
-    { "unambiguous_cursor", PM_INTEGER | PM_READONLY, NULL, NULL, VAL(get_unambig_curs) },
+    { "unambiguous_cursor", PM_INTEGER | PM_READONLY, NULL, NULL,
+      VAL(get_unambig_curs) },
+    { "list_max", PM_INTEGER, VAL(complistmax), NULL, NULL },
+    { "last_prompt", PM_SCALAR, VAL(complastprompt), NULL, NULL },
+    { "to_end", PM_SCALAR, VAL(comptoend), NULL, NULL },
+    { "old_list", PM_SCALAR, VAL(compoldlist), NULL, NULL },
+    { "old_insert", PM_SCALAR, VAL(compoldins), NULL, NULL },
     { NULL, 0, NULL, NULL, NULL }
 };
 

@@ -1,3 +1,3 @@
-#defcomp limit unlimit
+#compdef limit unlimit
 
 compgen -k "(${(j: :)${(f)$(limit)}%% *})"

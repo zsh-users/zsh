@@ -1,4 +1,4 @@
-#defcomp -subscript-
+#compdef -subscript-
 
 if [[ ${(Pt)${compstate[parameter]}} = assoc* ]]; then
   compgen -S ']' -k "( ${(kP)${compstate[parameter]}} )"

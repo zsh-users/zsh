@@ -1,4 +1,4 @@
-#defkeycomp complete-word \C-xm
+#compdef -k complete-word \C-xm
 
 # Complete the most recent file matching the pattern on the line so
 # far: globbing is active, i.e. *.txt will be expanded to the most recent

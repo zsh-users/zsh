@@ -1,4 +1,4 @@
-#defcomp tar
+#compdef tar
 
 # Tar completion.  Features:
 #  - Tries to collect tar commands from second position, single letter

@@ -1,4 +1,4 @@
-#defcomp find
+#compdef find
 
 local prev="$words[CURRENT-1]"
 

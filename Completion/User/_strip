@@ -1,3 +1,3 @@
-#defcomp strip
+#compdef strip
 
 _files -g '*(*)'

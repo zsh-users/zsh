@@ -19,11 +19,15 @@ compforcelist
 compinsert
 compiprefix
 compisuffix
+complastprompt
 complist
+complistmax
 compmatcher
 compmatcherstr
 compmatchertot
 compnmatches
+compoldlist
+compoldins
 compparameter
 comppatinsert
 comppatmatch
@@ -36,6 +40,7 @@ comprestore
 comp_setunsetptr
 comp_strptr
 compsuffix
+comptoend
 compwords
 freecmatcher
 freecmlist

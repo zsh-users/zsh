@@ -1,4 +1,9 @@
-#defcomp configure
+#compdef configure
 
-_long_options '*=(E|)PREFIX*' '_files -/' \
+_long_options -i '(--(disable|enable)-FEATURE* --(with|without)-PACKAGE*)' \
+              -s '(#--disable- --enable-
+	           #--enable- --disable-
+		   #--with- --without-
+		   #--without- --with-)' \
+	      '*=(E|)PREFIX*' '_files -/' \
               '*=PROGRAM*'    '_command_names'

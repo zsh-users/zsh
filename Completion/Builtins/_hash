@@ -1,4 +1,4 @@
-#defcomp hash
+#compdef hash
 
 if [[ "$words[2]" = -*d* ]]; then
   if compset -P 1 '*\='; then

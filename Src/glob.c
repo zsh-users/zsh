@@ -397,6 +397,7 @@ scanner(Complist q)
     int pbcwdsav = pathbufcwd;
     int errssofar = errsfound;
     struct dirsav ds;
+    char *str;
 
     ds.ino = ds.dev = 0;
     ds.dirname = NULL;
@@ -412,17 +413,18 @@ scanner(Complist q)
 	    scanner(q->next);
     }
     c = q->comp;
+    str = c->str;
     /* Now the actual matching for the current path section. */
-    if (!(c->next || c->left) && !haswilds(c->str)
+    if (!(c->next || c->left) && !haswilds(str)
 	&& (!((c->stat & (C_LCMATCHUC|C_IGNCASE)) || c->errsmax)
-	    || !strcmp(".", c->str) || !strcmp("..", c->str))) {
+	    || !*str || !strcmp(".", str) || !strcmp("..", str))) {
 	/*
 	 * We always need to match . and .. explicitly, even if we're
 	 * checking other strings for case-insensitive matches.
 	 *
 	 * It's a straight string to the end of the path section.
 	 */
-	int l = strlen(c->str);
+	int l = strlen(str);
 
 	if (l + !l + pathpos - pathbufcwd >= PATH_MAX) {
 	    int err;
@@ -442,14 +444,14 @@ scanner(Complist q)
 	    /* Not the last path section. Just add it to the path. */
 	    int oppos = pathpos;
 
-	    if (!errflag && !(q->closure && !strcmp(c->str, "."))) {
-		addpath(c->str);
+	    if (!errflag && !(q->closure && !strcmp(str, "."))) {
+		addpath(str);
 		if (!closure || statfullpath("", NULL, 1))
 		    scanner((q->closure) ? q : q->next);
 		pathbuf[pathpos = oppos] = '\0';
 	    }
 	} else
-	    insert(c->str, 0);
+	    insert(str, 0);
     } else {
 	/* Do pattern matching on current path section. */
 	char *fn = pathbuf[pathbufcwd] ? unmeta(pathbuf + pathbufcwd) : ".";
@@ -2282,16 +2284,45 @@ int
 getmatch(char **sp, char *pat, int fl, int n, char *replstr)
 {
     Comp c;
-    char *s = *sp, *t, *start, sav;
-    int i, l = strlen(*sp), matched;
 
     MUSTUSEHEAP("getmatch");	/* presumably covered by prefork() test */
-    repllist = NULL;
+    c = parsereg(pat);
+    if (!c) {
+ 	zerr("bad pattern: %s", pat, 0);
+ 	return 1;
+    }
+    return igetmatch(sp, c, fl, n, replstr);
+}
+
+/**/
+void
+getmatcharr(char ***ap, char *pat, int fl, int n, char *replstr)
+{
+    char **arr = *ap, **pp;
+    Comp c;
+
+    MUSTUSEHEAP("getmatch");	/* presumably covered by prefork() test */
+
     c = parsereg(pat);
     if (!c) {
 	zerr("bad pattern: %s", pat, 0);
-	return 1;
+	return;
     }
+    *ap = pp = ncalloc(sizeof(char *) * (arrlen(arr) + 1));
+    while ((*pp = *arr++))
+	if (igetmatch(pp, c, fl, n, replstr))
+	    pp++;
+}
+
+/**/
+static int
+igetmatch(char **sp, Comp c, int fl, int n, char *replstr)
+{
+    char *s = *sp, *t, *start, sav;
+    int i, l = strlen(*sp), matched;
+
+    repllist = NULL;
+
     if (fl & SUB_ALL) {
 	i = domatch(s, c, 0);
 	*sp = get_match_ret(*sp, 0, i ? l : 0, fl, i ? replstr : 0);
