@@ -3969,27 +3969,6 @@ restoredir(struct dirsav *d)
     return err;
 }
 
-/* Get a signal number from a string */
-
-/**/
-mod_export int
-getsignum(char *s)
-{
-    int x, i;
-
-    /* check for a signal specified by number */
-    x = atoi(s);
-    if (idigit(*s) && x >= 0 && x < VSIGCOUNT)
-	return x;
-
-    /* search for signal by name */
-    for (i = 0; i < VSIGCOUNT; i++)
-	if (!strcmp(s, sigs[i]))
-	    return i;
-
-    /* no matching signal */
-    return -1;
-}
 
 /* Check whether the shell is running with privileges in effect.  *
  * This is the case if EITHER the euid is zero, OR (if the system *

@@ -1819,6 +1819,36 @@ bin_fg(char *name, char **argv, Options ops, int func)
     return retval;
 }
 
+#if defined(SIGCHLD) && defined(SIGCLD)
+#if SIGCHLD == SIGCLD
+#define ALT_SIGS 1
+#endif
+#endif
+#if defined(SIGPOLL) && defined(SIGIO)
+#if SIGPOLL == SIGIO
+#define ALT_SIGS 1
+#endif
+#endif
+
+#ifdef ALT_SIGS
+const struct {
+    const char *name;
+    int num;
+} alt_sigs[] = {
+#if defined(SIGCHLD) && defined(SIGCLD)
+#if SIGCHLD == SIGCLD
+    { "CLD", SIGCLD },
+#endif
+#endif
+#if defined(SIGPOLL) && defined(SIGIO)
+#if SIGPOLL == SIGIO
+    { "IO", SIGIO },
+#endif
+#endif
+    { NULL, 0 }
+};
+#endif
+
 /* kill: send a signal to a process.  The process(es) may be specified *
  * by job specifier (see above) or pid.  A signal, defaulting to       *
  * SIGTERM, may be specified by name or number, preceded by a dash.    */
@@ -1847,6 +1877,18 @@ bin_kill(char *nam, char **argv, UNUSED(Options ops), UNUSED(int func))
 			    for (sig = 1; sig <= SIGCOUNT; sig++)
 				if (!cstrpcmp(sigs + sig, &signame))
 				    break;
+#ifdef ALT_SIGS
+			    if (sig > SIGCOUNT) {
+				int i;
+
+				for (i = 0; alt_sigs[i].name; i++)
+				    if (!cstrpcmp(&alt_sigs[i].name, &signame))
+				    {
+					sig = alt_sigs[i].num;
+					break;
+				    }
+			    }
+#endif
 			    if (sig > SIGCOUNT) {
 				zwarnnam(nam, "unknown signal: SIG%s",
 					 signame, 0);
@@ -1908,6 +1950,18 @@ bin_kill(char *nam, char **argv, UNUSED(Options ops), UNUSED(int func))
 			break;
 		if (*signame == '0' && !signame[1])
 		    sig = 0;
+#ifdef ALT_SIGS
+		if (sig > SIGCOUNT) {
+		    int i;
+
+		    for (i = 0; alt_sigs[i].name; i++)
+			if (!strcmp(alt_sigs[i].name, signame))
+			{
+			    sig = alt_sigs[i].num;
+			    break;
+			}
+		}
+#endif
 		if (sig > SIGCOUNT) {
 		    zwarnnam(nam, "unknown signal: SIG%s", signame, 0);
 		    zwarnnam(nam, "type kill -l for a List of signals", NULL, 0);
@@ -1963,6 +2017,81 @@ bin_kill(char *nam, char **argv, UNUSED(Options ops), UNUSED(int func))
     unqueue_signals();
 
     return returnval < 126 ? returnval : 1;
+}
+/* Get a signal number from a string */
+
+/**/
+mod_export int
+getsignum(char *s)
+{
+    int x, i;
+
+    /* check for a signal specified by number */
+    x = atoi(s);
+    if (idigit(*s) && x >= 0 && x < VSIGCOUNT)
+	return x;
+
+    /* search for signal by name */
+    for (i = 0; i < VSIGCOUNT; i++)
+	if (!strcmp(s, sigs[i]))
+	    return i;
+
+#ifdef ALT_SIGS
+    for (i = 0; alt_sigs[i].name; i++)
+    {
+	if (!strcmp(s, alt_sigs[i].name))
+	    return alt_sigs[i].num;
+    }
+#endif
+
+    /* no matching signal */
+    return -1;
+}
+
+/* Get the function node for a trap, taking care about alternative names */
+/**/
+HashNode
+gettrapnode(int sig, int ignoredisable)
+{
+    char fname[20];
+    HashNode hn;
+    HashNode (*getptr)(HashTable ht, char *name);
+#ifdef ALT_SIGS
+    int i;
+#endif
+    if (ignoredisable)
+	getptr = shfunctab->getnode2;
+    else
+	getptr = shfunctab->getnode;
+
+    sprintf(fname, "TRAP%s", sigs[sig]);
+    if ((hn = getptr(shfunctab, fname)))
+	return hn;
+
+#ifdef ALT_SIGS
+    for (i = 0; alt_sigs[i].name; i++) {
+	if (alt_sigs[i].num == sig) {
+	    sprintf(fname, "TRAP%s", alt_sigs[i].name);
+	    if ((hn = getptr(shfunctab, fname)))
+		return hn;
+	}
+    }
+#endif
+
+    return NULL;
+}
+
+/* Remove a TRAP function under any name for the signal */
+
+/**/
+void
+removetrapnode(int sig)
+{
+    HashNode hn = gettrapnode(sig, 1);
+    if (hn) {
+	shfunctab->removenode(shfunctab, hn->nam);
+	shfunctab->freenode(hn);
+    }
 }
 
 /* Suspend this shell */

@@ -2543,7 +2543,16 @@ bin_functions(char *name, char **argv, Options ops, int func)
 		/* no flags, so just print */
 		shfunctab->printnode((HashNode) shf, pflags);
 	} else if (on & PM_UNDEFINED) {
-	    int signum, ok = 1;
+	    int signum = -1, ok = 1;
+
+	    if (!strncmp(*argv, "TRAP", 4) &&
+		(signum = getsignum(*argv + 4)) != -1) {
+		/*
+		 * Because of the possibility of alternative names,
+		 * we must remove the trap explicitly.
+		 */
+		removetrapnode(signum);
+	    }
 
 	    /* Add a new undefined (autoloaded) function to the *
 	     * hash table with the corresponding flags set.     */
@@ -2552,8 +2561,7 @@ bin_functions(char *name, char **argv, Options ops, int func)
 	    shf->funcdef = mkautofn(shf);
 	    shfunctab->addnode(shfunctab, ztrdup(*argv), shf);
 
-	    if (!strncmp(*argv, "TRAP", 4) &&
-		(signum = getsignum(*argv + 4)) != -1) {
+	    if (signum != -1) {
 		if (settrap(signum, shf->funcdef)) {
 		    shfunctab->removenode(shfunctab, *argv);
 		    shfunctab->freenode((HashNode)shf);
@@ -4898,11 +4906,9 @@ bin_trap(char *name, char **argv, UNUSED(Options ops), UNUSED(int func))
 	queue_signals();
 	for (sig = 0; sig < VSIGCOUNT; sig++) {
 	    if (sigtrapped[sig] & ZSIG_FUNC) {
-		char fname[20];
 		HashNode hn;
 
-		sprintf(fname, "TRAP%s", sigs[sig]);
-		if ((hn = shfunctab->getnode(shfunctab, fname)))
+		if ((hn = gettrapnode(sig, 0)))
 		    shfunctab->printnode(hn, 0);
 		DPUTS(!hn, "BUG: I did not find any trap functions!");
 	    } else if (sigtrapped[sig]) {

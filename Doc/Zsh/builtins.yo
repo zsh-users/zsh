@@ -626,6 +626,14 @@ var(sig) that is a name, the corresponding signal number is
 listed.  For each var(sig) that is a signal number or a number
 representing the exit status of a process which was terminated or
 stopped by a signal the name of the signal is printed.
+
+On some systems, alternative signal names are allowed for a few signals.
+Typical examples are tt(SIGCHLD) and tt(SIGCLD) or tt(SIGPOLL) and
+tt(SIGIO), assuming they correspond to the same signal number.  tt(kill
+-l) will only list the preferred form, however tt(kill -l) var(alt) will
+show if the alternative form corresponds to a signal number.  For example,
+under Linux tt(kill -l IO) and tt(kill -l POLL) both output 29, hence
+tt(kill -IO) and tt(kill -POLL) have the same effect.
 )
 findex(let)
 item(tt(let) var(arg) ...)(
@@ -1179,6 +1187,11 @@ will print the line number of a command executed after it has run, while
 example(TRAPDEBUG() { print $LINENO; })
 
 will always print the number zero.
+
+Alternative signal names are allowed as described under tt(kill) above.
+Defining a trap under either name causes any trap under an alternative
+name to be removed.  However, it is recommended that for consistency
+users stick exclusively to one name or another.
 )
 findex(true)
 cindex(doing nothing, successfully)

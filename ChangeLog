@@ -1,3 +1,9 @@
+2004-11-22  Peter Stephenson  <pws@csr.com>
+
+	* 20572: Doc/Zsh/builtins.yo, Src/builtin.c, Src/exec.c,
+	Src/jobs.c, Src/signals.c, Src/utils.c: Allow -CLD and -IO
+	as alternatives to -CHLD and -POLL where they are the same signal.
+
 2004-11-20  Doug Kearns  <djkea2@mugca.its.monash.edu.au>
 
 	* 20571: Completion/Unix/Command/_java: update javac completion for

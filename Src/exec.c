@@ -3345,6 +3345,12 @@ execfuncdef(Estate state, UNUSED(int do_exec))
 		return 1;
 	    }
 	    sigtrapped[signum] |= ZSIG_FUNC;
+
+	    /*
+	     * Remove the old node explicitly in case it has
+	     * an alternative name
+	     */
+	    removetrapnode(signum);
 	}
 	shfunctab->addnode(shfunctab, ztrdup(s), shf);
     }

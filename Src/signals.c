@@ -697,10 +697,8 @@ dosavetrap(int sig, int level)
 	 * Get the old function: this assumes we haven't added
 	 * the new one yet.
 	 */
-	char func[20];
 	Shfunc shf, newshf = NULL;
-	sprintf(func, "TRAP%s", sigs[sig]);
-	if ((shf = (Shfunc)shfunctab->getnode2(shfunctab, func))) {
+	if ((shf = (Shfunc)gettrapnode(sig, 1))) {
 	    /* Copy the node for saving */
 	    newshf = (Shfunc) zalloc(sizeof(*newshf));
 	    newshf->nam = ztrdup(shf->nam);
@@ -837,16 +835,15 @@ removetrap(int sig)
      * That causes a little inefficiency, but a good deal more reliability.
      */
     if (trapped & ZSIG_FUNC) {
-	char func[20];
-	HashNode node;
+	HashNode node = gettrapnode(sig, 1);
 
-	sprintf(func, "TRAP%s", sigs[sig]);
 	/*
 	 * As in dosavetrap(), don't call removeshfuncnode() because
 	 * that calls back into unsettrap();
 	 */
 	sigfuncs[sig] = NULL;
-	node = removehashnode(shfunctab, func);
+	if (node)
+	    removehashnode(shfunctab, node->nam);
 	unqueue_signals();
 
 	return node;
@@ -1010,10 +1007,10 @@ dotrapargs(int sig, int *sigtr, void *sigfn)
     runhookdef(BEFORETRAPHOOK, NULL);
     if (*sigtr & ZSIG_FUNC) {
 	int osc = sfcontext;
+	HashNode hn = gettrapnode(sig, 0);
 
 	args = znewlinklist();
-	name = (char *) zalloc(5 + strlen(sigs[sig]));
-	sprintf(name, "TRAP%s", sigs[sig]);
+	name = ztrdup(hn->nam);
 	zaddlinknode(args, name);
 	sprintf(num, "%d", sig);
 	zaddlinknode(args, num);
