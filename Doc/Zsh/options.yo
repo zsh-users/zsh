@@ -380,6 +380,16 @@ If a command has a non-zero exit status, execute the tt(ZERR)
 trap, if set, and exit.  This is disabled while running initialization
 scripts.
 )
+pindex(ERR_RETURN)
+cindex(function return, on error)
+cidnex(return from function, on error)
+item(tt(ERR_RETURN))(
+If a command has a non-zero exit status, return immediately from the
+enclosing function.  The logic is identical to that for tt(ERR_EXIT),
+except that an implicit tt(return) statement is executed instead of an
+tt(exit).  This will trigger an exit at the outermost level of a
+non-interactive script.
+)
 pindex(EXEC)
 cindex(command execution, enabling)
 item(tt(EXEC) (tt(PLUS()n), ksh: tt(PLUS()n)) <D>)(

@@ -924,13 +924,23 @@ sublist_done:
 		dotrap(SIGZERR);
 		donetrap = 1;
 	    }
-	    if (lastval && isset(ERREXIT)) {
-		if (sigtrapped[SIGEXIT])
-		    dotrap(SIGEXIT);
-		if (mypid != getpid())
-		    _exit(lastval);
-		else
-		    exit(lastval);
+	    if (lastval) {
+		int errreturn = isset(ERRRETURN) && 
+		    (isset(INTERACTIVE) || locallevel || sourcelevel);
+		int errexit = isset(ERREXIT) || 
+		    (isset(ERRRETURN) && !errreturn);
+		if (errexit) {
+		    if (sigtrapped[SIGEXIT])
+			dotrap(SIGEXIT);
+		    if (mypid != getpid())
+			_exit(lastval);
+		    else
+			exit(lastval);
+		}
+		if (errreturn) {
+		    retflag = 1;
+		    breaks = loops;
+		}
 	    }
 	}
 	if (ltype & Z_END)

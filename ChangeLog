@@ -1,3 +1,8 @@
+2002-12-04  Peter Stephenson  <pws@csr.com>
+
+	* 17979: Doc/Zsh/options.yo, Src/exec.c, Src/options.c, Src/zsh.h:
+	Add ERR_RETURN option, similiar to ERR_EXIT option.
+
 2002-11-26  Peter Stephenson  <pws@csr.com>
 
 	* 17967: Test/B02typeset.ztst: globbable arguments to

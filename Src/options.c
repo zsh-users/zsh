@@ -109,6 +109,7 @@ static struct optname optns[] = {
 {NULL, "cshnullglob",	      OPT_EMULATE|OPT_CSH,	 CSHNULLGLOB},
 {NULL, "equals",	      OPT_EMULATE|OPT_ZSH,	 EQUALS},
 {NULL, "errexit",	      OPT_EMULATE,		 ERREXIT},
+{NULL, "errreturn",	      OPT_EMULATE,		 ERRRETURN},
 {NULL, "exec",		      OPT_ALL,			 EXECOPT},
 {NULL, "extendedglob",	      OPT_EMULATE,		 EXTENDEDGLOB},
 {NULL, "extendedhistory",     OPT_CSH,			 EXTENDEDHISTORY},
