@@ -1,3 +1,9 @@
+2001-04-02  Clint Adams  <schizo@debian.org>
+
+	* 13889: Completion/Linux/_apm, Completion/Linux/.distfiles,
+	Completion/Unix/Command/_apm, Completion/Unix/Command/.distfiles:
+	Add OpenBSD 2.7 apm options.  Move to Unix/Command.
+
 2001-04-02  Bart Schaefer  <schaefer@zsh.org>
 
 	* 13887: Config/installfns.sh: Skip CVS subdirectories.

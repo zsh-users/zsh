@@ -22,8 +22,9 @@ _arguments -C -s \
     '(--ignore)-i[tell the system to ignore system-generated APM message]' \
     '(-i)--ignore[tell the system to ignore system-generated APM message]'
 
-else
-     
+elif [[ $kludge == "freebsd4.1" ]]
+then
+
 _arguments -C \
      '-a[display AC line status]' \
      '-b[display battery status]' \
@@ -36,5 +37,18 @@ _arguments -C \
      '-t[display estimated remaining battery life in seconds]' \
      '-Z[transition system into standby mode]' \
      '-z[suspend the system]'
+
+elif [[ $kludge == "openbsd2.7" ]]
+then
+
+_arguments -C \
+     '-z[engage suspend mode]' \
+     '-S[engage stand-by mode]' \
+     '-l[display estimated battery lifetime percentage]' \
+     '-m[display estimated battery lifetime minutes]' \
+     '-b[display battery status]' \
+     '-a[display AC line status]' \
+     '-v[verbose]' \
+     '-f[socket]:sockname:_files'
 
 fi
