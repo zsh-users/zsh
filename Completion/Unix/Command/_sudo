@@ -1,0 +1,19 @@
+#compdef sudo
+
+_arguments \
+       '-V[show version]' \
+       '-l[list allowed commands]' \
+       '-L[list options from Default section]' \
+       '-h[show help]' \
+       '-v[validate user timestamp]' \
+       '-k[invalidate user timestamp]' \
+       '-K[remove user timestamp]' \
+       '-b[run command in background]' \
+       '-r[Kerberos realm]:Kerberos realm:' \
+       '-p[password prompt]:password prompt:' \
+       '-u[user name]:user name:_users' \
+       '-s[run SHELL]' \
+       '-H[set HOME environment variable]' \
+       '-S[read password from stdin]' \
+       '(-):command name: _command_names -e'  \
+       '*::arguments: _normal'
