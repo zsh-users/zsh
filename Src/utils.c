@@ -3198,7 +3198,7 @@ getkeystring(char *s, int *len, int fromwhere, int *misc)
 	} else if (fromwhere == 4 && *s == Snull) {
 	    for (u = t; (*u++ = *s++););
 	    return t + 1;
-	} else if (*s == '^' &&
+	} else if (*s == '^' && !control &&
 		   (fromwhere == 2 || fromwhere == 5 || fromwhere == 6)) {
 	    control = 1;
 	    continue;
