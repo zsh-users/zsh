@@ -751,9 +751,15 @@ getredirs(LinkList redirs)
 	    taddstr(fstr[f->type]);
 	    taddchr(' ');
 	    if (f->type == REDIR_HERESTR) {
-		taddchr('\'');
-		taddstr(bslashquote(f->name, NULL, 1));
-		taddchr('\'');
+                if (has_token(f->name)) {
+                    taddchr('\"');
+                    taddstr(bslashquote(f->name, NULL, 2));
+                    taddchr('\"');
+                } else {
+                    taddchr('\'');
+                    taddstr(bslashquote(f->name, NULL, 1));
+                    taddchr('\'');
+                }
 	    } else
 		taddstr(f->name);
 	    taddchr(' ');

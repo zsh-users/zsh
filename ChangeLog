@@ -1,5 +1,8 @@
 2001-08-16  Sven Wischnowsky  <wischnow@zsh.org>
 
+	* 15639: Src/text.c: fix bug for output of unquoted here-docs and
+	-strings with special characters
+
 	* 15638: Completion/Base/Completer/_approximate: make sure that
 	there is one of the group-options before using it
 
