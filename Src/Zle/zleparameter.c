@@ -185,10 +185,10 @@ struct pardef {
 };
 
 static struct pardef partab[] = {
-    { "zlewidgets", PM_READONLY,
+    { "widgets", PM_READONLY,
       getpmwidgets, scanpmwidgets, hashsetfn,
       NULL, NULL, stdunsetfn, NULL },
-    { "zlekeymaps", PM_ARRAY|PM_HIDE|PM_SPECIAL|PM_READONLY,
+    { "keymaps", PM_ARRAY|PM_HIDE|PM_SPECIAL|PM_READONLY,
       NULL, NULL, NULL,
       arrsetfn, keymapsgetfn, stdunsetfn, NULL },
     { NULL, 0, NULL, NULL, NULL, NULL, NULL, NULL, NULL }

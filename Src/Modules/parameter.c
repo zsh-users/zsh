@@ -331,17 +331,13 @@ scanpmcommands(HashTable ht, ScanFunc func, int flags)
 
 /**/
 static void
-setfunction(char *name, char *val)
+setfunction(char *name, char *val, int dis)
 {
     char *value = dupstring(val);
     Shfunc shf;
     List list;
-    int sn, dis = 0;
+    int sn;
 
-    if (strpfx("<disabled> ", val)) {
-	strcpy(val, val + 11);
-	dis = DISABLED;
-    }
     val = metafy(val, strlen(val), META_REALLOC);
 
     HEAPALLOC {
@@ -377,7 +373,14 @@ setfunction(char *name, char *val)
 static void
 setpmfunction(Param pm, char *value)
 {
-    setfunction(pm->nam, value);
+    setfunction(pm->nam, value, 0);
+}
+
+/**/
+static void
+setpmdisfunction(Param pm, char *value)
+{
+    setfunction(pm->nam, value, DISABLED);
 }
 
 /**/
@@ -392,7 +395,7 @@ unsetpmfunction(Param pm, int exp)
 
 /**/
 static void
-setpmfunctions(Param pm, HashTable ht)
+setfunctions(Param pm, HashTable ht, int dis)
 {
     int i;
     HashNode hn;
@@ -409,14 +412,28 @@ setpmfunctions(Param pm, HashTable ht)
 	    v.arr = NULL;
 	    v.pm = (Param) hn;
 
-	    setfunction(hn->nam, ztrdup(getstrvalue(&v)));
+	    setfunction(hn->nam, ztrdup(getstrvalue(&v)), dis);
 	}
     deleteparamtable(ht);
 }
 
 /**/
+static void
+setpmfunctions(Param pm, HashTable ht)
+{
+    setfunctions(pm, ht, 0);
+}
+
+/**/
+static void
+setpmdisfunctions(Param pm, HashTable ht)
+{
+    setfunctions(pm, ht, DISABLED);
+}
+
+/**/
 static HashNode
-getpmfunction(HashTable ht, char *name)
+getfunction(HashTable ht, char *name, int dis)
 {
     Shfunc shf;
     Param pm = NULL;
@@ -425,7 +442,7 @@ getpmfunction(HashTable ht, char *name)
 	pm = (Param) zhalloc(sizeof(struct param));
 	pm->nam = dupstring(name);
 	pm->flags = PM_SCALAR;
-	pm->sets.cfn = setpmfunction;
+	pm->sets.cfn = (dis ? setpmdisfunction : setpmfunction);
 	pm->gets.cfn = strgetfn;
 	pm->unsetfn = unsetpmfunction;
 	pm->ct = 0;
@@ -434,7 +451,8 @@ getpmfunction(HashTable ht, char *name)
 	pm->old = NULL;
 	pm->level = 0;
 
-	if ((shf = (Shfunc) shfunctab->getnode2(shfunctab, name))) {
+	if ((shf = (Shfunc) shfunctab->getnode2(shfunctab, name)) &&
+	    (dis ? (shf->flags & DISABLED) : !(shf->flags & DISABLED))) {
 	    if (shf->flags & PM_UNDEFINED) {
 		pm->u.str = dyncat("builtin autoload -X",
 				   ((shf->flags & PM_UNALIASED) ?
@@ -444,8 +462,7 @@ getpmfunction(HashTable ht, char *name)
 		char *t = getpermtext((void *) dupstruct((void *)
 							 shf->funcdef)), *h;
 
-		h = ((shf->flags & DISABLED) ?
-		     dyncat("<disabled> ", t) : dupstring(t));
+		h = dupstring(t);
 		zsfree(t);
 		unmetafy(h, NULL);
 
@@ -461,15 +478,29 @@ getpmfunction(HashTable ht, char *name)
 }
 
 /**/
+static HashNode
+getpmfunction(HashTable ht, char *name)
+{
+    return getfunction(ht, name, 0);
+}
+
+/**/
+static HashNode
+getpmdisfunction(HashTable ht, char *name)
+{
+    return getfunction(ht, name, DISABLED);
+}
+
+/**/
 static void
-scanpmfunctions(HashTable ht, ScanFunc func, int flags)
+scanfunctions(HashTable ht, ScanFunc func, int flags, int dis)
 {
     struct param pm;
     int i;
     HashNode hn;
 
     pm.flags = PM_SCALAR;
-    pm.sets.cfn = setpmcommand;
+    pm.sets.cfn = (dis ? setpmdisfunction : setpmfunction);
     pm.gets.cfn = strgetfn;
     pm.unsetfn = unsetpmcommand;
     pm.ct = 0;
@@ -480,7 +511,7 @@ scanpmfunctions(HashTable ht, ScanFunc func, int flags)
 
     for (i = 0; i < shfunctab->hsize; i++)
 	for (hn = shfunctab->nodes[i]; hn; hn = hn->next) {
-	    if (!(hn->flags & DISABLED)) {
+	    if (dis ? (hn->flags & DISABLED) : !(hn->flags & DISABLED)) {
 		pm.nam = hn->nam;
 		if (func != scancountparams) {
 		    if (((Shfunc) hn)->flags & PM_UNDEFINED) {
@@ -494,9 +525,7 @@ scanpmfunctions(HashTable ht, ScanFunc func, int flags)
 			char *t = getpermtext((void *)
 					      dupstruct((void *) ((Shfunc) hn)->funcdef));
 
-			pm.u.str = ((hn->flags & DISABLED) ?
-				    dyncat("<disabled> ", t) :
-				    dupstring(t));
+			pm.u.str = dupstring(t);
 			unmetafy(pm.u.str, NULL);
 			zsfree(t);
 		    }
@@ -506,11 +535,25 @@ scanpmfunctions(HashTable ht, ScanFunc func, int flags)
 	}
 }
 
+/**/
+static void
+scanpmfunctions(HashTable ht, ScanFunc func, int flags)
+{
+    scanfunctions(ht, func, flags, 0);
+}
+
+/**/
+static void
+scanpmdisfunctions(HashTable ht, ScanFunc func, int flags)
+{
+    scanfunctions(ht, func, flags, DISABLED);
+}
+
 /* Functions for the builtins special parameter. */
 
 /**/
 static HashNode
-getpmbuiltin(HashTable ht, char *name)
+getbuiltin(HashTable ht, char *name, int dis)
 {
     Param pm = NULL;
     Builtin bn;
@@ -527,12 +570,12 @@ getpmbuiltin(HashTable ht, char *name)
 	pm->ename = NULL;
 	pm->old = NULL;
 	pm->level = 0;
-	if ((bn = (Builtin) builtintab->getnode2(builtintab, name))) {
+	if ((bn = (Builtin) builtintab->getnode2(builtintab, name)) &&
+	    (dis ? (bn->flags & DISABLED) : !(bn->flags & DISABLED))) {
 	    char *t = ((bn->handlerfunc || (bn->flags & BINF_PREFIX)) ?
 		       "defined" : "undefined");
 
-	    pm->u.str = ((bn->flags & DISABLED) ?
-			 dyncat("<disabled> ", t) : dupstring(t));
+	    pm->u.str = dupstring(t);
 	} else {
 	    pm->u.str = dupstring("");
 	    pm->flags |= PM_UNSET;
@@ -543,8 +586,22 @@ getpmbuiltin(HashTable ht, char *name)
 }
 
 /**/
+static HashNode
+getpmbuiltin(HashTable ht, char *name)
+{
+    return getbuiltin(ht, name, 0);
+}
+
+/**/
+static HashNode
+getpmdisbuiltin(HashTable ht, char *name)
+{
+    return getbuiltin(ht, name, DISABLED);
+}
+
+/**/
 static void
-scanpmbuiltins(HashTable ht, ScanFunc func, int flags)
+scanbuiltins(HashTable ht, ScanFunc func, int flags, int dis)
 {
     struct param pm;
     int i;
@@ -562,78 +619,67 @@ scanpmbuiltins(HashTable ht, ScanFunc func, int flags)
 
     for (i = 0; i < builtintab->hsize; i++)
 	for (hn = builtintab->nodes[i]; hn; hn = hn->next) {
-	    pm.nam = hn->nam;
-	    if (func != scancountparams) {
-		char *t = ((((Builtin) hn)->handlerfunc ||
-			    (hn->flags & BINF_PREFIX)) ?
-			   "defined" : "undefined");
+	    if (dis ? (hn->flags & DISABLED) : !(hn->flags & DISABLED)) {
+		pm.nam = hn->nam;
+		if (func != scancountparams) {
+		    char *t = ((((Builtin) hn)->handlerfunc ||
+				(hn->flags & BINF_PREFIX)) ?
+			       "defined" : "undefined");
 
-		pm.u.str = ((((Builtin) hn)->flags & DISABLED) ?
-			    dyncat("<disabled> ", t) : dupstring(t));
+		    pm.u.str = dupstring(t);
+		}
+		func((HashNode) &pm, flags);
 	    }
-	    func((HashNode) &pm, flags);
 	}
+}
+
+/**/
+static void
+scanpmbuiltins(HashTable ht, ScanFunc func, int flags)
+{
+    scanbuiltins(ht, func, flags, 0);
+}
+
+/**/
+static void
+scanpmdisbuiltins(HashTable ht, ScanFunc func, int flags)
+{
+    scanbuiltins(ht, func, flags, DISABLED);
 }
 
 /* Functions for the reswords special parameter. */
 
 /**/
-static HashNode
-getpmresword(HashTable ht, char *name)
+static char **
+getreswords(int dis)
 {
-    Param pm = NULL;
+    int i;
     HashNode hn;
+    char **ret, **p;
 
-    HEAPALLOC {
-	pm = (Param) zhalloc(sizeof(struct param));
-	pm->nam = dupstring(name);
-	pm->flags = PM_SCALAR | PM_READONLY;
-	pm->sets.cfn = NULL;
-	pm->gets.cfn = strgetfn;
-	pm->unsetfn = NULL;
-	pm->ct = 0;
-	pm->env = NULL;
-	pm->ename = NULL;
-	pm->old = NULL;
-	pm->level = 0;
-	if ((hn = reswdtab->getnode2(reswdtab, name)))
-	    pm->u.str = dupstring((hn->flags & DISABLED) ?
-				  "<disabled>" : "<enabled>");
-	else {
-	    pm->u.str = dupstring("");
-	    pm->flags |= PM_UNSET;
-	}
-    } LASTALLOC;
+    p = ret = (char **) zhalloc((reswdtab->ct + 1) * sizeof(char *));
 
-    return (HashNode) pm;
+    for (i = 0; i < reswdtab->hsize; i++)
+	for (hn = reswdtab->nodes[i]; hn; hn = hn->next)
+	    if (dis ? (hn->flags & DISABLED) : !(hn->flags & DISABLED))
+		*p++ = dupstring(hn->nam);
+    *p = NULL;
+
+    return ret;
 }
 
 /**/
-static void
-scanpmreswords(HashTable ht, ScanFunc func, int flags)
+static char **
+reswordsgetfn(Param pm)
 {
-    struct param pm;
-    int i;
-    HashNode hn;
+    return getreswords(0);
+}
 
-    pm.flags = PM_SCALAR | PM_READONLY;
-    pm.sets.cfn = NULL;
-    pm.gets.cfn = strgetfn;
-    pm.unsetfn = NULL;
-    pm.ct = 0;
-    pm.env = NULL;
-    pm.ename = NULL;
-    pm.old = NULL;
-    pm.level = 0;
-
-    for (i = 0; i < reswdtab->hsize; i++)
-	for (hn = reswdtab->nodes[i]; hn; hn = hn->next) {
-	    pm.nam = hn->nam;
-	    if (func != scancountparams)
-		pm.u.str = dupstring((hn->flags & DISABLED) ?
-				     "<disabled>" : "<enabled>");
-	    func((HashNode) &pm, flags);
-	}
+/**/
+static char **
+disreswordsgetfn(Param pm)
+{
+    return getreswords(DISABLED);
 }
 
 /* Functions for the options special parameter. */
@@ -925,6 +971,7 @@ scanpmmodules(HashTable ht, ScanFunc func, int flags)
 
 /* Functions for the dirstack special parameter. */
 
+/**/
 static void
 dirssetfn(Param pm, char **x)
 {
@@ -940,6 +987,7 @@ dirssetfn(Param pm, char **x)
 	freearray(x);
 }
 
+/**/
 static char **
 dirsgetfn(Param pm)
 {
@@ -1019,6 +1067,7 @@ scanpmhistory(HashTable ht, ScanFunc func, int flags)
 
 /* Function for the historywords special parameter. */
 
+/**/
 static char **
 histwgetfn(Param pm)
 {
@@ -1050,6 +1099,7 @@ histwgetfn(Param pm)
 
 /* Functions for the jobtexts special parameter. */
 
+/**/
 static char *
 pmjobtext(int job)
 {
@@ -1137,6 +1187,7 @@ scanpmjobtexts(HashTable ht, ScanFunc func, int flags)
 
 /* Functions for the jobstates special parameter. */
 
+/**/
 static char *
 pmjobstate(int job)
 {
@@ -1437,29 +1488,45 @@ scanpmuserdirs(HashTable ht, ScanFunc func, int flags)
 
 /**/
 static void
+setralias(Param pm, char *value, int dis)
+{
+    aliastab->addnode(aliastab, ztrdup(pm->nam), createaliasnode(value, dis));
+}
+
+/**/
+static void
 setpmralias(Param pm, char *value)
 {
-    int dis = 0;
+    setralias(pm, value, 0);
+}
 
-    if (strpfx("<disabled> ", value)) {
-	strcpy(value, value + 11);
-	dis = DISABLED;
-    }
-    aliastab->addnode(aliastab, ztrdup(pm->nam), createaliasnode(value, dis));
+/**/
+static void
+setpmdisralias(Param pm, char *value)
+{
+    setralias(pm, value, DISABLED);
+}
+
+/**/
+static void
+setgalias(Param pm, char *value, int dis)
+{
+    aliastab->addnode(aliastab, ztrdup(pm->nam),
+		      createaliasnode(value, dis | ALIAS_GLOBAL));
 }
 
 /**/
 static void
 setpmgalias(Param pm, char *value)
 {
-    int dis = 0;
+    setgalias(pm, value, 0);
+}
 
-    if (strpfx("<disabled> ", value)) {
-	strcpy(value, value + 11);
-	dis = DISABLED;
-    }
-    aliastab->addnode(aliastab, ztrdup(pm->nam),
-		      createaliasnode(value, dis | ALIAS_GLOBAL));
+/**/
+static void
+setpmdisgalias(Param pm, char *value)
+{
+    setgalias(pm, value, DISABLED);
 }
 
 /**/
@@ -1474,7 +1541,7 @@ unsetpmalias(Param pm, int exp)
 
 /**/
 static void
-setpmaliases(Param pm, HashTable ht, int global)
+setaliases(Param pm, HashTable ht, int global, int dis)
 {
     int i;
     HashNode hn, next, hd;
@@ -1504,7 +1571,8 @@ setpmaliases(Param pm, HashTable ht, int global)
 	    if ((val = getstrvalue(&v)))
 		aliastab->addnode(aliastab, ztrdup(hn->nam),
 				  createaliasnode(ztrdup(val),
-						  (global ? ALIAS_GLOBAL : 0)));
+						  (global ? ALIAS_GLOBAL : 0) |
+						  (dis ? DISABLED : 0)));
 	}
     deleteparamtable(ht);
 }
@@ -1513,19 +1581,33 @@ setpmaliases(Param pm, HashTable ht, int global)
 static void
 setpmraliases(Param pm, HashTable ht)
 {
-    setpmaliases(pm, ht, 0);
+    setaliases(pm, ht, 0, 0);
+}
+
+/**/
+static void
+setpmdisraliases(Param pm, HashTable ht)
+{
+    setaliases(pm, ht, 0, DISABLED);
 }
 
 /**/
 static void
 setpmgaliases(Param pm, HashTable ht)
 {
-    setpmaliases(pm, ht, 1);
+    setaliases(pm, ht, 1, 0);
+}
+
+/**/
+static void
+setpmdisgaliases(Param pm, HashTable ht)
+{
+    setaliases(pm, ht, 1, DISABLED);
 }
 
 /**/
 static HashNode
-getpmalias(HashTable ht, char *name, int global)
+getalias(HashTable ht, char *name, int global, int dis)
 {
     Param pm = NULL;
     Alias al;
@@ -1534,7 +1616,8 @@ getpmalias(HashTable ht, char *name, int global)
 	pm = (Param) zhalloc(sizeof(struct param));
 	pm->nam = dupstring(name);
 	pm->flags = PM_SCALAR;
-	pm->sets.cfn = (global ? setpmgalias : setpmralias);
+	pm->sets.cfn = (global ? (dis ? setpmdisgalias : setpmgalias) :
+			(dis ? setpmdisralias : setpmralias));
 	pm->gets.cfn = strgetfn;
 	pm->unsetfn = unsetpmalias;
 	pm->ct = 0;
@@ -1544,10 +1627,9 @@ getpmalias(HashTable ht, char *name, int global)
 	pm->level = 0;
 	if ((al = (Alias) aliastab->getnode2(aliastab, name)) &&
 	    ((global && (al->flags & ALIAS_GLOBAL)) ||
-	     (!global && !(al->flags & ALIAS_GLOBAL))))
-	    pm->u.str = ((al->flags & DISABLED) ?
-			 dyncat("<disabled> ", al->text) :
-			 dupstring(al->text));
+	     (!global && !(al->flags & ALIAS_GLOBAL))) &&
+	    (dis ? (al->flags & DISABLED) : !(al->flags & DISABLED)))
+	    pm->u.str = dupstring(al->text);
 	else {
 	    pm->u.str = dupstring("");
 	    pm->flags |= PM_UNSET;
@@ -1561,19 +1643,33 @@ getpmalias(HashTable ht, char *name, int global)
 static HashNode
 getpmralias(HashTable ht, char *name)
 {
-    return getpmalias(ht, name, 0);
+    return getalias(ht, name, 0, 0);
+}
+
+/**/
+static HashNode
+getpmdisralias(HashTable ht, char *name)
+{
+    return getalias(ht, name, 0, 0);
 }
 
 /**/
 static HashNode
 getpmgalias(HashTable ht, char *name)
 {
-    return getpmalias(ht, name, 1);
+    return getalias(ht, name, 1, 0);
+}
+
+/**/
+static HashNode
+getpmdisgalias(HashTable ht, char *name)
+{
+    return getalias(ht, name, 1, DISABLED);
 }
 
 /**/
 static void
-scanpmaliases(HashTable ht, ScanFunc func, int flags, int global)
+scanaliases(HashTable ht, ScanFunc func, int flags, int global, int dis)
 {
     struct param pm;
     int i;
@@ -1581,7 +1677,8 @@ scanpmaliases(HashTable ht, ScanFunc func, int flags, int global)
     Alias al;
 
     pm.flags = PM_SCALAR;
-    pm.sets.cfn = (global ? setpmgalias : setpmralias);
+    pm.sets.cfn = (global ? (dis ? setpmdisgalias : setpmgalias) :
+		   (dis ? setpmdisralias : setpmralias));
     pm.gets.cfn = strgetfn;
     pm.unsetfn = unsetpmalias;
     pm.ct = 0;
@@ -1592,13 +1689,12 @@ scanpmaliases(HashTable ht, ScanFunc func, int flags, int global)
 
     for (i = 0; i < aliastab->hsize; i++)
 	for (hn = aliastab->nodes[i]; hn; hn = hn->next) {
-	    if ((global && ((al = (Alias) hn)->flags & ALIAS_GLOBAL)) ||
-		(!global && !((al = (Alias) hn)->flags & ALIAS_GLOBAL))) {
+	    if (((global && ((al = (Alias) hn)->flags & ALIAS_GLOBAL)) ||
+		 (!global && !((al = (Alias) hn)->flags & ALIAS_GLOBAL))) &&
+		(dis ? (al->flags & DISABLED) : !(al->flags & DISABLED))) {
 		pm.nam = hn->nam;
 		if (func != scancountparams)
-		    pm.u.str = ((hn->flags & DISABLED) ?
-				dyncat("<disabled> ", al->text) :
-				dupstring(al->text));
+		    pm.u.str = dupstring(al->text);
 		func((HashNode) &pm, flags);
 	    }
 	}
@@ -1608,14 +1704,28 @@ scanpmaliases(HashTable ht, ScanFunc func, int flags, int global)
 static void
 scanpmraliases(HashTable ht, ScanFunc func, int flags)
 {
-    scanpmaliases(ht, func, flags, 0);
+    scanaliases(ht, func, flags, 0, 0);
+}
+
+/**/
+static void
+scanpmdisraliases(HashTable ht, ScanFunc func, int flags)
+{
+    scanaliases(ht, func, flags, 0, DISABLED);
 }
 
 /**/
 static void
 scanpmgaliases(HashTable ht, ScanFunc func, int flags)
 {
-    scanpmaliases(ht, func, flags, 1);
+    scanaliases(ht, func, flags, 1, 0);
+}
+
+/**/
+static void
+scanpmdisgaliases(HashTable ht, ScanFunc func, int flags)
+{
+    scanpmaliases(ht, func, flags, 1, DISABLED);
 }
 
 /* Table for defined parameters. */
@@ -1642,25 +1752,34 @@ static struct pardef partab[] = {
     { "functions", 0,
       getpmfunction, scanpmfunctions, setpmfunctions,
       NULL, NULL, stdunsetfn, NULL },
+    { "disfunctions", 0,
+      getpmdisfunction, scanpmdisfunctions, setpmdisfunctions,
+      NULL, NULL, stdunsetfn, NULL },
     { "builtins", PM_READONLY,
       getpmbuiltin, scanpmbuiltins, hashsetfn,
       NULL, NULL, stdunsetfn, NULL },
-    { "reswords", PM_READONLY,
-      getpmresword, scanpmreswords, hashsetfn,
+    { "disbuiltins", PM_READONLY,
+      getpmdisbuiltin, scanpmdisbuiltins, hashsetfn,
       NULL, NULL, stdunsetfn, NULL },
+    { "reswords", PM_ARRAY|PM_SPECIAL|PM_READONLY,
+      NULL, NULL, NULL,
+      arrsetfn, reswordsgetfn, stdunsetfn, NULL },
+    { "disreswords", PM_ARRAY|PM_SPECIAL|PM_READONLY,
+      NULL, NULL, NULL,
+      arrsetfn, disreswordsgetfn, stdunsetfn, NULL },
     { "options", 0,
       getpmoption, scanpmoptions, setpmoptions,
       NULL, NULL, stdunsetfn, NULL },
     { "modules", PM_READONLY,
       getpmmodule, scanpmmodules, hashsetfn,
       NULL, NULL, stdunsetfn, NULL },
-    { "dirstack", PM_ARRAY|PM_HIDE|PM_SPECIAL|PM_REMOVABLE,
+    { "dirstack", PM_ARRAY|PM_SPECIAL|PM_REMOVABLE,
       NULL, NULL, NULL,
       dirssetfn, dirsgetfn, stdunsetfn, NULL },
     { "history", PM_READONLY,
       getpmhistory, scanpmhistory, hashsetfn,
       NULL, NULL, stdunsetfn, NULL },
-    { "historywords", PM_ARRAY|PM_HIDE|PM_SPECIAL|PM_READONLY,
+    { "historywords", PM_ARRAY|PM_SPECIAL|PM_READONLY,
       NULL, NULL, NULL,
       arrsetfn, histwgetfn, stdunsetfn, NULL },
     { "jobtexts", PM_READONLY,
@@ -1680,6 +1799,12 @@ static struct pardef partab[] = {
       NULL, NULL, stdunsetfn, NULL },
     { "galiases", 0,
       getpmgalias, scanpmgaliases, setpmgaliases,
+      NULL, NULL, stdunsetfn, NULL },
+    { "disraliases", 0,
+      getpmdisralias, scanpmdisraliases, setpmdisraliases,
+      NULL, NULL, stdunsetfn, NULL },
+    { "disgaliases", 0,
+      getpmdisgalias, scanpmdisgaliases, setpmdisgaliases,
       NULL, NULL, stdunsetfn, NULL },
     { NULL, 0, NULL, NULL, NULL, NULL, NULL, NULL, NULL }
 };
@@ -1715,7 +1840,7 @@ boot_parameter(Module m)
 	    if (def->hsetfn)
 		def->pm->sets.hfn = def->hsetfn;
 	} else {
-	    if (!(def->pm = createparam(def->name, def->flags)))
+	    if (!(def->pm = createparam(def->name, def->flags | PM_HIDE)))
 		return 1;
 	    def->pm->sets.afn = def->setfn;
 	    def->pm->gets.afn = def->getfn;

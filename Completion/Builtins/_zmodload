@@ -4,7 +4,7 @@ local fl="$words[2]" expl
 
 if [[ "$fl" = -*(a*u|u*a)* || "$fl" = -*a* && CURRENT -ge 4 ]]; then
   _description expl 'builtin command'
-  compadd "$expl[@]" "$@" - "${(k@)builtins[(R)^?disabled*]}" && ret=0
+  compadd "$expl[@]" "$@" - "${(k@)builtins}" && ret=0
 elif [[ "$fl" = -*u* ]]; then
   _description expl module
   compadd "$expl[@]" - "${(@k)modules}"

@@ -11,8 +11,8 @@ local expl
 
 if [[ "$words[2]" = -*[DAN]* || "$words[CURRENT-1]" = -*M ]]; then
   _description expl keymap
-  compadd "$expl[@]" - "$zlekeymaps[@]"
+  compadd "$expl[@]" - "$keymaps[@]"
 else
   _description expl widget
-  compadd "$expl[@]" -M 'r:|-=* r:|=*' - "${(@k)zlewidgets}"
+  compadd "$expl[@]" -M 'r:|-=* r:|=*' - "${(@k)widgets}"
 fi

@@ -8,12 +8,12 @@ ifnzman(noderef(Zsh Line Editor))\
 ).
 
 startitem()
-vindex(zlekeymaps)
-item(tt(zlekeymaps))(
+vindex(keymaps)
+item(tt(keymaps))(
 This array contains the names of the keymaps currently defined.
 )
-vindex(zlewidgets)
-item(tt(zlewidgets))(
+vindex(widgets)
+item(tt(widgets))(
 This associative array contains one entry per widget defined. The name 
 of the widget is the key and the value gives information about the
 widget. It is either the string `tt(builtin)' for builtin widgets, a

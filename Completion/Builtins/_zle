@@ -4,8 +4,8 @@ local expl
 
 if [[ "$words[2]" = -N && CURRENT -eq 3 ]]; then
   _description expl 'widget shell function'
-  compadd "$expl[@]" "$@" - "${(k@)functions[(R)^?disabled*]}" && ret=0
+  compadd "$expl[@]" "$@" - "${(k@)functions}" && ret=0
 else
   _description expl widget
-  compadd "$expl[@]" - "${(@k)zlewidgets}"
+  compadd "$expl[@]" - "${(@k)widgets}"
 fi

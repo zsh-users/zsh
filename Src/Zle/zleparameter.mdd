@@ -1,5 +1,5 @@
 moddeps="zle"
 
-autoparams="zlewidgets zlekeymaps"
+autoparams="widgets keymaps"
 
 objects="zleparameter.o"

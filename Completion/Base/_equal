@@ -3,6 +3,6 @@
 local expl
 
 _description expl alias
-compadd "$@" "$expl[@]" - "${(@k)aliases[(R)^?disabled*]}"
+compadd "$@" "$expl[@]" - "${(@k)aliases}"
 _description expl command
 compadd "$@" "$expl[@]" - "${(k@)commands}"

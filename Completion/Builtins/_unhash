@@ -8,11 +8,11 @@ if [[ "$fl" = -*d* ]]; then
 fi
 if [[ "$fl" = -*a* ]]; then
   _description expl alias
-  compadd "$expl[@]" - "${(@k)aliases}" && ret=0
+  compadd "$expl[@]" - "${(@k)aliases}" "${(@k)disaliases}" && ret=0
 fi
 if [[ "$fl" = -*f* ]]; then
   _description expl 'shell function'
-  compadd "$expl[@]" - "${(@k)functions}" && ret=0
+  compadd "$expl[@]" - "${(@k)functions}" "${(@k)disfunctions}" && ret=0
 fi
 if [[ "$fl" != -* ]]; then
   _command_names -e && ret=0

@@ -27,35 +27,51 @@ hash table.
 )
 vindex(functions)
 item(tt(functions))(
-This association maps function names to their definitions. Setting a
-key in it is like defining a function with the name given by the key
-and the body given by the value. Unsetting a key removes the
-definition for the function named by the key.
+This association maps names of enabled functions to their
+definitions. Setting a key in it is like defining a function with the
+name given by the key and the body given by the value. Unsetting a key
+removes the definition for the function named by the key.
+)
+vindex(disfunctions)
+item(tt(disfunctions))(
+Like tt(functions) but for disabled functions.
 )
 vindex(builtins)
 item(tt(builtins))(
 This association gives information about the builtin commands
-currently known. The keys are the names of the builtin commands and
+currently enabled. The keys are the names of the builtin commands and
 the values are either `tt(undefined)' for builtin commands that will
 automatically be loaded from a module if invoked or `tt(defined)' for
-builtin commands that are already loaded. Also, the string
-`tt(<disabled> )' will be prepended to the value if the builtin
-command is currently disabled.
+builtin commands that are already loaded.
+)
+vindex(disbuiltins)
+item(tt(disbuiltins))(
+Like tt(builtins) but for disabled builtin commands.
 )
 vindex(reswords)
 item(tt(reswords))(
-This association maps the reserved words to one of `tt(<enabled>)' or
-`tt(<disabled>)' for enabled and disabled reserved words, respectively.
+This array contains the enabled reserved words.
+)
+vindex(disreswords)
+item(tt(disreswords))(
+Like tt(reswords) but for disabled reserved words.
 )
 vindex(raliases)
 item(tt(raliases))(
-This maps the names of the regular aliases currently defined to their
-expansions. For disabled aliases the string `tt(<disabled>)' is
-prepended to their value.
+This maps the names of the regular aliases currently enabled to their
+expansions.
+)
+vindex(disraliases)
+item(tt(disraliases))(
+Like tt(raliases) but for disabled regular aliases.
 )
 vindex(galiases)
 item(tt(galiases))(
 Like tt(raliases), but for global aliases.
+)
+vindex(disgaliases)
+item(tt(disgaliases))(
+Like tt(galiases) but for disabled global aliases.
 )
 vindex(parameters)
 item(tt(parameters))(

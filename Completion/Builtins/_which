@@ -5,10 +5,10 @@ local expl
 _description expl 'external command'
 compadd "$expl[@]" "$@" - "${(k@)commands}" && ret=0
 _description expl 'builtin command'
-compadd "$expl[@]" "$@" - "${(k@)builtins[(R)^?disabled*]}" && ret=0
+compadd "$expl[@]" "$@" - "${(k@)builtins}" && ret=0
 _description expl 'shell function'
-compadd "$expl[@]" "$@" - "${(k@)functions[(R)^?disabled*]}" && ret=0
+compadd "$expl[@]" "$@" - "${(k@)functions}" && ret=0
 _description expl 'alias'
-compadd "$expl[@]" "$@" - "${(k@)raliases[(R)^?disabled*]}" && ret=0
+compadd "$expl[@]" "$@" - "${(k@)raliases}" && ret=0
 _description expl 'reserved word'
-compadd "$expl[@]" "$@" - "${(k@)reswords[(R)^?disabled*]}" && ret=0
+compadd "$expl[@]" "$@" - "${(k@)reswords}" && ret=0
