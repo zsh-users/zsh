@@ -1,5 +1,8 @@
 2003-10-24  Clint Adams  <clint@zsh.org>
 
+	* 19202: Doc/Makefile.in, Doc/Zsh/mod_datetime.yo:
+	rudimentary documentation for zsh/datetime module.
+
 	* 19201: Completion/Unix/Command/_screen: patch from
 	Yasuhiro Hayase to complete normal commands after screen.
 

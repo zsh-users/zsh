@@ -1,0 +1,23 @@
+COMMENT(!MOD!zsh/datetime
+Some date/time commands and parameters.
+!MOD!)
+The tt(zsh/datetime) module makes available one builtin command:
+
+startitem()
+findex(strftime)
+cindex(date string, printing)
+item(tt(strftime) var(format) var(epochtime) )(
+Output the date denoted by var(epochtime) in the var(format)
+specified.
+)
+enditem()
+
+The tt(zsh/datetime) module makes available one parameter:
+
+startitem()
+vindex(EPOCHSECONDS)
+item(tt(EPOCHSECONDS))(
+An integer value representing the number of seconds since the
+epoch.
+)
+enditem()
