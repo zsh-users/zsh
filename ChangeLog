@@ -1,3 +1,8 @@
+2000-09-27  Clint Adams  <schizo@debian.org>
+
+	* 12863: Src/string.c, Src/Zle/compresult.c: remove ztrdupstring(),
+	fold guts back into ztat(), change memory allocation to VARARR.
+
 2000-09-25  Bart Schaefer  <schaefer@zsh.org>
 
 	* 12862: Src/exec.c: Fix STTY parameter to match documentation.

@@ -732,16 +732,22 @@ mod_export int
 ztat(char *nam, struct stat *buf, int ls)
 {
     int e;
-    char *b;
 
     if (!(ls ? lstat(nam, buf) : stat(nam, buf)))
 	return 0;
+    else {
+	char *p;
+	VARARR(char, b, strlen(nam) + 1);
 
-    b = ztrdupstrip(nam, '\\');
-
-    e = ls ? lstat(b, buf) : stat(b, buf);
-    zsfree(b);
-    return e;
+	for (p = b; *nam; nam++)
+	    if (*nam == '\\' && nam[1])
+		*p++ = *++nam;
+	    else
+		*p++ = *nam;
+	*p = '\0';
+	
+	return ls ? lstat(b, buf) : stat(b, buf);
+    }
 }
 
 /* Insert a single match in the command line. */
