@@ -107,7 +107,7 @@ scanemptythingies(HashNode hn, int flags)
 static Thingy
 makethingynode(void)
 {
-    Thingy t = (Thingy) zcalloc(sizeof(*t));
+    Thingy t = (Thingy) zshcalloc(sizeof(*t));
 
     t->flags = DISABLED;
     return t;

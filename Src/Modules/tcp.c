@@ -216,7 +216,7 @@ zts_alloc(int ztflags)
 {
     Tcp_session sess;
 
-    sess = (Tcp_session)zcalloc(sizeof(struct tcp_session));
+    sess = (Tcp_session)zshcalloc(sizeof(struct tcp_session));
     if (!sess) return NULL;
     sess->fd=-1;
     sess->flags=ztflags;

@@ -96,7 +96,7 @@ newhashtable(int size, char const *name, PrintTableStats printinfo)
 {
     HashTable ht;
 
-    ht = (HashTable) zcalloc(sizeof *ht);
+    ht = (HashTable) zshcalloc(sizeof *ht);
 #ifdef ZSH_HASH_DEBUG
     ht->next = NULL;
     if(!firstht)
@@ -108,7 +108,7 @@ newhashtable(int size, char const *name, PrintTableStats printinfo)
     ht->printinfo = printinfo ? printinfo : printhashtabinfo;
     ht->tablename = ztrdup(name);
 #endif /* ZSH_HASH_DEBUG */
-    ht->nodes = (HashNode *) zcalloc(size * sizeof(HashNode));
+    ht->nodes = (HashNode *) zshcalloc(size * sizeof(HashNode));
     ht->hsize = size;
     ht->ct = 0;
     ht->scan = NULL;
@@ -458,7 +458,7 @@ expandhashtable(HashTable ht)
     onodes = ht->nodes;
 
     ht->hsize = osize * 4;
-    ht->nodes = (HashNode *) zcalloc(ht->hsize * sizeof(HashNode));
+    ht->nodes = (HashNode *) zshcalloc(ht->hsize * sizeof(HashNode));
     ht->ct = 0;
 
     /* scan through the old list of nodes, and *
@@ -496,7 +496,7 @@ resizehashtable(HashTable ht, int newsize)
      * we free it and allocate a new nodes array.          */
     if (ht->hsize != newsize) {
 	zfree(ht->nodes, ht->hsize * sizeof(HashNode));
-	ht->nodes = (HashNode *) zcalloc(newsize * sizeof(HashNode));
+	ht->nodes = (HashNode *) zshcalloc(newsize * sizeof(HashNode));
 	ht->hsize = newsize;
     } else {
 	/* else we just re-zero the current nodes array */
@@ -639,7 +639,7 @@ hashdir(char **dirp)
 
     while ((fn = zreaddir(dir, 1))) {
 	if (!cmdnamtab->getnode(cmdnamtab, fn)) {
-	    cn = (Cmdnam) zcalloc(sizeof *cn);
+	    cn = (Cmdnam) zshcalloc(sizeof *cn);
 	    cn->flags = 0;
 	    cn->u.name = dirp;
 	    cmdnamtab->addnode(cmdnamtab, ztrdup(fn), cn);
@@ -654,7 +654,7 @@ hashdir(char **dirp)
 	    (exe[3] == 'E' || exe[3] == 'e') && exe[4] == 0) {
 	    *exe = 0;
 	    if (!cmdnamtab->getnode(cmdnamtab, fn)) {
-		cn = (Cmdnam) zcalloc(sizeof *cn);
+		cn = (Cmdnam) zshcalloc(sizeof *cn);
 		cn->flags = 0;
 		cn->u.name = dirp;
 		cmdnamtab->addnode(cmdnamtab, ztrdup(fn), cn);
@@ -1069,7 +1069,7 @@ createaliasnode(char *txt, int flags)
 {
     Alias al;
 
-    al = (Alias) zcalloc(sizeof *al);
+    al = (Alias) zshcalloc(sizeof *al);
     al->flags = flags;
     al->text = txt;
     al->inuse = 0;

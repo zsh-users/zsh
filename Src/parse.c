@@ -2097,7 +2097,7 @@ dupeprog(Eprog p, int heap)
      */
     r->nref = heap ? -1 : 1;
     pp = r->pats = (heap ? (Patprog *) hcalloc(r->len) :
-		    (Patprog *) zcalloc(r->len));
+		    (Patprog *) zshcalloc(r->len));
     r->prog = (Wordcode) (r->pats + r->npats);
     r->strs = ((char *) r->prog) + (p->strs - ((char *) p->prog));
     memcpy(r->prog, p->prog, r->len - (p->npats * sizeof(Patprog)));
@@ -3240,7 +3240,7 @@ dump_autoload(char *nam, char *file, int on, Options ops, int func)
 
     for (n = firstfdhead(h), e = (FDHead) (h + fdheaderlen(h)); n < e;
 	 n = nextfdhead(n)) {
-	shf = (Shfunc) zcalloc(sizeof *shf);
+	shf = (Shfunc) zshcalloc(sizeof *shf);
 	shf->flags = on;
 	shf->funcdef = mkautofn(shf);
 	shfunctab->addnode(shfunctab, ztrdup(fdname(n) + fdhtail(n)), shf);

@@ -170,7 +170,7 @@ cut(int i, int ct, int dir)
 	Cutbuffer kptr;
 	if (!kring) {
 	    kringsize = KRINGCTDEF;
-	    kring = (Cutbuffer)zcalloc(kringsize * sizeof(struct cutbuffer));
+	    kring = (Cutbuffer)zshcalloc(kringsize * sizeof(struct cutbuffer));
 	} else
 	    kringnum = (kringnum + 1) % kringsize;
 	kptr = kring + kringnum;

@@ -380,7 +380,7 @@ inungetc(int c)
 	     * can't back up where we want to.  Instead, we just push it
 	     * onto the input stack as an extra character.
 	     */
-	    char *cback = (char *)zcalloc(2);
+	    char *cback = (char *)zshcalloc(2);
 	    cback[0] = (char) c;
 	    inpush(cback, INP_FREE|INP_CONT, NULL);
 	}

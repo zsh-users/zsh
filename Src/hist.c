@@ -773,7 +773,7 @@ hbegin(int dohist)
 	hwend = nohwe;
 	addtoline = nohw;
     } else {
-	chline = hptr = zcalloc(hlinesz = 64);
+	chline = hptr = zshcalloc(hlinesz = 64);
 	chwords = zalloc((chwordlen = 64) * sizeof(short));
 	hgetc = ihgetc;
 	hungetc = ihungetc;
@@ -966,7 +966,7 @@ prepnexthistent(void)
     }
 
     if (histlinect < histsiz) {
-	he = (Histent)zcalloc(sizeof *he);
+	he = (Histent)zshcalloc(sizeof *he);
 	if (!hist_ring)
 	    hist_ring = he->up = he->down = he;
 	else {

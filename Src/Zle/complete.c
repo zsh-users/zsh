@@ -707,7 +707,7 @@ restrict_range(int b, int e)
 	    e = wl;
 
 	i = e - b + 1;
-	p = (char **) zcalloc((i + 1) * sizeof(char *));
+	p = (char **) zshcalloc((i + 1) * sizeof(char *));
 
 	for (q = p, pp = compwords + b; i; i--, q++, pp++)
 	    *q = ztrdup(*pp);
@@ -1180,7 +1180,7 @@ compunsetfn(Param pm, int exp)
 		*((char **) pm->u.data) = ztrdup("");
 	    } else if (PM_TYPE(pm->flags) == PM_ARRAY) {
 		freearray(*((char ***) pm->u.data));
-		*((char ***) pm->u.data) = zcalloc(sizeof(char *));
+		*((char ***) pm->u.data) = zshcalloc(sizeof(char *));
 	    } else if (PM_TYPE(pm->flags) == PM_HASHED) {
 		deleteparamtable(pm->u.hash);
 		pm->u.hash = NULL;

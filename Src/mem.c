@@ -32,7 +32,7 @@
 
 /*
 	There are two ways to allocate memory in zsh.  The first way is
-	to call zalloc/zcalloc, which call malloc/calloc directly.  It
+	to call zalloc/zshcalloc, which call malloc/calloc directly.  It
 	is legal to call realloc() or free() on memory allocated this way.
 	The second way is to call zhalloc/hcalloc, which allocates memory
 	from one of the memory pools on the heap stack.  Such memory pools 
@@ -498,7 +498,7 @@ zalloc(size_t size)
 
 /**/
 mod_export void *
-zcalloc(size_t size)
+zshcalloc(size_t size)
 {
     void *ptr;
 

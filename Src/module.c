@@ -226,7 +226,7 @@ mod_export LinkList modules;
 int
 add_autobin(char *nam, char *module)
 {
-    Builtin bn = zcalloc(sizeof(*bn));
+    Builtin bn = zshcalloc(sizeof(*bn));
     bn->nam = ztrdup(nam);
     bn->optstr = ztrdup(module);
     return addbuiltin(bn);
@@ -770,7 +770,7 @@ load_module(char const *name)
 	    unqueue_signals();
 	    return 0;
 	}
-	m = zcalloc(sizeof(*m));
+	m = zshcalloc(sizeof(*m));
 	m->nam = ztrdup(name);
 	if (handle) {
 	    m->u.handle = handle;
@@ -912,7 +912,7 @@ add_dep(const char *name, char *from)
      * *points* to a module with dependencies, of course.)
      */
     if (!(node = find_module(name, 1, &name))) {
-	m = zcalloc(sizeof(*m));
+	m = zshcalloc(sizeof(*m));
 	m->nam = ztrdup(name);
 	zaddlinknode(modules, m);
     } else
@@ -1099,7 +1099,7 @@ bin_zmodload_alias(char *nam, char **args, Options ops)
 		    }
 		    zsfree(m->u.alias);
 		} else {
-		    m = (Module) zcalloc(sizeof(*m));
+		    m = (Module) zshcalloc(sizeof(*m));
 		    m->nam = ztrdup(*args);
 		    m->flags = MOD_ALIAS;
 		    zaddlinknode(modules, m);

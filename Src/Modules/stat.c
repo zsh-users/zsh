@@ -518,7 +518,7 @@ bin_stat(char *name, char **args, Options ops, int func)
 	arrsize = (flags & STF_PICK) ? 1 : ST_COUNT;
 	if (flags & STF_FILE)
 	    arrsize++;
-	hashptr = hash = (char **)zcalloc((arrsize+1)*2*sizeof(char *));
+	hashptr = hash = (char **)zshcalloc((arrsize+1)*2*sizeof(char *));
     }
 
     if (arrnam) {
@@ -526,7 +526,7 @@ bin_stat(char *name, char **args, Options ops, int func)
 	if (flags & STF_FILE)
 	    arrsize++;
 	arrsize *= nargs;
-	arrptr = array = (char **)zcalloc((arrsize+1)*sizeof(char *));
+	arrptr = array = (char **)zshcalloc((arrsize+1)*sizeof(char *));
     }
 
     for (; OPT_ISSET(ops,'f') || *args; args++) {

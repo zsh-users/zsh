@@ -1386,7 +1386,7 @@ setup_(Module m)
     incompfunc = incompctlfunc = hascompmod = 0;
     hascompwidgets = 0;
 
-    clwords = (char **) zcalloc((clwsize = 16) * sizeof(char *));
+    clwords = (char **) zshcalloc((clwsize = 16) * sizeof(char *));
 
     return 0;
 }

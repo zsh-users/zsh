@@ -414,7 +414,7 @@ set_killring(Param pm, char **x)
 	 */
 	int kpos = 0;
 	kringsize = arrlen(x);
-	kring = (Cutbuffer)zcalloc(kringsize * sizeof(struct cutbuffer));
+	kring = (Cutbuffer)zshcalloc(kringsize * sizeof(struct cutbuffer));
 	for (p = x; *p; p++) {
 	    int len = strlen(*p);
 	    kptr = kring + kpos;
@@ -443,7 +443,7 @@ get_killring(Param pm)
     /* Supposed to work even if kring is NULL */
     if (!kring) {
 	kringsize = KRINGCTDEF;
-	kring = (Cutbuffer)zcalloc(kringsize * sizeof(struct cutbuffer));
+	kring = (Cutbuffer)zshcalloc(kringsize * sizeof(struct cutbuffer));
     }
 
     p = ret = (char **)zhalloc((kringsize+1) * sizeof(char *));

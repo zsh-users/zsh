@@ -458,7 +458,7 @@ cd_init(char *nam, char *hide, char *mlen, char *sep,
         grp = 1;
     }
     while (*args) {
-	*setp = set = (Cdset) zcalloc(sizeof(*set));
+	*setp = set = (Cdset) zshcalloc(sizeof(*set));
 	setp = &(set->next);
         *setp = NULL;
         set->opts = NULL;

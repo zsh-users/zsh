@@ -1447,9 +1447,9 @@ pattryrefs(Patprog prog, char *string, int *nump, int *begp, int *endp)
 		char **matcharr, **mbeginarr, **mendarr;
 		char numbuf[DIGBUFSIZE];
 
-		matcharr = zcalloc(palen*sizeof(char *));
-		mbeginarr = zcalloc(palen*sizeof(char *));
-		mendarr = zcalloc(palen*sizeof(char *));
+		matcharr = zshcalloc(palen*sizeof(char *));
+		mbeginarr = zshcalloc(palen*sizeof(char *));
+		mendarr = zshcalloc(palen*sizeof(char *));
 
 		sp = patbeginp;
 		ep = patendp;
@@ -1803,7 +1803,7 @@ patmatch(Upat prog)
 			oldsyncstr = syncstrp->p;
 			if (!patinlen)
 			    patinlen = strlen(patinstart)+1;
-			syncstrp->p = (unsigned char *)zcalloc(patinlen);
+			syncstrp->p = (unsigned char *)zshcalloc(patinlen);
 			while ((ret = patmatch(P_OPERAND(scan)))) {
 			    unsigned char *syncpt;
 			    char savchar, *testptr;
@@ -1926,7 +1926,7 @@ patmatch(Upat prog)
 			    if (!ptrp->p) {
 				if (!patinlen)
 				    patinlen = strlen((char *)patinstart)+1;
-				ptrp->p = (unsigned char *)zcalloc(patinlen);
+				ptrp->p = (unsigned char *)zshcalloc(patinlen);
 				pfree = 1;
 			    }
 			    ptr = ptrp->p + (patinput - patinstart);

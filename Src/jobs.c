@@ -882,7 +882,7 @@ addproc(pid_t pid, char *text, int aux)
     Process pn, *pnlist;
     struct timezone dummy_tz;
 
-    pn = (Process) zcalloc(sizeof *pn);
+    pn = (Process) zshcalloc(sizeof *pn);
     pn->pid = pid;
     if (text)
 	strcpy(pn->text, text);

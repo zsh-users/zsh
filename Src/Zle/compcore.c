@@ -618,14 +618,14 @@ callcompfunc(char *s, char *fn)
 		untokenize(*q = ztrdup(*p));
 	    *q = NULL;
 	} else
-	    compwords = (char **) zcalloc(sizeof(char *));
+	    compwords = (char **) zshcalloc(sizeof(char *));
 
 	if (compredirs)
 	    freearray(compredirs);
         if (rdstrs)
             compredirs = bld_list_array(rdstrs);
         else
-            compredirs = (char **) zcalloc(sizeof(char *));
+            compredirs = (char **) zshcalloc(sizeof(char *));
 
 	compparameter = ztrdup(compparameter);
 	compredirect = ztrdup(compredirect);
@@ -2822,7 +2822,7 @@ dupmatch(Cmatch m, int nbeg, int nend)
 {
     Cmatch r;
 
-    r = (Cmatch) zcalloc(sizeof(struct cmatch));
+    r = (Cmatch) zshcalloc(sizeof(struct cmatch));
 
     r->str = ztrdup(m->str);
     r->orig = ztrdup(m->orig);
@@ -2922,7 +2922,7 @@ permmatches(int last)
 	    if (g->mcount > 1)
 		diffmatches = 1;
 
-	    n = (Cmgroup) zcalloc(sizeof(struct cmgroup));
+	    n = (Cmgroup) zshcalloc(sizeof(struct cmgroup));
 
 	    if (g->perm) {
 		g->perm->next = NULL;
@@ -2940,7 +2940,7 @@ permmatches(int last)
 	    n->num = gn++;
 	    n->flags = g->flags;
 	    n->mcount = g->mcount;
-	    n->matches = p = (Cmatch *) zcalloc((n->mcount + 1) * sizeof(Cmatch));
+	    n->matches = p = (Cmatch *) zshcalloc((n->mcount + 1) * sizeof(Cmatch));
 	    n->name = ztrdup(g->name);
 	    for (q = g->matches; *q; q++, p++)
 		*p = dupmatch(*q, nbrbeg, nbrend);
@@ -2954,9 +2954,9 @@ permmatches(int last)
 		n->ylist = NULL;
 
 	    if ((n->ecount = g->ecount)) {
-		n->expls = ep = (Cexpl *) zcalloc((n->ecount + 1) * sizeof(Cexpl));
+		n->expls = ep = (Cexpl *) zshcalloc((n->ecount + 1) * sizeof(Cexpl));
 		for (eq = g->expls; (o = *eq); eq++, ep++) {
-		    *ep = e = (Cexpl) zcalloc(sizeof(struct cexpl));
+		    *ep = e = (Cexpl) zshcalloc(sizeof(struct cexpl));
 		    e->count = (fi ? o->fcount : o->count);
                     e->always = o->always;
 		    e->fcount = 0;

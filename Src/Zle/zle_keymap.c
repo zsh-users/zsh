@@ -156,7 +156,7 @@ createkeymapnamtab(void)
 static KeymapName
 makekeymapnamnode(Keymap keymap)
 {
-    KeymapName kmn = (KeymapName) zcalloc(sizeof(*kmn));
+    KeymapName kmn = (KeymapName) zshcalloc(sizeof(*kmn));
 
     kmn->keymap = keymap;
     return kmn;
@@ -201,7 +201,7 @@ newkeytab(char *kmname)
 static Key
 makekeynode(Thingy t, char *str)
 {
-    Key k = (Key) zcalloc(sizeof(*k));
+    Key k = (Key) zshcalloc(sizeof(*k));
 
     k->bind = t;
     k->str = str;
@@ -230,7 +230,7 @@ static HashTable copyto;
 mod_export Keymap
 newkeymap(Keymap tocopy, char *kmname)
 {
-    Keymap km = zcalloc(sizeof(*km));
+    Keymap km = zshcalloc(sizeof(*km));
     int i;
 
     km->rc = 0;
