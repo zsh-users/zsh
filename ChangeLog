@@ -1,3 +1,8 @@
+2002-02-03  Clint Adams  <clint@zsh.org>
+
+	* 16540: Completion/Unix/Command/_rsync: include short options and
+	local files.
+
 2002-01-31  Oliver Kiddle  <opk@zsh.org>
 
 	* Derek Peschel: 16493: Src/params.c: correct typos
