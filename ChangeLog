@@ -1,3 +1,9 @@
+2001-10-26  Peter Stephenson  <pws@csr.com>
+
+	* 16171: Doc/Zsh/zftpsys.yo: minor changes of phrasing.
+
+	* unposted: Config/version.mk: create 4.0.4.
+	
 2001-10-25  Peter Stephenson  <pws@csr.com>
 
 	* 16145: Src/Builtins/rlimits.c: try to handle both RLIMITS_VMEM

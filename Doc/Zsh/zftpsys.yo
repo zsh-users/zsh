@@ -1,4 +1,4 @@
-texinode(Zftp Function System)()(Completion System)(Top)
+texinode(Zftp Function System)(User Contributions)(Zsh Modules)(Top)
 chapter(Zftp Function System)
 cindex(zftp function system)
 cindex(FTP, functions for using shell as client)
@@ -173,7 +173,8 @@ Produce a long directory listing.  The arguments var(dir-options) and
 var(dir) are passed directly to the server and their effect is
 implementation dependent, but specifying a particular remote directory
 var(dir) is usually possible.  The output is passed through a pager
-given by the environment variable tt($PAGER) or defaulting to `tt(more)'.
+given by the environment variable tt($PAGER), or `tt(more)' if that is not
+set.
 
 The directory is usually cached for re-use.  In fact, two caches are
 maintained.  One is for use when there is no var(dir-options) or var(dir),
@@ -279,7 +280,7 @@ file, but only the basename is used for the remote file name.
 With the option tt(-r), if any of the var(files) are directories they are
 sent recursively with all their subdirectories, including files beginning
 with `tt(.)'.  This requires that the remote machine understand UNIX file
-semantics. as `tt(/)' is used as a directory separator.
+semantics, since `tt(/)' is used as a directory separator.
 )
 findex(zfuput)
 item(tt(zfuput [ -vs ] var(file1) ...))(
@@ -357,8 +358,8 @@ findex(zftransfer)
 item(tt(zftransfer) var(sess1)tt(:)var(file1) var(sess2)tt(:)var(file2))(
 Transfer files between two sessions; no local copy is made.  The file
 is read from the session var(sess1) as var(file1) and written to session
-var(sess1) as file var(file2); var(file1) and var(file2) may be relative to
-the current directories of the sesssion.  Either var(sess1) or var(sess2)
+var(sess2) as file var(file2); var(file1) and var(file2) may be relative to
+the current directories of the session.  Either var(sess1) or var(sess2)
 may be omitted (though the colon should be retained if there is a
 possibility of a colon appearing in the file name) and defaults to the
 current session; var(file2) may be omitted or may end with a slash, in
@@ -366,8 +367,8 @@ which case the basename of var(file1) will be added.  The sessions
 var(sess1) and var(sess2) must be distinct.
 
 The operation is performed using pipes, so it is required that the
-connections still be valid in a subshell, which is not the case under some
-operating systems.
+connections still be valid in a subshell, which is not the case under 
+versions of some operating systems, presumably due to a system bug.
 )
 enditem()
 
@@ -376,7 +377,7 @@ The two functions tt(zfmark) and tt(zfgoto) allow you to `bookmark' the
 present location (host, user and directory) of the current FTP connection
 for later use.  The file to be used for storing and retrieving bookmarks is
 given by the parameter tt($ZFTP_BMFILE); if not set when one of the two
-functions is called, it will be set to the file tt(.zfbfmarks) in the
+functions is called, it will be set to the file tt(.zfbkmarks) in the
 directory where your zsh startup files live (usually tt(~)).
 
 startitem()
@@ -385,7 +386,7 @@ item(tt(zfmark [ )var(bookmark)tt( ]))(
 If given an argument, mark the current host, user and directory under the
 name var(bookmark) for later use by tt(zfgoto).  If there is no connection
 open, use the values for the last connection immediately before it was
-closed; it is an error if there is none.  Any existing bookmark
+closed; it is an error if there was none.  Any existing bookmark
 under the same name will be silently replaced.
 
 If not given an argument, list the existing bookmarks and the points to
@@ -471,7 +472,7 @@ findex(zftp_chpwd, supplied version)
 item(tt(zftp_chpwd))(
 This function is called every time a connection is opened, or closed, or
 the remote directory changes.  This version alters the title bar of an
-tt(xterm) compatible or tt(sun-cmd) terminal emulator to reflect the 
+tt(xterm)-compatible or tt(sun-cmd) terminal emulator to reflect the 
 local and remote hostnames and current directories.  It works best when
 combined with the function tt(chpwd).  In particular, a function of 
 the form
@@ -493,7 +494,7 @@ unless the output is going to a terminal; however, if you transfer files in
 the background, you should turn off progress reports by hand using
 `tt(zstyle ':zftp:*' progress none)'.  Note also that if you alter it, any
 output em(must) be to standard error, as standard output may be a file
-being received.  The form of the progess meter, or whether it is used at
+being received.  The form of the progress meter, or whether it is used at
 all, can be configured without altering the function, as described in the
 next section.
 )
@@ -517,22 +518,23 @@ described in
 ifzman(zmanref(zshmodules))\
 ifnzman(noderef(The zsh/zutil Module)). Briefly, the
 command `tt(zstyle ':zftp:*') var(style) var(value) ...'.
-defines the var(style) to have value var(value) (more than one may be
-given, although that is not useful in the cases described here).  These
+defines the var(style) to have value var(value); more than one value may be
+given, although that is not useful in the cases described here.  These
 values will then be used throughout the zftp function system.  For more
 precise control, the first argument, which gives a context in which the
 style applies, can be modified to include a particular function, as for
-example `tt(:zftp:zfget:)': the style will then have the given value only
+example `tt(:zftp:zfget)': the style will then have the given value only
 in the tt(zfget) function.  Values for the same style in different contexts
 may be set; the most specific function will be used, where
 strings are held to be more specific than patterns, and longer patterns and
 shorter patterns.  Note that only the top level function name, as called by
 the user, is used; calling of lower level functions is transparent to the
 user.  Hence modifications to the title bar in tt(zftp_chpwd) use the
-contexts tt(:zftp:zfopen:), tt(:zftp:zfcd:), etc., depending where it was
+contexts tt(:zftp:zfopen), tt(:zftp:zfcd), etc., depending where it was
 called from.  The following styles are understood:
 
 startitem()
+kindex(progress, zftp style)
 item(tt(progress))(
 Controls the way that tt(zftp_progress) reports on the progress of a
 transfer.  If empty, unset, or `tt(none)', no progress report is made; if
@@ -547,6 +549,7 @@ bytes transferred so far.
 When tt(zfinit) is run, if this style is not defined for the context
 tt(:zftp:*), it will be set to `bar'.
 )
+kindex(update, zftp style)
 item(tt(update))(
 Specifies the minimum time interval between updates of the progress meter
 in seconds.  No update is made unless new data has been received, so the
@@ -554,10 +557,12 @@ actual time interval is limited only by tt($ZFTP_TIMEOUT).
 
 As described for tt(progress), tt(zfinit) will force this to default to 1.
 )
+kindex(remote-glob, zftp style)
 item(tt(remote-glob))(
 If set to `1', `yes' or `true', filename generation (globbing) is
 performed on the remote machine instead of by zsh itself; see below.
 )
+kindex(titlebar, zftp style)
 item(tt(titlebar))(
 If set to `1', `yes' or `true', tt(zftp_chpwd) will put the remote host and
 remote directory into the titlebar of terminal emulators such as xterm or
@@ -565,6 +570,7 @@ sun-cmd that allow this.
 
 As described for tt(progress), tt(zfinit) will force this to default to 1.
 )
+kindex(chpwd, zftp style)
 item(tt(chpwd))(
 If set to `1' `yes' or `true', tt(zftp_chpwd) will call the function
 tt(chpwd) when a connection is closed.  This is useful if the remote host
@@ -652,6 +658,6 @@ subsect(Completion)
 Completion of local and remote files, directories, sessions and bookmarks
 is supported.  The older, tt(compctl)-style completion is defined when
 tt(zfinit) is called; support for the new widget-based completion system is
-provided in the function tt(Completion/Builtins/_zftp), which should be
+provided in the function tt(Completion/Zsh/Command/_zftp), which should be
 installed with the other functions of the completion system and hence
 should automatically be available.
