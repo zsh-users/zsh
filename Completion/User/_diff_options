@@ -58,17 +58,17 @@ if [[ -n "$_is_gnu[$cmd]" ]]; then
     '(-B)--ignore-blank-lines[ignore lines that are all blank]' \
     '(--ignore-blank-lines)-B[ignore lines that are all blank]' \
     '(-I)--ignore-matching-lines=[ignore lines that match regex]:line exclusion regex:' \
-    '(--ignore-matching-lines)-I[ignore lines that match regex]:line exclusion regex:' \
+    '(--ignore-matching-lines)-I+[ignore lines that match regex]:line exclusion regex:' \
     '(-a)--text[treat all files as text]' \
     '(--text)-a[treat all files as text]' \
     "($of $oss)--context=[context diff]::number of lines of copied context:" \
-    "($of $oss)-C[output a context diff]:number of lines of copied context:" \
+    "($of $oss)-C+[output a context diff]:number of lines of copied context:" \
     "($of $oss)-c[output a context diff]" \
     "($of $oss)--unified=[output a unified diff]::number of lines of unified context:" \
-    "($of $oss)-U[output a unified diff]:number of lines of unified context:" \
+    "($of $oss)-U+[output a unified diff]:number of lines of unified context:" \
     "($of $oss)-u[output a unified diff]" \
     "($ofwuc $oss -L)--label[set label to use instead of file name]:label:" \
-    "($ofwuc $oss --label)-L[set label to use instead of file name]:label:" \
+    "($ofwuc $oss --label)-L+[set label to use instead of file name]:label:" \
     "($ofwuc $oss -p)--show-c-function[show C function of each change]" \
     "($ofwuc $oss --show-c-function)-p[show C function of each change]" \
     "($ofwuc $oss -F)--show-function-line=[show the most recent line matching regex]:regex:" \
@@ -82,8 +82,8 @@ if [[ -n "$_is_gnu[$cmd]" ]]; then
     "($of $ouc $oss)-n[RCS format diff]" \
     "($of $ouc)--side-by-side[output in two columns]" \
     "($of $ouc)-y[output in two columns]" \
-    "($ofwy $ouc -W)--width[set size of line]:number of characters per line:" \
-    "($ofwy $ouc --width)-W[set size of line]:number of characters per line:" \
+    "($ofwy $ouc -W)--width=[set size of line]:number of characters per line:" \
+    "($ofwy $ouc --width)-W+[set size of line]:number of characters per line:" \
     "($ofwy $ouc)--left-column[output only left column of common lines]" \
     "($ofwy $ouc)--suppress-common-lines[do not output common lines]" \
     "($ofwg $ouc $oss)--old-group-format=[set old group format]:old group format:" \
@@ -109,11 +109,11 @@ if [[ -n "$_is_gnu[$cmd]" ]]; then
     '(-s)--report-identical-files[report when two files are the same]' \
     '(--report-identical-files)-s[report when two files are the same]' \
     '(-x)--exclude=[exclude files matching pattern]:exclusion pattern:' \
-    '(--exclude)-x[exclude files matching pattern]:exclusion pattern:' \
+    '(--exclude)-x+[exclude files matching pattern]:exclusion pattern:' \
     '(-X)--exclude-from=[exclude files matching pattern in file]:exclude file:_files' \
-    '(--exclude-from)-X[exclude files matching pattern in file]:exclude file:_files' \
+    '(--exclude-from)-X+[exclude files matching pattern in file]:exclude file:_files' \
     '(-S)--starting-file=[set first file in comparison]:start with file:_files' \
-    '(--starting-file)-S=[set first file in comparison]:start with file:_files' \
+    '(--starting-file)-S+[set first file in comparison]:start with file:_files' \
     '--horizon-lines=[set number of lines to keep in prefix and suffix]:number of horizon lines:' \
     '(-d)--mininal[try to find a smaller set of changes]' \
     '(--mininal)-d[try to find a smaller set of changes]' \

@@ -1,3 +1,7 @@
+2000-04-14  Sven Wischnowsky <wischnow@informatik.hu-berlin.de>
+
+	* 10760: Completion/User/_diff_options: just some missing `+'s
+
 2000-04-14  Peter Stephenson  <pws@cambridgesiliconradio.com>
 
 	* 10756: Doc/Zsh/expn.yo, Src/glob.c, Src/pattern.c, Src/zsh.h:
