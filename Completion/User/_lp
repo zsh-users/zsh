@@ -15,7 +15,7 @@ if (( ! $+_lp_cache )); then
 fi
 
 if compset -P -P || [[ "$words[CURRENT-1]" = -P ]]; then
-  _wanted printers expl printer && compadd "$expl" - "$_lp_cache[@]"
+  _wanted printers expl printer && compadd "$expl[@]" - "$_lp_cache[@]"
 else
   if [[ "$words[1]" = (lpq|lprm) ]]; then
     if [[ "$words" = *-P* ]]; then
