@@ -38,7 +38,7 @@ expandVars() {
 		;;
 	    esac
 	else
-	    print $ret
+	    print -- $ret
 	    return
 	fi
     done

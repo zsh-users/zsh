@@ -1,3 +1,8 @@
+2004-11-02  Clint Adams  <clint@zsh.org>
+
+	* 20539: Completion/Unix/Command/_make: avoid problems
+	minus signs in expandVars().
+
 2004-10-29  Peter Stephenson  <pws@csr.com>
 
 	* 20528: Src/exec.c: Clint spotted that fix in 18492 to make
