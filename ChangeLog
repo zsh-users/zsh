@@ -1,6 +1,6 @@
 2000-06-13  Clint Adams  <schizo@debian.org>
 
-	* ?????: Completion/Debian/_dpkg: more intelligence in
+	* 11882: Completion/Debian/_dpkg: more intelligence in
 	dpkg completion.
 
 2000-06-13  Sven Wischnowsky  <wischnow@zsh.org>
