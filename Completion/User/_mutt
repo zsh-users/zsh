@@ -10,7 +10,7 @@ local state line muttrc="~/.muttrc" ret=1
  '-e:post-init configuration:' \
  '-f+:mailbox:_mailboxes' \
  '-F+:init file:_files' \
- '-h+:help' \
+ '-h+:help:' \
  '-H+:draft file:_files' \
  '-i:include file:_files' \
  '-m+:default mailbox type:(mbox MMDF MH Maildir)' \

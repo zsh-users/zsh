@@ -839,7 +839,10 @@ in an expansion like `tt($expl[@])').
 
 In places where no sensible matches can be generated, the action
 should consist of only a space. This will make the var(message) be
-displayed but no possible completions listed.
+displayed but no possible completions listed. Note that even in this
+case the colon at the end of the var(message) is needed. The only case 
+where it can be left is when neither a var(message), nor a var(action) 
+is given.
 
 To include a colon in the var(message) or the var(action), it has to
 be preceded by a backslash.
