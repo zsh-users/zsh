@@ -1,3 +1,8 @@
+2000-08-15  Peter Stephenson  <pws@csr.com>
+
+	* 12650: Completion/Builtins/_zmodload: don't lists aliases if
+	there aren't any.
+
 2000-08-15  Bart Schaefer  <schaefer@zsh.org>
 
 	* 12652: Src/module.c: Fix variable scoping problem that caused

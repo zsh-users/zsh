@@ -11,8 +11,11 @@ else
   while _tags; do
     _requested files expl 'module file' \
       _files -W module_path -/g '*.(dll|s[ol])(:r)' && ret=0
-    _requested aliases expl 'module alias' \
-      compadd -- ${${(f)"$(zmodload -A)"}%% *} && ret=0
+    if _requested aliases expl 'module alias'; then
+      local array
+      array=(${${(f)"$(zmodload -A)"}%% *})
+      (( $#array )) && compadd "${expl[@]}" -- $array && ret=0
+    fi
     (( ret )) || break
   done
 fi
