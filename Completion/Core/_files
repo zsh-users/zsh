@@ -8,6 +8,7 @@ group=()
 gopts=()
 dopts=(-/)
 aopts=(-f)
+ign=()
 while getopts "P:S:qr:R:W:F:J:V:X:f/g:M:12n" opt; do
   case "$opt" in
   /)      type="${type}dir"                               ;;
