@@ -1,7 +1,7 @@
 2001-06-21  Bart Schaefer  <schaefer@zsh.org>
 
-	* 15023: Src/parse.c: Accept newlines before the "in" keyword in
-	"for" and "select", per POSIX.
+	* 15023, 15027: Src/parse.c: Accept newlines before the "in"
+	keyword in "for" and "select", per POSIX.
 
 	* 15020: Completion/Zsh/Command/_cd, Completion/Zsh/Context/_autocd,
 	Completion/Zsh/Type/_command_names: When AUTO_CD is set, complete
