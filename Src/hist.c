@@ -2099,6 +2099,10 @@ bufferwords(LinkList list, char *buf, int *index)
     strinbeg(0);
     noaliases = 1;
     do {
+	if (incond)
+	    incond = 1 + (tok != DINBRACK && tok != INPAR &&
+			  tok != DBAR && tok != DAMPER &&
+			  tok != BANG);
 	ctxtlex();
 	if (tok == ENDINPUT || tok == LEXERR)
 	    break;

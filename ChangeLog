@@ -5,6 +5,9 @@
 	escapes count from the other end of the appropriate string.
 
 2000-07-13  Sven Wischnowsky  <wischnow@zsh.org>
+	
+	* 12243: Src/hist.c: try to get (z) parameter flag parsing for
+ 	conditions right
 
 	* 12241: Completion/Core/_main_complete, Src/Zle/computil.c: fix
  	for _arguments with single-letter options: recognize
