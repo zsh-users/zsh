@@ -1,3 +1,7 @@
+2002-08-01  Peter Stephenson  <pws@csr.com>
+
+	* 17497: Src/builtin.c: getopts skipped over zero-length arguments.
+
 2002-07-25  Peter Stephenson  <pws@csr.com>
 
 	* 17481: Etc/MACHINES: from Karl Tomlinson
