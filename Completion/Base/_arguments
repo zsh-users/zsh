@@ -57,6 +57,8 @@ if [[ "$*" != "$_args_cache_descr" ]]; then
       # We have to build the long-option cache anew, get the `-i' and
       # `-s' options.
 
+      set -- "${(@)argv[nth+1,-1]}"
+
       iopts=()
       sopts=()
       while [[ "$1" = -[is]* ]]; do
@@ -105,7 +107,7 @@ if [[ "$*" != "$_args_cache_descr" ]]; then
       # ... and add "same" options
 
       while (( $#sopts )); do
-        lopts=( $lopts ${opts/$sopts[1]/$sopts[2]} )
+        lopts=( $lopts ${lopts/$sopts[1]/$sopts[2]} )
         shift 2 sopts
       done
 
