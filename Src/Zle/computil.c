@@ -941,13 +941,17 @@ ca_get_opt(Cadef d, char *line, int full, char **end)
 {
     Caopt p;
 
-    if (full) {
-	/* The full string has to be an option. */
+    /* The full string may be an option. */
 
-	for (p = d->opts; p; p = p->next)
-	    if (p->active && !strcmp(p->name, line))
-		return p;
-    } else {
+    for (p = d->opts; p; p = p->next)
+	if (p->active && !strcmp(p->name, line)) {
+	    if (end)
+		*end = line + strlen(line);
+
+	    return p;
+	}
+
+    if (!full) {
 	/* The string from the line probably only begins with an option. */
 	for (p = d->opts; p; p = p->next)
 	    if (p->active && ((!p->args || p->type == CAO_NEXT) ?
@@ -1160,7 +1164,7 @@ ca_parse_line(Cadef d)
 	    } LASTALLOC;
 	    ca_inactive(d, state.curopt->xor);
 
-	    /* Collect the argument strings. MAybe. */
+	    /* Collect the argument strings. Maybe. */
 
 	    if (state.def &&
 		(state.curopt->type == CAO_DIRECT ||
@@ -1431,7 +1435,7 @@ bin_comparguments(char *nam, char **args, char *ops, int func)
 	    return 1;
 	}
     case 'O':
-	if (ca_laststate.opt) {
+	if (ca_laststate.opt || (ca_laststate.doff && ca_laststate.def)) {
 	    LinkList next = newlinklist();
 	    LinkList direct = newlinklist();
 	    LinkList odirect = newlinklist();
@@ -1484,7 +1488,8 @@ bin_comparguments(char *nam, char **args, char *ops, int func)
 	    return 1;
 	}
     case 's':
-	if (ca_laststate.d->single && ca_laststate.singles) {
+	if (ca_laststate.d->single && ca_laststate.singles &&
+	    ca_laststate.opt) {
 	    setsparam(args[1],
 		      ztrdup(ca_laststate.ddef ?
 			     (ca_laststate.ddef->type == CAO_DIRECT ?

@@ -165,8 +165,9 @@ _style -s options auto-description autod
 
 if comparguments -i "$autod" "$@"; then
   local nm="$compstate[nmatches]" action noargs aret expl local
-  local next direct odirect equal single match matched ws tmp1 tmp2
+  local next direct odirect equal single match matched ws tmp1 tmp2 tmp3
   local opts subc prefix suffix
+  local origpre="$PREFIX" origipre="$IPREFIX"
 
   if comparguments -D descr action; then
     comparguments -C subc
@@ -254,11 +255,17 @@ if comparguments -i "$autod" "$@"; then
           fi
         fi
       fi
+
       if [[ -z "$matched" ]] && _requested options &&
           { ! _style options prefix-needed ||
-            [[ "$PREFIX" = [-+]* ]] } ; then
-        comparguments -M match
+            [[ "$origpre" = [-+]* ]] } ; then
+	local prevpre="$PREFIX" previpre="$IPREFIX"
 
+	PREFIX="$origpre"
+	IPREFIX="$origipre"
+
+        comparguments -M match
+	
         if comparguments -s single; then
 
           _description expl option
@@ -271,11 +278,13 @@ if comparguments -i "$autod" "$@"; then
 	    compadd "$expl[@]" -QqS= - "${PREFIX}${SUFFIX}"
           else
 	    tmp1=( "$next[@]" "$direct[@]" "$odirect[@]" "$equal[@]" )
+	    tmp3=( "${(M@)tmp1:#[-+]?[^:]*}" )
 	    tmp1=( "${(M@)tmp1:#[-+]?(|:*)}" )
 	    tmp2=( "${PREFIX}${(@M)^${(@)${(@)tmp1%%:*}#[-+]}:#?}" )
 
             _describe -o option \
-                      tmp1 tmp2 -Q -S ''
+                      tmp1 tmp2 -Q -S '' -- \
+		      tmp3 -Q
           fi
           single=yes
         else
@@ -285,10 +294,15 @@ if comparguments -i "$autod" "$@"; then
             direct -QS '' -M "$match" -- \
             equal -QqS= -M "$match"
         fi
+	PREFIX="$prevpre"
+	IPREFIX="$previpre"
       fi
     done
     if [[ -n "$opts" && -z "$aret$matched" &&
           nm -eq compstate[nmatches] ]]; then
+
+      PREFIX="$origpre"
+      IPREFIX="$origipre"
 
       prefix="${PREFIX#*\=}"
       suffix="$SUFFIX"
