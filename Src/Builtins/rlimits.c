@@ -44,12 +44,6 @@ enum {
 
 # include "rlimits.h"
 
-/* If RLIMIT_VMEM and RLIMIT_RSS are defined and equal, drop support *
- * for RLIMIT_RSS.  Observed on QNX Neutrino 6.1.0.                 */
-#if defined(RLIMIT_RSS) && defined(RLIMIT_VMEM) && (RLIMIT_RSS == RLIMIT_VMEM)
-#undef RLIMIT_RSS
-#endif
-
 # if defined(RLIM_T_IS_QUAD_T) || defined(RLIM_T_IS_LONG_LONG) || defined(RLIM_T_IS_UNSIGNED)
 static rlim_t
 zstrtorlimt(const char *s, char **t, int base)
@@ -174,7 +168,9 @@ printulimit(int lim, int hard, int head)
 	if (limit != RLIM_INFINITY)
 	    limit /= 512;
 	break;
-# ifdef RLIMIT_RSS
+/* If RLIMIT_VMEM and RLIMIT_RSS are defined and equal, avoid *
+ * duplicate case statement.  Observed on QNX Neutrino 6.1.0. */
+# if defined(RLIMIT_RSS) && (!defined(RLIMIT_VMEM) || RLIMIT_VMEM != RLIMIT_RSS)
     case RLIMIT_RSS:
 	if (head)
 	    printf("resident set size (kbytes) ");
@@ -205,7 +201,11 @@ printulimit(int lim, int hard, int head)
 # ifdef RLIMIT_VMEM
     case RLIMIT_VMEM:
 	if (head)
+#  if defined(RLIMIT_RSS) && RLIMIT_VMEM == RLIMIT_RSS
+	    printf("memory size (kb)           ");
+#  else
 	    printf("virtual memory size (kb)   ");
+#  endif
 	if (limit != RLIM_INFINITY)
 	    limit /= 1024;
 	break;

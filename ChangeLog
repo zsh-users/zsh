@@ -1,3 +1,8 @@
+2001-10-25  Peter Stephenson  <pws@csr.com>
+
+	* 16145: Src/Builtins/rlimits.c: try to handle both RLIMITS_VMEM
+	and RLIMITS_RSS, even if they are the same value (c.f. 16033).
+
 2001-10-24  Peter Stephenson  <pws@csr.com>
 
 	* unposted: Config/version.mk: create 4.0.3.
