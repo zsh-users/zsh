@@ -1,0 +1,14 @@
+#autoload
+
+local expl list names disp
+
+list=( $(lsvg -l $(lsvg)|sed  -e '2d'|awk '/[^:]* / {if ( $7 != "N/A" ) print $1 ":" $7; else print $1}' ) )
+names=(${list%%:*})
+if zstyle -T ":completion:${curcontext}" verbose; then
+  zformat -a list ' -- ' $list
+  disp=(-d list)
+else
+  disp=()
+fi
+_wanted logicalvolumes expl 'logical volumes' \
+    compadd "$disp[@]" "$@" - "$names[@]"
