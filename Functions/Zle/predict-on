@@ -61,7 +61,7 @@ insert-and-predict () {
 	  # get out of that `case'.
 	  repeat 1
 	  do
-	    _style -s '' cursor crs
+	    zstyle -s ":completion${curcontext}" cursor crs
 	    case $crs in
 	    (complete)
 	      # At the place where the completion left it, if it is after
@@ -119,7 +119,7 @@ predict-limit-list() {
   then
     compstate[list]=''
     compstate[force_list]=yes
-  elif _style '' list always ]]
+  elif zstyle ":completion${curcontext}:predict" list always ]]
   then
     compstate[force_list]=yes
   fi
