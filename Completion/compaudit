@@ -102,11 +102,11 @@ done <<(getent group)
 #   (including zwc files)
 
 if [[ $GROUP == $LOGNAME && ( -z $GROUPMEM || $GROUPMEM == $LOGNAME ) ]]; then
-  _i_wdirs=( ${^fpath}(Nf:g+w:^g:${GROUP}:,f:o+w:,^u0u${EUID})
-             ${^fpath}/..(Nf:g+w:^g:${GROUP}:,f:o+w:,^u0u${EUID}) )
+  _i_wdirs=( ${^fpath}(N-f:g+w:^g:${GROUP}:,-f:o+w:,-^u0u${EUID})
+             ${^fpath:h}(N-f:g+w:^g:${GROUP}:,-f:o+w:,-^u0u${EUID}) )
 else
-  _i_wdirs=( ${^fpath}(Nf:g+w:,f:o+w:,^u0u${EUID})
-             ${^fpath}/..(Nf:g+w:,f:o+w:,^u0u${EUID}) )
+  _i_wdirs=( ${^fpath}(N-f:g+w:,-f:o+w:,-^u0u${EUID})
+             ${^fpath:h}(N-f:g+w:,-f:o+w:,-^u0u${EUID}) )
 fi
 
 if [[ -f /etc/debian_version ]]
@@ -115,8 +115,8 @@ _i_ulwdirs=( ${(M)_i_wdirs:#/usr/local/*} )
 _i_wdirs=( ${_i_wdirs:#/usr/local/*} ${^_i_ulwdir}(Nf:g+ws:^g:staff:,f:o+w:,^u0) )
 fi
 
-_i_wdirs=( $_i_wdirs ${^fpath}.zwc^([^_]*|*~)(N^u0u${EUID}) )
-_i_wfiles=( ${^fpath}/^([^_]*|*~)(N^u0u${EUID}) )
+_i_wdirs=( $_i_wdirs ${^fpath}.zwc^([^_]*|*~)(N-^u0u${EUID}) )
+_i_wfiles=( ${^fpath}/^([^_]*|*~)(N-^u0u${EUID}) )
 
 case "${#_i_wdirs}:${#_i_wfiles}" in
 (0:0) _i_q= ;;
