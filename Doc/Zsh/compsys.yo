@@ -571,9 +571,6 @@ for process identifiers
 item(tt(ps))(
 used to look up the tt(arguments) and tt(list-arguments) styles
 )
-item(tt(regex))(
-used to look up tt(cache-path) style
-)
 item(tt(sequences))(
 for sequences (e.g. tt(mh) sequences)
 )
@@ -650,13 +647,6 @@ one argument. The sequence `tt(%d)' in the value will be replaced by
 the description for this argument. Depending on personal preferences,
 it may be useful to set this style to something like `tt(specify: %d)'. 
 Note that this may not work for some commands.
-)
-item(tt(cache-path))(
-The tt(_regex_arguments) utility function used by some completion
-functions creates shell functions on the fly. If this style is set to
-a non-empty string, the value is taken as the name of a directory
-where to store these functions so that they don't have to be created
-anew when the completion function is used in another shell.
 )
 item(tt(completer))(
 The strings given as the value of this style give the names of the

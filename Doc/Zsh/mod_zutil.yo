@@ -108,4 +108,7 @@ trailing colon removed. In both cases the lengths of the strings
 are not used to determine how the other strings have to be aligned.
 The resulting strings are stored in the var(array).
 )
+item(tt(zregexparse))(
+This implements the internals of the `tt(_regex_arguments)'.
+)
 enditem()

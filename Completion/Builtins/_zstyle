@@ -11,7 +11,6 @@ styles=(
   accept-exact		 c:bool
   arguments		 c:
   auto-description	 c:
-  cache-path		 'c:_path_files -/'
   completer		 c:completer
   completions		 c:
   condition		 c:
