@@ -929,13 +929,26 @@ scripts.
 )
 pindex(ERR_RETURN)
 cindex(function return, on error)
-cidnex(return from function, on error)
+cindex(return from function, on error)
 item(tt(ERR_RETURN))(
 If a command has a non-zero exit status, return immediately from the
 enclosing function.  The logic is identical to that for tt(ERR_EXIT),
 except that an implicit tt(return) statement is executed instead of an
 tt(exit).  This will trigger an exit at the outermost level of a
 non-interactive script.
+)
+pindex(EVAL_LINENO)
+cindex(line number, in evaluated expression)
+item(tt(EVAL_LINENO) <Z>)(
+If set, line numbers of expressions evaluated using the builtin tt(eval)
+are tracked separately of the enclosing environment.  This applies both
+to the parameter tt(LINENO) and the line number output by the prompt
+escape tt(%i).  If the option is set, the prompt escape tt(%N) will output
+the string `tt((eval))' instead of the script or function name as an
+indication.   (The two prompt escapes are typically used in the parameter
+tt(PS4) to be output when the option tt(XTRACE) is set.)  If
+tt(EVAL_LINENO) is unset, the line number of the surrounding script or
+function is retained during the evaluation.
 )
 pindex(EXEC)
 cindex(command execution, enabling)

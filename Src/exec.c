@@ -788,7 +788,7 @@ execsimple(Estate state)
 	return (lastval = 1);
 
     /* In evaluated traps, don't modify the line number. */
-    if ((!intrap || trapisfunc) && code)
+    if ((!intrap || trapisfunc) && !ineval && code)
 	lineno = code - 1;
 
     code = wc_code(*state->pc++);
@@ -1260,7 +1260,7 @@ execpline2(Estate state, wordcode pcode,
 	return;
 
     /* In evaluated traps, don't modify the line number. */
-    if ((!intrap || trapisfunc) && WC_PIPE_LINENO(pcode))
+    if ((!intrap || trapisfunc) && !ineval && WC_PIPE_LINENO(pcode))
 	lineno = WC_PIPE_LINENO(pcode) - 1;
 
     if (pline_level == 1) {

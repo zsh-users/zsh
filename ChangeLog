@@ -1,3 +1,11 @@
+2004-09-03  Peter Stephenson  <pws@csr.com>
+
+	* 20308: Doc/Zsh/options.yo, Src/builtin.c, Src/exec.c,
+	Src/options.c, Src/zsh.h: add option EVAL_LINENO <Z> which
+	issues separate line numbers inside eval's, as at present.
+	Without it, the line from the surrounding environment is
+	reported.
+
 2004-09-02  Peter Stephenson  <pws@csr.com>
 
 	* 20303: Src/Zle/zle_thingy.c, Doc/Zsh/zle.yo: Make test for

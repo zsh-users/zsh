@@ -4220,27 +4220,42 @@ bin_emulate(UNUSED(char *nam), char **argv, Options ops, UNUSED(int func))
 /* eval: simple evaluation */
 
 /**/
+int ineval;
+
+/**/
 int
 bin_eval(UNUSED(char *nam), char **argv, UNUSED(Options ops), UNUSED(int func))
 {
     Eprog prog;
     char *oscriptname = scriptname;
-
-    scriptname = "(eval)";
+    int oineval = ineval;
+    /*
+     * If EVALLINENO is not set, we use the line number of the
+     * environment and must flag this up to exec.c.  Otherwise,
+     * we use a special script name to indicate the special line number.
+     */
+    ineval = !isset(EVALLINENO);
 
     prog = parse_string(zjoin(argv, ' ', 1));
     if (!prog) {
 	errflag = 0;
 	return 1;
     }
+
     lastval = 0;
+    if (!ineval)
+	scriptname = "(eval)";
+
     execode(prog, 1, 0);
+
     if (errflag) {
 	lastval = errflag;
 	errflag = 0;
     }
 
-    scriptname = oscriptname;
+    if (!ineval)
+	scriptname = oscriptname;
+    ineval = oineval;
 
     return lastval;
 }

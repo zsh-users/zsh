@@ -115,6 +115,7 @@ static struct optname optns[] = {
 {NULL, "exec",		      OPT_ALL,			 EXECOPT},
 {NULL, "extendedglob",	      OPT_EMULATE,		 EXTENDEDGLOB},
 {NULL, "extendedhistory",     OPT_CSH,			 EXTENDEDHISTORY},
+{NULL, "evallineno",	      OPT_EMULATE|OPT_ZSH,	 EVALLINENO},
 {NULL, "flowcontrol",	      OPT_ALL,			 FLOWCONTROL},
 {NULL, "functionargzero",     OPT_EMULATE|OPT_NONBOURNE, FUNCTIONARGZERO},
 {NULL, "glob",		      OPT_EMULATE|OPT_ALL,	 GLOBOPT},
