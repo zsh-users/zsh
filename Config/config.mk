@@ -25,7 +25,7 @@
 #
 
 config: Makefile
-	@subdir='$(SUBDIRS)'; for subdir in $$subdirs; do \
+	@subdirs='$(SUBDIRS)'; for subdir in $$subdirs; do \
 	  (cd $$subdir && $(MAKE) $(MAKEDEFS) $@) || exit 1; \
 	done
 
@@ -36,3 +36,7 @@ $(dir_top)/Config/defs.mk $(dir_top)/Config/version.mk
 Makefile: Makefile.in $(dir_top)/config.status $(CONFIG_INCS)
 	cd $(dir_top) && \
 	  CONFIG_FILES=$(subdir)/$@ CONFIG_HEADERS= ./config.status
+
+$(dir_top)/Config/defs.mk: $(sdir_top)/Config/defs.mk.in $(dir_top)/config.status
+	cd $(dir_top) && \
+	  CONFIG_FILES=Config/defs.mk CONFIG_HEADERS= ./config.status
