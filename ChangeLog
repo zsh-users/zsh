@@ -1,3 +1,8 @@
+2000-04-11  Peter Stephenson  <pws@pwstephenson.fsnet.co.uk>
+
+	* 10669: Completion/Core/compinstall:  will now ask for
+	alternative files both for input and output.
+
 2000-04-11  Bart Schaefer  <schaefer@zsh.org>
 
 	* 10657: One change missed in 10635.

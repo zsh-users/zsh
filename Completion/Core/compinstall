@@ -24,7 +24,7 @@ __ci_newline() {
 
 typeset startline='# The following lines were added by compinstall'
 typeset endline='# End of lines added by compinstall'
-typeset ifile=${ZDOTDIR:-~}/.zshrc line fpath_line
+typeset ifile line fpath_line
 typeset -A styles
 typeset match mbegin mend matchers warn_unknown warn_old warn_comment
 integer lines_found
@@ -42,7 +42,38 @@ matchers=()
 # day I may even do that.
 #
 
-if [[ -f $ifile ]]; then
+__ci_test_ifile() {
+  [[ -f $1 ]] && grep "$endline" $1 >/dev/null 2>&1
+}
+
+local foundold=false
+ifile=${ZDOTDIR:-~}/.zshrc
+if __ci_test_ifile ${ZDOTDIR:-~}/.compinstall; then
+  ifile=${ZDOTDIR:-~}/.compinstall
+  foundold=true
+elif __ci_test_ifile $ifile; then
+  foundold=true
+fi
+
+local newifile=$ifile
+if [[ $foundold = true ]]; then
+  print "I have found completion definitions in $ifile.
+If you want me to read these, just hit return.  Otherwise, edit the file
+name to look for definitions somewhere else, or delete the whole line
+in order not to use existing definitions."
+  vared -ch -p 'file> ' newifile
+  [[ -z $newifile ]] && foundold=false
+else
+  print "I haven't found any existing completion definitions.
+If you have some already defined by compinstall, edit the name of the
+file where these can be found.  Note that this will only work if they
+are exactly the form in which compinstall inserted them.  If you leave
+the line as it is, or empty, I won't search."
+  vared -ch -p 'file> ' newifile
+  [[ -z $newifile || $ifile = $newifile ]] && foundold=false
+fi
+
+if [[ $foundold = true ]]; then
   sed -n "/^[   ]*$startline/,/^[       ]*$endline/p" $ifile |
   # Use the default read behaviour to handle any continuation lines.
   while read line; do
@@ -63,6 +94,8 @@ $line"
 ${match[3]}"
     elif [[ $line = [[:blank:]]#compconf* ]]; then
       warn_old=1
+    elif [[ $line == $startline || $line == $endline ]]; then
+      # no-op
     elif [[ $line = [[:blank:]]#\#* ]]; then
       warn_comment=1
     elif [[ $line != [[:blank:]]# &&
@@ -109,6 +142,9 @@ that these lines are actually executed.  They will not be if your .zshrc
 usually returns before the end."
   fi
 fi
+print "Note that you will be given a chance to save the new setup
+somewhere else at the end."
+
 
 __ci_newline || return 1
 
@@ -1546,7 +1582,14 @@ compinit"
   print -r "$output
 $endline" } >$tmpout
 
-if read -q key"?Save new settings to $ifile? "; then
+if ! read -q key"?Save new settings to $ifile? "; then
+   print "Enter a different filename (~ will be expanded), or return to abort:"
+   ifile=
+   vared -ch -p 'file> ' ifile
+   ifile=${~ifile}
+fi
+
+if [[ -n $ifile ]]; then
   #
   # Now use sed to update the file.
   #
@@ -1556,8 +1599,10 @@ if read -q key"?Save new settings to $ifile? "; then
   else
     touch $ifile
   fi
-  if sed -e "/^[ 	]*$endline/r $tmpout
-/^[ 	]*$startline/,/^[ 	]*$endline/d" $ifile >${tmpout}2 &&
+  if { { grep "$endline" $ifile >/dev/null 2>&1 &&
+         sed -e "/^[ 	]*$endline/r $tmpout
+/^[ 	]*$startline/,/^[ 	]*$endline/d" $ifile >${tmpout}2 } || 
+        cat $tmpout >>${tmpout}2 } &&
   mv ${tmpout}2 $ifile; then
     print "\nSuccessfully added compinstall lines to $ifile."
     rm -f $tmpout
