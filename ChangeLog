@@ -1,5 +1,8 @@
 2005-01-13  Peter Stephenson  <pws@csr.com>
 
+	* unposted: README, Config/version.mk, Etc/FAQ.yo:
+	release 4.2.3.
+
 	* 20698: Test/ztst.zsh: improve 20692 by using tail function
 	to overcome POSIX problems.
 

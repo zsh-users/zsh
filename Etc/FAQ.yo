@@ -294,7 +294,7 @@ sect(On what machines will it run?)
 
 sect(What's the latest version?)
 
-  Zsh 4.2.2 is the latest production version.
+  Zsh 4.2.3 is the latest production version.
 
   There will not be any further 4.0 releases now that 4.2 has become
   the stable version.
