@@ -125,7 +125,7 @@ static struct builtin builtins[] =
     BUILTIN("which", 0, bin_whence, 0, -1, 0, "ampsw", "c"),
 
 #ifdef DYNAMIC
-    BUILTIN("zmodload", 0, bin_zmodload, 0, -1, 0, "ILabcdipue", NULL),
+    BUILTIN("zmodload", 0, bin_zmodload, 0, -1, 0, "ILabcfdipue", NULL),
 #else
     BUILTIN("zmodload", 0, bin_zmodload, 0, -1, 0, "e", NULL),
 #endif

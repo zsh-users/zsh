@@ -1259,8 +1259,8 @@ cindex(modules, loading)
 cindex(loading modules)
 xitem(tt(zmodload) [ tt(-dL) ] [ ... ])
 xitem(tt(zmodload -e) [ ... ])
-xitem(tt(zmodload) [ tt(-a) [ tt(-bcp) [ tt(-I) ] ] ] [ tt(-iL) ] ...)
-item(tt(zmodload) tt(-u) [ tt(-abcdp) [ tt(-I) ] ] [ tt(-iL) ] ...)(
+xitem(tt(zmodload) [ tt(-a) [ tt(-bcpf) [ tt(-I) ] ] ] [ tt(-iL) ] ...)
+item(tt(zmodload) tt(-u) [ tt(-abcdpf) [ tt(-I) ] ] [ tt(-iL) ] ...)(
 tt(zmodload) performs operations relating to zsh's loadable modules.
 This feature is not available on all operating systems,
 or on all installations on a particular operating system.
@@ -1348,6 +1348,12 @@ xitem(tt(zmodload) tt(-ap) [ tt(-i) ] var(name) [ var(parameter) ... ])
 item(tt(zmodload) tt(-up) [ tt(-i) ] var(parameter) ...)(
 The tt(-p) option is like the tt(-b) and tt(-c) options, but makes
 tt(zmodload) work on autoloaded parameters instead.
+)
+xitem(tt(zmodload) tt(-af) [ tt(-L) ])
+xitem(tt(zmodload) tt(-af) [ tt(-i) ] var(name) [ var(function) ... ])
+item(tt(zmodload) tt(-uf) [ tt(-i) ] var(function) ...)(
+The tt(-p) option is like the tt(-b), tt(-p), and tt(-c) options, but
+makes tt(zmodload) work on autoloaded math functions instead. 
 )
 xitem(tt(zmodload) tt(-a) [ tt(-L) ])
 xitem(tt(zmodload) tt(-a) [ tt(-i) ] var(name) [ var(builtin) ... ])

@@ -25,6 +25,7 @@
 #                   autoloading (without the leading `-')
 #   autoprefixconds like autoinfixconds, but for prefix condition codes
 #   autoparams      parameters defined by the module, for autoloading
+#   automathfuncs   math functions defined by the module, for autoloading
 #   objects         .o files making up this module (*must* be defined)
 #   proto           .pro files for this module (default generated from $objects)
 #   headers         extra headers for this module (default none)
@@ -171,7 +172,7 @@ if $first_stage; then
     for module in $here_modules; do
 
 	unset moddeps nozshdep alwayslink hasexport
-	unset autobins autoinfixconds autoprefixconds autoparams
+	unset autobins autoinfixconds autoprefixconds autoparams automathfuncs
 	unset objects proto headers hdrdeps otherincs
 	. $top_srcdir/$the_subdir/${module}.mdd
 	test -n "${moddeps+set}" || moddeps=

@@ -101,6 +101,47 @@ cond_i_ex(char **a, int id)
 }
 
 /**/
+static mnumber
+math_sum(char *name, int argc, mnumber *argv, int id)
+{
+    mnumber ret;
+    int f = 0;
+
+    ret.u.l = 0;
+    while (argc--) {
+	if (argv->type == MN_INTEGER) {
+	    if (f)
+		ret.u.d += (double) argv->u.l;
+	    else
+		ret.u.l += argv->u.l;
+	} else {
+	    if (f)
+		ret.u.d += argv->u.d;
+	    else {
+		ret.u.d = ((double) ret.u.l) + ((double) argv->u.d);
+		f = 1;
+	    }
+	}
+	argv++;
+    }
+    ret.type = (f ? MN_FLOAT : MN_INTEGER);
+
+    return ret;
+}
+
+/**/
+static mnumber
+math_length(char *name, char *arg, int id)
+{
+    mnumber ret;
+
+    ret.type = MN_INTEGER;
+    ret.u.l = strlen(arg);
+
+    return ret;
+}
+
+/**/
 static int
 ex_wrapper(List list, FuncWrap w, char *name)
 {
@@ -136,6 +177,11 @@ static struct paramdef patab[] = {
     ARRPARAMDEF("exarr", &arrparam),
 };
 
+static struct mathfunc mftab[] = {
+    NUMMATHFUNC("sum", math_sum, 1, -1, 0),
+    STRMATHFUNC("length", math_length, 0),
+};
+
 static struct funcwrap wrapper[] = {
     WRAPDEF(ex_wrapper),
 };
@@ -162,6 +208,7 @@ boot_example(Module m)
     return !(addbuiltins(m->nam, bintab, sizeof(bintab)/sizeof(*bintab)) |
 	     addconddefs(m->nam, cotab, sizeof(cotab)/sizeof(*cotab)) |
 	     addparamdefs(m->nam, patab, sizeof(patab)/sizeof(*patab)) |
+	     addmathfuncs(m->nam, mftab, sizeof(mftab)/sizeof(*mftab)) |
 	     !addwrapper(m, wrapper));
 }
 
@@ -174,6 +221,7 @@ cleanup_example(Module m)
     deletebuiltins(m->nam, bintab, sizeof(bintab)/sizeof(*bintab));
     deleteconddefs(m->nam, cotab, sizeof(cotab)/sizeof(*cotab));
     deleteparamdefs(m->nam, patab, sizeof(patab)/sizeof(*patab));
+    deletemathfuncs(m->nam, mftab, sizeof(mftab)/sizeof(*mftab));
     deletewrapper(m, wrapper);
     return 0;
 }

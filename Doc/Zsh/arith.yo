@@ -78,6 +78,14 @@ short-circuiting, and only one of the latter two expressions in a ternary
 operator is evaluated.  Note the precedence of the bitwise AND, OR,
 and XOR operators.
 
+cindex(math functions)
+cindex(functions, math)
+Mathematical functions can be called with the syntax
+`var(func)tt(LPAR())var(args)tt(RPAR())', where the function decides
+if the var(args) is used as a string or a comma-separated list of
+arithmetic expressions. The shell currently defines no mathematical
+functions, but modules may define some.
+
 An expression of the form `tt(#\)var(x)' where var(x) is any character
 sequence such as `tt(a)', `tt(^A)', or `tt(\M-\C-x)' gives the ascii
 value of this character and an expression of the form `tt(#)var(foo)'

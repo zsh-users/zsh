@@ -25,6 +25,7 @@ for x_mod in $x_mods; do
 	*)  echo "/* non-linked-in known module \`$x_mod' */"
 	    eval "loc=\$loc_$x_mod"
 	    unset moddeps autobins autoinfixconds autoprefixconds autoparams
+	    unset automathfuncs
 	    . $srcdir/../$loc/${x_mod}.mdd
 	    for bin in $autobins; do
 		echo "    add_autobin(\"$bin\", \"$x_mod\");"
@@ -37,6 +38,9 @@ for x_mod in $x_mods; do
 	    done
 	    for param in $autoparams; do
 		echo "    add_autoparam(\"$param\", \"$x_mod\");"
+	    done
+	    for mfunc in $automathfuncs; do
+		echo "    add_automath(\"$mfunc\", \"$x_mod\");"
 	    done
 	    for dep in $moddeps; do
 		case $bin_mods in

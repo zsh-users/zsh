@@ -696,8 +696,9 @@ autoloadscan(HashNode hn, int printflags)
 int
 bin_zmodload(char *nam, char **args, char *ops, int func)
 {
-    if ((ops['b'] || ops['c'] || ops['p']) && !(ops['a'] || ops['u'])) {
-	zwarnnam(nam, "-b, -c, and -p must be combined with -a or -u",
+    if ((ops['b'] || ops['c'] || ops['p'] || ops['f']) &&
+	!(ops['a'] || ops['u'])) {
+	zwarnnam(nam, "-b, -c, -f, and -p must be combined with -a or -u",
 		 NULL, 0);
 	return 1;
     }
@@ -718,10 +719,12 @@ bin_zmodload(char *nam, char **args, char *ops, int func)
 	return bin_zmodload_exist(nam, args, ops);
     else if (ops['d'])
 	return bin_zmodload_dep(nam, args, ops);
-    else if ((ops['a'] || ops['b']) && !(ops['c'] || ops['p']))
+    else if ((ops['a'] || ops['b']) && !(ops['c'] || ops['p'] || ops['f']))
 	return bin_zmodload_auto(nam, args, ops);
     else if (ops['c'] && !(ops['b'] || ops['p']))
 	return bin_zmodload_cond(nam, args, ops);
+    else if (ops['f'] && !(ops['b'] || ops['p']))
+	return bin_zmodload_math(nam, args, ops);
     else if (ops['p'] && !(ops['b'] || ops['c']))
 	return bin_zmodload_param(nam, args, ops);
     else if (!(ops['a'] || ops['b'] || ops['c'] || ops['p']))
@@ -935,9 +938,10 @@ bin_zmodload_cond(char *nam, char **args, char *ops)
 			putchar('I');
 		    printf(" %s %s\n", p->module, p->name);
 		} else {
-		    fputs("post ", stdout);
 		    if (p->flags & CONDF_INFIX)
 			fputs("infix ", stdout);
+		    else
+			fputs("post ", stdout);
 		    printf("%s (%s)\n",p->name, p->module);
 		}
 	    }
@@ -958,7 +962,68 @@ bin_zmodload_cond(char *nam, char **args, char *ops)
 		zwarnnam(nam, "%s: `/' is illegal in a condition", cnam, 0);
 		ret = 1;
 	    } else if (add_autocond(cnam, ops['I'], modnam) && !ops['i']) {
-		zwarnnam(nam, "failed to add condition %s", cnam, 0);
+		zwarnnam(nam, "failed to add condition `%s'", cnam, 0);
+		ret = 1;
+	    }
+	} while(*args);
+	return ret;
+    }
+}
+
+/**/
+static int
+bin_zmodload_math(char *nam, char **args, char *ops)
+{
+    int ret = 0;
+
+    if (ops['u']) {
+	/* remove autoloaded conditions */
+	for (; *args; args++) {
+	    MathFunc f = getmathfunc(*args, 0);
+
+	    if (!f) {
+		if (!ops['i']) {
+		    zwarnnam(nam, "%s: no such math function", *args, 0);
+		    ret = 1;
+		}
+	    } else if (f->flags & CONDF_ADDED) {
+		zwarnnam(nam, "%s: math function is already defined", *args, 0);
+		ret = 1;
+	    } else
+		deletemathfunc(f);
+	}
+	return ret;
+    } else if (!*args) {
+	/* list autoloaded math functions */
+	MathFunc p;
+
+	for (p = mathfuncs; p; p = p->next) {
+	    if (p->module) {
+		if (ops['L']) {
+		    fputs("zmodload -af", stdout);
+		    printf(" %s %s\n", p->module, p->name);
+		} else
+		    printf("%s (%s)\n",p->name, p->module);
+	    }
+	}
+	return 0;
+    } else {
+	/* add autoloaded conditions */
+	char *modnam;
+
+	modnam = *args++;
+	if(isset(RESTRICTED) && strchr(modnam, '/')) {
+	    zwarnnam(nam, "%s: restricted", modnam, 0);
+	    return 1;
+	}
+	do {
+	    char *fnam = *args ? *args++ : modnam;
+	    if (strchr(fnam, '/')) {
+		zwarnnam(nam, "%s: `/' is illegal in a math function",
+			 fnam, 0);
+		ret = 1;
+	    } else if (add_automathfunc(fnam, modnam) && !ops['i']) {
+		zwarnnam(nam, "failed to add math function `%s'", fnam, 0);
 		ret = 1;
 	    }
 	} while(*args);
@@ -1272,8 +1337,10 @@ addconddefs(char const *nam, Conddef c, int size)
     int hads = 0, hadf = 0;
 
     while (size--) {
-	if (c->flags & CONDF_ADDED)
+	if (c->flags & CONDF_ADDED) {
+	    c++;
 	    continue;
+	}
 	if (addconddef(c)) {
 	    zwarnnam(nam, "name clash when adding condition `%s'", c->name, 0);
 	    hadf = 1;
@@ -1534,7 +1601,7 @@ deleteparamdefs(char const *nam, Paramdef d, int size)
 int
 add_autocond(char *nam, int inf, char *module)
 {
-    Conddef c = zalloc(sizeof(*c));
+    Conddef c = (Conddef) zalloc(sizeof(*c));
 
     c->name = ztrdup(nam);
     c->flags = (inf  ? CONDF_INFIX : 0);
@@ -1587,8 +1654,10 @@ deleteconddefs(char const *nam, Conddef c, int size)
     int hads = 0, hadf = 0;
 
     while (size--) {
-	if (!(c->flags & CONDF_ADDED))
+	if (!(c->flags & CONDF_ADDED)) {
+	    c++;
 	    continue;
+	}
 	if (deleteconddef(c)) {
 	    zwarnnam(nam, "condition `%s' already deleted", c->name, 0);
 	    hadf = 1;
@@ -1618,3 +1687,152 @@ add_autoparam(char *nam, char *module)
 
 /**/
 #endif
+
+/* List of math functions. */
+
+/**/
+MathFunc mathfuncs;
+
+/**/
+MathFunc
+getmathfunc(char *name, int autol)
+{
+    MathFunc p, q = NULL;
+
+    for (p = mathfuncs; p; q = p, p = p->next)
+	if (!strcmp(name, p->name)) {
+#ifdef DYNAMIC
+	    if (autol && p->module) {
+		char *n = dupstring(p->module);
+
+		if (q)
+		    q->next = p->next;
+		else
+		    mathfuncs = p->next;
+
+		zsfree(p->module);
+		zfree(p, sizeof(*p));
+
+		load_module(n);
+
+		return getmathfunc(name, 0);
+	    }
+#endif
+	    return p;
+	}
+
+    return NULL;
+}
+
+/**/
+int
+addmathfunc(MathFunc f)
+{
+    MathFunc p;
+
+    if (f->flags & MFF_ADDED)
+	return 1;
+
+    for (p = mathfuncs; p; p = p->next)
+	if (!strcmp(f->name, p->name))
+	    return 1;
+
+    f->flags |= MFF_ADDED;
+    f->next = mathfuncs;
+    mathfuncs = f;
+
+    return 0;
+}
+
+/**/
+int
+addmathfuncs(char const *nam, MathFunc f, int size)
+{
+    int hads = 0, hadf = 0;
+
+    while (size--) {
+	if (f->flags & MFF_ADDED) {
+	    f++;
+	    continue;
+	}
+	if (addmathfunc(f)) {
+	    zwarnnam(nam, "name clash when adding math function `%s'",
+		     f->name, 0);
+	    hadf = 1;
+	} else
+	    hads = 2;
+	f++;
+    }
+    return hadf ? hads : 1;
+}
+
+#ifdef DYNAMIC
+
+/**/
+int
+add_automathfunc(char *nam, char *module)
+{
+    MathFunc f = (MathFunc) zalloc(sizeof(*f));
+
+    f->name = ztrdup(nam);
+    f->module = ztrdup(module);
+
+    if (addmathfunc(f)) {
+	zsfree(f->name);
+	zsfree(f->module);
+	zfree(f, sizeof(*f));
+
+	return 1;
+    }
+    return 0;
+}
+
+/**/
+int
+deletemathfunc(MathFunc f)
+{
+    MathFunc p, q;
+
+    for (p = mathfuncs, q = NULL; p && p != f; q = p, p = p->next);
+
+    if (p) {
+	if (q)
+	    q->next = f->next;
+	else
+	    mathfuncs = f->next;
+
+	if (f->module) {
+	    zsfree(f->name);
+	    zsfree(f->module);
+	    zfree(f, sizeof(*f));
+	} else
+	    f->flags &= ~MFF_ADDED;
+
+	return 0;
+    }
+    return -1;
+}
+
+/**/
+int
+deletemathfuncs(char const *nam, MathFunc f, int size)
+{
+    int hads = 0, hadf = 0;
+
+    while (size--) {
+	if (!(f->flags & MFF_ADDED)) {
+	    f++;
+	    continue;
+	}
+	if (deletemathfunc(f)) {
+	    zwarnnam(nam, "math function `%s' already deleted",
+		     f->name, 0);
+	    hadf = 1;
+	} else
+	    hads = 2;
+	f++;
+    }
+    return hadf ? hads : 1;
+}
+
+#endif /* DYNAMIC */

@@ -141,7 +141,8 @@ static int unary = 1;
 #define POWER 49
 #define CID 50
 #define POWEREQ 51
-#define TOKCOUNT 52
+#define FUNC 52
+#define TOKCOUNT 53
 
 /* precedences */
 
@@ -157,7 +158,7 @@ static int prec[TOKCOUNT] =
     15,  15, 15, 15,  15,
     15,  15, 15, 16, 200,
      2,   2,  0,  0,   7,
-     0,  15
+     0,  15, 0
 };
 
 #define TOPPREC 16
@@ -175,7 +176,7 @@ static int type[TOKCOUNT] =
 /* 35 */  RL|OP_E2IO, RL|OP_E2IO, RL|OP_E2IO, RL|OP_E2IO, RL|OP_E2IO,
 /* 40 */  BOOL|OP_E2IO, BOOL|OP_E2IO, RL|OP_A2IO, RL|OP_A2, RL|OP_OP,
 /* 45 */  RL, RL, LR|OP_OPF, LR|OP_OPF, RL|OP_A2,
-/* 50 */  LR|OP_OPF, RL|OP_E2
+/* 50 */  LR|OP_OPF, RL|OP_E2, LR|OP_OPF
 };
 
 #define LVCOUNT 32
@@ -392,6 +393,7 @@ zzlex(void)
 		cct = 1;
 	    }
 	    if (iident(*ptr)) {
+		int func = 0;
 		char *p, q;
 
 		p = ptr;
@@ -400,12 +402,14 @@ zzlex(void)
 		    return EOI;
 		}
 		while (iident(*++ptr));
-		if (*ptr == '[') {
+		if (*ptr == '[' || (!cct && *ptr == '(')) {
+		    char op = *ptr, cp = ((*ptr == '[') ? ']' : ')');
 		    int l;
+		    func = (op == '(');
 		    for (ptr++, l = 1; *ptr && l; ptr++) {
-			if (*ptr == '[')
+			if (*ptr == op)
 			    l++;
-			if (*ptr == ']')
+			if (*ptr == cp)
 			    l--;
 			if (*ptr == '\\' && ptr[1])
 			    ptr++;
@@ -415,7 +419,7 @@ zzlex(void)
 		*ptr = '\0';
 		lvals[yylval = lvc++] = ztrdup(p);
 		*ptr = q;
-		return cct ? CID : ID;
+		return (func ? FUNC : (cct ? CID : ID));
 	    }
 	    else if (cct) {
 		yyval.u.l = poundgetfn(NULL);
@@ -482,6 +486,64 @@ setvar(LV s, mnumber v)
     return v;
 }
 
+
+/**/
+static mnumber
+callmathfunc(char *o)
+{
+    MathFunc f;
+    char *a, *n;
+    static mnumber dummy;
+
+    n = a = dupstring(o);
+
+    while (*a != '(')
+	a++;
+    *a++ = '\0';
+    a[strlen(a) - 1] = '\0';
+
+    if ((f = getmathfunc(n, 1))) {
+	if (f->flags & MFF_STR)
+	    return f->sfunc(n, a, f->funcid);
+	else {
+	    int argc = 0;
+	    mnumber *argv, *q;
+	    LinkList l = newlinklist();
+	    LinkNode node;
+	    char *p;
+
+	    if (*a) {
+		for (p = a; *a; a++) {
+		    if (*a == '\\' && a[1])
+			a++;
+		    else if (*a == ',') {
+			*a = '\0';
+			addlinknode(l, p);
+			argc++;
+			p = a + 1;
+		    }
+		}
+		addlinknode(l, p);
+		argc++;
+	    }
+	    if (argc >= f->minargs && (f->maxargs < 0 || argc <= f->maxargs)) {
+		if (argc) {
+		    q = argv = (mnumber *) zhalloc(argc * sizeof(mnumber));
+		    for (node = firstnode(l); node; incnode(node))
+			*q++ = matheval((char *) getdata(node));
+		}
+		return f->nfunc(n, argc, argv, f->funcid);
+	    } else
+		zerr("wrong number of argument: %s", o, 0);
+	}
+    } else
+	zerr("unknown function: %s", n, 0);
+
+    dummy.type = MN_INTEGER;
+    dummy.u.l = 0;
+
+    return dummy;
+}
 
 /**/
 static int
@@ -956,6 +1018,9 @@ mathparse(int pc)
 	    break;
 	case CID:
 	    push(getcvar(yylval), yylval);
+	    break;
+	case FUNC:
+	    push(callmathfunc(lvals[yylval]), yylval);
 	    break;
 	case M_INPAR:
 	    mathparse(TOPPREC);

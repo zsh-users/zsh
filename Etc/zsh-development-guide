@@ -129,6 +129,7 @@ variables:
                     autoloading (without the leading `-')
   - autoprefixconds like autoinfixconds, but for prefix condition codes
   - autoparams      parameters defined by the module, for autoloading
+  - automathfuncs   math functions defined by the module, for autoloading
   - objects         .o files making up this module (*must* be defined)
   - proto           .pro files for this module (default generated from $objects)
   - headers         extra headers for this module (default none)
@@ -397,6 +398,90 @@ builtins and condition codes:
     deleteparamdefs(m->nam, patab, sizeof(patab)/sizeof(*patab));
     ...
   }
+
+Modules can also define math functions. Again, they are described
+using a table:
+
+  static struct mathfunc mftab[] = {
+    NUMMATHFUNC("sum", math_sum, 1, -1, 0),
+    STRMATHFUNC("length", math_length, 0),
+  };
+
+The `NUMMATHFUNC()' macro defines a math function that gets an array
+of mnumbers (the zsh type for representing values in arithmetic
+expressions) taken from the string in parentheses at the function
+call. Its arguments are the name of the function, the C-function
+implementing it, the minimum and maximum number of arguments (as
+usual, the later may be `-1' to specify that the function accepts any
+number of arguments), and finally an integer that is given unchanged
+to the C-function (to be able to implement multiple math functions in
+one C-function).
+
+The `STRMATHFUNC()' macro defines a math function that gets the string 
+in parentheses at the call as one string argument (without the
+parentheses). The arguments are the name of the function, the
+C-function, and an integer used like the last argument of
+`NUMMATHFUNC()'.
+
+The C-functions implementing the math functions look like this:
+
+  /**/
+  static mnumber
+  math_sum(char *name, int argc, mnumber *argv, int id)
+  {
+    ...
+  }
+
+  /**/
+  static mnumber
+  math_length(char *name, char *arg, int id)
+  {
+    ...
+  }
+
+Functions defined with `NUMMATHFUNC' get the name of the function, the 
+number of numeric arguments, an array with these arguments, and the
+last argument from the macro-call. Functions defined with
+`STRMATHFUNC' get the name of the function, the string between the
+parentheses at the call, and the last argument from the macro-call.
+
+Both types of functions return an mnumber which is a descriminated
+union looking like:
+
+  typedef struct {
+    union {
+      zlong l;
+      double d;
+    } u;
+    int type;
+  } mnumber;
+
+The `type' field should be set to `MN_INTEGER' or `MN_FLOAT' and
+depending on its value either `u.l' or `u.d' contains the value.
+
+To register and de-register math functions, the functions
+`addmathfuncs()' and `deletemathfuncs()' are used:
+
+  /**/
+  int
+  boot_example(Module m)
+  {
+    int ret;
+
+    ret = addmathfuncs(m->nam, mftab, sizeof(mftab)/sizeof(*mftab));
+    ...
+  }
+
+  /**/
+  int
+  cleanup_example(Module m)
+  {
+    deletemathfuncs(m->nam, mftab, sizeof(mftab)/sizeof(*mftab));
+    ...
+  }
+
+The arguments and return values are as for the functions used to
+register and de-register parameters, conditions, etc.
 
 Modules can also define function hooks. Other modules can then add
 functions to these hooks to make the first module call these functions

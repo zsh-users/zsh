@@ -79,6 +79,30 @@ typedef struct {
 
 typedef int LV;
 
+typedef struct mathfunc *MathFunc;
+typedef mnumber (*NumMathFunc)(char *, int, mnumber *, int);
+typedef mnumber (*StrMathFunc)(char *, char *, int);
+
+struct mathfunc {
+    MathFunc next;
+    char *name;
+    int flags;
+    NumMathFunc nfunc;
+    StrMathFunc sfunc;
+    char *module;
+    int minargs;
+    int maxargs;
+    int funcid;
+};
+
+#define MFF_STR      1
+#define MFF_ADDED    2
+
+#define NUMMATHFUNC(name, func, min, max, id) \
+    { NULL, name, 0, func, NULL, NULL, min, max, id }
+#define STRMATHFUNC(name, func, id) \
+    { NULL, name, MFF_STR, NULL, func, NULL, 0, 0, id }
+
 /* Character tokens are sometimes casted to (unsigned char)'s.         * 
  * Unfortunately, some compilers don't correctly cast signed to        * 
  * unsigned promotions; i.e. (int)(unsigned char)((char) -1) evaluates * 
