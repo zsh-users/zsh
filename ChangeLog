@@ -1,5 +1,8 @@
 2002-05-14  Peter Stephenson  <pws@csr.com>
 
+	* 17162: Src/Modules/tcp.c: prevent warning on gethostbyaddr()
+	arguments.
+
 	* 17161: Src/Modules/tcp.c: length parameter to accept() wasn't
 	initialised, causing random failures.
 

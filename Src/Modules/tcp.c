@@ -565,12 +565,12 @@ bin_ztcp(char *nam, char **args, char *ops, int func)
 
 		if (sess->fd != -1)
 		{
-		    zthost = gethostbyaddr(&(sess->sock.in.sin_addr), sizeof(struct sockaddr_in), AF_INET);
+		    zthost = gethostbyaddr((const void *)&(sess->sock.in.sin_addr), sizeof(struct sockaddr_in), AF_INET);
 		    if (zthost)
 			localname = zthost->h_name;
 		    else
 			localname = ztrdup(inet_ntoa(sess->sock.in.sin_addr));
-		    ztpeer = gethostbyaddr(&(sess->peer.in.sin_addr), sizeof(struct sockaddr_in), AF_INET);
+		    ztpeer = gethostbyaddr((const void *)&(sess->peer.in.sin_addr), sizeof(struct sockaddr_in), AF_INET);
 		    if (ztpeer)
 			remotename = ztpeer->h_name;
 		    else
