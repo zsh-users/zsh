@@ -39,8 +39,6 @@
 #  relocate
 #    complete a `old=new' pair of paths
 
-local ret=1 tmp expl
-
 # Used by `_arguments', made local here.
 
 local curcontext="$curcontext" state lstate line
@@ -48,33 +46,57 @@ typeset -A opt_args
 
 state=''
 
+local ret=1
+local -a tmp expl commonopts packageopts
+commonopts=(
+  '*-v[verbose mode]'
+  '--rcfile:resource file:_files'
+  '--ftpproxy:FTP proxy server:_hosts'
+  '--ftpport:FTP port number:'
+  '--httpproxy:HTTP proxy server:_hosts'
+  '--httpport:HTTP port number:'
+)
+packageopts=(
+  '-a[query all packages]'
+  '-p+[query uninstalled package file]:*:RPM package file:->package_file'
+  '-f[specify file to query owner of]:file:_files'
+  '--triggeredby:RPM package:->package'
+  '--whatprovides:RPM capability:->capability'
+  '--whatrequires:RPM capability:->capability'
+)
+pathopts=(
+  '--root:RPM root directory:_files -/'
+  '--dbpath:RPM database path:_files -/'
+)
+
 # Do simple completions or get the first state.
 
 _arguments -C -s \
-  '--rcfile:resource file:_files' \
-  '--ftpproxy:FTP proxy server:_hosts' \
-  '--ftpport:FTP port number:' \
+  '--help[print help message]' \
+  '--version[print version number]' \
+  "${commonopts[@]}" \
   '-q+[query mode]:*:query:->query' \
-  '*-v[verbose mode]' \
-  --{setperms,setugids,querytags,initdb,showrc} \
+  --{querytags,initdb,showrc} \
   '--pipe:pipe command:_command_names -e' \
   -{V,y}'[verify mode]:*:verify:->verify' \
   '--verify[verify mode]:*:verify:->verify' \
-  '-i+[install mode]:*:install:->install' \
-  '--install:*:install:->install' \
-  '-U+[upgrade mode]:*:upgrade:->upgrade' \
-  '--upgrade:*:upgrade:->upgrade' \
-  '-F+[freshen mode]:*:upgrade:->upgrade' \
-  '--freshen:*:upgrade:->upgrade' \
-  '-e+[uninstall mode]:*:uninstall:->uninstall' \
-  '--erase:*:uninstall:->uninstall' \
-  -'b+[build mode (spec file)]:build stage:((p\:execute\ \%prep\ stage l\:do\ a\ list\ check c\:execute\ build\ stage i\:execute\ install\ stage b\:build\ a\ binary\ package a\:build\ binary\ and\ source\ packages)):*:build:->build_b' \
-  -'t+[build mode (tar file)]:build stage:((p\:execute\ \%prep\ stage l\:do\ a\ list\ check c\:execute\ build\ stage i\:execute\ install\ stage b\:build\ a\ binary\ package a\:build\ binary\ and\ source\ packages)):*:build:->build_t' \
+  '--setperms[set file permissions]:*:package:->setattrs' \
+  '--setugids[set file owner/group]:*:package:->setattrs' \
+  '(--install)-i+[install mode]:*:install:->install' \
+  '(-i)--install:*:install:->install' \
+  '(--upgrade)-U+[upgrade mode]:*:upgrade:->upgrade' \
+  '(-U)--upgrade:*:upgrade:->upgrade' \
+  '(--freshen)-F+[freshen mode]:*:upgrade:->upgrade' \
+  '(-F)--freshen:*:upgrade:->upgrade' \
+  '(--erase)-e+[uninstall mode]:*:uninstall:->uninstall' \
+  '(-e)--erase:*:uninstall:->uninstall' \
+  '-b+[build mode (spec file)]:build stage:((p\:execute\ \%prep\ stage l\:do\ a\ list\ check c\:execute\ build\ stage i\:execute\ install\ stage b\:build\ a\ binary\ package a\:build\ binary\ and\ source\ packages)):*:build:->build_b' \
+  '(-b)-t+[build mode (tar file)]:build stage:((p\:execute\ \%prep\ stage l\:do\ a\ list\ check c\:execute\ build\ stage i\:execute\ install\ stage b\:build\ a\ binary\ package a\:build\ binary\ and\ source\ packages)):*:build:->build_t' \
   --{resign,addsign}':*:RPM package:->package' \
   '--rmsource:*:spec file:->spec_file' \
   --{rebuild,recompile}':*:Src RPM files:->package_src' \
-    '-K+[signature check mode]:*:sigcheck:->sigcheck' \
-  '--checksig:*:sigcheck:->sigcheck' \
+  '(--checksig)-K+[signature check mode]:*:sigcheck:->sigcheck' \
+  '(-K)--checksig:*:sigcheck:->sigcheck' \
   '--rebuilddb:*:rebuild:->rebuild' && ret=0
 
 # As long as we have a state name...
@@ -96,59 +118,52 @@ while [[ -n "$state" ]]; do
   case "$lstate" in
   query)
     _arguments -s \
-      '*-v[verbose mode]' -q -c \
-      '--rcfile:resource file:_files' \
-      '--ftpproxy:FTP proxy server:_hosts' \
-      '--ftpport:FTP port number:' \
-      '--root:RPM root directory:_files -/' \
-      '--dbpath:RPM database path:_files -/' \
+      -q "${commonopts[@]}" "${packageopts[@]}" "${pathopts[@]}" \
       '--queryformat:RPM query format:->tags' \
-      '-f[specify file to query owner of]:file:_files' \
-      '-p+[specify uninstalled package file to query]:*:RPM package file:->package_file' \
-      '--triggeredby:RPM package:->package' \
-      '--whatprovides:RPM capability:->capability' \
-      '--whatrequires:RPM capability:->capability' \
+      '-i[display package information]' \
+      '--changelog[display change log]' \
+      '-l[display package file list]' \
+      '-s[show file states]' \
+      '-d[documentation files only]' \
+      '-c[configuration files only]' \
+      '--dump[show all information]'     # Requires one of -{l,c,d} ... \
+      --provides \
+      -{R,-requires}'[list dependencies]' \
+      '--scripts[show (un)install scripts]' \
+      '--triggers[show trigger scripts]' # Requires --scripts ... \
       '*:RPM package:->package_or_file' && ret=0
+    ;;
+  setattrs)
+    _arguments -s --set{perm,ugids} "${packageopts[@]}" && ret = 0
     ;;
   verify)
     _arguments -s \
-      '*-v[verbose mode]' '(-y)-V' '(-V)-y' \
-      '--rcfile:resource file:_files' \
-      '--ftpproxy:FTP proxy server:_hosts' \
-      '--ftpport:FTP port number:' \
+      '(-y --verify)-V' '(-V --verify)-y' '(-y -V)--verify' \
+      "${commonopts[@]}" "${pathopts[@]}" \
       --no{deps,md5,files} \
-      '--root:RPM root directory:_files -/' \
-      '--dbpath:RPM database path:_files -/' \
       '*:RPM package:->package' && ret=0
     ;;
   upgrade)
-    tmp=( -U --oldpackage )
+    tmp=( '(--upgrade)-U' '(-U)--upgrade' '(--force)--oldpackage' )
     ;&
   install)
-    (( $#tmp )) || tmp=(-i)
+    (( $#tmp )) || tmp=( '(--install)-i' '(-i)--install' )
     _arguments -s "$tmp[@]" \
-      '*-v[verbose mode]' \
-      '--rcfile:resource file:_files' \
-      '--ftpproxy:FTP proxy server:_hosts' \
-      '--ftpport:FTP port number:' \
-      '(-h)--hash' '(--hash)-h' \
-      '(--replacepkgs --replacefiles --oldpackage)--force' \
-      --{badreloc,excludedocs,allfiles,ignorearch,ignoreos,includedocs,justdb,nodeps,noorder,noscripts,notriggers,percent,replacefiles,replacepkgs,test} \
+      "${commonopts[@]}" "${pathopts[@]}" \
+      '--excludepath:exclude files in following path:_files -/' \
       '--relocate:relocate:->relocate' \
       '--prefix:package prefix directory:_files -/' \
-      '--root:RPM root directory:_files -/' \
-      '--dbpath:RPM database path:_files -/' \
+      '(-h)--hash' '(--hash)-h' \
+      '(--replacepkgs --replacefiles --oldpackage)--force' \
+      '(--force)--'{replacefiles,replacepkgs} \
+      --{badreloc,excludedocs,allfiles,ignorearch,ignoreos,includedocs,justdb,nodeps,noorder,noscripts,notriggers,percent,test} \
       '*:pkg file:->package_file' && ret=0
     ;;
   uninstall)
     _arguments -s \
-      '*-v[verbose mode]' -e \
-      '--rcfile:resource file:_files' \
-      '--ftpproxy:FTP proxy server:_hosts' \
-      '--ftpport:FTP port number:' \
+      '(-e)--erase' '(--erase)-e' \
+      "${commonopts[@]}" "${pathopts[@]}" \
       --{allmatches,justdb,nodeps,noorder,noscripts,notriggers} \
-      '--root:RPM root directory:_files -/' \
-      '--dbpath:RPM database path:_files -/' \
       '*:RPM package:->package' && ret=0
     ;;
   build_b)
@@ -158,10 +173,7 @@ while [[ -n "$state" ]]; do
     (( $#tmp )) || tmp=( '*:tar file:_files -g \*.\(\#i\)tar\(.\*\|\)' )
 
     _arguments -s \
-      '*-v[verbose mode]' \
-      '--rcfile:resource file:_files' \
-      '--ftpproxy:FTP proxy server:_hosts' \
-      '--ftpport:FTP port number:' \
+      "${commonopts[@]}" "${pathopts[@]}" \
       --{short-circuit,clean,rmsource,sign,test} \
       '--target:specify a build target:->target'\
       '--buildroot:build root directory:_files -/' \
@@ -171,21 +183,14 @@ while [[ -n "$state" ]]; do
     ;;
   sigcheck)
     _arguments -s \
-      '*-v[verbose mode]' -K \
-      '--rcfile:resource file:_files' \
-      '--ftpproxy:FTP proxy server:_hosts' \
-      '--ftpport:FTP port number:' \
+      '(-K)--checksig' '(--checksig)-K' \
+      "${commonopts[@]}" \
       --no{pgp,md5} \
       '*:RPM package file:->package_file' && ret=0
     ;;
   rebuild)
     _arguments -s \
-      '*-v[verbose mode]' \
-      '--rcfile:resource file:_files' \
-      '--ftpproxy:FTP proxy server:_hosts' \
-      '--ftpport:FTP port number:' \
-      '--root:RPM root directory:_files -/' \
-      '--dbpath:RPM database path:_files -/' \
+      "${commonopts[@]}" "${pathopts[@]}" \
       '*:RPM source package file:->package_file' && ret=0
     ;;
   target)
