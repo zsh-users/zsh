@@ -33,11 +33,18 @@
 
 /* Help for `_display'. */
 
+/* Calculation state. */
+
 typedef struct cdisp *Cdisp;
 
 struct cdisp {
-    int pre, suf, colon;
+    int pre;			/* prefix length */
+    int suf;			/* suffix length */
+    int colon;			/* number of strings with descriptions */
 };
+
+/* Calculate longest prefix and suffix and count the strings with
+ * descriptions. */
 
 static void
 cdisp_calc(Cdisp disp, char **args)
@@ -55,6 +62,8 @@ cdisp_calc(Cdisp disp, char **args)
 	}
     }
 }
+
+/* Build and return the array with the description-aligned strings. */
 
 static char **
 cdisp_build(Cdisp disp, char *sep, char **args)
@@ -110,17 +119,17 @@ bin_compdisplay(char *nam, char **args, char *ops, int func)
 typedef struct cdset *Cdset;
 
 struct cdstate {
-    int showd;
-    char *sep;
-    Cdset sets;
-    struct cdisp disp;
+    int showd;			/* != 0 if descriptions should be shown */
+    char *sep;			/* the separator string */
+    Cdset sets;			/* the sets of matches */
+    struct cdisp disp;		/* used to calculate the alignment */
 };
 
 struct cdset {
-    Cdset next;
-    char **opts;
-    char **strs;
-    char **matches;
+    Cdset next;			/* guess what */
+    char **opts;		/* the compadd-options */
+    char **strs;		/* the display-strings */
+    char **matches;		/* the matches (or NULL) */
 };
 
 static struct cdstate cd_state;
@@ -143,6 +152,7 @@ freecdsets(Cdset p)
     }
 }
 
+/* Initialisation. Store and calculate the string and matches and so on. */
 static int
 cd_init(char *nam, char *sep, char **args, int disp)
 {
@@ -199,6 +209,8 @@ cd_init(char *nam, char *sep, char **args, int disp)
     return 0;
 }
 
+/* Get the next set. */
+
 static int
 cd_get(char **params)
 {
@@ -226,6 +238,9 @@ cd_get(char **params)
 	    memcpy(buf + pre, cd_state.sep, sepl);
 	    suf = pre + sepl;
 	}
+
+	/* Build the aligned display strings. */
+
 	for (sdp = sd, ssp = ss, mdp = md, msp = ms,
 		 p = set->strs, mp = set->matches; *p; p++) {
 	    if ((cp = strchr(*p, ':')) && cp[1] && cd_state.showd) {
@@ -321,29 +336,34 @@ typedef struct cadef *Cadef;
 typedef struct caopt *Caopt;
 typedef struct caarg *Caarg;
 
+/* Cache for a set of _arguments-definitions. */
+
 struct cadef {
-    Cadef next;
-    Caopt opts;
-    int nopts, ndopts, nodopts;
-    Caarg args;
-    Caarg rest;
-    char **defs;
-    int ndefs;
-    int lastt;
-    Caopt *single;
-    char *match;
-    int argsactive;
+    Cadef next;			/* next in cache */
+    Caopt opts;			/* the options */
+    int nopts, ndopts, nodopts;	/* number of options/direct/optional direct */
+    Caarg args;			/* the normal arguments */
+    Caarg rest;			/* the rest-argument */
+    char **defs;		/* the original strings */
+    int ndefs;			/* number of ... */
+    int lastt;			/* last time this was used */
+    Caopt *single;		/* array of single-letter options */
+    char *match;		/* -M spec to use */
+    int argsactive;		/* if arguments are still allowed */
+				/* used while parsing a command line */
 };
+
+/* Description for an option. */
 
 struct caopt {
     Caopt next;
-    char *name;
-    char *descr;
-    char **xor;
-    int type;
-    Caarg args;
-    int active;
-    int num;
+    char *name;			/* option name */
+    char *descr;		/* the description */
+    char **xor;			/* if this, then not ... */
+    int type;			/* type, CAO_* */
+    Caarg args;			/* option arguments */
+    int active;			/* still allowed on command line */
+    int num;			/* it's the num'th option */
 };
 
 #define CAO_NEXT    1
@@ -351,14 +371,16 @@ struct caopt {
 #define CAO_ODIRECT 3
 #define CAO_EQUAL   4
 
+/* Description for an argument */
+
 struct caarg {
     Caarg next;
-    char *descr;
-    char *action;
-    int type;
-    char *end;
-    char *opt;
-    int num;
+    char *descr;		/* description */
+    char *action;		/* what to do for it */
+    int type;			/* CAA_* below */
+    char *end;			/* end-pattern for ::<pat>:... */
+    char *opt;			/* option name if for an option */
+    int num;			/* it's the num'th argument */
 };
 
 #define CAA_NORMAL 1
@@ -367,8 +389,12 @@ struct caarg {
 #define CAA_RARGS  4
 #define CAA_RREST  5
 
+/* The cache of parsed descriptons. */
+
 #define MAX_CACACHE 8
 static Cadef cadef_cache[MAX_CACACHE];
+
+/* Compare two arrays of strings for equality. */
 
 static int
 arrcmp(char **a, char **b)
@@ -385,6 +411,8 @@ arrcmp(char **a, char **b)
 	return (!*a && !*b);
     }
 }
+
+/* Memory stuff. Obviously. */
 
 static void
 freecaargs(Caarg a)
@@ -426,6 +454,8 @@ freecadef(Cadef d)
     }
 }
 
+/* Remove backslashes before colons. */
+
 static char *
 rembslashcolon(char *s)
 {
@@ -443,6 +473,8 @@ rembslashcolon(char *s)
     return r;
 }
 
+/* Parse an argument definition. */
+
 static Caarg
 parse_caarg(int mult, int type, int num, char *oname, char **def)
 {
@@ -455,12 +487,17 @@ parse_caarg(int mult, int type, int num, char *oname, char **def)
     ret->type = type;
     ret->opt = ztrdup(oname);
 
+    /* Get the description. */
+
     for (d = p; *p && *p != ':'; p++)
 	if (*p == '\\' && p[1])
 	    p++;
     sav = *p;
     *p = '\0';
     ret->descr = ztrdup(rembslashcolon(d));
+
+    /* Get the action if there is one. */
+
     if (sav) {
 	if (mult) {
 	    for (d = ++p; *p && *p != ':'; p++)
@@ -479,6 +516,8 @@ parse_caarg(int mult, int type, int num, char *oname, char **def)
     return ret;
 }
 
+/* Parse an array of definitions. */
+
 static Cadef
 parse_cadef(char *nam, char **args)
 {
@@ -490,6 +529,8 @@ parse_cadef(char *nam, char **args)
 
     nopts = ndopts = nodopts = 0;
 
+    /* First string is the auto-description definition. */
+
     for (p = args[0]; *p && (p[0] != '%' || p[1] != 'd'); p++);
 
     if (*p) {
@@ -499,6 +540,8 @@ parse_cadef(char *nam, char **args)
 	adsuf = dupstring(p + 2);
     } else
 	adpre = adsuf = NULL;
+
+    /* Now get the -s and -M options. */
 
     args++;
     while ((p = *args)) {
@@ -520,6 +563,8 @@ parse_cadef(char *nam, char **args)
     if (!*args)
 	return NULL;
 
+    /* Looks good. Optimistically allocate the cadef structure. */
+
     PERMALLOC {
 	ret = (Cadef) zalloc(sizeof(*ret));
 	ret->next = NULL;
@@ -536,10 +581,14 @@ parse_cadef(char *nam, char **args)
 	ret->match = ztrdup(match);
     } LASTALLOC;
 
+    /* Get the definitions. */
+
     for (optp = &(ret->opts); *args; args++) {
 	p = dupstring(*args);
 	xnum = 0;
 	if (*p == '(') {
+	    /* There is a xor list, get it. */
+
 	    LinkList list = newlinklist();
 	    LinkNode node;
 	    char **xp, sav;
@@ -560,6 +609,7 @@ parse_cadef(char *nam, char **args)
 		xnum++;
 		*p = sav;
 	    }
+	    /* Oops, end-of-string. */
 	    if (*p != ')') {
 		freecadef(ret);
 		zerrnam(nam, "invalid argument: %s", *args, 0);
@@ -573,9 +623,10 @@ parse_cadef(char *nam, char **args)
 	    p++;
 	} else
 	    xor = NULL;
-	
+
 	if (*p == '-' || *p == '+' ||
 	    (*p == '*' && (p[1] == '-' || p[1] == '+'))) {
+	    /* It's an option. */
 	    Caopt opt;
 	    Caarg oargs = NULL;
 	    int multi, otype = CAO_NEXT, again = 0;
@@ -583,6 +634,7 @@ parse_cadef(char *nam, char **args)
 
 	    rec:
 
+	    /* Allowed more than once? */
 	    if ((multi = (*p == '*')))
 		p++;
 
@@ -590,11 +642,14 @@ parse_cadef(char *nam, char **args)
 		 (p[0] == '+' && p[1] == '-')) &&
 		p[2] && p[2] != ':' && p[2] != '[' &&
 		p[2] != '=' && p[2] != '-' && p[2] != '+') {
+		/* It's a -+ or +- definition. We just execute the whole
+		 * stuff twice for such things. */
 		name = ++p;
 		*p = (again ? '-' : '+');
 		again = 1 - again;
 	    } else {
 		name = p;
+		/* If it's a long option skip over the first `-'. */
 		if (p[0] == '-' && p[1] == '-')
 		    p++;
 	    }
@@ -603,12 +658,15 @@ parse_cadef(char *nam, char **args)
 		zerrnam(nam, "invalid argument: %s", *args, 0);
 		return NULL;
 	    }
+	    /* Skip over the name. */
+
 	    for (p += 2; *p && *p != ':' && *p != '[' &&
 		     ((*p != '-' && *p != '+' && *p != '=') ||
 		      (p[1] != ':' && p[1] != '[')); p++)
 		if (*p == '\\' && p[1])
 		    p++;
 
+	    /* The character after the option name specifies the type. */
 	    c = *p;
 	    *p = '\0';
 	    if (c == '-') {
@@ -621,6 +679,7 @@ parse_cadef(char *nam, char **args)
 		otype = CAO_EQUAL;
 		c = *++p;
 	    }
+	    /* Get the optional description, if any. */
 	    if (c == '[') {
 		for (descr = ++p; *p && *p != ']'; p++)
 		    if (*p == '\\' && p[1])
@@ -641,6 +700,7 @@ parse_cadef(char *nam, char **args)
 		zerrnam(nam, "invalid option definition: %s", *args, 0);
 		return NULL;
 	    }
+	    /* Add the option name to the xor list if not `*-...'. */
 	    if (!multi) {
 		if (!xor) {
 		    xor = (char **) zalloc(2 * sizeof(char *));
@@ -649,14 +709,19 @@ parse_cadef(char *nam, char **args)
 		xor[xnum] = ztrdup(name);
 	    }
 	    if (c == ':') {
+		/* There's at least one argument. */
+
 		Caarg *oargp = &oargs;
 		int atype, rest, oanum = 1;
 		char *end;
+
+		/* Loop over the arguments. */
 
 		while (c == ':') {
 		    rest = 0;
 		    end = NULL;
 
+		    /* Get the argument type. */
 		    if (*++p == ':') {
 			atype = CAA_OPT;
 			p++;
@@ -684,6 +749,9 @@ parse_cadef(char *nam, char **args)
 			rest = 1;
 		    } else
 			atype = CAA_NORMAL;
+
+		    /* And the definition. */
+
 		    *oargp = parse_caarg(!rest, atype, oanum++, name, &p);
 		    oargp = &((*oargp)->next);
 		    if (rest)
@@ -691,6 +759,8 @@ parse_cadef(char *nam, char **args)
 		    c = *p;
 		}
 	    }
+	    /* Store the option definition. */
+
 	    PERMALLOC {
 		*optp = opt = (Caopt) zalloc(sizeof(*opt));
 		optp = &((*optp)->next);
@@ -715,14 +785,20 @@ parse_cadef(char *nam, char **args)
 	    else if (otype == CAO_ODIRECT || otype == CAO_EQUAL)
 		nodopts++;
 
+	    /* If this is for single-letter option we also store a
+	     * pointer for the definition in the array for fast lookup. */
+
 	    if (single && name[1] && !name[2])
 		ret->single[STOUC(name[1])] = opt;
 
 	    if (again) {
+		/* Do it all again for `*-...'. */
 		p = dupstring(*args);
 		goto rec;
 	    }
 	} else if (*p == '*') {
+	    /* It's a rest-argument definition. */
+
 	    int type = CAA_REST;
 
 	    if (*++p != ':') {
@@ -744,10 +820,13 @@ parse_cadef(char *nam, char **args)
 	    }
 	    ret->rest = parse_caarg(0, type, -1, NULL, &p);
 	} else {
+	    /* It's a normal argument definition. */
+
 	    int type = CAA_NORMAL;
 	    Caarg arg, tmp, pre;
 
 	    if (idigit(*p)) {
+		/* Argment number is given. */
 		int num = 0;
 
 		while (*p && idigit(*p))
@@ -755,6 +834,7 @@ parse_cadef(char *nam, char **args)
 
 		anum = num + 1;
 	    } else
+		/* Default number. */
 		anum++;
 
 	    if (*p != ':') {
@@ -763,10 +843,13 @@ parse_cadef(char *nam, char **args)
 		return NULL;
 	    }
 	    if (*++p == ':') {
+		/* Optional argument. */
 		type = CAA_OPT;
 		p++;
 	    }
 	    arg = parse_caarg(0, type, anum - 1, NULL, &p);
+
+	    /* Sort the new definition into the existing list. */
 
 	    for (tmp = ret->args, pre = NULL;
 		 tmp && tmp->num < anum - 1;
@@ -792,6 +875,9 @@ parse_cadef(char *nam, char **args)
     return ret;
 }
 
+/* Given an array of definitions, return the cadef for it. From the cache
+ * are newly built. */
+
 static Cadef
 get_cadef(char *nam, char **args)
 {
@@ -814,20 +900,26 @@ get_cadef(char *nam, char **args)
     return new;
 }
 
+/* Get the option used in a word from the line, if any. */
+
 static Caopt
 ca_get_opt(Cadef d, char *line, int full, char **end)
 {
     Caopt p;
 
     if (full) {
+	/* The full string has to be an option. */
+
 	for (p = d->opts; p; p = p->next)
 	    if (p->active && !strcmp(p->name, line))
 		return p;
     } else {
+	/* The string from the line probably only begins with an option. */
 	for (p = d->opts; p; p = p->next)
 	    if (p->active && ((!p->args || p->type == CAO_NEXT) ?
 			      !strcmp(p->name, line) : strpfx(p->name, line))) {
 		if (end) {
+		    /* Return a pointer to the end of the option. */
 		    int l = strlen(p->name);
 
 		    if (p->type == CAO_EQUAL && line[l] == '=')
@@ -840,6 +932,8 @@ ca_get_opt(Cadef d, char *line, int full, char **end)
     }
     return NULL;
 }
+
+/* Same as above, only for single-letter-style. */
 
 static Caopt
 ca_get_sopt(Cadef d, char *line, int full, char **end)
@@ -874,6 +968,8 @@ ca_get_sopt(Cadef d, char *line, int full, char **end)
     return NULL;
 }
 
+/* Return the n'th argument definition. */
+
 static Caarg
 ca_get_arg(Cadef d, int n)
 {
@@ -891,6 +987,8 @@ ca_get_arg(Cadef d, int n)
     return NULL;
 }
 
+/* Use a xor list, marking options as inactive. */
+
 static void
 ca_inactive(Cadef d, char **xor)
 {
@@ -906,6 +1004,8 @@ ca_inactive(Cadef d, char **xor)
     }
 }
 
+/* State when parsing a command line. */
+
 struct castate {
     Cadef d;
     Caarg def, ddef;
@@ -919,6 +1019,8 @@ struct castate {
 static struct castate ca_laststate;
 static int ca_parsed = 0, ca_alloced = 0;
 
+/* Pars a command line. */
+
 static void
 ca_parse_line(Cadef d)
 {
@@ -928,6 +1030,8 @@ ca_parse_line(Cadef d)
     char *line, *pe;
     int cur, doff;
     Patprog endpat = NULL;
+
+    /* Free old state. */
 
     if (ca_alloced) {
 	int i = ca_laststate.d->nopts;
@@ -940,9 +1044,13 @@ ca_parse_line(Cadef d)
 
 	zfree(ca_laststate.oargs, ca_laststate.d->nopts * sizeof(LinkList));
     }
+    /* MArk everything as active. */
+
     for (ptr = d->opts; ptr; ptr = ptr->next)
 	ptr->active = 1;
     d->argsactive = 1;
+
+    /* Default values for the state. */
 
     state.d = d;
     state.def = state.ddef = NULL;
@@ -964,10 +1072,15 @@ ca_parse_line(Cadef d)
 
 	return;
     }
+    /* Loop over the words from the line. */
+
     for (line = compwords[1], cur = 2, state.curopt = NULL, state.def = NULL;
 	 line; line = compwords[cur++]) {
 	ddef = adef = NULL;
 	doff = state.singles = 0;
+
+	/* We've a definition for an argument, skip to the next. */
+
 	if (state.def) {
 	    state.arg = 0;
 	    if (state.curopt) {
@@ -999,6 +1112,8 @@ ca_parse_line(Cadef d)
 
 	pe = NULL;
 
+	/* See if it's an option. */
+
 	if (state.opt == 2 && (state.curopt = ca_get_opt(d, line, 0, &pe))) {
 	    ddef = state.def = state.curopt->args;
 	    doff = pe - line;
@@ -1010,6 +1125,8 @@ ca_parse_line(Cadef d)
 		state.oargs[state.curopt->num] = newlinklist();
 	    } LASTALLOC;
 	    ca_inactive(d, state.curopt->xor);
+
+	    /* Collect the argument strings. MAybe. */
 
 	    if (state.def &&
 		(state.curopt->type == CAO_DIRECT ||
@@ -1030,6 +1147,8 @@ ca_parse_line(Cadef d)
 		state.curopt = NULL;
 	} else if (state.opt == 2 && d->single &&
 		   (state.curopt = ca_get_sopt(d, line, 0, &pe))) {
+	    /* Or maybe it's a single-letter option? */
+
 	    char *p;
 	    Caopt tmpopt;
 
@@ -1064,6 +1183,7 @@ ca_parse_line(Cadef d)
 	    else
 		state.curopt = NULL;
 	} else if (state.arg) {
+	    /* Otherwise it's a normal argument. */
 	    if (state.inopt) {
 		state.inopt = 0;
 		state.nargbeg = cur - 1;
@@ -1099,6 +1219,8 @@ ca_parse_line(Cadef d)
 	    state.nth++;
 	    state.def = NULL;
 	}
+	/* Do the end-pattern test if needed. */
+
 	if (state.def && state.curopt &&
 	    (state.def->type == CAA_RREST || state.def->type == CAA_RARGS)) {
 	    if (state.def->end)
@@ -1116,6 +1238,8 @@ ca_parse_line(Cadef d)
 		break;
 	    }
 	}
+	/* Copy the state into the global one. */
+
 	if (cur + 1 == compcurrent) {
 	    memcpy(&ca_laststate, &state, sizeof(state));
 	    ca_laststate.ddef = NULL;
@@ -1141,6 +1265,8 @@ ca_parse_line(Cadef d)
 	}
     }
 }
+
+/* Build a colon-list from a list. */
 
 static char *
 ca_colonlist(LinkList l)
@@ -1383,33 +1509,41 @@ bin_comparguments(char *nam, char **args, char *ops, int func)
 typedef struct cvdef *Cvdef;
 typedef struct cvval *Cvval;
 
+/* Definitions for _values. */
+
 struct cvdef {
-    char *descr;
-    int hassep;
-    char sep;
-    Cvdef next;
-    Cvval vals;
-    char **defs;
-    int ndefs;
-    int lastt;
+    char *descr;		/* global description */
+    int hassep;			/* multiple values allowed */
+    char sep;			/* separator character */
+    Cvdef next;			/* next in cache */
+    Cvval vals;			/* value definitions */
+    char **defs;		/* original strings */
+    int ndefs;			/* number of ... */
+    int lastt;			/* last time used */
 };
+
+/* One value definition. */
 
 struct cvval {
     Cvval next;
-    char *name;
-    char *descr;
-    char **xor;
-    int type;
-    Caarg arg;
-    int active;
+    char *name;			/* value name */
+    char *descr;		/* description */
+    char **xor;			/* xor-list */
+    int type;			/* CVV_* below */
+    Caarg arg;			/* argument definition */
+    int active;			/* still allowed */
 };
 
 #define CVV_NOARG 0
 #define CVV_ARG   1
 #define CVV_OPT   2
 
+/* Cache. */
+
 #define MAX_CVCACHE 8
 static Cvdef cvdef_cache[MAX_CVCACHE];
+
+/* Memory stuff. */
 
 static void
 freecvdef(Cvdef d)
@@ -1431,6 +1565,8 @@ freecvdef(Cvdef d)
 	zfree(d, sizeof(*d));
     }
 }
+
+/* Parse option definitions. */
 
 static Cvdef
 parse_cvdef(char *nam, char **args)
@@ -1471,6 +1607,8 @@ parse_cvdef(char *nam, char **args)
     for (valp = &(ret->vals); *args; args++) {
 	p = dupstring(*args);
 	xnum = 0;
+
+	/* xor list? */
 	if (*p == '(') {
 	    LinkList list = newlinklist();
 	    LinkNode node;
@@ -1506,8 +1644,11 @@ parse_cvdef(char *nam, char **args)
 	} else
 	    xor = NULL;
 
+	/* More than once allowed? */
 	if ((multi = (*p == '*')))
 	    p++;
+
+	/* Skip option name. */
 
 	for (name = p; *p && *p != ':' && *p != '['; p++)
 	    if (*p == '\\' && p[1])
@@ -1518,6 +1659,8 @@ parse_cvdef(char *nam, char **args)
 	    zerrnam(nam, "no multi-letter values with empty separator allowed", NULL, 0);
 	    return NULL;
 	}
+	/* Optional description? */
+
 	if ((c = *p) == '[') {
 	    *p = '\0';
 	    for (descr = ++p; *p && *p != ']'; p++)
@@ -1547,6 +1690,8 @@ parse_cvdef(char *nam, char **args)
 	    }
 	    xor[xnum] = ztrdup(name);
 	}
+	/* Get argument? */
+
 	if (c == ':') {
 	    if (hassep && !sep) {
 		freecvdef(ret);
@@ -1578,6 +1723,8 @@ parse_cvdef(char *nam, char **args)
     return ret;
 }
 
+/* Get the definition from the cache or newly built. */
+
 static Cvdef
 get_cvdef(char *nam, char **args)
 {
@@ -1600,6 +1747,8 @@ get_cvdef(char *nam, char **args)
     return new;
 }
 
+/* Get the definition for a value. */
+
 static Cvval
 cv_get_val(Cvdef d, char *name)
 {
@@ -1611,6 +1760,8 @@ cv_get_val(Cvdef d, char *name)
 
     return NULL;
 }
+
+/* Handle a xor list. */
 
 static void
 cv_inactive(Cvdef d, char **xor)
@@ -1624,6 +1775,8 @@ cv_inactive(Cvdef d, char **xor)
     }
 }
 
+/* Parse state. */
+
 struct cvstate {
     Cvdef d;
     Caarg def;
@@ -1633,6 +1786,8 @@ struct cvstate {
 
 static struct cvstate cv_laststate;
 static int cv_parsed = 0, cv_alloced = 0;
+
+/* Parse the current word. */
 
 static void
 cv_parse_word(Cvdef d)
@@ -1926,15 +2081,18 @@ bin_compvalues(char *nam, char **args, char *ops, int func)
     return 1;
 }
 
-
 static int
 bin_compquote(char *nam, char **args, char *ops, int func)
 {
     char *name;
     Value v;
 
+    /* Anything to do? */
+
     if (!compqstack || !*compqstack)
 	return 0;
+
+    /* For all parameters given... */
 
     while ((name = *args++)) {
 	name = dupstring(name);
@@ -1977,15 +2135,19 @@ bin_compquote(char *nam, char **args, char *ops, int func)
     return 0;
 }
 
+/* Style stuff. */
+
 typedef struct cspat *Cspat;
 typedef struct cstyle *Cstyle;
 
+/* A pattern and the styles for it. */
+
 struct cspat {
     Cspat next;
-    char *pat;
-    Patprog prog;
-    int weight;
-    Cstyle styles, lstyles;
+    char *pat;			/* pattern string */
+    Patprog prog;		/* compiled pattern */
+    int weight;			/* how specific is the pattern? */
+    Cstyle styles, lstyles;	/* first/last style */
 };
     
 struct cstyle {
@@ -1997,6 +2159,8 @@ struct cstyle {
 /* List of styles. */
 
 static Cspat compstyles, lcompstyles;
+
+/* Memory stuff. */
 
 static void
 freecstyle(Cstyle s)
@@ -2030,6 +2194,8 @@ freecspat(Cspat p)
     }
 }
 
+/* Get the struct for a pattern, if any. */
+
 static Cspat
 getcspat(char *pat)
 {
@@ -2041,6 +2207,8 @@ getcspat(char *pat)
 
     return NULL;
 }
+
+/* Get the style stuff for a name. */
 
 static Cstyle
 getcstyle(Cspat p, char *name)
@@ -2054,6 +2222,8 @@ getcstyle(Cspat p, char *name)
     return NULL;
 }
 
+/* Store a value for a style. */
+
 static void
 setcstyle(Cspat p, char *name, char **vals)
 {
@@ -2061,6 +2231,9 @@ setcstyle(Cspat p, char *name, char **vals)
 
     for (s = p->styles; s; s = s->next)
 	if (!strcmp(name, s->name)) {
+
+	    /* Exists -> replace. */
+
 	    freearray(s->vals);
 	    PERMALLOC {
 		s->vals = arrdup(vals);
@@ -2068,6 +2241,9 @@ setcstyle(Cspat p, char *name, char **vals)
 
 	    return;
 	}
+
+    /* New style. */
+
     s = (Cstyle) zalloc(sizeof(*s));
 
     s->name = ztrdup(name);
@@ -2083,6 +2259,8 @@ setcstyle(Cspat p, char *name, char **vals)
     p->lstyles = s;
 }
 
+/* Add a new pattern. */
+
 static Cspat
 addcspat(char *pat, Patprog prog)
 {
@@ -2090,8 +2268,11 @@ addcspat(char *pat, Patprog prog)
     int weight, tmp, first;
     char *s;
 
+    /* Calculate the weight. */
+
     for (weight = 0, tmp = 2, first = 1, s = pat; *s; s++) {
 	if (first && *s == '*' && (!s[1] || s[1] == ':')) {
+	    /* Only `*' in this component. */
 	    tmp = 0;
 	    continue;
 	}
@@ -2099,9 +2280,12 @@ addcspat(char *pat, Patprog prog)
 
 	if (*s == '(' || *s == '|' || *s == '*' || *s == '[' || *s == '<' ||
 	    *s == '?' || *s == '#' || *s == '^')
+	    /* Is pattern. */
 	    tmp = 1;
 
 	if (*s == ':') {
+	    /* Yet another component. */
+
 	    first = 1;
 	    weight += tmp;
 	    tmp = 2;
@@ -2130,6 +2314,8 @@ addcspat(char *pat, Patprog prog)
     return p;
 }
 
+/* Delete a style. */
+
 static void
 deletecstyle(Cspat p, char *name)
 {
@@ -2150,6 +2336,8 @@ deletecstyle(Cspat p, char *name)
 	    return;
 	}
 }
+
+/* Delete a whole pattern with all its styles. */
 
 static void
 deletecspat(Cspat pat)
@@ -2174,6 +2362,8 @@ deletecspat(Cspat pat)
 	    return;
 	}
 }
+
+/* Look up a style for a context pattern. This does the matching. */
 
 static Cstyle
 lookupcstyle(char *ctxt, char *style)
@@ -2348,19 +2538,25 @@ bin_compstyles(char *nam, char **args, char *ops, int func)
     return 0;
 }
 
+/* Tags stuff. */
+
 typedef struct ctags *Ctags;
 typedef struct ctset *Ctset;
 
+/* A bunch of tag sets. */
+
 struct ctags {
-    char **all;
-    char *context;
-    int init;
-    Ctset sets;
+    char **all;			/* all tags offered */
+    char *context;		/* the current context */
+    int init;			/* not yet used */
+    Ctset sets;			/* the tag sets */
 };
+
+/* A tag set. */
 
 struct ctset {
     Ctset next;
-    char **tags;
+    char **tags;		/* the tags */
 };
 
 /* Array of tag-set infos. Index is the locallevel. */
@@ -2398,6 +2594,8 @@ freectags(Ctags t)
     }
 }
 
+/* Set the tags for the current local level. */
+
 static void
 settags(char **tags)
 {
@@ -2415,6 +2613,8 @@ settags(char **tags)
     t->sets = NULL;
     t->init = 1;
 }
+
+/* Check if an array contains a string. */
 
 static int
 arrcontains(char **a, char *s)
