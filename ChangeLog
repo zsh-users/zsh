@@ -1,3 +1,8 @@
+2004-11-24  Clint Adams  <clint@zsh.org>
+
+	* 20578: Functions/Prompts/prompt_elite2_setup:
+	handle ttys with slashes in them.
+
 2004-11-23  Peter Stephenson  <pws@csr.com>
 
 	* 20576: Src/signals.c: 20572 caused core dump when
