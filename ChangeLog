@@ -1,3 +1,9 @@
+2000-05-03  Sven Wischnowsky  <wischnow@informatik.hu-berlin.de>
+
+	* 11110: Completion/Core/_expand, Src/Zle/complist.c: remove
+ 	backslashes before `$' in _expand when `substitute' is unset; fix
+ 	for clearing end-of-list lines in menu-selection
+	
 2000-05-03  Tanaka Akira  <akr@m17n.org>
 
 	* 11109: Completion/X/_xauth: new completion for xauth.

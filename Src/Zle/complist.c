@@ -985,7 +985,7 @@ compprintlist(int showall)
 	lastml = 0;
     }
     cl = (listdat.nlines > lines - nlnct - mhasstat ?
-	  lines - nlnct - mhasstat : listdat.nlines);
+	  lines - nlnct - mhasstat : listdat.nlines) - 1;
     mrestlines = lines - 1;
 
     if (cl < 2) {
