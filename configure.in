@@ -250,13 +250,6 @@ AC_ARG_ENABLE(maildir-support,
   AC_DEFINE(MAILDIR_SUPPORT)
 fi])
 
-dnl Do you want to verify that tcsetpgrp works?
-undefine([tcsetpgrp-check])dnl
-AC_ARG_ENABLE(tcsetpgrp-check,
-[  --disable-tcsetpgrp-check     Disable test of tcsetpgrp],
-[tcsetpgrp-check="$enableval"], [tcsetpgrp-check=yes])
-
-
 dnl ------------------
 dnl CHECK THE COMPILER
 dnl ------------------
@@ -1247,12 +1240,8 @@ fi
 dnl -----------
 dnl if found tcsetpgrp, test to see if it actually works
 dnl for instance, BeOS R4.51 does not support it yet
-dnl When building where stdin is not a terminal, this
-dnl check will fail, resulting in no job control support
-dnl being available.  Because this is undesirable, allow
-dnl it to be skipped.
 dnl -----------
-if test $ac_cv_func_tcsetpgrp=yes -a $tcsetpgrp-check=yes; then
+if test -t 0 -a $ac_cv_func_tcsetpgrp=yes; then
     AC_CACHE_CHECK(if tcsetpgrp() actually works,
     zsh_cv_sys_tcsetpgrp,
     [AC_TRY_RUN([
