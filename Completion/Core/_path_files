@@ -117,9 +117,9 @@ if zstyle -s ":completion:${curcontext}:files" file-sort tmp1; then
 
     tmp2=()
     for tmp1 in "$pats[@]"; do
-      if [[ "$tmp1" = (#b)(?*)(\(\([^\|~]##\)\)) ]]; then
+      if [[ "$tmp1" = (#b)(*[^\$])(\(\([^\|~]##\)\)) ]]; then
         tmp2=( "$tmp2[@]" "${match[1]}((${sort}${match[2][3,-1]}" )
-      elif [[ "$tmp1" = (#b)(?*)(\([^\|~]##\)) ]]; then
+      elif [[ "$tmp1" = (#b)(*[^\$])(\([^\|~]##\)) ]]; then
         tmp2=( "$tmp2[@]" "${match[1]}(${sort}${match[2][2,-1]}" )
       else
         tmp2=( "$tmp2[@]" "${tmp1}(${sort})" )
@@ -150,8 +150,8 @@ zstyle -a ":completion:${curcontext}:files" fake fake
 zstyle -s ":completion:${curcontext}:files" ignore-parents ignpar
 
 if [[ -n "$compstate[pattern_match]" &&
-      ( ( -z "$SUFFIX" && "$PREFIX" = *\([^\|\~]##\) ) ||
-        "$SUFFIX" =  *\([^\|\~]##\) ) ]]; then
+      ( ( -z "$SUFFIX" && "$PREFIX" = (|*[^\$])\([^\|\~]##\) ) ||
+        "$SUFFIX" =  (|*[^\$])\([^\|\~]##\) ) ]]; then
   # Copy all glob qualifiers from the line to
   # the patterns used when generating matches
   if [[ "$SUFFIX" = *\([^\|\~]##\) ]]; then
@@ -163,9 +163,9 @@ if [[ -n "$compstate[pattern_match]" &&
   fi
   tmp2=()
   for tmp1 in "$pats[@]"; do
-    if [[ "$tmp1" = (#b)(?*)(\(\([^\|~]##\)\)) ]]; then
+    if [[ "$tmp1" = (#b)(*[^\$])(\(\([^\|~]##\)\)) ]]; then
       tmp2=( "$tmp2[@]" "${match[1]}((${tmp3}${match[2][3,-1]}" )
-    elif [[ "$tmp1" = (#b)(?*)(\([^\|~]##\)) ]]; then
+    elif [[ "$tmp1" = (#b)(*[^\$])(\([^\|~]##\)) ]]; then
       tmp2=( "$tmp2[@]" "${match[1]}(${tmp3}${match[2][2,-1]}" )
     else
       tmp2=( "$tmp2[@]" "${tmp1}(${tmp3})" )
