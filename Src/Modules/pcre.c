@@ -42,7 +42,7 @@ static pcre_extra *pcre_hints;
 
 /**/
 static int
-bin_pcre_compile(char *nam, char **args, Options ops, int func)
+bin_pcre_compile(char *nam, char **args, Options ops, UNUSED(int func))
 {
     int pcre_opts = 0, pcre_errptr;
     const char *pcre_error;
@@ -70,7 +70,7 @@ bin_pcre_compile(char *nam, char **args, Options ops, int func)
 
 /**/
 static int
-bin_pcre_study(char *nam, char **args, Options ops, int func)
+bin_pcre_study(char *nam, UNUSED(char **args), UNUSED(Options ops), UNUSED(int func))
 {
     const char *pcre_error;
 
@@ -121,7 +121,7 @@ zpcre_get_substrings(char *arg, int *ovec, int ret, char *receptacle)
 
 /**/
 static int
-bin_pcre_match(char *nam, char **args, Options ops, int func)
+bin_pcre_match(char *nam, char **args, Options ops, UNUSED(int func))
 {
     int ret, capcount, *ovec, ovecsize;
     char *receptacle = NULL;
@@ -214,7 +214,7 @@ static struct conddef cotab[] = {
 
 /**/
 int
-setup_(Module m)
+setup_(UNUSED(Module m))
 {
     return 0;
 }
@@ -238,7 +238,7 @@ cleanup_(Module m)
 
 /**/
 int
-finish_(Module m)
+finish_(UNUSED(Module m))
 {
     return 0;
 }

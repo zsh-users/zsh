@@ -1,3 +1,7 @@
+2004-06-22  Clint Adams  <clint@zsh.org>
+
+	* 20091: Src/Modules/pcre.c: silence gcc "unused parameter" warnings.
+
 2004-06-22  Peter Stephenson  <pws@csr.com>
 
 	* 20076, 20084: Doc/Zsh/grammar.yo, Doc/Zsh/params.yo, Src/exec.c,
@@ -16,7 +20,7 @@
 	* users/7267: Functions/Zle/predict-on: Minor update to cooperate
 	with zle-line-init.
 
-2004-06-18  Clint Adams  <clint@zsh.org>
+2004-06-19  Clint Adams  <clint@zsh.org>
 
 	* 20081: Doc/Zsh/mod_pcre.yo: document -pcre-match condition.
 
