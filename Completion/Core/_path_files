@@ -10,7 +10,7 @@ local nm=$compstate[nmatches] menu match matcher
 
 typeset -U prepaths exppaths
 
-setopt localoptions nullglob rcexpandparam
+setopt localoptions nullglob rcexpandparam globdots
 unsetopt markdirs globsubst shwordsplit nounset
 
 local sopt='-' gopt='' opt
@@ -210,7 +210,7 @@ for prepath in "$prepaths[@]"; do
     # Get the matching files by globbing.
 
     if [[ "$tpre$tsuf" = */* ]]; then
-      tmp1=( ${^tmp1}*(-D/) )
+      tmp1=( ${^tmp1}*(-/) )
     else
       tmp1=( ${^tmp1}${^~pats} )
     fi

@@ -47,15 +47,16 @@
 #         # The default is to search the last 100 lines.
 #         max=10
 #       fi
-#       # We first search in the last ten lines, then in the last
-#       # twenty lines, and so on...
+#       # We first search in the last ten words, then in the last
+#       # twenty words, and so on...
 #       while [[ i -le max ]]; do
 #         if [[ -n "$compconfig[history_sort]" ]]; then
 #           _description expl "history ($n)"
 #         else
 #           _description -V expl "history ($n)"
 #         fi
-#         if compadd "$expl[@]" -Q - "${(@)historywords:#[\$'\"]*}"; then
+#         if compadd "$expl[@]" -Q - \
+#                "${(@)${(@)historywords:#[\$'\"]*}[1,i*10]}"; then
 #           # We have found at least one matching word, so we switch
 #           # on menu-completion and make sure that no other
 #           # completion function is called by setting _compskip.
