@@ -7793,6 +7793,9 @@ listlist(LinkList l)
     int vl = validlist, sm = smatches, nm = nmatches;
     char *oclp = complastprompt;
     Cmgroup am = amatches;
+    struct cldata odat;
+
+    memcpy(&odat, &listdat, sizeof(struct cldata));
 
     if (listshown)
 	showagain = 1;
@@ -7804,6 +7807,7 @@ listlist(LinkList l)
     dg.ylist = (char **) makearray(l, 0, 1, &(dg.lcount), NULL, NULL);
     nmatches = dg.lcount;
     amatches = &dg;
+    listdat.valid = 0;
     ilistmatches(NULL, NULL);
     amatches = am;
 
@@ -7811,6 +7815,7 @@ listlist(LinkList l)
     smatches = sm;
     nmatches = nm;
     complastprompt = oclp;
+    memcpy(&listdat, &odat, sizeof(struct cldata));
 
     return !dg.lcount;
 }
