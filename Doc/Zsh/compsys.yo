@@ -2938,17 +2938,18 @@ where `tt(a)' takes an argument in the next word, tt(_arguments) would
 normally not complete the other option directly after `tt(-a)', but it would
 allow that if given the tt(-w) option.
 
-Similarly, the option tt(-W) may be given to force completion of options
-even after options that get an argument in the same word.  For example,
-if a command takes the options `tt(a)' and `tt(b)', where `tt(a)' needs
-an argument in the same word, directly after the option character,
-tt(_arguments) would normally only execute the action for that argument
-and not offer other options as possible completions.  If given the
-tt(-W) option, it will offer other options as possible completions after
-executing the action for the argument.  Note that, depending on the
-action, this may mean that the other options can't really be completed,
-but at least they will be listed.  For more control, use an utility
-function like tt(_guard) in the argument's action.
+Similarly, the option tt(-W) may be given together with tt(-s) to force
+completion of single-letter options even after options that get an
+argument in the same word.  For example, if a command takes the options
+`tt(a)' and `tt(b)', where `tt(a)' needs an argument in the same word,
+directly after the option character, tt(_arguments) would normally only
+execute the action for that argument and not offer other single-letter
+options as possible completions.  If given the tt(-W) option, it will
+offer other options as possible completions after executing the action
+for the argument.  Note that, depending on the action, this may mean
+that the other options can't really be completed, but at least they will
+be listed.  For more control, use an utility function like tt(_guard) in
+the argument's action.
 
 The forms of var(optspec) are:
 

@@ -182,7 +182,7 @@ while [[ "$1" = -(O*|[CRWsw]) ]]; do
   -R)  rawret=yes; shift;;
   -w)  optarg=yes; shift;;
   -s)  singopt=(-s); shift;;
-  -W)  alwopt=yes; shift;;
+  -W)  alwopt=arg; shift;;
   esac
 done
 
@@ -282,7 +282,7 @@ if (( $# )) && comparguments -i "$autod" "$singopt[@]" "$@"; then
               eval ws\=\( "${action[3,-3]}" \)
 
               _describe -t "$subc" "$descr" ws -M "$matcher" "$subopts[@]" ||
-                  alwopt=yes
+                  alwopt=${alwopt:-yes}
 	      tried=yes
 
             elif [[ "$action" = \(*\) ]]; then
@@ -292,7 +292,7 @@ if (( $# )) && comparguments -i "$autod" "$singopt[@]" "$@"; then
               eval ws\=\( "${action[2,-2]}" \)
 
               _all_labels "$subc" expl "$descr" compadd "$subopts[@]" -a - ws ||
-                  alwopt=yes
+                  alwopt=${alwopt:-yes}
 	      tried=yes
             elif [[ "$action" = \{*\} ]]; then
 
@@ -301,7 +301,7 @@ if (( $# )) && comparguments -i "$autod" "$singopt[@]" "$@"; then
               while _next_label "$subc" expl "$descr"; do
                 eval "$action[2,-2]" && ret=0
               done
-              (( ret )) && alwopt=yes
+              (( ret )) && alwopt=${alwopt:-yes}
 	      tried=yes
             elif [[ "$action" = \ * ]]; then
 
@@ -311,7 +311,7 @@ if (( $# )) && comparguments -i "$autod" "$singopt[@]" "$@"; then
               while _next_label "$subc" expl "$descr"; do
                 "$action[@]" && ret=0
               done
-              (( ret )) && alwopt=yes
+              (( ret )) && alwopt=${alwopt:-yes}
 	      tried=yes
             else
 
@@ -321,7 +321,7 @@ if (( $# )) && comparguments -i "$autod" "$singopt[@]" "$@"; then
               while _next_label "$subc" expl "$descr"; do
                 "$action[1]" "$subopts[@]" "$expl[@]" "${(@)action[2,-1]}" && ret=0
 	      done
-              (( ret )) && alwopt=yes
+              (( ret )) && alwopt=${alwopt:-yes}
 	      tried=yes
             fi
           fi
@@ -340,7 +340,8 @@ if (( $# )) && comparguments -i "$autod" "$singopt[@]" "$@"; then
 	PREFIX="$origpre"
 	IPREFIX="$origipre"
 
-        if comparguments -s single; then
+        if [[ -z "$alwopt" || -z "$tried" || "$alwopt" = arg ]] &&
+           comparguments -s single; then
 
           if [[ "$single" = direct ]]; then
             _all_labels options expl option \

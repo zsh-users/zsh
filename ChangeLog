@@ -1,3 +1,9 @@
+2001-04-26  Sven Wischnowsky  <wischnow@zsh.org>
+
+	* 14117: Completion/Base/Utility/_arguments, Doc/Zsh/compsys.yo:
+	tweak to make single-letter options only be completed after an
+	option with an argument if the -W option is given
+
 2001-04-26  Bart Schaefer  <schaefer@zsh.org>
 
 	* 14108: Src/Modules/termcap.c: Don't define USES_TERM* if the
