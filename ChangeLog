@@ -1,5 +1,7 @@
 2001-09-10  Clint Adams  <clint@zsh.org>
 
+	* 15780: Src/Modules/tcp.c: tweak variable name.
+
 	* 15779: Src/Modules/tcp.c: add -d (specify fd)
 	for ztcp.
 
