@@ -1,3 +1,9 @@
+2000-05-10  Bart Schaefer  <schaefer@zsh.org>
+
+	* 11297: Doc/Zsh/compwid.yo, Doc/Zsh/zle.yo: Document that ZLE
+	user-defined widget functions are executed with standard input
+	closed.
+	
 2000-05-10  Peter Stephenson  <pws@cambridgesiliconradio.com>
 
 	* Naoki Wakamatsu: 11287: Completion/Core/compinstall: tab had
@@ -12,7 +18,7 @@
 	
 	* 11292: Completion/Core/_files: update `%p' replacement in _files
 	
-2000-05-09  Bart Schaefer  <schaefer@brasslantern.com>
+2000-05-09  Bart Schaefer  <schaefer@zsh.org>
 
 	* 11288: Completion/Commands/_complete_help,
 	Completion/Core/_main_complete: Reopen stdin from /dev/null,

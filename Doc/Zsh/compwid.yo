@@ -12,22 +12,27 @@ ifnzman(noderef(The zsh/zle Module))\
 
 example(zle -C complete expand-or-complete completer)
 
-defines a widget named tt(complete). When this widget is bound to a key
-using the tt(bindkey) builtin command defined in the tt(zsh/zle) module
-(see 
-ifzman(zmanref(zshzle))\
-ifnzman(noderef(Zsh Line Editor))\
-), typing that key will call the shell function tt(completer). This
-function is responsible for generating the possible matches using the
-builtins described below. Once the function returns, the completion code
-takes over control again and treats the matches as the builtin widget
-tt(expand-or-complete) would do.  For this second argument, the name of any
-of the builtin widgets that handle completions can be given:
+defines a widget named `tt(complete)'.  The second argument is the name
+of any of the builtin widgets that handle completions:
 tt(complete-word), tt(expand-or-complete),
 tt(expand-or-complete-prefix), tt(menu-complete),
 tt(menu-expand-or-complete), tt(reverse-menu-complete),
 tt(list-choices), or tt(delete-char-or-list).  Note that this will still
 work even if the widget in question has been rebound.
+
+When this newly defined widget is bound to a key
+using the tt(bindkey) builtin command defined in the tt(zsh/zle) module
+(\
+ifzman(see zmanref(zshzle))\
+ifnzman(noderef(Zsh Line Editor))\
+), typing that key will call the shell function `tt(completer)'. This
+function is responsible for generating the possible matches using the
+builtins described below.  As with other ZLE widgets, the function is
+called with its standard input closed.
+
+Once the function returns, the completion code takes over control again
+and treats the matches in the same manner as the specified builtin
+widget, in this case tt(expand-or-complete).
 
 startmenu()
 menu(Special Parameters)
