@@ -949,7 +949,11 @@ enditem()
 In each of the cases above, the var(action) says how the possible
 completions should be generated. In cases where only one of a fixed
 set of strings can be completed, these string can directly be given as 
-a list in parentheses, as in `tt(:foo:(foo bar baz))'. A string in
+a list in parentheses, as in `tt(:foo:(foo bar baz))'. Such a list in
+doubled parentheses, as in `tt(:foo:((a\:bar b\:baz)))' should contain 
+strings consisting of the string to complete followed by a colon
+(which needs to be preceded by a backslash) and a description. The
+matches will be listed together with their descriptions. A string in
 braces will be evaluated to generate the matches and if the
 var(action) does not begin with an opening parentheses or brace, it
 will be split into separate words and executed. If the var(action)

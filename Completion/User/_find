@@ -43,8 +43,8 @@ _arguments \
   '*-perm:file permission bits:' \
   '*-size:file size:' \
   '*-true' \
-  '*-type:file type:(b c d p f l s)' \
-  '*-xtype:file type:(b c d p f l s)' \
+  '*-type:file type:((b\:block\ special\ file c\:character\ special\ file d\:directory p\:named\ pipe f\:normal\ file l\:symbolic\ link s\:socket))' \
+  '*-xtype:file type:((b\:block\ special\ file c\:character\ special\ file d\:directory p\:named\ pipe f\:normal\ file l\:symbolic\ link s\:socket))' \
   '*-exec:program: _command_names -e:*\;::program arguments: _normal' \
   '*-ok:program: _command_names -e:*\;::program arguments: _normal' \
   '*-fls:output file:_files' \

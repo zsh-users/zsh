@@ -533,8 +533,34 @@ else
     if [[ -z "$action" ]]; then
 
       # An empty action means that we should just display a message.
+
       _message "$descr"
       return ret
+
+    elif [[ "$action" = \(\(*\)\) ]]; then
+
+      # ((...)) contains literal strings with descriptions.
+
+      eval ws\=\( "${action[3,-3]}" \)
+
+      compadd -D ws - "${(@)ws%%:*}"
+
+      if (( $#ws )); then
+        beg=1
+        for nth in "$ws[@]"; do
+          tmp="${#nth%%:*}"
+	  [[ tmp -gt beg ]] && beg="$tmp"
+        done
+        tmp=''
+        for nth in "$ws[@]"; do
+          tmp="$tmp
+${(r:beg:: :)nth%%:*} -- ${nth#*:}"
+        done
+        tmp="$tmp[2,-1]"
+        compadd "$expl[@]" -y tmp - "${(@)ws%%:*}"
+      else
+        _message "$descr"
+      fi
     elif [[ "$action" = \(*\) ]]; then
 
       # Anything inside `(...)' is added directly.
