@@ -1,3 +1,9 @@
+2004-02-26  Peter Stephenson  <pws@csr.com>
+
+	* 19460: configure.ac, Src/Modules/terminfo.c,
+	Src/Modules/terminfo.mdd: Another go at fixing the terminfo
+	configuration problems.
+
 2004-02-25  Doug Kearns  <djkea2@mugca.its.monash.edu.au>
 
 	* 19458: Completion/Unix/Command/_raggle: new completion for raggle

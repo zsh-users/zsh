@@ -29,12 +29,18 @@
 
 #define USES_TERM_H 1
 #include "terminfo.mdh"
-#include "terminfo.pro"
 
+#if defined(HAVE_TIGETFLAG) && defined(HAVE_CURSES_H)
+# define USE_TERMINFO_MODULE 1
+#else
+# undef USE_TERMINFO_MODULE
+#endif
+
+#include "terminfo.pro"
 static char terminfo_nam[] = "terminfo";
 
 /**/
-#ifdef HAVE_TIGETSTR
+#ifdef USE_TERMINFO_MODULE
 
 /* The following two undefs are needed for Solaris 2.6 */
 # ifdef VINTR
@@ -44,9 +50,7 @@ static char terminfo_nam[] = "terminfo";
 #  undef offsetof
 # endif
 
-# ifdef HAVE_CURSES_H
-#  include <curses.h>
-# endif
+# include <curses.h>
 # ifdef HAVE_TERM_H
 #  include <term.h>
 # endif
@@ -123,19 +127,19 @@ bin_echoti(char *name, char **argv, Options ops, int func)
 }
 
 /**/
-#else /* !HAVE_TIGETSTR */
+#else /* !USE_TERMINFO_MODULE */
 
 #define bin_echoti bin_notavail
 
 /**/
-#endif /* !HAVE_TIGETSTR */
+#endif /* !USE_TERMINFO_MODULE */
 
 static struct builtin bintab[] = {
     BUILTIN("echoti", 0, bin_echoti, 1, -1, 0, NULL, NULL),
 };
 
 /**/
-#ifdef HAVE_TIGETSTR
+#ifdef USE_TERMINFO_MODULE
 
 /* Empty dummy function for special hash parameters. */
 
@@ -361,7 +365,7 @@ scanterminfo(HashTable ht, ScanFunc func, int flags)
 }
 
 /**/
-#endif /* HAVE_TIGETSTR */
+#endif /* USE_TERMINOF_MODULE */
 
 /**/
 int
@@ -374,7 +378,7 @@ setup_(Module m)
 int
 boot_(Module m)
 {
-#ifdef HAVE_TIGETSTR
+#ifdef USE_TERMINFO_MODULE
 # ifdef HAVE_SETUPTERM
     int errret;
 
@@ -394,7 +398,7 @@ boot_(Module m)
 int
 cleanup_(Module m)
 {
-#ifdef HAVE_TIGETSTR
+#ifdef USE_TERMINFO_MODULE
     Param pm;
 
     if ((pm = (Param) paramtab->getnode(paramtab, terminfo_nam)) &&

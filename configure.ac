@@ -620,8 +620,7 @@ AH_TEMPLATE([HAVE_STRNAMES],
 AH_TEMPLATE([TERM_H_NEEDS_CURSES_H],
 [Define if term.h chokes without curses.h.])
 AC_SEARCH_LIBS(tgetent, [$termcap_curses_order])
-case "$LIBS" in
-*curses*)
+AC_SEARCH_LIBS(tigetflag, [$termcap_curses_order])
 AC_CHECK_HEADERS(curses.h, [],
 [AC_CACHE_CHECK(for Solaris 8 curses.h mistake, ac_cv_header_curses_solaris,
 AC_TRY_COMPILE([#include <curses.h>], [],
@@ -683,8 +682,7 @@ AC_TRY_LINK([#include <curses.h>
 #include <term.h>], [char **test = strnames; printf(*test);],
 AC_DEFINE(HAVE_STRNAMES) strnames=yes, strnames=no)
 AC_MSG_RESULT($strnames)
-]);;
-esac
+])
 
 dnl Some systems (Solaris 2.x, Linux Redhat 5.x) require
 dnl libnsl (Network Services Library) to find yp_all

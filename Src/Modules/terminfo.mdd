@@ -1,13 +1,13 @@
 name=zsh/terminfo
 
-link='if test "x$ac_cv_func_tigetstr" = xyes; then
+link='if test "x$ac_cv_func_tigetflag" = xyes -a "x$ac_cv_header_curses_h" = xyes; then
           if test "x$zsh_cv_shared_tigetstr" = xyes; then
 	      echo either
 	  else
 	      echo static
 	  fi
       else
-          echo either;
+          echo no;
       fi
 '
 load=yes
