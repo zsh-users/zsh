@@ -1,5 +1,8 @@
 2000-07-12  Sven Wischnowsky  <wischnow@zsh.org>
 
+	* 12226: Completion/Core/_main_complete: don't start menu
+ 	selection with only select=long
+	
 	* 12225: Completion/Linux/_rpm: check if options were completed
 	
 2000-07-11  Peter Stephenson  <pws@cambridgesiliconradio.com>

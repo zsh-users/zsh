@@ -175,7 +175,7 @@ if [[ $compstate[old_list] = keep || nm -gt 1 ]]; then
           -n "$_menu_style[(r)(yes|true|on|1)=long-list]" ) ]]; then
     compstate[insert]=menu
   elif [[ "$compstate[insert]" = "$_saved_insert" ]]; then
-    if [[ -n "$_menu_style[(r)select=long]" && tmp -gt LINES ]]; then
+    if [[ -n "$_menu_style[(r)(yes|true|1|on)=long]" && tmp -gt LINES ]]; then
         compstate[insert]=menu
     else
       sel=( "${(@M)_menu_style:#(yes|true|1|on)*}" )
@@ -183,11 +183,13 @@ if [[ $compstate[old_list] = keep || nm -gt 1 ]]; then
       if (( $#sel )); then
 	min=9999999
         for i in "$sel[@]"; do
-          if [[ "$i" = *\=* ]]; then
+          if [[ "$i" = *\=[0-9]* ]]; then
   	    num="${i#*\=}"
   	    [[ num -lt 0 ]] && num=0
-  	  else
-  	    num=$nm
+  	  elif [[ "$i" != *\=* ]]; then
+  	    num=0
+          else
+	    num=9999999
   	  fi
   	  [[ num -lt min ]] && min="$num"
   
@@ -199,11 +201,13 @@ if [[ $compstate[old_list] = keep || nm -gt 1 ]]; then
       if (( $#sel )); then
 	max=9999999
         for i in "$sel[@]"; do
-          if [[ "$i" = *\=* ]]; then
+          if [[ "$i" = *\=[0-9]* ]]; then
   	    num="${i#*\=}"
   	    [[ num -lt 0 ]] && num=0
-  	  else
+          elif [[ "$i" != *\=* ]]; then
   	    num=0
+  	  else
+  	    num=9999999
   	  fi
   	  [[ num -lt max ]] && max="$num"
   
@@ -229,20 +233,22 @@ if [[ $compstate[old_list] = keep || nm -gt 1 ]]; then
     elif [[ -n "$_menu_style[(r)select=long*]" ]]; then
       if [[ tmp -gt LINES ]]; then
         zmodload -i zsh/complist
-        MENUSELECT=0
+        MENUSELECT=00
       fi
     fi
-    if [[ "$MENUSELECT" != 0 ]]; then
+    if [[ "$MENUSELECT" != 00 ]]; then
       sel=( "${(@M)_menu_style:#select*}" )
 
       if (( $#sel )); then
 	min=9999999
         for i in "$sel[@]"; do
-          if [[ "$i" = *\=* ]]; then
+          if [[ "$i" = *\=[0-9]* ]]; then
   	    num="${i#*\=}"
   	    [[ num -lt 0 ]] && num=0
-  	  else
+  	  elif [[ "$i" != *\=* ]]; then
   	    num=0
+          else
+	    num=9999999
   	  fi
   	  [[ num -lt min ]] && min="$num"
   
