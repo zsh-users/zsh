@@ -1751,6 +1751,9 @@ bin_compadd(char *name, char **argv, char *ops, int func)
 	    case 'f':
 		dat.flags |= CMF_FILE;
 		break;
+	    case 'e':
+		dat.flags |= CMF_ISPAR;
+		break;
 	    case 'F':
 		sp = &(dat.ign);
 		e = "string expected after -%c";

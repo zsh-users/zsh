@@ -1,25 +1,31 @@
 #compdef -brace-parameter-
 
-setopt localoptions extendedglob
+_parameters -e
 
-local lp ls n q
 
-if [[ "$SUFFIX" = *\}* ]]; then
-  ISUFFIX="${SUFFIX#*\}}$ISUFFIX"
-  SUFFIX="${SUFFIX%%\}*}"
-  suf=()
-elif [[ "$LBUFFER" = *\$\{[^}]#\$\{[^}]#$PREFIX ||
-        "$compstate[insert]" = *menu* ]]; then
-  suf=(-b '')
-else
-  suf=(-b ' ')
-fi
+# Without the `-e' option, we would use the following (see the file
+# Core/_parameters for more enlightenment).
 
-lp="$LBUFFER[1,-${#PREFIX}-1]"
-ls="$RBUFFER[${#SUFFIX}+1,-1]"
-n=${(M)#ls##\"#}
-q=${(M)lp%%\"#}
+# setopt localoptions extendedglob
 
-[[ n -gt 0 ]] && suf=''
+# local lp ls n q
 
-_parameters "$suf[@]" -Qs "${q[1,-n-1]}" -r '-:?#%+=[/}'
+# if [[ "$SUFFIX" = *\}* ]]; then
+#   ISUFFIX="${SUFFIX#*\}}$ISUFFIX"
+#   SUFFIX="${SUFFIX%%\}*}"
+#   suf=()
+# elif [[ "$LBUFFER" = *\$\{[^}]#\$\{[^}]#$PREFIX ||
+#         "$compstate[insert]" = *menu* ]]; then
+#   suf=(-b '')
+# else
+#   suf=(-b ' ')
+# fi
+
+# lp="$LBUFFER[1,-${#PREFIX}-1]"
+# ls="$RBUFFER[${#SUFFIX}+1,-1]"
+# n=${(M)#ls##\"#}
+# q=${(M)lp%%\"#}
+
+# [[ n -gt 0 ]] && suf=''
+
+# _parameters "$suf[@]" -Qs "${q[1,-n-1]}" -r '-:?#%+=[/}'

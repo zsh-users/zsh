@@ -366,7 +366,7 @@ otherwise.
 )
 findex(compadd)
 cindex(completion widgets, adding specified matches)
-xitem(tt(compadd) [ tt(-qQfnUam) ] [ tt(-F) var(array) ])
+xitem(tt(compadd) [ tt(-qQfenUam) ] [ tt(-F) var(array) ])
 xitem([ tt(-P) var(prefix) ] [ tt(-S) var(suffix) ])
 xitem([ tt(-p) var(hidden-prefix) ] [ tt(-s) var(hidden-suffix) ])
 xitem([ tt(-i) var(ignored-prefix) ] [ tt(-I) var(ignored-suffix) ])
@@ -485,6 +485,12 @@ filenames, but if they are, and the option tt(LIST_TYPES) is set, the
 characters describing the types of the files in the completion lists will
 be shown. This also forces a slash to be added when the name of a
 directory is completed.
+)
+item(tt(-e))(
+This flag can be used to tell the completion code that the matches
+added are parameter names for a parameter expansion. This will make
+the tt(AUTO_PARAM_SLASH) and tt(AUTO_PARAM_KEYS) options be used for
+the matches.
 )
 item(tt(-W) var(file-prefix))(
 This option has the same meaning as for the tt(compctl) and

@@ -2,76 +2,94 @@
 
 # This should be used to complete parameter names if you need some of the
 # extra options of compadd. It completes only non-local parameters.
+
+setopt localoptions extendedglob
+
+local pars expl
+
+_description expl parameter
+
+if zmodload -e parameter; then
+  pars=( ${(k)parameters[(R)^*local*]} )
+else
+  pars=( ${${${(f)"$(typeset +)"}:#*local *}##* } )
+fi
+
+compadd "$expl[@]" "$@" - $pars
+
+
+
+# The `-e' option does everything for parameter expansions of us. If
+# we wouldn't have it, we would use something like:
+
 # If the first argument is `-s' or `-b' auto_param_slash will be tested
 # and slashes will be added to parameters containing a directory. `-s' is
 # for parameter expansions without braces and `-b' is for expansions with
 # braces. A `-' as the first argument is ignored and in all cases all
 # other arguments will be given to `compadd'.
 
+# setopt localoptions extendedglob
 
-setopt localoptions extendedglob
+# local pars expl slash suf
 
-local pars expl slash suf
+# if [[ "$1" = -s ]]; then
+#   slash=normal
+#   suf="$2"
+#   shift 2
+# elif [[ "$1" = -b ]]; then
+#   slash=brace
+#   suf="$2"
+#   shift 2
+# elif [[ "$1" = - ]]; then
+#   shift
+# fi
 
-if [[ "$1" = -s ]]; then
-  slash=normal
-  suf="$2"
-  shift 2
-elif [[ "$1" = -b ]]; then
-  slash=brace
-  suf="$2"
-  shift 2
-elif [[ "$1" = - ]]; then
-  shift
-fi
+# _description expl parameter
 
-_description expl parameter
+# if [[ -n "$slash" && -o autoparamslash ]]; then
+#   local i dirs nodirs ret=1
 
-if [[ -n "$slash" && -o autoparamslash ]]; then
-  local i dirs nodirs ret=1
+#   dirs=()
+#   nodirs=()
 
-  dirs=()
-  nodirs=()
+#   if zmodload -e parameter; then
+#     setopt localoptions extendedglob
+#     nodirs=( ${(k)parameters[(R)undefined]} )
+#     pars=( ${(k)parameters[(R)^*(local|undefined)*]} )
+#   else
+#     nodirs=( ${${(M)${(f)"$(typeset +)"}:#undefined *}##* } )
+#     pars=( ${${${(f)"$(typeset +)"}:#*(local|undefined) *}##* } )
+#   fi
 
-  if zmodload -e parameter; then
-    setopt localoptions extendedglob
-    nodirs=( ${(k)parameters[(R)undefined]} )
-    pars=( ${(k)parameters[(R)^*(local|undefined)*]} )
-  else
-    nodirs=( ${${(M)${(f)"$(typeset +)"}:#undefined *}##* } )
-    pars=( ${${${(f)"$(typeset +)"}:#*(local|undefined) *}##* } )
-  fi
+#   for i in $pars; do
+#     if [[ -d "${(P)i}" ]]; then
+#       dirs=( $dirs $i )
+#     else
+#       nodirs=( $nodirs $i )
+#     fi
+#   done
 
-  for i in $pars; do
-    if [[ -d "${(P)i}" ]]; then
-      dirs=( $dirs $i )
-    else
-      nodirs=( $nodirs $i )
-    fi
-  done
+#   if [[ "$slash" = normal ]]; then
+#     compadd -S "/${suf%% #}" -r ' [/:' "$expl[@]" "$@" - $dirs && ret=0
+#     compadd -S "$suf" -r ' [:' "$expl[@]" "$@" - $nodirs && ret=0
+#   elif [[ "$slash" = brace ]]; then
+#     compadd -S "}/${suf%% #}" -r '-:?#%+=[/}' "$expl[@]" "$@" - $dirs && ret=0
+#     compadd -S "}$suf" -r '-:?#%+=[/}' "$expl[@]" "$@" - $nodirs && ret=0
+#   fi
 
-  if [[ "$slash" = normal ]]; then
-    compadd -S "/${suf%% #}" -r ' [/:' "$expl[@]" "$@" - $dirs && ret=0
-    compadd -S "$suf" -r ' [:' "$expl[@]" "$@" - $nodirs && ret=0
-  elif [[ "$slash" = brace ]]; then
-    compadd -S "}/${suf%% #}" -r '-:?#%+=[/}' "$expl[@]" "$@" - $dirs && ret=0
-    compadd -S "}$suf" -r '-:?#%+=[/}' "$expl[@]" "$@" - $nodirs && ret=0
-  fi
+#   return ret
+# else
+#   if zmodload -e parameter; then
+#     pars=( ${(k)parameters[(R)^*local*]} )
+#   else
+#     pars=( ${${${(f)"$(typeset +)"}:#*local *}##* } )
+#   fi
 
-  return ret
-else
-  if zmodload -e parameter; then
-    setopt localoptions extendedglob
-    pars=( ${(k)parameters[(R)^*local*]} )
-  else
-    pars=( ${${${(f)"$(typeset +)"}:#*local *}##* } )
-  fi
-
-  if [[ "$slash" = normal ]]; then
-    compadd -S "$suf" -r ' [:' "$expl[@]" "$@" - $pars
-  elif [[ "$slash" = brace ]]; then
-    compadd -S "}$suf" -r '-:?#%+=[/}' "$expl[@]" "$@" - $pars
-  else
-    compadd "$expl[@]" "$@" - $pars
-  fi
-fi
+#   if [[ "$slash" = normal ]]; then
+#     compadd -S "$suf" -r ' [:' "$expl[@]" "$@" - $pars
+#   elif [[ "$slash" = brace ]]; then
+#     compadd -S "}$suf" -r '-:?#%+=[/}' "$expl[@]" "$@" - $pars
+#   else
+#     compadd "$expl[@]" "$@" - $pars
+#   fi
+# fi

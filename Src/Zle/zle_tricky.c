@@ -197,6 +197,10 @@ static int noreal;
 
 static char *parpre;
 
+/* Flags for parameter expansions for new style completion. */
+
+static int parflags;
+
 /* This is either zero or equal to the special character the word we are *
  * trying to complete starts with (e.g. Tilde or Equals).                */
 
@@ -812,7 +816,8 @@ check_param(char *s, int set, int test)
 		parq = eparq = 0;
 
 	    /* Save the prefix. */
-	    if (incompfunc) {
+	    if (compfunc) {
+		parflags = (br >= 2 ? CMF_PARBR : 0);
 		sav = *b;
 		*b = '\0';
 		untokenize(parpre = ztrdup(s));
@@ -3801,6 +3806,8 @@ addmatches(Cadata dat, char **argv)
     Patprog cp = NULL;
     LinkList aparl = NULL, oparl = NULL, dparl = NULL;
 
+    if (dat->flags & CMF_ISPAR)
+	dat->flags |= parflags;
     if (compquote && (qc = *compquote)) {
 	if (qc == '`') {
 	    instring = 0;
@@ -4562,7 +4569,8 @@ docompletion(char *s, int lst, int incmd)
 	    cs = origcs;
 	}
 	/* Print the explanation strings if needed. */
-	if (!showinglist && validlist && usemenu != 2 && nmatches != 1) {
+	if (!showinglist && validlist && usemenu != 2 && nmatches != 1 &&
+	    (!oldlist || !listshown)) {
 	    Cmgroup g = amatches;
 	    Cexpl *e;
 	    int up = 0, tr = 1, nn = 0;
@@ -7751,6 +7759,7 @@ do_single(Cmatch m)
 {
     int l, sr = 0, scs;
     int havesuff = 0;
+    int partest = (m->ripre || ((m->flags & CMF_ISPAR) && parpre));
     char *str = m->str, *ppre = m->ppre, *psuf = m->psuf, *prpre = m->prpre;
 
     if (!prpre) prpre = "";
@@ -7799,7 +7808,7 @@ do_single(Cmatch m)
 	/* There is no user-specified suffix, *
 	 * so generate one automagically.     */
 	cs = scs;
-	if (m->ripre && (m->flags & CMF_PARBR)) {
+	if (partest && (m->flags & CMF_PARBR)) {
 	    int pq;
 
 	    /*{{*/
@@ -7815,7 +7824,7 @@ do_single(Cmatch m)
 	    if (m->flags & CMF_PARNEST)
 		havesuff = 1;
 	}
-	if ((m->flags & CMF_FILE) || (m->ripre && isset(AUTOPARAMSLASH))) {
+	if ((m->flags & CMF_FILE) || (partest && isset(AUTOPARAMSLASH))) {
 	    /* If we have a filename or we completed a parameter name      *
 	     * and AUTO_PARAM_SLASH is set, lets see if it is a directory. *
 	     * If it is, we append a slash.                                */
@@ -7827,11 +7836,14 @@ do_single(Cmatch m)
 		t = 1;
 	    else {
 		/* Build the path name. */
-		if (m->ripre && !*psuf && !(m->flags & CMF_PARNEST)) {
+		if (partest && !*psuf && !(m->flags & CMF_PARNEST)) {
 		    int ne = noerrs;
 
-		    p = (char *) zhalloc(strlen(m->ripre) + strlen(str) + 2);
-		    sprintf(p, "%s%s%c", m->ripre, str,
+		    p = (char *) zhalloc(strlen((m->flags & CMF_ISPAR) ?
+						parpre : m->ripre) +
+					 strlen(str) + 2);
+		    sprintf(p, "%s%s%c",
+			    ((m->flags & CMF_ISPAR) ? parpre : m->ripre), str,
 			    ((m->flags & CMF_PARBR) ? Outbrace : '\0'));
 		    noerrs = 1;
 		    parsestr(p);
@@ -7841,7 +7853,8 @@ do_single(Cmatch m)
 		} else {
 		    p = (char *) zhalloc(strlen(prpre) + strlen(str) +
 				 strlen(psuf) + 3);
-		    sprintf(p, "%s%s%s", (prpre && *prpre) ? prpre : "./", str, psuf);
+		    sprintf(p, "%s%s%s", ((prpre && *prpre) ?
+					  prpre : "./"), str, psuf);
 		}
 		/* And do the stat. */
 		t = (!(sr = ztat(p, &buf, 0)) && S_ISDIR(buf.st_mode));
@@ -7900,7 +7913,7 @@ do_single(Cmatch m)
 		makesuffix(1);
 	}
     }
-    if (minfo.we && m->ripre && isset(AUTOPARAMKEYS))
+    if (minfo.we && partest && isset(AUTOPARAMKEYS))
 	makeparamsuffix(((m->flags & CMF_PARBR) ? 1 : 0), minfo.insc - parq);
 
     if ((menucmp && !minfo.we) || !movetoend) {
