@@ -1,5 +1,8 @@
-moddeps="comp1"
+name=zsh/compctl
 
-autobins="compctl"
+moddeps="zsh/complete zsh/zle"
 
+autobins="compctl compcall"
+
+headers="compctl.h"
 objects="compctl.o"

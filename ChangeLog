@@ -1,3 +1,8 @@
+2000-05-18  Sven Wischnowsky  <wischnow@zsh.org>
+
+	* 11457: Doc/Zsh/compsys.yo, Src/Zle/compctl.mdd: small doc fix;
+ 	make compcall autoload compctl module
+	
 2000-05-18  Peter Stephenson  <pws@cambridgesiliconradio.com>
 
 	* pws: 11455: Completion/Core/_oldlist: old-menu defaults on.

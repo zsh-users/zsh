@@ -1486,7 +1486,7 @@ example, with the tt(MENU_COMPLETE) option).
 
 In addition to (or instead of) the above possibilities, the value may
 contain the string `tt(select)', optionally followed by an equal sign and a
-number.  In this case menu-selection (as defined by the tt(zsh/computil)
+number.  In this case menu-selection (as defined by the tt(zsh/complist)
 module) will be started.  Without the optional number, it will be started
 unconditionally and with a number it will be started only if at least that
 many matches are generated; if the values for more than one tag provide a
