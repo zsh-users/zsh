@@ -1,3 +1,12 @@
+2004-10-17  Wayne Davison  <wayned@users.sourceforge.net>
+
+	* 20496: Src/utils.c: made zclose() not call close() when the
+	fd arg is < 0.
+	
+	* unposted: Src/Zle/zle_main.c: initialize the first byte of
+	the allocated "line" buffer so that we avoid uninitialized-
+	memory warnings in valgrind.
+
 2004-10-16  Peter Stephenson  <pws@pwstephenson.fsnet.co.uk>
 
 	* 20490: Src/pattern.c, Src/zsh.h: use lengths for test strings in
