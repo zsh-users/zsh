@@ -47,20 +47,39 @@ fi
 # is searched after a `--file=' long option, in the third word if the
 # second one didn't start with a hyphen but contained a `f', and after 
 # an option argument starting with only one hyphen and containing a `f'.
+# unless that option argument also contains a `C'.
 
 tmp="$words[(I)--file=*]"
+tmpb="$words[(I)-*Cf*~--*]}"
+
 if (( tmp )); then
   tf=${~words[tmp][8,-1]}
   _tar_cmd="f$_tar_cmd"
 elif [[ "$words[2]" != -* && "$words[2]" = *f* ]]; then
   tf=${~words[3]}
   _tar_cmd="f$_tar_cmd"
+elif (( tmpb )); then
+  tf=${~words[tmpb+2]}
+  wdir=${~words[tmpb+1]}
+  _tar_cmd="Cf$_tar_cmd"
 else
   tmp="${words[(I)-*f*~--*]}"
   if (( tmp )); then
     tf=${~words[tmp+1]}
     _tar_cmd="f$_tar_cmd"
   fi
+fi
+
+# See if we should use a path prefix.  We have to use eval as the dir can
+# be any unevaluated thing which appears on the command line, including a
+# parameter.
+
+# This isn't used right now.
+
+tmp=${words[(r)--dir[a-z]#=*]}
+
+if [[ -n $tmp ]]; then
+  eval "wdir=(${tmp#*=})"
 fi
 
 # Now we complete...
@@ -73,22 +92,34 @@ if [[ "$PREFIX" = --* ]]; then
                  '*=(PROG|COMMAND)*:program:_command_names -e' \
 		 '*=ARCHIVE*:archive: _tar_archive' \
 		 '*=NAME*:file:_files' \
+		 '*=DIR*:directory:_files -/' \
 		 '*=CONTROL*::version control:(t numbered nil existing never simple)'
 
 elif [[ ( CURRENT -gt 2 && "$words[CURRENT-1]" = -*f* &&
-          "$words[CURRENT-1]" != --* ) ||
-        ( CURRENT -eq 3 && "$words[2]" = *f* && "$words[2]" != -* ) ]]; then
+          "$words[CURRENT-1]" != --* && "$words[CURRENT-1]" != -*Cf* ) ||
+        ( CURRENT -eq 3 && "$words[2]" = *f* && "$words[2]" != -* &&
+          "$words[2]" != *Cf* ) ||
+        ( CURRENT -gt 2 && "$words[CURRENT-2]" = -*Cf* &&
+          "$words[CURRENT-2]" != --* && "$words[CURRENT-1]" != --* ) ||
+        ( CURRENT -eq 4 && "$words[2]" = *Cf* && "$words[2]" != -* ) ]]; then
 
   # ...archive files if we think they are wanted here.
 
   _tar_archive
+
+elif [[ ( CURRENT -gt 2 && "$words[CURRENT-1]" = -*Cf*) ||
+        ( CURRENT -eq 3 && "$words[2]" = *Cf* ) ]]; then
+
+  # a directory for -C
+
+  _files -/
 
 elif [[ ( "$_tar_cmd" = *[xt]* || -n $del ) && -n "$tf" ]]; then
 
   # ...and files from the archive if we found an archive name and tar
   # commands. We run `tar t...' on the file, keeping the list of
   # filenames cached, plus the name of the tarfile so we know if it
-  # changes.
+  # changes.  We skip this test if the alleged archive is not a file.
 
   local largs=-tf expl
 
@@ -96,13 +127,15 @@ elif [[ ( "$_tar_cmd" = *[xt]* || -n $del ) && -n "$tf" ]]; then
     largs=-tzf
   elif [[ $_tar_cmd = *Z* ]]; then
     largs=-tZf
+  elif [[ $_tar_cmd = *I* ]]; then
+    largs=-tIf
   else
-    # Some random compression program e.g. bzip2
+    # Some random compression program
     tmp="${words[(r)--use-comp*]}"
     [[ -n $tmp ]] && largs=($tmp -tf)
   fi
 
-  if [[ $tf != $_tar_cache_name ]]; then
+  if [[ $tf != $_tar_cache_name && -f $tf ]]; then
     _tar_cache_list=("${(@f)$($words[1] $largs $tf)}")
     _tar_cache_name=$tf
   fi
@@ -110,15 +143,5 @@ elif [[ ( "$_tar_cmd" = *[xt]* || -n $del ) && -n "$tf" ]]; then
   _wanted files expl 'file from archive' &&
       _multi_parts "$expl[@]" / _tar_cache_list
 else
-  
-  # See if we should use a path prefix.  We have to use eval as the dir can
-  # be any unevaluated thing which appears on the command line, including a
-  # parameter.
-  tmp=${words[(r)--dir[a-z]#=*]}
-  if [[ -n $tmp ]]; then
-    eval "tmp=(${tmp#*=})"
-    _path_files -W tmp
-  else
     _files
-  fi
 fi
