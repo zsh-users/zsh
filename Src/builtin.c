@@ -1586,6 +1586,7 @@ typeset_single(char *cname, char *pname, Param pm, int func,
 	       int on, int off, int roff, char *value, Param altpm)
 {
     int usepm, tc, keeplocal = 0, newspecial = 0;
+    char *subscript;
 
     /*
      * Do we use the existing pm?  Note that this isn't the end of the
@@ -1793,12 +1794,24 @@ typeset_single(char *cname, char *pname, Param pm, int func,
 	    pm->ct = auxlen;
 	else
 	    pm->ct = 0;
-    } else if (strchr(pname, '[')) {
+    } else if ((subscript = strchr(pname, '['))) {
 	if (on & PM_READONLY) {
 	    zerrnam(cname,
 		    "%s: can't create readonly array elements", pname, 0);
 	    return NULL;
-	} else if (PM_TYPE(on) == PM_SCALAR) {
+	} else if (on & PM_LOCAL) {
+	    *subscript = 0;
+	    pm = (Param) (paramtab == realparamtab ?
+			  gethashnode2(paramtab, pname) :
+			  paramtab->getnode(paramtab, pname));
+	    *subscript = '[';
+	    if (!pm || pm->level != locallevel) {
+		zerrnam(cname,
+			"%s: can't create local array elements", pname, 0);
+		return NULL;
+	    }
+	}
+	if (PM_TYPE(on) == PM_SCALAR) {
 	    /*
 	     * This will either complain about bad identifiers, or will set
 	     * a hash element or array slice.  This once worked by accident,
@@ -1808,6 +1821,8 @@ typeset_single(char *cname, char *pname, Param pm, int func,
 	    if (!(pm = setsparam(pname, ztrdup(value ? value : ""))))
 		return NULL;
 	    value = NULL;
+	    keeplocal = 0;
+	    on = pm->flags;
 	} else {
 	    zerrnam(cname,
 		    "%s: array elements must be scalar", pname, 0);

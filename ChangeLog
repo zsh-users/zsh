@@ -1,4 +1,12 @@
-2001-08-08  Sven Wischnowsky  <wischnow@zsh.org>
+2001-08-13  Bart Schaefer  <schaefer@brasslantern.com>
+
+	* 15613 (plus unposted additions): Test/B02typeset.ztst: Tests for
+	correct behavior of typeset options and arguments.
+
+	* 15611: Src/builtin.c: Fix crash bug when assigning to array
+	elements in a function in the arguments of typeset or local.
+
+2001-08-13  Sven Wischnowsky  <wischnow@zsh.org>
 
 	* 15615: Completion/Unix/Type/_path_files: -[12n] options don't
 	get arguments

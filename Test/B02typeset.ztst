@@ -1,0 +1,243 @@
+# There are certain usages of typeset and its synonyms that it is not
+# possible to test here, because they must appear at the top level and
+# everything that follows is processed by an "eval" within a function.
+
+# Equivalences:
+#  declare	typeset			but declare does not accept -m
+#  export	typeset -x		and typeset -x implies -g
+#  float	typeset -E
+#  functions	typeset -f
+#  integer	typeset -i
+#  local	typeset +g -m		approximately
+#  readonly	typeset -r
+
+# Tested elsewhere:
+#  Equivalence of autoload and typeset -fu 	A05execution
+#  Associative array creation & assignment	D04parameter, D06subscript
+#  Effects of GLOBAL_EXPORT			E01options
+#  Function tracing (typeset -ft)		E02xtrace
+
+# Not yet tested:
+#  Justification (-L, -R, -Z)
+#  Case conversion (-l, -u)
+#  Assorted illegal flag combinations
+
+%prep
+
+  setopt noglob
+
+  scalar=scalar
+  array=(a r r a y)
+
+  scope00() {
+    typeset scalar
+    scalar=local
+    typeset -a array
+    array=(l o c a l)
+    print $scalar $array
+  }
+  scope01() {
+    local scalar
+    scalar=local
+    local -a array
+    array=(l o c a l)
+    print $scalar $array
+  }
+  scope02() {
+    declare scalar
+    scalar=local
+    declare -a array
+    array=(l o c a l)
+    print $scalar $array
+  }
+  scope10() {
+    export outer=outer
+    /bin/sh -fc 'echo $outer'
+  }
+  scope11() {
+    typeset -x outer=outer
+    /bin/sh -fc 'echo $outer'
+  }
+  scope12() {
+    local -x outer=inner
+    /bin/sh -fc 'echo $outer'
+  }
+  scope13() {
+    local -xT OUTER outer
+    outer=(i n n e r)
+    /bin/sh -fc 'echo $OUTER'
+  }
+
+  # Bug?  `typeset -h' complains that ! # $ * - ? @ are not identifiers.
+  stress00() {
+    typeset -h +g -m [[:alpha:]_]*
+    unset -m [[:alpha:]_]*
+    typeset +m [[:alpha:]_]*
+  }
+
+%test
+
+ typeset +m scalar array
+0:Report types of parameters with typeset +m
+>scalar
+>array array
+
+ scope00
+ print $scalar $array
+0:Simple local declarations
+>local l o c a l
+>scalar a r r a y
+
+ scope01
+ print $scalar $array
+0:Equivalence of local and typeset in functions
+>local l o c a l
+>scalar a r r a y
+
+ scope02
+ print $scalar $array
+0:Basic equivalence of declare and typeset
+>local l o c a l
+>scalar a r r a y
+
+ declare +m
+1:Differences of declare and typeset
+?(eval):1: bad option: -m
+
+ scope10
+ print $outer
+0:Global export
+>outer
+>outer
+
+ scope11
+ print $outer
+0:Equivalence of export and typeset -x
+>outer
+>outer
+
+ scope12
+ print $outer
+0:Local export
+>inner
+>outer
+
+ float f=3.14159
+ typeset +m f
+ float -E3 f
+ print $f
+ float -F f
+ print $f
+0:Floating point, adding a precision, and fixed point
+>float local f
+>3.14e+00
+>3.142
+
+ integer i=3.141
+ typeset +m i
+ integer -i2 i
+ print $i
+0:Integer and changing the base
+>integer local i
+>2#11
+
+ float -E3 f=3.141
+ typeset +m f
+ integer -i2 f
+ typeset +m f
+ print $f
+0:Conversion of floating point to integer
+>float local f
+>integer local f
+>2#11
+
+ typeset -f
+0q:Equivalence of functions and typeset -f
+>$(functions)
+
+ readonly r=success
+ print $r
+ r=failure
+1:Readonly declaration
+>success
+?(eval):3: read-only variable: r
+
+ typeset r=success
+ readonly r
+ print $r
+ r=failure
+1:Convert to readonly
+>success
+?(eval):4: read-only variable: r
+
+ typeset -gU array
+ print $array
+0:Uniquified arrays and non-local scope
+>a r y
+
+ typeset -T SCALAR=l:o:c:a:l array
+ print $array
+ typeset -U SCALAR
+ print $SCALAR $array
+0:Tied parameters and uniquified colon-arrays
+>l o c a l
+>l:o:c:a l o c a
+
+ typeset -T SCALAR array
+ typeset +T SCALAR
+1:Untying is prohibited
+?(eval):typeset:2: use unset to remove tied variables
+
+ OUTER=outer
+ scope13
+ print $OUTER
+0:Export of tied parameters
+>i:n:n:e:r
+>outer
+
+ local array[2]=x
+1:Illegal local array element assignment
+?(eval):local:1: array[2]: can't create local array elements
+
+ local -a array
+ typeset array[1]=a array[2]=b array[3]=c
+ print $array
+0:Legal local array element assignment
+>a b c
+
+ local -A assoc
+ local b=1 ;: to stomp assoc[1] if assoc[b] is broken
+ typeset assoc[1]=a assoc[b]=2 assoc[3]=c
+ print $assoc[1] $assoc[b] $assoc[3]
+0:Legal local associative array element assignment
+>a 2 c
+
+ local scalar scalar[1]=a scalar[2]=b scalar[3]=c
+ print $scalar
+0:Local scalar subscript assignment
+>abc
+
+ stress00
+ print $scalar $array
+0q:Stress test: all parameters are local and unset, using -m
+>scalar a r y
+
+ # The first declare works around the "not an identifier" bug with -h
+ declare \! \# \$ * - ? @
+ typeset -h +g -m *
+ unset -m *
+ integer i=9
+ float -H f=9
+ declare -t scalar
+ declare -H -a array
+ typeset
+ typeset +
+0:Parameter hiding and tagging, printing types and values
+>array local array
+>float local f
+>integer local i=9
+>local tagged scalar=''
+>array local array
+>float local f
+>integer local i
+>local tagged scalar
