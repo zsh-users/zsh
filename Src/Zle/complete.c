@@ -616,13 +616,14 @@ bin_compadd(char *name, char **argv, char *ops, int func)
 	    }
 	}
     }
+
+ ca_args:
+
     if (mstr && (match = parse_cmatcher(name, mstr)) == pcm_err) {
 	zsfree(mstr);
 	return 1;
     }
     zsfree(mstr);
-
- ca_args:
 
     if (!*argv && !dat.group && !dat.mesg &&
 	!(dat.aflags & (CAF_NOSORT|CAF_UNIQALL|CAF_UNIQCON|CAF_ALL)))

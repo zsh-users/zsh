@@ -1,5 +1,9 @@
 2001-07-25  Sven Wischnowsky  <wischnow@zsh.org>
 
+	* 15487: Completion/Base/Utility/_describe, Src/Zle/complete.c:
+	move pattern matching in the loop to make sure all match specs
+	are used
+
 	* 15485: Completion/Unix/Command/_lzop,
 	Completion/Zsh/Type/_directory_stack,
 	Completion/Zsh/Type/_file_descriptors, Completion/Zsh/Type/_jobs:
