@@ -2452,7 +2452,7 @@ Fri May  3 03:38:28 1996  Zoltán Hidvégi  <hzoli@cs.elte.hu>
 	  P.Stephenson (98)
 
 	* Do not exit the spelling prompt until an acceptable key is
-	  pressed.  From Wayne Davison <wayne@tenor.clarinet.com> (6138)
+	  pressed.  From Wayne Davison (6138)
 
 	* Capitalize ../configure to ../Configure from Wayne (6132)
 
