@@ -1,3 +1,8 @@
+2004-03-12  Oliver Kiddle  <opk@zsh.org>
+
+	* 19602: Src/signames2.awk: adjust to cope with output from the
+	preprocessor on HP/UX, Itanium II, fixing signals problems
+
 2004-03-11  Clint Adams  <clint@zsh.org>
 
 	* 19605: Completion/Unix/Command/_mtr: completion for Matt's
