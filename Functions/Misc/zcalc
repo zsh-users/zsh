@@ -88,6 +88,25 @@
 emulate -L zsh
 setopt extendedglob
 
+# can't be local since required in EXIT trap
+zcalc_orighist=$HISTFILE 
+local temphist=${TMPPREFIX}hist SAVEHIST=$HISTSIZE
+HISTFILE=$temphist
+fc -W
+
+local HISTSIZE=0
+HISTSIZE=$SAVEHIST
+HISTFILE=~/.zcalc_history
+[[ -f $HISTFILE ]] && fc -R
+
+zcalc_restore() {
+    unfunction zcalc_restore
+    fc -W
+    HISTFILE=$zcalc_orighist
+    fc -R
+}
+trap zcalc_restore HUP INT QUIT EXIT
+
 local line latest base defbase match mbegin mend psvar optlist opt arg
 integer num
 
@@ -172,7 +191,10 @@ while vared -cehp "${(%)ZCALCPROMPT}" line; do
     # 
     # Since it's a string, we'd better make sure we know which
     # base it's in, so don't change that until we actually print it.
+    latest=
     eval "latest=\$(( $line ))"
+    # on error $latest is not set; let user re-edit line
+    [[ -n $latest ]] || continue
     argv[num++]=$latest
     psvar[1]=$num
     if [[ -z $base ]]; then

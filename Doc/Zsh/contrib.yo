@@ -828,8 +828,9 @@ Each line typed is evaluated as an expression.  The prompt shows a number,
 which corresponds to a positional parameter where the result of that
 calculation is stored.  For example, the result of the calculation on the
 line preceeded by `tt(4> )' is available as tt($4).  Full command line
-editing, including the history of previous calculations, is available.
-To exit, enter a blank line or type `tt(q)' on its own.
+editing, including the history of previous calculations, is available; the
+history is saved in the file tt(~/.zcalc_history).  To exit, enter a blank
+line or type `tt(q)' on its own.
 
 If arguments are given to tt(zcalc) on start up, they are used to prime the
 first few positional parameters.  A visual indication of this is given when
@@ -844,6 +845,10 @@ for example, `tt([#16])' to display hexadecimal output preceeded by an
 indication of the base, or `tt([##16])' just to display the raw number in
 the given base.  Bases themselves are always specified in decimal.
 `tt([#])' restores the normal output format.
+
+The output base can be initialised by passing the option `tt(-#)var(base)',
+for example `tt(zcalc -#16)' (the `tt(#)' may have to be quoted, depending
+on the globbing options set).
 
 The prompt is configurable via the parameter tt(ZCALCPROMPT), which
 undergoes standard prompt expansion.  The index of the current entry is

@@ -1,5 +1,8 @@
 2001-12-07  Peter Stephenson  <pws@csr.com>
 
+	* 16310: Functions/Misc/zcalc, Doc/Zsh/contrib.yo: separate zcalc
+	history, handle errors in expression, document -#base option.
+
 	* users/4503: Completion/Unix/Command/_gcc: don't complete source
 	or header files after -o.
 
