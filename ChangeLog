@@ -1,5 +1,8 @@
 2001-10-08  Peter Stephenson  <pws@csr.com>
 
+	* 15974: Etc/BUGS, LICENCE: mention trap EXIT bug fixed (ish)
+	on 4.1 branch, plus old LICENCE fix that got missed.
+
 	* 15965: Src/exec.c, Src/glob.c, Src/subst.c: rename glob() to
 	zglob() to avoid clashes with library function.
 
