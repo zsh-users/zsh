@@ -1,3 +1,8 @@
+2004-11-20  Doug Kearns  <djkea2@mugca.its.monash.edu.au>
+
+	* 20571: Completion/Unix/Command/_java: update javac completion for
+	J2SE 5.0
+
 2004-11-19  Peter Stephenson  <pws@csr.com>
 
 	* 20568: Src/pattern.c: in debug test, checking for NULL
