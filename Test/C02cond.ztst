@@ -52,7 +52,12 @@
   [[ -e zerolength && ! -e nonexistent ]]
 0:-e cond
 
-  [[ -f zerolength && ! -f cond && ! -f $char && ! -f $block && ! -f . ]]
+  if [[ -n $block ]]; then
+    [[ -f zerolength && ! -f cond && ! -f $char && ! -f $block[(f)1] && ! -f . ]]
+  else
+    print -u8 'Warning: Not testing [[ -f blockdevice ]] (no devices found)'
+    [[ -f zerolength && ! -f cond && ! -f $char && ! -f . ]]
+  fi
 0:-f cond
 
   [[ -g modish && ! -g zerolength ]]
