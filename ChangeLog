@@ -1,5 +1,8 @@
 2003-01-30  Clint Adams  <clint@zsh.org>
 
+	* unposted: config.guess, config.sub: update to 2003-01-10 and
+	2003-01-03 versions, respectively.
+
 	* 18131: zshconfig.ac: find pcre on RedHat.
 
 2003-01-30  Oliver Kiddle  <opk@zsh.org>
