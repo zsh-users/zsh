@@ -2,12 +2,21 @@
 
 local val nm="$compstate[nmatches]"
 
+[[ $# -eq 1 ]] && 2="$1"
+
 if zstyle -a ":completion:${curcontext}:$1" list-colors val; then
   zmodload -i zsh/complist
   if [[ "$1" = default ]]; then
     ZLS_COLORS="${(j.:.)${(@)val:gs/:/\\\:}}"
   else
-    eval "ZLS_COLORS=\"(${1})\${(j.:(${1}).)\${(@)val:gs/:/\\\:}}:\${ZLS_COLORS}\""
+    local simple grouped
+
+    simple=( "(${2})${(@)^val:#\(*\)*}" )
+    grouped=( "${(M@)val:#\(*\)*}" )
+    simple="${(j.:.)simple}:"
+    grouped="${(j.:.)grouped}:"
+    [[ "$ZLS_COLORS" != *${simple}*  ]] && ZLS_COLORS="${simple}$ZLS_COLORS"
+    [[ "$ZLS_COLORS" != *${grouped}* ]] && ZLS_COLORS="${grouped}$ZLS_COLORS"
   fi
 
 # Here is the problem mentioned in _main_complete.
@@ -16,6 +25,8 @@ if zstyle -a ":completion:${curcontext}:$1" list-colors val; then
 #   zmodload -i zsh/complist
 #   ZLS_COLORS="$ZLS_COLORS$ZLS_COLOURS"
 
+elif [[ "$1" = default ]]; then
+  ZLS_COLORS=
 fi
 
 if zstyle -t ":completion:${curcontext}:$1" list-packed; then

@@ -1358,13 +1358,14 @@ ifnzman(noderef(The zsh/complist Module))\
 If this style is set for the tt(default) tag, the strings in the value 
 are taken as specifications that are to be used everywhere.  If it is
 set for other tags, the specifications are used only for matches of
-the type described by the tag.  For this to work, the tt(group-name)
+the type described by the tag.  For this to work best, the tt(group-name)
 style must be set to an empty string.  If the tt(group-name) tag
 specifies other names for the groups the matches in these groups can
 be colored by using these names together with the `tt((group)...)'
 syntax described for the tt(ZLS_COLORS) and tt(ZLS_COLOURS) parameters 
 and adding the specifications to the value for this style with the
-tt(default) tag.
+tt(default) tag (although in most cases it should work by setting this 
+style for the appropriate tags).
 
 It is possible to use the same specifications set up for the GNU
 version of the tt(ls) command:
@@ -3472,10 +3473,14 @@ widget locally sets the options it needs.  Hence these options are not
 generally used by the completion system.
 )
 findex(_setup)
-item(tt(_setup) var(tag))(
+item(tt(_setup) var(tag) [ var(group) ])(
 This function expects a tag as its argument and sets up the special
 parameters used by the completion system appropriately for the tag,
 using styles such as tt(list-colors) and tt(last-prompt).
+
+The optional var(group) gives the name of the group in which the
+matches will be placed. If it is not given, the var(tag) is used as
+the group name.
 
 Note that this function is called automatically from tt(_description)
 so that one normally doesn't have to call it explicitly.
