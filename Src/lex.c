@@ -339,10 +339,9 @@ yylex(void)
 	    char *name;
 
 	    hwbegin(0);
-	    cmdpush(WC_REDIR_TYPE(*(hdocs->pc)) == HEREDOC ?
-		    CS_HEREDOC : CS_HEREDOCD);
+	    cmdpush(hdocs->type == HEREDOC ? CS_HEREDOC : CS_HEREDOCD);
 	    STOPHIST
-	    name = gethere(hdocs->str, WC_REDIR_TYPE(*hdocs->pc));
+	    name = gethere(hdocs->str, hdocs->type);
 	    ALLOWHIST
 	    cmdpop();
 	    hwend();

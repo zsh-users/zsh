@@ -233,6 +233,18 @@ Eccstr ecstrs;
 /**/
 int ecsoffs, ecssub, ecnfunc;
 
+/* Adjust pointers in here-doc structs. */
+
+static void
+ecadjusthere(int p, int d)
+{
+    struct heredocs *h;
+
+    for (h = hdocs; h; h = h->next)
+	if (h->pc >= p)
+	    h->pc += d;
+}
+
 /* Insert n free code-slots at position p. */
 
 static void
@@ -250,6 +262,7 @@ ecispace(int p, int n)
     if ((m = ecused - p) > 0)
 	memmove(ecbuf + p + n, ecbuf + p, m * sizeof(wordcode));
     ecused += n;
+    ecadjusthere(p, n);
 }
 
 /* Add one wordcode. */
@@ -278,6 +291,7 @@ ecdel(int p)
     if (n > 0)
 	memmove(ecbuf + p, ecbuf + p + 1, n * sizeof(wordcode));
     ecused--;
+    ecadjusthere(p, -1);
 }
 
 /* Build the wordcode for a string. */
@@ -682,7 +696,6 @@ par_pline(int *complex)
 	for (r = p + 1; wc_code(ecbuf[r]) == WC_REDIR; r += 3);
 
 	ecispace(r, 3);
-	p += 3;
 	ecbuf[r] = WCB_REDIR(MERGEOUT);
 	ecbuf[r + 1] = 2;
 	ecbuf[r + 2] = ecstrcode("1");
@@ -690,6 +703,8 @@ par_pline(int *complex)
 	*complex = 1;
 	cmdpush(CS_ERRPIPE);
 	yylex();
+	while (tok == SEPER)
+	    yylex();
 	ecbuf[p] = WCB_PIPE(WC_PIPE_MID, (line >= 0 ? line + 1 : 0));
 	ecispace(p + 1, 1);
 	ecbuf[p + 1] = ecused - 1 - p;
@@ -1577,18 +1592,19 @@ par_redir(int *rp)
 	/* <<[-] name */
 	struct heredocs **hd;
 
-	for (hd = &hdocs; *hd; hd = &(*hd)->next);
-	*hd = zalloc(sizeof(struct heredocs));
-	(*hd)->next = NULL;
-	(*hd)->pc = ecbuf + r;
-	(*hd)->str = tokstr;
-
 	/* If we ever need more than three codes (or less), we have to change
 	 * the factors in par_cmd() and par_simple(), too. */
 	ecispace(r, 3);
 	*rp = r + 3;
 	ecbuf[r] = WCB_REDIR(type);
 	ecbuf[r + 1] = fd1;
+
+	for (hd = &hdocs; *hd; hd = &(*hd)->next);
+	*hd = zalloc(sizeof(struct heredocs));
+	(*hd)->next = NULL;
+	(*hd)->type = type;
+	(*hd)->pc = r;
+	(*hd)->str = tokstr;
 
 	yylex();
 	return;
@@ -1626,10 +1642,10 @@ par_redir(int *rp)
 
 /**/
 void
-setheredoc(Wordcode pc, int type, char *str)
+setheredoc(int pc, int type, char *str)
 {
-    pc[0] = WCB_REDIR(type);
-    pc[2] = ecstrcode(str);
+    ecbuf[pc] = WCB_REDIR(type);
+    ecbuf[pc + 2] = ecstrcode(str);
 }
 
 /*

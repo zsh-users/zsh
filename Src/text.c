@@ -737,7 +737,12 @@ getredirs(LinkList redirs)
 		taddchr('0' + f->fd1);
 	    taddstr(fstr[f->type]);
 	    taddchr(' ');
-	    taddstr(f->name);
+	    if (f->type == HERESTR) {
+		taddchr('\'');
+		taddstr(bslashquote(f->name, NULL, 1));
+		taddchr('\'');
+	    } else
+		taddstr(f->name);
 	    taddchr(' ');
 	    break;
 #ifdef DEBUG

@@ -737,7 +737,8 @@ struct execstack {
 
 struct heredocs {
     struct heredocs *next;
-    Wordcode pc;
+    int type;
+    int pc;
     char *str;
 };
 

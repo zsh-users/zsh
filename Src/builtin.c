@@ -1816,17 +1816,17 @@ bin_typeset(char *name, char **argv, char *ops, int func)
 
     /* Sanity checks on the options.  Remove conficting options. */
     if (on & PM_FFLOAT) {
-	off |= PM_RIGHT_B | PM_LEFT | PM_RIGHT_Z | PM_UPPER | PM_ARRAY
-	    | PM_INTEGER | PM_EFLOAT;
+	off |= PM_RIGHT_B | PM_LEFT | PM_RIGHT_Z | PM_UPPER | PM_ARRAY |
+	    PM_HASHED | PM_INTEGER | PM_EFLOAT;
 	/* Allow `float -F' to work even though float sets -E by default */
 	on &= ~PM_EFLOAT;
     }
     if (on & PM_EFLOAT)
-	off |= PM_RIGHT_B | PM_LEFT | PM_RIGHT_Z | PM_UPPER | PM_ARRAY
-	    | PM_INTEGER | PM_FFLOAT;
+	off |= PM_RIGHT_B | PM_LEFT | PM_RIGHT_Z | PM_UPPER | PM_ARRAY |
+	    PM_HASHED | PM_INTEGER | PM_FFLOAT;
     if (on & PM_INTEGER)
 	off |= PM_RIGHT_B | PM_LEFT | PM_RIGHT_Z | PM_UPPER | PM_ARRAY |
-	    PM_EFLOAT | PM_FFLOAT;
+	    PM_HASHED | PM_EFLOAT | PM_FFLOAT;
     if (on & PM_LEFT)
 	off |= PM_RIGHT_B | PM_INTEGER | PM_EFLOAT | PM_FFLOAT;
     if (on & PM_RIGHT_B)
