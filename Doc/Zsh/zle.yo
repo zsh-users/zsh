@@ -1745,6 +1745,11 @@ does not reflect changes to the prompt variables themselves, only changes
 in the expansion of the values (for example, changes in time or
 directory, or changes to the value of variables referred to by the
 prompt).
+
+Otherwise, the prompt is only expaned each time zle starts, and
+when the display as been interrupted by output from another part of the
+shell (such as a job notification) which causes the command line to be
+reprinted.
 )
 tindex(send-break)
 item(tt(send-break) (^G ESC-^G) (unbound) (unbound))(

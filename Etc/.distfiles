@@ -1,7 +1,8 @@
 DISTFILES_SRC='
     .cvsignore .distfiles Makefile.in
-    BUGS CONTRIBUTORS FAQ FAQ.yo FEATURES MACHINES NEWS STD-TODO TODO
+    BUGS CONTRIBUTORS FAQ FAQ.yo STD-TODO TODO
     FTP-README pubring.pgp
     completion-style-guide zsh-development-guide
     changelog2html.pl
+    ChangeLog-3.1 ChangeLog-3.0 ChangeLog-4.1
 '

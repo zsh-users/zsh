@@ -1,5 +1,17 @@
 2004-07-02  Peter Stephenson  <pws@csr.com>
 
+	* 20127: Doc/Zsh/zle.yo, Src/Zle/zle_main.c,
+	Src/Zle/zle_refresh.c: slightly tweaked version of Wayne's
+	patch in users/7652 which only reexpands the prompt when
+	the commandline was trashed by output.
+
+	* 20126, with modifications: .distfiles, ChangeLog-3.1,
+	ChangeLog-4.1, ChangeLog.3.0, FEATURES, INSTALL, MACHINES,
+	NEWS, README, Etc/.distfiles, Etc/ChangeLog-3.1,
+	Etc/ChangeLog-4.1, Etc/FAQ.yo, Etc/FEATURES, Etc/MACHINES,
+	Etc/NEWS, Test/.distfiles, Etc/ChangeLog-3.0: tidy up
+	ready for 4.2.1
+
 	* 20125: Doc/Zsh/jobs.yo: say where the output for job
 	notifications goes.
 

@@ -291,7 +291,9 @@ zrefresh(void)
     unsigned char *tmpline;	/* line with added pre/post text */
     int tmpcs, tmpll;		/* ditto cursor position and line length */
     int tmpalloced;		/* flag to free tmpline when finished */
-	
+
+    if (trashedzle)
+	reexpandprompt();
 
     /* If this is called from listmatches() (indirectly via trashzle()), and *
      * that was called from the end of zrefresh(), then we don't need to do  *

@@ -275,7 +275,7 @@ sect(On what machines will it run?)
   mechanism.  This considerably increases flexibility over the old
   `buildzsh' mechanism.  Consequently, zsh should compile and run on
   any modern version of UNIX, and a great many not-so-modern versions
-  too.  The file Etc/MACHINES in the distribution has more details.
+  too.  The file MACHINES in the distribution has more details.
 
   There are also now separate ports for Windows and OS/2, see `Where
   do I get it' below.
@@ -288,7 +288,7 @@ sect(On what machines will it run?)
 
   To get it to work, retrieve the source distribution (see question
   link(1.6)(16)), un-gzip it, un-tar it and read the INSTALL file in the top
-  directory.  Also read the Etc/MACHINES file for up-to-date
+  directory.  Also read the MACHINES file for up-to-date
   information on compilation on certain architectures.
 
   mybf(Note for users of nawk) (The following information comes from Zoltan

@@ -15,7 +15,7 @@ MAKING AND INSTALLING
 Check MACHINES File
 -------------------
 
-Check the file MACHINES in the subdirectory Etc to see the architectures
+Check the file MACHINES in the top directory to see the architectures
 that zsh is known to compile on, as well as any special instructions
 for your particular architecture.  Most architectures will not require any
 special instructions.
@@ -243,7 +243,7 @@ which reduce memory usage on some systems. To use these, add the option
   --enable-zsh-mem
 when invoking "configure".
 
-You should check Etc/MACHINES to see if there are specific recommendations
+You should check MACHINES to see if there are specific recommendations
 about using the zsh malloc routines on your particular architecture.
 
 Debugging Routines

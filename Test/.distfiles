@@ -9,5 +9,6 @@ A04redirect.ztst     D01prompt.ztst       V02zregexparse.ztst
 A05execution.ztst    D02glob.ztst         Y01completion.ztst
 D06subscript.ztst    V01zmodload.ztst     E01options.ztst
 B02typeset.ztst      B03print.ztst        A06assign.ztst       B04read.ztst
+V03mathfunc.ztst
 README
 '

@@ -1311,14 +1311,20 @@ recursiveedit(UNUSED(char **args))
 }
 
 /**/
-int
-resetprompt(UNUSED(char **args))
+void
+reexpandprompt(void)
 {
     free(lpromptbuf);
     lpromptbuf = promptexpand(raw_lp, 1, NULL, NULL);
     free(rpromptbuf);
     rpromptbuf = promptexpand(raw_rp, 1, NULL, NULL);
+}
 
+/**/
+int
+resetprompt(UNUSED(char **args))
+{
+    reexpandprompt();
     return redisplay(NULL);
 }
 
