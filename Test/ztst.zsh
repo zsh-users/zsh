@@ -219,6 +219,19 @@ $ZTST_code"
   done
 }
 
+# diff wrapper
+ZTST_diff() {
+  local diff_out diff_ret
+
+  diff_out=$(diff "$@")
+  diff_ret="$?"
+  if [[ "$diff_ret" != "0" ]]; then
+    echo "$diff_out"
+  fi
+
+  return "$diff_ret"
+}
+    
 ZTST_test() {
   local last match mbegin mend found
 
@@ -297,13 +310,13 @@ ZTST_test: and standard error:
 $(<$ZTST_terr)"
 
       # Now check output and error.
-      if [[ $ZTST_flags != *d* ]] && ! diff -c $ZTST_out $ZTST_tout; then
+      if [[ $ZTST_flags != *d* ]] && ! ZTST_diff -c $ZTST_out $ZTST_tout; then
 	ZTST_testfailed "output differs from expected as shown above for:
 $ZTST_code${$(<$ZTST_terr):+
 Error output:
 $(<$ZTST_terr)}"
       fi
-      if [[ $ZTST_flags != *D* ]] && ! diff -c $ZTST_err $ZTST_terr; then
+      if [[ $ZTST_flags != *D* ]] && ! ZTST_diff -c $ZTST_err $ZTST_terr; then
 	ZTST_testfailed "error output differs from expected as shown above for:
 $ZTST_code"
       fi
