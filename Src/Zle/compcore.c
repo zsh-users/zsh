@@ -1735,7 +1735,7 @@ addmatches(Cadata dat, char **argv)
 		}
 		sl = strlen(s);
 		isalt = oisalt;
-		if ((!dat->psuf || !*(dat->psuf)) && aign) {
+		if (doadd && (!dat->psuf || !*(dat->psuf)) && aign) {
 		    /* Do the suffix-test. If the match has one of the
 		     * suffixes from ign, we put it in the alternate set. */
 		    char **pt = aign;
@@ -1745,12 +1745,6 @@ addmatches(Cadata dat, char **argv)
 			if ((filell = strlen(*pt)) < sl
 			    && !strcmp(*pt, s + sl - filell))
 			    isalt = 1;
-
-		    if (isalt && !doadd) {
-			if (dparr && !*++dparr)
-			    dparr = NULL;
-			continue;
-		    }
 		}
 		if (!(dat->aflags & CAF_MATCH)) {
 		    if (dat->aflags & CAF_QUOTE)
