@@ -1,3 +1,12 @@
+2002-02-22  Wayne Davison  <wayned@users.sourceforge.net>
+
+	* 16703: Src/hist.c: In putoldhistentryontop(), ensure that we can't
+	return with "next" set to the value we just put on top.
+
+	* 16703: Src/builtin.c: Improved the output of the "history" command
+	with a 1-line history buffer, and also improved the error handling of
+	explicitly-specified first/last values.
+
 2002-02-22  Oliver Kiddle  <opk@zsh.org>
 
 	* 16620, 16697: Src/subst.c, Src/glob.c, Doc/Zsh/expn.yo:
