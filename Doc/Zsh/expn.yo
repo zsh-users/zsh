@@ -620,6 +620,11 @@ arrays; the var(word) part em(must) be converted to an array, for
 example by using `tt(${(AA)=)var(name)tt(=)...tt(})' to activate
 field splitting, when creating an associative array.
 )
+item(tt(a))(
+With tt(o) or tt(O), sort in array index order. Note that `tt(oa)' is
+therefore equivalent to the default but `tt(Oa)' is useful for
+obtaining an array's elements in reverse order.
+)
 item(tt(c))(
 With tt(${#)var(name)tt(}), count the total number of characters in an array,
 as if the elements were concatenated with spaces between them.
@@ -654,6 +659,9 @@ this flag may not be combined with subscript ranges.
 )
 item(tt(L))(
 Convert all letters in the result to lower case.
+)
+item(tt(n))(
+With tt(o) or tt(O), sort numerically.
 )
 item(tt(o))(
 Sort the resulting words in ascending order.

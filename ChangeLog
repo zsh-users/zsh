@@ -1,3 +1,9 @@
+2002-02-22  Oliver Kiddle  <opk@zsh.org>
+
+	* 16620, 16697: Src/subst.c, Src/glob.c, Doc/Zsh/expn.yo:
+	add a and n parameter expansion flags for numeric sorting and
+	reverse index ordering of arrays
+
 2002-02-21  Clint Adams  <clint@zsh.org>
 
 	* 16689: Etc/.distfiles, Etc/TODO: list some things to do.

@@ -540,6 +540,72 @@ invcstrpcmp(const void *a, const void *b)
 }
 
 /**/
+int
+nstrpcmp(const void *a, const void *b)
+{
+    char *c = *(char **)a, *d = *(char **)b;
+    int cmp;
+
+#ifdef HAVE_STRCOLL
+    cmp = strcoll(c, d);
+#endif
+    for (; *c == *d && *c; c++, d++);
+#ifndef HAVE_STRCOLL
+    cmp = (int)STOUC(*c) - (int)STOUC(*d);
+#endif
+    if (idigit(*c) || idigit(*d)) {
+	for (; c > *(char **)b && idigit(c[-1]); c--, d--);
+	if (idigit(*c) && idigit(*d)) {
+	    while (*c == '0')
+		c++;
+	    while (*d == '0')
+		d++;
+	    for (; idigit(*c) && *c == *d; c++, d++);
+	    if (idigit(*c) || idigit(*d)) {
+		cmp = (int)STOUC(*c) - (int)STOUC(*d);
+		while (idigit(*c) && idigit(*d))
+		    c++, d++;
+		if (idigit(*c) && !idigit(*d))
+		    return 1;
+		if (idigit(*d) && !idigit(*c))
+		    return -1;
+	    }
+	}
+    }
+    return cmp;
+}
+
+/**/
+int
+invnstrpcmp(const void *a, const void *b)
+{
+    return -nstrpcmp(a, b);
+}
+
+/**/
+int
+instrpcmp(const void *a, const void *b)
+{
+    VARARR(char, c, strlen(*(char **) a) + 1);
+    VARARR(char, d, strlen(*(char **) b) + 1);
+    char **e = (char **)&c;
+    char **f = (char **)&d;
+    char *s, *t;
+
+    for (s = *(char **) a, t = c; (*t++ = tulower(*s++)););
+    for (s = *(char **) b, t = d; (*t++ = tulower(*s++)););
+
+    return nstrpcmp(&e, &f);
+}
+
+/**/
+int
+invinstrpcmp(const void *a, const void *b)
+{
+    return -instrpcmp(a, b);
+}
+
+/**/
 static char *
 dopadding(char *str, int prenum, int postnum, char *preone, char *postone, char *premul, char *postmul)
 {
@@ -773,7 +839,7 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int ssub)
     Value v = NULL;
     int flags = 0;
     int flnum = 0;
-    int sortit = 0, casind = 0;
+    int sortit = 0, casind = 0, numord = 0, indord = 0;
     int unique = 0;
     int casmod = 0;
     int quotemod = 0, quotetype = 0, quoteerr = 0;
@@ -880,6 +946,12 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int ssub)
 		    break;
 		case 'i':
 		    casind = 1;
+		    break;
+		case 'n':
+		    numord = 1;
+		    break;
+		case 'a':
+		    indord = 1;
 		    break;
 
 		case 'V':
@@ -1018,7 +1090,7 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int ssub)
 	}
     }
     if (sortit)
-	sortit += (casind << 1);
+	sortit += (casind << 1) + (numord << 2);
 
     if (!premul)
 	premul = " ";
@@ -1894,16 +1966,30 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int ssub)
 		zhuniqarray(aval);
 	}
 	if (sortit) {
-	    static CompareFn sortfn[] = {
-		strpcmp, invstrpcmp, cstrpcmp, invcstrpcmp
-	    };
-
 	    if (!copied)
 		aval = arrdup(aval);
+	    if (indord) {
+		if (sortit & 2) {
+		    char *copy;
+		    char **end = aval + arrlen(aval) - 1, **start = aval;
 
-	    i = arrlen(aval);
-	    if (i && (*aval[i-1] || --i))
-		qsort(aval, i, sizeof(char *), sortfn[sortit-1]);
+		    /* reverse the array */
+		    while (start < end) {
+			copy = *end;
+			*end-- = *start;
+			*start++ = copy;
+		    }
+		}
+	    } else {
+		static CompareFn sortfn[] = {
+		    strpcmp, invstrpcmp, cstrpcmp, invcstrpcmp,
+		    nstrpcmp, invnstrpcmp, instrpcmp, invinstrpcmp
+		};
+
+		i = arrlen(aval);
+		if (i && (*aval[i-1] || --i))
+		    qsort(aval, i, sizeof(char *), sortfn[sortit-1]);
+	    }
 	}
 	if (plan9) {
 	    LinkNode tn;

@@ -854,7 +854,10 @@ gmatchcmp(Gmatch a, Gmatch b)
     for (i = gf_nsorts, s = gf_sortlist; i; i--, s++) {
 	switch (*s & ~GS_DESC) {
 	case GS_NAME:
-	    r = notstrcmp(&a->name, &b->name);
+	    if (gf_numsort)
+	    	r = nstrpcmp(&b->name, &a->name);
+	    else
+	    	r = strpcmp(&b->name, &a->name);
 	    break;
 	case GS_DEPTH:
 	    {
@@ -1609,46 +1612,6 @@ zglob(LinkList list, LinkNode np, int nountok)
     free(matchbuf);
 
     restore_globstate(saved);
-}
-
-/* Return the order of two strings, taking into account *
- * possible numeric order if NUMERICGLOBSORT is set.    *
- * The comparison here is reversed.                     */
-
-/**/
-static int
-notstrcmp(char **a, char **b)
-{
-    char *c = *b, *d = *a;
-    int cmp;
-
-#ifdef HAVE_STRCOLL
-    cmp = strcoll(c, d);
-#endif
-    for (; *c == *d && *c; c++, d++);
-#ifndef HAVE_STRCOLL
-    cmp = (int)STOUC(*c) - (int)STOUC(*d);
-#endif
-    if (gf_numsort && (idigit(*c) || idigit(*d))) {
-	for (; c > *b && idigit(c[-1]); c--, d--);
-	if (idigit(*c) && idigit(*d)) {
-	    while (*c == '0')
-		c++;
-	    while (*d == '0')
-		d++;
-	    for (; idigit(*c) && *c == *d; c++, d++);
-	    if (idigit(*c) || idigit(*d)) {
-		cmp = (int)STOUC(*c) - (int)STOUC(*d);
-		while (idigit(*c) && idigit(*d))
-		    c++, d++;
-		if (idigit(*c) && !idigit(*d))
-		    return 1;
-		if (idigit(*d) && !idigit(*c))
-		    return -1;
-	    }
-	}
-    }
-    return cmp;
 }
 
 /* Return the trailing character for marking file types */
