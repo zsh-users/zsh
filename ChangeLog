@@ -1,3 +1,8 @@
+2005-03-09  Motoi Washida  <a66@h8.dion.ne.jp>
+
+	* 20953: Completion/Unix/Command/_du: "du --version" tries to
+	display size of files in current directory on FreeBSD and Darwin.
+
 2005-03-09  Clint Adams  <clint@zsh.org>
 
 	* 20951: Completion/Unix/Command/_baz: fix version detection
