@@ -116,7 +116,7 @@
     }
     :
     unfunction TRAPDEBUG
-  }' > fn
+  ' > fn
   autoload fn
   fn
   rm fn
@@ -128,7 +128,7 @@
   print 'trap '\''print Line $LINENO'\'' DEBUG
     :
     trap - DEBUG
-  }' > fn
+  ' > fn
   autoload fn
   fn
   rm fn
