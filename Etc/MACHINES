@@ -7,7 +7,8 @@ zsh to work on an OS not listed, let us know.  The information in this
 list may be out of date, as the developers do not have access to all
 machines.  In general, GNU/Linux distributions, Solaris and Cygwin are
 reasonably well covered.  Please let us have any recent information
-on other systems.
+on other systems.  The information for systems not known to have been
+tested recently is marked as `out of date'.
 
 On all machines if you use gcc and upgrade your OS you must rebuild gcc
 after the OS upgrade.  A gcc left from a previous OS may seem to work
@@ -50,7 +51,8 @@ Red Hat Inc.: Cygwin
 DEC: Ultrix (Alpha or DECstation)
 DEC: Mach 3.0 (DECstation 5000/25)
 DEC: OSF/1 1.2, 1.3, 2.0, 3.x, DEC Unix 4.x (Alpha)
-Compaq: Tru64
+	[Out of date.]
+
 	In OSF/1 3.x, there is apparently a bug in the header file
 	/usr/include/rpcsvc/ypclnt.h; the prototype for yp_all() has a
 	struct ypall_callback as its final argument, which should be a
@@ -73,8 +75,12 @@ FreeBSD: FreeBSD 2.2.7, 3.x, 4.x
 	does not work, but it does with 3.x and 4.x.
 
 HP: HP-UX 9, 10.20, 11.0
-	Should build `out-of-the-box', although various problems have
-	been encountered on HP-UX 11.x:
+	Should build `out-of-the-box'.  The zsh/zpty module is not
+	working on recent versions of 11.x.  This causes all the
+	Y tests in the Tests subdirectory to fail, possibly in obscure
+	ways.  However, zsh/zpty is not needed in normal operation.
+
+	Previous problems encountered on HP-UX 11.x:
 
 	  Some of the special keys on the keyboard (backspace, delete)
 	  have been found to stop functioning.  One suggested fix is
@@ -86,18 +92,24 @@ HP: HP-UX 9, 10.20, 11.0
 	  Recent reports indicated this is not necessary on recent versions
 	  of HP-UX 11.
 
-	  The configure option `--disable-dynamic' may be necessary when
-	  compiling on HP-UX 11 using Softbench.  Various problems with
-	  dynamic loading have been reported; this should compile using the
-	  standard dlopen() function set (rather than the 10.20 shl_load()
-	  function set).  More details of any difficulties would be
-	  appreciated.
-
 	  Compiling with gcc 2.7.1 is known to fail with header file
 	  conflicts.  Use the HP ANSI C compiler.
 
-IBM: AIX 3.2, 4.x
-	Should build `out-of-the-box', but --enable-zsh-mem will not work.
+HP/Compaq: Tru64
+	  Should build `out-of-the-box'.
+
+IBM: AIX 3.2, 4.x, 5.x
+	Should build `out-of-the-box'.
+
+	AIX, unusually, requires that symbols available in dynamically
+	loaded libraries be marked explicitly.  As the developers do not
+	have direct access to AIX these markers are often missing.  The
+	usual symptom is that linking a library (.so) file fails and
+	reports a missing symbol.  Please report any such failures to the
+	maintainers.
+
+	Certain features will not work, in particular --enable-cap
+	and --enable-zsh-mem.
 
 	On 3.2, for 64-bit integer support you need to compile with gcc, as
 	the native compiler does not support ANSI simultaneously with
@@ -140,11 +152,15 @@ OpenBSD: OpenBSD 2.x, 3.x
 	Should build `out-of-the-box'.
 
 SIEMENS: Reliant UNIX
+	[Out of date.]
+
 	Builds `out-of-the-box'. Dynamic loading is supported. 
 	Large Files and 64-bit integers are supported as of version 5.44
 	and CDS/CDS++ compiler.
 
 SIEMENS: SINIX
+	[Out of date.]
+
 	MX (Intel) platform: SINIX-L/M 5.41
 	Builds out-of-the-box with EGCS. Neither dynamic loading nor
 	64-bit integers are supported. Native compiler was not tried
@@ -159,6 +175,8 @@ SIEMENS: SINIX
 	update to Reliant UNIX.
 
 SGI: IRIX 6.2, 6.3, 6.5
+	[Out of date.]
+
 	Should build `out-of-the-box'.
 
 	On 6.5.2, zsh malloc routines are reported not to work; also
@@ -172,8 +190,7 @@ SGI: IRIX 6.2, 6.3, 6.5
 	The zpty module is not currently supported.
 
 Sun: SunOS 4.1.x
-	[This information is probably out of date.  If you know otherwise,
-	please tell zsh-workers@sunsite.dk.]
+	[Out of date.]
 
 	Under 4.1.3 if yellow pages is used, username completion may cause
 	segmentation violation.  This is a bug in the shared library not
@@ -194,12 +211,9 @@ Sun: Solaris 2.x
 	to /usr/ucblib in your LD_LIBRARY_PATH.  You can easily do this
 	by just unsetting LD_LIBRARY_PATH before building zsh.
 
-	Problems have been reported using --enable-lfs (the default) to
-	enable large file system and integer support on Solaris 2 with gcc.
-	Apparently upgrading to gcc version 2.95.2 fixes this.  If this
-	is not feasible, configure with --disable-lfs.  We would be
-	grateful for more detailed information.  The most problems seem
-	to occur on Solaris 2.6, where --disable-lfs is recommended.
+	Problems were once reported using --enable-lfs (the default) to
+	enable large file system and integer support on Solaris 2 with gcc
+	before 2.95.2.  Recent versions of gcc appear to be unproblematic.
 
 Other machines
 --------------
