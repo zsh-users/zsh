@@ -35,7 +35,7 @@ else
     elif [[ -n $useperl ]]; then
       tmp=(
       $(perl -ne '@matches = /^(?:([a-zA-Z0-9]+[^\/\t=\s]+)\s*)+:/  and
-	print join(" ", @matches);
+	print join(" ", @matches), "\n";
 if (/^\.include\s+\<bsd\.port\.(subdir\.|pre\.)?mk>/ ||
     /^\.include\s+\".*mk\/bsd\.pkg\.(subdir\.)?mk\"/) {
     print "fetch fetch-list extract patch configure build install reinstall deinstall package describe checkpatch checksum makesum\n";
