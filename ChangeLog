@@ -1,5 +1,151 @@
+1999-11-29  Peter Stephenson  <pws@pwstephenson.fsnet.co.uk>
+
+	* pws: Convig/version.mk: version 3.1.6-pws-10
+
+	* Sven: 8796: Src/Zle/computil.c, Src/utils.c: make freearray()
+	  safer w.r.t. null pointers.
+
+	* pws: 8794: Completion/User/_man: handle .bz2 files.
+
+	* pws: 8793: Src/jobs.c: matheval called incorrectly with
+	  heap allocation.
+
+1999-11-26  Peter Stephenson  <pws@supanet.com>
+
+	* Sven: 8787: Completion/Core/_approximate,
+	  Completion/Core/_correct, Completion/Core/_expand,
+	  Completion/Core/_main_complete: don't prepend completer name if
+	  there; save/restore $curcontext; typo.
+
+	* Tanaka Akira: 8786: Completion/User/_gs: ghostscript can handle
+	  PDF.
+
+	* Tanaka Akira: 8785: Completion/Debian/_apt: quoting typo.
+
+	* Bart: 8782, 8783: Src/lex.c: fix line numbers for `unmatched
+	  ...' errors.
+
+	* Clint: 8779: Src/utils.c: more compiler like error messages.
+
+	* Sven: 8777: Completion/Core/_normal, Completion/Core/_sort_tags,
+	  Doc/Zsh/compsys.yo: extra colon in ordinary argument contexts
+	  for consistency.
+
+	* Sven: 8776: Src/mkbltnmlst.sh, Src/module.c: error in static
+	  shell loading unknown module; don't use autoload stuff in
+	  static shells.
+
+1999-11-24  Peter Stephenson  <pws@supanet.com>
+
+	* Sven: 8770: Src/Builtins/rlimits.c, Src/Builtins/sched.c,
+	  Src/Modules/cap.c, Src/Modules/clone.c, Src/Modules/example.c,
+	  Src/Modules/files.c, Src/Modules/mapfile.c,
+	  Src/Modules/mathfunc.c, Src/Modules/parameter.c,
+	  Src/Modules/stat.c, Src/Modules/zftp.c, Src/Zle/compctl.c,
+	  Src/Zle/complete.c, Src/Zle/complist.c, Src/Zle/computil.c,
+	  Src/Zle/deltochar.c, Src/Zle/zle_hist.c, Src/Zle/zle_keymap.c,
+	  Src/Zle/zle_main.c, Src/Zle/zle_thingy.c,
+	  Src/Zle/zleparameter.c, Src/builtin.c, Src/exec.c, Src/init.c,
+	  Src/mkbltnmlst.sh, Src/module.c, Src/params.c, Src/zsh.h,
+	  Doc/Zsh/builtins.yo, Etc/zsh-development-guide: zmodload now
+	  behaves same for builtin as for dynamically loaded modules
+	  (need to call `zmodload' or autoload explicitly even in statically
+	  linked shells).
+
+	* Sven: 8768: Completion/Core/_complete: change the current
+	  context only if called from _main_complete.
+
+	* Sven: 8766: Src/module.c: don't try to load linked-in module.
+
+	* Zefram: 8764: Src/Modules/zftp.c, acconfig.h, configure.in:
+	  Support for IPv6 in zftp.
+
+1999-11-23  Peter Stephenson  <pws@supanet.com>
+
+	* Adam: 8756: Doc/Zsh/compsys.yo: typo.
+
+	* Sven: 8754: INSTALL: this really does remove comp1, and rewrites
+	  the instructions for systems where module symbols are not
+	  intervisible.
+
+	* Tanaka Akira: more funky telnet options.
+
+	* Sven: 8750: Completion/User/_perldoc: update.
+
+	* Sven: 8749: Src/Zle/computil.c, Completion/Base/_arguments:
+	  mixing single-letter and long options.
+
+	* Sven: 8747: INSTALL: remove comp1 references.
+
+	* Sven: 8746: Src/Zle/computil.c, Completion/Base/_arguments:
+	  (not compsys.yo hunk): escape :'s in computils; fix nesting of
+	  loops in arguments.
+
+	* Oliver: 8745: Completion/User/_mount: handles IRIX 5.3 and AIX,
+	  improves Linux.
+
+	* Sven: 8744: Src/init.c: make compctlreadptr visible after 8741.
+
+	* Sven/Alexandre: 8742: Completion/Builtins/_pids: added more
+	  matches than descriptions; also use command ps.
+
+	* Adam: 8741: Src/init.c: remove references to deleted comp1
+	  module.
+
+	* pws: 8738: Completion/Builtins/_vars, Completion/User/_make,
+	  Doc/Zsh/compsys.yo, Src/math.c, configure.in: parts missing
+	  in 3.1.6-pws-9.
+
+1999-11-22  Peter Stephenson  <pws@supanet.com>
+
+	* Alexandre: 8728: Completion/Base/_arguments: extra local.
+
+	* Oliver: 8726: Completion/User/_netscape: was broken.
+
+	* Oliver: 8725: Src/zsh.export, Src/Zle/compctl.mdd,
+	  Src/Zle/complete.export, Src/Zle/computil.mdd,
+	  Src/Zle/zle.export, Src/Zle/.distfiles: lastest changes
+	  necessary for dynamical AIX support.
+
+	* Sven: 8722: Completion/Base/_arguments,
+	  Completion/Core/_path_files, Completion/User/_telnet,
+	  Doc/Zsh/compsys.yo: ignored-suffixes style.
+
+	* Sven: 8721: Src/signals.c: null sigfuncs when being saved.
+
+	* Sven: 8720: Doc/Zsh/compsys.yo,
+	  Functions/Zle/incremental-complete-word,
+	  Functions/Zle/predict-on, Completion/Base/_combination,
+	  Completion/Base/_describe, Completion/Base/_jobs,
+	  Completion/Base/_subscript, Completion/Base/_tilde,
+	  Completion/Builtins/_pids, Completion/Builtins/_popd,
+	  Completion/Builtins/_sched, Completion/Core/_approximate,
+	  Completion/Core/_complete, Completion/Core/_correct,
+	  Completion/Core/_expand, Completion/Core/_list,
+	  Completion/Core/_main_complete, Completion/Core/_match,
+	  Completion/Core/_menu, Completion/Core/_oldlist,
+	  Completion/Core/compinit, Completion/User/_groups,
+	  Completion/User/_hosts, Completion/User/_my_accounts,
+	  Completion/User/_other_accounts, Completion/User/_ports,
+	  Completion/User/_rlogin, Completion/User/_socket,
+	  Completion/User/_ssh, Completion/User/_telnet,
+	  Completion/User/_user_at_host, Completion/User/_users: various
+	  parameters have become styles.
+
+	* Sven: 8718: Src/Zle/compcore.c: addmatches() with fignore.
+
+	* Sven: 8715: Src/Zle/complist.mdd: module depends on zle.
+
+	* Sven: 8716: Completion/Base/_arguments, Src/Zle/computil.c:
+	  option completion fixes; careful with multiple use of tags.
+
+	* Bart: 8501: configure.in: don't try testing for job control
+	  if stdin is not a terminal.
+
 1999-11-21  Peter Stephenson  <pws@supanet.com>
 
+	* pws: Configure/version.mk: 3.1.6-pws-9 made available.
+	
 	* Clint: 8702: Completion/Debian/_dpkg: typo.
 
 	* Bart: 8696: Completion/User/_cvs: `cvs watch add' failed.
