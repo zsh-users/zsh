@@ -1,3 +1,8 @@
+2003-06-25  Clint Adams  <clint@zsh.org>
+
+	* 18627: Completion/Unix/Command/_imagemagick: -resize and
+ 	-shave options to mogrify.
+
 2003-06-24  Oliver Kiddle  <opk@zsh.org>
 
 	* 18626: Src/Modules/terminfo.c: Try to do a better job of arg
