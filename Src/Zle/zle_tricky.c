@@ -1627,7 +1627,7 @@ inststrlen(char *str, int move, int len)
 static int
 doexpansion(char *s, int lst, int olst, int explincmd)
 {
-    int ret = 1;
+    int ret = 1, first = 1;
     LinkList vl;
     char *ss;
 
@@ -1678,10 +1678,11 @@ doexpansion(char *s, int lst, int olst, int explincmd)
 	if (olst != COMP_EXPAND_COMPLETE || nonempty(vl) ||
 	    (cs && line[cs-1] != '/')) {
 #endif
-	if (nonempty(vl)) {
+	if (nonempty(vl) || !first) {
 	    spaceinline(1);
 	    line[cs++] = ' ';
 	}
+	first = 0;
     }
     end:
     popheap();
