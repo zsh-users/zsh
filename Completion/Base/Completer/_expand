@@ -89,10 +89,16 @@ subd=("$exp[@]")
   [[ "$subd" = "$exp"(|\(N\)) ]] &&  return 1
 
 zstyle -s ":completion:${curcontext}:" keep-prefix tmp || tmp=changed
-if [[ "$word" = [\~\$]*/* && "$tmp" = (yes|true|on|1|changed) ]]; then
-  eval 'epre=( ${(e)~${word%%/*}} )' 2>/dev/null
-  if [[ -n "$epre" && $#epre -eq 1 ]]; then
+
+if [[ "$word" = (\~*/*|*\$*/*) && "$tmp" = (yes|true|on|1|changed) ]]; then
+  if [[ "$word" = *\$* ]]; then
+    opre="${(M)word##*\$[^/]##/}"
+  else
     opre="${word%%/*}"
+  fi
+  eval 'epre=( ${(e)~opre} )' 2> /dev/null
+
+  if [[ -n "$epre" && $#epre -eq 1 ]]; then
     pre="${(q)epre[1]}"
     [[ "$tmp" != changed || $#exp -gt 1 ||
        "${opre}${exp[1]#${pre}}" != "$word" ]] && exp=( ${opre}${^exp#${pre}} )
