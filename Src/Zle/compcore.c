@@ -524,14 +524,16 @@ after_complete(Hookdef dummy, int *dat)
 	    dat[1] = 0;
 	    menucmp = menuacc = 0;
 	    minfo.cur = NULL;
-	    if (ret == 2) {
+	    if (ret >= 2) {
 		fixsuffix();
 		cs = 0;
 		foredel(ll);
 		inststr(origline);
 		cs = origcs;
-		clearlist = 1;
-		invalidatelist();
+		if (ret == 2) {
+		    clearlist = 1;
+		    invalidatelist();
+		}
 	    }
 	}
     }

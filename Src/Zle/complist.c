@@ -2237,7 +2237,11 @@ domenuselect(Hookdef dummy, Chdata dat)
 	    continue;
 	} else {
 	    ungetkeycmd();
-	    acc = 1;
+	    if (cmd->widget && (cmd->widget->flags & WIDGET_NCOMP)) {
+		acc = 0;
+		broken = 2;
+	    } else
+		acc = 1;
 	    break;
 	}
 	do_single(**p);
@@ -2260,6 +2264,7 @@ domenuselect(Hookdef dummy, Chdata dat)
 	menucmp = 2;
 	showinglist = -2;
 	minfo.asked = 0;
+	zrefresh();
     }
     if (!noselect && (!dat || acc)) {
 	showinglist = -2;
@@ -2271,7 +2276,8 @@ domenuselect(Hookdef dummy, Chdata dat)
     mlbeg = -1;
     fdat = NULL;
 
-    return ((dat && !broken) ? (acc ? 1 : 2) : (!noselect ^ acc));
+    return (broken == 2 ? 3 :
+	    ((dat && !broken) ? (acc ? 1 : 2) : (!noselect ^ acc)));
 }
 
 /* The widget function. */

@@ -1,3 +1,9 @@
+2000-10-11  Sven Wischnowsky  <wischnow@zsh.org>
+
+	* 12959: Src/Zle/compcore.c, Src/Zle/complist.c: make user defined
+ 	completion widgets leave menu selection without accepting the
+ 	currently selected match
+	
 2000-10-10  Sven Wischnowsky  <wischnow@zsh.org>
 
 	* 12948: Completion/Core/_expand: follow-up to 12942, only a
