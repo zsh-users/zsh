@@ -2028,10 +2028,13 @@ savehistfile(char *fn, int err, int writeflags)
 	    Histent remember_hist_ring = hist_ring;
 	    int remember_histlinect = histlinect;
 	    int remember_curhist = curhist;
+	    int remember_histsiz = histsiz;
+	    int remember_histactive = histactive;
 
 	    hist_ring = NULL;
 	    curhist = histlinect = 0;
 	    histsiz = savehist;
+	    histactive = 0;
 	    createhisttable(); /* sets histtab */
 
 	    hist_ignore_all_dups |= isset(HISTSAVENODUPS);
@@ -2044,6 +2047,8 @@ savehistfile(char *fn, int err, int writeflags)
 	    histlinect = remember_histlinect;
 	    hist_ring = remember_hist_ring;
 	    histtab = remember_histtab;
+	    histsiz = remember_histsiz;
+	    histactive = remember_histactive;
 	}
     } else if (err)
 	zerr("can't write history file %s", fn, 0);
