@@ -1,3 +1,13 @@
+2000-05-08  Sven Wischnowsky  <wischnow@informatik.hu-berlin.de>
+
+	* 11242: Completion/Builtins/_pids, Completion/Builtins/_zstyle,
+ 	Completion/Commands/_complete_help, Completion/Core/_all_labels,
+ 	Completion/Core/_approximate, Completion/Core/_expand,
+ 	Completion/Core/_ignored, Completion/Core/_main_complete,
+ 	Completion/Core/_prefix, Completion/Core/_setup,
+ 	Doc/Zsh/compsys.yo, Src/Zle/complete.mdd, Src/Zle/complist.c:
+ 	misc. completion cleanups and changes
+	
 2000-05-06  Bart Schaefer  <schaefer@zsh.org>
 
 	* 11236: Completion/Base/_arguments: Handle tabs between options

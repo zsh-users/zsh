@@ -2,9 +2,10 @@
 
 # Try to ignore the suffix. A bit like e-o-c-prefix.
 
-[[ -n "$SUFFIX" ]] || return 1
+[[ _matcher_num -gt 1 || -z "$SUFFIX" ]] && return 1
 
-local comp i
+local comp curcontext="$curcontext" tmp \
+      _completer _completer_num _matcher _matchers _matcher_num
 
 zstyle -a ":completion:${curcontext}:" completer comp ||
   comp=( "${(@)_completers[1,_completer_num-1][(R)_prefix(|:*),-1]}" )
@@ -16,8 +17,29 @@ else
 fi
 SUFFIX=''
 
-for i in "$comp[@]"; do
-  [[ "$i" != _prefix ]] && "$i" && return 0
+_completer_num=1
+
+for tmp in "$comp[@]"; do
+  if [[ "$tmp" = *:-* ]]; then
+    _completer="${${tmp%:*}[2,-1]//_/-}${tmp#*:}"
+    tmp="${tmp%:*}"
+  elif [[ $tmp = *:* ]]; then
+    _completer="${tmp#*:}"
+    tmp="${tmp%:*}"
+  else
+    _completer="${tmp[2,-1]//_/-}"
+  fi
+  curcontext="${curcontext/:[^:]#:/:${_completer}:}"
+
+  zstyle -a ":completion:${curcontext}:" matcher-list _matchers ||
+      _matchers=( '' )
+
+  _matcher_num=1
+  for _matcher in "$_matchers[@]"; do
+    [[ "$tmp" != _prefix ]] && "$tmp" && return 0
+    (( _matcher_num++ ))
+  done
+  (( _completer_num++ ))
 done
 
 return 1

@@ -32,7 +32,7 @@ while comptags "-A$prev" "$1" curtag spec; do
     _description "$gopt" "${curtag%:*}" "$2" "$descr"
     curtag="${curtag%:*}"
 
-    "$4" "${(P@)2}" "${(@)argv[5,-1]}"
+    "$4" "${(P@)2}" "${(@)argv[5,-1]}" && ret=0
   else
     _description "$gopt" "$curtag" "$2" "$3"
 

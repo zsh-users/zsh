@@ -1589,7 +1589,7 @@ domenuselect(Hookdef dummy, Chdata dat)
 	    if ((step += lines - nlnct) < 0)
 		step = 1;
     }
-    if ((mstatus = getsparam("MENUPROMPT")) && !*mstatus)
+    if ((mstatus = dupstring(getsparam("MENUPROMPT"))) && !*mstatus)
 	mstatus = "%SScrolling active: current selection at %p%s";
     mhasstat = (mstatus && *mstatus);
     fdat = dat;

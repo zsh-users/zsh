@@ -2,30 +2,54 @@
 
 # Use ignored matches.
 
-(( $compstate[ignored] )) || return 1
+[[ _matcher_num -gt 1 || $compstate[ignored] -eq 0 ]] && return 1
 
-local comp i _comp_no_ignore=yes tmp expl
+local comp _comp_no_ignore=yes tmp expl \
+      _completer _completer_num _matcher _matchers _matcher_num
 
 zstyle -a ":completion:${curcontext}:" completer comp ||
   comp=( "${(@)_completers[1,_completer_num-1][(R)_ignored(|:*),-1]}" )
 
-for i in "$comp[@]"; do
-  if [[ "$i" != _ignored ]] && "$i"; then
-    if zstyle -s ":completion:${curcontext}:" single-ignored tmp &&
-       [[ $compstate[old_list] != shown && $compstate[nmatches] -eq 1 ]]; then
-      case "$tmp" in
-      show) compstate[insert]='' compstate[list]='list force' tmp='' ;;
-      menu)
-        compstate[insert]=menu
-        _description original expl original    
-        compadd "$expl[@]" -S '' - "$PREFIX$SUFFIX"
-        ;;
-      *) tmp='' ;;
-      esac
+_completer_num=1
+
+for tmp in "$comp[@]"; do
+  if [[ "$tmp" = *:-* ]]; then
+    _completer="${${tmp%:*}[2,-1]//_/-}${tmp#*:}"
+    tmp="${tmp%:*}"
+  elif [[ $tmp = *:* ]]; then
+    _completer="${tmp#*:}"
+    tmp="${tmp%:*}"
+  else
+    _completer="${tmp[2,-1]//_/-}"
+  fi
+  curcontext="${curcontext/:[^:]#:/:${_completer}:}"
+
+  zstyle -a ":completion:${curcontext}:" matcher-list _matchers ||
+      _matchers=( '' )
+
+  _matcher_num=1
+  for _matcher in "$_matchers[@]"; do
+    if [[ "$tmp" != _ignored ]] && "$tmp"; then
+      if zstyle -s ":completion:${curcontext}:" single-ignored tmp &&
+         [[ $compstate[old_list] != shown &&
+            $compstate[nmatches] -eq 1 ]]; then
+        case "$tmp" in
+        show) compstate[insert]='' compstate[list]='list force' tmp='' ;;
+        menu)
+          compstate[insert]=menu
+          _description original expl original    
+          compadd "$expl[@]" -S '' - "$PREFIX$SUFFIX"
+          ;;
+        esac
+      fi
+
+      return 0
     fi
 
-    return 0
-  fi
+    (( _matcher_num++ ))
+  done
+
+  (( _completer_num++ ))
 done
 
 return 1

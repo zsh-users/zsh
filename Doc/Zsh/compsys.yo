@@ -1038,12 +1038,16 @@ item(tt(force-list))(
 If the completion code would show a list of completions at all, this
 style controls whether the list is shown even in cases when it would
 normally not do that. For example, normally the list is only shown if
-there are at least to different matches. By setting this style to
-`tt(always)', the list will always even be shown, even if there is
-only a single match which is immediately accepted. The style may also
+there are at least two different matches. By setting this style to
+`tt(always)', the list will always be shown, even if there is only a
+single match which is immediately accepted. The style may also
 be set to a number. In this case the list will be shown if there are
 at least that many matches, even if they would all insert the same
 string.
+
+This style is tested for the default tag and all tags used when
+generating matches. This allows one to turn unconditional listing on
+for certain types of matches.
 )
 kindex(format, completion style)
 item(tt(format))(
@@ -1220,6 +1224,23 @@ version of the shell parameter tt($fignore).
 Note that during the execution of completion functions, the
 tt(EXTENDED_GLOB) option is in effect, so the characters `tt(#)',
 `tt(~)' and `tt(^)' have special meanings in the patterns.
+)
+kindex(insert-ids, completion style)
+item(tt(insert-ids))(
+The function that completes process IDs can be given the prefix of a
+command name to complete it to that process' ID. Since the function
+even in those cases has to insert the process ID, it has to be decided 
+when the string from the line will be converted to a process ID or a
+prefix of one. If this style is set to `tt(menu)' (the default),
+menucompletion will always be entered when the string on the line is
+not a number. If  it is set to `tt(single)', the string on the line
+will be converted to  the process ID only at the very end, when there
+is only one match left  (note that in this case the completion will
+not be able to insert characters in the line because it still has to
+match the process IDs, it just doesn't insert them yet). If the value
+is any other string, menucompletion will be entered when the string on
+the line is longer than the prefix of the IDs of all matching
+processes.
 )
 kindex(insert-unambiguous, completion style)
 item(tt(insert-unambiguous))(
@@ -2088,6 +2109,10 @@ has started trying to generate matches, it will append a minus sign
 and the number of errors accepted in this attempt to its name. So on the
 first try the field contains `tt(approximate-1)', on the
 second try `tt(approximate-2)', and so on.
+
+When tt(_approximate) is called directly, the number of errors to accept
+may be given directly with the tt(-a) option. It's argument should be
+the same as the value of the tt(accept) style, all in one string.
 )
 findex(_correct)
 item(tt(_correct))(
@@ -2106,7 +2131,11 @@ given, correction will not be performed, but correcting completion
 will be, and will accept as many errors as given by the numeric
 argument. Without a numeric argument, first correction and then
 correcting completion will be tried, with the first one accepting two
-errors  and the second one accepting three errors.
+errors and the second one accepting three errors.
+
+When tt(_correct) is called directly, the number of errors to accept
+may be given directly with the tt(-a) option. It's argument should be
+the same as the value of the tt(accept) style, all in one string.
 
 This completer function is intended to be used without the
 tt(_approximate) completer or, as in the example, just before
@@ -2168,6 +2197,11 @@ generate any expansions at all.
 
 In a different mode selected by the tt(completions) style, all
 em(completions) generated for the string on the line are inserted.
+
+When tt(_expand) is called directly, the different modes may be
+selected with options. The tt(-c) corresponds to the tt(completions)
+style, tt(-s) to tt(substitute), tt(-g) to tt(glob) and tt(-o) to
+tt(subst-globs-only).
 )
 findex(_history)
 item(tt(_history))(

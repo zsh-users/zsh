@@ -20,14 +20,15 @@ setopt localoptions nullglob rcexpandparam extendedglob
 unsetopt markdirs globsubst shwordsplit nounset ksharrays
 
 local func funcs ret=1 tmp _compskip format nm \
-      _completers _completer _completer_num curtag \
+      _completers _completer _completer_num curtag _comp_force_list \
       _matchers _matcher _matcher_num _comp_tags _comp_mesg \
       context state line opt_args val_args curcontext="$curcontext" \
       _last_nmatches=-1 _last_menu_style _def_menu_style _menu_style sel \
       _saved_exact="${compstate[exact]}" \
       _saved_lastprompt="${compstate[last_prompt]}" \
       _saved_list="${compstate[list]}" \
-      _saved_insert="${compstate[insert]}"
+      _saved_insert="${compstate[insert]}" \
+      _saved_colors="$ZLS_COLORS"
 
 typeset -U _lastdescr _comp_ignore
 
@@ -203,12 +204,11 @@ elif [[ nm -eq 0 &&
   fi
 fi
 
-if zstyle -s ":completion:${curcontext}:" force-list tmp &&
-   [[ "$compstate[list]" = *list* && 
-      ( "$tmp" = always ||
-        ( "$tmp" = [0-9]## && nm -ge tmp ) ) ]]; then
-  compstate[list]="$compstate[list] force"
-fi
+[[ "$_comp_force_list" = always ||
+   ( "$_comp_force_list" = ?*  && nm -ge _comp_force_list ) ]] &&
+    compstate[list]="$compstate[list] force"
+
+[[ "$compstate[old_list]" = keep ]] && ZLS_COLORS="$_saved_colors"
 
 # Now call the post-functions.
 

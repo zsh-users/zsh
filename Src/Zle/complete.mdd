@@ -1,11 +1,11 @@
-hasexport=1
+name=zsh/complete
 
-moddeps="zle"
+moddeps="zsh/zle"
 
-autobins="compgen compadd compset"
+autobins="compadd compset"
 
 autoprefixconds="prefix suffix between after"
 
-autoparams="compmatchers"
+headers="comp.h"
 
-objects="complete.o"
+objects="complete.o compcore.o compmatch.o compresult.o"

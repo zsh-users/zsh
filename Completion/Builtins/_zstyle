@@ -31,12 +31,14 @@ styles=(
   group-name		 c:
   group-order		 c:tag
   groups		 c:_groups
+  guarded-completer      c:completer
   hidden		 c:bool
   hosts			 c:_hosts
   hosts-ports		 c:host-port
   users-hosts-ports	 c:user-host-port
   ignore-parents         c:ignorepar
   ignored-patterns	 c:
+  insert-ids             c:insert-ids
   insert-unambiguous	 c:bool
   last-prompt		 c:bool
   list			 c:listwhen
@@ -243,6 +245,11 @@ while [[ -n $state ]]; do
       shift 3 words
       (( CURRENT -= 3 ))
       _normal
+      ;;
+
+    insert-ids)
+      _wanted values expl 'when to insert process IDs' \
+          compadd - menu single longer
       ;;
 
     _*)

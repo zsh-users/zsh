@@ -59,3 +59,10 @@ if zstyle -a ":completion:${curcontext}:$1" menu val; then
 else
   _last_nmatches=-1
 fi
+
+[[ "$_comp_force_list" != always ]] &&
+  zstyle -s ":completion:${curcontext}:$1" force-list val &&
+    [[ "$val" = always ||
+       ( "$val" = [0-9]## &&
+         ( -z "$_comp_force_list" || _comp_force_list -lt val ) ) ]] &&
+    _comp_force_list="$val"

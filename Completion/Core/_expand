@@ -11,7 +11,12 @@ setopt localoptions nullglob
 
 [[ _matcher_num -gt 1 ]] && return 1
 
-local exp word sort expr expl subd suf=" "
+local exp word sort expr expl subd suf=" " force opt
+
+(( $# )) &&
+    while getopts gsco opt; do
+      force="$force$opt"
+    done
 
 if [[ "$funcstack[2]" = _prefix ]]; then
   word="$IPREFIX$PREFIX$SUFFIX"
@@ -21,8 +26,9 @@ fi
 
 # First, see if we should insert all *completions*.
 
-if zstyle -s ":completion:${curcontext}:" completions expr &&
-   [[ "${(e):-\$[$expr]}" -eq 1 ]]; then
+if [[ "$force" = *c* ]] ||
+   { zstyle -s ":completion:${curcontext}:" completions expr &&
+     [[ "${(e):-\$[$expr]}" -eq 1 ]] }; then
   compstate[insert]=all
   return 1
 fi
@@ -35,9 +41,10 @@ exp=("$word")
 # changes quoted spaces, tabs, and newlines into spaces and protects
 # this function from aborting on parse errors in the expansion.
 
-if { zstyle -s ":completion:${curcontext}:" substitute expr ||
-     { [[ "$curcontext" = expand-word:* ]] && expr=1 } } &&
-       [[ "${(e):-\$[$expr]}" -eq 1 ]]; then
+if [[ "$force" = *s* ]] ||
+   { { zstyle -s ":completion:${curcontext}:" substitute expr ||
+       { [[ "$curcontext" = expand-word:* ]] && expr=1 } } &&
+         [[ "${(e):-\$[$expr]}" -eq 1 ]] }; then
   exp=( ${(f)"$(print -lR - ${(e)exp//\\[ 	
 ]/ })"} ) 2>/dev/null
 else
@@ -52,9 +59,10 @@ subd=("$exp[@]")
 
 # Now try globbing.
 
-{ zstyle -s ":completion:${curcontext}:" glob expr ||
-  { [[ "$curcontext" = expand-word:* ]] && expr=1 } } &&
-    [[ "${(e):-\$[$expr]}" -eq 1 ]] &&
+[[ "$force" = *g* ]] ||
+  { { zstyle -s ":completion:${curcontext}:" glob expr ||
+      { [[ "$curcontext" = expand-word:* ]] && expr=1 } } &&
+        [[ "${(e):-\$[$expr]}" -eq 1 ]] } &&
     exp=( ${~exp} )
 
 # If we don't have any expansions or only one and that is the same
@@ -67,8 +75,10 @@ subd=("$exp[@]")
 # With subst-globs-only we bail out if there were no glob expansions,
 # regardless of any substitutions
 
-zstyle -s ":completion:${curcontext}:" subst-globs-only expr &&
-    [[ "${(e):-\$[$expr]}" -eq 1 && "$subd" = "$exp"(|\(N\)) ]] && return 1
+[[ "$force" = *o* ]] ||
+  { zstyle -s ":completion:${curcontext}:" subst-globs-only expr &&
+      [[ "${(e):-\$[$expr]}" -eq 1 ]] } && 
+        [[ "$subd" = "$exp"(|\(N\)) ]] && return 1
 
 # Now add as matches whatever the user requested.
 

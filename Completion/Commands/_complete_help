@@ -9,9 +9,9 @@ _complete_help() {
 
   compadd() { return 1 }
   zstyle() {
-    local _f="${${(@)${(@)funcstack[2,(i)_(main_complete|complete|approximate|normal)]}:#_(wanted|requested|loop|try)}% *}"
+    local _f="${${(@)${(@)funcstack[2,(i)_(main_complete|complete|approximate|normal)]}:#_(wanted|requested|all_labels|next_label)}% *}"
 
-    [[ -z "$_f" ]] && _f="${${(@)funcstack[2,(i)_(main_complete|complete|approximate|normal)]}:#_(wanted|requested|loop|try)}"
+    [[ -z "$_f" ]] && _f="${${(@)funcstack[2,(i)_(main_complete|complete|approximate|normal)]}:#_(wanted|requested|all_labels|next_label)}"
 
     if [[ "$help_sfuncs[$2]" != *${_f}* ||
           "$help_styles[${2}${_f}]" != *${3}* ]]; then
@@ -77,7 +77,7 @@ styles in context ${i}"
 }
 
 _help_sort_tags() {
-  local f="${${(@)${(@)funcstack[3,(i)_(main_complete|complete|approximate|normal)]}:#_(wanted|requested|loop|try)}% *}"
+  local f="${${(@)${(@)funcstack[3,(i)_(main_complete|complete|approximate|normal)]}:#_(wanted|requested|all_labels|next_label)}% *}"
 
   if [[ "$help_funcs[$curcontext]" != *${f}* ||
         "$help_tags[${curcontext}${f}]" != *(${(j:|:)~argv})* ]]; then
