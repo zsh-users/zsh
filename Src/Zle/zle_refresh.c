@@ -268,10 +268,13 @@ zrefresh(void)
     if (clearlist && listshown) {
 	if (tccan(TCCLEAREOD)) {
 	    int ovln = vln, ovcs = vcs;
+	    char *nb = nbuf[vln];
 
+	    nbuf[vln] = obuf[vln];
 	    moveto(nlnct, 0);
 	    tcout(TCCLEAREOD);
 	    moveto(ovln, ovcs);
+	    nbuf[vln] = nb;
 	} else {
 	    invalidatelist();
 	    moveto(0, 0);

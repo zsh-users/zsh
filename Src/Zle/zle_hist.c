@@ -76,7 +76,8 @@ forget_edits(void)
 void
 uphistory(void)
 {
-    if (!zle_goto_hist(histline, -zmult) && isset(HISTBEEP))
+    int nodups = isset(HISTIGNOREDUPS);
+    if (!zle_goto_hist(histline, -zmult, nodups) && isset(HISTBEEP))
 	feep();
 }
 
@@ -267,7 +268,8 @@ acceptlineanddownhistory(void)
 void
 downhistory(void)
 {
-    if (!zle_goto_hist(histline, zmult) && isset(HISTBEEP))
+    int nodups = isset(HISTIGNOREDUPS);
+    if (!zle_goto_hist(histline, zmult, nodups) && isset(HISTBEEP))
 	feep();
 }
 
@@ -370,7 +372,7 @@ beginningofbufferorhistory(void)
 void
 beginningofhistory(void)
 {
-    if (!zle_goto_hist(firsthist(), 0) && isset(HISTBEEP))
+    if (!zle_goto_hist(firsthist(), 0, 0) && isset(HISTBEEP))
 	feep();
 }
 
@@ -388,7 +390,7 @@ endofbufferorhistory(void)
 void
 endofhistory(void)
 {
-    zle_goto_hist(curhist, 0);
+    zle_goto_hist(curhist, 0, 0);
 }
 
 /**/
@@ -472,9 +474,14 @@ setlocalhistory(void)
 
 /**/
 int
-zle_goto_hist(int ev, int n)
+zle_goto_hist(int ev, int n, int skipdups)
 {
     Histent he = movehistent(quietgethist(ev), n, hist_skip_flags);
+    if (skipdups && n) {
+	n = n < 0? -1 : 1;
+	while (he && !metadiffer(ZLETEXT(he), (char *) line, ll))
+	    he = movehistent(he, n, hist_skip_flags);
+    }
     if (!he)
 	return 0;
     zle_setline(he);
@@ -906,7 +913,7 @@ vifetchhistory(void)
 	    return;
 	}
     }
-    if (!zle_goto_hist((zmod.flags & MOD_MULT) ? zmult : curhist, 0) &&
+    if (!zle_goto_hist((zmod.flags & MOD_MULT) ? zmult : curhist, 0, 0) &&
 	isset(HISTBEEP))
 	feep();
 }

@@ -7,11 +7,11 @@
 # a command that does not support this option.
 #
 # For options that get an argument after a `=', the function also tries
-# to automatically find out what should be complete as the argument.
+# to automatically find out what should be completed as the argument.
 # The possible completions for option-arguments can be described with
 # the arguments to this function. This is done by giving pairs of
 # patterns and actions as consecutive arguments. The actions specify
-# what should be done to complete arguemts of those options that match 
+# what should be done to complete arguments of those options that match 
 # the pattern. The action may be a list of words in brackets or in
 # parentheses, separated by spaces. A list in brackets denotes
 # possible values for an optional argument, a list in parentheses
@@ -27,18 +27,18 @@
 # This makes `yes' and `no' be completed as the argument of options
 # whose description ends in a star, file names for options that
 # contain the substring `=FILE' in the description, and paths for
-# options whose description contains `=DIR'. Note the last two
+# options whose description contains `=DIR'. Note that the last two
 # patterns are not needed since this function always completes files
 # for option descriptions containing `=FILE' and paths for option
 # descriptions that contain `=DIR' or `=PATH'. These builtin patterns
 # can be overridden by patterns given as arguments, though.
 # 
-# This function accepts following options:
+# This function accepts the following options:
 #
 # -t   do completion only on words starting with two hyphens
 #
 # -i   list of patterns. Options, matching these patterns, are ignored.
-#      The list may be given as array name or as literal list in braces.
+#      The list may be given as a array name or as a literal list in braces.
 #      E.g. _long_options -i '(--(enable|disable)-FEATURE*)' will ignore
 #      --enable-FEATURE, that is listed in configure help output
 #

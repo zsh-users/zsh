@@ -17,12 +17,13 @@ Patches
 
 * Send all patches to the mailing list rather than directly to me.
 
-* Send only context diffs "diff -c oldfile newfile".  They are much
-  easier to read and understand while also allowing the patch program
-  to patch more intelligently.  Please make sure the filenames in
-  the diff header are relative to the top-level directory of the zsh
-  distribution; for example, it should say "Src/init.c" rather than
-  "init.c" or "zsh/Src/init.c".
+* Send only context diffs "diff -c oldfile newfile" or unified diffs
+  "diff -u oldfile newfile".  They are much easier to read and
+  understand while also allowing the patch program to patch more
+  intelligently.  Please make sure the filenames in the diff header
+  are relative to the top-level directory of the zsh distribution; for
+  example, it should say "Src/init.c" rather than "init.c" or
+  "zsh/Src/init.c".
 
 * Please put only one bug fix or feature enhancement in a single patch and
   only one patch per mail message.  This helps me to multiplex the many

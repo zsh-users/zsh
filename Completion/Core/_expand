@@ -132,7 +132,7 @@ else
   if [[ -z "$compconfig[expand_prompt]" ]]; then
     compadd -UQ $group _expand - "$exp[@]"
   else
-    compadd -UQ -X "${compconfig[expand_prompt]//\%o/$word}" \
+    compadd -UQ -X "${compconfig[expand_prompt]//\\%o/$word}" \
             $group _expand - "$exp[@]"
   fi
   [[ "$compconfig[expand_menu]" != *last* &&

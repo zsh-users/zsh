@@ -1,8 +1,8 @@
 #autoload
 
-# This is mainly a wrapper around the more general `_approximate.
+# This is mainly a wrapper around the more general `_approximate'.
 # By setting `compstate[pattern_match]' to something unequal to `*' and
-# then calling `_approximate, we get only corrections, not all strings
+# then calling `_approximate', we get only corrections, not all strings
 # with the corrected prefix and something after it.
 #
 # Supported configuration keys are the same as for `_approximate', only

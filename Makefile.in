@@ -63,8 +63,8 @@ install-strip:
 	$(MAKE) install STRIPFLAGS="-s"
 
 # install/uninstall everything (except info)
-install: install.bin install.modules install.man
-uninstall: uninstall.bin uninstall.modules uninstall.man
+install: install.bin install.modules install.man install.fns
+uninstall: uninstall.bin uninstall.modules uninstall.man uninstall.fns
 
 # install/uninstall just the binary
 install.bin uninstall.bin:
@@ -77,6 +77,11 @@ install.modules uninstall.modules:
 # install/uninstall just the man pages
 install.man uninstall.man:
 	@cd Doc && $(MAKE) $(MAKEDEFS) $@
+
+# install/uninstall just the shell functions
+install.fns uninstall.fns:
+	@cd Completion && $(MAKE) $(MAKEDEFS) $@
+	@cd Functions && $(MAKE) $(MAKEDEFS) $@
 
 # install/uninstall just the info pages
 install.info uninstall.info:

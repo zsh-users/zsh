@@ -640,7 +640,7 @@ execzlefunc(Thingy func)
 	    zsfree(msg);
 	    feep();
 	} else {
-	    int osc = sfcontext;
+	    int osc = sfcontext, osi = movefd(0);
 
 	    startparamscope();
 	    makezleparams(0);
@@ -650,6 +650,7 @@ execzlefunc(Thingy func)
 	    endparamscope();
 	    lastcmd = 0;
 	    r = 1;
+	    redup(osi, 0);
 	}
     }
     if (r) {
@@ -952,6 +953,7 @@ setup_zle(Module m)
     makecomplistcallptr = makecomplistcall;
     makecomplistctlptr = makecomplistctl;
     unambig_dataptr = unambig_data;
+    set_comp_sepptr = set_comp_sep;
 
     /* initialise the thingies */
     init_thingies();
@@ -1027,6 +1029,7 @@ finish_zle(Module m)
     makecomplistcallptr = NULL;
     makecomplistctlptr = NULL;
     unambig_dataptr = NULL;
+    set_comp_sepptr = NULL;
 
     return 0;
 }

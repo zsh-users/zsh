@@ -45,12 +45,24 @@ main(int argc, char **argv)
 
     for (t = argv; *t; *t = metafy(*t, -1, META_ALLOC), t++);
 
-    if (!(zsh_name = strrchr(argv[0], '/')))
-	zsh_name = argv[0];
-    else
-	zsh_name++;
-    if (*zsh_name == '-')
-	zsh_name++;
+    zsh_name = argv[0];
+    do {
+      char *arg0 = zsh_name;
+      if (!(zsh_name = strrchr(arg0, '/')))
+	  zsh_name = arg0;
+      else
+	  zsh_name++;
+      if (*zsh_name == '-')
+	  zsh_name++;
+      if (strcmp(zsh_name, "su") == 0) {
+	  char *sh = zgetenv("SHELL");
+	  if (sh && *sh && arg0 != sh)
+	      zsh_name = sh;
+	  else
+	      break;
+      } else
+	  break;
+    } while (zsh_name);
 
     fdtable_size = OPEN_MAX;
     fdtable = zcalloc(fdtable_size);

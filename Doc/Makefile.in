@@ -174,7 +174,7 @@ install.man: $(MAN)
 # install info pages, creating install directory if necessary
 install.info: zsh.info
 	$(sdir_top)/mkinstalldirs $(infodir)
-	for file in zsh.info zsh.info-[1-9]; do \
+	for file in zsh.info zsh.info-[1-9]*; do \
 	  if test -f $$file; then \
 	    $(INSTALL_DATA) $$file $(infodir); \
 	  elif test -f $(sdir)/$$file; then \
@@ -198,7 +198,7 @@ uninstall.man:
 
 # uninstall info pages
 uninstall.info:
-	rm -f $(infodir)/zsh.info $(infodir)/zsh.info-[1-9]
+	rm -f $(infodir)/zsh.info $(infodir)/zsh.info-[1-9]*
 
 # ========== DEPENDENCIES FOR CLEANUP ==========
 

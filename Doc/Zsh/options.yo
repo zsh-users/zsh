@@ -119,7 +119,8 @@ pindex(AUTO_REMOVE_SLASH)
 cindex(slash, removing trailing)
 item(tt(AUTO_REMOVE_SLASH))(
 When the last character resulting from a completion is a slash and the next
-character typed is a word delimiter or a slash, remove the slash.
+character typed is a word delimiter, a slash, or a character that ends 
+a command (such as a semicolon or an ampersand), remove the slash.
 )
 pindex(AUTO_RESUME)
 cindex(jobs, resuming automatically)
@@ -304,7 +305,8 @@ cindex(history, timestamping)
 item(tt(EXTENDED_HISTORY))(
 Save each command's beginning timestamp (in seconds since the epoch)
 and the duration (in seconds) to the history file.  The format of
-this prefixed data is
+this prefixed data is:
+
 `tt(:)var(<beginning time>)tt(:)var(<elapsed seconds>)tt(:)var(<command>)'.
 )
 pindex(FLOW_CONTROL)
@@ -327,15 +329,14 @@ item(tt(GLOB) (tt(PLUS()F), ksh: tt(PLUS()f)))(
 Perform filename generation (globbing).
 (See noderef(Filename Generation).)
 )
-pindex(GLOBAL_RCS_FIRST)
-cindex(startup files, changing order)
-cindex(files, startup, changing order)
-item(tt(GLOBAL_RCS_FIRST) (tt(-d)))(
-If this option is set, and the tt(RCS) option is also set (as it is by
-default), then the order in which startup files are sourced after
-tt(/etc/zshenv) changes to tt(/etc/zprofile), tt(/etc/zshrc),
-tt(/etc/zlogin), tt(.zshenv), tt(.zprofile), tt(.zshrc), tt(.zlogin).
-The order of tt(.zlogout) and tt(/etc/zlogout) is not affected.
+pindex(GLOBAL_RCS)
+cindex(startup files, global, inhibiting)
+cindex(files, global startup, inhibiting)
+item(tt(GLOBAL_RCS) (tt(-d)))(
+If this option is unset, the startup files tt(/etc/zprofile),
+tt(/etc/zshrc), tt(/etc/zlogin) and tt(/etc/zlogout) will not be run.  It
+can be disabled and re-enabled at any time, including inside local startup
+files (tt(.zshrc), etc.).
 )
 pindex(GLOB_ASSIGN)
 item(tt(GLOB_ASSIGN))(
@@ -409,13 +410,13 @@ isn't there.
 pindex(HIST_EXPIRE_DUPS_FIRST)
 cindex(history, expiring duplicates)
 item(tt(HIST_EXPIRE_DUPS_FIRST))(
-If the history needs to be trimmed to add a new line, setting this
-option will cause the oldest duplicate history line to be lost before
-losing a unique line from the internal history list.
+If the internal history needs to be trimmed to add a new line,
+setting this option will cause the oldest duplicate history line to
+be lost before losing a unique line from the list.
 )
 pindex(HIST_IGNORE_ALL_DUPS)
 cindex(history, ignoring all duplicates)
-item(tt(HIST_IGNORE_ALL_DUPS) (tt(-h)))(
+item(tt(HIST_IGNORE_ALL_DUPS))(
 If a new command line being added to the history list duplicates an
 older one, the older command is removed from the list (even if it is
 not the previous event).
@@ -482,11 +483,11 @@ to avoid the shell hanging if its tty goes away.
 pindex(INC_APPEND_HISTORY)
 cindex(history, incremental appending to a file)
 item(tt(INC_APPEND_HISTORY))(
-This options works like APPEND_HISTORY except that new history lines
-are added to the tt($HISTFILE) when they finish running, rather than
-waiting until the shell is killed. The file is periodically trimmed
-to the number of lines specified by tt($SAVEHIST), but can exceed this
-value between trimmings.
+This options works like tt(APPEND_HISTORY) except that new history lines
+are added to the tt($HISTFILE) incrementally (as soon as they are
+entered), rather than waiting until the shell is killed.
+The file is periodically trimmed to the number of lines specified by
+tt($SAVEHIST), but can exceed this value between trimmings.
 )
 pindex(INTERACTIVE)
 item(tt(INTERACTIVE) (tt(-i), ksh: tt(-i)))(
@@ -568,7 +569,8 @@ tt(XTRACE) and tt(PRINT_EXIT_VALUE) options are restored.  Hence
 if this is explicitly unset by a shell function the other options in
 force at the point of return will remain so.
 A shell function can also guarantee itself a known shell configuration
-with a formulation like `tt(emulate zsh; setopt localoptions)'.
+with a formulation like `tt(emulate -L zsh)'; the tt(-L) activates
+tt(LOCAL_OPTIONS).
 )
 pindex(LOGIN)
 item(tt(LOGIN) (tt(-l), ksh: tt(-l)))(
@@ -795,7 +797,10 @@ After tt(/etc/zshenv) is sourced on startup, source the
 tt(.zshenv), tt(/etc/zprofile), tt(.zprofile),
 tt(/etc/zshrc), tt(.zshrc), tt(/etc/zlogin), tt(.zlogin), and tt(.zlogout)
 files, as described in noderef(Files).
-If this option is unset, only the tt(/etc/zshenv) file is sourced.
+If this option is unset, the tt(/etc/zshenv) file is still sourced, but any
+of the others will not be; it can be set at any time to prevent the
+remaining startup files after the currently executing one from
+being sourced.
 )
 pindex(REC_EXACT)
 cindex(completion, exact matches)
@@ -833,21 +838,22 @@ cindex(history, sharing)
 item(tt(SHARE_HISTORY))(
 
 This option both imports new commands from the history file, and also
-causes your typed commands to be appended to the history file (like
-specifiying tt(INCREMENTAL_APPEND_HISTORY)).  The history lines are also
-output with timestamps ala tt(EXTENDED_HISTORY) (which makes it easier to
-find the spot where we left off reading the file after it gets re-written).
+causes your typed commands to be appended to the history file (the
+latter is like specifying tt(INC_APPEND_HISTORY)).
+The history lines are also output with timestamps ala
+tt(EXTENDED_HISTORY) (which makes it easier to find the spot where
+we left off reading the file after it gets re-written).
 
-By default, history movement commands visit the imported lines as well as
-the local lines, but you can toggle this on and off with the
+By default, history movement commands visit the imported lines as
+well as the local lines, but you can toggle this on and off with the
 set-local-history zle binding.  It is also possible to create a zle
-widget that will make some commands ignore imported commands, and some
-include them.
+widget that will make some commands ignore imported commands, and
+some include them.
 
 If you find that you want more control over when commands
 get imported, you may wish to turn tt(SHARE_HISTORY) off,
-tt(INCREMENTAL_APPEND_HISTORY) on, and then manually import
-commands whenever you need them using `fc -RI'.
+tt(INC_APPEND_HISTORY) on, and then manually import
+commands whenever you need them using `tt(fc -RI)'.
 )
 pindex(SH_FILE_EXPANSION)
 cindex(sh, expansion style)

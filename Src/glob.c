@@ -97,6 +97,7 @@ typedef struct stat *Statptr;	 /* This makes the Ultrix compiler happy.  Go figu
 #define TT_MINS 2
 #define TT_WEEKS 3
 #define TT_MONTHS 4
+#define TT_SECONDS 5
 
 #define TT_BYTES 0
 #define TT_POSIX_BLOCKS 1
@@ -1615,6 +1616,8 @@ glob(LinkList list, LinkNode np)
 				units = TT_WEEKS, ++s;
 			    else if (*s == 'M')
 				units = TT_MONTHS, ++s;
+			    else if (*s == 's')
+				units = TT_SECONDS, ++s;
 			}
 			/* See if it's greater than, equal to, or less than */
 			if ((range = *s == '+' ? 1 : *s == '-' ? -1 : 0))

@@ -115,6 +115,10 @@ To install the dynamically-loadable modules, do the command:
 To install the zsh man page, do the command:
     make install.man
 
+To install all the shell functions which come with the distribution, do the
+command:
+    make install.fns
+
 Or alternatively, you can install all the above with the command:
     make install
 
@@ -202,6 +206,33 @@ Any startup/shutdown script can be disabled by giving the
 --disable-scriptname option to "configure".  The --disable-etcdir option
 disables all startup/shutdown files which are not explicitely enabled.
 
+Shell functions
+---------------
+
+By default, the shell functions which are installed with `make install' or
+`make install.fns' go into the directory ${datadir}/zsh/functions, which
+unless you have specified --datadir is the same as
+${prefix}/share/zsh/functions ($prefix itself defaults to /usr/local, as
+described below).  This directory will also be compiled into the shell as
+the default directory for the variable $fpath/$FPATH. You can override it
+with --enable-fndir=directory; --disable-fndir or --enable-fndir=no will
+turn off both installation of functions and the setting of a default value
+for $fpath/$FPATH.
+
+You can control the functions which get installed by setting
+FUNCTIONS_INSTALL, either when running configure or when running `make
+install' or `make install.fns'.  It includes a list of files relative to
+either the Completion or Functions subdirectories.  By default, all the
+functions for the Completion system will be installed (see the zshcompsys
+manual page), i.e.
+  FUNCTIONS_INSTALL='Core/* Base/* Builtins/* User/* Commands/*'
+and if the --enable-dynamic option was given, the functions in
+Functions/Zftp, which require the zftp module to be available (see the
+zshzftpsys manual page), will be included as well.  There are also some
+miscellaneous functions with documentation in comments; the complete set
+of functions can be installed with
+  FUNCTIONS_INSTALL='Core/* Base/* Builtins/* User/* Commands/* Misc/* Zftp/*'
+
 Support for large files and integers
 ------------------------------------
 
@@ -269,5 +300,6 @@ Features:
      zlogin=pathname     # the full pathname of the global zlogin script
      zprofile=pathname   # the full pathname of the global zprofile script
      zlogout=pathname    # the full pathname of the global zlogout script
+     fns=directory       # the directory where shell functions will go
      dynamic             # allow dynamically loaded binary modules
      lfs                 # allow configure check for large files

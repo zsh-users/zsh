@@ -58,8 +58,8 @@ int excs, exlast;
  * the line does not get added to the list until hend(), if at all.
  * However, curhist is incremented to reflect the current line anyway
  * and a temporary history entry is inserted while the user is editing.
- * If the resulting line was not added to the list, curhist is
- * decremented in hend().
+ * If the resulting line was not added to the list, a flag is set so
+ * that curhist will be decremented in hbegin().
  */
  
 /**/
@@ -984,6 +984,8 @@ hend(void)
 void
 remhist(void)
 {
+    if (hist_ring == &curline)
+	return;
     if (!(histactive & HA_ACTIVE)) {
 	if (!(histactive & HA_JUNKED)) {
 	    freehistnode((HashNode)hist_ring);

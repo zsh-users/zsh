@@ -315,9 +315,9 @@ With the tt(-D) flag, tt(fc) prints elapsed times.
 
 cindex(history, file)
 cindex(file, history)
-tt(fc -R) reads the history from the given file,
-tt(fc -W) writes the history out to the given file,
-and tt(fc -A) appends the history out to the given file.
+`tt(fc -R)' reads the history from the given file,
+`tt(fc -W)' writes the history out to the given file,
+and `tt(fc -A)' appends the history out to the given file.
 If no filename is specified, the tt($HISTFILE) is assumed.
 If the tt(-I) option is added to tt(-R), only those events that are
 not already contained within the internal history list are added.

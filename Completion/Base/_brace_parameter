@@ -1,9 +1,19 @@
 #compdef -brace-parameter-
 
+setopt localoptions extendedglob
+
+local lp ls n q suf=''
+
 if [[ "$SUFFIX" = *\}* ]]; then
   ISUFFIX="${SUFFIX#*\}}$ISUFFIX"
   SUFFIX="${SUFFIX%%\}*}"
-  _parameters -S '} ' -r '-:?#%+=[/'
 else
-  _parameters -S '} ' -r '-:?#%+=[/'
+  suf='} '
 fi
+
+lp="$LBUFFER[1,-${#PREFIX}-1]"
+ls="$RBUFFER[${#SUFFIX}+1,-1]"
+n=${(M)#ls##\"#}
+q=${(M)lp%%\"#}
+
+_parameters -s "${q[1,-n-1]}" -S "$suf" -r '-:?#%+=[/'

@@ -25,7 +25,7 @@
 #
 
 config: Makefile
-	@subdir='$(SUBDIRS)'; for subdir in $$subdirs; do \
+	@subdirs='$(SUBDIRS)'; for subdir in $$subdirs; do \
 	  (cd $$subdir && $(MAKE) $(MAKEDEFS) $@) || exit 1; \
 	done
 

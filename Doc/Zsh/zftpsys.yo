@@ -7,10 +7,10 @@ This describes the set of shell functions supplied with the source
 distribution as an interface to the tt(zftp) builtin command, allowing you
 to perform FTP operations from the shell command line or within functions
 or scripts.  The interface is similar to a traditional FTP client (e.g. the
-manref(ftp)(1) command itself), but as it is entirely done within the shell
-all the familar completion, editing and globbing features, and so on, are
-present, and macros are particularly simple to write as they are just
-ordinary shell functions.
+tt(ftp) command itself, see manref(ftp)(1)), but as it is entirely done
+within the shell all the familar completion, editing and globbing features,
+and so on, are present, and macros are particularly simple to write as they
+are just ordinary shell functions.
 
 The prerequisite is that the tt(zftp) command, as described in
 ifzman(\
@@ -20,11 +20,11 @@ ifnzman(\
 noderef(The zftp Module)
 ), must be available in the
 version of tt(zsh) installed at your site.  If the shell is configured to
-load new commands at run time, it probably is: typing tt(zmodload zftp)
+load new commands at run time, it probably is: typing `tt(zmodload zftp)'
 will make sure (if that runs silently, it has worked).  If this is not the
 case, it is possible tt(zftp) was linked into the shell anyway: to test
-this, type tt(which zftp) and if tt(zftp) is available you will get the
-message tt(zftp: shell built-in command).
+this, type `tt(which zftp)' and if tt(zftp) is available you will get the
+message `tt(zftp: shell built-in command)'.
 
 Commands given directly with tt(zftp) builtin may be interspersed between
 the functions in this suite; in a few cases, using tt(zftp) directly may
@@ -43,7 +43,7 @@ sect(Installation)
 
 You should make sure all the functions from the tt(Functions/Zftp)
 directory of the source distribution are available; they all begin with the
-two letters tt(zf).  They may already have been installed on your system;
+two letters `tt(zf)'.  They may already have been installed on your system;
 otherwise, you will need to find them and copy them.  The directory should
 appear as one of the elements of the tt($fpath) array, and the functions
 should be autoloaded.  Finally, to initialise the use of the system you
@@ -93,13 +93,13 @@ described below.
 
 Normally, the var(host), var(user) and var(password) are internally
 recorded for later re-opening, either by a tt(zfopen) with no arguments, or
-automatically (see below).  With the option tt(-1), no information is
+automatically (see below).  With the option `tt(-1)', no information is
 stored.
 )
 item(tt(zfanon [ -1 ] var(host)))(
 Open a connection var(host) for anonymous FTP.  The username used is
 tt(anonymous).  The password (which will be reported the first time) is
-generated from var(user)tt(@)tt(host); this is then stored in the shell
+generated as var(user)tt(@)var(host); this is then stored in the shell
 parameter tt($EMAIL_ADDR) which can alternatively be set manually to a
 suitable string.
 )
@@ -114,9 +114,9 @@ Change the current directory on the remote server:  this is implemented to
 have many of the features of the shell builtin tt(cd).
 
 In the first form with var(dir) present, change to the directory var(dir).
-The command tt(zfcd ..) is treated specially, so is guaranteed to work on
+The command `tt(zfcd ..)' is treated specially, so is guaranteed to work on
 non-UNIX servers (note this is handled internall by tt(zftp)).  If var(dir)
-is omitted, has the effect of tt(zfcd ~).
+is omitted, has the effect of `tt(zfcd ~)'.
 
 The second form changes to the directory previously current.
 
@@ -125,22 +125,22 @@ first occurrence of the string var(old) with the string var(new) in the
 current directory.
 
 Note that in this command, and indeed anywhere a remote filename is
-expected, the string which on the local host corresponds to tt(~) is
-converted back to a tt(~) before being passed to the remote machine.
+expected, the string which on the local host corresponds to `tt(~)' is
+converted back to a `tt(~)' before being passed to the remote machine.
 This is convenient because of the way expansion is performed on the command
 line before tt(zfcd) receives a string.  For example, suppose the command
-is tt(zfcd ~/foo).  The shell will expand this to a full path as in tt(zfcd
-/home/user2/pws/foo).  At this stage, tt(zfcd) recognises the initial path
-as tt(~), and the directory sent to the remote host is tt(~/foo), so that
-the tt(~) will be expanded by the server to the correct remote host
-directory.  Other named directories of the form tt(~name) are not treated
-in this fashion.
+is `tt(zfcd ~/foo)'.  The shell will expand this to a full path as in
+`tt(zfcd /home/user2/pws/foo)'.  At this stage, tt(zfcd) recognises the
+initial path as `tt(~)', and the directory sent to the remote host is
+tt(~/foo), so that the `tt(~)' will be expanded by the server to the
+correct remote host directory.  Other named directories of the form
+`tt(~name)' are not treated in this fashion.
 )
 item(tt(zfhere))(
 Change directory on the remote server to the one corresponding to the
-current local directory, with special handling of tt(~) as in tt(zfcd).
+current local directory, with special handling of `tt(~)' as in tt(zfcd).
 For example, if the current local directory is tt(~/foo/bar), then
-tt(zfhere) performs the effect of tt(zfcd ~/foo/bar).
+tt(zfhere) performs the effect of `tt(zfcd ~/foo/bar)'.
 )
 item(tt(zfdir [ -rfd ] [ - ] [ var(dir-options) ] [ var(dir) ]))(
 Produce a long directory listing.  The arguments var(dir-options) and
@@ -163,7 +163,7 @@ listing.
 item(tt(zfls) [ var(ls-options) ] [ var(dir) ])(
 List files on the remote server.  With no arguments, this will produce a
 simple list of file names for the current remote directory.  Any arguments
-are passed directory to the server.  No pager and no caching is used.
+are passed directly to the server.  No pager and no caching is used.
 )
 enditem()
 
@@ -171,9 +171,9 @@ subsect(Status commands)
 startitem()
 item(tt(zftype) [ var(type) ])(
 With no arguments, show the type of data to be transferred, usually ASCII
-or binary.  With an argument, change the type: the types tt(A) or
-tt(ASCII) for ASCII data and tt(B) or tt(BINARY), tt(I) or tt(IMAGE) for
-binary data are understood case-insensitively.
+or binary.  With an argument, change the type: the types `tt(A)' or
+`tt(ASCII)' for ASCII data and `tt(B)' or `tt(BINARY)', `tt(I)' or
+`tt(IMAGE)' for binary data are understood case-insensitively.
 )
 item(tt(zfstat) [ -v ])(
 Show the status of the current or last connection, as well as the status of
@@ -266,9 +266,9 @@ A problem arises if you attempt to use tt(zfpcp) var(lfile1) var(rdir),
 i.e. the second form of copying but with two arguments, as the command has
 no simple way of knowing if var(rdir) corresponds to a directory or a
 filename.  It attempts to resolve this in various ways.  First, if the
-var(rdir) argument is tt(.) or tt(..) or ends in a slash, it is assumed to
-be a directory.  Secondly, if the operation of copying to a remote file in
-the first form failed, and the remote server sends back the expected
+var(rdir) argument is `tt(.)' or `tt(..)' or ends in a slash, it is assumed
+to be a directory.  Secondly, if the operation of copying to a remote file
+in the first form failed, and the remote server sends back the expected
 failure code 553 and a reply including the string `tt(Is a directory)',
 then tt(zfpcp) will retry using the second form.
 )

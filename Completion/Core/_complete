@@ -6,6 +6,15 @@
 
 local comp name
 
+# If we have a user-supplied context name, use only that.
+
+if [[ -n "$compcontext" ]]; then
+  comp="$_comps[$compcontext]"
+  [[ -z "$comp" ]] || "$comp"
+
+  return
+fi
+
 # An entry for `-first-' is the replacement for `compctl -T'
 # Completion functions may set `_compskip' to any value to make the 
 # main loops stop calling other completion functions.
@@ -19,6 +28,7 @@ if [[ ! -z "$comp" ]]; then
     return
   fi
 fi
+
 
 # For arguments and command names we use the `_normal' function.
 

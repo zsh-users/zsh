@@ -550,7 +550,11 @@ setupvals(void)
     cdpath   = mkarray(NULL);
     manpath  = mkarray(NULL);
     fignore  = mkarray(NULL);
+#ifdef FUNCTION_DIR
+    fpath    = mkarray(ztrdup(FUNCTION_DIR));
+#else
     fpath    = mkarray(NULL);
+#endif
     mailpath = mkarray(NULL);
     watch    = mkarray(NULL);
     psvar    = mkarray(NULL);
@@ -758,33 +762,31 @@ run_init_scripts(void)
 #ifdef GLOBAL_ZSHENV
 	source(GLOBAL_ZSHENV);
 #endif
-	if (isset(RCS)) {
-	    if (unset(PRIVILEGED))
-		sourcehome(".zshenv");
-	    if (islogin) {
+	if (isset(RCS) && unset(PRIVILEGED))
+	    sourcehome(".zshenv");
+	if (islogin) {
 #ifdef GLOBAL_ZPROFILE
-		if (isset(GLOBALRCS))
+	    if (isset(RCS) && isset(GLOBALRCS))
 		    source(GLOBAL_ZPROFILE);
 #endif
-		if (unset(PRIVILEGED))
-		    sourcehome(".zprofile");
-	    }
-	    if (interact) {
+	    if (isset(RCS) && unset(PRIVILEGED))
+		sourcehome(".zprofile");
+	}
+	if (interact) {
 #ifdef GLOBAL_ZSHRC
-		if (isset(GLOBALRCS))
-		    source(GLOBAL_ZSHRC);
+	    if (isset(RCS) && isset(GLOBALRCS))
+		source(GLOBAL_ZSHRC);
 #endif
-		if (unset(PRIVILEGED))
-		    sourcehome(".zshrc");
-	    }
-	    if (islogin) {
+	    if (isset(RCS) && unset(PRIVILEGED))
+		sourcehome(".zshrc");
+	}
+	if (islogin) {
 #ifdef GLOBAL_ZLOGIN
-		if (isset(GLOBALRCS))
-		    source(GLOBAL_ZLOGIN);
+	    if (isset(RCS) && isset(GLOBALRCS))
+		source(GLOBAL_ZLOGIN);
 #endif
-		if (unset(PRIVILEGED))
-		    sourcehome(".zlogin");
-	    }
+	    if (isset(RCS) && unset(PRIVILEGED))
+		sourcehome(".zlogin");
 	}
     }
     noerrexit = 0;

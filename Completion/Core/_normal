@@ -3,7 +3,7 @@
 local comp command cmd1 cmd2 pat val name i ret=1
 
 # Completing in command position? If not we set up `cmd1' and `cmd2' as
-# two strings we have search in the completion definition arrays (e.g.
+# two strings we have to search in the completion definition arrays (e.g.
 # a path and the last path name component).
 
 command="$words[1]"

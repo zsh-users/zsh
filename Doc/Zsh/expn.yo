@@ -332,9 +332,9 @@ a letter, digit, or underscore that is not to be interpreted
 as part of var(name).  In addition, more complicated forms of substitution
 usually require the braces to be present; exceptions, which only apply if
 the option tt(KSH_ARRAYS) is not set, are a single subscript or any colon
-modifiers appearing after the name, or any of the characters tt(^), tt(=),
-tt(~), tt(#) or tt(+) appearing before the name, all of which work with or
-without braces.
+modifiers appearing after the name, or any of the characters `tt(^)',
+`tt(=)', `tt(~)', `tt(#)' or `tt(+)' appearing before the name, all of
+which work with or without braces.
 
 If var(name) is an array parameter, then the value of each
 element of var(name) is substituted, one element per word.
@@ -375,8 +375,8 @@ containing a colon, then the shell only checks whether
 var(name) is set, not whether its value is null.
 
 In the following expressions, when var(name) is an array and
-the substitution is not quoted, or if the tt((@)) flag or the
-`var(name)tt([@])' syntax is used, matching and replacement is
+the substitution is not quoted, or if the `tt((@))' flag or the
+var(name)tt([@]) syntax is used, matching and replacement is
 performed on each array element separately.
 
 startitem()
@@ -404,7 +404,7 @@ item(tt(${)var(name)tt(:#)var(pattern)tt(}))(
 If the var(pattern) matches the value of var(name), then substitute
 the empty string; otherwise, just substitute the value of var(name).
 If var(name) is an array
-the matching array elements are removed (use the tt((M)) flag to
+the matching array elements are removed (use the `tt((M))' flag to
 remove the non-matched elements).
 )
 xitem(tt(${)var(name)tt(/)var(pattern)tt(/)var(repl)tt(}))
@@ -412,15 +412,15 @@ item(tt(${)var(name)tt(//)var(pattern)tt(/)var(repl)tt(}))(
 Replace by string var(repl), the longest possible match of
 var(pattern) in the expansion of parameter var(name).  The first form
 replaces just the first occurrence, the second form all occurrences.
-The var(pattern) may begin with a var(#), in which case the
-var(pattern) must match at the start of the string, or var(%), in
+The var(pattern) may begin with a `tt(#)', in which case the
+var(pattern) must match at the start of the string, or `tt(%)', in
 which case it must match at the end of the string.  The var(repl) may
-be an empty string, in which case the final tt(/) may also be omitted.
-To quote the final tt(/) in other cases it should be preceded by two
+be an empty string, in which case the final `tt(/)' may also be omitted.
+To quote the final `tt(/)' in other cases it should be preceded by two
 backslashes (i.e., a quoted backslash); this is not necessary if the
-tt(/) occurs inside a substituted parameter.
+`tt(/)' occurs inside a substituted parameter.
 
-The first tt(/) may be preceded by a tt(:), in which case the match
+The first `tt(/)' may be preceded by a `tt(:)', in which case the match
 will only succeed if it matches the entire word.  Note also the
 effect of the tt(I) and tt(S) parameter expansion flags below; however,
 the flags tt(M), tt(R), tt(B), tt(E) and tt(N) are not useful.
@@ -431,7 +431,7 @@ nofill(tt(foo="twinkle twinkle little star" sub="t*e" rep="spy")
 tt(print ${foo//${~sub}/$rep})
 tt(print ${(S)foo//${~sub}/$rep}))
 
-Here, the tt(~) ensures that the text of tt($sub) is treated as a
+Here, the `tt(~)' ensures that the text of tt($sub) is treated as a
 pattern rather than a plain string.  In the first case, the longest
 match for tt(t*e) is substituted and the result is `tt(spy star)',
 while in the second case, the shortest matches are taken and the
@@ -442,8 +442,8 @@ If var(spec) is one of the above substitutions, substitute
 the length in characters of the result instead of
 the result itself.  If var(spec) is an array expression,
 substitute the number of elements of the result.
-Note that tt(^), tt(=), and tt(~), below, must appear
-to the left of tt(#) when these forms are combined.
+Note that `tt(^)', `tt(=)', and `tt(~)', below, must appear
+to the left of `tt(#)' when these forms are combined.
 )
 item(tt(${^)var(spec)tt(}))(
 pindex(RC_EXPAND_PARAM, use of)
@@ -452,7 +452,7 @@ cindex(rc, array expansion style)
 Turn on the tt(RC_EXPAND_PARAM) option for the
 evaluation of var(spec); if the `tt(^)' is doubled, turn it off.
 When this option is set, array expansions of the form
-`var(foo)tt(${)var(xx)tt(})var(bar)',
+var(foo)tt(${)var(xx)tt(})var(bar),
 where the parameter var(xx)
 is set to tt(LPAR())var(a b c)tt(RPAR()), are substituted with
 `var(fooabar foobbar foocbar)' instead of the default
@@ -498,9 +498,18 @@ tt($LPAR())...tt(RPAR()) type command substitution is used in place of
 var(name) above, it is expanded first and the result is used as if
 it were the value of var(name).  Thus it is
 possible to perform nested operations:  tt(${${foo#head}%tail})
-substitutes the value of tt($foo) with both tt(head) and tt(tail)
+substitutes the value of tt($foo) with both `tt(head)' and `tt(tail)'
 deleted.  The form with tt($LPAR())...tt(RPAR()) is often useful in
 combination with the flags described next; see the examples below.
+
+Note that double quotes may appear around nested substitutions, in which
+case only the part inside is treated as quoted; for example,
+tt(${(f)"$(foo)"}) quotes the result of tt($(foo)), but the flag `tt((f))'
+(see below) is applied using the rules for unquoted substitutions.  Note
+further that quotes are themselves nested in this context; for example, in
+tt("${(@f)"$(foo)"}"), there are two sets of quotes, one surrounding the
+whole expression, the other (redundant) surrounding the tt($(foo)) as
+before.
 
 subsect(Parameter Expansion Flags)
 cindex(parameter expansion flags)
@@ -526,8 +535,8 @@ when creating an associative array.
 )
 item(tt(@))(
 In double quotes, array elements are put into separate words.
-E.g., `tt("${(@)foo}")' is equivalent to `tt("${foo[@]}")' and
-`tt("${(@)foo[1,2]}")' is the same as `tt("$foo[1]" "$foo[2]")'.
+E.g., tt("${(@)foo}") is equivalent to tt("${foo[@]}") and
+tt("${(@)foo[1,2]}") is the same as tt("$foo[1]" "$foo[2]").
 )
 item(tt(e))(
 Perform em(parameter expansion), em(command substitution) and
@@ -541,7 +550,7 @@ type parameter expression or a tt($LPAR())...tt(RPAR()) type command
 substitution in place of the parameter name this flag makes the result
 of the expansion be taken as a parameter name which is then
 used. E.g. if you have `tt(foo=bar)' and `tt(bar=baz)', the strings
-`tt(${(P)foo})' and `tt(${(P)${foo}})' will be expanded to `tt(baz)'.
+tt(${(P)foo}) and tt(${(P)${foo}}) will be expanded to `tt(baz)'.
 )
 item(tt(o))(
 Sort the resulting words in ascending order.
@@ -722,7 +731,7 @@ outermost.  The flags are not propagated up to enclosing
 substitutions; the nested subsitution will return either a scalar or an
 array as determined by the flags, possibly adjusted for quoting.  All the
 following steps take place where applicable at all levels of substitution.
-Note that, unless the tt((P)) flag is present, the flags and any subscripts
+Note that, unless the `tt((P))' flag is present, the flags and any subscripts
 apply directly to the value of the nested substitution; for example, the
 expansion tt(${${foo}}) behaves exactly the same as tt(${foo}).
 )
@@ -749,57 +758,57 @@ arrays are not modified).  If the tt((j)) flag is present, that is used for
 joining instead of tt($IFS).
 )
 item(tt(5.) em(Nested Subscripting))(
-Any remaining subscript (i.e. of a nested substitution) is evaluated at
-this point, based on whether the value is an array or a scalar; if it was
-an array, a second subscript for the character in the word may also appear.
-Note that tt(${foo[2,4][2]}) is thus equivalent to tt(${${foo[2,4]}[2]})
-and also to tt("${${(@)foo[2,4]}[2]}") (the nested substitution returns an
-array in both cases), but not to tt("${${foo[2,4]}[2]}") (the nested
-substitution returns a scalar because of the quotes).
+Any remaining subscripts (i.e. of a nested substitution) are evaluated at
+this point, based on whether the value is an array or a scalar.  As with
+tt(2.), multiple subscripts can appear.  Note that tt(${foo[2,4][2]}) is
+thus equivalent to tt(${${foo[2,4]}[2]}) and also to
+tt("${${(@)foo[2,4]}[2]}") (the nested substitution returns an array in
+both cases), but not to tt("${${foo[2,4]}[2]}") (the nested substitution
+returns a scalar because of the quotes).
 )
 item(tt(6.) em(Modifiers))(
-Any modifiers, as specified by a trailing tt(#), tt(%), tt(/)
+Any modifiers, as specified by a trailing `tt(#)', `tt(%)', `tt(/)'
 (possibly doubled) or by a set of modifiers of the form tt(:...) (see
 noderef(Modifiers) in noderef(History Expansion)), are applied to the words
 of the value at this level.
 )
 item(tt(7.) em(Forced Joining))(
-If the tt((j)) flag is present, or no tt((j)) flag is present but
+If the `tt((j))' flag is present, or no `tt((j))' flag is present but
 the string is to be split as given by rules tt(8.) or tt(9.), and joining
 did not take place at step tt(4.), any words in the value are joined
 together using the given string or the first character of tt($IFS) if none.
-Note that the tt((F)) flag implicitly supplies a string for joining in this
+Note that the `tt((F))' flag implicitly supplies a string for joining in this
 manner.
 )
 item(tt(8.) em(Forced Splitting))(
-If one of the tt((s)) or tt((f)) flags are present, or the tt(=)
+If one of the `tt((s))' or `tt((f))' flags are present, or the `tt(=)'
 specifier was present (e.g. tt(${=)var(var)tt(})), the word is split on
 occurrences of the specified string, or (for tt(=) with neither of the two
 flags present) any of the characters in tt($IFS).
 )
 item(tt(9.) em(Shell Word Splitting))(
-If no tt((s)), tt((f)) or tt(=) was given, but the word is not
+If no `tt((s))', `tt((f))' or `tt(=)' was given, but the word is not
 quoted and the option tt(SH_WORD_SPLIT) is set, the word is split on
 occurrences of any of the characters in tt($IFS).  Note this step, too,
 take place at all levels of a nested substitution.
 )
 item(tt(10.) em(Re-Evaluation))(
-Any tt((e)) flag is applied to the value, forcing it to be re-examined for
-new parameter substitutions, but also for command and arithmetic
+Any `tt((e))' flag is applied to the value, forcing it to be re-examined
+for new parameter substitutions, but also for command and arithmetic
 substitutions.
 )
 item(tt(11.) em(Padding))(
-Any padding of the value by the tt(LPAR()l.)var(fill)tt(.RPAR()) or
-tt(LPAR()r.)var(fill)tt(.RPAR()) flags is applied.
+Any padding of the value by the `tt(LPAR()l.)var(fill)tt(.RPAR())' or
+`tt(LPAR()r.)var(fill)tt(.RPAR())' flags is applied.
 )
 enditem()
 
 subsect(Examples)
 The flag tt(f) is useful to split a double-quoted substitution line by
-line.  For example, `tt("${(f)$LPAR()<)var(file)tt(RPAR()}")'
+line.  For example, tt("${(f)$LPAR()<)var(file)tt(RPAR()}")
 substitutes the contents of var(file) divided so that each line is
 an element of the resulting array.  Compare this with the effect of
-`tt($)tt(LPAR()<)var(file)tt(RPAR())' alone, which divides the file
+tt($)tt(LPAR()<)var(file)tt(RPAR()) alone, which divides the file
 up by words, or the same inside double quotes, which makes the entire
 content of the file a single string.
 
@@ -811,19 +820,19 @@ item(tt("${(@)${foo}[1]}"))(
 This produces the result tt(b).  First, the inner substitution
 tt("${foo}"), which has no array (tt(@)) flag, produces a single word
 result tt("bar baz").  The outer substitution tt("${(@)...[1]}") detects
-that this is a scalar, so that (despite the tt((@)) flag) the subscript
+that this is a scalar, so that (despite the `tt((@))' flag) the subscript
 picks the first character. 
 )
 item(tt("${${(@)foo}[1]}"))(
-The produces the result tt(bar).  In this case, the inner substitution
-tt("${(@)foo}") produces the array tt(LPAR()bar baz)tt(RPAR()).  The outer
+The produces the result `tt(bar)'.  In this case, the inner substitution
+tt("${(@)foo}") produces the array `tt(LPAR()bar baz)tt(RPAR())'.  The outer
 substitution tt("${...[1]}") detects that this is an array and picks the
 first word.  This is similar to the simple case tt("${foo[1]}").
 )
 enditem()
 
 As an example of the rules for word splitting and joining, suppose tt($foo)
-contains the array tt(LPAR()ax1 bx1)tt(RPAR()).  Then
+contains the array `tt(LPAR()ax1 bx1)tt(RPAR())'.  Then
 
 startitem()
 item(tt(${(s/x/)foo}))(
@@ -1371,21 +1380,21 @@ be taken (e.g. `tt(u:foo:)' or `tt(u[foo])' for user `tt(foo)')
 item(tt(g)var(id))(
 like tt(u)var(id) but with group IDs or names
 )
-item(tt(a)[tt(Mwhm)][tt(-)|tt(PLUS())]var(n))(
-files accessed exactly var(n) days ago.  Files accessed within the
-last var(n) days are selected using a negative value for var(n)
-(tt(-)var(n)).  Files accessed more than var(n) days ago are selected by a
-positive var(n) value (tt(PLUS())var(n)).  Optional unit specifiers `tt(M)',
-`tt(w)', `tt(h)' or `tt(m)' (e.g. `tt(ah5)') cause the check to be
-performed with months (of 30 days), weeks, hours, or minutes instead of
-days, respectively.  For instance, `tt(echo *(ah-5))' would echo files
-accessed within the last five hours.
+item(tt(a)[tt(Mwhms)][tt(-)|tt(PLUS())]var(n))(
+files accessed exactly var(n) days ago.  Files accessed within the last
+var(n) days are selected using a negative value for var(n) (tt(-)var(n)).
+Files accessed more than var(n) days ago are selected by a positive var(n)
+value (tt(PLUS())var(n)).  Optional unit specifiers `tt(M)', `tt(w)',
+`tt(h)', `tt(m)' or `tt(s)' (e.g. `tt(ah5)') cause the check to be
+performed with months (of 30 days), weeks, hours, minutes or seconds
+instead of days, respectively.  For instance, `tt(echo *(ah-5))' would
+echo files accessed within the last five hours.
 )
-item(tt(m)[tt(Mwhm)][tt(-)|tt(PLUS())]var(n))(
+item(tt(m)[tt(Mwhms)][tt(-)|tt(PLUS())]var(n))(
 like the file access qualifier, except that it uses the file modification
 time.
 )
-item(tt(c)[tt(Mwhm)][tt(-)|tt(PLUS())]var(n))(
+item(tt(c)[tt(Mwhms)][tt(-)|tt(PLUS())]var(n))(
 like the file access qualifier, except that it uses the file inode change
 time.
 )

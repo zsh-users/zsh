@@ -127,6 +127,7 @@ killwholeline(void)
 	for (i = cs; i != ll && line[i] != '\n'; i++);
 	forekill(i - cs + (i != ll), fg);
     }
+    clearlist = 1;
 }
 
 /**/
@@ -787,7 +788,9 @@ static char *suffixfunc;
 void
 makesuffix(int n)
 {
-    suffixlen[256] = suffixlen[' '] = suffixlen['\t'] = suffixlen['\n'] = n;
+    suffixlen[256] = suffixlen[' '] = suffixlen['\t'] = suffixlen['\n'] =
+	suffixlen[';'] = suffixlen['|'] = suffixlen['&'] = 
+	suffixlen['<'] = suffixlen['>'] = n;
 }
 
 /* Set up suffix for parameter names: the last n characters are a suffix *

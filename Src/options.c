@@ -438,17 +438,6 @@ emulate(const char *zsh_name, int fully)
 {
     char ch = *zsh_name;
 
-    if (!strcmp("su", zsh_name)) {
-	/* We haven't set up the paramtable yet, so just use zgetenv */
-	char *ptr = zgetenv("SHELL");
-	if (ptr && *ptr) {
-	    zsh_name = ptr;
-	    if ((ptr = strrchr(zsh_name, '/')))
-		zsh_name = ptr+1;
-	    ch = *zsh_name;
-	} else
-	    ch = 'z';
-    }
     if (ch == 'r')
 	ch = zsh_name[1];
 

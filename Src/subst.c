@@ -976,7 +976,7 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int ssub)
 		zerr("bad substitution", NULL, 0);
 		return NULL;
 	    }
-	} else if (INULL(*s))
+	} else if (inbrace && INULL(*s))
 	    s++;
 	else
 	    break;
@@ -984,7 +984,7 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int ssub)
     globsubst = globsubst && !qt;
 
     idbeg = s;
-    if ((subexp = (s[-1] && isstring(*s) &&
+    if ((subexp = (inbrace && s[-1] && isstring(*s) &&
 		   (s[1] == Inbrace || s[1] == Inpar)))) {
 	int sav;
 	int quoted = *s == Qstring;
@@ -1168,6 +1168,9 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int ssub)
     }
 
     idend = s;
+    if (inbrace)
+	while (INULL(*s))
+	    s++;
     if ((colf = *s == ':'))
 	s++;
 
@@ -1484,6 +1487,10 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int ssub)
 	val = dupstring("");
 	isarr = 0;
     } else if (isarr && aval && aval[0] && !aval[1]) {
+	/* treat a one-element array as a scalar for purposes of   *
+	 * concatenation with surrounding text (some${param}thing) *
+	 * and rc_expand_param handling.  Note: mult_isarr (above) *
+	 * propagates the true array type from nested expansions.  */
 	val = aval[0];
 	isarr = 0;
     }
@@ -1500,8 +1507,8 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int ssub)
 		val = aval[0];
 	    else
 		isarr = 2;
-	    mult_isarr = isarr;
 	}
+	mult_isarr = isarr;
     }
     if (casmod) {
 	if (isarr) {
@@ -1665,7 +1672,7 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int ssub)
 	    return NULL;
 	xlen = strlen(x);
 	*str = strcatsub(&y, ostr, aptr, x, xlen, fstr, globsubst);
-	if (qt && !*y && isarr != 2)
+	if (qt && !*y)
 	    y = dupstring(nulstring);
 	setdata(n, (void *) y);
     }

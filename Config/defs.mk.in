@@ -36,6 +36,7 @@ libdir          = @libdir@
 MODDIR          = $(libdir)/zsh/$(VERSION)
 infodir         = @infodir@
 mandir          = @mandir@
+fndir           = @fndir@
 
 # compilation
 CC              = @CC@
@@ -65,6 +66,9 @@ YODL2HTML       = $(YODL)2html
 INSTALL_PROGRAM = @INSTALL_PROGRAM@
 INSTALL_DATA    = @INSTALL_DATA@
 
+# variables used in determining what to install
+FUNCTIONS_INSTALL = @FUNCTIONS_INSTALL@
+
 # flags passed to recursive makes in subdirectories
 MAKEDEFS = \
 prefix='$(prefix)' exec_prefix='$(exec_prefix)' bindir='$(bindir)' \
@@ -74,7 +78,8 @@ LDFLAGS='$(LDFLAGS)' EXTRA_LDFLAGS='$(EXTRA_LDFLAGS)' \
 DLCFLAGS='$(DLCFLAGS)' DLLDFLAGS='$(DLLDFLAGS)' \
 LIBLDFLAGS='$(LIBLDFLAGS)' EXELDFLAGS='$(EXELDFLAGS)' \
 LIBS='$(LIBS)' DL_EXT='$(DL_EXT)' DLLD='$(DLLD)' \
-AWK='$(AWK)' YODL='$(YODL)' YODL2TXT='$(YODL2TXT)' YODL2HTML='$(YODL2HTML)'
+AWK='$(AWK)' YODL='$(YODL)' YODL2TXT='$(YODL2TXT)' YODL2HTML='$(YODL2HTML)' \
+FUNCTIONS_INSTALL='$(FUNCTIONS_INSTALL)'
 
 # override built-in suffix list
 .SUFFIXES:

@@ -91,6 +91,7 @@ struct compcond {
 #define CCT_NUMWORDS  10
 #define CCT_RANGESTR  11
 #define CCT_RANGEPAT  12
+#define CCT_QUOTE     13
 
 /* Contains the real description for compctls */
 
@@ -107,6 +108,7 @@ struct compctl {
     char *ylist;		/* for -y (user-defined desc. for listing) */
     char *prefix, *suffix;	/* for -P and -S (prefix, suffix)          */
     char *subcmd;		/* for -l (command name to use)            */
+    char *substr;		/* for -1 (command name to use)            */
     char *withd;		/* for -w (with directory                  */
     char *hpat;			/* for -H (history pattern)                */
     int hnum;			/* for -H (number of events to search)     */
@@ -209,6 +211,7 @@ struct cmatch {
     char *prpre;		/* path prefix for opendir */
     char *pre;			/* prefix string from -P */
     char *suf;			/* suffix string from -S */
+    char autoq;			/* closing quote to add automatically */
     int flags;			/* see CMF_* below */
     int brpl;			/* the place where to put the brace prefix */
     int brsl;			/* ...and the suffix */
@@ -297,42 +300,79 @@ struct cadata {
 
 /* Flags for special parameters. */
 
-#define CP_WORDS      (1 <<  0)
-#define CP_CURRENT    (1 <<  1)
-#define CP_PREFIX     (1 <<  2)
-#define CP_SUFFIX     (1 <<  3)
-#define CP_IPREFIX    (1 <<  4)
-#define CP_ISUFFIX    (1 <<  5)
-#define CP_COMPSTATE  (1 <<  6)
+#define CPN_WORDS      0
+#define CP_WORDS       (1 <<  CPN_WORDS)
+#define CPN_CURRENT    1
+#define CP_CURRENT     (1 <<  CPN_CURRENT)
+#define CPN_PREFIX     2
+#define CP_PREFIX      (1 <<  CPN_PREFIX)
+#define CPN_SUFFIX     3
+#define CP_SUFFIX      (1 <<  CPN_SUFFIX)
+#define CPN_IPREFIX    4
+#define CP_IPREFIX     (1 <<  CPN_IPREFIX)
+#define CPN_ISUFFIX    5
+#define CP_ISUFFIX     (1 <<  CPN_ISUFFIX)
+#define CPN_QIPREFIX   6
+#define CP_QIPREFIX    (1 <<  CPN_QIPREFIX)
+#define CPN_QISUFFIX   7
+#define CP_QISUFFIX    (1 <<  CPN_QISUFFIX)
+#define CPN_COMPSTATE  8
+#define CP_COMPSTATE   (1 <<  CPN_COMPSTATE)
 
-#define CP_REALPARAMS        7
+#define CP_REALPARAMS  9
+#define CP_ALLREALS    ((unsigned int) 0x1ff)
 
-#define CP_NMATCHES   (1 <<  7)
-#define CP_MATCHER    (1 <<  8)
-#define CP_MATCHERSTR (1 <<  9)
-#define CP_MATCHERTOT (1 << 10)
-#define CP_CONTEXT    (1 << 11)
-#define CP_PARAMETER  (1 << 12)
-#define CP_REDIRECT   (1 << 13)
-#define CP_QUOTE      (1 << 14)
-#define CP_QUOTING    (1 << 15)
-#define CP_RESTORE    (1 << 16)
-#define CP_LIST       (1 << 17)
-#define CP_FORCELIST  (1 << 18)
-#define CP_INSERT     (1 << 19)
-#define CP_EXACT      (1 << 20)
-#define CP_EXACTSTR   (1 << 21)
-#define CP_PATMATCH   (1 << 22)
-#define CP_PATINSERT  (1 << 23)
-#define CP_UNAMBIG    (1 << 24)
-#define CP_UNAMBIGC   (1 << 25)
-#define CP_LISTMAX    (1 << 26)
-#define CP_LASTPROMPT (1 << 27)
-#define CP_TOEND      (1 << 28)
-#define CP_OLDLIST    (1 << 29)
-#define CP_OLDINS     (1 << 30)
-#define CP_VARED      (1 << 31)
 
-#define CP_NUM              32
+#define CPN_NMATCHES   0
+#define CP_NMATCHES    (1 <<  CPN_NMATCHES)
+#define CPN_MATCHER    1
+#define CP_MATCHER     (1 <<  CPN_MATCHER)
+#define CPN_MATCHERSTR 2
+#define CP_MATCHERSTR  (1 <<  CPN_MATCHERSTR)
+#define CPN_MATCHERTOT 3
+#define CP_MATCHERTOT  (1 <<  CPN_MATCHERTOT)
+#define CPN_CONTEXT    4
+#define CP_CONTEXT     (1 <<  CPN_CONTEXT)
+#define CPN_PARAMETER  5
+#define CP_PARAMETER   (1 <<  CPN_PARAMETER)
+#define CPN_REDIRECT   6
+#define CP_REDIRECT    (1 <<  CPN_REDIRECT)
+#define CPN_QUOTE      7
+#define CP_QUOTE       (1 <<  CPN_QUOTE)
+#define CPN_QUOTING    8
+#define CP_QUOTING     (1 <<  CPN_QUOTING)
+#define CPN_RESTORE    9
+#define CP_RESTORE     (1 <<  CPN_RESTORE)
+#define CPN_LIST       10
+#define CP_LIST        (1 << CPN_LIST)
+#define CPN_FORCELIST  11
+#define CP_FORCELIST   (1 << CPN_FORCELIST)
+#define CPN_INSERT     12
+#define CP_INSERT      (1 << CPN_INSERT)
+#define CPN_EXACT      13
+#define CP_EXACT       (1 << CPN_EXACT)
+#define CPN_EXACTSTR   14
+#define CP_EXACTSTR    (1 << CPN_EXACTSTR)
+#define CPN_PATMATCH   15
+#define CP_PATMATCH    (1 << CPN_PATMATCH)
+#define CPN_PATINSERT  16
+#define CP_PATINSERT   (1 << CPN_PATINSERT)
+#define CPN_UNAMBIG    17
+#define CP_UNAMBIG     (1 << CPN_UNAMBIG)
+#define CPN_UNAMBIGC   18
+#define CP_UNAMBIGC    (1 << CPN_UNAMBIGC)
+#define CPN_LISTMAX    19
+#define CP_LISTMAX     (1 << CPN_LISTMAX)
+#define CPN_LASTPROMPT 20
+#define CP_LASTPROMPT  (1 << CPN_LASTPROMPT)
+#define CPN_TOEND      21
+#define CP_TOEND       (1 << CPN_TOEND)
+#define CPN_OLDLIST    22
+#define CP_OLDLIST     (1 << CPN_OLDLIST)
+#define CPN_OLDINS     23
+#define CP_OLDINS      (1 << CPN_OLDINS)
+#define CPN_VARED      24
+#define CP_VARED       (1 << CPN_VARED)
 
-#define CP_ALLMASK    ((unsigned int) 0xffffffff)
+#define CP_KEYPARAMS   25
+#define CP_ALLKEYS     ((unsigned int) 0xffffff)

@@ -1,3 +1,1241 @@
+1999-06-08  Peter Stephenson  <pws@ibmth.difi.unipi.it>
+
+	* 3.1.5-pws-21 made available
+
+	* Sven: 6515: Src/Zle/zle_tricky.c: fix memory problems with 6492
+
+	* Wayne: 6510: Completion/Core/compinit: another nounset problem
+
+1999-06-07  Peter Stephenson  <pws@ibmth.difi.unipi.it>
+
+	* pws: configure.in, Config/defs.mk.in, Functions/Makefile.in,
+	  Completion/Makefile.in, rearrangement of Functions
+	  subdirectories:  --enable-fndir allows function installation,
+	  defaults to ${datadir}/zsh/functions; is compiled into $fpath;
+	  FUNCTIONS_INSTALL can specify functions to install e.g.
+	  'Core/* Base/* Builtins/* Zftp/*'.
+
+	* pws: 6509: Src/Zle/zle_tricky.c: comp_setunset -> comp_setunsetptr
+
+	* pws: 6506: Completion/Core/compinit, Doc/Zsh/compsys.yo: if
+	  completion dumpfile is not writeable, use
+	  ${ZDOTDIR:-$HOME}/.zcompdump
+
+	* Sven: 6502: Doc/Zsh/options.yo: document 6496
+
+	* Sven: 6496: Src/Zle/zle_misc.c (makesuffix): more characters
+	  that can't be part of a filename
+
+	* Sven: 6493: Completion/Core/_approximate,
+	  Completion/Core/_expand: %e wasn't being replaced properly in
+	  correction prompts
+
+	* Sven: 6492: Src/Zle/comp.h, Src/Zle/comp1.c, Src/Zle/compctl.c,
+	  Src/Zle/zle_main.c, Src/Zle/zle_tricky.c, Doc/Zsh/compctl.yo,
+	  Doc/Zsh/compsys.yo, Doc/Zsh/compwid.yo,
+	  Completion/Base/_brace_parameter:  Completion inside quotes
+	  now acts as if the file name is the entire quoted string;
+	  `compctl -h' takes a command line from inside a quoted string;
+	  the compctl tests q[s], q[d], q[b] are true if we are in single,
+	  double, back quotes; compset -q tests quotes and splits the word,
+	  affecting $PREFIX, $SUFFX and setting $IQPREFIX, $IQSUFFIX for
+	  the bits which will now be ignored.
+
+	* pws: 6490: Completion/Core/compinit: nounset workaround
+
+	* Bart: 6485: Src/loop.c: only show one screenful at a time
+	  in select, as LINES doc implies it should do
+
+	* Sven: 6484: Src/Zle/zle_main.c, Src/Zle/zle_tricky.c: close
+	  fd 0 during zle widgets and completion and redup back afterwards
+	  (removed unnecessary zclose()'s)
+	
+	* Wayne: 6481: Doc/Zsh/builtins.yo, Doc/Zsh/options.yo,
+	  Src/hist.c:  improved new history documentation and comments
+
+	* Wayne: 6480: Src/hist.c: Ignore some lines in remhist() to
+	  workaround crashes attempting to add already removed lines
+
+	* Tanaka Akira: 6478: Completion/User/_make: complete files
+	  as fallback (but use _files instead of compgen -f)
+
+1999-06-06  Peter Stephenson  <pws@ibmth.difi.unipi.it>
+
+	* Naoki Wakamatsu <naoki-w@ht-net21.ne.jp>: 6477: configure.in:
+	  undefine etcdir, not zshenv
+
+1999-06-05  Peter Stephenson  <pws@ibmth.difi.unipi.it>
+
+	* Merge ChangeLog entry from patchlist.txt in 3.1.5-pws-20
+	  These are briefer than normal ChangeLog entries, but upgrading
+	  all of them is too much work.
+
+	* pws: 6473: Src/Modules/mapfile.c: munmap() after writing file
+
+	* Bart: 6472: doc for 6458
+
+	* pws: 6470: options.yo doc for globalrcs
+
+	* Sven: 6468: -first- context example; allow $compcontext for
+	  direct context in _complete; other stuff
+
+	* pws: 6464: fix problem with 6433; disallow nested parameter
+	  substitution without braces
+
+	* Sven: 6458: allow seconds in globbing qualifier time comparisons
+
+	* Zefram: off-list: metafaq updates
+
+	* pws: 6437: rearrange quotes in expn.yo, zftpsys.yo, minor
+	  corrections
+
+	* pws: 6433: allow quotes around names of parameters in braces
+
+	* pws: 6431: su saga again: new documentation
+
+	* Bart: 4127: su saga: 6299 and 6313 backed off; this alters
+	  ZSH_NAME using zgetenv("SHELL").  It can be turned into an
+	  --enable if anyone complains.
+
+	* Wayne: 6430: history tweaks: more careful ignoring history with
+	  foreign lines, changed name incappendhistory
+
+	* pws: 6424: reduce excess quoting in info files
+
+	* pws: 6421: _mh should use $words instead of $argv
+
+	* pws: 6416: document ${(f)"$(foo)"} change and nesting of quotes
+	  in braces
+
+	* Sven: 6414: completing parameters with extra quotes, don't
+	  complete local parameters
+
+	* Sven: 6411: fix display bug on terminals which can do
+	  TCMULTRIGHT (gap left when clearing list).
+
+	* pws: 6410: RCS option can now take affect at any point during
+	  initialisation, new GLOBAL_RCS applies to /etc/z* files.
+
+	* Bart: 6404: singleton arrays treated as scalars locally (as
+	  before), but correct array/scalar status is passed to enclosing
+	  substitutions.
+
+	* Bart: 6395: uninstall info files over 9, too
+
+	* Sven: 6212 (previously missed): an extra clear list
+
+	* Andrej: 6392: install info files higher than 9
+
+	* 3.1.5-pws-20
+
+	* Sven: 6388: completion in braces removes later arguments
+
+	* Sven: 6374: autoremove behaviour on -r and -R, documentation
+
+	* Bart: 6369: fix use of relative paths in compinstall
+
+	* Bart: 6368: don't use cp -f, use rm -f in configure.in
+
+	* Sven: 6355: ALL_EXPORT crashed the shell if set on command line
+
+	* Sven: 6352, 6354: more quoting in completion
+
+	* pws: 6346: msync() missing from mapfile.c, somehow
+
+	* pws: 6345: Config/defs.mk is now in build tree, not source tree
+
+	* Sven: 6343: test length of anchor in partial word matching
+
+	* pws: 6340: INSTALL didn't work if it was install-sh after 6330
+
+	* pws: 6335: now you can do ${(f)"$(...)"} to get arrays
+
+	* pws: 6332: mapfile module
+
+	* pws: 6331: protect against null hash tables in parameter module
+
+	* pws: 6330: rewrite configuration system to use AC_SUBST_FILE
+	  instead of including files by ed trickery (ed is now no longer
+	  required).
+
+	* Sven: 6326: compadd -r and -R work on automatically added
+	  suffixes, too
+
+	* Sven: 6322: reverse indexing of nested arrays
+
+	* Sven: 6318: memory fixes for parameter module (and compctl).
+
+	* 3.1.5-pws-19 made available
+
+	* pws: unposted: updated some .distfiles
+
+	* pws: 6314: in something like `{ false; } || true', errexit
+	  shouldn't be used at all on the left of the ||
+
+	* pws: 6313: fix 6299 to use $SHELL to decide emulation
+
+	* pws: 6307, 6312: wider support for 64-bit integers on 32-bit
+	  architectures
+
+	* Tanaka Akira: 6303: _path_files: find files after symbolic link
+
+	* Sven: 6302: more list_pipe intricacies
+
+	* Sven: 6301: expanded ignored prefix ignored for testing
+
+	* pws: 6299: if called as su* or -su*, zsh doesn't do sh emulation
+
+	* Sven: 6298: (mult_isarr) ${*:-word} didn't use the default word
+
+	* pws: 6294: typeset -U MANPATH performs uniqueness test straight
+	  away
+
+	* pws: 6291: zftp only checks for system type after login.
+
+	* pws: 6290: parameter module uses global scope, $parameters gets
+	  unreadonlied, gcc warning
+
+	* Sven: 6285: tty/job handling when executing some command in
+	  current shell code within RHS of pipeline
+
+	* Sven: 6283: compadd -U didn't quote characters properly
+
+	* Sven: 6278: fix ${$(foo)...} to produce an array
+
+	* Tatsuo Furukawa: 6274: updated form of zle_refresh patch
+
+	* Tatsuo Furukawa: 6273: don't need to defined _POSIX* flags
+	  specially on HPUX
+
+	* pws: 6272: correct even more mistakes some bozo (guess who) made
+	  with rlim_t: put back RLIM_T_IS_UNSIGNED code.
+
+	* pws: 6271: make sure -D_LARGEFILE_SOURCE is defined any time
+	  there are other -D's for large file support
+
+	* pws: 6284, should have been in 6269: changes to large file
+	  support
+
+	* Sven: 6268: parameter module for access to internal tables
+
+	* pws: 6263: incrementalappendhistory -> incappendhistory
+
+	* 3.1.5-pws-18 made available
+
+	* pws: 6259: second version of compinstall
+
+	* pws: 6258: yet another attempt at the same problem
+
+	* pws: 6257: rewrite 6240 for any old builtin structure after the
+	  pipeline
+
+	* Wayne: 6255: more history: zle toggle between local/global
+	  history;  `zle widget' can now take a direct numeric argument;
+	  small tweaks
+
+	* Sven: 6249: fix for 6046 (problem showed up with $(...))
+
+	* pws: 6246: doc changes for 6046, plus subscripts done properly
+
+	* Sven: 6046: nested parameter expansions can return either arrays
+	  or scalars.
+
+	* Wayne: 6241: history editing can use foreign history commands;
+	  history appended in hend() instead of hbegin()
+
+	* pws: 6240: a pipeline ending in a builtin didn't attach to the
+	  tty pgrp.
+
+	* pws: 6239: need space after incrementalappendhistory for
+	  kshoptionprint
+
+	* pws: 6238: Wayne's share_history option set in ksh emulation
+
+	* pws: 6237: window size code upgraded from 3.0.6-pre2, plus
+	  Bart's patch 4447.
+
+	* Wayne: 6236: history changes to improve management of duplicate
+	  lines, incremental history read/write, and sharing history
+
+	* pws: 6235: unset -m shouldn't restore unset parameters;
+	  unsetting a global should remove it from paramtab even inside a
+	  function.
+
+	* pws: 6227: configuration for large file support (from bash
+	  aclocal.m4).
+
+	* pws: 6224: alter 6205 to read chars only when necessary, but
+	  ensure terminal is set appropriately.
+
+	* Wayne: 6220: various compilation warnings
+
+	* Tanaka Akira: 6219: initialize a variable in zle_tricky.c
+
+	* Bart: 6213: race condition in $(...), use waitforpid() instead
+	  of unblocking child (which shouldn't happen until later).
+
+	* pws: 6205: use FIONREAD wherever defined, read chars immediately
+	  into buffer
+
+	* pws: 6202: trivial _correct_filename change, ^Xc -> ^XC
+
+	* Sven: 6197: off by one error parsing assignment in completion
+
+	* Sven: 6195: _expand_word and _correct_word change.
+
+	* Sven: 6194: complete assoc array arguments by default where
+	  necessary
+
+	* pws: 6193: [un]setopt shouldn't complain when setting an
+	  unsettable option to the value it already has
+
+	* Bart: 6188: compinit speedup
+
+	* 3.1.5-pws-17 made available
+
+	* pws: 6180: Completion/Core/compinstall
+
+	* Bart: 6171 as rewritten in 6174: old RedHat Linux doesn't have
+	  normal definitions for poll.
+
+	* Sven: 6167: show unloaded parameters as undefined
+
+	* pws: 6165: globsubst'd foo='~/bin' depended on extendedglob
+	  being set
+
+	* Bart: 6162: autoloadable parameter code links without dynamic
+	  loading
+
+	* Sven: 6153: realparamtab to smooth access to autoloaded parameters
+
+	* Sven: 6152: compstate[vared]
+
+	* Sven: 6150: alwayslastprompt sometimes failed in M-x
+
+	* Sven: 6133: autoloaded parameters
+
+	* Sven: 6132: compctl.mdd
+
+	* Ville Herva: 6131, see 6126: reset tv.tv_sec before select for
+	  Linux
+
+	* Sven: 6129: comments for struct cadata
+
+	* Sven: 6128: completion after an expansion; list after a
+	  non-completion list
+
+	* Sven: 6124: menu completion wasn't consistent between tabs
+
+	* Sven: 6121: try harder with braces after a parameter expansion
+
+	* Sven: 6119: don't insert word separator before ignored suffix
+
+	* pws: 6118: _closequote and _oldlist completers
+
+	* Sven: 6117: position of ignored suffix in inserted match
+
+	* Sven: 6113: compadd -D, nuke element in an array for each failed
+	  match
+
+	* Sven: 6109: completion in parameter assignment should set
+	  context `value'
+
+	* Bart: 6106: short documentation fixes in expn.yo, options.yo,
+	  redirect.yo
+
+	* Sven: 6105: _make patch whitespace
+
+	* Geoff: 6104: multi-line prompt fix (6101 backed off)
+
+	* 3.1.5-pws-16 made available
+
+	* pws: 6101: multi-line prompt ending in '\n' got another newline
+
+	* Tanaka Akira: 6092: _find, bad glob pattern
+
+	* Tanaka Akira: 6085: _make can hang when no [mM]akefile
+
+	* pws: zsh-announce/94: FAQ and FAQ.yo updated
+
+	* Sven: 6079: compwid.yo typo
+
+	* Tanaka Akira: 6078: _find syntax error
+
+	* Sven: 6077: do_single() fix for old completion
+
+	* pws: 6074: zftp function suite moved to Functions/Zftp and
+	  provided with documentation.
+
+	* pws: 6070: ~ in character class in parentheses with extendedglob
+	  failed
+
+	* Sven: 6066: create list of modules built into the base executable
+
+	* Sven: 6062: test whether using the same widget when doing
+	  menucompletion
+
+	* Sven: 6060: don't invalidatelist() in zle_main.c before calling
+	  completion functions
+
+	* Sven: 6058: small changes in _path_files, compinit and
+	  documentation
+
+	* Sven: 6056: compwid.yo
+
+	* pws: 6053: compwid.yo
+
+	* 3.1.5-pws-15 made available
+
+	* Sven: 6031: defcomp -> compdef
+
+	* pws: 6030: compsys.yo
+
+	* Sven: 6026: _path_files slight rewrite for speed
+
+	* Sven: 6021: _path_files expanding path fix
+
+	* pws: 6018: (#l) and friends with a trailing / on the glob
+	  pattern always failed
+
+	* pws: 6016: compinit and _zftp
+
+	* Andrej: 6017 (ex 6014): -i and -s options for _long_options
+
+	* Sven: 6013: pass ignored prefix and suffix in _path_files
+
+	* Sven: 6011: compadd uses first (not last) occurrence of an option
+
+	* Sven: 6010: _match_pattern and _match_test replaced by options
+	  to compadd (and deleted from distribution)
+
+	* Sven: extracted from 6009: chunk for getmatcharr()
+
+	* Sven: 6008: %{ works in completion listings
+
+	* Sven: 6005: Misc/compctl-examples altered for latest (more
+	  consistent) nested parameter expansion rules
+
+	* Bart: 6002, 6003: in ${foo/#bar/thing}, the `#' can appear from
+	  substitution and can be quoted
+
+	* Sven: 5999: ~foo<TAB> completes with /
+
+	* Sven: 5996: compsys.yo, special contexts
+
+	* Sven: 5995: should fix 5969
+
+	* Sven: 5986: compstate[insert]
+
+	* Sven: 5983: documentation for Completion/ system (compsys.1).
+
+	* Sven: 5982: menu behaviour
+
+	* Sven: 5981: bit masks in comp.h
+
+	* Sven: 5972: compconf without arguments lists; _compalso takes
+	  extra arguments
+
+	* Sven: 5971: shell code control over re-using existing completion
+	  lists
+
+	* Sven: 5970: completion fix compilation; #defcomp is now #compdef
+
+	* Sven: 5969: clear to end of display optimization (may need
+	  modifying for some terminals)
+
+	* Sven: 5968: fix brace re-insertion problem in completion
+
+	* pws: 5965: _correct_word
+
+	* Sven: 5960: $PREBUFFER: lines before current $BUFFER
+
+	* Sven: 5959: quoting characters in completion
+
+	* Bruce: 5958: _make
+
+	* Sven: 5955: more compstate choices: list_max, last_prompt, to_end
+
+	* 3.1.5-pws-14 made avaliable
+
+	* pws: unposted: updated .distfiles under Completion
+
+	* Sven: 5947: completion functions fix
+
+	* Sven: 5942: spaces in file names with old completion
+
+	* Sven: 5940: move cursor
+
+	* Sven: 5938, 5937: compset to replace modifying conditions
+
+	* Sven: 5936: replace modifying completion tests with compset
+
+	* pws: 5934: option GLOBAL_RCS_FIRST runs /etc/z* files before
+	  user's files.
+
+	* Sven: 5933: don't complete local parameters; _setopt/_unsetopt
+	  complete all options (code to use currently unset/set options
+	  remains in comments)
+
+	* pws: 5931: more parameter substitution rules
+
+	* Sven: 5928: copy context in zle_tricky
+
+	* Sven: 5926: $HISTNO
+
+	* Sven: 5925: path_expand
+
+	* Sven: 5918: _list completer
+
+	* Sven: 5916: _expand completer
+
+	* pws: 5915: minor type fixes
+
+	* Sven: 5914: _main_complete takes optional completer arguments
+
+	* Sven: 5913: zle -C test
+
+	* Sven: 5912: compiler warnings
+
+	* pws: 5905: _main_complete should at least try to get
+	  _unset_options correct.
+
+	* Sven: 5904: print local for parameters
+
+	* Sven: 5895, 5898, 5906: fix completion prefixes
+
+	* Sven: 5890: _match completer
+
+	* Sven: 5879, 5899: completion documentation
+
+	* Sven: 5872, 5881, 5889: corresponding Completion function rewrite
+
+	* Sven: 5871, 5875: big zle_tricky.c cleanup, with compstate
+	  changes and IFSUFFIX
+
+	* Bart: 5868: expn.yo fixes
+
+	* 3.1.5-pws-13 made available
+
+	* pws: 5863: substitution rules
+
+	* Sven: 5862: _path_files (turning on menu) and _cd (include . in
+	  path)
+
+	* pws: 5854: man page dependencies in Doc/Makefile.in
+
+	* Sven: 5852: warnings about _long_options
+
+	* pws: 5844: don't set errflag if noerrs = 2.
+
+	* Sven: 5831: in subscripts and math environments, the whole
+	  string is always passed down to the function handler.
+
+	* Sven: 5830: in ${#:-stuff}, stuff is treated as a single word
+	  (unless split for some other reason).
+
+	* Sven: 5829: clear the completion list in more zle functions
+
+	* Sven: 5818: parameter name in subscript which looks math-like;
+	  _subscript.
+
+	* Sven: 5811: put back _multi_parts which got left out when it was
+	  moved into Core.
+
+	* Sven: 5804: _pdf
+
+	* Sven: 5800: _path_files; path altered when no possible match
+
+	* pws: 5797: set CLOBBERS_TYPEAHEAD for Irix; old config.guess
+	  change for Reliant UNIX and Apple Rhapsody re-imported from old
+	  config.guess.
+
+	* Sven: 5796: globcomplete shouldn't always turn on menucompletion
+
+	* Sven: 5795: parsing change for assignment and arrays in nested
+	  substitution.
+
+	* Sven (reposted by Bart): 5783: zerr() sets errflag even if
+	  noerrs is set
+
+	* pws: 5780: Completion/Base/_brace_parameter change
+
+	* 3.1.5-pws-12 made available
+
+	* Geoff: 5779: correct mistakes some bozo (guess who) made testing
+	  rlim_t for long long.
+
+	* pws: unposted archive changes: .distfiles in Completion
+	  hierarchy, dunno what these do but it looks better; _comp_parts
+	  is now _sep_parts; moved _long_options into Base and mentioned
+	  it in Completion/README.
+
+	* pws: 5776: untested patch for typeahead problems when reading
+	  multiple lines of input
+
+	* Sven: 5775: correcting completion will not ignore everything the
+	  user has typed; prefix quote fix
+
+	* Sven: 5770: _path_files again
+
+	* Sven: 5766: _path_files closer to compctl/compgen behaviour
+
+	* Sven: 5761: remove unnecessary compiler warnings in compctl.c
+
+	* Sven: 5759: math environment fixes
+
+	* pws: www archive: updated Etc/FAQ finally, keep forgetting
+
+	* Sven: 5758: _path_files accepts -q, -r and -R options
+
+	* Sven: 5757: compconfig
+
+	* Sven: 5756: compstate[force_list]
+
+	* Lehti Rami: 5754: --disable-restricted-r stops the shell
+	  becoming restricted when its name starts with r
+
+	* Sven: zsh-users/2211 (+ p -> s): setopt -m handles underscores
+	  and case sensitivity
+
+	* pws: 5737: ${foo#* } is more efficient in ordinary cases
+
+	* Sven: 5736: completion before = in assignment
+
+	* Sven: 5732: _a2ps, _long_options
+
+	* pws: 5729: _bindkey doc
+
+	* Sven: 5726: zle_tricky.c: ctokenize() fix and parameter completion
+
+	* Will Day: 5724 (+postprocessing, 5741): signames2.awk: match
+	  extra spaces if produced by CPP.
+
+	* Andrej: 5719: _bindkey can use - as anchor for wildcard matching
+
+	* Sven: 5716: zle.h, zle_misc.c, zle_tricky.c: iremovesuffix() can
+	  be told whether to keep a list of matches
+
+	* Sven: 5714: _path_files: failed completions get left alone more
+	  often
+
+	* Sven: 5713: zle_tricky.c, interesting code specimen made extinct
+
+	* Sven: 5712: _path_files, noglobcomplete fix
+
+	* Sven: 5710: zle_tricky.c, completion inside words
+
+	* Sven: 5708: completion manual, -M anchors must be matched
+	  explicitly
+
+	* Sven: 5707: tokenization changes
+
+	* Sven: 5704: _long_options
+
+	* Sven: 5701: _main_complete, _multi_parts, _path_files, a few
+	  cosmetic changes.
+
+	* Sven: 5699: matching prefixes of various sorts
+
+	* Sven: 5698: array indexing in _long_options and _multi_parts
+
+	* Sven: 5696, 5697: "${${path}[1]}" indexes on characters again
+
+	* Sven: 5692: remove compstate[matcher] test from _long_options
+
+	* Sven: 5682: bindkey fix
+
+	* Sven: 5677, 5679: Completion/User/_long_options and consequent
+	  upgrades for Completion/User files which use long GNU-style
+	  options.
+
+	* Sven: 5676: all Completion example functions return a status
+
+	* pws: from autoconf 2.13: new config.guess, too.
+
+	* Sven: 5675: tidying up for zle_tricky.c
+
+	* Sven: 5671: another small parameter fix for multiple braces
+
+	* Sven: 5670: parameter completion fix
+
+	* 3.1.5-pws-11 made available
+
+	* pws: from autoconf 2.13: new config.sub
+
+	* Sven: 5666: calling inststrlen() with a null string
+
+	* Sven: 5665: return values from completion functions
+
+	* Sven: 5663: compctl -i _completion_function
+
+	* Sven: 5662: / following brace parameter
+
+	* Sven: 5659: globcomplete changes
+
+	* Sven: 5651: widespread completion fixes
+
+	* Andrej: 5650: more tricks with _configure
+
+	* Sven: 5647: _multi_parts doesn't replace so many *'s
+
+	* Sven: 5640: _multi_parts, _path_files, _tar
+
+	* Sven: 5637: mustuseheap check in complistflags
+
+	* Sven: 5634: return values for compgen and compadd
+
+	* Sven: 5631: compilation warnings
+
+	* Sven: 5629: approximate correction patches
+
+	* pws: 5628: _builtin, _cd, _most_recent_file
+
+	* Sven: 5624: CCORIG required to be offered original string when
+	  correcting using COMPCORRECT
+
+	* Sven: 5623: -X strings with compadd were mishandled
+
+	* Sven: 5622: zshcompwid manual: clarifications
+
+	* Sven: 5621: manual for nmatches and matcher
+
+	* Sven: 5620: fix for completion inside expansible braces
+
+	* Bart: 5614: Completion/Base/_match_test works out of the box
+
+	* Sven: 5613: copy scalar variable used for compgen -y
+
+	* Sven: 5605: explanation listing fix
+
+	* Sven: 5604: approximate completion.
+
+	* Sven: 5603: compstat[pattern_match]
+
+	* pws: 5602: _tar
+
+	* Sven: 5601: compstate[exact_string] and compstate[total_matchers]
+
+	* Sven: 5599: _comp_parts, _path_files tweaks
+
+	* Sven: 5598: a neater way of handling compadd -p/-P
+
+	* pws; 5597: Use separate file mymods.conf for your own builtin
+	  modules rather than the automatically generated modules-bltin.
+
+	* Matt: 5596: Makefile dependencies for module compilation
+
+	* Sven: 5593: _path_files -w
+
+	* Sven: 5590: compadd -p, -s and -P fixes
+
+	* Sven: 5588: fix _most_recent_file idiocy
+
+	* Sven: 5586: addmatch fix (old completion wasn't working)
+
+	* pws: 5583: post-patch restructuring of _mh, _zftp,
+	  _most_recent_file.
+
+	* Sven: 5582: _path_files will expand /u/ -> /usr/ even if /u
+	  exists if nothing later on would match otherwise (got that?)
+
+	* Sven: 5574, 5578: Completion/README notes
+
+	* Sven: 5571: Functions/Builtins/_cd tests if $cdpath is set
+
+	* Sven: 5566: $foo[(b.<index>.i)<match>] starts searching $foo for
+	  for <match> at <index>
+
+	* Sven: 5565, 5576: $NUMERIC gives the numeric argument in a zle
+	  widget
+
+	* Sven: 5564, 5577, 5579: massive new completion reworking with
+	  $words, $compstate, etc., etc.
+
+	* pws: 5561: attempted (untested) fix for QNX4 compilation;
+	  halloc() is now zhalloc().  (By private email from
+	  probin@qnx.co.uk, it seems the QNX problems are more
+	  considerable with 3.1.5.)
+
+	* Sven: 5560: subscripting fixes in params.c: flags for scalars
+	  and converting integer AA element to string
+
+	* pws: 5559: cd /.. doesn't show .. (except if RFS was detected).
+
+	* Larry P. Schrof: 5550: last -> previous in history documentation
+
+	* pws: 5557: configure.in for making sure signals really are
+	  defined in the file found.  This was in pws-10, but the patch
+	  didn't appear on the list for four days.
+
+	* 3.1.5-pws-10 made available
+
+	* pws: unposted: Functions/Completion moved to Completion;
+	  subdirectories Core, Base, Builtins, User, Commands created;
+	  Completion/README created.
+
+	* Matt: 5553: under _WIN32, .exe suffix is optional for commands
+
+	* Sven: 5548: _path_files, _comp_parts
+
+	* Sven: 5547: group handling -J/-V in compadd
+
+	* pws: 5545: silly set -x mistake
+
+	* Sven: 5544: another completion cleanup
+
+	* Sven: 5543: compadd -X, zshcompwid manual
+
+	* pws: 5538: approximate pattern matching, (#a1)readme etc.
+
+	* pws: 5531: small init fix
+
+	* Sven: 5529: cleanup for Functions/Completion
+
+	* Sven: 5521: improved option handling for _path_files
+
+	* Sven: 5512, 5525: globcomplete fix for new completion
+
+	* Sven: 5511: make sure compctl is available for new completion
+
+	* pws: 5508: init and dump, globbing and printing.
+
+	* pws: unposted, see 5503: remove dynamic=no from configure.in when
+	  underscore is needed.
+
+	* Sven: 5490: unset test for AA elements when substituting
+
+	* Sven: 5489: control for matching in _path_files and _comp_parts
+
+	* Sven: 5483: completeinword fixes
+
+	* Sven: 5476: quoting of tildes in Functions/Completion/_path_files
+	  
+	* Sven: 5471: range code knows not to handle associative arrays
+
+	* Sven: 5470: new completion conditions didn't handle untokenization
+	  consistently.
+
+	* Sven: 5469: init fix and Functions/Completion/_comp_parts
+
+	* Sven: 5467: expn manual typo
+
+	* Sven: 5466: compwid manual for -after and -between
+
+	* Sven: 5455: keep track of which matcher specification to use
+
+	* Matt: 5330: I've put this back the way it original was.  I hate
+	  sed almost as much as awk.
+
+	* Martin Buchholz: 5448: libc.h can't be included on Debian Linux,
+	  so only include it on NeXT where it's necessary.
+
+	* 3.1.5-pws-9 made available
+
+	* pws: unposted (but see 5440): zftp changes: more return 6's,
+	  functions now do auto-open and avoid subshells.
+
+	* pws: 5436: set -x for function calls and ((...)).
+
+	* Sven: 5430: rewrite Functions/Completions with simplified syntax
+	  (no #array type completions).
+
+	* Sven: 5429: $CONTEXT strings
+
+	* pws: 5425: fix pattern matching for new completion
+
+	* Sven: 5424: addmatches fix when not doing matching
+
+	* Sven: 5423: compadd accepts either - or -- to end options
+
+	* Sven: 5422: braces in completions were not tokenized; array
+	  parameters wereused uncopied
+
+	* pws: 5421: setting same element of assoc array in full array
+	  assignment crashed
+
+	* Sven: 5418: small addmatches fixes
+
+	* Sven: 5417: multiple subscripts with undefined array
+
+	* Sven: 5415: anchors in matchers shouldn't match variable part of
+	  completion
+
+	* Sven: 5412: better matcher control
+
+	* Helmut Jarausch/pws: 5410: IRIX 6.5 problems in Etc/MACHINES
+
+	* pws: 5408: set -x output for [[ ... ]]
+
+	* pws: 5403: magicequalsubst now affects all ...=~...:~
+
+	* Sven: 5401: files -> __files
+
+	* Sven: 5400, 5402: print needs - in dump; auto-dump and use
+	  $COMPDUMP file
+
+	* Sven: 5399, 5407: do_ambiguous overhaul
+
+	* pws: 5398: fixlet for __path_files
+
+	* pws: 5393: dump new completion status for faster init
+
+	* Sven: 5384, 5397: manual for new completion so far
+
+	* Andrej: 5377: Reliant UNIX configuration
+
+	* Oliver: 5374: compctl -T doc for ~dirs
+
+	* Oliver: 5372: change of mailing list host
+
+	* Bart: 5367: CVS ignores version.h
+
+	* 3.1.5-pws-8 made available
+
+	* pws: 5365: make dependencies for main.o, Makemod, zshpaths.h
+
+	* pws: 5364: 5281 now works
+
+	* pws: Misc/Completion now Functions/Completion, some new
+	  new-style completions
+
+	* pws: 5362: #key-* completions allow >= 0 key bindings
+
+	* Sven: 5355: compadd -R function for suffix removal
+
+	* Sven: 5354: redisplaying completion lists, don't show if
+	  completion failed
+
+	* Sven: 5352: new fignore handling
+
+	* pws/Bart: 5349, 5361: "$foo[@]" didn't get removed if $foo
+	  wasn't set
+
+	* pws/Sven: 5341, 5351: completion init and __normal
+
+	* Sven: 5342, 5343: ignoring ignored prefix in new conditions
+
+	* Sven: 5341: modularise new completion shell code
+
+	* Sven: 5335: printing zle condition codes
+
+	* pws: 5332: emulate -L
+
+	* Sweth/Bart/pws: zsh-users/2121: Functions/allopt with the odd
+	  emulate and local added
+
+	* pws/Matt: 5326, 5329, 5330: signames.c generation
+
+	* pws: 5321: compctl -LM
+
+	* Sven: 5320: keys available in zle widgets
+
+	* Sven: 5316: compctl matcher users reference counts
+
+	* Matt: 5311: CHAR(+) -> CHAR(43) in zmacros
+
+	* Bart: 5305: trashzle() crashed shell with loading dynamic but
+	  zle builtin
+
+	* Bart: 5299: PWD, OLDPWD export confusion
+
+	* Bart: 5297: local variables and $argv doc
+
+	* Geoff: 5295: no ld -g on NetBSD
+
+	* 3.1.5-pws-7 made available
+
+	* pws; 5281: interrupts in getquery() weren't handled gracefully
+
+	* Sven: 5266: get matcher number in new completion functions
+
+	* Sven: 5265, 5284: rewrite of $foo:q and doc
+
+	* Sven: 5262: compctl -M, REC_EXACT fixes
+
+	* Sven: 5261, 5268: GLOB_COMPLETE docs
+
+	* Bart: 5260: new mailing lists in Meta-FAQ
+
+	* Bart: 5258: parameter scoping docs
+
+	* pws: 5247: typeset -T fix
+
+	* pws: Etc/MACHINES: Linux Alpha with egcs
+
+	* pws: 5233: .zlogout doc
+
+	* pws/Sven: 5229, 5234, 5235, 5269: bashautolist option
+
+	* Sven: 5120: use ${foo:q} for quoting completion prefix/suffix
+
+	* Sven: 5208: preliminary version of ${foo:q}
+
+	* Sven: 5207: completion in conditions
+
+	* Sven: 5206: completion in arrays
+
+	* Sven: 5203: o -> f, O -> o, O = ^o
+
+	* Sven: 5201: zle commands erase listing when minibuffer used
+
+	* pws: 5185, 5198: compctl documentation tidy-up
+
+	* Sven: 5183, 5199, 5200: ${(P)...} flag
+
+	* Sven: 5178: fix for command completion and pattern completions
+
+	* Bart: 5174: unset assoc array elements
+
+	* Sven: 5145, 5204: compadd -m, -F, -r
+
+	* Sven: 5144: partial word completion fix
+
+	* Matt: 5133: cygwin needs native getcwd()
+
+	* Matt Armstrong: 5132, 5151: makepro.awk can spit out
+	  preprocessor lines, move init.pro inclusion
+
+	* Bart: 5129: vared assoc array and elements thereof
+
+	* Bart: 4965, missing hunk: unset assoc array when assigned as
+	  scalar
+
+	* pws: 5054: zls
+
+	* 3.1.5-pws-6 made available
+
+	* Drazen Kacar/pws: 5118: unlock terminal device on Solaris
+
+	* pws: 5111: unsetting special zle variables
+
+	* Sven: 5107: glob qualifier o for modes
+
+	* pws: 5105: remove old zle -C, zle -C does new completion
+	
+	* Sven: 5104: zle and widget information via variables
+
+	* Drazen Kacar/pws/Bart: 5103, 5113: terminal bug on Solaris with
+	  Openwindows
+
+	* Sven: 5102: glob qualifiers doc
+
+	* pws: 5094, 5120: typeset -T MYPATH mypath; MYPATH=(foo),
+	  mypath=foo fix; PATH=(foo) bug
+
+	* Sven: 5092: extra completion context
+
+	* Sven: 5060: completion in brace expansion
+
+	* Sven: 5059, 5065, 5085: compcall, compctl -K ' func', avoid
+	  recursion, fix dynamic loading
+
+	* pws: 5047: make install doesn't make install.info
+
+	* Phil/Bart: 5032, 5037: zless with localoptions added
+
+	* Sven: 5022, 5045, 5078: ${(t)param} and nounset behaviour
+
+	* Andrej: 5016: insert zsh.info into dir when installing
+
+	* pws: new mirror site ftp://ftp.win.ne.jp/pub/shell/zsh/
+
+	* Sven: 4986, 4988: new-style completion after redirection
+
+	* Sven: 4981: fix completion whitespace for copy-previous-word
+
+	* Sven: 4979, 4987: new glob modifiers for sort order and
+	  selecting items from list
+
+	* Sven: 4976: compadd and new-completion-examples
+
+	* Sven: 4975, 5007: comptl -M matches with *'s
+
+	* Sven: 4974: compctl list with single string
+
+	* Andrej: 5021: configuration on Reliant UNIX
+
+	* Bart: 4965: add-on
+
+	* Sven: 4957: completion after redirection
+
+	* Made available as 3.1.5-pws-5; top level directory now
+	  zsh-3.1.5-pws-5
+
+	* Helmut Jarausch: 4947: part of patch missed
+
+	* Sven: 4850, 4881, 4941, 4942, 4943, 4944, 4946, 4949, 4950,
+	  4945: New completion system
+
+	* Sven: 4940: compctl -t (minor incompatibility)
+
+	* pws: 4939: configure checks for tgetent() accepts null but then
+	  tgetstr() dumps core
+
+	* pws: 4931: compiler warnings
+
+	* Sven: 4930: completion after reserved words
+
+	* pws/Bart: 4923, 4924: findcmd() memory leak and comment
+
+	* pws: 4912: Etc/MACHINES
+
+	* pws: 4902: typeset neatness, -a, -m
+
+	* Bart: 4893: setting assoc array elements inside a substitution
+
+	* Andrej Borsenkow + pws: 4888: zftp shouldn't dup sockets until
+	  connected
+
+	* Oliver Kiddle: 4887: configure
+
+	* Sven: 4880: conditions from module again
+
+	* Sven: 4879: group completion
+
+	* Sven: 4878: accept-and-menu-complete
+
+	* Bart: 4874: array slices
+
+	* Geoff: 4855: refresh line the same length as terminal width
+
+	* pws: 4852: zftp test subcommand
+
+	* Bart: 4851: sethparam(), part got missed
+
+	* 3.1.5-pws-4 made available
+
+	* Sven: 4845: isident()
+
+	* Sven: 4837, 4842: more for loadable conditions
+
+	* Sven: 4828: ignored character
+
+	* Bart/Sven: 4826, 4831, 4836: assoc array fixes
+
+	* Gene Cohler + pws: 4824, 4833, 4843: dynamical loading under
+	  HPUX
+
+	* Sven: 4821: network byte order in zftp
+
+	* Bart: 4817: parameter documentation
+
+	* Sven: 4806, 4815, 4820, 4822, 4830: be careful when unloading
+	  modules which may have side effects
+
+	* pws: 4805: define INADDR_NONE in zftp if not defined
+
+	* pws: 4801: compilation without HAVE_GETPWUID
+
+	* Bart: 4792: Handle --program-{suf,pre}fix in configure
+
+	* Bart: 4791: don't hash PWD after all
+
+	* Bart: 4789, 4794, 4795: sethparam(), setsparam; allow assoc
+	  array assignment ${(AA)=assoc::=key1 val1 ...}
+
+	* Bart: 4788: some missing patches put back
+
+	* Phil: 4784: unused variable j in glob.c
+
+	* Phil: 4783: wtmp is in /var/log on Linux
+
+	* pws: 4779: compiling statically linked
+
+	* pws: version 3.1.5-pws-3 made available
+
+	* Sven: 4767: completion listing fix
+
+	* Bart: 4763, 4766, 4764: associative arrays using subscripting
+	  flags and typeset output
+
+	* Bart: 4762: use of conddef without dynamic loading
+
+	* pws: 4761: zftp module
+
+	* Phil: 4737: typeset -a docs
+
+	* pws: 4736, 4754: ${foo/orig/new} subst as in bash; optimize
+	  pattern matching in strings
+	
+	* Phil Pennock: 4727: associative arrays in stat builtin
+
+	* Sven: 4716, 4732, 4734, 4742, 4769:  allow modules for
+	  conditions and wrappers around functions
+
+	* Sven: 4700: heap memory fixes suggested by Phil Pennock
+
+	* Sven: 4698, 4707: ignore completions if cursor not in
+	  completable part of word
+
+	* Sven: 4697: zle_tricky.c
+
+	* pws: 4693: case-indendent globbing fix
+
+	* Bart: 4678: viforwardword
+
+	* pws: don't use vifirstnonblank()in vioperswapcase()
+
+	* Bart: 4674: scanmatchtable()
+
+	* Bart: 4482: cdmatch2
+
+	* Bart: 4644: delimiters in parameter substitution flags
+
+	* Bart: 4624: don't be too clever with optimizing when doing ***
+
+	* pws: 4612: 8 bit character input problem if char was signed
+
+	* Bart: 4606: error messages from parameters
+
+	* pws: 4601: rewrite prompt truncation in more predictable,
+	  delimitable way
+
+	* Bart: 4599, 4602, 4608, 4641, 4653, 4654: associative arrays
+
+	* pws: 4596: allow PWD to be hashed on explicit user request
+
+	* pws: 4595: globbing fix for problem which showed up in `case'
+
+	* Wilfredo Sanchez: 4594: fix configure problems
+
+	* pws: 4591: test line length in prompt e.g. %(40l.yes.no)
+
+	* Bart: 4589: PWD and OLDPWD fix
+
+	* Bart: 4472: doc fixes
+
+	* Bart: 4471: fixes for shell functions
+
+	* Bart: line missed in zle_tricky.c when patching
+
+	* Bart: 4589: chpwd
+
+	* pws: lete2ctl update
+
+	* pws: fixsuffix() missed in delcharorlist() when patching
+
+	* Bart: 4574: doc fix
+
+	* Bart: 4570: flags to allow zle command not to interrupt
+	  cumulative effects, deltochar
+
+	* pws: 4564: fix completion suffix for yank
+
+	* pws: 4533: ~PWD should not be displayed as such
+
+	* pws: 4513, 4552: case-insensitive globbing (#i)
+
+	* Sven: 4509, 4510, 4526, 4527, 4534, 4557: alternative matches in
+	  completion (compctl -t), mapping between characters on line and
+	  in matches (compctl -M)
+
+	* pws: 4477: change function names to avoid dynamic loading
+	  clashes
+
+	* Bart: 4473, 4475, 4476: collected minor fixes since 3.1.5
+
+	* Zoli: 3933: AIX dynamic patch
+
 Thu Oct 29 21:51:10 1998  Andrew Main  <zefram@zsh.org>
 
 	* Config/version.mk: Version 3.1.5.

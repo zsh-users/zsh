@@ -1,8 +1,8 @@
 #autoload
 
 # This completer function makes the other completer functions used
-# insert possible completions only after once the list has been
-# shown.
+# insert possible completions only after the list has been shown at
+# least once.
 #
 # Configuration keys:
 #

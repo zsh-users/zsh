@@ -149,6 +149,7 @@ setpmmapfile(Param pm, char *value)
 	 * pages.  Honestly, I tried it without, and you need both.
 	 */
 	ftruncate(fd, len);
+	munmap(mmptr, len);
     }
 #else /* don't USE_MMAP */
     /* can't be bothered to do anything too clever here */

@@ -9,7 +9,7 @@
 #
 #  _sep_parts '(foo bar)' @ hosts
 #
-# This will make this function complete the strings `foo' and `bar'
+# This will make this function complete the strings `foo' and `bar'.
 # If the string on the line contains a `@', the substring after it
 # will be completed from the array `hosts'. Of course more arrays
 # may be given, each preceded by another separator string.

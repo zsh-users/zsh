@@ -89,9 +89,11 @@ To speed up the running of tt(compinit), it can be made to produce a dumped
 configuration which will be read in on future invocations.  The easiest way
 to do this is by adding the option tt(-d) whenever tt(compinit) is sourced.
 In this case the dumped file will have the same name as the sourced file,
-but with tt(.dump) appended to the end; alternatively, an explicit file
-name can be given following the tt(-d).  On the next call to tt(compinit
--d), the dumped file will be read instead.
+but with tt(.dump) appended to the end, or, if that is not writeable by the
+user, the file tt(.zcompdump) in the same directory as the startup files
+(i.e. tt($ZDOTDIR) or tt($HOME)); alternatively, an explicit file name can
+be given following the tt(-d).  On the next call to tt(compinit -d), the
+dumped file will be read instead.
 
 The other option accepted by tt(compinit) is tt(-f var(dir)), which gives
 the directory in which tt(compinit) resides.  If you source tt(compinit) by
@@ -331,6 +333,11 @@ Default implementations are supplied for each of these
 contexts, in most cases named after the context itself
 (e.g. completion for the `tt(-tilde-)' context is done by the function 
 named `tt(_tilde)').
+
+Before trying to find a function for a specific context, tt(_complete) 
+checks if the parameter `tt(compcontext)' is set to a non-empty
+value. If it is, the value is taken as the name of the context to use
+and the function defined for that context will be called.
 )
 item(tt(_approximate))(
 This completer function uses the tt(_complete) completer to generate
@@ -614,13 +621,6 @@ appears.  With tt(_oldlist), it will instead continue to cycle through the
 list of completions. 
 )
 enditem()
-)
-item(tt(_closequotes))(
-When a completion starts in quotes, this completer will recognise the fact
-and insert a matching closing quote if there is not already one later on
-the line.  It should come earlier in the list of completers than any of the
-completers which generate matches.  It can be confused by some of the more
-sophisticated forms of completion.
 )
 enditem()
 

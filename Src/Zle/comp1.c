@@ -47,7 +47,7 @@ Cmlist cmatcher;
 void (*makecompparamsptr) _((void));
 
 /**/
-void (*comp_setunsetptr) _((unsigned int, unsigned int));
+void (*comp_setunsetptr) _((int, int, int, int));
 
 /* pointers to functions required by compctl and defined by zle */
 
@@ -68,6 +68,9 @@ int (*makecomplistctlptr) _((int));
 
 /**/
 char *(*unambig_dataptr) _((int *));
+
+/**/
+int (*set_comp_sepptr) _((void));
 
 /* Hash table for completion info for commands */
  
@@ -112,6 +115,8 @@ char **compwords,
      *compsuffix,
      *compiprefix,
      *compisuffix,
+     *compqiprefix,
+     *compqisuffix,
      *compmatcherstr,
      *compcontext,
      *compparameter,
@@ -133,7 +138,7 @@ char **compwords,
      *compvared;
 
 /**/
-Param *comppms;
+Param *comprpms, *compkpms;
 
 /* The function rembslash() came from zle_tricky.c, but is now used *
  * in compctl.c, too.                                               */
@@ -193,6 +198,7 @@ freecompctl(Compctl cc)
     zsfree(cc->hpat);
     zsfree(cc->gname);
     zsfree(cc->subcmd);
+    zsfree(cc->substr);
     if (cc->cond)
 	freecompcond(cc->cond);
     if (cc->ext) {
@@ -440,9 +446,10 @@ setup_comp1(Module m)
     cc_first.refc = 10000;
     cc_first.mask = 0;
     cc_first.mask2 = CC_CCCONT;
-    comppms = NULL;
+    comprpms = compkpms = NULL;
     compwords = NULL;
-    compprefix = compsuffix = compiprefix = compisuffix = compmatcherstr = 
+    compprefix = compsuffix = compiprefix = compisuffix = 
+	compqiprefix = compqisuffix = compmatcherstr = 
 	compcontext = compparameter = compredirect = compquote =
 	compquoting = comprestore = complist = compinsert =
 	compexact = compexactstr = comppatmatch = comppatinsert =
@@ -450,6 +457,7 @@ setup_comp1(Module m)
 	compoldlist = compoldins = compvared = NULL;
     makecompparamsptr = NULL;
     comp_setunsetptr = NULL;
+    set_comp_sepptr = NULL;
     return 0;
 }
 
@@ -481,6 +489,8 @@ finish_comp1(Module m)
     zsfree(compsuffix);
     zsfree(compiprefix);
     zsfree(compisuffix);
+    zsfree(compqiprefix);
+    zsfree(compqisuffix);
     zsfree(compmatcherstr);
     zsfree(compcontext);
     zsfree(compparameter);

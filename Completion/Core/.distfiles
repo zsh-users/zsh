@@ -1,7 +1,8 @@
 DISTFILES_SRC='
     .distfiles
-    _approximate _closequotes _compalso _complete _correct _expand _files
-    _list _main_complete _match _menu _multi_parts _normal _oldlist _options
-    _parameters _path_files _sep_parts _set_options _unset_options
+    _approximate _compalso _complete _correct _expand
+    _files _list _main_complete _match _menu _multi_parts
+    _normal _oldlist _options _parameters _path_files
+    _sep_parts _set_options _unset_options
     compdump compinit compinstall
 '

@@ -476,7 +476,7 @@ vigotomark(void)
 	feep();
 	return;
     }
-    if (curhist != vimarkline[ch] && !zle_goto_hist(vimarkline[ch], 0)) {
+    if (curhist != vimarkline[ch] && !zle_goto_hist(vimarkline[ch], 0, 0)) {
 	vimarkline[ch] = 0;
 	feep();
 	return;

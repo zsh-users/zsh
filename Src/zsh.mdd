@@ -30,6 +30,9 @@ version.h: $(sdir_top)/Config/version.mk
 
 zshpaths.h: FORCE Makemod
 	@echo '#define MODULE_DIR "'$(MODDIR)'"' > zshpaths.h.tmp
+	@if test x$(fndir) != xno; then \
+	  echo '#define FUNCTION_DIR "'$(fndir)'"' >> zshpaths.h.tmp; \
+	fi
 	@if cmp -s zshpaths.h zshpaths.h.tmp; then \
 	    rm -f zshpaths.h.tmp; \
 	    echo "\`zshpaths.h' is up to date." ; \

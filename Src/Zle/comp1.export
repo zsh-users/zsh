@@ -19,6 +19,7 @@ compforcelist
 compinsert
 compiprefix
 compisuffix
+compkpms
 complastprompt
 complist
 complistmax
@@ -34,9 +35,12 @@ comppatmatch
 comppms
 compprefix
 compredirect
+compqiprefix
+compqisuffix
 compquote
 compquoting
 comprestore
+comprpms
 comp_setunsetptr
 comp_strptr
 compsuffix
@@ -56,4 +60,5 @@ makecomplistctlptr
 makecompparamsptr
 patcomps
 rembslash
+set_comp_sepptr
 unambig_dataptr

@@ -33,7 +33,7 @@ COMMENT(--- emphasised text ---)
 
 def(em)(1)(NOTRANS(@emph{)ARG1NOTRANS(}))
 def(bf)(1)(NOTRANS(@cite{)ARG1NOTRANS(}))
-def(tt)(1)(NOTRANS(@code{)ARG1NOTRANS(}))
+def(tt)(1)(NOTRANS(@t{)ARG1NOTRANS(}))
 def(var)(1)(NOTRANS(@var{)ARG1NOTRANS(}))
 
 COMMENT(--- man page headers ---)

@@ -145,6 +145,7 @@ metadiffer
 metafy
 metalen
 mode_to_octal
+movefd
 movehistent
 mypgrp
 mypid
@@ -194,6 +195,7 @@ quietgethist
 quotedzputs
 readoutput
 realparamtab
+redup
 refreshptr
 remlpaths
 remnulargs

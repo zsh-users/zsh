@@ -138,6 +138,7 @@ execselect(Cmd cmd)
     LinkNode n;
     int i;
     FILE *inp;
+    size_t more;
 
     node = cmd->u.forcmd;
     args = cmd->args;
@@ -154,7 +155,7 @@ execselect(Cmd cmd)
     lastval = 0;
     pushheap();
     inp = fdopen(dup((SHTTY == -1) ? 0 : SHTTY), "r");
-    selectlist(args);
+    more = selectlist(args, 0);
     for (;;) {
 	for (;;) {
 	    if (empty(bufstack)) {
@@ -181,7 +182,7 @@ execselect(Cmd cmd)
 		*s = '\0';
 	    if (*str)
 	      break;
-	    selectlist(args);
+	    more = selectlist(args, more);
 	}
 	setsparam("REPLY", ztrdup(str));
 	i = atoi(str);
@@ -217,8 +218,8 @@ execselect(Cmd cmd)
 /* And this is used to print select lists. */
 
 /**/
-static void
-selectlist(LinkList l)
+size_t
+selectlist(LinkList l, size_t start)
 {
     size_t longest = 1, fct, fw = 0, colsz, t0, t1, ct;
     LinkNode n;
@@ -245,7 +246,7 @@ selectlist(LinkList l)
     else
 	fw = (columns - 1) / fct;
     colsz = (ct + fct - 1) / fct;
-    for (t1 = 0; t1 != colsz; t1++) {
+    for (t1 = start; t1 != colsz && t1 - start < lines - 2; t1++) {
 	ap = arr + t1;
 	do {
 	    int t2 = strlen(*ap) + 2, t3;
@@ -271,6 +272,8 @@ selectlist(LinkList l)
        }
        while (*ap);*/
     fflush(stderr);
+
+    return t1 < colsz ? t1 : 0;
 }
 
 /**/

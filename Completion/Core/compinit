@@ -2,7 +2,7 @@
 # functions and aliases. Everything else is split into different files that
 # will automatically be made autoloaded (see the end of this file).
 # The names of the files that will be considered for autoloading have to
-# start with an underscores (like `_setopt).
+# start with an underscores (like `_setopt').
 # The first line of these files will be read and has to say what should be
 # done with its contents:
 #
@@ -50,11 +50,11 @@
 _i_fdir=''
 _i_dumpfile=''
 _i_autodump=0
-while [[ $1 = -[df] ]]; do
+while [[ $# -gt 0 && $1 = -[df] ]]; do
   if [[ "$1" = -d ]]; then
     _i_autodump=1
     shift
-    if [[ -n "$1" && "$1" != -[df] ]]; then
+    if [[ $# -gt 0 && "$1" != -[df] ]]; then
       _i_dumpfile="$1"
       shift
     fi
@@ -91,13 +91,31 @@ elif [[ -n $_i_fdir ]]; then
   # We were told what directory to use.
   compconfig[dumpfile]="$_i_fdir/compinit.dump"
 else
-  # Now we're stuck, but we'd better do something.
-  compconfig[dumpfile]="$HOME/.compinit.dump"
+  compconfig[dumpfile]=''
 fi
 
-compconfig[correct_accept]=2n
-compconfig[correct_prompt]='correct to:'
-compconfig[completer]=_complete
+if [[ -n $compconfig[dumpfile] ]]; then
+  # Check the file is writeable.  If it doesn't exist, the
+  # only safe way is to try and create it.
+  if [[ -f $compconfig[dumpfile] ]]; then
+    [[ -w $compconfig[dumpfile] ]] || compconfig[dumpfile]=''
+  elif touch $compconfig[dumpfile] >& /dev/null; then
+    rm -f $compconfig[dumpfile]
+  else
+    compconfig[dumpfile]=''
+  fi
+fi
+
+if [[ -z $compconfig[dumpfile] ]]; then
+  # If no dumpfile given, or it was not writeable, then use
+  # user's ZDOTDIR.
+  compconfig[dumpfile]="${ZDOTDIR:-$HOME}/.zcompdump"
+fi
+
+(( ${+compconfig[correct_accept]} )) || compconfig[correct_accept]=2n
+(( ${+compconfig[correct_prompt]} )) ||
+  compconfig[correct_prompt]='correct to:'
+(( ${+compconfig[completer]} )) || compconfig[completer]=_complete
 
 # This function is used to register or delete completion functions. For
 # registering completion functions, it is invoked with the name of the

@@ -128,7 +128,7 @@ list([ tt(-K) var(function) ] [ tt(-i) var(function) ])
 list([ tt(-Q) ] [ tt(-P) var(prefix) ] [ tt(-S) var(suffix) ])
 list([ tt(-W) var(file-prefix) ] [ tt(-H) var(num pattern) ])
 list([ tt(-q) ] [ tt(-X) var(explanation) ] [ tt(-Y) var(explanation) ])
-list([ tt(-y) var(func-or-var) ] [ tt(-l) var(cmd) ] [ tt(-U) ])
+list([ tt(-y) var(func-or-var) ] [ tt(-l) var(cmd) ] [ tt(-h) var(cmd) ] [ tt(-U) ])
 list([ tt(-t) var(continue) ] [ tt(-J) var(name) ] [ tt(-V) var(name) ])
 list([ tt(-M) var(match-spec) ])
 endlist()
@@ -401,6 +401,15 @@ completes arguments between `tt(-exec)' and the following `tt(;)' (or the end
 of the command line if there is no such string) as if they were
 a separate command line.
 )
+item(tt(-h) var(cmd))(
+Normally zsh completes quoted strings as a whole. With this option,
+completion can be done separately on different parts of such
+strings. It works like the tt(-l) option but makes the completion code 
+work on the parts of the current word that are separated by
+spaces. These parts are completed as if they were arguments to the
+given var(cmd). If var(cmd) is the empty string, the first part is
+completed as a command name, as with tt(-l).
+)
 item(tt(-U))(
 Use the whole list of possible completions, whether or not they
 actually match the word on the command line.  The word typed so far
@@ -630,6 +639,12 @@ omitted, it matches if the cursor is after a word with prefix var(str1).
 )
 item(tt(R[)var(str1)tt(,)var(str2)tt(])...)(
 Like tt(r) but using pattern matching instead.
+)
+item(tt(q[)var(str)tt(])...)(
+Matches the word currently being completed is in single quotes and the 
+var(str) begins with the letter `s', or if completion is done in
+double quotes and var(str) starts with the letter `d', or if
+completion is done in backticks and var(str) starts with a `b'.
 )
 enditem()
 
