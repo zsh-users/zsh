@@ -1888,7 +1888,8 @@ This is used by the tt(_expand) completer if the word starts with a
 tilde or parameter expansion. If it is set to `true', the word will
 only be expanded if it doesn't have a suffix, i.e. if it is something
 like `tt(~foo)' or `tt($foo)', but not if it is `tt(~foo/)' or
-`tt($foo/bar)'.  The default for this style is `true'.
+`tt($foo/bar)', unless that suffix itself contains characters eligible
+for expansion.  The default for this style is `true'.
 )
 kindex(tag-order, completion style)
 item(tt(tag-order))(
