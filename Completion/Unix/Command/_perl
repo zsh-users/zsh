@@ -46,10 +46,7 @@ _perl_m_opt () {
 
 _perl_config_vars () {
   if (( ! $+_perl_config_vars )); then
-    # perl | perl ... nasty, but is there another way?
-    _perl_config_vars=( $(perl -V |
-			    perl -ne 'push @m, (/(\w+)(?==)/g);' \
-			         -e  'END {print join "\n", @m}' ) )
+    _perl_config_vars=( $(perl -MConfig -e 'print join("\n", keys %Config);') )
   fi
 
   local add_colon='-P:'

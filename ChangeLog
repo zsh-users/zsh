@@ -1,5 +1,7 @@
 2001-05-29  Clint Adams  <clint@zsh.org>
 
+	* 14538: cleaner _perl_config_vars from Matt Zimmerman.
+
 	* 14536: Completion/Debian/Command/_update-alternatives:
 	loop for multiple --slaves thanks to Sven.
 
