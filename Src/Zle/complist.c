@@ -60,6 +60,10 @@ static Keymap mskeymap;
 
 #define NUM_COLS 16
 
+/* Maximum number of in-string colours supported. */
+
+#define MAX_POS 11
+
 /* Names of the terminal strings. */
 
 static char *colnames[] = {
@@ -91,7 +95,7 @@ typedef struct patcol *Patcol;
 struct patcol {
     Patprog prog;
     Patprog pat;		/* pattern for match */
-    char *col;
+    char *cols[MAX_POS + 1];
     Patcol next;
 };
 
@@ -120,11 +124,11 @@ struct listcols {
  * The return value is a pointer to the character after it. */
 
 static char *
-getcolval(char *s)
+getcolval(char *s, int multi)
 {
     char *p;
 
-    for (p = s; *s && *s != ':'; p++, s++) {
+    for (p = s; *s && *s != ':' && (!multi || *s != '='); p++, s++) {
 	if (*s == '\\' && s[1]) {
 	    switch (*++s) {
 	    case 'a': *p = '\007'; break;
@@ -212,7 +216,7 @@ getcoldef(Listcols c, char *s)
 	if (!*s)
 	    return s;
 	*s++ = '\0';
-	p = getcolval(s);
+	p = getcolval(s, 0);
 	ec = (Extcol) zhalloc(sizeof(*ec));
 	ec->prog = gprog;
 	ec->ext = n;
@@ -228,7 +232,8 @@ getcoldef(Listcols c, char *s)
 	    *p++ = '\0';
 	return p;
     } else if (*s == '=') {
-	char *p = ++s, *t;
+	char *p = ++s, *t, *cols[MAX_POS];
+	int ncols = 0;
 	Patprog prog;
 
 	/* This is for a pattern. */
@@ -238,15 +243,26 @@ getcoldef(Listcols c, char *s)
 	if (!*s)
 	    return s;
 	*s++ = '\0';
-	t = getcolval(s);
+	while (1) {
+	    t = getcolval(s, 1);
+	    if (ncols < MAX_POS)
+		cols[ncols++] = s;
+	    s = t;
+	    if (*s != '=')
+		break;
+	    *s++ = '\0';
+	}
 	tokenize(p);
 	if ((prog = patcompile(p, 0, NULL))) {
 	    Patcol pc, po;
+	    int i;
 
 	    pc = (Patcol) zhalloc(sizeof(*pc));
 	    pc->prog = gprog;
 	    pc->pat = prog;
-	    pc->col = s;
+	    for (i = 0; i < ncols; i++)
+		pc->cols[i] = cols[i];
+	    pc->cols[i] = NULL;
 	    pc->next = NULL;
 	    if ((po = c->pats)) {
 		while (po->next)
@@ -272,7 +288,7 @@ getcoldef(Listcols c, char *s)
 	for (i = 0, nn = colnames; *nn; i++, nn++)
 	    if (!strcmp(n, *nn))
 		break;
-	p = getcolval(s);
+	p = getcolval(s, 0);
 	if (*nn) {
 	    Filecol fc, fo;
 
@@ -369,6 +385,14 @@ static Cmatch **mtab, **mmtabp;
 static Cmgroup *mgtab, *mgtabp;
 static struct listcols mcolors;
 
+/* Information for in-string colours. */
+
+static int nrefs;
+static int begpos[MAX_POS], curisbeg;
+static int endpos[MAX_POS], curisend;
+static char **patcols, *curiscols[MAX_POS];
+static int curiscol;
+
 /* The last color used. */
 
 static char *last_cap;
@@ -414,28 +438,131 @@ zcoff(void)
 	zcputs(&mcolors, NULL, COL_NO);
 }
 
-/* Get the terminal color string for the given match. */
 
 static void
+initiscol(Listcols c)
+{
+    int i;
+
+    zlrputs(c, patcols[0]);
+
+    curiscols[curiscol = 0] = *patcols++;
+
+    curisbeg = curisend = 0;
+
+    for (i = nrefs;  i < MAX_POS; i++)
+	begpos[i] = -1, endpos[i] = 0xfffffff;
+}
+
+static void
+doiscol(Listcols c, int pos)
+{
+    if (pos > endpos[curisend]) {
+	curisend++;
+	if (curiscol) {
+	    zcputs(c, NULL, COL_NO);
+	    zlrputs(c, curiscols[--curiscol]);
+	}
+    }
+    if (pos == begpos[curisbeg] && *patcols) {
+	curisbeg++;
+
+	zcputs(c, NULL, COL_NO);
+	zlrputs(c, *patcols);
+
+	curiscols[++curiscol] = *patcols++;
+    }
+}
+
+/* Stripped-down version of printfmt(). But can do in-string colouring. */
+
+static void
+clprintfmt(Listcols c, char *p)
+{
+    int cc = 0, i = 0;
+
+    initiscol(c);
+
+    for (; *p; p++) {
+	doiscol(c, i++);
+	cc++;
+	if (*p == '\n') {
+	    if (tccan(TCCLEAREOL))
+		tcout(TCCLEAREOL);
+	    else {
+		int s = columns - 1 - (cc % columns);
+
+		while (s-- > 0)
+		    putc(' ', shout);
+	    }
+	    cc = 0;
+	}
+	putc(*p, shout);
+    }
+    if (tccan(TCCLEAREOL))
+	tcout(TCCLEAREOL);
+    else {
+	int s = columns - 1 - (cc % columns);
+
+	while (s-- > 0)
+	    putc(' ', shout);
+    }
+}
+
+/* Local version of nicezputs() with in-string colouring. */
+
+static void
+clnicezputs(Listcols c, char *s)
+{
+    int cc, i = 0;
+
+    initiscol(c);
+
+    while ((cc = *s++)) {
+	doiscol(c, i++);
+	if (itok(cc)) {
+	    if (cc <= Comma)
+		cc = ztokens[cc - Pound];
+	    else 
+		continue;
+	}
+	if (cc == Meta)
+	    cc = *s++ ^ 32;
+	fputs(nicechar(cc), shout);
+    }
+}
+
+/* Get the terminal color string for the given match. */
+
+static int
 putmatchcol(Listcols c, char *group, char *n)
 {
     Patcol pc;
 
+    nrefs = MAX_POS - 1;
+
     for (pc = c->pats; pc; pc = pc->next)
 	if ((!pc->prog || !group || pattry(pc->prog, group)) &&
-	    pattry(pc->pat, n)) {
-	    zlrputs(c, pc->col);
+	    pattryrefs(pc->pat, n, &nrefs, begpos, endpos)) {
+	    if (pc->cols[1]) {
+		patcols = pc->cols;
 
-	    return;
+		return 1;
+	    }
+	    zlrputs(c, pc->cols[0]);
+
+	    return 0;
 	}
 
     zcputs(c, group, COL_NO);
+
+    return 0;
 }
 
 /* Get the terminal color string for the file with the given name and
  * file modes. */
 
-static void
+static int
 putfilecol(Listcols c, char *group, char *n, mode_t m)
 {
     int colour;
@@ -447,14 +574,22 @@ putfilecol(Listcols c, char *group, char *n, mode_t m)
 	    (!ec->prog || !group || pattry(ec->prog, group))) {
 	    zlrputs(c, ec->col);
 
-	    return;
+	    return 0;
 	}
+
+    nrefs = MAX_POS - 1;
+
     for (pc = c->pats; pc; pc = pc->next)
 	if ((!pc->prog || !group || pattry(pc->prog, group)) &&
-	    pattry(pc->pat, n)) {
-	    zlrputs(c, pc->col);
+	    pattryrefs(pc->pat, n, &nrefs, begpos, endpos)) {
+	    if (pc->cols[1]) {
+		patcols = pc->cols;
 
-	    return;
+		return 1;
+	    }
+	    zlrputs(c, pc->cols[0]);
+
+	    return 0;
 	}
 
     if (S_ISDIR(m))
@@ -475,6 +610,8 @@ putfilecol(Listcols c, char *group, char *n, mode_t m)
 	colour = COL_FI;
 
     zcputs(c, group, colour);
+
+    return 0;
 }
 
 static void
@@ -482,7 +619,7 @@ clprintm(Cmgroup g, Cmatch *mp, int mc, int ml, int lastc, int width,
 	 char *path, struct stat *buf)
 {
     Cmatch m;
-    int len;
+    int len, subcols = 0;
 
     if (!mp) {
 	zcputs(&mcolors, g->name, COL_MI);
@@ -511,8 +648,11 @@ clprintm(Cmgroup g, Cmatch *mp, int mc, int ml, int lastc, int width,
 	    mmlen = mcols;
 	    zcputs(&mcolors, g->name, COL_MA);
 	} else
-	    putmatchcol(&mcolors, g->name, m->disp);
-	printfmt(m->disp, 0, 1, 0);
+	    subcols = putmatchcol(&mcolors, g->name, m->disp);
+	if (subcols)
+	    clprintfmt(&mcolors, m->disp);
+	else
+	    printfmt(m->disp, 0, 1, 0);
 	zcoff();
     } else {
 	int mx;
@@ -543,11 +683,14 @@ clprintm(Cmgroup g, Cmatch *mp, int mc, int ml, int lastc, int width,
 	    mmlen = width;
 	    zcputs(&mcolors, g->name, COL_MA);
 	} else if (buf)
-	    putfilecol(&mcolors, g->name, path, buf->st_mode);
+	    subcols = putfilecol(&mcolors, g->name, path, buf->st_mode);
 	else
-	    putmatchcol(&mcolors, g->name, (m->disp ? m->disp : m->str));
+	    subcols = putmatchcol(&mcolors, g->name, (m->disp ? m->disp : m->str));
 
-	nicezputs((m->disp ? m->disp : m->str), shout);
+	if (subcols)
+	    clnicezputs(&mcolors, (m->disp ? m->disp : m->str));
+	else
+	    nicezputs((m->disp ? m->disp : m->str), shout);
 	len = niceztrlen(m->disp ? m->disp : m->str);
 
 	 if (isset(LISTTYPES) && buf) {

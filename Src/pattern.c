@@ -1283,10 +1283,25 @@ pattrystart(void)
 mod_export int
 pattry(Patprog prog, char *string)
 {
-    int i;
+    return pattryrefs(prog, string, NULL, NULL, NULL);
+}
+
+/* The last three arguments are used to report the positions for the
+ * backreferences. On entry, *nump should contain the maximum number
+ * positions to report. */
+
+/**/
+mod_export int
+pattryrefs(Patprog prog, char *string, int *nump, int *begp, int *endp)
+{
+    int i, maxnpos;
     char **sp, **ep;
     char *progstr = (char *)prog + prog->startoff;
 
+    if (nump) {
+	maxnpos = *nump;
+	*nump = 0;
+    }
     /* inherited from domatch, but why, exactly? */
     if (*string == Nularg)
 	string++;
@@ -1350,7 +1365,28 @@ pattry(Patprog prog, char *string)
 		setiparam("MEND",
 			  (zlong)(mlen + patoffset + !isset(KSHARRAYS) - 1));
 	    }
-	    if (prog->patnpar && !(patflags & PAT_FILE)) {
+	    if (prog->patnpar && nump) {
+		/*
+		 * b flag: for backreferences using parentheses. Reported
+		 * directly.
+		 */
+		*nump = prog->patnpar;
+
+		sp = patbeginp;
+		ep = patendp;
+
+		for (i = 0; i < prog->patnpar && i < maxnpos; i++) {
+		    DPUTS(!*sp || !*ep, "BUG: backrefs not set.");
+
+		    if (begp)
+			*begp++ = ztrsub(*sp, patinstart) + patoffset;
+		    if (endp)
+			*endp++ = ztrsub(*ep, patinstart) + patoffset - 1;
+
+		    sp++;
+		    ep++;
+		}
+	    } else if (prog->patnpar && !(patflags & PAT_FILE)) {
 		/*
 		 * b flag: for backreferences using parentheses.
 		 */

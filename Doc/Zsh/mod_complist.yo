@@ -78,10 +78,23 @@ Apart from these strings, the var(name) may also be an asterisk
 string will be used for all files whose name ends with the string.
 The var(name) may also be a equal sign (`tt(=)') followed by a
 pattern. The var(value) given for this pattern will be used for all
-matches (not only filenames) that whose display string are matched by
+matches (not only filenames) whose display string are matched by
 the pattern. Definitions for both of these take precedence over the
 values defined for file types and the form with the leading asterisk 
 takes precedence over the form with the leading equal sign.
+
+The last form also allows to color separate parts of the displayed
+strings using different colors. For this, the pattern has to use the
+`tt((#b))' globbing flag and pairs of parentheses surrounding the
+parts of the strings that are to be colored differently. In this case 
+the var(value) may consist of more than one color code separated by
+equal signs. The first code will be used for all parts for which no
+explicit code is specified and the following codes will be used for
+the parts matched by the sub-patterns in parentheses. For example,
+the specification `tt(=(#b)(?)*(?)=0=3=7)' will be used for all
+matches which are at least two characters long and will make the use
+the code `tt(3)' for the first character, `tt(7)' for the last
+character and `tt(0)' for the rest.
 
 All three forms of var(name) may be preceded by a pattern in
 parentheses. If such a pattern is given, the var(value) will be used
