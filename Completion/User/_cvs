@@ -501,7 +501,7 @@ _cvs_revisions () {
   local expl
 
   _wanted values expl revision &&
-      compadd - ${${${(M)${(f)"$(cvs -q status -vl .)"}:#	*}##[ 	]##}%%[ 	]*}
+      compadd - ${${${(M)${(f)"$(cvs -q status -vl .)"}:#	*}##[ 	]##(No Tags Exist)#}%%[ 	]*}
 }
 
 # define completion functions for files maintained by cvs.
