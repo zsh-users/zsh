@@ -1,5 +1,7 @@
 2000-08-14  Sven Wischnowsky  <wischnow@zsh.org>
 
+	* Andrej: 12613: Src/lex.c: missing mod_export
+	
 	* 12610: Src/Zle/computil.c: make all builtins in computil test if
  	they were called from a completion function
 	

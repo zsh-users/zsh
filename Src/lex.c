@@ -1460,7 +1460,7 @@ parsestrnoerr(char *s)
  * to parse the right-hand side of ${...%...} substitutions.           */
 
 /**/
-int
+mod_export int
 parse_subst_string(char *s)
 {
     int c, l = strlen(s), err, olen;
