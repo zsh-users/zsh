@@ -1,3 +1,8 @@
+2004-03-12  Clint Adams  <clint@zsh.org>
+
+	* 19613: Completion/Unix/Command/_vux: better descriptions
+	and indentation.
+
 2004-03-12  Oliver Kiddle  <opk@zsh.org>
 
 	* 19602: Src/signames2.awk: adjust to cope with output from the

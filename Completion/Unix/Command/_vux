@@ -1,10 +1,15 @@
 #compdef vux vuxctl
 
-case "$service" in
-	(vux)
+local expl
 
-_arguments -s -C \
-	'-x:action:(p g m w r f)' \
+case "$service" in
+  (vux)
+
+  _arguments -s -C \
+	'-x:action:((play\:play\ music generate\:generate\ new\ scorelist
+	            merge\:merge\ new\ songs
+		    weed\:prune\ songs\ from\ scorelist
+		    ratings\:show\ statistics force\:force-rate))' \
 	'-s:file:_files' \
 	'-a:file:_files' \
 	'-z:file:_files' \
@@ -47,14 +52,13 @@ _arguments -s -C \
 	'-P[Always play new songs]' \
 	'-g[print stats in xgraph format]' \
 	'-h[Show summary of options]'
+  ;;
 
-	;;
+  (vuxctl)
 
-	(vuxctl)
-
-	compadd start clean double half up down next previous forward \
-		replay pause resume stop reload save history help
-
-	;;
+  _wanted vuxcmd expl 'vux control command' \
+      compadd start clean double half up down next previous forward \
+	      replay pause resume stop reload save history help
+  ;;
 
 esac
