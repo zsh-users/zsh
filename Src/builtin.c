@@ -3209,9 +3209,11 @@ zexit(int val, int from_signal)
 	if (in_exit++ && from_signal) {
 	    LASTALLOC_RETURN;
 	}
-	if (isset(MONITOR))
+	if (isset(MONITOR)) {
 	    /* send SIGHUP to any jobs left running  */
 	    killrunjobs(from_signal);
+	    errflag = 0;
+	}
 	if (isset(RCS) && interact) {
 	    if (!nohistsave)
 		savehistfile(NULL, 1, HFILE_USE_OPTIONS);

@@ -876,6 +876,8 @@ mathevall(char *s, int prek, char **ep)
     ptr = s;
     sp = -1;
     unary = 1;
+    stack[0].val.type = MN_INTEGER;
+    stack[0].val.u.l = 0;
     mathparse(prek);
     *ep = ptr;
     DPUTS(!errflag && sp,
