@@ -1,0 +1,7 @@
+#autoload
+
+if (( ! $+_deb_packages )); then
+  _deb_packages=( $(awk '/^Package:/ { print $2 }' /var/lib/dpkg/status) )
+fi
+
+compadd "$@" - $_deb_packages
