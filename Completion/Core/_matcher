@@ -1,0 +1,5 @@
+#autoload
+
+zstyle -s ":completion:${curcontext%%:*}:matcher-${(M)#${(@)_completers[1,-$#_completers_left]}:#_matcher}:${curcontext#[^:]#:[^:]#:}:" matcher _comp_matcher || _comp_matcher=''
+
+return 1
