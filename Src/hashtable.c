@@ -1480,7 +1480,7 @@ addhistnode(HashTable ht, char *nam, void *nodeptr)
     HashNode oldnode = addhashnode2(ht, nam, nodeptr);
     Histent he = (Histent)nodeptr;
     if (oldnode && oldnode != (HashNode)nodeptr) {
-	if (he->flags & (HIST_MAKEUNIQUE | HIST_TMPSTORE)
+	if (he->flags & HIST_MAKEUNIQUE
 	 || (he->flags & HIST_FOREIGN && (Histent)oldnode == he->up)) {
 	    (void) addhashnode2(ht, oldnode->nam, oldnode); /* restore hash */
 	    he->flags |= HIST_DUP;
@@ -1511,7 +1511,7 @@ freehistdata(Histent he, int unlink)
     if (!he)
 	return;
 
-    if (!(he->flags & HIST_DUP))
+    if (!(he->flags & (HIST_DUP | HIST_TMPSTORE)))
 	removehashnode(histtab, he->text);
 
     zsfree(he->text);
