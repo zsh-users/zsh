@@ -1505,7 +1505,7 @@ setunderscore(char *str)
     }
 }
 
-static int esprefork, esglob;
+static int esprefork, esglob = 1;
 
 /**/
 void
@@ -1916,10 +1916,10 @@ execcmd(Estate state, int input, int output, int how, int last1)
 	is_exec = 1;
     }
 
-    if (args && (esglob = !(cflags & BINF_NOGLOB))) {
+    if ((esglob = !(cflags & BINF_NOGLOB)) && args) {
 	LinkList oargs = args;
 	globlist(args);
-	args=oargs;
+	args = oargs;
     }
     if (errflag) {
 	lastval = 1;
