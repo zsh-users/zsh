@@ -1,3 +1,8 @@
+2004-09-04  Bart Schaefer  <schaefer@zsh.org>
+
+	* 20318: Src/builtin.c: fix subtle xtrace output bug introduced
+	by 20308.
+
 2004-09-03  Peter Stephenson  <pws@csr.com>
 
 	* 20308: Doc/Zsh/options.yo, Src/builtin.c, Src/exec.c,

@@ -4235,16 +4235,18 @@ bin_eval(UNUSED(char *nam), char **argv, UNUSED(Options ops), UNUSED(int func))
      * we use a special script name to indicate the special line number.
      */
     ineval = !isset(EVALLINENO);
+    if (!ineval)
+	scriptname = "(eval)";
 
     prog = parse_string(zjoin(argv, ' ', 1));
     if (!prog) {
 	errflag = 0;
+        scriptname = oscriptname;
+        ineval = oineval;
 	return 1;
     }
 
     lastval = 0;
-    if (!ineval)
-	scriptname = "(eval)";
 
     execode(prog, 1, 0);
 
@@ -4253,8 +4255,7 @@ bin_eval(UNUSED(char *nam), char **argv, UNUSED(Options ops), UNUSED(int func))
 	errflag = 0;
     }
 
-    if (!ineval)
-	scriptname = oscriptname;
+    scriptname = oscriptname;
     ineval = oineval;
 
     return lastval;
