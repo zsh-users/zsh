@@ -1520,7 +1520,7 @@ calclist(int showall)
     }
     if (!onlyexpl) {
 	char **pp;
-	int *ws, tlines, tline, tcols, maxlen, nth, width, glines;
+	int *ws, tlines, tcols, width, glines;
 
 	for (g = amatches; g; g = g->next) {
             add = 2 + !!(g->flags & CGF_FILES);
