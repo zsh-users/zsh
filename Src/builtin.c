@@ -943,7 +943,8 @@ cd_try_chdir(char *pfix, char *dest, int hard)
 	buf = ztrdup(dest);
     else {
 	dlen = strlen(pwd);
-
+	if (pwd[dlen-1] == '/')
+	    --dlen;
 	buf = zalloc(dlen + strlen(dest) + 2);
 	strcpy(buf, pwd);
 	buf[dlen] = '/';
