@@ -9,7 +9,6 @@ _arguments -C \
  '(-a -d -s 1)-f[read multiple entries from file]:file:_files' \
  '(-a)1:host:->hostintable' && return 0
 
-if [[ "$state" = hostintable ]]; then
+[[ "$state" = hostintable ]] &&
   _wanted hosts expl 'host' compadd ${${${(f)"$(${words[1]} -a)"}##[ ?(]#}%%[ )]*}
-fi
 

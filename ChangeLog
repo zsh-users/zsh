@@ -1,3 +1,7 @@
+2000-07-05  Sven Wischnowsky  <wischnow@zsh.org>
+
+	* 12171: Completion/User/_arp: get return status right
+	
 2000-07-05  Bart Schaefer  <schaefer@zsh.org>
 
 	* 12167: Test/Makefile.in: Ignore failure exit from "for" loop
