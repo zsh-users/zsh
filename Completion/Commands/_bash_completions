@@ -25,16 +25,19 @@
 # that will not have been overridden, so you should add '~' to the
 # list of keys at the top of the for-loop.
 
+setopt localoptions nullglob rcexpandparam extendedglob
+unsetopt markdirs globsubst shwordsplit nounset ksharrays
+
 local key=$KEYS[-1]
 
 case $key in
   '!') _main_complete _command_names
        ;;
-  '$') compgen -E
+  '$') compadd - "${(@k)parameters[(R)*export*]}"
        ;;
   '@') _main_complete _hosts
        ;;
-  '/') _files
+  '/') _main_complete _files
        ;;
   '~') _main_complete _users
        ;;

@@ -1,5 +1,9 @@
 2000-04-26  Sven Wischnowsky  <wischnow@informatik.hu-berlin.de>
 
+	* 10933: Completion/Commands/_bash_completions,
+ 	Completion/Commands/_history_complete_word: ensure options are set
+ 	as expected in _history_complete_word and _bash_completions
+	
 	* Adam Spiers: 10892: Completion/User/_perl_modules: ensure perl
 	is there and better pattern for searching modules
 

@@ -17,6 +17,9 @@
 #
 
 _history_complete_word () {
+  setopt localoptions nullglob rcexpandparam extendedglob
+  unsetopt markdirs globsubst shwordsplit nounset ksharrays
+
   local expl direction stop
 
   if [[ $WIDGET = *newer ]]; then
