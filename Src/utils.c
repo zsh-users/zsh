@@ -1122,28 +1122,34 @@ zclose(int fd)
     return -1;
 }
 
-/* Get a file name relative to $TMPPREFIX which *
- * is unique, for use as a temporary file.      */
- 
 #ifdef HAVE__MKTEMP
 extern char *_mktemp(char *);
 #endif
 
+/* Get a unique filename for use as a temporary file.  If "prefix" is
+ * NULL, the name is relative to $TMPPREFIX; If it is non-NULL, the
+ * unique suffix includes a prefixed '.' for improved readability.  If
+ * "use_heap" is true, we allocate the returned name on the heap. */
+ 
 /**/
 mod_export char *
-gettempname(void)
+gettempname(const char *prefix, int use_heap)
 {
-    char *s, *ret;
+    char *ret, *suffix = prefix ? ".XXXXXX" : "XXXXXX";
  
     queue_signals();
-    if (!(s = getsparam("TMPPREFIX")))
-	s = DEFAULT_TMPPREFIX;
+    if (!prefix && !(prefix = getsparam("TMPPREFIX")))
+	prefix = DEFAULT_TMPPREFIX;
+    if (use_heap)
+	ret = dyncat(unmeta(prefix), suffix);
+    else
+	ret = bicat(unmeta(prefix), suffix);
  
 #ifdef HAVE__MKTEMP
     /* Zsh uses mktemp() safely, so silence the warnings */
-    ret = ((char *) _mktemp(dyncat(unmeta(s), "XXXXXX")));
+    ret = (char *) _mktemp(ret);
 #else
-    ret = ((char *) mktemp(dyncat(unmeta(s), "XXXXXX")));
+    ret = (char *) mktemp(ret);
 #endif
     unqueue_signals();
 
