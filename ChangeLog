@@ -1,6 +1,8 @@
 2001-07-13  Andrej Borsenkow  <bor@zsh.org>
 
-	* 15390: Completion/Unix/Command/_mount: Cygwin support
+	* 15278 (Sven), 15390: Completion/Unix/Command/_mount,
+	Completion/Unix/Type/_path_files: more Cygwin support
+	15278 was accidentally committed by me
 
 2001-07-13  Sven Wischnowsky  <wischnow@zsh.org>
 
