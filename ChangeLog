@@ -1,3 +1,10 @@
+2001-05-15  Clint Adams  <clint@zsh.org>
+
+	* 14341: Completion/Unix/Command/.distfiles,
+	Completion/Unix/Command/_modutils:
+	complete loaded Linux kernel modules for
+	rmmod or modprobe -r.
+
 2001-05-14  Peter Stephenson  <pws@csr.com>
 
 	* 14330: Completion/Base/Widget/_most_recent_file: handle filenames

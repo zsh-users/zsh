@@ -1,0 +1,44 @@
+#compdef modprobe rmmod
+
+local loaded
+
+_modutils_loaded_modules() {
+
+if [[ -f /proc/modules ]]; then
+ loaded=(${${(f)"$(</proc/modules)"}%% *})
+elif [[ -x /sbin/lsmod ]]; then
+ loaded=(${${${(f)"$(</sbin/lsmod)"}%% *}%Module})
+else
+ return 1
+fi
+
+compadd -a loaded
+return 0
+}
+
+case "$service" in
+  rmmod)
+
+  _arguments '(--all)-a[remove all unused autocleanable modules]' \
+             '(-a)--all' \
+             '(--persist)-e[save persistent data]' \
+             '(-e)--persist' \
+             '(--help)-h[print help text]' \
+             '(-h)--help' \
+             '(--stacks)-r[remove a module stack]' \
+             '(-r)--stacks' \
+             '(--syslog)-s[output to syslog]' \
+             '(-s)--syslog' \
+             '(--verbose)-v[be verbose]' \
+             '(-v)--verbose' \
+             '(--version)-V[print version]' \
+             '(-V)--version' \
+             '*:loaded module:_modutils_loaded_modules'
+  ;;
+
+  modprobe)
+  _arguments '(--remove)-r[remove]:loaded module:_modutils_loaded_modules' \
+             '(-r)--remove:loaded module:_modutils_loaded_modules'
+  ;;
+
+esac
