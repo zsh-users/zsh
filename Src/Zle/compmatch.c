@@ -33,10 +33,6 @@
 #undef GLOBAL_PROTOTYPES
 #include "compmatch.pro"
 
-/* Convenience macro for calling bslashquote() (formerly quotename()). */
-
-#define quotename(s, e) bslashquote(s, e, instring)
-
 /* This compares two cpattern lists and returns non-zero if they are
  * equal. */
 
@@ -853,9 +849,8 @@ comp_match(char *pfx, char *sfx, char *w, Patprog cp, Cline *clp, int qu,
 	if (!pattry(cp, r))
 	    return NULL;
     
-	r = (qu ? quotename(r, NULL) : dupstring(r));
-	if (qu == 2 && r[0] == '\\' && r[1] == '~')
-	    chuck(r);
+	r = (qu == 2 ? tildequote(r, 0) : multiquote(r, !qu));
+
 	/* We still break it into parts here, trying to build a sensible
 	 * cline list for these matches, too. */
 	w = dupstring(w);
@@ -866,10 +861,7 @@ comp_match(char *pfx, char *sfx, char *w, Patprog cp, Cline *clp, int qu,
 	Cline pli, plil;
 	int mpl, rpl, wl;
 
-	w = (qu ? quotename(w, NULL) : dupstring(w));
-	if (qu == 2 && w[0] == '\\' && w[1] == '~')
-	    chuck(w);
-
+	w = (qu == 2 ? tildequote(w, 0) : multiquote(w, !qu));
 	wl = strlen(w);
 
 	/* Always try to match the prefix. */

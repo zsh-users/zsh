@@ -1811,10 +1811,12 @@ addmatch(char *s, char *t)
 		    isalt = 1;
 	}
 	ms = ((addwhat == CC_FILES || addwhat == -6 ||
-	       addwhat == -5 || addwhat == -8) ? 
-	      comp_match(qfpre, qfsuf, s, filecomp, &lc, (ppre && *ppre ? 1 : 2),
+	       addwhat == -5 || addwhat == -8) ?
+	      comp_match(tildequote(qfpre, 1), multiquote(qfsuf, 1),
+			 s, filecomp, &lc, (ppre && *ppre ? 1 : 2),
 			 &bpl, ppl ,&bsl, psl, &isexact) :
-	      comp_match(fpre, fsuf, s, filecomp, &lc, 0,
+	      comp_match(multiquote(fpre, 1), multiquote(fsuf, 1),
+			 s, filecomp, &lc, 0,
 			 &bpl, ppl, &bsl, psl, &isexact));
 	if (!ms)
 	    return;
@@ -1855,6 +1857,8 @@ addmatch(char *s, char *t)
 	    p1 = qlpre; s1 = qlsuf;
 	    p2 = lpre;  s2 = lsuf;
 	}
+	p1 = multiquote(p1, 1); s1 = multiquote(s1, 1);
+	p2 = multiquote(p2, 1); s2 = multiquote(s2, 1);
 	bpt = bpl;
 	bst = bsl;
 
@@ -2128,21 +2132,24 @@ makecomplistctl(int flags)
 	    char *str = comp_str(&lip, &lp, 0), *t;
 	    char *os = cmdstr, **ow = clwords, **p, **q, qc;
 	    int on = clwnum, op = clwpos, ois =  instring, oib = inbackt;
-	    char *oisuf = isuf, *oqp = qipre, *oqs = qisuf, oaq = autoq;
+	    char *oisuf = isuf, *oqp = qipre, *oqs = qisuf, *oaq = autoq;
+	    char buf[2];
 
 	    if (compquote && (qc = *compquote)) {
 		if (qc == '`') {
 		    instring = 0;
 		    inbackt = 0;
-		    autoq = '\0';
+		    autoq = "";
 		} else {
+		    buf[0] = qc;
+		    buf[1] = '\0';
 		    instring = (qc == '\'' ? 1 : 2);
 		    inbackt = 0;
-		    autoq = qc;
+		    autoq = buf;
 		}
 	    } else {
 		instring = inbackt = 0;
-		autoq = '\0';
+		autoq = "";
 	    }
 	    qipre = ztrdup(compqiprefix ? compqiprefix : "");
 	    qisuf = ztrdup(compqisuffix ? compqisuffix : "");
@@ -2593,9 +2600,10 @@ sep_comp_string(char *ss, char *s, int noffs)
     LinkList foo = newlinklist();
     LinkNode n;
     int owe = we, owb = wb, ocs = cs, swb, swe, scs, soffs, ne = noerrs;
-    int sl = strlen(ss), tl, got = 0, i = 0, cur = -1, oll = ll;
+    int sl = strlen(ss), tl, got = 0, i = 0, cur = -1, oll = ll, remq;
     int ois = instring, oib = inbackt;
-    char *tmp, *p, *ns, *ol = (char *) line, sav, oaq = autoq, *qp, *qs;
+    char *tmp, *p, *ns, *ol = (char *) line, sav, *oaq = autoq, *qp, *qs;
+    char *ts, qc = '\0';
 
     swb = swe = soffs = 0;
     ns = NULL;
@@ -2612,6 +2620,8 @@ sep_comp_string(char *ss, char *s, int noffs)
     memcpy(tmp + sl + 1, s, noffs);
     tmp[(scs = cs = sl + 1 + noffs)] = 'x';
     strcpy(tmp + sl + 2 + noffs, s + noffs);
+    if ((remq = (*compqstack == '\\')))
+	tmp = rembslash(tmp);
     inpush(dupstrspace(tmp), 0, NULL);
     line = (unsigned char *) tmp;
     ll = tl - 1;
@@ -2674,21 +2684,29 @@ sep_comp_string(char *ss, char *s, int noffs)
 		*p = '\'';
     }
     offs = owb;
+
+    untokenize(ts = dupstring(ns));
+
     if (*ns == Snull || *ns == Dnull) {
 	instring = (*ns == Snull ? 1 : 2);
 	inbackt = 0;
 	swb++;
 	if (ns[strlen(ns) - 1] == *ns && ns[1])
 	    swe--;
-	autoq = (*ns == Snull ? '\'' : '"');
+	autoq = compqstack[1] ? "" : multiquote(*ns == Snull ? "'" : "\"", 1);
+	qc = (*ns == Snull ? '\'' : '"');
+	ts++;
     } else {
 	instring = 0;
-	autoq = '\0';
+	autoq = "";
     }
     for (p = ns, i = swb; *p; p++, i++) {
 	if (INULL(*p)) {
-	    if (i < scs)
+	    if (i < scs) {
 		soffs--;
+		if (remq && *p == Bnull && p[1])
+		    swb -= 2;
+	    }
 	    if (p[1] || *p != Bnull) {
 		if (*p == Bnull) {
 		    if (scs == i + 1)
@@ -2704,26 +2722,41 @@ sep_comp_string(char *ss, char *s, int noffs)
 	    chuck(p--);
 	}
     }
+    ns = ts;
+
+    if (instring && strchr(compqstack, '\\')) {
+	int rl = strlen(ns), ql = strlen(multiquote(ns, !!compqstack[1]));
+
+	if (ql > rl)
+	    swb -= ql - rl;
+    }
     sav = s[(i = swb - sl - 1)];
     s[i] = '\0';
-    qp = tricat(qipre, s, "");
+    qp = tricat(qipre, multiquote(s, 0), "");
     s[i] = sav;
     if (swe < swb)
 	swe = swb;
     swe -= sl + 1;
     sl = strlen(s);
-    if (swe > sl)
-	swe = sl, ns[swe - swb + 1] = '\0';
-    qs = tricat(s + swe, qisuf, "");
+    if (swe > sl) {
+	swe = sl;
+	if (strlen(ns) > swe - swb + 1)
+	    ns[swe - swb + 1] = '\0';
+    }
+    qs = tricat(multiquote(s + swe, 0), qisuf, "");
     sl = strlen(ns);
     if (soffs > sl)
 	soffs = sl;
 
     {
 	char **ow = clwords, *os = cmdstr, *oqp = qipre, *oqs = qisuf;
+	char *oqst = compqstack;
 	int olws = clwsize, olwn = clwnum, olwp = clwpos;
 	int obr = brange, oer = erange, oof = offs;
 	unsigned long occ = ccont;
+
+	compqstack = tricat((instring ? (instring == 1 ? "'" : "\"") : "\\"),
+			    compqstack, "");
 
 	clwsize = clwnum = countlinknodes(foo);
 	clwords = (char **) zalloc((clwnum + 1) * sizeof(char *));
@@ -2756,6 +2789,8 @@ sep_comp_string(char *ss, char *s, int noffs)
 	qipre = oqp;
 	zsfree(qisuf);
 	qisuf = oqs;
+	zsfree(compqstack);
+	compqstack = oqst;
     }
     autoq = oaq;
     instring = ois;

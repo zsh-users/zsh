@@ -184,6 +184,17 @@ When completing inside quotes, this contains the quotation character
 (i.e. either a single quote, a double quote, or a backtick).  Otherwise it
 is unset.
 )
+item(tt(all_quotes))(
+The tt(-q) option of the tt(compset) builtin command (see below)
+allows breaking a quoted string into separate words and completing one 
+of these words. This key allows to test which types of quoted strings
+are currently broken into parts this way. Its value contains one
+character for each quoting level. The characters are a single quote or 
+a double quote for strings quoted with these characters and a
+backslash for strings not starting with a quote character. The first
+character in the value always corresponds to the innermost quoting
+level.
+)
 item(tt(nmatches))(
 The number of matches generated and accepted by the completion code so
 far, excluding those matches that are only accepted by ignoring the

@@ -112,7 +112,7 @@ static char *qword;
  * closing quote. */
 
 /**/
-char *qipre, *qisuf, autoq;
+char *qipre, *qisuf, *autoq;
 
 /* This contains the name of the function to call if this is for a new  *
  * style completion. */
@@ -547,7 +547,8 @@ docomplete(int lst)
     qipre = ztrdup("");
     zsfree(qisuf);
     qisuf = ztrdup("");
-    autoq = '\0';
+    zsfree(autoq);
+    autoq = NULL;
     /* Get the word to complete. */
     noerrs = 1;
     s = get_comp_string();
@@ -881,6 +882,20 @@ dupbrinfo(Brinfo p, Brinfo *last)
 
     return ret;
 }
+
+/* This is a bit like has_token(), but ignores nulls. */
+
+static int
+has_real_token(const char *s)
+{
+    while (*s) {
+	if (itok(*s) && !INULL(*s))
+	    return 1;
+	s++;
+    }
+    return 0;
+}
+
 
 /* Lasciate ogni speranza.                                                  *
  * This function is a nightmare.  It works, but I'm sure that nobody really *
@@ -1264,7 +1279,7 @@ get_comp_string(void)
 		else if (*p == Snull)
 		    *p = '\'';
 	}
-	if ((*s == Snull || *s == Dnull) && !has_token(s + 1)) {
+	if ((*s == Snull || *s == Dnull) && !has_real_token(s + 1)) {
 	    char *q = (*s == Snull ? "'" : "\""), *n = tricat(qipre, q, "");
 	    int sl = strlen(s);
 
@@ -1276,7 +1291,7 @@ get_comp_string(void)
 		zsfree(qisuf);
 		qisuf = n;
 	    }
-	    autoq = *q;
+	    autoq = ztrdup(q);
 	}
 	/* While building the quoted form, we also clean up the command line. */
 	for (p = s, tt = qword, i = wb; *p; p++, tt++, i++)

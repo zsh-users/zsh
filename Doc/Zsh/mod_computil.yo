@@ -1,16 +1,29 @@
 texinode(The computil Module)(The deltochar Module)(The complist Module)(Zsh Modules)
 sect(The computil Module)
 cindex(completion, utility)
-The tt(computil) module adds four builtin commands that are used by
+The tt(computil) module adds several builtin commands that are used by
 some of the completion functions in the shell function based
 completions system (see
 ifzman(zmanref(zshcompsys))\
 ifnzman(noderef(Completion System))
-). Except for tt(compdisplay) these builtin commands are very
+). Except for tt(compquote) and tt(compdisplay) these builtin
+commands are very
 specialised and thus not very interesting when writing your own
 completion functions. In short, these builtin commands are:
 
 startitem()
+item(tt(compquote) var(names) ...)(
+There may be reasons to write completion functions that have to add
+the matches using the tt(-Q) option to tt(compadd) and do the quoting
+themselves. Instead of interpreting the first character of the
+tt(all_quotes) key of the tt(compstate) special association and using
+the tt(q) flag for parameter expansions, one can use this builtin
+command. The arguements are the names of scalar or array parameters
+and the values of these parameters are quoted as needed for the
+innermost quoting level.
+
+The return value is non-zero in case of an error and zero otherwise.
+)
 item(tt(compdisplay) var(name) var(string) var(defs) ...)(
 The var(defs) are strings which should be of the form
 `var(str)tt(:)var(descr)' (the intended use is that the var(descr)

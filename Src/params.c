@@ -1417,7 +1417,7 @@ getnumvalue(Value v)
 }
 
 /**/
-static void
+void
 setstrvalue(Value v, char *val)
 {
     char buf[(sizeof(zlong) * 8) + 4];
@@ -1515,7 +1515,7 @@ setstrvalue(Value v, char *val)
 }
 
 /**/
-static void
+void
 setnumvalue(Value v, mnumber val)
 {
     char buf[DIGBUFSIZE], *p;
@@ -1552,7 +1552,7 @@ setnumvalue(Value v, mnumber val)
 }
 
 /**/
-static void
+void
 setarrvalue(Value v, char **val)
 {
     if (v->pm->flags & PM_READONLY) {

@@ -101,8 +101,7 @@ int parq, eparq;
 
 /* We store the following prefixes/suffixes:                               *
  * ipre,ripre  -- the ignored prefix (quoted and unquoted)                 *
- * isuf        -- the ignored suffix                                       *
- * autoq       -- quotes to automatically insert                           */
+ * isuf        -- the ignored suffix                                       */
 
 /**/
 char *ipre, *ripre, *isuf;
@@ -246,10 +245,6 @@ int fromcomp;
 /**/
 int lastend;
 
-/* Convenience macro for calling bslashquote() (formerly quotename()). */
-
-#define quotename(s, e) bslashquote(s, e, instring)
-
 #define inststr(X) inststrlen((X),1,-1)
 
 /* Main completion entry point, called from zle. */
@@ -269,6 +264,13 @@ do_completion(Hookdef dummy, Compldat dat)
 
 	ainfo = fainfo = NULL;
 	matchers = newlinklist();
+
+	zsfree(compqstack);
+	compqstack = ztrdup("\\");
+	if (instring == 2)
+	    compqstack[0] = '"';
+	else if (instring)
+	    compqstack[0] = '\'';
 
 	hasunqu = 0;
 	useline = (lst != COMP_LIST_COMPLETE);
@@ -603,7 +605,7 @@ callcompfunc(char *s, char *fn)
 	zsfree(compprefix);
 	zsfree(compsuffix);
 	if (unset(COMPLETEINWORD)) {
-	    tmp = quotename(s, NULL);
+	    tmp = multiquote(s, 0);
 	    untokenize(tmp);
 	    compprefix = ztrdup(tmp);
 	    compsuffix = ztrdup("");
@@ -614,11 +616,11 @@ callcompfunc(char *s, char *fn)
 
 	    sav = *ss;
 	    *ss = '\0';
-	    tmp = quotename(s, NULL);
+	    tmp = multiquote(s, 0);
 	    untokenize(tmp);
 	    compprefix = ztrdup(tmp);
 	    *ss = sav;
-	    ss = quotename(ss, NULL);
+	    ss = multiquote(ss, 0);
 	    untokenize(ss);
 	    compsuffix = ztrdup(ss);
 	}
@@ -917,6 +919,40 @@ makecomplist(char *s, int incmd, int lst)
     return 1;
 }
 
+/**/
+char *
+multiquote(char *s, int ign)
+{
+    char *os = s, *p = compqstack;
+
+    if (p && *p && (ign < 1 || p[ign])) {
+	if (ign > 0)
+	    p += ign;
+	while (*p) {
+	    if (ign >= 0 || p[1])
+		s = bslashquote(s, NULL,
+				(*p == '\'' ? 1 : (*p == '"' ? 2 : 0)));
+	    p++;
+	}
+    }
+    return (s == os ? dupstring(s) : s);
+}
+
+/**/
+char *
+tildequote(char *s, int ign)
+{
+    int tilde;
+
+    if ((tilde = (*s == '~')))
+	*s = 'x';
+    s = multiquote(s, ign);
+    if (tilde)
+	*s = '~';
+
+    return s;
+}
+
 /* Check if we have to complete a parameter name. */
 
 /**/
@@ -1121,20 +1157,18 @@ comp_str(int *ipl, int *pl, int untok)
     return str;
 }
 
-/* This is for compset -q. */
-
 /**/
 int
 set_comp_sep(void)
 {
     int lip, lp;
-    char *s = comp_str(&lip, &lp, 0);
+    char *s = comp_str(&lip, &lp, 1);
     LinkList foo = newlinklist();
     LinkNode n;
     int owe = we, owb = wb, ocs = cs, swb, swe, scs, soffs, ne = noerrs;
-    int tl, got = 0, i = 0, cur = -1, oll = ll, sl;
+    int tl, got = 0, i = 0, cur = -1, oll = ll, sl, remq;
     int ois = instring, oib = inbackt, noffs = lip + lp;
-    char *tmp, *p, *ns, *ol = (char *) line, sav, oaq = autoq, *qp, *qs;
+    char *tmp, *p, *ns, *ol = (char *) line, sav, *qp, *qs, *ts, qc = '\0';
 
     if (compisuffix)
 	s = dyncat(s, compisuffix);
@@ -1154,7 +1188,8 @@ set_comp_sep(void)
     memcpy(tmp + 1, s, noffs);
     tmp[(scs = cs = 1 + noffs)] = 'x';
     strcpy(tmp + 2 + noffs, s + noffs);
-    tmp = rembslash(tmp);
+    if ((remq = (*compqstack == '\\')))
+	tmp = rembslash(tmp);
     inpush(dupstrspace(tmp), 0, NULL);
     line = (unsigned char *) tmp;
     ll = tl - 1;
@@ -1217,21 +1252,31 @@ set_comp_sep(void)
 		*p = '\'';
     }
     offs = owb;
+
+    untokenize(ts = dupstring(ns));
+
     if (*ns == Snull || *ns == Dnull) {
 	instring = (*ns == Snull ? 1 : 2);
 	inbackt = 0;
 	swb++;
 	if (ns[strlen(ns) - 1] == *ns && ns[1])
 	    swe--;
-	autoq = (*ns == Snull ? '\'' : '"');
+	zsfree(autoq);
+	autoq = ztrdup(compqstack[1] ? "" :
+		       multiquote(*ns == Snull ? "'" : "\"", 1));
+	qc = (*ns == Snull ? '\'' : '"');
+	ts++;
     } else {
 	instring = 0;
-	autoq = '\0';
+	zsfree(autoq);
+	autoq = NULL;
     }
     for (p = ns, i = swb; *p; p++, i++) {
 	if (INULL(*p)) {
-	    if (i < scs)
-		soffs--;
+	    if (i < scs) {
+		if (remq && *p == Bnull && p[1])
+		    swb -= 2;
+	    }
 	    if (p[1] || *p != Bnull) {
 		if (*p == Bnull) {
 		    if (scs == i + 1)
@@ -1247,23 +1292,39 @@ set_comp_sep(void)
 	    chuck(p--);
 	}
     }
+    ns = ts;
+
+    if (instring && strchr(compqstack, '\\')) {
+	int rl = strlen(ns), ql = strlen(multiquote(ns, !!compqstack[1]));
+
+	if (ql > rl)
+	    swb -= ql - rl;
+    }
     sav = s[(i = swb - 1)];
     s[i] = '\0';
-    qp = tricat(qipre, rembslash(s), "");
+    qp = rembslash(s);
     s[i] = sav;
     if (swe < swb)
 	swe = swb;
     swe--;
     sl = strlen(s);
-    if (swe > sl)
-	swe = sl, ns[swe - swb + 1] = '\0';
-    qs = tricat(rembslash(s + swe), qisuf, "");
+    if (swe > sl) {
+	swe = sl;
+	if (strlen(ns) > swe - swb + 1)
+	    ns[swe - swb + 1] = '\0';
+    }
+    qs = rembslash(s + swe);
     sl = strlen(ns);
     if (soffs > sl)
 	soffs = sl;
 
     {
 	int set = CP_QUOTE | CP_QUOTING, unset = 0;
+
+	p = tricat((instring ? (instring == 1 ? "'" : "\"") : "\\"),
+		   compqstack, "");
+	zsfree(compqstack);
+	compqstack = p;
 
 	zsfree(compquote);
 	zsfree(compquoting);
@@ -1282,11 +1343,11 @@ set_comp_sep(void)
 	compquoting = ztrdup(compquoting);
 	comp_setunset(0, 0, set, unset);
 
+	zsfree(compprefix);
+	zsfree(compsuffix);
 	if (unset(COMPLETEINWORD)) {
 	    untokenize(ns);
-	    zsfree(compprefix);
 	    compprefix = ztrdup(ns);
-	    zsfree(compsuffix);
 	    compsuffix = ztrdup("");
 	} else {
 	    char *ss, sav;
@@ -1305,17 +1366,12 @@ set_comp_sep(void)
 	compiprefix = ztrdup("");
 	zsfree(compisuffix);
 	compisuffix = ztrdup("");
+	tmp = tricat(compqiprefix, "", multiquote(qp, 1));
 	zsfree(compqiprefix);
+	compqiprefix = tmp;
+	tmp = tricat(multiquote(qs, 1), "", compqisuffix);
 	zsfree(compqisuffix);
-	if (ois) {
-	    compqiprefix = qp;
-	    compqisuffix = qs;
-	} else {
-	    compqiprefix = ztrdup(quotename(qp, NULL));
-	    zsfree(qp);
-	    compqisuffix = ztrdup(quotename(qs, NULL));
-	    zsfree(qs);
-	}
+	compqisuffix = tmp;
 	freearray(compwords);
 	i = countlinknodes(foo);
 	compwords = (char **) zalloc((i + 1) * sizeof(char *));
@@ -1326,7 +1382,6 @@ set_comp_sep(void)
 	compcurrent = cur + 1;
 	compwords[i] = NULL;
     }
-    autoq = oaq;
     instring = ois;
     inbackt = oib;
 
@@ -1422,7 +1477,7 @@ int
 addmatches(Cadata dat, char **argv)
 {
     char *s, *ms, *lipre = NULL, *lisuf = NULL, *lpre = NULL, *lsuf = NULL;
-    char **aign = NULL, **dparr = NULL, oaq = autoq, *oppre = dat->ppre;
+    char **aign = NULL, **dparr = NULL, *oaq = autoq, *oppre = dat->ppre;
     char *oqp = qipre, *oqs = qisuf, qc, **disp = NULL;
     int lpl, lsl, pl, sl, bcp = 0, bcs = 0, bpadd = 0, bsadd = 0;
     int llpl = 0, llsl = 0, nm = mnum, gflags = 0, ohp = haspattern;
@@ -1446,15 +1501,19 @@ addmatches(Cadata dat, char **argv)
 	if (qc == '`') {
 	    instring = 0;
 	    inbackt = 0;
-	    autoq = '\0';
+	    autoq = "";
 	} else {
+	    char buf[2];
+
 	    instring = (qc == '\'' ? 1 : 2);
 	    inbackt = 0;
-	    autoq = qc;
+	    buf[0] = qc;
+	    buf[1] = '\0';
+	    autoq = multiquote(buf, 1);
 	}
     } else {
 	instring = inbackt = 0;
-	autoq = '\0';
+	autoq = NULL;
     }
     qipre = ztrdup(compqiprefix ? compqiprefix : "");
     qisuf = ztrdup(compqisuffix ? compqisuffix : "");
@@ -1536,21 +1595,16 @@ addmatches(Cadata dat, char **argv)
 	    else if (lisuf)
 		dat->isuf = lisuf;
 	    if (dat->ppre) {
-		if (!(dat->aflags & CAF_QUOTE)) {
-		    dat->ppre = quotename(dat->ppre, NULL);
-		    if ((dat->flags & CMF_FILE) &&
-			dat->ppre[0] == '\\' && dat->ppre[1] == '~')
-			chuck(dat->ppre);
-		} else
-		    dat->ppre = dupstring(dat->ppre);
+		dat->ppre = ((dat->flags & CMF_FILE) ?
+			     tildequote(dat->ppre,
+					!!(dat->aflags & CAF_QUOTE)) :
+			     multiquote(dat->ppre,
+					!!(dat->aflags & CAF_QUOTE)));
 		lpl = strlen(dat->ppre);
 	    } else
 		lpl = 0;
 	    if (dat->psuf) {
-		if (!(dat->aflags & CAF_QUOTE))
-		    dat->psuf = quotename(dat->psuf, NULL);
-		else
-		    dat->psuf = dupstring(dat->psuf);
+		dat->psuf = multiquote(dat->psuf, !!(dat->aflags & CAF_QUOTE));
 		lsl = strlen(dat->psuf);
 	    } else
 		lsl = 0;
@@ -1653,6 +1707,11 @@ addmatches(Cadata dat, char **argv)
 		    dat->rems = NULL;
 		} else if (dat->rems)
 		    dat->rems = dupstring(dat->rems);
+
+		lpre = ((!(dat->aflags & CAF_QUOTE) &&
+			 (!dat->ppre && (dat->flags & CMF_FILE))) ?
+			tildequote(lpre, 1) : multiquote(lpre, 1));
+		lsuf = multiquote(lsuf, 1);
 	    }
 	    /* Walk through the matches given. */
 	    obpl = bpl;
@@ -1687,12 +1746,12 @@ addmatches(Cadata dat, char **argv)
 		    if (dat->aflags & CAF_QUOTE)
 			ms = dupstring(s);
 		    else
-			sl = strlen(ms = quotename(s, NULL));
+			sl = strlen(ms = multiquote(s, 0));
 		    lc = bld_parts(ms, sl, -1, NULL);
 		    isexact = 0;
 		} else if (!(ms = comp_match(lpre, lsuf, s, cp, &lc,
 					     (!(dat->aflags & CAF_QUOTE) ?
-					      ((dat->ppre && dat->ppre) ||
+					      (dat->ppre ||
 					       !(dat->flags & CMF_FILE) ? 1 : 2) : 0),
 					     &bpl, bcp, &bsl, bcs,
 					     &isexact))) {
@@ -1994,6 +2053,9 @@ add_match_data(int alt, char *str, Cline line,
     cm->pre = pre;
     cm->suf = suf;
     cm->flags = flags;
+    if (*compqstack == '\\' ||
+	(autoq && *compqstack && compqstack[1] == '\\'))
+	cm->flags |= CMF_NOSPACE;
     if (nbrbeg) {
 	int *p;
 	Brinfo bp;
@@ -2016,7 +2078,7 @@ add_match_data(int alt, char *str, Cline line,
 	cm->brsl = NULL;
     cm->qipl = qipl;
     cm->qisl = qisl;
-    cm->autoq = (autoq ? autoq : (inbackt ? '`' : '\0'));
+    cm->autoq = dupstring(autoq ? autoq : (inbackt ? "`" : NULL));
     cm->rems = cm->remf = cm->disp = NULL;
 
     if ((lastprebr || lastpostbr) && !hasbrpsfx(cm, lastprebr, lastpostbr))
@@ -2348,7 +2410,7 @@ dupmatch(Cmatch m, int nbeg, int nend)
 	r->brsl = NULL;
     r->rems = ztrdup(m->rems);
     r->remf = ztrdup(m->remf);
-    r->autoq = m->autoq;
+    r->autoq = ztrdup(m->autoq);
     r->qipl = m->qipl;
     r->qisl = m->qisl;
     r->disp = dupstring(m->disp);
@@ -2489,6 +2551,7 @@ freematch(Cmatch m, int nbeg, int nend)
     zsfree(m->rems);
     zsfree(m->remf);
     zsfree(m->disp);
+    zsfree(m->autoq);
     zfree(m->brpl, nbeg * sizeof(int));
     zfree(m->brsl, nend * sizeof(int));
 

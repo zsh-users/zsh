@@ -33,11 +33,6 @@
 #undef GLOBAL_PROTOTYPES
 #include "compresult.pro"
 
-/* Convenience macro for calling bslashquote() (formerly quotename()). *
- * This uses the instring variable above.                              */
-
-#define quotename(s, e) bslashquote(s, e, instring)
-
 #define inststr(X) inststrlen((X),1,-1)
 
 /* This cuts the cline list before the stuff that isn't worth
@@ -857,11 +852,13 @@ do_single(Cmatch m)
 	/* If we didn't add a suffix, add a space, unless we are *
 	 * doing menu completion or we are completing files and  *
 	 * the string doesn't name an existing file.             */
-	if (m->autoq && (!m->isuf || m->isuf[0] != m->autoq)) {
-	    inststrlen(&(m->autoq), 1, 1);
-	    minfo.insc++;
+	if (m->autoq && (!m->isuf || !strpfx(m->autoq, m->isuf))) {
+	    int al = strlen(m->autoq);
+	    inststrlen(m->autoq, 1, al);
+	    minfo.insc += al;
 	}
-	if (!menucmp && (usemenu != 3 || insspace)) {
+	if (!menucmp && !(m->flags & CMF_NOSPACE) &&
+	    (usemenu != 3 || insspace)) {
 	    inststrlen(" ", 1, 1);
 	    minfo.insc++;
 	    if (minfo.we)

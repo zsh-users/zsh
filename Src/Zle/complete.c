@@ -61,6 +61,7 @@ char **compwords,
      *compredirect,
      *compquote,
      *compquoting,
+     *compqstack,
      *comprestore,
      *complist,
      *compforcelist,
@@ -962,6 +963,7 @@ static struct compparam compkparams[] = {
     { "vared", PM_SCALAR, VAL(compvared), NULL, NULL },
     { "alternate_nmatches", PM_INTEGER | PM_READONLY, NULL, NULL, VAL(get_anmatches) },
     { "list_lines", PM_INTEGER | PM_READONLY, NULL, NULL, VAL(get_listlines) },
+    { "all_quotes", PM_SCALAR | PM_READONLY, VAL(compqstack), NULL, NULL },
     { NULL, 0, NULL, NULL, NULL }
 };
 
@@ -1169,7 +1171,7 @@ comp_wrapper(List list, FuncWrap w, char *name)
 	return 1;
     else {
 	char *orest, *opre, *osuf, *oipre, *oisuf, **owords;
-	char *oqipre, *oqisuf, *oq, *oqi;
+	char *oqipre, *oqisuf, *oq, *oqi, *oqs, *oaq;
 	zlong ocur;
 	unsigned int runset = 0, kunset = 0, m, sm;
 	Param *pp;
@@ -1193,6 +1195,8 @@ comp_wrapper(List list, FuncWrap w, char *name)
 	oqisuf = dupstring(compqisuffix);
 	oq = dupstring(compquote);
 	oqi = dupstring(compquoting);
+	oqs = dupstring(compqstack);
+	oaq = dupstring(autoq);
 
 	HEAPALLOC {
 	    owords = arrdup(compwords);
@@ -1218,6 +1222,10 @@ comp_wrapper(List list, FuncWrap w, char *name)
 	    compquote = ztrdup(oq);
 	    zsfree(compquoting);
 	    compquoting = ztrdup(oqi);
+	    zsfree(compqstack);
+	    compqstack = ztrdup(oqs);
+	    zsfree(autoq);
+	    autoq = ztrdup(oaq);
 	    freearray(compwords);
 	    PERMALLOC {
 		compwords = arrdup(owords);
@@ -1354,7 +1362,7 @@ setup_complete(Module m)
 	compquoting = comprestore = complist = compinsert =
 	compexact = compexactstr = comppatmatch = comppatinsert =
 	compforcelist = complastprompt = comptoend = 
-	compoldlist = compoldins = compvared = NULL;
+	compoldlist = compoldins = compvared = compqstack = NULL;
 
     hascompmod = 1;
 
@@ -1418,6 +1426,7 @@ finish_complete(Module m)
     zsfree(compparameter);
     zsfree(compredirect);
     zsfree(compquote);
+    zsfree(compqstack);
     zsfree(compquoting);
     zsfree(comprestore);
     zsfree(complist);

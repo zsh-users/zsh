@@ -233,7 +233,9 @@ for prepath in "$prepaths[@]"; do
  	if [[ "$tmp2[1]" = */* ]]; then
 	  tmp2=( "${(@)tmp2#${prepath}${realpath}}" )
 	  if [[ "$tmp2[1]" = */* ]]; then
-	    exppaths=( "$exppaths[@]" ${^tmp2:h:q}/${tpre}${tsuf} )
+	    tmp2=( "${(@)tmp2:h}" )
+	    compquote tmp2
+	    exppaths=( "$exppaths[@]" ${^tmp2}/${tpre}${tsuf} )
           else
 	    exppaths=( "$exppaths[@]" ${tpre}${tsuf} )
 	  fi
@@ -329,36 +331,39 @@ for prepath in "$prepaths[@]"; do
 	SUFFIX="${tsuf}"
       fi
 
+tmp4="$testpath"
+compquote tmp1 tmp4
+
       if [[ -n $menu || "$compconfig[path_expand]" != *suffix* ]]; then
         [[ -n "$compconfig[path_cursor]" ]] && compstate[to_end]=''
         if [[ "$tmp3" = */* ]]; then
-	  compadd -Qf -p "$linepath${testpath:q}" -s "/${tmp3#*/}" \
+	  compadd -Qf -p "$linepath$tmp4" -s "/${tmp3#*/}" \
 	          -W "$prepath$realpath$testpath" "$ignore[@]" \
 		  "$addpfx[@]" "$addsfx[@]" "$remsfx[@]" \
                   -M "r:|/=* r:|=* $match" "$group[@]" "$expl[@]" \
-		  - "${(@)${(@)tmp1%%/*}:q}"
+		  - "${(@)tmp1%%/*}"
 	else
-	  compadd -Qf -p "$linepath${testpath:q}" \
+	  compadd -Qf -p "$linepath$tmp4" \
 	          -W "$prepath$realpath$testpath" "$ignore[@]" \
 		   "$addpfx[@]" "$addsfx[@]" "$remsfx[@]" \
                    -M "r:|/=* r:|=* $match" "$group[@]" "$expl[@]" \
-		   - "${(@)tmp1:q}"
+		   - "$tmp1[@]"
 	fi
       else
         if [[ "$tmp3" = */* ]]; then
           for i in "$tmp1[@]"; do
-	    compadd -Qf -p "$linepath${testpath:q}" -s "/${${i#*/}:q}" \
+	    compadd -Qf -p "$linepath$tmp4" -s "/${i#*/}" \
 		    -W "$prepath$realpath$testpath" "$ignore[@]" \
 		    "$addpfx[@]" "$addsfx[@]" "$remsfx[@]" \
                     -M "r:|/=* r:|=* $match" "$group[@]" "$expl[@]" \
-		    - "${${i%%/*}:q}"
+		    - "${i%%/*}"
 	  done
         else
-	  compadd -Qf -p "$linepath${testpath:q}" \
+	  compadd -Qf -p "$linepath$tmp4" \
 		  -W "$prepath$realpath$testpath" "$ignore[@]" \
 		  "$addpfx[@]" "$addsfx[@]" "$remsfx[@]" \
                   -M "r:|/=* r:|=* $match" "$group[@]" "$expl[@]" \
-		  - "${(@)tmp1:q}"
+		  - "$tmp1[@]"
         fi
       fi
       tmp4=-
@@ -397,11 +402,13 @@ for prepath in "$prepaths[@]"; do
   if [[ -z "$tmp4" ]]; then
     PREFIX="${opre}${osuf}"
     SUFFIX=""
-    compadd -Qf -p "$linepath${testpath:q}" \
+    tmp4="$testpath"
+    compquote tmp4 tmp1
+    compadd -Qf -p "$linepath$tmp4" \
 	    -W "$prepath$realpath$testpath" "$ignore[@]" \
 	    "$addpfx[@]" "$addsfx[@]" "$remsfx[@]" \
             -M "r:|/=* r:|=* $match" "$group[@]" "$expl[@]" \
-	    - "${(@)tmp1:q}"
+	    - "$tmp1[@]"
   fi
 done
 

@@ -95,7 +95,7 @@ struct cmatch {
     char *pre;			/* prefix string from -P */
     char *suf;			/* suffix string from -S */
     char *disp;			/* string to display (compadd -d) */
-    char autoq;			/* closing quote to add automatically */
+    char *autoq;		/* closing quote to add automatically */
     int flags;			/* see CMF_* below */
     int *brpl;			/* places where to put the brace prefixes */
     int *brsl;			/* ...and the suffixes */
@@ -115,6 +115,7 @@ struct cmatch {
 #define CMF_NOLIST    32	/* should not be listed */
 #define CMF_DISPLINE  64	/* display strings one per line */
 #define CMF_HIDE     128	/* temporarily hide this one */
+#define CMF_NOSPACE  256	/* don't add a space */
 
 /* Stuff for completion matcher control. */
 
@@ -353,9 +354,11 @@ typedef void (*CLPrintFunc)(Cmgroup, Cmatch *, int, int, int, int,
 #define CP_ANMATCHES   (1 << CPN_ANMATCHES)
 #define CPN_LISTLINES  26
 #define CP_LISTLINES   (1 << CPN_LISTLINES)
+#define CPN_QUOTES     27
+#define CP_QUOTES      (1 << CPN_QUOTES)
 
-#define CP_KEYPARAMS   27
-#define CP_ALLKEYS     ((unsigned int) 0x7ffffff)
+#define CP_KEYPARAMS   28
+#define CP_ALLKEYS     ((unsigned int) 0xfffffff)
 
 /* Hooks. */
 

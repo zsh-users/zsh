@@ -1887,11 +1887,62 @@ bin_compvalues(char *nam, char **args, char *ops, int func)
 }
 
 
+static int
+bin_compquote(char *nam, char **args, char *ops, int func)
+{
+    char *name;
+    Value v;
+
+    if (!compqstack || !*compqstack)
+	return 0;
+
+    while ((name = *args++)) {
+	name = dupstring(name);
+	if ((v = getvalue(&name, 0))) {
+	    switch (PM_TYPE(v->pm->flags)) {
+	    case PM_SCALAR:
+		{
+		    char *val = getstrvalue(v);
+
+		    val = bslashquote(val, NULL,
+				      (*compqstack == '\'' ? 1 :
+				       (*compqstack == '"' ? 2 : 0)));
+
+		    setstrvalue(v, ztrdup(val));
+		}
+		break;
+	    case PM_ARRAY:
+		{
+		    char **val = v->pm->gets.afn(v->pm);
+		    char **new = (char **) zalloc((arrlen(val) + 1) *
+						  sizeof(char *));
+		    char **p = new;
+
+		    for (; *val; val++, p++)
+			*p = ztrdup(bslashquote(*val, NULL,
+						(*compqstack == '\'' ? 1 :
+						 (*compqstack == '"' ? 2 :
+						  0))));
+		    *p = NULL;
+
+		    setarrvalue(v, new);
+		}
+		break;
+	    default:
+		zwarnnam(nam, "invalid parameter type: %s", args[-1], 0);
+	    }
+	} else
+	    zwarnnam(nam, "unknown parameter: %s", args[-1], 0);
+    }
+    return 0;
+}
+
 static struct builtin bintab[] = {
     BUILTIN("compdisplay", 0, bin_compdisplay, 2, -1, 0, NULL, NULL),
     BUILTIN("compdescribe", 0, bin_compdescribe, 3, -1, 0, NULL, NULL),
     BUILTIN("comparguments", 0, bin_comparguments, 1, -1, 0, NULL, NULL),
     BUILTIN("compvalues", 0, bin_compvalues, 1, -1, 0, NULL, NULL),
+    BUILTIN("compquote", 0, bin_compquote, 1, -1, 0, NULL, NULL),
 };
 
 
