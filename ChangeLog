@@ -22,6 +22,16 @@
         * 15915: Completion/Debian/Command/_bts:
         completion for bts script in devscripts.
 
+2001-09-28  Bart Schaefer  <schaefer@zsh.org>
+
+	* 15889: Test/V01zmodload.ztst: Compute module dependencies for
+	external modules so that they can be unloaded in the right order.
+
+2001-09-25  Bart Schaefer  <schaefer@zsh.org>
+
+	* 15871, 15872: Src/subst.c, Test/D04parameter.ztst: Equivalence
+	of `...` and $(...) in parameter substitutions, e.g. ${(e)...}.
+
 2001-09-25  Sven Wischnowsky  <wischnow@zsh.org>
 
 	* 15868, 15869: Src/text.c: job text building code couldn't handle
