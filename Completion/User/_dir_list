@@ -1,7 +1,0 @@
-#autoload
-
-local suf
-
-compset -P '*:'
-compset -S ':*' || suf=":"
-_files -S "$suf" -r ': \t\t\-' -/
