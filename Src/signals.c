@@ -591,7 +591,7 @@ killjb(Job jn, int sig)
         if (jn->stat & STAT_SUPERJOB) {
             if (sig == SIGCONT) {
                 for (pn = jobtab[jn->other].procs; pn; pn = pn->next)
-                    kill(pn->pid, sig);
+                    killpg(pn->pid, sig);
  
                 for (pn = jn->procs; pn->next; pn = pn->next)
                     err = kill(pn->pid, sig);
