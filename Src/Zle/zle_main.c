@@ -1138,6 +1138,7 @@ setup_(Module m)
     stackhist = stackcs = -1;
     kungetbuf = (char *) zalloc(kungetsz = 32);
     comprecursive = 0;
+    rdstrs = NULL;
 
     /* initialise the keymap system */
     init_keymaps();
@@ -1192,7 +1193,8 @@ finish_(Module m)
     zfree(vichgbuf, vichgbufsz);
     zfree(kungetbuf, kungetsz);
     free_isrch_spots();
-
+    if (rdstrs)
+        freelinklist(rdstrs, freestr);
     zfree(cutbuf.buf, cutbuf.len);
     for(i = KRINGCT; i--; )
 	zfree(kring[i].buf, kring[i].len);

@@ -346,6 +346,13 @@ mod_export int lincmd, linredir, linarr;
 /**/
 mod_export char *rdstr;
 
+static char rdstrbuf[20];
+
+/* The list of redirections on the line. */
+
+/**/
+mod_export LinkList rdstrs;
+
 /* This holds the name of the current command (used to find the right *
  * compctl).                                                          */
 
@@ -978,7 +985,7 @@ get_comp_string(void)
 {
     int t0, tt0, i, j, k, cp, rd, sl, ocs, ins, oins, ia, parct, varq = 0;
     int ona = noaliases;
-    char *s = NULL, *linptr, *tmp, *p, *tt = NULL;
+    char *s = NULL, *linptr, *tmp, *p, *tt = NULL, rdop[20];
 
     freebrinfo(brbeg);
     freebrinfo(brend);
@@ -987,6 +994,11 @@ get_comp_string(void)
     zsfree(lastprebr);
     zsfree(lastpostbr);
     lastprebr = lastpostbr = NULL;
+    if (rdstrs)
+        freelinklist(rdstrs, freestr);
+    rdstrs = znewlinklist();
+    rdop[0] = '\0';
+    rdstr = NULL;
 
     /* This global flag is used to signal the lexer code if it should *
      * expand aliases or not.                                         */
@@ -1074,8 +1086,14 @@ get_comp_string(void)
 	    else
 		linarr = 0;
 	}
-	if (inredir)
-	    rdstr = tokstrings[tok];
+	if (inredir) {
+            rdstr = rdstrbuf;
+            if (tokfd >= 0)
+                sprintf(rdop, "%d%s", tokfd, tokstrings[tok]);
+            else
+                strcpy(rdop, tokstrings[tok]);
+            strcpy(rdstr, rdop);
+        }
 	if (tok == DINPAR)
 	    tokstr = NULL;
 
@@ -1118,8 +1136,11 @@ get_comp_string(void)
 	    ia = linarr;
 	    if (inwhat == IN_NOTHING && incond)
 		inwhat = IN_COND;
-	} else if (linredir)
+	} else if (linredir) {
+            if (rdop[0] && tokstr)
+                zaddlinknode(rdstrs, tricat(rdop, ":", tokstr));
 	    continue;
+        }
 	if (incond) {
 	    if (tok == DBAR)
 		tokstr = "||";

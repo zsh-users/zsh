@@ -1,3 +1,11 @@
+2002-03-01  Sven Wischnowsky  <wischnow@zsh.org>
+
+	* 16751: Src/Zle/comp.h, Src/Zle/compcore.c, Src/Zle/complete.c,
+	Src/Zle/zle_main.c, Src/Zle/zle_tricky.c: add $redirections
+	array to completion system parameters, containing information
+	about all redirections on the line; make this and
+	compstate[redirect] contain the file descriptor number
+
 2002-02-28  Bart Schaefer  <schaefer@zsh.org>
 
 	* 16748: Completion/Zsh/Command/_zle: Fix infinite loop

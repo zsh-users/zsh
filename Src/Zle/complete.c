@@ -43,6 +43,7 @@ zlong complistlines,
 /**/
 mod_export
 char **compwords,
+     **compredirs,
      *compprefix,
      *compsuffix,
      *compisuffix,
@@ -948,6 +949,7 @@ struct compparam {
 
 static struct compparam comprparams[] = {
     { "words", PM_ARRAY, VAL(compwords), NULL, NULL },
+    { "redirections", PM_ARRAY, VAL(compredirs), NULL, NULL },
     { "CURRENT", PM_INTEGER, VAL(compcurrent), NULL, NULL },
     { "PREFIX", PM_SCALAR, VAL(compprefix), NULL, NULL },
     { "SUFFIX", PM_SCALAR, VAL(compsuffix), NULL, NULL },
@@ -1239,13 +1241,13 @@ comp_wrapper(Eprog prog, FuncWrap w, char *name)
     if (incompfunc != 1)
 	return 1;
     else {
-	char *orest, *opre, *osuf, *oipre, *oisuf, **owords;
+	char *orest, *opre, *osuf, *oipre, *oisuf, **owords, **oredirs;
 	char *oqipre, *oqisuf, *oq, *oqi, *oqs, *oaq;
 	zlong ocur;
 	unsigned int runset = 0, kunset = 0, m, sm;
 	Param *pp;
 
-	m = CP_WORDS | CP_CURRENT | CP_PREFIX | CP_SUFFIX | 
+	m = CP_WORDS | CP_REDIRS | CP_CURRENT | CP_PREFIX | CP_SUFFIX | 
 	    CP_IPREFIX | CP_ISUFFIX | CP_QIPREFIX | CP_QISUFFIX;
 	for (pp = comprpms, sm = 1; m; pp++, m >>= 1, sm <<= 1) {
 	    if ((m & 1) && ((*pp)->flags & PM_UNSET))
@@ -1267,6 +1269,7 @@ comp_wrapper(Eprog prog, FuncWrap w, char *name)
 	oqs = ztrdup(compqstack);
 	oaq = ztrdup(autoq);
 	owords = zarrdup(compwords);
+	oredirs = zarrdup(compredirs);
 
 	runshfunc(prog, w, name);
 
@@ -1293,11 +1296,14 @@ comp_wrapper(Eprog prog, FuncWrap w, char *name)
 	    zsfree(autoq);
 	    autoq = oaq;
 	    freearray(compwords);
+	    freearray(compredirs);
 	    compwords = owords;
+            compredirs = oredirs;
 	    comp_setunset(CP_COMPSTATE |
-			  (~runset & (CP_WORDS | CP_CURRENT | CP_PREFIX |
-				     CP_SUFFIX | CP_IPREFIX | CP_ISUFFIX |
-				     CP_QIPREFIX | CP_QISUFFIX)),
+			  (~runset & (CP_WORDS | CP_REDIRS |
+                                      CP_CURRENT | CP_PREFIX |
+                                      CP_SUFFIX | CP_IPREFIX | CP_ISUFFIX |
+                                      CP_QIPREFIX | CP_QISUFFIX)),
 			  (runset & CP_ALLREALS),
 			  (~kunset & CP_RESTORE), (kunset & CP_ALLKEYS));
 	} else {
@@ -1390,7 +1396,7 @@ setup_(Module m)
     hasperm = 0;
 
     comprpms = compkpms = NULL;
-    compwords = NULL;
+    compwords = compredirs = NULL;
     compprefix = compsuffix = compiprefix = compisuffix = 
 	compqiprefix = compqisuffix =
 	compcontext = compparameter = compredirect = compquote =
@@ -1447,6 +1453,8 @@ finish_(Module m)
 {
     if (compwords)
 	freearray(compwords);
+    if (compredirs)
+	freearray(compredirs);
     zsfree(compprefix);
     zsfree(compsuffix);
     zsfree(compiprefix);

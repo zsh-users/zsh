@@ -298,25 +298,27 @@ typedef void (*CLPrintFunc)(Cmgroup, Cmatch *, int, int, int, int,
 
 #define CPN_WORDS      0
 #define CP_WORDS       (1 <<  CPN_WORDS)
-#define CPN_CURRENT    1
+#define CPN_REDIRS     1
+#define CP_REDIRS      (1 <<  CPN_REDIRS)
+#define CPN_CURRENT    2
 #define CP_CURRENT     (1 <<  CPN_CURRENT)
-#define CPN_PREFIX     2
+#define CPN_PREFIX     3
 #define CP_PREFIX      (1 <<  CPN_PREFIX)
-#define CPN_SUFFIX     3
+#define CPN_SUFFIX     4
 #define CP_SUFFIX      (1 <<  CPN_SUFFIX)
-#define CPN_IPREFIX    4
+#define CPN_IPREFIX    5
 #define CP_IPREFIX     (1 <<  CPN_IPREFIX)
-#define CPN_ISUFFIX    5
+#define CPN_ISUFFIX    6
 #define CP_ISUFFIX     (1 <<  CPN_ISUFFIX)
-#define CPN_QIPREFIX   6
+#define CPN_QIPREFIX   7
 #define CP_QIPREFIX    (1 <<  CPN_QIPREFIX)
-#define CPN_QISUFFIX   7
+#define CPN_QISUFFIX   8
 #define CP_QISUFFIX    (1 <<  CPN_QISUFFIX)
-#define CPN_COMPSTATE  8
+#define CPN_COMPSTATE  9
 #define CP_COMPSTATE   (1 <<  CPN_COMPSTATE)
 
-#define CP_REALPARAMS  9
-#define CP_ALLREALS    ((unsigned int) 0x1ff)
+#define CP_REALPARAMS  10
+#define CP_ALLREALS    ((unsigned int) 0x3ff)
 
 
 #define CPN_NMATCHES   0
