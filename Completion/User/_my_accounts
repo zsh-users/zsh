@@ -10,4 +10,4 @@ else
   accounts_users_hosts=( $my_accounts )
 fi
 
-_user@host "$@"
+_user_at_host "$@"
