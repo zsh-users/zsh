@@ -7,6 +7,16 @@
 	Completion/X/Command/_netscape,	Completion/Zsh/Command/_zstyle:
 	add new function for completing e-mail addresses
 
+2003-01-13  Peter Stephenson  <pws@csr.com>
+
+	* 18086: Src/utils.c: from Peter Wemm <peter@FreeBSD.ORG> via
+	Jos Backus: prototype _mktemp since casting the stable door after
+	the horse has bolted doesn't work if the stable door is 32 bits
+	and the horse is 64 bits.
+
+	* 18059: Src/Zle/compresult.c, Doc/Zsh/compwid.yo: allow compadd
+	-r and -R to strip and automatically added space suffix.
+
 2003-01-07  Oliver Kiddle  <opk@zsh.org>
 
 	* 18060: Completion/Zsh/Command/_zmv, Doc/Zsh/contrib.yo,
