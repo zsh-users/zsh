@@ -1,0 +1,3 @@
+#compdef -redirect-
+
+_files
