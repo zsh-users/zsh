@@ -7,9 +7,8 @@
 #
 # Available styles:
 #
-#   list --  display lists of available matches
-#   stop --  prevent looping at beginning and end of matches during
-#            menu-completion
+#   list --  avoid to display lists of available matches
+#   stop --  stop before looping at beginning and end of matches
 #   sort --  sort matches lexically (default is to sort by age)
 #   remove-all-dups --
 #            remove /all/ duplicate matches rather than just consecutives
@@ -19,7 +18,6 @@ _history_complete_word () {
   setopt localoptions ${_comp_options[@]}
 
   local expl direction stop curcontext="$curcontext"
-  local max slice hmax=$#historywords
 
   if [[ -z "$curcontext" ]]; then
     curcontext=history-words:::
@@ -33,26 +31,12 @@ _history_complete_word () {
     direction=older
   fi
 
-  zstyle -s ":completion:${curcontext}:history-words" stop stop
+  zstyle -t ":completion:${curcontext}:history-words" stop && stop=yes
 
-  zstyle -t ":completion:${curcontext}:history-words" list || compstate[list]=''
+  zstyle -T ":completion:${curcontext}:history-words" list || compstate[list]=''
 
-  if zstyle -s ":completion:${curcontext}:history-words" range max; then
-    if [[ $max = *:* ]]; then
-      slice=${max#*:}
-      max=${max%:*}
-    else
-      slice=$max
-    fi
-    [[ max -gt hmax ]] && max=$hmax
-  else
-    max=$hmax
-    slice=$max
-  fi
-
-  if [[ ( -n "$compstate[old_list]" ||
-          ( $LASTWIDGET = _history-complete-* && -n $_hist_stop ) ) &&
-        ( -n "$stop" || "$compstate[insert]" = menu ) ]]; then
+  if [[ $LASTWIDGET = _history-complete-* &&
+        ( -n "$compstate[old_list]" || -n $_hist_stop ) ]]; then
     if [[ "$direction" == older ]]; then
       if [[ $_hist_stop = new ]]; then
         PREFIX=$_hist_old_prefix
@@ -67,10 +51,13 @@ _history_complete_word () {
       elif [[ compstate[old_insert] -lt _hist_menu_length ]]; then
         compstate[old_list]=keep
         (( compstate[insert] = compstate[old_insert] + 1 ))
-      else
+      elif [[ -n $stop ]]; then
         _hist_stop=old
         _message 'beginning of history reached'
         return 1
+      else
+        compstate[old_list]=keep
+        compstate[insert]=1
       fi
     elif [[ "$direction" == 'newer' ]]; then
       if [[ $_hist_stop = old ]]; then
@@ -86,10 +73,13 @@ _history_complete_word () {
       elif [[ compstate[old_insert] -gt 1 ]]; then
         compstate[old_list]=keep
         (( compstate[insert] = compstate[old_insert] - 1 ))
-      else
+      elif [[ -n $stop ]]; then
         _hist_stop=new
         _message 'end of history reached'
         return 1
+      else
+        compstate[old_list]=keep
+        compstate[insert]=$_hist_menu_length
       fi
     fi
     return 0
@@ -103,47 +93,29 @@ _history_complete_word () {
 }
 
 _history_complete_word_gen_matches () {
-  local opt beg=2
 
   [[ -n "$_hist_stop" ]] && PREFIX="$_hist_old_prefix"
 
-  if zstyle -t ":completion:${curcontext}:history-words" remove-all-dups; then
-    opt=-
-  else
-    opt=-1
-  fi
-  if zstyle -t ":completion:${curcontext}:history-words" sort; then
-    opt="${opt}J"
-  else
-    opt="${opt}V"
-  fi
+  _main_complete _history
 
-  PREFIX="$IPREFIX$PREFIX"
-  IPREFIX=
-  SUFFIX="$SUFFIX$ISUFFIX"
-  ISUFFIX=
-
-  while [[ $compstate[nmatches] -eq 0 && beg -lt max ]]; do
-    _main_complete - history _wanted "$opt" history-words expl 'history word' \
-                                 compadd -Q -a 'historywords[beg,beg+slice]'
-    (( beg+=slice ))
-  done
-
-  zstyle -t ":completion:${curcontext}:history-words" list ||
-      compstate[list]=
+  zstyle -T ":completion:${curcontext}:history-words" list || compstate[list]=
 
   _hist_menu_length="$compstate[nmatches]"
 
-  case "$direction" in 
-    newer)  compstate[insert]=$_hist_menu_length
-	    [[ -n "$_hist_stop" ]] && (( compstate[insert]-- ))
-            ;;
-    older)  compstate[insert]=1
-	    [[ -n "$_hist_stop" ]] && (( compstate[insert]++ ))
-            ;;
-  esac
+  if [[ $_lastcomp[insert] != *unambig* ]]; then
+    case "$direction" in 
+      newer)  compstate[insert]=$_hist_menu_length
+	      [[ -n "$_hist_stop" ]] && (( compstate[insert]-- ))
+              ;;
+      older)  compstate[insert]=1
+	      [[ -n "$_hist_stop" ]] && (( compstate[insert]++ ))
+              ;;
+    esac
+  fi
 
-  [[ -n "$_hist_stop" ]] && _hist_stop=''
+  _hist_stop=
+
+  return
 }
 
 _history_complete_word "$@"

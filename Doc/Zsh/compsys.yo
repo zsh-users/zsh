@@ -1470,9 +1470,11 @@ tt(ALWAYS_LAST_PROMPT) option.
 )
 kindex(list, completion style)
 item(tt(list))(
-This style is used by the tt(_history_complete_word) bindable command to
-decide if the available matches should be shown.  Use the context prefix
-`tt(:completion:history-words)'.
+This style is used by the tt(_history_complete_word) bindable command.
+If it is set to `true' it has no effect, but if it is set to `false'
+the matches will not be listed, overriding the setting of the options
+that control listing behaviour, especially tt(AUTO_LIST). Use the
+context prefix `tt(:completion:history-words)'.
 )
 kindex(list-colors, completion style)
 item(tt(list-colors))(
@@ -1917,10 +1919,11 @@ the slashes.
 kindex(stop, completion style)
 item(tt(stop))(
 If set to `true', the tt(_history_complete_word) bindable
-command will always insert matches as if menu completion were started
-and will stop when the last match is inserted.  If this style is set
-to `tt(verbose)' a message will be displayed when the last match is
-reached.
+command will stop once when reaching the beginning or end of the
+history.  Invoking tt(_history_complete_word) will then wrap around to 
+the opposite end of the history.  If this style is set to `false' (the 
+default), tt(_history_complete_word) will loop immediately as in a
+menu completion.
 )
 kindex(subst-globs-only, completion style)
 item(tt(subst-globs-only))(

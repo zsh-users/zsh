@@ -1,5 +1,10 @@
 2001-03-28  Sven Wischnowsky  <wischnow@zsh.org>
 
+	* Completion/Commands/_history_complete_word,
+	13815: Doc/Zsh/compsys.yo: more cleanup; simplify the stop
+	and liststyles; try to make it obey whatever _main_complete
+	says should be done (menu-wise)
+
 	* 13814: Completion/User/_urls, Doc/Zsh/compsys.yo: replace
 	`path' with more general `urls' style
 
