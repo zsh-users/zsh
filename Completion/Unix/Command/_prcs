@@ -92,8 +92,8 @@ else
     ;;
   checkin)
     _prcs_arguments \
-      '(-r)--revison=[version of the project]:revision:' \
-      '(--revison)-r[version of the project]:revision:' \
+      '(-r)--revision=[version of the project]:revision:' \
+      '(--revision)-r[version of the project]:revision:' \
       '(-s)--skilled-merge[turn off most of the safety features of merge]' \
       '(--skilled-merge)-s[turn off most of the safety features of merge]' \
       ':project name:_prcs_projects' \
@@ -101,8 +101,8 @@ else
     ;;
   checkout)
     _prcs_arguments \
-      '(-r)--revison=[version of the project]:revision:' \
-      '(--revison)-r[version of the project]:revision:' \
+      '(-r)--revision=[version of the project]:revision:' \
+      '(--revision)-r[version of the project]:revision:' \
       '(-p)--preserve[preserve permissions on files that are checked out]' \
       '(--preserve)-p[preserve permissions on files that are checked out]' \
       "(-u)--unlink[don't overwrite symbolic link references]" \
@@ -117,8 +117,8 @@ else
     ;;
   delete)
     _prcs_arguments \
-      '(-r)--revison=[version of the project]:reversion:' \
-      '(--revison)-r[version of the project]:reversion:' \
+      '(-r)--revision=[version of the project]:reversion:' \
+      '(--revision)-r[version of the project]:reversion:' \
       ':project name:_prcs_projects'
     ;;
   depopulate)
@@ -128,7 +128,7 @@ else
     ;;
   diff)
     _prcs_arguments \
-      '*--revison=[version of the project]:revision:' \
+      '*--revision=[version of the project]:revision:' \
       '*-r[version of the project]:revision:' \
       '(-k)--keywords[compare keywords too]' \
       '(--keywords)-k[compare keywords too]' \
@@ -142,8 +142,8 @@ else
     ;;
   execute)
       _prcs_arguments \
-	'(-r)--revison=[version of the project]:reversion:' \
-	'(--revison)-r[version of the project]:reversion:' \
+	'(-r)--revision=[version of the project]:reversion:' \
+	'(--revision)-r[version of the project]:reversion:' \
 	'--pre[list directories first]' \
 	'(--pipe)--all[execute command once, with all files as arguments]' \
 	'(--all)--pipe[supply file contents as the standard input]' \
@@ -155,16 +155,16 @@ else
     ;;
   info)
     _prcs_arguments \
-      '(-r)--revison=[version of the project]:revision:' \
-      '(--revison)-r[version of the project]:revision:' \
+      '(-r)--revision=[version of the project]:revision:' \
+      '(--revision)-r[version of the project]:revision:' \
       '--sort=[set sorting type]:sorting type:(version date)' \
       ':project name:_prcs_projects' \
       '*:file or directory:_files'
     ;;
   merge)
     _prcs_arguments \
-      '(-r)--revison=[version of the project]:revision:' \
-      '(--revison)-r[version of the project]:revision:' \
+      '(-r)--revision=[version of the project]:revision:' \
+      '(--revision)-r[version of the project]:revision:' \
       '(-s)--skilled-merge[turn off most of the safety features of merge]' \
       '(--skilled-merge)-s[turn off most of the safety features of merge]' \
       "(-u)--unlink[don't overwrite symbolic link references]" \
@@ -174,8 +174,8 @@ else
     ;;
   package)
     _prcs_arguments \
-      '(-r)--revison=[version of the project]:revision:' \
-      '(--revison)-r[version of the project]:revision:' \
+      '(-r)--revision=[version of the project]:revision:' \
+      '(--revision)-r[version of the project]:revision:' \
       '(-z)--compress=[compress the output]' \
       '(--compress)-z[compress the output]' \
       ':project name:_prcs_projects' \

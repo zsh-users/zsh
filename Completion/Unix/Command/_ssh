@@ -40,7 +40,7 @@ _ssh () {
       '-N[do not execute a remote command. (protocol version 2 only)]'\
       '*-o[specify extra options]:option string:->option' \
       '-p[specify port on remote host]:port number on remote host:_ports' \
-      '-P[use non priviledged port]' \
+      '-P[use non privileged port]' \
       '-q[quiet operation]' \
       '-t[force pseudo-tty allocation]' \
       '-T[disable pseudo-tty allocation (protocol version 2 only)]'\
@@ -64,7 +64,7 @@ _ssh () {
       option)
         if compset -P '*[= ]'; then
           case "$IPREFIX" in
-          *(#i)(batchmode|compression|fallbacktorsh|forward(agent|x11)|keepalive|passwordauthentication|rhosts(|rsa)authentication|rsaauthentication|usersh|kerberos(authetication|tgtparsing)|usepriviledgedport)*)
+          *(#i)(batchmode|compression|fallbacktorsh|forward(agent|x11)|keepalive|passwordauthentication|rhosts(|rsa)authentication|rsaauthentication|usersh|kerberos(authetication|tgtparsing)|useprivileged)*)
 	    _wanted values expl 'truth value' compadd yes no && ret=0
             ;;
           *(#i)cipher*)
@@ -118,7 +118,7 @@ _ssh () {
                   ProxyCommand RemoteForward RhostsAuthentication \
                   RhostsRSAAuthentication RSAAuthentication \
                   StrictHostKeyChecking TISAuthentication \
-                  UsePriviledgedPort Protocol User UserKnownHostsFile UseRsh \
+                  UsePrivilegedPort Protocol User UserKnownHostsFile UseRsh \
                   XAuthLocation && ret=0
         fi
         ;;

@@ -79,7 +79,7 @@ findex(comptags)
 findex(comptry)
 xitem(tt(comptags))
 item(tt(comptry))(
-These implements the internals of the tags mechanism.
+These implement the internals of the tags mechanism.
 )
 findex(compvalues)
 item(tt(compvalues))(

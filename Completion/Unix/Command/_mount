@@ -101,7 +101,7 @@ if (( ! $+_fs_any )); then
       'secure[use DES encryption]'
       'grpid[inherit group id of parent directory]'
       '(acl)noacl[don'"'"'t use access control lists]'
-      '(noacl)acl[Use acces control lists for this mount]'
+      '(noacl)acl[use access control lists for this mount]'
       'noac[no attribute or directory caching]'
       'shortdev[server lack support for 32-bit device special files]'
       "$_nfs_access[@]"
@@ -178,15 +178,15 @@ if (( ! $+_fs_any )); then
       '(atime)noatime[don'"'"'t update access time]'
       'f[fake an /etc/mnttab entry]'
       'm[don'"'"'t make an /etc/mnttab entry]'
-      '(noforcedirectio)forcedirectio[do I/O synchronously]'
-      '(forcedirectio)noforcedirectio[do all I/O asynchronously]'
+      '(noforcedirection)forcedirection[do I/O synchronously]'
+      '(forcedirection)noforcedirection[do all I/O asynchronously]'
       '(nointr)intr[allow operations to be interrupted]'
       '(intr)nointr[prevent operations from being interrupted]'
       '(nolargefiles)largefiles[don'"'"' restrict file size]'
       '(largefiles)nolargefiles[restrict file size]'
       '(nologging)logging[log transactions]'
       '(logging)nologging[log transactions]'
-      'onerror[action to recover from error]:action(panic lock umout)'
+      'onerror[action to recover from error]:action(panic lock umount)'
       'quota[turn on quotas]'
       '(ro rw)rq[mount file system read-write with quotas]'
       "$_fs_s5fs[@]"
@@ -202,7 +202,7 @@ if (( ! $+_fs_any )); then
       'nrr[no rock ridge]'
       'notraildot[no trail dot when no extension]'
       'nomaplcase[don'"'"'t force lowercase]'
-      'nosiud[ignore suid and sgid bits]'
+      'nosuid[ignore suid and sgid bits]'
     )
     _fs_nfs=(
       '(fg)bg[retry in the background]'
@@ -214,7 +214,7 @@ if (( ! $+_fs_any )); then
       '(sec secure)kerberos[use kerberos authentication]'
       'noac[no attribute caching]'
       'port[server IP port number]:port:'
-      'posix[posix sematics]'
+      'posix[posix semantics]'
       'proto[specify protocol]:protocol:'\("$(grep -v '^#' /etc/netconfig 2> /dev/null | cut -d ' ' -f 1)"\)
       'public[force public file handle]'
       '(noquota)quota[enable quotas]'
@@ -226,7 +226,7 @@ if (( ! $+_fs_any )); then
       'wsize[specify write buffer size]:write buffer size:(8192)'
       '(kerberos secure)sec[set the security mode]:security mode:(sys dh krb4 none)'
       '(kerberos sec)secure[use Diffie-Hellman public key system]'
-      'vers[set NFS vesion number]:NFS version number:(2 3)'
+      'vers[set NFS version number]:NFS version number:(2 3)'
       "$_nfs_access[@]"
       "$_fs_s5fs[@]"
     ) 

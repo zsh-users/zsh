@@ -419,7 +419,7 @@ xtp)
       '-account:password:' \
       '-binary[retrieve files as binary]' \
       '-directory[list directory]' \
-      '-exclude:regualr expression for exclusion:' \
+      '-exclude:regular expression for exclusion:' \
       '-file:output file:_files' \
       '-get[get files]' \
       '-port:port: _ports' \

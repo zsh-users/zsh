@@ -857,7 +857,7 @@ _cvs_files () {
   _alternative \
     'directories:directory:_cvs_existing_directories' \
     'existing-files:file:_cvs_existing_entries' \
-    'removed-files:removed file:_cvs_nonexisting_entries'
+    'removed-files:removed file:_cvs_nonexistent_entries'
 }
 
 (( $+functions[_cvs_files_modified] )) ||
@@ -865,14 +865,14 @@ _cvs_files_modified () {
   _alternative \
     'directories:directory:_cvs_existing_directories' \
     'existing-files:file:_cvs_modified_entries' \
-    'removed-files:removed file:_cvs_nonexisting_entries'
+    'removed-files:removed file:_cvs_nonexistent_entries'
 }
 
 (( $+functions[_cvs_files_removed] )) ||
 _cvs_files_removed () {
   _alternative \
     'directories:directory:_cvs_existing_directories' \
-    'removed-files:removed file:_cvs_nonexisting_entries'
+    'removed-files:removed file:_cvs_nonexistent_entries'
 }
 
 (( $+functions[_cvs_files_unmaintained] )) ||
@@ -962,8 +962,8 @@ _cvs_nonentried_files () {
   }
 }
 
-(( $+functions[_cvs_nonexisting_entries] )) ||
-_cvs_nonexisting_entries () {
+(( $+functions[_cvs_nonexistent_entries] )) ||
+_cvs_nonexistent_entries () {
   local expl match linedir realdir files
   match=()
   : ${PREFIX:#(#b)(*/)(*)}

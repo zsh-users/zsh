@@ -2,8 +2,8 @@
 
 _arguments -s \
     '-1[disable automatic retries]' \
-    '-a[server must athenticate itself]' \
-    '-A:local adress:_hosts' \
+    '-a[server must authenticate itself]' \
+    '-A:local address:_hosts' \
     '-b:base directory:_files -/' \
     '-c:collections directory:_files -/' \
     '-d:maximum number of deleted files:' \

@@ -980,7 +980,7 @@ process IDs in the following lines.  If the line does not contain
 process IDs to complete.
 
 Note that the completion function generally has to call the command
-everytime it is called.  Because of that care should be taken to
+every time it is called.  Because of that care should be taken to
 specify only commands that take a short time to run (and that will
 eventually stop at all).
 )
@@ -3109,9 +3109,9 @@ value of 300 (to make it distinguishable from other return values)
 after setting the global `tt(context)', `tt(line)' and `tt(opt_args)'
 parameters as described below, and without resetting any changes made
 to the special parameters such as tt(PREFIX) and tt(words).  This
-allows to write wrapper functions around tt(_arguments) that have to
-be able to find out if they have to make sure that the special
-completion parameters are not reset when they return.
+enables wrapper functions around tt(_arguments) to be able to find out
+if they have to make sure that the special completion parameters are
+not reset when they return.
 
 Note that this means that a function calling tt(_arguments) with at least
 one action containing such a `tt(->)var(string)' has to declare
@@ -3466,7 +3466,7 @@ that the sequence `tt(%d)' is replaced by the var(descr) given as the third
 argument without any leading or trailing white space.  If, after
 removing the white space, the var(descr) is the empty string, the format
 style will not be used and the options put into the var(name) array will
-not contain an explantion string to be displayed above the matches.If
+not contain an explanation string to be displayed above the matches.  If
 tt(_description) is called with more than three arguments,
 the additional var(specs) should be of the form `var(char)tt(:)var(str)'
 and every appearance of `tt(%)var(char)' in the format string will be

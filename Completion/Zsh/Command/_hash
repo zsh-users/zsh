@@ -12,7 +12,7 @@ case ${service} in
     _arguments -C -s -S \
       '(-f -m -v)-r[empty hash table]' \
       '(-f -r)-m[treat arguments as patterns]' \
-      '(-f -r -m)-v[list entires as they are added]' \
+      '(-f -r -m)-v[list entries as they are added]' \
       '(-f -r -v)-L[list in the form of calls to hash]' \
       "${common_args[@]}" \
       '(-d -f -r -m -v -L)*:hash:->hashval' && return 0

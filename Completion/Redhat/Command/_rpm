@@ -181,7 +181,7 @@ _rpm () {
         '--target:specify a build target:->target'\
         '--buildroot:build root directory:_files -/' \
         '--buildarch:architecture for which to build:->target' \
-        '--buildos:ositecture for which to build:' \
+        '--buildos:operating system for which to build:' \
         '--timecheck:time check (seconds):' "$tmp[1]" && ret=0
       ;;
     sigcheck)

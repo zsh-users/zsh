@@ -16,7 +16,7 @@ if (( ! $+_telnet_args )); then
     '*\[-E\]*' '-E[disable an escape character]'
     '*\[-K\]*' '-K[no automatic login]'
     '*\[-L\]*' '-L[allow 8-Bit data on output]'
-    '*\[-N\]*' '-N[supress reverse lookup]'
+    '*\[-N\]*' '-N[suppress reverse lookup]'
     '*\[-S tos\]*' '-S+:IP type-of-service:'
     '*\[-X atype\]*' '-X+:authentication type to disable:'
     '*\[-a\]*' '-a[attempt automatic login]'

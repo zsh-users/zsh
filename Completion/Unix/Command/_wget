@@ -29,7 +29,7 @@ _arguments -C -s \
   '--spider' \
   {'(--timeout)-T+[timeout]','(-T)--timeout='}':read timeout(seconds):' \
   {'(--wait)-w+[wait]','(-w)--wait='}':wait between retrievals(seconds):' \
-  '--waitretry=:seconds to wait between retries of a retieval:' \
+  '--waitretry=:seconds to wait between retries of a retrieval:' \
   {'(--proxy --use-proxy)-Y+[proxy]','(-Y --use-proxy)--proxy=','(-Y --proxy)--use-proxy='}':proxy:(on off)' \
   {'(--quota)-Q+[quota]','(-Q)--quota='}':number:' \
   '(--force-directories)-x[force directories]' '(-x)--force-directories' \

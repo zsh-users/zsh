@@ -46,7 +46,7 @@ opre="$PREFIX"
 osuf="$SUFFIX"
 orig="$PREFIX$SUFFIX"
 
-# Special handling for menucompletion?
+# Special handling for menu completion?
 
 [[ $compstate[insert] = (*menu|[0-9]*) || -n "$_comp_correct" ||
    ( $#compstate[pattern_match] -ne 0 &&
@@ -149,8 +149,8 @@ while true; do
       if ! zstyle -t ":completion:${curcontext}:" expand suffix ||
          [[ -n "$menu" || -z "$compstate[insert]" ]]; then
 
-        # With menucompletion we add only the ambiguous component with
-        # the prefix collected and a spearator for the matches that
+        # With menu completion we add only the ambiguous component with
+        # the prefix collected and a separator for the matches that
         # have more components.
 
         tmp2="$pre$suf"

@@ -1,7 +1,7 @@
 #! /usr/local/bin/zsh
 #
 # This autoloadable function checks the folders specified as arguments
-# for new mails.  The arguments are interpeted in exactly the same way
+# for new mails.  The arguments are interpreted in exactly the same way
 # as the mailpath special zsh parameter (see zshparam(1)).
 #
 # If no arguments are given mailpath is used.  If mailpath is empty, $MAIL

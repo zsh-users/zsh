@@ -2,7 +2,7 @@
 
 [[ _matcher_num -gt 1 ]] && return 1
 
-# This completer is an example showing how menucompletion can be
+# This completer is an example showing how menu completion can be
 # implemented with the new completion system.
 # Use this one before the normal _complete completer, as in:
 #

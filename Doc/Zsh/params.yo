@@ -280,7 +280,7 @@ braces (`tt({)' and `tt(})'): they must appear either in balanced pairs or
 preceded by a backslash, and backslashes that protect parentheses or
 braces are removed during parsing.  This is because parameter expansions
 may be surrounded balanced braces, and subscript flags are introduced by
-balanced parens.
+balanced parenthesis.
 
 The second difference is that a double-quote (`tt(")') may appear as part
 of a subscript expression without being preceded by a backslash, and

@@ -1,6 +1,6 @@
 # This makes defining styles a bit simpler by using a single `+' as a
-# special token that allows to append a context name to the previously
-# used context name. Like this:
+# special token that allows one to append a context name to the
+# previously used context name. Like this:
 #
 #   zstyle+ ':foo:bar' style1 value1 \
 #         + ':baz'     style2 value2 \

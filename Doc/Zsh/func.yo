@@ -176,7 +176,7 @@ executed.  If the history mechanism is active (and the line was not
 discarded from the history buffer), the string that the user typed is
 passed as the first argument, otherwise it is an empty string.  The
 actual command that will be executed (including expanded aliases) is
-passed in two differnt forms: the second argument is a single-line,
+passed in two different forms: the second argument is a single-line,
 size-limited version of the command (with things like function bodies
 elided); the third argument contains the full text what what is being
 executed.

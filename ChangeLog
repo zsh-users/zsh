@@ -1,3 +1,24 @@
+2001-05-29  Oliver Kiddle  <opk@zsh.org>
+
+	* unposted: Completion/compdump, Completion/BSD/Command/_cvsup,
+	Completion/Base/Completer/_approximate,
+	Completion/Base/Completer/_menu, Completion/Base/Core/_tags,
+	Completion/Base/Utility/_multi_parts,
+	Completion/Base/Utility/_regex_arguments,
+	Completion/Base/Utility/_sep_parts, Completion/Redhat/Command/_rpm,
+	Completion/Unix/Command/_apm, Completion/Unix/Command/_cvs,
+	Completion/Unix/Command/_enscript,
+	Completion/Unix/Command/_imagemagick, Completion/Unix/Command/_java,
+	Completion/Unix/Command/_ls, Completion/Unix/Command/_mount,
+	Completion/Unix/Command/_pbm, Completion/Unix/Command/_perl,
+	Completion/Unix/Command/_prcs, Completion/Unix/Command/_ssh,
+	Completion/Unix/Command/_telnet, Completion/Unix/Command/_wget,
+	Completion/Unix/Type/_path_files, Completion/Zsh/Command/_bindkey,
+	Completion/Zsh/Command/_hash, Completion/Zsh/Command/_which,
+	Doc/Zsh/compsys.yo, Doc/Zsh/expn.yo, Doc/Zsh/func.yo,
+	Doc/Zsh/mod_computil.yo, Doc/Zsh/params.yo, Functions/Misc/checkmail,
+	Functions/Misc/zrecompile, Functions/Misc/zstyle+: spelling corrections
+
 2001-05-29  Bart Schaefer  <schaefer@zsh.org>
 
 	* 1454?: INSTALL: Mention "make check" and its usage.
@@ -100,7 +121,7 @@
 	accept-line-and-down-history not get tripped up by transitory
 	changes to the history data.
 
-2001-05-26  Andrej Borsenkow <bor@zsh.org>
+2001-05-26  Andrej Borsenkow  <bor@zsh.org>
 
 	* 14489: Test/C02cond.ztst: workaround for (probably) find
 	bug on ReliantUNIX made visible by 14484.
@@ -178,7 +199,7 @@
 
 	* unposted: Test/ztst.zsh: Handle line wrapping in ZTST_hashmark.
 
-2001-05-20  Andrej Borsenkow <bor@zsh.org>
+2001-05-20  Andrej Borsenkow  <bor@zsh.org>
 
 	* 14401: Makefile.in, configure.in, Config/config.mk,
 	Config/installfns.sh, Doc/Makefile.in, Src/Makefile.in,
@@ -317,7 +338,7 @@
 	* 14304: Src/hist.c: Fixed an obscure local-history bug that could
 	make the "history" command output something that was slightly wrong.
 
-2001-05-10  Andrej Borsenkow <bor@zsh.org>
+2001-05-10  Andrej Borsenkow  <bor@zsh.org>
 
 	* users/3872: Src/Modules/zftp.c: rename inet_* to avoid clash
 	with Solaris 7 headers.
@@ -450,8 +471,8 @@
 2001-05-03  Oliver Kiddle  <opk@zsh.org>
 
 	* 14216: Completion/Unix/Command/.distfiles,
-        Completion/Unix/Command/_loadkeys, Completion/Unix/Command/_lp,
-        Completion/Unix/Command/_pbm, Completion/Unix/Command/_w3m: minor
+	Completion/Unix/Command/_loadkeys, Completion/Unix/Command/_lp,
+	Completion/Unix/Command/_pbm, Completion/Unix/Command/_w3m: minor
 	completion changes
 
 2001-05-03  Sven Wischnowsky  <wischnow@zsh.org>
@@ -506,7 +527,7 @@
 	for the suffix style; if word contains only a tilde, don't try
 	to expand it
 
-2001-04-30  Andrej Borsenkow <bor@zsh.org>
+2001-04-30  Andrej Borsenkow  <bor@zsh.org>
 
 	* Bart: 14144 (modified): Src/Modules/stat.c: The S_IXUSR,
 	S_IXGRP, S_IXOTH are made external variables in Cygwin 1.3.1 and
@@ -538,10 +559,10 @@
 
 2001-04-26  Clint Adams  <clint@zsh.org>
 
-        * 14125: Src/Modules/termcap.c, Src/Modules/terminfo.c:
+	* 14125: Src/Modules/termcap.c, Src/Modules/terminfo.c:
 	remove static incleanup flag since it is not used.
 
-        * 14123: acconfig.h, configure.in, Src/Modules/termcap.c:
+	* 14123: acconfig.h, configure.in, Src/Modules/termcap.c:
 	don't include curses.h in termcap.c if term.h doesn't need it.
 
 2001-04-26  Sven Wischnowsky  <wischnow@zsh.org>
@@ -598,13 +619,13 @@
 	quotes; fail noisily rather than silently on certain illegal
 	associative array assignments; still more subscripting tests.
 
-2001-04-23  Clint Adams <schizo@debian.org>
+2001-04-23  Clint Adams  <schizo@debian.org>
 
 	* 14078: Doc/Zsh/mod_termcap.yo, Doc/Zsh/mod_terminfo.yo:
 	Document $termcap, change reference to termcap/terminfo
 	'strings' to 'values'.
 
-2001-04-23  Andrej Borsenkow <bor@zsh.org>
+2001-04-23  Andrej Borsenkow  <bor@zsh.org>
 
 	* 14077 : acconfig.h, aczsh.m4, configure.in, Config/defs.mk.in,
 	Src/Makefile.in, Src/mkmakemod.sh, Src/zsh.mdd, Src/Modules/cap.mdd,
@@ -845,11 +866,11 @@
 
 	* 13916: Src/params.c: like 13907, but for backward searches
 
-2001-04-05 Felix Rosencrantz <f_rosencrantz@yahoo.com>
+2001-04-05 Felix Rosencrantz  <f_rosencrantz@yahoo.com>
 
-        * workers/13914: Completion/Unix/Command/_java: Added call to
-        _normal after class to run is specified for java, and added
-        completion for files to extract for "jar -x". 
+	* workers/13914: Completion/Unix/Command/_java: Added call to
+	_normal after class to run is specified for java, and added
+	completion for files to extract for "jar -x".
 
 2001-04-05  Bart Schaefer  <schaefer@zsh.org>
 
@@ -1198,7 +1219,7 @@
 
 2001-03-13  Peter Stephenson  <pws@csr.com>
 
-	* 13611, 13615: Doc/Zsh/zle.yo, Src/init.c, Src/zsh.h, 
+	* 13611, 13615: Doc/Zsh/zle.yo, Src/init.c, Src/zsh.h,
 	Src/Zle/zle_keymap.c: Use termcap to find cursor sequences to
 	bind; default to VT100.  If ^[[? or ^[O? is being bound, bind
 	the other one too.  Also bind cursor keys in viins keymap.
@@ -1214,7 +1235,7 @@
 	* unposted: Completion/Commands/_complete_help: fix to declare tmp
 	as a local variable
 
-2001-03-12  Chmouel Boudjnah <chmouel@mandrakesoft.com>
+2001-03-12  Chmouel Boudjnah  <chmouel@mandrakesoft.com>
 
 	* 13605: Completion/User/_tar, Completion/User/_tar_archive: New tar
 	options -j.
@@ -1225,7 +1246,7 @@
 	filenames containing spaces in zip archives and don't complete lftp
 	from _hosts
 
-2001-03-12  Chmouel Boudjnah <chmouel@mandrakesoft.com>
+2001-03-12  Chmouel Boudjnah  <chmouel@mandrakesoft.com>
 
 	* 13601: Completion/User/_lftp: Add completion for lftp
 
@@ -1264,11 +1285,11 @@
 	* 13591: Completion/User/_init_d: try to find out the sub commands
  	to complete in _init_d
 	
-2001-03-07 Felix Rosencrantz <f_rosencrantz@yahoo.com>
+2001-03-07 Felix Rosencrantz  <f_rosencrantz@yahoo.com>
 
 	* 13590: Test/54compmatch.ztst: Added another test case
-        that covers the bug mentioned in workers/13563.  The case
-        is based on a bug mentioned in workers/13320.
+	that covers the bug mentioned in workers/13563.  The case
+	is based on a bug mentioned in workers/13320.
 
 2001-03-07  Sven Wischnowsky  <wischnow@zsh.org>
 
@@ -1277,7 +1298,7 @@
  	pointer to newly allocated heaps to avoid having to search for a
  	heap with free space in most cases
 	
-2001-03-07  Andrej Borsenkow <bor@zsh.org>
+2001-03-07  Andrej Borsenkow  <bor@zsh.org>
 
 	* unposted: configure.in, aczsh.m4: support building with
 	GCC on ReliantUNIX; use AC_TRY_COMMAND for better diagnostic
@@ -1303,7 +1324,7 @@
 	* 13575: Src/Zle/compmatch.c: another fix for completion matching,
  	CLF_MISS in the wrong cline struct
 	
-2001-03-06  Andrej Borsenkow <bor@zsh.org>
+2001-03-06  Andrej Borsenkow  <bor@zsh.org>
 
 	* 13544, 13568 (Peter): Completion/Core/_ignored,
 	Completion/Core/_main_complete, Completion/Core/_prefix,
@@ -1425,7 +1446,7 @@
 	* 13323: Functions/Zle/edit-command-line: handle
 	multi-line buffers.
 
-2001-02-13  Andrej Borsenkow <Andrej.Borsenkow@mow.siemens.ru>
+2001-02-13  Andrej Borsenkow  <Andrej.Borsenkow@mow.siemens.ru>
 
 	* 13431: aczsh.m4,configure.in,Src/Modules/termcap.c,
 	Src/Modules/termcap.mdd,Src/Modules/terminfo.c,
@@ -1468,7 +1489,7 @@
 	* 13439: Test/Makefile.in: "make test" cleans up after killed
 	tests.
 
-2001-02-02  Andrej Borsenkow <Andrej.Borsenkow@mow.siemens.ru>
+2001-02-02  Andrej Borsenkow  <Andrej.Borsenkow@mow.siemens.ru>
 
 	* unposted: Src/mkmakemod.sh: patterns in 13412 were wrong.
 
@@ -1485,22 +1506,22 @@
 
 	* 13420: Completion/User/_tin: new completion function for tin
 
-2001-01-31  Andrej Borsenkow <Andrej.Borsenkow@mow.siemens.ru>
+2001-01-31  Andrej Borsenkow  <Andrej.Borsenkow@mow.siemens.ru>
 
 	* 13412: Src/mkmakemod.sh: avoid duplicate subdirectories in
 	recursive build
 
-2001-01-29  Andrej Borsenkow <Andrej.Borsenkow@mow.siemens.ru>
+2001-01-29  Andrej Borsenkow  <Andrej.Borsenkow@mow.siemens.ru>
 
 	* unposted: ChangeLog: typo in previous commit message
 
-2001-01-28 Felix Rosencrantz <f_rosencrantz@yahoo.com>
+2001-01-28 Felix Rosencrantz  <f_rosencrantz@yahoo.com>
 
 	* 13395: Test/54compmatch.ztst, Test/comptest: Added code to
 	test compstate[insert_positions], value of insert_positions are
 	now reported
 
-2001-01-26  Andrej Borsenkow <Andrej.Borsenkow@mow.siemens.ru>
+2001-01-26  Andrej Borsenkow  <Andrej.Borsenkow@mow.siemens.ru>
 
 	* 13389: Src/builtin.c: on Cygwin convert path to posix form in
 	cd_do_chdir() to avoid dealing with drives letters
@@ -1514,7 +1535,7 @@
 	* 13384: Src/signals.c: make signal queueing variables be exported
  	to modules
 	
-2001-01-19  Andrej Borsenkow <Andrej.Borsenkow@mow.siemens.ru>
+2001-01-19  Andrej Borsenkow  <Andrej.Borsenkow@mow.siemens.ru>
 
 	* 13370 (modified): Src/params.c: do not modify environment when
 	importing it - some library functions may access it. When importing
@@ -1671,7 +1692,7 @@
 	* unposted: Src/jobs.c: rename waitjob() to zwaitjob() to avoid
 	clash with IRIX system function.
 
-2000-12-06  Andrej Borsenkow <Andrej.Borsenkow@mow.siemens.ru>
+2000-12-06  Andrej Borsenkow  <Andrej.Borsenkow@mow.siemens.ru>
 
 	* 13243: Makefile.in: we do not use Makefile in Completion and
 	Functions any more.
@@ -2010,7 +2031,7 @@
 	Completion/Core/_path_files, Doc/Zsh/compsys.yo: rename fake style
 	to fake-files
 
-2000-10-11  Andrej Borsenkow <Andrej.Borsenkow@mow.siemens.ru>
+2000-10-11  Andrej Borsenkow  <Andrej.Borsenkow@mow.siemens.ru>
 
 	* 12958: Cosmo <cosmo@informix.com>: aczsh.m4: fix for NCR compiler
 
@@ -2156,7 +2177,7 @@
 	Completion/Core/_expand, Doc/Zsh/compsys.yo: Change the way the
 	completers are selected for _expand_word; clarify and update doc.
 
-2000-09-20  Andrej Borsenkow <Andrej.Borsenkow@mow.siemens.ru>
+2000-09-20  Andrej Borsenkow  <Andrej.Borsenkow@mow.siemens.ru>
 
 	* 12848: Doc/Zsh/zle.yo: Alphabetize list of parameters
 
@@ -2174,7 +2195,7 @@
 
 	* 12845: Src/Modules/files.c: dynamically allocate pbuf in domove().
 
-2000-09-18  Andrej Borsenkow <Andrej.Borsenkow@mow.siemens.ru>
+2000-09-18  Andrej Borsenkow  <Andrej.Borsenkow@mow.siemens.ru>
 
 	* 12835: Doc/Zsh/compwid.yo: Alphabetize list of special parameters
 
@@ -2247,7 +2268,7 @@
 	* 12793: Completion/Builtins/_zle, Doc/Zsh/compwid.yo,
 	Doc/Zsh/mod_zle.yo: Convert _zle to use _arguments; fix typos.
 
-2000-09-08  Andrej Borsenkow <Andrej.Borsenkow@mow.siemens.ru>
+2000-09-08  Andrej Borsenkow  <Andrej.Borsenkow@mow.siemens.ru>
 
 	* 12779: Src/system.h: Comment out #define _XPG_IV for sinix.
 	It was not correct to set it here, and is not needed with
@@ -2280,7 +2301,7 @@
 	* 12762: Akinori MUSHA: configure.in, Completion/Bsd/_kld:
 	changes for new FreeBSD releases.
 
-2000-09-06  Andrej Borsenkow <Andrej.Borsenkow@mow.siemens.ru>
+2000-09-06  Andrej Borsenkow  <Andrej.Borsenkow@mow.siemens.ru>
 
 	* 12761: Doc/ztexi.yo: `` was converted into " by makeinfo;
 	use `@:` instead. In line, use `{}` for tex, this looks better
@@ -2318,7 +2339,7 @@
 	* 12741: Src/math.c: problem with nested matheval unexpectedly
 	stomping on outputradix.
 
-2000-09-04  Andrej Borsenkow <Andrej.Borsenkow@mow.siemens.ru>
+2000-09-04  Andrej Borsenkow  <Andrej.Borsenkow@mow.siemens.ru>
 
 	* 12736: configure.in: Fix `make install' dependency
 	for Cygwin static build
@@ -2630,10 +2651,10 @@
 
 2000-08-02  Clint Adams  <schizo@debian.org>
 
-        * 12489: Src/Modules/files.c, Src/Modules/parameter.c: check
+	* 12489: Src/Modules/files.c, Src/Modules/parameter.c: check
 	errno change from pathconf() in case of unlimited path length.
 
-        * 12472: configure.in, Src/Modules/files.c,
+	* 12472: configure.in, Src/Modules/files.c,
 	Src/Modules/parameter.c: use pathconf() instead
 	of PATH_MAX if possible.
 
@@ -2687,7 +2708,7 @@
  	select= and yes= may be given both a number and one of the long*
  	values at the same time
 
-2000-07-30  Andrew Main <zefram@zsh.org>
+2000-07-30  Andrew Main  <zefram@zsh.org>
 
 	* 12436: Doc/Zsh/invoke.yo, Src/init.c: Make -b behave like
 	the csh -b, permitting more options to be stacked after it and
@@ -2695,7 +2716,7 @@
 	consistent with all the other single-letter options, rather than
 	having a clashing check of emulation type.
 
-2000-07-30  Andrew Main <zefram@zsh.org>
+2000-07-30  Andrew Main  <zefram@zsh.org>
 
 	* 12434: Doc/Zsh/invoke.yo, Src/init.c, Src/options.c, Src/zsh.h,
 	Src/zsh.mdd: Allow options to be specified on the zsh command line

@@ -4,7 +4,7 @@ local prev
 
 # A `--' as the first argument says that we should tell comptags to use
 # the preceding function nesting level. This is only documented here because
-# if everythings goes well, users won't have to worry about it and should
+# if everything goes well, users won't have to worry about it and should
 # not mess with it.
 
 if [[ "$1" = -- ]]; then

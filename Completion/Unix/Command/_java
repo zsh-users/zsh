@@ -54,7 +54,7 @@ javadoc)
     '-overview[specify overview file]:_files' \
     '-public[display public classes and members only]' \
     '-protected[display public/protected classes and members only (default)]' \
-    '-package[display pacages, public/protected classes and members only]' \
+    '-package[display packages, public/protected classes and members only]' \
     '-private[display all classes and members]' \
     '-help[print help message]' \
     '-doclet[specify a doclet]:doclet:->doclet' \
@@ -195,7 +195,7 @@ rmiregistry)
 
 rmid)
   _arguments \
-    '-C-[specify command line argument for child process]:comand line argument for child process:' \
+    '-C-[specify command line argument for child process]:command line argument for child process:' \
     '-log[specify log directory]:directory to place logs:_files -/' \
     '-port[specify port]:port:_ports' \
     '-stop[stop rmid]:' && return 0
@@ -513,7 +513,7 @@ class|doclet)
 
 docsrc)
   if compset -P @; then
-    _wanted files expl 'pacakge/source list file' _files
+    _wanted files expl 'package/source list file' _files
   else
     _wanted files expl 'package or source' _files -g '*.java'
   fi

@@ -103,7 +103,7 @@ _arguments -C -s \
   '--color=-:use color:(false true)' \
   '--download-font=:fontname:' \
   '--filter-stdin=:stdin name:(-)' \
-  '--h-column-height=:holizontal column height:' \
+  '--h-column-height=:horizontal column height:' \
   '--help' \
   '--help-pretty-print' \
   '--highlight-bar-gray=:gray level:' \

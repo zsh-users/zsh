@@ -15,7 +15,7 @@
 #   -q: Be quiet, i.e.: only set the return status.
 #   -p: If this is given, the arguments are interpreted differently:
 #       they should form one or more sets of arguments for zcompile,
-#       seperated by `--'. For example:
+#       separated by `--'. For example:
 #
 #         zrecompile -p \
 #                    -R ~/.zshrc -- \

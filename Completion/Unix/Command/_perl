@@ -24,7 +24,7 @@ _perl () {
     "-P[run script through C preprocessor before compilation]" \
     "-s[enable some switch parsing for switches after script name]" \
     "-S[look for the script using PATH environment variable]" \
-    "-T[turn on tainting checks]" \
+    "-T[turn on tainted checks]" \
     "-u[dump core after parsing script]" \
     "-U[allow unsafe operations]" \
     "-v[print version number, patchlevel plus VERY IMPORTANT perl info]" \

@@ -116,7 +116,7 @@ while [[ $# -gt 0 && "$str" == *${1}* ]]; do
     PREFIX="$str"
   fi
 
-  # We incrementally add suffixes by appending to them the seperators
+  # We incrementally add suffixes by appending to them the separators
   # and the strings from the next array that match the pattern we built.
 
   arr="$2"

@@ -9,7 +9,7 @@ cargs=( \
   '-s[print symlink free path as well]' \
   '*:commands:->command' )
 farg='-f[output contents of functions]'
-aarg='-a[print all occurences in path]'
+aarg='-a[print all occurrences in path]'
 
 case ${service} in
   whence)

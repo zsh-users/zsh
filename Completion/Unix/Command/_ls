@@ -51,8 +51,8 @@ arguments=( \
   '(--sort -S -U -v -X)-t[sort by time]' \
   '(--sort -S -t -v -X)-U[no sort]' \
   '(--sort -S -t -U -X)-v[sort by version]' \
-  '(--sort -S -t -U -v)-X[sort by extention]' \
-  '(-S -t -U -v -X)--sort=:sort:(size time none version extention)' \
+  '(--sort -S -t -U -v)-X[sort by extension]' \
+  '(-S -t -U -v -X)--sort=:sort:(size time none version extension)' \
   \
   '--color=-::color:(never always auto)' \
   \

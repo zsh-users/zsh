@@ -128,7 +128,7 @@ fi
 
 # Check if we have to skip over sequences of slashes. The value of $skips
 # is used below to match the pathname components we always have to accept
-# immediatly.
+# immediately.
 
 if zstyle -t ":completion:${curcontext}:paths" squeeze-slashes; then
   skips='((.|..|)/)##'
@@ -174,7 +174,7 @@ if [[ -n "$compstate[pattern_match]" &&
 fi
 
 # We get the prefix and the suffix from the line and save the whole
-# original string. Then we see if we will do menucompletion.
+# original string. Then we see if we will do menu completion.
 
 pre="$PREFIX"
 suf="$SUFFIX"
@@ -469,8 +469,8 @@ for prepath in "$prepaths[@]"; do
     # enough to handle multiple components with patterns.
 
     if (( tmp4 )); then
-      # It is. For menucompletion we now add the possible completions
-      # for this component with the unambigous prefix we have built
+      # It is. For menu completion we now add the possible completions
+      # for this component with the unambiguous prefix we have built
       # and the rest of the string from the line as the suffix.
       # For normal completion we add the rests of the filenames
       # collected as the suffixes to make the completion code expand

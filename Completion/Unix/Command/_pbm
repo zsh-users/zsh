@@ -554,7 +554,7 @@ ppmforge)
              '-mesh:FFT mesh size:' '-power:elevations power factor:' \
              '-glaciers:glacier elevation:' '-ice:polar ice cap extent:' \
              '-saturation:star color saturation:' \
-             '-seed:randum number seed:' \
+             '-seed:random number seed:' \
              '-stars:minimum star pixel percentage:' \
  	     '(-xsize)-width:width:'   '(-width)-xsize:width:' \
  	     '(-ysize)-height:height:' '(-height)-ysize:height:'

@@ -2,7 +2,7 @@
 
 # This code will try to correct the string on the line based on the
 # strings generated for the context. These corrected strings will be
-# shown in a list and one can cycle through them as in a menucompletion
+# shown in a list and one can cycle through them as in a menu completion
 # or get the corrected prefix.
 
 # We don't try correction if the string is too short or we have tried it

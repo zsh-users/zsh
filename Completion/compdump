@@ -36,7 +36,7 @@ fi
 print "#files: $#_d_files" > $_d_file
 
 # First dump the arrays _comps, _services and _patcomps.  The quoting
-# hieroglyphyics ensure that a single quote inside a variable is itself
+# hieroglyphics ensure that a single quote inside a variable is itself
 # correctly quoted.
 
 print "_comps=(" >> $_d_file
