@@ -1,3 +1,8 @@
+2000-09-04  Andrej Borsenkow <Andrej.Borsenkow@mow.siemens.ru>
+
+	* 12736: configure.in: Fix `make install' dependency
+	for Cygwin static build
+
 2000-09-04  Peter Stephenson  <pws@csr.com>
 
 	* Config/version.mk: 3.1.9-dev-6

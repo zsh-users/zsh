@@ -1463,6 +1463,8 @@ dnl ---------------
 dnl dynamic loading
 dnl ---------------
 L=N
+INSTLIB="install.bin-\$(L)"
+UNINSTLIB="uninstall.bin-\$(L)"
 LINKMODS=NOLINKMODS
 MOD_EXPORT=
 MOD_IMPORT_VARIABLE=
@@ -1687,6 +1689,10 @@ if test "x$dynamic" = xyes; then
   if $strip_libldflags && test "$zsh_cv_sys_dynamic_strip_lib" = yes; then
     LIBLDFLAGS="$LIBLDFLAGS -s"
   fi
+  if test "x$ac_cv_cygwin" = xyes; then
+    INSTLIB="install.cygwin-lib"
+    UNINSTLIB="uninstall.cygwin-lib"
+  fi
 else
   $strip_exeldflags && EXELDFLAGS="$EXELDFLAGS -s"
   $strip_libldflags && LIBLDFLAGS="$LIBLDFLAGS -s"
@@ -1714,13 +1720,6 @@ else
 fi
 AC_SUBST(SHORTBOOTNAMES)
 
-if test "x$ac_cv_cygwin" = xyes; then
-  INSTLIB="install.cygwin-lib"
-  UNINSTLIB="uninstall.cygwin-lib"
-else
-  INSTLIB="install.bin-\$(L)"
-  UNINSTLIB="uninstall.bin-\$(L)"
-fi
 AC_SUBST(INSTLIB)dnl
 AC_SUBST(UNINSTLIB)dnl
 
