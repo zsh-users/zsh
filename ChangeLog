@@ -1,3 +1,10 @@
+2004-02-13  Oliver Kiddle  <opk@zsh.org>
+
+	* 19418: Completion/Linux/Command/_modutils,
+	Completion/Unix/Command/_lzop, Completion/Unix/Command/_perldoc,
+	Completion/Unix/Command/_vorbis, Completion/X/Command/_mozilla,
+	Completion/X/Command/_nedit: update completions for new versions
+
 2004-02-12  Doug Kearns  <djkea2@mugca.its.monash.edu.au>
 
 	* unposted: Completion/X/Command/_acroread: capitalize PDF

@@ -10,20 +10,22 @@ nedit_common=(
   '-do[execute macro or action commands]:macro command'
   '-lm[specify language mode]:language mode:->lang'
   '-svrname[name the server]:nedit server name'
-  '(-noiconic)-iconic[set initial window state to iconic]'
+  '(-noiconic -icon -iconic)'{-icon,-iconic}'[set initial window state to iconic]'
   '(- *)'{-V,-version}'[display version information]'
   '*-xrm:resource:_x_resource'
   '*:file:_files'
 )
 
 if [[ $service = nc ]]; then
-  _x_arguments -C \
+  _x_arguments -C -S \
     '(-noask)-ask[prompt if no server found]' \
     '(-ask)-noask[start a new server without asking if none found]' \
+    "-wait[don't return to the shell until all files given are closed]" \
+    '-timeout[timeout period when talking to server]:timeout (seconds)' \
     '-svrcmd[command to run server]:server command:_command_names -e' \
     "$nedit_common[@]" && ret=0
 else
-  _x_arguments -C \
+  _x_arguments -C -S \
     '-server[designate this session as an nedit server]' \
     '-tags[load ctags file]:tags file:_files' \
     '-tabs[specify tab width in characters]:tab width' \

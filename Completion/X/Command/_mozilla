@@ -1,4 +1,4 @@
-#compdef mozilla mozilla-firebird mozilla-xremote-client
+#compdef mozilla mozilla-firefox mozilla-xremote-client
 
 local curcontext="$curcontext" state line ret=1 suf
 typeset -A opt_args

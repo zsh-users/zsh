@@ -4,42 +4,23 @@ local expl state line decompress disp curcontext="$curcontext" sep ret=1
 typeset -A opt_args
 
 _arguments -C -s \
-  '(--to-stdout --stdout)-c[write on standard output]' \
-  '(-c --stdout)--to-stdout[write on standard output]' \
-  '(-c --to-stdout)--stdout[write on standard output]' \
-  '(--decompress --uncompress -x -extract)-d[decompress]' \
-  '(-d --uncompress -x -extract)--decompress[decompress]' \
-  '(-d --decompress -x -extract)--uncompress[decompress]' \
-  '(--extract -d --decompress --uncompress -n --name -p --path)-x[extract]' \
-  '(-x -d --decompress --uncompress -n --name -p --path)-x[extract]' \
-  '(--force)-f[force overwrite]' \
-  '(-f)--force[force overwrite]' \
-  '(--help -H)-h[display help message]' \
-  '(-h -H)--help[display help message]' \
-  '(-h --help)-H[display help message]' \
-  '(--list)-l[list compressed file contents]' \
-  '(-l)--list[list compressed file contents]' \
-  '(--license)-L[display software license]' \
-  '(-L)--license[display software license]' \
-  '(--no-name -N --name)-n[do not save or restore the original name and time stamp]' \
-  '(-n -N --name)--no-name[do not save or restore the original name and time stamp]' \
-  '(--name -n --no-name)-N[save or restore the original name and time stamp]' \
-  '(-N -n --no-name)--name[save or restore the original name and time stamp]' \
+  '(-c --stdout --to-stdout)'{-c,--stdout,--to-stdout}'[write on standard output]' \
+  '(-d --decompress --uncompress -x -extract)'{-d,--decompress,--uncompress}'[decompress]' \
+  '(-x --extract -d --decompress --uncompress -n --name -p --path)'{-x,--extract}'[extract]' \
+  '(-f --force)'{-f,--force}'[force overwrite]' \
+  '(- *)'{-h,-H,--help}'[display help information]' \
+  '(-l --list)'{-l,--list}'[list compressed file contents]' \
+  '(-L --license)'{-L,--license}'[display software license]' \
+  '(-n --no-name -N --name)'{-n,--no-name}'[do not save or restore the original name and time stamp]' \
+  '(-N --name -n --no-name)'{-N,--name}'[save or restore the original name and time stamp]' \
   '--no-mode[do not restore original mode]' \
   '--no-time[do not restore original time stamp]' \
-  '(--quiet --silent)-q[suppress all warnings]' \
-  '(-q --silent)--quiet[suppress all warnings]' \
-  '(-q --quiet)--silent[suppress all warnings]' \
-  '(--recursive)-r[operate recursively on directories]' \
-  '(-r)--recursive[operate recursively on directories]' \
-  '(--suffix)-S+[specify suffix for compressed files]:suffix:' \
-  '(-S)--suffix=[specify suffix for compressed files]:suffix:' \
-  '(--test)-t[test compressed file integrity]' \
-  '(-t)--test[test compressed file integrity]' \
-  '*-v[verbose mode]' \
-  '*--verbose[verbose mode]' \
-  '(--version)-V[display version number]' \
-  '(-V)--version[display version number]' \
+  '(-q --quiet --silent)'{-q,--quiet,--silent}'[suppress all warnings]' \
+  '(-r --recursive)'{-r,--recursive}'[operate recursively on directories]' \
+  '(-S --suffix)'{-S+,--suffix=}'[specify suffix for compressed files]:suffix' \
+  '(-t --test)'{-t,--test}'[test compressed file integrity]' \
+  \*{-v,--verbose}'[verbose mode]' \
+  '(- *)'{-V,--version}'[display version number]' \
   '(       -1 -2 -3 -4 -5 -6 -7 -8 -9 --best)--fast' \
   '(--fast    -2 -3 -4 -5 -6 -7 -8 -9 --best)-1' \
   '(--fast -1    -3 -4 -5 -6 -7 -8 -9 --best)-2' \
@@ -53,19 +34,12 @@ _arguments -C -s \
   '(--fast -1 -2 -3 -4 -5 -6 -7 -8 -9       )--best' \
   '--ls=[list each compressed file in a format similar to ls -ln]:ls flag:->flags' \
   '--info[list internal header fields for each compressed file]' \
-  '(--sysinfo)-I[display information about the system]' \
-  '(-I)--sysinfo[display information about the system]' \
-  '(--outfile)-o[specify output file]:output file:_files' \
-  '(-o)--outfile=[specify output file]:output file:_files' \
-  '(--path)-p[write output files to specified directory]:directory:_files -/' \
-  '(-p)--path=[write output files to specified directory]:directory:_files -/' \
-  '(--no-checksum)-F[do not store or verify a checksum]' \
-  '(-F)--no-checksum[do not store or verify a checksum]' \
-  "(--keep -U --unlink --delete)-k[keep (don't delete) input files]" \
-  "(-k -U --unlink --delete)--keep[keep (don't delete) input files]" \
-  '(--unlink --delete)-U[delete input files]' \
-  '(-U --delete)--unlink[delete input files]' \
-  '(-U --unlink)--delete[delete input files]' \
+  '(-I --sysinfo)'{-I,--sysinfo}'[display information about the system]' \
+  '(-o --outfile)'{-o,--outfile=}'[specify output file]:output file:_files' \
+  '(-p --path)'{-p,--path=}'[write output files to specified directory]:directory:_files -/' \
+  '(-F --no-checksum)'{-F,--no-checksum}'[do not store or verify a checksum]' \
+  '(-k --keep -U --unlink --delete)'{-k,--keep}"[keep (don't delete) input files]" \
+  '(-U --unlink --delete)'{-U,--unlink,--delete}'[delete input files]' \
   '--no-stdin[do not try to read stdin]' \
   '--no-warn[suppress all warnings]' \
   '--ignore-warn[suppress all warnings and never exit with status 2]' \
@@ -86,15 +60,14 @@ case "$state" in
       _files "$expl[@]" -g '*.[tl]zo(-.)' && ret=0
     else
       _description files expl 'file to compress'
-      _files "$expl[@]" -g '*~*.[tl]zo(-.)' && ret=0
-
+      _files "$expl[@]" -g '^*.[tl]zo(-.)' && ret=0
     fi
   ;;
   flags)
     zstyle -s ":completion:${curcontext}:flags" list-separator sep || sep=--
-    disp=( \
-      "F $sep Append a \`*' for executable files" \
-      "G $sep Inhibit display of group information" \
+    disp=(
+      "F $sep Append a \`*' for executable files"
+      "G $sep Inhibit display of group information"
       "Q $sep Enclose file names in double quotes" )
     disp=( ${disp[@]:#[Z$PREFIX]*} )
     compset -P '[FGQ]*'

@@ -1,23 +1,59 @@
-#compdef perldoc
-#
-# _perldoc - zsh completion function for perldoc
-#
-# Adam Spiers <adam@spiers.net>
-#
+#compdef perldoc -value-,PERLDOC,-default-
 
-_perldoc () {
-  _arguments -s \
-    '-h:help:' \
-    '(-q)-f:Perl built-in function:_perl_builtin_funcs:*:' \
-    '(-f)-q:Perl FAQ keyword:' \
-    '*:Perl pod pages:_perl_pods'
-}
+local curcontext="$curcontext" state line expl args ret=1
+typeset -A opt_args
 
-_perl_pods () {
-  _alternative \
-    'modules:: _perl_modules' \
-    'pods:: _perl_basepods' \
-    'files:Perl modules and .pods:_files -g "*.(pod|pm)(-.)"'
-}
+args=( '*:Perl pod pages:->perl-pods' )
 
-_perldoc "$@"
+if [[ $service = *PERLDOC* ]]; then
+  compset -q
+  words=( fake "$words[@]" )
+  (( CURRENT++ ))
+  args=()
+fi
+
+_arguments -C -s -S -A "-*" \
+  '(- *)-h[print help information]' \
+  '(- *)-V[display version information]' \
+  '-v[verbose output]' \
+  '-t[use plain text output instead of nroff]' \
+  '-u[show raw Pod source]' \
+  '*-m[display entire module]:module:_perl_modules' \
+  '-l[display only filename of the module found]' \
+  '-F[consider arguments as filenames]' \
+  '(-q)-f+[view documentation for Perl built-in function]:perl builtin function:->perl-builtin-funcs' \
+  '(-f)-q+[search question headings in Perl FAQ]:regular expression' \
+  '(-d)-T[send output direct to stdout and not via pager]' \
+  '(-T)-d+[specify output file]:output file:_files' \
+  '-o+[specify output format]:output format:(man nroff pod rtf text tk xml latex)' \
+  '-M[specifies module to use for formatting]:module:_perl_modules' \
+  '-w[specify option to formatter]:option' \
+  '-X[use an index if present]' \
+  '-n+[specify replacement for nroff]:nroff replacement:_command_names -e' \
+  '-r[recursive search]' \
+  '-i[ignore case]' \
+  "$args[@]" && ret=0
+
+case  $state in
+  perl-builtin-funcs)
+    : ${(A)_perl_builtin_funcs:=${(u)${${(M)${(f)"$(_call_program functions \
+	perldoc -u perlfunc 2>/dev/null)"}:#\=item [a-z]*}#* }%%[^a-z]*}}
+
+    _wanted functions expl 'perl built-in function' compadd "$@" -a - \
+	_perl_builtin_funcs && ret=0
+  ;;
+
+  perl-pods)
+    if (( $+opt_args[-F] )); then
+      _wanted files expl 'Perl modules and .pods' \
+          _files -g "*.(pod|pm)(-.)" && ret=0
+    else
+      _alternative \
+	'modules:: _perl_modules' \
+	'pods:: _perl_basepods' \
+	'files:Perl modules and .pods:_files -g "*.(pod|pm)(-.)"' && ret=0
+    fi
+  ;;
+esac
+
+return ret
