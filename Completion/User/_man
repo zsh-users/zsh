@@ -1,4 +1,4 @@
-#compdef man
+#compdef man apropos whatis
 
 setopt localoptions rcexpandparam extendedglob
 
