@@ -11,6 +11,10 @@ if (( $tmp[(I)-g*] )); then
   glob="${${${${(@M)tmp:#-g*}#-g}##[[:blank:]]#}%%[[:blank:]]#}"
   [[ "$glob" = *[^\\][[:blank:]]* ]] &&
       glob="{${glob//(#b)([^\\])[[:blank:]]##/${match[1]},}}"
+
+  # add `#q' to the beginning of any glob qualifier if not there already
+  [[ "$glob" = (#b)(*\()([^\|\~]##\)) && $match[2] != \#q* ]] &&
+      glob="${match[1]}#q${match[2]}"
 fi
 tmp=$opts[(I)-F]
 if (( tmp )); then
