@@ -32,7 +32,7 @@
 
 /* parameters */
 
-static long intparam;
+static zlong intparam;
 static char *strparam;
 static char **arrparam;
 
@@ -55,7 +55,11 @@ bin_example(char *nam, char **args, char *ops, int func)
 	fputs(*args, stdout);
     }
     printf("\nName: %s\n", nam);
+#ifdef ZSH_64_BIT_TYPE
+    printf("\nInteger Parameter: %s\n", output64(intparam));
+#else
     printf("\nInteger Parameter: %ld\n", intparam);
+#endif
     printf("String Parameter: %s\n", strparam ? strparam : "");
     printf("Array Parameter:");
     if (p)
@@ -76,10 +80,10 @@ bin_example(char *nam, char **args, char *ops, int func)
 static int
 cond_p_len(char **a, int id)
 {
-    char *s1 = cond_str(a, 0);
+    char *s1 = cond_str(a, 0, 0);
 
     if (a[1]) {
-	long v = cond_val(a, 1);
+	zlong v = cond_val(a, 1);
 
 	return strlen(s1) == v;
     } else {
@@ -91,7 +95,7 @@ cond_p_len(char **a, int id)
 static int
 cond_i_ex(char **a, int id)
 {
-    char *s1 = cond_str(a, 0), *s2 = cond_str(a, 1);
+    char *s1 = cond_str(a, 0, 0), *s2 = cond_str(a, 1, 0);
 
     return !strcmp("example", dyncat(s1, s2));
 }
