@@ -1,3 +1,8 @@
+2000-04-28  Bart Schaefer  <schaefer@zsh.org>
+
+	* 11015: Src/builtin.c, Src/hashtable.c, Src/signals.c:
+	`unfunction TRAPxxx' now works with localtraps in effect.
+
 2000-04-28  Peter Stephenson  <pws@cambridgesiliconradio.com>
 
 	* pws: 11013: Completion/Core/compinstall: more breaks and

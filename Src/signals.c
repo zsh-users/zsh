@@ -670,6 +670,7 @@ dosavetrap(int sig, int level)
 	st->list = sigfuncs[sig];
 	sigfuncs[sig] = NULL;
     }
+    noerrs = !!st->list;
     if (!savetraps)
 	savetraps = znewlinklist();
     /*
@@ -726,11 +727,22 @@ settrap(int sig, Eprog l)
 void
 unsettrap(int sig)
 {
+    int ne = noerrs;
+    HashNode hn = removetrap(sig);
+    noerrs = ne;
+    if (hn)
+	shfunctab->freenode(hn);
+}
+
+/**/
+HashNode
+removetrap(int sig)
+{
     int trapped;
 
     if (sig == -1 ||
 	(jobbing && (sig == SIGTTOU || sig == SIGTSTP || sig == SIGTTIN)))
-	return;
+	return NULL;
 
     trapped = sigtrapped[sig];
     /*
@@ -743,7 +755,7 @@ unsettrap(int sig)
 	dosavetrap(sig, locallevel);
 
     if (!trapped)
-        return;
+        return NULL;
 
     sigtrapped[sig] = 0;
     if (sig == SIGINT && interact) {
@@ -769,19 +781,19 @@ unsettrap(int sig)
      */
     if (trapped & ZSIG_FUNC) {
 	char func[20];
-	HashNode hn;
 
 	sprintf(func, "TRAP%s", sigs[sig]);
 	/*
 	 * As in dosavetrap(), don't call removeshfuncnode() because
 	 * that calls back into unsettrap();
 	 */
-	if ((hn = removehashnode(shfunctab, func)))
-	    shfunctab->freenode(hn);
+	return removehashnode(shfunctab, func);
     } else if (sigfuncs[sig]) {
 	freeeprog(sigfuncs[sig]);
 	sigfuncs[sig] = NULL;
     }
+
+    return NULL;
 }
 
 /**/

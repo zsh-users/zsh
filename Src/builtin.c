@@ -2592,12 +2592,14 @@ bin_unhash(char *name, char **argv, char *ops, int func)
 
     /* Take arguments literally -- do not glob */
     for (; *argv; argv++) {
+	int ne = noerrs;
 	if ((hn = ht->removenode(ht, *argv))) {
 	    ht->freenode(hn);
 	} else {
 	    zwarnnam(name, "no such hash table element: %s", *argv, 0);
-	    returnval = 1;
+	    returnval |= !noerrs;
 	}
+	noerrs = ne;
     }
     return returnval;
 }

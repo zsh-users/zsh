@@ -788,12 +788,12 @@ removeshfuncnode(HashTable ht, char *nam)
 {
     HashNode hn;
 
-    if ((hn = removehashnode(shfunctab, nam))) {
-	if (!strncmp(hn->nam, "TRAP", 4))
-	    unsettrap(getsignum(hn->nam + 4));
-	return hn;
-    } else
-	return NULL;
+    if (!strncmp(nam, "TRAP", 4))
+	hn = removetrap(getsignum(nam + 4));
+    else
+	hn = removehashnode(shfunctab, nam);
+
+    return hn;
 }
 
 /* Disable an entry in the shell function hash table.    *
@@ -822,11 +822,10 @@ static void
 enableshfuncnode(HashNode hn, int flags)
 {
     Shfunc shf = (Shfunc) hn;
-    int signum;
 
     shf->flags &= ~DISABLED;
     if (!strncmp(shf->nam, "TRAP", 4)) {
-	signum = getsignum(shf->nam + 4);
+	int signum = getsignum(shf->nam + 4);
 	if (signum != -1) {
 	    settrap(signum, shf->funcdef);
 	    sigtrapped[signum] |= ZSIG_FUNC;
