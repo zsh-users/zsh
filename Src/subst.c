@@ -1015,7 +1015,7 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int ssub)
 		spbreak = 0;
 		s++;
 	    } else
-		spbreak = 1;
+		spbreak = 2;
 	} else if ((c == '#' || c == Pound) &&
 		   (iident(cc = s[1])
 		    || cc == '*' || cc == Star || cc == '@'
@@ -1414,8 +1414,6 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int ssub)
 		    if (spsep || spbreak) {
 			aval = sepsplit(val, spsep, 0, 1);
 			isarr = 2;
-			sep = spsep = NULL;
-			spbreak = 0;
 			l = arrlen(aval);
 			if (l && !*(aval[l-1]))
 			    l--;
@@ -1456,10 +1454,12 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int ssub)
 		if (isarr) {
 		  if (nojoin)
 		    isarr = -1;
-		  if (qt && !getlen && isarr > 0) {
+		  if (qt && !getlen && isarr > 0 && !spsep && spbreak < 2) {
 		    val = sepjoin(aval, sep, 1);
 		    isarr = 0;
 		  }
+		  sep = spsep = NULL;
+		  spbreak = 0;
 		}
 	    }
 	    break;

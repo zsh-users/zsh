@@ -1,9 +1,13 @@
+2001-02-16  Bart Schaefer  <schaefer@zsh.org>
+
+	* 13495: Follow-up to 13492 to un-break "${(A)=foo=$@}".
+
 2001-02-16  Sven Wischnowsky  <wischnow@zsh.org>
 
 	* 13494: Completion/Core/compinit: make `compdef foo=bar' use the
  	service defined for `bar' if there is any
 	
-2001-02-16  Bart Schaefer  <schaefer@brasslantern.com>
+2001-02-16  Bart Schaefer  <schaefer@zsh.org>
 
 	* 13492: Src/subst.c: Partial fix for ${1+"$@"} expanding to
 	an array (still doesn't handle shwordsplit properly); fix so
