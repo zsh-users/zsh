@@ -329,7 +329,7 @@ read and checked for syntax errors, but not executed.
 )
 pindex(EXTENDED_GLOB)
 cindex(globbing, extended)
-item(tt(EXTENDED_GLOB))(
+item(tt(EXTENDED_GLOB) <Z>)(
 Treat the `tt(#)', `tt(~)' and `tt(^)' characters as part of patterns
 for filename generation, etc.  (An initial unquoted `tt(~)'
 always produces named directory expansion.)
@@ -982,7 +982,7 @@ If this option is set the shell tries to interpret single letter options
 This also affects the value of the tt(-) special parameter.
 )
 pindex(SHORT_LOOPS)
-item(tt(SHORT_LOOPS) <D>)(
+item(tt(SHORT_LOOPS) <C> <Z>)(
 Allow the short forms of tt(for), tt(select),
 tt(if), and tt(function) constructs.
 )
