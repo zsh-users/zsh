@@ -9,7 +9,8 @@ case $service in
     _arguments -C -s \
       '-f[freshen: only changed files]' \
       '-d[delete entries in zipfile]' \
-      '-R[recurse into directories]' \
+      '-r[recurse into directories]' \
+      '-R[PKZIP recursion]' \
       '-q[quiet operation]' \
       '-c[add one-line comments]' \
       '-b[use "path" for temp file]:path for temporary archive:_files -/' \
