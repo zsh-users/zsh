@@ -1,3 +1,8 @@
+2004-03-22  Clint Adams  <clint@zsh.org>
+
+	* 19673: Peter Palfrader: Completion/Unix/Command/_cvs:
+	tags can contain the + character.
+
 2004-03-22  Peter Stephenson  <pws@pwstephenson.fsnet.co.uk>
 
 	* 19669, 19670: Danek Duvall: Completion/compaudit: Use of

@@ -794,7 +794,7 @@ _cvs_revisions() {
       _cvs_revisions_cache=(
 	$(CVS_IGNORE_REMOTE_ROOT= _call_program tags cvs -d "$cvsroot" -q status -vl .|
 	  sed -n -e '/No Tags Exist/d' \
-		 -e 's/^	\([A-Za-z][-_0-9A-Za-z]*\).*/\1/p'|
+		 -e 's/^	\([A-Za-z][-_0-9A-Za-z+]*\).*/\1/p'|
 	  sort|uniq)
       )
     else
