@@ -1913,13 +1913,11 @@ CLEAN_MK="${srcdir}/Config/clean.mk"
 CONFIG_MK="${srcdir}/Config/config.mk"
 dnl defs.mk is in the build tree, not the source tree
 DEFS_MK="Config/defs.mk"
-FUNCINST_MK="${srcdir}/Config/funcinst.mk"
 VERSION_MK="${srcdir}/Config/version.mk"
 
 AC_SUBST_FILE(CLEAN_MK)dnl
 AC_SUBST_FILE(CONFIG_MK)dnl
 AC_SUBST_FILE(DEFS_MK)dnl
-AC_SUBST_FILE(FUNCINST_MK)dnl
 AC_SUBST_FILE(VERSION_MK)dnl
 
 AC_OUTPUT(Config/defs.mk Makefile Doc/Makefile Etc/Makefile Src/Makefile \

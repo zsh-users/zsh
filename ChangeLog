@@ -1,3 +1,7 @@
+2001-07-02  Bart Schaefer  <schaefer@zsh.org>
+
+	* unposted: zshconfig.ac: Remove references to FUNCINST_MK.
+
 2001-07-02  Clint Adams  <clint@zsh.org>
 
 	* 15211: zshconfig.ac, Doc/Zsh/mod_pcre.yo,
