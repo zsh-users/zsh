@@ -18,9 +18,7 @@
   mkdir modish
   chgrp $EGID modish
 
-  chmod g+xs modish
-  chmod u+s modish
-  chmod +t modish
+  chmod 7710 modish  # g+xs,u+s,+t
 
   touch unmodish
   chmod 000 unmodish

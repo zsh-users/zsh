@@ -17,6 +17,9 @@ The format of entries is thus:
 Machines
 --------
 
+Apple: MacOS X/Darwin 1.4
+	Should build `out-of-the-box'. Dynamic loading does not work.
+
 Red Hat Inc.: Cygwin
 	Should build `out-of-the-box'.  The compilation directory should
 	be on a file system mounted as binary (the mount command shows
