@@ -350,7 +350,7 @@ zrefresh(void)
 		listshown = 0;
 	}
         if (t0 > -1)
-            olnct = t0;
+            olnct = (t0 < winh) ? t0 : winh;
         if (termflags & TERM_SHORT)
             vcs = 0;
         else if (!clearflag && lpromptbuf[0]) {
