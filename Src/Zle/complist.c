@@ -856,8 +856,7 @@ domenuselect(Hookdef dummy, Chdata dat)
 	mselect = -1;
 	inselect = 0;
 	if (acc) {
-	    menucmp = 0;
-	    lastambig = 0;
+	    menucmp = lastambig = hasoldlist = 0;
 	    do_single(*(minfo.cur));
 	}
 	if (!noselect) {
