@@ -1,6 +1,11 @@
 #autoload
 
-local gopt=-J len tmp pre suf ret=1 descr spec
+local gopt=-J len tmp pre suf ret=1 descr spec prev
+
+if [[ "$1" = - ]]; then
+  prev=-
+  shift
+fi
 
 if [[ "$1" = -([12]|)[VJ] ]]; then
   gopt="$1"
@@ -20,7 +25,7 @@ else
   suf=5
 fi
 
-while comptags -A "$1" curtag spec; do
+while comptags "-A$prev" "$1" curtag spec; do
   _comp_tags="$_comp_tags $spec "
   if [[ "$curtag" = *:* ]]; then
     zformat -f descr "${curtag#*:}" "d:$3"

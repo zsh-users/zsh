@@ -1,5 +1,9 @@
 2000-04-25  Sven Wischnowsky  <wischnow@informatik.hu-berlin.de>
 
+	* 10910: Completion/Base/_tilde, Completion/Core/_all_labels,
+ 	Completion/Core/_requested: small fix for _requested to be able to
+ 	use _all_labels from within it
+	
 	* 10909: Completion/Core/_expand, Src/Zle/compcore.c,
  	Src/Zle/compresult.c: report prefix/suffix of parameter expansion
  	in IPREFIX/ISUFFIX; make _expand use them to be able to expand $foo

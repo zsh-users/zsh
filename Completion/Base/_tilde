@@ -18,6 +18,7 @@ _tags users named-directories directory-stack
 
 while _tags; do
   _requested users && _users "$suf[@]" "$@" && ret=0
+
   _requested named-directories expl 'named directory' \
       compadd "$suf[@]" "$@" - "${(@k)nameddirs}"
 
