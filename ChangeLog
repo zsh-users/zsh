@@ -1,5 +1,9 @@
 2001-10-05  Sven Wischnowsky  <wischnow@zsh.org>
 
+	* 15945: Completion/Zsh/Command/_cd: make _cd use only one call
+	to _alternative, including completions from _tilde (using the
+	named-directories tag)
+
 	* 15944: Completion/Unix/Type/_path_files, Doc/Zsh/compsys.yo:
 	make expand style (file completion) work again; no more special
 	behaviour with menu completion; try to make docs clearer

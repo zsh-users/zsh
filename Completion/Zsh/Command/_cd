@@ -32,13 +32,17 @@ else
   fi
 
   if [[ $PREFIX != (\~|/|./|../)* ]]; then
-    local tmpcdpath
+    local tmpcdpath alt
+
     tmpcdpath=(${${(@)cdpath:#.}:#$PWD})
+
+    (( $#tmpcdpath )) &&
+      alt=( 'path-directories:directory in cdpath:_path_files -W tmpcdpath -/' )
 
     # With cdablevars, we can complete foo as if ~foo/
     if [[ -o cdablevars && -n "$PREFIX" && "$PREFIX" != <-> ]]; then
       if [[ "$PREFIX" != */* ]]; then
-        _tilde && ret=0
+        alt=( "$alt[@]" 'named-directories: : _tilde' )
       else
         local oipre="$IPREFIX" opre="$PREFIX" dirpre dir
 
@@ -51,26 +55,22 @@ else
         PREFIX="${PREFIX#*/}"
 
         [[ $#dir -eq 1 && "$dir[1]" != "~$dirpre" ]] &&
-          _wanted named-directories expl 'directories after cdablevar' \
+          _wanted named-directories expl 'directory after cdablevar' \
 	      _path_files -W dir -/ && ret=0
 
         PREFIX="$opre"
         IPREFIX="$oipre"
       fi
     fi
-    if [[ $#tmpcdpath -ne 0 ]]; then
-      # Don't complete local directories in command position, that's
-      # already handled by _command_names (see _autocd)
-      if [[ CURRENT -eq 1 ]]; then
-	_wanted path-directories expl 'directories in cdpath' \
-	  _path_files -W tmpcdpath -/ && ret=0
-      else
-        _alternative \
-	  'local-directories:local directories:_path_files -/' \
-	  "path-directories:directories in cdpath:_path_files -W tmpcdpath -/" && ret=0
-      fi
-      return ret
-    fi
+    # Don't complete local directories in command position, that's
+    # already handled by _command_names (see _autocd)
+
+    [[ CURRENT -ne 1 ]] &&
+        alt=( "${cdpath+local-}directories:${cdpath+local }directory:_path_files -/" "$alt[@]" )
+
+    _alternative "$alt[@]" && ret=0
+
+    return ret
   fi
   _wanted directories expl directory _path_files -/ && ret=0
 
