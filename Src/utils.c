@@ -3748,7 +3748,7 @@ mailstat(char *path, struct stat *st)
        DIR                     *dd;
        struct                  dirent *fn;
        struct stat             st_ret, st_tmp;
-       static struct stat      st_new_last, st_ret_last;
+       static struct stat      st_ret_last;
        char                    *dir, *file = 0;
        int                     i;
        time_t                  atime = 0, mtime = 0;
@@ -3782,6 +3782,9 @@ mailstat(char *path, struct stat *st)
        if (stat(dir, &st_tmp) || !S_ISDIR(st_tmp.st_mode)) return 0;
        st_ret.st_mtime = st_tmp.st_mtime;
 
+#if THERE_IS_EXACTLY_ONE_MAILDIR_IN_MAILPATH
+       {
+       static struct stat      st_new_last;
        /* Optimization - if new/ didn't change, nothing else did. */
        if (st_tmp.st_dev == st_new_last.st_dev &&
            st_tmp.st_ino == st_new_last.st_ino &&
@@ -3791,6 +3794,8 @@ mailstat(char *path, struct stat *st)
 	   return 0;
        }
        st_new_last = st_tmp;
+       }
+#endif
 
        /* Loop over new/ and cur/ */
        for (i = 0; i < 2; i++) {
