@@ -338,7 +338,7 @@ for prepath in "$prepaths[@]"; do
     else
       compfiles -p$cfopt tmp1 accex "$skipped" "$_matcher $matcher[2]" '' fake "$pats[@]"
     fi
-    tmp1=( $~tmp1 )
+    tmp1=( $~tmp1 ) 2> /dev/null
 
     if [[ -n "$PREFIX$SUFFIX" ]]; then
       # See which of them match what's on the line.

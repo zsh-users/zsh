@@ -1,3 +1,9 @@
+2002-07-02  Sven Wischnowsky  <wischnow@zsh.org>
+
+	* 17393: Completion/Unix/Command/_chown,
+	Completion/Unix/Type/_path_files: keep globbing quiet in
+	_path_files; check if group/user exists in _chown
+
 2002-07-01  Clint Adams  <clint@zsh.org>
 
 	* 17391: Completion/Debian/Command/_dpkg: complete files after

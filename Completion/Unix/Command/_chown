@@ -1,6 +1,6 @@
 #compdef chown chgrp
 
-local suf usr grp req expl line
+local suf usr grp req line
 
 line=( "${(@)words[2,CURRENT-1]:#-*}" )
 
@@ -33,6 +33,9 @@ else
   req=( ${usr:+\^u$usr} ${grp:+\^g$grp} )
   (( EUID )) && req=( u$EUID$^req )
   req=( -$^req )
+  req="*(${(j:,:)req})"
 
-  _wanted files expl file _files -g "*(${(j:,:)req})" && return 0
+  ( : $~req ) 2> /dev/null || req='*'
+
+  _files -g "$req" && return 0
 fi
