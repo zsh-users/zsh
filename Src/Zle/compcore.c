@@ -2082,7 +2082,7 @@ addmatches(Cadata dat, char **argv)
 		    compignored++;
 		    if (dparr && !*++dparr)
 			dparr = NULL;
-		    continue;
+		    goto next_array;
 		}
 	    }
 	    if (!(dat->aflags & CAF_MATCH)) {
@@ -2100,7 +2100,7 @@ addmatches(Cadata dat, char **argv)
 					 &isexact))) {
 		if (dparr && !*++dparr)
 		    dparr = NULL;
-		continue;
+		goto next_array;
 	    }
 	    if (doadd) {
 		Brinfo bp;
@@ -2132,6 +2132,7 @@ addmatches(Cadata dat, char **argv)
 		}
 		free_cline(lc);
 	    }
+	next_array:
 	    if ((dat->aflags & CAF_ARRAYS) && !argv[1]) {
 		Heap oldheap2;
 
