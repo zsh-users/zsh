@@ -7,7 +7,7 @@
 
 local context state line expl
 typeset -A opt_args
-set -x
+
 if (( ! $+_telnet_short )); then
   local k help="$(telnet -\? < /dev/null 2>&1)"
   local -A optionmap
