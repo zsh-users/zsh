@@ -1376,12 +1376,17 @@ pattryrefs(Patprog prog, char *string, int *nump, int *begp, int *endp)
 		ep = patendp;
 
 		for (i = 0; i < prog->patnpar && i < maxnpos; i++) {
-		    DPUTS(!*sp || !*ep, "BUG: backrefs not set.");
-
-		    if (begp)
-			*begp++ = ztrsub(*sp, patinstart) + patoffset;
-		    if (endp)
-			*endp++ = ztrsub(*ep, patinstart) + patoffset - 1;
+		    if (parsfound & (1 << i)) {
+			if (begp)
+			    *begp++ = ztrsub(*sp, patinstart) + patoffset;
+			if (endp)
+			    *endp++ = ztrsub(*ep, patinstart) + patoffset - 1;
+		    } else {
+			if (begp)
+			    *begp++ = -1;
+			if (endp)
+			    *endp++ = -1;
+		    }
 
 		    sp++;
 		    ep++;
@@ -1403,25 +1408,36 @@ pattryrefs(Patprog prog, char *string, int *nump, int *begp, int *endp)
 
 		PERMALLOC {
 		    for (i = 0; i < prog->patnpar; i++) {
-			DPUTS(!*sp || !*ep, "BUG: backrefs not set.");
-			matcharr[i] = dupstrpfx(*sp, *ep - *sp);
-			/*
-			 * mbegin and mend give indexes into the string
-			 * in the standard notation, i.e. respecting
-			 * KSHARRAYS, and with the end index giving
-			 * the last character, not one beyond.
-			 * For example, foo=foo; [[ $foo = (f)oo ]] gives
-			 * (without KSHARRAYS) indexes 1 and 1, which
-			 * corresponds to indexing as ${foo[1,1]}.
-			 */
-			sprintf(numbuf, "%ld",
-				(long)(ztrsub(*sp, patinstart) + patoffset +
-				       !isset(KSHARRAYS)));
-			mbeginarr[i] = ztrdup(numbuf);
-			sprintf(numbuf, "%ld",
-				(long)(ztrsub(*ep, patinstart) + patoffset +
-				       !isset(KSHARRAYS) - 1));
-			mendarr[i] = ztrdup(numbuf);
+			if (parsfound & (1 << i)) {
+			    matcharr[i] = dupstrpfx(*sp, *ep - *sp);
+			    /*
+			     * mbegin and mend give indexes into the string
+			     * in the standard notation, i.e. respecting
+			     * KSHARRAYS, and with the end index giving
+			     * the last character, not one beyond.
+			     * For example, foo=foo; [[ $foo = (f)oo ]] gives
+			     * (without KSHARRAYS) indexes 1 and 1, which
+			     * corresponds to indexing as ${foo[1,1]}.
+			     */
+			    sprintf(numbuf, "%ld",
+				    (long)(ztrsub(*sp, patinstart) + 
+					   patoffset +
+					   !isset(KSHARRAYS)));
+			    mbeginarr[i] = ztrdup(numbuf);
+			    sprintf(numbuf, "%ld",
+				    (long)(ztrsub(*ep, patinstart) + 
+					   patoffset +
+					   !isset(KSHARRAYS) - 1));
+			    mendarr[i] = ztrdup(numbuf);
+			} else {
+			    /* Pattern wasn't set: either it was in an
+			     * unmatched branch, or a hashed parenthesis
+			     * that didn't match at all.
+			     */
+			    matcharr[i] = ztrdup("");
+			    mbeginarr[i] = ztrdup("-1");
+			    mendarr[i] = ztrdup("-1");
+			}
 			sp++;
 			ep++;
 		    }

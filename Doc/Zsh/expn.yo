@@ -1246,8 +1246,22 @@ as tt(${)var(param)tt(//)var(pat)tt(/)var(repl)tt(}), only the data for the
 last match remains available.  In the case of global replacements this may
 still be useful.  See the example for the tt(m) flag below.
 
+The numbering of backreferences strictly follows the order of the opening
+parentheses from left to right in the pattern string, although sets of
+parentheses may be nested.  There are special rules for parentheses followed
+by `tt(#)' or `tt(##)'.  Only the last match of the parenthesis is
+remembered: for example, in `tt([[ abab = (#b)([ab])# ]])', only the final
+`tt(b)' is stored in tt(match[1]).  Thus extra parentheses may be necessary
+to match the complete segment: for example, use `tt(X((ab|cd)#)Y)' to match
+a whole string of either `tt(ab)' or `tt(cd)' between `tt(X)' and `tt(Y)',
+using the value of tt($match[1]) rather than tt($match[2]).
+
 If the match fails none of the parameters is altered, so in some cases it
-may be necessary to initialise them beforehand.
+may be necessary to initialise them beforehand.  If some of the
+backreferences fail to match --- which happens if they are in an alternate
+branch which fails to match, or if they are followed by tt(#) and matched
+zero times --- then the matched string is set to the empty string, and the
+start and end indices are set to -1.
 
 Pattern matching with backreferences is slightly slower than without.
 )
