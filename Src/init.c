@@ -535,11 +535,11 @@ init_term(void)
 
 #ifdef TGETENT_ACCEPTS_NULL
     /* If possible, we let tgetent allocate its own termcap buffer */
-    if (tgetent(NULL, term) != 1) {
+    if (tgetent(NULL, term) != TGETENT_SUCCESS)
 #else
-    if (tgetent(termbuf, term) != 1) {
+    if (tgetent(termbuf, term) != TGETENT_SUCCESS)
 #endif
-
+    {
 	if (isset(INTERACTIVE))
 	    zerr("can't find terminal definition for %s", term, 0);
 	errflag = 0;

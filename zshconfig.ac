@@ -964,14 +964,16 @@ zsh_cv_func_tgetent_accepts_null,
 [AC_TRY_RUN([
 main()
 {
-    int i = tgetent((char*)0,"vt100");
-    if (i > 0) {
-	char tbuf[1024], *u;
-    	u = tbuf;
+    char buf[4096];
+    int r1 = tgetent(buf, "vt100");
+    int r2 = tgetent((char*)0,"vt100");
+    if (r1 >= 0 && r1 == r2) {
+        char tbuf[1024], *u;
+        u = tbuf;
     	tgetstr("cl", &u);
 	creat("conftest.tgetent", 0640);
     }
-    exit(!i || i == -1);
+    exit((r1 != r2) || r2 == -1);
 }
 ],
   if test -f conftest.tgetent; then
@@ -983,6 +985,35 @@ main()
   zsh_cv_func_tgetent_accepts_null=no)])
 if test $zsh_cv_func_tgetent_accepts_null = yes; then
   AC_DEFINE(TGETENT_ACCEPTS_NULL)
+fi
+AC_CACHE_CHECK(if tgetent returns 0 on success,
+zsh_cv_func_tgetent_zero_success,
+[AC_TRY_RUN([
+main()
+{
+    char buf[4096];
+    int r1 = tgetent(buf, "!@#$%^&*");
+    int r2 = tgetent(buf, "vt100");
+    if (r1 < 0 && r2 == 0) {
+        char tbuf[1024], *u;
+        u = tbuf;
+    	tgetstr("cl", &u);
+	creat("conftest.tgetent0", 0640);
+    }
+    exit(r1 == r2);
+}
+],
+  if test -f conftest.tgetent0; then
+    zsh_cv_func_tgetent_zero_success=yes
+  else
+    zsh_cv_func_tgetent_zero_success=no
+  fi,
+  zsh_cv_func_tgetent_zero_success=no,
+  zsh_cv_func_tgetent_zero_success=no)])
+if test $zsh_cv_func_tgetent_zero_success = yes; then
+  AC_DEFINE(TGETENT_SUCCESS, 0)
+else
+  AC_DEFINE(TGETENT_SUCCESS, 1)
 fi
 
 AC_FUNC_MMAP

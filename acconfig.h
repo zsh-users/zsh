@@ -187,6 +187,9 @@
 /* Define to 1 if tgetent() accepts NULL as a buffer */
 #undef TGETENT_ACCEPTS_NULL
 
+/* Define to what tgetent() returns on success (0 on HP-UX X/Open curses) */
+#define TGETENT_SUCCESS 1
+
 /* Define to 1 if you use POSIX style signal handling */
 #undef POSIX_SIGNALS
 
