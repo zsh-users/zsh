@@ -445,15 +445,15 @@ for prepath in "$prepaths[@]"; do
     if [[ "$tpre" = */* ]]; then
       PREFIX="${donepath}${linepath}${cpre}${tpre%%/*}"
       SUFFIX="/${tsuf#*/}"
+      tmp2="${cpre}${tpre%%/*}"
     else
       PREFIX="${donepath}${linepath}${cpre}${tpre}"
       SUFFIX="${tsuf}"
+      tmp2="${cpre}${tpre}"
     fi
 
     if (( $#tmp4 )) ||
-       [[ -n "$compstate[pattern_match]" &&
-          "${PREFIX:s/$//}${SUFFIX:s/$//}" != "${(q)PREFIX:s/$//}${(q)SUFFIX:s/$//}" ]]; then
-
+       [[ -n "$compstate[pattern_match]" && "$tmp2" != "${(q)tmp2}" ]]; then
       # It is. For menucompletion we now add the possible completions
       # for this component with the unambigous prefix we have built
       # and the rest of the string from the line as the suffix.
