@@ -1,5 +1,7 @@
 2004-03-14  Oliver Kiddle  <opk@zsh.org>
 
+	* unposted: Etc/MACHINES: mention relevant version numbers
+
 	* 19619: configure.ac: fix problem with getting signals
 	on MacOS X 10.1
 

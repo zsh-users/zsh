@@ -22,7 +22,7 @@ The format of entries is thus:
 Machines
 --------
 
-Apple: MacOS X/Darwin 1.4
+Apple: MacOS X/Darwin 10.x
 	Should build `out-of-the-box'.
 
 	For dynamic loading to work, you need to use the dlcompat library.
@@ -74,7 +74,7 @@ FreeBSD: FreeBSD 2.2.7, 3.x, 4.x
 	Should build `out-of-the-box'.  On FreeBSD 2.2, dynamic	loading
 	does not work, but it does with 3.x and 4.x.
 
-HP: HP-UX 9, 10.20, 11.0
+HP: HP-UX 9, 10.20, 11.x (PA-RISC, Itanium)
 	Should build `out-of-the-box'.  The zsh/zpty module is not
 	working on recent versions of 11.x.  This causes all the
 	Y tests in the Tests subdirectory to fail, possibly in obscure
@@ -95,7 +95,7 @@ HP: HP-UX 9, 10.20, 11.0
 	  Compiling with gcc 2.7.1 is known to fail with header file
 	  conflicts.  Use the HP ANSI C compiler.
 
-HP/Compaq: Tru64
+HP/Compaq: Tru64 4.x, 5.x
 	  Should build `out-of-the-box'.
 
 IBM: AIX 3.2, 4.x, 5.x
@@ -202,7 +202,7 @@ Sun: SunOS 4.1.x
 	This may work, but the first username completion will be _very_
 	slow (as slow as in tcsh).
 
-Sun: Solaris 2.x
+Sun: Solaris 2.x, 8, 9
 	The UCB versions of the routines for reading directories are not
 	usable (the struct definitions are incompatible with the ones
 	assumed by zsh).  The symptom of this is that globbed filenames in
