@@ -1,7 +1,7 @@
 DISTFILES_SRC='
     .cvsignore .distfiles .preconfig Makefile.in
     ChangeLog ChangeLog-3.1 ChangeLog.3.0 INSTALL LICENCE META-FAQ README
-    acconfig.h aclocal.m4 aczsh.m4 configure.in zshconfig.ac configure.ac
+    acconfig.h aclocal.m4 aczsh.m4 configure.ac
     configure config.h.in stamp-h.in
     config.guess config.sub install-sh mkinstalldirs 
 '
