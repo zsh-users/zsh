@@ -3111,7 +3111,11 @@ bin_print(char *name, char **args, Options ops, int func)
     if (OPT_ISSET(ops,'m')) {
 	Patprog pprog;
 	char **t, **p;
-	
+
+	if (!*args) {
+	    zwarnnam(name, "no pattern specified", NULL, 0);
+	    return 1;
+	}
 	tokenize(*args);
 	if (!(pprog = patcompile(*args, PAT_STATIC, NULL))) {
 	    untokenize(*args);
