@@ -168,7 +168,7 @@ zstyle -s ":completion:${curcontext}:options" auto-description autod
 if (( $# )) && comparguments -i "$autod" "$@"; then
   local action noargs aret expl local tried
   local next direct odirect equal single matcher matched ws tmp1 tmp2 tmp3
-  local opts subc tc prefix suffix descrs actions subcs
+  local opts subc tc prefix suffix descrs actions subcs anum
   local origpre="$PREFIX" origipre="$IPREFIX" nm="$compstate[nmatches]"
 
   if comparguments -D descrs actions subcs; then
@@ -203,11 +203,12 @@ if (( $# )) && comparguments -i "$autod" "$@"; then
 
   while true; do
     while _tags; do
-      while (( $#descrs )); do
+      anum=1
+      while [[ anum -le  $#descrs ]]; do
 
-	action="$actions[1]"
-	descr="$descrs[1]"
-	subc="$subcs[1]"
+	action="$actions[anum]"
+	descr="$descrs[anum]"
+	subc="$subcs[anum++]"
 
         if [[ -n "$matched" ]] || _requested "$subc"; then
 
@@ -293,9 +294,6 @@ if (( $# )) && comparguments -i "$autod" "$@"; then
             fi
           fi
         fi
-        shift descrs
-        shift actions
-        shift subcs
       done
 
       if [[ -z "$matched$hasopts" ]] && _requested options &&
