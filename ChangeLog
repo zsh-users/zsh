@@ -1,3 +1,9 @@
+2001-10-24  Geoff Wing  <gcw@zsh.org>
+
+	* 16063: Src/zsh.h, Src/options.c, Src/Zle/zle_main.c,
+	Src/Zle/zle_refresh.c, Doc/Zsh/options.yo: add transientrprompt
+	option to remove right prompt from display when accepting commands
+
 2001-10-23  Bart Schaefer  <schaefer@zsh.org>
 
 	* 16124: Src/loop.c: Fix infinite loop on `case' with xtrace
