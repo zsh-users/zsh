@@ -24,7 +24,7 @@ _arguments -C -s \
   '-V[show version]' \
   '-7[generate 7-bit scanner]' \
   '-8[generate 8-bit scanner]' \
-  '-+[generate C++ scanner class]' \
+  '-\+[generate C++ scanner class]' \
   '-C-[specify degree of table compression]:table compression:->tabcomp' \
   '-o-[specify output file]:output file:_files' \
   '-P-[change yy prefix]:prefix string:' \
