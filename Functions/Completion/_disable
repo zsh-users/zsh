@@ -1,6 +1,0 @@
-#defcomp disable
-
-[[ -mcurrent -1 -*a* ]] && complist -ea
-[[ -mcurrent -1 -*f* ]] && complist -eF
-[[ -mcurrent -1 -*r* ]] && complist -ew
-[[ ! -mcurrent -1 -* ]] && complist -eB

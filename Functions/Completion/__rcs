@@ -1,9 +1,0 @@
-#function co ci rcs
-
-[[ $COMMAND = ci || $COMMAND = rcs ]] && __files
-
-if [[ $NMATCHES -eq 0 && -d RCS && $COMMAND != ci ]]; then
-  local rep
-  rep=(RCS/$PREFIX*$SUFFIX,v(:t:s/\,v//))
-  (( $#rep )) && compadd -m $rep
-fi

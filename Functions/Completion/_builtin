@@ -1,7 +1,0 @@
-#defcomp builtin
-
-if [[ -position 2 -1 ]]; then
-  compsub
-else
-  complist -eB
-fi

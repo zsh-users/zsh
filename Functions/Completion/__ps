@@ -1,3 +1,0 @@
-#function  gs ghostview gview psnup psselect pswrap pstops pstruct lpr
-
-__files -g '*([pP][sS]|eps)'

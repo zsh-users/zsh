@@ -1,3 +1,0 @@
-#helper
-
-reply=( "$(ps 2>/dev/null)" )

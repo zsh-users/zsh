@@ -1,2 +1,0 @@
-#array autoload
-__autoload=(-s '${^fpath}/*(N:t)')

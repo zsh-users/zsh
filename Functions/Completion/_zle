@@ -1,7 +1,0 @@
-#defcomp zle
-
-if [[ -word 1 -N && -position 3 ]]; then
-  complist -F
-else
-  complist -b
-fi

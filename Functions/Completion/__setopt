@@ -1,7 +1,0 @@
-#function setopt
-
-local nm=$NMATCHES
-
-complist -M 'L:|[nN][oO]= M:_= M:{A-Z}={a-z}' \
-         -s '$({ unsetopt kshoptionprint; unsetopt } 2>/dev/null)'
-[[ -nmatches nm ]] && complist -M 'L:|[nN][oO]= M:_= M:{A-Z}={a-z}' -o

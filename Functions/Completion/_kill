@@ -1,8 +1,0 @@
-#defcomp kill
-
-if [[ -iprefix '-' ]]; then
-  complist -k "($signals[1,-3])"
-else
-  complist -P '%' -j
-  complist -y _kill_helper -s '`ps 2>/dev/null | tail +2 | cut -c1-5`'
-fi

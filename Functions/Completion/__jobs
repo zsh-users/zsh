@@ -1,2 +1,0 @@
-#array fg jobs
-__jobs=(-j -P '%')

@@ -1,9 +1,0 @@
-#defcomp zmodload
-
-if [[ -mword 1 -*(a*u|u*a)* || -mword 1 -*a* && -position 3 -1 ]]; then
-  complist -B
-elif [[ -mword 1 -*u* ]]; then
-  complist -s '$(zmodload)'
-else
-  complist -s '${^module_path}/*(N:t:r)'
-fi

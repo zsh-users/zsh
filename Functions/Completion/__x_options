@@ -1,5 +1,0 @@
-#pattern-function '*/X11/*'
-
-# A simple pattern completion, just as an example.
-
-complist -J options -k '(-display -name -xrm)'

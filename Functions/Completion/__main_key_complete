@@ -1,6 +1,0 @@
-#helper
-
-# The widget name looks like `__complete_key_<num>' where <num> can be
-# used as an index into the `keycomps' array to get at the definition.
-
-callcomplete keycomps "$WIDGET" "$@"

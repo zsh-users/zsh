@@ -1,3 +1,0 @@
-#defcomp rmdir df du dircmp
-
-_files -/ '*(-/)'

@@ -1,3 +1,0 @@
-#defcomp gzip
-
-_files -g '*~*.[gG][zZ]'

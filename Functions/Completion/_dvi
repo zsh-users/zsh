@@ -1,3 +1,0 @@
-#defcomp xdvi dvips dvibook dviconcat dvicopy dvidvi dviselect dvitodvi dvitype
-
-_files -g '*.(dvi|DVI)'

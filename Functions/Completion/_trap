@@ -1,7 +1,0 @@
-#defcomp trap
-
-if [[ -position 1 ]]; then
-  complist -c
-else
-  complist -k signals
-fi
