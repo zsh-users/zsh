@@ -1,8 +1,11 @@
-#compdef whois
+#compdef whois fwhois
 
 _whois () {
   _whois_setup
-  $_whois_comp
+  case "$0" in
+  fwhois) _whois_fwhois;;
+  *) $_whois_comp;;
+  esac
 }
 
 (( $+functions[_whois_setup] )) ||
