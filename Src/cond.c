@@ -107,16 +107,15 @@ evalcond(Cond c)
     left = dupstring((char *) c->left);
     singsub(&left);
     untokenize(left);
-    if (c->right) {
+    if (c->right && c->type != COND_STREQ && c->type != COND_STRNEQ) {
 	right = dupstring((char *) c->right);
 	singsub(&right);
-	if (c->type != COND_STREQ && c->type != COND_STRNEQ)
-	    untokenize(right);
+	untokenize(right);
     }
 
     if (tracingcond) {
 	if (c->type < COND_MOD) {
-	    char *rt = (char *)right;
+	    char *rt = (char *) right;
 	    if (c->type == COND_STREQ || c->type == COND_STRNEQ) {
 		rt = dupstring(rt);
 		untokenize(rt);
@@ -168,9 +167,29 @@ evalcond(Cond c)
 
     switch (c->type) {
     case COND_STREQ:
-	return matchpat(left, right);
     case COND_STRNEQ:
-	return !matchpat(left, right);
+	{
+	    Patprog pprog = c->prog;
+	    int test;
+
+	    if (pprog == dummy_patprog1 || pprog == dummy_patprog2) {
+		char *opat;
+		int save;
+
+		right = opat = dupstring((char *) c->right);
+		singsub(&right);
+		save = (!strcmp(opat, right) && pprog != dummy_patprog2);
+
+		if (!(pprog = patcompile(right, (save ? PAT_ZDUP : PAT_STATIC),
+					 NULL)))
+		    zerr("bad pattern: %s", right, 0);
+		else if (save)
+		    c->prog = pprog;
+	    }		
+	    test = (pprog && pattry(pprog, left));
+
+	    return (c->type == COND_STREQ ? test : !test);
+	}
     case COND_STRLT:
 	return strcmp(left, right) < 0;
     case COND_STRGTR:

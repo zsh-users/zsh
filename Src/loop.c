@@ -422,10 +422,13 @@ execcase(Cmd cmd, LinkList args, int flags)
     char *word;
     List *l;
     char **p;
+    Patprog *pp, pprog;
+    int save;
 
     node = cmd->u.casecmd;
     l = node->lists;
     p = node->pats;
+    pp = node->progs;
 
     word = dupstring(*p++);
     singsub(&word);
@@ -435,22 +438,47 @@ execcase(Cmd cmd, LinkList args, int flags)
     if (node) {
 	cmdpush(CS_CASE);
 	while (*p) {
-	    char *pat = dupstring(*p + 1);
-	    singsub(&pat);
+	    char *pat = NULL, *opat;
+
+	    pprog = NULL;
+	    save = 0;
+
 	    if (isset(XTRACE)) {
-		char *pat2 = dupstring(pat);
+		char *pat2;
+
+		opat = pat = dupstring(*p + 1);
+		singsub(&pat);
+		save = (!strcmp(pat, opat) && *pp != dummy_patprog2);
+
+		pat2 = dupstring(pat);
 		untokenize(pat2);
 		printprompt4();
 		fprintf(stderr, "case %s (%s)\n", word, pat2);
 		fflush(stderr);
 	    }
-	    if (matchpat(word, pat)) {
+	    if (*pp != dummy_patprog1 && *pp != dummy_patprog2)
+		pprog = *pp;
+
+	    if (!pprog) {
+		if (!pat) {
+		    opat = pat = dupstring(*p + 1);
+		    singsub(&pat);
+		    save = (!strcmp(pat, opat) && *pp != dummy_patprog2);
+		}
+		if (!(pprog = patcompile(pat, (save ? PAT_ZDUP : PAT_STATIC),
+				      NULL)))
+		    zerr("bad pattern: %s", pat, 0);
+		else if (save)
+		    *pp = pprog;
+	    }
+	    if (pprog && pattry(pprog, word)) {
 		do {
 		    execlist(*l++, 1, **p == ';' && (flags & CFLAG_EXEC));
 		} while(**p++ == '&' && *p);
 		break;
 	    }
 	    p++;
+	    pp++;
 	    l++;
 	}
 	cmdpop();

@@ -539,6 +539,7 @@ par_case(Cmd c)
     LinkList pats, lists;
     int n = 1;
     char **pp;
+    Patprog *ppp;
     List *ll;
     LinkNode no;
     struct casecmd *cc;
@@ -659,11 +660,17 @@ par_case(Cmd c)
     incmdpos = 1;
     yylex();
 
-    cc->pats = (char **)alloc((n + 1) * sizeof(char *));
+    cc->pats = (char **) alloc((n + 1) * sizeof(char *));
+    cc->progs = (Patprog *) alloc((n + 1) * sizeof(Patprog));
 
-    for (pp = cc->pats, no = firstnode(pats); no; incnode(no))
+    for (pp = cc->pats, ppp = cc->progs, no = firstnode(pats);
+	 no; incnode(no)) {
 	*pp++ = (char *)getdata(no);
+	*ppp++ = dummy_patprog1;
+    }
     *pp = NULL;
+    *ppp = NULL;
+
     cc->lists = (List *) alloc((n + 1) * sizeof(List));
     for (ll = cc->lists, no = firstnode(lists); no; incnode(no), ll++)
 	if (!(*ll = (List) getdata(no)))
@@ -1438,18 +1445,21 @@ par_cond_triple(char *a, char *b, char *c)
     Cond n = (Cond) make_cond();
     int t0;
 
-    n->ntype = NT_SET(N_COND, NT_STR, NT_STR, 0, 0);
     n->left = (void *) a;
     n->right = (void *) c;
+    n->prog = dummy_patprog1;
     if ((b[0] == Equals || b[0] == '=') &&
-	(!b[1] || ((b[1] == Equals || b[1] == '=') && !b[2])))
+	(!b[1] || ((b[1] == Equals || b[1] == '=') && !b[2]))) {
+	n->ntype = NT_SET(N_COND, NT_STR, NT_STR, NT_PAT, 0);
 	n->type = COND_STREQ;
-    else if (b[0] == '!' && (b[1] == Equals || b[1] == '=') && !b[2])
+    } else if (b[0] == '!' && (b[1] == Equals || b[1] == '=') && !b[2]) {
+	n->ntype = NT_SET(N_COND, NT_STR, NT_STR, NT_PAT, 0);
 	n->type = COND_STRNEQ;
-    else if (b[0] == '-') {
-	if ((t0 = get_cond_num(b + 1)) > -1)
+    } else if (b[0] == '-') {
+	if ((t0 = get_cond_num(b + 1)) > -1) {
+	    n->ntype = NT_SET(N_COND, NT_STR, NT_STR, 0, 0);
 	    n->type = t0 + COND_NT;
-	else {
+	} else {
 	    char *d[3];
 
 	    n->ntype = NT_SET(N_COND, NT_STR, NT_STR | NT_ARR, 0, 0);

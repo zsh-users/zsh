@@ -1933,9 +1933,9 @@ static int flagtab[N_COUNT] = {
     NT_SET(N_PLINE, NT_NODE, NT_NODE, 0, 0),
     NT_SET(N_CMD, NT_NODE, NT_STR | NT_LIST, NT_NODE | NT_LIST, NT_NODE | NT_LIST),
     NT_SET(N_REDIR, NT_STR, 0, 0, 0),
-    NT_SET(N_COND, NT_NODE, NT_NODE, 0, 0),
+    NT_SET(N_COND, NT_NODE, NT_NODE, NT_PAT, 0),
     NT_SET(N_FOR, NT_STR, NT_STR, NT_STR, NT_NODE),
-    NT_SET(N_CASE, NT_STR | NT_ARR, NT_NODE | NT_ARR, 0, 0),
+    NT_SET(N_CASE, NT_STR | NT_ARR, NT_PAT | NT_ARR, NT_NODE | NT_ARR, 0),
     NT_SET(N_IF, NT_NODE | NT_ARR, NT_NODE | NT_ARR, 0, 0),
     NT_SET(N_WHILE, NT_NODE, NT_NODE, 0, 0),
     NT_SET(N_VARASG, NT_STR, NT_STR, NT_STR | NT_LIST, 0),
@@ -1983,17 +1983,26 @@ dupstruct(void *a)
 	    case NT_STR:
 		n = dupstring(on);
 		break;
+	    case NT_PAT:
+		n = duppatprog(on);
+		break;
 	    case NT_LIST | NT_NODE:
 		n = duplist(on, (VFunc) dupstruct);
 		break;
 	    case NT_LIST | NT_STR:
 		n = duplist(on, (VFunc) (useheap ? dupstring : ztrdup));
 		break;
+	    case NT_LIST | NT_PAT:
+		n = duplist(on, (VFunc) duppatprog);
+		break;
 	    case NT_NODE | NT_ARR:
 		n = duparray(on, (VFunc) dupstruct);
 		break;
 	    case NT_STR | NT_ARR:
 		n = duparray(on, (VFunc) (useheap ? dupstring : ztrdup));
+		break;
+	    case NT_PAT | NT_ARR:
+		n = duparray(on, (VFunc) duppatprog);
 		break;
 	    default:
 		DPUTS(1, "BUG: bad node type in dupstruct()");
@@ -2055,32 +2064,49 @@ ifreestruct(void *a)
 	    case NT_STR:
 		zsfree((char *) n);
 		break;
+	    case NT_PAT:
+		freepatprog((Patprog) n);
+		break;
 	    case NT_LIST | NT_NODE:
 		freelinklist((LinkList) n, (FreeFunc) freestruct);
 		break;
-	    case NT_NODE | NT_ARR:
-	    {
-		void **p = (void **) n;
-
-		while (*p)
-		    freestruct(*p++);
-		zfree(n, sizeof(void *) * (p + 1 - (void **) n));
-		break;
-	    }
 	    case NT_LIST | NT_STR:
 		freelinklist((LinkList) n, (FreeFunc) zsfree);
 		break;
+	    case NT_LIST | NT_PAT:
+		freelinklist((LinkList) n, (FreeFunc) freepatprog);
+		break;
+	    case NT_NODE | NT_ARR:
+		{
+		    void **p = (void **) n;
+
+		    while (*p)
+			freestruct(*p++);
+		    zfree(n, sizeof(void *) * (p + 1 - (void **) n));
+		    break;
+		}
 	    case NT_STR | NT_ARR:
 		freearray((char **) n);
 		break;
+	    case NT_PAT | NT_ARR:
+		{
+		    Patprog *p = (Patprog *) n;
+
+		    while (*p)
+			freepatprog(*p++);
+		    zfree(n, sizeof(void *) * ((void **) p + 1 - (void **) n));
+		    break;
+		}
 	    default:
 		DPUTS(1, "BUG: bad node type in freenode()");
 		abort();
 	    }
 	}
     }
+#if 0
     DPUTS(size != ((char *) nodes) - ((char *) a),
 	"BUG: size wrong in freenode()");
+#endif
     zfree(a, size);
 }
 

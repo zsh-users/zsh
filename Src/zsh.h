@@ -392,6 +392,7 @@ struct node {
 #define NT_EMPTY 0
 #define NT_NODE  1
 #define NT_STR   2
+#define NT_PAT   3
 #define NT_LIST  4
 #define NT_ARR   8
 
@@ -502,6 +503,7 @@ struct cond {
     int type;		/* can be cond_type, or a single */
 			/* letter (-a, -b, ...)          */
     void *left, *right;
+    Patprog prog;	/* compiled pattern for `==' and `!=' */
 };
 
 #define COND_NOT    0
@@ -555,17 +557,10 @@ struct forcmd {			/* for/select */
 struct casecmd {
 /* Cmd->args contains word to test */
     int ntype;			/* node type       */
-    char **pats;
+    char **pats;		/* pattern strings */
+    Patprog *progs;		/* compiled patterns (on demand) */
     List *lists;		/* list to execute */
 };
-
-
-/*  A command like "if foo then bar elif baz then fubar else fooble"  */
-/*  generates a tree like:                                            */
-/*                                                                    */
-/*  struct ifcmd a = { next =  &b,  ifl = "foo", thenl = "bar" }      */
-/*  struct ifcmd b = { next =  &c,  ifl = "baz", thenl = "fubar" }    */
-/*  struct ifcmd c = { next = NULL, ifl = NULL, thenl = "fooble" }    */
 
 struct ifcmd {
     int ntype;			/* node type */
@@ -974,12 +969,19 @@ struct patprog {
 #define PAT_PURES	0x0020	/* Pattern is a pure string: set internally */
 #define PAT_STATIC	0x0040	/* Don't copy pattern to heap as per default */
 #define PAT_SCAN	0x0080	/* Scanning, so don't try must-match test */
+#define PAT_ZDUP        0x0100  /* Copy pattern in real memory */
 
 /* Globbing flags: lower 8 bits gives approx count */
 #define GF_LCMATCHUC	0x0100
 #define GF_IGNCASE	0x0200
 #define GF_BACKREF	0x0400
 #define GF_MATCHREF	0x0800
+
+/* Dummy Patprog pointers. Used mainly in executions trees, but the
+ * pattern code needs to knwo about it, too. */
+
+#define dummy_patprog1 ((Patprog) 1)
+#define dummy_patprog2 ((Patprog) 2)
 
 /* node used in parameter hash table (paramtab) */
 

@@ -427,8 +427,13 @@ patcompile(char *exp, int inflags, char **endexp)
      * The pattern was compiled in a fixed buffer:  unless told otherwise,
      * we stick the compiled pattern on the heap.  This is necessary
      * for files where we will often be compiling multiple segments at once.
+     * But if we get the ZDUP flag w always put it in zalloc()ed memory.
      */
-    if (!(patflags & PAT_STATIC)) {
+    if (patflags & PAT_ZDUP) {
+	Patprog newp = (Patprog)zalloc(patsize);
+	memcpy((char *)newp, (char *)p, patsize);
+	p = newp;
+    } else if (!(patflags & PAT_STATIC)) {
 	Patprog newp = (Patprog)zhalloc(patsize);
 	memcpy((char *)newp, (char *)p, patsize);
 	p = newp;
@@ -2186,6 +2191,32 @@ static int patrepeat(Upat p)
 
     patinput = scan;
     return count;
+}
+
+/* Duplicate a patprog. */
+
+/**/
+Patprog
+duppatprog(Patprog prog)
+{
+    if (prog && prog != dummy_patprog1 && prog != dummy_patprog2) {
+	Patprog ret = (Patprog) alloc(prog->size);
+
+	memcpy(ret, prog, prog->size);
+
+	return ret;
+    }
+    return prog;
+}
+
+/* Free a patprog. */
+
+/**/
+void
+freepatprog(Patprog prog)
+{
+    if (prog && prog != dummy_patprog1 && prog != dummy_patprog2)
+	zfree(prog, prog->size);
 }
 
 /**/
