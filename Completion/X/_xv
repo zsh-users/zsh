@@ -42,4 +42,4 @@ _x_arguments \
   '-gsres:ghostscript resolution:' \
   '-gsgeom:ghostscript page size:' \
   '-DEBUG:debug level:' \
-  '*:picture file:_files -g \*.\(\#i\)\(gif\|jpeg\|tiff\|pbm\|pgm\|ppm\|xbm\|xpm\|ras\(\|t\)\|tga\|rle\|rgb\|bmp\|pcx\|fits\|pm\)'
+  '*:picture file:_files -g \*.\(\#i\)\(png\|gif\|jpeg\|jpg\|tiff\|pbm\|pgm\|ppm\|xbm\|xpm\|ras\(\|t\)\|tga\|rle\|rgb\|bmp\|pcx\|fits\|pm\)'
