@@ -1,3 +1,8 @@
+2004-02-18  Oliver Kiddle  <opk@zsh.org>
+
+	* 19436: Completion/Unix/Type/_groups, Completion/Unix/Type/_hosts,
+	Completion/Unix/Type/_printers: complete more things from nis
+
 2004-02-17  Peter Stephenson  <pws@csr.com>
 
 	* 19428: configure.ac, Src/Modules/pty.c: use configure to

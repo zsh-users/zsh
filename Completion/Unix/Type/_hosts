@@ -1,10 +1,18 @@
 #compdef ftp ping rwho rup xping traceroute host aaaa zone mx ns soa txt
 
-local expl hosts
+local expl hosts tmp
 
 if ! zstyle -a ":completion:${curcontext}:hosts" hosts hosts; then
   (( $+_cache_hosts )) ||
-      : ${(A)_cache_hosts:=${(s: :)${(ps:\t:)${${(f)~~"$(</etc/hosts)"}%%\#*}##[:blank:]#[^[:blank:]]#}}}
+      if (( ${+commands[getent]} )); then
+	: ${(A)_cache_hosts:=${(s: :)${(ps:\t:)${(f)~~"$(_call_program hosts getent hosts 2>/dev/null)"}##[:blank:]#[^[:blank:]]#}}}
+      else
+        : ${(A)_cache_hosts:=${(s: :)${(ps:\t:)${${(f)~~"$(</etc/hosts)"}%%\#*}##[:blank:]#[^[:blank:]]#}}}
+	if (( ${+commands[ypcat]} )) &&
+	    tmp=$(_call_program hosts ypcat hosts.byname 2>/dev/null); then
+          _cache_hosts+=( ${=${(f)tmp}##[:blank:]#[^[:blank:]]#} ) # If you use YP
+	fi
+      fi
 
   hosts=( "$_cache_hosts[@]" )
 fi
