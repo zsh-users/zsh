@@ -1,3 +1,8 @@
+2002-09-04  Clint Adams  <clint@zsh.org>
+
+	* 17620: Completion/Unix/Command/_lynx: add new/missing
+        lynx options.
+
 2002-09-04  Bart Schaefer  <schaefer@zsh.org>
 
 	* 16613 (modified): acconfig.h, zshconfig.ac, Src/init.c: detect
