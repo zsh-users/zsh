@@ -1108,6 +1108,7 @@ ca_get_sopt(Cadef d, char *line, char **end, LinkList *lp)
 			line++;
 		    *end = line;
 		}
+		pp = p;
 		break;
 	    }
 	} else if (!p || (p && !p->active))
@@ -1429,7 +1430,9 @@ ca_parse_line(Cadef d, int multi, int first)
 	    if (!state.oargs[state.curopt->num])
 		state.oargs[state.curopt->num] = znewlinklist();
 
-	    ddef = state.def = state.curopt->args;
+	    state.def = state.curopt->args;
+	    ddef = (state.curopt->type == CAO_NEXT && cur == compcurrent ?
+		    NULL : state.def);
 	    dopt = state.curopt;
 	    doff = pe - line;
 	    state.optbeg = state.argbeg = state.inopt = cur;

@@ -1,5 +1,9 @@
 2000-08-08  Sven Wischnowsky  <wischnow@zsh.org>
 
+	* 12567: Completion/Linux/_rpm, Src/Zle/computil.c: handle the
+ 	right option in strings with multiple single-letter options (and
+ 	correctly handle its argument)
+	
 	* 12565: Completion/Core/_expand, Completion/Core/_path_files,
  	Doc/Zsh/mod_computil.yo, Src/Zle/computil.c: more fixes for
  	completion of special characters (quoting)

@@ -59,7 +59,7 @@ _rpm () {
   )
   packageopts=(
     '-a[query all packages]'
-    '-p+[query uninstalled package file]:*:RPM package file:->package_file'
+    '-p[query uninstalled package file]:*:RPM package file:->package_file'
     '-f[specify file to query owner of]:file:_files'
     '--triggeredby:RPM package:->package'
     '--whatprovides:RPM capability:->capability'
