@@ -1,3 +1,8 @@
+2004-08-13  Clint Adams  <clint@zsh.org>
+
+	* unposted: config.guess, config.sub: update to 2004-07-19 and
+	2004-06-24, respectively.
+
 2004-08-13  Peter Stephenson  <pws@csr.com>
 
 	* unposted: Version 4.2.1.
