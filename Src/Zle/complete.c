@@ -182,12 +182,15 @@ parse_cmatcher(char *name, char *s)
 {
     Cmatcher ret = NULL, r = NULL, n;
     Cpattern line, word, left, right;
-    int fl, ll, wl, lal, ral, err;
+    int fl, ll, wl, lal, ral, err, both;
 
     if (!*s)
 	return NULL;
 
     while (*s) {
+	lal = ral = both = 0;
+	left = right = NULL;
+
 	while (*s && inblank(*s)) s++;
 
 	if (!*s) break;
@@ -216,6 +219,10 @@ parse_cmatcher(char *name, char *s)
 	    left = parse_pattern(name, &s, &lal, '|', &err);
 	    if (err)
 		return pcm_err;
+
+	    if ((both = (*s == '|')))
+		s++;
+
 	    if (!*s || !*++s) {
 		zwarnnam(name, "missing line pattern", NULL, 0);
 		return pcm_err;
@@ -227,6 +234,12 @@ parse_cmatcher(char *name, char *s)
 			     &err);
 	if (err)
 	    return pcm_err;
+	if (both) {
+	    right = line;
+	    ral = ll;
+	    line = NULL;
+	    ll = 0;
+	}
 	if ((fl & CMF_RIGHT) && (!*s || !*++s)) {
 	    zwarnnam(name, "missing right anchor", NULL, 0);
 	} else if (!(fl & CMF_RIGHT)) {
@@ -237,6 +250,13 @@ parse_cmatcher(char *name, char *s)
 	    s++;
 	}
 	if (fl & CMF_RIGHT) {
+	    if (*s == '|') {
+		left = line;
+		lal = ll;
+		line = NULL;
+		ll = 0;
+		s++;
+	    }
 	    right = parse_pattern(name, &s, &ral, '=', &err);
 	    if (err)
 		return pcm_err;

@@ -1,5 +1,9 @@
 2000-04-26  Sven Wischnowsky  <wischnow@informatik.hu-berlin.de>
 
+	* 10926: Completion/X/_x_color, Doc/Zsh/compwid.yo, Src/Zle/complete.c,
+ 	Src/Zle/compmatch.c: allow to anchor on gaps between strings in
+ 	matching control specs
+	
 	* 10925: Src/Zle/compmatch.c: faster test for `*'-patterns in
  	matching control; prefer direct character matches over match specs
  	in recursive invocations of match_str()

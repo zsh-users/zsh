@@ -764,21 +764,30 @@ item(tt(M:)var(lpat)tt(=)var(tpat))(
 Here, var(lpat) is a pattern that matches on the command line,
 corresponding to var(tpat) which matches in the trial completion.
 )
-xitem(tt(l:)var(anchor)tt(|)var(lpat)tt(=)var(tpat))
-item(tt(L:)var(anchor)tt(|)var(lpat)tt(=)var(tpat))(
+xitem(tt(l:)var(lanchor)tt(|)var(lpat)tt(=)var(tpat))
+xitem(tt(L:)var(lanchor)tt(|)var(lpat)tt(=)var(tpat))
+xitem(tt(l:)var(lanchor)tt(||)var(ranchor)tt(=)var(tpat))
+item(tt(L:)var(lanchor)tt(||)var(ranchor)tt(=)var(tpat))(
 These letters are for patterns that are anchored by another pattern on
 the left side. Matching for var(lpat) and var(tpat) is as for tt(m) and
 tt(M), but the pattern var(lpat) matched on the command line must be
-preceeded by the pattern var(anchor).  The var(anchor) can be blank to
+preceeded by the pattern var(lanchor).  The var(lanchor) can be blank to
 anchor the match to the start of the command line string; otherwise the
 anchor can occur anywhere, but must match in both the command line and
 trial completion strings.
+
+If no var(lpat) is given, but a var(ranchor), this matches the gap
+between substrings matched by var(lanchor) an var(ranchor). Unlike
+var(lanchor), the var(ranchor) only needs to match the trial
+completion string.
 )
-xitem(tt(r:)var(lpat)tt(|)var(anchor)tt(=)var(tpat))
-item(tt(R:)var(lpat)tt(|)var(anchor)tt(=)var(tpat))(
+xitem(tt(r:)var(lpat)tt(|)var(ranchor)tt(=)var(tpat))
+xitem(tt(R:)var(lpat)tt(|)var(ranchor)tt(=)var(tpat))
+xitem(tt(r:)var(lanchor)tt(||)var(ranchor)tt(=)var(tpat))
+item(tt(R:)var(lanchor)tt(||)var(ranchor)tt(=)var(tpat))(
 As tt(l) and tt(L) with the difference that the command line and trial
 completion patterns are anchored on the right side.  Here an empty
-var(anchor) forces the match to the end of the command line string.
+var(ranchor) forces the match to the end of the command line string.
 )
 enditem()
 
@@ -902,6 +911,29 @@ characters in the square brackets.  For example, to
 complete tt(veryverylongfile.c) rather than tt(veryverylongheader.h)
 with the above in effect, you can just type tt(very.c) before attempting
 completion.
+
+The specifications with both a left and a right anchor are useful to
+complete partial words whose parts are not really separated by some
+special character. For example, in some places strings have to be
+completed that are formed `tt(LikeThis)' (i.e. the separate parts are
+determined by a leading uppercase letter) or maybe one has to
+complete strings with trailing numbers. Here one could use the simple
+form with only one anchor as in:
+
+example(compadd -M 'r:|[A-Z0-9]=* r:|=*' LikeTHIS FooHoo foo123 bar234)
+
+But with this, the string `tt(H)' would be completed to `tt(FooHoo)'
+em(and) tt(LikeTHIS) and `tt(2)' would be completed to the other two
+strings because characters can be inserted before every uppercase
+letter and digit. To avoid this one would use:
+
+example(compadd -M 'r:[^A-Z0-9]||[A-Z0-9]=* r:|=*' \
+    LikeTHIS FooHoo foo123 bar234)
+
+By using these two anchors, a `tt(H)' matches only uppercase `H's that 
+are immediately preceded by something matching the left anchor
+`tt([^A-Z0-9])'. The effect is, of course, that `tt(H)' matches only
+the string `tt(FooHoo)', a `tt(2)' matches only `tt(bar234)' and so on.
 
 When using the completion system (see
 ifzman(zmanref(zshcompsys))\

@@ -57,11 +57,9 @@ cmp_cmatchers(Cmatcher a, Cmatcher b)
 	     a->llen == b->llen && a->wlen == b->wlen &&
 	     (!a->llen || cmp_cpatterns(a->line, b->line)) &&
 	     (a->wlen <= 0 || cmp_cpatterns(a->word, b->word)) &&
-	     (!(a->flags & CMF_LEFT) ||
-	      (a->lalen == b->lalen &&
-	       (!a->lalen || cmp_cpatterns(a->left, b->left)))) &&
-	     (!(a->flags & CMF_RIGHT) ||
-	      (a->ralen == b->ralen &&
+	     (!(a->flags & (CMF_LEFT | CMF_RIGHT)) ||
+	      (a->lalen == b->lalen && a->ralen == b->ralen &&
+	       (!a->lalen || cmp_cpatterns(a->left, b->left)) &&
 	       (!a->ralen || cmp_cpatterns(a->right, b->right))))));
 }
 
@@ -514,29 +512,32 @@ match_str(char *l, char *w, Brinfo *bpp, int bc, int *rwlp,
 		    continue;
 
 		if (mp->wlen < 0) {
-		    int both, loff, aoff, llen, alen, zoff, moff, ct, ict;
+		    int both, loff, aoff, llen, alen, zoff, moff, ct, ict, aol;
 		    char *tp, savl = '\0', savw;
-		    Cpattern ap;
+		    Cpattern ap, aop;
 
 		    /* This is for `*' patterns, first initialise some
 		     * local variables. */
 		    llen = mp->llen;
-		    alen = (mp->flags & CMF_LEFT ? mp->lalen : mp->ralen);
-
+		    if (mp->flags & CMF_LEFT) {
+			alen = mp->lalen; aol = mp->ralen;
+		    } else {
+			alen = mp->ralen; aol = mp->lalen;
+		    }
 		    /* Give up if we don't have enough characters for the
 		     * line-string and the anchor. */
-		    if (ll < llen + alen || lw < alen)
+		    if (ll < llen + alen || lw < alen + aol)
 			continue;
 
 		    if (mp->flags & CMF_LEFT) {
-			ap = mp->left; zoff = 0; moff = alen;
+			ap = mp->left; zoff = 0; moff = alen; aop = mp->right;
 			if (sfx) {
 			    both = 0; loff = -llen; aoff = -(llen + alen);
 			} else {
 			    both = 1; loff = alen; aoff = 0;
 			}
 		    } else {
-			ap = mp->right; zoff = alen; moff = 0;
+			ap = mp->right; zoff = alen; moff = 0; aop = mp->left;
 			if (sfx) {
 			    both = 1; loff = -(llen + alen); aoff = -alen;
 			} else {
@@ -548,9 +549,11 @@ match_str(char *l, char *w, Brinfo *bpp, int bc, int *rwlp,
 			continue;
 		    if (ap) {
 			if (!pattern_match(ap, l + aoff, NULL, NULL) ||
-			    (both && (!pattern_match(ap, w + aoff, NULL, NULL) ||
-				      !match_parts(l + aoff, w + aoff, alen,
-						   part))))
+			    (both &&
+			     (!pattern_match(ap, w + aoff, NULL, NULL) ||
+			      (aol && !pattern_match(aop, w + aoff - aol,
+						     NULL, NULL)) ||
+			      !match_parts(l + aoff, w + aoff, alen, part))))
 				continue;
 		    } else if (!both || il || iw)
 			continue;
@@ -566,9 +569,13 @@ match_str(char *l, char *w, Brinfo *bpp, int bc, int *rwlp,
 			 tp += add, ct++, ict--) {
 			if ((both &&
 			     (!ap || !test ||
-			      !pattern_match(ap, tp + aoff, NULL, NULL))) ||
+			      !pattern_match(ap, tp + aoff, NULL, NULL) ||
+			      (aol && !pattern_match(aop, tp + aoff - aol,
+						     NULL, NULL)))) ||
 			    (!both &&
 			     pattern_match(ap, tp - moff, NULL, NULL) &&
+			     (!aol || pattern_match(aop, tp - moff - aol,
+						    NULL, NULL)) &&
 			     match_parts(l + aoff , tp - moff, alen, part))) {
 			    if (sfx) {
 				savw = tp[-zoff];
@@ -699,28 +706,36 @@ match_str(char *l, char *w, Brinfo *bpp, int bc, int *rwlp,
 		    }
 		    if (mp->flags & CMF_LEFT) {
 			/* Try to match the left anchor, if any. */
-			if (til < mp->lalen || tiw < mp->lalen)
+			if (til < mp->lalen || tiw < mp->lalen + mp->ralen)
 			    continue;
 			else if (mp->left)
 			    t = pattern_match(mp->left, tl - mp->lalen,
 					      NULL, NULL) &&
 				pattern_match(mp->left, tw - mp->lalen,
-					      NULL, NULL);
+					      NULL, NULL) &&
+				(!mp->ralen ||
+				 pattern_match(mp->right,
+					       tw - mp->lalen - mp->ralen,
+					       NULL, NULL));
 			else
 			    t = (!sfx && !il && !iw);
 		    }
 		    if (mp->flags & CMF_RIGHT) {
 			/* Try to match the right anchor, if any. */
 			if (tll < mp->llen + mp->ralen ||
-			    tlw < mp->wlen + mp->ralen)
+			    tlw < mp->wlen + mp->ralen + mp->lalen)
 			    continue;
-			else if (mp->left)
+			else if (mp->right)
 			    t = pattern_match(mp->right,
 					      tl + mp->llen - mp->ralen,
 					      NULL, NULL) &&
 				pattern_match(mp->right,
 					      tw + mp->wlen - mp->ralen,
-					      NULL, NULL);
+					      NULL, NULL) &&
+				(!mp->lalen ||
+				 pattern_match(mp->left, tw + mp->wlen -
+					       mp->ralen - mp->lalen,
+					       NULL, NULL));
 			else
 			    t = (sfx && !il && !iw);
 		    }
@@ -1044,8 +1059,11 @@ bld_parts(char *str, int len, int plen, Cline *lp)
 	for (t = 0, ms = bmatchers; ms && !t; ms = ms->next) {
 	    mp = ms->matcher;
 	    if (mp && mp->flags == CMF_RIGHT && mp->wlen < 0 &&
-		!mp->llen && len >= mp->ralen && mp->ralen &&
-		pattern_match(mp->right, str, NULL, NULL)) {
+		!mp->llen && len >= mp->ralen + mp->lalen && mp->ralen &&
+		pattern_match(mp->right, str, NULL, NULL) &&
+		(!mp->lalen ||
+		 ((str - p) >= mp->lalen &&
+		  pattern_match(mp->left, str - mp->lalen, NULL, NULL)))) {
 		int olen = str - p, llen;
 
 		/* We found an anchor, create a new cline. The NEW flag
