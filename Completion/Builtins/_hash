@@ -1,16 +1,37 @@
-#compdef hash
+#compdef hash rehash
 
-local expl
+local state line expl common_args curcontext="$curcontext"
+typeset -A opt_args
 
-if [[ "$words[2]" = -*d* ]]; then
-  if compset -P 1 '*='; then
-    _wanted -C -d-value files expl directories _path_files -/
+common_args=( \
+  '-d[use named directory hash table]' \
+  '(-r -m -v)-f[rebuild hash table]' )
+
+case ${words[1]} in
+  hash)
+    _arguments -C -s \
+      '(-f -m -v)-r[empty hash table]' \
+      '(-f -r)-m[treat arguments as patterns]' \
+      '(-f -r -m)-v[list entires as they are added]' \
+      "${common_args[@]}" \
+      '(-d -f -r -m -v)*:hash:->hashval' && return 0
+  ;;
+  rehash)
+    _arguments -C -s ${common_args[@]} && return 0
+  ;;
+esac
+
+if [[ $state = hashval ]]; then
+  if (( $+opt_args[-d] )); then
+    if compset -P 1 '*='; then
+      _wanted -C value files expl directories _path_files -/
+    else
+      _wanted -C name named-directories expl 'named directory' \
+          compadd -q -S '=' - "${(@k)nameddirs}"
+    fi
+  elif compset -P 1 '*='; then
+    _wanted -C value values expl 'executable file' _files -g '*(-*)'
   else
-    _wanted -C -d named-directories expl 'named directory' \
-        compadd -q -S '=' - "${(@k)nameddirs}"
+    _wanted -C name commands expl command compadd -q -S '=' - "${(@k)commands}"
   fi
-elif compset -P 1 '*='; then
-  _wanted -C value values expl 'executable file' _files -g '*(-*)'
-else
-  _wanted -C name commands expl command compadd -q -S '=' - "${(@k)commands}"
 fi

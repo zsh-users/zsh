@@ -1,3 +1,8 @@
+2000-05-12  Oliver Kiddle  <opk@zsh.org>
+
+	* 11347: Completion/Builtins/_hash, Completion/Builtins/_vars_eq:
+	use _arguments for hash completion and add + options for typeset
+
 2000-05-12  Sven Wischnowsky  <wischnow@zsh.org>
 
 	* 11346: Src/Zle/compmatch.c, Src/Zle/compresult.c: fixes for
