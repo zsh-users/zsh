@@ -3789,8 +3789,8 @@ mailstat(char *path, struct stat *st)
        struct stat             st_ret, st_tmp;
        static struct stat      st_new_last, st_ret_last;
        char                    dir[PATH_MAX * 2];
-       char                    file[PATH_MAX * 2];
-       int                     i, l;
+       char                    *file;
+       int                     i;
        time_t                  atime = 0, mtime = 0;
 
        /* First see if it's a directory. */
@@ -3832,28 +3832,26 @@ mailstat(char *path, struct stat *st)
                return 0;
        }
        st_new_last = st_tmp;
-
+       
        /* Loop over new/ and cur/ */
        for (i = 0; i < 2; i++) {
-               sprintf(dir, "%s/%s", path, i ? "cur" : "new");
-               sprintf(file, "%s/", dir);
-               l = strlen(file);
+	   sprintf(dir, "%s/%s", path, i ? "cur" : "new");
                if ((dd = opendir(dir)) == NULL)
-                       return 0;
+		   return 0;
                while ((fn = readdir(dd)) != NULL) {
-                       if (fn->d_name[0] == '.' ||
-                           strlen(fn->d_name) + l >= sizeof(file))
-                               continue;
-                       strcpy(file + l, fn->d_name);
-                       if (stat(file, &st_tmp) != 0)
-                               continue;
-                       st_ret.st_size += st_tmp.st_size;
-                       st_ret.st_blocks++;
-                       if (st_tmp.st_atime != st_tmp.st_mtime &&
-                           st_tmp.st_atime > atime)
-                               atime = st_tmp.st_atime;
-                       if (st_tmp.st_mtime > mtime)
-                               mtime = st_tmp.st_mtime;
+		   if (fn->d_name[0] == '.')
+		       continue;
+
+		   file = zhtricat(dir, "/", fn->d.name);
+		   if (stat(file, &st_tmp) != 0)
+		       continue;
+		   st_ret.st_size += st_tmp.st_size;
+		   st_ret.st_blocks++;
+		   if (st_tmp.st_atime != st_tmp.st_mtime &&
+		       st_tmp.st_atime > atime)
+		       atime = st_tmp.st_atime;
+		   if (st_tmp.st_mtime > mtime)
+		       mtime = st_tmp.st_mtime;
                }
                closedir(dd);
        }
