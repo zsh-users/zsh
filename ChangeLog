@@ -1,3 +1,8 @@
+2004-11-10  Wayne Davison  <wayned@users.sourceforge.net>
+
+	* 20551: Completion/Unix/Command/_make: handle $$ when
+	expanding variables.
+
 2004-11-09  Peter Stephenson  <pws@csr.com>
 
 	* Jussi Pakkanen <jpakkane@yahoo.com>: users/8189:
