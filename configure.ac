@@ -412,6 +412,11 @@ AC_PROG_CPP                 dnl Figure out how to run C preprocessor.
 AC_PROG_GCC_TRADITIONAL     dnl Do we need -traditional flag for gcc.
 AC_C_CONST                  dnl Does compiler support `const'.
 
+dnl Default preprocessing on Mac OS X produces warnings
+case "$host_os" in
+  darwin*) CPP="$CPP -traditional-cpp" ;;
+esac
+
 fp_PROG_CC_STDC
 AC_MSG_CHECKING([whether to use prototypes])
 if test ."$ansi2knr" = .yes || test ."$ansi2knr" = .no; then
@@ -1232,7 +1237,7 @@ dnl slashes rather than doubled backslashes in the path.
 echo "#include <errno.h>" > nametmp.c
 errfile_list="`$CPP nametmp.c |
 sed -n -e 's/^#line[ 	].*\"\(.*\)\"/\1/p' \
-       -e 's/^#[ 	].*\"\(.*\)\"/\1/p' |
+       -e 's/^#[ 	0-9].*\"\(.*\)\"/\1/p' |
 sed 's/\\\\\\\\/\//g' |
 $AWK '{ if (\$1 ~ \"err\") files[[\$1]] = \$1 }
   END { for (var in files) print var }'`"
