@@ -43,16 +43,22 @@ tt(compadd) to register the matches with the completion code.
 findex(compfiles)
 item(tt(compfiles))(
 Used by the tt(_path_files) function to optimize complex recursive
-filename generation (globbing).
-)
-findex(compfmt)
-item(tt(compfmt))(
-An obsolete form of `tt(zformat -f)'.  Do not use this.
+filename generation (globbing).  It does three things.  With the
+tt(-p) and tt(-P) options it builds the glob patterns to use,
+including the paths already handled and trying to optimize the
+patterns with respect to the prefix and suffix from the line and the
+match specification currently used.  The tt(-i) option does the
+directory tests for the tt(ignore-parents) style and the tt(-r) option 
+tests if a component for some of the matches are equal to the string
+on the line and removes all other matches if that is true.
 )
 findex(compgroups)
 item(tt(compgroups))(
 Used by the tt(_tags) function to implement the internals of the
-tt(group-order) style.
+tt(group-order) style.  This only takes its arguments as names of
+completion groups and creates the groups for it (all six types: sorted 
+and unsorted, both without removing duplicates, with removing all
+duplicates and with removing consecutive duplicates).
 )
 findex(compquote)
 item(tt(compquote) var(names) ...)(
