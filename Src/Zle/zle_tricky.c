@@ -1592,7 +1592,7 @@ get_comp_string(void)
 		else if (*p == Snull)
 		    *p = '\'';
 	}
-	if (*s == Snull || *s == Dnull) {
+	if ((*s == Snull || *s == Dnull) && !has_token(s + 1)) {
 	    char *q = (*s == Snull ? "'" : "\""), *n = tricat(qipre, q, "");
 	    int sl = strlen(s);
 
@@ -2299,7 +2299,7 @@ match_str(char *l, char *w, int *bp, int *rwlp, int sfx, int test)
 		t = 1;
 		if ((lm && lm == mp) ||
 		    ((oll == ll || olw == lw) &&
-		     (test == 1 || (!mp->left && !mp->right)) &&
+		     (test == 1 || (test && !mp->left && !mp->right)) &&
 		     mp->wlen < 0))
 		    /* If we were called recursively, don't use `*' patterns
 		     * at the beginning (avoiding infinite recursion). */
