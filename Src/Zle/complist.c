@@ -194,13 +194,17 @@ getcoldef(Listcols c, char *s)
     }
 }
 
+/* Combined length of LC and RC, maximum length of capability strings. */
+
+static int lr_caplen, max_caplen;
+
 /* This initializes the given terminal color structure. */
 
 static void
 getcols(Listcols c)
 {
     char *s;
-    int i;
+    int i, l;
 
     if (!(s = getsparam("ZLS_COLORS")) &&
 	!(s = getsparam("ZLS_COLOURS"))) {
@@ -222,9 +226,15 @@ getcols(Listcols c)
 	s = getcoldef(c, s);
 
     /* Use default values for those that aren't set explicitly. */
-    for (i = 0; i < NUM_COLS; i++)
+    max_caplen = lr_caplen = 0;
+    for (i = 0; i < NUM_COLS; i++) {
 	if (!c->cols[i])
 	    c->cols[i] = defcols[i];
+	if ((l = (c->cols[i] ? strlen(c->cols[i]) : 0)) > max_caplen)
+	    max_caplen = l;
+    }
+    lr_caplen = strlen(c->cols[COL_LC]) + strlen(c->cols[COL_RC]);
+
     /* Default for missing files. */
     if (!c->cols[COL_MI])
 	c->cols[COL_MI] = c->cols[COL_FI];
@@ -235,14 +245,24 @@ getcols(Listcols c)
 static int last_col = COL_NO;
 
 static void
+zlrputs(Listcols c, char *cap)
+{
+    VARARR(char, buf, lr_caplen + max_caplen + 1);
+
+    strcpy(buf, c->cols[COL_LC]);
+    strcat(buf, cap);
+    strcat(buf, c->cols[COL_RC]);
+
+    tputs(buf, 1, putshout);
+}
+
+static void
 zcputs(Listcols c, int colour)
 {
     if (colour != last_col
 	&& (last_col < COL_NO
 	    || strcmp(c->cols[last_col], c->cols[colour]))) {
-	fputs(c->cols[COL_LC], shout);
-	fputs(c->cols[colour], shout);
-	fputs(c->cols[COL_RC], shout);
+	zlrputs(c, c->cols[colour]);
 	last_col = colour;
     }
     return;
@@ -260,11 +280,9 @@ putcolstr(Listcols c, char *n, mode_t m)
     for (e = c->exts; e; e = e->next)
 	if (strsfx(e->ext, n)) {	/* XXX: unoptimised if used */
 	    if (last_col < COL_NO
-		|| strcmp(c->cols[last_col], e->col)) {
-		fputs(c->cols[COL_LC], shout);
-		fputs(e->col, shout);
-		fputs(c->cols[COL_RC], shout);
-	    }
+		|| strcmp(c->cols[last_col], e->col))
+		zlrputs(c, e->col);
+
 	    last_col = COL_NO - 1;
 	    return;
 	}
@@ -565,7 +583,7 @@ complistmatches(Hookdef dummy, Chdata dat)
 			while (a--)
 			    putc(' ', shout);
 			if (col.cols[COL_EC])
-			    fputs(col.cols[COL_EC], shout);
+			    tputs(col.cols[COL_EC], 1, putshout);
 			else
 			    zcputs(&col, COL_NO);
 			break;
@@ -614,14 +632,14 @@ complistmatches(Hookdef dummy, Chdata dat)
 		    while (a--)
 			putc(' ', shout);
 		    if (col.cols[COL_EC])
-			fputs(col.cols[COL_EC], shout);
+			tputs(col.cols[COL_EC], 1, putshout);
 		    else
 			zcputs(&col, COL_NO);
 		    if (i) {
 			zcputs(&col, COL_NO);
 			fputs("  ", shout);
 			if (col.cols[COL_EC])
-			    fputs(col.cols[COL_EC], shout);
+			    tputs(col.cols[COL_EC], 1, putshout);
 			else
 			    zcputs(&col, COL_NO);
 		    }
@@ -636,7 +654,7 @@ complistmatches(Hookdef dummy, Chdata dat)
 		    while (a--)
 			putc(' ', shout);
 		    if (col.cols[COL_EC])
-			fputs(col.cols[COL_EC], shout);
+			tputs(col.cols[COL_EC], 1, putshout);
 		    else
 			zcputs(&col, COL_NO);
 		}
