@@ -3,6 +3,9 @@
 	* 20626: Completion/Unix/Command/_baz: completion
 	derived from _tla by Matt Zimmerman.
 
+	* 20627: Completion/Unix/Command/_bogofilter:
+	updated completion for newer bogoutil.
+
 2004-12-10  Andrey Borzenkov  <bor@zsh.org>
 
 	* 20617: Completion/Linux/Command/_modutils: fix

@@ -27,9 +27,14 @@ _bogofilter() {
   	'-m[perform maintenance functions]' \
   	'-w[display token information]:database file or directory:_files' \
   	'-p[display token probability information]:database file or directory:_files' \
+	'-C[verify database]:database:_files -/' \
   	'-H[print histogram]' \
-  	'(-R)-r[recalculate ROBX]' \
-  	'(-r)-R[recalculate and save ROBX]' \
+  	'(-f -F -P -R)-r[recalculate ROBX]:database:_files -/' \
+  	'(-f -F -P -r)-R[recalculate and save ROBX]:database:_files -/' \
+	'(-F -P -r -R)-f[run regular recovery]:database:_files -/' \
+	'(-f -P -r -R)-F[run catastrophic recovery]:database:_files -/' \
+	'(-f -F -r -R)-P[checkpoint database]:database:_files -/' \
+	'(-f -F -r -R -P)--remove-environment:database:_files -/' \
   	'-h[help]' \
   	'-V[version]' \
   	'*:tokens:->tokens' && ret=0
