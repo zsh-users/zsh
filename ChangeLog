@@ -1,3 +1,9 @@
+2001-11-15  Peter Stephenson  <pws@csr.com>
+
+	* 16241: zshconfig.ac, Src/Modules/mathfunc.c,
+	Doc/Zsh/mod_mathfunc.yo: new rand48(param) math function calls
+	erand48(3), storing seed as hex string in $param.
+
 2001-11-14  Andrej Borsenkow  <bor@zsh.org>
 
 	* 16247: Completion/Mandrake/Command/_urpmi: completion

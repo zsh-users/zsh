@@ -938,7 +938,8 @@ AC_CHECK_FUNCS(strftime difftime gettimeofday \
 	       brk sbrk \
 	       pathconf sysconf \
 	       tgetent tigetflag tigetnum tigetstr setupterm \
-	       pcre_compile pcre_study pcre_exec)
+	       pcre_compile pcre_study pcre_exec \
+	       erand48)
 AC_FUNC_STRCOLL
 
 dnl  Check if tgetent accepts NULL (and will allocate its own termcap buffer)
