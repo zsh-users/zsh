@@ -636,6 +636,7 @@ struct job {
 #define STAT_NOSTTY	(1<<11)	/* the tty settings are not inherited   */
 				/* from this job when it exits.         */
 #define STAT_ATTACH	(1<<12)	/* delay reattaching shell to tty       */
+#define STAT_SUBLEADER  (1<<13) /* is super-job, but leader is sub-shell */
 
 #define SP_RUNNING -1		/* fake status for jobs currently running */
 

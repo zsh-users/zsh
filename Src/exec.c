@@ -949,9 +949,10 @@ execpline(Estate state, wordcode slcode, int how, int last1)
 
 		    /* If the super-job contains only the sub-shell, the
 		       sub-shell is the group leader. */
-		    if (!jn->procs->next || lpforked == 2)
+		    if (!jn->procs->next || lpforked == 2) {
 			jn->gleader = list_pipe_pid;
-
+			jn->stat |= STAT_SUBLEADER;
+		    }
 		    for (pn = jobtab[jn->other].procs; pn; pn = pn->next)
 			if (WIFSTOPPED(pn->status))
 			    break;
@@ -971,14 +972,17 @@ execpline(Estate state, wordcode slcode, int how, int last1)
 		    lastwj = -1;
 	    }
 
+	    errbrk_saved = 0;
 	    for (; !nowait;) {
 		if (list_pipe_child) {
 		    jn->stat |= STAT_NOPRINT;
 		    makerunning(jn);
 		}
-		if (!(jn->stat & STAT_LOCKED))
+		if (!(jn->stat & STAT_LOCKED)) {
+		    child_unblock();
+		    child_block();
 		    waitjobs();
-
+		}
 		if (list_pipe_child &&
 		    jn->stat & STAT_DONE &&
 		    lastval2 & 0200)
@@ -1042,6 +1046,10 @@ execpline(Estate state, wordcode slcode, int how, int last1)
 			list_pipe = 0;
 			list_pipe_child = 1;
 			opts[INTERACTIVE] = 0;
+			if (errbrk_saved) {
+			    errflag = prev_errflag;
+			    breaks = prev_breaks;
+			}
 			break;
 		    }
 		}

@@ -64,7 +64,13 @@ struct tms shtms;
  
 /**/
 int ttyfrozen;
- 
+
+/* Previous values of errflag and breaks if the signal handler had to
+ * change them. And a flag saying if it did that. */
+
+/**/
+int prev_errflag, prev_breaks, errbrk_saved;
+
 static struct timeval dtimeval, now;
 
 /* Diff two timevals for elapsed-time computations */
@@ -311,6 +317,11 @@ update_job(Job jn)
 		/* If we have `foo|while true; (( x++ )); done', and hit
 		 * ^C, we have to stop the loop, too. */
 		if ((val & 0200) && inforeground == 1) {
+		    if (!errbrk_saved) {
+			errbrk_saved = 1;
+			prev_breaks = breaks;
+			prev_errflag = errflag;
+		    }
 		    breaks = loops;
 		    errflag = 1;
 		    inerrflush();
@@ -322,6 +333,11 @@ update_job(Job jn)
 	    }
 	}
     } else if (list_pipe && (val & 0200) && inforeground == 1) {
+	if (!errbrk_saved) {
+	    errbrk_saved = 1;
+	    prev_breaks = breaks;
+	    prev_errflag = errflag;
+	}
 	breaks = loops;
 	errflag = 1;
 	inerrflush();
@@ -1296,6 +1312,7 @@ bin_fg(char *name, char **argv, char *ops, int func)
 		    thisjob = job;
 		    if ((jobtab[job].stat & STAT_SUPERJOB) &&
 			((!jobtab[job].procs->next ||
+			  (jobtab[job].stat & STAT_SUBLEADER) ||
 			  killpg(jobtab[job].gleader, 0) == -1)) &&
 			jobtab[jobtab[job].other].gleader)
 			attachtty(jobtab[jobtab[job].other].gleader);
