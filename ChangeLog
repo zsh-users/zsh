@@ -1,3 +1,8 @@
+2004-04-15  Clint Adams  <clint@zsh.org>
+
+	* 19606: Completion/Unix/Command/_tla: switch tla completion to
+	the version by Jason McCarty, Erik Toubro Nielsen, and Rob Weir.
+
 2004-04-14  Clint Adams  <clint@zsh.org>
 
 	* Jay Berkenbilt: 19769: Completion/Unix/Command/_rsync:
