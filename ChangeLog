@@ -4,10 +4,10 @@
 
 2000-04-14  Peter Stephenson  <pws@cambridgesiliconradio.com>
 
-	* 10756: Doc/Zsh/expn.yo, Src/glob.c, Src/pattern.c, Src/zsh.h:
-	fix (#s) and (#e) to work in allerlei parameter substitutions;
-	fix potential problem with (#e) in exclusions; note things in
-	manual which should work.
+	* 10756, 10761: Doc/Zsh/expn.yo, Src/glob.c, Src/pattern.c,
+	Src/zsh.h: fix (#s) and (#e) to work in allerlei parameter
+	substitutions; fix potential problem with (#e) in exclusions; note
+	things in manual which should work.
 
 2000-04-13  Clint Adams  <schizo@debian.org>
 

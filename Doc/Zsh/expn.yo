@@ -1318,7 +1318,10 @@ operations `tt(/)' and `tt(//)' with the `tt((#s))' and `tt((#e))' flags
 provides a single simple and memorable method.
 
 Note that assertions of the form `tt((^(#s)))' also work, i.e. match
-anywhere except at the start of the string.
+anywhere except at the start of the string, although this actually means
+`anything except a zero-length portion at the start of the string'; you
+need to use `tt((""~(#s)))' to match a zero-length portion of the string
+not at the start.
 )
 enditem()
 
