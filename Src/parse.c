@@ -1264,13 +1264,16 @@ par_repeat(int *complex)
 static void
 par_subsh(int *complex)
 {
-    int oecused = ecused, otok = tok;
+    int oecused = ecused, otok = tok, p;
 
-    ecadd(tok == INPAR ? WCB_SUBSH() : WCB_CURSH());
+    p = ecadd(0);
     yylex();
-    par_save_list(complex);
+    par_list(complex);
+    ecadd(WCB_END());
     if (tok != ((otok == INPAR) ? OUTPAR : OUTBRACE))
 	YYERRORV(oecused);
+    ecbuf[p] = (otok == INPAR ? WCB_SUBSH(ecused - 1 - p) :
+		WCB_CURSH(ecused - 1 - p));
     incmdpos = 1;
     yylex();
 }
@@ -2422,6 +2425,7 @@ build_dump(char *nam, char *dump, char **files, int ali, int map)
 	    zfree(file, flen);
 	    zerrnam(nam, "can't read file: %s", *files, 0);
 	    noaliases = ona;
+	    errflag  = 0;
 	    return 1;
 	}
 	zfree(file, flen);

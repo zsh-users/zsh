@@ -596,9 +596,11 @@ struct eccstr {
 #define WC_SIMPLE_ARGC(C)   wc_data(C)
 #define WCB_SIMPLE(N)       wc_bld(WC_SIMPLE, (N))
 
-#define WCB_SUBSH()         wc_bld(WC_SUBSH, 0)
+#define WC_SUBSH_SKIP(C)    wc_data(C)
+#define WCB_SUBSH(O)        wc_bld(WC_SUBSH, (O))
 
-#define WCB_CURSH()         wc_bld(WC_CURSH, 0)
+#define WC_CURSH_SKIP(C)    wc_data(C)
+#define WCB_CURSH(O)        wc_bld(WC_CURSH, (O))
 
 #define WC_TIMED_TYPE(C)    wc_data(C)
 #define WC_TIMED_EMPTY      0

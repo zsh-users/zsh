@@ -315,11 +315,15 @@ static char list_pipe_text[JOBTEXTSIZE];
 static int
 execcursh(Estate state, int do_exec)
 {
+    Wordcode end = state->pc + WC_CURSH_SKIP(state->pc[-1]);
+
     if (!list_pipe && thisjob != list_pipe_job)
 	deletejob(jobtab + thisjob);
     cmdpush(CS_CURSH);
     execlist(state, 1, do_exec);
     cmdpop();
+
+    state->pc = end;
 
     return lastval;
 }
