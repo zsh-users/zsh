@@ -303,7 +303,15 @@ execbuiltin(LinkList args, Builtin bn)
 		    argv++;
 		    break;
 		}
-		/* unrecognised options to echo etc. are not really options */
+		/*
+		 * Unrecognised options to echo etc. are not really
+		 * options.
+		 *
+		 * Note this flag is not smart enough to handle option
+		 * arguments.  In fact, ideally it shouldn't be added
+		 * to any new builtins, to preserve standard option
+		 * handling as much as possible.
+		*/
 		if (flags & BINF_SKIPINVALID) {
 		    char *p = arg;
 		    if (optstr)

@@ -1,3 +1,8 @@
+2002-09-03  Peter Stephenson  <pws@csr.com>
+
+	* 17608: Src/builtins.c: comment on use and abuse of
+	BINF_SKIPINVALID.
+
 2002-09-03  Oliver Kiddle  <opk@zsh.org>
 
 	* Thomas Köhler: 176xx: Completion/Unix/Command/_ssh: also pass
