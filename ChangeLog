@@ -1,3 +1,9 @@
+2005-02-15  Peter Stephenson  <pws@csr.com>
+
+	* 20812: Doc/Zsh/contrib.yo, Functions/Exceptions/catch,
+	Functions/Exceptions/throw, Src/zsh.mdd: add functions for
+	exception handling using "always" block.
+
 2005-02-14  Peter Stephenson  <pws@csr.com>
 
 	* 20811: configure.ac: Copy the trick for finding the
