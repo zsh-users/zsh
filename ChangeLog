@@ -1,3 +1,8 @@
+2001-05-21  Clint Adams  <clint@zsh.org>
+
+	* unposted: Completion/Unix/Type/_diff_options: quote $@
+	in calls to _arguments.
+
 2001-05-21  Oliver Kiddle  <opk@zsh.org>
 
 	* 14409: Completion/Zsh/Command/_set: make use of _arguments in _set
