@@ -1,7 +1,10 @@
 2005-03-02  Clint Adams  <clint@zsh.org>
 
-	* 20909: Src/Modules/termcap.c: reverse row and col
-	arguments to tgoto.
+	* 20909, 20911: Src/Modules/termcap.c: reverse row and col
+	arguments to tgoto(), and set affcnt to 1 unconditionally
+	when we echotc a capability with arguments (which we then
+	assume to be the 'cm' capability, with arguments in the
+	form <rows> <columns>.
 
 2005-03-01  Peter Stephenson  <pws@csr.com>
 

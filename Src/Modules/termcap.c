@@ -154,8 +154,9 @@ bin_echotc(char *name, char **argv, UNUSED(Options ops), UNUSED(int func))
     if (!argct)
 	tputs(t, 1, putraw);
     else {
+	/* This assumes arguments of <lines> <columns> for cap 'cm' */
 	num = (argv[1]) ? atoi(argv[1]) : atoi(*argv);
-	tputs(tgoto(t, num, atoi(*argv)), num, putraw);
+	tputs(tgoto(t, num, atoi(*argv)), 1, putraw);
     }
     return 0;
 }
