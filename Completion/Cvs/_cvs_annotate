@@ -1,8 +1,0 @@
-#autoload
-
-# "+lr:D:fR"
-_arguments -s \
-  -{l,f,R} \
-  '-r+:tag:_cvs_revisions' \
-  '-D+:date:_cvs_D' \
-  '*:file:_cvs_files'

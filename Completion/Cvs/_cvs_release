@@ -1,6 +1,0 @@
-#autoload
-
-# "+Qdq"
-_arguments -s \
-  -{Q,d,q} \
-  '*:directory:_files -/'

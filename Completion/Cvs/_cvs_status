@@ -1,6 +1,0 @@
-#autoload
-
-# "+vlR"
-_arguments -s \
-  -{v,l,R} \
-  '*:file:_cvs_files'

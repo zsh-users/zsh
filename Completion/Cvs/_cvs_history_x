@@ -1,5 +1,0 @@
-#autoload
-
-compset -P '*'
-# It should describe meaning.
-compadd F O E T C G U W A M R

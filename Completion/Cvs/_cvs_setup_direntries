@@ -1,8 +1,0 @@
-#autoload
-
-entries=()
-if [[ -f ${pref}CVS/Entries ]]; then
-  local rawentries
-  rawentries=(${(f)"$(<${pref}CVS/Entries)"})
-  _cvs_extract_directory_entries
-fi

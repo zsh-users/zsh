@@ -1,9 +1,0 @@
-#autoload
-
-# "+nlRm:fF:r:"
-_arguments -s \
-  -{n,l,R,f} \
-  '-m+:message:_cvs_m' \
-  '-F+:log message file:_files' \
-  '-r+:tag:_cvs_revisions' \
-  '*:file:_cvs_files_modified'

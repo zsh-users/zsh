@@ -1,7 +1,0 @@
-#autoload
-
-if compset -P '*='; then
-  _default
-else
-  _message "variable=value"
-fi

@@ -1,7 +1,0 @@
-#autoload
-
-# "+lRa:"
-_arguments -s \
-  -{l,R} \
-  '-a+:action:(edit unedit commit all none)'
-  '*:file:_cvs_files'
