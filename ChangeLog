@@ -1,4 +1,14 @@
-2001-04-12  Bart Schaefer  <schaefer@brasslantern.com>
+2001-04-13  Bart Schaefer  <schaefer@zsh.org>
+
+	* 13973: Completion/Unix/Type/_path_files: Parameter expansions
+	are checked before tilde-expansions so that the former are handled
+	properly when they appear in the same word as the latter.
+
+	* 13972: Src/prototypes.h, Src/system.h, Src/Modules/termcap.c,
+	Src/Modules/terminfo.c: Resolve assorted header file collisions,
+	mostly for benefit of Solaris 2.6.
+
+2001-04-12  Bart Schaefer  <schaefer@zsh.org>
 
 	* 13965: Src/system.h, Src/prototypes.h, Src/Modules/terminfo.c:
 	Use <term.h> for termcap protos when it is found but <termcap.h>
