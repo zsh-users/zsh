@@ -217,6 +217,10 @@ getcols(Listcols c)
 	    c->cols[COL_MA] = "";
 	else
 	    c->cols[COL_EC] = tcstr[TCSTANDOUTEND];
+	lr_caplen = 0;
+	if ((max_caplen = strlen(c->cols[COL_MA])) <
+	    (l = strlen(c->cols[COL_EC])))
+	    max_caplen = l;
 	return;
     }
     /* We have one of the parameters, use it. */
@@ -230,7 +234,7 @@ getcols(Listcols c)
     for (i = 0; i < NUM_COLS; i++) {
 	if (!c->cols[i])
 	    c->cols[i] = defcols[i];
-	if ((l = (c->cols[i] ? strlen(c->cols[i]) : 0)) > max_caplen)
+	if (c->cols[i] && (l = strlen(c->cols[i])) > max_caplen)
 	    max_caplen = l;
     }
     lr_caplen = strlen(c->cols[COL_LC]) + strlen(c->cols[COL_RC]);

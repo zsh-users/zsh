@@ -752,9 +752,14 @@ checkmailpath(char **s)
 		    fprintf(shout, "You have new mail.\n");
 		    fflush(shout);
 		} else {
-		    char *usav = underscore;
+		    VARARR(char, usav, underscorelen);
+		    int sl = strlen(*s);
 
-		    underscore = *s;
+		    if (sl >= underscorelen) {
+			zfree(underscore, underscorelen);
+			underscore = (char *) zalloc(underscorelen = sl + 32);
+		    }
+		    strcpy(underscore, *s);
 		    HEAPALLOC {
 			u = dupstring(u);
 			if (! parsestr(u)) {
@@ -763,8 +768,8 @@ checkmailpath(char **s)
 			    fputc('\n', shout);
 			    fflush(shout);
 			}
-			underscore = usav;
 		    } LASTALLOC;
+		    strcpy(underscore, usav);
 		}
 	    }
 	    if (isset(MAILWARNING) && st.st_atime > st.st_mtime &&
