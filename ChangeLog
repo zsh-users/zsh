@@ -9,6 +9,9 @@
 
 2001-06-06  Andrej Borsenkow  <bor@zsh.org>
 
+	* 14772: David Lebel <lebel@lebel.org>: zshconfig.ac: patch
+	for dynamic linking on OpenBSD
+
 	* unposted: Etc/zsh-development-guide: we now support autoconf-2.50
 
 	* 14766: Src/prompt.c: unify %l substitution (tty0, pts/3 etc)
