@@ -2,7 +2,8 @@
 
 	* unposted: Src/Modules/tcp.c:
 	don't segfault on -a if
-	the session table is empty.
+	the session table is empty,
+	and other fixes.
 
 	* 15772: Src/Modules/tcp.c:
 	add -t (test) for ztcp.

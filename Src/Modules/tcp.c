@@ -282,6 +282,8 @@ zts_delete(Tcp_session sess)
 
     tsess = zts_head();
 
+    if(!sess) return 1;
+
     if (tsess == sess)
     {
 	ztcp_head = sess->next;
@@ -289,15 +291,16 @@ zts_delete(Tcp_session sess)
 	return 0;
     }
 
-    while((tsess->next != sess) && (tsess->next))
-    {
+    while((tsess->next != sess) && (tsess->next)) {
 	tsess = zts_next(tsess);
     }
 
     if (!tsess->next) return 1;
 
-    tsess->next = tsess->next->next;
-    free(tsess->next);
+    if (ztcp_tail == sess)
+	    ztcp_tail = tsess;
+    tsess->next = sess->next;
+    free(sess);
     return 0;
 
 }
@@ -417,7 +420,7 @@ bin_ztcp(char *nam, char **args, char *ops, int func)
 	    }
 	    else
 	    {
-		zwarnnam(nam, "fd not found in tcp table", NULL, 0);
+		zwarnnam(nam, "fd %s not found in tcp table", args[0], 0);
 		return 1;
 	    }
 	}
