@@ -1616,8 +1616,6 @@ char *argv[];
 	DLLDARG=""
       ;;
     esac
-    DLLD="${DLLD=ld}"
-    DLLDARG=""
   fi
   if test -n "$GCC"; then
     DLCFLAGS="${DLCFLAGS=-fPIC}"
