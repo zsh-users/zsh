@@ -1,6 +1,9 @@
 2001-09-08  Clint Adams  <clint@zsh.org>
 
-	* 1576x: Src/Modules/tcp.c: add -v (verbose)
+	* 15765: Doc/Zsh/expn.yo, Src/pattern.c:
+	introduce [:ascii:] class.
+
+	* 15763: Src/Modules/tcp.c: add -v (verbose)
 	for ztcp.
 
 	* 15762: Src/Modules/tcp.c, Src/Modules/tcp.h,

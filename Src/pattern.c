@@ -158,18 +158,19 @@ typedef union upat *Upat;
  */
 #define PP_ALPHA  1
 #define PP_ALNUM  2
-#define PP_BLANK  3
-#define PP_CNTRL  4
-#define PP_DIGIT  5
-#define PP_GRAPH  6
-#define PP_LOWER  7
-#define PP_PRINT  8
-#define PP_PUNCT  9
-#define PP_SPACE  10
-#define PP_UPPER  11
-#define PP_XDIGIT 12
-#define PP_UNKWN  13
-#define PP_RANGE  14
+#define PP_ASCII  3
+#define PP_BLANK  4
+#define PP_CNTRL  5
+#define PP_DIGIT  6
+#define PP_GRAPH  7
+#define PP_LOWER  8
+#define PP_PRINT  9
+#define PP_PUNCT  10
+#define PP_SPACE  11
+#define PP_UPPER  12
+#define PP_XDIGIT 13
+#define PP_UNKWN  14
+#define PP_RANGE  15
 
 #define	P_OP(p)		((p)->l & 0xff)
 #define	P_NEXT(p)	((p)->l >> 8)
@@ -928,6 +929,8 @@ patcomppiece(int *flagp)
 			    ch = PP_ALPHA;
 			else if (!strncmp(patparse, "alnum", len))
 			    ch = PP_ALNUM;
+			else if (!strncmp(patparse, "ascii", len))
+			    ch = PP_ASCII;
 			else if (!strncmp(patparse, "blank", len))
 			    ch = PP_BLANK;
 			else if (!strncmp(patparse, "cntrl", len))
@@ -2185,6 +2188,10 @@ patmatchrange(char *range, int ch)
 		break;
 	    case PP_ALNUM:
 		if (isalnum(ch))
+		    return 1;
+		break;
+	    case PP_ASCII:
+		if ((ch & ~0x7f) == 0)
 		    return 1;
 		break;
 	    case PP_BLANK:

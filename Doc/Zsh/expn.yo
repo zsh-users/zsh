@@ -1178,6 +1178,7 @@ cindex(character classes)
 There are also several named classes of characters, in the form
 `tt([:)var(name)tt(:])' with the following meanings:  `tt([:alnum:])'
 alphanumeric, `tt([:alpha:])' alphabetic,
+`tt([:ascii:])' 7-bit,
 `tt([:blank:])' space or tab,
 `tt([:cntrl:])' control character, `tt([:digit:])' decimal
 digit, `tt([:graph:])' printable character except whitespace,
