@@ -3153,13 +3153,13 @@ static int
 execautofn(Estate state, int do_exec)
 {
     Shfunc shf = state->prog->shf;
-    int noalias = noaliases;
+    int noalias = noaliases, ksh = 1;
     Eprog prog;
 
     pushheap();
 
     noaliases = (shf->flags & PM_UNALIASED);
-    prog = getfpfunc(shf->nam);
+    prog = getfpfunc(shf->nam, &ksh);
     noaliases = noalias;
 
     if (prog == &dummy_eprog) {
@@ -3169,7 +3169,7 @@ execautofn(Estate state, int do_exec)
     }
     if (!prog)
 	prog = &dummy_eprog;
-    if (isset(KSHAUTOLOAD)) {
+    if (ksh == 2 || (ksh == 1 && isset(KSHAUTOLOAD))) {
 	VARARR(char, n, strlen(shf->nam) + 1);
 	strcpy(n, shf->nam);
 	execode(prog, 1, 0);
@@ -3205,7 +3205,7 @@ loadautofn(Shfunc shf)
     pushheap();
 
     noaliases = (shf->flags & PM_UNALIASED);
-    prog = getfpfunc(shf->nam);
+    prog = getfpfunc(shf->nam, NULL);
     noaliases = noalias;
 
     if (prog == &dummy_eprog) {
@@ -3360,7 +3360,7 @@ runshfunc(Eprog prog, FuncWrap wrap, char *name)
 
 /**/
 Eprog
-getfpfunc(char *s)
+getfpfunc(char *s, int *ksh)
 {
     char **pp, buf[PATH_MAX];
     off_t len;
@@ -3376,7 +3376,7 @@ getfpfunc(char *s)
 	    sprintf(buf, "%s/%s", *pp, s);
 	else
 	    strcpy(buf, s);
-	if ((r = try_dump_file(*pp, s, buf)))
+	if ((r = try_dump_file(*pp, s, buf, ksh)))
 	    return r;
 	unmetafy(buf, NULL);
 	if (!access(buf, R_OK) && (fd = open(buf, O_RDONLY | O_NOCTTY)) != -1) {

@@ -1295,8 +1295,8 @@ Equivalent to tt(whence -c).
 findex(zcompile)
 cindex(wordcode, creation)
 cindex(compilation)
-xitem(tt(zcompile) [ tt(-U) ] [ tt(-r) | tt(-m) ] var(file) [ var(name) ... ])
-xitem(tt(zcompile) tt(-c) [ tt(-M) ] [ tt(-r) | tt(-m) ] var(file) [ var(name) ... ])
+xitem(tt(zcompile) [ tt(-U) ] [ tt(-z) | tt(-k) ] [ tt(-r) | tt(-m) ] var(file) [ var(name) ... ])
+xitem(tt(zcompile) tt(-c) [ tt(-M) ] [ tt(-z) | tt(-k) ] [ tt(-r) | tt(-m) ] var(file) [ var(name) ... ])
 item(tt(zcompile -t) var(file) [ var(name) ... ])(
 This builtin command can be used to create and display files
 containing the wordcode for functions or scripts. In the first form, a wordcode
@@ -1331,6 +1331,16 @@ of the resulting wordcode file. On some systems it is impossible to
 map wordcode files into memory. On such systems, the wordcode will
 only be read from the file, independent on the mode selected when the 
 file was created.
+
+The tt(-z) and tt(-k) options are used when the wordcode file contains
+functions and these functions are autoloaded. If tt(-z) is given, the
+function will be autoloaded as if the tt(KSHAUTOLOAD) option weren't
+set, even if it is. The tt(-k) makes the function be loaded as if
+tt(KASHAUTOLOAD) were set and if neither of these options is given,
+the function will be loaded as determined by the setting of the
+tt(KSHAUTOLOAD) option at the time the function is loaded. These
+options may also be given in the lists of var(name)s and make all
+following functions be loaded as described.
 
 When creating wordcode files for scripts instead of functions, it is
 often better to use the tt(-r) option. Otherwise the whole wordcode

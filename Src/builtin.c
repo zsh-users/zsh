@@ -124,7 +124,7 @@ static struct builtin builtins[] =
     BUILTIN("where", 0, bin_whence, 0, -1, 0, "pmsw", "ca"),
     BUILTIN("which", 0, bin_whence, 0, -1, 0, "ampsw", "c"),
     BUILTIN("zmodload", 0, bin_zmodload, 0, -1, 0, "ILabcfdipue", NULL),
-    BUILTIN("zcompile", 0, bin_zcompile, 0, -1, 0, "tUmrcM", NULL),
+    BUILTIN("zcompile", 0, bin_zcompile, 0, -1, 0, "tUmrcMzk", NULL),
 };
 
 /****************************************/
