@@ -2807,10 +2807,16 @@ qualsheval(char *name, struct stat *buf, off_t days, char *str)
 static int
 qualnonemptydir(char *name, struct stat *buf, off_t days, char *str)
 {
-    DIR *dirh = opendir(name);
+    DIR *dirh;
     struct dirent *de;
 
-    if (dirh == NULL)
+    if (!S_ISDIR(buf->st_mode))
+	return 0;
+
+    if (buf->st_nlink > 2)
+	return 1;
+
+    if (!(dirh = opendir(name)))
 	return 0;
 
     while ((de = readdir(dirh))) {
