@@ -1010,7 +1010,19 @@ dotrapargs(int sig, int *sigtr, void *sigfn)
 	HashNode hn = gettrapnode(sig, 0);
 
 	args = znewlinklist();
-	name = ztrdup(hn->nam);
+	/*
+	 * In case of multiple names, try to get
+	 * a hint of the name in use from the function table.
+	 * In special cases, e.g. EXIT traps, the function
+	 * has already been removed.  Then it's OK to
+	 * use the standard name.
+	 */
+	if (hn) {
+	    name = ztrdup(hn->nam);
+	} else {
+	    name = (char *) zalloc(5 + strlen(sigs[sig]));
+	    sprintf(name, "TRAP%s", sigs[sig]);
+	}
 	zaddlinknode(args, name);
 	sprintf(num, "%d", sig);
 	zaddlinknode(args, num);
