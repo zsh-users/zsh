@@ -799,7 +799,12 @@ configuration key tt(describe_options) is used to decide if these
 explanation strings should be printed when options are listed. If it
 is set to a non-empty string and it doesn't contain the substring
 `tt(!)var(command)', where `var(command)' is the name of the command
-that is completed for, the descriptions will be shown.
+that is completed for, the descriptions will be shown. If no
+explanation string is given but the tt(autodescribe_options) key is
+set and only one argument is described for this var(opt-spec), the
+option will be described by the value of tt(autodescribe_options) with 
+any appearance of the sequence `tt(%d)' in it replaced by the
+description for the first argument.
 )
 enditem()
 
@@ -1165,6 +1170,13 @@ If set to a non-empty strings, options will be described when they are
 listed. If the value string contains substrings of the form
 `tt(!)var(command)', this will not be done for any of these
 var(command)s.
+)
+item(tt(autodescribe_options))(
+If set, this string will be used as the description for options which
+are not described by the completion function, but that have exactly
+one argument. The sequence `tt(%d)' in the value will be replaced by
+the description for this argument. Depending on personal preferences,
+it may be useful to set this key to something like `tt(specify: %d)'.
 )
 item(tt(describe_values))(
 Like tt(describe_options), but used when completing value lists.
