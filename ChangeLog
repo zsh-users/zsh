@@ -1,3 +1,9 @@
+2005-03-22  Andrey Borzenkov  <bor@zsh.org>
+
+	* 21051 (modifed as suugested by Oliver in 21052):
+	Completion/Unix/Command/_fuser: for SVR4 complete signals only after
+	-k; fix file name as first argument.
+
 2005-03-21  Peter Stephenson  <pws@pwstephenson.fsnet.co.uk>
 
 	* 21046: Completion/Base/Completer/_approximate:  use extra tests

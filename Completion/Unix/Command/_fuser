@@ -27,7 +27,7 @@ else
       )
     ;;
     sysv4 )
-      arg1=( ':signal:_signals -p' )
+      (( $+words[(r)-k] )) && arg1=( ':signal: _alternative signals\:signal\:_signals\ -p files:name:_files' )
     ;;
   esac
 
@@ -38,5 +38,5 @@ else
 	 '-u[append the user name of the process owner to each PID]' \
 	 $args \
 	 $arg1 \
-	 ':name:_files'
+	 '*:name:_files'
 fi
