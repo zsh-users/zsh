@@ -1,3 +1,9 @@
+2001-04-30  Sven Wischnowsky  <wischnow@zsh.org>
+
+	* 14160: Completion/Base/Completer/_expand: fixelt for the test
+	for the suffix style; if word contains only a tilde, don't try
+	to expand it
+
 2001-04-30  Andrej Borsenkow <bor@zsh.org>
 
 	* Bart: 14144 (modified):  Src/Modules/stat.c
