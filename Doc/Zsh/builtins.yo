@@ -655,7 +655,8 @@ If the tt(PUSHD_MINUS) option is set, the meanings of `tt(PLUS())' and
 `tt(-)' in this context are swapped.
 )
 findex(print)
-item(tt(print) [ tt(-bnrslzpNDPoOicm) ] [ tt(-u)var(n) ] [ tt(-f) var(format) ] [ tt(-R) [ tt(-en) ]] [ var(arg) ... ])(
+xitem(tt(print) [ tt(-abcDilmnNoOpPrsz) ] [ tt(-u)var(n) ] [ tt(-f) var(format) ] [ tt(-C) var(cols) ])
+item(  [ tt(-R) [ tt(-en) ]] [ var(arg) ... ])(
 With the `tt(-f)' option the arguments are printed as described by tt(printf).
 With no flags or with the flag `tt(-)', the arguments are printed on
 the standard output as described by tt(echo), with the following differences:
@@ -667,14 +668,9 @@ Finally, if not in an escape
 sequence, `tt(\)' escapes the following character and is not printed.
 
 startitem()
-item(tt(-r))(
-Ignore the escape conventions of tt(echo).
-)
-item(tt(-R))(
-Emulate the BSD tt(echo) command, which does not process escape sequences
-unless the tt(-e) flag is given.  The tt(-n) flag suppresses the trailing
-newline.  Only the tt(-e) and tt(-n) flags are recognized after
-tt(-R); all other arguments and options are printed.
+item(tt(-a))(
+Print arguments with the column incrementing first.  Only useful with the
+tt(-c) and tt(-C) options.
 )
 item(tt(-b))(
 Recognize all the escape sequences defined for the tt(bindkey) command,
@@ -683,19 +679,32 @@ ifzman(zmanref(zshzle))\
 ifnzman(noderef(Zle Builtins))\
 .
 )
+item(tt(-c))(
+Print the arguments in columns.  Unless tt(-a) is also given, arguments are
+printed with the row incrementing first.
+)
+item(tt(-C) var(cols))(
+Print the arguments in var(cols) columns.  Unless tt(-a) is also given,
+arguments are printed with the row incrementing first.
+)
+item(tt(-D))(
+Treat the arguments as directory names, replacing prefixes with tt(~)
+expressions, as appropriate.
+)
+item(tt(-i))(
+If given together with tt(-o) or tt(-O), sorting is performed
+case-independently.
+)
+item(tt(-l))(
+Print the arguments separated by newlines instead of spaces.
+)
 item(tt(-m))(
 Take the first argument as a pattern (should be quoted), and remove
 it from the argument list together with subsequent arguments that
 do not match this pattern.
 )
-item(tt(-s))(
-Place the results in the history list instead of on the standard output.
-)
 item(tt(-n))(
 Do not add a newline to the output.
-)
-item(tt(-l))(
-Print the arguments separated by newlines instead of spaces.
 )
 item(tt(-N))(
 Print the arguments separated and terminated by nulls.
@@ -706,31 +715,32 @@ Print the arguments sorted in ascending order.
 item(tt(-O))(
 Print the arguments sorted in descending order.
 )
-item(tt(-i))(
-If given together with tt(-o) or tt(-O), sorting is performed
-case-independently.
-)
-item(tt(-c))(
-Print the arguments in columns.
-)
-item(tt(-u)var(n))(
-Print the arguments to file descriptor var(n).
-)
 item(tt(-p))(
 Print the arguments to the input of the coprocess.
-)
-item(tt(-z))(
-Push the arguments onto the editing buffer stack, separated by spaces.
-)
-item(tt(-D))(
-Treat the arguments as directory names, replacing prefixes with tt(~)
-expressions, as appropriate.
 )
 item(tt(-P))(
 Perform prompt expansion (see
 ifzman(zmanref(zshmisc))\
 ifnzman(noderef(Prompt Expansion))\
 ).
+)
+item(tt(-r))(
+Ignore the escape conventions of tt(echo).
+)
+item(tt(-R))(
+Emulate the BSD tt(echo) command, which does not process escape sequences
+unless the tt(-e) flag is given.  The tt(-n) flag suppresses the trailing
+newline.  Only the tt(-e) and tt(-n) flags are recognized after
+tt(-R); all other arguments and options are printed.
+)
+item(tt(-s))(
+Place the results in the history list instead of on the standard output.
+)
+item(tt(-u)var(n))(
+Print the arguments to file descriptor var(n).
+)
+item(tt(-z))(
+Push the arguments onto the editing buffer stack, separated by spaces.
 )
 enditem()
 

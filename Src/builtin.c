@@ -100,7 +100,7 @@ static struct builtin builtins[] =
 #endif
 
     BUILTIN("popd", 0, bin_cd, 0, 1, BIN_POPD, NULL, NULL),
-    BUILTIN("print", BINF_PRINTOPTS, bin_print, 0, -1, BIN_PRINT, "RDPbnrsf:lzNu:pioOcm-", NULL),
+    BUILTIN("print", BINF_PRINTOPTS, bin_print, 0, -1, BIN_PRINT, "abcC:Df:ilmnNoOpPrRsu:z-", NULL),
     BUILTIN("printf", 0, bin_print, 1, -1, BIN_PRINTF, NULL, NULL),
     BUILTIN("pushd", BINF_SKIPINVALID | BINF_SKIPDASH | BINF_DASHDASHVALID, bin_cd, 0, 2, BIN_PUSHD, "sPL", NULL),
     BUILTIN("pushln", BINF_PRINTOPTS, bin_print, 0, -1, BIN_PRINT, NULL, "-nz"),
@@ -3172,7 +3172,8 @@ bin_print(char *name, char **args, Options ops, int func)
 	    } else {
 		fd = (int)zstrtol(argptr, &eptr, 10);
 		if (*eptr) {
-		    zwarnnam(name, "number expected after -u: %s", argptr, 0);
+		    zwarnnam(name, "number expected after -%c: %s", argptr,
+			     'u');
 		    return 1;
 		}
 	    }
@@ -3209,30 +3210,71 @@ bin_print(char *name, char **args, Options ops, int func)
 	    len[n] = strlen(args[n]);
 
     /* -c -- output in columns */
-    if (OPT_ISSET(ops,'c')) {
+    if (OPT_ISSET(ops,'c') || OPT_ISSET(ops,'C')) {
 	int l, nc, nr, sc, n, t, i;
 	char **ap;
 
+	/*
+	 * n: loop counter
+	 * ap: array iterator
+	 * l: maximum length seen
+	 */
 	for (n = l = 0, ap = args; *ap; ap++, n++)
 	    if (l < (t = strlen(*ap)))
 		l = t;
 
+	/*
+	 * sc: column width
+	 * nc: number of columns (at least one)
+	 */
 	sc = l + 2;
-	nc = (columns + 1) / sc;
-	if (!nc)
-	    nc = 1;
+	if (OPT_ISSET(ops,'C')) {
+	    char *eptr, *argptr = OPT_ARG(ops,'C');
+	    nc = (int)zstrtol(argptr, &eptr, 10);
+	    if (*eptr) {
+		zwarnnam(name, "number expected after -%c: %s", argptr, 'C');
+		return 1;
+	    }
+	    if (nc <= 0) {
+		zwarnnam(name, "invalid number of columns: %s", argptr, 0);
+		return 1;
+	    }
+	}
+	else
+	{
+	    nc = (columns + 1) / sc;
+	    if (!nc)
+		nc = 1;
+	}
 	nr = (n + nc - 1) / nc;
 
+	if (OPT_ISSET(ops,'a'))	/* print across, i.e. columns first */
+	    ap = args;
 	for (i = 0; i < nr; i++) {
-	    ap = args + i;
-	    do {
-		l = strlen(*ap);
-		fprintf(fout, "%s", *ap);
-		for (t = nr; t && *ap; t--, ap++);
-		if(*ap)
-		    for (; l < sc; l++)
-			fputc(' ', fout);
-	    } while (*ap);
+	    if (OPT_ISSET(ops,'a'))
+	    {
+		int ic;
+		for (ic = 0; ic < nc && *ap; ic++, ap++)
+		{
+		    l = strlen(*ap);
+		    fprintf(fout, "%s", *ap);
+		    if (*ap)
+			for (; l < sc; l++)
+			    fputc(' ', fout);
+		}
+	    }
+	    else
+	    {
+		ap = args + i;
+		do {
+		    l = strlen(*ap);
+		    fprintf(fout, "%s", *ap);
+		    for (t = nr; t && *ap; t--, ap++);
+		    if(*ap)
+			for (; l < sc; l++)
+			    fputc(' ', fout);
+		} while (*ap);
+	    }
 	    fputc(OPT_ISSET(ops,'N') ? '\0' : '\n', fout);
 	}
 	/* Testing EBADF special-cases >&- redirections */
@@ -4104,7 +4146,7 @@ bin_read(char *name, char **args, Options ops, int func)
 	} else {
 	    readfd = (int)zstrtol(argptr, &eptr, 10);
 	    if (*eptr) {
-		zwarnnam(name, "number expected after -u: %s", argptr, 0);
+		zwarnnam(name, "number expected after -%c: %s", argptr, 'u');
 		return 1;
 	    }
 	}

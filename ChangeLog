@@ -1,3 +1,9 @@
+2002-11-20  Peter Stephenson  <pws@csr.com>
+
+	* 17940: Src/builtin.c, Doc/Zsh/builtin.yo: print -C <cols> prints
+	given number of columns, -a with -c or -C prints arguments across
+	before down.
+
 2002-11-13  Clint Adams  <clint@zsh.org>
 
 	* 17935: Src/text.c: beautify bin_whence indentation of ()
