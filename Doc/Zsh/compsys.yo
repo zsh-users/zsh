@@ -1075,6 +1075,22 @@ Once a string has been read, the next call to tt(_read_comp) will use the
 existing string instead of reading a new one.  To force a new string to be
 read, call tt(_read_comp) with a numeric argument.
 )
+item(tt(_verbose_list) (^Xv))(
+This widget behaves like the builtin tt(delete-char-or-list) widget
+but if called repeatedly with the same command line, it will make the
+completion list more and more verbose. The default behavior is to
+first show options even if the tt(option_prefix) configuration key is
+set and to show option and value descriptions, too, on the next
+invocation. Using the tt(verboselist_stages) configuration key it is
+possible to change this default behavior, see
+ifzman(the section `Completion System Configuration' below)\
+ifnzman(noderef(Completion System Configuration)). Also, the
+tt(_oldlist) completer has support for this command, which is
+described in the entry for the tt(oldlist_menu) configuration key.
+
+Since this widget normally behaves like tt(delete-char-or-list) you
+may find it convenient to bind it to tt(^D).
+)
 enditem()
 
 texinode(Completion System Configuration)()(Bindable Commands)(Completion System)
@@ -1339,7 +1355,37 @@ For example, suppose you type tt(^Xc) to generate a list of corrections,
 and menu completion is started in one of the usual ways.  Usually, typing
 tt(TAB) at this point would start trying to complete the line as it now
 appears.  With tt(_oldlist), it will instead continue to cycle through the
-list of completions. 
+list of completions.
+
+With this key, the tt(_oldlist) completer also has additional support
+for the tt(_verbose_list) bindable command: when it is set to
+tt(verbose), invoking the tt(_oldlist) completer after a different
+list has been shown by calling the tt(_verbose_list) command will make 
+completion re-use this list, so that, for example, menu completion
+will be started when the tt(AUTO_LIST) option is set.
+)
+item(tt(verboselist_stages))(
+This key is used by the tt(_verbose_list) bindable command to find out 
+when options or descriptions should be shown. It is a colon-separated
+list of the keywords tt(normal), tt(options) and tt(describe). The
+keywords are used in the order in which they appear to describe what
+should be listed on the next call to the widget (with an unchanged
+command line). The value tt(normal) says that the list should be
+generated as defined by the normal settings of the configuration
+keys, the value tt(options) says that options should be listed even if 
+the tt(option_prefix) configuration key is set, and tt(describe) says
+that options and values should be described. The last two can be
+combined as in tt(describe-options) to make both options being listed
+and options and values being described.
+
+For example, if tt(option_prefix) is set to any non-empty value,
+tt(describe_options) is not set and tt(verboselist_stages) is set to
+tt(describe:normal) invoking the tt(_verbose_list) widget with a list
+being shown will replace this list with a list containing also option
+names that are possible matches and will also make these options be
+described if possible. Consecutively invoking the tt(_verbose_list)
+widget will then toggle between the normal list form and the extra
+verbose one.
 )
 item(tt(path_expand))(
 This is used by the tt(_path_files) function which is used throughout
