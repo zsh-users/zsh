@@ -20,7 +20,8 @@
 	
 2000-05-17  Bart Schaefer  <schaefer@zsh.org>
 
-	* Felix Rosencrantz: 11450: Replace `tr` with paramsubst.
+	* Felix Rosencrantz: 11450: Test/comptest: Replace `tr` with
+	parameter substitution.
 
 2000-05-17  Peter Stephenson  <pws@pwstephenson.fsnet.co.uk>
 
