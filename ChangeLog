@@ -1,3 +1,11 @@
+2000-10-17  Peter Stephenson  <pws@csr.com>
+
+	* Config/version.mk, Functions/Zle/.distfiles,
+	Completion/Core/.distfiles: 3.1.6-dev-7
+
+	* Functions/Misc/zmv: in verbose mode, report if something was
+	skipped because it didn't change.
+	
 2000-10-16  Sven Wischnowsky  <wischnow@zsh.org>
 
 	* ?????: Test/54compmatch.ztst: add tests for the stuff in 12995

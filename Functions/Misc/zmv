@@ -235,6 +235,7 @@ for f in $files; do
   elif [[ $f = $g ]]; then
     # don't cause error: more useful just to skip
     #   errs=($errs "$f not altered by substitution")
+    [[ -n $opt_v ]] && print "$f not altered, ignored"
     continue
   elif [[ -n $from[$g] && ! -d $g ]]; then
     errs=($errs "$f and $from[$g] both map to $g")

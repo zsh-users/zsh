@@ -1,4 +1,4 @@
 DISTFILES_SRC='
     .distfiles history-search-end edit-command-line incremental-complete-word
-    incarg insert-files predict-on
+    incarg insert-files predict-on smart-insert-last-word
 '
