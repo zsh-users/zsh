@@ -510,7 +510,8 @@ createparamtable(void)
 			pm->env = *envp++ = ztrdup(*envp2);
 			*envp = NULL;
 			if (pm->flags & PM_SPECIAL)
-			    pm->env = replenv(pm->env, getsparam(pm->nam));
+			    pm->env = replenv(pm->env, getsparam(pm->nam),
+					      pm->flags);
 		    }
 		}
 		*str = '=';
@@ -522,18 +523,18 @@ createparamtable(void)
 	pm = (Param) paramtab->getnode(paramtab, "HOME");
 	if (!(pm->flags & PM_EXPORTED)) {
 	    pm->flags |= PM_EXPORTED;
-	    pm->env = addenv("HOME", home);
+	    pm->env = addenv("HOME", home, pm->flags);
 	}
 	pm = (Param) paramtab->getnode(paramtab, "LOGNAME");
 	if (!(pm->flags & PM_EXPORTED)) {
 	    pm->flags |= PM_EXPORTED;
-	    pm->env = addenv("LOGNAME", pm->u.str);
+	    pm->env = addenv("LOGNAME", pm->u.str, pm->flags);
 	}
 	pm = (Param) paramtab->getnode(paramtab, "SHLVL");
 	if (!(pm->flags & PM_EXPORTED))
 	    pm->flags |= PM_EXPORTED;
 	sprintf(buf, "%d", (int)++shlvl);
-	pm->env = addenv("SHLVL", buf);
+	pm->env = addenv("SHLVL", buf, pm->flags);
 
 	/* Add the standard non-special parameters */
 	set_pwd_env();
@@ -1506,10 +1507,10 @@ setstrvalue(Value v, char *val)
     else
 	val = v->pm->gets.cfn(v->pm);
     if (v->pm->env)
-	v->pm->env = replenv(v->pm->env, val);
+	v->pm->env = replenv(v->pm->env, val, v->pm->flags);
     else {
 	v->pm->flags |= PM_EXPORTED;
-	v->pm->env = addenv(v->pm->nam, val);
+	v->pm->env = addenv(v->pm->nam, val, v->pm->flags);
     }
 }
 
@@ -2683,13 +2684,13 @@ arrfixenv(char *s, char **t)
     len_s = strlen(s);
     for (ep = environ; *ep; ep++)
 	if (!strncmp(*ep, s, len_s) && (*ep)[len_s] == '=') {
-	    pm->env = replenv(*ep, u);
+	    pm->env = replenv(*ep, u, pm->flags);
 	    return;
 	}
     if (isset(ALLEXPORT))
 	pm->flags |= PM_EXPORTED;
     if (pm->flags & PM_EXPORTED)
-	pm->env = addenv(s, u);
+	pm->env = addenv(s, u, pm->flags);
 }
 
 /* Given *name = "foo", it searchs the environment for string *
@@ -2709,11 +2710,25 @@ zgetenv(char *name)
     return NULL;
 }
 
+/**/
+static void
+copyenvstr(char *s, char *value, int flags)
+{
+    while (*s++) {
+	if ((*s = *value++) == Meta)
+	    *s = *value++ ^ 32;
+	if (flags & PM_LOWER)
+	    *s = tulower(*s);
+	else if (flags & PM_UPPER)
+	    *s = tuupper(*s);
+    }
+}
+
 /* Change the value of an existing environment variable */
 
 /**/
 char *
-replenv(char *e, char *value)
+replenv(char *e, char *value, int flags)
 {
     char **ep, *s;
     int len_value;
@@ -2726,9 +2741,7 @@ replenv(char *e, char *value)
 	    while (*s++ != '=');
 	    *ep = (char *) zrealloc(e, s - e + len_value + 1);
 	    s = s - e + *ep - 1;
-	    while (*s++)
-		if ((*s = *value++) == Meta)
-		    *s = *value++ ^ 32;
+	    copyenvstr(s, value, flags);
 	    return *ep;
 	}
     return NULL;
@@ -2739,7 +2752,7 @@ replenv(char *e, char *value)
 
 /**/
 static char *
-mkenvstr(char *name, char *value)
+mkenvstr(char *name, char *value, int flags)
 {
     char *str, *s;
     int len_name, len_value;
@@ -2751,9 +2764,7 @@ mkenvstr(char *name, char *value)
     strcpy(s, name);
     s += len_name;
     *s = '=';
-    while (*s++)
-	if ((*s = *value++) == Meta)
-	    *s = *value++ ^ 32;
+    copyenvstr(s, value, flags);
     return str;
 }
 
@@ -2764,7 +2775,7 @@ mkenvstr(char *name, char *value)
 
 /**/
 char *
-addenv(char *name, char *value)
+addenv(char *name, char *value, int flags)
 {
     char **ep, *s, *t;
     int num_env;
@@ -2775,7 +2786,7 @@ addenv(char *name, char *value)
 	for (s = *ep, t = name; *s && *s == *t; s++, t++);
 	if (*s == '=' && !*t) {
 	    zsfree(*ep);
-	    return *ep = mkenvstr(name, value);
+	    return *ep = mkenvstr(name, value, flags);
 	}
     }
 
@@ -2785,7 +2796,7 @@ addenv(char *name, char *value)
 
     /* Now add it at the end */
     ep = environ + num_env;
-    *ep = mkenvstr(name, value);
+    *ep = mkenvstr(name, value, flags);
     *(ep + 1) = NULL;
     return *ep;
 }

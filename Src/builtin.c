@@ -645,13 +645,13 @@ set_pwd_env(void)
     if (!(pm->flags & PM_EXPORTED) &&
 	(!pm->level || (isset(ALLEXPORT) && !pm->old))) {
 	pm->flags |= PM_EXPORTED;
-	pm->env = addenv("PWD", pwd);
+	pm->env = addenv("PWD", pwd, pm->flags);
     }
     pm = (Param) paramtab->getnode(paramtab, "OLDPWD");
     if (!(pm->flags & PM_EXPORTED) &&
 	(!pm->level || (isset(ALLEXPORT) && !pm->old))) {
 	pm->flags |= PM_EXPORTED;
-	pm->env = addenv("OLDPWD", oldpwd);
+	pm->env = addenv("OLDPWD", oldpwd, pm->flags);
     }
 }
 
@@ -1621,7 +1621,7 @@ typeset_single(char *cname, char *pname, Param pm, int func,
 	if (!(pm->flags & (PM_ARRAY|PM_HASHED))) {
 	    if (pm->flags & PM_EXPORTED) {
 		if (!(pm->flags & PM_UNSET) && !pm->env && !value)
-		    pm->env = addenv(pname, getsparam(pname));
+		    pm->env = addenv(pname, getsparam(pname), pm->flags);
 	    } else if (pm->env &&
 		       (!pm->level || (isset(ALLEXPORT) && !pm->old))) {
 		delenv(pm->env);
