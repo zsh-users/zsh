@@ -1,3 +1,8 @@
+2004-02-27  Peter Stephenson  <pws@csr.com>
+
+	* 19478: configure.ac: make pcre put its flag into
+	CPPFLAGS so preprocessor can find them.
+
 2004-02-26  Wayne Davison  <wayned@users.sourceforge.net>
 
 	* unposted: Src/Modules/zpty.c: silenced a compiler warning

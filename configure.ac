@@ -496,8 +496,12 @@ AC_HEADER_SYS_WAIT
 
 oldcflags="$CFLAGS"
 AC_CHECK_PROG([PCRECONF], pcre-config, pcre-config)
+dnl Typically (meaning on this single RedHat 9 box in front of me)
+dnl pcre-config --cflags produces a -I output which needs to go into
+dnl CPPFLAGS else configure's preprocessor tests don't pick it up,
+dnl producing a warning.
 if test "x$ac_cv_prog_PCRECONF" = xpcre-config; then
-  CFLAGS="$CFLAGS `pcre-config --cflags`"
+  CPPFLAGS="$CPPFLAGS `pcre-config --cflags`"
 fi
 
 AC_CHECK_HEADERS(sys/time.h sys/times.h sys/select.h termcap.h termio.h \
