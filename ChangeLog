@@ -1,5 +1,7 @@
 2000-10-05  Sven Wischnowsky  <wischnow@zsh.org>
 
+	* 12899: Completion/Core/_main_complete: unset cshnullglob
+	
 	* 12898: Src/parse.c: don't return invalid Eprog after parse error
 	
 	* 12897: Src/Zle/computil.c: comparguments: don't use

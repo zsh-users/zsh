@@ -16,8 +16,8 @@
 # which makes the output of setopt and unsetopt reflect a different
 # state than the global one for which you are completing.
 
-setopt localoptions nullglob rcexpandparam extendedglob noshglob
-unsetopt markdirs globsubst shwordsplit nounset ksharrays
+setopt localoptions nullglob rcexpandparam extendedglob noshglob \
+       nomarkdirs noglobsubst noshwordsplit unset noksharrays nocshnullglob
 exec </dev/null	# ZLE closes stdin, which can cause errors
 
 # Failed returns from this code are not real errors
