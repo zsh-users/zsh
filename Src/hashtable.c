@@ -789,8 +789,8 @@ removeshfuncnode(HashTable ht, char *nam)
     HashNode hn;
     int signum;
 
-    if (!strncmp(nam, "TRAP", 4) && (signum = getsignum(nam +4)) != -1)
-	hn = removetrap(getsignum(nam + 4));
+    if (!strncmp(nam, "TRAP", 4) && (signum = getsignum(nam + 4)) != -1)
+	hn = removetrap(signum);
     else
 	hn = removehashnode(shfunctab, nam);
 

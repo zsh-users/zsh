@@ -1,3 +1,8 @@
+2000-04-30  Bart Schaefer  <schaefer@zsh.org>
+
+	* 11029: Src/hashtable.c, Src/signals.c: Back out more bits of
+	11015 made obsolete by 11026.
+
 2000-04-30  Clint Adams  <schizo@debian.org>
 
 	* 11027: Josip Rodin: Completion/User/_joe:

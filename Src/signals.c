@@ -674,7 +674,6 @@ dosavetrap(int sig, int level)
     } else {
 	st->list = sigfuncs[sig] ? dupeprog(sigfuncs[sig], 0) : NULL;
     }
-    noerrs = !!st->list;
     if (!savetraps)
 	savetraps = znewlinklist();
     /*
@@ -731,9 +730,7 @@ settrap(int sig, Eprog l)
 void
 unsettrap(int sig)
 {
-    int ne = noerrs;
     HashNode hn = removetrap(sig);
-    noerrs = ne;
     if (hn)
 	shfunctab->freenode(hn);
 }
