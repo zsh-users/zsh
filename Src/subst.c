@@ -1230,6 +1230,15 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int ssub)
 	if (!inbrace)
 	    break;
     }
+    if (inbrace &&
+	(c = *s) != '-' && c != '+' && c != ':' && c != '%'  && c != '/' &&
+	c != '=' && c != Equals &&
+	c != '#' && c != Pound &&
+	c != '?' && c != Quest &&
+	c != '}' && c != Outbrace) {
+	zerr("bad substitution", NULL, 0);
+	return NULL;
+    }
     if (isarr) {
 	if (nojoin)
 	    isarr = -1;
@@ -1463,9 +1472,6 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int ssub)
 		}
 	    }
 	    {
-		char t = s[-1];
-
-		singsub(&s);
 #if 0
 		/*
 		 * This allows # and % to be at the start of
@@ -1473,6 +1479,11 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int ssub)
 		 * a bit nasty, and can be done (although
 		 * less efficiently) with anchors.
 		 */
+
+		char t = s[-1];
+
+		singsub(&s);
+
 		if (t == '/' && (flags & SUB_SUBSTR)) {
 		    if ((c = *s) == '#' || c == '%') {
 			flags &= ~SUB_SUBSTR;
@@ -1483,6 +1494,8 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int ssub)
 			s++;
 		    }
 		}
+#else
+		singsub(&s);
 #endif
 	    }
 

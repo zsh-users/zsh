@@ -1,5 +1,8 @@
 2000-05-15  Sven Wischnowsky  <wischnow@zsh.org>
 
+	* 11380: Src/subst.c: detect additional characters in parameter
+ 	expansions and signal an error for them
+	
 	* 11379: Completion/Base/.distfiles, Completion/Base/_in_vared,
  	Completion/Core/_compalso, Completion/Core/_complete,
  	Completion/Core/_main_complete, Doc/Zsh/compsys.yo: add _in_vared
