@@ -23,6 +23,12 @@ ifzman(the section `Matching Control' in zmanref(zshcompwid))\
 ifnzman(noderef(Matching Control))
 for further details.
 
+Note also, that it is possible to use old completion definitions using 
+the tt(compctl) builtin command together with the functions for the
+new completion system. To enable this, the tt(_default) function from
+the tt(Base) directory of the distribution should be copied and
+modified as described in that file.
+
 startmenu()
 menu(Initialization)
 menu(Completion System Configuration)
@@ -71,7 +77,11 @@ information, and your tt(.zshrc) will not be altered at all.
 After initialization all the builtin completion widgets such as
 tt(expand-or-complete) will be redefined to use the new completion system.
 Should you need to, you can still bind keys to the old functions by putting
-a `tt(.)' in front, e.g. `tt(.expand-or-complete)'.
+a `tt(.)' in front, e.g. `tt(.expand-or-complete)'. Note that this
+means that the tt(zsh/complist) module has to be loaded before the
+completion system is initialized (i.e. the tt(compinit) function is
+called) to make sure that the tt(menu-select) widget defined by it
+will be redefined, too.
 
 subsect(Use of compinit)
 findex(compinit)
@@ -981,7 +991,13 @@ ifnzman(noderef(The zsh/complist Module))\
 If this style is set for the tt(default) tag, the strings in the value 
 are taken as specifications that are to be used everywhere. If it is
 set for other tags, the specifications are used only for matches of
-the type described by the tag.
+the type described by the tag. For this to work, the tt(group-name)
+style has to be set to an empty string. If the tt(group-name) tag
+specifies other names for the groups the matches in these groups can
+be colored by using these names together with the `tt((group)...)'
+syntax described for the tt(ZLS_COLORS) and tt(ZLS_COLOURS) parameters 
+and adding the specifications to the value for this style with the
+tt(default) tag.
 
 To be able to share the same specifications one has set up for the GNU
 version of the tt(ls) command one can use:
