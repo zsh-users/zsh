@@ -1,5 +1,8 @@
 2001-09-08  Clint Adams  <clint@zsh.org>
 
+	* 1576x: Src/Modules/tcp.c: add -v (verbose)
+	for ztcp.
+
 	* 15762: Src/Modules/tcp.c, Src/Modules/tcp.h,
 	Src/Modules/tcp.mdd, Src/Modules/zftp.c:
 	introduce ztcp builtin.

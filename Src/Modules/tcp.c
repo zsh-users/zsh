@@ -381,13 +381,16 @@ tcp_connect(Tcp_session sess, char *addrp, struct hostent *zhost, int d_port)
 static int
 bin_ztcp(char *nam, char **args, char *ops, int func)
 {
-    int herrno, err=1, destport, force=0, len;
+    int herrno, err=1, destport, force=0, verbose=0, len;
     char **addrp, *desthost;
     struct hostent *zthost = NULL;
     Tcp_session sess;
 
     if (ops['f'])
 	force=1;
+
+    if (ops['v'])
+	verbose=1;
     
     if (ops['c']) {
 	if (!args[0]) {
@@ -473,7 +476,10 @@ bin_ztcp(char *nam, char **args, char *ops, int func)
 	    zwarnnam(nam, "connection failed: %e", NULL, errno);
 	else
 	{
-	    fprintf(shout, "%s:%d is now on fd %d\n", desthost, destport, sess->fd);
+	    if(verbose)
+		fprintf(shout, "%s:%d is now on fd %d\n", desthost, destport, sess->fd);
+	    else
+		fprintf(shout, "%d\n", sess->fd);
 	}
 	
 	zsfree(desthost);
