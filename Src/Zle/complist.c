@@ -346,11 +346,7 @@ clprintm(Cmgroup g, Cmatch *mp, int mc, int ml, int lastc, int width,
 	len = width - 2;
 	while (len-- > 0)
 	    putc(' ', shout);
-	if (mcolors.cols[COL_EC])
-	    tputs(mcolors.cols[COL_EC], 1, putshout);
-	else
-	    zcputs(&mcolors, COL_NO);
-
+	zcoff();
 	return;
     }
     m = *mp;
@@ -412,19 +408,19 @@ clprintm(Cmgroup g, Cmatch *mp, int mc, int ml, int lastc, int width,
 	nicezputs((m->disp ? m->disp : m->str), shout);
 	len = niceztrlen(m->disp ? m->disp : m->str);
 
-	if (isset(LISTTYPES)) {
-	    zcoff();
-	    zcputs(&mcolors, COL_TC);
-	    if (buf)
-		putc(file_type(buf->st_mode), shout);
-	    else
-		putc(' ', shout);
+        if (isset(LISTTYPES) && buf) {
+	    if (m->gnum != mselect) {
+		zcoff();
+		zcputs(&mcolors, COL_TC);
+	    }
+	    putc(file_type(buf->st_mode), shout);
 	    len++;
 	}
 	if ((len = width - len - 2) > 0) {
-	    zcoff();
-	    zcputs(&mcolors, COL_SP);
-
+	    if (m->gnum != mselect) {
+		zcoff();
+		zcputs(&mcolors, COL_SP);
+	    }
 	    while (len-- > 0)
 		putc(' ', shout);
 	}
