@@ -197,7 +197,7 @@ stringsubst(LinkList list, LinkNode node, int ssub, int asssub)
 		continue;
 	    }
 	    if (!qt && ssub && isset(GLOBSUBST))
-		tokenize(s);
+		shtokenize(s);
 	    l1 = str2 - str3;
 	    l2 = strlen(s);
 	    if (nonempty(pl)) {
@@ -450,14 +450,14 @@ strcatsub(char **d, char *pb, char *pe, char *src, int l, char *s, int glbsub,
     if (!pl && (!s || !*s)) {
 	*d = dest = (copied ? src : dupstring(src));
 	if (glbsub)
-	    tokenize(dest);
+	    shtokenize(dest);
     } else {
 	*d = dest = hcalloc(pl + l + (s ? strlen(s) : 0) + 1);
 	strncpy(dest, pb, pl);
 	dest += pl;
 	strcpy(dest, src);
 	if (glbsub)
-	    tokenize(dest);
+	    shtokenize(dest);
 	dest += l;
 	if (s)
 	    strcpy(dest, s);
@@ -1595,7 +1595,7 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int ssub)
 		if (!quoteerr) {
 		    errflag = oef;
 		    if (haserr)
-			tokenize(s);
+			shtokenize(s);
 		} else if (haserr || errflag) {
 		    zerr("parse error in ${...%c...} substitution",
 			 NULL, s[-1]);
@@ -2063,7 +2063,7 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int ssub)
 		else {
 		    y = dupstring(x);
 		    if (globsubst)
-			tokenize(y);
+			shtokenize(y);
 		}
 		insertlinknode(l, n, (void *) y), incnode(n);
 	    }

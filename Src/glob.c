@@ -2448,6 +2448,20 @@ igetmatch(char **sp, Patprog p, int fl, int n, char *replstr)
 mod_export void
 tokenize(char *s)
 {
+    zshtokenize(s, 0);
+}
+
+/**/
+mod_export void
+shtokenize(char *s)
+{
+    zshtokenize(s, isset(SHGLOB));
+}
+
+/**/
+static void
+zshtokenize(char *s, int shglob)
+{
     char *t;
     int bslash = 0;
 
@@ -2463,7 +2477,7 @@ tokenize(char *s)
 	    bslash = 1;
 	    continue;
 	case '<':
-	    if (isset(SHGLOB))
+	    if (shglob)
 		break;
 	    if (bslash) {
 		s[-1] = Bnull;
@@ -2482,7 +2496,7 @@ tokenize(char *s)
 	case '(':
 	case '|':
 	case ')':
-	    if (isset(SHGLOB))
+	    if (shglob)
 		break;
 	case '>':
 	case '^':

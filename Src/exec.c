@@ -2797,7 +2797,7 @@ readoutput(int in, int qt)
 
 	while (*words) {
 	    if (isset(GLOBSUBST))
-		tokenize(*words);
+		shtokenize(*words);
 	    addlinknode(ret, *words++);
 	}
     }
