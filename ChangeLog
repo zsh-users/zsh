@@ -1,5 +1,8 @@
 2003-10-08  Peter Stephenson  <pws@csr.com>
 
+	* unposted: Completion/Unix/Command/.distfiles, Etc/.distfiles:
+	more new files weren't handled.
+
 	* 19169: Src/Modules/datetime.c: change SECS parameter to
 	EPOCHSECONDS.
 
