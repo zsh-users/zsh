@@ -3726,7 +3726,7 @@ int
 addmatches(Cadata dat, char **argv)
 {
     char *s, *ms, *lipre = NULL, *lisuf = NULL, *lpre = NULL, *lsuf = NULL;
-    char **aign = NULL, **dparr = NULL, oaq = autoq;
+    char **aign = NULL, **dparr = NULL, oaq = autoq, *oppre = dat->ppre;
     char *oqp = qipre, *oqs = qisuf, qc;
     int lpl, lsl, pl, sl, bpl, bsl, llpl = 0, llsl = 0, nm = mnum;
     int oisalt = 0, isalt, isexact, doadd, ois = instring, oib = inbackt;
@@ -3847,12 +3847,21 @@ addmatches(Cadata dat, char **argv)
 	    else if (lisuf)
 		dat->isuf = lisuf;
 	    if (dat->ppre) {
-		dat->ppre = dupstring(dat->ppre);
+		if (!(dat->aflags & CAF_QUOTE)) {
+		    dat->ppre = quotename(dat->ppre, NULL);
+		    if ((dat->flags & CMF_FILE) &&
+			dat->ppre[0] == '\\' && dat->ppre[1] == '~')
+			chuck(dat->ppre);
+		} else
+		    dat->ppre = dupstring(dat->ppre);
 		lpl = strlen(dat->ppre);
 	    } else
 		lpl = 0;
 	    if (dat->psuf) {
-		dat->psuf = dupstring(dat->psuf);
+		if (!(dat->aflags & CAF_QUOTE))
+		    dat->psuf = quotename(dat->psuf, NULL);
+		else
+		    dat->psuf = dupstring(dat->psuf);
 		lsl = strlen(dat->psuf);
 	    } else
 		lsl = 0;
@@ -3877,7 +3886,7 @@ addmatches(Cadata dat, char **argv)
 		    dat->pre = dupstring(dat->pre);
 		if (dat->suf)
 		    dat->suf = dupstring(dat->suf);
-		if (!dat->prpre && (dat->prpre = dat->ppre)) {
+		if (!dat->prpre && (dat->prpre = oppre)) {
 		    singsub(&(dat->prpre));
 		    untokenize(dat->prpre);
 		} else
@@ -3901,22 +3910,6 @@ addmatches(Cadata dat, char **argv)
 		    dat->rems = NULL;
 		} else if (dat->rems)
 		    dat->rems = dupstring(dat->rems);
-
-		/* Probably quote the prefix and suffix for testing. */
-		if (!(dat->aflags & CAF_QUOTE)) {
-		    if (!cp && (dat->aflags & CAF_MATCH)) {
-			lpre = quotename(lpre, NULL);
-			lsuf = quotename(lsuf, NULL);
-		    }
-		    if (dat->ppre) {
-			dat->ppre = quotename(dat->ppre, NULL);
-			if ((dat->flags & CMF_FILE) &&
-			    dat->ppre[0] == '\\' && dat->ppre[1] == '~')
-			    chuck(dat->ppre);
-		    }
-		    if (dat->psuf)
-			dat->psuf = quotename(dat->psuf, NULL);
-		}
 	    }
 	    /* Walk through the matches given. */
 	    for (; (s = *argv); argv++) {
