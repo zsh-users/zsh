@@ -1,3 +1,7 @@
+2003-02-08  Clint Adams  <clint@zsh.org>
+
+        * 18207: Src/Builtins/rlimits.c: add maxfilelocks to ulimit output.
+
 2003-02-06  Clint Adams  <clint@zsh.org>
 
 	* unposted: Completion/compinit: conjugate "need" properly.
