@@ -1,3 +1,7 @@
+2001-04-02  Bart Schaefer  <schaefer@zsh.org>
+
+	* 13887: Config/installfns.sh: Skip CVS subdirectories.
+
 2001-04-02  Clint Adams  <schizo@debian.org>
 
 	* 13884: Completion/Linux/_apm: Add FreeBSD 4.1 apm options.

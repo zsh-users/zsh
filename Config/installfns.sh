@@ -15,6 +15,7 @@ for file in $allfuncs; do
   if test -f $sdir_top/$file; then
     if test x$FUNCTIONS_SUBDIRS != x -a x$FUNCTIONS_SUBDIRS != xno; then
       case "$file" in
+      */CVS/*) continue;;
       Completion/comp*)
         subdir="`echo $file | sed -e 's%/[^/]*/[^/]*$%%'`"
         instdir="$fndir/Completion"
