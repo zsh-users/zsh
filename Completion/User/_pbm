@@ -36,13 +36,13 @@ asciitop[gn]m)
 
 fitstopgm)
   _arguments \
-    '-image[specify image number]:image number:' 
+    '-image[specify image number]:image number:' \
     ':file: _pbm'
   ;;
 
 fitstopnm)
   _arguments \
-    '-image[specify image number]:image number:' 
+    '-image[specify image number]:image number:' \
     '-noraw[produce ASCII pnm file]' \
     '(-min -max)-scanmax[force scanning data for minimum and maximum]' \
     '-printmax[only print minimum and maximum values]' \
@@ -62,7 +62,7 @@ g3topbm)
 giftopnm)
   _arguments \
     '-verbose[verbose mode]' \
-    '-comments[only print comment fields]'
+    '-comments[only print comment fields]' \
     '-image[specify image number]:image number:' \
     ':file: _pbm'
   ;;
@@ -728,8 +728,8 @@ rawtoppm)
     '-headerskip:header bytes to skip:' \
     '-rowskip:row padding to skip:' \
     '(-rgb -rbg -grb -gbr -brg -bgr)'-{rgb,rbg,grb,gbr,brg,bgr} \
-    '(-interrow)-interpixel' \        
-    '(-interpixel)-interrow' \        
+    '(-interrow)-interpixel' \
+    '(-interpixel)-interrow' \
     ':width:' ':height:' ':grayscale bytes:'
   ;;
 
