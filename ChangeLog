@@ -1,3 +1,8 @@
+2001-06-10  Clint Adams <clint@zsh.org>
+
+	* 14830: config.guess, config.sub:
+	upgrade to modern versions.
+
 2001-06-06  Andrej Borsenkow <bor@zsh.org>
 
 	* 14772: David Lebel <lebel@lebel.org>: zshconfig.ac: patch
