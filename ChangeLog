@@ -30,6 +30,11 @@
 	* Matt Zimmerman: 16463: Completion/Debian/Command/_apt:
 	completion for apt-cache showsrc.
 
+2002-01-14  Oliver Kiddle  <opk@zsh.org>
+
+	* 16449: Completion/Unix/Command/_chkconfig: new completion for
+	both the IRIX and RedHat chkconfig commands
+
 2001-12-26  Clint Adams  <clint@zsh.org>
 
         * 16375: Completion/Unix/Command/.distfiles,
