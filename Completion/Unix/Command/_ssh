@@ -6,7 +6,7 @@ _remote_files () {
 
   if zstyle -T ":completion:${curcontext}:" remote-access; then
     zparseopts -D -E -a args p: 1 2 4 6 F:
-    remfiles=(${(M)${(f)"$(ssh $args -a -x ${words[CURRENT]%%:*} ls -d1F ${PREFIX%%[^./][^/]#}\* 2>/dev/null)"}%%[^/]#(|/)})
+    remfiles=(${(M)${(f)"$(ssh $args -a -x ${IPREFIX%:} ls -d1F ${(Q)PREFIX%%[^./][^/]#}\* 2>/dev/null)"}%%[^/]#(|/)})
     compset -P '*/'
     compset -S '/*' || suf='remote file'
 

@@ -1,3 +1,8 @@
+2003-06-05  Oliver Kiddle  <opk@zsh.org>
+
+	* 18607: Completion/Unix/Command/_rlogin: correctly handle
+	quoting for remote files for rcp completion
+
 2003-06-05  Peter Stephenson  <pws@csr.com>
 
 	* users/6154: Src/subst.c: anchors didn't work with //
@@ -31,6 +36,15 @@
 	and in use in the completion system.  Change the documentation,
 	mention the inconsistency in README and alter the completion
 	system to hide the `/' a parameter so that it doesn't care.
+
+2003-05-07  Oliver Kiddle  <opk@zsh.org>
+
+	* users/6083: Completion/Unix/Command/_rlogin,
+	Completion/Unix/Command/_ssh: get hostname from IPREFIX instead
+	of words[CURRENT] to avoid quote characters
+
+	* Michał Politowski: users/6080: Completion/Unix/Command/_ssh:
+	remove one level of quoting on files before using with remote ls
 
 2003-05-07  Peter Stephenson  <pws@csr.com>
 
