@@ -852,6 +852,7 @@ mathevall(char *s, int prek, char **ep)
     struct mathvalue *xstack = 0, nstack[STACKSZ];
     mnumber ret;
 
+    MUSTUSEHEAP("mathevall");
     if (mlevel++) {
 	xlastbase = lastbase;
 	xnoeval = noeval;
@@ -874,9 +875,7 @@ mathevall(char *s, int prek, char **ep)
     ptr = s;
     sp = -1;
     unary = 1;
-    HEAPALLOC {
-	mathparse(prek);
-    } LASTALLOC;
+    mathparse(prek);
     *ep = ptr;
     DPUTS(!errflag && sp,
 	  "BUG: math: wallabies roaming too freely in outback");
