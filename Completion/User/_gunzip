@@ -2,5 +2,5 @@
 
 local expl
 
-_description expl 'compressed file'
+_description files expl 'compressed file'
 _files "$expl[@]" -g '*.[gG][z]'

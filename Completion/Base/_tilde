@@ -21,7 +21,7 @@ while _tags; do
   _requested named-directories expl 'named directory' &&
       compadd "$suf[@]" "$expl[@]" "$@" - "${(@k)nameddirs}"
 
-  if _requested directory-stack -V expl 'directory stack' &&
+  if _requested -V directory-stack expl 'directory stack' &&
      { ! _style directory-stack prefix-needed ||
        [[ "$PREFIX" = [-+]* ]] }; then
     if _style directory-stack verbose; then

@@ -2,5 +2,5 @@
 
 local expl
 
-_description expl 'TeX or LaTeX file'
+_description files expl 'TeX or LaTeX file'
 _files "$expl[@]" -g '*.(tex|TEX|texinfo|texi)'

@@ -55,7 +55,7 @@ if [[ -n "$state" ]]; then
     pointer*)
       if compset -P '*=[ 	]#'; then
         compset -P '*[ 	]'
-        _description expl 'button code'
+        _description values expl 'button code'
         compadd "$expl[@]" -qS ' ' 1 2 3 4 5 default
         return
       else

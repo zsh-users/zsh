@@ -57,7 +57,7 @@ _ssh () {
                     ret=0
             ;;
           *(#i)globalknownhostsfile*)
-            _description expl 'global file with known hosts'
+            _description files expl 'global file with known hosts'
             _files "$expl[@]" && ret=0
             ;;
           *(#i)hostname*)
@@ -65,7 +65,7 @@ _ssh () {
                 _ssh_hosts "$expl[@]" && ret=0
             ;;
           *(#i)identityfile*)
-            _description expl 'SSH identity file'
+            _description files expl 'SSH identity file'
             _files "$expl[@]" && ret=0
             ;;
           *(#i)(local|remote)forward*)
@@ -82,7 +82,7 @@ _ssh () {
 	        compadd "$expl[@]" yes no ask
             ;;
           *(#i)userknownhostsfile*)
-            _description expl 'user file with known hosts'
+            _description files expl 'user file with known hosts'
             _files "$expl[@]" && ret=0
             ;;
           *(#i)user*)
@@ -90,7 +90,7 @@ _ssh () {
                 _ssh_users "$expl[@]" && ret=0
             ;;
           *(#i)xauthlocation*)
-            _description expl 'xauth program'
+            _description files expl 'xauth program'
             _files "$expl[@]" -g '*(*)' && ret=0
             ;;
           esac

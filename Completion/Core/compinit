@@ -326,6 +326,7 @@ your setup should be available in the file:
 
     \`${HOME}/.zsh-styles'
 
+Note that the values for the style may not be fully correct.
 
 Have fun
 
@@ -373,7 +374,7 @@ Have fun
 compstyle '*:options' prefix-hidden yes"
       ;;    
     group_matches)
-      tmp="'*:matches' group 'yes'"
+      tmp="'*' group-name ''"
       ;;
     colors_path)
       tmp="'*:colors' path ${(qq)val}"

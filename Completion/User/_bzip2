@@ -2,5 +2,5 @@
 
 local expl
 
-_description expl 'file to compress'
+_description files expl 'file to compress'
 _files "$expl[@]" -g '*~*.bz2'

@@ -1495,6 +1495,25 @@ addmatches(Cadata dat, char **argv)
     LinkList aparl = NULL, oparl = NULL, dparl = NULL;
     Brinfo bp, bpl = brbeg, obpl, bsl = brend, obsl;
 
+    if (!*argv) {
+	SWITCHHEAPS(compheap) {
+	    HEAPALLOC {
+		/* Select the group in which to store the matches. */
+		gflags = (((dat->aflags & CAF_NOSORT ) ? CGF_NOSORT  : 0) |
+			  ((dat->aflags & CAF_UNIQALL) ? CGF_UNIQALL : 0) |
+			  ((dat->aflags & CAF_UNIQCON) ? CGF_UNIQCON : 0));
+		if (dat->group) {
+		    endcmgroup(NULL);
+		    begcmgroup(dat->group, gflags);
+		} else {
+		    endcmgroup(NULL);
+		    begcmgroup("default", 0);
+		}
+	    } LASTALLOC;
+	} SWITCHBACKHEAPS;
+
+	return 1;
+    }
     for (bp = brbeg; bp; bp = bp->next)
 	bp->curpos = ((dat->aflags & CAF_QUOTE) ? bp->pos : bp->qpos);
     for (bp = brend; bp; bp = bp->next)

@@ -194,7 +194,7 @@ if comparguments -i "$autod" "$@"; then
   while true; do
     while _tags; do
       if [[ -n "$matched" ]] || _requested arguments; then
-        _description expl "$descr"
+        _description arguments expl "$descr"
 
         if [[ "$action" = -\>* ]]; then
           comparguments -W line opt_args
@@ -268,7 +268,7 @@ if comparguments -i "$autod" "$@"; then
 	
         if comparguments -s single; then
 
-          _description expl option
+          _description options expl option
 
           if [[ "$single" = direct ]]; then
 	    compadd "$expl[@]" -QS '' - "${PREFIX}${SUFFIX}"

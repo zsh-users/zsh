@@ -25,7 +25,7 @@ while _tags; do
       descr="${${def#*:}%%:*}"
       action="${def#*:*:}"
 
-      _description expl "$descr"
+      _description "${def%%:*}" expl "$descr"
 
       if [[ "$action" = \ # ]]; then
 

@@ -41,12 +41,12 @@ if [[ -n "$state" ]]; then
   
     if [[ -n "$pair" ]]; then
       if compset -P '*/'; then
-        _description expl 'call arc to function'
+        _description functions expl 'call arc to function'
       else
-        _description expl 'call arc from function'
+        _description functions expl 'call arc from function'
       fi
     else
-      _description expl function
+      _description functions expl function
     fi
     compadd "$expl[@]" -M 'r:|_=* r:|=*' - "$_gprof_funcs[@]" && ret=0
   else

@@ -19,7 +19,7 @@ elif [[ ${(Pt)${compstate[parameter]}} = array* ]]; then
   _tags indexes parameters
 
   while _tags; do
-    if _requested indexes -V expl 'array index'; then
+    if _requested -V indexes expl 'array index'; then
       ind=( {1..${#${(P)${compstate[parameter]}}}} )
       if _style indexes verbose; then
         list=()

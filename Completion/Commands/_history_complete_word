@@ -69,9 +69,9 @@ _history_complete_word () {
 _history_complete_word_gen_matches () {
   if _style history-words list; then
     if _style history-words sort; then
-      _description expl 'history word'
+      _description history-words expl 'history word'
     else
-      _description -V expl 'history word'
+      _description -V history-words expl 'history word'
     fi
   else
     if _style history-words sort; then

@@ -18,7 +18,7 @@ fi
   
 if [[ $# -ne 0 || $+_in_pbm -ne 0 ]]; then
   if (( ! $# )); then
-    _description expl 'picture file'
+    _description files expl 'picture file'
     set -- "$expl[@]"
   fi
   _files "$@" -g "$pat" || _files "$@" -g '*.(#i)p[bgp]m'
@@ -258,7 +258,7 @@ pgmtoppm)
   
     return ret
   elif [[ CURRENT -eq 3 && "$words[2]" = -map ]]; then
-    _description expl 'map file'
+    _description files expl 'map file'
     _files "$expl[@]" -g '*.(#i)ppm'
   else
     _pbm
@@ -516,9 +516,9 @@ ppmchange)
   _pbm && ret=0
   
   if (( CURRENT & 1 )); then
-    _description expl 'new color'
+    _description colors expl 'new color'
   else
-    _description expl 'old color'
+    _description colors expl 'old color'
   fi
   
   _x_color "$expl[@]" && ret=0
@@ -600,7 +600,7 @@ ppmquant)
   
     return ret
   elif [[ CURRENT -eq 3 && "$words[2]" = -map ]]; then
-    _description expl 'map file'
+    _description files expl 'map file'
     _files "$expl[@]" -g '*.(#i)ppm'
   else
     _pbm
@@ -742,7 +742,7 @@ rgb3toppm)
   fi
   
   if [[ -n "$expl" ]]; then
-    _description expl "$expl"
+    _description files expl "$expl"
     _files "$expl" -g '*.(#i)pgm'
   fi
   ;;
@@ -772,7 +772,7 @@ zeisstopnm)
   _arguments '(-pgm -ppm)'-p{g,p}m ':file: _pbm'
   ;;
 
-*) 
-  _description expl 'picture file'
+*)
+  _description files expl 'picture file'
   _files "$expl[@]" -g "$pat" || _files "$expl[@]" -g '*.(#i)p[bgp]m'
 esac

@@ -89,7 +89,7 @@ dvitodvi)
     "$args[@]"
   ;;
 *)
-  _description expl 'DVI file'
+  _description files expl 'DVI file'
   _files "$expl[@]" -g '*.(dvi|DVI)'
   ;;
 esac

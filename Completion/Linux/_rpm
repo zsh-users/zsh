@@ -213,9 +213,9 @@ while [[ -n "$state" ]]; do
     ;;
   relocate)
     if compset -P '*\='; then
-      _description expl 'new path'
+      _description directories expl 'new path'
     else
-      _description expl 'old path'
+      _description directories expl 'old path'
     fi
 
     _tags directories || return 1

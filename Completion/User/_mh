@@ -36,7 +36,7 @@ elif compset -P 1 '[+@]' || [[ "$prev" = -draftfolder ]]; then
   fi
 
   # painless, or what?
-  _description expl 'MH folder'
+  _description files expl 'MH folder'
   _path_files "$expl[@]" -W mhpath -/
 elif [[ "$prev" = -(editor|(whatnow|rmm|show|more)proc) ]]; then
   _command_names -e
@@ -50,7 +50,7 @@ elif [[ "$prev" = -(form|audit|filter) ]]; then
   [[ -d $mhlib ]] || { mhlib=$(mhparam mhlproc); mhlib=$mhlib:h; }
   mhfpath=($mymhdir $mhlib)
 
-  _description expl 'MH template file'
+  _description files expl 'MH template file'
   _files "$expl[@]" -W mhfpath -g '*(.)'
 elif [[ "$prev" = -(no|)cc ]]; then
   _wanted -C "$prev" values expl 'CC address' &&

@@ -2,5 +2,5 @@
 
 local expl
 
-_description expl executable
+_description files expl executable
 _files "$expl[@]" -g '*(*)'

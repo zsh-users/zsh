@@ -473,7 +473,7 @@ simple and a verbose form and use the tt(verbose) style to decide
 which form should be used. To make all such functions always use the
 verbose form one can simply call
 
-example(compstyle '*' description yes)
+example(compstyle '*' verbose yes)
 
 in one of the startup files like tt(.zshrc) (after the call to the
 tt(compinit) function). This definition simply means that the
@@ -486,7 +486,7 @@ and the command lines of the processes (the latter is achieved by
 calling the tt(ps) command). To make this builtin list the matches
 only as numbers one could call:
 
-example(compstyle '*::kill:*' description no)
+example(compstyle '*::kill:*' verbose no)
 
 And if one wants to see the command lines for processes but not the
 job texts one could use the fact that the tag name is appended to the
@@ -494,7 +494,7 @@ context name when styles are looked up and instead of the previous
 call use (remember that the function for the tt(kill) builtin command
 uses the tags tt(jobs) and tt(processes)): 
 
-example(compstyle '*::kill:*:jobs' description no)
+example(compstyle '*::kill:*:jobs' verbose no)
 
 As said above, the patterns given to the tt(compstyle) function are
 tested in the order in which they were given. But that isn't
@@ -633,9 +633,6 @@ for names of manual pages
 )
 item(tt(maps))(
 for map names (e.g. YP maps)
-)
-item(tt(matches))(
-used to look up the tt(group) style
 )
 item(tt(messages))(
 used to look up the tt(format) style for messages
@@ -809,11 +806,6 @@ generating filenames as matches to find out if the cursor will be left
 after the first ambiguous pathname component even when menucompletion
 is used.
 )
-item(tt(verbose))(
-This is used in several contexts to decide if only a simple or a
-verbose list of matches should be generated. For example some commands 
-show descriptions for option names if this style is true.
-)
 item(tt(disable-stat))(
 This is used with the tt(cvs) tag by the function completing for the
 tt(cvs) command to decide if the tt(stat) module should be used to
@@ -848,10 +840,47 @@ The value is used like the one for tt(complete) and if it evaluates to
 substitution (see the tt(substitute) style) or the original string
 from the line.
 )
-item(tt(group))(
-This is used with the tt(matches) tag. If it is `true', matches of
-different types will be put in different groups, so that they are
-listed separately and not mixed when using menu completion.
+item(tt(group-name))(
+The completion system can put different types of matches in different
+groups which are then displayed separately in the list of possible
+completions. This style can be use to give the names for these groups
+for particular tags. For example, in command position the completion
+system generates names of builtin and external commands, names of
+aliases and shell functions and reserved words as possible
+completions. To have the external commands and shell functions listed
+separately, one can set:
+
+example(compstyle '*:-command-:commands' group-name commands
+compstyle '*:-command-:functions' group-name functions)
+
+This also means that if the same name is used for different types of
+matches, then those matches will be displayed together in the same
+group.
+
+If the name given is the empty string, then the name of the tag for
+the matches will be used as the name of the group. So, to have all
+different types of matches displayed separately, one can just set:
+
+example(compstyle '*' group-name '')
+
+All matches for which no group name is defined will be put in a group
+named `tt(-default-)'.
+)
+item(tt(group-order))(
+This style is to be used together with the tt(group-name) style. Once
+different types of matches are put into different groups, this style
+can be used to define in which order these groups should appear in the 
+list. The strings in the value are taken as group names and the named
+groups will be shown in the order in which their names appear in the
+value. All groups whose names are not given in the value of this style 
+will appear in the order defined by the function generating the
+matches.
+
+For example, to have names of builtin commands, shell functions and
+external commands appear in this order when completing in command
+position one would set:
+
+example(compstyle '*:-command-' group-order builtins functions commands)
 )
 item(tt(groups))(
 A style holding the names of the groups that should be completed. If
@@ -1148,6 +1177,11 @@ user's own accounts. With the tt(other-accounts) this is used for
 commands such as tt(talk) and tt(finger) and should contain other
 people's accounts. Finally, this may also used by some commands with
 the tt(accounts) tag.
+)
+item(tt(verbose))(
+This is used in several contexts to decide if only a simple or a
+verbose list of matches should be generated. For example some commands 
+show descriptions for option names if this style is true.
 )
 item(tt(word))(
 To find out if listing should be performed on its own, the tt(_list)
@@ -1549,25 +1583,27 @@ one can write a pattern completion function that keeps other functions
 from being tried simply by setting this parameter to any value.
 )
 item(tt(_description))(
-This function gets two arguments: the name of an array and a
+This function gets two or three arguments: a group name,
+the name of an array and a
 string. It tests if the style tt(format) for the tt(descriptions) tag is
 set and if it is, it stores some options in the array that can then be 
 given to the tt(compadd) builtin command to make the
 value of the tt(format) style for the tt(descriptions) tag (with the
-sequence `tt(%d)' replaced by the string given as the second argument)
+sequence `tt(%d)' replaced by the string given as the last argument)
 be displayed above the matches added. These options also will make
-sure that the matches are placed in a separate group (the second
-argument is used as the name of the group) if the style tt(group) for
-the tt(matches) tag is set to a non-empty string. Normally a sorted
+sure that the matches are placed in a separate group if the style
+tt(group) for the tt(matches) tag is set to `true'. The first argument 
+will be used as the name of the group and should in most cases be the
+name of a tag. Normally a sorted
 group will be used for this (with the `tt(-J)' option), but if a
 option starting with `tt(-V)' or `tt(-J)' is given, that option will
 be included in the array, so that it is possible to make the group
-unsorted by given the option `tt(-V)', `tt(-V1)', or `tt(-V2)'.
+unsorted by giving the option `tt(-V)', `tt(-V1)', or `tt(-V2)'.
 
 In most cases, this function will be used like this:
 
 example(local expl
-_description expl file
+_description expl file  # same as `files expl file'
 compadd "$expl[@]" - "$files[@]")
 )
 item(tt(_message))(
@@ -1621,8 +1657,10 @@ and if that tag is currently requested, the return value is zero (and
 non-zero otherwise).
 
 If more than one argument is given, tt(_requested) calls the
-tt(_description) function with all arguments except the first
-one. This is often useful to do both the testing of the tag and
+tt(_description) function with all arguments and if the first argument 
+is a option string starting with tt(-J) or tt(-V), the argument after
+it is taken as the name of the tag.
+This is often useful to do both the testing of the tag and
 getting the description for the matches one is about to add at
 once. E.g.:
 
@@ -1640,8 +1678,8 @@ In many contexts only one type of matches can be generated but even
 then it should be tested if the tag representing those matches is
 requested by the user. This function makes that easier.
 
-Like tt(_requested) it gets a tag and arguments for tt(_description)
-as arguments. With the tag it calls tt(_tags) and if that returns zero 
+Like tt(_requested) it gets arguments as for tt(_description).
+With the tag it calls tt(_tags) and if that returns zero 
 (i.e. the tag is requested by the user) it calls tt(_description). So, 
 if you want to offer only one tag and immediatly want to use the
 description built, you can just do:

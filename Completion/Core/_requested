@@ -1,9 +1,17 @@
 #autoload
 
+local tag
+
+if [[ "$1" = -[VJ]* ]]; then
+  tag="$2"
+else
+  tag="$1"
+fi
+
 comptags -C _cur_context
 
-comptags -R "$1" &&
+comptags -R "$tag" &&
     if [[ $# -gt 1 ]]; then
-      _description "${(@)argv[2,-1]}"
+      _description "$@"
       return 0
     fi

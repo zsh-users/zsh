@@ -34,7 +34,7 @@
 # completion of words from the history by adding two commas at the end 
 # and hitting TAB.
 #
-#     if [[ "$PREFIX" = *,, ]]; then
+#     if [[ "$PREFIX" = *,, ]] && _tags history-words; then
 #       local max i=1 expl
 #     
 #       PREFIX="$PREFIX[1,-2]"
@@ -51,9 +51,9 @@
 #       # twenty words, and so on...
 #       while [[ i -le max ]]; do
 #         if _style history-words sort; then
-#           _description expl "history ($n)"
+#           _description history-words expl "history ($n)"
 #         else
-#           _description -V expl "history ($n)"
+#           _description -V history-words expl "history ($n)"
 #         fi
 #         if compadd "$expl[@]" -Q - \
 #                "${(@)${(@)historywords:#[\$'\"]*}[1,i*10]}"; then

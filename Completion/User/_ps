@@ -9,5 +9,5 @@ local expl
 #  fixscribeps fixtpps fixwfwps fixwpps fixwwps includeres psbook psmerge
 #  psnup psresize psselect pstops
 
-_description expl 'postscript file'
+_description files expl 'postscript file'
 _files "$expl[@]" -g '*.(#i)(ps|eps)'

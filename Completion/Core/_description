@@ -1,27 +1,33 @@
 #autoload
 
-local gropt=-J format
+local gropt format gname
 
-if [[ "$1" = -[VJ]* ]]; then
-  gropt="$1"
+gropt=(-J)
+
+if [[ "$1" = -[VJ] ]]; then
+  gropt=("$1")
+  shift
+elif [[ "$1" = -[VJ] ]]; then
+  gropt=("-${1[3,-1]}" "${1[1,2]}")
   shift
 fi
 
-_lastdescr=( "$_lastdescr[@]" "$2" )
+_lastdescr=( "$_lastdescr[@]" "$3" )
 
 _style -s descriptions format format
+_style -s "$1" group-name gname && [[ -z "$gname" ]] && gname="$1"
 
-if _style matches group; then
+if [[ -n "$gname" ]]; then
   if [[ -n "$format" ]]; then
-    eval "$1=($gropt ${(q)2} -X ${(q)format//\\%d/$2})"
+    eval "$2=($gropt ${(q)gname} -X ${(q)format//\\%d/$3})"
   else
-    eval "$1=($gropt ${(q)2})"
+    eval "$2=($gropt ${(q)gname})"
   fi
 else
   if [[ -n "$format" ]]; then
-    eval "$1=(-X ${(q)format//\\%d/$2})"
+    eval "$2=(-J -default- -X ${(q)format//\\%d/$3})"
   else
-    eval "$1=()"
+    eval "$2=(-J -default-)"
   fi
 fi
 

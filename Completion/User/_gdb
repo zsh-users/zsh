@@ -12,7 +12,7 @@ if compset -P '-(cd|directory)='; then
 elif compset -P '-tty='; then
   _wanted devices expl 'terminal device' && compadd "$expl[@]" - /dev/tty*
 elif compset -P '-(exec|se)='; then
-  _description expl executable
+  _description files expl executable
   _files "$expl[@]" -g '*(*)'
 elif compset -P '-(symbols|core|command)='; then
   _files
@@ -29,9 +29,9 @@ else
   case "$prev" in
   (-d)     _files -/ && return 0 ;;
   (-[csx]) _files && return 0 ;;
-  (-e)     _description expl executable
+  (-e)     _description files expl executable
            _files "$expl[@]" -g '*(*)' && return 0 ;;
-  (-b)     _wanted values expl -V expl 'baud rate' &&
+  (-b)     _wanted -V values expl 'baud rate' &&
                compadd "$expl[@]" 0 50 75 110 134 150 200 300 600 1200 1800 \
 			          2400 4800 9600 19200 38400 57600 115200 \
 			          230400 && return 0 ;;
@@ -46,7 +46,7 @@ else
   if [[ $#w -gt 1 ]]; then
     _alternative 'files:: _files' "processes:: _pids -m ${w[1]:t}"
   else
-    _description expl executable
+    _description files expl executable
     _files "$expl[@]" -g '*(*)'
   fi
 fi

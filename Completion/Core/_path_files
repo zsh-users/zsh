@@ -77,9 +77,9 @@ done
 
 if (( ! ( $#group + $#expl ) )); then
   if [[ "$sopt" = -/ ]]; then
-    _description expl directory
+    _description directories expl directory
   else
-    _description expl file
+    _description files expl file
   fi
 fi
 

@@ -78,7 +78,7 @@ if [[ "$state" = "urls" ]]; then
             license logo memory-cache mozilla plugins && ret=0
   else
     if _tags prefixes; then
-      _description expl 'URL prefix'
+      _description prefixes expl 'URL prefix'
       compadd "$expl[@]" -S '' about: mocha: javascript:
       _urls "$@" && ret=0
     fi

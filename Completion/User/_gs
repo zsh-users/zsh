@@ -39,7 +39,7 @@ else
             compadd "$expl[@]" - "${(@)${=${$(gs -h)##* devices:}%%Search path:*}:#}" && ret=0
         ;;
       *OutputFile\=)
-        _description expl 'output file'
+        _description files expl 'output file'
         _files "$expl[@]" && ret=0
         ;;
       *)

@@ -11,7 +11,7 @@ local expl
 
 [[ $# -eq 0 && $+_tar_cmd -ne 0 ]] && set "$_tar_cmd"
 
-_description expl 'archive file'
+_description files expl 'archive file'
 
 if [[ "$1" = *[tx]* ]]; then
   if [[ "$1" = *[zZ]* ]]; then

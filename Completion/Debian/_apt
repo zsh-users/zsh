@@ -325,9 +325,9 @@ _describe -o option tmp2 -- tmp3 -S='
     bool_prefix=($bool_prefix)
 
     local expl_opt expl_bool expl_configfile
-    _description expl_opt option
-    _description expl_bool 'bool value'
-    _description expl_configfile 'config file'
+    _description options expl_opt option
+    _description values expl_bool 'boolean value'
+    _description files expl_configfile 'config file'
 
     local current_option tmp1 tmp2 tmp3
 
@@ -388,8 +388,8 @@ _apt-get () {
 
   _apt-get () {
     local expl_action expl_packages
-    _description expl_action 'action'
-    _description expl_packages 'package'
+    _description actions expl_action 'action'
+    _description packages expl_packages 'package'
 
     _apt-get_sm
   }
@@ -426,10 +426,10 @@ _apt-cache () {
 
   _apt-cache () {
     local expl_action expl_packages expl_pkg_cache expl_src_cache
-    _description expl_action 'action'
-    _description expl_packages 'package'
-    _description expl_pkg_cache 'package cache'
-    _description expl_src_cache 'source cache'
+    _description actions expl_action 'action'
+    _description packages expl_packages 'package'
+    _description files expl_pkg_cache 'package cache'
+    _description files expl_src_cache 'source cache'
 
     _apt-cache_sm
   }
@@ -455,8 +455,8 @@ _apt-cdrom () {
 
   _apt-cdrom () {
     local expl_action expl_mount_point
-    _description expl_action 'action'
-    _description expl_mount_point 'mount point'
+    _description actions expl_action 'action'
+    _description files expl_mount_point 'mount point'
 
     _apt-cdrom_sm
   }
@@ -481,9 +481,9 @@ _apt-config () {
 
   _apt-config () {
     local expl_action expl_shell_var expl_config_key
-    _description expl_action 'action'
-    _description expl_shell_var 'shell variable to assign'
-    _description expl_config_key 'configuration key'
+    _description actions expl_action 'action'
+    _description parameters expl_shell_var 'shell variable to assign'
+    _description configuration-keys expl_config_key 'configuration key'
 
     _apt-config_sm
   }

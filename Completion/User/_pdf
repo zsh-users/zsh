@@ -7,5 +7,5 @@ local expl
 # xpdf:
 #  pdfimages pdfinfo pdftopbm pdftops pdftotext xpdf
 
-_description expl 'PDF file'
+_description files expl 'PDF file'
 _files "$expl[@]" -g '*.(#i)pdf'

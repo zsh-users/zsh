@@ -10,7 +10,7 @@ fi
 
 if [[ $# -ne 0 || $+_in_tiff -ne 0 ]]; then
   if (( ! $# )); then
-    _description expl 'picture file'
+    _description files expl 'picture file'
     set -- "$expl[@]"
   fi
   _path_files "$@" -g "$pat" || _files "$@" -g '*.(#i)tiff'
@@ -166,7 +166,7 @@ pal2rgb)
     ':output file:_files -g \*.\(\#i\)tiff' && ret=0
   ;;
 *)
-  _description expl 'picture file'
+  _description files expl 'picture file'
   _files "$expl[@]" -g "$pat" && ret=0
 esac
 

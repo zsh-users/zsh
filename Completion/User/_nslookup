@@ -66,9 +66,9 @@ if [[ -n "$compcontext" ]]; then
       _message "redirection not allowed for command \`$words[1]'"
       return 1
     elif [[ "$compstate[redirect]" = '>' ]]; then
-      _description expl 'write to file'
+      _description files expl 'write to file'
     elif [[ "$compstate[redirect]" = '>>' ]]; then
-      _description expl 'append to file'
+      _description files expl 'append to file'
     else
       _message "unknown redirection operator \`$compstate[redirect]'"
       return 1
@@ -107,7 +107,7 @@ if [[ -n "$compcontext" ]]; then
     return
     ;;
   view)
-    _description expl 'view file'
+    _description files expl 'view file'
     _files "$expl[@]"
     return
     ;;
@@ -144,9 +144,9 @@ if [[ -n "$state" ]]; then
   _tags hosts || return 1
 
   if compset -P '*/'; then
-    _description expl 'search list entry'
+    _description hosts expl 'search list entry'
   else
-    _description expl 'default domain name and first search list entry'
+    _description hosts expl 'default domain name and first search list entry'
   fi
   if [[ -n "$_vals_cache_multi" ]]; then
     _hosts "$expl[@]" -qS/ -r "/\\- \\t\\n$_vals_cache_multi"

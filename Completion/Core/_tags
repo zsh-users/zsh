@@ -4,7 +4,7 @@ if (( $# )); then
 
   # We have arguments: the tags supported in this context.
 
-  local curcontext="$curcontext"
+  local curcontext="$curcontext" order
 
   if [[ "$1" = -C?* ]]; then
     curcontext="${curcontext}:${1[3,-1]}"
@@ -17,6 +17,20 @@ if (( $# )); then
   fi
 
   [[ "$1" = -(|-) ]] && shift
+
+
+  if _style -a '' group-order order; then
+    local name
+
+    for name in "$order[@]"; do
+      compadd -J "$name"
+      compadd -V "$name"
+      compadd -J "$name" -1
+      compadd -V "$name" -1
+      compadd -J "$name" -2
+      compadd -V "$name" -2
+    done
+  fi
 
   # Set and remember offered tags.
 

@@ -9,7 +9,7 @@ setopt extendedglob nonomatch
 
 local expl list lines revlines disp
 
-_wanted directory-stack -V expl 'directory stack' || return 1
+_wanted -V directory-stack expl 'directory stack' || return 1
 
 ! _style directory-stack prefix-needed || [[ $PREFIX = [-+]* ]] || return 1
 

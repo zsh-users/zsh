@@ -63,13 +63,13 @@ Then, before adding the matches, see if matches of that type are
 requested by the user in the current context. If you will add only one 
 type of matches, this is very simple. You can use the function `_tags' 
 or the function `_wanted' for this. `_tags' is normally used to offer
-multiple types of matche by giving the tags for them as arguments. But 
-it any case its return value is zero only if at least one of these
+multiple types of matches by giving the tags for them as arguments. But 
+in any case its return value is zero only if at least one of these
 types is requested by the user, so you can just do:
 
   _tags names || return 1
 
-  _description expl 'name'
+  _description names expl 'name'
   compadd "$expl[@]" - alice bob
 
 Since this sequence of command is used so often, the `_wanted'
@@ -83,7 +83,7 @@ matches should be added. So the example becomes:
 Note that you can also give the `-J' and `-V' options with the
 optional `1' or `2' following them supported by `_description':
 
-  _wanted names -V2 expl 'name' && compadd ...
+  _wanted -V2 names expl 'name' && compadd ...
 
 The more complicated case is where you can offer multiple types of
 matches. In this case the user should be able to say which types he
@@ -97,7 +97,7 @@ for this uses `_tags' and `_requested':
 
   while _tags; do
     if _requested friends; then
-      _description expl friend
+      _description friends expl friend
       compad "$expl[@]" alice bob && ret=0
     fi
     _requested users && _users && ret=0
@@ -192,10 +192,10 @@ to get user-configured values. This is done using the function
 
 Basically styles map names to a bunch of strings (the `value'). In
 many cases you want to treat the value as a boolean, so let's start
-with that. To test if, for example, the style `description' is set for 
+with that. To test if, for example, the style `verbose' is set for 
 the tag `options' in the context you are currently in, you can just do:
 
-  if _style options description; then
+  if _style options verbose; then
     # yes, it is set...
   fi
 
@@ -240,9 +240,9 @@ automatically be set up appropriately at the time when you have a
 chance to call `_style'.
 
 Some random comments about style names. Use the ones already in use if 
-possible. Especially, use the `description' style if you can add
+possible. Especially, use the `verbose' style if you can add
 matches in a simple and a verbose way. Use the verbose form only if
-the `description' style is `true' for the current context. Also, if
+the `verbose' style is `true' for the current context. Also, if
 the matches you want to add have a common prefix which is somehow
 special, use the `prefix-needed' and `prefix-hidden' styles. The first 
 one says if the user has to give the prefix on the line to make these
@@ -280,20 +280,20 @@ throughout the completion system) and do:
 
   local expl
 
-  _description expl <descr>
+  _description tag expl <descr>
   compadd "$expl@]" - <matches ...>
 
 Note that this function also accepts `-V' und `-J', optionally (in the 
 same word) followed by `1' or `2' to describe the type of group you
 want to use. For example:
 
-  _description expl '...'
+  _description tag expl '...'
   compadd "$expl[@]" -V1 foo - ...    # THIS IS WRONG!!!
 
 is *not* the right way to use a unsorted group. Instead do the
 simpler:
 
-  _description -V1 expl '...'
+  _description -V1 tag expl '...'
   compadd "$expl[@]" - ...
 
 and everything will work fine.
@@ -303,16 +303,16 @@ multiple calls to `_description' and add them with multiple calls to
 `compadd'. But in almost all cases you should then add them using
 different tags anyway, so, see above.
 
-And since often a tag directly corresponds to a group of matches,
-you'll often be using the tags function that allow you to give the
+And since a tag directly corresponds to a group of matches, you'll
+often be using the tags function that allow you to give the
 explanation to the same function that is used to test if the tags are
 requested (again: see above). Just as a reminder:
 
-  _wanted <tag> [ -V[1,2] | -J[1,2] ] expl <descr>
+  _wanted [ -V[1,2] | -J[1,2] ] <tag> expl <descr>
 
 and
 
-  _requested <tag> [ -V[1,2] | -J[1,2] ] expl <descr>
+  _requested [ -V[1,2] | -J[1,2] ] <tag> expl <descr>
 
 is all you need to make your function work correctly with both tags
 and description at the same time.

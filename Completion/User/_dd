@@ -10,10 +10,10 @@ if compset -P 1 'conv\='; then
       compadd "$expl[@]" -qS, -q \
               ascii ebcdic ibm block unblock lcase ucase swab noerror sync
 elif compset -P 1 'if\='; then
-  _description expl 'input file'
+  _description files expl 'input file'
   _files "$expl[@]"
 elif compset -P 1 'of\='; then
-  _description expl 'output file'
+  _description files expl 'output file'
   _files "$expl[@]"
 else
   _wanted values expl option &&

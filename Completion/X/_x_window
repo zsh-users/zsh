@@ -9,11 +9,11 @@ list=( "${(@)${(M@)${(@f)$(xwininfo -root -tree)}:#[ 	]#0x[0-9a-f]# \"*}##[ 	]#}
 if [[ "$1" = -n ]]; then
   shift
 
-  _description expl 'window name'
+  _description windows expl 'window name'
   compadd "$@" "$expl[@]" -d list - "${(@)${(@)list#*\"}%%\"*}"
 else
   [[ "$1" = - ]] && shift
 
-  _description expl 'window ID'
+  _description windows expl 'window ID'
   compadd "$@" "$expl[@]" -d list - "${(@)list%% *}"
 fi

@@ -11,15 +11,15 @@ _style jobs verbose       && desc=yes
 if [[ "$1" = -r ]]; then
   jids=( "${(@k)jobstates[(R)running*]}" )
   shift
-  _description expl 'running job'
+  _description jobs expl 'running job'
 elif [[ "$1" = -s ]]; then
   jids=( "${(@k)jobstates[(R)running*]}" )
   shift
-  _description expl 'suspended job'
+  _description jobs expl 'suspended job'
 else
   [[ "$1" = - ]] && shift
   jids=( "${(@k)jobtexts}" )
-  _description expl job
+  _description jobs expl job
 fi
 
 if [[ -n "$desc" ]]; then

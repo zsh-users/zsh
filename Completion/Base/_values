@@ -76,7 +76,7 @@ if compvalues -i "$@"; then
     return 1
   fi
 
-  _description expl "$descr"
+  _description arguments expl "$descr"
 
   # We add the separator character as a autoremovable suffix unless
   # we have only one possible value left.
