@@ -750,15 +750,11 @@ set_pwd_env(void)
     setsparam("OLDPWD", ztrdup(oldpwd));
 
     pm = (Param) paramtab->getnode(paramtab, "PWD");
-    if (!(pm->flags & PM_EXPORTED)) {
-	pm->flags |= PM_EXPORTED;
-	pm->env = addenv("PWD", pwd, pm->flags);
-    }
+    if (!(pm->flags & PM_EXPORTED))
+	addenv(pm, pwd);
     pm = (Param) paramtab->getnode(paramtab, "OLDPWD");
-    if (!(pm->flags & PM_EXPORTED)) {
-	pm->flags |= PM_EXPORTED;
-	pm->env = addenv("OLDPWD", oldpwd, pm->flags);
-    }
+    if (!(pm->flags & PM_EXPORTED))
+	addenv(pm, oldpwd);
 }
 
 /* set if we are resolving links to their true paths */
@@ -1883,11 +1879,9 @@ typeset_single(char *cname, char *pname, Param pm, UNUSED(int func),
 	if (!(pm->flags & (PM_ARRAY|PM_HASHED))) {
 	    if (pm->flags & PM_EXPORTED) {
 		if (!(pm->flags & PM_UNSET) && !pm->env && !value)
-		    pm->env = addenv(pname, getsparam(pname), pm->flags);
-	    } else if (pm->env && !(pm->flags & PM_HASHELEM)) {
-		delenv(pm->env);
-		pm->env = NULL;
-	    }
+		    addenv(pm, getsparam(pname));
+	    } else if (pm->env && !(pm->flags & PM_HASHELEM))
+		delenv(pm);
 	    if (value && !(pm = setsparam(pname, ztrdup(value))))
 		return NULL;
 	} else if (value) {
@@ -1938,7 +1932,7 @@ typeset_single(char *cname, char *pname, Param pm, UNUSED(int func),
 	 * Maybe it would be easier to create a new struct but copy
 	 * the get/set methods.
 	 */
-	tpm = (Param) zalloc(sizeof *tpm);
+	tpm = (Param) zshcalloc(sizeof *tpm);
 
 	tpm->nam = pm->nam;
 	if (pm->ename &&
@@ -1962,10 +1956,9 @@ typeset_single(char *cname, char *pname, Param pm, UNUSED(int func),
 	tpm->old = pm->old;
 	tpm->level = pm->level;
 	tpm->ct = pm->ct;
-	if (pm->env) {
-	    delenv(pm->env);
-	}
-	tpm->env = pm->env = NULL;
+	if (pm->env)
+	    delenv(pm);
+	tpm->env = NULL;
 
 	pm->old = tpm;
 	/*

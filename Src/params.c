@@ -587,20 +587,15 @@ createparamtable(void)
     opts[ALLEXPORT] = oae;
 
     pm = (Param) paramtab->getnode(paramtab, "HOME");
-    if (!(pm->flags & PM_EXPORTED)) {
-	pm->flags |= PM_EXPORTED;
-	pm->env = addenv("HOME", home, pm->flags);
-    }
-    pm = (Param) paramtab->getnode(paramtab, "LOGNAME");
-    if (!(pm->flags & PM_EXPORTED)) {
-	pm->flags |= PM_EXPORTED;
-	pm->env = addenv("LOGNAME", pm->u.str, pm->flags);
-    }
-    pm = (Param) paramtab->getnode(paramtab, "SHLVL");
     if (!(pm->flags & PM_EXPORTED))
-	pm->flags |= PM_EXPORTED;
+	addenv(pm, home);
+    pm = (Param) paramtab->getnode(paramtab, "LOGNAME");
+    if (!(pm->flags & PM_EXPORTED))
+	addenv(pm, pm->u.str);
+    pm = (Param) paramtab->getnode(paramtab, "SHLVL");
     sprintf(buf, "%d", (int)++shlvl);
-    pm->env = addenv("SHLVL", buf, pm->flags);
+    if (!(pm->flags & PM_EXPORTED))
+	addenv(pm, buf);
 
     /* Add the standard non-special parameters */
     set_pwd_env();
@@ -712,10 +707,8 @@ createparam(char *name, int flags)
 		 * needed to avoid freeing oldpm, but we do take it
 		 * out of the environment when it's hidden.
 		 */
-		if (oldpm->env) {
-		    delenv(oldpm->env);
-		    oldpm->env = NULL;
-		}
+		if (oldpm->env)
+		    delenv(oldpm);
 		paramtab->removenode(paramtab, name);
 	    }
 	    paramtab->addnode(paramtab, ztrdup(name), pm);
@@ -1585,8 +1578,7 @@ export_param(Param pm)
     else
 	val = pm->gets.cfn(pm);
 
-    pm->flags |= PM_EXPORTED;
-    pm->env = addenv(pm->nam, val, pm->flags);
+    addenv(pm, val);
 }
 
 /**/
@@ -2240,10 +2232,8 @@ unsetparam_pm(Param pm, int altflag, int exp)
 	return 1;
     }
     pm->unsetfn(pm, exp);
-    if ((pm->flags & PM_EXPORTED) && pm->env) {
-	delenv(pm->env);
-	pm->env = NULL;
-    }
+    if (pm->env)
+	delenv(pm);
 
     /* remove it under its alternate name if necessary */
     if (pm->ename && !altflag) {
@@ -3296,7 +3286,7 @@ arrfixenv(char *s, char **t)
     else
 	joinchar = ':';
 
-    pm->env = addenv(s, t ? zjoin(t, joinchar, 1) : "", pm->flags);
+    addenv(pm, t ? zjoin(t, joinchar, 1) : "");
 }
 
 
@@ -3385,8 +3375,8 @@ copyenvstr(char *s, char *value, int flags)
 }
 
 /**/
-char *
-addenv(char *name, char *value, int flags)
+void
+addenv(Param pm, char *value)
 {
     char *oldenv = 0, *newenv = 0, *env = 0;
     int pos;
@@ -3394,13 +3384,14 @@ addenv(char *name, char *value, int flags)
     /* First check if there is already an environment *
      * variable matching string `name'. If not, and   *
      * we are not requested to add new, return        */
-    if (findenv(name, &pos))
+    if (findenv(pm->nam, &pos))
 	oldenv = environ[pos];
 
-     newenv = mkenvstr(name, value, flags);
+     newenv = mkenvstr(pm->nam, value, pm->flags);
      if (zputenv(newenv)) {
         zsfree(newenv);
-	return NULL;
+	pm->env = NULL;
+	return;
     }
     /*
      * Under Cygwin we must use putenv() to maintain consistency.
@@ -3408,16 +3399,19 @@ addenv(char *name, char *value, int flags)
      * silently reuse existing environment string. This tries to
      * check for both cases
      */
-    if (findenv(name, &pos)) {
+    if (findenv(pm->nam, &pos)) {
 	env = environ[pos];
 	if (env != oldenv)
 	    zsfree(oldenv);
 	if (env != newenv)
 	    zsfree(newenv);
-	return env;
+	pm->flags |= PM_EXPORTED;
+	pm->env = env;
+	return;
     }
 
-    return NULL; /* Cannot happen */
+    DPUTS(1, "addenv should never reach the end");
+    pm->env = NULL;
 }
 
 
@@ -3448,12 +3442,9 @@ mkenvstr(char *name, char *value, int flags)
  * string.                                         */
 
 
-/* Delete a pointer from the list of pointers to environment *
- * variables by shifting all the other pointers up one slot. */
-
 /**/
 void
-delenv(char *x)
+delenvvalue(char *x)
 {
     char **ep;
 
@@ -3465,6 +3456,22 @@ delenv(char *x)
 	for (; (ep[0] = ep[1]); ep++);
     }
     zsfree(x);
+}
+
+/* Delete a pointer from the list of pointers to environment *
+ * variables by shifting all the other pointers up one slot. */
+
+/**/
+void
+delenv(Param pm)
+{
+    delenvvalue(pm->env);
+    pm->env = NULL;
+    /*
+     * Note we don't remove PM_EXPORT from the flags.  This
+     * may be asking for trouble but we need to know later
+     * if we restore this parameter to its old value.
+     */
 }
 
 /**/
@@ -3625,10 +3632,8 @@ scanendscope(HashNode hn, UNUSED(int flags))
 	    pm->flags = (tpm->flags & ~PM_NORESTORE);
 	    pm->level = tpm->level;
 	    pm->ct = tpm->ct;
-	    if (pm->env) {
-		delenv(pm->env);
-	    }
-	    pm->env = NULL;
+	    if (pm->env)
+		delenv(pm);
 
 	    if (!(tpm->flags & PM_NORESTORE))
 		switch (PM_TYPE(pm->flags)) {

@@ -483,7 +483,7 @@ execute(UNUSED(Cmdnam cmdname), int dash, int defpath)
      * that as argv[0] for this external command       */
     if (unset(RESTRICTED) && (z = zgetenv("ARGV0"))) {
 	setdata(firstnode(args), (void *) ztrdup(z));
-	delenv(z - 6);
+	delenvvalue(z - 6);
     } else if (dash) {
     /* Else if the pre-command `-' was given, we add `-' *
      * to the front of argv[0] for this command.         */
@@ -2520,15 +2520,13 @@ save_params(Estate state, Wordcode pc, LinkList *restore_p, LinkList *remove_p)
     while (wc_code(ac = *pc) == WC_ASSIGN) {
 	s = ecrawstr(state->prog, pc + 1, NULL);
 	if ((pm = (Param) paramtab->getnode(paramtab, s))) {
-	    if (pm->env) {
-		delenv(pm->env);
-		pm->env = NULL;
-	    }
+	    if (pm->env)
+		delenv(pm);
 	    if (!(pm->flags & PM_SPECIAL)) {
 		paramtab->removenode(paramtab, s);
 	    } else if (!(pm->flags & PM_READONLY) &&
 		       (unset(RESTRICTED) || !(pm->flags & PM_RESTRICTED))) {
-		Param tpm = (Param) zhalloc(sizeof *tpm);
+		Param tpm = (Param) hcalloc(sizeof *tpm);
 		tpm->nam = pm->nam;
 		copyparam(tpm, pm, 1);
 		pm = tpm;
@@ -2589,10 +2587,11 @@ restore_params(LinkList restorelist, LinkList removelist)
 		    tpm->sets.hfn(tpm, pm->u.hash);
 		    break;
 		}
+		pm = tpm;
 	    } else
 		paramtab->addnode(paramtab, pm->nam, pm);
 	    if ((pm->flags & PM_EXPORTED) && ((s = getsparam(pm->nam))))
-		pm->env = addenv(pm->nam, s, pm->flags);
+		addenv(pm, s);
 	}
     }
 }
