@@ -33,8 +33,7 @@ if [[ "$state" = userhost ]]; then
   else
     _description users expl 'login name'
     _users "$expl[@]" -q -S@ && return 0
-   fi
- fi
+  fi
 fi
 
 return ret

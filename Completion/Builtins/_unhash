@@ -8,7 +8,7 @@ args=()
 [[ "$fl" = -*a* ]] &&
     args=( "$args[@]"
            'aliases:alias:compadd - ${(@k)aliases} ${(@k)galiases} ${(@k)dis-aliases} ${(@k)dis-galiases}' )
-[[ "$fl != -* ]] &&
+[[ "$fl" != -* ]] &&
     args=( 'commands:: _command_names -e' )
 
 _alternative "$args[@]"
