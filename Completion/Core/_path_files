@@ -30,6 +30,7 @@ if (( $tmp1[(I)-/] )); then
 else
   pats=( "${(@)=${(@M)tmp1:#-g*}#-g}" )
 fi
+pats=( "${(@)pats:# #}" )
 
 if (( $#prepaths )); then
   tmp1="${prepaths[2]}"
@@ -268,7 +269,7 @@ for prepath in "$prepaths[@]"; do
       fi
     else
       if [[ ! -o globdots && "$PREFIX" = .* ]]; then
-        tmp1=( ${^tmp1}${skipped}${^~pats} ${^tmp1}${skipped}.${^~pats} )
+        tmp1=( ${^tmp1}${skipped}${^~pats} ${^tmp1}${skipped}.${^~pats:#.*} )
       else
         tmp1=( ${^tmp1}${skipped}${^~pats} )
       fi
