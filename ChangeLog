@@ -1,5 +1,8 @@
 2000-05-16  Tanaka Akira  <akr@zsh.org>
 
+	* 11396: Completion/User/_look: display a message when
+	an argument is empty.
+
 	* 11394: Completion/User/_cvs: rewrite filename completion
 	functions.
 

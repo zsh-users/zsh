@@ -8,11 +8,14 @@ _arguments -C -s \
   '-f[case insensitive]' \
   '-d[dictionary order]' \
   ':string:->string' \
-  ':dictionary file:_files -f' && return 0
+  ':dictionary file:_files' && return 0
 
 case "$state" in
 string)
-  [[ -n "$PREFIX" ]] &&
-      _wanted values expl 'word prefix' compadd - $(_call values $words[1] $PREFIX)
+  if [[ -n "$PREFIX" ]]; then
+    _wanted values expl 'word prefix' compadd - $(_call values $words[1] $PREFIX)
+  else
+    _message 'word prefix'
+  fi
   ;;
 esac
