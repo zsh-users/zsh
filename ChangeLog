@@ -1,3 +1,9 @@
+2001-06-16  Wayne Davison  <wayned@users.sourceforge.net>
+
+	* unposted: Src/utils.c: Revert the mkstemp() change since it was not
+	right.  Left zshconfig.ac alone in case someone wants to create a more
+	elaborate mkstemp() change.
+
 2001-06-16  Peter Stephenson  <pws@pwstephenson.fsnet.co.uk>
 
 	* 14939: zshconfig.ac, Src/utils.c: Some systems with GNU-based
