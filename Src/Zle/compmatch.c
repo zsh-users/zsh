@@ -1584,8 +1584,15 @@ sub_match(Cmdata md, char *str, int len, int sfx)
 	if (check_cmdata(md, sfx))
 	    return ret;
 
+	/*
+	 * Look for a common prefix.  Be careful not to include
+	 * a widowed Meta in the prefix.  If we do include metafied
+	 * characters, at this stage we still need the overall length
+	 * including Meta's as separate characters.
+	 */
 	for (l = 0, p = str, q = md->str;
-	     l < len && l < md->len && p[ind] == q[ind];
+	     l < len && l < md->len && p[ind] == q[ind]
+		 && (p[ind] != Meta || p[ind+1] == q[ind+1]);
 	     l++, p += add, q += add);
 
 	if (l) {

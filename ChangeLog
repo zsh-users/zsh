@@ -1,3 +1,11 @@
+2004-01-05  Peter Stephenson  <pws@csr.com>
+
+	* 19336: Src/Zle/compmatch.c: Matches were compared in length
+	treating Meta characters as ordinary characters.  This could
+	result in a common prefix being truncated immediately after
+	the Meta.  This generated an invalid metafied string which
+	could cause the shell to crash.
+
 2004-01-05  Wayne Davison  <wayned@users.sourceforge.net>
 
 	* zsh-users/6969: Src/builtin.c: made an eval of an empty string
