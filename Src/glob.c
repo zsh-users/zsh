@@ -1971,8 +1971,11 @@ igetmatch(char **sp, Patprog p, int fl, int n, char *replstr)
 				*ptr = sav;
 			    }
 			}
-			if (!--n || (n <= 0 && (fl & SUB_GLOBAL)))
+			if (!--n || (n <= 0 && (fl & SUB_GLOBAL))) {
 			    *sp = get_match_ret(*sp, t-s, mpos-s, fl, replstr);
+			    if (mpos == start)
+				mpos++;
+			}
 			if (!(fl & SUB_GLOBAL)) {
 			    if (n) {
 				/*
