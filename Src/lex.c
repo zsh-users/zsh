@@ -1119,7 +1119,9 @@ gettokstr(int c, int sub)
 		}
 		ALLOWHIST
 		if (c != '\'') {
+		    lineno -= (c == '\n');
 		    zerr("unmatched \'", NULL, 0);
+		    lineno += (c == '\n');
 		    peek = LEXERR;
 		    cmdpop();
 		    goto brk;
@@ -1141,7 +1143,9 @@ gettokstr(int c, int sub)
 	    c = dquote_parse('"', sub);
 	    cmdpop();
 	    if (c) {
+		lineno -= (c == '\n');
 		zerr("unmatched \"", NULL, 0);
+		lineno += (c == '\n');
 		peek = LEXERR;
 		goto brk;
 	    }
@@ -1178,7 +1182,9 @@ gettokstr(int c, int sub)
 		ALLOWHIST
 	    cmdpop();
 	    if (c != '`') {
+		lineno -= (c == '\n');
 		zerr("unmatched `", NULL, 0);
+		lineno += (c == '\n');
 		peek = LEXERR;
 		goto brk;
 	    }
