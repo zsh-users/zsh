@@ -138,6 +138,7 @@ static struct optname optns[] = {
 {NULL, "histnofunctions",     0,			 HISTNOFUNCTIONS},
 {NULL, "histnostore",	      0,			 HISTNOSTORE},
 {NULL, "histreduceblanks",    0,			 HISTREDUCEBLANKS},
+{NULL, "histsavebycopy",      OPT_ALL,			 HISTSAVEBYCOPY},
 {NULL, "histsavenodups",      0,			 HISTSAVENODUPS},
 {NULL, "histverify",	      0,			 HISTVERIFY},
 {NULL, "hup",		      OPT_EMULATE|OPT_ZSH,	 HUP},
