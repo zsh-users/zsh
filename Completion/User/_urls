@@ -85,11 +85,11 @@ case "$scheme" in
     fi
   ;;
   bookmark)
-    if [[ -f "$urls_path/$scheme/$PREFIX$SUFFIX" &&
-	  -s "$urls_path/$scheme/$PREFIX$SUFFIX" ]]; then
+    if [[ -f "$urls_path/$scheme/${(Q)PREFIX}${(Q)SUFFIX}" &&
+	  -s "$urls_path/$scheme/${(Q)PREFIX}${(Q)SUFFIX}" ]]; then
       _wanted -C bookmark bookmarks expl bookmarks &&
           compadd "$expl[@]" "$@" -QU - \
-              "$ipre$(<"$urls_path/$scheme/$PREFIX$SUFFIX")" && ret=0
+              "$ipre$(<"$urls_path/$scheme/${(Q)PREFIX}${(Q)SUFFIX}")" && ret=0
     else
       if _wanted -C bookmark files expl 'bookmark'; then
         _path_files -W "$urls_path/$scheme" "$expl[@]" -S '' -g '*(^/)' && 
