@@ -1754,7 +1754,7 @@ tt(n) they are sorted by name (the default); if it is tt(L) they
 are sorted depending on the size (length) of the files; if tt(l) 
 they are sorted by the number of links; if tt(a), tt(m), or tt(c)
 they are sorted by the time of the last access, modification, or
-inode change respectively; if var(d), files in subdirectories appear before
+inode change respectively; if tt(d), files in subdirectories appear before
 those in the current directory at each level of the search --- this is best
 combined with other criteria, for example `tt(odon)' to sort on names for
 files within the same directory.  Note that tt(a), tt(m), and tt(c) compare
