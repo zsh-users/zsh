@@ -43,7 +43,7 @@ unsigned pmpt_attr, rpmpt_attr;
 /* number of lines displayed */
 
 /**/
-int nlnct;
+mod_export int nlnct;
 
 /* Most lines of the buffer we've shown at once with the current list *
  * showing.  == 0 if there is no list.  == -1 if a new list has just  *
@@ -51,25 +51,25 @@ int nlnct;
  * list.                                                              */
 
 /**/
-int showinglist;
+mod_export int showinglist;
 
 /* > 0 if a completion list is displayed below the prompt,
  * < 0 if a list is displayed above the prompt. */
 
 /**/
-int listshown;
+mod_export int listshown;
 
 /* Non-zero if ALWAYS_LAST_PROMPT has been used, meaning that the *
  * screen below the buffer display should not be cleared by       *
  * zrefresh(), but should be by trashzle().                       */
 
 /**/
-int clearflag;
+mod_export int clearflag;
 
 /* Non-zero if zrefresh() should clear the list below the prompt. */
 
 /**/
-int clearlist;
+mod_export int clearlist;
 
 #ifdef HAVE_SELECT
 /* cost of last update */
@@ -243,7 +243,7 @@ static int cleareol,		/* clear to end-of-line (if can't cleareod) */
     numscrolls, onumscrolls;
 
 /**/
-void
+mod_export void
 zrefresh(void)
 {
     static int inlist;		/* avoiding recursion                        */
@@ -893,7 +893,7 @@ moveto(int ln, int cl)
 }
 
 /**/
-int
+mod_export int
 tcmultout(int cap, int multcap, int ct)
 {
     if (tccan(multcap) && (!tccan(cap) || tclen[multcap] <= tclen[cap] * ct)) {
@@ -989,7 +989,7 @@ tc_downcurs(int ct)
 }
 
 /**/
-void
+mod_export void
 tcout(int cap)
 {
     tputs(tcstr[cap], 1, putshout);
@@ -1008,7 +1008,7 @@ tcoutarg(int cap, int arg)
 }
 
 /**/
-int
+mod_export int
 clearscreen(char **args)
 {
     tcout(TCCLEARSCREEN);
@@ -1018,7 +1018,7 @@ clearscreen(char **args)
 }
 
 /**/
-int
+mod_export int
 redisplay(char **args)
 {
     moveto(0, 0);

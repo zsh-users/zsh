@@ -104,7 +104,7 @@ taddnl(void)
 /* get a permanent textual representation of n */
 
 /**/
-char *
+mod_export char *
 getpermtext(struct node *n)
 {
     tnewlins = 1;

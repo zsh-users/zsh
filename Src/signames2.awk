@@ -63,7 +63,7 @@ END {
     printf "#include %czsh.mdh%c\n", 34, 34
     printf "\n"
     printf "/**/\n"
-    printf "char *sigmsg[SIGCOUNT+2] = {\n"
+    printf "mod_export char *sigmsg[SIGCOUNT+2] = {\n"
     printf "\t%c%s%c,\n", 34, "done", 34
 
     for (i = 1; i <= 0 + max; i++)

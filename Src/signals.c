@@ -34,12 +34,12 @@
  * 0 for the default action or some ZSIG_* flags ored together.   */
 
 /**/
-int sigtrapped[VSIGCOUNT];
+mod_export int sigtrapped[VSIGCOUNT];
 
 /* trap functions for each signal */
 
 /**/
-List sigfuncs[VSIGCOUNT];
+mod_export List sigfuncs[VSIGCOUNT];
 
 /* Variables used by signal queueing */
 
@@ -82,7 +82,7 @@ static sigset_t blocked_set;
  * system calls are not restarted.                    */
 
 /**/
-void
+mod_export void
 install_handler(int sig)
 {
 #ifdef POSIX_SIGNALS
@@ -122,7 +122,7 @@ install_handler(int sig)
 /* enable ^C interrupts */
  
 /**/
-void
+mod_export void
 intr(void)
 {
     if (interact)
@@ -143,7 +143,7 @@ nointr(void)
 /* temporarily block ^C interrupts */
  
 /**/
-void
+mod_export void
 holdintr(void)
 {
     if (interact)
@@ -153,7 +153,7 @@ holdintr(void)
 /* release ^C interrupts */
  
 /**/
-void
+mod_export void
 noholdintr(void)
 {
     if (interact)
@@ -682,7 +682,7 @@ dosavetrap(int sig, int level)
 }
 
 /**/
-int
+mod_export int
 settrap(int sig, List l)
 {
     if (sig == -1)

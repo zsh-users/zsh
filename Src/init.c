@@ -53,38 +53,40 @@ int sourcelevel;
 /* the shell tty fd */
 
 /**/
-int SHTTY;
+mod_export int SHTTY;
 
 /* the FILE attached to the shell tty */
 
 /**/
-FILE *shout;
+mod_export FILE *shout;
 
 /* termcap strings */
  
 /**/
-char *tcstr[TC_COUNT];
+mod_export char *tcstr[TC_COUNT];
 
 /* lengths of each termcap string */
  
 /**/
-int tclen[TC_COUNT];
+mod_export int tclen[TC_COUNT];
 
 /* Values of the li, co and am entries */
 
 /**/
-int tclines, tccolumns, hasam;
+int tclines, tccolumns;
+/**/
+mod_export int hasam;
 
 /* Pointer to read-key function from zle */
 
 /**/
-int (*getkeyptr) _((int));
+mod_export int (*getkeyptr) _((int));
 
 #ifdef DEBUG
 /* depth of allocation type stack */
 
 /**/
-int alloc_stackp;
+mod_export int alloc_stackp;
 #endif
 
 /* keep executing lists until EOF found */
@@ -287,7 +289,7 @@ parseargs(char **argv)
 
 
 /**/
-void
+mod_export void
 init_io(void)
 {
     long ttpgrp;
@@ -412,7 +414,7 @@ init_io(void)
 }
 
 /**/
-void
+mod_export void
 init_shout(void)
 {
     static char shoutbuf[BUFSIZ];
@@ -446,7 +448,7 @@ static char *tccapnams[TC_COUNT] = {
 /* Initialise termcap */
 
 /**/
-int
+mod_export int
 init_term(void)
 {
 #ifndef TGETENT_ACCEPTS_NULL
@@ -945,14 +947,14 @@ init_bltinmods(void)
 }
 
 /**/
-void
+mod_export void
 noop_function(void)
 {
     /* do nothing */
 }
 
 /**/
-void
+mod_export void
 noop_function_int(int nothing)
 {
     /* do nothing */
@@ -966,26 +968,26 @@ noop_function_int(int nothing)
 #ifdef LINKED_XMOD_zle
 
 /**/
-ZleVoidFn trashzleptr = noop_function;
+mod_export ZleVoidFn trashzleptr = noop_function;
 /**/
-ZleVoidFn gotwordptr = noop_function;
+mod_export ZleVoidFn gotwordptr = noop_function;
 /**/
-ZleVoidFn refreshptr = noop_function;
+mod_export ZleVoidFn refreshptr = noop_function;
 /**/
-ZleVoidIntFn spaceinlineptr = noop_function_int;
+mod_export ZleVoidIntFn spaceinlineptr = noop_function_int;
 /**/
-ZleReadFn zlereadptr = autoload_zleread;
+mod_export ZleReadFn zlereadptr = autoload_zleread;
 
 #else /* !LINKED_XMOD_zle */
 
-ZleVoidFn trashzleptr = noop_function;
-ZleVoidFn gotwordptr = noop_function;
-ZleVoidFn refreshptr = noop_function;
-ZleVoidIntFn spaceinlineptr = noop_function_int;
+mod_export ZleVoidFn trashzleptr = noop_function;
+mod_export ZleVoidFn gotwordptr = noop_function;
+mod_export ZleVoidFn refreshptr = noop_function;
+mod_export ZleVoidIntFn spaceinlineptr = noop_function_int;
 # ifdef UNLINKED_XMOD_zle
-ZleReadFn zlereadptr = autoload_zleread;
+mod_export ZleReadFn zlereadptr = autoload_zleread;
 # else /* !UNLINKED_XMOD_zle */
-ZleReadFn zlereadptr = fallback_zleread;
+mod_export ZleReadFn zlereadptr = fallback_zleread;
 # endif /* !UNLINKED_XMOD_zle */
 
 #endif /* !LINKED_XMOD_zle */
@@ -1000,7 +1002,7 @@ autoload_zleread(char *lp, char *rp, int ha)
 }
 
 /**/
-unsigned char *
+mod_export unsigned char *
 fallback_zleread(char *lp, char *rp, int ha)
 {
     char *pptbuf;
@@ -1015,10 +1017,10 @@ fallback_zleread(char *lp, char *rp, int ha)
 /* compctl entry point pointers.  Similar to the ZLE ones. */
 
 /**/
-CompctlReadFn compctlreadptr = fallback_compctlread;
+mod_export CompctlReadFn compctlreadptr = fallback_compctlread;
 
 /**/
-int
+mod_export int
 fallback_compctlread(char *name, char **args, char *ops, char *reply)
 {
     zwarnnam(name, "option valid only in functions called from completion",

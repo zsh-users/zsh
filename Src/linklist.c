@@ -33,7 +33,7 @@
 /* Get an empty linked list header */
 
 /**/
-LinkList
+mod_export LinkList
 newlinklist(void)
 {
     LinkList list;
@@ -47,7 +47,7 @@ newlinklist(void)
 /* Insert a node in a linked list after a given node */
 
 /**/
-LinkNode
+mod_export LinkNode
 insertlinknode(LinkList list, LinkNode node, void *dat)
 {
     LinkNode tmp, new;
@@ -67,7 +67,7 @@ insertlinknode(LinkList list, LinkNode node, void *dat)
 /* Insert an already-existing node into a linked list after a given node */
 
 /**/
-LinkNode
+mod_export LinkNode
 uinsertlinknode(LinkList list, LinkNode node, LinkNode new)
 {
     LinkNode tmp = node->next;
@@ -104,7 +104,7 @@ insertlinklist(LinkList l, LinkNode where, LinkList x)
 /* Get top node in a linked list */
 
 /**/
-void *
+mod_export void *
 getlinknode(LinkList list)
 {
     void *dat;
@@ -125,7 +125,7 @@ getlinknode(LinkList list)
 /* Get top node in a linked list without freeing */
 
 /**/
-void *
+mod_export void *
 ugetnode(LinkList list)
 {
     void *dat;
@@ -145,7 +145,7 @@ ugetnode(LinkList list)
 /* Remove a node from a linked list */
 
 /**/
-void *
+mod_export void *
 remnode(LinkList list, LinkNode nd)
 {
     void *dat;
@@ -164,7 +164,7 @@ remnode(LinkList list, LinkNode nd)
 /* Remove a node from a linked list without freeing */
 
 /**/
-void *
+mod_export void *
 uremnode(LinkList list, LinkNode nd)
 {
     void *dat;
@@ -181,7 +181,7 @@ uremnode(LinkList list, LinkNode nd)
 /* Free a linked list */
 
 /**/
-void
+mod_export void
 freelinklist(LinkList list, FreeFunc freefunc)
 {
     LinkNode node, next;
@@ -198,7 +198,7 @@ freelinklist(LinkList list, FreeFunc freefunc)
 /* Count the number of nodes in a linked list */
 
 /**/
-int
+mod_export int
 countlinknodes(LinkList list)
 {
     LinkNode nd;

@@ -33,41 +33,44 @@
 /* Global matcher. */
 
 /**/
-Cmlist cmatcher;
+mod_export Cmlist cmatcher;
 
 /* global variables for shell parameters in new style completion */
 
 /**/
-zlong compcurrent,
-      compmatcher,
+mod_export zlong compcurrent;
+/**/
+zlong compmatcher,
       compmatchertot,
       complistmax,
       complistlines;
 
 /**/
+mod_export
 char **compwords,
      *compprefix,
      *compsuffix,
-     *compiprefix,
      *compisuffix,
      *compqiprefix,
      *compqisuffix,
+     *compquote,
+     *compqstack,
+     *comppatmatch,
+     *complastprompt;
+/**/
+char *compiprefix,
      *compmatcherstr,
      *compcontext,
      *compparameter,
      *compredirect,
-     *compquote,
      *compquoting,
-     *compqstack,
      *comprestore,
      *complist,
      *compforcelist,
      *compinsert,
      *compexact,
      *compexactstr,
-     *comppatmatch,
      *comppatinsert,
-     *complastprompt,
      *comptoend,
      *compoldlist,
      *compoldins,
@@ -94,7 +97,7 @@ freecmlist(Cmlist l)
 }
 
 /**/
-void
+mod_export void
 freecmatcher(Cmatcher m)
 {
     Cmatcher n;
@@ -152,7 +155,7 @@ cpcmlist(Cmlist l)
 /* Copy a completion matcher list. */
 
 /**/
-Cmatcher
+mod_export Cmatcher
 cpcmatcher(Cmatcher m)
 {
     Cmatcher r = NULL, *p = &r, n;
@@ -202,7 +205,7 @@ cpcpattern(Cpattern o)
 /* Set the global match specs. */
 
 /**/
-int
+mod_export int
 set_gmatcher(char *name, char **argv)
 {
     Cmlist l = NULL, *q = &l, n;
@@ -229,7 +232,7 @@ set_gmatcher(char *name, char **argv)
 /* Parse a string for matcher control, containing multiple matchers. */
 
 /**/
-Cmatcher
+mod_export Cmatcher
 parse_cmatcher(char *name, char *s)
 {
     Cmatcher ret = NULL, r = NULL, n;
@@ -616,7 +619,7 @@ bin_compadd(char *name, char **argv, char *ops, int func)
 #define CVT_SUFPAT   5
 
 /**/
-void
+mod_export void
 ignore_prefix(int l)
 {
     if (l) {
@@ -640,7 +643,7 @@ ignore_prefix(int l)
 }
 
 /**/
-void
+mod_export void
 ignore_suffix(int l)
 {
     if (l) {
@@ -663,7 +666,7 @@ ignore_suffix(int l)
 }
 
 /**/
-void
+mod_export void
 restrict_range(int b, int e)
 {
     int wl = arrlen(compwords) - 1;

@@ -69,7 +69,7 @@ widgets[] = {
  */
 
 /**/
-struct thingy thingies[] = {
+mod_export struct thingy thingies[] = {
 #define T(name, th_flags, w_idget, t_next) \
     { NULL, name, th_flags, 2, w_idget, t_next },
 #include "thingies.list"

@@ -59,12 +59,12 @@ int insmnum, insgnum, insgroup, insspace;
 /* Information about menucompletion. */
 
 /**/
-struct menuinfo minfo;
+mod_export struct menuinfo minfo;
 
 /* Number of matches accepted with accept-and-menu-complete */
 
 /**/
-int menuacc;
+mod_export int menuacc;
 
 /* Brace insertion stuff. */
 
@@ -74,7 +74,7 @@ int hasunqu, useqbr, brpcs, brscs;
 /* Flags saying in what kind of string we are. */
 
 /**/
-int ispar, linwhat;
+mod_export int ispar, linwhat;
 
 /* A parameter expansion prefix (like ${). */
 
@@ -89,7 +89,7 @@ int parflags;
 /* Match flags for all matches in this group. */
 
 /**/
-int mflags;
+mod_export int mflags;
 
 /* Flags saying how the parameter expression we are in is quoted. */
 
@@ -101,13 +101,15 @@ int parq, eparq;
  * isuf        -- the ignored suffix                                       */
 
 /**/
-char *ipre, *ripre, *isuf;
+mod_export char *ipre, *ripre, *isuf;
 
 /* The list of matches.  fmatches contains the matches we first ignore *
  * because of fignore.                                                 */
 
 /**/
-LinkList matches, fmatches;
+mod_export LinkList matches;
+/**/
+LinkList fmatches;
 
 /* This holds the list of matches-groups. lastmatches holds the last list of 
  * permanently allocated matches, pmatches is the same for the list
@@ -116,12 +118,12 @@ LinkList matches, fmatches;
  * lmatches/lastlmatches is a pointer to the last element in the lists. */
 
 /**/
-Cmgroup lastmatches, pmatches, amatches, lmatches, lastlmatches;
+mod_export Cmgroup lastmatches, pmatches, amatches, lmatches, lastlmatches;
 
 /* Non-zero if we have permanently allocated matches (old and new). */
 
 /**/
-int hasoldlist, hasperm;
+mod_export int hasoldlist, hasperm;
 
 /* Non-zero if we have newly added matches. */
 
@@ -136,27 +138,29 @@ int permmnum, permgnum, lastpermmnum, lastpermgnum;
 /* The total number of matches and the number of matches to be listed. */
 
 /**/
-int nmatches, smatches;
+mod_export int nmatches;
+/**/
+int smatches;
 
 /* != 0 if only explanation strings should be printed */
 
 /**/
-int onlyexpl;
+mod_export int onlyexpl;
 
 /* Information about the matches for listing. */
 
 /**/
-struct cldata listdat;
+mod_export struct cldata listdat;
 
 /* This flag is non-zero if we are completing a pattern (with globcomplete) */
 
 /**/
-int ispattern, haspattern;
+mod_export int ispattern, haspattern;
 
 /* Non-zero if at least one match was added without -U. */
 
 /**/
-int hasmatched;
+mod_export int hasmatched;
 
 /* The current group of matches. */
 
@@ -166,7 +170,7 @@ Cmgroup mgroup;
 /* Match counter: all matches. */
 
 /**/
-int mnum;
+mod_export int mnum;
 
 /* The match counter when unambig_data() was called. */
 
@@ -185,22 +189,22 @@ int maxmlen, minmlen;
 LinkList expls;
 
 /**/
-Cexpl curexpl;
+mod_export Cexpl curexpl;
 
 /* A stack of completion matchers to be used. */
 
 /**/
-Cmlist mstack;
+mod_export Cmlist mstack;
 
 /* The completion matchers used when building new stuff for the line. */
 
 /**/
-Cmlist bmatchers;
+mod_export Cmlist bmatchers;
 
 /* A list with references to all matchers we used. */
 
 /**/
-LinkList matchers;
+mod_export LinkList matchers;
 
 /* A heap of free Cline structures. */
 
@@ -215,7 +219,7 @@ Aminfo ainfo, fainfo;
 /* The memory heap to use for new style completion generation. */
 
 /**/
-Heap compheap;
+mod_export Heap compheap;
 
 /* A list of some data.
  *
@@ -223,7 +227,7 @@ Heap compheap;
  * conceptually we don't know anything about compctls here... */
 
 /**/
-LinkList allccs;
+mod_export LinkList allccs;
 
 /* This says what of the state the line is in when completion is started *
  * came from a previous completion. If the FC_LINE bit is set, the       *
@@ -917,7 +921,7 @@ makecomplist(char *s, int incmd, int lst)
 }
 
 /**/
-char *
+mod_export char *
 multiquote(char *s, int ign)
 {
     if (s) {
@@ -940,7 +944,7 @@ multiquote(char *s, int ign)
 }
 
 /**/
-char *
+mod_export char *
 tildequote(char *s, int ign)
 {
     if (s) {
@@ -961,7 +965,7 @@ tildequote(char *s, int ign)
 /* Check if we have to complete a parameter name. */
 
 /**/
-char *
+mod_export char *
 check_param(char *s, int set, int test)
 {
     char *p;
@@ -1086,7 +1090,7 @@ check_param(char *s, int set, int test)
 /* Copy the given string and remove backslashes from the copy and return it. */
 
 /**/
-char *
+mod_export char *
 rembslash(char *s)
 {
     char *t = s = dupstring(s);
@@ -1105,7 +1109,7 @@ rembslash(char *s)
 /* This should probably be moved into tokenize(). */
 
 /**/
-char *
+mod_export char *
 ctokenize(char *p)
 {
     char *r = p;
@@ -1131,7 +1135,7 @@ ctokenize(char *p)
 }
 
 /**/
-char *
+mod_export char *
 comp_str(int *ipl, int *pl, int untok)
 {
     char *p = dupstring(compprefix);
@@ -1396,7 +1400,7 @@ set_comp_sep(void)
 /* This stores the strings from the list in an array. */
 
 /**/
-void
+mod_export void
 set_list_array(char *name, LinkList l)
 {
     char **a, **p;
@@ -1413,7 +1417,7 @@ set_list_array(char *name, LinkList l)
 /* Get the words from a variable or a (list of words). */
 
 /**/
-char **
+mod_export char **
 get_user_var(char *nam)
 {
     if (!nam)
@@ -1842,7 +1846,7 @@ addmatches(Cadata dat, char **argv)
 /* This adds all the data we have for a match. */
 
 /**/
-Cmatch
+mod_export Cmatch
 add_match_data(int alt, char *str, Cline line,
 	       char *ipre, char *ripre, char *isuf,
 	       char *pre, char *prpre,
@@ -2170,7 +2174,7 @@ add_match_data(int alt, char *str, Cline line,
 /* This begins a new group of matches. */
 
 /**/
-void
+mod_export void
 begcmgroup(char *n, int flags)
 {
     if (n) {
@@ -2213,7 +2217,7 @@ begcmgroup(char *n, int flags)
 /* End the current group for now. */
 
 /**/
-void
+mod_export void
 endcmgroup(char **ylist)
 {
     mgroup->ylist = ylist;
@@ -2222,7 +2226,7 @@ endcmgroup(char **ylist)
 /* Add an explanation string to the current group, joining duplicates. */
 
 /**/
-void
+mod_export void
 addexpl(void)
 {
     LinkNode n;
@@ -2581,7 +2585,7 @@ freematch(Cmatch m, int nbeg, int nend)
 /* This frees the groups of matches. */
 
 /**/
-void
+mod_export void
 freematches(Cmgroup g)
 {
     Cmgroup n;

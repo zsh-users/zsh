@@ -1,5 +1,6 @@
 Makefile
 Makefile.in
+*.export
 so_locations
 *.pro
 *.epro

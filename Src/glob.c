@@ -116,7 +116,7 @@ struct qual {
 /* Prefix, suffix for doing zle trickery */
 
 /**/
-char *glob_pre, *glob_suf;
+mod_export char *glob_pre, *glob_suf;
 
 /* struct to easily save/restore current state */
 
@@ -390,7 +390,7 @@ insert(char *s, int checked)
 /* Check to see if str is eligible for filename generation. */
 
 /**/
-int
+mod_export int
 haswilds(char *str)
 {
     /* `[' and `]' are legal even if bad patterns are usually not. */
@@ -1445,7 +1445,7 @@ notstrcmp(char **a, char **b)
 /* Return the trailing character for marking file types */
 
 /**/
-char
+mod_export char
 file_type(mode_t filemode)
 {
     if(S_ISBLK(filemode))
@@ -1620,7 +1620,7 @@ xpandredir(struct redir *fn, LinkList tab)
 /* concatenate s1 and s2 in dynamically allocated buffer */
 
 /**/
-char *
+mod_export char *
 dyncat(char *s1, char *s2)
 {
     /* This version always uses space from the current heap. */
@@ -1636,7 +1636,7 @@ dyncat(char *s1, char *s2)
 /* concatenate s1, s2, and s3 in dynamically allocated buffer */
 
 /**/
-char *
+mod_export char *
 tricat(char const *s1, char const *s2, char const *s3)
 {
     /* This version always uses permanently-allocated space. */
@@ -2252,7 +2252,7 @@ igetmatch(char **sp, Patprog p, int fl, int n, char *replstr)
 /* blindly turn a string into a tokenised expression without lexing */
 
 /**/
-void
+mod_export void
 tokenize(char *s)
 {
     char *t;
@@ -2314,7 +2314,7 @@ tokenize(char *s)
 /* remove unnecessary Nulargs */
 
 /**/
-void
+mod_export void
 remnulargs(char *s)
 {
     if (*s) {

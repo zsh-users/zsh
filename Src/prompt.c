@@ -38,7 +38,7 @@ unsigned txtattrmask;
 /* text change - attribute change made by prompts */
 
 /**/
-unsigned txtchange;
+mod_export unsigned txtchange;
 
 /* the command stack for use with %_ in prompts */
  
@@ -137,7 +137,7 @@ promptpath(char *p, int npath, int tilde)
  * `glitch' space.                                               */
 
 /**/
-char *
+mod_export char *
 promptexpand(char *s, int ns, char *rs, char *Rs)
 {
     if(!s)
@@ -628,7 +628,7 @@ stradd(char *d)
 /* tsetcap(), among other things, can write a termcap string into the buffer. */
 
 /**/
-void
+mod_export void
 tsetcap(int cap, int flag)
 {
     if (!(termflags & TERM_SHORT) && tcstr[cap]) {
@@ -688,7 +688,7 @@ putstr(int d)
  * newlines require nontrivial processing.                          */
 
 /**/
-void
+mod_export void
 countprompt(char *str, int *wp, int *hp, int overf)
 {
     int w = 0, h = 1;

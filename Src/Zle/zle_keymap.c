@@ -105,7 +105,7 @@ char *curkeymapname;
 /* the hash table of keymap names */
 
 /**/
-HashTable keymapnamtab;
+mod_export HashTable keymapnamtab;
 
 /* key sequence reading data */
 
@@ -217,7 +217,7 @@ freekeynode(HashNode hn)
 static HashTable copyto;
 
 /**/
-Keymap
+mod_export Keymap
 newkeymap(Keymap tocopy, char *kmname)
 {
     Keymap km = zcalloc(sizeof(*km));
@@ -323,7 +323,7 @@ openkeymap(char *name)
 }
 
 /**/
-int
+mod_export int
 unlinkkeymap(char *name, int ignm)
 {
     KeymapName n = (KeymapName) keymapnamtab->getnode(keymapnamtab, name);
@@ -336,7 +336,7 @@ unlinkkeymap(char *name, int ignm)
 }
 
 /**/
-int
+mod_export int
 linkkeymap(Keymap km, char *name, int imm)
 {
     KeymapName n = (KeymapName) keymapnamtab->getnode(keymapnamtab, name);
@@ -386,7 +386,7 @@ selectkeymap(char *name, int fb)
 /* Select a local key map. */
 
 /**/
-void
+mod_export void
 selectlocalmap(Keymap m)
 {
     localkeymap = m;
@@ -414,7 +414,7 @@ reselectkeymap(void)
  * back onto the input.                                                   */
 
 /**/
-int
+mod_export int
 bindkey(Keymap km, char *seq, Thingy bind, char *str)
 {
     Key k;
@@ -1204,7 +1204,7 @@ getkeybuf(int w)
  * Must be executed at most once after each getkeymapcmd().    */
 
 /**/
-void
+mod_export void
 ungetkeycmd(void)
 {
     ungetkeys(keybuf, keybuflen);
@@ -1213,7 +1213,7 @@ ungetkeycmd(void)
 /* read a command from the current keymap, with widgets */
 
 /**/
-Thingy
+mod_export Thingy
 getkeycmd(void)
 {
     Thingy func;

@@ -1660,3 +1660,9 @@ typedef int (*CompctlReadFn) _((char *, char **, char *, char *));
 typedef void (*ZleVoidFn) _((void));
 typedef void (*ZleVoidIntFn) _((int));
 typedef unsigned char * (*ZleReadFn) _((char *, char *, int));
+
+/***************************************/
+/* Pseudo-keyword to mark exportedness */
+/***************************************/
+
+#define mod_export

@@ -682,7 +682,7 @@ do_ambiguous(void)
  * (l)stat().                                                         */
 
 /**/
-int
+mod_export int
 ztat(char *nam, struct stat *buf, int ls)
 {
     char b[PATH_MAX], *p;
@@ -700,7 +700,7 @@ ztat(char *nam, struct stat *buf, int ls)
 /* Insert a single match in the command line. */
 
 /**/
-void
+mod_export void
 do_single(Cmatch m)
 {
     int l, sr = 0, scs;
@@ -891,7 +891,7 @@ do_single(Cmatch m)
  * insert the next completion.                                              */
 
 /**/
-void
+mod_export void
 do_menucmp(int lst)
 {
     /* Just list the matches if the list was requested. */
@@ -947,7 +947,7 @@ reverse_menu(Hookdef dummy, void *dummy2)
  * accept several selections from the list of matches.  */
 
 /**/
-int
+mod_export int
 accept_last(void)
 {
     if (!menuacc) {
@@ -1132,7 +1132,7 @@ skipnolist(Cmatch *p)
 }
 
 /**/
-void
+mod_export void
 calclist(void)
 {
     Cmgroup g;
@@ -1517,7 +1517,7 @@ int asklist(void)
 }
 
 /**/
-int
+mod_export int
 printlist(int over, CLPrintFunc printm)
 {
     Cmgroup g;
@@ -1800,7 +1800,7 @@ list_matches(Hookdef dummy, void *dummy2)
 /* Invalidate the completion list. */
 
 /**/
-int
+mod_export int
 invalidate_list(void)
 {
     if (showinglist == -2)

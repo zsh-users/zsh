@@ -33,24 +33,28 @@
 /* tokens */
 
 /**/
-char ztokens[] = "#$^*()$=|{}[]`<>?~`,'\"\\";
+mod_export char ztokens[] = "#$^*()$=|{}[]`<>?~`,'\"\\";
 
 /* parts of the current token */
 
 /**/
-char *yytext, *tokstr;
+char *yytext;
 /**/
-int tok, tokfd;
+mod_export char *tokstr;
+/**/
+mod_export int tok;
+/**/
+int tokfd;
 
 /* lexical analyzer error flag */
  
 /**/
-int lexstop;
+mod_export int lexstop;
 
 /* if != 0, this is the first line of the command */
  
 /**/
-int isfirstln;
+mod_export int isfirstln;
  
 /* if != 0, this is the first char of the command (not including white space) */
  
@@ -70,47 +74,48 @@ int nocorrect;
 /* the line buffer */
 
 /**/
-unsigned char *line;
+mod_export unsigned char *line;
 
 /* cursor position and line length */
+/* N.B.: must use the real names here, for the .export file */
 
 /**/
-int cs, ll;
+mod_export int zshcs, zshll;
 
 /* inwhat says what exactly we are in     *
  * (its value is one of the IN_* things). */
 
 /**/
-int inwhat;
+mod_export int inwhat;
 
 /* 1 if x added to complete in a blank between words */
 
 /**/
-int addedx;
+mod_export int addedx;
 
 /* 1 if aliases should not be expanded */
  
 /**/
-int noaliases;
+mod_export int noaliases;
 
 /* we are parsing a line sent to use by the editor */
  
 /**/
-int zleparse;
+mod_export int zleparse;
  
 /**/
-int wordbeg;
+mod_export int wordbeg;
  
 /**/
-int parbegin;
+mod_export int parbegin;
 
 /**/
-int parend;
+mod_export int parend;
  
 /* text of puctuation tokens */
 
 /**/
-char *tokstrings[WHILE + 1] = {
+mod_export char *tokstrings[WHILE + 1] = {
     NULL,	/* NULLTOK	  0  */
     ";",	/* SEPER	     */
     "\\n",	/* NEWLIN	     */
@@ -197,7 +202,7 @@ static struct lexstack *lstack = NULL;
 /* is this a hack or what? */
 
 /**/
-void
+mod_export void
 lexsave(void)
 {
     struct lexstack *ls;
@@ -250,7 +255,7 @@ lexsave(void)
 /* restore lexical state */
 
 /**/
-void
+mod_export void
 lexrestore(void)
 {
     struct lexstack *ln;
@@ -332,7 +337,7 @@ yylex(void)
 }
 
 /**/
-void
+mod_export void
 ctxtlex(void)
 {
     static int oldpos;
@@ -1351,7 +1356,7 @@ dquote_parse(char endchar, int sub)
  * quotes.  This is usually called before singsub().          */
 
 /**/
-int
+mod_export int
 parsestr(char *s)
 {
     int l = strlen(s), err;

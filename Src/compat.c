@@ -106,7 +106,7 @@ strerror(int errnum)
 
 
 /**/
-char *
+mod_export char *
 zgetdir(struct dirsav *d)
 {
     char nbuf[PATH_MAX+3];
@@ -258,7 +258,7 @@ zgetcwd(void)
  * faliliure and -2 when chdir failed and the current directory is lost.  */
 
 /**/
-int
+mod_export int
 zchdir(char *dir)
 {
     char *s;
@@ -313,7 +313,7 @@ zchdir(char *dir)
 /**/
 #ifdef ZSH_64_BIT_TYPE
 /**/
-char *
+mod_export char *
 output64(zlong val)
 {
     static char llbuf[DIGBUFSIZE];

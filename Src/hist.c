@@ -34,7 +34,7 @@
  * word control. */
 
 /**/
-int (*hgetc) _((void));
+mod_export int (*hgetc) _((void));
 
 /**/
 void (*hungetc) _((int));
@@ -54,7 +54,7 @@ void (*addtoline) _((int));
 /* != 0 means history substitution is turned off */
  
 /**/
-int stophist;
+mod_export int stophist;
  
 /* this line began with a space, so junk it if HISTIGNORESPACE is on */
  
@@ -64,12 +64,12 @@ int spaceflag;
 /* if != 0, we are expanding the current line */
 
 /**/
-int expanding;
+mod_export int expanding;
 
 /* these are used to modify the cursor position during expansion */
 
 /**/
-int excs, exlast;
+mod_export int excs, exlast;
 
 /*
  * Current history event number
@@ -84,7 +84,7 @@ int excs, exlast;
  */
  
 /**/
-int curhist;
+mod_export int curhist;
 
 /**/
 struct histent curline;
@@ -99,7 +99,7 @@ int histlinect;
 /**/
 HashTable histtab;
 /**/
-Histent hist_ring;
+mod_export Histent hist_ring;
  
 /* capacity of history lists */
  
@@ -126,7 +126,7 @@ int hist_ignore_all_dups;
 /* What flags (if any) we should skip when moving through the history */
 
 /**/
-int hist_skip_flags;
+mod_export int hist_skip_flags;
 
 /* Bits of histactive variable */
 #define HA_ACTIVE	(1<<0)	/* History mechanism is active */
@@ -159,12 +159,12 @@ char *hsubr;
 /* pointer into the history line */
  
 /**/
-char *hptr;
+mod_export char *hptr;
  
 /* the current history line */
  
 /**/
-char *chline;
+mod_export char *chline;
 
 /* true if the last character returned by hgetc was an escaped bangchar *
  * if it is set and NOBANGHIST is unset hwaddc escapes bangchars        */
@@ -670,7 +670,7 @@ ihungetc(int c)
 /* begin reading a string */
 
 /**/
-void
+mod_export void
 strinbeg(int dohist)
 {
     strin++;
@@ -681,7 +681,7 @@ strinbeg(int dohist)
 /* done reading a string */
 
 /**/
-void
+mod_export void
 strinend(void)
 {
     hend();
@@ -798,7 +798,7 @@ histremovedups(void)
 }
 
 /**/
-int
+mod_export int
 addhistnum(int hl, int n, int xflags)
 {
     int dir = n < 0? -1 : n > 0? 1 : 0;
@@ -816,7 +816,7 @@ addhistnum(int hl, int n, int xflags)
 }
 
 /**/
-Histent
+mod_export Histent
 movehistent(Histent he, int n, int xflags)
 {
     while (n < 0) {
@@ -835,14 +835,14 @@ movehistent(Histent he, int n, int xflags)
 }
 
 /**/
-Histent
+mod_export Histent
 up_histent(Histent he)
 {
     return he->up == hist_ring? NULL : he->up;
 }
 
 /**/
-Histent
+mod_export Histent
 down_histent(Histent he)
 {
     return he == hist_ring? NULL : he->down;
@@ -1182,7 +1182,7 @@ hwrep(char *rep)
 /* Get the entire current line, deleting it in the history. */
 
 /**/
-char *
+mod_export char *
 hgetline(void)
 {
     /* Currently only used by pushlineoredit().
@@ -1329,7 +1329,7 @@ rembutext(char **junkptr)
 }
 
 /**/
-int
+mod_export int
 remlpaths(char **junkptr)
 {
     char *str = *junkptr, *remcut;
@@ -1434,7 +1434,7 @@ convamps(char *out, char *in, int inlen)
 }
 
 /**/
-Histent
+mod_export Histent
 quietgethistent(int ev, int nearmatch)
 {
     if (ev == curhist && (histactive & HA_ACTIVE)) {
@@ -1446,7 +1446,7 @@ quietgethistent(int ev, int nearmatch)
 }
 
 /**/
-Histent
+mod_export Histent
 quietgethist(int ev)
 {
     return quietgethistent(ev, GETHIST_EXACT);

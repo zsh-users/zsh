@@ -292,7 +292,7 @@ patcompstart(void)
 /* Top level pattern compilation subroutine */
 
 /**/
-Patprog
+mod_export Patprog
 patcompile(char *exp, int inflags, char **endexp)
 {
     int flags = 0, len = 0;
@@ -1280,7 +1280,7 @@ pattrystart(void)
 }
 
 /**/
-int
+mod_export int
 pattry(Patprog prog, char *string)
 {
     int i;
@@ -2212,7 +2212,7 @@ duppatprog(Patprog prog)
 /* Free a patprog. */
 
 /**/
-void
+mod_export void
 freepatprog(Patprog prog)
 {
     if (prog && prog != dummy_patprog1 && prog != dummy_patprog2)

@@ -38,12 +38,12 @@ int emulation;
 /* the options; e.g. if opts[SHGLOB] != 0, SH_GLOB is turned on */
  
 /**/
-char opts[OPT_SIZE];
+mod_export char opts[OPT_SIZE];
  
 /* Option name hash table */
 
 /**/
-HashTable optiontab;
+mod_export HashTable optiontab;
  
 /* The canonical option name table */
 
@@ -559,7 +559,7 @@ bin_setopt(char *nam, char **args, char *ops, int isun)
 /* Identify an option name */
 
 /**/
-int
+mod_export int
 optlookup(char const *name)
 {
     char *s, *t;
@@ -622,7 +622,7 @@ static char *rparams[] = {
  * from the usual meaning of the option.                            */
 
 /**/
-int
+mod_export int
 dosetopt(int optno, int value, int force)
 {
     if(!optno)

@@ -911,7 +911,7 @@ mathevall(char *s, int prek, char **ep)
 
 
 /**/
-mnumber
+mod_export mnumber
 matheval(char *s)
 {
     char *junk;

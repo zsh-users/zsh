@@ -65,7 +65,7 @@ NLIST = `cat stamp-modobjs`
 LIBZSH = libzsh-$(VERSION).$(DL_EXT)
 NIBZSH =
 
-ZSH_EXPORT = $(EXPOPT)$(sdir)/zsh.export
+ZSH_EXPORT = $(EXPOPT)zsh.export
 ZSH_NXPORT =
 ENTRYOBJ   = modentry..o
 NNTRYOBJ   =
@@ -73,7 +73,7 @@ NNTRYOBJ   =
 LDRUNPATH = LD_RUN_PATH=$(libdir)/zsh
 NDRUNPATH =
 
-zsh: $(@L@IBZSH) $(@L@STMP) $(MAIN_OBJS)
+zsh: $(@L@IBZSH) $(@L@STMP) $(MAIN_OBJS) zsh.export
 	rm -f $@
 	$(@L@DRUNPATH) $(LINK) $(MAIN_OBJS) $(@L@LIST) $(ZSH_@E@XPORT) $(@L@IBZSH) $(LIBS)
 
@@ -218,7 +218,7 @@ mostlyclean-modules clean-modules distclean-modules realclean-modules: modules.i
 # ========== RECURSIVE MAKES ==========
 
 install.modules uninstall.modules \
-modobjs modules headers proto $(MAIN_OBJS): Makemod
+modobjs modules headers proto $(MAIN_OBJS) zsh.export: Makemod
 	@$(MAKE) -f Makemod $(MAKEDEFS) $@
 
 $(MAIN_OBJS): $(sdir)/zsh.h

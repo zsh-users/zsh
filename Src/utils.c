@@ -38,7 +38,7 @@ char *scriptname;
 /* Print an error */
  
 /**/
-void
+mod_export void
 zerr(const char *fmt, const char *str, int num)
 {
     if (errflag || noerrs) {
@@ -51,7 +51,7 @@ zerr(const char *fmt, const char *str, int num)
 }
 
 /**/
-void
+mod_export void
 zerrnam(const char *cmd, const char *fmt, const char *str, int num)
 {
     if (errflag || noerrs)
@@ -62,7 +62,7 @@ zerrnam(const char *cmd, const char *fmt, const char *str, int num)
 }
 
 /**/
-void
+mod_export void
 zwarn(const char *fmt, const char *str, int num)
 {
     if (errflag || noerrs)
@@ -81,7 +81,7 @@ zwarn(const char *fmt, const char *str, int num)
 }
 
 /**/
-void
+mod_export void
 zwarnnam(const char *cmd, const char *fmt, const char *str, int num)
 {
     if (errflag || noerrs)
@@ -172,7 +172,7 @@ putraw(int c)
 /* Output a single character, for the termcap routines. */
 
 /**/
-int
+mod_export int
 putshout(int c)
 {
     putc(c, shout);
@@ -190,7 +190,7 @@ putshout(int c)
  * literal characters.                                                  */
 
 /**/
-char *
+mod_export char *
 nicechar(int c)
 {
     static char buf[6];
@@ -505,7 +505,7 @@ finddir(char *s)
 /* add a named directory */
 
 /**/
-void
+mod_export void
 adduserdir(char *s, char *t, int flags, int always)
 {
     Nameddir nd;
@@ -610,7 +610,7 @@ dircmp(char *s, char *t)
 /* extra functions to call before displaying the prompt */
 
 /**/
-LinkList prepromptfns;
+mod_export LinkList prepromptfns;
 
 /* the last time we checked mail */
  
@@ -806,7 +806,7 @@ printprompt4(void)
 }
 
 /**/
-void
+mod_export void
 freestr(void *a)
 {
     zsfree(a);
@@ -838,7 +838,7 @@ gettyinfo(struct ttyinfo *ti)
 }
 
 /**/
-void
+mod_export void
 settyinfo(struct ttyinfo *ti)
 {
     if (SHTTY != -1) {
@@ -870,18 +870,18 @@ settyinfo(struct ttyinfo *ti)
 /* the default tty state */
  
 /**/
-struct ttyinfo shttyinfo;
+mod_export struct ttyinfo shttyinfo;
 
 /* != 0 if we need to call resetvideo() */
 
 /**/
-int resetneeded;
+mod_export int resetneeded;
 
 #ifdef TIOCGWINSZ
 /* window size changed */
 
 /**/
-int winchanged;
+mod_export int winchanged;
 #endif
 
 static int
@@ -1017,7 +1017,7 @@ adjustwinsize(int from)
  * is already >= 10, it is not moved.  If it is invalid, -1 is returned. */
 
 /**/
-int
+mod_export int
 movefd(int fd)
 {
     if(fd != -1 && fd < 10) {
@@ -1043,7 +1043,7 @@ movefd(int fd)
 /* Move fd x to y.  If x == -1, fd y is closed. */
 
 /**/
-void
+mod_export void
 redup(int x, int y)
 {
     if(x < 0)
@@ -1061,7 +1061,7 @@ redup(int x, int y)
 /* Close the given fd, and clear it from fdtable. */
 
 /**/
-int
+mod_export int
 zclose(int fd)
 {
     if (fd >= 0) {
@@ -1080,7 +1080,7 @@ zclose(int fd)
  * is unique, for use as a temporary file.      */
  
 /**/
-char *
+mod_export char *
 gettempname(void)
 {
     char *s;
@@ -1094,7 +1094,7 @@ gettempname(void)
 /* Check if a string contains a token */
 
 /**/
-int
+mod_export int
 has_token(const char *s)
 {
     while(*s)
@@ -1106,7 +1106,7 @@ has_token(const char *s)
 /* Delete a character in a string */
  
 /**/
-void
+mod_export void
 chuck(char *str)
 {
     while ((str[0] = str[1]))
@@ -1114,7 +1114,7 @@ chuck(char *str)
 }
 
 /**/
-int
+mod_export int
 tulower(int c)
 {
     c &= 0xff;
@@ -1122,7 +1122,7 @@ tulower(int c)
 }
 
 /**/
-int
+mod_export int
 tuupper(int c)
 {
     c &= 0xff;
@@ -1143,7 +1143,7 @@ ztrncpy(char *s, char *t, int len)
 /* copy t into *s and update s */
 
 /**/
-void
+mod_export void
 strucpy(char **s, char *t)
 {
     char *u = *s;
@@ -1153,7 +1153,7 @@ strucpy(char **s, char *t)
 }
 
 /**/
-void
+mod_export void
 struncpy(char **s, char *t, int n)
 {
     char *u = *s;
@@ -1168,7 +1168,7 @@ struncpy(char **s, char *t, int n)
  * It doesn't count the NULL pointer at the end.          */
 
 /**/
-int
+mod_export int
 arrlen(char **s)
 {
     int count;
@@ -1180,7 +1180,7 @@ arrlen(char **s)
 /* Skip over a balanced pair of parenthesis. */
 
 /**/
-int
+mod_export int
 skipparens(char inpar, char outpar, char **s)
 {
     int level;
@@ -1202,7 +1202,7 @@ skipparens(char inpar, char outpar, char **s)
  * to be broken.                                                       */
 
 /**/
-zlong
+mod_export zlong
 zstrtol(const char *s, char **t, int base)
 {
     zlong ret = 0;
@@ -1384,7 +1384,7 @@ spscan(HashNode hn, int scanflags)
 /* fix s ; if hist is nonzero, fix the history list too */
 
 /**/
-void
+mod_export void
 spckword(char **s, int hist, int cmd, int ask)
 {
     char *t, *u;
@@ -1513,7 +1513,7 @@ spckword(char **s, int hist, int cmd, int ask)
 }
 
 /**/
-int
+mod_export int
 ztrftime(char *buf, int bufsize, char *fmt, struct tm *tm)
 {
     int hr12;
@@ -1613,7 +1613,7 @@ ztrftime(char *buf, int bufsize, char *fmt, struct tm *tm)
 }
 
 /**/
-char *
+mod_export char *
 zjoin(char **arr, int delim)
 {
     int len = 0;
@@ -1684,7 +1684,7 @@ skipwsep(char **s)
 }
 
 /**/
-char **
+mod_export char **
 spacesplit(char *s, int allownull)
 {
     char *t, **ret, **ptr;
@@ -1831,7 +1831,7 @@ wordcount(char *s, char *sep, int mul)
 }
 
 /**/
-char *
+mod_export char *
 sepjoin(char **s, char *sep)
 {
     char *r, *p, **t;
@@ -1890,7 +1890,7 @@ sepsplit(char *s, char *sep, int allownull)
 /* Get the definition of a shell function */
 
 /**/
-List
+mod_export List
 getshfunc(char *nam)
 {
     Shfunc shf;
@@ -1964,7 +1964,7 @@ allocnode(int type)
 /* duplicate a syntax tree */
 
 /**/
-void *
+mod_export void *
 dupstruct(void *a)
 {
     void **onodes, **nnodes, *ret, *n, *on;
@@ -2027,7 +2027,7 @@ dupstruct(void *a)
 static LinkList freeslist = NULL;
 
 /**/
-void
+mod_export void
 freestruct(void *a)
 {
     if (!a || ((List) a) == &dummy_list)
@@ -2171,7 +2171,7 @@ mkarray(char *s)
 }
 
 /**/
-void
+mod_export void
 zbeep(void)
 {
     char *vb;
@@ -2184,7 +2184,7 @@ zbeep(void)
 }
 
 /**/
-void
+mod_export void
 freearray(char **s)
 {
     char **t = s;
@@ -2212,7 +2212,7 @@ equalsplit(char *s, char **t)
 /* the ztypes table */
 
 /**/
-short int typtab[256];
+mod_export short int typtab[256];
 
 /* initialize the ztypes table */
 
@@ -2262,7 +2262,7 @@ inittyptab(void)
 }
 
 /**/
-char **
+mod_export char **
 arrdup(char **s)
 {
     char **x, **y;
@@ -2458,7 +2458,7 @@ setcbreak(void)
 /* give the tty to some process */
 
 /**/
-void
+mod_export void
 attachtty(pid_t pgrp)
 {
     static int ep = 0;
@@ -2638,7 +2638,7 @@ getbaudrate(struct ttyinfo *shttyinfo)
  *   META_HEAPDUP:  same as META_DUP, but uses the heap                      */
 
 /**/
-char *
+mod_export char *
 metafy(char *buf, int len, int heap)
 {
     int meta = 0;
@@ -2703,7 +2703,7 @@ metafy(char *buf, int len, int heap)
 }
 
 /**/
-char *
+mod_export char *
 unmetafy(char *s, int *len)
 {
     char *p, *t;
@@ -2721,7 +2721,7 @@ unmetafy(char *s, int *len)
  * unmetafied substring length.                                        */
 
 /**/
-int
+mod_export int
 metalen(const char *s, int len)
 {
     int mlen = len;
@@ -2741,7 +2741,7 @@ metalen(const char *s, int len)
  * 4 * PATH_MAX.                                                       */
 
 /**/
-char *
+mod_export char *
 unmeta(const char *file_name)
 {
     static char fn[4 * PATH_MAX];
@@ -2796,7 +2796,7 @@ ztrcmp(unsigned char const *s1, unsigned char const *s2)
  * 2 is r is the lowercase prefix of s and return 3 otherwise. */
 
 /**/
-int
+mod_export int
 metadiffer(char const *s, char const *r, int len)
 {
     int l = len;
@@ -2823,7 +2823,7 @@ metadiffer(char const *s, char const *r, int len)
 /* Return the unmetafied length of a metafied string. */
 
 /**/
-int
+mod_export int
 ztrlen(char const *s)
 {
     int l;
@@ -2843,7 +2843,7 @@ ztrlen(char const *s)
 /* Subtract two pointers in a metafied string. */
 
 /**/
-int
+mod_export int
 ztrsub(char const *t, char const *s)
 {
     int l = t - s;
@@ -2862,7 +2862,7 @@ ztrsub(char const *t, char const *s)
 }
 
 /**/
-char *
+mod_export char *
 zreaddir(DIR *dir, int ignoredots)
 {
     struct dirent *de;
@@ -2880,7 +2880,7 @@ zreaddir(DIR *dir, int ignoredots)
 /* Unmetafy and output a string.  Tokens are skipped. */
 
 /**/
-int
+mod_export int
 zputs(char const *s, FILE *stream)
 {
     int c;
@@ -2927,7 +2927,7 @@ nicedup(char const *s, int heap)
 }
 
 /**/
-char *
+mod_export char *
 niceztrdup(char const *s)
 {
     return nicedup(s, 0);
@@ -2943,7 +2943,7 @@ nicedupstring(char const *s)
 /* Unmetafy and output a string, displaying special characters readably. */
 
 /**/
-int
+mod_export int
 nicezputs(char const *s, FILE *stream)
 {
     int c;
@@ -2966,7 +2966,7 @@ nicezputs(char const *s, FILE *stream)
 /* Return the length of the visible representation of a metafied string. */
 
 /**/
-size_t
+mod_export size_t
 niceztrlen(char const *s)
 {
     size_t l = 0;
@@ -2989,7 +2989,7 @@ niceztrlen(char const *s)
 /* check for special characters in the string */
 
 /**/
-int
+mod_export int
 hasspecial(char const *s)
 {
     for (; *s; s++)
@@ -3007,7 +3007,7 @@ hasspecial(char const *s)
  * The string may be metafied and contain tokens.                           */
 
 /**/
-char *
+mod_export char *
 bslashquote(const char *s, char **e, int instring)
 {
     const char *u, *tt;
@@ -3118,7 +3118,7 @@ bslashquote(const char *s, char **e, int instring)
 /* Unmetafy and output a string, quoted if it contains special characters. */
 
 /**/
-int
+mod_export int
 quotedzputs(char const *s, FILE *stream)
 {
     int inquote = 0, c;
@@ -3193,7 +3193,7 @@ quotedzputs(char const *s, FILE *stream)
 /* Double-quote a metafied string. */
 
 /**/
-char *
+mod_export char *
 dquotedztrdup(char const *s)
 {
     int len = strlen(s) * 4 + 2;
@@ -3303,7 +3303,7 @@ dquotedzputs(char const *s, FILE *stream)
  */
 
 /**/
-char *
+mod_export char *
 getkeystring(char *s, int *len, int fromwhere, int *misc)
 {
     char *buf, tmp[1];
@@ -3460,7 +3460,7 @@ getkeystring(char *s, int *len, int fromwhere, int *misc)
 /* Return non-zero if s is a prefix of t. */
 
 /**/
-int
+mod_export int
 strpfx(char *s, char *t)
 {
     while (*s && *s == *t)
@@ -3471,7 +3471,7 @@ strpfx(char *s, char *t)
 /* Return non-zero if s is a suffix of t. */
 
 /**/
-int
+mod_export int
 strsfx(char *s, char *t)
 {
     int ls = strlen(s), lt = strlen(t);
@@ -3482,7 +3482,7 @@ strsfx(char *s, char *t)
 }
 
 /**/
-char *
+mod_export char *
 dupstrpfx(const char *s, int len)
 {
     char *r = ncalloc(len + 1);
@@ -3493,7 +3493,7 @@ dupstrpfx(const char *s, int len)
 }
 
 /**/
-char *
+mod_export char *
 ztrduppfx(const char *s, int len)
 {
     char *r = zalloc(len + 1);
@@ -3506,7 +3506,7 @@ ztrduppfx(const char *s, int len)
 /* Append a string to an allocated string, reallocating to make room. */
 
 /**/
-char *
+mod_export char *
 appstr(char *base, char const *append)
 {
     return strcat(realloc(base, strlen(base) + strlen(append) + 1), append);
@@ -3537,7 +3537,7 @@ upchdir(int n)
  * in an unwanted directory in case of failure.                            */
 
 /**/
-int
+mod_export int
 lchdir(char const *path, struct dirsav *d, int hard)
 {
     char const *pptr;
@@ -3660,7 +3660,7 @@ lchdir(char const *path, struct dirsav *d, int hard)
 }
 
 /**/
-int
+mod_export int
 restoredir(struct dirsav *d)
 {
     int err = 0;
@@ -3699,7 +3699,7 @@ restoredir(struct dirsav *d)
 /* Get a signal number from a string */
 
 /**/
-int
+mod_export int
 getsignum(char *s)
 {
     int x, i;
@@ -3753,7 +3753,7 @@ privasserted(void)
 #ifdef DEBUG
 
 /**/
-void
+mod_export void
 dputs(char *message)
 {
     fprintf(stderr, "%s\n", message);
@@ -3763,7 +3763,7 @@ dputs(char *message)
 #endif /* DEBUG */
 
 /**/
-int
+mod_export int
 mode_to_octal(mode_t mode)
 {
     int m = 0;

@@ -43,7 +43,7 @@ int contflag;
 /* # of break levels */
  
 /**/
-int breaks;
+mod_export int breaks;
 
 /**/
 int

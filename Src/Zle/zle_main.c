@@ -34,17 +34,17 @@
  * will work (i.e., the line is metafied, and the above word arrays are OK). */
 
 /**/
-int incompctlfunc;
+mod_export int incompctlfunc;
 
 /* != 0 if we are in a new style completion function */
 
 /**/
-int incompfunc;
+mod_export int incompfunc;
 
 /* != 0 if completion module is loaded */
 
 /**/
-int hascompmod;
+mod_export int hascompmod;
 
 /* != 0 if we're done editing */
 
@@ -64,7 +64,7 @@ int c;
 /* the bindings for the previous and for this key */
 
 /**/
-Thingy lbindk, bindk;
+mod_export Thingy lbindk, bindk;
 
 /* insert mode/overwrite mode flag */
 
@@ -83,10 +83,10 @@ static int baud;
 /* flags associated with last command */
 
 /**/
-int lastcmd;
+mod_export int lastcmd;
 
 /**/
-Widget compwidget;
+mod_export Widget compwidget;
 
 /* the status line, and its length */
 
@@ -109,7 +109,7 @@ int undoing;
 /* current modifier status */
 
 /**/
-struct modifier zmod;
+mod_export struct modifier zmod;
 
 /* Current command prefix status.  This is normally 0.  Prefixes set *
  * this to 1.  Each time round the main loop, this is checked: if it *
@@ -127,7 +127,7 @@ int prefixflag;
 int kungetct;
 
 /**/
-char *zlenoargs[1] = { NULL };
+mod_export char *zlenoargs[1] = { NULL };
 
 #ifdef FIONREAD
 static int delayzsetterm;
@@ -136,7 +136,7 @@ static int delayzsetterm;
 /* set up terminal */
 
 /**/
-void
+mod_export void
 zsetterm(void)
 {
     struct ttyinfo ti;
@@ -316,7 +316,7 @@ breakread(int fd, char *buf, int n)
 #endif
 
 /**/
-int
+mod_export int
 getkey(int keytmout)
 {
     char cc;
@@ -722,7 +722,7 @@ handleprefixes(void)
 /* this exports the argument we are currently vared'iting if != NULL */
 
 /**/
-char *varedarg;
+mod_export char *varedarg;
 
 /* vared: edit (literally) a parameter value */
 
@@ -952,7 +952,7 @@ whereis(char **args)
 }
 
 /**/
-void
+mod_export void
 trashzle(void)
 {
     if (zleactive) {
@@ -991,7 +991,7 @@ static struct builtin bintab[] = {
  * macros in zle.h */
 
 /**/
-struct hookdef zlehooks[] = {
+mod_export struct hookdef zlehooks[] = {
     HOOKDEF("list_matches", NULL, 0),
     HOOKDEF("complete", NULL, 0),
     HOOKDEF("before_complete", NULL, 0),

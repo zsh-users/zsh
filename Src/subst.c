@@ -46,7 +46,7 @@ char nulstring[] = {Nularg, '\0'};
  */
 
 /**/
-void
+mod_export void
 prefork(LinkList list, int flags)
 {
     LinkNode node;
@@ -211,7 +211,7 @@ stringsubst(LinkList list, LinkNode node, int ssub)
 }
 
 /**/
-void
+mod_export void
 globlist(LinkList list)
 {
     LinkNode node, next;
@@ -228,7 +228,7 @@ globlist(LinkList list)
 /* perform substitution on a single word */
 
 /**/
-void
+mod_export void
 singsub(char **s)
 {
     LinkList foo;
@@ -306,7 +306,7 @@ multsub(char **s, char ***a, int *isarr, char *sep)
  */
 
 /**/
-void
+mod_export void
 filesub(char **namptr, int assign)
 {
     char *sub = NULL, *str, *ptr;
@@ -341,7 +341,7 @@ filesub(char **namptr, int assign)
 }
 
 /**/
-int
+mod_export int
 filesubstr(char **namptr, int assign)
 {
 #define isend(c) ( !(c) || (c)=='/' || (c)==Inpar || (assign && (c)==':') )

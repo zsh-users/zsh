@@ -35,58 +35,66 @@
 /* what level of localness we are at */
  
 /**/
-int locallevel;
+mod_export int locallevel;
  
 /* Variables holding values of special parameters */
  
 /**/
 char **pparams,		/* $argv        */
      **cdpath,		/* $cdpath      */
-     **fignore,		/* $fignore     */
      **fpath,		/* $fpath       */
      **mailpath,	/* $mailpath    */
      **manpath,		/* $manpath     */
-     **path,		/* $path        */
      **psvar,		/* $psvar       */
      **watch;		/* $watch       */
+/**/
+mod_export
+char **path,		/* $path        */
+     **fignore;		/* $fignore     */
  
 /**/
 char *argzero,		/* $0           */
      *home,		/* $HOME        */
      *hostnam,		/* $HOST        */
-     *ifs,		/* $IFS         */
      *nullcmd,		/* $NULLCMD     */
      *oldpwd,		/* $OLDPWD      */
      *zoptarg,		/* $OPTARG      */
-     *postedit,		/* $POSTEDIT    */
      *prompt,		/* $PROMPT      */
      *prompt2,		/* $PROMPT2     */
      *prompt3,		/* $PROMPT3     */
      *prompt4,		/* $PROMPT4     */
-     *pwd,		/* $PWD         */
      *readnullcmd,	/* $READNULLCMD */
      *rprompt,		/* $RPROMPT     */
      *sprompt,		/* $SPROMPT     */
      *term,		/* $TERM        */
-     *ttystrname,	/* $TTY         */
      *wordchars,	/* $WORDCHARS   */
      *zsh_name;		/* $ZSH_NAME    */
+/**/
+mod_export
+char *ifs,		/* $IFS         */
+     *postedit,		/* $POSTEDIT    */
+     *ttystrname,	/* $TTY         */
+     *pwd;		/* $PWD         */
 
 /**/
+mod_export
 zlong lastval,		/* $?           */
      mypid,		/* $$           */
      lastpid,		/* $!           */
      columns,		/* $COLUMNS     */
-     lineno,		/* $LINENO      */
      lines,		/* $LINES       */
+     ppid;		/* $PPID        */
+/**/
+zlong lineno,		/* $LINENO      */
      zoptind,		/* $OPTIND      */
-     ppid,		/* $PPID        */
      shlvl;		/* $SHLVL       */
 
 /* $histchars */
  
 /**/
-unsigned char bangchar, hatchar, hashchar;
+mod_export unsigned char bangchar;
+/**/
+unsigned char hatchar, hashchar;
  
 /* $SECONDS = time(NULL) - shtimer.tv_sec */
  
@@ -96,7 +104,7 @@ struct timeval shtimer;
 /* 0 if this $TERM setup is usable, otherwise it contains TERM_* flags */
 
 /**/
-int termflags;
+mod_export int termflags;
  
 /* Nodes for special parameters for parameter hash table */
 
@@ -248,10 +256,10 @@ static Param argvparam;
 /* hash table containing the parameters */
  
 /**/
-HashTable paramtab, realparamtab;
+mod_export HashTable paramtab, realparamtab;
 
 /**/
-HashTable
+mod_export HashTable
 newparamtable(int size, char const *name)
 {
     HashTable ht = newhashtable(size, name, NULL);
@@ -327,7 +335,7 @@ static int delunset;
 /* Function to delete a parameter table. */
 
 /**/
-void
+mod_export void
 deleteparamtable(HashTable t)
 {
     /* The parameters in the hash table need to be unset *
@@ -341,7 +349,7 @@ deleteparamtable(HashTable t)
 static unsigned numparamvals;
 
 /**/
-void
+mod_export void
 scancountparams(HashNode hn, int flags)
 {
     ++numparamvals;
@@ -586,7 +594,7 @@ assigngetset(Param pm)
  * created because it already exists, the PM_UNSET flag is cleared.        */
 
 /**/
-Param
+mod_export Param
 createparam(char *name, int flags)
 {
     Param pm, oldpm;
@@ -1162,14 +1170,14 @@ getindex(char **pptr, Value v)
 
 
 /**/
-Value
+mod_export Value
 getvalue(char **pptr, int bracks)
 {
   return fetchvalue(pptr, bracks, 0);
 }
 
 /**/
-Value
+mod_export Value
 fetchvalue(char **pptr, int bracks, int flags)
 {
     char *s, *t;
@@ -1265,7 +1273,7 @@ fetchvalue(char **pptr, int bracks, int flags)
 }
 
 /**/
-char *
+mod_export char *
 getstrvalue(Value v)
 {
     char *s, **ss;
@@ -1372,7 +1380,7 @@ getarrvalue(Value v)
 }
 
 /**/
-zlong
+mod_export zlong
 getintvalue(Value v)
 {
     if (!v || v->isarr)
@@ -1408,7 +1416,7 @@ getnumvalue(Value v)
 }
 
 /**/
-void
+mod_export void
 setstrvalue(Value v, char *val)
 {
     char buf[(sizeof(zlong) * 8) + 4];
@@ -1543,7 +1551,7 @@ setnumvalue(Value v, mnumber val)
 }
 
 /**/
-void
+mod_export void
 setarrvalue(Value v, char **val)
 {
     if (v->pm->flags & PM_READONLY) {
@@ -1611,7 +1619,7 @@ setarrvalue(Value v, char **val)
 /* Retrieve an integer parameter */
 
 /**/
-zlong
+mod_export zlong
 getiparam(char *s)
 {
     Value v;
@@ -1640,7 +1648,7 @@ getnparam(char *s)
 /* Retrieve a scalar (string) parameter */
 
 /**/
-char *
+mod_export char *
 getsparam(char *s)
 {
     Value v;
@@ -1653,7 +1661,7 @@ getsparam(char *s)
 /* Retrieve an array parameter */
 
 /**/
-char **
+mod_export char **
 getaparam(char *s)
 {
     Value v;
@@ -1667,7 +1675,7 @@ getaparam(char *s)
 /* Retrieve an assoc array parameter as an array */
 
 /**/
-char **
+mod_export char **
 gethparam(char *s)
 {
     Value v;
@@ -1679,7 +1687,7 @@ gethparam(char *s)
 }
 
 /**/
-Param
+mod_export Param
 setsparam(char *s, char *val)
 {
     Value v;
@@ -1717,7 +1725,7 @@ setsparam(char *s, char *val)
 }
 
 /**/
-Param
+mod_export Param
 setaparam(char *s, char **val)
 {
     Value v;
@@ -1761,7 +1769,7 @@ setaparam(char *s, char **val)
 }
 
 /**/
-Param
+mod_export Param
 sethparam(char *s, char **val)
 {
     Value v;
@@ -1856,7 +1864,7 @@ setnparam(char *s, mnumber val)
 /* Unset a parameter */
 
 /**/
-void
+mod_export void
 unsetparam(char *s)
 {
     Param pm;
@@ -1870,7 +1878,7 @@ unsetparam(char *s)
 /* Unset a parameter */
 
 /**/
-void
+mod_export void
 unsetparam_pm(Param pm, int altflag, int exp)
 {
     Param oldpm, altpm;
@@ -1933,7 +1941,7 @@ unsetparam_pm(Param pm, int altflag, int exp)
  * the specific set function.                                           */
 
 /**/
-void
+mod_export void
 stdunsetfn(Param pm, int exp)
 {
     switch (PM_TYPE(pm->flags)) {
@@ -1983,7 +1991,7 @@ floatsetfn(Param pm, double x)
 /* Function to get value of a scalar (string) parameter */
 
 /**/
-char *
+mod_export char *
 strgetfn(Param pm)
 {
     return pm->u.str ? pm->u.str : (char *) hcalloc(1);
@@ -2014,7 +2022,7 @@ arrgetfn(Param pm)
 /* Function to set value of an array parameter */
 
 /**/
-void
+mod_export void
 arrsetfn(Param pm, char **x)
 {
     if (pm->u.arr && pm->u.arr != x)
@@ -2030,7 +2038,7 @@ arrsetfn(Param pm, char **x)
 /* Function to get value of an association parameter */
 
 /**/
-HashTable
+mod_export HashTable
 hashgetfn(Param pm)
 {
     return pm->u.hash;
@@ -2039,7 +2047,7 @@ hashgetfn(Param pm)
 /* Function to set value of an association parameter */
 
 /**/
-void
+mod_export void
 hashsetfn(Param pm, HashTable x)
 {
     if (pm->u.hash && pm->u.hash != x)
@@ -2103,7 +2111,7 @@ nullsetfn(Param pm, char *x)
  * containing the integer value.                    */
 
 /**/
-zlong
+mod_export zlong
 intvargetfn(Param pm)
 {
     return *((zlong *)pm->u.data);
@@ -2114,7 +2122,7 @@ intvargetfn(Param pm)
  * where the value is to be stored.                 */
 
 /**/
-void
+mod_export void
 intvarsetfn(Param pm, zlong x)
 {
     *((zlong *)pm->u.data) = x;
@@ -2140,7 +2148,7 @@ zlevarsetfn(Param pm, zlong x)
  * representing the scalar (string).                  */
 
 /**/
-void
+mod_export void
 strvarsetfn(Param pm, char *x)
 {
     char **q = ((char **)pm->u.data);
@@ -2154,7 +2162,7 @@ strvarsetfn(Param pm, char *x)
  * representing the scalar (string).                  */
 
 /**/
-char *
+mod_export char *
 strvargetfn(Param pm)
 {
     char *s = *((char **)pm->u.data);
@@ -2170,7 +2178,7 @@ strvargetfn(Param pm)
  * of pointers).                                   */
 
 /**/
-char **
+mod_export char **
 arrvargetfn(Param pm)
 {
     return *((char ***)pm->u.data);
@@ -2183,7 +2191,7 @@ arrvargetfn(Param pm)
  * version of this array which will need to be updated.         */
 
 /**/
-void
+mod_export void
 arrvarsetfn(Param pm, char **x)
 {
     char ***dptr = (char ***)pm->u.data;
@@ -2688,7 +2696,7 @@ arrfixenv(char *s, char **t)
  * "foo=bar", and returns a pointer to the beginning of "bar" */
 
 /**/
-char *
+mod_export char *
 zgetenv(char *name)
 {
     char **ep, *s, *t;
@@ -2800,7 +2808,7 @@ delenv(char *x)
 }
 
 /**/
-void
+mod_export void
 convbase(char *s, zlong v, int base)
 {
     int digs = 0;
@@ -2888,7 +2896,7 @@ convfloat(double dval, int digits, int flags, FILE *fout)
 /* Start a parameter scope */
 
 /**/
-void
+mod_export void
 startparamscope(void)
 {
     locallevel++;
@@ -2897,7 +2905,7 @@ startparamscope(void)
 /* End a parameter scope: delete the parameters local to the scope. */
 
 /**/
-void
+mod_export void
 endparamscope(void)
 {
     locallevel--;
@@ -2980,7 +2988,7 @@ freeparamnode(HashNode hn)
 /* Print a parameter */
 
 /**/
-void
+mod_export void
 printparamnode(HashNode hn, int printflags)
 {
     Param p = (Param) hn;

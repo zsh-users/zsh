@@ -349,7 +349,7 @@ optison(char *s)
 }
 
 /**/
-char *
+mod_export char *
 cond_str(char **args, int num, int raw)
 {
     char *s = args[num];
@@ -362,7 +362,7 @@ cond_str(char **args, int num, int raw)
 }
 
 /**/
-zlong
+mod_export zlong
 cond_val(char **args, int num)
 {
     char *s = args[num];
@@ -374,7 +374,7 @@ cond_val(char **args, int num)
 }
 
 /**/
-int
+mod_export int
 cond_match(char **args, int num, char *str)
 {
     char *s = args[num];

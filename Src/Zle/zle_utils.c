@@ -73,7 +73,7 @@ sizeline(int sz)
 /* insert space for ct chars at cursor position */
 
 /**/
-void
+mod_export void
 spaceinline(int ct)
 {
     int i;
@@ -105,7 +105,7 @@ shiftchars(int to, int cnt)
 }
 
 /**/
-void
+mod_export void
 backkill(int ct, int dir)
 {
     int i = (cs -= ct);
@@ -115,7 +115,7 @@ backkill(int ct, int dir)
 }
 
 /**/
-void
+mod_export void
 forekill(int ct, int dir)
 {
     int i = cs;
@@ -191,14 +191,14 @@ cut(int i, int ct, int dir)
 }
 
 /**/
-void
+mod_export void
 backdel(int ct)
 {
     shiftchars(cs -= ct, ct);
 }
 
 /**/
-void
+mod_export void
 foredel(int ct)
 {
     shiftchars(cs, ct);
@@ -283,7 +283,7 @@ hstrnstr(char *haystack, int pos, char *needle, int len, int dir, int sens)
  * characters are read.  Case is folded.                        */
 
 /**/
-int
+mod_export int
 getzlequery(void)
 {
     int c;

@@ -99,14 +99,24 @@ C coding style
   type of the function, and finally the name of the function with typed
   arguments.  These lines must not be indented.  The script generating
   function prototypes and the ansi2knr program depend on this format.
-  If the function is not used outside the file it is defined in, it
-  should be declared "static"; this keyword goes on the type line,
-  before the return type.
 
-* Global variable declarations must similarly be preceded by a
+* Variable declarations must similarly be preceded by a
   line containing only "/**/", for the prototype generation script.
   The declaration itself should be all on one line (except for multi-line
   initialisers).
+
+* Preprocessor directives thst affect the function/variable declarations must
+  also be preceded by a "/**/" line, so that they get copied into the
+  prototype lists.
+
+* There are three levels of visibility for a function or variable.  It can
+  be file-local, for which it must be marked with the keyword "static" at
+  the front of the declaration.  It can be visible to other object files in
+  the same module, for which it requires no extra keyword.  Or it can be
+  made available to the entire program (including other dynamically loaded
+  modules), for which it must be marked with the pseudo-keyword "mod_export"
+  at the front of the declaration.  Symbols should have the least visibility
+  possible.
 
 * Leave a blank line between the declarations and statements in a compound
   statement, if both are present.  Use blank lines elsewhere to separate
@@ -131,7 +141,7 @@ variables:
   - autoparams      parameters defined by the module, for autoloading
   - automathfuncs   math functions defined by the module, for autoloading
   - objects         .o files making up this module (*must* be defined)
-  - proto           .pro files for this module (default generated from $objects)
+  - proto           .syms files for this module (default generated from $objects)
   - headers         extra headers for this module (default none)
   - hdrdeps         extra headers on which the .mdh depends (default none)
   - otherincs       extra headers that are included indirectly (default none)

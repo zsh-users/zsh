@@ -77,13 +77,14 @@ BEGIN {
 	    break
     }
     sub(/^ */, "", line)
-    match(line, /^((const|enum|static|struct|union) +)*([_0-9A-Za-z]+ +|((char|double|float|int|long|short|unsigned|void) +)+)((const|static) +)*/)
+    match(line, /^((const|enum|mod_export|static|struct|union) +)*([_0-9A-Za-z]+ +|((char|double|float|int|long|short|unsigned|void) +)+)((const|static) +)*/)
     dtype = substr(line, 1, RLENGTH)
     sub(/ *$/, "", dtype)
     if(" " dtype " " ~ / static /)
 	locality = "L"
     else
 	locality = "E"
+    exported = " " dtype " " ~ / mod_export /
     line = substr(line, RLENGTH+1) ","
     # Handle each declarator.
     while(match(line, /^[^,]*,/)) {
@@ -116,6 +117,10 @@ BEGIN {
 	    printf "%s#  define " dnam " " modtype "_\n", locality
 	    printf "%s# endif\n", locality
 	}
+
+	# If this is exported, add it to the exported symbol list.
+	if(exported)
+	    printf "X%s\n", dnam
 
 	# Format the declaration for output
 	dcl = dtype " " dcltor ";"

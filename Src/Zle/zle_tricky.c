@@ -47,27 +47,27 @@
 /* The line before completion was tried. */
 
 /**/
-char *origline;
+mod_export char *origline;
 /**/
-int origcs, origll;
+mod_export int origcs, origll;
 
 /* Words on the command line, for use in completion */
  
 /**/
-int clwsize, clwnum, clwpos;
+mod_export int clwsize, clwnum, clwpos;
 /**/
-char **clwords;
+mod_export char **clwords;
 
 /* wb and we hold the beginning/end position of the word we are completing. */
 
 /**/
-int wb, we;
+mod_export int wb, we;
 
 /* offs is the cursor position within the tokenized *
  * current word after removing nulargs.             */
 
 /**/
-int offs;
+mod_export int offs;
 
 /* These control the type of completion that will be done.  They are       *
  * affected by the choice of ZLE command and by relevant shell options.    *
@@ -75,34 +75,34 @@ int offs;
  * insert a match as if for menucompletion but without really starting it. */
 
 /**/
-int usemenu, useglob;
+mod_export int usemenu, useglob;
 
 /* != 0 if we are in the middle of a menu completion. May be == 2 to force *
  * menu completion even if using different widgets.                        */
 
 /**/
-int menucmp;
+mod_export int menucmp;
 
 /* Lists of brace-infos before/after cursor (first and last for each). */
 
 /**/
-Brinfo brbeg, lastbrbeg, brend, lastbrend;
+mod_export Brinfo brbeg, lastbrbeg, brend, lastbrend;
 
 /**/
-int nbrbeg, nbrend;
+mod_export int nbrbeg, nbrend;
 
 /**/
-char *lastprebr, *lastpostbr;
+mod_export char *lastprebr, *lastpostbr;
 
 /* !=0 if we have a valid completion list. */
 
 /**/
-int validlist;
+mod_export int validlist;
 
 /* Non-zero if we have to redisplay the list of matches. */
 
 /**/
-int showagain = 0;
+mod_export int showagain = 0;
 
 /* This holds the word we are completing in quoted from. */
 
@@ -112,13 +112,13 @@ static char *qword;
  * closing quote. */
 
 /**/
-char *qipre, *qisuf, *autoq;
+mod_export char *qipre, *qisuf, *autoq;
 
 /* This contains the name of the function to call if this is for a new  *
  * style completion. */
 
 /**/
-char *compfunc = NULL;
+mod_export char *compfunc = NULL;
 
 /* Non-zero if the last completion done was ambiguous (used to find   *
  * out if AUTOMENU should start).  More precisely, it's nonzero after *
@@ -132,14 +132,14 @@ char *compfunc = NULL;
  * lastambig == 2.                                                    */
 
 /**/
-int lastambig;
+mod_export int lastambig;
 
 /* Arguments for and return value of completion widget. */
 
 /**/
-char **cfargs;
+mod_export char **cfargs;
 /**/
-int cfret;
+mod_export int cfret;
 
 /* Find out if we have to insert a tab (instead of trying to complete). */
 
@@ -189,7 +189,7 @@ completeword(char **args)
 }
 
 /**/
-int
+mod_export int
 menucomplete(char **args)
 {
     usemenu = 1;
@@ -284,7 +284,7 @@ listexpand(char **args)
 }
 
 /**/
-int
+mod_export int
 reversemenucomplete(char **args)
 {
     if (!menucmp)
@@ -308,28 +308,28 @@ acceptandmenucomplete(char **args)
  * position, in a redirection, or in a parameter expansion.   */
 
 /**/
-int lincmd, linredir, linarr;
+mod_export int lincmd, linredir, linarr;
 
 /* The string for the redirection operator. */
 
 /**/
-char *rdstr;
+mod_export char *rdstr;
 
 /* This holds the name of the current command (used to find the right *
  * compctl).                                                          */
 
 /**/
-char *cmdstr;
+mod_export char *cmdstr;
 
 /* This hold the name of the variable we are working on. */
 
 /**/
-char *varname;
+mod_export char *varname;
 
 /* != 0 if we are in a subscript */
 
 /**/
-int insubscr;
+mod_export int insubscr;
 
 /* Parameter pointer for completing keys of an assoc array. */
 
@@ -339,7 +339,7 @@ Param keypm;
 /* 1 if we are completing in a quoted string (or inside `...`) */
 
 /**/
-int instring, inbackt;
+mod_export int instring, inbackt;
 
 /* Convenience macro for calling bslashquote() (formerly quotename()). *
  * This uses the instring variable above.                              */
@@ -802,7 +802,7 @@ addx(char **ptmp)
 /* Like dupstring, but add an extra space at the end of the string. */
 
 /**/
-char *
+mod_export char *
 dupstrspace(const char *str)
 {
     int len = strlen((char *)str);
@@ -820,7 +820,7 @@ dupstrspace(const char *str)
  * functions (there's one for each direction).                             */
 
 /**/
-void
+mod_export void
 metafy_line(void)
 {
     int len = ll;
@@ -836,7 +836,7 @@ metafy_line(void)
 }
 
 /**/
-void
+mod_export void
 unmetafy_line(void)
 {
     cs = ztrsub((char *) line + cs, (char *) line);
@@ -846,7 +846,7 @@ unmetafy_line(void)
 /* Free a brinfo list. */
 
 /**/
-void
+mod_export void
 freebrinfo(Brinfo p)
 {
     Brinfo n;
@@ -863,7 +863,7 @@ freebrinfo(Brinfo p)
 /* Duplicate a brinfo list. */
 
 /**/
-Brinfo
+mod_export Brinfo
 dupbrinfo(Brinfo p, Brinfo *last)
 {
     Brinfo ret = NULL, *q = &ret, n = NULL;
@@ -1572,7 +1572,7 @@ get_comp_string(void)
  * The last argument says if we should quote the string.                */
 
 /**/
-int
+mod_export int
 inststrlen(char *str, int move, int len)
 {
     if (!len || !str)
@@ -1683,7 +1683,7 @@ docompletion(char *s, int lst, int incmd)
 /* Return the length of the common prefix of s and t. */
 
 /**/
-int
+mod_export int
 pfxlen(char *s, char *t)
 {
     int i = 0;
@@ -1715,7 +1715,7 @@ sfxlen(char *s, char *t)
 /* This is strcmp with ignoring backslashes. */
 
 /**/
-int
+mod_export int
 strbpcmp(char **aa, char **bb)
 {
     char *a = *aa, *b = *bb;
@@ -1761,7 +1761,7 @@ strbpcmp(char **aa, char **bb)
  * It returns the number of lines printed.       */
 
 /**/
-int
+mod_export int
 printfmt(char *fmt, int n, int dopr, int doesc)
 {
     char *p = fmt, nc[DIGBUFSIZE];

@@ -833,7 +833,7 @@ executenamedcommand(char *prmt)
  * suffixlen[256] is the length to remove for non-insertion editing actions. */
 
 /**/
-int suffixlen[257];
+mod_export int suffixlen[257];
 
 /* Shell function to call to remove the suffix. */
 
@@ -844,7 +844,7 @@ static char *suffixfunc;
  * removed in the usual word end conditions.                        */
 
 /**/
-void
+mod_export void
 makesuffix(int n)
 {
     suffixlen[256] = suffixlen[' '] = suffixlen['\t'] = suffixlen['\n'] = 
@@ -858,7 +858,7 @@ makesuffix(int n)
  * characters that can only be used in braces are included.              */
 
 /**/
-void
+mod_export void
 makeparamsuffix(int br, int n)
 {
     if(br || unset(KSHARRAYS))
@@ -874,7 +874,7 @@ makeparamsuffix(int br, int n)
  * remove the suffix. */
 
 /**/
-void
+mod_export void
 makesuffixstr(char *f, char *s, int n)
 {
     if (f) {
@@ -920,7 +920,7 @@ makesuffixstr(char *f, char *s, int n)
 /* Remove suffix, if there is one, when inserting character c. */
 
 /**/
-void
+mod_export void
 iremovesuffix(int c, int keep)
 {
     if (suffixfunc) {
@@ -958,7 +958,7 @@ iremovesuffix(int c, int keep)
 /* Fix the suffix in place, if there is one, making it non-removable. */
 
 /**/
-void
+mod_export void
 fixsuffix(void)
 {
     memset(suffixlen, 0, sizeof(suffixlen));

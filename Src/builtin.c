@@ -133,7 +133,7 @@ static struct builtin builtins[] =
 /* hash table containing builtin commands */
 
 /**/
-HashTable builtintab;
+mod_export HashTable builtintab;
  
 /**/
 void
@@ -573,7 +573,7 @@ bin_pwd(char *name, char **argv, char *ops, int func)
 /* the directory stack */
  
 /**/
-LinkList dirstack;
+mod_export LinkList dirstack;
  
 /* dirs: list the directory stack, or replace it with a provided list */
 
@@ -1139,7 +1139,7 @@ fixdir(char *src)
 }
 
 /**/
-void
+mod_export void
 printqt(char *str)
 {
     /* Print str, but turn any single quote into '\'' or ''. */
@@ -1151,7 +1151,7 @@ printqt(char *str)
 }
 
 /**/
-void
+mod_export void
 printif(char *str, int c)
 {
     /* If flag c has an argument, print that */
@@ -2699,7 +2699,7 @@ bin_false(char *name, char **argv, char *ops, int func)
 /* the zle buffer stack */
  
 /**/
-LinkList bufstack;
+mod_export LinkList bufstack;
 
 /* echo, print, pushln */
 
@@ -3149,7 +3149,7 @@ bin_break(char *name, char **argv, char *ops, int func)
 /* we have printed a 'you have stopped (running) jobs.' message */
  
 /**/
-int stopmsg;
+mod_export int stopmsg;
  
 /* check to see if user has jobs running/stopped */
 
@@ -3183,7 +3183,7 @@ checkjobs(void)
  * because of a signal.                                    */
 
 /**/
-void
+mod_export void
 zexit(int val, int from_signal)
 {
     static int in_exit;
@@ -4045,7 +4045,7 @@ bin_umask(char *nam, char **args, char *ops, int func)
 /* Generic builtin for facilities not available on this OS */
 
 /**/
-int
+mod_export int
 bin_notavail(char *nam, char **argv, char *ops, int func)
 {
     zwarnnam(nam, "not available on this system", NULL, 0);

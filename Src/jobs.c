@@ -33,12 +33,12 @@
 /* the process group of the shell */
 
 /**/
-pid_t mypgrp;
+mod_export pid_t mypgrp;
  
 /* the job we are working on */
  
 /**/
-int thisjob;
+mod_export int thisjob;
 
 /* the current job (+) */
  
@@ -53,7 +53,7 @@ int prevjob;
 /* the job table */
  
 /**/
-struct job jobtab[MAXJOB];
+mod_export struct job jobtab[MAXJOB];
  
 /* shell timings */
  
@@ -906,7 +906,7 @@ waitjobs(void)
 /* clear job table when entering subshells */
 
 /**/
-void
+mod_export void
 clearjobtab(void)
 {
     int i;

@@ -88,7 +88,7 @@ int strin;
 /* total # of characters waiting to be read. */
 
 /**/
-int inbufct;
+mod_export int inbufct;
 
 /* the flags controlling the input routines in input.c: see INP_* in zsh.h */
 
@@ -128,7 +128,7 @@ static int instacksz = INSTACK_INITIAL;
  * null characters to Meta c^32 character pairs. */
 
 /**/
-char *
+mod_export char *
 shingetline(void)
 {
     char *line = NULL;
@@ -444,7 +444,7 @@ inerrflush(void)
 /* Set some new input onto a new element of the input stack */
 
 /**/
-void
+mod_export void
 inpush(char *str, int flags, Alias inalias)
 {
     if (!instack) {
@@ -532,7 +532,7 @@ inpoptop(void)
 /* Remove the top element of the stack and all its continuations. */
 
 /**/
-void
+mod_export void
 inpop(void)
 {
     int remcont;

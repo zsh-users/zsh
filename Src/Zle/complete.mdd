@@ -1,5 +1,3 @@
-hasexport=1
-
 moddeps="zle"
 
 autobins="compgen compadd compset"

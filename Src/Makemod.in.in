@@ -148,7 +148,7 @@ uninstall.modules-here:
 @CLEAN_MK@
 
 mostlyclean-here:
-	rm -f *.o *.$(DL_EXT)
+	rm -f *.o *.export *.$(DL_EXT)
 
 clean-here:
 	rm -f *.o.c *.syms *.pro *.epro *.mdh *.mdhi *.mdhs *.mdh.tmp

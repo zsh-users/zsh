@@ -134,7 +134,7 @@ addbuiltin(Builtin b)
  *  return !addbuiltins(m->nam, bintab, sizeof(bintab)/sizeof(*bintab)); */
 
 /**/
-int
+mod_export int
 addbuiltins(char const *nam, Builtin binl, int size)
 {
     int hads = 0, hadf = 0, n;
@@ -163,7 +163,7 @@ FuncWrap wrappers;
  * error and zero if all went fine. */
 
 /**/
-int
+mod_export int
 addwrapper(Module m, FuncWrap w)
 {
     FuncWrap p, q;
@@ -190,7 +190,7 @@ char **module_path;
 /* List of modules */
 
 /**/
-LinkList modules;
+mod_export LinkList modules;
 
 /* Define an autoloadable builtin.  It returns 0 on success, or 1 on *
  * failure.  The only possible cause of failure is that a builtin    *
@@ -232,7 +232,7 @@ deletebuiltin(char *nam)
  * wayward module had deleted our builtin without telling us.           */
 
 /**/
-int
+mod_export int
 deletebuiltins(char const *nam, Builtin binl, int size)
 {
     int hads = 0, hadf = 0, n;
@@ -255,7 +255,7 @@ deletebuiltins(char const *nam, Builtin binl, int size)
  * one in case of error and zero otherwise. */
 
 /**/
-int
+mod_export int
 deletewrapper(Module m, FuncWrap w)
 {
     FuncWrap p, q;
@@ -760,7 +760,7 @@ load_module(char const *name)
  * The return value is non-zero if the module was found or loaded. */
 
 /**/
-int
+mod_export int
 require_module(char *nam, char *module, int res, int test)
 {
     Module m = NULL;
@@ -1427,7 +1427,7 @@ bin_zmodload_load(char *nam, char **args, char *ops)
 /* The list of module-defined conditions. */
 
 /**/
-Conddef condtab;
+mod_export Conddef condtab;
 
 /* This gets a condition definition with the given name. The first        *
  * argument says if we have to look for an infix condition. The last      *
@@ -1488,7 +1488,7 @@ addconddef(Conddef c)
 /* This adds multiple condition definitions. This is like addbuiltins(). */
 
 /**/
-int
+mod_export int
 addconddefs(char const *nam, Conddef c, int size)
 {
     int hads = 0, hadf = 0;
@@ -1551,7 +1551,7 @@ addhookdef(Hookdef h)
 /* This adds multiple hook definitions. This is like addbuiltins(). */
 
 /**/
-int
+mod_export int
 addhookdefs(char const *nam, Hookdef h, int size)
 {
     int hads = 0, hadf = 0;
@@ -1589,7 +1589,7 @@ deletehookdef(Hookdef h)
 }
 
 /**/
-int
+mod_export int
 deletehookdefs(char const *nam, Hookdef h, int size)
 {
     while (size--) {
@@ -1612,7 +1612,7 @@ addhookdeffunc(Hookdef h, Hookfn f)
 }
 
 /**/
-int
+mod_export int
 addhookfunc(char *n, Hookfn f)
 {
     Hookdef h = gethookdef(n);
@@ -1639,7 +1639,7 @@ deletehookdeffunc(Hookdef h, Hookfn f)
 }
 
 /**/
-int
+mod_export int
 deletehookfunc(char *n, Hookfn f)
 {
     Hookdef h = gethookdef(n);
@@ -1652,7 +1652,7 @@ deletehookfunc(char *n, Hookfn f)
 /* Run the function(s) for a hook. */
 
 /**/
-int
+mod_export int
 runhookdef(Hookdef h, void *d)
 {
     if (empty(h->funcs)) {
@@ -1712,7 +1712,7 @@ addparamdef(Paramdef d)
 /* This adds multiple parameter definitions. This is like addbuiltins(). */
 
 /**/
-int
+mod_export int
 addparamdefs(char const *nam, Paramdef d, int size)
 {
     int hads = 0, hadf = 0;
@@ -1739,7 +1739,7 @@ deleteparamdef(Paramdef d)
 }
 
 /**/
-int
+mod_export int
 deleteparamdefs(char const *nam, Paramdef d, int size)
 {
     while (size--) {
@@ -1802,7 +1802,7 @@ deleteconddef(Conddef c)
 /* This removes multiple condition definitions (like deletebuiltins()). */
 
 /**/
-int
+mod_export int
 deleteconddefs(char const *nam, Conddef c, int size)
 {
     int hads = 0, hadf = 0;
@@ -1874,7 +1874,7 @@ getmathfunc(char *name, int autol)
 }
 
 /**/
-int
+mod_export int
 addmathfunc(MathFunc f)
 {
     MathFunc p;
@@ -1894,7 +1894,7 @@ addmathfunc(MathFunc f)
 }
 
 /**/
-int
+mod_export int
 addmathfuncs(char const *nam, MathFunc f, int size)
 {
     int hads = 0, hadf = 0;
@@ -1936,7 +1936,7 @@ add_automathfunc(char *nam, char *module)
 }
 
 /**/
-int
+mod_export int
 deletemathfunc(MathFunc f)
 {
     MathFunc p, q;
@@ -1962,7 +1962,7 @@ deletemathfunc(MathFunc f)
 }
 
 /**/
-int
+mod_export int
 deletemathfuncs(char const *nam, MathFunc f, int size)
 {
     int hads = 0, hadf = 0;

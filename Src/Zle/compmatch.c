@@ -68,7 +68,7 @@ cmp_cmatchers(Cmatcher a, Cmatcher b)
 /* Add the given matchers to the bmatcher list. */
 
 /**/
-void
+mod_export void
 add_bmatchers(Cmatcher m)
 {
     Cmlist old = bmatchers, *q = &bmatchers, n;
@@ -88,7 +88,7 @@ add_bmatchers(Cmatcher m)
  * ensure that the bmatchers list contains no matchers not in mstack. */
 
 /**/
-void
+mod_export void
 update_bmatchers(void)
 {
     Cmlist p = bmatchers, q = NULL, ms;
@@ -832,7 +832,7 @@ match_parts(char *l, char *w, int n, int part)
  * and the suffix don't match the word w. */
 
 /**/
-char *
+mod_export char *
 comp_match(char *pfx, char *sfx, char *w, Patprog cp, Cline *clp, int qu,
 	   Brinfo *bpl, int bcp, Brinfo *bsl, int bcs, int *exact)
 {

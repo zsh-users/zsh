@@ -79,7 +79,7 @@ static struct zleparam {
 };
 
 /**/
-void
+mod_export void
 makezleparams(int ro)
 {
     struct zleparam *zp;

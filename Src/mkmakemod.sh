@@ -185,7 +185,7 @@ if $first_stage; then
 	imports=
 	for dep in $moddeps; do
 	    eval "loc=\$loc_$dep"
-	    imports="$imports \$(IMPOPT)\$(sdir_top)/$loc/$dep.export"
+	    imports="$imports \$(IMPOPT)\$(dir_top)/$loc/$dep.export"
 	    case $the_subdir in
 		$loc)
 		    mdh="${dep}.mdh"
@@ -215,17 +215,20 @@ if $first_stage; then
 	echo "SYMS_${module} = $proto"
 	echo "EPRO_${module} = "`echo $proto '' | sed 's,\.syms ,.epro ,g'`
 	echo "INCS_${module} = \$(EPRO_${module}) $otherincs"
-	echo "EXPIMP_${module} = $imports ${hasexport+\$(EXPOPT)\$(sdir)/$module.export}"
+	echo "EXPIMP_${module} = $imports \$(EXPOPT)$module.export"
 	echo "NXPIMP_${module} ="
 	echo
-	echo "proto.${module}: \$(PRO_${module})"
+	echo "proto.${module}: \$(EPRO_${module})"
 	echo "\$(SYMS_${module}): \$(PROTODEPS)"
+	echo
+	echo "${module}.export: \$(SYMS_${module})"
+	echo "	( echo '#!'; cat \$(SYMS_${module}) | sed -n '/^X/{s/^X//;p;}' | sort -u ) > \$@"
 	echo
 	echo "modobjs.${module}: \$(MODOBJS_${module})"
 	echo "	echo '' \$(MODOBJS_${module}) $modobjs_sed>> \$(dir_src)/stamp-modobjs.tmp"
 	echo
 	if test -z "$alwayslink"; then
-	    echo "${module}.\$(DL_EXT): \$(MODDOBJS_${module})"
+	    echo "${module}.\$(DL_EXT): \$(MODDOBJS_${module}) ${module}.export"
 	    echo '	rm -f $@'
 	    echo "	\$(DLLINK) \$(@E@XPIMP_$module) \$(@E@NTRYOPT) \$(MODDOBJS_${module}) \$(LIBS)"
 	    echo

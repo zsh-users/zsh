@@ -38,7 +38,7 @@ int noerrexit;
 /* suppress error messages */
  
 /**/
-int noerrs;
+mod_export int noerrs;
  
 /* do not save history on exec and exit */
 
@@ -48,7 +48,7 @@ int nohistsave;
 /* error/break flag */
  
 /**/
-int errflag;
+mod_export int errflag;
  
 /* Status of return from a trap */
  
@@ -63,7 +63,7 @@ int subsh;
 /* != 0 if we have a return pending */
  
 /**/
-int retflag;
+mod_export int retflag;
 
 /**/
 long lastval2;
@@ -92,17 +92,17 @@ int max_zsh_fd;
 /* input fd from the coprocess */
 
 /**/
-int coprocin;
+mod_export int coprocin;
 
 /* output fd from the coprocess */
 
 /**/
-int coprocout;
+mod_export int coprocout;
 
 /* != 0 if the line editor is active */
 
 /**/
-int zleactive;
+mod_export int zleactive;
 
 /* pid of process undergoing 'process substitution' */
  
@@ -117,7 +117,7 @@ int cmdoutval;
 /* The context in which a shell function is called, see SFC_* in zsh.h. */ 
 
 /**/
-int sfcontext;
+mod_export int sfcontext;
 
 /* Stack to save some variables before executing a signal handler function */
 
@@ -132,7 +132,7 @@ static int doneps4;
 /* parse string into a list */
 
 /**/
-List
+mod_export List
 parse_string(char *s, int ln)
 {
     List l;
@@ -156,10 +156,10 @@ parse_string(char *s, int ln)
 /* the resource limits for the shell and its children */
 
 /**/
-struct rlimit current_limits[RLIM_NLIMITS], limits[RLIM_NLIMITS];
+mod_export struct rlimit current_limits[RLIM_NLIMITS], limits[RLIM_NLIMITS];
  
 /**/
-int
+mod_export int
 zsetlimit(int limnum, char *nam)
 {
     if (limits[limnum].rlim_max != current_limits[limnum].rlim_max ||
@@ -175,7 +175,7 @@ zsetlimit(int limnum, char *nam)
 }
 
 /**/
-int
+mod_export int
 setlimits(char *nam)
 {
     int limnum;
@@ -546,7 +546,7 @@ execute(Cmdnam not_used_yet, int dash)
  */
 
 /**/
-char *
+mod_export char *
 findcmd(char *arg0, int docopy)
 {
     char **pp;
@@ -644,7 +644,7 @@ isrelative(char *s)
 }
 
 /**/
-Cmdnam
+mod_export Cmdnam
 hashcmd(char *arg0, char **pp)
 {
     Cmdnam cn;
@@ -683,7 +683,7 @@ hashcmd(char *arg0, char **pp)
 /* execute a string */
 
 /**/
-void
+mod_export void
 execstring(char *s, int dont_change_job, int exiting)
 {
     List list;
@@ -1145,7 +1145,7 @@ makecline(LinkList list)
 }
 
 /**/
-void
+mod_export void
 untokenize(char *s)
 {
     if (*s) {
@@ -2309,7 +2309,7 @@ entersubsh(int how, int cl, int fake)
 /* close internal shell fds */
 
 /**/
-void
+mod_export void
 closem(int how)
 {
     int i;
@@ -2477,7 +2477,7 @@ getoutput(char *cmd, int qt)
 /* read output of command substitution */
 
 /**/
-LinkList
+mod_export LinkList
 readoutput(int in, int qt)
 {
     LinkList ret;
@@ -2961,7 +2961,7 @@ loadautofn(Shfunc shf)
 /* execute a shell function */
 
 /**/
-void
+mod_export void
 doshfunc(char *name, List list, LinkList doshargs, int flags, int noreturnval)
 /* If noreturnval is nonzero, then reset the current return *
  * value (lastval) to its value before the shell function   *
@@ -3058,7 +3058,7 @@ doshfunc(char *name, List list, LinkList doshargs, int flags, int noreturnval)
  * in turn has to call back this function with the arguments it gets.   */
 
 /**/
-void
+mod_export void
 runshfunc(List list, FuncWrap wrap, char *name)
 {
     int cont;

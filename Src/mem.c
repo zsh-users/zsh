@@ -76,13 +76,13 @@
 /* != 0 if we are allocating in the heaplist */
  
 /**/
-int useheap;
+mod_export int useheap;
 
 /* Current allocation pointers.  ncalloc() is either zalloc() or zhalloc(); *
  * alloc() is either zcalloc() or hcalloc().                               */
 
 /**/
-void *(*ncalloc) _((size_t)), *(*alloc) _((size_t));
+mod_export void *(*ncalloc) _((size_t)), *(*alloc) _((size_t));
 
 #ifdef ZSH_MEM_WARNING
 # ifndef DEBUG
@@ -110,7 +110,7 @@ union mem_align {
 /* set default allocation to heap stack */
 
 /**/
-int
+mod_export int
 global_heapalloc(void)
 {
     int luh = useheap;
@@ -124,7 +124,7 @@ global_heapalloc(void)
 /* set default allocation to malloc() */
 
 /**/
-int
+mod_export int
 global_permalloc(void)
 {
     int luh = useheap;
@@ -146,7 +146,7 @@ static Heap fheap;
 /* Use new heaps from now on. This returns the old heap-list. */
 
 /**/
-Heap
+mod_export Heap
 new_heaps(void)
 {
     Heap h = heaps;
@@ -159,7 +159,7 @@ new_heaps(void)
 /* Re-install the old heaps again, freeing the new ones. */
 
 /**/
-void
+mod_export void
 old_heaps(Heap old)
 {
     Heap h, n;
@@ -176,7 +176,7 @@ old_heaps(Heap old)
 /* Temporarily switch to other heaps (or back again). */
 
 /**/
-Heap
+mod_export Heap
 switch_heaps(Heap new)
 {
     Heap h = heaps;
@@ -190,7 +190,7 @@ switch_heaps(Heap new)
 /* save states of zsh heaps */
 
 /**/
-void
+mod_export void
 pushheap(void)
 {
     Heap h;
@@ -212,7 +212,7 @@ pushheap(void)
 /* reset heaps to previous state */
 
 /**/
-void
+mod_export void
 freeheap(void)
 {
     Heap h, hn, hl = NULL;
@@ -244,7 +244,7 @@ freeheap(void)
 /* reset heap to previous state and destroy state information */
 
 /**/
-void
+mod_export void
 popheap(void)
 {
     Heap h, hn, hl = NULL;
@@ -280,7 +280,7 @@ popheap(void)
 /* allocate memory from the current memory pool */
 
 /**/
-void *
+mod_export void *
 zhalloc(size_t size)
 {
     Heap h;
@@ -337,7 +337,7 @@ zhalloc(size_t size)
 }
 
 /**/
-void *
+mod_export void *
 hrealloc(char *p, size_t old, size_t new)
 {
     Heap h, ph;
@@ -413,7 +413,7 @@ hrealloc(char *p, size_t old, size_t new)
 /* allocate memory from the current memory pool and clear it */
 
 /**/
-void *
+mod_export void *
 hcalloc(size_t size)
 {
     void *ptr;
@@ -426,7 +426,7 @@ hcalloc(size_t size)
 /* allocate permanent memory */
 
 /**/
-void *
+mod_export void *
 zalloc(size_t size)
 {
     void *ptr;
@@ -442,7 +442,7 @@ zalloc(size_t size)
 }
 
 /**/
-void *
+mod_export void *
 zcalloc(size_t size)
 {
     void *ptr;
@@ -465,7 +465,7 @@ zcalloc(size_t size)
  * POSIX compliant, but I'm not sure how to do that.                */
 
 /**/
-void *
+mod_export void *
 zrealloc(void *ptr, size_t size)
 {
     if (ptr) {
@@ -490,7 +490,7 @@ zrealloc(void *ptr, size_t size)
 }
 
 /**/
-char *
+mod_export char *
 dupstring(const char *s)
 {
     char *t;
@@ -503,7 +503,7 @@ dupstring(const char *s)
 }
 
 /**/
-char *
+mod_export char *
 ztrdup(const char *s)
 {
     char *t;
@@ -515,6 +515,7 @@ ztrdup(const char *s)
     return t;
 }
 
+/**/
 #ifdef ZSH_MEM
 
 /*
@@ -913,7 +914,7 @@ malloc(MALLOC_ARG_T size)
    0 for this parameter means: `don't know' */
 
 /**/
-void
+mod_export void
 zfree(void *p, int sz)
 {
     struct m_hdr *m = (struct m_hdr *)(((char *)p) - M_ISIZE), *mp, *mt = NULL;
@@ -1120,7 +1121,7 @@ free(FREE_ARG_T p)
    those that have a zero byte at the end) */
 
 /**/
-void
+mod_export void
 zsfree(char *p)
 {
     if (p)
@@ -1327,10 +1328,11 @@ bin_mem(char *name, char **argv, char *ops, int func)
 
 #endif
 
+/**/
 #else				/* not ZSH_MEM */
 
 /**/
-void
+mod_export void
 zfree(void *p, int sz)
 {
     if (p)
@@ -1338,11 +1340,12 @@ zfree(void *p, int sz)
 }
 
 /**/
-void
+mod_export void
 zsfree(char *p)
 {
     if (p)
 	free(p);
 }
 
+/**/
 #endif

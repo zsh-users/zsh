@@ -33,17 +33,17 @@
 /* != 0 if we are about to read a command word */
  
 /**/
-int incmdpos;
+mod_export int incmdpos;
  
 /* != 0 if we are in the middle of a [[ ... ]] */
  
 /**/
-int incond;
+mod_export int incond;
  
 /* != 0 if we are after a redirection (for ctxtlex only) */
  
 /**/
-int inredir;
+mod_export int inredir;
  
 /* != 0 if we are about to read a case pattern */
  
@@ -68,7 +68,7 @@ struct heredocs *hdocs;
 /* used in arrays of lists instead of NULL pointers */
  
 /**/
-struct list dummy_list;
+mod_export struct list dummy_list;
 
 #define YYERROR  { tok = LEXERR; return NULL; }
 #define YYERRORV { tok = LEXERR; return; }

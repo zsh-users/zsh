@@ -77,7 +77,7 @@ static HashTable firstht, lastht;
 /* Generic hash function */
 
 /**/
-unsigned
+mod_export unsigned
 hasher(char *str)
 {
     unsigned hashval = 0;
@@ -91,7 +91,7 @@ hasher(char *str)
 /* Get a new hash table */
 
 /**/
-HashTable
+mod_export HashTable
 newhashtable(int size, char const *name, PrintTableStats printinfo)
 {
     HashTable ht;
@@ -120,7 +120,7 @@ newhashtable(int size, char const *name, PrintTableStats printinfo)
  * existing pointers to the hash table are invalid.             */
 
 /**/
-void
+mod_export void
 deletehashtable(HashTable ht)
 {
     ht->emptytable(ht);
@@ -148,7 +148,7 @@ deletehashtable(HashTable ht)
  * the table is then expanded.                          */
 
 /**/
-void
+mod_export void
 addhashnode(HashTable ht, char *nam, void *nodeptr)
 {
     HashNode oldnode = addhashnode2(ht, nam, nodeptr);
@@ -222,7 +222,7 @@ addhashnode2(HashTable ht, char *nam, void *nodeptr)
  * or isn't found, it returns NULL        */
 
 /**/
-HashNode
+mod_export HashNode
 gethashnode(HashTable ht, char *nam)
 {
     unsigned hashval;
@@ -246,7 +246,7 @@ gethashnode(HashTable ht, char *nam)
  * it returns NULL.                       */
 
 /**/
-HashNode
+mod_export HashNode
 gethashnode2(HashTable ht, char *nam)
 {
     unsigned hashval;
@@ -266,7 +266,7 @@ gethashnode2(HashTable ht, char *nam)
  * is no such node, then it returns NULL        */
 
 /**/
-HashNode
+mod_export HashNode
 removehashnode(HashTable ht, char *nam)
 {
     unsigned hashval;
@@ -358,7 +358,7 @@ hnamcmp(const void *ap, const void *bp)
  */
 
 /**/
-void
+mod_export void
 scanhashtable(HashTable ht, int sorted, int flags1, int flags2, ScanFunc scanfunc, int scanflags)
 {
     struct scanstatus st;
@@ -509,7 +509,7 @@ resizehashtable(HashTable ht, int newsize)
 /* Generic method to empty a hash table */
 
 /**/
-void
+mod_export void
 emptyhashtable(HashTable ht)
 {
     resizehashtable(ht, ht->hsize);
@@ -578,12 +578,12 @@ bin_hashinfo(char *nam, char **args, char *ops, int func)
 /* hash table containing external commands */
  
 /**/
-HashTable cmdnamtab;
+mod_export HashTable cmdnamtab;
  
 /* how far we've hashed the PATH so far */
  
 /**/
-char **pathchecked;
+mod_export char **pathchecked;
  
 /* Create a new command hash table */
  
@@ -756,7 +756,7 @@ printcmdnamnode(HashNode hn, int printflags)
 /* hash table containing the shell functions */
 
 /**/
-HashTable shfunctab;
+mod_export HashTable shfunctab;
 
 /**/
 void
@@ -934,7 +934,7 @@ static struct reswd reswds[] = {
 /* hash table containing the reserved words */
 
 /**/
-HashTable reswdtab;
+mod_export HashTable reswdtab;
 
 /* Build the hash table containing zsh's reserved words. */
 
@@ -997,7 +997,7 @@ printreswdnode(HashNode hn, int printflags)
 /* hash table containing the aliases */
  
 /**/
-HashTable aliastab;
+mod_export HashTable aliastab;
  
 /* Create new hash table for aliases */
 
@@ -1028,7 +1028,7 @@ createaliastable(void)
 /* Create a new alias node */
 
 /**/
-Alias
+mod_export Alias
 createaliasnode(char *txt, int flags)
 {
     Alias al;
@@ -1133,7 +1133,7 @@ printaliasnode(HashNode hn, int printflags)
 /* hash table containing named directories */
 
 /**/
-HashTable nameddirtab;
+mod_export HashTable nameddirtab;
  
 /* != 0 if all the usernames have already been *
  * added to the named directory hash table.    */

@@ -134,7 +134,7 @@ freethingynode(HashNode hn)
  * correctly.                                                          */
 
 /**/
-Thingy
+mod_export Thingy
 refthingy(Thingy th)
 {
     if(th)
@@ -261,7 +261,7 @@ freewidget(Widget w)
  * returned.                                                            */
 
 /**/
-Widget
+mod_export Widget
 addzlefunction(char *name, ZleIntFunc ifunc, int flags)
 {
     VARARR(char, dotn, strlen(name) + 2);
@@ -290,7 +290,7 @@ addzlefunction(char *name, ZleIntFunc ifunc, int flags)
  * a widget from the fixed table -- it would be bad.  (Thanks, Egon.)   */
 
 /**/
-void
+mod_export void
 deletezlefunction(Widget w)
 {
     Thingy p, n;
