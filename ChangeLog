@@ -1,3 +1,9 @@
+2000-06-22  Peter Stephenson  <pws@pwstephenson.fsnet.co.uk>
+
+	* 12040: Src/builtin.c: typeset -r on existing parameter set
+	the readonly flag before assigning any value on the same command
+	line.
+
 2000-06-22  Bart Schaefer  <schaefer@zsh.org>
 
 	* 12039: Test/comptest: Use "compinit -u" to avoid a possible

@@ -1622,7 +1622,7 @@ typeset_single(char *cname, char *pname, Param pm, int func,
 		    arrfixenv(pm->nam, x);
 	    }
 	}
-	pm->flags = (pm->flags | on) & ~(off | PM_UNSET);
+	pm->flags = (pm->flags | (on & ~PM_READONLY)) & ~(off | PM_UNSET);
 	/* This auxlen/pm->ct stuff is a nasty hack. */
 	if ((on & (PM_LEFT | PM_RIGHT_B | PM_RIGHT_Z | PM_INTEGER |
 		   PM_EFLOAT | PM_FFLOAT)) &&
@@ -1643,6 +1643,7 @@ typeset_single(char *cname, char *pname, Param pm, int func,
 	    zwarnnam(cname, "can't assign new value for array %s", pname, 0);
 	    return NULL;
 	}
+	pm->flags |= (on & PM_READONLY);
 	return pm;
     }
 
