@@ -31,7 +31,7 @@ if (( ! $+_lp_cache )); then
       fi
     done < $file[1]
   fi
-  (( $#_lp_cache )) || _lp_cache( 'lp0:Guessed default printer' )
+  (( $#_lp_cache )) || _lp_cache=( 'lp0:Guessed default printer' )
   (( $#_lp_alias_cache )) || unset _lp_alias_cache
 fi
 
