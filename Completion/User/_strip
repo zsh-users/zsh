@@ -3,4 +3,4 @@
 local expl
 
 _description files expl executable
-_files "$expl[@]" -g '*(*)'
+_files "$expl[@]" -g '*(-*)'

@@ -91,7 +91,7 @@ _ssh () {
             ;;
           *(#i)xauthlocation*)
             _description files expl 'xauth program'
-            _files "$expl[@]" -g '*(*)' && ret=0
+            _files "$expl[@]" -g '*(-*)' && ret=0
             ;;
           esac
         else
@@ -155,7 +155,7 @@ _ssh () {
       '-c[select encryption cipher]:encryption cipher:(idea des 3des blowfish arcfour tss none)' \
       '-P[specify port on remote host]:port number on remote host:' \
       '-i[select identity file]:SSH identity file:_files' \
-      '-S[specify path to ssh]:path to ssh:_files -g \*\(\*\)' \
+      '-S[specify path to ssh]:path to ssh:_files -g \*\(-\*\)' \
       '-o[give SSH options]:options:->options' \
       '-p[preserve modification times]' \
       '-r[recursively copy directories]' \

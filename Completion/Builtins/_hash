@@ -11,7 +11,7 @@ if [[ "$words[2]" = -*d* ]]; then
   fi
 elif compset -P 1 '*='; then
   _wanted -C value values expl 'executable file' &&
-      _files "$expl[@]" -g '*(*)'
+      _files "$expl[@]" -g '*(-*)'
 else
   _wanted -C name commands expl command &&
       compadd "$expl[@]" -q -S '=' - "${(@k)commands}"

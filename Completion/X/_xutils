@@ -138,7 +138,7 @@ xrdb)
     '(-global -all -screens)-screen' \
     '(-global -all -screen)-screens' \
     '-n[only display on stdout]' \
-    '(-nocpp)-cpp:preprocessor program:_files -g \*\(\*\)' \
+    '(-nocpp)-cpp:preprocessor program:_files -g \*\(-\*\)' \
     '(-cpp)-nocpp' \
     '(-load -override -merge -remove)-query' \
     '(-query -override -merge -remove)-load' \

@@ -71,7 +71,7 @@
 #              option -d follow close means "debug level" \
 #              option -k means "function names" action '->pair' \
 #              option -m means "minimum execution count" \
-#              argument means executable action '_files -g \*\(\*\)' \
+#              argument means executable action '_files -g \*\(-\*\)' \
 #              argument means "profile file" action '_files -g gmon.\*' \
 #              help '*=name*' means "function name" action '->funcs' \
 #              help '*=dirs*' means "directory" action _dir_list

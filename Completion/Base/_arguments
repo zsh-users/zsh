@@ -134,11 +134,7 @@ if (( long )); then
         tmp=("${(@)tmp:#*\=*}")
         tmpo=("${(@)${(@)tmpo%%\=*}//[^a-z0-9-]}")
 
-        if [[ "$descr" = ::* ]]; then
-	  cache=( "$cache[@]" "${(@)^tmpo}=${descr[2,-1]}" )
-        else
-	  cache=( "$cache[@]" "${(@)^tmpo}=${descr}" )
-        fi
+	cache=( "$cache[@]" "${(@)^tmpo}=${descr}" )
       fi
 
       # Everything else is just added as a option without arguments.
