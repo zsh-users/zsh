@@ -86,13 +86,14 @@ if the var(args) is used as a string or a comma-separated list of
 arithmetic expressions. The shell currently defines no mathematical
 functions, but modules may define some.
 
-An expression of the form `tt(#\)var(x)' where var(x) is any character
+An expression of the form `tt(##)var(x)' where var(x) is any character
 sequence such as `tt(a)', `tt(^A)', or `tt(\M-\C-x)' gives the ascii
 value of this character and an expression of the form `tt(#)var(foo)'
 gives the ascii value of the first character of the value of the
 parameter var(foo).  Note that this is different from the expression
 `tt($#)var(foo)', a standard parameter substitution which gives the
-length of the parameter var(foo).
+length of the parameter var(foo).  `tt(#\)' is accepted instead of
+`tt(##)', but its use is deprecated.
 
 Named parameters and subscripted arrays can be referenced by name within an
 arithmetic expression without using the parameter expansion syntax.  For

@@ -374,7 +374,7 @@ zzlex(void)
 		return NUM;
 	    }
 	    if (*ptr == '#') {
-		if (*++ptr == '\\') {
+		if (*++ptr == '\\' || *ptr == '#') {
 		    int v;
 
 		    ptr++;
