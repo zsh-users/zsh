@@ -219,11 +219,11 @@ zprof_wrapper(Eprog prog, FuncWrap w, char *name)
 {
     int active = 0;
     struct sfunc sf, *sp;
-    Pfunc f;
+    Pfunc f = NULL;
     Parc a = NULL;
     struct timeval tv;
     struct timezone dummy;
-    double prev, now;
+    double prev = 0, now;
 
     if (zprof_module && !(zprof_module->flags & MOD_UNLOAD)) {
         active = 1;

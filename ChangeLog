@@ -1,5 +1,8 @@
 2001-05-28  Bart Schaefer  <schaefer@zsh.org>
 
+	* unposted: Src/Modules/zprof.c: Silence bogus compiler warnings
+	about variables used when unitialized.
+
 	* Andrej: 14501 (as tweaked by 14510): Fix device and FIFO tests
 	for Cygwin and other platforms where they're not implemented or
 	the testing user has insufficient permissions.
