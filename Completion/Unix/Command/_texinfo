@@ -1,13 +1,12 @@
-#compdef info install-info makeinfo texi2dvi texindex
+#compdef info tkinfo install-info makeinfo texi2dvi texindex
 
 local curcontext="$curcontext" state line ret=1
+local -A opt_args
+local -a info
 
 case $service in
   info)
-    local -A opt_args
-    local -a info
-    info=(_call_program info ${words[1]})
-
+    info=( _call_program info ${words[1]} )
     _arguments -C -s \
       '(: -)--apropos=[look up string in indices]:search string: ' \
       '(-f --file)'{\*-d,\*--directory=}'[add directory to infopath]:info dir:_files -/' \
@@ -23,6 +22,8 @@ case $service in
       '--vi-keys[use Vi-like key bindings]' \
       '(: -)--version[display version information]' \
       '(--apropos -h --help -O --output --version)*::menu items:->item' && ret=0
+
+    info=( $info {(kv)opt_args[(I)(-d|--directory|-f|--file)]} )
   ;;
   install-info)
     if _pick_variant debian=Debian gnu --version; then
@@ -128,13 +129,24 @@ case $service in
       '*:texinfo file:_texi'
       return
   ;;
+  tkinfo)
+    _x_arguments -C \
+      '-+'{headers,buttons,balloons,scrollthrough,pagesep,showdir} \
+      '-linklook:menu display:(color font underline)' \
+      '-highlight:link display:(color inverse underline)' \
+      '-searchlook:search match display:(color inverse underline)' \
+      '-iconic' \
+      '-dir:info path:_dir_list' \
+      '-file:info file:_files -g "*.info(|.gz|.bz2)"' \
+      '-node:info node:->item' \
+      '*::menu items:->item' && ret=0
+    info=( _call_program info info ${(kv)opt_args[(I)-file]/-file/-f} )
+  ;;
 esac
 
 case $state in
   item )
     local -a items
-
-    info=($info ${(kv)opt_args[(I)(-d|--directory|-f|--file)]})
 
     items=(${${(M)${${(f)"$(${info} --output - ${words[1,CURRENT-1]} 2>/dev/null)"}[1,(r)[[:space:]]#--- The Detailed Node Listing ---[[:space:]]#]}:#\* *~\* Menu:*}:/(#b)\*[[:space:]]##([^:]##):(#B)( \(?##\)[^.]#.|(:|))[[:space:]]#(#b)(*)[[:space:]]#/$match[1]${match[2]:+:}$match[2]})
 
