@@ -14,7 +14,7 @@
 
 2001-12-11  Clint Adams  <clint@zsh.org>
 
-	* 16326: Completion/Debian/Command/_dpkg: glob for udebs
+	* 16327: Completion/Debian/Command/_dpkg: glob for udebs
 	as well as debs.
 
         * 16326: Completion/Unix/Command/_webbrowser,
@@ -26,6 +26,11 @@
         * 16315: Completion/Unix/Command/.distfiles,
         Completion/Unix/Command/_spamassassin: completion for
         spamassassin.
+
+2001-12-06  Oliver Kiddle  <opk@zsh.org>
+
+	* users/4519: Completion/Unix/Command/_zip: complete files
+	in all argument positions for zip (bug fix)
 
 2001-11-29  Clint Adams  <clint@zsh.org>
 
