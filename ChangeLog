@@ -1,3 +1,6 @@
+2000-04-11  Clint Adams  <schizo@debian.org>
+	* 10680: Completion/User/_diff_options: spelling corrections.
+
 2000-04-11  Peter Stephenson  <pws@pwstephenson.fsnet.co.uk>
 
 	* 10669: Completion/Core/compinstall:  will now ask for
