@@ -1,0 +1,33 @@
+#compdef sysctl
+
+case $OSTYPE in
+  freebsd[0-4]*)
+    _arguments -s \
+      '-a[list all]' \
+      '-A[show all opaques (values suppressed)]' \
+      '-b[binary output]' \
+      '-n[show only variable values]' \
+      '-w[write mode]' \
+      '-X[show all opaques (entire values)]' \
+      "*:sysctl variable:compadd ${words[(r)-w]:+-S =} $(sysctl -A | sed 's/:.*//')"
+  ;;
+  freebsd[5-9]*)
+    _arguments -s \
+      '-a[list all]' \
+      '-b[binary output]' \
+      '-N[show only variable names]' \
+      '-n[show only variable values]' \
+      '-o[show opaques as well (values suppressed)]' \
+      '-x[show opaques as well (entire values)]' \
+      '*:sysctl variable:compadd -S "" - $(sysctl -aN)'
+  ;;
+  linux*)
+    _arguments -A "-*" \
+      '-n[show only variable values]' \
+      '(-n -p -a -A)-w[write mode]' \
+      '(-n -w -a -A *)-p[specify file to load sysctl settings from]:file:_files' \
+      '(-n -w -p -A *)-a[list all]' \
+      '(-n -w -p -a *)-A[list all in table form]' \
+      '(-n -p -a -A)*:sysctl variable:_files -W /proc/sys'
+  ;;
+esac
