@@ -4,5 +4,5 @@ DISTFILES_SRC='
     _compdef _disable _echotc _enable _fc _fg_jobs _functions _hash _kill
     _limits _nothing _pids _popd _sched _set _setopt _source _stat _trap
     _unhash _unsetopt _vars _vars_eq _wait _which _zftp _zle _zmodload
-    _signals
+    _signals _zstyle
 '

@@ -1,0 +1,177 @@
+#compdef zstyle
+
+local curcontext="$curcontext" state ostate line expl ctop
+local nm=$compstat[nmatches]
+
+typeset -A styles
+# Assoc array of styles; the values give the possible top-level
+# contexts (currently c for completion, z for zftp or cz for both),
+# followed by a colon, followed by a state to enter, empty if none.
+styles=(
+  accept-exact		 c:bool
+  arguments		 c:
+  auto-description	 c:
+  cache-path		 'c:_path_files -/'
+  completer		 c:completer
+  completions		 c:
+  condition		 c:
+  cursor		 c:bool
+  disable-stat		 c:bool
+  expand		 c:
+  format		 c:
+  glob			 c:
+  group-name		 c:
+  group-order		 c:tag
+  groups		 c:_groups
+  hidden		 c:bool
+  hosts			 c:_hosts
+  hosts-ports		 c:host-port
+  hosts-ports-users	 c:host-port-user
+  ignored-suffixes	 c:
+  insert-unambiguous	 c:bool
+  last-prompt		 c:bool
+  list			 c:listwhen
+  list-arguments	 c:
+  list-colors		 c:
+  list-packed		 c:bool
+  list-rows-first	 c:bool
+  local			 c:
+  max-errors		 c:
+  menu			 c:boolauto
+  numbers		 c:bool
+  original		 c:bool
+  path			 'c:_path_files -/'
+  ports			 c:_ports
+  prefix-hidden		 c:bool
+  prefix-needed		 c:bool
+  prompt		 c:
+  remove-all-dups	 c:bool
+  sort			 c:bool
+  tag-order		 c:tag
+  special-dirs		 c:sdirs
+  stop			 c:stop
+  substitute		 c:
+  users			 c:_users
+  users-hosts		 c:user-host
+  verbose		 c:bool
+  word			 c:bool
+
+  chpwd			 z:bool
+  progress		 z:progress
+  remote_glob		 z:bool
+  titlebar		 z:bool
+  update		 z:
+)
+
+local taglist
+taglist=(accounts all-files all-expansions arguments arrays
+association-keys bookmarks builtins characters colors commands corrections
+cursors cvs default descriptions devices directories directory-stack
+displays expansions extensions files fonts functions globbed-files groups
+history-words hosts indexes jobs keymaps keysyms local-directories
+libraries limits manuals maps messages modifiers modules my-accounts
+named-directories names nicknames options original other-accounts packages
+parameters path-directories paths pods ports prefixes processes ps regex
+sequences sessions signals strings tags targets types urls users values
+warnings widgets windows zsh-options)
+
+_arguments ':context:->contexts' ':style:->styles' '*:argument:->style-arg'
+
+while [[ -n $state ]]; do
+  ostate=$state
+  state=
+
+  case "$ostate" in
+    contexts)
+      if [[ $PREFIX != :*: ]]; then
+	_wanted contexts expl context &&
+	compadd -P : -S : "$expl[@]" completion zftp
+      fi
+      ;;
+
+    styles)
+      # Get the top-level context we're completing for, if any.
+      if [[ $words[2] = :(completion|zftp):* ]]; then
+	ctop=${words[2][2]}
+      else
+        ctop=cz
+      fi
+      _wanted styles expl style &&
+         compadd "$expl[@]" - ${(k)styles[(R)[^:]#[$ctop][^:]#:*]}
+      ;;
+      
+    style-arg)
+      state="${styles[$words[3]]#*:}"
+      ;;
+
+    bool) 
+      _wanted values expl boolean &&
+	compadd "$expl[@]" true false
+      ;;
+
+    boolauto) 
+      _wanted values expl boolean &&
+	compadd "$expl[@]" true false auto select
+      ;;
+
+    completer)
+      _wanted values expl completer &&
+	compadd "$expl[@]" _complete _approximate _correct _match \
+          _expand _list _menu _oldlist
+      ;;
+
+    host-port*)
+      if [[ $PREFIX != *:* ]]; then
+	_hosts -S :
+      elif [[ $ostate != *user || $PREFIX != *:*:* ]]; then
+	compset -P 1 '*:'
+	_ports
+      else
+	compset -P 2 '*:'
+        _users
+      fi
+      ;;
+
+    listwhen)
+      _wanted values expl 'when to list completions' &&
+	compadd "$expl[@]" always never sometimes
+      ;;
+
+    progress)
+      _wanted values expl 'progress meter style' &&
+        compadd "$expl[@]" none bar percent
+      ;;
+
+    sdirs)
+      _wanted values expl 'whether to complete . or ..' &&
+        compadd "$expl[@]" true false ..
+      ;;
+
+    stop)
+      _wanted values expl 'when to insert matches' &&
+	compadd "$expl[@]" true false verbose
+      ;;
+
+    tag)
+      _wanted tags expl tag && compadd "$expl[@]" - $taglist
+      ;;
+
+    user-host)
+      if [[ $PREFIX = *:* ]]; then
+	compset -P '*:'
+	_hosts
+      else
+	_users
+      fi
+      ;;
+
+    _*)
+      ${=ostate}
+      ;;
+
+    *)
+      ;;
+  esac
+done
+
+[[ $compstate[nmatches] != $nm ]]
