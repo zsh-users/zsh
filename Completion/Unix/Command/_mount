@@ -365,6 +365,12 @@ if (( ! $+_fs_any )); then
       'fat[specify fat type]:fat type (bit):(12 16)'
       'quiet[quiet mode]'
     )
+    _fs_ext3=(
+      "$_fs_ext2[@]"
+      'journal[update fs journal]:update or inode number:(update)'
+      'noload[do not load journal]'
+      'data[specify mode for data]:journalling mode:(journal ordered writeback)'
+    )
     _fs_msdos=( "$_fs_fat[@]" )
     _fs_umsdos=( "$_fs_fat[@]" )
     _fs_vfat=( "$_fs_fat[@]"
@@ -523,7 +529,7 @@ if [[ "$service" = mount ]]; then
     )
     fss=( minix ext ext2 xiafs hpfs msdos umsdos vfat proc nfs iso9660
           smbfs ncpfs affs ufs romfs sysv adfs autofs coda devpts efs
-          hfs ntfs qnx4 smbfs udf )
+          hfs ntfs qnx4 smbfs udf ext3 )
     [[ -r /proc/filesystems ]] &&
         fss=( ${$(</proc/filesystems)#nodev} )
     ;;
