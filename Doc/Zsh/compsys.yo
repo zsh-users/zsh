@@ -1923,25 +1923,6 @@ be quoted by preceding them with a backslash and a `tt(%d)' appearing
 in the description is replaced with the description given by the
 completion function.
 )
-item(var(func)tt(LPAR()RPAR()))(
-The function var(func) is called, which can then define the order
-in which tags are to be used based on additional context
-information.  See the tt(_sort_tags) function below for a description
-of how such functions can be implemented.  The return value of the
-function is used to decide if the following values for the style
-should be used.  If it is zero, they are used and if it is non-zero,
-they are not used.  For example:
-
-example(non-empty() { [[ -n $PREFIX ]] }
-zstyle ':completion:*:*:-command-:*' tag-order 'non-empty()')
-
-Makes completion in command position happen only if the string on the
-line is not empty.  This is tested using the tt(PREFIX)
-parameter which is special in completion widgets; see
-ifzman(zshcompwid)\
-ifnzman(noderef(Completion Widgets))
-for a description of these special parameters.
-)
 enditem()
 
 In each of the cases above, the tag may also be a pattern or more than 
@@ -2004,6 +1985,28 @@ tt(tag-order) is used, which tries all tags again except that this time
 each has tt(-case) appended to its name for lookup of styles.  Hence this
 time the value for the tt(matcher) style from the second call to tt(zstyle)
 in the example is used to make completion case-insensitive.
+
+Using the tt(-e) option of the tt(zstyle) builtin command, it is
+possible to specify conditions saying when certain tags are to be
+used. For example:
+
+example(zstyle -e '*:-command-:*' tag-order '
+    if [[ -n $PREFIX ]]; then
+      reply=( )
+    else
+      reply=( - )
+    fi')
+
+Makes completion in command position happen only if the string on 
+the line is not empty.  This is tested using the tt(PREFIX)
+parameter which is special in completion widgets; see
+ifzman(zshcompwid)\
+ifnzman(noderef(Completion Widgets))
+for a description of these special parameters.
+Setting tt(reply) to an empty array ensures that only the default
+behaviour of trying all tags at once is used and setting it to an
+array containing only a hyphen disables that default behaviour -- thus 
+keeping all tags from being tried.
 
 If no style has been defined for a context, the strings
 `tt((|*-)argument-* (|*-)option-* values)' and `tt(options)' plus all
@@ -3628,89 +3631,6 @@ the group name.
 
 Note that this function is called automatically from tt(_description)
 so that one normally doesn't have to call it explicitly.
-)
-findex(_sort_tags)
-item(tt(_sort_tags) var(tag) ...)(
-No such function is actually used by the completion system; as mentioned
-above for the tt(tag-order) style, it is only provided to show how
-functions that sort tags can be implemented.
-
-Inside such functions the name of the current context can
-be accessed using the tt(curcontext) parameter.  For example, the
-function used in command position (called tt(_command_names)) in the
-completion can generate names of external and builtin commands, names
-of shell functions, aliases and parameters and reserved words.
-
-Example:
-
-example(_sort_tags() {
-  case $curcontext in
-  (*:-command-:*)
-    comptry commands functions
-    comptry builtins aliases
-    ;;
-  (*)
-    .comptry "$@"
-    ;;
-  esac
-  return 1
-})
-
-Every call to the tt(comptry) builtin command gives a
-set of tags to use; as soon as the completion system produces
-matches for one set, subsequent sets have no effect.  Hence in
-the example this means that in command position on the first attempt
-only names of external commands and shell functions will be generated
-(the first call to tt(comptry)).  If none of those names match the string
-from the command line the completion function will generate names of
-builtin commands and aliases as possible matches (the second call to
-tt(comptry)).
-
-For all other context names the second case-pattern matches, so that
-normally the completion functions will try all tags offered. The
-return value means that the calling function, tt(_tags), will not use
-all offered tags as a default, so in the first case names or
-parameters and reserved words will never be completed.
-
-In any context the function may call tt(comptry) as often as necessary.
-Also, any string may be given as an argument, even if no tag
-with that name was offered by the completion function.  This allows
-one to give a preferred ordering for some common tag sets without
-having to worry about sensible patterns for context names.  For
-example, many completion functions can generate both arguments and
-option names for commands.  These functions normally use the tags
-like tt(argument-)var(num), tt(option-)var(name)tt(-)var(num) and
-tt(options).  Depending on your preference you may write in your
-sorting function:
-
-example(_sort_tags() {
-  comptry -m '(|*-)argument-* (|*-)option-* options'
-  case $curcontext in
-  ...
-  esac
-})
-
-or
-
-example(_sort_tags() {
-  comptry -m '(|*-)argument-* (|*-)option-*'
-  comptry options
-  case $curcontext in
-  ...
-  esac
-})
-
-The former always adds both the matches for the argument and the option
-names as possible matches.  The latter forces matches for the arguments to
-be preferred.  In this case option names are only generated as matches if
-the string on the line produces no possible completion for arguments;
-normally you would have to type the hyphen the option names start with
-yourself in order to see the list of option names that can be completed.
-
-With the tt(-s) option, each tag given to tt(comptry) will be put in a 
-separate set. With the tt(-m) option, the arguments are treated in the 
-same way as the the values for the tt(tag-order) style (except for the 
-`tt(!...)', `tt(-)' and `tt(foo())' forms).
 )
 findex(_store_cache)
 item(tt(_store_cache) var(cache_identifier) var(vars) ...)(

@@ -48,11 +48,6 @@ if (( $# )); then
     for tag in $order; do
       case $tag in
       -)     nodef=yes;;
-      *\(\)) if ! "${${tag%%[ 	]#\(\)}##[ 	]#}" "$@"; then
-               nodef=yes
-               break
-             fi
-             ;;
       \!*)   comptry "${(@)argv:#(${(j:|:)~${=~tag[2,-1]}})}";;
       ?*)    comptry -m "$tag";;
       esac

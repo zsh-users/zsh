@@ -1,5 +1,9 @@
 2000-10-12  Sven Wischnowsky  <wischnow@zsh.org>
 
+	* 12974: Completion/Core/_tags, Completion/Core/_sort_tags,
+	Doc/Zsh/compsys.yo: remove possibility for func() entries in
+	tag-order style, can be done using zstyle -e
+
 	* 12954, 12973: Completion/Builtins/_zstyle,
 	Completion/Core/_path_files, Doc/Zsh/compsys.yo: rename fake style
 	to fake-files
