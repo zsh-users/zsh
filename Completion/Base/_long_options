@@ -141,9 +141,9 @@ if [[ "$tmp" != $_lo_cache_cmd ]]; then
     # First, we get the pattern and the action to use and take them
     # from the positional parameters.
 
-    pattern="${1%%:*}"
-    descr="${${1#*:}%%:*}"
-    action="${1#*:*:}"
+    pattern="${${${(M)1#*[^\\]:}[1,-2]}//\\\\:/:}"
+    descr="${${${(M)${1#*[^\\]:}#*[^\\]:}[1,-2]}//\\\\:/:}"
+    action="${${1#*[^\\]:*[^\\]:}//\\\\:/:}"
     shift
 
     # We get all options matching the pattern and take them from the
@@ -257,7 +257,7 @@ if [[ "$str" = *\=* ]]; then
 
       _description expl "$descr"
 
-      if [[ "$action[1]" = (\[*\]|\(*\)) ]]; then
+      if [[ "$action" = (\[*\]|\(*\)) ]]; then
         compadd "$expl[@]" - ${=action[2,-2]}
       elif [[ "$action" = \{*\} ]]; then
         eval "$action[2,-2]"

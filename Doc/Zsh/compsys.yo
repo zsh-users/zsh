@@ -836,11 +836,13 @@ For options that get an argument after a `tt(=)', the function also tries
 to automatically find out what should be completed as the argument.
 The possible completions for option-arguments can be described with
 the arguments to this function. Each argument contains one description
-of the form <pattern>:<message>:<action>. The message will be printed 
+of the form `tt(<pattern>:<message>:<action>)'. The message will be printed 
 above the possible completion if the `description_format' configuration
 key is set (see above). The actions specify what
 should be done to complete arguments of those options that match 
-the pattern. The action may be a list of words in brackets or in
+the pattern. In both the message and the action a colon can be
+included by preceding it with a backslash. The action may be a list of
+words in brackets or in
 parentheses, separated by spaces. A list in brackets denotes
 possible values for an optional argument, a list in parentheses
 gives words to complete for mandatory arguments. If the action does
@@ -910,6 +912,18 @@ var(description) has to be of the form
 `tt(:)var(message)tt(:)var(action)' or
 `tt(::)var(message)tt(:)var(action)', where the second form describes
 an optional argument and the first one describes a mandatory argument.
+The last description may also be of the form
+`tt(:*:)var(message)tt(:)var(action)' or
+`tt(:*)var(pattern)tt(:)var(message)tt(:)var(action)'. These describe
+multiple arguments. In the first form all following words on the line
+are to be completed as described by the var(action), in the second
+form all words up to a word matching the given var(pattern) are to be
+completed using the var(action). The `tt(*)' or the var(pattern) may
+also be separated from the var(message) by two or three colons. With
+two colons the tt(words) special array and the tt(CURRENT) special
+parameter are modified to refer only to the words after the option
+(with two colons) or to the words covered by this description (with
+three colons) during the execution or evaluation of the var(action).
 
 In the simplest form the var(opt-spec) is just the option name
 beginning with a minus or a plus sign, such as `tt(-foo)'. In this
@@ -941,8 +955,11 @@ tt(compgen) builtins and which make sure that the var(message) given
 in the description will be shown above the matches. During the
 evaluation or execution of the action the array `tt(line)' will be set 
 to the command name and normal arguments from the command line,
-i.e. to the words from the command line xcluding all options and their 
+i.e. to the words from the command line excluding all options and their 
 arguments.
+
+To include a colon in the var(message) or the var(action), it has to
+be preceded by a backslash.
 
 Normally the option names are taken as multi-character names and a
 word from the line is considered to contain only one option (or
