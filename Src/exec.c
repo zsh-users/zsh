@@ -877,8 +877,10 @@ execpline(Sublist l, int how, int last1)
     if (how & Z_ASYNC) {
 	lastwj = newjob;
 	jobtab[thisjob].stat |= STAT_NOSTTY;
-	if (l->flags & PFLAG_COPROC)
+	if (l->flags & PFLAG_COPROC) {
 	    zclose(ipipe[1]);
+	    zclose(opipe[0]);
+	}
 	if (how & Z_DISOWN) {
 	    deletejob(jobtab + thisjob);
 	    thisjob = -1;

@@ -77,10 +77,10 @@ item(tt(<<<) var(word))(
 Perform shell expansion on var(word) and pass the result
 to standard input.  This is known as a em(here-string).
 )
-xitem(tt(<&) var(digit))
-item(tt(>&) var(digit))(
+xitem(tt(<&) var(number))
+item(tt(>&) var(number))(
 The standard input/output is duplicated from file descriptor
-var(digit) (see manref(dup)(2)).
+var(number) (see manref(dup2)(2)).
 )
 xitem(tt(<& -))
 item(tt(>& -))(
@@ -90,8 +90,10 @@ xitem(tt(<& p))
 item(tt(>& p))(
 The input/output from/to the coprocess is moved to the standard input/output.
 )
-item(tt(>&) var(word))(
-Same as `tt(>) var(word) tt(2>&1)'.
+xitem(tt(>&) var(word))
+item(tt(&>) var(word))(
+Same as `tt(>) var(word) tt(2>&1)'.  Note that with tt(&>), var(word) is
+never interpreted as a file descriptor, even if it is a number.
 )
 item(tt(>>&) var(word))(
 Same as `tt(>>) var(word) tt(2>&1)'.
