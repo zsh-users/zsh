@@ -389,11 +389,11 @@ pindex(GLOB_COMPLETE)
 item(tt(GLOB_COMPLETE))(
 When the current word has a glob pattern, do not insert all the words
 resulting from the expansion but generate matches as for completion and
-cycle through them like tt(MENU_COMPLETE). The matches are generated
-as if a `tt(*)' is added to the end of the word or inserted at the cursor if
-tt(COMPLETE_IN_WORD) is set.  Since this doesn't use globbing, it
-works not only for files but for all completions, such as options,
-user names, etc.
+cycle through them like tt(MENU_COMPLETE). The matches are generated as if
+a `tt(*)' was added to the end of the word, or inserted at the cursor when
+tt(COMPLETE_IN_WORD) is set.  This actually uses pattern matching, not
+globbing, so it works not only for files but for any completion, such as
+options, user names, etc.
 )
 pindex(GLOB_DOTS)
 cindex(globbing, of . files)
