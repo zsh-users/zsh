@@ -126,8 +126,7 @@ mod_export int hist_skip_flags;
 /* Bits of histactive variable */
 #define HA_ACTIVE	(1<<0)	/* History mechanism is active */
 #define HA_NOSTORE	(1<<1)	/* Don't store the line when finished */
-#define HA_JUNKED	(1<<2)	/* Last history line was already junked */
-#define HA_NOINC	(1<<3)	/* Don't store, curhist not incremented */
+#define HA_NOINC	(1<<2)	/* Don't store, curhist not incremented */
 
 /* Array of word beginnings and endings in current history line. */
 
@@ -679,7 +678,7 @@ strinbeg(int dohist)
 mod_export void
 strinend(void)
 {
-    hend();
+    hend(NULL);
     DPUTS(!strin, "BUG: strinend() called without strinbeg()");
     strin--;
     isfirstch = 1;
@@ -763,8 +762,6 @@ hbegin(int dohist)
     }
     chwordpos = 0;
 
-    if (histactive & HA_JUNKED)
-	curhist--;
     if (hist_ring && !hist_ring->ftim)
 	hist_ring->ftim = time(NULL);
     if (interact && isset(SHINSTDIN) && !strin) {
@@ -945,11 +942,54 @@ prepnexthistent(void)
     return he;
 }
 
+/* A helper function for hend() */
+
+static int
+shouldIgnoreLine(Eprog prog)
+{
+    if (!prog)
+	return 0;
+
+    if (isset(HISTIGNORESPACE)) {
+	if (*chline == ' ' || aliasspaceflag)
+	    return 1;
+    }
+
+    if (isset(HISTNOFUNCTIONS)) {
+	Wordcode pc = prog->prog;
+	wordcode code = *pc;
+	if (wc_code(code) == WC_LIST && WC_LIST_TYPE(code) & Z_SIMPLE
+	 && wc_code(pc[2]) == WC_FUNCDEF)
+	    return 1;
+    }
+
+    if (isset(HISTNOSTORE)) {
+	char *b = getpermtext(prog, NULL);
+	if (*b == 'h' && strncmp(b, "history", 7) == 0
+	 && (!b[7] || b[7] == ' ')) {
+	    zsfree(b);
+	    return 1;
+	}
+	if (*b == 'f' && b[1] == 'c' && b[2] == ' ' && b[3] == '-') {
+	    b += 3;
+	    do {
+		if (*++b == 'l') {
+		    zsfree(b);
+		    return 1;
+		}
+	    } while (isalpha(*b));
+	}
+	zsfree(b);
+    }
+
+    return 0;
+}
+
 /* say we're done using the history mechanism */
 
 /**/
 mod_export int
-hend(void)
+hend(Eprog prog)
 {
     int flag, save = 1;
     char *hf = getsparam("HISTFILE");
@@ -987,7 +1027,7 @@ hend(void)
 	    } else
 		save = 0;
 	}
-	if (chwordpos <= 2 || (isset(HISTIGNORESPACE) && *chline == ' '))
+	if (chwordpos <= 2 || shouldIgnoreLine(prog))
 	    save = 0;
     }
     if (flag & (HISTFLAG_DONE | HISTFLAG_RECALL)) {
@@ -1059,24 +1099,6 @@ hend(void)
 	savehistfile(hf, 0, HFILE_USE_OPTIONS | HFILE_FAST);
     unlockhistfile(hf); /* It's OK to call this even if we aren't locked */
     return !(flag & HISTFLAG_NOEXEC || errflag);
-}
-
-/* remove the current line from the history List */
-
-/**/
-void
-remhist(void)
-{
-    if (hist_ring == &curline)
-	return;
-    if (!(histactive & HA_ACTIVE)) {
-	if (!(histactive & HA_JUNKED) && curline.histnum == curhist) {
-	    freehistnode((HashNode)hist_ring);
-	    histactive |= HA_JUNKED;
-	    /* curhist-- is delayed until the next hbegin() */
-	}
-    } else
-	histactive |= HA_NOSTORE;
 }
 
 /* Gives current expansion word if not last word before chwordpos. */
