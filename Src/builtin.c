@@ -2914,7 +2914,10 @@ bin_print(char *name, char **args, char *ops, int func)
     int flags[5], *len;
     char *start, *endptr, *c, *d, *flag, *buf, spec[11], *fmt = NULL;
     char **first, *curarg, *flagch = "0+- #", save = '\0', nullstr = '\0';
-    size_t rcount, mcount, count = 0;
+    size_t rcount, count = 0;
+#ifdef HAVE_OPEN_MEMSTREAM
+    size_t mcount;
+#endif
     FILE *fout = stdout;
     Histent ent;
     

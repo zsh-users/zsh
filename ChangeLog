@@ -1,5 +1,7 @@
 2002-06-05  Peter Stephenson  <pws@csr.com>
 
+	* 17292: Src/builtin.c: shut up compiler if no OPEN_MEMSTREAM.
+
 	* 17265: Src/exec.c, Src/jobs.c, Src/Modules/clone.c: Make the
 	`jobs' command work in a subshell of a shell with job control by
 	saving the valid bits of the job table.
