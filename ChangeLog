@@ -1,5 +1,8 @@
 2002-03-17  Clint Adams  <clint@zsh.org>
 
+	* 16847: Completion/Unix/Command/_cvs: complete multiple -j's after
+	cvs update.
+
 	* 16846: Completion/X/Command/_xdvi: complete .dvi.gz and .dvi.bz2
 	too.
 

@@ -552,7 +552,7 @@ _cvs_update () {
     '-k+[keyword]:keyword substitution:_cvs_k' \
     '(-D)-r+[specify revision]:tag:_cvs_revisions' \
     '(-r)-D+[specify date]:date:_cvs_D' \
-    '-j+[merge]:tag:_cvs_revisions' \
+    '*-j+[merge]:tag:_cvs_revisions' \
     '*-I+[ignore files]:file:_files' \
     '*-W+[wrapper specification]:spec:_files' \
     '*:file:_cvs_files'
