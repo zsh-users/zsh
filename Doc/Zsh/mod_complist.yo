@@ -61,6 +61,13 @@ for the left code (see below)
 item(tt(rc m))(
 for the right code
 )
+item(tt(tc) var(0))(
+for the character indicating the file type  printed after filenames if
+the tt(LIST_TYPES) option is set
+)
+item(tt(sp) var(0))(
+for the spaces printed after matches to align the next column
+)
 item(tt(ec) var(none))(
 for the end code
 )

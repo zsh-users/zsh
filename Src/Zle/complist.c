@@ -54,22 +54,24 @@ static Keymap mskeymap;
 #define COL_LC 10
 #define COL_RC 11
 #define COL_EC 12
-#define COL_MA 13
+#define COL_TC 13
+#define COL_SP 14
+#define COL_MA 15
 
-#define NUM_COLS 14
+#define NUM_COLS 16
 
 /* Names of the terminal strings. */
 
 static char *colnames[] = {
     "no", "fi", "di", "ln", "pi", "so", "bd", "cd", "ex", "mi",
-    "lc", "rc", "ec", "ma", NULL
+    "lc", "rc", "ec", "tc", "sp", "ma", NULL
 };
 
 /* Default values. */
 
 static char *defcols[] = {
     "0", "0", "1;34", "1;36", "33", "1;35", "1;33", "1;33", "1;32", NULL,
-    "\033[", "m", NULL, "7"
+    "\033[", "m", NULL, "0", "0", "7"
 };
 
 /* This describes a terminal string for a filename extension. */
@@ -246,6 +248,15 @@ getcols(Listcols c)
     return;
 }
 
+/* Information about the list shown. */
+
+static int noselect, mselect, inselect, mcol, mline, mcols, mlines, mmlen;
+static Cmatch **mtab, **mmtabp;
+static Cmgroup *mgtab, *mgtabp;
+static struct listcols mcolors;
+
+/* The last color used. */
+
 static int last_col = COL_NO;
 
 static void
@@ -270,6 +281,17 @@ zcputs(Listcols c, int colour)
 	last_col = colour;
     }
     return;
+}
+
+/* Turn off colouring. */
+
+static void
+zcoff(void)
+{
+    if (mcolors.cols[COL_EC])
+	tputs(mcolors.cols[COL_EC], 1, putshout);
+    else
+	zcputs(&mcolors, COL_NO);
 }
 
 /* Get the terminal color string for the file with the given name and
@@ -312,14 +334,6 @@ putcolstr(Listcols c, char *n, mode_t m)
     return;
 }
 
-/* Information about the list shown. */
-
-static int noselect, mselect, inselect, mcol, mline, mcols, mlines, mmlen;
-static Cmatch **mtab, **mmtabp;
-static Cmgroup *mgtab, *mgtabp;
-static struct listcols mcolors;
-
-
 static void
 clprintm(Cmgroup g, Cmatch *mp, int mc, int ml, int lastc, int width,
 	 char *path, struct stat *buf)
@@ -361,10 +375,7 @@ clprintm(Cmgroup g, Cmatch *mp, int mc, int ml, int lastc, int width,
 	    cc = COL_NO;
 	zcputs(&mcolors, cc);
 	printfmt(m->disp, 0, 1, 0);
-	if (mcolors.cols[COL_EC])
-	    tputs(mcolors.cols[COL_EC], 1, putshout);
-	else
-	    zcputs(&mcolors, COL_NO);
+	zcoff();
     } else {
 	int mx;
 
@@ -401,39 +412,27 @@ clprintm(Cmgroup g, Cmatch *mp, int mc, int ml, int lastc, int width,
 	nicezputs((m->disp ? m->disp : m->str), shout);
 	len = niceztrlen(m->disp ? m->disp : m->str);
 
-	if (m->gnum != mselect) {
-	    if (mcolors.cols[COL_EC])
-		tputs(mcolors.cols[COL_EC], 1, putshout);
-	    else
-		zcputs(&mcolors, COL_NO);
-	}
-
 	if (isset(LISTTYPES)) {
+	    zcoff();
+	    zcputs(&mcolors, COL_TC);
 	    if (buf)
 		putc(file_type(buf->st_mode), shout);
 	    else
 		putc(' ', shout);
 	    len++;
 	}
-	len = width - len - 2;
+	if ((len = width - len - 2) > 0) {
+	    zcoff();
+	    zcputs(&mcolors, COL_SP);
 
-	while (len-- > 0)
-	    putc(' ', shout);
-
-	if (m->gnum == mselect) {
-	    if (mcolors.cols[COL_EC])
-		tputs(mcolors.cols[COL_EC], 1, putshout);
-	    else
-		zcputs(&mcolors, COL_NO);
+	    while (len-- > 0)
+		putc(' ', shout);
 	}
-
+	zcoff();
 	if (!lastc) {
 	    zcputs(&mcolors, COL_NO);
 	    fputs("  ", shout);
-	    if (mcolors.cols[COL_EC])
-		tputs(mcolors.cols[COL_EC], 1, putshout);
-	    else
-		zcputs(&mcolors, COL_NO);
+	    zcoff();
 	}
     }
 }
