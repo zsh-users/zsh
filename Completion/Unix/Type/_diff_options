@@ -49,19 +49,16 @@ if [[ -n "$_is_gnu[$cmd]" ]]; then
   --unchanged-group-format"
 
   _arguments -s \
-    '(-i)--ignore-case[case insensitive]' \
-    '(--ignore-case)-i[case insensitive]' \
-    '(-w)--ignore-all-space[ignore all white space]' \
-    '(--ignore-all-space)-w[ignore all white space]' \
+    '(--ignore-case -i)'{--ignore-case,-i}'[case insensitive]' \
+    '(--ignore-all-space -w)'{--ignore-all-space,-w}'[ignore all white space]' \
     '(-b)--ignore-space-change[ignore changes in the amount of white space]' \
     '(--ignore-space-change)-b[ignore changes in the amount of white space]' \
     '(-B)--ignore-blank-lines[ignore lines that are all blank]' \
     '(--ignore-blank-lines)-B[ignore lines that are all blank]' \
     '(-I)--ignore-matching-lines=[ignore lines that match regex]:line exclusion regex:' \
     '(--ignore-matching-lines)-I+[ignore lines that match regex]:line exclusion regex:' \
-    '(-a)--text[treat all files as text]' \
-    '(--text)-a[treat all files as text]' \
-    "($of $oss)--context=-[context diff]:number of lines of copied context:" \
+    '(--text -a)'{--text,-a}'[treat all files as text]' \
+    "($of $oss)--context=-[output a context diff]:number of lines of copied context:" \
     "($of $oss)-C+[output a context diff]:number of lines of copied context:" \
     "($of $oss)-c[output a context diff]" \
     "($of $oss)--unified=-[output a unified diff]:number of lines of unified context:" \
@@ -95,16 +92,12 @@ if [[ -n "$_is_gnu[$cmd]" ]]; then
     "($ofwl $ouc $oss)--old-line-format=[set old line format]:old line format:" \
     "($ofwl $ouc $oss)--new-line-format=[set new line format]:new line format:" \
     "($ofwl $ouc $oss)--unchanged-line-format=[set unchanged line format]:unchanged line format:" \
-    '(-l)--paginate[output through pr]' \
-    '(--paginate)-l[output through pr]' \
-    '(-t)--expand-tabs[expand tabs to spaces]' \
-    '(--expand-tabs)-t[expand tabs to spaces]' \
-    '(-T)--initial-tab[prepend a tab]' \
-    '(--initial-tab)-T[prepend a tab]' \
+    '(--paginate -l)'{--paginate,-l}'[output through pr]' \
+    '(--expand-tabs -t)'{--expand-tabs,-t}'[expand tabs to spaces]' \
+    '(--initial-tab -T)'{--initial-tab,-T}'[prepend a tab]' \
     '(-r)--recursive[recursively compare subdirectories]' \
     '(--recursive)-r[recursively compare subdirectories]' \
-    '(-N)--new-file[treat absent files as empty]' \
-    '(--new-file)-N[treat absent files as empty]' \
+    '(--new-file -N)'{--new-file,-N}'[treat absent files as empty]' \
     '(-P)--unidirectional-new-file[treat absent first files as empty]' \
     '(--unidirectional-new-file)-P[treat absent first files as empty]' \
     '(-s)--report-identical-files[report when two files are the same]' \
@@ -116,12 +109,10 @@ if [[ -n "$_is_gnu[$cmd]" ]]; then
     '(-S)--starting-file=[set first file in comparison]:start with file:_files' \
     '(--starting-file)-S+[set first file in comparison]:start with file:_files' \
     '--horizon-lines=[set number of lines to keep in prefix and suffix]:number of horizon lines:' \
-    '(-d)--minimal[try to find a smaller set of changes]' \
-    '(--minimal)-d[try to find a smaller set of changes]' \
+    '(--minimal -d)'{--minimal,-d}'[try to find a smaller set of changes]' \
     '(-H)--speed-large-files[assume large files and many small changes]' \
     '(--speed-large-files)-H[assume large files and many small changes]' \
-    '(--version)-v[output version info]' \
-    '(-v)--version[output version info]' \
+    '(--version -v)'{--version,-v}'[output version info]' \
     '--help[help text]' \
     "$@"
 else

@@ -1,47 +1,28 @@
 #compdef dict
 
 _arguments \
-	'(--host)-h[host]:dict server:_hosts' \
-	'(-h)--host:dict server:_hosts' \
-	'(--port)-p[port]:service:' \
-	'(-p)--port:service:' \
-	'(--database)-d[database]:db name:' \
-	'(-d)--database:db name:' \
-	'(--match)-m[match]' \
-	'(-m)--match' \
-	'(--strategy)-s[strategy]:strategy:' \
-	'(-s)--strategy:strategy:' \
-	'(--nocorrect)-C[nocorrect]' \
-	'(-C)--nocorrect' \
-	'(--config)-c[config]:config file:_files' \
-	'(-c)--config:config file:_files' \
-	'(--dbs)-D[list dbs]' \
-	'(-D)--dbs' \
-	'(--strats)-S[strats]' \
-	'(-S)--strats' \
-	'(--serverhelp)-H[server help]' \
-	'(-H)--serverhelp' \
-	'(--info)-i[db info]:db name:' \
-	'(-i)--info:db name:' \
-	'(--noauth)-a[disable authentication]' \
-	'(-a)--noauth' \
-	'(--user)-u[user]:user name:' \
-	'(-u)--user:user name:' \
-	'(--key)-k[key]:shared secret:' \
-	'(-k)--key:shared secret:' \
-	'(--version)-V[display version]' \
-	'(-V)--version' \
-	'(--license)-L[display license]' \
-	'(-L)--license' \
-	'--help' \
-	'(--verbose)-v[be verbose]' \
-	'(-v)--verbose' \
-	'(--raw)-r[be very verbose]' \
-	'(-r)--raw' \
-	'(--pager)-P[pager]:program:_command_names -e' \
-	'(-P)--pager:_command_names -e:' \
-	'--html' \
-	'--pipesize:buffer size:' \
-	'--client:client text:' \
-	'--debug:debug flag:(verbose raw scan parse pipe serial time)' \
-	':word:_dict_words'
+  '(--host -h)'{--host,-h}'[host]:dict server:_hosts' \
+  '(--port -p)'{--port,-p}'[port]:service:' \
+  '(--database -d)'{--database,-d}'[database]:db name:' \
+  '(--match -m)'{--match,-m}'[match]' \
+  '(--strategy -s)'{--strategy,-s}'[strategy]:strategy:' \
+  '(--nocorrect -C)'{--nocorrect,-C}'[nocorrect]' \
+  '(--config -c)'{--config,-c}'[config]:config file:_files' \
+  '(--dbs -D)'{--dbs,-D}'[list dbs]' \
+  '(--strats -S)'{--strats,-S}'[strats]' \
+  '(--serverhelp -H)'{--serverhelp,-H}'[server help]' \
+  '(--info -i)'{--info,-i}'[db info]:db name:' \
+  '(--noauth -a)'{--noauth,-a}'[disable authentication]' \
+  '(--user -u)'{--user,-u}'[user]:user name:' \
+  '(--key -k)'{--key,-k}'[key]:shared secret:' \
+  '(--version -V)'{--version,-V}'[display version]' \
+  '(--license -L)'{--license,-L}'[display license]' \
+  '--help' \
+  '(--verbose -v)'{--verbose,-v}'[be verbose]' \
+  '(--raw -r)'{--raw,-r}'[be very verbose]' \
+  '(--pager -P)'{--pager,-P}'[pager]:program:_command_names -e' \
+  '--html' \
+  '--pipesize:buffer size:' \
+  '--client:client text:' \
+  '--debug:debug flag:(verbose raw scan parse pipe serial time)' \
+  ':word:_dict_words'

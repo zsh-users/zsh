@@ -1,7 +1,7 @@
 #compdef grep egrep fgrep
 # Ulrik Haugen 2001
 
-local efgrep="" efarguments arguments
+local arguments matchers
 
 (( $+_is_gnu )) || typeset -gA _is_gnu
 
@@ -14,59 +14,50 @@ if (( ! $+_is_gnu[$words[1]] )); then
   fi
 fi
 
-
-[[ "$service" = [ef]grep ]] && efgrep=t
-
-if [[ -z $efgrep ]]; then
-  efarguments=( \
-    '(--extended-regexp -F --fixed-strings)-E[extended regexp]' \
-    '(-E -F --fixed-strings)--extended-regexp' \
-    '(--fixed-strings -E --extended-regexp)-F[fixed strings]' \
-    '(-F -E --extended-regexp)--fixed-strings' \
+if [[ $service != [ef]grep ]]; then
+  matchers='(--extended-regexp --fixed-strings --basic-regexp -E -F -G)'
+  arguments=(
+    $matchers{--extended-regexp,-E}'[use extended regular expression]'
+    $matchers{--fixed-strings,-F}'[use literal strings]'
+    $matchers{--basic-regexp,-G}'[use basic regular expression]'
   )
 fi
 
-arguments=( \
-  '(-e --regexp -f --file)1:pattern:' \
-  {'(--regexp -f --file 1)-e+[regexp]','(-e -f --file 1)--regexp='}':regexp:' \
-  {'(--file -e --regexp 1)-f+[file]','(-f -e --regexp 1)--file='}':pattern file:_files' \
-  \
-  '*:files:_files' \
-  \
-  {'(--after-context)-A+[after context]','(-A)--after-context='}':after context:(1)' \
-  '(--text --binary-files)-a[text]' '(-a --binary-files)--text' \
-  {'(--before-context)-B+[before context]','(-B)--before-context='}':before context:(1)' \
-  {'(--context)-C+[context]','(-C)--context='}':context:(1)' \
-  '(--byte-offset)-b[byte offset]' '(-b)--byte-offset' \
-  '(-a --text -I)--binary-files:binary files:(binary without-match text)' \
-  '(--count)-c[count]' '(-c)--count' \
-  {'(--directories -r --recursive)-d+[directories]','(-d -r --recursive)--directories='}':directories:(read skip recurse grep)' \
-  \
-  $efarguments \
-  \
-  '(--basic-regexp)-G[basic regexp]' '(-G)--basic-regexp' \
-  '(--with-filename)-H[with filename]' '(-H)--with-filename' \
-  '(--no-filename)-h[no filename]' '(-h)--no-filename' \
-  '--help' \
-  '(--binary-files)-I[ignore binary]' \
-  '(--ignore-case)-i[ignore case]' '(-i)--ignore-case' \
-  '(--files-without-match)-L[files without match]' '(-L)--files-without-match' \
-  '(--file-with-matches)-l[files with matches]' '(-l)--files-with-matches' \
-  '--mmap' \
-  '(--line-number)-n[line number]' '(-n)--line-number' \
-  '(--quiet --silent)-q[quiet]' '(-q --quiet)--silent' '(-q --silent)--quiet' \
-  '(--recursive -d --directories)-r[recursive]' '(-r -d --directories)--recursive' \
-  '(--no-mesages)-s[no messages]' '(-s)--no-messages' \
-  '(--version)-V[version]' '(-V)--version' \
-  '(--invert-match)-v[invert match]' '(-v)--invert-match' \
-  '(--word-regexp)-w[word regexp]' '(-w)--word-regexp' \
-  '(--line-regexp)-x[line regexp]' '(-x)--line-regexp' \
-  '(--null)-Z[null]' '(-Z)--null' \
+arguments=( $arguments[@]
+  '(--after-context -A)'{--after-context=,-A+}'[specify lines of trailing context]:lines'
+  '(--text -a --binary-files -I)'{--text,-a}'[process binary file as if it were text]'
+  '(--before-context -B)'{--before-context=,-B+}'[specify lines of leading context]:lines'
+  '(--context,-C)'{--context=,-C+}'[specify lines of context]:lines'
+  '(--byte-offset -b -c)'{--byte-offset,-b}'[print the byte offset with output lines]'
+  '(--text -a -I)--binary-files=[specify type to assume for binary files]:file type:(binary without-match text)'
+  '(--count -c --byte-offset -b --line-number -n)'{--count,-c}'[only print a count of matching lines]'
+  '(--directories -d -r --recursive)'{--directories=,-d+}'[specify handling of directories]:action on directory:(read skip recurse)'
+  '(1)*'{--regexp=,-e+}'[specify pattern]:pattern'
+  '(1)*'{--file=,-f+}'[specify pattern file]:file:_files'
+  '(--with-filename -H --no-filename -h)'{--with-filename,-H}'[print filename with each match]'
+  '(--no-filename -h --with-filename -H --null -Z --files-without-match -L --file-with-matches -l)'{--no-filename,-h}'[suppress printing of filenames]'
+  '(--text -a --binary-files)-I[process binary files as if non-matching]'
+  '(--ignore-case -i -y)'{--ignore-case,-i,-y}'[case-insensitive]'
+  '(--files-without-match -L --file-with-matches -l --no-filename -h)'{--files-without-match,-L}"[output non-matching files' names only]"
+  '(--files-with-matches -l --files-without-match -L --no-filename -h)'{--files-with-matches,-l}"[output matching files' names only]"
+  '(--line-number -n -c)'{--line-number,-n}'[prefix output with line numbers]'
+  '(--quiet --silent -q)'{--quiet,--silent,-q}'[suppress normal output]'
+  '(--recursive -r -d --directories)'{--recursive,-r}'[recurse subdirectories]'
+  '(--no-mesages -s)'{--no-messages,-s}'[suppress messages about unreadable]'
+  '(--version -V)'{--version,-V}'[display version info]'
+  '(--invert-match -v)'{--invert-match,-v}'[select non-matching lines]'
+  '(--word-regexp -w --line-regexp -x)'{--word-regexp,-w}'[force pattern to match only whole words]'
+  '(--line-regexp -x --word-regexp -w)'{--line-regexp,-x}'[force pattern to match only whole lines]'
+  '(--null -Z --no-filename -h)'{--null,-Z}'[print 0 byte after FILE name]'
+  '--help[display help]'
+  '--mmap[memory map input]'
+  '(-e --regexp -f --file)1:pattern:_guard "^--*"'
+  '*:files:_files'
 )
 
 # remove long options?
 [[ -z "$_is_gnu[$words[1]]" ]] &&
-    arguments=( ${${${${arguments:#*\)--*}:#--*}//--[^ )]#/}/\( #\)/} )
+    arguments=( ${${${arguments:#(|*\)(\*|))--*}//--[^ )]#/}/\( #\)/} )
 
-_arguments -s $arguments
+_arguments -s $arguments[@]
 

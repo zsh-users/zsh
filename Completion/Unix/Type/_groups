@@ -1,4 +1,4 @@
-#compdef newgrp
+#compdef newgrp groupdel
 
 local expl groups tmp
 

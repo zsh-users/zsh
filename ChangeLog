@@ -1,3 +1,15 @@
+2001-08-06  Oliver Kiddle  <opk@zsh.org>
+
+	* 15574: Completion/Unix/Command/_cvs, Completion/Unix/Command/_dd,
+	Completion/Unix/Command/_dict, Completion/Unix/Command/_grep,
+	Completion/Unix/Command/_loadkeys, Completion/Unix/Command/_ls,
+	Completion/Unix/Command/_patch, Completion/Unix/Command/_user_admin,
+	Completion/Unix/Command/_wget, Completion/Unix/Type/_diff_options,
+	Completion/Unix/Type/_directories,  Completion/Unix/Type/_groups,
+	Completion/Unix/Type/_users: new _user_admin for useradd, groupmod etc,
+	rewrite of _dd to use _values and make more completions share
+	descriptions for long and short options
+
 2001-08-03  Oliver Kiddle  <opk@zsh.org>
 
 	* 15562, Akinori Musha: 15559, 15563: Completion/BSD/Command/_chflags,

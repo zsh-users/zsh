@@ -56,7 +56,7 @@ if (( ! $+_patch_args )); then
 
     '* --quoting-style=WORD[, ]*' '--quoting-style=[quoting style]:quoting style:(literal shell shell-always c escape)'
 
-    '*(\[-[a-zA-Z]#b[a-zA-Z]#\]| -b[, ])*' '(--backup)-b[back up original]'
+    '*(\[-[a-zA-Z]#b[a-zA-Z]#\]| -b[, ])*' '(--backup)-b[backup original]'
     '* --backup[, ]*' '(-b)--backup[backup original]'
     '* --backup-if-mismatch[, ]*' '(--no-backup-if-mismatch)--backup-if-mismatch[back up if not match exactly]'
     '* --no-backup-if-mismatch[, ]*' '(--backup-if-mismatch)--no-backup-if-mismatch[back up only if otherwise requested]'

@@ -3,22 +3,16 @@
 case $OSTYPE in
   linux*)
     _arguments \
-	'(--clearcompose)-c[clearcompose]' \
-	'(-c)--clearcompose' \
-	'(--default)-d[default]' \
-	'(-d)--default' \
-	'(--help)-h[help]' \
-	'(-h)--help' \
-	'(--mktable)-m[mktable]' \
-	'(-m)--mktable' \
-	'(--clearstrings)-s[clearstrings]' \
-	'(-s)--clearstrings' \
-	'(--verbose)-v[verbose]' \
-	'(-v)--verbose' \
-	':keymap:_files -W /usr/share/keymaps'
+      '(--clearcompose -c)'{--clearcompose,-c}'[clear kernel compose table]' \
+      '(--default -d)'{--default,-d}'[load default keymap file]' \
+      '(--help -h)'{--help,-h}'[display help information]' \
+      '(--mktable -m)'{--mktable,-m}'[output a "defkeymap.c" to stdout]' \
+      '(--clearstrings)'{--clearstrings,-s}'[clear kernel string table]' \
+      '*'{--verbose,-v}'[print more details]' \
+      ':keymap:_files -W /usr/share/keymaps'
   ;;
   solaris*)
-	_files -W /usr/share/lib/keytables
+    _files -W /usr/share/lib/keytables
   ;;
 
   *) _default;;

@@ -1,0 +1,67 @@
+#compdef useradd usermod groupadd groupmod
+
+local args shells home=${${words[(r)-D]:+b}:-d} sun=" -s"
+
+if [[ $service = user* ]]; then
+  if [[ -r /etc/shells ]]; then
+    shells=( $(</etc/shells) )
+  else
+    shells=( ${(M)commands:#*/(|[abckz]|tc|ba)sh} )
+  fi
+
+  args=(
+    '(-D)-c+[comment]:comment'
+    "(-D)-${home}+[home directory]:home directory:_directories -W /"
+    '(-D)-e+[specify expriration date]:expiration date (YYYY-MM-DD)'
+    '(-D)-f+[specify inactive days]:inactive days'
+    '(-D)-g+[initial group]:initial group:_groups'
+    '(-D)-G+[supplementary groups]:supplementary groups:_groups -S,'
+    "(-D)-s+[shell]:shell:( $shells /dev/null )"
+    '(-D)-m[create home directory]'
+    '(-D)-u[uid]:uid'
+    '(-D)-o[allow non unique uid]'
+  )
+  [[ $OSTYPE = linux* ]] && args=( $args[@] 
+      '(-D)-p+[specify encrypted password]:encrypted password' )
+
+  if [[ $service = useradd ]]; then
+    if [[ $OSTYPE = linux* ]]; then
+      args=( $args[@]
+	"(-D -k)-M[don't create home]"
+	'(-D)-r[create system account]'
+	"(-D)-n[don't create mirrored user]"
+      )
+      unset sun
+    fi
+    args=( $args[@]
+      "(-c -G -m -k -M -p -u -o -n -r$sun)-D[modify or display defaults]"
+      '(-D -M)-k[skeleton home directory]:skeleton directory:_directories -W /'
+      ':username'
+    )
+  else
+    [[ $OSTYPE = linux* ]] && args=( $args[@]
+	"(-U)-L[lock user's password]"
+	"(-L)-U[unlock user's password]"
+    )
+    args=( $args[@]
+      '-l[specify new user name]:new username'
+      ':username:_users'
+    )
+  fi
+else
+  args=( '-g+[gid]:gid' '-o[allow non unique gid]' )
+  if [[ $service = groupadd ]]; then
+    args=( $args[@] ':group name' )
+    [[ $OSTYPE = linux* ]] && args=( $args[@]
+      '-r[create system group]'
+      '-f[force]'
+    )
+  else
+    args=( $args[@] 
+      '-n[specify new group name]:new group name'
+      ':group name:_groups'
+    )
+  fi
+fi
+
+_arguments -A "-*" -s $args[@]
