@@ -1,3 +1,9 @@
+2001-09-25  Clint Adams  <clint@zsh.org>
+
+	* 15866, Sven 15468: Completion/Unix/Command/_ssh:
+	complete v2 ciphers, protocol versions,
+	improve user/host completion before @.
+
 2001-09-24  Bart Schaefer  <schaefer@zsh.org>
 
 	* 15864: Doc/Zsh/params.yo: Document that assignment to TERM
