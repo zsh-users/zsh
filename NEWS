@@ -64,6 +64,11 @@ Changes since zsh version 4.2.0
   compatibility mode the option is turned off by default and the option
   letter -T turns it on, for compatibility with FreeBSD sh.
 
+- New WIDGETSTYLE, WIDGETFUNC parameters in ZLE.
+
+- Glob qualifiers (+func) is shorthand for (e:func:) (calls command,
+  typically shell function, with no argument).
+
 New features between zsh versions 4.0 and 4.2
 ---------------------------------------------
 

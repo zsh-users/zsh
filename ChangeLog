@@ -1,3 +1,10 @@
+2005-01-11  Peter Stephenson  <pws@csr.com>
+
+	* 20688: Etc/FAQ.yo: add notes on Unicode/UTF-8 adapted from
+	Clint.
+
+	* 20687: NEWS: news for 4.2.2.
+
 2005-01-11  Bart Schaefer  <schaefer@brasslantern.com>
 
 	* 20666 (tweaked): Src/exec.c: In closemn(), discard the multio
