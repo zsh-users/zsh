@@ -1,3 +1,7 @@
+2002-03-10  Clint Adams  <clint@zsh.org>
+
+	* unposted: Etc/BUGS: mention that you can't time builtins.
+
 2002-03-07  Bart Schaefer  <schaefer@zsh.org>
 
 	* 16737 (tweaked): Src/parse.c: fix parsing of binary infix

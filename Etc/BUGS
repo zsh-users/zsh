@@ -44,3 +44,5 @@ and ksh and may be removed in the future. A good fix would be to keep
 such patterns unchanged if they do not match regardless of the state of
 the nonomatch and nullglob options.
 ------------------------------------------------------------------------
+It is currently impossible to time builtins.
+------------------------------------------------------------------------
