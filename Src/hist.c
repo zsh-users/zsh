@@ -704,6 +704,36 @@ nohwe(void)
 {
 }
 
+/* these functions handle adding/removing curline to/from the hist_ring */
+
+static void
+linkcurline(void)
+{
+    if (!hist_ring)
+	hist_ring = curline.up = curline.down = &curline;
+    else {
+	curline.up = hist_ring;
+	curline.down = hist_ring->down;
+	hist_ring->down = hist_ring->down->up = &curline;
+	hist_ring = &curline;
+    }
+    curline.histnum = ++curhist;
+}
+
+static void
+unlinkcurline(void)
+{
+    curline.up->down = curline.down;
+    curline.down->up = curline.up;
+    if (hist_ring == &curline) {
+	if (!histlinect)
+	    hist_ring = NULL;
+	else
+	    hist_ring = curline.up;
+    }
+    curhist--;
+}
+
 /* initialize the history mechanism */
 
 /**/
@@ -745,15 +775,7 @@ hbegin(int dohist)
     if (interact && isset(SHINSTDIN) && !strin) {
 	histactive = HA_ACTIVE;
 	attachtty(mypgrp);
-	if (!hist_ring)
-	    hist_ring = curline.up = curline.down = &curline;
-	else {
-	    curline.up = hist_ring;
-	    curline.down = hist_ring->down;
-	    hist_ring->down = hist_ring->down->up = &curline;
-	    hist_ring = &curline;
-	}
-	curline.histnum = ++curhist;
+	linkcurline();
 	defev = addhistnum(curhist, -1, HIST_FOREIGN);
     } else
 	histactive = HA_ACTIVE | HA_NOINC;
@@ -883,9 +905,13 @@ gethistent(int ev, int nearmatch)
 
 /**/
 Histent
-prepnexthistent(int histnum)
+prepnexthistent(void)
 {
     Histent he;
+    int curline_in_ring = hist_ring == &curline;
+
+    if (curline_in_ring)
+	unlinkcurline();
 
     if (histlinect < histsiz) {
 	he = (Histent)zcalloc(sizeof *he);
@@ -920,8 +946,10 @@ prepnexthistent(int histnum)
 	}
 	freehistdata(hist_ring = he, 0);
     }
-    hist_ring->histnum = histnum;
-    return hist_ring;
+    he->histnum = ++curhist;
+    if (curline_in_ring)
+	linkcurline();
+    return he;
 }
 
 /* say we're done using the history mechanism */
@@ -937,17 +965,8 @@ hend(void)
 	  "BUG: chline is NULL in hend()");
     if (histdone & HISTFLAG_SETTY)
 	settyinfo(&shttyinfo);
-    if (!(histactive & HA_NOINC)) {
-	curline.up->down = curline.down;
-	curline.down->up = curline.up;
-	if (hist_ring == &curline) {
-	    if (!histlinect)
-		hist_ring = NULL;
-	    else
-		hist_ring = curline.up;
-	}
-	curhist--;
-    }
+    if (!(histactive & HA_NOINC))
+	unlinkcurline();
     if (histactive & (HA_NOSTORE|HA_NOINC)) {
 	zfree(chline, hlinesz);
 	zfree(chwords, chwordlen*sizeof(short));
@@ -1023,7 +1042,7 @@ hend(void)
 	    freehistdata(he, 0);
 	} else {
 	    keepflags = 0;
-	    he = prepnexthistent(++curhist);
+	    he = prepnexthistent();
 	}
 
 	he->text = ztrdup(chline);
@@ -1777,7 +1796,7 @@ readhistfile(char *fn, int err, int readflags)
 		lasthist.stim = stim;
 	    }
 
-	    he = prepnexthistent(++curhist);
+	    he = prepnexthistent();
 	    he->text = ztrdup(pt);
 	    he->flags = newflags;
 	    if ((he->stim = stim) == 0)

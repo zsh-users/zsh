@@ -1,5 +1,9 @@
 2000-05-05  Sven Wischnowsky  <wischnow@informatik.hu-berlin.de>
 
+	* Wayne: 11171: Src/builtin.c, Src/hist.c: fix for print -s when
+	called from widget; added lines are not immediately available,
+	though
+
 	* 11172: Src/Zle/computil.c: fix for completion arguments of
  	options, don't use all of them at once
 	
