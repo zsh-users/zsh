@@ -10,7 +10,7 @@
 # compctl -f -x 'w[1,-f]' -F -- zed
 #
 
-local var fun cleanup
+local var fun
 # We do not want timeout while we are editing a file
 integer TMOUT=0
 
@@ -24,19 +24,26 @@ local curcontext=zed:::
 zstyle -m ":completion:zed:*" insert-tab '*' ||
     zstyle ":completion:zed:*" insert-tab yes
 
-# catch interrupts
-cleanup="$(bindkey -L "^M"; bindkey -L -M emacs "^X^W"; bindkey -aL "ZZ"
-    echo "trap - INT EXIT"; trap)"
-trap "return 130" INT
-trap "$cleanup" EXIT
+if ! bindkey -M zed >&/dev/null; then
+  # Make the zed keymap a copy of the current main.
+  bindkey -N zed main
+
+  # Assign some default keys.
+  # Depending on your stty's, you may be able to use ^J as accept-line, else:
+
+  # The following isn't useful if we are copying viins, but that's
+  # a nicety.
+  bindkey -M zed '^x^w' accept-line
+  bindkey -M zed '^M' self-insert-unmeta
+fi
+if ! bindkey -M zed-vicmd >&/dev/null; then
+  bindkey -N zed-vicmd vicmd
+
+  bindkey -M zed-vicmd "ZZ" accept-line
+fi
 
 # don't mangle !'s
 setopt localoptions nobanghist
-
-bindkey "^M" self-insert-unmeta
-# Depending on your stty's, you may be able to use ^J as accept-line, else:
-bindkey -M emacs "^X^W" accept-line
-bindkey -a "ZZ" accept-line
 
 if ((fun)) then
   var="$(functions $1)"
@@ -55,10 +62,10 @@ $(<$dir/$1)
     var="$1() {
 }"
   fi
-  vared var && eval "$cleanup ;" function "$var"
+  vared -M zed -m zed-vicmd var && eval function "$var"
 else
   [[ -f $1 ]] && var="$(<$1)"
-  while vared var
+  while vared -M zed -m zed-vicmd var
   do
     (print -r -- "$var" >| $1) && break
     echo -n -e '\a'

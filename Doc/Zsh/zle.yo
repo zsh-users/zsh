@@ -265,7 +265,8 @@ by `tt(bindkey -m)'.
 findex(vared)
 cindex(parameters, editing)
 cindex(editing parameters)
-item(tt(vared) [ tt(-Aache) ] [ tt(-p) var(prompt) ] [ tt(-r) var(rprompt) ] var(name))(
+xitem(tt(vared) [ tt(-Aache) ] [ tt(-p) var(prompt) ] [ tt(-r) var(rprompt) ])
+item(  [ -M var(main-keymap) ] [ -m var(vicmd-keymap) ] var(name))(
 The value of the parameter var(name) is loaded into the edit
 buffer, and the line editor is invoked.  When the editor exits,
 var(name) is set to the string value returned by the editor.
@@ -289,9 +290,16 @@ created automatically, even without tt(-c).
 If the tt(-p) flag is given, the following string will be taken as
 the prompt to display at the left.  If the tt(-r) flag is given,
 the following string gives the prompt to display at the right.  If the
-tt(-h) flag is specified, the history can be accessed from ZLE. If the 
+tt(-h) flag is specified, the history can be accessed from ZLE. If the
 tt(-e) flag is given, typing tt(^D) (Control-D) on an empty line
 causes tt(vared) to exit immediately with a non-zero return value.
+
+The tt(-M) option gives a keymap to link to the tt(main) keymap during
+editing, and the tt(-m) option gives a keymap to link to the tt(vicmd)
+keymap during editing.  For vi-style editing, this allows a pair of keymaps
+to override tt(viins) and tt(vicmd).  For emacs-style editing, only tt(-M)
+is normally needed but the tt(-m) option may still be used.  On exit, the
+previous keymaps will be restored.
 )
 findex(zle)
 cindex(widgets, rebinding)

@@ -169,8 +169,7 @@ freekeymapnamnode(HashNode hn)
     KeymapName kmn = (KeymapName) hn;
 
     zsfree(kmn->nam);
-    if(!--kmn->keymap->rc)
-	deletekeymap(kmn->keymap);
+    unrefkeymap(kmn->keymap);
     zfree(kmn, sizeof(*kmn));
 }
 
@@ -355,8 +354,7 @@ linkkeymap(Keymap km, char *name, int imm)
 	    return 1;
 	if(n->keymap == km)
 	    return 0;
-	if(!--n->keymap->rc)
-	    deletekeymap(n->keymap);
+	unrefkeymap(n->keymap);
 	n->keymap = km;
     } else {
 	n = makekeymapnamnode(km);
@@ -364,8 +362,21 @@ linkkeymap(Keymap km, char *name, int imm)
 	    n->flags |= KMN_IMMORTAL;
 	keymapnamtab->addnode(keymapnamtab, ztrdup(name), n);
     }
-    km->rc++;
+    refkeymap(km);
     return 0;
+}
+
+/**/
+void refkeymap(Keymap km)
+{
+    km->rc++;
+}
+
+/**/
+void unrefkeymap(Keymap km)
+{
+    if (!--km->rc)
+	deletekeymap(km);
 }
 
 /* Select a keymap as the current ZLE keymap.  Can optionally fall back *

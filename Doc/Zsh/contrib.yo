@@ -1312,12 +1312,7 @@ See the comments in the function for a few extra tips.
 )
 findex(zed)
 item(tt(zed) [ tt(-f) ] var(name))(
-This function uses the ZLE editor to edit a file or function.  It rebinds
-the return key to insert a line break, and adds bindings for `tt(^X^W)' in
-the tt(emacs) keymap and `tt(ZZ)' in the tt(vicmd) keymap to accept (and
-therefore write, in the case of a file) the edited file or function.
-Keybindings are otherwise the standard ones; completion is available, and
-styles may be set with the context prefix `tt(:completion:zed)'.
+This function uses the ZLE editor to edit a file or function.
 
 Only one var(name) argument is recognized (additional arguments are
 ignored).  If the tt(-f) option is given, the name is taken to be that of
@@ -1328,6 +1323,26 @@ autoload file.
 
 Without tt(-f), var(name) is the path name of the file to edit, which need
 not exist; it is created on write, if necessary.
+
+While editing, the function sets the main keymap to tt(zed) and the
+vi command keymap to tt(zed-vicmd).  These will be copied from the existing
+tt(main) and tt(vicmd) keymaps if they do not exist the first time tt(zed)
+is run.  They can be used to provide special key bindings used only in zed.
+
+If it creates the keymap, tt(zed) rebinds the return key to insert a line
+break and `tt(^X^W)' to accept the edit in the tt(zed) keymap, and binds
+`tt(ZZ)' to accept the edit in the tt(zed-vicmd) keymap.  If the tt(zed)
+keymap is created by hand, the user will need to bind:
+
+example(zle -M zed '^M' self-insert-unmeta
+zle -M zed '^X^W' accept-line)
+
+for this behaviour, and if tt(zed-vicmd) is created by hand,
+
+example(zle -M zed-vicmd 'ZZ' accept-line)
+
+Completion is available, and styles may be set with the context prefix
+`tt(:completion:zed)'.
 )
 findex(zcp)
 findex(zln)

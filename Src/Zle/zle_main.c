@@ -987,6 +987,45 @@ handleprefixes(void)
 	initmodifier(&zmod);
 }
 
+/**/
+static int
+savekeymap(char *cmdname, char *oldname, char *newname, Keymap *savemapptr)
+{
+    Keymap km = openkeymap(newname);
+
+    if (km) {
+	*savemapptr = openkeymap(oldname);
+	/* I love special cases */
+	if (*savemapptr == km)
+	    *savemapptr = NULL;
+	else {
+	    /* make sure this doesn't get deleted. */
+	    if (*savemapptr)
+		refkeymap(*savemapptr);
+	    linkkeymap(km, oldname, 0);
+	}
+	return 0;
+    } else {
+	zwarnnam(cmdname, "no such keymap: %s", newname, 0);
+	return 1;
+    }
+}
+
+/**/
+static void
+restorekeymap(char *cmdname, char *oldname, char *newname, Keymap savemap)
+{
+    if (savemap) {
+	linkkeymap(savemap, oldname, 0);
+	/* we incremented the reference count above */
+	unrefkeymap(savemap);
+    } else if (newname) {
+	/* urr... can this happen? */
+	zwarnnam(cmdname,
+		 "keymap %s was not defined, not restored", oldname, 0);
+    }
+}
+
 /* this exports the argument we are currently vared'iting if != NULL */
 
 /**/
@@ -1002,9 +1041,10 @@ bin_vared(char *name, char **args, Options ops, int func)
     struct value vbuf;
     Value v;
     Param pm = 0;
-    int create = 0, ifl;
+    int ifl;
     int type = PM_SCALAR, obreaks = breaks, haso = 0;
-    char *p1 = NULL, *p2 = NULL;
+    char *p1, *p2, *main_keymapname, *vicmd_keymapname;
+    Keymap main_keymapsave = NULL, vicmd_keymapsave = NULL;
     FILE *oshout = NULL;
 
     if ((interact && unset(USEZLE)) || !strcmp(term, "emacs")) {
@@ -1016,61 +1056,23 @@ bin_vared(char *name, char **args, Options ops, int func)
 	return 1;
     }
 
-    /* all options are handled as arguments */
-    while (*args && **args == '-') {
-	while (*++(*args))
-	    switch (**args) {
-	    case 'c':
-		/* -c option -- allow creation of the parameter if it doesn't
-		yet exist */
-		create = 1;
-		break;
-	    case 'a':
-		type = PM_ARRAY;
-		break;
-	    case 'A':
-		type = PM_HASHED;
-		break;
-	    case 'p':
-		/* -p option -- set main prompt string */
-		if ((*args)[1])
-		    p1 = *args + 1, *args = "" - 1;
-		else if (args[1])
-		    p1 = *(++args), *args = "" - 1;
-		else {
-		    zwarnnam(name, "prompt string expected after -%c", NULL,
-			     **args);
-		    return 1;
-		}
-		break;
-	    case 'r':
-		/* -r option -- set right prompt string */
-		if ((*args)[1])
-		    p2 = *args + 1, *args = "" - 1;
-		else if (args[1])
-		    p2 = *(++args), *args = "" - 1;
-		else {
-		    zwarnnam(name, "prompt string expected after -%c", NULL,
-			     **args);
-		    return 1;
-		}
-		break;
-	    case 'h':
-		/* -h option -- enable history */
-		ops->ind['h'] = 1;
-		break;
-	    case 'e':
-		/* -e option -- enable EOF */
-		ops->ind['e'] = 1;
-		break;
-	    default:
-		/* unrecognised option character */
-		zwarnnam(name, "unknown option: %s", *args, 0);
-		return 1;
-	    }
-	args++;
+    if (OPT_ISSET(ops,'A'))
+    {
+	if (OPT_ISSET(ops, 'a'))
+	{
+	    zwarnnam(name, "specify only one of -a and -A", NULL, 0);
+	    return 1;
+	}
+	type = PM_HASHED;
     }
-    if (type && !create) {
+    else if (OPT_ISSET(ops,'a'))
+	type = PM_ARRAY;
+    p1 = OPT_ARG_SAFE(ops,'p');
+    p2 = OPT_ARG_SAFE(ops,'r');
+    main_keymapname = OPT_ARG_SAFE(ops,'M');
+    vicmd_keymapname = OPT_ARG_SAFE(ops,'m');
+
+    if (type != PM_SCALAR && !OPT_ISSET(ops,'c')) {
 	zwarnnam(name, "-%s ignored", type == PM_ARRAY ? "a" : "A", 0);
     }
 
@@ -1082,9 +1084,9 @@ bin_vared(char *name, char **args, Options ops, int func)
     /* handle non-existent parameter */
     s = args[0];
     queue_signals();
-    v = fetchvalue(&vbuf, &s, (!create || type == PM_SCALAR),
+    v = fetchvalue(&vbuf, &s, (!OPT_ISSET(ops,'c') || type == PM_SCALAR),
 		   SCANPM_WANTKEYS|SCANPM_WANTVALS|SCANPM_MATCHMANY);
-    if (!v && !create) {
+    if (!v && !OPT_ISSET(ops,'c')) {
 	unqueue_signals();
 	zwarnnam(name, "no such variable: %s", args[0], 0);
 	return 1;
@@ -1156,6 +1158,13 @@ bin_vared(char *name, char **args, Options ops, int func)
     /* edit the parameter value */
     zpushnode(bufstack, s);
 
+    if (main_keymapname &&
+	savekeymap(name, "main", main_keymapname, &main_keymapsave))
+	main_keymapname = NULL;
+    if (vicmd_keymapname &&
+	savekeymap(name, "vicmd", vicmd_keymapname, &vicmd_keymapsave))
+	vicmd_keymapname = NULL;
+
     varedarg = *args;
     ifl = isfirstln;
     if (OPT_ISSET(ops,'h'))
@@ -1167,6 +1176,10 @@ bin_vared(char *name, char **args, Options ops, int func)
 	hend(NULL);
     isfirstln = ifl;
     varedarg = ova;
+
+    restorekeymap(name, "main", main_keymapname, main_keymapsave);
+    restorekeymap(name, "vicmd", vicmd_keymapname, vicmd_keymapsave);
+
     if (haso) {
 	fclose(shout);	/* close(SHTTY) */
 	shout = oshout;
@@ -1182,7 +1195,7 @@ bin_vared(char *name, char **args, Options ops, int func)
     if (t[strlen(t) - 1] == '\n')
 	t[strlen(t) - 1] = '\0';
     /* final assignment of parameter value */
-    if (create) {
+    if (OPT_ISSET(ops,'c')) {
 	unsetparam(args[0]);
 	createparam(args[0], type);
     }
@@ -1353,7 +1366,7 @@ zleaftertrap(Hookdef dummy, void *dat)
 
 static struct builtin bintab[] = {
     BUILTIN("bindkey", 0, bin_bindkey, 0, -1, 0, "evaM:ldDANmrsLRp", NULL),
-    BUILTIN("vared",   0, bin_vared,   1,  7, 0, NULL,             NULL),
+    BUILTIN("vared",   0, bin_vared,   1,  7, 0, "aAchM:m:p:r:", NULL),
     BUILTIN("zle",     0, bin_zle,     0, -1, 0, "aAcCDFgGIKlLmMNRU", NULL),
 };
 

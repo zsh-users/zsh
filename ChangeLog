@@ -1,3 +1,10 @@
+2004-04-06  Peter Stephenson  <pws@csr.com>
+
+	* 19733 (with improved documentation): Doc/Zsh/contrib.yo,
+	Doc/Zsh/zle.yo, Functions/Misc/zed, Src/Zle/zle_keymap.c,
+	Src/Zle/zle_main.c: vared -M and -m allow you to provide
+	main and alternate keymap; zed will use keymaps zed and zed-vicmd.
+
 2004-04-05  Peter Stephenson  <pws@csr.com>
 
 	* 19728: Doc/Zsh/expn.yo: explain that (^F) (from 19717)
