@@ -1,3 +1,9 @@
+2001-03-24  Bart Schaefer  <schaefer@zsh.org>
+
+	* 13740: Completion/User/_mailboxes: Fixes for mh (based on PWS's
+	patch in 13737): handle sub-folders; handle +folder abbreviations;
+	add commented-out lines that might eventually handle @folder, too.
+
 2001-03-23  Bart Schaefer  <schaefer@zsh.org>
 
 	* 13736: Test/01grammar.ztst: Enable more tests as they seem to

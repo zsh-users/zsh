@@ -84,6 +84,7 @@ _mailbox_cache () {
       _maildir_cache=( "${_maildir_cache[@]}" "$i" )
     elif j=( "$i"/<1-> ) && [[ -n "$j" ]]; then
       _mh_cache=( "${_mh_cache[@]}" "$i" )
+      dirboxes=( $dirboxes "$i"/*(/) )
     else
       _mbox_cache=( "${_mbox_cache[@]}" "$i"/*(.) )
       dirboxes=( $dirboxes "$i"/*(/) )
@@ -116,8 +117,17 @@ _mua_mailboxes() {
 		    "${_mailbox_cache[@]}" )
       fi
       ;;
-    (*:mh:*) # I've probably got this wrong, or at least incomplete
-      (( $#_mh_cache )) && _multi_parts "${expl[@]}" / _mh_cache && ret=0
+    (*:mh:*)
+#     local lastmhbox=???	# Where does this come from?
+      if compset -P +; then
+	mbox_names=( "${(@)_mh_cache#$~maildirectory/}" )
+#     elif compset -P @; then
+#	mbox_names=( "${(@)${(@M)_mh_cache:#$~lastmhbox/*}#$~lastmhbox/}" )
+      else
+	mbox_names=( +"${(@)^_mh_cache#$~maildirectory/}"
+#		     @"${(@)^${(@M)_mh_cache:#$~lastmhbox/*}#$~lastmhbox/}"
+		     "${_mh_cache[@]}" )
+      fi
       ;;
     (*:mush:*)
       if compset -P %; then
