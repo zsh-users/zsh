@@ -23,9 +23,12 @@ freematches
 getkey
 getkeycmd
 getzlequery
+hasoldlist
 hasperm
 invalidatelist
 lastambig
+lastmatches
+lastlmatches
 lbindk
 linkkeymap
 listdat
@@ -37,6 +40,8 @@ menucomplete
 minfo
 newkeymap
 nlnct
+nmatches
+onlyexpl
 pmatches
 printfmt
 printlist

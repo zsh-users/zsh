@@ -27,6 +27,7 @@ compmatcherstr
 compmatchertot
 compnmatches
 compnnmatches
+comp_listptr
 compoldlist
 compoldins
 compparameter
@@ -53,9 +54,11 @@ freecompctl
 getcpatptr
 incompctlfunc
 incompfunc
+list_linesptr
 makecomplistcallptr
 makecomplistctlptr
 makecompparamsptr
+num_matchesptr
 patcomps
 rembslash
 set_comp_sepptr
