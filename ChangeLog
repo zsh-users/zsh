@@ -1,3 +1,9 @@
+2000-09-05  Sven Wischnowsky  <wischnow@zsh.org>
+
+	* 12744: Doc/Zsh/contrib.yo, Doc/Zsh/mod_complist.yo,
+ 	Functions/Zle/incremental-complete-word: change context for i-c-w
+ 	styles, update docs
+	
 2000-09-04  Bart Schaefer  <schaefer@zsh.org>
 
 	* 12742: Doc/.distfiles, Doc/Makefile.in, Doc/Zsh/.distfiles,

@@ -118,7 +118,14 @@ tt(no), and tt(rc) if tt(ec) is not defined.
 
 The default values are ISO 6429 (ANSI) compliant and can be used on
 vt100 compatible terminals such as tt(xterm)s.  On monochrome terminals
-the default values will have no visible effect.
+the default values will have no visible effect.  The tt(colors)
+function from the contribution can be used to get associative arrays
+containing the codes for ANSI terminals (see
+ifzman(the section `Other Functions' in zmanref(zshcontrib))\
+ifnzman(noderef(Other Functions))\
+).  For example, after loading tt(colors), one could use
+`tt($colors[red])' to get the code for foreground color red and
+`tt($colors[bg-green])' for the code for background color green.
 
 If the completion system based around shell functions is used, these
 parameters should not be set directly because the system controls them 

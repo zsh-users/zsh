@@ -96,7 +96,7 @@ works only if the names stored in the wordcode files are full paths or are
 relative to the directory that contains the wordcode file.
 
 In the first form, each var(name) is the name of a wordcode file or a
-directori containing wordcode files that should be checked. If no
+directory containing wordcode files that should be checked. If no
 arguments are given, the directories and wordcode files in $fpath are
 used.
 
@@ -432,7 +432,9 @@ item(tt(break-keys))(
 This style is used by the tt(incremental-complete-word) widget. Its value
 should be a pattern, and all keys matching this pattern will cause the
 widget to stop incremental completion without the key having any further
-effect.
+effect. Like all styles used directly by
+tt(incremental-complete-word), this style is looked up using the
+context `tt(:incremental)'.
 )
 kindex(completer, completion style)
 item(tt(completer))(
@@ -519,11 +521,14 @@ Replaced by the unambiguous part of all matches, if there
 is any, and if it is different from the word on the line.
 )
 enditem()
+
+Like `tt(break-keys)', this uses the `tt(:incremental)' context.
 )
 kindex(stop-keys, completion style)
 item(tt(stop-keys))(
 This style is used by the tt(incremental-complete-word) widget.  Its value
-is treated similarly to the one for the tt(break-keys) style.  However, in
+is treated similarly to the one for the tt(break-keys) style (and uses 
+the same context: `tt(:incremental)').  However, in
 this case all keys matching the pattern given as its value will stop
 incremental completion and will then execute their usual function.
 )
