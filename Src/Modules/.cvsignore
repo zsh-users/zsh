@@ -13,4 +13,5 @@ so_locations
 *.mdhs
 *.mdh.tmp
 *.swp
-ernames.c errcount.h
+errnames.c errcount.h
+*.dll
