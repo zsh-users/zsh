@@ -1,0 +1,39 @@
+#compdef a2ps
+
+# This is for the GNU version of a2ps.
+
+if [[ "$words[1]" != "$_a2ps_cache_cmd" ]]; then
+  local descr
+
+  _a2ps_cache_cmd="$words[1]"
+
+  descr=( "${(@)${(f@)$(_call_program features LC_ALL=C $words[1] --list=features)//
+ /	}:#}" )
+
+  _a2ps_cache_values=(
+      "${descr[(r)Known [Ss]tyle [Ss]heets*]#*	}"
+      "${descr[(r)Known [Ee]ncodings*]#*	}"
+      "${descr[(r)Known [Mm]edia*]#*	}"
+      "${descr[(r)Known [Pp]rologues*]#*	}"
+      "${descr[(r)Known PostScript Printer Descriptions*]#*	}"
+      "${descr[(r)Known [Oo]utput [Dd]estination*]#*	}"
+      "${descr[(r)Known [Uu]ser [Oo]ptions*]#*	}"
+      "${descr[(r)Known Variables*]#*	}"
+  )
+fi
+
+_arguments '*:input file:_files' -- \
+           '*\*:toggle:(yes no)' \
+           '*=DIRECTION:direction:(rows columns)' \
+           '*=TYPE:type:(r n nr rn any)' \
+	   '--highlight-level*:highlight:(none normal heavy)' \
+	   '--version-control*:version control:(none off t numbered nil 
+		                                existing never simple)' \
+	   "--pretty-print*::style:(${_a2ps_cache_values[1]})" \
+	   "--encoding*:encoding:(${_a2ps_cache_values[2]})" \
+	   "--medium*::medium:(${_a2ps_cache_values[3]})" \
+	   "--prologue*::prologue:(${_a2ps_cache_values[4]})" \
+	   "--ppd*::printer description:(${_a2ps_cache_values[5]})" \
+	   "--printer*::printer:(${_a2ps_cache_values[6]})" \
+	   "--user-option*::user option:(${_a2ps_cache_values[7]})" \
+	   "--variable*::variable:(${_a2ps_cache_values[8]})"
