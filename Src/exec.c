@@ -1487,7 +1487,8 @@ closemn(struct multio **mfds, int fd)
 		}
 	}
 	_exit(0);
-    }
+    } else if (fd >= 0)
+	mfds[fd] = NULL;
 }
 
 /* close all the mnodes (failure) */

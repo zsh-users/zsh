@@ -1,3 +1,10 @@
+2005-01-11  Bart Schaefer  <schaefer@brasslantern.com>
+
+	* 20666 (tweaked): Src/exec.c: In closemn(), discard the multio
+	structure when it has only one descriptor so far, to avoid
+	creating an unnecessary multio if a later redirect re-opens that
+	descriptor.
+
 2004-01-10  Clint Adams  <clint@zsh.org>
 
 	* 20665: Completion/Unix/Command/_gnome-gv,
