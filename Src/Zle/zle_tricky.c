@@ -158,7 +158,6 @@ usetab(void)
 {
     unsigned char *s = line + cs - 1;
 
-    wouldinstab = 0;
     if (keybuf[0] != '\t' || keybuf[1])
 	return 0;
     for (; s >= line && *s != '\n'; s--)
@@ -192,6 +191,7 @@ completeword(char **args)
 {
     usemenu = !!isset(MENUCOMPLETE);
     useglob = isset(GLOBCOMPLETE);
+    wouldinstab = 0;
     if (c == '\t' && usetab())
 	return selfinsert(args);
     else {
@@ -213,6 +213,7 @@ menucomplete(char **args)
 {
     usemenu = 1;
     useglob = isset(GLOBCOMPLETE);
+    wouldinstab = 0;
     if (c == '\t' && usetab())
 	return selfinsert(args);
     else
@@ -225,6 +226,7 @@ listchoices(char **args)
 {
     usemenu = !!isset(MENUCOMPLETE);
     useglob = isset(GLOBCOMPLETE);
+    wouldinstab = 0;
     return docomplete(COMP_LIST_COMPLETE);
 }
 
@@ -233,6 +235,7 @@ int
 spellword(char **args)
 {
     usemenu = useglob = 0;
+    wouldinstab = 0;
     return docomplete(COMP_SPELL);
 }
 
@@ -242,6 +245,7 @@ deletecharorlist(char **args)
 {
     usemenu = !!isset(MENUCOMPLETE);
     useglob = isset(GLOBCOMPLETE);
+    wouldinstab = 0;
 
     if (cs != ll) {
 	fixsuffix();
@@ -256,6 +260,7 @@ int
 expandword(char **args)
 {
     usemenu = useglob = 0;
+    wouldinstab = 0;
     if (c == '\t' && usetab())
 	return selfinsert(args);
     else
@@ -268,6 +273,7 @@ expandorcomplete(char **args)
 {
     usemenu = !!isset(MENUCOMPLETE);
     useglob = isset(GLOBCOMPLETE);
+    wouldinstab = 0;
     if (c == '\t' && usetab())
 	return selfinsert(args);
     else {
@@ -289,6 +295,7 @@ menuexpandorcomplete(char **args)
 {
     usemenu = 1;
     useglob = isset(GLOBCOMPLETE);
+    wouldinstab = 0;
     if (c == '\t' && usetab())
 	return selfinsert(args);
     else
@@ -301,6 +308,7 @@ listexpand(char **args)
 {
     usemenu = !!isset(MENUCOMPLETE);
     useglob = isset(GLOBCOMPLETE);
+    wouldinstab = 0;
     return docomplete(COMP_LIST_EXPAND);
 }
 
@@ -308,6 +316,7 @@ listexpand(char **args)
 mod_export int
 reversemenucomplete(char **args)
 {
+    wouldinstab = 0;
     if (!menucmp)
 	return menucomplete(args);
 
@@ -319,6 +328,7 @@ reversemenucomplete(char **args)
 int
 acceptandmenucomplete(char **args)
 {
+    wouldinstab = 0;
     if (!menucmp)
 	return 1;
     runhookdef(ACCEPTCOMPHOOK, NULL);

@@ -4,6 +4,9 @@
 
 2000-05-22  Sven Wischnowsky  <wischnow@zsh.org>
 
+	* 11503: Src/Zle/zle_tricky.c: make sure wouldinstab is set before
+ 	calling docomplete()
+	
 	* 11500: Completion/Core/_main_complete: another fix for
  	`select=long*' in menu style
 	
