@@ -5,7 +5,7 @@
 zmodload -i zsh/zpty
 setopt extendedglob
 
-fpath=( ${ZTST_srcdir:h}/(Completion|Functions)/*~*/CVS(/) )
+fpath=( $ZTST_srcdir/../(Completion|Functions)/*~*/CVS(/) )
 
 debug=
 dump=(-D)

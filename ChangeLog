@@ -4027,7 +4027,7 @@
 
 	* pws: 7257: Completion/Core/_parameters: simplify.
 
-	* Tanak Akira: 7256: Completion/User/_bzip2,
+	* Tanaka Akira: 7256: Completion/User/_bzip2,
 	  Completion/User/_bunzip2: new.
 
 	* Tanaka Akira: 7255: Completion/User/_make: complete after =.
