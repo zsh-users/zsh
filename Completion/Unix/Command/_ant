@@ -2,6 +2,7 @@
 
 typeset -A opt_args
 local buildfile tmp state line curcontext="$curcontext" ret=1
+local targets importedfiles
 local c target='*:target:->target'
 
 c=( $ANT_HOME/lib/*.jar )
@@ -86,7 +87,9 @@ case $state in
 	buildfile=${(v)opt_args[(I)(-f|-file|-buildfile)]:-build.xml}
       fi
       if [[ -f $buildfile ]]; then
-        targets=( $(sed -n "s/ *<target[^>]* name=[\"']\([^\"']*\)[\"'].*/\1/p" < $buildfile) )
+        importedfiles=( $(sed -n "s/ *<import[^>]* file=[\"']\([^\"']*\)[\"'].*/\1/p" < $buildfile) )
+        targets=( $(cat $buildfile $importedfiles |
+	    sed -n "s/ *<target[^>]* name=[\"']\([^\"']*\)[\"'].*/\1/p" ) )
 	_wanted targets expl target compadd -a targets && ret=0
       else
 	_message -e targets target

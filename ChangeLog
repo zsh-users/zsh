@@ -1,5 +1,8 @@
 2005-02-24  Oliver Kiddle  <opk@zsh.org>
 
+	* Konstantin Sobolev: 20832 (modified):
+	Completion/Unix/Command/_ant: gather targets from imported files
+
 	* 20862: configure.ac, Src/system.h, Src/utils.c: attempt to
 	fix configure scripts to detect iconv properly
 
