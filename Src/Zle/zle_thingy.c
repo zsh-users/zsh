@@ -709,7 +709,7 @@ bin_zle_invalidate(UNUSED(char *name), UNUSED(char **args), UNUSED(Options ops),
     if (zleactive) {
 	if (!trashedzle)
 	    trashzle();
-	return !zle_usable();
+	return 0;
     } else
 	return 1;
 }

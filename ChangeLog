@@ -1,3 +1,9 @@
+2004-09-08  Peter Stephenson  <pws@csr.com>
+
+	* 20330: Src/Zle/zle_thingy.c, Doc/Zsh/zle.yo: rationalise status
+	from zle -I and improve documentation of status from zle, zle -I,
+	zle -R.
+
 2004-09-08  Bart Schaefer  <schaefer@zanshin.com>
 
 	* 20325: Src/exec.c, Test/E01options.ztst: fix crash when using
