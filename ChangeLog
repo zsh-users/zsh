@@ -1,3 +1,12 @@
+2001-03-30  Bart Schaefer  <schaefer@zsh.org>
+
+	* 13846: Test/ztst.zsh: When "make check" is run with output to a
+	tty, print a hash mark approximately once per second during tests
+	to provide a "progress bar".
+
+	* 13845: Doc/Zsh/options.yo, Src/options.c: Refuse `setopt noexec'
+	in interactive shells, except at startup with `zsh -n'.
+
 2001-03-29  Peter Stephenson  <pws@csr.com>
 
 	* 13838: Src/prompt.c: don't assume we can change the string
