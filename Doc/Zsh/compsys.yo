@@ -1628,8 +1628,11 @@ of the `false' values (as in `tt(no=10)') makes menu completion
 em(not) be used if there are var(num) or more matches.  Of course,
 this is only useful when menu completion is normally used, e.g. by
 setting the tt(MENU_COMPLETE) option.  The `true' values may also be
-used in the form `tt(yes=long-list)' to turn on menu completion
-whenever listing is done and the list does not fit onto the screen.
+used in the form `tt(yes=long)' to turn on menu completion
+if the list does not fit onto the screen.  This will start menu
+completion only if normal completion was attempted, not when only the
+list of possible completions was requested.  To start menu completion
+even then, the value `tt(yes=long-list)' can be used.
 
 In addition to (or instead of) the above possibilities, the value may
 contain the string `tt(select)', optionally followed by an equal sign and a

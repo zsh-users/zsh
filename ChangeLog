@@ -1,3 +1,9 @@
+2000-07-27  Sven Wischnowsky  <wischnow@zsh.org>
+
+	* 12405: Completion/Core/_main_complete, Doc/Zsh/compsys.yo: fix a
+ 	bug that started menu selection too often; fix bug for `yes=long'
+ 	and documentit
+	
 2000-07-27  Bart Schaefer  <schaefer@zsh.org>
 
 	* 12396: Functions/Misc/zed: The value of `$(functions $1)' for

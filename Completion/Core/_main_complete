@@ -177,7 +177,8 @@ if [[ $compstate[old_list] = keep || nm -gt 1 ]]; then
           -n "$_menu_style[(r)(yes|true|on|1)=long-list]" ) ]]; then
     compstate[insert]=menu
   elif [[ "$compstate[insert]" = "$_saved_insert" ]]; then
-    if [[ -n "$_menu_style[(r)(yes|true|1|on)=long]" && tmp -gt LINES ]]; then
+    if [[ -n "$compstate[insert]" &&
+          -n "$_menu_style[(r)(yes|true|1|on)=long]" && tmp -gt LINES ]]; then
         compstate[insert]=menu
     else
       sel=( "${(@M)_menu_style:#(yes|true|1|on)*}" )
@@ -230,6 +231,7 @@ if [[ $compstate[old_list] = keep || nm -gt 1 ]]; then
   fi
 
   if [[ "$compstate[insert]" = *menu* ]]; then
+    [[ "$MENUSELECT" = 00 ]] && MENUSELECT=0
     if [[ -n "$_menu_style[(r)no-select*]" ]]; then
       unset MENUSELECT
     elif [[ -n "$_menu_style[(r)select=long*]" ]]; then
