@@ -1,3 +1,8 @@
+2004-11-18  Clint Adams  <clint@zsh.org>
+
+	* Completion/Unix/Command/_bogofilter: fix -w/-p typo, which was
+	noticed by Michał Politowski.
+
 2004-11-16  Peter Stephenson  <pws@csr.com>
 
 	* users/8219: Doc/Zsh/params.yo, Doc/Zsh/zle.yo,

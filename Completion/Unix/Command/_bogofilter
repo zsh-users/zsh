@@ -26,7 +26,7 @@ _bogofilter() {
   	'-l[load file into db]:textfile:_files' \
   	'-m[perform maintenance functions]' \
   	'-w[display token information]:database file or directory:_files' \
-  	'-w[display token probability information]:database file or directory:_files' \
+  	'-p[display token probability information]:database file or directory:_files' \
   	'-H[print histogram]' \
   	'(-R)-r[recalculate ROBX]' \
   	'(-r)-R[recalculate and save ROBX]' \
