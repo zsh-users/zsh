@@ -1,3 +1,8 @@
+2005-01-05  Peter Stephenson  <pws@csr.com>
+
+	* 20632: propagating signals incorrectly to current process
+	group could kill shell.
+
 2004-12-27  Clint Adams  <clint@zsh.org>
 
 	* 20639: Completion/Unix/Command/_bogofilter:

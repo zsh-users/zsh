@@ -1233,7 +1233,8 @@ execpline(Estate state, wordcode slcode, int how, int last1)
 		(!(jn->stat & STAT_INUSE) || (jn->stat & STAT_DONE))) {
 		deletejob(jn);
 		jn = jobtab + pj;
-		killjb(jn, lastval & ~0200);
+		if (jn->gleader)
+		    killjb(jn, lastval & ~0200);
 	    }
 	    if (list_pipe_child ||
 		((jn->stat & STAT_DONE) &&
