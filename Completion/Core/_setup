@@ -1,0 +1,13 @@
+#autoload
+
+local colors i
+
+for i; do
+  if _style -a "$i" list-colors colors; then
+    if [[ "$1" = default ]]; then
+      ZLS_COLORS="${(j.:.)${(@)colors:gs/:/\\\:}}"
+    else
+      eval "ZLS_COLORS=\"(${i})\${(j.:(${i}).)\${(@)colors:gs/:/\\\:}}:\${ZLS_COLORS}\""
+    fi
+  fi
+done
