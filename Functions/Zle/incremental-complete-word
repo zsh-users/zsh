@@ -21,7 +21,7 @@ incremental-complete-word() {
   local curcontext="${curcontext}" stop brk
 
   [[ -z "$curcontext" ]] && curcontext=:::
-  curcontext="${curcontext#*:}incremental:"
+  curcontext="incremental:${curcontext#*:}"
 
   zstyle -s ":completion:${curcontext}" prompt pmpt ||
     pmpt='incremental (%c): %u%s  %l'
