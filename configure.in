@@ -533,36 +533,36 @@ AC_MSG_CHECKING(if boolcodes is available)
 AC_TRY_LINK([#ifdef TERM_H_NEEDS_CURSES_H
 #include <curses.h>
 #endif
-#include <term.h>], [char **test = boolcodes;],
+#include <term.h>], [char **test = boolcodes; printf(*test);],
 AC_DEFINE(HAVE_BOOLCODES) boolcodes=yes, boolcodes=no)
 AC_MSG_RESULT($boolcodes)
 AC_MSG_CHECKING(if numcodes is available)
 AC_TRY_LINK([#ifdef TERM_H_NEEDS_CURSES_H
 #include <curses.h>
 #endif
-#include <term.h>], [char **test = numcodes;],
+#include <term.h>], [char **test = numcodes; printf(*test);],
 AC_DEFINE(HAVE_NUMCODES) numcodes=yes, numcodes=no)
 AC_MSG_RESULT($numcodes)
 AC_MSG_CHECKING(if strcodes is available)
 AC_TRY_LINK([#ifdef TERM_H_NEEDS_CURSES_H
 #include <curses.h>
 #endif
-#include <term.h>], [char **test = strcodes;],
+#include <term.h>], [char **test = strcodes; printf(*test);],
 AC_DEFINE(HAVE_STRCODES) strcodes=yes, strcodes=no)
 AC_MSG_RESULT($strcodes)
 AC_MSG_CHECKING(if boolnames is available)
 AC_TRY_LINK([#include <curses.h>
-#include <term.h>], [char **test = boolnames;],
+#include <term.h>], [char **test = boolnames; printf(*test);],
 AC_DEFINE(HAVE_BOOLNAMES) boolnames=yes, boolnames=no)
 AC_MSG_RESULT($boolnames)
 AC_MSG_CHECKING(if numnames is available)
 AC_TRY_LINK([#include <curses.h>
-#include <term.h>], [char **test = numnames;],
+#include <term.h>], [char **test = numnames; printf(*test);],
 AC_DEFINE(HAVE_NUMNAMES) numnames=yes, numnames=no)
 AC_MSG_RESULT($numnames)
 AC_MSG_CHECKING(if strnames is available)
 AC_TRY_LINK([#include <curses.h>
-#include <term.h>], [char **test = strnames;],
+#include <term.h>], [char **test = strnames; printf(*test);],
 AC_DEFINE(HAVE_STRNAMES) strnames=yes, strnames=no)
 AC_MSG_RESULT($strnames)
 

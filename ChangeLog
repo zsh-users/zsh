@@ -1,15 +1,20 @@
+2001-04-30  Bart Schaefer  <schaefer@zsh.org>
+
+	* 14169: configure.in: Improve some AC_TRY_LINK tests so that they
+	can't accidentally succeed because of a compiler that optimizes
+	away unreferenced variables.
+
 2001-04-30  Sven Wischnowsky  <wischnow@zsh.org>
 
-	* 14160: Completion/Base/Completer/_expand: fixelt for the test
+	* 14160: Completion/Base/Completer/_expand: fixlet for the test
 	for the suffix style; if word contains only a tilde, don't try
 	to expand it
 
 2001-04-30  Andrej Borsenkow <bor@zsh.org>
 
-	* Bart: 14144 (modified):  Src/Modules/stat.c
-	The S_IXUSR, S_IXGRP, S_IXOTH are made external variables in
-	Cygwin 1.3.1 and cannot be used as static array initializer
-	anymore.
+	* Bart: 14144 (modified): Src/Modules/stat.c: The S_IXUSR,
+	S_IXGRP, S_IXOTH are made external variables in Cygwin 1.3.1 and
+	cannot be used as static array initializer anymore.
 
 2001-04-29  Bart Schaefer  <schaefer@zsh.org>
 
