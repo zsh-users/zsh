@@ -1,3 +1,8 @@
+2001-06-25  Sven Wischnowsky  <wischnow@zsh.org>
+
+	* user/3940: Src/Zle/zle_tricky.c: make expand-word not always
+	restore the command line
+
 2001-06-24  Bart Schaefer  <schaefer@zsh.org>
 
 	* 15060: Test/A02alias.ztst: Change expected return value to
