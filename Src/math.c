@@ -959,7 +959,9 @@ matheval(char *s)
     char *junk;
     mnumber x;
     int xmtok = mtok;
-    outputradix = 0;
+    /* maintain outputradix across levels of evaluation */
+    if (!mlevel)
+	outputradix = 0;
 
     if (!*s) {
 	x.type = MN_INTEGER;
