@@ -29,3 +29,5 @@ _value:LDFLAGS () {
     _default "$@"
   fi
 }
+
+_value "$@"
