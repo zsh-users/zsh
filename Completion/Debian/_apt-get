@@ -30,7 +30,7 @@ _apt-get_args () {
     compadd "$@" - update upgrade dselect-upgrade dist-upgrade install remove source check clean autoclean help
   else
     case "$words[1]" in
-      install) _deb_packages uninstalled "$@";;
+      install) _deb_packages uninstalled "$@" || _deb_packages installed "$@";;
       remove) _deb_packages installed "$@";;
       *) _deb_packages avail "$@";;
     esac
