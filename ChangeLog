@@ -1,3 +1,18 @@
+2001-04-19  Bart Schaefer  <schaefer@zsh.org>
+
+	* 14008, 1405x: Src/lex.c, Src/math.c, Src/params.c,
+	Test/D06subscript.ztst: Improve parsing of subscripts so that
+	many forms that failed before, work now, particularly for assoc
+	array keys; create a test suite.
+
+	* 14008: Src/hist.c: Don't getsparam("HISTFILE") until it is
+	actually needed, because other parameter expansions reset the
+	history mechanism for subscript parsing.
+
+	* 14008: Src/builtin.c: Keep track of the new Param created when
+	typeset_single() calls setsparam() in some circumstances; drop a
+	redundant isident() test.
+
 2001-04-19  Peter Stephenson  <pws@pwstephenson.fsnet.co.uk>
 
 	* 14046: Doc/Zle/zle.yo, Src/Zle/zle_keymap.c: bindkey -rp removes

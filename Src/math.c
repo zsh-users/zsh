@@ -517,6 +517,7 @@ setvar(char *s, mnumber v)
     }
     if (noeval)
 	return v;
+    untokenize(s);
     setnparam(s, v);
     return v;
 }

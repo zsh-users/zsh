@@ -1690,8 +1690,8 @@ typeset_single(char *cname, char *pname, Param pm, int func,
 		delenv(pm->env);
 		pm->env = NULL;
 	    }
-	    if (value)
-		setsparam(pname, ztrdup(value));
+	    if (value && !(pm = setsparam(pname, ztrdup(value))))
+		return 0;
 	} else if (value) {
 	    zwarnnam(cname, "can't assign new value for array %s", pname, 0);
 	    return NULL;
@@ -1807,9 +1807,10 @@ typeset_single(char *cname, char *pname, Param pm, int func,
 	pm->level = keeplocal;
     else if (on & PM_LOCAL)
 	pm->level = locallevel;
-    if (value && !(pm->flags & (PM_ARRAY|PM_HASHED)))
-	setsparam(pname, ztrdup(value));
-    else if (newspecial && !(pm->old->flags & PM_NORESTORE)) {
+    if (value && !(pm->flags & (PM_ARRAY|PM_HASHED))) {
+	if (!(pm = setsparam(pname, ztrdup(value))))
+	    return 0;
+    } else if (newspecial && !(pm->old->flags & PM_NORESTORE)) {
 	/*
 	 * We need to use the special setting function to re-initialise
 	 * the special parameter to empty.
@@ -2061,12 +2062,6 @@ bin_typeset(char *name, char **argv, char *ops, int func)
 
     /* Take arguments literally.  Don't glob */
     while ((asg = getasg(*argv++))) {
-	/* check if argument is a valid identifier */
-	if (!isident(asg->name)) {
-	    zerr("not an identifier: %s", asg->name, 0);
-	    returnval = 1;
-	    continue;
-	}
 	if (!typeset_single(name, asg->name,
 			    (Param) (paramtab == realparamtab ?
 				     gethashnode2(paramtab, asg->name) :

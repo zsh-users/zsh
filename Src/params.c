@@ -770,38 +770,18 @@ isident(char *s)
 	if (!iident(*ss))
 	    break;
 
-#if 0
-    /* If this exhaust `s' or the next two characters *
-     * are [(, then it is a valid identifier.         */
-    if (!*ss || (*ss == '[' && ss[1] == '('))
-	return 1;
-
-    /* Else if the next character is not [, then it is *
-     * definitely not a valid identifier.              */
-    if (*ss != '[')
-	return 0;
-
-    noeval = 1;
-    (void)mathevalarg(++ss, &ss);
-    if (*ss == ',')
-	(void)mathevalarg(++ss, &ss);
-    noeval = ne;		/* restore the value of noeval */
-    if (*ss != ']' || ss[1])
-	return 0;
-    return 1;
-#else
     /* If the next character is not [, then it is *
-     * definitely not a valid identifier.              */
+     * definitely not a valid identifier.         */
     if (!*ss)
 	return 1;
     if (*ss != '[')
 	return 0;
 
-    /* Require balanced [ ] pairs */
-    if (skipparens('[', ']', &ss))
+    /* Require balanced [ ] pairs with something between */
+    if (!(ss = parse_subscript(++ss)))
 	return 0;
-    return !*ss;
-#endif
+    untokenize(s);
+    return !ss[1];
 }
 
 /**/
@@ -933,8 +913,21 @@ getarg(char **str, int *inv, Value v, int a2, zlong *w)
     }
 
     for (t = s, i = 0;
-	 (c = *t) && ((c != ']' && c != Outbrack &&
+	 (c = *t) && ((c != Outbrack &&
 		       (ishash || c != ',')) || i); t++) {
+	/* Untokenize INULL() except before brackets, for parsestr() */
+	if (INULL(c)) {
+	    if (t[1] == '[' || t[1] == ']') {
+		/* This test handles nested subscripts in hash keys */
+		if (ishash && i)
+		    *t = ztokens[c - Pound];
+		needtok = 1;
+		++t;
+	    } else
+		*t = ztokens[c - Pound];
+	    continue;
+	}
+	/* Inbrack and Outbrack are probably never found here ... */
 	if (c == '[' || c == Inbrack)
 	    i++;
 	else if (c == ']' || c == Outbrack)
@@ -946,11 +939,18 @@ getarg(char **str, int *inv, Value v, int a2, zlong *w)
 	return 0;
     s = dupstrpfx(s, t - s);
     *str = tt = t;
+    /* If we're NOT reverse subscripting, strip the INULL()s so brackets *
+     * are not backslashed after parsestr().  Otherwise leave them alone *
+     * so that the brackets will be escaped when we patcompile() or when *
+     * subscript arithmetic is performed (for nested subscripts).        */
+    if (ishash && !rev)
+	remnulargs(s);
     if (needtok) {
 	if (parsestr(s))
 	    return 0;
 	singsub(&s);
-    }
+    } else if (rev)
+	remnulargs(s);	/* This is probably always a no-op, but ... */
     if (!rev) {
 	if (ishash) {
 	    HashTable ht = v->pm->gets.hfn(v->pm);
@@ -1019,7 +1019,7 @@ getarg(char **str, int *inv, Value v, int a2, zlong *w)
 		    s = d;
 		}
 	    } else {
-		if (!l || s[l - 1] != '*') {
+		if (!l || s[l - 1] != '*' || (l > 1 && s[l - 2] == '\\')) {
 		    d = (char *) hcalloc(l + 2);
 		    strcpy(d, s);
 		    strcat(d, "*");
@@ -1028,6 +1028,7 @@ getarg(char **str, int *inv, Value v, int a2, zlong *w)
 	    }
 	}
 	tokenize(s);
+	remnulargs(s);
 
 	if (keymatch || (pprog = patcompile(s, 0, NULL))) {
 	    int len;
@@ -1156,7 +1157,7 @@ getarg(char **str, int *inv, Value v, int a2, zlong *w)
 				    return r;
 		    }
 		}
-		return 0;
+		return down ? 0 : len + 1;
 	    }
 	}
     }
@@ -1170,13 +1171,27 @@ getindex(char **pptr, Value v)
     int start, end, inv = 0;
     char *s = *pptr, *tbrack;
 
-    *s++ = '[';
-    for (tbrack = s; *tbrack && *tbrack != ']' && *tbrack != Outbrack; tbrack++)
+    *s++ = Inbrack;
+    s = parse_subscript(s);	/* Error handled after untokenizing */
+    /* Now we untokenize everthing except INULL() markers so we can check *
+     * for the '*' and '@' special subscripts.  The INULL()s are removed  *
+     * in getarg() after we know whether we're doing reverse indexing.    */
+    for (tbrack = *pptr + 1; *tbrack && tbrack != s; tbrack++) {
+	if (INULL(*tbrack) && !*++tbrack)
+	    break;
 	if (itok(*tbrack))
 	    *tbrack = ztokens[*tbrack - Pound];
-    if (*tbrack == Outbrack)
-	*tbrack = ']';
-    if ((s[0] == '*' || s[0] == '@') && s[1] == ']') {
+    }
+    /* If we reached the end of the string (s == NULL) we have an error */
+    if (*tbrack)
+	*tbrack = Outbrack;
+    else {
+	zerr("invalid subscript", NULL, 0);
+	*pptr = tbrack;
+	return 1;
+    }
+    s = *pptr + 1;
+    if ((s[0] == '*' || s[0] == '@') && s[1] == Outbrack) {
 	if ((v->isarr || IS_UNSET_VALUE(v)) && s[0] == '@')
 	    v->isarr |= SCANPM_ISVAR_AT;
 	v->start = 0;
@@ -1208,12 +1223,12 @@ getindex(char **pptr, Value v)
 	    }
 	    if (*s == ',') {
 		zerr("invalid subscript", NULL, 0);
-		while (*s != ']' && *s != Outbrack)
+		while (*s && *s != Outbrack)
 		    s++;
 		*pptr = s;
 		return 1;
 	    }
-	    if (*s == ']' || *s == Outbrack)
+	    if (*s == Outbrack)
 		s++;
 	} else {
 	    int com;
@@ -1228,7 +1243,7 @@ getindex(char **pptr, Value v)
 		start--;
 	    else if (start == 0 && end == 0)
 		end++;
-	    if (*s == ']' || *s == Outbrack) {
+	    if (*s == Outbrack) {
 		s++;
 		if (v->isarr && start == end-1 && !com &&
 		    (!(v->isarr & SCANPM_MATCHMANY) ||

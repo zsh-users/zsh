@@ -1302,10 +1302,13 @@ dquote_parse(char endchar, int sub)
 	    c = hgetc();
 	    if (c != '\n') {
 		if (c == '$' || c == '\\' || (c == '}' && !intick && bct) ||
-		    c == endchar || c == '`')
+		    c == endchar || c == '`' ||
+		    (math && (c == '[' || c == ']' ||
+			      c == '(' || c == ')' ||
+			      c == '{' || c == '}')))
 		    add(Bnull);
 		else {
-		    /* lexstop is implicitely handled here */
+		    /* lexstop is implicitly handled here */
 		    add('\\');
 		    goto cont;
 		}
@@ -1456,6 +1459,38 @@ parsestrnoerr(char *s)
     DPUTS(cmdsp, "BUG: parsestr: cmdstack not empty.");
     lexrestore();
     return err;
+}
+
+/**/
+mod_export char *
+parse_subscript(char *s)
+{
+    int l = strlen(s), err;
+    char *t;
+
+    if (!*s || *s == ']')
+	return 0;
+    lexsave();
+    untokenize(t = dupstring(s));
+    inpush(t, 0, NULL);
+    strinbeg(0);
+    len = 0;
+    bptr = tokstr = s;
+    bsiz = l + 1;
+    err = dquote_parse(']', 1);
+    if (err) {
+	err = *bptr;
+	*bptr = 0;
+	untokenize(s);
+	*bptr = err;
+	s = 0;
+    } else
+	s = bptr;
+    strinend();
+    inpop();
+    DPUTS(cmdsp, "BUG: parse_subscript: cmdstack not empty.");
+    lexrestore();
+    return s;
 }
 
 /* Tokenize a string given in s. Parsing is done as if s were a normal *

@@ -1011,7 +1011,6 @@ hend(Eprog prog)
     DPUTS(stophist != 2 && !(inbufflags & INP_ALIAS) && !chline,
 	  "BUG: chline is NULL in hend()");
     queue_signals();
-    hf = getsparam("HISTFILE");
     if (histdone & HISTFLAG_SETTY)
 	settyinfo(&shttyinfo);
     if (!(histactive & HA_NOINC))
@@ -1028,6 +1027,7 @@ hend(Eprog prog)
      && (hist_ignore_all_dups = isset(HISTIGNOREALLDUPS)) != 0)
 	histremovedups();
     /* For history sharing, lock history file once for both read and write */
+    hf = getsparam("HISTFILE");
     if (isset(SHAREHISTORY) && lockhistfile(hf, 0)) {
 	readhistfile(hf, 0, HFILE_USE_OPTIONS | HFILE_FAST);
 	curline.histnum = curhist+1;
