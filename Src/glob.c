@@ -243,7 +243,11 @@ statfullpath(const char *s, struct stat *st, int l)
 	  "BUG: statfullpath(): pathname too long");
     strcpy(buf, pathbuf + pathbufcwd);
     strcpy(buf + pathpos - pathbufcwd, s);
-    if (!*s) {
+    if (!*s && *buf) {
+	/*
+	 * Don't add the '.' if the path so far is empty, since
+	 * then we get bogus empty strings inserted as files.
+	 */
 	buf[pathpos - pathbufcwd] = '.';
 	buf[pathpos - pathbufcwd + 1] = '\0';
 	l = 0;

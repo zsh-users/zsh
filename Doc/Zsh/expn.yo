@@ -1107,9 +1107,13 @@ If the tt(KSH_GLOB) option is set, then a
 the `tt(LPAR())' is treated specially, as detailed below. The option
 tt(SH_GLOB) prevents bare parentheses from being used in this way, though
 the tt(KSH_GLOB) option is still available.
+
 Note that grouping cannot extend over multiple directories: it is an error
-to have a `tt(/)' within a group (this only applies for patterns which
-match filenames).
+to have a `tt(/)' within a group (this only applies for patterns used in
+filename generation).  There is one exception:  a group of the form
+tt(LPAR())var(pat)tt(/RPAR()#) appearing as a complete path segment can
+match a sequence of directories.  For example, tt(foo/(a*/)#bar) matches
+tt(foo/bar), tt(foo/any/bar), tt(foo/any/anyother/bar), and so on).
 )
 item(var(x)tt(|)var(y))(
 Matches either var(x) or var(y).
