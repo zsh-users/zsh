@@ -614,11 +614,11 @@ pushline(UNUSED(char **args))
 
     if (n < 0)
 	return 1;
-    zpushnode(bufstack, metafy((char *) zleline, zlell, META_DUP));
+    zpushnode(bufstack, zlelineasstring(zleline, zlell, 0, NULL, NULL, 0));
     while (--n)
 	zpushnode(bufstack, ztrdup(""));
     stackcs = zlecs;
-    *zleline = '\0';
+    *zleline = ZWC('\0');
     zlell = zlecs = 0;
     clearlist = 1;
     return 0;
@@ -629,19 +629,23 @@ int
 pushlineoredit(char **args)
 {
     int ics, ret;
-    unsigned char *s;
+    ZLE_STRING_T s;
     char *hline = hgetline();
 
     if (zmult < 0)
 	return 1;
     if (hline && *hline) {
-	ics = ztrlen(hline);
+	ZLE_STRING_T zhline = stringaszleline((unsigned char *)hline,
+					      &ics, NULL);
+
 	sizeline(ics + zlell + 1);
-	for (s = zleline + zlell; --s >= zleline; *(s + ics) = *s);
-	for (s = zleline; *hline; hline++)
-	    *s++ = *hline == Meta ? *++hline ^ 32 : *hline;
+	/* careful of overlapping copy */
+	for (s = zleline + zlell; --s >= zleline; s[ics] = *s)
+	    ;
+	ZS_memcpy(zleline, zhline, ics);
 	zlell += ics;
 	zlecs += ics;
+	free(zhline);
     }
     ret = pushline(args);
     if (!isfirstln)
@@ -669,18 +673,19 @@ pushinput(char **args)
 int
 zgetline(UNUSED(char **args))
 {
-    char *s = (char *)getlinknode(bufstack);
+    unsigned char *s = (unsigned char *)getlinknode(bufstack);
 
     if (!s) {
 	return 1;
     } else {
 	int cc;
+	ZLE_STRING_T lineadd = stringaszleline(s, &cc, NULL);
 
-	unmetafy(s, &cc);
 	spaceinline(cc);
-	memcpy((char *)zleline + zlecs, s, cc);
+	ZS_memcpy(zleline + zlecs, lineadd, cc);
 	zlecs += cc;
 	free(s);
+	free(lineadd);
 	clearlist = 1;
     }
     return 0;
@@ -940,7 +945,11 @@ doisearch(char **args, int dir)
 	    skip_pos = 1;
 	rpt:
 	    if (!sbptr && previous_search_len) {
-		if (previous_search_len > sibuf - FIRST_SEARCH_CHAR - 2) {
+		if (previous_search_len > sibuf - FIRST_SEARCH_CHAR - 2
+#ifdef ZLE_UNICODE_SUPPORT
+		    - MB_CUR_MAX
+#endif
+		    ) {
 		    ibuf = hrealloc(ibuf, sibuf, sibuf + previous_search_len);
 		    sbuf = ibuf + FIRST_SEARCH_CHAR;
 		    sibuf += previous_search_len;
@@ -983,14 +992,28 @@ doisearch(char **args, int dir)
 		continue;
 	    }
 	    set_isrch_spot(top_spot++, hl, pos, zlecs, sbptr, dir, nomatch);
-	    if (sbptr == sibuf - FIRST_SEARCH_CHAR - 2) {
+	    if (sbptr >= sibuf - FIRST_SEARCH_CHAR - 2
+#ifdef ZLE_UNICODE_SUPPORT
+		- MB_CUR_MAX
+#endif
+		) {
 		ibuf = hrealloc(ibuf, sibuf, sibuf * 2);
 		sbuf = ibuf + FIRST_SEARCH_CHAR;
 		sibuf *= 2;
 	    }
-	    /* TODO: use lastchar_wide if available, convert back to
-	     * multibyte string.  Yuk.  */
+#ifdef ZLE_UNICODE_SUPPORT
+	    /*
+	     * We've supposedly arranged above that lastchar_wide is
+	     * always valid at this point.
+	     */
+	    {
+		int len = wctomb(sbuf + sbptr, lastchar_wide);
+		if (len > 0)
+		    sbptr += len;
+	    }
+#else
 	    sbuf[sbptr++] = lastchar;
+#endif
 	}
 	if (feep)
 	    handlefeep(zlenoargs);
@@ -1160,8 +1183,15 @@ getvisrchstr(void)
 		strcpy(newbuf, sbuf);
 		statusline = sbuf = newbuf;
 	    }
-	    /* TODO: may be wide char, convert back to multibyte string */
+#ifdef ZLE_UNICODE_SUPPORT
+	    {
+		int len = wctomb(sbuf + sptr, lastchar_wide);
+		if (len > 0)
+		    sptr += len;
+	    }
+#else
 	    sbuf[sptr++] = lastchar;
+#endif
 	} else {
 	    feep = 1;
 	}

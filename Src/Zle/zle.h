@@ -44,21 +44,9 @@ typedef wint_t   ZLE_INT_T;
 #define MB_CUR_MAX 6
 #endif
 
-#define ZLENL	L'\n'
-#define ZLENUL	L'\0'
-#define ZLETAB	L'\t'
-#define ZLESPC	L' '
+/* Convert character or string to wide character or string */
+#define ZWC(c)	L ## c
 
-#define DIGIT_1		L'1'
-#define DIGIT_9		L'9'
-#define LETTER_a	L'a'
-#define LETTER_z	L'z'
-#define LETTER_A	L'A'
-#define LETTER_Z	L'Z'
-#define LETTER_y	L'y'
-#define LETTER_n	L'n'
-
-#define ZLENULSTR	L""
 #define ZLEEOF	WEOF
 #define ZS_memcpy wmemcpy
 #define ZS_memmove wmemmove
@@ -73,21 +61,9 @@ typedef unsigned char *ZLE_STRING_T;
 typedef int ZLE_INT_T;
 #define ZLE_CHAR_SIZE	sizeof(unsigned char)
 
-#define ZLENL	'\n'
-#define ZLENUL	'\0'
-#define ZLETAB	'\t'
-#define ZLESPC	' '
+/* Leave character or string as is */
+#define ZWC(c)	c
 
-#define DIGIT_1		'1'
-#define DIGIT_9		'9'
-#define LETTER_a	'a'
-#define LETTER_z	'z'
-#define LETTER_A	'A'
-#define LETTER_Z	'Z'
-#define LETTER_y	'y'
-#define LETTER_n	'n'
-
-#define ZLENULSTR	""
 #define ZLEEOF	EOF
 #define ZS_memcpy memcpy
 #define ZS_memmove memmove

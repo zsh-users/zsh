@@ -237,10 +237,10 @@ set_lbuffer(UNUSED(Param pm), char *x)
     ZLE_STRING_T y;
     int len;
 
-    if (x && *x != ZLENUL)
+    if (x && *x != ZWC('\0'))
 	y = stringaszleline((unsigned char *)x, &len, NULL);
     else
-	y = ZLENULSTR, len = 0;
+	y = ZWC(""), len = 0;
     sizeline(zlell - zlecs + len);
     ZS_memmove(zleline + len, zleline + zlecs, zlell - zlecs);
     ZS_memcpy(zleline, y, len);
@@ -267,10 +267,10 @@ set_rbuffer(UNUSED(Param pm), char *x)
     char *y;
     int len;
 
-    if (x && *x != ZLENUL)
+    if (x && *x != ZWC('\0'))
 	y = stringaszleline((unsigned char *)x, &len, NULL);
     else
-	y = ZLENULSTR, len = 0;
+	y = ZWC(""), len = 0;
     sizeline(zlell = zlecs + len);
     ZS_memcpy(zleline + zlecs, y, len);
     zsfree(x);

@@ -1861,7 +1861,11 @@ msearchpop(int *backp)
 static Cmatch **
 msearch(Cmatch **ptr, int ins, int back, int rep, int *wrapp)
 {
+#ifdef ZLE_UNICODE_SUPPORT
+    char s[MB_CUR_MAX+1];
+#else
     char s[2];
+#endif
     Cmatch **p, *l = NULL, m;
     int x = mcol, y = mline;
     int ex, ey, wrap = 0, owrap = (msearchstate & MS_WRAPPED);
@@ -1869,12 +1873,19 @@ msearch(Cmatch **ptr, int ins, int back, int rep, int *wrapp)
     msearchpush(ptr, back);
 
     if (ins) {
-	/*
-	 * TODO: probably need to convert back to multibyte character
-	 * string?  Who knows...
-	 */
-        s[0] = lastchar;
-        s[1] = '\0';
+#ifdef ZLE_UNICODE_SUPPORT
+	if (lastchar_wide_valid)
+	{
+	    int len = wctomb(s, lastchar_wide);
+	    if (len < 0)
+		len = 0;
+	    s[len] = '\0';
+	} else
+#endif
+	{
+	    s[0] = lastchar;
+	    s[1] = '\0';
+	}
 
         msearchstr = dyncat(msearchstr, s);
     }

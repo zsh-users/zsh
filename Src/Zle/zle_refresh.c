@@ -459,10 +459,10 @@ zrefresh(void)
 	if (t == scs)			/* if cursor is here, remember it */
 	    nvcs = s - (unsigned char *)(nbuf[nvln = ln]);
 
-	if (*t == ZLENL){		/* newline */
+	if (*t == ZWC('\n')){		/* newline */
 	    nbuf[ln][winw + 1] = '\0';	/* text not wrapped */
 	    nextline
-	} else if (*t == ZLETAB) {		/* tab */
+	} else if (*t == ZWC('\t')) {		/* tab */
 	    t0 = (char *)s - nbuf[ln];
 	    if ((t0 | 7) + 1 >= winw) {
 		nbuf[ln][winw + 1] = '\n';	/* text wrapped */

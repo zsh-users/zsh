@@ -163,8 +163,8 @@ usetab(void)
 
     if (keybuf[0] != '\t' || keybuf[1])
 	return 0;
-    for (; s >= zleline && *s != ZLENL; s--)
-	if (*s != ZLETAB && *s != ZLESPC)
+    for (; s >= zleline && *s != ZWC('\n'); s--)
+	if (*s != ZWC('\t') && *s != ZWC(' '))
 	    return 0;
     if (compfunc) {
 	wouldinstab = 1;
@@ -582,6 +582,15 @@ docomplete(int lst)
 	active = 0;
 	return 0;
     }
+
+    /*
+     * TODO: metafy_line() currently tries to metafy in place.
+     * For ZLE_UNICODE_SUPPORT we need to metafy into a separate
+     * string, replacing all use of zleline, zlecs and zlell here
+     * with those values, then restoring at the end.
+     *
+     * The alternative is probably too horrendous to contemplate.
+     */
     metafy_line();
 
     ocs = zlecs;

@@ -469,9 +469,9 @@ visetmark(UNUSED(char **args))
     ZLE_INT_T ch;
 
     ch = getfullchar(0);
-    if (ch < LETTER_a || ch > LETTER_z)
+    if (ch < ZWC('a') || ch > ZWC('z'))
 	return 1;
-    ch -= LETTER_a;
+    ch -= ZWC('a');
     vimarkcs[ch] = zlecs;
     vimarkline[ch] = histline;
     return 0;
@@ -487,9 +487,9 @@ vigotomark(UNUSED(char **args))
     if (ch == LASTFULLCHAR)
 	ch = 26;
     else {
-	if (ch < LETTER_a || ch > LETTER_z)
+	if (ch < ZWC('a') || ch > ZWC('z'))
 	    return 1;
-	ch -= LETTER_a;
+	ch -= ZWC('a');
     }
     if (!vimarkline[ch])
 	return 1;

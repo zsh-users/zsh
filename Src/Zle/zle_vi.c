@@ -200,7 +200,7 @@ getvirange(int wf)
      * the line, or selected a different history line.             */
     if (histline != hist1 || zlell != lastll || memcmp(zleline, lastline, zlell)) {
 	histline = hist1;
-	memcpy(zleline, lastline, zlell = lastll);
+	ZS_memcpy(zleline, lastline, zlell = lastll);
 	zlecs = pos;
 	return -1;
     }
@@ -733,13 +733,13 @@ viputbefore(UNUSED(char **args))
     if(buf->flags & CUTBUFFER_LINE) {
 	zlecs = findbol();
 	spaceinline(buf->len + 1);
-	memcpy((char *)zleline + zlecs, buf->buf, buf->len);
-	zleline[zlecs + buf->len] = '\n';
+	ZS_memcpy(zleline + zlecs, buf->buf, buf->len);
+	zleline[zlecs + buf->len] = ZWC('\n');
 	vifirstnonblank(zlenoargs);
     } else {
 	while (n--) {
 	    spaceinline(buf->len);
-	    memcpy((char *)zleline + zlecs, buf->buf, buf->len);
+	    ZS_memcpy(zleline + zlecs, buf->buf, buf->len);
 	    zlecs += buf->len;
 	}
 	if (zlecs)
@@ -765,15 +765,15 @@ viputafter(UNUSED(char **args))
     if(buf->flags & CUTBUFFER_LINE) {
 	zlecs = findeol();
 	spaceinline(buf->len + 1);
-	zleline[zlecs++] = '\n';
-	memcpy((char *)zleline + zlecs, buf->buf, buf->len);
+	zleline[zlecs++] = ZWC('\n');
+	ZS_memcpy(zleline + zlecs, buf->buf, buf->len);
 	vifirstnonblank(zlenoargs);
     } else {
 	if (zlecs != findeol())
 	    zlecs++;
 	while (n--) {
 	    spaceinline(buf->len);
-	    memcpy((char *)zleline + zlecs, buf->buf, buf->len);
+	    ZS_memcpy(zleline + zlecs, buf->buf, buf->len);
 	    zlecs += buf->len;
 	}
 	if (zlecs)
@@ -798,7 +798,7 @@ vijoin(UNUSED(char **args))
 	zlecs--;
     else {
 	spaceinline(1);
-	zleline[zlecs] = ' ';
+	zleline[zlecs] = ZWC(' ');
     }
     return 0;
 }
@@ -854,15 +854,16 @@ visetbuffer(UNUSED(char **args))
     ZLE_INT_T ch;
 
     if ((zmod.flags & MOD_VIBUF) ||
-	(((ch = getfullchar(0)) < DIGIT_1 || ch > DIGIT_9) &&
-	 (ch < LETTER_a || ch > LETTER_z) &&
-	 (ch < LETTER_A || ch > LETTER_Z)))
+	(((ch = getfullchar(0)) < ZWC('1') || ch > ZWC('9')) &&
+	 (ch < ZWC('a') || ch > ZWC('z')) &&
+	 (ch < ZWC('A') || ch > ZWC('Z'))))
 	return 1;
-    if (ch >= LETTER_A && ch <= LETTER_Z)	/* needed in cut() */
+    if (ch >= ZWC('A') && ch <= ZWC('Z'))	/* needed in cut() */
 	zmod.flags |= MOD_VIAPP;
     else
 	zmod.flags &= ~MOD_VIAPP;
-    zmod.vibuf = tulower(ch) + (idigit(ch) ? - DIGIT_1 + 26 : -LETTER_a);
+    /* TODO tulower, idigit doen't handle wint_t */
+    zmod.vibuf = tulower(ch) + (idigit(ch) ? - ZWC('1') + 26 : -ZWC('a'));
     zmod.flags |= MOD_VIBUF;
     prefixflag = 1;
     return 0;

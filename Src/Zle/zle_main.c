@@ -717,8 +717,6 @@ getbyte(int keytmout)
 
 /*
  * Get a full character rather than just a single byte.
- * (TODO: Strictly we ought to call this getbyte and the above
- * function getbyte.)
  */
 
 /**/
@@ -778,6 +776,8 @@ getrestchar(int inchar)
 
 	/* No timeout here as we really need the character. */
 	inchar = getbyte(0);
+	/* getbyte deliberately resets lastchar_wide_valid */
+	lastchar_wide_valid = 1;
 	if (inchar == EOF)
 	    return lastchar_wide = WEOF;
 	c = inchar;
@@ -833,7 +833,7 @@ zlecore(void)
 	    handleprefixes();
 	    /* for vi mode, make sure the cursor isn't somewhere illegal */
 	    if (invicmdmode() && zlecs > findbol() &&
-		(zlecs == zlell || zleline[zlecs] == ZLENL))
+		(zlecs == zlell || zleline[zlecs] == ZWC('\n')))
 		zlecs--;
 	    if (undoing)
 		handleundo();
@@ -934,7 +934,7 @@ zleread(char **lp, char **rp, int flags, int context)
     histline = curhist;
     undoing = 1;
     zleline = (unsigned char *)zalloc(((linesz = 256) + 2) * ZLE_CHAR_SIZE);
-    *zleline = ZLENUL;
+    *zleline = ZWC('\0');
     virangeflag = lastcmd = done = zlecs = zlell = mark = 0;
     vichgflag = 0;
     viinsbegin = 0;
@@ -993,7 +993,7 @@ zleread(char **lp, char **rp, int flags, int context)
     if (eofsent) {
 	s = NULL;
     } else {
-	zleline[zlell++] = ZLENL;
+	zleline[zlell++] = ZWC('\n');
 	s = zlegetline(NULL, NULL);
     }
     free(zleline);

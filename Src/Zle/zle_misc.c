@@ -294,7 +294,7 @@ acceptline(UNUSED(char **args))
 int
 acceptandhold(UNUSED(char **args))
 {
-    zpushnode(bufstack, metafy((char *)zleline, zlell, META_DUP));
+    zpushnode(bufstack, zlelineasstring(zleline, zlell, 0, NULL, NULL, 0));
     stackcs = zlecs;
     done = 1;
     return 0;
@@ -314,10 +314,10 @@ killline(char **args)
 	return ret;
     }
     while (n--) {
-	if (zleline[zlecs] == '\n')
+	if (zleline[zlecs] == ZWC('\n'))
 	    zlecs++, i++;
 	else
-	    while (zlecs != zlell && zleline[zlecs] != '\n')
+	    while (zlecs != zlell && zleline[zlecs] != ZWC('\n'))
 		zlecs++, i++;
     }
     backkill(i, 0);
@@ -378,8 +378,7 @@ yank(UNUSED(char **args))
     while (n--) {
 	kct = -1;
 	spaceinline(kctbuf->len);
-	memcpy((char *)(zleline + zlecs), (char *)kctbuf->buf,
-	       kctbuf->len * ZLE_CHAR_SIZE);
+	ZS_memcpy(zleline + zlecs, kctbuf->buf, kctbuf->len);
 	zlecs += kctbuf->len;
 	yanke = zlecs;
     }
@@ -433,13 +432,13 @@ yankpop(UNUSED(char **args))
 	 *    was full, we could loop round and round it, otherwise
 	 *    we just stopped when we hit the first empty buffer.
 	 */
-    } while (!buf->buf || *buf->buf == ZLENUL);
+    } while (!buf->buf || *buf->buf == ZWC('\0'));
 
     zlecs = yankb;
     foredel(yanke - yankb);
     cc = buf->len;
     spaceinline(cc);
-    memcpy((char *)(zleline + zlecs), (char *)buf->buf, cc * ZLE_CHAR_SIZE);
+    ZS_memcpy(zleline + zlecs, buf->buf, cc);
     zlecs += cc;
     yanke = zlecs;
     return 0;
@@ -458,32 +457,35 @@ int
 whatcursorposition(UNUSED(char **args))
 {
     char msg[100];
-    char *s = msg;
-    int bol = findbol();
-    int c = STOUC(zleline[zlecs]);
+    char *s = msg, *mbstr;
+    int bol = findbol(), len;
+    ZLE_CHAR_T c = zleline[zlecs];
 
     if (zlecs == zlell)
 	strucpy(&s, "EOF");
     else {
 	strucpy(&s, "Char: ");
 	switch (c) {
-	case ' ':
+	case ZWC(' '):
 	    strucpy(&s, "SPC");
 	    break;
-	case '\t':
+	case ZWC('\t'):
 	    strucpy(&s, "TAB");
 	    break;
-	case '\n':
+	case ZWC('\n'):
 	    strucpy(&s, "LFD");
 	    break;
 	default:
-	    if (imeta(c)) {
-		*s++ = Meta;
-		*s++ = c ^ 32;
-	    } else
-		*s++ = c;
+	    /*
+	     * convert a single character, remembering it may
+	     * turn into a multibyte string or be metafied.
+	     */
+	    mbstr = zlelineasstring(zleline+zlecs, 1, 0, &len, NULL, 1);
+	    strcpy(s, mbstr);
+	    s += len;
 	}
-	sprintf(s, " (0%o, %d, 0x%x)", c, c, c);
+	sprintf(s, " (0%o, %u, 0x%x)", (unsigned int)c,
+		(unsigned int)c, (unsigned int)c);
 	s += strlen(s);
     }
     sprintf(s, "  point %d of %d(%d%%)  column %d", zlecs+1, zlell+1,
@@ -629,7 +631,7 @@ copyprevword(UNUSED(char **args))
 	t0++;
     len = zlecs - t0;
     spaceinline(len);
-    memcpy((char *)&zleline[zlecs], (char *)&zleline[t0], len);
+    ZS_memcpy(zleline + zlecs, zleline + t0, len);
     zlecs += len;
     return 0;
 }
@@ -641,21 +643,24 @@ copyprevshellword(UNUSED(char **args))
     LinkList l;
     LinkNode n;
     int i;
-    char *p = NULL;
+    unsigned char *p = NULL;
 
     if ((l = bufferwords(NULL, NULL, &i)))
         for (n = firstnode(l); n; incnode(n))
             if (!i--) {
-                p = getdata(n);
+                p = (unsigned char *)getdata(n);
                 break;
             }
 
     if (p) {
-	int len = strlen(p);
+	int len;
+	ZLE_STRING_T lineadd = stringaszleline(p, &len, NULL);
 
 	spaceinline(len);
-	memcpy(zleline + zlecs, p, len);
+	ZS_memcpy(zleline + zlecs, lineadd, len);
 	zlecs += len;
+
+	free(lineadd);
     }
     return 0;
 }
@@ -672,7 +677,7 @@ sendbreak(UNUSED(char **args))
 int
 quoteregion(UNUSED(char **args))
 {
-    char *str;
+    ZLE_STRING_T str;
     size_t len;
 
     if (mark > zlell)
@@ -682,12 +687,12 @@ quoteregion(UNUSED(char **args))
 	mark = zlecs;
 	zlecs = tmp;
     }
-    str = (char *)hcalloc(len = mark - zlecs);
-    memcpy(str, (char *)&zleline[zlecs], len);
+    str = (ZLE_STRING_T)hcalloc((len = mark - zlecs) * ZLE_CHAR_SIZE);
+    ZS_memcpy(str, zleline + zlecs, len);
     foredel(len);
     str = makequote(str, &len);
     spaceinline(len);
-    memcpy((char *)&zleline[zlecs], str, len);
+    ZS_memcpy(zleline + zlecs, str, len);
     mark = zlecs;
     zlecs += len;
     return 0;
@@ -697,39 +702,39 @@ quoteregion(UNUSED(char **args))
 int
 quoteline(UNUSED(char **args))
 {
-    char *str;
+    ZLE_STRING_T str;
     size_t len = zlell;
 
-    str = makequote((char *)zleline, &len);
+    str = makequote(zleline, &len);
     sizeline(len);
-    memcpy(zleline, str, len);
+    ZS_memcpy(zleline, str, len);
     zlecs = zlell = len;
     return 0;
 }
 
 /**/
-static char *
-makequote(char *str, size_t *len)
+static ZLE_STRING_T
+makequote(ZLE_STRING_T str, size_t *len)
 {
     int qtct = 0;
-    char *l, *ol;
-    char *end = str + *len;
+    ZLE_STRING_T l, ol;
+    ZLE_STRING_T end = str + *len;
 
     for (l = str; l < end; l++)
-	if (*l == '\'')
+	if (*l == ZWC('\''))
 	    qtct++;
     *len += 2 + qtct*3;
-    l = ol = (char *)zhalloc(*len);
-    *l++ = '\'';
+    l = ol = (char *)zhalloc(*len * ZLE_CHAR_SIZE);
+    *l++ = ZWC('\'');
     for (; str < end; str++)
-	if (*str == '\'') {
-	    *l++ = '\'';
-	    *l++ = '\\';
-	    *l++ = '\'';
-	    *l++ = '\'';
+	if (*str == ZWC('\'')) {
+	    *l++ = ZWC('\'');
+	    *l++ = ZWC('\\');
+	    *l++ = ZWC('\'');
+	    *l++ = ZWC('\'');
 	} else
 	    *l++ = *str;
-    *l++ = '\'';
+    *l++ = ZWC('\'');
     return ol;
 }
 

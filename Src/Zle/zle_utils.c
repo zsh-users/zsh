@@ -94,11 +94,17 @@ zleaddtoline(ZLE_CHAR_T chr)
 /*
  * Input a line in internal zle format, possibly using wide characters,
  * possibly not, together with its length and the cursor position.
- * Output an ordinary string, using multibyte characters instead of wide
- * characters where appropriate and with the contents metafied.
+ * The length must be accurate and includes all characters (no NULL
+ * termination is expected).  The input cursor position is only
+ * significant if outcs is non-NULL.
+ *
+ * Output an ordinary NULL-terminated string, using multibyte characters
+ * instead of wide characters where appropriate and with the contents
+ * metafied.
  *
  * If outll is non-NULL, assign the new length.  If outcs is non-NULL,
- * assign the new character position.
+ * assign the new character position.  This is the conventional string
+ * length, without the NULL byte.
  *
  * If useheap is 1, memory is returned from the heap, else is allocated
  * for later freeing.
@@ -200,12 +206,10 @@ stringaszleline(unsigned char *instr, int *outll, int *outsz)
 
 #ifdef ZLE_UNICODE_SUPPORT
     if (ll) {
-	/* reset shift state by converting null. */
-	/* char cnull = '\0'; */
 	char *inptr = (char *)instr;
 	wchar_t *outptr = outstr;
 
-	/* mbrtowc(outstr, &cnull, 1, &ps); */
+	/* Reset shift state to input complete string */
 	memset(&ps, '\0', sizeof(ps));
 
 	while (ll) {
@@ -268,7 +272,7 @@ spaceinline(int ct)
     for (i = zlell; --i >= zlecs;)
 	zleline[i + ct] = zleline[i];
     zlell += ct;
-    zleline[zlell] = ZLENUL;
+    zleline[zlell] = ZWC('\0');
 
     if (mark > zlecs)
 	mark += ct;
@@ -287,7 +291,7 @@ shiftchars(int to, int cnt)
 	zleline[to] = zleline[to + cnt];
 	to++;
     }
-    zleline[zlell = to] = ZLENUL;
+    zleline[zlell = to] = ZWC('\0');
 }
 
 /**/
@@ -323,7 +327,7 @@ cut(int i, int ct, int dir)
 	if (!(zmod.flags & MOD_VIAPP) || !b->buf) {
 	    free(b->buf);
 	    b->buf = (ZLE_STRING_T)zalloc(ct * ZLE_CHAR_SIZE);
-	    memcpy((char *)b->buf, (char *)(zleline + i), ct * ZLE_CHAR_SIZE);
+	    ZS_memcpy(b->buf, zleline + i, ct);
 	    b->len = ct;
 	    b->flags = vilinerange ? CUTBUFFER_LINE : 0;
 	} else {
@@ -336,9 +340,8 @@ cut(int i, int ct, int dir)
 			(ct + len + !!(b->flags & CUTBUFFER_LINE))
 			* ZLE_CHAR_SIZE);
 	    if (b->flags & CUTBUFFER_LINE)
-		b->buf[len++] = ZLENL;
-	    memcpy((char *)(b->buf + len), (char *)(zleline + i),
-		   ct * ZLE_CHAR_SIZE);
+		b->buf[len++] = ZWC('\n');
+	    ZS_memcpy(b->buf + len, zleline + i, ct);
 	    b->len = len + ct;
 	}
 	return;
@@ -349,14 +352,13 @@ cut(int i, int ct, int dir)
 	for(n=34; n>26; n--)
 	    vibuf[n] = vibuf[n-1];
 	vibuf[26].buf = (ZLE_STRING_T)zalloc(ct * ZLE_CHAR_SIZE);
-	memcpy((char *)vibuf[26].buf, (char *)(zleline + i),
-	       ct * ZLE_CHAR_SIZE);
+	ZS_memcpy(vibuf[26].buf, zleline + i, ct);
 	vibuf[26].len = ct;
 	vibuf[26].flags = vilinerange ? CUTBUFFER_LINE : 0;
     }
     if (!cutbuf.buf) {
 	cutbuf.buf = (ZLE_STRING_T)zalloc(ZLE_CHAR_SIZE);
-	cutbuf.buf[0] = ZLENUL;
+	cutbuf.buf[0] = ZWC('\0');
 	cutbuf.len = cutbuf.flags = 0;
     } else if (!(lastcmd & ZLE_KILL)) {
 	Cutbuffer kptr;
@@ -370,23 +372,21 @@ cut(int i, int ct, int dir)
 	    free(kptr->buf);
 	*kptr = cutbuf;
 	cutbuf.buf = (ZLE_STRING_T)zalloc(ZLE_CHAR_SIZE);
-	cutbuf.buf[0] = ZLENUL;
+	cutbuf.buf[0] = ZWC('\0');
 	cutbuf.len = cutbuf.flags = 0;
     }
     if (dir) {
 	ZLE_STRING_T s = (ZLE_STRING_T)zalloc((cutbuf.len + ct)*ZLE_CHAR_SIZE);
 
-	memcpy(s, (char *) (zleline + i), ct * ZLE_CHAR_SIZE);
-	memcpy((char *)(s + ct), (char *)cutbuf.buf,
-	       cutbuf.len * ZLE_CHAR_SIZE);
+	ZS_memcpy(s, zleline + i, ct);
+	ZS_memcpy(s + ct, cutbuf.buf, cutbuf.len);
 	free(cutbuf.buf);
 	cutbuf.buf = s;
 	cutbuf.len += ct;
     } else {
 	cutbuf.buf = realloc((char *)cutbuf.buf,
 			     (cutbuf.len + ct) * ZLE_CHAR_SIZE);
-	memcpy((char *)(cutbuf.buf + cutbuf.len), (char *) (zleline + i),
-	       ct * ZLE_CHAR_SIZE);
+	ZS_memcpy(cutbuf.buf + cutbuf.len, zleline + i, ct);
 	cutbuf.len += ct;
     }
     if(vilinerange)
@@ -442,7 +442,7 @@ findbol(void)
 {
     int x = zlecs;
 
-    while (x > 0 && zleline[x - 1] != ZLENL)
+    while (x > 0 && zleline[x - 1] != ZWC('\n'))
 	x--;
     return x;
 }
@@ -453,7 +453,7 @@ findeol(void)
 {
     int x = zlecs;
 
-    while (x != zlell && zleline[x] != ZLENL)
+    while (x != zlell && zleline[x] != ZWC('\n'))
 	x++;
     return x;
 }
@@ -528,15 +528,15 @@ getzlequery(int yesno)
     /* get a character from the tty and interpret it */
     c = getfullchar(0);
     if (yesno) {
-	if (c == ZLETAB)
-	    c = LETTER_y;
-	else if (icntrl(c) || c == EOF)
-	    c = LETTER_n;
+	if (c == ZWC('\t'))
+	    c = ZWC('y');
+	else if (icntrl(c) || c == ZLEEOF) /* TODO iswcntrl */
+	    c = ZWC('n');
 	else
-	    c = tulower(c);
+	    c = tulower(c);	/* TODO tulower doesn't handle wint_t */
     }
     /* echo response and return */
-    if (c != ZLENL)
+    if (c != ZWC('\n'))
 	putc(c, shout);		/* TODO: convert to multibyte */
     return c;
 }
@@ -667,7 +667,7 @@ initundo(void)
     curchange->del = curchange->ins = NULL;
     curchange->dell = curchange->insl = 0;
     lastline = zalloc((lastlinesz = linesz) * ZLE_CHAR_SIZE);
-    memcpy(lastline, zleline, (lastll = zlell) * ZLE_CHAR_SIZE);
+    ZS_memcpy(lastline, zleline, (lastll = zlell));
     lastcs = zlecs;
 }
 
@@ -751,8 +751,7 @@ mkundoent(void)
     } else {
 	ch->dell = lastll - pre - suf;
 	ch->del = (ZLE_STRING_T)zalloc(ch->dell * ZLE_CHAR_SIZE);
-	memcpy((char *)ch->del, (char *)(lastline + pre),
-	       ch->dell * ZLE_CHAR_SIZE);
+	ZS_memcpy(ch->del, lastline + pre, ch->dell);
     }
     if(suf + pre == zlell) {
 	ch->ins = NULL;
@@ -760,8 +759,7 @@ mkundoent(void)
     } else {
 	ch->insl = zlell - pre - suf;
 	ch->ins = (ZLE_STRING_T)zalloc(ch->insl * ZLE_CHAR_SIZE);
-	memcpy((char *)ch->ins, (char *)(zleline + pre),
-	       ch->insl * ZLE_CHAR_SIZE);
+	ZS_memcpy(ch->ins, zleline + pre, ch->insl);
     }
     if(nextchanges) {
 	ch->flags = CH_PREV;
@@ -784,7 +782,7 @@ setlastline(void)
 {
     if(lastlinesz != linesz)
 	lastline = realloc(lastline, (lastlinesz = linesz) * ZLE_CHAR_SIZE);
-    memcpy(lastline, zleline, (lastll = zlell) * ZLE_CHAR_SIZE);
+    ZS_memcpy(lastline, zleline, (lastll = zlell));
     lastcs = zlecs;
 }
 
@@ -821,8 +819,7 @@ unapplychange(struct change *ch)
 	foredel(ch->insl);
     if(ch->del) {
 	spaceinline(ch->dell);
-	memcpy((char *)(zleline + zlecs), (char *)ch->del,
-	       ch->dell * ZLE_CHAR_SIZE);
+	ZS_memcpy(zleline + zlecs, ch->del, ch->dell);
 	zlecs += ch->dell;
     }
     zlecs = ch->old_cs;
@@ -862,8 +859,7 @@ applychange(struct change *ch)
 	foredel(ch->dell);
     if(ch->ins) {
 	spaceinline(ch->insl);
-	memcpy((char *)(zleline + zlecs), (char *)ch->ins,
-	       ch->insl * ZLE_CHAR_SIZE);
+	ZS_memcpy(zleline + zlecs, ch->ins, ch->insl);
 	zlecs += ch->insl;
     }
     zlecs = ch->new_cs;
