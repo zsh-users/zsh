@@ -2883,32 +2883,27 @@ mod_export LinkList bufstack;
 /* echo, print, printf, pushln */
 
 #define print_val(VAL) \
-  if (width >= 0) { \
-      if (prec >= 0) \
-	  count += fprintf(fout, start, width, prec, VAL); \
-      else \
-	  count += fprintf(fout, start, width, VAL); \
-  } else { \
-      if (prec >= 0) \
-	  count += fprintf(fout, start, prec, VAL); \
-      else \
-	  count += fprintf(fout, start, VAL); \
-  }
+    if (prec >= 0) \
+	count += fprintf(fout, spec, width, prec, VAL); \
+    else \
+	count += fprintf(fout, spec, width, VAL);
 
 /**/
 int
 bin_print(char *name, char **args, char *ops, int func)
 {
     int flen, width, prec, type, argc, n, nnl = 0, ret = 0;
-    int *len;
-    char *start, *endptr, *c, *fmt = NULL;
-    char **first, nullstr = '\0', save = '\0';
+    int flags[5], *len;
+    char *start, *endptr, *c, *d, *flag, spec[11], *fmt = NULL;
+    char **first, *flagch = "0+- #", save, nullstr = '\0';
     zlong count = 0;
     FILE *fout = stdout;
 
+    mnumber mnumval;
     double doubleval;
     int intval;
-    unsigned int uintval;
+    zlong zlongval;
+    zulong zulongval;
     char *stringval;
 
     if (func == BIN_PRINTF) auxdata = *args++;
@@ -2940,7 +2935,7 @@ bin_print(char *name, char **args, char *ops, int func)
     len = (int *) hcalloc(argc * sizeof(int));
     for(n = 0; n < argc; n++) {
 	/* first \ sequences */
-	if (fmt || !ops['e'] && (ops['R'] || ops['r'] || ops['E']))
+	if (fmt || (!ops['e'] && (ops['R'] || ops['r'] || ops['E'])))
 	    unmetafy(args[n], &len[n]);
 	else
 	    args[n] = getkeystring(args[n], &len[n], ops['b'] ? 2 :
@@ -3098,6 +3093,7 @@ bin_print(char *name, char **args, char *ops, int func)
     }
     
     /* printf style output */
+    *spec='%';
     do {
 	for (c = fmt;c-fmt < flen;c++) {
 	    if (*c != '%') {
@@ -3112,34 +3108,48 @@ bin_print(char *name, char **args, char *ops, int func)
 		++count;
 		continue;
 	    }
-	    type = prec = width = -1;
 
-	    if (strchr("+- #", *c)) c++;
+	    type = prec = -1;
+	    width = 0;
+	    d = spec + 1;
+
+	    /* copy only one of each flag as spec has finite size */
+	    memset(flags, 0, sizeof(flags));
+	    while (flag = strchr(flagch, *c)) {
+	    	if (!flags[flag - flagch]) {
+	    	    flags[flag - flagch] = 1;
+		    *d++ = *c;
+		}
+	    	c++;
+	    }
 
 	    if (*c == '*') {
-		width = (*args) ? strtoul(*args++, NULL, 0) : 0;
+		if (*args) width = (int)mathevali(*args++);
 		c++;
-	    } else {
-		while (idigit(*c)) c++;
+	    } else if (idigit(*c)) {
+		width = strtoul(c, &endptr, 0);
+		c = endptr;
 	    }
+	    *d++ = '*';
 
 	    if (*c == '.') {
 		c++;
 		if (*c == '*') {
-		    prec = (*args) ? strtoul(*args++, NULL, 0) : 0;
+		    prec = (*args) ? (int)mathevali(*args++) : 0;
 		    c++;
-		} else {
-		    while (idigit(*c)) c++;
+		} else if (idigit(*c)) {
+		    prec = strtoul(c, &endptr, 0);
+		    c = endptr;
 		}
+		if (prec >= 0) *d++ = '.', *d++ = '*';
 	    }
 
+	    /* ignore any size modifier */
 	    if (*c == 'l' || *c == 'L' || *c == 'h') c++;
 
-	    if (*c) {
-		save = c[1];
-		c[1] = '\0';
-	    }
-	    switch (*c) {
+	    errflag = 0;
+	    d[1] = '\0';
+	    switch (*d = *c) {
 	    case 'c':
 		if (*args) {
 		    intval = **args;
@@ -3162,7 +3172,7 @@ bin_print(char *name, char **args, char *ops, int func)
 		break;
 	    case 'q':
 		stringval = *args ? bslashquote(*args++, NULL, 0) : &nullstr;
-		*c = 's';
+		*d = 's';
 		print_val(stringval);
 		break;
 	    case 'd':
@@ -3186,50 +3196,65 @@ bin_print(char *name, char **args, char *ops, int func)
 		if (*args) setiparam(*args++, count);
 		break;
 	    default:
-		zerrnam(name, "%s: invalid directive", start, 0);
+	        if (*c) {
+		    save = c[1];
+	            c[1] = '\0';
+		}
+		zwarnnam(name, "%s: invalid directive", start, 0);
 		ret = 1;
+		if (*c) c[1] = save;
 	    }
 
 	    if (type > 0) {
 		if (*args && (**args == '\'' || **args == '"' )) {
 		    if (type == 2) {
-			doubleval = (*args)[1];
+			doubleval = (unsigned char)(*args)[1];
 			print_val(doubleval);
 		    } else {
-			intval = (*args)[1];
+			intval = (unsigned char)(*args)[1];
 			print_val(intval);
 		    }
 		    args++;
 		} else {
 		    switch (type) {
 		    case 1:
-			intval = (*args) ? strtol(*args, &endptr, 0) : 0;
-			print_val(intval);
+#ifdef ZSH_64_BIT_TYPE
+ 		    	*d++ = 'l';
+#endif
+		    	*d++ = 'l', *d++ = *c, *d = '\0';
+			zlongval = (*args) ? mathevali(*args++) : 0;
+			if (errflag) {
+			    zlongval = 0;
+			    errflag = 0;
+			}
+			print_val(zlongval)
 			break;
 		    case 2:
-			doubleval = (*args) ? strtod(*args, &endptr) : 0;
-			print_val(doubleval);
+			if (*args) {
+			    mnumval = matheval(*args++);
+			    doubleval = (mnumval.type & MN_FLOAT) ?
+			    	mnumval.u.d : (double)mnumval.u.l;
+			} else doubleval = 0;
+			if (errflag) {
+			    doubleval = 0;
+			    errflag = 0;
+			}
+			print_val(doubleval)
 			break;
 		    case 3:
-			uintval = (*args) ? strtoul(*args, &endptr, 0) : 0;
-			print_val(uintval);
-		    }
-		    if (*args) {
-			if (errno == ERANGE) {
-			    zerrnam(name, "`%s' arithmetic overflow", *args, 0);
-			    ret = 1;
-			} else if (**args && endptr == *args) {
-			    zerrnam(name, "`%s' expected numeric value", endptr, 0);
-			    ret = 1;
-			} else if (*endptr) {
-			    zerrnam(name, "`%s' not completely converted", *args, 0);
-			    ret = 1;
+#ifdef ZSH_64_BIT_TYPE
+ 		    	*d++ = 'l';
+#endif
+		    	*d++ = 'l', *d++ = *c, *d = '\0';
+			zulongval = (*args) ? mathevali(*args++) : 0;
+			if (errflag) {
+			    doubleval = 0;
+			    errflag = 0;
 			}
-			args++;
+			print_val(zulongval)
 		    }
 		}
 	    }
-	    if (*c) c[1] = save;
 	}
 
     /* if there are remaining args, reuse format string */

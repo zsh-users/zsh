@@ -1,3 +1,8 @@
+2001-10-15  Oliver Kiddle  <opk@zsh.org>
+
+	* 16042: Src/builtin.c, Doc/Zsh/builtins.yo: use arithmetic
+	evaluation for numeric arguments to printf
+
 2001-10-15  Sven Wischnowsky  <wischnow@zsh.org>
 
 	* Bart: 16038 and 16041: Src/cond.c, Src/loop.c: for caching of
@@ -35,7 +40,7 @@
 
 2001-10-10  Oliver Kiddle  <opk@zsh.org>
 
-	* 16xxx: acconfig.h, zshconfig.ac, Etc/MACHINES,
+	* 16018: acconfig.h, zshconfig.ac, Etc/MACHINES,
 	Test/C02cond.ztst: allow dynamic loading to work on MacOS X
 	if the dlcompat library is installed.
 
