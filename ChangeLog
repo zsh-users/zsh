@@ -1,5 +1,7 @@
 2001-08-28  Peter Stephenson  <pws@pwstephenson.fsnet.co.uk>
 
+	* 15722: Completion/Unix/Command/_sh: handle zsh options.
+
 	* 15720: Functions/Misc/zmv: use ${(e)...} as suggested by
 	Bart; fix problem with option arguments with special characters;
 	more consistency with shifting arguments; fix verbose mode
