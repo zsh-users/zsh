@@ -233,7 +233,8 @@ else
     print "Completion directories $compdir/*
 are already in your \$fpath, good."
   else
-    print "Completion directory $compdir is already in your \$fpath, good."
+    print "Completion directory $compdir
+is already in your \$fpath, good."
   fi
   if [[ -n $fpath_line ]]; then
     print "I shall keep the existing \$fpath=( ... ) assignment."
@@ -1241,6 +1242,7 @@ this case.  Do you want this?
 
 __ci_do_selection() {
   local key listc menu select amenu elt
+  integer num
 
   __ci_get_this_style list-colors listc
   __ci_get_this_style menu menu
@@ -1307,17 +1309,18 @@ number of completions.  Please enter:
 - 0 or 1, to turn this feature on unconditionally
 - a higher number to turn this feature on when there are that many
   completions
-- an \`l' for \`long' to turn it on for completions which don't fit on the
-  screen
+- an \`l' for \`long' to turn it on for listings which don't fit on the
+  screen.
 - an \`ll' for \`long list' to turn it on for completions which don't fit
   on the screen, even for commands which only do listing of completions.
+  This may be combined with a number which will be used in ordinary selection.
 - a negative number to turn this feature off
 - an empty line to leave the setting the way it is.
 "
          while true; do
            vared -eh -p 'value> ' select
-	   [[ -z $select || $select = ((-|)<->|l#) ]] && break;
-	   print "Type a number, l, ll, or an empty line." >&2
+	   [[ -z $select || $select = ((-|)<->|l|<->#ll<->#) ]] && break;
+	   print "Type a number, l, ll, ll<num>, or an empty line." >&2
 	 done
 	 amenu=(${=menu})
 	 elt=${amenu[(i)*select*]}
@@ -1330,15 +1333,20 @@ number of completions.  Please enter:
 	        fi
 		menu="$amenu"
 		;;
-	   l#) if [[ $select = l ]]; then
-                 select=long
+	   *ll*) num=${(RS)select##ll}
+	         select="select=long-list"
+		 [[ -n $num ]] && select="$select select=$num"
+		 if [[ -n $elt ]]; then
+		   amenu[$elt]=$select
+		 else
+		   amenu=($amenu $select)
+		 fi
+		 menu="$amenu"
+		 ;;
+	   l#) if [[ -n $elt ]]; then
+                 amenu[$elt]="select=long"
                else
-                 select=long-list
-               fi
-               if [[ -n $elt ]]; then
-                 amenu[$elt]="select=$select"
-               else
-                 amenu=($amenu "select=$select")
+                 amenu=($amenu "select=long")
                fi
 	       menu="$amenu"
                ;;

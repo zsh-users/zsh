@@ -1,3 +1,8 @@
+2000-05-22  Peter Stephenson  <pws@cambridgesiliconradio.com>
+
+	* 11516: Completion/Core/compinstall: select=long-list can
+	be combined with select=some number.
+
 2000-05-22  Bart Schaefer  <schaefer@zsh.org>
 
 	* 11515: Completion/Base/_arguments: Fix infinite loop.
