@@ -391,6 +391,17 @@ if (( ! $+_fs_any )); then
       'sunit[specify stripe unit]:size:'
       'swidth[specify stripe width]:size:'
     )
+    _fs_reiserfs=(
+    'conv[mount 3.5 fs using 3.6 format for new objects]'
+    'hash[choose hash type]:hash function:(rupasov tea r5 detect)'
+    '(no_unhashed_relocation)hashed_relocation[tune the block allocator]'
+    'noborder[disable border allocator algorithm]'
+    'nolog[disable journalling]'
+    'notail[disable packing of files into the tree]'
+    '(hashed_relocation)no_unhashed_relocation[tune the block allocator]'
+    'replayonly[replay but do not mount]'
+    'resize[assume the device has this many blocks]:number of blocks:'
+    )
     ;;
   freebsd*)
     _fs_any=(
@@ -506,7 +517,7 @@ if [[ "$service" = mount ]]; then
     )
     fss=( minix ext ext2 xiafs hpfs msdos umsdos vfat proc nfs iso9660
           smbfs ncpfs affs ufs romfs sysv adfs autofs coda devpts efs
-          hfs ntfs qnx4 smbfs udf ext3 xfs )
+          hfs ntfs qnx4 smbfs udf ext3 xfs reiserfs )
     [[ -r /proc/filesystems ]] &&
         fss=( ${$(</proc/filesystems)#nodev} )
     ;;
