@@ -109,7 +109,8 @@ while true; do
 	PREFIX="${cpre}${pre}"
 	SUFFIX="$suf"
 
-	if [[ $#imm -ne 0 && $#matches -eq 1 ]]; then
+	if [[ $#imm -ne 0 && $#matches -eq 1 ]] ||
+           zstyle -t ":completion:${curcontext}:" expand suffix; then
 	  compadd "$group[@]" "$expl[@]" "$opts[@]" \
                   -M "r:|${sep}=* r:|=* $match" - "$pref$matches[1]"
         else
@@ -142,7 +143,8 @@ while true; do
 	SUFFIX="$suf"
       fi
 
-      if [[ -n "$menu" || -z "$compstate[insert]" ]]; then
+      if ! zstyle -t ":completion:${curcontext}:" expand suffix ||
+         [[ -n "$menu" || -z "$compstate[insert]" ]]; then
 
         # With menucompletion we add only the ambiguous component with
         # the prefix collected and a spearator for the matches that
@@ -164,22 +166,6 @@ while true; do
                     -M "r:|${sep}=* r:|=* $match" - "$i"
           fi
         done
-
-# The old code and its comment:
-
-        # With menucompletion we just add matches for the matching
-        # components with the prefix we collected and the rest from the
-        # line as a suffix.
-
-#        tmp2="$pre$suf"
-#        if [[ "$tmp2" = *${sep}* ]]; then
-#          compadd "$group[@]" "$expl[@]" "$sopts[@]" \
-#                  -p "$pref" -s "${sep}${tmp2#*${sep}}" \
-#                  -M "r:|${sep}=* r:|=* $match" - "$tmp1[@]"
-#        else
-#          compadd "$group[@]" "$expl[@]" -p "$pref" "$sopts[@]" \
-#                  -M "r:|${sep}=* r:|=* $match" - "$tmp1[@]"
-#        fi
       else
         # With normal completion we add all matches one-by-one with
 	# the unmatched part as a suffix. This will insert the longest
@@ -202,7 +188,8 @@ while true; do
       # case we insert the expanded prefix we collected if it differs
       # from the original string from the line.
 
-      [[ "$orig" = "$pref$pre$suf" ]] && return 1
+      { ! zstyle -t ":completion:${curcontext}:" expand prefix ||
+        [[ "$orig" = "$pref$pre$suf" ]] } && return 1
 
       PREFIX="${cpre}${pre}"
       SUFFIX="$suf"

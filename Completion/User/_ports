@@ -2,7 +2,7 @@
 
 local expl ports
 
-if ! zstyle -a ":completion:${curcontext}:ports" ports ports; then
+if ! zstyle -a ":completion:${curcontext}:" ports ports; then
   (( $+_cache_ports )) ||
       : ${(A)_cache_ports:=${${(M)${${(f)"$(</etc/services)"}:#\#*}#*/tcp}%%[ 	]*}}
 

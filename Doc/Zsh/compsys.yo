@@ -773,10 +773,11 @@ completed. If this is not set by the user domain names mentioned in
 tt(/etc/resolv.conf) will be used.
 )
 item(tt(expand))(
-Like tt(cursor), this style is used with the tt(paths) tag. If its
-value contains the string tt(prefix), the partially typed path from
-the line will be expanded as far as possible even if trailing pathname
-components can not be completed. If it contains the string tt(suffix)
+This style is used when completing strings consisting of multiple
+parts, such as path names. If its
+value contains the string tt(prefix), the partially typed word from
+the line will be expanded as far as possible even if trailing parts
+can not be completed. If it contains the string tt(suffix)
 and normal (non-menu-) completion is used, matching names for
 components after the first ambiguous one will be added, too. This
 means that the resulting string is the longest unambiguous string
