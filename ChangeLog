@@ -1,3 +1,8 @@
+2003-02-19  Oliver Kiddle  <opk@zsh.org>
+
+	* 18262: Completion/Base/Utility/_multi_parts: fix bug where only
+	the first match was added with expand style set to suffix
+
 2003-02-18  Oliver Kiddle  <opk@zsh.org>
 
 	* 18257: Completion/Unix/Command/_xmlsoft,
