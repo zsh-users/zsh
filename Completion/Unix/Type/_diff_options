@@ -90,7 +90,7 @@ if _pick_variant -c $cmd gnu=GNU unix -v; then
     '(-N --new-file)'{-N,--new-file}'[treat absent files as empty]' \
     '(-P --unidirectional-new-file)'{-P,--unidirectional-new-file}'[treat absent first files as empty]' \
     '(-s --report-identical-files)'{-s,--report-identical-files}'[report when two files are the same]' \
-    '(-x --exclude)'{-x+,--exclude=}'[exclude files matching pattern]:exclusion pattern' \
+    \*{-x+,--exclude=}'[exclude files matching pattern]:exclusion pattern' \
     '(-X --exclude-from)'{-X+,--exclude-from=}'[exclude files matching pattern in file]:exclude file:_files' \
     '(-S --starting-file)'{-S+,--starting-file=}'[set first file in comparison]:start with file:_files' \
     '(--to-file)--from-file=[compare specified file to all operands]:from file:_files' \
