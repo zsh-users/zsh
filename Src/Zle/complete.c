@@ -1133,14 +1133,21 @@ static void
 compunsetfn(Param pm, int exp)
 {
     if (exp) {
-	if (PM_TYPE(pm->flags) == PM_SCALAR) {
-	    zsfree(*((char **) pm->u.data));
-	    *((char **) pm->u.data) = ztrdup("");
-	} else if (PM_TYPE(pm->flags) == PM_ARRAY) {
-	    freearray(*((char ***) pm->u.data));
-	    *((char ***) pm->u.data) = zcalloc(sizeof(char *));
+	if (pm->u.data) {
+	    if (PM_TYPE(pm->flags) == PM_SCALAR) {
+		zsfree(*((char **) pm->u.data));
+		*((char **) pm->u.data) = ztrdup("");
+	    } else if (PM_TYPE(pm->flags) == PM_ARRAY) {
+		freearray(*((char ***) pm->u.data));
+		*((char ***) pm->u.data) = zcalloc(sizeof(char *));
+	    } else if (PM_TYPE(pm->flags) == PM_HASHED) {
+		deleteparamtable(pm->u.hash);
+		pm->u.hash = NULL;
+	    }
 	}
-	pm->flags |= PM_UNSET;
+    } else if (PM_TYPE(pm->flags) == PM_HASHED) {
+	deletehashtable(pm->u.hash);
+	pm->u.hash = NULL;
     }
 }
 

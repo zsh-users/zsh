@@ -179,12 +179,15 @@ static struct globdata curglobdata;
     memcpy(&(N), &curglobdata, sizeof(struct globdata)); \
     (N).gd_pathpos = pathpos; \
     (N).gd_pathbuf = pathbuf; \
+    (N).gd_pathbufsz = 0; \
+    (N).gd_pathbuf = NULL; \
     (N).gd_glob_pre = glob_pre; \
     (N).gd_glob_suf = glob_suf; \
   } while (0)
 
 #define restore_globstate(N) \
   do { \
+    zfree(pathbuf, pathbufsz); \
     memcpy(&curglobdata, &(N), sizeof(struct globdata)); \
     pathpos = (N).gd_pathpos; \
     pathbuf = (N).gd_pathbuf; \

@@ -58,7 +58,7 @@ createspecialhash(char *name, GetNodeFunc get, ScanTabFunc scan)
     pm->gets.hfn = hashgetfn;
     pm->sets.hfn = hashsetfn;
     pm->unsetfn = stdunsetfn;
-    pm->u.hash = ht = newhashtable(7, name, NULL);
+    pm->u.hash = ht = newhashtable(0, name, NULL);
 
     ht->hash        = hasher;
     ht->emptytable  = (TableFunc) shempty;

@@ -689,8 +689,8 @@ struct m_hdr {
  *         back; note that this has to be less than M_FREE
  * M_ALLOC is the number of extra bytes to request from the system */
 
-#define M_FREE  65536
-#define M_KEEP  32768
+#define M_FREE  32768
+#define M_KEEP  16384
 #define M_ALLOC M_KEEP
 
 /* a pointer to the last free block, a pointer to the free list (the blocks
@@ -737,7 +737,7 @@ static char *m_high, *m_low;
 #define M_BSLEN(S) (((S) - sizeof(struct m_shdr *) -  \
 		     sizeof(zlong) - sizeof(struct m_hdr *)) / M_SNUM)
 #endif
-#define M_NSMALL   13
+#define M_NSMALL    8
 
 static struct m_hdr *m_small[M_NSMALL];
 
