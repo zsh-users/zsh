@@ -536,7 +536,7 @@ ptywritestr(Ptycmd cmd, char *s, int len)
 
     for (; !errflag && !breaks && !retflag && !contflag && len;
 	 len -= written, s += written) {
-	if ((written = write(cmd->fd, s, len)) < 0 && cmd->nblock &&
+	if ((written = ztrapwrite(cmd->fd, s, len)) < 0 && cmd->nblock &&
 #ifdef EWOULDBLOCK
 	    errno == EWOULDBLOCK
 #else
@@ -578,7 +578,7 @@ ptywrite(Ptycmd cmd, char **args, int nonl)
 	int n;
 	char buf[BUFSIZ];
 
-	while ((n = read(0, buf, BUFSIZ)) > 0)
+	while ((n = ztrapread(0, buf, BUFSIZ)) > 0)
 	    if (ptywritestr(cmd, buf, n))
 		return 1;
     }

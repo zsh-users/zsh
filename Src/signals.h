@@ -56,8 +56,8 @@
 # define sigismember(s,n)  ((*(s) & (1 << ((n) - 1))) != 0)
 #endif   /* ifndef POSIX_SIGNALS */
  
-#define child_block()      signal_block(signal_mask(SIGCHLD))
-#define child_unblock()    signal_unblock(signal_mask(SIGCHLD))
+#define child_block()      signal_block(sigchld_mask)
+#define child_unblock()    signal_unblock(sigchld_mask)
 #define child_suspend(S)   signal_suspend(SIGCHLD, S)
 
 /* ignore a signal */
@@ -92,3 +92,34 @@
 	} \
     } \
 } while (0)
+
+
+/* Make some signal functions faster. */
+
+#ifdef POSIX_SIGNALS
+#define signal_block(S) \
+    ((dummy_sigset1 = (S)), \
+     sigprocmask(SIG_BLOCK, &dummy_sigset1, &dummy_sigset2), \
+     dummy_sigset2)
+#else
+# ifdef BSD_SIGNALS
+#define signal_block(S) sigblock(S)
+# else
+extern sigset_t signal_block _((sigset_t));
+# endif  /* BSD_SIGNALS   */
+#endif   /* POSIX_SIGNALS */
+
+#ifdef POSIX_SIGNALS
+#define signal_unblock(S) \
+    ((dummy_sigset1 = (S)), \
+     sigprocmask(SIG_UNBLOCK, &dummy_sigset1, &dummy_sigset2), \
+     dummy_sigset2)
+#else
+extern sigset_t signal_unblock _((sigset_t));
+#endif   /* POSIX_SIGNALS */
+
+#define RUNTRAPS() do { if (trapqused) doqueuedtraps(); } while (0)
+#define ALLOWTRAPS do { RUNTRAPS(); trapsallowed++; do
+#define DISALLOWTRAPS while (0); RUNTRAPS(); trapsallowed--; } while (0)
+#define ALLOWTRAPS_RETURN(V) \
+    do { RUNTRAPS(); trapsallowed--; return (V); } while (0)

@@ -170,7 +170,7 @@ loop(int toplevel, int justonce)
 	}
 	if (isset(SINGLECOMMAND) && toplevel) {
 	    if (sigtrapped[SIGEXIT])
-		dotrap(SIGEXIT);
+		dotrap(SIGEXIT, 1);
 	    exit(lastval);
 	}
 	if (justonce)
@@ -1107,6 +1107,7 @@ fallback_zleread(char *lp, char *rp, int ha)
     pptbuf = unmetafy(promptexpand(lp, 0, NULL, NULL), &pptlen);
     write(2, (WRITE_ARG_2_T)pptbuf, pptlen);
     free(pptbuf);
+
     return (unsigned char *)shingetline();
 }
 

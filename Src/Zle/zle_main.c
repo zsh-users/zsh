@@ -313,11 +313,17 @@ static int
 breakread(int fd, char *buf, int n)
 {
     fd_set f;
+    int ret;
 
     FD_ZERO(&f);
     FD_SET(fd, &f);
-    return (select(fd + 1, (SELECT_ARG_2_T) & f, NULL, NULL, NULL) == -1 ?
-	    EOF : read(fd, buf, n));
+
+    ALLOWTRAPS {
+	ret = (select(fd + 1, (SELECT_ARG_2_T) & f, NULL, NULL, NULL) == -1 ?
+	       EOF : read(fd, buf, n));
+    } DISALLOWTRAPS;
+
+    return ret;
 }
 
 # define read    breakread
@@ -388,7 +394,7 @@ getkey(int keytmout)
 #  else
 	    ioctl(SHTTY, TCSETA, &ti.tio);
 #  endif
-	    r = read(SHTTY, &cc, 1);
+	    r = ztrapread(SHTTY, &cc, 1);
 #  ifdef HAVE_TERMIOS_H
 	    tcsetattr(SHTTY, TCSANOW, &shttyinfo.tio);
 #  else
@@ -398,7 +404,10 @@ getkey(int keytmout)
 # endif
 #endif
 	}
-	while ((r = read(SHTTY, &cc, 1)) != 1) {
+	for (;;) {
+	    r = ztrapread(SHTTY, &cc, 1);
+	    if (r == 1)
+		break;
 	    if (r == 0) {
 		/* The test for IGNOREEOF was added to make zsh ignore ^Ds
 		   that were typed while commands are running.  Unfortuantely
@@ -1083,7 +1092,7 @@ zleaftertrap(Hookdef dummy, void *dat)
 static struct builtin bintab[] = {
     BUILTIN("bindkey", 0, bin_bindkey, 0, -1, 0, "evaMldDANmrsLR", NULL),
     BUILTIN("vared",   0, bin_vared,   1,  7, 0, NULL,             NULL),
-    BUILTIN("zle",     0, bin_zle,     0, -1, 0, "lDANCLmMgGcRaU", NULL),
+    BUILTIN("zle",     0, bin_zle,     0, -1, 0, "lDANCLmMgGcRaUI", NULL),
 };
 
 /* The order of the entries in this table has to match the *HOOK

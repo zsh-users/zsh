@@ -497,7 +497,7 @@ handler(int sig)
  
     case SIGHUP:
         if (sigtrapped[SIGHUP])
-            dotrap(SIGHUP);
+            dotrap(SIGHUP, 0);
         else {
             stopmsg = 1;
             zexit(SIGHUP, 1);
@@ -506,7 +506,7 @@ handler(int sig)
  
     case SIGINT:
         if (sigtrapped[SIGINT])
-            dotrap(SIGINT);
+            dotrap(SIGINT, 0);
         else {
 	    if ((isset(PRIVILEGED) || isset(RESTRICTED)) &&
 		isset(INTERACTIVE) && noerrexit < 0)
@@ -523,14 +523,14 @@ handler(int sig)
     case SIGWINCH:
         adjustwinsize(1);  /* check window size and adjust */
 	if (sigtrapped[SIGWINCH])
-	    dotrap(SIGWINCH);
+	    dotrap(SIGWINCH, 0);
         break;
 #endif
 
     case SIGALRM:
         if (sigtrapped[SIGALRM]) {
 	    int tmout;
-            dotrap(SIGALRM);
+            dotrap(SIGALRM, 0);
 
 	    if ((tmout = getiparam("TMOUT")))
 		alarm(tmout);           /* reset the alarm */
@@ -549,7 +549,7 @@ handler(int sig)
         break;
  
     default:
-        dotrap(sig);
+        dotrap(sig, 0);
         break;
     }   /* end of switch(sig) */
  
@@ -907,7 +907,9 @@ dotrapargs(int sig, int *sigtr, void *sigfn)
      * function will test for this, but this way we keep status flags *
      * intact without working too hard.  Special cases (e.g. calling  *
      * a trap for SIGINT after the error flag was set) are handled    *
-     * by the calling code.  (PWS 1995/06/08).			      */
+     * by the calling code.  (PWS 1995/06/08).			      *
+     *                                                                *
+     * This test is now replicated in dotrap().                       */
     if ((*sigtr & ZSIG_IGNORED) || !sigfn || errflag)
         return;
 
@@ -953,15 +955,67 @@ dotrapargs(int sig, int *sigtr, void *sigfn)
 	    breaks = loops;
     }
 
+    /*
+     * If zle was running while the trap was executed, see if we
+     * need to restore the display.
+     */
+    if (zleactive && resetneeded)
+	zrefresh();
+
     if (*sigtr != ZSIG_IGNORED)
 	*sigtr &= ~ZSIG_IGNORED;
 }
 
-/* Standard call to execute a trap for a given signal */
+/* != 0 if trap handlers can be called immediately */
+
+/**/
+mod_export int trapsallowed;
+
+/* Queued traps and allocated length of queue. */
+
+static int *trapqueue, trapqlen;
+
+/* Number of used slots in trap queue. */
+
+/**/
+mod_export int trapqused;
+
+/* Standard call to execute a trap for a given signal.  The second
+ * argument should be zero if we may need to put the trap on the queue
+ * and 1 if it may be called immediately.  It should never be set to
+ * anything less than zero, that's used internally. */
 
 /**/
 void
-dotrap(int sig)
+dotrap(int sig, int now)
 {
-    dotrapargs(sig, sigtrapped+sig, sigfuncs[sig]);
+    /* Copied from dotrapargs(). */
+    if ((sigtrapped[sig] & ZSIG_IGNORED) || !sigfuncs[sig] || errflag)
+	return;
+
+    if (now || trapsallowed) {
+	if (now < 0)
+	    RUNTRAPS();
+	dotrapargs(sig, sigtrapped+sig, sigfuncs[sig]);
+    } else {
+	if (trapqlen == trapqused)
+	    trapqueue = (int *) zrealloc(trapqueue, (trapqlen += 32));
+	trapqueue[trapqused++] = sig;
+    }
+}
+
+/**/
+mod_export void
+doqueuedtraps(void)
+{
+    int sig, ota = trapsallowed;
+
+    trapsallowed = 1;
+    while (trapqused) {
+	trapqused--;
+	sig = *trapqueue;
+	memcpy(trapqueue, trapqueue + 1, trapqused * sizeof(int));
+	dotrap(sig, -1);
+    }
+    trapsallowed = ota;
 }

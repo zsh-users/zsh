@@ -801,7 +801,7 @@ zfgetline(char *ln, int lnsize, int tmout)
 		cmdbuf[0] = (char)IAC;
 		cmdbuf[1] = (char)DONT;
 		cmdbuf[2] = ch;
-		write(zfsess->cfd, cmdbuf, 3);
+		ztrapwrite(zfsess->cfd, cmdbuf, 3);
 		continue;
 
 	    case DO:
@@ -811,7 +811,7 @@ zfgetline(char *ln, int lnsize, int tmout)
 		cmdbuf[0] = (char)IAC;
 		cmdbuf[1] = (char)WONT;
 		cmdbuf[2] = ch;
-		write(zfsess->cfd, cmdbuf, 3);
+		ztrapwrite(zfsess->cfd, cmdbuf, 3);
 		continue;
 
 	    case EOF:
@@ -996,7 +996,7 @@ zfsendcmd(char *cmd)
 	return 6;
     }
     zfalarm(tmout);
-    ret = write(zfsess->cfd, cmd, strlen(cmd));
+    ret = ztrapwrite(zfsess->cfd, cmd, strlen(cmd));
     alarm(0);
 
     if (ret <= 0) {
@@ -1470,7 +1470,7 @@ zfread(int fd, char *bf, off_t sz, int tmout)
     int ret;
 
     if (!tmout)
-	return read(fd, bf, sz);
+	return ztrapread(fd, bf, sz);
 
     if (setjmp(zfalrmbuf)) {
 	alarm(0);
@@ -1479,7 +1479,7 @@ zfread(int fd, char *bf, off_t sz, int tmout)
     }
     zfalarm(tmout);
 
-    ret = read(fd, bf, sz);
+    ret = ztrapread(fd, bf, sz);
 
     /* we don't bother turning off the whole alarm mechanism here */
     alarm(0);
@@ -1495,7 +1495,7 @@ zfwrite(int fd, char *bf, off_t sz, int tmout)
     int ret;
 
     if (!tmout)
-	return write(fd, bf, sz);
+	return ztrapwrite(fd, bf, sz);
 
     if (setjmp(zfalrmbuf)) {
 	alarm(0);
@@ -1504,7 +1504,7 @@ zfwrite(int fd, char *bf, off_t sz, int tmout)
     }
     zfalarm(tmout);
 
-    ret = write(fd, bf, sz);
+    ret = ztrapwrite(fd, bf, sz);
 
     /* we don't bother turning off the whole alarm mechanism here */
     alarm(0);
@@ -2846,7 +2846,7 @@ zfclose(int leaveparams)
 	if (!zfnopen) {
 	    /* Write the final status in case this is a subshell */
 	    lseek(zfstatfd, zfsessno*sizeof(int), 0);
-	    write(zfstatfd, zfstatusp+zfsessno, sizeof(int));
+	    ztrapwrite(zfstatfd, zfstatusp+zfsessno, sizeof(int));
 
 	    close(zfstatfd);
 	    zfstatfd = -1;
@@ -3123,7 +3123,7 @@ bin_zftp(char *name, char **args, char *ops, int func)
 	/* Get the status in case it was set by a forked process */
 	int oldstatus = zfstatusp[zfsessno];
 	lseek(zfstatfd, 0, 0);
-	read(zfstatfd, zfstatusp, sizeof(int)*zfsesscnt);
+	ztrapread(zfstatfd, zfstatusp, sizeof(int)*zfsesscnt);
 	if (zfsess->cfd != -1 && (zfstatusp[zfsessno] & ZFST_CLOS)) {
 	    /* got closed in subshell without us knowing */
 	    zcfinish = 2;
@@ -3212,7 +3212,7 @@ bin_zftp(char *name, char **args, char *ops, int func)
 	 * but only for the active session.
 	 */
 	lseek(zfstatfd, zfsessno*sizeof(int), 0);
-	write(zfstatfd, zfstatusp+zfsessno, sizeof(int));
+	ztrapwrite(zfstatfd, zfstatusp+zfsessno, sizeof(int));
     }
     return ret;
 }

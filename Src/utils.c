@@ -1418,12 +1418,38 @@ checkrmall(char *s)
 }
 
 /**/
+mod_export int
+ztrapread(int fd, char *buf, int len)
+{
+    int ret;
+
+    ALLOWTRAPS {
+	ret = read(fd, buf, len);
+    } DISALLOWTRAPS;
+
+    return ret;
+}
+
+/**/
+mod_export int
+ztrapwrite(int fd, char *buf, int len)
+{
+    int ret;
+
+    ALLOWTRAPS {
+	ret = write(fd, buf, len);
+    } DISALLOWTRAPS;
+
+    return ret;
+}
+
+/**/
 int
 read1char(void)
 {
     char c;
 
-    while (read(SHTTY, &c, 1) != 1) {
+    while (ztrapread(SHTTY, &c, 1) != 1) {
 	if (errno != EINTR || errflag || retflag || breaks || contflag)
 	    return -1;
     }
@@ -1440,7 +1466,7 @@ noquery(int purge)
     ioctl(SHTTY, FIONREAD, (char *)&val);
     if (purge) {
 	for (; val; val--)
-	    read(SHTTY, &c, 1);
+	    ztrapread(SHTTY, &c, 1);
     }
 #endif
 

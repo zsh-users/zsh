@@ -3218,7 +3218,7 @@ zexit(int val, int from_signal)
 	    checkjobs();   /* check if any jobs are running/stopped */
 	if (stopmsg) {
 	    stopmsg = 2;
-	    LASTALLOC_RETURN;
+	    return;
 	}
     }
     if (in_exit++ && from_signal)
@@ -3240,7 +3240,7 @@ zexit(int val, int from_signal)
 	}
     }
     if (sigtrapped[SIGEXIT])
-	dotrap(SIGEXIT);
+	dotrap(SIGEXIT, 1);
     runhookdef(EXITHOOK, NULL);
     if (mypid != getpid())
 	_exit(val);
@@ -3486,7 +3486,7 @@ bin_read(char *name, char **args, char *ops, int func)
 		    *bptr = readchar;
 		    val = 1;
 		    readchar = -1;
-		} else if ((val = read(readfd, bptr, nchars)) <= 0)
+		} else if ((val = ztrapread(readfd, bptr, nchars)) <= 0)
 		    break;
 	    
 		/* decrement number of characters read from number required */
@@ -3500,7 +3500,7 @@ bin_read(char *name, char **args, char *ops, int func)
 	if (!izle && !ops['u'] && !ops['p']) {
 	    /* dispose of result appropriately, etc. */
 	    if (isem)
-		while (val > 0 && read(SHTTY, &d, 1) == 1 && d != '\n');
+		while (val > 0 && ztrapread(SHTTY, &d, 1) == 1 && d != '\n');
 	    else
 		settyinfo(&shttyinfo);
 	    if (haso) {
@@ -3733,6 +3733,7 @@ static int
 zread(int izle, int *readchar)
 {
     char cc, retry = 0;
+    int ret;
 
     if (izle) {
 	int c = getkeyptr(0);
@@ -3756,7 +3757,8 @@ zread(int izle, int *readchar)
     }
     for (;;) {
 	/* read a character from readfd */
-	switch (read(readfd, &cc, 1)) {
+	ret = ztrapread(readfd, &cc, 1);
+	switch (ret) {
 	case 1:
 	    /* return the character read */
 	    return STOUC(cc);

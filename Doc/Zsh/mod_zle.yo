@@ -198,6 +198,7 @@ xitem(tt(zle) tt(-C) var(widget) var(completion-widget) var(function))
 xitem(tt(zle) tt(-R) [ tt(-c) ] [ var(display-string) ] [ var(string) ... ])
 xitem(tt(zle) tt(-M) var(string))
 xitem(tt(zle) tt(-U) var(string))
+xitem(tt(zle) tt(-I))
 xitem(tt(zle) var(widget) tt([ -n) var(num) tt(]) tt([ -N ]) var(args) ...)
 item(tt(zle))(
 The tt(zle) builtin performs a number of different actions concerning
@@ -263,6 +264,11 @@ cleared.
 Note that this option is only useful for widgets that do not exit
 immediately after using it because the strings displayed will be erased 
 immediately after return from the widget.
+
+This command can safely be called outside user defined widgets; if zle is
+active, the display will be refreshed, while if zle is not active, the
+command has no effect.  In this case there will usually be no other
+arguments.  The status is zero if zle was active, else one.
 )
 item(tt(-M) var(string))(
 As with the tt(-R) option, the var(string) will be displayed below the 
@@ -280,6 +286,28 @@ As ZLE uses a stack, if this option is used repeatedly
 the last string pushed onto the stack will be processed first.  However,
 the characters in each var(string) will be processed in the order in which
 they appear in the string.
+)
+item(tt(-I))(
+Unusually, this option is only useful em(outside) ordinary widget functions.
+It invalidates the current zle display in preparation for output; usually
+this will be from a trap function.  It has no effect if zle is not
+active.  When a trap exits, the shell checks to see if the display needs
+restoring, hence the following will print output in such a way as not to
+disturb the line being edited:
+
+example(TRAPUSR1() {
+    # Invalidate zle display
+  zle -I
+    # Show output
+  print Hello
+})
+
+Note that there are better ways of manipulating the display from within zle
+widgets.  In general, the trap function may need to test whether zle is
+loaded before using this method; if it is not, there is no point in loading
+it specially since the line editor will not be active.
+
+The status is zero if zle was active, else one.
 )
 item(var(widget) tt([ -n) var(num) tt(]) tt([ -N ]) var(args) ...)(
 Invoke the specified widget.  This can only be done when ZLE is

@@ -1627,8 +1627,6 @@ struct heap {
 #endif
 ;
 
-# define LASTALLOC_RETURN return
-
 # define NEWHEAPS(h)    do { Heap _switch_oldheaps = h = new_heaps(); do
 # define OLDHEAPS       while (0); old_heaps(_switch_oldheaps); } while (0);
 

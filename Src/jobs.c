@@ -378,7 +378,7 @@ update_job(Job jn)
 	    zrefresh();
     }
     if (sigtrapped[SIGCHLD] && job != thisjob)
-	dotrap(SIGCHLD);
+	dotrap(SIGCHLD, 0);
 
     /* When MONITOR is set, the foreground process runs in a different *
      * process group from the shell, so the shell will not receive     *
@@ -389,7 +389,7 @@ update_job(Job jn)
 
 	if (sig == SIGINT || sig == SIGQUIT) {
 	    if (sigtrapped[sig]) {
-		dotrap(sig);
+		dotrap(sig, 0);
 		/* We keep the errflag as set or not by dotrap.
 		 * This is to fulfil the promise to carry on
 		 * with the jobs if trap returns zero.
@@ -878,7 +878,9 @@ waitforpid(pid_t pid)
 	else
 	    kill(pid, SIGCONT);
 
-	child_suspend(SIGINT);
+	ALLOWTRAPS {
+	    child_suspend(SIGINT);
+	} DISALLOWTRAPS;
 	child_block();
     }
     child_unblock();
@@ -900,7 +902,9 @@ waitjob(int job, int sig)
 	while (!errflag && jn->stat &&
 	       !(jn->stat & STAT_DONE) &&
 	       !(interact && (jn->stat & STAT_STOPPED))) {
-	    child_suspend(sig);
+	    ALLOWTRAPS {
+		child_suspend(sig);
+	    } DISALLOWTRAPS;
 	    /* Commenting this out makes ^C-ing a job started by a function
 	       stop the whole function again.  But I guess it will stop
 	       something else from working properly, we have to find out
@@ -1363,7 +1367,7 @@ bin_fg(char *name, char **argv, char *ops, int func)
 		killjb(jobtab + job, SIGCONT);
 	    }
 	    if (func == BIN_WAIT)
-	        waitjob(job, SIGINT);
+		waitjob(job, SIGINT);
 	    if (func != BIN_BG) {
 		waitjobs();
 		retval = lastval2;

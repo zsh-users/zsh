@@ -738,6 +738,7 @@ static int
 execsimple(Estate state)
 {
     wordcode code = *state->pc++;
+    int lv;
 
     if (errflag)
 	return (lastval = 1);
@@ -754,9 +755,13 @@ execsimple(Estate state)
 	    fputc('\n', xtrerr);
 	    fflush(xtrerr);
 	}
-	return (lastval = (errflag ? errflag : cmdoutval));
+	lv = (errflag ? errflag : cmdoutval);
     } else
-	return (lastval = (execfuncs[code - WC_CURSH])(state, 0));
+	lv = (execfuncs[code - WC_CURSH])(state, 0);
+
+    RUNTRAPS();
+
+    return lastval = lv;
 }
 
 /* Main routine for executing a list.                                *
@@ -887,19 +892,19 @@ sublist_done:
 	noerrexit = oldnoerrexit;
 
 	if (sigtrapped[SIGDEBUG])
-	    dotrap(SIGDEBUG);
+	    dotrap(SIGDEBUG, 1);
 
 	/* Check whether we are suppressing traps/errexit *
 	 * (typically in init scripts) and if we haven't  *
 	 * already performed them for this sublist.       */
 	if (!noerrexit && !donetrap) {
 	    if (sigtrapped[SIGZERR] && lastval) {
-		dotrap(SIGZERR);
+		dotrap(SIGZERR, 1);
 		donetrap = 1;
 	    }
 	    if (lastval && isset(ERREXIT)) {
 		if (sigtrapped[SIGEXIT])
-		    dotrap(SIGEXIT);
+		    dotrap(SIGEXIT, 1);
 		if (mypid != getpid())
 		    _exit(lastval);
 		else
@@ -1181,9 +1186,10 @@ execpline2(Estate state, wordcode pcode,
 	else
 	    list_pipe_text[0] = '\0';
     }
-    if (WC_PIPE_TYPE(pcode) == WC_PIPE_END)
+    if (WC_PIPE_TYPE(pcode) == WC_PIPE_END) {
 	execcmd(state, input, output, how, last1 ? 1 : 2);
-    else {
+	RUNTRAPS();
+    } else {
 	int old_list_pipe = list_pipe;
 	Wordcode next = state->pc + (*state->pc);
 	wordcode code;
@@ -1218,12 +1224,14 @@ execpline2(Estate state, wordcode pcode,
 		entersubsh(how, 2, 0);
 		close(synch[1]);
 		execcmd(state, input, pipes[1], how, 0);
+		RUNTRAPS();
 		_exit(lastval);
 	    }
 	} else {
 	    /* otherwise just do the pipeline normally. */
 	    subsh_close = pipes[0];
 	    execcmd(state, input, pipes[1], how, 0);
+	    RUNTRAPS();
 	}
 	zclose(pipes[1]);
 	state->pc = next;
