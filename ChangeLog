@@ -1,3 +1,16 @@
+2000-09-14  Bart Schaefer  <schaefer@brasslantern.com>
+
+	* 12804: Src/builtin.c: "typeset -m" implies "-g".
+
+	* unposted: Completion/Commands/_complete_debug: Changed my mind
+	about the edit to 12800.
+
+2000-09-13  Bart Schaefer  <schaefer@zsh.org>
+
+	* 12800: E. Jay Berkenbilt: Completion/Commands/_complete_debug:
+	Quote the file name pushed onto the history, in case the command
+	word has strange characters in it.  (Slighty edited.)
+
 2000-09-11  Bart Schaefer  <schaefer@brasslantern.com>
 
 	* 12793: Completion/Builtins/_zle, Doc/Zsh/compwid.yo,
