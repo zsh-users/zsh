@@ -1,0 +1,29 @@
+#compdef iwconfig
+
+local iwparams prevword expl
+
+iwparams=(
+essid nwid freq channel sens mode ap nick rate rts frag txpower enc
+key power retry
+)
+
+if (( CURRENT == 2 )); then
+  _net_interfaces || compadd -- --help --version
+  return
+fi
+
+prevword="$words[CURRENT-1]"
+
+if [[ -n ${iwparams[(r)$prevword]} ]]; then
+  case "$prevword" in
+    (mode)
+      _wanted tag expl 'operating mode' \
+        compadd Ad-Hoc Managed Master Repeater Secondary Monitor Auto
+    ;;
+    (*)
+      _wanted tag expl "$prevword value" \
+        compadd off
+  esac
+else
+  _wanted tag expl 'iwconfig parameter' compadd $iwparams commit
+fi

@@ -1,3 +1,8 @@
+2005-03-07  Clint Adams  <clint@zsh.org>
+
+	* 20946: Completion/Linux/Command/_iwconfig: completion for
+	iwconfig command.
+
 2005-03-07  Peter Stephenson  <pws@csr.com>
 
 	* 20945: Src/Zle/zle_misc.c: rename static variables to
