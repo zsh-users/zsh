@@ -15,5 +15,5 @@ _dd           _gprof        _lynx         _perldoc      _telnet       _pine
 _dict         _grep         _lzop         _prcs         _tiff         _elm
 _diff         _gs           _make         _psutils      _tin	_apm  _mail
 _loadkeys     _modutils     _ruby         _samba        _sysctl       _links
-_user_admin   _rsync
+_user_admin   _rsync        _arping
 '
