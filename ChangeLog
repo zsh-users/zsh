@@ -1,5 +1,8 @@
 2005-03-07  Clint Adams  <clint@zsh.org>
 
+	* 20938: Completion/Unix/Command/_fuser: completion for fuser
+	command.
+
 	* 20937: Completion/Unix/Command/_fortune: completion for fortune
 	command.
 
