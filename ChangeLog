@@ -1,5 +1,9 @@
 2005-04-04  Peter Stephenson  <pws@csr.com>
 
+	* Toby Peterson: 21083: On Mac OS X 10.4, the AS and RSS rlimits
+	are the same.  Also utmpx doesn't have ut_name.  In fact, it
+	doesn't seem to have it on any system.
+
 	* Dan Nelson: 21082: Src/exec.c, Test/A01grammar.ztst: fix zsh -c
 	exit status on parse error.
 

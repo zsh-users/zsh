@@ -87,6 +87,14 @@
 
 #if !defined(WATCH_STRUCT_UTMP) && defined(HAVE_STRUCT_UTMPX) && defined(REAL_UTMPX_FILE)
 # define WATCH_STRUCT_UTMP struct utmpx
+/*
+ * In utmpx, the ut_name field is replaced by ut_user.
+ * Howver, on some systems ut_name may already be defined this
+ * way for the purposes of utmp.
+ */
+# ifndef ut_name
+#  define ut_name ut_user
+# endif
 # ifdef HAVE_STRUCT_UTMPX_UT_XTIME
 #  undef ut_time
 #  define ut_time ut_xtime

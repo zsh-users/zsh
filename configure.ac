@@ -1502,6 +1502,33 @@ if test $zsh_cv_rlimit_vmem_is_as = yes; then
 fi
 
 
+AH_TEMPLATE([RLIMIT_RSS_IS_AS],
+[Define to 1 if RLIMIT_RSS and RLIMIT_AS both exist and are equal.])
+AC_CACHE_CHECK(if RLIMIT_RSS and RLIMIT_AS are the same,
+zsh_cv_rlimit_rss_is_as,
+[AC_TRY_RUN([
+#include <sys/types.h>
+#ifdef HAVE_SYS_TIME_H
+#include <sys/time.h>
+#endif
+#include <sys/resource.h>
+int main()
+{
+int ret = 1;
+#if defined(HAVE_RLIMIT_RSS) && defined(HAVE_RLIMIT_AS)
+if (RLIMIT_AS == RLIMIT_RSS) ret = 0;
+#endif
+return ret;
+}],
+  zsh_cv_rlimit_rss_is_as=yes,
+  zsh_cv_rlimit_rss_is_as=no,
+  zsh_cv_rlimit_rss_is_as=no)])
+
+if test $zsh_cv_rlimit_rss_is_as = yes; then
+  AC_DEFINE(RLIMIT_RSS_IS_AS)
+fi
+
+
 dnl --------------------------------------------
 dnl Check for members of struct rusage
 dnl --------------------------------------------
