@@ -42,7 +42,7 @@
 # state than the global one for which you are completing.
 
 
-local comp ret=1
+local comp ret=1 _compskip
 
 setopt localoptions nullglob rcexpandparam
 unsetopt markdirs globsubst shwordsplit nounset ksharrays
@@ -79,5 +79,7 @@ _lastcomp[iprefix]="$IPREFIX"
 _lastcomp[isuffix]="$ISUFFIX"
 _lastcomp[qiprefix]="$QIPREFIX"
 _lastcomp[qisuffix]="$QISUFFIX"
+
+unset _compskip
 
 return ret

@@ -29,17 +29,19 @@ fi
 
 # See if there are any matching pattern completions.
 
-for i in "$_patcomps[@]"; do
-  pat="${i% *}"
-  val="${i#* }"
-  if [[ "$cmd1" == $~pat || "$cmd2" == $~pat ]]; then
-    "$val" && ret=0
-    if (( $+_compskip )); then
-      unset _compskip
-      return ret
+if [[ "$_compskip" != *patterns* ]]; then
+  for i in "$_patcomps[@]"; do
+    pat="${i% *}"
+    val="${i#* }"
+    if [[ "$cmd1" == $~pat || "$cmd2" == $~pat ]]; then
+      "$val" && ret=0
+      if [[ "$_compskip" = *patterns* || "$_compskip" = all ]]; then
+        unset _compskip
+        return ret
+      fi
     fi
-  fi
-done
+  done
+fi
 
 # Now look up the two names in the normal completion array.
 
@@ -54,9 +56,15 @@ fi
 # And generate the matches, probably using default completion.
 
 if [[ -z "$comp" ]]; then
+  if [[ "$_compskip" = *default* ]]; then
+    unset _compskip
+    return 1
+  fi
   name=-default-
   comp="$_comps[-default-]"
 fi
 [[ -z "$comp" ]] || "$comp" && ret=0
+
+unset _compskip
 
 return ret

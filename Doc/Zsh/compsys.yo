@@ -334,8 +334,12 @@ for completing the name of a parameter expansion within braces
 item(tt(-first-))(
 for adding completions before any other other completion functions are
 tried (similar to the `tt(-T)' flag of tt(compctl)); if this
-function sets the tt(_compskip) parameter to any value, the completion
-system will not call any other function to generate matches.
+function sets the tt(_compskip) parameter to `tt(all)', no other
+completion functions will be called, if it is set to a string
+containing `tt(patterns)', no pattern completion functions will be
+called, and if it is set to a string containing `tt(default)' the
+function for the `tt(-default-)' context will not be called, but
+functions defined for commands will.
 )
 item(tt(-default-))(
 for generating completions when no special completion function is used 
@@ -684,8 +688,9 @@ the tt(words) array, decrements the tt(CURRENT) parameter, then calls this
 function.
 
 When calling a function defined for a pattern, this function also
-checks if the parameter tt(_compskip) is set. If it was set by the
-function called, no further completion functions are called. With this 
+checks if the parameter tt(_compskip) is set and uses the value in the 
+same way it is used after calling the completion function for the
+tt(-first-) context. With this 
 one can write a pattern completion function that keeps other functions 
 from being tried simply by setting this parameter to any value.
 )

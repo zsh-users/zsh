@@ -1,8 +1,147 @@
 #compdef -p p[bgpn]m*
 
-local pat
+local pat opts ret=1
 
-_compskip=1
+# No other completion functions, please.
+
+_compskip=all
+
+if (( ! $+_pbm_options )); then
+
+  # Most of the stuff is done by table lookup in these arrays.
+
+  typeset -gA _pbm_options _pbm_arg_options
+
+  # Options with arguments, per command.
+
+  _pbm_arg_options=(
+    pbmreduce 'value'
+    pbmtext 'font:_files:-g:*.(#i)pbm'
+    pbmtolj 'resolution'
+    pbmtolps 'dpi'
+    pbmtomacp 'l r t b'
+    pgmcrater 'number height ysize width xsize gamma'
+    pgmkernel 'weight'
+    pgmnorm 'bpercent bvalue wpercent wvalue'
+    pgmoil 'n'
+    pgmtexture 'd'
+    pgmtopbm 'value'
+    pgmtoppm 'map:_files:-g:*.(#i)ppm'
+    ppmbrighten 's v'
+    ppmdither 'dim red green blue'
+    ppmforge 'dimension hour inclination tilt mesh power glaciers ice saturation seed stars xsize width ysize height'
+    ppmnorm 'bpercent bvalue wpercent wvalue'
+    ppmquant 'map:_files:-g:*.(#i)ppm'
+    ppmtoacad 'background aspect'
+    ppmtoicr 'windowname expand display'
+    ppmtomitsu 'sharpness:compadd:1:2:3:4 enlarge:compadd:1:2:3 media:compadd:A:A4:AS:A4S copy:compadd:1:2:3:4:5:6:7:8:9'
+    ppmtopj 'gamma xpos ypos back:compadd:dark:lite render:compadd:none:snap:bw:dither:diffuse:monodither:monodiffuse:clusterdither:monoclusterdither'
+    ppmtopjxl 'gamma xshift yshift xsize width xscale ysize height yscale'
+    ppmtouil 'name'
+    ppmtoxpm 'name'
+    pnmalias 'fgcolor:_colors bgcolor:_colors weight'
+    pnmcomp 'xoff yoff alpha:_files:-g:*.(#i)pgm'
+    pnmhistmap 'max'
+    pnmindex 'size across colors'
+    pnmmargin 'color:_colors'
+    pnmscale 'xsize width ysize height xscale yscale xysize'
+    pnmtoddif 'resolution'
+    pnmtofits 'min max'
+    pnmtops 'scale dpi width height'
+    pnmtosgi 'imagename'
+    pnmtotiff 'predictor rowsperstrip'
+    pnmtoxwd 'pseudodepth'
+  )
+
+  # Options without arguments.
+
+  _pbm_options=(
+    pbmclean 'connect'
+    pbmmake 'white black gray'
+    pbmmask 'expand'
+    pbmreduce 'floyd fs threshold'
+    pbmtoepsi 'bbonly'
+    pgmenhance '1 2 3 4 5 6 7 8 9'
+    pgmramp 'lr tb rectangle ellipse'
+    pgmtopbm 'floyd fs threshold dither8 d8 cluster3 c3 cluster4 c4 cluster8 c8'
+    ppmbrighten 'n'
+    ppmdist 'intensity frequency'
+    ppmforge 'clouds night'
+    ppmpat 'gingham2 g2 gingham3 g3 madras tartan poles squig camo anticamo'
+    ppmquant 'floyd fs'
+    ppmqvga 'd q v'
+    ppmtoacad 'dxb poly white 8'
+    ppmtobmp 'os2 windows'
+    ppmtogif 'interlace'
+    ppmtoicr 'rle'
+    ppmtoilbm 'hamif'
+    ppmtomap 'sort square'
+    ppmtomitsu 'dpi300 tiny'
+    ppmtopj 'rle center'
+    ppmtopjxl 'nopack presentation dark diffuse cluster dither'
+    ppmtosixel 'raw margin'
+    ppmtotga 'mono cmap rgb norle'
+    pnmalias 'bonly fonly balias falias'
+    pnmarith 'add subtract multiply'
+    pnmcat 'white black leftright lr topbottom tb jtop jbottom jleft jright'
+    pnmcomp 'invert'
+    pnmcrop 'white black'
+    pnmflip 'leftright lr topbottom tb transpose xy rotate90 r90 ccw rotate270 r270 cw rotate180 r180'
+    pnmhistmap 'black white verbose'
+    pnmindex 'black'
+    pnmmargin 'white black'
+    pnmpad 'white black'
+    pnmpaste 'replace or and xor'
+    pnmrotate 'noantialias'
+    pnmshear 'noantialias'
+    pnmtops 'turn noturn rle runlength'
+    pnmtorast 'standard rle'
+    pnmtosgi 'verbatim rle'
+    pnmtotiff 'none packbits lzw g3 g4 2d fill msb2lsb lsb2msb'
+    pnmtoxwd 'directcolor'
+  )
+fi
+
+opts=( $=_pbm_arg_options[$words[1]] )
+if (( $#opts )); then
+
+  # This Command has options with arguments. The options are already in
+  # `opts'. Now we see if we are after one of these options on the line.
+
+  local after="$opts[(I)${words[CURRENT-1][2,-1]}(|:*)]"
+
+  if (( after )); then
+
+    # We are. If the string contains a colon, anything after it is a 
+    # colon-separated list of words. We just execute this list of words
+    # as a command with its arguments.
+
+    if [[ "$after" = *:* ]]; then
+      after="${${opts[after]#*:}//:/ }"
+      [[ -z "$after" ]] || $=after 
+    fi
+    return
+  fi
+
+  # Otherwise we just add the option names.
+
+  compadd -J options - -${^=opts%%:*}
+fi
+
+# And the names of the options without arguments.
+
+opts=( $=_pbm_options[$words[1]] )
+(( $#opts )) && compadd -J options - -${^=opts}
+
+# A small special case here: the first argument of `ppmmake' is a
+# color. More of these could be added.
+
+if [[ "$words[1]" = ppmmake && CURRENT -eq 2 ]]; then
+  _colors
+  return
+fi
+
+# Generate the filenames.
 
 if [[ "$words[1]" = pnm* ]]; then
   pat='*.(#i)p[bgp]m'
@@ -10,4 +149,4 @@ else
   pat="*.(#i)${words[1][1,3]}"
 fi
 
-_path_files -g "$pat" || _files -g '*.(#i)p[bgp]m'
+_path_files -J files -g "$pat" || _files -J files -g '*.(#i)p[bgp]m'

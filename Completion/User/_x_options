@@ -3,7 +3,7 @@
 # A simple pattern completion, just as an example.
 
 if [ "$words[CURRENT-1]" = "-display" ]; then
-  _compskip=''
+  _compskip=all
   _hosts -S :0
 else
   compadd -P- -J options - display name xrm

@@ -5338,6 +5338,10 @@ makecomplistcall(Compctl cc)
 	    offs = lip + lp;
 	    cc->refc++;
 	    ccont = 0;
+	    if (!cc->ylist && !cc->gname) {
+		endcmgroup(NULL);
+		begcmgroup("default", 0);
+	    }
 	    makecomplistor(cc, str, lincmd, lip, 0);
 	    offs = ooffs;
 	    isuf = oisuf;

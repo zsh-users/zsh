@@ -1,7 +1,7 @@
 #compdef -p zf*
 
 # Don't try any more completion after this.
-_compskip=1
+_compskip=all
 
 # Completion for zftp builtin and zf* functions.  The functions
 # zfcd_match and zfget_match (used for old-style completion)

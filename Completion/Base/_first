@@ -55,7 +55,7 @@
 #           # on menu-completion and make sure that no other
 #           # completion function is called by setting _compskip.
 #           compstate[insert]=menu
-#           _compskip=1
+#           _compskip=all
 #           return
 #         fi
 #         (( i++ ))
