@@ -1,0 +1,81 @@
+#autoload
+
+if (( $# )); then
+  local cmd="$words[1]" func="$funcstack[2]" defs i tags tag pat style prio
+
+  while getopts 'c:f:' i; do
+    if [[ "$i" = c ]]; then
+      cmd="$OPTARG"
+    else
+      func="$OPTARG"
+    fi
+  done
+
+  shift OPTIND-1
+
+  defs=( "${(@M)argv:#${(kj:|:)~override_tags[(R)(|+*)]}}" )
+  (( $#defs )) && set -- "$defs[@]"
+
+  _offered_tags=( "$_offered_tags[@]" "$@" )
+  _last_tags=()
+
+  defs=()
+  for i; do
+    if [[ -n ${override_tags[$i]} && ${override_tags[$i]} != (\[|+\[)* ]]; then
+      if [[ ${override_tags[$i]} = *\[* ]]; then
+        prio=( "${i}:*=${override_tags[$i]#+}" )
+      else
+        prio=( "${i}:${(@v)^comptags[(I)(|*:)${i}(|:*)]}" )
+        (( $#prio )) || prio=( "${i}:${comptags[any]}" )
+        prio="${${${prio[(r)(|*:)\*=[^:]#\[*\](|:*)]}##(|*:)\*}%%:*}"
+        prio=( "${i}:*=${override_tags[$i]#+}${(M)prio%%\[*\]}" )
+      fi
+    else
+      prio=( "${i}:${(@v)^comptags[(I)(|*:)${i}(|:*)]}" )
+      (( $#prio )) || prio=( "${i}:${comptags[any]}" )
+    fi
+    defs=( "$defs[@]" "$prio[@]" )
+  done
+
+  tags=()
+  for i in "$defs[@]"; do
+    tag="${i%%:*}"
+    for pat in "${(s.:.)i#*:}"; do
+      if [[ ( "$pat" = _* && "$func" = ${~pat%%\=*} ) ||
+            "$cmd" = ${~pat%%\=*} ]]; then
+        prio="${pat#*\=}"
+	[[ "$prio" = -* ]] && continue 2
+
+	if [[ "$prio" = *\[*\] ]]; then
+	  style="${(M)prio%%\[*}"
+	  prio="${prio%%\[*}"
+        else
+	  style=''
+        fi
+	[[ ${override_tags[$tag]} = (|+)\[* ]] &&
+	    style="${override_tags[$tag]#+}"
+
+	(( prio++ ))
+
+        tags[$prio]="${tags[$prio]}:${tag}${style}"
+        break
+      fi
+    done
+  done
+
+  prios=( "${(@)tags:#}" )
+
+  return 0
+fi
+
+_failed_tags=( "$_failed_tags[@]" "$_last_tags[@]" )
+
+(( $#prios )) || return 1
+
+tags="${prios[1]}:"
+shift 1 prios
+
+_last_tags=( "${(@s.:.)${${tags#:}%:}}" )
+_tried_tags=( "$_tried_tags[@]" "$_last_tags[@]" )
+
+return 0
