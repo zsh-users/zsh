@@ -1,3 +1,9 @@
+2003-04-28  Peter Stephenson  <pws@csr.com>
+
+	* 17820 (tweaked): Andrej: Src/Modules/tcp.h: unconfirmed but
+	apparently safe attempt to get recent Cygwin versions to include
+	<netinet/in_systm.h> where available.
+
 2003-04-25  Oliver Kiddle  <opk@zsh.org>
 
 	* Haakon Riiser: 18473: Completion/X/Command/_acroread,

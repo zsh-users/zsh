@@ -46,9 +46,9 @@
  * __USE_LARGEFILE.  This means the problem is somewhere in the
  * header files where we can't get at it.  For now, revert to
  * not including this file only on systems where we know it's missing.
- * Currently this is just cygwin.
+ * Currently this is just some older versions of cygwin.
  */
-#ifndef __CYGWIN__
+#if defined(HAVE_NETINET_IN_SYSTM_H) || !defined(__CYGWIN__)
 # include <netinet/in_systm.h>
 #endif
 #include <netinet/in.h>
