@@ -142,9 +142,9 @@ _rpm () {
     verify)
       _arguments -s \
         '(-y --verify)-V' '(-V --verify)-y' '(-y -V)--verify' \
-        "${commonopts[@]}" "${pathopts[@]}" \
+        "${commonopts[@]}" "${packageopts[@]}" "${pathopts[@]}" \
         --no{deps,md5,files} \
-        '*:RPM package:->package' && ret=0
+        '*:RPM package:->package_or_file' && ret=0
       ;;
     upgrade)
       tmp=( '(--upgrade)-U' '(-U)--upgrade' '(--force)--oldpackage' )
@@ -272,7 +272,10 @@ _rpms_caching_policy () {
   oldp=( "$1"(mw+1) )
   (( $#oldp )) && return 0
 
-  [[ /var/lib/rpm/packages.rpm -nt "$1" ]]
+  pkg_indices=( /var/lib/rpm/{packages.rpm,Packages}(N) )
+  for pkg_index in $pkg_indices; do
+    [[ "$pkg_index" -nt "$1" ]] && return 0
+  done
 }
 
 _rpm "$@"
