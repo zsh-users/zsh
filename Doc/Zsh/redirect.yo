@@ -180,4 +180,4 @@ the command named in the shell variable tt(READNULLCMD) is assumed.
 
 nofill(tt(< file))
 
-prints the contents of tt(file).
+copies the contents of tt(file) to the standard output.
