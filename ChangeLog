@@ -1,7 +1,10 @@
 2004-02-09  Wayne Davison  <wayned@users.sourceforge.net>
 
+	* 19410: Src/Zle/compmatch.c: Another fix to avoid a match that
+	ends in the middle of a Meta sequence.
+
 	* 19406: Src/Zle/compmatch.c: Optimized the check for a
-	widowed Meta character.
+	"widowed" Meta character.
 
 2004-02-08  Peter Stephenson  <pws@pwstephenson.fsnet.co.uk>
 
