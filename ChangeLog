@@ -1,3 +1,7 @@
+2004-02-08  Peter Stephenson  <pws@pwstephenson.fsnet.co.uk>
+
+	* 19408: Src/Builtins/rlimits.c: fix option handling for ulimit -aH.
+
 2004-02-04  Oliver Kiddle  <opk@zsh.org>
 
 	* Mikael Magnusson: 19405: Completion/Unix/Command/_gphoto2:

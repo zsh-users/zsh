@@ -462,7 +462,7 @@ bin_unlimit(char *nam, char **argv, Options ops, int func)
 static int
 bin_ulimit(char *name, char **argv, Options ops, int func)
 {
-    int res, resmask = 0, hard = 0, soft = 0, nres = 0;
+    int res, resmask = 0, hard = 0, soft = 0, nres = 0, all = 0;
     char *options;
 
     do {
@@ -486,11 +486,12 @@ bin_ulimit(char *name, char **argv, Options ops, int func)
 		    soft = 1;
 		    continue;
 		case 'a':
-		    if (*argv || options[1] || resmask) {
-			zwarnnam(name, "no arguments required after -a",
+		    if (resmask) {
+			zwarnnam(name, "no limits allowed with -a",
 				 NULL, 0);
 			return 1;
 		    }
+		    all = 1;
 		    resmask = (1 << RLIM_NLIMITS) - 1;
 		    nres = RLIM_NLIMITS;
 		    continue;
@@ -547,6 +548,11 @@ bin_ulimit(char *name, char **argv, Options ops, int func)
 		    resmask |= 1 << res;
 		    nres++;
 		}
+		if (all && res != -1) {
+		    zwarnnam(name, "no limits allowed with -a",
+			     NULL, 0);
+		    return 1;
+		}
 	    }
 	}
 	if (!*argv || **argv == '-') {
@@ -559,6 +565,10 @@ bin_ulimit(char *name, char **argv, Options ops, int func)
 	    resmask |= 1 << res;
 	    nres++;
 	    continue;
+	}
+	if (all) {
+	    zwarnnam(name, "no arguments allowed after -a", NULL, 0);
+	    return 1;
 	}
 	if (res < 0)
 	    res = RLIMIT_FSIZE;
