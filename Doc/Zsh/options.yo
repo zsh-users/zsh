@@ -305,6 +305,9 @@ cindex(correction, spelling)
 cindex(spelling correction)
 item(tt(CORRECT) (tt(-0)))(
 Try to correct the spelling of commands.
+Note that, when the tt(HASH_LIST_ALL) option is not set or when some
+directories in the path are not readable, this may falsely report spelling
+errors the first time some commands are used.
 )
 pindex(CORRECT_ALL)
 item(tt(CORRECT_ALL) (tt(-O)))(
