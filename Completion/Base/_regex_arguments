@@ -247,16 +247,17 @@ _ra_gen_func () {
 }
 
 _ra_gen_parse_state () {
-  local actions i
+  local actions i p
   test='if'
   for index in $=tbl[$state]; do
     if [[ "$pattern[$index]" != "[]" ]]; then
+      p="$pattern[$index]$lookahead[$index]*"
       if [[ -z "$guard[$index]" ]]; then
 	print -lr - \
-	  "$test [[ \$_ra_right = $pattern[$index]$lookahead[$index]* ]]"
+	  "$test [[ \$_ra_right = \${~:-${(qqqq)p}} ]]"
       else
 	print -lr - \
-	  "$test [[ \$_ra_right = $pattern[$index]$lookahead[$index]* ]] && {" \
+	  "$test [[ \$_ra_right = \${~:-${(qqqq)p}} ]] && {" \
 	      "$guard[$index]" \
 	    "}"
       fi
@@ -365,7 +366,7 @@ _regex_arguments () {
 
     if [[ -d "$cache_dir" && -w "$cache_dir" ]]; then
       print -lr - \
-	'if [[ $# -eq '$#' && "$*" = '"${*:q}"' ]]; then' \
+	'if [[ $# -eq '$#' && "$*" = '"${(qqqq)*}"' ]]; then' \
 	"$funcdef" \
 	'true; else false; fi' > "${cache_file}.$HOST.$$"
       source "${cache_file}.$HOST.$$" "$@"
