@@ -1,5 +1,8 @@
 2002-03-11  Oliver Kiddle  <opk@zsh.org>
 
+	* 16804: Completion/Unix/Command/_sccs,
+	Completion/Unix/Command/.distfiles: completion for sccs
+
 	* 16803: Completion/Debian/Command/_make-kpkg,
 	Completion/Debian/Command/_dpkg: option descriptions
 
