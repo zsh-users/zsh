@@ -308,7 +308,7 @@ gettext2(struct node *n)
 	    taddstr(*p++);
 	    taddstr(" in");
 	    tindent++;
-	    for (; *l; p++, l++) {
+	    for (; l && *l; p++, l++) {
 		if (tnewlins)
 		    taddnl();
 		else
