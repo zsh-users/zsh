@@ -1,3 +1,8 @@
+2000-05-17  Peter Stephenson  <pws@pwstephenson.fsnet.co.uk>
+
+	* pws; 11448: Doc/Zsh/compsys.yo, Doc/Zsh/metafaq.yo: more
+	changes of phrasing.
+
 2000-05-17  Peter Stephenson  <pws@cambridgesiliconradio.com>
 
 	* pws: 11444: Completion/Builtins/_zstyle: add old-list and old-menu.
