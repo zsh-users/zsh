@@ -2270,7 +2270,12 @@ domenuselect(Hookdef dummy, Chdata dat)
 	menucmp = 2;
 	showinglist = -2;
 	minfo.asked = 0;
-	zrefresh();
+	if (!noselect) {
+	    int nos = noselect;
+
+	    zrefresh();
+	    noselect = nos;
+	}
     }
     if (!noselect && (!dat || acc)) {
 	showinglist = -2;

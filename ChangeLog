@@ -1,5 +1,8 @@
 2000-10-25  Sven Wischnowsky  <wischnow@zsh.org>
 
+	* 13084: Src/Zle/complist.c: re-display list for cleanup only if
+ 	we were in menu selection
+	
 	* 13082: Src/Zle/complist.c, Src/Zle/compresult.c: add a counter
  	for invalidatelist() to allow finding out if there is a new list
 	
