@@ -1188,7 +1188,7 @@ getindex(char **pptr, Value v)
 	    if ((com = (*s == ','))) {
 		s++;
 		len = getarg(&s, &inv, v, 1, &dummy);
-		if (len > 0) {
+		if (len >= 0) {
 		    len -= start - 1;
 		    if (len < 0)
 			len = 0;
