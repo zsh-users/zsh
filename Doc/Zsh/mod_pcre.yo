@@ -18,5 +18,9 @@ findex(pcre_match)
 item(tt(pcre_match) var(string))(
 Returns successfully if tt(string) matches the previously-compiled
 PCRE.
+
+If the expression captures substrings within parentheses,
+tt(pcre_match) will set the positional parameters to
+those substrings, starting with $1 for the first.
 )
 enditem()
