@@ -680,7 +680,13 @@ zlecore(void)
     FD_ZERO(&foofd);
 #endif
 
-    while (!done && !errflag) {
+    /*
+     * A widget function may decide to exit the shell.
+     * We never exit directly from functions, to allow
+     * the shell to tidy up, so we have to test for
+     * that explicitly.
+     */
+    while (!done && !errflag && !exit_pending) {
 
 	statusline = NULL;
 	vilinerange = 0;
