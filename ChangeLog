@@ -1,5 +1,7 @@
 2000-09-18  Clint Adams  <schizo@debian.org>
 
+	* 12828: Src/utils.c: dynamically allocate 'dir' in mailstat.
+
 	* 12827: Src/utils.c: dynamically allocate 'file' in mailstat.
 
 2000-09-17  Clint Adams  <schizo@debian.org>

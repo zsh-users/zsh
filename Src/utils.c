@@ -3788,18 +3788,13 @@ mailstat(char *path, struct stat *st)
        struct                  dirent *fn;
        struct stat             st_ret, st_tmp;
        static struct stat      st_new_last, st_ret_last;
-       char                    dir[PATH_MAX * 2];
-       char                    *file;
+       char                    *dir, *file;
        int                     i;
        time_t                  atime = 0, mtime = 0;
 
        /* First see if it's a directory. */
        if ((i = stat(path, st)) != 0 || !S_ISDIR(st->st_mode))
                return i;
-       if (strlen(path) > sizeof(dir) - 5) {
-               errno = ENAMETOOLONG;
-               return -1;
-       }
 
        st_ret = *st;
        st_ret.st_nlink = 1;
@@ -3809,17 +3804,17 @@ mailstat(char *path, struct stat *st)
        st_ret.st_mode  |= S_IFREG;
 
        /* See if cur/ is present */
-       sprintf(dir, "%s/cur", path);
+       dir = dyncat(path, "/cur");
        if (stat(dir, &st_tmp) || !S_ISDIR(st_tmp.st_mode)) return 0;
        st_ret.st_atime = st_tmp.st_atime;
 
        /* See if tmp/ is present */
-       sprintf(dir, "%s/tmp", path);
+       dir = dyncat(path, "/tmp");
        if (stat(dir, &st_tmp) || !S_ISDIR(st_tmp.st_mode)) return 0;
        st_ret.st_mtime = st_tmp.st_mtime;
 
        /* And new/ */
-       sprintf(dir, "%s/new", path);
+       dir = dyncat(path, "/new");
        if (stat(dir, &st_tmp) || !S_ISDIR(st_tmp.st_mode)) return 0;
        st_ret.st_mtime = st_tmp.st_mtime;
 
@@ -3828,32 +3823,32 @@ mailstat(char *path, struct stat *st)
            st_tmp.st_ino == st_new_last.st_ino &&
            st_tmp.st_atime == st_new_last.st_atime &&
            st_tmp.st_mtime == st_new_last.st_mtime) {
-               *st = st_ret_last;
-               return 0;
+	   *st = st_ret_last;
+	   return 0;
        }
        st_new_last = st_tmp;
-       
+
        /* Loop over new/ and cur/ */
        for (i = 0; i < 2; i++) {
-	   sprintf(dir, "%s/%s", path, i ? "cur" : "new");
-               if ((dd = opendir(dir)) == NULL)
-		   return 0;
-               while ((fn = readdir(dd)) != NULL) {
-		   if (fn->d_name[0] == '.')
-		       continue;
+	   dir = tricat(path, "/", i ? "cur" : "new");
+	   if ((dd = opendir(dir)) == NULL)
+	       return 0;
+	   while ((fn = readdir(dd)) != NULL) {
+	       if (fn->d_name[0] == '.')
+		   continue;
 
-		   file = zhtricat(dir, "/", fn->d.name);
-		   if (stat(file, &st_tmp) != 0)
-		       continue;
-		   st_ret.st_size += st_tmp.st_size;
-		   st_ret.st_blocks++;
-		   if (st_tmp.st_atime != st_tmp.st_mtime &&
-		       st_tmp.st_atime > atime)
-		       atime = st_tmp.st_atime;
-		   if (st_tmp.st_mtime > mtime)
-		       mtime = st_tmp.st_mtime;
-               }
-               closedir(dd);
+	       file = zhtricat(dir, "/", fn->d.name);
+	       if (stat(file, &st_tmp) != 0)
+		   continue;
+	       st_ret.st_size += st_tmp.st_size;
+	       st_ret.st_blocks++;
+	       if (st_tmp.st_atime != st_tmp.st_mtime &&
+		   st_tmp.st_atime > atime)
+		   atime = st_tmp.st_atime;
+	       if (st_tmp.st_mtime > mtime)
+		   mtime = st_tmp.st_mtime;
+	   }
+	   closedir(dd);
        }
 
        if (atime) st_ret.st_atime = atime;
