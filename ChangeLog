@@ -1,5 +1,9 @@
 2002-02-25  Sven Wischnowsky  <wischnow@zsh.org>
 
+	* 16710: Completion/Base/Core/_message, Test/Y03arguments.ztst:
+	make _message inhibit insertion of matches unless there are
+	faked ones
+
 	* 16708: Completion/Base/Core/_message,
 	Completion/Base/Utility/_guard, Completion/Unix/Command/_grep,
 	Completion/Unix/Command/_pbm, Completion/Unix/Command/_pine,

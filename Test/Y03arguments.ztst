@@ -91,7 +91,7 @@
  comptest $'tst -\t'
 0:argument beginning with minus
 >line: {tst -}{}
->MESSAGE:{arg}
+>DESCRIPTION:{arg}
 >DESCRIPTION:{option}
 >NO:{-x}
 

@@ -18,6 +18,8 @@ if [[ "$1" = -e ]]; then
     ret=0
   done
 
+  (( $compstate[nmatches] )) || compstate[insert]=
+
   return ret
 fi
 
