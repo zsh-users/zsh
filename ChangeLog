@@ -1,3 +1,8 @@
+2002-02-16  Wayne Davison  <wayned@users.sourceforge.net>
+
+	* 16625: Src/hist.c: Optimized putoldhistentryontop() for use by
+	resizehistents().
+
 2002-02-14  Clint Adams  <clint@zsh.org>
 
 	* Gergely Nagy, 16644: Completion/Unix/Command/.distfiles,
