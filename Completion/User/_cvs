@@ -309,13 +309,12 @@ _cvsaddp () {
   if [[ -d ${pref}CVS ]]; then
     _cvsentries
     setopt localoptions unset
-    local all omit
-    all=( ${pref}*~${pref}CVS(D:t) )
+    local omit
     omit=( CVS $entries ${=cvsignore} )
     [[ -r ~/.cvsignore ]] && omit=( $omit $(<~/.cvsignore) )
     [[ -r ${pref}.cvsignore ]] && omit=( $omit $(<${pref}.cvsignore) )
-    compgen -g '*~(*/|)('${(j:|:)omit:q}')' ||
-    { _cvsdirentries; compgen -g '('${(j:|:)entries:q}')' }
+    compgen -g '*~(*/|)('${(j:|:)omit:q}')(D)' ||
+    { _cvsdirentries; compgen -g '('${(j:|:)entries:q}')(D)' }
   else
     _files
   fi
