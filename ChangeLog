@@ -1,5 +1,8 @@
 2001-03-05  Sven Wischnowsky  <wischnow@zsh.org>
 
+	* 13566: Completion/Builtins/_aliases, Completion/Core/_expand_alias,
+ 	Doc/Zsh/compsys.yo: new _expand_aliases to, well, expand aliases
+	
 	* 13565: Src/Zle/compmatch.c, Src/Zle/compresult.c,
  	Test/54compmatch.ztst: fix for matching control, try harder to
  	merge separately completed parts to avoid losing user-typed

@@ -958,6 +958,13 @@ process IDs in the following lines.  If the line does not contain
 `tt(PID)', the first numbers in each of the other lines are taken as the 
 process IDs to complete.
 )
+kindex(complete, completion style)
+item(tt(complete))(
+This is used by the tt(_expand_alias) function when invoked as a
+bindable command.  If it set to `true' and the word on the command
+line is not the name of an alias, matching alias names will be
+completed.
+)
 kindex(completer, completion style)
 item(tt(completer))(
 The strings given as the value of this style provide the names of the
@@ -999,6 +1006,12 @@ item(tt(condition))(
 This style is used by the tt(_list) completer function to decide if
 insertion of matches should be delayed unconditionally. The default is 
 `true'.
+)
+kindex(disabled, completion style)
+item(tt(disabled))(
+If this is set to `true', the tt(_expand_alias) completer and bindable 
+command will try to expand disabled aliases, too.  The default is
+`tt(false)'.
 )
 kindex(disable-stat, completion style)
 item(tt(disable-stat))(
@@ -1183,6 +1196,11 @@ This is used by the tt(_expand) completer.  If
 it is set to `true' (the default), globbing will be attempted on the
 words resulting from substitution (see the tt(substitute) style) or
 the original string from the line.
+)
+kindex(global, completion style)
+item(tt(global))(
+If this is set to `true' (the default), the tt(_expand_alias)
+completer and bindable command will try to expand global aliases.
 )
 kindex(group-name, completion style)
 item(tt(group-name))(
@@ -1719,6 +1737,15 @@ is always added.  Note that these completers use this style after
 setting the completer field in the context name to
 tt(correct-)var(num) or tt(approximate-)var(num), where var(num) is
 the number of errors that were accepted.
+)
+kindex(regular, completion style)
+item(tt(regular))(
+This style is used by the tt(_expand_alias) completer and bindable 
+command.  If is set to `true' (the default) regular alias will be
+expanded only in command position.  If it is set to `false', regular
+aliases will never be expanded and if it is set to the string
+`tt(always)', regular aliases will be expanded even if not in command
+position.
 )
 kindex(packageset, completion style)
 item(tt(packageset))(
@@ -2389,6 +2416,17 @@ When tt(_expand) is called as a function, the different modes may be
 selected with options.  The tt(-s) to tt(substitute), tt(-g) to
 tt(glob) and tt(-o) to tt(subst-globs-only).
 )
+findex(_expand_alias)
+item(tt(_expand_alias))(
+If the word the cursor is on is an alias, it is expanded and no other
+completers are called.  Which types of aliases are to be expanded can
+be controlled with the tt(regular), tt(global) and tt(disabled)
+styles.
+
+This function is also a bindable command, see
+ifzman(the section `Bindable Commands' below)\
+ifnzman(noderef(Bindable Commands)).
+)
 findex(_history)
 item(tt(_history))(
 Complete words from the shell's command  history.  This completer 
@@ -2560,6 +2598,20 @@ Performs correction of the current argument using the usual contextual
 completions as possible choices. This stores the string
 `tt(correct-word)' in the var(function) field of the context name and
 then calls the tt(_correct) completer.
+)
+findex(_expand_alias (^Xa))
+item(tt(_expand_alias (^Xa)))(
+This function can be used as a completer and as a bindable command.
+It expands the word the cursor on if it is an alias.  The types of
+aliases used can be controlled with the tt(regular), tt(global) and
+tt(disabled) styles.
+
+When used as a bindable command there is one additional feature that
+can be selected by setting the tt(complete) style to `true'.  In this
+case, if the word isn't the name of an alias, tt(_expand_alias) tries
+to complete the word to an full alias name without expanding it (but
+leaving the cursor directly after the completed word so that invoking
+tt(_expand_alias) once more will expand the now-complete alias name).
 )
 findex(_expand_word (^Xe))
 item(tt(_expand_word (^Xe)))(
