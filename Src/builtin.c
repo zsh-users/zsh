@@ -1064,7 +1064,7 @@ int
 fixdir(char *src)
 {
     char *dest = src, *d0 = dest;
-#ifdef __CYGWIN
+#ifdef __CYGWIN__
     char *s0 = src;
 #endif
     int ret = 0;

@@ -1,7 +1,221 @@
+1999-09-13  Peter Stephenson  <pws@ibmth.df.unipi.it>
+
+	* pws: Config/version.mk: 3.1.6-pws-4.
+
+	* Tanaka Akira: 7806: Completion/Users/_pbm: missing backslash.
+	
+	* Sven: 7804: Completion/Base/_arguments: `no more arguments'
+	  message.
+
+	* Sven: 7801: Completion/Base/_arguments: listing problem with
+	  arguments.
+
+	* Sven: 7800: Completion/Core/_normal: terminate whence options to
+	  avoid error message.
+
+	* Sven: 7798: Doc/Zsh/compwid.yo, Src/Zle/comp.h,
+	  Src/Zle/compctl.c, Src/Zle/zle_tricky.c,
+	  Completion/Base/_brace_parameter, Completion/Base/_parameter,
+	  Completion/Core/_parameters: compadd -e treats arguments as
+	  parameters for AUTO_PARAM_SLASH and AUTO_PARAM_KEYS.
+
+	* Sven: 7797: Doc/Zsh/compsys.yo,
+	  Completion/Commands/_verbose_list, Completion/Core/_oldlist:
+	  _verbose_list widget makes completion function lists
+	  progressively more verbose.
+
+	* Sven: 7795: Completion/User/_mount: mounting excitement.
+
+	* Sven: 7793: Completion/User/_ispell: ispell completions.
+
+	* Sven: 7792: Completion/User/_bison, Completion/User/_flex:
+	  not particularly hairy bison and flex completions.
+
+	* Sven: 7791: Src/Zle/zle_tricky.c: completion code numbers.
+
+	* Sven: 7790: Completion/User/_pbm, Completion/User/_ssh,
+	  Completion/Linux/_rpm: miscellaneous tidying.
+
+	* Sven: 7789: Completion/User/_tiff: completions for conversions
+	  to/from tiff format.
+
+	* Bart: 7784, 7787: Src/utils.c: memory use in bslashquote
+	  (cf. 7713).
+
+	* Tanaka Akira: 7779, 7781: Completion/User/_hosts,
+	  Completion/User/_telnet, Completion/User/_socket: telnet and
+	  socket completions with ports.
+
+	* Bart and pws: 2592: Functions/Zle/history-search-end,
+	  Functions/Zle/predict-on: new Zle functions for fancy history
+	  searching.
+
+	* Tanaka Akira: 7778: Completion/Base/_regex_arguments: implement
+	  cache.
+
+	* Tanaka Akira: 7777: Completion/Base/_regex_arguments,
+	  Completion/Debian/_apt: more apt utilities handled, condensed to
+	  single file; _apt-cache, _apt-get and _apt_arguments deleted.
+
+1999-09-10  Peter Stephenson  <pws@ibmth.df.unipi.it>
+
+	* pws: 7767: Completion/Builtins/_zftp, Doc/Zsh/mod_zftp.yo,
+	Doc/Zsh/zftpsys.yo, Functions/Zftp/zfanon,
+	Functions/Zftp/zfautocheck, Functions/Zftp/zfcd,
+	Functions/Zftp/zfcd_match, Functions/Zftp/zfcget,
+	Functions/Zftp/zfdir, Functions/Zftp/zffcache,
+	Functions/Zftp/zfgcp, Functions/Zftp/zfget,
+	Functions/Zftp/zfget_match, Functions/Zftp/zfgoto,
+	Functions/Zftp/zfinit, Functions/Zftp/zfmark,
+	Functions/Zftp/zfopen, Functions/Zftp/zfparams,
+	Functions/Zftp/zfpcp, Functions/Zftp/zfrglob,
+	Functions/Zftp/zfsession, Functions/Zftp/zfstat,
+	Functions/Zftp/zftp_chpwd, Functions/Zftp/zftp_progress,
+	Functions/Zftp/zftransfer, Functions/Zftp/zfuget,
+	Functions/Zftp/zfuput, Src/Modules/zftp.c:
+	new session management for zftp (session, rmsession); new
+	functions zfsession, zftransfer, zffcache; various completion
+	and argument-handling improvements.
+
+	* pws: 7765: Src/builtin.c, Src/exec.c: getopts didn't reset
+	  counter for index into option list properly; didn't set option
+	  variable to "?" when printing its own error message.
+
+	* Tanaka Akira: 7763: Completion/Base/_arguments: bad argument
+	  indexing.
+
+1999-09-09  Peter Stephenson  <pws@ibmth.df.unipi.it>
+
+	* Sven: 7750: Completion/Base/_arguments: fix option aliasing.
+
+	* Tanaka Akira: 7748: Completion/User/_urls,
+	  Completion/Core/_display: missing "$@" and X.
+
+	* Sven: 7747: Doc/Zsh/compsys.yo, Completion/Base/_first,
+	  Completion/Commands/_history_complete_word,
+	  Completion/User/_cvs, Completion/User/_groups,
+	  Etc/completion-style-guide: Mainly documentation changes: group
+	  configuration keys into a single section.
+
+	* Tanaka Akira: 7744: Completion/User/_patch: argument changes.
+	
+	* Sven: 7739: Completion/User/_rlogin: improvements.
+
+	* pws: 7738: Completion/User/_man: didn't work with correction
+	  and approximation.
+
+	* Sven: 7737: Completion/User/_ssh, Completion/User/_users:
+	  slogin, scp, and user@host; use array $users if defined.
+
+	* Sven: 7736: Src/Zle/zle_tricky.c, Completion/Core/_display:
+
+	* Sven: 7734: Src/Zle/complist.c, Src/Zle/zle_tricky.c:
+	  displays of lists with disparate lengths and different groups of
+	  matches with the same name.
+
+	* Tanaka Akira: 7729, 7735: Completion/Debian/_apt-get,
+	  Completion/Debian/_apt_arguments, Completion/Debian/_apt-cache:
+	  apt-get and apt-cache completion improvments.
+
+1999-09-08  Peter Stephenson  <pws@ibmth.df.unipi.it>
+
+	* Tanaka Akira: 7723: Completion/User/_cvs: typo.
+
+	* Sven: 7722: Completion/User/_dvi, Completion/User/_rlogin,
+	  Completion/User/_ssh, Completion/User/_yodl,
+	  Completion/User/_yp: new _yodl and all-round improvements.
+
+	* Tanaka Akira: 7720: Completion/Base/_regex_arguments,
+	  Completion/Debian/_apt_arguments, _apt-get: regular expression
+	  argument parsing, used for apt-get.
+
+	* Sven: 7718, 7719: Completion/Base/_arguments,
+	  Completion/Linux/_rpm, Doc/Zsh/compsys.yo: better handling for
+	  combined single-letter options.
+
+	* Sven: 7716: Completion/Core/_complete, Completion/Core/_normal,
+	  Completion/Base/_precommand: modify 7693 so that _normal always
+	  resets _compskip unless called from _complete (via -s option).
+
+	* Sven: 7714: Src/Zle/zle_tricky.c: problem displaying multiople
+	  completion messages.
+
+	* Sven: 7713: Src/utils.c: buffer for backslash quoting was too
+	  short.
+
+	* Sven: 7712: Src/text.c: fix core dump in case.
+
+	* Bart: 7707: Config/installfns.sh, Config/uninstallfns.sh:
+	  insert $DESTDIR as internal prefix of $fndir.
+
+	* Bart, Tanaka Akira: 7705, 7706, 7709: Completion/User/_cvs:
+	  select cvs function by substitution.
+
+	* Clint: 7704: Makefile.in, Completion/Makefile.in,
+	  Doc/Makefile.in, Functions/Makefile.in: betting distclean for
+	  Completion/Makefile, Functions/Makefile, Config/defs.mk.
+
+	* Clint: 7703: Config/installfns.sh: $DESTDIR prefixes $fndir.
+
+	* Bart: 7697: Src/subst.c: sroted -> sorted.
+
+1999-09-07  Peter Stephenson  <pws@ibmth.df.unipi.it>
+
+	* pws: 7693: Completion/Base/_precommand: unset _compskip for
+	  redoing _normal after _precommand.
+
+	* Sven: 7690: Completion/Base/_arguments, Completion/User/_gprof,
+	  Completion/User/_gs, Completion/User/_gv,
+	  Completion/User/_patch, Completion/User/_xargs,
+	  Completion/X/_x_arguments, Completion/X/_xt_arguments,
+	  Doc/Zsh/compsys.yo: more exclusion lists and states, different
+	  return value for using states.
+
+	* Sven: 7687: Completion/Base/_arguments, Completion/User/_yp,
+	  Doc/Zsh/compsys.yo: _arguments allows case where an option turns
+	  off normal argument handling, new _yp function, space in action
+	  means no action.
+
+	* Sven: zsh-users/2576, zsh-users/2578: fix typeset -Z and typeset
+	  -R.
+	
+	* Tanaka Akira: 7675: Completion/User/_hosts: remove nslookup,
+	  since that uses _nslookup.
+
+	* Adam: 7674: Doc/Zsh/compsys.yo, Etc/completion-style-guide:
+	  typos.
+
+	* Adam: 7671: Completion/Linux/_rpm: tyeset -> typeset,
+	  build_b completes *.spec.
+
+	* Tanaka Akira: 7670, 7686: Completion/User/_cvs, INSTALL,
+	  configure.in: _cvs back in one function, remove Completion/Cvs.
+
+	* John Williams: 7669: Src/builtin.c: __CYGWIN should be __CYGWIN__
+
 1999-09-06  Peter Stephenson  <pws@ibmth.df.unipi.it>
+
+	* Sven: 7662: Etc/completion-style-guide: subcommands and using
+	  funcall to test state functions.
+
+	* pws: 7660: Src/Modules/cap.c: changes as per 7591; initialize
+	  variables to silence compiler.
+
+	* Sven: 7656: Doc/Zsh/compsys.yo: display fixes.
+
+	* Sven: 7655: Src/Zle/zle_tricky.c: bug completing on continuation
+	  line.
+
+	* Sven: 7654: Src/Zle/zle_thingy.c: error calling zle -R outside
+	  widget.
 
 	* pws: Config/version.mk: 3.1.6-pws-3
 
+	* Sven: 7652: Doc/Zsh/compsys.yo, Completion/Base/_values,
+	  Completion/User/_hosts, Completion/User/_nslookup,
+	  Functions/Misc/nslookup: complete assignment-like arguments,
+	  nslookup wrapper with completion.
+	
 	* pws: 7651: Doc/Zsh/options.yo: document HIST_FIND_NO_DUPS.
 
 	* Sven: 7650: Doc/Zsh/compsys.yo, Completion/Base/_arguments,

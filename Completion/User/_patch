@@ -24,7 +24,7 @@ _arguments -s \
   '(--ifdef)-D+:name:' \
   '(--version-control)-V+:version control style:(simple numbered existing)' \
   '(--prefix)-B+:backup path prefix:' \
-  '(--suffix)-b+:backup extension:' \
+  '(--suffix)-b:backup extension:' \
   '-Y+:backup basename prefix:_files' \
   '-z+:backup file suffix:(.bak)' \
   '-g+:NUM:' \

@@ -201,6 +201,7 @@ realparamtab
 redup
 refreshptr
 remlpaths
+remnode
 remnulargs
 removehashnode
 require_module
