@@ -472,7 +472,7 @@ freechanges(struct change *p)
 /* register pending changes in the undo system */
 
 /**/
-void
+mod_export void
 handleundo(void)
 {
     mkundoent();

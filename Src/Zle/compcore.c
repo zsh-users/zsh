@@ -37,7 +37,10 @@ static Widget lastcompwidget;
 /* Flags saying what we have to do with the result. */
 
 /**/
-int useexact, useline, uselist, forcelist, iforcemenu, startauto;
+int useexact, useline, uselist, forcelist, startauto;
+
+/**/
+mod_export int iforcemenu;
 
 /* Non-zero if we should go back to the last prompt. */
 

@@ -1400,7 +1400,7 @@ getstrvalue(Value v)
 static char *nular[] = {"", NULL};
 
 /**/
-char **
+mod_export char **
 getarrvalue(Value v)
 {
     char **s;
