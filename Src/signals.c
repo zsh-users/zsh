@@ -666,6 +666,7 @@ dosavetrap(int sig, int level)
 	st->list = removehashnode(shfunctab, func);
     } else {
 	st->list = sigfuncs[sig];
+	sigfuncs[sig] = NULL;
 	unsettrap(sig);
     }
     sigtrapped[sig] = 0;
