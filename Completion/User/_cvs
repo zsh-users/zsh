@@ -182,21 +182,14 @@ _cvsrepositories () {
 }
 
 _cvsprefix () {
-  local f
-  qpref=$PREFIX
-  if [[ $qpref != */ ]]; then
-    if [[ $qpref = */* ]]; then
-      qpref=$qpref:h
-    else
-      qpref=
-    fi
-  fi
-  pref=$~qpref
-  if [[ ! -d "$pref" ]]; then
+  #if [[ -prefix */ ]]; then
+  if [[ x"$PREFIX" == x*/* ]]; then
+    qpref="${PREFIX%/*}/"
+    pref=$~qpref
+  else
     qpref=
-    pref=
+    pref=./
   fi
-  [[ -n "$pref" && "$pref" != */ ]] && qpref=$qpref/ pref=$pref/
 }
 
 _cvsdirentries () {
@@ -247,68 +240,66 @@ _cvsentries_modified () {
 }
 
 _cvsdirs () {
-  local qpref pref entries
-  _cvsprefix
   if [[ -d ${pref}CVS ]]; then
     _cvsdirentries
-    compadd -fP "$qpref" -W "$pref" - $entries
+    compadd -fW "$pref" - $entries
   else
-    _files
+    _files -W "$pref"
   fi
 }
 
 _cvstargets () {
   local qpref pref entries
-  _cvsprefix
+  _cvsprefix; compset -P '*/'
   if [[ -d ${pref}CVS ]]; then
     _cvsentries
-    compadd -fP "$qpref" -W "$pref" - $entries
+    compgen -W "$pref" -g "(${(j:|:)entries})"
   else
-    _files
+    _files -W "$pref"
   fi
 }
 
 _cvstargets_modified () {
   local qpref pref entries
-  _cvsprefix
+  _cvsprefix; compset -P '*/'
   if [[ -d ${pref}CVS ]]; then
     _cvsentries_modified
-    compadd -fP "$qpref" -W "$pref" - $entries
+    compgen -W "$pref" -g "(${(j:|:)entries})"
   else
-    _files
+    _files -W "$pref"
   fi
 }
 
 _cvsremovep () {
   local qpref pref entries
-  _cvsprefix
+  _cvsprefix; compset -P '*/'
   if [[ -d ${pref}CVS ]]; then
     _cvsentries
     setopt localoptions unset
     local omit
     omit=( ${pref}*(D:t) )
-    eval 'compadd -fP "$qpref" -W "$pref" - ${entries:#('${(j:|:)omit}')}' ||
+    eval 'compadd -fW "$pref" - ${entries:#('${(j:|:)omit}')}' ||
     _cvsdirs
   else
-    _files
+    _files -W "$pref"
   fi
 }
 
 _cvsaddp () {
   local qpref pref entries
-  _cvsprefix
+  _cvsprefix; compset -P '*/'
   if [[ -d ${pref}CVS ]]; then
     _cvsentries
     setopt localoptions unset
     local all omit
     all=( ${pref}*~${pref}CVS(D:t) )
-    omit=( $entries ${=cvsignore} )
+    omit=( CVS $entries ${=cvsignore} )
     [[ -r ~/.cvsignore ]] && omit=( $omit $(<~/.cvsignore) )
     [[ -r ${pref}.cvsignore ]] && omit=( $omit $(<${pref}.cvsignore) )
-    eval 'compadd -fP "$qpref" -W "$pref" - ${all:#('${(j:|:)omit}')}' ||
+    compgen -W "$pref" -g "*~*/(${(j:|:)omit})" ||
     _cvsdirs
   else
-    _files
+    _files -W "$pref"
   fi
 }
 
