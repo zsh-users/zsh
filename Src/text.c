@@ -58,6 +58,7 @@ static void
 taddstr(char *s)
 {
     int sl = strlen(s);
+    char c;
 
     while (tptr + sl >= tlim) {
 	int x = tptr - tbuf;
@@ -68,8 +69,12 @@ taddstr(char *s)
 	tlim = tbuf + tsiz;
 	tptr = tbuf + x;
     }
-    strcpy(tptr, s);
-    tptr += sl;
+    if (tnewlins) {
+	memcpy(tptr, s, sl);
+	tptr += sl;
+    } else
+	while ((c = *s++))
+	    *tptr++ = (c == '\n' ? ' ' : c);
 }
 
 /**/
@@ -195,6 +200,9 @@ struct tstack {
 	struct {
 	    int par;
 	} _cond;
+	struct {
+	    Wordcode end;
+	} _subsh;
     } u;
 };
 
@@ -330,8 +338,10 @@ gettext2(Estate state)
 	    if (!s) {
 		taddstr("( ");
 		tindent++;
-		tpush(code, 1);
+		n = tpush(code, 1);
+		n->u._subsh.end = state->pc + WC_SUBSH_SKIP(code);
 	    } else {
+		state->pc = s->u._subsh.end;
 		tindent--;
 		taddstr(" )");
 		stack = 1;
@@ -341,8 +351,10 @@ gettext2(Estate state)
 	    if (!s) {
 		taddstr("{ ");
 		tindent++;
-		tpush(code, 1);
+		n = tpush(code, 1);
+		n->u._subsh.end = state->pc + WC_CURSH_SKIP(code);
 	    } else {
+		state->pc = s->u._subsh.end;
 		tindent--;
 		taddstr(" }");
 		stack = 1;
@@ -719,35 +731,41 @@ getredirs(LinkList redirs)
 	Redir f = (Redir) getdata(n);
 
 	switch (f->type) {
-	case WRITE:
-	case WRITENOW:
-	case APP:
-	case APPNOW:
-	case ERRWRITE:
-	case ERRWRITENOW:
-	case ERRAPP:
-	case ERRAPPNOW:
-	case READ:
-	case READWRITE:
-	case HERESTR:
-	case MERGEIN:
-	case MERGEOUT:
-	case INPIPE:
-	case OUTPIPE:
+	case REDIR_WRITE:
+	case REDIR_WRITENOW:
+	case REDIR_APP:
+	case REDIR_APPNOW:
+	case REDIR_ERRWRITE:
+	case REDIR_ERRWRITENOW:
+	case REDIR_ERRAPP:
+	case REDIR_ERRAPPNOW:
+	case REDIR_READ:
+	case REDIR_READWRITE:
+	case REDIR_HERESTR:
+	case REDIR_MERGEIN:
+	case REDIR_MERGEOUT:
+	case REDIR_INPIPE:
+	case REDIR_OUTPIPE:
 	    if (f->fd1 != (IS_READFD(f->type) ? 0 : 1))
 		taddchr('0' + f->fd1);
 	    taddstr(fstr[f->type]);
 	    taddchr(' ');
-	    if (f->type == HERESTR) {
-		taddchr('\'');
-		taddstr(bslashquote(f->name, NULL, 1));
-		taddchr('\'');
+	    if (f->type == REDIR_HERESTR) {
+                if (has_token(f->name)) {
+                    taddchr('\"');
+                    taddstr(bslashquote(f->name, NULL, 2));
+                    taddchr('\"');
+                } else {
+                    taddchr('\'');
+                    taddstr(bslashquote(f->name, NULL, 1));
+                    taddchr('\'');
+                }
 	    } else
 		taddstr(f->name);
 	    taddchr(' ');
 	    break;
 #ifdef DEBUG
-	case CLOSE:
+	case REDIR_CLOSE:
 	    DPUTS(1, "BUG: CLOSE in getredirs()");
 	    taddchr(f->fd1 + '0');
 	    taddstr(">&- ");
