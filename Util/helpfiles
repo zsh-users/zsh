@@ -109,8 +109,9 @@ BUILTINS: while (<>) {
 	$undented && &doprint($_);
 	while (defined($_ = <>) && /(^\w)|(^\s*$)/) { 
 	    last BUILTINS if /^STARTUP\/SHUTDOWN FILES/;
+	    last if /^zsh.*\s\d$/; # GNU nroff -man end-of-page marker
 	}
-        if (/^\s*Page/) {
+        if (/^\s*Page/ || /^zsh.*\s\d$/) {
 	    do {
 		$_ = <>;
 	    } while (defined($_) && /^\s*$/);
@@ -121,8 +122,8 @@ BUILTINS: while (<>) {
 	    }
 	}
 	# In zshall, the zshcompctl manual page comes after the
-	# builtins.
-	if (/ZSHCOMPCTL\(1\).*ZSHCOMPCTL\(1\)/) {
+	# builtins for 3.0, and zshzle comes after it for 3.1.
+	if (/ZSH(COMPCTL|ZLE)\(1\).*ZSH(COMPCTL|ZLE)\(1\)/) {
 	    last BUILTINS;
 	}
 	if (/^(\s*)/ && length($1) < $indent) {
