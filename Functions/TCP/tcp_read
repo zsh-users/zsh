@@ -190,7 +190,7 @@ while (( ${#read_fds} )); do
     print "[tcp_read: returned fds ${reply}]" >&2
   fi
   for read_fd in ${reply[2,-1]}; do
-    if ! read -r line <&$read_fd; then
+    if ! read -u $read_fd -r line; then
       unset "read_fds[$read_fd]"
       stat=1
       continue

@@ -20,14 +20,14 @@ else
   zle -I
   # Handle fds not in the TCP set similarly.
   # This does the drain thing, to try and get as much data out as possible.
-  if ! read line <&$1; then
+  if ! read -u $1 line; then
     print "[Reading on $1 failed; removing from poll list]" >& 2
     zle -F $1
     return 1
   fi
   line="fd$1:$line"
   local newline
-  while read -t newline <&$1; do
+  while read -u $1 -t newline; do
     line="${line}
 fd$1:$newline"
   done

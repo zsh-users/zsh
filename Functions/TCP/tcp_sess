@@ -33,7 +33,7 @@ for name in ${(ko)tcp_by_name}; do
   else
     cur=
   fi
-  print "sess:$name; fd:$fd$cur" >&$__myfd
+  print -u $__myfd "sess:$name; fd:$fd$cur"
 done
 
 return $(( __myfd - 1 ))

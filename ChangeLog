@@ -1,3 +1,10 @@
+2003-07-25  Peter Stephenson  <pws@csr.com>
+
+	* 18908: Doc/Zsh/builtins.yo, Functions/TCP/tcp_fd_handler,
+	Functions/TCP/tcp_read, Functions/TCP/tcp_send,
+	Functions/TCP/tcp_sess: Use print/read -u for supplying fd's.
+	Tweak documentation for print/read -u for consistency.
+
 2003-07-24  Oliver Kiddle  <opk@zsh.org>
 
 	* 18901: baptiste daroussin (and Nikolai Weibull, 18894):

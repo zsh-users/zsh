@@ -657,7 +657,7 @@ If the tt(PUSHD_MINUS) option is set, the meanings of `tt(PLUS())' and
 `tt(-)' in this context are swapped.
 )
 findex(print)
-xitem(tt(print) [ tt(-abcDilmnNoOpPrsz) ] [ tt(-u)var(n) ] [ tt(-f) var(format) ] [ tt(-C) var(cols) ])
+xitem(tt(print) [ tt(-abcDilmnNoOpPrsz) ] [ tt(-u) var(n) ] [ tt(-f) var(format) ] [ tt(-C) var(cols) ])
 item(  [ tt(-R) [ tt(-en) ]] [ var(arg) ... ])(
 With the `tt(-f)' option the arguments are printed as described by tt(printf).
 With no flags or with the flag `tt(-)', the arguments are printed on
@@ -738,7 +738,7 @@ tt(-R); all other arguments and options are printed.
 item(tt(-s))(
 Place the results in the history list instead of on the standard output.
 )
-item(tt(-u)var(n))(
+item(tt(-u) var(n))(
 Print the arguments to file descriptor var(n).
 )
 item(tt(-z))(
@@ -827,7 +827,7 @@ alias(r)(fc -e -)
 findex(read)
 vindex(IFS, use of)
 ifzman(xitem(tt(read) [ tt(-rszpqAclneE) ] [ tt(-t) [ var(num) ] ] [ tt(-k) [ var(num) ] ] [ tt(-d) var(delim) ]))
-item(ifnzman(tt(read) [ tt(-rszpqAclneE) ] [ tt(-t) [ var(num) ] ] [ tt(-k) [ var(num) ] ] [ tt(-d) var(delim) ]) [ tt(-u)var(n) ] [ var(name)[tt(?)var(prompt)] ] [ var(name) ...  ])(
+item(ifnzman(tt(read) [ tt(-rszpqAclneE) ] [ tt(-t) [ var(num) ] ] [ tt(-k) [ var(num) ] ] [ tt(-d) var(delim) ]) [ tt(-u) var(n) ] [ var(name)[tt(?)var(prompt)] ] [ var(name) ...  ])(
 vindex(REPLY, use of)
 vindex(reply, use of)
 Read one line and break it into fields using the characters
@@ -895,7 +895,7 @@ read.  Note that the command name is word number 1, not word 0,
 and that when the cursor is at the end of the line, its character
 index is the length of the line plus one.
 )
-item(tt(-u)var(n))(
+item(tt(-u) var(n))(
 Input is read from file descriptor var(n).
 )
 item(tt(-p))(
