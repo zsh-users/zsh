@@ -1,3 +1,8 @@
+2001-07-26  Oliver Kiddle  <opk@zsh.org>
+
+	* 15503: Test/E01options.ztst: fix posixbuiltins test so that it
+	isn't broken by the existence of a print external command.
+
 2001-07-25  Sven Wischnowsky  <wischnow@zsh.org>
 
 	* 15487: Src/Zle/complete.c: fix for `--' before matches ignoring all
