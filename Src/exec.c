@@ -458,7 +458,8 @@ execute(Cmdnam not_used_yet, int dash)
     /* If the parameter STTY is set in the command's environment, *
      * we first run the stty command with the value of this       *
      * parameter as it arguments.                                 */
-    if (!exargs && (s = zgetenv("STTY")) && isatty(0)) {
+    if (!exargs && (s = zgetenv("STTY")) && isatty(0) &&
+	(GETPGRP() == getpid())) {
 	char *t;
 
 	exargs = args;	/* this prevents infinite recursion */

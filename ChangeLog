@@ -1,5 +1,7 @@
 2000-04-07  Bart Schaefer <schaefer@zsh.org>
 
+	* 10582: Src/exec.c: Apply STTY only to process group leaders.
+
 	* 10581: Etc/BUGS, Src/Modules/zpty.c: Note a fixed bug; typo.
 
 	* Chmouel Boudjnah: 10562: Completion/Linux/_rpm: Complete
