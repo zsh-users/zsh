@@ -1,8 +1,89 @@
+Conventions
+-----------
+
+There are a number of conventions related to writing completion
+functions and it is useful if they are followed for functions which are
+to be distributed as part of zsh to maintain a level of consistency.
+
+Coding style:
+
+* Use two spaces for indentation and four for continuation lines except
+  where there are many continutation lines such as `_arguments' or
+  `_values' specs. Lines tend to be longer than in C code so less
+  indentation makes sense.
+
+* For constructs such as `if' and `while', the `then' or `do' should be
+  on the end of the line after a semi-colon and space unless there
+  isn't room for it (see the next point) in which case put it on the
+  next line un-indented.
+
+* Please try not to use lines longer than 79 characters. Don't worry
+  about breaking long `_arguments' or `_values' specs though.
+
+Descriptions:
+
+Descriptions should not have a trailing full stop and initial capital
+letter. Though capitals are fine where you have an acronym which
+generally appears in uppercase. 
+
+It is a good idea to copy descriptions from the command's man page or
+--help output. If you do this, be careful that the description still
+makes sense. Some commands have a description like `print help message
+(this one) and exit' for --help but the `(this one)' part no longer
+makes sense. A less obvious example is where the help output looks like:
+  -X, --encoding=NAME        use input encoding NAME
+copying this description exactly would result in completion output that
+looks like this:
+  --encoding   -X    -- use input encoding NAME
+In the help output, it is much clearer what is meant by `NAME' because
+it appears after `--encoding=' but it doesn't in the completion
+listing. So it is better to use a description of this form:
+  --encoding   -X    -- use specified input encoding
+The word specify is commonly used with options that take arguments.
+
+Another example of where --help output may not be suitable unedited is
+where default values or units are indicated. Do not put them in
+per-match descriptions; they are better placed in the group
+descriptions. Put the units in parentheses after the description. So
+for example, do not use:
+  '--timeout[specifiy connection timeout in milliseconds]:timeout'
+but use:
+  '--timeout[specify connection timeout]:timeout (ms)'
+  
+Group descriptions should be singular because only one thing is being
+completed even though many may be listed. This applies even where you
+complete a list of the things. Tags, functions for completing types of
+things (such as _files), and states should have plural names.
+
+In a function, allow any descriptions passed as an argument to override
+the default you define. For example:
+  _wanted directories expl directory _files -/ "$@" -
+The "$@" adds descriptions passed as parameters and the trailing `-'
+tells _wanted where to put options specifying the `directory' description.
+
+Where two matches have identical meaning, give them the same
+description. The zsh 4.1 completion system will group them together.
+Conventionally a brace exapansion of this form is used:
+  '(--context,-C)'{--context=,-C-}'[specify lines of context]:lines'
+You won't need the exclusion list if the option can be specified
+multiple times. It can also be useful to use the same description for
+matches which are completely opposite in their meaning if it shortens
+the completion listing provided that the names of the matches makes it
+clear what their effect is.
+
+Command Versions:
+
+In most cases multiple versions (releases) of commands are not
+supported. The functions are merely updated to reflect the latest stable
+version. Exceptions to this can be made where are particular version
+continues to be commonly distributed. Where there is more than one variant
+of the same command however, the separate variants should be supported.
+
 Contexts, tags and all that
 ---------------------------
 
 The completion system keeps track of the current context in the
-parameter `curcontext'. It's content is the hierarchical name for the
+parameter `curcontext'. Its content is the hierarchical name for the
 current context sans the `:completion:' and the last colon and the tag
 currently tried. The tags represent different types of matches. So,
 whenever you are about to add matches, you should use a tag for them
@@ -27,7 +108,7 @@ by giving it to functions like `_tags' via the `-C' options, as in:
 
   local context ...
   ...
-  _arguments ... '-foo:foo:->foo'
+  _arguments ... '-foo:foo:->foo' && return 0
   ...
   if [[ "$state" = foo ]]; then
     _tags -C "$context" ...
@@ -47,7 +128,7 @@ reported back to functions you call. E.g.:
 
   local curcontext="$curcontext" ...
   ...
-  _arguments -C ... 'foo:foo:->foo'
+  _arguments -C ... 'foo:foo:->foo' && return 0
   ...
   if [[ "$state" = foo ]]; then
     _tags ...
@@ -60,40 +141,59 @@ value changed by `_arguments' and `_values' is only used in your
 function (and make sure to initialise it to its old value as in the
 example).
 
+All this only works if the specifications given to `_arguments' define 
+options and arguments that are completely separate. If there is more
+than one `->state' action and more than one of them might be needed
+for the same word, you'll have to use a loop:
+
+  local state context line i expl ret=1
+  ...
+  _arguments \
+      '::arg1:->arg1' \
+      '*:args:->rest' && return 0
+
+  while (( $#state )); do
+    case "$state[1]" in
+    arg1) _wanted -C "$context[1]" foo expl 'foo' compadd - foo1 foo2 && ret=0;;
+    rest) _wanted -C "$context[1]" bar expl 'bar' compadd - bar1 bar2 && ret=0;;
+    esac
+    shift 1 state
+    shift 1 context
+  done
+
+  return ret
+
+As you can see, `state' and `context' are really arrays. In this
+example, completion for the first argument has to complete both `foo's 
+and `bar's.
+
 Then, before adding the matches, see if matches of that type are
 requested by the user in the current context. If you will add only one 
 type of matches, this is very simple. You can use the function
-`_wanted' for this. Its return value is zero only if the type of
-matches is requested by the user, so you can just do:
+`_wanted' for this. Well, you can often use it, that is. Use it as in:
 
-  _wanted names || return 1
+  _wanted names expl 'name' compadd - alice bob
 
-  _loop names expl 'name' compadd - alice bob
+This is like testing if the tag `names' is requested by the user and
+then calling `_all_labels' with the same arguments.
 
-The `_loop' function implements the loop over the tag aliases and
+The `_all_labels' function implements the loop over the tag aliases and
 handles the user-defined description, using (in the example) the
-parameter `expl' to store options to give to the command. These option 
+parameter `expl' to store options to give to the command. These options
 are inserted into the command line either directly before a single
 hyphen if there is such an argument or after the first word if there
-is no single hyphen. Since using `_loop' is so much more conveient
-than writing the loop with the `_try' function (see below), but some
-function called to generate matches don't accept a single hyphen as
-argument anywhere but want the options built as their last arguments,
-`_loop' will *replace* the hyphen with the options if the hyphen is
+is no single hyphen. Since using `_all_labels' is so much more convenient
+than writing the loop with the `_next_label' function (see below), but
+some functions called to generate matches don't accept a single hyphen
+as an argument anywhere but want the options built as their last arguments,
+`_all_labels' will *replace* the hyphen with the options if the hyphen is
 the last argument. A good example for such a function is
 `_combination' which can be called like:
 
-  _loop foo expl 'descr...' _combination ... -
+  _all_labels foo expl 'descr...' _combination ... -
 
 And the `-' will be replaced by the options that are to be given to
 `compadd'.
-
-Since the above sequence of command is used so often, the `_wanted'
-function can also accept the same arguments as `_loop'. In this case
-it will do the test for the requested tag and then just call `_loop',
-so:
-
-  _wanted names expl 'name' compadd - alice bob
 
 Note that you can also give the `-J' and `-V' options with the
 optional `1' or `2' preceding them supported by `_description':
@@ -103,29 +203,29 @@ optional `1' or `2' preceding them supported by `_description':
 In some cases one needs to call multiple functions or call `compadd'
 more than once to generate the matches. In such a case one needs to
 implement the loop over the tag aliases directly. This is done with the 
-`_try' function. Like this:
+`_next_label' function. Like this:
 
-  while _try names expl 'name'; do
+  while _next_label names expl 'name'; do
     compadd "$expl[@]" - alice bob && ret=0
     _other_names "$expl[@]" && ret=0
   done
   return ret
 
-Simple enough, I hope. But `_try' can do some more: utility functions
-normally accept options which are then given to `compadd'. Since these 
-may contain options for the description and `_try' may generate such
-options, too, it isn't entirely trivial to decide which of these
-options should take precedence. But `_try' can do the work for you
-here. All you have to do is to give the options your utility function
-gets to `_try', as in:
+Simple enough, I hope. But `_next_label' can do some more: utility
+functions normally accept options which are then given to `compadd'.
+Since these may contain options for the description and `_next_label' may
+generate such options, too, it isn't entirely trivial to decide which
+of these options should take precedence. But `_next_label' can do the work
+for you here. All you have to do is to give the options your utility
+function gets to `_next_label', as in:
 
-  while _try names expl 'name' "$@"; do
+  while _next_label names expl 'name' "$@"; do
     compadd "$expl[@]" - alice bob
     ...
   done
 
 That's all. Note that the positional argument "$@" are *not* given to
-`compadd'. They will be stuffed into the `expl' array by `_try'.
+`compadd'. They will be stuffed into the `expl' array by `_next_label'.
 
 The most complicated case is where you can offer multiple types of
 matches. In this case the user should be able to say which types he
@@ -138,7 +238,7 @@ for this uses `_tags' and `_requested':
   _tags friends users hosts
 
   while _tags; do
-    _requested friends expl friend compad alice bob && ret=0
+    _requested friends expl friend compadd alice bob && ret=0
     _requested users && _users && ret=0
     _requested hosts && _hosts && ret=0
 
@@ -188,7 +288,7 @@ used by the corresponding call to `_tags' automatically.
 For the names of the tags: choose simple (short, if at all possible)
 names in plural. Also, first have a look at the tag names already used 
 by other functions and if any of these names seem sensible for the
-type of matches you are about to add, the use those names. This will
+type of matches you are about to add, then use those names. This will
 allow users to define styles for certain types of matches independent
 of the place where they are added.
 
@@ -214,7 +314,7 @@ Styles
 Users can associate patterns for hierarchical context names with
 certain styles using the `zstyle' builtin. The completion code
 should then use these styles to decide how matches should be added and 
-to get user-configured values. This, too,  is done using the builtin
+to get user-configured values. This, too, is done using the builtin
 `zstyle'.
 
 Basically styles map names to a bunch of strings (the `value'). In
@@ -308,7 +408,7 @@ throughout the completion system) and do:
   _description tag expl <descr>
   compadd "$expl@]" - <matches ...>
 
-Note that this function also accepts `-V' und `-J', optionally (in the 
+Note that this function also accepts `-V' and `-J', optionally (in the 
 same word) preceded by `1' or `2' to describe the type of group you
 want to use. For example:
 
@@ -332,11 +432,11 @@ often be using the tags function that allows you to give the
 explanation to the same function that is used to test if the tags are
 requested (again: see above). Just as a reminder:
 
-  _wanted [ -[1,2]V | -[1,2]J ] <tag> expl <descr>
+  _wanted [ -[1,2]V | -[1,2]J ] <tag> expl <descr> <cmd> ...
 
 and
 
-  _requested [ -[1,2]V | -[1,2]J ] <tag> expl <descr>
+  _requested [ -[1,2]V | -[1,2]J ] <tag> expl <descr> [ <cmd> ... ]
 
 is all you need to make your function work correctly with both tags
 and description at the same time.
@@ -354,7 +454,7 @@ Misc. remarks
     change the way these things will be completed everywhere by just using
     their own implementations for these functions.
 4)  Make sure that the return value of your functions is correct: zero
-    if matches where added and non-zero if no matches were found.
+    if matches were added and non-zero if no matches were found.
     In some cases you'll need to test the value of `$compstate[nmatches]'
     for this. This should always be done by first saving the old value
     (`local nm="$compstate[nmatches]"') and later comparing this with
@@ -378,17 +478,17 @@ Misc. remarks
     documentation for `_arguments' and `_values' for two functions
     that may help you with this.
 8)  If a completion function generates completely different types of
-    completions (for example, because the comamnd has several
+    completions (for example, because the command has several
     completely different modes), it should allow users to define
     functions that separately override the behavior for these
     different types. This can easily be achieved by using the
-    `_funcall' utility function, as in:
+    `_call_function' utility function, as in:
 
-      _funcall ret _command_$subcommand && return ret
+      _call_function ret _command_$subcommand && return ret
 
     This will try to call the function `_command_$subcommand' and if
     it exists, it will be called and the completion function exits
-    with its exit status. After this call to `funcall' the completion
-    function would contain the code for the default way to generate
-    the matches.
+    with its exit status. After this call to `call_function' the
+    completion function would contain the code for the default way to
+    generate the matches.
     See the `_rpm' and `_nslookup' files for examples.

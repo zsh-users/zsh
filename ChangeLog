@@ -1,3 +1,14 @@
+2003-07-23  Oliver Kiddle  <opk@zsh.org>
+
+	* 18890: Completion/Unix/Command/_sablotron: new sabcmd completion
+
+	* 18877: Etc/completion-style-guide: add a few more points
+
+2003-07-17  Oliver Kiddle  <opk@zsh.org>
+
+	* 18866: Etc/completion-style-guide: document conventions used
+	in completion functions
+
 2003-07-17  Peter Stephenson  <pws@csr.com>
 
 	* 18864: Src/lex.c: unnecessary spaces with empty substitutions
