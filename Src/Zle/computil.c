@@ -926,6 +926,8 @@ ca_parse_line(Cadef d)
 	while (i--)
 	    if (*p++)
 		freelinklist(p[-1], freestr);
+
+	zfree(ca_laststate.oargs, ca_laststate.d->nopts * sizeof(LinkList));
     }
     for (ptr = d->opts; ptr; ptr = ptr->next)
 	ptr->active = 1;
@@ -1051,7 +1053,10 @@ ca_parse_line(Cadef d)
 		(state.def->type == CAA_RREST ||
 		 state.def->type == CAA_RARGS)) {
 		state.inrest = 0;
-		state.argbeg = cur;
+		state.opt = 0;
+		state.optbeg = state.nargbeg;
+		state.argbeg = cur - 1;
+
 		for (; line; line = compwords[cur++]) {
 		    PERMALLOC {
 			addlinknode(state.args, ztrdup(line));
@@ -1082,11 +1087,10 @@ ca_parse_line(Cadef d)
 	    else {
 		LinkList l = state.oargs[state.curopt->num];
 
-		for (; line; line = compwords[cur++]) {
-		    PERMALLOC {
-			addlinknode(l, line);
-		    } LASTALLOC;
-		}
+		PERMALLOC {
+		    for (; line; line = compwords[cur++])
+			addlinknode(l, ztrdup(line));
+		} LASTALLOC;
 		memcpy(&ca_laststate, &state, sizeof(state));
 		ca_laststate.ddef = NULL;
 		ca_laststate.doff = 0;
@@ -1103,8 +1107,8 @@ ca_parse_line(Cadef d)
 	    else {
 		ca_laststate.def = adef;
 		ca_laststate.ddef = NULL;
-		ca_laststate.argbeg = state.nargbeg;
-		ca_laststate.optbeg = state.restbeg;
+		ca_laststate.optbeg = state.nargbeg;
+		ca_laststate.argbeg = state.restbeg;
 		ca_laststate.singles = state.singles;
 	    }
 	}
@@ -1116,21 +1120,26 @@ ca_colonlist(LinkList l)
 {
     if (l) {
 	LinkNode n;
-	int len = 1;
+	int len = 0;
 	char *p, *ret, *q;
 
-	for (n = firstnode(l); n; incnode(n))
+	for (n = firstnode(l); n; incnode(n)) {
+	    len++;
 	    for (p = (char *) getdata(n); *p; p++)
 		len += (*p == ':' ? 2 : 1);
-
+	}
 	ret = q = (char *) zalloc(len);
 
-	for (n = firstnode(l); n; incnode(n))
+	for (n = firstnode(l); n;) {
 	    for (p = (char *) getdata(n); *p; p++) {
 		if (*p == ':')
 		    *q++ = '\\';
 		*q++ = *p;
 	    }
+	    incnode(n);
+	    if (n)
+		*q++ = ':';
+	}
 	*q = '\0';
 
 	return ret;
@@ -1206,10 +1215,10 @@ bin_comparguments(char *nam, char **args, char *ops, int func)
 		if (ca_laststate.doff > 0)
 		    ignore_prefix(ca_laststate.doff);
 		if (arg->type == CAA_RARGS)
-		    restrict_range(ca_laststate.argbeg - 1,
+		    restrict_range(ca_laststate.optbeg,
 				   arrlen(compwords) - 1);
 		else if (arg->type == CAA_RREST)
-		    restrict_range(ca_laststate.optbeg - 1,
+		    restrict_range(ca_laststate.argbeg,
 				   arrlen(compwords) - 1);
 		return 0;
 	    }

@@ -277,7 +277,7 @@ for prepath in "$prepaths[@]"; do
       # otherwise this would keep `_files' from completing all filenames
       # if none of the patterns match.
 
-      if [[ -z "$tpre$tsuf" ]]; then
+      if [[ -z "$tpre$tsuf" && -n "$pre$suf" ]]; then
         tmp1=( "$tmp2[@]" )
 	addsfx=(-S '')
 	remsfx=()
