@@ -49,11 +49,18 @@ mod_export int nsigtrapped;
 /* Variables used by signal queueing */
 
 /**/
-mod_export int queueing_enabled, queue_front, queue_rear, queue_not_sigchld;
+mod_export int queueing_enabled, queue_front, queue_rear;
 /**/
 mod_export int signal_queue[MAX_QUEUE_SIZE];
 /**/
 mod_export sigset_t signal_mask_queue[MAX_QUEUE_SIZE];
+
+/* Variables used by trap queueing */
+
+/**/
+mod_export int trap_queueing_enabled, trap_queue_front, trap_queue_rear;
+/**/
+mod_export int trap_queue[MAX_QUEUE_SIZE];
 
 /* This is only used on machines that don't understand signal sets.  *
  * On SYSV machines this will represent the signals that are blocked *
@@ -426,7 +433,7 @@ zhandler(int sig)
 #endif
 
     /* Are we queueing signals now?      */
-    if (queueing_enabled && (sig != SIGCHLD || !queue_not_sigchld)) {
+    if (queueing_enabled) {
         int temp_rear = ++queue_rear % MAX_QUEUE_SIZE;
 
 	DPUTS(temp_rear == queue_front, "BUG: signal queue full");
@@ -1057,6 +1064,18 @@ dotrap(int sig)
     /* Copied from dotrapargs(). */
     if ((sigtrapped[sig] & ZSIG_IGNORED) || !sigfuncs[sig] || errflag)
 	return;
+
+    /* Adapted from signal queueing in zhandler */
+    if (trap_queueing_enabled && !isset(TRAPSASYNC)) {
+	int temp_rear = ++trap_queue_rear % MAX_QUEUE_SIZE;
+
+	DPUTS(temp_rear == trap_queue_front, "BUG: trap queue full");
+	if (temp_rear != trap_queue_front) {
+	    trap_queue_rear = temp_rear;
+	    trap_queue[trap_queue_rear] = sig;
+	}
+	return;
+    }
 
     dotrapargs(sig, sigtrapped+sig, sigfuncs[sig]);
 }

@@ -994,11 +994,8 @@ zwaitjob(int job, int sig)
     int q = queue_signal_level();
     Job jn = jobtab + job;
 
-    queue_not_sigchld++;
-    if (isset(TRAPSASYNC))
-	dont_queue_signals();
-    else
-	queue_signals();
+    dont_queue_signals();
+    queue_traps();
     child_block();		 /* unblocked during child_suspend() */
     if (jn->procs || jn->auxprocs) { /* if any forks were done         */
 	jn->stat |= STAT_LOCKED;
@@ -1029,10 +1026,8 @@ zwaitjob(int job, int sig)
 	numpipestats = 1;
     }
     child_unblock();
+    dont_queue_traps();
     restore_queue_signals(q);
-    if (!queueing_enabled)
-	run_queued_signals();
-    queue_not_sigchld--;
 }
 
 /* wait for running job to finish */

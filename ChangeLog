@@ -1,3 +1,10 @@
+2004-04-21  Peter Stephenson  <pws@csr.com>
+
+	* 19809: Src/jobs.c, Src/signals.c, Src/signals.h: improve
+	zsh-users/7365 by only queuing traps when TRAPS_ASYNC is set.
+	This avoids any nasty races, including one reported by Vincent
+	Stemen.
+
 2004-04-21  Oliver Kiddle  <opk@zsh.org>
 
 	* 19806: Src/prompt.c: fix bug with %v expansion and negative index
