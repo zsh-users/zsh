@@ -640,7 +640,8 @@ in turn matches what is on the line.  If the var(n)'th var(word) does not
 match, the var(n)'th element of the var(array) is removed.  Elements
 for which the corresponding var(word) is matched are retained.
 )
-item(tt(-), tt(--))(
+xitem(tt(-))
+item(tt(-)tt(-))(
 This flag ends the list of flags and options. All arguments after it
 will be taken as the words to use as matches even if they begin with
 hyphens.

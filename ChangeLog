@@ -1,3 +1,8 @@
+2000-09-11  Bart Schaefer  <schaefer@brasslantern.com>
+
+	* 12793: Completion/Builtins/_zle, Doc/Zsh/compwid.yo,
+	Doc/Zsh/mod_zle.yo: Convert _zle to use _arguments; fix typos.
+
 2000-09-08  Andrej Borsenkow <Andrej.Borsenkow@mow.siemens.ru>
 
 	* 12779: Src/system.h: Comment out #define _XPG_IV for sinix.

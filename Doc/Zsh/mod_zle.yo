@@ -190,7 +190,7 @@ cindex(widgets, calling)
 cindex(calling widgets)
 cindex(widgets, defining)
 cindex(defining widgets)
-xitem(tt(zle) tt(-l) [ tt(-L) ] [ tt(-a) ] [ var(string) ... ])
+xitem(tt(zle) tt(-l) [ tt(-L) | tt(-a) ] [ var(string) ... ])
 xitem(tt(zle) tt(-D) var(widget) ...)
 xitem(tt(zle) tt(-A) var(old-widget) var(new-widget))
 xitem(tt(zle) tt(-N) var(widget) [ var(function) ])
@@ -204,7 +204,7 @@ The tt(zle) builtin performs a number of different actions concerning
 ZLE.  Which operation it performs depends on its options:
 
 startitem()
-item(tt(-l) [ tt(-L) ])(
+item(tt(-l) [ tt(-L) | tt(-a) ])(
 List all existing user-defined widgets.  If the tt(-L)
 option is used, list in the form of tt(zle)
 commands to create the widgets.
@@ -238,7 +238,7 @@ ifzman(zmanref(zshzle))\
 ifnzman(noderef(Zsh Line Editor))\
 .
 )
-citem(completion widgets, creating)
+cindex(completion widgets, creating)
 item(tt(-C) var(widget) var(completion-widget) var(function))(
 Create a user-defined completion widget named var(widget). The 
 completion widget will behave like the built-in completion-widget
