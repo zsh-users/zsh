@@ -1,3 +1,8 @@
+2002-06-22  Bart Schaefer  <schaefer@zsh.org>
+
+	* users/5073: Completion/compdump: use `typeset +f' instead of
+	`whence -w' to get names of completion functions.
+
 2002-06-20  Peter Stephenson  <pws@csr.com>
 
 	* 17334: Src/builtin.c, Src/options.c, Src/params.c, Src/zsh.h,

@@ -101,13 +101,9 @@ bindkey |
 print >> $_d_file
 
 
-# Autoloads: whence -w produces "_d_foo: function", so look for
-# all functions beginning with `_'.
+# Autoloads: look for all functions beginning with `_'.
 
-_d_als=($(whence -wm '_*' | sort |
-while read -rA _d_line; do
-  [[ ${_d_line[2]} = function ]] && print -r - ${_d_line[1]%:}
-done))
+_d_als=(${(o)$(typeset +fm '_*')})
 
 # print them out:  about five to a line looks neat
 
@@ -116,7 +112,7 @@ print -n autoload -U >> $_d_file
 while (( $#_d_als )); do
   if (( ! $+_compautos[$_d_als[1]] )); then
     print -n " $_d_als[1]"
-    if (( ! _i-- && $#_d_als > 1 )); then
+    if (( ! --_i && $#_d_als > 1 )); then
       _i=5
       print -n ' \\\n           '
     fi
