@@ -1,3 +1,12 @@
+2003-09-03  Oliver Kiddle  <opk@zsh.org>
+
+	* 19021: Completion/Zsh/Command/_cd: in command position,
+	try to complete directories once and once only
+
+	* 19019: Completion/Zsh/Command/_alias,
+	Completion/Zsh/Command/_unhash: only complete aliases of the
+	appropriate type for the alias builtin
+
 2003-09-03  Peter Stephenson  <pws@csr.com>
 
 	* 19020: Src/hashtable.c: printaliasnode was screwed up by 19014.

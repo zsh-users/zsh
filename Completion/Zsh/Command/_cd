@@ -67,14 +67,15 @@ else
     # Don't complete local directories in command position, that's
     # already handled by _command_names (see _autocd)
 
-    [[ CURRENT -ne 1 ]] &&
+    [[ CURRENT -ne 1 || ( -z "$path[(r).]" && $PREFIX != */* ) ]] &&
         alt=( "${cdpath+local-}directories:${cdpath+local }directory:_path_files -/" "$alt[@]" )
 
     _alternative "$alt[@]" && ret=0
 
     return ret
   fi
-  _wanted directories expl directory _path_files -/ && ret=0
+  [[ CURRENT -ne 1 ]] && _wanted directories expl directory \
+      _path_files -/ && ret=0
 
   return ret
 fi
