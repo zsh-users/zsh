@@ -3261,7 +3261,7 @@ cfp_opt_pats(char **pats, char *matcher)
 	if (haswilds(t))
 	    return;
     }
-    add = (char *) zhalloc(sizeof(compprefix) * 2 + 1);
+    add = (char *) zhalloc(strlen(compprefix) * 2 + 1);
     for (s = compprefix, t = add; *s; s++) {
 	if (*s != '\\' || !s[1] || s[1] == '*' || s[1] == '?' ||
 	    s[1] == '<' || s[1] == '>' || s[1] == '(' || s[1] == ')' ||

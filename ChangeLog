@@ -78,6 +78,10 @@
 	typeset_single() calls setsparam() in some circumstances; drop a
 	redundant isident() test.
 
+2001-04-25  Sven Wischnowsky  <wischnow@zsh.org>
+
+	* ?????: Src/Zle/computil.c: fix a sizeof() to strlen(). ahem.
+
 2001-04-19  Peter Stephenson  <pws@pwstephenson.fsnet.co.uk>
 
 	* 14046: Doc/Zle/zle.yo, Src/Zle/zle_keymap.c: bindkey -rp removes
