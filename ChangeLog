@@ -1,5 +1,7 @@
 2000-05-10  Sven Wischnowsky  <wischnow@zsh.org>
 
+	* 11294: Src/Zle/computil.c: fix for `-+opt' with mutex list
+	
 	* 11292: Completion/Core/_files: update `%p' replacement in _files
 	
 2000-05-09  Bart Schaefer  <schaefer@brasslantern.com>

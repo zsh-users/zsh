@@ -651,7 +651,7 @@ parse_cadef(char *nam, char **args, int multi)
 	    Caopt opt;
 	    Caarg oargs = NULL;
 	    int multi, otype = CAO_NEXT, again = 0;
-	    char *name, *descr, c;
+	    char *name, *descr, c, *againp = NULL;
 
 	    rec:
 
@@ -665,6 +665,7 @@ parse_cadef(char *nam, char **args, int multi)
 		p[2] != '=' && p[2] != '-' && p[2] != '+') {
 		/* It's a -+ or +- definition. We just execute the whole
 		 * stuff twice for such things. */
+		againp = dupstring(p);
 		name = ++p;
 		*p = (again ? '-' : '+');
 		again++;
@@ -838,7 +839,7 @@ parse_cadef(char *nam, char **args, int multi)
 
 	    if (again == 1) {
 		/* Do it all again for `*-...'. */
-		p = dupstring(*args);
+		p = againp;
 		goto rec;
 	    }
 	} else if (*p == '*') {
