@@ -31,20 +31,11 @@ predict-on() {
   zle -N magic-space insert-and-predict
   zle -N backward-delete-char delete-backward-and-predict
   zle -N delete-char-or-list delete-no-predict
-
-  # Prediction doesn't work well with automenu set, so we unset it here
-  # and restore it in predict-off().
-  if [[ -o automenu ]]; then
-    unsetopt automenu
-    _predict_am=yes
-  fi
 }
 predict-off() {
   zle -A .self-insert self-insert
   zle -A .magic-space magic-space
   zle -A .backward-delete-char backward-delete-char
-
-  [[ -n $_predict_am ]] && setopt automenu
 }
 insert-and-predict () {
   emulate -L zsh
@@ -61,6 +52,7 @@ insert-and-predict () {
 	RBUFFER=""
 	if [[ ${KEYS[-1]} != ' ' ]]
 	then
+	  unsetopt automenu
 	  integer curs=$CURSOR pos nchar=${#LBUFFER//[^${KEYS[-1]}]}
 	  local -a +h comppostfuncs
 	  comppostfuncs=( predict-limit-list )
@@ -120,11 +112,14 @@ delete-no-predict() {
 # of matches from forcing a "do you wish to see all ...?" prompt.
 
 predict-limit-list() {
-  if [[ compstate[list_lines]+BUFFERLINES -gt LINES ]]; then
+  if (( compstate[list_lines]+BUFFERLINES > LINES ||
+	compstate[nmatches] > compstate[list_max] ))
+  then
     compstate[list]=''
     compstate[force_list]=yes
+  elif [[ $compconfig[predict_list] = always ]]
+    compstate[force_list]=yes
   fi
-  [[ $compconfig[predict_list] = always ]] && compstate[force_list]=yes
 }
 
 # Handle zsh autoloading conventions
