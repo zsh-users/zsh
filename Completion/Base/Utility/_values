@@ -13,8 +13,11 @@ done
 
 if compvalues -i "$@"; then
 
-  local noargs args opts descr action expl sep subc
+  local noargs args opts descr action expl sep argsep subc test='*'
   local oldcontext="$curcontext"
+
+  compvalues -S argsep
+  compvalues -s sep && [[ -n "$sep" ]] && test="[^${(q)sep}]#"
 
   if ! compvalues -D descr action; then
 
@@ -24,17 +27,17 @@ if compvalues -i "$@"; then
 
     compvalues -V noargs args opts
 
-    if [[ "$PREFIX" = *\=* ]]; then
+    if [[ "$PREFIX" = *${argsep}${~test} ]]; then
       local name
 
-      name="${PREFIX%%\=*}"
+      name="${PREFIX%%${argsep}*}"
       if compvalues -L "$name" descr action; then
-        IPREFIX="${IPREFIX}${name}="
-        PREFIX="${PREFIX#*\=}"
+        IPREFIX="${IPREFIX}${name}${argsep}"
+        PREFIX="${PREFIX#*${argsep}}"
       else
         local prefix suffix
 
-	prefix="${PREFIX#*\=}"
+	prefix="${PREFIX#*${argsep}}"
 	suffix="$SUFFIX"
 	PREFIX="$name"
 	SUFFIX=''
@@ -45,7 +48,7 @@ if compvalues -i "$@"; then
 
         PREFIX="$prefix"
 	SUFFIX="$suffix"
-        IPREFIX="${IPREFIX}${args[1]%%:*}="
+        IPREFIX="${IPREFIX}${args[1]%%:*}${argsep}"
 	compvalues -L "${args[1]%%:*}" descr action subc
 	curcontext="${oldcontext%:*}:$subc"
       fi
@@ -59,8 +62,8 @@ if compvalues -i "$@"; then
 
       _describe "$descr" \
         noargs "$sep[@]" -M 'r:|[_-]=* r:|=*' -- \
-        args -S= -M 'r:|[_-]=* r:|=*' -- \
-        opts -qS= -M 'r:|[_-]=* r:|=*'
+        args -S "${argsep}" -M 'r:|[_-]=* r:|=*' -- \
+        opts -qS "${argsep}" -M 'r:|[_-]=* r:|=*'
 
       curcontext="$oldcontext"
 
@@ -82,7 +85,7 @@ if compvalues -i "$@"; then
   # we have only one possible value left.
 
   [[ ${#snames}+${#names}+${#onames} -ne 1 ]] && compvalues -s sep &&
-      expl=( "-qS$sep" "$expl[@]" )
+      expl=( "-qS$sep" "$expl[@]" ) sep=( "-qS$sep" )
 
   if [[ "$action" = -\>* ]]; then
     compvalues -v val_args
@@ -113,7 +116,7 @@ if compvalues -i "$@"; then
 
       eval ws\=\( "${action[3,-3]}" \)
 
-      _describe "$descr" ws -M 'r:|[_-]=* r:|=*' "$subopts[@]"
+      _describe "$descr" ws -M 'r:|[_-]=* r:|=*' "$subopts[@]" "$sep[@]"
 
     elif [[ "$action" = \(*\) ]]; then
 
@@ -121,7 +124,7 @@ if compvalues -i "$@"; then
 
       eval ws\=\( "${action[2,-2]}" \)
 
-      _all_labels arguments expl "$descr" compadd "$subopts[@]" -a - ws
+      _all_labels arguments expl "$descr" compadd "$subopts[@]" "$sep[@]" -a - ws
     elif [[ "$action" = \{*\} ]]; then
 
       # A string in braces is evaluated.

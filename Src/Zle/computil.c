@@ -2029,6 +2029,7 @@ struct cvdef {
     char *descr;		/* global description */
     int hassep;			/* multiple values allowed */
     char sep;			/* separator character */
+    char argsep;                /* argument separator */
     Cvdef next;			/* next in cache */
     Cvval vals;			/* value definitions */
     char **defs;		/* original strings */
@@ -2090,16 +2091,21 @@ parse_cvdef(char *nam, char **args)
     Cvdef ret;
     Cvval val, *valp;
     Caarg arg;
-    char **oargs = args, sep = '\0', *name, *descr, *p, *q, **xor, c;
+    char **oargs = args, sep = '\0', asep = '=', *name, *descr, *p, *q, **xor, c;
     int xnum, multi, vtype, hassep = 0;
 
-    if (args[0][0] == '-' && args[0][1] == 's' && !args[0][2]) {
+    while (args[0][0] == '-' && (args[0][1] == 's' || args[0][1] == 'S') &&
+           !args[0][2]) {
 	if (args[1][0] && args[1][1]) {
 	    zwarnnam(nam, "invalid separator: %s", args[1], 0);
 	    return NULL;
 	}
-	hassep = 1;
-	sep = args[1][0];
+        if (args[0][1] == 's') {
+            hassep = 1;
+            sep = args[1][0];
+        } else
+            asep = args[1][0];
+
 	args += 2;
     }
     if (!args[0] || !args[1]) {
@@ -2112,6 +2118,7 @@ parse_cvdef(char *nam, char **args)
     ret->descr = ztrdup(descr);
     ret->hassep = hassep;
     ret->sep = sep;
+    ret->argsep = asep;
     ret->next = NULL;
     ret->vals = NULL;
     ret->defs = zarrdup(oargs);
@@ -2330,7 +2337,7 @@ cv_parse_word(Cvdef d)
 	    for (str = compprefix, end = strchr(str, d->sep); end;) {
 		*end = '\0';
 
-		if ((heq = !!(eq = strchr(str, '='))))
+		if ((heq = !!(eq = strchr(str, d->argsep))))
 		    *eq++ = '\0';
 		else
 		    eq = "";
@@ -2342,7 +2349,7 @@ cv_parse_word(Cvdef d)
 		    cv_inactive(d, ptr->xor);
 		}
 		if (heq)
-		    eq[-1] = '=';
+		    eq[-1] = d->argsep;
 
 		*end = d->sep;
 		str = end + 1;
@@ -2357,7 +2364,7 @@ cv_parse_word(Cvdef d)
 		    if ((end = strchr(str, d->sep)))
 			*end = '\0';
 
-		    if ((heq = !!(eq = strchr(str, '='))))
+		    if ((heq = !!(eq = strchr(str, d->argsep))))
 			*eq++ = '\0';
 		    else
 			eq = "";
@@ -2369,7 +2376,7 @@ cv_parse_word(Cvdef d)
 			cv_inactive(d, ptr->xor);
 		    }
 		    if (heq)
-			eq[-1] = '=';
+			eq[-1] = d->argsep;
 		    if (end)
 			*end++ = d->sep;
 		}
@@ -2408,16 +2415,16 @@ cv_parse_word(Cvdef d)
     compprefix = str;
     compsuffix = ztrdup("");
 
-    if ((eq = strchr(str, '='))) {
+    if ((eq = strchr(str, d->argsep))) {
 	*eq++ = '\0';
 
 	if ((ptr = cv_get_val(d, str)) && ptr->type != CVV_NOARG) {
-	    eq[-1] = '=';
+	    eq[-1] = d->argsep;
 	    ignore_prefix(eq - str);
 	    state.def = ptr->arg;
 	    state.val = ptr;
 	} else
-	    eq[-1] = '=';
+	    eq[-1] = d->argsep;
     }
     memcpy(&cv_laststate, &state, sizeof(state));
 }
@@ -2445,6 +2452,7 @@ bin_compvalues(char *nam, char **args, char *ops, int func)
     case 'C': min = 1; max =  1; break;
     case 'V': min = 3; max =  3; break;
     case 's': min = 1; max =  1; break;
+    case 'S': min = 1; max =  1; break;
     case 'd': min = 1; max =  1; break;
     case 'L': min = 3; max =  4; break;
     case 'v': min = 1; max =  1; break;
@@ -2546,6 +2554,15 @@ bin_compvalues(char *nam, char **args, char *ops, int func)
 	    return 0;
 	}
 	return 1;
+    case 'S':
+	{
+	    char tmp[2];
+
+	    tmp[0] = cv_laststate.d->argsep;
+	    tmp[1] = '\0';
+	    setsparam(args[1], ztrdup(tmp));
+	}
+	return 0;
     case 'd':
 	setsparam(args[1], ztrdup(cv_laststate.d->descr));
 	return 0;

@@ -3949,8 +3949,14 @@ listing the values.
 All other arguments describe the possible values and their
 arguments in the same format used for the description of options by
 the tt(_arguments) function (see above).  The only differences are that
-no minus or plus sign is required at the beginning and that
-values can have only one argument.
+no minus or plus sign is required at the beginning, that
+values can have only one argument and that those forms of actions
+beginning with an equal sign are not supported.
+
+The character separating a value from its argument can be set using the
+option tt(-S) (like tt(-s), followed by the character to use as the
+separator in the next argument).  If this option is not used, the equal
+sign will be used as the separator.
 
 Example:
 
