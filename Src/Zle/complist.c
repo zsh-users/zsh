@@ -395,6 +395,7 @@ static int mnew, mlastcols, mlastlines, mhasstat, mfirstl, mlastm;
 static int mlprinted;
 static char *mstatus, *mlistp;
 static Cmatch **mtab, **mmtabp;
+static int mtab_been_reallocated;
 static Cmgroup *mgtab, *mgtabp;
 static struct listcols mcolors;
 
@@ -1573,6 +1574,8 @@ complistmatches(Hookdef dummy, Chdata dat)
     if (mnew) {
 	int i;
 
+    	mtab_been_reallocated = 1;
+
 	i = columns * listdat.nlines;
 	free(mtab);
 	mtab = (Cmatch **) zalloc(i * sizeof(Cmatch **));
@@ -1647,6 +1650,7 @@ domenuselect(Hookdef dummy, Chdata dat)
     Cmatch **p;
     Cmgroup *pg;
     Thingy cmd;
+    int     do_last_key = 0;
     Menustack u = NULL;
     int i = 0, acc = 0, wishcol = 0, setwish = 0, oe = onlyexpl, wasnext = 0;
     int space, lbeg = 0, step = 1, wrap, pl = nlnct, broken = 0, first = 1;
@@ -1689,6 +1693,7 @@ domenuselect(Hookdef dummy, Chdata dat)
     mlines = 999999;
     mlbeg = 0;
     for (;;) {
+    	mtab_been_reallocated = 0;
 	if (mline < 0) {
 	    int x, y;
 	    Cmatch **p = mtab;
@@ -1778,7 +1783,16 @@ domenuselect(Hookdef dummy, Chdata dat)
 
     getk:
 
-	if (!(cmd = getkeycmd()) || cmd == Th(z_sendbreak)) {
+    	if (!do_last_key) {
+	    cmd = getkeycmd();
+	    if (mtab_been_reallocated) {
+		do_last_key = 1;
+		continue;
+	    }
+    	}
+	do_last_key = 0;
+
+	if (!cmd || cmd == Th(z_sendbreak)) {
 	    zbeep();
 	    break;
 	} else if (nolist && cmd != Th(z_undo)) {

@@ -1,3 +1,9 @@
+2003-05-14  Peter Stephenson  <pws@csr.com>
+
+	* Jonathan Paisley <jp-www@dcs.gla.ac.uk>: 18513:
+	Src/Zle/complist.c: Work around a bad pointer access after
+	resizing the terminal in menu selection.
+
 2003-05-12  Oliver Kiddle  <opk@zsh.org>
 
 	* unposted: Completion/Unix/Command/_chown: use of _message -e:
