@@ -8,7 +8,7 @@ typeset -A opt_args
     _nedit && return
 
 if (( ! $+_nc_args )); then
-  local help="$(_call_program options nc -h < /dev/null 2>&1)"
+  local help="$(_call_program options $words[1] -h < /dev/null 2>&1)"
   local -A optionmap
   optionmap=(
     '*-e prog*' '-e+[program to exec after connect]:prog:_command_names -e'
