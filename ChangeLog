@@ -1,3 +1,8 @@
+2004-06-18  Oliver Kiddle  <opk@zsh.org>
+
+	* 20077: Completion/Zsh/Command/_disable,
+	Completion/Zsh/Command/_enable: fix completion of reserved words
+
 2004-06-18  Peter Stephenson  <pws@csr.com>
 
 	* 20033: Completion/Base/Utility/_arguments: unconfirmed fix

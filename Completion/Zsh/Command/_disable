@@ -3,6 +3,6 @@
 _arguments -C -s -A "-*" -S \
   "(-f -r)-a[act on aliases]:*:aliases:(${(k)aliases} ${(k)galiases})" \
   "(-a -r)-f[act on functions]:*:functions:(${(k)functions})" \
-  "(-a -f)-r[act on reserved words]:*:reserved-words:(${(k)reswords})" \
+  "(-a -f)-r[act on reserved words]:*:reserved-words:compadd -k reswords" \
   '-m[treat arguments as patterns]' \
   "*:builtin command:(${(k)builtins})"
