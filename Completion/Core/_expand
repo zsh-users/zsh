@@ -18,14 +18,6 @@ local exp word sort expr expl subd suf=" " force opt asp tmp opre pre epre
       force="$force$opt"
     done
 
-# First, see if we should insert all *completions*.
-
-if [[ "$force" = *c* ]] ||
-   zstyle -t ":completion:${curcontext}:" completions; then
-  compstate[insert]=all
-  return 1
-fi
-
 if [[ "$funcstack[2]" = _prefix ]]; then
   word="$IPREFIX$PREFIX$SUFFIX"
 else

@@ -452,6 +452,9 @@ bin_compadd(char *name, char **argv, char *ops, int func)
 	    case 'Q':
 		dat.aflags |= CAF_QUOTE;
 		break;
+	    case 'C':
+		dat.aflags |= CAF_ALL;
+		break;
 	    case 'f':
 		dat.flags |= CMF_FILE;
 		break;
@@ -604,7 +607,7 @@ bin_compadd(char *name, char **argv, char *ops, int func)
  ca_args:
 
     if (!*argv && !dat.group && !dat.mesg &&
-	!(dat.aflags & (CAF_NOSORT|CAF_UNIQALL|CAF_UNIQCON)))
+	!(dat.aflags & (CAF_NOSORT|CAF_UNIQALL|CAF_UNIQCON|CAF_ALL)))
 	return 1;
 
     dat.match = match = cpcmatcher(match);

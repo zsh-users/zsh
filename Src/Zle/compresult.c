@@ -570,36 +570,40 @@ instmatch(Cmatch m, int *scs)
 mod_export int
 hasbrpsfx(Cmatch m, char *pre, char *suf)
 {
-    char *op = lastprebr, *os = lastpostbr;
-    VARARR(char, oline, ll);
-    int oll = ll, ocs = cs, ole = lastend, opcs = brpcs, oscs = brscs, ret;
+    if (m->flags & CMF_ALL)
+	return 1;
+    else {
+	char *op = lastprebr, *os = lastpostbr;
+	VARARR(char, oline, ll);
+	int oll = ll, ocs = cs, ole = lastend, opcs = brpcs, oscs = brscs, ret;
 
-    memcpy(oline, line, ll);
+	memcpy(oline, line, ll);
 
-    lastprebr = lastpostbr = NULL;
+	lastprebr = lastpostbr = NULL;
 
-    instmatch(m, NULL);
+	instmatch(m, NULL);
 
-    cs = 0;
-    foredel(ll);
-    spaceinline(oll);
-    memcpy(line, oline, oll);
-    cs = ocs;
-    lastend = ole;
-    brpcs = opcs;
-    brscs = oscs;
+	cs = 0;
+	foredel(ll);
+	spaceinline(oll);
+	memcpy(line, oline, oll);
+	cs = ocs;
+	lastend = ole;
+	brpcs = opcs;
+	brscs = oscs;
 
-    ret = (((!pre && !lastprebr) ||
-	    (pre && lastprebr && !strcmp(pre, lastprebr))) &&
-	   ((!suf && !lastpostbr) ||
-	    (suf && lastpostbr && !strcmp(suf, lastpostbr))));
+	ret = (((!pre && !lastprebr) ||
+		(pre && lastprebr && !strcmp(pre, lastprebr))) &&
+	       ((!suf && !lastpostbr) ||
+		(suf && lastpostbr && !strcmp(suf, lastpostbr))));
 
-    zsfree(lastprebr);
-    zsfree(lastpostbr);
-    lastprebr = op;
-    lastpostbr = os;
+	zsfree(lastprebr);
+	zsfree(lastpostbr);
+	lastprebr = op;
+	lastpostbr = os;
 
-    return ret;
+	return ret;
+    }
 }
 
 /* Handle the case were we found more than one match. */
@@ -748,6 +752,65 @@ ztat(char *nam, struct stat *buf, int ls)
     }
 }
 
+/* Insert all matches in the command line. */
+
+/**/
+void
+do_allmatches(int end)
+{
+    int first = 1, nm = nmatches - 1, omc = menucmp, oma = menuacc, e;
+    Cmatch *mc;
+    struct menuinfo mi;
+    char *p = (brbeg ? ztrdup(lastbrbeg->str) : NULL);
+
+    memcpy(&mi, &minfo, sizeof(struct menuinfo));
+    menucmp = 1;
+    menuacc = 0;
+
+    for (minfo.group = amatches;
+	 minfo.group && !(minfo.group)->mcount;
+	 minfo.group = (minfo.group)->next);
+
+    mc = (minfo.group)->matches;
+
+    while (1) {
+	if (!((*mc)->flags & CMF_ALL)) {
+	    if (!first)
+		accept_last();
+	    first = 0;
+
+	    if (!omc && !--nm)
+		menucmp = 0;
+
+	    do_single(*mc);
+	}
+	minfo.cur = mc;
+
+	if (!*++(minfo.cur)) {
+	    do {
+		if (!(minfo.group = (minfo.group)->next))
+		    break;
+	    } while (!(minfo.group)->mcount);
+	    if (!minfo.group)
+		break;
+	    minfo.cur = minfo.group->matches;
+	}
+	mc = minfo.cur;
+    }
+    menucmp = omc;
+    menuacc = oma;
+
+    e = minfo.end;
+    memcpy(&minfo, &mi, sizeof(struct menuinfo));
+    minfo.end = e;
+    minfo.len = e - minfo.pos;
+
+    if (p) {
+	zsfree(lastbrbeg->str);
+	lastbrbeg->str = p;
+    }
+}
+
 /* Insert a single match in the command line. */
 
 /**/
@@ -784,6 +847,10 @@ do_single(Cmatch m)
     minfo.insc = 0;
     cs = minfo.pos;
     foredel(l);
+
+    if (m->flags & CMF_ALL)
+	do_allmatches(0);
+    else {
 
     /* And then we insert the new string. */
     minfo.len = instmatch(m, &scs);
@@ -955,6 +1022,7 @@ do_single(Cmatch m)
 	    minfo.cur = &m;
 	runhookdef(INSERTMATCHHOOK, (void *) &dat);
 	minfo.cur = om;
+    }
     }
 }
 
@@ -1886,6 +1954,54 @@ printlist(int over, CLPrintFunc printm, int showall)
 }
 
 /**/
+mod_export void
+bld_all_str(Cmatch all)
+{
+    Cmgroup g;
+    Cmatch *mp, m;
+    int len = columns - 5, t, add = 0;
+    VARARR(char, buf, columns + 1);
+
+    buf[0] = '\0';
+
+    for (g = amatches; g && !g->mcount; g = g->next);
+
+    mp = g->matches;
+    while (1) {
+	m = *mp;
+	if (!(m->flags & (CMF_ALL | CMF_HIDE)) && m->str) {
+	    t = strlen(m->str) + add;
+	    if (len >= t) {
+		if (add)
+		    strcat(buf, " ");
+		strcat(buf, m->str);
+		len -= t;
+		add = 1;
+	    } else {
+		if (len > add + 2) {
+		    if (add)
+			strcat(buf, " ");
+		    strncat(buf, m->str, len);
+		}
+		strcat(buf, " ...");
+		break;
+	    }
+	}
+	if (!*++mp) {
+	    do {
+		if (!(g = g->next))
+		    break;
+	    } while (!g->mcount);
+	    if (!g)
+		break;
+	    mp = g->matches;
+	}
+    }
+    zsfree(all->disp);
+    all->disp = ztrdup(buf);
+}
+
+/**/
 static void
 iprintm(Cmgroup g, Cmatch *mp, int mc, int ml, int lastc, int width,
 	char *path, struct stat *buf)
@@ -1897,6 +2013,8 @@ iprintm(Cmgroup g, Cmatch *mp, int mc, int ml, int lastc, int width,
 	return;
 
     m = *mp;
+    if ((m->flags & CMF_ALL) && (!m->disp || !m->disp[0]))
+	bld_all_str(m);
     if (m->disp) {
 	if (m->flags & CMF_DISPLINE) {
 	    printfmt(m->disp, 0, 1, 0);

@@ -58,7 +58,8 @@ styles=(
   max-errors		 c:
   menu			 c:boolauto
   numbers		 c:bool
-  old-list		 c:bool 
+  old-list		 c:bool
+  old-matches            c:oldmatches
   old-menu		 c:bool 
   original		 c:bool
   packageset		 c:packageset
@@ -275,15 +276,19 @@ while [[ -n $state ]]; do
       ;;
 
     ignline) 
-      _wanted values expl boolean compadd true false current current-shown other
+      _wanted values expl 'ignore strings on the line' compadd true false current current-shown other
       ;;
 
     keep-prefix) 
-      _wanted values expl boolean compadd true false changed
+      _wanted values expl 'keep prefix' compadd true false changed
       ;;
 
     match-orig) 
-      _wanted values expl boolean compadd only both
+      _wanted values expl "match without inserting \`*'" compadd only both
+      ;;
+
+    oldmatches) 
+      _wanted values expl 'use list of old matches' compadd true false only
       ;;
 
     urgh) 

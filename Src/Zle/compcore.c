@@ -143,6 +143,11 @@ mod_export Cmgroup lastmatches, pmatches, amatches, lmatches, lastlmatches;
 /**/
 mod_export int hasoldlist, hasperm;
 
+/* Non-zero if we have a match representing all other matches. */
+
+/**/
+int hasallmatch;
+
 /* Non-zero if we have newly added matches. */
 
 /**/
@@ -331,6 +336,7 @@ do_completion(Hookdef dummy, Compldat dat)
     maxmlen = -1;
     compignored = 0;
     nmessages = 0;
+    hasallmatch = 0;
 
     /* Make sure we have the completion list and compctl. */
     if (makecomplist(s, incmd, lst)) {
@@ -366,41 +372,8 @@ do_completion(Hookdef dummy, Compldat dat)
 	cs = origcs;
 	showinglist = -2;
     } else if (useline == 2 && nmatches > 1) {
-	int first = 1, nm = nmatches;
-	Cmatch *mc;
+	do_allmatches(1);
 
-	menucmp = 1;
-	menuacc = 0;
-
-	for (minfo.group = amatches;
-	     minfo.group && !(minfo.group)->mcount;
-	     minfo.group = (minfo.group)->next);
-
-	mc = (minfo.group)->matches;
-
-	while (1) {
-	    if (!first)
-		accept_last();
-	    first = 0;
-
-	    if (!--nm)
-		menucmp = 0;
-
-	    do_single(*mc);
-	    minfo.cur = mc;
-
-	    if (!*++(minfo.cur)) {
-		do {
-		    if (!(minfo.group = (minfo.group)->next))
-			break;
-		} while (!(minfo.group)->mcount);
-		if (!minfo.group)
-		    break;
-		minfo.cur = minfo.group->matches;
-	    }
-	    mc = minfo.cur;
-	}
-	menucmp = 0;
 	minfo.cur = NULL;
 
 	if (forcelist)
@@ -1604,7 +1577,7 @@ addmatches(Cadata dat, char **argv)
     Brinfo bp, bpl = brbeg, obpl, bsl = brend, obsl;
     Heap oldheap;
 
-    if (!*argv) {
+    if (!*argv && !(dat->aflags & CAF_ALL)) {
 	SWITCHHEAPS(oldheap, compheap) {
 	    /* Select the group in which to store the matches. */
 	    gflags = (((dat->aflags & CAF_NOSORT ) ? CGF_NOSORT  : 0) |
@@ -2042,6 +2015,36 @@ addmatches(Cadata dat, char **argv)
 	    set_list_array(dat->dpar, dparl);
 	if (dat->exp)
 	    addexpl();
+	if (!hasallmatch && (dat->aflags & CAF_ALL)) {
+	    Cmatch cm = (Cmatch) zhalloc(sizeof(struct cmatch));
+
+	    memset(cm, 0, sizeof(struct cmatch));
+	    cm->str = dupstring("<all>");
+	    cm->flags = (dat->flags | CMF_ALL |
+			 (complist ?
+			  ((strstr(complist, "packed") ? CMF_PACKED : 0) |
+			   (strstr(complist, "rows")   ? CMF_ROWS   : 0)) : 0));
+	    if (disp) {
+		if (!*++disp)
+		    disp = NULL;
+		if (disp)
+		    cm->disp = dupstring(*disp);
+	    } else {
+		cm->disp = dupstring("");
+		cm->flags |= CMF_DISPLINE;
+	    }
+	    mnum++;
+	    ainfo->count++;
+	    if (curexpl)
+		curexpl->count++;
+
+	    addlinknode(matches, cm);
+
+	    newmatches = 1;
+	    mgroup->new = 1;
+
+	    hasallmatch = 1;
+	}
     } SWITCHBACKHEAPS(oldheap);
 
     /* We switched back to the current heap, now restore the stack of
@@ -2695,7 +2698,7 @@ dupmatch(Cmatch m, int nbeg, int nend)
     r->pre = ztrdup(m->pre);
     r->suf = ztrdup(m->suf);
     r->flags = m->flags;
-    if (nbeg) {
+    if (m->brpl) {
 	int *p, *q, i;
 
 	r->brpl = (int *) zalloc(nbeg * sizeof(int));
@@ -2704,7 +2707,7 @@ dupmatch(Cmatch m, int nbeg, int nend)
 	    *p = *q;
     } else
 	r->brpl = NULL;
-    if (nend) {
+    if (m->brsl) {
 	int *p, *q, i;
 
 	r->brsl = (int *) zalloc(nend * sizeof(int));
@@ -2888,8 +2891,10 @@ freematch(Cmatch m, int nbeg, int nend)
     zsfree(m->remf);
     zsfree(m->disp);
     zsfree(m->autoq);
-    zfree(m->brpl, nbeg * sizeof(int));
-    zfree(m->brsl, nend * sizeof(int));
+    if (m->brpl)
+	zfree(m->brpl, nbeg * sizeof(int));
+    if (m->brsl)
+	zfree(m->brsl, nend * sizeof(int));
 
     zfree(m, sizeof(m));
 }

@@ -1,5 +1,13 @@
 2000-10-11  Sven Wischnowsky  <wischnow@zsh.org>
 
+	* 12960: Completion/Builtins/_zstyle, Completion/Commands/_expand_word,
+ 	Completion/Core/_all_matches, Completion/Core/_expand,
+ 	Doc/Zsh/compsys.yo, Doc/Zsh/compwid.yo, Src/Zle/comp.h,
+ 	Src/Zle/compcore.c, Src/Zle/complete.c, Src/Zle/complist.c,
+ 	Src/Zle/compresult.c:add _all_matcher completer and supporting
+ 	C-code for adding a special match representing all other matches;
+ 	remove completions style from _expand(|_word)
+	
 	* 12959: Src/Zle/compcore.c, Src/Zle/complist.c: make user defined
  	completion widgets leave menu selection without accepting the
  	currently selected match

@@ -6,7 +6,6 @@ setopt localoptions nullglob rcexpandparam extendedglob unset
 unsetopt markdirs globsubst shwordsplit shglob ksharrays cshnullglob
 
 local curcontext="$curcontext"
-local -ah completers
 
 if [[ -z "$curcontext" ]]; then
   curcontext="expand-word:::"
@@ -14,12 +13,4 @@ else
   curcontext="expand-word:${curcontext#*:}"
 fi
 
-if zstyle -t ":completion:${curcontext}:" completions; then
-    zstyle -a ":completion:${curcontext}:" completer completers
-    completers[1,(i)_expand]=_expand
-    (( $#completers == 1 )) && completers=(_expand _complete)
-else
-    completers=(_expand)
-fi
-
-_main_complete $completers
+_main_complete _expand

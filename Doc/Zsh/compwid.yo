@@ -418,7 +418,7 @@ sect(Builtin Commands)
 startitem()
 findex(compadd)
 cindex(completion widgets, adding specified matches)
-xitem(tt(compadd) [ tt(-akqQfenUl12) ] [ tt(-F) var(array) ])
+xitem(tt(compadd) [ tt(-akqQfenUl12C) ] [ tt(-F) var(array) ])
 xitem([ tt(-P) var(prefix) ] [ tt(-S) var(suffix) ])
 xitem([ tt(-p) var(hidden-prefix) ] [ tt(-s) var(hidden-suffix) ])
 xitem([ tt(-i) var(ignored-prefix) ] [ tt(-I) var(ignored-suffix) ])
@@ -639,6 +639,15 @@ completions.  Instead, the completion code tests whether each var(word)
 in turn matches what is on the line.  If the var(n)'th var(word) does not
 match, the var(n)'th element of the var(array) is removed.  Elements
 for which the corresponding var(word) is matched are retained.
+)
+item(tt(-C))(
+This option adds a special match which expands to all other metches
+when inserted into the line, even those that are added after this
+option is used.  Together with the tt(-d) option it is possible to
+specify a string that should be displayed in the list for this special 
+match.  If no string is given, it will be shown as a string containing 
+the strings that would be inserted for the other matches, truncated to 
+the width of the screen.
 )
 xitem(tt(-))
 item(tt(-)tt(-))(

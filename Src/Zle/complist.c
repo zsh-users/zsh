@@ -1375,6 +1375,10 @@ clprintm(Cmgroup g, Cmatch *mp, int mc, int ml, int lastc, int width,
 	return 0;
     }
     m = *mp;
+
+    if ((m->flags & CMF_ALL) && (!m->disp || !m->disp[0]))
+	bld_all_str(m);
+
     mlastm = m->gnum;
     if (m->disp && (m->flags & CMF_DISPLINE)) {
 	if (mselect >= 0) {

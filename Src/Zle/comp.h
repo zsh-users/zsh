@@ -124,6 +124,7 @@ struct cmatch {
 #define CMF_ROWS     (1<<10)	/* prefer LIST_ROWS_FIRST */
 #define CMF_MULT     (1<<11)	/* string appears more than once */
 #define CMF_FMULT    (1<<12)	/* first of multiple equal strings */
+#define CMF_ALL      (1<<13)	/* a match representing all other matches */
 
 /* Stuff for completion matcher control. */
 
@@ -236,6 +237,7 @@ struct menuinfo {
 #define CAF_UNIQALL 16
 #define CAF_ARRAYS  32
 #define CAF_KEYS    64
+#define CAF_ALL    128
 
 /* Data for compadd and addmatches() */
 
