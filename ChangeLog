@@ -1,5 +1,7 @@
 2002-02-21  Clint Adams  <clint@zsh.org>
 
+	* 16689: Etc/.distfiles, Etc/TODO: list some things to do.
+
 	* 16688: Doc/Zsh/params.yo: clarify the pseudo-randomness of
 	RANDOM.
 
