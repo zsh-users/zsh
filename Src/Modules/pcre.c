@@ -3,7 +3,7 @@
  *
  * This file is part of zsh, the Z shell.
  *
- * Copyright (c) 2001 Clint Adams
+ * Copyright (c) 2001, 2002, 2003, 2004 Clint Adams
  * All rights reserved.
  *
  * Permission is hereby granted, without written agreement and without
@@ -71,6 +71,13 @@ static int
 bin_pcre_study(char *nam, char **args, Options ops, int func)
 {
     const char *pcre_error;
+
+    if (pcre_pattern == NULL)
+    {
+	zwarnnam(nam, "no pattern has been compiled for study: %s",
+		 pcre_error, 0);
+	return 1;
+    }
     
     pcre_hints = pcre_study(pcre_pattern, 0, &pcre_error);
     if (pcre_error != NULL)

@@ -8,6 +8,13 @@ startitem()
 findex(pcre_compile)
 item(tt(pcre_compile) [ tt(-aimx) ] var(PCRE))(
 Compiles a perl-compatible regular expression.
+
+Option tt(-a) will force the pattern to be anchored.
+Option tt(-i) will compile a case-insensitive pattern.
+Option tt(-m) will compile a multi-line pattern; that is,
+tt(^) and tt($) will match newlines within the pattern.
+Option tt(-x) will compile an extended pattern, wherein
+whitespace and tt(#) comments are ignored.
 )
 findex(pcre_study)
 item(tt(pcre_study))(
