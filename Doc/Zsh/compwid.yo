@@ -250,7 +250,7 @@ positions, as indexes into the command line.
 )
 vindex(last_prompt, compstate)
 item(tt(last_prompt))(
-If this is set to an non-empty string for every match added, the
+If this is set to a non-empty string for every match added, the
 completion code will move the cursor back to the previous prompt after
 the list of completions has been displayed.  Initially this is set or
 unset according to the tt(ALWAYS_LAST_PROMPT) option.
@@ -416,7 +416,7 @@ vindex(vared, compstate)
 item(tt(vared))(
 If completion is called while editing a line using the tt(vared)
 builtin, the value of this key is set to the name of the parameter
-given as argument to tt(vared).  This key is only set while a tt(vared)
+given as an argument to tt(vared).  This key is only set while a tt(vared)
 command is active.
 )
 enditem()
@@ -821,7 +821,7 @@ that this is not used if the command line contains a glob pattern and
 the tt(GLOB_COMPLETE) option is set or the tt(pattern_match) of the
 tt(compstate) special association is set to a non-empty string.
 
-The var(match-spec) given as argument to the tt(-M) option (see
+The var(match-spec) given as the argument to the tt(-M) option (see
 ifzman(`Builtin Commands' above)\
 ifnzman(noderef(Builtin Commands))\
 ) consists of one or more matching descriptions separated by

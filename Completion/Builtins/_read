@@ -6,7 +6,7 @@ local pflag expl line curcontext="$curcontext"
 (:>&p) 2>/dev/null &&
   pflag='(-q -u -z)-p[input is read from the coprocess]'
 
-_arguments -C -s \
+_arguments -C -s -A "-*" -S \
   '-r[raw mode]' \
   '(-p -k -u -z)-q[read y or n character from terminal]' \
   '(-q)-k[specify number of characters to read]:number of characters' \

@@ -53,7 +53,7 @@ for ((i=1;i<=$#use;++i)); do
       ${allargs[${use[$i]}${${(s::)use[$i]}[(r)[Uut]]:+$func}]} )
 done
 
-_arguments -C -s "${args[@]}" '*:vars:->vars_eq'
+_arguments -C -s -A "-*" -S "${args[@]}" '*:vars:->vars_eq'
 
 if [[ "$state" = vars_eq ]]; then
   if [[ $func = f ]]; then

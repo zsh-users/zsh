@@ -9,13 +9,13 @@ common_args=( \
 
 case ${service} in
   hash)
-    _arguments -C -s \
+    _arguments -C -s -S \
       '(-f -m -v)-r[empty hash table]' \
       '(-f -r)-m[treat arguments as patterns]' \
       '(-f -r -m)-v[list entires as they are added]' \
       '(-f -r -v)-L[list in the form of calls to hash]' \
       "${common_args[@]}" \
-      '(-d -f -r -m -v)*:hash:->hashval' && return 0
+      '(-d -f -r -m -v -L)*:hash:->hashval' && return 0
   ;;
   rehash)
     _arguments -C -s ${common_args[@]} && return 0

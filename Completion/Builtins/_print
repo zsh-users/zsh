@@ -9,7 +9,7 @@ eflag="${words[1,CURRENT-1][(r)-*R*]:+-e[enable escapes]}"
 (:>&p) 2>/dev/null &&
   pflag='(-s -u -z)-p[print arguments to input of coprocess]'
 
-_arguments -C -s \
+_arguments -C -s -A "-*" -S \
   '-r[ignore escape conventions of echo]' \
   '(-r -b -m -s -l -N -o -O -i -c -u -p -z -D -P)-R[emulate BSD echo (no escapes, -n & -e flags only)]' \
   '-b[recognise bindkey escape sequences]' \

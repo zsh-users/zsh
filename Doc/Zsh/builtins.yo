@@ -258,6 +258,8 @@ The tt(-E) flag, or the tt(BSD_ECHO) option, can be used to disable
 these escape sequences.  In the latter case, tt(-e) flag can be used to
 enable them.
 )
+module(echotc)(zsh/termcap)
+module(echoti)(zsh/terminfo)
 findex(emulate)
 cindex(compatibility, sh)
 cindex(compatibility, ksh)
@@ -938,8 +940,6 @@ Suspend the execution of the shell (send it a tt(SIGTSTP))
 until it receives a tt(SIGCONT).
 Unless the tt(-f) option is given, this will refuse to suspend a login shell.
 )
-module(termcap)(zsh/termcap)
-module(terminfo)(zsh/terminfo)
 findex(test)
 xitem(tt(test) [ var(arg) ... ])
 item(tt([) [ var(arg) ... ] tt(]))(

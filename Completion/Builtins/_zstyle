@@ -17,12 +17,17 @@ styles=(
   avoid-completer        c:
   break-keys             c:
   cache-path		 'c:_wanted directories expl directory _path_files -/'
+  cache-policy           c:_functions
+  call-command           c:bool
   command                c:command
+  commands               c:
+  complete               c:bool
   completer		 c:completer
   completions		 c:bool
   condition		 c:bool
   cursor		 c:cursor
   disable-stat		 c:bool
+  disabled               c:bool
   domains                c:
   expand		 c:
   fake-files		 c:fake-files
@@ -32,6 +37,7 @@ styles=(
   force-list             c:
   format		 c:
   glob			 c:bool
+  global                 c:bool
   group-name		 c:
   group-order		 c:tag
   groups		 c:_groups
@@ -69,7 +75,8 @@ styles=(
   ports			 c:_ports
   prefix-hidden		 c:bool
   prefix-needed		 c:bool
-  prompt		 c:
+  range                  c:
+  regular                c:bool
   remote-access		 c:bool
   remove-all-dups	 c:bool
   select-prompt          c:

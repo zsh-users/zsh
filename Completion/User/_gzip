@@ -8,7 +8,7 @@ gunzip|zcat)
   decompress=yes
   ;&
 gzip)
-  _arguments -C -s \
+  _arguments -C -s -S \
     '(--to-stdout --stdout)-c[write on standard output]' \
     '(-c --stdout)--to-stdout[write on standard output]' \
     '(-c --to-stdout)--stdout[write on standard output]' \

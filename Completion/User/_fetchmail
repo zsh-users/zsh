@@ -1,6 +1,6 @@
 #compdef fetchmail
 
-_arguments \
+_arguments -S \
   {--bsmtp,'(--logfile)-L','(-L)--logfile','(--fetchmailrc)-f','(-f)--fetchmailrc','(--idfile)-i','(-i)--idfile'}':file:_files' \
   {--plugin,--plugout,'(--mda)-m','(-m)--mda'}':command:_command_names -e' \
   {'(--username)-u','(-u)--username'}:user:_users \

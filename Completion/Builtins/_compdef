@@ -3,7 +3,7 @@
 local state line expl list disp curcontext="$curcontext"
 typeset -A opt_args
 
-_arguments -C -s \
+_arguments -C -s -A "-*" -S \
   '(-d)-a[make function autoloadable]' \
   '(-d -p -P)-n[leave existing definitions intact]' \
   ':completion function:->cfun' \

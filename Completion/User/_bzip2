@@ -6,7 +6,7 @@ typeset -A opt_args
 case "$service" in
   bzip2recover) [[ $CURRENT = 2 ]] && state=files;;
   bzip2) decompress=no;&
-  bunzip2) _arguments -C -s \
+  bunzip2) _arguments -C -s -S \
     '(--help)-h[display help message]' \
     '(-h)--help[display help message]' \
     '(--decompress --compress -z --test -t)-d[decompress]' \
@@ -47,7 +47,7 @@ if [[ "$state" = files ]]; then
   (( $+opt_args[-z] || $+opt_args[--compress] )) && decompress=no
   (( $+opt_args[-d] || $+opt_args[--decompress] || $+opt_args[-t] ||
       $+opt_args[--test] )) && unset decompress
-  if [[ -z "$decompress" ]] ; then
+  if [[ -z "$decompress" ]]; then
     _description files expl 'compressed file'
     _files "$expl[@]" -g '*.bz2' && return 0
   else

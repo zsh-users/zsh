@@ -15,7 +15,7 @@ compwids=(accept-and-menu-complete
 
 opts=(-A -C -D -L -M -N -R -U -a -c -l \* :)
 
-_arguments -s \
+_arguments -s -S \
     "($opts)-A[define widget alias]:old widget:->widget :new widget:->widget" \
     "($opts)-C[define completion widget]:new widget name:->comp-widget :completion widget:->builtin-comp-widget :widget shell function:->function" \
     "($opts)-D[delete widget]:*:widget:->widget" \
@@ -30,7 +30,7 @@ _arguments -s \
     '(-)::widget name:->call'
 
 [[ $state == listing ]] &&
-  _arguments -s \
+  _arguments -s -S \
     "-l[list user-defined widgets]" \
     "(-a)-L[list as commands]" \
     "(-L)-a[list all widgets]" \

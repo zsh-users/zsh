@@ -1122,6 +1122,7 @@ Matches any of the enclosed characters.  Ranges of characters
 can be specified by separating two characters by a `tt(-)'.
 A `tt(-)' or `tt(])' may be matched by including it as the
 first character in the list.
+cindex(character classes)
 There are also several named classes of characters, in the form
 `tt([:)var(name)tt(:])' with the following meanings:  `tt([:alnum:])'
 alphanumeric, `tt([:alpha:])' alphabetic,

@@ -1,6 +1,6 @@
 #compdef enable
 
-_arguments -C -s \
+_arguments -C -s -A "-*" -S \
   "(-f -r)-a[act on aliases]:*:aliases:(${(k)dis_aliases})" \
   "(-a -r)-f[act on functions]:*:functions:(${(k)dis_functions})" \
   "(-a -f)-r[act on reserved words]:*:reserved-words:(${(k)dis_reswords})" \

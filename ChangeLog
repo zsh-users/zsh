@@ -1,4 +1,20 @@
-2001-04-01 Chmouel Boudjnah <chmouel@mandrakesoft.com>
+2001-04-01  Oliver Kiddle  <opk@zsh.org>
+
+	* Completion/Builtins/_bindkey, Completion/Builtins/_compdef,
+	Completion/Builtins/_disable, Completion/Builtins/_emulate,
+	Completion/Builtins/_enable, Completion/Builtins/_fc,
+	Completion/Builtins/_hash, Completion/Builtins/_print,
+	Completion/Builtins/_read, Completion/Builtins/_unhash,
+	Completion/Builtins/_vars_eq, Completion/Builtins/_which,
+	Completion/Builtins/_zcompile, Completion/Builtins/_zle,
+	Completion/Builtins/_zpty, Completion/Builtins/_zstyle,
+	Completion/User/_bison, Completion/User/_bzip2, Completion/User/_dirs,
+	Completion/User/_fetchmail, Completion/User/_gzip,
+	Doc/Zsh/builtins.yo, Doc/Zsh/compsys.yo, Doc/Zsh/compwid.yo,
+	Doc/Zsh/expn.yo: various doc fixes and minor changes to completion
+	functions, including use of -A "-*" and -S options to _arguments.
+
+2001-04-01  Chmouel Boudjnah  <chmouel@mandrakesoft.com>
 
 	* 13861: Completion/Linux/_apm: Completion for apm command (linux only).
 

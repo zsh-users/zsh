@@ -4,7 +4,7 @@ local state line list names expl curcontext="$curcontext"
 typeset -A opt_args
 
 
-_arguments -C -s \
+_arguments -C -s -S \
   '(-r -w -L -d)-e[echo input characters]' \
   '(-r -w -L -d)-b[io to pseudo-terminal blocking]' \
   '(-r -w -L -e -b)-d[delete command]:*:name:->name' \
@@ -17,7 +17,7 @@ _arguments -C -s \
 
 # One could use sets, but that's more expensive and zpty is simple enough.
 #
-# _arguments -C -s \
+# _arguments -C -s -S \
 #   - read \
 #     '-r[read string from command]' \
 #     ':name:->name' \
