@@ -1659,11 +1659,12 @@ spscan(HashNode hn, UNUSED(int scanflags))
 mod_export void
 spckword(char **s, int hist, int cmd, int ask)
 {
-    char *t, *u;
+    char *t;
     int x;
     char ic = '\0';
     int ne;
     int preflen = 0;
+    int autocd = cmd && isset(AUTOCD) && strcmp(*s, ".") && strcmp(*s, "..");
 
     if ((histdone & HISTFLAG_NOEXEC) || **s == '-' || **s == '%')
 	return;
@@ -1727,8 +1728,7 @@ spckword(char **s, int hist, int cmd, int ask)
 	}
 	if (access(unmeta(guess), F_OK) == 0)
 	    return;
-	if ((u = spname(guess)) != guess)
-	    best = u;
+	best = spname(guess);
 	if (!*t && cmd) {
 	    if (hashcmd(guess, pathchecked))
 		return;
@@ -1738,12 +1738,28 @@ spckword(char **s, int hist, int cmd, int ask)
 	    scanhashtable(shfunctab, 1, 0, 0, spscan, 0);
 	    scanhashtable(builtintab, 1, 0, 0, spscan, 0);
 	    scanhashtable(cmdnamtab, 1, 0, 0, spscan, 0);
+	    if (autocd) {
+		char **pp;
+		for (pp = cdpath; *pp; pp++) {
+		    char bestcd[PATH_MAX + 1];
+		    int thisdist;
+		    /* Less than d here, instead of less than or equal  *
+		     * as used in spscan(), so that an autocd is chosen *
+		     * only when it is better than anything so far, and *
+		     * so we prefer directories earlier in the cdpath.  */
+		    if ((thisdist = mindist(*pp, *s, bestcd)) < d) {
+			best = dupstring(bestcd);
+			d = thisdist;
+		    }
+		}
+	    }
 	}
     }
     if (errflag)
 	return;
     if (best && (int)strlen(best) > 1 && strcmp(best, guess)) {
 	if (ic) {
+	    char *u;
 	    if (preflen) {
 		/* do not correct the result of an expansion */
 		if (strncmp(guess, best, preflen))
@@ -2432,10 +2448,14 @@ spname(char *oldname)
 {
     char *p, spnameguess[PATH_MAX + 1], spnamebest[PATH_MAX + 1];
     static char newname[PATH_MAX + 1];
-    char *new = newname, *old;
-    int bestdist = 200, thisdist;
+    char *new = newname, *old = oldname;
+    int bestdist = 0, thisdist, thresh, maxthresh = 0;
 
-    old = oldname;
+    /* This loop corrects each directory component of the path, stopping *
+     * when any correction distance would exceed the distance threshold. *
+     * NULL is returned only if the first component cannot be corrected; *
+     * otherwise a copy of oldname with a corrected prefix is returned.  *
+     * Rationale for this, if there ever was any, has been forgotten.    */
     for (;;) {
 	while (*old == '/')
 	    *new++ = *old++;
@@ -2447,15 +2467,29 @@ spname(char *oldname)
 	    if (p < spnameguess + PATH_MAX)
 		*p++ = *old;
 	*p = '\0';
-	if ((thisdist = mindist(newname, spnameguess, spnamebest)) >= 3) {
-	    if (bestdist < 3) {
+	/* Every component is allowed a single distance 2 correction or two *
+	 * distance 1 corrections.  Longer ones get additional corrections. */
+	thresh = (int)(p - spnameguess) / 4 + 1;
+	if (thresh < 3)
+	    thresh = 3;
+	if ((thisdist = mindist(newname, spnameguess, spnamebest)) >= thresh) {
+	    /* The next test is always true, except for the first path    *
+	     * component.  We could initialize bestdist to some large     *
+	     * constant instead, and then compare to that constant here,  *
+	     * because an invariant is that we've never exceeded the      *
+	     * threshold for any component so far; but I think that looks *
+	     * odd to the human reader, and we may make use of the total  *
+	     * distance for all corrections at some point in the future.  */
+	    if (bestdist < maxthresh) {
 		strcpy(new, spnameguess);
 		strcat(new, old);
 		return newname;
 	    } else
 	    	return NULL;
-	} else
-	    bestdist = thisdist;
+	} else {
+	    maxthresh = bestdist + thresh;
+	    bestdist += thisdist;
+	}
 	for (p = spnamebest; (*new = *p++);)
 	    new++;
     }
@@ -2498,6 +2532,7 @@ mindist(char *dir, char *mindistguess, char *mindistbest)
 static int
 spdist(char *s, char *t, int thresh)
 {
+    /* TODO: Correction for non-ASCII and multibyte-input keyboards. */
     char *p, *q;
     const char qwertykeymap[] =
     "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\
@@ -2531,7 +2566,7 @@ spdist(char *s, char *t, int thresh)
 
     if (!strcmp(s, t))
 	return 0;
-/* any number of upper/lower mistakes allowed (dist = 1) */
+    /* any number of upper/lower mistakes allowed (dist = 1) */
     for (p = s, q = t; *p && tulower(*p) == tulower(*q); p++, q++);
     if (!*p && !*q)
 	return 1;
@@ -2555,7 +2590,7 @@ spdist(char *s, char *t, int thresh)
 	    int t0;
 	    char *z;
 
-	/* mistyped letter */
+	    /* mistyped letter */
 
 	    if (!(z = strchr(keymap, p[0])) || *z == '\n' || *z == '\t')
 		return spdist(p + 1, q + 1, thresh - 1) + 1;
