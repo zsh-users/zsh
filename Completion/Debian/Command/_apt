@@ -460,6 +460,7 @@ _apt-cache () {
     /$'add\0'/ /$'[^\0]#\0'/ ':files:index files:_files "$expl[@]"' \# \| \
     /$'gencaches\0'/ \| \
     /$'showpkg\0'/ /$'[^\0]#\0'/ ':packages::_deb_packages "$expl_packages[@]" avail' \# \| \
+    /$'showsrc\0'/ /$'[^\0]#\0'/ ':packages::_deb_packages "$expl_packages[@]" avail' \# \| \
     /$'stats\0'/ \| \
     /$'dump\0'/ \| \
     /$'dumpavail\0'/ \| \

@@ -1,3 +1,8 @@
+2001-01-16  Clint Adams  <clint@zsh.org>
+
+	* Matt Zimmerman: 16463: Completion/Debian/Command/_apt:
+	completion for apt-cache showsrc.
+
 2001-12-26  Clint Adams  <clint@zsh.org>
 
         * 16375: Completion/Unix/Command/.distfiles,
