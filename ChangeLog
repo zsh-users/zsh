@@ -1,3 +1,8 @@
+2003-09-08  Peter Stephenson  <pws@csr.com>
+
+	* 19044: Src/Modules/parameter.c: several typos in code
+	to assign suffix aliases using the parameter saliases.
+
 2003-09-03  Oliver Kiddle  <opk@zsh.org>
 
 	* 19021: Completion/Zsh/Command/_cd: in command position,

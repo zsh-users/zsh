@@ -1617,7 +1617,7 @@ scanpmuserdirs(HashTable ht, ScanFunc func, int flags)
 static void
 setalias(HashTable ht, Param pm, char *value, int flags)
 {
-    ht->addnode(aliastab, ztrdup(pm->nam),
+    ht->addnode(ht, ztrdup(pm->nam),
 		createaliasnode(value, flags));
 }
 
@@ -1646,21 +1646,21 @@ setpmgalias(Param pm, char *value)
 static void
 setpmdisgalias(Param pm, char *value)
 {
-    setgalias(aliastab, pm, value, ALIAS_GLOBAL|DISABLED);
+    setalias(aliastab, pm, value, ALIAS_GLOBAL|DISABLED);
 }
 
 /**/
 static void
 setpmsalias(Param pm, char *value)
 {
-    setgalias(sufaliastab, pm, value, 0);
+    setalias(sufaliastab, pm, value, ALIAS_SUFFIX);
 }
 
 /**/
 static void
 setpmdissalias(Param pm, char *value)
 {
-    setgalias(sufaliastab, pm, value, DISABLED);
+    setalias(sufaliastab, pm, value, ALIAS_SUFFIX|DISABLED);
 }
 
 /**/
