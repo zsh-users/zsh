@@ -1,5 +1,9 @@
 2002-04-30  Clint Adams  <clint@zsh.org>
 
+        * 16349: Completion/Debian/Command/.distfiles,
+        Completion/Debian/Command/_make-kpkg: completion for
+        make-kpkg.
+
         * 17057: Completion/Debian/Command/.distfiles,
         Completion/Debian/Command/_debfoster: completion for
 	debfoster.
