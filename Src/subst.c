@@ -701,7 +701,7 @@ get_intarg(char **s)
 
 /* Parsing for the (e) flag. */
 
-static char *
+static int
 subst_parse_str(char **sp, int single)
 {
     char *s;
