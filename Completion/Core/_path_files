@@ -417,9 +417,9 @@ for prepath in "$prepaths[@]"; do
     # Next we see if this component is ambiguous.
 
     if [[ "$tmp3" = */* ]]; then
-       tmp4=$tmp1[(I)^${tmp1[1]%%/*}/*]
+       tmp4=$tmp1[(I)^${(q)tmp1[1]%%/*}/*]
     else
-       tmp4=$tmp1[(I)^${tmp1[1]}]
+       tmp4=$tmp1[(I)^${(q)tmp1[1]}]
     fi
 
     if [[ "$tpre" = */* ]]; then
