@@ -1,3 +1,7 @@
+2000-05-15  Oliver Kiddle  <opk@zsh.org>
+
+	* 11376: Makefile.in: install functions before man pages
+
 2000-05-15  Peter Stephenson  <pws@cambridgesiliconradio.com>
 
 	* unposted: Etc/FAQ.yo: updated from website.
