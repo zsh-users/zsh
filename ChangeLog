@@ -1,3 +1,8 @@
+2000-05-16  Peter Stephenson  <pws@cambridgesiliconradio.com>
+
+	* pws: 11402: Doc/Zsh/options.yo: correct and expand OCTAL_ZEROES
+	entry.
+	
 2000-05-16  Sven Wischnowsky  <wischnow@zsh.org>
 
 	* 11401: Src/Zle/complist.c: make menu-select accept the match

@@ -780,8 +780,10 @@ sort the filenames numerically rather than lexicographically.
 pindex(OCTAL_ZEROES)
 cindex(octal, arithmetic expressions)
 item(tt(OCTAL_ZEROES) <S>)(
-Interpret any integer constant beginning with a 0 and not
-as octal, per IEEE Std 1003.2-1992 (ISO 9945-2:1993).
+Interpret any integer constant beginning with a 0 as octal, per IEEE Std
+1003.2-1992 (ISO 9945-2:1993).  This is not enabled by default as it
+causes problems with parsing of, for example, date and time strings with
+leading zeroes.
 )
 pindex(OVERSTRIKE)
 cindex(editor, overstrike mode)
