@@ -1593,10 +1593,15 @@ sub_match(Cmdata md, char *str, int len, int sfx)
 	     l < len && l < md->len && p[ind] == q[ind];
 	     l++, p += add, q += add) {}
 
-	/* Make sure we don't end with a widowed Meta (which can only
-	 * happen in a forward scan). */
-	if (l && add == 1 && p[-1] == Meta)
-	    l--;
+	/* Make sure we don't end in the middle of a Meta sequence. */
+	if (add == 1) {
+	    if (l && p[-1] == Meta)
+		l--;
+	} else {
+	    if (l && ((l < len && p[-1] == Meta)
+		   || (l < md->len && q[-1] == Meta)))
+		l--;
+	}
 	if (l) {
 	    /* There was a common prefix, use it. */
 	    md->len -= l; len -= l;
