@@ -164,7 +164,7 @@ zstyle -s ":completion:${curcontext}:options" auto-description autod
 
 if (( $# )) && comparguments "$multi[@]" "$autod" "$@"; then
   local action noargs aret expl local tried
-  local next direct odirect equal single match matched ws tmp1 tmp2 tmp3
+  local next direct odirect equal single matcher matched ws tmp1 tmp2 tmp3
   local opts subc tc prefix suffix descrs actions subcs
   local origpre="$PREFIX" origipre="$IPREFIX"
 
@@ -195,6 +195,8 @@ if (( $# )) && comparguments "$multi[@]" "$autod" "$@"; then
       return 1
     fi
   fi
+
+  comparguments -M matcher
 
   context=()
   state=()
@@ -252,7 +254,7 @@ if (( $# )) && comparguments "$multi[@]" "$autod" "$@"; then
 
               eval ws\=\( "${action[3,-3]}" \)
 
-              _describe -t "$subc" "$descr" ws -M "$match" "$subopts[@]"
+              _describe -t "$subc" "$descr" ws -M "$matcher" "$subopts[@]"
 	      tried=yes
 
             elif [[ "$action" = \(*\) ]]; then
@@ -307,8 +309,6 @@ if (( $# )) && comparguments "$multi[@]" "$autod" "$@"; then
 	PREFIX="$origpre"
 	IPREFIX="$origipre"
 
-        comparguments -M match
-	
         if comparguments -s single; then
 
           if [[ "$single" = direct ]]; then
@@ -342,15 +342,15 @@ if (( $# )) && comparguments "$multi[@]" "$autod" "$@"; then
           next=( "$next[@]" "$odirect[@]" )
 	  if [[ -n "$ismulti" ]]; then
 	    _ms_opt=yes
-	    _ms_match="$_ms_match $match"
+	    _ms_match="$_ms_match $matcher"
 	    _ms_optnext=( "$_ms_optnext[@]" "$next[@]" )
 	    _ms_optdirect=( "$_ms_optdirect[@]" "$direct[@]" )
 	    _ms_optequal=( "$_ms_optequal[@]" "$equal[@]" )
 	  else
             _describe -o option \
-                      next -Q -M "$match" -- \
-                      direct -QS '' -M "$match" -- \
-                      equal -QqS= -M "$match"
+                      next -Q -M "$matcher" -- \
+                      direct -QS '' -M "$matcher" -- \
+                      equal -QqS= -M "$matcher"
           fi
         fi
 	PREFIX="$prevpre"
@@ -368,7 +368,8 @@ if (( $# )) && comparguments "$multi[@]" "$autod" "$@"; then
       suffix="$SUFFIX"
       PREFIX="${PREFIX%%\=*}"
       SUFFIX=''
-      compadd -M "$match" -D equal - "${(@)equal%%:*}"
+
+      compadd -M "$matcher" -D equal - "${(@)equal%%:*}"
 
       if [[ $#equal -eq 1 ]]; then
         PREFIX="$prefix"

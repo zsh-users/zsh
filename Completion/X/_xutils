@@ -46,7 +46,7 @@ xev)
     '-rv'
   ;;
 xhost)
-  local expl type ret=1 tmp
+  local expl type ret=1 tmp match
 
   if compset -P '-'; then
     tmp=(${(f)"$(xhost)"})

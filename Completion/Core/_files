@@ -1,6 +1,6 @@
 #autoload
 
-local opts tmp glob pat pats expl tag i def descr end ign ret=1
+local opts tmp glob pat pats expl tag i def descr end ign ret=1 match
 
 zparseopts -a opts \
     '/=tmp' 'f=tmp' 'g+:-=tmp' q n 1 2 P: S: r: R: W: X+: M+: F: J+: V+:

@@ -7,27 +7,22 @@
 # The parts of words from the array that are separated by the
 # separator character are then completed independently.
 
-local sep matches patstr orig matchflags pref i tmp1 tmp2 nm
-local group expl
-
-_match_test _multi_parts || return 1
-
-# Save the current number of matches to be able to return if we added
-# matches or not.
-
-nm=$compstate[nmatches]
+local sep matches pref npref i tmp1 group expl menu pre suf opre osuf cpre
+local opts sopts matcher imm
+typeset -U tmp2
 
 # Get the options.
 
-group=()
-expl=()
-while getopts "J:V:X:" opt; do
-  case "$opt" in
-  [JV]) group=("-$opt" "$OPTARG");;
-  X)    expl=(-X "$OPTARG");;
-  esac
-done
-shift OPTIND-1
+zparseopts -D -a sopts \
+    'J+:=group' 'V+:=group' 'X+:=expl' 'P:=opts' 'F:=opts' \
+    S: r: R: q 1 2 n f 'M+:=matcher' 'i=imm'
+
+sopts=( "$sopts[@]" "$opts[@]" )
+if (( $#matcher )); then
+  matcher="${matcher[2]}"
+else
+  matcher=
+fi
 
 # Get the arguments, first the separator, then the array. The array is 
 # stored in `matches'. Further on this array will always contain those 
@@ -36,166 +31,237 @@ shift OPTIND-1
 
 sep="$1"
 if [[ "${2[1]}" = '(' ]]; then
-  matches=( ${2[2,-2]} )
+  matches=( ${=2[2,-2]} )
 else
   matches=( "${(@P)2}" )
 fi
 
-# Now build the pattern from what we have on the line. We also save
-# the original string in `orig'. The `eval' is used to replace our
-# separator character by `*<sep>'.
+# In `pre' and `suf' we will hold the prefix and the suffix from the
+# line while we walk through them. The original string are used 
+# temporarily for matching.
 
-if [[ -o globcomplete ]]; then
-  patstr="${PREFIX}*${SUFFIX}*"
-else
-  patstr="${PREFIX:q}*${SUFFIX:q}*"
-fi
-orig="${PREFIX}${SUFFIX}"
+pre="$PREFIX"
+suf="$SUFFIX"
+opre="$PREFIX"
+osuf="$SUFFIX"
+orig="$PREFIX$SUFFIX"
 
-matchflags=""
-_match_pattern _path_files patstr matchflags
-[[ -n "$_comp_correct" ]] && matchflags="$matchflags(#a$_comp_correct)"
+# Special handling for menucompletion?
 
-patstr="${${patstr//$sep/*$sep}//\*##/*}"
-#eval patstr\="\$patstr:gs-${sep}-\*${sep}-:gs/\*\*/\*/"
+[[ $compstate[insert] = (*menu|[0-9]*) || -n "$_comp_correct" ||
+   ( $#compstate[pattern_match] -ne 0 &&
+     "$orig" != "${orig:q}" ) ]] && menu=yes
 
-# First we will skip over those parts of the matches for which we have 
-# exact substrings on the line. In `pref' we will build the
-# unambiguous prefix string.
+# In `pref' we collect the unambiguous prefix path.
 
 pref=''
-while [[ "$orig" = *${sep}* ]] do
 
-  # First build the pattern to use, then collect all strings from
-  # `matches' that match the prefix we have and the exact substring in 
-  # the array `tmp1'.
+# If the string from the line matches at least one of the strings,
+# we use only the matching strings.
 
-  pat="${${${patstr#*${sep}}%${sep}*}//\*/[^${sep}]#}${patstr##*${sep}}"
-  tmp1=( "${(@M)matches:#${~matchflags}${orig%%${sep}*}${sep}${~pat}}" )
+compadd -O tmp1 -M "r:|${sep}=* r:|=* $matcher" - "$matches[@]"
 
-  # If there are no words matching the exact substring, stop.
+(( $#tmp1 )) && matches=( "$tmp1[@]" )
 
-  (( $#tmp1 )) || break
+while true; do
 
-  # Otherwise add the part to the prefix, remove it from the matches
-  # (which will also remove all words not matching the string at all), 
-  # and set `patstr' and `orig' to the next component.
+  # Get the prefix and suffix for matching.
 
-  pref="$pref${orig%%${sep}*}${sep}"
-  matches=( "${(@)${(@)matches#${orig%%${sep}*}${sep}}:#}" )
-  orig="${orig#*${sep}}"
-  patstr="${patstr#*${sep}}"
-done
-
-# Now we get all the words that still match in `tmp1'.
-
-if [[ "$patstr" = *${sep}* ]]; then
-  tmp1="${patstr%${sep}*}${sep}"
-  pat="${tmp1//\*/[^${sep}]#}${patstr##*${sep}}"
-else
-  pat="$patstr"
-fi
-tmp1=( "${(@M)matches:#${~matchflags}${~pat}}" )
-
-if (( $#tmp1 )); then
-
-  # There are words that are matched, put them int `matches' and then
-  # move all unambiguous components from the beginning into `pref'.
-
-  matches=( "$tmp1[@]" )
-  while [[ "$matches[1]" = *${sep}* ]]; do
-
-    # We just take the first component of the first match and see if
-    # there are other matches with a different prefix (these are
-    # collected in `tmp2'). If there are any, we give up.
-
-    tmp1="${matches[1]%%${sep}*}${sep}"
-    tmp2=( "${(@)matches:#${tmp1}*}" )
-    (( $#tmp2 )) && break
-
-    # All matches have the same prefix, but it into `pref' and remove
-    # it from the matches.
-
-    pref="$pref$tmp1"
-    matches=( "${(@)${(@)matches#$tmp1}:#}" )
-
-    if [[ "$orig" = *${sep}* ]]; then
-      orig="${orig#*${sep}}"
-    else
-      orig=''
-    fi
-  done
-
-  # Now we can tell the completion code about the things we
-  # found. Strings that have a separator will be added with a suffix.
-
-  if [[ -z "$orig" && "$PREFIX$SUFFIX" != "$pref$orig" ]]; then
-    compadd -QU  "$group[@]" "$expl[@]" -i "$IPREFIX" -S '' - "${pref}${orig}"
-  elif [[ $compstate[insert] = *menu ]]; then
-    for i in "$matches[@]" ; do
-      if [[ "$i" = *${sep}* ]]; then
-        compadd -U "$group[@]" "$expl[@]" -i "$IPREFIX" \
-	        -p "$pref" -qS "$sep" - "${i%%${sep}*}"
-      else
-        compadd -U "$group[@]" "$expl[@]" -i "$IPREFIX" \
-	        -p "$pref" - "${i%%${sep}*}"
-      fi
-    done
+  if [[ "$pre" = *${sep}* ]]; then
+    PREFIX="${pre%%${sep}*}"
+    SUFFIX=""
   else
-    for i in "$matches[@]" ; do
-      if [[ "$i" = *${sep}* ]]; then
-        compadd -U -i "$IPREFIX" -p "$pref" -s "${sep}${i#*${sep}}" \
-	        "$group[@]" "$expl[@]" -M "r:|${sep}=*" - "${i%%${sep}*}"
-      else
-        compadd -U "$group[@]" "$expl[@]" -i "$IPREFIX" -p "$pref" - "$i"
-      fi
-    done
+    PREFIX="${pre}"
+    SUFFIX="${suf%%${sep}*}"
   fi
-elif [[ "$patstr" = *${sep}* ]]; then
 
-  # We had no words matching the string from the line. But we want to
-  # be friendly and at least expand the prefix as far as we can. So we 
-  # will loop through the rest of the string from the line and test
-  # the components one by one.
+  # Check if the component for some of the possible matches is equal
+  # to the string from the line. If there are such strings, we directly
+  # use the stuff from the line. This avoids having `foo' complete to
+  # both `foo' and `foobar'.
 
-  while [[ "$patstr" = *${sep}* ]]; do
+  if [[ -n "$PREFIX$SUFFIX" || "$pre" = ${sep}* ]]; then
+    tmp1=( "${(@M)matches:#${PREFIX}${SUFFIX}${sep}*}" )
+  else
+    tmp1=()
+  fi
 
-    # First we get all words matching at least this component in
-    # `tmp1'. If there are none, we give up.
+  if (( $#tmp1 )); then
+    npref="${PREFIX}${SUFFIX}${sep}"
+  else
+    # No exact match, see how many strings match what's on the line.
 
-    tmp1=( "${(@M)matches:#${~matchflags}${~patstr%%${sep}*}${sep}*}" )
-    (( $#tmp1 )) || break
+    builtin compadd -O tmp1 - "${(@)matches%%${sep}*}"
 
-    # Then we check if there are words that have a different prefix.
+    [[ $#tmp1 -eq 0 && -n "$_comp_correct" ]] &&
+      compadd -O tmp1 - "${(@)matches%%${sep}*}"
 
-    tmp2=( "${(@)tmp1:#${tmp1[1]%%${sep}*}${sep}*}" )
-    if (( $#tmp2 )); then
+    tmp2=( "$tmp1[@]" )
 
-      # There are words with another prefix, so we have found an
-      # ambiguous component. So we just give all possible prefixes to
-      # the completion code together with our prefix and the rest of
-      # the string from the line as the suffix.
+    if [[ $#tmp1 -eq 1 ]]; then
 
-      compadd -U "$group[@]" "$expl[@]" -S '' -i "$IPREFIX" -p "$pref" \
-              -s "${sep}${orig#*${sep}}" - "${(@)matches%%${sep}*}"
-      return 0
+      # Only one match. If there are still separators from the line
+      # we just accept this component. Otherwise we insert what we 
+      # have collected, probably giving it a separator character
+      # as a suffix.
+
+      if [[ "$pre$suf" = *${sep}* ]]; then
+        npref="${tmp1[1]}${sep}"
+      else
+        matches=( "${(@M)matches:#${tmp1[1]}*}" )
+
+	PREFIX="${cpre}${pre}"
+	SUFFIX="$suf"
+
+	if [[ $#imm -ne 0 && $#matches -eq 1 ]] ||
+           zstyle -t ":completion:${curcontext}:" expand suffix; then
+	  compadd "$group[@]" "$expl[@]" "$opts[@]" \
+                  -M "r:|${sep}=* r:|=* $matcher" - "$pref$matches[1]"
+        else
+	  tmp2=( "${(@M)matches:#${tmp1[1]}${sep}*}" )
+
+	  if (( $#tmp2 )); then
+	    compadd "$group[@]" "$expl[@]" -p "$pref" -r "$sep" -S "$sep" "$opts[@]" \
+                    -M "r:|${sep}=* r:|=* $matcher" - "$tmp1[1]"
+          else
+	    compadd "$group[@]" "$expl[@]" -p "$pref" "$sopts[@]" \
+                    -M "r:|${sep}=* r:|=* $matcher" - "$tmp1[1]"
+          fi
+        fi
+	return
+      fi
+    elif (( $#tmp1 )); then
+      local ret=1
+
+      # More than one match. First we get all strings that match the
+      # rest from the line.
+
+      PREFIX="$pre"
+      SUFFIX="$suf"
+      compadd -O matches -M "r:|${sep}=* r:|=* $matcher" - "$matches[@]"
+
+      if [[ "$pre" = *${sep}* ]]; then
+ 	PREFIX="${cpre}${pre%%${sep}*}"
+	SUFFIX="${sep}${pre#*${sep}}${suf}"
+      else
+        PREFIX="${cpre}${pre}"
+	SUFFIX="$suf"
+      fi
+
+      if ! zstyle -t ":completion:${curcontext}:" expand suffix ||
+         [[ -n "$menu" || -z "$compstate[insert]" ]]; then
+
+        # With menucompletion we add only the ambiguous component with
+        # the prefix collected and a spearator for the matches that
+        # have more components.
+
+        tmp2="$pre$suf"
+        if [[ "$tmp2" = *${sep}* ]]; then
+          tmp2=(-s "${sep}${tmp2#*${sep}}")
+        else
+	  tmp2=()
+        fi
+        for i in "${(@M)matches:#(${(j:|:)~tmp1})*}"; do
+	  case "$i" in
+	  *${sep})
+            compadd "$group[@]" "$expl[@]" -r "$sep" -S "$sep" "$opts[@]" \
+	            -p "$pref" \
+                    -M "r:|${sep}=* r:|=* $matcher" - "${i%%${sep}*}" && ret=0
+            ;;
+	  ${sep}*)
+            compadd "$group[@]" "$expl[@]" -S '' "$opts[@]" \
+	            -p "$pref" \
+                    -M "r:|${sep}=* r:|=* $matcher" - "$sep" && ret=0
+            ;;
+	  *${sep}*)
+            compadd "$group[@]" "$expl[@]" -r "$sep" -S "$sep" "$opts[@]" \
+	            -p "$pref" \
+                    -M "r:|${sep}=* r:|=* $matcher" - "${i%%${sep}*}" && ret=0
+            ;;
+          *)
+            compadd "$group[@]" "$expl[@]" -S '' "$opts[@]" -p "$pref" \
+                    -M "r:|${sep}=* r:|=* $matcher" - "$i" && ret=0
+            ;;
+          esac
+        done
+      else
+        # With normal completion we add all matches one-by-one with
+	# the unmatched part as a suffix. This will insert the longest
+	# unambiguous string for all matching strings.
+
+        for i in "${(@M)matches:#(${(j:|:)~tmp1})*}"; do
+	  if [[ "$i" = *${sep}* ]]; then
+            compadd "$group[@]" "$expl[@]" "$opts[@]" \
+	            -p "$pref" -s "${i#*${sep}}" \
+                    -M "r:|${sep}=* r:|=* $matcher" - "${i%%${sep}*}" && ret=0
+          else
+            compadd "$group[@]" "$expl[@]" -S '' "$opts[@]" -p "$pref" \
+                    -M "r:|${sep}=* r:|=* $matcher" - "$i" && ret=0
+          fi
+        done
+      fi
+      return ret
+    else
+      # We are here if no string matched what's on the line. In this
+      # case we insert the expanded prefix we collected if it differs
+      # from the original string from the line.
+
+      { ! zstyle -t ":completion:${curcontext}:" expand prefix ||
+        [[ "$orig" = "$pref$pre$suf" ]] } && return 1
+
+      PREFIX="${cpre}${pre}"
+      SUFFIX="$suf"
+
+      if [[ -n "$suf" ]]; then
+        compadd "$group[@]" "$expl[@]" -s "$suf" "$sopts[@]" \
+                -M "r:|${sep}=* r:|=* $matcher" - "$pref$pre"
+      else
+        compadd "$group[@]" "$expl[@]" -S '' "$opts[@]" \
+                -M "r:|${sep}=* r:|=* $matcher" - "$pref$pre"
+      fi
+      return
     fi
+  fi
 
-    # All words have the same prefix, so add it to `pref' again and
-    # try the next component.
+  # We just accepted and/or expanded a component from the line. We
+  # remove it from the matches (using only those that have a least
+  # the skipped string) and ad it the `pref'.
 
-    pref="$pref${tmp1[1]%%${sep}*}${sep}"
-    matches=( "${(@)matches#${tmp1[1]%%${sep}*}${sep}}" )
-    orig="${orig#*${sep}}"
-    patstr="${patstr#*${sep}}"
-  done
+  matches=( "${(@)${(@)${(@M)matches:#${npref}*}#*${sep}}:#}" )
+  pref="$pref$npref"
 
-  # Finally, add the unambiguous prefix and the rest of the string
-  # from the line.
+  # Now we set `pre' and `suf' to their new values.
 
-  compadd -U "$group[@]" "$expl[@]" -S '' -i "$IPREFIX" -p "$pref" - "$orig"
-fi
+  if [[ "$pre" = *${sep}* ]]; then
+    cpre="${cpre}${pre%%${sep}*}${sep}"
+    pre="${pre#*${sep}}"
+  elif [[ "$suf" = *${sep}* ]]; then
+    cpre="${cpre}${pre}${suf%%${sep}*}${sep}"
+    pre="${suf#*${sep}}"
+    suf=""
+  else
+    # The string from the line is fully handled. If we collected an
+    # unambiguous prefix and that differs from the original string,
+    # we insert it.
 
-# This sets the return value to indicate that we added matches (or not).
+    PREFIX="${opre}${osuf}"
+    SUFFIX=""
 
-[[ nm -ne compstate[nmatches] ]]
+    if [[ -n "$pref" && "$orig" != "$pref" ]]; then
+      if [[ "$pref" = *${sep} ]]; then
+        compadd "$group[@]" "$expl[@]" "$opts[@]" \
+                -p "${pref%${sep}*${sep}}${sep}" -S "$sep" \
+                -M "r:|${sep}=* r:|=* $matcher" - "${${pref%${sep}}##*${sep}}"
+
+      elif [[ "$pref" = *${sep}* ]]; then
+        compadd "$group[@]" "$expl[@]" -S '' "$opts[@]" \
+                -p "${pref%${sep}*}${sep}" \
+                -M "r:|${sep}=* r:|=* $matcher" - "${pref##*${sep}}"
+      else
+        compadd "$group[@]" "$expl[@]" -S '' "$opts[@]" \
+                -M "r:|${sep}=* r:|=* $matcher" - "$pref"
+      fi
+    fi
+    return
+  fi
+done

@@ -10,7 +10,7 @@
 
 [[ _matcher_num -gt 1 || "${#:-$PREFIX$SUFFIX}" -le 1 ]] && return 1
 
-local _comp_correct _correct_expl comax cfgacc redef
+local _comp_correct _correct_expl comax cfgacc redef match
 local oldcontext="${curcontext}" opm="$compstate[pattern_match]"
 
 if [[ "$1" = -a* ]]; then

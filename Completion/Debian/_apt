@@ -53,7 +53,7 @@ _apt_arguments () {
   comp_hasarg="{case \$current_option in
   ${comp_hasarg}esac}"
 
-  local short_seq false true bool bool_prefix intlevel word word1 nul qnul
+  local short_seq false true bool bool_prefix intlevel word word1 nul qnul match
   local comp_bool comp_intlevel comp_configfile comp_arbitem comp_long comp_opt
   local regex_short regex_long regex_all
 

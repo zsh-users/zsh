@@ -1,6 +1,6 @@
 #compdef finger
 
-local curcontext="$curcontext" state line
+local curcontext="$curcontext" state line match
 typeset -A opt_args
 
 if (( ! $+_finger_args )); then

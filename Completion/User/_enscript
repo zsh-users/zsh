@@ -1,6 +1,6 @@
 #compdef enscript
 
-local state context line curcontext="$curcontext"
+local state context line curcontext="$curcontext" match
 typeset -A opt_args
 
 _arguments -C -s \
