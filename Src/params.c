@@ -2501,7 +2501,6 @@ zhuniqarray(char **x)
     while (*++p)
 	for (t = x; t < p; t++)
 	    if (!strcmp(*p, *t)) {
-		*p = NULL;
 		for (t = p--; (*t = t[1]) != NULL; t++);
 		break;
 	    }

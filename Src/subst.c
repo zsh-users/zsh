@@ -1879,7 +1879,7 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int ssub)
 	    return n;
 	}
 	if (unique) {
-/*	    if(!copied) */
+	    if(!copied)
 		aval = arrdup(aval);
 
 	    i = arrlen(aval);
