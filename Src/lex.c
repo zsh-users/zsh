@@ -177,7 +177,6 @@ struct lexstack {
     int isfirstch;
     int histactive;
     int histdone;
-    int spaceflag;
     int stophist;
     int hlinesz;
     char *hline;
@@ -233,7 +232,6 @@ lexsave(void)
     ls->isfirstch = isfirstch;
     ls->histactive = histactive;
     ls->histdone = histdone;
-    ls->spaceflag = spaceflag;
     ls->stophist = stophist;
     ls->hline = chline;
     ls->hptr = hptr;
@@ -294,7 +292,6 @@ lexrestore(void)
     isfirstch = lstack->isfirstch;
     histactive = lstack->histactive;
     histdone = lstack->histdone;
-    spaceflag = lstack->spaceflag;
     stophist = lstack->stophist;
     chline = lstack->hline;
     hptr = lstack->hptr;

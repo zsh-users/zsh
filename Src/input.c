@@ -88,7 +88,7 @@ int strin;
 /* total # of characters waiting to be read. */
 
 /**/
-int inbufct;
+mod_export int inbufct;
 
 /* the flags controlling the input routines in input.c: see INP_* in zsh.h */
 
@@ -128,7 +128,7 @@ static int instacksz = INSTACK_INITIAL;
  * null characters to Meta c^32 character pairs. */
 
 /**/
-char *
+mod_export char *
 shingetline(void)
 {
     char *line = NULL;
@@ -176,7 +176,7 @@ shingetline(void)
 int
 ingetc(void)
 {
-    char lastc;
+    int lastc;
 
     if (lexstop)
 	return ' ';
@@ -186,6 +186,8 @@ ingetc(void)
 	    inbufct--;
 	    if (itok(lastc = STOUC(*inbufptr++)))
 		continue;
+	    if (((inbufflags & INP_LINENO) || !strin) && lastc == '\n')
+		lineno++;
 	    return lastc;
 	}
 
@@ -219,7 +221,7 @@ inputline(void)
     char *ingetcline, *ingetcpmptl = NULL, *ingetcpmptr = NULL;
 
     /* If reading code interactively, work out the prompts. */
-    if (interact && isset(SHINSTDIN))
+    if (interact && isset(SHINSTDIN)) {
 	if (!isfirstln)
 	    ingetcpmptl = prompt2;
 	else {
@@ -227,6 +229,7 @@ inputline(void)
 	    if (rprompt)
 		ingetcpmptr = rprompt;
 	}
+    }
     if (!(interact && isset(SHINSTDIN) && SHTTY != -1 && isset(USEZLE))) {
 	/*
 	 * If not using zle, read the line straight from the input file.
@@ -248,8 +251,21 @@ inputline(void)
 	    free(pptbuf);
 	}
 	ingetcline = shingetline();
-    } else
-	ingetcline = (char *)zleread(ingetcpmptl, ingetcpmptr, 1);
+    } else {
+	/*
+	 * Since we may have to read multiple lines before getting
+	 * a complete piece of input, we tell zle not to restore the
+	 * original tty settings after reading each chunk.  Instead,
+	 * this is done when the history mechanism for the current input
+	 * terminates, which is not until we have the whole input.
+	 * This is supposed to minimise problems on systems that clobber
+	 * typeahead when the terminal settings are altered.
+	 *                     pws 1998/03/12
+	 */
+	ingetcline = (char *)zleread(ingetcpmptl, ingetcpmptr,
+				     ZLRF_HISTORY|ZLRF_NOSETTY);
+	histdone |= HISTFLAG_SETTY;
+    }
     if (!ingetcline) {
 	return lexstop = 1;
     }
@@ -257,31 +273,25 @@ inputline(void)
 	free(ingetcline);
 	return lexstop = errflag = 1;
     }
-    /* Look for a space, to see if this shouldn't be put into history */
-    if (isfirstln)
-	spaceflag = *ingetcline == ' ';
     if (isset(VERBOSE)) {
 	/* Output the whole line read so far. */
 	zputs(ingetcline, stderr);
 	fflush(stderr);
     }
-    if (*ingetcline && ingetcline[strlen(ingetcline) - 1] == '\n') {
-	/* We've now read a complete line. */
-	lineno++;
-	if (interact && isset(SUNKEYBOARDHACK) && isset(SHINSTDIN) &&
-	    SHTTY != -1 && *ingetcline && ingetcline[1] &&
-	    ingetcline[strlen(ingetcline) - 2] == '`') {
-	    /* Junk an unmatched "`" at the end of the line. */
-	    int ct;
-	    char *ptr;
+    if (*ingetcline && ingetcline[strlen(ingetcline) - 1] == '\n' &&
+	interact && isset(SUNKEYBOARDHACK) && isset(SHINSTDIN) &&
+	SHTTY != -1 && *ingetcline && ingetcline[1] &&
+	ingetcline[strlen(ingetcline) - 2] == '`') {
+	/* Junk an unmatched "`" at the end of the line. */
+	int ct;
+	char *ptr;
 
-	    for (ct = 0, ptr = ingetcline; *ptr; ptr++)
-		if (*ptr == '`')
-		    ct++;
-	    if (ct & 1) {
-		ptr[-2] = '\n';
-		ptr[-1] = '\0';
-	    }
+	for (ct = 0, ptr = ingetcline; *ptr; ptr++)
+	    if (*ptr == '`')
+		ct++;
+	if (ct & 1) {
+	    ptr[-2] = '\n';
+	    ptr[-1] = '\0';
 	}
     }
     isfirstch = 1;
@@ -345,6 +355,8 @@ inungetc(int c)
 	    inbufptr--;
 	    inbufct++;
 	    inbufleft++;
+	    if (((inbufflags & INP_LINENO) || !strin) && c == '\n')
+		lineno--;
 	}
 #ifdef DEBUG
         else if (!(inbufflags & INP_CONT)) {
@@ -392,7 +404,7 @@ stuff(char *fn)
 {
     FILE *in;
     char *buf;
-    int len;
+    off_t len;
 
     if (!(in = fopen(unmeta(fn), "r"))) {
 	zerr("can't open %s", fn, 0);
@@ -429,7 +441,7 @@ inerrflush(void)
 /* Set some new input onto a new element of the input stack */
 
 /**/
-void
+mod_export void
 inpush(char *str, int flags, Alias inalias)
 {
     if (!instack) {
@@ -517,7 +529,7 @@ inpoptop(void)
 /* Remove the top element of the stack and all its continuations. */
 
 /**/
-void
+mod_export void
 inpop(void)
 {
     int remcont;
