@@ -1,3 +1,8 @@
+2001-01-31  Andrej Borsenkow <Andrej.Borsenkow@mow.siemens.ru>
+
+	* 13412: Src/mkmakemod.sh: avoid duplicate subdirectories in
+	recursive build
+
 2001-01-29  Andrej Borsenkow <Andrej.Borsenkow@mow.siemens.ru>
 
 	* unposted: ChangeLog: typo in previous commit message
