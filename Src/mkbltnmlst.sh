@@ -21,6 +21,11 @@ exec > $1
 
 for x_mod in $x_mods; do
     q_x_mod=`echo $x_mod | sed 's,Q,Qq,g;s,_,Qu,g;s,/,Qs,g'`
+    eval "modfile=\$modfile_$q_x_mod"
+    if test "x$modfile" = x; then
+	echo >&2 "WARNING: $XMODCF lists non-existent module \`$x_mod' (ignored)"
+	continue
+    fi
     case "$bin_mods" in
     *" $x_mod "*)
         echo "/* linked-in known module \`$x_mod' */"
@@ -31,7 +36,6 @@ for x_mod in $x_mods; do
         echo "/* non-linked-in known module \`$x_mod' */"
 	linked=no
     esac
-    eval "modfile=\$modfile_$q_x_mod"
     unset moddeps autobins autoinfixconds autoprefixconds autoparams
     unset automathfuncs
     . $srcdir/../$modfile
