@@ -1,5 +1,8 @@
 2000-05-16  Peter Stephenson  <pws@cambridgesiliconradio.com>
 
+	* pws: one hunk of 11381: Completion/Builtins/_vars_eq:
+	bad substitution, now picked up by changes in 11380.
+
 	* pws: 11402: Doc/Zsh/options.yo: correct and expand OCTAL_ZEROES
 	entry.
 	

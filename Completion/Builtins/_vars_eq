@@ -45,7 +45,7 @@ case ${words[1]} in
   export) use="${${use/g/}/x/}" ;;
 esac
 
-[[ -z "${words[(r)-*f*]]}" ]] || func=f
+[[ -z "${words[(r)-*f*]}" ]] || func=f
 [[ -z "${words[(r)-*[aA]*]}" ]] || func=p
    
 for ((i=1;i<=$#use;++i)); do
