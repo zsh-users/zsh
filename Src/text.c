@@ -194,6 +194,9 @@ struct tstack {
 	struct {
 	    int par;
 	} _cond;
+	struct {
+	    Wordcode end;
+	} _subsh;
     } u;
 };
 
@@ -329,8 +332,10 @@ gettext2(Estate state)
 	    if (!s) {
 		taddstr("( ");
 		tindent++;
-		tpush(code, 1);
+		n = tpush(code, 1);
+		n->u._subsh.end = state->pc + WC_SUBSH_SKIP(code);
 	    } else {
+		state->pc = s->u._subsh.end;
 		tindent--;
 		taddstr(" )");
 		stack = 1;
@@ -340,8 +345,10 @@ gettext2(Estate state)
 	    if (!s) {
 		taddstr("{ ");
 		tindent++;
-		tpush(code, 1);
+		n = tpush(code, 1);
+		n->u._subsh.end = state->pc + WC_CURSH_SKIP(code);
 	    } else {
+		state->pc = s->u._subsh.end;
 		tindent--;
 		taddstr(" }");
 		stack = 1;
