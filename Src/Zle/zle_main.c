@@ -688,30 +688,23 @@ zlecore(void)
 	selectlocalmap(NULL);
 	bindk = getkeycmd();
 	if (bindk) {
-	    if (!ll && isfirstln && lastchar == eofchar) {
+	    if (!ll && isfirstln && !(zlereadflags & ZLRF_IGNOREEOF) &&
+		lastchar == eofchar) {
 		/*
 		 * Slight hack: this relies on getkeycmd returning
 		 * a value for the EOF character.  However,
 		 * undefined-key is fine.  That's necessary because
 		 * otherwise we can't distinguish this case from
 		 * a ^C.
-		 *
-		 * The noxitct test is done in the top-level loop
-		 * if zle is not running.  As we trap EOFs at this
-		 * level inside zle we need to mimic it here.
-		 * If we break, the top-level loop will actually increment
-		 * noexitct an extra time; that doesn't cause any
-		 * problems.
 		 */
-		if (!(zlereadflags & ZLRF_IGNOREEOF) ||
-		    ++noexitct >= 10)
-		{
-		    eofsent = 1;
-		    break;
-		}
+		eofsent = 1;
+		break;
 	    }
-	    if (execzlefunc(bindk, zlenoargs))
+	    if (execzlefunc(bindk, zlenoargs)) {
 		handlefeep(zlenoargs);
+		if (eofsent)
+		    break;
+	    }
 	    handleprefixes();
 	    /* for vi mode, make sure the cursor isn't somewhere illegal */
 	    if (invicmdmode() && cs > findbol() &&
@@ -908,6 +901,7 @@ execzlefunc(Thingy func, char **args)
 	    !ll && isfirstln && (zlereadflags & ZLRF_IGNOREEOF)) {
 	    showmsg((!islogin) ? "zsh: use 'exit' to exit." :
 		    "zsh: use 'logout' to logout.");
+	    eofsent = 1;
 	    ret = 1;
 	} else {
 	    if(!(wflags & ZLE_KEEPSUFFIX))

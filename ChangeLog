@@ -1,3 +1,11 @@
+2004-09-20  Bart Schaefer  <schaefer@zsh.org>
+
+	* 20387: Src/init.c, Src/zle_main.c: rather than counting the EOF
+	keystrokes as in 20363, pretend that we received an EOF each time
+	the "use 'logout' to logout" warning is printed, and let the top-
+	level loop keep the count.  This way, disabling the warning (by
+	rebinding that key to a "zle -N" widget) also disables counting.
+
 2004-09-17  Peter Stephenson  <pws@csr.com>
 
 	* 20378: Matthias B <msb@winterdrache.de>: Src/params.c,
@@ -34,7 +42,7 @@
 	from zle -I and improve documentation of status from zle, zle -I,
 	zle -R.
 
-2004-09-08  Bart Schaefer  <schaefer@zanshin.com>
+2004-09-08  Bart Schaefer  <schaefer@zsh.org>
 
 	* 20325: Src/exec.c, Test/E01options.ztst: fix crash when using
 	the "command" builtin (as opposed to the "command" precommand
