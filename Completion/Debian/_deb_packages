@@ -1,37 +1,49 @@
 #autoload
 
-local opt caopts
+# Usage: _deb_packages expl... avail|installed|uninstalled
 
-# Usage: _deb_packages installed|uninstalled|avail
-while getopts "J:" opt; do
-  case "$opt" in
-     J) caopts="-J $OPTARG"
-        shift 2			# presume that -J -default- are the first args
-        ;;
-  esac
-done
+_deb_packages_updage_avail () {
+  if (( ! $+_deb_packages_cache_uninstalled )); then
+    _deb_packages_cache_avail=(
+      ${(f)"$(apt-cache dumpavail | awk '/^Package:/ { print $2 }')"}
+    )
+  fi
+  cachevar=_deb_packages_cache_avail
+}
 
-if (( ! $+_deb_cache_dpkg_get_selections )); then
-  _deb_cache_dpkg_get_selections=(
-    ${(f)"$(dpkg --get-selections)"}
-  )
-  _deb_cache_avail=(
-    ${(f)"$(apt-cache dumpavail | awk '/^Package:/ { print $2 }')"}
-  )
-  _deb_cache_installed=(
-    ${${_deb_cache_dpkg_get_selections:#*deinstall}%%	*}
-  )
-  _deb_cache_uninstalled=(
-    ${_deb_cache_avail:#${(j:|:)~${_deb_cache_installed:q}}}
-  )
-fi
+_deb_packages_updage_installed () {
+  if (( ! $+_deb_packages_cache_installed )); then
+    _deb_packages_cache_installed=(
+      ${${${(f)"$(dpkg --get-selections)"}:#*deinstall}%%	*}
+    )
+  fi
+  cachevar=_deb_packages_cache_installed
+}
 
-local command="$1" expl
-shift
+_deb_packages_updage_uninstalled () {
+  _deb_packages_updage_avail
+  _deb_packages_updage_installed
+  if (( ! $+_deb_packages_cache_uninstalled )); then
+    _deb_packages_cache_uninstalled=(
+      ${_deb_packages_cache_avail:#${(j:|:)~${_deb_packages_cache_installed:q}}}
+    )
+  fi
+  cachevar=_deb_packages_cache_uninstalled
+}
 
-_wanted packages expl packages &&
-    case "$command" in
-    installed) compadd "$@" - $_deb_cache_installed;;
-    uninstalled) compadd "$@" - $_deb_cache_uninstalled;;
-    avail) compadd "$@" - $_deb_cache_avail;;
-    esac
+_deb_packages () {
+  local command="$argv[$#]" expl cachevar
+
+  [[ "$command" = (installed|uninstalled|avail) ]] || {
+    _message "_deb_packages:unknown command: $command"
+    return
+  }
+
+  expl=("${(@)argv[1,-2]}")
+
+  _deb_packages_updage_$command
+
+  _tags packages && compadd "$expl[@]" - "${(e):-"\${(@)$cachevar}"}"
+}
+
+_deb_packages "$@"

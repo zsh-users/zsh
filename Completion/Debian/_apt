@@ -375,14 +375,14 @@ _apt-get () {
     -- \
     /$'update\0'/ \| \
     /$'upgrade\0'/ \| \
-    /$'install\0'/ /$'[^\0]#\0'/ :'_deb_packages uninstalled "$expl_packages[@]" || _deb_packages installed "$expl_packages[@]" ' \# \| \
-    /$'remove\0'/ /$'[^\0]#\0'/ :'_deb_packages installed "$expl_packages[@]"' \# \| \
+    /$'install\0'/ /$'[^\0]#\0'/ :'_deb_packages "$expl_packages[@]" uninstalled || _deb_packages "$expl_packages[@]" installed' \# \| \
+    /$'remove\0'/ /$'[^\0]#\0'/ :'_deb_packages "$expl_packages[@]" installed' \# \| \
     /$'dist-upgrade\0'/ \| \
     /$'dselect-upgrade\0'/ \| \
     /$'clean\0'/ \| \
     /$'autoclean\0'/ \| \
     /$'check\0'/ \| \
-    /$'source\0'/ /$'[^\0]#\0'/ :'_deb_packages avail "$expl_packages[@]"' \# \| \
+    /$'source\0'/ /$'[^\0]#\0'/ :'_deb_packages "$expl_packages[@]" avail' \# \| \
     /$'help\0/' \| \
     /"[]"/	:'_tags actions && compadd "$expl_action[@]" update upgrade install remove dist-upgrade dselect-upgrade clean autoclean check source help'
 
@@ -413,14 +413,14 @@ _apt-cache () {
     /$'help\0'/ \| \
     /$'add\0'/ /$'[^\0]#\0'/ :'_files' \# \| \
     /$'gencaches\0'/ \| \
-    /$'showpkg\0'/ /$'[^\0]#\0'/ :'_deb_packages avail "$expl_packages[@]"' \# \| \
+    /$'showpkg\0'/ /$'[^\0]#\0'/ :'_deb_packages "$expl_packages[@]" avail' \# \| \
     /$'stats\0'=$status[4]/ \| \
     /$'dump\0'/ \| \
     /$'dumpavail\0'/ \| \
     /$'unmet\0'/ \| \
     /$'check\0'/ \| \
     /$'search\0'/ \| \
-    /$'show\0'/ /$'[^\0]#\0'/ :'_deb_packages avail "$expl_packages[@]"' \# \| \
+    /$'show\0'/ /$'[^\0]#\0'/ :'_deb_packages "$expl_packages[@]" avail' \# \| \
     /$'depends\0'/ \| \
     /"[]"/ :'_tags actions && compadd "$expl_action[@]" help add gencaches showpkg stats dump dumpavail unmet check search show depends'
 
