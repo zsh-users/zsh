@@ -173,4 +173,4 @@ _xwit () {
   _xwit_parse
 }
 
-[[ -o kshautoload ]] || _xwit "$@"
+_xwit "$@"

@@ -817,4 +817,4 @@ _cvs_nonexisting_entries () {
   }
 }
 
-[[ -o kshautoload ]] || _cvs "$@"
+_cvs "$@"

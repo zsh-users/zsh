@@ -175,4 +175,4 @@ _mua_mailboxes() {
   return ret
 }
 
-[[ -o kshautoload ]] || _mailboxes "$@"
+_mailboxes "$@"

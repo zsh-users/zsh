@@ -3189,7 +3189,7 @@ execautofn(Estate state, int do_exec)
 	return 1;
 
     oldscriptname = scriptname;
-    scriptname = dupstring(state->prog->shf->nam);
+    scriptname = dupstring(shf->nam);
     execode(shf->funcdef, 1, 0);
     scriptname = oldscriptname;
 

@@ -138,4 +138,4 @@ _next_tags_pre() {
   fi
 }
 
-[[ -o kshautoload ]] || _next_tags "$@"
+_next_tags "$@"

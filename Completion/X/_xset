@@ -195,4 +195,4 @@ _xset () {
   _xset_parse
 }
 
-[[ -o kshautoload ]] || _xset "$@"
+_xset "$@"
