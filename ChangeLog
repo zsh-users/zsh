@@ -27,6 +27,11 @@
 
 	* 15772: Src/Modules/tcp.c: add -t (test) for ztcp.
 
+2001-09-09  Bart Schaefer  <schaefer@zsh.org>
+
+	* David Lebel: 15742: zshconfig.ac: Shared object linkage on
+	OpenBSD.
+
 2001-09-09  Clint Adams  <clint@zsh.org>
 
 	* 15770: Src/Modules/tcp.c, Src/Modules/tcp.h:

@@ -1612,7 +1612,14 @@ char *argv[];
   else
     case "$host" in
       *openbsd*)
-	DLLD="${DLLD=$CC}"
+	case "$host_os" in
+	  openbsd[01].* | openbsd2.[0-7] | openbsd2.[0-7].*)
+	    DLLD="${DLLD=ld}"
+	  ;;
+	  *)
+	    DLLD="${DLLD=$CC}"
+	  ;;
+	esac
 	DLLDARG="${LDARG}"
       ;;
       * )
@@ -1638,11 +1645,29 @@ char *argv[];
     netbsd*)      DLLDFLAGS="${DLLDFLAGS=${DLLDARG}-x -shared --whole-archive}" ;;
     aix*)         DLLDFLAGS="${DLLDFLAGS=-G -bexpall -lc}" ;;
     solaris*|sysv4*|esix*) DLLDFLAGS="${DLLDFLAGS=-G}" ;;
-    openbsd*)     DLLDFLAGS="${DLLDFLAGS=-shared -fPIC}" ;;
+    openbsd*)
+      if test $zsh_cv_sys_elf = yes; then
+	DLLDFLAGS="${DLLDFLAGS=-shared -fPIC}"
+      else
+	case "$host_os" in
+	  openbsd[01].* | openbsd2.[0-7] | openbsd2.[0-7].*)
+	   DLLDFLAGS="${DLLDFLAGS=-Bshareable}"
+	  ;;
+	  *)
+	    DLLDFLAGS="${DLLDFLAGS=-shared -fPIC}"
+	  ;;
+	esac
+      fi
+    ;;
   esac
   case "$host" in
     *-hpux*)  EXTRA_LDFLAGS="${EXTRA_LDFLAGS=-Wl,-E}" ;;
     *-freebsd[3-9]*|*-linux*) EXTRA_LDFLAGS="${EXTRA_LDFLAGS=-rdynamic}" ;;
+    *openbsd*)
+       if test $zsh_cv_sys_elf = yes; then
+	 EXTRA_LDFLAGS="${EXTRA_LDFLAGS=-Wl,-E}"
+       fi
+    ;;
     mips-sni-sysv4)
       #
       # unfortunately, we have different compilers
