@@ -1182,7 +1182,7 @@ is set to `true', then none of the words that are already on the line
 will be considered possible completions.
 
 Note that you almost certainly don't want to set this for a general
-context such as `tt(:completion:*)'. This because it would disallow
+context such as `tt(:completion:*)'. This is because it would disallow
 completion of, for example, options multiple times even if the command
 in question accepts the option more than once.
 )

@@ -1026,13 +1026,13 @@ the former.  Only the scalar may have an initial value.  Both the
 scalar and the array may otherwise be manipulated as normal.  If one
 is unset, the other will automatically be unset too.  There is no way
 of untying the variables without unsetting them, or converting the
-type of one them with another tt(typeset) command; tt(+T) does not work,
-assigning an array to var(SCALAR) is an error, and assigning a scalar
-to var(array) sets it to be a single-element array.  Note that
+type of one of them with another tt(typeset) command; tt(+T) does not
+work, assigning an array to var(SCALAR) is an error, and assigning a
+scalar to var(array) sets it to be a single-element array.  Note that
 both tt(typeset -xT ...) and tt(export -T ...) work, but only the
 scalar will be marked for export.
 
-The flag tt(-g) (global) flag is treated specially: it means that any
+The tt(-g) (global) flag is treated specially: it means that any
 resulting parameter will not be restricted to local scope.  Note that this
 does not necessarily mean that the parameter will be global, as the flag
 will apply to any existing parameter (even if unset) from an enclosing

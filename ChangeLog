@@ -1,5 +1,7 @@
 2000-05-08  Oliver Kiddle  <opk@zsh.org>
 
+	* 11268: Doc/Zsh/compsys.yo, Doc/Zsh/builtins.yo: minor typo fixes
+
 	* unposted: Etc/CONTRIBUTORS fix
 
 2000-05-08  Bart Schaefer  <schaefer@zsh.org>
