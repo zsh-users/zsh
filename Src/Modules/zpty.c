@@ -483,7 +483,12 @@ ptyread(char *nam, Ptycmd cmd, char **args)
 	    if (cmd->fin)
 		break;
 	}
-	if ((ret = read(cmd->fd, buf + used, 1)) == 1) {
+	if (cmd->read != -1 || (ret = read(cmd->fd, buf + used, 1)) == 1) {
+	    if (cmd->read != -1) {
+		ret = 1;
+		buf[used] = (char) cmd->read;
+		cmd->read = -1;
+	    }
 	    seen = 1;
 	    if (++used == blen) {
 		if (!*args) {
