@@ -257,6 +257,7 @@ zts_alloc(int ztflags)
     }
     else {
 	ztcp_tail->next = sess;
+	ztcp_tail = sess;
     }
     return sess;
 }
@@ -328,7 +329,6 @@ tcp_cleanup(void)
     {
 	prev = sess;
 	tcp_close(sess);
-	zts_delete(sess);
     }
 }
 
@@ -338,7 +338,7 @@ tcp_close(Tcp_session sess)
 {
     int err;
     
-    if (sess->fd != -1)
+    if (sess && sess->fd != -1)
     {  
 	err = close(sess->fd);
 	if (err)
@@ -346,9 +346,11 @@ tcp_close(Tcp_session sess)
 	    zwarn("connection close failed: %e", NULL, errno);
 	    return -1;
 	}
+	zts_delete(sess);
 	return 0;
     }
 
+    zts_delete(sess);
     return -1;
 }
 
@@ -381,7 +383,7 @@ tcp_connect(Tcp_session sess, char *addrp, struct hostent *zhost, int d_port)
 static int
 bin_ztcp(char *nam, char **args, char *ops, int func)
 {
-    int herrno, err=1, destport, force=0, verbose=0, len, rfd;
+    int herrno, err=1, destport, force=0, verbose=0, len;
     char **addrp, *desthost, *localname, *remotename;
     struct hostent *zthost = NULL, *ztpeer = NULL;
     struct servent *srv;
@@ -409,7 +411,6 @@ bin_ztcp(char *nam, char **args, char *ops, int func)
 		    return 1;
 		}
 		tcp_close(sess);
-		zts_delete(sess);
 		return 0;
 	    }
 	    else
@@ -435,7 +436,7 @@ bin_ztcp(char *nam, char **args, char *ops, int func)
 	if (!lport) { zwarnnam(nam, "bad service name or port number", NULL, 0);
 	return 1;
 	}
-	sess = tcp_socket(PF_INET, SOCK_STREAM, 0, ZTCP_INBOUND);
+	sess = tcp_socket(PF_INET, SOCK_STREAM, 0, ZTCP_LISTEN);
 
 	if (!sess) {
 	    zwarnnam(nam, "unable to allocate a TCP session slot", NULL, 0);
@@ -469,21 +470,52 @@ bin_ztcp(char *nam, char **args, char *ops, int func)
 	    return 1;
 	}
 
-	if ((rfd = accept(sess->fd, (struct sockaddr *)&sess->peer.in, &len)) == -1)
+	/* move the fd since no one will want to read from it */
+	sess->fd = movefd(sess->fd);
+
+	setiparam("REPLY", sess->fd);
+
+	if(verbose)
+	    fprintf(shout, "%d listener is on fd %d\n", ntohs(sess->sock.in.sin_port), sess->fd);
+
+	return 0;
+
+    }
+    else if (ops['a'])
+    {
+	int lfd, rfd;
+
+	if (!args[0]) {
+	    zwarnnam(nam, "-a requires an argument", NULL, 0);
+	    return 1;
+	}
+
+	lfd = atoi(args[0]);
+
+	if (!lfd) {
+	    zwarnnam(nam, "invalid numerical argument", NULL, 0);
+	    return 1;
+	}
+
+	sess = zts_byfd(lfd);
+	if (!sess) {
+	    zwarnnam(nam, "fd is not registered as a tcp connection", NULL, 0);
+	    return 1;
+	}
+
+	if (!(sess->flags & ZTCP_LISTEN))
+	{
+	    zwarnnam(nam, "tcp connection not a listener", NULL, 0);
+	    return 1;
+	}
+
+	sess = zts_alloc(ZTCP_INBOUND);
+
+	if ((rfd = accept(lfd, (struct sockaddr *)&sess->peer.in, &len)) == -1)
 	{
 	    zwarnnam(nam, "could not accept connection: %e", NULL, errno);
 	    tcp_close(sess);
 	    return 1;
-	}
-
-	/* move the fd since it doesn't seem to be closing well */
-	sess->fd = movefd(sess->fd);
-
-	err = close(sess->fd);
-	if (err)
-	{
-	    zwarn("listener close failed: %e", NULL, errno);
-	    return -1;
 	}
 	sess->fd = rfd;
 
@@ -492,10 +524,9 @@ bin_ztcp(char *nam, char **args, char *ops, int func)
 	if(verbose)
 	    fprintf(shout, "%d is on fd %d\n", ntohs(sess->peer.in.sin_port), sess->fd);
 
-	return 0;
-
     }
-    else {
+    else
+    {
 	
 	if (!args[0]) {
 	    for(sess = zts_head(); sess != NULL; sess = zts_next(sess))
@@ -512,7 +543,7 @@ bin_ztcp(char *nam, char **args, char *ops, int func)
 			remotename = ztpeer->h_name;
 		    else
 			remotename = ztrdup(inet_ntoa(sess->sock.in.sin_addr));
-		    fprintf(shout, "%s:%d %s %s:%d is on fd %d%s\n", localname, ntohs(sess->sock.in.sin_port), (sess->flags & ZTCP_INBOUND) ? "<-" : "->", remotename, ntohs(sess->peer.in.sin_port), sess->fd, (sess->flags & ZTCP_ZFTP) ? " ZFTP" : "");
+		    fprintf(shout, "%s:%d %s %s:%d is on fd %d%s\n", localname, ntohs(sess->sock.in.sin_port), (sess->flags & ZTCP_LISTEN) ? "-<" : (sess->flags & ZTCP_INBOUND) ? "<-" : "->", remotename, ntohs(sess->peer.in.sin_port), sess->fd, (sess->flags & ZTCP_ZFTP) ? " ZFTP" : "");
 		}
 	    }
 	    return 0;
@@ -582,7 +613,7 @@ bin_ztcp(char *nam, char **args, char *ops, int func)
 }
 
 static struct builtin bintab[] = {
-    BUILTIN("ztcp", 0, bin_ztcp, 0, 2, 0, "cflv", NULL),
+    BUILTIN("ztcp", 0, bin_ztcp, 0, 2, 0, "acflv", NULL),
 };
 
 /* The load/unload routines required by the zsh library interface */

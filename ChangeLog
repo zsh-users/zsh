@@ -1,6 +1,9 @@
 2001-09-09  Clint Adams  <clint@zsh.org>
 
-	* 1576x: Src/Modules/tcp.c:
+	* 15769: Src/Modules/tcp.c, Src/Modules/tcp.h:
+	add -a (accept) for ztcp.
+
+	* 15768: Src/Modules/tcp.c:
 	take service names in lieu of numbers,
 	and stuff fd numbers into $REPLY instead
 	of printing them.

@@ -72,8 +72,9 @@ union tcp_sockaddr {
 
 typedef struct tcp_session *Tcp_session;
 
-#define ZTCP_INBOUND 1
-#define ZTCP_ZFTP 16
+#define ZTCP_LISTEN  1
+#define ZTCP_INBOUND 2
+#define ZTCP_ZFTP    16
 
 struct tcp_session {
     int fd;				/* file descriptor */
