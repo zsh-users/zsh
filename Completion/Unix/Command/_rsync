@@ -1,0 +1,5 @@
+#compdef rsync
+
+_arguments -- '*=COMMAND*:command:_command' \
+              '*=FILE*:file:_files' \
+              '*=DIR*:directory:_files -/'
