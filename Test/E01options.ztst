@@ -193,7 +193,6 @@
   unsetopt cdablevars
   cd cdablevar2
 1q:CDABLE_VARS option
->`print -P '%~'`/tmpcd
 >back in options.tmp
 ?ZTST_execchunk:cd:2: no such file or directory: cdablevar1
 ?ZTST_execchunk:cd:2: no such file or directory: cdablevar2
@@ -769,9 +768,7 @@
   cd $mydir  
 0q:PUSHD_MINUS option
 >$mydirt/newcd $mydirt/tmpcd $mydirt
->$mydirt
 >$mydirt $mydirt/newcd $mydirt/tmpcd
->$mydirt
 >$mydirt $mydirt/newcd $mydirt/tmpcd
 
 # Do you have any idea how dull this is?

@@ -1,3 +1,13 @@
+2002-03-17  Bart Schaefer  <schaefer@zsh.org>
+
+	* 16820: Test/E01options.ztst: change tests to match 16759.
+
+	* 16556: Src/builtin.c: Error messages added in 16504,16505 should
+	not change the behavior of >&- redirections.
+
+	* Felix Rosencrantz: 16546: Completion/Unix/Command/_perl:
+	complete the arguments to a perl script with _normal.
+
 2002-03-17  Clint Adams  <clint@zsh.org>
 
         * 16850: Completion/Unix/Command/_rsync: remote file completion via

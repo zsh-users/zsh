@@ -3031,9 +3031,11 @@ bin_print(char *name, char **args, char *ops, int func)
 	    } while (*ap);
 	    fputc(ops['N'] ? '\0' : '\n', fout);
 	}
-	if (((fout != stdout) ? fclose(fout) : fflush(fout)) != 0) {
-	    zwarnnam(name, "write error: %e", NULL, errno);
-	    ret = 1;
+	/* Testing EBADF special-cases >&- redirections */
+	if ((fout != stdout) ? (fclose(fout) != 0) :
+	    (fflush(fout) != 0 && errno != EBADF)) {
+            zwarnnam(name, "write error: %e", NULL, errno);
+            ret = 1;
 	}
 	return ret;
     }
@@ -3045,7 +3047,9 @@ bin_print(char *name, char **args, char *ops, int func)
     }
     if (!(ops['n'] || nnl))
 	fputc(ops['N'] ? '\0' : '\n', fout);
-    if (((fout != stdout) ? fclose(fout) : fflush(fout)) != 0) {
+    /* Testing EBADF special-cases >&- redirections */
+    if ((fout != stdout) ? (fclose(fout) != 0) :
+	(fflush(fout) != 0 && errno != EBADF)) {
 	zwarnnam(name, "write error: %e", NULL, errno);
 	ret = 1;
     }
