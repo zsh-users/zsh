@@ -3,8 +3,10 @@
 	* users/5260 (Bill Burton), users/5266: Completion/Unix/Command/_ant:
 	with the call-command style parse ant -projecthelp to get targets
 
-	* unposted: Completion/X/Command/_nedit, Completion/Unix/Command/_mail:
-	nedit 5.3 adds a -version option and complete for nail with _mail
+	* unposted: Completion/X/Command/_nedit, Completion/Unix/Command/_mail,
+	Completion/Unix/Command/_killall, Completion/Unix/Type/_net_interfaces:
+	nedit 5.3 adds a -version option and complete for nail,
+	killall5, ifup and ifdown using existing functions
 
 2002-08-18  Felix Rosencrantz <f_rosencrantz@yahoo.com>
 
