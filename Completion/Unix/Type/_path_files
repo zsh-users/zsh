@@ -140,7 +140,7 @@ zstyle -s ":completion:${curcontext}:paths" special-dirs sdirs
 zstyle -t ":completion:${curcontext}:paths" list-suffixes &&
     listsfx=yes
 
-[[ "$pats" = ((|*[[:blank:]])\*(|[[:blank:]]*)|*\([^[:blank:]]#/[^[:blank:]]#\)*) ]] &&
+[[ "$pats" = ((|*[[:blank:]])\*(|[[:blank:]]*|\([^[:blank:]]##\))|*\([^[:blank:]]#/[^[:blank:]]#\)*) ]] &&
     sopt=$sopt/
 
 zstyle -a ":completion:${curcontext}:paths" accept-exact accex
