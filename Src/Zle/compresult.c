@@ -1288,9 +1288,11 @@ calclist(int showall)
 	}
     }
     if (!onlyexpl) {
+	char **pp;
+	int *ws, tlines, tline, tcols, maxlen, nth, width, glines;
+
 	for (g = amatches; g; g = g->next) {
-	    char **pp;
-	    int glines = 0;
+	    glines = 0;
 
 	    zfree(g->widths, 0);
 	    g->widths = NULL;
@@ -1332,11 +1334,6 @@ calclist(int showall)
 	    g->lins = glines;
 	    nlines += glines;
 	}
-    }
-    if (!onlyexpl) {
-	char **pp;
-	int *ws, tlines, tline, tcols, maxlen, nth, width;
-
 	for (g = amatches; g; g = g->next) {
 	    if (!(g->flags & CGF_PACKED))
 		continue;
@@ -1357,9 +1354,11 @@ calclist(int showall)
 
 		    if (g->flags & CGF_ROWS) {
 			int count, tcol, first, maxlines = 0, llines;
+			int beg = columns / g->shortest, end = g->cols;
 
-			for (tcols = columns / g->shortest; tcols > g->cols;
-			     tcols--) {
+			while (1) {
+			    tcols = (beg + end) >> 1;
+
 			    for (nth = first = maxlen = width = maxlines =
 				     llines = tcol = 0,
 				     count = g->dcount;
@@ -1383,17 +1382,33 @@ calclist(int showall)
 				ws[tcol++] = maxlen;
 				width += maxlen;
 			    }
-			    if (!count && width < columns)
+			    if (!count && width < columns &&
+				(tcols <= 0 || beg == end))
 				break;
+
+			    if (beg == end) {
+				beg--;
+				end--;
+			    } else if (width < columns) {
+				if ((end = tcols) == beg - 1)
+				    end++;
+			    } else {
+				if ((beg = tcols) - 1 == end)
+				    end++;
+			    }
 			}
 			if (tcols > g->cols)
 			    tlines = maxlines;
 		    } else {
-			for (tlines = ((g->totl + columns) / columns);
-			     tlines < g->lins; tlines++) {
+			int beg = ((g->totl + columns) / columns);
+			int end = g->lins;
+
+			while (1) {
+			    tlines = (beg + end) >> 1;
+
 			    for (pp = g->ylist, nth = tline = width =
 				     maxlen = tcols = 0;
-				 *pp; nth++, pp++) {
+				 *pp; pp++) {
 				if (ylens[nth] > maxlen)
 				    maxlen = ylens[nth];
 				if (++tline == tlines) {
@@ -1402,23 +1417,40 @@ calclist(int showall)
 				    ws[tcols++] = maxlen;
 				    maxlen = tline = 0;
 				}
+				nth++;
 			    }
 			    if (tline) {
 				ws[tcols++] = maxlen;
 				width += maxlen;
 			    }
-			    if (nth == yl && width < columns)
+			    if (nth == yl && width < columns &&
+				(beg == end || tlines >= g->lins))
 				break;
+
+			    if (beg == end) {
+				beg++;
+				end++;
+			    } else if (width < columns) {
+				if ((end = tlines) == beg + 1)
+				    end--;
+			    } else {
+				if ((beg = tlines) + 1 == end)
+				    end--;
+			    }
 			}
+			if (tlines > g->lins)
+			    tlines = g->lins;
 		    }
 		}
 	    } else if (g->width) {
 		if (g->flags & CGF_ROWS) {
 		    int addlen, count, tcol, maxlines = 0, llines, i;
+		    int beg = columns / g->shortest, end = g->cols;
 		    Cmatch *first;
 
-		    for (tcols = columns / g->shortest; tcols > g->cols;
-			 tcols--) {
+		    while (1) {
+			tcols = (beg + end) >> 1;
+
 			p = first = skipnolist(g->matches, showall);
 			for (maxlen = width = maxlines = llines = tcol = 0,
 				 count = g->dcount;
@@ -1448,8 +1480,20 @@ calclist(int showall)
 			    ws[tcol++] = maxlen;
 			    width += maxlen;
 			}
-			if (!count && width < columns)
+			if (!count && width < columns &&
+			    (tcols <= 0 || beg == end))
 			    break;
+
+			if (beg == end) {
+			    beg--;
+			    end--;
+			} else if (width < columns) {
+			    if ((end = tcols) == beg - 1)
+				end++;
+			} else {
+			    if ((beg = tcols) - 1 == end)
+				end++;
+			}
 		    }
 		    if (tcols > g->cols)
 			tlines = maxlines;
@@ -1457,12 +1501,15 @@ calclist(int showall)
 		    int addlen;
 		    int smask = ((showall ? 0 : (CMF_NOLIST | CMF_MULT)) |
 				 CMF_HIDE);
+		    int beg = ((g->totl + columns) / columns);
+		    int end = g->lins;
 
-		    for (tlines = ((g->totl + columns) / columns);
-			 tlines < g->lins; tlines++) {
+		    while (1) {
+			tlines = (beg + end) >> 1;
+
 			for (p = g->matches, nth = tline = width =
 				 maxlen = tcols = 0;
-			     (m = *p); p++, nth++) {
+			     (m = *p); p++) {
 			    if (!(m->flags &
 				  (m->disp ? (CMF_DISPLINE | CMF_HIDE) :
 				   smask))) {
@@ -1475,15 +1522,30 @@ calclist(int showall)
 				    ws[tcols++] = maxlen;
 				    maxlen = tline = 0;
 				}
+				nth++;
 			    }
 			}
 			if (tline) {
 			    ws[tcols++] = maxlen;
 			    width += maxlen;
 			}
-			if (nth == g->dcount && width < columns)
+			if (nth == g->dcount && width < columns &&
+			    (beg == end || tlines >= g->lins))
 			    break;
+
+			if (beg == end) {
+			    beg++;
+			    end++;
+			} else if (width < columns) {
+			    if ((end = tlines) == beg + 1)
+				end--;
+			} else {
+			    if ((beg = tlines) + 1 == end)
+				end--;
+			}
 		    }
+		    if (tlines > g->lins)
+			tlines = g->lins;
 		}
 	    }
 	    if (tlines == g->lins) {

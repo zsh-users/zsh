@@ -2596,7 +2596,7 @@ build_cur_dump(char *nam, char *dump, char **names, int match, int map, int flag
 {
     int dfd, hlen, tlen;
     LinkList progs, lnames;
-    Shfunc shf;
+    Shfunc shf = NULL;
 
     if (!strsfx(FD_EXT, dump))
 	dump = dyncat(dump, FD_EXT);

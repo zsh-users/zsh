@@ -900,7 +900,7 @@ int
 source(char *s)
 {
     Eprog prog;
-    int tempfd, fd, cj, oldlineno;
+    int tempfd = -1, fd, cj, oldlineno;
     int oldshst, osubsh, oloops;
     FILE *obshin;
     char *old_scriptname = scriptname, *us;
