@@ -45,7 +45,6 @@ MF_CEIL,
 MF_COPYSIGN,
 MF_COS,
 MF_COSH,
-MF_DREM,
 MF_ERF,
 MF_ERFC,
 MF_EXP,
@@ -131,7 +130,6 @@ static struct mathfunc mftab[] = {
   NUMMATHFUNC("copysign", math_func, 2, 2, MF_COPYSIGN),
   NUMMATHFUNC("cos", math_func, 1, 1, MF_COS),
   NUMMATHFUNC("cosh", math_func, 1, 1, MF_COSH),
-  NUMMATHFUNC("drem", math_func, 2, 2, MF_DREM),
   NUMMATHFUNC("erf", math_func, 1, 1, MF_ERF),
   NUMMATHFUNC("erfc", math_func, 1, 1, MF_ERFC),
   NUMMATHFUNC("exp", math_func, 1, 1, MF_EXP),
@@ -294,10 +292,6 @@ math_func(char *name, int argc, mnumber *argv, int id)
 
   case MF_COSH:
       retd = cosh(argd);
-      break;
-
-  case MF_DREM:
-      retd = drem(argd, argd2);
       break;
 
   case MF_ERF:

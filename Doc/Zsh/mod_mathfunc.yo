@@ -37,7 +37,7 @@ tt(lgamma).  Note also that `tt(signgam())' and `tt(signgam)' are distinct
 expresssions.
 
 The following functions take two floating point arguments: tt(copysign),
-tt(drem), tt(fmod), tt(hypot), tt(nextafter).
+tt(fmod), tt(hypot), tt(nextafter).
 
 The following take an integer first argument and a floating point second
 argument: tt(jn), tt(yn).
