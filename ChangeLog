@@ -480,6 +480,13 @@
 
 	* 15183: zshconfig.ac: fix DLLD in non-ELF case
 
+	* 15181: zshconfig.ac: use -KPIC instead of -Kpic at request
+	of Tomi Vainio <Tomi.Vainio@Sun.COM>
+
+	* 15180: zshconfig.ac, Etc/MACHINES: make AIX default to termcap
+	as workaround for apparent AIX curses bug; add flags to create
+	modules with shared object type. Mention curses problem.
+
 2001-06-29  Clint Adams  <clint@zsh.org>
 
         * Bart: 15083 plus comments: Functions/Zle/bash-backward-kill-word:

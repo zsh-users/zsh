@@ -79,7 +79,7 @@ HP: HP-UX 9, 10.20, 11.0
 	Compiling with gcc 2.7.1 is known to fail with header file
 	conflicts on HP-UX 11.  Use the HP ANSI C compiler.
 
-IBM: AIX 3.2, 4.1
+IBM: AIX 3.2, 4.x
 	Should build `out-of-the-box', but --enable-zsh-mem will not work.
 
 	On 3.2, for 64-bit integer support you need to compile with gcc, as
@@ -88,6 +88,12 @@ IBM: AIX 3.2, 4.1
 	--enable-dynamic (the default) with gcc (version was 2.7.2.3) in
 	4.1, though native cc works. More information about this problem
 	would be appreciated.
+
+	It was reported, that at least some 4.x versions have problem
+	with curses - variables boolcodes and some other are declared
+	in term.h but missing is libcurses.a. That makes native compiler
+	very unhappy (GCC 3.0 apparently does not mind). Zsh now defaults
+	to termcap on AIX; any info about this problem is appreciated.
 
 Linux: Linux 2.* (various 32-bit and 64-bit processors)
 	Should build `out-of-the-box'.
