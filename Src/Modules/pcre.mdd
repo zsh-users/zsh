@@ -1,5 +1,5 @@
 name=zsh/pcre
-link=either
+link=dynamic
 load=no
 
 autobins="pcre_compile pcre_study pcre_match"

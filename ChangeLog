@@ -1,3 +1,8 @@
+2001-07-06  Bart Schaefer  <schaefer@zsh.org>
+
+	* 15271: Src/Modules/pcre.mdd: Default to dynamic linkage only, as
+	the pcre library is unlikely to be available.
+
 2001-07-06  Peter Stephenson  <pws@pwstephenson.fsnet.co.uk>
 
 	* 15266: Src/glob.c, Doc/Zsh/expn.yo: ${(S)...%%...} matches
@@ -22,18 +27,16 @@
 
 2001-07-03  Clint Adams  <clint@zsh.org>
 
-	* 15242: Doc/Zsh/mod_pcre.yo,
-	Src/Modules/pcre.c: set $match
-	instead of pparams.  pcre_match -a
-	sets specified array instead of $match.
+	* 15242: Doc/Zsh/mod_pcre.yo, Src/Modules/pcre.c: set $match
+	instead of pparams.  pcre_match -a sets specified array instead of
+	$match.
 
-	* 15234: Doc/Zsh/mod_pcre.yo: describe
-	behavior introduced by 15228.
+	* 15234: Doc/Zsh/mod_pcre.yo: describe behavior introduced by
+	15228.
 
-	* 15228: zshconfig.ac, Src/Modules/pcre.c:
-	switch AC_CHECK_LIB to AC_SEARCH_LIBS for pcre.
-	Have pcre_match set positional parameters
-	with the contents of capture buffers.
+	* 15228: zshconfig.ac, Src/Modules/pcre.c: switch AC_CHECK_LIB to
+	AC_SEARCH_LIBS for pcre.  Have pcre_match set positional
+	parameters with the contents of capture buffers.
 
 2001-07-03  Clint Adams  <clint@zsh.org>
 
@@ -46,9 +49,8 @@
 
 2001-07-03  Clint Adams  <clint@zsh.org>
 
-	* unposted: Doc/Zsh/.distfiles,
-	Functions/Example/.distfiles, Src/Modules/.distfiles:
-	update distfiles for 15211.
+	* unposted: Doc/Zsh/.distfiles, Functions/Example/.distfiles,
+	Src/Modules/.distfiles: update distfiles for 15211.
 
 2001-07-02  Bart Schaefer  <schaefer@zsh.org>
 
