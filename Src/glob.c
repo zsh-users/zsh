@@ -82,14 +82,6 @@ int pathpos;		/* position in pathbuf (needed by pattern code) */
 /**/
 char *pathbuf;		/* pathname buffer (needed by pattern code) */
 
-static int matchsz;		/* size of matchbuf                     */
-static int matchct;		/* number of matches found              */
-static int pathbufsz;		/* size of pathbuf			*/
-static int pathbufcwd;		/* where did we chdir()'ed		*/
-static Gmatch matchbuf;		/* array of matches                     */
-static Gmatch matchptr;		/* &matchbuf[matchct]                   */
-static char *colonmod;		/* colon modifiers in qualifier list    */
-
 typedef struct stat *Statptr;	 /* This makes the Ultrix compiler happy.  Go figure. */
 
 /* modifier for unit conversions */
@@ -121,19 +113,85 @@ struct qual {
     char *sdata;		/* currently only: expression to eval        */
 };
 
-/* Qualifiers pertaining to current pattern */
-static struct qual *quals;
-
-/* Other state values for current pattern */
-static int qualct, qualorct;
-static int range, amc, units;
-static int gf_nullglob, gf_markdirs, gf_noglobdots, gf_listtypes, gf_follow;
-static int gf_sorts, gf_nsorts, gf_sortlist[11];
-
 /* Prefix, suffix for doing zle trickery */
 
 /**/
 char *glob_pre, *glob_suf;
+
+/* struct to easily save/restore current state */
+
+struct globdata {
+    int gd_badcshglob;
+    int gd_pathpos;
+    char *gd_pathbuf;
+
+    int gd_matchsz;		/* size of matchbuf                     */
+    int gd_matchct;		/* number of matches found              */
+    int gd_pathbufsz;		/* size of pathbuf			*/
+    int gd_pathbufcwd;		/* where did we chdir()'ed		*/
+    Gmatch gd_matchbuf;		/* array of matches                     */
+    Gmatch gd_matchptr;		/* &matchbuf[matchct]                   */
+    char *gd_colonmod;		/* colon modifiers in qualifier list    */
+
+    /* Qualifiers pertaining to current pattern */
+    struct qual *gd_quals;
+
+    /* Other state values for current pattern */
+    int gd_qualct, gd_qualorct;
+    int gd_range, gd_amc, gd_units;
+    int gd_gf_nullglob, gd_gf_markdirs, gd_gf_noglobdots, gd_gf_listtypes;
+    int gd_gf_follow, gd_gf_sorts, gd_gf_nsorts, gd_gf_sortlist[11];
+
+    char *gd_glob_pre, *gd_glob_suf;
+};
+
+/* The variable with the current globbing state and convenience macros */
+
+static struct globdata curglobdata;
+
+#define matchsz       (curglobdata.gd_matchsz)
+#define matchct       (curglobdata.gd_matchct)
+#define pathbufsz     (curglobdata.gd_pathbufsz)
+#define pathbufcwd    (curglobdata.gd_pathbufcwd)
+#define matchbuf      (curglobdata.gd_matchbuf)
+#define matchptr      (curglobdata.gd_matchptr)
+#define colonmod      (curglobdata.gd_colonmod)
+#define quals         (curglobdata.gd_quals)
+#define qualct        (curglobdata.gd_qualct)
+#define qualorct      (curglobdata.gd_qualorct)
+#define g_range       (curglobdata.gd_range)
+#define g_amc         (curglobdata.gd_amc)
+#define g_units       (curglobdata.gd_units)
+#define gf_nullglob   (curglobdata.gd_gf_nullglob)
+#define gf_markdirs   (curglobdata.gd_gf_markdirs)
+#define gf_noglobdots (curglobdata.gd_gf_noglobdots)
+#define gf_listtypes  (curglobdata.gd_gf_listtypes)
+#define gf_follow     (curglobdata.gd_gf_follow)
+#define gf_sorts      (curglobdata.gd_gf_sorts)
+#define gf_nsorts     (curglobdata.gd_gf_nsorts)
+#define gf_sortlist   (curglobdata.gd_gf_sortlist)
+
+/* and macros for save/restore */
+
+#define save_globstate(N) \
+  do { \
+    memcpy(&(N), &curglobdata, sizeof(struct globdata)); \
+    (N).gd_badcshglob = badcshglob; \
+    (N).gd_pathpos = pathpos; \
+    (N).gd_pathbuf = pathbuf; \
+    (N).gd_glob_pre = glob_pre; \
+    (N).gd_glob_suf = glob_suf; \
+  } while (0)
+
+#define restore_globstate(N) \
+  do { \
+    memcpy(&curglobdata, &(N), sizeof(struct globdata)); \
+    badcshglob = (N).gd_badcshglob; \
+    pathpos = (N).gd_pathpos; \
+    pathbuf = (N).gd_pathbuf; \
+    glob_pre = (N).gd_glob_pre; \
+    glob_suf = (N).gd_glob_suf; \
+  } while (0)
 
 /* pathname component in filename patterns */
 
@@ -250,9 +308,9 @@ insert(char *s, int checked)
 	statted = 1;
 	qo = quals;
 	for (qn = qo; qn && qn->func;) {
-	    range = qn->range;
-	    amc = qn->amc;
-	    units = qn->units;
+	    g_range = qn->range;
+	    g_amc = qn->amc;
+	    g_units = qn->units;
 	    if ((qn->sense & 2) && !(statted & 2)) {
 		/* If (sense & 2), we're following links */
 		if (!S_ISLNK(buf.st_mode) || statfullpath(s, &buf2, 0))
@@ -819,11 +877,15 @@ glob(LinkList list, LinkNode np)
 					/* chops it up                   */
     int first = 0, last = -1;		/* index of first/last match to  */
 				        /* return */
+    struct globdata saved;		/* saved glob state              */
+
     MUSTUSEHEAP("glob");
     if (unset(GLOBOPT) || !haswilds(ostr)) {
 	untokenize(ostr);
 	return;
     }
+    save_globstate(saved);
+
     str = dupstring(ostr);
     sl = strlen(str);
     uremnode(list, np);
@@ -997,7 +1059,7 @@ glob(LinkList list, LinkNode np)
 		    case 'l':
 			/* Match files with the given no. of hard links */
 			func = qualnlink;
-			amc = -1;
+			g_amc = -1;
 			goto getrange;
 		    case 'U':
 			/* Match files owned by effective user ID */
@@ -1115,48 +1177,48 @@ glob(LinkList list, LinkNode np)
 			break;
 		    case 'a':
 			/* Access time in given range */
-			amc = 0;
+			g_amc = 0;
 			func = qualtime;
 			goto getrange;
 		    case 'm':
 			/* Modification time in given range */
-			amc = 1;
+			g_amc = 1;
 			func = qualtime;
 			goto getrange;
 		    case 'c':
 			/* Inode creation time in given range */
-			amc = 2;
+			g_amc = 2;
 			func = qualtime;
 			goto getrange;
 		    case 'L':
 			/* File size (Length) in given range */
 			func = qualsize;
-			amc = -1;
+			g_amc = -1;
 			/* Get size multiplier */
-			units = TT_BYTES;
+			g_units = TT_BYTES;
 			if (*s == 'p' || *s == 'P')
-			    units = TT_POSIX_BLOCKS, ++s;
+			    g_units = TT_POSIX_BLOCKS, ++s;
 			else if (*s == 'k' || *s == 'K')
-			    units = TT_KILOBYTES, ++s;
+			    g_units = TT_KILOBYTES, ++s;
 			else if (*s == 'm' || *s == 'M')
-			    units = TT_MEGABYTES, ++s;
+			    g_units = TT_MEGABYTES, ++s;
 		      getrange:
 			/* Get time multiplier */
-			if (amc >= 0) {
-			    units = TT_DAYS;
+			if (g_amc >= 0) {
+			    g_units = TT_DAYS;
 			    if (*s == 'h')
-				units = TT_HOURS, ++s;
+				g_units = TT_HOURS, ++s;
 			    else if (*s == 'm')
-				units = TT_MINS, ++s;
+				g_units = TT_MINS, ++s;
 			    else if (*s == 'w')
-				units = TT_WEEKS, ++s;
+				g_units = TT_WEEKS, ++s;
 			    else if (*s == 'M')
-				units = TT_MONTHS, ++s;
+				g_units = TT_MONTHS, ++s;
 			    else if (*s == 's')
-				units = TT_SECONDS, ++s;
+				g_units = TT_SECONDS, ++s;
 			}
 			/* See if it's greater than, equal to, or less than */
-			if ((range = *s == '+' ? 1 : *s == '-' ? -1 : 0))
+			if ((g_range = *s == '+' ? 1 : *s == '-' ? -1 : 0))
 			    ++s;
 			data = qgetnum(&s);
 			break;
@@ -1175,12 +1237,14 @@ glob(LinkList list, LinkNode np)
 			    case 'c': t = GS_CTIME; break;
 			    default:
 				zerr("unknown sort specifier", NULL, 0);
+				restore_globstate(saved);
 				return;
 			    }
 			    if ((sense & 2) && t != GS_NAME)
 				t <<= GS_SHIFT;
 			    if (gf_sorts & t) {
 				zerr("doubled sort specifier", NULL, 0);
+				restore_globstate(saved);
 				return;
 			    }
 			    gf_sorts |= t;
@@ -1202,16 +1266,11 @@ glob(LinkList list, LinkNode np)
 				func = qualsheval;
 				sdata = dupstring(s + 1);
 				untokenize(sdata);
-				if (!parsestr(sdata)) {
-				    *tt = sav;
-				    if (sav)
-					s = tt + 1;
-				    else
-					s = tt;
-				} else {
-				    func = NULL;
-				    sdata = NULL;
-				}
+				*tt = sav;
+				if (sav)
+				    s = tt + 1;
+				else
+				    s = tt;
 			    }
 			    break;
 			}
@@ -1227,6 +1286,7 @@ glob(LinkList list, LinkNode np)
 			    v.inv = 0;
 			    if (getindex(&s, &v) || s == os) {
 				zerr("invalid subscript", NULL, 0);
+				restore_globstate(saved);
 				return;
 			    }
 			    first = v.a;
@@ -1235,6 +1295,7 @@ glob(LinkList list, LinkNode np)
 			}
 		    default:
 			zerr("unknown file attribute", NULL, 0);
+			restore_globstate(saved);
 			return;
 		    }
 		if (func) {
@@ -1250,19 +1311,22 @@ glob(LinkList list, LinkNode np)
 		    qn->sense = sense;
 		    qn->data = data;
 		    qn->sdata = sdata;
-		    qn->range = range;
-		    qn->units = units;
-		    qn->amc = amc;
+		    qn->range = g_range;
+		    qn->units = g_units;
+		    qn->amc = g_amc;
 		    qn = NULL;
 		    qualct++;
 		}
-		if (errflag)
+		if (errflag) {
+		    restore_globstate(saved);
 		    return;
+		}
 	    }
 	}
     }
     q = parsepat(str);
     if (!q || errflag) {	/* if parsing failed */
+	restore_globstate(saved);
 	if (unset(BADPATTERN)) {
 	    untokenize(ostr);
 	    insertlinknode(list, node, ostr);
@@ -1326,6 +1390,8 @@ glob(LinkList list, LinkNode np)
 	}
     }
     free(matchbuf);
+
+    restore_globstate(saved);
 }
 
 /* Return the order of two strings, taking into account *
@@ -2234,8 +2300,8 @@ qualdev(char *name, struct stat *buf, off_t dv, char *dummy)
 static int
 qualnlink(char *name, struct stat *buf, off_t ct, char *dummy)
 {
-    return (range < 0 ? buf->st_nlink < ct :
-	    range > 0 ? buf->st_nlink > ct :
+    return (g_range < 0 ? buf->st_nlink < ct :
+	    g_range > 0 ? buf->st_nlink > ct :
 	    buf->st_nlink == ct);
 }
 
@@ -2372,7 +2438,7 @@ qualsize(char *name, struct stat *buf, off_t size, char *dummy)
     unsigned long scaled = (unsigned long)buf->st_size;
 #endif
 
-    switch (units) {
+    switch (g_units) {
     case TT_POSIX_BLOCKS:
 	scaled += 511l;
 	scaled /= 512l;
@@ -2387,8 +2453,8 @@ qualsize(char *name, struct stat *buf, off_t size, char *dummy)
 	break;
     }
 
-    return (range < 0 ? scaled < QS_CAST_SIZE() size :
-	    range > 0 ? scaled > QS_CAST_SIZE() size :
+    return (g_range < 0 ? scaled < QS_CAST_SIZE() size :
+	    g_range > 0 ? scaled > QS_CAST_SIZE() size :
 	    scaled == QS_CAST_SIZE() size);
 #undef QS_CAST_SIZE
 }
@@ -2402,10 +2468,10 @@ qualtime(char *name, struct stat *buf, off_t days, char *dummy)
     time_t now, diff;
 
     time(&now);
-    diff = now - (amc == 0 ? buf->st_atime : amc == 1 ? buf->st_mtime :
+    diff = now - (g_amc == 0 ? buf->st_atime : g_amc == 1 ? buf->st_mtime :
 		  buf->st_ctime);
     /* handle multipliers indicating units */
-    switch (units) {
+    switch (g_units) {
     case TT_DAYS:
 	diff /= 86400l;
 	break;
@@ -2423,8 +2489,8 @@ qualtime(char *name, struct stat *buf, off_t days, char *dummy)
 	break;
     }
 
-    return (range < 0 ? diff < days :
-	    range > 0 ? diff > days :
+    return (g_range < 0 ? diff < days :
+	    g_range > 0 ? diff > days :
 	    diff == days);
 }
 
@@ -2435,19 +2501,12 @@ static int
 qualsheval(char *name, struct stat *buf, off_t days, char *str)
 {
     List list;
-    char *usav = underscore;
-
-    underscore = name;
-    str = dupstring(str);
-    singsub(&str);
-    underscore = usav;
-    untokenize(str);
 
     if ((list = parse_string(str, 0))) {
 	int ef = errflag, lv = lastval, ret;
 
 	unsetparam("reply");
-	unsetparam("REPLY");
+	setsparam("REPLY", ztrdup(name));
 
 	execlist(list, 1, 0);
 

@@ -1385,17 +1385,16 @@ is non-zero). The first character after the `tt(e)' will be used as a
 separator and anything up to the next matching separator will be taken 
 as the var(string) (`tt([)', `tt({)', and `tt(<)' match `tt(])',
 `tt(})', and `tt(>)' respectively, any other character matches
-itself). Before the string is executed, expansion is performed on it
-with the parameter tt($_) being set to the filename currently being
-tested. Note that parameter expansions in the var(string) have to be
-quoted to prevent them from being expanded before globbing is done.
+itself). Note that expansions have to be quoted in the var(string) to
+prevent them from being expanded before globbing is done.
 
-If during the execution of var(string) the parameter tt(reply) is set
-to an array or to a string or if the parameter tt(REPLY) is set to a
-string, then these strings will be inserted into the generated list
-instead of the original filename. For security reasons, these
-parameters will be unset by the shell before the var(string) is
-executed.
+During the execution of var(string) the parameter tt(REPLY) is set to
+the filename currently being tested. It may also be set to any string
+to make this string be inserted into the list instead of the original
+filename. Also, the parameter tt(reply) may be set to an array or a
+string and if it is, these strings will be inserted instead of the
+value of the tt(REPLY) parameter. For security reasons, tt(reply)
+will be unset by the shell before the var(string) is executed.
 )
 item(tt(d)var(dev))(
 files on the device var(dev)
