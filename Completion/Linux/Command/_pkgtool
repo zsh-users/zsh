@@ -73,7 +73,7 @@ _slackware_pkg() {
     '-tagfile[this flag is used to specify from the command line which tagfile should be used for the installation.]:tagfile:_files -/'
     '-source_dir[used  when installing multiple packages from disk sets. This is the directory in which the subdirectories for each disk are found.]:source directory:_path_files -/'
     '-target_dir[the directory where the target root directory is located. This is '/' when installing on the hard drive, or typically '\''/mnt'\''  when installing from an install disk.]:target directory:_path_files -W -/'
-    '-source_device[the source device to install from. This is not used if you'\''ve provided the -source_mounted flag. It'\''s usually used when installing from floppy.]:source device:_files -/'
+    '-source_device[the source device to install from. This is not used if you'\''ve provided the -source_mounted flag. It'\''s usually used when installing from floppy.]:source device:{compadd "$expl[@]" /dev/*}'
     )
     _arguments -s \
       $flags[@] 

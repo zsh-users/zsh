@@ -1,5 +1,12 @@
 2003-07-24  Oliver Kiddle  <opk@zsh.org>
 
+	* 18901: baptiste daroussin (and Nikolai Weibull, 18894):
+	Completion/Unix/Command/_vorbis: new completions for ogg vorbis
+
+	* 18893: baptiste daroussin: Completion/Linux/Command/_pkgtool,
+	Completion/Unix/Command/_rar: improved _pkgtool and new
+	completions for rar/unrar
+
 	* 18900: Completion/Linux/Command/_iptables,
 	Completion/Unix/Command/_nmap: new iptables and nmap completions
 
