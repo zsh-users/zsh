@@ -2542,9 +2542,12 @@ match_str(char *l, char *w, int *bp, int *rwlp, int sfx, int test)
 	    lm = NULL;
 	} else {
 	    /* No matcher and different characters: l does not match w. */
+	    if (test)
+		return 0;
+
 	    abort_match();
 
-	    return (test ? 0 : -1);
+	    return -1;
 	}
     }
     /* If this is a recursive call, we just return if l matched w or not. */
@@ -2907,7 +2910,7 @@ cmp_anchors(Cline o, Cline n, int join)
     /* First try the exact strings. */
     if ((!(o->flags & CLF_LINE) && o->wlen == n->wlen &&
 	 (!o->word || !strncmp(o->word, n->word, o->wlen))) ||
-	(line = ((!o->line && !n->line) ||
+	(line = ((!o->line && !n->line && !o->wlen && !n->wlen) ||
 		 (o->llen == n->llen && o->line && n->line &&
 		  !strncmp(o->line, n->line, o->llen))))) {
 	if (line) {
@@ -3434,6 +3437,7 @@ join_clines(Cline o, Cline n)
 		    o->wlen = 0;
 		    free_cline(o->next);
 		    o->next = NULL;
+		    o->flags |= CLF_MISS;
 		}
 	    }
 	    /* Ok, they are equal, now join the sub-lists. */
