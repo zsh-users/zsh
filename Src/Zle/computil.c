@@ -1043,24 +1043,28 @@ ca_parse_line(Cadef d)
 	    if (!state.def)
 		state.curopt = NULL;
 	} else if (state.arg) {
-	    PERMALLOC {
-		addlinknode(state.args, ztrdup(line));
-	    } LASTALLOC;
+	    if (state.inopt) {
+		state.inopt = 0;
+		state.nargbeg = cur - 1;
+	    }
 	    if ((adef = state.def = ca_get_arg(d, state.nth)) &&
 		(state.def->type == CAA_RREST ||
 		 state.def->type == CAA_RARGS)) {
 		state.inrest = 0;
+		state.argbeg = cur;
 		for (; line; line = compwords[cur++]) {
 		    PERMALLOC {
 			addlinknode(state.args, ztrdup(line));
 		    } LASTALLOC;
 		}
+		memcpy(&ca_laststate, &state, sizeof(state));
+		ca_laststate.ddef = NULL;
+		ca_laststate.doff = 0;
 		break;
 	    }
-	    if (state.inopt) {
-		state.inopt = 0;
-		state.nargbeg = cur - 1;
-	    }
+	    PERMALLOC {
+		addlinknode(state.args, ztrdup(line));
+	    } LASTALLOC;
 	    if (state.def && state.def->type != CAA_NORMAL &&
 		state.def->type != CAA_OPT && state.inarg) {
 		state.restbeg = cur;
@@ -1083,6 +1087,9 @@ ca_parse_line(Cadef d)
 			addlinknode(l, line);
 		    } LASTALLOC;
 		}
+		memcpy(&ca_laststate, &state, sizeof(state));
+		ca_laststate.ddef = NULL;
+		ca_laststate.doff = 0;
 		break;
 	    }
 	}
