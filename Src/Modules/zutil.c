@@ -1262,7 +1262,7 @@ static int
 bin_zparseopts(char *nam, char **args, char *ops, int func)
 {
     char *o, *p, *n, **pp, **aval, **ap, *assoc = NULL, **cp, **np;
-    int del = 0, f, extract = 0;
+    int del = 0, f, extract = 0, keep = 0;
     Zoptdesc sopts[256], d;
     Zoptarr a, defarr = NULL;
     Zoptval v;
@@ -1297,6 +1297,14 @@ bin_zparseopts(char *nam, char **args, char *ops, int func)
 		    break;
 		}
 		extract = 1;
+		break;
+	    case 'K':
+		if (o[2]) {
+		    args--;
+		    o = NULL;
+		    break;
+		}
+		keep = 1;
 		break;
 	    case 'a':
 		if (defarr) {
@@ -1478,18 +1486,20 @@ bin_zparseopts(char *nam, char **args, char *ops, int func)
 	    *cp++ = *pp++;
 
     for (a = opt_arrs; a; a = a->next) {
-	aval = (char **) zalloc((a->num + 1) * sizeof(char *));
-	for (ap = aval, v = a->vals; v; ap++, v = v->next) {
-	    if (v->str)
-		*ap = ztrdup(v->str);
-	    else {
-		*ap = ztrdup(v->name);
-		if (v->arg)
-		    *++ap = ztrdup(v->arg);
+	if (!keep || a->num) {
+	    aval = (char **) zalloc((a->num + 1) * sizeof(char *));
+	    for (ap = aval, v = a->vals; v; ap++, v = v->next) {
+		if (v->str)
+		    *ap = ztrdup(v->str);
+		else {
+		    *ap = ztrdup(v->name);
+		    if (v->arg)
+			*++ap = ztrdup(v->arg);
+		}
 	    }
+	    *ap = NULL;
+	    setaparam(a->name, aval);
 	}
-	*ap = NULL;
-	setaparam(a->name, aval);
     }
     if (assoc) {
 	int num;
@@ -1498,31 +1508,33 @@ bin_zparseopts(char *nam, char **args, char *ops, int func)
 	    if (d->vals)
 		num++;
 
-	aval = (char **) zalloc(((num * 2) + 1) * sizeof(char *));
-	for (ap = aval, d = opt_descs; d; d = d->next) {
-	    if (d->vals) {
-		*ap++ = n = (char *) zalloc(strlen(d->name) + 2);
-		*n = '-';
-		strcpy(n + 1, d->name);
+	if (!keep || num) {
+	    aval = (char **) zalloc(((num * 2) + 1) * sizeof(char *));
+	    for (ap = aval, d = opt_descs; d; d = d->next) {
+		if (d->vals) {
+		    *ap++ = n = (char *) zalloc(strlen(d->name) + 2);
+		    *n = '-';
+		    strcpy(n + 1, d->name);
 
-		for (num = 1, v = d->vals; v; v = v->onext) {
-		    num += (v->arg ? strlen(v->arg) : 0);
-		    if (v->next)
-			num++;
-		}
-		*ap++ = n = (char *) zalloc(num);
-		for (v = d->vals; v; v = v->onext) {
-		    if (v->arg) {
-			strcpy(n, v->arg);
-			n += strlen(v->arg);
+		    for (num = 1, v = d->vals; v; v = v->onext) {
+			num += (v->arg ? strlen(v->arg) : 0);
+			if (v->next)
+			    num++;
 		    }
-		    *n = ' ';
+		    *ap++ = n = (char *) zalloc(num);
+		    for (v = d->vals; v; v = v->onext) {
+			if (v->arg) {
+			    strcpy(n, v->arg);
+			    n += strlen(v->arg);
+			}
+			*n = ' ';
+		    }
+		    *n = '\0';
 		}
-		*n = '\0';
 	    }
+	    *ap = NULL;
+	    sethparam(assoc, aval);
 	}
-	*ap = NULL;
-	sethparam(assoc, aval);
     }
     if (del) {
 	if (extract) {

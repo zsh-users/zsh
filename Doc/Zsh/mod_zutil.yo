@@ -131,7 +131,7 @@ item(tt(zregexparse))(
 This implements the internals of the `tt(_regex_arguments)'.
 )
 findex(zparseopts)
-item(tt(zparseopts) [ tt(-D) ] [ tt(-E) ] [ tt(-a) var(array) ] [ tt(-A) var(assoc) ] var(specs))(
+item(tt(zparseopts) [ tt(-D) ] [ tt(-K) ] [ tt(-E) ] [ tt(-a) var(array) ] [ tt(-A) var(assoc) ] var(specs))(
 This builtin simplifies the parsing of options in positional
 parameters, i.e. the set of arguments given by tt($*).  Each var(spec)
 describes one option and should be of the form
@@ -161,21 +161,40 @@ that isn't described by one of the var(specs) And even with tt(-E),
 parsing always stops at a positional parameter equal to `tt(-)' or
 `tt(-)tt(-)'.
 
-If the tt(-A) option is given, the options and their values will also
+The other
+
+startitem()
+item(tt(-a) var(array))(
+As described above, this specifies the default array to store the
+recognised options in.
+)
+item(tt(-A) var(assoc))(
+If this is given, the options and their values will also
 be put into an associative array with the option names as keys and the 
 arguments (if any) as the values.  Note that it is an error to give
 var(specs) without a `tt(=)var(array)' and not use either the tt(-a)
 or tt(-A) option.
-
-If the tt(-D) option is given, all options found are removed from the
+)
+item(tt(-D))(
+If this option is given, all options found are removed from the
 positional parameters, up to but not including any not described by the
 var(specs).  This means that any options processed by tt(zparseopts) are
 removed from the positional parameters.
-
-Since tt(-E) changes the parsing rules, it can be used to test for or
-(if used together with tt(-D)) extract options and their arguments,
-ignoring all other options and arguments that may be in the positional 
-parameters.
+)
+item(tt(-K))(
+With this option, the arrays specified with the tt(-a) and tt(-A)
+options and with the `tt(=)var(array)' forms will be left unchanged
+when none of the var(specs) for them is used.  This allows to assign
+default values to them before calling tt(zparseopts).
+)
+item(tt(-E))(
+This changes the parsing rules to em(not) stop at the first string
+that isn't described by one of the var(spec)s.  It can be used to test
+for or (if used together with tt(-D)) extract options and their
+arguments, ignoring all other options and arguments that may be in the
+positional parameters.
+)
+enditem()
 
 For example,
 

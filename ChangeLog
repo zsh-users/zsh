@@ -1,5 +1,8 @@
 2000-06-07  Sven Wischnowsky  <wischnow@zsh.org>
 
+	* 11792: Doc/Zsh/mod_zutil.yo, Src/Modules/zutil.c: -K option for
+ 	zparseopts to keep previous array values
+	
 	* 11789: Completion/Commands/_correct_word,
  	Completion/Commands/_expand_word, Completion/Commands/_next_tags:
  	setup options in bindable commands
