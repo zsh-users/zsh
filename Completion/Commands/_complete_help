@@ -5,7 +5,7 @@ _complete_help() {
 
   exec </dev/null	# ZLE closes stdin, which can cause errors
 
-  local _sort_tags=_help_sort_tags text i j k
+  local _sort_tags=_help_sort_tags text i j k tmp
   typeset -A help_funcs help_tags help_sfuncs help_styles
 
   compadd() { return 1 }
