@@ -3633,10 +3633,10 @@ privasserted(void)
 	    for(n = 0; !cap_get_flag(caps, n, CAP_EFFECTIVE, &val); n++)
 		if(val ||
 		   (!cap_get_flag(caps, n, CAP_INHERITABLE, &val) && val)) {
-		    cap_free(&caps);
+		    cap_free(caps);
 		    return 1;
 		}
-	    cap_free(&caps);
+	    cap_free(caps);
 	}
     }
 #endif /* HAVE_CAP_GET_PROC */
