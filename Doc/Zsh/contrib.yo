@@ -381,12 +381,12 @@ tindex(capitalize-word-match)
 tindex(up-case-word-match)
 tindex(down-case-word-match)
 tindex(select-word-style)
-tindex(match-word-by-style)
+tindex(match-words-by-style)
 xitem(tt(forward-word-match), tt(backward-word-match))
 xitem(tt(kill-word-match), tt(backward-kill-word-match))
 xitem(tt(transpose-words-match), tt(capitalize-word-match))
 xitem(tt(up-case-word-match), tt(down-case-word-match))
-item(tt(select-word-style), tt(match-word-by-style))(
+item(tt(select-word-style), tt(match-words-by-style))(
 The eight `tt(-match)' functions are drop-in replacements for the
 builtin widgets without the suffix.  By default they behave in a similar
 way.  However, by the use of styles and the function tt(select-word-style),
@@ -484,10 +484,10 @@ the var(X) of tt(foo)var(X)tt(bar), where var(X) can be any character, then
 the resulting expression is tt(bar)var(X)tt(foo).
 
 The word matching and all the handling of tt(zstyle) settings is actually
-implemented by the function tt(match-word-by-style).  This can be used to
+implemented by the function tt(match-words-by-style).  This can be used to
 create new user-defined widgets.  The calling function should set the local
 parameter tt(curcontext) to tt(:zle:)var(widget), create the local
-parameter tt(matched_words) and call tt(match-word-by-style) with no
+parameter tt(matched_words) and call tt(match-words-by-style) with no
 arguments.  On return, tt(matched_words) will be set to an array with the
 elements: (1) the start of the line (2) the word before the cursor (3) any
 non-word characters between that word and the cursor (4) any non-word
