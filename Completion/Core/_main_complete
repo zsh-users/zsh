@@ -20,7 +20,7 @@ setopt localoptions nullglob rcexpandparam extendedglob
 unsetopt markdirs globsubst shwordsplit nounset ksharrays
 exec </dev/null	# ZLE closes stdin, which can cause errors
 
-local func funcs ret=1 tmp _compskip format nm \
+local func funcs ret=1 tmp _compskip format nm call \
       _completers _completer _completer_num curtag _comp_force_list \
       _matchers _matcher _matcher_num _comp_tags _comp_mesg \
       context state line opt_args val_args curcontext="$curcontext" \
@@ -84,7 +84,16 @@ fi
 # Get the names of the completers to use in the positional parameters.
 
 if (( $# )); then
-  _completers=( "$@" )
+  if [[ "$1" = - ]]; then
+    if [[ $# -lt 3 ]]; then
+      _completers=()
+    else
+      _completers=( "$2" )
+      call=yes
+    fi
+  else
+    _completers=( "$@" )
+  fi
 else
   zstyle -a ":completion:${curcontext}:" completer _completers ||
       _completers=( _complete _ignored )
@@ -104,7 +113,9 @@ done
 
 for tmp in "$_completers[@]"; do
 
-  if [[ "$tmp" = *:-* ]]; then
+  if [[ -n "$call" ]]; then
+    _completer="${tmp}"
+  elif [[ "$tmp" = *:-* ]]; then
     _completer="${${tmp%:*}[2,-1]//_/-}${tmp#*:}"
     tmp="${tmp%:*}"
   elif [[ $tmp = *:* ]]; then
@@ -120,7 +131,12 @@ for tmp in "$_completers[@]"; do
 
   _matcher_num=1
   for _matcher in "$_matchers[@]"; do
-    if "$tmp"; then
+    if [[ -n "$call" ]]; then
+      if "${(@)argv[3,-1]}"; then
+        ret=0
+        break 2
+      fi
+    elif "$tmp"; then
       ret=0
       break 2
     fi

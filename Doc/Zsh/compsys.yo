@@ -2003,6 +2003,12 @@ functions to decide if other completers should be called.  If the return
 value is zero, no other completers are tried and the tt(_main_complete)
 function returns.
 
+If the first argument to tt(_main_complete) is a single hyphen, the
+arguments will not be taken as names of completers. Instead, the
+second argument gives a name to use in the var(completer) field of the 
+context and the other arguments give a command anme and arguments to
+call to generate the matches.
+
 The following completer functions are contained in the distribution (users
 may write their own):
 

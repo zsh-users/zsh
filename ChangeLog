@@ -1,5 +1,8 @@
 2000-05-18  Sven Wischnowsky  <wischnow@zsh.org>
 
+	* 11459: Completion/Core/_main_complete, Doc/Zsh/compsys.yo: allow
+ 	_main_complete to call an arbitrary command given as arguments
+	
 	* 11457: Doc/Zsh/compsys.yo, Src/Zle/compctl.mdd: small doc fix;
  	make compcall autoload compctl module
 	
