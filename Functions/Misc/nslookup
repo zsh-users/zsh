@@ -10,7 +10,7 @@ trap 'print -p exit;return' INT
 coproc command nslookup
 pid=$!
 
-while read -pk1 char; do
+while read -pk 1 char; do
   line="$line$char"
   [[ "$line" = *'
 > ' ]] && break
@@ -21,7 +21,7 @@ line=''
 while vared -p '> ' line; do
   print -p "$line"
   line=''
-  while read -pk1 char; do
+  while read -pk 1 char; do
     line="$line$char"
     [[ "$line" = *'
 > ' ]] && break
