@@ -1,3 +1,8 @@
+2000-06-26  Sven Wischnowsky  <wischnow@zsh.org>
+
+	* 12066: Src/Zle/computil.c: missing allocation of list for option
+ 	arguments
+	
 2000-06-25  Bart Schaefer  <schaefer@zsh.org>
 
 	* 12063: Doc/Zsh/builtins.yo, Doc/Zsh/compwid.yo,

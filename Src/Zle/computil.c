@@ -1349,6 +1349,8 @@ ca_parse_line(Cadef d, int multi, int first)
 		state.argend = argend;
 		doff = state.doff = 0;
 		state.singles = 1;
+		if (!state.oargs[state.curopt->num])
+		    state.oargs[state.curopt->num] = znewlinklist();
 		goto cont;
 	    } else {
 		state.curopt = NULL;
@@ -1422,6 +1424,9 @@ ca_parse_line(Cadef d, int multi, int first)
 
 	    if (sopts && nonempty(sopts))
 		state.curopt = (Caopt) uremnode(sopts, firstnode(sopts));
+
+	    if (!state.oargs[state.curopt->num])
+		state.oargs[state.curopt->num] = znewlinklist();
 
 	    ddef = state.def = state.curopt->args;
 	    dopt = state.curopt;
