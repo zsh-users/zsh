@@ -4051,6 +4051,9 @@ zexit(int val, int from_where)
     if (sigtrapped[SIGEXIT])
 	dotrap(SIGEXIT);
     runhookdef(EXITHOOK, NULL);
+    if (opts[MONITOR] && interact && (SHTTY != -1)) {
+       release_pgrp();
+    }
     if (mypid != getpid())
 	_exit(val);
     else
