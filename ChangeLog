@@ -1,3 +1,8 @@
+2003-03-31  Felix Rosencrantz <f_rosencrantz@yahoo.com>
+
+	* unposted: Functions/TCP/.distfiles: Removed zgprintf, file was
+	  removed in posting 18278.
+
 2003-03-28  Wayne Davison  <wayned@users.sourceforge.net>
 
 	* 18402: Src/builtin.c: Prevent "print -m" from crashing (it now
