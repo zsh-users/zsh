@@ -1,5 +1,8 @@
 2005-03-07  Clint Adams  <clint@zsh.org>
 
+	* 20940: Completion/Unix/Command/_knock: completion for knock
+	command.
+
 	* 20939: Completion/Unix/Command/_groff: completion for groff
 	command.
 
