@@ -1,8 +1,8 @@
 2001-05-08  Peter Stephenson  <pws@csr.com>
 
-	* probably 14268: configure.in, acconfig.h: use TRY_COMPILE
-	to check for curses.h because SunOS 5.8 produces warnings which
-	cause HAVE_CURSES_H not to be defined.
+	* 14270: configure.in, acconfig.h: use TRY_COMPILE to check for
+	curses.h because SunOS 5.8 produces warnings which cause
+	HAVE_CURSES_H not to be defined.
 
 2001-05-08  Bart Schaefer  <schaefer@zsh.org>
 
