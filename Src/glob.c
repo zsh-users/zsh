@@ -106,7 +106,8 @@ typedef struct stat *Statptr;	 /* This makes the Ultrix compiler happy.  Go figu
 #define TT_KILOBYTES 2
 #define TT_MEGABYTES 3
 
-typedef int (*TestMatchFunc) _((struct stat *, off_t));
+
+typedef int (*TestMatchFunc) _((char *, struct stat *, off_t, LinkList));
 
 struct qual {
     struct qual *next;		/* Next qualifier, must match                */
@@ -117,6 +118,7 @@ struct qual {
     int amc;			/* Flag for which time to test (a, m, c)     */
     int range;			/* Whether to test <, > or = (as per signum) */
     int units;			/* Multiplier for time or size, respectively */
+    LinkList ldata;		/* currently only: shell function to call    */
 };
 
 /* Qualifiers pertaining to current pattern */
@@ -197,6 +199,11 @@ statfullpath(const char *s, struct stat *st, int l)
     return l ? lstat(buf, st) : stat(buf, st);
 }
 
+/* This may be set by qualifier functions to an array of strings to insert
+ * into the list instead of the original string. */
+
+char **inserts;
+
 /* add a match to the list */
 
 /**/
@@ -206,6 +213,8 @@ insert(char *s, int checked)
     struct stat buf, buf2, *bp;
     char *news = s;
     int statted = 0;
+
+    inserts = NULL;
 
     if (gf_listtypes || gf_markdirs) {
 	/* Add the type marker to the end of the filename */
@@ -235,6 +244,9 @@ insert(char *s, int checked)
 
 	if (!statted && statfullpath(s, &buf, 1))
 	    return;
+
+	news = dyncat(pathbuf, news);
+
 	statted = 1;
 	qo = quals;
 	for (qn = qo; qn && qn->func;) {
@@ -251,7 +263,7 @@ insert(char *s, int checked)
 	    /* Reject the file if the function returned zero *
 	     * and the sense was positive (sense&1 == 0), or *
 	     * vice versa.                                   */
-	    if ((!((qn->func) (bp, qn->data)) ^ qn->sense) & 1) {
+	    if ((!((qn->func) (news, bp, qn->data, qn->ldata)) ^ qn->sense) & 1) {
 		/* Try next alternative, or return if there are no more */
 		if (!(qo = qo->or))
 		    return;
@@ -264,47 +276,53 @@ insert(char *s, int checked)
 	if (statfullpath(s, NULL, 1))
 	    return;
 	statted = 1;
-    }
-    news = dyncat(pathbuf, news);
-    if (colonmod) {
-	/* Handle the remainder of the qualifer:  e.g. (:r:s/foo/bar/). */
-	s = colonmod;
-	modify(&news, &s);
-    }
-    if (!statted && (gf_sorts & GS_NORMAL)) {
-	statfullpath(s, &buf, 1);
-	statted = 1;
-    }
-    if (!(statted & 2) && (gf_sorts & GS_LINKED)) {
-	if (statted) {
-	    if (!S_ISLNK(buf.st_mode) || statfullpath(s, &buf2, 0))
-		memcpy(&buf2, &buf, sizeof(buf));
-	} else if (statfullpath(s, &buf2, 0))
-	    statfullpath(s, &buf2, 1);
-	statted |= 2;
-    }
-    matchptr->name = news;
-    if (statted & 1) {
-	matchptr->size = buf.st_size;
-	matchptr->atime = buf.st_atime;
-	matchptr->mtime = buf.st_mtime;
-	matchptr->ctime = buf.st_ctime;
-	matchptr->links = buf.st_nlink;
-    }
-    if (statted & 2) {
-	matchptr->_size = buf2.st_size;
-	matchptr->_atime = buf2.st_atime;
-	matchptr->_mtime = buf2.st_mtime;
-	matchptr->_ctime = buf2.st_ctime;
-	matchptr->_links = buf2.st_nlink;
-    }
-    matchptr++;
+	news = dyncat(pathbuf, news);
+    } else
+	news = dyncat(pathbuf, news);
 
-    if (++matchct == matchsz) {
-	matchbuf = (Gmatch )realloc((char *)matchbuf,
-				    sizeof(struct gmatch) * (matchsz *= 2));
+    while (!inserts || (news = dupstring(*inserts++))) {
+	if (colonmod) {
+	    /* Handle the remainder of the qualifer:  e.g. (:r:s/foo/bar/). */
+	    s = colonmod;
+	    modify(&news, &s);
+	}
+	if (!statted && (gf_sorts & GS_NORMAL)) {
+	    statfullpath(s, &buf, 1);
+	    statted = 1;
+	}
+	if (!(statted & 2) && (gf_sorts & GS_LINKED)) {
+	    if (statted) {
+		if (!S_ISLNK(buf.st_mode) || statfullpath(s, &buf2, 0))
+		    memcpy(&buf2, &buf, sizeof(buf));
+	    } else if (statfullpath(s, &buf2, 0))
+		statfullpath(s, &buf2, 1);
+	    statted |= 2;
+	}
+	matchptr->name = news;
+	if (statted & 1) {
+	    matchptr->size = buf.st_size;
+	    matchptr->atime = buf.st_atime;
+	    matchptr->mtime = buf.st_mtime;
+	    matchptr->ctime = buf.st_ctime;
+	    matchptr->links = buf.st_nlink;
+	}
+	if (statted & 2) {
+	    matchptr->_size = buf2.st_size;
+	    matchptr->_atime = buf2.st_atime;
+	    matchptr->_mtime = buf2.st_mtime;
+	    matchptr->_ctime = buf2.st_ctime;
+	    matchptr->_links = buf2.st_nlink;
+	}
+	matchptr++;
 
-	matchptr = matchbuf + matchct;
+	if (++matchct == matchsz) {
+	    matchbuf = (Gmatch )realloc((char *)matchbuf,
+					sizeof(struct gmatch) * (matchsz *= 2));
+
+	    matchptr = matchbuf + matchct;
+	}
+	if (!inserts)
+	    break;
     }
 }
 
@@ -832,19 +850,21 @@ glob(LinkList list, LinkNode np)
 		break;
 	if (*s == Inpar && (!isset(EXTENDEDGLOB) || s[1] != Pound)) {
 	    /* Real qualifiers found. */
-	    int sense = 0;	/* bit 0 for match (0)/don't match (1)   */
-				/* bit 1 for follow links (2), don't (0) */
-	    off_t data = 0;	/* Any numerical argument required       */
-	    int (*func) _((Statptr, off_t));
+	    int sense = 0;	   /* bit 0 for match (0)/don't match (1)   */
+				   /* bit 1 for follow links (2), don't (0) */
+	    off_t data = 0;	   /* Any numerical argument required       */
+	    LinkList ldata = NULL; /* Any list argument required            */
+	    int (*func) _((char *, Statptr, off_t, LinkList));
 
 	    str[sl-1] = 0;
 	    *s++ = 0;
 	    while (*s && !colonmod) {
-		func = (int (*) _((Statptr, off_t)))0;
+		func = (int (*) _((char *, Statptr, off_t, LinkList)))0;
 		if (idigit(*s)) {
 		    /* Store numeric argument for qualifier */
 		    func = qualflags;
 		    data = 0;
+		    ldata = NULL;
 		    while (idigit(*s))
 			data = data * 010 + (*s++ - '0');
 		} else if (*s == ',') {
@@ -1169,6 +1189,48 @@ glob(LinkList list, LinkNode np)
 			    s++;
 			    break;
 			}
+		    case 'F':
+			{
+			    char sav, *tt = get_strarg(s);
+
+			    if (!*tt) {
+				zerr("missing end of function name", NULL, 0);
+				data = 0;
+			    } else {
+				char sep = *s;
+
+				sav = *tt;
+				*tt = '\0';
+				func = qualshfunc;
+				ldata = newlinklist();
+				addlinknode(ldata, dupstring(s + 1));
+				addlinknode(ldata, NULL);
+				*tt = sav;
+				if (sav)
+				    s = tt + 1;
+				else
+				    s = tt;
+				while (*s == sep) {
+				    tt = get_strarg(s);
+				    if (!*tt) {
+					zerr("missing end of argument", NULL, 0);
+					data = 0;
+					ldata = NULL;
+					break;
+				    } else {
+					sav = *tt;
+					*tt = '\0';
+					addlinknode(ldata, dupstring(s + 1));
+					*tt = sav;
+					if (sav)
+					    s = tt + 1;
+					else
+					    s = tt;
+				    }
+				}
+			    }
+			    break;
+			}
 		    case '[':
 		    case Inbrack:
 			{
@@ -1203,6 +1265,7 @@ glob(LinkList list, LinkNode np)
 		    qn->func = func;
 		    qn->sense = sense;
 		    qn->data = data;
+		    qn->ldata = ldata;
 		    qn->range = range;
 		    qn->units = units;
 		    qn->amc = amc;
@@ -2176,7 +2239,7 @@ remnulargs(char *s)
 
 /**/
 static int
-qualdev(struct stat *buf, off_t dv)
+qualdev(char *name, struct stat *buf, off_t dv, LinkList dummy)
 {
     return buf->st_dev == dv;
 }
@@ -2185,7 +2248,7 @@ qualdev(struct stat *buf, off_t dv)
 
 /**/
 static int
-qualnlink(struct stat *buf, off_t ct)
+qualnlink(char *name, struct stat *buf, off_t ct, LinkList dummy)
 {
     return (range < 0 ? buf->st_nlink < ct :
 	    range > 0 ? buf->st_nlink > ct :
@@ -2196,7 +2259,7 @@ qualnlink(struct stat *buf, off_t ct)
 
 /**/
 static int
-qualuid(struct stat *buf, off_t uid)
+qualuid(char *name, struct stat *buf, off_t uid, LinkList dummy)
 {
     return buf->st_uid == uid;
 }
@@ -2205,7 +2268,7 @@ qualuid(struct stat *buf, off_t uid)
 
 /**/
 static int
-qualgid(struct stat *buf, off_t gid)
+qualgid(char *name, struct stat *buf, off_t gid, LinkList dummy)
 {
     return buf->st_gid == gid;
 }
@@ -2214,7 +2277,7 @@ qualgid(struct stat *buf, off_t gid)
 
 /**/
 static int
-qualisdev(struct stat *buf, off_t junk)
+qualisdev(char *name, struct stat *buf, off_t junk, LinkList dummy)
 {
     return S_ISBLK(buf->st_mode) || S_ISCHR(buf->st_mode);
 }
@@ -2223,7 +2286,7 @@ qualisdev(struct stat *buf, off_t junk)
 
 /**/
 static int
-qualisblk(struct stat *buf, off_t junk)
+qualisblk(char *name, struct stat *buf, off_t junk, LinkList dummy)
 {
     return S_ISBLK(buf->st_mode);
 }
@@ -2232,7 +2295,7 @@ qualisblk(struct stat *buf, off_t junk)
 
 /**/
 static int
-qualischr(struct stat *buf, off_t junk)
+qualischr(char *name, struct stat *buf, off_t junk, LinkList dummy)
 {
     return S_ISCHR(buf->st_mode);
 }
@@ -2241,7 +2304,7 @@ qualischr(struct stat *buf, off_t junk)
 
 /**/
 static int
-qualisdir(struct stat *buf, off_t junk)
+qualisdir(char *name, struct stat *buf, off_t junk, LinkList dummy)
 {
     return S_ISDIR(buf->st_mode);
 }
@@ -2250,7 +2313,7 @@ qualisdir(struct stat *buf, off_t junk)
 
 /**/
 static int
-qualisfifo(struct stat *buf, off_t junk)
+qualisfifo(char *name, struct stat *buf, off_t junk, LinkList dummy)
 {
     return S_ISFIFO(buf->st_mode);
 }
@@ -2259,7 +2322,7 @@ qualisfifo(struct stat *buf, off_t junk)
 
 /**/
 static int
-qualislnk(struct stat *buf, off_t junk)
+qualislnk(char *name, struct stat *buf, off_t junk, LinkList dummy)
 {
     return S_ISLNK(buf->st_mode);
 }
@@ -2268,7 +2331,7 @@ qualislnk(struct stat *buf, off_t junk)
 
 /**/
 static int
-qualisreg(struct stat *buf, off_t junk)
+qualisreg(char *name, struct stat *buf, off_t junk, LinkList dummy)
 {
     return S_ISREG(buf->st_mode);
 }
@@ -2277,7 +2340,7 @@ qualisreg(struct stat *buf, off_t junk)
 
 /**/
 static int
-qualissock(struct stat *buf, off_t junk)
+qualissock(char *name, struct stat *buf, off_t junk, LinkList dummy)
 {
     return S_ISSOCK(buf->st_mode);
 }
@@ -2286,7 +2349,7 @@ qualissock(struct stat *buf, off_t junk)
 
 /**/
 static int
-qualflags(struct stat *buf, off_t mod)
+qualflags(char *name, struct stat *buf, off_t mod, LinkList dummy)
 {
     return mode_to_octal(buf->st_mode) & mod;
 }
@@ -2295,7 +2358,7 @@ qualflags(struct stat *buf, off_t mod)
 
 /**/
 static int
-qualmodeflags(struct stat *buf, off_t mod)
+qualmodeflags(char *name, struct stat *buf, off_t mod, LinkList dummy)
 {
     long v = mode_to_octal(buf->st_mode), y = mod & 07777, n = mod >> 12;
 
@@ -2306,7 +2369,7 @@ qualmodeflags(struct stat *buf, off_t mod)
 
 /**/
 static int
-qualiscom(struct stat *buf, off_t mod)
+qualiscom(char *name, struct stat *buf, off_t mod, LinkList dummy)
 {
     return S_ISREG(buf->st_mode) && (buf->st_mode & S_IXUGO);
 }
@@ -2315,7 +2378,7 @@ qualiscom(struct stat *buf, off_t mod)
 
 /**/
 static int
-qualsize(struct stat *buf, off_t size)
+qualsize(char *name, struct stat *buf, off_t size, LinkList dummy)
 {
 #if defined(LONG_IS_64_BIT) || defined(OFF_T_IS_64_BIT)
 # define QS_CAST_SIZE()
@@ -2350,7 +2413,7 @@ qualsize(struct stat *buf, off_t size)
 
 /**/
 static int
-qualtime(struct stat *buf, off_t days)
+qualtime(char *name, struct stat *buf, off_t days, LinkList dummy)
 {
     time_t now, diff;
 
@@ -2379,4 +2442,45 @@ qualtime(struct stat *buf, off_t days)
     return (range < 0 ? diff < days :
 	    range > 0 ? diff > days :
 	    diff == days);
+}
+
+/* call shell function */
+
+/**/
+static int
+qualshfunc(char *name, struct stat *buf, off_t days, LinkList args)
+{
+    List list;
+    char *func = (char *) getdata(firstnode(args));
+
+    if ((list = getshfunc(func)) && list != &dummy_list) {
+	int osc = sfcontext, ef = errflag, lv = lastval, ret;
+
+	unsetparam("reply");
+	unsetparam("REPLY");
+
+	setdata(nextnode(firstnode(args)), dupstring(name));
+	sfcontext = SFC_GLOB;
+	doshfunc(func, list, args, 0, 0);
+	ret = lastval;
+	errflag = ef;
+	lastval = lv;
+	sfcontext = osc;
+
+	if (!(inserts = getaparam("reply")) &&
+	    !(inserts = gethparam("reply"))) {
+	    char *tmp;
+
+	    if ((tmp = getsparam("reply")) || (tmp = getsparam("REPLY"))) {
+		static char *tmparr[2];
+
+		tmparr[0] = tmp;
+		tmparr[1] = NULL;
+
+		inserts = tmparr;
+	    }
+	}
+	return !ret;
+    }
+    return 0;
 }

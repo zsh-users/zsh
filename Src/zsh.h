@@ -819,6 +819,7 @@ struct shfunc {
 #define SFC_WIDGET   3		/* user defined widget */
 #define SFC_COMPLETE 4		/* called from completion code */
 #define SFC_CWIDGET  5		/* new style completion widget */
+#define SFC_GLOB     6		/* called from the `F' glob qualifier */
 
 /* node in list of function call wrappers */
 

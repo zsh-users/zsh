@@ -1799,8 +1799,11 @@ execcmd(Cmd cmd, int input, int output, int how, int last1)
 	is_exec = 1;
     }
 
-    if (args && !(cflags & BINF_NOGLOB))
+    if (args && !(cflags & BINF_NOGLOB)) {
+	LinkList oargs = args;
 	globlist(args);
+	args=oargs;
+    }
     if (errflag) {
 	lastval = 1;
 	goto err;
