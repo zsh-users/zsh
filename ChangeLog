@@ -1,3 +1,8 @@
+2003-01-27  Oliver Kiddle  <opk@zsh.org>
+
+	* Doug Kearns: 18141: Completion/Unix/Command/_elinks:
+	new completion for elinks web browser
+
 2003-01-07  Oliver Kiddle  <opk@zsh.org>
 
 	* 18060: Completion/Zsh/Command/_zmv, Doc/Zsh/contrib.yo,
