@@ -1,6 +1,0 @@
-#compdef whereis
-
-local expl
-
-_description expl command
-compgen "$expl[@]" -m
