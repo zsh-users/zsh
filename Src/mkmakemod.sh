@@ -27,7 +27,7 @@
 #   autoparams      parameters defined by the module, for autoloading
 #   automathfuncs   math functions defined by the module, for autoloading
 #   objects         .o files making up this module (*must* be defined)
-#   proto           .pro files for this module (default generated from $objects)
+#   proto           .syms files for this module (default generated from $objects)
 #   headers         extra headers for this module (default none)
 #   hdrdeps         extra headers on which the .mdh depends (default none)
 #   otherincs       extra headers that are included indirectly (default none)
@@ -39,9 +39,9 @@
 # For each module in also knows how to build a .mdh file.  Each source file
 # should #include the .mdh file for the module it is a part of.  The .mdh
 # file #includes the .mdh files for any module dependencies, then each of
-# $headers, and then each of $proto (for global declarations).  It will
+# $headers, and then each .epro (for global declarations).  It will
 # be recreated if any of the dependency .mdh files changes, or if any of
-# $headers or $hdrdeps changes.  When anything depends on it, all of $proto
+# $headers or $hdrdeps changes.  When anything depends on it, all the .epros
 # and $otherincs will be made up to date, but the .mdh file won't actually
 # be rebuilt if those files change.
 #
@@ -178,7 +178,7 @@ if $first_stage; then
 	test -n "${moddeps+set}" || moddeps=
 	test -n "$nozshdep" || moddeps="$moddeps zsh"
 	test -n "${proto+set}" ||
-	    proto=`echo $objects '' | sed 's,\.o ,.pro ,g'`
+	    proto=`echo $objects '' | sed 's,\.o ,.syms ,g'`
 
 	dobjects=`echo $objects '' | sed 's,\.o ,..o ,g'`
 	modhdeps=
@@ -212,13 +212,14 @@ if $first_stage; then
 	echo
 	echo "MODOBJS_${module} = $objects"
 	echo "MODDOBJS_${module} = $dobjects \$(@E@NTRYOBJ)"
-	echo "PROTO_${module} = $proto"
-	echo "INCS_${module} = \$(PROTO_${module}) $otherincs"
+	echo "SYMS_${module} = $proto"
+	echo "EPRO_${module} = "`echo $proto '' | sed 's,\.syms ,.epro ,g'`
+	echo "INCS_${module} = \$(EPRO_${module}) $otherincs"
 	echo "EXPIMP_${module} = $imports ${hasexport+\$(EXPOPT)\$(sdir)/$module.export}"
 	echo "NXPIMP_${module} ="
 	echo
-	echo "proto.${module}: \$(PROTO_${module})"
-	echo "\$(PROTO_${module}): \$(PROTODEPS)"
+	echo "proto.${module}: \$(PRO_${module})"
+	echo "\$(SYMS_${module}): \$(PROTODEPS)"
 	echo
 	echo "modobjs.${module}: \$(MODOBJS_${module})"
 	echo "	echo '' \$(MODOBJS_${module}) $modobjs_sed>> \$(dir_src)/stamp-modobjs.tmp"
@@ -274,11 +275,9 @@ if $first_stage; then
 	    echo "	    echo; \\"
 	fi
 	if test -n "$proto"; then
-	    echo "	    echo '# define GLOBAL_PROTOTYPES'; \\"
-	    echo "	    for pro in \$(PROTO_${module}); do \\"
-	    echo "		echo '# include \"'\$\$pro'\"'; \\"
+	    echo "	    for epro in \$(EPRO_${module}); do \\"
+	    echo "		echo '# include \"'\$\$epro'\"'; \\"
 	    echo "	    done; \\"
-	    echo "	    echo '# undef GLOBAL_PROTOTYPES'; \\"
 	    echo "	    echo; \\"
 	fi
 	echo "	    echo '#endif /* !have_${module}_module */'; \\"

@@ -28,9 +28,6 @@
  */
 
 #include "complete.mdh"
-#define GLOBAL_PROTOTYPES
-#include "zle_tricky.pro"
-#undef GLOBAL_PROTOTYPES
 #include "compresult.pro"
 
 #define inststr(X) inststrlen((X),1,-1)

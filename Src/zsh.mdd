@@ -80,9 +80,9 @@ clean.zsh:
 	rm -f sigcount.h signames.c bltinmods.list version.h zshpaths.h zshxmods.h
 
 # This is not properly part of this module, but it is built as if it were.
-main.o: main.c zsh.mdh main.pro
+main.o: main.c zsh.mdh main.epro
 	$(CC) -c -I. $(CPPFLAGS) $(DEFS) $(CFLAGS) -o $@ $(sdir)/main.c
 
-main.pro: $(PROTODEPS)
-proto.zsh: main.pro
+main.syms: $(PROTODEPS)
+proto.zsh: main.epro
 Make

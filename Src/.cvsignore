@@ -1,6 +1,8 @@
 Makefile
 Makemod.in Makemod
 [_a-zA-Z0-9]*.pro
+*.epro
+*.syms
 *.o
 *.o.c
 *.so

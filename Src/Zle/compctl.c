@@ -29,10 +29,6 @@
 
 #include "compctl.mdh"
 #include "compctl.pro"
-#define GLOBAL_PROTOTYPES
-#include "zle_tricky.pro"
-#include "complete.pro"
-#undef GLOBAL_PROTOTYPES
 
 /* Default completion infos */
  

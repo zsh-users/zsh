@@ -28,9 +28,6 @@
  */
 
 #include "complete.mdh"
-#define GLOBAL_PROTOTYPES
-#include "zle_tricky.pro"
-#undef GLOBAL_PROTOTYPES
 #include "compmatch.pro"
 
 /* This compares two cpattern lists and returns non-zero if they are

@@ -58,7 +58,7 @@ KNROBJ=._foo_
 ANSIOBJ=.o
 ANSI_OBJ=._foo_
 
-.SUFFIXES: .c .$(DL_EXT) ..o .._foo_ .o ._foo_ .pro
+.SUFFIXES: .c .$(DL_EXT) ..o .._foo_ .o ._foo_ .syms .pro .epro
 
 .c$(ANSI@U@OBJ):
 	$(COMPILE) -o $@ $<
@@ -78,8 +78,12 @@ ANSI_OBJ=._foo_
 	$(DLCOMPILE) -o $@ $@.c
 	rm -f $@.c
 
-.c.pro:
+.c.syms:
 	$(AWK) -f $(sdir_src)/makepro.awk $< $(subdir) > $@
+
+.syms.epro:
+	sed -n '/^E/{s/^E//;p;}' < $< > $@
+	sed -n '/^L/{s/^L//;p;}' < $< > `echo $@ | sed 's/\.epro$$/.pro/'`
 
 PROTODEPS = $(sdir_src)/makepro.awk
 
@@ -147,7 +151,7 @@ mostlyclean-here:
 	rm -f *.o *.$(DL_EXT)
 
 clean-here:
-	rm -f *.o.c *.pro *.mdh *.mdhi *.mdhs *.mdh.tmp
+	rm -f *.o.c *.syms *.pro *.epro *.mdh *.mdhi *.mdhs *.mdh.tmp
 
 distclean-here:
 	rm -f $(makefile) $(makefile).in

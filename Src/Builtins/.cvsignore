@@ -2,6 +2,8 @@ Makefile
 Makefile.in
 so_locations
 *.pro
+*.epro
+*.syms
 *.o
 *.o.c
 *.so
