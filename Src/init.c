@@ -37,6 +37,14 @@
 /**/
 int noexitct = 0;
 
+/* buffer for $_ and its length */
+
+/**/
+char *underscore;
+
+/**/
+int underscorelen;
+
 /* what level of sourcing we are at */
  
 /**/
@@ -67,6 +75,11 @@ int tclen[TC_COUNT];
 /**/
 int tclines, tccolumns, hasam;
 
+/* Pointer to read-key function from zle */
+
+/**/
+int (*getkeyptr) _((int));
+
 #ifdef DEBUG
 /* depth of allocation type stack */
 
@@ -94,7 +107,7 @@ loop(int toplevel, int justonce)
 	    if (interact)
 		preprompt();
 	}
-	hbegin();		/* init history mech        */
+	hbegin(1);		/* init history mech        */
 	intr();			/* interrupts on            */
 	lexinit();              /* initialize lexical state */
 	if (!(list = parse_event())) {	/* if we couldn't parse a list */
@@ -110,15 +123,14 @@ loop(int toplevel, int justonce)
 	    List prelist;
 
 	    if (toplevel && (prelist = getshfunc("preexec")) != &dummy_list) {
-		Histent he = gethistent(curhist);
 		LinkList args;
 		int osc = sfcontext;
 
 		PERMALLOC {
 		    args = newlinklist();
 		    addlinknode(args, "preexec");
-		    if (he && he->text)
-			addlinknode(args, he->text);
+		    if (hist_ring)
+			addlinknode(args, hist_ring->text);
 		} LASTALLOC;
 		sfcontext = SFC_HOOK;
 		doshfunc("preexec", prelist, args, 0, 1);
@@ -129,6 +141,8 @@ loop(int toplevel, int justonce)
 	    if (stopmsg)	/* unset 'you have stopped jobs' flag */
 		stopmsg--;
 	    execlist(list, 0, 0);
+	    if (toplevel)
+		freestructs();
 	    tok = toksav;
 	    if (toplevel)
 		noexitct = 0;
@@ -185,6 +199,7 @@ parseargs(char **argv)
 
     /* loop through command line options (begins with "-" or "+") */
     while (*argv && (**argv == '-' || **argv == '+')) {
+	char *args = *argv;
 	action = (**argv == '-');
 	if(!argv[0][1])
 	    *argv = "--";
@@ -219,6 +234,14 @@ parseargs(char **argv)
 		    restricted = action;
 		else
 		    dosetopt(optno, action, 1);
+              break;
+	    } else if (isspace(STOUC(**argv))) {
+		/* zsh's typtab not yet set, have to use ctype */
+		while (*++*argv)
+		    if (!isspace(STOUC(**argv))) {
+			zerr("bad option string: `%s'", args, 0);
+			exit(1);
+		    }
 		break;
 	    } else {
 	    	if (!(optno = optlookupc(**argv))) {
@@ -330,7 +353,7 @@ init_io(void)
 	 * Try both stdin and stdout before trying /dev/tty. -- Bart
 	 */
 #if defined(HAVE_FCNTL_H) && defined(F_GETFL)
-#define rdwrtty(fd)	((fcntl(fd, F_GETFL) & O_RDWR) == O_RDWR)
+#define rdwrtty(fd)	((fcntl(fd, F_GETFL, 0) & O_RDWR) == O_RDWR)
 #else
 #define rdwrtty(fd)	1
 #endif
@@ -415,7 +438,7 @@ init_shout(void)
 static char *tccapnams[TC_COUNT] = {
     "cl", "le", "LE", "nd", "RI", "up", "UP", "do",
     "DO", "dc", "DC", "ic", "IC", "cd", "ce", "al", "dl", "ta",
-    "md", "so", "us", "me", "se", "ue"
+    "md", "so", "us", "me", "se", "ue", "ch"
 };
 
 /* Initialise termcap */
@@ -521,12 +544,15 @@ setupvals(void)
     int i;
 #endif
 
+    getkeyptr = NULL;
+
+    lineno = 1;
     noeval = 0;
     curhist = 0;
     histsiz = DEFAULT_HISTSIZE;
     inithist();
 
-    cmdstack = (unsigned char *) zalloc(256);
+    cmdstack = (unsigned char *) zalloc(CMDSTACKSZ);
     cmdsp = 0;
 
     bangchar = '!';
@@ -551,7 +577,23 @@ setupvals(void)
     cdpath   = mkarray(NULL);
     manpath  = mkarray(NULL);
     fignore  = mkarray(NULL);
+#ifdef FPATH_DIR
+# ifdef FPATH_SUBDIRS
+    {
+	char *fpath_subdirs[] = FPATH_SUBDIRS;
+	int len = sizeof(fpath_subdirs)/sizeof(char *), j;
+
+	fpath = zalloc((len+1)*sizeof(char *));
+	for (j = 0; j < len; j++)
+	    fpath[j] = tricat(FPATH_DIR, "/", fpath_subdirs[j]);
+	fpath[len] = NULL;
+    }
+# else
+    fpath    = mkarray(ztrdup(FPATH_DIR));
+# endif
+#else
     fpath    = mkarray(NULL);
+#endif
     mailpath = mkarray(NULL);
     watch    = mkarray(NULL);
     psvar    = mkarray(NULL);
@@ -573,19 +615,21 @@ setupvals(void)
 	prompt2 = ztrdup("%_> ");
     }
     prompt3 = ztrdup("?# ");
-    prompt4 = ztrdup("+ ");
+    prompt4 = (emulation == EMULATE_KSH || emulation == EMULATE_SH)
+	? ztrdup("+ ") : ztrdup("+%N:%i> ");
     sprompt = ztrdup("zsh: correct '%R' to '%r' [nyae]? ");
 
     ifs         = ztrdup(DEFAULT_IFS);
     wordchars   = ztrdup(DEFAULT_WORDCHARS);
     postedit    = ztrdup("");
-    underscore  = ztrdup("");
+    underscore  = (char *) zalloc(underscorelen = 32);
+    *underscore = '\0';
 
     zoptarg = ztrdup("");
     zoptind = 1;
 
-    ppid  = (long) getppid();
-    mypid = (long) getpid();
+    ppid  = (zlong) getppid();
+    mypid = (zlong) getpid();
     term  = ztrdup("");
 
     /* The following variable assignments cause zsh to behave more *
@@ -642,11 +686,13 @@ setupvals(void)
     wrappers = NULL;
 
 #ifdef TIOCGWINSZ
-    adjustwinsize();
+    adjustwinsize(0);
 #else
-    /* Using zero below sets the defaults from termcap */
-    setiparam("COLUMNS", 0);
-    setiparam("LINES", 0);
+    /* columns and lines are normally zero, unless something different *
+     * was inhereted from the environment.  If either of them are zero *
+     * the setiparam calls below set them to the defaults from termcap */
+    setiparam("COLUMNS", columns);
+    setiparam("LINES", lines);
 #endif
 
 #ifdef HAVE_GETRLIMIT
@@ -757,48 +803,31 @@ run_init_scripts(void)
 #ifdef GLOBAL_ZSHENV
 	source(GLOBAL_ZSHENV);
 #endif
-	if (isset(RCS)) {
-	    int globalfirst = isset(GLOBALRCSFIRST);
-	    if (globalfirst) {
+	if (isset(RCS) && unset(PRIVILEGED))
+	    sourcehome(".zshenv");
+	if (islogin) {
 #ifdef GLOBAL_ZPROFILE
-		if (islogin)
+	    if (isset(RCS) && isset(GLOBALRCS))
 		    source(GLOBAL_ZPROFILE);
 #endif
+	    if (isset(RCS) && unset(PRIVILEGED))
+		sourcehome(".zprofile");
+	}
+	if (interact) {
 #ifdef GLOBAL_ZSHRC
-		if (interact)
-		    source(GLOBAL_ZSHRC);
+	    if (isset(RCS) && isset(GLOBALRCS))
+		source(GLOBAL_ZSHRC);
 #endif
+	    if (isset(RCS) && unset(PRIVILEGED))
+		sourcehome(".zshrc");
+	}
+	if (islogin) {
 #ifdef GLOBAL_ZLOGIN
-		if (islogin)
-		    source(GLOBAL_ZLOGIN);
+	    if (isset(RCS) && isset(GLOBALRCS))
+		source(GLOBAL_ZLOGIN);
 #endif
-	    }
-	    if (unset(PRIVILEGED))
-		sourcehome(".zshenv");
-	    if (islogin) {
-#ifdef GLOBAL_ZPROFILE
-		if (!globalfirst)
-		    source(GLOBAL_ZPROFILE);
-#endif
-		if (unset(PRIVILEGED))
-		    sourcehome(".zprofile");
-	    }
-	    if (interact) {
-#ifdef GLOBAL_ZSHRC
-		if (!globalfirst)
-		    source(GLOBAL_ZSHRC);
-#endif
-		if (unset(PRIVILEGED))
-		    sourcehome(".zshrc");
-	    }
-	    if (islogin) {
-#ifdef GLOBAL_ZLOGIN
-		if (!globalfirst)
-		    source(GLOBAL_ZLOGIN);
-#endif
-		if (unset(PRIVILEGED))
-		    sourcehome(".zlogin");
-	    }
+	    if (isset(RCS) && unset(PRIVILEGED))
+		sourcehome(".zlogin");
 	}
     }
     noerrexit = 0;
@@ -828,7 +857,7 @@ init_misc(void)
     }
 
     if (interact && isset(RCS))
-	readhistfile(getsparam("HISTFILE"), 0);
+	readhistfile(NULL, 0, HFILE_USE_OPTIONS);
 }
 
 /* source a file */
@@ -858,7 +887,7 @@ source(char *s)
     SHIN = tempfd;
     bshin = fdopen(SHIN, "r");
     subsh  = 0;
-    lineno = 0;
+    lineno = 1;
     loops  = 0;
     dosetopt(SHINSTDIN, 0, 1);
     scriptname = s;
