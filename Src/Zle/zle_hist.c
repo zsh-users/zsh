@@ -720,7 +720,8 @@ doisearch(char **args, int dir)
 		    statusline = ibuf + NORM_PROMPT_POS;
 		    break;
 		}
-		if (!(he = movehistent(he, dir, hist_skip_flags))) {
+		if (!(zlereadflags & ZLRF_HISTORY)
+		 || !(he = movehistent(he, dir, hist_skip_flags))) {
 		    if (sbptr == (int)isrch_spots[top_spot-1].len
 		     && (isrch_spots[top_spot-1].flags & ISS_FAILING))
 			top_spot--;
