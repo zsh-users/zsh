@@ -1133,16 +1133,16 @@ bld_parts(char *str, int len, int plen, Cline *lp)
     Cmlist ms;
     Cmatcher mp;
     int t, op = plen;
-    char *p = str;
+    char *p = str, *os = str;
 
     while (len) {
 	for (t = 0, ms = bmatchers; ms && !t; ms = ms->next) {
 	    mp = ms->matcher;
-	    if (mp && mp->flags == CMF_RIGHT && mp->wlen < 0 &&
-		!mp->llen && len >= mp->ralen + mp->lalen && mp->ralen &&
+	    if (mp && mp->flags == CMF_RIGHT && mp->wlen < 0 && mp->ralen &&
+		!mp->llen && len >= mp->ralen && (str - os) >= mp->lalen &&
 		pattern_match(mp->right, str, NULL, NULL) &&
 		(!mp->lalen ||
-		 ((str - p) >= mp->lalen &&
+		 ((str - os) >= mp->lalen &&
 		  pattern_match(mp->left, str - mp->lalen, NULL, NULL)))) {
 		int olen = str - p, llen;
 

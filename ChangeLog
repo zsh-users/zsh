@@ -1,5 +1,8 @@
 2001-01-15  Sven Wischnowsky  <wischnow@zsh.org>
 
+	* 13349: Src/Zle/compmatch.c, Src/Zle/compresult.c: two more fixes
+ 	for completion matching and reporting interesting positions
+	
 	* Ulrik Haugen: 13344, 13347: Completion/User/_grep,
 	Completion/User/_ls, Completion/User/_use_lo: add completion for
 	ls and ([ef]|)grep

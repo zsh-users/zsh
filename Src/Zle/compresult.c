@@ -249,7 +249,7 @@ cline_str(Cline l, int ins, int *csp, LinkList posl)
 	/* Remember the position if this is the first prefix with
 	 * missing characters. */
 	if ((l->flags & CLF_MISS) && !(l->flags & CLF_SUF)) {
-	    if (posl && l->min != l->max && (npos = cs + padd) != opos) {
+	    if (posl && (npos = cs + padd) != opos) {
 		opos = npos;
 		addlinknode(posl, (void *) ((long) npos));
 	    }
@@ -303,7 +303,7 @@ cline_str(Cline l, int ins, int *csp, LinkList posl)
 	    if (l->flags & CLF_MID)
 		mid = cs;
 	    else if (l->flags & CLF_SUF) {
-		if (posl && l->min != l->max && (npos = cs + padd) != opos) {
+		if (posl && (npos = cs + padd) != opos) {
 		    opos = npos;
 		    addlinknode(posl, (void *) ((long) npos));
 		}
@@ -414,7 +414,13 @@ cline_str(Cline l, int ins, int *csp, LinkList posl)
 	l = l->next;
     }
     if (posl && (npos = cs + padd) != opos)
+#if 0
+	/* This could be used to put an extra colon before the end-of-word
+	 * position if there is nothing missing. */
+	addlinknode(posl, (void *) ((long) -npos));
+#endif
 	addlinknode(posl, (void *) ((long) npos));
+
     if (ins) {
 	int ocs = cs;
 
@@ -483,9 +489,18 @@ build_pos_string(LinkList list)
     LinkNode node;
     int l;
     char buf[40], *s;
+    long p;
 
     for (node = firstnode(list), l = 0; node; incnode(node)) {
-	sprintf(buf, "%ld", (long) getdata(node));
+	p = (long) getdata(node);
+#if 0
+	/* This could be used to put an extra colon before the end-of-word
+	 * position if there is nothing missing. */
+	if (p < 0)
+	    sprintf(buf, ":%ld", -p);
+	else
+#endif
+	    sprintf(buf, "%ld", p);
 	setdata(node, dupstring(buf));
 	l += 1 + strlen(buf);
     }
