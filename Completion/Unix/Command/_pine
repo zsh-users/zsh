@@ -10,7 +10,7 @@ if [[ -n $+_cache_pine_options ]]; then
       break
     fi
   done
-  _cache_pine_options=( $($=getopts | sed -n 's/^\([^#]*=\).*/-\1/p') )
+  _cache_pine_options=( $($=getopts | sed -n 's/^\([-a-z]*=\).*/-\1/p') )
 fi
 
 sortorder=( {subject,arrival,date,from,size}{,/reverse} )
