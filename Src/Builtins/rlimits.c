@@ -257,6 +257,12 @@ printulimit(int lim, int hard, int head)
 	    printf("threads per process        ");
 	break;
 # endif /* RLIMIT_PTHREAD */
+# ifdef RLIMIT_LOCKS
+    case RLIMIT_LOCKS:
+	if (head)
+	    printf("file locks                 ");
+	break;
+# endif /* RLIMIT_LOCKS */
     }
     /* display the limit */
     if (limit == RLIM_INFINITY)
