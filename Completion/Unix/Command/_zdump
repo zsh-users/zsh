@@ -1,9 +1,5 @@
 #compdef zdump
 
-if (( ! $+_zoneinfo_dirs )); then
-  _zoneinfo_dirs=( /usr/{share,lib,share/lib}/zoneinfo*(/) )
-fi
-
 _arguments '-v[lowest possible]' \
            '-c[cutoff]:cutoff year:' \
-           '*:timezone:_files -W _zoneinfo_dirs'
+           '*:timezone:_time_zone'

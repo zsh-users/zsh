@@ -1,3 +1,9 @@
+2001-10-26  Oliver Kiddle  <opk@zsh.org>
+
+	* 16174: Completion/Unix/Command/_zdump,
+	Completion/Unix/Type/_time_zone, Completion/Zsh/Context/_value,
+	Completion/Unix/Type/.distfiles: complete value of $TZ
+
 2001-10-26  Peter Stephenson  <pws@csr.com>
 
 	* 16172: Src/Modules/tcp.c, Src/Modules/zftp.c: rename

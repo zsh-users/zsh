@@ -60,4 +60,6 @@ _value:LDFLAGS () {
 
 _value:DISPLAY() { _x_display "$@" }
 
+_value:TZ() { _time_zone "$@" }
+
 _value "$@"
