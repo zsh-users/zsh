@@ -1,6 +1,6 @@
 2001-04-19  Sven Wischnowsky  <wischnow@zsh.org>
 
-	* ?????: Src/Zle/complete.mdd: use the right path patterns for
+	* 14028: Src/Zle/complete.mdd: use the right path patterns for
 	completion functions
 
 2001-04-19  Clint Adams  <schizo@debian.org>
