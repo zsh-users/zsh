@@ -3201,14 +3201,14 @@ bin_zftp(char *name, char **args, char *ops, int func)
 
 /**/
 int
-setup_(Module m)
+setup_zftp(Module m)
 {
     return 0;
 }
 
 /**/
 int
-boot_(Module m)
+boot_zftp(Module m)
 {
     int ret;
     if ((ret = addbuiltins(m->nam, bintab,
@@ -3232,7 +3232,7 @@ boot_(Module m)
 
 /**/
 int
-cleanup_(Module m)
+cleanup_zftp(Module m)
 {
     /*
      * There are various parameters hanging around, but they're
@@ -3260,7 +3260,7 @@ cleanup_(Module m)
 
 /**/
 int
-finish_(Module m)
+finish_zftp(Module m)
 {
     return 0;
 }

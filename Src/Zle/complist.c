@@ -1196,14 +1196,14 @@ menuselect(char **args)
 
 /**/
 int
-setup_(Module m)
+setup_complist(Module m)
 {
     return 0;
 }
 
 /**/
 int
-boot_(Module m)
+boot_complist(Module m)
 {
     mtab = NULL;
     mgtab = NULL;
@@ -1237,7 +1237,7 @@ boot_(Module m)
 
 /**/
 int
-cleanup_(Module m)
+cleanup_complist(Module m)
 {
     free(mtab);
     free(mgtab);
@@ -1251,7 +1251,7 @@ cleanup_(Module m)
 
 /**/
 int
-finish_(Module m)
+finish_complist(Module m)
 {
     return 0;
 }

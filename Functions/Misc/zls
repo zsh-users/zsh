@@ -1,7 +1,7 @@
 # zls () {
 # simple internal ls using the stat module
 
-zmodload -i zsh/stat || return 1
+zmodload -i stat || return 1
 
 emulate -R zsh
 setopt localoptions

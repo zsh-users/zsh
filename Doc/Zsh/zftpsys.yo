@@ -21,7 +21,7 @@ ifnzman(\
 noderef(The zftp Module)
 ), must be available in the
 version of tt(zsh) installed at your site.  If the shell is configured to
-load new commands at run time, it probably is: typing `tt(zmodload zsh/zftp)'
+load new commands at run time, it probably is: typing `tt(zmodload zftp)'
 will make sure (if that runs silently, it has worked).  If this is not the
 case, it is possible tt(zftp) was linked into the shell anyway: to test
 this, type `tt(which zftp)' and if tt(zftp) is available you will get the

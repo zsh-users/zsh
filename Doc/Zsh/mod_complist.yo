@@ -3,15 +3,15 @@ Completion listing extensions.
 !MOD!)
 cindex(completion, listing)
 cindex(completion, coloured listings)
-The tt(zsh/complist) module offers two extensions to completion listings:
+The tt(complist) module offers two extensions to completion listings:
 the ability to highlight matches in such a list and a different
 style of menu-completion.
 
 Whenever one of the parameters tt(ZLS_COLORS) or tt(ZLS_COLOURS) is set 
-and the tt(zsh/complist) module is loaded or linked into the shell,
+and the tt(complist) module is loaded or linked into the shell,
 completion lists will be colored.  Note, however, that tt(complist) will
 not automatically be loaded if it is not linked in:  on systems with
-dynamic loading, `tt(zmodload zsh/complist)' is required.
+dynamic loading, `tt(zmodload complist)' is required.
 
 subsect(Parameters)
 vindex(ZLS_COLORS)
@@ -130,7 +130,7 @@ subsect(Menu selection)
 cindex(completion, selecting by cursor)
 vindex(SELECTMIN)
 tindex(menu-select)
-The tt(zsh/complist) module also offers an alternative style of selecting
+The tt(complist) module also offers an alternative style of selecting
 matches from a list, called menu-selection, which can be used if the
 shell is set up to return to the last prompt after showing a
 completion list (see the tt(ALWAYS_LAST_PROMPT) option in
@@ -211,4 +211,4 @@ continue with normal menu-completion one can call
 
 indent(tt(bindkey -M menuselect '^M' send-break))
 
-after loading the tt(zsh/complist) module.
+after loading the tt(complist) module.

@@ -291,14 +291,14 @@ static struct funcwrap wrapper[] = {
 
 /**/
 int
-setup_(Module m)
+setup_zprof(Module m)
 {
     return 0;
 }
 
 /**/
 int
-boot_(Module m)
+boot_zprof(Module m)
 {
     calls = NULL;
     ncalls = 0;
@@ -311,7 +311,7 @@ boot_(Module m)
 
 /**/
 int
-cleanup_(Module m)
+cleanup_zprof(Module m)
 {
     freepfuncs(calls);
     freeparcs(arcs);
@@ -322,7 +322,7 @@ cleanup_(Module m)
 
 /**/
 int
-finish_(Module m)
+finish_zprof(Module m)
 {
     return 0;
 }

@@ -334,7 +334,7 @@ mod_export int insubscr;
 /* Parameter pointer for completing keys of an assoc array. */
 
 /**/
-Param keypm;
+mod_export Param keypm;
 
 /* 1 if we are completing in a quoted string (or inside `...`) */
 

@@ -109,6 +109,15 @@ BEGIN {
 	gsub(/@>/, ")", dcltor)
 	gsub(/@!/, ",", dcltor)
 
+	# If this is a module boot/cleanup function, conditionally rename it.
+	if(" " dtype " " ~ / int / && dcltor ~ / *@\+(boot|cleanup|setup|finish)_[_0-9A-Za-z]+@- *_\(\( *Module +[_0-9A-Za-z]+ *\)\) */) {
+	    modtype = dnam
+	    sub(/_.*$/, "", modtype)
+	    printf "%s# if defined(DYNAMIC_NAME_CLASH_OK) && defined(MODULE)\n", locality
+	    printf "%s#  define " dnam " " modtype "_\n", locality
+	    printf "%s# endif\n", locality
+	}
+
 	# If this is exported, add it to the exported symbol list.
 	if(exported)
 	    printf "X%s\n", dnam

@@ -1,7 +1,7 @@
 COMMENT(!MOD!
 A ZLE function duplicating EMACS' tt(zap-to-char).
 !MOD!)
-The tt(zsh/deltochar) module makes available two ZLE functions:
+The tt(deltochar) module makes available two ZLE functions:
 
 startitem()
 tindex(delete-to-char)

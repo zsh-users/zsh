@@ -36,34 +36,34 @@
 LinkList linkedmodules;
 
 
-/* The `zsh/main' module contains all the base code that can't actually be *
- * built as a separate module.  It is initialised by main(), so there's    *
- * nothing for the boot function to do.                                    */
+/* The `zsh' module contains all the base code that can't actually be built *
+ * as a separate module.  It is initialised by main(), so there's nothing   *
+ * for the boot function to do.                                             */
 
 /**/
 int
-setup_(Module m)
+setup_zsh(Module m)
 {
     return 0;
 }
 
 /**/
 int
-boot_(Module m)
+boot_zsh(Module m)
 {
     return 0;
 }
 
 /**/
 int
-cleanup_(Module m)
+cleanup_zsh(Module m)
 {
     return 0;
 }
 
 /**/
 int
-finish_(Module m)
+finish_zsh(Module m)
 {
     return 0;
 }
@@ -358,14 +358,22 @@ hpux_dlsym(void *handle, char *name)
 
 #ifdef DLSYM_NEEDS_UNDERSCORE
 # define STR_SETUP     "_setup_"
+# define STR_SETUP_S   "_setup_%s"
 # define STR_BOOT      "_boot_"
+# define STR_BOOT_S    "_boot_%s"
 # define STR_CLEANUP   "_cleanup_"
+# define STR_CLEANUP_S "_cleanup_%s"
 # define STR_FINISH    "_finish_"
+# define STR_FINISH_S  "_finish_%s"
 #else /* !DLSYM_NEEDS_UNDERSCORE */
 # define STR_SETUP     "setup_"
+# define STR_SETUP_S   "setup_%s"
 # define STR_BOOT      "boot_"
+# define STR_BOOT_S    "boot_%s"
 # define STR_CLEANUP   "cleanup_"
+# define STR_CLEANUP_S "cleanup_%s"
 # define STR_FINISH    "finish_"
+# define STR_FINISH_S  "finish_%s"
 #endif /* !DLSYM_NEEDS_UNDERSCORE */
 
 /**/
@@ -387,11 +395,21 @@ try_load_module(char const *name)
     void *ret = NULL;
     int l;
 
-    l = 1 + strlen(name) + 1 + strlen(DL_EXT);
+    if (strchr(name, '/')) {
+	ret = dlopen(unmeta(name), RTLD_LAZY | RTLD_GLOBAL);
+	if (ret || 
+	    unset(PATHDIRS) ||
+	    (*name == '/') ||
+	    (*name == '.' && name[1] == '/') ||
+	    (*name == '.' && name[1] == '.' && name[2] == '/'))
+	    return ret;
+    }
+
+    l = strlen(name) + 1;
     for (pp = module_path; !ret && *pp; pp++) {
 	if (l + (**pp ? strlen(*pp) : 1) > PATH_MAX)
 	    continue;
-	sprintf(buf, "%s/%s.%s", **pp ? *pp : ".", name, DL_EXT);
+	sprintf(buf, "%s/%s", **pp ? *pp : ".", name);
 	ret = dlopen(unmeta(buf), RTLD_LAZY | RTLD_GLOBAL);
     }
 
@@ -402,9 +420,15 @@ try_load_module(char const *name)
 static void *
 do_load_module(char const *name)
 {
-    void *ret;
+    void *ret = NULL;
+    char buf[PATH_MAX + 1];
 
-    ret = try_load_module(name);
+    if (strlen(name) + strlen(DL_EXT) < PATH_MAX) {
+	sprintf(buf, "%s.%s", name, DL_EXT);
+	ret = try_load_module(buf);
+    }
+    if (!ret)
+	ret = try_load_module(name);
     if (!ret) {
 	int waserr = errflag;
 	zerr("failed to load module: %s", name, 0);
@@ -481,39 +505,37 @@ dyn_finish_module(Module m)
 #else
 
 static Module_func
-module_func(Module m, char *name)
+module_func(Module m, char *name, char *name_s)
 {
+    char *s, *t;
+#ifndef DYNAMIC_NAME_CLASH_OK
+    char buf[PATH_MAX + 1];
+#endif
+    Module_func fn;
+
+    s = strrchr(m->nam, '/');
+    if (s)
+	s = dupstring(++s);
+    else
+	s = m->nam;
+    if ((t = strrchr(s, '.')))
+	*t = '\0';
 #ifdef DYNAMIC_NAME_CLASH_OK
-    return (Module_func) dlsym(m->u.handle, name);
+    fn = (Module_func) dlsym(m->u.handle, name);
 #else /* !DYNAMIC_NAME_CLASH_OK */
-    VARARR(char, buf, strlen(name) + strlen(m->nam)*2 + 1);
-    char const *p;
-    char *q;
-    strcpy(buf, name);
-    q = strchr(buf, 0);
-    for(p = m->nam; *p; p++) {
-	if(*p == '/') {
-	    *q++ = 'Q';
-	    *q++ = 's';
-	} else if(*p == '_') {
-	    *q++ = 'Q';
-	    *q++ = 'u';
-	} else if(*p == 'Q') {
-	    *q++ = 'Q';
-	    *q++ = 'q';
-	} else
-	    *q++ = *p;
-    }
-    *q = 0;
-    return (Module_func) dlsym(m->u.handle, buf);
+    if (strlen(s) + 6 > PATH_MAX)
+	return NULL;
+    sprintf(buf, name_s, s);
+    fn = (Module_func) dlsym(m->u.handle, buf);
 #endif /* !DYNAMIC_NAME_CLASH_OK */
+    return fn;
 }
 
 /**/
 static int
 dyn_setup_module(Module m)
 {
-    Module_func fn = module_func(m, STR_SETUP);
+    Module_func fn = module_func(m, STR_SETUP, STR_SETUP_S);
 
     if (fn)
 	return fn(m);
@@ -525,7 +547,7 @@ dyn_setup_module(Module m)
 static int
 dyn_boot_module(Module m)
 {
-    Module_func fn = module_func(m, STR_BOOT);
+    Module_func fn = module_func(m, STR_BOOT, STR_BOOT_S);
 
     if(fn)
 	return fn(m);
@@ -537,7 +559,7 @@ dyn_boot_module(Module m)
 static int
 dyn_cleanup_module(Module m)
 {
-    Module_func fn = module_func(m, STR_CLEANUP);
+    Module_func fn = module_func(m, STR_CLEANUP, STR_CLEANUP_S);
 
     if(fn)
 	return fn(m);
@@ -552,7 +574,7 @@ dyn_cleanup_module(Module m)
 static int
 dyn_finish_module(Module m)
 {
-    Module_func fn = module_func(m, STR_FINISH);
+    Module_func fn = module_func(m, STR_FINISH, STR_FINISH_S);
     int r;
 
     if (fn)
@@ -635,22 +657,6 @@ finish_module(Module m)
 #endif /* !DYNAMIC */
 
 /**/
-static int
-modname_ok(char const *p)
-{
-    do {
-	if(*p != '_' && !ialnum(*p))
-	    return 0;
-	do {
-	    p++;
-	} while(*p == '_' || ialnum(*p));
-	if(!*p)
-	    return 1;
-    } while(*p++ == '/');
-    return 0;
-}
-
-/**/
 int
 load_module(char const *name)
 {
@@ -660,10 +666,6 @@ load_module(char const *name)
     LinkNode node, n;
     int set;
 
-    if (!modname_ok(name)) {
-	zerr("invalid module name `%s'", name, 0);
-	return 0;
-    }
     if (!(node = find_module(name))) {
 	if (!(linked = module_linked(name)) &&
 	    !(handle = do_load_module(name)))
@@ -776,6 +778,9 @@ require_module(char *nam, char *module, int res, int test)
 	    zwarnnam(nam, "module %s already loaded.", module, 0);
 	    return 0;
 	}
+    } else if (res && isset(RESTRICTED) && strchr(module, '/')) {
+	zwarnnam(nam, "%s: restricted", module, 0);
+	return 0;
     } else
 	return load_module(module);
 
@@ -979,8 +984,13 @@ bin_zmodload_dep(char *nam, char **args, char *ops)
 	int ret = 0;
 	char *tnam = *args++;
 
-	for(; *args; args++)
-	    add_dep(tnam, *args);
+	for(; *args; args++) {
+	    if(isset(RESTRICTED) && strchr(*args, '/')) {
+		zwarnnam(nam, "%s: restricted", *args, 0);
+		ret = 1;
+	    } else
+		add_dep(tnam, *args);
+	}
 	return ret;
     }
 }
@@ -1015,6 +1025,10 @@ bin_zmodload_auto(char *nam, char **args, char *ops)
 	/* add autoloaded builtins */
 	char *modnam;
 	modnam = *args++;
+	if(isset(RESTRICTED) && strchr(modnam, '/')) {
+	    zwarnnam(nam, "%s: restricted", modnam, 0);
+	    return 1;
+	}
 	do {
 	    char *bnam = *args ? *args++ : modnam;
 	    if (strchr(bnam, '/')) {
@@ -1078,6 +1092,10 @@ bin_zmodload_cond(char *nam, char **args, char *ops)
 	char *modnam;
 
 	modnam = *args++;
+	if(isset(RESTRICTED) && strchr(modnam, '/')) {
+	    zwarnnam(nam, "%s: restricted", modnam, 0);
+	    return 1;
+	}
 	do {
 	    char *cnam = *args ? *args++ : modnam;
 	    if (strchr(cnam, '/')) {
@@ -1134,6 +1152,10 @@ bin_zmodload_math(char *nam, char **args, char *ops)
 	char *modnam;
 
 	modnam = *args++;
+	if(isset(RESTRICTED) && strchr(modnam, '/')) {
+	    zwarnnam(nam, "%s: restricted", modnam, 0);
+	    return 1;
+	}
 	do {
 	    char *fnam = *args ? *args++ : modnam;
 	    if (strchr(fnam, '/')) {
@@ -1193,6 +1215,10 @@ bin_zmodload_param(char *nam, char **args, char *ops)
 	char *modnam;
 
 	modnam = *args++;
+	if(isset(RESTRICTED) && strchr(modnam, '/')) {
+	    zwarnnam(nam, "%s: restricted", modnam, 0);
+	    return 1;
+	}
 	do {
 	    char *pnam = *args ? *args++ : modnam;
 	    if (strchr(pnam, '/')) {

@@ -1,5 +1,3 @@
-name=zsh/sched
-
 autobins="sched"
 
 objects="sched.o"

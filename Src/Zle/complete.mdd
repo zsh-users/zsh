@@ -1,8 +1,6 @@
-name=zsh/complete
+moddeps="zle"
 
-moddeps="zsh/zle"
-
-autobins="compadd compset"
+autobins="compgen compadd compset"
 
 autoprefixconds="prefix suffix between after"
 

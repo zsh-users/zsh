@@ -729,7 +729,7 @@ static struct builtin bintab[] = {
 
 /**/
 int
-setup_(Module m)
+setup_zutil(Module m)
 {
     zstyles = NULL;
 
@@ -738,14 +738,14 @@ setup_(Module m)
 
 /**/
 int
-boot_(Module m)
+boot_zutil(Module m)
 {
     return !addbuiltins(m->nam, bintab, sizeof(bintab)/sizeof(*bintab));
 }
 
 /**/
 int
-cleanup_(Module m)
+cleanup_zutil(Module m)
 {
     deletebuiltins(m->nam, bintab, sizeof(bintab)/sizeof(*bintab));
     return 0;
@@ -753,7 +753,7 @@ cleanup_(Module m)
 
 /**/
 int
-finish_(Module m)
+finish_zutil(Module m)
 {
     freestypat(zstyles);
 

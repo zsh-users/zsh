@@ -1,5 +1,3 @@
-name=zsh/parameter
-
 autoparams="parameters commands functions dis_functions funcstack builtins dis_builtins reswords dis_reswords options modules dirstack history historywords jobtexts jobdirs jobstates nameddirs userdirs aliases dis_aliases galiases dis_galiases"
 
 objects="parameter.o"

@@ -943,7 +943,7 @@ init_bltinmods(void)
 
 #include "bltinmods.list"
 
-    load_module("zsh/main");
+    load_module("zsh");
 }
 
 /**/
@@ -965,7 +965,7 @@ noop_function_int(int nothing)
  * avoid wasting space with the fallback functions.  No other source    *
  * file needs to know which modules are linked in.                      */
 
-#ifdef LINKED_XMOD_zshQszle
+#ifdef LINKED_XMOD_zle
 
 /**/
 mod_export ZleVoidFn trashzleptr = noop_function;
@@ -978,26 +978,26 @@ mod_export ZleVoidIntFn spaceinlineptr = noop_function_int;
 /**/
 mod_export ZleReadFn zlereadptr = autoload_zleread;
 
-#else /* !LINKED_XMOD_zshQszle */
+#else /* !LINKED_XMOD_zle */
 
 mod_export ZleVoidFn trashzleptr = noop_function;
 mod_export ZleVoidFn gotwordptr = noop_function;
 mod_export ZleVoidFn refreshptr = noop_function;
 mod_export ZleVoidIntFn spaceinlineptr = noop_function_int;
-# ifdef UNLINKED_XMOD_zshQszle
+# ifdef UNLINKED_XMOD_zle
 mod_export ZleReadFn zlereadptr = autoload_zleread;
-# else /* !UNLINKED_XMOD_zshQszle */
+# else /* !UNLINKED_XMOD_zle */
 mod_export ZleReadFn zlereadptr = fallback_zleread;
-# endif /* !UNLINKED_XMOD_zshQszle */
+# endif /* !UNLINKED_XMOD_zle */
 
-#endif /* !LINKED_XMOD_zshQszle */
+#endif /* !LINKED_XMOD_zle */
 
 /**/
 unsigned char *
 autoload_zleread(char *lp, char *rp, int ha)
 {
     zlereadptr = fallback_zleread;
-    load_module("zsh/zle");
+    load_module("zle");
     return zleread(lp, rp, ha);
 }
 

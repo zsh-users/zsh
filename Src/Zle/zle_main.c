@@ -1003,7 +1003,7 @@ mod_export struct hookdef zlehooks[] = {
 
 /**/
 int
-setup_(Module m)
+setup_zle(Module m)
 {
     /* Set up editor entry points */
     trashzleptr = trashzle;
@@ -1036,7 +1036,7 @@ setup_(Module m)
 
 /**/
 int
-boot_(Module m)
+boot_zle(Module m)
 {
     addbuiltins(m->nam, bintab, sizeof(bintab)/sizeof(*bintab));
     addhookdefs(m->nam, zlehooks, sizeof(zlehooks)/sizeof(*zlehooks));
@@ -1045,7 +1045,7 @@ boot_(Module m)
 
 /**/
 int
-cleanup_(Module m)
+cleanup_zle(Module m)
 {
     if(zleactive) {
 	zerrnam(m->nam, "can't unload the zle module while zle is active",
@@ -1059,7 +1059,7 @@ cleanup_(Module m)
 
 /**/
 int
-finish_(Module m)
+finish_zle(Module m)
 {
     int i;
 

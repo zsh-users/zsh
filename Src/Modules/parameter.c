@@ -1940,7 +1940,7 @@ static struct funcwrap wrapper[] = {
 
 /**/
 int
-setup_(Module m)
+setup_parameter(Module m)
 {
     incleanup = 0;
 
@@ -1949,7 +1949,7 @@ setup_(Module m)
 
 /**/
 int
-boot_(Module m)
+boot_parameter(Module m)
 {
     /* Create the special associative arrays.
      * As an example for autoloaded parameters, this is probably a bad
@@ -1987,7 +1987,7 @@ boot_(Module m)
 
 /**/
 int
-cleanup_(Module m)
+cleanup_parameter(Module m)
 {
     Param pm;
     struct pardef *def;
@@ -2009,7 +2009,7 @@ cleanup_(Module m)
 
 /**/
 int
-finish_(Module m)
+finish_parameter(Module m)
 {
     return 0;
 }

@@ -17,9 +17,8 @@
 # defines one module.  The .mdd file is actually a shell script, which will
 # be sourced.  It may define the following shell variables:
 #
-#   name            name of this module
 #   moddeps         modules on which this module depends (default none)
-#   nozshdep        non-empty indicates no dependence on the `zsh/main' pseudo-module
+#   nozshdep        non-empty indicates no dependence on the `zsh' pseudo-module
 #   alwayslink      if non-empty, always link the module into the executable
 #   autobins        builtins defined by the module, for autoloading
 #   autoinfixconds  infix condition codes defined by the module, for
@@ -104,14 +103,14 @@ if $first_stage; then
     echo
 
     . Src/modules.index
-    bin_mods=" zsh/main "`sed 's/^/ /;s/$/ /' Src/modules-bltin`
+    bin_mods=" zsh "`sed 's/^/ /;s/$/ /' Src/modules-bltin`
     if grep '%@D@%D%' config.status >/dev/null; then
 	is_dynamic=true
     else
 	is_dynamic=false
     fi
 
-    here_mddnames=
+    here_modules=
     all_subdirs=
     all_modobjs=
     all_modules=
@@ -120,31 +119,30 @@ if $first_stage; then
     all_proto=
     lastsub=//
     for module in $module_list; do
-	q_module=`echo $module | sed 's,Q,Qq,g;s,_,Qu,g;s,/,Qs,g'`
-	eval "modfile=\$modfile_$q_module"
-	case $modfile in
-	    $the_subdir/$lastsub/*) ;;
-	    $the_subdir/*/*)
-		lastsub=`echo $modfile | sed 's,^'$the_subdir'/,,;s,/[^/]*$,,'`
-		all_subdirs="$all_subdirs $lastsub"
-		;;
-	    $the_subdir/*)
-		mddname=`echo $modfile | sed 's,^.*/,,;s,\.mdd$,,'`
-		here_mddnames="$here_mddnames $mddname"
+	eval "loc=\$loc_$module"
+	case $loc in
+	    $the_subdir)
+		here_modules="$here_modules $module"
 		build=$is_dynamic
 		case $is_dynamic@$bin_mods in
 		    *" $module "*)
 			build=true
-			all_modobjs="$all_modobjs modobjs.${mddname}" ;;
+			all_modobjs="$all_modobjs modobjs.${module}" ;;
 		    true@*)
-			all_modules="$all_modules ${mddname}.\$(DL_EXT)" ;;
+			all_modules="$all_modules ${module}.\$(DL_EXT)" ;;
 		esac
-		all_mdds="$all_mdds ${mddname}.mdd"
-		$build && all_mdhs="$all_mdhs ${mddname}.mdh"
-		$build && all_proto="$all_proto proto.${mddname}"
+		all_mdds="$all_mdds ${module}.mdd"
+		$build && all_mdhs="$all_mdhs ${module}.mdh"
+		$build && all_proto="$all_proto proto.${module}"
+		;;
+	    $lastsub | $lastsub/*) ;;
+	    $the_subdir/*)
+		all_subdirs="$all_subdirs $loc"
+		lastsub=$loc
 		;;
 	esac
     done
+    all_subdirs=`echo "$all_subdirs" | sed "s' $the_subdir/' 'g"`
     echo "MODOBJS =$all_modobjs"
     echo "MODULES =$all_modules"
     echo "MDDS    =$all_mdds"
@@ -171,41 +169,39 @@ if $first_stage; then
 
     other_mdhs=
     remote_mdhs=
-    for mddname in $here_mddnames; do
+    for module in $here_modules; do
 
-	unset name moddeps nozshdep alwayslink hasexport
+	unset moddeps nozshdep alwayslink hasexport
 	unset autobins autoinfixconds autoprefixconds autoparams automathfuncs
 	unset objects proto headers hdrdeps otherincs
-	. $top_srcdir/$the_subdir/${mddname}.mdd
-	q_name=`echo $name | sed 's,Q,Qq,g;s,_,Qu,g;s,/,Qs,g'`
+	. $top_srcdir/$the_subdir/${module}.mdd
 	test -n "${moddeps+set}" || moddeps=
-	test -n "$nozshdep" || moddeps="$moddeps zsh/main"
+	test -n "$nozshdep" || moddeps="$moddeps zsh"
 	test -n "${proto+set}" ||
 	    proto=`echo $objects '' | sed 's,\.o ,.syms ,g'`
 
 	dobjects=`echo $objects '' | sed 's,\.o ,..o ,g'`
 	modhdeps=
 	imports=
-	q_moddeps=
+	depimports=
 	for dep in $moddeps; do
-	    q_dep=`echo $dep | sed 's,Q,Qq,g;s,_,Qu,g;s,/,Qs,g'`
-	    q_moddeps="$q_moddeps $q_dep"
-	    eval "depfile=\$modfile_$q_dep"
-	    eval `echo $depfile | sed 's,/\([^/]*\)\.mdd$,;depbase=\1,;s,^,loc=,'`
-	    imports="$imports \$(IMPOPT)\$(dir_top)/$loc/${depbase}.export"
+	    eval "loc=\$loc_$dep"
+	    imports="$imports \$(IMPOPT)\$(dir_top)/$loc/$dep.export"
+	    test "$loc" = "$the_subdir" &&
+	        depimports="$depimports $dep.export"
 	    case $the_subdir in
 		$loc)
-		    mdh="${depbase}.mdh"
+		    mdh="${dep}.mdh"
 		    ;;
 		$loc/*)
-		    mdh="\$(dir_top)/$loc/${depbase}.mdh"
+		    mdh="\$(dir_top)/$loc/${dep}.mdh"
 		    case "$other_mdhs " in
 			*" $mdh "*) ;;
 			*) other_mdhs="$other_mdhs $mdh" ;;
 		    esac
 		    ;;
 		*)
-		    mdh="\$(dir_top)/$loc/${depbase}.mdh"
+		    mdh="\$(dir_top)/$loc/${dep}.mdh"
 		    case "$remote_mdhs " in
 			*" $mdh "*) ;;
 			*) remote_mdhs="$remote_mdhs $mdh" ;;
@@ -215,91 +211,64 @@ if $first_stage; then
 	    modhdeps="$modhdeps $mdh"
 	done
 
-	echo "##### ===== DEPENDENCIES GENERATED FROM ${mddname}.mdd ===== #####"
+	echo "##### ===== DEPENDENCIES GENERATED FROM ${module}.mdd ===== #####"
 	echo
-	echo "MODOBJS_${mddname} = $objects"
-	echo "MODDOBJS_${mddname} = $dobjects \$(@E@NTRYOBJ)"
-	echo "SYMS_${mddname} = $proto"
-	echo "EPRO_${mddname} = "`echo $proto '' | sed 's,\.syms ,.epro ,g'`
-	echo "INCS_${mddname} = \$(EPRO_${mddname}) $otherincs"
-	echo "EXPIMP_${mddname} = $imports \$(EXPOPT)$mddname.export"
-	echo "NXPIMP_${mddname} ="
+	echo "MODOBJS_${module} = $objects"
+	echo "MODDOBJS_${module} = $dobjects \$(@E@NTRYOBJ)"
+	echo "SYMS_${module} = $proto"
+	echo "EPRO_${module} = "`echo $proto '' | sed 's,\.syms ,.epro ,g'`
+	echo "INCS_${module} = \$(EPRO_${module}) $otherincs"
+	echo "EXPIMP_${module} = $imports \$(EXPOPT)$module.export"
+	echo "NXPIMP_${module} ="
 	echo
-	echo "proto.${mddname}: \$(EPRO_${mddname})"
-	echo "\$(SYMS_${mddname}): \$(PROTODEPS)"
+	echo "proto.${module}: \$(EPRO_${module})"
+	echo "\$(SYMS_${module}): \$(PROTODEPS)"
 	echo
-	echo "${mddname}.export: \$(SYMS_${mddname})"
-	echo "	( echo '#!'; cat \$(SYMS_${mddname}) | sed -n '/^X/{s/^X//;p;}' | sort -u ) > \$@"
+	echo "${module}.export: \$(SYMS_${module})"
+	echo "	( echo '#!'; cat \$(SYMS_${module}) | sed -n '/^X/{s/^X//;p;}' | sort -u ) > \$@"
 	echo
-	echo "modobjs.${mddname}: \$(MODOBJS_${mddname})"
-	echo "	echo '' \$(MODOBJS_${mddname}) $modobjs_sed>> \$(dir_src)/stamp-modobjs.tmp"
+	echo "modobjs.${module}: \$(MODOBJS_${module})"
+	echo "	echo '' \$(MODOBJS_${module}) $modobjs_sed>> \$(dir_src)/stamp-modobjs.tmp"
 	echo
 	if test -z "$alwayslink"; then
-	    case " $all_modules" in *" ${mddname}."*)
-		echo "install.modules-here: install.modules.${mddname}"
-		echo "uninstall.modules-here: uninstall.modules.${mddname}"
-		echo
-	    ;; esac
-	    instsubdir=`echo $name | sed 's,^,/,;s,/[^/]*$,,'`
-	    echo "install.modules.${mddname}: ${mddname}.\$(DL_EXT)"
-	    echo "	\$(sdir_top)/mkinstalldirs \$(DESTDIR)\$(MODDIR)${instsubdir}"
-	    echo "	\$(INSTALL_PROGRAM) ${mddname}.\$(DL_EXT) \$(DESTDIR)\$(MODDIR)/${name}.\$(DL_EXT)"
-	    echo
-	    echo "uninstall.modules.${mddname}:"
-	    echo "	rm -f \$(DESTDIR)\$(MODDIR)/${name}.\$(DL_EXT)"
-	    echo
-	    echo "${mddname}.\$(DL_EXT): \$(MODDOBJS_${mddname}) ${mddname}.export"
+	    echo "${module}.\$(DL_EXT): \$(MODDOBJS_${module}) ${module}.export $depimports"
 	    echo '	rm -f $@'
-	    echo "	\$(DLLINK) \$(@E@XPIMP_$mddname) \$(@E@NTRYOPT) \$(MODDOBJS_${mddname}) \$(LIBS)"
+	    echo "	\$(DLLINK) \$(@E@XPIMP_$module) \$(@E@NTRYOPT) \$(MODDOBJS_${module}) \$(LIBS)"
 	    echo
 	fi
-	echo "${mddname}.mdhi: ${mddname}.mdhs \$(INCS_${mddname})"
+	echo "${module}.mdhi: ${module}.mdhs \$(INCS_${module})"
 	echo "	@test -f \$@ || echo 'do not delete this file' > \$@"
 	echo
-	echo "${mddname}.mdhs: ${mddname}.mdd"
-	echo "	@\$(MAKE) -f \$(makefile) \$(MAKEDEFS) ${mddname}.mdh.tmp"
-	echo "	@if cmp -s ${mddname}.mdh ${mddname}.mdh.tmp; then \\"
-	echo "	    rm -f ${mddname}.mdh.tmp; \\"
-	echo "	    echo \"\\\`${mddname}.mdh' is up to date.\"; \\"
+	echo "${module}.mdhs: ${module}.mdd"
+	echo "	@\$(MAKE) -f \$(makefile) \$(MAKEDEFS) ${module}.mdh.tmp"
+	echo "	@if cmp -s ${module}.mdh ${module}.mdh.tmp; then \\"
+	echo "	    rm -f ${module}.mdh.tmp; \\"
+	echo "	    echo \"\\\`${module}.mdh' is up to date.\"; \\"
 	echo "	else \\"
-	echo "	    mv -f ${mddname}.mdh.tmp ${mddname}.mdh; \\"
-	echo "	    echo \"Updated \\\`${mddname}.mdh'.\"; \\"
+	echo "	    mv -f ${module}.mdh.tmp ${module}.mdh; \\"
+	echo "	    echo \"Updated \\\`${module}.mdh'.\"; \\"
 	echo "	fi"
-	echo "	echo 'timestamp for ${mddname}.mdh against ${mddname}.mdd' > \$@"
+	echo "	echo 'timestamp for ${module}.mdh against ${module}.mdd' > \$@"
 	echo
-	echo "${mddname}.mdh: ${modhdeps} ${headers} ${hdrdeps} ${mddname}.mdhi"
-	echo "	@\$(MAKE) -f \$(makefile) \$(MAKEDEFS) ${mddname}.mdh.tmp"
-	echo "	@mv -f ${mddname}.mdh.tmp ${mddname}.mdh"
-	echo "	@echo \"Updated \\\`${mddname}.mdh'.\""
+	echo "${module}.mdh: ${modhdeps} ${headers} ${hdrdeps} ${module}.mdhi"
+	echo "	@\$(MAKE) -f \$(makefile) \$(MAKEDEFS) ${module}.mdh.tmp"
+	echo "	@mv -f ${module}.mdh.tmp ${module}.mdh"
+	echo "	@echo \"Updated \\\`${module}.mdh'.\""
 	echo
-	echo "${mddname}.mdh.tmp:"
+	echo "${module}.mdh.tmp:"
 	echo "	@( \\"
-	echo "	    echo '#ifndef have_${q_name}_module'; \\"
-	echo "	    echo '#define have_${q_name}_module'; \\"
+	echo "	    echo '#ifndef have_${module}_module'; \\"
+	echo "	    echo '#define have_${module}_module'; \\"
 	echo "	    echo; \\"
-	echo "	    echo '# ifndef IMPORTING_MODULE_${q_name}'; \\"
-	echo "	    if test @SHORTBOOTNAMES@ = yes; then \\"
-	echo "		echo '#  ifndef MODULE'; \\"
-	echo "	    fi; \\"
-	echo "	    echo '#   define boot_ boot_${q_name}'; \\"
-	echo "	    echo '#   define cleanup_ cleanup_${q_name}'; \\"
-	echo "	    echo '#   define setup_ setup_${q_name}'; \\"
-	echo "	    echo '#   define finish_ finish_${q_name}'; \\"
-	echo "	    if test @SHORTBOOTNAMES@ = yes; then \\"
-	echo "		echo '#  endif /* !MODULE */'; \\"
-	echo "	    fi; \\"
-	echo "	    echo '# endif /* !IMPORTING_MODULE_${q_name} */'; \\"
-	echo "	    echo; \\"
-	if test -n "$moddeps"; then (
-	    set x $q_moddeps
+	if test -n "$moddeps"; then
 	    echo "	    echo '/* Module dependencies */'; \\"
-	    for hdep in $modhdeps; do
-		shift
-		echo "	    echo '# define IMPORTING_MODULE_${1} 1'; \\"
-		echo "	    echo '# include \"${hdep}\"'; \\"
-	    done
+	    echo "	    for mod in $modhdeps; do \\"
+	    echo "		echo '# define USING_MODULE'; \\"
+	    echo "		echo '# include \"'\$\$mod'\"'; \\"
+	    echo "	    done; \\"
+	    echo "	    echo '# undef USING_MODULE'; \\"
 	    echo "	    echo; \\"
-	) fi
+	fi
 	if test -n "$headers"; then
 	    echo "	    echo '/* Extra headers for this module */'; \\"
 	    echo "	    for hdr in $headers; do \\"
@@ -312,18 +281,18 @@ if $first_stage; then
 	    echo "	    echo; \\"
 	fi
 	if test -n "$proto"; then
-	    echo "	    for epro in \$(EPRO_${mddname}); do \\"
+	    echo "	    for epro in \$(EPRO_${module}); do \\"
 	    echo "		echo '# include \"'\$\$epro'\"'; \\"
 	    echo "	    done; \\"
 	    echo "	    echo; \\"
 	fi
-	echo "	    echo '#endif /* !have_${q_name}_module */'; \\"
+	echo "	    echo '#endif /* !have_${module}_module */'; \\"
 	echo "	) > \$@"
 	echo
-	echo "\$(MODOBJS_${mddname}) \$(MODDOBJS_${mddname}): ${mddname}.mdh"
+	echo "\$(MODOBJS_${module}) \$(MODDOBJS_${module}): ${module}.mdh"
 	sed -e '/^ *: *<< *\\Make *$/,/^Make$/!d' \
 	    -e 's/^ *: *<< *\\Make *$//; /^Make$/d' \
-	    < $top_srcdir/$the_subdir/${mddname}.mdd
+	    < $top_srcdir/$the_subdir/${module}.mdd
 	echo
 
     done

@@ -1,6 +1,4 @@
-name=zsh/computil
-
-moddeps="zsh/complete zsh/zle"
+moddeps="complete zle"
 
 objects="computil.o"
 

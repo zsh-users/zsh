@@ -2,7 +2,7 @@ COMMENT(!MOD!
 Access to internal hash tables via special associative arrays.
 !MOD!)
 cindex(parameters, special)
-The tt(zsh/parameter) module gives access to some of the internal hash
+The tt(parameter) module gives access to some of the internal hash
 tables used by the shell by defining some special parameters.
 
 startitem()

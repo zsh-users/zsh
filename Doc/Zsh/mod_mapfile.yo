@@ -2,7 +2,7 @@ COMMENT(!MOD!
 Access to external files via a special associative array.
 !MOD!)
 cindex(parameter, file access via)
-The tt(zsh/mapfile) module provides one special associative array parameter of
+The tt(mapfile) module provides one special associative array parameter of
 the same name.
 
 startitem()

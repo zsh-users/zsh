@@ -1,5 +1,3 @@
-name=zsh/main
-
 nozshdep=1
 alwayslink=1
 
@@ -63,15 +61,18 @@ zshxmods.h: modules-bltin xmods.conf
 	@( \
 	    binmods=`sed 's/^/ /;s/$$/ /' modules-bltin`; \
 	    for mod in `cat $(sdir_src)/xmods.conf`; do \
-		q_mod=`echo $$mod | sed 's,Q,Qq,g;s,_,Qu,g;s,/,Qs,g'`; \
 		case $$binmods in \
 		    *" $$mod "*) \
-			echo "#define    LINKED_XMOD_$$q_mod 1" ;; \
+			echo "#define    LINKED_XMOD_$$mod 1" ;; \
 		    *)  echo "#ifdef DYNAMIC"; \
-			echo "# define UNLINKED_XMOD_$$q_mod 1"; \
+			echo "# define UNLINKED_XMOD_$$mod 1"; \
 			echo "#endif" ;; \
 		esac; \
-	    done \
+	    done; \
+	    echo; \
+	    for mod in $$binmods; do \
+		echo "int boot_$$mod _((Module));"; \
+	    done; \
 	) > $@
 
 clean-here: clean.zsh

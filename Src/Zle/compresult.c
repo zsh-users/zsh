@@ -1491,7 +1491,7 @@ calclist(int showall)
 }
 
 /**/
-int asklist(void)
+mod_export int asklist(void)
 {
     /* Set the cursor below the prompt. */
     trashzle();

@@ -147,26 +147,16 @@ C coding style
   groups of statements in the interests of clarity.  There should never
   be two consecutive blank lines.
 
-* Each .c file *must* #include the .mdh header for the module it is a
-  part of and then its own .pro file (for local prototypes).  It may
-  also #include other system headers.  It *must not* #include any other
-  module's headers or any other .pro files.
-
 Modules
 -------
 
-Modules have hierarchical names.  Name segments are separated by `/', and
-each segment consists of alphanumerics plus `_'.  Relative names are never
-used; the naming hierarchy is strictly for organisational convenience.
+Modules are described by a file named `foo.mdd' for a module
+`foo'. This file is actually a shell script that will sourced when zsh 
+is build. To describe the module it can/should set the following shell 
+variables:
 
-Each module is described by a file with a name ending in `.mdd' somewhere
-under the Src directory.  This file is actually a shell script that will
-sourced when zsh is build. To describe the module it can/should set the
-following shell variables:
-
-  - name            name of the module
   - moddeps         modules on which this module depends (default none)
-  - nozshdep        non-empty indicates no dependence on the `zsh/main' pseudo-module
+  - nozshdep        non-empty indicates no dependence on the `zsh' pseudo-module
   - alwayslink      if non-empty, always link the module into the executable
   - autobins        builtins defined by the module, for autoloading
   - autoinfixconds  infix condition codes defined by the module, for
@@ -180,25 +170,25 @@ following shell variables:
   - hdrdeps         extra headers on which the .mdh depends (default none)
   - otherincs       extra headers that are included indirectly (default none)
 
-Be sure to put the values in quotes. For further enlightenment have a look
-at the `mkmakemod.sh' script in the Src directory of the distribution.
+Be sure to put the values in quotes. For further enlightenment have a
+look at the `mkmakemod.sh' script in the Src directory of the
+distribution.
 
 Modules have to define four functions which will be called automatically
-by the zsh core. The first one, named `setup_', should set up any data
-needed in the module, at least any data other modules may be interested
-in. The second one, named `boot_', should register all builtins,
-conditional codes, and function wrappers (i.e. anything that will be
-visible to the user) and will be called after the `setup_'-function.
-
-The third one, named `cleanup_', is called when the user tries to unload
-a module and should de-register the builtins etc. The last function,
-`finish_' is called when the module is actually unloaded and should
-finalize all the data initialized in the `setup_'-function.
-
-In short, the `cleanup_'-function should undo what the `boot_'-function
-did, and the `finish_'-function should undo what the `setup_'-function
+by the zsh core. The first one, named `setup_foo' for a module named
+`foo', should set up any data needed in the module, at least any data
+other modules may be interested in. The second one, named `boot_foo',
+should register all builtins, conditional codes, and function wrappers
+(i.e. anything that will be visible to the user) and will be called
+after the `setup'-function. 
+The third one, named `cleanup_foo' for module `foo' is called when the
+user tries to unload a module and should de-register the builtins
+etc. The last function, `finish_foo' is called when the module is
+actually unloaded and should finalize all the data initialized in the 
+`setup'-function.
+In short, the `cleanup'-function should undo what the `boot'-function
+did, and the `finish'-function should undo what the `setup'-function
 did.
-
 All of these functions should return zero if they succeeded and
 non-zero otherwise.
 
@@ -798,20 +788,3 @@ Documentation
   All the above should appear on their own, separated by newlines from the
   surrounding text.  No extra newlines after the opening or before the
   closing parenthesis are required.
-
-Module names
-------------
-
-Modules have hierarchical names.  Name segments are separated by `/', and
-each segment consists of alphanumerics plus `_'.  Relative names are never
-used; the naming hierarchy is strictly for organisational convenience.
-
-Top-level name segments should be organisational identifiers, assigned
-by the Zsh Development Group and recorded here:
-
-top-level identifier  organisation
---------------------  ------------
-x_*                   reserved for private experimental use
-zsh                   The Zsh Development Group (contact: <coordinator@zsh.org>)
-
-Below the top level, naming authority is delegated.

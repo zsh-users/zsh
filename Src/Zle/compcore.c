@@ -145,7 +145,7 @@ int permmnum, permgnum, lastpermmnum, lastpermgnum;
 /**/
 mod_export int nmatches;
 /**/
-int smatches;
+mod_export int smatches;
 
 /* != 0 if only explanation strings should be printed */
 

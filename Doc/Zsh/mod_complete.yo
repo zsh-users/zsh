@@ -1,7 +1,7 @@
 COMMENT(!MOD!
 The basic completion code.
 !MOD!)
-The tt(zsh/complete) module makes available several builtin commands which
+The tt(complete) module makes available several builtin commands which
 can be used in user-defined completion widgets, see
 ifzman(zmanref(zshcompwid))\
 ifnzman(noderef(Completion Widgets))\

@@ -3,7 +3,7 @@ Some utility builtins, e.g. the one for supporting configuration via
 styles.
 !MOD!)
 cindex(builtins, utility)
-The tt(zsh/zutil) module only adds some builtins:
+The tt(zutil) module only adds some builtins:
 
 startitem()
 xitem(tt(zstyle) [ tt(-L) ])

@@ -1,5 +1,3 @@
-name=zsh/complist
-
-moddeps="zsh/complete zsh/zle"
+moddeps="complete zle"
 
 objects="complist.o"

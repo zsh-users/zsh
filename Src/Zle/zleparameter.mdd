@@ -1,6 +1,4 @@
-name=zsh/zleparameter
-
-moddeps="zsh/zle"
+moddeps="zle"
 
 autoparams="widgets keymaps"
 

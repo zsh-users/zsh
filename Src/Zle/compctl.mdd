@@ -1,6 +1,4 @@
-name=zsh/compctl
-
-moddeps="zsh/complete zsh/zle"
+moddeps="complete zle"
 
 autobins="compctl"
 

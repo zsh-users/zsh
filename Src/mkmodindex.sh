@@ -13,25 +13,28 @@ while test $# -ne 0; do
     dir=$1
     shift
     ( set $dir/*.mdd; test -f $1 ) || continue
-    for modfile in $dir/*.mdd; do
-	name=`( . $modfile; echo $name )`
-	case "$name" in *[!/_0-9A-Za-z]* | /* | */ | *//*)
-	    echo >&2 "WARNING: illegally named module \`$name' in $modfile"
-	    echo >&2 "         (ignoring it)"
-	    continue
-	;; esac
-	q_name=`echo $name | sed 's,Q,Qq,g;s,_,Qu,g;s,/,Qs,g'`
-	case " $module_list " in *" $name "*)
-	    eval "omodfile=\$modfile_$q_name"
-	    echo >&2 "WARNING: module \`$name' (in $omodfile) duplicated in $modfile"
-	    echo >&2 "         (ignoring duplicate)"
-	    continue
-	;; esac
-	module_list="$module_list$name "
-	echo "modfile_$q_name=$modfile"
-	eval "modfile_$q_name=\$modfile"
+    dosubs=false
+    for mod in `echo '' $dir/*.mdd '' | sed 's, [^ ]*/, ,g;s,\.mdd , ,g'`; do
+	case `echo "$mod@ $module_list " | sed 's,^.*[^_0-9A-Za-z].*@,@@,'` in
+	    @@*)
+		echo >&2 "WARNING: illegally named module \`$mod' in $dir"
+		echo >&2 "         (ignoring it)"
+		;;
+	    *@*" $mod "*)
+		eval "loc=\$loc_$mod"
+		echo >&2 "WARNING: module \`$mod' (in $loc) duplicated in $dir"
+		echo >&2 "         (ignoring duplicate)"
+		dosubs=true
+		;;
+	    *)
+		module_list="$module_list$mod "
+		echo "loc_$mod=$dir"
+		eval "loc_$mod=\$dir"
+		dosubs=true
+		;;
+	esac
     done
-    set `echo $dir/*/. '' | sed 's,/\. , ,g'` "$@"
+    $dosubs && set `echo $dir/*/. '' | sed 's,/\. , ,g'` "$@"
 done
 
 echo

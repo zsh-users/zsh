@@ -1303,15 +1303,16 @@ xitem(tt(zmodload) [ tt(-i) ] var(name) ... )
 item(tt(zmodload) tt(-u) [ tt(-i) ] var(name) ...)(
 In the simplest case, tt(zmodload) loads a binary module.  The module must
 be in a file with a name consisting of the specified var(name) followed by
-a standard suffix, usually `tt(.so)'.
-If the module to be loaded is
+a standard suffix, usually `tt(.so)'.  If this can't be found, the
+var(name) is tried without the suffix.  If the module to be loaded is
 already loaded and the tt(-i) option is given, the duplicate module is
 ignored.  Otherwise tt(zmodload) prints an error message.
 
 The var(name)d module is searched for in the same way a command is, using
-tt($module_path) instead of tt($path).  However, the path search is
-performed even when the module name contains a `tt(/)', which it usually does.
-There is no way to prevent the path search.
+tt($module_path) instead of tt($path).  If var(name) contains a `tt(/)',
+it will be used as-is, and a path search will be performed otherwise.
+This behaviour can be modified by the tt(PATH_DIRS) option.
+cindex(PATH_DIRS, use of)
 
 With tt(-u), tt(zmodload) unloads modules.  The same var(name)
 must be given that was given when the module was loaded, but it is not
