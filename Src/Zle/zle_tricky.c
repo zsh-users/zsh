@@ -1020,13 +1020,10 @@ get_comp_string(void)
      * the previously massaged command line using the lexer.  It stores *
      * each token in each command (commands being regarded, roughly, as *
      * being separated by tokens | & &! |& || &&).  The loop stops when *
-     * the end of the command containing the cursor is reached.  It's a *
-     * simple way to do things, but suffers from an inability to        *
-     * distinguish actual command arguments from, for example,          *
-     * filenames in redirections.  (But note that code elsewhere checks *
-     * if we are completing *in* a redirection.)  The only way to fix   *
-     * this would be to pass the command line through the parser too,   *
-     * and get the arguments that way.  Maybe in 3.1...                 */
+     * the end of the command containing the cursor is reached.  What   *
+     * makes this messy is checking for things like redirections, loops *
+    * and whatnot. */
+
     do {
 	lincmd = ((incmdpos && !ins && !incond) || (oins == 2 && i == 2) ||
 		  (ins == 3 && i == 1));
@@ -1343,6 +1340,19 @@ get_comp_string(void)
 		*p = '"';
 	    else if (*p == Snull)
 		*p = '\'';
+    } else {
+        int level = 0;
+
+        for (p = s; *p; p++) {
+            if (level && *p == Snull)
+                *p = '\'';
+            else if (level && *p == Dnull)
+                *p = '"';
+            else if (*p == String && p[1] == Inbrace)
+                level++;
+            else if (*p == Outbrace)
+                level--;
+        }
     }
     if ((*s == Snull || *s == Dnull) && !has_real_token(s + 1)) {
 	char *q = (*s == Snull ? "'" : "\""), *n = tricat(qipre, q, "");
@@ -1673,11 +1683,18 @@ doexpansion(char *s, int lst, int olst, int explincmd)
 {
     int ret = 1, first = 1;
     LinkList vl;
-    char *ss;
+    char *ss, *ts;
 
     pushheap();
     vl = newlinklist();
     ss = dupstring(s);
+    /* get_comp_string() leaves these quotes unchanged when they are
+     * inside parameter expansions. */
+    for (ts = ss; *ts; ts++)
+        if (*ts == '"')
+            *ts = Dnull;
+        else if (*ts == '\'')
+            *ts = Snull;
     addlinknode(vl, ss);
     prefork(vl, 0);
     if (errflag)

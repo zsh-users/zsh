@@ -1,3 +1,10 @@
+2001-05-15  Sven Wischnowsky  <wischnow@zsh.org>
+
+	* 14350: Completion/Base/Completer/_expand, Src/Zle/zle_tricky.c:
+	don't remove single and double quotes that are inside parameter
+	expansions; hopefully better handling of brace expansions in
+	_expand
+
 2001-05-15  Peter Stephenson  <pws@csr.com>
 
 	* 14348: Src/builtin.c: some idiot forgot to make GLOBAL_EXPORT

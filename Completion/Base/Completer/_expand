@@ -55,8 +55,31 @@ exp=("$word")
 
 if [[ "$force" = *s* ]] ||
    zstyle -T ":completion:${curcontext}:" substitute; then
-  [[ ! -o ignorebraces && "${#${exp}//[^\{]}" = "${#${exp}//[^\}]}" ]] &&
-      eval exp\=\( ${${(q)exp}:gs/\\{/\{/:gs/\\}/\}/} \) 2>/dev/null
+
+###  We once used this:
+###
+###  [[ ! -o ignorebraces && "${#${exp}//[^\{]}" = "${#${exp}//[^\}]}" ]] &&
+###      eval exp\=\( ${${(q)exp}:gs/\\{/\{/:gs/\\}/\}/} \) 2>/dev/null
+###
+###  instead of the following loop to expand braces.  But that made
+###  parameter expressions such as ${foo} be expanded like brace
+###  expansions, too (and with braceccl set...).
+
+   if [[ ! -o ignorebraces && "${#${exp}//[^\{]}" = "${#${exp}//[^\}]}" ]]; then
+     local otmp
+
+     tmp=${(q)word}
+     while [[ $#tmp != $#otmp ]]; do
+       otmp=$tmp
+       tmp=${tmp//(#b)\\\$\\\{(([^\{\}]|\\\\{|\\\\})#)([^\\])\\\}/\\$\\\\{${match[1]}${match[3]}\\\\}}
+     done
+     eval exp\=\( ${tmp:gs/\\{/\{/:gs/\\}/\}/} \) 2>/dev/null
+   fi
+
+###  There's a bug: spaces resulting from brace expansion are quoted in
+###  the following expression, too.  We don't want that, but I have no
+###  idea how to fix it.
+
   eval 'exp=( ${${(e)exp//\\[ 	
 ]/ }//(#b)([ 	
 ])/\\$match[1]} )' 2>/dev/null
