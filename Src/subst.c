@@ -694,6 +694,22 @@ get_intarg(char **s)
     return ret < 0 ? -ret : ret;
 }
 
+/* Parsing for the (e) flag. */
+
+static int
+subst_parse_str(char *s, int single)
+{
+    if (!parsestr(s)) {
+	if (!single) {
+	    for (; *s; s++)
+		if (*s == Qstring)
+		    *s = String;
+	}
+	return 0;
+    }
+    return 1;
+}
+
 /* parameter substitution */
 
 #define	isstring(c) ((c) == '$' || (char)(c) == String || (char)(c) == Qstring)
@@ -1766,7 +1782,7 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int ssub)
 		if (prenum || postnum)
 		    x = dopadding(x, prenum, postnum, preone, postone,
 				  premul, postmul);
-		if (eval && parse_subst_string(x))
+		if (eval && subst_parse_str(x, (qt && !nojoin)))
 		    return NULL;
 		xlen = strlen(x);
 		for (tn = firstnode(tl);
@@ -1801,7 +1817,7 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int ssub)
 	    if (prenum || postnum)
 		x = dopadding(x, prenum, postnum, preone, postone,
 			      premul, postmul);
-	    if (eval && parse_subst_string(x))
+	    if (eval && subst_parse_str(x, (qt && !nojoin)))
 		return NULL;
 	    xlen = strlen(x);
 	    strcatsub(&y, ostr, aptr, x, xlen, NULL, globsubst);
@@ -1816,7 +1832,7 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int ssub)
 		if (prenum || postnum)
 		    x = dopadding(x, prenum, postnum, preone, postone,
 				  premul, postmul);
-		if (eval && parse_subst_string(x))
+		if (eval && subst_parse_str(x, (qt && !nojoin)))
 		    return NULL;
 		if (qt && !*x && isarr != 2)
 		    y = dupstring(nulstring);
@@ -1832,7 +1848,7 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int ssub)
 	    if (prenum || postnum)
 		x = dopadding(x, prenum, postnum, preone, postone,
 			      premul, postmul);
-	    if (eval && parse_subst_string(x))
+	    if (eval && subst_parse_str(x, (qt && !nojoin)))
 		return NULL;
 	    xlen = strlen(x);
 	    *str = strcatsub(&y, aptr, aptr, x, xlen, fstr, globsubst);
@@ -1851,7 +1867,7 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int ssub)
 	if (prenum || postnum)
 	    x = dopadding(x, prenum, postnum, preone, postone,
 			  premul, postmul);
-	if (eval && parse_subst_string(x))
+	if (eval && subst_parse_str(x, (qt && !nojoin)))
 	    return NULL;
 	xlen = strlen(x);
 	*str = strcatsub(&y, ostr, aptr, x, xlen, fstr, globsubst);
