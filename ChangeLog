@@ -1,3 +1,8 @@
+2001-06-12  Clint Adams  <clint@zsh.org>
+
+	* 14863: Src/Modules/tcp.c, Src/Modules/zftp.c:
+	introduce tcp_connect.
+
 2001-06-12  Peter Stephenson  <pws@csr.com>
 
 	* 14858: Doc/Zsh/options.yo, Src/options.c, Src/subst.c,

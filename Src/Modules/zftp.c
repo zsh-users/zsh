@@ -1764,6 +1764,8 @@ zftp_open(char *name, char **args, int flags)
 	    /* should use herror() here if available, but maybe
 	     * needs configure test. on AIX it's present but not
 	     * in headers.
+	     * 
+	     * on the other hand, herror() is obsolete
 	     */
 	    FAILED();
 	    zwarnnam(name, "host not found: %s", args[0], 0);
@@ -1775,16 +1777,10 @@ zftp_open(char *name, char **args, int flags)
 	zfsess->control.peer.a.sa_family = af;
 #ifdef SUPPORT_IPV6
 	if(af == AF_INET6) {
-	    zfsess->control.peer.in6.sin6_port = zservp->s_port;
-	    zfsess->control.peer.in6.sin6_flowinfo = 0;
-# ifdef HAVE_STRUCT_SOCKADDR_IN6_SIN6_SCOPE_ID
-	    zfsess->control.peer.in6.sin6_scope_id = 0;
-# endif
 	    salen = sizeof(struct sockaddr_in6);
 	} else
 #endif /* SUPPORT_IPV6 */
 	{
-	    zfsess->control.peer.in.sin_port = zservp->s_port;
 	    salen = sizeof(struct sockaddr_in);
 	}
 
@@ -1809,15 +1805,10 @@ zftp_open(char *name, char **args, int flags)
 
 	/* try all possible IP's */
 	for (addrp = zhostp->h_addr_list; err && *addrp; addrp++) {
-#ifdef SUPPORT_IPV6
-	    if(af == AF_INET6)
-		memcpy(&zfsess->control.peer.in6.sin6_addr, *addrp, zhostp->h_length);
-	    else
-#endif /* SUPPORT_IPV6 */
-		memcpy(&zfsess->control.peer.in.sin_addr, *addrp, zhostp->h_length);
+	    if(salen != zhostp->h_length)
+		zwarnnam(name, "address length mismatch", NULL, 0);
 	    do {
-		err = connect(zfsess->control.fd, (struct sockaddr *)&zfsess->control.peer,
-			      salen);
+		err = tcp_connect(&(zfsess->control), *addrp, zhostp, zservp->s_port);
 	    } while (err && errno == EINTR && !errflag);
 	    /* you can check whether it's worth retrying here */
 	}

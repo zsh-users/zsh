@@ -243,8 +243,34 @@ tcp_cleanup(void)
 mod_export int
 tcp_close(Tcp_session sess)
 {
-    close(sess->fd);
-    sess->fd = -1;
+    if(!close(sess->fd))
+    {
+	sess->fd = -1;
+	return 0;
+    }
+       else return -1;
+}
+
+/**/
+mod_export int
+tcp_connect(Tcp_session sess, char *addrp, struct hostent *zhost, int d_port)
+{
+#ifdef SUPPORT_IPV6
+    if(zhost->h_addrtype==AF_INET6) {
+	memcpy(&(sess->peer.in6.sin6_addr), addrp, zhost->h_length);
+	sess->peer.in6.sin6_port = d_port;
+	sess->peer.in6.sin6_flowinfo = 0;
+# ifdef HAVE_STRUCT_SOCKADDR_IN6_SIN6_SCOPE_ID
+	sess->peer.in6.sin6_scope_id = 0;
+# endif
+    } else
+#endif /* SUPPORT_IPV6 */
+    {
+	memcpy(&(sess->peer.in.sin_addr), addrp, zhost->h_length);
+	sess->peer.in.sin_port = d_port;
+    }
+
+    return connect(sess->fd, (struct sockaddr *)&(sess->peer), zhost->h_length);
 }
 
 /* The load/unload routines required by the zsh library interface */
