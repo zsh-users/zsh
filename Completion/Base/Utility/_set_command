@@ -1,7 +1,7 @@
 #autoload
 
-# This sets the parameters _comp_command1 and _comp_command2 in the
-# calling function.
+# This sets the parameters _comp_command1, _comp_command2 and _comp_command
+# in the calling function.
 
 local command
 
@@ -11,21 +11,21 @@ command="$words[1]"
 
 if (( $+builtins[$command] + $+functions[$command] )); then
   _comp_command1="$command"
-  curcontext="${curcontext%:*:*}:${_comp_command1}:"
+  _comp_command="$_comp_command1"
 elif [[ "$command[1]" = '=' ]]; then
   eval _comp_command2\=$command
   _comp_command1="$command[2,-1]"
-  curcontext="${curcontext%:*:*}:${_comp_command2}:"
+  _comp_command="$_comp_command2"
 elif [[ "$command" = ..#/* ]]; then
   _comp_command1="${PWD}/$command"
   _comp_command2="${command:t}"
-  curcontext="${curcontext%:*:*}:${_comp_command2}:"
+  _comp_command="$_comp_command2"
 elif [[ "$command" = */* ]]; then
   _comp_command1="$command"
   _comp_command2="${command:t}"
-  curcontext="${curcontext%:*:*}:${_comp_command2}:"
+  _comp_command="$_comp_command2"
 else
   _comp_command1="$command"
   _comp_command2="$commands[$command]"
-  curcontext="${curcontext%:*:*}:${_comp_command1}:"
+  _comp_command="$_comp_command1"
 fi

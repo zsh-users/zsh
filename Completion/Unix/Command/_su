@@ -17,4 +17,4 @@ fi
 shell="${${(M@)${(@f)$(</etc/passwd)}:#$usr*}##*:}"
 compset -n $base
 
-_dispatch comps $shell $shell:t -default-
+_dispatch $shell:t $shell $shell:t -default-

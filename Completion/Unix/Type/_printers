@@ -1,4 +1,4 @@
-#compdef -T values PRINTER LPDEST
+#compdef -value-,PRINTER,-default- -value-,LPDEST,-default-
 
 local expl ret=1 list disp sep
 

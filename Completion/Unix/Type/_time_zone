@@ -1,4 +1,4 @@
-#compdef -T values TZ
+#compdef -value-,TZ,-default-
 
 local expl
 

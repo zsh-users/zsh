@@ -1,4 +1,4 @@
-#compdef -T redirs -default-
+#compdef -redirect-,-default-,-default-
 
 local opts tmp glob pat pats expl tag i def descr end ign ret=1 match tried
 local type sdef

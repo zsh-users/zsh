@@ -159,7 +159,8 @@ completion system and will not be treated specially.
 The tags are:
 
 startitem()
-item(tt(#compdef) var(names...))(
+item(tt(#compdef) var(names...) [ tt(-[pP]) var(patterns...) [ tt(-N)
+var(names...) ] ])(
 The file will be made autoloadable and the function defined 
 in it will be called when completing var(names), each of which is
 either the name of a command whose arguments are to be completed or one of
@@ -174,33 +175,18 @@ arguments for the command `tt(cmd)', setting the parameter tt($service)
 to the string `tt(service)'.  The function can then use that parameter 
 to decide what to complete.
 
-Finally, the list of var(names) may contain tt(-T) options, each
-followed by a type name.  These type names describe in which set of
-completion function definitions the function is to be stored.  The
-default without a tt(-T) option is `tt(comps)', saying that the
-function is a normal completion function.  Other type names currently
-understood by the completion system are tt(redirs) and tt(values).
-The first is used to define specialised completion functions for
-use after redirection operators for certain commands and the latter is
-used to define functions used when completing values of parameters.
-For example, to define the function that should be used when
-completing after `tt(foo=<TAB>)' one would use the tag line:
+If the list of var(names) contains a tt(-p) or tt(-P) option, the
+following words are taken to be patterns.  When completing for a
+command or context whose name matches one of the patterns, the
+function will be called.  In the case of tt(-P), this will only be
+done if no other completion function for the command or context could
+be found (i.e. this can be used to define default completion for
+commands or contexts matching one of the patterns which don't have a
+completion function specifically defined for them).
 
-example(#compdef -T values foo)
-
-When the function is called, the parameter tt($comptype) will be set
-to the type name, making it easy to distinguish what should be
-completed.
-)
-item(tt(#compdef -p) var(patterns...))(
-The file will be made autoloadable and the function defined in it will be
-called when completing for a command whose name matches the given
-var(pattern) (a standard globbing pattern).  As in the first case, the
-list of var(patterns) may contain tt(-T) options.
-)
-item(tt(#compdef -P) var(patterns...))(
-Like the previous one, but the function will be called only if no
-completion function for the command on the line could be found.
+If the list contains the tt(-N) option, the following words are used
+as in the normal case again.  Another tt(-p) or tt(-P) option can be
+usedto toggle back to defining patterns again. 
 )
 item(tt(#compdef -k) var(style key-sequences...))(
 This can be used to bind special completion functions to the
@@ -272,10 +258,8 @@ also be called directly by the user.
 findex(compdef)
 cindex(completion system, adding definitions)
 startitem()
-xitem(tt(compdef) [ tt(-an) ] var(function names) [ tt(-T) var(type) ] ...))
-xitem(tt(compdef -d) [ tt(-T) var(type) ] var(names...))
-xitem(tt(compdef -p) [ tt(-a) ] var(function patterns) [ tt(-T) var(type) ] ...)
-xitem(tt(compdef -P) [ tt(-a) ] var(function patterns) [ tt(-T) var(type) ] ...)
+xitem(tt(compdef) [ tt(-an) ] var(function names...) [ tt(-[pP]) var(patterns...) ])
+xitem(tt(compdef -d) var(names...))
 xitem(tt(compdef -k) [ tt(-an) ] var(function style key-sequences...))
 item(tt(compdef -K) [ tt(-an) ] var(function name style key-sequences ...))(
 The first form tells the completion system to call the given
@@ -297,27 +281,25 @@ arguments to the command tt(foo), one would use:
 
 example(compdef '_files -g "*.h"' foo)
 
-The tt(-T) options in the list of var(names) define for which type of
-completions the function is to be used, i.e. in which set of
-completion functions definitions it should be added.  Currently used
-tt(type)s are tt(comps) (the default, for normal completion functions
-for command completion), tt(values) for completion of parameter values
-in assignments and tt(redirs) for completion after redirection
-operators.
-
 If the
 tt(-n) option is given, any existing completion behaviour for particular
 contexts or commands will not be altered.  These definitions can be deleted
 by giving the tt(-d) option as in the second form.
 
-The form with tt(-p) is similar to the first, but var(function) will be
-called for all commands whose name matches the var(pattern); this is like
-the tt(#compdef -p) function tag.
+In both of the first two cases forms and as for the tt(#compdef) tag
+described above, the var(names) may also contain tt(-p), tt(-P) and
+tt(-N) options.  The first two make the following arguments be used as
+patterns and the var(function) will be called for all commands and
+contexts matching one of the patterns.  Wtih tt(-P) this will only
+happen if no specific function is defined for the command or context.
+The tt(-N) option toggles back to using the var(names) as described
+above.
 
-The form with tt(-P) is like the third, but the var(function) will be
-called only if no function for the command itself was found or if one
-was found and it set the tt(_compskip) parameter to a value em(not)
-containing the substring tt(patterns).
+Inside functions defined for patterns, the parameter tt($_compskip)
+may be used.  If it is set to a value containing the substring
+`tt(patterns)' none of the pattern-functions will be called.  If it is
+set to a value containing the substring `tt(all)', no other function
+will be called.
 
 The form with tt(-k) defines a widget with the same name as the var(function)
 which will be called for each of the var(key-sequences); this is like the
@@ -2566,6 +2548,56 @@ contexts, in most cases named after the context itself
 (e.g. completion for the `tt(-tilde-)' context is done by the function 
 named `tt(_tilde)').
 
+The functions for some contexts re-dispatch by calling the function
+tt(_dispatch) to offer more specific context information.  This is
+done by appending the parts of extra information to the name of the
+context, separated by commas.  Currently, only the function
+completing redirection arguments (tt(_redirect)) and the function
+completing values in parameter assignments (tt(_value)) use this
+feature.  The former uses contexts of the form
+`tt(-redirect-,)var(op)tt(,)var(command)', where var(op) is the
+redirection operator and var(command) is the name of the command on
+the line.  If there isn't a command yet, the var(command) field will
+be empty.  The function completing values uses contexts of the form
+`tt(-value-,)var(name)tt(,)var(command)', where var(name) is the name
+of the parameter (or `var(name)tt(-)var(key)' when completing a
+value of an associative array in an assignment like
+`tt(assoc=LPAR()key <TAB>)').  The var(command) part is the name of
+the command from the line again in completions like `tt(make
+CFLAGS=<TAB>)' and is empty for normal assignments.
+
+To simplify defining functions for multiple cases, the functions
+tt(_redirect) and tt(_value) will make tt(_dispatch) try these context
+names more than once with each of the parts once set to the string
+tt(-default-).  For example, when completing after `tt(foo=<TAB>)',
+tt(_value) will try the names `tt(-value-,foo,)' (note the empty
+var(command) part), `tt(-value-,foo,-default-)' and
+`tt(-value-,-default-,-default-)'.  Also note the order in which the
+contexts are tried.
+
+As an example:
+
+example(compdef '_files -g "*.log"' '-redirect-,2>,-default-')
+
+could be used to complete files matching `tt(*.log)' when completing
+after `tt(2> <TAB>)'.
+
+And:
+
+example(compdef _foo -value-,-default-,-default-)
+
+says that the function tt(_foo) is to be called to provide completion
+for the values of parameters for which no special function has been
+defined.
+
+In any case the most specific context name will be used inside the
+context string used for looking up styles.  For example:
+
+example(zstyle ':completion:*:*:-redirect-,2>,*:*' file-patterns '*.log')
+
+is another way to make completion after `tt(2> <TAB>)' complete files
+matching `tt(*.log)'.
+
 Before trying to find a function for a specific context, tt(_complete) 
 checks if the parameter `tt(compcontext)' is set.  If it is set to an
 array, the elements are taken to be the possible matches which will be
@@ -3657,17 +3689,16 @@ a similar format; this ensures that user-specified styles are correctly
 passed down to the builtins which implement the internals of completion.
 )
 findex(_dispatch)
-item(tt(_dispatch) [ tt(-d) ] var(type strings ...))(
-This function looks up the function defined for the first var(string)
-in the set of definitions named var(type) (these are those definitions
-defined with `tt(-T )var(type)').  If one is found, it is called to
-generate completions.  Otherwise the definition for the second
-var(string) is looked up and so on.  If none is found and the tt(-d)
-option is given, the definition for the special name tt(-default-) is
-used.
+item(tt(_dispatch) var(context strings ...))(
+This looks up the functions defined for the var(strings) one after
+another until it finds one that is defined. That function is then
+called to generate the matches.  Normally, the last var(string) is the
+one used to look up the default completion.
 
-This function is the one responsible for setting the parameters
-tt($service) and tt($comptype).
+This function is the one responsible for setting the parameter
+tt($service) (to the var(strings) as they are tried) and for setting
+the var(context/command) field of the tt($curcontext) parameter (to
+the var(context) given as the first argument).
 )
 findex(_files)
 item(tt(_files))(

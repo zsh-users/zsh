@@ -1,0 +1,11 @@
+#compdef -value-,LANG,-default- -P -value-,LC_*,-default-
+
+local locales
+
+if (( $+commands[locale] )); then
+  locales=( $(_call_program locales locale -a) )
+else
+  locales=( /usr/lib/locale/*(:t) )
+fi
+
+_wanted locales expl locale compadd "$@" -a locales

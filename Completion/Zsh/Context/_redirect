@@ -1,17 +1,16 @@
 #compdef -redirect-
 
-# This searches for `<command-name>:<redir-op>' and `<redir-op>', where
-# `<redir-op>' is something like `<' or `2>'.
-
-local strs _comp_command1 _comp_command2
+local strs _comp_command1 _comp_command2 _comp_command
 
 _set_command
 
-strs=( "$compstate[redirect]" )
+strs=( -default- )
 
 if [[ -n "$_comp_command1" ]]; then
-  strs=( "${_comp_command1}:$strs[-1]" "$strs[@]" )
-  [[ -n "$_comp_command2" ]] && strs=( "${_comp_command2}:$strs[1]" "$strs[@]" )
+  strs=( "${_comp_command1}" "$strs[@]" )
+  [[ -n "$_comp_command2" ]] &&
+      strs=( "${_comp_command2}" "$strs[@]" )
 fi
 
-_dispatch -d redirs "$strs[@]"
+_dispatch -redirect-,${compstate[redirect]},${_comp_command} \
+          -redirect-,{${compstate[redirect]},-default-},${^strs}

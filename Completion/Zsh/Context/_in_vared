@@ -32,4 +32,4 @@ fi
 
 compstate[insert]="${compstate[insert]//tab /}"
 
-_dispatch comps "$also"
+_dispatch "$also" "$also"

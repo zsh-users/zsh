@@ -856,6 +856,7 @@ addx(char **ptmp)
 	(iblank(line[cs]) && (!cs || line[cs-1] != '\\')) ||
 	line[cs] == ')' || line[cs] == '`' || line[cs] == '}' ||
 	line[cs] == ';' || line[cs] == '|' || line[cs] == '&' ||
+	line[cs] == '>' || line[cs] == '<' ||
 	(instring && (line[cs] == '"' || line[cs] == '\'')) ||
 	(addspace = (comppref && !iblank(line[cs])))) {
 	*ptmp = (char *)line;

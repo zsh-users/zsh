@@ -1,4 +1,4 @@
-#compdef -value- -array-value- -T values -default-
+#compdef -value- -array-value- -value-,-default-,-default-
 
 # You can customize completion for different parameters by writing
 # functions with the tag-line `#compdef -T value <name>'.
@@ -6,30 +6,20 @@
 # and `<param-name>'. If the line contains a command (as in `make foo=<TAB>')
 # the string `<command>:<param-name>:<param-type>' is also searched for.
 
-if [[ "$service" != -default- ]]; then
-  local strs type
+if [[ "$service" != -value-,* ]]; then
+  local strs ctx=
 
-  type="${(Pt)compstate[parameter]}"
-
-  if [[ -z "$type" ]]; then
-    if [[ "$compstate[parameter]" = *-* ]]; then
-      type=association-value
-    elif [[ "$compstate[context]" = value ]]; then
-      type=scalar
-    else
-      type=array
-    fi
-  fi
-
-  strs=( "${compstate[parameter]}:$type" "$compstate[parameter]" )
+  strs=( -default- )
 
   if [[ "$compstate[context]" != *value && -n "$_comp_command1" ]]; then
-    strs=( "${_comp_command1}:$^strs[@]" "$strs[@]" )
+    ctx="${_comp_command}"
+    strs=( "${_comp_command1}" "$strs[@]" )
     [[ -n "$_comp_command2" ]] &&
-        strs=( "${_comp_command2}:${(@)^strs[-2,-1]}" "$strs[@]" )
+        strs=( "${_comp_command2}" "$strs[@]" )
   fi
 
-  _dispatch -d values "$strs[@]"
+  _dispatch -value-,${compstate[parameter]},$ctx \
+            -value-,{${compstate[parameter]},-default-},${^strs}
 else
   if [[ "$compstate[parameter]" != *-* &&
         "$compstate[context]" = *value &&
@@ -39,7 +29,9 @@ else
           compadd -k "$compstate[parameter]"
     else
       compstate[parameter]="${compstate[parameter]}-${words[CURRENT-1]}"
-      _value "$@"
+
+      _dispatch -value-,${compstate[parameter]}, \
+                -value-,{${compstate[parameter]},-default-},-default-
     fi
   else
     local pats

@@ -35,43 +35,34 @@ fi
 
 print "#files: $#_d_files" > $_d_file
 
-# First dump the arrays _comps, _servicecomps and _patcomps.  The quoting
+# Dump the arrays _comps, _services and _patcomps.  The quoting
 # hieroglyphics ensure that a single quote inside a variable is itself
 # correctly quoted.
 
-for _d_name in $_comp_assocs; do
-
-  print "\n\ntypeset -gA _$_d_name _service$_d_name _pat$_d_name _postpat$_d_name"
-
-  _d_tmp="_${_d_name}"
-  print "\n_${_d_name}=("
-  for _d_f in ${(Pok)_d_tmp}; do
-    print -r - "${(q)_d_f}" "${(q)${(e):-\$${_d_tmp}[$_d_f]}}"
-  done
-  print ")"
-
-  _d_tmp="_service${_d_name}"
-  print "\n_service${_d_name}=("
-  for _d_f in ${(Pok)_d_tmp}; do
-    print -r - "${(q)_d_f}" "${(q)${(e):-\$${_d_tmp}[$_d_f]}}"
-  done
-  print ")"
-
-  _d_tmp="_pat${_d_name}"
-  print "\n_pat${_d_name}=("
-  for _d_f in ${(Pok)_d_tmp}; do
-    print -r - "${(q)_d_f}" "${(q)${(e):-\$${_d_tmp}[$_d_f]}}"
-  done
-  print ")"
-
-  _d_tmp="_postpat${_d_name}"
-  print "\n_postpat${_d_name}=("
-  for _d_f in ${(Pok)_d_tmp}; do
-    print -r - "${(q)_d_f}" "${(q)${(e):-\$${_d_tmp}[$_d_f]}}"
-  done
-  print ")"
-
+print "\n_comps=(" >> $_d_file
+for _d_f in ${(ok)_comps}; do
+  print -r - "${(q)_d_f}" "${(q)_comps[$_d_f]}"
 done >> $_d_file
+print ")" >> $_d_file
+
+print "\n_services=(" >> $_d_file
+for _d_f in ${(ok)_services}; do
+  print -r - "${(q)_d_f}" "${(q)_services[$_d_f]}"
+done >> $_d_file
+print ")" >> $_d_file
+
+print "\n_patcomps=(" >> $_d_file
+for _d_f in ${(ok)_patcomps}; do
+  print -r - "${(q)_d_f}" "${(q)_patcomps[$_d_f]}"
+done >> $_d_file
+print ")" >> $_d_file
+
+_d_tmp="_postpatcomps"
+print "\n_postpatcomps=(" >> $_d_file
+for _d_f in ${(ok)_postpatcomps}; do
+  print -r - "${(q)_d_f}" "${(q)_postpatcomps[$_d_f]}"
+done >> $_d_file
+print ")" >> $_d_file
 
 print "\n_compautos=(" >> $_d_file
 for _d_f in "${(ok@)_compautos}"; do

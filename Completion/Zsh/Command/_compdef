@@ -1,24 +1,37 @@
 #compdef compdef
 
-local state line expl list disp curcontext="$curcontext"
+local state line expl list disp curcontext="$curcontext" pat normal ret=1
+local args1 args2
 typeset -A opt_args
 
-_arguments -C -s -A "-*" -S \
-  '(-d)-a[make function autoloadable]' \
-  '(-d -p -P)-n[leave existing definitions intact]' \
-  "*-T[select type of completion function]:completion function type:($_comp_assocs)" \
+args2=()
+if (( ! ${words[2,-1][(I)[^-]*]} || ${words[(I)-[kK]]} )); then
+  args1=(
+    -A '-*'
+    '(-d)-a[make function autoloadable]'
+    '(-d)-n[leave existing definitions intact]'
+  )
+  args2=(
+     - d
+      '(-a -n)-d[delete]:*:completed command:->ccom'
+     - k
+      '-k[define widget and key binding]:completion function:->cfun:style:->style:*:key'
+     - K
+      '-K[define multiple widgets based on function]:*::: :->multi'
+  )
+else
+  args1=(
+    '-N[completion for named command]'
+  )
+fi
+
+_arguments -C -s -S \
+  "$args1[@]" \
+  '-p[completion for command matching pattern]' \
+  '-P[completion for command matching pattern]' \
   ':completion function:->cfun' \
-  '*:commands: _command_names' \
- - d \
-  '(-a -n)-d[delete]:*:completed command:->ccom' \
- - p \
-  '(-n)-p[completion for command matching pattern]:completion function:->cfun:pattern' \
- - P \
-  '(-n)-P[as -p for commands without own completion]:completion function:->cfun:pattern' \
- - k \
-  '-k[define widget and key binding]:completion function:->cfun:style:->style:*:key' \
- - K \
-  '-K[define multiple widgets based on function]:*::: :->multi' && return 0
+  '*:commands:->com' \
+  "$args2[@]" && return 0
 
 if [[ $state = multi ]]; then
   case $(( CURRENT % 3 )) in
@@ -30,6 +43,15 @@ if [[ $state = multi ]]; then
 fi
 
 case $state in
+  com)
+    pat="${words[(I)-[pP]]}"
+    normal="${words[(I)-N]}"
+    if (( pat && pat > normal )); then
+      _message -e patterns 'pattern'
+    else
+      _command_names
+    fi
+  ;;
   ccom)
     _wanted commands expl 'completed command' compadd -k _comps
   ;;

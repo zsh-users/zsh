@@ -45,6 +45,7 @@ else
     fi
     _wanted targets expl 'make target' compadd -a tmp && return 0
   fi
+  compstate[parameter]="${PREFIX%%\=*}"
   compset -P 1 '*='
-  _files
+  _value "$@"
 fi

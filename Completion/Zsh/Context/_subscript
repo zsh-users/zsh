@@ -113,5 +113,5 @@ elif [[ ${(Pt)${compstate[parameter]}} = array* ]]; then
 
   return 1
 else
-  _dispatch comps -math-
+  _dispatch -math- -math-
 fi

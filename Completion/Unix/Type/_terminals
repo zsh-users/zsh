@@ -1,4 +1,4 @@
-#compdef infocmp -T values TERM
+#compdef infocmp -value-,TERM,-default-
 
 local desc expl
 

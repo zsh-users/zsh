@@ -1,31 +1,17 @@
 #autoload
 
 local comp pat val name i ret=1 _compskip="$_compskip"
-local curcontext="$curcontext" service str comptype noskip def
-local __comps __patcomps __postpatcomps __services
+local curcontext="$curcontext" service str noskip
 
 # If we get the option `-s', we don't reset `_compskip'.
 
-while [[ "$1" = -[sd] ]]; do
-  if [[ "$1" = -s ]]; then
-    noskip=yes
-  else
-    def=yes
-  fi
-  shift
-done
+if [[ "$1" = -s ]]; then
+  noskip=yes
+fi
 
 [[ -z "$noskip" ]] && _compskip=
 
-comptype=$1
-
-__comps=_$1
-
-(( ${(P)+__comps} )) || return 1
-
-__patcomps=_pat$1
-__postpatcomps=_postpat$1
-__services=_service$1
+curcontext="${curcontext%:*:*}:${1}:"
 
 shift
 
@@ -35,9 +21,9 @@ if [[ "$_compskip" != (all|*patterns*) ]]; then
 
   for str in "$@"; do
     [[ -n "$str" ]] || continue
-    service="${${(e):-\$${__services}[\$str]}:-$str}"
-    for i in "${(@e):-\$${__patcomps}[(K)\$str]}"; do
-      "$i" && ret=0
+    service="${_services[$str]:-$str}"
+    for i in "${(@)_patcomps[(K)$str]}"; do
+      eval "$i" && ret=0
       if [[ "$_compskip" = *patterns* ]]; then
         break
       elif [[ "$_compskip" = all ]]; then
@@ -54,30 +40,27 @@ ret=1
 for str in "$@"; do
   [[ -n "$str" ]] || continue
   name="$str"
-  comp="${(e):-\$${__comps}[\$str]}"
-  service="${${(e):-\$${__services}[\$str]}:-$str}"
+  comp="${_comps[$str]}"
+  service="${_services[$str]:-$str}"
 
   [[ -z "$comp" ]] || break
 done
 
 # And generate the matches, probably using default completion.
 
-if [[ -n "$comp" ]]; then
+if [[ -n "$comp" && "$name" != "${argv[-1]}" ]]; then
   _compskip=patterns
   eval "$comp" && ret=0
   [[ "$_compskip" = (all|*patterns*) ]] && return ret
-elif [[ "$_compskip" != *default* ]]; then
-  name=-default-
-  comp="${(e):-\$${__comps}[-default-]}"
 fi
 
 if [[ "$_compskip" != (all|*patterns*) ]]; then
   for str; do
     [[ -n "$str" ]] || continue
-    service="${${(e):-\$${__services}[\$str]}:-$str}"
-    for i in "${(@e):-\$${__postpatcomps}[(K)\$str]}"; do
+    service="${_services[$str]:-$str}"
+    for i in "${(@)_postpatcomps[(K)$str]}"; do
       _compskip=default
-      "$i" && ret=0
+      eval "$i" && ret=0
       if [[ "$_compskip" = *patterns* ]]; then
         break
       elif [[ "$_compskip" = all ]]; then
@@ -88,9 +71,9 @@ if [[ "$_compskip" != (all|*patterns*) ]]; then
   done
 fi
 
-[[ "$name" = -default- && -n "$comp" &&
+[[ "$name" = "${argv[-1]}" && -n "$comp" &&
    "$_compskip" != (all|*default*) ]] &&
-  service="${${(e):-\$${__services}[-default-]}:--default-}" &&
+  service="${_services[$name]:-$name}" &&
    eval "$comp" && ret=0
 
 _compskip=''

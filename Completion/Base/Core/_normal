@@ -1,6 +1,6 @@
 #compdef -command-line-
 
-local _comp_command1 _comp_command2 skip
+local _comp_command1 _comp_command2 _comp_command skip
 
 if [[ "$1" = -s ]]; then
   skip=(-s)
@@ -22,4 +22,5 @@ fi
 
 _set_command
 
-_dispatch -d "$skip[@]" comps "$_comp_command1" "$_comp_command2"
+_dispatch "$skip[@]" "$_comp_command" \
+          "$_comp_command1" "$_comp_command2" -default-
