@@ -31,10 +31,10 @@ def(mydit)(1)(\
 COMMENT(-- myeit is like eit but fancier text formatting --)\
 def(myeit)(0)(\
     whenlatex(eit())whenhtml(eit())whenman(eit())whenms(eit())whensgml(eit())\
-    whentxt(USECOUNTER(XXenumcounter)CHAR(41)))\
+    whentxt(eit()CHAR(41)))\
 def(myeitd)(0)(\
     whenlatex(eit())whenhtml(eit())whenman(eit())whenms(eit())whensgml(eit())\
-    whentxt(USECOUNTER(XXenumcounter).))\
+    whentxt(eit().))\
 COMMENT(-- don't want headers for text, USENET headers must come first --)\
 def(myreport)(3)(\
 whentxt(report()()())\
@@ -49,7 +49,7 @@ description(\
 mydit(Archive-Name:) unix-faq/shell/zsh
 mydit(Last-Modified:) 1999/07/30
 mydit(Submitted-By:) email(pws@ibmth.df.unipi.it (Peter Stephenson))
-mydit(Version:) $Id: FAQ.yo,v 1.1.1.12 1999/10/27 19:36:49 akr Exp $
+mydit(Version:) $Id: FAQ.yo,v 1.1.1.13 1999/10/27 21:03:21 akr Exp $
 mydit(Posting-Frequency:) Monthly
 mydit(Copyright:) (C) P.W. Stephenson, 1995--1999 (see end of document)
 )
@@ -500,7 +500,6 @@ label(21)
   substantial.
 
   As a summary of the status:
-  NEWCOUNTER(XXenumcounter)
   enumerate(
   myeit() because of all the options it is not safe to assume a general
      zsh run by a user will behave as if sh or ksh compatible;
@@ -748,7 +747,6 @@ label(23)
 
   Here is Bart Schaefer's guide to converting csh aliases for zsh.
 
-  SETCOUNTER(XXenumcounter)(0)
   enumerate(
   myeit() If the csh alias references "parameters" (tt(\!:1), tt(\!*) etc.),
      then in zsh you need a function (referencing tt($1), tt($*) etc.).
@@ -1054,7 +1052,6 @@ sect(What is the difference between `export' and the tt(ALL_EXPORT) option?)
 
   This may seem a useful shorthand, but in practice it can have
   unhelpful side effects:
-  SETCOUNTER(XXenumcounter)(0)
   enumerate(
   myeit() Since every variable is in the environment as well as remembered
      by the shell, the memory for it needs to be allocated twice.
@@ -1265,7 +1262,6 @@ sect(Why do my autoloaded functions not autoload [the first time]?)
   The problem is that there are two possible ways of autoloading a
   function (see the AUTOLOADING FUNCTIONS section of the zsh manual
   page zshmisc for more detailed information):
-  SETCOUNTER(XXenumcounter)(0)
   enumerate(
   myeit() The file contains just the body of the function, i.e.
      there should be no line at the beginning saying mytt(function foo {)
@@ -1865,7 +1861,6 @@ label(45)
 
   Different conditions can also be combined.  There are three levels
   of this (in decreasing order of precedence):
-  SETCOUNTER(XXenumcounter)(0)
   enumerate(
    myeit() multiple square brackets after a single condition give
       alternatives:  for example, mytt(s[foo][bar]) says apply the
