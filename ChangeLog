@@ -1,3 +1,8 @@
+2004-04-27  Peter Stephenson  <pws@csr.com>
+
+	* 19837: Src/Zle/zle_main.c: fix 19733 which accidentally
+	removed the -e option to vared.
+
 2004-04-26  Doug Kearns  <djkea2@mugca.its.monash.edu.au>
 
 	* unposted: Completion/Unix/Command/_aap: short and long options
