@@ -1,6 +1,8 @@
 2000-06-14  Sven Wischnowsky  <wischnow@zsh.org>
 
-	* 11885: Src/Zle/complist.c: better fix for menu selection on dumb 
+	* ?????: Src/parse.c: nix kaboom with `time time'
+	
+	* ?????: Src/Zle/complist.c: better fix for menu selection on dumb 
 	terminal
 	
 2000-06-13  Clint Adams  <schizo@debian.org>

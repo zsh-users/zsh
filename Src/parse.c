@@ -799,10 +799,6 @@ par_cmd(int *complex)
 	par_funcdef();
 	cmdpop();
 	break;
-    case TIME:
-	*complex = 1;
-	par_time();
-	break;
     case DINBRACK:
 	cmdpush(CS_COND);
 	par_dinbrack();
@@ -813,6 +809,20 @@ par_cmd(int *complex)
 	ecstr(tokstr);
 	yylex();
 	break;
+    case TIME:
+	{
+	    static int inpartime = 0;
+
+	    if (!inpartime) {
+		*complex = 1;
+		inpartime = 1;
+		par_time();
+		inpartime = 0;
+		break;
+	    }
+	}
+	tok = STRING;
+	/* fall through */
     default:
 	{
 	    int sr;
