@@ -557,6 +557,12 @@ EOF
                            # says <Richard.M.Bartel@ccMail.Census.GOV>
         echo i586-unisys-sysv4
         exit 0 ;;
+    Power*:Rhapsody:*:*)
+        echo powerpc-apple-rhapsody${UNAME_RELEASE}
+        exit 0 ;;
+    *:Rhapsody:*:*)
+        echo ${UNAME_MACHINE}-apple-rhapsody${UNAME_RELEASE}
+        exit 0 ;;
 esac
 
 #echo '(No uname command or uname output not recognized.)' 1>&2

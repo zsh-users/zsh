@@ -98,12 +98,13 @@ Change the current directory.  In the first form, change the
 current directory to var(arg), or to the value of tt($HOME) if
 var(arg) is not specified.  If var(arg) is `tt(-)', change to the
 value of tt($OLDPWD), the previous directory.
-If a directory named var(arg) is not found in the current directory
-and var(arg) does not begin with a slash,
-search each component of the shell parameter tt(cdpath).
-If the option tt(CDABLE_VARS) is set, and a parameter named var(arg)
-exists whose value begins with a slash, treat its value as
-the directory.
+Otherwise, if a directory named var(arg) is not found in the current
+directory and var(arg) does not begin with a slash, search each
+component of the shell parameter tt(cdpath).  If no directory is found
+and the option tt(CDABLE_VARS) is set, and a parameter named var(arg)
+exists whose value begins with a slash, treat its value as the
+directory.  In that case, the parameter is added to the named
+directory hash table.
 
 The second form of tt(cd) substitutes the string var(new)
 for the string var(old) in the name of the current directory,
@@ -357,11 +358,20 @@ is stored in tt(OPTARG).
 vindex(OPTIND, use of)
 vindex(OPTARG, use of)
 
+The first option to be examined may be changed by explicitly assigning
+to tt(OPTIND).  tt(OPTIND) has an initial value of tt(1), and is
+normally reset to tt(1) upon exit from a shell function.  tt(OPTARG)
+is not reset and retains its value from the most recent call to
+tt(getopts).  If either of tt(OPTIND) or tt(OPTARG) is explicitly
+unset, it remains unset, and the index or option argument is not
+stored.  The option itself is still stored in var(name) in this case.
+
 A leading `tt(:)' in var(optstring) causes tt(getopts) to store the
-letter of the invalid option in tt(OPTARG), and to set var(name)
-to `tt(?)' for an unknown option and to `tt(:)' when a required option
-is missing.  Otherwise, tt(getopts) prints an error
-message.  The exit status is nonzero when there are no more options.
+letter of any invalid option in tt(OPTARG), and to set var(name) to
+`tt(?)' for an unknown option and to `tt(:)' when a required option is
+missing.  Otherwise, tt(getopts) sets var(name) to `tt(?)' and prints
+an error message when an option is invalid.  The exit status is
+nonzero when there are no more options.
 )
 findex(hash)
 item(tt(hash) [ tt(-dfmrv) ] [ var(name)[tt(=)var(value)] ] ...)(
@@ -521,8 +531,8 @@ Same as tt(exit), except that it only works in a login shell.
 prefix(noglob)
 findex(popd)
 item(tt(popd) [ {tt(PLUS())|tt(-)}var(n) ])(
-Removes a entry from the directory stack, and perform a tt(cd) to
-the new top directory. With no argument, the current top entry is
+Remove an entry from the directory stack, and perform a tt(cd) to
+the new top directory.  With no argument, the current top entry is
 removed.  An argument of the form `tt(PLUS())var(n)' identifies a stack
 entry by counting from the left of the list shown by the tt(dirs) command,
 starting with zero.  An argument of the form tt(-n) counts from the right.
@@ -615,21 +625,9 @@ If var(arg) is not specified, change to the second directory
 on the stack (that is, exchange the top two entries), or
 change to tt($HOME) if the tt(PUSHD_TO_HOME)
 option is set or if there is only one entry on the stack.
-
-If var(arg) is `tt(-)', change to tt($OLDPWD), the previous directory.
-If a directory named var(arg) is not found in the current directory
-and var(arg) does not contain a slash,
-search each component of the shell parameter tt(cdpath).
-If the option tt(CDABLE_VARS) is set, and a parameter named var(arg)
-exists whose value begins with a slash, treat its value as
-the directory.
-
-If the option tt(PUSHD_SILENT) is not set, the directory
-stack will be printed after a tt(pushd) is performed.
-
-The second form of tt(pushd) substitutes the string var(new)
-for the string var(old) in the name of the current directory,
-and tries to change to this new directory.
+Otherwise, var(arg) is interpreted as it would be by tt(cd).
+The meaning of var(old) and var(new) in the second form is also
+the same as for tt(cd).
 
 The third form of tt(pushd) changes directory by rotating the
 directory list.  An argument of the form `tt(PLUS())var(n)' identifies a stack
@@ -637,6 +635,9 @@ entry by counting from the left of the list shown by the tt(dirs)
 command, starting with zero.  An argument of the form `tt(-)var(n)' counts
 from the right.  If the tt(PUSHD_MINUS) option is set, the meanings
 of `tt(PLUS())' and `tt(-)' in this context are swapped.
+
+If the option tt(PUSHD_SILENT) is not set, the directory
+stack will be printed after a tt(pushd) is performed.
 )
 findex(pushln)
 item(tt(pushln) [ var(arg) ... ])(
@@ -727,7 +728,8 @@ is interactive.
 
 The value (exit status) of tt(read) is 1 when an end-of-file is
 encountered, or when tt(-c) or tt(-l) is present and the command is
-not called from a tt(compctl) function.  Otherwise the value is 0.
+not called from a tt(compctl) function, or as described for tt(-q).
+Otherwise the value is 0.
 
 The behavior of some combinations of the tt(-k), tt(-p), tt(-q), tt(-u)
 and tt(-z) flags is undefined.  Presently tt(-q) cancels all the others,
@@ -835,7 +837,7 @@ var(arg) is a command to be read and executed when the shell
 receives var(sig).  Each var(sig) can be given as a number
 or as the name of a signal.
 If var(arg) is `tt(-)', then all traps var(sig) are reset to their
-default values.  If var(arg) is the null string, then this signal
+default values.  If var(arg) is the empty string, then this signal
 is ignored by the shell and by the commands it invokes.
 
 If var(sig) is tt(ZERR) then var(arg) will be executed
@@ -958,7 +960,7 @@ or functions (with the tt(-f) flag) with matching names are printed.
 findex(ulimit)
 cindex(resource limits)
 cindex(limits, resource)
-item(tt(ulimit) [ tt(-SHacdflmnpstv) [ tt(limit) ] ... ])(
+item(tt(ulimit) [ tt(-SHacdflmnpstv) [ var(limit) ] ... ])(
 Set or display resource limits of the shell and the processes started by
 the shell.  The value of var(limit) can be a number in the unit specified
 below or the value `tt(unlimited)'.  If the tt(-H) flag is given use

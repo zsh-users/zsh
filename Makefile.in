@@ -51,6 +51,10 @@ META-FAQ: FORCE
 
 # ========== DEPENDENCIES FOR INSTALLING ==========
 
+# install stripped
+install-strip:
+	$(MAKE) install STRIPFLAGS="-s"
+
 # install/uninstall everything
 install: install.bin install.modules install.man install.info
 uninstall: uninstall.bin uninstall.modules uninstall.man uninstall.info
@@ -69,6 +73,10 @@ install.man uninstall.man:
 
 # install/uninstall just the info pages
 install.info uninstall.info:
+	@cd Doc && $(MAKE) $(MAKEDEFS) $@
+
+# install/uninstall just the html pages
+install.html uninstall.html:
 	@cd Doc && $(MAKE) $(MAKEDEFS) $@
 
 # ========== DEPENDENCIES FOR CLEANUP ==========

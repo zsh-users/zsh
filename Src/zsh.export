@@ -59,6 +59,7 @@ freeheap
 getaparam
 gethashnode
 gethashnode2
+gethparam
 getiparam
 getkeystring
 getlinknode

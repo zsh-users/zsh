@@ -5,7 +5,7 @@ patches.  (The version number built into the shell has not been changed.)
 
 Zoli's AIX dynamic loading patch from 3933, slightly updated, without
 some hunks which weren't needed on AIX 3.x so I don't know how to
-update properly.
+update them properly
 
 My completion widgets patch
 
@@ -18,24 +18,85 @@ My patch in 4477 to rename three functions to avoid clashes when
 dynamic loading (particularly necessary on IRIX and AIX), including
 the effect of Sven's additional fix in 4488
 
-My patch 4513 for case-insensitive globbing via flags, plus fixlet 4552
+Sven's magna opera patch-or 4510 and patch-match 4509 to add control
+of alternative matches and arbitrary mapping between characters in the
+command line and the matched string, plus all known related fixes
+4526, 4527, 4534, 4555, 4557
 
-Sven's magna opera patch-or 4510 and patch-match 4509 to add control of
-alternative matches and arbitrary mapping between characters in the
-command line and the matched, plus all known fixes 4526, 4527, 4534,
-4555, 4557
+My patch 4513 for case-insensitive globbing via flags, plus fixlet 4552
 
 My ~PWD patch 4533
 
 My suggestion for fixing the suffix on a yank in 4564
 
 Bart's deltochar patch including new flags to allow commands not to
-interrupt cumulative effects in 4570
+interrupt cumulative effects in 4570 (new flag merged with compctl
+widgets flags).
 
-Bart's doc fiz 4574
+Bart's doc fix 4574
 
-Sven's latest word on the fixsuffix() horror in 4576, plus a
-fixsuffix() added by hand in delcharorlist() which I've somehow missed
-along the way
+A fixsuffix() added by hand in delcharorlist() which I've somehow
+missed along the way. The fixsuffix() horror is probably not yet
+resolved; 4576 has side effects and hasn't been applied.
 
-My latest version of lete2ctl, not posted
+My latest version of lete2ctl, not posted but available at
+http://www.ifh.de/~pws/computing/lete2ctl .
+
+Bart's chpwd() fix 4589
+
+  Second edition
+
+Added line in zle_tricky.c missed when patching by hand, spotted by
+Bart.  (Whitespace is still non-canonical.)
+
+Fixed up my compctl widgets patch for use with Sven's rewrite, which I
+hadn't done properly before.
+
+Bart's function fixes, 4471
+
+Bart's doc fixes, 4472
+
+Bart's PWD and OLDPWD reshuffle, 4589
+
+My test-line-length patch for prompts, 4591
+
+Configure patch from Wilfredo Sanchez in 4594, with some extra
+tabbification and without the setterm() hunk, since I've already renamed
+that to zsetterm(), avoiding the conflict
+
+My globbing fix for a bug which shows up in `case' constructs, 4595
+
+Alternative version of the ~PWD patch (allow users to hash PWD
+explicitly if that's what turns them on), 4596
+
+Bart's experimental associative array patch, 4598, plus various
+additions, 4599, 4602, 4608, 4641, 4653, 4654.  No documentation yet;
+if you want to play with this, so far:
+% typeset -A hash                    # create associative array $hash
+% hash[one]=eins hash[two]=zwei      # assign elements
+% hash=(one eins two zwei)           # same, assign whole array (*)
+% print $hash[one]                   # retrieve elements
+eins
+% print $hash                        # whole array looks like normal array
+eins zwei
+% print ${(k)hash}                   # flag to get keys
+one two
+% print ${(kv)hash}                  # flag to get keys and values (**)
+one eins two zwei
+Comparison of (*) and (**) will reveal how to copy an associative
+array, but you always need to declare it with typeset -A or an
+ordinary array will appear.  There is a predefined special associative
+array $testhash, for testing purposes only, which will eventually
+disappear.
+
+My rewrite of prompt truncation, 4601
+
+Bart's params error message fix, 4606
+
+My input fix for 8 bit characters, 4612
+
+Bart's version of the *** fix, 4624
+
+Bart's parameter substitution flag delimiter fix, 4644
+
+My special parameter unset fix, 4662

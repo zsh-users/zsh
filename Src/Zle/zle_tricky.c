@@ -2945,7 +2945,7 @@ docompletion(char *s, int lst, int incmd)
 	ainfo = fainfo = NULL;
 
 	/* Make sure we have the completion list and compctl. */
-	if (makecomplist(s, incmd)) {
+	if (makecomplist(s, incmd, lst)) {
 	    /* Error condition: feeeeeeeeeeeeep(). */
 	    feep();
 	    goto compend;
@@ -3029,7 +3029,7 @@ static unsigned long ccont;
 
 /**/
 static int
-makecomplist(char *s, int incmd)
+makecomplist(char *s, int incmd, int lst)
 {
     struct cmlist ms;
     Cmlist m = cmatcher;
@@ -3062,7 +3062,7 @@ makecomplist(char *s, int incmd)
 	ccused = newlinklist();
 	ccstack = newlinklist();
 
-	makecomplistglobal(s, incmd);
+	makecomplistglobal(s, incmd, lst);
 
 	endcmgroup(NULL);
 
@@ -3098,12 +3098,14 @@ makecomplist(char *s, int incmd)
 
 /**/
 static void
-makecomplistglobal(char *os, int incmd)
+makecomplistglobal(char *os, int incmd, int lst)
 {
     Compctl cc;
     char *s;
 
-    if (inwhat == IN_ENV)
+    if (lst == COMP_WIDGET) {
+	cc = compwidget->u.cc;
+    } else if (inwhat == IN_ENV)
         /* Default completion for parameter values. */
         cc = &cc_default;
     else if (inwhat == IN_MATH) {
@@ -4413,7 +4415,8 @@ get_user_var(char *nam)
     } else {
 	/* Otherwise it should be a parameter name. */
 	char **arr = NULL, *val;
-	if (!(arr = getaparam(nam)) && (val = getsparam(nam))) {
+	if (!(arr = getaparam(nam)) && !(arr = gethparam(nam)) &&
+	    (val = getsparam(nam))) {
 	    arr = (char **)ncalloc(2*sizeof(char *));
 	    arr[0] = val;
 	    arr[1] = NULL;
@@ -5026,6 +5029,7 @@ do_single(Cmatch m)
 		else {
 		    p = (char *) ncalloc(strlen(ppre) + strlen(str) +
 					 strlen(psuf) + 1);
+		    sprintf(p, "%s%s%s", ppre, str, psuf);
 		}
 		parsestr(p);
 		if (ic)

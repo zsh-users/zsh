@@ -538,6 +538,7 @@ struct value {
     int inv;		/* should we return the index ?        */
     int a;		/* first element of array slice, or -1 */
     int b;		/* last element of array slice, or -1  */
+    char **arr;		/* cache for hash turned into array */
 };
 
 /* structure for foo=bar assignments */
@@ -813,6 +814,7 @@ struct param {
 	char **arr;		/* value if declared array   (PM_ARRAY)   */
 	char *str;		/* value if declared string  (PM_SCALAR)  */
 	long val;		/* value if declared integer (PM_INTEGER) */
+        HashTable hash;		/* value if declared assoc   (PM_HASHED)  */
     } u;
 
     /* pointer to function to set value of this parameter */
@@ -820,6 +822,7 @@ struct param {
 	void (*cfn) _((Param, char *));
 	void (*ifn) _((Param, long));
 	void (*afn) _((Param, char **));
+        void (*hfn) _((Param, HashTable));
     } sets;
 
     /* pointer to function to get value of this parameter */
@@ -827,6 +830,7 @@ struct param {
 	char *(*cfn) _((Param));
 	long (*ifn) _((Param));
 	char **(*afn) _((Param));
+        HashTable (*hfn) _((Param));
     } gets;
 
     /* pointer to function to unset this parameter */
@@ -845,8 +849,9 @@ struct param {
 #define PM_SCALAR	0	/* scalar                                     */
 #define PM_ARRAY	(1<<0)	/* array                                      */
 #define PM_INTEGER	(1<<1)	/* integer                                    */
+#define PM_HASHED	(1<<15)	/* association                                */
 
-#define PM_TYPE(X) (X & (PM_SCALAR|PM_INTEGER|PM_ARRAY))
+#define PM_TYPE(X) (X & (PM_SCALAR|PM_INTEGER|PM_ARRAY|PM_HASHED))
 
 #define PM_LEFT		(1<<2)	/* left justify and remove leading blanks     */
 #define PM_RIGHT_B	(1<<3)	/* right justify and fill with leading blanks */

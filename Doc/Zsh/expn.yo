@@ -573,11 +573,11 @@ enditem()
 subsect(Example)
 The flag tt(f) is useful to split a double-quoted substitution line by
 line.  For example, `tt("${(f)$LPAR()<)var(file)tt(RPAR()}")'
-will substitue the contents of var(file) divided so that one line is
-supplied per argument to var(cmd).  Compare this with the effect of
+substitutes the contents of var(file) divided so that each line is
+an element of the resulting array.  Compare this with the effect of
 `tt($)tt(LPAR()<)var(file)tt(RPAR())' alone, which divides the file
-up by words, or the same inside double quotes, where the entire
-contents of the file are passed as a single argument.
+up by words, or the same inside double quotes, which makes the entire
+content of the file a single string.
 texinode(Command Substitution)(Arithmetic Expansion)(Parameter Expansion)(Expansion)
 sect(Command Substitution)
 cindex(command substitution)

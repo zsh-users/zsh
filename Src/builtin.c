@@ -50,7 +50,7 @@ static struct builtin builtins[] =
     BUILTIN("cd", 0, bin_cd, 0, 2, BIN_CD, NULL, NULL),
     BUILTIN("chdir", 0, bin_cd, 0, 2, BIN_CD, NULL, NULL),
     BUILTIN("continue", BINF_PSPECIAL, bin_break, 0, 1, BIN_CONTINUE, NULL, NULL),
-    BUILTIN("declare", BINF_TYPEOPTS | BINF_MAGICEQUALS | BINF_PSPECIAL, bin_typeset, 0, -1, 0, "LRUZfilrtux", NULL),
+    BUILTIN("declare", BINF_TYPEOPTS | BINF_MAGICEQUALS | BINF_PSPECIAL, bin_typeset, 0, -1, 0, "ALRUZafilrtux", NULL),
     BUILTIN("dirs", 0, bin_dirs, 0, -1, 0, "v", NULL),
     BUILTIN("disable", 0, bin_enable, 0, -1, BIN_DISABLE, "afmr", NULL),
     BUILTIN("disown", 0, bin_fg, 0, -1, BIN_DISOWN, NULL, NULL),
@@ -60,7 +60,7 @@ static struct builtin builtins[] =
     BUILTIN("enable", 0, bin_enable, 0, -1, BIN_ENABLE, "afmr", NULL),
     BUILTIN("eval", BINF_PSPECIAL, bin_eval, 0, -1, BIN_EVAL, NULL, NULL),
     BUILTIN("exit", BINF_PSPECIAL, bin_break, 0, 1, BIN_EXIT, NULL, NULL),
-    BUILTIN("export", BINF_TYPEOPTS | BINF_MAGICEQUALS | BINF_PSPECIAL, bin_typeset, 0, -1, BIN_EXPORT, "LRUZfilrtu", "x"),
+    BUILTIN("export", BINF_TYPEOPTS | BINF_MAGICEQUALS | BINF_PSPECIAL, bin_typeset, 0, -1, BIN_EXPORT, "LRUZafilrtu", "x"),
     BUILTIN("false", 0, bin_false, 0, -1, 0, NULL, NULL),
     BUILTIN("fc", BINF_FCOPTS, bin_fc, 0, -1, BIN_FC, "nlreIRWAdDfEim", NULL),
     BUILTIN("fg", 0, bin_fg, 0, -1, BIN_FG, NULL, NULL),
@@ -78,7 +78,7 @@ static struct builtin builtins[] =
     BUILTIN("jobs", 0, bin_fg, 0, -1, BIN_JOBS, "dlpZrs", NULL),
     BUILTIN("kill", 0, bin_kill, 0, -1, 0, NULL, NULL),
     BUILTIN("let", 0, bin_let, 1, -1, 0, NULL, NULL),
-    BUILTIN("local", BINF_TYPEOPTS | BINF_MAGICEQUALS | BINF_PSPECIAL, bin_typeset, 0, -1, 0, "LRUZilrtu", NULL),
+    BUILTIN("local", BINF_TYPEOPTS | BINF_MAGICEQUALS | BINF_PSPECIAL, bin_typeset, 0, -1, 0, "ALRUZailrtu", NULL),
     BUILTIN("log", 0, bin_log, 0, 0, 0, NULL, NULL),
     BUILTIN("logout", 0, bin_break, 0, 1, BIN_LOGOUT, NULL, NULL),
 
@@ -93,7 +93,7 @@ static struct builtin builtins[] =
     BUILTIN("pwd", 0, bin_pwd, 0, 0, 0, "rLP", NULL),
     BUILTIN("r", BINF_R, bin_fc, 0, -1, BIN_FC, "nrl", NULL),
     BUILTIN("read", 0, bin_read, 0, -1, 0, "rzu0123456789pkqecnAlE", NULL),
-    BUILTIN("readonly", BINF_TYPEOPTS | BINF_MAGICEQUALS | BINF_PSPECIAL, bin_typeset, 0, -1, 0, "LRUZfiltux", "r"),
+    BUILTIN("readonly", BINF_TYPEOPTS | BINF_MAGICEQUALS | BINF_PSPECIAL, bin_typeset, 0, -1, 0, "ALRUZafiltux", "r"),
     BUILTIN("rehash", 0, bin_hash, 0, 0, 0, "dfv", "r"),
     BUILTIN("return", BINF_PSPECIAL, bin_break, 0, 1, BIN_RETURN, NULL, NULL),
     BUILTIN("set", BINF_PSPECIAL, bin_set, 0, -1, 0, NULL, NULL),
@@ -107,7 +107,7 @@ static struct builtin builtins[] =
     BUILTIN("trap", BINF_PSPECIAL, bin_trap, 0, -1, 0, NULL, NULL),
     BUILTIN("true", 0, bin_true, 0, -1, 0, NULL, NULL),
     BUILTIN("type", 0, bin_whence, 0, -1, 0, "ampfsw", "v"),
-    BUILTIN("typeset", BINF_TYPEOPTS | BINF_MAGICEQUALS | BINF_PSPECIAL, bin_typeset, 0, -1, 0, "LRUZfilrtuxm", NULL),
+    BUILTIN("typeset", BINF_TYPEOPTS | BINF_MAGICEQUALS | BINF_PSPECIAL, bin_typeset, 0, -1, 0, "ALRUZafilrtuxm", NULL),
     BUILTIN("umask", 0, bin_umask, 0, 1, 0, "S", NULL),
     BUILTIN("unalias", 0, bin_unhash, 1, -1, 0, "m", "a"),
     BUILTIN("unfunction", 0, bin_unhash, 1, -1, 0, "m", "f"),
@@ -618,6 +618,8 @@ set_pwd_env(void)
 {
     Param pm;
 
+    /* update the PWD and OLDPWD shell parameters */
+
     pm = (Param) paramtab->getnode(paramtab, "PWD");
     if (pm && PM_TYPE(pm->flags) != PM_SCALAR) {
 	pm->flags &= ~PM_READONLY;
@@ -704,7 +706,6 @@ bin_cd(char *nam, char **argv, char *ops, int func)
 	    chdir(unmeta(pwd));
 	}
     }
-    set_pwd_env();
     return 0;
 }
 
@@ -946,7 +947,6 @@ cd_try_chdir(char *pfix, char *dest, int hard)
 static void
 cd_new_pwd(int func, LinkNode dir, int chaselinks)
 {
-    Param pm;
     List l;
     char *new_pwd, *s;
     int dirstacksize;
@@ -981,13 +981,8 @@ cd_new_pwd(int func, LinkNode dir, int chaselinks)
     zsfree(oldpwd);
     oldpwd = pwd;
     pwd = new_pwd;
-    /* update the PWD and OLDPWD shell parameters */
-    if ((pm = (Param) paramtab->getnode(paramtab, "PWD")) &&
-	(pm->flags & PM_EXPORTED) && pm->env)
-	pm->env = replenv(pm->env, pwd);
-    if ((pm = (Param) paramtab->getnode(paramtab, "OLDPWD")) &&
-	(pm->flags & PM_EXPORTED) && pm->env)
-	pm->env = replenv(pm->env, oldpwd);
+    set_pwd_env();
+
     if (unset(PUSHDSILENT) && func != BIN_CD && isset(INTERACTIVE))
 	printdirstack();
     else if (doprintdir) {
@@ -1474,8 +1469,8 @@ bin_typeset(char *name, char **argv, char *ops, int func)
     Param pm;
     Asgment asg;
     Comp com;
-    char *optstr = "iLRZlurtxU";
-    int on = 0, off = 0, roff, bit = PM_INTEGER;
+    char *optstr = "aiLRZlurtxU----A";
+    int on = 0, off = 0, roff, bit = PM_ARRAY;
     int initon, initoff, of, i;
     int returnval = 0, printflags = 0;
 
@@ -1506,6 +1501,8 @@ bin_typeset(char *name, char **argv, char *ops, int func)
 	off |= PM_LOWER;
     if (on & PM_LOWER)
 	off |= PM_UPPER;
+    if (on & PM_HASHED)
+	off |= PM_ARRAY;
     on &= ~off;
 
     /* Given no arguments, list whatever the options specify. */
@@ -1548,8 +1545,15 @@ bin_typeset(char *name, char **argv, char *ops, int func)
 			    if (PM_TYPE(pm->flags) == PM_ARRAY && (on & PM_UNIQUE) &&
 				!(pm->flags & PM_READONLY & ~off))
 				uniqarray((*pm->gets.afn) (pm));
+			    if ((on & ~pm->flags) & PM_HASHED) {
+				char *nam = ztrdup(pm->nam);
+				unsetparam(nam);
+				pm = createparam(nam, on & ~PM_READONLY);
+				DPUTS(!pm, "BUG: parameter not created");
+			    }
 			    pm->flags = (pm->flags | on) & ~off;
-			    if (PM_TYPE(pm->flags) != PM_ARRAY) {
+			    if (PM_TYPE(pm->flags) != PM_ARRAY &&
+				PM_TYPE(pm->flags) != PM_HASHED) {
 				if ((on & (PM_LEFT | PM_RIGHT_B | PM_RIGHT_Z | PM_INTEGER)) && auxlen)
 				    pm->ct = auxlen;
 				/* did we just export this? */
@@ -1598,7 +1602,8 @@ bin_typeset(char *name, char **argv, char *ops, int func)
 	    (((pm->flags & PM_SPECIAL) && pm->level == locallevel) ||
 	     (!(pm->flags & PM_UNSET) &&
 	      ((locallevel == pm->level) || func == BIN_EXPORT) &&
-	      !(bit = ((off & pm->flags) | (on & ~pm->flags)) & PM_INTEGER)))) {
+	      !(bit = (((off & pm->flags) | (on & ~pm->flags)) &
+		       (PM_INTEGER|PM_HASHED)))))) {
 	    /* if no flags or values are given, just print this parameter */
 	    if (!on && !roff && !asg->value) {
 		paramtab->printnode((HashNode) pm, 0);
@@ -1623,7 +1628,8 @@ bin_typeset(char *name, char **argv, char *ops, int func)
 	    if ((on & (PM_LEFT | PM_RIGHT_B | PM_RIGHT_Z | PM_INTEGER)) &&
 		auxlen)
 		pm->ct = auxlen;
-	    if (PM_TYPE(pm->flags) != PM_ARRAY) {
+	    if (PM_TYPE(pm->flags) != PM_ARRAY &&
+		PM_TYPE(pm->flags) != PM_HASHED) {
 		if (pm->flags & PM_EXPORTED) {
 		    if (!(pm->flags & PM_UNSET) && !pm->env && !asg->value)
 			pm->env = addenv(asg->name, getsparam(asg->name));

@@ -510,8 +510,8 @@ adduserdir(char *s, char *t, int flags, int always)
     if ((flags & ND_USERNAME) && nameddirtab->getnode2(nameddirtab, s))
 	return;
 
-    /* Never hash PWD, because it's never useful */
-    if (!strcmp(s, "PWD"))
+    /* Never hash PWD unless it was explicitly requested */
+    if (!always && !strcmp(s, "PWD"))
 	return;
 
     /* Normal parameter assignments generate calls to this function, *

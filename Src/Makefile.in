@@ -149,7 +149,7 @@ uninstall.bin: uninstall.bin-here
 # install binary, creating install directory if necessary
 install.bin-here: zsh install.bin-@L@
 	$(sdir_top)/mkinstalldirs $(bindir)
-	$(INSTALL_PROGRAM) zsh $(bindir)/zsh-$(VERSION)
+	$(INSTALL_PROGRAM) $(STRIPFLAGS) zsh $(bindir)/zsh-$(VERSION)
 	if test -f $(bindir)/zsh; then \
 	    rm -f $(bindir)/zsh.old; \
 	    ln $(bindir)/zsh $(bindir)/zsh.old; \

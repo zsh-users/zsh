@@ -716,6 +716,8 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int ssub)
     int eval = 0;
     int nojoin = 0;
     char inbrace = 0;		/* != 0 means ${...}, otherwise $... */
+    char hkeys = 0;		/* 1 means get keys from associative array */
+    char hvals = 1;		/* > hkeys get values of associative array */
 
     *s++ = '\0';
     if (!ialnum(*s) && *s != '#' && *s != Pound && *s != '-' &&
@@ -732,12 +734,16 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int ssub)
     if (*s == Inbrace) {
 	inbrace = 1;
 	s++;
-	if (*s == '(' || *s == Inpar) {
+	if (*s == '!' && s[1] != Outbrace && emulation == EMULATE_KSH) {
+	    hkeys = 1;
+	    s++;
+	} else if (*s == '(' || *s == Inpar) {
 	    char *t, sav;
 	    int tt = 0;
 	    long num;
 	    int escapes = 0;
 	    int klen;
+#define UNTOK(C)  (itok(C) ? ztokens[(C) - Pound] : (C))
 #define UNTOK_AND_ESCAPE(X) {\
 		untokenize(X = dupstring(s + 1));\
 		if (escapes) {\
@@ -851,7 +857,7 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int ssub)
 			prenum = num;
 		    else
 			postnum = num;
-		    if (s[1] != sav)
+		    if (UNTOK(s[1]) != UNTOK(sav))
 			break;
 		    t = get_strarg(++s);
 		    if (!*t)
@@ -865,7 +871,7 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int ssub)
 		    *t = sav;
 		    sav = *s;
 		    s = t + 1;
-		    if (*s != sav) {
+		    if (UNTOK(*s) != UNTOK(sav)) {
 			s--;
 			break;
 		    }
@@ -884,6 +890,13 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int ssub)
 
 		case 'p':
 		    escapes = 1;
+		    break;
+
+		case 'k':
+		    hkeys = 1;
+		    break;
+		case 'v':
+		    hvals = 2;
 		    break;
 
 		default:
@@ -986,9 +999,16 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int ssub)
 	    if (getindex(&s, v) || s == os)
 		break;
 	}
-	if ((isarr = v->isarr))
+	if ((isarr = v->isarr)) {
+	    /* No way to reach here with v->inv != 0, so getvaluearr() *
+	     * will definitely be called by getarrvalue().  Slicing of *
+	     * associations isn't done, so use v->a and v->b for flags */
+	    if (PM_TYPE(v->pm->flags) == PM_HASHED) {
+		v->a = hkeys;
+		v->b = hvals;
+	    }
 	    aval = getarrvalue(v);
-	else {
+	} else {
 	    if (v->pm->flags & PM_ARRAY) {
 		int tmplen = arrlen(v->pm->gets.afn(v->pm));
 

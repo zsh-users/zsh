@@ -5,8 +5,6 @@
 # Usage: e.g.
 # compctl -D -f + -U -Q -S '' -K multicomp
 #
-# Note that exactly matched directories are not expanded, e.g.
-# s/zsh-2.4/s<TAB> will not expand to src/zsh-2.4old/src.
 # Will expand glob patterns already in the word, but use complete-word,
 # not TAB (expand-or-complete), or you will get ordinary glob expansion.
 # Requires the -U option to compctl.
@@ -42,31 +40,31 @@ while [[ -n "$pref" ]]; do
   [[ "$pref" = /* ]] && sofar=(${sofar}/) && pref="${pref#/}"
   head="${pref%%/*}"
   pref="${pref#$head}"
-  if [[ -n "$pref" && -z $sofar[2] && -d "${sofar}$head" ]]; then
-    # Exactly matched directory: don't try to glob
-    reply=("${sofar}$head")
+  [[ -z "$pref" ]] && globdir=
+  # if path segment contains wildcards, don't add another.
+  if [[ "$head" = *[\[\(\*\?\$\~]* ]]; then
+    wild=$head
   else
     [[ -z "$pref" ]] && globdir=
     # if path segment contains wildcards, don't add another.
     if [[ "$head" = *[\[\(\*\?\$\~]* || -z "$head" ]]; then
       wild=$head
     else
-      # Simulate case-insensitive globbing for ASCII characters
-      wild="[${(j(][))${(s())head:l}}]*"	# :gs/a/[a]/ etc.
-      # The following could all be one expansion, but for readability:
-      wild=$wild:gs/a/aA/:gs/b/bB/:gs/c/cC/:gs/d/dD/:gs/e/eE/:gs/f/fF/
-      wild=$wild:gs/g/gG/:gs/h/hH/:gs/i/iI/:gs/j/jJ/:gs/k/kK/:gs/l/lL/
-      wild=$wild:gs/m/mM/:gs/n/nN/:gs/o/oO/:gs/p/pP/:gs/q/qQ/:gs/r/rR/
-      wild=$wild:gs/s/sS/:gs/t/tT/:gs/u/uU/:gs/v/vV/:gs/w/wW/:gs/x/xX/
-      wild=$wild:gs/y/yY/:gs/z/zZ/:gs/-/_/:gs/_/-_/:gs/[]//
+    # Simulate case-insensitive globbing for ASCII characters
+    wild="[${(j(][))${(s())head:l}}]*" # :gs/a/[a]/ etc.
+    # The following could all be one expansion, but for readability:
+    wild=$wild:gs/a/aA/:gs/b/bB/:gs/c/cC/:gs/d/dD/:gs/e/eE/:gs/f/fF/
+    wild=$wild:gs/g/gG/:gs/h/hH/:gs/i/iI/:gs/j/jJ/:gs/k/kK/:gs/l/lL/
+    wild=$wild:gs/m/mM/:gs/n/nN/:gs/o/oO/:gs/p/pP/:gs/q/qQ/:gs/r/rR/
+    wild=$wild:gs/s/sS/:gs/t/tT/:gs/u/uU/:gs/v/vV/:gs/w/wW/:gs/x/xX/
+    wild=$wild:gs/y/yY/:gs/z/zZ/:gs/-/_/:gs/_/-_/:gs/[]//
 
-      # Expand on both sides of '.' (except when leading) as for '/'
-      wild="${${wild:gs/[.]/*.*/}#\*}"
-    fi
-
-    reply=(${sofar}"${wild}${globdir}")
-    reply=(${~reply})
+    # Expand on both sides of '.' (except when leading) as for '/'
+    wild="${${wild:gs/[.]/*.*/}#\*}"
   fi
+
+  reply=(${sofar}"${wild}${globdir}")
+  reply=(${~reply})
 
   [[ -z $reply[1] ]] && reply=() && break
   [[ -n $pref ]] && sofar=($reply)
@@ -77,4 +75,3 @@ done
 [[ -n "$origtop" ]] && reply=("$origtop"${reply#$newtop})
 
 # }
-

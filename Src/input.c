@@ -176,7 +176,7 @@ shingetline(void)
 int
 ingetc(void)
 {
-    char lastc;
+    int lastc;
 
     if (lexstop)
 	return ' ';

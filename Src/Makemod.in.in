@@ -119,8 +119,9 @@ uninstall.modules: uninstall.modules-here
 install.bin-here uninstall.bin-here:
 
 install.modules-here:
-	$(sdir_top)/mkinstalldirs $(MODDIR)
-	modules='$(MODULES)'; for mod in $$modules; do \
+	modules='$(MODULES)'; \
+	if test -n "$$modules"; then $(sdir_top)/mkinstalldirs $(MODDIR); fi; \
+	for mod in $$modules; do \
 	    $(INSTALL_PROGRAM) $$mod $(MODDIR)/$$mod; \
 	done
 

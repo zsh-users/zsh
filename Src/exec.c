@@ -1004,11 +1004,12 @@ void
 untokenize(char *s)
 {
     for (; *s; s++)
-	if (itok(*s))
+	if (itok(*s)) {
 	    if (*s == Nularg)
 		chuck(s--);
 	    else
 		*s = ztokens[*s - Pound];
+	}
 }
 
 /* Open a file for writing redicection */
@@ -1923,22 +1924,8 @@ save_params(Cmd cmd, LinkList *restore_p, LinkList *remove_p)
 	    } else if (!(pm->flags & PM_READONLY) &&
 		       (unset(RESTRICTED) || !(pm->flags & PM_RESTRICTED))) {
 		Param tpm = (Param) alloc(sizeof *tpm);
-
 		tpm->nam = s;
-		tpm->flags = pm->flags;
-		switch (PM_TYPE(pm->flags)) {
-		case PM_SCALAR:
-		    tpm->u.str = ztrdup(pm->gets.cfn(pm));
-		    break;
-		case PM_INTEGER:
-		    tpm->u.val = pm->gets.ifn(pm);
-		    break;
-		case PM_ARRAY:
-		    PERMALLOC {
-			tpm->u.arr = arrdup(pm->gets.afn(pm));
-		    } LASTALLOC;
-		    break;
-		}
+		copyparam(tpm, pm, 1);
 		pm = tpm;
 	    }
 	    addlinknode(*remove_p, s);
@@ -1988,6 +1975,9 @@ restore_params(LinkList restorelist, LinkList removelist)
 		    break;
 		case PM_ARRAY:
 		    tpm->sets.afn(tpm, pm->u.arr);
+		    break;
+		case PM_HASHED:
+		    tpm->sets.hfn(tpm, pm->u.hash);
 		    break;
 		}
 	    } else

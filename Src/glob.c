@@ -355,21 +355,12 @@ scanner(Complist q)
 	    insert(c->str, 0);
     } else {
 	/* Do pattern matching on current path section. */
-	char *fn;
+	char *fn = pathbuf[pathbufcwd] ? unmeta(pathbuf + pathbufcwd) : ".";
 	int dirs = !!q->next;
-	DIR *lock;
+	DIR *lock = opendir(fn);
 	char *subdirs = NULL;
 	int subdirlen = 0;
 
-	fn = pathbuf[pathbufcwd] ? unmeta(pathbuf + pathbufcwd) : ".";
-	if (dirs) {
-	    struct stat st;
-	    stat(fn, &st);
-	    /* a directory with subdirectories has link count greater than 2 */
-	    if (!S_ISDIR(st.st_mode) || st.st_nlink == 2)
-		return;
-	}
-	lock = opendir(fn);
 	if (lock == NULL)
 	    return;
 	while ((fn = zreaddir(lock, 1)) && !errflag) {
@@ -594,7 +585,8 @@ parsecomp(int gflag)
 		 pptr[1] && pptr[1] != Outpar && pptr[1] != Bar) ||
 		*pptr == Outpar) {
 		if (*pptr == '/' || !*pptr ||
-		    (isset(EXTENDEDGLOB) && *pptr == Tilde &&
+		    ((*pptr == Bar ||
+		      (isset(EXTENDEDGLOB) && *pptr == Tilde)) &&
 		     (gflag & GF_TOPLEV)))
 		    c->stat |= C_LAST;
 		return c;
@@ -746,7 +738,8 @@ parsecomp(int gflag)
     }
     /* mark if last pattern component in path component or pattern */
     if (*pptr == '/' || !*pptr ||
-	(isset(EXTENDEDGLOB) && *pptr == Tilde && (gflag & GF_TOPLEV)))
+	((*pptr == Bar ||
+	 (isset(EXTENDEDGLOB) && *pptr == Tilde)) && (gflag & GF_TOPLEV)))
 	c->stat |= C_LAST;
     c->str = dupstrpfx(cstr, pptr - cstr);
     return c;

@@ -450,6 +450,8 @@ getsimptext(Cmd cmd)
 	    taddchr('(');
 	    taddlist(v->arr);
 	    taddstr(") ");
+	} else if (PM_TYPE(v->type) == PM_HASHED) {
+	    /* XXX */
 	} else {
 	    taddstr(v->str);
 	    taddchr(' ');

@@ -139,8 +139,12 @@ install.info: zsh.info
 	  elif test -f $(sdir)/$$file; then \
 	    $(INSTALL_DATA) $(sdir)/$$file $(infodir); \
 	  else :; \
-	  fi || exit 1; \
+	   fi || exit 1; \
 	done
+
+install.html: zsh_toc.html
+	$(sdir_top)/mkinstalldirs $(htmldir)
+	$(INSTALL_DATA) *.html $(htmldir)
 
 # uninstall man pages
 uninstall.man:
