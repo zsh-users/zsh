@@ -1,6 +1,7 @@
 2002-06-17  Peter Stephenson  <pws@csr.com>
 
-	* unposted: Config/version.mk: version 4.1.0-dev-5.
+	* unposted: Config/version.mk, Completion/Unix/Command/.distfile,
+	Doc/Zsh.distfiles, Functions/Zle/.distfiles: version 4.1.0-dev-5.
 
 2002-06-14  Peter Stephenson  <pws@csr.com>
 

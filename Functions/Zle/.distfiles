@@ -8,4 +8,6 @@ cycle-completion-positions  incarg                      predict-on
 edit-command-line           incremental-complete-word   smart-insert-last-word
 history-search-end          insert-files
 copy-earlier-word
+down-line-or-beginning-search
+up-line-or-beginning-search
 '
