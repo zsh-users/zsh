@@ -1,5 +1,8 @@
 2001-09-28  Bart Schaefer  <schaefer@zsh.org>
 
+	* 15895: Src/Modules/zftp.c: Control-connection management sanity
+	in conjunction with the new zsh/net/tcp module.
+
 	* 15889: Test/V01zmodload.ztst: Compute module dependencies for
 	external modules so that they can be unloaded in the right order.
 

@@ -703,7 +703,7 @@ zfgetmsg(void)
     char line[256], *ptr, *verbose;
     int stopit, printing = 0, tmout;
 
-    if ((zfsess->control && zfsess->control->fd == -1))
+    if (!zfsess->control)
 	return 6;
     zsfree(lastmsg);
     lastmsg = NULL;
@@ -831,7 +831,7 @@ zfsendcmd(char *cmd)
      */
     int ret, tmout;
 
-    if ((zfsess->control && zfsess->control->fd == -1))
+    if (!zfsess->control)
 	return 6;
     tmout = getiparam("ZFTP_TMOUT");
     if (setjmp(zfalrmbuf)) {
@@ -1718,7 +1718,7 @@ zftp_open(char *name, char **args, int flags)
      * Probably this is the safest thing to do.  It's possible
      * a `QUIT' will hang, though.
      */
-    if ((zfsess->control && zfsess->control->fd != -1))
+    if (zfsess->control)
 	zfclose(0);
 
     /* this is going to give 0.  why bother? */
@@ -1789,6 +1789,10 @@ zftp_open(char *name, char **args, int flags)
 	zfsess->control = tcp_socket(af, SOCK_STREAM, 0, ZTCP_ZFTP);
 
 	if (!(zfsess->control) || (zfsess->control->fd < 0)) {
+	    if (zfsess->control) {
+		tcp_close(zfsess->control);
+		zfsess->control = NULL;
+	    }
 	    freehostent(zhostp);
 	    zfunsetparam("ZFTP_HOST");
 	    FAILED();
@@ -1925,15 +1929,17 @@ zftp_open(char *name, char **args, int flags)
 
     if (zfsess->control->fd == -1) {
 	/* final paranoid check */
-	return 1;
+	tcp_close(zfsess->control);
+	zfsess->control = NULL;
+	zfnopen--;
+    } else {
+	zfsetparam("ZFTP_MODE", ztrdup("S"), ZFPM_READONLY);
+	/* if remaining arguments, use them to log in. */
+	if (*++args)
+	    return zftp_login(name, args, flags);
     }
-	
-    zfsetparam("ZFTP_MODE", ztrdup("S"), ZFPM_READONLY);
-    /* if remaining arguments, use them to log in. */
-    if (zfsess->control->fd > -1 && *++args)
-	return zftp_login(name, args, flags);
     /* if something wayward happened, connection was already closed */
-    return zfsess->control->fd == -1;
+    return !zfsess->control;
 }
 
 /*
@@ -2127,7 +2133,7 @@ zftp_login(char *name, char **args, int flags)
     }
 
     zsfree(ucmd);
-    if (zfsess->control->fd == -1)
+    if (!zfsess->control)
 	return 1;
     if (stopit == 2 || (lastcode != 230 && lastcode != 202)) {
 	zwarnnam(name, "login failed", NULL, 0);
@@ -2206,7 +2212,7 @@ zftp_test(char *name, char **args, int flags)
     struct timeval tv;
 # endif /* HAVE_POLL */
 
-    if (zfsess->control->fd == -1)
+    if (!zfsess->control)
 	return 1;
 
 # ifdef HAVE_POLL
@@ -2236,8 +2242,8 @@ zftp_test(char *name, char **args, int flags)
 	zfgetmsg();
     }
 # endif /* HAVE_POLL */
-    /* if we now have zfsess->control->fd == -1, then we've just been dumped out. */
-    return (zfsess->control->fd == -1) ? 2 : 0;
+    /* if we have no zfsess->control, then we've just been dumped out. */
+    return zfsess->control ? 0 : 2;
 #else
     zfwarnnam(name, "not supported on this system.", NULL, 0);
     return 3;
@@ -2659,7 +2665,7 @@ zfclose(int leaveparams)
     char **aptr;
     Eprog prog;
 
-    if (zfsess->control->fd == -1)
+    if (!zfsess->control)
 	return;
 
     zfclosing = 1;
@@ -2675,9 +2681,11 @@ zfclose(int leaveparams)
 	fclose(zfsess->cin);
 	zfsess->cin = NULL;
     }
-    if (zfsess->control->fd != -1) {
+    if (zfsess->control) {
 	zfnopen--;
 	tcp_close(zfsess->control);
+	/* We leak if the above failed */
+	zfsess->control = NULL;
     }
 
     if (zfstatfd != -1) {
@@ -2965,7 +2973,7 @@ bin_zftp(char *name, char **args, char *ops, int func)
 	int oldstatus = zfstatusp[zfsessno];
 	lseek(zfstatfd, 0, 0);
 	read(zfstatfd, (char *)zfstatusp, sizeof(int)*zfsesscnt);
-	if ((zfsess->control && zfsess->control->fd != -1) && (zfstatusp[zfsessno] & ZFST_CLOS)) {
+	if (zfsess->control && (zfstatusp[zfsessno] & ZFST_CLOS)) {
 	    /* got closed in subshell without us knowing */
 	    zcfinish = 2;
 	    zfclose(0);
@@ -2986,7 +2994,7 @@ bin_zftp(char *name, char **args, char *ops, int func)
 	}
     }
 #if defined(HAVE_SELECT) || defined (HAVE_POLL)
-    if ((zfsess->control && zfsess->control->fd != -1) && !(zptr->flags & (ZFTP_TEST|ZFTP_SESS))) {
+    if (zfsess->control && !(zptr->flags & (ZFTP_TEST|ZFTP_SESS))) {
 	/*
 	 * Test the connection for a bad fd or incoming message, but
 	 * only if the connection was last heard of open, and
@@ -2996,7 +3004,7 @@ bin_zftp(char *name, char **args, char *ops, int func)
 	ret = zftp_test("zftp test", NULL, 0);
     }
 #endif
-    if ((zptr->flags & ZFTP_CONN) && (zfsess->control && zfsess->control->fd == -1)) {
+    if ((zptr->flags & ZFTP_CONN) && !zfsess->control) {
 	if (ret != 2) {
 	    /*
 	     * with ret == 2, we just got dumped out in the test,
