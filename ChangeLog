@@ -1,3 +1,8 @@
+2001-10-22  Bart Schaefer  <schaefer@zsh.org>
+
+	* 16109: Use a fixed initial fdtable_size to fix crash resulting
+	from a huge memory allocation, as reported in 16082.
+
 2001-10-20  Bart Schaefer  <schaefer@zsh.org>
 
 	* Adapted from Stefan Dalibor, 16043: Src/utils.c: checkrmall()

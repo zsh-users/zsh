@@ -1190,7 +1190,8 @@ zsh_main(int argc, char **argv)
 	  break;
     } while (zsh_name);
 
-    fdtable_size = zopenmax();
+    /* Not zopenmax() here: it may return a number too big for zcalloc(). */
+    fdtable_size = 256; /* This grows as necessary, see utils.c:movefd(). */
     fdtable = zcalloc(fdtable_size);
 
     createoptiontable();
