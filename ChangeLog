@@ -1,3 +1,8 @@
+2004-05-19  Peter Stephenson  <pws@csr.com>
+
+	* unposted: Completion/Unix/Command/_perforce: tweak
+	to allow changes and revisions with >, <, = qualifiers.
+
 2004-05-13  Peter Stephenson  <pws@pwstephenson.fsnet.co.uk>
 
 	* 19941: Src/math.c, Test/C01arith.ztst: (( x, )) triggered

@@ -124,6 +124,17 @@
 # backslash, as before.  The # and @ are never added automatically; you
 # have to select one by hand.
 #
+# Perforce allows change and revision numbers to be preceded by =, <, <=, >
+# or >=.  See `p4 help undoc' for details.  (In particular, `=' is
+# an extremely useful shortcut when integrating single changes.)
+# This syntax is handled, but currently the < and > must be quoted
+# with a backslash, not by any other mechanism.  For example,
+#   p4 files myfile@\>=3<TAB>
+# will complete a change number.  The valid syntax where the second
+# change or revision in a range does not have the @ or # in front
+# (for example `file@32183,32185') is not currently handled; the @
+# must be repeated.
+#
 # File completion for some functions is restricted by the Perforce
 # status of the file; for example, `p4 opened' only completes opened
 # files (surprised?)  However, you can set the style (N.B. not tag)
@@ -530,7 +541,7 @@ _perforce_changes() {
       # in case we are looking at a range.
       (-tf)
       file=${${(Q)PREFIX}%%[\#@]*}
-      compset -P '*@'
+      compset -P '*@(|\\\<|\\\>)(|=)'
       ;;
 
       # Changes already submitted
@@ -1236,9 +1247,9 @@ _perforce_revisions() {
 	shift
   fi
 
-  # Beware of @foo,#bar; stupid but probably valid.
+  # Beware of @foo,#bar; stupid but valid.
   pfx=${${(Q)PREFIX}%%[\#@]*}
-  compset -P '*\#'
+  compset -P '*\#(|\\\<|\\\>)(|=)'
 
   # Numerical revision numbers, possibly with text.
   if [[ -z $PREFIX || $PREFIX = <-> ]]; then
