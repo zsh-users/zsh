@@ -325,6 +325,7 @@ struct caopt {
     int active;			/* still allowed on command line */
     int num;			/* it's the num'th option */
     char *set;			/* set name, shared */
+    int not;			/* don't complete this option (`!...') */
 };
 
 #define CAO_NEXT    1
@@ -573,7 +574,7 @@ parse_cadef(char *nam, char **args)
     char *adpre, *adsuf, *axor = NULL, *doset = NULL, **setp = NULL;
     char *nonarg = NULL;
     int single = 0, anum = 1, xnum, nopts, ndopts, nodopts, flags = 0;
-    int state = 0;
+    int state = 0, not = 0;
 
     nopts = ndopts = nodopts = 0;
 
@@ -683,6 +684,8 @@ parse_cadef(char *nam, char **args)
 	}
 	p = dupstring(*args);
 	xnum = 0;
+	if ((not = (*p == '!')))
+	    p++;
 	if (*p == '(') {
 	    /* There is a xor list, get it. */
 
@@ -910,6 +913,7 @@ parse_cadef(char *nam, char **args)
 	    opt->type = otype;
 	    opt->args = oargs;
 	    opt->num = nopts++;
+	    opt->not = not;
 
 	    if (otype == CAO_DIRECT || otype == CAO_EQUAL)
 		ndopts++;
@@ -931,6 +935,9 @@ parse_cadef(char *nam, char **args)
 	    /* It's a rest-argument definition. */
 
 	    int type = CAA_REST;
+
+	    if (not)
+		continue;
 
 	    if (*++p != ':') {
 		freecadef(all);
@@ -956,6 +963,9 @@ parse_cadef(char *nam, char **args)
 
 	    int type = CAA_NORMAL, direct;
 	    Caarg arg, tmp, pre;
+
+	    if (not)
+		continue;
 
 	    if ((direct = idigit(*p))) {
 		/* Argment number is given. */
@@ -1100,7 +1110,7 @@ ca_get_sopt(Cadef d, char *line, char **end, LinkList *lp)
 		}
 		break;
 	    }
-	} else if (p && !p->active)
+	} else if (!p || (p && !p->active))
 	    return NULL;
 	p = NULL;
     }
@@ -1853,7 +1863,7 @@ bin_comparguments(char *nam, char **args, char *ops, int func)
 		      (compcurrent == 1)))) {
 		    ret = 0;
 		    for (p = lstate->d->opts; p; p = p->next) {
-			if (p->active) {
+			if (p->active && !p->not) {
 			    switch (p->type) {
 			    case CAO_NEXT:    l = next;    break;
 			    case CAO_DIRECT:  l = direct;  break;

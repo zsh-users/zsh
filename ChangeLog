@@ -1,5 +1,9 @@
 2000-06-19  Sven Wischnowsky  <wischnow@zsh.org>
 
+	* 11985: Completion/Debian/_dpkg, Doc/Zsh/compsys.yo, Src/Zle/computil.c:
+ 	_arguments: small fix for -s and new `!...' for things not to
+ 	complete (but to understand)
+	
 	* 11982: Test/comptest: update comptest to not set ZLS_COLORS
  	directly
 	

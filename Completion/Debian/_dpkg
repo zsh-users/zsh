@@ -81,8 +81,10 @@ _dpkg_options=('--abort-after[abort after errors]:number of errors:' \
            --{force,refuse,no-force}'--[forcing options]:what:(auto-select downgrade configure-any hold bad-path not-root overwrite overwrite-diverted depends-version depends confnew confold confdef confmiss conflicts architecture overwrite-dir remove-reinstreq remove-essential)')
 
 _dpkg_options_recursive=('(--recursive)-R[recursive]' '(-R)--recursive')
-_dpkg_actions_install=('(--install)-i[install]' '(-i)--install')
-_dpkg_actions_record_avail=('(--record-avail)-A[record available]' '(-A)--record-avail')
+
+# not needed anymore?
+#  _dpkg_actions_install=('(--install)-i[install]' '(-i)--install')
+#  _dpkg_actions_record_avail=('(--record-avail)-A[record available]' '(-A)--record-avail')
 
 case "${words[1]:t}" in
 dpkg)
@@ -90,12 +92,12 @@ _arguments -C -s "$_dpkg_actions[@]" \
            "$_dpkg_deb_actions[@]" \
            "$_dpkg_common_actions[@]" \
            "$_dpkg_options[@]" \
-	   "$_dpkg_options_recursive[@]"
+	   "$_dpkg_options_recursive[@]" && return 0
 ;;
 
 dpkg-deb)
 _arguments "$_dpkg_deb_actions[@]" \
-           "$_dpkg_common_actions[@]"
+           "$_dpkg_common_actions[@]" && return 0
 
 ;;
 
@@ -104,14 +106,16 @@ esac
 case "$state" in
   install|record_avail)
         _funcall ret _dpkg_$state && return ret
-        _arguments -C -s "$_dpkg_options[@]" \
-           "${(@e):-\$_dpkg_actions_${state}}" \
+# not needed anymore?
+#            "${(@e):-\$_dpkg_actions_${state}}" \
+        _arguments -C -A '-*' -s \
+             "$_dpkg_options[@]" \
+             \!${^_dpkg_actions%%:*} \
 	   - recur \
-	   '(--recursive)-R[recursive]' \
-	   '(-R)--recursive' \
-	   ':directory:_files -/' \
+             "$_dpkg_options_recursive[@]" \
+	     ':directory:_files -/' \
 	   - nonrecur \
-	   ':Debian package:_files -g \*.deb'
+	     ':Debian package:_files -g \*.deb'
   ;;
   remove|purge|status|listfiles)
         _funcall ret _dpkg_$state && return ret

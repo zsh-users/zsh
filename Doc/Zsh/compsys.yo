@@ -2800,6 +2800,17 @@ that the descriptions for all normal (non-option-) arguments should not be
 used and a hyphen (tt(-)) to specify that the descriptions for all options
 should not be used.  This paragraph desperately needs rewriting.
 
+To simplify writing writing functions that call tt(_arguments) more
+than once, the var(specs) may also start with the character `tt(!)'
+(exclamation mark) to make the spec em(not) be completed.  However, if
+this is used with one of the forms describing options, the option (and 
+its arguments, if it takes any) will be understood and skipped if they 
+appear on the command line.  It's just that the option itself will not
+be completed. This is intended to be used with an array containing the 
+options used in the first call to tt(arguments).  The second call can
+then use `tt(\!${^global_options})' to ignore those options and
+complete only the ones understood in the current context.
+
 In every case above, the var(action) determines how the possible
 completions should be generated.  In places where no sensible matches can
 be generated, the action should consist of only a space. This will make
