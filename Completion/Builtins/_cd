@@ -67,7 +67,7 @@ elif [[ $PREFIX != (\~|/|./|../)* && $#cdpath -ne 0 ]]; then
   # variable names, but it hardly seems worth it.
   # Note we need a tilde because cdablevars also allows user home
   # directories, hence we also need nonomatch to suppress error messages.
-  if [[ -o cdablevars && ! -d ${tdir::=${PREFIX%%/*}} &&
+  if [[ -o cdablevars && -n "$PREFIX" && ! -d ${tdir::=${PREFIX%%/*}} &&
     -d ${~tdir2::="~$tdir"} ]]; then
       PREFIX="~$PREFIX"
       _path_files -/
