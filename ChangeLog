@@ -1,5 +1,7 @@
 2000-05-22  Bart Schaefer  <schaefer@zsh.org>
 
+	* 11508: Doc/Zsh/index.yo: Add texipage() to printindex().
+
 	* 11485, 11488: Relocate "Compatibility" and "Restricted Shell" docs.
 
 2000-05-22  Chmouel Boudjnah  <chmouel@mandrakesoft.com>
