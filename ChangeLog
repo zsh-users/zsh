@@ -6,6 +6,11 @@
 
 	* unposted: Completion/compinit: conjugate "need" properly.
 
+2003-01-30  Oliver Kiddle  <opk@zsh.org>
+
+	* Doug Kearns: 18159: Completion/Unix/Command/_tidy:
+	completion function for HTML Tidy
+
 2003-01-29  Oliver Kiddle  <opk@zsh.org>
 
 	* 18149, 18153, 18156: Completion/bashcompinit, Doc/Zsh/compsys.yo:
