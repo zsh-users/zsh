@@ -3,6 +3,8 @@
 setopt localoptions nullglob rcexpandparam extendedglob
 unsetopt markdirs globsubst shwordsplit nounset ksharrays
 
+setopt localtraps noerrexit ; trap - ZERR
+
 (( $+_debug_count )) || integer -g _debug_count
 local tmp=${TMPPREFIX}${$}${words[1]:t}$[++_debug_count]
 local w="${(qq)words}"

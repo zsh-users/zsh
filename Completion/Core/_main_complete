@@ -20,6 +20,9 @@ setopt localoptions nullglob rcexpandparam extendedglob
 unsetopt markdirs globsubst shwordsplit nounset ksharrays
 exec </dev/null	# ZLE closes stdin, which can cause errors
 
+# Failed returns from this code are not real errors
+setopt localtraps noerrexit ; trap - ZERR
+
 local func funcs ret=1 tmp _compskip format nm call \
       _completers _completer _completer_num curtag _comp_force_list \
       _matchers _matcher _matcher_num _comp_tags _comp_mesg \
