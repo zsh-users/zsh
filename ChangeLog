@@ -1,3 +1,9 @@
+2002-07-01  Peter Stephenson  <pws@csr.com>
+
+	* 17384: Src/Zle/zle_main.c, Src/Zle/iwidgets.list,
+	Doc/Zsh/zle.yo: new `recursive-edit' widget allows a user-defined
+	widget to pass control back to zle as a subcommand.
+
 2002-07-01  Sven Wischnowsky  <wischnow@zsh.org>
 
 	* 17387: Completion/Zsh/Context/.distfiles,

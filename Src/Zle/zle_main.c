@@ -89,10 +89,11 @@ mod_export int eofchar;
 static int eofsent;
 static long keytimeout;
 
-#ifdef HAVE_SELECT
+#if defined(HAVE_SELECT) || defined(HAVE_POLL)
 /* Terminal baud rate */
 
 static int baud;
+static long costmult;
 #endif
 
 /* flags associated with last command */
@@ -631,108 +632,19 @@ getkey(int keytmout)
     return ret;
 }
 
-/* Read a line.  It is returned metafied. */
-
 /**/
-unsigned char *
-zleread(char *lp, char *rp, int flags)
+void
+zlecore(void)
 {
-    unsigned char *s;
-    int old_errno = errno;
-    int tmout = getiparam("TMOUT");
-
-#if defined(HAVE_SELECT) || defined(HAVE_POLL)
-    long costmult;
-# ifdef HAVE_POLL
-# else
+#if !defined(HAVE_POLL) && defined(HAVE_SELECT)
     struct timeval tv;
     fd_set foofd;
-# endif
 
-    baud = getiparam("BAUD");
-    costmult = (baud) ? 3840000L / baud : 0;
-#endif
-
-    /* ZLE doesn't currently work recursively.  This is needed in case a *
-     * select loop is used in a function called from ZLE.  vared handles *
-     * this differently itself.                                          */
-    if(zleactive) {
-	char *pptbuf;
-	int pptlen;
-
-	pptbuf = unmetafy(promptexpand(lp, 0, NULL, NULL), &pptlen);
-	write(2, (WRITE_ARG_2_T)pptbuf, pptlen);
-	free(pptbuf);
-	return (unsigned char *)shingetline();
-    }
-
-    keytimeout = getiparam("KEYTIMEOUT");
-    if (!shout) {
-	if (SHTTY != -1)
-	    init_shout();
-
-	if (!shout)
-	    return NULL;
-	/* We could be smarter and default to a system read. */
-
-	/* If we just got a new shout, make sure the terminal is set up. */
-	if (termflags & TERM_UNKNOWN)
-	    init_term();
-    }
-
-    fflush(shout);
-    fflush(stderr);
-    intr();
-    insmode = unset(OVERSTRIKE);
-    eofsent = 0;
-    resetneeded = 0;
-    lpromptbuf = promptexpand(lp, 1, NULL, NULL);
-    pmpt_attr = txtchange;
-    rpromptbuf = promptexpand(rp, 1, NULL, NULL);
-    rpmpt_attr = txtchange;
-
-    zlereadflags = flags;
-    histline = curhist;
-#ifndef HAVE_POLL
-# ifdef HAVE_SELECT
     FD_ZERO(&foofd);
-# endif
 #endif
-    undoing = 1;
-    line = (unsigned char *)zalloc((linesz = 256) + 2);
-    virangeflag = lastcmd = done = cs = ll = mark = 0;
-    vichgflag = 0;
-    viinsbegin = 0;
-    statusline = NULL;
-    selectkeymap("main", 1);
-    selectlocalmap(NULL);
-    fixsuffix();
-    if ((s = (unsigned char *)getlinknode(bufstack))) {
-	setline((char *)s);
-	zsfree((char *)s);
-	if (stackcs != -1) {
-	    cs = stackcs;
-	    stackcs = -1;
-	    if (cs > ll)
-		cs = ll;
-	}
-	if (stackhist != -1) {
-	    histline = stackhist;
-	    stackhist = -1;
-	}
-    }
-    initundo();
-    if (isset(PROMPTCR))
-	putc('\r', shout);
-    if (tmout)
-	alarm(tmout);
-    zleactive = 1;
-    resetneeded = 1;
-    errflag = retflag = 0;
-    lastcol = -1;
-    initmodifier(&zmod);
-    prefixflag = 0;
+
     zrefresh();
+
     while (!done && !errflag) {
 
 	statusline = NULL;
@@ -786,6 +698,100 @@ zleread(char *lp, char *rp, int flags)
 	    if (!kungetct)
 		zrefresh();
     }
+}
+
+/* Read a line.  It is returned metafied. */
+
+/**/
+unsigned char *
+zleread(char *lp, char *rp, int flags)
+{
+    unsigned char *s;
+    int old_errno = errno;
+    int tmout = getiparam("TMOUT");
+
+#if defined(HAVE_POLL) || defined(HAVE_SELECT)
+    baud = getiparam("BAUD");
+    costmult = (baud) ? 3840000L / baud : 0;
+#endif
+
+    /* ZLE doesn't currently work recursively.  This is needed in case a *
+     * select loop is used in a function called from ZLE.  vared handles *
+     * this differently itself.                                          */
+    if(zleactive) {
+	char *pptbuf;
+	int pptlen;
+
+	pptbuf = unmetafy(promptexpand(lp, 0, NULL, NULL), &pptlen);
+	write(2, (WRITE_ARG_2_T)pptbuf, pptlen);
+	free(pptbuf);
+	return (unsigned char *)shingetline();
+    }
+
+    keytimeout = getiparam("KEYTIMEOUT");
+    if (!shout) {
+	if (SHTTY != -1)
+	    init_shout();
+
+	if (!shout)
+	    return NULL;
+	/* We could be smarter and default to a system read. */
+
+	/* If we just got a new shout, make sure the terminal is set up. */
+	if (termflags & TERM_UNKNOWN)
+	    init_term();
+    }
+
+    fflush(shout);
+    fflush(stderr);
+    intr();
+    insmode = unset(OVERSTRIKE);
+    eofsent = 0;
+    resetneeded = 0;
+    lpromptbuf = promptexpand(lp, 1, NULL, NULL);
+    pmpt_attr = txtchange;
+    rpromptbuf = promptexpand(rp, 1, NULL, NULL);
+    rpmpt_attr = txtchange;
+
+    zlereadflags = flags;
+    histline = curhist;
+    undoing = 1;
+    line = (unsigned char *)zalloc((linesz = 256) + 2);
+    virangeflag = lastcmd = done = cs = ll = mark = 0;
+    vichgflag = 0;
+    viinsbegin = 0;
+    statusline = NULL;
+    selectkeymap("main", 1);
+    selectlocalmap(NULL);
+    fixsuffix();
+    if ((s = (unsigned char *)getlinknode(bufstack))) {
+	setline((char *)s);
+	zsfree((char *)s);
+	if (stackcs != -1) {
+	    cs = stackcs;
+	    stackcs = -1;
+	    if (cs > ll)
+		cs = ll;
+	}
+	if (stackhist != -1) {
+	    histline = stackhist;
+	    stackhist = -1;
+	}
+    }
+    initundo();
+    if (isset(PROMPTCR))
+	putc('\r', shout);
+    if (tmout)
+	alarm(tmout);
+    zleactive = 1;
+    resetneeded = 1;
+    errflag = retflag = 0;
+    lastcol = -1;
+    initmodifier(&zmod);
+    prefixflag = 0;
+
+    zlecore();
+
     statusline = NULL;
     invalidatelist();
     trashzle();
@@ -1231,6 +1237,20 @@ whereis(char **args)
     showmsg(ff.msg);
     zsfree(ff.msg);
     return 0;
+}
+
+/**/
+int
+recursiveedit(char **args)
+{
+    int locerror;
+
+    zlecore();
+
+    locerror = errflag;
+    errflag = done = 0;
+
+    return locerror;
 }
 
 /**/

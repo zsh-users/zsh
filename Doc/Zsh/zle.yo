@@ -1620,6 +1620,48 @@ At a secondary (tt(PS2)) prompt, move the entire current multiline
 construct into the editor buffer.
 The latter is equivalent to tt(push-input) followed by tt(get-line).
 )
+tindex(recursive-edit)
+item(tt(recursive-edit))(
+Only useful from a user-defined widget.  At this point in the function,
+the editor regains control until one of the standard widgets which would
+normally cause zle to exit (typically an tt(accept-line) caused by
+hitting the return key) is executed.  Instead, control returns to the
+user-defined widget.  The status returned is non-zero if the return was
+caused by an error, but the function still continues executing and hence
+may tidy up.  This makes it safe for the user-defined widget to alter
+the command line or key bindings temporarily.
+
+
+The following widget, tt(caps-lock), serves as an example.
+example(self-insert-ucase() {
+  LBUFFER+=${(U)KEYS[-1]}
+}
+
+integer stat
+
+zle -N self-insert self-insert-ucase
+zle -A caps-lock save-caps-lock
+zle -A accept-line caps-lock
+
+zle recursive-edit
+stat=$?
+
+zle -A .self-insert self-insert
+zle -A save-caps-lock caps-lock
+zle -D save-caps-lock
+
+(( stat )) && zle send-break
+
+return $stat
+)
+This causes typed letters to be inserted capitalised until either
+tt(accept-line) (i.e. typically the return key) is typed or the
+tt(caps-lock) widget is invoked again; the later is handled by saving
+the old definition of tt(caps-lock) as tt(save-caps-lock) and then
+rebinding it to invoke tt(accept-line).  Note that an error from the
+recursive edit is detected as a non-zero return status and propagated by
+using the tt(send-break) widget.
+)
 tindex(redisplay)
 item(tt(redisplay) (unbound) (^R) (^R))(
 Redisplays the edit buffer.
