@@ -160,28 +160,28 @@ uninstall.bin: uninstall.bin-here
 
 # install binary, creating install directory if necessary
 install.bin-here: zsh install.bin-@L@
-	$(sdir_top)/mkinstalldirs $(bindir)
-	$(INSTALL_PROGRAM) $(STRIPFLAGS) zsh $(bindir)/zsh-$(VERSION)
-	if test -f $(bindir)/zsh; then \
-	    rm -f $(bindir)/zsh.old; \
-	    $(LN) $(bindir)/zsh $(bindir)/zsh.old; \
+	$(sdir_top)/mkinstalldirs $(DESTDIR)$(bindir)
+	$(INSTALL_PROGRAM) $(STRIPFLAGS) zsh $(DESTDIR)$(bindir)/zsh-$(VERSION)
+	if test -f $(DESTDIR)$(bindir)/zsh; then \
+	    rm -f $(DESTDIR)$(bindir)/zsh.old; \
+	    $(LN) $(DESTDIR)$(bindir)/zsh $(DESTDIR)$(bindir)/zsh.old; \
 	else :; fi
-	rm -f $(bindir)/zsh.new
-	$(LN) $(bindir)/zsh-$(VERSION) $(bindir)/zsh.new
-	mv $(bindir)/zsh.new $(bindir)/zsh
+	rm -f $(DESTDIR)$(bindir)/zsh.new
+	$(LN) $(DESTDIR)$(bindir)/zsh-$(VERSION) $(DESTDIR)$(bindir)/zsh.new
+	mv $(DESTDIR)$(bindir)/zsh.new $(DESTDIR)$(bindir)/zsh
 
 install.bin-N:
 install.bin-L: $(LIBZSH)
-	$(sdir_top)/mkinstalldirs $(libdir)/zsh
-	$(INSTALL_PROGRAM) $(LIBZSH) $(libdir)/zsh/$(LIBZSH)
+	$(sdir_top)/mkinstalldirs $(DESTDIR)$(libdir)/zsh
+	$(INSTALL_PROGRAM) $(LIBZSH) $(DESTDIR)$(libdir)/zsh/$(LIBZSH)
 
 # uninstall binary
 uninstall.bin-here: uninstall.bin-@L@
-	rm -f $(bindir)/zsh-$(VERSION) $(bindir)/zsh
+	rm -f $(DESTDIR)$(bindir)/zsh-$(VERSION) $(bindir)/zsh
 
 uninstall.bin-N:
 uninstall.bin-L:
-	rm -f $(libdir)/zsh/$(LIBZSH)
+	rm -f $(DESTDIR)$(libdir)/zsh/$(LIBZSH)
 
 # ========== DEPENDENCIES FOR CLEANUP ==========
 

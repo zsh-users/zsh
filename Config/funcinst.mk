@@ -33,6 +33,7 @@ install.fns:
 	  FUNCTIONS_INSTALL="$(FUNCTIONS_INSTALL)" \
 	  FUNCTIONS_SUBDIRS="$(FUNCTIONS_SUBDIRS)" \
 	  INSTALL_DATA="$(INSTALL_DATA)" \
+	  DESTDIR="$(DESTDIR)" \
 	  $(SHELL) $(sdir_top)/Config/installfns.sh || exit 1; \
 	fi; \
 	exit 0
@@ -42,6 +43,7 @@ uninstall.fns:
 	  fndir="$(fndir)" sdir="$(sdir)" \
 	  FUNCTIONS_INSTALL="$(FUNCTIONS_INSTALL)" \
 	  FUNCTIONS_SUBDIRS="$(FUNCTIONS_SUBDIRS)" \
+	  DESTDIR="$(DESTDIR)" \
 	  $(SHELL) $(sdir_top)/Config/uninstallfns.sh || exit 1; \
 	fi; \
 	exit 0
