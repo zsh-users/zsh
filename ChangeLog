@@ -1,5 +1,8 @@
 2004-04-14  Oliver Kiddle  <opk@zsh.org>
 
+	* Ingo Rohlfs: 19747: Completion/Unix/Command/_subversion:
+	complete files/urls for svn cp and mv commands
+
 	* unposted: Completion/Unix/Command/_cdrecord: add missing local
 
 	* 19768: Completion/compinit: suggest running compaudit to see

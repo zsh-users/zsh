@@ -84,7 +84,7 @@ _svn_subcommand () {
     ;;
     *)
       case $_svn_subcmd_usage in
-        *(TARGET|URL*PATH)*)
+        *(SRC|DST|TARGET|URL*PATH)*)
           _svn_subcmds+=( 
 	    '*: : _alternative "files:file:_files" "urls:URL:_svn_urls"'
 	  )
