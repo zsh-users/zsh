@@ -1,3 +1,8 @@
+2000-09-01  Bart Schaefer  <schaefer@zsh.org>
+
+	* 12721: Functions/Misc/allopt: Remove "emulate" which changes the
+	output of the function; other minor cleanup.
+
 2000-08-30  Clint Adams  <schizo@debian.org>
 
 	* 12720: Completion/Debian/_dpkg: change two instances of
