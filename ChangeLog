@@ -1,3 +1,8 @@
+2001-05-20  Wayne Davison  <wayned@users.sourceforge.net>
+
+	* last half of 14390: Src/params.c: Added some boundary checks
+	to the array-assignment code.
+
 2001-05-19  Wayne Davison  <wayned@users.sourceforge.net>
 
 	* 14389: Src/hashtable.c, Src/hist.c: Don't call addhistnode()
