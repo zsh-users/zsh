@@ -723,6 +723,7 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int ssub)
     int sortit = 0, casind = 0;
     int casmod = 0;
     int quotemod = 0, quotetype = 0, quoteerr = 0;
+    int visiblemod = 0;
     char *sep = NULL, *spsep = NULL;
     char *premul = NULL, *postmul = NULL, *preone = NULL, *postone = NULL;
     char *replstr = NULL;	/* replacement string for /orig/repl */
@@ -824,6 +825,10 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int ssub)
 		    break;
 		case 'i':
 		    casind = 1;
+		    break;
+
+		case 'V':
+		    visiblemod++;
 		    break;
 
 		case 'q':
@@ -1628,20 +1633,20 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int ssub)
 	    ap = aval;
 
 	    if (quotemod > 0) {
-		if (quotetype == 3)
-		    for (; *ap; ap++)
-			*ap = nicedupstring(*ap);
-		else if (quotetype) {
+		if (quotetype) {
 		    int sl;
 		    char *tmp;
 
 		    for (; *ap; ap++) {
+			int pre = quotetype != 3 ? 1 : 2;
 			tmp = bslashquote(*ap, NULL, quotetype);
 			sl = strlen(tmp);
-			*ap = (char *) zhalloc(sl + 3);
-			strcpy((*ap) + 1, tmp);
-			ap[0][0] = ap[0][sl + 1] = (quotetype == 1 ? '\'' : '"');
-			ap[0][sl + 2] = '\0';
+			*ap = (char *) zhalloc(pre + sl + 2);
+			strcpy((*ap) + pre, tmp);
+			ap[0][pre - 1] = ap[0][pre + sl] = (quotetype != 2 ? '\'' : '"');
+			ap[0][pre + sl + 1] = '\0';
+			if (quotetype == 3)
+			  ap[0][0] = '$';
 		    }
 		} else
 		    for (; *ap; ap++)
@@ -1668,18 +1673,19 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int ssub)
 	    if (!copied)
 		val = dupstring(val), copied = 1;
 	    if (quotemod > 0) {
-		if (quotetype == 3)
-		    val = nicedupstring(val);
-		else if (quotetype) {
+		if (quotetype) {
+		    int pre = quotetype != 3 ? 1 : 2;
 		    int sl;
 		    char *tmp;
 
 		    tmp = bslashquote(val, NULL, quotetype);
 		    sl = strlen(tmp);
-		    val = (char *) zhalloc(sl + 3);
-		    strcpy(val + 1, tmp);
-		    val[0] = val[sl + 1] = (quotetype == 1 ? '\'' : '"');
-		    val[sl + 2] = '\0';
+		    val = (char *) zhalloc(pre + sl + 2);
+		    strcpy(val + pre, tmp);
+		    val[pre - 1] = val[pre + sl] = (quotetype != 2 ? '\'' : '"');
+		    val[pre + sl + 1] = '\0';
+		    if (quotetype == 3)
+		      val[0] = '$';
 		} else
 		    val = bslashquote(val, NULL, 0);
 	    } else {
@@ -1698,6 +1704,19 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int ssub)
 		remnulargs(val);
 		untokenize(val);
 	    }
+	}
+    }
+    if (visiblemod) {
+	if (isarr) {
+	    char **ap;
+	    if (!copied)
+		aval = arrdup(aval), copied = 1;
+	    for (ap = aval; *ap; ap++)
+		*ap = nicedupstring(*ap);
+	} else {
+	    if (!copied)
+		val = dupstring(val), copied = 1;
+	    val = nicedupstring(val);
 	}
     }
     if (isarr) {

@@ -2984,7 +2984,64 @@ bslashquote(const char *s, char **e, int instring)
     for (; *u; u++) {
 	if (e && *e == u)
 	    *e = v, sf = 1;
-	if (ispecial(*u) &&
+	if (instring == 3) {
+	  int c = *u;
+	  if (c == Meta) {
+	    c = *++u ^ 32;
+	  }
+	  c &= 0xff;
+	  if(isprint(c)) {
+	    switch (c) {
+	    case '\\':
+	    case '\'':
+	      *v++ = '\\';
+	      *v++ = c;
+	      break;
+
+	    default:
+	      if(imeta(c)) {
+		*v++ = Meta;
+		*v++ = c ^ 32;
+	      }
+	      else {
+		if (isset(BANGHIST) && c == bangchar) {
+		  *v++ = '\\';
+		}
+		*v++ = c;
+	      }
+	      break;
+	    }
+	  }
+	  else {
+	    switch (c) {
+	    case '\0':
+	      *v++ = '\\';
+	      *v++ = '0';
+	      if ('0' <= u[1] && u[1] <= '7') {
+		*v++ = '0';
+		*v++ = '0';
+	      }
+	      break;
+
+	    case '\007': *v++ = '\\'; *v++ = 'a'; break;
+	    case '\b': *v++ = '\\'; *v++ = 'b'; break;
+	    case '\f': *v++ = '\\'; *v++ = 'f'; break;
+	    case '\n': *v++ = '\\'; *v++ = 'n'; break;
+	    case '\r': *v++ = '\\'; *v++ = 'r'; break;
+	    case '\t': *v++ = '\\'; *v++ = 't'; break;
+	    case '\v': *v++ = '\\'; *v++ = 'v'; break;
+
+	    default:
+	      *v++ = '\\';
+	      *v++ = '0' + ((c >> 6) & 7);
+	      *v++ = '0' + ((c >> 3) & 7);
+	      *v++ = '0' + (c & 7);
+	      break;
+	    }
+	  }
+	  continue;
+	}
+	else if (ispecial(*u) &&
 	    (!instring ||
 	     (isset(BANGHIST) && *u == (char)bangchar) ||
 	     (instring == 2 &&

@@ -581,12 +581,14 @@ Capitalize the resulting words.  `Words' in this case refers to sequences
 of alphanumeric characters separated by non-alphanumerics, em(not) to words
 that result from field splitting.
 )
+item(tt(V))(
+Make any special characters in the resulting words visible.
+)
 item(tt(q))(
 Quote the resulting words with backslashes. If this flag is given
 twice, the resulting words are quoted in single quotes and if it is
 given three times, the words are quoted in double quotes. If it is
-given four times, no real quoting is done, but any special characters
-in the resulting words will be in a human-readable form.
+given four times, the words are quoted in single quotes preceded a tt($).
 )
 item(tt(Q))(
 Remove one level of quotes from the resulting words.
