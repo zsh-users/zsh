@@ -1,3 +1,9 @@
+2002-06-02  Peter Stephenson  <pws@pwstephenson.fsnet.co.uk>
+
+	* 17272: Src/parse.c: `outer() { inner(); }' succeded; when outer
+	ran it created a bogus `inner' which crashed the shell.  Make
+	original command issue error.
+
 2002-05-31  Clint Adams  <clint@zsh.org>
 
 	* 17266: Completion/Unix/Command/_man: check `manpath`
