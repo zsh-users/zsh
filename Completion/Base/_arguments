@@ -87,9 +87,11 @@ if (( long )); then
     done
 
     # Then we walk through the descriptions plus a few builtin ones.
+    # The last one matches all options; the `special' description and action
+    # makes those options be completed without an argument description.
 
     set -- "$@" '*=FILE*:file:_files' \
-           '*=(DIR|PATH)*:directory:_files -/' '*: :'
+           '*=(DIR|PATH)*:directory:_files -/' '*: :  '
 
     while (( $# )); do
 
@@ -147,7 +149,7 @@ if (( long )); then
 
       if (( $#tmp )); then
         tmp=("${(@)tmp//[^a-zA-Z0-9-]}")
-        if [[ -n "$descr" ]]; then
+        if [[ -n "$descr" && "$descr" != ': :  ' ]]; then
 	  cache=( "$cache[@]" "${(@)^tmp}${descr}" )
         else
 	  cache=( "$cache[@]" "$tmp[@]" )

@@ -1,5 +1,8 @@
 2000-08-01  Sven Wischnowsky  <wischnow@zsh.org>
 
+	* 12462: Completion/Base/_arguments: fix for automatically
+ 	recognised options, don't expect an argument after each of them
+	
 	* 12453: Completion/Bsd/_bsd_pkg, Completion/Bsd/_kld,
  	Completion/Commands/_next_tags, Completion/User/_cvs,
  	Completion/User/_mailboxes, Completion/X/_xset,
