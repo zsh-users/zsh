@@ -270,6 +270,7 @@ lexsave(void)
     inredir = 0;
     hdocs = NULL;
     histactive = 0;
+    ecbuf = NULL;
 
     ls->next = lstack;
     lstack = ls;
@@ -318,6 +319,8 @@ lexrestore(void)
     hwbegin = lstack->hwbegin;
     hwend = lstack->hwend;
     addtoline = lstack->addtoline;
+    if (ecbuf)
+	zfree(ecbuf, eclen);
     eclen = lstack->eclen;
     ecused = lstack->ecused;
     ecnpats = lstack->ecnpats;

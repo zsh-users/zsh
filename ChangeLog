@@ -1,5 +1,8 @@
 2001-03-06  Sven Wischnowsky  <wischnow@zsh.org>
 
+	* 13576: Src/lex.c, Src/parse.c: make the parser use real memory
+ 	for the ecbuf to avoid having hrealloc() throw away lots of memory
+	
 	* 13575: Src/Zle/compmatch.c: another fix for completion matching,
  	CLF_MISS in the wrong cline struct
 	

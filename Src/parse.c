@@ -235,6 +235,11 @@ Eccstr ecstrs;
 /**/
 int ecsoffs, ecssub, ecnfunc;
 
+#define EC_INIT_SIZE         256
+#define EC_DOUBLE_THRESHOLD  32768
+#define EC_INCREMENT         1024
+
+
 /* Adjust pointers in here-doc structs. */
 
 static void
@@ -255,10 +260,11 @@ ecispace(int p, int n)
     int m;
 
     if ((eclen - ecused) < n) {
-	int a = (n > 256 ? n : 256);
+	int a = (eclen < EC_DOUBLE_THRESHOLD ? eclen : EC_INCREMENT);
 
-	ecbuf = (Wordcode) hrealloc((char *) ecbuf, eclen * sizeof(wordcode),
-				    (eclen + a) * sizeof(wordcode));
+	if (n > a) a = n;
+
+	ecbuf = (Wordcode) zrealloc((char *) ecbuf, (eclen + a) * sizeof(wordcode));
 	eclen += a;
     }
     if ((m = ecused - p) > 0)
@@ -273,9 +279,10 @@ static int
 ecadd(wordcode c)
 {
     if ((eclen - ecused) < 1) {
-	ecbuf = (Wordcode) hrealloc((char *) ecbuf, eclen * sizeof(wordcode),
-				    (eclen + 256) * sizeof(wordcode));
-	eclen += 256;
+	int a = (eclen < EC_DOUBLE_THRESHOLD ? eclen : EC_INCREMENT);
+
+	ecbuf = (Wordcode) zrealloc((char *) ecbuf, (eclen + a) * sizeof(wordcode));
+	eclen += a;
     }
     ecbuf[ecused] = c;
     ecused++;
@@ -360,7 +367,9 @@ ecstr(char *s)
 static void
 init_parse(void)
 {
-    ecbuf = (Wordcode) zhalloc((eclen = 256) * sizeof(wordcode));
+    if (ecbuf) zfree(ecbuf, eclen);
+
+    ecbuf = (Wordcode) zalloc((eclen = EC_INIT_SIZE) * sizeof(wordcode));
     ecused = 0;
     ecstrs = NULL;
     ecsoffs = ecnpats = 0;
@@ -398,6 +407,9 @@ bld_eprog(void)
 	l = strlen(p->str) + 1;
 	memcpy(q, p->str, l);
     }
+    zfree(ecbuf, eclen);
+    ecbuf = NULL;
+
     return ret;
 }
 
