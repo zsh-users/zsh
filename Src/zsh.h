@@ -487,7 +487,8 @@ typedef struct eprog *Eprog;
 
 struct funcdump {
     FuncDump next;		/* next in list */
-    char *name;			/* path name */
+    dev_t dev;			/* device */
+    ino_t ino;			/* indoe number */
     int fd;			/* file descriptor */
     Wordcode map;		/* pointer to header */
     Wordcode addr;		/* mapped region */

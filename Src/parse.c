@@ -2741,7 +2741,7 @@ static FuncDump dumps;
 /* Load a dump file (i.e. map it). */
 
 static void
-load_dump_file(char *dump, int other, int len)
+load_dump_file(char *dump, struct stat *sbuf, int other, int len)
 {
     FuncDump d;
     Wordcode addr;
@@ -2781,7 +2781,8 @@ load_dump_file(char *dump, int other, int len)
     d = (FuncDump) zalloc(sizeof(*d));
     d->next = dumps;
     dumps = d;
-    d->name = ztrdup(dump);
+    d->dev = sbuf->st_dev;
+    d->ino = sbuf->st_ino;
     d->fd = fd;
     d->map = addr + (other ? (len - off) / sizeof(wordcode) : 0);
     d->addr = addr;
@@ -2806,7 +2807,7 @@ try_dump_file(char *path, char *name, char *file, int *ksh)
     char *dig, *wc;
 
     if (strsfx(FD_EXT, path))
-	return check_dump_file(path, name, ksh);
+	return check_dump_file(path, NULL, name, ksh);
 
     dig = dyncat(path, FD_EXT);
     wc = dyncat(file, FD_EXT);
@@ -2822,13 +2823,13 @@ try_dump_file(char *path, char *name, char *file, int *ksh)
     if (!rd &&
 	(rc || std.st_mtime > stc.st_mtime) &&
 	(rn || std.st_mtime > stn.st_mtime) &&
-	(prog = check_dump_file(dig, name, ksh)))
+	(prog = check_dump_file(dig, &std, name, ksh)))
 	return prog;
 
     /* No digest file. Now look for the per-function compiled file. */
     if (!rc &&
 	(rn || stc.st_mtime > stn.st_mtime) &&
-	(prog = check_dump_file(wc, name, ksh)))
+	(prog = check_dump_file(wc, &stc, name, ksh)))
 	return prog;
 
     /* No compiled file for the function. The caller (getfpfunc() will
@@ -2853,7 +2854,7 @@ try_source_file(char *file)
 	tail = file;
 
     if (strsfx(FD_EXT, file))
-	return check_dump_file(file, tail, NULL);
+	return check_dump_file(file, NULL, tail, NULL);
 
     wc = dyncat(file, FD_EXT);
 
@@ -2861,7 +2862,7 @@ try_source_file(char *file)
     rn = stat(file, &stn);
 
     if (!rc && (rn || stc.st_mtime > stn.st_mtime) &&
-	(prog = check_dump_file(wc, tail, NULL)))
+	(prog = check_dump_file(wc, &stc, tail, NULL)))
 	return prog;
 
     return NULL;
@@ -2872,12 +2873,19 @@ try_source_file(char *file)
 
 /**/
 static Eprog
-check_dump_file(char *file, char *name, int *ksh)
+check_dump_file(char *file, struct stat *sbuf, char *name, int *ksh)
 {
     int isrec = 0;
     Wordcode d;
     FDHead h;
     FuncDump f;
+    struct stat lsbuf;
+
+    if (!sbuf) {
+	if (stat(file, &lsbuf))
+	    return NULL;
+	sbuf = &lsbuf;
+    }
 
 #ifdef USE_MMAP
 
@@ -2890,7 +2898,7 @@ check_dump_file(char *file, char *name, int *ksh)
 #ifdef USE_MMAP
 
     for (f = dumps; f; f = f->next)
-	if (!strcmp(file, f->name)) {
+	if (f->dev == sbuf->st_dev && f->ino == sbuf->st_ino) {
 	    d = f->map;
 	    break;
 	}
@@ -2935,7 +2943,7 @@ check_dump_file(char *file, char *name, int *ksh)
 
 	    return prog;
 	} else if (fdflags(d) & FDF_MAP) {
-	    load_dump_file(file, (fdflags(d) & FDF_OTHER), fdother(d));
+	    load_dump_file(file, sbuf, (fdflags(d) & FDF_OTHER), fdother(d));
 	    isrec = 1;
 	    goto rec;
 	} else
@@ -3017,7 +3025,6 @@ decrdumpcount(FuncDump f)
 		dumps = p->next;
 	    munmap((void *) f->addr, f->len);
 	    zclose(f->fd);
-	    zsfree(f->name);
 	    zfree(f, sizeof(*f));
 	}
     }
