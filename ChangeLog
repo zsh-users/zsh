@@ -1,3 +1,9 @@
+2005-04-03  Andrey Borzenkov  <bor@zsh.org>
+
+	* 21085: Completion/Mandrake/Command/_urpmi: update for 10.2,
+	add parsehdlist, use urpmq --list options to get media and
+	package list
+
 2005-04-01  Oliver Kiddle  <opk@zsh.org>
 
 	* 21081: Completion/Unix/Command/_fuser: complete network
