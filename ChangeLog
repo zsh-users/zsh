@@ -1,3 +1,9 @@
+2004-07-13  Peter Stephenson  <pws@csr.com>
+
+	* 20153: Src/Zle/zle_main.c: make zle-line-init run after
+	the initial zrefresh() by moving the latter out of zlecore().
+	Needs an extra call in recursiveedit().
+
 2004-07-12  Peter Stephenson  <pws@csr.com>
 
 	* unposted: NEWS: read it through and tidied it up.

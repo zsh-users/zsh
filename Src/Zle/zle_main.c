@@ -680,8 +680,6 @@ zlecore(void)
     FD_ZERO(&foofd);
 #endif
 
-    zrefresh();
-
     while (!done && !errflag) {
 
 	statusline = NULL;
@@ -833,6 +831,8 @@ zleread(char **lp, char **rp, int flags, int context)
     lastcol = -1;
     initmodifier(&zmod);
     prefixflag = 0;
+
+    zrefresh();
 
     if ((initthingy = rthingy_nocreate("zle-line-init"))) {
 	char *args[2];
@@ -1303,6 +1303,7 @@ recursiveedit(UNUSED(char **args))
 {
     int locerror;
 
+    zrefresh();
     zlecore();
 
     locerror = errflag;
