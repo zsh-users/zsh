@@ -1214,7 +1214,8 @@ parenthesised group, and so on.  These arrays are not otherwise special to
 the shell.  The indices use the same convention as does parameter
 substitution, so that elements of tt($mend) and tt($mbegin) may be used in
 subscripts; the tt(KSH_ARRAYS) option is respected.  Sets of globbing flags
-are not considered parenthesised groups.
+are not considered parenthesised groups; only the first nine active
+parentheses can be referenced.
 
 For example,
 
