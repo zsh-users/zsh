@@ -1119,7 +1119,7 @@ printaliasnode(HashNode hn, int printflags)
 	    printf("suffix ");
 	else if (a->flags & ALIAS_GLOBAL)
 	    printf("globally ");
-	printf (" aliased to ");
+	printf ("aliased to ");
 	nicezputs(a->text, stdout);
 	putchar('\n');
 	return;
@@ -1134,7 +1134,7 @@ printaliasnode(HashNode hn, int printflags)
 	    printf(" global");
 	else
 	    printf("n");
-	printf(" alias for");
+	printf(" alias for ");
 	nicezputs(a->text, stdout);
 	putchar('\n');
 	return;

@@ -1,5 +1,7 @@
 2003-09-03  Peter Stephenson  <pws@csr.com>
 
+	* 19020: Src/hashtable.c: printaliasnode was screwed up by 19014.
+
 	* 19014: Completion/Zsh/Command/_alias,
 	Completion/Zsh/Type/.distfiles, Completion/Zsh/Type/_aliases,
 	Completion/Zsh/Type/_command_names,
