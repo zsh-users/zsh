@@ -1,3 +1,8 @@
+2000-05-08  Tanaka Akira  <akr@zsh.org>
+
+	* Bart, Tanaka Akira: 11247: Don't signal to a process group which
+	has only zombie processes.
+
 2000-05-08  Sven Wischnowsky  <wischnow@informatik.hu-berlin.de>
 
 	* 11244: Completion/Builtins/_zstyle, Completion/Core/_description,

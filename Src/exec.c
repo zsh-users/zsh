@@ -2466,8 +2466,8 @@ entersubsh(int how, int cl, int fake)
 	}
     } else if (thisjob != -1 && cl) {
 	if (jobtab[list_pipe_job].gleader && (list_pipe || list_pipe_child)) {
-	    if (killpg(jobtab[list_pipe_job].gleader, 0) == -1 ||
-		setpgrp(0L, jobtab[list_pipe_job].gleader) == -1) {
+	    if (setpgrp(0L, jobtab[list_pipe_job].gleader) == -1 ||
+		killpg(jobtab[list_pipe_job].gleader, 0) == -1) {
 		jobtab[list_pipe_job].gleader =
 		    jobtab[thisjob].gleader = (list_pipe_child ? mypgrp : getpid());
 		setpgrp(0L, jobtab[list_pipe_job].gleader);
