@@ -49,7 +49,7 @@ _svn_subcommand () {
   )
 
   [[ "$_svn_subcmd_usage" == *URL* ]] && _svn_subcmds=($_svn_subcmds ":url:_urls")
-  [[ "$_svn_subcmd_usage" == *PATH* ]] && _svn_subcmds=($_svn_subcmds "*:path:_files -/")
+  [[ "$_svn_subcmd_usage" == *PATH* ]] && _svn_subcmds=($_svn_subcmds "*:path:_files")
 
     _arguments \
     	"$_svn_subcmds[@]" && ret=0
