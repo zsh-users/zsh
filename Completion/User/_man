@@ -1,6 +1,6 @@
 #compdef man
 
-setopt localoptions rcexpandparam
+setopt localoptions rcexpandparam extendedglob
 
 local rep expl star approx
 
@@ -14,12 +14,14 @@ if [[ -n $_comp_correct ]]; then
   approx="(#a${_comp_correct})"
 fi
 
+# `sman' is the SGML manual directory for Solaris 7.
+
 if [[ $words[2] = (<->*|ln) ]]; then
   rep=(
-  $manpath/(man|cat)${words[2]}/${~approx}$PREFIX${~star}$SUFFIX.<->*(N:t:r) )
+  $manpath/(sman|man|cat)${words[2]}/${~approx}$PREFIX${~star}$SUFFIX.<->*(N:t) )
 else
-  rep=( $manpath/(man|cat)*/${~approx}$PREFIX${~star}$SUFFIX.<->*(N:t:r) )
+  rep=( $manpath/(sman|man|cat)*/${~approx}$PREFIX${~star}$SUFFIX.<->*(N:t) )
 fi
 
 _description expl 'manual page'
-(( $#rep )) && compadd "$expl[@]" - $rep
+(( $#rep )) && compadd "$expl[@]" - ${rep%%.[^.]##(.gz|)}
