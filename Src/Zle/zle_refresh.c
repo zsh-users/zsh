@@ -393,7 +393,7 @@ zrefresh(void)
 
     if (termflags & TERM_SHORT) {
 	singlerefresh();
-	return;
+	goto singlelineout;
     }
 
     if (cs < 0) {
@@ -643,6 +643,7 @@ individually */
     onumscrolls = numscrolls;
     if (nlnct > vmaxln)
 	vmaxln = nlnct;
+singlelineout:
     fflush(shout);		/* make sure everything is written out */
 
     /* if we have a new list showing, note it; if part of the list has been
@@ -1183,7 +1184,6 @@ singlerefresh(void)
     qbuf = nbuf;
     nbuf = obuf;
     obuf = qbuf;
-    fflush(shout);		/* make sure everything is written out */
 }
 
 /**/
