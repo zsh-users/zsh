@@ -141,6 +141,19 @@ zpathmax(char *dir)
 }
 #endif
 
+/**/
+mod_export char *
+zrealpath(const char *path, char *resolved_path)
+{
+#ifdef HAVE_REALPATH
+    return realpath(path, resolved_path);
+#else /* the following block should be replaced with a realpath() equiv. */
+    long pathmax;
+
+    if ((pathmax = zpathmax(path)) > 0)
+	return strncpy(resolved_path, path, pathmax);
+#endif
+}
 
 /**/
 mod_export char *

@@ -1,5 +1,8 @@
 2000-08-04  Clint Adams  <schizo@debian.org>
 
+	* 12541: configure.in, Src/compat.c: zrealpath wrapper around
+	realpath().
+
 	* 12533: Src/Modules/files.c: drop the tail of the path
 	passed to mkdir in the call to pathconf().
 
