@@ -4,6 +4,9 @@
 	prevent ZLE modules from being loaded before $module_path is
 	changed to point at the test installation.
 
+	* 13439: Test/Makefile.in: "make test" cleans up after killed
+	tests.
+
 2001-02-02  Andrej Borsenkow <Andrej.Borsenkow@mow.siemens.ru>
 
 	* unposted: Src/mkmakemod.sh: patterns in 13412 were wrong.

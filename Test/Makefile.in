@@ -55,7 +55,7 @@ check test:
 @CLEAN_MK@
 
 mostlyclean-here:
-	rm -rf *.tmp
+	rm -rf Modules .zcompdump *.tmp
 
 distclean-here:
 	rm -f Makefile
