@@ -1,3 +1,8 @@
+2004-07-01  Peter Stephenson  <pws@csr.com>
+
+	* 7650: Doc/Zsh/zle.yo, Src/Zle/iwidgets.list, Src/Zle/zle_main.c:
+	new zle widget prompt-reset redisplays screen with prompt updated.
+
 2004-06-30  Peter Stephenson  <pws@csr.com>
 
 	* 20118: Doc/Zsh/builtins.yo, Src/Builtins/rlimits.c:

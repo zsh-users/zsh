@@ -1737,6 +1737,15 @@ tindex(redisplay)
 item(tt(redisplay) (unbound) (^R) (^R))(
 Redisplays the edit buffer.
 )
+tindex(reset-prompt)
+item(tt(reset-prompt) (unbound) (unbound) (unbound))(
+Force the prompts on both the left and right of the screen to be
+re-expanded, then redisplay the edit buffer.  Note that this
+does not reflect changes to the prompt variables themselves, only changes
+in the expansion of the values (for example, changes in time or
+directory, or changes to the value of variables referred to by the
+prompt).
+)
 tindex(send-break)
 item(tt(send-break) (^G ESC-^G) (unbound) (unbound))(
 Abort the current editor function, e.g. tt(execute-named-command), or the

@@ -150,6 +150,8 @@ int kungetct;
 /**/
 mod_export char *zlenoargs[1] = { NULL };
 
+static char *raw_lp, *raw_rp;
+
 #ifdef FIONREAD
 static int delayzsetterm;
 #endif
@@ -785,8 +787,10 @@ zleread(char *lp, char *rp, int flags, int context)
     insmode = unset(OVERSTRIKE);
     eofsent = 0;
     resetneeded = 0;
+    raw_lp = lp;
     lpromptbuf = promptexpand(lp, 1, NULL, NULL);
     pmpt_attr = txtchange;
+    raw_rp = rp;
     rpromptbuf = promptexpand(rp, 1, NULL, NULL);
     rpmpt_attr = txtchange;
     free_prepostdisplay();
@@ -1304,6 +1308,18 @@ recursiveedit(UNUSED(char **args))
     errflag = done = 0;
 
     return locerror;
+}
+
+/**/
+int
+resetprompt(UNUSED(char **args))
+{
+    free(lpromptbuf);
+    lpromptbuf = promptexpand(raw_lp, 1, NULL, NULL);
+    free(rpromptbuf);
+    rpromptbuf = promptexpand(raw_rp, 1, NULL, NULL);
+
+    return redisplay(NULL);
 }
 
 /**/
