@@ -119,6 +119,7 @@ _arguments -s \
   '--rsync-path=[specify path to rsync on the remote machine]:remote command:' \
   '--existing[only update files that already exist on receiving side]' \
   '--ignore-existing[ignore files that already exist on receiving side]' \
+  '--remove-sent-files[transferred files/symlinks are removed from sending side]' \
   '(--delete --delete-before --delete-during --delete-after)--del[an alias for --delete-during]' \
   '(--del --delete-before --delete-during --delete-after)--delete[delete files that do not exist on the sending side]' \
   '(--del --delete --delete-during --delete-after)--delete-before[receiver deletes before transfer]' \
@@ -158,6 +159,7 @@ _arguments -s \
   '--stats[give some file-transfer stats]' \
   '(-P)--progress[show progress during transfer]' \
   '(--partial --progress)-P[same as --partial --progress]' \
+  '(-i --itemize-changes)'{-i,--itemize-changes}'[output a change-summary for all updates]' \
   '--log-format=[log file-transfers using specified format]:format:' \
   '--password-file=[read password from file]:file:_files' \
   '--list-only[list the files instead of copying them]' \
