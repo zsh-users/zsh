@@ -1109,7 +1109,10 @@ ca_parse_line(Cadef d)
 
 	/* See if it's an option. */
 
-	if (state.opt == 2 && (state.curopt = ca_get_opt(d, line, 0, &pe))) {
+	if (state.opt == 2 && (state.curopt = ca_get_opt(d, line, 0, &pe)) &&
+	    (state.curopt->type != CAO_EQUAL || 
+	     compwords[cur] || pe[-1] == '=')) {
+
 	    ddef = state.def = state.curopt->args;
 	    doff = pe - line;
 	    state.optbeg = state.argbeg = state.inopt = cur;
