@@ -1,5 +1,8 @@
 2004-07-23  Oliver Kiddle  <opk@zsh.org>
 
+	* 20180 (based on Jean-Baptiste Quenot's 20177):
+	Completion/Unix/Command/_killall: fix to work on BSD systems
+
 	* Motoi Washida <a66@h8.dion.ne.jp>: 20179 (tweaked):
 	Completion/Darwin/Type/_mac_applications,
 	Completion/Darwin/Command/_open, Completion/Darwin/Command/_defaults:
