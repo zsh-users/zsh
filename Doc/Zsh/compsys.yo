@@ -1695,6 +1695,11 @@ zstyle ':completion::prefix-1:::' completer _complete)
 The tt(add-space) style is used, too. If it is set to `true' then
 tt(_prefix) will insert a space between the matches generated (if any) 
 and the suffix.
+
+Note that using this completer will only work if the
+tt(COMPLETE_IN_WORD) option is set. Because otherwise the cursor will
+be set after the word before the completion code is called and hence
+there will be no suffix.
 )
 findex(_menu)
 item(tt(_menu))(
