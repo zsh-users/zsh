@@ -3,14 +3,15 @@
 _mailboxes() {
   #emulate -L zsh
   local expl ret=1
-  local pinedirectory="${pinedirectory:-~/mail}"
-  local maildirectory="${maildirectory:-~/Mail}"
+  local maildirectory pinedirectory
+  zstyle -s ":completion:${curcontext}:" mail-directory maildirectory || maildirectory="~/Mail"
+  zstyle -s ":completion:${curcontext}:" pine-directory pinedirectory || pinedirectory="~/mail"
 
   if (( ! $+_mailbox_cache )) then
     _mailbox_cache "$@"
   fi
 
-  case "${curcontext}" in
+  case "${curcontext}:" in
     (*:mail:*)
       if [[ "$PREFIX" == +* ]]; then
 	_tags mailboxes
@@ -49,7 +50,7 @@ _mailboxes() {
     _requested mailboxes expl 'mailbox specification' _mua_mailboxes && ret=0
 
     if _requested files expl 'mailbox file'; then
-      [[ "${curcontext}" != *:(mail|mush|mutt|zmail|zmlite):* ]] &&
+      [[ "${curcontext}:" != *:(mail|mush|mutt|zmail|zmlite):* ]] &&
 	compset -P -f
       _files "$expl[@]" && ret=0
     fi
@@ -60,13 +61,15 @@ _mailboxes() {
 }
 
 _mailbox_cache () {
-  # Depends on $maildirectory and $pinedirectory from _mailboxes!
-
-  local i j _mc_tmp muttrc="${muttrc:-~/.muttrc}"
+  local i j _mc_tmp
   local -aU dirboxes
+  local maildirectory pinedirectory muttrc
   typeset -aU -g _mailbox_cache
   typeset -aU -g _maildir_cache _mbox_cache _mh_cache _mutt_cache _pine_cache
 
+  zstyle -s ":completion:${curcontext}:" mail-directory maildirectory || maildirectory="~/Mail"
+  zstyle -s ":completion:${curcontext}:" pine-directory pinedirectory || pinedirectory="~/mail"
+  zstyle -s ":completion:${curcontext}:" muttrc muttrc || muttrc="~/.muttrc"
 
   [[ -f ${~muttrc:-.} ]] &&
     _mc_tmp=${=${(M)${(f)"$(<${~muttrc})"}:#mailboxes *}#mailboxes *} &&
@@ -98,13 +101,15 @@ _mailbox_cache () {
 }
 
 _mua_mailboxes() {
-  # Depends on $maildirectory and $pinedirectory from _mailboxes!
-
   local -a mbox_short
   local -aU mbox_names
   local ret=1
 
-  case "${curcontext}" in
+  local maildirectory pinedirectory
+  zstyle -s ":completion:${curcontext}:" mail-directory maildirectory || maildirectory="~/Mail"
+  zstyle -s ":completion:${curcontext}:" pine-directory pinedirectory || pinedirectory="~/mail"
+
+  case "${curcontext}:" in
     (*:elm:*) # I've probably got this wrong, or at least incomplete
       mbox_names=( "${_mbox_cache[@]}" "${_mailbox_cache[@]}" )
       mbox_short=( \! \< \> )

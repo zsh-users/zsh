@@ -1590,6 +1590,11 @@ attempt to match the name `tt(toast)' against the first argument to the
 style, and if successful will look in the directory under tt(~yousir) given
 by the third argument to the style for possible completions.
 )
+kindex(mail-directory, completion style)
+item(tt(mail-directory))(
+If set, zsh will assume that mailbox files can be found in
+the directory specified.  It defaults to `tt(~/Mail)'.
+)
 kindex(match-original, completion style)
 item(tt(match-original))(
 This is used by the tt(_match) completer.  If it is set to
@@ -1740,6 +1745,11 @@ matches is generated em(or) the list of matches does not fit onto the
 screen, both of `tt(yes=)' and `tt(select=)' can be given twice, once
 with a number and once with `tt(long)' or `tt(long-list)'.
 )
+kindex(muttrc, completion style)
+item(tt(muttrc))(
+If set, zsh will assume that the local mutt configuration can be found
+in the file specified.  It defaults to `tt(~/.muttrc)'.
+)
 kindex(numbers, completion style)
 item(tt(numbers))(
 This is used with the tt(jobs) tag.  If it is `true', the shell will
@@ -1834,6 +1844,11 @@ tt(colors) tag.  The value should be the pathname of a file
 containing color names in the format of an X11 tt(rgb.txt) file.  If
 the style is not set but this file is found in one of various standard
 locations it will be used as the default.
+)
+kindex(pine-directory, completion style)
+item(tt(pine-directory))(
+If set, zsh will assume that PINE mailbox files can be found in
+the directory specified.  It defaults to `tt(~/mail)'.
 )
 kindex(ports, completion style)
 item(tt(ports))(

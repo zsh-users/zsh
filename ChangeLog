@@ -1,5 +1,9 @@
 2001-10-10  Clint Adams  <clint@zsh.org>
 
+	* 16006: Completion/Unix/Type/_mailboxes, Doc/Zsh/compsys.yo:
+	use styles for mail directory, pine directory,
+	and muttrc.
+
 	* 16005: Completion/Unix/Command/_mount:
 	check /etc/filesystems under Linux.
 
