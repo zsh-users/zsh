@@ -194,3 +194,9 @@ struct compldat {
 /* Invalidate the completion list. */
 
 #define invalidatelist() runhookdef(INVALIDATELISTHOOK, NULL)
+
+/* Bit flags to setline */
+enum {
+    ZSL_COPY = 1,		/* Copy the argument, don't modify it */
+    ZSL_TOEND = 2,		/* Go to the end of the new line */
+};

@@ -175,12 +175,8 @@ static void
 set_buffer(UNUSED(Param pm), char *x)
 {
     if(x) {
-	unmetafy(x, &zlell);
-	sizeline(zlell);
-	strcpy((char *)zleline, x);
+	setline(x, 0);
 	zsfree(x);
-	if(zlecs > zlell)
-	    zlecs = zlell;
     } else
 	zlecs = zlell = 0;
     fixsuffix();
@@ -191,7 +187,7 @@ set_buffer(UNUSED(Param pm), char *x)
 static char *
 get_buffer(UNUSED(Param pm))
 {
-    return metafy((char *)zleline, zlell, META_HEAPDUP);
+    return (char *)zlelineasstring((char *)zleline, zlell, 0, NULL, NULL, 1);
 }
 
 /**/
@@ -238,19 +234,22 @@ get_mark(UNUSED(Param pm))
 static void
 set_lbuffer(UNUSED(Param pm), char *x)
 {
-    char *y;
+    ZLE_STRING_T y;
     int len;
 
-    if(x)
-	unmetafy(y = x, &len);
+    if (x && *x != ZLENUL)
+	y = stringaszleline((unsigned char *)x, &len, NULL);
     else
-	y = "", len = 0;
+	y = ZLENULSTR, len = 0;
     sizeline(zlell - zlecs + len);
-    memmove(zleline + len, zleline + zlecs, zlell - zlecs);
-    memcpy(zleline, y, len);
+    memmove((char *)(zleline + len), (char *)(zleline + zlecs),
+	    (zlell - zlecs) * ZLE_CHAR_SIZE);
+    ZS_memcpy(zleline, y, len);
     zlell = zlell - zlecs + len;
     zlecs = len;
     zsfree(x);
+    if (len)
+	free(y);
     fixsuffix();
     menucmp = 0;
 }
@@ -259,7 +258,7 @@ set_lbuffer(UNUSED(Param pm), char *x)
 static char *
 get_lbuffer(UNUSED(Param pm))
 {
-    return metafy((char *)zleline, zlecs, META_HEAPDUP);
+    return (char *)zlelineasstring(zleline, zlecs, 0, NULL, NULL, 1);
 }
 
 /**/
@@ -269,13 +268,15 @@ set_rbuffer(UNUSED(Param pm), char *x)
     char *y;
     int len;
 
-    if(x)
-	unmetafy(y = x, &len);
+    if (x && *x != ZLENUL)
+	y = stringaszleline((unsigned char *)x, &len, NULL);
     else
-	y = "", len = 0;
+	y = ZLENULSTR, len = 0;
     sizeline(zlell = zlecs + len);
-    memcpy(zleline + zlecs, y, len);
+    ZS_memcpy(zleline + zlecs, y, len);
     zsfree(x);
+    if (len)
+	free(y);
     fixsuffix();
     menucmp = 0;
 }
@@ -284,7 +285,8 @@ set_rbuffer(UNUSED(Param pm), char *x)
 static char *
 get_rbuffer(UNUSED(Param pm))
 {
-    return metafy((char *)zleline + zlecs, zlell - zlecs, META_HEAPDUP);
+    return (char *)zlelineasstring(zleline + zlecs, zlell - zlecs,
+				   0, NULL, NULL, 1);
 }
 
 /**/
@@ -547,27 +549,23 @@ unset_killring(Param pm, int exp)
 }
 
 static void
-set_prepost(unsigned char **textvar, int *lenvar, char *x)
+set_prepost(ZLE_STRING_T *textvar, int *lenvar, char *x)
 {
     if (*lenvar) {
-	zfree(*textvar, *lenvar);
+	free(*textvar);
 	*textvar = NULL;
 	*lenvar = 0;
     }
     if (x) {
-	unmetafy(x, lenvar);
-	if (*lenvar) {
-	    *textvar = (unsigned char *)zalloc(*lenvar);
-	    memcpy((char *)*textvar, x, *lenvar);
-	}
+	*textvar = stringaszleline((unsigned char *)x, lenvar, NULL);
 	free(x);
     }
 }
 
 static char *
-get_prepost(unsigned char *text, int len)
+get_prepost(ZLE_STRING_T text, int len)
 {
-    return metafy((char *)text, len, META_HEAPDUP);
+    return (char *)zlelineasstring(text, len, 0, NULL, NULL, 1);
 }
 
 /**/

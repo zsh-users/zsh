@@ -287,7 +287,7 @@ zrefresh(void)
 	*sen,			/* pointer to end of the video buffer (eol)  */
 	*u;			/* pointer for status line stuff */
     ZLE_STRING_T t,		/* pointer into the real buffer		     */
-	*scs;			/* pointer to cursor position in real buffer */
+	scs;			/* pointer to cursor position in real buffer */
     char **qbuf;		/* tmp					     */
     ZLE_STRING_T tmpline;	/* line with added pre/post text */
     int tmpcs, tmpll;		/* ditto cursor position and line length */

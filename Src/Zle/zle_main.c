@@ -829,7 +829,7 @@ zleread(char **lp, char **rp, int flags, int context)
     selectlocalmap(NULL);
     fixsuffix();
     if ((s = (unsigned char *)getlinknode(bufstack))) {
-	setline((char *)s);
+	setline((char *)s, ZSL_TOEND);
 	zsfree((char *)s);
 	if (stackcs != -1) {
 	    zlecs = stackcs;

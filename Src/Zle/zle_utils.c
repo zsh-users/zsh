@@ -410,9 +410,14 @@ foredel(int ct)
 
 /**/
 void
-setline(char const *s)
+setline(char *s, int flags)
 {
-    char *scp = ztrdup(s);
+    char *scp;
+
+    if (flags & ZSL_COPY)
+	scp = ztrdup(s);
+    else
+	scp = s;
     /*
      * TBD: we could make this more efficient by passing the existing
      * allocated line to stringaszleline.
@@ -421,10 +426,13 @@ setline(char const *s)
 
     zleline = stringaszleline(scp, &zlell, &linesz);
 
-    if ((zlecs = zlell) && invicmdmode())
+    if ((flags & ZSL_TOEND) && (zlecs = zlell) && invicmdmode())
 	zlecs--;
+    else if (zlecs > zlell)
+	zlecs = zlell;
 
-    free(scp);
+    if (flags & ZSL_COPY)
+	free(scp);
 }
 
 /**/

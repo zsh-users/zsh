@@ -567,7 +567,7 @@ zle_setline(Histent he)
     remember_edits();
     mkundoent();
     histline = he->histnum;
-    setline(ZLETEXT(he));
+    setline(ZLETEXT(he), ZSL_COPY|ZSL_TOEND);
     setlastline();
     clearlist = 1;
 }
