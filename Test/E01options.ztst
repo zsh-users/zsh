@@ -1,0 +1,181 @@
+# Test various shell options.
+# Interactive options not tested here:
+#    ALWAYS_LAST_PROMPT
+#    ALWAYS_TO_END
+#    APPEND_HISTORY (history not maintained)
+#    AUTO_LIST
+#    AUTO_MENU
+#    AUTO_NAME_DIRS  (named directory table not maintained)
+#    AUTO_PARAM_KEYS
+#    AUTO_PARAM_SLASH
+#    AUTO_REMOVE_SLASH
+#    AUTO_RESUME
+#    BANG_HIST
+#    BASH_AUTO_LIST
+#    BEEP (!)
+#    BG_NICE
+#    CHECK_JOBS
+#    COMPLETE_ALIASES
+#    COMPLETE_IN_WORD
+#    CORRECT
+#    CORRECT_ALL
+#    CSH_JUNKIE_HISTORY
+# The following require SHINSTDIN and are not (yet) tested:
+#    AUTO_CD (why?)
+
+%prep
+  mkdir options.tmp && cd options.tmp
+  mkdir tmpcd
+  touch tmpfile1 tmpfile2
+  mydir=$PWD
+
+%test
+
+  alias echo='print foo'
+  unsetopt aliases
+  # use eval else aliases are all parsed at start
+  eval echo bar
+  setopt aliases
+  eval echo bar
+  unalias echo
+0:ALIASES option
+>bar
+>foo bar
+
+  setopt allexport
+  testpm1=exported
+  unsetopt allexport
+  testpm2=unexported
+  print ${(t)testpm1}
+  print ${(t)testpm2}
+0:ALL_EXPORT option
+>scalar-export
+>scalar
+  
+  # Count the number of directories on the stack.  Don't care what they are.
+  dircount() { dirs -v | tail -1 | awk '{ print $1 + 1}'; }
+  unsetopt autopushd
+  cd tmpcd
+  dircount
+  cd ..
+  setopt autopushd
+  cd tmpcd
+  dircount
+  cd ..
+  unsetopt autopushd
+0:AUTO_PUSHD option
+>1
+>2
+
+  unsetopt badpattern
+  print [a
+  setopt badpattern
+  print [b
+1:BAD_PATTERN option
+>[a
+?ZTST_execchunk:2: bad pattern: [b
+
+  unsetopt bareglobqual nomatch
+  print *(.)
+  setopt bareglobqual nomatch
+  print *(.)
+0:BARE_GLOB_QUAL option
+>*(.)
+>tmpfile1 tmpfile2
+
+  setopt braceccl
+  print {abcd}
+  unsetopt braceccl
+  print {abcd}
+0:BRACE_CCL option
+>a b c d
+>{abcd}
+
+  setopt bsdecho
+  echo "histon\nimpington"
+  echo -e "girton\ncottenham"
+  unsetopt bsdecho
+  echo "newnham\ncomberton"
+0:BSD_ECHO option
+>histon\nimpington
+>girton
+>cottenham
+>newnham
+>comberton
+
+  unsetopt c_bases
+  print $(( [#16]15 ))
+  print $(( [#8]9 ))
+  setopt c_bases
+  print $(( [#16]31 ))
+  print $(( [#8]17 ))
+  setopt octal_zeroes
+  print $(( [#8]19 ))
+  unsetopt c_bases octal_zeroes
+0:C_BASES option
+>16#F
+>8#11
+>0x1F
+>8#21
+>023
+
+  setopt cdablevars
+  # only absolute paths are eligible for ~-expansion
+  cdablevar1=tmpcd
+  (cd cdablevar1)
+  cdablevar2=$PWD/tmpcd
+  cd cdablevar2
+  cd ..
+  print back in ${PWD:t}
+  unsetopt cdablevars
+  cd cdablevar2
+1q:CDABLE_VARS option
+>`print -P '%~'`/tmpcd
+>back in options.tmp
+?ZTST_execchunk:cd:2: no such file or directory: cdablevar1
+?ZTST_execchunk:cd:2: no such file or directory: cdablevar2
+
+# CHASE_DOTS should go with CHASE_LINKS in B01cd.ztst
+# which saves me having to write it here.
+
+  setopt noclobber
+  rm -f foo1 bar1 rod1
+  echo waterbeach >foo1
+  (echo landbeach >foo1)
+  cat foo1
+  (echo lode >>bar1)
+  [[ -f bar1 ]] && print That shouldn\'t be there.
+  echo denny >rod1
+  echo wicken >>rod1
+  cat rod1
+  unsetopt noclobber
+  rm -f foo2 bar2 rod2
+  echo ely >foo2
+  echo march >foo2
+  cat foo2
+  echo wimpole >>bar2
+  cat bar2
+  echo royston >rod2
+  echo foxton >>rod2
+  cat rod2
+0:CLOBBER option
+>waterbeach
+>denny
+>wicken
+>march
+>wimpole
+>royston
+>foxton
+?ZTST_execchunk:2: file exists: foo1
+?ZTST_execchunk:2: no such file or directory: bar1
+
+   setopt cshjunkieloops
+   eval 'for f in swaffham bulbeck; print $f; end'
+   print next one should fail >&2
+   unsetopt cshjunkieloops
+   eval 'for f in chesterton arbury; print $f; end'
+1:CSH_JUNKIE_LOOPS option (for loop)
+>swaffham
+>bulbeck
+?next one should fail
+?ZTST_execchunk:-1: parse error near `end'

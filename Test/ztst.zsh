@@ -107,7 +107,7 @@ ZTST_testfailed() {
 ZTST_verbose() {
   local lev=$1
   shift
-  [[ -n $ZTST_verbose && $ZTST_verbose -ge $lev ]] && print -- $* >&8
+  [[ -n $ZTST_verbose && $ZTST_verbose -ge $lev ]] && print -r -- $* >&8
 }
 ZTST_hashmark() {
   [[ ZTST_verbose -le 0 && -t 8 ]] && print -nu8 ${(pl:SECONDS::\#::\#\r:)}

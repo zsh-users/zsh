@@ -1,3 +1,7 @@
+2001-05-11  Peter Stephenson  <pws@csr.com>
+
+	* 14313: Test/E01options.ztst, Test/ztst.zsh: new options tests.
+
 2001-05-10  Wayne Davison  <wayned@users.sourceforge.net>
 
 	* 14304: Src/hist.c: Fixed an obscure local-history bug that could
