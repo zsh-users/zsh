@@ -1,3 +1,7 @@
+2001-12-17  Oliver Kiddle  <opk@zsh.org>
+
+	* 16351: Src/params.c: fix bug in parameter unset code
+
 2001-12-14  Clint Adams  <clint@zsh.org>
 
         * 16336: Completion/Debian/Type/_deb_packages:
