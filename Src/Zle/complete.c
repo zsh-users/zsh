@@ -894,11 +894,9 @@ bin_compset(char *name, char **argv, char *ops, int func)
 	break;
     case CVT_RANGEPAT:
 	tokenize(sa);
-	sa = rembslash(sa);
 	remnulargs(sa);
 	if (sb) {
 	    tokenize(sb);
-	    sb = rembslash(sb);
 	    remnulargs(sb);
 	}
 	break;
@@ -914,7 +912,6 @@ bin_compset(char *name, char **argv, char *ops, int func)
 	} else
 	    na = -1;
 	tokenize(sa);
-	sa = rembslash(sa);
 	remnulargs(sa);
 	break;
     }
