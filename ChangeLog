@@ -97,6 +97,11 @@
 	* 15846: aczsh.m4: Fix attempt to restore LDFLAGS from non-existent
 	saved value when testing RTLD_GLOBAL.
 
+2001-09-18  Wayne Davison  <wayned@users.sourceforge.net>
+
+	* 15836: Src/builtin.c: Further modify the "fc -l" code to tolerate
+	out-of range values.
+
 2001-09-17  Wayne Davison  <wayned@users.sourceforge.net>
 
 	* 15837: Src/Zle/zle_hist.c: Fixed incremental search in vared
@@ -106,6 +111,17 @@
 
 	* Akinori MUSHA: 15815: Completion/BSD/Command/_bsd_pkg: More
 	detailed completion of package options on different BSD flavors.
+
+2001-09-14  Wayne Davison  <wayned@users.sourceforge.net>
+
+	* 15809: Src/hist.c: With HIST_NO_STORE, don't ignore what looks like
+	a history command if we're really going to call a user-defined shell
+	function.
+
+2001-09-13  Wayne Davison  <wayned@users.sourceforge.net>
+
+	* 15806: Src/builtin.c, Src/hist.c: Fixed "r" with an empty history
+	and the non-storing nature of "r" with HIST_NO_STORE.
 
 2001-09-12  Oliver Kiddle  <opk@zsh.org>
 
