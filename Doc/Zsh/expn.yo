@@ -721,8 +721,8 @@ Use a string describing the type of the parameter where the value
 of the parameter would usually appear. This string consists of keywords
 separated by hyphens (`tt(-)'). The first keyword in the string describes
 the main type, it can be one of `tt(scalar)', `tt(array)', `tt(integer)',
-or `tt(association)'. The other keywords describe the type in more
-detail:
+`tt(float)' or `tt(association)'. The other keywords describe the type in
+more detail:
 
 startitem()
 item(tt(local))(

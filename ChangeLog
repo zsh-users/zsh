@@ -1,5 +1,8 @@
 2000-08-10  Oliver Kiddle  <opk@zsh.org>
 
+	* 12585: Doc/Zsh/compsys.yo, Doc/Zsh/compwid.yo, Doc/Zsh/expn.yo,
+	Doc/Zsh/mod_complist.yo, Doc/Zsh/mod_zutil.yo: minor doc fixes
+
 	* 12583: Completion/Base/_math, Completion/Builtins/_arrays,
 	Completion/Builtins/_vars, Completion/Builtins/_zpty,
 	Completion/Commands/_bash_completions, Completion/Core/_parameters,

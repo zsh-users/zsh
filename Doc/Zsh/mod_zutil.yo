@@ -131,7 +131,7 @@ by the var(sep) string and padding the var(left) strings with spaces
 to the right so that the var(sep) strings in the result (and hence the 
 var(right) strings after them) are all aligned if the strings are
 printed below each other.  All strings without a colon are left
-unchanged and all strings with a empty var(right) string have the
+unchanged and all strings with an empty var(right) string have the
 trailing colon removed.  In both cases the lengths of the strings
 are not used to determine how the other strings are to be aligned.
 The resulting strings are stored in the var(array).

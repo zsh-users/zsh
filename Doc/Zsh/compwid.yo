@@ -498,7 +498,7 @@ item(tt(-d) var(array))(
 This adds per-match display strings. The var(array) should contain one 
 element per var(word) given. The completion code will then display the 
 first element instead of the first var(word), and so on. The
-var(array) may be given as the name of a array parameter or directly
+var(array) may be given as the name of an array parameter or directly
 as a space-separated list of words in parentheses.
 
 If there are fewer display strings than var(words), the leftover
