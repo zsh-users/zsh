@@ -909,6 +909,8 @@ par_for(int *complex)
 	ecstr(tokstr);
 	incmdpos = 1;
 	yylex();
+	while (isnewlin && !csh)
+	  yylex();
 	if (tok == STRING && !strcmp(tokstr, "in")) {
 	    int np, n;
 
