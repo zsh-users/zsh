@@ -4609,6 +4609,48 @@ docompletion(char *s, int lst, int incmd)
 	    inststr(origline);
 	    cs = origcs;
 	    showinglist = -2;
+	} else if (useline == 2 && nmatches > 1) {
+	    int first = 1, nm = nmatches;
+	    Cmatch *mc;
+
+	    menucmp = 1;
+	    menuacc = 0;
+
+	    for (minfo.group = amatches;
+		 minfo.group && !(minfo.group)->mcount;
+		 minfo.group = (minfo.group)->next);
+
+	    mc = (minfo.group)->matches;
+
+	    while (1) {
+		if (!first)
+		    acceptlast();
+		first = 0;
+
+		if (!--nm)
+		    menucmp = 0;
+
+		do_single(*mc);
+		minfo.cur = mc;
+
+		if (!*++(minfo.cur)) {
+		    do {
+			if (!(minfo.group = (minfo.group)->next))
+			    break;
+		    } while (!(minfo.group)->mcount);
+		    if (!minfo.group)
+			break;
+		    minfo.cur = minfo.group->matches;
+		}
+		mc = minfo.cur;
+	    }
+	    menucmp = 0;
+	    minfo.cur = NULL;
+
+	    if (compforcelist && *compforcelist && uselist)
+		showinglist = -2;
+	    else
+		invalidatelist();
 	} else if (useline) {
 	    /* We have matches. */
 	    if (nmatches > 1) {
@@ -4637,7 +4679,7 @@ docompletion(char *s, int lst, int incmd)
 	}
 	/* Print the explanation strings if needed. */
 	if (!showinglist && validlist && usemenu != 2 && nmatches != 1 &&
-	    (!oldlist || !listshown)) {
+	    useline != 2 && (!oldlist || !listshown)) {
 	    Cmgroup g = amatches;
 	    Cexpl *e;
 	    int up = 0, tr = 1, nn = 0;
@@ -4948,6 +4990,8 @@ callcompfunc(char *s, char *fn)
 	else if (!strcmp(compinsert, "auto") ||
 		 !strcmp(compinsert, "automenu"))
 	    useline = 1, usemenu = 2;
+	else if (!strcmp(compinsert, "all"))
+	    useline = 2, usemenu = 0;
 	else if (idigit(*compinsert)) {
 	    char *m;
 

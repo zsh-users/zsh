@@ -259,6 +259,9 @@ around, so that a value of zero selects the last match or group and a value
 one more than the maximum selects the first. Unless the value of this
 key ends in a space, the match is inserted as in a menu-completion,
 i.e. without automatically appending a space.
+
+It may also be set to tt(all), which makes all matches generated be
+inserted into the line.
 )
 item(tt(to_end))(
 Specifies the occasions on which the cursor is moved to the end of a string
