@@ -9,4 +9,5 @@ DISTFILES_SRC='
     parameter.mdd parameter.c
     stat.mdd stat.c
     zftp.mdd zftp.c
+    zutil.mdd zutil.c
 '

@@ -2234,7 +2234,6 @@ inittyptab(void)
 	typtab[t0] = typtab[t0 - 'a' + 'A'] = IALPHA | IALNUM | IIDENT | IUSER | IWORD;
     for (t0 = 0240; t0 != 0400; t0++)
 	typtab[t0] = IALPHA | IALNUM | IIDENT | IUSER | IWORD;
-    typtab['.'] |= IIDENT;
     typtab['_'] = IIDENT | IUSER;
     typtab['-'] = IUSER;
     typtab[' '] |= IBLANK | INBLANK;

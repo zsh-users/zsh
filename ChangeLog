@@ -1,11 +1,176 @@
+1999-12-15  Peter Stephenson  <pws@pwstephenson.fsnet.co.uk>
+
+	* Clint: 9065: Src/builtin.c: change order of tests in 9028.
+
+	* Bart: 9064: Functions/Zle/predict-on: shouldn't use _style any
+	more.
+
+	* 9058: Completion/Base/_arguments, Completion/Base/_combination,
+	Completion/Base/_command_names, Completion/Base/_jobs,
+	Completion/Base/_tilde, Completion/Builtins/_cd,
+	Completion/Builtins/_kill, Completion/Builtins/_stat,
+	Completion/Builtins/_wait, Completion/Core/_path_files,
+	Completion/Core/_sort_tags, Completion/Core/_tags,
+	Completion/Core/compinit, Doc/Zsh/compsys.yo, Src/Makemod.in:
+	Many small cleanups, plus change sort-tags to tag-order and
+	add to syntax a bit.
+
+	* Tanaka Akira: 9054: Test/50cd.ztst: get PWD without symlinks, to
+	avoid messing up cd tests.
+
+1999-12-14  Peter Stephenson  <pws@pwstephenson.fsnet.co.uk>
+
+	* Oliver: 9047: zsh-3.1.6-pws-11.new/Src/Zle/compcore.c,
+	zsh-3.1.6-pws-11.new/Src/Zle/compresult.c,
+	zsh-3.1.6-pws-11.new/Src/Zle/zle_thingy.c,
+	zsh-3.1.6-pws-11.new/Src/Zle/zle_tricky.c,
+	zsh-3.1.6-pws-11.new/Src/mkmakemod.sh: hack .export files to
+	be made in time for use.
+
+	* Sven: 9039: Doc/Zsh/mod_compctl.yo: description change.
+
+	* Sven: 9035: Completion/Core/_main_complete,
+	Completion/Core/_normal, Completion/Core/compdump,
+	Completion/Core/compinit: more small optimisations: _patcomps,
+	postpatcomps are assocs; avoid post-processing in _main_complete;
+	fix command name in _normal.
+
+	* Sven: 9031: Completion/Core/_path_files, Doc/Zsh/compsys.yo:
+	complete .. only for special-dirs.
+
+	* Clint: 9028: Src/builtin.c: hack to be able to change to
+	subdirectories even when the current directory is renamed.
+	Hopefully to be replaced by something more elegant eventually.
+
+	* pws: 9048: Completion/Core/_sort_tags, Completion/Core/compinit,
+	Completion/User/_mh, Doc/Zsh/compsys.yo,
+	Functions/Zle/incremental-complete-word: assorted completion
+	fixes, documentation improvement, plus sort-tags style.
+	
+1999-12-13  Peter Stephenson  <pws@pwstephenson.fsnet.co.uk>
+
+	* Zefram: 9023: Doc/Makefile.in, Doc/Zsh/.cvsignore,
+	Doc/Zsh/.distfiles, Doc/Zsh/manual.yo, Doc/Zsh/mod_cap.yo,
+	Doc/Zsh/mod_clone.yo, Doc/Zsh/mod_compctl.yo,
+	Doc/Zsh/mod_complete.yo, Doc/Zsh/mod_complist.yo,
+	Doc/Zsh/mod_computil.yo, Doc/Zsh/mod_deltochar.yo,
+	Doc/Zsh/mod_example.yo, Doc/Zsh/mod_files.yo,
+	Doc/Zsh/mod_mapfile.yo, Doc/Zsh/mod_mathfunc.yo,
+	Doc/Zsh/mod_parameter.yo, Doc/Zsh/mod_sched.yo,
+	Doc/Zsh/mod_stat.yo, Doc/Zsh/mod_zftp.yo, Doc/Zsh/mod_zle.yo,
+	Doc/Zsh/mod_zleparameter.yo, Doc/Zsh/mod_zutil.yo,
+	Doc/Zsh/modules.yo: generate module documentation automatically
+	from a single list in the makefile.
+
+	* Sven: 9020: Completion/Core/_path_files, Doc/Zsh/compsys.yo:
+	special-dirs style allows completion of . and ..
+
+	* Sven: 9018: Completion/Builtins/_pids,
+	Completion/Core/_path_files, Completion/User/_cvs,
+	Completion/User/_pbm: completion optimisations.
+
+	* Zefram: 9013: patching file Doc/Zsh/mod_files.yo,
+	Src/Modules/files.c: use . as alternative to : for user and group
+	separator.
+
+	* Sven: 2776: Completion/Core/_path_files: handling of . and .. in
+	path.
+
+	* Felix: (most of) 9007: Src/Modules/parameter.c,
+	Src/modules/parameter.mdd, mod_parameter.yo: jobdirs special assoc
+	array.
+
+	* Bart: 9005: Src/exec.c: problem backgrounding shell script.
+
+	* Tanaka Akira: 9004: Test/Makefile.in: run tests with zsh -f.
+
+	* pws: 9024: Etc/zsh-development-guide, Test/.distfiles,
+	Test/01grammar.ztst, Test/02alias.ztst, Test/03quoting.ztst,
+	Test/50cd.ztst, Test/cd.ztst, Test/ztst.zsh: new tests for basic
+	shell stuff.
+
+1999-12-10  Peter Stephenson  <pws@pwstephenson.fsnet.co.uk>
+
+	* pws: 8997: Src/builtin.c, Src/exec.c, Src/params.c: exported
+	  values respect upper-/lowercase flags at the point at which they
+	  are set.
+
+	* Alexandre: 8994: Functions/Zftp/zftp_chpwd, Etc/FAQ.yo,
+	  Doc/Zsh/zftpsys.yo: extend 8993.
+
+	* Clint: 8993: Functions/Zftp/zftp_chpwd: titlebar support in more
+	  general xterm-like emulators.
+
+	* Sven: 8992: Completion/Base/_arguments,
+	  Completion/Base/_combination, Completion/Base/_describe,
+	  Completion/Base/_first, Completion/Base/_jobs,
+	  Completion/Base/_regex_arguments, Completion/Base/_subscript,
+	  Completion/Base/_tilde, Completion/Builtins/_pids,
+	  Completion/Builtins/_popd, Completion/Builtins/_sched,
+	  Completion/Builtins/_signals, Completion/Builtins/_stat,
+	  Completion/Commands/_history_complete_word,
+	  Completion/Core/_approximate, Completion/Core/_description,
+	  Completion/Core/_expand, Completion/Core/_list,
+	  Completion/Core/_main_complete, Completion/Core/_match,
+	  Completion/Core/_message, Completion/Core/_oldlist,
+	  Completion/Core/_path_files, Completion/Core/_requested,
+	  Completion/Core/_setup, Completion/Core/_tags,
+	  Completion/Core/compinit, Completion/Debian/_apt,
+	  Completion/User/_cvs, Completion/User/_groups,
+	  Completion/User/_hosts, Completion/User/_ports,
+	  Completion/User/_socket, Completion/User/_urls,
+	  Completion/User/_users, Completion/X/_x_color, Doc/Zsh/compsys.yo,
+	  Doc/Zsh/mod_clone.yo, Doc/Zsh/mod_complete.yo,
+	  Doc/Zsh/mod_computil.yo, Doc/Zsh/mod_zutil.yo, Doc/Zsh/modules.yo,
+	  Etc/completion-style-guide,
+	  Functions/Zle/incremental-complete-word, Src/Modules/zutil.c,
+	  Src/Modules/zutil.mdd, Src/Zle/complist.c, Src/Zle/computil.c,
+	  Src/Zle/computil.mdd, Src/xmods.conf: compstyle is now
+	  implemented in terms of the new zstyle and zformat commands in
+	  the new zutil module.
+
+	* Tanaka Akira: 8990: Completion/User/_ports,
+	Completion/User/_socket: completion after `socket hosts'.
+
+1999-12-09  Peter Stephenson  <pws@pwstephenson.fsnet.co.uk>
+
+	* Zefram: 8982: Doc/Zsh/mod_files.yo, Src/Modules/files.c,
+	  Src/Modules/files.mdd, Src/system.h, configure.in: chown and
+	  chgrp are implemented as builtins in the files module.
+
+	* Sven: 8981: Src/Zle/complist.c: don't use old list with
+	  accept-and-infer-next-history's completion form.
+
+	* Andrej: 8973: Completion/User/_sudo: revised version.
+
+	* Zefram: 8968: Config/config.mk: dependencies for rebuilding
+	  defs.mk from defs.mk.in.
+
+	* Zefram: 8966: Config/defs.mk.in, Doc/Makefile.in, Makefile.in:
+	  proper install.html.
+
+	* Sven: 8965: Completion/Core/_description,
+	  Completion/Core/_files, Completion/Core/_main_complete,
+	  Completion/Core/_multi_parts, Completion/Core/_path_files,
+	  Completion/Core/_sep_parts, Doc/Zsh/compsys.yo,
+	  Etc/completion-style-guide: doc cleanup and tweak some option
+	  passing.
+
+	* Tanaka Akira: 8962: cd to test directory before removing
+	  temporaries.
+
+	* Tanaka Akira: 8957: Completion/User/.distfiles, Src/Makefile.in:
+	  _sudo missed out of 3.1.6-pws-11, and Src/Makefile.in didn't
+	  get patched properly.
+
 1999-12-08  Peter Stephenson  <pws@pwstephenson.fsnet.co.uk>
 
 	* pws: Config/version.mk: version 3.1.6-pws-11.
 
-	* pws: Src/Modules/zftp.c: command name buffer wasn't large enough
-	  for "zftp session".
+	* pws: 8955: Src/Modules/zftp.c: command name buffer wasn't large
+	  enough for "zftp session".
 
-	* pws: Makefile.in, Etc/zsh-development-guide, Test/Makefile.in:
+	* pws: 8954: Makefile.in, Etc/zsh-development-guide, Test/Makefile.in:
 	  targets for testing should be `check' and `test', which are there
 	  already.
 
@@ -92,7 +257,7 @@
 	  Doc/.distfiles, Doc/Makefile.in, Src/Makefile.in: More
 	  consistent renaming when altering programme name.
 
-	* Sven: 8902: Completion/Commands/_history_complete_word:
+	* Adam: 8902: Completion/Commands/_history_complete_word:
 	  directions broken.
 
 1999-12-05  Peter Stephenson  <pws@pwstephenson.fsnet.co.uk>

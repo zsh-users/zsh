@@ -42,7 +42,7 @@ INSTALL         = @INSTALL@
 
 check test:
 	for f in *.ztst; do \
-	  ../Src/zsh ztst.zsh $$f; \
+	  ../Src/zsh -f ztst.zsh $$f; \
 	done
 
 # ========== DEPENDENCIES FOR CLEANUP ==========
