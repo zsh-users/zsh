@@ -1,5 +1,9 @@
 2003-02-17  Oliver Kiddle  <opk@zsh.org>
 
+	* Doug Kearns: 18246: Completion/Unix/Command/_elinks,
+	Completion/Unix/Command/_ant, Completion/Unix/Command/_java:
+	minor update to _elinks and a couple of trivial fixes for java/ant
+
 	* 18242: Src/builtin.c, Completion/Zsh/Command/_read,
 	Doc/Zsh/builtins.yo: add -d option to read for specifying
 	delimiter to terminate input instead of newline

@@ -20,7 +20,7 @@ javac)
     '-extdirs[specify directories for extensions]:extensions directories:->extdirs' \
     '-d[specify destination directory]:directory:_files -/' \
     '-encoding[specify character encoding for source files]:encoding:->encoding' \
-    '-target[specify VM version]:release:(1.1 1.2)' \
+    '-target[specify VM version]:release:(1.{1..4})' \
     '*:java source file:_files -g \*.java' && return 0
   ;;
 
