@@ -1,7 +1,15 @@
+2000-05-01  Bart Schaefer  <schaefer@zsh.org>
+
+	* 11043: Completion/Core/_expand, Completion/User/_nedit: Catch
+	an eval-time parse error by forcing the eval into a subshell;
+	don't fail on nonexistent ~/.nedit file.
+
 2000-05-01  Oliver Kiddle  <opk@zsh.org>
 
 	* 11041: Completion/User/.distfiles, Completion/User/_bzip2:
 	Use of _arguments for bzip2 completion
+
+2000-04-31  Oliver Kiddle  <opk@zsh.org>
 
 	* 11037: Etc/MACHINES, Etc/NEWS, Etc/completion-style-guide,
 	Etc/zsh-development-guide: spelling corrections

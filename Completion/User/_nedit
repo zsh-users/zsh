@@ -44,7 +44,7 @@ else
     "$nedit_common[@]"
 fi
 
-[[ $state = lang ]] &&
+[[ $state = lang && -f ~/.nedit ]] &&
     _wanted neditlanguages expl 'language mode' \
         compadd -  ${(f)"$(sed -n \
             '/^nedit.languageMode/,/^nedit/ s/.*	\([^:]*\).*/\1/p' < ~/.nedit)"}

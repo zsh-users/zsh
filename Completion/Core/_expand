@@ -32,13 +32,14 @@ fi
 exp=("$word")
 
 # First try substitution. That weird thing spanning multiple lines
-# changes quoted spaces, tabs, and newlines into spaces.
+# changes quoted spaces, tabs, and newlines into spaces and protects
+# this function from aborting on parse errors in the expansion.
 
 { zstyle -s ":completion:${curcontext}:" substitute expr ||
   { [[ "$curcontext" = expand-word:* ]] && expr=1 } } &&
     [[ "${(e):-\$[$expr]}" -eq 1 ]] &&
-    exp=( "${(e)exp//\\[ 	
-]/ }" )
+    exp=( ${(f)"$(print -lR - ${(e)exp//\\[ 	
+]/ } 2>/dev/null)"} )
 
 # If the array is empty, store the original string again.
 
