@@ -3,6 +3,9 @@
 	* 16635: Src/Zle/zle_refresh.c: make sure we display lists in
 	singlelinezle mode
 
+	* unposted: Doc/Zsh/metafaq.yo: update distribution sites - remove one
+	site (France), add one (Netherlands)
+
 2002-02-18  Wayne Davison  <wayned@users.sourceforge.net>
 
 	* 16672: Src/hist.c: Fixed a just-introduced bug in prepnexthistent()
