@@ -76,7 +76,7 @@ zwarn(const char *fmt, const char *str, int num)
      */
     nicezputs((isset(SHINSTDIN) && !locallevel) ? "zsh" :
 	      scriptname ? scriptname : argzero, stderr);
-    fputs(": ", stderr);
+    fputc((unsigned char)':', stderr);
     zerrmsg(fmt, str, num);
 }
 
@@ -89,11 +89,11 @@ zwarnnam(const char *cmd, const char *fmt, const char *str, int num)
     trashzle();
     if (unset(SHINSTDIN) || locallevel) {
 	nicezputs(scriptname ? scriptname : argzero, stderr);
-	fputs(": ", stderr);
+	fputc((unsigned char)':', stderr);
     }
     if (cmd) {
 	nicezputs(cmd, stderr);
-	fputs(": ", stderr);
+	fputc((unsigned char)':', stderr);
     }
     zerrmsg(fmt, str, num);
 }
@@ -102,6 +102,11 @@ zwarnnam(const char *cmd, const char *fmt, const char *str, int num)
 void
 zerrmsg(const char *fmt, const char *str, int num)
 {
+    if ((unset(SHINSTDIN) || locallevel) && lineno)
+	fprintf(stderr, "%ld: ", (long)lineno);
+    else
+	fputc((unsigned char)' ', stderr);
+
     while (*fmt)
 	if (*fmt == '%') {
 	    fmt++;
@@ -149,10 +154,7 @@ zerrmsg(const char *fmt, const char *str, int num)
 	    putc(*fmt == Meta ? *++fmt ^ 32 : *fmt, stderr);
 	    fmt++;
 	}
-    if ((unset(SHINSTDIN) || locallevel) && lineno)
-	fprintf(stderr, " [%ld]\n", (long)lineno);
-    else
-	putc('\n', stderr);
+    putc('\n', stderr);
     fflush(stderr);
 }
 
