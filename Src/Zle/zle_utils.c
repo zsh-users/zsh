@@ -388,7 +388,7 @@ printbind(char *str, FILE *stream)
  * The message must be metafied.                              */
 
 /**/
-void mod_export
+mod_export void
 showmsg(char const *msg)
 {
     char const *p;

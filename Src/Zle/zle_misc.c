@@ -73,7 +73,7 @@ selfinsert(char **args)
 }
 
 /**/
-int
+mod_export int
 selfinsertunmeta(char **args)
 {
     lastchar &= 0x7f;

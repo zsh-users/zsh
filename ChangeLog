@@ -1,5 +1,8 @@
 2004-03-12  Peter Stephenson  <pws@csr.com>
 
+	* zsh-users/7160: Src/Zle/zle_misc.c, Src/Zle/zle_utils.c,
+	Util/check_exports: Check and fix mod_export entries.
+
 	* 19615: Etc/MACHINES: update information.
 
 2004-03-12  Oliver Kiddle  <opk@zsh.org>
