@@ -16,3 +16,5 @@ autobins="echoti"
 autoparams="terminfo"
 
 objects="terminfo.o"
+
+extralibs="terminfo"

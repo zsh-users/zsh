@@ -15,3 +15,5 @@ load=yes
 autobins="echotc"
 
 objects="termcap.o"
+
+extralibs="termcap"

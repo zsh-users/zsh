@@ -5,3 +5,5 @@ load=no
 autobins="cap getcap setcap"
 
 objects="cap.o"
+
+extralibs="cap"

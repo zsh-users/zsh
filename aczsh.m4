@@ -683,3 +683,27 @@ AC_DEFUN(zsh_COMPILE_FLAGS,
 	then LIBS="$4"
 	else LIBS="$enable_libs"
 	fi)])
+
+dnl zsh_SEARCH_LIBS(FUNCTION, SEARCH-LIBS [, ACTION-IF-FOUND
+dnl            [, ACTION-IF-NOT-FOUND [, OTHER-LIBRARIES]]])
+dnl Search for a library defining FUNC, if it's not already available.
+
+AC_DEFUN(zsh_SEARCH_LIBS,
+[AC_PREREQ([2.13])
+AC_CACHE_CHECK([for library containing $1], [ac_cv_search_$1],
+[ac_func_search_save_LIBS="$LIBS"
+ac_cv_search_$1="no"
+AC_TRY_LINK_FUNC([$1], [ac_cv_search_$1="none required"])
+test "$ac_cv_search_$1" = "no" && for i in $2; do
+LIBS="-l$i $5 $ac_func_search_save_LIBS"
+AC_TRY_LINK_FUNC([$1],
+[ac_cv_search_$1="-l$i"
+break])
+done
+LIBS="$ac_func_search_save_LIBS"])
+if test "$ac_cv_search_$1" != "no"; then
+  test "$ac_cv_search_$1" = "none required" || ZS_LIBS="$ac_cv_search_$1"
+  $3
+else :
+  $4
+fi])

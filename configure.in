@@ -504,7 +504,7 @@ dnl On ReliantUNIX -lc better be the last library, else funny things
 dnl may happen.
 AC_CHECK_LIB(c, printf, [LIBS="$LIBS -lc"])
 
-AC_CHECK_LIB(m, pow)
+AC_CHECK_LIB(m, pow, [LIBS_M="-lm"])
 
 dnl Prefer BSD termcap library to SysV curses library, except on certain
 dnl SYSV-derived systems.
@@ -514,7 +514,12 @@ case "$host_os" in
   *)             termcap_curses_order="termcap curses ncurses" ;;
 esac
 
-AC_SEARCH_LIBS(tgetent, [$termcap_curses_order])
+zsh_SEARCH_LIBS(tgetent, [$termcap_curses_order])
+LIBS_TERMCAP=$ZS_LIBS
+
+zsh_SEARCH_LIBS(tigetstr, [$termcap_curses_order])
+LIBS_TERMINFO=$ZS_LIBS
+
 AC_MSG_CHECKING(if boolcodes is available)
 AC_TRY_COMPILE([#include <curses.h>
 #include <term.h>], [char **test = boolcodes;],
@@ -549,7 +554,8 @@ AC_MSG_RESULT($strnames)
 dnl Some systems (Solaris 2.x, Linux Redhat 5.x) require
 dnl libnsl (Network Services Library) to find yp_all
 
-AC_SEARCH_LIBS(yp_all, nsl)
+zsh_SEARCH_LIBS(yp_all, nsl)
+LIBS_YP=$ZS_LIBS
 
 dnl I am told that told that unicos reqire these for nis_list
 if test `echo $host_os | sed 's/^\(unicos\).*/\1/'` = unicos; then
@@ -560,9 +566,11 @@ if test "x$dynamic" = xyes; then
   AC_CHECK_LIB(dl, dlopen)
 fi
 
-AC_CHECK_LIB(cap, cap_get_proc)
+AC_CHECK_LIB(cap, cap_get_proc, [LIBS_CAP="-lcap"
+AC_DEFINE(HAVE_LIBCAP)])
 
-AC_CHECK_LIB(socket, socket)
+AC_CHECK_LIB(socket, socket, [LIBS_SOCKET="-lsocket"
+AC_DEFINE(HAVE_LIBSOCKET)])
 
 dnl ---------------------
 dnl CHECK TERMCAP LIBRARY
@@ -831,6 +839,9 @@ dnl ---------------
 dnl need to integrate this function
 dnl AC_FUNC_STRFTIME
 
+SAVELIBS=$LIBS
+LIBS="$LIBS_TERMCAP $LIBS_TERMINFO $LIBS"
+
 AC_CHECK_FUNCS(strftime difftime gettimeofday \
 	       select poll \
 	       readlink lstat lchown faccessx fchdir ftruncate \
@@ -886,6 +897,8 @@ main()
 if test $zsh_cv_func_tgetent_accepts_null = yes; then
   AC_DEFINE(TGETENT_ACCEPTS_NULL)
 fi
+
+LIBS=$SAVELIBS
 
 AC_FUNC_MMAP
 if test x$ac_cv_func_mmap_fixed_mapped = xyes; then
@@ -1675,10 +1688,16 @@ if test "x$dynamic" = xyes; then
   test "$zsh_cv_shared_environ" = yes || dynamic=no
 dnl  test "$zsh_cv_sys_dynamic_broken" = no || dynamic=no
   if test "$ac_cv_func_tgetent" = yes; then
+    SAVELIBS=$LIBS
+    LIBS="$LIBS_TERMCAP $LIBS"
     zsh_SHARED_FUNCTION([tgetent])
+    LIBS=$SAVELIBS
   fi
   if test "$ac_cv_func_tigetstr" = yes; then
+    SAVELIBS=$LIBS
+    LIBS="$LIBS_TERMINFO $LIBS"
     zsh_SHARED_FUNCTION([tigetstr])
+    LIBS=$SAVELIBS
   fi
 fi
 
@@ -1752,6 +1771,12 @@ AC_SUBST(MOD_EXPORT)dnl
 AC_SUBST(MOD_IMPORT_VARIABLE)dnl
 AC_SUBST(MOD_IMPORT_FUNCTION)dnl
 AC_SUBST(EXTRAZSHOBJS)dnl
+AC_SUBST(LIBS_M)dnl
+AC_SUBST(LIBS_CAP)dnl
+AC_SUBST(LIBS_SOCKET)dnl
+AC_SUBST(LIBS_TERMCAP)dnl
+AC_SUBST(LIBS_TERMINFO)dnl
+AC_SUBST(LIBS_YP)dnl
 
 # Generate config.modules.  We look for *.mdd files in first and second
 # level subdirectories.  Any existing line not containing 'auto=y' will be

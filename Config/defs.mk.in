@@ -63,6 +63,14 @@ DLLD            = @DLLD@
 EXPOPT          = @EXPOPT@
 IMPOPT          = @IMPOPT@
 
+# extra libraries
+LIBS_M          = @LIBS_M@
+LIBS_CAP        = @LIBS_CAP@
+LIBS_SOCKET     = @LIBS_SOCKET@
+LIBS_TERMCAP    = @LIBS_TERMCAP@
+LIBS_TERMINFO   = @LIBS_TERMINFO@
+LIBS_YP         = @LIBS_YP@
+
 # utilities
 AWK             = @AWK@
 YODL            = @YODL@
