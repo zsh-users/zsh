@@ -1,3 +1,7 @@
+2001-04-09  Peter Stephenson  <pws@csr.com>
+
+	* unposted: Config/version.mk: 4.0.1-pre-3.
+
 2001-04-06  Bart Schaefer  <schaefer@zsh.org>
 
 	* 13919: Completion/compinit: Clarify the prompt presented when
