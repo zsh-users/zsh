@@ -176,6 +176,7 @@ if [[ "$*" != "$_args_cache_descr" ]]; then
 	fi
       done
     fi
+    _args_cache_long=( "${(@)_args_cache_long:# #}" )
 
     set -- "$tmpargv[@]" "$_args_cache_long[@]"
   fi
