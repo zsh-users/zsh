@@ -9,38 +9,34 @@ local curcontext="$curcontext" state line expl
 typeset -A opt_args
 
 if (( ! $+_telnet_args )); then
-  local k help="$(telnet -\? < /dev/null 2>&1)"
+  local help="$(telnet -\? < /dev/null 2>&1)"
   local -A optionmap
-  optionmap=( "[-8]" '-8[allow 8-Bit data]' \
-              "[-E]" '-E[disable an escape character]' \
-              "[-K]" '-K[no automatic login]' \
-              "[-L]" '-L[allow 8-Bit data on output]' \
-              "[-N]" '-N[supress reverse lookup]' \
-              "[-S tos]" '-S+:IP type-of-service:' \
-              "[-X atype]" '-X+:authentication type to disable:' \
-              "[-a]" '-a[attempt automatic login]' \
-              "[-c]" '-c[disable .telnetrc]' \
-              "[-d]" '-d[debug mode]' \
-              "[-e char]" '-e+[specify escape character]:escape character:' \
-              "[-f/" '-f' \
-              "/-F]" '-F' \
-              "[-k realm]" '-k+:realm:' \
-              "[-l user]" '-l+[specify user]:user:->users' \
-              "[-n tracefile]" '-n+[specify tracefile]:tracefile:_files' \
-              "[-r]" '-r[rlogin like user interface]' \
-              "[-s src_addr]" '-s+[set source IP address]:src_addr:' \
-              "[-x]" '-x' \
-              "[-t transcom]" '-t+:transcom:' \
-              "[-noasynch]" '-noasynch' \
-              "[-noasyncnet]" '-noasyncnet' \
-              "[-noasynctty]" '-noasynctty' )
-
-  _telnet_args=()
-  for k in ${(k)optionmap}
-  do
-    [[ "$help" = *"$k"* ]] &&
-      _telnet_args=( "$_telnet_args[@]" "$optionmap[$k]" )
-  done
+  optionmap=(
+    '*\[-8\]*' '-8[allow 8-Bit data]'
+    '*\[-E\]*' '-E[disable an escape character]'
+    '*\[-K\]*' '-K[no automatic login]'
+    '*\[-L\]*' '-L[allow 8-Bit data on output]'
+    '*\[-N\]*' '-N[supress reverse lookup]'
+    '*\[-S tos\]*' '-S+:IP type-of-service:'
+    '*\[-X atype\]*' '-X+:authentication type to disable:'
+    '*\[-a\]*' '-a[attempt automatic login]'
+    '*\[-c\]*' '-c[disable .telnetrc]'
+    '*\[-d\]*' '-d[debug mode]'
+    '*\[-e char\]*' '-e+[specify escape character]:escape character:'
+    '*\[-f/*' '-f'
+    '*/-F\]*' '-F'
+    '*\[-k realm\]*' '-k+:realm:'
+    '*\[-l user\]*' '-l+[specify user]:user:->users'
+    '*\[-n tracefile\]*' '-n+[specify tracefile]:tracefile:_files'
+    '*\[-r\]*' '-r[rlogin like user interface]'
+    '*\[-s src_addr\]*' '-s+[set source IP address]:src_addr:'
+    '*\[-x\]*' '-x'
+    '*\[-t transcom\]*' '-t+:transcom:'
+    '*\[-noasynch\]*' '-noasynch'
+    '*\[-noasyncnet\]*' '-noasyncnet'
+    '*\[-noasynctty\]*' '-noasynctty'
+  )
+  _telnet_args=($optionmap[(K)"$help"])
 fi
 
 _arguments -C -s \
