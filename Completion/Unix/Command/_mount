@@ -785,9 +785,11 @@ devordir)
       'directories:mount point:compadd -a mp_tmp' && ret=0
     ;;
   *)
-    _alternative \
-      'devices:device:_files -P /dev/ -W /dev' \
-      'directories:mount point:_directories' && ret=0
+    if (( ${${(s.,.)opt_args[-o]}[(I)loop(|=*)]} )) ; then
+      _wanted device-files expl 'loop device file' _files && ret=0
+    else
+      _wanted files expl 'device or mount point' _files -g "*(-%,-/)" && ret=0
+    fi
     ;;
   esac
   ;;
