@@ -1,6 +1,6 @@
 #compdef xterm
 
-_arguments \
+_xt_arguments \
   '-version' \
   '-help' \
   '-132' \
@@ -16,13 +16,13 @@ _arguments \
   '-cc:character class:' \
   '-cm' '+cm' \
   '-cn' '+cn' \
-  '-cr:text cursor color:_color' \
+  '-cr:text cursor color:_colors' \
   '-cu' '+cu' \
   '-dc' '+dc' \
   '-e:program: _command_names -e:*::program arguments: _normal' \
   '-fb:bold font:' \
   '-fi:icon font:' \
-  '-hc:background color for highlighted text:_color' \
+  '-hc:background color for highlighted text:_colors' \
   '-hf' '+hf' \
   '-ie' '+ie' \
   '-im' '+im' \
@@ -31,7 +31,7 @@ _arguments \
   '-ls' '+ls' \
   '-mb' '+mb' \
   '-mc:multi-click threshold (milliseconds):' \
-  '-ms:pointer cursor color:_color' \
+  '-ms:pointer cursor color:_colors' \
   '-nb:margin bell number:' \
   '-nul' '+nul' \
   '-pc' '+pc' \
@@ -58,15 +58,3 @@ _arguments \
   '-ziconbeep:iconbeep (percent):' \
   '-C' \
   '-S-:pseudo-terminal and file descriptor:' \
-  '-bd:border color:_color' \
-  '-bg:background color:_color' \
-  '-bw:border width:' \
-  '-display:display:_x_display' \
-  '-fg:foreground color:_color' \
-  '-fn:font:' \
-  '-geometry:geometry:' \
-  '-iconic' \
-  '-name:name:' \
-  '-rv' \
-  '-title:title:' \
-  '-xrm:resource:'
