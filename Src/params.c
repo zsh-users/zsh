@@ -3357,6 +3357,8 @@ convfloat(double dval, int digits, int flags, FILE *fout)
     } else {
 	VARARR(char, buf, 512 + digits);
 	sprintf(buf, fmt, digits, dval);
+	if (!strchr(buf, 'e') && !strchr(buf, '.'))
+	    strcat(buf, ".");
 	return dupstring(buf);
     }
 }
