@@ -2777,7 +2777,7 @@ bin_print(char *name, char **args, char *ops, int func)
 	int nwords = 0, nlen, iwords;
 	char **pargs = args;
 
-	ent = prepnexthistent(++curhist);
+	ent = prepnexthistent(zleactive ? curhist++ : ++curhist);
 	while (*pargs++)
 	    nwords++;
 	if ((ent->nwords = nwords)) {
