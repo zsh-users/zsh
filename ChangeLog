@@ -1,3 +1,8 @@
+2001-06-28  Peter Stephenson  <pws@pwstephenson.fsnet.co.uk>
+
+	* 15151: zshconfig.ac: --enable-sitefndir should be
+	--enable-site-fndir, spotted by Jos Backus.
+
 2001-06-26  Sven Wischnowsky  <wischnow@zsh.org>
 
 	* user/3946: Src/Zle/computil.c: fix for finding the first
