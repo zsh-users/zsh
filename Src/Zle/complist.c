@@ -58,7 +58,7 @@ static Keymap mskeymap;
 #define COL_SP 14
 #define COL_MA 15
 #define COL_HI 16
-#define COL_MU 17
+#define COL_DU 17
 
 #define NUM_COLS 18
 
@@ -70,7 +70,7 @@ static Keymap mskeymap;
 
 static char *colnames[] = {
     "no", "fi", "di", "ln", "pi", "so", "bd", "cd", "ex", "mi",
-    "lc", "rc", "ec", "tc", "sp", "ma", "hi", "mu", NULL
+    "lc", "rc", "ec", "tc", "sp", "ma", "hi", "du", NULL
 };
 
 /* Default values. */
@@ -659,7 +659,7 @@ clprintm(Cmgroup g, Cmatch *mp, int mc, int ml, int lastc, int width,
 	} else if (m->flags & CMF_NOLIST)
 	    zcputs(&mcolors, g->name, COL_HI);
 	else if (mselect >= 0 && (m->flags & (CMF_MULT | CMF_FMULT)))
-	    zcputs(&mcolors, g->name, COL_MU);
+	    zcputs(&mcolors, g->name, COL_DU);
 	else
 	    subcols = putmatchcol(&mcolors, g->name, m->disp);
 	if (subcols)
@@ -698,7 +698,7 @@ clprintm(Cmgroup g, Cmatch *mp, int mc, int ml, int lastc, int width,
 	} else if (m->flags & CMF_NOLIST)
 	    zcputs(&mcolors, g->name, COL_HI);
 	else if (mselect >= 0 && (m->flags & (CMF_MULT | CMF_FMULT)))
-	    zcputs(&mcolors, g->name, COL_MU);
+	    zcputs(&mcolors, g->name, COL_DU);
 	else if (buf)
 	    subcols = putfilecol(&mcolors, g->name, path, buf->st_mode);
 	else

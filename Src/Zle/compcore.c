@@ -2368,16 +2368,21 @@ makearray(LinkList l, int type, int flags, int *np, int *nlp, int *llp)
 		  (int (*) _((const void *, const void *)))matchcmp);
 
 	    if (!(flags & CGF_UNIQCON)) {
+		int dup;
+
 		/* And delete the ones that occur more than once. */
 		for (ap = cp = rp; *ap; ap++) {
 		    *cp++ = *ap;
 		    for (bp = ap; bp[1] && matcheq(*ap, bp[1]); bp++, n--);
 		    ap = bp;
 		    /* Mark those, that would show the same string in the list. */
-		    for (; bp[1] && !(*ap)->disp && !(bp[1])->disp &&
-			     !strcmp((*ap)->str, (bp[1])->str); bp++)
+		    for (dup = 0; bp[1] && !(*ap)->disp && !(bp[1])->disp &&
+			     !strcmp((*ap)->str, (bp[1])->str); bp++) {
 			(bp[1])->flags |= CMF_MULT;
-		    (*ap)->flags |= CMF_FMULT;
+			dup = 1;
+		    }
+		    if (dup)
+			(*ap)->flags |= CMF_FMULT;
 		}
 		*cp = NULL;
 	    }
@@ -2399,14 +2404,19 @@ makearray(LinkList l, int type, int flags, int *np, int *nlp, int *llp)
 		    *cp = NULL;
 		}
 	    } else if (!(flags & CGF_UNIQCON)) {
+		int dup;
+
 		for (ap = cp = rp; *ap; ap++) {
 		    *cp++ = *ap;
 		    for (bp = ap; bp[1] && matcheq(*ap, bp[1]); bp++, n--);
 		    ap = bp;
-		    for (; bp[1] && !(*ap)->disp && !(bp[1])->disp &&
-			     !strcmp((*ap)->str, (bp[1])->str); bp++)
+		    for (dup = 0; bp[1] && !(*ap)->disp && !(bp[1])->disp &&
+			     !strcmp((*ap)->str, (bp[1])->str); bp++) {
 			(bp[1])->flags |= CMF_MULT;
-		    (*ap)->flags |= CMF_FMULT;
+			dup = 1;
+		    }
+		    if (dup)
+			(*ap)->flags |= CMF_FMULT;
 		}
 		*cp = NULL;
 	    }

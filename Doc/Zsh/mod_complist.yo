@@ -162,7 +162,7 @@ builtin command) or they are matches which duplicate a string already
 in the list (because they differ only in things like prefixes or
 suffixes that are not displayed). In the list used for menu-selection,
 however, even these matches are shown so that it is possible to select
-them. To highlight such matches the tt(hi) and tt(mu) capabilities in
+them. To highlight such matches the tt(hi) and tt(du) capabilities in
 the tt(ZLS_COLORS) and tt(ZLS_COLOURS) parameters are supported for
 hidden matches of the first and second kind, respectively.
 
