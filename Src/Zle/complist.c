@@ -576,6 +576,7 @@ clnicezputs(Listcols c, char *s, int ml)
 		    return ask;
 		}
 		col = 0;
+                fputs(" \010", shout);
 	    }
 	}
     }
@@ -895,8 +896,10 @@ compprintfmt(char *fmt, int n, int dopr, int doesc, int ml, int *stop)
 		    continue;
 		}
 		putc(*p, shout);
-		if ((beg = !(cc % columns)) && !stat)
+		if ((beg = !(cc % columns)) && !stat) {
 		    ml++;
+                    fputs(" \010", shout);
+                }
 		if (mscroll && beg && !--mrestlines && (ask = asklistscroll(ml))) {
 		    *stop = 1;
 		    if (stat && n)

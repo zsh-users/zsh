@@ -1917,8 +1917,11 @@ printfmt(char *fmt, int n, int dopr, int doesc)
 		l += 1 + (cc / columns);
 		cc = 0;
 	    }
-	    if (dopr)
+	    if (dopr) {
 		putc(*p, shout);
+                if (!(cc % columns))
+                    fputs(" \010", shout);
+            }
 	}
     }
     if (dopr) {

@@ -1,3 +1,10 @@
+2001-05-08  Sven Wischnowsky  <wischnow@zsh.org>
+
+	* 14251: Src/Zle/complist.c, Src/Zle/zle_tricky.c: print
+	space/backspace when reaching the last column while printing
+	descriptions and the like to avoid a cursor positioning bug
+	depending on the kind of terminal (autowrap)
+
 2001-05-07  Sven Wischnowsky  <wischnow@zsh.org>
 
 	* 14240: Completion/Unix/Type/_files: double all backslashes
