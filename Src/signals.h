@@ -82,7 +82,7 @@
 	sigset_t oset; \
 	queue_front = (queue_front + 1) % MAX_QUEUE_SIZE; \
 	oset = signal_setmask(signal_mask_queue[queue_front]); \
-	handler(signal_queue[queue_front]);  /* handle queued signal   */ \
+	zhandler(signal_queue[queue_front]);  /* handle queued signal   */ \
 	signal_setmask(oset); \
     } \
 } while (0)

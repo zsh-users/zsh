@@ -93,7 +93,7 @@ install_handler(int sig)
 #ifdef POSIX_SIGNALS
     struct sigaction act;
  
-    act.sa_handler = (SIGNAL_HANDTYPE) handler;
+    act.sa_handler = (SIGNAL_HANDTYPE) zhandler;
     sigemptyset(&act.sa_mask);        /* only block sig while in handler */
     act.sa_flags = 0;
 # ifdef SA_INTERRUPT                  /* SunOS 4.x */
@@ -401,7 +401,7 @@ signal_suspend(int sig, int sig2)
  
 /**/
 mod_export RETSIGTYPE
-handler(int sig)
+zhandler(int sig)
 {
     sigset_t newmask, oldmask;
 
