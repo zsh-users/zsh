@@ -553,9 +553,8 @@ execcase(Estate state, int do_exec)
 	    printprompt4();
 	    fprintf(xtrerr, "case %s (%s)\n", word, pat2);
 	    fflush(xtrerr);
-	    state->pc++;
-	} else
-	    state->pc += 2;
+	}
+	state->pc += 2;
 
 	if (*spprog != dummy_patprog1 && *spprog != dummy_patprog2)
 	    pprog = *spprog;
