@@ -216,12 +216,12 @@ mostlyclean-here:
 
 clean-here:
 	rm -f modules.index.tmp modules.stamp zsh$(EXEEXT) ansi2knr.o ansi2knr
-	rm -f modules.index modules-bltin
 	rm -f libzsh-*.$(DL_EXT)
 .PHONY: clean-here
 
 distclean-here:
 	rm -f TAGS tags
+	rm -f modules.index modules-bltin
 	rm -f Makefile mymods.conf
 .PHONY: distclean-here
 
