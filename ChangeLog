@@ -25,7 +25,7 @@
 	Load tcp module for zftp; autoload zfget_match and zfcd_match
 	for _zftp.
 
-	* 14915: Doc/Zsh/builtins.yo, Doc/Zsh/Params.yo, Src/builtin.c,
+	* 14915: Doc/Zsh/builtins.yo, Doc/Zsh/params.yo, Src/builtin.c,
 	Src/params.c: special parameters can't have readonly turned off;
 	$* and $@ are readonly.
 
@@ -59,8 +59,9 @@
 
 2001-06-13  Peter Stephenson  <pws@csr.com>
 
-	* unposted: Completion/compinstall: pointed out by Bart:  bad
-	array handling.
+	* unposted: Completion/compinstall: spotted by Bart: assignments
+	when finding $fpath if not set in current shell were completely
+	garbled.
 
 2001-06-13  Sven Wischnowsky  <wischnow@zsh.org>
 
@@ -164,15 +165,6 @@
 	Src/Modules/zftp.mdd: move some functionality
 	from zftp to independent tcp module.
 
-2001-06-06  Sven Wischnowsky  <wischnow@zsh.org>
-
-	* 14736: Doc/Zsh/compsys.yo: make docs for _wanted and
-	_requested clearer (command has to allow options passed to it)
-
-	* 14733: Completion/Base/Utility/_arguments: two fixes: try all
-	actions that have to be tried (but only once), execute actions
-	if we aren't after an option already (in the same word)
-
 2001-06-06  Andrej Borsenkow  <bor@zsh.org>
 
 	* 14772: David Lebel <lebel@lebel.org>: zshconfig.ac: patch
@@ -180,7 +172,7 @@
 
 	* unposted: Etc/zsh-development-guide: we now support autoconf-2.50
 
-	* 14766: Src/prompt.c: unify %l substitution (tty0, pts/3 etc)
+	* 14766: Src/prompt.c: uniform %l substitution
 
 	* 14760: zshconfig.ac: use old-style AC_INIT without version
 
@@ -191,6 +183,15 @@
 	zshconfig.ac, .distfiles, Makefile.in, configure.in, Src/mkmakemod.sh:
 	Allow processing by both autoconf-2.13 and autoconf-2.50; remove
 	config.status hack for autoconf-2.50
+
+2001-06-06  Sven Wischnowsky  <wischnow@zsh.org>
+
+	* 14736: Doc/Zsh/compsys.yo: make docs for _wanted and
+	_requested clearer (command has to allow options passed to it)
+
+	* 14733: Completion/Base/Utility/_arguments: two fixes: try all
+	actions that have to be tried (but only once), execute actions
+	if we aren't after an option already (in the same word)
 
 2001-06-05  Chmouel Boudjnah  <chmouel@mandrakesoft.com>
 
