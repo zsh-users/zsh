@@ -853,7 +853,7 @@ endtrapscope(void)
 	    if (sigtrapped[sig])
 		unsettrap(sig);
 	    sigtrapped[sig] = st->flags;
-	    if (st->flags) {
+	    if (st->flags && (st->list != NULL)) {
 		Eprog prog = (st->flags & ZSIG_FUNC) ?
 		    ((Shfunc) st->list)->funcdef : (Eprog) st->list;
 		/* prevent settrap from saving this */

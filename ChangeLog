@@ -1,3 +1,8 @@
+2000-06-09  Clint Adams  <schizo@debian.org>
+
+	* 11839: Src/signals.c: prevent segmentation fault in
+	endtrapscope() by not dereferencing null pointers.
+
 2000-06-09  Sven Wischnowsky  <wischnow@zsh.org>
 
 	* 11836: Src/Zle/compcore.c, Src/Zle/complist.c: fix for
