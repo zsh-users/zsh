@@ -1,5 +1,7 @@
 2004-06-08  Peter Stephenson  <pws@csr.com>
 
+	* Philippe Troin: 20026: INSTALL: nit-pick.
+
 	* Philippe Troin, 19996, plus 20025: configure.ac, INSTALL: add
 	configure option --with-tcsetpgrp.
 
