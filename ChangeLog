@@ -1,8 +1,5 @@
 2001-12-18  Clint Adams  <clint@zsh.org>
 
-	* unposted: Src/builtin.c: initialize save to NULL to avoid
-	compiler warning.
-
 	* 16361: zshconfig.ac, Src/input.c:
 	include <stdio.h> to avoid implicit declarations.
 
