@@ -32,8 +32,8 @@ definitions. Setting a key in it is like defining a function with the
 name given by the key and the body given by the value. Unsetting a key
 removes the definition for the function named by the key.
 )
-vindex(disfunctions)
-item(tt(disfunctions))(
+vindex(dis_functions)
+item(tt(dis_functions))(
 Like tt(functions) but for disabled functions.
 )
 vindex(builtins)
@@ -44,33 +44,33 @@ the values are either `tt(undefined)' for builtin commands that will
 automatically be loaded from a module if invoked or `tt(defined)' for
 builtin commands that are already loaded.
 )
-vindex(disbuiltins)
-item(tt(disbuiltins))(
+vindex(dis_builtins)
+item(tt(dis_builtins))(
 Like tt(builtins) but for disabled builtin commands.
 )
 vindex(reswords)
 item(tt(reswords))(
 This array contains the enabled reserved words.
 )
-vindex(disreswords)
-item(tt(disreswords))(
+vindex(dis_reswords)
+item(tt(dis_reswords))(
 Like tt(reswords) but for disabled reserved words.
 )
-vindex(raliases)
-item(tt(raliases))(
+vindex(aliases)
+item(tt(aliases))(
 This maps the names of the regular aliases currently enabled to their
 expansions.
 )
-vindex(disraliases)
-item(tt(disraliases))(
+vindex(dis_aliases)
+item(tt(dis_aliases))(
 Like tt(raliases) but for disabled regular aliases.
 )
 vindex(galiases)
 item(tt(galiases))(
 Like tt(raliases), but for global aliases.
 )
-vindex(disgaliases)
-item(tt(disgaliases))(
+vindex(dis_galiases)
+item(tt(dis_galiases))(
 Like tt(galiases) but for disabled global aliases.
 )
 vindex(parameters)

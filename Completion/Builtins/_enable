@@ -4,19 +4,19 @@ local prev="$words[CURRENT-1]" ret=1 expl
 
 if [[ "$prev" = -*a* ]]; then
   _description expl alias
-  compadd "$expl[@]" "$@" - "${(k@)disaliases}" && ret=0
+  compadd "$expl[@]" "$@" - "${(k@)dis_aliases}" "${(k@)dis_galiases}" && ret=0
 fi
 if [[ "$prev" = -*f* ]]; then
   _description expl 'shell function'
-  compadd "$expl[@]" "$@" - "${(k@)disfunctions}" && ret=0
+  compadd "$expl[@]" "$@" - "${(k@)dis_functions}" && ret=0
 fi
 if [[ "$prev" = -*r* ]]; then
   _description expl 'reserved word'
-  compadd "$expl[@]" "$@" - "${(k@)disreswords}" && ret=0
+  compadd "$expl[@]" "$@" - "${(k@)dis_reswords}" && ret=0
 fi
 if [[ "$prev" != -* ]]; then
   _description expl 'builtin command'
-  compadd "$expl[@]" "$@" - "${(k@)disbuiltins}" && ret=0
+  compadd "$expl[@]" "$@" - "${(k@)dis_builtins}" && ret=0
 fi
 
 return ret

@@ -28,7 +28,7 @@ if [[ -z "$ext" ]]; then
   _description expl 'shell function'
   compadd "$expl[@]" "$@" - "${(k@)functions}" && ret=0
   _description expl 'alias'
-  compadd "$expl[@]" "$@" - "${(k@)raliases}" && ret=0
+  compadd "$expl[@]" "$@" - "${(k@)aliases}" && ret=0
   _description expl 'reserved word'
   compadd "$expl[@]" "$@" - "${(k@)reswords}" && ret=0
 fi

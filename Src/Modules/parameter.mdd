@@ -1,3 +1,3 @@
-autoparams="parameters commands functions disfunctions funcstack builtins disbuiltins reswords disreswords options modules dirstack history historywords jobtexts jobstates nameddirs userdirs raliases disraliases galiases disgaliases"
+autoparams="parameters commands functions dis_functions funcstack builtins dis_builtins reswords dis_reswords options modules dirstack history historywords jobtexts jobstates nameddirs userdirs aliases dis_aliases galiases dis_galiases"
 
 objects="parameter.o"

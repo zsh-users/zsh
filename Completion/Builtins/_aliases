@@ -3,6 +3,6 @@
 local expl
 
 _description expl 'regular alias'
-compadd "$expl[@]" - "${(@k)raliases}"
+compadd "$expl[@]" - "${(@k)aliases}"
 _description expl 'global alias'
 compadd "$expl[@]" - "${(@k)galiases}"
