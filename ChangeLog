@@ -1,3 +1,8 @@
+2002-08-14  Peter Stephenson  <pws@csr.com>
+
+	* 17542 (Thomas Stromberg <thomas@stromberg.org>):
+	Completion/Unix/Command/_mount: most systems don't have /etc/mnt.
+
 2002-08-12  Peter Stephenson  <pws@csr.com>
 
 	* 17482 (Karl Tomlinson): Src/Modules/termcap.c,
