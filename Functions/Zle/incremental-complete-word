@@ -20,11 +20,12 @@ incremental-complete-word() {
   local lastl lastr wid twid num alt post toolong
   local curcontext="${curcontext}:incremental" stop brk
 
-  _style -s '' prompt pmpt || pmpt='incremental (%c): %u%s  %l}'
-  _style -s '' stop stop
-  _style -s '' break brk
+  zstyle -s ":completion${curcontext}" prompt pmpt ||
+    pmpt='incremental (%c): %u%s  %l'
+  zstyle -s ":completion${curcontext}" stop stop
+  zstyle -s ":completion${curcontext}" break brk
 
-  if _style '' list; then
+  if zstyle -t ":completion${curcontext}" list; then
     wid=list-choices
     post=( icw-list-helper )
   else

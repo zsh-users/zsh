@@ -1,28 +1,39 @@
 #autoload
 
-comptry arguments values
-comptry options
+local stags tag
 
-case "$curcontext" in
-# Some silly examples commented out:
-#
-# *::*p[bgpn]m:*)           # change the order for file-completion
-#   comptry globbed-files directories
-#   comptry all-files
-#   ;;
-# *::dvips::-o*)            # automatic context set by _arguments
-#   comptry all-files
-#   return
-#   ;;
-# *::kill:*)
-#   comptry processes
-#   return                  # this return ensures that we use only processes
-#   ;;
-*)
-  comptry globbed-files
-  comptry directories
-  comptry all-files
-  ;;
-esac
+if zstyle -a ":completion${curcontext}" sort-tags stags; then
 
-comptry "$@"
+  for tag in $stags; do
+    [[ $tag != '' ]] && comptry ${=tag}
+  done
+
+else
+
+  comptry arguments values
+  comptry options
+
+  case "$curcontext" in
+  # Some silly examples commented out:
+  #
+  # *::*p[bgpn]m:*)           # change the order for file-completion
+  #   comptry globbed-files directories
+  #   comptry all-files
+  #   ;;
+  # *::dvips::-o*)            # automatic context set by _arguments
+  #   comptry all-files
+  #   return
+  #   ;;
+  # *::kill:*)
+  #   comptry processes
+  #   return                  # this return ensures that we use only processes
+  #   ;;
+  *)
+    comptry globbed-files
+    comptry directories
+    comptry all-files
+    ;;
+  esac
+
+  comptry "$@"
+fi
