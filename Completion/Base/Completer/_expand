@@ -12,6 +12,7 @@ setopt localoptions nonomatch
 [[ _matcher_num -gt 1 ]] && return 1
 
 local exp word sort expr expl subd suf=" " force opt asp tmp opre pre epre
+local continue=0
 
 (( $# )) &&
     while getopts gsco opt; do
@@ -37,13 +38,17 @@ zstyle -T ":completion:${curcontext}:" suffix &&
      "${(e)word}" != *[][^*?\(\)\<\>\{\}\|]* ]] &&
   return 1
 
-zstyle -t ":completion:${curcontext}:" accept-exact ||
-  [[ $? -eq 2 && ! -o recexact ]] ||
+zstyle -s ":completion:${curcontext}:" accept-exact tmp ||
+    [[ ! -o recexact ]] || tmp=1
+
+if [[ "$tmp" != (yes|true|on|1) ]]; then
   { [[ "$word" = \~(|[-+]) ||
-       ( "$word" = \~[-+][1-9]## && $word[3,-1] -le $#dirstack ) ||
-       ( "$word" = \~* && ${#userdirs[(I)${word[2,-1]}*]}+${#nameddirs[(I)${word[2,-1]}*]} -ne 1 ) ||
+       ( "$word" = \~[-+][1-9]## && $word[3,-1] -le $#dirstack ) ]] && return 1 }
+  { [[ ( "$word" = \~* && ${#userdirs[(I)${word[2,-1]}*]}+${#nameddirs[(I)${word[2,-1]}*]} -gt 1 ) ||
        ( "$word" = *\$[a-zA-Z0-9_]## && 
-         ${#parameters[(I)${word##*\$}*]} -ne 1 ) ]] && return 1 }
+         ${#parameters[(I)${word##*\$}*]} -ne 1 ) ]] && continue=1 }
+  [[ continue -eq 1 && "$tmp" != continue ]] && return 1
+fi
 
 # In exp we will collect the expansions.
 
@@ -217,4 +222,4 @@ else
   compstate[insert]=menu
 fi
 
-return 0
+return continue

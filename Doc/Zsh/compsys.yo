@@ -1034,7 +1034,9 @@ words beginning with a tilde or parameter expansion should be
 expanded.  For example, if there are parameters
 tt(foo) and tt(foobar), the string `tt($foo)' will only be expanded if 
 tt(accept-exact) is set to `true'; otherwise the completion system will
-be allowed to complete tt($foo) to tt($foobar).
+be allowed to complete tt($foo) to tt($foobar). If the style is set to
+`continue', _expand will add the expansion as a match and the completion
+system will also be allowed to continue.
 )
 kindex(add-space, completion style)
 item(tt(add-space))(
