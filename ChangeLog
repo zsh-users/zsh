@@ -3,6 +3,9 @@
 	* 15707: Src/init.c: Fix history crash caused by re-entering
 	loop() when the `precmd' shell function uses `source' or `.'.
 
+	* 15702: Doc/Zsh/expn.yo: Alphabetize (mostly) parameter flag
+	descriptions; fix a couple of typos; parameter rule #12.
+	
 2001-08-24  Sven Wischnowsky  <wischnow@zsh.org>
 
 	* 15705: Src/Zle/complete.c: test if hash table pointer is NULL

@@ -63,8 +63,10 @@ the size of which is controlled by the tt(HISTSIZE) parameter.  The one
 most recent command is always retained in any case.  Each saved command in
 the history list is called a history em(event) and is assigned a number,
 beginning with 1 (one) when the shell starts up.  The history number that
-you may see in your prompt (see noderef(Prompt Expansion)) is the number
-that is to be assigned to the em(next) command.
+you may see in your prompt (see
+ifzman(Prompt Expansion in zmanref(zshmisc))\
+ifnzman(noderef(Prompt Expansion))\
+) is the number that is to be assigned to the em(next) command.
 
 startmenu()
 menu(Overview)
@@ -241,7 +243,7 @@ item(tt(Q))(
 Remove one level of quotes from the substituted words.
 )
 item(tt(x))(
-Like tt(q), but break into words at each blank.  Does not work with
+Like tt(q), but break into words at whitespace.  Does not work with
 parameter expansion.
 )
 item(tt(l))(
@@ -334,8 +336,8 @@ Both the tt(/dev/fd) and the named pipe implementation have drawbacks.  In
 the former case, some programmes may automatically close the file
 descriptor in question before examining the file on the command line,
 particularly if this is necessary for security reasons such as when the
-programme is running setuid.  In the second case,  if the
-programme does not actually open the file the subshell attempting to read
+programme is running setuid.  In the second case, if the
+programme does not actually open the file, the subshell attempting to read
 from or write to the pipe will (in a typical implementation, different
 operating systems may have different behaviour) block for ever and have to
 be killed explicitly.  In both cases, the shell actually supplies the
@@ -588,12 +590,26 @@ cindex(flags, parameter expansion)
 cindex(substitution, parameter, flags)
 If the opening brace is directly followed by an opening parenthesis,
 the string up to the matching closing parenthesis will be taken as a
-list of flags.  Where arguments are valid, any character, or the
-matching pairs `tt(LPAR())...tt(RPAR())', `tt({)...tt(})',
-`tt([)...tt(])', or `tt(<)...tt(>)',  may be used
-in place of the colon as delimiters.  The following flags are supported:
+list of flags.  In cases where repeating a flag is meaningful, the
+repetitions need not be consecutive; for example, `(tt(q%q%q))'
+means the same thing as the more readable `(tt(%%qqq))'.  The
+following flags are supported:
 
 startitem()
+item(tt(%))(
+Expand all tt(%) escapes in the resulting words in the same way as in in
+prompts (see noderef(Prompt Expansion)). If this flag is given twice,
+full prompt expansion is done on the resulting words, depending on the
+setting of the tt(PROMPT_PERCENT), tt(PROMPT_SUBST) and tt(PROMPT_BANG)
+options.
+)
+item(tt(@))(
+In double quotes, array elements are put into separate words.
+E.g., `tt("${(@)foo}")' is equivalent to `tt("${foo[@]}")' and
+`tt("${(@)foo[1,2]}")' is the same as `tt("$foo[1]" "$foo[2]")'.
+This is distinct from em(field splitting) by the the tt(f), tt(s)
+or tt(z) flags, which still applies within each array element.
+)
 item(tt(A))(
 Create an array parameter with `tt(${)...tt(=)...tt(})',
 `tt(${)...tt(:=)...tt(})' or `tt(${)...tt(::=)...tt(})'.
@@ -601,26 +617,43 @@ If this flag is repeated (as in `tt(AA)'), create an associative
 array parameter.  Assignment is made before sorting or padding.
 The var(name) part may be a subscripted range for ordinary
 arrays; the var(word) part em(must) be converted to an array, for
-example by using `tt(${(AA)=)var(name)tt(=)...tt(})' to activate word
-splitting, when creating an associative array.
+example by using `tt(${(AA)=)var(name)tt(=)...tt(})' to activate
+field splitting, when creating an associative array.
 )
-item(tt(@))(
-In double quotes, array elements are put into separate words.
-E.g., `tt("${(@)foo}")' is equivalent to `tt("${foo[@]}")' and
-`tt("${(@)foo[1,2]}")' is the same as `tt("$foo[1]" "$foo[2]")'.
+item(tt(c))(
+With tt(${#)var(name)tt(}), count the total number of characters in an array,
+as if the elements were concatenated with spaces between them.
+)
+item(tt(C))(
+Capitalize the resulting words.  `Words' in this case refers to sequences
+of alphanumeric characters separated by non-alphanumerics, em(not) to words
+that result from field splitting.
 )
 item(tt(e))(
 Perform em(parameter expansion), em(command substitution) and
 em(arithmetic expansion) on the result. Such expansions can be
 nested but too deep recursion may have unpredictable effects.
 )
-item(tt(P))(
-This forces the value of the parameter var(name) to be interpreted as a
-further parameter name, whose value will be used where appropriate. If used
-with a nested parameter or command substitution, the result of that will be
-taken as a parameter name in the same way.  For example, if you have
-`tt(foo=bar)' and `tt(bar=baz)', the strings tt(${(P)foo}),
-tt(${(P)${foo}}), and tt(${(P)$(echo bar)}) will be expanded to `tt(baz)'.
+item(tt(f))(
+Split the result of the expansion to lines. This is a shorthand
+for `tt(ps:\n:)'.
+)
+item(tt(F))(
+Join the words of arrays together using newline as a separator.
+This is a shorthand for `tt(pj:\n:)'.
+)
+item(tt(i))(
+With tt(o) or tt(O), sort case-independently.
+)
+item(tt(k))(
+If var(name) refers to an associative array, substitute the em(keys)
+(element names) rather than the values of the elements.  Used with
+subscripts (including ordinary arrays), force indices or keys to be
+substituted even if the subscript form refers to values.  However,
+this flag may not be combined with subscript ranges.
+)
+item(tt(L))(
+Convert all letters in the result to lower case.
 )
 item(tt(o))(
 Sort the resulting words in ascending order.
@@ -628,22 +661,13 @@ Sort the resulting words in ascending order.
 item(tt(O))(
 Sort the resulting words in descending order.
 )
-item(tt(i))(
-With tt(o) or tt(O), sort case-independently.
-)
-item(tt(L))(
-Convert all letters in the result to lower case.
-)
-item(tt(U))(
-Convert all letters in the result to upper case.
-)
-item(tt(C))(
-Capitalize the resulting words.  `Words' in this case refers to sequences
-of alphanumeric characters separated by non-alphanumerics, em(not) to words
-that result from field splitting.
-)
-item(tt(V))(
-Make any special characters in the resulting words visible.
+item(tt(P))(
+This forces the value of the parameter var(name) to be interpreted as a
+further parameter name, whose value will be used where appropriate. If
+used with a nested parameter or command substitution, the result of that
+will be taken as a parameter name in the same way.  For example, if you
+have `tt(foo=bar)' and `tt(bar=baz)', the strings tt(${(P)foo}),
+tt(${(P)${foo}}), and tt(${(P)$(echo bar)}) will be expanded to `tt(baz)'.
 )
 item(tt(q))(
 Quote the resulting words with backslashes. If this flag is given
@@ -653,87 +677,6 @@ given four times, the words are quoted in single quotes preceded by a tt($).
 )
 item(tt(Q))(
 Remove one level of quotes from the resulting words.
-)
-item(tt(%))(
-Expand all tt(%) escapes in the resulting words in the same way as in
-prompts (see noderef(Prompt Expansion)). If this flag is given twice,
-full prompt expansion is done on the resulting words, depending on the 
-setting of the tt(PROMPT_PERCENT), tt(PROMPT_SUBST) and
-tt(PROMPT_BANG) options.
-)
-item(tt(X))(
-With this flag parsing errors occurring with the tt(Q) and tt(e) flags or the
-pattern matching forms such as `tt(${)var(name)tt(#)var(pattern)tt(})' 
-are reported. Without the flag they are silently ignored.
-)
-item(tt(c))(
-With tt(${#)var(name)tt(}), count the total number of characters in an array,
-as if the elements were concatenated with spaces between them.
-)
-item(tt(w))(
-With tt(${#)var(name)tt(}), count words in arrays or strings; the tt(s)
-flag may be used to set a word delimiter.
-)
-item(tt(W))(
-Similar to tt(w) with the difference that empty words between
-repeated delimiters are also counted.
-)
-item(tt(k))(
-If var(name) refers to an associative array, substitute the em(keys)
-(element names) rather than the values of the elements.  Used with
-subscripts (including ordinary arrays), force indices or keys to be
-substituted even if the subscript form refers to values.  However,
-this flag may not be combined with subscript ranges.
-)
-item(tt(v))(
-Used with tt(k), substitute (as two consecutive words) both the key
-and the value of each associative array element.  Used with subscripts,
-force values to be substituted even if the subscript form refers to
-indices or keys.
-)
-item(tt(p))(
-Recognize the same escape sequences as the tt(print) builtin
-in string arguments to any of the flags described below.
-)
-item(tt(l:)var(expr)tt(::)var(string1)tt(::)var(string2)tt(:))(
-Pad the resulting words on the left.  Each word will be truncated if
-required and placed in a field var(expr) characters wide.  The space
-to the left will be filled with var(string1) (concatenated as often
-as needed) or spaces if var(string1) is not given.  If both
-var(string1) and var(string2) are given, this string is inserted
-once directly to the left of each word, before padding.
-)
-item(tt(r:)var(expr)tt(::)var(string1)tt(::)var(string2)tt(:))(
-As tt(l), but pad the words on the right and insert var(string2)
-on the right.
-)
-item(tt(j:)var(string)tt(:))(
-Join the words of arrays together using var(string) as a separator.
-pindex(SH_WORD_SPLIT, use of)
-Note that this occurs before field splitting by the tt(SH_WORD_SPLIT)
-option.
-)
-item(tt(F))(
-Join the words of arrays together using newline as a separator.
-This is a shorthand for `tt(pj:\n:)'.
-)
-item(tt(s:)var(string)tt(:))(
-Force field splitting (see the option tt(SH_WORD_SPLIT)) at the
-separator var(string).  Splitting only occurs in places where an
-array value is valid.
-)
-item(tt(f))(
-Split the result of the expansion to lines. This is a shorthand
-for `tt(ps:\n:)'.
-)
-item(tt(z))(
-Split the result of the expansion into words using shell parsing to
-find the words, i.e. taking into account any quoting in the value.
-
-Note that this is done very late, as for the `tt((s))' flag. So to
-access single words in the result, one has to use nested expansions as 
-in `tt(${${(z)foo}[2]})'. Likewise, to remove the quotes in the
-resulting words one would do: `tt(${(Q)${(z)foo}})'.
 )
 item(tt(t))(
 Use a string describing the type of the parameter where the value
@@ -784,6 +727,77 @@ for special parameters defined by the shell
 )
 enditem()
 )
+item(tt(U))(
+Convert all letters in the result to upper case.
+)
+item(tt(v))(
+Used with tt(k), substitute (as two consecutive words) both the key
+and the value of each associative array element.  Used with subscripts,
+force values to be substituted even if the subscript form refers to
+indices or keys.
+)
+item(tt(V))(
+Make any special characters in the resulting words visible.
+)
+item(tt(w))(
+With tt(${#)var(name)tt(}), count words in arrays or strings; the tt(s)
+flag may be used to set a word delimiter.
+)
+item(tt(W))(
+Similar to tt(w) with the difference that empty words between
+repeated delimiters are also counted.
+)
+item(tt(X))(
+With this flag parsing errors occurring with the tt(Q) and tt(e) flags or the
+pattern matching forms such as `tt(${)var(name)tt(#)var(pattern)tt(})' 
+are reported. Without the flag they are silently ignored.
+)
+item(tt(z))(
+Split the result of the expansion into words using shell parsing to
+find the words, i.e. taking into account any quoting in the value.
+
+Note that this is done very late, as for the `tt((s))' flag. So to
+access single words in the result, one has to use nested expansions as 
+in `tt(${${(z)foo}[2]})'. Likewise, to remove the quotes in the
+resulting words one would do: `tt(${(Q)${(z)foo}})'.
+)
+enditem()
+
+The following flags (except tt(p)) are followed by one or more arguments
+as shown.  Any character, or the matching pairs `tt(LPAR())...tt(RPAR())',
+`tt({)...tt(})', `tt([)...tt(])', or `tt(<)...tt(>)', may be used in place
+of a colon as delimiters, but note that when a flag takes more than one
+argument, a matched pair of delimiters must surround each argument.
+
+startitem()
+item(tt(p))(
+Recognize the same escape sequences as the tt(print) builtin
+in string arguments to any of the flags described below.
+)
+item(tt(j:)var(string)tt(:))(
+Join the words of arrays together using var(string) as a separator.
+pindex(SH_WORD_SPLIT, use of)
+Note that this occurs before field splitting by the tt(SH_WORD_SPLIT)
+option.
+)
+item(tt(l:)var(expr)tt(::)var(string1)tt(::)var(string2)tt(:))(
+Pad the resulting words on the left.  Each word will be truncated if
+required and placed in a field var(expr) characters wide.  The space
+to the left will be filled with var(string1) (concatenated as often
+as needed) or spaces if var(string1) is not given.  If both
+var(string1) and var(string2) are given, this string is inserted
+once directly to the left of each word, before padding.
+)
+item(tt(r:)var(expr)tt(::)var(string1)tt(::)var(string2)tt(:))(
+As tt(l), but pad the words on the right and insert var(string2)
+on the right.
+)
+item(tt(s:)var(string)tt(:))(
+Force field splitting (see the option tt(SH_WORD_SPLIT)) at the
+separator var(string).  Note that a var(string) of two or more
+characters means all must all match in sequence; this differs from
+the treatment of two or more characters in the tt(IFS) parameter.
+)
 enditem()
 
 The following flags are meaningful with the tt(${)...tt(#)...tt(}) or
@@ -824,20 +838,20 @@ will remove the same matches as for `tt(#)', but in reverse order, and the
 form using `tt(%%)' will remove the same matches as for `tt(##)' in reverse
 order.
 )
-item(tt(M))(
-Include the matched portion in the result.
-)
-item(tt(R))(
-Include the unmatched portion in the result (the em(R)est).
-)
 item(tt(B))(
 Include the index of the beginning of the match in the result.
 )
 item(tt(E))(
 Include the index of the end of the match in the result.
 )
+item(tt(M))(
+Include the matched portion in the result.
+)
 item(tt(N))(
 Include the length of the match in the result.
+)
+item(tt(R))(
+Include the unmatched portion in the result (the em(R)est).
 )
 enditem()
 
@@ -929,6 +943,15 @@ substitutions.
 item(tt(11.) em(Padding))(
 Any padding of the value by the `tt(LPAR()l.)var(fill)tt(.RPAR())' or
 `tt(LPAR()r.)var(fill)tt(.RPAR())' flags is applied.
+)
+item(tt(12.) em(Semantic Joining))(
+In contexts where expansion semantics requires a single word to
+result, all words are rejoined with the first character of tt(IFS)
+between.  So in `tt(${LPAR()P)tt(RPAR()${LPAR()f)tt(RPAR()lines}})'
+the value of tt(${lines}) is split at newlines, but then must be
+joined again before the tt(P) flag can be applied.
+
+If a single word is not required, this rule is skipped.
 )
 enditem()
 
