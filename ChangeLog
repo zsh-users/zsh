@@ -1,3 +1,8 @@
+2002-02-12  Bart Schaefer  <schaefer@zsh.org>
+
+	* unposted: Doc/Zsh/compsys.yo: special-dirs example derived from
+	zsh-users/4656.
+
 2002-02-12  Sven Wischnowsky  <wischnow@zsh.org>
 
 	* 16609: Completion/Base/Core/_all_labels,

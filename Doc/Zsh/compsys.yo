@@ -2033,6 +2033,13 @@ Normally, the completion code will not produce the directory names
 `tt(.)' and `tt(..)' as possible completions.  If this style is set to
 `true', it will add both `tt(.)' and `tt(..)' as possible completions;
 if it is set to `tt(..)', only `tt(..)' will be added.
+
+The following example sets tt(special-dirs) to `tt(..)' only when the
+current prefix is empty, is a single `tt(.)', or consists only of a path
+beginning with one or more `tt(../)', and otherwise sets it to `false'.
+
+example(zstyle -e ':completion:*' special-dirs \ 
+   '[[ $PREFIX = LPAR()../RPAR()#LPAR()|.|..RPAR() ]] && reply=LPAR()..RPAR()')
 )
 kindex(squeeze-slashes, completion style)
 item(tt(squeeze-slashes))(
