@@ -23,11 +23,12 @@ local _param="$1" _arr _len _i _tmp _simple
 # Remove all descriptions not matched by the string on the line.
 
 if [[ "${2[1]}" = \( ]]; then
-  _arr=( ${(o)=2[2,-2]} )
+  _arr=( ${(Qo)=2[2,-2]} )
 else
   _arr=( "${(@Po)2}" )
 fi
 
+_arr=( "${(@)_arr:#}" )
 compadd -D _arr "${(@)argv[3,-1]}" - "${(@)_arr%%:*}"
 
 [[ "${2[1]}" != \( ]] && eval "${2}=( \"\$_arr[@]\" )"
@@ -68,7 +69,7 @@ ${(r:_len:: :)_i%%:*} -- ${_i#*:}"
   (( $#_simple )) && _tmp="${_tmp}
 $(print -c - $_simple)"
 
-  eval "${_param}=${(q)_tmp[2,-1]}"
+  eval "${_param}=\"\${_tmp[2,-1]}\""
 
   return 0
 else

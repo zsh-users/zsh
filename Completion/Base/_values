@@ -3,7 +3,7 @@
 setopt localoptions extendedglob
 
 local name arg def descr xor str tmp ret=1 expl nm="$compstate[nmatches]"
-local snames odescr gdescr sep
+local snames odescr gdescr sep esep spat
 typeset -A names onames xors _values
 
 # Probably fill our cache.
@@ -11,7 +11,7 @@ typeset -A names onames xors _values
 if [[ "$*" != "$_vals_cache_args" ]]; then
   _vals_cache_args="$*"
 
-  unset _vals_cache_{sep,descr,names,onames,snames,xors,odescr}
+  unset _vals_cache_{sep,esep,descr,names,onames,snames,xors,odescr}
 
   typeset -gA _vals_cache_{names,onames,xors}
   _vals_cache_snames=()
@@ -21,6 +21,7 @@ if [[ "$*" != "$_vals_cache_args" ]]; then
 
   if [[ "$1" = -s ]]; then
     _vals_cache_sep="$2"
+    [[ -z "$2" ]] && _vals_cache_esep=yes
     shift 2
   fi
 
@@ -107,20 +108,33 @@ xors=( "${(@kv)_vals_cache_xors}" )
 odescr=( "$_vals_cache_odescr[@]" )
 gdescr="$_vals_cache_descr"
 sep="$_vals_cache_sep"
+esep="$_vals_cache_esep"
 
-if [[ -n "$sep" ]]; then
+if [[ -n "$sep$esep" ]]; then
 
   # We have a separator character. We parse the PREFIX and SUFFIX to
   # see if any of the values that must not appear more than once are
   # already on the line.
 
-  while [[ "$PREFIX" = *${sep}* ]]; do
+  if [[ -n "$esep" ]]; then
+    spat='?*'
+  else
+    spat="*${sep}*"
+  fi
+
+  while [[ "$PREFIX" = $~spat ]]; do
 
     # Get one part, remove it from PREFIX and put it into IPREFIX.
 
-    tmp="${PREFIX%%${sep}*}"
-    PREFIX="${PREFIX#*${sep}}"
-    IPREFIX="${IPREFIX}${tmp}${sep}"
+    if [[ -n "$esep" ]]; then
+      tmp="$PREFIX[1]"
+      IPREFIX="${IPREFIX}${tmp}"
+      PREFIX="${PREFIX[2,-1]}"
+    else
+      tmp="${PREFIX%%${sep}*}"
+      PREFIX="${PREFIX#*${sep}}"
+      IPREFIX="${IPREFIX}${tmp}${sep}"
+    fi
 
     # Get the value `name'.
 
@@ -138,24 +152,34 @@ if [[ -n "$sep" ]]; then
     if [[ -n "$xors[$name]" ]]; then
       snames=( "${(@)snames:#(${(j:|:)~${=xors[$name]}})}" )
       odescr=( "${(@)odescr:#(${(j:|:)~${=xors[$name]}}):*}" )
-      unset {names,onames,xors}\[${^=tmp}\]
+      unset {names,onames,xors}\[$name\]
     fi
   done
-  if [[ "$SUFFIX" =  *${sep}* ]]; then
+  if [[ "$SUFFIX" = $~spat ]]; then
 
     # The same for the suffix.
 
-    str="${SUFFIX%%${sep}*}"
-    SUFFIX="${SUFFIX#*${sep}}"
+    if [[ -n "$esep" ]]; then
+      str=''
+    else
+      str="${SUFFIX%%${sep}*}"
+      SUFFIX="${SUFFIX#*${sep}}"
+    fi
+
     while [[ -n "$SUFFIX" ]]; do
-      tmp="${PREFIX%%${sep}*}"
-      if [[ "$SUFFIX" = *${sep}* ]]; then
-        SUFFIX="${SUFFIX#*${sep}}"
+      if [[ -n "$esep" ]]; then
+        tmp="$SUFFIX[-1]"
+        ISUFFIX="${SUFFIX[-1]}$ISUFFIX"
+	SUFFIX="$SUFFIX[1,-2]"
       else
-        SUFFIX=''
+        tmp="${SUFFIX##*${sep}}"
+        if [[ "$SUFFIX" = *${sep}* ]]; then
+          SUFFIX="${SUFFIX%${sep}*}"
+        else
+          SUFFIX=''
+        fi
+	ISUFFIX="${sep}${tmp}${ISUFFIX}"
       fi
-      PREFIX="${PREFIX#*${sep}}"
-      IPREFIX="${IPREFIX}${tmp}${sep}"
 
       name="${tmp%%\=*}"
 
@@ -168,7 +192,7 @@ if [[ -n "$sep" ]]; then
       if [[ -n "$xors[$name]" ]]; then
         snames=( "${(@)snames:#(${(j:|:)~${=xors[$name]}})}" )
         odescr=( "${(@)odescr:#(${(j:|:)~${=xors[$name]}}):*}" )
-        unset {names,onames,xors}\[${^=tmp}\]
+        unset {names,onames,xors}\[$name\]
       fi
     done
     SUFFIX="$str"

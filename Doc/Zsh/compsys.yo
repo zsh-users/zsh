@@ -797,7 +797,10 @@ a list in parentheses, as in `tt(:foo:(foo bar baz))'. Such a list in
 doubled parentheses, as in `tt(:foo:((a\:bar b\:baz)))' should contain 
 strings consisting of the string to complete followed by a colon
 (which needs to be preceded by a backslash) and a description. The
-matches will be listed together with their descriptions.
+matches will be listed together with their descriptions if the
+value of configuration key tt(describe_values) is non-empty and does
+not contain the substring `tt(!)var(command)', where `var(command)' is 
+the name of the command on the line.
 
 An var(action) of the form `tt(->)var(string)' is used by functions
 that implement a state machine. In this case, the `var(string)' (with
