@@ -33,7 +33,9 @@
 /* global variables for shell parameters in new style completion */
 
 /**/
-mod_export zlong compcurrent;
+mod_export
+zlong compcurrent,
+      complistmax;
 /**/
 zlong complistlines,
       compignored;
@@ -49,8 +51,7 @@ char **compwords,
      *compquote,
      *compqstack,
      *comppatmatch,
-     *complastprompt,
-     *complistmax;
+     *complastprompt;
 /**/
 char *compiprefix,
      *compcontext,
@@ -924,7 +925,7 @@ static struct compparam compkparams[] = {
     { "unambiguous", PM_SCALAR | PM_READONLY, NULL, NULL, VAL(get_unambig) },
     { "unambiguous_cursor", PM_INTEGER | PM_READONLY, NULL, NULL,
       VAL(get_unambig_curs) },
-    { "list_max", PM_SCALAR, VAL(complistmax), NULL, NULL },
+    { "list_max", PM_INTEGER, VAL(complistmax), NULL, NULL },
     { "last_prompt", PM_SCALAR, VAL(complastprompt), NULL, NULL },
     { "to_end", PM_SCALAR, VAL(comptoend), NULL, NULL },
     { "old_list", PM_SCALAR, VAL(compoldlist), NULL, NULL },
@@ -1312,13 +1313,13 @@ setup_(Module m)
     comprpms = compkpms = NULL;
     compwords = NULL;
     compprefix = compsuffix = compiprefix = compisuffix = 
-	compqiprefix = compqisuffix = complistmax = 
+	compqiprefix = compqisuffix =
 	compcontext = compparameter = compredirect = compquote =
 	compquoting = comprestore = complist = compinsert =
 	compexact = compexactstr = comppatmatch = comppatinsert =
 	complastprompt = comptoend = compoldlist = compoldins =
 	compvared = compqstack = NULL;
-
+    complistmax = 0;
     hascompmod = 1;
 
     return 0;
@@ -1367,7 +1368,6 @@ finish_(Module m)
 {
     if (compwords)
 	freearray(compwords);
-    zsfree(complistmax);
     zsfree(compprefix);
     zsfree(compsuffix);
     zsfree(compiprefix);

@@ -1590,8 +1590,6 @@ calclist(int showall)
 mod_export int
 asklist(void)
 {
-    int lmax = (complistmax ? (int) mathevali(complistmax) : 0);
-
     /* Set the cursor below the prompt. */
     trashzle();
     showinglist = listshown = 0;
@@ -1601,9 +1599,9 @@ asklist(void)
 
     /* Maybe we have to ask if the user wants to see the list. */
     if ((!minfo.cur || !minfo.asked) &&
-	((lmax > 0 && listdat.nlist >= lmax) ||
-	 (lmax < 0 && listdat.nlines <= -lmax) ||
-	 (!lmax && listdat.nlines >= lines))) {
+	((complistmax > 0 && listdat.nlist >= complistmax) ||
+	 (complistmax < 0 && listdat.nlines <= -complistmax) ||
+	 (!complistmax && listdat.nlines >= lines))) {
 	int qup, l;
 
 	zsetterm();

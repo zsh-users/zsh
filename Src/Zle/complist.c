@@ -384,7 +384,7 @@ getcols(Listcols c)
 static int noselect, mselect, inselect, mcol, mline, mcols, mlines, mmlen;
 static int selected, mlbeg = -1, mlend = 9999999, mscroll, mrestlines;
 static int mnew, mlastcols, mlastlines, mhasstat, mfirstl, mlastm;
-static char *mstatus;
+static char *mstatus, *mlistp;
 static Cmatch **mtab, **mmtabp;
 static Cmgroup *mgtab, *mgtabp;
 static struct listcols mcolors;
@@ -730,8 +730,8 @@ compprintfmt(char *fmt, int n, int dopr, int doesc, int ml, int *stop)
 	    if (!(fmt = mstatus))
 		return 0;
 	    cc = -1;
-	} else if (!(fmt = getsparam("LISTPROMPT")))
-	    fmt = "Continue? ";
+	} else
+	    fmt = mlistp;
     }
     for (p = fmt; *p; p++) {
 	if (doesc && *p == '%') {
@@ -1437,7 +1437,6 @@ static int
 complistmatches(Hookdef dummy, Chdata dat)
 {
     Cmgroup oamatches = amatches;
-    char *p = NULL;
 
     amatches = dat->matches;
 
@@ -1463,24 +1462,30 @@ complistmatches(Hookdef dummy, Chdata dat)
 	clearflag = 0;
 
     mscroll = 0;
+    mlistp = NULL;
 
     if (mselect >= 0 || mlbeg >= 0 ||
-	((p = complistmax) && !strcmp(p, "scroll"))) {
+	(mlistp = getsparam("LISTPROMPT"))) {
+	if (!*mlistp)
+	    mlistp = "%SAt %p: Hit TAB for more, or the character to insert%s";
 	trashzle();
 	showinglist = listshown = 0;
 
 	lastlistlen = 0;
 
-	if (p) {
+	if (mlistp) {
 	    clearflag = (isset(USEZLE) && !termflags && dolastprompt);
 	    mscroll = 1;
 	} else {
 	    clearflag = 1;
 	    minfo.asked = (listdat.nlines + nlnct <= lines);
 	}
-    } else if (asklist()) {
-	amatches = oamatches;
-	return (noselect = 1);
+    } else {
+	mlistp = NULL;
+	if (asklist()) {
+	    amatches = oamatches;
+	    return (noselect = 1);
+	}
     }
     if (mlbeg >= 0) {
 	mlend = mlbeg + lines - nlnct - mhasstat;
@@ -1569,7 +1574,7 @@ domenuselect(Hookdef dummy, Chdata dat)
     int space, lbeg = 0, step = 1;
     char *s;
 
-    if (fdat || (dummy && (!(s = getsparam("SELECTMIN")) ||
+    if (fdat || (dummy && (!(s = getsparam("MENUSELECT")) ||
 			   (dat && dat->num < atoi(s))))) {
 	if (fdat) {
 	    fdat->matches = dat->matches;
@@ -1577,14 +1582,15 @@ domenuselect(Hookdef dummy, Chdata dat)
 	}
 	return 0;
     }
-    if ((s = getsparam("SELECTSCROLL"))) {
+    if ((s = getsparam("MENUSCROLL"))) {
 	if (!(step = mathevali(s)))
 	    step = (lines - nlnct) >> 1;
 	else if (step < 0)
 	    if ((step += lines - nlnct) < 0)
 		step = 1;
     }
-    mstatus = getsparam("SELECTPROMPT");
+    if ((mstatus = getsparam("MENUPROMPT")) && !*mstatus)
+	mstatus = "%SScrolling active: current selection at %p%s";
     mhasstat = (mstatus && *mstatus);
     fdat = dat;
     selectlocalmap(mskeymap);

@@ -1273,12 +1273,14 @@ they are listed normally.
 )
 kindex(list-prompt, completion style)
 item(tt(list-prompt))(
-If this style is set to a non-empty value for the tt(default) tag,
+If this style is set for the tt(default) tag,
 completion lists that don't fit on the screen can be scrolled (see
 ifzman(the description of the tt(zsh/complist) module in zmanref(zshmodules))\
 ifnzman(noderef(The zsh/complist Module))\
-). The value will be displayed after every screenful, prompting for a
-key press. It may contain the escape `tt(%l)' or `tt(%L)' which will be
+). The value, if not the empty string, will be displayed after every
+screenful, prompting for a key press. If the value is the empty
+string, a default prompt will be used. It may contain the escape
+`tt(%l)' or `tt(%L)' which will be
 replaced by the number of the last line displayed and the total number
 of lines. A `tt(%m)' or `tt(%M)' will be replaced by the number of the 
 last match shown and the total number of matches and `tt(%p)' and
@@ -1588,11 +1590,13 @@ duplicates.
 )
 kindex(select-prompt, completion style)
 item(tt(select-prompt))(
-If this is set to a non-empty string for the tt(default) tag, its
+If this is set for the tt(default) tag, its
 value will be displayed during menu-selection (see the tt(menu) style
 above) when the completion list does not fit on the screen as a
 whole. The same escapes as for the tt(list-prompt) style are
-understood, but give the number of the match or line the mark is on.
+understood, but give the number of the match or line the mark is
+on. As for tt(list-prompt), a default prompt is used when the value is 
+the empty string.
 )
 kindex(select-scroll, completion style)
 item(tt(select-scroll))(

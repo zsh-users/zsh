@@ -1,3 +1,13 @@
+2000-04-27  Sven Wischnowsky  <wischnow@informatik.hu-berlin.de>
+
+	* 10959: Completion/Core/_main_complete, Doc/Zsh/compsys.yo,
+ 	Doc/Zsh/mod_complist.yo, Src/params.c, Src/Zle/compcore.c,
+ 	Src/Zle/complete.c, Src/Zle/complist.c, Src/Zle/compresult.c:
+ 	renamed parameters for menu selection to MENUSELECT, MENUPROMPT
+ 	and MENUSCROLL; no special value for LISTMAX to turn on list
+ 	scrolling, this is done by setting LISTPROMPT now; default values
+ 	for LISTPROMPT and MENUPROMPT when set but empty
+	
 2000-04-27  Adam Spiers <adam@spiers.net>
 
 	* 10949: Completion/User/_perl_modules: print warning when

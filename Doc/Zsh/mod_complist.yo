@@ -128,12 +128,25 @@ ifnzman(noderef(Completion System Configuration))\
 ).
 
 subsect(Scrolling in completion listings)
-vindex(LISTMAX)
-To be able to scroll through a completion list, the tt(LISTMAX)
-parameter has to be set to the string `tt(scroll)'. If it has this
-value, the completion code will not ask if the list should be
-shown. Instead it immediately starts displaying the list, stopping
-after the first screenful, showing a prompt at the bottom,
+To be able to scroll through a completion list, the tt(LISTPROMPT)
+parameter has to be set. Its value will be used as the prompt, if it
+is the empty string, a default prompt will be used.  The value may
+contain escapes of the form `tt(%x)'. It supports the escapes
+`tt(%B)', `tt(%b)', `tt(%S)', `tt(%s)', `tt(%U)', `tt(%u)' and
+`tt(%{...%})' known from the shell prompts and three pairs of
+additional sequences. A `tt(%l)' or `tt(%L)' is replaced by the number
+of the last line shown and the total number of lines in the form
+`var(number)tt(/)var(total)'. A `tt(%m)' or `tt(%M)' is replaced with
+the number of the last match shown and the total number of matches and 
+`tt(%p)' or `tt(%P)' is replaced with `tt(Top)', `tt(Bottom)' or the
+position of the first line shown in percent of the total number of
+lines, respectively. In each of these cases the one with the uppercase
+letter will be replaced with a string of fixed width, padded to the
+right with spaces.
+
+If tt(LISTPROMPT) is set, the completion code will not ask if the list
+should be shown. Instead it immediately starts displaying the list,
+stopping after the first screenful, showing the prompt at the bottom,
 waiting for a keypress after temporarily switching to the
 tt(listscroll) keymap. Some of the zle functions have special meaning:
 
@@ -156,20 +169,6 @@ as usual. Any key that is not bound in the tt(listscroll) keymap or
 that is bound to tt(undefined-key) is looked up in the keymap
 currently selected.
 
-If the parameter tt(LISTPROMPT) is set, its value will be used as the
-prompt.  The value may contain escapes of the form `tt(%x)'. It
-supports the escapes `tt(%B)', `tt(%b)', `tt(%S)', `tt(%s)', `tt(%U)',
-`tt(%u)' and `tt(%{...%})' known from the shell prompts and three
-pairs of additional sequences. A `tt(%l)' or `tt(%L)' is replaced by
-the number of the last line shown and the total number of lines in the form
-`var(number)tt(/)var(total)'. A `tt(%m)' or `tt(%M)' is replaced with
-the number of the last match shown and the total number of matches and 
-`tt(%p)' or `tt(%P)' is replaced with `tt(Top)', `tt(Bottom)' or the
-position of the first line shown in percent of the total number of
-lines, respectively. In each of these cases the one with the uppercase 
-letter will be replaced with a string of fixed width, padded to the
-right with spaces.
-
 As for the tt(ZLS_COLORS) and tt(ZLS_COLOURS) parameters,
 tt(LISTPROMPT) should not be set directly when using the shell
 function based completion system. Instead, the tt(list-prompt) style
@@ -177,7 +176,7 @@ should be used.
 
 subsect(Menu selection)
 cindex(completion, selecting by cursor)
-vindex(SELECTMIN)
+vindex(MENUSELECT)
 tindex(menu-select)
 The tt(zsh/complist) module also offers an alternative style of selecting
 matches from a list, called menu-selection, which can be used if the
@@ -187,16 +186,16 @@ ifzman(zmanref(zshoptions))\
 ifnzman(noderef(Options))\
 ). It can be invoked directly by
 the widget tt(menu-select) defined by the module.  Alternatively,
-the parameter tt(SELECTMIN) can be set to an integer, which give the
+the parameter tt(MENUSELECT) can be set to an integer, which give the
 minimum number of matches that must be present before menu selection is
 automatically turned on.  This second method requires that menu completion
 be started, either directly from a widget such as tt(menu-complete), or due
 to one of the options tt(MENU_COMPLETE) or tt(AUTO_MENU) being set.  If
-tt(SELECTMIN) is set, but is 0, 1 or empty, menu selection will always be
+tt(MENUSELECT) is set, but is 0, 1 or empty, menu selection will always be
 started during an ambiguous menu completion.
 
 When using the shell function based completion system, the
-tt(SELECTMIN) parameter should not be used (like the tt(ZLS_COLORS)
+tt(MENUSELECT) parameter should not be used (like the tt(ZLS_COLORS)
 and tt(ZLS_COLOURS) parameters described above). Instead, the tt(menu) 
 style should be used.
 
@@ -212,12 +211,13 @@ neither tt(ZLS_COLORS) nor tt(ZLS_COLOURS) is set, the same terminal
 control sequence as for the `tt(%S)' escape in prompts is used.
 
 If there are more matches than fit on the screen and the parameter
-tt(SELECTPROMPT) is set, its value will be shown below the
-matches. It supports the sames escape sequences as tt(LISTPROMPT), but 
-the number of the match or line shown will be that of the one where
-the mark is placed.
+tt(MENUPROMPT) is set, its value will be shown below the matches. It
+supports the sames escape sequences as tt(LISTPROMPT), but the number
+of the match or line shown will be that of the one where the mark is
+placed. If its value is the empty string, a default prompt will be
+used.
 
-The tt(SELECTSCROLL) parameter can be used to specify how the list is
+The tt(MENUSCROLL) parameter can be used to specify how the list is
 scrolled. If the parameter is unset, this is done line by line, if it
 is set to `tt(0)' (zero), the list will scrolled half the number of
 lines of the screen. If the value is positive, it gives the number of
@@ -225,7 +225,7 @@ lines to scroll and if it is negative, the list will be scrolled
 the number of lines of the screen minus the (absolute) value.
 
 As for the tt(ZLS_COLORS), tt(ZLS_COLOURS) and tt(LISTPROMPT)
-parameters, neither tt(SELECTPROMPT) nor tt(SELECTSCROLL) should be
+parameters, neither tt(MENUPROMPT) nor tt(MENUSCROLL) should be
 set directly when using the shell function based completion
 system. Instead, the tt(select-prompt) and tt(select-scroll) styles
 should be used.
