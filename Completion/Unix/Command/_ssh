@@ -1,18 +1,26 @@
 #compdef ssh slogin=ssh scp ssh-add ssh-agent ssh-keygen
 
 _remote_files () {
-  # Rather than simple directory discrimination, there should be
-  # coloring based on all the different ls -F classifiers.
-  local expl remfiles
+  # There should be coloring based on all the different ls -F classifiers.
+  local expl remfiles remdispf remdispd
 
   if zstyle -T ":completion:${curcontext}:" remote-access; then
-    remfiles=(${(f)"$(ssh -a -x ${words[CURRENT]%:*} ls -d1F ${words[CURRENT]#*:}\* 2>/dev/null)"})
+    if [[ $options[globdots] == "on" ]] && [[ "$PREFIX" == */ || -z "$PREFIX" ]];
+    then
+      print ssh -a -x ${words[CURRENT]%:*} ls -a1F ${words[CURRENT]#*:}
+      remfiles=(${(f)"$(ssh -a -x ${words[CURRENT]%:*} ls -a1F ${words[CURRENT]#*:} 2>/dev/null)"})
+    else
+      remfiles=(${(f)"$(ssh -a -x ${words[CURRENT]%:*} ls -d1F ${words[CURRENT]#*:}\* 2>/dev/null)"})
+    fi
 
-    _wanted files expl 'remote files' \
-      compadd ${${remfiles:#*/}/[*=@|](#e)/}
+    remdispf=(${remfiles:#*/})
+    remdispd=(${(M)remfiles:#*/})
 
-    _wanted dirs expl 'remote directories' \
-      compadd -S/ ${${(M)remfiles:#*/}/\\/(#e)/}
+    _wanted files expl 'remote files and directories' \
+      compadd -d remdispf ${${remfiles:#*/}/[*=@|](#e)/}
+      
+    _wanted files expl 'remote files and directories' \
+      compadd -S/ -d remdispd ${${(M)remfiles:#*/}/\\/(#e)/}
   else
     _message 'remote files'
   fi
