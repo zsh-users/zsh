@@ -10,6 +10,12 @@
 	file with signal names to make finding the file with resource
 	names more reliable.
 
+2005-02-14  Wayne Davison  <wayned@users.sourceforge.net>
+
+	* unposted: Completion/Unix/Command/_rsync:  Divided the options
+	so that daemon options and client options are not intermixed.
+	Improved some descriptions and added new options for 2.6.4.
+
 2005-02-10  Wayne Davison  <wayned@users.sourceforge.net>
 
 	* unposted: Completion/Unix/Command/_yodl:  Added missing
