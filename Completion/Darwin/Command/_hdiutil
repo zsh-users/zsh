@@ -84,9 +84,9 @@ _hdiutil(){
     -stdinpass "-stdinpass[specify password from standard input]"
     -certificate "-certificate[secondary access certificate]:certificate file:_files"
     -cacert "-cacert[certificate authority certificate]: :_files"
-    -imagekey "*-imagekey[image key]:: :->keyvalue"
-    -srcimagekey "*-srcimagekey[source image key]:: :->keyvalue"
-    -tgtimagekey "*-tgtimagekey[target image key]:: :->keyvalue"
+    -imagekey "*-imagekey[image key]: :->keyvalue"
+    -srcimagekey "*-srcimagekey[source image key]: :->keyvalue"
+    -tgtimagekey "*-tgtimagekey[target image key]: :->keyvalue"
     -insecurehttp "-insecurehttp[ignore SSL host validation failure]"
     -plist "-plist[display output in plist format]"
     -recover "-recover[keychain to unlock]:keychain file:_files -g \*.keychain"
@@ -240,8 +240,8 @@ _hdiutil(){
         
       if [[ $state = keyvalue ]]; then
         _values 'key=value' \
-          "di-sparse-puma-compatible:(TRUE FALSE)" \
-          "di-shadow-puma-compatible:(TRUE FALSE)" \
+          "di-sparse-puma-compatible: :(TRUE FALSE)" \
+          "di-shadow-puma-compatible: :(TRUE FALSE)" \
           "encrypted-encoding-version:version:(1 2)" \
           "zlib-level:compression level:(1 2 3 4 5 6 7 8 9)" && return 0
       fi

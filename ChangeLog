@@ -2,6 +2,9 @@
 
 	* unposted: Completion/Darwin/Command/_softwareupdate: new completion
 
+	* unposted: Completion/Darwin/Command/_hdiutil: arguments are
+	required after -imagekey, -srcimagekey options
+
 2005-03-03  Oliver Kiddle  <opk@zsh.org>
 
 	* 20921, 20924: Src/utils.c, Completion/Unix/Command/_iconv:
