@@ -2,5 +2,5 @@ DISTFILES_SRC='
     .distfiles
     _bash_completions _complete_debug _correct_filename _correct_word
     _expand_word _history_complete_word _read_comp _most_recent_file
-    _complete_help _next_tags _complete_tag
+    _complete_help _next_tags _complete_tag _generic
 '

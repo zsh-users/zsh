@@ -1,5 +1,8 @@
 2000-06-19  Peter Stephenson  <pws@cambridgesiliconradio.com>
 
+	* unpost: additions to Completion/Commands/.distfiles and
+	.distfiles.
+
 	* users/3189: Functions/Misc/zmv:  use depth-first ordering with
 	**/; ignore files whose names are unchanged by the substitution.
 
