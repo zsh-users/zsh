@@ -1,3 +1,8 @@
+2004-08-01  Clint Adams  <clint@zsh.org>
+
+	* 20225: Doc/Zsh/mod_clone.yo: add Philippe Troin's explanations
+	of clone usage.
+
 2004-07-30  Peter Stephenson  <pws@csr.com>
 
 	* unposted: minor tidy up for 20219: neaten read-from-minibuffer
