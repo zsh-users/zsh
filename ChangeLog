@@ -1,5 +1,9 @@
 2000-07-26  Sven Wischnowsky  <wischnow@zsh.org>
 
+	* 12378: Completion/Base/_arguments: make `_arguments --' use
+ 	specs after the `--' even for options not described in the help
+ 	output to get arguments
+	
 	* users/3337: Completion/Base/_value: allow _value:<assoc> functions to
  	override completion for all keys of an assoc
 	

@@ -142,11 +142,16 @@ if (( long )); then
 	cache=( "$cache[@]" "${(@)^tmpo}=${dir}${descr}" )
       fi
 
-      # Everything else is just added as an option without arguments.
+      # Everything else is just added as an option without arguments or
+      # as described by $descr.
 
       if (( $#tmp )); then
         tmp=("${(@)tmp//[^a-zA-Z0-9-]}")
-	cache=( "$cache[@]" "$tmp[@]" )
+        if [[ -n "$descr" ]]; then
+	  cache=( "$cache[@]" "${(@)^tmp}${descr}" )
+        else
+	  cache=( "$cache[@]" "$tmp[@]" )
+        fi
       fi
     done
     set -A "$name" "${(@)cache:# #}"
