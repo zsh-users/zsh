@@ -14,7 +14,7 @@ _arguments -s \
   '(--version)-V[show version]' \
   '(--help)-h[show help]' \
   '(--yacc --fixed-output-file)-y[imitate yacc'"'"'s output file convention]' \
-  ':input file:_files -g \*.\(\#i\)\(bison\|yacc\)' \
+  ':input file:_files -g \*.\(\#i\)\(bison\|yacc\|y\)' \
   -- \
   '*=outfile:parser file name:_files' \
   '*file-prefix=prefix:output file prefix:' \

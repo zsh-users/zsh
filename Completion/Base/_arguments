@@ -5,7 +5,7 @@
 
 setopt localoptions extendedglob
 
-local long cmd="$words[1]" descr
+local long cmd="$words[1]" descr mesg
 
 long=$argv[(I)--]
 if (( long )); then
@@ -189,7 +189,7 @@ if comparguments -i "$compconfig[autodescribe_options]" "$@"; then
           # An empty action means that we should just display a message.
 
           [[ -n "$matched" ]] && compadd -n -Q -S '' -s "$SUFFIX" - "$PREFIX"
-          _message "$descr"
+          mesg="$descr"
 
         elif [[ "$action" = \(\(*\)\) ]]; then
 
@@ -286,6 +286,7 @@ if comparguments -i "$compconfig[autodescribe_options]" "$@"; then
 
   [[ -n "$aret" ]] && return 300
 
+  [[ -n "$mesg" ]] && _message "$mesg"
   [[ -n "$noargs" ]] && _message "$noargs"
 
   # Set the return value.

@@ -583,8 +583,10 @@ parse_cadef(char *nam, char **args)
 	    if ((multi = (*p == '*')))
 		p++;
 
-	    if ((p[0] == '-' && p[1] == '+') ||
-		(p[0] == '+' && p[1] == '-')) {
+	    if (((p[0] == '-' && p[1] == '+') ||
+		 (p[0] == '+' && p[1] == '-')) &&
+		p[2] && p[2] != ':' && p[2] != '[' &&
+		p[2] != '=' && p[2] != '-' && p[2] != '+') {
 		name = ++p;
 		*p = (again ? '-' : '+');
 		again = 1 - again;
@@ -593,7 +595,12 @@ parse_cadef(char *nam, char **args)
 		if (p[0] == '-' && p[1] == '-')
 		    p++;
 	    }
-	    for (p++; *p && *p != ':' && *p != '[' &&
+	    if (!p[1]) {
+		free_cadef(ret);
+		zerrnam(nam, "invalid argument: %s", *args, 0);
+		return NULL;
+	    }
+	    for (p += 2; *p && *p != ':' && *p != '[' &&
 		     ((*p != '-' && *p != '+' && *p != '=') ||
 		      (p[1] != ':' && p[1] != '[')); p++)
 		if (*p == '\\' && p[1])
@@ -834,8 +841,7 @@ static Caopt
 ca_get_sopt(Cadef d, char *line, int full, char **end)
 {
     Caopt p;
-
-    line++;
+    char pre = *line++;
 
     if (full) {
 	for (p = NULL; *line; line++)
@@ -846,7 +852,7 @@ ca_get_sopt(Cadef d, char *line, int full, char **end)
     } else {
 	for (p = NULL; *line; line++)
 	    if ((p = d->single[STOUC(*line)]) && p->active &&
-		p->args && p->type != CAO_NEXT) {
+		p->args && p->type != CAO_NEXT && p->name[0] == pre) {
 		if (end) {
 		    line++;
 		    if (p->type == CAO_EQUAL && *line == '=')
@@ -854,9 +860,12 @@ ca_get_sopt(Cadef d, char *line, int full, char **end)
 		    *end = line;
 		}
 		break;
-	    } else if (!p || !p->active || (line[1] && p->args))
+	    } else if (!p || !p->active || (line[1] && p->args) ||
+		       p->name[0] != pre)
 		return NULL;
-	if (end)
+	    else
+		p = NULL;
+	if (p && end)
 	    *end = line;
 	return p;
     }
