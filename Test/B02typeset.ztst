@@ -148,7 +148,7 @@
  print $f
 0:Conversion of floating point to integer
 >float local f
->integer local f
+>integer 2 local f
 >2#11
 
  typeset -f

@@ -1,5 +1,8 @@
 2002-07-05  Peter Stephenson  <pws@csr.com>
 
+	* 17432: Test/B02typeset.ztst:  change consequent on 17334
+	spotted by Bart:  `typeset' outputs base for integer.	
+
 	* 17414: Doc/Zsh/contrib.yo, Functions/Zle/narrow-to-region:
 	allow narrow-to-region to save and restore state, a bit
 	like save-restriction in emacs only completely different.
