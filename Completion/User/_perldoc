@@ -14,16 +14,10 @@ _perldoc () {
 }
 
 _perl_pods () {
-  local nm="$compstate[nmatches]"
-  local expl
-  
-  _perl_modules
-  _perl_basepods
-
-  _description expl 'Perl modules and .pods'
-  _files "$expl[@]"  -g '*.(pod|pm)'
-
-  [[ nm -ne "$compstate[nmatches]" ]]
+  _alternative \
+    'modules:: _perl_modules' \
+    'pods:: _perl_basepods' \
+    'files:Perl modules and .pods:_files -g \*.\(pod\|pm\)'
 }
 
 _perldoc "$@"
