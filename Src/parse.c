@@ -2467,10 +2467,11 @@ ecgetarr(Estate s, int num, int dup)
 {
     char **ret, **rp;
 
-    ret = rp = (char **) zhalloc(num * sizeof(char *));
+    ret = rp = (char **) zhalloc((num + 1) * sizeof(char *));
 
     while (num--)
 	*rp++ = ecgetstr(s, dup);
+    *rp = NULL;
 
     return ret;
 }

@@ -3281,7 +3281,6 @@ stripkshdef(Eprog prog, char *name)
 {
     Wordcode pc = prog->prog;
     wordcode code;
-    Eprog ret;
 
     if (!prog)
 	return NULL;
@@ -3301,16 +3300,33 @@ stripkshdef(Eprog prog, char *name)
 	*pc != 1 || strcmp(name, ecrawstr(prog, pc + 1)))
 	return prog;
 
-    ret = (Eprog) zhalloc(sizeof(*prog));
-    ret->len = (WC_FUNCDEF_SKIP(code) - 3) * sizeof(wordcode);
-    ret->prog = pc + 3;
-    ret->strs = (char *) (pc + pc[3]);
-    ret->shf = NULL;
-    ret->pats = prog->pats;
-    ret->npats = prog->npats;
-    ret->heap = 1;
+    {
+	Eprog ret;
+	Wordcode end = pc + WC_FUNCDEF_SKIP(code);
+	int nprg = pc[2] - 4;
+	int npats = pc[3];
+	int plen, len, i;
+	Patprog *pp;
 
-    return ret;
+	pc += 4;
+
+	plen = (end - pc) * sizeof(wordcode);
+	len = plen + (npats * sizeof(Patprog));
+
+	ret = (Eprog) zhalloc(sizeof(*ret));
+	ret->heap = 1;
+	ret->len = len;
+	ret->npats = npats;
+	ret->pats = pp = (Patprog *) zhalloc(len);
+	ret->prog = (Wordcode) (ret->pats + npats);
+	for (i = npats; i--; pp++)
+	    *pp = dummy_patprog1;
+	memcpy(ret->prog, pc, plen);
+	ret->strs = (char *) (ret->prog + nprg);
+	ret->shf = NULL;
+
+	return ret;
+    }
 }
 
 /* check to see if AUTOCD applies here */

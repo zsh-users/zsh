@@ -636,6 +636,7 @@ gettext2(Estate state)
 			break;
 		    case COND_MOD:
 			taddstr(ecgetstr(state, 0));
+			taddchr(' ');
 			taddlist(state, WC_COND_SKIP(code));
 			stack = 1;
 			break;
