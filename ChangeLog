@@ -1,3 +1,8 @@
+2000-10-04  Tanaka Akira  <akr@zsh.org>
+
+	* 12886: Completion/User/_cvs: make _cvs_vendor_branches to handle
+	remote-access style.
+
 2000-10-04  Sven Wischnowsky  <wischnow@zsh.org>
 
 	* 12885: Src/Zle/zle_tricky.c: don't stop parsing too early when

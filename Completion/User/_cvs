@@ -744,11 +744,14 @@ _cvs_remote_directories () {
 (( $+functions[_cvs_vendor_branches] )) ||
 _cvs_vendor_branches () {
   local expl vendor_branch
-  if [[ -n $opt_args[-b] ]]; then
-    _cvs_extract_vendor_branch -b "$opt_args[-b]" "$cvsroot" "$line[1]" \
-      vendor_branch
-  else
-    _cvs_extract_vendor_branch "$cvsroot" "$line[1]" vendor_branch
+  vendor_branch=()
+  if zstyle -T ":completion:${curcontext}:" remote-access; then
+    if [[ -n $opt_args[-b] ]]; then
+      _cvs_extract_vendor_branch -b "$opt_args[-b]" "$cvsroot" "$line[1]" \
+	vendor_branch
+    else
+      _cvs_extract_vendor_branch "$cvsroot" "$line[1]" vendor_branch
+    fi
   fi
   if (( $#vendor_branch )); then
     _wanted values expl 'vendor branch' compadd -a vendor_branch
