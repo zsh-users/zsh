@@ -1,3 +1,8 @@
+2001-09-09  Clint Adams  <clint@zsh.org>
+
+	* 15766: Src/Modules/tcp.c, Src/Modules/tcp.h:
+	add -l (listen) for ztcp.
+
 2001-09-08  Clint Adams  <clint@zsh.org>
 
 	* 15765: Doc/Zsh/expn.yo, Src/pattern.c:

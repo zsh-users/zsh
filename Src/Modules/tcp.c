@@ -89,11 +89,11 @@ int h_errno;
 mod_export char const *
 zsh_inet_ntop(int af, void const *cp, char *buf, size_t len)
 {       
-    if(af != AF_INET) {
+    if (af != AF_INET) {
 	errno = EAFNOSUPPORT;
 	return NULL;
     } 
-    if(len < INET_ADDRSTRLEN) {
+    if (len < INET_ADDRSTRLEN) {
 	errno = ENOSPC;
 	return NULL;
     }
@@ -111,14 +111,11 @@ zsh_inet_ntop(int af, void const *cp, char *buf, size_t len)
 #endif /* !HAVE_INET_NTOP */
 
 /**/
-#ifndef HAVE_INET_PTON
+#ifndef HAVE_INET_ATON
 
-/**/
-# ifndef HAVE_INET_ATON
-
-#  ifndef INADDR_NONE
-#   define INADDR_NONE 0xffffffffUL
-#  endif
+# ifndef INADDR_NONE
+#  define INADDR_NONE 0xffffffffUL
+# endif
 
 /**/
 mod_export int zsh_inet_aton(char const *src, struct in_addr *dst)
@@ -133,13 +130,16 @@ mod_export int zsh_inet_aton(char const *src, struct in_addr *dst)
 # define zsh_inet_aton inet_aton
 
 /**/
-# endif /* !HAVE_INET_ATON */
+#endif /* !HAVE_INET_ATON */
+
+/**/
+#ifndef HAVE_INET_PTON
 
 /**/
 mod_export int
 zsh_inet_pton(int af, char const *src, void *dst)
 {
-    if(af != AF_INET) {
+    if (af != AF_INET) {
 	errno = EAFNOSUPPORT;
 	return -1;
     }
@@ -163,7 +163,7 @@ zsh_inet_pton(int af, char const *src, void *dst)
 mod_export struct hostent *
 zsh_gethostbyname2(char const *name, int af)
 {
-    if(af != AF_INET) {
+    if (af != AF_INET) {
 	h_errno = NO_RECOVERY;
 	return NULL;
     }
@@ -196,7 +196,7 @@ zsh_getipnodebyname(char const *name, int af, int flags, int *errorp)
     static char pbuf[INET_ADDRSTRLEN];
 # endif
     struct hostent *he;
-    if(zsh_inet_pton(af, name, nbuf) == 1) {
+    if (zsh_inet_pton(af, name, nbuf) == 1) {
 	zsh_inet_ntop(af, nbuf, pbuf, sizeof(pbuf));
 	ahe.h_name = pbuf;
 	ahe.h_aliases = addrlist+1;
@@ -206,7 +206,7 @@ zsh_getipnodebyname(char const *name, int af, int flags, int *errorp)
 	return &ahe;
     }
     he = zsh_gethostbyname2(name, af);
-    if(!he)
+    if (!he)
 	*errorp = h_errno;
     return he;
 }
@@ -247,12 +247,12 @@ zts_alloc(int ztflags)
     Tcp_session sess;
 
     sess = (Tcp_session)zcalloc(sizeof(struct tcp_session));
-    if(!sess) return NULL;
+    if (!sess) return NULL;
     sess->fd=-1;
     sess->next=NULL;
     sess->flags=ztflags;
 
-    if(!zts_head()) {
+    if (!zts_head()) {
 	ztcp_head = ztcp_tail = sess;
     }
     else {
@@ -268,7 +268,7 @@ tcp_socket(int domain, int type, int protocol, int ztflags)
     Tcp_session sess;
 
     sess = zts_alloc(ztflags);
-    if(!sess) return NULL;
+    if (!sess) return NULL;
 
     sess->fd = socket(domain, type, protocol);
     return sess;
@@ -281,7 +281,7 @@ zts_delete(Tcp_session sess)
 
     tsess = zts_head();
 
-    if(tsess == sess)
+    if (tsess == sess)
     {
 	ztcp_head = sess->next;
 	free(sess);
@@ -293,7 +293,7 @@ zts_delete(Tcp_session sess)
 	tsess = zts_next(tsess);
     }
 
-    if(!tsess->next) return 1;
+    if (!tsess->next) return 1;
 
     tsess->next = tsess->next->next;
     free(tsess->next);
@@ -309,7 +309,7 @@ zts_byfd(int fd)
     tsess = zts_head();
 
     do {
-	if(tsess->fd == fd)
+	if (tsess->fd == fd)
 	    return tsess;
 
 	tsess = zts_next(tsess);
@@ -338,10 +338,10 @@ tcp_close(Tcp_session sess)
 {
     int err;
     
-    if(sess->fd != -1)
+    if (sess->fd != -1)
     {  
 	err = close(sess->fd);
-	if(err)
+	if (err)
 	{
 	    zwarn("connection close failed: %e", NULL, errno);
 	    return -1;
@@ -358,7 +358,7 @@ tcp_connect(Tcp_session sess, char *addrp, struct hostent *zhost, int d_port)
 {
     int salen;
 #ifdef SUPPORT_IPV6
-    if(zhost->h_addrtype==AF_INET6) {
+    if (zhost->h_addrtype==AF_INET6) {
 	memcpy(&(sess->peer.in6.sin6_addr), addrp, zhost->h_length);
 	sess->peer.in6.sin6_port = d_port;
 	sess->peer.in6.sin6_flowinfo = 0;
@@ -381,9 +381,9 @@ tcp_connect(Tcp_session sess, char *addrp, struct hostent *zhost, int d_port)
 static int
 bin_ztcp(char *nam, char **args, char *ops, int func)
 {
-    int herrno, err=1, destport, force=0, verbose=0, len;
-    char **addrp, *desthost;
-    struct hostent *zthost = NULL;
+    int herrno, err=1, destport, force=0, verbose=0, len, rfd;
+    char **addrp, *desthost, *localname, *remotename;
+    struct hostent *zthost = NULL, *ztpeer = NULL;
     Tcp_session sess;
 
     if (ops['f'])
@@ -400,9 +400,9 @@ bin_ztcp(char *nam, char **args, char *ops, int func)
 	    int targetfd = atoi(args[0]);
 	    sess = zts_byfd(targetfd);
 
-	    if(sess)
+	    if (sess)
 	    {
-		if((sess->flags & ZTCP_ZFTP) && !force)
+		if ((sess->flags & ZTCP_ZFTP) && !force)
 		{
 		    zwarnnam(nam, "use -f to force closure of a zftp control connection", NULL, 0);
 		    return 1;
@@ -418,16 +418,93 @@ bin_ztcp(char *nam, char **args, char *ops, int func)
 	    }
 	}
     }
+    else if (ops['l']) {
+	int lport;
+
+	if (!args[0]) {
+	    zwarnnam(nam, "-l requires an argument", NULL, 0);
+	    return 1;
+	}
+	lport = atoi(args[0]);
+	if (!lport) {
+	    zwarnnam(nam, "bad port number", NULL, 0);
+	    return 1;
+	}
+	sess = tcp_socket(PF_INET, SOCK_STREAM, 0, 0);
+
+	if (!sess) {
+	    zwarnnam(nam, "unable to allocate a TCP session slot", NULL, 0);
+	    return 1;
+	}
+#ifdef SO_OOBINLINE
+	len = 1;
+	setsockopt(sess->fd, SOL_SOCKET, SO_OOBINLINE, (char *)&len, sizeof(len));
+#endif
+	if (!zsh_inet_aton("0.0.0.0", &(sess->sock.in.sin_addr)))
+	{
+	    zwarnnam(nam, "bad address: %s", "0.0.0.0", 0);
+	    return 1;
+	}
+
+	sess->sock.in.sin_family = AF_INET;
+	sess->sock.in.sin_port = htons(lport);
+
+
+	if (bind(sess->fd, (struct sockaddr *)&sess->sock.in, sizeof(struct sockaddr_in)))
+	{
+	    zwarnnam(nam, "could not bind to %s: %e", "0.0.0.0", errno);
+	    tcp_close(sess);
+	    return 1;
+	}
+
+	if (listen(sess->fd, 1))
+	{
+	    zwarnnam(nam, "could not listen on socket: %e", NULL, errno);
+	    tcp_close(sess);
+	    return 1;
+	}
+
+	if ((rfd = accept(sess->fd, (struct sockaddr *)&sess->peer.in, &len)) == -1)
+	{
+	    zwarnnam(nam, "could not accept connection: %e", NULL, errno);
+	    tcp_close(sess);
+	    return 1;
+	}
+
+	/* move the fd since it doesn't seem to be closing well */
+	sess->fd = movefd(sess->fd);
+
+	err = close(sess->fd);
+	if (err)
+	{
+	    zwarn("listener close failed: %e", NULL, errno);
+	    return -1;
+	}
+	sess->fd = rfd;
+
+	fprintf(shout, "%d is on fd %d\n", ntohs(sess->peer.in.sin_port), sess->fd);
+
+	return 0;
+
+    }
     else {
 	
 	if (!args[0]) {
 	    for(sess = zts_head(); sess != NULL; sess = zts_next(sess))
 	    {
-		if(sess->fd != -1)
+		if (sess->fd != -1)
 		{
-		    zthost = gethostbyaddr(&(sess->peer.in.sin_addr), sizeof(struct sockaddr_in), AF_INET);
-		    if(zthost) fprintf(shout, "%s:%d is on fd %d%s\n", zthost->h_name, ntohs(sess->peer.in.sin_port), sess->fd, (sess->flags & ZTCP_ZFTP) ? " ZFTP" : "");
-		    else fprintf(shout, "%s:%d is on fd %d%s\n", "UNKNOWN", sess->peer.in.sin_port, sess->fd, (sess->flags & ZTCP_ZFTP) ? " ZFTP" : "");
+		    zthost = gethostbyaddr(&(sess->sock.in.sin_addr), sizeof(struct sockaddr_in), AF_INET);
+		    if (zthost)
+			localname = zthost->h_name;
+		    else
+			localname = ztrdup(inet_ntoa(sess->sock.in.sin_addr));
+		    ztpeer = gethostbyaddr(&(sess->peer.in.sin_addr), sizeof(struct sockaddr_in), AF_INET);
+		    if (ztpeer)
+			remotename = ztpeer->h_name;
+		    else
+			remotename = ztrdup(inet_ntoa(sess->sock.in.sin_addr));
+		    fprintf(shout, "%s:%d -> %s:%d is on fd %d%s%s\n", localname, ntohs(sess->sock.in.sin_port), remotename, ntohs(sess->peer.in.sin_port), sess->fd, (sess->flags & ZTCP_ZFTP) ? " ZFTP" : "", (sess->flags & ZTCP_INBOUND) ? "INBOUND" : "");
 		}
 	    }
 	    return 0;
@@ -448,15 +525,17 @@ bin_ztcp(char *nam, char **args, char *ops, int func)
 	}
 	
 	sess = tcp_socket(PF_INET, SOCK_STREAM, 0, 0);
+
+	if (!sess) {
+	    zwarnnam(nam, "unable to allocate a TCP session slot", NULL, 0);
+	    return 1;
+	}
+
 #ifdef SO_OOBINLINE
 	len = 1;
 	setsockopt(sess->fd, SOL_SOCKET, SO_OOBINLINE, (char *)&len, sizeof(len));
 #endif
 
-	if(!sess) {
-	    zwarnnam(nam, "unable to allocate a TCP session slot", NULL, 0);
-	    return 1;
-	}
 	if (sess->fd < 0) {
 	    zwarnnam(nam, "socket creation failed: %e", NULL, errno);
 	    zsfree(desthost);
@@ -465,18 +544,18 @@ bin_ztcp(char *nam, char **args, char *ops, int func)
 	}
 	
 	for (addrp = zthost->h_addr_list; err && *addrp; addrp++) {
-	    if(zthost->h_length != 4)
+	    if (zthost->h_length != 4)
 		zwarnnam(nam, "address length mismatch", NULL, 0);
 	    do {
 		err = tcp_connect(sess, *addrp, zthost, htons(destport));
 	    } while (err && errno == EINTR && !errflag);
 	}
 	
-	if(err)
+	if (err)
 	    zwarnnam(nam, "connection failed: %e", NULL, errno);
 	else
 	{
-	    if(verbose)
+	    if (verbose)
 		fprintf(shout, "%s:%d is now on fd %d\n", desthost, destport, sess->fd);
 	    else
 		fprintf(shout, "%d\n", sess->fd);
@@ -490,7 +569,7 @@ bin_ztcp(char *nam, char **args, char *ops, int func)
 }
 
 static struct builtin bintab[] = {
-    BUILTIN("ztcp", 0, bin_ztcp, 0, 2, 0, "c", NULL),
+    BUILTIN("ztcp", 0, bin_ztcp, 0, 2, 0, "cflv", NULL),
 };
 
 /* The load/unload routines required by the zsh library interface */
