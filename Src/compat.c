@@ -198,12 +198,32 @@ zpathmax(char *dir)
 mod_export long
 zopenmax(void)
 {
-    long openmax = sysconf(_SC_OPEN_MAX);
+    static long openmax = 0;
 
-    if (openmax < 1)
-	return OPEN_MAX;
-    else
-	return openmax;
+    if (openmax < 1) {
+	if ((openmax = sysconf(_SC_OPEN_MAX)) < 1) {
+	    openmax = OPEN_MAX;
+	} else if (openmax > OPEN_MAX) {
+	    /* On some systems, "limit descriptors unlimited" or the  *
+	     * equivalent will set openmax to a huge number.  Unless  *
+	     * there actually is a file descriptor > OPEN_MAX already *
+	     * open, nothing in zsh requires the true maximum, and in *
+	     * fact it causes inefficiency elsewhere if we report it. *
+	     * So, report the maximum of OPEN_MAX or the largest open *
+	     * descriptor (is there a better way to find that?).      */
+	    long i, j = OPEN_MAX;
+	    for (i = j; i < openmax; i += (errno != EINTR)) {
+		errno = 0;
+		if (fcntl(i, F_GETFL, 0) < 0 &&
+		    (errno == EBADF || errno == EINTR))
+		    continue;
+		j = i;
+	    }
+	    openmax = j;
+	}
+    }
+
+    return (max_zsh_fd > openmax) ? max_zsh_fd : openmax;
 }
 #endif
 
