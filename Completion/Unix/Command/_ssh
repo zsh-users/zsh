@@ -2,10 +2,11 @@
 
 _remote_files () {
   # There should be coloring based on all the different ls -F classifiers.
-  local expl remfiles remdispf remdispd suf ret=1
+  local expl remfiles remdispf remdispd args suf ret=1
 
   if zstyle -T ":completion:${curcontext}:" remote-access; then
-    remfiles=(${(M)${(f)"$(ssh -a -x ${words[CURRENT]%%:*} ls -d1F ${PREFIX%%[^./][^/]#}\* 2>/dev/null)"}%%[^/]#(|/)})
+    zparseopts -D -E -a args p: 1 2 4 6 F:
+    remfiles=(${(M)${(f)"$(ssh $args -a -x ${words[CURRENT]%%:*} ls -d1F ${PREFIX%%[^./][^/]#}\* 2>/dev/null)"}%%[^/]#(|/)})
     compset -P '*/'
     compset -S '/*' || suf='remote file'
 
@@ -262,7 +263,7 @@ _ssh () {
       ;;
     file)
       if compset -P '*:'; then
-        _remote_files && ret=0
+        _remote_files ${(kv)~opt_args[(I)-[FP1246]]/-P/-p} && ret=0
       elif compset -P '*@'; then
         _wanted hosts expl host _ssh_hosts -S: && ret=0
       else
