@@ -1,3 +1,8 @@
+2005-03-10  Andrey Borzenkov  <bor@zsh.org>
+
+	* 20957: Completion/Unix/Command/_fuser:
+	Add support for Solaris and SVR4
+
 2005-03-10  Peter Stephenson  <pws@csr.com>
 
 	* 20959 (variant of 20958): Src/params.c, Src/Module/parameter.c,

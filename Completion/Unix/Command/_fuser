@@ -1,17 +1,42 @@
 #compdef fuser
 
-_arguments \
-       '(-s)-a[show all files specified on the command line]' \
-       {-c,-m}'[list all processes accessing files on the filesystem specified by name]' \
-       '-k[kill processes accessing the file]' \
-       '-i[ask for confirmation before killing]' \
-       '-l[list all known signal names]' \
-       '-n[select name space]:namespace:(file udp tcp)' \
-       '(-a)-s[silent operation]' \
-       '-signal[send alternate signal with -k]:signal:_signals' \
-       '-u[append the user name of the process owner to each PID]' \
-       '-v[verbose mode]' \
-       '-V[display version information]' \
-       '-4[search only for IPv4 sockets]' \
-       '-6[search only for IPv6 sockets]' \
-       ':name:_files'
+local -a args arg1
+
+if _pick_variant -c $words[1] gnu=GNU unix -V; then
+  _arguments \
+	 '(-s)-a[show all files specified on the command line]' \
+	 {-c,-m}'[list all processes accessing files on the filesystem specified by name]' \
+	 '-k[kill processes accessing the file]' \
+	 '-i[ask for confirmation before killing]' \
+	 '-l[list all known signal names]' \
+	 '-n[select name space]:namespace:(file udp tcp)' \
+	 '(-a)-s[silent operation]' \
+	 '-signal[send alternate signal with -k]:signal:_signals' \
+	 '-u[append the user name of the process owner to each PID]' \
+	 '-v[verbose mode]' \
+	 '-V[display version information]' \
+	 '-4[search only for IPv4 sockets]' \
+	 '-6[search only for IPv6 sockets]' \
+	 ':name:_files'
+else
+  case $OSTYPE in
+    solaris2.9 )
+      args=(
+	 '-n[list only processes with non-blocking mandatory locks]' 
+	 '-s[send alternate signal with -k]:signal:_signals' 
+      )
+    ;;
+    sysv4 )
+      arg1=( ':signal:_signals -p' )
+    ;;
+  esac
+
+  _arguments \
+	 '(-f)-c[list all processes accessing files on the filesystem specified by name]' \
+	 '(-c)-f[list all processes accessing named files]' \
+	 '-k[kill processes accessing the file]' \
+	 '-u[append the user name of the process owner to each PID]' \
+	 $args \
+	 $arg1 \
+	 ':name:_files'
+fi
