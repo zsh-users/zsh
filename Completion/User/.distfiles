@@ -3,7 +3,7 @@ DISTFILES_SRC='
     _a2ps _archie _bison _bunzip2 _bzip2 _chown _compress
     _configure _cvs _dd _diff _diff_options _dir_list _dirs
     _domains _dvi _find _finger _fakeroot _flex _gcc _gdb  _getconf _gprof _groups
-    _gs _gunzip _gv _gzip _hosts _imagemagick _ispell _killall _lp _lynx
+    _gs _gv _gzip _hosts _imagemagick _ispell _killall _lp _lynx
     _mailboxes _make _man _mh _mount _mutt _my_accounts _mysql_utils _nedit
     _netscape _nslookup _other_accounts _pack _patch _pbm _pdf _perl
     _perl_basepods _perl_builtin_funcs _perl_modules _perldoc
@@ -11,5 +11,5 @@ DISTFILES_SRC='
     _ssh _strip _stty _su _sudo _tar _tar_archive _telnet _tex _texi
     _tiff _tilde_files _uncompress _unpack _urls _use_lo _user_at_host
     _users _users_on _webbrowser _wget _whereis _whois _xargs _yodl _yp
-    _zdump
+    _zcat _zdump
 '
