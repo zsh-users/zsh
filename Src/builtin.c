@@ -3536,6 +3536,7 @@ bin_read(char *name, char **args, char *ops, int func)
     first = 1;
     bslash = 0;
     while (*args || (ops['A'] && !gotnl)) {
+	sigset_t s = child_unblock();
 	buf = bptr = (char *)zalloc(bsiz = 64);
 	/* get input, a character at a time */
 	while (!gotnl) {
@@ -3573,6 +3574,7 @@ bin_read(char *name, char **args, char *ops, int func)
 		bptr = buf + blen;
 	    }
 	}
+	signal_setmask(s);
 	if (c == '\n' || c == EOF)
 	    gotnl = 1;
 	*bptr = '\0';
@@ -3627,7 +3629,8 @@ bin_read(char *name, char **args, char *ops, int func)
     buf = bptr = (char *)zalloc(bsiz = 64);
     /* any remaining part of the line goes into one parameter */
     bslash = 0;
-    if (!gotnl)
+    if (!gotnl) {
+	sigset_t s = child_unblock();
 	for (;;) {
 	    c = zread(izle);
 	    /* \ at the end of a line introduces a continuation line, except in
@@ -3662,6 +3665,8 @@ bin_read(char *name, char **args, char *ops, int func)
 		bptr = buf + blen;
 	    }
 	}
+	signal_setmask(s);
+    }
     while (bptr > buf && iwsep(bptr[-1]))
 	bptr--;
     *bptr = '\0';
@@ -3718,8 +3723,8 @@ zread(int izle)
 	case 1:
 	    /* return the character read */
 	    return STOUC(cc);
-#if defined(EAGAIN) || defined(EWOULDBLOCK)
 	case -1:
+#if defined(EAGAIN) || defined(EWOULDBLOCK)
 	    if (!retry && readfd == 0 && (
 # ifdef EAGAIN
 		    errno == EAGAIN
@@ -3733,9 +3738,11 @@ zread(int izle)
 		) && setblock_stdin()) {
 		retry = 1;
 		continue;
-	    }
-	    break;
+	    } else
 #endif /* EAGAIN || EWOULDBLOCK */
+	    if (errno == EINTR && !(errflag || retflag || breaks || contflag))
+		continue;
+	    break;
 	}
 	return EOF;
     }
