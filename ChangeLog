@@ -1,3 +1,8 @@
+2001-09-15  Bart Schaefer  <schaefer@zsh.org>
+
+	* 15812: Doc/Makefile.in, Doc/Zsh/zle.yo: Include mod_tcp.yo in
+	MODDOCSRC.  Cross-reference parameters used by ZLE.
+
 2001-09-14  Wayne Davison  <wayned@users.sourceforge.net>
 
 	* 15809: Src/hist.c: With HIST_NO_STORE, don't ignore what looks like

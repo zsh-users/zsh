@@ -21,6 +21,14 @@ This mode
 is similar to bf(ksh), and uses no termcap sequences.  If tt(TERM) is
 "emacs", the tt(ZLE) option will be unset by default.
 
+vindex(BAUD, use of)
+vindex(COLUMNS, use of)
+vindex(LINES, use of)
+The parameters tt(BAUD), tt(COLUMNS), and tt(LINES) are also used by the
+line editor.
+ifzman(See em(Parameters Used By The Shell) in zmanref(zshparam))\
+ifnzman(noderef(Parameters Used By The Shell)).
+
 startmenu()
 menu(Keymaps)
 menu(Zle Builtins)
