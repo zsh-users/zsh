@@ -1,3 +1,152 @@
+2000-01-12  Peter Stephenson  <pws@pwstephenson.fsnet.co.uk>
+
+	* pws: Config/version.mk: 3.1.6-dev-15.
+
+	* pws: configure.in: use quoted '${VERSION}' in function directory
+	to be determined at compile time, avoids having to re-make
+	config.status.
+
+	* Sven: 9298: Completion/Core/_description,
+	Completion/Core/_main_complete, Completion/Core/_path_files,
+	Doc/Zsh/compsys.yo, Doc/Zsh/compwid.yo, Src/Zle/compcore.c:
+	ignored-suffixes becomes ignored-patterns for more general
+	ignorance.
+
+	* Sven: 9297: Completion/Core/_alternative: typo.
+
+	* Sven: 9296: Src/Zle/compmatch.c: matcher ignores backslashes by
+	default.
+
+2000-01-11  Peter Stephenson  <pws@pwstephenson.fsnet.co.uk>
+
+	* pws: 9295: Doc/Zsh/grammar.yo, Src/loop.c,
+	Src/Modules/parameter.c: problem with aliased options with
+	negative number when retrieving $options; bad test for use of
+	terminal with `select'; defective description of tests for
+	alternative forms using if ... { ... } etc.
+
+	* Sven: 9291: Completion/Core/_main_complete: insufficient care
+	with ksharrays affected _cd completion.
+
+	* Sven: 9287: Src/exec.c: unbalanced use of heaps.
+
+2000-01-10  Peter Stephenson  <pws@pwstephenson.fsnet.co.uk>
+
+	* Sven: 9283: Src/mem.c: hrealloc() problem with mmap().
+
+	* Tanaka Akira: 9281, 9282: Completion/Builtins/_popd: too eager
+	to insert slash suffix.
+
+2000-01-09  Peter Stephenson  <pws@pwstephenson.fsnet.co.uk>
+
+	* pws: 9280: Src/subst.c: failed to copy parameter properly using
+	${(P)...} flag.
+
+	* pws: 9279: Src/mem.c: use munmap() instead of zfree() for
+	one more heap reference.
+
+	* pws: 9278: Completion/Core/_path_files: overenthusiastic use of
+	$fignore on explicitly globbed files.
+
+	* Tanaka Akira: 9274: Completion/X/_xutils: completing options of
+	X commands didn't work.
+
+	* Tanaka Akira: 9273: Completion/User/_cvs: various tweaks.
+
+	* Bart: 9272: Src/Aliases/alias.mdd.in: file missed in 9253.
+
+	* Bart: 9270: Doc/Zsh/.cvsignore, Doc/Zsh/.distfiles,
+	Doc/Makefile.in: Doc/Zsh/manmodmenu.yo is a generated file.
+
+2000-01-08  Peter Stephenson  <pws@pwstephenson.fsnet.co.uk>
+
+	* Tanaka Akira: 9269: Completion/User/_pack: bogus space in _pack.
+
+2000-01-07  Peter Stephenson  <pws@pwstephenson.fsnet.co.uk>
+
+	* pws: 9267: Src/signals.c, Test/08traps.ztst, Test/50cd.ztst,
+	Test/ztst.zsh:	fix remaining(?) trap issues by simplifying
+	save/restore code; add tests for traps (with unpleasantness
+	testing trap triggering).
+
+	* pws: 9266: configure.in, INSTALL: move $ZSH_VERSION to before
+	functions, to allow other zsh versioned stuff to be collected.
+
+	* Sven: 9264 (minus `make clean' hunk): ./Doc/Makefile.in,
+	Doc/Zsh/manual.yo:  remove yodl comments to avoid makeinfo
+	problems.
+
+	* Sven: 9263: Completion/Builtins/_zmodload,
+	Completion/Core/_files, Completion/Core/_path_files: _path_files
+	handles (:r) modifier; _files handles -/g; _zmodload handles
+	hierarchical modules.
+
+	* Sven: 9262: Completion/Builtins/_hash, Completion/Linux/_rpm,
+	Completion/User/_dd, Completion/User/_gs, Completion/User/_make:
+	9260 add-on for various uses of compset.
+
+	* Sven: 9261: Completion/User/_a2ps: missing backslash.
+
+	* Sven: 9260: Completion/Core/_main_complete: completion after `='.
+
+2000-01-06  Peter Stephenson  <pws@pwstephenson.fsnet.co.uk>
+
+	* pws: 9256: configure.in, INSTALL: add $ZSH_VERSION to default
+	function install path.
+
+	* Oliver: 9253: Src/Aliases/cap.mdd, Src/Aliases/clone.mdd,
+	Src/Aliases/compctl.mdd, Src/Aliases/complete.mdd,
+	Src/Aliases/complist.mdd, Src/Aliases/computil.mdd,
+	Src/Aliases/deltochar.mdd, Src/Aliases/example.mdd,
+	Src/Aliases/files.mdd, Src/Aliases/mapfile.mdd,
+	Src/Aliases/mathfunc.mdd, Src/Aliases/parameter.mdd,
+	Src/Aliases/rlimits.mdd, Src/Aliases/sched.mdd,
+	Src/Aliases/stat.mdd, Src/Aliases/zftp.mdd, Src/Aliases/zle.mdd,
+	Src/Aliases/zleparameter.mdd, Src/Aliases/zutil.mdd,
+	Src/linklist.c, Src/mkmakemod.sh, Src/params.c, Src/utils.c: more
+	fixes for dynamical linking on AIX.
+
+	* Tanaka Akira: 9252: Completion/User/_lp: typo in 9242.
+
+	* Sven: 9250: Src/Zle/complete.c: extend 9237 for compset.
+
+	* Sven: 9248: Completion/Core/_tags, Doc/Zsh/compsys.yo: simplify
+	undoability of 9245 and suchlike by making `!tag' valid in
+	tag-order style.
+
+	* Sven: 9245: Completion/Base/_command_names,
+	Completion/Base/_parameter: complete parameters in command
+	position (now undoable using styles).
+
+	* Sven: 9244: Completion/Builtins/_zstyle: partial word completion
+	for style names.
+
+	* Sven: 9242: Completion/User/_lp: better completion of printer
+	names.
+
+	* Alexandre: 9240: Completion/User/_urls: handle URLs from
+	bookmarks with spaces by quoting.
+
+	* Sven: 9237: Doc/Zsh/compwid.yo, Src/Zle/compcore.c: fix literal
+	handling of completion prefix/suffix.
+
+	* Sven: 9236: Src/Zle/compresult.c, Src/Zle/zle_misc.c:
+	listmatches called with bogus list, plus extra paranoia.
+
+	* Tanaka Akira: 9235: Test/07cond.ztst: chgrp to workaround
+	inherited groups.
+
+	* Tanaka Akira: 9228: Completion/Builtins/_popd: probllem listing
+	directories.
+
+	* Tanaka Akira: 9227: Test/04redirect.ztst: problem with .nfs*
+	files remaining when deleting directory.
+
+	* Tanaka Akira: 9226: Completion/User/_lp: explanation typo.
+
+	* Tanaka Akira: 9225: Completion/Core/_path_files,
+	Doc/Zsh/compsys.yo: file completion in root directory.
+
 2000-01-05  Peter Stephenson  <pws@pwstephenson.fsnet.co.uk>
 
 	* pws: Config/version.mk: zsh-3.1.6-dev-14 (note change of
