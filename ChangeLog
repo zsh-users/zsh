@@ -1,3 +1,8 @@
+2001-09-24  Peter Stephenson  <pws@csr.com>
+
+	* Src/builtin.c, Src/exec.c: Unwind function calls before exiting
+	shell from exit command to allow EXIT traps to run.
+
 2001-09-21  Andrew Main (Zefram)  <zefram@zsh.org>
 
 	* Doc/Zsh/contrib.yo, Functions/Misc/tetris: Tetris game for ZLE.

@@ -3202,6 +3202,11 @@ err:
     return 0;
 }
 
+/* Flag that we should exit the shell as soon as all functions return. */
+/**/
+int
+exit_pending;
+
 /* break, bye, continue, exit, logout, return -- most of these take   *
  * one numeric argument, and the other (logout) is related to return. *
  * (return is treated as a logout when in a login shell.)             */
@@ -3248,10 +3253,22 @@ bin_break(char *name, char **argv, char *ops, int func)
 	    zerrnam(name, "not login shell", NULL, 0);
 	    return 1;
 	}
-	zexit(num, 0);
-	break;
+	/*FALLTHROUGH*/
     case BIN_EXIT:
-	zexit(num, 0);
+	if (locallevel) {
+	    /*
+	     * We don't exit directly from functions to allow tidying
+	     * up, in particular EXIT traps.  We still need to perform
+	     * the usual interactive tests to see if we can exit at
+	     * all, however.
+	     */
+	    if (stopmsg || (zexit(0,2), !stopmsg)) {
+		retflag = 1;
+		breaks = loops;
+		exit_pending = (num << 1) | 1;
+	    }
+	} else
+	    zexit(num, 0);
 	break;
     }
     return 0;
@@ -3290,16 +3307,19 @@ checkjobs(void)
 }
 
 /* exit the shell.  val is the return value of the shell.  *
- * from_signal should be non-zero if zexit is being called *
- * because of a signal.                                    */
+ * from_where is
+ *   1   if zexit is called because of a signal
+ *   2   if we can't actually exit yet (e.g. functions need
+ *       terminating) but should perform the usual interactive tests.
+ */
 
 /**/
 mod_export void
-zexit(int val, int from_signal)
+zexit(int val, int from_where)
 {
     static int in_exit;
 
-    if (isset(MONITOR) && !stopmsg && !from_signal) {
+    if (isset(MONITOR) && !stopmsg && from_where != 1) {
 	scanjobs();    /* check if jobs need printing           */
 	if (isset(CHECKJOBS))
 	    checkjobs();   /* check if any jobs are running/stopped */
@@ -3308,12 +3328,12 @@ zexit(int val, int from_signal)
 	    return;
 	}
     }
-    if (in_exit++ && from_signal)
+    if (from_where == 2 || (in_exit++ && from_where))
 	    return;
 
     if (isset(MONITOR)) {
 	/* send SIGHUP to any jobs left running  */
-	killrunjobs(from_signal);
+	killrunjobs(from_where == 1);
     }
     if (isset(RCS) && interact) {
 	if (!nohistsave)

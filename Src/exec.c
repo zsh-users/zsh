@@ -3429,6 +3429,22 @@ doshfunc(char *name, Eprog prog, LinkList doshargs, int flags, int noreturnval)
     if (noreturnval)
 	lastval = oldlastval;
     popheap();
+
+    if (exit_pending) {
+	if (locallevel) {
+	    /* Still functions to return: force them to do so. */
+	    retflag = 1;
+	    breaks = loops;
+	} else {
+	    /*
+	     * All functions finished: time to exit the shell.
+	     * We already did the `stopmsg' test when the
+	     * exit command was handled.
+	     */
+	    stopmsg = 1;
+	    zexit(exit_pending >> 1, 0);
+	}
+    }
 }
 
 /* This finally executes a shell function and any function wrappers     *
