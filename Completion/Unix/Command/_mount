@@ -750,6 +750,17 @@ fsopt)
 devordir)
   local dev_tmp mp_tmp mline
 
+  if compset -P '*:'; then
+    _wanted exports expl 'exported path' compadd \
+	${${(f)"$(path+=( {/usr,}/sbin(N) ) _call_program exports \
+	showmount -e ${IPREFIX%:} 2>/dev/null)"}[2,-1]%% *} && ret=0
+    return ret
+  fi
+  if compset -S ':*'; then
+    _hosts -S '' && ret=0
+    return ret
+  fi
+
   case "$OSTYPE" in
   freebsd*)
     while read mline; do 
@@ -767,6 +778,7 @@ devordir)
     done < /etc/fstab
 
     _alternative \
+      'hosts:host:_hosts -S :' \
       'devices:device:compadd -a dev_tmp' \
       'directories:mount point:compadd -a mp_tmp' && ret=0
     ;;
@@ -774,7 +786,9 @@ devordir)
     if (( ${${(s.,.)opt_args[-o]}[(I)loop(|=*)]} )) ; then
       _wanted device-files expl 'loop device file' _files && ret=0
     else
-      _wanted files expl 'device or mount point' _files -g "*(-%,-/)" && ret=0
+      _alternative \
+        'hosts:host:_hosts -S :' \
+        'files:device or mount point:_files -g "*(-%b,-/)"' && ret=0
     fi
     ;;
   esac

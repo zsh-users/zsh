@@ -1,3 +1,8 @@
+2004-02-20  Oliver Kiddle  <opk@zsh.org>
+
+	* 19455: Completion/Unix/Command/_mount: complete hostnames
+	and nfs mounts
+
 2004-02-19  Clint Adams  <schizo@debian.org>
 
 	* unposted: Completion/Debian/Command/_bts: patch from
