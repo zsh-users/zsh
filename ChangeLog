@@ -1,3 +1,8 @@
+2000-04-27  Peter Stephenson  <pws@pwstephenson.fsnet.co.uk>
+
+	* 10985: Completion/Core/compinstall: _oldlist, list-prompt and
+	matcher-list enhancements.
+
 2000-04-27  Sven Wischnowsky  <wischnow@informatik.hu-berlin.de>
 
 	* 10979: originally from Felix: 10894: Completion/Core/.distfiles,
