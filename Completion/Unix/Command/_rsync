@@ -1,5 +1,24 @@
 #compdef rsync
 
-_arguments -- '*=COMMAND*:command:_command' \
+_arguments -C -s \
+	'*:local files:_files' \
+ 	'(--verbose)-v[verbose]' \
+ 	'(--quiet)-q[quiet]' \
+ 	'(--checksum)-c[checksum]' \
+ 	'(--archive)-a[archive]' \
+ 	'(--recursive)-r[recursive]' \
+ 	'(--backup)-b[backup]' \
+ 	'(--update)-u[update]' \
+ 	'(--links)-l[links]' \
+ 	'(--perms)-p[perms]' \
+ 	'(--owner)-o[owner]' \
+ 	'(--group)-g[group]' \
+ 	'(--times)-t[times]' \
+ 	'(--dry-run)-n[dry-run]' \
+ 	'(--one-file-system)-x[one-file-system]' \
+ 	'(--rsh)-e[rsh command]:remote command:(rsh ssh)' \
+ 	'(--compress)-z[compress]' \
+ 	'(--help)-h[help]' \
+	   -- '*=COMMAND*:command:_command' \
               '*=FILE*:file:_files' \
               '*=DIR*:directory:_files -/'

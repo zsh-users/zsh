@@ -1,3 +1,8 @@
+2002-02-03  Clint Adams  <clint@zsh.org>
+
+	* 16540: Completion/Unix/Command/_rsync: include short options and
+	local files.
+
 2002-02-01  Oliver Kiddle  <opk@zsh.org>
 
 	* Akinori Musha: 16534: Completion/BSD/Command/_bsd_pkg:
