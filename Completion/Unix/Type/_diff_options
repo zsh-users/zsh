@@ -55,7 +55,7 @@ if _pick_variant -c $cmd gnu=GNU unix -v; then
     '(-a --text)'{-a,--text}'[treat all files as text]' \
     "($of $oss)"{-C+,--context=-}'[output a context diff]:number of lines of copied context' \
     "($of $oss)-c[output a context diff]" \
-    "($of $oss)"{-U+,-unified=-}'[output a unified diff]:number of lines of unified context' \
+    "($of $oss)"{-U+,--unified=-}'[output a unified diff]:number of lines of unified context' \
     "($of $oss)-u[output a unified diff]" \
     "($ofwuc $oss)*"{-L+,--label=}'[set label to use instead of file name]:label' \
     "($ofwuc $oss -p --show-c-function)"{-p,--show-c-function}'[show C function of each change]' \

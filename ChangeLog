@@ -1,3 +1,8 @@
+2004-09-28  Clint Adams  <clint@zsh.org>
+
+	* 20414: Completion/Unix/Type/_diff_options: correct missing
+	minus in --unified, spotted by Paul Wagland.
+
 2004-09-27  Peter Stephenson  <pws@csr.com>
 
 	* unposted: Completion/Unix/Command/_perforce: when adding
