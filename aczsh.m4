@@ -695,7 +695,7 @@ AC_DEFUN([zsh_CHECK_SOCKLEN_T],[
     [base type of the third argument to accept],
     [zsh_cv_type_socklen_t],
     [zsh_cv_type_socklen_t=
-    for zsh_type in int "unsigned long" size_t ; do
+    for zsh_type in socklen_t int "unsigned long" size_t ; do
       AC_TRY_COMPILE(
         [#include <sys/types.h>
          #include <sys/socket.h>],
