@@ -468,9 +468,12 @@ pindex(APPEND_HISTORY)
 cindex(history, appending to a file)
 item(tt(APPEND_HISTORY) <D>)(
 If this is set, zsh sessions will append their history list to
-the history file, rather than overwrite it. Thus, multiple parallel
-zsh sessions will all have their history lists added to the
-history file, in the order they are killed.
+the history file, rather than replace it. Thus, multiple parallel
+zsh sessions will all have the new entries from their history lists
+added to the history file, in the order that they exit.
+The file will still be periodically re-written to trim it when the
+number of lines grows 20% beyond the value specified by
+tt($SAVEHIST) (see also the HIST_SAVE_BY_COPY option).
 )
 pindex(BANG_HIST)
 cindex(history, enable substitution)
@@ -562,6 +565,18 @@ item(tt(HIST_REDUCE_BLANKS))(
 Remove superfluous blanks from each command line
 being added to the history list.
 )
+pindex(HIST_SAVE_BY_COPY)
+item(tt(HIST_SAVE_BY_COPY))(
+When the history file is re-written, we normally write out a copy of
+the file named $HISTFILE.new and then rename it over the old one.
+However, if this option is unset, we instead truncate the old
+history file and write out the new version in-place.  If one of the
+history-appending options is enabled, this option only has an affect
+when the enlarged history file needs to be re-written to trim it
+down to size.  Disable this only if you have special needs, as this
+makes it possible to lose history entries if zsh gets interrupted
+during the save.
+)
 pindex(HIST_SAVE_NO_DUPS)
 item(tt(HIST_SAVE_NO_DUPS))(
 When writing out the history file, older commands that duplicate
@@ -579,9 +594,10 @@ cindex(history, incremental appending to a file)
 item(tt(INC_APPEND_HISTORY))(
 This options works like tt(APPEND_HISTORY) except that new history lines
 are added to the tt($HISTFILE) incrementally (as soon as they are
-entered), rather than waiting until the shell is killed.
-The file is periodically trimmed to the number of lines specified by
-tt($SAVEHIST), but can exceed this value between trimmings.
+entered), rather than waiting until the shell exits.
+The file will still be periodically re-written to trim it when the
+number of lines grows 20% beyond the value specified by
+tt($SAVEHIST) (see also the HIST_SAVE_BY_COPY option).
 )
 pindex(SHARE_HISTORY)
 cindex(share history)
