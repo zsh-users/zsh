@@ -622,6 +622,10 @@ for names of zsh keymaps
 item(tt(keysyms))(
 for names of X keysyms
 )
+item(tt(local-directories))(
+for names of directories in the current working directory when
+completing for the tt(cd) builtin command
+)
 item(tt(libraries))(
 for names of system libraries
 )
@@ -666,6 +670,10 @@ for packages (e.g. tt(rpm) packages)
 )
 item(tt(parameters))(
 for names of parameters
+)
+item(tt(path-directories))(
+for names of directories in directories from the tt(cdpath) array when
+completing for the tt(cd) builtin command
 )
 item(tt(paths))(
 used to look up the values of the tt(expand) and tt(cursor) styles
