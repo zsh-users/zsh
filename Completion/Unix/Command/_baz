@@ -8,7 +8,7 @@ local hide_short
 # ask the user which version of baz this is
 if ! zstyle -s ":completion:${curcontext}" baz-version baz_version; then
   # ask baz instead
-  baz_version="${${$($BAZ --version)#baz baz-}%% from regexps.com*}"
+  baz_version="${${$($BAZ --version)#baz Bazaar version }%% \(thelove@canonical.com*}"
 fi
 
 # test whether to hide short options from completion
@@ -496,8 +496,8 @@ cmd_new_merges=('::version:_baz_versions')
 local cmd_branch
 cmd_branch=(':SOURCE-REVISION:_baz_revisions' ':TAG-VERSION:_baz_versions')
 
-local cmd_star_merge
-cmd_star_merge=(':FROM:_baz_revisions')
+local cmd_merge
+cmd_merge=(':FROM:_baz_revisions')
 
 local cmd_missing cmd_whats_missing
 cmd_missing=('::revision:_baz_revisions')

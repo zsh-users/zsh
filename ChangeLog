@@ -1,3 +1,8 @@
+2005-03-09  Clint Adams  <clint@zsh.org>
+
+	* 20951: Completion/Unix/Command/_baz: fix version detection
+	and baz merge completion.
+
 2005-03-07  Clint Adams  <clint@zsh.org>
 
 	* 20946: Completion/Linux/Command/_iwconfig: completion for
