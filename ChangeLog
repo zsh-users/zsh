@@ -112,11 +112,6 @@
 	* 15792: Doc/Zsh/manual.yo, Doc/Zsh/metafaq.yo: update url
 	references to http://zsh.sunsite.dk/
 
-2001-09-11  Wayne Davison  <wayned@users.sourceforge.net>
-
-	* 15630 & 15713: Completion/Redhat/Command/_rpm: Brought over the
-	--verify package-specification options and updated caching policy.
-
 2001-09-11  Oliver Kiddle  <opk@zsh.org>
 
 	* 15781: Completion/Unix/Command/.distfiles,
@@ -140,6 +135,11 @@
 	* 15717: Src/subst.c, Src/Modules/parameter.c,
 	Src/Zle/zle_misc.c: handle possible NULL pointer returned from
 	bufferwords()
+
+2001-08-27  Wayne Davison  <wayned@users.sourceforge.net>
+
+	* 15713: Completion/Redhat/Command/_rpm: added package-specification
+	options to the --verify command.
 
 2001-08-25  Bart Schaefer  <schaefer@zsh.org>
 
@@ -171,6 +171,11 @@
 
 	* 15639: Src/text.c: fix bug for output of unquoted here-docs and
 	-strings with special characters
+
+2001-08-15  Adam Spiers  <adam@spiers.net>
+
+	* 15630: Completion/Redhat/Command/_rpm: update caching policy
+	for newer versions of rpm.
 
 2001-08-14  Clint Adams  <clint@zsh.org>
 
