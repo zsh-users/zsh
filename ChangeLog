@@ -1,3 +1,10 @@
+2001-12-11  Oliver Kiddle  <opk@zsh.org>
+
+	* 16320: Completion/Unix/Type/_file_systems,
+	Completion/Unix/Type/.distfiles, Completion/Unix/Command/_find,
+	Completion/Unix/Command/_mount: factor out file system completion 
+	to simplify matters and complete file systems for find and umount
+
 2001-12-09  Clint Adams  <clint@zsh.org>
 
 	* 16315: Completion/Unix/Command/.distfiles,

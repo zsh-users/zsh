@@ -49,7 +49,7 @@ fi
 # arguments for the `mount' command for different operating systems
 # are below these table.
 
-local curcontext="$curcontext" state line ret=1
+local curcontext="$curcontext" state line suf ret=1
 local args fss deffs=iso9660 descr tmp typeops=-t _nfs_access _nfs_ufs
 
 typeset -A opt_args
@@ -499,12 +499,11 @@ fi
 if [[ "$service" = mount ]]; then
 
   # Here are the tests and tables for the arguments and options for
-  # the `mount' program. The `fss' array has to be set to the names
-  # of the file system types understood on this system.
-  # This should also set the `deffs' parameter if the default file
-  # system type is not `iso9660' (it should be set to the name of
-  # the default file system type), and set 'typeops' to the mount 
-  # option for file system type selection when it is not '-t'.
+  # the `mount' program. This should set the `deffs' parameter if
+  # the default file system type is not `iso9660' (it should be set
+  # to the name of the default file system type), and set 'typeops'
+  # to the mount  option for file system type selection when it is
+  # not '-t'.
 
   case "$OSTYPE" in
   aix*)
@@ -514,13 +513,12 @@ if [[ "$service" = mount ]]; then
       '-n[remote node]:remote node:_hosts'
       '-p[mount as removable file system]'
       '-r[mount read-only]'
-      '-t[specify file system type]:file system type:->fstype'
+      '-t[specify file system type]:file system type:_file_systems'
       '-o[specify file system options]:file system option:->fsopt'
       '-v[filesystem defined by /etc/vfs]:VfsName'
       ':dev or dir:->devordir'
       ':mount point:_files -/'
     )
-    fss=( jfs nfs cdrfs )
     deffs=jfs
     ;;
   irix*)
@@ -534,7 +532,7 @@ if [[ "$service" = mount ]]; then
       '-o[specify file system options]:file system option:->fsopt'
       '-p[print list of mounted filesystems in format suitable for /etc/fstab]'
       '-r[mount read-only]'
-      '-t[specify file system type]:file system type:->fstype'
+      '-t[specify file system type]:file system type:_file_systems'
       '-v[verbose]'
       '-M[use alternate mtab]:alternate mtab:_files'
       '-P[with -p, prepend prefix to paths]:prefix'
@@ -554,18 +552,11 @@ if [[ "$service" = mount ]]; then
       '-s[tolerate sloppy mount options]'
       '-r[mount read-only]'
       '-w[mount read/write]'
-      '-t[specify file system type]:file system type:->fstype'
+      '-t[specify file system type]:file system type:->fslist'
       '-o[specify file system options]:file system option:->fsopt'
       ':dev or dir:->devordir'
       ':mount point:_files -/'
     )
-    typeset -aU fss
-    fss=( adfs bfs cramfs ext2 ext3 hfs hpfs iso9660 minix ntfs qnx4
-          reiserfs romfs swap udf ufs vxfs xfs xiafs )
-    [[ -r /proc/filesystems ]] &&
-        fss=( $fss ${$(</proc/filesystems)#nodev} )
-    [[ -r /etc/filesystems ]] &&
-        fss=( $fss ${$(</etc/filesystems)#nodev} )
     ;;
   osf*)
     args=( -s
@@ -574,7 +565,7 @@ if [[ "$service" = mount ]]; then
       '-e[list all mount points]'
       '-f[fake mount]'
       '-l[display values of all file system options]'
-      '-t[specify file system type]:file system type:->fstype'
+      '-t[specify file system type]:file system type:_file_systems'
       '-o[specify file system options]:file system option:->fsopt'
       '-u[remount file system]'
       '-r[mount read-only]'
@@ -583,13 +574,12 @@ if [[ "$service" = mount ]]; then
       ':dev or dir:->devordir'
       ':mount point:_files -/'
     )
-    fss=( advfs ufs nfs mfs cdfs )
     deffs=cdfs
     ;;
   solaris*)
     args=( -s
       '(-p -v)-a[mount all filesystems in fstab]'
-      '(-p -v)-F[specify file system type]:file system type:->fstype'
+      '(-p -v)-F[specify file system type]:file system type:_file_systems'
       '(-a -v)-p[print mounted file systems]'
       '(-p -a)-v[print mounted file systems verbosely]'
       '(-p -v)-V[fake mount]'
@@ -601,7 +591,6 @@ if [[ "$service" = mount ]]; then
       ':dev or dir:->devordir'
       ':mount point:_files -/'
     )
-    fss=( ufs nfs hsfs s5fs pcfs cachefs tmpfs )
     deffs=hsfs
     typeops=-F
     ;;
@@ -613,15 +602,13 @@ if [[ "$service" = mount ]]; then
       '-o[specify file system options]:file system option:->fsopt'
       '-p[print mounted file systems]'
       '-r[mount readonly]'
-      '-t[specify file system type]:file system type:->fstype'
+      '-t[specify file system type]:file system type:->fslist'
       '-u[change status of already mounted filesystem]'
       '-v[verbose mode]'
       '-w[mount read/write]'
       ':dev or dir:->devordir'
       ':mount point:_files -/'
     )
-    fss=( cd9660 devfs ext2fs fdesc kernfs linprocfs mfs msdos nfs 
-          ntfs null nwfs portal procfs std ufs umap union )
     deffs=ufs
     ;;
   *)
@@ -629,13 +616,12 @@ if [[ "$service" = mount ]]; then
 
     args=( -s
       '(-o)-a[mount all filesystems in fstab]'
-      '-t[specify file system type]:file system type:->fstype'
+      '-t[specify file system type]:file system type:_file_systems'
       '-o[specify file system options]:file system option:->fsopt'
       '-f[fake mount]'
       ':dev or dir:->devordir'
       ':mount point:_files -/'
     )
-    fss=( ufs )
     deffs=ufs
     ;;
   esac
@@ -652,7 +638,7 @@ else
 	'-a[unmount all mounted file systems]'
 	'-f[force unmount]'
 	'-n[remote node]:remote node:_hosts'
-	'-t[specify file system type]:file system type:->fstype'
+	'-t[specify file system type]:file system type:_file_systems'
 	'*:dev or dir:->udevordir'
       )
     ;;
@@ -662,7 +648,7 @@ else
 	'-b[unmount all filesystems in /etc/fstab except those listed]:list of directories:_dir_list -s,'
 	'-h[unmount all filesystems associated with host]:hostnames:_hosts'
 	'-k[kill all processes with files open on filesystems before unmounting]'
-	'-t[unmount all filesystems of specified type]:file system type:->fstype'
+	'-t[unmount all filesystems of specified type]:file system type:_file_systems'
 	'-v[verbose]'
       )
     ;;  
@@ -672,7 +658,7 @@ else
         '-A[unmount all mounted file systems except the root]'
         '-f[force unmount]'
         '-h[unmount all filesystems associated with host]:hostnames:_hosts'
-	'-t[unmount all filesystems of specified type]:file system type:->fstype'
+	'-t[unmount all filesystems of specified type]:file system type:->fslist'
 	'-v[verbose mode]'
 	'*:dev or dir:->udevordir'
       )
@@ -685,7 +671,7 @@ else
 	'-n[don'"'"'t write /etc/mtab]'
 	'-r[remount read-only on failure]'
 	'-a[unmount all file systems from /etc/mtab]'
-	'-t[specify file system type]:file system type:->fstype'
+	'-t[specify file system type]:file system type:_file_systems'
 	'*:dev or dir:->udevordir'
       )
     ;;
@@ -696,12 +682,11 @@ else
 fi
 
 case "$state" in
-fstype)
+fslist)
   compset -P '*,'
-
-  _wanted types expl 'file system type' \
-      compadd -qS, -M 'L:|no=' -a fss && ret=0
-  ;;
+  compset -S ',*' || suf=','
+  _file_systems -qS "$suf"
+;;
 fsopt)
   _tags options || return 1
 

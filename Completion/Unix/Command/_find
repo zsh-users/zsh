@@ -23,7 +23,7 @@ _arguments \
   '*-used:access after inode change (days):' \
   '*-empty' \
   '*-false' \
-  '*-fstype:filesystem type:(ufs 4.2 4.3 nfs tmp mfs S51K S52K)' \
+  '*-fstype:file system type:_file_systems' \
   '*-gid:numeric group ID:' \
   '*-group:group:_groups' \
   '*-uid:numeric user ID:' \
