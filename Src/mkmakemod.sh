@@ -73,15 +73,6 @@ sed_normalise='
     s,\(.\)/$,\1,
 '
 
-CYGWIN=no
-if uname -s > /dev/null 2>&1; then
-    case `uname -s` in
-	CYGWIN* )
-	    CYGWIN=yes
-	;;
-    esac
-fi
-
 # decide which stages to process
 first_stage=true
 second_stage=true
@@ -202,7 +193,6 @@ if $first_stage; then
 	exportdeps=
 	imports=
 	q_moddeps=
-	dllname=
 	for dep in $moddeps; do
 	    q_dep=`echo $dep | sed 's,Q,Qq,g;s,_,Qu,g;s,/,Qs,g'`
 	    q_moddeps="$q_moddeps $q_dep"
@@ -221,9 +211,6 @@ if $first_stage; then
 		    case "$dep" in
 			zsh/main )
 			    mdll="\$(dir_top)/Src/libzsh-\$(VERSION).\$(DL_EXT) "
-			;;
-			zsh/$mddname )
-			    mdll=
 			;;
 			* )
 			    mdll="${depbase}.\$(DL_EXT) "
@@ -244,9 +231,6 @@ if $first_stage; then
 		    case "$dep" in
 			zsh/main )
 			    mdll="\$(dir_top)/Src/libzsh-\$(VERSION).\$(DL_EXT) "
-			;;
-			zsh/$mddname )
-			    mdll=
 			;;
 			* )
 			    mdll="\$(dir_top)/$loc/${depbase}.\$(DL_EXT) "
@@ -272,9 +256,6 @@ if $first_stage; then
 			zsh/main )
 			    mdll="\$(dir_top)/Src/libzsh-\$(VERSION).\$(DL_EXT) "
 			;;
-			zsh/$mddname )
-			    mdll=
-			;;
 			* )
 			    mdll="\$(dir_top)/$loc/${depbase}.\$(DL_EXT) "
 			;;
@@ -288,20 +269,15 @@ if $first_stage; then
 	    modhdeps="$modhdeps $mdh"
 	    exportdeps="$exportdeps $export"
 	    imports="$imports \$(IMPOPT)$export"
-	    if test $CYGWIN = yes -a -n "$mdll"; then
-		case "$mododeps" in
-		    *" $mdll "* )
-			:
-		    ;;
-		    * )
-			mododeps="$mododeps $mdll"
-		    ;;
-		esac
-	    fi
+	    case "$mododeps " in
+		*" $mdll "* )
+		    :
+		;;
+		* )
+		    mododeps="$mododeps $mdll"
+		;;
+	    esac
 	done
-	if test $CYGWIN = yes; then
-		dllname="--dllname $q_name"
-	fi
 
 	echo "##### ===== DEPENDENCIES GENERATED FROM ${mddname}.mdd ===== #####"
 	echo
@@ -312,8 +288,8 @@ if $first_stage; then
 	echo "INCS_${mddname} = \$(EPRO_${mddname}) $otherincs"
 	echo "EXPIMP_${mddname} = $imports \$(EXPOPT)$mddname.export"
 	echo "NXPIMP_${mddname} ="
-	echo "DEPMODS_${mddname} = $mododeps"
-	echo "DLLNAME_${mddname} = $dllname"
+	echo "LINKMODS_${mddname} = $mododeps"
+	echo "NOLINKMODS_${mddname} = "
 	echo
 	echo "proto.${mddname}: \$(EPRO_${mddname})"
 	echo "\$(SYMS_${mddname}): \$(PROTODEPS)"
@@ -338,9 +314,9 @@ if $first_stage; then
 	    echo "uninstall.modules.${mddname}:"
 	    echo "	rm -f \$(DESTDIR)\$(MODDIR)/${name}.\$(DL_EXT)"
 	    echo
-	    echo "${mddname}.\$(DL_EXT): \$(MODDOBJS_${mddname}) ${mddname}.export $exportdeps \$(DEPMODS_${mddname})"
+	    echo "${mddname}.\$(DL_EXT): \$(MODDOBJS_${mddname}) ${mddname}.export $exportdeps \$(@LINKMODS@_${mddname})"
 	    echo '	rm -f $@'
-	    echo "	\$(DLLINK) \$(@E@XPIMP_$mddname) \$(@E@NTRYOPT) \$(DLLNAME_${mddname}) \$(MODDOBJS_${mddname}) \$(DEPMODS_${mddname}) \$(LIBS) "
+	    echo "	\$(DLLINK) \$(@E@XPIMP_$mddname) \$(@E@NTRYOPT) \$(MODDOBJS_${mddname}) \$(@LINKMODS@_${mddname}) \$(LIBS) "
 	    echo
 	fi
 	echo "${mddname}.mdhi: ${mddname}.mdhs \$(INCS_${mddname})"
@@ -368,30 +344,16 @@ if $first_stage; then
 	echo "	    echo '#define have_${q_name}_module'; \\"
 	echo "	    echo; \\"
 	echo "	    echo '# ifndef IMPORTING_MODULE_${q_name}'; \\"
-	if test $CYGWIN = yes; then
-	    echo "	    echo '#  ifdef MODULE'; \\"
-	    echo "	    echo '#   define boot_ __attribute__((__dllexport__)) boot_${q_name}'; \\"
-	    echo "	    echo '#   define cleanup_ __attribute__((__dllexport__)) cleanup_${q_name}'; \\"
-	    echo "	    echo '#   define setup_ __attribute__((__dllexport__)) setup_${q_name}'; \\"
-	    echo "	    echo '#   define finish_ __attribute__((__dllexport__)) finish_${q_name}'; \\"
-	    echo "	    echo '#  else /* MODULE */'; \\"
-	    echo "	    echo '#   define boot_ boot_${q_name}'; \\"
-	    echo "	    echo '#   define cleanup_ cleanup_${q_name}'; \\"
-	    echo "	    echo '#   define setup_ setup_${q_name}'; \\"
-	    echo "	    echo '#   define finish_ finish_${q_name}'; \\"
-	    echo "	    echo '#  endif /* MODULE */'; \\"
-	else
-	    echo "	    if test @SHORTBOOTNAMES@ = yes; then \\"
-	    echo "		echo '#  ifndef MODULE'; \\"
-	    echo "	    fi; \\"
-	    echo "	    echo '#   define boot_ boot_${q_name}'; \\"
-	    echo "	    echo '#   define cleanup_ cleanup_${q_name}'; \\"
-	    echo "	    echo '#   define setup_ setup_${q_name}'; \\"
-	    echo "	    echo '#   define finish_ finish_${q_name}'; \\"
-	    echo "	    if test @SHORTBOOTNAMES@ = yes; then \\"
-	    echo "		echo '#  endif /* !MODULE */'; \\"
-	    echo "	    fi; \\"
-	fi
+	echo "	    if test @SHORTBOOTNAMES@ = yes; then \\"
+	echo "		echo '#  ifndef MODULE'; \\"
+	echo "	    fi; \\"
+	echo "	    echo '#   define boot_ boot_${q_name}'; \\"
+	echo "	    echo '#   define cleanup_ cleanup_${q_name}'; \\"
+	echo "	    echo '#   define setup_ setup_${q_name}'; \\"
+	echo "	    echo '#   define finish_ finish_${q_name}'; \\"
+	echo "	    if test @SHORTBOOTNAMES@ = yes; then \\"
+	echo "		echo '#  endif /* !MODULE */'; \\"
+	echo "	    fi; \\"
 	echo "	    echo '# endif /* !IMPORTING_MODULE_${q_name} */'; \\"
 	echo "	    echo; \\"
 	if test -n "$moddeps"; then (
@@ -416,26 +378,25 @@ if $first_stage; then
 	    echo "	    echo; \\"
 	fi
 	if test -n "$proto"; then
-	    if test "$CYGWIN" = yes; then
-		echo "	    echo '# ifndef IMPORTING_MODULE_${q_name} '; \\"
-		echo "	    echo '#  undef mod_import_variable'; \\"
-		echo "	    echo '#  define mod_import_variable'; \\"
-		echo "	    echo '# endif /* IMPORTING_MODULE_${q_name} */'; \\"
-	    fi
+	    echo "	    echo '# undef mod_import_variable'; \\"
+	    echo "	    echo '# undef mod_import_function'; \\"
+	    echo "	    echo '# if defined(IMPORTING_MODULE_${q_name}) &&  defined(MODULE)'; \\"
+	    echo "	    echo '#  define mod_import_variable @MOD_IMPORT_VARIABLE@'; \\"
+	    echo "	    echo '#  define mod_import_function @MOD_IMPORT_FUNCTION@'; \\"
+	    echo "	    echo '# else'; \\"
+	    echo "	    echo '#  define mod_import_function'; \\"
+	    echo "	    echo '#  define mod_import_variable'; \\"
+	    echo "	    echo '# endif /* IMPORTING_MODULE_${q_name} && MODULE */'; \\"
 	    echo "	    for epro in \$(EPRO_${mddname}); do \\"
 	    echo "		echo '# include \"'\$\$epro'\"'; \\"
 	    echo "	    done; \\"
-	    if test "$CYGWIN" = yes; then
-		echo "	    echo '# ifndef IMPORTING_MODULE_${q_name} '; \\"
-		echo "      echo '#  ifdef MODULE'; \\"
-		echo "	    echo '#   undef mod_import_variable'; \\"
-		echo "	    echo '#   define mod_import_variable __attribute__((__dllimport__))'; \\"
-		echo "      echo '#  else /* MODULE */'; \\"
-		echo "      echo '#   undef mod_import_variable'; \\"
-		echo "      echo '#   define mod_import_variable'; \\"
-		echo "      echo '#  endif /* MODULE */'; \\"
-		echo "	    echo '# endif /* IMPORTING_MODULE_${q_name} */'; \\"
-	    fi
+	    echo "	    echo '# undef mod_import_variable'; \\"
+	    echo "	    echo '# define mod_import_variable'; \\"
+	    echo "	    echo '# undef mod_import_variable'; \\"
+	    echo "	    echo '# define mod_import_variable'; \\"
+	    echo "	    echo '# ifndef mod_export'; \\"
+	    echo "	    echo '#  define mod_export @MOD_EXPORT@'; \\"
+	    echo "	    echo '# endif /* mod_export */'; \\"
 	    echo "	    echo; \\"
 	fi
 	echo "	    echo '#endif /* !have_${q_name}_module */'; \\"
@@ -472,17 +433,15 @@ if $first_stage; then
 	    echo "	false # should only happen with make -n"
 	    echo
 	fi
-	if test "$CYGWIN" = yes; then
-	    for mdll in $remote_modules; do
-		echo "$mdll: FORCE"
-		echo "	@cd @%@ && \$(MAKE) \$(MAKEDEFS) @%@$mdll"
-		echo
-	    done | sed 's,^\(.*\)@%@\(.*\)@%@\(.*\)/\([^/]*\)$,\1\3\2\4,'
-	    if test -n "$other_modules"; then
-		echo "${other_modules}:" | sed 's,^ ,,'
-		echo "	false # should only happen with make -n"
-		echo
-	    fi
+	for mdll in $remote_modules; do
+	    echo "$mdll: FORCE"
+	    echo "	@cd @%@ && \$(MAKE) \$(MAKEDEFS) @%@$mdll"
+	    echo
+	done | sed 's,^\(.*\)@%@\(.*\)@%@\(.*\)/\([^/]*\)$,\1\3\2\4,'
+	if test -n "$other_modules"; then
+	    echo "${other_modules}:" | sed 's,^ ,,'
+	    echo "	false # should only happen with make -n"
+	    echo
 	fi
     fi
 

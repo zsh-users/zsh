@@ -371,6 +371,7 @@ AC_PROG_GCC_TRADITIONAL     dnl Do we need -traditional flag for gcc.
 AC_C_CONST                  dnl Does compiler support `const'.
 
 AC_CYGWIN                   dnl Check for cygwin environment
+
 AC_EXEEXT                   dnl Check for executable extension, e.g. .exe
 
 fp_PROG_CC_STDC
@@ -1431,6 +1432,10 @@ dnl ---------------
 dnl dynamic loading
 dnl ---------------
 L=N
+LINKMODS=NOLINKMODS
+MOD_EXPORT=
+MOD_IMPORT_VARIABLE=
+MOD_IMPORT_FUNCTION=
 aixdynamic=no
 hpuxdynamic=no
 if test "$ac_cv_func_dlopen"  != yes ||
@@ -1477,6 +1482,7 @@ if test "x$aixdynamic" = xyes; then
 elif test "x$ac_cv_cygwin" = xyes; then
   DL_EXT="${DL_EXT=dll}"
   DLLD="${DLLD=dllwrap}"
+  DLLDFLAGS="${DLLDFLAGS=--export-all-symbols}"
   zsh_cv_func_dlsym_needs_underscore=no
   DLLDFLAGS=${DLLDFLAGS=}
   EXTRA_LDFLAGS=${EXTRA_LDFLAGS=}
@@ -1486,6 +1492,10 @@ elif test "x$ac_cv_cygwin" = xyes; then
   zsh_cv_sys_dynamic_strip_exe="${zsh_cv_sys_dynamic_strip_exe=yes}"
   zsh_cv_sys_dynamic_strip_lib="${zsh_cv_sys_dynamic_strip_lib=yes}"
   zsh_cv_sys_dynamic_broken="${zsh_cv_sys_dynamic_broken=no}"
+  LINKMODS=LINKMODS
+  MOD_EXPORT="__attribute__((__dllexport__))"
+  MOD_IMPORT_VARIABLE="__attribute__((__dllimport__))"
+  MOD_IMPORT_FUNCTION=
 elif test "x$dynamic" = xyes; then
   AC_CACHE_CHECK(if your system use ELF binaries,
    zsh_cv_sys_elf,
@@ -1694,7 +1704,10 @@ AC_SUBST(EXTRA_LDFLAGS)dnl
 AC_SUBST(EXPOPT)dnl
 AC_SUBST(IMPOPT)dnl
 AC_SUBST(L)dnl
-AC_SUBST(RTLD_GLOBAL_OK)dnl
+AC_SUBST(LINKMODS)dnl
+AC_SUBST(MOD_EXPORT)dnl
+AC_SUBST(MOD_IMPORT_VARIABLE)dnl
+AC_SUBST(MOD_IMPORT_FUNCTION)dnl
 
 CLEAN_MK="${srcdir}/Config/clean.mk"
 CONFIG_MK="${srcdir}/Config/config.mk"
