@@ -75,6 +75,11 @@ int tclen[TC_COUNT];
 /**/
 int tclines, tccolumns, hasam;
 
+/* Pointer to read-key function from zle */
+
+/**/
+int (*getkeyptr) _((int));
+
 #ifdef DEBUG
 /* depth of allocation type stack */
 
@@ -194,6 +199,7 @@ parseargs(char **argv)
 
     /* loop through command line options (begins with "-" or "+") */
     while (*argv && (**argv == '-' || **argv == '+')) {
+	char *args = *argv;
 	action = (**argv == '-');
 	if(!argv[0][1])
 	    *argv = "--";
@@ -228,6 +234,14 @@ parseargs(char **argv)
 		    restricted = action;
 		else
 		    dosetopt(optno, action, 1);
+              break;
+	    } else if (isspace(**argv)) {
+		/* zsh's typtab not yet set, have to use ctype */
+		while (*++*argv)
+		    if (!isspace(**argv)) {
+			zerr("bad option string: `%s'", args, 0);
+			exit(1);
+		    }
 		break;
 	    } else {
 	    	if (!(optno = optlookupc(**argv))) {
@@ -376,7 +390,16 @@ init_io(void)
 #ifdef JOB_CONTROL
     /* If interactive, make the shell the foreground process */
     if (opts[MONITOR] && interact && (SHTTY != -1)) {
-	attachtty(GETPGRP());
+      /* Since we now sometimes execute programs in the process group
+       * of the parent shell even when using job-control, we have to
+       * make sure that we run in our own process group. Otherwise if
+       * we are called from a program that doesn't put us in our own
+       * group a SIGTSTP that we ignore might stop our parent process.
+       * Instead of the two calls below we once had:
+       *   attachtty(GETPGRP());
+       */
+	attachtty(getpid());
+	setpgrp(0L, 0L);
 	if ((mypgrp = GETPGRP()) > 0) {
 	    while ((ttpgrp = gettygrp()) != -1 && ttpgrp != mypgrp) {
 		sleep(1);
@@ -530,12 +553,15 @@ setupvals(void)
     int i;
 #endif
 
+    getkeyptr = NULL;
+
+    lineno = 1;
     noeval = 0;
     curhist = 0;
     histsiz = DEFAULT_HISTSIZE;
     inithist();
 
-    cmdstack = (unsigned char *) zalloc(256);
+    cmdstack = (unsigned char *) zalloc(CMDSTACKSZ);
     cmdsp = 0;
 
     bangchar = '!';
@@ -869,7 +895,7 @@ source(char *s)
     SHIN = tempfd;
     bshin = fdopen(SHIN, "r");
     subsh  = 0;
-    lineno = 0;
+    lineno = 1;
     loops  = 0;
     dosetopt(SHINSTDIN, 0, 1);
     scriptname = s;

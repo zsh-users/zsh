@@ -1,9 +1,20 @@
 #compdef wait
 
+# This uses two configuration keys:
+#
+#  ps_args
+#    This can be set to options of the ps(1) command that should be
+#    used when invoking it to get the pids to complete.
+#
+#  ps_listargs
+#    This defaults to the value of the `ps_args' key and defines
+#    options for the ps command that are to be used when creating
+#    the list to display during completion.
+
 local list ret=1
 
 compgen -P '%' -j && ret=0
-list=("$(ps 2>/dev/null)")
-compgen -y '$list' -s '${${${(f)"$(ps 2>/dev/null)"}[2,-1]## #}%% *}' && ret=0
+list=("${(@Mr:COLUMNS-1:)${(f)$(ps ${compconfig[ps_listargs]:-$compconfig[ps_args]} 2>/dev/null)}[2,-1]:#[ 	]#${PREFIX}[0-9]#${SUFFIX}[ 	]*}")
+compadd -y list - ${${${(f)"$(ps $compconfig[ps_args] 2>/dev/null)"}[2,-1]## #}%% *} && ret=0
 
 return ret

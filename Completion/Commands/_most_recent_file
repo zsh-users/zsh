@@ -14,9 +14,9 @@ local file tilde etilde
 if [[ $PREFIX = \~*/* ]]; then
   tilde=${PREFIX%%/*}
   etilde=${~tilde}
-  file=($~PREFIX*$~SUFFIX(om[$NUMERIC]N))
+  file=($~PREFIX*$~SUFFIX(om[${NUMERIC:-1}]N))
   file=(${file/#$etilde/$tilde})
 else
-  file=($~PREFIX*$~SUFFIX(om[$NUMERIC]N))
+  file=($~PREFIX*$~SUFFIX(om[${NUMERIC:-1}]N))
 fi
 (( $#file )) && compadd -U -i "$IPREFIX" -I "$ISUFFIX" -f -Q $file

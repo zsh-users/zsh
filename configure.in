@@ -598,7 +598,8 @@ main() { return sizeof(ino_t) < 8; }
   if test "x$enable_lfs" != xno -o $zsh_cv_off_t_is_64_bit = yes \
   -o $zsh_cv_ino_t_is_64_bit = yes; then
     AC_CACHE_CHECK(if compiler has a 64 bit type, zsh_cv_64_bit_type,
-    [if test "x$enable_lfs" != xyes -a "x$enable_lfs" != xno; then
+    [if test "x$enable_lfs" != x -a "x$enable_lfs" != xyes \
+     -a "x$enable_lfs" != xno; then
       zsh_64_BIT_TYPE(${enable_lfs}, zsh_cv_64_bit_type, force)
      else
        zsh_64_BIT_TYPE(long long, zsh_cv_64_bit_type)

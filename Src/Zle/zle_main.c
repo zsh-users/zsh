@@ -106,10 +106,12 @@ struct modifier zmod;
 /**/
 int prefixflag;
 
-/* != 0 if there is a pending beep (usually indicating an error) */
+/* Number of characters waiting to be read by the ungetkeys mechanism */
+/**/
+int kungetct;
 
 /**/
-int feepflag;
+char *zlenoargs[1] = { NULL };
 
 #ifdef FIONREAD
 static int delayzsetterm;
@@ -262,7 +264,7 @@ zsetterm(void)
 }
 
 static char *kungetbuf;
-static int kungetct, kungetsz;
+static int kungetsz;
 
 /**/
 void
@@ -499,6 +501,7 @@ zleread(char *lp, char *rp, int flags)
 	viinsbegin = 0;
 	statusline = NULL;
 	selectkeymap("main", 1);
+	selectlocalmap(NULL);
 	fixsuffix();
 	if ((s = (unsigned char *)getlinknode(bufstack))) {
 	    setline((char *)s);
@@ -527,20 +530,21 @@ zleread(char *lp, char *rp, int flags)
 	lastcol = -1;
 	initmodifier(&zmod);
 	prefixflag = 0;
-	feepflag = 0;
 	zrefresh();
 	while (!done && !errflag) {
 
 	    statusline = NULL;
 	    vilinerange = 0;
 	    reselectkeymap();
+	    selectlocalmap(NULL);
 	    bindk = getkeycmd();
 	    if (!ll && isfirstln && c == eofchar) {
 		eofsent = 1;
 		break;
 	    }
 	    if (bindk) {
-		execzlefunc(bindk);
+		if (execzlefunc(bindk, zlenoargs))
+		    handlefeep(zlenoargs);
 		handleprefixes();
 		/* for vi mode, make sure the cursor isn't somewhere illegal */
 		if (invicmdmode() && cs > findbol() &&
@@ -565,7 +569,6 @@ zleread(char *lp, char *rp, int flags)
 #endif
 		if (!kungetct)
 		    zrefresh();
-	    handlefeep();
 	}
 	statusline = NULL;
 	invalidatelist();
@@ -591,10 +594,10 @@ zleread(char *lp, char *rp, int flags)
 /* execute a widget */
 
 /**/
-void
-execzlefunc(Thingy func)
+int
+execzlefunc(Thingy func, char **args)
 {
-    int r = 0;
+    int r = 0, ret = 0;
     Widget w;
 
     if(func->flags & DISABLED) {
@@ -605,7 +608,7 @@ execzlefunc(Thingy func)
 	zsfree(nm);
 	showmsg(msg);
 	zsfree(msg);
-	feep();
+	ret = 1;
     } else if((w = func->widget)->flags & (WIDGET_INT|WIDGET_NCOMP)) {
 	int wflags = w->flags;
 
@@ -621,9 +624,9 @@ execzlefunc(Thingy func)
 	    lastcol = -1;
 	if (wflags & WIDGET_NCOMP) {
 	    compwidget = w;
-	    completecall();
+	    ret = completecall(args);
 	} else
-	    w->u.fn();
+	    ret = w->u.fn(args);
 	if (!(wflags & ZLE_NOTCOMMAND))
 	    lastcmd = wflags;
 	r = 1;
@@ -638,14 +641,23 @@ execzlefunc(Thingy func)
 	    zsfree(nm);
 	    showmsg(msg);
 	    zsfree(msg);
-	    feep();
+	    ret = 1;
 	} else {
-	    int osc = sfcontext, osi = movefd(0);
+	    int osc = sfcontext, osi = movefd(0), olv = lastval;
+	    LinkList largs = NULL;
 
+	    if (*args) {
+		largs = newlinklist();
+		addlinknode(largs, dupstring(w->u.fnnam));
+		while (*args)
+		    addlinknode(largs, dupstring(*args++));
+	    }
 	    startparamscope();
 	    makezleparams(0);
 	    sfcontext = SFC_WIDGET;
-	    doshfunc(w->u.fnnam, l, NULL, 0, 1);
+	    doshfunc(w->u.fnnam, l, largs, 0, 0);
+	    ret = lastval;
+	    lastval = olv;
 	    sfcontext = osc;
 	    endparamscope();
 	    lastcmd = 0;
@@ -658,6 +670,7 @@ execzlefunc(Thingy func)
 	refthingy(func);
 	lbindk = func;
     }
+    return ret;
 }
 
 /* initialise command modifiers */
@@ -826,14 +839,14 @@ bin_vared(char *name, char **args, char *ops, int func)
 }
 
 /**/
-void
-describekeybriefly(void)
+int
+describekeybriefly(char **args)
 {
     char *seq, *str, *msg, *is;
     Thingy func;
 
     if (statusline)
-	return;
+	return 1;
     clearlist = 1;
     statusline = "Describe key briefly: _";
     statusll = strlen(statusline);
@@ -841,7 +854,7 @@ describekeybriefly(void)
     seq = getkeymapcmd(curkeymap, &func, &str);
     statusline = NULL;
     if(!*seq)
-	return;
+	return 1;
     msg = bindztrdup(seq);
     msg = appstr(msg, " is ");
     if (!func)
@@ -852,6 +865,7 @@ describekeybriefly(void)
     zsfree(is);
     showmsg(msg);
     zsfree(msg);
+    return 0;
 }
 
 #define MAXFOUND 4
@@ -882,13 +896,13 @@ scanfindfunc(char *seq, Thingy func, char *str, void *magic)
 }
 
 /**/
-void
-whereis(void)
+int
+whereis(char **args)
 {
     struct findfunc ff;
 
     if (!(ff.func = executenamedcommand("Where is: ")))
-	return;
+	return 1;
     ff.found = 0;
     ff.msg = niceztrdup(ff.func->nam);
     scankeymap(curkeymap, 1, scanfindfunc, &ff);
@@ -898,6 +912,7 @@ whereis(void)
 	ff.msg = appstr(ff.msg, " et al");
     showmsg(ff.msg);
     zsfree(ff.msg);
+    return 0;
 }
 
 /**/
@@ -933,7 +948,17 @@ trashzle(void)
 static struct builtin bintab[] = {
     BUILTIN("bindkey", 0, bin_bindkey, 0, -1, 0, "evaMldDANmrsLR", NULL),
     BUILTIN("vared",   0, bin_vared,   1,  7, 0, NULL,             NULL),
-    BUILTIN("zle",     0, bin_zle,     0, -1, 0, "lDANCLmMgGc",    NULL),
+    BUILTIN("zle",     0, bin_zle,     0, -1, 0, "lDANCLmMgGcRa",  NULL),
+};
+
+/* The order of the entries in this table has to match the *HOOK
+ * macros in zle.h */
+
+/**/
+struct hookdef zlehooks[] = {
+    HOOKDEF("list_matches", ilistmatches, 0),
+    HOOKDEF("insert_match", NULL, HOOKF_ALL),
+    HOOKDEF("menu_start", NULL, HOOKF_ALL),
 };
 
 /**/
@@ -954,6 +979,8 @@ setup_zle(Module m)
     makecomplistctlptr = makecomplistctl;
     unambig_dataptr = unambig_data;
     set_comp_sepptr = set_comp_sep;
+
+    getkeyptr = getkey;
 
     /* initialise the thingies */
     init_thingies();
@@ -977,6 +1004,7 @@ int
 boot_zle(Module m)
 {
     addbuiltins(m->nam, bintab, sizeof(bintab)/sizeof(*bintab));
+    addhookdefs(m->nam, zlehooks, sizeof(zlehooks)/sizeof(*zlehooks));
     return 0;
 }
 
@@ -992,6 +1020,7 @@ cleanup_zle(Module m)
 	return 1;
     }
     deletebuiltins(m->nam, bintab, sizeof(bintab)/sizeof(*bintab));
+    deletehookdefs(m->nam, zlehooks, sizeof(zlehooks)/sizeof(*zlehooks));
     return 0;
 }
 
@@ -1030,6 +1059,8 @@ finish_zle(Module m)
     makecomplistctlptr = NULL;
     unambig_dataptr = NULL;
     set_comp_sepptr = NULL;
+
+    getkeyptr = NULL;
 
     return 0;
 }

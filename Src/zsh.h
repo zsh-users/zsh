@@ -226,6 +226,7 @@ enum {
 #define INP_HIST      (1<<2)	/* expanding history                       */
 #define INP_CONT      (1<<3)	/* continue onto previously stacked input  */
 #define INP_ALCONT    (1<<4)	/* stack is continued from alias expn.     */
+#define INP_LINENO    (1<<5)    /* update line number                      */
 
 /* Flags for metafy */
 #define META_REALLOC	0
@@ -277,8 +278,9 @@ typedef struct heapstack *Heapstack;
 typedef struct histent   *Histent;
 typedef struct forcmd    *Forcmd;
 typedef struct autofn    *AutoFn;
+typedef struct hookdef   *Hookdef;
 
-typedef struct asgment  *Asgment;
+typedef struct asgment   *Asgment;
 
 
 /********************************/
@@ -886,6 +888,22 @@ struct module {
 #define MOD_UNLOAD  (1<<1)
 #define MOD_SETUP   (1<<2)
 
+/* C-function hooks */
+
+typedef int (*Hookfn) _((Hookdef, void *));
+
+struct hookdef {
+    Hookdef next;
+    char *name;
+    Hookfn def;
+    int flags;
+    LinkList funcs;
+};
+
+#define HOOKF_ALL 1
+
+#define HOOKDEF(name, func, flags) { NULL, name, (Hookfn) func, flags, NULL }
+
 /* node used in parameter hash table (paramtab) */
 
 struct param {
@@ -958,12 +976,13 @@ struct param {
 #define PM_UNALIASED	(1<<11)	/* do not expand aliases when autoloading     */
 
 #define PM_TIED 	(1<<12)	/* array tied to colon-path or v.v. */
-#define PM_SPECIAL	(1<<13) /* special builtin parameter                  */
-#define PM_DONTIMPORT	(1<<14)	/* do not import this variable                */
-#define PM_RESTRICTED	(1<<15) /* cannot be changed in restricted mode       */
-#define PM_UNSET	(1<<16)	/* has null value                             */
-#define PM_REMOVABLE	(1<<17)	/* special can be removed from paramtab */
-#define PM_AUTOLOAD     (1<<18) /* autoloaded from module */
+#define PM_LOCAL	(1<<13) /* this parameter will be made local */
+#define PM_SPECIAL	(1<<14) /* special builtin parameter                  */
+#define PM_DONTIMPORT	(1<<15)	/* do not import this variable                */
+#define PM_RESTRICTED	(1<<16) /* cannot be changed in restricted mode       */
+#define PM_UNSET	(1<<17)	/* has null value                             */
+#define PM_REMOVABLE	(1<<18)	/* special can be removed from paramtab */
+#define PM_AUTOLOAD     (1<<19) /* autoloaded from module */
 
 /* Flags for extracting elements of arrays and associative arrays */
 #define SCANPM_WANTVALS   (1<<0)
@@ -1201,6 +1220,7 @@ enum {
     LISTBEEP,
     LISTTYPES,
     LOCALOPTIONS,
+    LOCALTRAPS,
     LOGINSHELL,
     LONGLISTJOBS,
     MAGICEQUALSUBST,
@@ -1358,7 +1378,8 @@ struct ttyinfo {
 /* Definitions for the %_ prompt escape */
 /****************************************/
 
-#define cmdpush(X) if (!(cmdsp >= 0 && cmdsp < 256)) {;} else cmdstack[cmdsp++]=(X)
+#define CMDSTACKSZ 256
+#define cmdpush(X) if (!(cmdsp >= 0 && cmdsp < CMDSTACKSZ)) {;} else cmdstack[cmdsp++]=(X)
 #ifdef DEBUG
 # define cmdpop()  if (cmdsp <= 0) { \
 			fputs("BUG: cmdstack empty\n", stderr); \
@@ -1491,9 +1512,13 @@ struct heap {
 
 /* These used in the sigtrapped[] array */
 
-#define ZSIG_TRAPPED	(1<<0)
-#define ZSIG_IGNORED	(1<<1)
-#define ZSIG_FUNC	(1<<2)
+#define ZSIG_TRAPPED	(1<<0)	/* Signal is trapped */
+#define ZSIG_IGNORED	(1<<1)	/* Signal is ignored */
+#define ZSIG_FUNC	(1<<2)	/* Trap is a function, not an eval list */
+/* Mask to get the above flags */
+#define ZSIG_MASK	(ZSIG_TRAPPED|ZSIG_IGNORED|ZSIG_FUNC)
+/* No. of bits to shift local level when storing in sigtrapped */
+#define ZSIG_SHIFT	3
 
 /**********************************/
 /* Flags to third argument of zle */

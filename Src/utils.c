@@ -62,9 +62,10 @@ zerr(const char *fmt, const char *str, int num)
     /*
      * scriptname is set when sourcing scripts, so that we get the
      * correct name instead of the generic name of whatever
-     * program/script is running.
+     * program/script is running.  It's also set in shell functions,
+     * so test locallevel, too.
      */
-    nicezputs(isset(SHINSTDIN) ? "zsh" :
+    nicezputs((isset(SHINSTDIN) && !locallevel) ? "zsh" :
 	      scriptname ? scriptname : argzero, stderr);
     fputs(": ", stderr);
     zerrnam(NULL, fmt, str, num);
@@ -79,7 +80,7 @@ zerrnam(const char *cmd, const char *fmt, const char *str, int num)
 	    return;
 	errflag = 1;
 	trashzle();
-	if(unset(SHINSTDIN)) {
+	if (unset(SHINSTDIN) || locallevel) {
 	    nicezputs(scriptname ? scriptname : argzero, stderr);
 	    fputs(": ", stderr);
 	}
@@ -133,7 +134,7 @@ zerrnam(const char *cmd, const char *fmt, const char *str, int num)
 	    putc(*fmt == Meta ? *++fmt ^ 32 : *fmt, stderr);
 	    fmt++;
 	}
-    if (unset(SHINSTDIN) && lineno)
+    if ((unset(SHINSTDIN) || locallevel) && lineno)
 	fprintf(stderr, " [%ld]\n", (long)lineno);
     else
 	putc('\n', stderr);
@@ -771,6 +772,23 @@ checkmailpath(char **s)
 	}
 	*v = c;
 	s++;
+    }
+}
+
+/* This prints the XTRACE prompt. */
+
+/**/
+void
+printprompt4(void)
+{
+    if (prompt4) {
+	int l;
+	char *s = dupstring(prompt4);
+
+	unmetafy(s, &l);
+	s = unmetafy(promptexpand(metafy(s, l, META_NOALLOC), 0, NULL, NULL), &l);
+
+	fprintf(stderr, "%s", s);
     }
 }
 
@@ -2116,7 +2134,12 @@ mkarray(char *s)
 void
 zbeep(void)
 {
-    if (isset(BEEP))
+    char *vb;
+    if ((vb = getsparam("ZBEEP"))) {
+	int len;
+	vb = getkeystring(vb, &len, 2, NULL);
+	write(SHTTY, vb, len);
+    } else if (isset(BEEP))
 	write(SHTTY, "\07", 1);
 }
 
@@ -3149,6 +3172,22 @@ dquotedzputs(char const *s, FILE *stream)
     return ret;
 }
 #endif
+
+/*
+ * Decode a key string, turning it into the literal characters.
+ * The length is returned in len.
+ * fromwhere determines how the processing works.
+ *   0:  Don't handle keystring, just print-like escapes.
+ *       Expects misc to be present.
+ *   1:  Handle Emacs-like \C-X arguments etc., but not ^X
+ *       Expects misc to be present.
+ *   2:  Handle ^X as well as emacs-like keys; don't handle \c
+ *       for no newlines.
+ *   3:  As 1, but don't handle \c.
+ *   4:  Do $'...' quoting.  Overwrites the existing string instead of
+ *       zhalloc'ing 
+ *   5:  As 2, but \- is special.  Expects misc to be defined.
+ */
 
 /**/
 char *

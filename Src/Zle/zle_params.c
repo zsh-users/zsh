@@ -69,8 +69,8 @@ static struct zleparam {
         zleunsetfn, NULL },
     { "keys", PM_ARRAY | PM_READONLY, NULL, FN(get_keys),
         zleunsetfn, NULL },
-    { "NUMERIC", PM_INTEGER, FN(set_numeric), FN(get_numeric),
-        zleunsetfn, NULL },
+    { "NUMERIC", PM_INTEGER | PM_UNSET, FN(set_numeric), FN(get_numeric),
+        unset_numeric, NULL },
     { "HISTNO", PM_INTEGER | PM_READONLY, NULL, FN(get_histno),
         zleunsetfn, NULL },
     { NULL, 0, NULL, NULL, NULL, NULL }
@@ -84,12 +84,12 @@ makezleparams(int ro)
 
     for(zp = zleparams; zp->name; zp++) {
 	Param pm = createparam(zp->name, (zp->type |PM_SPECIAL|PM_REMOVABLE|
-					  (ro ? PM_READONLY : 0)));
+					  PM_LOCAL|(ro ? PM_READONLY : 0)));
 	if (!pm)
 	    pm = (Param) paramtab->getnode(paramtab, zp->name);
 	DPUTS(!pm, "param not set in makezleparams");
 
-	pm->level = locallevel;
+	pm->level = locallevel + 1;
 	pm->u.data = zp->data;
 	switch(PM_TYPE(zp->type)) {
 	    case PM_SCALAR:
@@ -107,6 +107,8 @@ makezleparams(int ro)
 		break;
 	}
 	pm->unsetfn = zp->unsetfn;
+	if ((zp->type & PM_UNSET) && (zmod.flags & MOD_MULT))
+	    pm->flags &= ~PM_UNSET;
     }
 }
 
@@ -267,6 +269,7 @@ static void
 set_numeric(Param pm, zlong x)
 {
     zmult = x;
+    zmod.flags = MOD_MULT;
 }
 
 /**/
@@ -274,6 +277,17 @@ static zlong
 get_numeric(Param pm)
 {
     return zmult;
+}
+
+/**/
+static void
+unset_numeric(Param pm, int exp)
+{
+    if (exp) {
+	stdunsetfn(pm, exp);
+	zmod.flags = 0;
+	zmult = 1;
+    }
 }
 
 /**/

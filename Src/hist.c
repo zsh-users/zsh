@@ -888,9 +888,14 @@ prepnexthistent(int histnum)
     else {
 	he = hist_ring->down;
 	if (isset(HISTEXPIREDUPSFIRST) && !(he->flags & HIST_DUP)) {
+	    int max_unique_ct = getiparam("SAVEHIST");
 	    do {
+		if (max_unique_ct-- <= 0) {
+		    he = hist_ring->down;
+		    break;
+		}
 		he = he->down;
-	    } while (he != hist_ring->down && !(he->flags & HIST_DUP)) ;
+	    } while (he != hist_ring->down && !(he->flags & HIST_DUP));
 	    if (he != hist_ring->down) {
 		he->up->down = he->down;
 		he->down->up = he->up;
@@ -989,7 +994,7 @@ hend(void)
 	}
 #endif
 	/* get rid of pesky \n which we've already nulled out */
-	if (!chline[chwords[chwordpos-2]])
+	if (chwordpos > 1 && !chline[chwords[chwordpos-2]])
 	    chwordpos -= 2;
 	/* strip superfluous blanks, if desired */
 	if (isset(HISTREDUCEBLANKS))

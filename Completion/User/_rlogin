@@ -3,7 +3,7 @@
 if [[ CURRENT -eq 2 ]]; then
   compgen -k hosts
 elif [[ CURRENT -eq 3 ]]; then
-  compgen -k '(-l)'
+  compadd - -l
 else
   compgen -u
 fi

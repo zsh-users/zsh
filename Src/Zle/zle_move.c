@@ -33,64 +33,69 @@
 static int vimarkcs[27], vimarkline[27];
 
 /**/
-void
-beginningofline(void)
+int
+beginningofline(char **args)
 {
     int n = zmult;
 
     if (n < 0) {
+	int ret;
 	zmult = -n;
-	endofline();
+	ret = endofline(args);
 	zmult = n;
-	return;
+	return ret;
     }
     while (n--) {
 	if (cs == 0)
-	    return;
+	    return 0;
 	if (line[cs - 1] == '\n')
 	    if (!--cs)
-		return;
+		return 0;
 	while (cs && line[cs - 1] != '\n')
 	    cs--;
     }
+    return 0;
 }
 
 /**/
-void
-endofline(void)
+int
+endofline(char **args)
 {
     int n = zmult;
 
     if (n < 0) {
+	int ret;
 	zmult = -n;
-	beginningofline();
+	ret = beginningofline(args);
 	zmult = n;
-	return;
+	return ret;
     }
     while (n--) {
 	if (cs >= ll) {
 	    cs = ll;
-	    return;
+	    return 0;
 	}
 	if (line[cs] == '\n')
 	    if (++cs == ll)
-		return;
+		return 0;
 	while (cs != ll && line[cs] != '\n')
 	    cs++;
     }
+    return 0;
 }
 
 /**/
-void
-beginningoflinehist(void)
+int
+beginningoflinehist(char **args)
 {
     int n = zmult;
 
     if (n < 0) {
+	int ret;
 	zmult = -n;
-	endoflinehist();
+	ret = endoflinehist(args);
 	zmult = n;
-	return;
+	return ret;
     }
     while (n) {
 	if (cs == 0)
@@ -103,26 +108,29 @@ beginningoflinehist(void)
 	n--;
     }
     if (n) {
-	int m = zmult;
+	int m = zmult, ret;
 
 	zmult = n;
-	uphistory();
+	ret = uphistory(args);
 	zmult = m;
 	cs = 0;
+	return ret;
     }
+    return 0;
 }
 
 /**/
-void
-endoflinehist(void)
+int
+endoflinehist(char **args)
 {
     int n = zmult;
 
     if (n < 0) {
+	int ret;
 	zmult = -n;
-	beginningoflinehist();
+	ret = beginningoflinehist(args);
 	zmult = n;
-	return;
+	return ret;
     }
     while (n) {
 	if (cs >= ll) {
@@ -137,46 +145,51 @@ endoflinehist(void)
 	n--;
     }
     if (n) {
-	int m = zmult;
+	int m = zmult, ret;
 
 	zmult = n;
-	downhistory();
+	ret = downhistory(args);
 	zmult = m;
+	return ret;
     }
+    return 0;
 }
 
 /**/
-void
-forwardchar(void)
+int
+forwardchar(char **args)
 {
     cs += zmult;
     if (cs > ll)
 	cs = ll;
     if (cs < 0)
 	cs = 0;
+    return 0;
 }
 
 /**/
-void
-backwardchar(void)
+int
+backwardchar(char **args)
 {
     cs -= zmult;
     if (cs > ll)
 	cs = ll;
     if (cs < 0)
 	cs = 0;
+    return 0;
 }
 
 /**/
-void
-setmarkcommand(void)
+int
+setmarkcommand(char **args)
 {
     mark = cs;
+    return 0;
 }
 
 /**/
-void
-exchangepointandmark(void)
+int
+exchangepointandmark(char **args)
 {
     int x;
 
@@ -185,11 +198,12 @@ exchangepointandmark(void)
     cs = x;
     if (cs > ll)
 	cs = ll;
+    return 0;
 }
 
 /**/
-void
-vigotocolumn(void)
+int
+vigotocolumn(char **args)
 {
     int x, y;
 
@@ -202,20 +216,20 @@ vigotocolumn(void)
 	cs = y;
     if (cs < x)
 	cs = x;
+    return 0;
 }
 
 /**/
-void
-vimatchbracket(void)
+int
+vimatchbracket(char **args)
 {
     int ocs = cs, dir, ct;
     unsigned char oth, me;
 
   otog:
     if (cs == ll || line[cs] == '\n') {
-	feep();
 	cs = ocs;
-	return;
+	return 1;
     }
     switch (me = line[cs]) {
     case '{':
@@ -258,49 +272,49 @@ vimatchbracket(void)
 	    ct++;
     }
     if (cs < 0 || cs >= ll) {
-	feep();
 	cs = ocs;
+	return 1;
     } else if(dir > 0 && virangeflag)
 	cs++;
+    return 0;
 }
 
 /**/
-void
-viforwardchar(void)
+int
+viforwardchar(char **args)
 {
     int lim = findeol() - invicmdmode();
     int n = zmult;
 
     if (n < 0) {
+	int ret;
 	zmult = -n;
-	vibackwardchar();
+	ret = vibackwardchar(args);
 	zmult = n;
-	return;
+	return ret;
     }
-    if (cs >= lim) {
-	feep();
-	return;
-    }
+    if (cs >= lim)
+	return 1;
     while (n-- && cs < lim)
 	cs++;
+    return 0;
 }
 
 /**/
-void
-vibackwardchar(void)
+int
+vibackwardchar(char **args)
 {
     int n = zmult;
 
     if (n < 0) {
+	int ret;
 	zmult = -n;
-	viforwardchar();
+	ret = viforwardchar(args);
 	zmult = n;
-	return;
+	return ret;
     }
-    if (cs == findbol()) {
-	feep();
-	return;
-    }
+    if (cs == findbol())
+	return 1;
     while (n--) {
 	cs--;
 	if (cs < 0 || line[cs] == '\n') {
@@ -308,157 +322,163 @@ vibackwardchar(void)
 	    break;
 	}
     }
+    return 0;
 }
 
 /**/
-void
-viendofline(void)
+int
+viendofline(char **args)
 {
     int oldcs = cs, n = zmult;
 
-    if (n < 1) {
-	feep();
-	return;
-    }
+    if (n < 1)
+	return 1;
     while(n--) {
 	if (cs > ll) {
 	    cs = oldcs;
-	    feep();
-	    return;
+	    return 1;
 	}
 	cs = findeol() + 1;
     }
     cs--;
     lastcol = 1<<30;
+    return 0;
 }
 
 /**/
-void
-vibeginningofline(void)
+int
+vibeginningofline(char **args)
 {
     cs = findbol();
+    return 0;
 }
 
 static int vfindchar, vfinddir, tailadd;
 
 /**/
-void
-vifindnextchar(void)
+int
+vifindnextchar(char **args)
 {
     if ((vfindchar = vigetkey()) != -1) {
 	vfinddir = 1;
 	tailadd = 0;
-	virepeatfind();
+	return virepeatfind(args);
     }
+    return 1;
 }
 
 /**/
-void
-vifindprevchar(void)
+int
+vifindprevchar(char **args)
 {
     if ((vfindchar = vigetkey()) != -1) {
 	vfinddir = -1;
 	tailadd = 0;
-	virepeatfind();
+	return virepeatfind(args);
     }
+    return 1;
 }
 
 /**/
-void
-vifindnextcharskip(void)
+int
+vifindnextcharskip(char **args)
 {
     if ((vfindchar = vigetkey()) != -1) {
 	vfinddir = 1;
 	tailadd = -1;
-	virepeatfind();
+	return virepeatfind(args);
     }
+    return 1;
 }
 
 /**/
-void
-vifindprevcharskip(void)
+int
+vifindprevcharskip(char **args)
 {
     if ((vfindchar = vigetkey()) != -1) {
 	vfinddir = -1;
 	tailadd = 1;
-	virepeatfind();
+	return virepeatfind(args);
     }
+    return 1;
 }
 
 /**/
-void
-virepeatfind(void)
+int
+virepeatfind(char **args)
 {
     int ocs = cs, n = zmult;
 
-    if (!vfinddir) {
-	feep();
-	return;
-    }
+    if (!vfinddir)
+	return 1;
     if (n < 0) {
+	int ret;
 	zmult = -n;
-	virevrepeatfind();
+	ret = virevrepeatfind(args);
 	zmult = n;
-	return;
+	return ret;
     }
     while (n--) {
 	do
 	    cs += vfinddir;
 	while (cs >= 0 && cs < ll && line[cs] != vfindchar && line[cs] != '\n');
 	if (cs < 0 || cs >= ll || line[cs] == '\n') {
-	    feep();
 	    cs = ocs;
-	    return;
+	    return 1;
 	}
     }
     cs += tailadd;
     if (vfinddir == 1 && virangeflag)
 	cs++;
+    return 0;
 }
 
 /**/
-void
-virevrepeatfind(void)
+int
+virevrepeatfind(char **args)
 {
+    int ret;
+
     if (zmult < 0) {
 	zmult = -zmult;
-	virepeatfind();
+	ret = virepeatfind(args);
 	zmult = -zmult;
-	return;
+	return ret;
     }
     vfinddir = -vfinddir;
-    virepeatfind();
+    ret = virepeatfind(args);
     vfinddir = -vfinddir;
+    return ret;
 }
 
 /**/
-void
-vifirstnonblank(void)
+int
+vifirstnonblank(char **args)
 {
     cs = findbol();
     while (cs != ll && iblank(line[cs]))
 	cs++;
+    return 0;
 }
 
 /**/
-void
-visetmark(void)
+int
+visetmark(char **args)
 {
     int ch;
 
     ch = getkey(0);
-    if (ch < 'a' || ch > 'z') {
-	feep();
-	return;
-    }
+    if (ch < 'a' || ch > 'z')
+	return 1;
     ch -= 'a';
     vimarkcs[ch] = cs;
     vimarkline[ch] = histline;
+    return 0;
 }
 
 /**/
-void
-vigotomark(void)
+int
+vigotomark(char **args)
 {
     int ch;
 
@@ -466,30 +486,26 @@ vigotomark(void)
     if (ch == c)
 	ch = 26;
     else {
-	if (ch < 'a' || ch > 'z') {
-	    feep();
-	    return;
-	}
+	if (ch < 'a' || ch > 'z')
+	    return 1;
 	ch -= 'a';
     }
-    if (!vimarkline[ch]) {
-	feep();
-	return;
-    }
+    if (!vimarkline[ch])
+	return 1;
     if (curhist != vimarkline[ch] && !zle_goto_hist(vimarkline[ch], 0, 0)) {
 	vimarkline[ch] = 0;
-	feep();
-	return;
+	return 1;
     }
     cs = vimarkcs[ch];
     if (cs > ll)
 	cs = ll;
+    return 0;
 }
 
 /**/
-void
-vigotomarkline(void)
+int
+vigotomarkline(char **args)
 {
-    vigotomark();
-    vifirstnonblank();
+    vigotomark(args);
+    return vifirstnonblank(zlenoargs);
 }

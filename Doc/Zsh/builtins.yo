@@ -224,10 +224,11 @@ are reset to their default value corresponding to the specified emulation
 mode, except for certain options describing the interactive
 environment; otherwise, only those options likely to cause portability
 problems in scripts and functions are altered.  If the tt(-L) option
-is given, the option tt(LOCAL_OPTIONS) will be set as well, causing
-the effect of the tt(emulate) command to be local to the immediately
-surrounding shell function, if any; normally this is turned off in all
-emulation modes except tt(ksh).
+is given, the options tt(LOCAL_OPTIONS) and tt(LOCAL_TRAPS) will be set as
+well, causing the effects of the tt(emulate) command and any tt(setopt) and
+tt(trap) commands to be local to the immediately surrounding shell
+function, if any; normally these options are turned off in all emulation
+modes except tt(ksh).
 )
 findex(enable)
 cindex(enabling commands)
@@ -263,8 +264,7 @@ findex(export)
 item(tt(export) [ var(name)[tt(=)var(value)] ... ])(
 The specified var(name)s are marked for automatic export
 to the environment of subsequently executed commands.
-Equivalent to tt(typeset -x), except that no parameter will be created
-to hide an existing one in an outer scope.
+Equivalent to tt(typeset -gx).
 If a parameter specified does not
 already exist, it is created in the global scope.
 )
@@ -428,7 +428,7 @@ added by explicit specification.  If has no effect if used with tt(-f).
 )
 alias(history)(fc -l)
 findex(integer)
-item(tt(integer) [ {tt(PLUS())|tt(-)}tt(lrtux) ] [ var(name)[tt(=)var(value)] ... ])(
+item(tt(integer) [ {tt(PLUS())|tt(-)}tt(glrtux) ] [ var(name)[tt(=)var(value)] ... ])(
 Equivalent to tt(typeset -i), except that options irrelevant to
 integers are not permitted.
 )
@@ -522,7 +522,7 @@ endsitem()
 )
 findex(local)
 item(tt(local) [ {tt(PLUS())|tt(-)}tt(ALRUZailrtu) [var(n)]] [ var(name)[tt(=)var(value)] ] ...)(
-Same as tt(typeset), except that the options tt(-x) and
+Same as tt(typeset), except that the options tt(-g), tt(-x) and
 tt(-f) are not permitted.
 )
 findex(log)
@@ -682,12 +682,13 @@ Read only one character from the terminal and set var(name) to
 With this flag set the return value is zero only if the character was
 `tt(y)' or `tt(Y)'.  Note that this always reads from the terminal, even
 if used with the tt(-p) or tt(-u) or tt(-z) flags or with redirected input.
+This option may also be used within zle widgets.
 )
 item(tt(-k) [ var(num) ])(
 Read only one (or var(num)) characters.  All are assigned to the first
 var(name), without word splitting.  This flag is ignored when tt(-q) is
 present.  Input is read from the terminal unless one of tt(-u) or tt(-p)
-is present.
+is present.  This option may also be used within zle widgets.
 )
 item(tt(-z))(
 Read one entry from the editor buffer stack and assign it to the first
@@ -842,7 +843,8 @@ findex(trap)
 cindex(signals, trapping)
 cindex(trapping signals)
 item(tt(trap) [ var(arg) [ var(sig) ... ] ])(
-var(arg) is a command to be read and executed when the shell
+var(arg) is a series of commands (usually quoted to protect it from
+immediate evaluation by the shell) to be read and executed when the shell
 receives var(sig).  Each var(sig) can be given as a number
 or as the name of a signal.
 If var(arg) is `tt(-)', then all traps var(sig) are reset to their
@@ -862,6 +864,20 @@ then the command var(arg) is executed when the shell terminates.
 
 The tt(trap) command with no arguments prints a list of commands
 associated with each signal.
+
+Note that traps defined with the tt(trap) builtin are slightly different
+from those defined as `tt(TRAP)var(NAL) () { ... }', as the latter have
+their own function environment (line numbers, local variables, etc.) while
+the former use the environment of the command in which they were called.
+For example,
+
+example(trap 'print $LINENO' DEBUG)
+
+will print the line number of command executed after it has run, while
+
+example(TRAPDEBUG() { print $LINENO; })
+
+will always print the number zero.
 )
 findex(true)
 cindex(doing nothing, successfully)
@@ -887,7 +903,7 @@ Equivalent to tt(whence -v).
 findex(typeset)
 cindex(parameters, setting)
 cindex(parameters, declaring)
-xitem(tt(typeset) [ {tt(PLUS())|tt(-)}tt(ALRUZafilrtuxm) [var(n)]] [ \
+xitem(tt(typeset) [ {tt(PLUS())|tt(-)}tt(ALRUZafgilrtuxm) [var(n)]] [ \
 var(name)[tt(=)var(value)] ... ])
 item(tt(typeset) -T [ {tt(PLUS()|tt(-))}tt(LRUZrux) ] \
   var(SCALAR)[tt(=)var(value)] var(array))(
@@ -925,6 +941,14 @@ assigning an array to var(SCALAR) is an error, and assigning a scalar
 to var(array) sets it to be a single-element array.  Note that
 both tt(typeset -xT ...) and tt(export -T ...) work, but only the
 scalar will be marked for export.
+
+The flag tt(-g) (global) flag is treated specially: it means that any
+resulting parameter will not be restricted to local scope.  Note that this
+does not necessarily mean that the parameter will be global, as the flag
+will apply to any existing parameter (even if unset) from an enclosing
+function.  This flag does not affect the parameter after creation, hence it
+has no effect when listing existing parameters, nor does the flag tt(+g)
+have any effect.
 
 If no var(name) is present, the names and values of all parameters are
 printed.  In this case the attribute flags restrict the display to
@@ -1174,6 +1198,7 @@ findex(zmodload)
 cindex(modules, loading)
 cindex(loading modules)
 xitem(tt(zmodload) [ tt(-dL) ] [ ... ])
+xitem(tt(zmodload -e) [ ... ])
 xitem(tt(zmodload) [ tt(-a) [ tt(-bcp) [ tt(-I) ] ] ] [ tt(-iL) ] ...)
 item(tt(zmodload) tt(-u) [ tt(-abcdp) [ tt(-I) ] ] [ tt(-iL) ] ...)(
 tt(zmodload) performs operations relating to zsh's loadable modules.
@@ -1269,6 +1294,21 @@ xitem(tt(zmodload) tt(-a) [ tt(-i) ] var(name) [ var(builtin) ... ])
 item(tt(zmodload) tt(-ua) [ tt(-i) ] var(builtin) ...)(
 Equivalent to tt(-ab) and tt(-ub).
 )
+item(tt(zmodload -e) [ var(string) ... ])(
+The tt(-e) option without arguments lists all modules loaded or linked 
+into the shell. With arguments only the return status is set to zero
+if all var(string)s given as arguments are names of modules loaded or
+linked in and to one if at least on var(string) is not the name of a
+module loaded or linked. This can be used to test for the availability 
+of things implemented by modules.
+)
 enditem()
+
+In a shell without dynamic loading only the tt(-e) option is
+supported. In such a shell the return status of tt(zmodload) without
+arguments or options is one whereas in a shell with dynamic loading
+the return status without arguments or options is always zero. This
+can be used to test if the shell supports dynamic loading of modules
+or not.
 )
 enditem()

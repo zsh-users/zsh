@@ -47,7 +47,7 @@ two letters `tt(zf)'.  They may already have been installed on your system;
 otherwise, you will need to find them and copy them.  The directory should
 appear as one of the elements of the tt($fpath) array (this should already
 be the case if they were installed), and at least the function tt(zfinit)
-should be autoloaded; it will autoload the rest.  Finally, to initialise
+should be autoloaded; it will autoload the rest.  Finally, to initialize
 the use of the system you need to call the tt(zfinit) function.  The
 following code in your tt(.zshrc) will arrange for this; assume the
 functions are stored in the directory tt(~/myfns):
@@ -59,7 +59,7 @@ zfinit)
 Note that tt(zfinit) assumes you are using the tt(zmodload) method to
 load the tt(zftp) command.  If it is already built into the shell, change
 tt(zfinit) to tt(zfinit -n).  It is helpful (though not essential) if the
-call to tt(zfinit) appears after any code to initialise the new completion
+call to tt(zfinit) appears after any code to initialize the new completion
 system, else unnecessary tt(compctl) commands will be given.
 
 texinode(Zftp Functions)(Miscellaneous Features)(Installation)(Zftp Function System)
@@ -324,7 +324,7 @@ alter tt(zftp_chpwd) and tt(zftp_progress), in particular.
 
 startitem()
 item(tt(zfinit [ -n ]))(
-As described above, this is used to initialise the zftp function system.
+As described above, this is used to initialize the zftp function system.
 The tt(-n) option should be used if the zftp command is already built into
 the shell.
 )

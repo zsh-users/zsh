@@ -146,8 +146,10 @@ then be processed with bf(dvips) and optionally bf(gs) (Ghostscript) to
 produce a nicely formatted printed guide.
 )
 item(The HTML guide)(
-An HTML version of this guide is available at the Zsh web site via
+An HTML version of this guide is available at the Zsh web site via:
+
 tt(http://sunsite.auc.dk/zsh/Doc/index.html).
+
 (The HTML version is produced with bf(texi2html), which may be obtained
 from tt(http://wwwcn.cern.ch/dci/texi2html/). The command is
 `tt(texi2html -split_chapter -expandinfo zsh.texi)'.)

@@ -71,6 +71,7 @@ execfor(Cmd cmd, LinkList args, int flags)
     lastval = 0;
     loops++;
     pushheap();
+    cmdpush(CS_FOR);
     for (;;) {
 	if (node->condition) {
 	    str = dupstring(node->condition);
@@ -119,6 +120,7 @@ execfor(Cmd cmd, LinkList args, int flags)
 	freeheap();
     }
     popheap();
+    cmdpop();
     loops--;
     return lastval;
 }
@@ -147,6 +149,7 @@ execselect(Cmd cmd, LinkList args, int flags)
     loops++;
     lastval = 0;
     pushheap();
+    cmdpush(CS_SELECT);
     inp = fdopen(dup((SHTTY == -1) ? 0 : SHTTY), "r");
     more = selectlist(args, 0);
     for (;;) {
@@ -201,6 +204,7 @@ execselect(Cmd cmd, LinkList args, int flags)
 	    break;
     }
   done:
+    cmdpop();
     popheap();
     fclose(inp);
     loops--;
@@ -279,6 +283,7 @@ execwhile(Cmd cmd, LinkList args, int flags)
     node = cmd->u.whilecmd;
     oldval = 0;
     pushheap();
+    cmdpush(node->cond ? CS_UNTIL : CS_WHILE);
     loops++;
     for (;;) {
 	noerrexit = 1;
@@ -304,6 +309,7 @@ execwhile(Cmd cmd, LinkList args, int flags)
 	}
 	oldval = lastval;
     }
+    cmdpop();
     popheap();
     loops--;
     return lastval;
@@ -322,6 +328,7 @@ execrepeat(Cmd cmd, LinkList args, int flags)
     }
     count = atoi(peekfirst(args));
     pushheap();
+    cmdpush(CS_REPEAT);
     loops++;
     while (count--) {
 	execlist(cmd->u.list, 1, 0);
@@ -337,6 +344,7 @@ execrepeat(Cmd cmd, LinkList args, int flags)
 	    break;
 	}
     }
+    cmdpop();
     popheap();
     loops--;
     return lastval;
@@ -347,7 +355,7 @@ int
 execif(Cmd cmd, LinkList args, int flags)
 {
     struct ifcmd *node;
-    int olderrexit;
+    int olderrexit, s = 0;
     List *i, *t;
 
     olderrexit = noerrexit;
@@ -358,17 +366,22 @@ execif(Cmd cmd, LinkList args, int flags)
     if (!noerrexit)
 	noerrexit = 1;
     while (*i) {
+	cmdpush(s ? CS_ELIF : CS_IF);
 	execlist(*i, 1, 0);
+	cmdpop();
 	if (!lastval)
 	    break;
+	s = 1;
 	i++;
 	t++;
     }
     noerrexit = olderrexit;
 
-    if (*t)
+    if (*t) {
+	cmdpush(*i ? (s ? CS_ELIFTHEN : CS_IFTHEN) : CS_ELSE);
 	execlist(*t, 1, flags & CFLAG_EXEC);
-    else
+	cmdpop();
+    } else
 	lastval = 0;
 
     return lastval;
@@ -393,6 +406,7 @@ execcase(Cmd cmd, LinkList args, int flags)
     lastval = 0;
 
     if (node) {
+	cmdpush(CS_CASE);
 	while (*p) {
 	    char *pat = dupstring(*p + 1);
 	    singsub(&pat);
@@ -405,6 +419,7 @@ execcase(Cmd cmd, LinkList args, int flags)
 	    p++;
 	    l++;
 	}
+	cmdpop();
     }
     return lastval;
 }

@@ -409,19 +409,11 @@ showmsg(char const *msg)
 /* handle the error flag */
 
 /**/
-void
-feep(void)
+int
+handlefeep(char **args)
 {
-    feepflag = 1;
-}
-
-/**/
-void
-handlefeep(void)
-{
-    if(feepflag)
-	zbeep();
-    feepflag = 0;
+    zbeep();
+    return 0;
 }
 
 /***************/
@@ -554,18 +546,17 @@ setlastline(void)
 /* move backwards through the change list */
 
 /**/
-void
-undo(void)
+int
+undo(char **args)
 {
     handleundo();
     do {
-	if(!curchange->prev) {
-	    feep();
-	    return;
-	}
+	if(!curchange->prev)
+	    return 1;
 	unapplychange(curchange = curchange->prev);
     } while(curchange->flags & CH_PREV);
     setlastline();
+    return 0;
 }
 
 /**/
@@ -592,19 +583,18 @@ unapplychange(struct change *ch)
 /* move forwards through the change list */
 
 /**/
-void
-redo(void)
+int
+redo(char **args)
 {
     handleundo();
     do {
-	if(!curchange->next) {
-	    feep();
-	    return;
-	}
+	if(!curchange->next)
+	    return 1;
 	applychange(curchange);
 	curchange = curchange->next;
     } while(curchange->prev->flags & CH_NEXT);
     setlastline();
+    return 0;
 }
 
 /**/
@@ -631,8 +621,8 @@ applychange(struct change *ch)
 /* vi undo: toggle between the end of the undo list and the preceding point */
 
 /**/
-void
-viundochange(void)
+int
+viundochange(char **args)
 {
     handleundo();
     if(curchange->next) {
@@ -641,6 +631,7 @@ viundochange(void)
 	    curchange = curchange->next;
 	} while(curchange->next);
 	setlastline();
+	return 0;
     } else
-	undo();
+	return undo(args);
 }

@@ -89,14 +89,14 @@ fi
 
 # Get the number of errors to accept.
 
-if [[ "$cfgacc" = *[nN]* && NUMERIC -ne 1 ]]; then
+if [[ "$cfgacc" = *[nN]* && ${NUMERIC:-1} -ne 1 ]]; then
   # Stop if we also have a `!'.
 
   [[ "$cfgacc" = *\!* ]] && return 1
 
   # Prefer the numeric argument if that has a sensible value.
 
-  comax="$NUMERIC"
+  comax="${NUMERIC:-1}"
 else
   comax="${cfgacc//[^0-9]}"
 fi

@@ -15,12 +15,10 @@ ifnzman(\
 def(ifzshone)(1)()\
 def(ifzshall)(1)()\
 )\
-ifztexi(\
+ifztexi(
 texinfo(zsh.info)(zsh)
-NOTRANS(@setchapternewpage off
-@iftex
+NOTRANS(@iftex
 @finalout
-@afourpaper
 @end iftex)
 texititlepage()
 texititle(The Z Shell Guide)

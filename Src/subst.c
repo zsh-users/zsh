@@ -1328,10 +1328,15 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int ssub)
 			else
 			    t = aval;
 		    } else if (!isarr) {
-			arr[0] = val;
-			arr[1] = NULL;
+			if (!*val && arrasg > 1) {
+			    arr[0] = NULL;
+			    l = 0;
+			} else {
+			    arr[0] = val;
+			    arr[1] = NULL;
+			    l = 1;
+			}
 			t = aval = arr;
-			l = 1;
 		    } else
 			l = arrlen(aval), t = aval;
 		    p = a = zalloc(sizeof(char *) * (l + 1));
@@ -1944,6 +1949,8 @@ dstackent(char ch, int val)
     else
 	for (end=NULL, n=firstnode(dirstack); n && val; val--, n=nextnode(n));
     if (n == end) {
+	if (backwards && !val)
+	    return pwd;
 	if (isset(NOMATCH))
 	    zerr("not enough directory stack entries.", NULL, 0);
 	return NULL;

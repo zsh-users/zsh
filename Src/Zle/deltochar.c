@@ -33,8 +33,8 @@
 static Widget w_deletetochar;
 
 /**/
-static void
-deltochar(void)
+static int
+deltochar(char **args)
 {
     int c = getkey(0), dest = cs, ok = 0, n = zmult;
 
@@ -67,8 +67,7 @@ deltochar(void)
 	    }
 	}
     }
-    if (!ok)
-	feep();
+    return !ok;
 }
 
 /**/

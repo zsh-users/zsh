@@ -326,7 +326,7 @@ setfunction(char *name, char *val)
     val = metafy(val, strlen(val), META_REALLOC);
 
     HEAPALLOC {
-	list = parse_string(val);
+	list = parse_string(val, 1);
     } LASTALLOC;
 
     if (!list || list == &dummy_list) {

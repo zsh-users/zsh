@@ -11,7 +11,6 @@ def(CMT)(0)(NOTRANS(@c))
 
 ATEXIT(\
   NL()\
-  NOTRANS(@setchapternewpage off)NL()\
   NOTRANS(@contents)NL()\
   NOTRANS(@bye)NL()\
 )
@@ -47,6 +46,10 @@ def(texinfo)(2)(\
   STDPAR()\
   NOTRANS(\input texinfo.tex)NL()\
   NOTRANS(@c %**start of header)NL()\
+  NOTRANS(@iftex)NL()\
+  NOTRANS(@afourpaper)NL()\
+  NOTRANS(@setchapternewpage off)NL()\
+  NOTRANS(@end iftex)NL()\
   NOTRANS(@setfilename )ARG1NL()\
   NOTRANS(@settitle )ARG2NL()\
   NOTRANS(@c %**end of header)NL()\

@@ -34,6 +34,12 @@ Some of the single letter option names refer to an option being off,
 in which case the inversion of that name refers to the option being on.
 For example, `tt(PLUS()n)' is the short name of `tt(exec)', and
 `tt(-n)' is the short name of its inversion, `tt(noexec)'.
+
+In strings of single letter options supplied to the shell at startup,
+trailing whitespace will be ignored; for example the string `tt(-f    )'
+will be treated just as `tt(-f)', but the string `tt(-f i)' is an error.
+This is because many systems which implement the `tt(#!)' mechanism for
+calling scripts do not strip trailing whitespace.
 texinode(Description of Options)(Option Aliases)(Specifying Options)(Options)
 sect(Description of Options)
 cindex(options, description)
@@ -551,7 +557,10 @@ pindex(LIST_BEEP)
 cindex(beep, ambiguous completion)
 cindex(completion, beep on ambiguous)
 item(tt(LIST_BEEP))(
-Beep on an ambiguous completion.
+Beep on an ambiguous completion.  More accurately, this forces the
+completion widgets to return status 1 on an ambiguous completion, which
+causes the shell to beep if the option tt(BEEP) is also set; this may
+be modified if completion is called from a user-defined widget.
 )
 pindex(LIST_TYPES)
 cindex(marking file types)
@@ -571,6 +580,22 @@ force at the point of return will remain so.
 A shell function can also guarantee itself a known shell configuration
 with a formulation like `tt(emulate -L zsh)'; the tt(-L) activates
 tt(LOCAL_OPTIONS).
+)
+pindex(LOCAL_TRAPS)
+item(tt(LOCAL_TRAPS))(
+If this option is set when a signal trap is set inside a function, then the
+previous status of the trap for that signal will be restored when the
+function exits.  Note that this option must be set em(prior) to altering the
+trap behaviour in a function; unlike tt(LOCAL_OPTIONS), the value on exit
+from the function is irrelevant.  However, it does not need to be set
+before any global trap for that to be correctly restored by a function.
+For example,
+
+example(unsetopt localtraps
+trap - INT
+fn() { setopt localtraps; trap '' INT; sleep 3; })
+
+will restore normally handling of tt(SIGINT) after the function exits.
 )
 pindex(LOGIN)
 item(tt(LOGIN) (tt(-l), ksh: tt(-l)))(

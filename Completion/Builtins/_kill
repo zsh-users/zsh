@@ -3,13 +3,13 @@
 local list
 
 if compset -P 1 -; then
-  compgen -k "($signals[1,-3])"
+  compadd $signals[1,-3]
 else
   local ret=1
 
   compgen -P '%' -j && ret=0
-  list=("$(ps 2>/dev/null)")
-  compgen -y '$list' -s '${${${(f)"$(ps 2>/dev/null)"}[2,-1]## #}%% *}' && 
+  list=("${(@Mr:COLUMNS-1:)${(f)$(ps ${compconfig[ps_listargs]:-$compconfig[ps_args]} 2>/dev/null)}[2,-1]:#[ 	]#${PREFIX}[0-9]#${SUFFIX}[ 	]*}")
+  compadd -y list - ${${${(f)"$(ps $compconfig[ps_args] 2>/dev/null)"}[2,-1]## #}%% *} &&
     ret=0
 
   return ret

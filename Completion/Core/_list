@@ -14,7 +14,7 @@
 #    will be done if the expression evaluates to `1'.
 #    For example, with
 #
-#      compconf list_condition='NUMERIC != 1'
+#      compconf list_condition='${NUMERIC:-1} != 1'
 #
 #    delaying will be done only if given an explicit numeric argument
 #    other than `1'.

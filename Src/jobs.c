@@ -92,8 +92,12 @@ makerunning(Job jn)
 
     jn->stat &= ~STAT_STOPPED;
     for (pn = jn->procs; pn; pn = pn->next)
+#if 0
 	if (WIFSTOPPED(pn->status) && 
 	    (!(jn->stat & STAT_SUPERJOB) || pn->next))
+	    pn->status = SP_RUNNING;
+#endif
+        if (WIFSTOPPED(pn->status))
 	    pn->status = SP_RUNNING;
 
     if (jn->stat & STAT_SUPERJOB)
@@ -181,8 +185,9 @@ update_job(Job jn)
 
 		for (i = 1; i < MAXJOB; i++)
 		    if ((jobtab[i].stat & STAT_SUPERJOB) &&
-			jobtab[i].other == job) {
-			killpg(jobtab[i].gleader, SIGSTOP);
+			jobtab[i].other == job &&
+			jobtab[i].gleader) {
+			killpg(jobtab[i].gleader, SIGTSTP);
 			break;
 		    }
 	    }

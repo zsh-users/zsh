@@ -67,7 +67,7 @@ with the var(new-keymap) name, it is deleted.
 item(tt(-N) var(new-keymap) [ var(old-keymap) ])(
 Create a new keymap, named var(new-keymap).  If a keymap already has that
 name, it is deleted.  If an var(old-keymap) name is given, the new keymap
-is initialised to be a duplicate of it, otherwise the new keymap will
+is initialized to be a duplicate of it, otherwise the new keymap will
 be empty.
 )
 enditem()
@@ -161,12 +161,13 @@ cindex(widgets, calling)
 cindex(calling widgets)
 cindex(widgets, defining)
 cindex(defining widgets)
-xitem(tt(zle) tt(-l) [ tt(-L) ])
+xitem(tt(zle) tt(-l) [ tt(-L) ] [ tt(-a) ] [ var(string) ... ])
 xitem(tt(zle) tt(-D) var(widget) ...)
 xitem(tt(zle) tt(-A) var(old-widget) var(new-widget))
 xitem(tt(zle) tt(-N) var(widget) [ var(function) ])
 xitem(tt(zle) tt(-C) var(widget) var(completion-widget) var(function))
-item(tt(zle) var(widget))(
+xitem(tt(zle) tt(-R) [ var(display-string) ])
+item(tt(zle) var(widget) tt([ -n) var(num) tt(]) tt([ -N ]) var(args) ...)(
 The tt(zle) builtin performs a number of different actions concerning
 ZLE.  Which operation it performs depends on its options:
 
@@ -175,7 +176,15 @@ item(tt(-l) [ tt(-L) ])(
 List all existing user-defined widgets.  If the tt(-L)
 option is used, list in the form of tt(zle)
 commands to create the widgets.
-Built-in widgets are not listed.
+
+When combined with the tt(-a) option, all widget names are listed,
+including the builtin ones. In this case the tt(-L) option is ignored.
+
+If at least one var(string) is given, nothing will be printed but the
+return status will be zero if all var(string)s are names of existing
+widgets (or of user-defined widgets if the tt(-a) flag is not given)
+and non-zero if at least one var(string) is not a name of an defined
+widget.
 )
 item(tt(-D) var(widget) ...)(
 Delete the named var(widget)s.
@@ -191,7 +200,11 @@ Create a user-defined widget.  If there is already a widget with the
 specified name, it is overwritten.  When the new
 widget is invoked from within the editor, the specified shell var(function)
 is called.  If no function name is specified, it defaults to
-the same name as the widget.
+the same name as the widget.  For further information, see the section
+em(Widgets) in
+ifzman(zmanref(zshzle))\
+ifnzman(noderef(Zsh Line Editor))\
+.
 )
 item(tt(-C) var(widget) var(completion-widget) var(function))(
 Create a user-defined completion widget names var(widget). The 
@@ -203,9 +216,38 @@ ifzman(zmanref(zshcompwid))\
 ifnzman(noderef(Completion Widgets))\
 .
 )
-item(var(widget))(
+item(tt(-R) [ var(display-string) ])(
+Redisplay the command line; this is to be called from within a user-defined
+widget to allow changes to become visible.  If a var(display-string) is
+given, this is shown in the status line (immediately below the line being
+edited).
+)
+item(var(widget) tt([ -n) var(num) tt(]) tt([ -N ]) var(args) ...)(
 Invoke the specified widget.  This can only be done when ZLE is
 active; normally this will be within a user-defined widget.
+
+With the options tt(-n) and tt(-N), the current numerical argument will be
+saved and then restored after the call to tt(widget); `tt(-n) var(num)'
+sets the numerical argument temporarily to var(num), while `tt(-N)' sets it
+to the default, i.e. as if there were none.
+
+Any further arguments will be passed to the widget.  If it is a shell
+function, these are passed down as postional parameters; for builtin
+widgets it is up to the widget in question what it does with them.
+Currently arguments are only handled by the incremental-search commands,
+the tt(history-search-forward) and tt(-backward) and the corresponding
+functions prefixed by tt(vi-), and by tt(universal-argument).  No error is
+flagged if the command does not use the arguments, or only uses some of
+them.
+
+The return status reflects the success or failure of the operation carried
+out by the widget, or if it is a user-defined widget the return status of
+the shell function.  
+
+A non-zero return status causes the shell to beep when the widget exits,
+unless the tt(BEEP) options was unset or the widget was called via the
+tt(zle) command.  Thus if a user defined widget requires an immediate beep,
+it should call the tt(beep) widget directly.
 )
 enditem()
 )

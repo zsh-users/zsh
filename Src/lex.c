@@ -219,7 +219,7 @@ lexsave(void)
     ls->hlinesz = hlinesz;
     ls->cstack = cmdstack;
     ls->csp = cmdsp;
-    cmdstack = (unsigned char *)zalloc(256);
+    cmdstack = (unsigned char *)zalloc(CMDSTACKSZ);
     ls->tok = tok;
     ls->isnewlin = isnewlin;
     ls->tokstr = tokstr;
@@ -1150,7 +1150,7 @@ gettokstr(int c, int sub)
 	    cmdpush(CS_BQUOTE);
 	    SETPARBEGIN
 	    inquote = 0;
-	    while ((c = hgetc()) != '`' && !lexstop)
+	    while ((c = hgetc()) != '`' && !lexstop) {
 		if (c == '\\') {
 		    c = hgetc();
 		    if (c != '\n') {
@@ -1171,6 +1171,7 @@ gettokstr(int c, int sub)
 			    ALLOWHIST
 		    }
 		}
+	    }
 	    if (inquote)
 		ALLOWHIST
 	    cmdpop();

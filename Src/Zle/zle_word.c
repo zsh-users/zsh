@@ -31,38 +31,41 @@
 #include "zle_word.pro"
 
 /**/
-void
-forwardword(void)
+int
+forwardword(char **args)
 {
     int n = zmult;
 
     if (n < 0) {
+	int ret;
 	zmult = -n;
-	backwardword();
+	ret = backwardword(args);
 	zmult = n;
-	return;
+	return ret;
     }
     while (n--) {
 	while (cs != ll && iword(line[cs]))
 	    cs++;
 	if (wordflag && !n)
-	    return;
+	    return 0;
 	while (cs != ll && !iword(line[cs]))
 	    cs++;
     }
+    return 0;
 }
 
 /**/
-void
-viforwardword(void)
+int
+viforwardword(char **args)
 {
     int n = zmult;
 
     if (n < 0) {
+	int ret;
 	zmult = -n;
-	backwardword();
+	ret = backwardword(args);
 	zmult = n;
-	return;
+	return ret;
     }
     while (n--) {
 	if (iident(line[cs]))
@@ -72,64 +75,69 @@ viforwardword(void)
 	    while (cs != ll && !iident(line[cs]) && !iblank(line[cs]))
 		cs++;
 	if (wordflag && !n)
-	    return;
+	    return 0;
 	while (cs != ll && (iblank(line[cs]) || line[cs] == '\n'))
 	    cs++;
     }
+    return 0;
 }
 
 /**/
-void
-viforwardblankword(void)
+int
+viforwardblankword(char **args)
 {
     int n = zmult;
 
     if (n < 0) {
+	int ret;
 	zmult = -n;
-	vibackwardblankword();
+	ret = vibackwardblankword(args);
 	zmult = n;
-	return;
+	return ret;
     }
     while (n--) {
 	while (cs != ll && !iblank(line[cs]))
 	    cs++;
 	if (wordflag && !n)
-	    return;
+	    return 0;
 	while (cs != ll && iblank(line[cs]))
 	    cs++;
     }
+    return 0;
 }
 
 /**/
-void
-emacsforwardword(void)
+int
+emacsforwardword(char **args)
 {
     int n = zmult;
 
     if (n < 0) {
+	int ret;
 	zmult = -n;
-	emacsbackwardword();
+	ret = emacsbackwardword(args);
 	zmult = n;
-	return;
+	return ret;
     }
     while (n--) {
 	while (cs != ll && !iword(line[cs]))
 	    cs++;
 	if (wordflag && !n)
-	    return;
+	    return 0;
 	while (cs != ll && iword(line[cs]))
 	    cs++;
     }
+    return 0;
 }
 
 /**/
-void
-viforwardblankwordend(void)
+int
+viforwardblankwordend(char **args)
 {
     int n = zmult;
 
     if (n < 0)
-	return;
+	return 1;
     while (n--) {
 	while (cs != ll && iblank(line[cs + 1]))
 	    cs++;
@@ -138,19 +146,21 @@ viforwardblankwordend(void)
     }
     if (cs != ll && virangeflag)
 	cs++;
+    return 0;
 }
 
 /**/
-void
-viforwardwordend(void)
+int
+viforwardwordend(char **args)
 {
     int n = zmult;
 
     if (n < 0) {
+	int ret;
 	zmult = -n;
-	backwardword();
+	ret = backwardword(args);
 	zmult = n;
-	return;
+	return ret;
     }
     while (n--) {
 	if (iblank(line[cs + 1]))
@@ -165,19 +175,21 @@ viforwardwordend(void)
     }
     if (cs != ll && virangeflag)
 	cs++;
+    return 0;
 }
 
 /**/
-void
-backwardword(void)
+int
+backwardword(char **args)
 {
     int n = zmult;
 
     if (n < 0) {
+	int ret;
 	zmult = -n;
-	forwardword();
+	ret = forwardword(args);
 	zmult = n;
-	return;
+	return ret;
     }
     while (n--) {
 	while (cs && !iword(line[cs - 1]))
@@ -185,19 +197,21 @@ backwardword(void)
 	while (cs && iword(line[cs - 1]))
 	    cs--;
     }
+    return 0;
 }
 
 /**/
-void
-vibackwardword(void)
+int
+vibackwardword(char **args)
 {
     int n = zmult;
 
     if (n < 0) {
+	int ret;
 	zmult = -n;
-	backwardword();
+	ret = backwardword(args);
 	zmult = n;
-	return;
+	return ret;
     }
     while (n--) {
 	while (cs && iblank(line[cs - 1]))
@@ -209,19 +223,21 @@ vibackwardword(void)
 	    while (cs && !iident(line[cs - 1]) && !iblank(line[cs - 1]))
 		cs--;
     }
+    return 0;
 }
 
 /**/
-void
-vibackwardblankword(void)
+int
+vibackwardblankword(char **args)
 {
     int n = zmult;
 
     if (n < 0) {
+	int ret;
 	zmult = -n;
-	viforwardblankword();
+	ret = viforwardblankword(args);
 	zmult = n;
-	return;
+	return ret;
     }
     while (n--) {
 	while (cs && iblank(line[cs - 1]))
@@ -229,19 +245,21 @@ vibackwardblankword(void)
 	while (cs && !iblank(line[cs - 1]))
 	    cs--;
     }
+    return 0;
 }
 
 /**/
-void
-emacsbackwardword(void)
+int
+emacsbackwardword(char **args)
 {
     int n = zmult;
 
     if (n < 0) {
+	int ret;
 	zmult = -n;
-	emacsforwardword();
+	ret = emacsforwardword(args);
 	zmult = n;
-	return;
+	return ret;
     }
     while (n--) {
 	while (cs && !iword(line[cs - 1]))
@@ -249,19 +267,21 @@ emacsbackwardword(void)
 	while (cs && iword(line[cs - 1]))
 	    cs--;
     }
+    return 0;
 }
 
 /**/
-void
-backwarddeleteword(void)
+int
+backwarddeleteword(char **args)
 {
     int x = cs, n = zmult;
 
     if (n < 0) {
+	int ret;
 	zmult = -n;
-	deleteword();
+	ret = deleteword(args);
 	zmult = n;
-	return;
+	return ret;
     }
     while (n--) {
 	while (x && !iword(line[x - 1]))
@@ -270,19 +290,18 @@ backwarddeleteword(void)
 	    x--;
     }
     backdel(cs - x);
+    return 0;
 }
 
 /**/
-void
-vibackwardkillword(void)
+int
+vibackwardkillword(char **args)
 {
     int x = cs, lim = (viinsbegin > findbol()) ? viinsbegin : findbol();
     int n = zmult;
 
-    if (n < 0) {
-	feep();
-	return;
-    }
+    if (n < 0)
+	return 1;
 /* this taken from "vibackwardword" */
     while (n--) {
 	while ((x > lim) && iblank(line[x - 1]))
@@ -295,20 +314,22 @@ vibackwardkillword(void)
 		x--;
     }
     backkill(cs - x, 1);
+    return 0;
 }
 
 /**/
-void
-backwardkillword(void)
+int
+backwardkillword(char **args)
 {
     int x = cs;
     int n = zmult;
 
     if (n < 0) {
+	int ret;
 	zmult = -n;
-	killword();
+	ret = killword(args);
 	zmult = n;
-	return;
+	return ret;
     }
     while (n--) {
 	while (x && !iword(line[x - 1]))
@@ -317,11 +338,12 @@ backwardkillword(void)
 	    x--;
     }
     backkill(cs - x, 1);
+    return 0;
 }
 
 /**/
-void
-upcaseword(void)
+int
+upcaseword(char **args)
 {
     int n = zmult;
     int neg = n < 0, ocs = cs;
@@ -338,11 +360,12 @@ upcaseword(void)
     }
     if (neg)
 	cs = ocs;
+    return 0;
 }
 
 /**/
-void
-downcaseword(void)
+int
+downcaseword(char **args)
 {
     int n = zmult;
     int neg = n < 0, ocs = cs;
@@ -359,11 +382,12 @@ downcaseword(void)
     }
     if (neg)
 	cs = ocs;
+    return 0;
 }
 
 /**/
-void
-capitalizeword(void)
+int
+capitalizeword(char **args)
 {
     int first, n = zmult;
     int neg = n < 0, ocs = cs;
@@ -384,20 +408,22 @@ capitalizeword(void)
     }
     if (neg)
 	cs = ocs;
+    return 0;
 }
 
 /**/
-void
-deleteword(void)
+int
+deleteword(char **args)
 {
     int x = cs;
     int n = zmult;
 
     if (n < 0) {
+	int ret;
 	zmult = -n;
-	backwarddeleteword();
+	ret = backwarddeleteword(args);
 	zmult = n;
-	return;
+	return ret;
     }
     while (n--) {
 	while (x != ll && !iword(line[x]))
@@ -406,20 +432,22 @@ deleteword(void)
 	    x++;
     }
     foredel(x - cs);
+    return 0;
 }
 
 /**/
-void
-killword(void)
+int
+killword(char **args)
 {
     int x = cs;
     int n = zmult;
 
     if (n < 0) {
+	int ret;
 	zmult = -n;
-	backwardkillword();
+	ret = backwardkillword(args);
 	zmult = n;
-	return;
+	return ret;
     }
     while (n--) {
 	while (x != ll && !iword(line[x]))
@@ -428,11 +456,12 @@ killword(void)
 	    x++;
     }
     forekill(x - cs, 0);
+    return 0;
 }
 
 /**/
-void
-transposewords(void)
+int
+transposewords(char **args)
 {
     int p1, p2, p3, p4, x = cs;
     char *temp, *pp;
@@ -448,22 +477,16 @@ transposewords(void)
 	    x = cs;
 	    while (x && line[x - 1] != '\n' && !iword(line[x]))
 		x--;
-	    if (!x || line[x - 1] == '\n') {
-		feep();
-		return;
-	    }
+	    if (!x || line[x - 1] == '\n')
+		return 1;
 	}
 	for (p4 = x; p4 != ll && iword(line[p4]); p4++);
 	for (p3 = p4; p3 && iword(line[p3 - 1]); p3--);
-	if (!p3) {
-	    feep();
-	    return;
-	}
+	if (!p3)
+	    return 1;
 	for (p2 = p3; p2 && !iword(line[p2 - 1]); p2--);
-	if (!p2) {
-	    feep();
-	    return;
-	}
+	if (!p2)
+	    return 1;
 	for (p1 = p2; p1 && iword(line[p1 - 1]); p1--);
 	pp = temp = (char *)zhalloc(p4 - p1 + 1);
 	struncpy(&pp, (char *) line + p3, p4 - p3);
@@ -474,4 +497,5 @@ transposewords(void)
     }
     if (neg)
 	cs = ocs;
+    return 0;
 }

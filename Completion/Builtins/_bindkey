@@ -8,7 +8,7 @@
 # Where appropriate, will complete keymaps instead of widgets.
 
 if [[ "$words[2]" = -*[DAN]* || "$words[CURRENT-1]" = -*M ]]; then
-  compgen -s '$(bindkey -l)'
+  compadd - $(bindkey -l)
 else
   compgen -b -M 'r:|-=* r:|=*'
 fi

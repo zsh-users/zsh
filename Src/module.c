@@ -709,7 +709,14 @@ bin_zmodload(char *nam, char **args, char *ops, int func)
 	zwarnnam(nam, "what do you want to unload?", NULL, 0);
 	return 1;
     }
-    if (ops['d'])
+    if (ops['e'] && (ops['I'] || ops['L'] || ops['a'] || ops['d'] ||
+		     ops['i'] || ops['u'])) {
+	zwarnnam(nam, "-e cannot be combined with other options", NULL, 0);
+	return 1;
+    }
+    if (ops['e'])
+	return bin_zmodload_exist(nam, args, ops);
+    else if (ops['d'])
 	return bin_zmodload_dep(nam, args, ops);
     else if ((ops['a'] || ops['b']) && !(ops['c'] || ops['p']))
 	return bin_zmodload_auto(nam, args, ops);
@@ -723,6 +730,46 @@ bin_zmodload(char *nam, char **args, char *ops, int func)
 	zwarnnam(nam, "use only one of -b, -c, or -p", NULL, 0);
 
     return 1;
+}
+
+/**/
+static int
+bin_zmodload_exist(char *nam, char **args, char *ops)
+{
+    LinkNode node;
+    Module m;
+
+    if (!*args) {
+	for (node = firstnode(bltinmodules); node; incnode(node)) {
+	    nicezputs((char *) getdata(node), stdout);
+	    putchar('\n');
+	}
+	for (node = firstnode(modules); node; incnode(node)) {
+	    m = (Module) getdata(node);
+	    if (m->handle && !(m->flags & MOD_UNLOAD)) {
+		nicezputs(m->nam, stdout);
+		putchar('\n');
+	    }
+	}
+	return 0;
+    } else {
+	int ret = 0, f;
+
+	for (; !ret && *args; args++) {
+	    f = 0;
+	    for (node = firstnode(bltinmodules);
+		 !f && node; incnode(node))
+		f = !strcmp(*args, (char *) getdata(node));
+	    for (node = firstnode(modules);
+		 !f && node; incnode(node)) {
+		m = (Module) getdata(node);
+		if (m->handle && !(m->flags & MOD_UNLOAD))
+		    f = !strcmp(*args, m->nam);
+	    }
+	    ret = !f;
+	}
+	return ret;
+    }
 }
 
 /**/
@@ -1116,6 +1163,37 @@ bin_zmodload_load(char *nam, char **args, char *ops)
 }
 
 /**/
+#else /* DYNAMIC */
+
+/* This is the version for shells without dynamic linking. */
+
+/**/
+int
+bin_zmodload(char *nam, char **args, char *ops, int func)
+{
+    /* We understand only the -e option. */
+
+    if (ops['e']) {
+	LinkNode node;
+
+	if (!*args) {
+	    for (node = firstnode(bltinmodules); node; incnode(node)) {
+		nicezputs((char *) getdata(node), stdout);
+		putchar('\n');
+	    }
+	} else {
+	    for (; *args; args++)
+		for (node = firstnode(bltinmodules); node; incnode(node))
+		    if (strcmp(*args, (char *) getdata(node)))
+			return 1;
+	}
+	return 0;
+    }
+    /* Otherwise we return 1 -- different from the dynamic version. */
+    return 1;
+}
+
+/**/
 #endif /* DYNAMIC */
 
 /* The list of module-defined conditions. */
@@ -1204,6 +1282,180 @@ addconddefs(char const *nam, Conddef c, int size)
 	c++;
     }
     return hadf ? hads : 1;
+}
+
+/* This list of hook functions defined. */
+
+/**/
+Hookdef hooktab;
+
+/* Find a hook definition given the name. */
+
+/**/
+Hookdef
+gethookdef(char *n)
+{
+    Hookdef p;
+
+    for (p = hooktab; p; p = p->next)
+	if (!strcmp(n, p->name))
+	    return p;
+    return NULL;
+}
+
+/* This adds the given hook definition. The return value is zero on      *
+ * success and 1 on failure.                                             */
+
+/**/
+int
+addhookdef(Hookdef h)
+{
+    if (gethookdef(h->name))
+	return 1;
+
+    h->next = hooktab;
+    hooktab = h;
+    PERMALLOC {
+	h->funcs = newlinklist();
+    } LASTALLOC;
+
+    return 0;
+}
+
+/* This adds multiple hook definitions. This is like addbuiltins(). */
+
+/**/
+int
+addhookdefs(char const *nam, Hookdef h, int size)
+{
+    int hads = 0, hadf = 0;
+
+    while (size--) {
+	if (addhookdef(h)) {
+	    zwarnnam(nam, "name clash when adding condition `%s'", h->name, 0);
+	    hadf = 1;
+	} else
+	    hads = 2;
+	h++;
+    }
+    return hadf ? hads : 1;
+}
+
+/* Delete hook definitions. */
+
+/**/
+int
+deletehookdef(Hookdef h)
+{
+    Hookdef p, q;
+
+    for (p = hooktab, q = NULL; p && p != h; q = p, p = p->next);
+
+    if (!p)
+	return 1;
+
+    if (q)
+	q->next = p->next;
+    else
+	hooktab = p->next;
+    freelinklist(p->funcs, NULL);
+    return 0;
+}
+
+/**/
+int
+deletehookdefs(char const *nam, Hookdef h, int size)
+{
+    while (size--) {
+	deletehookdef(h);
+	h++;
+    }
+    return 1;
+}
+
+/* Add a function to a hook. */
+
+/**/
+int
+addhookdeffunc(Hookdef h, Hookfn f)
+{
+    PERMALLOC {
+	addlinknode(h->funcs, (void *) f);
+    } LASTALLOC;
+    return 0;
+}
+
+/**/
+int
+addhookfunc(char *n, Hookfn f)
+{
+    Hookdef h = gethookdef(n);
+
+    if (h)
+	return addhookdeffunc(h, f);
+    return 1;
+}
+
+/* Delete a function from a hook. */
+
+/**/
+int
+deletehookdeffunc(Hookdef h, Hookfn f)
+{
+    LinkNode p;
+
+    for (p = firstnode(h->funcs); p; incnode(p))
+	if (f == (Hookfn) getdata(p)) {
+	    remnode(h->funcs, p);
+	    return 0;
+	}
+    return 1;
+}
+
+/**/
+int
+deletehookfunc(char *n, Hookfn f)
+{
+    Hookdef h = gethookdef(n);
+
+    if (h)
+	return deletehookdeffunc(h, f);
+    return 1;
+}
+
+/* Run the function(s) for a hook. */
+
+/**/
+int
+runhookdef(Hookdef h, void *d)
+{
+    if (empty(h->funcs)) {
+	if (h->def)
+	    return h->def(h, d);
+	return 0;
+    } else if (h->flags & HOOKF_ALL) {
+	LinkNode p;
+	int r;
+
+	for (p = firstnode(h->funcs); p; incnode(p))
+	    if ((r = ((Hookfn) getdata(p))(h, d)))
+		return r;
+	if (h->def)
+	    return h->def(h, d);
+	return 0;
+    } else
+	return ((Hookfn) getdata(lastnode(h->funcs)))(h, d);
+}
+
+/**/
+int
+runhook(char *n, void *d)
+{
+    Hookdef h = gethookdef(n);
+
+    if (h)
+	return runhookdef(h, d);
+    return 0;
 }
 
 /* This adds the given parameter definition. The return value is zero on *

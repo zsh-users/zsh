@@ -3,7 +3,7 @@ DISTFILES_SRC='
     arith.yo builtins.yo compat.yo compctl.yo compsys.yo compwid.yo
     cond.yo exec.yo expn.yo filelist.yo files.yo func.yo grammar.yo
     guide.yo index.yo intro.yo invoke.yo jobs.yo metafaq.yo
-    mod_cap.yo mod_clone.yo mod_comp1.yo
+    mod_cap.yo mod_clone.yo mod_comp1.yo mod_complist.yo
     mod_compctl.yo mod_deltochar.yo mod_example.yo mod_files.yo
     mod_mapfile.yo mod_parameter.yo mod_sched.yo mod_stat.yo
     mod_zftp.yo mod_zle.yo

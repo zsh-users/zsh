@@ -186,6 +186,8 @@ ingetc(void)
 	    inbufct--;
 	    if (itok(lastc = STOUC(*inbufptr++)))
 		continue;
+	    if (((inbufflags & INP_LINENO) || !strin) && lastc == '\n')
+		lineno++;
 	    return lastc;
 	}
 
@@ -279,23 +281,20 @@ inputline(void)
 	zputs(ingetcline, stderr);
 	fflush(stderr);
     }
-    if (*ingetcline && ingetcline[strlen(ingetcline) - 1] == '\n') {
-	/* We've now read a complete line. */
-	lineno++;
-	if (interact && isset(SUNKEYBOARDHACK) && isset(SHINSTDIN) &&
-	    SHTTY != -1 && *ingetcline && ingetcline[1] &&
-	    ingetcline[strlen(ingetcline) - 2] == '`') {
-	    /* Junk an unmatched "`" at the end of the line. */
-	    int ct;
-	    char *ptr;
+    if (*ingetcline && ingetcline[strlen(ingetcline) - 1] == '\n' &&
+	interact && isset(SUNKEYBOARDHACK) && isset(SHINSTDIN) &&
+	SHTTY != -1 && *ingetcline && ingetcline[1] &&
+	ingetcline[strlen(ingetcline) - 2] == '`') {
+	/* Junk an unmatched "`" at the end of the line. */
+	int ct;
+	char *ptr;
 
-	    for (ct = 0, ptr = ingetcline; *ptr; ptr++)
-		if (*ptr == '`')
-		    ct++;
-	    if (ct & 1) {
-		ptr[-2] = '\n';
-		ptr[-1] = '\0';
-	    }
+	for (ct = 0, ptr = ingetcline; *ptr; ptr++)
+	    if (*ptr == '`')
+		ct++;
+	if (ct & 1) {
+	    ptr[-2] = '\n';
+	    ptr[-1] = '\0';
 	}
     }
     isfirstch = 1;
@@ -359,6 +358,8 @@ inungetc(int c)
 	    inbufptr--;
 	    inbufct++;
 	    inbufleft++;
+	    if (((inbufflags & INP_LINENO) || !strin) && c == '\n')
+		lineno--;
 	}
 #ifdef DEBUG
         else if (!(inbufflags & INP_CONT)) {

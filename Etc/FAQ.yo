@@ -49,20 +49,9 @@ description(
 mydit(Archive-Name:) unix-faq/shell/zsh
 mydit(Last-Modified:) 1999/05/24
 mydit(Submitted-By:) email(pws@ibmth.df.unipi.it (Peter Stephenson))
-mydit(Version:) $Id: FAQ.yo,v 1.1.1.4 1999/05/31 17:10:29 akr Exp $
+mydit(Version:) $Id: FAQ.yo,v 1.1.1.5 1999/06/27 05:33:49 akr Exp $
 mydit(Posting-Frequency:) Monthly
 mydit(Copyright:) (C) P.W. Stephenson, 1995--1999 (see end of document)
-)
-
-bf(Changes since issue posted April 1999:)
-description(
-mydit(*.*)  Orthography for option names standardised.
-mydit(1.4)  don't change config.h.in, change acconfig.h
-mydit(1.6)  email zefram@zsh.org
-mydit(2.4)  new widget version of tcsh run-fg-editor
-mydit(3.7)  should have mentioned tt(PRINT_EIGHT_BIT) is new in 3.1
-mydit(3.23) new: describe tt(PROMPT_CR) option.
-mydit(5.1)  Description of tt(LIST_AMBIGUOUS) corrected.
 )
 
 This document contains a list of frequently-asked (or otherwise
@@ -125,6 +114,7 @@ Chapter 3:  How to get various things to work
 3.21. Why is my history not being saved?
 3.22. How do I get a variable's value to be evaluated as another variable?
 3.23. How do I prevent the prompt overwriting output when there is no newline?
+3.24. What's wrong with cut and paste on my xterm?
 
 Chapter 4:  The mysteries of completion
 4.1. What is completion?
@@ -309,11 +299,11 @@ sect(What's the latest version?)
   list of incompatibilities at the end of link(5.1)(51).  This is longer
   than usual due to enhanced sh, ksh and POSIX compatibility.
 
-  The beta version 3.1.5 is also available.  Development of zsh is
-  usually patch by patch, with each intermediate version publicly
-  available.  Note that this `open' development system does mean bugs
-  are sometimes introduced into the most recent archived version.
-  These are usually fixed quickly.
+  The beta version 3.1.5 is also available, and 3.1.6 should appear over
+  the summer.  Development of zsh is usually patch by patch, with each
+  intermediate version publicly available.  Note that this `open'
+  development system does mean bugs are sometimes introduced into the most
+  recent archived version.  These are usually fixed quickly.
 
   Note also that as the shell changes, it may become incompatible with
   older versions; see the end of question link(5.1)(51) for a partial list.
@@ -326,17 +316,20 @@ sect(What's the latest version?)
 sect(Where do I get it?)
 label(16)
 
-  The archive is now run by email(Andrew Main <zefram@zsh.org>).
-  The following are known mirrors (kept frequently up to date); the
+  The coordinator of development is currently me; the alias
+  email(coordinator@zsh.org) can be used to contact whoever is in the hot
+  seat.  The following are known mirrors (kept frequently up to date); the
   first is the official archive site, currently in Australia.  All are
-  available by anonymous FTP.  The major sites keep test versions in
-  the 'testing' subdirectory: such up-to-the-minute development
-  versions should only be retrieved if you actually plan to help test
-  the latest version of the shell.  The following list also appears
-  on the WWW at url(http://www.zsh.org)(http://www.zsh.org) .
+  available by anonymous FTP.  The major sites keep test versions in the
+  `testing' subdirectory: such up-to-the-minute development versions should
+  only be retrieved if you actually plan to help test the latest version of
+  the shell.  The following list also appears on the WWW at
+  url(http://www.zsh.org)(http://www.zsh.org) .
 
   description(
     mydit(Home site) url(ftp://ftp.zsh.org)(ftp://ftp.zsh.org)
+    mydit()          url(http://www.zsh.org/pub/zsh/)
+(http://www.zsh.org/pub/zsh/)
     mydit(Australia) url(ftp://ftp.ips.gov.au/mirror/zsh/)
 (ftp://ftp.ips.gov.au/mirror/zsh/)
     mydit(Denmark)   url(ftp://sunsite.auc.dk/pub/unix/shells/zsh)
@@ -354,7 +347,9 @@ label(16)
     mydit(Hungary)   url(ftp://ftp.cs.elte.hu/pub/zsh/)
 (ftp://ftp.cs.elte.hu/pub/zsh/)
     mydit()          (also url(http://www.cs.elte.hu/pub/zsh/)
-                   (http://www.cs.elte.hu/pub/zsh/) )
+(http://www.cs.elte.hu/pub/zsh/) )
+    mydit()          url(ftp://ftp.kfki.hu/pub/packages/zsh/)
+(ftp://ftp.kfki.hu/pub/packages/zsh/)
     mydit(Israel)    \
 url(ftp://ftp.math.technion.ac.il/mirror/ftp.zsh.org/pub/zsh/)
 (ftp://ftp.math.technion.ac.il/mirror/ftp.zsh.org/pub/zsh/)
@@ -363,7 +358,7 @@ url(http://www.math.technion.ac.il/mirror/ftp.zsh.org/pub/zsh/)
 (http://www.math.technion.ac.il/mirror/ftp.zsh.org/pub/zsh/)
     mydit(Japan)     url(ftp://ftp.tohoku.ac.jp/mirror/zsh/)
 (ftp://ftp.tohoku.ac.jp/mirror/zsh/)
-    mydit()          url(ftp://ftp.nis.co.jp/pub/shells/zsh/)
+    mydit()          url(ftp://ftp.nisiq.net/pub/shells/zsh/)
 (ftp://ftp.nis.co.jp/pub/shells/zsh/)
     mydit()          url(ftp://ftp.win.ne.jp/pub/shell/zsh/)
 (ftp://ftp.win.ne.jp/pub/shell/zsh/)
@@ -378,8 +373,8 @@ url(http://www.math.technion.ac.il/mirror/ftp.zsh.org/pub/zsh/)
     mydit(UK)        url(ftp://ftp.net.lut.ac.uk/zsh/)
 (ftp://ftp.net.lut.ac.uk/zsh/)
     mydit()          (also by FSP at port 21)
-    mydit()          url(ftp://src.doc.ic.ac.uk/packages/unix/shells/zsh/)
-(ftp://src.doc.ic.ac.uk/packages/unix/shells/zsh/)
+    mydit()          url(ftp://sunsite.org.uk/packages/zsh/)
+(ftp://sunsite.org.uk/packages/zsh/)
     mydit(USA)       url(ftp://ftp.math.gatech.edu/pub/zsh/)
 (ftp://ftp.math.gatech.edu/pub/zsh/)
     mydit()          url(ftp://uiarchive.uiuc.edu/pub/packages/shells/zsh/)
@@ -388,6 +383,10 @@ url(http://www.math.technion.ac.il/mirror/ftp.zsh.org/pub/zsh/)
 (ftp://ftp.sterling.com/zsh/)
     mydit()          url(ftp://ftp.rge.com/pub/shells/zsh/)
 (ftp://ftp.rge.com/pub/shells/zsh/)
+    mydit()          url(ftp://foad.org/pub/zsh/)
+(ftp://foad.org/pub/zsh/)
+    mydit()          url(http://foad.org/zsh/)
+(http://foad.org/zsh/)
   )
 
   The Windows port mentioned above is maintained separately by email(Amol
@@ -463,7 +462,6 @@ sect(I don't have root access: how do I make zsh my login shell?)
             if ( "$<" == Y ) exec ~/bin/zsh -l
     endif
   )
-
 
   It's not a good idea to put this (even without the -l) into .cshrc,
   at least without some tests on what the csh is supposed to be doing,
@@ -577,10 +575,6 @@ tt(SH_OPTION_LETTERS),
     it()* The results of parameter substitutions are treated as plain text:
         mytt(foo="*"; print $foo) prints all files in ksh but mytt(*) in zsh
         (uset tt(GLOB_SUBST)).
-    it()  The backslash in tt($(echo '\$x')) is treated differently:  in \
-ksh, it
-        is not stripped, in zsh it is.  (The tt(`...`) form gives the same in
-        both shells.)
     it()* tt($PSn) do not do parameter substitution by default (use \
 PROMPT_SUBST).
     it()* Standard globbing does not allow ksh-style `pattern-lists'.
@@ -641,11 +635,11 @@ link(2.3)(23).
     it()* Options are not local to functions (use LOCAL_OPTIONS; note this
         may always be unset locally to propagate options settings from a
         function to the calling level).
-    it()  Function definitions themselves are not local to functions.
   )
     it() Traps and signals:
   itemize(
-    it()  Traps are not local to functions.
+    it()* Traps are not local to functions.  The option LOCAL_TRAPS will
+          be available from 3.1.6.
     it()  TRAPERR has become TRAPZERR (this was forced by UNICOS which
         has SIGERR).
   )
@@ -660,6 +654,8 @@ link(2.3)(23).
         release either.)
     it()  Management of histories in multiple shells is different:
         the history list is not saved and restored after each command.
+        (The option tt(SHARE_HISTORY) will appear in 3.1.6 and will be
+        set in ksh compatibility mode to remedy this.)
     it()  mytt(\) does not escape editing chars (use mytt(^V)).
     it()  Not all ksh bindings are set (e.g. mytt(<ESC>#); try mytt(<ESC>q)).
     it()* mytt(#) in an interactive shell is not treated as a comment by
@@ -1155,15 +1151,16 @@ sect(How do I automatically display the directory in my xterm title bar?)
 
 sect(How do I make the completion list use eight bit characters?)
 
-  If you are sure your terminal handles this, the easiest way from version
-  3.1 of the shell is to set the option tt(PRINT_EIGHT_BIT).  In principle,
-  this will work automatically if your computer uses the `locale' system
-  and your locale variables are set properly, as zsh understands this.
-  However, it is quite complicated, so if it isn't already set up, trying
-  the option is a lot easier.  For 3.0, you are stuck with trying to
-  understand locales, see the tt(setlocale(3)) and tt(zshparam(1)) manual
-  pages:  the simplest possibility may be to set tt(LC_ALL=en_US).  For older
-  versions of the shell, there is no easy way out.
+  If you are sure your terminal handles this, the easiest way from versions
+  3.0.6 and 3.1 of the shell is to set the option tt(PRINT_EIGHT_BIT).  In
+  principle, this will work automatically if your computer uses the
+  `locale' system and your locale variables are set properly, as zsh
+  understands this.  However, it is quite complicated, so if it isn't
+  already set up, trying the option is a lot easier.  For earlier versions
+  of zsh 3, you are stuck with trying to understand locales, see the
+  tt(setlocale(3)) and tt(zshparam(1)) manual pages: the simplest
+  possibility may be to set tt(LC_ALL=en_US).  For older versions of the
+  shell, there is no easy way out.
 
 
 sect(Why do the cursor (arrow) keys not work?)
@@ -1538,8 +1535,8 @@ sect(How do I get a variable's value to be evaluated as another variable?)
   )
   produces the same result.
 
-  Future versions of zsh will probably allow you to do this directly,
-  with a new flag; mytt(${(P)E}).
+  Versions 3.1.6 of zsh will allow you to do this directly with a new flag;
+  mytt(${(P)E}).
 
   As a slight aside, sometimes people note that the syntax mytt(${${E}})
   is valid and expect it to have this effect.  It probably ought to, but
@@ -1567,6 +1564,39 @@ sect(How do I prevent the prompt overwriting output when there is no newline?)
   position, unless the line starts in the left hand column.  Apart from
   tt(PROMPT_CR), you can force this to happen by putting a newline in the
   prompt (see question link(3.13)(313) for that).
+
+
+sect(What's wrong with cut and paste on my xterm?)
+
+  On the majority of modern UNIX systems, cutting text from one window and
+  pasting it into another should work fine.  On a few, however, there are
+  problems due to issues about how the terminal is handled:  most programs
+  expect the terminal to be in `canonical input mode', which means that the
+  program is passed a whole line of input at a time, while for editing
+  the shell needs a single character at a time and must be in
+  `non-canonical input mode'.  On the systems in question, input can be
+  lost or re-ordered when the mode changes.  There are actually two
+  slightly different problems:
+  enumerate(
+  myeit() When you paste something in while a programme is running, so that
+     the shell only retrieves it later.  Traditionally, there was a test
+     which was used only on systems where the problem was known to exist,
+     so it is possible some other systems were not handled (for example,
+     certain versions of IRIX, it appears); also, continuation lines were
+     not handled properly.  A more reliable approach will appear in
+     versions 3.0.6 and 3.1.6.
+  myeit() When the shell is waiting for input, and you paste in a chunk of
+     text consisting of more than one complete set of commands.
+     Unfortunately, this is a much harder problem: the line editor is
+     already active, and needs to be turned off when the first command is
+     executed.  The shell doesn't even know if the remaining text is input
+     to a command or for the shell, so there's simply nothing it can do.
+     However, if you have problems you can trick it: type `tt({)' on a line
+     by itself, then paste the input, then type `tt(})' on a line by
+     itself.  The shell will not execute anything until the final brace is
+     read; all input is read as continuation lines (this may require the
+     fixes referred to above in order to be reliable).
+  )
 
 
 chapter(The mysteries of completion)
@@ -1673,7 +1703,7 @@ sect(How does zsh deal with ambiguous completions?)
   flexibility for what it does here via its options.  The default is
   for it to beep and completion to stop until you type another
   character.  You can type tt(\C-D) to see all the possible completions.
-  (That's assuming your at the end of the line, otherwise tt(\C-D) will
+  (That's assuming you're at the end of the line, otherwise tt(\C-D) will
   delete the next character and you have to use tt(ESC-\C-D).)  This can be
   changed by the following options, among others:
   itemize(
@@ -1887,13 +1917,15 @@ this applies
 
   itemize(
   it() mytt(time) is ignored with builtins and can't be used with mytt({...}).
-  it() mytt(set -x) (mytt(setopt xtrace)) still has a few glitches.
+  it() mytt(set -x) (mytt(setopt xtrace)) still has a few glitches; these
+     are mostly fixed in 3.1.6.
   it() Zsh's notion of the current line number (via tt($LINENO)) is
      sometimes not well handled, particularly when using functions and traps.
+     This should also work reliably from 3.1.6.
   it() In vi mode, mytt(u) can go past the original modification point.
   it() The singlelinezle option has problems with prompts containing escapes.
   it() The mytt(r) command does not work inside mytt($(...)) or mytt(`...`)
-     expansions.   (This is fixed in 3.1.)
+     expansions.   This is fixed in 3.1.
   it() mytt(typeset) handling is non-optimal, particularly with regard to
      flags, and is ksh-incompatible in unpredictable ways. 
   it() Nested closures in extended globbing and pattern matching, such as
@@ -1901,8 +1933,8 @@ this applies
       [[ fofo = (fo#)# ]]
   )
      were not correctly handled, and there were problems with
-     complicated exclusions using mytt(^) or mytt(~).  (These
-     are fixed in version 3.1.3.)
+     complicated exclusions using mytt(^) or mytt(~).  These
+     are fixed in version 3.1.3.
   )
 
   Note that a few recent changes introduce incompatibilities (these
@@ -1918,7 +1950,7 @@ this applies
      zsh features are never noticed by many users.  To turn them off,
      just put mytt(unsetopt alwayslastprompt listambiguous) in your
      tt(.zshrc) file.
-  it() tt(history-search-{forward,backward}) now only find previous
+  it() In 3.1.5, tt(history-search-{forward,backward}) only find previous
      lines where the first word is the same as the current one.  For
      example, 
     verb(
@@ -2051,11 +2083,7 @@ label(52)
   email(zsh-workers-owner@sunsite.auc.dk).  The list maintainer's
   real name is email(Karsten Thygesen <karthy@kom.auc.dk>).
   
-  The list from May 1992 to May 1995 is archived in
-    url(ftp://ftp.sterling.com/zsh/zsh-list/YY-MM)
-(ftp://ftp.sterling.com/zsh/zsh-list/YY-MM)
-  where YY-MM are the year and month in digits.  More recent
-  mailings up to date are to be found at
+  An archive of mailings for the last few years can be found at
     url(http://www.zsh.org/mla/)(http://www.zsh.org/mla/)
   at the main zsh archive in Australia.
 
@@ -2089,7 +2117,8 @@ sect(What's on the wish-list?)
      case-insensitive matching and wild card anchors, e.g. mytt(z_t<TAB>)
      can allow a wildcard before the mytt(_) so that this will expand
      to mytt(zle_tricky.c) --- all under user control; completions can
-     be grouped.
+     be grouped; a new completion command, menu-select, allows real menu
+     selection --- you can move the cursor around to choose a completion.
   it() Case-insensitive and approximate matching in the globbing code:
      for example, mytt((#ia2)readme) matches the string mytt(readme)
      case-insensitively with up to two errors, such as tt(README),

@@ -17,7 +17,7 @@
 #    In this case, expansion of substitutions will be done if the
 #    expression evaluates to `1'. For example, with
 #
-#      compconf expand_substitute='NUMERIC != 1'
+#      compconf expand_substitute='${NUMERIC:-1} != 1'
 #
 #    substitution will be performed only if given an explicit numeric
 #    argument other than `1', as by typing ESC 2 TAB.

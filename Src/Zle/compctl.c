@@ -1727,7 +1727,7 @@ bin_compadd(char *name, char **argv, char *ops, int func)
     }
     dat.ipre = dat.isuf = dat.ppre = dat.psuf = dat.prpre =
 	dat.pre = dat.suf = dat.group = dat.rems = dat.remf =
-	dat.ign = dat.exp = dat.apar = dat.opar = dat.dpar = NULL;
+	dat.ign = dat.exp = dat.apar = dat.opar = dat.dpar = dat.ylist = NULL;
     dat.match = NULL;
     dat.flags = 0;
     dat.aflags = CAF_MATCH;
@@ -1778,6 +1778,10 @@ bin_compadd(char *name, char **argv, char *ops, int func)
 		    dat.aflags |= CAF_NOSORT;
 		sp = &(dat.group);
 		e = "group name expected after -%c";
+		break;
+	    case 'y':
+		sp = &(dat.ylist);
+		e = "string expected after -%c";
 		break;
 	    case 'i':
 		sp = &(dat.ipre);
@@ -2217,13 +2221,14 @@ static void
 addcompparams(struct compparam *cp, Param *pp)
 {
     for (; cp->name; cp++, pp++) {
-	Param pm = createparam(cp->name, cp->type | PM_SPECIAL | PM_REMOVABLE);
+	Param pm = createparam(cp->name,
+			       cp->type |PM_SPECIAL|PM_REMOVABLE|PM_LOCAL);
 	if (!pm)
 	    pm = (Param) paramtab->getnode(paramtab, cp->name);
 	DPUTS(!pm, "param not set in addcompparams");
 
 	*pp = pm;
-	pm->level = locallevel;
+	pm->level = locallevel + 1;
 	if ((pm->u.data = cp->var)) {
 	    switch(PM_TYPE(cp->type)) {
 	    case PM_SCALAR:
@@ -2257,7 +2262,8 @@ makecompparams(void)
 
     addcompparams(comprparams, comprpms);
 
-    if (!(cpm = createparam(COMPSTATENAME, PM_SPECIAL|PM_REMOVABLE|PM_HASHED)))
+    if (!(cpm = createparam(COMPSTATENAME,
+			    PM_SPECIAL|PM_REMOVABLE|PM_LOCAL|PM_HASHED)))
 	cpm = (Param) paramtab->getnode(paramtab, COMPSTATENAME);
     DPUTS(!cpm, "param not set in makecompparams");
 

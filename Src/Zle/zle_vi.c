@@ -102,10 +102,8 @@ vigetkey(void)
     char m[3], *str;
     Thingy cmd;
 
-    if((c = getkey(0)) == EOF) {
-	feep();
+    if((c = getkey(0)) == EOF)
 	return -1;
-    }
 
     m[0] = c;
     metafy(m, 1, META_NOALLOC);
@@ -115,13 +113,10 @@ vigetkey(void)
 	cmd = t_undefinedkey;
 
     if (!cmd || cmd == Th(z_sendbreak)) {
-	feep();
 	return -1;
     } else if (cmd == Th(z_quotedinsert)) {
-	if ((c = getkey(0)) == EOF) {
-	    feep();
+	if ((c = getkey(0)) == EOF)
 	    return -1;
-	}
     } else if(cmd == Th(z_viquotedinsert)) {
 	char sav = line[cs];
 
@@ -129,10 +124,8 @@ vigetkey(void)
 	zrefresh();
 	c = getkey(0);
 	line[cs] = sav;
-	if(c == EOF) {
-	    feep();
+	if(c == EOF)
 	    return -1;
-	}
     } else if (cmd == Th(z_vicmdmode))
 	return -1;
     return c;
@@ -142,7 +135,7 @@ vigetkey(void)
 static int
 getvirange(int wf)
 {
-    int pos = cs;
+    int pos = cs, ret = 0;
     int mult1 = zmult, hist1 = histline;
     Thingy k2;
 
@@ -168,39 +161,37 @@ getvirange(int wf)
 		k2 == Th(z_sendbreak)) {
 	    wordflag = 0;
 	    virangeflag = 0;
-	    feep();
 	    return -1;
 	}
-	if(k2 == bindk)
-	    /* The command key is repeated: a number of lines is used. */
-	    dovilinerange();
-	else
-	    execzlefunc(k2);
+	/*
+	 * With k2 == bindk, the command key is repeated:
+	 * a number of lines is used.  If the function used
+	 * returns 1, we fail.
+	 */
+	if ((k2 == bindk) ? dovilinerange() : execzlefunc(k2, zlenoargs))
+	    ret = -1;
 	if(vichgrepeat)
 	    zmult = mult1;
 	else
 	    zmult = mult1 * zmod.tmult;
-    } while(prefixflag);
+    } while(prefixflag && !ret);
     wordflag = 0;
     virangeflag = 0;
 
     /* It is an error to use a non-movement command to delimit the *
      * range.  We here reject the case where the command modified  *
      * the line, or selected a different history line.             */
-    if(histline != hist1 || ll != lastll || memcmp(line, lastline, ll)) {
+    if (histline != hist1 || ll != lastll || memcmp(line, lastline, ll)) {
 	histline = hist1;
 	memcpy(line, lastline, ll = lastll);
 	cs = pos;
-	feep();
 	return -1;
     }
 
     /* Can't handle an empty file.  Also, if the movement command *
      * failed, or didn't move, it is an error.                    */
-    if (!ll || (cs == pos && virangeflag != 2)) {
-	feep();
+    if (!ll || (cs == pos && virangeflag != 2) || ret == -1)
 	return -1;
-    }
 
     /* vi-match-bracket changes the value of virangeflag when *
      * moving to the opening bracket, meaning that we need to *
@@ -233,7 +224,7 @@ getvirange(int wf)
 }
 
 /**/
-static void
+static int
 dovilinerange(void)
 {
     int pos = cs, n = zmult;
@@ -243,17 +234,14 @@ dovilinerange(void)
      * downward, otherwise upward.  The repeat count gives the    *
      * number of lines.                                           */
     vilinerange = 1;
-    if (!n) {
-	feep();
-	return;
-    }
+    if (!n)
+	return 1;
     if (n > 0) {
 	while(n-- && cs <= ll)
 	    cs = findeol() + 1;
 	if (n != -1) {
 	    cs = pos;
-	    feep();
-	    return;
+	    return 1;
 	}
 	cs--;
     } else {
@@ -261,123 +249,127 @@ dovilinerange(void)
 	    cs = findbol() - 1;
 	if (n != 1) {
 	    cs = pos;
-	    feep();
-	    return;
+	    return 1;
 	}
 	cs++;
     }
     virangeflag = 2;
+    return 0;
 }
 
 /**/
-void
-viaddnext(void)
+int
+viaddnext(char **args)
 {
     if (cs != findeol())
 	cs++;
     startvitext(1);
+    return 0;
 }
 
 /**/
-void
-viaddeol(void)
+int
+viaddeol(char **args)
 {
     cs = findeol();
     startvitext(1);
+    return 0;
 }
 
 /**/
-void
-viinsert(void)
+int
+viinsert(char **args)
 {
     startvitext(1);
+    return 0;
 }
 
 /**/
-void
-viinsertbol(void)
+int
+viinsertbol(char **args)
 {
-    vifirstnonblank();
+    vifirstnonblank(zlenoargs);
     startvitext(1);
+    return 0;
 }
 
 /**/
-void
-videlete(void)
+int
+videlete(char **args)
 {
-    int c2;
+    int c2, ret = 1;
 
     startvichange(1);
     if ((c2 = getvirange(0)) != -1) {
 	forekill(c2 - cs, 0);
+	ret = 0;
 	if (vilinerange && ll) {
 	    if (cs == ll)
 		cs--;
 	    foredel(1);
-	    vifirstnonblank();
+	    vifirstnonblank(zlenoargs);
 	}
     }
     vichgflag = 0;
+    return ret;
 }
 
 /**/
-void
-videletechar(void)
+int
+videletechar(char **args)
 {
     int n = zmult;
 
     startvichange(-1);
     /* handle negative argument */
     if (n < 0) {
+	int ret;
 	zmult = -n;
-	vibackwarddeletechar();
+	ret = vibackwarddeletechar(args);
 	zmult = n;
-	return;
+	return ret;
     }
     /* it is an error to be on the end of line */
-    if (cs == ll || line[cs] == '\n') {
-	feep();
-	return;
-    }
+    if (cs == ll || line[cs] == '\n')
+	return 1;
     /* Put argument into the acceptable range -- it is not an error to  *
      * specify a greater count than the number of available characters. */
     if (n > findeol() - cs)
 	n = findeol() - cs;
     /* do the deletion */
     forekill(n, 0);
+    return 0;
 }
 
 /**/
-void
-vichange(void)
+int
+vichange(char **args)
 {
-    int c2;
+    int c2, ret = 1;
 
     startvichange(1);
     if ((c2 = getvirange(1)) != -1) {
+	ret = 0;
 	forekill(c2 - cs, 0);
 	selectkeymap("main", 1);
 	viinsbegin = cs;
 	undoing = 0;
     }
+    return ret;
 }
 
 /**/
-void
-visubstitute(void)
+int
+visubstitute(char **args)
 {
     int n = zmult;
 
     startvichange(1);
-    if (n < 0) {
-	feep();
-	return;
-    }
+    if (n < 0)
+	return 1;
     /* it is an error to be on the end of line */
-    if (cs == ll || line[cs] == '\n') {
-	feep();
-	return;
-    }
+    if (cs == ll || line[cs] == '\n')
+	return 1;
     /* Put argument into the acceptable range -- it is not an error to  *
      * specify a greater count than the number of available characters. */
     if (n > findeol() - cs)
@@ -385,79 +377,84 @@ visubstitute(void)
     /* do the substitution */
     forekill(n, 0);
     startvitext(1);
+    return 0;
 }
 
 /**/
-void
-vichangeeol(void)
+int
+vichangeeol(char **args)
 {
     forekill(findeol() - cs, 0);
     startvitext(1);
+    return 0;
 }
 
 /**/
-void
-vichangewholeline(void)
+int
+vichangewholeline(char **args)
 {
-    vifirstnonblank();
-    vichangeeol();
+    vifirstnonblank(args);
+    return vichangeeol(zlenoargs);
 }
 
 /**/
-void
-viyank(void)
+int
+viyank(char **args)
 {
-    int oldcs = cs, c2;
+    int oldcs = cs, c2, ret = 1;
 
     startvichange(1);
-    if ((c2 = getvirange(0)) != -1)
+    if ((c2 = getvirange(0)) != -1) {
 	cut(cs, c2 - cs, 0);
+	ret = 0;
+    }
     vichgflag = 0;
     cs = oldcs;
+    return ret;
 }
 
 /**/
-void
-viyankeol(void)
+int
+viyankeol(char **args)
 {
     int x = findeol();
 
     startvichange(-1);
-    if (x == cs) {
-	feep();
-	return;
-    }
+    if (x == cs)
+	return 1;
     cut(cs, x - cs, 0);
+    return 0;
 }
 
 /**/
-void
-viyankwholeline(void)
+int
+viyankwholeline(char **args)
 {
     int bol = findbol(), oldcs = cs;
     int n = zmult;
 
     startvichange(-1);
     if (n < 1)
-	return;
+	return 1;
     while(n--) {
      if (cs > ll) {
-	feep();
 	cs = oldcs;
-	return;
+	return 1;
      }
      cs = findeol() + 1;
     }
     vilinerange = 1;
     cut(bol, cs - bol - 1, 0);
     cs = oldcs;
+    return 0;
 }
 
 /**/
-void
-vireplace(void)
+int
+vireplace(char **args)
 {
     startvitext(0);
+    return 0;
 }
 
 /* vi-replace-chars has some oddities relating to vi-repeat-change.  In *
@@ -474,32 +471,27 @@ vireplace(void)
  * without a rewrite of the repeat code.                                */
 
 /**/
-void
-vireplacechars(void)
+int
+vireplacechars(char **args)
 {
     int ch, n = zmult;
 
     startvichange(1);
     /* check argument range */
     if (n < 1 || n + cs > findeol()) {
-	if(vichgrepeat) {
-	    int ofeep = feepflag;
+	if(vichgrepeat)
 	    vigetkey();
-	    feepflag = ofeep;
-	}
 	if(vichgflag) {
 	    free(vichgbuf);
 	    vichgbuf = NULL;
 	    vichgflag = 0;
 	}
-	feep();
-	return;
+	return 1;
     }
     /* get key */
     if((ch = vigetkey()) == -1) {
 	vichgflag = 0;
-	feep();
-	return;
+	return 1;
     }
     /* do change */
     if (ch == '\r' || ch == '\n') {
@@ -513,47 +505,51 @@ vireplacechars(void)
 	cs--;
     }
     vichgflag = 0;
+    return 0;
 }
 
 /**/
-void
-vicmdmode(void)
+int
+vicmdmode(char **args)
 {
     if (invicmdmode() || selectkeymap("vicmd", 0))
-	feep();
+	return 1;
     undoing = 1;
     vichgflag = 0;
     if (cs != findbol())
 	cs--;
+    return 0;
 }
 
 /**/
-void
-viopenlinebelow(void)
+int
+viopenlinebelow(char **args)
 {
     cs = findeol();
     spaceinline(1);
     line[cs++] = '\n';
     startvitext(1);
     clearlist = 1;
+    return 0;
 }
 
 /**/
-void
-viopenlineabove(void)
+int
+viopenlineabove(char **args)
 {
     cs = findbol();
     spaceinline(1);
     line[cs] = '\n';
     startvitext(1);
     clearlist = 1;
+    return 0;
 }
 
 /**/
-void
-vioperswapcase(void)
+int
+vioperswapcase(char **args)
 {
-    int oldcs, c2;
+    int oldcs, c2, ret = 1;
 
     /* get the range */
     startvichange(1);
@@ -569,22 +565,22 @@ vioperswapcase(void)
 	}
 	/* go back to the first line of the range */
 	cs = oldcs;
+	ret = 0;
 #if 0
 	vifirstnonblank();
 #endif
     }
     vichgflag = 0;
+    return ret;
 }
 
 /**/
-void
-virepeatchange(void)
+int
+virepeatchange(char **args)
 {
     /* make sure we have a change to repeat */
-    if (!vichgbuf || vichgflag) {
-	feep();
-	return;
-    }
+    if (!vichgbuf || vichgflag)
+	return 1;
     /* restore or update the saved count and buffer */
     if (zmod.flags & MOD_MULT) {
 	lastmod.mult = zmod.mult;
@@ -598,11 +594,12 @@ virepeatchange(void)
     /* repeat the command */
     inrepeat = 1;
     ungetkeys(vichgbuf, vichgbufptr);
+    return 0;
 }
 
 /**/
-void
-viindent(void)
+int
+viindent(char **args)
 {
     int oldcs = cs, c2;
 
@@ -610,14 +607,13 @@ viindent(void)
     startvichange(1);
     if ((c2 = getvirange(0)) == -1) {
 	vichgflag = 0;
-	return;
+	return 1;
     }
     vichgflag = 0;
     /* must be a line range */
     if (!vilinerange) {
-	feep();
 	cs = oldcs;
-	return;
+	return 1;
     }
     oldcs = cs;
     /* add a tab to the beginning of each line within range */
@@ -628,12 +624,13 @@ viindent(void)
     }
     /* go back to the first line of the range */
     cs = oldcs;
-    vifirstnonblank();
+    vifirstnonblank(zlenoargs);
+    return 0;
 }
 
 /**/
-void
-viunindent(void)
+int
+viunindent(char **args)
 {
     int oldcs = cs, c2;
 
@@ -641,14 +638,13 @@ viunindent(void)
     startvichange(1);
     if ((c2 = getvirange(0)) == -1) {
 	vichgflag = 0;
-	return;
+	return 1;
     }
     vichgflag = 0;
     /* must be a line range */
     if (!vilinerange) {
-	feep();
 	cs = oldcs;
-	return;
+	return 1;
     }
     oldcs = cs;
     /* remove a tab from the beginning of each line within range */
@@ -659,12 +655,13 @@ viunindent(void)
     }
     /* go back to the first line of the range */
     cs = oldcs;
-    vifirstnonblank();
+    vifirstnonblank(zlenoargs);
+    return 0;
 }
 
 /**/
-void
-vibackwarddeletechar(void)
+int
+vibackwarddeletechar(char **args)
 {
     int n = zmult;
 
@@ -672,16 +669,16 @@ vibackwarddeletechar(void)
 	startvichange(-1);
     /* handle negative argument */
     if (n < 0) {
+	int ret;
 	zmult = -n;
-	videletechar();
+	ret = videletechar(args);
 	zmult = n;
-	return;
+	return ret;
     }
     /* It is an error to be at the beginning of the line, or (in *
      * insert mode) to delete past the beginning of insertion.   */
     if ((!invicmdmode() && cs - n < viinsbegin) || cs == findbol()) {
-	feep();
-	return;
+	return 1;
     }
     /* Put argument into the acceptable range -- it is not an error to  *
      * specify a greater count than the number of available characters. */
@@ -689,41 +686,39 @@ vibackwarddeletechar(void)
 	n = cs - findbol();
     /* do the deletion */
     backkill(n, 1);
+    return 0;
 }
 
 /**/
-void
-vikillline(void)
+int
+vikillline(char **args)
 {
-    if (viinsbegin > cs) {
-	feep();
-	return;
-    }
+    if (viinsbegin > cs)
+	return 1;
     backdel(cs - viinsbegin);
+    return 0;
 }
 
 /**/
-void
-viputbefore(void)
+int
+viputbefore(char **args)
 {
     Cutbuffer buf = &cutbuf;
     int n = zmult;
 
     startvichange(-1);
     if (n < 0)
-	return;
+	return 1;
     if (zmod.flags & MOD_VIBUF)
 	buf = &vibuf[zmod.vibuf];
-    if (!buf->buf) {
-	feep();
-	return;
-    }
+    if (!buf->buf)
+	return 1;
     if(buf->flags & CUTBUFFER_LINE) {
 	cs = findbol();
 	spaceinline(buf->len + 1);
 	memcpy((char *)line + cs, buf->buf, buf->len);
 	line[cs + buf->len] = '\n';
-	vifirstnonblank();
+	vifirstnonblank(zlenoargs);
     } else {
 	while (n--) {
 	    spaceinline(buf->len);
@@ -733,30 +728,29 @@ viputbefore(void)
 	if (cs)
 	    cs--;
     }
+    return 0;
 }
 
 /**/
-void
-viputafter(void)
+int
+viputafter(char **args)
 {
     Cutbuffer buf = &cutbuf;
     int n = zmult;
 
     startvichange(-1);
     if (n < 0)
-	return;
+	return 1;
     if (zmod.flags & MOD_VIBUF)
 	buf = &vibuf[zmod.vibuf];
-    if (!buf->buf) {
-	feep();
-	return;
-    }
+    if (!buf->buf)
+	return 1;
     if(buf->flags & CUTBUFFER_LINE) {
 	cs = findeol();
 	spaceinline(buf->len + 1);
 	line[cs++] = '\n';
 	memcpy((char *)line + cs, buf->buf, buf->len);
-	vifirstnonblank();
+	vifirstnonblank(zlenoargs);
     } else {
 	if (cs != findeol())
 	    cs++;
@@ -768,20 +762,18 @@ viputafter(void)
 	if (cs)
 	    cs--;
     }
-
+    return 0;
 }
 
 /**/
-void
-vijoin(void)
+int
+vijoin(char **args)
 {
     int x;
 
     startvichange(-1);
-    if ((x = findeol()) == ll) {
-	feep();
-	return;
-    }
+    if ((x = findeol()) == ll)
+	return 1;
     cs = x + 1;
     for (x = 1; cs != ll && iblank(line[cs]); cs++, x++);
     backdel(x);
@@ -791,17 +783,18 @@ vijoin(void)
 	spaceinline(1);
 	line[cs] = ' ';
     }
+    return 0;
 }
 
 /**/
-void
-viswapcase(void)
+int
+viswapcase(char **args)
 {
     int eol, n = zmult;
 
     startvichange(-1);
     if (n < 1)
-	return;
+	return 1;
     eol = findeol();
     while (cs < eol && n--) {
 	if (islower(line[cs]))
@@ -812,11 +805,12 @@ viswapcase(void)
     }
     if (cs && cs == eol)
 	cs--;
+    return 0;
 }
 
 /**/
-void
-vicapslockpanic(void)
+int
+vicapslockpanic(char **args)
 {
     clearlist = 1;
     zbeep();
@@ -825,20 +819,19 @@ vicapslockpanic(void)
     zrefresh();
     while (!islower(getkey(0)));
     statusline = NULL;
+    return 0;
 }
 
 /**/
-void
-visetbuffer(void)
+int
+visetbuffer(char **args)
 {
     int ch;
 
     if ((zmod.flags & MOD_VIBUF) ||
 	(((ch = getkey(0)) < '1' || ch > '9') &&
-	 (ch < 'a' || ch > 'z') && (ch < 'A' || ch > 'Z'))) {
-	feep();
-	return;
-    }
+	 (ch < 'a' || ch > 'z') && (ch < 'A' || ch > 'Z')))
+	return 1;
     if (ch >= 'A' && ch <= 'Z')	/* needed in cut() */
 	zmod.flags |= MOD_VIAPP;
     else
@@ -846,32 +839,33 @@ visetbuffer(void)
     zmod.vibuf = tulower(ch) + (idigit(ch) ? -'1' + 26 : -'a');
     zmod.flags |= MOD_VIBUF;
     prefixflag = 1;
+    return 0;
 }
 
 /**/
-void
-vikilleol(void)
+int
+vikilleol(char **args)
 {
     int n = findeol() - cs;
 
     startvichange(-1);
     if (!n) {
 	/* error -- line already empty */
-	feep();
-	return;
+	return 1;
     }
     /* delete to end of line */
     forekill(findeol() - cs, 0);
+    return 0;
 }
 
 /**/
-void
-vipoundinsert(void)
+int
+vipoundinsert(char **args)
 {
     int oldcs = cs;
 
     startvichange(-1);
-    vifirstnonblank();
+    vifirstnonblank(zlenoargs);
     if(line[cs] != '#') {
 	spaceinline(1);
 	line[cs] = '#';
@@ -884,11 +878,12 @@ vipoundinsert(void)
 	    viinsbegin--;
 	cs = oldcs - (cs < oldcs);
     }
+    return 0;
 }
 
 /**/
-void
-viquotedinsert(void)
+int
+viquotedinsert(char **args)
 {
 #ifndef HAS_TIO
     struct sgttyb sob;
@@ -908,23 +903,23 @@ viquotedinsert(void)
 #endif
     foredel(1);
     if(c < 0)
-	feep();
+	return 1;
     else
-	selfinsert();
+	return selfinsert(args);
 }
 
 /* the 0 key in vi: continue a repeat count in the manner of      *
  * digit-argument if possible, otherwise do vi-beginning-of-line. */
 
 /**/
-void
-vidigitorbeginningofline(void)
+int
+vidigitorbeginningofline(char **args)
 {
     if(zmod.flags & MOD_TMULT)
-	digitargument();
+	return digitargument(args);
     else {
 	removesuffix();
 	invalidatelist();
-	vibeginningofline();
+	return vibeginningofline(args);
     }
 }

@@ -23,7 +23,7 @@ if [[ -z $WIDGET ]]; then
   file=$1
   local IPREFIX
 else
-  (( NUMERIC > 1 )) && max_approx=$NUMERIC
+  (( ${NUMERIC:-1} > 1 )) && max_approx=$NUMERIC
 fi
 
 if [[ $file = \~*/* ]]; then

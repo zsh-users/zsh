@@ -41,16 +41,16 @@ pindex(KSH_AUTOLOAD, use of)
 If the tt(KSH_AUTOLOAD) option is set, or the file contains only a simple
 definition of the function, the file's contents will be
 executed.  It would normally define the function in question, but may
-also perform initialisation.
+also perform initialization.
 It is executed in the context of the function
 execution, and may therefore define local parameters.
 
 Otherwise, the function is defined such that its body is the
 complete contents of the file.  This form allows the file to be
 used directly as an executable shell script.
-Initialisation code can be executed, but only as part of the first
+Initialization code can be executed, but only as part of the first
 function execution, so the function would have to redefine itself to
-avoid reinitialising on the next execution.
+avoid reinitializing on the next execution.
 
 If this processing of the file results in the function being
 fully defined, the function itself is then executed.

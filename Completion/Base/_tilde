@@ -7,10 +7,32 @@
 #   `(( compstate[nmatches] )) || compgen -nu -qS/'
 # below that.
 
+local c s dirs list
+
 if [[ "$SUFFIX" = */* ]]; then
   ISUFFIX="/${SUFFIX#*/}$ISUFFIX"
   SUFFIX="${SUFFIX%%/*}"
-  compgen -nu -S ''
+  s=(-S '')
 else
-  compgen -nu -qS/
+  s=(-qS/)
 fi
+
+if compset -P +; then
+  dirs="$(dirs -v)"
+  list=("${(f)dirs}")
+  [[ -o pushdminus ]] && dirs="$(awk '{ $1 = '$#list' - $1 - 1;
+  				        printf("%s\t%s\n", $1, $2); }' <<<$dirs)"
+  list=("${(@)list%	*}")
+  c=(-y '$dirs' -k "($list)")
+elif compset -P -; then
+  dirs="$(dirs -v)"
+  list=("${(f)dirs}")
+  [[ ! -o pushdminus ]] && dirs="$(awk '{ $1 = '$#list' - $1 - 1;
+					  printf("%s\t%s\n", $1, $2); }' <<<$dirs)"
+  list=("${(@)list%	*}")
+  c=(-y '$dirs' -k "($list)")
+else
+  c=(-nu)
+fi
+
+compgen "$c[@]" "$s[@]"

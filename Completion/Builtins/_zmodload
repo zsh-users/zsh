@@ -5,7 +5,7 @@ local fl="$words[2]"
 if [[ "$fl" = -*(a*u|u*a)* || "$fl" = -*a* && CURRENT -ge 4 ]]; then
   compgen -B
 elif [[ "$fl" = -*u* ]]; then
-  compgen -s '$(zmodload)'
+  compadd - $(zmodload)
 else
-  compgen -s '${^module_path}/*(N:t:r)'
+  compadd - ${^module_path}/*(N:t:r)
 fi

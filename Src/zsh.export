@@ -5,6 +5,8 @@ addconddefs
 addedx
 addhashnode
 addhistnum
+addhookdefs
+addhookfunc
 addparamdefs
 addwrapper
 arrvargetfn
@@ -43,6 +45,8 @@ current_limits
 deletebuiltins
 deleteconddefs
 deletehashtable
+deletehookdefs
+deletehookfunc
 deleteparamdefs
 deleteparamtable
 deletewrapper
@@ -83,6 +87,7 @@ gethashnode2
 gethparam
 getintvalue
 getiparam
+getkeyptr
 getkeystring
 getlinknode
 getpermtext
@@ -206,6 +211,7 @@ resetneeded
 restoredir
 reswdtab
 retflag
+runhookdef
 runshfunc
 scancountparams
 scanhashtable

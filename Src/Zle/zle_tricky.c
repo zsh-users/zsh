@@ -110,20 +110,10 @@ static int movetoend;
 
 static int menucmp;
 
-/* Pointers to the current position in the groups list and in the menu-    *
- * completion array (the one that was put in the command line last).       */
+/* Information about menucompletion. */
 
-static Cmgroup menugrp;
-static Cmatch *menucur;
-
-/* menupos is the point (in the command line) where the menu-completion   *
- * strings are inserted.  menulen is the length of the string that was    *
- * inserted last.  menuend is the end position of this string in the      *
- * command line.  menuwe is non-zero if the cursor was at the end of the  *
- * word (meaning that suffixes should go before the cursor).  menuinsc is *
- * the length of any suffix that has been temporarily added.              */
-
-static int menupos, menulen, menuend, menuwe, menuinsc;
+/**/
+struct menuinfo minfo;
 
 /* This is for completion inside a brace expansion. brbeg and brend hold  *
  * strings that were temporarily removed from the string to complete.     *
@@ -376,157 +366,174 @@ static int lastend;
 #define FC_LINE   1
 #define FC_INWORD 2
 
+/* Arguments for and return value of completion widget. */
+
+static char **cfargs;
+static int cfret;
+
 /**/
-void
-completecall(void)
+int
+completecall(char **args)
 {
+    cfargs = args;
+    cfret = 0;
     compfunc = compwidget->u.comp.func;
-    compwidget->u.comp.fn();
+    if (compwidget->u.comp.fn(zlenoargs) && !cfret)
+	cfret = 1;
     compfunc = NULL;
+
+    return cfret;
 }
 
 /**/
-void
-completeword(void)
+int
+completeword(char **args)
 {
     usemenu = !!isset(MENUCOMPLETE);
     useglob = isset(GLOBCOMPLETE);
     if (c == '\t' && usetab())
-	selfinsert();
+	return selfinsert(args);
     else {
+	int ret;
 	if (lastambig == 1 && isset(BASHAUTOLIST) && !usemenu && !menucmp) {
-	    docomplete(COMP_LIST_COMPLETE);
+	    ret = docomplete(COMP_LIST_COMPLETE);
 	    lastambig = 2;
 	} else
-	    docomplete(COMP_COMPLETE);
+	    ret = docomplete(COMP_COMPLETE);
+	return ret;
     }
 }
 
 /**/
-void
-menucomplete(void)
+int
+menucomplete(char **args)
 {
     usemenu = 1;
     useglob = isset(GLOBCOMPLETE);
     if (c == '\t' && usetab())
-	selfinsert();
+	return selfinsert(args);
     else
-	docomplete(COMP_COMPLETE);
+	return docomplete(COMP_COMPLETE);
 }
 
 /**/
-void
-listchoices(void)
+int
+listchoices(char **args)
 {
     usemenu = !!isset(MENUCOMPLETE);
     useglob = isset(GLOBCOMPLETE);
-    docomplete(COMP_LIST_COMPLETE);
+    return docomplete(COMP_LIST_COMPLETE);
 }
 
 /**/
-void
-spellword(void)
+int
+spellword(char **args)
 {
     usemenu = useglob = 0;
-    docomplete(COMP_SPELL);
+    return docomplete(COMP_SPELL);
 }
 
 /**/
-void
-deletecharorlist(void)
+int
+deletecharorlist(char **args)
 {
-    Cmgroup mg = menugrp;
-    Cmatch *mc = menucur;
+    Cmgroup mg = minfo.group;
+    Cmatch *mc = minfo.cur;
+    int ret;
 
     usemenu = !!isset(MENUCOMPLETE);
     useglob = isset(GLOBCOMPLETE);
     if (cs != ll) {
 	fixsuffix();
-	deletechar();
+	ret = deletechar(args);
     } else
-	docomplete(COMP_LIST_COMPLETE);
+	ret = docomplete(COMP_LIST_COMPLETE);
 
-    menucur = mc;
-    menugrp = mg;
+    minfo.cur = mc;
+    minfo.group = mg;
+    return ret;
 }
 
 /**/
-void
-expandword(void)
+int
+expandword(char **args)
 {
     usemenu = useglob = 0;
     if (c == '\t' && usetab())
-	selfinsert();
+	return selfinsert(args);
     else
-	docomplete(COMP_EXPAND);
+	return docomplete(COMP_EXPAND);
 }
 
 /**/
-void
-expandorcomplete(void)
+int
+expandorcomplete(char **args)
 {
     usemenu = !!isset(MENUCOMPLETE);
     useglob = isset(GLOBCOMPLETE);
     if (c == '\t' && usetab())
-	selfinsert();
+	return selfinsert(args);
     else {
+	int ret;
 	if (lastambig == 1 && isset(BASHAUTOLIST) && !usemenu && !menucmp) {
-	    docomplete(COMP_LIST_COMPLETE);
+	    ret = docomplete(COMP_LIST_COMPLETE);
 	    lastambig = 2;
 	} else
-	    docomplete(COMP_EXPAND_COMPLETE);
+	    ret = docomplete(COMP_EXPAND_COMPLETE);
+	return ret;
     }
 }
 
 /**/
-void
-menuexpandorcomplete(void)
+int
+menuexpandorcomplete(char **args)
 {
     usemenu = 1;
     useglob = isset(GLOBCOMPLETE);
     if (c == '\t' && usetab())
-	selfinsert();
+	return selfinsert(args);
     else
-	docomplete(COMP_EXPAND_COMPLETE);
+	return docomplete(COMP_EXPAND_COMPLETE);
 }
 
 /**/
-void
-listexpand(void)
+int
+listexpand(char **args)
 {
     usemenu = !!isset(MENUCOMPLETE);
     useglob = isset(GLOBCOMPLETE);
-    docomplete(COMP_LIST_EXPAND);
+    return docomplete(COMP_LIST_EXPAND);
 }
 
 /**/
-void
-reversemenucomplete(void)
+int
+reversemenucomplete(char **args)
 {
-    if (!menucmp) {
-	menucomplete();
-	return;
-    }
+    if (!menucmp)
+	return menucomplete(args);
+
     HEAPALLOC {
-	if (menucur == menugrp->matches) {
+	if (minfo.cur == (minfo.group)->matches) {
 	    do {
-		if (!(menugrp = menugrp->prev))
-		    menugrp = lmatches;
-	    } while (!menugrp->mcount);
-	    menucur = menugrp->matches + menugrp->mcount - 1;
+		if (!(minfo.group = (minfo.group)->prev))
+		    minfo.group = lmatches;
+	    } while (!(minfo.group)->mcount);
+	    minfo.cur = (minfo.group)->matches + (minfo.group)->mcount - 1;
 	} else
-	    menucur--;
+	    minfo.cur--;
 	metafy_line();
-	do_single(*menucur);
+	do_single(*(minfo.cur));
 	unmetafy_line();
     } LASTALLOC;
+    return 0;
 }
 
 /* Accepts the current completion and starts a new arg, *
  * with the next completions. This gives you a way to   *
  * accept several selections from the list of matches.  */
 
-static void
+/**/
+void
 acceptlast(void)
 {
     if (brbeg && *brbeg) {
@@ -542,26 +549,24 @@ acceptlast(void)
 	brbeg[l] = ',';
 	brbeg[l + 1] = '\0';
     } else {
-	cs = menupos + menulen + menuinsc;
+	cs = minfo.pos + minfo.len + minfo.insc;
 	iremovesuffix(' ', 1);
 
 	inststrlen(" ", 1, 1);
-	menuinsc = menulen = 0;
-	menupos = cs;
-	menuwe = 1;
+	minfo.insc = minfo.len = 0;
+	minfo.pos = cs;
+	minfo.we = 1;
     }
 }
 
 /**/
-void
-acceptandmenucomplete(void)
+int
+acceptandmenucomplete(char **args)
 {
-    if (!menucmp) {
-	feep();
-	return;
-    }
+    if (!menucmp)
+	return 1;
     acceptlast();
-    menucomplete();
+    return menucomplete(args);
 }
 
 /* These are flags saying if we are completing in the command *
@@ -788,11 +793,11 @@ check_param(char *s, int set, int test)
 /* The main entry point for completion. */
 
 /**/
-static void
+static int
 docomplete(int lst)
 {
     char *s, *ol;
-    int olst = lst, chl = 0, ne = noerrs, ocs;
+    int olst = lst, chl = 0, ne = noerrs, ocs, ret = 0, omc = menucmp;
 
     if (showagain && validlist)
 	showinglist = -2;
@@ -803,7 +808,7 @@ docomplete(int lst)
     if (menucmp && lst != COMP_LIST_EXPAND && 
 	(!compwidget || compwidget == lastcompwidget)) {
 	do_menucmp(lst);
-	return;
+	return 0;
     }
     lastcompwidget = compwidget;
 
@@ -823,7 +828,7 @@ docomplete(int lst)
      * changed, do no more.                                               */
 
     if (doexpandhist())
-	return;
+	return 0;
 
     metafy_line();
 
@@ -874,8 +879,7 @@ docomplete(int lst)
 	    ll = strlen((char *) line);
 	    cs = ocs;
 	    unmetafy_line();
-	    feep();
-	    return;
+	    return 1;
 	}
 	ocs = cs;
 	cs = 0;
@@ -985,7 +989,7 @@ docomplete(int lst)
 	    inwhat = IN_CMD;
 
 	if (lst == COMP_SPELL) {
-	    char *x, *q;
+	    char *x, *q, *ox;
 
 	    for (q = s; *q; q++)
 		if (INULL(*q))
@@ -993,10 +997,11 @@ docomplete(int lst)
 	    cs = wb;
 	    foredel(we - wb);
 	    HEAPALLOC {
-		untokenize(x = dupstring(s));
+		untokenize(x = ox = dupstring(s));
 		if (*s == Tilde || *s == Equals || *s == String)
 		    *x = *s;
 		spckword(&x, 0, lincmd, 0);
+		ret = !strcmp(x, ox);
 	    } LASTALLOC;
 	    untokenize(x);
 	    inststr(x);
@@ -1032,18 +1037,30 @@ docomplete(int lst)
 				p++, skipparens(Inbrace, Outbrace, &p);
 			}
 		}
-		docompletion(s, lst, lincmd);
-	    }
+		ret = docompletion(s, lst, lincmd);
+	    } else
+		ret = !strcmp(ol, (char *) line);
 	} else
 	    /* Just do completion. */
-	    docompletion(s, lst, lincmd);
+	    ret = docompletion(s, lst, lincmd);
 	zsfree(s);
-    }
+    } else
+	ret = 1;
     /* Reset the lexer state, pop the heap. */
     lexrestore();
     popheap();
     zsfree(qword);
     unmetafy_line();
+
+    if (menucmp && !omc) {
+	struct chdata dat;
+
+	dat.matches = amatches;
+	dat.num = nmatches;
+	dat.cur = NULL;
+	runhookdef(MENUSTARTHOOK, (void *) &dat);
+    }
+    return ret;
 }
 
 /* Do completion, given that we are in the middle of a menu completion.  We *
@@ -1052,7 +1069,7 @@ docomplete(int lst)
  * insert the next completion.                                              */
 
 /**/
-static void
+void
 do_menucmp(int lst)
 {
     /* Just list the matches if the list was requested. */
@@ -1062,16 +1079,16 @@ do_menucmp(int lst)
     }
     /* Otherwise go to the next match in the array... */
     HEAPALLOC {
-	if (!*++menucur) {
+	if (!*++(minfo.cur)) {
 	    do {
-		if (!(menugrp = menugrp->next))
-		    menugrp = amatches;
-	    } while (!menugrp->mcount);
-	    menucur = menugrp->matches;
+		if (!(minfo.group = (minfo.group)->next))
+		    minfo.group = amatches;
+	    } while (!(minfo.group)->mcount);
+	    minfo.cur = minfo.group->matches;
 	}
 	/* ... and insert it into the command line. */
 	metafy_line();
-	do_single(*menucur);
+	do_single(*(minfo.cur));
 	unmetafy_line();
     } LASTALLOC;
 }
@@ -1425,7 +1442,6 @@ get_comp_string(void)
 		lexrestore();
 		goto start;
 	    }
-	    feep();
 	    noaliases = 0;
 	    lexrestore();
 	    LASTALLOC_RETURN NULL;
@@ -1484,11 +1500,14 @@ get_comp_string(void)
 			if (lev)
 			    lev--;
 		    }
-		wb++;
 		p = (char *) line + wb;
+		wb++;
 		if (wb && (*p == '[' || *p == '(') &&
-		    !skipparens(*p, (*p == '[' ? ']' : ')'), &p))
-			we = p - (char *) line;
+		    !skipparens(*p, (*p == '[' ? ']' : ')'), &p)) {
+			we = (p - (char *) line) - 1;
+			if (insubscr == 2)
+			    insubscr = 3;
+		}
 	    } else {
 		/* In mathematical expression, we complete parameter names  *
 		 * (even if they don't have a `$' in front of them).  So we *
@@ -1513,9 +1532,10 @@ get_comp_string(void)
 		varname = ztrdup((char *) line + i + 1);
 		line[wb - 1] = sav;
 		if ((keypm = (Param) paramtab->getnode(paramtab, varname)) &&
-		    (keypm->flags & PM_HASHED))
-		    insubscr = 2;
-		else
+		    (keypm->flags & PM_HASHED)) {
+		    if (insubscr != 3)
+			insubscr = 2;
+		} else
 		    insubscr = 1;
 	    }
 	}
@@ -1734,11 +1754,8 @@ doexpansion(char *s, int lst, int olst, int explincmd)
 	}
 	if (errflag)
 	    goto end;
-	if (empty(vl) || !*(char *)peekfirst(vl)) {
-	    if (!noerrs)
-		feep();
+	if (empty(vl) || !*(char *)peekfirst(vl))
 	    goto end;
-	}
 	if (peekfirst(vl) == (void *) ss ||
 		(olst == COMP_EXPAND_COMPLETE &&
 		 !nextnode(firstnode(vl)) && *s == Tilde &&
@@ -1748,8 +1765,6 @@ doexpansion(char *s, int lst, int olst, int explincmd)
 	     * expandorcomplete was called, otherwise, just beep.     */
 	    if (lst == COMP_EXPAND_COMPLETE)
 		docompletion(s, COMP_COMPLETE, explincmd);
-	    else
-		feep();
 	    goto end;
 	}
 	if (lst == COMP_LIST_EXPAND) {
@@ -3776,9 +3791,10 @@ addmatches(Cadata dat, char **argv)
 		} else
 		    dat->prpre = dupstring(dat->prpre);
 		/* Select the group in which to store the matches. */
-		if (dat->group) {
+		if (dat->group || dat->ylist) {
 		    endcmgroup(NULL);
-		    begcmgroup(dat->group, (dat->aflags & CAF_NOSORT));
+		    begcmgroup((dat->ylist ? NULL : dat->group),
+			       (dat->aflags & CAF_NOSORT));
 		    if (dat->aflags & CAF_NOSORT)
 			mgroup->flags |= CGF_NOSORT;
 		} else {
@@ -3800,6 +3816,10 @@ addmatches(Cadata dat, char **argv)
 		    lpre = quotename(lpre, NULL);
 		    lsuf = quotename(lsuf, NULL);
 		}
+		if (dat->ppre)
+		    dat->ppre = quotename(dat->ppre, NULL);
+		if (dat->psuf)
+		    dat->psuf = quotename(dat->psuf, NULL);
 	    }
 	    /* Walk through the matches given. */
 	    for (; (s = *argv); argv++) {
@@ -3825,8 +3845,10 @@ addmatches(Cadata dat, char **argv)
 		    }
 		}
 		if (!(dat->aflags & CAF_MATCH)) {
-		    ms = ((dat->aflags & CAF_QUOTE) ? dupstring(s) :
-			  quotename(s, NULL));
+		    if (dat->aflags & CAF_QUOTE)
+			ms = dupstring(s);
+		    else
+			sl = strlen(ms = quotename(s, NULL));
 		    lc = bld_parts(ms, sl, -1, NULL);
 		    isexact = 0;
 		} else if (!(ms = comp_match(lpre, lsuf, s, cp, &lc,
@@ -3865,6 +3887,10 @@ addmatches(Cadata dat, char **argv)
 		set_param(dat->opar, oparl);
 	    if (dat->dpar)
 		set_param(dat->dpar, dparl);
+	    if (dat->ylist) {
+		endcmgroup(get_user_var(dat->ylist));
+		begcmgroup("default", 0);
+	    }
 	} LASTALLOC;
     } SWITCHBACKHEAPS;
 
@@ -4288,9 +4314,11 @@ gen_matches_files(int dirs, int execs, int all)
 }
 
 /**/
-static void
+static int
 docompletion(char *s, int lst, int incmd)
 {
+    int ret = 0;
+
     HEAPALLOC {
 	char *opm;
 	LinkNode n;
@@ -4328,8 +4356,8 @@ docompletion(char *s, int lst, int incmd)
 	    foredel(ll);
 	    inststr(origline);
 	    cs = origcs;
-	    feep();
 	    clearlist = 1;
+	    ret = 1;
 	    goto compend;
 	}
 	if (comppatmatch && *comppatmatch && comppatmatch != opm)
@@ -4339,17 +4367,17 @@ docompletion(char *s, int lst, int incmd)
 	    showinglist = -2;
 	else if (useline) {
 	    /* We have matches. */
-	    if (nmatches > 1)
+	    if (nmatches > 1) {
 		/* There is more than one match. */
-		    do_ambiguous();
-
-	    else if (nmatches == 1) {
+		ret = do_ambiguous();
+	    } else if (nmatches == 1) {
 		/* Only one match. */
 		Cmgroup m = amatches;
 
 		while (!m->mcount)
 		    m = m->next;
-		menucur = NULL;
+		minfo.cur = NULL;
+		minfo.asked = 0;
 		do_single(m->matches[0]);
 		invalidatelist();
 	    }
@@ -4363,7 +4391,7 @@ docompletion(char *s, int lst, int incmd)
 	    int up = 0, tr = 1, nn = 0;
 
 	    if (!nmatches)
-		feep();
+		ret = 1;
 
 	    while (g) {
 		if ((e = g->expls))
@@ -4404,6 +4432,7 @@ docompletion(char *s, int lst, int incmd)
 	    cs = ll;
 	popheap();
     } LASTALLOC;
+    return ret;
 }
 
 /* This calls the given function for new style completion. */
@@ -4604,8 +4633,8 @@ callcompfunc(char *s, char *fn)
 	    else
 		compoldlist = "yes";
 	    kset |= CP_OLDLIST;
-	    if (menucur) {
-		sprintf(buf, "%d", (*menucur)->gnum);
+	    if (minfo.cur) {
+		sprintf(buf, "%d", (*(minfo.cur))->gnum);
 		compoldins = buf;
 		kset |= CP_OLDINS;
 	    } else
@@ -4623,7 +4652,20 @@ callcompfunc(char *s, char *fn)
 	makezleparams(1);
 	sfcontext = SFC_CWIDGET;
 	NEWHEAPS(compheap) {
-	    doshfunc(fn, list, NULL, 0, 1);
+	    LinkList largs = NULL;
+	    int olv = lastval;
+
+	    if (*cfargs) {
+		char **p = cfargs;
+
+		largs = newlinklist();
+		addlinknode(largs, dupstring(fn));
+		while (*p)
+		    addlinknode(largs, dupstring(*p++));
+	    }
+	    doshfunc(fn, list, largs, 0, 0);
+	    cfret = lastval;
+	    lastval = olv;
 	} OLDHEAPS;
 	sfcontext = osc;
 	endparamscope();
@@ -4673,7 +4715,7 @@ callcompfunc(char *s, char *fn)
 	    movetoend = 2;
 
 	oldlist = (hasperm && compoldlist && !strcmp(compoldlist, "keep"));
-	oldins = (hasperm && menucur &&
+	oldins = (hasperm && minfo.cur &&
 		  compoldins && !strcmp(compoldins, "keep"));
 
 	zfree(comprpms, CP_REALPARAMS * sizeof(Param));
@@ -4710,7 +4752,7 @@ makecomplist(char *s, int incmd, int lst)
     int onm = nmatches, osi = movefd(0);
 
     /* Inside $... ? */
-    if (compfunc && (p = check_param(s, 0, NULL)))
+    if (compfunc && (p = check_param(s, 0, 0)))
 	os = s = p;
 
     /* We build a copy of the list of matchers to use to make sure that this
@@ -5281,10 +5323,10 @@ makecomplistglobal(char *os, int incmd, int lst, int flags)
         cc = &cc_default;
 	keypm = NULL;
     } else if (linwhat == IN_MATH) {
-	if (insubscr == 2) {
+	if (insubscr >= 2) {
 	    /* Inside subscript of assoc array, complete keys. */
 	    cc_dummy.mask = 0;
-	    cc_dummy.suffix = "]";
+	    cc_dummy.suffix = (insubscr == 2 ? "]" : "");
 	} else {
 	    /* Other math environment, complete paramete names. */
 	    keypm = NULL;
@@ -5590,7 +5632,7 @@ makecomplistext(Compctl occ, char *os, int incmd)
 		    case CCT_RANGEPAT:
 			if (cc->type == CCT_RANGEPAT)
 			    tokenize(sc = dupstring(cc->u.l.a[i]));
-			for (j = clwpos; j; j--) {
+			for (j = clwpos - 1; j > 0; j--) {
 			    untokenize(s = ztrdup(clwords[j]));
 			    if (cc->type == CCT_RANGESTR)
 				sc = rembslash(cc->u.l.a[i]);
@@ -5791,7 +5833,7 @@ makecomplistflags(Compctl cc, char *s, int incmd, int compadd)
 	ic = 0;
 
     /* Check if we have to complete a parameter name... */
-    if (!incompfunc && (p = check_param(s, 1, NULL))) {
+    if (!incompfunc && (p = check_param(s, 1, 0))) {
 	s = p;
 	/* And now make sure that we complete parameter names. */
 	cc = &cc_dummy;
@@ -6267,8 +6309,15 @@ makecomplistflags(Compctl cc, char *s, int incmd, int compadd)
 	maketildelist();
 	addwhat = oaw;
     }
-    if (cc->widget)
+    if (cc->widget) {
+	char **ocfa = cfargs;
+	int ocfr = cfret;
+
+	cfargs = zlenoargs;
 	callcompfunc(os, cc->widget);
+	cfargs = ocfa;
+	cfret = ocfr;
+    }
     if (cc->func) {
 	/* This handles the compctl -K flag. */
 	List list;
@@ -6313,20 +6362,14 @@ makecomplistflags(Compctl cc, char *s, int incmd, int compadd)
     if (cc->mask & (CC_JOBS | CC_RUNNING | CC_STOPPED)) {
 	/* Get job names. */
 	int i;
-	char *j, *jj;
+	char *j;
 
 	for (i = 0; i < MAXJOB; i++)
 	    if ((jobtab[i].stat & STAT_INUSE) &&
 		jobtab[i].procs && jobtab[i].procs->text) {
 		int stopped = jobtab[i].stat & STAT_STOPPED;
 
-		j = jj = dupstring(jobtab[i].procs->text);
-		/* Find the first word. */
-		for (; *jj; jj++)
-		    if (*jj == ' ') {
-			*jj = '\0';
-			break;
-		    }
+		j = dupstring(jobtab[i].procs->text);
 		if ((cc->mask & CC_JOBS) ||
 		    (stopped && (cc->mask & CC_STOPPED)) ||
 		    (!stopped && (cc->mask & CC_RUNNING)))
@@ -6507,7 +6550,7 @@ makecomplistflags(Compctl cc, char *s, int incmd, int compadd)
     if (cc->subcmd) {
 	/* Handle -l sub-completion. */
 	char **ow = clwords, *os = cmdstr, *ops = NULL;
-	int oldn = clwnum, oldp = clwpos;
+	int oldn = clwnum, oldp = clwpos, br;
 	unsigned long occ = ccont;
 	
 	ccont = CC_CCCONT;
@@ -6523,21 +6566,22 @@ makecomplistflags(Compctl cc, char *s, int incmd, int compadd)
 	    erange = 1;
 	clwnum = erange - brange + 1;
 	clwpos = clwpos - brange;
-	
+	br = brange;
+
 	if (cc->subcmd[0]) {
 	    /* And probably put the command name given to the flag *
 	     * in the array.                                       */
 	    clwpos++;
 	    clwnum++;
 	    incmd = 0;
-	    ops = clwords[brange - 1];
-	    clwords[brange - 1] = cc->subcmd;
+	    ops = clwords[br - 1];
+	    clwords[br - 1] = ztrdup(cc->subcmd);
 	    cmdstr = ztrdup(cc->subcmd);
-	    clwords += brange - 1;
+	    clwords += br - 1;
 	} else {
-	    cmdstr = ztrdup(clwords[brange]);
+	    cmdstr = ztrdup(clwords[br]);
 	    incmd = !clwpos;
-	    clwords += brange;
+	    clwords += br;
 	}
 	/* Produce the matches. */
 	makecomplistcmd(s, incmd, CFN_FIRST);
@@ -6548,8 +6592,10 @@ makecomplistflags(Compctl cc, char *s, int incmd, int compadd)
 	cmdstr = os;
 	clwnum = oldn;
 	clwpos = oldp;
-	if (ops)
-	    clwords[brange - 1] = ops;
+	if (ops) {
+	    zsfree(clwords[br - 1]);
+	    clwords[br - 1] = ops;
+	}
 	ccont = occ;
     }
     if (cc->substr)
@@ -6570,7 +6616,8 @@ invalidatelist(void)
     if (validlist)
 	freematches();
     lastambig = menucmp = validlist = showinglist = fromcomp = 0;
-    menucur = NULL;
+    minfo.cur = NULL;
+    minfo.asked = 0;
     compwidget = NULL;
 }
 
@@ -7337,19 +7384,20 @@ instmatch(Cmatch m, int *scs)
 /* Handle the case were we found more than one match. */
 
 /**/
-static void
+static int
 do_ambiguous(void)
 {
+    int ret = 0;
     menucmp = 0;
 
     /* If we have to insert the first match, call do_single().  This is *
      * how REC_EXACT takes effect.  We effectively turn the ambiguous   *
      * completion into an unambiguous one.                              */
     if (ainfo && ainfo->exact == 1 && useexact && !(fromcomp & FC_LINE)) {
-	menucur = NULL;
+	minfo.cur = NULL;
 	do_single(ainfo->exactm);
 	invalidatelist();
-	return;
+	return ret;
     }
     /* Setting lastambig here means that the completion is ambiguous and *
      * AUTO_MENU might want to start a menu completion next time round,  *
@@ -7369,7 +7417,8 @@ do_ambiguous(void)
 	int atend = (cs == we), oll = ll, la, eq, tcs;
 	VARARR(char, oline, ll);
 
-	menucur = NULL;
+	minfo.cur = NULL;
+	minfo.asked = 0;
 
 	/* Copy the line buffer to be able to easily test if it changed. */
 	memcpy(oline, line, ll);
@@ -7418,19 +7467,21 @@ do_ambiguous(void)
 	    fromcomp = fc;
 	    lastambig = 0;
 	    clearlist = 1;
-	    return;
+	    return ret;
 	}
     } else
-	return;
+	return ret;
 
     /* At this point, we might want a completion listing.  Show the listing *
      * if it is needed.                                                     */
     if (isset(LISTBEEP))
-	feep();
-    if (uselist && usemenu != 2 &&
-	(!showinglist || (usemenu == 3 && !oldlist)) &&
+	ret = 1;
+    if (uselist && (usemenu != 2 || (!showinglist && !oldlist)) &&
+	((!showinglist && (!listshown || !oldlist)) ||
+	 (usemenu == 3 && !oldlist)) &&
 	(smatches >= 2 || (compforcelist && *compforcelist)))
 	showinglist = -2;
+    return ret;
 }
 
 /* This is a stat that ignores backslashes in the filename.  The `ls' *
@@ -7440,7 +7491,7 @@ do_ambiguous(void)
  * (l)stat().                                                         */
 
 /**/
-static int
+int
 ztat(char *nam, struct stat *buf, int ls)
 {
     char b[PATH_MAX], *p;
@@ -7458,7 +7509,7 @@ ztat(char *nam, struct stat *buf, int ls)
 /* Insert a single match in the command line. */
 
 /**/
-static void
+void
 do_single(Cmatch m)
 {
     int l, sr = 0, scs;
@@ -7471,39 +7522,39 @@ do_single(Cmatch m)
 
     fixsuffix();
 
-    if (!menucur) {
+    if (!minfo.cur) {
 	/* We are currently not in a menu-completion, *
 	 * so set the position variables.             */
-	menupos = wb;
-	menuwe = (movetoend >= 2 || (movetoend == 1 && !menucmp));
-	menuend = we;
+	minfo.pos = wb;
+	minfo.we = (movetoend >= 2 || (movetoend == 1 && !menucmp));
+	minfo.end = we;
     }
     /* If we are already in a menu-completion or if we have done a *
      * glob completion, we have to delete some of the stuff on the *
      * command line.                                               */
-    if (menucur)
-	l = menulen + menuinsc;
+    if (minfo.cur)
+	l = minfo.len + minfo.insc;
     else
 	l = we - wb;
 
-    menuinsc = 0;
-    cs = menupos;
+    minfo.insc = 0;
+    cs = minfo.pos;
     foredel(l);
 
     /* And then we insert the new string. */
-    menulen = instmatch(m, &scs);
-    menuend = cs;
-    cs = menupos + menulen;
+    minfo.len = instmatch(m, &scs);
+    minfo.end = cs;
+    cs = minfo.pos + minfo.len;
 
     if (m->suf) {
 	havesuff = 1;
-	menuinsc = ztrlen(m->suf);
-	menulen -= menuinsc;
-	if (menuwe) {
-	    menuend += menuinsc;
+	minfo.insc = ztrlen(m->suf);
+	minfo.len -= minfo.insc;
+	if (minfo.we) {
+	    minfo.end += minfo.insc;
 	    if (m->flags & CMF_REMOVE) {
-		makesuffixstr(m->remf, m->rems, menuinsc);
-		if (menuinsc == 1)
+		makesuffixstr(m->remf, m->rems, minfo.insc);
+		if (minfo.insc == 1)
 		    suffixlen[STOUC(m->suf[0])] = 1;
 	    }
 	}
@@ -7519,11 +7570,11 @@ do_single(Cmatch m)
 	    cs += eparq;
 	    for (pq = parq; pq; pq--)
 		inststrlen("\"", 1, 1);
-	    menuinsc += parq;
+	    minfo.insc += parq;
 	    inststrlen("}", 1, 1);
-	    menuinsc++;
-	    if (menuwe)
-		menuend += menuinsc;
+	    minfo.insc++;
+	    if (minfo.we)
+		minfo.end += minfo.insc;
 	}
 	if ((m->flags & CMF_FILE) || (m->ripre && isset(AUTOPARAMSLASH))) {
 	    /* If we have a filename or we completed a parameter name      *
@@ -7559,10 +7610,10 @@ do_single(Cmatch m)
 		/* It is a directory, so add the slash. */
 		havesuff = 1;
 		inststrlen("/", 1, 1);
-		menuinsc++;
-		if (menuwe)
-		    menuend++;
-		if (!menucmp || menuwe) {
+		minfo.insc++;
+		if (minfo.we)
+		    minfo.end++;
+		if (!menucmp || minfo.we) {
 		    if (m->remf || m->rems)
 			makesuffixstr(m->remf, m->rems, 1);
 		    else if (isset(AUTOREMOVESLASH)) {
@@ -7572,8 +7623,8 @@ do_single(Cmatch m)
 		}
 	    }
 	}
-	if (!menuinsc)
-	    cs = menupos + menulen;
+	if (!minfo.insc)
+	    cs = minfo.pos + minfo.len;
     }
     /* If completing in a brace expansion... */
     if (brbeg) {
@@ -7589,9 +7640,9 @@ do_single(Cmatch m)
 	    cs = scs;
 	    havesuff = 1;
 	    inststrlen(",", 1, 1);
-	    menuinsc++;
+	    minfo.insc++;
 	    makesuffix(1);
-	    if ((!menucmp || menuwe) && isset(AUTOPARAMKEYS))
+	    if ((!menucmp || minfo.we) && isset(AUTOPARAMKEYS))
 		suffixlen[','] = suffixlen['}'] = 1;
 	}
     } else if (!havesuff && (!(m->flags & CMF_FILE) || !sr)) {
@@ -7600,20 +7651,33 @@ do_single(Cmatch m)
 	 * the string doesn't name an existing file.             */
 	if (m->autoq && (!m->isuf || m->isuf[0] != m->autoq)) {
 	    inststrlen(&(m->autoq), 1, 1);
-	    menuinsc++;
+	    minfo.insc++;
 	}
-	if (!menucmp) {
+	if (!menucmp && usemenu != 3) {
 	    inststrlen(" ", 1, 1);
-	    menuinsc++;
-	    if (menuwe)
+	    minfo.insc++;
+	    if (minfo.we)
 		makesuffix(1);
 	}
     }
-    if (menuwe && m->ripre && isset(AUTOPARAMKEYS))
-	makeparamsuffix(((m->flags & CMF_PARBR) ? 1 : 0), menuinsc - parq);
+    if (minfo.we && m->ripre && isset(AUTOPARAMKEYS))
+	makeparamsuffix(((m->flags & CMF_PARBR) ? 1 : 0), minfo.insc - parq);
 
-    if ((menucmp && !menuwe) || !movetoend)
-	cs = menuend;
+    if ((menucmp && !minfo.we) || !movetoend)
+	cs = minfo.end;
+    {
+	Cmatch *om = minfo.cur;
+	struct chdata dat;
+
+	dat.matches = amatches;
+	dat.num = nmatches;
+	dat.cur = m;
+
+	if (menucmp)
+	    minfo.cur = &m;
+	runhookdef(INSERTMATCHHOOK, (void *) &dat);
+	minfo.cur = om;
+    }
 }
 
 /* This maps the value in v into the range [0,m-1], decrementing v
@@ -7643,40 +7707,42 @@ do_ambig_menu(void)
 
     if (usemenu != 3) {
 	menucmp = 1;
-	menucur = NULL;
+	minfo.cur = NULL;
     } else {
 	if (oldlist) {
 	    if (oldins)
 		acceptlast();
 	} else
-	    menucur = NULL;
+	    minfo.cur = NULL;
     }
     if (insgroup) {
 	insgnum = comp_mod(insgnum, permgnum);
-	for (menugrp = amatches;
-	     menugrp && menugrp->num != insgnum + 1;
-	     menugrp = menugrp->next);
-	if (!menugrp || !menugrp->mcount) {
-	    menucur = NULL;
+	for (minfo.group = amatches;
+	     minfo.group && (minfo.group)->num != insgnum + 1;
+	     minfo.group = (minfo.group)->next);
+	if (!minfo.group || !(minfo.group)->mcount) {
+	    minfo.cur = NULL;
+	    minfo.asked = 0;
 	    return;
 	}
-	insmnum = comp_mod(insmnum, menugrp->mcount);
+	insmnum = comp_mod(insmnum, (minfo.group)->mcount);
     } else {
 	int c = 0;
 
 	insmnum = comp_mod(insmnum, permmnum);
-	for (menugrp = amatches;
-	     menugrp && (c += menugrp->mcount) <= insmnum;
-	     menugrp = menugrp->next)
-	    insmnum -= menugrp->mcount;
-	if (!menugrp) {
-	    menucur = NULL;
+	for (minfo.group = amatches;
+	     minfo.group && (c += (minfo.group)->mcount) <= insmnum;
+	     minfo.group = (minfo.group)->next)
+	    insmnum -= (minfo.group)->mcount;
+	if (!minfo.group) {
+	    minfo.cur = NULL;
+	    minfo.asked = 0;
 	    return;
 	}
     }
-    mc = menugrp->matches + insmnum;
+    mc = (minfo.group)->matches + insmnum;
     do_single(*mc);
-    menucur = mc;
+    minfo.cur = mc;
 }
 
 /* Return the length of the common prefix of s and t. */
@@ -7715,7 +7781,7 @@ sfxlen(char *s, char *t)
  * It returns the number of lines printed.       */
 
 /**/
-static int
+int
 printfmt(char *fmt, int n, int dopr)
 {
     char *p = fmt, nc[DIGBUFSIZE];
@@ -7798,7 +7864,8 @@ printfmt(char *fmt, int n, int dopr)
 
 /* This skips over matches that are not to be listed. */
 
-static Cmatch *
+/**/
+Cmatch *
 skipnolist(Cmatch *p)
 {
     while (*p && ((*p)->flags & CMF_NOLIST))
@@ -7813,11 +7880,7 @@ skipnolist(Cmatch *p)
 void
 listmatches(void)
 {
-    Cmgroup g;
-    Cmatch *p, m;
-    Cexpl *e;
-    int nlines = 0, ncols, nlist = 0, longest = 1, pnl = 0;
-    int of = isset(LISTTYPES), opl = 0;
+    struct chdata dat;
 
 #ifdef DEBUG
     /* Sanity check */
@@ -7826,6 +7889,22 @@ listmatches(void)
 	return;
     }
 #endif
+
+    dat.matches = amatches;
+    dat.num = nmatches;
+    dat.cur = NULL;
+    runhookdef(LISTMATCHESHOOK, (void *) &dat);
+}
+
+/**/
+int
+ilistmatches(Hookdef dummy, Chdata dat)
+{
+    Cmgroup g;
+    Cmatch *p, m;
+    Cexpl *e;
+    int nlines = 0, ncols, nlist = 0, longest = 1, pnl = 0;
+    int of = isset(LISTTYPES), opl = 0;
 
     /* Set the cursor below the prompt. */
     trashzle();
@@ -7911,8 +7990,9 @@ listmatches(void)
     }
 
     /* Maybe we have to ask if the user wants to see the list. */
-    if ((complistmax && nlist > complistmax) ||
-	(!complistmax && nlines >= lines)) {
+    if ((!minfo.cur || !minfo.asked) &&
+	((complistmax && nlist > complistmax) ||
+	 (!complistmax && nlines >= lines))) {
 	int qup;
 	zsetterm();
 	qup = printfmt("zsh: do you wish to see all %n possibilities? ", nlist, 1);
@@ -7926,7 +8006,9 @@ listmatches(void)
 		tcmultout(TCUP, TCMULTUP, nlnct);
 	    } else
 		putc('\n', shout);
-	    return;
+	    if (minfo.cur)
+		minfo.asked = 2;
+	    return 0;
 	}
 	if (clearflag) {
 	    putc('\r', shout);
@@ -7936,6 +8018,8 @@ listmatches(void)
 	} else
 	    putc('\n', shout);
 	settyinfo(&shttyinfo);
+	if (minfo.cur)
+	    minfo.asked = 1;
     }
 
     /* Now print the matches. */
@@ -7956,7 +8040,7 @@ listmatches(void)
 		e++;
 	    }
 	}
-	if (pp) {
+	if (pp && *pp) {
 	    if (pnl) {
 		putc('\n', shout);
 		pnl = 0;
@@ -8055,6 +8139,7 @@ listmatches(void)
 	    clearflag = 0, putc('\n', shout);
     } else
 	putc('\n', shout);
+    return 0;
 }
 
 /* This is used to print expansions. */
@@ -8064,9 +8149,9 @@ void
 listlist(LinkList l)
 {
     struct cmgroup dg;
-    Cmgroup am = amatches;
     int vl = validlist, sm = smatches;
     char *oclp = complastprompt;
+    Cmgroup am = amatches;
 
     if (listshown)
 	showagain = 1;
@@ -8074,12 +8159,12 @@ listlist(LinkList l)
     complastprompt = ((zmult == 1) == !!isset(ALWAYSLASTPROMPT) ? "yes" : NULL);
     smatches = 1;
     validlist = 1;
-    amatches = &dg;
     memset(&dg, 0, sizeof(struct cmgroup));
     dg.ylist = (char **) makearray(l, 1, &(dg.lcount), NULL);
-    listmatches();
-
+    amatches = &dg;
+    ilistmatches(NULL, NULL);
     amatches = am;
+
     validlist = vl;
     smatches = sm;
     complastprompt = oclp;
@@ -8153,20 +8238,22 @@ doexpandhist(void)
 }
 
 /**/
-void
-magicspace(void)
+int
+magicspace(char **args)
 {
+    int ret;
     c = ' ';
-    selfinsert();
-    doexpandhist();
+    ret = selfinsert(args);
+    return !doexpandhist();
 }
 
 /**/
-void
-expandhistory(void)
+int
+expandhistory(char **args)
 {
     if (!doexpandhist())
-	feep();
+	return 1;
+    return 0;
 }
 
 static int cmdwb, cmdwe;
@@ -8210,19 +8297,17 @@ getcurcmd(void)
 }
 
 /**/
-void
-processcmd(void)
+int
+processcmd(char **args)
 {
     char *s;
     int m = zmult;
 
     s = getcurcmd();
-    if (!s) {
-	feep();
-	return;
-    }
+    if (!s)
+	return 1;
     zmult = 1;
-    pushline();
+    pushline(zlenoargs);
     zmult = m;
     inststr(bindk->nam);
     inststr(" ");
@@ -8232,11 +8317,12 @@ processcmd(void)
     } LASTALLOC;
     zsfree(s);
     done = 1;
+    return 0;
 }
 
 /**/
-void
-expandcmdpath(void)
+int
+expandcmdpath(char **args)
 {
     int oldcs = cs, na = noaliases;
     char *s, *str;
@@ -8244,16 +8330,12 @@ expandcmdpath(void)
     noaliases = 1;
     s = getcurcmd();
     noaliases = na;
-    if (!s || cmdwb < 0 || cmdwe < cmdwb) {
-	feep();
-	return;
-    }
+    if (!s || cmdwb < 0 || cmdwe < cmdwb)
+	return 1;
     str = findcmd(s, 1);
     zsfree(s);
-    if (!str) {
-	feep();
-	return;
-    }
+    if (!str)
+	return 1;
     cs = cmdwb;
     foredel(cmdwe - cmdwb);
     spaceinline(strlen(str));
@@ -8263,16 +8345,20 @@ expandcmdpath(void)
 	cs += cmdwe - cmdwb + strlen(str);
     if (cs > ll)
 	cs = ll;
+    return 0;
 }
 
 /* Extra function added by AR Iano-Fletcher. */
 /* This is a expand/complete in the vein of wash. */
 
 /**/
-void
-expandorcompleteprefix(void)
+int
+expandorcompleteprefix(char **args)
 {
+    int ret;
+
     comppref = 1;
-    expandorcomplete();
+    ret = expandorcomplete(args);
     comppref = 0;
+    return ret;
 }

@@ -890,6 +890,8 @@ par_subsh(Cmd c)
 static void
 par_funcdef(Cmd c)
 {
+    int oldlineno = lineno;
+    lineno = 0;
     nocorrect = 1;
     incmdpos = 0;
     yylex();
@@ -912,13 +914,17 @@ par_funcdef(Cmd c)
     if (tok == INBRACE) {
 	yylex();
 	c->u.list = par_list();
-	if (tok != OUTBRACE)
+	if (tok != OUTBRACE) {
+	    lineno += oldlineno;
 	    YYERRORV;
+	}
 	yylex();
     } else if (unset(SHORTLOOPS)) {
+	lineno += oldlineno;
 	YYERRORV;
     } else
 	c->u.list = par_list1();
+    lineno += oldlineno;
 }
 
 /*
@@ -1023,6 +1029,8 @@ par_simple(Cmd c)
 		c->redir = newlinklist();
 	    par_redir(c->redir);
 	} else if (tok == INOUTPAR) {
+	    int oldlineno = lineno;
+	    lineno = 0;
 	    incmdpos = 1;
 	    cmdpush(CS_FUNCDEF);
 	    yylex();
@@ -1033,6 +1041,7 @@ par_simple(Cmd c)
 		c->u.list = par_list();
 		if (tok != OUTBRACE) {
 		    cmdpop();
+		    lineno += oldlineno;
 		    YYERROR;
 		}
 		yylex();
@@ -1051,6 +1060,7 @@ par_simple(Cmd c)
 	    }
 	    cmdpop();
 	    c->type = FUNCDEF;
+	    lineno += oldlineno;
 	} else
 	    break;
 	isnull = 0;

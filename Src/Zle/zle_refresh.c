@@ -1004,23 +1004,25 @@ tcoutarg(int cap, int arg)
 }
 
 /**/
-void
-clearscreen(void)
+int
+clearscreen(char **args)
 {
     tcout(TCCLEARSCREEN);
     resetneeded = 1;
     clearflag = 0;
+    return 0;
 }
 
 /**/
-void
-redisplay(void)
+int
+redisplay(char **args)
 {
     moveto(0, 0);
     zputc('\r', shout);		/* extra care */
     tc_upcurs(lprompth - 1);
     resetneeded = 1;
     clearflag = 0;
+    return 0;
 }
 
 /**/

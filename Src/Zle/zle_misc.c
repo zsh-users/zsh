@@ -57,8 +57,8 @@ doinsert(char *str)
 }
 
 /**/
-void
-selfinsert(void)
+int
+selfinsert(char **args)
 {
     char s[3], *p = s;
 
@@ -69,56 +69,61 @@ selfinsert(void)
     *p++ = c;
     *p = 0;
     doinsert(s);
+    return 0;
 }
 
 /**/
-void
-selfinsertunmeta(void)
+int
+selfinsertunmeta(char **args)
 {
     c &= 0x7f;
     if (c == '\r')
 	c = '\n';
-    selfinsert();
+    return selfinsert(args);
 }
 
 /**/
-void
-deletechar(void)
+int
+deletechar(char **args)
 {
     if (zmult < 0) {
+	int ret;
 	zmult = -zmult;
-	backwarddeletechar();
+	ret = backwarddeletechar(args);
 	zmult = -zmult;
-	return;
+	return ret;
     }
     if (cs + zmult <= ll) {
 	cs += zmult;
 	backdel(zmult);
-    } else
-	feep();
+	return 0;
+    }
+    return 1;
 }
 
 /**/
-void
-backwarddeletechar(void)
+int
+backwarddeletechar(char **args)
 {
     if (zmult < 0) {
+	int ret;
 	zmult = -zmult;
-	deletechar();
+	ret = deletechar(args);
 	zmult = -zmult;
-	return;
+	return ret;
     }
     backdel(zmult > cs ? cs : zmult);
+    return 0;
 }
 
 /**/
-void
-killwholeline(void)
+int
+killwholeline(char **args)
 {
     int i, fg, n = zmult;
 
     if (n < 0)
-	return;
+	return 1;
     while (n--) {
 	if ((fg = (cs && cs == ll)))
 	    cs--;
@@ -128,28 +133,31 @@ killwholeline(void)
 	forekill(i - cs + (i != ll), fg);
     }
     clearlist = 1;
+    return 0;
 }
 
 /**/
-void
-killbuffer(void)
+int
+killbuffer(char **args)
 {
     cs = 0;
     forekill(ll, 0);
     clearlist = 1;
+    return 0;
 }
 
 /**/
-void
-backwardkillline(void)
+int
+backwardkillline(char **args)
 {
     int i = 0, n = zmult;
 
     if (n < 0) {
+	int ret;
 	zmult = -n;
-	killline();
+	ret = killline(args);
 	zmult = n;
-	return;
+	return ret;
     }
     while (n--) {
 	if (cs && line[cs - 1] == '\n')
@@ -160,11 +168,12 @@ backwardkillline(void)
     }
     forekill(i, 1);
     clearlist = 1;
+    return 0;
 }
 
 /**/
-void
-gosmacstransposechars(void)
+int
+gosmacstransposechars(char **args)
 {
     int cc;
 
@@ -172,19 +181,19 @@ gosmacstransposechars(void)
 	if (cs == ll || line[cs] == '\n' ||
 	    ((cs + 1 == ll || line[cs + 1] == '\n') &&
 	     (!cs || line[cs - 1] == '\n'))) {
-	    feep();
-	    return;
+	    return 1;
 	}
 	cs += (cs == 0 || line[cs - 1] == '\n') ? 2 : 1;
     }
     cc = line[cs - 2];
     line[cs - 2] = line[cs - 1];
     line[cs - 1] = cc;
+    return 0;
 }
 
 /**/
-void
-transposechars(void)
+int
+transposechars(char **args)
 {
     int cc, ct;
     int n = zmult;
@@ -194,10 +203,8 @@ transposechars(void)
 	n = -n;
     while (n--) {
 	if (!(ct = cs) || line[cs - 1] == '\n') {
-	    if (ll == cs || line[cs] == '\n') {
-		feep();
-		return;
-	    }
+	    if (ll == cs || line[cs] == '\n')
+		return 1;
 	    if (!neg)
 		cs++;
 	    ct++;
@@ -214,29 +221,28 @@ transposechars(void)
 	}
 	if (ct == ll || line[ct] == '\n')
 	    ct--;
-	if (ct < 1 || line[ct - 1] == '\n') {
-	    feep();
-	    return;
-	}
+	if (ct < 1 || line[ct - 1] == '\n')
+	    return 1;
 	cc = line[ct - 1];
 	line[ct - 1] = line[ct];
 	line[ct] = cc;
     }
+    return 0;
 }
 
 /**/
-void
-poundinsert(void)
+int
+poundinsert(char **args)
 {
     cs = 0;
-    vifirstnonblank();
+    vifirstnonblank(zlenoargs);
     if (line[cs] != '#') {
 	spaceinline(1);
 	line[cs] = '#';
 	cs = findeol();
 	while(cs != ll) {
 	    cs++;
-	    vifirstnonblank();
+	    vifirstnonblank(zlenoargs);
 	    spaceinline(1);
 	    line[cs] = '#';
 	    cs = findeol();
@@ -246,42 +252,46 @@ poundinsert(void)
 	cs = findeol();
 	while(cs != ll) {
 	    cs++;
-	    vifirstnonblank();
+	    vifirstnonblank(zlenoargs);
 	    if(line[cs] == '#')
 		foredel(1);
 	    cs = findeol();
 	}
     }
     done = 1;
+    return 0;
 }
 
 /**/
-void
-acceptline(void)
+int
+acceptline(char **args)
 {
     done = 1;
+    return 0;
 }
 
 /**/
-void
-acceptandhold(void)
+int
+acceptandhold(char **args)
 {
     pushnode(bufstack, metafy((char *)line, ll, META_DUP));
     stackcs = cs;
     done = 1;
+    return 0;
 }
 
 /**/
-void
-killline(void)
+int
+killline(char **args)
 {
     int i = 0, n = zmult;
 
     if (n < 0) {
+	int ret;
 	zmult = -n;
-	backwardkillline();
+	ret = backwardkillline(args);
 	zmult = n;
-	return;
+	return ret;
     }
     while (n--) {
 	if (line[cs] == '\n')
@@ -292,11 +302,12 @@ killline(void)
     }
     backkill(i, 0);
     clearlist = 1;
+    return 0;
 }
 
 /**/
-void
-killregion(void)
+int
+killregion(char **args)
 {
     if (mark > ll)
 	mark = ll;
@@ -304,11 +315,12 @@ killregion(void)
 	forekill(mark - cs, 0);
     else
 	backkill(cs - mark, 1);
+    return 0;
 }
 
 /**/
-void
-copyregionaskill(void)
+int
+copyregionaskill(char **args)
 {
     if (mark > ll)
 	mark = ll;
@@ -316,25 +328,24 @@ copyregionaskill(void)
 	cut(cs, mark - cs, 0);
     else
 	cut(mark, cs - mark, 1);
+    return 0;
 }
 
 static int kct, yankb, yanke;
 
 /**/
-void
-yank(void)
+int
+yank(char **args)
 {
     Cutbuffer buf = &cutbuf;
     int n = zmult;
 
     if (n < 0)
-	return;
+	return 1;
     if (zmod.flags & MOD_VIBUF)
 	buf = &vibuf[zmod.vibuf];
-    if (!buf->buf) {
-	feep();
-	return;
-    }
+    if (!buf->buf)
+	return 1;
     mark = cs;
     yankb = cs;
     while (n--) {
@@ -344,18 +355,17 @@ yank(void)
 	cs += buf->len;
 	yanke = cs;
     }
+    return 0;
 }
 
 /**/
-void
-yankpop(void)
+int
+yankpop(char **args)
 {
     int cc;
 
-    if (!(lastcmd & ZLE_YANK) || !kring[kct].buf) {
-	feep();
-	return;
-    }
+    if (!(lastcmd & ZLE_YANK) || !kring[kct].buf)
+	return 1;
     cs = yankb;
     foredel(yanke - yankb);
     cc = kring[kct].len;
@@ -364,17 +374,20 @@ yankpop(void)
     cs += cc;
     yanke = cs;
     kct = (kct + KRINGCT - 1) % KRINGCT;
+    return 0;
 }
 
 /**/
-void
-overwritemode(void)
+int
+overwritemode(char **args)
 {
     insmode ^= 1;
+    return 0;
 }
+
 /**/
-void
-whatcursorposition(void)
+int
+whatcursorposition(char **args)
 {
     char msg[100];
     char *s = msg;
@@ -408,18 +421,19 @@ whatcursorposition(void)
     sprintf(s, "  point %d of %d(%d%%)  column %d", cs+1, ll+1,
 	    ll ? 100 * cs / ll : 0, cs - bol);
     showmsg(msg);
+    return 0;
 }
 
 /**/
-void
-undefinedkey(void)
+int
+undefinedkey(char **args)
 {
-    feep();
+    return 1;
 }
 
 /**/
-void
-quotedinsert(void)
+int
+quotedinsert(char **args)
 {
 #ifndef HAS_TIO
     struct sgttyb sob;
@@ -433,16 +447,19 @@ quotedinsert(void)
     zsetterm();
 #endif
     if (c < 0)
-	feep();
+	return 1;
     else
-	selfinsert();
+	return selfinsert(args);
 }
 
 /**/
-void
-digitargument(void)
+int
+digitargument(char **args)
 {
     int sign = (zmult < 0) ? -1 : 1;
+
+    if (c < '0' || c > '9')
+	return 1;
 
     if (!(zmod.flags & MOD_TMULT))
 	zmod.tmult = 0;
@@ -455,26 +472,31 @@ digitargument(void)
 	zmod.tmult = zmod.tmult * 10 + sign * (c & 0xf);
     zmod.flags |= MOD_TMULT;
     prefixflag = 1;
+    return 0;
 }
 
 /**/
-void
-negargument(void)
+int
+negargument(char **args)
 {
-    if(zmod.flags & MOD_TMULT) {
-	feep();
-	return;
-    }
+    if (zmod.flags & MOD_TMULT)
+	return 1;
     zmod.tmult = -1;
     zmod.flags |= MOD_TMULT|MOD_NEG;
     prefixflag = 1;
+    return 0;
 }
 
 /**/
-void
-universalargument(void)
+int
+universalargument(char **args)
 {
     int digcnt = 0, pref = 0, minus = 1, gotk;
+    if (*args) {
+	zmod.mult = atoi(*args);
+	zmod.flags |= MOD_MULT;
+	return 0;
+    }
     while ((gotk = getkey(0)) != EOF) {
 	if (gotk == '-' && !digcnt) {
 	    minus = -1;
@@ -493,11 +515,12 @@ universalargument(void)
 	zmod.tmult *= 4;
     zmod.flags |= MOD_TMULT;
     prefixflag = 1;
+    return 0;
 }
 
 /**/
-void
-copyprevword(void)
+int
+copyprevword(char **args)
 {
     int len, t0;
 
@@ -513,18 +536,20 @@ copyprevword(void)
     spaceinline(len);
     memcpy((char *)&line[cs], (char *)&line[t0], len);
     cs += len;
+    return 0;
 }
 
 /**/
-void
-sendbreak(void)
+int
+sendbreak(char **args)
 {
     errflag = 1;
+    return 1;
 }
 
 /**/
-void
-quoteregion(void)
+int
+quoteregion(char **args)
 {
     char *str;
     size_t len;
@@ -544,11 +569,12 @@ quoteregion(void)
     memcpy((char *)&line[cs], str, len);
     mark = cs;
     cs += len;
+    return 0;
 }
 
 /**/
-void
-quoteline(void)
+int
+quoteline(char **args)
 {
     char *str;
     size_t len = ll;
@@ -557,6 +583,7 @@ quoteline(void)
     sizeline(len);
     memcpy(line, str, len);
     cs = ll = len;
+    return 0;
 }
 
 /**/
@@ -612,7 +639,7 @@ Thingy
 executenamedcommand(char *prmt)
 {
     Thingy cmd;
-    int len, l = strlen(prmt), ols = listshown;
+    int len, l = strlen(prmt), ols = listshown, feep = 0;
     char *ptr;
     char *okeymap = curkeymapname;
 
@@ -637,20 +664,20 @@ executenamedcommand(char *prmt)
 	    return NULL;
 	}
 	if(cmd == Th(z_clearscreen)) {
-	    clearscreen();
+	    clearscreen(zlenoargs);
 	} else if(cmd == Th(z_redisplay)) {
-	    redisplay();
+	    redisplay(zlenoargs);
 	} else if(cmd == Th(z_viquotedinsert)) {
 	    *ptr = '^';
 	    zrefresh();
 	    c = getkey(0);
 	    if(c == EOF || !c || len == NAMLEN)
-		feep();
+		feep = 1;
 	    else
 		*ptr++ = c, len++;
 	} else if(cmd == Th(z_quotedinsert)) {
 	    if((c = getkey(0)) == EOF || !c || len == NAMLEN)
-		feep();
+		feep = 1;
 	    else
 		*ptr++ = c, len++;
 	} else if(cmd == Th(z_backwarddeletechar) ||
@@ -701,7 +728,7 @@ executenamedcommand(char *prmt)
 		    scanhashtable(thingytab, 1, 0, DISABLED, scancompcmd, 0);
 		} LASTALLOC;
 		if (empty(cmdll))
-		    feep();
+		    feep = 1;
 		else if (cmd == Th(z_listchoices) ||
 		    cmd == Th(z_deletecharorlist)) {
 		    int zmultsav = zmult;
@@ -723,7 +750,7 @@ executenamedcommand(char *prmt)
 			!(isset(LISTAMBIGUOUS) && cmdambig > len)) {
 			int zmultsav = zmult;
 			if (isset(LISTBEEP))
-			    feep();
+			    feep = 1;
 			statusll = l + cmdambig + 1;
 			zmult = 1;
 			listlist(cmdll);
@@ -733,12 +760,14 @@ executenamedcommand(char *prmt)
 		}
 	    } else {
 		if (len == NAMLEN || icntrl(c) || cmd != Th(z_selfinsert))
-		    feep();
+		    feep = 1;
 		else
 		    *ptr++ = c, len++;
 	    }
 	}
-	handlefeep();
+	if (feep)
+	    handlefeep(zlenoargs);
+	feep = 0;
     }
 }
 

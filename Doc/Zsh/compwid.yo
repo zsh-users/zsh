@@ -26,7 +26,8 @@ of the builtin widgets that handle completions can be given:
 tt(complete-word), tt(expand-or-complete),
 tt(expand-or-complete-prefix), tt(menu-complete),
 tt(menu-expand-or-complete), tt(reverse-menu-complete),
-tt(list-choices), or tt(delete-char-or-list).
+tt(list-choices), or tt(delete-char-or-list).  Note that this will still
+work even if the widget in question has been rebound.
 
 startmenu()
 menu(Special Parameters)
@@ -346,7 +347,7 @@ xitem(tt(compadd) [ tt(-qQfnUam) ] [ tt(-F) var(array) ])
 xitem([ tt(-P) var(prefix) ] [ tt(-S) var(suffix) ])
 xitem([ tt(-p) var(hidden-prefix) ] [ tt(-s) var(hidden-suffix) ])
 xitem([ tt(-i) var(ignored-prefix) ] [ tt(-I) var(ignored-suffix) ])
-xitem([ tt(-W) var(file-prefix) ])
+xitem([ tt(-W) var(file-prefix) ] [ tt(-y) var(array) ])
 xitem([ tt(-J) var(name) ] [ tt(-V) var(name) ] [ tt(-X) var(explanation) ])
 xitem([ tt(-r) var(remove-chars) ] [ tt(-R) var(remove-func) ])
 xitem([ tt(-M) var(match-spec) ] [ tt(-O) var(array) ] [ tt(-A) var(array) ])
@@ -405,6 +406,12 @@ match.
 )
 item(tt(-I) var(ignored-suffix))(
 Like tt(-i), but gives an ignored suffix.
+)
+item(tt(-y) var(array))(
+This gives a number of string to display instead of the matches. This
+is like the tt(-y) option of the tt(compctl) builtin command but the
+var(array) argument may only be the name of an array parameter or a
+literal array in parentheses containing the strings to display.
 )
 item(tt(-J) var(name))(
 As for tt(compctl) and tt(compgen), this gives the name of the group

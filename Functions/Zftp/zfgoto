@@ -1,0 +1,86 @@
+# zfgoto bname
+# Go to bookmark bname, a location on a remote FTP host.  Unless
+# this was the last session or is for anonymous FTP, prompt for
+# the user's password.
+
+emulate -L zsh
+setopt extendedglob
+
+# Set ZFTP_BMFILE if not already set.  This should agree with
+# the corresponding line in zfmark.
+: ${ZFTP_BMFILE:=${ZFDOTDIR:-$HOME}/.zfbkmarks}
+
+typeset -A bkmarks
+local line ncftp opt optlist
+
+while [[ $1 == -* ]]; do
+  if [[ $1 == - || $1 == -- ]]; then
+    shift;
+    break;
+  fi
+  optlist=${1#-}
+  for (( i = 1; i <= $#optlist; i++)); do
+    opt=$optlist[$i]
+    case $opt in
+      n) ncftp=1
+	 ;;
+      *) print option $opt not recognised >&2
+	 return 1
+	 ;;
+    esac
+  done
+  shift
+done
+
+if (( $# != 1 )); then
+  print "Usage: zfgoto bookmark" >&2
+  return 1
+fi
+
+if [[ -n $ncftp && -f ~/.ncftp/bookmarks ]]; then
+  local oldifs=$IFS
+  IFS=,
+  while read -rA line; do
+    bkmarks[$line[1]]="${line[3]:-anonymous}@${line[2]}:${line[6]}"
+  done < ~/.ncftp/bookmarks
+  IFS=$oldifs
+elif [[ -f $ZFTP_BMFILE ]]; then
+  # read in file:  could optimise this by recording last read time
+  # comparing with file
+  while read -r line; do
+    # ignore blank and comment lines
+    [[ $line = [[:blank:]]# || $line = [[:blank:]]#'#'* ]] && continue
+    bkmarks[${line%% *}]="${line#* }"
+  done <$ZFTP_BMFILE
+fi
+
+line=${bkmarks[$1]}
+
+if [[ -z $line ]]; then
+  print "Bookmark \`$1' not found" >&2
+  return 1
+fi
+
+local user host dir
+user=${line%%@*}
+line=${line#*@}
+host=${line%%:*}
+dir=${line#*:}
+
+if [[ $user = ftp || $user = anonymous ]]; then
+  # Anonymous ftp, so we don't need password etc.
+  zfanon $host && [[ -n $dir ]] && zfcd $dir
+elif [[ $zflastsession = ${host}:* && $user = $zflastuser ]]; then
+  # This was the last session, so assume it's still setup in the
+  # open parameters
+  zfopen && [[ -n $dir ]] && zfcd $dir
+else
+  # Last try: see if it's in the parameters.
+  local params
+  params=($(zftp params))
+  if [[ $host = $params[1] && $user = $params[2] ]]; then
+    zfopen && [[ -n $dir ]] && zfcd $dir
+  else
+    zfopen $host $user && [[ -n $dir ]] && zfcd $dir
+  fi
+fi

@@ -11,12 +11,17 @@
 # with one of the suffixes thus given are treated like files with one
 # of the suffixes in the `fignore' array in normal completion.
 #
-# This function supports one configuration key:
+# This function supports two configuration keys:
 #
 #  path_expand
 #    If this is set to a non-empty string, the partially typed path
 #    from the line will be expanded as far as possible even if trailing
 #    pathname components can not be completed.
+#
+#  path_cursor
+#    If this is set to an non-empty string, the cursor will be placed
+#    in the path after the ambiguous pathname component even when using
+#    menucompletion.
 
 local linepath realpath donepath prepath testpath exppath
 local tmp1 tmp2 tmp3 tmp4 i orig pre suf tpre tsuf
@@ -304,10 +309,11 @@ for prepath in "$prepaths[@]"; do
       # it as far as possible.
 
       if [[ -n $menu ]]; then
+        [[ -n "$compconfig[path_cursor]" ]] && compstate[to_end]=''
         if [[ "$tmp3" = */* ]]; then
 	  compadd -Uf -p "$linepath$testpath" -s "/${tmp3#*/}" \
 	          -W "$prepath$realpath$testpath" "$ignore[@]" \
-		  "$addpfx[@]" "$addsfx[@]" "$remsfx[@]" \
+		  "$addpfx[@]" "$addsfx[@]" "$remsfx[@]" -M 'r:|/=* r:|=*' \
 		  "$group[@]" "$expl[@]" -i "$IPREFIX" -I "$ISUFFIX" \
 		  - "${(@)tmp1%%/*}"
 	else
@@ -371,9 +377,9 @@ done
 exppaths=( "${(@)exppaths:#$orig}" )
 
 if [[ -n "$compconfig[path_expand]" &&
-      $#exppaths -ne 0 && nm -eq compstate[nmatches] ]]; then
-  compadd -U -S '' "$group[@]" "$expl[@]" -i "$IPREFIX" -I "$ISUFFIX" \
-          -p "$linepath" - "${(@)exppaths}"
+      $#exppaths -eq 0 && nm -eq compstate[nmatches] ]]; then
+  compadd -QU -S '' "$group[@]" "$expl[@]" -i "$IPREFIX" -I "$ISUFFIX" \
+          -M 'r:|/=* r:|=*' -p "$linepath" - "${(@)exppaths}"
 fi
 
 [[ nm -eq compstate[nmatches] ]]

@@ -38,7 +38,7 @@ typedef struct thingy *Thingy;
 
 /* widgets (ZLE functions) */
 
-typedef void (*ZleIntFunc) _((void));
+typedef int (*ZleIntFunc) _((char **));
 
 struct widget {
     int flags;		/* flags (see below) */
@@ -54,16 +54,17 @@ struct widget {
     } u;
 };
 
-#define WIDGET_INT	(1<<0)    /* widget is internally implemented */
-#define WIDGET_NCOMP    (1<<1)    /* new style completion widget */
-#define ZLE_MENUCMP	(1<<2)    /* DON'T invalidate completion list */
+#define WIDGET_INT	(1<<0)	/* widget is internally implemented */
+#define WIDGET_NCOMP    (1<<1)	/* new style completion widget */
+#define ZLE_MENUCMP	(1<<2)	/* DON'T invalidate completion list */
 #define ZLE_YANK	(1<<3)
-#define ZLE_LINEMOVE	(1<<4)    /* command is a line-oriented movement */
-#define ZLE_LASTCOL     (1<<5)    /* command maintains lastcol correctly */
+#define ZLE_LINEMOVE	(1<<4)	/* command is a line-oriented movement */
+#define ZLE_LASTCOL     (1<<5)	/* command maintains lastcol correctly */
 #define ZLE_KILL	(1<<6)
-#define ZLE_KEEPSUFFIX	(1<<7)    /* DON'T remove added suffix */
-#define ZLE_NOTCOMMAND  (1<<8)    /* widget should not alter lastcmd */
-#define ZLE_ISCOMP      (1<<9)	  /* usable for new style completion */
+#define ZLE_KEEPSUFFIX	(1<<7)	/* DON'T remove added suffix */
+#define ZLE_NOTCOMMAND  (1<<8)	/* widget should not alter lastcmd */
+#define ZLE_ISCOMP      (1<<9)	/* usable for new style completion */
+
 /* thingies */
 
 struct thingy {
@@ -142,3 +143,9 @@ typedef struct cutbuffer *Cutbuffer;
 #define CUTBUFFER_LINE 1   /* for vi: buffer contains whole lines of data */
 
 #define KRINGCT 8   /* number of buffers in the kill ring */
+
+/* Convenience macros for the hooks */
+
+#define LISTMATCHESHOOK (zlehooks + 0)
+#define INSERTMATCHHOOK (zlehooks + 1)
+#define MENUSTARTHOOK   (zlehooks + 2)

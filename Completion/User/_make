@@ -1,4 +1,24 @@
 #compdef make gmake pmake
 
-compgen -s "\$(awk '/^[a-zA-Z0-9][^\/ 	]+:/ {print \$1}' FS=: [mM]akefile /dev/null)" ||
-_files
+local prev="$words[CURRENT-1]" file ret=1
+
+if [[ "$prev" = -[CI] ]]; then
+  _files -/
+elif [[ "$prev" = -[foW] ]]; then
+  _files
+else
+  file="$words[(I)-f]"
+  if (( file )); then
+    file="$words[file+1]"
+  elif [[ -e Makefile ]]; then
+    file=Makefile
+  elif [[ -e makefile ]]; then
+    file=makefile
+  else
+    file=''
+  fi
+
+  [[ -n "$file" ]] &&
+    compadd - $(awk '/^[a-zA-Z0-9][^/ 	]+:/ {print $1}' FS=: $file) && ret=0
+  (( ret )) && _files
+fi

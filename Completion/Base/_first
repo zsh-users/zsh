@@ -40,9 +40,9 @@
 #       PREFIX="$PREFIX[1,-2]"
 #       # If a numeric prefix is given, we use it as the number of
 #       # lines (multiplied by ten below) in the history to search.
-#       if [[ NUMERIC -gt 1 ]]; then
+#       if [[ ${NUMERIC:-1} -gt 1 ]]; then
 #         max=$NUMERIC
-#         NUMERIC=1
+#         unset NUMERIC
 #       else
 #         # The default is to search the last 100 lines.
 #         max=10

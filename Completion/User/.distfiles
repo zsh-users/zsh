@@ -1,6 +1,6 @@
 DISTFILES_SRC='
     .distfiles
-    _a2ps _compress _configure _dd _dvi _find _gunzip _gzip _hosts
-    _make _man _mh _pdf _ps _rcs _rlogin _strip _stty _tar _tar_archive
-    _tex _uncompress _x_options _xfig 
+    _a2ps _chown _compress _configure _dd _dvi _find _groups _gunzip _gzip
+    _hosts _make _man _mh _pdf _ps _rcs _rlogin _strip _stty
+    _tar _tar_archive _tex _uncompress _x_options _xfig 
 '

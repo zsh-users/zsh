@@ -133,14 +133,17 @@ static int doneps4;
 
 /**/
 List
-parse_string(char *s)
+parse_string(char *s, int ln)
 {
     List l;
+    int oldlineno = lineno;
 
     lexsave();
-    inpush(s, 0, NULL);
+    inpush(s, (ln ? INP_LINENO : 0), NULL);
     strinbeg(0);
+    lineno = ln ? 1 : -1;
     l = parse_list();
+    lineno = oldlineno;
     strinend();
     inpop();
     lexrestore();
@@ -301,7 +304,9 @@ execcursh(Cmd cmd, LinkList args, int flags)
 {
     if (!list_pipe)
 	deletejob(jobtab + thisjob);
+    cmdpush(CS_CURSH);
     execlist(cmd->u.list, 1, flags & CFLAG_EXEC);
+    cmdpop();
 
     return lastval;
 }
@@ -354,7 +359,9 @@ zexecve(char *pth, char **argv)
 		    if (execvebuf[1] == '!') {
 			for (t0 = 0; t0 != ct; t0++)
 			    if (execvebuf[t0] == '\n')
-				execvebuf[t0] = '\0';
+				break;
+			while (inblank(execvebuf[t0]))
+			    execvebuf[t0--] = '\0';
 			execvebuf[POUNDBANGLIMIT] = '\0';
 			for (ptr = execvebuf + 2; *ptr && *ptr == ' '; ptr++);
 			for (ptr2 = ptr; *ptr && *ptr != ' '; ptr++);
@@ -676,7 +683,7 @@ execstring(char *s, int dont_change_job, int exiting)
     List list;
 
     pushheap();
-    if ((list = parse_string(s)))
+    if ((list = parse_string(s, 0)))
 	execlist(list, dont_change_job, exiting);
     popheap();
 }
@@ -694,8 +701,8 @@ execlist(List list, int dont_change_job, int exiting)
 {
     Sublist slist;
     static int donetrap;
-    int ret, cj;
-    int old_pline_level, old_list_pipe;
+    int ret, cj, csp;
+    int old_pline_level, old_list_pipe, oldlineno;
     /*
      * ERREXIT only forces the shell to exit if the last command in a &&
      * or || fails.  This is the case even if an earlier command is a
@@ -707,6 +714,7 @@ execlist(List list, int dont_change_job, int exiting)
     cj = thisjob;
     old_pline_level = pline_level;
     old_list_pipe = list_pipe;
+    oldlineno = lineno;
 
     if (sourcelevel && unset(SHINSTDIN))
 	pline_level = list_pipe = 0;
@@ -718,6 +726,7 @@ execlist(List list, int dont_change_job, int exiting)
 	 * called once for each sublist that fails.          */
 	donetrap = 0;
 	slist = list->left;
+	csp = cmdsp;
 
 	/* Loop through code followed by &&, ||, or end of sublist. */
 	while (slist) {
@@ -744,6 +753,7 @@ execlist(List list, int dont_change_job, int exiting)
 			goto sublist_done;
 		    }
 		}
+		cmdpush(CS_CMDAND);
 		break;
 	    case ORNEXT:
 		/* If the return code is zero, we skip pipelines until *
@@ -760,12 +770,14 @@ execlist(List list, int dont_change_job, int exiting)
 			goto sublist_done;
 		     }
 		}
+		cmdpush(CS_CMDOR);
 		break;
 	    }
 	    slist = slist->right;
 	}
 sublist_done:
 
+	cmdsp = csp;
 	noerrexit = oldnoerrexit;
 
 	if (sigtrapped[SIGDEBUG])
@@ -794,6 +806,7 @@ sublist_done:
 
     pline_level = old_pline_level;
     list_pipe = old_list_pipe;
+    lineno = oldlineno;
     if (dont_change_job)
 	thisjob = cj;
 }
@@ -888,6 +901,9 @@ execpline(Sublist l, int how, int last1)
 		    DPUTS(!list_pipe_pid, "invalid list_pipe_pid");
 		    addproc(list_pipe_pid, list_pipe_text);
 
+		    if (!jn->procs->next)
+			jn->gleader = mypgrp;
+
 		    for (pn = jobtab[jn->other].procs; pn; pn = pn->next)
 			if (WIFSTOPPED(pn->status))
 			    break;
@@ -901,12 +917,14 @@ execpline(Sublist l, int how, int last1)
 		    jn->stat |= STAT_STOPPED | STAT_CHANGED;
 		    printjob(jn, !!isset(LONGLISTJOBS), 1);
 		}
-		else
+		else if (newjob != list_pipe_job)
 		    deletejob(jn);
+		else
+		    lastwj = -1;
 	    }
 
 	    for (; !nowait;) {
-		if (list_pipe_child) {
+		if (list_pipe_child || pline_level) {
 		    jn->stat |= STAT_NOPRINT;
 		    makerunning(jn);
 		}
@@ -917,8 +935,11 @@ execpline(Sublist l, int how, int last1)
 		    jn->stat & STAT_DONE &&
 		    lastval2 & 0200)
 		    killpg(mypgrp, lastval2 & ~0200);
-		if ((list_pipe || last1) && !list_pipe_child &&
-		    jn->stat & STAT_STOPPED) {
+		if ((list_pipe || last1 || pline_level) &&
+		    !list_pipe_child && 
+		    ((jn->stat & STAT_STOPPED) ||
+		     (list_pipe_job && pline_level &&
+		      (jobtab[list_pipe_job].stat & STAT_STOPPED)))) {
 		    pid_t pid;
 		    int synch[2];
 
@@ -944,21 +965,28 @@ execpline(Sublist l, int how, int last1)
 			close(synch[1]);
 			read(synch[0], &dummy, 1);
 			close(synch[0]);
-			jobtab[list_pipe_job].other = newjob;
-			jobtab[list_pipe_job].stat |= STAT_SUPERJOB;
-			jn->stat |= STAT_SUBJOB | STAT_NOPRINT;
-			jn->other = pid;
-			killpg(jobtab[list_pipe_job].gleader, SIGSTOP);
+			/* If this job has finished, we leave it as a
+			 * normal (non-super-) job. */
+			if (!(jn->stat & STAT_DONE)) {
+			    jobtab[list_pipe_job].other = newjob;
+			    jobtab[list_pipe_job].stat |= STAT_SUPERJOB;
+			    jn->stat |= STAT_SUBJOB | STAT_NOPRINT;
+			    jn->other = pid;
+			}
+			if ((list_pipe || last1) && jobtab[list_pipe_job].procs)
+			    killpg(jobtab[list_pipe_job].gleader, SIGSTOP);
 			break;
 		    }
 		    else {
 			close(synch[0]);
 			entersubsh(Z_ASYNC, 0, 0);
-			setpgrp(0L, mypgrp = jobtab[list_pipe_job].gleader);
+			if (jobtab[list_pipe_job].procs)
+			    setpgrp(0L, mypgrp = jobtab[list_pipe_job].gleader);
 			close(synch[1]);
 			kill(getpid(), SIGSTOP);
 			list_pipe = 0;
 			list_pipe_child = 1;
+			opts[INTERACTIVE] = 0;
 			break;
 		    }
 		}
@@ -975,7 +1003,8 @@ execpline(Sublist l, int how, int last1)
 		jn->stat |= STAT_NOPRINT;
 		killjb(jobtab + pj, lastval & ~0200);
 	    }
-	    if (list_pipe_child || (list_pipe && (jn->stat & STAT_DONE)))
+	    if (list_pipe_child || ((list_pipe || pline_level) &&
+				    (jn->stat & STAT_DONE)))
 		deletejob(jn);
 	    thisjob = pj;
 
@@ -998,19 +1027,19 @@ execpline2(Pline pline, int how, int input, int output, int last1)
 {
     pid_t pid;
     int pipes[2];
-    int oldlineno;
 
     if (breaks || retflag)
 	return;
 
-    oldlineno = lineno;
-    lineno = pline->left->lineno;
+    if (pline->left->lineno >= 0)
+	lineno = pline->left->lineno;
 
-    if (pline_level == 1)
+    if (pline_level == 1) {
 	if (!sfcontext)
 	    strcpy(list_pipe_text, getjobtext((void *) pline->left));
 	else
 	    list_pipe_text[0] = '\0';
+    }
     if (pline->type == END)
 	execcmd(pline->left, input, output, how, last1 ? 1 : 2);
     else {
@@ -1054,15 +1083,15 @@ execpline2(Pline pline, int how, int input, int output, int last1)
 	if (pline->right) {
 	    /* if another execpline() is invoked because the command is *
 	     * a list it must know that we're already in a pipeline     */
+	    cmdpush(CS_PIPE);
 	    list_pipe = 1;
 	    execpline2(pline->right, how, pipes[0], output, last1);
 	    list_pipe = old_list_pipe;
+	    cmdpop();
 	    zclose(pipes[0]);
 	    subsh_close = -1;
 	}
     }
-
-    lineno = oldlineno;
 }
 
 /* make the argv array */
@@ -1079,7 +1108,7 @@ makecline(LinkList list)
     argv = 2 + (char **) ncalloc((countlinknodes(list) + 4) * sizeof(char *));
     if (isset(XTRACE)) {
 	if (!doneps4)
-	    fprintf(stderr, "%s", (prompt4) ? prompt4 : "");
+	    printprompt4();
 
 	for (node = firstnode(list); node; incnode(node)) {
 	    *ptr++ = (char *)getdata(node);
@@ -1283,7 +1312,7 @@ addvars(LinkList l, int export)
 
     xtr = isset(XTRACE);
     if (xtr && nonempty(l)) {
-	fprintf(stderr, "%s", prompt4 ? prompt4 : "");
+	printprompt4();
 	doneps4 = 1;
     }
 
@@ -2179,8 +2208,9 @@ entersubsh(int how, int cl, int fake)
 		    attachtty(jobtab[thisjob].gleader);
 	    }
 	}
-	else if (!jobtab[thisjob].gleader ||
-		 (setpgrp(0L, jobtab[thisjob].gleader) == -1)) {
+	else if (!(list_pipe || list_pipe_child || pline_level > 1) &&
+		 (!jobtab[thisjob].gleader ||
+		  setpgrp(0L, jobtab[thisjob].gleader) == -1)) {
 	    jobtab[thisjob].gleader = getpid();
 	    if (list_pipe_job != thisjob &&
 		!jobtab[list_pipe_job].gleader)
@@ -2322,7 +2352,7 @@ getoutput(char *cmd, int qt)
     Cmd c;
     Redir r;
 
-    if (!(list = parse_string(cmd)))
+    if (!(list = parse_string(cmd, 0)))
 	return NULL;
     if (list != &dummy_list && !list->right && !list->left->flags &&
 	list->left->type == END && list->left->left->type == END &&
@@ -2451,7 +2481,7 @@ parsecmd(char *cmd)
 	return NULL;
     }
     *str = '\0';
-    if (str[1] || !(list = parse_string(cmd + 2))) {
+    if (str[1] || !(list = parse_string(cmd + 2, 0))) {
 	zerr("parse error in process substitution", NULL, 0);
 	return NULL;
     }
@@ -2661,7 +2691,8 @@ execcond(Cmd cmd, LinkList args, int flags)
 {
     int stat;
     if (isset(XTRACE)) {
-	fprintf(stderr, "%s[[", prompt4 ? prompt4 : "");
+	printprompt4();
+	fprintf(stderr, "[[");
 	tracingcond++;
     }
     stat = !evalcond(cmd->u.cond);
@@ -2682,8 +2713,10 @@ execarith(Cmd cmd, LinkList args, int flags)
     char *e;
     zlong val = 0;
 
-    if (isset(XTRACE))
-	fprintf(stderr, "%s((", prompt4 ? prompt4 : "");
+    if (isset(XTRACE)) {
+	printprompt4();
+	fprintf(stderr, "((");
+    }
     if (args)
 	while ((e = (char *) ugetnode(args))) {
 	    if (isset(XTRACE))
@@ -2759,21 +2792,22 @@ static void
 execshfunc(Cmd cmd, Shfunc shf, LinkList args)
 {
     LinkList last_file_list = NULL;
+    unsigned char *ocs;
+    int ocsp;
 
     if (errflag)
 	return;
 
-    if (!list_pipe) {
+    if (!list_pipe && thisjob != list_pipe_job) {
 	/* Without this deletejob the process table *
 	 * would be filled by a recursive function. */
 	last_file_list = jobtab[thisjob].filelist;
 	jobtab[thisjob].filelist = NULL;
 	deletejob(jobtab + thisjob);
     }
-
     if (isset(XTRACE)) {
 	LinkNode lptr;
-	fprintf(stderr, "%s", prompt4 ? prompt4 : prompt4);
+	printprompt4();
 	if (args)
 	    for (lptr = firstnode(args); lptr; incnode(lptr)) {
 		if (lptr != firstnode(args))
@@ -2783,8 +2817,14 @@ execshfunc(Cmd cmd, Shfunc shf, LinkList args)
 	fputc('\n', stderr);
 	fflush(stderr);
     }
-
+    ocs = cmdstack;
+    ocsp = cmdsp;
+    cmdstack = (unsigned char *) zalloc(CMDSTACKSZ);
+    cmdsp = 0;
     doshfunc(shf->nam, shf->funcdef, args, shf->flags, 0);
+    free(cmdstack);
+    cmdstack = ocs;
+    cmdsp = ocsp;
 
     if (!list_pipe)
 	deletefilelist(last_file_list);
@@ -2842,9 +2882,8 @@ doshfunc(char *name, List list, LinkList doshargs, int flags, int noreturnval)
  * was executed.                                            */
 {
     char **tab, **x, *oargv0 = NULL;
-    int xexittr, newexittr, oldzoptind, oldlastval;
-    void *xexitfn, *newexitfn;
-    char saveopts[OPT_SIZE];
+    int oldzoptind, oldlastval;
+    char saveopts[OPT_SIZE], *oldscriptname;
     int obreaks = breaks;
 
     HEAPALLOC {
@@ -2852,14 +2891,12 @@ doshfunc(char *name, List list, LinkList doshargs, int flags, int noreturnval)
 	if (trapreturn < 0)
 	    trapreturn--;
 	oldlastval = lastval;
-	xexittr = sigtrapped[SIGEXIT];
-	if (xexittr & ZSIG_FUNC)
-	    xexitfn = shfunctab->removenode(shfunctab, "TRAPEXIT");
-	else
-	    xexitfn = sigfuncs[SIGEXIT];
-	sigtrapped[SIGEXIT] = 0;
-	sigfuncs[SIGEXIT] = NULL;
+
+	starttrapscope();
+
 	tab = pparams;
+	oldscriptname = scriptname;
+	scriptname = name;
 	oldzoptind = zoptind;
 	zoptind = 1;
 
@@ -2902,6 +2939,7 @@ doshfunc(char *name, List list, LinkList doshargs, int flags, int noreturnval)
 	    argzero = oargv0;
 	}
 	zoptind = oldzoptind;
+	scriptname = oldscriptname;
 	pparams = tab;
 
 	if (isset(LOCALOPTIONS)) {
@@ -2916,27 +2954,7 @@ doshfunc(char *name, List list, LinkList doshargs, int flags, int noreturnval)
 	    opts[LOCALOPTIONS] = saveopts[LOCALOPTIONS];
 	}
 
-	/*
-	 * The trap '...' EXIT runs in the environment of the caller,
-	 * so remember it here but run it after resetting the
-	 * traps for the parent.
-	 */
-	newexittr = sigtrapped[SIGEXIT];
-	newexitfn = sigfuncs[SIGEXIT];
-	if (newexittr & ZSIG_FUNC)
-	    shfunctab->removenode(shfunctab, "TRAPEXIT");
-
-	sigtrapped[SIGEXIT] = xexittr;
-	if (xexittr & ZSIG_FUNC) {
-	    shfunctab->addnode(shfunctab, ztrdup("TRAPEXIT"), xexitfn);
-	    sigfuncs[SIGEXIT] = ((Shfunc) xexitfn)->funcdef;
-	} else
-	    sigfuncs[SIGEXIT] = (List) xexitfn;
-
-	if (newexitfn) {
-	    dotrapargs(SIGEXIT, &newexittr, newexitfn);
-	    freestruct(newexitfn);
-	}
+	endtrapscope();
 
 	if (trapreturn < -1)
 	    trapreturn++;
@@ -3008,7 +3026,7 @@ getfpfunc(char *s)
 		    d[len] = '\0';
 		    d = metafy(d, len, META_REALLOC);
 		    HEAPALLOC {
-			r = parse_string(d);
+			r = parse_string(d, 1);
 		    } LASTALLOC;
 		    return r;
 		} else

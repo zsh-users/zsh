@@ -143,6 +143,7 @@ static struct optname optns[] = {
 {NULL, "listbeep",	      OPT_ALL,			 LISTBEEP},
 {NULL, "listtypes",	      OPT_ALL,			 LISTTYPES},
 {NULL, "localoptions",	      OPT_EMULATE|OPT_KSH,	 LOCALOPTIONS},
+{NULL, "localtraps",	      OPT_EMULATE|OPT_KSH,	 LOCALTRAPS},
 {NULL, "login",		      OPT_SPECIAL,		 LOGINSHELL},
 {NULL, "longlistjobs",	      0,			 LONGLISTJOBS},
 {NULL, "magicequalsubst",     0,			 MAGICEQUALSUBST},
