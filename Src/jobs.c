@@ -979,6 +979,10 @@ clearjobtab(int monitor)
 	    zfree(jobtab[i].ty, sizeof(struct ttyinfo));
 	    jobtab[i].ty = NULL;
 	}
+	if (jobtab[i].pwd) {
+	    zsfree(jobtab[i].pwd);
+	    jobtab[i].pwd = NULL;
+	}
 	if (monitor) {
 	    /*
 	     * See if there is a jobtable worth saving.
@@ -1011,8 +1015,10 @@ initjob(void)
     for (i = 1; i < MAXJOB; i++)
 	if (!jobtab[i].stat) {
 	    jobtab[i].stat = STAT_INUSE;
-	    if (jobtab[i].pwd)
+	    if (jobtab[i].pwd) {
 		zsfree(jobtab[i].pwd);
+		jobtab[i].pwd = NULL;
+	    }
 	    jobtab[i].gleader = 0;
 	    return i;
 	}
