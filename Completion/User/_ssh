@@ -36,7 +36,7 @@ _ssh () {
       '-n[redirect stdin from /dev/null]' \
       '-N[do not execute a remote command. (protocol version 2 only)]'\
       '*-o[specify extra options]:option string:->option' \
-      '-p[specify port on remote host]:port number on remote host:' \
+      '-p[specify port on remote host]:port number on remote host:_ports' \
       '-P[use non priviledged port]' \
       '-q[quiet operation]' \
       '-t[force pseudo-tty allocation]' \

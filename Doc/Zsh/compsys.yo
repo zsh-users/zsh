@@ -69,15 +69,15 @@ directory mentioned in the tt($fpath) variable, and should be autoloaded
 (`tt(autoload -U compinit)' is recommended), and then run simply as
 `tt(compinit)'.  This will define a
 few utility functions, arrange for all the necessary shell functions to be
-autoloaded, and will then re-bind all keys that do completion to use the
+autoloaded, and will then re-define all widgets that do completion to use the
 new system.  If you use the tt(menu-select) widget, which is part of the
 tt(zsh/complist) module, you should make sure that that module is loaded
 before the call to tt(compinit) to make sure that that widget is also
-re-bound.
+re-defined.
 
 Should you need to use the original completion commands, you can still
-bind keys to the old functions by putting a `tt(.)' in front of the
-command name, e.g. `tt(.expand-or-complete)'.
+bind keys to the old widgets by putting a `tt(.)' in front of the
+widget name, e.g. `tt(.expand-or-complete)'.
 
 To speed up the running of tt(compinit), it can be made to produce a dumped
 configuration which will be read in on future invocations; this is the

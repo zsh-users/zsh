@@ -1,5 +1,10 @@
 2000-06-28  Sven Wischnowsky  <wischnow@zsh.org>
 
+	* Jan Fedak: 12097: Completion/Use/_ssh: use _ports when
+	completing remote ports
+
+	* Andrej: 12094: Doc/Zsh/compsys.yo: a bit of cleanup
+
 	* 12099: Completion/Core/_oldlist: make _oldlist not use the dummy
  	match added for the warning
 	
