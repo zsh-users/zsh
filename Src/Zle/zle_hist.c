@@ -48,7 +48,7 @@ void
 remember_edits(void)
 {
     Histent ent = quietgethist(histline);
-    if (metadiffer(ZLETEXT(ent), (char *) line, ll)) {
+    if (ent && metadiffer(ZLETEXT(ent), (char *) line, ll)) {
 	zsfree(ent->zle_text);
 	ent->zle_text = metafy((char *) line, ll, META_DUP);
     }
@@ -248,13 +248,13 @@ downlineorsearch(char **args)
 int
 acceptlineanddownhistory(char **args)
 {
-    Histent he;
+    Histent he = quietgethist(histline);
 
-    if (!(he = movehistent(quietgethist(histline), 1, HIST_FOREIGN)))
-	return 1;
-    zpushnode(bufstack, ztrdup(he->text));
+    if (he && (he = movehistent(he, 1, HIST_FOREIGN))) {
+	zpushnode(bufstack, ztrdup(he->text));
+	stackhist = he->histnum;
+    }
     done = 1;
-    stackhist = he->histnum;
     return 0;
 }
 
@@ -301,7 +301,8 @@ historysearchbackward(char **args)
 	str = srch_str;
 	hp = histpos;
     }
-    he = quietgethist(histline);
+    if (!(he = quietgethist(histline)))
+	return 1;
     while ((he = movehistent(he, -1, hist_skip_flags))) {
 	if (isset(HISTFINDNODUPS) && he->flags & HIST_DUP)
 	    continue;
@@ -349,7 +350,8 @@ historysearchforward(char **args)
 	str = srch_str;
 	hp = histpos;
     }
-    he = quietgethist(histline);
+    if (!(he = quietgethist(histline)))
+	return 1;
     while ((he = movehistent(he, 1, hist_skip_flags))) {
 	if (isset(HISTFINDNODUPS) && he->flags & HIST_DUP)
 	    continue;
@@ -578,7 +580,9 @@ setlocalhistory(char **args)
 int
 zle_goto_hist(int ev, int n, int skipdups)
 {
-    Histent he = movehistent(quietgethist(ev), n, hist_skip_flags);
+    Histent he = quietgethist(ev);
+    if (!he || !(he = movehistent(he, n, hist_skip_flags)))
+	return 1;
     if (skipdups && n) {
 	n = n < 0? -1 : 1;
 	while (he && !metadiffer(ZLETEXT(he), (char *) line, ll))
@@ -752,10 +756,13 @@ doisearch(char **args, int dir)
     int odir = dir, sens = zmult == 1 ? 3 : 1;
     int hl = histline, savekeys = -1, feep = 0;
     Thingy cmd;
-    char *okeymap = ztrdup(curkeymapname);
+    char *okeymap;
     static char *previous_search = NULL;
     static int previous_search_len = 0;
     Histent he;
+
+    if (!(he = quietgethist(hl)))
+	return;
 
     clearlist = 1;
 
@@ -770,7 +777,7 @@ doisearch(char **args, int dir)
     strcpy(ibuf, ISEARCH_PROMPT);
     memcpy(ibuf + NORM_PROMPT_POS, (dir == 1) ? "fwd" : "bck", 3);
     remember_edits();
-    he = quietgethist(hl);
+    okeymap = ztrdup(curkeymapname);
     s = ZLETEXT(he);
     selectkeymap("main", 1);
     pos = metalen(s, cs);
@@ -1014,9 +1021,9 @@ acceptandinfernexthistory(char **args)
 int
 infernexthistory(char **args)
 {
-    Histent he;
+    Histent he = quietgethist(histline);
 
-    if (!(he = infernexthist(quietgethist(histline), args)))
+    if (!he || !(he = infernexthist(he, args)))
 	return 1;
     zle_setline(he);
     return 0;
@@ -1200,7 +1207,8 @@ virepeatsearch(char **args)
 	visrchsense = -visrchsense;
     }
     t0 = strlen(visrchstr);
-    he = quietgethist(histline);
+    if (!(he = quietgethist(histline)))
+	return 1;
     while ((he = movehistent(he, visrchsense, hist_skip_flags))) {
 	if (isset(HISTFINDNODUPS) && he->flags & HIST_DUP)
 	    continue;
@@ -1248,7 +1256,8 @@ historybeginningsearchbackward(char **args)
 	zmult = n;
 	return ret;
     }
-    he = quietgethist(histline);
+    if (!(he = quietgethist(histline)))
+	return 1;
     while ((he = movehistent(he, -1, hist_skip_flags))) {
 	if (isset(HISTFINDNODUPS) && he->flags & HIST_DUP)
 	    continue;
@@ -1284,7 +1293,8 @@ historybeginningsearchforward(char **args)
 	zmult = n;
 	return ret;
     }
-    he = quietgethist(histline);
+    if (!(he = quietgethist(histline)))
+	return 1;
     while ((he = movehistent(he, 1, hist_skip_flags))) {
 	if (isset(HISTFINDNODUPS) && he->flags & HIST_DUP)
 	    continue;

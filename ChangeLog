@@ -1,5 +1,11 @@
 2002-06-24  Peter Stephenson  <pws@csr.com>
 
+	* 17361: Src/zle_hist.c: Be safer about NULL returns from
+	quietgethist() in case the history has been changed under our feet.
+
+	* 17360: Src/zle_hist.c: Allow accept-line-and-down-history to
+	accept the line even if there is no more history.
+
 	* 17350: Src/zle_params.c, Doc/Zsh/zle.yo: Add $CUTBUFFER and
 	$killring zle parameters.
 
