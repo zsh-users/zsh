@@ -2569,9 +2569,11 @@ permmatches(int last)
     static int fi = 0;
     int nn, nl, ll, gn = 1, mn = 1, rn;
 
-    if (pmatches && !newmatches)
+    if (pmatches && !newmatches) {
+	if (last && fi)
+	    ainfo = fainfo;
 	return fi;
-
+    }
     newmatches = fi = 0;
 
     if (pmatches)
@@ -2587,7 +2589,7 @@ permmatches(int last)
     }
     while (g) {
 	HEAPALLOC {
-	    if (empty(g->lmatches))
+	    if (fi)
 		/* We have no matches, try ignoring fignore. */
 		mlist = g->lfmatches;
 	    else
