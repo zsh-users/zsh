@@ -1,3 +1,8 @@
+2000-06-11  Bart Schaefer  <schaefer@zsh.org>
+
+	* Alexandre: 11864: Src/Zle/complist.c: Shift an array the opposite
+	way to fix colored listings crash.
+
 2000-06-11  Tanaka Akira  <akr@zsh.org>
 
 	* 11861: Completion/User/_cvs: fix -a use for compadd.

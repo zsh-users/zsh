@@ -489,7 +489,7 @@ doiscol(Listcols c, int pos)
 	    /* insert e in sendpos */
 	    for (i = curissend; sendpos[i] <= e; ++i)
 		;
-	    for (j = i + 1; j < MAX_POS; ++j)
+	    for (j = MAX_POS - 1; j > i; --j)
 		sendpos[j] = sendpos[j-1];
 	    sendpos[i] = e;
 	    
