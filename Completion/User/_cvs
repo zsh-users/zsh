@@ -142,23 +142,12 @@ _cvs () {
     return
   fi
 
-  case ${+cvs_roots} in
-    0)
-      cvs_roots=()
-      if [[ -f ~/.cvspass ]]; then
-	cvs_roots=(
-	  $(cut -d ' ' -f 1 ~/.cvspass)
-	)
-      fi
-      ;;
-  esac
-
   _complete_opts \
     H '' Q '' q '' r '' w '' l '' n '' t '' v '' f '' a '' \
     b: "compadd /usr/local/bin" \
     T: "compadd $TMPPREFIX:h $TMPDIR /tmp" \
     e: "compadd vi" \
-    d: "compadd $cvs_roots || _files -/" \
+    d: "compadd $_cvs_roots || _files -/" \
     z: "compadd 9'" \
     s: "_cvs_user_variable" \
    || 
@@ -198,7 +187,7 @@ _cvsprefix () {
 _cvsdirentries () {
   setopt localoptions nullglob unset
   if [[ -f ${pref}CVS/Entries ]]; then
-    entries=( ${${${(M)${(f)"$(<${pref}CVS/Entries)"}:#D/*}#D/}%%/*} )
+    entries=(${${${(M)${(f)"$(<${pref}CVS/Entries)"}:#D/*}#D/}%%/*})
   else
     entries=()
   fi
@@ -207,7 +196,7 @@ _cvsdirentries () {
 _cvsentries () {
   setopt localoptions nullglob unset
   if [[ -f ${pref}CVS/Entries ]]; then
-    entries=( ${${${${(f)"$(<${pref}CVS/Entries)"}:#D}#(D|)/}%%/*} )
+    entries=(${${${${(f)"$(<${pref}CVS/Entries)"}:#D}#(D|)/}%%/*})
   else
     entries=()
   fi
@@ -233,8 +222,8 @@ _cvsentries_modified () {
   local LANG=C
   local OLDTZ="$TZ"; if ! (( $+TZ )); then unset OLDTZ; fi; export TZ=GMT
 
-  mtime=( ${(s:/:)${(j:/:)${${${${(M)${(f)Entries}:#/*}#/}%/*/*}/\\/*\\///}}} )
-  entries=( ${${${(M)${(f)Entries}:#D/*}#D/}%%/*} )
+  mtime=(${(s:/:)${(j:/:)${${${${(M)${(f)Entries}:#/*}#/}%/*/*}/\\/*\\///}}})
+  entries=(${${${(M)${(f)Entries}:#D/*}#D/}%%/*})
   builtin stat -n +mtime -F '%a %b %e %T %Y' "$pref${(@k)^mtime}" |
   while read line
   do
@@ -297,8 +286,8 @@ _cvsremovep () {
     _cvsentries
     setopt localoptions unset
     local omit
-    omit=( ${pref}*(D:t) )
-    eval 'entries=( ${entries:#('${(j:|:)omit:q}')} )'
+    omit=(${pref}*(D:t))
+    eval 'entries=(${entries:#('${(j:|:)omit:q}')})'
     compadd -P "$qpref" - ${entries:q} ||
     _cvsdirs
   else
@@ -313,14 +302,32 @@ _cvsaddp () {
     _cvsentries
     setopt localoptions unset
     local omit
-    omit=( CVS ${entries:q} ${=cvsignore} )
-    [[ -r ~/.cvsignore ]] && omit=( $omit $(<~/.cvsignore) )
-    [[ -r ${pref}.cvsignore ]] && omit=( $omit $(<${pref}.cvsignore) )
+    omit=($_cvs_ignore_default ${entries:q} ${=cvsignore})
+    [[ -r ~/.cvsignore ]] && omit=($omit $(<~/.cvsignore))
+    [[ -r ${pref}.cvsignore ]] && omit=($omit $(<${pref}.cvsignore))
     compgen -g '*~(*/|)('${(j:|:)omit}')(D)' ||
-    { _cvsdirentries; compgen -g '('${(j:|:)entries:q}')(D)' }
+    compgen -g '*~(*/|)('${(j:|:)entries:q}')(D)' ||
+    _cvsdirs
   else
     _files
   fi
 }
+
+if (( ! $+_cvs_ignore_default )); then
+  _cvs_ignore_default=(
+    RCS SCCS CVS CVS.adm RCSLOG 'cvslog.*' tags TAGS .make.state .nse_depinfo
+    '*\~' '\#*' '.\#*' ',*' '_$*' '*$' '*.old' '*.bak' '*.BAK' '*.orig' '*.rej'
+    '.del-*' '*.a' '*.olb' '*.o' '*.obj' '*.so' '*.exe' '*.Z' '*.elc' '*.ln'
+    core
+  )
+fi
+
+if (( ! $+_cvs_roots )); then
+  if [[ -f ~/.cvspass ]]; then
+    _cvs_roots=(${${(f)"$(<~/.cvspass)"}%% *})
+  else
+    _cvs_roots=()
+  fi
+fi
 
 _cvs "$@"
