@@ -1,3 +1,8 @@
+2001-06-20  Peter Stephenson  <pws@csr.com>
+
+	* 14988: Src/exec.c: names of saved special parameters need
+	to be copied.
+
 2001-06-19  Bart Schaefer  <schaefer@zsh.org>
 
 	* 14976: aczsh.m4: Add socklen_t to possible SOCKLEN_T types.
