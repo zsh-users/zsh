@@ -1109,6 +1109,8 @@ mathparse(int pc)
 	    }
 	    break;
 	case QUEST:
+	    if (stack[sp].val.type == MN_UNSET)
+		stack[sp].val = getnparam(stack[sp].lval);
 	    q = (stack[sp].val.type == MN_FLOAT) ? (zlong)stack[sp].val.u.d :
 		stack[sp].val.u.l;
 

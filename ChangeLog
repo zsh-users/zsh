@@ -1,3 +1,8 @@
+2002-05-17  Peter Stephenson  <pws@csr.com>
+
+	* 17175: Src/math.c: didn't handle parameters before a ternary
+	expression properly.
+
 2002-05-16  Peter Stephenson  <pws@csr.com>
 
 	* 17171: Src/Modules/tcp.c: ztcp didn't return status 1 when a
