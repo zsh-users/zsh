@@ -90,6 +90,8 @@ the_makefile=$2
 
 if $first_stage; then
 
+    dir_top=`echo $the_subdir | sed 's,[^/][^/]*,..,g'`
+
     trap "rm -f $the_subdir/${the_makefile}.in" 1 2 15
     echo "creating $the_subdir/${the_makefile}.in"
     exec 3>&1 >$the_subdir/${the_makefile}.in
@@ -99,13 +101,19 @@ if $first_stage; then
     echo "##### ===== DEFINITIONS ===== #####"
     echo
     echo "makefile = ${the_makefile}"
-    echo "dir_top = "`echo $the_subdir | sed 's,[^/][^/]*,..,g'`
-    echo "subdir = $the_subdir"
+    echo "dir_top = ${dir_top}"
+    echo "subdir = ${the_subdir}"
     echo
 
-    . Src/modules.index
-    bin_mods=" zsh/main "`sed 's/^/ /;s/$/ /' Src/modules-bltin`
-    if grep '%@D@%D%' config.status >/dev/null; then
+    bin_mods=`grep link=static ./config.modules | \
+    sed -e '/^#/d' -e 's/ .*/ /' -e 's/^name=/ /'`
+    dyn_mods="`grep link=dynamic ./config.modules | \
+    sed -e '/^#/d' -e 's/ .*/ /' -e 's/^name=/ /'`"
+    module_list="${bin_mods}${dyn_mods}"
+
+    # check both 2.13 and 2.50 syntax
+    if grep '%@D@%D%' config.status >/dev/null ||
+       grep ',@D@,D,' config.status >/dev/null; then
 	is_dynamic=true
     else
 	is_dynamic=false
@@ -120,13 +128,18 @@ if $first_stage; then
     all_proto=
     lastsub=//
     for module in $module_list; do
-	q_module=`echo $module | sed 's,Q,Qq,g;s,_,Qu,g;s,/,Qs,g'`
-	eval "modfile=\$modfile_$q_module"
+        modfile="`grep '^name='$module' ' ./config.modules | \
+	  sed -e 's/^.* modfile=//' -e 's/ .*//'`"
 	case $modfile in
 	    $the_subdir/$lastsub/*) ;;
 	    $the_subdir/*/*)
 		lastsub=`echo $modfile | sed 's,^'$the_subdir'/,,;s,/[^/]*$,,'`
-		all_subdirs="$all_subdirs $lastsub"
+		case "$all_subdirs " in
+		    *" $lastsub "* ) ;;
+		    * )
+			all_subdirs="$all_subdirs $lastsub"
+		    ;;
+		esac
 		;;
 	    $the_subdir/*)
 		mddname=`echo $modfile | sed 's,^.*/,,;s,\.mdd$,,'`
@@ -173,6 +186,8 @@ if $first_stage; then
     remote_mdhs=
     other_exports=
     remote_exports=
+    other_modules=
+    remote_modules=
     for mddname in $here_mddnames; do
 
 	unset name moddeps nozshdep alwayslink hasexport
@@ -187,18 +202,34 @@ if $first_stage; then
 
 	dobjects=`echo $objects '' | sed 's,\.o ,..o ,g'`
 	modhdeps=
+	mododeps=
 	exportdeps=
 	imports=
 	q_moddeps=
 	for dep in $moddeps; do
+	    depfile="`grep '^name='$dep' ' ./config.modules | \
+	      sed -e 's/^.* modfile=//' -e 's/ .*//'`"
 	    q_dep=`echo $dep | sed 's,Q,Qq,g;s,_,Qu,g;s,/,Qs,g'`
 	    q_moddeps="$q_moddeps $q_dep"
-	    eval "depfile=\$modfile_$q_dep"
 	    eval `echo $depfile | sed 's,/\([^/]*\)\.mdd$,;depbase=\1,;s,^,loc=,'`
+	    case "$binmod" in
+		*" $dep "* )
+		    dep=zsh/main
+		;;
+	    esac
+
 	    case $the_subdir in
 		$loc)
 		    mdh="${depbase}.mdh"
 		    export="${depbase}.export"
+		    case "$dep" in
+			zsh/main )
+			    mdll="\$(dir_top)/Src/libzsh-\$(VERSION).\$(DL_EXT) "
+			;;
+			* )
+			    mdll="${depbase}.\$(DL_EXT) "
+			;;
+		    esac
 		    ;;
 		$loc/*)
 		    mdh="\$(dir_top)/$loc/${depbase}.mdh"
@@ -210,6 +241,18 @@ if $first_stage; then
 		    case "$other_exports " in
 			*" $export "*) ;;
 			*) other_exports="$other_exports $export" ;;
+		    esac
+		    case "$dep" in
+			zsh/main )
+			    mdll="\$(dir_top)/Src/libzsh-\$(VERSION).\$(DL_EXT) "
+			;;
+			* )
+			    mdll="\$(dir_top)/$loc/${depbase}.\$(DL_EXT) "
+			;;
+		    esac
+		    case "$other_modules " in
+			*" $mdll "*) ;;
+			*) other_modules="$other_modules $mdll" ;;
 		    esac
 		    ;;
 		*)
@@ -223,11 +266,31 @@ if $first_stage; then
 			*" $export "*) ;;
 			*) remote_exports="$remote_exports $export" ;;
 		    esac
+		    case "$dep" in
+			zsh/main )
+			    mdll="\$(dir_top)/Src/libzsh-\$(VERSION).\$(DL_EXT) "
+			;;
+			* )
+			    mdll="\$(dir_top)/$loc/${depbase}.\$(DL_EXT) "
+			;;
+		    esac
+		    case "$remote_modules " in
+			*" $mdll "*) ;;
+			*) remote_modules="$remote_modules $mdll" ;;
+		    esac
 		    ;;
 	    esac
 	    modhdeps="$modhdeps $mdh"
 	    exportdeps="$exportdeps $export"
 	    imports="$imports \$(IMPOPT)$export"
+	    case "$mododeps " in
+		*" $mdll "* )
+		    :
+		;;
+		* )
+		    mododeps="$mododeps $mdll"
+		;;
+	    esac
 	done
 
 	echo "##### ===== DEPENDENCIES GENERATED FROM ${mddname}.mdd ===== #####"
@@ -239,6 +302,8 @@ if $first_stage; then
 	echo "INCS_${mddname} = \$(EPRO_${mddname}) $otherincs"
 	echo "EXPIMP_${mddname} = $imports \$(EXPOPT)$mddname.export"
 	echo "NXPIMP_${mddname} ="
+	echo "LINKMODS_${mddname} = $mododeps"
+	echo "NOLINKMODS_${mddname} = "
 	echo
 	echo "proto.${mddname}: \$(EPRO_${mddname})"
 	echo "\$(SYMS_${mddname}): \$(PROTODEPS)"
@@ -257,15 +322,15 @@ if $first_stage; then
 	    ;; esac
 	    instsubdir=`echo $name | sed 's,^,/,;s,/[^/]*$,,'`
 	    echo "install.modules.${mddname}: ${mddname}.\$(DL_EXT)"
-	    echo "	\$(sdir_top)/mkinstalldirs \$(DESTDIR)\$(MODDIR)${instsubdir}"
-	    echo "	\$(INSTALL_PROGRAM) ${mddname}.\$(DL_EXT) \$(DESTDIR)\$(MODDIR)/${name}.\$(DL_EXT)"
+	    echo "	\$(SHELL) \$(sdir_top)/mkinstalldirs \$(DESTDIR)\$(MODDIR)${instsubdir}"
+	    echo "	\$(INSTALL_PROGRAM) \$(STRIPFLAGS) ${mddname}.\$(DL_EXT) \$(DESTDIR)\$(MODDIR)/${name}.\$(DL_EXT)"
 	    echo
 	    echo "uninstall.modules.${mddname}:"
 	    echo "	rm -f \$(DESTDIR)\$(MODDIR)/${name}.\$(DL_EXT)"
 	    echo
-	    echo "${mddname}.\$(DL_EXT): \$(MODDOBJS_${mddname}) ${mddname}.export $exportdeps"
+	    echo "${mddname}.\$(DL_EXT): \$(MODDOBJS_${mddname}) ${mddname}.export $exportdeps \$(@LINKMODS@_${mddname})"
 	    echo '	rm -f $@'
-	    echo "	\$(DLLINK) \$(@E@XPIMP_$mddname) \$(@E@NTRYOPT) \$(MODDOBJS_${mddname}) \$(LIBS)"
+	    echo "	\$(DLLINK) \$(@E@XPIMP_$mddname) \$(@E@NTRYOPT) \$(MODDOBJS_${mddname}) \$(@LINKMODS@_${mddname}) \$(LIBS) "
 	    echo
 	fi
 	echo "${mddname}.mdhi: ${mddname}.mdhs \$(INCS_${mddname})"
@@ -327,9 +392,25 @@ if $first_stage; then
 	    echo "	    echo; \\"
 	fi
 	if test -n "$proto"; then
+	    echo "	    echo '# undef mod_import_variable'; \\"
+	    echo "	    echo '# undef mod_import_function'; \\"
+	    echo "	    echo '# if defined(IMPORTING_MODULE_${q_name}) &&  defined(MODULE)'; \\"
+	    echo "	    echo '#  define mod_import_variable @MOD_IMPORT_VARIABLE@'; \\"
+	    echo "	    echo '#  define mod_import_function @MOD_IMPORT_FUNCTION@'; \\"
+	    echo "	    echo '# else'; \\"
+	    echo "	    echo '#  define mod_import_function'; \\"
+	    echo "	    echo '#  define mod_import_variable'; \\"
+	    echo "	    echo '# endif /* IMPORTING_MODULE_${q_name} && MODULE */'; \\"
 	    echo "	    for epro in \$(EPRO_${mddname}); do \\"
 	    echo "		echo '# include \"'\$\$epro'\"'; \\"
 	    echo "	    done; \\"
+	    echo "	    echo '# undef mod_import_variable'; \\"
+	    echo "	    echo '# define mod_import_variable'; \\"
+	    echo "	    echo '# undef mod_import_variable'; \\"
+	    echo "	    echo '# define mod_import_variable'; \\"
+	    echo "	    echo '# ifndef mod_export'; \\"
+	    echo "	    echo '#  define mod_export @MOD_EXPORT@'; \\"
+	    echo "	    echo '# endif /* mod_export */'; \\"
 	    echo "	    echo; \\"
 	fi
 	echo "	    echo '#endif /* !have_${q_name}_module */'; \\"
@@ -343,7 +424,7 @@ if $first_stage; then
 
     done
 
-    if test -n "$remote_mdhs$other_mdhs$remote_exports$other_exports"; then
+    if test -n "$remote_mdhs$other_mdhs$remote_exports$other_exports$remote_modules$other_modules"; then
 	echo "##### ===== DEPENDENCIES FOR REMOTE MODULES ===== #####"
 	echo
 	for mdh in $remote_mdhs; do
@@ -366,6 +447,16 @@ if $first_stage; then
 	    echo "	false # should only happen with make -n"
 	    echo
 	fi
+	for mdll in $remote_modules; do
+	    echo "$mdll: FORCE"
+	    echo "	@cd @%@ && \$(MAKE) \$(MAKEDEFS) @%@$mdll"
+	    echo
+	done | sed 's,^\(.*\)@%@\(.*\)@%@\(.*\)/\([^/]*\)$,\1\3\2\4,'
+	if test -n "$other_modules"; then
+	    echo "${other_modules}:" | sed 's,^ ,,'
+	    echo "	false # should only happen with make -n"
+	    echo
+	fi
     fi
 
     echo "##### End of ${the_makefile}.in"
@@ -374,7 +465,12 @@ if $first_stage; then
 
 fi
 
-if $second_stage; then
+if $second_stage ; then
+    if grep 'Hack for autoconf-2.13' ./config.status > /dev/null 2>&1 ; then
+        bang=\!
+    else
+	bang=
+    fi
 
     trap "rm -f $the_subdir/${the_makefile}" 1 2 15
 
@@ -383,7 +479,7 @@ if $second_stage; then
     # tree, this is a problem.  zsh's configure script edits config.status,
     # adding the feature that an input filename starting with "!" has the
     # "!" removed and is not mangled further.
-    CONFIG_FILES=$the_subdir/${the_makefile}:\!$the_subdir/${the_makefile}.in CONFIG_HEADERS= ./config.status
+    CONFIG_FILES=$the_subdir/${the_makefile}:$bang$the_subdir/${the_makefile}.in CONFIG_HEADERS= ${CONFIG_SHELL-/bin/sh} ./config.status
 
 fi
 

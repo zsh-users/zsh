@@ -1,3 +1,10 @@
+2001-06-06  Andrej Borsenkow <bor@zsh.org>
+
+	* 14679, Bart 14693, 14758, 14760: configure.ac, zshconfig.ac,
+	.distfiles, Makefile.in, configure.in, Src/mkmakemod.sh: Allow
+	processing by both autoconf-2.13 and autoconf-2.50; remove
+	config.status hack for autoconf-2.50
+
 2001-06-06  Sven Wischnowsky <wischnow@zsh.org>
 
 	* 14736: Doc/Zsh/compsys.yo: make docs for _wanted and

@@ -60,8 +60,8 @@ install-strip:
 	$(MAKE) install STRIPFLAGS="-s"
 
 # install/uninstall most things
-install: install.bin install.modules install.man install.fns
-uninstall: uninstall.bin uninstall.modules uninstall.man uninstall.fns
+install: install.bin install.modules install.fns install.man
+uninstall: uninstall.bin uninstall.modules uninstall.fns uninstall.man
 
 # install/uninstall just the binary
 install.bin uninstall.bin:
@@ -77,14 +77,25 @@ install.man uninstall.man:
 
 # install/uninstall just the shell functions
 install.fns:
-	test x$(sitefndir) != xno && $(sdir_top)/mkinstalldirs $(DESTDIR)$(sitefndir)
-	@cd Completion && $(MAKE) $(MAKEDEFS) $@
-	@cd Functions && $(MAKE) $(MAKEDEFS) $@
+	if test x$(fndir) != x && test x$(fndir) != xno; then \
+	  test x$(sitefndir) != xno && \
+	    $(SHELL) $(sdir_top)/mkinstalldirs $(DESTDIR)$(sitefndir); \
+	  sdir_top="$(sdir_top)" fndir="$(fndir)" dir_top="$(dir_top)" \
+	  FUNCTIONS_SUBDIRS="$(FUNCTIONS_SUBDIRS)" \
+	  INSTALL_DATA="$(INSTALL_DATA)" \
+	  DESTDIR="$(DESTDIR)" VERSION="$(VERSION)" \
+	  $(SHELL) $(sdir_top)/Config/installfns.sh || exit 1; \
+	fi; \
+	exit 0
 
 uninstall.fns:
-	# never attempt to remove $(sitefndir)
-	@cd Completion && $(MAKE) $(MAKEDEFS) $@
-	@cd Functions && $(MAKE) $(MAKEDEFS) $@
+	if test x$(fndir) != x && test x$(fndir) != xno; then \
+	  fndir="$(fndir)" dir_top="$(dir_top)" \
+	  FUNCTIONS_SUBDIRS="$(FUNCTIONS_SUBDIRS)" \
+	  DESTDIR="$(DESTDIR)" VERSION="$(VERSION)" \
+	  $(SHELL) $(sdir_top)/Config/uninstallfns.sh || exit 1; \
+	fi; \
+	exit 0
 
 # install/uninstall just the info pages
 install.info uninstall.info:
@@ -103,10 +114,7 @@ check test:
 @CLEAN_MK@
 
 distclean-here:
-	@cd Completion && $(MAKE) $(MAKEDEFS) $@
-	@cd Functions && $(MAKE) $(MAKEDEFS) $@
-	@cd Test && $(MAKE) $(MAKEDEFS) $@
-	rm -f Makefile config.h config.status config.log config.cache stamp-h Config/defs.mk
+	rm -f Makefile config.h config.status config.log config.cache config.modules stamp-h Config/defs.mk
 
 realclean-here:
 	cd $(sdir) && rm -f config.h.in stamp-h.in configure
@@ -117,19 +125,20 @@ realclean-here:
 
 config: config.h
 
-config.status: configure
-	./config.status --recheck
+config.status: $(sdir)/configure
+	$(SHELL) ./config.status --recheck
 
-configure: configure.in aclocal.m4 aczsh.m4
+$(sdir)/configure: $(sdir)/zshconfig.ac $(sdir)/aclocal.m4 $(sdir)/aczsh.m4 $(sdir)/configure.in $(sdir)/configure.ac
 	cd $(sdir) && autoconf
 
 config.h: stamp-h
-stamp-h: config.h.in config.status
+stamp-h: $(sdir)/config.h.in config.status
 	cd $(dir_top) && \
-	  CONFIG_FILES= CONFIG_HEADERS=$(subdir)/config.h ./config.status
+	  CONFIG_FILES= CONFIG_HEADERS=$(subdir)/config.h $(SHELL) ./config.status
 
-config.h.in: stamp-h.in
-stamp-h.in: configure.in acconfig.h aclocal.m4 aczsh.m4
+$(sdir)/config.h.in: $(sdir)/stamp-h.in
+$(sdir)/stamp-h.in: $(sdir)/zshconfig.ac $(sdir)/acconfig.h \
+		$(sdir)/aclocal.m4 $(sdir)/aczsh.m4
 	cd $(sdir) && autoheader
 	echo > $(sdir)/stamp-h.in
 
