@@ -65,6 +65,7 @@ else
 	  compress\:"instruct PRCS to save disk space for project"
 	  init\:"create a repository entry"
 	  pdelete\:"delete a repository entry"
+	  pinfo\:"list all projects in the repository"
 	  prename\:"rename a repository entry"
 	  rebuild\:"reconstruct PRCS data files in the repository"
 	  uncompress\:"instruct PRCS to save time in processing project"))'
@@ -75,6 +76,9 @@ else
       access|compress|init|pdelete|prename|rebuild)
         _prcs_arguments ':project name:_prcs_projects'
         ;;
+      pinfo)
+	_prcs_arguments
+	;;
       uncompress)
         _prcs_arguments \
 	  '-i[expand the entire project immediately]' \
@@ -120,11 +124,6 @@ else
       '*:file or directory:_files'
     ;;
   diff)
-#
-# FIXME: when there will be a _diff completion function,
-#        we should complete with diff options after `--' :
-# prcs diff [OPTION ...] [PROJECT [FILE-OR-DIR ...]] [-- [DIFF-OPTION ...]]
-#
     _prcs_arguments \
       '*--revison=[version of the project]:revision:' \
       '*-r[version of the project]:revision:' \
@@ -134,6 +133,7 @@ else
       '(--new)-N[compare new files against empty files]' \
       "(-P)--exclude-project-file[don't diff the project file]" \
       "(--exclude-project-file)-P[don't diff the project file]" \
+      '--[introduce diff options]:*:diff options: _diff_options' \
       ':project name:_prcs_projects' \
       '*:file or directory:_files'
     ;;
