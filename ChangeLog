@@ -1,3 +1,8 @@
+2000-07-12  Peter Stephenson  <pws@cambridgesiliconradio.com>
+
+	* 12227: Completion/Core/compinstall: add select-prompt handling
+	and correct menu entry and missing local parameters.
+
 2000-07-12  Sven Wischnowsky  <wischnow@zsh.org>
 
 	* 12226: Completion/Core/_main_complete: don't start menu
@@ -7,8 +12,13 @@
 	
 2000-07-11  Peter Stephenson  <pws@cambridgesiliconradio.com>
 
-	* Src/exec.c: 12220: print error message for unfound autoload
-	function body at lower locallevel.
+	* 12222: Src/exec.c: ignore EINTR in helper processe for
+	tee and cat with multios.  It might be considered unfortunate
+	that the shell is liable to exit on SIGPIPE if these disappear
+	early.
+
+	* 12220: Src/exec.c: print error message for unfound autoload
+	function body at lower locallevel.a
 
 2000-07-10  Bart Schaefer  <schaefer@zsh.org>
 

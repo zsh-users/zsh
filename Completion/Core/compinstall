@@ -1243,7 +1243,7 @@ this case.  Do you want this?
 
 
 __ci_do_selection() {
-  local key listc menu select amenu elt
+  local key listc menu select amenu elt listp selectp haslistp hasselectp
   integer num
 
   __ci_get_this_style list-colors listc
@@ -1251,6 +1251,9 @@ __ci_do_selection() {
   __ci_get_this_style list-prompt listp
   [[ -n $listp ]] && haslistp=1
   listp=${(Q)listp}
+  __ci_get_this_style select-prompt selectp
+  [[ -n $selectp ]] && hasselectp=1
+  selectp=${(Q)selectp}
 
   while true; do
     clear
@@ -1319,6 +1322,7 @@ number of completions.  Please enter:
 - a negative number to turn this feature off
 - an empty line to leave the setting the way it is.
 "
+	 # Better to parse and display the current setting.
          while true; do
            vared -eh -p 'value> ' select
 	   [[ -z $select || $select = ((-|)<->|l|<->#ll<->#) ]] && break;
@@ -1363,6 +1367,23 @@ number of completions.  Please enter:
 		 menu="$amenu"
 		 ;;
 	 esac
+	 if [[ $menu = *select* ]]; then
+	   print "\
+You can also set a prompt to use for menu selection when it would scroll
+off the screen.  Unless this is set, you won't see a prompt, but the feature
+is still enabled.
+
+Edit a prompt below.  It can contain \`%l' to show the number of matches
+as \`current_number/total_number', \`%p' to show the fraction of
+the way down the list, or font-control sequences such as %B, %U, %S and
+the corresponding %b, %u, %s; quotes will be added automatically.  Delete
+the whole line to turn it off.  Hit return to keep the current value.
+"
+	   [[ -z $hasselectp ]] &&
+	     selectp='%SScrolling active: current selection at %p%s'
+	   vared -eh -p 'prompt> ' -c selectp
+	   [[ -z $selectp ]] && hasselectp=
+	 fi
          ;;
       3) print "\
 You can make completion lists scroll when they don't fit on the screen.
@@ -1395,6 +1416,8 @@ the current value.
   __ci_set_this_style menu menu
   [[ -n $haslistp ]] && listp=${(qq)listp}
   __ci_set_this_style list-prompt listp
+  [[ -n $hasselectp ]] && selectp=${(qq)selectp}
+  __ci_set_this_style select-prompt selectp
 
   return 0
 }
@@ -1411,8 +1434,7 @@ __ci_do_display() {
          *** compinstall: display and insertion options ***
 
 1.  Change appearance of completion lists:  allows descriptions of
-    completions to appear, sorting of different types of completions,
-    and scrolling of completion lists.
+    completions to appear and sorting of different types of completions.
 
 2.  Change how completions are inserted: includes options for sorting,
     and keeping the original or an unambiguous prefix with correction etc.
