@@ -1,5 +1,8 @@
 2002-02-04  Clint Adams  <clint@zsh.org>
 
+	* 16568: Completion/Unix/Command/_ssh: get listing of
+	entire directory for approximation and other purposes.
+
 	* 16566: Completion/Unix/Command/_ssh: show ls -F
 	classifiers as display strings.
 

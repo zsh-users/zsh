@@ -5,13 +5,7 @@ _remote_files () {
   local expl remfiles remdispf remdispd
 
   if zstyle -T ":completion:${curcontext}:" remote-access; then
-    if [[ $options[globdots] == "on" ]] && [[ "$PREFIX" == */ || -z "$PREFIX" ]];
-    then
-      print ssh -a -x ${words[CURRENT]%:*} ls -a1F ${words[CURRENT]#*:}
-      remfiles=(${(f)"$(ssh -a -x ${words[CURRENT]%:*} ls -a1F ${words[CURRENT]#*:} 2>/dev/null)"})
-    else
-      remfiles=(${(f)"$(ssh -a -x ${words[CURRENT]%:*} ls -d1F ${words[CURRENT]#*:}\* 2>/dev/null)"})
-    fi
+    remfiles=(${(f)"$(ssh -a -x ${words[CURRENT]%:*} ls -d1F ${${${words[CURRENT]#*:}:h}/\\/(#e)/}/\* 2>/dev/null)"})
 
     remdispf=(${remfiles:#*/})
     remdispd=(${(M)remfiles:#*/})
