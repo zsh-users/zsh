@@ -1,0 +1,52 @@
+#compdef lp lpr lpq lprm
+
+local expl ret=1 printer list disp strs shown
+
+if compset -P -P || [[ "$words[CURRENT-1]" = -P ]]; then
+  _printers
+else
+  if [[ "$service" = (lpq|lprm) ]]; then
+    if [[ "$words" = *-P* ]]; then
+      printer=(-P "${${words##*-P( |)}%% *}")
+    else
+      printer=()
+    fi
+    list=( ${(M)"${(f@)$(_call_program jobs lpq $printer 2> /dev/null)}":#[0-9]*} )
+
+    if (( $#list )); then
+      _tags users jobs
+
+      while _tags; do
+        if _requested users; then
+          strs=( "${(@)${(@)list##[^ 	]##[ 	]##[^ 	]##[ 	]##}%%[ 	]*}" )
+          if [[ -z "$shown" ]] &&
+             zstyle -T ":completion:${curcontext}:users" verbose; then
+            disp=(-ld list)
+  	  shown=yes
+          else
+  	  disp=()
+          fi
+	  _all_labels users expl user compadd "$disp[@]" -a strs ||
+              _users && ret=0
+        fi
+        if _requested jobs; then
+          strs=( "${(@)${(@)list##[^ 	]##[ 	]##[^ 	]##[ 	]##[^ 	]##[ 	]##}%%[ 	]*}" )
+          if [[ -z "$shown" ]] &&
+             zstyle -T ":completion:${curcontext}:jobs" verbose; then
+            disp=(-ld list)
+  	  shown=yes
+          else
+  	  disp=()
+          fi
+          _all_labels jobs expl job compadd "$disp[@]" -a strs && ret=0
+        fi
+        (( ret )) || return 0
+      done
+    else
+      _message 'no print jobs'
+    fi
+    return 1
+  else
+    _ps
+  fi
+fi
