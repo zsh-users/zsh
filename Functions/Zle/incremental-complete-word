@@ -8,57 +8,25 @@
 # completion so far.  You can hit TAB to do normal completion, ^g to
 # abort back to the state when you started, and ^d to list the matches.
 #
-# This works best with the new function based completion system.
-#
-# Configuration keys:
-#
-#  incremental_prompt
-#    Prompt to show in status line during icompletion. The sequence `%u'
-#    is replaced by the unambiguous part of all matches if there is any
-#    and it is different from the word on the line. A `%s' is replaced
-#    with `-no match-', `-no prefix-', or an empty string if there is
-#    no completion matching the word on the line, if the matches have 
-#    no common prefix different from the word on the line or if there is
-#    such a common prefix, respectively. The sequence `%c' is replaced
-#    by the name of the completer function that generated the matches
-#    (without the leading underscore). Finally, `%n' is replaced by the
-#    number of matches generated, `%a' is replaced by an empty string
-#    if the matches are in the normal set (i.e. the one without file names
-#    with one of the suffixes from `fignore') and with ` -alt-' if the
-#    matches are in the alternate set, and if the `incremental_list' key
-#    (see below) is set, `%l' is replaced by `...' if the list of matches
-#    is too long to fit on the screen and with an empty string otherwise.
-#
-#  incremental_stop
-#    Pattern matching keys which will cause icompletion to stop and the
-#    key to be re-executed.
-#
-#  incremental_break
-#    Pattern matching keys which will cause icompletion to stop and the
-#    key to be discarded.
-#
-#  incremental_completer
-#    Set of completers, like the `completer' key for normal completion.
-#
-#  incremental_list
-#    If set to a non-empty string, the matches will be listed on every
-#    key-press.
-
+# This works only with the new function based completion system.
 
 # The main widget function.
 
 incremental-complete-word() {
-  emulate -L zsh
+  #emulate -L zsh
   unsetopt autolist menucomplete automenu # doesn't work well
 
   local key lbuf="$LBUFFER" rbuf="$RBUFFER" pmpt word
   local lastl lastr wid twid num alt post toolong
+  local curcontext="$curcontext" stop brk
 
-  [[ -n "$compconfig[incremental_completer]" ]] &&
-      set ${(s.:.)compconfig[incremental_completer]}
-  pmpt="${compconfig[incremental_prompt]-incremental (%c): %u%s  %l}"
+  [[ -z "$curcontext" ]] && curcontext=':incremental'
 
-  if [[ -n "$compconfig[incremental_list]" ]]; then
+  _style -s '' prompt pmpt || pmpt='incremental (%c): %u%s  %l}'
+  _style -s '' stop stop
+  _style -s '' break brk
+
+  if _style '' list; then
     wid=list-choices
     post=( icw-list-helper )
   else
@@ -91,10 +59,10 @@ incremental-complete-word() {
   while [[ '#key' -ne '#\\r' && '#key' -ne '#\\n' &&
            '#key' -ne '#\\C-g' ]]; do
     twid=$wid
-    if [[ "$key" = ${~compconfig[incremental_stop]} ]]; then
+    if [[ "$key" = ${~stop} ]]; then
       zle -U "$key"
       return
-    elif [[ "$key" = ${~compconfig[incremental_break]} ]]; then
+    elif [[ "$key" = ${~brk} ]]; then
       return
     elif [[ '#key' -eq '#\\C-h' || '#key' -eq '#\\C-?' ]]; then
       [[ $#LBUFFER -gt $#l ]] && LBUFFER="$LBUFFER[1,-2]"

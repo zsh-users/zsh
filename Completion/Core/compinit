@@ -406,7 +406,7 @@ compstyle '*:options' prefix-hidden yes"
       tmp="':expand-word' ${name#expandword_} ${(qq)val}"
       ;;
     history_*)
-      tmp="'*:history-entries' ${name#history_} ${(qq)val}"
+      tmp="'*:history-words ${name#history_} ${(qq)val}"
       ;;
     completer)
       tmp="'*' completer ${${(qqs.:.)val}}"

@@ -330,7 +330,7 @@ _regex_arguments () {
   local i state next
 
   local cache_dir
-  _style -s regex argument-path cache_dir
+  _style -s regex cache-path cache_dir
   [[ -z "$cache_dir" ]] && cache_dir="$HOME/.zsh/regex_arguments"
   local cache_file="$cache_dir/$1"
   local cache_test

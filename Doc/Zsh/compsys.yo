@@ -25,14 +25,14 @@ for further details.
 
 startmenu()
 menu(Initialization)
+menu(Completion System Configuration)
 menu(Control Functions)
+menu(Bindable Commands)
 menu(Completion Functions)
 menu(Completion Directories)
-menu(Bindable Commands)
-menu(Completion System Configuration)
 endmenu()
 
-texinode(Initialization)(Control Functions)()(Completion System)
+texinode(Initialization)(Completion System Configuration)()(Completion System)
 sect(Initialization)
 findex(compinstall)
 cindex(completion system, installing)
@@ -258,31 +258,35 @@ In each of the forms supporting it the tt(-a) option makes the
 var(function) autoloadable (exactly equivalent to
 tt(autoload )var(function)).
 )
-findex(compconf)
+findex(compstyle)
 cindex(completion system, configuring)
-xitem(tt(compconf) var(definitions...))
-xitem(tt(compconf) [ tt(-L) ] )
-item(tt(compconf) [ tt(-l) ] [ tt(-L) ] var(keys...))(
-vindex(compconfig)
+xitem(tt(compstyle) var(pattern) var(style) var(strings ...))
+xitem(tt(compstyle -d) [ var(pattern) [ var(styles ...) ] ])
+item(tt(compstyle) [ tt(-L) ] )(
 Several aspects of the completion system can be configured by the
-user. The configuration values are stored under the keys described
-below in the associative array `tt(compconfig)'.  After sourcing
-tt(compinit), configuration values can either be set directly as in
-`tt(compconfig[completer]=_complete)' or by calling this utility function.
+user. This function allows to define so-called styles that are used by 
+various completion functions. These styles are associated with
+patterns that are compared to context names used by the completion
+system. The configuration possibilities are explained in detail in
+ifzman(the section `Completion System Configuration' below)\
+ifnzman(noderef(Completion System Configuration))\
+.
 
-Each var(definition) may be either a simple `var(key)', which sets this
-key in the tt(compconfig) array to an empty string, or of the form
-`var(key=value)' which stores the `var(value)' under key `var(key)'.
+In the first form a new var(style) is defined for a certain
+var(pattern), setting it the value given by the var(strings). If there 
+was already a definition for the same var(pattern)/var(style) pair,
+only the value is changed.
 
-Since the completion system also uses the array for internal purposes,
-you should not set all values at once by doing `tt(compconfig=(...))'.
+The second form with the tt(-d) option can be used to delete
+definitions made by previous calls with the first form. Without any
+arguments all definitions are removed. If a var(pattern) is given, all 
+styles defined for it are removed and if a var(pattern) and any number 
+of var(styles) are given, only those styles are removed for the
+pattern.
 
-In the second form (without arguments), this function lists all keys
-and their values. If given the tt(-l) option as its first argument, as 
-in the last form, the other arguments are taken as names of keys and
-the values of these keys are printed one per line. In either case, if the
-tt(-L) option is given, the keys and values are printed as calls to this
-function, usable to be put in a setup script.
+In the last form (without arguments) all definitions are listed. If
+the tt(-L) option is given this is done in the form of calls to
+tt(compstyle).
 )
 findex(funcall)
 item(tt(funcall) var(return) var(name) [ var(args) ... ])(
@@ -295,27 +299,892 @@ var(name) exists and was called and non-zero otherwise.
 )
 enditem()
 
-texinode(Control Functions)(Completion Functions)(Initialization)(Completion System)
+texinode(Completion System Configuration)(Control Functions)(Initialization)(Completion System)
+sect(Completion System Configuration)
+cindex(completion system, configuration)
+
+The completion system allows users to configure many aspects of how
+and when matches are generated. After a short overview of how the
+completion system works, this section describes how this can be done.
+
+subsect(Overview)
+
+When completion is attempted somewhere on a command line the
+completion system first tries to find out the context where completion 
+was tried. Such a context depends, for example, on the name of the
+command when completing an argument. Or it may depend on both the name 
+of a command and the name of an option when completing after one that
+takes arguments.
+
+The completion system represents such a context as a hierarchical name 
+with components separated by colons. For example the name
+tt(:complete:dvips:-o-1) is used when completing the first argument of 
+the tt(-o) option of the tt(dvips) command. The tt(:complete) at the
+beginning just says that we are currently trying completion as opposed 
+to, say, correction, which can also be done using the function based
+completion system (see
+ifzman(the section `Control Functions' below)\
+ifnzman(noderef(Control Functions))\
+ for more information).
+
+In many of the possible contexts the completion system can generate
+matches, and often it can generate multiple types of matches. Whenever 
+a completion function is about to generate such matches it first calls 
+a utility function, telling it what types of matches can be
+generated. These types are represented as simple names calld
+`tags'. This utility function in turn calls another function
+(tt(_sort_tags)) and gives the list of tags to it as the positional
+arguments. The function tt(_sort_tags) can then say in which order the 
+tags are to be used by the completion function. The function will then 
+only generate those types of matches whose tags were selected by the
+user's implementation of the tt(_sort_tags) function. And it will
+try to generate the different types of matches in the order in which
+they were specified by tt(_sort_tags).
+
+Inside the tt(_sort_tags) function the name of the current context can
+be accessed using the tt(curcontext) parameter. For example, the
+function generating file names (called tt(_files)) in the completion
+system is often called to generate only filenames matching a given
+glob pattern and then uses the tags tt(globbed-files),
+tt(directories), and tt(all-files). This means that the function
+offers to generate filenames matching the pattern, names of
+directories or all filenames as possible matches. Now, the user may
+have definition for tt(_sort_tags):
+
+example(_sort_tags() {
+  case $curcontext in
+  (*:dvips:*)
+    comptry globbed-files directories
+    comptry all-files
+    ;;
+  (*)
+    comptry globbed-files
+    comptry directories
+    comptry all-files
+    ;;
+  esac
+})
+
+Every call to the tt(comptry) function (well, it's actually a builtin
+command defined by the tt(computil) module, but never mind) gives a
+set of tags to use. So, the first calls says which tags are to be used 
+first. If there are no matches for those tags, the tags from the
+second call to tt(comptry) will be tried, and so on. In the example
+this means that for the tt(dvips) command on the first attempt the
+names of DVI files and directories will be generated (first call to
+tt(comptry)). If none of those names match the string from the command
+line the completion function will then generate all filenames as
+possible matches (second call to tt(comptry)).
+
+For all other context names the second case-pattern matches, so that
+normally the completion functions will only try the filenames matching 
+the glob pattern (if any glob pattern is used). If that doesn't yield
+any matches, names of directories are generated, and if that doesn't
+yield any matching names either, all filenames will be generated.
+
+In every context the tt(_sort_tags) function may call tt(comptry) as
+often as it wants. Also, every string may be given as argument, even
+if no tag with such a name was offered by the completion
+function. This allows one to give a preferred ordering for some common 
+tag sets without having to worry about sensible patterns for context
+names. For example, many completion functions can generate both
+arguments and option names for commands. These functions normally use
+the tags tt(arguments) and tt(options). Depending on your preference
+you may write in your tt(_sort_tags) function:
+
+example(_sort_tags() {
+  comptry arguments options
+
+  case $curcontext in
+  ...
+  esac
+})
+
+or
+
+example(_sort_tags() {
+  comptry arguments
+  comptry options
+
+  case $curcontext in
+  ...
+  esac
+})
+
+The former always adds both the matches for the argument and the
+option names as possible matches. The latter makes the matches for the 
+arguments be preferred. In this case option names are only generated
+as matches if the string on the line matches no possible completion
+for the argument, which normally means that you have to type the
+hyphen the option names start with yourself to see the list of option
+names that can be completed.
+
+Since the completion function are free to choose the tag names they
+use, there can't be a complete list. So to make sure that all types of 
+matches are eventually tried as completions, one should  use a call to 
+tt(comptry) with all positional argument at the end of
+tt(_sort_tags). For those contexts where one really wants to make sure 
+that certain tags are never used one can then use a call to tt(return) 
+to circumvent that last tt(comptry). For example:
+
+example(_sort_tags() {
+  ...
+  case $curcontext in
+  (*:kill:*)
+    comptry processes
+    return
+    ;;
+  esac
+  comptry "$@"
+})
+
+The completion function for the tt(kill) builtin command offers the
+tags tt(jobs) and tt(processes) which represent job references
+(e.g. `tt(%1)') and process identifiers respectively. The function
+above makes sure that for this builtin command only process
+identifiers are generated as possible matches by using only the
+tt(processes) tag in a call to tt(comptry). The immediate call to
+tt(return) then makes sure that the default tt(comptry) at the end is
+not executed.
+
+The tt(_complete_help) bindable command described in 
+ifzman(the section `Bindable Commands' below)\
+ifnzman(noderef(Bindable Commands))\
+can be used to find out the context and tag names used by completion
+functions. If it is invoked, it shows a list of context names and the
+tag names used in those contexts if completion were tried in the
+current cursor position. This allows one to easily find out all the
+information needed to change the tt(_sort_tags) function when one
+wants to change the way matches are generated for that context.
+
+But the tt(_sort_tags) function is only one half of the configuration
+possibilities of the completion system. The other half uses the
+`styles' defined with the tt(compstyle) function mentioned in
+ifzman(the section `Initialization' above)\
+ifnzman(noderef(Initialization))\
+.
+
+For some tags the completion functions look up the definition of
+certain styles set for the current context. These styles can have any
+number of strings as their values and specify, for example, how the
+matches are generated. The tt(compstyle) function defines mappings
+between patterns and style names with their values. Whenever a
+completion function looks up the value of a style it uses the name of
+the current context followed by a colon and the name of a tag. This
+combined name and the name of a style is then compared to all patterns
+and the value of the style for the first matching pattern is used.
+
+For example, many completion functions can generate matches in a
+simple and a verbose form and use the tt(description) style to decide
+which form should be used. To make all such functions always use the
+verbose form one can simply call
+
+example(compstyle '*' description yes)
+
+in one of the startup files like tt(.zshrc) (after the call to the
+tt(compinit) function). This definition simply means that the
+tt(description) style has tt(yes) as its value in every context.
+
+The completion function for the tt(kill) builtin command uses this
+style to decide if jobs and processes are listed only as job numbers
+and process identifiers or if they are listed with the full job texts
+and the command lines of the processes (the latter is achieved by
+calling the tt(ps) command). To make this builtin list the matches
+only as numbers one could call:
+
+example(compstyle '*:kill:*' description no)
+
+And if one wants to see the command lines for processes but not the
+job texts one could use the fact that the tag name is appended to the
+context name when styles are looked up and instead of the previous
+call use (remember that the function for the tt(kill) builtin command
+uses the tags tt(jobs) and tt(processes)): 
+
+example(compstyle '*:kill*:jobs' description no)
+
+As said above, the patterns given to the tt(compstyle) function are
+tested in the order in which they were given. But that isn't
+completely true. In fact, this function roughly sorts the patterns so
+that more specialized patterns are compared before more general
+patterns. Due to this, the last two examples could be defined before
+the first one because both `tt(*:kill:*)' and `tt(*:kill*:jobs)' are
+considered to be more special then the pattern `tt(*)' from the first
+example. When decided how specific a pattern is, the function looks at 
+the number of colons (corresponding to the number of components) used
+in the pattern, and if these components are actual patterns (like the
+`tt(*)') or simple strings (like the `tt(jobs)' in the last
+example). Patterns with fewer patterns and fewer simple strings are
+considered to be less specific.
+
+As for tags, completion functions can use any number of styles, so
+there can't be a complete list. However, the following two sections
+list those tags and styles that are used in many places of the
+completion system.
+
+subsect(Standard Tags)
+cindex(completion system, tags)
+
+Here are the tags currently used by the completion system. Note that
+some of these tags are not really used when generating mathes but
+instead are only used by some completion functions when looking up
+styles.
+
+em(NOTE: There are far too many of them -- we have to find ways to reduce
+the number. Please tell us if you think that you have identified a tag 
+that should be replaced by one of the more generic ones.)
+
+startitem()
+item(tt(all-files))(
+for the names of all files
+)
+item(tt(arguments))(
+when an argument of a command may be completed
+)
+item(tt(arrays))(
+for names of array parameters
+)
+item(tt(association-keys))(
+for keys of associative arrays (e.g. when completing inside a
+subscript of such a parameter)
+)
+item(tt(bookmarks))(
+when completing bookmarks (e.g. for URLs and the tt(zftp) function suite)
+)
+item(tt(builtins))(
+for names of builtin commands
+)
+item(tt(characters))(
+used for commands like tt(stty) when completing characters; also used
+when completing character classes after a opening bracket
+)
+item(tt(colors))(
+for color names
+)
+item(tt(commands))(
+for names of external commands and names of sub-commands (used by some 
+commands like tt(cvs))
+)
+item(tt(cursors))(
+for cursor names used by X programs
+)
+item(tt(cvs))(
+used only to look up the value of the tt(disable-stat) style
+)
+item(tt(descriptions))(
+used when looking up the value of the tt(format) style for
+descriptions
+)
+item(tt(devices))(
+for names of device special files
+)
+item(tt(directories))(
+for names of directories
+)
+item(tt(directory-stack))(
+for entries in the directory stack
+)
+item(tt(displays))(
+for X display names
+)
+item(tt(extensions))(
+for X server extensions
+)
+item(tt(files))(
+used by completion functions that can complete some kind of filenames
+and different types of matches
+)
+item(tt(fonts))(
+used for X font names
+)
+item(tt(functions))(
+names of functions (shell function or other kinds of functions for
+some commands)
+)
+item(tt(globbed-files))(
+for names of files matching the glob pattern used by completion
+functions that expect a certain type of file
+)
+item(tt(groups))(
+used when completing names of user groups
+)
+item(tt(history-words))(
+for words from the history
+)
+item(tt(hosts))(
+for hostnames
+)
+item(tt(indexes))(
+used for array indexes
+)
+item(tt(jobs))(
+used for jobs
+)
+item(tt(keymaps))(
+for names of zsh keymaps
+)
+item(tt(keysyms))(
+for names of X keysyms
+)
+item(tt(libraries))(
+for names of system libraries
+)
+item(tt(limits))(
+for system limits
+)
+item(tt(manuals))(
+for names of manual pages
+)
+item(tt(maps))(
+for map names (e.g. YP maps)
+)
+item(tt(matches))(
+used to look up the tt(matches) style
+)
+item(tt(messages))(
+used to look up the tt(format) style for messages
+)
+item(tt(modifiers))(
+for names of X modifiers
+)
+item(tt(modules))(
+for zsh modules
+)
+item(tt(named-directories))(
+for named directories (you wouldn't have guessed that, would you?)
+)
+item(tt(names))(
+for all kinds of names
+)
+item(tt(nicknames))(
+for nicknames of YP maps
+)
+item(tt(options))(
+for command options
+)
+item(tt(packages))(
+for RPM packages
+)
+item(tt(parameters))(
+for names of parameters
+)
+item(tt(paths))(
+used to look up the values of the tt(expand) and tt(cursor) style
+)
+item(tt(pods))(
+for perl pods
+)
+item(tt(ports))(
+for communication ports
+)
+item(tt(prefixes))(
+for prefixes (like those of an URL)
+)
+item(tt(processes))(
+for process identifiers
+)
+item(tt(ps))(
+used to look up the tt(arguments) and tt(list-arguments) styles
+)
+item(tt(regex))(
+used to look up tt(cache-path) style
+)
+item(tt(sequences))(
+for MH sequences
+)
+item(tt(sessions))(
+for sessions in the tt(zftp) function suite
+)
+item(tt(signals))(
+for signal names
+)
+item(tt(strings))(
+for strings (e.g. the replacement strings for the tt(cd) builtin
+command)
+)
+item(tt(tags))(
+for RPM tags
+)
+item(tt(targets))(
+for makefile targets
+)
+item(tt(types))(
+for types of whatever (e.g. adress types for the tt(xhost) command)
+)
+item(tt(urls))(
+used to look up the tt(path) and tt(local) styles when completing URLs
+)
+item(tt(users))(
+for usernames
+)
+item(tt(values))(
+when completing a value out of a set of values (or a list of such
+values)
+)
+item(tt(warnings))(
+used to look up the tt(format) style for warnings
+)
+item(tt(widgets))(
+for zsh widget names
+)
+item(tt(windows))(
+for IDs of X windows
+)
+item(tt(zsh-options))(
+for shell options
+)
+enditem()
+
+subsect(Standard Styles)
+cindex(completion system, styles)
+
+Here are the names of the styles used by the completion system. Note
+that the values of several of these styles represent boolean
+values. In all these cases any of the strings `tt(true)', `tt(on)',
+`tt(yes)', and `tt(1)' can be used for the truth value `true' and
+every other value (or if the style is not set at all for the context
+in which it is looked up) stands for `false'.
+
+em(NOTE: Maybe we should sort them differently. Or maybe we should
+explain some of them only when explaining the completers that use
+them.)
+
+startitem()
+item(tt(accept))(
+This is used by the tt(_approximate) completer function to determine
+the maximum number of errors to accept. The completer will try to
+generate completions by first allowing one error, then two errors, and
+so on, until either a match was found or the maximum number of errors
+given by this style has been reached.
+
+If the value for this style contains a lower- or upper-case `tt(n)', the 
+completer function will take any numeric argument as the
+maximum number of errors allowed. For example, with
+
+example(compstyle ':approximate' accept 2n)
+
+two errors will be allowed if no numeric argument is given. However,
+with a numeric argument of six (as in `tt(ESC-6 TAB)'), up to six
+errors are accepted.  Hence with a value of `tt(0n)', no correcting
+completion will be attempted unless a numeric argument is given.
+
+If the value contains `tt(n)' or `tt(N)' and an exclamation mark
+(`tt(!)'), tt(_approximate) will em(not) try to generate corrected
+completions when given a numeric argument, so in this case the number given
+should be greater than zero.  For example, `tt(2n!)' specifies that
+correcting completion with two errors will usually be performed, but if a
+numeric argument is given, correcting completion will not be performed.
+)
+item(tt(arguments))(
+The value of this style is given to the tt(ps) command by functions
+that call it when generating process identifiers as matches.
+)
+item(tt(auto-description))(
+If set, this string will be used as the description for options which
+are not described by the completion functions, but that have exactly
+one argument (note that this may not work for all commands).
+
+The sequence `tt(%d)' in the value will be replaced by the description
+for this argument. Depending on personal preferences, it may be useful
+to set this style to something like `tt(specify: %d)'.
+)
+item(tt(cache-path))(
+The tt(_regex_arguments) utility function used by some completion
+functions creates shell functions on the fly. If this style is set to
+a non-empty string, the value is taken as the name of a directory
+where to store these functions so that they don't have to be created
+anew when the completion function is used in another shell.
+)
+item(tt(completer))(
+The strings given as the value of this style give the names of the
+completer function to use. The available completer functions are
+described in
+ifzman(the section `Control Functions' below)\
+ifnzman(noderef(Control Functions))\
+.
+)
+item(tt(completions))(
+This style is used by the tt(_expand) completer function.
+
+If this is set to an non-empty string it should be an expression
+usable inside a `tt($((...)))' arithmetical expression. The completer
+function evaluates this expression and if the result is `tt(1)' no
+expansions will be generated, but instead the completions will be
+generated as normal and all of them will be inserted in the command
+line.
+)
+item(tt(condition))(
+This style is used by the tt(_list) completer function.
+
+If it is not set or set to the empty string, the insertion of
+matches will be delayed unconditionally. If this value is set, it
+should be set to an expression usable inside a `tt($((...)))'
+arithmetical expression. In this case, delaying will be done if the
+expression evaluates to `tt(1)'. For example, with
+
+example(compstyle ':list' condition 'NUMERIC != 1')
+
+delaying will be done only if given an explicit numeric argument
+other than `tt(1)'.
+)
+item(tt(cursor))(
+This is used together with the tt(paths) tag by the function
+generating filenames as matches to say that the cursor will be left
+after the first ambiguous pathname component even when menucompletion
+is used.
+)
+item(tt(description))(
+This is used in several contexts to decide if only a simple or a
+verbose list of matches should be generated. For example some commands 
+show descriptions for option names if the style is true.
+)
+item(tt(disable-stat))(
+This is used with the tt(cvs) tag by the function completing for the
+tt(cvs) command to decide if the tt(stat) module should be used to
+generate only names of modified files in the appropriate places.
+)
+item(tt(expand))(
+Like tt(cursor) this style is used with the tt(paths) tag. If it is
+set to `true', the partially typed path from the line will be
+expanded as far as possible even if trailing pathname components can
+not be completed.
+)
+item(tt(format))(
+If this is set for the tt(descriptions) tag, its value is used as a
+string to display above matches in completion lists. The sequence
+`tt(%d)' in this string will be replaced with a short description of
+what these matches are. This string may also contain the sequences to
+specify output attributes, such as `tt(%b)' and `tt(%s)'.
+
+For the tt(messages) tag, this defines a string to display messages
+from the completion functions. Here, the `tt(%d)' is replaced with the 
+message given by the completion function.
+
+Finally, for the tt(warnings) tag, it is printed when no matches could 
+be generated at all. In this case the `tt(%d)' is replaced with the
+descriptions for the matches that were expected.
+)
+item(tt(glob))(
+Like tt(complete) this is used by the tt(_expand) completer.
+
+The value is used like the one for tt(complete) and if it evaluates to 
+`tt(1)', globbing will be attempted on the words resulting from
+substitution (see the tt(substitute) style) or the original string
+from the line.
+)
+item(tt(group))(
+This is used with the tt(matches) tag. If it is `true', matches of
+different types will be put in different groups, so that they are
+listed separately and not mixed when using menu completion.
+)
+item(tt(insert))(
+This is used by the tt(_match) completer function. If it is set to a
+string starting with tt(unambig), the tt(_completer) will start menu
+completion only if no unambiguous string could be generated that is at
+least as long as the original string from the line.
+)
+item(tt(last-prompt))(
+This is used by the main completion function tt(_main_complete). If it 
+is `true', the cursor will always be moved back to the last prompt if
+that is still visible, independent of the setting of the
+tt(ALWAYS_LAST_PROMPT) option.
+)
+item(tt(list))(
+This is used by the tt(_oldlist) completer, the
+tt(_history_complete_word) bindable command and by the
+tt(incremental-complete-word) widget.
+
+For tt(_oldlist), if this is set to tt(always), then standard
+widgets which perform listing will retain the current list of matches,
+however they were generated.  If it is set to tt(never), this will not
+be done (the behaviour without the tt(_oldlist) completer).  If it is
+unset, or any other value, then the existing list of completions will
+be displayed if it is not already; otherwise, the standard completion
+list will be generated:  this is the default behaviour of
+tt(_oldlist). However, if there is an old list and this style contains
+the name of the completer function that generated the list, then the
+old list will be used even if it was generated by a widget which does
+not do listing.
+
+For example, suppose you type tt(^Xc) to use the tt(_correct_word)
+widget, which generates a list of corrections for the word under the
+cursor.  Usually, typing tt(^D) would generate a standard list of
+completions for the word on the command line, and show that.  With
+tt(_oldlist), it will instead show the list of corrections already
+generated.
+
+As another example consider the tt(_match) completer: with the
+tt(insert) style set to tt(unambig) it inserts only an
+unambiguous prefix string if there is any. But since this may remove
+parts of the original pattern, attempting completion again may result
+in more matches than on the first attempt. But by using the
+tt(_oldlist) completer and setting this style to tt(_match), the list of 
+matches generated on the first attempt will be used again.
+
+The tt(_history_complete_word) bindable command uses this style to
+decide if the available matches should be shown.
+
+In the tt(incremental-complete-word) widget, if it is `true', then the 
+matches are listed on every key press.
+)
+item(tt(list-arguments))(
+Like the tt(arguments) style, but used when calling the tt(ps) command 
+to generate the list to display.
+)
+item(tt(local))(
+This style is used by completion functions which generate URLs as
+possible matches to add suitable matches when a URL points to a
+local web server. Its value should consist of three strings: a
+hostname, the path to the default web pages for the server and the
+directory name used by a user placing web pages within their home
+area.
+)
+item(tt(menu))(
+This is used by the tt(_expand) completer. If it is unset or set to
+the empty string, the words resulting from expansion (if any) will
+simply be inserted in the command line, replacing the original
+string. However, if this style is set to a non-empty string, the user
+can cycle through the expansion as in menucompletion. Unless the value
+contains the substring `tt(only)', the user will still be offered all
+expansions at once as one of the strings to insert in the command
+line; normally, this possibility is offered first, but if the value
+contains the substring `tt(last)', it is offered last. Also, if the
+value contains the substring `tt(sort)', the expansions will be sorted
+alphabetically, normally they are kept in the order the expansion
+produced them in. And finally, if the value contains the substring
+`tt(showall)', the string of all words will be shown in the list of
+expansions.
+
+The tt(_oldlist) completer uses this, too. Here it controls how menu
+completion behaves when a completion has already been inserted and the
+user types a standard completion key type such as tt(TAB). The default
+behaviour of tt(_oldlist) is that menu completion always continues
+with the existing list of completions.  If this style is set to
+tt(never), however, a new completion is started if the old list was
+generated by a different completion command (the behaviour without the 
+tt(_oldlist) completer).
+
+For example, suppose you type tt(^Xc) to generate a list of corrections,
+and menu completion is started in one of the usual ways.  Usually, typing
+tt(TAB) at this point would start trying to complete the line as it now
+appears.  With tt(_oldlist), it will instead continue to cycle through the
+list of completions.
+)
+item(tt(original))(
+In the tt(_approximate) completer this style is used to specify
+whether the original string on which correcting completion was
+attempted is to be included in the list of possible corrections. If it
+is set to any non-empty string, the original string will be offered
+when cycling through the completions. Normally it will appear as the
+first string, so that the command line does not change immediately;
+consecutive completion attempts will cycle through the corrected
+strings.  If the value for this style contains the string `tt(last)',
+the original string will be the last one in the list, so that it
+appears just before wrapping around to the first corrected string
+again.  Also, if the value contains the string `tt(always)', the
+original string will always be included; normally it is included only
+if more than one possible correction was generated. And finally, if
+the value contains the string `tt(show)', the original string will
+be shown in the list of corrections.
+
+For the tt(_expand) completer function, if this is set to an non-empty
+string, the original string from the line will be included in the list
+of strings the user can cycle through as in a menucompletion. If the
+value contains the string `tt(last)', the original string will
+appear as the last string, with other values it is inserted as the
+first one (so that the command line does not change
+immediately). Also, if the value contains the string `tt(show)',
+the original string will be shown in the list of expansions.
+
+Finally, for the tt(_match) completer, if this style is set to
+`tt(only)', it will try to generate matches without inserting a
+`tt(*)' at the cursor position. If set to any other non-empty value,
+it will first try to generate matches without inserting the `tt(*)'
+and if that yields no matches, it will try again with the `tt(*)'
+inserted.
+)
+item(tt(path))(
+This is used together with the the tt(urls) tag by completion
+functions that generate URLs as possible matches. It should be set to
+the path of a directory containing sub-directories named like
+`tt(http)', `tt(ftp)', `tt(bookmark)', and so on. These
+sub-directories should contain files and other sub-directories whose
+pathnames are possible completions after the initial `tt(http://)',
+`tt(ftp://)', etc. See the description in the file tt(_urls) in the
+tt(User) sub-directory of the completion system for more information.
+
+Also, the function that completes color names uses this style with the 
+tt(colors) tag. Here, the value should be the pathname of a file
+containing color names in the format of an X11 tt(rgb.txt) file.
+)
+item(tt(prefix-hidden))(
+This is used when matches with a common prefix are added (e.g. option
+names). If it is `true', this prefix will not be shown in the list of
+matches.
+)
+item(tt(prefix-needed))(
+This, too, is used for matches with a common prefix. If it is set to
+`true' this common prefix has to be typed by the user to generate the
+matches. E.g. for options this means that the `tt(-)', `tt(+)', or
+`tt(--)' has to be on the line to make option names be completed at
+all.
+)
+item(tt(prompt))(
+The tt(approximate) completer uses the value of this style as a string
+to be displayed on top of the corrected strings generated when cycling
+through them. This string may contain the control sequences `tt(%n)',
+`tt(%B)', etc. known from the `tt(-X)' option of tt(compadd). Also,
+the sequence `tt(%e)' will be replaced by the number of errors
+accepted to generate the corrected  strings.
+
+The tt(_expand) completer uses it for the same purpose, but here the
+sequence `tt(%o)' will be replaced by the original string from the
+line.
+
+Also, the tt(incremental-complete-word) widget shows the value of this
+style in the status line during incremental completion. The sequence
+`tt(%u)' is replaced by the unambiguous part of all matches if there
+is any and it is different from the word on the line. A `tt(%s)' is
+replaced with `tt(-no match-)', `tt(-no prefix-)', or an empty string
+if there is no completion matching the word on the line, if the
+matches have no common prefix different from the word on the line or
+if there is such a common prefix, respectively. The sequence `tt(%c)'
+is replaced by the name of the completer function that generated the
+matches (without the leading underscore). Finally, `tt(%n)' is
+replaced by the number of matches generated, `tt(%a)' is replaced by
+an empty string if the matches are in the normal set (i.e. the one
+without file names with one of the suffixes from the tt(fignore)
+array) and with `tt( -alt-)' if the matches are in the alternate set,
+and if the tt(list) style is set, `tt(%l)' is replaced by `tt(...)' if
+the list of matches is too long to fit on the screen and with an empty
+string otherwise. If tt(incremental_list) is not set or set to an
+empty string, `tt(%l)' will always be removed.
+)
+item(tt(remove-all-dups))(
+The tt(_history_complete_word) bindable command uses this to decide if 
+all duplicate matches should be removed, rather than just consecutive
+duplicates.
+)
+item(tt(sort))(
+If set to `true', completion functions that generate words from the
+history as possible matches sort these words alphabetically instead of
+keeping them in the order in which they appear in the history (from
+youngest to oldest).
+)
+item(tt(stop))(
+If set to a non-empty string, the tt(_history_complete_word) bindable
+command will always insert matches as if menu-completion were started
+and it will stop when the last match is inserted. If this style is set
+to tt(verbose) a message will be displayed when the last match is reached.
+)
+item(tt(substitute))(
+If this is unset or set to the empty string, the tt(_expand) completer
+will first try to expand all substitutions in the string (such as
+`tt($LPAR()...RPAR())' and `tt(${...})'). If this is set to an
+non-empty string it should be an expression usable inside a `tt($((...)))'
+arithmetical expression. In this case, expansion of substitutions will
+be done if the expression evaluates to `tt(1)'. For example, with
+
+example(compstyle ':expand' substitute '${NUMERIC:-1} != 1')
+
+substitution will be performed only if given an explicit numeric
+argument other than `tt(1)', as by typing `tt(ESC 2 TAB)'.
+)
+item(tt(word))(
+To find out if listing should be performed on its own, the tt(_list)
+completer normally compares the contents of the line with the contents
+the line had at the time of the last invocation. If this style is set to
+`true', comparison is done using only the current word. In this case,
+attempting completion on a word equal to the one when completion was called
+the last time will not delay the generation of matches.
+)
+enditem()
+
+subsect(Parameters)
+
+These parameters may be set by the user to change the behavior of the
+completion system:
+
+startitem()
+item(tt(users))(
+This may be set to an array of names that should be completed whenever 
+a username is needed. If it is not set or the string on the line
+doesn't match any of the strings in this array, all usernames will be
+completed.
+)
+item(tt(groups))(
+An array holding the names of the groups that should be completed. If
+this is not set by the user, it will automatically be set to a list
+of group names taken from the YP database or the file `tt(/etc/group)'.
+)
+item(tt(hosts))(
+An array holding the names of hosts that should be completed. If this
+is not set by the user it will automatically be set to a list of the
+hostnames in `tt(/etc/hosts)'.
+)
+item(tt(ports))(
+An array holding the service names of ports to complete. If this is
+not set by the user, it will be set to a list of the service names
+from `tt(/etc/services)'.
+)
+item(tt(my_accounts))(
+This array is used for completion of usernames and hostnames for many
+commands, including the tt(ssh) and tt(rlogin) family. It should
+contain elements of the form `var(host)tt(:)var(user)', corresponding
+to the user's own accounts. These pairs will be used to complete names
+of hosts and usernames depending on the information already on the
+line, so that if, for example, the username is already typed, only
+those hostnames will be completed for which pairs with the username
+from the line exist.
+)
+item(tt(other_accounts))(
+Like tt(my_accounts), except that it should contain the usernames and
+hostnames of other people's accounts, for use with commands such as
+tt(talk), tt(ytalk) and tt(finger).
+)
+item(var(command)tt(_accounts))(
+Any of the commands which use the above tt(my_accounts) and
+tt(other_accounts) arrays can have this behaviour overridden by
+specifying a username/hostname array unique to that command.
+For example, if you wanted tt(rcp) to complete usernames and hostnames
+from a different set of accounts, you could set the array
+tt(rcp_accounts) with username/hostname pairs in the same format as
+tt(my_accounts).
+)
+item(tt(telnet_hosts_ports_users))(
+This array is used by the completion function for tt(telnet). It
+should contain elements of the form
+`var(host)tt(:)var(port)tt(:)var(user)'. These triples will be used to 
+complete names of hosts, ports, and usernames depending on the
+information already on the line, so that if, for example, the hostname 
+is already typed, only those ports and usernames will be completed for 
+which triples with the hostname from the line exist.
+)
+item(tt(socket_hosts_ports))(
+Like tt(telnet_hosts_ports_users), but used for the tt(socket) command 
+and containing pairs of hostnames and ports.
+)
+enditem()
+
+texinode(Control Functions)(Bindable Commands)(Completion System Configuration)(Completion System)
 sect(Control Functions)
 cindex(completion system, choosing completers)
 
 The initialization script tt(compinit) redefines all the widgets
-which perform completion to call the supplied widget
-function tt(_main_complete). This function acts as a wrapper calling
-the so-called `completer' functions that generate matches. If
-tt(_main_complete) is
-called with arguments, these are taken as the names of completer
-functions to be called in the order given.  If no arguments are given, the
-set of functions to try is taken from the colon-separated list in the
-configuration key tt(completer). For example, to use normal
-completion and correction if that doesn't generate any matches:
+which perform completion to call the supplied widget function
+tt(_main_complete). This function acts as a wrapper calling the
+so-called `completer' functions that generate matches. If
+tt(_main_complete) is called with arguments, these are taken as the
+names of completer functions to be called in the order given.  If no
+arguments are given, the set of functions to try is taken from the
+tt(completer) style. For example, to use normal completion and
+correction if that doesn't generate any matches:
 
-example(compconf completer=_complete:_correct)
+example(compstyle '*' completer _complete _correct)
 
-after sourcing tt(compinit). The default value for this configuration key
-set up in tt(compinit) is `tt(_complete)', i.e. normally only ordinary
-completion is tried. The tt(_main_complete) function uses the return value
-of the completer functions to decide if other completers should be
+after sourcing tt(compinit). The default value for this style set up
+in tt(compinit) is `tt(_complete)', i.e. normally only ordinary
+completion is tried. The tt(_main_complete) function uses the return
+value of the completer functions to decide if other completers should be
 called. If the return value is zero, no other completers are tried and the
 tt(_main_complete) function returns.
 
@@ -325,8 +1194,8 @@ then resets it to an empty array. This can be used by completion
 functions or by other ZLE widgets calling completion to register code
 that is to be executed after all matches have been added.
 
-The widget function tt(_main_complete) also uses the configuration key 
-tt(last_prompt). If this is set to tt(always), the cursor is moved up
+The widget function tt(_main_complete) also uses the style 
+tt(last-prompt). If this is set to `true', the cursor is moved up
 to the last prompt after printing a list of matches even if a numeric
 argument was given.
 
@@ -408,6 +1277,19 @@ Before trying to find a function for a specific context, tt(_complete)
 checks if the parameter `tt(compcontext)' is set to a non-empty
 value. If it is, the value is taken as the name of the context to use
 and the function defined for that context will be called.
+
+Note that the widget functions from the distribution that call the
+completion code (namely, the tt(incremental-complete-word) and the
+tt(predict-on) widgets) set up their top-level context name before
+calling completion. This allows one to define different sets of
+completer functions for normal completion and for these widgets. For
+example, to use completion, approximation and correction for normal
+completion, completion and correction for incremental completion and
+only completion for prediction one could use:
+
+example(compstyle '*' completer _complete _correct _approximate
+compstyle ':incremental' completer _complete _correct
+compstyle ':predict' completer _complete)
 )
 item(tt(_approximate))(
 This completer function uses the tt(_complete) completer to generate
@@ -425,7 +1307,7 @@ counted. The resulting list of corrected and completed strings is then
 presented to the user. The intended use of this completer function is to
 try after the normal tt(_complete) completer by setting:
 
-example(compconf completer=_complete:_approximate)
+example(compstyle '*' completer _complete _approximate)
 
 This will give correcting completion if and only if
 normal completion doesn't yield any possible completions. When
@@ -433,36 +1315,34 @@ corrected completions are found, the completer will normally start
 menucompletion allowing you to cycle through these strings.
 
 The exact behavior of this completer can be changed by using the
-configuration keys tt(approximate_accept), tt(approximate_original),
-tt(approximate_prompt), and tt(approximate_insert), see
-ifzman(the section `Completion System Configuration' below)\
+style tt(accept), tt(original), tt(prompt), and tt(insert), see
+ifzman(the section `Completion System Configuration' above)\
 ifnzman(noderef(Completion System Configuration)).
 
-If any of these keys is not set, but the the same key with the prefix
-`tt(correct)' instead of `tt(approximate)' is set, that value will be
-used. The forms beginning with `tt(correct)' are also used by the
-tt(_correct) completer function.
-
-The keys with the `tt(approximate)' prefix have no default values, but 
-tt(compinit) defines default values for tt(correct_accept) (which 
-is set to `tt(2n)'), and tt(correct_prompt).
+Like all completers tt(_approximate) uses its name without the
+undersccore as the top-level context name. Once it has started trying
+to generate matches, it will add another context name component
+containing the number of errors accepted in this attempt. So on the
+first try the context name starts with `tt(:approximate:1)', on the
+second try with `tt(:approximate:1)', and so on.
 )
 item(tt(_correct))(
 Generate corrections (but not completions) for the current word; this is
-similar to spell-checking.  This calls tt(_approximate), but only the
-configuration parameters beginning tt(correct_) are used.
+similar to spell-checking.  This calls tt(_approximate) but uses a
+different top-level context name.
 
 For example, with:
 
-example(compconf completer=_complete:_correct:_approximate
-compconf correct_accept='2n!' approximate_accept=3n)
+example(compstyle '*' completer _complete _correct _approximate
+compstyle ':correct' accept '2n!'
+compstyle ':approximate' accept 3n)
 
 correction will accept up to two errors. If a numeric argument is
-given, correction will not be performed, but correcting completion will be,
-and will accept as many errors as given by the numeric argument.
-Without a numeric argument, first correction and then correcting
-completion will be tried, with the first one accepting two errors 
-and the second one accepting three errors.
+given, correction will not be performed, but correcting completion
+will be, and will accept as many errors as given by the numeric
+argument. Without a numeric argument, first correction and then
+correcting completion will be tried, with the first one accepting two
+errors  and the second one accepting three errors.
 
 This completer function is intended to be used without the
 tt(_approximate) completer or, as in the example, just before
@@ -473,23 +1353,22 @@ generated by the tt(_correct) completer -- and probably more.
 item(tt(_match))(
 This completer is intended to be used after the tt(_complete)
 completer. It allows one to give patterns on the command line and
-to complete all strings matching these patterns from the set of possible
-completions for the context the cursor is in, without having to set
-the tt(GLOB_COMPLETE) option.
+to complete all strings matching these patterns from the set of
+possible completions for the context the cursor is in, without having
+to set the tt(GLOB_COMPLETE) option.
 
 Normally this will be done by taking the pattern from the line,
 inserting a `tt(*)' at the cursor position and comparing the resulting
 pattern with the possible completions generated. However, if the
-configuration key tt(match_original) has a value of `tt(only)', no
-`tt(*)' will be inserted. If tt(match_original) has any other non-empty
-string as its value, this completer will first try to generate matches
-without, then with a `tt(*)' inserted at the cursor position.
+tt(original) style has a value of `tt(only)', no `tt(*)' will be
+inserted. If tt(original) has any other non-empty string as its
+value, this completer will first try to generate matches without, then
+with a `tt(*)' inserted at the cursor position.
 
 The generated matches will be offered in a menucompletion unless the
-tt(match_insert) configuration key is set to a string starting with
-`tt(unambig)'. In this case menucompletion will only be started if no
-unambiguous string could be generated that is at least as long as the
-original string.
+tt(insert) style is set to a string starting with `tt(unambig)'. In
+this case menucompletion will only be started if no unambiguous string
+could be generated that is at least as long as the original string.
 
 Note that the matcher specifications defined globally or used by the
 completion functions will not be used.
@@ -505,24 +1384,20 @@ called. Also, this completer should be called before the tt(_complete)
 completer function.
 
 Control over how the expanded string will be treated is possible with the 
-configuration keys tt(expand_substitute), tt(expand_glob),
-tt(expand_menu), tt(expand_original), and tt(expand_prompt), see
-ifzman(the section `Completion System Configuration' below)\
+tt(substitute), tt(glob), tt(menu), tt(original), and tt(prompt)
+styles, see
+ifzman(the section `Completion System Configuration' above)\
 ifnzman(noderef(Completion System Configuration)).
 
-In a different mode selected by the tt(expand_completions)
-configuration key, all em(completions) generated for the string on the 
-line are inserted.
-
-None of these configuration keys has a default value.
+In a different mode selected by the tt(completions) style, all
+em(completions) generated for the string on the line are inserted.
 )
 item(tt(_list))(
 This completer allows one to delay the insertion of matches until
 completion is attempted a second time without the word on the line
 being changed. On the first attempt, only the list of matches will be
-shown. Configuration keys understood are tt(list_condition) and
-tt(list_word), see
-ifzman(the section `Completion System Configuration' below)\
+shown. Styles used are tt(condition) and tt(word), see
+ifzman(the section `Completion System Configuration' above)\
 ifnzman(noderef(Completion System Configuration)).
 )
 item(tt(_menu))(
@@ -535,18 +1410,102 @@ menucompletion widgets such as tt(reverse-menu-complete), or
 tt(accept-and-menu-complete).
 )
 item(tt(_oldlist))(
-This completer controls how the standard completion widgets behave when
-there is an existing list of completions which may have been generated by a
-special completion (i.e. a separately-bound completion command).  It should
-appear in the list of completers before any of the widgets which generate
-matches.  It understands two configuration keys: tt(oldlist_list) and
-tt(oldlist_menu), see
-ifzman(the section `Completion System Configuration' below)\
+This completer controls how the standard completion widgets behave
+when there is an existing list of completions which may have been
+generated by a special completion (i.e. a separately-bound completion
+command).  It should appear in the list of completers before any of
+the widgets which generate matches.  It uses two styles: tt(list) and
+tt(menu), see
+ifzman(the section `Completion System Configuration' above)\
 ifnzman(noderef(Completion System Configuration)).
 )
 enditem()
 
-texinode(Completion Functions)(Completion Directories)(Control Functions)(Completion System)
+texinode(Bindable Commands)(Completion Functions)(Control Functions)(Completion System)
+sect(Bindable Commands)
+cindex(completion system, bindable commands)
+
+In addition to the context-dependent completions provided, which are
+expected to work in an intuitively obvious way, there are a few widgets
+implementing special behaviour which can be bound separately to keys.  The
+following is a list of these and their default bindings.
+
+startitem()
+item(tt(_bash_completions))(
+This function is used by two widgets, tt(_bash_complete-word) and
+tt(_bash_list-choices).  It exists to provide compatibility with
+completion bindings in bash.  The last character of the binding determines
+what is completed: `tt(!)', command names; `tt($)', environment variables;
+`tt(@)', host names; `tt(/)', file names; `tt(~)' user names.  In bash, the
+binding preceeded by `tt(\e)' gives completion, and preceeded by `tt(^X)'
+lists options.  As some of these bindings clash with standard zsh
+bindings, only `tt(\e~)' and `tt(^X~)' are bound by default.  To add the
+rest, the following should be added to tt(.zshrc) after tt(compinit) has
+been run:
+
+example(for key in '!' '$' '@' '/' '~'; do
+  bindkey "\e$key" _bash_complete-word
+  bindkey "^X$key" _bash_list-choices
+done)
+
+This includes the bindings for `tt(~)' in case they were already bound to
+something else; the completion code does not override user bindings.
+)
+item(tt(_correct_filename (^XC)))(
+Correct the filename path at the cursor position.  Allows up to six errors
+in the name.  Can also be called with an argument to correct
+a filename path, independently of zle; the correction is printed on
+standard output.
+)
+item(tt(_correct_word) (^Xc))(
+Performs correction of the current argument using the usual contextual
+completions as possible choices. This uses the top-level context name
+`tt(correct-word)' and then calls the tt(_correct) completer.
+)
+item(tt(_expand_word (^Xe)))(
+Performs expansion on the current word:  equivalent to the standard
+tt(expand-word) command, but using the tt(_expand) completer. Before
+calling it, the top-level context name is set to `tt(expand-word)'.
+)
+item(tt(_history_complete_word) (\e/))(
+Complete words from the shell's command history.
+)
+item(tt(_most_recent_file (^Xm)))(
+Complete the name of the most recently modified file matching the pattern
+on the command line (which may be blank).  If given a numeric argument
+var(N), complete the var(N)th most recently modified file.  Note the
+completion, if any, is always unique.
+)
+item(tt(_read_comp (^X^R)))(
+Prompt the user for a string, and use that to perform completion on the
+current word.  There are two possibilities for the string.  First, it can
+be a set of words beginning `tt(_)', for example `tt(_files -/)', in which
+case the function with any arguments will be called to generate the
+completions.  Unambiguous parts of the function name will be completed
+automatically (normal completion is not available at this point) until a
+space is typed.
+
+Otherwise, any other string, will be passed as arguments to
+tt(compadd) and should hence be an expression specifying what should
+be completed.
+
+A very restricted set of editing commands is available when reading the
+string:  `tt(DEL)' and `tt(^H)' delete the last character; `tt(^U)' deletes
+the line, and `tt(^C)' and `tt(^G)' abort the function, while `tt(RET)'
+accepts the completion.  Note the string is used verbatim as a command
+line, so arguments must be quoted in accordance with standard shell rules.
+
+Once a string has been read, the next call to tt(_read_comp) will use the
+existing string instead of reading a new one.  To force a new string to be
+read, call tt(_read_comp) with a numeric argument.
+)
+item(tt(_complete_help))(
+This widget displays information about the context names and tags used 
+when completing for the place where the cursor is on the line.
+)
+enditem()
+
+texinode(Completion Functions)(Completion Directories)(Bindable Commands)(Completion System)
 sect(Utility Functions)
 cindex(completion system, utility functions)
 
@@ -588,19 +1547,19 @@ from being tried simply by setting this parameter to any value.
 )
 item(tt(_description))(
 This function gets two arguments: the name of an array and a
-string. It tests if the configuration key tt(description_format) is
+string. It tests if the style tt(format) for the tt(descriptions) tag is
 set and if it is, it stores some options in the array that can then be 
 given to the tt(compadd) builtin command to make the
-value of the tt(description_format) key (with the sequence `tt(%d)'
-replaced by the string given as the second argument) be displayed
-above the matches added. These options also will make sure that the
-matches are placed in a separate group (the second argument is used as 
-the name of the group) if the configuration key tt(group_matches) is
-set to a non-empty string. Normally a sorted group will be used for this
-(with the `tt(-J)' option), but if a option starting with `tt(-V)' or
-`tt(-J)' is given, that option will be included in the array, so that
-it is possible to make the group unsorted by given the option
-`tt(-V)', `tt(-V1)', or `tt(-V2)'.
+value of the tt(format) style for the tt(descriptions) tag (with the
+sequence `tt(%d)' replaced by the string given as the second argument)
+be displayed above the matches added. These options also will make
+sure that the matches are placed in a separate group (the second
+argument is used as the name of the group) if the style tt(group) for
+the tt(matches) tag is set to a non-empty string. Normally a sorted
+group will be used for this (with the `tt(-J)' option), but if a
+option starting with `tt(-V)' or `tt(-J)' is given, that option will
+be included in the array, so that it is possible to make the group
+unsorted by given the option `tt(-V)', `tt(-V1)', or `tt(-V2)'.
 
 In most cases, this function will be used like this:
 
@@ -615,9 +1574,150 @@ string will always be shown, not only if some matches were
 generated. This is useful to display help texts in places where no
 completions can be generated automatically.
 
-This function also uses the configuration key tt(message_format) in
-preference to tt(description_format). The latter is used only if the
-former is unset or set to the empty string.
+This function also uses the tt(format) style for the tt(messages) tag in
+preference to tt(format) style for the tt(descriptions) tag. The
+latter is used only if the former is unset.
+)
+item(tt(_tags))(
+If called with arguments, these are taken as the names of the tags for 
+the types of matches the calling completion function can generate in
+the current context. These tags are stored internally and sorted by
+calling the tt(_sort_tags) function. Following calls to this function
+without arguments from the same function will then select the first,
+second, etc. set of tags requested by the user. To test if a certain
+tag should be tried, the tt(_requested) function has to be called (see 
+below).
+
+The return value is zero if tags are requested and non-zero otherwise.
+
+This function also accepts the tt(-C) option followed by a name. This
+name is temporarily (i.e. not visible outside tt(_tags)) appended
+(with a colon before it) to the contents of the tt(curcontext)
+parameter. This allows to make tt(_tags) and tt(_sort_tags) use a
+more specific context name without havin to change and reset the
+tt(curcontext) parameter (which would otherwise have the same effect).
+)
+item(tt(_requested))(
+A function that uses t(_tags) to register tags and then calls it to
+loop over the requested sets of tags should call this function to
+check if a certain tag is currently requested. This normally has to be 
+done in a loop such as:
+
+example(_tags foo bar baz
+
+while _tags; do
+  if _requested foo; then
+    ...
+  fi
+  ... # test other tags
+  ... # exit loop if matches were generated
+done)
+
+So, the first argument for tt(_requested) is used as the name of a tag 
+and if that tag is currently requested, the return value is zero (and
+non-zero otheriwse).
+
+If more than one argument is given, tt(_requested) call the
+tt(_description) function with all arguments except the first
+one. This is often useful to do both the testing of the tag and
+getiing the description for the matches one is about to add at
+once. E.g.:
+
+example(local expl ret=1
+
+_tags foo bar baz
+
+while _tags; do
+  _requested foo expl 'description' &&
+      compadd "$expl[@]" foobar foobaz && ret=0
+  ...
+  (( ret )) || break
+done)
+)
+item(tt(_wanted))(
+In many contexts only one type of matches can be generated but even
+then it should be tested if the tag representing those matches is
+requested by the user. This function makes that easier.
+
+Like tt(_requested) it gets a tag and arguments for tt(_description)
+as arguments. With the tag it calls tt(_tags) and if that returns zero 
+(i.e. the tag is requested by the user) it calls tt(_description). So, 
+if you want to offer only one tag and immediatly want to use the
+description built, you can just do:
+
+example(_wanted tag expl 'description' &&
+    compadd "$expl[@]" matches...)
+
+Note that you only need to use this function if you need a
+description. If, for example, you use one of the utility functions
+that adds a description itself, you only need to call tt(_tags) as in:
+
+example(_tags tag && _helper)
+)
+item(tt(_alternative))(
+This function is useful if you offer multiple tags and building the
+matches for them is easy enough. It basically implements a loop like
+the one described above for the tt(_tags) function.
+
+The tags to use and what to do if the tags are requested are described 
+using the arguments which are of the form:
+`var(tag)tt(:)var(descr)tt(:)var(action)'. The var(tag)s are offered
+using tt(_tags) and if the tag is requested, the var(action) is
+executed with the given var(descr) (description). The var(action)s
+supported are those used by the tt(_arguments) function (described
+below), without the `tt(->)var(state)' form.
+
+For example, the var(action) may be a simple function call. With that
+one could do:
+
+example(_alternative \
+    'users:user:_users' \
+    'hosts:host:_hosts')
+
+to offer usernames and hostnames as possible matches (which are
+generated by the tt(_users) and tt(_hosts) functions respectively).
+
+Like tt(_tags) this function supports the tt(-C) option to give a
+additional context name component.
+)
+item(tt(_style))(
+This function is used to look up the values of styles defined by the
+user. In its simplest form, it is called with two arguments: a tag and 
+a style-name. The tag (if non-empty) is temporarily appended to the
+current context name (preceded by a colon) and the patterns defined by 
+the user with the tt(compstyle) function will be compared to that
+combined name. If any of those pattern matches the name and the given
+style is defined for it and its boolean value is `true', tt(_style)
+returns zero and non-zero otherwise. If you want to test the style not 
+only for a boolean value, you can give a third argument which is then
+used as a pattern and tt(_style) returns zero if the pattern matches
+the value defined for the style.
+
+If you want to retireve the value defined for the style, you can use
+one of the options tt(-b) (to retrieve it as a boolean value, i.e. one 
+of tt(yes) or tt(no)), tt(-s) (to get it as a scalar, i.e. a string
+concatenated from the value strings defined by the user, separated by
+spaces), tt(-a) (to get it as an array), and tt(-h) (to get it as an
+associative array). In each of this cases the arguments after the
+option are the tag, the style-name and the name of the parameter into
+which the result will be stored.
+
+For example, to test if the tt(description) style is set to `true' for 
+the current context and the tag tt(foo):
+
+example(if _style foo description; then
+  ... # style is true
+fi)
+
+And to get the value of the tt(path) style for the tag tt(foo) as an
+array into the parameter tt(tmp):
+
+example(local tmp
+_style -a foo path tmp)
+
+In any case, the return value of this function is zero, if a
+definition for the style was found and non-zero if no definition was
+found.
 )
 item(tt(_display))(
 This function generates a display list usable for the `tt(-d)' option
@@ -635,7 +1735,7 @@ match with a description non-zero otherwise.
 item(tt(_describe))(
 This function can be used to add options or values with descriptions
 as matches. The first argument is taken as a string to display above
-the matches if the tt(description_format) configuration key is set.
+the matches if the tt(format) style for the tt(descriptions) tag is set.
 
 After this one or two names of arrays followed by options to give
 to tt(compadd) must be given. The first array contains the possible
@@ -652,15 +1752,10 @@ to be added with different options for tt(compadd).
 
 Before the first argument, two options may be given. A `tt(-o)' says
 that the matches added are option names. This will make tt(_describe)
-use the tt(option_prefix) and tt(describe_options) configuration keys
+use the tt(prefix-hidden), tt(prefix-needed) and tt(description) styles
 to find out if the strings should be added at all and if the
-descriptions should be shown. Without the `tt(-o)' option, the
-tt(describe_values) key is used.
-
-The `tt(-c)' option, followed by a string, may be used to give the
-name of the current command for testing the configuration keys. If the 
-first element of the tt(words) special array contains the correct
-command name, this option need not be used.
+descriptions should be shown. Without the `tt(-o)' option, only the
+tt(description) style is used.
 )
 item(tt(_multi_parts))(
 This function gets two arguments: a separator character and an
@@ -718,9 +1813,9 @@ These functions also accept the `tt(-J)', `tt(-V)', `tt(-X)',
 `tt(-M)', `tt(-P)', `tt(-S)', `tt(-q)', `tt(-r)', and `tt(-R)' options
 from the tt(compadd) builtin.
 
-Finally, the tt(_path_files) function supports two configuration keys.
+Finally, the tt(_path_files) function supports two styles.
 startitem()
-item(tt(path_expand))(
+item(tt(expand))(
 If this is set to a string containing `tt(prefix)', the partially
 typed path from the line will be expanded as far as possible even if
 trailing pathname components can not be completed. If it contains the
@@ -732,10 +1827,9 @@ list of matches generated this way (e.g. due to the option
 tt(AUTO_MENU) being set), this will also cycle through the names
 of the files in pathname components after the first ambiguous one.
 )
-item(tt(path_cursor))(
-If this is set to a non-empty string, the cursor will be left
-after the first ambiguous pathname component even when menucompletion
-is used.
+item(tt(cursor))(
+If this is set to `true', the cursor will be left after the first
+ambiguous pathname component even when menucompletion is used.
 )
 enditem()
 )
@@ -848,16 +1942,13 @@ should not be used if the option described is on the line.
 
 Finally, the var(opt-spec) may contain a explanation string. This is
 given in brackets at the end, as in `tt(-q[query operation])'. The
-configuration key tt(describe_options) is used to decide if these
-explanation strings should be printed when options are listed. If it
-is set to a non-empty string and it doesn't contain the substring
-`tt(!)var(command)', where `var(command)' is the name of the command
-that is completed for, the descriptions will be shown. If no
-explanation string is given but the tt(autodescribe_options) key is
+style tt(description) for the tt(options) tag is used to decide if these
+explanation strings should be printed when options are listed. If no
+explanation string is given but the tt(auto-describe) style is
 set and only one argument is described for this var(opt-spec), the
-option will be described by the value of tt(autodescribe_options) with 
-any appearance of the sequence `tt(%d)' in it replaced by the
-description for the first argument.
+option will be described by the value of the style with any appearance
+of the sequence `tt(%d)' in it replaced by the description for the
+first argument.
 )
 enditem()
 
@@ -868,10 +1959,8 @@ a list in parentheses, as in `tt(:foo:(foo bar baz))'. Such a list in
 doubled parentheses, as in `tt(:foo:((a\:bar b\:baz)))' should contain 
 strings consisting of the string to complete followed by a colon
 (which needs to be preceded by a backslash) and a description. The
-matches will be listed together with their descriptions if the
-value of configuration key tt(describe_values) is non-empty and does
-not contain the substring `tt(!)var(command)', where `var(command)' is 
-the name of the command on the line.
+matches will be listed together with their descriptions the
+tt(description) style for the tt(values) tag is set.
 
 An var(action) of the form `tt(->)var(string)' is used by functions
 that implement a state machine. In this case, the `var(string)' (with
@@ -927,6 +2016,17 @@ a string of the form `var(-opt)tt(-)var(n)' for the var(n)'th argument
 of the option var(-opt), or a string of the form `tt(argument-)var(n)' 
 for the var(n)'th argument (for rest arguments the var(n) is the
 string `tt(rest)').
+
+Also, during the evaluation of the var(action), the context name will
+be changed by adding another component describing the option or
+argument for which the action is executed. For arguments of options,
+the name is build from the name of the option followed by a hyphen and 
+the number of the argument (starting with `tt(1)'). For arguments the
+name added is the string tt(argument-) followed by the number of the
+argument or the string tt(rest) if this is for a `tt(*:...)'
+definition. For example, when completing the argument of the tt(-o)
+option, the name is `tt(-o-1)' and for the second normal (non-option-)
+argument it is `tt(argument-2)'.
 
 Normally the option names are taken as multi-character names and a
 word from the line is considered to contain only one option (or
@@ -1012,14 +2112,8 @@ replacement. E.g. some tt(configure)-scripts describe options only as
 completion of the second form, one would use `tt(-s "LPAR()#-)tt(-enable-
 -)tt(-disable-RPAR()")'.
 
-Finally, this function uses the configuration key tt(option_prefix). If
-it is set to a non-empty string, option names are added as possible
-matches only if the word on the line begins with the prefix character
-of them (i.e. a minus or a plus sign). If the value contains
-`tt(!)var(command)' as a substring, where `var(command)' is the name
-of the command that is completed for, the options are added as
-possible matches even if their prefix character is not given on the
-line.
+Finally, this function uses the styles tt(prefix-hidden) and
+tt(prefix-needed).
 
 Example:
 
@@ -1093,10 +2187,14 @@ as `tt(another number)' and gets an optional argument decribed as
 `tt(2)', and `tt(3)'. The tt(_values) function will complete lists of
 these values separated by commas.
 
+Like tt(_arguments) this function temporarily adds another context
+name component to the current context name while executing the
+var(action). Here this name is just the name of the value for which
+the argument is completed.
+
 To decide if the descriptions for the values (not those for the
-arguments) should be printed, the configuration key
-tt(describe_values) is used in the same way as the key
-tt(describe_options) is used by the tt(_arguments) function.
+arguments) should be printed, the style tt(description) for the
+tt(values) tag is used.
 
 One last difference is that this function uses the associative array
 tt(val_args) to report values and their arguments (but otherwise this
@@ -1205,7 +2303,7 @@ function `tt(_)var(fieldname)' exists, the function is called.
 )
 enditem()
 
-texinode(Completion Directories)(Bindable Commands)(Completion Functions)(Completion System)
+texinode(Completion Directories)()(Completion Functions)(Completion System)
 sect(Completion Directories)
 cindex(completion system, directory structure)
 
@@ -1237,630 +2335,5 @@ commands.  They may need modifying for your system.
 item(tt(Commands))(
 Functions which implement special types of completion to be bound to
 keystrokes rather than called by context.
-)
-enditem()
-
-texinode(Bindable Commands)(Completion System Configuration)(Completion Directories)(Completion System)
-sect(Bindable Commands)
-cindex(completion system, bindable commands)
-
-In addition to the context-dependent completions provided, which are
-expected to work in an intuitively obvious way, there are a few widgets
-implementing special behaviour which can be bound separately to keys.  The
-following is a list of these and their default bindings.
-
-startitem()
-item(tt(_bash_completions))(
-This function is used by two widgets, tt(_bash_complete-word) and
-tt(_bash_list-choices).  It exists to provide compatibility with
-completion bindings in bash.  The last character of the binding determines
-what is completed: `tt(!)', command names; `tt($)', environment variables;
-`tt(@)', host names; `tt(/)', file names; `tt(~)' user names.  In bash, the
-binding preceeded by `tt(\e)' gives completion, and preceeded by `tt(^X)'
-lists options.  As some of these bindings clash with standard zsh
-bindings, only `tt(\e~)' and `tt(^X~)' are bound by default.  To add the
-rest, the following should be added to tt(.zshrc) after tt(compinit) has
-been run:
-
-example(for key in '!' '$' '@' '/' '~'; do
-  bindkey "\e$key" _bash_complete-word
-  bindkey "^X$key" _bash_list-choices
-done)
-
-This includes the bindings for `tt(~)' in case they were already bound to
-something else; the completion code does not override user bindings.
-)
-item(tt(_correct_filename (^XC)))(
-Correct the filename path at the cursor position.  Allows up to six errors
-in the name.  Can also be called with an argument to correct
-a filename path, independently of zle; the correction is printed on
-standard output.
-)
-item(tt(_correct_word) (^Xc))(
-Performs correction of the current argument using the usual contextual
-completions as possible choices. This uses the configuration keys with 
-the prefix tt(correctword_) if they are set, see
-ifzman(the section `Completion System Configuration' below)\
-ifnzman(noderef(Completion System Configuration)).
-)
-item(tt(_expand_word (^Xe)))(
-Performs expansion on the current word:  equivalent to the standard
-tt(expand-word) command, but using all the `tt(expand_*)' configuration
-keys described previously.  In addition, each such key can be overridden by
-a key starting with the string `tt(expandword_)'; for example, the
-tt(expandword_substitute) key if defined overrides the
-tt(expand_substitute) key.
-)
-item(tt(_history_complete_word) (\e/))(
-Complete words from the shell's command history.
-)
-item(tt(_most_recent_file (^Xm)))(
-Complete the name of the most recently modified file matching the pattern
-on the command line (which may be blank).  If given a numeric argument
-var(N), complete the var(N)th most recently modified file.  Note the
-completion, if any, is always unique.
-)
-item(tt(_read_comp (^X^R)))(
-Prompt the user for a string, and use that to perform completion on the
-current word.  There are two possibilities for the string.  First, it can
-be a set of words beginning `tt(_)', for example `tt(_files -/)', in which
-case the function with any arguments will be called to generate the
-completions.  Unambiguous parts of the function name will be completed
-automatically (normal completion is not available at this point) until a
-space is typed.
-
-Otherwise, any other string, will be passed as
-arguments to tt(compadd) and should hence be an expression specifying
-what should be completed.
-
-A very restricted set of editing commands is available when reading the
-string:  `tt(DEL)' and `tt(^H)' delete the last character; `tt(^U)' deletes
-the line, and `tt(^C)' and `tt(^G)' abort the function, while `tt(RET)'
-accepts the completion.  Note the string is used verbatim as a command
-line, so arguments must be quoted in accordance with standard shell rules.
-
-Once a string has been read, the next call to tt(_read_comp) will use the
-existing string instead of reading a new one.  To force a new string to be
-read, call tt(_read_comp) with a numeric argument.
-)
-item(tt(_verbose_list) (^Xv))(
-This widget behaves like the builtin tt(delete-char-or-list) widget
-but if called repeatedly with the same command line, it will make the
-completion list more and more verbose. The default behavior is to
-first show options even if the tt(option_prefix) configuration key is
-set and to show option and value descriptions, too, on the next
-invocation. Using the tt(verboselist_stages) configuration key it is
-possible to change this default behavior, see
-ifzman(the section `Completion System Configuration' below)\
-ifnzman(noderef(Completion System Configuration)). Also, the
-tt(_oldlist) completer has support for this command, which is
-described in the entry for the tt(oldlist_menu) configuration key.
-
-Since this widget normally behaves like tt(delete-char-or-list) you
-may find it convenient to bind it to tt(^D).
-)
-enditem()
-
-texinode(Completion System Configuration)()(Bindable Commands)(Completion System)
-sect(Completion System Configuration)
-cindex(completion system, configuring, summary)
-
-Here is a list of parameters and configuration keys used by the
-completion system.
-
-subsect(Parameters)
-
-These parameters may be set by the user to change the behavior of the
-completion system:
-
-startitem()
-item(tt(users))(
-This may be set to an array of names that should be completed whenever 
-a username is needed. If it is not set or the string on the line
-doesn't match any of the strings in this array, all usernames will be
-completed.
-)
-item(tt(groups))(
-An array holding the names of the groups that should be completed. If
-this is not set by the user, it will automatically be set to a list
-of group names taken from the YP database or the file `tt(/etc/group)'.
-)
-item(tt(hosts))(
-An array holding the names of hosts that should be completed. If this
-is not set by the user it will automatically be set to a list of the
-hostnames in `tt(/etc/hosts)'.
-)
-item(tt(ports))(
-An array holding the service names of ports to complete. If this is
-not set by the user, it will be set to a list of the service names
-from `tt(/etc/services)'.
-)
-item(tt(my_accounts))(
-This array is used for completion of usernames and hostnames for many
-commands, including the tt(ssh) and tt(rlogin) family. It should
-contain elements of the form `var(host)tt(:)var(user)', corresponding
-to the user's own accounts. These pairs will be used to complete names
-of hosts and usernames depending on the information already on the
-line, so that if, for example, the username is already typed, only
-those hostnames will be completed for which pairs with the username
-from the line exist.
-)
-item(tt(other_accounts))(
-Like tt(my_accounts), except that it should contain the usernames and
-hostnames of other people's accounts, for use with commands such as
-tt(talk), tt(ytalk) and tt(finger).
-)
-item(var(command)tt(_accounts))(
-Any of the commands which use the above tt(my_accounts) and
-tt(other_accounts) arrays can have this behaviour overridden by
-specifying a username/hostname array unique to that command.
-For example, if you wanted tt(rcp) to complete usernames and hostnames
-from a different set of accounts, you could set the array
-tt(rcp_accounts) with username/hostname pairs in the same format as
-tt(my_accounts).
-)
-item(tt(telnet_hosts_ports_users))(
-This array is used by the completion function for tt(telnet). It
-should contain elements of the form
-`var(host)tt(:)var(port)tt(:)var(user)'. These triples will be used to 
-complete names of hosts, ports, and usernames depending on the
-information already on the line, so that if, for example, the hostname 
-is already typed, only those ports and usernames will be completed for 
-which triples with the hostname from the line exist.
-)
-item(tt(socket_hosts_ports))(
-Like tt(telnet_hosts_ports_users), but used for the tt(socket) command 
-and containing pairs of hostnames and ports.
-)
-enditem()
-
-subsect(Configuration keys)
-
-startitem()
-item(tt(completer))(
-The colon-separated list of completer function to use.
-)
-item(tt(dumpfile))(
-Set internally to the pathname of the dumpfile.
-)
-item(tt(group_matches))(
-If set to a non-empty string, matches of different types will be put
-in different groups, so that they are listed separately and not mixed
-when using menu completion.
-)
-item(tt(describe_options))(
-If set to a non-empty strings, options will be described when they are 
-listed. If the value string contains substrings of the form
-`tt(!)var(command)', this will not be done for any of these
-var(command)s.
-)
-item(tt(autodescribe_options))(
-If set, this string will be used as the description for options which
-are not described by the completion function, but that have exactly
-one argument. The sequence `tt(%d)' in the value will be replaced by
-the description for this argument. Depending on personal preferences,
-it may be useful to set this key to something like `tt(specify: %d)'.
-)
-item(tt(describe_values))(
-Like tt(describe_options), but used when completing value lists.
-)
-item(tt(description_format))(
-A string to display above matches. The sequence `tt(%d)' in this
-string will be replaced with a short description of what these matches 
-are. This string may also contain the sequences to specify output
-attributes, such as `tt(%b)' and `tt(%s)'.
-)
-item(tt(message_format))(
-Like tt(description_format), but used when displaying messages in
-those places where no completions can automatically be generated.
-)
-item(tt(warning_format))(
-Like the previous two, but used by tt(_main_complete) to show a
-warning if no matches could be generated. Any `tt(%d)' sequence in the 
-value will be replaced by the descriptions for the matches that were
-expected.
-)
-item(tt(option_prefix))(
-If set to a non-empty value, options will only be generated as
-possible matches when no other completions could be found or if the
-string on the line begins with a option prefix character (a minus or a 
-plus sign). This value may also contain strings of the form
-`tt(!)var(command)' which makes options be always completed for all
-var(command)s given in this way. Finally, if the value of this key
-begins with `tt(hide)', the prefix characters `tt(-)', `tt(+)', or
-`tt(-)tt(-)' will not be shown in the list.
-)
-item(tt(last_prompt))(
-If this is set to tt(always), the cursor will always be moved back to
-the last prompt if that is still visible, independent of the setting
-of the tt(ALWAYS_LAST_PROMPT) option.
-)
-item(tt(approximate_accept))(
-This should be set to the number of errors the correction code should
-accept. The completer will try to generate completions by first allowing
-one error, then two errors, and so on, until either a match
-was found or the maximum number of errors given by this key has
-been reached.
-
-If the value for this key contains a lower- or upper-case `tt(n)', the 
-completer function will take any numeric argument as the
-maximum number of errors allowed. For example, with
-
-example(compconf approximate_accept=2n)
-
-two errors will be allowed if no numeric argument is given. However,
-with a numeric argument of six (as in `tt(ESC-6 TAB)'), up to six
-errors are accepted.  Hence with a value of `tt(0n)', no correcting
-completion will be attempted unless a numeric argument is given.
-
-If the value contains `tt(n)' or `tt(N)' and an exclamation mark
-(`tt(!)'), tt(_approximate) will var(not) try to generate corrected
-completions when given a numeric argument, so in this case the number given
-should be greater than zero.  For example, `tt(2n!)' specifies that
-correcting completion with two errors will usually be performed, but if a
-numeric argument is given, correcting completion will not be performed.
-)
-item(tt(approximate_insert))(
-If this is set to a string starting with `tt(unambig)', the code will try
-to insert a usable unambiguous string in the command line instead of
-always cycling through the corrected strings. If such a unambiguous
-string could be found, the original string is not used, independent of
-the setting of tt(approximate_original). If no sensible string could be
-found, one can cycle through the corrected strings as usual.
-)
-item(tt(approximate_original))(
-This key is used to specify whether the original string on which correcting 
-completion was attempted is to be included in the list of possible
-corrections. If it is set to any non-empty string, the original string 
-will be offered when cycling through the completions. Normally it will 
-appear as the first string, so that the command line does not change
-immediately; consecutive completion attempts will cycle through the
-corrected strings.  If the value for this key contains the substring
-`tt(last)', the original string will be the last one in the list, so
-that it appears just before wrapping around to the first corrected
-string again.  Also, if the value contains the substring `tt(always)',
-the original string will always be included; normally it is
-included only if more than one possible correction was generated. And
-finally, if the value contains the substring `tt(show)', the original
-string will be shown in the list of corrections.
-)
-item(tt(approximate_prompt))(
-This can be set to a string to be displayed on top of the
-corrected strings generated when cycling through them. This string
-may contain the control sequences `tt(%n)', `tt(%B)', etc. known from
-the `tt(-X)' option of tt(compadd). Also, the sequence `tt(%e)' will
-be replaced by the number of errors accepted to generate the corrected 
-strings.
-)
-item(tt(correct_accept), tt(correct_insert), tt(correct_original), tt(correct_prompt))(
-These keys are used by the tt(_correct) completer instead of the forms
-beginning with tt(approximate_) described above.
-)
-item(tt(correctword_accept), tt(correctword_insert),
-tt(correctword_original), tt(correctword_prompt))(
-These keys are used by the tt(_correct_word) bindable command to
-override the values of tt(correct_accept), tt(correct_insert),
-tt(correct_original), and tt(correct_prompt) if they are set.
-)
-item(tt(expand_substitute))(
-If this is unset or set to the empty string, the code will first try
-to expand all substitutions in the string (such as
-`tt($LPAR()...RPAR())' and `tt(${...})'). If this is set to an
-non-empty string it should be an expression usable inside a `tt($((...)))'
-arithmetical expression. In this case, expansion of substitutions will
-be done if the expression evaluates to `tt(1)'. For example, with
-
-example(compconf expand_substitute='${NUMERIC:-1} != 1')
-
-substitution will be performed only if given an explicit numeric
-argument other than `tt(1)', as by typing `tt(ESC 2 TAB)'.
-)
-item(tt(expand_glob))(
-If this is unset or set to an empty string, globbing will be attempted
-on the word resulting from substitution or the original string. The
-values accepted for this key are the same as for tt(expand_substitute).
-)
-item(tt(expand_menu))(
-If this is unset or set to the empty string, the words resulting from
-expansion (if any) will simply be inserted in the command line,
-replacing the original string. However, if this key is set to a
-non-empty string, the user can cycle through the expansion as in
-menucompletion. Unless the value contains the substring `tt(only)',
-the user will still be offered all expansions at once as one of the
-strings to insert in the command line; normally, this possibility is
-offered first, but if the value contains the
-substring `tt(last)', it is offered last. Also, if the value contains
-the substring `tt(sort)', the expansions will be sorted alphabetically,
-normally they are kept in the order the expansion produced them in.
-And finally, if the value contains the substring `tt(showall)', the
-string of all words will be shown in the list of expansions.
-)
-item(tt(expand_original))(
-If this is set to an non-empty string, the original string from the
-line will be included in the list of strings the user can cycle
-through as in a menucompletion. If the value contains the substring
-`tt(last)', the original string will appear as the last string, with
-other values it is inserted as the first one (so that the command line
-does not change immediately). Also, if the value contains the
-substring `tt(show)', the original string will be shown in the list of 
-expansions.
-)
-item(tt(expand_prompt))(
-This may be set to a string that should be displayed before the
-possible expansions. This is passed to the `tt(-X)' option of
-tt(compadd) and thus may contain the control sequences `tt(%n)',
-`tt(%B)', etc. Also, the sequence `tt(%o)' in this string will be
-replaced by the original string.
-)
-item(tt(expand_completions))(
-If this is set and non-empty, its value will be evaluated in the same
-way as tt(expand_substitute) and if the result is `tt(1)', no
-expansions will be generated, but instead the completions will be
-generated as normal and all of them will be inserted in the command
-line.
-)
-item(tt(expandword_substitute), tt(expandword_glob),
-tt(expandword_menu), tt(expandword_original), tt(expandword_prompt),
-tt(expandword_completions))(
-If these keys are set, they are used by the tt(_expand_word) bindable
-command to override the values for the configuration keys with the
-tt(expand_) prefix.
-)
-item(tt(list_condition))(
-If this key is unset or set to the empty string, the insertion of
-matches will be delayed unconditionally. If this value is set, it
-should be set to an expression usable inside a `tt($((...)))'
-arithmetical expression. In this case, delaying will be done if the
-expression evaluates to `tt(1)'. For example, with
-
-example(compconf list_condition='NUMERIC != 1')
-
-delaying will be done only if given an explicit numeric argument
-other than `tt(1)'.
-)
-item(tt(list_word))(
-To find out if listing should be performed on its own, the code normally
-compares the contents of the line with the contents the line had at the
-time of the last invocation. If this key is set to an non-empty string,
-comparison is done using only the current word. So if it is set,
-attempting completion on a word equal to the one when completion was called
-the last time will not delay the generation of matches.
-)
-item(tt(match_original))(
-If set too tt(only), the tt(_match) completer will try to generate
-matches without inserting a `tt(*)' at the cursor position. If set to
-any other non-empty value, it will first try to generate matches
-without inserting the `tt(*)' and if that yields no matches, it will
-try again with the `tt(*)' inserted.
-)
-item(tt(match_insert))(
-If this is set to a string starting with tt(unambig), the tt(_match)
-completer will start menu completion only if no unambiguous string
-could be generated that is at least as long as the original string
-from the line.
-)
-item(tt(oldlist_list))(
-If this is set to tt(always), then standard widgets which perform listing
-will retain the current list of matches, however they were generated.  If
-it is set to tt(never), this will not be done (the behaviour without the
-tt(_oldlist) completer).  If it is unset, or any other value, then the
-existing list of completions will be displayed if it is not already;
-otherwise, the standard completion list will be generated:  this is the
-default behaviour of tt(_oldlist). However, if there is an old list
-and this key contains the name of the completer function that
-generated the list, then the old list will be used even if it was
-generated by a widget which does not do listing.
-
-For example, suppose you type tt(^Xc) to use the tt(_correct_word)
-widget, which generates a list of corrections for the word under the
-cursor.  Usually, typing tt(^D) would generate a standard list of
-completions for the word on the command line, and show that.  With
-tt(_oldlist), it will instead show the list of corrections already
-generated.
-
-As another example consider the tt(_match) completer: with the
-tt(match_insert) key set to tt(unambig) it inserts only an
-unambiguous prefix string if there is any. But since this may remove
-parts of the original pattern, attempting completion again may result
-in more matches than on the first attempt. But by using the
-tt(_oldlist) completer and setting this key to tt(_match), the list of 
-matches generated on the first attempt will be used again.
-)
-item(tt(oldlist_menu))(
-Controls how menu completion behaves when a completion has already been
-inserted and the user types a standard completion key type such as tt(TAB).
-The default behaviour of tt(_oldlist) is that menu completion always
-continues with the existing list of completions.  If this key is set to
-tt(never), however, a new completion is started if the old list was
-generated by a different completion command (the behaviour without the
-tt(_oldlist) completer).
-
-For example, suppose you type tt(^Xc) to generate a list of corrections,
-and menu completion is started in one of the usual ways.  Usually, typing
-tt(TAB) at this point would start trying to complete the line as it now
-appears.  With tt(_oldlist), it will instead continue to cycle through the
-list of completions.
-
-With this key, the tt(_oldlist) completer also has additional support
-for the tt(_verbose_list) bindable command: when it is set to
-tt(verbose), invoking the tt(_oldlist) completer after a different
-list has been shown by calling the tt(_verbose_list) command will make 
-completion re-use this list, so that, for example, menu completion
-will be started when the tt(AUTO_LIST) option is set.
-)
-item(tt(verboselist_stages))(
-This key is used by the tt(_verbose_list) bindable command to find out 
-when options or descriptions should be shown. It is a colon-separated
-list of the keywords tt(normal), tt(options) and tt(describe). The
-keywords are used in the order in which they appear to describe what
-should be listed on the next call to the widget (with an unchanged
-command line). The value tt(normal) says that the list should be
-generated as defined by the normal settings of the configuration
-keys, the value tt(options) says that options should be listed even if 
-the tt(option_prefix) configuration key is set, and tt(describe) says
-that options and values should be described. The last two can be
-combined as in tt(describe-options) to make both options being listed
-and options and values being described.
-
-For example, if tt(option_prefix) is set to any non-empty value,
-tt(describe_options) is not set and tt(verboselist_stages) is set to
-tt(describe:normal) invoking the tt(_verbose_list) widget with a list
-being shown will replace this list with a list containing also option
-names that are possible matches and will also make these options be
-described if possible. Consecutively invoking the tt(_verbose_list)
-widget will then toggle between the normal list form and the extra
-verbose one.
-)
-item(tt(path_expand))(
-This is used by the tt(_path_files) function which is used throughout
-the completion system to generate filenames. If this is set to any
-non-empty string, the partially typed path from the line will be
-expanded as far as possible even if trailing pathname components can
-not be completed.
-)
-item(tt(path_cursor))(
-Like tt(path_expand), this is used by the tt(path_files) function. If
-this is set to a non-empty string, the cursor will be left after the
-first ambiguous pathname component even when menucompletion is used.
-)
-item(tt(ps_args))(
-This key is used by completion functions that call the unix command
-tt(ps) to generate process IDs as matches. Its value is given to
-tt(ps) as its argument when calling it to get the IDs of process to
-complete.
-)
-item(tt(ps_listargs))(
-Like tt(ps_args), this key is used by functions that call tt(ps) to
-generate process IDs as matches. These functions will display the
-output of tt(ps) called with the value of this key as its argument
-when showing completion lists.
-)
-item(tt(urls_localhttp))(
-This key is used by completion functions which generate URLs as
-possible matches to add suitable matches when a URL points to a
-local web server. Its value should be of the form
-`tt(hostname:doc root:user area)' where hostname is the name of the web
-server, doc root is the path to the default web pages for the server
-and user area is the directory name used by a user placing web pages
-within their home area
-)
-item(tt(urls_path))(
-This key is used by completion functions that generate URLs as
-possible matches. It should be set to the path of a directory
-containing sub-directories named like `tt(http)', `tt(ftp)',
-`tt(bookmark)', and so on. These sub-directories should contain files
-and other sub-directories whose pathnames are possible completions
-after the initial `tt(http://)', `tt(ftp://)', etc. See the
-description in the file tt(_urls) in the tt(User) sub-directory of the 
-completion system for more information.
-)
-item(tt(colors_path))(
-This is used by functions that complete color names. It should be set
-to the pathname of a file containing color names in the format of an
-X11 tt(rgb.txt) file.
-)
-item(tt(history_list))(
-If this is set to a non-empty string, the tt(_history_complete_word)
-bindable command will list all available matches.
-)
-item(tt(history_remove_all_dups))(
-If this is set to a non-empty string, the tt(_history_complete_word)
-bindable command will remove all duplicate matches, rather than just
-removing consecutive duplicates.
-)
-item(tt(history_sort))(
-If this is set to a non-empty string, completion functions that
-generate words from the history as possible matches sort these words
-alphabetically instead of keeping them in the order in which they
-appear in the history (from youngest to oldest).
-)
-item(tt(history_stop))(
-If this is set to a non-empty string, the tt(_history_complete_word)
-bindable command will always insert matches as if menu-completion were 
-started and it will stop when the last match is inserted. If this key
-is set to tt(verbose) a message will be displayed when the last match
-is reached.
-)
-item(tt(cvs_disable_stat))(
-This is used by the completion function for the tt(cvs) command. If it 
-is set to a non-empty value, this function will not try to use the
-tt(stat) module to generate only names of modified files in the
-appropriate places.
-)
-item(tt(regex_arguments_path))(
-This specifies cache directory for the tt(_regex_arguments).  If it is
-empty, tt($HOME/.zsh/regex_arguments) is assumed.
-
-If tt(regex_arguments_path) is an existing writable directory,
-tt(_regex_arguments) sotores a compiled function definition into the
-directory.
-)
-item(tt(incremental_prompt))(
-The keys with the prefix tt(incremental_) are used by the
-tt(incremental-complete-word) widget found in the tt(Functions/Zle)
-directory of the tt(zsh) source distribution.
-
-This key defines the Prompt to show in the status line during
-incremental completion. The sequence `tt(%u)' is replaced by the
-unambiguous part of all matches if there is any and it is different
-from the word on the line. A `tt(%s)' is replaced with `tt(-no
-match-)', `tt(-no prefix-)', or an empty string if there is no
-completion matching the word on the line, if the matches have no
-common prefix different from the word on the line or if there is such
-a common prefix, respectively. The sequence `tt(%c)' is replaced by
-the name of the completer function that generated the matches (without
-the leading underscore). Finally, `tt(%n)' is replaced by the number
-of matches generated, `tt(%a)' is replaced by an empty string if
-the matches are in the normal set (i.e. the one without file names
-with one of the suffixes from the tt(fignore) array) and with `tt(
--alt-)' if the matches are in the alternate set, and if the
-tt(incremental_list) key (see below) is set, `tt(%l)' is replaced by
-`tt(...)' if the list of matches is too long to fit on the screen and
-with an empty string otherwise. If tt(incremental_list) is not set or
-set to an empty string, `tt(%l)' will always be removed.
-)
-item(tt(incremental_stop))(
-This gives a pattern matching (keyboard-) keys which will cause
-incremental completion to stop and the key to be re-executed.
-)
-item(tt(incremental_break))(
-This gives a pattern matching (keyboard-) keys which will cause
-incremental completion to stop and the key to be discarded.
-)
-item(tt(incremental_completer))(
-Colon-separated list of completers, like the tt(completer) key for
-normal completion.
-)
-item(tt(incremental_list))(
-If set to a non-empty string, the matches will be listed on every
-key-press.
-)
-item(tt(predict_completer))(
-The keys starting with tt(predict_) are used by the functions in the
-tt(predict-on) file in the tt(Functions/Zle) directory of the tt(zsh)
-source distribution.
-
-A colon separated list of completer functions (like the tt(completer)
-key for normal completion) to be used when attempting completion.
-)
-item(tt(predict_cursor))(
-This describes where the cursor should be left after completion was
-attempted. If it is set to `tt(complete)' the cursor is left where
-completion put it if it is after the character typed, otherwise this
-behaves like the value `tt(key)'. If it is set to `tt(key)' the
-prediction function will try to place the cursor after the character
-which corresponds to the last character typed. This is useful if one
-uses global match specifications with patterns for partial word
-completion. If no sensible place could be found or this configuration
-key is set to any other value (or unset), the cursor is moved back to
-the original position. With global match specifications as described
-above this sometimes means that the character typed does not appear on 
-the line.
-)
-item(tt(predict_list))(
-If this is set to `tt(always)' the list of possible matches when
-completion was tried will always be shown, even if there is only one
-match. Otherwise the listing behavior is as usual, i.e. the list will
-only be shown if there are multiple matches.
 )
 enditem()

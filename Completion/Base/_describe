@@ -2,21 +2,15 @@
 
 # This can be used to add options or values with descriptions as matches.
 
-local _cmd _opt _expl _tmps _tmpd _tmpmd _tmpms _ret=1 _showd _nm _hide _args
+local _opt _expl _tmps _tmpd _tmpmd _tmpms _ret=1 _showd _nm _hide _args
 local _type=values
 
-_cmd="$words[1]"
+# Get the option.
 
-# Get the options.
-
-while getopts 'oc:' _opt; do
-  if [[ "$_opt" = o ]]; then
-    _type=options
-  else
-    _cmd="$OPTARG"
-  fi
-done
-shift OPTIND-1
+if [[ "$1" = -o ]]; then
+  _type=options
+  shift
+fi
 
 # Do the tests. `showd' is set if the descriptions should be shown.
 

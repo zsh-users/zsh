@@ -7,7 +7,7 @@
 # standard completion --- though editing in the middle is liable to delete
 # the rest of the line.
 #
-# The setting of compmatchers means that if you use the completion system,
+# With the function based completion system (which is needed for this),
 # you should be able to type TAB at almost any point to advance the cursor
 # to the next "interesting" character position (usually the end of the
 # current word, but sometimes somewhere in the middle of the word).  And
@@ -23,8 +23,6 @@
 # Note that all functions are defined when you first type the predict-on
 # key, which means typing the predict-off key before that gives a harmless
 # error message.
-#
-# This uses the configuration keys starting with `predict_'.
 
 predict-on() {
   zle -N self-insert insert-and-predict
@@ -55,13 +53,18 @@ insert-and-predict () {
 	  unsetopt automenu recexact
 	  integer curs=$CURSOR pos nchar=${#LBUFFER//[^${KEYS[-1]}]}
 	  local -a +h comppostfuncs
+	  local crs curcontext="$curcontext"
+
+	  [[ -z "$curcontext" ] && curcontext=':predict'
+
 	  comppostfuncs=( predict-limit-list )
-	  zle complete-word ${(s.:.)compconfig[predict_completer]}
+	  zle complete-word
 	  # Decide where to leave the cursor. The dummy loop is used to
 	  # get out of that `case'.
 	  repeat 1
 	  do
-	    case $compconfig[predict_cursor] in
+	    _style -s '' cursor crs
+	    case $crs in
 	    (complete)
 	      # At the place where the completion left it, if it is after
 	      # the character typed.
@@ -118,7 +121,7 @@ predict-limit-list() {
   then
     compstate[list]=''
     compstate[force_list]=yes
-  elif [[ $compconfig[predict_list] = always ]]
+  elif _style '' list always ]]
   then
     compstate[force_list]=yes
   fi

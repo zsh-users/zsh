@@ -5,15 +5,15 @@
 # by Adam Spiers, with help gratefully received from
 # Sven Wischnowsky and Bart Schaefer
 #
-# Available configuration keys:
+# Available styles:
 #
-#   :history-entries:list -- display lists of available matches
-#   :history-entries:stop -- prevent looping at beginning and end of matches
-#                            during menu-completion
-#   :history-entries:sort -- sort matches lexically (default is to sort by age)
-#   :history-entries:remove-all-dups --
-#                            remove /all/ duplicate matches rather than just
-#                            consecutives
+#   :history-words:list -- display lists of available matches
+#   :history-words:stop -- prevent looping at beginning and end of matches
+#                          during menu-completion
+#   :history-words:sort -- sort matches lexically (default is to sort by age)
+#   :history-words:remove-all-dups --
+#                          remove /all/ duplicate matches rather than just
+#                          consecutives
 #
 
 _history_complete_word () {
@@ -25,9 +25,9 @@ _history_complete_word () {
     direction=newer
   fi
 
-  _style -s history-entries stop stop
+  _style -s history-words stop stop
 
-  _style history-entries list || compstate[list]=''
+  _style history-words list || compstate[list]=''
 
   if [[ -n "$compstate[old_list]" &&
         ( -n "$stop" || "$compstate[insert]" = menu ) ]] ; then
@@ -36,7 +36,6 @@ _history_complete_word () {
       if [[ compstate[old_insert] -eq $_hist_menu_length ||
             "$_hist_stop" == 'oldest' ]]; then
         _hist_stop='oldest'
-	_style history-entries 
         [[ "$stop" = verbose ]] &&
           _message 'beginning of history reached'
       elif [[ "$_hist_stop" == 'newest' ]]; then
@@ -68,14 +67,14 @@ _history_complete_word () {
 }
 
 _history_complete_word_gen_matches () {
-  if _style history-entries list; then
-    if _style history-entries sort; then
+  if _style history-words list; then
+    if _style history-words sort; then
       _description expl 'history word'
     else
       _description -V expl 'history word'
     fi
   else
-    if _style history-entries sort; then
+    if _style history-words sort; then
       expl=()
     else
       expl=('-V' '')
@@ -85,7 +84,7 @@ _history_complete_word_gen_matches () {
   [[ -n "$_hist_stop" ]] && PREFIX="$_hist_old_prefix"
 
   local rem_dups
-  if _style history-entries remove-all-dups; then
+  if _style history-words remove-all-dups; then
     rem_dups=''
   else
     rem_dups='-1'
