@@ -27,11 +27,12 @@
  *
  */
 
-/**/
-#if defined(HAVE_PCRE_COMPILE) && defined(HAVE_PCRE_EXEC)
 
 #include "pcre.mdh"
 #include "pcre.pro"
+
+/**/
+#if defined(HAVE_PCRE_COMPILE) && defined(HAVE_PCRE_EXEC)
 #include <pcre.h>
 
 static pcre *pcre_pattern;
@@ -48,6 +49,8 @@ bin_pcre_compile(char *nam, char **args, char *ops, int func)
     if(ops['i']) pcre_opts |= PCRE_CASELESS;
     if(ops['m']) pcre_opts |= PCRE_MULTILINE;
     if(ops['x']) pcre_opts |= PCRE_EXTENDED;
+    
+    pcre_hints = NULL;  /* Is this necessary? */
     
     pcre_pattern = pcre_compile(*args, pcre_opts, &pcre_error, &pcre_errptr, NULL);
     
@@ -86,11 +89,38 @@ bin_pcre_study(char *nam, char **args, char *ops, int func)
 static int
 bin_pcre_match(char *nam, char **args, char *ops, int func)
 {
-#define PCRE_OVEC_SIZE 50
+    int ret, capcount, *ovec, ovecsize;
+    char **captures;
     
-    int ovec[PCRE_OVEC_SIZE];   /* throwing this away now, but will be useful someday */
+    if (pcre_fullinfo(pcre_pattern, pcre_hints, PCRE_INFO_CAPTURECOUNT, &capcount))
+    {
+	zwarnnam(nam, "error in fullinfo", NULL, 0);
+	return 1;
+    }
     
-    return !(pcre_exec(pcre_pattern, pcre_hints, *args, strlen(*args), 0, 0, ovec, PCRE_OVEC_SIZE) >= 0);
+    ovecsize = (capcount+1)*3;
+    ovec = zalloc(ovecsize*sizeof(int));
+    
+    ret = pcre_exec(pcre_pattern, pcre_hints, *args, strlen(*args), 0, 0, ovec, ovecsize);
+    
+    if (ret==0) return 0;
+    else if (ret==PCRE_ERROR_NOMATCH) return 1; /* no match */
+    else if (ret>0) {
+	if(!pcre_get_substring_list(*args, ovec, ret, (const char ***)&captures)) {
+
+	    freearray(pparams);
+	    pparams = zarrdup(&captures[1]); /* first one would be entire string */
+	    
+	    pcre_free_substring_list((const char **)captures);
+	    return 0;
+      	}
+    }
+    else {
+	zwarnnam(nam, "error in pcre_exec", NULL, 0);
+	return 1;
+    }
+    
+    return 1;
 }
 
 static struct builtin bintab[] = {

@@ -1,5 +1,12 @@
 2001-07-03  Clint Adams  <clint@zsh.org>
 
+	* 15228: zshconfig.ac, Src/Modules/pcre.c:
+	switch AC_CHECK_LIB to AC_SEARCH_LIBS for pcre.
+	Have pcre_match set positional parameters
+	with the contents of capture buffers.
+
+2001-07-03  Clint Adams  <clint@zsh.org>
+
 	* unposted: Doc/Makefile.in: add mod_pcre.yo to makefile.
 
 2001-07-03  Oliver Kiddle  <opk@zsh.org>

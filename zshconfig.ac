@@ -644,7 +644,7 @@ AC_CHECK_LIB(cap, cap_get_proc)
 AC_CHECK_LIB(socket, socket)
 
 dnl pcre-config should probably be employed here
-AC_CHECK_LIB(pcre, pcre_compile)
+AC_SEARCH_LIBS(pcre_compile, pcre)
 
 dnl ---------------------
 dnl CHECK TERMCAP LIBRARY
