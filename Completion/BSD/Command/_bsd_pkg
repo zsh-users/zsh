@@ -1,4 +1,4 @@
-#compdef pkg_add pkg_delete pkg_info
+#compdef pkg_add pkg_create pkg_delete pkg_info
 
 (( $+functions[_bsd_pkg_pkgfiles] )) ||
 _bsd_pkg_pkgfiles() {
@@ -78,6 +78,49 @@ _bsd_pkg() {
       $flags[@] \
       '*:package to install:_bsd_pkg_pkgfiles'
     ;;
+
+  pkg_create)
+    case "$OSTYPE" in
+    freebsd*)
+      flags=(
+	'-f[specify plist file]:plist file:_files'
+	'(-b)-c[specify comment file]:comment file:_files'
+	'(-b)-d[specify descr file]:descr file:_files'
+	'-Y[assume YES for any questions asked]'
+	'-N[assume NO for any questions asked]'
+	'(-b)-O[packing list only mode]'
+	'-v[be verbose]'
+	'-h[force tar to follow symlinks]'
+	'(-b)-i[specify pre-install script]:pre-install script:_files'
+	'(-b)-I[specify post-install script]:post-install script:_files'
+	'(-b)-P[specify initial dependencies]:dependencies:_bsd_pkg_pkgs'
+	'(-b)-p[specify prefix]:prefix directory:_files -/'
+	'(-b)-k[specify deinstall script]:deinstall script:_files'
+	'(-b)-K[specify post-deinstall script]:post-deinstall script:_files'
+	'(-b)-r[specify req script]:req script:_files'
+	'(-b)-s[specify source directory]:source directory:_files -/'
+	'(-b)-t[specify mktemp template]:mktemp template:_files'
+	'(-b)-X[specify exclude file]:exclude file for tar:_files'
+	'(-b)-D[specify message file]:message file:_files'
+	'(-b)-m[specify mtree file]:mtree file:_files'
+	'(-b)-o[specify origin]:origin:_files -W ${PORTSDIR\:-/usr/ports} -/'
+	'-j[use bzip2]'
+	'-z[use gzip]'
+	'(-c -d -O -i -I -P -p -k -K -r -s -t -X -D -m -o)-b[specify pkgname]:pkgname:_bsd_pkg_pkgs'
+	'*:package file name:_files'
+      )
+      ;;
+    netbsd*)
+      # NetBSD users, improve me!
+      flags=(
+	'*:package name:_bsd_pkg_pkgs'
+      )
+      ;;
+    esac
+
+    _arguments -s \
+      $flags[@]
+      ;;
 
   pkg_delete)
     flags=(
