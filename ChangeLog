@@ -1,3 +1,8 @@
+2002-11-06  Sven Wischnowsky  <wischnow@zsh.org>
+
+	* 17910: Bart (17906): de-quote prefix when calling compfiles to
+	remove non-exact matches
+
 2002-11-04  Peter Stephenson  <pws@csr.com>
 
 	* 17859: Philippe Troin <phil@fifi.org>: Src/init.c: Better

@@ -464,7 +464,7 @@ for prepath in "$prepaths[@]"; do
     # names. This avoids having `foo' complete to `foo' and `foobar'.
     # The return value is non-zero if the component is ambiguous.
 
-    compfiles -r tmp1 "$tmp3"
+    compfiles -r tmp1 "${(Q)tmp3}"
     tmp4=$?
 
     if [[ "$tpre" = */* ]]; then
