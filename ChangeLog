@@ -1,5 +1,7 @@
 2001-03-25  Peter Stephenson  <pws@pwstephenson.fsnet.co.uk>
 
+	* 13751: Completion/User/_cpio: added.
+
 	* 13745: Test/ztst.zsh: set LC_COLLATE to C if already set to
 	something.
 
