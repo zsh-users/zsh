@@ -1190,7 +1190,7 @@ gettokstr(int c, int sub)
 		    goto brk;
 		}
 		e = hgetc();
-		if (e != '\'' || unset(RCQUOTES))
+		if (e != '\'' || unset(RCQUOTES) || strquote)
 		    break;
 		add(c);
 	    }

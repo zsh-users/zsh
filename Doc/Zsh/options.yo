@@ -917,7 +917,9 @@ cindex(rc, quoting style)
 cindex(quoting style, rc)
 item(tt(RC_QUOTES))(
 Allow the character sequence `tt('')' to signify a single quote
-within singly quoted strings.
+within singly quoted strings.  Note this does not apply in quoted strings
+using the format tt($')var(...)tt('), where a backslashed single quote can
+be used.
 )
 pindex(RCS)
 cindex(startup files, sourcing)

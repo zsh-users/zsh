@@ -1,5 +1,8 @@
 2000-05-24  Peter Stephenson  <pws@cambridgesiliconradio.com>
 
+	* 11561: Src/lex.c, Doc/Zsh/expn.yo: don't use RC_QUOTES in Posix
+	$'...' quoting.
+
 	* 11560: Doc/Zsh/expn.yo: pipes are pipes even if plumbing isn't.
 
 2000-05-24  Bart Schaefer  <schaefer@zsh.org>
