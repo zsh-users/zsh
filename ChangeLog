@@ -1,3 +1,10 @@
+2005-04-01  Oliver Kiddle  <opk@zsh.org>
+
+	* 21081: Completion/Unix/Command/_fuser: complete network
+	services for the psmisc version of fuser
+
+	* unposted: Completion/Unix/Command/_subversion: minor correction
+
 2005-04-01  Peter Stephenson  <pws@csr.com>
 
 	* c.f. 21071: Doc/Zsh/{builtins.yo,compsys.yo,compwid.yo,func.yo,
