@@ -1,3 +1,7 @@
+2000-06-11  Tanaka Akira  <akr@zsh.org>
+
+	* 11861: Completion/User/_cvs: fix -a use for compadd.
+
 2000-06-10  Bart Schaefer  <schaefer@zsh.org>
 
 	* 11850: Src/Zle/complist.c: Don't try to menuselect in a listing

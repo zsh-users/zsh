@@ -813,7 +813,7 @@ _cvs_nonexisting_entries () {
       ${${${${(M)${(f)"$(<"$realdir"CVS/Entries)"}:#(D|)/*}#(D|)/}%%/*}:#${(j:|:)~${files//(#m)[][*?()<|^~#\\]/\\$MATCH}}}
     )
     compquote files
-    _wanted files expl file compadd -Qp -a linedir files
+    _wanted files expl file compadd -Qp "$linedir" -a files
   }
 }
 
