@@ -1,5 +1,126 @@
+2000-01-05  Peter Stephenson  <pws@pwstephenson.fsnet.co.uk>
+
+	* pws: Config/version.mk: zsh-3.1.6-dev-14 (note change of
+	string).
+
+	* Sven: 9219: Functions/Zle/predict-on: zstyle typo.
+
+	* Sven: 9217: Completion/User/_lp, Doc/Zsh/compsys.yo: additions
+	to foregoing.
+
+	* Sven: zsh-users/2830: Completion/User/.distfiles,
+	Completion/User/_lp, Completion/User/_ps: completion for printer
+	commands.
+
+	* Alexandre: 9216: Src/Zle/computil.c, Completion/User/.distfiles,
+	Completion/User/_prcs: Don't skip too many characters at start of
+	option; completion for prcs revision control.
+
+2000-01-04  Peter Stephenson  <pws@pwstephenson.fsnet.co.uk>
+
+	* pws: 9212: Src/zsh.h, Src/Zle/zle_main.c, Src/Zle/zle_hist.c:
+	make cleaner use of flags to zleread().
+
+	* pws: 9209: Src/Makefile.in, Src/Makemod.in.in, Doc/Makefile.in:
+	rearrange 9181 to better order.
+
+	* Tanaka Akira: 9206 (+ tweaks): Src/zsh.h: use __attribute__
+	to get alignment for struct heap for gcc.
+
+	* Gene Cohler: 9200: Src/module.c: fix for dynamic linking on
+	latest HP-UX 11 systems.
+
+	* Sven: 9199: Completion/Core/_path_files, Doc/Zsh/compsys.yo:
+	allow sorting with sort style for files.
+
+	* Sven: 9198: Completion/Base/_arguments, Completion/Base/_values,
+	Completion/Core/_alternative: avoid mangling spaces with evals.
+
+	* Sven: 9197: Completion/Core/_multi_parts,
+	Completion/Core/_path_files, Completion/Core/_sep_parts:
+	tweak approximation for file completion etc.
+
+	* Sven: 9195: Src/Zle/compcore.c: PS to 9189.
+
+	* Sven: 9193: Completion/Builtins/_zstyle: fix typos etc.
+
+	* Sven: 9191: Completion/Base/_default,
+	Completion/Core/_description, Completion/Core/_path_files,
+	Doc/Zsh/compsys.yo, Doc/Zsh/compwid.yo, Src/Zle/complete.c:
+	style control of matcher specification.
+
+	* Sven: 9190: Completion/Core/compinit: tweak default completion
+	styles.
+
+	* Sven: 2826: Completion/Commands/_complete_help: help is more
+	helpful about what functions completion is in.
+
+	* Sven: 9189: Src/Zle/compcore.c: problem with not recognizing
+	prefix lengths when adding matches from patterns.
+
+	* Sven: 9188: Src/loop.c: repeat with a negative count.
+
+	* Sven: 9187: Src/Zle/computil.c: bug with :*pat: patterns
+	in styles.
+
+	* Helmut: 9186: Src/zsh.h: heaps struct was no longer properly
+	aligned.
+
+2000-01-02  Peter Stephenson  <pws@pwstephenson.fsnet.co.uk>
+
+	* pws: 9181: Src/Makefile.in, Src/Makemod.in.in, Doc/Makefile.in:
+	add .PHONY targets to prevent GNU make creating them sometimes.
+
+2000-01-01  Peter Stephenson  <pws@pwstephenson.fsnet.co.uk>
+
+	* Tanaka Akira: 9174: Test/ztst.zsh: missing `$'.
+
+	* Geoff: 9173: Completion/User/_tar: bogus `}'.
+
+	* Tanaka Akira: 9170: Completion/Builtins/_unhash,
+	Completion/User/_mutt: typos.
+
+	* Geoff: 9169: Completion/Builtins/_stat: bogus `fi'.
+
+1999-12-29  Peter Stephenson  <pws@pwstephenson.fsnet.co.uk>
+
+	* Tanaka Akira: 9166: Completion/Builtins/_zstyle,
+	Doc/Zsh/compsys.yo, Doc/Zsh/mod_zutil.yo: remove unnecessary
+	cache-path tag.
+
+	* Clint: 9165: Completion/Debian/_dpkg: dpkg improvement.
+
+	* Tanaka Akira: 9164: Test/01grammar.ztst: use zsh instead of sh
+	to check - modifier.
+
+	* Tanaka Akira: 9163: Test/ztst.zsh: use absolute path for test
+	directory.
+
+1999-12-28  Peter Stephenson  <pws@pwstephenson.fsnet.co.uk>
+
+	* pws: 9162: Completion/Base/_regex_arguments,
+	Src/Modules/zutil.c: rename regexparse to zregexparse.
+
+	* Tanaka Akira: 9161: Completion/Debian/_apt,
+	Completion/Debian/_deb_packages: improved 9160.
+
+	* Clint: 9160: Completion/Debian/_deb_packages: handle -J option.
+
+	* Vin Shelton: 9159: Test/Makefile.in, Test/ztst.zsh,
+	Test/07cond.ztst: fix testing when source and build tree are
+	separate.
+
+	* Tanaka Akira: 9158: Src/Modules/zutil.mdd: fix module
+	dependencies (showed up only in static linking).
+
+	* Tanaka Akira: 9154, 9156: Completion/Base/_regex_arguments,
+	Src/Modules/zutil.c: re-implement parsing for _regex_arguments in
+	C.
+
 1999-12-23  Peter Stephenson  <pws@pwstephenson.fsnet.co.uk>
 
+	* pws: Config/version.mk: zsh-3.1.6-pws-13.
+	
 	* Zefram: 9143: Util/mkdisttree.sh: same find change here.
 
 	* Andrej: 9142: Util/preconfig: work around probably find bug
