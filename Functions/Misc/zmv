@@ -263,7 +263,12 @@ for f in $files; do
   elif [[ -n $from[$g] && ! -d $g ]]; then
     errs=($errs "$f and $from[$g] both map to $g")
   elif [[ -f $g && -z $opt_f ]]; then
-    errs=($errs "file exists: $g")
+    if [[ $f != $g && $f -ef $g ]]; then
+      errs=($errs "file exists: $g
+(Probably the same file, owing to file system limitations.)")
+    else
+      errs=($errs "file exists: $g")
+    fi
   fi
   from[$g]=$f
   to[$f]=$g

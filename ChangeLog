@@ -1,3 +1,8 @@
+2004-01-16  Peter Stephenson  <pws@csr.com>
+
+	* 19382: Functions/Misc/zmv: better error message if move failed
+	due to file system not recognising new name as being different.
+
 2004-01-15  Oliver Kiddle  <opk@zsh.org>
 
 	* 19378: Completion/Debian/Command/_update-rc.d,
