@@ -1734,6 +1734,33 @@ freecastate(Castate s)
     zfree(s->oargs, s->d->nopts * sizeof(LinkList));
 }
 
+/* Return a copy of an option's argument, ignoring possible quoting
+ * in the option name. */
+
+static char *
+ca_opt_arg(Caopt opt, char *line)
+{
+    char *o = opt->name;
+
+    while (1) {
+        if (*o == '\\')
+            o++;
+        if (*line == '\\' || *line == '\'' || *line == '"')
+            line++;
+        if (!*o || *o != *line)
+            break;
+        o++;
+        line++;
+    }
+    if (*line && (opt->type == CAO_EQUAL || opt->type == CAO_OEQUAL)) {
+        if (*line == '\\')
+            line++;
+        if (*line == '=')
+            line++;
+    }
+    return ztrdup(line);
+}
+
 /* Parse a command line. */
 
 static int
@@ -1742,7 +1769,7 @@ ca_parse_line(Cadef d, int multi, int first)
     Caarg adef, ddef;
     Caopt ptr, wasopt = NULL, dopt;
     struct castate state;
-    char *line, *pe, **argxor = NULL;
+    char *line, *oline, *pe, **argxor = NULL;
     int cur, doff, argend, arglast, ne;
     Patprog endpat = NULL, napat = NULL;
     LinkList sopts = NULL;
@@ -1808,6 +1835,7 @@ ca_parse_line(Cadef d, int multi, int first)
 	doff = state.singles = arglast = 0;
 
         /* remove quotes */
+        oline = line;
         line = dupstring(line);
         ne = noerrs;
         noerrs = 2;
@@ -1827,7 +1855,7 @@ ca_parse_line(Cadef d, int multi, int first)
 	if (state.def) {
 	    state.arg = 0;
 	    if (state.curopt)
-		zaddlinknode(state.oargs[state.curopt->num], ztrdup(line));
+		zaddlinknode(state.oargs[state.curopt->num], ztrdup(oline));
 
 	    if ((state.opt = (state.def->type == CAA_OPT)) && state.def->opt)
 		state.oopt++;
@@ -1909,7 +1937,8 @@ ca_parse_line(Cadef d, int multi, int first)
 		    state.def->type != CAA_RREST)
 		    state.def = state.def->next;
 
-		zaddlinknode(state.oargs[state.curopt->num], ztrdup(pe));
+		zaddlinknode(state.oargs[state.curopt->num],
+                             ca_opt_arg(state.curopt, oline));
 	    }
 	    if (state.def)
 		state.opt = 0;
@@ -1962,7 +1991,8 @@ ca_parse_line(Cadef d, int multi, int first)
 		    state.def->type != CAA_RREST)
 		    state.def = state.def->next;
 
-		zaddlinknode(state.oargs[state.curopt->num], ztrdup(pe));
+		zaddlinknode(state.oargs[state.curopt->num],
+                             ca_opt_arg(state.curopt, line));
 	    }
 	    if (state.def)
 		state.opt = 0;

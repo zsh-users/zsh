@@ -1,5 +1,8 @@
 2002-05-23  Sven Wischnowsky  <wischnow@zsh.org>
 
+	* 17196: Src/Zle/computil.c: report option arguments to
+	_arguments in the original form
+
 	* 17214: Completion/Base/Utility/_arguments: for automatic long
 	options completion, use the string after the equal signs (from
 	the --help-text) as the description to shown when completing
