@@ -1,6 +1,11 @@
 # Simple wrapper function for `nslookup'. With completion if you are using
 # the function based completion system.
 
+if [[ $argv[(I)-] -eq 0 && $argv[(I)[^-]*] -ne 0 ]]; then
+  command nslookup "$@"
+  return
+fi
+
 setopt localoptions localtraps completealiases
 
 local tmp line compcontext=nslookup curcontext='nslookup:::' pmpt
@@ -19,7 +24,7 @@ zstyle -s ':nslookup' pager tmp &&
     [[ -z "$pager" ]] && pager="${opager:-more}"
 (( $#pmpt )) || pmpt=(-p '> ')
 
-zpty nslookup nslookup
+zpty nslookup nslookup "$@"
 
 zpty -r nslookup line '*
 > '
