@@ -1,3 +1,11 @@
+2001-10-22  Peter Stephenson  <pws@csr.com>
+
+	* 16033: Pavel Roskin <proski@gnu.org>:
+          Src/Builtins/rlimits.c: Undefine RLIMIT_RSS if it's equal to
+        RLIMIT_VMEM to avoid duplicate case value.
+          aczsh.m4 (zsh_LARGE_FILE_SUPPORT): Ignore output of getconf
+        if it returns "undefined".
+
 2001-10-22  Bart Schaefer  <schaefer@zsh.org>
 
 	* 16111: Src/Builtins/rlimits.c: Report error on attempt to set
