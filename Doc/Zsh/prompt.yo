@@ -120,7 +120,12 @@ tt(%K)/tt(%L) correspond to tt(%k)/tt(%l) for the hour of the day
 (24/12 hour clock) in the same way.
 )
 item(tt(%l))(
-The line (tty) the user is logged in on.
+The line (tty) the user is logged in on without tt(/dev/) prefix.
+If name starts with tt(/dev/tty) this is stripped.
+)
+item(tt(%y))(
+The line (tty) the user is logged in on without tt(/dev/) prefix.
+It does not treat tt(/dev/tty*) specially.
 )
 item(tt(%?))(
 The return code of the last command executed just before the prompt.
