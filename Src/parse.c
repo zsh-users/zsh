@@ -1587,6 +1587,8 @@ par_simple(int *complex, int nr)
 	    ecbuf[p] = WCB_FUNCDEF(ecused - 1 - p);
 
 	    isfunc = 1;
+	    isnull = 0;
+	    break;
 	} else
 	    break;
 	isnull = 0;

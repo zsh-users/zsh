@@ -1,3 +1,7 @@
+2002-06-04  Peter Stephenson  <pws@pwstephenson.fsnet.co.uk>
+
+	* 17283: Src/parse.c: `func() { ... } this bit was ignored'.
+
 2002-06-05  Peter Stephenson  <pws@csr.com>
 
 	* 17285: David Wolfe <dwolfe@gforcetech.com>:
