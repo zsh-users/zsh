@@ -1,3 +1,8 @@
+2000-12-15  Tanaka Akira  <akr@zsh.org>
+
+	* 13281: Functions/Misc/mere: new implementation.
+	Completion/User/_mere: new completion function for mere.
+
 2000-12-13  Clint Adams  <schizo@debian.org>
 
 	* 13250: Completion/User/.distfiles, Completion/User/_dict:
