@@ -1,5 +1,8 @@
 2001-07-05  Peter Stephenson  <pws@csr.com>
 
+	* 15277: Src/glob.c: bug with ${(S)...%%...}: the indices
+	for start and end of backreferences were incorrect.
+
 	* 15264: Doc/Zsh/grammar.yo: improve description of use of
 	variant complex command forms to avoid confusing the present
 	writer.
