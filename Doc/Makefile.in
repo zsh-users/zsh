@@ -27,8 +27,15 @@
 subdir = Doc
 dir_top = ..
 
-@@version.mk@@
-@@defs.mk@@
+@VERSION_MK@
+
+# source/build directories
+VPATH           = @srcdir@
+sdir            = @srcdir@
+sdir_top        = @top_srcdir@
+INSTALL         = @INSTALL@
+
+@DEFS_MK@
 
 MAKEINFO = makeinfo
 TEXI2DVI = texi2dvi
@@ -45,13 +52,15 @@ zshoptions.1 zshparam.1 zshzftpsys.1 zshzle.1 zshall.1
 # yodl documentation
 YODLDOC = $(MAN) zsh.texi
 YODLSRC = zmacros.yo zman.yo ztexi.yo Zsh/arith.yo Zsh/builtins.yo \
-Zsh/compat.yo Zsh/compctl.yo Zsh/cond.yo Zsh/exec.yo Zsh/expn.yo \
+Zsh/compat.yo Zsh/compctl.yo Zsh/compsys.yo Zsh/compwid.yo Zsh/cond.yo \
+Zsh/exec.yo Zsh/expn.yo \
 Zsh/filelist.yo Zsh/files.yo Zsh/func.yo Zsh/grammar.yo Zsh/guide.yo \
 Zsh/index.yo Zsh/intro.yo Zsh/invoke.yo Zsh/jobs.yo Zsh/metafaq.yo \
-Zsh/modules.yo Zsh/mod_cap.yo Zsh/compwid.yo Zsh/compsys.yo \
-Zsh/mod_clone.yo Zsh/mod_comp1.yo Zsh/mod_compctl.yo Zsh/mod_deltochar.yo \
-Zsh/mod_example.yo Zsh/mod_files.yo Zsh/mod_stat.yo \
-Zsh/mod_zle.yo Zsh/options.yo \
+Zsh/modules.yo Zsh/mod_cap.yo \
+Zsh/mod_clone.yo Zsh/mod_comp1.yo Zsh/mod_compctl.yo Zsh/mod_complist.yo \
+Zsh/mod_deltochar.yo Zsh/mod_example.yo Zsh/mod_files.yo \
+Zsh/mod_mapfile.yo Zsh/mod_parameter.yo Zsh/mod_sched.yo \
+Zsh/mod_stat.yo Zsh/mod_zftp.yo Zsh/mod_zle.yo Zsh/options.yo \
 Zsh/params.yo Zsh/prompt.yo Zsh/redirect.yo Zsh/restricted.yo \
 Zsh/seealso.yo Zsh/zftpsys.yo Zsh/zle.yo
 
@@ -65,7 +74,7 @@ zsh.dvi: zsh.texi
 	$(TEXI2DVI) $(sdir)/zsh.texi
 
 zsh.info: zsh.texi
-	$(MAKEINFO) $(sdir)/zsh.texi; exit 0
+	$(MAKEINFO) $(sdir)/zsh.texi || exit 0
 
 zsh.texi: zsh.yo
 	$(YODL) -o $(sdir)/zsh.texi -I$(sdir) -w ztexi.yo version.yo zsh.yo
@@ -76,7 +85,7 @@ zsh.texi: zsh.yo
 	  */*) target=$@ ;; \
 	  *) target=$(sdir)/$@ ;; \
 	esac; \
-	$(YODL) -o $$target -I$(sdir) -w zman.yo version.yo $< || exit 1; \
+	$(YODL) -I$(sdir) -w zman.yo version.yo $< | sed -e '1s/\\-/-/g' -e '/^\.'\''/d' > $$target || exit 1; \
 	test -f $$target
 
 zsh_us.ps: zsh.dvi
@@ -93,7 +102,7 @@ zshall.1: zsh.yo
 	  */*) target=$@ ;; \
 	  *) target=$(sdir)/$@ ;; \
 	esac; \
-	$(YODL) -o $$target -I$(sdir) -DZSHALL -w zman.yo version.yo zsh.yo || exit 1; \
+	$(YODL) -I$(sdir) -DZSHALL -w zman.yo version.yo zsh.yo | sed -e '1s/\\-/-/g' -e '/^\.'\''/d' > $$target || exit 1; \
 	test -f $$target
 
 ../META-FAQ: META-FAQ.yo Zsh/metafaq.yo
@@ -124,9 +133,10 @@ zshmisc.1: Zsh/grammar.yo Zsh/redirect.yo Zsh/exec.yo Zsh/func.yo \
            Zsh/prompt.yo Zsh/restricted.yo
 
 zshmodules.1: Zsh/modules.yo Zsh/mod_cap.yo Zsh/mod_clone.yo \
-              Zsh/mod_comp1.yo Zsh/mod_compctl.yo Zsh/mod_deltochar.yo \
-              Zsh/mod_example.yo Zsh/mod_files.yo Zsh/mod_sched.yo \
-              Zsh/mod_stat.yo Zsh/mod_zftp.yo Zsh/mod_zle.yo
+              Zsh/mod_comp1.yo Zsh/mod_complist.yo Zsh/mod_compctl.yo \
+              Zsh/mod_deltochar.yo Zsh/mod_example.yo Zsh/mod_files.yo \
+              Zsh/mod_mapfile.yo Zsh/mod_sched.yo Zsh/mod_stat.yo \
+              Zsh/mod_zftp.yo Zsh/mod_zle.yo
 
 zshoptions.1: Zsh/options.yo
 
@@ -167,7 +177,7 @@ install.man: $(MAN)
 # install info pages, creating install directory if necessary
 install.info: zsh.info
 	$(sdir_top)/mkinstalldirs $(infodir)
-	for file in zsh.info zsh.info-[1-9]; do \
+	for file in zsh.info zsh.info-[1-9]*; do \
 	  if test -f $$file; then \
 	    $(INSTALL_DATA) $$file $(infodir); \
 	  elif test -f $(sdir)/$$file; then \
@@ -191,11 +201,11 @@ uninstall.man:
 
 # uninstall info pages
 uninstall.info:
-	rm -f $(infodir)/zsh.info $(infodir)/zsh.info-[1-9]
+	rm -f $(infodir)/zsh.info $(infodir)/zsh.info-[1-9]*
 
 # ========== DEPENDENCIES FOR CLEANUP ==========
 
-@@clean.mk@@
+@CLEAN_MK@
 
 clean-here:
 	rm -f *.html *.info* *.dvi *.ps
@@ -210,4 +220,4 @@ realclean-here:
 
 # ========== DEPENDENCIES FOR MAINTENANCE ==========
 
-@@config.mk@@
+@CONFIG_MK@
