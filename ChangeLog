@@ -1,9 +1,10 @@
 2001-12-12  Oliver Kiddle  <opk@zsh.org>
 
-	* 16330: Completion/X/Command/_netscape, 
+	* 16323, 16330: Completion/Unix/Command/_webbrowser,
+	Completion/Unix/Type/_urls, Completion/X/Command/_netscape, 
 	Completion/Unix/Command/_lynx, Completion/Unix/Command/_links,
-	Completion/Unix/Command/_w3m: allow tag-order to select order of
-	files and urls instead of files first
+	Completion/Unix/Command/_w3m: allow tag-order to select order
+	of files and urls instead being fixed to files first
 
 2001-12-11  Clint Adams  <clint@zsh.org>
 

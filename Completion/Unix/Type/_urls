@@ -1,9 +1,5 @@
 #compdef curl
 
-# Usage: _urls [-f]
-# Options:
-#  -f : complete files first.
-#
 # Configuration styles used:
 #
 #  urls
@@ -47,11 +43,6 @@ zstyle -a ":completion:${curcontext}:urls" local localhttp
 local localhttp_servername="$localhttp[1]"
 local localhttp_documentroot="$localhttp[2]"
 local localhttp_userdir="$localhttp[3]"
-
-if [[ "$1" = -f ]]; then
-  shift
-  _wanted -C -f files expl file _files "$@" && return 0
-fi
 
 zstyle -a ":completion:${curcontext}:urls" urls urls
 
@@ -134,7 +125,7 @@ if ! compset -P '(#b)([^:/]#)([:/])'; then
 
   _tags hosts
   while _tags; do
-    while _next_label hosts expl host "$@"; do
+    while _next_label hosts expl host; do
       compset -S '[:/]*' || suf="/"
       (( $#uhosts )) || _hosts -S "$suf" -r '/:' "$expl[@]" && ret=0
       [[ "$scheme" = http ]] && uhosts=($uhosts $localhttp_servername)
