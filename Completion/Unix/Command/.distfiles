@@ -31,7 +31,7 @@ _strip          _stty           _su             _subversion     _sudo
 _sysctl         
 _tar            _telnet         _texinfo        _tidy           _tiff           
 _tin            _tla            
-_uniq           _user_admin     _vorbis         _vux            
+_unace          _uniq           _user_admin     _vorbis         _vux            
 _w3m            _webbrowser     _wget           _whereis        _whois          
 _wiggle         _xargs          _xmlsoft        
 _yodl           _yp             _zcat           _zdump          _zip            

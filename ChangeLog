@@ -1,3 +1,8 @@
+2005-03-03  Oliver Kiddle  <opk@zsh.org>
+
+	* Henryk Konsek: 20918 (modified): Completion/Unix/Command/_unace:
+	new completion for unace
+
 2005-03-03  Peter Stephenson  <pws@csr.com>
 
 	* from Wayne, adapted: 20900: another way of preventing
