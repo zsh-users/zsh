@@ -1,3 +1,9 @@
+2000-08-23  Sven Wischnowsky  <wischnow@zsh.org>
+
+	* 12692: Alexandre: 12691; 12692: Completion/User/_gv,
+	Completion/User/_pdf, Completion/User/_ps, Completion/User/_pspdf:
+ 	complete compressed files for gv; improve results from _pspdf
+	
 2000-08-21  Sven Wischnowsky  <wischnow@zsh.org>
 
 	* 12682: Completion/Builtins/_zmodload: use return value
