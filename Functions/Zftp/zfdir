@@ -98,11 +98,11 @@ if [[ -n $file && -f $file ]]; then
 else
   if (zftp test); then
     # Works OK in subshells
-    zftp dir $* | tee $file | eval ${PAGER-:more}
+    zftp dir $* | tee $file | eval ${PAGER:-more}
   else
     # Doesn't work in subshells (IRIX 6.2 --- why?)
     zftp dir $* >$file
-    eval ${PAGER-:more} $file
+    eval ${PAGER:-more} $file
   fi
 fi
 # }
