@@ -1,0 +1,221 @@
+# Tests corresponding to the `Redirection' texinfo node.
+
+%prep
+  mkdir redir.tmp && cd redir.tmp
+
+%test
+
+  print 'This is file redir' >redir  &&  cat redir
+0:'>' and '<' redirection
+>This is file redir
+
+  rm -f redir
+  print 'This is still file redir' <>redir >&0  &&  cat <>redir
+0:'<>' redirection
+>This is still file redir
+
+  rm -f redir
+  print 'With a bar' >|redir  &&  cat redir
+0:'>|' redirection
+>With a bar
+
+  rm -f redir
+  print 'With a bang' >!redir  &&  cat redir
+0:'>!' redirection
+>With a bang
+
+  rm -f redir
+  print 'Line 1' >>redir  &&  print 'Line 2' >>redir  &&  cat redir
+0:'>>' redirection
+>Line 1
+>Line 2
+
+  rm -f redir
+  print 'Line a' >>|redir  &&  print 'Line b' >>!redir
+0:'>>|' and '>>!' redirection
+
+  foo=bar
+  cat <<'  HERE'
+  $foo
+  HERE
+  eval "$(print 'cat <<HERE\n$foo\nHERE')"
+0:Here-documents
+>  $foo
+>bar
+
+  cat <<-HERE
+# note tabs at the start of the following lines
+	$foo$foo
+	HERE
+0:Here-documents stripping tabs
+>barbar
+
+  cat <<<"This is a line with a $foo in it"
+0:'<<<' redirection
+>This is a line with a bar in it
+
+  exec 3>redir  &&  print hello >&3  &&  print goodbye >&3  && cat redir
+0:'>&' redirection
+>hello
+>goodbye
+
+  exec 3<redir && read foo <&3 && print $foo && read foo <&3 && print $foo
+0:'<&' redirection
+>hello
+>goodbye
+
+  exec 3<&-
+  read foo <&-
+1:'<&-' redirection
+
+  print foo >&-
+0:'>&-' redirection
+
+  fn() { local foo; read foo; print $foo; }
+  coproc fn
+  print test output >&p
+  read bar <&p
+  print $bar
+0:'>&p' and '<&p' redirection
+>test output
+
+  ( print Output; print Error >& 2 ) >&errout  &&  cat errout
+0:'>&FILE' handling
+>Output
+>Error
+
+  rm -f errout
+  ( print Output2; print Error2 >& 2 ) &>errout  &&  cat errout
+0:'&>FILE' handling
+>Output2
+>Error2
+
+  rm -f errout
+  ( print Output3; print Error3 >& 2 ) >&|errout  &&  cat errout
+  ( print Output4; print Error4 >& 2 ) >&!errout  &&  cat errout
+  ( print Output5; print Error5 >& 2 ) &>|errout  &&  cat errout
+  ( print Output6; print Error6 >& 2 ) &>!errout  &&
+  ( print Output7; print Error7 >& 2 ) >>&errout  &&
+  ( print Output8; print Error8 >& 2 ) &>>errout  &&
+  ( print Output9; print Error9 >& 2 ) >>&|errout  &&
+  ( print Output10; print Error10 >& 2 ) &>>|errout  &&
+  ( print Output11; print Error11 >& 2 ) >>&!errout  &&
+  ( print Output12; print Error12 >& 2 ) &>>!errout  &&  cat errout
+0:'>&|', '>&!', '&>|', '&>!' redirection
+>Output3
+>Error3
+>Output4
+>Error4
+>Output5
+>Error5
+>Output6
+>Error6
+>Output7
+>Error7
+>Output8
+>Error8
+>Output9
+>Error9
+>Output10
+>Error10
+>Output11
+>Error11
+>Output12
+>Error12
+
+  rm -f errout
+  ( print Output; print Error 1>&2 ) 1>errout 2>&1  && cat errout
+0:'Combining > with >& (1)'
+>Output
+>Error
+
+  rm -f errout
+  ( print Output; print Error 1>&2 ) 2>&1 1>errout   &&  print errout:  &&
+  cat errout
+0:'Combining > with >& (2)'
+>Error
+>errout:
+>Output
+
+# Following two tests have to be separated since in
+#   print bar >foo >bar && print "$(<foo) $(<bar)"
+# the multios aren't flushed until after the substitutions take
+# place.  This can't be right.
+  rm -f errout
+  print doo be doo be doo >foo >bar 
+0:setup 2-file multio
+
+  print "foo: $(<foo)\nbar: $(<bar)"
+0:read 2-file multio
+>foo: doo be doo be doo
+>bar: doo be doo be doo
+
+  rm -f foo bar
+  print dont be dont be dont >foo | sed 's/dont/wont/g' >bar
+0:setup file+pipe multio
+
+  print "foo: $(<foo)\nbar: $(<bar)"
+0:read file+pipe multio
+>foo: dont be dont be dont
+>bar: wont be wont be wont
+
+  rm -f *
+  touch out1 out2
+  print All files >*
+0:setup multio with globbing
+
+  print *
+  print "out1: $(<out1)\nout2: $(<out2)"
+0:read multio with globbing
+>out1 out2
+>out1: All files
+>out2: All files
+
+  print This is out1 >out1
+  print This is out2 >out2
+0:setup multio for input
+
+# Currently, <out{1,2} doesn't work: this is a bug.
+  cat <out*
+0:read multio input
+>This is out1
+>This is out2
+
+  cat out1 | sed s/out/bout/ <out2
+0:read multio input with pipe
+>This is bout1
+>This is bout2
+
+  unset NULLCMD
+  >out1
+1:null redir with NULLCMD unset
+?ZTST_execchunk:2: redirection with no command
+
+  echo this should still work >out1
+  print "$(<out1)"
+0:null redir in $(...) with NULLCMD unset
+>this should still work
+
+  READNULLCMD=cat
+  print cat input >out1
+  <out1
+1:READNULLCMD with NULLCMD unset
+?ZTST_execchunk:2: redirection with no command
+
+  NULLCMD=:
+  >out1
+  [[ ! -s out1 ]] || print out1 is not empty
+0:null redir with NULLCMD=:
+<input
+
+  print cat input >out1
+  <out1
+0:READNULLCMD
+>cat input
+
+  NULLCMD=cat
+  >out1
+  cat out1
+0:null redir with NULLCMD=cat
+<input
+>input
