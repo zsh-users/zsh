@@ -10,8 +10,8 @@ if [[ -n "$format" ]]; then
     compstate[list]=list
     compstate[insert]=''
     compadd -UX "${format//\\%d/$1}" -n ''
+    compstate[force_list]=yes
   else
-    compadd -X "${format//\\%d/$1}" -n ''
+    compadd -X "${format//\\%d/$1}" -n '' && compstate[force_list]=yes
   fi
-  compstate[force_list]=yes
 fi

@@ -628,8 +628,11 @@ if [[ -z "$def" || "$def" = :* ]]; then
       [[ -n "$inrest" ]] && opt=''
     fi
     if [[ -z "$def" ]]; then
-      _message 'no more arguments'
-      noargs=yes
+      if [[ -z "$args$rest" ]]; then
+        noargs='no arguments'
+      else
+        noargs='no more arguments'
+      fi
     fi
   fi
 
@@ -651,6 +654,7 @@ if [[ -z "$def" || "$def" = :* ]]; then
 	for i in ${(s::)prefix[2,-1]%%${tmp[1][2]}*} ${tmp[1][2]}; do
 	  _options[${prefix[1]}$i]=''
 	done
+	noargs=''
 	break
       elif compset -P "$tmp[1]"; then
 
@@ -659,6 +663,7 @@ if [[ -z "$def" || "$def" = :* ]]; then
 
 	def="$dopts[$tmp[1]]"
 	opt=''
+	noargs=''
 	break
       fi
       shift 1 tmp
@@ -675,10 +680,12 @@ if [[ -z "$def" || "$def" = :* ]]; then
 	for i in ${(s::)prefix[2,-1]%%${tmp[1][2]}*} ${tmp[1][2]}; do
 	  _options[${prefix[1]}$i]=''
 	done
+	noargs=''
 	break
       elif compset -P "$tmp[1]"; then
 	def="$odopts[$tmp[1]]"
 	opt=''
+	noargs=''
 	break
       fi
       shift 1 tmp
@@ -913,6 +920,8 @@ while true; do
 
   break
 done
+
+[[ -n "$noargs" ]] && _message "$noargs"
 
 [[ -n "$aret" ]] && return 300
 
