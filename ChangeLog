@@ -1,3 +1,9 @@
+2000-05-17  Tanaka Akira  <akr@zsh.org>
+
+	* 11441: Test/comptest, Test/53completion.ztst,
+	Test/54compmatch.ztst: use only one zsh process to test for each
+	completion test file.
+
 2000-05-17  Sven Wischnowsky  <wischnow@zsh.org>
 
 	* Felix: 11397 and my 11439: Doc/Zsh/compwid.yo, Src/Zle/comp.h,

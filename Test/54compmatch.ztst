@@ -11,15 +11,12 @@
 # contains the compadd output.
 
 %prep
-  zmodload -i zsh/zpty
-
-  TERM=vt100
-  export ZTST_testdir ZTST_srcdir TERM
-  comptest () { $ZTST_testdir/../Src/zsh -f $ZTST_srcdir/comptest -z $ZTST_testdir/../Src/zsh -d $ZTST_testdir/compdump.tmp "$@" }
+  . $ZTST_srcdir/comptest
 
   mkdir match.tmp
   cd match.tmp
 
+  comptestinit -z $ZTST_testdir/../Src/zsh
 
   list1=(IndianRed IndianRed2 IndianRed3 IndianRed4)
   test_code () {
@@ -28,87 +25,87 @@
 	code="compdef _tst tst ; _tst () { echo -n '<COMPADD>';compadd -M '"
 	code="$code$matcher"
 	code="$code'  - ${(P)list} ; echo  -n '</COMPADD>'}"
+	comptesteval "$code"
   }
 
 	 
 
 %test
 
-
  test_code z: list1
- comptest  -c "$code" $'tst \t'
+ comptest  $'tst \t'
 0:Match Error for "z:"
 >line: {tst }{}
 >COMPADD:{_tst:compadd: unknown match specification character `z'}
 
  test_code m: list1
- comptest  -c "$code" $'tst \t'
+ comptest  $'tst \t'
 0:Match Error for "m:"
 >line: {tst }{}
 >COMPADD:{_tst:compadd: missing patterns}
 
  test_code M: list1
- comptest -c "$code" $'tst \t'
+ comptest $'tst \t'
 0:Match Error for "M:"
 >line: {tst }{}
 >COMPADD:{_tst:compadd: missing patterns}
 
  test_code r: list1
- comptest -c "$code" $'tst \t'
+ comptest $'tst \t'
 0:Match Error "r:"
 >line: {tst }{}
 >COMPADD:{_tst:compadd: missing patterns}
 
  test_code R: list1
- comptest -c "$code" $'tst \t'
+ comptest $'tst \t'
 0:Match Error "R:"
 >line: {tst }{}
 >COMPADD:{_tst:compadd: missing patterns}
 
  test_code l: list1
- comptest -c "$code" $'tst \t'
+ comptest $'tst \t'
 0:Match Error for "l:"
 >line: {tst }{}
 >COMPADD:{_tst:compadd: missing patterns}
 
  test_code L: list1
- comptest -c "$code" $'tst \t'
+ comptest $'tst \t'
 0:Match Error for "L:"
 >line: {tst }{}
 >COMPADD:{_tst:compadd: missing patterns}
 
  test_code 'm:{0-9' list1
- comptest -c "$code" $'tst \t'
+ comptest $'tst \t'
 0:Match Error for "m:{0-9"
 >line: {tst }{}
 >COMPADD:{_tst:compadd: unterminated character class}
 
  test_code 'm:{0-9}' list1
- comptest -c "$code" $'tst \t'
+ comptest $'tst \t'
 0:Match Error for "m:{0-9}"
 >line: {tst }{}
 >COMPADD:{_tst:compadd: missing word pattern}
 
  test_code 'm:{0-9}={' list1
- comptest -c "$code" $'tst \t'
+ comptest $'tst \t'
 0:Match Error for "m:{0-9}={"
 >line: {tst }{}
 >COMPADD:{_tst:compadd: unterminated character class}
 
  test_code 'm:{0-9}={0-' list1
- comptest -c "$code" $'tst \t'
+ comptest $'tst \t'
 0:Match Error for "m:{0-9}={0-"
 >line: {tst }{}
 >COMPADD:{_tst:compadd: unterminated character class}
 
  test_code 'm:{0-9}={-' list1
- comptest -c "$code" $'tst \t'
+ comptest $'tst \t'
 0:Match Error for "m:{0-9}={-"
 >line: {tst }{}
 >COMPADD:{_tst:compadd: unterminated character class}
 
  test_code r: list1
- comptest -c "$code" $'tst \t'
+ comptest $'tst \t'
 0:Match Error "r:"
 >line: {tst }{}
 >COMPADD:{_tst:compadd: missing patterns}
@@ -123,26 +120,26 @@
    )
  options_matcher='L:|[nN][oO]= M:_= M:{A-Z}={a-z}'
  test_code $options_matcher example1_list
- comptest -c "$code" $'tst nolistbee\t'
+ comptest $'tst nolistbee\t'
 0:Documentation example for options, input "nolistbee"
 >line: {tst nolistbeep }{}
 >COMPADD:{}
 
 
  test_code $options_matcher example1_list
- comptest -c "$code" $'tst list_bee\t'
+ comptest $'tst list_bee\t'
 0:Documentation example for options, input "list_bee"
 >line: {tst list_beep }{}
 >COMPADD:{}
 
  test_code $options_matcher example1_list
- comptest -c "$code" $'tst ListBee\t'
+ comptest $'tst ListBee\t'
 0:Documentation example for options, input "ListBee"
 >line: {tst ListBeep }{}
 >COMPADD:{}
 
  test_code $options_matcher example1_list
- comptest -c "$code" $'tst NOList\tB\t'
+ comptest $'tst NOList\tB\t'
 0:Documentation example for options, input "NOList"
 >line: {tst NOList}{}
 >COMPADD:{}
@@ -156,7 +153,7 @@
 
 
  test_code $options_matcher example1_list
- comptest -c "$code" $'tst NO_List\t__\tB\t'
+ comptest $'tst NO_List\t__\tB\t'
 0:Documentation example for options, input "NO_List\t__\tB\t"
 >line: {tst NO_List}{}
 >COMPADD:{}
@@ -176,7 +173,7 @@
 >COMPADD:{}
 
  test_code $options_matcher example1_list
- comptest -c "$code" $'tst __\tN\t__o\t___\tlist_\tbeep__\t'
+ comptest $'tst __\tN\t__o\t___\tlist_\tbeep__\t'
 0:Documentation example for options, input "__\tN\t__o\t___\tlist_\tbeep__\t" 
 >line: {tst __}{}
 >COMPADD:{}
@@ -204,7 +201,7 @@
 >COMPADD:{}
 
  test_code $options_matcher example1_list
- comptest -c "$code" $'tst __\tNo\t___\tlist_\tbeep__\t'
+ comptest $'tst __\tNo\t___\tlist_\tbeep__\t'
 0:Documentation example for options, input "__\tNo\t___\tlist_\tbeep__\t" 
 >line: {tst __}{}
 >COMPADD:{}
@@ -231,7 +228,7 @@
 
 
  test_code $options_matcher example1_list
- comptest -c "$code" $'tst ___\tlist_\tbeep__\t'
+ comptest $'tst ___\tlist_\tbeep__\t'
 0:Documentation example for options, input "___\tlist_\tbeep__\t" 
 >line: {tst ___}{}
 >COMPADD:{}
@@ -261,7 +258,7 @@
  lower_insensitive_m="m:{a-z}={A-Z}"
  example2_list=(ABC Abc abc)
  test_code $lower_insensitive_M example2_list
- comptest -c "$code" $'tst ab\tC\t'
+ comptest $'tst ab\tC\t'
 0:Documentation example for lowercase insenitive M, input "ab\tC\t"
 >line: {tst ab}{}
 >COMPADD:{}
@@ -271,7 +268,7 @@
 >COMPADD:{}
 
  test_code $lower_insensitive_m example2_list
- comptest -c "$code" $'tst A\t\t'
+ comptest $'tst A\t\t'
 0:Documentation example for lowercase insenitive m, input "A\t\t" 
 >line: {tst A}{}
 >COMPADD:{}
@@ -284,7 +281,7 @@
  case_insensitive_M="M:{a-zA-Z}={A-Za-z}"
  case_insensitive_m="m:{a-zA-Z}={A-Za-z}"
  test_code $case_insensitive_M example3_list
- comptest -c "$code" $'tst aB\t\t'
+ comptest $'tst aB\t\t'
 0:Documentation example for case insenitive M, input "aB\t\t"
 >line: {tst aB}{}
 >COMPADD:{}
@@ -295,7 +292,7 @@
 
 
  test_code $case_insensitive_m example3_list
- comptest -c "$code" $'tst aB\t\t'
+ comptest $'tst aB\t\t'
 0:Documentation example for case insenitive m, input "aB\t\t"
 >line: {tst a}{BC}
 >COMPADD:{}
@@ -317,13 +314,13 @@
   comp.graphics.rendering.misc comp.graphics.rendering.raytracing
   comp.graphics.rendering.renderman)
  test_code $example4_matcher example4_list
- comptest -c "$code" $'tst c.s.u\t'
+ comptest $'tst c.s.u\t'
 0:Documentation example using input c.s.u
 >line: {tst comp.sources.unix }{}
 >COMPADD:{}
 
  test_code $example4_matcher example4_list
- comptest -c "$code" $'tst c.g.\ta\t.\tp\ta\tg\t'
+ comptest $'tst c.g.\ta\t.\tp\ta\tg\t'
 0:Documentation example using input c.g.\ta\t.\tp\ta\tg\t
 >line: {tst comp.graphics.}{}
 >COMPADD:{}
@@ -357,13 +354,13 @@
 >COMPADD:{}
 
  test_code $example4_matcher example4_list
- comptest -c "$code" $'tst c...pag\t'
+ comptest $'tst c...pag\t'
 0:Documentation example using input c...pag\t
 >line: {tst comp.graphics.apps.pagemaker }{}
 >COMPADD:{}
 
  test_code $example4_matcher example4_list
- comptest -c "$code" $'tst c...pa\tg\t'
+ comptest $'tst c...pa\tg\t'
 0:Documentation example using input c...pa\tg\t
 >line: {tst comp.graphics.apps.pa}{}
 >COMPADD:{}
@@ -373,7 +370,7 @@
  example5_matcher='r:|[.,_-]=* r:|=*'
  example5_list=(veryverylongfile.c veryverylongheader.h)
  test_code $example5_matcher example5_list
- comptest -c "$code" $'tst  v.c\tv.h\t'
+ comptest $'tst  v.c\tv.h\t'
 0:Documentation example using input v.c\t
 >line: {tst  veryverylongfile.c }{}
 >COMPADD:{}
@@ -383,19 +380,19 @@
 
  example6_list=(LikeTHIS FooHoo 5foo123 5bar234)
  test_code 'r:|[A-Z0-9]=* r:|=*' example6_list
- comptest -c "$code" $'tst H\t'
+ comptest $'tst H\t'
 0:Documentation example using "r:|[A-Z0-9]=* r:|=*", input H
 >line: {tst H}{}
 >COMPADD:{}
 
  test_code 'r:|[A-Z0-9]=* r:|=*' example6_list
- comptest -c "$code" $'tst 2\t'
+ comptest $'tst 2\t'
 0:Documentation example using "r:|[A-Z0-9]=* r:|=*", input 2
 >line: {tst 2}{}
 >COMPADD:{}
 
  test_code 'r:|[A-Z0-9]=** r:|=*' example6_list
- comptest -c "$code" $'tst H\t'
+ comptest $'tst H\t'
 0:Documentation example using "r:|[A-Z0-9]=* r:|=*", input 2
 >line: {tst H}{}
 >COMPADD:{}
@@ -403,7 +400,7 @@
 >NO:{LikeTHIS}
 
  test_code 'r:|[A-Z0-9]=** r:|=*' example6_list
- comptest -c "$code" $'tst 2\t\t'
+ comptest $'tst 2\t\t'
 0:Documentation example using "r:|[A-Z0-9]=* r:|=*", input 2
 >line: {tst 523}{}
 >COMPADD:{}
@@ -415,7 +412,7 @@
  example7_matcher="r:[^A-Z0-9]||[A-Z0-9]=** r:|=*"
  example7_list=($example6_list)
  test_code $example7_matcher example7_list
- comptest -c "$code" $'tst H\t2\t'
+ comptest $'tst H\t2\t'
 0:Documentation example using "r:[^A-Z0-9]||[A-Z0-9]=** r:|=*"
 >line: {tst FooHoo }{}
 >COMPADD:{}
@@ -426,13 +423,13 @@
  workers_7311_matcher="m:{a-z}={A-Z} r:|[.,_-]=* r:|=*"
  workers_7311_list=(Abc-Def-Ghij.txt Abc-def.ghi.jkl_mno.pqr.txt Abc_def_ghi_jkl_mno_pqr.txt)
  test_code $workers_7311_matcher workers_7311_list
- comptest -c "$code" $'tst a-a\t'
+ comptest $'tst a-a\t'
 0:Bug from workers 7311
 >line: {tst a-a}{}
 >COMPADD:{}
 
  test_code $workers_7311_matcher workers_7311_list
- comptest -c "$code" $'tst a\t\t-d.\t'
+ comptest $'tst a\t\t-d.\t'
 0:Bug from workers_7311 
 >line: {tst Abc}{}
 >COMPADD:{}
@@ -447,7 +444,7 @@
  workers_10886_matcher="r:|[A-Z0-9]=* r:|=*"
  workers_10886_list=(BW UWB W)
  test_code $workers_10886_matcher workers_10886_list
- comptest -c "$code" $'tst W\t'
+ comptest $'tst W\t'
 0:Bug from workers 10886
 >line: {tst W }{}
 >COMPADD:{}
@@ -455,7 +452,7 @@
  workers_11081_matcher='m:{a-zA-Z}={A-Za-z} r:|[.,_-]=* r:[^A-Z0-9]||[A-Z0-9]=* r:[A-Z0-9]||[^A-Z0-9]=* r:[^0-9]||[0-9]=* r:|=*'
  workers_11081_list=(build.out build.out1 build.out2)
  test_code $workers_11081_matcher workers_11081_list
- comptest -c "$code" $'tst bui\t\t\t'
+ comptest $'tst bui\t\t\t'
 0:Bug from workers 11081
 >line: {tst build.out}{}
 >COMPADD:{}
@@ -471,7 +468,7 @@
  workers_11388_matcher='r:|[:.]=* r:|=*'
  workers_11388_list=(a.b:0 c.d:1)
  test_code $workers_11388_matcher workers_11388_list
- comptest -c "$code" $'tst :\t'
+ comptest $'tst :\t'
 0:Non-bug from workers 11388
 >line: {tst :}{}
 >COMPADD:{}
@@ -479,7 +476,7 @@
  workers_11388_matcher='r:|[:.]=** r:|=*'
  workers_11388_list=(a.b:0 c.d:1)
  test_code $workers_11388_matcher workers_11388_list
- comptest -c "$code" $'tst :\t'
+ comptest $'tst :\t'
 0:Non-bug from workers 11388
 >line: {tst }{.:}
 >COMPADD:{}

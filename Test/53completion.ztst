@@ -1,14 +1,12 @@
 # Tests for completion system.
 
 %prep
-  zmodload -i zsh/zpty
-
-  TERM=vt100
-  export ZTST_testdir ZTST_srcdir TERM
-  comptest () { $ZTST_testdir/../Src/zsh -f $ZTST_srcdir/comptest -z $ZTST_testdir/../Src/zsh -d $ZTST_testdir/compdump.tmp "$@" }
+  . $ZTST_srcdir/comptest
 
   mkdir comp.tmp
   cd comp.tmp
+
+  comptestinit -z $ZTST_testdir/../Src/zsh
 
   mkdir dir1
   mkdir dir2
@@ -32,7 +30,8 @@
 >line: {: dir1/}{}
 >line: {: dir2/}{}
 
-  comptest -c '_users () { compadd user1 user2 }' $': ~\t\t\t\t\t'
+  comptesteval '_users () { compadd user1 user2 }'
+  comptest $': ~\t\t\t\t\t'
 0:tilde
 >line: {: ~user}{}
 >line: {: ~user}{}
@@ -42,99 +41,108 @@
 >line: {: ~user2}{}
 >line: {: ~user1}{}
 
- code='compdef _tst tst; _tst () { _arguments ":desc1:(arg1)" }'
- comptest -c "$code" $'tst \t'
+  comptest $'echo ;:\C-b\C-b\t'
+0:tilde
+>line: {echo }{;:}
+>DESCRIPTION:{file}
+>DI:{dir1}
+>DI:{dir2}
+>FI:{file1}
+>FI:{file2}
+
+ comptesteval 'compdef _tst tst; _tst () { _arguments ":desc1:(arg1)" }'
+ comptest $'tst \t'
 0:_arguments
 >line: {tst arg1 }{}
 
- comptest -c "$code" $'tst a\t'
+ comptest $'tst a\t'
 0:_arguments
 >line: {tst arg1 }{}
 
- comptest -c "$code" $'tst ar\t'
+ comptest $'tst ar\t'
 0:_arguments
 >line: {tst arg1 }{}
 
- comptest -c "$code" $'tst arg\t'
+ comptest $'tst arg\t'
 0:_arguments
 >line: {tst arg1 }{}
 
- comptest -c "$code" $'tst arg1\t'
+ comptest $'tst arg1\t'
 0:_arguments
 >line: {tst arg1 }{}
 
- comptest -c "$code" $'tst r\t'
+ comptest $'tst r\t'
 0:_arguments
 >line: {tst r}{}
 
- comptest -c "$code" $'tst x\t'
+ comptest $'tst x\t'
 0:_arguments
 >line: {tst x}{}
 
- comptest -c "$code" $'tst a \t'
+ comptest $'tst a \t'
 0:_arguments
 >line: {tst a }{}
 >MESSAGE:{no more arguments}
 
- comptest -c "$code" $'tst a b \t'
+ comptest $'tst a b \t'
 0:_arguments
 >line: {tst a b }{}
 >MESSAGE:{no more arguments}
 
- code='compdef _tst tst; _tst () { _arguments ":desc1:(a b)" }'
- comptest -c "$code" $'tst \t'
+ comptesteval 'compdef _tst tst; _tst () { _arguments ":desc1:(a b)" }'
+ comptest $'tst \t'
 0:_arguments
 >line: {tst }{}
 >DESCRIPTION:{desc1}
 >NO:{a}
 >NO:{b}
 
- code='compdef _tst tst; _tst () { _arguments ":desc1:(arg1)" ":desc2:(arg2)" ":desc3:(arg3)" }'
- comptest -c "$code" $'tst \t'
+ comptesteval 'compdef _tst tst; _tst () { _arguments ":desc1:(arg1)" ":desc2:(arg2)" ":desc3:(arg3)" }'
+ comptest $'tst \t'
 0:_arguments
 >line: {tst arg1 }{}
 
- comptest -c "$code" $'tst arg1 \t'
+ comptest $'tst arg1 \t'
 0:_arguments
 >line: {tst arg1 arg2 }{}
 
- comptest -c "$code" $'tst arg1 arg2 \t'
+ comptest $'tst arg1 arg2 \t'
 0:_arguments
 >line: {tst arg1 arg2 arg3 }{}
 
- comptest -c "$code" $'tst \C-D'
+ comptest $'tst \C-D'
 0:_arguments
 >DESCRIPTION:{desc1}
 >NO:{arg1}
 
- code='compdef _tst tst; _tst () { _arguments "-\+[opt]" }'
- comptest -c "$code" $'tst -\C-D'
+ comptesteval 'compdef _tst tst; _tst () { _arguments "-\+[opt]" }'
+ comptest $'tst -\C-D'
 0:_arguments
 >DESCRIPTION:{option}
 >NO:{-+ -- opt}
 
- code='compdef _tst tst; _tst () { _arguments "1:desc1:(arg1)" }'
- comptest -c "$code" $'tst \t'
+ comptesteval 'compdef _tst tst; _tst () { _arguments "1:desc1:(arg1)" }'
+ comptest $'tst \t'
 0:_arguments
 >line: {tst arg1 }{}
 
- code='compdef _tst tst; _tst () { _arguments "-x" ":arg:" }'
- comptest -c "$code" $'tst -\t'
+ comptesteval 'compdef _tst tst; _tst () { _arguments "-x" ":arg:" }'
+ comptest $'tst -\t'
 0:_arguments
 >line: {tst -}{}
 >MESSAGE:{arg}
 
- code='compdef _tst tst; _tst () { _arguments "-x:arg:" }'
- comptest -c "$code" $'tst -x\t'
+ comptesteval 'compdef _tst tst; _tst () { _arguments "-x:arg:" }'
+ comptest $'tst -x\t'
 0:_arguments
 >line: {tst -x }{}
 
- code='
+ comptesteval '
    compdef _tst tst
    _tst () { _arguments "-a" "*::rest:_tst2" }
    _tst2 () { compadd - -b }
  '
- comptest -c "$code" $'tst arg -\t'
+ comptest $'tst arg -\t'
 0:_arguments
 >line: {tst arg -b }{}
 
