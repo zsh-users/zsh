@@ -86,6 +86,19 @@ if (( ! $mopts[(I)-[JVX]] )); then
   mopts=( "$mopts[@]" "$expl[@]" )
 fi
 
+# If given no `-F' option, we may want to use $fignore, turned into patterns.
+
+[[ -z "$_comp_no_ignore" && $#ignore -eq 0 &&
+   ( -z $gopt || "$pats" = \ #\*\ # ) && -n $FIGNORE ]] && 
+    ignore=( "?*${^fignore[@]}" )
+
+if (( $#ignore )); then
+  _comp_ignore=( "$_comp_ignore[@]" "$ignore[@]" )
+  (( $mopts[(I)-F] )) || mopts=( "$mopts[@]" -F _comp_ignore )
+fi
+
+(( $#matcher )) && mopts=( "$mopts[@]" "$matcher[@]" )
+
 if zstyle -s ":completion:${curcontext}:files" file-sort tmp1; then
   case "$tmp1" in
   *size*)             sort=oL;;
@@ -139,19 +152,6 @@ eorig="$orig"
 [[ $compstate[insert] = (*menu|[0-9]*) || -n "$_comp_correct" ||
    ( -n "$compstate[pattern_match]" &&
      "${orig#\~}" != "${${orig#\~}:q}" ) ]] && menu=yes
-
-# If given no `-F' option, we may want to use $fignore, turned into patterns.
-
-[[ -z "$_comp_no_ignore" && $#ignore -eq 0 &&
-   ( -z $gopt || "$pats" = \ #\*\ # ) && -n $FIGNORE ]] && 
-    ignore=( "?*${^fignore[@]}" )
-
-if (( $#ignore )); then
-  _comp_ignore=( "$_comp_ignore[@]" "$ignore[@]" )
-  (( $mopts[(I)-F] )) || mopts=( "$mopts[@]" -F _comp_ignore )
-fi
-
-(( $#matcher )) && mopts=( "$mopts[@]" "$matcher[@]" )
 
 # Now let's have a closer look at the string to complete.
 

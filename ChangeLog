@@ -1,3 +1,7 @@
+2000-04-26  Sven Wischnowsky  <wischnow@informatik.hu-berlin.de>
+
+	* 10922: Completion/Core/_path_files: file-sort made $fignore fail
+	
 2000-04-25  Sven Wischnowsky  <wischnow@informatik.hu-berlin.de>
 
 	* 10917: Src/Zle/complist.c, Src/Zle/compresult.c: don't show
