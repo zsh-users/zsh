@@ -1,3 +1,8 @@
+2002-05-08  Andrej Borsenkow  <bor@zsh.org>
+
+	* unposted: .cvsignore: add autom4te.cache. Looks like
+	autoconf-2.53 generates it for whatever reason
+
 2002-05-06  Sven Wischnowsky  <wischnow@zsh.org>
 
 	* 17078: Completion/Base/Utility/_describe: fix _arguments' -s
