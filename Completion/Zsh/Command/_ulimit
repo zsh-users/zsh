@@ -14,4 +14,6 @@ _arguments -s \
   '-n[maximum no. of open file descriptors]:maximum no. of open file descriptors' \
   '-s[stack size limit]:stack size limit (K-bytes)' \
   '-t[maximum cpu time per process]:maximum cpu time per process (seconds)' \
+  '-u[processes available to the user]:processes' \
+  '-v[maximum size of virtual memory]:maximum size of virtual memory (K-bytes)' \
   '*:size of largest file allowed'
