@@ -1,22 +1,22 @@
 2000-06-13  Sven Wischnowsky  <wischnow@zsh.org>
 
-	* ?????: Doc/Zsh/compsys.yo, Src/Zle/computil.c: make -A take a
+	* 11876: Doc/Zsh/compsys.yo, Src/Zle/computil.c: make -A take a
 	pattern as argument to match non-arguments; allow single-letter
 	option strings to have multiple arguments; fix to allow option
 	completion with multiple sets
 	
-	* ?????: Completion/Commands/_generic, Doc/Zsh/compsys.yo: new
+	* 11872 Completion/Commands/_generic, Doc/Zsh/compsys.yo: new
 	_generic widget to call completion with $WIDGET in function field
 	of context
 	
-	* ?????: Completion/Core/_main_complete, Doc/Zsh/compsys.yo: allow 
+	* 11873: Completion/Core/_main_complete, Doc/Zsh/compsys.yo: allow 
 	insert-tab style to contain `pending[=num]' to handle the case
 	when there is pending input
 
-	* ?????: Completion/Core/_expand, Doc/Zsh/compsys.yo: new style
+	* 11874: Completion/Core/_expand, Doc/Zsh/compsys.yo: new style
 	`suffix', use accept-exact style in _expand
 	
-	* ?????: Src/Zle/complist.c: fix for longer capability strings;
+	* 11875: Src/Zle/complist.c: fix for longer capability strings;
 	very bad
 
 2000-06-13  Peter Stephenson  <pws@cambridgesiliconradio.com>
