@@ -1,15 +1,16 @@
 #compdef sudo
 
 _arguments \
-        '-V[show version]' \
-        '-l[list commands]' \
-        '-h[show help]' \
-        '-v[validate timestamp file]' \
-        '-k[remove timestamp file]' \
-        '-b[run command in background]' \
-        '-r:Kerberos realm:' \
-        '-p:prompt:' \
-        '-u:user name:_users' \
-        '-s[run SHELL]' \
-        '-H[set HOME environment variable]' \
-        '*::command and arguments:_normal'
+       '-V[show version]' \
+       '-l[list commands]' \
+       '-h[show help]' \
+       '-v[validate timestamp file]' \
+       '-k[remove timestamp file]' \
+       '-b[run command in background]' \
+       '-r:Kerberos realm:' \
+       '-p:prompt:' \
+       '-u:user name:_users' \
+       '-s[run SHELL]' \
+       '-H[set HOME environment variable]' \
+       ':complete command name: _command_names -e'  \
+       '*::arguments: _normal'
