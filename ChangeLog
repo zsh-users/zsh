@@ -1,3 +1,8 @@
+2001-05-09  Sven Wischnowsky  <wischnow@zsh.org>
+
+	* 14279: Doc/Zsh/compsys.yo: add description of how to add a
+	auto-removable suffix when using a ->state action with _values
+
 2001-05-08  Bart Schaefer  <schaefer@zsh.org>
 
 	* 14275: configure.in, acconfig.h: Fix 14270 so that it works
