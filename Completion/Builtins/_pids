@@ -1,0 +1,18 @@
+#autoload
+
+# If given the `-m <pattern>' option, this tries to complete only pids
+# of processes whose command line match the `<pattern>'.
+
+local list expl match
+
+if [[ "$1" = -m ]]; then
+  match="${2}*"
+  shift 2
+fi
+
+_description expl 'process ID'
+
+list=("${(@Mr:COLUMNS-1:)${(f@)$(ps ${=compconfig[ps_listargs]:-$=compconfig[ps_args]} 2>/dev/null)}[2,-1]:#[ 	]#${PREFIX}[0-9]#${SUFFIX}[ 	]*${~match}}")
+
+compadd "$expl[@]" "$@" -ld list - \
+  ${${${(M)${(f)"$(ps $=compconfig[ps_args] 2>/dev/null)"}[2,-1]:#*${~match}}## #}%% *}
