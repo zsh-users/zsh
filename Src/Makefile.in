@@ -135,20 +135,6 @@ modules: $(@E@NTRYOBJ)
 $(ENTRYOBJ): FORCE
 	@$(MAKE) -f Makemod $(MAKEDEFS) $@
 
-# ========== ANSI TO K&R CONVERSION ==========
-
-ANSI_KNR = ansi2knr
-ANSIKNR  =
-
-Makemod: $(ANSI@U@KNR)
-
-ansi2knr.o: ansi2knr.c
-	$(CC) -c $(CPPFLAGS) $(CFLAGS) $(sdir)/ansi2knr.c
-
-ansi2knr: ansi2knr.o
-	rm -f $@
-	$(CC) $(LDFLAGS) $(EXELDFLAGS) -o $@ ansi2knr.o
-
 # ========== DEPENDENCIES FOR INSTALLING ==========
 
 install: install.bin install.modules
@@ -203,7 +189,7 @@ mostlyclean-here:
 .PHONY: mostlyclean-here
 
 clean-here:
-	rm -f modules.stamp zsh$(EXEEXT) ansi2knr.o ansi2knr
+	rm -f modules.stamp zsh$(EXEEXT)
 	rm -f libzsh-*.$(DL_EXT)
 .PHONY: clean-here
 

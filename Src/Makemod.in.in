@@ -65,7 +65,7 @@ ANSI_OBJ=._foo_
 	@rm -f $(dir_src)/stamp-modobjs
 
 .c$(KNR@U@OBJ):
-	$(dir_src)/ansi2knr $< > $@.c
+	@ANSI2KNR@ $< > $@.c
 	$(COMPILE) -o $@ $@.c
 	rm -f $@.c
 	@rm -f $(dir_src)/stamp-modobjs
@@ -74,7 +74,7 @@ ANSI_OBJ=._foo_
 	$(DLCOMPILE) -o $@ $<
 
 .c.$(KNR@U@OBJ):
-	$(dir_src)/ansi2knr $< > $@.c
+	@ANSI2KNR@ $< > $@.c
 	$(DLCOMPILE) -o $@ $@.c
 	rm -f $@.c
 
