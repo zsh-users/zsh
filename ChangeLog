@@ -1,3 +1,10 @@
+2000-05-04  Sven Wischnowsky  <wischnow@informatik.hu-berlin.de>
+
+	* 11140: Completion/Builtins/_zstyle, Completion/Core/_main_complete,
+ 	Doc/Zsh/compsys.yo, Src/Zle/compcore.c, Src/Zle/compctl.c: don't
+ 	list when all matches look the same; force-list style to give
+ 	users control over this
+	
 2000-05-03  Tanaka Akira  <akr@zsh.org>
 
 	* 11137: Test/07cond.ztst: detect block device file using find.

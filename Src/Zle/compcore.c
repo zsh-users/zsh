@@ -152,6 +152,11 @@ mod_export int nmatches;
 /**/
 mod_export int smatches;
 
+/* != 0 if more than one match and at least two different matches */
+
+/**/
+mod_export int diffmatches;
+
 /* The number of messages. */
 
 /**/
@@ -388,10 +393,10 @@ do_completion(Hookdef dummy, Compldat dat)
 	    invalidatelist();
     } else if (useline) {
 	/* We have matches. */
-	if (nmatches > 1) {
+	if (nmatches > 1 && diffmatches) {
 	    /* There is more than one match. */
 	    ret = do_ambiguous();
-	} else if (nmatches == 1) {
+	} else if (nmatches == 1 || !diffmatches) {
 	    /* Only one match. */
 	    Cmgroup m = amatches;
 
@@ -423,7 +428,8 @@ do_completion(Hookdef dummy, Compldat dat)
 	cs = origcs;
     }
     /* Print the explanation strings if needed. */
-    if (!showinglist && validlist && usemenu != 2 && nmatches != 1 &&
+    if (!showinglist && validlist && usemenu != 2 && 
+	(nmatches != 1 || diffmatches) &&
 	useline != 2 && (!oldlist || !listshown)) {
 	onlyexpl = 1;
 	showinglist = -2;
@@ -870,7 +876,7 @@ makecomplist(char *s, int incmd, int lst)
 
     if (compfunc) {
 	char *os = s;
-	int onm = nmatches, osi = movefd(0);
+	int onm = nmatches, odm = diffmatches, osi = movefd(0);
 
 	bmatchers = NULL;
 	mstack = NULL;
@@ -905,6 +911,7 @@ makecomplist(char *s, int incmd, int lst)
 
 	if (oldlist) {
 	    nmatches = onm;
+	    diffmatches = odm;
 	    validlist = 1;
 	    amatches = lastmatches;
 	    lmatches = lastlmatches;
@@ -2635,7 +2642,7 @@ permmatches(int last)
 
     opm = pmatches;
     pmatches = lmatches = NULL;
-    nmatches = smatches = 0;
+    nmatches = smatches = diffmatches = 0;
 
     if (!ainfo->count) {
 	if (last)
@@ -2666,6 +2673,9 @@ permmatches(int last)
 
 	    nmatches += g->mcount;
 	    smatches += g->lcount;
+
+	    if (g->mcount > 1)
+		diffmatches = 1;
 
 	    n = (Cmgroup) zcalloc(sizeof(struct cmgroup));
 
@@ -2721,17 +2731,28 @@ permmatches(int last)
 
 	    nmatches += g->mcount;
 	    smatches += g->lcount;
+
+	    if (g->mcount > 1)
+		diffmatches = 1;
+
 	    g->num = gn++;
 	}
 	g->new = 0;
 	g = g->next;
     }
-    for (g = pmatches; g; g = g->next) {
+    for (g = pmatches, p = NULL; g; g = g->next) {
 	g->nbrbeg = nbrbeg;
 	g->nbrend = nbrend;
 	for (rn = 1, q = g->matches; *q; q++) {
 	    (*q)->rnum = rn++;
 	    (*q)->gnum = mn++;
+	}
+	if (!diffmatches && *g->matches) {
+	    if (p) {
+		if (!matcheq(*g->matches, *p))
+		    diffmatches = 1;
+	    } else
+		p = g->matches;
 	}
     }
     hasperm = 1;

@@ -1762,7 +1762,7 @@ ccmakehookfn(Hookdef dummy, struct ccmakedat *dat)
     struct cmlist ms;
     Cmlist m;
     char *os = s;
-    int onm = nmatches, osi = movefd(0);
+    int onm = nmatches, odm = diffmatches, osi = movefd(0);
     LinkNode n;
 
     /* We build a copy of the list of matchers to use to make sure that this
@@ -1843,6 +1843,7 @@ ccmakehookfn(Hookdef dummy, struct ccmakedat *dat)
 
 	if (oldlist) {
 	    nmatches = onm;
+	    diffmatches = odm;
 	    validlist = 1;
 	    amatches = lastmatches;
 	    lmatches = lastlmatches;

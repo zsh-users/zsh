@@ -25,6 +25,7 @@ styles=(
   expand		 c:
   file-patterns		 c:filepat
   file-sort              c:fsort
+  force-list             c
   format		 c:
   glob			 c:
   group-name		 c:

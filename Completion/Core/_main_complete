@@ -200,6 +200,13 @@ elif [[ nm -eq 0 &&
   fi
 fi
 
+if zstyle -s ":completion:${curcontext}:" force-list tmp &&
+   [[ "$compstate[list]" = *list* && 
+      ( "$tmp" = always ||
+        ( "$tmp" = [0-9]## && nm -ge tmp ) ) ]]; then
+  compstate[list]="$compstate[list] force"
+fi
+
 # Now call the post-functions.
 
 funcs=( "$comppostfuncs[@]" )

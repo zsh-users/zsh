@@ -1033,6 +1033,18 @@ time. Any other value (or not setting this style at all) makes them be
 sorted alphabetically by name. If the value contains the string
 `tt(reverse)', sorting is done in decreasing order.
 )
+kindex(force-list, completion style)
+item(tt(force-list))(
+If the completion code would show a list of completions at all, this
+style controls whether the list is shown even in cases when it would
+normally not do that. For example, normally the list is only shown if
+there are at least to different matches. By setting this style to
+`tt(always)', the list will always even be shown, even if there is
+only a single match which is immediately accepted. The style may also
+be set to a number. In this case the list will be shown if there are
+at least that many matches, even if they would all insert the same
+string.
+)
 kindex(format, completion style)
 item(tt(format))(
 If this is set for the tt(descriptions) tag, its value is used as a
