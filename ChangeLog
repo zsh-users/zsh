@@ -1,3 +1,8 @@
+2001-09-28  Bart Schaefer  <schaefer@zsh.org>
+
+	* 15889: Test/V01zmodload.ztst: Compute module dependencies for
+	external modules so that they can be unloaded in the right order.
+
 2001-09-27  Oliver Kiddle  <opk@zsh.org>
 
 	* 15882: zshconfig.ac, Etc/MACHINES, Test/C02cond.ztst: fix
