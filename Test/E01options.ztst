@@ -553,6 +553,7 @@
   cat <in1 <in2
   setopt multios
   print Test message >foo1 >foo2
+  sleep 1   # damn, race in multios
   print foo1: $(<foo1)
   print foo2: $(<foo2)
   cat <in1 <in2
@@ -575,7 +576,11 @@
 >with nonomatch: flooble*
 ?ZTST_execchunk:2: no matches found: flooble*
 
-# NULL_GLOB should override NOMATCH...
+# NULL_GLOB should override NONOMATCH...
   setopt nullglob nomatch
-  unsetopt nullglob
-  unsetopt nomatch
+  print frooble* tmp*
+  unsetopt nullglob nomatch
+  print frooble* tmp*
+0:NULL_GLOB option
+>tmpcd tmpfile1 tmpfile2
+>frooble* tmpcd tmpfile1 tmpfile2
