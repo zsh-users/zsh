@@ -1,3 +1,10 @@
+2001-04-26  Bart Schaefer  <schaefer@zsh.org>
+
+	* 14129: Completion/Base/Completer/_approximate: Use a trap to
+	unfunction the `compadd' function so that it can be correctly
+	removed in the event that the competion system is interrupted by
+	a keyboard signal.
+
 2001-04-26  Clint Adams  <clint@zsh.org>
 
         * 14125: Src/Modules/termcap.c, Src/Modules/terminfo.c:
