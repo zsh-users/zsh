@@ -27,7 +27,7 @@ fi
 # `sman' is the SGML manual directory for Solaris 7.
 # 1M is system administrator commands on SVR4
 
-mrd=(${^manpath/\\%L/${LANG:-En_US.ASCII}}/mandb(N))
+mrd=(${^manpath/\%L/${LANG:-En_US.ASCII}}/mandb(N))
 if [[ $words[2] = (<->*|1M|l|n) ]]; then
   rep=(
   $manpath/(sman|man|cat)${words[2]}/${~approx}$PREFIX${~star}$SUFFIX.<->*(N:t) )

@@ -1,5 +1,8 @@
 2000-05-31  Sven Wischnowsky  <wischnow@zsh.org>
 
+	* Andrej: 11660: Completion/User/_man: fix for ${..//..} with % in 
+	search string
+
 	* 11686: Completion/Core/compdump, Completion/Core/compinit: allow
  	using menu-select for compdef -k (i.e.: autoload zsh/complist in
  	such cases)
