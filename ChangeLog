@@ -1,9 +1,6 @@
 2001-09-25  Sven Wischnowsky  <wischnow@zsh.org>
 
-	* 15868: Src/text.c: job text building code couldn't handle
-	empty sublists (as in `coproc || test')
-
-	* 15868: Src/text.c: job text building code couldn't handle
+	* 15868, 15869: Src/text.c: job text building code couldn't handle
 	empty sublists (as in `coproc || test')
 
 2001-09-25  Clint Adams  <clint@zsh.org>
