@@ -1,0 +1,71 @@
+#compdef grep egrep fgrep
+# Ulrik Haugen 2001
+
+local efgrep="" efarguments arguments
+
+(( $+_is_gnu )) || typeset -gA _is_gnu
+
+if (( ! $+_is_gnu[$words[1]] )); then
+  if [[ $(_call_program version $words[1] --help </dev/null 2>/dev/null) = *gnu* ]]
+  then
+    _is_gnu[$words[1]]=yes
+  else
+    _is_gnu[$words[1]]=
+  fi
+fi
+
+
+[[ "$service" = [ef]grep ]] && efgrep=t
+
+if [[ -z $efgrep ]]; then
+  efarguments=( \
+    '(--extended-regexp -F --fixed-strings)-E[extended regexp]' \
+    '(-E -F --fixed-strings)--extended-regexp' \
+    '(--fixed-strings -E --extended-regexp)-F[fixed strings]' \
+    '(-F -E --extended-regexp)--fixed-strings' \
+  )
+fi
+
+arguments=( \
+  '(-e --regexp -f --file)1:pattern:_guard "^--*"' \
+  '(1)*'{'-e+[regexp]',--regexp=}':pattern' \
+  '(1)*'{'-f+[file]',--file=}':pattern file:_files' \
+  \
+  '*:files:_files' \
+  \
+  {'(--after-context)-A+[after context]','(-A)--after-context='}':after context:(1)' \
+  '(--text --binary-files)-a[text]' '(-a --binary-files)--text' \
+  {'(--before-context)-B+[before context]','(-B)--before-context='}':before context:(1)' \
+  {'(--context)-C+[context]','(-C)--context='}':context:(1)' \
+  '(--byte-offset)-b[byte offset]' '(-b)--byte-offset' \
+  '(-a --text -I)--binary-files:binary files:(binary without-match text)' \
+  '(--count)-c[count]' '(-c)--count' \
+  {'(--directories -r --recursive)-d+[directories]','(-d -r --recursive)--directories='}':directories:(read skip recurse grep)' \
+  \
+  $efarguments \
+  \
+  '(--basic-regexp)-G[basic regexp]' '(-G)--basic-regexp' \
+  '(--with-filename)-H[with filename]' '(-H)--with-filename' \
+  '(--no-filename)-h[no filename]' '(-h)--no-filename' \
+  '--help' \
+  '(--binary-files)-I[ignore binary]' \
+  '(--ignore-case)-i[ignore case]' '(-i)--ignore-case' \
+  '(--files-without-match)-L[files without match]' '(-L)--files-without-match' \
+  '(--files-with-matches -l)'{'-l[files with matches]',--files-with-matches} \
+  '--mmap' \
+  '(--line-number)-n[line number]' '(-n)--line-number' \
+  '(--quiet --silent)-q[quiet]' '(-q --quiet)--silent' '(-q --silent)--quiet' \
+  '(--recursive -d --directories)-r[recursive]' '(-r -d --directories)--recursive' \
+  '(--no-mesages)-s[no messages]' '(-s)--no-messages' \
+  '(--version)-V[version]' '(-V)--version' \
+  '(--invert-match)-v[invert match]' '(-v)--invert-match' \
+  '(--word-regexp)-w[word regexp]' '(-w)--word-regexp' \
+  '(--line-regexp)-x[line regexp]' '(-x)--line-regexp' \
+  '(--null)-Z[null]' '(-Z)--null' \
+)
+
+# remove long options?
+[[ -z "$_is_gnu[$words[1]]" ]] &&
+    arguments=( ${arguments:#(|*\)(\*|))--*} )
+
+_arguments -s $arguments

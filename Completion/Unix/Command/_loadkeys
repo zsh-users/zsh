@@ -1,0 +1,25 @@
+#compdef loadkeys
+
+case $OSTYPE in
+  linux*)
+    _arguments \
+	'(--clearcompose)-c[clearcompose]' \
+	'(-c)--clearcompose' \
+	'(--default)-d[default]' \
+	'(-d)--default' \
+	'(--help)-h[help]' \
+	'(-h)--help' \
+	'(--mktable)-m[mktable]' \
+	'(-m)--mktable' \
+	'(--clearstrings)-s[clearstrings]' \
+	'(-s)--clearstrings' \
+	'*-v[verbose]' \
+	'*--verbose' \
+	':keymap:_files -W /usr/share/keymaps'
+  ;;
+  solaris*)
+	_files -W /usr/share/lib/keytables
+  ;;
+
+  *) _default;;
+esac

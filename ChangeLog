@@ -1,3 +1,8 @@
+2001-08-06  Oliver Kiddle  <opk@zsh.org>
+
+	* 15577: Completion/Unix/Command/_grep,
+	Completion/Unix/Command/_loadkeys: fix exclusion lists
+
 2001-07-31  Clint Adams  <clint@zsh.org>
 
         * 15551: Completion/Unix/Command/_gzip: handle -l and -t
