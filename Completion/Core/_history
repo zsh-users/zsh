@@ -30,6 +30,11 @@ else
   opt="${opt}V"
 fi
 
+PREFIX="$IPREFIX$PREFIX"
+IPREFIX=
+SUFFIX="$SUFFIX$ISUFFIX"
+ISUFFIX=
+
 # We skip the first element of historywords so the current word doesn't
 # interfere with the completion
 h_words=( "${(@)historywords[2,-1]}" )

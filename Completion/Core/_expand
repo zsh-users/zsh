@@ -33,6 +33,8 @@ else
   word="$IPREFIX$PREFIX$SUFFIX$ISUFFIX"
 fi
 
+[[ "$word" = *\$\{[^\}]# ]] && return 1
+
 zstyle -T ":completion:${curcontext}:" suffix &&
   [[ "$word" = (\~*/*|\$[a-zA-Z0-9_\[\]]##[^a-zA-Z0-9_\[\]]*|\$\{*\}?*) ]] &&
   return 1
