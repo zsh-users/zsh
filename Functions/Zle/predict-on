@@ -119,7 +119,7 @@ predict-limit-list() {
   then
     compstate[list]=''
     compstate[force_list]=yes
-  elif zstyle ":completion:predict${curcontext}" list always ]]
+  elif zstyle -t ":completion:predict${curcontext}" list always
   then
     compstate[force_list]=yes
   fi
