@@ -391,7 +391,8 @@ static struct listcols mcolors;
 
 static int nrefs;
 static int begpos[MAX_POS], curisbeg;
-static int endpos[MAX_POS], curisend;
+static int endpos[MAX_POS];
+static int sendpos[MAX_POS], curissend; /* sorted end positions */
 static char **patcols, *curiscols[MAX_POS];
 static int curiscol;
 
@@ -450,29 +451,45 @@ initiscol(Listcols c)
 
     curiscols[curiscol = 0] = *patcols++;
 
-    curisbeg = curisend = 0;
+    curisbeg = curissend = 0;
 
-    for (i = nrefs;  i < MAX_POS; i++)
-	begpos[i] = endpos[i] = -1;
+    for (i = 0; i < nrefs; i++)
+	sendpos[i] = 0xfffffff;
+    for (; i < MAX_POS; i++)
+	begpos[i] = endpos[i] = sendpos[i] = 0xfffffff;
 }
 
 static void
 doiscol(Listcols c, int pos)
 {
-    if (endpos[curisend] >= 0 && pos > endpos[curisend]) {
-	curisend++;
+    int fi;
+
+    while (pos > sendpos[curissend]) {
+	curissend++;
 	if (curiscol) {
 	    zcputs(c, NULL, COL_NO);
 	    zlrputs(c, curiscols[--curiscol]);
 	}
     }
-    if (pos == begpos[curisbeg] && *patcols) {
-	curisbeg++;
-
-	zcputs(c, NULL, COL_NO);
-	zlrputs(c, *patcols);
-
-	curiscols[++curiscol] = *patcols++;
+    while (((fi = (endpos[curisbeg] < begpos[curisbeg] || 
+		  begpos[curisbeg] == -1)) ||
+	    pos == begpos[curisbeg]) && *patcols) {
+	if (!fi) {
+	    int i, j, e = endpos[curisbeg];
+	    
+	    /* insert e in sendpos */
+	    for (i = curissend; sendpos[i] <= e; ++i)
+		;
+	    for (j = i + 1; j < MAX_POS; ++j)
+		sendpos[j] = sendpos[j-1];
+	    sendpos[i] = e;
+	    
+	    zcputs(c, NULL, COL_NO);
+	    zlrputs(c, *patcols);
+	    curiscols[++curiscol] = *patcols;
+	}
+	++patcols;
+	++curisbeg;
     }
 }
 
