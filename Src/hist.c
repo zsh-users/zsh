@@ -1096,8 +1096,8 @@ hend(Eprog prog)
 		histreduceblanks();
 	}
 	newflags = save > 0? 0 : HIST_OLD | HIST_TMPSTORE;
-	if ((isset(HISTIGNOREDUPS) || isset(HISTIGNOREALLDUPS)) && hist_ring
-	 && histstrcmp(chline, hist_ring->text) == 0) {
+	if ((isset(HISTIGNOREDUPS) || isset(HISTIGNOREALLDUPS)) && save > 0
+	 && hist_ring && histstrcmp(chline, hist_ring->text) == 0) {
 	    /* This history entry compares the same as the previous.
 	     * In case minor changes were made, we overwrite the
 	     * previous one with the current one.  This also gets the
@@ -1119,7 +1119,8 @@ hend(Eprog prog)
 	    he->words = (short *)zalloc(chwordpos * sizeof(short));
 	    memcpy(he->words, chwords, chwordpos * sizeof(short));
 	}
-	addhistnode(histtab, he->text, he);
+	if (!(newflags & HIST_TMPSTORE))
+	    addhistnode(histtab, he->text, he);
     }
     zfree(chline, hlinesz);
     zfree(chwords, chwordlen*sizeof(short));
