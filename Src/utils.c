@@ -1249,7 +1249,7 @@ zstrtol(const char *s, char **t, int base)
 
 /**/
 int
-setblock_stdin(void)
+setblock_fd(int turnonblocking, int fd, long *modep)
 {
 #ifdef O_NDELAY
 # ifdef O_NONBLOCK
@@ -1267,18 +1267,35 @@ setblock_stdin(void)
 
 #if NONBLOCK
     struct stat st;
-    long mode;
 
-    if (!fstat(0, &st) && !S_ISREG(st.st_mode)) {
-	mode = fcntl(0, F_GETFL, 0);
-	if (mode != -1 && (mode & NONBLOCK) &&
-	    !fcntl(0, F_SETFL, mode & ~NONBLOCK))
-	    return 1;
-    }
+    if (!fstat(fd, &st) && !S_ISREG(st.st_mode)) {
+	*modep = fcntl(fd, F_GETFL, 0);
+	if (*modep != -1) {
+	    if (!turnonblocking) {
+		/* We want to know if blocking was off */
+		if ((*modep & NONBLOCK) ||
+		    !fcntl(fd, F_SETFL, *modep | NONBLOCK))
+		    return 1;
+	    } else if ((*modep & NONBLOCK) &&
+		       !fcntl(fd, F_SETFL, *modep & ~NONBLOCK)) {
+		/* Here we want to know if the state changed */
+		return 1;
+	    }
+	}
+    } else
 #endif /* NONBLOCK */
+	*modep = -1;
     return 0;
 
 #undef NONBLOCK
+}
+
+/**/
+int
+setblock_stdin(void)
+{
+    long mode;
+    return setblock_fd(1, 0, &mode);
 }
 
 /**/

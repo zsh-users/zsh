@@ -751,7 +751,7 @@ contain symbolic links.
 alias(r)(fc -e -)
 findex(read)
 vindex(IFS, use of)
-item(tt(read) [ tt(-rzpqAclneE) ] [ tt(-k) [ var(num) ] ] \
+item(tt(read) [ tt(-rzpqAclneEt) ] [ tt(-k) [ var(num) ] ] \
 [ tt(-u)var(n) ] [ var(name)[tt(?)var(prompt)] ] [ var(name) ...  ])(
 Read one line and break it into fields using the characters
 in tt($IFS) as separators, except as noted below.
@@ -821,6 +821,22 @@ digit and must em(not) be separated from tt(-u) by any whitespace.
 )
 item(tt(-p))(
 Input is read from the coprocess.
+)
+item(tt(-t))(
+Test if input is available before attempting to read; if none is, return
+status 1 and do not set any variables.  This is not available when reading
+from the editor buffer with tt(-z), when called from within completion
+with tt(-c) or tt(-l), with tt(-q) which clears the input queue before
+reading, or within zle where other mechanisms should be used to test for
+input.
+
+Note that read does not attempt to alter the input processing mode.  The
+default mode is canonical input, in which an entire line is read at a time,
+so usually `tt(read -t)' will not read anything until an entire line has
+been typed.  However, when reading from the terminal with tt(-k)
+this is automatically handled; note that only availablity of the first
+character is tested, so that e.g. `tt(read -t -k 2)' can still block on the
+second character.
 )
 enditem()
 

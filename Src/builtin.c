@@ -97,7 +97,7 @@ static struct builtin builtins[] =
     BUILTIN("pushln", BINF_PRINTOPTS, bin_print, 0, -1, BIN_PRINT, NULL, "-nz"),
     BUILTIN("pwd", 0, bin_pwd, 0, 0, 0, "rLP", NULL),
     BUILTIN("r", BINF_R, bin_fc, 0, -1, BIN_FC, "nrl", NULL),
-    BUILTIN("read", 0, bin_read, 0, -1, 0, "rzu0123456789pkqecnAlE", NULL),
+    BUILTIN("read", 0, bin_read, 0, -1, 0, "ceklnpqrtzuAE0123456789", NULL),
     BUILTIN("readonly", BINF_TYPEOPTS | BINF_MAGICEQUALS | BINF_PSPECIAL, bin_typeset, 0, -1, 0, "AEFHLRTUZafghiltux", "r"),
     BUILTIN("rehash", 0, bin_hash, 0, 0, 0, "df", "r"),
     BUILTIN("return", BINF_PSPECIAL, bin_break, 0, 1, BIN_RETURN, NULL, NULL),
@@ -3361,6 +3361,94 @@ static int readfd;
 /* Read a character from readfd, or from the buffer zbuf.  Return EOF on end of
 file/buffer. */
 
+/**/
+static int
+read_poll(int *readchar, int polltty)
+{
+    int ret = 0;
+    long mode = -1;
+    char c;
+#ifdef FIONREAD
+    int val;
+#endif
+#ifdef HAVE_SELECT
+    fd_set foofd;
+    struct timeval expire_tv;
+#endif
+#ifdef HAS_TIO
+    struct ttyinfo ti;
+#endif
+
+
+#if defined(HAS_TIO) && !defined(__CYGWIN__)
+    /*
+     * Under Solaris, at least, reading from the terminal in non-canonical
+     * mode requires that we use the VMIN mechanism to poll.  Any attempt
+     * to check any other way, or to set the terminal to non-blocking mode
+     * and poll that way, fails; it will just for canonical mode input.
+     * We should probably use this mechanism if the user has set non-canonical
+     * mode, in which case testing here for isatty() and ~ICANON would be
+     * better than testing whether bin_read() set it, but for now we've got
+     * enough problems.
+     *
+     * Under Cygwin, you won't be surprised to here, this mechanism,
+     * although present, doesn't work, and we *have* to use ordinary
+     * non-blocking reads to find out if there is a character present
+     * in non-canonical mode.
+     *
+     * I am assuming Solaris is nearer the UNIX norm.  This is not necessarily
+     * as plausible as it sounds, but it seems the right way to guess.
+     *		pws 2000/06/26
+     */
+    if (polltty) {
+	gettyinfo(&ti);
+	ti.tio.c_cc[VMIN] = 0;
+	settyinfo(&ti);
+    }
+#else
+    polltty = 0;
+#endif
+#ifdef HAVE_SELECT
+    if (!ret) {
+	expire_tv.tv_sec = expire_tv.tv_usec = 0;
+	FD_ZERO(&foofd);
+	FD_SET(readfd, &foofd);
+	if (select(readfd+1, (SELECT_ARG_2_T) &foofd, NULL, NULL, &expire_tv)
+	    > 1)
+	    ret = 1;
+    }
+#else
+#ifdef FIONREAD
+    if (!ret) {
+	ioctl(readfd, FIONREAD, (char *)&val);
+	if (val)
+	    ret = 1;
+    }
+#endif
+#endif
+
+    if (!ret) {
+	/*
+	 * Final attempt: set non-blocking read and try to read a character.
+	 * Praise Bill, this works under Cygwin (nothing else seems to).
+	 */
+	if ((polltty || setblock_fd(0, readfd, &mode))
+	    && read(readfd, &c, 1) > 0) {
+	    *readchar = STOUC(c);
+	    ret = 1;
+	}
+	if (mode != -1)
+	    fcntl(readfd, F_SETFL, mode);
+    }
+#ifdef HAS_TIO
+    if (polltty) {
+	ti.tio.c_cc[VMIN] = 1;
+	settyinfo(&ti);
+    }
+#endif
+    return ret;
+}
+
 /* read: get a line of input, or (for compctl functions) return some *
  * useful data about the state of the editing line.  The -E and -e   *
  * options mean that the result should be sent to stdout.  -e means, *
@@ -3378,6 +3466,9 @@ bin_read(char *name, char **args, char *ops, int func)
     char *buf, *bptr, *firstarg, *zbuforig;
     LinkList readll = newlinklist();
     FILE *oshout = NULL;
+    int readchar = -1, val;
+    char d;
+
 
     if ((ops['k'] || ops['b']) && *args && idigit(**args)) {
 	if (!(nchars = atoi(*args)))
@@ -3438,6 +3529,17 @@ bin_read(char *name, char **args, char *ops, int func)
     } else
 	readfd = izle = 0;
 
+    if (ops['t'] && !read_poll(&readchar, keys && !zleactive)) {
+	if (ops['k'] && !zleactive && !isem)
+	    settyinfo(&shttyinfo);
+	if (haso) {
+	    fclose(shout);
+	    shout = oshout;
+	    SHTTY = -1;
+	}
+	return 1;
+    }
+
     /* handle prompt */
     if (firstarg) {
 	for (readpmpt = firstarg;
@@ -3453,9 +3555,6 @@ bin_read(char *name, char **args, char *ops, int func)
 
     /* option -k means read only a given number of characters (default 1) */
     if (ops['k']) {
-	int val;
-	char d;
-
 	/* allocate buffer space for result */
 	bptr = buf = (char *)zalloc(nchars+1);
 
@@ -3467,7 +3566,11 @@ bin_read(char *name, char **args, char *ops, int func)
 		nchars--;
 	    } else {
 		/* If read returns 0, is end of file */
-		if ((val = read(readfd, bptr, nchars)) <= 0)
+		if (readchar >= 0) {
+		    *bptr = readchar;
+		    val = 1;
+		    readchar = -1;
+		} else if ((val = read(readfd, bptr, nchars)) <= 0)
 		    break;
 	    
 		/* decrement number of characters read from number required */
@@ -3544,7 +3647,7 @@ bin_read(char *name, char **args, char *ops, int func)
 	buf = bptr = (char *)zalloc(bsiz = 64);
 	/* get input, a character at a time */
 	while (!gotnl) {
-	    c = zread(izle);
+	    c = zread(izle, &readchar);
 	    /* \ at the end of a line indicates a continuation *
 	     * line, except in raw mode (-r option)            */
 	    if (bslash && c == '\n') {
@@ -3645,7 +3748,7 @@ bin_read(char *name, char **args, char *ops, int func)
     if (!gotnl) {
 	sigset_t s = child_unblock();
 	for (;;) {
-	    c = zread(izle);
+	    c = zread(izle, &readchar);
 	    /* \ at the end of a line introduces a continuation line, except in
 	    raw mode (-r option) */
 	    if (bslash && c == '\n') {
@@ -3711,7 +3814,7 @@ bin_read(char *name, char **args, char *ops, int func)
 
 /**/
 static int
-zread(int izle)
+zread(int izle, int *readchar)
 {
     char cc, retry = 0;
 
@@ -3729,6 +3832,11 @@ zread(int izle)
 	    return zbuf++, STOUC(*zbuf++ ^ 32);
 	else
 	    return (*zbuf) ? STOUC(*zbuf++) : EOF;
+    }
+    if (*readchar >= 0) {
+	cc = *readchar;
+	*readchar = -1;
+	return STOUC(cc);
     }
     for (;;) {
 	/* read a character from readfd */

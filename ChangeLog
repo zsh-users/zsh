@@ -1,3 +1,9 @@
+2000-06-26  Peter Stephenson  <pws@cambridgesiliconradio.com>
+
+	* 12073: Src/builtin.c, Src/utils.c, Doc/Zsh/builtins.yo: first
+	pass at `read -t' which tests for availability of input before
+	inputting.
+
 2000-06-26  Sven Wischnowsky  <wischnow@zsh.org>
 
 	* 3208: Completion/User/_use_lo: default completion even if there
