@@ -1,6 +1,6 @@
 DISTFILES_SRC='
 .distfiles
-allopt      getjobs       mere       relative   zcalc   zmv
+allopt      getjobs       mere       relative   zcalc   zmv          zargs
 checkmail   harden        nslookup   run-help   zed     zrecompile
 colors      is-at-least   promptnl   tetris     zkbd    zstyle+
 '
