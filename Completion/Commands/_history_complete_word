@@ -1,0 +1,2 @@
+#compdef -k complete-word \e/
+compgen -Q -H 0 ''

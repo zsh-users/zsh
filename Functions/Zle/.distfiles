@@ -1,0 +1,3 @@
+DISTFILES_SRC='
+    .distfiles incremental-complete-word insert-files
+'
