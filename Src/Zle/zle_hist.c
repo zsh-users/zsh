@@ -30,12 +30,6 @@
 #include "zle.mdh"
 #include "zle_hist.pro"
 
-/* Are references to earlier history lines permitted?  == 0 if       *
- * editing or reading a standalone line, such as in vared or select. */
-
-/**/
-int histallowed;
-
 /* Column position of vi ideal cursor.  -1 if it is unknown -- most *
  * movements and changes do this.                                   */
 
@@ -126,7 +120,7 @@ uplineorhistory(char **args)
 	int m = zmult, ret;
 
 	cs = ocs;
-	if (virangeflag || !histallowed)
+	if (virangeflag || !(zlereadflags & ZLRF_HISTORY))
 	    return 1;
 	zmult = n;
 	ret = uphistory(args);
@@ -156,7 +150,7 @@ uplineorsearch(char **args)
 	int m = zmult, ret;
 
 	cs = ocs;
-	if (virangeflag || !histallowed)
+	if (virangeflag || !(zlereadflags & ZLRF_HISTORY))
 	    return 1;
 	zmult = n;
 	ret = historysearchbackward(args);
@@ -210,7 +204,7 @@ downlineorhistory(char **args)
 	int m = zmult, ret;
 
 	cs = ocs;
-	if (virangeflag || !histallowed)
+	if (virangeflag || !(zlereadflags & ZLRF_HISTORY))
 	    return 1;
 	zmult = n;
 	ret = downhistory(args);
@@ -240,7 +234,7 @@ downlineorsearch(char **args)
 	int m = zmult, ret;
 
 	cs = ocs;
-	if (virangeflag || !histallowed)
+	if (virangeflag || !(zlereadflags & ZLRF_HISTORY))
 	    return 1;
 	zmult = n;
 	ret = historysearchforward(args);

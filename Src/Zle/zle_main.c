@@ -46,6 +46,11 @@ mod_export int incompfunc;
 /**/
 mod_export int hascompmod;
 
+/* ZLRF_* flags passed to zleread() */
+
+/**/
+int zlereadflags;
+
 /* != 0 if we're done editing */
 
 /**/
@@ -447,8 +452,6 @@ getkey(int keytmout)
     return ret;
 }
 
-static int no_restore_tty;
-
 /* Read a line.  It is returned metafied. */
 
 /**/
@@ -505,8 +508,8 @@ zleread(char *lp, char *rp, int flags)
     pmpt_attr = txtchange;
     rpromptbuf = promptexpand(rp, 1, NULL, NULL);
     rpmpt_attr = txtchange;
-    histallowed = (flags & ZLRF_HISTORY);
     PERMALLOC {
+	zlereadflags = flags;
 	histline = curhist;
 #ifdef HAVE_SELECT
 	FD_ZERO(&foofd);
@@ -540,8 +543,6 @@ zleread(char *lp, char *rp, int flags)
 	if (tmout)
 	    alarm(tmout);
 	zleactive = 1;
-	if (flags & ZLRF_NOSETTY)
-	  no_restore_tty = 1;
 	resetneeded = 1;
 	errflag = retflag = 0;
 	lastcol = -1;
@@ -592,7 +593,7 @@ zleread(char *lp, char *rp, int flags)
 	trashzle();
 	free(lpromptbuf);
 	free(rpromptbuf);
-	zleactive = no_restore_tty = 0;
+	zleactive = zlereadflags = 0;
 	alarm(0);
     } LASTALLOC;
     freeundo();
@@ -974,7 +975,7 @@ trashzle(void)
 	    fprintf(shout, "%s", postedit);
 	fflush(shout);
 	resetneeded = 1;
-	if (!no_restore_tty)
+	if (!(zlereadflags & ZLRF_NOSETTY))
 	  settyinfo(&shttyinfo);
     }
     if (errflag)

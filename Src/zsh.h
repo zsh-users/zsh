@@ -1642,8 +1642,8 @@ struct heap {
 /* Flags to third argument of zle */
 /**********************************/
 
-#define ZLRF_HISTORY	0x01
-#define ZLRF_NOSETTY	0x02
+#define ZLRF_HISTORY	0x01	/* OK to access the history list */
+#define ZLRF_NOSETTY	0x02	/* Don't set tty before return */
 
 /****************/
 /* Entry points */
