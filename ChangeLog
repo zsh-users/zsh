@@ -1,3 +1,7 @@
+2001-03-22  Peter Stephenson  <pws@csr.com>
+
+	* 13676: Completion/User/_mh: some tweaks for nmh.
+
 2001-03-22  Sven Wischnowsky  <wischnow@zsh.org>
 
 	* 13706: Src/exec.c: skip redirections in execpline2() when

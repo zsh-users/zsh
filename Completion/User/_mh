@@ -1,4 +1,4 @@
-#compdef folder folders comp inc mark refile repl scan show next prev rmm pick whom mhn mhpath
+#compdef folder folders comp inc mark refile repl scan show next prev rmm pick whom mhn mhpath mhlist mhstore mhshow mhparam mhmail
 
 # Completion for all possible MH commands.
 
@@ -50,6 +50,11 @@ elif [[ "$prev" = -(no|)cc ]]; then
   _wanted -C "$prev" values expl 'CC address' compadd all to cc me
 elif [[ "$prev" = -[rw]cache ]]; then
   _wanted -C "$prev" values expl cache compadd public private never ask
+elif [[ $service = mhparam ]]; then
+  _wanted parameters expl 'MH parameter' compadd - \
+    ${${(f)"$(mhparam -all)"}%%:*}
+elif [[ $service = mhmail ]]; then
+  _user_at_host
 else
   # Generate sequences.
   local foldnam folddir f ret
