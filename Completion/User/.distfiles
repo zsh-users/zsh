@@ -1,5 +1,0 @@
-DISTFILES_SRC='
-.distfiles
-_cpio~         _make~         _mysql_utils~  _rlogin~       _urls~
-_init_d~       _man~          _nedit~        _telnet~
-'

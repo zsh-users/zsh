@@ -1,6 +1,0 @@
-DISTFILES_SRC='
-.distfiles
-_all_labels~     _expand~         _next_label~     _setup~
-_approximate~    _main_complete~  _normal~         compinit~
-_expand_alias~   _multi_parts~    _path_files~
-'
