@@ -192,6 +192,11 @@
 	* 18841: Completion/Base/Completer/_prefix: work around problem
 	where the unambiguous part is empty making the word be removed
 
+2003-07-09  Peter Stephenson  <pws@csr.com>
+
+	* 18839, modified c.f. 18840: Completion/Unix/Command/_nice,
+	Completion/Zsh/Command/_precommand: Completion for nice.
+
 2003-07-07  Oliver Kiddle  <opk@zsh.org>
 
 	* 18822: Completion/Base/Completer/_expand
@@ -215,6 +220,13 @@
 	Completion/Linux/Command/.distfiles,
 	Completion/Linux/Command/_pkgtool: Completion for Slackware
 	package management tool.
+
+2003-07-03  Peter Stephenson  <pws@csr.com>
+
+	* 18796: Completion/Unix/Command/_cvs: quoting of characters
+	when completing existing CVS-managed files (in particular
+	spaces) was flakey.  The same problem probably exists for
+	completing modified files, but the code is indecipherable.
 
 2003-07-02  Oliver Kiddle  <opk@zsh.org>
 

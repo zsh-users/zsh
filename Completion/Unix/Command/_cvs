@@ -856,8 +856,8 @@ _cvs_existing_entries() {
   linedir="$match[1]"
   realdir=${(e)~linedir}
   [[ -f "$realdir"CVS/Entries ]] &&
-  [[ -n ${pat::="${(@j:|:)${(@)${(@)${(@)${(@M)${(@f)"$(<"$realdir"CVS/Entries)"}:#/*}#/}%%/*}//(#m)[][*?()<|^~#\\]/\\$MATCH}}"} ]] &&
-  _wanted files expl file _path_files -g "$pat"
+  pat=(${(@)${(@)${(@M)${(@f)"$(<"$realdir"CVS/Entries)"}:#/*}#/}%%/*})
+  (( ${#pat} )) && _wanted files expl file _path_files -a pat
 }
 
 (( $+functions[_cvs_modified_entries] )) ||
