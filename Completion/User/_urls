@@ -88,7 +88,7 @@ case "$scheme" in
     if [[ -f "$urls_path/$scheme/${(Q)PREFIX}${(Q)SUFFIX}" &&
 	  -s "$urls_path/$scheme/${(Q)PREFIX}${(Q)SUFFIX}" ]]; then
       _wanted -C bookmark bookmarks expl bookmarks &&
-          compadd "$expl[@]" "$@" -QU - \
+          compadd "$expl[@]" "$@" -U - \
               "$ipre$(<"$urls_path/$scheme/${(Q)PREFIX}${(Q)SUFFIX}")" && ret=0
     else
       if _wanted -C bookmark files expl 'bookmark'; then
@@ -107,7 +107,7 @@ if ! compset -P '(#b)([^/]#)/' &&
   uhosts=($urls_path/$scheme/$PREFIX*$SUFFIX(/:t))
   (( $#uhosts )) || _hosts -S/ && ret=0
   [[ "$scheme" = http ]] && uhosts=($uhosts $localhttp_servername)
-  compadd "$expl[@]" "$@" -QS/ - $uhosts && ret=0
+  compadd "$expl[@]" "$@" -S/ - $uhosts && ret=0
   return ret
 fi
 host="$match[1]"
