@@ -1,38 +1,82 @@
 #compdef chown chgrp
 
-local suf usr grp req expl line
+local curcontext="$curcontext" state line expl ret=1
+local suf usr grp req deref args
 
-line=( "${(@)words[2,CURRENT-1]:#-*}" )
-
-if [[ -prefix - ]]; then
-  _message option
-elif [[ $#line -eq 0 ]]; then
-  if [[ $service = chgrp ]] || compset -P '*[:.]'; then
-    if (( EGID && $+commands[groups] )); then  # except for root
-      _wanted groups expl 'group' compadd $(groups) && return 0
-    fi
-    _groups && return 0
-  else
-    if [[ $OSTYPE = (solaris*|hpux*|*bsd*) ]]; then
-      suf=':'
-    else
-      suf='.'
-    fi
-    compset -S '.*' && unset suf
-    _users -S "$suf" -q && return 0
-  fi
+if [[ $(_call_program version $words[1] --version 2>&1) = *Free\ Soft* ]]; then
+  args=(
+    '(-c --changes -v --verbose)'{-c,--changes}'[report each change made]'
+    '(-c --changes -v --verbose)'{-v,--verbose}'[output info for every file processed]'
+    '(-h --no-dereference)--dereference[dereference symlinks]'
+    '(-h --no-dereference --dereference)'{-h,--no-dereference}'[operate on symlinks them self]'
+    '(-f --silent --quiet)'{-f,--silent,--quiet}"[don't report errors]"
+    '--reference=[copy ownership of specified file]:file:_files'
+    '(-R --recursive)'{-R,--recursive}'[change files and directories recursively]'
+    '(- : *)--help[display help information]'
+    '(- : *)--version[display version information]'
+  )    
+  [[ $service = chown ]] &&
+      args=( $args '--from=[restrict changes to files by current ownership]: :->owner' )
 else
-  if [[ $service = chgrp ]]; then
-    grp=${line[1]}
-  else
-    usr=${line[1]%%[.:]*}
-    usr=${${(M)usr:#[0-9]#}:-${userdirs[$usr]:+.$usr.}}
-    grp=${${(M)line[1]%%[.:]*}#?}
-  fi
-  [[ -n $grp ]] && grp="${${(M)grp:#[0-9]#}:-.$grp.}"
-  req=( ${usr:+\^u$usr} ${grp:+\^g$grp} )
-  (( EUID )) && req=( u$EUID$^req )
-  req=( -$^req )
-
-  _wanted files expl file _files -g "*(${(j:,:)req})" && return 0
+  # based on $OSTYPE = solaris2.8
+  args=(
+    "-f[don't report errors]"
+    "-h[operate on symlinks them self]"
+    '-R[change files and directories recursively]'
+  )
 fi
+
+(( $+words[(r)--reference*] )) || args=( $args '(--reference)1: :->owner' )
+_arguments -C -s "$args[@]" '*:files:->files' && ret=0
+
+case $state in
+  owner)
+    if [[ $service = chgrp ]] || compset -P '*[:.]'; then
+      if (( EGID && $+commands[groups] )); then  # except for root
+	_wanted groups expl 'group' compadd $(groups) && return 0
+      fi
+      _groups && ret=0
+    else
+      if compset -S '[.:]*'; then
+        suf=()
+      elif [[ $OSTYPE = (solaris*|hpux*|*bsd*) ]]; then
+	suf=( -qS ':' )
+      else
+	suf=( -qS '.' )
+      fi
+      _users "$suf[@]" && ret=0
+    fi
+  ;;
+  files)
+    (( $+opt_args[-h] || $+opt_args[--no-dereference] )) || deref="-"
+    if (( $+opt_args[--reference] )); then
+      if zstyle -t ":completion:${curcontext}:" disable-stat; then
+	_files && ret=0
+      else
+	zmodload -i zsh/stat 2>/dev/null
+	usr=$(stat +uid $opt_args[--reference])
+	grp=$(stat +gid $opt_args[--reference])
+	_wanted files expl file _files -g "*($deref^u$usr,$deref^g$grp)" && ret=0
+      fi
+      return ret
+    fi
+    if [[ $service = chgrp ]]; then
+      grp=${line[1]}
+    else
+      usr=${line[1]%%[.:]*}
+      usr=${${(M)usr:#[0-9]#}:-${userdirs[$usr]:+.$usr.}}
+      grp=${${(M)line[1]%%[.:]*}#?}
+    fi
+    [[ -n $grp ]] && grp="${${(M)grp:#[0-9]#}:-.$grp.}"
+    req=( ${usr:+\^u$usr} ${grp:+\^g$grp} )
+    (( EUID )) && req=( u$EUID$^req )
+    req=( $deref$^req )
+    req="*(${(j:,:)req})"
+
+    ( : $~req ) 2> /dev/null || req='*'
+
+    _wanted files expl file _files -g "$req" && ret=0
+  ;;
+esac
+
+return ret

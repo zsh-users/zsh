@@ -1,3 +1,8 @@
+2003-08-20  Oliver Kiddle  <opk@zsh.org>
+
+	* 18947: Completion/Unix/Command/_chown: also complete options using
+	_arguments
+
 2003-08-05  Peter Stephenson  <pws@csr.com>
 
 	* 18926: Src/Zle/complist.c: fix (without knowing how) insertion
@@ -257,6 +262,7 @@
 
 	* 18346: Completion/Unix/Type/_pids, Completion/Unix/Type/_users:
 	complete for more commands using existing completions
+
 2003-03-12  Doug Kearns  <djkea2@mugca.its.monash.edu.au>
 
 	* unposted: Completion/Debian/Command/_debfoster,
