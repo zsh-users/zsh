@@ -687,12 +687,19 @@ zlecore(void)
 	reselectkeymap();
 	selectlocalmap(NULL);
 	bindk = getkeycmd();
-	if (!ll && isfirstln && !(zlereadflags & ZLRF_IGNOREEOF) &&
-	    lastchar == eofchar) {
-	    eofsent = 1;
-	    break;
-	}
 	if (bindk) {
+	    if (!ll && isfirstln && !(zlereadflags & ZLRF_IGNOREEOF) &&
+		lastchar == eofchar) {
+		/*
+		 * Slight hack: this relies on getkeycmd returning
+		 * a value for the EOF character.  However,
+		 * undefined-key is fine.  That's necessary because
+		 * otherwise we can't distinguish this case from
+		 * a ^C.
+		 */
+		eofsent = 1;
+		break;
+	    }
 	    if (execzlefunc(bindk, zlenoargs))
 		handlefeep(zlenoargs);
 	    handleprefixes();

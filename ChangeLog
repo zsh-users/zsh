@@ -1,3 +1,8 @@
+2004-09-02  Peter Stephenson  <pws@csr.com>
+
+	* 20300: Src/Zle/zle_main.c: typing ^D to list completions,
+	then two ^C's caused a spurious EOF.
+
 2004-08-24  Wayne Davison  <wayned@users.sourceforge.net>
 
 	* 20283: Completion/Unix/Command/_ant: Improved the parsing
