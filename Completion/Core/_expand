@@ -77,6 +77,10 @@ else
   expl2=(-n)
 fi
 
+# Quote the results and remove unnecessary quotes before `='s.
+
+    exp=( "${(@)${(@)${(@q)exp}//\\\\=/=}/#=/\\=}" )
+
 # We have expansions, should we menucomplete them?
 
 if [[ -z "$compconfig[expand_menu]" ]]; then
@@ -112,7 +116,7 @@ else
      "$compconfig[expand_original]" != *last* ]] &&
       compadd "$expl[@]" -UQ -V _expand_original - "$word"
 
-  [[ "$compconfig[expand_menu]" = *last* &&
+  [[ $#exp -ne 1 && "$compconfig[expand_menu]" = *last* &&
      "$compconfig[expand_menu]" != *only* ]] &&
       compadd "$expl2[@]" -UQ -V _expand_all - "$exp"
 
@@ -122,7 +126,7 @@ else
     compadd -UQ -X "${compconfig[expand_prompt]//\\%o/$word}" \
             $group _expand - "$exp[@]"
   fi
-  [[ "$compconfig[expand_menu]" != *last* &&
+  [[ $#exp -ne 1 && "$compconfig[expand_menu]" != *last* &&
      "$compconfig[expand_menu]" != *only* ]] &&
       compadd "$expl2[@]" -UQ -V _expand_all - "$exp"
 
