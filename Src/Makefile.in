@@ -78,13 +78,18 @@ NNTRYOBJ   =
 LDRUNPATH = LD_RUN_PATH=$(libdir)/$(tzsh)
 NDRUNPATH =
 
-zsh$(EXEEXT): $(@L@IBZSH) $(@L@STMP) $(MAIN_OBJS) zsh.export
+EXTRAZSHOBJS = @EXTRAZSHOBJS@
+
+zsh$(EXEEXT): $(@L@IBZSH) $(@L@STMP) $(MAIN_OBJS) zsh.export $(EXTRAZSHOBJS)
 	rm -f $@
-	$(@L@DRUNPATH) $(LINK) $(MAIN_OBJS) $(@L@LIST) $(ZSH_@E@XPORT) $(@L@IBZSH) $(LIBS)
+	$(@L@DRUNPATH) $(LINK) $(MAIN_OBJS) $(EXTRAZSHOBJS) $(@L@LIST) $(ZSH_@E@XPORT) $(@L@IBZSH) $(LIBS)
 
 $(LIBZSH): $(LIBOBJS) $(NSTMP)
 	rm -f $@
 	$(DLLINK) $(LIBOBJS) $(NLIST) $(LIBS)
+
+zsh.res.o: $(sdir)/zsh.rc $(sdir)/zsh.ico
+	windres -O coff --include-dir $(sdir) -i $(sdir)/zsh.rc -o zsh.res.o
 
 stamp-modobjs: modobjs
 	@if cmp -s stamp-modobjs.tmp stamp-modobjs; then \

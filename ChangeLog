@@ -1,5 +1,9 @@
 2000-08-16  Peter Stephenson  <pws@csr.com>
 
+	* pws/Andrej: 12594, 12661: Src/zsh.rc, Src/zsh.ico, Src/Makefile.in,
+	configure.in: basic support for Windows resources including icon,
+	will be built in for cygwin.
+
 	* Andrej: 12658: .cvsignore, Src/.cvsignore: cscope ignorance.
 
 2000-08-16  Sven Wischnowsky  <wischnow@zsh.org>

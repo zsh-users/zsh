@@ -1693,6 +1693,10 @@ fi
 AC_SUBST(INSTLIB)dnl
 AC_SUBST(UNINSTLIB)dnl
 
+if test x"$ac_cv_cygwin" = xyes; then
+  EXTRAZSHOBJS="$EXTRAZSHOBJS zsh.res.o"
+fi
+
 AC_DEFINE_UNQUOTED(DL_EXT, "$DL_EXT")dnl
 AC_SUBST(D)dnl
 AC_SUBST(DL_EXT)dnl
@@ -1708,6 +1712,7 @@ AC_SUBST(LINKMODS)dnl
 AC_SUBST(MOD_EXPORT)dnl
 AC_SUBST(MOD_IMPORT_VARIABLE)dnl
 AC_SUBST(MOD_IMPORT_FUNCTION)dnl
+AC_SUBST(EXTRAZSHOBJS)dnl
 
 CLEAN_MK="${srcdir}/Config/clean.mk"
 CONFIG_MK="${srcdir}/Config/config.mk"
