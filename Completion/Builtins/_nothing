@@ -1,0 +1,3 @@
+#compdef true false
+
+_message 'no argument or option'
