@@ -1,3 +1,12 @@
+2000-11-08  Sven Wischnowsky  <wischnow@zsh.org>
+
+	* 13128: Completion/Builtins/_zstyle, Completion/Core/_match,
+ 	Completion/Core/_path_files, Doc/Zsh/compsys.yo: aloow value
+ 	`pattern' for insert-unambiguous style to preserve patterns in the
+ 	original string; add list-suffixes style to make file completion
+ 	list path suffixes if possible; slightly improved completion of
+ 	pathnames with multiple pattern-components
+	
 2000-11-06  Bart Schaefer  <schaefer@zsh.org>
 
 	* 13127: Completion/User/_rcs: Test of $compstate[nmatches] was a

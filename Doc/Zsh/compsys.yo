@@ -1368,6 +1368,10 @@ tt(_approximate) completer uses it after setting the completer field
 in the context name to one of tt(correct-)var(num) or
 tt(approximate-)var(num), where var(num) is the number of errors that
 were accepted.
+
+When used for the tt(_match) completer, the style may also be set to
+the string `tt(pattern)'.  This makes the pattern on the line be left
+unchanged if it didn't match unambiguously.
 )
 kindex(keep-prefix, completion style)
 item(tt(keep-prefix))(
@@ -1466,6 +1470,14 @@ item(tt(list-rows-first))(
 This style is tested in the same way as the tt(list-packed) style and
 determines if matches are to be listed in a rows-first fashion, as for the
 tt(LIST_ROWS_FIRST) option.
+)
+kindex(list-suffixes, completion style)
+item(tt(list-suffixes))(
+This style is used by the function used to complete filenames.  If
+completion is attempted on a string containing multiple partially
+typed pathname components and this style is set to `true', all
+components starting with the first one for which more than one match
+could be generated will be shown.
 )
 kindex(local, completion style)
 item(tt(local))(
@@ -2417,6 +2429,9 @@ The generated matches will be offered in a menu completion unless the
 tt(insert-unambiguous) style is set to `true'.  In
 this case menu completion will only be started if no unambiguous string
 could be generated that is at least as long as the original string.
+The style may also be set to the string `tt(pattern)'.  This will keep 
+the pattern on the line intact as long as there isn't an unambiguous
+completion with which it could be replaced.
 
 Note that the matcher specifications defined globally or used by the
 completion functions will not be used.
@@ -3475,7 +3490,7 @@ These functions also accept the `tt(-J)', `tt(-V)', `tt(-1)',
 `tt(-r)', and `tt(-R)' options from the tt(compadd) builtin.
 
 Finally, the tt(_path_files) function  uses the styles tt(expand),
-tt(ambiguous) and tt(special-dirs) and tt(file-sort).
+tt(ambiguous), tt(special-dirs), tt(list-suffixes) and tt(file-sort).
 )
 findex(_regex_arguments)
 item(tt(_regex_arguments) var(name) var(specs) ...)(

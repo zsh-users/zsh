@@ -44,7 +44,7 @@ styles=(
   ignored-patterns	 c:
   insert-ids             c:insert-ids
   insert-tab             c:bool
-  insert-unambiguous	 c:bool
+  insert-unambiguous	 c:insunambig
   keep-prefix		 c:keep-prefix
   last-prompt		 c:bool
   list			 c:listwhen
@@ -52,6 +52,7 @@ styles=(
   list-packed		 c:bool
   list-prompt            c:
   list-rows-first	 c:bool
+  list-suffixes		 c:bool
   local			 c:
   match-original	 c:match-orig
   matcher		 c:
@@ -290,6 +291,10 @@ while [[ -n $state ]]; do
 
     oldmatches) 
       _wanted values expl 'use list of old matches' compadd true false only
+      ;;
+
+    insunambig) 
+      _wanted values expl 'insert unambiguous string compadd true false pattern
       ;;
 
     urgh) 

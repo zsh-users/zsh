@@ -5,7 +5,7 @@
 
 local linepath realpath donepath prepath testpath exppath skips skipped
 local tmp1 tmp2 tmp3 tmp4 i orig eorig pre suf tpre tsuf opre osuf cpre
-local pats haspats ignore pfxsfx sopt gopt opt sdirs ignpar cfopt
+local pats haspats ignore pfxsfx sopt gopt opt sdirs ignpar cfopt listsfx
 local nm=$compstate[nmatches] menu matcher mopts sort match mid accex fake
 
 typeset -U prepaths exppaths
@@ -137,6 +137,8 @@ else
 fi
 
 zstyle -s ":completion:${curcontext}:paths" special-dirs sdirs
+zstyle -t ":completion:${curcontext}:paths" list-suffixes &&
+    listsfx=yes
 
 [[ "$pats" = ((|*[[:blank:]])\*(|[[:blank:]]*)|*\([^[:blank:]]#/[^[:blank:]]#\)*) ]] &&
     sopt=$sopt/
@@ -460,9 +462,11 @@ for prepath in "$prepaths[@]"; do
       SUFFIX="${tsuf}"
     fi
 
-    if (( tmp4 )) ||
-       [[ -n "$compstate[pattern_match]" &&
-          "$tmp2" = (|*[^\\])[][*?#~^\|\<\>]* ]]; then
+    # This once tested `|| [[ -n "$compstate[pattern_match]" &&
+    # "$tmp2" = (|*[^\\])[][*?#~^\|\<\>]* ]]' but it should now be smart
+    # enough to handle multiple components with patterns.
+
+    if (( tmp4 )); then
       # It is. For menucompletion we now add the possible completions
       # for this component with the unambigous prefix we have built
       # and the rest of the string from the line as the suffix.
@@ -480,15 +484,33 @@ for prepath in "$prepaths[@]"; do
         compquote tmp1 tmp2
       fi
 
+      if [[ -z "$_comp_correct" &&
+            "$compstate[pattern_match]" = \*  && -n "$listsfx" &&
+            "$tmp2" = (|*[^\\])[][*?#~^\|\<\>]* ]]; then
+        PREFIX="$opre"
+        SUFFIX="$osuf"
+      fi
+
       if [[ -n $menu || -z "$compstate[insert]" ]] ||
-         ! zstyle -t ":completion:${curcontext}:paths" expand suffix; then
+         ! zstyle -t ":completion:${curcontext}:paths" expand suffix ||
+           [[ -z "$listsfx" &&
+              ( -n "$_comp_correct" ||
+                -z "$compstate[pattern_match]" || "$SUFFIX" != */* ||
+                "${SUFFIX#*/}" = (|*[^\\])[][*?#~^\|\<\>]* ) ]]; then
         (( tmp4 )) && zstyle -t ":completion:${curcontext}:paths" ambiguous &&
             compstate[to_end]=
         if [[ "$tmp3" = */* ]]; then
-	  compadd -Qf "$mopts[@]" -p "$linepath$tmp2" -s "/${tmp3#*/}" \
-	          -W "$prepath$realpath$testpath" \
-		  "$pfxsfx[@]" -M "r:|/=* r:|=*" \
-		  - "${(@)tmp1%%/*}"
+	  if [[ -z "$listsfx" || "$tmp3" != */?* ]]; then
+	    compadd -Qf "$mopts[@]" -p "$linepath$tmp2" -s "/${tmp3#*/}" \
+	            -W "$prepath$realpath$testpath" \
+		    "$pfxsfx[@]" -M "r:|/=* r:|=*" \
+		    - "${(@)tmp1%%/*}"
+          else
+	    compadd -Qf "$mopts[@]" -p "$linepath$tmp2" \
+	            -W "$prepath$realpath$testpath" \
+		    "$pfxsfx[@]" -M "r:|/=* r:|=*" \
+		    - "${(@)^tmp1%%/*}/${tmp3#*/}"
+          fi
 	else
 	  compadd -Qf "$mopts[@]" -p "$linepath$tmp2" \
 	          -W "$prepath$realpath$testpath" \
@@ -497,12 +519,20 @@ for prepath in "$prepaths[@]"; do
 	fi
       else
         if [[ "$tmp3" = */* ]]; then
-	  tmp3=( -Qf "$mopts[@]" -p "$linepath$tmp2"
+	  tmp4=( -Qf "$mopts[@]" -p "$linepath$tmp2"
 	         -W "$prepath$realpath$testpath"
 	         "$pfxsfx[@]" -M "r:|/=* r:|=*" )
-          for i in "$tmp1[@]"; do
-	    compadd "$tmp3[@]" -s "/${i#*/}" - "${i%%/*}"
-	  done
+	  if [[ -z "$listsfx" ]]; then
+            for i in "$tmp1[@]"; do
+	      compadd "$tmp4[@]" -s "/${i#*/}" - "${i%%/*}"
+	    done
+          else
+            [[ -n "$compstate[pattern_match]" ]] && SUFFIX="${SUFFIX:s./.*/}*"
+
+            for i in "$tmp1[@]"; do
+	      compadd "$tmp4[@]" - "$i"
+	    done
+          fi
         else
 	  compadd -Qf "$mopts[@]" -p "$linepath$tmp2" \
                   -W "$prepath$realpath$testpath" \
@@ -526,22 +556,33 @@ for prepath in "$prepaths[@]"; do
     # take it from the filenames.
 
     testpath="${testpath}${tmp1[1]%%/*}/"
-    tmp1=( "${(@)tmp1#*/}" )
 
     tmp3="${tmp3#*/}"
 
     if [[ "$tpre" = */* ]]; then
-      cpre="${cpre}${tpre%%/*}/"
+      if [[ -z "$_comp_correct" && -n "$compstate[pattern_match]" &&
+            "$tmp2" = (|*[^\\])[][*?#~^\|\<\>]* ]]; then
+        cpre="${cpre}${tmp1[1]%%/*}/"
+      else
+        cpre="${cpre}${tpre%%/*}/"
+      fi
       tpre="${tpre#*/}"
     elif [[ "$tsuf" = */* ]]; then
       [[ "$tsuf" != /* ]] && mid="$testpath"
-      cpre="${cpre}${tpre}/"
+      if [[ -z "$_comp_correct" && -n "$compstate[pattern_match]" &&
+            "$tmp2" = (|*[^\\])[][*?#~^\|\<\>]* ]]; then
+        cpre="${cpre}${tmp1[1]%%/*}/"
+      else
+        cpre="${cpre}${tpre}/"
+      fi
       tpre="${tsuf#*/}"
       tsuf=
     else
       tpre=
       tsuf=
     fi
+
+    tmp1=( "${(@)tmp1#*/}" )
   done
 
   if [[ -z "$tmp4" ]]; then
@@ -580,8 +621,14 @@ for prepath in "$prepaths[@]"; do
       else
         compquote tmp4 tmp1
       fi
-      compadd -Qf "$mopts[@]" -p "$linepath$tmp4" -W "$prepath$realpath$testpath" \
-	      "$pfxsfx[@]" -M "r:|/=* r:|=*" -a tmp1
+      if [[ -z "$_comp_correct" && -n "$compstate[pattern_match]" &&
+            "$PREFIX$SUFFIX" = (|*[^\\])[][*?#~^\|\<\>]* ]]; then
+        compadd -Qf -W "$prepath$realpath" "$pfxsfx[@]" "$mopts[@]" \
+                -M "r:|/=* r:|=*" - "$linepath$tmp4${(@)^tmp1}"
+      else
+        compadd -Qf -p "$linepath$tmp4" -W "$prepath$realpath$testpath" \
+	        "$pfxsfx[@]" "$mopts[@]" -M "r:|/=* r:|=*" -a tmp1
+      fi
     fi
   fi
 done
