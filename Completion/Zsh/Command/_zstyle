@@ -141,7 +141,7 @@ taglist=(
   other-accounts packages parameters path-directories paths pods ports
   prefixes printers processes processes-names ps regex sequences
   sessions signals strings styles tags targets timezones types urls
-  users values version visuals warnings widgets windows zsh-options
+  users values variant visuals warnings widgets windows zsh-options
 )
 
 _arguments -C \

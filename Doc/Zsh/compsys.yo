@@ -864,10 +864,10 @@ item(tt(values))(
 when completing a value out of a set of values (or a list of such
 values)
 )
-kindex(version, completion tag)
-item(tt(version))(
-used by tt(_call_program) to look up the command to run to determine the installed
-version of various other commands (such as tt(diff) and tt(make)).
+kindex(variant, completion tag)
+item(tt(variant))(
+used by tt(_pick_variant) to look up the command to run when determining
+what program is installed for a particular command name.
 )
 kindex(visuals, completion tag)
 item(tt(visuals))(
@@ -3941,6 +3941,26 @@ These functions also accept the `tt(-J)', `tt(-V)', `tt(-1)',
 
 Finally, the tt(_path_files) function  uses the styles tt(expand),
 tt(ambiguous), tt(special-dirs), tt(list-suffixes) and tt(file-sort).
+)
+findex(_pick_variant)
+item(tt(_pick_variant [ tt(-c) var(command) ] [ tt(-r) var(name) ] var(command)tt(=)var(pattern) ... var(command) [ var(args ... ]))(
+This function is used to resolve situations where a command has more
+than one variant, each requiring different handling or where there is a
+name clash between two different commands.
+
+_pick_variant does this by running the command and comparing its output
+against a series of patterns. The command to run is taken from the
+first element of the var(words) array unless specified with the tt(-c)
+option. Arguments to be passed on to it can be specified at the end
+after all the other arguments. The patterns are specified by the series
+of var(command)tt(=)var(pattern) arguments where var(command) is a
+label used to describe each command. If none of the patterns match, the
+final command label is taken and 1 is returned.
+
+The results are cached in the var(_cmd_variant) associative array so
+the calling function can either look up the result in there or it can
+pass the name of a parameter with the tt(-r) option which will be set
+to the result.
 )
 findex(_regex_arguments)
 item(tt(_regex_arguments) var(name) var(specs) ...)(

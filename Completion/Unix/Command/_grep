@@ -16,17 +16,6 @@ else
   command="$words[1]"
 fi
 
-(( $+_is_gnu )) || typeset -gA _is_gnu
-
-if (( ! $+_is_gnu[$command] )); then
-  if [[ $(_call_program version $command --help </dev/null 2>/dev/null) = *gnu* ]]
-  then
-    _is_gnu[$command]=yes
-  else
-    _is_gnu[$command]=
-  fi
-fi
-
 if [[ $service != [ef]grep ]]; then
   matchers='(--extended-regexp --fixed-strings --basic-regexp --perl-regexp -E -F -G -P)'
   arguments+=(
@@ -77,7 +66,7 @@ arguments=( $arguments[@]
 )
 
 # remove long options?
-[[ -z "$_is_gnu[$command]" ]] &&
+_pick_variant -c "$command" gnu=gnu unix --help ||
     arguments=( ${arguments:#(|*\)(\*|))--*} )
 
 _arguments -s $arguments[@]

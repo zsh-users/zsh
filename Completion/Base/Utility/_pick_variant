@@ -1,0 +1,35 @@
+#autoload
+
+local output cmd pat
+local -a var
+local -A opts
+
+(( $+_cmd_variant )) || typeset -gA _cmd_variant
+
+zparseopts -D -A opts c: r:
+: ${opts[-c]:=$words[1]}
+
+while [[ $1 = *=* ]]; do
+  var+=( "${1%%\=*}" "${1#*=}" )
+  shift
+done
+if (( $+_cmd_variant[$opts[-c]] )); then
+  (( $+opts[-r] )) && eval "${opts[-r]}=${_cmd_variant[$opts[-c]]}"
+  [[ $_cmd_variant[$opts[-c]] = "$1" ]] && return 1
+  return 0
+fi
+
+output="$(_call_program variant $opts[-c] "${@[2,-1]}" </dev/null 2>&1)"
+
+for cmd pat in "$var[@]"; do
+  if [[ $output = *$~pat* ]]; then
+    (( $+opts[-r] )) && eval "${opts[-r]}=$cmd"
+    _cmd_variant[$opts[-c]]="$cmd"
+    return
+  fi
+done
+
+(( $+opts[-r] )) && eval "${opts[-r]}=$1"
+_cmd_variant[$opts[-c]]="$1"
+
+return 1

@@ -1,5 +1,15 @@
 2002-03-15  Oliver Kiddle  <opk@zsh.org>
 
+	* 16842: Completion/Base/Utility/_pick_variant,
+	Completion/Base/Utility/.distfiles, Completion/Unix/Command/_cpio,
+	Completion/Unix/Command/_grep, Completion/Unix/Command/_iconv,
+	Completion/Unix/Command/_ls, Completion/Unix/Command/_make,
+	Completion/Unix/Command/_netcat, Completion/Unix/Command/_zcat,
+	Completion/Unix/Type/_diff_options, Completion/X/Command/_nedit,
+	Completion/Zsh/Command/_zstyle, Doc/Zsh/compsys.yo:
+	resolve name clash for nc between netcat and the nedit client
+	and add utility function to handle the general case of this
+
 	* 16838: Completion/Unix/Command/_grep: complete new options of
 	grep 2.5 and value for GREP_OPTIONS parameter
 

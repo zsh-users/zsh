@@ -2,20 +2,10 @@
 
 local of ofwuc ouc oss ofwy ofwg ofwl cmd
 
-(( $+_is_gnu )) || typeset -gA _is_gnu
-
 cmd="$1"
 shift
 
-if (( ! $+_is_gnu[$cmd] )); then
-  if [[ $(_call_program version $cmd -v </dev/null 2>/dev/null) = *GNU* ]]; then
-    _is_gnu[$cmd]=yes
-  else
-    _is_gnu[$cmd]=
-  fi
-fi
-
-if [[ -n "$_is_gnu[$cmd]" ]]; then
+if _pick_variant -c $cmd gnu=GNU unix -v; then
   # output formats
   of="-y --side-by-side -n --rcs -e -f --ed -q --brief -c -C --context -u -U \
   --unified --old-group-format --new-group-format --changed-group-format \

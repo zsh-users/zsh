@@ -1,17 +1,8 @@
 #compdef make gmake pmake dmake
 
-local prev="$words[CURRENT-1]" file expl tmp
+local prev="$words[CURRENT-1]" file expl tmp is_gnu
 
-(( $+_is_gnu )) || typeset -gA _is_gnu
-
-if (( ! $+_is_gnu[$words[1]] )); then
-  if [[ $(_call_program version $words[1] -v -f /dev/null </dev/null 2>/dev/null) = *GNU* ]]
-  then
-    _is_gnu[$words[1]]=yes
-  else
-    _is_gnu[$words[1]]=
-  fi
-fi
+_pick_variant -r is_gnu gnu=GNU unix -v -f
 
 if [[ "$prev" = -[CI] ]]; then
   _files -/
@@ -25,14 +16,14 @@ else
     file=Makefile
   elif [[ -e makefile ]]; then
     file=makefile
-  elif [[ -n "$_is_gnu[$words[1]]" && -e GNUmakefile ]]; then
+  elif [[ $is_gnu = gnu && -e GNUmakefile ]]; then
     file=GNUmakefile
   else
     file=''
   fi
 
   if [[ -n "$file" ]] && _tags targets; then
-    if [[ -n "$_is_gnu[$words[1]]" ]] &&
+    if [[ $is_gnu = gnu ]] &&
        zstyle -t ":completion:${curcontext}:targets" call-command; then
       tmp=( $(_call_program targets "$words[1]" -nsp --no-print-directory -f "$file" .PHONY 2> /dev/null | awk '/^[a-zA-Z0-9][^\/\t=]+:/ {print $1}' FS=:) )
     else

@@ -1,33 +1,23 @@
 #compdef cpio
 
-(( $+_is_gnu )) || typeset -gA _is_gnu
-
-local cmd=$service args ig curcontext="$curcontext" state line
+local args ig curcontext="$curcontext" state line
 local expl ret
 local fmts='(bar bin odc newc crc tar ustar hpbin hpodc)'
 
-if (( ! $+_is_gnu[$cmd] )); then
-  if [[ $(_call_program version $cmd --version </dev/null 2>/dev/null) = *GNU* ]]
-  then
-    _is_gnu[$cmd]=yes
-  else
-    _is_gnu[$cmd]=
-  fi
-fi 
-ig=$_is_gnu[$cmd]
+_pick_variant -r ig gnu=GNU unix --version
 
-if (( $CURRENT == 2 )); then
+if (( CURRENT == 2 )); then
    # Complete arguments 
    args=('-o[create archive]' '-i[extract from archive]'
    '-p[run as filter on directory tree]')
-   [[ -n $ig ]] && args=($args '--create[create archive]'
+   [[ $ig = gnu ]] && args=($args '--create[create archive]'
    '--extract[extract from archive]' 
    '--pass-through[run as filter on directory tree]'
    '--help[show help text]' '--version[show version information]')
 else
   if [[ -n ${words[(r)(-o*|-[^-]*o*|--create)]} ]]; then
-    # Optiona for creating archive
-    if [[ -n $ig ]]; then
+    # Options for creating archive
+    if [[ $ig = gnu ]]; then
 	args=(
 	   '--file=:archive file:->afile'
 	   "--format=:format type:$fmts"
@@ -51,7 +41,7 @@ else
 	  '-O[set output archive file]:output archive file:_files'
 	 )
   elif [[ -n ${words[(r)(-i*|-[^-]*i*|--extract)]} ]]; then
-    if [[ -n $ig ]]; then
+    if [[ $ig = gnu ]]; then
       args=('--file=:archive file:->afile'
 	    "--format=:format type:$fmts"
 	    '--make-directories' '--nonmatching' 
@@ -90,7 +80,7 @@ else
 	  '*:pattern to extract'
 	  )
   elif [[ -n ${words[(r)(-p*|-[^-]*p*|--pass-through)]} ]]; then
-    if [[ -n $ig ]]; then
+    if [[ $ig = gnu ]]; then
       args=('--null' '--reset-access-time' '--make-directories'
             '--link' '--quiet' '--preserve-modification-time'
 	    '--unconditional' '--verbose' '--dot' '--dereference'

@@ -3,6 +3,10 @@
 local curcontext="$curcontext" state line expl
 typeset -A opt_args
 
+# handle name clash with the nedit client
+[[ $service = nc ]] && ! _pick_variant netcat=connect nedit -h &&
+    _nedit && return
+
 if (( ! $+_nc_args )); then
   local help="$(_call_program options nc -h < /dev/null 2>&1)"
   local -A optionmap

@@ -3,17 +3,6 @@
 
 local arguments
 
-(( $+_is_gnu )) || typeset -gA _is_gnu
-
-if (( ! $+_is_gnu[$words[1]] )); then
-  if [[ $(_call_program version $words[1] --help </dev/null 2>/dev/null) = *gnu* ]]
-  then
-    _is_gnu[$words[1]]=yes
-  else
-    _is_gnu[$words[1]]=
-  fi
-fi
-
 arguments=(
   '(--all -a -A --almost-all)'{--all,-a}'[list entries starting with .]'
   '(--almost-all -A -a --all)'{--almost-all,-A}'[list all except . and ..]'
@@ -79,7 +68,7 @@ arguments=(
 )
 
 # remove long options?
-[[ -z "$_is_gnu[$words[1]]" ]] &&
+_pick_variant gnu=gnu unix --help ||
     arguments=( ${${${arguments:#(|*\))--*}//--[^ )]#/}/\( #\)/} )
 
 _arguments -s $arguments
