@@ -2241,9 +2241,13 @@ doexpandhist(void)
 int
 magicspace(char **args)
 {
+    char *bangq;
     int ret;
     c = ' ';
-    if (!(ret = selfinsert(args)))
+    for (bangq = (char *)line; (bangq = strchr(bangq, bangchar)); bangq += 2)
+	if (bangq[1] == '"' && (bangq == (char *)line || bangq[-1] != '\\'))
+	    break;
+    if (!(ret = selfinsert(args)) && (!bangq || bangq + 2 > (char *)line + cs))
 	doexpandhist();
     return ret;
 }

@@ -1,5 +1,8 @@
 2001-06-23  Bart Schaefer  <schaefer@zsh.org>
 
+	* 15056: Src/Zle/zle_tricky.c: Change magic-space to recognize
+	whether !" (quote against history expansion) has been typed.
+
 	* 15050, 15054: Src/exec.c: Change exit status of external
 	commands that could not be executed, to comply with POSIX.
 
