@@ -583,7 +583,7 @@ tt(SH_OPTION_LETTERS),
         tt(NO_NOMATCH)).
     it()* The results of parameter substitutions are treated as plain text:
         mytt(foo="*"; print $foo) prints all files in ksh but mytt(*) in zsh
-        (uset tt(GLOB_SUBST)).
+        (use tt(GLOB_SUBST)).
     it()* tt($PSn) do not do parameter substitution by default (use \
 PROMPT_SUBST).
     it()* Standard globbing does not allow ksh-style `pattern-lists'.
@@ -615,7 +615,6 @@ tt(EXTENDED_GLOB).
         the way to exclude some subdirectories from matching a mytt(**).
     it()  Unquoted assignments do file expansion after mytt(:)s (intended for
         PATHs). 
-    it()  mytt(integer) does not allow mytt(-i).
     it()  mytt(typeset) and mytt(integer) have special behaviour for
         assignments in ksh, but not in zsh.  For example, this doesn't
         work in zsh:
@@ -658,13 +657,14 @@ link(2.3)(23).
   )
   it() Editing:
   itemize(
-    it()  The options tt(emacs), tt(gmacs), tt(viraw) are not supported.
+    it()  The options tt(gmacs), tt(viraw) are not supported.
         Use bindkey to change the editing behaviour: mytt(set -o {emacs,vi})
-        becomes mytt(bindkey -{e,v}); for gmacs, go to emacs mode and use
-        mytt(bindkey \^t gosmacs-transpose-characters).
+        becomes `bindkey -{e,v}', although `set -o emacs' and `set -o vi'
+        are supported for compatibility; for gmacs, go to emacs mode and
+        use `bindkey \^t gosmacs-transpose-characters'.
     it()  The mytt(keyword) option does not exist and mytt(-k) is instead
-        interactivecomments.  (mytt(keyword) will not be in the next ksh
-        release either.)
+        interactivecomments.  (mytt(keyword) is not in recent versions
+        of ksh either.)
     it()* Management of histories in multiple shells is different:
         the history list is not saved and restored after each command.
         The option tt(SHARE_HISTORY) appeared in 3.1.6 and is set in ksh
@@ -681,7 +681,6 @@ link(2.3)(23).
     it()  There is no built-in command newgrp: use e.g. mytt(alias
         newgrp="exec newgrp")
     it()  mytt(jobs) has no mytt(-n) flag.
-    it()  mytt(read) has no mytt(-s) flag.
   )
   it() Other idiosyncrasies:
   itemize(
@@ -832,8 +831,7 @@ label(23)
   as an alias, defining mytt(/bin/ls) and mytt(-F) as functions which call
   mytt(/bin/ls), which gets a bit recursive.  This can be avoided if you use
   mytt(function) to define a function, which doesn't expand aliases.  It is
-  possible to argue for extra warnings somewhere in this mess.  Luckily,
-  it is not possible to define mytt(function) as an alias.
+  possible to argue for extra warnings somewhere in this mess.
 
   Bart Schaefer's rule is:  Define first those aliases you expect to
   use in the body of a function, but define the function first if the
