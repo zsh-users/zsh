@@ -414,6 +414,26 @@ if (( ! $+_fs_any )); then
       'ufstype[set ufs type]:ufs type:(old 44bsd sun sunx86 nextstep nextstep-cd openstep)'
       'onerror[set behaviour on error]:behaviour on error:(panic lock umount repair)'
     )
+    _fs_xfs=(
+      'biosize[specify preffer buffered I/O size]:base 2 logarithm:((13:8K 14:16K 15:32K 16:64K))
+      '(xdsm)dmapi[enable DMAPI event callouts]'
+      '(dmapi)xdsm[enable DMAPI event callouts]'
+      'logbufs[set number of in-memory log buffers]:(2 3 4 5 6 7 8)'
+      'logbsize[set size of each in-memory log buffer]:(16384 32768)'
+      'logdev[use external log device]:_files'
+      'rtdev[use external realtime device]:_files'
+      'noalign[do not align data allocations at stripe unit boundaries]'
+      'noatime[do not update atime on reads]'
+      'norecovery[do not run log recovery]'
+      'osyncisdsync[make O_SYNC behave as O_DSYNC]'
+      '(usrquota uqnoenforce)quota[enable user quotas]'
+      '(quota uqnoenforce)usrquota[enable user quotas]'
+      '(quota usrquota)uqnoenforce[enable user quotas without enforcement]'
+      '(gqnoenforce)grpquota[enable group quotas]'
+      '(grpquota)gqnoenforce[enable group quotas without enforcement]'
+      'sunit[specify stripe unit]:size:'
+      'swidth[specify stripe width]:size:'
+    )
     ;;
   freebsd*)
     _fs_any=(
@@ -529,7 +549,7 @@ if [[ "$service" = mount ]]; then
     )
     fss=( minix ext ext2 xiafs hpfs msdos umsdos vfat proc nfs iso9660
           smbfs ncpfs affs ufs romfs sysv adfs autofs coda devpts efs
-          hfs ntfs qnx4 smbfs udf ext3 )
+          hfs ntfs qnx4 smbfs udf ext3 xfs )
     [[ -r /proc/filesystems ]] &&
         fss=( ${$(</proc/filesystems)#nodev} )
     ;;

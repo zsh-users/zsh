@@ -1,5 +1,8 @@
 2001-10-05  Clint Adams  <clint@zsh.org>
 
+	* 15939: Completion/Unix/Command/_mount:
+	complete xfs mount options (for Linux).
+
 	* 15938: Completion/Unix/Command/_mount:
 	complete ext3 mount options.
 
