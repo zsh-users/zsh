@@ -47,7 +47,7 @@ fi
 for def in "$pats[@]"; do
   def="${def##[[:blank:]]#}"
   while [[ "$def" = *[^\\][[:blank:]]* ]]; do
-    sdef="${(M)def#*[^\\][[:blank:]]}"
+    sdef="${${(M)def#*[^\\][[:blank:]]}%%[[:blank:]]#}"
     tag="${${sdef#*[^\\]:}%%:*}"
     pat="${${${sdef%%:${tag}*}//\\\\:/:}//,/ }"
 

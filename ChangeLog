@@ -1,5 +1,8 @@
 2000-04-11  Sven Wischnowsky <wischnow@informatik.hu-berlin.de>
 
+	* 10650: Completion/Core/_files: make trailing blanks in
+ 	file-patterns tags be removed
+	
 	* 10648: Completion/Core/_oldlist: make _oldlist ignore old list
  	when _complete_help is used
 	
