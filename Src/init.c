@@ -1033,7 +1033,7 @@ sourcehome(char *s)
 	return;
     }
 #endif
-    zasprintf(&buf, "%s/%s", h, s);
+    buf = tricat(h, "/", s);
     source(buf);
     zsfree(buf);
 }
