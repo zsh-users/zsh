@@ -1,3 +1,12 @@
+2000-06-01  Peter Stephenson  <pws@cambridgesiliconradio.com>
+
+	* unposted: Etc/NEWS: notes for 3.1.8.
+
+	* 11707: Src/subst.c: further promptexpand leaks.
+
+	* Felix Rosencrantz: 11700: Src/utils.c memory leak in return
+	value of promptexpand.
+
 2000-05-31  Peter Stephenson  <pws@pwstephenson.fsnet.co.uk>
 
 	* 11696: Src/params.c: fix bugs reported in 10990 localising

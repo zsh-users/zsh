@@ -807,6 +807,7 @@ printprompt4(void)
 	opts[XTRACE] = t;
 
 	fprintf(xtrerr, "%s", s);
+	free(s);
     }
 }
 

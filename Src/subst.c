@@ -1661,18 +1661,24 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int ssub)
 		aval = arrdup(aval), copied = 1;
 	    ap = aval;
 	    for (; *ap; ap++) {
+		char *tmps;
 		unmetafy(*ap, &len);
 		untokenize(*ap);
-		*ap = unmetafy(promptexpand(metafy(*ap, len, META_NOALLOC),
-					    0, NULL, NULL), &len);
+		tmps = unmetafy(promptexpand(metafy(*ap, len, META_NOALLOC),
+					     0, NULL, NULL), &len);
+		*ap = dupstring(tmps);
+		free(tmps);
 	    }
 	} else {
+	    char *tmps;
 	    if (!copied)
 		val = dupstring(val), copied = 1;
 	    unmetafy(val, &len);
 	    untokenize(val);
-	    val = unmetafy(promptexpand(metafy(val, len, META_NOALLOC),
+	    tmps = unmetafy(promptexpand(metafy(val, len, META_NOALLOC),
 					0, NULL, NULL), &len);
+	    val = dupstring(tmps);
+	    free(tmps);
 	}
 	opts[PROMPTSUBST] = ops;
 	opts[PROMPTBANG] = opb;

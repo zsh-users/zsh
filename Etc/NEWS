@@ -2,6 +2,12 @@
 CHANGES FROM PREVIOUS VERSIONS OF ZSH
 -------------------------------------
 				     
+New features in zsh version 3.1.8
+---------------------------------
+This is primarily a bug-fix version.  There are only a few user-visible
+changes.
+ - Array slices ${array[a,b]} with b < a now correctly have zero length.
+
 New features in zsh version 3.1.7
 ---------------------------------
 Further enhancements to new completion system:
