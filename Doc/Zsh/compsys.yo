@@ -1195,7 +1195,8 @@ expansions).
 item(tt(special-dirs))(
 Normally, the completion code will not produce the directory names
 tt(.) and tt(..) as possible completions. If this style is set to
-`true', it will.
+`true', it will add both `tt(.)' and `tt(..)' as possible completions,
+if it is set to tt(..), only `tt(..)' will be added.
 )
 item(tt(stop))(
 If set to `true', the tt(_history_complete_word) bindable
