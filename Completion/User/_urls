@@ -71,11 +71,13 @@ case "$scheme" in
   file)
     if ! compset -P //; then
       if [ -prefix / ]; then
-	_files "$@"
+	_path_files "$@" -S '' -g '*(^/)' && ret=0
+	_path_files "$@" -S/ -r '/' -/ && ret=0
       elif [ ! "$PREFIX" ]; then
-	compadd -S '/' - "${PWD%/}"
+	compadd -S '/' -r '/' - "${PWD%/}"
+	ret=0
       fi
-      return
+      return $ret
     fi
   ;;
   bookmark)
@@ -85,7 +87,7 @@ case "$scheme" in
     else
       _description expl 'bookmark'
       _path_files -W "$urls_path/$scheme" "$expl[@]" -S '' -g '*(^/)' && ret=0
-      _path_files -W "$urls_path/$scheme" -S/ -r '' -/ && ret=0
+      _path_files -W "$urls_path/$scheme" -S/ -r '/' -/ && ret=0
     fi
     return $ret
   ;;
@@ -95,8 +97,7 @@ esac
 if ! [[ -prefix */* ]]; then
   dirs=($urls_path/$scheme/$PREFIX*$SUFFIX(/:t))
   (( $#dirs )) || _hosts -S/ && ret=0
-  [ "$scheme" = "http" ] && 
-    dirs=($dirs $localhttp_servername)
+  [ "$scheme" = "http" ] && dirs=($dirs $localhttp_servername)
   compadd "$@" -QS/ - $dirs && ret=0
   return $ret
 fi
@@ -104,23 +105,23 @@ fi
 # Complete part after hostname
 host=${PREFIX%%/*}
 compset -P "$host/"
-if [[ "$compconfig[urls_localhttp]" = ${host}:* ]]; then
+if [[ "$localhttp_servername" = $host ]]; then
   if [[ -prefix \~ ]]; then
     compset -P \~
     if [[ -prefix */* ]]; then
       user=${PREFIX%%/*}
       compset -P $user/
       _path_files -W ~$user/$localhttp_userdir -g '*(^/)' && ret=0
-      _path_files -W ~$user/$localhttp_userdir -S/ -r '' -/ && ret=0
+      _path_files -W ~$user/$localhttp_userdir -S/ -r '/' -/ && ret=0
     else
       _users -S/ && ret=0
     fi
   else
     _path_files -W $localhttp_documentroot -g '*(^/)' && ret=0
-    _path_files -W $localhttp_documentroot -S/ -r '' -/ && ret=0
+    _path_files -W $localhttp_documentroot -S/ -r '/' -/ && ret=0
   fi
 else
   _path_files -W $urls_path/$scheme/$host/ -g '*(^/)' && ret=0
-  _path_files -W $urls_path/$scheme/$host/ -S/ -r '' -/ && ret=0
+  _path_files -W $urls_path/$scheme/$host/ -S/ -r '/' -/ && ret=0
 fi
 return $ret
