@@ -996,10 +996,10 @@ argument), options are considered to be one-character options and the
 strings from the line may contain more than one such option letter.
 
 The function can also be made to automatically complete long options
-for commands that support the `tt(--help)' option as, for example,
-most of the GNU commands do. For this, the string `tt(--)' must be
+for commands that support the `tt(-)tt(-help)' option as, for example,
+most of the GNU commands do. For this, the string `tt(-)tt(-)' must be
 given as one argument and if it is, the command from the line is
-invoked with the `tt(--help)' option and its output is parsed to find
+invoked with the `tt(-)tt(-help)' option and its output is parsed to find
 possible option names. Note that this means that you should be careful
 to make sure that this feature is not used for a command that does not
 support this option.
@@ -1007,13 +1007,13 @@ support this option.
 For options that get an argument after a `tt(=)', the function also tries
 to automatically find out what should be completed as the argument.
 The possible completions for option-arguments can be described with
-the arguments after the `tt(--)' (which are not used as described
+the arguments after the `tt(-)tt(-)' (which are not used as described
 above). Each argument contains one description of the form
 `var(pattern)tt(:)var(message)tt(:)var(action)'. The var(message) and
 the var(action) have the same format as for the normal option
 descriptions described above. The var(action) will be executed to
 complete arguments of options whose description in the output of the
-command from the line with the `tt(--help)' option matches the
+command from the line with the `tt(-)tt(-help)' option matches the
 var(pattern). For example:
 
 example(_arguments -- '*\*'     '(yes no)' \ 
@@ -1035,17 +1035,17 @@ detect this, the colon before the var(message) can be doubled to tell
 it about this as described for the normal option descriptions above.
 
 The option `tt(-i) var(patterns)' (which must be given after the
-`tt(--)') can be used to give patterns for options which should not be
+`tt(-)tt(-)') can be used to give patterns for options which should not be
 completed. The patterns can be given as the name of an array parameter
 or as a literal list in parentheses. E.g. `tt(-i
-"(--(en|dis)able-FEATURE*)")' will make the options
-`tt(--enable-FEATURE)' and `tt(--disable-FEATURE)' be ignored. The
-option `tt(-s) var(pairs)' (again, after the `tt(--)') can be used to
+"LPAR()-)tt(-(en|dis)able-FEATURE*RPAR()")' will make the options
+`tt(-)tt(-enable-FEATURE)' and `tt(-)tt(-disable-FEATURE)' be ignored. The
+option `tt(-s) var(pairs)' (again, after the `tt(-)tt(-)') can be used to
 describe option aliases. Each var(pair) consists of a pattern and a
 replacement. E.g. some tt(configure)-scripts describe options only as
-`tt(--enable-foo)', but also accept `tt(disable-foo)'. To allow
-completion of the second form, one would use `tt(-s "(#--enable-
---disable-)")'.
+`tt(-)tt(-enable-foo)', but also accept `tt(disable-foo)'. To allow
+completion of the second form, one would use `tt(-s "LPAR()#-)tt(-enable-
+-)tt(-disable-RPAR()")'.
 
 Finally, this function uses the configuration key tt(option_prefix). If
 it is set to a non-empty string, option names are added as possible
