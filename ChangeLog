@@ -1,3 +1,7 @@
+2004-08-06  Peter Stephenson  <pws@csr.com>
+
+	* unposted: Config/version.mk: version 4.2.1-test-A.
+
 2004-08-01  Clint Adams  <clint@zsh.org>
 
 	* 20230: Completion/Debian/Command/_apt: dumb down apt-get
