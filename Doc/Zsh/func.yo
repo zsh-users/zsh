@@ -31,62 +31,64 @@ sect(Autoloading Functions)
 findex(autoload, use of)
 cindex(autoloading functions)
 cindex(functions, autoloading)
+
 A function can be marked as em(undefined) using the tt(autoload) builtin
 (or `tt(functions -u)' or `tt(typeset -fu)').  Such a function has no
-body.  When the function is first executed, the definition for it will 
-be searched using the elements of the tt(fpath) variable. For each
-element, the shell looks for three files: the element plus the
-extension tt(.zwc), a file named after the function plus the extension 
-tt(.zwc) in a directory named by the element of tt(fpath) and the name 
-of the function without the extension in the same directory. The
-youngest of these files will be used to get the definition for the
-function. The files with the tt(.zwc) extension should be wordcode
-files created with the tt(zcompile) builtin command. The first one
-(with the name of the element from tt(fpath) plus the extension) is
-normally used to contain the definitions for all functions in the
-directory. The latter is intended to be used for individual wordcode
-files for single functions. But of course it is also possible to
-create any number of wordcode files and put their names (including the 
-extension) in the tt(fpath) variable. In that case these files will be 
-searched for the definition of the function directly without comparing 
-its age to that of other files.
-
-The usual alias expansion during reading will be suppressed
-if the tt(autoload) builtin or its equivalent is given the option
-tt(-U), for wordcode files this has to be decided when creating the
-file with the tt(-U) option of the tt(zcompile) builtin command;
-this is recommended for the use of functions supplied with the zsh
-distribution.  Thus to define functions for autoloading, a typical sequence
-is:
+body.  When the function is first executed, the shell searches for its
+definition using the elements of the tt(fpath) variable.  Thus to define
+functions for autoloading, a typical sequence is:
 
 example(fpath=(~/myfuncs $fpath)
 autoload myfunc1 myfunc2 ...)
 
-The elements of the tt(fpath) array may also name wordcode files
-directly. The names of these files must have the tt(.zwc) extension
-but in tt(fpath) the names may be given with or without it. This is
-mostly useful for wordcode files containing multiple 
-functions, in which case the file is treated like a directory
-containing files for functions and will be searched for the definition 
-of the function.
+The usual alias expansion during reading will be suppressed if the
+tt(autoload) builtin or its equivalent is given the option tt(-U).  For
+functions precompiled with the tt(zcompile) builtin command, this has to
+be decided when creating the file; this is recommended for the use of
+functions supplied with the zsh distribution.
+
+For each var(element) in tt(fpath), the shell looks for three files, the
+newest of which is used to load the definition for the function:
+
+startitem()
+item(var(element)tt(.zwc))(
+A file created with the tt(zcompile) builtin command, expected to
+contain the definitions for all functions in the directory named
+var(element).  The file is treated like a directory containing files for
+functions and is searched for the definition of the function; the search
+goes on to the next two files if the definition is not found.
+
+If var(element) already includes a tt(.zwc) extension, var(element) is
+searched for the definition of the function without comparing its age to
+that of other files.
+)
+item(var(element)tt(/)var(function)tt(.zwc))(
+A file created with tt(zcompile), expected to contain the definition for
+var(function).  It may include other function definitions as well, but
+those are neither loaded nor executed; a file found in this way is
+searched em(only) for the definition of var(function).
+)
+item(var(element)tt(/)var(function))(
+A file of zsh command text, taken to be the definition for var(function).
+)
+enditem()
 
 pindex(KSH_AUTOLOAD, use of)
-If the tt(KSH_AUTOLOAD) option is set, or the file contains only a simple
-definition of the function, the file's contents will be
-executed.  It will normally define the function in question, but may
-also perform initialization:  this
-is executed in the context of the function
-execution, and may therefore define local parameters.  It is an error if
-the function is not defined by loading the file.
+If the tt(KSH_AUTOLOAD) option is set, or the file contains only a
+simple definition of the function, the file's contents will be executed.
+This will normally define the function in question, but may also perform
+initialization; such initialization is executed in the context of the
+function execution, and may therefore define local parameters.  It is an
+error if the function is not defined by loading the file.
 
 Otherwise, the function is defined such that its body is the complete
-contents of the file.  This form allows the file to be used directly as an
-executable shell script.  If processing of the file results in the function
-being re-defined, the function itself is not re-executed. To force the
-function to perform initialization and be called, the file should contain
-initialization code (which will be discarded) in addition to a complete
-function definition (which will be retained for subsequent calls to the
-function), and a call to the shell function at the end.
+contents of the file.  This form allows the file to be used directly as
+an executable shell script.  If processing of the file results in the
+function being re-defined, the function itself is not re-executed. To
+force the function to perform initialization and be called, the file
+should contain initialization code (which will be discarded) in addition
+to a complete function definition (which will be retained for subsequent
+calls to the function), and a call to the shell function at the end.
 
 For example, suppose the autoload file tt(func) contains
 
@@ -110,7 +112,7 @@ myfunc "$@")
 
 In fact, the tt(functions) command outputs `tt(builtin autoload -X)' as
 the body of an autoloaded function.  A true autoloaded function can be
-identifed by the presence of the comment `tt(# undefined)' in the body,
+identified by the presence of the comment `tt(# undefined)' in the body,
 because all comments are discarded from defined functions.  This is done
 so that
 

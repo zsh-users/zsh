@@ -23,21 +23,19 @@ findex(.)
 item(tt(.) var(file) [ var(arg) ... ])(
 Read commands from var(file) and execute them in the current shell
 environment.
-If var(file) does not contain a slash, or if tt(PATH_DIRS)
-is set, the shell looks in the components of tt($path) to find the
-directory containing var(file).
-Files in the current directory are not read unless `tt(.)' appears
-somewhere in tt($path).
+
+If var(file) does not contain a slash, or if tt(PATH_DIRS) is set,
+the shell looks in the components of tt($path) to find the directory
+containing var(file).  Files in the current directory are not read
+unless `tt(.)' appears somewhere in tt($path).  If a file named
+`var(file)tt(.zwc)' is found, is newer than var(file), and is the
+compiled form (created with the tt(zcompile) builtin) of var(file),
+then commands are read from that file instead of var(file).
 
 If any arguments var(arg) are given,
 they become the positional parameters; the old positional
 parameters are restored when the var(file) is done executing.
 The exit status is the exit status of the last command executed.
-
-If a file named `var(file)tt(.zwc)' exists, is newer than var(file)
-and is a wordcode created with the tt(zcompile) builtin containing the 
-contents of var(file), that file will be used. This allows to speed up 
-processing of scripts by creating pre-compiled wordcode files for them.
 )
 findex(NOTRANS(:))
 cindex(expanding parameters)
@@ -1298,76 +1296,96 @@ cindex(compilation)
 xitem(tt(zcompile) [ tt(-U) ] [ tt(-z) | tt(-k) ] [ tt(-r) | tt(-m) ] var(file) [ var(name) ... ])
 xitem(tt(zcompile) tt(-c) [ tt(-M) ] [ tt(-z) | tt(-k) ] [ tt(-r) | tt(-m) ] var(file) [ var(name) ... ])
 item(tt(zcompile -t) var(file) [ var(name) ... ])(
-This builtin command can be used to create and display files
-containing the wordcode for functions or scripts. In the first form, a wordcode
-file is created. If called with only the var(file) argument, the
-wordcode file has the name `var(file)tt(.zwc)' and will be placed in
-the same directory as the var(file). This will make the wordcode file
-be loaded instead of the normal function file when the function is
-autoloaded (see
+This builtin command can be used to compile functions or scripts and
+store the compiled form in a file, and to examine files containing
+the compiled form.  This allows faster autoloading of functions and
+execution of scripts by avoiding parsing of the text when the files
+are read.
+
+The first form (without the tt(-c) or tt(-t) options) creates a
+compiled file.  If only the var(file) argument is provided, the
+output file has the name `var(file)tt(.zwc)' and will be placed in
+the same directory as the var(file).  This will make the compiled
+file be loaded instead of the normal function file when the function
+is autoloaded (see
 ifzman(\
 the section `Autoloading Functions' in zmanref(zshfunc)
 )\
 ifnzman(\
 noderef(Functions)
 )\
-for a description of how autoloaded functions are searched).
+for a description of how autoloaded functions are searched).  The
+extension tt(.zwc) stands for `zsh word codes'.
 
-If there is at least one var(name) argument, the wordcode for all
-these files will be put in the created wordcode var(file) (if that 
-name does not end in tt(.zwc), this extension is automatically
-appended). Such digest files are intended to be used as elements of
-the tt(FPATH)/tt(fpath) special array.
+If there is at least one var(name) argument, all those named files
+are compiled into one output var(file).  If var(file) does not end
+in tt(.zwc), this extension is automatically appended.  Files
+containing multiple compiled functions are called `digest' files,
+and are intended to be used as elements of the tt(FPATH)/tt(fpath)
+special array.
 
-If the tt(-U) option is given, aliases in the var(name)d files will not
-be expanded. If the tt(-r) option is given, the wordcode in the
-file will be read and copied into the shell's memory when they are
-used. If the tt(-m) option is given instead, the wordcode file
-will be mapped into the shell's memory. This is done in such a way
-that multiple instances of the shell running on the same host will
-share this mapped file. If neither tt(-r) nor tt(-m) are given,
-the tt(zcompile) builtin decides which style is used based on the size 
-of the resulting wordcode file. On some systems it is impossible to
-map wordcode files into memory. On such systems, the wordcode will
-only be read from the file, independent on the mode selected when the 
-file was created.
-
-The tt(-z) and tt(-k) options are used when the wordcode file contains
-functions and these functions are autoloaded. If tt(-z) is given, the
-function will be autoloaded as if the tt(KSHAUTOLOAD) option weren't
-set, even if it is. The tt(-k) makes the function be loaded as if
-tt(KASHAUTOLOAD) were set and if neither of these options is given,
-the function will be loaded as determined by the setting of the
-tt(KSHAUTOLOAD) option at the time the function is loaded. These
-options may also be given in the lists of var(name)s and make all
-following functions be loaded as described.
-
-When creating wordcode files for scripts instead of functions, it is
-often better to use the tt(-r) option. Otherwise the whole wordcode
-file will remain mapped if the script defined one or more functions
-even if the rest of the file will not be used again.
-
-In every case, the created file contains two versions of the wordcode, 
-one for big-endian machines and one for small-endian machines. The
-upshot of this is that the wordcode file is machine independent and if 
-it is read or mapped, only one half of the file will really be used
-(and mapped).
-
-If given the tt(-c) option, the names have to be names currently
-defined in the shell or marked as autoloaded. The definitions for all
-these functions will be written into the wordcode var(file). If the
+The second form, with the tt(-c) option, writes the definitions for
+all the named functions into var(file).  The names must be functions
+currently defined in the shell or marked for autoloading.  If the
 tt(-M) option is given, too, the var(name)s are used as patterns and
 all functions whose names match one of these patterns will be
 written. If no var(name) is given, the definitions of all functions
-currently defined or marked as autoloaded will be written. 
+currently defined or marked as autoloaded will be written.
 
-In the third form, with the tt(-t) option, an existing wordcode file is
-tested. Without further arguments, the names of the original files
-used for it are listed. The first line tells the version of the shell
-the file was created with and how the file will be used (mapping or
-reading the file). With arguments, only the return value is set
-to zero if all var(name)s name files contained in the wordcode file and
-non-zero if at least one var(name) is not contained in it.
+The third form, with the tt(-t) option, examines an existing
+compiled file.  Without further arguments, the names of the original
+files compiled into it are listed.  The first line of output tells
+the version of the shell which compiled the file and how the file
+will be used (mapping or reading the file).  With arguments, nothing
+is output and the return value is set to zero if em(all) var(name)s
+name files contained in the wordcode file, and non-zero if at least
+one var(name) is not contained in it.
+
+Other options:
+
+startitem()
+item(tt(-U))(
+Aliases are not expanded when compiling the var(name)d files.
+)
+item(tt(-r))(
+When the compiled file is read, its contents are copied into the
+shell's memory, rather than memory-mapped (see tt(-m)).  This
+happens automatically on systems that do not support memory mapping.
+
+When compiling scripts instead of autoloadable functions, it is
+often desirable to use this option. Otherwise the whole file will
+remain mapped if the script has defined one or more functions, even
+if the rest of the file will not be used again.
+)
+item(tt(-m))(
+The compiled file is mapped into the shell's memory when read. This
+is done in such a way that multiple instances of the shell running
+on the same host will share this mapped file.  If neither tt(-r) nor
+tt(-m) is given, the tt(zcompile) builtin decides what to do based
+on the size of the compiled file.
+)
+xitem(tt(-k))
+item(tt(-z))(
+These options are used when the compiled file contains functions and
+those functions are to be autoloaded. If tt(-z) is given, the
+function will be autoloaded as if the tt(KSHAUTOLOAD) option is
+em(not) set, even if it is set at the time the compiled file is
+read. The tt(-k) makes the function be loaded as if tt(KASHAUTOLOAD)
+em(is) set.  If neither of these options is given, the function will
+be loaded as determined by the setting of the tt(KSHAUTOLOAD) option
+at the time the compiled file is read.
+
+These options may also be repeated among the listed var(name)s to
+specify the loading style of all following functions, up to the next
+tt(-k) or tt(-z).
+)
+enditem()
+
+The created file always contains two versions of the compiled
+format, one for big-endian machines and one for small-endian
+machines. The upshot of this is that the compiled file is machine
+independent and if it is read or mapped, only one half of the file
+is actually used (and mapped).
 )
 findex(zmodload)
 cindex(modules, loading)
