@@ -1,3 +1,8 @@
+2001-07-31  Clint Adams  <clint@zsh.org>
+
+	* 15551: Completion/Unix/Command/_gzip: handle -l and -t
+	as done for -d; only complete presumably compressed files.
+
 2001-07-31  Sven Wischnowsky  <wischnow@zsh.org>
 
 	* 15549: Test/Y03arguments.ztst: fix for changed listing layout

@@ -57,7 +57,9 @@ esac
 
 case "$state" in
 files)
-  (( $+opt_args[-d] || $+opt_args[--decompress] || $+opt_args[--uncompress] )) &&
+  (( $+opt_args[-d] || $+opt_args[--decompress] || $+opt_args[--uncompress] ||
+     $+opt_args[-l] || $+opt_args[--list] ||
+     $+opt_args[-t] || $+opt_args[--test] )) &&
     decompress=yes
   if (( $+opt_args[-r] || $+opt_args[--recursive] )); then
     if [[ -z "$decompress" ]]; then
