@@ -1,5 +1,7 @@
 #compdef dpkg dpkg-deb
 
+local dds
+
 _dpkg_deb_args=('(--build)-b[build archive]:directory:_files -/' \
            '(-b)--build:directory:_files -/' \
            '(--contents)-c[list contents]:Debian package:_files -g \*.deb' \
@@ -20,6 +22,9 @@ _dpkg_common_args=('--help[show help]' \
            '--version[show version]' \
            '--licence[show licensing]')
 
+zstyle -s ':completion${curcontext}:deb:dpkg' status dds
+[[ "$dds" == installed ]] || dds="avail"
+
 case "$words[1]" in
 dpkg)
 _arguments -s '(--install)-i[install packages]:Debian package:_files -g \*.deb' \
@@ -38,8 +43,8 @@ _arguments -s '(--install)-i[install packages]:Debian package:_files -g \*.deb' 
            '--merge-avail[merge available]:package file:_files' \
            '--clear-avail[clear available]' \
            '--forget-old-unavail[forget uninstalled unavailable]' \
-           '(--status)-s[display package status]:packages:_deb_packages avail' \
-           '(-s)--status:packages:_deb_packages avail' \
+           '(--status)-s[display package status]:packages:_deb_packages $dds' \
+           '(-s)--status:packages:_deb_packages $dds' \
            '(--print-avail)-p[display available details]:packages:_deb_packages avail' \
            '(-p)--print-avail:packages:_deb_packages avail' \
            '(--listfiles)-L[list owned files]:packages:_deb_packages installed' \
