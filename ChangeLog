@@ -1,3 +1,9 @@
+2004-04-19  Clint Adams  <clint@zsh.org>
+
+	* 19798: Completion/Unix/Command/.distfiles,
+	Completion/Unix/Command/_bogofilter: rudimentary completion for
+	bogoutil.
+
 2004-04-19  Peter Stephenson  <pws@csr.com>
 
 	* zsh=users/7365: Doc/Zsh/options.yo, Src/jobs.c, Src/options.c,

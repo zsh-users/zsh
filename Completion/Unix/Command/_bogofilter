@@ -1,0 +1,57 @@
+#compdef bogoutil
+
+local ret bogotokens
+
+_bogoutil_caching_policy () {
+
+  # rebuild if cache is more than a week old
+  oldp=( "$1"(mw+1) )
+  (( $#oldp )) && return 0
+
+  return 1
+}
+
+_bogofilter() {
+  _arguments -C \
+  	'-v[verbose]' \
+  	'-n[replace non-ASCII characters]' \
+  	'-D[redirect debug output to stdout]' \
+  	'-a[acceptable token age]:date or day count' \
+  	'-c[acceptable count]:count threshold' \
+  	'-s[acceptable size range]:min-max range' \
+  	'-y[date for when unknown]:date' \
+  	'-I[input file]:input file:_files' \
+  	'-x[debug flags]:debug flags:' \
+  	'-d[print contents of db]:database:_files -g "*.db"' \
+  	'-l[load file into db]:textfile:_files' \
+  	'-m[perform maintenance functions]' \
+  	'-w[display token information]:database file or directory:_files' \
+  	'-w[display token probability information]:database file or directory:_files' \
+  	'-H[print histogram]' \
+  	'(-R)-r[recalculate ROBX]' \
+  	'(-r)-R[recalculate and save ROBX]' \
+  	'-h[help]' \
+  	'-V[version]' \
+  	'*:tokens:->tokens' && ret=0
+  
+  zstyle -s ":completion:${curcontext}:" cache-policy update_policy
+  if [[ -z "$update_policy" ]]; then
+    zstyle ":completion:${curcontext}:" cache-policy _bogoutil_caching_policy
+  fi
+  
+  case $state in
+  	(tokens)
+  	if ( [[ -z "$bogotokens" ]] || _cache_invalid bogotokens ) &&
+  	  ! _retrieve_cache bogotokens; then
+  	  bogotokens=(${${(f)"$(_call_program bogoutil bogoutil -d ~/.bogofilter/wordlist.db -c 50)"}%% *})
+  	  _store_cache bogotokens bogotokens
+  	else
+  	  :
+  	fi
+  	  _wanted tokens expl "token" \
+  	     compadd -a bogotokens
+  	;;
+  esac
+}
+
+_bogofilter "$@"
