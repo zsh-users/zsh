@@ -1,3 +1,8 @@
+2001-04-17  Sven Wischnowsky  <wischnow@zsh.org>
+
+	* 13997: Completion/Zsh/Type/_directory_stack: remove
+	SUFFIX-handling, it's in _tilde and only needed there
+
 2001-04-14  Bart Schaefer  <schaefer@zsh.org>
 
 	* unposted: Etc/zsh-development-guide: The entire section on hook

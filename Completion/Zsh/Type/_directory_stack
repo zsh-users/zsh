@@ -7,15 +7,7 @@
 
 setopt localoptions nonomatch
 
-local expl list lines revlines disp suf
-
-if [[ "$SUFFIX" = */* ]]; then
-  ISUFFIX="/${SUFFIX#*/}$ISUFFIX"
-  SUFFIX="${SUFFIX%%/*}"
-  suf=(-S '')
-else
-  suf=()
-fi
+local expl list lines revlines disp
 
 ### we decided against this, for now...
 #! zstyle -T ":completion:${curcontext}:directory-stack" prefix-needed ||
@@ -48,4 +40,4 @@ else
 fi
 
 _wanted -V directory-stack expl 'directory stack' \
-    compadd "$@" "$suf[@]" "$disp[@]" -Q -a list
+    compadd "$@" "$disp[@]" -Q -a list
