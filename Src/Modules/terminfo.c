@@ -365,7 +365,7 @@ scanterminfo(HashTable ht, ScanFunc func, int flags)
 }
 
 /**/
-#endif /* USE_TERMINOF_MODULE */
+#endif /* USE_TERMINFO_MODULE */
 
 /**/
 int
