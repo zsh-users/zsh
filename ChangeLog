@@ -1,5 +1,9 @@
 2003-10-06  Peter Stephenson  <pws@pwstephenson.fsnet.co.uk>
 
+	* 19168: Src/prompt.c, Src/utils.c, Src/Modules/datetime.c:
+	various problems with size of buffers and pointer usage
+	in ztrftime().
+
 	* 19167: Src/glob.c, Test/E01options.ztst: NULL at start
 	of BRACE_CCL range didn't work.
 

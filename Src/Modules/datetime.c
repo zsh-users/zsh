@@ -35,10 +35,9 @@ static int
 bin_strftime(char *nam, char **argv, Options ops, int func)
 {
     int bufsize, x;
-    char *endptr = NULL, *buffer = NULL;
+    char *endptr = NULL, *buffer;
     time_t secs;
     struct tm *t;
-    int size;
 
     secs = (time_t)strtoul(argv[1], &endptr, 10);
     if (secs == ULONG_MAX) {
@@ -51,15 +50,17 @@ bin_strftime(char *nam, char **argv, Options ops, int func)
 
     t = localtime(&secs);
     bufsize = strlen(argv[0]) * 2;
+    buffer = zalloc(bufsize);
 
-    for (x=1;x<4;x++) {
-	buffer = zrealloc(buffer, bufsize * x);
-        size = ztrftime(buffer, bufsize * x, argv[0], t);
-	if (size) x = 4;
+    for (x=0; x < 4; x++) {
+        if (ztrftime(buffer, bufsize, argv[0], t))
+	    break;
+	buffer = zrealloc(buffer, bufsize *= 2);
     }
 
     printf("%s\n", buffer);
-    
+    zfree(buffer, bufsize);
+
     return 0;
 }
 
