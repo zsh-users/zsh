@@ -97,7 +97,9 @@ mod_export unsigned char bangchar;
 /**/
 unsigned char hatchar, hashchar;
  
-/* $SECONDS = time(NULL) - shtimer.tv_sec */
+/* $SECONDS = now.tv_sec - shtimer.tv_sec
+ *          + (now.tv_usec - shtimer.tv_usec) / 1000000.0
+ * (rounded to an integer if the parameter is not set to float) */
  
 /**/
 struct timeval shtimer;
@@ -2672,7 +2674,7 @@ randomsetfn(Param pm, zlong v)
 zlong
 intsecondsgetfn(Param pm)
 {
-    return time(NULL) - shtimer.tv_sec;
+    return (zlong)floatsecondsgetfn(pm);
 }
 
 /* Function to set value of special parameter `SECONDS' */
@@ -2681,8 +2683,7 @@ intsecondsgetfn(Param pm)
 void
 intsecondssetfn(Param pm, zlong x)
 {
-    shtimer.tv_sec = time(NULL) - x;
-    shtimer.tv_usec = 0;
+    floatsecondssetfn(pm, (double)x);
 }
 
 /**/
@@ -2706,8 +2707,23 @@ floatsecondssetfn(Param pm, double x)
     struct timezone dummy_tz;
 
     gettimeofday(&now, &dummy_tz);
-    shtimer.tv_sec = now.tv_sec - (int)x;
-    shtimer.tv_usec = now.tv_usec - (int)((x - (double)(int)x) * 1000000.0);
+    shtimer.tv_sec = now.tv_sec - (zlong)x;
+    shtimer.tv_usec = now.tv_usec - (zlong)((x - (zlong)x) * 1000000.0);
+}
+
+/**/
+double
+getrawseconds(void)
+{
+    return (double)shtimer.tv_sec + (double)shtimer.tv_usec / 1000000.0;
+}
+
+/**/
+void
+setrawseconds(double x)
+{
+    shtimer.tv_sec = (zlong)x;
+    shtimer.tv_usec = (zlong)((x - (zlong)x) * 1000000.0);
 }
 
 /**/
@@ -3487,19 +3503,10 @@ scanendscope(HashNode hn, int flags)
 	    {
 		setsecondstype(pm, PM_TYPE(tpm->flags), PM_TYPE(pm->flags));
 		/*
-		 * We restore SECONDS by adding back in the elapsed
-		 * time (from the point we reset shtimer) rather
-		 * than restoring it completely, since SECONDS should
-		 * run in the calling function, too.
+		 * We restore SECONDS by restoring its raw internal value
+		 * that we cached off into tpm->u.dval.
 		 */
-		if (PM_TYPE(pm->flags) == PM_INTEGER)
-		{
-		    pm->sets.ifn(pm, pm->gets.ifn(pm) + tpm->u.val);
-		}
-		else
-		{
-		    pm->sets.ffn(pm, pm->gets.ffn(pm) + tpm->u.dval);
-		}
+		setrawseconds(tpm->u.dval);
 		tpm->flags |= PM_NORESTORE;
 	    }
 	    DPUTS(!tpm || PM_TYPE(pm->flags) != PM_TYPE(tpm->flags) ||
