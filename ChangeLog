@@ -1,3 +1,8 @@
+2002-07-22  Clint Adams  <clint@zsh.org>
+
+       * Akira, 17459: Completion/Unix/Command/_cvs: exclude files which have
+       RCS kflags for cvs add.
+
 2002-07-01  Clint Adams  <clint@zsh.org>
 
 	* 17391: Completion/Debian/Command/_dpkg: complete files after
