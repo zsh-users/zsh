@@ -13,10 +13,11 @@ styles=(
   add-space		 c:bool
   arguments		 c:
   auto-description	 c:
+  break                  c:
   completer		 c:completer
   completions		 c:
   condition		 c:
-  cursor		 c:bool
+  cursor		 c:cursor
   disable-stat		 c:bool
   domains                c:
   expand		 c:
@@ -130,6 +131,19 @@ while [[ -n $state ]]; do
     boolauto) 
       _wanted values expl boolean &&
 	compadd "$expl[@]" true false auto select
+      ;;
+
+    cursor)
+      if [[ "$words[2]" = *:completion:inc* ]]; then
+        _wanted values expl 'cursor positioning' &&
+	  compadd "$expl[@]" complete key default
+      elif [[ "$words[2]" = *:completion::* ]]; then
+        _wanted values expl 'cursor positioning' &&
+	  compadd "$expl[@]" true false
+      else
+        _wanted values expl 'cursor positioning' &&
+	  compadd "$expl[@]" complete key default true false
+      fi
       ;;
 
     completer)

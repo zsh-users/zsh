@@ -697,6 +697,13 @@ the description for this argument. Depending on personal preferences,
 it may be useful to set this style to something like `tt(specify: %d)'. 
 Note that this may not work for some commands.
 )
+item(tt(break))(
+This style is used by the tt(incremental-complete-word) widget (found
+in the tt(Functions/Zle) directory of the distribution). Its value
+should be a pattern and all keys matching this pattern will cause the
+widget to stop incremental completion without the key having any
+further effect.
+)
 item(tt(completer))(
 The strings given as the value of this style give the names of the
 completer functions to use. The available completer functions are
@@ -747,6 +754,21 @@ This is used together with the tt(paths) tag by the function
 generating filenames as matches to find out if the cursor should be left
 after the first ambiguous pathname component even when menucompletion
 is used.
+
+The tt(predict-on) widget uses this style to decide where to place the 
+cursor after completion has been tried. If it is set to tt(complete),
+the cursor is left at the place where completion left it, but only if
+it is after a character equal to the one just inserted by the user. If 
+it is after another character, the value is treated as if it where the 
+string tt(key). If the value is set to tt(key), the cursor is left
+after the var(n)th occurrence of the character just inserted, where
+var(n) is the number of times that character appeared in the word
+before completion was attempted. In short, this has the effect of
+leaving the cursor after the character just typed even if the
+completion code found out that no other characters need to be inserted 
+at that position. Finally, any other value for this style
+unconditionally leaves the cursor at the position where the completion
+code left it.
 )
 item(tt(disable-stat))(
 This is used with the an empty tag by the function completing for the
@@ -1012,6 +1034,10 @@ decide if the available matches should be shown.
 When using the tt(incremental-complete-word) widget, this style says
 if the matches should be listed on every key press (if they fit on the 
 screen).
+
+The tt(predict-on) widget uses this style to decide if the completion
+should be shown even if there is only one possible completion. This is 
+done if the value of this style is the string tt(always).
 )
 item(tt(list-arguments))(
 Like the tt(arguments) style, but used when calling the tt(ps) command 
@@ -1271,6 +1297,11 @@ If set to `true', the tt(_history_complete_word) bindable
 command will always insert matches as if menucompletion were started
 and it will stop when the last match is inserted. If this style is set
 to tt(verbose) a message will be displayed when the last match is reached.
+
+This style is also used by the tt(incremental-complete-word)
+widget. Here its value is used like the one for the tt(break)
+style. But all keys matching the pattern given as its value will stop
+incremental completion and will then execute their usual function.
 )
 item(tt(substitute))(
 If this is unset or set to the empty string, the tt(_expand) completer
