@@ -75,7 +75,7 @@ static struct builtin bintab[] = {
 };
 
 static struct paramdef patab[] = {
-    PARAMDEF("SECS", PM_INTEGER|PM_SPECIAL|PM_READONLY,
+    PARAMDEF("EPOCHSECONDS", PM_INTEGER|PM_SPECIAL|PM_READONLY,
 		    NULL, NULL, &getcurrentsecs, NULL),
 };
 

@@ -1,3 +1,8 @@
+2003-10-08  Peter Stephenson  <pws@csr.com>
+
+	* 19169: Src/Modules/datetime.c: change SECS parameter to
+	EPOCHSECONDS.
+
 2003-10-06  Peter Stephenson  <pws@pwstephenson.fsnet.co.uk>
 
 	* 19168: Src/prompt.c, Src/utils.c, Src/Modules/datetime.c:
