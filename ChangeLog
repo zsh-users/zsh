@@ -1,3 +1,8 @@
+2000-05-06  Bart Schaefer  <schaefer@zsh.org>
+
+	* 11236: Completion/Base/_arguments: Handle tabs between options
+	and their descriptions when parsing --help output.
+
 2000-05-06  Tanaka Akira  <akr@zsh.org>
 
 	* 11224: Util/mkdisttree.sh: problem with pattern matching `.' in

@@ -60,16 +60,16 @@ if (( long )); then
     # The parameter expansion trickery first gets the lines as separate
     # array elements. Then we select all lines whose first non-blank
     # character is a hyphen. Since some commands document more than one
-    # option per line, separated by commas, we convert commas int
+    # option per line, separated by commas, we convert commas into
     # newlines and then split the result again at newlines after joining 
     # the old array elements with newlines between them. Then we select
     # those elements that start with two hyphens, remove anything up to
-    # those hyphens and anything from the space or comma after the
-    # option up to the end. 
+    # those hyphens and anything from the space or tab after the
+    # option up to the end.
 
     lopts=("--${(@)^${(@)${(@)${(@M)${(@ps:\n:j:\n:)${(@)${(@M)${(@f)$(_call options ${~words[1]} --help 2>&1)//\[--/
 --}:#[ 	]#-*}//,/
-}}:#[ 	]#--*}#*--}%%[], ]*}:#}")
+}}:#[ 	]#--*}#*--}%%[]	 ]*}:#}")
     lopts=( "${(@)lopts:#--}" )
 
     # Now remove all ignored options ...
