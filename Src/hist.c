@@ -947,6 +947,7 @@ putoldhistentryontop(short keep_going)
 Histent
 prepnexthistent(void)
 {
+    Histent he; 
     int curline_in_ring = hist_ring == &curline;
 
     if (curline_in_ring)
@@ -957,7 +958,7 @@ prepnexthistent(void)
     }
 
     if (histlinect < histsiz) {
-	Histent he = (Histent)zcalloc(sizeof *he);
+	he = (Histent)zcalloc(sizeof *he);
 	if (!hist_ring)
 	    hist_ring = he->up = he->down = he;
 	else {
@@ -970,12 +971,12 @@ prepnexthistent(void)
     }
     else {
 	putoldhistentryontop(0);
-	freehistdata(hist_ring, 0);
+	freehistdata(he = hist_ring, 0);
     }
-    hist_ring->histnum = ++curhist;
+    he->histnum = ++curhist;
     if (curline_in_ring)
 	linkcurline();
-    return hist_ring;
+    return he;
 }
 
 /* A helper function for hend() */
