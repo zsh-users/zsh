@@ -2772,7 +2772,7 @@ zftp_rmsession(char *name, char **args, int flags)
     char *newsess = NULL;
 
     /* Find the session in the list: either the current one, or by name */
-    for (no = 0, nptr = firstnode(zfsessions); nptr; no++, nptr++) {
+    for (no = 0, nptr = firstnode(zfsessions); nptr; no++, incnode(nptr)) {
 	sptr = (Zftp_session) nptr->dat;
 	if ((!*args && sptr == zfsess) ||
 	    (*args && !strcmp(sptr->name, *args)))
@@ -2794,7 +2794,7 @@ zftp_rmsession(char *name, char **args, int flags)
 	    LinkNode newn = firstnode(zfsessions);
 	    if (newn == nptr)
 		incnode(newn);
-	    newsess = ((Zftp_session)nptr->dat)->name;
+	    newsess = ((Zftp_session)newn->dat)->name;
 	}
     } else {
 	Zftp_session oldsess = zfsess;
