@@ -50,7 +50,7 @@ fi
 # are below these table.
 
 local curcontext="$curcontext" state line suf ret=1
-local args fss deffs=iso9660 descr tmp typeops=-t _nfs_access _nfs_ufs
+local args deffs=iso9660 tmp typeops=-t _nfs_access _nfs_ufs
 
 typeset -A opt_args
 
@@ -177,7 +177,7 @@ if (( ! $+_fs_any )); then
       '(susp)nosusp[disable system use sharing protocol]'
       '(norrip)rrip[enable rock ridge extensions]'
       '(rrip)norrip[disable rock ridge extensions]'
-      'nmconv[specify filename translation]:filename translation:(c l m)'
+      'nmconv[specify filename translation]:filename translation:((c\:no\ translation l\:to\ lowercase m\:suppress\ version\ no))'
     )
       
     _fs_nfs=(
@@ -537,7 +537,6 @@ if [[ "$service" = mount ]]; then
       '-M[use alternate mtab]:alternate mtab:_files'
       '-P[with -p, prepend prefix to paths]:prefix'
     )
-    fss=( efs proc fd nfs iso9660 dos hfs cachefs )
     deffs=efs
     ;;
   linux*)

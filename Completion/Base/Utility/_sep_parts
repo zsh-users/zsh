@@ -3,7 +3,7 @@
 # This function can be used to separately complete parts of strings
 # where each part may be one of a set of matches and different parts
 # have different sets.
-# Arguments are alternatingly arrays and separator strings. Arrays may
+# Arguments are alternately arrays and separator strings. Arrays may
 # be given by name or literally as words separated by white space in
 # parentheses, e.g.:
 #

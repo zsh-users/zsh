@@ -5,8 +5,12 @@ _remote_files () {
   # colorings and LIST_TYPES and so on, but I'm just not that ambitious.
   local expl
 
-  _wanted files expl 'remote files' \
-      compadd $(ssh -a -x ${words[CURRENT]%:*} echo ${words[CURRENT]#*:}\*)
+  if zstyle -T ":completion:${curcontext}:" remote-access; then
+    _wanted files expl 'remote files' \
+        compadd $(ssh -a -x ${words[CURRENT]%:*} echo ${words[CURRENT]#*:}\*)
+  else
+    _message 'remote files'
+  fi
 }
 
 _ssh () {

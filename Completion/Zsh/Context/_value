@@ -60,6 +60,11 @@ _value:LDFLAGS () {
 
 _value:DISPLAY() { _x_display "$@" }
 
+_value:PRINTER() { _printers "$@" }
+_value:LPDEST() { _printers "$@" }
+
+_value:TERM() { _terminals "$@" }
+
 _value:TZ() { _time_zone "$@" }
 
 _value "$@"

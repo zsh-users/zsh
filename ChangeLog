@@ -1,3 +1,18 @@
+2002-01-16  Oliver Kiddle  <opk@zsh.org>
+
+	* 16461: Completion/AIX/Command/_lspv
+	Completion/Base/Utility/_sep_parts,
+	Completion/Mandrake/Command/_urpmi, Completion/Unix/Command/_cpio,
+	Completion/Unix/Command/_fsh, Completion/Unix/Command/_ifconfig,
+	Completion/Unix/Command/_java, Completion/Unix/Command/_lynx,
+	Completion/Unix/Command/_modutils, Completion/Unix/Command/_mount,
+	Completion/Unix/Command/_ssh, Completion/Unix/Command/_telnet,
+	Completion/Unix/Command/_user_admin, Completion/Unix/Command/_w3m,
+	Completion/Unix/Type/.distfiles, Completion/Unix/Type/_terminals,
+	Completion/X/Command/_xfig, Completion/X/Command/_xloadimage,
+	Completion/X/Command/_xterm, Completion/Zsh/Command/_alias,
+	Completion/Zsh/Context/_value: various minor completion changes
+
 2002-01-14  Oliver Kiddle  <opk@zsh.org>
 
 	* 16449: Completion/Unix/Command/_chkconfig: new completion for

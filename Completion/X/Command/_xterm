@@ -16,7 +16,7 @@ _xt_arguments \
   '-ms:pointer cursor color:_x_color' \
   '-nb:margin bell number:' \
   '-sl:save lines:' \
-  '-ti:terminal ID:(vt52 vt100 vt101 vt102 vt220)' \
+  '-ti:terminal ID:_terminals' \
   '-tm:terminal setting:' \
   '-tn:terminal type:' \
   '-ziconbeep:iconbeep (percent):' \

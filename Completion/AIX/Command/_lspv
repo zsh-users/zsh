@@ -1,7 +1,7 @@
 #compdef lspv
 
 _arguments -C -s \
-  '(-p -M)-l[list logical volumns on physical volume]' \
+  '(-p -M)-l[list logical volumes on physical volume]' \
   '(-l -M)-p[list partitions on physical volume]' \
   '(-l -p)-M[list mapping of physical and logical partition numbers]' \
   '-n[specify physical volume to access variable descriptor from]:physical volume:_physical_volumes' \

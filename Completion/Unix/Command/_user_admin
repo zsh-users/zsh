@@ -15,7 +15,7 @@ if [[ $service = user* ]]; then
   args=(
     '(-D)-c+[comment]:comment'
     "(-D)-${home}+[home directory]:home directory:_directories -W /"
-    '(-D)-e+[specify expriration date]:expiration date (YYYY-MM-DD)'
+    '(-D)-e+[specify expiration date]:expiration date (YYYY-MM-DD)'
     '(-D)-f+[specify inactive days]:inactive days'
     '(-D)-g+[initial group]:initial group:_groups'
     '(-D)-G+[supplementary groups]:supplementary groups:_groups -S,'

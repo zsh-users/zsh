@@ -7,7 +7,7 @@ _x_arguments \
   '-but_per_row:number of buttons:' \
   '-cbg:canvas background color:_x_color' \
   '-cfg:canvas foreground color:_x_color' \
-  '-depth:visual depth:_x_visdepth' \
+  '-depth:visual depth:' \
   '-exportlanguage:export language:(box latex epic eepic eepicemu pictex ibmgl eps ps pstex textyl tpic pic mf acad pcx png gif jpeg tiff ppm xbm xpm)' \
   '-iconGeometry:icon geometry:_x_geometry' \
   '-internalBW:internal border width:' \

@@ -1,8 +1,21 @@
 #compdef alias
 
+local curcontext="$curcontext" state line suf
+
 _arguments -C -s -A "-*" -S \
   '-+g[list or define global aliases]' \
   '-+r[list or define regular aliases]' \
   '-+m[print aliases matching specified pattern]' \
   '-L[print each alias in the form of calls to alias]' \
-  '*::alias definition:_aliases -S ='
+  '*::alias definition:->defn'
+
+if [[ -n "$state" ]]; then
+  if compset -P 1 '*='; then
+    compset -q
+    _normal
+  else
+    compset -S '=*' || suf='='
+    _wanted alias expl 'alias definition' _aliases -S "$suf"
+  fi
+fi
+

@@ -9,7 +9,7 @@ local curcontext="$curcontext" state line expl
 typeset -A opt_args
 
 if (( ! $+_telnet_args )); then
-  local help="$(_call_program options telnet -\? < /dev/null 2>&1)"
+  local help="$(_call_program options 'telnet -\?' < /dev/null 2>&1)"
   local -A optionmap
   optionmap=(
     '*\[-8\]*' '-8[allow 8-Bit data]'

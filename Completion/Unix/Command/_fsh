@@ -1,6 +1,8 @@
 #compdef fsh
 
-_arguments \
+local curcontext="$curcontext" state line
+
+_arguments -C \
 	'(--help)-h[help]' \
 	'(-h)--help' \
 	'(--version)-V[version]' \

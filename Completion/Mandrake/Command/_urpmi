@@ -11,12 +11,12 @@ _urpmi_cache_policy() {
 }
     
 _urpmi() {
-    local state context line ret=1
+    local expl state curcontext="$curcontext" line ret=1
     typeset -A opt_args
 
     case "$service" in
 	urpmi.addmedia )
-	    _arguments -A '-*' \
+	    _arguments -C -A '-*' \
 		"(--wget)--curl[use curl to retrieve distant files]" \
 		"(:)--distrib[automatically create all media from an installation medium]:media URL:->media_url" \
 		"--update[mark as update media]" \
@@ -31,13 +31,13 @@ _urpmi() {
 	     && ret=0
 	;;
 	urpmi.removemedia )
-	    _arguments -A '-*' \
+	    _arguments -C -A '-*' \
 		"(:)-a[select all media]" \
 		"(-a)"{,\*}": :->urpmi_media" \
 	     && ret=0
 	;;
 	urpmi.update )
-	    _arguments -A '-*' \
+	    _arguments -C -A '-*' \
 		"(--wget)--curl[use curl to retrieve distant files]" \
 		"(--curl)--wget[use wget to retrieve distant files]" \
 		"(:)-a[select all non-removable media]" \
@@ -48,7 +48,7 @@ _urpmi() {
 	     && ret=0
 	;;
 	urpmi )
-	    _arguments -A '-*' \
+	    _arguments -C -A '-*' \
 		"(: -)--help[print usage information]" \
 		"(--help)--allow-medium-change[allow change of removable media]" \
 		"(--help)--auto[do not ask any questions]" \

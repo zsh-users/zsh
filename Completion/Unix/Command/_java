@@ -8,7 +8,7 @@ jdb_args=()
 
 case "$service" in
 javac)
-  _arguments \
+  _arguments -C \
     '-g-[generate debugging information]:debug:->debug' \
     '-O[optimize]' \
     '-nowarn[suppress warnings]' \
@@ -32,7 +32,7 @@ jdb)
   ;&
 
 java)
-  _arguments \
+  _arguments -C \
     "$jdb_args[@]" \
     '(-cp)-classpath[specify path for user class files]:class path:->classpath' \
     '(-classpath)-cp[specify path for user class files]:class path:->classpath' \
@@ -50,7 +50,7 @@ java)
   ;;
 
 javadoc)
-  _arguments \
+  _arguments -C \
     '-overview[specify overview file]:_files' \
     '-public[display public classes and members only]' \
     '-protected[display public/protected classes and members only (default)]' \
@@ -94,7 +94,7 @@ javadoc)
   ;;
 
 appletviewer)
-  _arguments \
+  _arguments -C \
     '-debug[run applet on jdb]' \
     '-encoding[specify character encoding for source files]:encoding:->encoding' \
     '-J-[specify java option]:java option:' \
@@ -120,7 +120,7 @@ jar)
       m ':manifest file:_files'
       f ':archive file:_files -g \*.\(jar\|zip\)'
     )
-    _arguments \
+    _arguments -C \
       "${jar_cmd/[^-]*/:dummy:}" \
       ${${(s::)jar_cmd}/(#b)(?)/$tmpassoc[$match[1]]} \
       '*:file:->jararg' && return 0
@@ -128,7 +128,7 @@ jar)
   ;;
 
 javah|javah_g)
-  _arguments \
+  _arguments -C \
     '-o[specify output file]:output file:_files' \
     '-d[specify destination directory]:directory:_files -/' \
     '-stubs[generate stubs]' \
@@ -144,7 +144,7 @@ javah|javah_g)
   ;;
 
 javap)
-  _arguments \
+  _arguments -C \
     '-help[print help message]' \
     '-l[line and local variable tables]' \
     '-b[backward compatible to JDK1.1]' \
@@ -169,7 +169,7 @@ extcheck)
   ;;
 
 rmic)
-  _arguments \
+  _arguments -C \
     '-classpath[specify path for user class files]:class path:->classpath' \
     '-d[specify destination directory]:directory:_files -/' \
     '-depend[treat dependencies]' \
@@ -207,7 +207,7 @@ serialvar)
   ;;
 
 native2ascii)
-  _arguments \
+  _arguments -C \
     '-reverse[convert Latin-1 (with \udddd) to native encoding]' \
     '-encoding[specify character encoding]:encoding:->encoding' \
     ':input file:_files' \

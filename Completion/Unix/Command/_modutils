@@ -1,6 +1,6 @@
 #compdef modprobe rmmod
 
-local expl loaded
+local curcontext="$curcontext" state line expl loaded
 
 _modutils_loaded_modules() {
 
@@ -62,7 +62,7 @@ case "$service" in
              '(-C)--config:config file:_files'
   )
 
-  _arguments '(--remove)-r[remove]:*:loaded module:->modprobe_remove' \
+  _arguments -C '(--remove)-r[remove]:*:loaded module:->modprobe_remove' \
              '(-r)--remove:*:loaded module:->modprobe_remove' \
              '(--list)-l[list matching modules]:*:module file:->modprobe_list' \
              '(-l)--list:*:module file:->modprobe_list' \

@@ -14,20 +14,20 @@ _arguments -C \
   '-blink' \
   '-book' \
   '-buried_news' \
-  '-cache=:NUMBER:' \
+  '-cache=:number of documents:' \
   '-case' \
-  '-cfg=:FILENAME:_files' \
+  '-cfg=:configuration file:_files' \
   '-child' \
   '-color' \
   '-cookies' \
   '-core' \
   '-crawl' \
-  '-display=:DISPLAY:_x_display' \
+  '-display=:display:_x_display' \
   '-dump' \
-  '-editor=:EDITOR:_files' \
+  '-editor=:editor:_command_names -e' \
   '-emacskeys' \
   '-enable_scrollback' \
-  '-error_file=:FILENAME:_files' \
+  '-error_file=:error file:_files' \
   '-fileversions' \
   '-force_html' \
   '-force_secure' \
@@ -41,7 +41,7 @@ _arguments -C \
   '-image_links' \
   '-ismap' \
   '-index=:URL:->html' \
-  '-link=:NUMBER:' \
+  '-link=:starting count:' \
   '-localhost' \
   '-locexec' \
   '-mime_header' \
@@ -83,7 +83,7 @@ _arguments -C \
   '-startfile_ok' \
   '-tagsoup' \
   '-telnet' \
-  '-term=:TERM:' \
+  '-term=:terminal name:_terminals' \
   '-tlog' \
   '-trace' \
   '-traversal' \

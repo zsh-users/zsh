@@ -2,7 +2,7 @@
 
 (( $+_is_gnu )) || typeset -gA _is_gnu
 
-local cmd=$service args ig context curcontext="$curcontext" state line opt_args
+local cmd=$service args ig curcontext="$curcontext" state line
 local expl ret
 local fmts='(bar bin odc newc crc tar ustar hpbin hpodc)'
 
@@ -114,7 +114,7 @@ else
 fi 
 
 ret=1
-_arguments -s "$args[@]" && ret=0
+_arguments -C -s "$args[@]" && ret=0
 
 if [[ $state = afile ]]; then
   if compset -P '*:'; then

@@ -16,7 +16,7 @@ if rc=( ${(f)"$($words[1] -path)"} ); then
     '*-iscale[scale image]:scale factor'
     '*-c'{,olor}'dither[dither image]'
     '*-expand[expand image to 24-bit]'
-    '*-xpm[specify xpm color map]:color context key:(m g4 g c)'
+    '*-xpm[specify xpm color map]:color context key:((m\:mono g4\:4\ level\ gray g\:gray c\:color))'
   )
 else
   # xloadimage
@@ -40,7 +40,7 @@ extension=( ${=rc[2]#*:} )
 _x_arguments "$args[@]" \
   '-default[set root background to default]' \
   '-fit[use default visual and colormap]' \
-  '-fullscreen[use whole screen, suurounding image with border]' \
+  '-fullscreen[use whole screen, surrounding image with border]' \
   "-goto[specify image to display at end]:image name:_files -W ipath -g '*(#i)(${(j:|:)extension})(|${(j:|:)filters})'" \
   '(*)-help[display information on options]' \
   '-identity[identify supplied images instead of displaying]' \
