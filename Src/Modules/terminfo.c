@@ -30,10 +30,11 @@
 #include "terminfo.mdh"
 #include "terminfo.pro"
 
+static char terminfo_nam[] = "terminfo";
+
 /**/
 #ifdef HAVE_TIGETSTR
 
-static char terminfo_nam[] = "terminfo";
 static Param terminfo_pm;
 
 /* echoti: output a terminfo capability */
