@@ -105,6 +105,22 @@ dyncat(char *s1, char *s2)
 
 /**/
 mod_export char *
+bicat(const char *s1, const char *s2)
+{
+    /* This version always uses permanently-allocated space. */
+    char *ptr;
+    size_t l1 = strlen(s1);
+
+    ptr = (char *)zalloc(l1 + strlen(s2) + 1);
+    strcpy(ptr, s1);
+    strcpy(ptr + l1, s2);
+    return ptr;
+}
+
+/* like strdup(), but with a specified length */
+
+/**/
+mod_export char *
 dupstrpfx(const char *s, int len)
 {
     char *r = zhalloc(len + 1);
@@ -118,6 +134,7 @@ dupstrpfx(const char *s, int len)
 mod_export char *
 ztrduppfx(const char *s, int len)
 {
+    /* This version always uses permanently-allocated space. */
     char *r = zalloc(len + 1);
 
     memcpy(r, s, len);
