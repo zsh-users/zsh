@@ -1,3 +1,8 @@
+2004-06-08  Peter Stephenson  <pws@pwstephenson.fsnet.co.uk>
+
+	* 20029: Src/Modules/mathfunc.c: rand48(seed) stopped being
+	random after the second call.
+
 2004-06-08  Peter Stephenson  <pws@csr.com>
 
 	* Philippe Troin: 20026: INSTALL: nit-pick.

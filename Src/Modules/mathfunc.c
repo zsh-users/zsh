@@ -500,7 +500,7 @@ math_string(UNUSED(char *name), char *arg, int id)
 		     * to each unsigned short.
 		     */
 		    for (i = 0; i < 3 && !do_init; i++) {
-			unsigned short *seedptr = seedbuf + i;
+			unsigned short *seedptr = seedbufptr + i;
 			*seedptr = 0;
 			for (j = 0; j < 4; j++) {
 			    if (*seedstr >= '0' && *seedstr <= '9')
