@@ -1,9 +1,7 @@
 #compdef elm
 
-local curcontext="$curcontext" state line expl suf
-
-_arguments -C -s \
-  '::recipient:->userhost' \
+_arguments -s \
+  '::recipient:_email_addresses' \
   '-a[use the arrow pointer regardless]' \
   '-A+[attach file]:file attachment:_files' \
   '-c[check the given aliases only]:*:alias' \
@@ -17,17 +15,4 @@ _arguments -C -s \
   '-V[enable sendmail voyeur mode]' \
   '-v[display elm version]' \
   '-w[write .elm/elmrc]' \
-  '-z[start only if new messages]' && return 0
-
-if [[ "$state" = userhost ]]; then
-  if compset -P '*@'; then
-    _description hosts expl 'remote host name'
-    _hosts "$expl[@]" && return 0
-  else
-    compset -S '@*' || suf='@'
-    _description users expl 'login name'
-    _users "$expl[@]" -q -S "$suf" && return 0
-  fi
-fi
-
-return 1
+  '-z[start only if new messages]'

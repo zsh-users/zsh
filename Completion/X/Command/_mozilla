@@ -58,13 +58,7 @@ if [[ "$state" = "remote" ]]; then
       fi
     ;;
     mailto*)
-      compset -P "*,"
-      if compset -P '*@'; then
-        _wanted hosts expl 'remote host name' _hosts -q -S, && ret=0
-      else
-        compset -S "@*" || suf="@"
-        _wanted users expl 'login name' _users -q -S "$suf" && ret=0
-      fi
+      _email_addresses -s, -c && ret=0
     ;;
     *)
       compset -S '(|\\)\(*' || suf="${${QIPREFIX:+(}:-\(}"
@@ -83,13 +77,15 @@ if [[ "$state" = "urls" ]]; then
             license logo memory-cache mozilla plugins && ret=0
   elif compset -P news: ; then
     _newsgroups "$@" && ret=0
+  elif compset -P mailto: ; then
+    _email_addresses -c && ret=0
   else
     _tags prefixes
     while _tags; do
       while _next_label prefixes expl 'URL prefix' "$@"; do
         _urls "$expl[@]" && ret=0
 	compset -S '[^:]*'
-        compadd -S '' "$expl[@]" about: news: mocha: javascript: && ret=0
+        compadd -S '' "$expl[@]" about: news: mailto: mocha: javascript: && ret=0
       done
       (( ret )) || return 0
     done

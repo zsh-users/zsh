@@ -1,9 +1,8 @@
 #compdef pine pinef
 
-local curcontext="$curcontext" state line expl suf
 local optfile getopts='pine -conf' sortorder lusortorder opts send idx
 
-if [[ -n $+_cache_pine_options ]]; then
+if (( $#_cache_pine_options )); then
   for optfile in ~/.pinerc /etc/pine.conf; do
     if [[ -f $optfile ]]; then
       getopts="cat $optfile"
@@ -20,7 +19,7 @@ opts=( -h -v -F -conf -create_lu -pinerc -copy_abook -copy_pinerc)  # exclusive 
 idx=( -f -c -i -I -n -o -sort )  # options used when viewing messages
 send=( -attach -attachlist -attach_and_delete -url )  # options when sending
 
-_arguments -C -s \
+_arguments -s \
   "($opts $idx $send -bail -d -k -z -r -p -P *)-h[display help]" \
   "($opts $idx $send -bail -d -k -z -r -p -P *)-v[display version information]" \
   "($opts $idx $send -r *)-F+[specify file to open and page through]:file:_files" \
@@ -32,7 +31,7 @@ _arguments -C -s \
   "($opts $idx -url)-attach[go directly into composer with given file]:file:_files" \
   "($opts $idx -url)-attachlist[go to composer with given files]:file:_files" \
   "($opts $idx -url)-attach_and_delete[go to composer, attach file, delete when finished]:file:_files" \
-  "($opts $idx $send)-url[open the given URL]:url:->url" \
+  "($opts $idx $send)-url[open the given URL]:url:_email_addresses -c -P mailto\:" \
   "($opts $send)-f+[specify mailbox to load]:mailbox: _mailboxes" \
   "($opts $send)-c+[specify context to apply to -f arg]: :_guard '[0-9]#' number" \
   "($opts $send)-sort[specify sort order of folder]:sort order:(${(j: :)sortorder})" \
@@ -48,26 +47,5 @@ _arguments -C -s \
   \(${(j. .)opts:#-F}')-P+[use alternate pine.conf file]:alternate pine.conf:_files' \
   \(${(j. .)opts:#-F}')-x[use configuration exceptions file]:configuration exceptions file:_files' \
   \(${(j. .)opts:#-F}")-bail[exit if pinerc file doesn't already exist]" \
-  '*::recipient:->userhost' \
-  ${^_cache_pine_options}':option value' && return 0
-
-if [[ "$state" = url ]]; then
-  if compset -P 'mailto:'; then
-    state=userhost
-  else
-    compadd -S: mailto && return 0
-  fi
-fi
-
-if [[ "$state" = userhost ]]; then
-  if compset -P '*@'; then
-    _description hosts expl 'remote host name'
-    _hosts "$expl[@]" && return 0
-  else
-    compset -S '@*' || suf='@'
-    _description users expl 'login name'
-    _users "$expl[@]" -q -S "$suf" && return 0
-  fi
-fi
-
-return 1
+  '*::recipient:_email_addresses -n pine' \
+  ${^_cache_pine_options}':option value'

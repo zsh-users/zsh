@@ -1,39 +1,23 @@
 #compdef mutt
 
-local curcontext="$curcontext" state line expl suf
-typeset -A opt_args
-
-_arguments -C -s \
-    '::recipient:->userhost' \
-    '*-a[attach file using MIME]:file attachment:_files' \
-    '*-b[specify a BCC recipient]:BCC recipient:->userhost' \
-    '*-c[specify a CC recipient]:CC recipient:->userhost' \
-    '-e+[specify a post-init configuration command]:post-init configuration:' \
-    '-f+[specify mailbox to load]:mailbox: _mailboxes' \
-    '-F+[specify an init file]:init file:_files' \
-    '-h[display help]' \
-    '-H+[specify a draft file for message]:draft file:_files' \
-    '-i+[specify file to include in message]:include file:_files' \
-    '-m+[specify default mailbox type]:mailbox type:(mbox MMDF MH Maildir)' \
-    '-n[bypass system configuration]' \
-    '-p[resume postponed message]' \
-    '-R[open in read-only mode]' \
-    '-s+[specify a subject]:subject:' \
-    '-v[display mutt version]' \
-    '-x[emulate mailx compose]' \
-    '-y[start listing mailboxes]' \
-    '-z[start only if new messages]' \
-    '-Z[open first mailbox with new mail]' && return 0
-
-if [[ "$state" = userhost ]]; then
-  if compset -P '*@'; then
-    _description hosts expl 'remote host name'
-    _hosts "$expl[@]" -q -S, && return 0
-  else
-    compset -S '@*' || suf='@'
-    _description users expl 'login name'
-    _users "$expl[@]" -q -S "$suf" && return 0
-  fi
-fi
-
-return 1
+_arguments -s \
+  '::recipient:_email_addresses -n mutt' \
+  '*-a[attach file using MIME]:file attachment:_files' \
+  '*-b[specify a BCC recipient]:BCC recipient:_email_addresses -n mutt' \
+  '*-c[specify a CC recipient]:CC recipient:_email_addresses -n mutt' \
+  '-e+[specify a post-init configuration command]:post-init configuration:' \
+  '-f+[specify mailbox to load]:mailbox: _mailboxes' \
+  '-F+[specify an init file]:init file:_files' \
+  '-h[display help]' \
+  '-H+[specify a draft file for message]:draft file:_files' \
+  '-i+[specify file to include in message]:include file:_files' \
+  '-m+[specify default mailbox type]:mailbox type:(mbox MMDF MH Maildir)' \
+  '-n[bypass system configuration]' \
+  '-p[resume postponed message]' \
+  '-R[open in read-only mode]' \
+  '-s+[specify a subject]:subject:' \
+  '-v[display mutt version]' \
+  '-x[emulate mailx compose]' \
+  '-y[start listing mailboxes]' \
+  '-z[start only if new messages]' \
+  '-Z[open first mailbox with new mail]'

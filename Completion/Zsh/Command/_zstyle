@@ -48,6 +48,7 @@ styles=(
   fake-parameters	 c:fake-params
   file-patterns		 c:filepat
   file-sort              c:fsort
+  filter		 c:
   force-list             c:
   format		 c:
   glob			 c:bool
@@ -109,6 +110,7 @@ styles=(
   squeeze-slashes	 c:bool
   stop			 c:stop
   stop-keys		 c:
+  strip-comments	 c:bool
   subst-globs-only       c:bool
   substitute		 c:bool
   suffix		 c:bool
@@ -143,6 +145,7 @@ taglist=(
   prefixes printers processes processes-names ps regex sequences
   sessions signals strings styles tags targets timezones types urls
   users values variant visuals warnings widgets windows zsh-options
+  email-address ${(k)functions[(I)_email-*]#_}
 )
 
 _arguments -C \
@@ -294,7 +297,7 @@ while (( $#state )); do
       if compset -P '*:*:'; then
         _message -e descriptions description
       elif compset -P '*:'; then
-        _message -e aliases 'tag alias'
+        _message -e labels 'tag label'
       else
         suf=()
         compset -S ':*' || suf=( -qS: )
