@@ -1,6 +1,15 @@
---------------
-INSTALLING ZSH
---------------
+                        ++++++++++++++
+                        INSTALLING ZSH
+                        ++++++++++++++
+
+This file is divided into two parts:  making and installing the shell, and
+a description of various additional configuration options.  You should
+have a look at the items in the second part before following the
+instructions in the first.
+
+=====================
+MAKING AND INSTALLING
+=====================
 
 Check MACHINES File
 -------------------
@@ -9,6 +18,16 @@ Check the file MACHINES in the subdirectory Etc to see the architectures
 that zsh is known to compile on, as well as any special instructions
 for your particular architecture.  Most architectures will not require any
 special instructions.
+
+Pre-configuration
+-----------------
+
+If you are using a normal source release, skip this section.
+
+If the `configure' script does not already exist -- e.g., if you've got
+a snapshot of the bare sources just checked out from a CVS repository
+-- some things need to be built before the configuration can proceed.
+Run the script `./Util/preconfig' to do this.
 
 Configuring Zsh
 ---------------
@@ -27,18 +46,21 @@ top level Makefile.
 Dynamic loading
 ---------------
 
-Zsh-3.1 has support for dynamically loadable modules.  To enable this run
-configure with the --enable-dynamic option.  Note that dynamic loading
-does not work on all systems.  On these systems this option will have no
-effect, so it is always safe to use --enable-dynamic.  When dynamic
-loading is enabled, major parts of zsh (including the Zsh Line Editor) are
-compiled into modules and not included into the main zsh binary.  Zsh
-autoloads these modules when they are required.  This means that you have
-to execute make install.modules before you try the newly compiled zsh
-executable.
+Zsh-3.1 has support for dynamically loadable modules.  This is now enabled
+by default; to disable it, run configure with the --disable-dynamic option.
+Note that dynamic loading does not work on all systems.  On these systems
+this option will have no effect.  When dynamic loading is enabled, major
+parts of zsh (including the Zsh Line Editor) are compiled into modules and
+not included into the main zsh binary.  Zsh autoloads these modules when
+they are required.  This means that you have to execute make
+install.modules before you try the newly compiled zsh executable, and hence
+also the install paths must be correct.  The installation path for modules
+is EPREFIX/lib/zsh/<zsh-version-number>, where EPREFIX defaults to PREFIX
+unless given explicitly, and PREFIX defaults to /usr/local.  See the end of
+this file for options to configure to change these.
 
-Adding more modules
--------------------
+Adding and removing modules
+---------------------------
 
 The zsh distribution contains several modules, in the Src/Builtins,
 Src/Modules and Src/Zle directories.  If you have any additional zsh
@@ -51,15 +73,46 @@ If you wish to add or remove modules or module directories after you
 have already run make, then after adding or removing the modules run:
     make prep
 
+You can also instruct the configuration process that a certain module
+should neither be compiled nor installed without modifying any files.  To
+do this, give the argument `--enable-omit-modules=mod1,mod2,...' to
+configure.  The module arguments are the full names of the modules,
+probably including the prefix `zsh/'.  For example,
+`configure --enable-omit-modules=zsh/zpty,zsh/example' says that the
+modules zsh/zpty and zsh/example are not to be compiled nor installed.
+Note that it is up to you to make sure the modules in question are not going
+to be compiled into the main zsh binary, as described in the next section.
+It is unlikely you would want to omit any of the modules liable to be
+compiled in by default.
+
 Controlling what is compiled into the main zsh binary
 -----------------------------------------------------
 
-By default the comp1, compctl, zle, sched and rlimits modules are compiled
-into non-dynamic zsh and no modules are compiled into the main binary if
-dynamic loading is available.  This can be overridden by creating the
-Src/modules-bltin file with the list of modules which are to be compiled
-into the main binary.  See the zshmodules manual page for the list of
-available modules.
+By default the complete, compctl, zle, computil, complist, sched, parameter,
+zleparameter and rlimits modules are compiled into non-dynamic zsh and no
+modules are compiled into the main binary if dynamic loading is available.
+This can be overridden by creating the file mymods.conf in the compilation
+directory (Src, unless you have told configure to use another directory)
+with the list of modules which are to be compiled into the main binary, one
+module name per line with no punctuation and no suffix.  See the zshmodules
+manual page for the list of available modules.
+
+Note that mymods.conf replaces the standard list of linked-in modules from
+Src/xmods.conf.  If you wish to add to the standard list, copy the lines
+that begin with "L " from xmods.conf into mymods.conf and remove the "L "
+from each such line in mymods.conf.  Then add the names of other modules
+that you want to link.  Module names typically must begin with "zsh/";
+see the ".mdd" file for the module for the actual name.  The modules must
+be listed in dependency order, e.g., "zsh/zle" must precede "zsh/complete",
+"zsh/complete" must precede "zsh/compctl", and similarly for any other
+dependencies.
+
+Note that the modules depending on zle or complete (e.g.: complist and
+deltochar) cannot be loaded dynamically on systems which do not allow symbols
+in one dynamically loaded library to be visible from another; this is true,
+for example, of version 4 of SunOS.  The most convenient workaround is to
+compile zle and complete into the base executable by including them in
+mymods.conf as described above.
 
 Compiler Options or Using a Different Compiler
 ----------------------------------------------
@@ -114,15 +167,22 @@ To install the dynamically-loadable modules, do the command:
 To install the zsh man page, do the command:
     make install.man
 
-To install the zsh info files, do the command:
-    make install.info
+To install all the shell functions which come with the distribution, do the
+command:
+    make install.fns
 
 Or alternatively, you can install all the above with the command:
     make install
 
-"make install.info" will only move the info files into the info directory.
-You will have to edit the topmost node of the info tree "dir" manually
-in order to have the zsh info files available to your info reader.
+To install the zsh info files (this must be done separately), do the
+command:
+    make install.info
+
+If the programme install-info is available, "make install.info" will
+insert an entry in the file "dir" in the same directory as the info
+files.  Otherwise you will have to edit the topmost node of the info
+tree "dir" manually in order to have the zsh info files available to
+your info reader.
 
 Building Zsh On Additional Architectures
 ----------------------------------------
@@ -147,6 +207,11 @@ source code in the directory that "configure" is in.  For example,
     cd /usr/local/SunOS/zsh
     /usr/local/src/zsh-3.0/configure
     make
+
+
+=====================
+CONFIGURATION OPTIONS
+=====================
 
 Memory Routines
 ---------------
@@ -198,6 +263,86 @@ Any startup/shutdown script can be disabled by giving the
 --disable-scriptname option to "configure".  The --disable-etcdir option
 disables all startup/shutdown files which are not explicitely enabled.
 
+Shell functions
+---------------
+
+By default, the shell functions which are installed with `make install' or
+`make install.fns' go into the directory ${datadir}/zsh/functions, which
+unless you have specified --datadir is the same as
+${prefix}/share/zsh/$ZSH_VERSION/functions ($prefix itself defaults to
+/usr/local, as described below).  This directory will also be compiled into
+the shell as the default directory for the variable $fpath/$FPATH. You can
+override it with --enable-fndir=directory; --disable-fndir or
+--enable-fndir=no will turn off both installation of functions and the
+setting of a default value for $fpath/$FPATH.  Note the presence of
+$ZSH_VERSION (e.g. `3.1.7') to avoid clashes between versions of zsh.
+If you only run one version of zsh at once, installing into a common
+directory such as /usr/local/share/zsh/functions is fine.
+
+You can control the functions which get installed by setting
+FUNCTIONS_INSTALL, either when running configure (e.g.
+`FUNCTIONS_INSTALL="..." configure ...') or when running `make install' or
+`make install.fns'.  It includes a list of files relative to either the
+Completion or Functions subdirectories.  By default, all the functions for
+the Completion system will be installed (see the zshcompsys manual page),
+plus those provide functions for the line editor, i.e.
+  FUNCTIONS_INSTALL='Core/* Base/* Builtins/* User/* Commands/* Debian/* Linux/* X/* Zle/* Prompts/* Misc/*'
+and if the --enable-dynamic option was given, the functions in
+Functions/Zftp, which require the zftp module to be available (see the
+zshzftpsys manual page), will be included as well.  Note, however, that
+some of the functions in the User subdirectory are version- and
+system-specific.
+
+There are also some miscellaneous functions with documentation in comments;
+the complete set of functions can be installed with
+  FUNCTIONS_INSTALL='Core/* Base/* Builtins/* User/* Commands/* \
+  Debian/* Linux/* X/* Misc/* Zftp/* Zle/*'
+Note you should set this by hand to include `Zftp/*' if you have zftp
+compiled into a statically linked shell.
+
+You can also use the configure option --enable-function-subdirs to allow
+shell functions to be installed into subdirectories of the function
+directory, i.e. `Core/*' files will be installed into `FNDIR/Core', and so
+on. This also initialises $fpath/$FPATH appropriately.
+
+The option --enable-site-fndir controls whether to create and initialise
+$fpath to include a directory for site-specific functions.  By default this
+is created in the location ${datadir}/zsh/site-functions, i.e. parallel to
+the version-specific functions directory, and inserted at the start of the
+$fpath array on shell startup.  This directory will not be affected by
+`make uninstall' or `make uninstall.fns', although the version-specific
+directory and its contents will be deleted.
+
+Support for large files and integers
+------------------------------------
+
+Some 32-bit systems allow special compilation modes to get around the 2GB
+file size barrier.  The option --enable-lfs turns on the configure check
+for support for large files.  This is now enabled by default; use
+--disable-lfs to turn it off.  Not all systems recognize the test used by
+zsh (via the getconf command), so flags may need to be set by hand.  On
+HP-UX 10.20, zsh has been successfully compiled with large file support by
+configuring with
+  CC="cc -Ae" CPPFLAGS="-D_LARGEFILE_SOURCE -D_FILE64" configure \
+  --enable-lfs ...
+You can also give a value to --enable-lfs, which will be interpreted as the
+name of a 64-bit integer type, for example --enable-lfs="long long"
+(although this type is checked for anyway).
+
+Furthermore, use of --enable-lfs will also enable 64-bit arithmetic for
+shell parameters, and anywhere they are used such as in mathematical
+formulae.  This depends only on the shell finding a suitable 64-bit integer
+type; it does not require that support for large files is actually
+enabled.  Hence you might consider using --enable-lfs on any 32-bit system
+with a suitable compiler such as gcc.
+
+Also note that if `configure' finds out that either of the types off_t or
+ino_t are 64-bit quantities, but that long integers are only 32 bits, all
+the above will be enabled automatically.  This is necessary to ensure
+correct handling of these types.
+
+None of this is relevant for 64-bit systems; zsh should compile and run
+without problems if (sizeof(long) == 8).
 
 Options For Configure
 ---------------------
@@ -239,4 +384,10 @@ Features:
      zlogin=pathname     # the full pathname of the global zlogin script
      zprofile=pathname   # the full pathname of the global zprofile script
      zlogout=pathname    # the full pathname of the global zlogout script
+     fndir=directory     # the directory where shell functions will go
+     site-fndir=directory# the directory where site-specific functions can go
+     function-subdirs    # if functions will be installed into subdirectories
+     omit-modules=mod1,..# don't compile nor install the modules named mod1,...
      dynamic             # allow dynamically loaded binary modules
+     lfs                 # allow configure check for large files
+     locale              # allow use of locale library

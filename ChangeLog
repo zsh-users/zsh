@@ -1,3 +1,7 @@
+2000-08-11  Bart Schaefer  <schaefer@zsh.org>
+
+	* 12596: INSTALL: Update for module aliasing changes.
+
 2000-08-11  Sven Wischnowsky  <wischnow@zsh.org>
 
 	* 12592: Completion/Core/_parameters, Src/Zle/compcore.c,
