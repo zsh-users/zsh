@@ -1,3 +1,16 @@
+2002-04-28  Wayne Davison  <wayned@users.sourceforge.net>
+
+	* 16927: zsh/Functions/Misc/zmv: Added -W to auto-convert wildcards in
+	both the find and replace strings.  Fixed the usage message to output
+	the '$' args and '\' characters (they were getting eaten).
+
+2002-04-28  Peter Stephenson  <pws@csr.com>
+
+	* 15720: Functions/Misc/zmv: use ${(e)...} as suggested by
+	Bart; fix problem with option arguments with special characters;
+	more consistency with shifting arguments; fix verbose mode
+	output with backslashes.
+
 2002-04-28  Clint Adams  <clint@zsh.org>
 
         * unposted: Completion/Unix/Command/_spamassassin:
