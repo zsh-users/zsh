@@ -34,7 +34,10 @@
  
 /**/
 mod_export int incmdpos;
- 
+
+/**/
+int aliasspaceflag;
+
 /* != 0 if we are in the middle of a [[ ... ]] */
  
 /**/
@@ -418,6 +421,7 @@ parse_event(void)
 {
     tok = ENDINPUT;
     incmdpos = 1;
+    aliasspaceflag = 0;
     yylex();
     init_parse();
     return ((par_event()) ? bld_eprog() : NULL);
