@@ -74,6 +74,12 @@ _arguments -C -s \
   '(--cache -C)'{--cache=,-C+}'[(dis)allow server-cached data]:cache:(on off)' \
   '--htmlify=:htmlify:' \
   '--no:no:->noflags' \
+  '--cookies=[turn cookies on or off]:cookies:(on off)' \
+  '--load-cookies=[specify file to load cookies from]:cookie file:_files' \
+  '--save-cookies=[specify file to save cookies to]:cookie file:_files' \
+  '--no-http-keep-alive[disable HTTP keep-alive]' \
+  '--sslcertfile=[specify client certificate]:client certificate file:_files' \
+  '--sslcertkey=[specify keyfile for certificate]:keyfile:_files' \
   '*:url:_urls' && return 0
 
 case "$state" in

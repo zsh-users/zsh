@@ -1,4 +1,4 @@
-#compdef curl galeon
+#compdef curl
 
 # Usage: _urls [-f]
 # Options:

@@ -13,8 +13,8 @@ case $OSTYPE in
       '(-o)-x[show opaques as well (entire values)]' \
       '(-a)*:sysctl variable:_multi_parts -i . sysctlvars'
   ;;
-  freebsd[0-4].*)
-    : ${(A)_cache_sysctlvars:=${${$(sysctl -A):#[^a-z]*}%%:*}}
+  freebsd[0-4].*|darwin*)
+    : ${(A)_cache_sysctlvars:=${${$(sysctl -A 2>/dev/null):#[^a-z]*}%%:*}}
     _arguments -s -A "-*" \
       '(-w -X *)-a[list all]' \
       '(-w -X *)-A[show all opaques (values suppressed)]' \
