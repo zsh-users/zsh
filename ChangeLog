@@ -1,5 +1,8 @@
 2002-03-19  Oliver Kiddle  <opk@zsh.org>
 
+	* 16864: Completion/Unix/Command/ssh: fix remote file completion
+	with relative paths
+
 	* unposted: Completion/Unix/Command/_grep: argument to -C must
 	be in the same word and correct mistake on file completion
 

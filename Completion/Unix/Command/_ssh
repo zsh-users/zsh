@@ -2,21 +2,28 @@
 
 _remote_files () {
   # There should be coloring based on all the different ls -F classifiers.
-  local expl remfiles remdispf remdispd
+  local expl remfiles remdispf remdispd suf ret=1
 
   if zstyle -T ":completion:${curcontext}:" remote-access; then
-    remfiles=(${(f)"$(ssh -a -x ${words[CURRENT]%:*} ls -d1F ${${${words[CURRENT]#*:}:h}/\\/(#e)/}/\* 2>/dev/null)"})
+    remfiles=(${(M)${(f)"$(ssh -a -x ${words[CURRENT]%%:*} ls -d1F ${PREFIX%%[^/]#}\* 2>/dev/null)"}%%[^/]##(|/)})
+    compset -P '*/'
+    compset -S '/*' || suf='remote file'
 
     remdispf=(${remfiles:#*/})
     remdispd=(${(M)remfiles:#*/})
 
-    _wanted files expl 'remote files and directories' \
-      compadd -d remdispf ${${remfiles:#*/}/[*=@|](#e)/}
-      
-    _wanted files expl 'remote files and directories' \
-      compadd -S/ -d remdispd ${${(M)remfiles:#*/}/\\/(#e)/}
+    _tags files
+    while _tags; do
+      while _next_label files expl ${suf:-remote directory}; do
+        [[ -n $suf ]] && compadd "$@" "$expl[@]" -d remdispf \
+	    ${remdispf%[*=@|]} && ret=0 
+	compadd ${suf:+-S/} "$@" "$expl[@]" -d remdispd \
+	    ${remdispd%/} && ret=0
+      done
+      (( ret )) || return 0
+    done
   else
-    _message 'remote files'
+    _message 'remote file'
   fi
 }
 
