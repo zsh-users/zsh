@@ -1,3 +1,9 @@
+2000-07-26  Peter Stephenson  <pws@cambridgesiliconradio.com>
+
+	* Andrej/pws: 12381: configure.in: cygwin on Windows 2000 is
+	mysteriously returning status 0 even though the test fails, so
+	create a file we can test to see if the test got that far.
+
 2000-07-26  Bart Schaefer  <schaefer@zsh.org>
 
 	* 12377: Completion/Core/compaudit, Completion/Core/compinit,

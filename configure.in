@@ -579,6 +579,8 @@ fi
 dnl  Check if tgetent accepts NULL (and will allocate its own termcap buffer)
 dnl  Some termcaps reportedly accept a zero buffer, but then dump core
 dnl  in tgetstr().
+dnl  Under Cygwin test program crashes but exit code is still 0. So,
+dnl  we test for a file that porgram should create
 AC_CACHE_CHECK(if tgetent accepts NULL,
 zsh_cv_func_tgetent_accepts_null,
 [AC_TRY_RUN([
@@ -589,11 +591,16 @@ main()
 	char tbuf[1024], *u;
     	u = tbuf;
     	tgetstr("cl", &u);
+	creat("conftest.tgetent", 0640);
     }
     exit(!i || i == -1);
 }
 ],
-  zsh_cv_func_tgetent_accepts_null=yes,
+  if test -f conftest.tgetent; then
+    zsh_cv_func_tgetent_accepts_null=yes
+  else
+    zsh_cv_func_tgetent_accepts_null=no
+  fi,
   zsh_cv_func_tgetent_accepts_null=no,
   zsh_cv_func_tgetent_accepts_null=no)])
 if test $zsh_cv_func_tgetent_accepts_null = yes; then
