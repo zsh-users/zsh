@@ -440,7 +440,7 @@ int
 match_str(char *l, char *w, Brinfo *bpp, int bc, int *rwlp,
 	  int sfx, int test, int part)
 {
-    int ll = strlen(l), lw = strlen(w), oll = ll, olw = lw;
+    int ll = strlen(l), lw = strlen(w), oll = ll, olw = lw, exact = 0, wexact = 0;
     int il = 0, iw = 0, t, ind, add, he = 0, bpc, obc = bc, bslash;
     VARARR(unsigned char, ea, (ll > lw ? ll : lw) + 1);
     char *ow;
@@ -489,11 +489,12 @@ match_str(char *l, char *w, Brinfo *bpp, int bc, int *rwlp,
 	 * Update: this once tested `test && ...' to check for exact
 	 * character matches only in recursive calls.  But then one
 	 * can't complete `nom<TAB>' to `nomatch' with a match spec
-	 * of `B:[nN][oO]=' because that will eat the `no'. I'm almost
-	 * certain that this will break something, but I don't know what
-	 * or if it really is a problem (or has been fixed by other
-	 * changes in the code handling partial word matching). And the
-	 * completion matching tests work.
+	 * of `B:[nN][oO]=' because that will eat the `no'.
+	 * But that would break completion of strings like `nonomatch'
+	 * because the `B:[nN][oO]=' doesn't match the second `no'.
+	 * For this we added the code below that can remove already
+	 * accepted exact characters and try again, preferring match
+	 * specs.
 	 */
 
 	bslash = 0;
@@ -503,10 +504,12 @@ match_str(char *l, char *w, Brinfo *bpp, int bc, int *rwlp,
 			(ind ? (w[0] == l[0]) : (w[1] == l[0])))))) {
 	    /* No matcher could be used, but the strings have the same
 	     * character here, skip over it. */
-	    l += add; w += (bslash ? (add + add ) : add);
+	    l += add; w += (bslash ? (add + add) : add);
 	    il++; iw += 1 + bslash;
 	    ll--; lw -= 1 + bslash;
 	    bc++;
+	    exact++;
+	    wexact += 1 + bslash;
 	    if (!test)
 		while (bp && bc >= (useqbr ? bp->qpos : bp->pos)) {
 		    bp->curpos = matchbufadded + (sfx ? (ow - w) : (w - ow)) + obc;
@@ -517,6 +520,7 @@ match_str(char *l, char *w, Brinfo *bpp, int bc, int *rwlp,
 
 	    continue;
 	}
+    retry:
 	/* First try the matchers. Err... see above. */
 	for (mp = NULL, ms = mstack; !mp && ms; ms = ms->next) {
 	    for (mp = ms->matcher; mp; mp = mp->next) {
@@ -687,6 +691,7 @@ match_str(char *l, char *w, Brinfo *bpp, int bc, int *rwlp,
 		    ll -= llen; il += llen;
 		    lw -= alen; iw += alen;
 		    bc += llen;
+		    exact = 0;
 
 		    if (!test)
 			while (bp &&
@@ -798,6 +803,7 @@ match_str(char *l, char *w, Brinfo *bpp, int bc, int *rwlp,
 		    il += mp->llen; iw += mp->wlen;
 		    ll -= mp->llen; lw -= mp->wlen;
 		    bc += mp->llen;
+		    exact = 0;
 
 		    if (!test)
 			while (bp &&
@@ -836,6 +842,23 @@ match_str(char *l, char *w, Brinfo *bpp, int bc, int *rwlp,
 	    lm = NULL;
 	    he = 0;
 	} else {
+
+	    if (exact) {
+		/* If we just accepted some characters directly (at the
+		 * beginning of the loop) and now can't match any further,
+		 * we go back to before those characters and try again,
+		 * preferring match specs this time. */
+
+		il -= exact; iw -= wexact;
+		ll += exact; lw += wexact;
+		bc -= exact;
+		l -= add * exact; w -= add * wexact;
+
+		exact = wexact = 0;
+
+		goto retry;
+	    }
+
 	    if (!lw)
 		break;
 	    /* No matcher and different characters: l does not match w. */
