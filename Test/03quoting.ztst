@@ -1,0 +1,26 @@
+%test
+  print 'single  quotes'  "double  quotes"  `echo backquotes`
+0:Simple use of quotes
+>single  quotes double  quotes backquotes
+
+  foo=text
+  print -r '$foo\\\' "$foo\$foo\\\"\``echo bar`\`\"" `print -r $foo\\\``
+0:Quoting inside quotes
+>$foo\\\ text$foo\"`bar`" text`
+
+  print -r $'\'ut queant laxis\'\n"resonare fibris"'
+0:$'-style quotes
+>'ut queant laxis'
+>"resonare fibris"
+
+  print -r ''''
+  setopt rcquotes
+# We need to set rcquotes here for the next example since it is
+# needed while parsing.
+0:No RC_QUOTES with single quotes
+>
+
+  print -r ''''
+  unsetopt rcquotes
+0:Yes RC_QUOTES with single quotes
+>'

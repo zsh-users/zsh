@@ -1,0 +1,23 @@
+%prep
+  alias foo=echo
+
+  alias -g bar=echo
+
+  alias '\bar=echo'
+
+%test
+  foo foo
+0:Basic aliasing
+>foo
+
+  bar bar
+0:Global aliasing
+>echo
+
+  \foo foo
+1:Not aliasing
+?ZTST_execchunk:2: command not found: foo
+
+  \bar \bar
+0:Aliasing with a backslash
+>bar
