@@ -89,6 +89,7 @@ styles=(
   original		 c:bool
   packageset		 c:packageset
   path			 c:_directories
+  pager			 c:_command_names
   pine-directory         c:_directories
   ports			 c:_ports
   prefix-hidden		 c:bool
@@ -233,8 +234,8 @@ while (( $#state )); do
 
     functions)
       _wanted comp-widget expl 'completion widget' \
-          compadd $suf - all-matches complete-tag correct-word expand-word \
-	  expand-alias-word history-words
+          compadd $suf - all-matches complete-debug complete-tag \
+	  correct-word expand-word expand-alias-word history-words
       ;;
 
     user-host-port)

@@ -42,12 +42,12 @@ _arguments -C -s \
   "($opts $send)-o[open first folder read-only]" \
   "(-F -h -v)-r[restricted - can only send mail to oneself]" \
   "(-h -v)-d[set debug level]:debug:(0 1 2 3 4 5 6 7 8 9 flush timestamp imap= numfiles= verbose=)" \
-  "(${opts#-F})-k[force use of function keys]" \
-  "(${opts#-F})-z[allow use of ^Z suspension]" \
-  "(${opts#-F})-p+[use alternate .pinerc file]:alternate pinerc:_files" \
-  "(${opts#-F})-P+[use alternate pine.conf file]:alternate pine.conf:_files" \
-  "(${opts#-F})-x[use configuration exceptions file]:configuration exceptions file:_files" \
-  "(${opts#-F})-bail[exit if pinerc file doesn't already exist]" \
+  \(${(j. .)opts:#-F}')-k[force use of function keys]' \
+  \(${(j. .)opts:#-F}')-z[allow use of ^Z suspension]' \
+  \(${(j. .)opts:#-F}')-p+[use alternate .pinerc file]:alternate pinerc:_files' \
+  \(${(j. .)opts:#-F}')-P+[use alternate pine.conf file]:alternate pine.conf:_files' \
+  \(${(j. .)opts:#-F}')-x[use configuration exceptions file]:configuration exceptions file:_files' \
+  \(${(j. .)opts:#-F}")-bail[exit if pinerc file doesn't already exist]" \
   '*::recipient:->userhost' \
   ${^_cache_pine_options}':option value' && return 0
 

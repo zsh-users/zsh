@@ -1,3 +1,12 @@
+2002-01-17  Oliver Kiddle  <opk@zsh.org>
+
+	* 16464: Completion/Base/Widget/_complete_debug,
+	Completion/Zsh/Command/_zstyle: use pager style in _complete_debug
+	in preference to $EDITOR
+
+	* 16464: Completion/Unix/Command/_pine, Completion/Zsh/Command/_zle:
+	fix subtitutions used for exclusion lists and do cleanup of _zle
+
 2002-01-16  Clint Adams  <clint@zsh.org>
 
 	* unposted: Src/.distfiles: remove ansi2knr.
