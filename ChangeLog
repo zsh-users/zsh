@@ -1,3 +1,8 @@
+2001-11-02  Oliver Kiddle  <opk@zsh.org>
+
+	* 16177: Completion/Unix/Type/_time_zone: also look in
+	/usr/lib/locale/TZ for time zones
+
 2001-11-01  Bart Schaefer  <schaefer@zsh.org>
 
 	* 16197: Completion/Zsh/Command/.distfiles,

@@ -3,7 +3,7 @@
 local expl
 
 if (( ! $+_zoneinfo_dirs )); then
-  _zoneinfo_dirs=( /usr/{share,lib,share/lib}/zoneinfo*(/) )
+  _zoneinfo_dirs=( /usr/{share,lib,share/lib}/{zoneinfo*,locale/TZ}(/) )
 fi
 
 _wanted timezone expl 'time zone' _files -W _zoneinfo_dirs
