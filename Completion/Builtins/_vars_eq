@@ -1,3 +1,7 @@
 #compdef declare export integer local readonly typeset
 
-_parameters -q -S '='
+if compset -P '*='; then
+  _default
+else
+  _parameters -q -S '='
+fi

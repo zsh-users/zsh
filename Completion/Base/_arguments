@@ -7,7 +7,7 @@ setopt localoptions extendedglob
 
 local long args rest ws cur nth def nm expl descr action opt arg tmp
 local single uns ret=1 soptseq soptseq1 sopts prefix line
-local beg optbeg argbeg
+local beg optbeg argbeg nargbeg inopt
 
 # Associative arrays used to collect information about the options.
 
@@ -82,6 +82,16 @@ while (( $# )); do
       opts[$tmp]=''
     fi
     unset "oneshot[$tmp]"
+  elif [[ "$1" = \*::* ]]; then
+
+    # This is `*:...', describing `all other arguments', with argument 
+    # range restriction.
+
+    if [[ "$1" = \*:::* ]]; then
+      rest="*${1[3,-1]}"
+    else
+      rest="$1"
+    fi
   elif [[ "$1" = \*:* ]]; then
 
     # This is `*:...', describing `all other arguments'.
@@ -125,8 +135,9 @@ cur=$(( CURRENT-2 ))
 nth=1
 line=( "$words[1]" )
 beg=2
-argbeg=2
-optbeg=2
+argbeg=1
+optbeg=1
+nargbeg=1
 
 # ...until the current word is reached.
 
@@ -190,6 +201,7 @@ while [[ cur -gt 0 ]]; do
       def="$opts[$ws[1]]"
       optbeg="$beg"
       argbeg="$beg"
+      inopt=yes
       [[ -n "$oneshot[$ws[1]]" ]] && unset "opts[$ws[1]]"
     else
       uns=''
@@ -199,6 +211,7 @@ while [[ cur -gt 0 ]]; do
 	  def="$opts[$tmp]"
 	  optbeg="$beg"
 	  argbeg="$beg"
+          inopt=yes
 	  uns="${ws[1][2,-1]}"
 	  opt=''
 	fi
@@ -242,6 +255,7 @@ while [[ cur -gt 0 ]]; do
 	  [[ -n "$oneshot[$tmp[1]]" ]] && unset "dopts[$tmp[1]]"
 	  if [[ "$def" = [^*]*[^\\]:*[^\\]:* ]]; then
             def="${def#?*[^\\]:*[^\\]:}"
+            inopt=yes
           else
             def=''
 	  fi
@@ -279,6 +293,7 @@ while [[ cur -gt 0 ]]; do
               def="${def#?*[^\\]:*[^\\]:}"
 	      optbeg="$beg"
 	      argbeg="$beg"
+              inopt=yes
             else
               def=''
             fi
@@ -303,6 +318,8 @@ while [[ cur -gt 0 ]]; do
       if [[ -n "$opt" && -n "$arg" ]]; then
         def=''
 	line=( "$line[@]" "$ws[1]" )
+	[[ -n "$inopt" ]] && nargbeg=$(( beg - 1 ))
+	inopt=''
 	(( nth++ ))
       fi
     fi
@@ -312,6 +329,8 @@ while [[ cur -gt 0 ]]; do
   (( cur-- ))
   (( beg++ ))
 done
+
+[[ -n "$inopt" ]] && nargbeg="$beg"
 
 # Now generate the matches.
 
@@ -339,12 +358,10 @@ else
       # If we have none at all, use the one for this argument position.
 
       def="$args[nth]"
-      [[ -z "$def" ]] && def="$rest"
-
-      if [[ "$def" = \** ]]; then
-        def="${def#*[^\\]:}"
-	[[ "$def" = :* ]] && def="$def[2,-1]"
-	[[ "$def" = :* ]] && def="$def[2,-1]"
+      if [[ -z "$def" ]]; then
+        def="$rest"
+	optbeg="$nargbeg"
+	argbeg="$nargbeg"
       fi
     fi
 
@@ -456,6 +473,8 @@ else
 	  def="$def[2,-1]"
 	  beg=$optbeg
 	fi
+
+	[[ beg -ge $#words ]] && beg=$(( $#words - 1 ))
 
 	shift beg words
 	(( CURRENT -= beg ))

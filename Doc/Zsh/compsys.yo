@@ -902,6 +902,11 @@ item(tt(*:)var(message)tt(:)var(action))(
 This describes how arguments are to be completed for which no
 description with one of the first two forms was given. This also means 
 that any number of arguments can be completed.
+
+If there are two colons before the message (as in
+`tt(*::)var(message)tt(:)var(action)') the tt(words) special array and 
+the tt(CURRENT) special parameter will be restricted to only the
+normal arguments when the var(Action) is executed or evaluated.
 )
 item(var(opt-spec)[var(description) ...])(
 This describes an option and (if at least one var(description) is
