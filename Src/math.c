@@ -378,8 +378,9 @@ zzlex(void)
 	    break;
 	case '0':
 	    if (*ptr == 'x' || *ptr == 'X') {
+		ptr++;
 		/* Should we set lastbase here? */
-		yyval.u.l = zstrtol(++ptr, &ptr, lastbase = 16);
+		yyval.u.l = zstrtol(ptr, &ptr, lastbase = 16);
 		return NUM;
 	    }
 	    else if (isset(OCTALZEROES) &&
