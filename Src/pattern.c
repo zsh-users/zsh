@@ -2247,6 +2247,7 @@ patmatchrange(char *range, int ch)
 	    case PP_XDIGIT:
 		if (isxdigit(ch))
 		    return 1;
+		break;
 	    case PP_RANGE:
 		range++;
 		r1 = STOUC(UNMETA(range));
