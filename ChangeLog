@@ -117,7 +117,7 @@
 	Completion/Unix/Command/_ssh: get hostname from IPREFIX instead
 	of words[CURRENT] to avoid quote characters
 
-	* MichaÅ Politowski: users/6080: Completion/Unix/Command/_ssh:
+	* Michał Politowski: users/6080: Completion/Unix/Command/_ssh:
 	remove one level of quoting on files before using with remote ls
 
 2003-05-07  Peter Stephenson  <pws@csr.com>
@@ -1651,7 +1651,7 @@
 	* c.f. 17128: Doc/Makefile.in: back out changes accidentally
 	committed along with 17081.
 
-2002-05-12 Andrej Borsenkow  <bor@zsh.org>
+2002-05-12  Andrej Borsenkow  <bor@zsh.org>
 
 	* unposted: Completion/Redhat/Command/_service: fix context
 	name for tag-order style. For now comment it out because it
