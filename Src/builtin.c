@@ -2171,7 +2171,7 @@ bin_typeset(char *name, char **argv, Options ops, int func)
 	    return 1;
 	}
 	on &= ~off;
-	if (!argv[1] || argv[3]) {
+	if (!argv[1] || (argv[2] && argv[3])) {
 	    zwarnnam(name, "-T requires names of scalar and array", NULL, 0);
 	    unqueue_signals();
 	    return 1;
