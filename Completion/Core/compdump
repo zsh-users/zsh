@@ -94,9 +94,9 @@ print -n autoload -U >> $_d_file
 while (( $#_d_als )); do
   if (( ! $+_compautos[$_d_als[1]] )); then
     print -n " $_d_als[1]"
-    if (( _i-- && $#_d_als > 1 )); then
+    if (( ! _i-- && $#_d_als > 1 )); then
       _i=5
-      print -n '\nautoload -U'
+      print -n ' \\\n           '
     fi
   fi
   shift _d_als

@@ -322,7 +322,7 @@ in the file:
 
 Note that the values for the styles may be partly incorrect. Please
 read the manual to find out how to configure the completion system
-with styles.
+with styles or use the \`compinstall' function.
 
 Have fun
 
