@@ -15,7 +15,7 @@
 	* 13323: Functions/Zle/edit-command-line: handle
 	multi-line buffers.
 
-2001-02-02  Andrej Borsenkow <Andrej.Borsenkow@mow.siemens.ru>
+2001-02-13  Andrej Borsenkow <Andrej.Borsenkow@mow.siemens.ru>
 
 	* 13431: aczsh.m4,configure.in,Src/Modules/termcap.c,
 	Src/Modules/termcap.mdd,Src/Modules/terminfo.c,
