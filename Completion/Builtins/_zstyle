@@ -42,6 +42,7 @@ styles=(
   menu			 c:boolauto
   numbers		 c:bool
   original		 c:bool
+  packageset		 c:packageset
   path			 'c:_path_files -/'
   ports			 c:_ports
   prefix-hidden		 c:bool
@@ -138,6 +139,11 @@ while [[ -n $state ]]; do
     listwhen)
       _wanted values expl 'when to list completions' &&
 	compadd "$expl[@]" always never sometimes
+      ;;
+
+    packageset)
+      _wanted values expl 'default package set' &&
+        compadd "$expl[@]" available installed uninstalled
       ;;
 
     progress)
