@@ -1,3 +1,11 @@
+2005-03-18  Wayne Davison  <wayned@users.sourceforge.net>
+
+	* 20984 (modified): Src/zsh.h, Src/options.c, Src/hist.c,
+	Doc/Zsh/options.yo:  Added a new option, HIST_SAVE_BY_COPY, and
+	made it enabled by default.  This changes the rewriting of the
+	history file to be done via copy and rename rather than truncate
+	and write-in-place.
+
 2005-03-18  Peter Stephenson  <pws@csr.com>
 
 	* 21014: Src/Zle/zle_hist.c: remember_edits() was broken,
