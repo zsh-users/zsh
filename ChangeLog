@@ -1,3 +1,7 @@
+2000-05-11  Oliver Kiddle  <opk@zsh.org>
+
+	* 11327: Completion/Core/_call: pass on exit code from called command
+
 2000-05-11  Sven Wischnowsky  <wischnow@zsh.org>
 
 	* 11324: Completion/Base/_argument_sets, Completion/Base/_arguments,
