@@ -133,6 +133,7 @@ mod_export Funcstack funcstack;
 
 static LinkList args;
 static int doneps4;
+static char *STTYval;
 
 /* Execution functions. */
 
@@ -444,7 +445,6 @@ void
 execute(Cmdnam not_used_yet, int dash)
 {
     Cmdnam cn;
-    static LinkList exargs;
     char buf[MAXCMDLEN], buf2[MAXCMDLEN];
     char *s, *z, *arg0;
     char **argv, **pp;
@@ -459,17 +459,19 @@ execute(Cmdnam not_used_yet, int dash)
     /* If the parameter STTY is set in the command's environment, *
      * we first run the stty command with the value of this       *
      * parameter as it arguments.                                 */
-    if (!exargs && (s = zgetenv("STTY")) && isatty(0) &&
-	(GETPGRP() == getpid())) {
-	char *t;
+    if ((s = STTYval) && isatty(0) && (GETPGRP() == getpid())) {
+	LinkList exargs = args;
+	char *t = tricat("stty", " ", s);
 
-	exargs = args;	/* this prevents infinite recursion */
+	STTYval = 0;	/* this prevents infinite recursion */
+	zsfree(s);
 	args = NULL;
-	t = tricat("stty", " ", s);
 	execstring(t, 1, 0);
 	zsfree(t);
 	args = exargs;
-	exargs = NULL;
+    } else if (s) {
+	STTYval = 0;
+	zsfree(s);
     }
 
     cn = (Cmdnam) cmdnamtab->getnode(cmdnamtab, arg0);
@@ -1537,6 +1539,10 @@ addvars(Estate state, Wordcode pc, int export)
 		    state->pc = opc;
 		    return;
 		}
+		if (strcmp(name, "STTY") == 0) {
+		    zsfree(STTYval);
+		    STTYval = ztrdup(val);
+		}
 		allexp = opts[ALLEXPORT];
 		opts[ALLEXPORT] = 1;
 		pm = setsparam(name, val);
@@ -2326,6 +2332,10 @@ execcmd(Estate state, int input, int output, int how, int last1)
 		if (!forked)
 		    setlimits(NULL);
 #endif
+		if (how & Z_ASYNC) {
+		    zsfree(STTYval);
+		    STTYval = 0;
+		}
 		execute((Cmdnam) hn, cflags & BINF_DASH);
 	    } else {		/* ( ... ) */
 		DPUTS(varspc,
