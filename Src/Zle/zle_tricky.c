@@ -1739,6 +1739,116 @@ strbpcmp(char **aa, char **bb)
     return (int)(*a - *b);
 }
 
+/* This is used to print the strings (e.g. explanations). *
+ * It returns the number of lines printed.       */
+
+/**/
+int
+printfmt(char *fmt, int n, int dopr, int doesc)
+{
+    char *p = fmt, nc[DIGBUFSIZE];
+    int l = 0, cc = 0, b = 0, s = 0, u = 0, m;
+
+    for (; *p; p++) {
+	/* Handle the `%' stuff (%% == %, %n == <number of matches>). */
+	if (doesc && *p == '%') {
+	    if (*++p) {
+		m = 0;
+		switch (*p) {
+		case '%':
+		    if (dopr)
+			putc('%', shout);
+		    cc++;
+		    break;
+		case 'n':
+		    sprintf(nc, "%d", n);
+		    if (dopr)
+			fprintf(shout, nc);
+		    cc += strlen(nc);
+		    break;
+		case 'B':
+		    b = 1;
+		    if (dopr)
+			tcout(TCBOLDFACEBEG);
+		    break;
+		case 'b':
+		    b = 0; m = 1;
+		    if (dopr)
+			tcout(TCALLATTRSOFF);
+		    break;
+		case 'S':
+		    s = 1;
+		    if (dopr)
+			tcout(TCSTANDOUTBEG);
+		    break;
+		case 's':
+		    s = 0; m = 1;
+		    if (dopr)
+			tcout(TCSTANDOUTEND);
+		    break;
+		case 'U':
+		    u = 1;
+		    if (dopr)
+			tcout(TCUNDERLINEBEG);
+		    break;
+		case 'u':
+		    u = 0; m = 1;
+		    if (dopr)
+			tcout(TCUNDERLINEEND);
+		    break;
+		case '{':
+		    for (p++; *p && (*p != '%' || p[1] != '}'); p++, cc++)
+			if (dopr)
+			    putc(*p, shout);
+		    if (*p)
+			p++;
+		    else
+			p--;
+		    break;
+		}
+		if (dopr && m) {
+		    if (b)
+			tcout(TCBOLDFACEBEG);
+		    if (s)
+			tcout(TCSTANDOUTBEG);
+		    if (u)
+			tcout(TCUNDERLINEBEG);
+		}
+	    } else
+		break;
+	} else {
+	    cc++;
+	    if (*p == '\n') {
+		if (dopr) {
+		    if (tccan(TCCLEAREOL))
+			tcout(TCCLEAREOL);
+		    else {
+			int s = columns - 1 - (cc % columns);
+
+			while (s-- > 0)
+			    putc(' ', shout);
+		    }
+		}
+		l += 1 + (cc / columns);
+		cc = 0;
+	    }
+	    if (dopr)
+		putc(*p, shout);
+	}
+    }
+    if (dopr) {
+	if (tccan(TCCLEAREOL))
+	    tcout(TCCLEAREOL);
+	else {
+	    int s = columns - 1 - (cc % columns);
+
+	    while (s-- > 0)
+		putc(' ', shout);
+	}
+    }
+    return l + (cc / columns);
+}
+
 /* This is used to print expansions. */
 
 /**/

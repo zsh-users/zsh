@@ -1,4 +1,5 @@
 #!
+SHTTY
 addbuiltins
 addconddefs
 addedx
@@ -145,7 +146,6 @@ intvarsetfn
 inwhat
 isfirstln
 jobtab
-keymapnamtab
 lastpid
 lastval
 lchdir
@@ -200,7 +200,6 @@ postedit
 ppid
 prefork
 prepromptfns
-printfmt
 printif
 printparamnode
 printqt
