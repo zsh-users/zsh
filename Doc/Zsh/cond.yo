@@ -149,6 +149,20 @@ true if either var(exp1) or var(exp2) is true.
 )
 enditem()
 
+Normal shell expansion is performed on the var(file), var(string) and
+var(pattern) arguments, but the result of each expansion is constrained to
+be a single word, similar to the effect of double quotes.  However, pattern
+metacharacters are active for the var(pattern) arguments; the patterns
+are the same as those used for filename generation, see
+ifzman(\
+zmanref(zshexpn)\
+)\
+ifnzman(\
+noderef(Filename Generation)\
+)\
+, but there is no special behaviour
+of `tt(/)' nor initial dots, and no glob qualifiers are allowed.
+
 In each of the above expressions, if
 var(file) is of the form `tt(/dev/fd/)var(n)',
 where var(n) is an integer,
@@ -156,3 +170,14 @@ then the test applied to the open file whose
 descriptor number is var(n),
 even if the underlying system does not support
 the tt(/dev/fd) directory.
+
+In the forms which do numeric comparison, the expressions var(exp)
+undergo arithmetic expansion as if they were enclosed in tt($((...))).
+
+For example, the following:
+
+example([[ ( -f foo || -f bar ) && $report = y* ]] && print File exists.)
+
+tests if either file tt(foo) or file tt(bar) exists, and if so, if the
+value of the parameter tt(report) begins with `tt(y)'; if the complete
+condition is true, the message `tt(File exists.)' is printed.

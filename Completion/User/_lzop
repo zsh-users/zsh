@@ -58,7 +58,7 @@ _arguments -C -s \
   '(--outfile)-o[specify output file]:output file:_files' \
   '(-o)--outfile=[specify output file]:output file:_files' \
   '(--path)-p[write output files to specified directory]:directory:_files -/' \
-  '(-p)--path=[[write output files to specified directory]:directory:_files -/' \
+  '(-p)--path=[write output files to specified directory]:directory:_files -/' \
   '(--no-checksum)-F[do not store or verify a checksum]' \
   '(-F)--no-checksum[do not store or verify a checksum]' \
   "(--keep -U --unlink --delete)-k[keep (don't delete) input files]" \

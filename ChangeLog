@@ -1,3 +1,13 @@
+2000-05-16  Bart Schaefer  <schaefer@zsh.org>
+
+	* Felix Rosencrantz: 11398: Completion/User/_lzop,
+	Completion/Bsd/_bsd_pkg: Fix typos in option descriptions.
+
+	* 11378: Functions/Misc/is-at-least, Misc/make-zsh-urls: Remove
+	RCS Id strings.
+
+	* unposted: Doc/Zsh/cond.yo: Yodl off some excess whitespace.
+	
 2000-05-16  Tanaka Akira  <akr@zsh.org>
 
 	* 11415: Completion/User/_cvs: follow the new matcher-list behaviour.

@@ -49,7 +49,7 @@ _bsd_pkg() {
 	'-c[show comment fields]' \
 	'-d[show long descriptions]' \
 	'-D[show install-message files]' \
-        '-f[show packing list instrcutions]' \
+        '-f[show packing list instructions]' \
 	'-i[show install scripts]' \
 	'-I[show index lines]' \
 	'-k[show deinstall scripts]' \
