@@ -23,7 +23,6 @@ local exp word sort expr expl subd suf=" " force opt asp tmp opre pre epre
 if [[ "$force" = *c* ]] ||
    zstyle -t ":completion:${curcontext}:" completions; then
   compstate[insert]=all
-  [[ "$curcontext" = expand-word:* ]] && _complete && return 0
   return 1
 fi
 

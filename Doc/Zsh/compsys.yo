@@ -971,7 +971,8 @@ item(tt(completions))(
 This style is used by the tt(_expand) completer function. If it is set 
 to `true', the completer will not generate expansions, but instead the
 completions will be generated as normal and all of them will be
-inserted into the command line.
+inserted into the command line.  This style is most useful when set
+only for very specific completion contexts.
 )
 kindex(condition, completion style)
 item(tt(condition))(
@@ -2302,10 +2303,9 @@ string from the line.
 Which kind of expansion is tried is controlled by the tt(substitute),
 tt(glob) and tt(subst-globs-only) styles.
 
-There is another style, tt(completions), which allows tt(_expand) to
-display or insert all em(completions) generated for the string.  The use of
-this is that the tags tt(expansions) and tt(all-expansions) are available,
-unlike with tt(_complete).
+There is another style, tt(completions), which causes tt(_expand) to
+unconditionally insert all em(completions) generated for the current
+word (even if the word is empty).
 
 When tt(_expand) is called as a function, the different modes may be
 selected with options.  The tt(-c) corresponds to the tt(completions)
@@ -2486,6 +2486,12 @@ item(tt(_expand_word (^Xe)))(
 Performs expansion on the current word:  equivalent to the standard
 tt(expand-word) command, but using the tt(_expand) completer.  Before
 calling it, the var(function) field is set to `tt(expand-word)'.
+
+The tt(completions) style is also tested in the resulting context.  When
+it is true, the list of functions from the tt(completer) style is shifted
+to remove any that would be called ahead of tt(_expand).  If tt(_expand)
+does not appear in the tt(completer) style, then only the two completers
+tt(_expand) and tt(_complete) are used (in that order).
 )
 findex(_generic)
 item(tt(_generic))(
