@@ -3,7 +3,10 @@
 local prev="$words[CURRENT-1]" file expl tmp is_gnu dir incl
 
 expandVars() {
-    local open close var val tmp=$1 ret=$1
+    local open close var val tmp=$2 ret=$2
+    if (( $1 == 0 )); then
+	return
+    fi
     while :; do
 	var=${tmp#*\$}
 	if [[ $var != $tmp ]]; then
@@ -37,7 +40,7 @@ expandVars() {
 	    case $var in
 	    ([[:alnum:]_]#)
 		val=${(P)var}
-		val=$(expandVars $val)
+		val=$(expandVars $(($1 - 1)) $val)
 		ret=${ret//\$$open$var$close/$val}
 		;;
 	    esac
@@ -63,12 +66,12 @@ parseMakefile() {
 	    var=${input%%[ $TAB]#:=*}
 	    val=${input#*=}
 	    val=${val##[ $TAB]#}
-	    val=$(expandVars $val)
+	    val=$(expandVars 10 $val)
 	    eval $var=\$val
 	    ;;
 	([[:alnum:]][^$TAB:=]#:[^=]*)
 	    input=${input%%:*}
-	    print $(expandVars $input)
+	    print $(expandVars 10 $input)
 	    ;;
 	($incl *)
 	    local f=${input##$incl ##}
@@ -76,7 +79,7 @@ parseMakefile() {
 		f=${f#[\"<]}
 		f=${f%[\">]}
 	    fi
-	    f=$(expandVars $f)
+	    f=$(expandVars 10 $f)
 	    case $f in
 	    (/*) ;;
 	    (*)  f=$dir/$f ;;
