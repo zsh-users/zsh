@@ -1526,7 +1526,7 @@ exalias(void)
 	    } else if (incond && !strcmp(yytext, "]]")) {
 		tok = DOUTBRACK;
 		incond = 0;
-	    } else if (incond && yytext[0] == '!' && !yytext[1])
+	    } else if (incond == 1 && yytext[0] == '!' && !yytext[1])
 		tok = BANG;
 	}
 	inalmore = 0;
