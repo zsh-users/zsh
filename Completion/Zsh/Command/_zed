@@ -1,0 +1,7 @@
+#compdef zed fned
+
+case $service in
+(fned) _arguments ':shell function:_functions';;
+(zed) _arguments '(-):file:_files' \
+	'(:)-f[edit function]:shell function:_functions';;
+esac
