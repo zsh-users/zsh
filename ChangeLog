@@ -1,5 +1,11 @@
 2001-03-26  Clint Adams  <schizo@debian.org>
 
+	* 13783 from Michal Politowski: Completion/Builtins/_pids:
+	handle pids that don't have a preceding space in ps output.
+
+	* 13779 from Michal Politowski: Completion/Commands/_complete_tag:
+	typo fixes?
+
 	* 13777: Src/Builtins/rlimits.awk: add maxfilelocks
 	for glibc 2.2.
 
