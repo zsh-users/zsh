@@ -316,7 +316,7 @@ for prepath in "$prepaths[@]"; do
       # collected as the suffixes to make the completion code expand
       # it as far as possible.
 
-      if [[ "$tsuf" = */* ]]; then
+      if [[ "$tpre" = */* ]]; then
         PREFIX="${donepath}${linepath}${cpre}${tpre%%/*}"
 	SUFFIX="/${tsuf#*/}"
       else
@@ -390,8 +390,8 @@ for prepath in "$prepaths[@]"; do
   done
 
   if [[ -z "$tmp4" ]]; then
-    PREFIX="${opre}"
-    SUFFIX="${osuf}"
+    PREFIX="${opre}${osuf}"
+    SUFFIX=""
     compadd -Qf -p "$linepath${testpath:q}" \
 	    -W "$prepath$realpath$testpath" "$ignore[@]" \
 	    "$addpfx[@]" "$addsfx[@]" "$remsfx[@]" \
