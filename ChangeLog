@@ -1,3 +1,11 @@
+2002-03-21  Peter Stephenson  <pws@csr.com>
+
+	* 16879: Functions/Zle/up-line-or-beginning-search,
+	Functions/Zle/down-line-or-beginning-search,
+	Doc/Zsh/contrib.yo: originally by Bart --- widgets which
+	combine up-line-or-search and history-beginning-search-backward
+	behaviour.
+
 2002-03-19  Oliver Kiddle  <opk@zsh.org>
 
 	* 16864: Completion/Unix/Command/ssh: fix remote file completion

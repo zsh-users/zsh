@@ -430,6 +430,17 @@ zle -N history-beginning-search-forward-end \
 bindkey '\e^P' history-beginning-search-backward-end
 bindkey '\e^N' history-beginning-search-forward-end)
 )
+tindex(up-line-or-beginning-search)
+tindex(down-line-or-beginning-search)
+item(tt(up-line-or-beginning-search), tt(down-line-or-beginning-search))(
+These widgets are similar to the builtin functions tt(up-line-or-search)
+and tt(down-line-or-search):  if in a multiline buffer they move up or
+down within the buffer, otherwise they search for a history line matching
+the start of the current line.  In this case, however, they search for
+a line which matches the current line up to the current cursor position, in
+the manner of tt(history-begining-search-backward) and tt(-forward), rather
+than the first word on the line.
+)
 tindex(incarg)
 vindex(incarg, use of)
 item(tt(incarg))(

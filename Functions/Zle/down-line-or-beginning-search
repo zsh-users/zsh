@@ -1,0 +1,13 @@
+# Like down-line-or-search, but uses the whole line prefix up to the
+# cursor position for searching forwards.
+
+if [[ $LASTWIDGET != $WIDGET ]]
+then
+    if [[ $LBUFFER == *$'\n'* ]]
+    then
+        __last_down_line=down-line-or-history
+    else
+        __last_down_line=history-beginning-search-forward
+    fi
+fi
+zle .${__last_down_line:-beep}

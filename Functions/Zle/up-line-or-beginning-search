@@ -1,0 +1,13 @@
+# Like up-line-or-search, but uses the whole line prefix up to the
+# cursor position for searching backwards.
+
+if [[ $LASTWIDGET != $WIDGET ]]
+then
+    if [[ $LBUFFER == *$'\n'* ]]
+    then
+        __last_up_line=up-line-or-history
+    else
+        __last_up_line=history-beginning-search-backward
+    fi
+fi
+zle .${__last_up_line:-beep}
