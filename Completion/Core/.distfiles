@@ -3,7 +3,7 @@ DISTFILES_SRC='
     _alternative _approximate _compalso _complete _correct _description
     _expand _files _funcall _list _main_complete _match 
     _matcher _menu _multi_parts _message _normal _oldlist 
-    _options _parameters _path_files _requested
+    _options _parameters _path_files _prefix _requested
     _sep_parts _set_options _setup _sort_tags _tags
     _unset_options _wanted
     compdump compinit compinstall
