@@ -71,7 +71,7 @@ if (( long )); then
 
     lopts=("--${(@)^${(@)${(@)${(@M)${(@ps:\n:j:\n:)${(@)${(@M)${(@f)$(${~words[1]} --help 2>&1)//\[--/
 --}:#[ 	]#-*}//,/
-}}:#[ 	]#--*}#*--}%%[, ]*}:#}")
+}}:#[ 	]#--*}#*--}%%[], ]*}:#}")
 
     # Now remove all ignored options ...
 
@@ -227,7 +227,8 @@ if comparguments -i "$compconfig[autodescribe_options]" "$@"; then
 
     if [[ -z "$matched" ]] &&
        comparguments -O next direct odirect equal &&
-       [[ ( ( nm -eq compstate[nmatches] || -n "$noargs" ) && -z "$aret" ) ||
+       [[ ( ( nm -eq compstate[nmatches] || -n "$noargs" ) &&
+            -z "$aret" && -z "$mesg" ) ||
           -z "$compconfig[option_prefix]" || 
           "$compconfig[option_prefix]" = *\!${cmd}* ||
           "$PREFIX" = [-+]* ]]; then
@@ -246,6 +247,7 @@ if comparguments -i "$compconfig[autodescribe_options]" "$@"; then
 	  compadd "$expl[@]" -QqS= - "${PREFIX}${SUFFIX}"
         else
 	  tmp1=( "$next[@]" "$direct[@]" "$odirect[@]" "$equal[@]" )
+	  tmp1=( "${(M@)tmp1:#[-+]?(|:*)}" )
 	  tmp2=( "${PREFIX}${(@M)^${(@)${(@)tmp1%%:*}#[-+]}:#?}" )
 
           _describe -o -c "$cmd" option tmp1 tmp2 -Q -S ''

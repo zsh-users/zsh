@@ -1,14 +1,14 @@
 #compdef bison
 
 _arguments -s \
-  '(--file-prefix)-b[specify output file prefix]:output file prefix:' \
+  '(--file-prefix)-b+[specify output file prefix]:output file prefix:' \
   '(--defines)-d[write token definition file]' \
   '(--raw)-r[output bison token numbers]' \
   '(--token-table)-k[output token table]' \
   '(--no-lines)-l[don'"'"'t generate #line directives]' \
   '(--no-parser)-n[don'"'"'t generate parse (only declarations)]' \
-  '(--output-file)-o[specify parser output file name]:parser file name:_files' \
-  '(--name-prefix)-p[change yy prefix]:prefix string:' \
+  '(--output-file)-o+[specify parser output file name]:parser file name:_files' \
+  '(--name-prefix)-p+[change yy prefix]:prefix string:' \
   '(--debug)-t[output YYDEBUG definition]' \
   '(--verbose)-v[verbose mode]' \
   '(--version)-V[show version]' \

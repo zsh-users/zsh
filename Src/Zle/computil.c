@@ -696,7 +696,8 @@ parse_cadef(char *nam, char **args)
 		opt->name = ztrdup(name);
 		if (descr)
 		    opt->descr = ztrdup(descr);
-		else if (adpre && oargs && !oargs->next)
+		else if (adpre && oargs && !oargs->next &&
+			 oargs->descr && oargs->descr[0])
 		    opt->descr = tricat(adpre, oargs->descr, adsuf);
 		else
 		    opt->descr = NULL;
@@ -1118,8 +1119,15 @@ ca_parse_line(Cadef d)
 	    ca_laststate.doff = 0;
 	} else if (cur == compcurrent && !ca_laststate.def) {
 	    if ((ca_laststate.def = ddef)) {
-		ca_laststate.doff = doff;
-		ca_laststate.opt = 0;
+		ca_laststate.singles = state.singles;
+		if (state.curopt && state.curopt->type == CAO_NEXT) {
+		    ca_laststate.ddef = ddef;
+		    ca_laststate.def = NULL;
+		    ca_laststate.opt = 1;
+		} else {
+		    ca_laststate.doff = doff;
+		    ca_laststate.opt = 0;
+		}
 	    } else {
 		ca_laststate.def = adef;
 		ca_laststate.ddef = NULL;

@@ -36,7 +36,7 @@ if compvalues -i "$@"; then
     else
       compvalues -d descr
       if [[ ${#noargs}+${#args}+${#opts} -ne 1 ]] && compvalues -s sep; then
-        sep=( "-qQS$sep" )
+        sep=( "-qQS" "$sep" )
       else
         sep=()
       fi
