@@ -1,3 +1,10 @@
+2004-10-18  Wayne Davison  <wayned@users.sourceforge.net>
+
+	* 20499 (modified): Src/builtin.c, Src/exec.c, Src/hist.c,
+	Src/string.c, Src/utils.c, Src/Modules/zftp.c: improved gettempname(),
+	added bicat(), and used these improvements to make the history-file
+	locking better.
+
 2004-10-18  Peter Stephenson  <pws@csr.com>
 
 	* 20500: Misc/globtests, Src/glob.c, Src/pattern.c, Src/zsh.h,
