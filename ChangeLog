@@ -1,5 +1,9 @@
 2001-07-05  Peter Stephenson  <pws@csr.com>
 
+	* 15264: Doc/Zsh/grammar.yo: improve description of use of
+	variant complex command forms to avoid confusing the present
+	writer.
+
 	* 15261: Test/E01options.ztst, Test/ztst.zsh: remaining easy
 	option tests.
 

@@ -272,11 +272,16 @@ cindex(commands, alternate forms for complex)
 Many of zsh's complex commands have alternate forms.  These particular
 versions of complex commands should be considered deprecated and may be
 removed in the future.  The versions in the previous section should be
-preferred instead.  The short versions below only work if var(sublist)
-is of the form `tt({) var(list) tt(})' or if the tt(SHORT_LOOPS)
-option is set.  In this case, the test part of the loop must also be
-suitably delimited, such as by `tt([[ ... ]])' or `tt((( ... )))', else
-the end of the test will not be recognized.
+preferred instead.
+
+The short versions below only work if var(sublist) is of the form `tt({)
+var(list) tt(})' or if the tt(SHORT_LOOPS) option is set.  For the tt(if),
+tt(while) and tt(until) commands, in both these cases the test part of the
+loop must also be suitably delimited, such as by `tt([[ ... ]])' or `tt(((
+... )))', else the end of the test will not be recognized.  For the
+tt(for), tt(repeat), tt(case) and tt(select) commands no such special form
+for the arguments is necessary, but the other condition (the special form
+of var(sublist) or use of the tt(SHORT_LOOPS) option) still applies.
 
 startitem()
 item(tt(if) var(list) tt({) var(list) tt(}) [ tt(elif) var(list) tt({) var(list) tt(}) ] ... [ tt(else {) var(list) tt(}) ])(
@@ -296,7 +301,8 @@ example(if true {  # Does not work!
 does em(not), since the test is not suitably delimited.
 )
 item(tt(if) var(list) var(sublist))(
-A short form of the alternate `if'.
+A short form of the alternate `if'.  The same limitations on the form of
+var(list) apply as for the previous form.
 )
 item(tt(for) var(name) ... tt(LPAR()) var(word) ... tt(RPAR()) var(sublist))(
 A short form of tt(for).
@@ -312,10 +318,12 @@ item(tt(foreach) var(name) ... tt(LPAR()) var(word) ... tt(RPAR()) var(list) tt(
 Another form of tt(for).
 )
 item(tt(while) var(list) tt({) var(list) tt(}))(
-An alternative form of tt(while).
+An alternative form of tt(while).  Note the limitations on the form of
+var(list) mentioned above.
 )
 item(tt(until) var(list) tt({) var(list) tt(}))(
-An alternative form of tt(until).
+An alternative form of tt(until).  Note the limitations on the form of
+var(list) mentioned above.
 )
 item(tt(repeat) var(word) var(sublist))(
 This is a short form of tt(repeat).
