@@ -7,7 +7,7 @@
 # the expansions done produce no result or do not change the original
 # word from the line.
 
-local exp word="$PREFIX$SUFFIX" sort expr expl
+local exp word="$PREFIX$SUFFIX" sort expr expl subd
 local curcontext="${curcontext/:[^:]#:/:expand:}"
 
 # First, see if we should insert all *completions*.
@@ -34,17 +34,25 @@ zstyle -s ":completion:${curcontext}:" substitute expr &&
 
 [[ -z "$exp" ]] && exp=("$word")
 
+subd="$exp"
+
 # Now try globbing.
 
 zstyle -s ":completion:${curcontext}:" glob expr &&
     [[ "${(e):-\$[$expr]}" -eq 1 ]] &&
     exp=( ${~exp}(N) )
-
+ 
 # If we don't have any expansions or only one and that is the same
 # as the original string, we let other completers run.
 
 [[ $#exp -eq 0 ||
    ( $#exp -eq 1 && "$exp[1]" = "$word"(|\(N\)) ) ]] && return 1
+
+# With subst-globs-only we bail out if there were no glob expansions,
+# regardless of any substitutions
+zstyle -s ":completion:${curcontext}:" subst-globs-only expr &&
+    [[ "${(e):-\$[$expr]}" -eq 1 ]] &&
+    [[ "$subd" = "$exp"(|\(N\)) ]] && return 1
 
 # Now add as matches whatever the user requested.
 
