@@ -1670,10 +1670,14 @@ possibilities if the tt(AUTO_LIST) option is set.
 Any other character that is not bound to tt(self-insert) or
 tt(self-insert-unmeta) will beep and be ignored.
 The bindings of the current insert mode will be used.
+
+Currently this command may not be redefined or called by name.
 )
 tindex(execute-last-named-cmd)
 item(tt(execute-last-named-cmd) (ESC-z) (unbound) (unbound))(
 Redo the last function executed with tt(execute-named-cmd).
+
+Currently this command may not be redefined or called by name.
 )
 tindex(get-line)
 item(tt(get-line) (ESC-G ESC-g) (unbound) (unbound))(

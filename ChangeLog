@@ -1,3 +1,9 @@
+2005-03-21  Peter Stephenson  <pws@csr.com>
+
+	* 21042: Src/Zle/zle_main.c, Doc/Zsh/zle.yo: test for and
+	document limitation that execute-named-comand and
+	execute-last-named-command can't be redefined or called by name.
+
 2005-03-18  Wayne Davison  <wayned@users.sourceforge.net>
 
 	* 20984 (modified): Src/zsh.h, Src/options.c, Src/hist.c,
