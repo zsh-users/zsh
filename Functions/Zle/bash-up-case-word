@@ -1,0 +1,9 @@
+# This implements a bash-style up-case-word.
+# To use,
+#   zle -N bash-up-case-word
+#   bindkey '...' bash-up-case-word
+# or if you wish to replace existing up-case-word bindings,
+#   zle -N up-case-word bash-up-case-word
+
+local WORDCHARS=''
+zle .up-case-word
