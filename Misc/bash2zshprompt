@@ -25,7 +25,7 @@ while (<>) {
   # UGH
   elsif (! $seen_fn_end && $seen_fn) {
     s/^\s*/  /;
-    s/^\s*}\s*$/\n  precmd () { }\n  preexec () { }\n}\n/ and $seen_fn_end++;
+    s/^\s*}\s*$/\n  precmd () { setopt promptsubst }\n  preexec () { }\n}\n/ and $seen_fn_end++;
   }
 
   s/\\\[/%{/g;
