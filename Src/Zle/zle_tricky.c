@@ -2308,7 +2308,7 @@ fixmagicspace(void)
      * since lastchar is a full character, but it's safer anyway...
      */
     lastchar_wide = L' ';
-    lastchar_wide_valid = TRUE;
+    lastchar_wide_valid = 1;
 #endif
 }
 

@@ -4,6 +4,8 @@
 
 2005-02-18  Peter Stephenson  <pws@csr.com>
 
+	* 20828: Src/zle_main.c, Src/zle_misc.c: typos in 20822.
+
 	* 20823: Src/Modules/stat.c: debugging test failed on 64-bit
 	machines.
 

@@ -86,7 +86,7 @@ fixunmeta(void)
      * with multibyte input.
      */
     lastchar_wide = (ZLE_CHAR_T)lastchar;
-    lastchar_wide_valid = TRUE;
+    lastchar_wide_valid = 1;
 #endif
 }
 
