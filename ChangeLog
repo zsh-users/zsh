@@ -1,5 +1,8 @@
 2004-12-25  Clint Adams  <clint@zsh.org>
 
+	* 20637: Completion/Debian/Command/_lintian: add
+	completion for 'lintian', a Debian package checker.
+
 	* 20636: Completion/Unix/Command/_bogofilter: add
 	completion for 'bogofilter' and 'bogotune' commands.
 
