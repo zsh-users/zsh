@@ -2876,7 +2876,7 @@ Like tt(_tags) this function supports the tt(-C) option to give a
 different name for the argument context field.
 )
 findex(_arguments)
-item(tt(_arguments) var(spec) ...)(
+item(tt(_arguments) [ tt(-ACS) ] [ tt(-O) var(name) ] [ tt(-M) var(matchspec) ] var(spec) ...)(
 This function can be used to complete words on the line by describing the
 options and arguments which may be passed to the command for which
 completion is being performed.  The description is given as arguments to
