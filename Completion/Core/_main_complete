@@ -19,7 +19,7 @@
 setopt localoptions nullglob rcexpandparam extendedglob
 unsetopt markdirs globsubst shwordsplit nounset ksharrays
 
-local comp post ret=1 _compskip format _comp_ignore \
+local comp post ret=1 tmp _compskip format _comp_ignore \
       _completers _completer _completer_num \
       _matchers _matcher _matcher_num \
       context state line opt_args val_args curcontext="$curcontext" \
@@ -80,7 +80,24 @@ for _completer; do
   (( _completer_num++ ))
 done
 
-if [[ $compstate[nmatches] -gt 1 ]]; then
+if zstyle -s ":completion:${curcontext}:" single-ignored tmp &&
+   [[ $compstate[old_list] != shown &&
+      $compstate[nmatches] = 0 &&
+      $compstate[alternate_nmatches] = 1 ]]; then
+  case "$tmp" in
+  show) compstate[insert]='' compstate[list]='list force' tmp='' ;;
+  menu)
+    local expl
+
+    compstate[insert]='menu'
+    _description original expl original    
+    compadd "$expl[@]" -a -S '' - "$PREFIX$SUFFIX"
+    ;;
+  *) tmp='' ;;
+  esac
+fi
+
+if [[ -n "$tmp" || $compstate[nmatches] -gt 1 ]]; then
   [[ _last_nmatches -ge 0 && _last_nmatches -ne compstate[nmatches] ]] &&
       _menu_style=( "$_last_menu_style[@]" "$_menu_style[@]" )
 
