@@ -1,3 +1,8 @@
+2001-03-06  Sven Wischnowsky  <wischnow@zsh.org>
+
+	* 13575: Src/Zle/compmatch.c: another fix for completion matching,
+ 	CLF_MISS in the wrong cline struct
+	
 2001-03-06  Andrej Borsenkow <bor@zsh.org>
 
 	* 13544, 13568 (Peter): Completion/Core/_ignored,
