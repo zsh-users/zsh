@@ -1078,6 +1078,7 @@ par_simple(Cmd c)
 		sl->left = pl = (Pline) allocnode(N_PLINE);
 		pl->type = END;
 		pl->left = par_cmd();
+		c->u.list = l;
 	    }
 	    cmdpop();
 	    c->type = FUNCDEF;
