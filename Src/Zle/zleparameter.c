@@ -146,7 +146,8 @@ scanpmwidgets(HashTable ht, ScanFunc func, int flags)
 	for (hn = thingytab->nodes[i]; hn; hn = hn->next) {
 	    pm.nam = hn->nam;
 	    if (func != scancountparams &&
-		(flags & (SCANPM_WANTVALS|SCANPM_MATCHVAL)))
+		((flags & (SCANPM_WANTVALS|SCANPM_MATCHVAL)) ||
+		 !(flags & SCANPM_WANTKEYS)))
 		pm.u.str = widgetstr(((Thingy) hn)->widget);
 	    func((HashNode) &pm, flags);
 	}
@@ -189,7 +190,7 @@ static struct pardef partab[] = {
     { "widgets", PM_READONLY,
       getpmwidgets, scanpmwidgets, hashsetfn,
       NULL, NULL, stdunsetfn, NULL },
-    { "keymaps", PM_ARRAY|PM_HIDE|PM_SPECIAL|PM_READONLY,
+    { "keymaps", PM_ARRAY|PM_SPECIAL|PM_READONLY,
       NULL, NULL, NULL,
       arrsetfn, keymapsgetfn, stdunsetfn, NULL },
     { NULL, 0, NULL, NULL, NULL, NULL, NULL, NULL, NULL }
@@ -219,7 +220,7 @@ boot_zleparameter(Module m)
 	    if (def->hsetfn)
 		def->pm->sets.hfn = def->hsetfn;
 	} else {
-	    if (!(def->pm = createparam(def->name, def->flags)))
+	    if (!(def->pm = createparam(def->name, def->flags | PM_HIDE)))
 		return 1;
 	    def->pm->sets.afn = def->setfn;
 	    def->pm->gets.afn = def->getfn;
