@@ -11,7 +11,7 @@ _arguments -s '(--install)-i[install packages]:Debian package:_files -g \*.deb' 
            '--update-avail[update available]:package file:_files' \
            '--merge-avail[merge available]:package file:_files' \
            '--clear-avail[clear available]' \
-           '--forget-old-avail[forget uninstalled unavailable]' \
+           '--forget-old-unavail[forget uninstalled unavailable]' \
            '(--status)-s[display package status]:packages:_deb_packages avail' \
            '(--print-avail)-p[display available details]:packages:_deb_packages avail' \
            '(--listfiles)-L[list owned files]:packages:_deb_packages installed' \
