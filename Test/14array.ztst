@@ -23,7 +23,7 @@
 >..
 
   echo .$foo[1,-8].
-0:An empty slice with a negative length
+0:An empty slice with a negative end
 >..
 
   echo .$foo[0].
@@ -47,7 +47,7 @@
 >.b.
 
   echo .$foo[2,-4].
-0:A slice with a negative length
+0:A slice with a negative end
 >.b c d.
 
   echo .$foo[-4,5].
@@ -55,7 +55,7 @@
 >.d e.
 
   echo .$foo[-6,-2].
-0:A slice with both items negative
+0:A slice with a negative start and end
 >.b c d e f.
 
   setopt ksh_arrays
