@@ -53,6 +53,8 @@ ZTST_mainopts=(${(kv)options})
 ZTST_testdir=$PWD
 ZTST_testname=$1
 
+integer ZTST_testfailed
+
 # The source directory is not necessarily the current directory,
 # but if $0 doesn't contain a `/' assume it is.
 if [[ $0 = */* ]]; then
@@ -99,8 +101,8 @@ ZTST_testfailed() {
     print -r "Was testing: $ZTST_message"
   fi
   print -r "$ZTST_testname: test failed."
-  ZTST_cleanup
-  exit 1
+  ZTST_testfailed=1
+  return 1
 }
 
 # Print messages if $ZTST_verbose is non-empty
@@ -114,7 +116,10 @@ ZTST_hashmark() {
   (( SECONDS > COLUMNS+1 && (SECONDS -= COLUMNS) ))
 }
 
-[[ ! -r $ZTST_testname ]] && ZTST_testfailed "can't read test file."
+if [[ ! -r $ZTST_testname ]]; then
+  ZTST_testfailed "can't read test file."
+  exit 1
+fi
 
 exec 8>&1
 exec 9<$ZTST_testname
@@ -136,15 +141,18 @@ ZTST_getline() {
 
 # Get the name of the section.  It may already have been read into
 # $curline, or we may have to skip some initial comments to find it.
+# If argument present, it's OK to skip the reset of the current section,
+# so no error if we find garbage.
 ZTST_getsect() {
   local match mbegin mend
 
   while [[ $ZTST_curline != '%'(#b)([[:alnum:]]##)* ]]; do
     ZTST_getline || return 1
     [[ $ZTST_curline = [[:blank:]]# ]] && continue
-    if [[ $ZTST_curline != '%'[[:alnum:]]##* ]]; then
+    if [[ $# -eq 0 && $ZTST_curline != '%'[[:alnum:]]##* ]]; then
       ZTST_testfailed "bad line found before or after section:
 $ZTST_curline"
+      exit 1
     fi
   done
   # have the next line ready waiting
@@ -194,6 +202,7 @@ case $char in
   '?') fn=$ZTST_err
        ;;
    *)  ZTST_testfailed "bad redir operator: $char"
+       return 1
        ;;
 esac
 if [[ $ZTST_flags = *q* ]]; then
@@ -201,6 +210,8 @@ if [[ $ZTST_flags = *q* ]]; then
 else
   print -r -- "$ZTST_redir" >>$fn
 fi
+
+return 0
 }
 
 # Execute an indented chunk.  Redirections will already have
@@ -278,21 +289,23 @@ $ZTST_curline"
 	  else
 	    ZTST_testfailed "expecting test status at:
 $ZTST_curline"
+	    return 1
 	  fi
 	  ZTST_getline
 	  found=1
 	  ;;
-	'<'*) ZTST_getredir
+	'<'*) ZTST_getredir || return 1
 	  found=1
 	  ;;
-	'>'*) ZTST_getredir
+	'>'*) ZTST_getredir || return 1
 	  found=1
 	  ;;
-	'?'*) ZTST_getredir
+	'?'*) ZTST_getredir || return 1
 	  found=1
 	  ;;
 	*) ZTST_testfailed "bad line in test block:
 $ZTST_curline"
+	  return 1
           ;;
       esac
     done
@@ -311,6 +324,7 @@ $ZTST_curline"
 $ZTST_code${$(<$ZTST_terr):+
 Error output:
 $(<$ZTST_terr)}"
+	return 1
       fi
 
       ZTST_verbose 2 "ZTST_test: test produced standard output:
@@ -324,6 +338,7 @@ $(<$ZTST_terr)"
 $ZTST_code${$(<$ZTST_terr):+
 Error output:
 $(<$ZTST_terr)}"
+	return 1
       fi
       if [[ $ZTST_flags != *D* ]] && ! ZTST_diff -c $ZTST_err $ZTST_terr; then
 	ZTST_testfailed "error output differs from expected as shown above for:
@@ -348,11 +363,13 @@ ZTST_sects=(prep 0 test 0 clean 0)
 print "$ZTST_testname: starting."
 
 # Now go through all the different sections until the end.
-while ZTST_getsect; do
+ZTST_skipok=
+while ZTST_getsect $ZTST_skipok; do
   case $ZTST_cursect in
     prep) if (( ${ZTST_sects[prep]} + ${ZTST_sects[test]} + \
 	        ${ZTST_sects[clean]} )); then
 	    ZTST_testfailed "\`prep' section must come first"
+            exit 1
 	  fi
 	  ZTST_prepclean
 	  ZTST_sects[prep]=1
@@ -360,22 +377,28 @@ while ZTST_getsect; do
     test)
 	  if (( ${ZTST_sects[test]} + ${ZTST_sects[clean]} )); then
 	    ZTST_testfailed "bad placement of \`test' section"
+	    exit 1
 	  fi
+	  # careful here: we can't execute ZTST_test before || or &&
+	  # because that affects the behaviour of traps in the tests.
 	  ZTST_test
+	  (( $? )) && ZTST_skipok=1
 	  ZTST_sects[test]=1
 	  ;;
     clean)
 	   if (( ${ZTST_sects[test]} == 0 || ${ZTST_sects[clean]} )); then
 	     ZTST_testfailed "bad use of \`clean' section"
+	   else
+	     ZTST_prepclean 1
+	     ZTST_sects[clean]=1
 	   fi
-	   ZTST_prepclean 1
-	   ZTST_sects[clean]=1
+	   ZTST_skipok=
 	   ;;
     *) ZTST_testfailed "bad section name: $ZTST_cursect"
        ;;
   esac
 done
 
-print "$ZTST_testname: all tests successful."
+(( $ZTST_testfailed )) || print "$ZTST_testname: all tests successful."
 ZTST_cleanup
-exit 0
+exit $(( ZTST_testfailed ))
