@@ -168,14 +168,15 @@ uninstall: uninstall.man
 install.man: $(MAN)
 	$(sdir_top)/mkinstalldirs $(DESTDIR)$(mandir)/man1
 	for file in $(MAN); do \
-	  tzsh=`echo $$file | sed '$(transform)'`; \
+	  tzsh=`echo zsh | sed '$(transform)'`; \
+	  tfile=`echo $$file | sed "s/zsh/$$tzsh/"`; \
 	  if test -f $$file; then \
-	    cp -f $$file $$tzsh; \
+	    cp -f $$file $$tfile; \
 	  elif test -f $(sdir)/$$file; then \
-	    cp -f $(sdir)/$$file $$tzsh; \
+	    cp -f $(sdir)/$$file $$tfile; \
 	  else :; \
 	  fi || exit 1; \
-	  $(INSTALL_DATA) $$tzsh $(DESTDIR)$(mandir)/man1 || exit 1; \
+	  $(INSTALL_DATA) $$tfile $(DESTDIR)$(mandir)/man1 || exit 1; \
 	done
 
 # install info pages, creating install directory if necessary
@@ -203,7 +204,8 @@ install.html: zsh_toc.html
 uninstall.man:
 	for file in $(MAN); do \
 	  tzsh=`echo zsh | sed '$(transform)'`; \
-	  rm -f $(DESTDIR)$(mandir)/man1/$$tzsh; \
+	  tfile=`echo $$file | sed "s/zsh/$$tzsh/"`; \
+	  rm -f $(DESTDIR)$(mandir)/man1/$$tfile; \
 	done
 
 # uninstall info pages
