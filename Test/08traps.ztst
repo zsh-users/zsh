@@ -175,3 +175,12 @@
 >testunset
 >f
 >ERR-or!
+
+  f() {
+    setopt localtraps
+    TRAPWINCH() { print "Window changed.  That wrecked the test."; }
+  }
+  f
+  f
+  functions TRAPWINCH
+1:Unsetting ordinary traps with localtraps.

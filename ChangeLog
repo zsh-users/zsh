@@ -1,5 +1,7 @@
 2000-06-14  Peter Stephenson  <pws@cambridgesiliconradio.com>
 
+	* 11902: Test/08traps.ztst: add test for localtraps with SIGWINCH.
+
 	* 11901: Src/signals.c: not one but two more bugs in trap
 	saving: sigfuncs wasn't reset for function signals, and dosavetrap()
 	didn't check sigtrapped before assuming sigfuncs was valid.
