@@ -1985,8 +1985,8 @@ case the colon at the end of the var(message) is needed. The only case
 where it can be left is when neither a var(message), nor a var(action) 
 is given.
 
-To include a colon in the var(message) or the var(action), it has to
-be preceded by a backslash.
+To include a colon in the option name, the var(message) or the
+var(action), it has to be preceded by a backslash.
 
 During the evaluation or execution of the action the array `tt(line)'
 will be set to the command name and normal arguments from the command

@@ -190,8 +190,8 @@ if comparguments -i "$autod" "$@"; then
     _tags options
   fi
 
-  while _tags; do
-    while true; do
+  while true; do
+    while _tags; do
       if [[ -n "$matched" ]] || _requested arguments; then
         _description expl "$descr"
 
@@ -286,30 +286,31 @@ if comparguments -i "$autod" "$@"; then
             equal -QqS= -M "$match"
         fi
       fi
-      if [[ -n "$opts" && -z "$aret$matched" &&
-            nm -eq compstate[nmatches] ]]; then
-
-        prefix="${PREFIX#*\=}"
-        suffix="$SUFFIX"
-        PREFIX="${PREFIX%%\=*}"
-        SUFFIX=''
-        compadd -M "$match" -D equal - "${(@)equal%%:*}"
-
-        if [[ $#equal -eq 1 ]]; then
-	  PREFIX="$prefix"
-	  SUFFIX="$suffix"
-	  IPREFIX="${IPREFIX}${equal[1]%%:*}="
-	  matched=yes
-
-	  comparguments -L "${equal[1]%%:*}" descr action subc
-	  curcontext="${oldcontext}:$subc"
-
-	  continue
-        fi
-      fi
-      break
     done
-    [[ -n "$aret" || nm -ne compstate[nmatches] ]] && break
+    if [[ -n "$opts" && -z "$aret$matched" &&
+          nm -eq compstate[nmatches] ]]; then
+
+      prefix="${PREFIX#*\=}"
+      suffix="$SUFFIX"
+      PREFIX="${PREFIX%%\=*}"
+      SUFFIX=''
+      compadd -M "$match" -D equal - "${(@)equal%%:*}"
+
+      if [[ $#equal -eq 1 ]]; then
+        PREFIX="$prefix"
+	SUFFIX="$suffix"
+	IPREFIX="${IPREFIX}${equal[1]%%:*}="
+	matched=yes
+
+	comparguments -L "${equal[1]%%:*}" descr action subc
+	curcontext="${oldcontext}:$subc"
+
+	_tags arguments
+
+	continue
+      fi
+    fi
+    break
   done
 
   [[ -z "$aret" || -z "$usecc" ]] && curcontext="$oldcontext"

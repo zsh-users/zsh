@@ -50,12 +50,15 @@ static void
 cdisp_calc(Cdisp disp, char **args)
 {
     char *cp;
-    int i;
+    int i, nbc;
 
     for (; *args; args++) {
-	if ((cp = strchr(*args, ':')) && cp[1]) {
+	for (nbc = 0, cp = *args; *cp && *cp != ':'; cp++)
+	    if (*cp == '\\' && cp[1])
+		cp++, nbc++;
+	if (*cp == ':' && cp[1]) {
 	    disp->colon++;
-	    if ((i = cp - *args) > disp->pre)
+	    if ((i = cp - *args - nbc) > disp->pre)
 		disp->pre = i;
 	    if ((i = strlen(cp + 1)) > disp->suf)
 		disp->suf = i;
@@ -70,7 +73,7 @@ cdisp_build(Cdisp disp, char *sep, char **args)
 {
     int sl = strlen(sep), pre = disp->pre, suf;
     VARARR(char, buf, disp->pre + disp->suf + sl + 1);
-    char **ret, **rp, *cp;
+    char **ret, **rp, *cp, *copy, *cpp, oldc;
 
     ret = (char **) zalloc((arrlen(args) + 1) * sizeof(char *));
 
@@ -78,18 +81,21 @@ cdisp_build(Cdisp disp, char *sep, char **args)
     suf = pre + sl;
 
     for (rp = ret; *args; args++) {
-	if ((cp = strchr(*args, ':')) && cp[1]) {
+	copy = dupstring(*args);
+	for (cp = cpp = copy; *cp && *cp != ':'; cp++) {
+	    if (*cp == '\\' && cp[1])
+		cp++;
+	    *cpp++ = *cp;
+	}
+	oldc = *cpp;
+	*cpp = '\0';
+	if (((cpp == cp && oldc == ':') || *cp == ':') && cp[1]) {
 	    memset(buf, ' ', pre);
-	    memcpy(buf, *args, (cp - *args));
+	    memcpy(buf, copy, (cpp - copy));
 	    strcpy(buf + suf, cp + 1);
 	    *rp++ = ztrdup(buf);
-	} else {
-	    if (cp)
-		*cp = '\0';
-	    *rp++ = ztrdup(*args);
-	    if (cp)
-		*cp = ':';
-	}
+	} else
+	    *rp++ = ztrdup(copy);
     }
     *rp = NULL;
 
@@ -153,6 +159,7 @@ freecdsets(Cdset p)
 }
 
 /* Initialisation. Store and calculate the string and matches and so on. */
+
 static int
 cd_init(char *nam, char *sep, char **args, int disp)
 {
@@ -218,15 +225,21 @@ cd_get(char **params)
 
     if ((set = cd_state.sets)) {
 	char **sd, **sdp, **md, **mdp, **ss, **ssp, **ms, **msp;
-	char **p, **mp, *cp;
+	char **p, **mp, *cp, *copy, *cpp, oldc;
 	int dl = 1, sl = 1, sepl = strlen(cd_state.sep);
 	int pre = cd_state.disp.pre, suf = cd_state.disp.suf;
 	VARARR(char, buf, pre + suf + sepl + 1);
 
 	for (p = set->strs; *p; p++)
-	    if (cd_state.showd && (cp = strchr(*p, ':')) && cp[1])
-		dl++;
-	    else
+	    if (cd_state.showd) {
+		for (cp = *p; *cp && *cp != ':'; cp++)
+		    if (*cp == '\\' && cp[1])
+			cp++;
+		if (*cp == ':' && cp[1])
+		    dl++;
+		else
+		    sl++;
+	    } else
 		sl++;
 
 	sd = (char **) zalloc(dl * sizeof(char *));
@@ -243,32 +256,34 @@ cd_get(char **params)
 
 	for (sdp = sd, ssp = ss, mdp = md, msp = ms,
 		 p = set->strs, mp = set->matches; *p; p++) {
-	    if ((cp = strchr(*p, ':')) && cp[1] && cd_state.showd) {
+	    copy = dupstring(*p);
+	    for (cp = cpp = copy; *cp && *cp != ':'; cp++) {
+		if (*cp == '\\' && cp[1])
+		    cp++;
+		*cpp++ = *cp;
+	    }
+	    oldc = *cpp;
+	    *cpp = '\0';
+	    if (((cpp == cp && oldc == ':') || *cp == ':') && cp[1] &&
+		cd_state.showd) {
 		memset(buf, ' ', pre);
-		memcpy(buf, *p, (cp - *p));
+		memcpy(buf, copy, (cpp - copy));
 		strcpy(buf + suf, cp + 1);
 		*sdp++ = ztrdup(buf);
 		if (mp) {
 		    *mdp++ = ztrdup(*mp);
 		    if (*mp)
 			mp++;
-		} else {
-		    *cp = '\0';
-		    *mdp++ = ztrdup(*p);
-		    *cp = ':';
-		}
+		} else
+		    *mdp++ = ztrdup(copy);
 	    } else {
-		if (cp)
-		    *cp = '\0';
-		*ssp++ = ztrdup(*p);
+		*ssp++ = ztrdup(copy);
 		if (mp) {
 		    *msp++ = ztrdup(*mp);
 		    if (*mp)
 			mp++;
 		} else
-		    *msp++ = ztrdup(*p);
-		if (cp)
-		    *cp = ':';
+		    *msp++ = ztrdup(copy);
 	    }
 	}
 	*sdp = *ssp = *mdp = *msp = NULL;
@@ -467,6 +482,25 @@ rembslashcolon(char *s)
 	if (s[0] != '\\' || s[1] != ':')
 	    *p++ = *s;
 	s++;
+    }
+    *p = '\0';
+
+    return r;
+}
+
+/* Add backslashes before colons. */
+
+static char *
+bslashcolon(char *s)
+{
+    char *p, *r;
+
+    r = p = zhalloc((2 * strlen(s)) + 1);
+
+    while (*s) {
+	if (*s == ':')
+	    *p++ = '\\';
+	*p++ = *s++;
     }
     *p = '\0';
 
@@ -766,7 +800,7 @@ parse_cadef(char *nam, char **args)
 		optp = &((*optp)->next);
 
 		opt->next = NULL;
-		opt->name = ztrdup(name);
+		opt->name = ztrdup(rembslashcolon(name));
 		if (descr)
 		    opt->descr = ztrdup(descr);
 		else if (adpre && oargs && !oargs->next &&
@@ -1414,14 +1448,15 @@ bin_comparguments(char *nam, char **args, char *ops, int func)
 		    default:          l = equal;   break;
 		    }
 		    if (p->descr) {
-			int len = strlen(p->name) + strlen(p->descr) + 2;
+			char *n = bslashcolon(p->name);
+			int len = strlen(n) + strlen(p->descr) + 2;
 
 			str = (char *) zhalloc(len);
-			strcpy(str, p->name);
+			strcpy(str, n);
 			strcat(str, ":");
 			strcat(str, p->descr);
 		    } else
-			str = p->name;
+			str = bslashcolon(p->name);
 		    addlinknode(l, str);
 		}
 	    }
