@@ -8,7 +8,7 @@
 	* Chmouel: 10440: Completion/Linux/_rpm: rpm tags should have %
 	in front.
 
-2000-04-03  Sven Wischnowsky <wischnow@informatik.hu-berlin.de>
+2000-04-04  Sven Wischnowsky <wischnow@informatik.hu-berlin.de>
 
 	* 10471: Completion/User/_imagemagick: new completion function
 
