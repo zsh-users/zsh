@@ -3259,11 +3259,10 @@ bin_dot(char *name, char **argv, char *ops, int func)
 {
     char **old, *old0 = NULL;
     int ret, diddot = 0, dotdot = 0;
-    char buf[PATH_MAX];
-    char *s, **t, *enam, *arg0;
+    char *s, **t, *enam, *arg0, *buf;
     struct stat st;
 
-    if (!*argv || strlen(*argv) >= PATH_MAX)
+    if (!*argv)
 	return 0;
     old = pparams;
     /* get arguments for the script */
@@ -3304,18 +3303,18 @@ bin_dot(char *name, char **argv, char *ops, int func)
 		    if (diddot)
 			continue;
 		    diddot = 1;
-		    strcpy(buf, arg0);
-		} else {
-		    if (strlen(*t) + strlen(arg0) + 1 >= PATH_MAX)
-			continue;
-		    sprintf(buf, "%s/%s", *t, arg0);
-		}
+		    buf = ztrdup(arg0);
+		} else
+		    buf = tricat(*t, "/", arg0);
+
 		s = unmeta(buf);
 		if (access(s, F_OK) == 0 && stat(s, &st) >= 0
 		    && !S_ISDIR(st.st_mode)) {
 		    ret = source(enam = buf);
+		    zsfree(buf);
 		    break;
 		}
+		zsfree(buf);
 	    }
 	}
     }
