@@ -100,13 +100,16 @@
   print -R ${(k)A[(r)qxstar]} $A[${(q)x}]
   # A[*] is interpreted specially, assignment to it fails silently (oops)
   A[*]=star
-  A[\*]=backstar
   print -R ${(k)A[(r)star]} $A[$x]
+  A[(e)*]=star
+  A[\*]=backstar
+  print -R ${(k)A[(r)star]} $A[(e)*]
   print -R ${(k)A[(r)backstar]} $A[\*]
 0:Associative array assignment
 >* xstar
 >\* qxstar
 >xstar
+>* star
 >\* backstar
 
   o='['
@@ -136,3 +139,9 @@
 >zounds
 >zounds
 >zounds
+
+  print -R ${(o)A[(K)\]]}
+  print -R ${(o)A[(K)\\\]]}
+0:Associative array keys interpreted as patterns
+>\2 backcbrack cbrack star
+>\\\4 \\\? star zounds
