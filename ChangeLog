@@ -1,3 +1,8 @@
+2002-08-05  Oliver Kiddle  <opk@zsh.org>
+
+	* Akinori Musha: 17499: Completion/BSD/Command/_bsd_pkg: BSD pkg_*
+	tools now support bzip2'd packages
+
 2002-08-02  Peter Stephenson  <pws@csr.com>
 
 	* Unposted: fix typo in 17496.
