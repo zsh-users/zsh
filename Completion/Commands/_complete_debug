@@ -1,0 +1,26 @@
+#compdef -k complete-word \C-x?
+
+setopt localoptions nullglob rcexpandparam extendedglob
+unsetopt markdirs globsubst shwordsplit nounset ksharrays
+
+(( $+_debug_count )) || integer -g _debug_count
+local tmp=${TMPPREFIX}${$}${words[1]}$[++_debug_count]
+local w="${(qqq)words}"
+
+[[ -t 2 ]] && exec 3>&2 2>| $tmp
+
+setopt xtrace
+_main_complete
+integer ret=$?
+unsetopt xtrace
+
+[[ -t 2 ]] || {
+    ## Calling "print -s" during completion is presently broken.
+    # _message -r "Trace output left in $tmp (up-history to view)"
+    # print -sR "${VISUAL:-${EDITOR:-${PAGER:-more}}} $tmp ;: $w"
+    _message -r "Trace output left in $tmp"
+    print -zR "${VISUAL:-${EDITOR:-${PAGER:-more}}} $tmp ;: $w"
+    exec 2>&3 3>&-
+}
+
+return ret

@@ -1,8 +1,11 @@
+2000-04-30  Bart Schaefer  <schaefer@zsh.org>
+
+	* 11024: Completion/Commands/_complete_debug, Doc/Zsh/compsys.yo:
+	Completion widget that enables and captures xtrace output.
+
 2000-04-29  Adam Spiers  <adam@spiers.net>
 
 	* 11019: Doc/Zsh/compsys.yo: fix bug in _description example
-
-2000-04-29  Adam Spiers  <adam@spiers.net>
 
 	* 11017: Completion/Linux/_rpm: fixes for --rmsource and
 	--recompile options, and for breakage caused by 10772

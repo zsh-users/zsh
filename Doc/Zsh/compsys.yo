@@ -2308,7 +2308,7 @@ on the command line (which may be blank).  If given a numeric argument
 var(N), complete the var(N)th most recently modified file.  Note the
 completion, if any, is always unique.
 )
-findex(_next_tags)
+findex(_next_tags (^Xn))
 item(tt(_next_tags) (^Xn))(
 This allows to complete types of matches that are not immediately
 offered because of the setting of the tt(tag-order) style. After a
@@ -2353,6 +2353,13 @@ called, the information about the styles may be
 incomplete. I.e. depending on the settings for some styles other
 styles may be used, and, depending on the user's settings, only the
 first sort of styles may be detected by tt(_complete_help).
+)
+findex(_complete_debug (^X?))
+item(tt(_complete_debug (^X?)))(
+This widget performs ordinary completion, but captures in a temporary file
+a trace of the shell commands executed by the completion system.  Each
+completion attempt gets its own file.  A command to view each of these
+files is pushed onto the editor buffer stack.
 )
 enditem()
 
