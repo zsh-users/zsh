@@ -1,6 +1,12 @@
 #compdef -subscript-
 
-local expl
+local expl osuf=']'
+
+if [[ "$1" = -q ]]; then
+  osuf='] '
+  compquote osuf
+  shift
+fi
 
 if [[ "$PREFIX" = :* ]]; then
   _wanted characters expl 'character class' \
@@ -9,7 +15,7 @@ if [[ "$PREFIX" = :* ]]; then
 elif [[ ${(Pt)${compstate[parameter]}} = assoc* ]]; then
   local suf
 
-  [[ "$RBUFFER" != \]* ]] && suf=']'
+  [[ "$RBUFFER" != (|\\)\]* ]] && suf="$osuf"
 
   _wanted association-keys expl 'association key' \
       compadd -S "$suf" -k "$compstate[parameter]"
@@ -37,12 +43,12 @@ elif [[ ${(Pt)${compstate[parameter]}} = array* ]]; then
         disp=()
       fi
 
-      if [[ "$RBUFFER" = \]* ]]; then
+      if [[ "$RBUFFER" = (|\\)\]* ]]; then
         _all_labels -V indexes expl 'array index' \
             compadd -S '' "$disp[@]" -a ind && ret=0
       else
         _all_labels -V indexes expl 'array index' \
-            compadd -S ']' "$disp[@]" -a ind && ret=0
+            compadd -S "$osuf" "$disp[@]" -a ind && ret=0
       fi
     fi
     _requested parameters && _parameters && ret=0

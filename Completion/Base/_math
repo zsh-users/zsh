@@ -9,4 +9,4 @@ if [[ "$SUFFIX" = *[^a-zA-Z0-9_]* ]]; then
   SUFFIX="${SUFFIX%%[^a-zA-Z0-9_]*}"
 fi
 
-_parameters -g '(integer|float)*'
+_parameters -g '(integer|float)*' || _parameters

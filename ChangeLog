@@ -1,5 +1,11 @@
 2000-10-10  Sven Wischnowsky  <wischnow@zsh.org>
 
+	* 12946: Completion/Base/_math, Completion/Base/_subscript,
+ 	Completion/Builtins/_vars, Completion/Builtins/_zstyle,
+ 	Completion/Core/_parameters, Doc/Zsh/compsys.yo: add
+ 	fake-parameters style to allow completing parameters which are not
+ 	yet set
+	
 	* 12942,12945: Completion/Core/_expand: temporarily remove global
  	aliases to avoid error message inside the evals
 	
