@@ -615,12 +615,16 @@ iscom(char *s)
 int
 isreallycom(Cmdnam cn)
 {
-    char fullnam[MAXCMDLEN];
+    if (cn->flags & HASHED)
+	return 1;
+    else {
+	char fullnam[MAXCMDLEN];
 
-    strcpy(fullnam, cn->u.name ? *(cn->u.name) : "");
-    strcat(fullnam, "/");
-    strcat(fullnam, cn->nam);
-    return iscom(fullnam);
+	strcpy(fullnam, cn->u.name ? *(cn->u.name) : "");
+	strcat(fullnam, "/");
+	strcat(fullnam, cn->nam);
+	return iscom(fullnam);
+    }
 }
 
 /**/
