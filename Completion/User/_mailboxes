@@ -23,6 +23,12 @@ _mailboxes() {
       else
         _tags mailboxes files
       fi;;
+    (*:mutt:*)
+      if [[ "$PREFIX" == (|-f)[+=]* ]]; then
+	_tags mailboxes
+      else
+        _tags mailboxes files
+      fi;;
     (*:pine:*)
       # Files for pine must be absolute paths.
       if [[ "$PREFIX" == (|-f)[/\~]* ]]; then
@@ -43,7 +49,7 @@ _mailboxes() {
     _requested mailboxes expl 'mailbox specification' _mua_mailboxes && ret=0
 
     if _requested files expl 'mailbox file'; then
-      [[ "${curcontext}" != *:(mail|mush|zmail|zmlite):* ]] &&
+      [[ "${curcontext}" != *:(mail|mush|mutt|zmail|zmlite):* ]] &&
 	compset -P -f
       _files "$expl[@]" && ret=0
     fi
@@ -65,7 +71,7 @@ _mailbox_cache () {
 
 
   [[ -f ${~muttrc:-.} ]] &&
-    _mutt_cache=( ${${(M)${(f)"$(<${~muttrc})"}:#mailboxes *}#mailboxes *} )
+    _mutt_cache=( ${=${(M)${(f)"$(<${~muttrc})"}:#mailboxes *}#mailboxes *} )
 
 
   _mbox_cache=( ${~maildirectory}/*(^/) )
@@ -127,9 +133,16 @@ _mua_mailboxes() {
       fi
       ;;
     (*:mutt:*)
+      if compset -P '='; then
+        mbox_names=( "${_mutt_cache[@]#[+=]}" "${(@)_mbox_cache#$~maildirectory/}" "${(@)_maildir_cache#$~maildirectory/}" "${(@)_mh_cache#$~maildirectory/}")
+      elif compset -P +; then
+        mbox_names=( "${_mutt_cache[@]#[+=]}" "${(@)_mbox_cache#$~maildirectory/}" "${(@)_maildir_cache#$~maildirectory/}" "${(@)_mh_cache#$~maildirectory/}")
+      else
       mbox_names=( "${_mutt_cache[@]}" "${_mailbox_cache[@]}"
-		   "${_maildir_cache[@]}" )
-      mbox_short=( \! \< \> );;
+		   "${_maildir_cache[@]}" "${_mh_cache[@]}" )
+      mbox_short=( \! \< \> )
+      fi
+      ;;
     (*:pine:*)
       # Pine is like mail but with no leading `+' to disambiguate;
       # any files not in $pinedirectory must be absolute paths.

@@ -1,5 +1,9 @@
 2000-06-22  Clint Adams  <schizo@debian.org>
 
+	* 12027: Completion/User/_mailboxes: fix splitting problem in
+	12024, add intelligence for mutt mailboxes in $maildirectory
+	not specified in muttrc.
+
 	* 12024: Completion/User/_mailboxes: handle multiple mailboxes
 	lines in muttrc.
 
