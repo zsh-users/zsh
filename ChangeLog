@@ -1,5 +1,8 @@
 2003-02-25  Oliver Kiddle  <opk@zsh.org>
 
+	* 18296: Completion/Base/Widget/_next_tags: fake _all_labels and
+	_next_label functions were out of sync with changes to the real ones
+
 	* unposted: Completion/Zsh/Context/_value, Doc/Zsh/compsys.yo:
 	fix out of date documentation and move description of special
 	contexts from _complete's to #compdef's description
