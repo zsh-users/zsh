@@ -21,6 +21,11 @@ _svn_controlled() {
   [[ -f ${(M)REPLY##*/}.svn/text-base/${REPLY##*/}.svn-base ]]
 }
 
+(( $+functions[_svn_adm_files] )) ||
+_svn_adm_files() {
+  compadd ${${(M)${(f)"$(svn status)"}:#(#s)[ADM]*}##[ADM] ##}
+}
+
 (( $+functions[_svn_urls] )) ||
 _svn_urls() {
   local expl
@@ -80,6 +85,11 @@ _svn_subcommand () {
       _svn_subcmds+=(
         '1: : _alternative "files:file:_files -g \*\(e:_svn_controlled:\)" "urls:URL:_svn_urls"'
 	'*:file:_files -g "*(e:_svn_controlled:)"'
+      )
+    ;;
+    (revert)
+      _svn_subcmds+=(
+	'*:file:_svn_adm_files'
       )
     ;;
     *)
