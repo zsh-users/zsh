@@ -553,7 +553,7 @@ else
   termcap_curses_order="termcap curses ncurses"
 fi],
 [case "$host_os" in
-  aix*|hpux10.*|hpux11.*|solaris*)
+  hpux10.*|hpux11.*|solaris*)
       termcap_curses_order="curses ncurses termcap" ;;
   *)             termcap_curses_order="termcap curses ncurses" ;;
 esac])dnl
@@ -1535,6 +1535,11 @@ if test "x$aixdynamic" = xyes; then
   DL_EXT="${DL_EXT=so}"
   DLLD="${DLLD=$CC}"
   zsh_cv_func_dlsym_needs_underscore=no
+  if test -n "$GCC"; then
+    DLLDFLAGS=${DLLDFLAGS=-shared}
+  else
+    DLLDFLAGS=${DLLDFLAGS=-bM:SRE}
+  fi
   DLLDFLAGS=${DLLDFLAGS=}
   EXTRA_LDFLAGS=${EXTRA_LDFLAGS=}
   EXPOPT=${LDARG}-bE:
