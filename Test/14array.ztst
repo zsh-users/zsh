@@ -1,0 +1,51 @@
+# Tests for array indexing
+
+%prep
+
+  foo=(a b c d e f g)
+
+%test
+
+  echo .$foo[1,4].
+0:Array indexing
+>.a b c d.
+
+  echo .$foo[1,-5].
+0:Array indexing
+>.a b c.
+
+  echo .$foo[4,1].
+0:Array indexing
+>..
+
+  echo .$foo[0,0].
+0:Array indexing
+>.a.
+
+  echo .$foo[0].
+0:Array indexing
+>.a.
+
+  echo .$foo[1].
+0:Array indexing
+>.a.
+
+  echo .$foo[3].
+0:Array indexing
+>.c.
+
+  echo .$foo[0,1].
+0:Array indexing
+>.a.
+
+  echo .$foo[2,2].
+0:Array indexing
+>.b.
+
+  echo .$foo[1,0].
+0:Array indexing
+>..
+
+  echo .$foo[-4,5].
+0:Array indexing
+>.d e.
