@@ -3834,6 +3834,9 @@ while _tags; do
   ...
   (( ret )) || break
 done)
+
+Note that this means that the var(command) has to accept the options
+that have to be passed down to tt(compadd).
 )
 findex(_retrieve_cache)
 item(tt(_retrieve_cache) var(cache_identifier))(
@@ -4036,6 +4039,9 @@ Unlike tt(_requested), however, tt(_wanted) cannot be called without
 the var(command).  This is because tt(_wanted) also implements the loop
 over the tags, not just the one for the labels; conversely, it should not
 be called in the middle of a tt(_tags) loop.
+
+Note that, as for tt(_requested), the var(command) has to accept the options
+that have to be passed down to tt(compadd).
 
 Like tt(_tags) this function supports the tt(-C) option to give a
 different name for the argument context field.
