@@ -1170,6 +1170,26 @@ implementing special behaviour which can be bound separately to keys.  The
 following is a list of these and their default bindings.
 
 startitem()
+item(tt(_bash_completions))(
+This function is used by two widgets, tt(_bash_complete-word) and
+tt(_bash_list-choices).  It exists to provide compatibility with
+completion bindings in bash.  The last character of the binding determines
+what is completed: `tt(!)', command names; `tt($)', environment variables;
+`tt(@)', host names; `tt(/)', file names; `tt(~)' user names.  In bash, the
+binding preceeded by `tt(\e)' gives completion, and preceeded by `tt(^X)'
+lists options.  As some of these bindings clash with standard zsh
+bindings, only `tt(\e~)' and `tt(^X~)' are bound by default.  To add the
+rest, the following should be added to tt(.zshrc) after tt(compinit) has
+been run:
+
+example(for key in '!' '$' '@' '/' '~'; do
+  bindkey "\e$key" _bash_complete-word
+  bindkey "^X$key" _bash_list-choices
+done)
+
+This includes the bindings for `tt(~)' in case they were already bound to
+something else; the completion code does not override user bindings.
+)
 item(tt(_correct_filename (^XC)))(
 Correct the filename path at the cursor position.  Allows up to six errors
 in the name.  Can also be called with an argument to correct
