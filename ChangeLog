@@ -1,3 +1,14 @@
+2001-04-11  Bart Schaefer  <schaefer@zsh.org>
+
+	* 13949: Completion/Zsh/Type/_directory_stack: Don't append a slash
+	when completing after [-+]*.
+	
+	* unposted: Functions/Misc/getjobs: Update comment to reflect
+	change in preexec call signature from 13942.
+
+	* unposted (see 13946): Functions/Prompts/prompt_bart_setup: Strip
+	%[BSUbsu] from $PS1 when computing the width of the first line.
+
 2001-04-11  Oliver Kiddle  <opk@zsh.org>
 
 	* 13947: Completion/Zsh/Command/_fc, Completion/Zsh/Type/_aliases,
