@@ -1,5 +1,9 @@
 2004-09-02  Peter Stephenson  <pws@csr.com>
 
+	* 20303: Src/Zle/zle_thingy.c, Doc/Zsh/zle.yo: Make test for
+	zle -I more consistent with other uses of zle. Make zle widgets
+	runnable inside traps.
+
 	* 20300: Src/Zle/zle_main.c: typing ^D to list completions,
 	then two ^C's caused a spurious EOF.
 

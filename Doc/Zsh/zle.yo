@@ -505,9 +505,12 @@ to minimise disruption.
 Note that there are normally better ways of manipulating the display from
 within zle widgets; see, for example, `tt(zle -R)' above.
 
-The status is zero if zle is active and the current zle display has
-been invalidated (even if this was by a previous call to `tt(zle -I)'),
-else one.
+The returned status is zero if a zle widget can be called immediately.
+Note this is independent of whether the display has been invalidated.
+For example, if a completion widget is active a zle widget cannot be used
+and the status is one even if the display was invalidated; on the other
+hand, the status may be zero if the display was invalidated by a previous
+call to `tt(zle -I)'.
 )
 item(var(widget) tt([ -n) var(num) tt(]) tt([ -N ]) var(args) ...)(
 Invoke the specified widget.  This can only be done when ZLE is
