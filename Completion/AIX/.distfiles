@@ -1,0 +1,4 @@
+DISTFILES_SRC='
+    .distfiles
+    _floppy _lsdev _lslv _lspv _lsvg _physical_volumes _smit _volume_groups
+'

@@ -1,0 +1,6 @@
+#autoload
+
+local expl
+
+_wanted physicalvolumes expl 'physical volumes' \
+    compadd - $(lsdev -C -c disk -S a -F name)

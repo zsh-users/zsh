@@ -10,6 +10,12 @@
 	
 2000-04-20  Oliver Kiddle  <opk@zsh.org>
 
+	* 10857: Completion/AIX/.distfiles Completion/AIX/_floppy
+	Completion/AIX/_lsdev Completion/AIX/_lslv Completion/AIX/_lspv
+	Completion/AIX/_lsvg Completion/AIX/_physical_volumes
+	Completion/AIX/_smit Completion/AIX/_volume_groups: new completions
+	for AIX commands
+
 	* 10848: Completion/Builtins/_print, Completion/Core/.distfiles,
 	Completion/Core/_file_descriptors: Add completion for file
 	descriptors
