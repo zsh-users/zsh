@@ -1,3 +1,8 @@
+2003-07-09  Oliver Kiddle  <opk@zsh.org>
+
+	* 18841: Completion/Base/Completer/_prefix: work around problem
+	where the unambiguous part is empty making the word be removed
+
 2003-07-09  Peter Stephenson  <pws@csr.com>
 
 	* 18839, modified c.f. 18840: Completion/Unix/Command/_nice,
@@ -25,9 +30,9 @@
 
 2003-07-07  Clint Adams  <clint@zsh.org>
 
-	* 18xxx: Completion/Unix/Command/_subversion: completion for
+	* 18831: Completion/Unix/Command/_subversion: completion for
 	svn and svnadmin.
-	* 18xxx: Completion/Debian/Command/_debsign: completion for
+	* 18832: Completion/Debian/Command/_debsign: completion for
 	debsign, by Matt Zimmerman.
 
 2003-07-04  Oliver Kiddle  <opk@zsh.org>
