@@ -25,8 +25,8 @@ Machines
 Apple: MacOS X/Darwin 10.x
 	Should build `out-of-the-box'.
 
-	For dynamic loading to work, you need to use the dlcompat library.
-	It can be downloaded from:
+	For dynamic loading to work on 10.1 and 10.2, you need to use the
+	dlcompat library.  It can be downloaded from:
 	    http://sourceforge.net/project/showfiles.php?group_id=17203
 
 	The zsh/zpty library is not working on 10.1 and 10.2, but is on

@@ -1,5 +1,8 @@
 2004-03-17  Peter Stephenson  <pws@csr.com>
 
+	* unposted: Etc/MACHINES: dlcompat apparently not needed
+	on Apple from 10.3 on.
+
 	* 19653: Etc/MACHINES: Latest OS-specific information after some
 	tweaking.
 
