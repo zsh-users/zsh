@@ -1,5 +1,9 @@
 2002-08-05  Oliver Kiddle  <opk@zsh.org>
 
+	* 17503: Doc/Zsh/builtins.yo, Doc/Zsh/compsys.yo, Doc/Zsh/expn.yo,
+	Doc/Zsh/params.yo: fix various typos, spelling mistakes and poor
+	wordings in docs
+
 	* Akinori Musha: 17499: Completion/BSD/Command/_bsd_pkg: BSD pkg_*
 	tools now support bzip2'd packages
 

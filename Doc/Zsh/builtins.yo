@@ -633,7 +633,7 @@ If the tt(PUSHD_MINUS) option is set, the meanings of `tt(PLUS())' and
 )
 findex(print)
 item(tt(print) [ tt(-bnrslzpNDPoOicm) ] [ tt(-u)var(n) ] [ tt(-R) [ tt(-en) ]] [ var(arg) ... ])(
-With no flags or with flag `tt(-)', the arguments are printed on
+With no flags or with the flag `tt(-)', the arguments are printed on
 the standard output as described by tt(echo), with the following differences:
 the escape sequence `tt(\M-)var(x)' metafies the character
 var(x) (sets the highest bit),
