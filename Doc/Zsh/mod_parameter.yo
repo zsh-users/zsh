@@ -46,4 +46,19 @@ noderef(Parameter Expansion)
 .
 Setting or unsetting keys in this array is not possible.
 )
+vindex(modules)
+item(tt(modules))(
+An association giving information about module. The keys are the names
+of the modules builtin, loaded, or registered to be autoloaded. The
+value says which state the named module is in and is one of the
+strings tt(builtin), tt(loaded), or tt(autoloaded).
+
+Setting or unsetting keys in this array is not possible.
+)
+vindex(dirstack)
+item(tt(dirstack))(
+A normal array holding the elements of the directory stack. Note that
+the output of the tt(dirs) builtin command includes one more
+directory, the current working directory.
+)
 enditem()

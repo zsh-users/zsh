@@ -596,14 +596,216 @@ scanpmoptions(HashTable ht, ScanFunc func, int flags)
 	}
 }
 
+/* Functions for the modules special parameter. */
+
+static char *modpmname;
+static int modpmfound;
+
+/**/
+static void
+modpmbuiltinscan(HashNode hn, int dummy)
+{
+    if (!(((Builtin) hn)->flags & BINF_ADDED) &&
+	!strcmp(((Builtin) hn)->optstr, modpmname))
+	modpmfound = 1;
+}
+
+/**/
+static void
+modpmparamscan(HashNode hn, int dummy)
+{
+    if ((((Param) hn)->flags & PM_AUTOLOAD) &&
+	!strcmp(((Param) hn)->u.str, modpmname))
+	modpmfound = 1;
+}
+
+/**/
+static int
+findmodnode(LinkList l, char *nam)
+{
+    LinkNode node;
+
+    for (node = firstnode(l); node; incnode(node))
+	if (!strcmp(nam, (char *) getdata(node)))
+	    return 1;
+
+    return 0;
+}
+
+/**/
+static HashNode
+getpmmodule(HashTable ht, char *name)
+{
+    Param pm = NULL;
+    char *type = NULL;
+    LinkNode node;
+
+    HEAPALLOC {
+	pm = (Param) zhalloc(sizeof(struct param));
+	pm->nam = dupstring(name);
+	pm->flags = PM_SCALAR | PM_READONLY;
+	pm->sets.cfn = NULL;
+	pm->gets.cfn = strgetfn;
+	pm->unsetfn = NULL;
+	pm->ct = 0;
+	pm->env = NULL;
+	pm->ename = NULL;
+	pm->old = NULL;
+	pm->level = 0;
+
+	for (node = firstnode(bltinmodules); node; incnode(node))
+	    if (!strcmp(name, (char *) getdata(node))) {
+		type = "builtin";
+		break;
+	    }
+#ifdef DYNAMIC
+	if (!type) {
+	    Module m;
+
+	    for (node = firstnode(modules); node; incnode(node)) {
+		m = (Module) getdata(node);
+		if (m->handle && !(m->flags & MOD_UNLOAD) &&
+		    !strcmp(name, m->nam)) {
+		    type = "loaded";
+		    break;
+		}
+	    }
+	}
+	modpmname = name;
+	modpmfound = 0;
+	if (!type) {
+	    scanhashtable(builtintab, 0, 0, 0, modpmbuiltinscan, 0);
+	    if (!modpmfound) {
+		Conddef p;
+
+		for (p = condtab; p; p = p->next)
+		    if (p->module && !strcmp(name, p->module)) {
+			modpmfound = 1;
+			break;
+		    }
+		if (!modpmfound)
+		    scanhashtable(realparamtab, 0, 0, 0, modpmparamscan, 0);
+	    }
+	    if (modpmfound)
+		type = "autoloaded";
+	}
+#endif
+	if (type)
+	    pm->u.str = type;
+	else {
+	    pm->u.str = "";
+	    pm->flags |= PM_UNSET;
+	}
+    } LASTALLOC;
+
+    return (HashNode) pm;
+}
+
+/**/
+static void
+scanpmmodules(HashTable ht, ScanFunc func, int flags)
+{
+    struct param pm;
+    int i;
+    HashNode hn;
+    LinkList done = newlinklist();
+    LinkNode node;
+    Module m;
+    Conddef p;
+
+    pm.flags = PM_SCALAR | PM_READONLY;
+    pm.sets.cfn = NULL;
+    pm.gets.cfn = strgetfn;
+    pm.unsetfn = NULL;
+    pm.ct = 0;
+    pm.env = NULL;
+    pm.ename = NULL;
+    pm.old = NULL;
+    pm.level = 0;
+
+    for (node = firstnode(bltinmodules); node; incnode(node)) {
+	pm.nam = (char *) getdata(node);
+	addlinknode(done, pm.nam);
+	pm.u.str = "builtin";
+	func((HashNode) &pm, flags);
+    }
+#ifdef DYNAMIC
+    for (node = firstnode(modules); node; incnode(node)) {
+	m = (Module) getdata(node);
+	if (m->handle && !(m->flags & MOD_UNLOAD)) {
+	    pm.nam = m->nam;
+	    addlinknode(done, pm.nam);
+	    pm.u.str = "loaded";
+	    func((HashNode) &pm, flags);
+	}
+    }
+    for (i = 0; i < builtintab->hsize; i++)
+	for (hn = builtintab->nodes[i]; hn; hn = hn->next) {
+	    if (!(((Builtin) hn)->flags & BINF_ADDED) &&
+		!findmodnode(done, ((Builtin) hn)->optstr)) {
+		pm.nam = ((Builtin) hn)->optstr;
+		addlinknode(done, pm.nam);
+		pm.u.str = "autoloaded";
+		func((HashNode) &pm, flags);
+	    }
+	}
+    for (p = condtab; p; p = p->next)
+	if (p->module && !findmodnode(done, p->module)) {
+	    pm.nam = p->module;
+	    addlinknode(done, pm.nam);
+	    pm.u.str = "autoloaded";
+	    func((HashNode) &pm, flags);
+	}
+    for (i = 0; i < realparamtab->hsize; i++)
+	for (hn = realparamtab->nodes[i]; hn; hn = hn->next) {
+	    if ((((Param) hn)->flags & PM_AUTOLOAD) &&
+		!findmodnode(done, ((Param) hn)->u.str)) {
+		pm.nam = ((Param) hn)->u.str;
+		addlinknode(done, pm.nam);
+		pm.u.str = "autoloaded";
+		func((HashNode) &pm, flags);
+	    }
+	}
+#endif
+}
+
+/* Functions for the dirstack special parameter. */
+
+static void
+dirssetfn(Param pm, char **x)
+{
+    PERMALLOC {
+	freelinklist(dirstack, freestr);
+	dirstack = newlinklist();
+	while (*x)
+	    addlinknode(dirstack, ztrdup(*x++));
+    } LASTALLOC;
+}
+
+static char **
+dirsgetfn(Param pm)
+{
+    int l = countlinknodes(dirstack);
+    char **ret = (char **) zhalloc((l + 1) * sizeof(char *)), **p;
+    LinkNode n;
+
+    for (n = firstnode(dirstack), p = ret; n; incnode(n), p++)
+	*p = dupstring((char *) getdata(n));
+    *p = NULL;
+
+    return ret;
+}
+
 /* Names and Params for the special parameters. */
 
 #define PAR_NAM "parameters"
 #define CMD_NAM "commands"
 #define FUN_NAM "functions"
 #define OPT_NAM "options"
+#define MOD_NAM "modules"
+#define DIR_NAM "dirstack"
 
-static Param parpm, cmdpm, funpm, optpm;
+static Param parpm, cmdpm, funpm, optpm, modpm, dirpm;
 
 /**/
 int
@@ -618,7 +820,7 @@ boot_parameter(Module m)
 {
     /* Create the special associative arrays.
      * As an example for autoloaded parameters, this is probably a bad
-     * example, because we the zsh core doesn't support creation of
+     * example, because the zsh core doesn't support creation of
      * special hashes, yet. */
 
     unsetparam(PAR_NAM);
@@ -641,6 +843,18 @@ boot_parameter(Module m)
 				    scanpmoptions)))
 	return 1;
     optpm->sets.hfn = setpmoptions;
+    unsetparam(MOD_NAM);
+    if (!(modpm = createspecialhash(MOD_NAM, getpmmodule,
+				    scanpmmodules)))
+	return 1;
+    modpm->flags |= PM_READONLY;
+    unsetparam(DIR_NAM);
+    if (!(dirpm = createparam(DIR_NAM,
+			      PM_ARRAY|PM_HIDE|PM_SPECIAL|PM_REMOVABLE)))
+	return 1;
+    dirpm->sets.afn = dirssetfn;
+    dirpm->gets.afn = dirsgetfn;
+    dirpm->unsetfn = stdunsetfn;
 
     return 0;
 }
@@ -664,6 +878,12 @@ cleanup_parameter(Module m)
     if ((pm = (Param) paramtab->getnode(paramtab, FUN_NAM)) && pm == funpm)
 	unsetparam_pm(pm, 0, 1);
     if ((pm = (Param) paramtab->getnode(paramtab, OPT_NAM)) && pm == optpm)
+	unsetparam_pm(pm, 0, 1);
+    if ((pm = (Param) paramtab->getnode(paramtab, MOD_NAM)) && pm == modpm) {
+	pm->flags &= ~PM_READONLY;
+	unsetparam_pm(pm, 0, 1);
+    }
+    if ((pm = (Param) paramtab->getnode(paramtab, DIR_NAM)) && pm == dirpm)
 	unsetparam_pm(pm, 0, 1);
     return 0;
 }
