@@ -1,3 +1,8 @@
+2002-07-16  Tanaka Akira  <akr@zsh.org>
+
+	* 17459: Completion/Unix/Command/_cvs: exclude file which have
+	RCS kflags for cvs add.
+
 2002-07-08  Sven Wischnowsky  <wischnow@zsh.org>
 
 	* 17439: Src/Zle/zle_tricky.c: remove qword, it isn't needed
