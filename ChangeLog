@@ -1,3 +1,7 @@
+2002-08-28  Peter Stephenson  <pws@csr.com>
+
+	* 17590: Doc/Zsh/mod_socket.yo: missing enditem().
+
 2002-08-27  Peter Stephenson  <pws@pwstephenson.fsnet.co.uk>
 
 	* unposted: Config/version.mk: Update version to 4.1.0-dev-6.
