@@ -1,5 +1,7 @@
 2000-07-12  Sven Wischnowsky  <wischnow@zsh.org>
 
+	* 12229: Doc/Zsh/compsys.yo: fix for list-prompt docs
+	
 	* 12228: Src/hist.c, Src/lex.c: fix for (z) flag, don't take # as
  	comment
 	

@@ -1470,7 +1470,8 @@ completion lists that don't fit on the screen can be scrolled (see
 ifzman(the description of the tt(zsh/complist) module in zmanref(zshmodules))\
 ifnzman(noderef(The zsh/complist Module))\
 ).  The value, if not the empty string, will be displayed after every
-screenful and the shell will prompt for a key press; if the style is unset,
+screenful and the shell will prompt for a key press; if the style is
+set to the empty string,
 a default prompt will be used.  The value may contain the escape sequences
 `tt(%l)' or `tt(%L)', which will be replaced by the number of the last line
 displayed and the total number of lines; `tt(%m)' or `tt(%M)', which will
