@@ -125,8 +125,6 @@ modules-bltin: Makefile
 	    cat mymods.conf > $@; \
 	elif test @D@ = N; then \
 	    cat $(sdir)/xmods.conf > $@; \
-	elif test @RTLD_GLOBAL_OK@ != yes; then \
-	    echo comp1 > $@; \
 	else \
 	    echo > $@; \
 	fi
