@@ -12,6 +12,10 @@
 
 2005-02-24  Peter Stephenson  <pws@csr.com>
 
+	* 20863: Src/utils.c, Src/zsh.h, Src/Zle/zle.h,
+	Src/Zle/zle_hist.c, Src/Zle/zle_utils.c: fix history (i)searching
+	for Unicode.
+
 	* 20861: Src/Zle/complist.c, Src/Zle/zle.h, Src/Zle/zle_hist.c,
 	Src/Zle/zle_main.c, Src/Zle/zle_misc.c, Src/Zle/zle_refresh.c,
 	Src/Zle/zle_thingy.c, Src/Zle/zle_vi.c: Fix use of statusline

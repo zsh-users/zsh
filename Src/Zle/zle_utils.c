@@ -466,31 +466,79 @@ findline(int *a, int *b)
     *b = findeol();
 }
 
-/* Search for needle in haystack.  Haystack is a metafied string while *
- * needle is unmetafied and len-long.  Start the search at position    *
- * pos.  Search forward if dir > 0 otherwise search backward.          */
+/*
+ * Return zero if the ZLE string histp length histl and the ZLE string
+ * inputp length inputl are the same.  Return -1 if inputp is a prefix
+ * of histp.  Return 1 if inputp is the lowercase version of histp.
+ * Return 2 if inputp is the lowercase prefix of histp and return 3
+ * otherwise.
+ */
 
 /**/
-char *
-hstrnstr(char *haystack, int pos, char *needle, int len, int dir, int sens)
+int
+zlinecmp(ZLE_STRING_T histp, int histl, ZLE_STRING_T inputp, int inputl)
 {
-    char *s = haystack + pos;
+    int cnt;
+
+    if (histl < inputl) {
+	/* Not identical, second string is not a prefix. */
+	return 3;
+    }
+
+    if (!ZS_memcmp(histp, inputp, inputl)) {
+	/* Common prefix is identical */
+	/* If lines are identical return 0 */
+	if (histl == inputl)
+	    return 0;
+	/* Second string is a prefix of the first */
+	return -1;
+    }
+
+    for (cnt = inputl; cnt; cnt--) {
+	if (*inputp++ != ZC_tolower(*histp++))
+	    return 3;
+    }
+    /* Is second string is lowercase version of first? */
+    if (histl == inputl)
+	return 1;
+    /* Second string is lowercase prefix of first */
+    return 2;
+}
+
+
+/*
+ * Search for needle in haystack.  Haystack and needle are ZLE strings
+ * of the indicated length.  Start the search at position
+ * pos in haystack.  Search forward if dir > 0, otherwise search
+ * backward.  sens is used to test against the return value of linecmp.
+ */
+
+/**/
+ZLE_STRING_T
+zlinefind(ZLE_STRING_T haystack, int haylen, int pos,
+	  ZLE_STRING_T needle, int needlen, int dir, int sens)
+{
+    ZLE_STRING_T s = haystack + pos;
+    int slen = haylen - pos;
 
     if (dir > 0) {
-	while (*s) {
-	    if (metadiffer(s, needle, len) < sens)
+	while (slen) {
+	    if (zlinecmp(s, slen, needle, needlen) < sens)
 		return s;
-	    s += 1 + (*s == Meta);
+	    s++;
+	    slen--;
 	}
     } else {
 	for (;;) {
-	    if (metadiffer(s, needle, len) < sens)
+	    if (zlinecmp(s, slen, needle, needlen) < sens)
 		return s;
 	    if (s == haystack)
 		break;
-	    s -= 1 + (s != haystack+1 && s[-2] == Meta);
+	    s--;
+	    slen++;
 	}
     }
+
     return NULL;
 }
 

@@ -1368,7 +1368,12 @@ struct histent {
 
     Histent up;			/* previous line (moving upward)    */
     Histent down;		/* next line (moving downward)      */
-    char *zle_text;		/* the edited history line          */
+#ifdef ZLE_UNICODE_SUPPORT
+    wchar_t *zle_text;		/* the edited history line          */
+#else
+    unsigned char *zle_text;	/* the edited history line          */
+#endif
+    int zle_len;		/* length of zle_text */
     time_t stim;		/* command started time (datestamp) */
     time_t ftim;		/* command finished time            */
     short *words;		/* Position of words in history     */

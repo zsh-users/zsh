@@ -2925,36 +2925,6 @@ ztrcmp(unsigned char const *s1, unsigned char const *s2)
 	return 1;
 }
 
-/* Return zero if the metafied string s and the non-metafied,  *
- * len-long string r are the same.  Return -1 if r is a prefix *
- * of s.  Return 1 if r is the lowercase version of s.  Return *
- * 2 is r is the lowercase prefix of s and return 3 otherwise. */
-
-/**/
-mod_export int
-metadiffer(char const *s, char const *r, int len)
-{
-    int l = len;
-
-    while (l-- && *s && *r++ == (*s == Meta ? *++s ^ 32 : *s))
-	s++;
-    if (*s && l < 0)
-	return -1;
-    if (l < 0)
-	return 0;
-    if (!*s)
-	return 3;
-    s -= len - l - 1;
-    r -= len - l;
-    while (len-- && *s && *r++ == tulower(*s == Meta ? *++s ^ 32 : *s))
-	s++;
-    if (*s && len < 0)
-	return 2;
-    if (len < 0)
-	return 1;
-    return 3;
-}
-
 /* Return the unmetafied length of a metafied string. */
 
 /**/

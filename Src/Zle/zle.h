@@ -53,12 +53,21 @@ typedef wint_t   ZLE_INT_T;
 #define ZS_memcpy wmemcpy
 #define ZS_memmove wmemmove
 #define ZS_memset wmemset
+#define ZS_memcmp wmemcmp
 #define ZS_strlen wcslen
 #define ZS_strcpy wcscpy
 #define ZS_strncpy wcsncpy
 #define ZS_strncmp wcsncmp
 
 #define ZC_icntrl iswcntrl
+#define ZC_iblank iswspace
+/*
+ * TODO: doesn't work on arguments with side effects.
+ * Also YUK.  Not even sure this is guaranteed to work.
+ */
+#define ZC_iident(x)	(x < 256 && iident((int)x))
+
+#define ZC_tolower towlower
 
 #define LASTFULLCHAR	lastchar_wide
 
@@ -78,12 +87,17 @@ typedef int ZLE_INT_T;
 #define ZS_memcpy memcpy
 #define ZS_memmove memmove
 #define ZS_memset memset
+#define ZS_memcmp memcmp
 #define ZS_strlen strlen
 #define ZS_strcpy strcpy
 #define ZS_strncpy strncpy
 #define ZS_strncmp strncmp
 
 #define ZC_icntrl icntrl
+#define ZC_iblank iblank
+#define ZC_iident iident
+
+#define ZC_tolower tulower
 
 #define LASTFULLCHAR	lastchar
 
