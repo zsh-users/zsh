@@ -1,10 +1,12 @@
 2000-05-19  Sven Wischnowsky  <wischnow@zsh.org>
 
+	* 11466: Src/Zle/compresult.c: fix for unambiguous string insertion
+	
 	* 11464: Completion/Base/_arguments, Completion/Core/_approximate,
  	Completion/Core/_files, Completion/Core/_multi_parts,
  	Completion/Core/_sep_parts, Completion/Debian/_apt,
  	Completion/User/_enscript, Completion/User/_finger,
- 	Completion/User/_urls, Completion/X/_xutils:don't use $match for
+ 	Completion/User/_urls, Completion/X/_xutils: don't use $match for
  	something different than (#b)ackrefs
 	
 2000-05-18  Sven Wischnowsky  <wischnow@zsh.org>

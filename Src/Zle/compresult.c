@@ -105,7 +105,7 @@ cut_cline(Cline l)
 		ls = 1;
 
 		for (p = e; p; p = p->next)
-		    len += p->max;
+		    len += p->min;
 
 		if (len > ((minmlen << 1) / 3))
 		    goto end;
