@@ -2151,6 +2151,7 @@ bufferwords(LinkList list, char *buf, int *index)
 {
     int num = 0, cur = -1, got = 0, ne = noerrs, ocs = cs, oll = ll;
     int owb = wb, owe = we, oadx = addedx, ozp = zleparse, onc = nocomments;
+    int ona = noaliases;
     char *p;
 
     if (!list)
@@ -2226,7 +2227,7 @@ bufferwords(LinkList list, char *buf, int *index)
     }
     if (cur < 0 && num)
 	cur = num - 1;
-    noaliases = 0;
+    noaliases = ona;
     strinend();
     inpop();
     errflag = 0;
