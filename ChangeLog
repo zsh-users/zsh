@@ -24,7 +24,7 @@
 	completion update
 
 	* 17074: Completion/Linux/Command/.distfiles,
-	Completion/Linux/Command/_mondo, Src/Zsh/complete.mdd:
+	Completion/Linux/Command/_mondo, Src/Zle/complete.mdd:
 	mondoarchive completion (with typo correction from Bart)
 
 	* unposted: .cvsignore: add autom4te.cache. Looks like
