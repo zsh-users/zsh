@@ -1,3 +1,7 @@
+2004-12-01  Wayne Davison  <wayned@users.sourceforge.net>
+
+	* 20595 (modified): Src/compat.c: some style tweaks to zchdir().
+
 2004-12-01  Doug Kearns  <djkea2@gus.gscit.monash.edu.au>
 
 	* 20587: Completion/Unix/Command/_screen: update screen completion for
@@ -10,7 +14,7 @@
 2004-11-29  Peter Stephenson  <pws@csr.com>
 
 	* 20591: Stephane Chazelas <Stephane_Chazelas@yahoo.fr>:
-	use of fchdir to change directory leaked filed descriptors.
+	Src/compat.c: use of fchdir in zchdir could leak a file descriptor.
 
 	* 20592: Src/math.c: $((##)) caused mayhem by passing null
 	string to getkeystring().  Report error instead.
