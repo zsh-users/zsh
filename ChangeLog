@@ -322,10 +322,10 @@
 
 2002-02-22  Wayne Davison  <wayned@users.sourceforge.net>
 
-	* 16703: Src/hist.c: In putoldhistentryontop(), ensure that we can't
+	* 16703-A: Src/hist.c: In putoldhistentryontop(), ensure that we can't
 	return with "next" set to the value we just put on top.
 
-	* 16703: Src/builtin.c: Improved the output of the "history" command
+	* 16703-B: Src/builtin.c: Improved the output of the "history" command
 	with a 1-line history buffer, and also improved the error handling of
 	explicitly-specified first/last values.
 
