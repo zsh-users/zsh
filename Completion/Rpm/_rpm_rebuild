@@ -1,0 +1,6 @@
+#autoload
+
+_rpm_arguments \
+  '--root:RPM root directory:_files -/' \
+  '--dbpath:RPM database path:_files -/' \
+  '*:RPM source package file:_rpm_pkg_file'

@@ -1,0 +1,11 @@
+#autoload
+
+local expl
+
+if compset -P '*\='; then
+  _description expl 'new path'
+else
+  _description expl 'old path'
+fi
+
+_files "$expl[@]" -/
