@@ -225,11 +225,11 @@ for prepath in "$prepaths[@]"; do
     if [[ "$tpre$tsuf" = */* ]]; then
       tmp2=( ${^tmp1}*(-/) )
       [[ ! -o globdots && "$PREFIX" = .* ]] &&
-          tmp2=( "$tmp1[@]" ${^tmp1}.*(-/) )
+          tmp2=( "$tmp2[@]" ${^tmp1}.*(-/) . .. )
     else
       tmp2=( ${^tmp1}${^~pats} )
       [[ ! -o globdots && "$PREFIX" = .* ]] &&
-          tmp2=( "$tmp1[@]" ${^tmp1}.${^~pats} )
+          tmp2=( "$tmp2[@]" ${^tmp1}.${^~pats} . .. )
     fi
     tmp1=( "$tmp2[@]" )
 
