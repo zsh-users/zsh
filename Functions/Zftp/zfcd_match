@@ -30,7 +30,7 @@ if [[ $ZFTP_SYSTEM = UNIX* ]]; then
   rm -f $tmpf
   [[ -n $dir && $dir != */ ]] && dir="$dir/"
   if [[ -n $WIDGET ]]; then
-    _wanted directories expl 'remote directory'
+    _wanted directories expl 'remote directory' \
         compadd -S/ -q -P "$dir" - $reply
   elif [[ -n $dir ]]; then
     reply=(${dir}$reply)

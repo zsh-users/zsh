@@ -1,5 +1,8 @@
 2000-05-03  Sven Wischnowsky  <wischnow@informatik.hu-berlin.de>
 
+	* 11091: Functions/Zftp/zfcd_match: fix for completion of
+ 	directories for zftp suite
+	
 	* 11086: Src/builtin.c: allow calling `print -s' in widgets, avoid
  	duplicated history number
 	
