@@ -2260,7 +2260,7 @@ bufferwords(LinkList list, char *buf, int *index)
 	if (zlegetlineptr) {
 	    linein = zlegetlineptr(&ll, &cs);
 	} else {
-	    linein = "";
+	    linein = ztrdup("");
 	    ll = cs = 0;
 	}
 	zlell = ll + 1; /* length of line plus space added below */
@@ -2287,6 +2287,7 @@ bufferwords(LinkList list, char *buf, int *index)
 	    p[zlell] = '\0';
 	    inpush(p, 0, NULL);
 	}
+    zsfree(linein);
     }
     if (zlecs)
 	zlecs--;

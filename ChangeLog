@@ -3,6 +3,10 @@
 	* unposted (cf. zsh-users/8412): Config/version.mk: fix
 	year typo.
 
+	* 2073x: Src/Zle/zle_utils.c, Src/hist.c: modify zlegetline() and
+	zlegetline caller so that the octet-based and wide-character
+	versions should return the same string.
+
 2005-01-21  Bart Schaefer  <schaefer@brasslantern.com>
 
 	* unposted (cf. zsh-users/8409): Functions/Zle/keeper: "keeper"

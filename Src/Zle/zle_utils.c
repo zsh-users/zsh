@@ -89,10 +89,35 @@ zleaddtoline(int chr)
 mod_export unsigned char *
 zlegetline(int *ll, int *cs)
 {
+    char *s;
+#ifdef ZLE_UNICODE_SUPPORT
+    char *mb_cursor;
+    int i, j;
+    size_t mb_len = 0;
+
+    mb_cursor = s = zalloc(zlell * MB_CUR_MAX);
+
+    for(i=0;i<=zlell;i++) {
+	if (i == zlecs)
+	    *cs = mb_len;
+	j = wctomb(mb_cursor, zleline[i]);
+	if (j == -1) {
+	    /* invalid char; what to do? */
+	} else {
+	    mb_len += j;
+	}
+    }
+
+    *ll = mb_len;
+
+    return (unsigned char *)s;
+#else
     *ll = zlell;
     *cs = zlecs;
 
-    return zleline;
+    s = ztrdup(zleline);
+    return (unsigned char *)s;
+#endif
 }
 
 
