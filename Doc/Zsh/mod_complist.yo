@@ -145,7 +145,7 @@ xitem(tt(accept-line), tt(down-history), tt(down-line-or-history))
 item(tt(down-line-or-search), tt(vi-down-line-or-history))(
 scrolls forward one line
 )
-item(tt(complete-word), tt(menu-complete), tt(expand-or-complete))(
+xitem(tt(complete-word), tt(menu-complete), tt(expand-or-complete))
 item(tt(expand-or-complete-prefix), tt(menu-complete-or-expand))(
 scrolls forward one screenful
 )

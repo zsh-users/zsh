@@ -1,3 +1,7 @@
+2000-04-18  Peter Stephenson  <pws@cambridgesiliconradio.com>
+
+	* 10802: Doc/Zsh/mod_complist.yo: typo
+
 2000-04-18  Sven Wischnowsky <wischnow@informatik.hu-berlin.de>
 
 	* 10801: Completion/Builtins/_zstyle, Completion/Core/_main_complete,
