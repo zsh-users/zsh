@@ -554,7 +554,7 @@ actual time interval is limited only by tt($ZFTP_TIMEOUT).
 
 As described for tt(progress), tt(zfinit) will force this to default to 1.
 )
-item(tt(remote_glob))(
+item(tt(remote-glob))(
 If set to `1', `yes' or `true', filename generation (globbing) is
 performed on the remote machine instead of by zsh itself; see below.
 )
@@ -598,7 +598,7 @@ within the current directory.  The list of files in the current directory,
 if retrieved, will be cached, so that subsequent globs in the same
 directory without an intervening tt(zfcd) are much faster.
 
-If the tt(remote_glob) style (see above) is set, globbing is instead
+If the tt(remote-glob) style (see above) is set, globbing is instead
 performed on the remote host: the server is asked for a list of matching
 files.  This is highly dependent on how the server is implemented, though
 typically UNIX servers will provide support for basic glob patterns.  This

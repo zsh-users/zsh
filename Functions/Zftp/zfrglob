@@ -9,7 +9,7 @@
 #      stick with a single directory.  This is the default.
 #  (2) Use remote globbing, i.e. pass it to ls at the site.
 #      Faster, but only works with UNIX, and only basic globbing.
-#      We do this if the remote_glob style (or $zfrglob for
+#      We do this if the remote-glob style (or $zfrglob for
 #      backward compatibility) is set.
 
 # There is only one argument, the variable containing the
@@ -21,7 +21,7 @@ setopt extendedglob
 
 local pat dir nondir files i zfrglob
 
-zstyle -t "$curcontext" remote_glob && zfrglob=1
+zstyle -t "$curcontext" remote-glob && zfrglob=1
 
 eval pat=\$$1
 

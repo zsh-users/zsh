@@ -19,7 +19,7 @@ local curcontext="${curcontext/:[^:]#:/:match:}"
 tmp="${${:-$PREFIX$SUFFIX}#[~=]}"
 [[ "$tmp:q" = "$tmp" ]] && return 1
 
-zstyle -s ":completion:${curcontext}:" original orig
+zstyle -s ":completion:${curcontext}:" match-original orig
 zstyle -b ":completion:${curcontext}:" insert-unambiguous ins
 
 # Try completion without inserting a `*'?
