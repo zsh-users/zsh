@@ -131,7 +131,7 @@ config: config.h
 config.status: $(sdir)/configure
 	$(SHELL) ./config.status --recheck
 
-$(sdir)/configure: $(sdir)/zshconfig.ac $(sdir)/aclocal.m4 $(sdir)/aczsh.m4 $(sdir)/configure.in $(sdir)/configure.ac
+$(sdir)/configure: $(sdir)/aclocal.m4 $(sdir)/aczsh.m4 $(sdir)/configure.ac
 	cd $(sdir) && autoconf
 
 config.h: stamp-h
@@ -140,7 +140,7 @@ stamp-h: $(sdir)/config.h.in config.status
 	  CONFIG_FILES= CONFIG_HEADERS=$(subdir)/config.h $(SHELL) ./config.status
 
 $(sdir)/config.h.in: $(sdir)/stamp-h.in
-$(sdir)/stamp-h.in: $(sdir)/zshconfig.ac $(sdir)/acconfig.h \
+$(sdir)/stamp-h.in: $(sdir)/configure.ac $(sdir)/acconfig.h \
 		$(sdir)/aclocal.m4 $(sdir)/aczsh.m4
 	cd $(sdir) && autoheader
 	echo > $(sdir)/stamp-h.in

@@ -18,10 +18,9 @@ Tools
 To develop (as opposed to just build) zsh, you'll need a few specialised
 tools:
 
-* GNU autoconf, version 2.12 or later.  (Earlier versions mostly work,
-  but part of the configuration system now relies on part of the format
-  of the config.status files that get generated.  See the comments in
-  configure.in and at the end of Src/mkmakemod.sh for an explanation.)
+* GNU autoconf, version 2.50 or later.  This version contained
+  significant enhancements and arlier versions will no
+  longer work.
 
 * GNU m4.  (Required by autoconf.)
 

@@ -1,3 +1,10 @@
+2004-01-08  Peter Stephenson  <pws@csr.com>
+
+	* 19338 adapated (see following thread): .distfiles,
+	Makefile.in, zshconfig.ac, configure.in, configure.ac,
+	Etc/zsh-development-guide: Remove support for autoconf
+	versions before 2.50.
+
 2004-01-06  Peter Stephenson  <pws@csr.com>
 
 	* 19339: Doc/Zsh/tcpsys.yo, Functions/TCP/tcp_fd_handler,
