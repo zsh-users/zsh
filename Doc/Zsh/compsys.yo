@@ -523,16 +523,16 @@ some of these tags are not really used when generating mathes but
 instead are only used by some completion functions when looking up
 styles.
 
-em(NOTE: There are far too many of them -- we have to find ways to reduce
-the number. Please tell us if you think that you have identified a tag 
-that should be replaced by one of the more generic ones.)
-
 startitem()
 item(tt(accounts))(
 used to look up the tt(users-hosts) style
 )
 item(tt(all-files))(
 for the names of all files
+)
+item(tt(all-expansions))(
+used by the tt(_expand) completer when adding the string containing
+all expansions
 )
 item(tt(arguments))(
 when an argument of a command may be completed
@@ -561,6 +561,9 @@ item(tt(commands))(
 for names of external commands and names of sub-commands (used by some 
 commands like tt(cvs))
 )
+item(tt(corrections))(
+used by the tt(_approximate) completer for the possible corrections
+)
 item(tt(cursors))(
 for cursor names used by X programs
 )
@@ -582,6 +585,9 @@ for entries in the directory stack
 )
 item(tt(displays))(
 for X display names
+)
+item(tt(expansions))(
+used by the tt(_expand) completer for possible expansions
 )
 item(tt(extensions))(
 for X server extensions
@@ -661,6 +667,10 @@ for nicknames of YP maps
 )
 item(tt(options))(
 for command options
+)
+item(tt(original))(
+used by the tt(_approximate) and tt(_expand) completers when adding
+the original string
 )
 item(tt(other-accounts))(
 used to look up the tt(users-hosts) style

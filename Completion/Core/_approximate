@@ -59,9 +59,9 @@ compadd() {
     PREFIX="(#a${_comp_correct})$PREFIX"
   fi
   if [[ -n "$_correct_prompt" ]]; then
-    builtin compadd -X "$_correct_prompt" -J _correct "$@"
+    builtin compadd -X "$_correct_prompt" -J corrections "$@"
   else
-    builtin compadd -J _correct "$@"
+    builtin compadd -J corrections "$@"
   fi
 }
 
@@ -77,6 +77,11 @@ _comp_correct=1
 compstate[matcher]=-1
 
 _correct_prompt="${cfgps//\\%e/1}"
+
+_setup original corrections
+
+[[ "$cfgorig" != *last* ]] && builtin compadd -V original
+builtin compadd -J corrections
 
 [[ -z "$compstate[pattern_match]" ]] && compstate[pattern_match]='*'
 
@@ -99,11 +104,7 @@ while [[ _comp_correct -le comax ]]; do
       else
         expl=(-n)
       fi
-      if [[ "$cfgorig" = *last* ]]; then
-        builtin compadd "$expl[@]" -U -V _correct_original -Q - "$PREFIX$SUFFIX"
-      elif [[ -n "$cfgorig" ]]; then
-	builtin compadd "$expl[@]" -U -Q - "$PREFIX$SUFFIX"
-      fi
+      builtin compadd "$expl[@]" -U -V original -Q - "$PREFIX$SUFFIX"
 
       # If you always want to see the list of possible corrections,
       # set `compstate[list]=list' here.

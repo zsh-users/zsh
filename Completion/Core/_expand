@@ -82,7 +82,9 @@ fi
 
 # Quote the results and remove unnecessary quotes before `='s.
 
-    exp=( "${(@)${(@)${(@q)exp}//\\\\=/=}/#=/\\=}" )
+exp=( "${(@)${(@)${(@q)exp}//\\\\=/=}/#=/\\=}" )
+
+_setup original expansions all-expansions
 
 # We have expansions, should we menucomplete them?
 
@@ -93,15 +95,15 @@ if [[ -z "$menu" ]]; then
   # probably also adding the original string.
 
   if [[ -z "$compstate[insert]" ]]; then
-    compadd -U -V _expand -Q - "$exp[@]"
+    compadd -U -V all-expansions -Q - "$exp[@]"
   else
     [[ -n "$orig" && "$orig" != *last* ]] &&
-        compadd "$expl[@]" -UQ -V _expand_original - "$word"
+        compadd "$expl[@]" -UQ -V original - "$word"
 
     compadd -UQ -V _expand - "$exp"
 
     [[ -n "$orig" && "$orig" = *last* ]] &&
-        compadd "$expl[@]" -UQ -V _expand_original - "$word"
+        compadd "$expl[@]" -UQ -V original - "$word"
 
     compstate[insert]=menu
   fi
@@ -114,22 +116,22 @@ else
   # and/or the string containing all expanded string.
 
   [[ -n "$orig" && "$orig" != *last* ]] &&
-      compadd "$expl[@]" -UQ -V _expand_original - "$word"
+      compadd "$expl[@]" -UQ -V original - "$word"
 
   [[ $#exp -ne 1 && "$menu" = *last* && "$menu" != *only* ]] &&
-      compadd "$expl2[@]" -UQ -V _expand_all - "$exp"
+      compadd "$expl2[@]" -UQ -V all-expansions - "$exp"
 
   if [[ -z "$prompt" ]]; then
-    compadd -UQ $group _expand - "$exp[@]"
+    compadd -UQ $group expansions - "$exp[@]"
   else
     compadd -UQ -X "${prompt//\\%o/$word}" \
-            $group _expand - "$exp[@]"
+            $group expansions - "$exp[@]"
   fi
   [[ $#exp -ne 1 && "$menu" != *last* && "$menu" != *only* ]] &&
-      compadd "$expl2[@]" -UQ -V _expand_all - "$exp"
+      compadd "$expl2[@]" -UQ -V all-expansions - "$exp"
 
   [[ -n "$orig" && "$orig" = *last* ]] &&
-      compadd "$expl[@]" -UQ -V _expand_original - "$word"
+      compadd "$expl[@]" -UQ -V original - "$word"
 
   compstate[insert]=menu
 fi
