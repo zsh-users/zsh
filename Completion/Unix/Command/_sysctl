@@ -1,18 +1,7 @@
 #compdef sysctl
 
 case $OSTYPE in
-  freebsd[0-4].*)
-    : ${(A)_cache_sysctlvars:=${${$(sysctl -A):#[^a-z]*}%%:*}}
-    _arguments -s -A "-*" \
-      '(-w -X *)-a[list all]' \
-      '(-w -X *)-A[show all opaques (values suppressed)]' \
-      '(-w)-b[binary output]' \
-      '(-w)-n[show only variable values]' \
-      '(-a -A -b -n -X)-w[write mode]' \
-      '(-a -A -w *)-X[show all opaques (entire values)]' \
-      '(-a -A -X)*:sysctl variable:_multi_parts ${words[(r)-w]:+-S=} -i . _cache_sysctlvars'
-  ;;
-  freebsd[5-9].*)
+  freebsd[5-9].*|freebsd4.[4-9]*)
     local -a sysctlvars
     sysctlvars=( $(sysctl -aN) )
     _arguments -s -A "-*" \
@@ -23,6 +12,17 @@ case $OSTYPE in
       '(-x)-o[show opaques as well (values suppressed)]' \
       '(-o)-x[show opaques as well (entire values)]' \
       '(-a)*:sysctl variable:_multi_parts -i . sysctlvars'
+  ;;
+  freebsd[0-4].*)
+    : ${(A)_cache_sysctlvars:=${${$(sysctl -A):#[^a-z]*}%%:*}}
+    _arguments -s -A "-*" \
+      '(-w -X *)-a[list all]' \
+      '(-w -X *)-A[show all opaques (values suppressed)]' \
+      '(-w)-b[binary output]' \
+      '(-w)-n[show only variable values]' \
+      '(-a -A -b -n -X)-w[write mode]' \
+      '(-a -A -w *)-X[show all opaques (entire values)]' \
+      '(-a -A -X)*:sysctl variable:_multi_parts ${words[(r)-w]:+-S=} -i . _cache_sysctlvars'
   ;;
   linux*)
     _arguments -A "-*" \

@@ -1,3 +1,9 @@
+2001-08-03  Oliver Kiddle  <opk@zsh.org>
+
+	* 15562, Akinori Musha: 15559, 15563: Completion/BSD/Command/_chflags,
+	Completion/Unix/Command/_chown, Completion/Unix/Command/_sysctl:
+	new BSD completion and fix _chown for symlinks
+
 2001-07-31  Clint Adams  <clint@zsh.org>
 
 	* 15551: Completion/Unix/Command/_gzip: handle -l and -t
