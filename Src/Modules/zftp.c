@@ -1699,7 +1699,7 @@ zftp_open(char *name, char **args, int flags)
     struct hostent *zhostp = NULL;
     char **addrp, *fname;
     int err, len, tmout;
-    int herrno, af, salen;
+    int herrno, af, hlen;
 
     if (!*args) {
 	if (zfsess->userparams)
@@ -1777,11 +1777,11 @@ zftp_open(char *name, char **args, int flags)
 	zfsess->control.peer.a.sa_family = af;
 #ifdef SUPPORT_IPV6
 	if(af == AF_INET6) {
-	    salen = sizeof(struct sockaddr_in6);
+	    hlen = 16;
 	} else
 #endif /* SUPPORT_IPV6 */
 	{
-	    salen = sizeof(struct sockaddr_in);
+	    hlen = 4;
 	}
 
 	tcp_socket(af, SOCK_STREAM, 0, &(zfsess->control));
@@ -1805,7 +1805,7 @@ zftp_open(char *name, char **args, int flags)
 
 	/* try all possible IP's */
 	for (addrp = zhostp->h_addr_list; err && *addrp; addrp++) {
-	    if(salen != zhostp->h_length)
+	    if(hlen != zhostp->h_length)
 		zwarnnam(name, "address length mismatch", NULL, 0);
 	    do {
 		err = tcp_connect(&(zfsess->control), *addrp, zhostp, zservp->s_port);

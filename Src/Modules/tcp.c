@@ -255,6 +255,7 @@ tcp_close(Tcp_session sess)
 mod_export int
 tcp_connect(Tcp_session sess, char *addrp, struct hostent *zhost, int d_port)
 {
+    int salen;
 #ifdef SUPPORT_IPV6
     if(zhost->h_addrtype==AF_INET6) {
 	memcpy(&(sess->peer.in6.sin6_addr), addrp, zhost->h_length);
@@ -263,14 +264,16 @@ tcp_connect(Tcp_session sess, char *addrp, struct hostent *zhost, int d_port)
 # ifdef HAVE_STRUCT_SOCKADDR_IN6_SIN6_SCOPE_ID
 	sess->peer.in6.sin6_scope_id = 0;
 # endif
+	salen = sizeof(struct sockaddr_in6);
     } else
 #endif /* SUPPORT_IPV6 */
     {
 	memcpy(&(sess->peer.in.sin_addr), addrp, zhost->h_length);
 	sess->peer.in.sin_port = d_port;
+	salen = sizeof(struct sockaddr_in);
     }
 
-    return connect(sess->fd, (struct sockaddr *)&(sess->peer), zhost->h_length);
+    return connect(sess->fd, (struct sockaddr *)&(sess->peer), salen);
 }
 
 /* The load/unload routines required by the zsh library interface */
