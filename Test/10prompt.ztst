@@ -93,7 +93,7 @@
   if [[ $date3 != [0-9][0-9]-[0-9][0-9]-[0-9][0-9] ]]; then
     print "Date \`$date3' is not in the form \`YY-MM-DD'"
   fi
-  if (( $date1[5,-1] != $date2[4,5] )) || (( $date2[4,5] != $date3[8,9] ))
+  if (( $date1[5,-1] != $date2[4,5] )) || (( $date2[4,5] != $date3[7,8] ))
   then
     print "Days of month do not agree in $date1, $date2, $date3"
   fi
