@@ -1,3 +1,8 @@
+2001-05-04  Bart Schaefer  <schaefer@zsh.org>
+
+	* 14224: Completion/Unix/Commmand/_cvs: Complete path prefixes for
+	subcommands where file completion must reference CVS/Entries.
+
 2001-05-04  Oliver Kiddle  <opk@zsh.org>
 
 	* 14219: Completion/Zsh/Command/_bindkey: update for bindkey

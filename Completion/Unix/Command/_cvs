@@ -73,7 +73,7 @@ _cvs_add () {
   _arguments -s \
     '-k+[keyword]:keyword substitution:_cvs_k' \
     '-m+[message]:message:_cvs_m' \
-    '*:file:_cvs_files_unmaintained' \
+    '*:added file:_cvs_files_unmaintained' \
 }
 
 (( $+functions[_cvs_admin] )) ||
@@ -157,7 +157,7 @@ _cvs_commit () {
     '(-F)-m+[message]:message:_cvs_m' \
     '(-m)-F+[message file]:log message file:_files' \
     '-r+[specify revision]:tag:_cvs_revisions' \
-    '*:file:_cvs_files_modified'
+    '*:modified file:_cvs_files_modified'
 }
 
 (( $+functions[_cvs_diff] )) ||
@@ -434,7 +434,7 @@ _cvs_remove () {
     '-f[force to remove]' \
     '(-R)-l[don'\''t recursive]' \
     '(-l)-R[recursive]' \
-    '*:file:_cvs_remove_arg'
+    '*:removed file:_cvs_remove_arg'
 }
 
 (( $+functions[_cvs_remove_arg] )) ||
@@ -516,7 +516,7 @@ _cvs_update () {
     '(-D)-r+[specify revision]:tag:_cvs_revisions' \
     '(-r)-D+[specify date]:date:_cvs_D' \
     '-j+[merge]:tag:_cvs_revisions' \
-    '*-I+[ignore files]:name:_files' \
+    '*-I+[ignore files]:file:_files' \
     '*-W+[wrapper specification]:spec:_files' \
     '*:file:_cvs_files'
 }
@@ -856,7 +856,8 @@ _cvs_files_unmaintained () {
 (( $+functions[_cvs_existing_directories] )) ||
 _cvs_existing_directories () {
   local expl
-  _wanted files expl file _path_files -g "*~(*/|)CVS(/)"
+  _wanted directories expl directory _path_files -g "*~(*/|)CVS(/)" ||
+  _cvs_path_prefixes
 }
 
 (( $+functions[_cvs_existing_entries] )) ||
@@ -881,7 +882,7 @@ _cvs_modified_entries () {
     realdir=${(e)~linedir}
     [[ -f "$realdir"CVS/Entries ]] &&
     [[ -n ${pat::="${(@j:|:)${(@)${(@)${(@)${(@)${(@)${(@M)${(@f)"$(<"$realdir"CVS/Entries)"}:#/*}#/}/\\/[^\\/]#\\///}%/[^/]#/[^/]#}:#${(j:|:)~${${${${(f)"$(LC_ALL=C builtin stat -gn +mtime -F '%a %b %e %T %Y' ${realdir}*(D) 2>/dev/null)"}##*/}/ //}//(#m)[][*?()<|^~#\\]/\\$MATCH}}}%%/*}//(#m)[][*?()<|^~#\\]/\\$MATCH}"} ]] &&
-    _wanted files expl file _path_files -g "$pat"
+    _wanted files expl 'modified file' _path_files -g "$pat"
   else
     _cvs_existing_entries
   fi
@@ -945,7 +946,20 @@ _cvs_nonexisting_entries () {
       ${${${${(M)${(f)"$(<"$realdir"CVS/Entries)"}:#(D|)/*}#(D|)/}%%/*}:#${(j:|:)~${files//(#m)[][*?()<|^~#\\]/\\$MATCH}}}
     )
     compquote files
-    _wanted files expl file compadd -Qp "$linedir" -a files
+    _wanted files expl 'removed file' compadd -Qp "$linedir" -a files
+  }
+}
+
+(( $+functions[_cvs_path_prefixes] )) ||
+_cvs_path_prefixes () {
+  local expl match
+  match=()
+  [[ "$PREFIX$SUFFIX" = (#b)(*)(/[^/]#) ]] && {
+    PREFIX="$match[1]"
+    ISUFFIX="$match[2]$ISUFFIX"
+    SUFFIX=''
+    _wanted directories expl directory \
+	_path_files -g "*~($PREFIX|(*/|)CVS)(/)" -S ''
   }
 }
 
