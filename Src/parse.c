@@ -2269,8 +2269,8 @@ init_eprog(void)
 #define FD_MINMAP 4096
 
 #define FD_PRELEN 12
-#define FD_MAGIC  0x02030405
-#define FD_OMAGIC 0x05040302
+#define FD_MAGIC  0x03040506
+#define FD_OMAGIC 0x06050403
 
 #define FDF_MAP   1
 #define FDF_OTHER 2
