@@ -1616,7 +1616,7 @@ typeset_single(char *cname, char *pname, Param pm, int func,
 		     (apm = (Param) paramtab->getnode(paramtab, pm->ename)))
 		uniqarray((*apm->gets.afn) (apm));
 	}
-	pm->flags = (pm->flags | on) & ~off;
+	pm->flags = (pm->flags | on) & ~(off | PM_UNSET);
 	/* This auxlen/pm->ct stuff is a nasty hack. */
 	if ((on & (PM_LEFT | PM_RIGHT_B | PM_RIGHT_Z | PM_INTEGER |
 		   PM_EFLOAT | PM_FFLOAT)) &&
