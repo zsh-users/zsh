@@ -1,3 +1,10 @@
+2004-08-07  Geoff Wing  <gcw@zsh.org>
+
+	* 20196: Src/prompt.c: still allow user specified text modifiers
+	with a short terminal.  Only disallow if the terminal is really
+	unknown or without sufficient capabilities or if SINGLE_LINE_ZLE
+	option is specified
+
 2004-08-06  Peter Stephenson  <pws@csr.com>
 
 	* 20232 with typo corrected: Functions/Zftp/zfcd: remove
