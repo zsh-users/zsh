@@ -1,3 +1,8 @@
+2001-07-02  Bart Schaefer  <schaefer@zsh.org>
+
+	* 15198: Completion/Zsh/Context/_tilde: Return nonzero if no
+	matches are found.
+
 2001-06-30  Bart Schaefer  <schaefer@zsh.org>
 
 	* 15191: Src/init.c: Don't infinite loop if there's an error in

@@ -6,7 +6,7 @@
 
 [[ -n "$compstate[quote]" ]] && return 1
 
-local expl suf ret
+local expl suf ret=1
 
 if [[ "$SUFFIX" = */* ]]; then
   ISUFFIX="/${SUFFIX#*/}$ISUFFIX"
@@ -28,3 +28,5 @@ while _tags; do
 
   (( ret )) || return 0
 done
+
+return ret
