@@ -7,10 +7,12 @@
 
 setopt localoptions nonomatch
 
-local expl list lines revlines disp
+local expl list lines revlines disp sep
 
 ### we decided against this, for now...
 #! zstyle -T ":completion:${curcontext}:directory-stack" prefix-needed ||
+
+zstyle -s ":completion:${curcontext}:directory-stack" list-separator sep || sep=--
 
 [[ $PREFIX = [-+]* ]] || return 1
 
@@ -24,11 +26,11 @@ if zstyle -T ":completion:${curcontext}:directory-stack" verbose; then
     integer i
     revlines=( $lines )
     for (( i = 1; i <= $#lines; i++ )); do
-      lines[$i]="$((i-1)) -- ${revlines[-$i]##[0-9]#[	 ]#}"
+      lines[$i]="$((i-1)) $sep ${revlines[-$i]##[0-9]#[	 ]#}"
     done
   else
     for (( i = 1; i <= $#lines; i++ )); do
-      lines[$i]="$i -- ${lines[$i]##[0-9]#[	 ]#}"
+      lines[$i]="$i $sep ${lines[$i]##[0-9]#[	 ]#}"
     done
   fi
   # get the array of numbers only

@@ -1,6 +1,6 @@
 #compdef lzop
 
-local expl state line decompress disp curcontext="$curcontext"
+local expl state line decompress disp curcontext="$curcontext" sep
 typeset -A opt_args
 
 _arguments -C -s \
@@ -91,12 +91,13 @@ case "$state" in
     fi
   ;;
   flags)
+    zstyle -s ":completion:${curcontext}:flags" list-separator sep || sep=--
     disp=( \
-      "F -- Append a \`*' for executable files" \
-      "G -- Inhibit display of group information" \
-      "Q -- Enclose file names in double quotes" )
-    disp=( ${disp[@]%[Z$PREFIX] -*} )
+      "F $sep Append a \`*' for executable files" \
+      "G $sep Inhibit display of group information" \
+      "Q $sep Enclose file names in double quotes" )
+    disp=( ${disp[@]:#[Z$PREFIX]*} )
     compset -P '[FGQ]*'
-    compadd -d disp - ${disp[@]% -*}
+    compadd -d disp - ${disp[@]%% *}
   ;;
 esac

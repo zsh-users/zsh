@@ -1,5 +1,10 @@
 2001-07-25  Sven Wischnowsky  <wischnow@zsh.org>
 
+	* 15485: Completion/Unix/Command/_lzop,
+	Completion/Zsh/Type/_directory_stack,
+	Completion/Zsh/Type/_file_descriptors, Completion/Zsh/Type/_jobs:
+	some more places where list-separator should be used
+
 	* 15484: Completion/AIX/Command/_lscfg,
 	Completion/AIX/Type/_logical_volumes,
 	Completion/Base/Utility/_describe,

@@ -1,6 +1,6 @@
 #autoload
 
-local expl disp jobs job jids pfx='%' desc how expls
+local expl disp jobs job jids pfx='%' desc how expls sep
 
 if [[ "$1" = -t ]]; then
   zstyle -T ":completion:${curcontext}:jobs" prefix-needed &&
@@ -26,9 +26,10 @@ fi
 
 if [[ -n "$desc" ]]; then
   disp=()
+  zstyle -s ":completion:${curcontext}:jobs" list-separator sep || sep=--
   for job in "$jids[@]"; do
     [[ -n "$desc" ]] &&
-        disp=( "$disp[@]" "${pfx}${(r:2:: :)job} -- ${(r:COLUMNS-8:: :)jobtexts[$job]}" )
+        disp=( "$disp[@]" "${pfx}${(r:2:: :)job} $sep ${(r:COLUMNS-8:: :)jobtexts[$job]}" )
   done
 fi
 
