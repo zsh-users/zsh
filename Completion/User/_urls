@@ -52,8 +52,8 @@ if [[ "$1" = -f ]]; then
   _wanted -C -f files expl file _files "$@" && return 0
 fi
 
-zparseopts -D -E g:=glob
-: ${(A)=glob:=-g '*(^/)'}
+glob=(-g '*(^/)')
+zparseopts -D -K -E g:=glob
 
 ipre="$IPREFIX"
 

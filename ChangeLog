@@ -1,3 +1,8 @@
+2000-06-08  Oliver Kiddle  <opk@zsh.org>
+
+	* 11823: Doc/Makefile.in, Completion/User/_urls: avoid bug in
+	IRIX's sed and use new -K option to zparseopts in _urls
+
 2000-06-08  Peter Stephenson  <pws@cambridgesiliconradio.com>
 
 	* pws: 11820: Src/main.c: metafication of command line arguments
