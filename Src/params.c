@@ -2147,6 +2147,7 @@ unsetparam_pm(Param pm, int altflag, int exp)
 	paramtab->addnode(paramtab, oldpm->nam, oldpm);
 	if ((PM_TYPE(oldpm->flags) == PM_SCALAR) &&
 	    !(pm->flags & PM_HASHELEM) &&
+	    (oldpm->flags & PM_NAMEDDIR) &&
 	    oldpm->sets.cfn == strsetfn)
 	    adduserdir(oldpm->nam, oldpm->u.str, 0, 0);
 	if (oldpm->flags & PM_EXPORTED) {
@@ -2231,8 +2232,11 @@ strsetfn(Param pm, char *x)
 {
     zsfree(pm->u.str);
     pm->u.str = x;
-    if (!(pm->flags & PM_HASHELEM))
+    if (!(pm->flags & PM_HASHELEM) &&
+	((pm->flags & PM_NAMEDDIR) || isset(AUTONAMEDIRS))) {
+	pm->flags |= PM_NAMEDDIR;
 	adduserdir(pm->nam, x, 0, 0);
+    }
 }
 
 /* Function to get value of an array parameter */
