@@ -731,19 +731,17 @@ do_ambiguous(void)
 mod_export int
 ztat(char *nam, struct stat *buf, int ls)
 {
-    char b[PATH_MAX], *p;
+    int e;
+    char *b;
 
     if (!(ls ? lstat(nam, buf) : stat(nam, buf)))
 	return 0;
 
-    for (p = b; p < b + sizeof(b) - 1 && *nam; nam++)
-	if (*nam == '\\' && nam[1])
-	    *p++ = *++nam;
-	else
-	    *p++ = *nam;
-    *p = '\0';
+    b = ztrdupstrip(nam, '\\');
 
-    return ls ? lstat(b, buf) : stat(b, buf);
+    e = ls ? lstat(b, buf) : stat(b, buf);
+    zsfree(b);
+    return e;
 }
 
 /* Insert a single match in the command line. */

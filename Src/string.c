@@ -133,3 +133,23 @@ appstr(char *base, char const *append)
 {
     return strcat(realloc(base, strlen(base) + strlen(append) + 1), append);
 }
+
+/* Duplicate a string, stripping delimiters. */
+
+/**/
+mod_export char *
+ztrdupstrip(const char *nam, char delim)
+{
+    char *p, *buf;
+
+    buf = zalloc(strlen(nam));
+
+    for (p = buf; *nam; nam++)
+        if (*nam == delim && nam[1])
+            *p++ = *++nam;
+        else
+            *p++ = *nam;
+    *p = '\0';
+
+    return buf;
+}
