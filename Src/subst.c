@@ -1109,6 +1109,8 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int ssub)
 		    val = dyncat(val, "-unique");
 		if (f & PM_HIDE)
 		    val = dyncat(val, "-hide");
+		if (f & PM_HIDE)
+		    val = dyncat(val, "-hideval");
 		if (f & PM_SPECIAL)
 		    val = dyncat(val, "-special");
 		vunset = 0;

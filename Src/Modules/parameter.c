@@ -51,7 +51,8 @@ createspecialhash(char *name, GetNodeFunc get, ScanTabFunc scan)
     Param pm;
     HashTable ht;
 
-    if (!(pm = createparam(name, PM_SPECIAL|PM_HIDE|PM_REMOVABLE|PM_HASHED)))
+    if (!(pm = createparam(name, PM_SPECIAL|PM_HIDE|PM_HIDEVAL|
+			   PM_REMOVABLE|PM_HASHED)))
 	return NULL;
 
     pm->level = pm->old ? locallevel : 0;
@@ -122,6 +123,8 @@ paramtypestr(Param pm)
 	    val = dyncat(val, "-unique");
 	if (f & PM_HIDE)
 	    val = dyncat(val, "-hide");
+	if (f & PM_HIDEVAL)
+	    val = dyncat(val, "-hideval");
 	if (f & PM_SPECIAL)
 	    val = dyncat(val, "-special");
     } else
@@ -1942,8 +1945,8 @@ boot_(Module m)
 	    if (def->hsetfn)
 		def->pm->sets.hfn = def->hsetfn;
 	} else {
-	    if (!(def->pm = createparam(def->name, def->flags | PM_HIDE |
-					PM_REMOVABLE)))
+	    if (!(def->pm = createparam(def->name, def->flags | PM_HIDE|
+					PM_HIDEVAL | PM_REMOVABLE)))
 		return 1;
 	    def->pm->sets.afn = def->setfn;
 	    def->pm->gets.afn = def->getfn;

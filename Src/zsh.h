@@ -1117,21 +1117,22 @@ struct param {
 #define PM_UNALIASED	(1<<13)	/* do not expand aliases when autoloading   */
 
 #define PM_HIDE		(1<<14)	/* Special behaviour hidden by local        */
-#define PM_TIED 	(1<<15)	/* array tied to colon-path or v.v.         */
+#define PM_HIDEVAL	(1<<15)	/* Value not shown in `typeset' commands    */
+#define PM_TIED 	(1<<16)	/* array tied to colon-path or v.v.         */
 
 /* Remaining flags do not correspond directly to command line arguments */
-#define PM_LOCAL	(1<<16) /* this parameter will be made local        */
-#define PM_SPECIAL	(1<<17) /* special builtin parameter                */
-#define PM_DONTIMPORT	(1<<18)	/* do not import this variable              */
-#define PM_RESTRICTED	(1<<19) /* cannot be changed in restricted mode     */
-#define PM_UNSET	(1<<20)	/* has null value                           */
-#define PM_REMOVABLE	(1<<21)	/* special can be removed from paramtab     */
-#define PM_AUTOLOAD	(1<<22) /* autoloaded from module                   */
-#define PM_NORESTORE	(1<<23)	/* do not restore value of local special    */
-#define PM_HASHELEM     (1<<24) /* is a hash-element */
+#define PM_LOCAL	(1<<17) /* this parameter will be made local        */
+#define PM_SPECIAL	(1<<18) /* special builtin parameter                */
+#define PM_DONTIMPORT	(1<<19)	/* do not import this variable              */
+#define PM_RESTRICTED	(1<<20) /* cannot be changed in restricted mode     */
+#define PM_UNSET	(1<<21)	/* has null value                           */
+#define PM_REMOVABLE	(1<<22)	/* special can be removed from paramtab     */
+#define PM_AUTOLOAD	(1<<23) /* autoloaded from module                   */
+#define PM_NORESTORE	(1<<24)	/* do not restore value of local special    */
+#define PM_HASHELEM     (1<<25) /* is a hash-element */
 
 /* The option string corresponds to the first of the variables above */
-#define TYPESET_OPTSTR "aiEFALRZlurtxUhT"
+#define TYPESET_OPTSTR "aiEFALRZlurtxUhHT"
 
 /* These typeset options take an optional numeric argument */
 #define TYPESET_OPTNUM "LRZiEF"
