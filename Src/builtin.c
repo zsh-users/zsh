@@ -1299,8 +1299,8 @@ bin_fc(char *nam, char **argv, char *ops, int func)
     if (last == -1)
 	last = ops['l']? addhistnum(curline.histnum,-1,0) : first;
     if (first < firsthist())
-	first = firsthist();
-    if (last == -1)
+	first = firsthist() - (first == last);
+    if (last > curhist)
 	last = (minflag) ? curhist : first;
     else if (last < first)
 	last = first;
@@ -1368,7 +1368,7 @@ fcgetcomm(char *s)
     if ((cmd = atoi(s))) {
 	if (cmd < 0)
 	    cmd = addhistnum(curline.histnum,cmd,HIST_FOREIGN);
-	if (cmd >= curline.histnum) {
+	if (cmd < firsthist()) {
 	    zwarnnam("fc", "bad history number: %d", 0, cmd);
 	    return -1;
 	}
