@@ -1,3 +1,8 @@
+2001-05-31  Sven Wischnowsky  <wischnow@zsh.org>
+
+	* 14599: Completion/Base/Utility/_multi_parts: always use
+	supplied matchers
+
 2001-05-30  Peter Stephenson  <pws@csr.com>
 
 	* 14573: INSTALL, README, Doc/Zsh/builtins.yo, Test/README,
