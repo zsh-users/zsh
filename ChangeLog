@@ -1,3 +1,12 @@
+2002-03-07  Bart Schaefer  <schaefer@zsh.org>
+
+	* 16737 (tweaked): Src/parse.c: fix parsing of binary infix
+	operators of builtin `test' when there are more than three
+	arguments.
+
+	* unposted: Etc/BUGS: stop mentioning a bug that's been fixed
+	since 3.1.6.
+
 2002-03-07  Adam Spiers  <adam@spiers.net>
 
 	* 16779: Completion/Unix/Command/_mysqldiff,
@@ -74,7 +83,7 @@
 
 2002-02-28  Bart Schaefer  <schaefer@zsh.org>
 
-	* 16748: Completion/Zsh/Command/_zle: Fix infinite loop
+	* 16748: Completion/Zsh/Command/_zle: fix infinite loop
 	introduced by 16464.
 
 2002-02-25  Sven Wischnowsky  <wischnow@zsh.org>
