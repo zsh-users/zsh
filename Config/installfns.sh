@@ -4,7 +4,7 @@ if test -d $fndir.old; then
   add_old=1
 fi
 
-$sdir_top/mkinstalldirs $DESTDIR$fndir || exit 1;
+$sdir_top/mkinstalldirs $fndir || exit 1;
 
 # If the source directory is somewhere else, we need to force
 # the shell to expand it in that directory, then strip it off.
@@ -36,8 +36,8 @@ for file in $install; do
         : ${add_old:=1}
       fi
     fi
-    $sdir_top/mkinstalldirs $DESTDIR$instdir || exit 1
-    $INSTALL_DATA $sdir/$file $DESTDIR$instdir || exit 1
+    $sdir_top/mkinstalldirs $instdir || exit 1
+    $INSTALL_DATA $sdir/$file $instdir || exit 1
   fi
 done
 

@@ -127,15 +127,15 @@ install.bin-here uninstall.bin-here:
 
 install.modules-here:
 	modules='$(MODULES)'; \
-	if test -n "$$modules"; then $(sdir_top)/mkinstalldirs $(DESTDIR)$(MODDIR); fi; \
+	if test -n "$$modules"; then $(sdir_top)/mkinstalldirs $(MODDIR); fi; \
 	for mod in $$modules; do \
-	    $(INSTALL_PROGRAM) $$mod $(DESTDIR)$(MODDIR)/$$mod; \
+	    $(INSTALL_PROGRAM) $$mod $(MODDIR)/$$mod; \
 	done
 
 uninstall.modules-here:
 	modules='$(MODULES)'; for mod in $$modules; do \
-	    if test -f $(DESTDIR)$(MODDIR)/$$mod; then \
-		rm -f $(DESTDIR)$(MODDIR)/$$mod; \
+	    if test -f $(MODDIR)/$$mod; then \
+		rm -f $(MODDIR)/$$mod; \
 	    else :; fi; \
 	done
 

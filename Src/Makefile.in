@@ -177,7 +177,7 @@ install.bin-L: $(LIBZSH)
 
 # uninstall binary
 uninstall.bin-here: uninstall.bin-@L@
-	rm -f $(DESTDIR)$(bindir)/zsh-$(VERSION) $(bindir)/zsh
+	rm -f $(DESTDIR)$(bindir)/zsh-$(VERSION) $(DESTDIR)$(bindir)/zsh
 
 uninstall.bin-N:
 uninstall.bin-L:
