@@ -184,6 +184,7 @@ LCIPDEF("LC_TIME"),
 IPDEF4("!", &lastpid),
 IPDEF4("$", &mypid),
 IPDEF4("?", &lastval),
+IPDEF4("HISTCMD", &curhist),
 IPDEF4("LINENO", &lineno),
 IPDEF4("PPID", &ppid),
 

@@ -1,5 +1,11 @@
 2004-11-16  Peter Stephenson  <pws@csr.com>
 
+	* users/8219: Doc/Zsh/params.yo, Doc/Zsh/zle.yo,
+	Src/params.c: Add $HISTCMD which gives the current history
+	line number as in bash.  Works like ${(%):-%!} except that a human
+	being could find out how to use it, too.  Note it is
+	distinct from zle's $HISTNO.
+
 	* 20556: AIX 5.3 has a SOCKLEN_T definition, so use
 	ZSOCKLEN_T internally.
 

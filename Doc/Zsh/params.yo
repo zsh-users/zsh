@@ -535,6 +535,12 @@ parameter.  Also (assuming sufficient privileges), you may start a single
 command under a different
 group ID by `tt(LPAR()GID=)var(gid)tt(; command+RPAR())'
 )
+vindex(HISTCMD)
+item(tt(HISTCMD))(
+The current history line number in an interactive shell, in other
+words the line number for the command that caused tt($HISTCMD)
+to be read.
+)
 vindex(HOST)
 item(tt(HOST))(
 The current hostname.
