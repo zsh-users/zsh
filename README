@@ -129,7 +129,7 @@ Zsh Maintenance and Bug Reports
 
 Zsh is currently maintained by the members of the zsh-workers mailing list
 and coordinated by Peter Stephenson <pws@zsh.org>.  Please send
-any feedback and bugs reports to <zsh-workers@sunsite.auc.dk>.
+any feedback and bugs reports to <zsh-workers@sunsite.dk>.
 
 There is a script "reporter" in the subdirectory Util which will print
 out your current shell environment/setup.  If you report a bug, please

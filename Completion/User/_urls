@@ -18,14 +18,14 @@
 #      ... drwxr-xr-x ... 512 Sep  3 03:01 ./http/www.zsh.org/mla/workers
 #      ... drwxr-xr-x ... 512 Sep  3 03:01 ./http/www.zsh.org/mla/workers/1999
 #      ... -rw-r--r-- ...   0 Sep  3 03:01 ./http/www.zsh.org/mla/workers/1999/index.html
-#      ... drwxr-xr-x ... 512 Sep  3 02:48 ./http/sunsite.auc.dk
-#      ... drwxr-xr-x ... 512 Sep  3 02:48 ./http/sunsite.auc.dk/zsh
+#      ... drwxr-xr-x ... 512 Sep  3 02:48 ./http/sunsite.dk
+#      ... drwxr-xr-x ... 512 Sep  3 02:48 ./http/sunsite.dk/zsh
 #      ... drwxr-xr-x ... 512 Sep  3 02:47 ./bookmark
 #      ... drwxr-xr-x ... 512 Sep  3 02:48 ./bookmark/zsh
 #      ... -rw-r--r-- ...  27 Sep  3 02:47 ./bookmark/zsh/home
 #      ... -rw-r--r-- ...  20 Sep  3 02:48 ./bookmark/zsh/meta
 #      % cat bookmark/zsh/home 
-#      http://sunsite.auc.dk/zsh/
+#      http://sunsite.dk/zsh/
 #      % cat bookmark/zsh/meta
 #      http://www.zsh.org/
 #

@@ -1,5 +1,9 @@
 2001-02-01  Oliver Kiddle  <opk@zsh.org>
 
+	* 13422: README, Completion/User/_urls, Doc/Zsh/manual.yo,
+	Doc/Zsh/metafaq.yo, Etc/CONTRIBUTORS: refer to just sunsite.dk
+	instead of sunsite.auc.dk
+
 	* 13420: Completion/User/_tin: new completion function for tin
 
 2001-01-31  Andrej Borsenkow <Andrej.Borsenkow@mow.siemens.ru>

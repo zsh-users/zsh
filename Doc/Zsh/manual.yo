@@ -169,10 +169,10 @@ produce a nicely formatted printed manual.
 item(The HTML manual)(
 An HTML version of this manual is available at the Zsh web site via:
 
-tt(http://sunsite.auc.dk/zsh/Doc/index.html).
+tt(http://sunsite.dk/zsh/Doc/).
 
 (The HTML version is produced with bf(texi2html), which may be obtained
-from tt(http://wwwcn.cern.ch/dci/texi2html/). The command is
+from tt(http://www.mathematik.uni-kl.de/~obachman/Texi2html/). The command is
 `tt(texi2html -split_chapter -expandinfo zsh.texi)'.)
 )
 enditem()
