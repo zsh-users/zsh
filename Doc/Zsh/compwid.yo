@@ -52,7 +52,7 @@ menu(Special Parameters)
 menu(Builtin Commands)
 menu(Condition Codes)
 menu(Matching Control)
-menu(Examples)
+menu(Completion Widget Example)
 endmenu()
 
 texinode(Special Parameters)(Builtin Commands)()(Completion Widgets)

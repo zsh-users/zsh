@@ -1,5 +1,7 @@
 2000-10-05  Sven Wischnowsky  <wischnow@zsh.org>
 
+	* 12901: Doc/Zsh/compwid.yo, Doc/Zsh/manual.yo: cleanup for 12896
+	
 	* 12899: Completion/Core/_main_complete: unset cshnullglob
 	
 	* 12898: Src/parse.c: don't return invalid Eprog after parse error

@@ -111,7 +111,7 @@ menu(Special Parameters)
 menu(Builtin Commands)
 menu(Condition Codes)
 menu(Matching Control)
-menu(Examples)
+menu(Completion Widget Example)
 
 Completion System
 
