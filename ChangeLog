@@ -2,9 +2,19 @@
 
 	* 17080: Doc/Zsh/compsys.yo: clarify tag-order style usage
 
+	* 17076: Completion/Redhat/Command/.distfiles,
+	Completion/Redhat/Command/_service, Completion/Unix/Command/_chkconfig,
+	Completion/Unix/Command/_init_d, Completion/Unix/Type/.distfiles,
+	Completion/Unix/Type/_services: use new helper _services to complete
+	init/xinetd services; make chkconfig use it; completion of
+	service command
+
+	* 17075: Completion/Mandrake/Command/_urpmi: _urpmi
+	completion update
+
 	* 17074: Completion/Linux/Command/.distfiles,
-	Completion/Linux/Command/_mondo: mondoarchive completion
-	(with typo correction from Bart)
+	Completion/Linux/Command/_mondo, Src/Zsh/complete.mdd:
+	mondoarchive completion (with typo correction from Bart)
 
 	* unposted: .cvsignore: add autom4te.cache. Looks like
 	autoconf-2.53 generates it for whatever reason
