@@ -22,23 +22,40 @@ _arguments '-c[exclude configs from report]' \
 
 reportbug)
 _arguments '(--no-config-files)-c[exclude configs from report]' \
-           '(--file=)-f[argument is a file, not a package]:filename:' \
-           '(--header=)-H[special header]:custom header:' \
-           '(--subject=)-s[set subject]:subject:' \
-           '(--severity=)-S[set severity]:severity:(wishlist normal important grave critical)' \
+           '(-c)--no-config-files' \
+           '(--file)-f[argument is a file, not a package]:filename:' \
+           '(-f)--file=:filename:' \
+           '(--header)-H[special header]:custom header:' \
+           '(-H)--header=:custom header:' \
+           '(--subject)-s[set subject]:subject:' \
+           '(-s)--subject=:subject:' \
+           '(--severity)-S[set severity]:severity:(wishlist normal important grave critical)' \
+           '(-S)--severity=:severity:(wishlist normal important grave critical)' \
            '(--no-cc)-x[do not cc submitter]' \
+           '(-x)--no-cc' \
            '(--no-compress)-z[send configs verbatim]' \
+           '(-z)--no-compress[send configs verbatim]' \
            '(--af)-a[use af instead of editor]' \
+           '(-a)--af[use af instead of editor]' \
            '(--no-bts-query)-b[do not check bts]' \
-           '(--bts=)-B[use alternate BTS]:system:(debian gnome kde tdyc)' \
+           '(-b)--no-bts-query' \
+           '(--bts)-B[use alternate BTS]:system:(debian gnome kde tdyc)' \
+           '(-B)--bts=:system:(debian gnome kde tdyc)' \
            '-g[sign report with GnuPG]' \
-           '(--include=)-i[include text]:' \
+           '(--include)-i[include text]:' \
+           '(-i)--include=:' \
            '(--no-ldap)-l[disable LDAP support]' \
+           '(-l)--no-ldap' \
            '(--mutt)-M[use mutt instead of editor]' \
+           '(-M)--mutt' \
            '--mua=[use specified mua instead of editor]' \
            '(--nmh --mh)-n[use comp instead of editor]' \
-           '(--output=)-o[output to file instead of mail]' \
+           '(-n --mh)--nmh' \
+           '(--nmh -n)--mh' \
+           '(--output)-o[output to file instead of mail]' \
+           '(-o)--output=' \
            '(--pgp)-P[sign report with PGP]' \
+           '(-P)--pgp' \
            '--ldap[enable LDAP support]' \
            "$_bug_commonargs[@]"
 ;;
