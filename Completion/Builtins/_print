@@ -1,9 +1,13 @@
 #compdef print
 
-local state expl line eflag
+local state expl line eflag pflag
 
 # -e flag available only after -R 
 eflag="${words[1,CURRENT-1][(r)-*R*]:+-e[enable escapes]}"
+
+# -p flag only relevant if we have a coprocess
+(:>&p) 2>/dev/null &&
+  pflag='(-s -u -z)-p[print arguments to input of coprocess]'
 
 _arguments -C -s \
   '-r[ignore escape conventions of echo]' \
@@ -18,9 +22,8 @@ _arguments -C -s \
   '(-o)-O[sort arguments in descending order]' \
   '-i[case-insensitive sorting]' \
   '(-n -l -N)-c[print arguments in columns]' \
-  '(-s -p -z)-u+[specify file-descriptor to print arguments to]:file-descritor' \
-  '(-s -u -z)-p[print arguments to input of coprocess]' \
+  '(-s -p -z)-u+[specify file-descriptor to print arguments to]:file-descriptor:_file_descriptors' \
   '(-s -p -u)-z[push arguments onto editing buffer stack]' \
   '-D[substitute any arguments which are named directories using ~ notation]' \
   '-P[perform prompt expansion]' \
-  $eflag '*:default:_default'
+  $pflag $eflag '*:default:_default'

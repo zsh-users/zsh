@@ -1,3 +1,9 @@
+2000-04-20  Oliver Kiddle  <opk@zsh.org>
+
+	* 10848: Completion/Builtins/_print, Completion/Core/.distfiles,
+	Completion/Core/_file_descriptors: Add completion for file
+	descriptors
+
 2000-04-19  Peter Stephenson  <pws@pwstephenson.fsnet.co.uk>
 
 	* Config/version.mk: 3.1.7-pre-1
