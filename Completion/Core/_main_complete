@@ -106,7 +106,7 @@ fi
 if [[ -n "$tmp" || $compstate[old_list] = keep ||
       $compstate[nmatches]+$compstate[alternate_nmatches] -gt 1 ]]; then
   [[ _last_nmatches -ge 0 &&
-     _last_nmatches -ne $compstate[nmatches]+$compstate[alternate_nmatches ]] &&
+     _last_nmatches -ne $compstate[nmatches]+$compstate[alternate_nmatches] ]] &&
       _menu_style=( "$_last_menu_style[@]" "$_menu_style[@]" )
 
   if [[ "$compstate[insert]" = "$_saved_insert" ]]; then

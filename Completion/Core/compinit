@@ -308,12 +308,16 @@ compconf() {
 
 Hello
 
-\`compconf' will be removed in the near future. The \`styles' form of
-your setup should be available in the file:
+\`compconf' will be removed in the near future, we now use a more
+general (and powerful) mechanism using the \`zstyle' builtin. An
+approximation to your old setup using \`zstyle' should be available
+in the file:
 
     \`${HOME}/.zsh-styles'
 
-Note that the values for the style may not be fully correct.
+Note that the values for the styles may be partly incorrect. Please
+read the manual to find out how to configure the completion system
+with styles.
 
 Have fun
 
@@ -358,7 +362,7 @@ Have fun
       tmp="'*:options' prefix-needed yes"
       [[ "$val" = hide* ]] &&
           tmp="$tmp
-zstyle ':completion*:options' prefix-hidden yes"
+zstyle ':completion:*:options' prefix-hidden yes"
       ;;    
     group_matches)
       tmp="'*' group-name ''"
@@ -373,28 +377,28 @@ zstyle ':completion*:options' prefix-hidden yes"
       tmp="'*:paths' cursor ${(qq)val}"
       ;;
     (approximate|incremental|predict|list|oldlist|match)_*)
-      tmp="':${name%%_*}' ${${name#*_}//_/-} ${(qq)val}"
+      tmp="'*${name%%_*}:*' ${${name#*_}//_/-} ${(qq)val}"
       ;;
     correct_*)
       cmt="# This one is a bit ugly. You may want to use only \`*:correct'
 # if you also have the \`correctword_*' or \`approximate_*' keys.
 "
-      tmp="':(correct(|-word)|approximate)' ${name#*_} ${(qq)val}"
+      tmp="'*(correct(|-word)|approximate):*' ${name#*_} ${(qq)val}"
       ;;
     correctword_*)
-      tmp="':correct-word' ${name#correctword_} ${(qq)val}"
+      tmp="'*:correct-word' ${name#correctword_} ${(qq)val}"
       ;;
     expand_*)
       cmt="# This one is a bit ugly. You may want to use only \`*:expand'
 # if you also have the \`expandword_*' keys.
 "
-      tmp="':expand(|expand-word)' ${name#*_} ${(qq)val}"
+      tmp="'*expand(|expand-word):*' ${name#*_} ${(qq)val}"
       ;;
     expandword_*)
-      tmp="':expand-word' ${name#expandword_} ${(qq)val}"
+      tmp="'expand-word:*' ${name#expandword_} ${(qq)val}"
       ;;
     history_*)
-      tmp="'*:history-words' ${name#history_} ${(qq)val}"
+      tmp="'history-words:*' ${name#history_} ${(qq)val}"
       ;;
     completer)
       tmp="'*' completer ${${(qqs.:.)val}}"
@@ -403,71 +407,13 @@ zstyle ':completion*:options' prefix-hidden yes"
       tmp="'*' last-prompt 'yes'"
       ;;
     esac
-    [[ -n "$tmp" ]] && style="${style}${cmt}zstyle :completion${tmp}
+    [[ -n "$tmp" ]] && style="${style}${cmt}zstyle :completion:${tmp}
 "
   done
 
   eval "${style}"
 
   print "$style" >>! ${HOME}/.zsh-styles
-}
-
-# Very simple interface for setting styles:
-#
-#   compstyle pattern style values...
-
-compstyle() {
-  local long
-
-  if [[ "$1" = -L ]]; then
-    long=yes
-    shift
-  fi
-
-  if (( ! $# )); then
-    local pats styles vals pat style pre eq
-
-    zstyle -g pats
-
-    for pat in "${(@M)pats:#:completion*}"; do
-      if [[ -n "$long" ]]; then
-        pre="compstyle ${(qq)pat#:completion} "
-      else
-        print "${pat#:completion}"
-	pre='    '
-	eq=' ='
-      fi
-      zstyle -g styles "$pat"
-      for style in "$styles[@]"; do
-        zstyle -g vals "$pat" "$style"
-        print "${pre}${style}${eq}" "${(@qq)vals}"
-      done
-    done
-
-    return 0
-  fi
-
-  if [[ "$1" = -d ]]; then
-    if [[ $# -gt 1 ]]; then
-      zstyle -d ":completion$2" "${(@)argv[3,-1]}"
-    else
-      local pats
-
-      zstyle -g pats
-
-      for pat in "${(@M)pats:#:completion}"; do
-        zstyle -d "$pat"
-      done
-    fi
-
-    return 0
-  fi
-
-  [[ "$1" = -(|-) ]] && shift
-
-  zstyle - ":completion$1" "${(@)argv[2,-1]}"
-
-  return 0
 }
 
 # Now we automatically make the definition files autoloaded.

@@ -29,19 +29,19 @@ print "#files: $#_d_files" > $_d_file
 
 print "_comps=(" >> $_d_file
 for _d_f in ${(ok)_comps}; do
-    print -r - "'${_d_f//\'/'\\''}'" "'${_comps[$_d_f]//\'/'\\''}'"
+    print -r - "${(q)_d_f}" "${(q)_comps[$_d_f]}"
 done  >> $_d_file
 print ")" >> $_d_file
 
 print "\n_patcomps=(" >> $_d_file
 for _d_f in "${(ok@)_patcomps}"; do
-  print -r - "'${_d_f//\'/'\\''}'" "'${_patcomps[$_d_f]//\'/'\\''}'"
+  print -r - "${(q)_d_f}" "${(q)_patcomps[$_d_f]}"
 done >> $_d_file
 print ")" >> $_d_file
 
 print "\n_postpatcomps=(" >> $_d_file
 for _d_f in "${(ok@)_postpatcomps}"; do
-  print -r - "'${_d_f//\'/'\\''}'" "'${_postpatcomps[$_d_f]//\'/'\\''}'"
+  print -r - "${(q)_d_f}" "${(q)_postpatcomps[$_d_f]}"
 done >> $_d_file
 print ")" >> $_d_file
 
