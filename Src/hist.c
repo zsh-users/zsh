@@ -1043,7 +1043,7 @@ hend(void)
     chline = NULL;
     histactive = 0;
     if (isset(SHAREHISTORY) || isset(INCAPPENDHISTORY))
-	savehistfile(hf, 1, HFILE_USE_OPTIONS | HFILE_FAST);
+	savehistfile(hf, 0, HFILE_USE_OPTIONS | HFILE_FAST);
     unlockhistfile(hf); /* It's OK to call this even if we aren't locked */
     return !(flag & HISTFLAG_NOEXEC || errflag);
 }
