@@ -1,3 +1,8 @@
+2001-04-19  Sven Wischnowsky  <wischnow@zsh.org>
+
+	* ?????: Src/Zle/complete.mdd: use the right path patterns for
+	completion functions
+
 2001-04-19  Clint Adams  <schizo@debian.org>
 
 	* 14018: Src/mkmakemod.sh: honor STRIPFLAGS when installing
