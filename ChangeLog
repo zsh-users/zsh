@@ -1,3 +1,7 @@
+2000-05-03  Bart Schaefer  <schaefer@brasslantern.com>
+
+	* 11136: Doc/Zsh/expn.yo: Reorganize history expansion doc.
+
 2000-05-03  Peter Stephenson  <pws@cambridgesiliconradio.com>
 
 	* 11126: Doc/Zsh/expn.yo: typos in 11117.

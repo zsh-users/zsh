@@ -49,36 +49,91 @@ cindex(expansion, history)
 History expansion allows you to use words from previous command
 lines in the command line you are typing.  This simplifies spelling
 corrections and the repetition of complicated commands or arguments.
-Command lines are saved in the history list, the size of which
-is controlled by the tt(HISTSIZE)
 vindex(HISTSIZE, use of)
-parameter.  The most recent command is retained in any case.
-A history expansion begins with the first character of the
-tt(histchars) parameter which is `tt(!)'
-by default and may occur anywhere on the command line; history
-expansions do not nest.  The `tt(!)' can be escaped with `tt(\)'
-or can be enclosed between a pair of single quotes (tt('')) to suppress
-its special meaning. Double quotes will em(not) work for this.
+Immediately before execution, each command is saved in the history list,
+the size of which is controlled by the tt(HISTSIZE) parameter.  The one
+most recent command is always retained in any case.  Each saved command in
+the history list is called a history em(event) and is assigned a number,
+beginning with 1 (one) when the shell starts up.  The history number that
+you may see in your prompt (see noderef(Prompt Expansion)) is the number
+that is to be assigned to the em(next) command.
 
-Input lines containing history expansions are echoed on the
-terminal after being expanded, but before any other
-expansions take place or the command gets executed.
 startmenu()
+menu(Overview)
 menu(Event Designators)
 menu(Word Designators)
 menu(Modifiers)
 endmenu()
-texinode(Event Designators)(Word Designators)()(History Expansion)
+texinode(Overview)(Event Designators)()(History Expansion)
+subsect(Overview)
+vindex(histchars, use of)
+A history expansion begins with the first character of the tt(histchars)
+parameter, which is `tt(!)' by default, and may occur anywhere on the
+command line; history expansions do not nest.  The `tt(!)' can be escaped
+with `tt(\)' or can be enclosed between a pair of single quotes (tt(''))
+to suppress its special meaning.  Double quotes will em(not) work for
+this.  Following this history character is an optional event designator
+(ifzman(see )noderef(Event Designators)) and then an optional word
+designator (noderef(Word Designators)); if neither of these designators is
+present, no history expansion occurs.
+
+Input lines containing history expansions are echoed after being expanded,
+but before any other expansions take place and before the command is
+executed.  It is this expanded form that is recorded as the history event
+for later references.
+
+By default, a history reference with no event designator refers to the
+same event as any preceding history reference on that command line; if it
+is the only history reference in a command, it refers to the previous
+command.
+pindex(CSH_JUNKIE_HISTORY, use of)
+However, if the option tt(CSH_JUNKIE_HISTORY) is set, then every history
+reference with no event specification em(always) refers to the previous
+command.
+
+For example, `tt(!)' is the event designator for the previous command, so
+`tt(!!:1)' always refers to the first word of the previous command, and
+`tt(!!$)' always refers to the last word of the previous command.  With
+tt(CSH_JUNKIE_HISTORY) set, then `tt(!:1)' and `tt(!$)' function in the
+same manner as `tt(!!:1)' and `tt(!!$)', respectively.  Conversely, if
+tt(CSH_JUNKIE_HISTORY) is unset, then `tt(!:1)' and `tt(!$)' refer to the
+first and last words, respectively, of the same event referenced by the
+nearest other history reference preceding them on the current command
+line, or to the previous command if there is no preceding reference.
+
+The character sequence `tt(^)var(foo)tt(^)var(bar)' (where `tt(^)' is
+actually the second charcter of the tt(histchars) parameter)
+repeats the last command, replacing the string var(foo) with var(bar).
+More precisely, the sequence `tt(^)var(foo)tt(^)var(bar)tt(^)' is
+synonymous with `tt(!!:s)tt(^)var(foo)tt(^)var(bar)tt(^)', hence other
+modifiers (see noderef(Modifiers)) may follow the final `tt(^)'.
+
+If the shell encounters the character sequence `tt(!")'
+in the input, the history mechanism is temporarily disabled until
+the current list (see
+ifzman(manref(zshmisc))\
+ifnzman(noderef(Shell Grammar))\
+) is fully parsed.  The `tt(!")' is removed from the input, and any
+subsequent `tt(!)' characters have no special significance.
+
+findex(fc, use of)
+A less convenient but more comprehensible form of command history support
+is provided by the tt(fc) builtin.
+texinode(Event Designators)(Word Designators)(Overview)(History Expansion)
 subsect(Event Designators)
 cindex(history event designators)
 cindex(event designators, history)
-An event designator is a reference to a command-line entry in
-the history list.
+An event designator is a reference to a command-line entry in the history
+list.  In the list below, remember that the initial tt(`!') in each item
+may be changed to another character by setting the tt(histchars)
+parameter.
 
 startitem()
 item(tt(!))(
 Start a history expansion, except when followed by a blank, newline,
-`tt(=)' or `tt(LPAR())'.
+`tt(=)' or `tt(LPAR())'.  If followed immediately by a word designator
+(ifzman(see )noderef(Word Designators)), this forms a history reference
+with no event designator (ifzman(see )noderef(Overview)).
 )
 item(tt(!!))(
 Refer to the previous command.
@@ -95,7 +150,9 @@ item(tt(!)var(str))(
 Refer to the most recent command starting with var(str).
 )
 item(tt(!?)var(str)[tt(?)])(
-Refer to the most recent command containing var(str).
+Refer to the most recent command containing var(str).  The trailing
+`tt(?)' is necessary if this reference is to be followed by a modifier or
+followed by any text that is not to be considered part of var(str).
 )
 item(tt(!#))(
 Refer to the current command line typed in so far.  The line is
@@ -110,10 +167,10 @@ texinode(Word Designators)(Modifiers)(Event Designators)(History Expansion)
 subsect(Word Designators)
 cindex(history word designators)
 cindex(word designators, history)
-A word designator indicates which word or words of a given command line will
-be included in a history reference.  A `tt(:)'
+A word designator indicates which word or words of a given command line are
+to be included in a history reference.  A `tt(:)' usually
 separates the event specification from the word designator.
-It can be omitted if the word designator begins with a
+It may be omitted only if the word designator begins with a
 `tt(^)', `tt($)', `tt(*)', `tt(-)' or `tt(%)'.
 Word designators include:
 
@@ -129,9 +186,9 @@ sitem(var(x)tt(*))(Abbreviates `var(x)tt(-$)'.)
 sitem(var(x)tt(-))(Like `var(x)tt(*)' but omitting word tt($).)
 endsitem()
 
-Note that a `tt(%)' word designator will only work when used as
-`tt(!%)', `tt(!:%)' or `tt(!?)var(str)tt(?:%)',
-and only when used after a tt(!?) expansion.  Anything else will result
+Note that a `tt(%)' word designator works only when used in one of
+`tt(!%)', `tt(!:%)' or `tt(!?)var(str)tt(?:%)', and only when used after a
+tt(!?) expansion (possibly in an earlier command).  Anything else results
 in an error, although the error may not be the most obvious one.
 texinode(Modifiers)()(Word Designators)(History Expansion)
 subsect(Modifiers)
@@ -179,30 +236,6 @@ Convert the words to all lowercase.
 item(tt(u))(
 Convert the words to all uppercase.
 )
-item(tt(f))(
-(This and the following
-tt(F), tt(w) and tt(W) modifier only work with parameter expansion and
-filename generation.)
-Repeats the immediately (without a colon) following modifier until the
-resulting word doesn't change any more.
-)
-item(tt(F:)var(expr)tt(:))(
-Like tt(f), but repeats only var(n) times if the expression
-var(expr) evaluates to var(n).  Any character can be used instead of
-the `tt(:)'; if `tt(LPAR())', `tt([)', or `tt({)'
-is used as the opening delimiter,
-the closing delimiter should be 'tt(RPAR())', `tt(])', or `tt(})',
-respectively.
-)
-item(tt(w))(
-Makes the immediately following modifier work on each word in the
-string.
-)
-item(tt(W:)var(sep)tt(:))(
-Like tt(w) but words are considered to be the parts of the string
-that are separated by var(sep). Any character can be used instead of
-the `tt(:)'; opening parentheses are handled specially, see above.
-)
 item(tt(s/)var(l)tt(/)var(r)[tt(/)])(
 Substitute var(r) for var(l) as described below.
 Unless preceded immediately by a tt(g), with no colon between,
@@ -231,43 +264,33 @@ the rightmost `tt(?)' in a context scan can similarly be omitted.
 Note the same record of the last var(l) and var(r) is maintained
 across all forms of expansion.
 
-By default, a history reference with no event specification refers to the same
-line as the previous history reference on that command line, unless it is the
-first history reference in a command.  In that case, a history reference
-with no event specification always refers to the previous command.  However,
-if the option tt(CSH_JUNKIE_HISTORY) is set,
-pindex(CSH_JUNKIE_HISTORY, use of)
-then history reference with no
-event specification will em(always) refer to the previous command.
+The following tt(f), tt(F), tt(w) and tt(W) modifiers work only with
+parameter expansion and filename generation.  They are listed here to
+provide a single point of reference for all modifiers.
 
-For example, `tt(!!:1)'
-will always refer to the first word of the previous command, and `tt(!!$)'
-will always refer to the last word of the previous command.  And with
-tt(CSH_JUNKIE_HISTORY) set, then `tt(!:1)' and `tt(!$)'
-will function in the same manner as `tt(!!:1)' and `tt(!!$)',
-respectively.  However, if tt(CSH_JUNKIE_HISTORY) is unset, then
-`tt(!:1)' and `tt(!$)'
-will refer to the first and last words respectively, of the last command
-referenced on the current command line.  However, if they are the first history
-reference on the command line, then they refer to the previous command.
-
-The character sequence `tt(^)var(foo)tt(^)var(bar)' (where `tt(^)' is
-actually the second charcter of the tt(histchars) parameter)
-repeats the last command, replacing the string var(foo) with var(bar).
-More precisely, the sequence `tt(^)var(foo)tt(^)var(bar)tt(^)' is
-synonymous with `tt(!!:s)tt(^)var(foo)tt(^)var(bar)tt(^)', hence other
-modifiers may follow the final `tt(^)'.
-
-If the shell encounters the character sequence `tt(!")'
-in the input, the history mechanism is temporarily disabled until
-the current list is fully parsed.  The `tt(!")'
-is removed from the input, and any subsequent `tt(!)'
-characters have no special significance.
-
-A less convenient but more comprehensible
-form of command history support
-is provided by the tt(fc) builtin.
-findex(fc, use of)
+startitem()
+item(tt(f))(
+Repeats the immediately (without a colon) following modifier until the
+resulting word doesn't change any more.
+)
+item(tt(F:)var(expr)tt(:))(
+Like tt(f), but repeats only var(n) times if the expression
+var(expr) evaluates to var(n).  Any character can be used instead of
+the `tt(:)'; if `tt(LPAR())', `tt([)', or `tt({)'
+is used as the opening delimiter,
+the closing delimiter should be 'tt(RPAR())', `tt(])', or `tt(})',
+respectively.
+)
+item(tt(w))(
+Makes the immediately following modifier work on each word in the
+string.
+)
+item(tt(W:)var(sep)tt(:))(
+Like tt(w) but words are considered to be the parts of the string
+that are separated by var(sep). Any character can be used instead of
+the `tt(:)'; opening parentheses are handled specially, see above.
+)
+enditem()
 texinode(Process Substitution)(Parameter Expansion)(History Expansion)(Expansion)
 sect(Process Substitution)
 cindex(process substitution)
@@ -277,7 +300,7 @@ Each command argument of the form
 `tt(>LPAR())var(list)tt(RPAR())' or
 `tt(=LPAR())var(list)tt(RPAR())'
 is subject to process substitution.
-In the case of the tt(<) or tt(>) forms, the shell will run process
+In the case of the tt(<) or tt(>) forms, the shell runs process
 var(list) asynchronously.  If the system supports the tt(/dev/fd)
 mechanism, the command argument is the name of the device file
 corresponding to a file descriptor; otherwise, if the system supports named
