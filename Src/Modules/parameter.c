@@ -1223,13 +1223,12 @@ scanpmjobtexts(HashTable ht, ScanFunc func, int flags)
     for (job = 1; job < MAXJOB; job++) {
 	if (jobtab[job].stat && jobtab[job].procs &&
 	    !(jobtab[job].stat & STAT_NOPRINT)) {
+	    sprintf(buf, "%d", job);
+	    pm.nam = dupstring(buf);
 	    if (func != scancountparams &&
 		((flags & (SCANPM_WANTVALS|SCANPM_MATCHVAL)) ||
-		 !(flags & SCANPM_WANTKEYS))) {
-		sprintf(buf, "%d", job);
-		pm.nam = dupstring(buf);
+		 !(flags & SCANPM_WANTKEYS)))
 		pm.u.str = pmjobtext(job);
-	    }
 	    func((HashNode) &pm, flags);
 	}
     }
@@ -1329,13 +1328,12 @@ scanpmjobstates(HashTable ht, ScanFunc func, int flags)
     for (job = 1; job < MAXJOB; job++) {
 	if (jobtab[job].stat && jobtab[job].procs &&
 	    !(jobtab[job].stat & STAT_NOPRINT)) {
+	    sprintf(buf, "%d", job);
+	    pm.nam = dupstring(buf);
 	    if (func != scancountparams &&
 		((flags & (SCANPM_WANTVALS|SCANPM_MATCHVAL)) ||
-		 !(flags & SCANPM_WANTKEYS))) {
-		sprintf(buf, "%d", job);
-		pm.nam = dupstring(buf);
+		 !(flags & SCANPM_WANTKEYS)))
 		pm.u.str = pmjobstate(job);
-	    }
 	    func((HashNode) &pm, flags);
 	}
     }
