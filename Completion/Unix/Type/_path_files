@@ -351,19 +351,19 @@ for prepath in "$prepaths[@]"; do
       elif [[ "$tmp1[1]" = */* ]]; then
         if [[ -n "$_comp_correct" ]]; then
           tmp2=( "$tmp1[@]" )
-          builtin compadd -D tmp1 -F _comp_ignore "$matcher[@]" - "${(@)tmp1:t}"
+          builtin compadd -D tmp1 "$matcher[@]" - "${(@)tmp1:t}"
 
           if [[ $#tmp1 -eq 0 ]]; then
             tmp1=( "$tmp2[@]" )
-	    compadd -D tmp1 -F _comp_ignore "$matcher[@]" - "${(@)tmp2:t}"
+	    compadd -D tmp1 "$matcher[@]" - "${(@)tmp2:t}"
           fi
         else
           tmp2=( "$tmp1[@]" )
-          compadd -D tmp1 -F _comp_ignore "$matcher[@]" - "${(@)tmp1:t}"
+          compadd -D tmp1 "$matcher[@]" - "${(@)tmp1:t}"
         fi
       else
         tmp2=( '' )
-        compadd -D tmp1 -F _comp_ignore "$matcher[@]" -a tmp1
+        compadd -D tmp1 "$matcher[@]" -a tmp1
       fi
 
       # If no file matches, save the expanded path and continue with

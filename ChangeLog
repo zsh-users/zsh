@@ -1,3 +1,8 @@
+2001-10-17  Sven Wischnowsky  <wischnow@zsh.org>
+
+	* 16076: Completion/Unix/Type/_path_files: don't use
+	_comp_ignore while building paths, only at end
+
 2001-10-16  Peter Stephenson  <pws@csr.com>
 
 	* 16065: Doc/Zsh/metafaq.yo: sourceforge.
