@@ -27,12 +27,6 @@
  *
  */
 
-#ifdef __hpux
-# define _INCLUDE_POSIX_SOURCE 1
-# define _INCLUDE_XOPEN_SOURCE 1
-# define _INCLUDE_HPUX_SOURCE 1
-#endif
-
 #ifdef sinix
 # define _XPG_IV 1
 #endif
@@ -51,7 +45,7 @@
 #endif
 
 #ifndef HAVE_ALLOCA
-# define alloca halloc
+# define alloca zhalloc
 #else
 # ifdef __GNUC__
 #  define alloca __builtin_alloca
@@ -70,8 +64,15 @@ char *alloca _((size_t));
 # endif
 #endif
 
-#ifdef HAVE_LIBC_H     /* NeXT */
-# include <libc.h>
+/*
+ * libc.h in an optional package for Debian Linux is broken (it
+ * defines dup() as a synonym for dup2(), which has a different
+ * number of arguments), so just include it for next.
+ */
+#ifdef __NeXT__
+# ifdef HAVE_LIBC_H
+#  include <libc.h>
+# endif
 #endif
 
 #ifdef HAVE_SYS_TYPES_H
@@ -266,6 +267,8 @@ struct timezone {
 # ifndef TIME_H_SELECT_H_CONFLICTS
 #  include <sys/select.h>
 # endif
+#elif defined(SELECT_IN_SYS_SOCKET_H)
+# include <sys/socket.h>
 #endif
 
 #ifdef HAVE_SYS_FILIO_H
@@ -394,9 +397,10 @@ struct timezone {
 #endif
 
 /* DIGBUFSIZ is the length of a buffer which can hold the -LONG_MAX-1 *
+ * (or with ZSH_64_BIT_TYPE maybe -LONG_LONG_MAX-1)                   *
  * converted to printable decimal form including the sign and the     *
  * terminating null character. Below 0.30103 > lg 2.                  */
-#define DIGBUFSIZE ((int)(((sizeof(long) * 8) - 1) * 0.30103) + 3)
+#define DIGBUFSIZE ((int)(((sizeof(zlong) * 8) - 1) * 0.30103) + 3)
 
 /* If your stat macros are broken, we will *
  * just undefine them.                     */
@@ -405,6 +409,7 @@ struct timezone {
 # undef S_ISBLK
 # undef S_ISCHR
 # undef S_ISDIR
+# undef S_ISDOOR
 # undef S_ISFIFO
 # undef S_ISLNK
 # undef S_ISMPB
@@ -431,6 +436,9 @@ struct timezone {
 #endif
 #if !defined(S_ISDIR) && defined(S_IFDIR)
 # define S_ISDIR(m) (((m) & S_IFMT) == S_IFDIR)
+#endif
+#if !defined(S_ISDOOR) && defined(S_IFDOOR)      /* Solaris */
+# define S_ISDOOR(m) (((m) & S_IFMT) == S_IFDOOR)
 #endif
 #if !defined(S_ISFIFO) && defined(S_IFIFO)
 # define S_ISFIFO(m) (((m) & S_IFMT) == S_IFIFO)
@@ -470,6 +478,9 @@ struct timezone {
 #endif
 #ifndef S_ISDIR
 # define S_ISDIR(m) ((void)(m), 0)
+#endif
+#ifndef S_ISDOOR
+# define S_ISDOOR(m) ((void)(m), 0)
 #endif
 #ifndef S_ISFIFO
 # define S_ISFIFO(m) ((void)(m), 0)
@@ -572,6 +583,10 @@ struct timezone {
 # define R_OK 4
 #endif
 
+#ifndef HAVE_LCHOWN
+# define lchown chown
+#endif
+
 #ifndef HAVE_MEMCPY
 # define memcpy memmove
 #endif
@@ -593,6 +608,41 @@ extern char PC, *BC, *UP;
 extern short ospeed;
 #endif
 
+/* Rename some global zsh variables to avoid *
+ * possible name clashes with libc           */
+
+#define cs zshcs
+#define ll zshll
+
 #ifndef O_NOCTTY
 # define O_NOCTTY 0
+#endif
+
+#ifdef _LARGEFILE_SOURCE
+#ifdef HAVE_FSEEKO
+#define fseek fseeko
+#endif
+#ifdef HAVE_FTELLO
+#define ftell ftello
+#endif
+#endif
+
+/* Can't support job control without working tcsetgrp() */
+#ifdef BROKEN_TCSETPGRP
+#undef JOB_CONTROL
+#endif /* BROKEN_TCSETPGRP */
+
+#ifdef BROKEN_KILL_ESRCH
+#undef ESRCH
+#define ESRCH EINVAL
+#endif /* BROKEN_KILL_ESRCH */
+
+/* Can we do locale stuff? */
+#undef USE_LOCALE
+#if defined(CONFIG_LOCALE) && defined(HAVE_SETLOCALE) && defined(LC_ALL)
+# define USE_LOCALE 1
+#endif /* CONFIG_LOCALE && HAVE_SETLOCALE && LC_ALL */
+
+#ifdef __CYGWIN__
+# undef HAVE_MMAP
 #endif

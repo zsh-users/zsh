@@ -40,7 +40,7 @@ if [[ -z $compstate[old_insert] && -n $compstate[old_list] &&
   compstate[old_list]=keep
   return 0
 elif [[ $WIDGET = *complete(|-prefix|-word) ]] &&
-     zstyle -t ":completion:${curcontext}:" old-menu; then
+     zstyle -T ":completion:${curcontext}:" old-menu; then
   if [[ -n $compstate[old_insert] ]]; then
     compstate[old_list]=keep
     if [[ $WIDGET = *reverse* ]]; then

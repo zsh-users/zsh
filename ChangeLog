@@ -1,3 +1,7 @@
+2000-05-18  Peter Stephenson  <pws@cambridgesiliconradio.com>
+
+	* pws: 11455: Completion/Core/_oldlist: old-menu defaults on.
+
 2000-05-18  Sven Wischnowsky  <wischnow@zsh.org>
 
 	* 11453: Completion/Core/_files: make _files remove backslashes in
