@@ -1,3 +1,7 @@
+2001-01-18  Peter Stephenson  <pws@csr.com>
+
+	* 13302: Functions/Zftp/zftp_progress: division by zero
+
 2001-01-16  Sven Wischnowsky  <wischnow@zsh.org>
 
 	* 13365: Src/builtin.c, Src/exec.c, Src/glob.c, Src/hashtable.c,
