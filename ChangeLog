@@ -1,3 +1,10 @@
+2002-01-29  Clint Adams  <clint@zsh.org>
+
+	* 16514: Completion/Unix/Command/_init_d: do not attempt
+	to read file if it doesn't exist, match pipe-separated lists
+	and characters following the parenthesis, and don't wantonly
+	remove hyphens from completions.
+
 2002-01-28  Sven Wischnowsky  <wischnow@zsh.org>
 
 	* 16507: Completion/Zsh/Type/_command_names: slight improvement
