@@ -485,10 +485,19 @@ match_str(char *l, char *w, Brinfo *bpp, int bc, int *rwlp,
 	 * recursive calls. At least, it /seems/ to work.
 	 *
 	 * Let's try.
+	 *
+	 * Update: this once tested `test && ...' to check for exact
+	 * character matches only in recursive calls.  But then one
+	 * can't complete `nom<TAB>' to `nomatch' with a match spec
+	 * of `B:[nN][oO]=' because that will eat the `no'. I'm almost
+	 * certain that this will break something, but I don't know what
+	 * or if it really is a problem (or has been fixed by other
+	 * changes in the code handling partial word matching). And the
+	 * completion matching tests work.
 	 */
 
 	bslash = 0;
-	if (test && !sfx && lw &&
+	if (!sfx && lw &&
 	    (l[ind] == w[ind] ||
 	     (bslash = (lw > 1 && w[ind] == '\\' &&
 			(ind ? (w[0] == l[0]) : (w[1] == l[0])))))) {

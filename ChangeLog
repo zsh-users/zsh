@@ -1,3 +1,8 @@
+2000-10-09  Sven Wischnowsky  <wischnow@zsh.org>
+
+	* 12930: Src/Zle/compmatch.c: prefer exact character matches over
+ 	match specs (so that `nom' can match `nomatch')
+	
 2000-10-06  Sven Wischnowsky  <wischnow@zsh.org>
 
 	* 12919: Completion/User/_tiff, Completion/X/_xv: search for *.tif
