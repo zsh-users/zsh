@@ -2102,6 +2102,11 @@ bufferwords(LinkList list, char *buf, int *index)
 	    cur = num - 1;
 	}
     } while (tok != ENDINPUT && tok != LEXERR);
+    if (buf && tok == LEXERR && tokstr && *tokstr) {
+	untokenize((p = dupstring(tokstr)));
+	addlinknode(list, p);
+	num++;
+    }
     if (cur < 0 && num)
 	cur = num - 1;
     noaliases = 0;

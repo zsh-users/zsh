@@ -679,6 +679,11 @@ for `tt(ps:\n:)'.
 item(tt(z))(
 Split the result of the expansion into words using shell parsing to
 find the words, i.e. taking into account any quoting in the value.
+
+Note that this is done very lately, as for the `tt((s))' flag. So to
+access single words in the result, one has to use nested expansions as 
+in `tt(${${(z)foo}[2]}'. Likewise, to remove the quotes in the
+resulting words one would do: `tt(${(Q)${(z)foo}})'.
 )
 item(tt(t))(
 Use a string describing the type of the parameter where the value
@@ -839,7 +844,7 @@ Note that the `tt((F))' flag implicitly supplies a string for joining in this
 manner.
 )
 item(tt(8.) em(Forced Splitting))(
-If one of the `tt((s))' or `tt((f))' flags are present, or the `tt(=)'
+If one of the `tt((s))', `tt((f))' or `tt((z))' flags are present, or the `tt(=)'
 specifier was present (e.g. tt(${=)var(var)tt(})), the word is split on
 occurrences of the specified string, or (for tt(=) with neither of the two
 flags present) any of the characters in tt($IFS).

@@ -1,5 +1,9 @@
 2000-05-03  Sven Wischnowsky  <wischnow@informatik.hu-berlin.de>
 
+	* 11117: Doc/Zsh/expn.yo, Src/hist.c: fix for the (z) flag: report
+ 	partial word (like `"foo', without a closing quote); mention in
+ 	manual that (z) is handled lately
+	
 	* Andrej: 11067: Completion/Builtins/_zcompile: handle -t option
 
 	* 11113: Doc/Zsh/expn.yo, Src/hist.c, Src/subst.c,
