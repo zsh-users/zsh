@@ -1,3 +1,9 @@
+2000-05-22  Sven Wischnowsky  <wischnow@zsh.org>
+
+	* 11487: Completion/Core/_expand, Src/Zle/complist.c: fix for
+ 	a-a-m-c in menu selection; scroll explanations onto screen again
+ 	when cursor comes near them
+	
 2000-05-21  Bart Schaefer  <schaefer@zsh.org>
 
 	* unposted: Doc/Zsh/options.yo: Missing () in a tt().

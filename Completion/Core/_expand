@@ -111,7 +111,7 @@ else
   if _requested all-expansions expl 'all expansions'; then
     local disp dstr
 
-    if [[ $#exp -ge COLUMNS ]]; then
+    if [[ "${#${exp}}" -ge COLUMNS ]]; then
       disp=( -ld dstr )
       dstr=( "${(r:COLUMNS-5:)exp} ..." )
     else

@@ -390,6 +390,11 @@ static Cmatch **mtab, **mmtabp;
 static Cmgroup *mgtab, *mgtabp;
 static struct listcols mcolors;
 
+/* Used in mtab/mgtab, for explanations. */
+
+#define mtexpl ((Cmatch *) 1)
+#define mgexpl ((Cmgroup) 1)
+
 /* Information for in-string colours. */
 
 static int nrefs;
@@ -977,7 +982,7 @@ static int
 compprintlist(int showall)
 {
     static int lasttype = 0, lastbeg = 0, lastml = 0;
-    static lastn = 0, lastnl = 0;
+    static int lastn = 0, lastnl = 0, lastnlnct = -1;
     static Cmgroup lastg = NULL;
     static Cmatch *lastp = NULL;
     static Cexpl *lastexpl = NULL;
@@ -994,9 +999,11 @@ compprintlist(int showall)
 	lastg = NULL;
 	lastexpl = NULL;
 	lastml = 0;
+	lastnlnct = -1;
     }
     cl = (listdat.nlines > lines - nlnct - mhasstat ?
-	  lines - nlnct - mhasstat : listdat.nlines) - 1;
+	  lines - nlnct - mhasstat : listdat.nlines) - (lastnlnct > nlnct);
+    lastnlnct = nlnct;
     mrestlines = lines - 1;
 
     if (cl < 2) {
@@ -1039,8 +1046,8 @@ compprintlist(int showall)
 			int mm = (mcols * ml), i;
 
 			for (i = mcols; i--; ) {
-			    mtab[mm + i] = NULL;
-			    mgtab[mm + i] = NULL;
+			    mtab[mm + i] = mtexpl;
+			    mgtab[mm + i] = mgexpl;
 			}
 		    }
 		    if (stop)
@@ -1563,8 +1570,8 @@ adjust_mcol(int wish, Cmatch ***tabp, Cmgroup **grp)
 
     tab -= mcol;
 
-    for (p = wish; p >= 0 && !tab[p]; p--);
-    for (n = wish; n < mcols && !tab[n]; n++);
+    for (p = wish; p >= 0 && (!tab[p] || tab[p] == mtexpl); p--);
+    for (n = wish; n < mcols && (!tab[n] || tab[n] == mtexpl); n++);
     if (n == mcols)
 	n = -1;
 
@@ -1597,6 +1604,8 @@ struct menustack {
     int cs, acc, nmatches, mline, mlbeg;
     struct menuinfo info;
     Cmgroup amatches, pmatches, lastmatches, lastlmatches;
+    char *origline;
+    int origcs, origll;
 };
 
 static int
@@ -1608,7 +1617,7 @@ domenuselect(Hookdef dummy, Chdata dat)
     Thingy cmd;
     Menustack u = NULL;
     int i = 0, acc = 0, wishcol = 0, setwish = 0, oe = onlyexpl, wasnext = 0;
-    int space, lbeg = 0, step = 1, wrap, pl = nlnct;
+    int space, lbeg = 0, step = 1, wrap, pl = nlnct, broken = 0;
     char *s;
 
     if (fdat || (dummy && (!(s = getsparam("MENUSELECT")) ||
@@ -1649,7 +1658,7 @@ domenuselect(Hookdef dummy, Chdata dat)
 
 	    for (y = 0; y < mlines; y++) {
 		for (x = mcols; x; x--, p++)
-		    if (*p && **p && mselect == (**p)->gnum)
+		    if (*p && *p != mtexpl && **p && mselect == (**p)->gnum)
 			break;
 		if (x)
 		    break;
@@ -1657,20 +1666,17 @@ domenuselect(Hookdef dummy, Chdata dat)
 	    if (y < mlines)
 		mline = y;
 	}
-	space = lines - pl - mhasstat;
 	while (mline < mlbeg)
 	    if ((mlbeg -= step) < 0)
 		mlbeg = 0;
-#if 0
-	/* Attempt to ensure that the explanations for groups are scrolled
-	 * in. Doesn't work because there are other NULL fields. */
+
 	if (mlbeg && lbeg != mlbeg) {
 	    Cmatch **p = mtab + ((mlbeg - 1) * columns), **q;
 	    int c;
 
 	    while (mlbeg) {
 		for (q = p, c = columns; c; q++, c--)
-		    if (*q)
+		    if (*q && *q != mtexpl)
 			break;
 		if (c)
 		    break;
@@ -1678,10 +1684,10 @@ domenuselect(Hookdef dummy, Chdata dat)
 		mlbeg--;
 	    }
 	}
-#endif
-	while (mline >= mlbeg + space)
-	    if ((mlbeg += step) + space > mlines)
-		mlbeg = mlines - space;
+	if ((space = lines - pl - mhasstat))
+	    while (mline >= mlbeg + space)
+		if ((mlbeg += step) + space > mlines)
+		    mlbeg = mlines - space;
 	if (lbeg != mlbeg) {
 	    Cmatch **p = mtab + (mlbeg * columns), **q;
 	    int c;
@@ -1701,8 +1707,10 @@ domenuselect(Hookdef dummy, Chdata dat)
 	showinglist = -2;
 	zrefresh();
 	inselect = 1;
-	if (noselect)
+	if (noselect) {
+	    broken = 1;
 	    break;
+	}
 	selected = 1;
 	if (!i) {
 	    i = mcols * mlines;
@@ -1755,6 +1763,9 @@ domenuselect(Hookdef dummy, Chdata dat)
 	    s->nbrbeg = nbrbeg;
 	    s->nbrend = nbrend;
 	    s->nmatches = nmatches;
+	    s->origline = origline;
+	    s->origcs = origcs;
+	    s->origll = origll;
 	    menucmp = menuacc = hasoldlist = 0;
 	    fixsuffix();
 	    validlist = 0;
@@ -1792,6 +1803,9 @@ domenuselect(Hookdef dummy, Chdata dat)
 	    s->nbrbeg = nbrbeg;
 	    s->nbrend = nbrend;
 	    s->nmatches = nmatches;
+	    s->origline = origline;
+	    s->origcs = origcs;
+	    s->origll = origll;
 	    accept_last();
 	    do_menucmp(0);
 	    mselect = (*(minfo.cur))->gnum;
@@ -1805,7 +1819,10 @@ domenuselect(Hookdef dummy, Chdata dat)
 			break;
 		if (mcol != mcols)
 		    break;
-		mline++;
+		if (++mline == mlines) {
+		    mline = 0;
+		    p -= mlines * mcols;
+		}
 	    } while (mline != ol);
 	    if (*p != minfo.cur) {
 		noselect = clearlist = listshown = 1;
@@ -1847,6 +1864,9 @@ domenuselect(Hookdef dummy, Chdata dat)
 	    brend = dupbrinfo(u->brend, &lastbrend, 0);
 	    nbrbeg = u->nbrbeg;
 	    nbrend = u->nbrend;
+	    origline = u->origline;
+	    origcs = u->origcs;
+	    origll = u->origll;
 
 	    u = u->prev;
 	    clearlist = 1;
@@ -1888,7 +1908,7 @@ domenuselect(Hookdef dummy, Chdata dat)
 		}
 		if (adjust_mcol(wishcol, &p, NULL))
 		    continue;
-	    } while (!*p);
+	    } while (!*p || *p == mtexpl);
 
 	    if (wrap == 1)
 		goto right;
@@ -1922,7 +1942,7 @@ domenuselect(Hookdef dummy, Chdata dat)
 		}
 		if (adjust_mcol(wishcol, &p, NULL))
 		    continue;
-	    } while (!*p);
+	    } while (!*p || *p == mtexpl);
 
 	    if (wrap == 1)
 		goto left;
@@ -1946,7 +1966,7 @@ domenuselect(Hookdef dummy, Chdata dat)
 		}
 		if (adjust_mcol(wishcol, &p, NULL))
 		    continue;
-		if (*p) {
+		if (*p && *p != mtexpl) {
 		    i--;
 		    lp = p;
 		    ll = mline;
@@ -1973,7 +1993,7 @@ domenuselect(Hookdef dummy, Chdata dat)
 		}
 		if (adjust_mcol(wishcol, &p, NULL))
 		    continue;
-		if (*p) {
+		if (*p || *p != mtexpl) {
 		    i--;
 		    lp = p;
 		    ll = mline;
@@ -1994,7 +2014,7 @@ domenuselect(Hookdef dummy, Chdata dat)
 		p -= mcols;
 		if (adjust_mcol(wishcol, &p, NULL))
 		    continue;
-		if (*p) {
+		if (*p && *p != mtexpl) {
 		    lp = p;
 		    ll = mline;
 		}
@@ -2014,7 +2034,7 @@ domenuselect(Hookdef dummy, Chdata dat)
 		p += mcols;
 		if (adjust_mcol(wishcol, &p, NULL))
 		    continue;
-		if (*p) {
+		if (*p && *p != mtexpl) {
 		    lp = p;
 		    ll = mline;
 		}
@@ -2046,7 +2066,7 @@ domenuselect(Hookdef dummy, Chdata dat)
 		    mcol++;
 		    p++;
 		}
-	    } while (!*p || (mcol != omcol && *p == *op));
+	    } while (!*p || *p == mtexpl || (mcol != omcol && *p == *op));
 	    wishcol = mcol;
 
 	    if (wrap == 2)
@@ -2076,7 +2096,7 @@ domenuselect(Hookdef dummy, Chdata dat)
 		    mcol--;
 		    p--;
 		}
-	    } while (!*p || (mcol != omcol && *p == *op));
+	    } while (!*p || *p == mtexpl || (mcol != omcol && *p == *op));
 	    wishcol = mcol;
 
 	    if (wrap == 2)
@@ -2087,7 +2107,7 @@ domenuselect(Hookdef dummy, Chdata dat)
 		   cmd == Th(z_vibeginningofline)) {
 	    p -= mcol;
 	    mcol = 0;
-	    while (!*p) {
+	    while (!*p || *p == mtexpl) {
 		mcol++;
 		p++;
 	    }
@@ -2098,7 +2118,7 @@ domenuselect(Hookdef dummy, Chdata dat)
 		   cmd == Th(z_viendofline)) {
 	    p += mcols - mcol - 1;
 	    mcol = mcols - 1;
-	    while (!*p) {
+	    while (!*p || *p == mtexpl) {
 		mcol--;
 		p--;
 	    }
@@ -2120,7 +2140,7 @@ domenuselect(Hookdef dummy, Chdata dat)
 		}
 		if (adjust_mcol(wishcol, &p, &pg))
 		    continue;
-	    } while (ol != mline && (*pg == g || !*pg));
+	    } while (ol != mline && (*pg == g || !*pg || *pg == mgexpl));
 	} else if (cmd == Th(z_vibackwardblankword)) {
 	    Cmgroup g = *pg;
 	    int ol = mline;
@@ -2137,7 +2157,7 @@ domenuselect(Hookdef dummy, Chdata dat)
 		}
 		if (adjust_mcol(wishcol, &p, &pg))
 		    continue;
-	    } while (ol != mline && (*pg == g || !*pg));
+	    } while (ol != mline && (*pg == g || !*pg || *pg == mgexpl));
 	} else if (cmd == Th(z_completeword) ||
 		   cmd == Th(z_expandorcomplete) ||
 		   cmd == Th(z_expandorcompleteprefix) ||
@@ -2184,7 +2204,7 @@ domenuselect(Hookdef dummy, Chdata dat)
 	menucmp = lastambig = hasoldlist = 0;
 	do_single(*(minfo.cur));
     }
-    if (wasnext) {
+    if (wasnext || broken) {
 	menucmp = 2;
 	showinglist = -2;
 	minfo.asked = 0;
@@ -2199,7 +2219,7 @@ domenuselect(Hookdef dummy, Chdata dat)
     mlbeg = -1;
     fdat = NULL;
 
-    return (dat ? (acc ? 1 : 2) : (!noselect ^ acc));
+    return ((dat && !broken) ? (acc ? 1 : 2) : (!noselect ^ acc));
 }
 
 /* The widget function. */
