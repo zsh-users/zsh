@@ -45,7 +45,7 @@ The usual alias expansion during reading will be suppressed if the
 tt(autoload) builtin or its equivalent is given the option tt(-U). This is
 recommended for the use of functions supplied with the zsh distribution.
 Note that for functions precompiled with the tt(zcompile) builtin command
-the flag tt(-U) must be created when the tt(.zwc) file is created, as the
+the flag tt(-U) must be provided when the tt(.zwc) file is created, as the
 corresponding information is compiled into the latter.
 
 For each var(element) in tt(fpath), the shell looks for three possible
@@ -67,20 +67,25 @@ files; in fact, there does not need to be any directory named var(element)
 without the suffix.  Thus including an element such as
 `tt(/usr/local/funcs.zwc)' in tt(fpath) will speed up the search for
 functions, with the disadvantage that functions included must be explicitly
-recompiled by hand before the shell notices any changes.  )
-item(var(element)tt(/)var(function)tt(.zwc))( A file created with
-tt(zcompile), which is expected to contain the definition for
-var(function).  It may include other function definitions as well, but
-those are neither loaded nor executed; a file found in this way is searched
-em(only) for the definition of var(function).  )
-item(var(element)tt(/)var(function))( A file of zsh command text, taken to
-be the definition for var(function).  ) enditem()
+recompiled by hand before the shell notices any changes.
+)
+item(var(element)tt(/)var(function)tt(.zwc))(
+A file created with tt(zcompile), which is expected to contain the
+definition for var(function).  It may include other function definitions
+as well, but those are neither loaded nor executed; a file found in this
+way is searched em(only) for the definition of var(function).
+)
+item(var(element)tt(/)var(function))(
+A file of zsh command text, taken to be the definition for var(function).
+)
+enditem()
 
-In summary, the order of searching is, first, directories in tt(fpath),
-with the earliest directory containing a function definition being used;
-within that directory, the newest of the three possibilities --- a compiled
-directory, a compiled function, or an ordinary function defition --- is
-used.
+In summary, the order of searching is, first, in the em(parents of)
+directories in tt(fpath) for the newer of either a compiled directory or
+a directory in tt(fpath); second, if more than one of these contains a
+definition for the function that is sought, the leftmost in the tt(fpath)
+is chosen; and third, within a directory, the newer of either a compiled
+function or an ordinary function definition is used.
 
 pindex(KSH_AUTOLOAD, use of)
 If the tt(KSH_AUTOLOAD) option is set, or the file contains only a
@@ -90,8 +95,8 @@ initialization, which is executed in the context of the function execution,
 and may therefore define local parameters.  It is an error if the function
 is not defined by loading the file.
 
-Otherwise, the function body with no surrounding `var(funcname)tt(()
-{)var(...)tt(}) is taken to be the complete contents of the file.  This
+Otherwise, the function body (with no surrounding `var(funcname)tt(()
+{)var(...)tt(})') is taken to be the complete contents of the file.  This
 form allows the file to be used directly as an executable shell script.  If
 processing of the file results in the function being re-defined, the
 function itself is not re-executed.  To force the shell to perform

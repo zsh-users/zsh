@@ -1,3 +1,8 @@
+2000-05-21  Bart Schaefer  <schaefer@zsh.org>
+
+	* 11483: Doc/Zsh/func.yo: Fix formatting and other small errors
+	introduced in 11352.
+
 2000-05-21  Peter Stephenson  <pws@pwstephenson.fsnet.co.uk>
 
 	* Config/version.mk: 3.1.7-pre-4.
