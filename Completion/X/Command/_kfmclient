@@ -1,5 +1,8 @@
 #compdef kfmclient
 
+# kfmclient is a command line interface for use with Konqueror,
+# the KDE file manager and web browser.
+
 local expl
 local -a context state line
 typeset -A opt_args
@@ -60,14 +63,14 @@ case $line[1] in
     _mime_types
     return
   elif [[ $state = firstarg ]]; then
-    _urls
+    _webbrowser
     return
   fi
   ;;
 
   (openProfile)
   if [[ $state = secondarg ]]; then
-    _urls
+    _webbrowser
     return
   elif [[ $state = firstarg ]]; then
     _wanted profile expl 'Konqueror profile' \
@@ -82,14 +85,14 @@ case $line[1] in
     _message "KDE binding"
     return
   elif [[ $state = firstarg ]]; then
-    _urls
+    _webbrowser
     return
   fi
   ;;
 
   (move|download|openProperties)
   if [[ $state = firstarg ]]; then
-      _urls
+      _webbrowser
       return
   fi
   ;;
