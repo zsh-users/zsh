@@ -1,3 +1,8 @@
+2001-09-18  Wayne Davison  <wayned@users.sourceforge.net>
+
+	* 15836: Src/builtin.c: Further modify the "fc -l" code to tolerate
+	out-of range values.
+
 2001-09-17  Wayne Davison  <wayned@users.sourceforge.net>
 
 	* 15837: Src/Zle/zle_hist.c: Fixed incremental search in vared
