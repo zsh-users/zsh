@@ -163,14 +163,14 @@ while true; do
 
         compadd "$group[@]" "$expl[@]" -r "$sep" -S "$sep" "$opts[@]" \
 	        -p "$pref" "$tmp2[@]" -M "r:|${sep}=* r:|=* $matcher" - \
-                "${(@)${(@M)matches:#*${sep}}%%${sep}*}" && ret=0
+                "${(@)${(@)${(@M)matches:#*${sep}}%%${sep}*}:#}" && ret=0
         (( $matches[(I)${sep}*] )) &&
             compadd "$group[@]" "$expl[@]" -S '' "$opts[@]" \
 	            -p "$pref" \
                     -M "r:|${sep}=* r:|=* $matcher" - "$sep" && ret=0
         compadd "$group[@]" "$expl[@]" -r "$sep" -S "$sep" "$opts[@]" \
                 -p "$pref" "$tmp2[@]" -M "r:|${sep}=* r:|=* $matcher" - \
-                "${(@)${(@M)matches:#*?${sep}?*}%%${sep}*}" && ret=0
+                "${(@)${(@)${(@M)matches:#*?${sep}?*}%%${sep}*}:#}" && ret=0
         compadd "$group[@]" "$expl[@]" -S '' "$opts[@]" -p "$pref" "$tmp2[@]" \
                 -M "r:|${sep}=* r:|=* $matcher" - \
                 "${(@)matches:#*${sep}*}" && ret=0
@@ -182,7 +182,7 @@ while true; do
         compadd "$group[@]" "$expl[@]" "$opts[@]" \
 	        -p "$pref" -s "${i#*${sep}}" \
                 -M "r:|${sep}=* r:|=* $matcher" - \
-                "${(@)${(@M)matches:#*${sep}*}%%${sep}*}" && ret=0
+                "${(@)${(@)${(@M)matches:#*${sep}*}%%${sep}*}:#}" && ret=0
         compadd "$group[@]" "$expl[@]" -S '' "$opts[@]" -p "$pref" \
                 -M "r:|${sep}=* r:|=* $matcher" - \
                 "${(@)matches:#*${sep}*}" && ret=0
