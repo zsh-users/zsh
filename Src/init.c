@@ -905,7 +905,7 @@ source(char *s)
     int oldshst, osubsh, oloops;
     FILE *obshin;
     char *old_scriptname = scriptname, *us;
-    char *ocs;
+    unsigned char *ocs;
     int ocsp;
 
     if (!s || 
