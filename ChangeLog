@@ -1,3 +1,8 @@
+2000-09-04  Bart Schaefer  <schaefer@zsh.org>
+
+	* 12732: Src/params.c: Suppress base# prefix when base is 10 even
+	if the [##base] format of 12722 was not used.
+
 2000-09-03  Clint Adams  <schizo@debian.org>
 
 	* 12728: Completion/User/_man: complete _files instead of

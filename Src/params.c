@@ -3049,8 +3049,10 @@ convbase(char *s, zlong v, int base)
 	    sprintf(s, "0x");
 	else if (isset(CBASES) && base == 8 && isset(OCTALZEROES))
 	    sprintf(s, "0");
-	else
+	else if (base != 10)
 	    sprintf(s, "%d#", base);
+	else
+	    *s = 0;
 	s += strlen(s);
     } else
 	base = -base;
