@@ -1,6 +1,6 @@
 #compdef netscape
 
-local curcontext="$curcontext" state line ret=1 suf
+local curcontext="$curcontext" state line ret=1 suf files
 typeset -A opt_args
 
 _x_arguments -C \
@@ -68,7 +68,7 @@ fi
 if [[ "$state" = "urls" ]]; then
   _tags files urls
   while _tags; do
-    _requested files expl 'file' _files "$@" && ret=0
+    _requested files expl 'file' _files "$@" && files=yes ret=0
     if _requested urls; then
       # Complete netscape urls
       if compset -P about: ; then
@@ -87,6 +87,7 @@ if [[ "$state" = "urls" ]]; then
 	  done
 	  (( ret )) || return 0
 	done
+        [[ -z "$files" ]] && _tags files
       fi
     fi
     (( ret )) || return 0
