@@ -8,6 +8,9 @@
 # msgs, from, etc).
 #
 
+# THIS FILE IS NOT INTENDED TO BE USED AS /etc/zlogin, NOR WITHOUT EDITING
+return 0	# Remove this line after editing this file as appropriate
+
 clear
 stty dec new cr0 -tabs
 ttyctl -f  # freeze the terminal modes... can't change without a ttyctl -u

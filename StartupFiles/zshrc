@@ -6,6 +6,9 @@
 # options, key bindings, etc.
 #
 
+# THIS FILE IS NOT INTENDED TO BE USED AS /etc/zshrc, NOR WITHOUT EDITING
+return 0	# Remove this line after editing this file as appropriate
+
 # Search path for the cd command
 cdpath=(.. ~ ~/src ~/zsh)
 

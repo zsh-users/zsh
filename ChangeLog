@@ -1,3 +1,9 @@
+2001-03-25  Bart Schaefer  <schaefer@zsh.org>
+
+	* 13757: StartupFiles/zlogin, StartupFiles/zshenv,
+	StartupFiles/zshrc:  Strongly discourage use of these files as
+	/etc/z* drop-ins.
+
 2001-03-25  Peter Stephenson  <pws@pwstephenson.fsnet.co.uk>
 
 	* 13751: Completion/User/_cpio: added.

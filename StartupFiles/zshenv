@@ -9,6 +9,9 @@
 # output or assume the shell is attached to a tty.
 #
 
+# THIS FILE IS NOT INTENDED TO BE USED AS /etc/zshenv, NOR WITHOUT EDITING
+return 0	# Remove this line after editing this file as appropriate
+
 export X11HOME=/usr/X11
 
 path=($X11HOME/bin)
