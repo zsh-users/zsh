@@ -945,7 +945,11 @@ _cvs_strict_nonentried_files () {
     omitpats=(
       ${${${${(M)${(f)"$(<"$realdir"CVS/Entries)"}:#/*}#/}%%/*}//(#m)[][*?()<|^~#\\]/\\$MATCH}
     )
-    _path_files -g "*~(*/|)(${(j:|:)~omitpats})(D.)"
+    if (( $#omitpats )); then
+    	_path_files -g "*~(*/|)(${(j:|:)~omitpats})(D.)"
+    else
+    	_path_files -g "*~(*/|)(D.)"
+    fi
   }
 }
 
