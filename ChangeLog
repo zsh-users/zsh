@@ -1,5 +1,9 @@
 2001-05-28  Sven Wischnowsky  <wischnow@zsh.org>
 
+	* 14504: Src/Modules/zprof.c: make the zprof wrapper function
+	be more careful, avoiding almost all of the code when the
+	module is being unloaded
+
 	* 14503: Src/exec.c: another attempt at fixing the job problem
 	from 14327; make execpline() reset list_pipe_job to zero if it
 	would be set for a job started in the background

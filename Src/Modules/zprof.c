@@ -68,6 +68,7 @@ static int ncalls;
 static Parc arcs;
 static int narcs;
 static Sfunc stack;
+static Module zprof_module;
 
 static void
 freepfuncs(Pfunc f)
@@ -216,6 +217,7 @@ bin_zprof(char *nam, char **args, char *ops, int func)
 static int
 zprof_wrapper(Eprog prog, FuncWrap w, char *name)
 {
+    int active = 0;
     struct sfunc sf, *sp;
     Pfunc f;
     Parc a = NULL;
@@ -223,56 +225,64 @@ zprof_wrapper(Eprog prog, FuncWrap w, char *name)
     struct timezone dummy;
     double prev, now;
 
-    if (!(f = findpfunc(name))) {
-	f = (Pfunc) zalloc(sizeof(*f));
-	f->name = ztrdup(name);
-	f->calls = 0;
-	f->time = f->self = 0.0;
-	f->next = calls;
-	calls = f;
-	ncalls++;
-    }
-    if (stack) {
-	if (!(a = findparc(stack->p, f))) {
-	    a = (Parc) zalloc(sizeof(*a));
-	    a->from = stack->p;
-	    a->to = f;
-	    a->calls = 0;
-	    a->time = a->self = 0.0;
-	    a->next = arcs;
-	    arcs = a;
-	    narcs++;
-	}
-    }
-    sf.prev = stack;
-    sf.p = f;
-    stack = &sf;
+    if (zprof_module && !(zprof_module->flags & MOD_UNLOAD)) {
+        active = 1;
+        if (!(f = findpfunc(name))) {
+            f = (Pfunc) zalloc(sizeof(*f));
+            f->name = ztrdup(name);
+            f->calls = 0;
+            f->time = f->self = 0.0;
+            f->next = calls;
+            calls = f;
+            ncalls++;
+        }
+        if (stack) {
+            if (!(a = findparc(stack->p, f))) {
+                a = (Parc) zalloc(sizeof(*a));
+                a->from = stack->p;
+                a->to = f;
+                a->calls = 0;
+                a->time = a->self = 0.0;
+                a->next = arcs;
+                arcs = a;
+                narcs++;
+            }
+        }
+        sf.prev = stack;
+        sf.p = f;
+        stack = &sf;
 
-    f->calls++;
-    tv.tv_sec = tv.tv_usec = 0;
-    gettimeofday(&tv, &dummy);
-    sf.beg = prev = ((((double) tv.tv_sec) * 1000.0) +
-		     (((double) tv.tv_usec) / 1000.0));
+        f->calls++;
+        tv.tv_sec = tv.tv_usec = 0;
+        gettimeofday(&tv, &dummy);
+        sf.beg = prev = ((((double) tv.tv_sec) * 1000.0) +
+                         (((double) tv.tv_usec) / 1000.0));
+    }
     runshfunc(prog, w, name);
-    tv.tv_sec = tv.tv_usec = 0;
-    gettimeofday(&tv, &dummy);
+    if (active) {
+        if (zprof_module && !(zprof_module->flags & MOD_UNLOAD)) {
+            tv.tv_sec = tv.tv_usec = 0;
+            gettimeofday(&tv, &dummy);
 
-    now = ((((double) tv.tv_sec) * 1000.0) +
-	   (((double) tv.tv_usec) / 1000.0));
-    f->self += now - sf.beg;
-    for (sp = sf.prev; sp && sp->p != f; sp = sp->prev);
-    if (!sp)
-	f->time += now - prev;
-    if (a) {
-	a->calls++;
-	a->self += now - sf.beg;
-    }
-    stack = sf.prev;
+            now = ((((double) tv.tv_sec) * 1000.0) +
+                   (((double) tv.tv_usec) / 1000.0));
+            f->self += now - sf.beg;
+            for (sp = sf.prev; sp && sp->p != f; sp = sp->prev);
+            if (!sp)
+                f->time += now - prev;
+            if (a) {
+                a->calls++;
+                a->self += now - sf.beg;
+            }
+            stack = sf.prev;
 
-    if (stack) {
-	stack->beg += now - prev;
-	if (a)
-	    a->time += now - prev;
+            if (stack) {
+                stack->beg += now - prev;
+                if (a)
+                    a->time += now - prev;
+            }
+        } else
+            stack = sf.prev;
     }
     return 0;
 }
@@ -289,6 +299,7 @@ static struct funcwrap wrapper[] = {
 int
 setup_(Module m)
 {
+    zprof_module = m;
     return 0;
 }
 
