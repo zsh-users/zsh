@@ -1143,12 +1143,21 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int ssub)
 		case PM_RIGHT_Z:
 		case PM_RIGHT_Z | PM_RIGHT_B:
 		    if (strlen(val) < fwidth) {
-			t = (char *)ncalloc(fwidth + 1);
-			memset(t, (v->pm->flags & PM_RIGHT_B) ? ' ' : '0', fwidth);
-			if ((t0 = strlen(val)) > fwidth)
-			    t0 = fwidth;
-			strcpy(t + (fwidth - t0), val);
-			val = t;
+			t = NULL;
+			if (v->pm->flags & PM_RIGHT_Z) {
+			    for (t = val; iblank(*t); t++);
+			    if (t && idigit(*t))
+				val = t, t = NULL;
+			}
+			if (!t) {
+			    t = (char *)ncalloc(fwidth + 1);
+			    memset(t, (v->pm->flags & PM_RIGHT_B) ? ' ' : '0', 
+				   fwidth);
+			    if ((t0 = strlen(val)) > fwidth)
+				t0 = fwidth;
+			    strcpy(t + (fwidth - t0), val);
+			    val = t;
+			}
 		    } else {
 			t = (char *)ncalloc(fwidth + 1);
 			t[fwidth] = '\0';
