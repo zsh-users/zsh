@@ -155,7 +155,7 @@ if (( long )); then
 fi
 
 subopts=()
-while [[ "$1" = -(O*|C|m*) ]]; do
+while [[ "$1" = -(O*|C) ]]; do
   case "$1" in
   -C) usecc=yes; shift ;;
   -O) subopts=( "${(@P)2}" ); shift 2 ;;
