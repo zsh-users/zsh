@@ -1,3 +1,19 @@
+2003-04-25  Oliver Kiddle  <opk@zsh.org>
+
+	* 18472: zshconfig.ac, Completion/Base/Core/_wanted,
+	Completion/Linux/Command/_uml, Completion/Mandrake/Command/_urpmi,
+	Completion/Unix/Command/_figlet, Completion/Unix/Command/_grep,
+	Completion/Unix/Command/_larch, Completion/Unix/Command/_ls,
+	Completion/Unix/Command/_perforce, Completion/Unix/Command/_sccs,
+	Completion/Unix/Command/_texinfo, Completion/Unix/Type/_java_class,
+	Completion/Zsh/Command/_zmv, Doc/zshtcpsys.yo, Doc/Zsh/compsys.yo,
+	Doc/Zsh/mod_tcp.yo, Doc/Zsh/mod_zselect.yo, Doc/Zsh/tcpsys.yo,
+	Doc/Zsh/zle.yo, Functions/Misc/relative, Functions/TCP/tcp_alias,
+	Functions/TCP/tcp_close, Functions/TCP/tcp_read,
+	Functions/Zle/forward-word-match, Functions/Zle/match-words-by-style,
+	Functions/Zle/transpose-words-match, Src/zsh.h, Src/Modules/zselect.c,
+	Test/B03print.ztst: spelling corrections
+
 2003-04-24  Peter Stephenson  <pws@pwstephenson.fsnet.co.uk>
 
 	* unposted, c.f. 2003-04-14: Doc/Zsh/compsys.yo: finish
@@ -630,7 +646,7 @@
 2002-12-04  Peter Stephenson  <pws@csr.com>
 
 	* 17979: Doc/Zsh/options.yo, Src/exec.c, Src/options.c, Src/zsh.h:
-	Add ERR_RETURN option, similiar to ERR_EXIT option.
+	Add ERR_RETURN option, similar to ERR_EXIT option.
 
 2002-11-26  Peter Stephenson  <pws@csr.com>
 
@@ -1075,7 +1091,7 @@
 2002-07-05  Sven Wischnowsky  <wischnow@zsh.org>
 
 	* 17429: Src/Zle/complist.c: improve interactive mode when
-	there are no matches left (alow to go back with undo)
+	there are no matches left (allow going back with undo)
 
 2002-07-04  Clint Adams  <clint@zsh.org>
 
@@ -1129,7 +1145,7 @@
 	* 17387: Completion/Zsh/Context/.distfiles,
 	Completion/Zsh/Context/_assign, Doc/Zsh/compsys.yo,
 	Doc/Zsh/compwid.yo, Src/zsh.h, Src/Zle/compcore.c,
-	Src/Zle/zle_tricky.c: add new sepcial context
+	Src/Zle/zle_tricky.c: add new special context
 	-assign-parameter- for completing the parameter in an
 	assignment
 
@@ -1234,7 +1250,7 @@
 
 2002-06-02  Peter Stephenson  <pws@pwstephenson.fsnet.co.uk>
 
-	* 17273: Src/parse.c: `outer() { inner(); }' succeded; when outer
+	* 17273: Src/parse.c: `outer() { inner(); }' succeeded; when outer
 	ran it created a bogus `inner' which crashed the shell.  Make
 	original command issue error.
 
@@ -1896,7 +1912,7 @@
 
 2002-02-25  Sven Wischnowsky  <wischnow@zsh.org>
 
-	* 16711: Src/loop.c: allow nterruption of empty while-loops
+	* 16711: Src/loop.c: allow interruption of empty while-loops
 	with ^C
 
 	* 16710: Completion/Base/Core/_message, Test/Y03arguments.ztst:
@@ -1907,7 +1923,7 @@
 	Completion/Base/Utility/_guard, Completion/Unix/Command/_grep,
 	Completion/Unix/Command/_pbm, Completion/Unix/Command/_pine,
 	Completion/X/Command/_vnc, Doc/Zsh/compsys.yo,
-	Src/Zle/compcore.c: make _guard use `_mesage -e'; make
+	Src/Zle/compcore.c: make _guard use `_message -e'; make
 	`_message -e' use $curtag as a default; change uses of _guard
 
 2002-02-22  Wayne Davison  <wayned@users.sourceforge.net>
@@ -2189,7 +2205,7 @@
 	in preference to $EDITOR
 
 	* 16464: Completion/Unix/Command/_pine, Completion/Zsh/Command/_zle:
-	fix subtitutions used for exclusion lists and do cleanup of _zle
+	fix substitutions used for exclusion lists and do cleanup of _zle
 
 2002-01-16  Clint Adams  <clint@zsh.org>
 
@@ -2264,7 +2280,7 @@
 2002-01-07  Sven Wischnowsky  <wischnow@zsh.org>
 
 	* 16408: Src/Zle/compcore.c: make sure auto menu isn't started
-	accidentially when bashautolist is set
+	accidentally when bashautolist is set
 
 	* 16407: Completion/X/Command/_netscape: fix nested _tags-loops
 	by re-initialising the outer one when leaving the inner one
@@ -3366,7 +3382,7 @@
 2001-07-20  Peter Stephenson  <pws@csr.com>
 
 	* 15432: Functions/Zle/bash-transpose-words, Doc/Zsh/contrib.yo:
-	new bash-branspose-words widget.
+	new bash-transpose-words widget.
 
 2001-07-20  Sven Wischnowsky  <wischnow@zsh.org>
 
@@ -3378,7 +3394,7 @@
 	* 15415: Completion/Base/Utility/_describe, Src/Zle/computil.c:
 	yet another followup to 15407; make _describe filter out
 	non-matching strings before calling compdescribe, otherwise
-	some matches will be hiddens
+	some matches will be hidden
 
 2001-07-18  Sven Wischnowsky  <wischnow@zsh.org>
 
@@ -3390,7 +3406,7 @@
 	Src/Zle/complist.c, Src/Zle/compresult.c, Src/Zle/computil.c:
 	add list-grouped option to make options and such be grouped
 	together if they have the same description; matches with
-	line-display strings can be hidden; hi and du capabalities in
+	line-display strings can be hidden; hi and du capabilities in
 	complist are only used if set by the user
 
 	* 15402 (Akinori Musha): Completion/Unix/Command/_cvs: add

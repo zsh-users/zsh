@@ -171,7 +171,7 @@
 >0003
 
  printf '%2$d%1$d\n' 1 2 3 4
-0:reuse format where arguments are explictly specified
+0:reuse format where arguments are explicitly specified
 >21
 >43
 

@@ -54,7 +54,7 @@ This is likely to be zero unless the connection is for listening.
 )
 item(The remote host)(
 This is the fully qualified domain name of the peer, if available, else an
-IP address.  It is an all-zero IP adress for a session opened for
+IP address.  It is an all-zero IP address for a session opened for
 listening.
 )
 item(The remote port)(

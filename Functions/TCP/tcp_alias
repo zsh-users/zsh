@@ -85,7 +85,7 @@ for arg in $*; do
 	index=${array[(i)$alias]}
 	array=(${array[1,index-1]} ${array[index+1,-1]})
 	if [[ -z "$array" ]]; then
-	  unset "tcp_aliase[$fd]"
+	  unset "tcp_aliases[$fd]"
 	else
 	  tcp_aliases[$fd]="$array"
 	fi

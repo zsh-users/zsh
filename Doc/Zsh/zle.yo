@@ -425,7 +425,7 @@ produces output to the terminal, it should call `tt(zle -I)' before doing
 so (see below).  The handler should not attempt to read from the terminal.
 Note that zle makes no attempt to check whether this fd is actually
 readable when installing the handler.  The user must make their own
-arrangments for handling the file descriptor when zle is not active.
+arrangements for handling the file descriptor when zle is not active.
 
 Any number of handlers for any number of readable file descriptors may be
 installed.  Installing a handler for an var(fd) which is already handled

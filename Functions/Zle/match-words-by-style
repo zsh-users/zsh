@@ -10,7 +10,7 @@
 # For example
 #    foo bar  rod stick
 #            ^
-# with the cursor where indicated whill with typical settings produce the
+# with the cursor where indicated will with typical settings produce the
 # elements `foo ', `bar', ` ', ` ', `rod', ` ' and `stick'.
 #
 # The style word-style can be set to indicate what a word is.
@@ -26,7 +26,7 @@
 #		treated as `normal', but this should not be relied upon.)
 #  specified    Similar to normal, except that only the words given
 #               in the string (and not also alphanumeric characters)
-#               are to be considerd parts of words.
+#               are to be considered parts of words.
 #  unspecified  The negation of `specified': the characters given
 #               are those that aren't to be considered parts of a word.
 #               They should probably include white space.
@@ -38,7 +38,7 @@
 #   zstyle ':zle:transpose-words*' word-style normal
 #   zstyle ':zle:transpose-words*' word-chars ''
 # will force bash-style word recognition, i.e only alphanumeric characters
-# are considerd parts of a word.  It is up to the function which calls
+# are considered parts of a word.  It is up to the function which calls
 # match-words-by-style to set the context in the variable curcontext,
 # else a default context will be used (not recommended).
 #

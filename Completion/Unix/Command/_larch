@@ -92,7 +92,7 @@ _larch_command () {
 "show-config:show the revision frontier of a configuration" \
 "config-history:report the history of a configuration" \
 "update:merge local changes with the latest revision" \
-"replay:merge the latest revsion with local changes" \
+"replay:merge the latest revision with local changes" \
 "delta-patch:compute and apply an arbitrary patch" \
 "star-merge:merge of mutually merged branches" \
 "make-sync-tree:prepare a tree that will synchronize branches" \
@@ -1603,7 +1603,7 @@ _larch_library-add () {
 		'--report[default output]' \
 		'--verbose[maximal output]' \
 		'--debug[debugging output]' \
-		'--ignore-extra-args[ignore extra argyments]' \
+		'--ignore-extra-args[ignore extra arguments]' \
 		"--skip-readmes[don't update readme files]" \
 		'*: :_files' \
            && return 0

@@ -18,7 +18,7 @@ while (( count-- )); do
     match-words-by-style
 
     # For some reason forward-word doesn't work like the other word
-    # word commnds; it skips whitespace only after any matched word
+    # commands; it skips whitespace only after any matched word
     # characters.
 
     if [[ -n $matched_words[4] ]]; then

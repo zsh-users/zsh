@@ -113,7 +113,7 @@ while [[ -n $state ]]; do
 	'ncpus[specify number of virtual processors to start]:processors' \
 	'mode[force UML to run in specified mode]:mode:(tt)' \
 	'mconsole[request mconsole driver to send a message to socket]:socket' \
-	'xterm[specify alternate terminal emulator]:terminam emulator:->xterm' \
+	'xterm[specify alternate terminal emulator]:terminal emulator:->xterm' \
 	'dsp[specify host dsp device]:dsp device:_files' \
 	'mixer[specify host mixer device]:mixer device:_files' \
 	'umn[specify ip address for host side of slip device]' && ret=0

@@ -8,7 +8,7 @@ arguments=(
   '(--almost-all -A -a --all)'{--almost-all,-A}'[list all except . and ..]'
   '(--ignore-backups -B)'{--ignore-backups,-B}"[don't list entries ending with ~]"
   '(--directory -d)'{--directory,-d}'[list directory entries instead of contents]'
-  '(--ignore,-I)'{--ignore,-I}"[don't list entires matching pattern]:pattern:"
+  '(--ignore,-I)'{--ignore,-I}"[don't list entire matching pattern]:pattern:"
   '(--dereference -L)'{--dereference,-L}'[list referenced file for sym link]'
   '(--recursive -R)'{--recursive,-R}'[list subdirectories recursively]'
  

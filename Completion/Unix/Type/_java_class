@@ -1,7 +1,7 @@
 #autoload
 
 # Should probably add some sort of cache.
-# Should we call _multi_parts insteads of compadd?
+# Should we call _multi_parts instead of compadd?
 
 local classpath i expl
 local -a c

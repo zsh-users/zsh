@@ -13,7 +13,7 @@
 # subcommand e.g.
 #   zstyle ':completion:*:p4-labelsync:*' verbose false
 # or for a particular tag, e.g. changes,
-#   zstyle ':completeion:*:changes' verbose false
+#   zstyle ':completion:*:changes' verbose false
 # or just for top-level completion (i.e. up to and including completion
 # of the subcommand):
 #   zstyle ':completion:*:p4:*' verbose false
@@ -233,7 +233,7 @@ _perforce() {
     fi
 
     if [[ $p4cmd = '=p4' ]]; then
-	_message "p4 excutable not found: completion not available"
+	_message "p4 executable not found: completion not available"
 	return
     fi
 
@@ -497,7 +497,7 @@ _perforce_files_or_minus() {
 }
 
 
-(( $+functions[_perforce_file_suffx] )) ||
+(( $+functions[_perforce_file_suffix] )) ||
 _perforce_file_suffix() {
     # Used with compadd -R to handle @ or # after a file name.
     # Differs from compadd -r '...' in that it quotes `#' if typed.
@@ -734,7 +734,7 @@ _perforce_files() {
 	    labels:label:_perforce_labels \
 	    'dates:date (+ time):_perforce_dates'
     elif [[ -prefix *\# ]]; then
-	# Modify context to indicate we are in a suffx.
+	# Modify context to indicate we are in a suffix.
 	curcontext="${curcontext%:*}:hash-suffix"
 	# Check for existing range syntax
 	[[ $PREFIX = *[@\#]*,* ]] && range=
@@ -919,7 +919,7 @@ _perforce_jobviews() {
     # Ignore up to the last one.  We don't try to complete these.
     compset -P '*[[:blank:]\^\&\|\(\)]'
 
-    # According to the manual, `p4 jobspec' requires admin priveleges.
+    # According to the manual, `p4 jobspec' requires admin privileges.
     # If this is true even of `p4 jobspec -o', we are a bit screwed.
     _call_program jobspec p4 jobspec -o 2>/dev/null | while read line; do
 	case $line in
@@ -1114,7 +1114,7 @@ _perforce_cmd_branch() {
 	'(-o)-f[force operation by superuser]' \
 	'(-o -i)-d[delete branch]' \
 	'(-d -i -f)-o[write specification to standard output]' \
-	'(-d -o)-i[read specificationf from standard input]' \
+	'(-d -o)-i[read specification from standard input]' \
 	'(-i)*::branch name:_perforce_branches'
 }
 
@@ -1464,7 +1464,7 @@ _perforce_cmd_labelsync() {
 	'-a[add files to label]' \
 	'-d[delete files from label]' \
 	'-n[no effect, dummy run]' \
-	'-l[specify lable]:label:_perforce_labels' \
+	'-l[specify label]:label:_perforce_labels' \
 	'*::file:_perforce_files -tR'
 }
 

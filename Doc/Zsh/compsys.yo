@@ -1662,7 +1662,7 @@ style must be set to an empty string.
 
 In addition to setting styles for specific tags, it is also possible to
 use group names specified explicitly by the tt(group-name) tag together
-withe the `tt((group))' syntax allowed by the tt(ZLS_COLORS) and
+with the `tt((group))' syntax allowed by the tt(ZLS_COLORS) and
 tt(ZLS_COLOURS) parameters and simply using the tt(default) tag.
 
 It is possible to use any color specifications already set up for the GNU
@@ -3865,7 +3865,7 @@ completed separately.  For example, the tt(_tar) function uses
 from the given array of complete file paths.
 
 The tt(-i) option causes tt(_multi_parts) to insert a unique match even
-that requires multiple separators to be inserted.  This is not usually
+if that requires multiple separators to be inserted.  This is not usually
 the expected behaviour with filenames, but certain other types of
 completion, for example those with a fixed set of possibilities, may be
 more suited to this form.
@@ -3878,7 +3878,7 @@ them to the tt(compadd) builtin.
 findex(_next_label)
 item(tt(_next_label) [ tt(-x) ] [ tt(-12VJ) ] var(tag) var(name) var(descr) [ var(options) ... ])(
 This function is used to implement the loop over different tag
-labels for a particular tag as describe above for the tt(tag-order)
+labels for a particular tag as described above for the tt(tag-order)
 style.  On each call it checks to see if there are any more tag labels; if
 there is it returns status zero, otherwise non-zero.
 As this function requires a current tag to be set, it must always follow
@@ -3912,13 +3912,13 @@ return ret)
 )
 findex(_normal)
 item(tt(_normal))(
-This is the standard function called to handled completion outside
-nay special var(-context-).  It is called both to complete the command
+This is the standard function called to handle completion outside
+any special var(-context-).  It is called both to complete the command
 word and also the arguments for a command.  In the second case,
 tt(_normal) looks for a special completion for that command, and if
 there is none it uses the completion for the tt(-default-) context.
 
-A second use is to rexamine the command line specified by the tt($words)
+A second use is to reexamine the command line specified by the tt($words)
 array and the tt($CURRENT) parameter after those have been modified.
 For example, the function tt(_precommand), which
 completes after pre-command specifiers such as tt(nohup), removes the
@@ -4012,7 +4012,7 @@ findex(_pick_variant)
 item(tt(_pick_variant [ tt(-c) var(command) ] [ tt(-r) var(name) ] var(label)tt(=)var(pattern) ... var(label) [ var(args) ... ]))(
 This function is used to resolve situations where a single command name
 requires more than one type of handling, either because it
-has more than one variant because there is a name clash between two
+has more than one variant or because there is a name clash between two
 different commands.
 
 The command to run is taken from the first element of the array
@@ -4123,7 +4123,7 @@ done)
 
 Note that the test for whether matches were generated is not performed
 until the end of the tt(_tags) loop.  This is so that the user can set
-the tt(tag-order) style to specify a set of tags to be tested at the
+the tt(tag-order) style to specify a set of tags to be completed at the
 same time.
 
 If var(name) and var(descr) are given, tt(_requested) calls the
@@ -4179,7 +4179,7 @@ item(tt(_setup) var(tag) [ var(group) ])(
 This function sets up the special
 parameters used by the completion system appropriately for the var(tag)
 given as the first argument.  It uses the styles tt(list-colors),
-tt(list-packed), tt(list-rows-first), tt(last-promp), tt(accept-exact),
+tt(list-packed), tt(list-rows-first), tt(last-prompt), tt(accept-exact),
 tt(menu) and tt(force-list).
 
 The optional var(group) supplies the name of the group in which the
@@ -4193,7 +4193,7 @@ findex(_store_cache)
 item(tt(_store_cache) var(cache_identifier) var(params) ...)(
 This function, together with tt(_retrieve_cache) and
 tt(_cache_invalid), implements a caching layer which can be used
-in any completion functions.  Data obtained by
+in any completion function.  Data obtained by
 costly operations are stored in parameters;
 this function then dumps the values of those parameters to a file.  The
 data can then be retrieved quickly from that file via tt(_retrieve_cache),
@@ -4225,7 +4225,7 @@ valid for completions in the current context.  These tags are stored
 internally and sorted by using the tt(tag-order) style.
 
 Next, tt(_tags) is called repeatedly without arguments from the same
-comletion function.  This successively selects the first, second,
+completion function.  This successively selects the first, second,
 etc. set of tags requested by the user.  The return value is zero if at
 least one of the tags is requested and non-zero otherwise.  To test if a
 particular tag is to be tried, the tt(_requested) function should be
@@ -4239,7 +4239,7 @@ specific context without having to change and reset the
 tt(curcontext) parameter (which has the same effect).
 )
 findex(_values)
-item(tt(_values) [ -O var(name) ] [ -s var(sep) ] [ -S var(sep) ] [ -C ] var(desc) var(spec) ...)(
+item(tt(_values) [ tt(-O) var(name) ] [ tt(-s) var(sep) ] [ tt(-S) var(sep) ] [ tt(-wC) ] var(desc) var(spec) ...)(
 This is used to complete arbitrary keywords (values) and their arguments,
 or lists of such combinations.
 
@@ -4273,8 +4273,8 @@ beginning with an equal sign are not supported.
 
 The character separating a value from its argument can be set using the
 option tt(-S) (like tt(-s), followed by the character to use as the
-separator in the next argument).  By default the equal
-sign will be used to separator values and arguments.
+separator in the next argument).  By default the equals
+sign will be used as the separator between values and arguments.
 
 Example:
 
@@ -4341,9 +4341,8 @@ This function is useful in such a case.
 The arguments to tt(_wanted) are the same as those to tt(_requested),
 i.e. arguments to be passed to tt(_description).  However, in this case
 the var(command) is not optional;  all the processing of tags, including
-the loop over both tags and tags labels and the generation of matches,
-is carried out automatically by tt(_wanted).  This also means that
-tt(_wanted) should not be called inside a tt(_tags) loop.
+the loop over both tags and tag labels and the generation of matches,
+is carried out automatically by tt(_wanted).
 
 Hence to offer only one tag and immediately add the corresponding
 matches with the given description:

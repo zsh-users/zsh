@@ -939,7 +939,7 @@ struct funcwrap {
  * Handling of options.
  *
  * Option strings are standard in that a trailing `:' indicates
- * a mandatory argument.  In addtion, `::' indicates an optional
+ * a mandatory argument.  In addition, `::' indicates an optional
  * argument which must immediately follow the option letter if it is present.
  * `:%' indicates an optional numeric argument which may follow
  * the option letter or be in the next word; the only test is
@@ -1014,7 +1014,7 @@ struct builtin {
 #define BINF_SKIPINVALID	(1<<12)	/* Treat invalid option as argument */
 #define BINF_KEEPNUM		(1<<13) /* `[-+]NUM' can be an option */
 #define BINF_SKIPDASH		(1<<14) /* Treat `-' as argument (maybe `+') */
-#define BINF_DASHDASHVALID	(1<<15) /* Handle `--' evenf if SKIPINVALD */
+#define BINF_DASHDASHVALID	(1<<15) /* Handle `--' even if SKIPINVALD */
 
 struct module {
     char *nam;

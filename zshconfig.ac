@@ -1224,7 +1224,7 @@ fi
 
 dnl On some systems the RLIMIT_* don't evaluate to integers at compile time
 dnl (they may be enums).  In this case we are not able to do preprocessor
-dnl comparisions and need our tests to determine what values exist and
+dnl comparisons and need our tests to determine what values exist and
 dnl if there are clashing definitions.
 
 zsh_LIMIT_PRESENT(RLIMIT_AIO_MEM)

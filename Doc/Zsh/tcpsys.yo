@@ -285,8 +285,8 @@ handled and printed out according to the current settings.  Status 0 is
 always returned.
 
 This is generally only useful for interactive use, to prevent the display
-becomming fragmented by output returned from the connection.  Within a
-programe or function it is generally better to handle reading data by a
+becoming fragmented by output returned from the connection.  Within a
+programme or function it is generally better to handle reading data by a
 more explicit method.
 )
 findex(tcp_expect)
@@ -322,7 +322,7 @@ The function returns as soon as any one of the patterns given match.  If
 the caller needs to know which of the patterns matched, the option tt(-p)
 var(var) can be used; on return, tt($var) is set to the number of the
 pattern using ordinary zsh indexing, i.e. the first is 1, and so on.  Note
-tha absence of a `tt($)' in front of var(var).  To avoid clashes, the
+the absence of a `tt($)' in front of var(var).  To avoid clashes, the
 parameter cannot begin with `tt(_expect)'.
 
 The option tt(-q) is passed directly down to tt(tcp_read).
@@ -371,7 +371,7 @@ tt($tcp_spam_list) array or on the command line are spammed in the order
 given.  The tt(-r) flag reverses the order however it was arrived it.
 
 The tt(-v) flag specifies that a tt($TCP_PROMPT) will be output before each
-session.  This is output after any modfication to TCP_SESS by the
+session.  This is output after any modification to TCP_SESS by the
 user-defined tt(tcp_on_spam) function described below.  (Obviously that
 function is able to generate its own output.)
 )

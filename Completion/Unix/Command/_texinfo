@@ -36,7 +36,7 @@ case $service in
         '--infodir=[specify directory containing dir file]:info directory:_files -/' \
         '--align=[specify minimum indentation for description]:indentation' \
         '--calign=[specify minimum indentation for continuation lines of description]:indentation' \
-        '--maxwidth=[specify maximim width of dir file]:width' \
+        '--maxwidth=[specify maximum width of dir file]:width' \
         '--quiet[suppress informational output]' \
         '--description=[specify description for menu entry]:description' \
         '--menuentry=[specify the menu entry for dir file]:menu entry' \

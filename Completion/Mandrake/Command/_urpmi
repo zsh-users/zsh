@@ -153,7 +153,7 @@ _urpmi() {
 	"(--help -h --src -s)"{--src,-s}"[next package is source package]" \
 	"(--help -h)--update[use only update media]" \
 	"(--help -h -c -p -P)-c[choose complete method for resolving requires closure]" \
-	"(--help -h)-d[show package depndencies]" \
+	"(--help -h)-d[show package dependencies]" \
 	"(--help -h)-f[print version, release and arch with name]" \
 	"(--help -h)-g[print groups too with name]" \
 	"(--help -h -c -p -P)-p[allow search in provides to find package]" \

@@ -1,5 +1,5 @@
 # Transpose words, matching the words using match-words-by-style, q.v.
-# The group of word characters preceeding the cursor (not necessarily
+# The group of word characters preceding the cursor (not necessarily
 # immediately) are transposed with the group of word characters following
 # the cursor (again, not necessarily immediately).
 #

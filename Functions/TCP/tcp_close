@@ -4,7 +4,7 @@
 # -n means don't close a fake session's fd.
 # -q means quiet.
 #
-# Accepts the -s and -l arguments for consistenty with other functions,
+# Accepts the -s and -l arguments for consistency with other functions,
 # but there is no particular gain in using them
 emulate -L zsh
 setopt extendedglob cbases

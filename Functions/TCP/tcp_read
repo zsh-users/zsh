@@ -87,7 +87,7 @@ while getopts "abdl:qs:t:T:u:" opt; do
 	done
 	;;
 
-    # Don't print an error mesage if there is no TCP connection,
+    # Don't print an error message if there is no TCP connection,
     # just return 1.
     (q) quiet=1
 	;;

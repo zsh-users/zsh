@@ -233,7 +233,7 @@ bin_zselect(char *nam, char **args, Options ops, int func)
 			zaddlinknode(fdlist, ztrdup(buf));
 		    }
 		} else {
-		    /* List of fd's preceeded by -r, -w, -e. */
+		    /* List of fd's preceded by -r, -w, -e. */
 		    if (!doneit) {
 			buf[0] = '-';
 			buf[1] = fdchar[i];

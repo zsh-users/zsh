@@ -15,4 +15,4 @@ _arguments -s -S -A '-*' \
   '(-W)-w[implicitly add parenthesis to wildcards in the pattern]' \
   '(-w)-W[like -w, but turn wildcards in replacement patterns into references]' \
   '1:source pattern:_files' \
-  '2:desination pattern:_files'
+  '2:destination pattern:_files'

@@ -19,7 +19,7 @@ shell builtin of the same name.
 Arguments and options may be intermingled in any order.  Non-option
 arguments are file descriptors, which must be decimal integers.  By
 default, file descriptors are to be tested for reading, i.e. tt(zselect)
-will return when data is availble to be read from the file descriptor, or
+will return when data is available to be read from the file descriptor, or
 more precisely, when a read operation from the file descriptor will not
 block.  After a tt(-r), tt(-w) and tt(-e), the given file descriptors are
 to be tested for reading, writing, or error conditions.  These options and

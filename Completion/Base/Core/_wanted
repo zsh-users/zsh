@@ -1,9 +1,7 @@
 #autoload
 
-local __targs __gopt
+local -a __targs __gopt
 
-__gopt=()
-__tagrs=()
 zparseopts -D -a __gopt 1 2 V J x C:=__targs
 
 _tags "$__targs[@]" "$1"

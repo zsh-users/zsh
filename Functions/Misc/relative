@@ -15,7 +15,7 @@ local -a cur abs
 cur=(${(s:/:)2})	# Split 'current' directory into cur
 abs=(${(s:/:)1} $3)	# Split target directory into abs
 
-# Compute the length of the common prefix, or discover a subdiretory:
+# Compute the length of the common prefix, or discover a subdirectory:
 integer i=1
 while [[ i -le $#abs && $abs[i] == $cur[i] ]]
 do
