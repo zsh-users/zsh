@@ -83,6 +83,8 @@ typedef union upat *Upat;
 #define	P_ONEHASH 0x06	/* node	Match this (simple) thing 0 or more times. */
 #define	P_TWOHASH 0x07	/* node	Match this (simple) thing 1 or more times. */
 #define P_GFLAGS  0x08	/* long Match nothing and set globbing flags */
+#define P_ISSTART 0x09  /* no   Match start of string. */
+#define P_ISEND   0x0a  /* no   Match end of string. */
 /* numbered so we can test bit 5 for a branch */
 #define	P_BRANCH  0x20	/* node	Match this alternative, or the next... */
 #define	P_WBRANCH 0x21	/* uc* node P_BRANCH, but match at least 1 char */
@@ -486,7 +488,8 @@ patcompswitch(int paren, int *flagp)
 
     while (*patparse == Bar ||
 	   (isset(EXTENDEDGLOB) && *patparse == Tilde &&
-	    !memchr(patendseg, patparse[1], patendseglen))) {
+	    (patparse[1] == '/' ||
+	     !memchr(patendseg, patparse[1], patendseglen)))) {
 	int tilde = *patparse++ == Tilde;
 	long gfnode = 0, newbr;
 
@@ -628,13 +631,13 @@ static long
 patcompbranch(int *flagp)
 {
     long chain, latest, starter;
-    int flags;
+    int flags = 0;
 
     *flagp = P_PURESTR;
 
     starter = chain = 0;
     while (!memchr(patendseg, *patparse, patendseglen) ||
-	   (*patparse == Tilde &&
+	   (*patparse == Tilde && patparse[1] != '/' &&
 	    memchr(patendseg, patparse[1], patendseglen))) {
 	if (isset(EXTENDEDGLOB) &&
 	    ((!isset(SHGLOB) &&
@@ -644,34 +647,44 @@ patcompbranch(int *flagp)
 	    /* Globbing flags. */
 	    char *pp1 = patparse;
 	    int oldglobflags = patglobflags;
+	    long assert;
 	    patparse += (*patparse == '@') ? 3 : 2;
-	    if (!patgetglobflags(&patparse))
-		return 0;	    
-	    if (pp1 == patstart) {
-		/* Right at start of pattern, the simplest case.
-		 * Put them into the flags and don't emit anything.
+	    if (!patgetglobflags(&patparse, &assert))
+		return 0;
+	    if (assert) {
+		/*
+		 * Start/end assertion looking like flags, but
+		 * actually handled as a normal node
 		 */
-		((Patprog)patout)->globflags = patglobflags;
-		continue;
-	    } else if (!*patparse) {
-		/* Right at the end, so just leave the flags for
-		 * the next Patprog in the chain to pick up.
-		 */
-		break;
-	    }
-	    /*
-	     * Otherwise, we have to stick them in as a pattern
-	     * matching nothing.
-	     */
-	    if (oldglobflags != patglobflags) {
-		/* Flags changed */
-		union upat up;
-		latest = patnode(P_GFLAGS);
-		up.l = patglobflags;
-		patadd((char *)&up, 0, sizeof(union upat), 0);
+		latest = patnode(assert);
+		flags = 0;
 	    } else {
-		/* No effect. */
-		continue;
+		if (pp1 == patstart) {
+		    /* Right at start of pattern, the simplest case.
+		     * Put them into the flags and don't emit anything.
+		     */
+		    ((Patprog)patout)->globflags = patglobflags;
+		    continue;
+		} else if (!*patparse) {
+		    /* Right at the end, so just leave the flags for
+		     * the next Patprog in the chain to pick up.
+		     */
+		    break;
+		}
+		/*
+		 * Otherwise, we have to stick them in as a pattern
+		 * matching nothing.
+		 */
+		if (oldglobflags != patglobflags) {
+		    /* Flags changed */
+		    union upat up;
+		    latest = patnode(P_GFLAGS);
+		    up.l = patglobflags;
+		    patadd((char *)&up, 0, sizeof(union upat), 0);
+		} else {
+		    /* No effect. */
+		    continue;
+		}
 	    }
 	} else if (isset(EXTENDEDGLOB) && *patparse == Hat) {
 	    /*
@@ -706,10 +719,12 @@ patcompbranch(int *flagp)
 
 /**/
 int
-patgetglobflags(char **strp)
+patgetglobflags(char **strp, long *assertp)
 {
     char *nptr, *ptr = *strp;
     zlong ret;
+
+    *assertp = 0;
     /* (#X): assumes we are still positioned on the first X */
     for (; *ptr && *ptr != Outpar; ptr++) {
 	switch (*ptr) {
@@ -762,11 +777,22 @@ patgetglobflags(char **strp)
 	    patglobflags &= ~GF_MATCHREF;
 	    break;
 
+	case 's':
+	    *assertp = P_ISSTART;
+	    break;
+
+	case 'e':
+	    *assertp = P_ISEND;
+	    break;
+
 	default:
 	    return 0;
 	}
     }
     if (*ptr != Outpar)
+	return 0;
+    /* Start/end assertions must appear on their own. */
+    if (*assertp && (*strp)[1] != Outpar)
 	return 0;
     *strp = ptr + 1;
     return 1;
@@ -781,7 +807,7 @@ patgetglobflags(char **strp)
 static long
 patcomppiece(int *flagp)
 {
-    long starter, next, pound, op;
+    long starter = 0, next, pound, op;
     int flags, flags2, kshchar, len, ch, patch;
     union upat up;
     char *nptr, *str0, cbuf[2];
@@ -811,6 +837,7 @@ patcomppiece(int *flagp)
 	 */
 	if (kshchar || (memchr(patendstr, *patparse, patendstrlen) &&
 			(*patparse != Tilde ||
+			 patparse[1] == '/' ||
 			 !memchr(patendseg, patparse[1], patendseglen))))
 	    break;
 
@@ -987,19 +1014,17 @@ patcomppiece(int *flagp)
 		patparse = nptr;
 		len |= 1;
 	    }
-	    if (*patparse == '-') {
-		patparse++;
-		if (idigit(*patparse)) {
-		    to = (zrange_t) zstrtol((char *)patparse,
-					      (char **)&nptr, 10);
-		    patparse = nptr;
-		    len |= 2;
-		}
+	    DPUTS(*patparse != '-', "BUG: - missing from numeric glob");
+	    patparse++;
+	    if (idigit(*patparse)) {
+		to = (zrange_t) zstrtol((char *)patparse,
+					  (char **)&nptr, 10);
+		patparse = nptr;
+		len |= 2;
 	    }
 	    if (*patparse != Outang)
 		return 0;
 	    patparse++;
-	    starter = 0;	/* shut compiler up */
 	    switch(len) {
 	    case 3:
 		starter = patnode(P_NUMRNG);
@@ -1078,13 +1103,19 @@ patcomppiece(int *flagp)
      * each time we fail on a non-empty branch, we try the empty branch,
      * which is equivalent to backtracking.
      */
-    if ((flags & P_SIMPLE) && op == P_ONEHASH &&
+    if ((flags & P_SIMPLE) && (op == P_ONEHASH || op == P_TWOHASH) &&
 	P_OP((Upat)patout+starter) == P_ANY) {
 	/* Optimize ?# to *.  Silly thing to do, since who would use
 	 * use ?# ? But it makes the later code shorter.
 	 */
 	Upat uptr = (Upat)patout + starter;
-	uptr->l = (uptr->l & ~0xff) | P_STAR;
+	if (op == P_TWOHASH) {
+	    /* ?## becomes ?* */
+	    uptr->l = (uptr->l & ~0xff) | P_ANY;
+	    pattail(starter, patnode(P_STAR));
+	} else {
+	    uptr->l = (uptr->l & ~0xff) | P_STAR;
+	}
     } else if ((flags & P_SIMPLE) && op && !(patglobflags & 0xff)) {
 	/* Don't simplify if we need to look for approximations. */
 	patinsert(op, starter, NULL, 0);
@@ -1313,6 +1344,8 @@ pattryrefs(Patprog prog, char *string, int *nump, int *begp, int *endp)
 	    ((prog->flags & PAT_NOANCH) ? 
 	     !strncmp(progstr, string, prog->patmlen)
 	     : !strcmp(progstr, string))) {
+	    if ((prog->flags & PAT_NOGLD) && *string == '.')
+		return 0;
 	    /* in case used for ${..#..} etc. */
 	    patinput = string + prog->patmlen;
 	    /* if matching files, must update globbing flags */
@@ -1731,6 +1764,9 @@ patmatch(Upat prog)
 			 * over, that doesn't matter:  we should fail anyway.
 			 * The pointer also tells us where the asserted
 			 * pattern matched for use by the exclusion.
+			 *
+			 * P.S. in case you were wondering, this code
+			 * is horrible.
 			 */
 			Upat syncstrp;
 			unsigned char *oldsyncstr;
@@ -1754,7 +1790,9 @@ patmatch(Upat prog)
 			while ((ret = patmatch(P_OPERAND(scan)))) {
 			    unsigned char *syncpt;
 			    char savchar, *testptr;
-			    int savforce = forceerrs;
+			    char *savpatinstart = patinstart;
+			    int savforce = forceerrs, savpatinlen = patinlen;
+			    int savpatflags = patflags;
 			    forceerrs = -1;
 			    savglobdots = globdots;
 			    matchederrs = errsfound;
@@ -1773,6 +1811,12 @@ patmatch(Upat prog)
 			    testptr = patinstart + (syncpt - syncstrp->p);
 			    DPUTS(testptr > matchpt, "BUG: EXCSYNC failed");
 			    savchar = *testptr;
+			    /*
+			     * If this isn't really the end of the string,
+			     * remember this for the (#e) assertion.
+			     */
+			    if (savchar)
+				patflags |= PAT_NOTEND;
 			    *testptr = '\0';
 			    next = PATNEXT(scan);
 			    while (next && P_ISEXCLUDE(next)) {
@@ -1799,7 +1843,8 @@ patmatch(Upat prog)
 					zalloc(pathpos + patinlen);
 				    strcpy(buf, pathbuf);
 				    strcpy(buf + pathpos, patinput);
-				    patinput = buf;
+				    patinput = patinstart = buf;
+				    patinlen += pathpos;
 				}
 				if (patmatch(opnd)) {
 				    ret = 0;
@@ -1810,13 +1855,17 @@ patmatch(Upat prog)
 				     */
 				    parsfound = savparsfound;
 				}
-				if (buf)
+				if (buf) {
+				    patinstart = savpatinstart;
+				    patinlen = savpatinlen;
 				    zfree(buf, pathpos + patinlen);
+				}
 				if (!ret)
 				    break;
 				next = PATNEXT(next);
 			    }
 			    *testptr = savchar;
+			    patflags = savpatflags;
 			    globdots = savglobdots;
 			    forceerrs = savforce;
 			    if (ret)
@@ -1983,6 +2032,14 @@ patmatch(Upat prog)
 	     * anything here.
 	     */
 	    return 0;
+	case P_ISSTART:
+	    if (patinput != patinstart || (patflags & PAT_NOTSTART))
+		fail = 1;
+	    break;
+	case P_ISEND:
+	    if (*patinput || (patflags & PAT_NOTEND))
+		fail = 1;
+	    break;
 	case P_END:
 	    if (!(fail = (*patinput && !(patflags & PAT_NOANCH))))
 		return 1;
@@ -2169,6 +2226,7 @@ patmatchrange(char *range, int ch)
 	    case PP_XDIGIT:
 		if (isxdigit(ch))
 		    return 1;
+		break;
 	    case PP_RANGE:
 		range++;
 		r1 = STOUC(UNMETA(range));
@@ -2380,6 +2438,12 @@ patprop(Upat op)
 	break;
     case P_GFLAGS:
 	p = "GFLAGS";
+	break;
+    case P_ISSTART:
+	p = "ISSTART";
+	break;
+    case P_ISEND:
+	p = "ISEND";
 	break;
     case P_NOTHING:
 	p = "NOTHING";
