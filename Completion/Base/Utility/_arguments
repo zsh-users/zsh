@@ -348,6 +348,8 @@ if (( $# )) && comparguments -i "$autod" "$singopt[@]" "$@"; then
 
 	    tmp1=( "$next[@]" "$direct[@]" "$odirect[@]" "$equal[@]" )
 
+            [[ "$PREFIX" = [-+]* ]] && tmp1=( "${(@M)tmp1:#${PREFIX[1]}*}" )
+
             [[ "$single" = next ]] &&
                 tmp1=( "${(@)tmp1:#[-+]${PREFIX[-1]}((#e)|:*)}" )
 
