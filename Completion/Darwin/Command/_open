@@ -1,0 +1,12 @@
+#compdef open
+
+local curcontext="$curcontext" state line
+
+_arguments -C \
+  '-a[specify application]:application:->open_mac_applications' \
+  '-e[open with TextEdit]' \
+  '*:files:_webbrowser'
+
+if [[ -n "$state" ]]; then
+  _mac_applications || _files
+fi

@@ -1,3 +1,10 @@
+2004-07-23  Oliver Kiddle  <opk@zsh.org>
+
+	* Motoi Washida <a66@h8.dion.ne.jp>: 20179 (tweaked):
+	Completion/Darwin/Type/_mac_applications,
+	Completion/Darwin/Command/_open, Completion/Darwin/Command/_defaults:
+	new completions for Mac OS X
+
 2004-07-19  Oliver Kiddle  <opk@zsh.org>
 
 	* Jean-Baptiste Quenot: 20167: Completion/Unix/Command/_ant:
