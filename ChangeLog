@@ -1,3 +1,8 @@
+2000-09-16  Bart Schaefer  <schaefer@zsh.org>
+
+	* 12817: Doc/Zsh/builtins.yo, Src/builtin.c: Give meaning to
+	"typeset +m" and "typeset +g -m".
+
 2000-09-16  Clint Adams  <schizo@debian.org>
 
 	* 12818: Src/init.c: call tricat() instead of zasprintf()

@@ -1041,9 +1041,9 @@ assigned in tt(typeset) expressions, only scalars and integers.
 
 For each remaining var(name) that refers to a parameter that is set, the
 name and value of the parameter are printed in the form of an assignment.
-Nothing is printed for newly-created parameters, or if any attribute flags
-listed below are given.  Using `tt(PLUS())' instead of minus to introduce
-an attribute turns it off.
+Nothing is printed for newly-created parameters, or when any attribute
+flags listed below are given along with the var(name).  Using `tt(PLUS())'
+instead of minus to introduce an attribute turns it off.
 
 If the tt(-T) option is given, exactly two (or zero) var(name)
 arguments must be present.  They represent a scalar and an array (in
@@ -1057,7 +1057,7 @@ of untying the variables without unsetting them, or converting the
 type of one of them with another tt(typeset) command; tt(+T) does not
 work, assigning an array to var(SCALAR) is an error, and assigning a
 scalar to var(array) sets it to be a single-element array.  Note that
-both tt(typeset -xT ...) and tt(export -T ...) work, but only the
+both `tt(typeset -xT ...)' and `tt(export -T ...)' work, but only the
 scalar will be marked for export.
 
 The tt(-g) (global) flag is treated specially: it means that any
@@ -1066,19 +1066,31 @@ does not necessarily mean that the parameter will be global, as the flag
 will apply to any existing parameter (even if unset) from an enclosing
 function.  This flag does not affect the parameter after creation, hence it
 has no effect when listing existing parameters, nor does the flag tt(+g)
-have any effect.
+have any effect except in combination with tt(-m) (see below).
 
 If no var(name) is present, the names and values of all parameters are
 printed.  In this case the attribute flags restrict the display to only
 those parameters that have the specified attributes, and using `tt(PLUS())'
 rather than `tt(-)' to introduce the flag suppresses printing of the values
-of parameters when there is no parameter name.  Also, if the option list
-ends with `tt(PLUS())', values will not be printed.  If only the tt(-m)
-flag is given the arguments are taken as patterns (which should be quoted)
-and all parameters (or functions with the tt(-f) flag) with matching names
-are printed.  If no attribute flags and no tt(-m) flag is present, the
-parameter names will be preceded by a list of any attributes (tt(array),
-tt(association), tt(exported), tt(integer), tt(readonly)).
+of parameters when there is no parameter name.  Also, if the last option
+is the word `tt(PLUS())', then names are printed but values are not.
+
+If the tt(-m) flag is given the var(name) arguments are taken as patterns
+(which should be quoted).  With no attribute flags, all parameters (or
+functions with the tt(-f) flag) with matching names are printed.  Note that
+tt(-m) is ignored if no patterns are given.  If the tt(+g) flag is combined
+with tt(-m), a new local parameter is created for every matching parameter
+that is not already local.  Otherwise tt(-m) applies all other flags or
+assignments to the existing parameters.  Except when assignments are made
+with var(name)tt(=)var(value), using tt(+m) forces the matching parameters
+to be printed, even inside a function.
+
+If no attribute flags are given and either no tt(-m) flag is present or
+the tt(+m) form was used, each parameter name printed is preceded by a
+list of the attributes of that parameter (tt(array), tt(association),
+tt(exported), tt(integer), tt(readonly)).  If tt(+m) is used with attribute
+flags, and all those flags are introduced with tt(PLUS()), the matching
+parameter names are printed but their values are not.
 
 The following attribute flags may be specified:
 
@@ -1138,7 +1150,7 @@ is first referenced; see noderef(Functions).
 item(tt(-h))(
 Hide: only useful for special parameters (those marked `<S>' in the table in
 ifzman(zmanref(zshparams))\
-ifnzman(noderef(Parameters))\
+ifnzman(noderef(Parameters Set By The Shell))\
 ), and for local parameters with the same name as a special parameter,
 though harmless for others.  A special parameter with this attribute will
 not retain its special effect when made local.  Thus after `tt(typeset -h

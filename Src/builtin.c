@@ -1858,7 +1858,7 @@ bin_typeset(char *name, char **argv, char *ops, int func)
 	return 0;
     }
 
-    if ((!ops['g'] && !ops['x']) || ops['g'] == 2 || *name == 'l' ||
+    if (!(ops['g'] || ops['x'] || ops['m']) || ops['g'] == 2 || *name == 'l' ||
 	!isset(GLOBALEXPORT))
 	on |= PM_LOCAL;
 
@@ -1942,7 +1942,11 @@ bin_typeset(char *name, char **argv, char *ops, int func)
 
     /* With the -m option, treat arguments as glob patterns */
     if (ops['m']) {
-	on &= ~PM_LOCAL;
+	if (!(on|roff))
+	    printflags |= PRINT_TYPE;
+	if (!on)
+	    printflags |= PRINT_NAMEONLY;
+
 	while ((asg = getasg(*argv++))) {
 	    LinkList pmlist = newlinklist();
 	    LinkNode pmnode;
@@ -1952,6 +1956,11 @@ bin_typeset(char *name, char **argv, char *ops, int func)
 		untokenize(asg->name);
 		zwarnnam(name, "bad pattern : %s", argv[-1], 0);
 		returnval = 1;
+		continue;
+	    }
+	    if (ops['m'] == 2 && !asg->value) {
+		scanmatchtable(paramtab, pprog, on|roff, 0,
+			       paramtab->printnode, printflags);
 		continue;
 	    }
 	    /*
