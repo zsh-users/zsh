@@ -1,0 +1,23 @@
+#compdef zpty
+
+local state line list names expl
+
+_arguments -C -s \
+  '(-d -w -r -L)-e[echo input characters]' \
+  '(-d -w -r -L)-b[io to pseudo-terminal blocking]' \
+  '(-e -b -w -r -L)-d[delete command]:*:name:->name' \
+  '(-e -b -d -r -L)-w[send string to command]:name:->name:*:strings to write' \
+  '(-e -b -d -w -L)-r[read string from command]:name:->name:param:_parameters:*:nothing:_nothing' \
+  '(-e -b -d -w -r)-L[list defined commands as calls]' \
+  '*::args:_normal'
+
+if [[ $state = name ]] && _wanted zptynames expl 'zpty command names'; then
+  list=( ${${(f)"$(zpty)"}#*\) } )
+  names=( ${list%%:*} )
+  if zstyle -T ":completion:${curcontext}" verbose; then
+    zformat -a list ' --' ${${(f)"$(zpty)"}#*\) }
+    compadd "$expl[@]" -d list - "$names[@]"
+  else
+    compadd "$expl[@]" - "$names[@]"
+  fi
+fi
