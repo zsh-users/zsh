@@ -1,3 +1,16 @@
+2000-05-31  Peter Stephenson  <pws@cambridgesiliconradio.com>
+
+	* Wayne Davison: 11680: Src/params.c: subscript too small/big
+	error messages.
+
+	* Wayne Davison: 11677, 11681: Src/glob.c, Src/params.c, Src/subst.c,
+	Src/zsh.h, Src/Modules/mapfile.c, Src/Modules/parameter.c,
+	Src/Zle/complete.c: make $array[1,0] return a zero-length array.
+
+	* Wayne Davison: 11676: Src/pattern.c: uninitialised variable.
+
+	* Wayne Davison: 11675: Test/07cond.ztst: apparent race condition.
+
 2000-05-31  Sven Wischnowsky  <wischnow@zsh.org>
 
 	* 11682: Src/Zle/compresult.c: move to last cursor after not

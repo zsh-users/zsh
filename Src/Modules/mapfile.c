@@ -86,7 +86,8 @@ createmapfilehash()
     unsetparam(mapfile_nam);
     mapfile_pm = NULL;
 
-    if (!(pm = createparam(mapfile_nam, PM_SPECIAL|PM_REMOVABLE|PM_HASHED)))
+    if (!(pm = createparam(mapfile_nam,
+			   PM_SPECIAL|PM_HIDE|PM_REMOVABLE|PM_HASHED)))
 	return NULL;
 
     pm->level = pm->old ? locallevel : 0;
@@ -143,12 +144,16 @@ setpmmapfile(Param pm, char *value)
 	 */
 	ftruncate(fd, len);
 	memcpy(mmptr, value, len);
+#ifndef MS_SYNC
+#define MS_SYNC 0
+#endif
 	msync(mmptr, len, MS_SYNC);
 	/*
 	 * Then we need to truncate again, since mmap() always maps complete
 	 * pages.  Honestly, I tried it without, and you need both.
 	 */
 	ftruncate(fd, len);
+	munmap(mmptr, len);
     }
 #else /* don't USE_MMAP */
     /* can't be bothered to do anything too clever here */
@@ -197,8 +202,8 @@ setpmmapfiles(Param pm, HashTable ht)
 	    for (hn = ht->nodes[i]; hn; hn = hn->next) {
 		struct value v;
 
-		v.isarr = v.inv = v.a = 0;
-		v.b = -1;
+		v.isarr = v.inv = v.start = 0;
+		v.len = -1;
 		v.arr = NULL;
 		v.pm = (Param) hn;
 
@@ -243,7 +248,7 @@ get_contents(char *fname)
     val = NULL;
     if ((fd = open(fname, O_RDONLY | O_NOCTTY)) >= 0) {
 	LinkList ll;
-	MUSTUSEHEAP("mapfile:get_contents");
+
 	if ((ll = readoutput(fd, 1)))
 	    val = peekfirst(ll);
     }
@@ -259,30 +264,27 @@ getpmmapfile(HashTable ht, char *name)
     char *contents;
     Param pm = NULL;
 
-    HEAPALLOC {
-	pm = (Param) zhalloc(sizeof(struct param));
-	pm->nam = dupstring(name);
-	pm->flags = PM_SCALAR;
-	pm->sets.cfn = setpmmapfile;
-	pm->gets.cfn = strgetfn;
-	pm->unsetfn = unsetpmmapfile;
-	pm->ct = 0;
-	pm->env = NULL;
-	pm->ename = NULL;
-	pm->old = NULL;
-	pm->level = 0;
+    pm = (Param) zhalloc(sizeof(struct param));
+    pm->nam = dupstring(name);
+    pm->flags = PM_SCALAR;
+    pm->sets.cfn = setpmmapfile;
+    pm->gets.cfn = strgetfn;
+    pm->unsetfn = unsetpmmapfile;
+    pm->ct = 0;
+    pm->env = NULL;
+    pm->ename = NULL;
+    pm->old = NULL;
+    pm->level = 0;
 
-	pm->flags |= (mapfile_pm->flags & PM_READONLY);
+    pm->flags |= (mapfile_pm->flags & PM_READONLY);
 
-	/* Set u.str to contents of file given by name */
-	if ((contents = get_contents(pm->nam)))
-	    pm->u.str = contents;
-	else {
-	    pm->u.str = "";
-	    pm->flags |= PM_UNSET;
-	}
-    } LASTALLOC;
-
+    /* Set u.str to contents of file given by name */
+    if ((contents = get_contents(pm->nam)))
+	pm->u.str = contents;
+    else {
+	pm->u.str = "";
+	pm->flags |= PM_UNSET;
+    }
     return (HashNode) pm;
 }
 
@@ -324,14 +326,14 @@ scanpmmapfile(HashTable ht, ScanFunc func, int flags)
 
 /**/
 int
-setup_mapfile(Module m)
+setup_(Module m)
 {
     return 0;
 }
 
 /**/
 int
-boot_mapfile(Module m)
+boot_(Module m)
 {
     /* Create the special associative array. */
 
@@ -341,11 +343,9 @@ boot_mapfile(Module m)
     return 0;
 }
 
-#ifdef MODULE
-
 /**/
 int
-cleanup_mapfile(Module m)
+cleanup_(Module m)
 {
     Param pm;
 
@@ -361,9 +361,7 @@ cleanup_mapfile(Module m)
 
 /**/
 int
-finish_mapfile(Module m)
+finish_(Module m)
 {
     return 0;
 }
-
-#endif

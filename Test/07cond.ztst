@@ -99,6 +99,7 @@
 
 # can't be bothered with -S
 
+  sleep 1
   cat unmodified
   touch newnewnew
   [[ -N newnewnew && ! -N unmodified ]]

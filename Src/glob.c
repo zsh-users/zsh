@@ -921,8 +921,8 @@ glob(LinkList list, LinkNode np, int nountok)
     Complist q;				/* pattern after parsing         */
     char *ostr = (char *)getdata(np);	/* the pattern before the parser */
 					/* chops it up                   */
-    int first = 0, last = -1;		/* index of first/last match to  */
-				        /* return */
+    int first = 0, count = -1;		/* index of first match to return */
+					/* plus number of items		 */
     struct globdata saved;		/* saved glob state              */
 
     if (unset(GLOBOPT) || !haswilds(ostr)) {
@@ -1334,15 +1334,15 @@ glob(LinkList list, LinkNode np, int nountok)
 
 			    v.isarr = SCANPM_WANTVALS;
 			    v.pm = NULL;
-			    v.b = -1;
+			    v.len = -1;
 			    v.inv = 0;
 			    if (getindex(&s, &v) || s == os) {
 				zerr("invalid subscript", NULL, 0);
 				restore_globstate(saved);
 				return;
 			    }
-			    first = v.a;
-			    last = v.b;
+			    first = v.start;
+			    count = v.len;
 			    break;
 			}
 		    default:
@@ -1428,16 +1428,15 @@ glob(LinkList list, LinkNode np, int nountok)
 
     if (first < 0)
 	first += matchct;
-    if (last < 0)
-	last += matchct;
+    if (count < 0)
+	count += matchct + 1;
     if (first < 0)
 	first = 0;
-    if (last >= matchct)
-	last = matchct - 1;
-    if (first <= last) {
-	matchptr = matchbuf + matchct - 1 - last;
-	last -= first;
-	while (last-- >= 0) {		/* insert matches in the arg list */
+    if (count > matchct - first)
+	count = matchct - first;
+    if (count > 0) {
+	matchptr = matchbuf + matchct - first - count;
+	while (count-- > 0) {		/* insert matches in the arg list */
 	    insertlinknode(list, node, matchptr->name);
 	    matchptr++;
 	}

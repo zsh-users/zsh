@@ -394,8 +394,8 @@ scanparamvals(HashNode hn, int flags)
     }
     v.isarr = (PM_TYPE(v.pm->flags) & (PM_ARRAY|PM_HASHED));
     v.inv = 0;
-    v.a = 0;
-    v.b = -1;
+    v.start = 0;
+    v.len = -1;
     paramvals[numparamvals] = getstrvalue(&v);
     if (flags & SCANPM_MATCHVAL) {
 	if (pattry(scanprog, paramvals[numparamvals])) {
@@ -437,8 +437,8 @@ getvaluearr(Value v)
     else if (PM_TYPE(v->pm->flags) == PM_HASHED) {
 	v->arr = paramvalarr(v->pm->gets.hfn(v->pm), v->isarr);
 	/* Can't take numeric slices of associative arrays */
-	v->a = 0;
-	v->b = numparamvals;
+	v->start = 0;
+	v->len = numparamvals + 1;
 	return v->arr;
     } else
 	return NULL;
@@ -932,13 +932,15 @@ getarg(char **str, int *inv, Value v, int a2, zlong *w)
 		paramtab = tht;
 	    }
 	    v->isarr = (*inv ? SCANPM_WANTINDEX : 0);
-	    v->a = 0;
+	    v->start = 0;
 	    *inv = 0;	/* We've already obtained the "index" (key) */
-	    *w = v->b = -1;
+	    *w = v->len = -1;
 	    r = isset(KSHARRAYS) ? 1 : 0;
-	} else
-	if (!(r = mathevalarg(s, &s)) || (isset(KSHARRAYS) && r >= 0))
-	    r++;
+	} else {
+	    r = mathevalarg(s, &s);
+	    if ((!r && !a2) || (isset(KSHARRAYS) && r >= 0))
+		r++;
+	}
 	if (word && !v->isarr) {
 	    s = t = getstrvalue(v);
 	    i = wordcount(s, sep, 0);
@@ -955,7 +957,7 @@ getarg(char **str, int *inv, Value v, int a2, zlong *w)
 		return 0;
 
 	    if (!a2 && *tt != ',')
-		*w = (zlong)(s - t) - 1;
+		*w = (zlong)(s - d) - 1;
 
 	    return (a2 ? s : d + 1) - t;
 	} else if (!v->isarr && !word) {
@@ -1014,7 +1016,7 @@ getarg(char **str, int *inv, Value v, int a2, zlong *w)
 				 (v->isarr & (SCANPM_MATCHKEY | SCANPM_MATCHVAL |
 					      SCANPM_KEYMATCH))))) {
 			*inv = v->inv;
-			*w = v->b;
+			*w = v->len;
 			return 1;
 		    }
 		} else
@@ -1065,7 +1067,7 @@ getarg(char **str, int *inv, Value v, int a2, zlong *w)
 		    if (!--r) {
 			r = (zlong)(t - s + (a2 ? -1 : 1));
 			if (!a2 && *tt != ',')
-			    *w = r + strlen(ta[i]) - 2;
+			    *w = strlen(ta[i]) - 1;
 			return r;
 		    }
 		return a2 ? -1 : 0;
@@ -1129,7 +1131,7 @@ getarg(char **str, int *inv, Value v, int a2, zlong *w)
 int
 getindex(char **pptr, Value v)
 {
-    int a, b, inv = 0;
+    int start, len, inv = 0;
     char *s = *pptr, *tbrack;
 
     *s++ = '[';
@@ -1141,31 +1143,32 @@ getindex(char **pptr, Value v)
     if ((s[0] == '*' || s[0] == '@') && s[1] == ']') {
 	if ((v->isarr || IS_UNSET_VALUE(v)) && s[0] == '@')
 	    v->isarr |= SCANPM_ISVAR_AT;
-	v->a = 0;
-	v->b = -1;
+	v->start = 0;
+	v->len = -1;
 	s += 2;
     } else {
-	zlong we = 0, dummy;
+	zlong wlen = 0, dummy;
 
-	a = getarg(&s, &inv, v, 0, &we);
+	start = getarg(&s, &inv, v, 0, &wlen);
 
 	if (inv) {
-	    if (!v->isarr && a != 0) {
+	    if (!v->isarr && start != 0) {
 		char *t, *p;
 		t = getstrvalue(v);
-		if (a > 0) {
-		    for (p = t + a - 1; p-- > t; )
+		if (start > 0) {
+		    for (p = t + start - 1; p-- > t; )
 			if (*p == Meta)
-			    a--;
+			    start--;
 		} else
-		    a = -ztrlen(t + a + strlen(t));
+		    start = -ztrlen(t + start + strlen(t));
 	    }
-	    if (a > 0 && (isset(KSHARRAYS) || (v->pm->flags & PM_HASHED)))
-		a--;
+	    if (start > 0 && (isset(KSHARRAYS) || (v->pm->flags & PM_HASHED)))
+		start--;
 	    if (v->isarr != SCANPM_WANTINDEX) {
 		v->inv = 1;
 		v->isarr = 0;
-		v->a = v->b = a;
+		v->start = start;
+		v->len = 1;
 	    }
 	    if (*s == ',') {
 		zerr("invalid subscript", NULL, 0);
@@ -1179,25 +1182,28 @@ getindex(char **pptr, Value v)
 	} else {
 	    int com;
 
-	    if (a > 0)
-		a--;
+	    if (start > 0)
+		start--;
 	    if ((com = (*s == ','))) {
 		s++;
-		b = getarg(&s, &inv, v, 1, &dummy);
-		if (b > 0)
-		    b--;
+		len = getarg(&s, &inv, v, 1, &dummy);
+		if (len > 0) {
+		    len -= start;
+		    if (len < 0)
+			len = 0;
+		}
 	    } else {
-		b = we ? we : a;
+		len = wlen ? wlen : 1;
 	    }
 	    if (*s == ']' || *s == Outbrack) {
 		s++;
-		if (v->isarr && a == b && !com &&
+		if (v->isarr && len == 1 && !com &&
 		    (!(v->isarr & SCANPM_MATCHMANY) ||
 		     !(v->isarr & (SCANPM_MATCHKEY | SCANPM_MATCHVAL |
 				   SCANPM_KEYMATCH))))
 		    v->isarr = 0;
-		v->a = a;
-		v->b = b;
+		v->start = start;
+		v->len = len;
 	    } else
 		s = *pptr;
 	}
@@ -1258,7 +1264,8 @@ fetchvalue(Value v, char **pptr, int bracks, int flags)
 	    v = (Value) hcalloc(sizeof *v);
 	v->pm = argvparam;
 	v->inv = 0;
-	v->a = v->b = ppar - 1;
+	v->start = ppar - 1;
+	v->len = 1;
 	if (sav)
 	    *s = sav;
     } else {
@@ -1288,8 +1295,8 @@ fetchvalue(Value v, char **pptr, int bracks, int flags)
 	}
 	v->pm = pm;
 	v->inv = 0;
-	v->a = 0;
-	v->b = -1;
+	v->start = 0;
+	v->len = -1;
 	if (bracks > 0 && (*s == '[' || *s == Inbrack)) {
 	    if (getindex(&s, v)) {
 		*pptr = s;
@@ -1297,19 +1304,21 @@ fetchvalue(Value v, char **pptr, int bracks, int flags)
 	    }
 	} else if (!(flags & SCANPM_ASSIGNING) && v->isarr &&
 		   iident(*t) && isset(KSHARRAYS))
-	    v->b = 0, v->isarr = 0;
+	    v->len = 1, v->isarr = 0;
     }
     if (!bracks && *s)
 	return NULL;
     *pptr = s;
-    if (v->a > MAX_ARRLEN ||
-	v->a < -MAX_ARRLEN) {
-	zerr("subscript too %s: %d", (v->a < 0) ? "small" : "big", v->a);
+    if (v->start > MAX_ARRLEN ||
+	v->start < -MAX_ARRLEN) {
+	zerr("subscript too %s: %d", (v->start < 0) ? "small" : "big",
+	     v->start + !isset(KSHARRAYS));
 	return NULL;
     }
-    if (v->b > MAX_ARRLEN ||
-	v->b < -MAX_ARRLEN) {
-	zerr("subscript too %s: %d", (v->b < 0) ? "small" : "big", v->b);
+    if (v->start + v->len > MAX_ARRLEN ||
+	v->start + v->len < -MAX_ARRLEN) {
+	zerr("subscript too %s: %d", (v->len < 0) ? "small" : "big",
+	     v->start + v->len - !!isset(KSHARRAYS));
 	return NULL;
     }
     return v;
@@ -1326,7 +1335,7 @@ getstrvalue(Value v)
 	return hcalloc(1);
 
     if (v->inv && !(v->pm->flags & PM_HASHED)) {
-	sprintf(buf, "%d", v->a);
+	sprintf(buf, "%d", v->start);
 	s = dupstring(buf);
 	return s;
     }
@@ -1345,9 +1354,10 @@ getstrvalue(Value v)
 	if (v->isarr)
 	    s = sepjoin(ss, NULL, 1);
 	else {
-	    if (v->a < 0)
-		v->a += arrlen(ss);
-	    s = (v->a >= arrlen(ss) || v->a < 0) ? (char *) hcalloc(1) : ss[v->a];
+	    if (v->start < 0)
+		v->start += arrlen(ss);
+	    s = (v->start >= arrlen(ss) || v->start < 0) ?
+		(char *) hcalloc(1) : ss[v->start];
 	}
 	return s;
     case PM_INTEGER:
@@ -1367,18 +1377,18 @@ getstrvalue(Value v)
 	break;
     }
 
-    if (v->a == 0 && v->b == -1)
+    if (v->start == 0 && v->len == -1)
 	return s;
 
-    if (v->a < 0)
-	v->a += strlen(s);
-    if (v->b < 0)
-	v->b += strlen(s);
-    s = (v->a > (int)strlen(s)) ? dupstring("") : dupstring(s + v->a);
-    if (v->b < v->a)
+    if (v->start < 0)
+	v->start += strlen(s);
+    if (v->len < 0)
+	v->len += strlen(s) - v->start + 1;
+    s = (v->start > (int)strlen(s)) ? dupstring("") : dupstring(s + v->start);
+    if (v->len <= 0)
 	s[0] = '\0';
-    else if (v->b - v->a < (int)strlen(s))
-	s[v->b - v->a + 1 + (s[v->b - v->a] == Meta)] = '\0';
+    else if (v->len <= (int)strlen(s))
+	s[v->len + (s[v->len - 1] == Meta)] = '\0';
 
     return s;
 }
@@ -1399,25 +1409,25 @@ getarrvalue(Value v)
 	char buf[DIGBUFSIZE];
 
 	s = arrdup(nular);
-	sprintf(buf, "%d", v->a);
+	sprintf(buf, "%d", v->start);
 	s[0] = dupstring(buf);
 	return s;
     }
     s = getvaluearr(v);
-    if (v->a == 0 && v->b == -1)
+    if (v->start == 0 && v->len == -1)
 	return s;
-    if (v->a < 0)
-	v->a += arrlen(s);
-    if (v->b < 0)
-	v->b += arrlen(s);
-    if (v->a > arrlen(s) || v->a < 0)
+    if (v->start < 0)
+	v->start += arrlen(s);
+    if (v->len < 0)
+	v->len += arrlen(s) - v->start + 1;
+    if (v->start > arrlen(s) || v->start < 0)
 	s = arrdup(nular);
     else
-	s = arrdup(s + v->a);
-    if (v->b < v->a)
+	s = arrdup(s + v->start);
+    if (v->len <= 0)
 	s[0] = NULL;
-    else if (v->b - v->a < arrlen(s))
-	s[v->b - v->a + 1] = NULL;
+    else if (v->len <= arrlen(s))
+	s[v->len] = NULL;
     return s;
 }
 
@@ -1428,7 +1438,7 @@ getintvalue(Value v)
     if (!v || v->isarr)
 	return 0;
     if (v->inv)
-	return v->a;
+	return v->start;
     if (PM_TYPE(v->pm->flags) == PM_INTEGER)
 	return v->pm->gets.ifn(v->pm);
     if (v->pm->flags & (PM_EFLOAT|PM_FFLOAT))
@@ -1446,7 +1456,7 @@ getnumvalue(Value v)
     if (!v || v->isarr) {
 	mn.u.l = 0;
     } else if (v->inv) {
-	mn.u.l = v->a;
+	mn.u.l = v->start;
     } else if (PM_TYPE(v->pm->flags) == PM_INTEGER) {
 	mn.u.l = v->pm->gets.ifn(v->pm);
     } else if (v->pm->flags & (PM_EFLOAT|PM_FFLOAT)) {
@@ -1495,7 +1505,7 @@ setstrvalue(Value v, char *val)
     v->pm->flags &= ~PM_UNSET;
     switch (PM_TYPE(v->pm->flags)) {
     case PM_SCALAR:
-	if (v->a == 0 && v->b == -1) {
+	if (v->start == 0 && v->len == -1) {
 	    (v->pm->sets.cfn) (v->pm, val);
 	    if (v->pm->flags & (PM_LEFT | PM_RIGHT_B | PM_RIGHT_Z) && !v->pm->ct)
 		v->pm->ct = strlen(val);
@@ -1506,22 +1516,22 @@ setstrvalue(Value v, char *val)
 	    z = dupstring((v->pm->gets.cfn) (v->pm));
 	    zlen = strlen(z);
 	    if (v->inv && unset(KSHARRAYS))
-		v->a--, v->b--;
-	    if (v->a < 0) {
-		v->a += zlen;
-		if (v->a < 0)
-		    v->a = 0;
+		v->start--;
+	    if (v->start < 0) {
+		v->start += zlen;
+		if (v->start < 0)
+		    v->start = 0;
 	    }
-	    if (v->a > zlen)
-		v->a = zlen;
-	    if (v->b < 0)
-		v->b += zlen;
-	    if (v->b > zlen - 1)
-		v->b = zlen - 1;
-	    x = (char *) zalloc(v->a + strlen(val) + zlen - v->b);
-	    strncpy(x, z, v->a);
-	    strcpy(x + v->a, val);
-	    strcat(x + v->a, z + v->b + 1);
+	    if (v->start > zlen)
+		v->start = zlen;
+	    if (v->len < 0)
+		v->len += zlen - v->start + 1;
+	    if (v->len > zlen - v->start)
+		v->len = zlen - v->start;
+	    x = (char *) zalloc(strlen(val) + zlen - v->len + 1);
+	    strncpy(x, z, v->start);
+	    strcpy(x + v->start, val);
+	    strcat(x + v->start, z + v->start + v->len);
 	    (v->pm->sets.cfn) (v->pm, x);
 	    zsfree(val);
 	}
@@ -1618,7 +1628,7 @@ setarrvalue(Value v, char **val)
 	zerr("attempt to assign array value to non-array", NULL, 0);
 	return;
     }
-    if (v->a == 0 && v->b == -1) {
+    if (v->start == 0 && v->len == -1) {
 	if (PM_TYPE(v->pm->flags) == PM_HASHED)
 	    arrhashsetfn(v->pm, val);
 	else
@@ -1633,30 +1643,30 @@ setarrvalue(Value v, char **val)
 	    return;
 	}
 	if (v->inv && unset(KSHARRAYS))
-	    v->a--, v->b--;
+	    v->start--;
 	q = old = v->pm->gets.afn(v->pm);
 	n = arrlen(old);
-	if (v->a < 0)
-	    v->a += n;
-	if (v->b < 0)
-	    v->b += n;
-	if (v->a < 0)
-	    v->a = 0;
-	if (v->b < 0)
-	    v->b = 0;
+	if (v->start < 0)
+	    v->start += n;
+	if (v->len < 0)
+	    v->len += n - v->start + 1;
+	if (v->start < 0)
+	    v->start = 0;
+	if (v->len < 0)
+	    v->len = 0;
 
-	ll = v->a + arrlen(val);
-	if (v->b < n)
-	    ll += n - v->b;
+	ll = v->start + arrlen(val);
+	if (v->start + v->len - 1 < n)
+	    ll += n - (v->start + v->len - 1);
 
 	p = new = (char **) zcalloc(sizeof(char *) * (ll + 1));
 
-	for (i = 0; i < v->a; i++)
+	for (i = 0; i < v->start; i++)
 	    *p++ = i < n ? ztrdup(*q++) : ztrdup("");
 	for (r = val; *r;)
 	    *p++ = ztrdup(*r++);
-	if (v->b + 1 < n)
-	    for (q = old + v->b + 1; *q;)
+	if (v->start + v->len < n)
+	    for (q = old + v->start + v->len; *q;)
 		*p++ = ztrdup(*q++);
 	*p = NULL;
 
@@ -2151,7 +2161,7 @@ arrhashsetfn(Param pm, char **val)
     HashTable opmtab = paramtab, ht = 0;
     char **aptr = val;
     Value v = (Value) hcalloc(sizeof *v);
-    v->b = -1;
+    v->len = -1;
 
     if (alen % 2) {
 	freearray(val);

@@ -467,8 +467,8 @@ struct value {
     int isarr;
     Param pm;		/* parameter node                      */
     int inv;		/* should we return the index ?        */
-    int a;		/* first element of array slice, or -1 */
-    int b;		/* last element of array slice, or -1  */
+    int start;		/* first element of array slice, or -1 */
+    int len;		/* length of array slice, or -1        */
     char **arr;		/* cache for hash turned into array */
 };
 

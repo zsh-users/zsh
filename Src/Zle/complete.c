@@ -1033,8 +1033,8 @@ set_compstate(Param pm, HashTable ht)
 	    for (cp = compkparams,
 		 pp = compkpms; cp->name; cp++, pp++)
 		if (!strcmp(hn->nam, cp->name)) {
-		    v.isarr = v.inv = v.a = 0;
-		    v.b = -1;
+		    v.isarr = v.inv = v.start = 0;
+		    v.len = -1;
 		    v.arr = NULL;
 		    v.pm = (Param) hn;
 		    if (cp->type == PM_INTEGER)

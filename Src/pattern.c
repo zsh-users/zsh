@@ -807,7 +807,7 @@ patgetglobflags(char **strp, long *assertp)
 static long
 patcomppiece(int *flagp)
 {
-    long starter, next, pound, op;
+    long starter = 0, next, pound, op;
     int flags, flags2, kshchar, len, ch, patch;
     union upat up;
     char *nptr, *str0, cbuf[2];
@@ -1025,7 +1025,6 @@ patcomppiece(int *flagp)
 	    if (*patparse != Outang)
 		return 0;
 	    patparse++;
-	    starter = 0;	/* shut compiler up */
 	    switch(len) {
 	    case 3:
 		starter = patnode(P_NUMRNG);
