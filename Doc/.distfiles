@@ -2,7 +2,7 @@ DISTFILES_SRC='
     .cvsignore .distfiles Makefile.in
     META-FAQ.yo intro.ms
     version.yo zmacros.yo zman.yo ztexi.yo
-    zsh.yo zshbuiltins.yo zshcompctl.yo zshcompsys.yo zshcompwid.yo
+    zsh.yo.in zshbuiltins.yo zshcompctl.yo zshcompsys.yo zshcompwid.yo
     zshexpn.yo zshmisc.yo zshmodules.yo zshoptions.yo zshparam.yo
     zshzftpsys.yo zshzle.yo
     zsh.texi

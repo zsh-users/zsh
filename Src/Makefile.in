@@ -42,8 +42,7 @@ LN		= @LN@
 sdir_src      = $(sdir)
 dir_src       = .
 
-transform=@program_transform_name@
-tzsh=`echo zsh | sed '$(transform)'`
+tzsh = zsh
 
 # ========= DEPENDENCIES FOR BUILDING ==========
 

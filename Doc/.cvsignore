@@ -1,5 +1,6 @@
 Makefile
 version.yo
+zsh.yo
 zsh*.1
 zsh.texi
 zsh.info*
