@@ -1,3 +1,8 @@
+2002-02-14  Geoff Wing  <gcw@zsh.org>
+
+	* unposted: Doc/Zsh/metafaq.yo: update distribution sites - remove four
+	sites, add three, change one path
+
 2002-02-12  Wayne Davison  <wayned@users.sourceforge.net>
 
 	* unposted: Src/params.c: The minimum size of histsiz (aka HISTSIZE)
