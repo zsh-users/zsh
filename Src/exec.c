@@ -1760,6 +1760,13 @@ execcmd(Cmd cmd, int input, int output, int how, int last1)
 #ifdef PATH_DEV_FD
 	    closem(2);
 #endif
+
+	    /* If there is already a group leader but that has died, we make
+	     * this one the leader. */
+	    if (pline_level == 1 && jobtab[thisjob].procs &&
+		kill(jobtab[thisjob].gleader, 0) == -1)
+		jobtab[thisjob].gleader = pid;
+
 	    if (how & Z_ASYNC) {
 		lastpid = (zlong) pid;
 	    } else if (!jobtab[thisjob].stty_in_env &&

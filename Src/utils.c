@@ -2438,7 +2438,7 @@ attachtty(pid_t pgrp)
 # endif
 #endif
 	{
-	    if (pgrp != mypgrp && kill(pgrp, 0) == -1)
+	    if (pgrp != mypgrp && kill(-pgrp, 0) == -1)
 		attachtty(mypgrp);
 	    else {
 		if (errno != ENOTTY)
