@@ -3673,7 +3673,7 @@ command has to be called and hence it shouldn't be used if one can't
 be sure that the command understands the `tt(-)tt(-help)' option.
 )
 findex(_guard)
-item(tt(_guard) [ var(options) ] var(pattern) [ var(descr) ])(
+item(tt(_guard) [ var(options) ] var(pattern descr))(
 This function is intended to be used in an action of functions like
 tt(_arguments).  It returns immediately with a non-zero return value if
 the string to be completed does not match the var(pattern).  If the
@@ -3683,18 +3683,11 @@ zero if the word to complete is not empty and non-zero otherwise.
 The var(pattern) may be preceded by those options understood by
 tt(compadd) that are passed down from tt(_description), namely tt(-M),
 tt(-J), tt(-V), tt(-1), tt(-2), tt(-n), tt(-F) and tt(-X).  All of these
-options, except tt(-X), will be ignored.  If the tt(-X) option appears,
-the description following it will be used as the string to display if
-the var(pattern) matches, unless the option var(descr) is given to
-tt(_guard) itself, which will then take precedence.
+options will be ignored.
 
 As an example, consider a command taking the options tt(-n) and
 tt(-none), where tt(-n) has to be followed by a numeric value in the
-same word.  By using either of:
-
-example(_argument '-n-:numeric value:_guard "[0-9]#"' '-none')
-
-or
+same word.  By using:
 
 example(_argument '-n-: :_guard "[0-9]#" "numeric value"' '-none')
 
@@ -3706,7 +3699,7 @@ followed by another character, only options are completed.
 )
 findex(_message)
 xitem(tt(_message) [ tt(-r12) ] [ tt(-VJ) var(group) ] var(descr))
-item(tt(_message -e) var(tag descr))(
+item(tt(_message -e) [ var(tag) ] var(descr))(
 The var(descr) is used like the third
 argument to the tt(_description) function. However, the resulting
 string will always be shown whether or not matches were
@@ -3727,7 +3720,10 @@ hence determine the group the message string is added to.
 
 In the second form, the var(descr) is added like a description added
 by tt(_description) under the given var(tag), but the var(descr) will
-always be shown even if no matches are added for the var(tag).
+always be shown even if no matches are added for the var(tag).  If the
+var(tag) is omitted, it is taken from the tt(curtag) parameter which
+is set by the functions dealing with tags so it should contain the
+right one in almost all cases.
 )
 findex(_multi_parts)
 item(tt(_multi_parts) var(sep) var(array))(

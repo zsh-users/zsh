@@ -3,11 +3,17 @@
 local format raw gopt
 
 if [[ "$1" = -e ]]; then
-  local expl ret=1
+  local expl ret=1 tag
 
   _comp_mesg=yes
 
-  _tags "$2" && while _next_label "$2" expl "$3"; do
+  if (( $# > 2 )); then
+    tag="$2"
+    shift
+  else
+    tag="$curtag"
+  fi
+  _tags "$tag" && while _next_label "$tag" expl "$2"; do
     compadd ${expl:/-X/-x}
     ret=0
   done

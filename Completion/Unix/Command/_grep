@@ -51,7 +51,7 @@ arguments=( $arguments[@]
   '(--null -Z --no-filename -h)'{--null,-Z}'[print 0 byte after FILE name]'
   '--help[display help]'
   '--mmap[memory map input]'
-  '(-e --regexp -f --file)1:pattern:_guard "^--*"'
+  '(-e --regexp -f --file)1: :_guard "^--*" pattern'
   '*:files:_files'
 )
 

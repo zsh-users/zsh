@@ -1648,10 +1648,6 @@ addmatches(Cadata dat, char **argv)
     if (!*argv && !dat->dummies && !(dat->aflags & CAF_ALL))
 	return 1;
 
-#if 0
-    if (dat->dummies)
-        dat->aflags = (dat->aflags | CAF_NOSORT | CAF_UNIQCON) & ~CAF_UNIQALL;
-#endif
     for (bp = brbeg; bp; bp = bp->next)
 	bp->curpos = ((dat->aflags & CAF_QUOTE) ? bp->pos : bp->qpos);
     for (bp = brend; bp; bp = bp->next)
