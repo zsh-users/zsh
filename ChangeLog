@@ -1,3 +1,7 @@
+2000-05-24  Bart Schaefer  <schaefer@zsh.org>
+
+	* 11554: Doc/Zsh/compsys.yo: Rearrange _arguments doc some more.
+
 2000-05-24  Sven Wischnowsky  <wischnow@zsh.org>
 
 	* 11552: Completion/Linux/_rpm, Src/Zle/computil.c: fix for

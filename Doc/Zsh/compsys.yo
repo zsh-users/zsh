@@ -2555,129 +2555,198 @@ Like tt(_tags) this function supports the tt(-C) option to give a
 different name for the argument context field.
 )
 findex(_arguments)
-item(tt(_arguments) var(specs) ...)(
-This function can be used to complete words on the line by simply
-describing the arguments which may be passed to the command for which
+item(tt(_arguments) var(spec) ...)(
+This function can be used to complete words on the line by describing the
+options and arguments which may be passed to the command for which
 completion is being performed.  The description is given as arguments to
-this function, with each var(spec) describing one option or normal argument
-of the command.  The descriptions understood are:
+this function, with each var(spec) describing one option or normal
+argument of the command.  The forms of var(spec) understood are:
 
 startitem()
-item(var(n)tt(:)var(message)tt(:)var(action))(
+xitem(var(n)tt(:)var(message)tt(:)var(action))
+item(var(n)tt(::)var(message)tt(:)var(action))(
 This describes the var(n)'th normal argument.  The var(message) will be 
 printed above the matches generated and the var(action) says what can
 be completed in this position (see below).  If there are two colons
 before the var(message), this describes an optional argument.
 )
-item(tt(:)var(message)tt(:)var(action))(
+xitem(tt(:)var(message)tt(:)var(action))
+item(tt(::)var(message)tt(:)var(action))(
 Like the previous one, but describing the em(next) argument. I.e. if
 you want to describe all arguments a command can get, you can leave
 out the numbers in the description and just use this form to describe
 them one after another in the order they have to appear on the line.
 )
-item(tt(*:)var(message)tt(:)var(action))(
-This describes how arguments are to be completed for which no
-description with one of the first two forms was given. This also means 
-that any number of arguments can be completed.
+xitem(tt(*:)var(message)tt(:)var(action))
+xitem(tt(*::)var(message)tt(:)var(action))
+item(tt(*:::)var(message)tt(:)var(action))(
+This describes how arguments (usually non-option arguments, those not
+beginning with tt(-) or tt(+)) are to be completed when no description
+with one of the first two forms was given. This also means that any number
+of arguments can be completed.
 
-If there are two colons before the var(message) (as in
-`tt(*::)var(message)tt(:)var(action)') the tt(words) special array and 
-the tt(CURRENT) special parameter will be restricted to only the
-normal arguments when the var(action) is executed or evaluated. With
-three colons before the var(message) they will be restricted to only
+With two colons before the var(message), the tt(words) special array and
+the tt(CURRENT) special parameter are modified to refer only to the
+normal arguments when the var(action) is executed or evaluated.  With
+three colons before the var(message) they are modified to refer only to
 the normal arguments covered by this description.
 )
-item(var(opt-spec)[var(description) ...])(
-This describes an option and (if at least one var(description) is
-given) the arguments that have to come after the option. If no
-var(description) is given, this will only be used to offer the option
-name as a possible completion in the right places. Each
-var(description) has to be of the form
-`tt(:)var(message)tt(:)var(action)' or
-`tt(::)var(message)tt(:)var(action)', where the second form describes
-an optional argument and the first one describes a mandatory argument.
-The last description may also be of the form
-`tt(:*:)var(message)tt(:)var(action)' or
-`tt(:*)var(pattern)tt(:)var(message)tt(:)var(action)'. These describe
-multiple arguments. In the first form all following words on the line
-are to be completed as described by the var(action), in the second
-form all words up to a word matching the given var(pattern) are to be
-completed using the var(action). The `tt(*)' or the var(pattern) may
-also be separated from the var(message) by two or three colons. In
-this case, the tt(words) special array and the tt(CURRENT) special
-parameter are modified to refer only to the words after the option
-(with two colons) or to the words covered by this description (with
-three colons) during the execution or evaluation of the
-var(action). Note that only one such `tt(:*)'-specification is useful
-and no other argument specification may be given after it.
+item(var(optspec)[var(description) ...])(
+This describes an option and (if var(description) is given) the arguments
+that have to come after the option.  If no var(description) is given, this
+means to offer only the option name as a possible completion in the right
+places.  (Note that the brackets, above, around var(description), indicate
+that zero or more var(description)s may appear; but the brackets are not
+themselves part of this format.  If brackets are used, they are part of
+the var(optspec); see below.)
 
-In the simplest form the var(opt-spec) is just the option name
-beginning with a minus or a plus sign, such as `tt(-foo)'. If the
-command accepts the option both with a leading minus and a plus sign,
-one can use either tt(-+foo) or tt(+-foo) to define both options at
-once.
+In the descriptions below, the option names represented by var(optname)
+are normally taken to be multi-character names, and a word from the line
+is considered to contain only one option (or none).  By giving the tt(-s)
+option to tt(_arguments) before the first var(spec), each var(optname) is
+considered to be a single character and each word from the line may
+contain more than one such option letter.  However, words beginning with
+two hyphens (like `tt(-)tt(-prefix)') are still considered to contain only
+one option name.  This allows the use of the `tt(-s)' option to describe
+single-letter options together with such long option names.
 
-In these
-cases, the first argument for the option (if any) has to come as a
-separate word directly after the option and the option may appear only 
-once on the line (and if it is already on the line and to the left of
-the cursor, the option name
-will not be offered as a possible completion again). If the first
-argument for the option has to come directly after the option name
-em(in the same word), a minus sign should be added to the end of the
-var(opt-spec), as in `tt(-foo-:)var(...)'. If the first argument may be given
-in one string with the option name, but may also be given as a
-separate argument after the option, a plus sign should be used
-instead. If the argument may be given as the next string or in same
-string as the option name but separated from it by an equal sign, a
-`tt(=)' should be used instead of the minus or plus sign and if the
-argument to the option has to be given in the same string after an
-equal sign and may not be given in the next argument, `tt(=-)' should
-be used.
+The forms of var(optspec) are:
 
-Note that this and the shortcut syntax with a leading tt(-+) or tt(+-) 
-means that for options like tt(-+) the second character has to be
-quoted with a backslash.
+startitem()
+item(tt(*)var(optspec))(
+If the option may be given more than once, a star (`tt(*)') must be
+added in front of one of the following forms of var(optspec).  Otherwise,
+if the option is already on the line and to the left of the cursor, it
+is not offered as a possible completion again.
+)
+xitem(tt(-)var(optname))
+item(tt(+)var(optname))(
+In the simplest form the var(optspec) is just the option name beginning
+with a minus or a plus sign, such as `tt(-foo)'.  The first argument for
+the option (if any) must follow as a em(separate) word directly after the
+option.
 
-If the option may be given more than once, a star
-(`tt(*)') has to be added in front of the var(opt-spec).
+If the command accepts the option with either a leading minus or a leading
+plus sign, use either `tt(-+)var(optname)' or `tt(+-)var(optname)' to
+define both variants at once.
 
-Finally, the var(opt-spec) may contain a explanation string. This is
-given in brackets at the end, as in `tt(-q[query operation])'. The
-tt(verbose) style is used to decide if these
-explanation strings should be printed when options are listed. If no
-explanation string is given but the tt(auto-description) style is
-set and only one argument is described for this var(opt-spec), the
-option will be described by the value of the style with any appearance
-of the sequence `tt(%d)' in it replaced by the description for the
-first argument.
+In all the following forms, the leading `tt(-)' may be replaced or paired
+with `tt(+)' in this way.
+)
+item(tt(-)var(optname)tt(-))(
+The first argument of the option must come directly after the option name
+em(in the same word), as in `tt(-foo-:)var(...)'.
+)
+item(tt(-)var(optname)tt(+))(
+The first argument may appear immediately after var(optname) in the same
+word, or may instead appear as a separate word after the option.
+)
+item(tt(-)var(optname)tt(=))(
+The argument may appear as the next word, or in same word as the option
+name provided that it is separated from it by an equal sign.
+)
+item(tt(-)var(optname)tt(=-))(
+The argument to the option must appear after an equal sign in the same
+word, and may not be given in the next argument.
+)
+item(var(optspec)tt([)var(explanation)tt(]))(
+An explanation string may be appended to any of the preceding forms of
+var(optspec) by enclosing it in brackets, as in `tt(-q[query operation])'.
+
+The tt(verbose) style is used to decide if these explanation strings
+should be displayed with the option in a completion listing.
+
+If no bracketed explanation string is given but the tt(auto-description)
+style is set and only one argument is described for this var(optspec), the
+value of the style is displayed, with any appearance of the sequence
+`tt(%d)' in it replaced by the var(message) of the first var(description)
+that follows the var(optspec); see below.
 )
 enditem()
 
-Every var(spec) may also contain a list of option names and argument
-numbers with which the option or argument described is mutually
-exclusive. Such a list is given in parentheses at the beginning, as in
-`tt((-two -three 1)-one:...)' or `tt((-foo):...)'. In the first
+Note that the special meaning of a leading or trailing tt(-) or tt(+) in
+var(optspec) means that when the command to be completed accepts options
+like `tt(-+)' or `tt(-=)', the second character has to be quoted with a
+backslash, as in `tt(-\+)'.
+
+Each var(description) following an var(optspec) must take one of the
+following forms:
+
+startitem()
+xitem(tt(:)var(message)tt(:)var(action))
+item(tt(::)var(message)tt(:)var(action))(
+Describes a mandatory argument with one colon, or an optional argument
+with two colons.  As in other forms of var(spec), the var(message) will be
+printed above the matches generated and the var(action) says what can be
+completed in this position.
+)
+xitem(tt(:*)var(pattern)tt(:)var(message)tt(:)var(action))
+xitem(tt(:*)var(pattern)tt(::)var(message)tt(:)var(action))
+item(tt(:*)var(pattern)tt(:::)var(message)tt(:)var(action))(
+This describes multiple arguments.  Only the em(last) description may be
+given in this form.  If the var(pattern) is empty (i.e., tt(:*:)), all
+following words on the line are to be completed as described by the
+var(action); otherwise, all words up to a word matching the var(pattern)
+are to be completed using the var(action).
+
+When the var(message) is preceded by two colons, the tt(words) special
+array and the tt(CURRENT) special parameter are modified during the
+execution or evaluation of the var(action) to refer only to the words
+after the option.  When preceded by three colons, they are modified to
+refer only to the words covered by this description.
+
+Note that only one such `tt(:*)'-specification is useful
+and no other argument specification may be given after it.
+)
+enditem()
+)
+enditem()
+
+To include a colon in any var(optname), var(message), or var(action)
+anywhere above, it has to be preceded by a backslash, as `tt(\:)'.
+
+Each of the six forms of var(spec) (yes, there are six, keep track of
+the nestings) may be preceded by a list
+of option names and argument numbers with which the option or argument
+described is mutually exclusive.  This list is given in parentheses, as
+in `tt((-two -three 1)-one:...)' or `tt((-foo):...)'.  In the first
 example, the options `tt(-two)' and `tt(-three)' and the first
 argument will not be offered as possible completions if the option
-`tt(-one)' is on the line before the cursor and in the second example
+`tt(-one)' is on the line before the cursor, and in the second example
 the option `tt(-foo)' will not be offered if the argument described by
-the specification is on the line. Also, the list may contain a single
-star as one of its elements to specify that the description for the
-rest arguments (i.e. a specification of the form `tt(*:...)') should
-not be used, a colon to
-specify that the descriptions for all normal (non-option-) arguments
-should not be used and a hyphen to specify that the descriptions for
-all options should not be used.
+the specification is on the line.
 
-In each of the cases above, the var(action) says how the possible
-completions should be generated. In cases where only one of a fixed
-set of strings can be completed, these strings can directly be given as 
-a list in parentheses, as in `tt(:foo:(foo bar baz))'. Such a list in
-doubled parentheses, as in `tt(:foo:((a\:bar b\:baz)))' should contain 
-strings consisting of the string to complete followed by a colon
-(which needs to be preceded by a backslash) and a description. The
-matches will be listed together with their descriptions if the
+The list may also contain a single star (tt(*)) as one of its elements to
+specify that the description for the rest arguments (i.e. a specification
+of the form `tt(*:...)') should not be used, a colon (tt(:)) to specify
+that the descriptions for all normal (non-option-) arguments should not be
+used and a hyphen (tt(-)) to specify that the descriptions for all options
+should not be used.  This paragraph desperately needs rewriting.
+
+In every case above, the var(action) determines how the possible
+completions should be generated.  In places where no sensible matches can
+be generated, the action should consist of only a space. This will make
+the var(message) be displayed but no possible completions listed. Note
+that even in this case the colon at the end of the var(message) is
+needed. The only case where it can be left is when neither a var(message),
+nor a var(action) is given.
+
+Except for the `tt(->)var(string)' form below, the var(action) will be
+executed by calling the tt(_all_labels) function to process all tag labels,
+so one doesn't need to call that explicitly unless another tag is to
+be used, for example in a function called in the var(action).
+
+When only one of a fixed set of strings can be completed, the var(action)
+can consist of these strings as a list in parentheses, as in:
+
+example(tt(:foo:LPAR()foo bar baz)tt(RPAR()))
+
+Such a list in doubled parentheses should contain strings consisting of
+the string to complete followed by `tt(\:)' and a description, as in:
+
+example(tt(:foo:LPAR()LPAR()a\:bar b\:baz)tt(RPAR()RPAR()))
+
+The matches will be listed together with their descriptions if the
 tt(description) style for the tt(values) tag is set.
 
 An var(action) of the form `tt(->)var(string)' is used by functions
@@ -2687,10 +2756,11 @@ have to be used will be stored in
 the global array tt(state) and the function returns with a return
 value of 300 (to make it distinguishable from other return values)
 after setting the global `tt(context)', `tt(line)' and `tt(opt_args)'
-parameters as described below and without resetting any changes made
-to the special parameters such as tt(PREFIX) and tt(words). Note that
-this means that a function calling tt(_arguments) with at least one
-action containing such a `tt(->)var(string)' has to declare
+parameters as described below, and without resetting any changes made
+to the special parameters such as tt(PREFIX) and tt(words).
+
+Note that this means that a function calling tt(_arguments) with at least
+one action containing such a `tt(->)var(string)' has to declare
 appropriate local parameters as in:
 
 example(local context state line
@@ -2699,10 +2769,9 @@ typeset -A opt_args)
 This will ensure that tt(_arguments) does not create unused global
 parameters.
 
-A string in
-braces will be evaluated to generate the matches and if the
+A string in braces is evaluated to generate the matches and if the
 var(action) does not begin with an opening parentheses or brace, it
-will be split into separate words and executed. If the var(action)
+is also split into separate words and executed. If the var(action)
 starts with a space, this list of words will be invoked unchanged,
 otherwise it will be invoked with some extra strings placed after the
 first word which can be given as arguments to the tt(compadd) builtin
@@ -2729,21 +2798,6 @@ restricted range for argument parsing. Without the inserted dummy
 element, the first word in the range would be taken (by the second
 tt(_arguments)) to be the command name and hence ignored.
 
-Except for the `tt(->)var(string)' form, the var(action) will be
-executed by calling the tt(_all_labels) function to process all tag labels,
-so one doesn't need to call that explicitly unless another tag is to
-be used, for example in a function called in the var(action).
-
-In places where no sensible matches can be generated, the action
-should consist of only a space. This will make the var(message) be
-displayed but no possible completions listed. Note that even in this
-case the colon at the end of the var(message) is needed. The only case 
-where it can be left is when neither a var(message), nor a var(action) 
-is given.
-
-To include a colon in the option name, the var(message) or the
-var(action), it has to be preceded by a backslash.
-
 During the evaluation or execution of the action the array `tt(line)'
 will be set to the command name and normal arguments from the command
 line, i.e. to the words from the command line excluding all options
@@ -2753,9 +2807,9 @@ the values. For options that have more than one argument these are
 given as one string, separated by colons. All colons in the original
 arguments are preceded with backslashes.
 
-The parameter `tt(context)' (only set in the calling function when
+The parameter `tt(context)' (set only in the calling function when
 using an action of the form `tt(->)var(string)', not during the
-evaluation of other var(action)s) will be set to the automatically
+evaluation of other var(action)s) is set to the automatically
 created context names. These are either strings of the form
 `tt(option)var(-opt)tt(-)var(n)' for the var(n)'th argument of the
 option var(-opt), or strings of the form `tt(argument-)var(n)' for
@@ -2765,7 +2819,7 @@ option, the name is `tt(option-o-1)' and for the second normal
 (non-option-) argument it is `tt(argument-2)'.
 
 Also, during the evaluation of the var(action), the context name in
-the tt(curcontext) parameter will be changed by appending the same
+the tt(curcontext) parameter is changed by appending the same
 string that is stored in the tt(context) parameter.
 
 It is also possible to specify multiple sets of options and
@@ -2806,16 +2860,6 @@ example(_arguments \
     {-c,--compress}'[compress]' \ 
   - '(uncompress)' \ 
     {-d,--decompress}'[decompress]')
-
-Normally the option names are taken as multi-character names and a
-word from the line is considered to contain only one option (or
-none). By giving the tt(-s) option to this function (before the first
-description), options are considered to be one-character options and the
-strings from the line may contain more than one such option
-letter. However, strings beginning with two hyphens (like
-`tt(-)tt(-prefix)') are still considered to contain only one option
-name. This allows the use of the `tt(-s)' option to describe
-single-letter options together with such long option names.
 
 To simplify the specifications for commands with standard option
 parsing, the options tt(-A) and tt(-S) may be given. With tt(-A) no
