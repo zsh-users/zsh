@@ -1,3 +1,8 @@
+2000-12-13  Clint Adams  <schizo@debian.org>
+
+	* 13250: Completion/User/.distfiles, Completion/User/_dict:
+	completion for dict.
+
 2000-12-06  Peter Stephenson  <pws@csr.com>
 
 	* unposted: Src/jobs.c: rename waitjob() to zwaitjob() to avoid
