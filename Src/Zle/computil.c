@@ -640,9 +640,9 @@ parse_cadef(char *nam, char **args)
 		zerrnam(nam, "invalid argument: %s", *args, 0);
 		return NULL;
 	    }
-	    /* Skip over the name. */
 
-	    for (p += 2; *p && *p != ':' && *p != '[' &&
+	    /* Skip over the name. */
+	    for (p++; *p && *p != ':' && *p != '[' &&
 		     ((*p != '-' && *p != '+' && *p != '=') ||
 		      (p[1] != ':' && p[1] != '[')); p++)
 		if (*p == '\\' && p[1])
