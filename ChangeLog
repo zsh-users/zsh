@@ -16,6 +16,12 @@
 	* 15882: zshconfig.ac, Etc/MACHINES, Test/C02cond.ztst: fix
 	build and test problems on MacOS X (Darwin).
 
+2001-10-11  Bart Schaefer  <schaefer@zsh.org>
+
+	* 16013: Src/exec.c: Properly save/restore state around the
+	DEBUG trap, so that its return value does not alter the return
+	value of current command (among other things).
+
 2001-10-08  Peter Stephenson  <pws@csr.com>
 
 	* 15974: Etc/BUGS, LICENCE: mention trap EXIT bug fixed (ish)
@@ -375,7 +381,7 @@
 	* user/3940: Src/Zle/zle_tricky.c: make expand-word not always
 	restore the command line
 
-001-06-22  Andrej Borsenkow  <bor@zsh.org>
+2001-06-22  Andrej Borsenkow  <bor@zsh.org>
 
 	* 15021: Src/prompt.c, Doc/Zsh/prompt.yo: revert to old %l
 	semantic; add new %y character instead as suggested by Wayne
