@@ -17,11 +17,14 @@
 # state than the global one for which you are completing.
 
 
-local comp post ret=1 _compskip _prio_num=1 _cur_context format
-local context state line opt_args val_args curcontext="$curcontext"
-local _saved_exact="$compstate[exact]" \
+local comp post ret=1 _compskip _prio_num=1 _cur_context format \
+      context state line opt_args val_args curcontext="$curcontext" \
+      _last_nmatches=-1 _last_menu_style _def_menu_style _menu_style sel \
+      _saved_exact="$compstate[exact]" \
       _saved_lastprompt="$compstate[last_prompt]" \
-      _saved_list="$compstate[list]"
+      _saved_list="$compstate[list]" \
+      _saved_insert="$compstate[insert]"
+
 typeset -U _offered_tags _tried_tags _failed_tags _used_tags _unused_tags
 
 _offered_tags=()
@@ -45,6 +48,8 @@ fi
 # Initial setup.
 
 _setup default
+_def_menu_style=( "$_last_menu_style[@]" )
+_last_menu_style=()
 
 # Get the names of the completers to use in the positional parameters.
 
@@ -77,6 +82,59 @@ done
 comppostfuncs=()
 
 _lastdescr=( "\`${(@)^_lastdescr:#}'" )
+
+[[ _last_nmatches -ge 0 && _last_nmatches -ne compstate[nmatches] ]] &&
+    _menu_style=( "$_last_menu_style[@]" "$_menu_style[@]" )
+
+if [[ "$compstate[insert]" = "$_saved_insert" ]]; then
+  if [[ -n "$_menu_style[(r)(yes|true|1|on)]" ||
+        ( -n "$_menu_style[(r)auto*]" &&
+          "$compstate[insert]" = automenu ) ]]; then
+    compstate[insert]=menu
+  elif [[ -n "$_menu_style[(r)auto*]" &&
+          "$compstate[insert]" != automenu ]]; then
+    compstate[insert]=automenu-unambiguous
+  elif [[ -n "$_menu_style[(r)(no|false|0|off)]" ]]; then
+    compstate[insert]=unambiguous
+  elif [[ -n "$_def_menu_style[(r)(yes|true|1|on)]" ||
+        ( -n "$_def_menu_style[(r)auto*]" &&
+          "$compstate[insert]" = automenu ) ]]; then
+    compstate[insert]=menu
+  elif [[ -n "$_def_menu_style[(r)auto*]" &&
+          "$compstate[insert]" != automenu ]]; then
+    compstate[insert]=automenu-unambiguous
+  elif [[ -n "$_def_menu_style[(r)(no|false|0|off)]" ]]; then
+    compstate[insert]=unambiguous
+  fi
+fi
+
+_menu_style=( "$_menu_style[@]" "$_def_menu_style[@]" )
+
+if [[ "$compstate[insert]" = *menu ]]; then
+  if [[ -n "$_menu_style[(r)no-select*]" ]]; then
+    unset SELECTMIN
+  else
+    sel=( "${(@M)_menu_style:#select*}" )
+
+    if (( $# )); then
+      local min=9999999 i num
+
+      for i in "$sel[@]"; do
+        if [[ "$i" = *\=* ]]; then
+	  num="${i#*\=}"
+	  [[ num -lt 0 ]] && num=0
+	else
+	  num=0
+	fi
+	[[ num -lt min ]] && min="$num"
+
+	(( min )) || break
+      done
+
+      SELECTMIN="$min"
+    fi
+  fi
+fi
 
 _style -s warnings format format
 

@@ -1075,7 +1075,31 @@ correcting completion with two errors will usually be performed, but if a
 numeric argument is given, correcting completion will not be performed.
 )
 item(tt(menu))(
-This is used by the tt(_oldlist) completer. It controls how menu
+This style is tested for the tt(default) tag and the tags used when
+adding matches. The value should be one of the `true' values (tt(yes), 
+tt(true), tt(1), or tt(on)) if menu completion should be started when
+matches for the given tag (or always in case of the tt(default) tag)
+are generated. If none of these values is defined for any of the tags
+used, but for at least one of these tags the value is the string
+tt(auto), this says that the same behavior as for the tt(AUTO_MENU)
+options should be used. Finally, if menu-completion is started by some 
+other means (e.g. by setting the tt(MENU_COMPLETE) option) and the
+value for one of the tags used is `false' (i.e. tt(no), tt(false),
+tt(0), or tt(off)), then menu-completion will em(not) be started for
+this completions. Note that the values defined for normal tags
+override the value set for the tt(default) tag.
+
+Either instead of or in addition to one of the values above, the value
+for this style may also contain the string tt(select), optionally
+followed by an equal sign and a number. In this case menu-selection
+(as defined by the tt(computil) module) will be started. Without the
+optional number, it will be started unconditionally and with a number
+it will be started only if at least that many matches are generated
+(if the values for more than one tag defines such a number, the
+smallest one is taken). Starting menu-selection can explicitly be
+turned off by defining a value containing the string tt(no-select).
+
+This is also used by the tt(_oldlist) completer. Here it controls how menu
 completion behaves when a completion has already been inserted and the
 user types a standard completion key type such as tt(TAB). The default
 behaviour of tt(_oldlist) is that menu completion always continues

@@ -1,6 +1,6 @@
 #autoload
 
-local val
+local val nm="$compstate[nmatches]"
 
 if _style -a "$1" list-colors val; then
   if [[ "$1" = default ]]; then
@@ -48,4 +48,14 @@ if _style -s "$1" accept-exact val; then
   fi
 else
   compstate[exact]="$_saved_exact"
+fi
+
+[[ _last_nmatches -ge 0 && _last_nmatches -ne nm ]] &&
+    _menu_style=( "$_last_menu_style[@]" "$_menu_style[@]" )
+
+if _style -a "$1" menu val; then
+  _last_nmatches="$nm"
+  _last_menu_style=( "$val[@]" )
+else
+  _last_nmatches=-1
 fi

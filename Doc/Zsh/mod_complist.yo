@@ -145,6 +145,11 @@ to one of the options tt(MENU_COMPLETE) or tt(AUTO_MENU) being set.  If
 tt(SELECTMIN) is set, but is 0, 1 or empty, menu selection will always be
 started during an ambiguous menu completion.
 
+When using the shell function based completion system, the
+tt(SELECTMIN) parameter should not be used (like the tt(ZLS_COLORS)
+and tt(ZLS_COLOURS) parameters described above). Instead, the tt(menu) 
+style should be used.
+
 After menu-selection is started, the matches will be listed. The
 matches to insert into the command line can be selected from this
 list. In the list one match is highlighted using the value for tt(ma)
