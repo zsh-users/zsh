@@ -1805,7 +1805,7 @@ sethparam(char *s, char **val)
 }
 
 /**/
-Param
+mod_export Param
 setiparam(char *s, zlong val)
 {
     Value v;

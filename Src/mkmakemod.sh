@@ -188,6 +188,7 @@ if $first_stage; then
 	dobjects=`echo $objects '' | sed 's,\.o ,..o ,g'`
 	modhdeps=
 	exportdeps=
+	imports=
 	q_moddeps=
 	for dep in $moddeps; do
 	    q_dep=`echo $dep | sed 's,Q,Qq,g;s,_,Qu,g;s,/,Qs,g'`
@@ -226,6 +227,7 @@ if $first_stage; then
 	    esac
 	    modhdeps="$modhdeps $mdh"
 	    exportdeps="$exportdeps $export"
+	    imports="$imports \$(IMPOPT)$export"
 	done
 
 	echo "##### ===== DEPENDENCIES GENERATED FROM ${mddname}.mdd ===== #####"
@@ -235,7 +237,7 @@ if $first_stage; then
 	echo "SYMS_${mddname} = $proto"
 	echo "EPRO_${mddname} = "`echo $proto '' | sed 's,\.syms ,.epro ,g'`
 	echo "INCS_${mddname} = \$(EPRO_${mddname}) $otherincs"
-	echo "EXPIMP_${mddname} = $exportdeps \$(EXPOPT)$mddname.export"
+	echo "EXPIMP_${mddname} = $imports \$(EXPOPT)$mddname.export"
 	echo "NXPIMP_${mddname} ="
 	echo
 	echo "proto.${mddname}: \$(EPRO_${mddname})"

@@ -2143,7 +2143,7 @@ duplist(LinkList l, VFunc func)
 }
 
 /**/
-char **
+mod_export char **
 duparray(char **arr, VFunc func)
 {
     if (arr && *arr) {

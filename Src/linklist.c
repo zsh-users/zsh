@@ -84,7 +84,7 @@ uinsertlinknode(LinkList list, LinkNode node, LinkNode new)
 /* Insert a list in another list */
 
 /**/
-void
+mod_export void
 insertlinklist(LinkList l, LinkNode where, LinkList x)
 {
     LinkNode nx;
