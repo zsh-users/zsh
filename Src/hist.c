@@ -945,7 +945,7 @@ prepnexthistent(void)
 /* A helper function for hend() */
 
 static int
-shouldIgnoreLine(Eprog prog)
+should_ignore_line(Eprog prog)
 {
     if (!prog)
 	return 0;
@@ -1030,7 +1030,7 @@ hend(Eprog prog)
 	    } else
 		save = 0;
 	}
-	if (chwordpos <= 2 || shouldIgnoreLine(prog))
+	if (chwordpos <= 2 || should_ignore_line(prog))
 	    save = 0;
     }
     if (flag & (HISTFLAG_DONE | HISTFLAG_RECALL)) {
