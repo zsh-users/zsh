@@ -1,0 +1,3 @@
+#compdef amaya arena chimera express grail gzilla hotjava mmm mozilla opera www xmosaic Mosaic galeon
+
+_urls -f

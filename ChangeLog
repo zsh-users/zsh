@@ -1,5 +1,10 @@
 2001-10-12  Oliver Kiddle  <opk@zsh.org>
 
+	* 15983: Completion/Unix/Command/_user_admin,
+	Completion/Unix/Command/_sysctl, Completion/Unix/Type/_urls,
+	Completion/Unix/Command/_webbrowser: darwin support in _sysctl,
+	complete files for galeon
+
 	* 16018: acconfig.h, zshconfig.ac, Etc/MACHINES,
 	Test/C02cond.ztst: allow dynamic loading to work on MacOS X
 	if the dlcompat library is installed.
