@@ -90,6 +90,7 @@ static struct optname optns[] = {
 {NULL, "badpattern",	      OPT_EMULATE|OPT_NONBOURNE, BADPATTERN},
 {NULL, "banghist",	      OPT_EMULATE|OPT_NONBOURNE, BANGHIST},
 {NULL, "bareglobqual",        OPT_EMULATE|OPT_ZSH,       BAREGLOBQUAL},
+{NULL, "bashautolist",	      0,                         BASHAUTOLIST},
 {NULL, "beep",		      OPT_ALL,			 BEEP},
 {NULL, "bgnice",	      OPT_EMULATE|OPT_NONBOURNE, BGNICE},
 {NULL, "braceccl",	      0,			 BRACECCL},

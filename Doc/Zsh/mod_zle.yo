@@ -131,12 +131,20 @@ written as `tt(^?)'.  Note that `tt(\M^?)' and `tt(^\M?)' are not the same.
 findex(vared)
 cindex(parameters, editing)
 cindex(editing parameters)
-item(tt(vared) [ tt(-ch) ] [ tt(-p) var(prompt) ] [ tt(-r) var(rprompt) ] var(name))(
+item(tt(vared) [ tt(-Aach) ] [ tt(-p) var(prompt) ] [ tt(-r) var(rprompt) ] var(name))(
 The value of the parameter var(name) is loaded into the edit
 buffer, and the line editor is invoked.  When the editor exits,
 var(name) is set to the string value returned by the editor.
-If the tt(-c) flag is given, the parameter is created if it doesn't
-already exist.
+When the tt(-c) flag is given, the parameter is created if it doesn't
+already exist.  The tt(-a) flag may be given with tt(-c) to create
+an array parameter, or the tt(-A) flag to create an associative array.
+If the type of an existing parameter does not match the type to be
+created, the parameter is unset and recreated.
+
+Individual elements of existing array or associative array parameters
+may be edited by using subscript syntax on var(name).  New elements are
+created automatically, even without tt(-c).
+
 If the tt(-p) flag is given, the following string will be taken as
 the prompt to display at the left.  If the tt(-r) flag is given,
 the following string gives the prompt to display at the right.  If the

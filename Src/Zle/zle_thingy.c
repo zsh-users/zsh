@@ -390,7 +390,7 @@ scanlistwidgets(HashNode hn, int list)
     if(w->flags & WIDGET_INT)
 	return;
     if(list) {
-	fputs("zle -N ", stdout);
+	printf("zle -%c ", (w->flags & WIDGET_NCOMP) ? 'C' : 'N');
 	if(t->nam[0] == '-')
 	    fputs("-- ", stdout);
 	quotedzputs(t->nam, stdout);
@@ -406,7 +406,7 @@ scanlistwidgets(HashNode hn, int list)
     } else {
 	nicezputs(t->nam, stdout);
 	if (w->flags & WIDGET_NCOMP) {
-	    fputs(" -c ", stdout);
+	    fputs(" -C ", stdout);
 	    nicezputs(w->u.comp.wid, stdout);
 	    fputc(' ', stdout);
 	    nicezputs(w->u.comp.func, stdout);

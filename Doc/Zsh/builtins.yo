@@ -913,7 +913,9 @@ is unset, the other will automatically be unset too.  There is no way
 of untying the variables without unsetting them, or converting the
 type of one them with another tt(typeset) command; tt(+T) does not work,
 assigning an array to var(SCALAR) is an error, and assigning a scalar
-to var(array) sets it to be a single-element array.
+to var(array) sets it to be a single-element array.  Note that
+both tt(typeset -xT ...) and tt(export -T ...) work, but only the
+scalar will be marked for export.
 
 If no var(name) is present, the names and values of all parameters are
 printed.  In this case the attribute flags restrict the the display to
@@ -1072,10 +1074,16 @@ Each named parameter is unset.
 Local parameters remain local even if unset; they appear unset within scope,
 but the previous value will still reappear when the scope ends.
 
-If the tt(-m) flag is specified the
-arguments are taken as patterns (should be quoted) and all parameters
-with matching names are unset.  tt(unset -f) is equivalent to
-tt(unfunction).
+Individual elements of associative array parameters may be unset by using
+subscript syntax on var(name), which should be quoted (or the entire command
+prefixed with tt(noglob)) to protect the subscript from filename generation.
+
+If the tt(-m) flag is specified the arguments are taken as patterns (should
+be quoted) and all parameters with matching names are unset.  Note that this
+cannot be used when unsetting associative array elements, as the subscript
+will be treated as part of the pattern.
+
+tt(unset -f) is equivalent to tt(unfunction).
 )
 findex(unsetopt)
 cindex(options, unsetting)

@@ -1036,6 +1036,9 @@ fixdir(char *src)
 {
     char *dest = src;
     char *d0 = dest;
+#ifdef __CYGWIN__
+    char *s0 = src;
+#endif
 
 /*** if have RFS superroot directory ***/
 #ifdef HAVE_SUPERROOT
@@ -1052,6 +1055,11 @@ fixdir(char *src)
     for (;;) {
 	/* compress multiple /es into single */
 	if (*src == '/') {
+#ifdef __CYGWIN__
+	    /* allow leading // under cygwin */
+	    if (src == s0 && src[1] == '/')
+		*dest++ = *src++;
+#endif
 	    *dest++ = *src++;
 	    while (*src == '/')
 		src++;
@@ -1657,7 +1665,8 @@ bin_typeset(char *name, char **argv, char *ops, int func)
 
     if (on & PM_TIED) {
 	Param apm;
-	char *name1;
+	struct asgment asg0;
+	char *oldval = NULL;
 
 	if (ops['m']) {
 	    zwarnnam(name, "incompatible options for -T", NULL, 0);
@@ -1669,36 +1678,61 @@ bin_typeset(char *name, char **argv, char *ops, int func)
 	    return 1;
 	}
 
+	if (!(asg = getasg(argv[0])))
+	    return 1;
+	asg0 = *asg;
+	if (!(asg = getasg(argv[1])))
+	    return 1;
+	if (!strcmp(asg0.name, asg->name)) {
+	    zerrnam(name, "can't tie a variable to itself", NULL, 0);
+	    return 1;
+	}
+	/*
+	 * Keep the old value of the scalar.  We need to do this
+	 * here as if it is already tied to the same array it
+	 * will be unset when we retie the array.  This is all
+	 * so that typeset -T is idempotent.
+	 *
+	 * We also need to remember here whether the damn thing is
+	 * exported and pass that along.  Isn't the world complicated?
+	 */
+	if ((pm = (Param) paramtab->getnode(paramtab, asg0.name))
+	    && !(pm->flags & PM_UNSET)
+	    && (locallevel == pm->level || func == BIN_EXPORT)) {
+	    if (!asg0.value && !(PM_TYPE(pm->flags) & (PM_ARRAY|PM_HASHED)))
+		oldval = ztrdup(getsparam(asg0.name));
+	    on |= (pm->flags & PM_EXPORTED);
+	}
 	/*
 	 * Create the tied array; this is normal except that
 	 * it has the PM_TIED flag set.  Do it first because
 	 * we need the address.
 	 */
-	if (!(asg = getasg(argv[1])))
-	    return 1;
-	name1 = ztrdup(asg->name);
 	if (!(apm=typeset_single(name, asg->name,
 				 (Param)paramtab->getnode(paramtab,
 							  asg->name),
-				 func, on | PM_ARRAY, off, roff,
-				 asg->value, NULL)))
+				 func, (on | PM_ARRAY) & ~PM_EXPORTED,
+				 off, roff, asg->value, NULL)))
 	    return 1;
 
 	/*
 	 * Create the tied colonarray.  We make it as a normal scalar
 	 * and fix up the oddities later.
 	 */
-	if (!(asg = getasg(argv[0])) ||
-	    !(pm=typeset_single(name, asg->name,
+	if (!(pm=typeset_single(name, asg0.name,
 				(Param)paramtab->getnode(paramtab,
-							 asg->name),
-				func, on, off, roff, asg->value, apm))) {
+							 asg0.name),
+				func, on, off, roff, asg0.value, apm))) {
+	    if (oldval)
+		zsfree(oldval);
 	    unsetparam_pm(apm, 1, 1);
 	    return 1;
 	}
 
-	pm->ename = name1;
-	apm->ename = ztrdup(asg->name);
+	pm->ename = ztrdup(asg->name);
+	apm->ename = ztrdup(asg0.name);
+	if (oldval)
+	    setsparam(asg0.name, oldval);
 
 	return 0;
     }
@@ -1928,14 +1962,39 @@ bin_unset(char *name, char **argv, char *ops, int func)
 
     /* do not glob -- unset the given parameter */
     while ((s = *argv++)) {
+	char *ss = strchr(s, '[');
+	char *sse = ss;
+	if (ss) {
+	    if (skipparens('[', ']', &sse) || *sse) {
+		zerrnam(name, "%s: invalid parameter name", s, 0);
+		returnval = 1;
+		continue;
+	    }
+	    *ss = 0;
+	}
 	pm = (Param) paramtab->getnode(paramtab, s);
 	if (!pm)
 	    returnval = 1;
 	else if ((pm->flags & PM_RESTRICTED) && isset(RESTRICTED)) {
 	    zerrnam(name, "%s: restricted", pm->nam, 0);
 	    returnval = 1;
+	} else if (ss) {
+	    if (PM_TYPE(pm->flags) == PM_HASHED) {
+		HashTable tht = paramtab;
+		if ((paramtab = pm->gets.hfn(pm))) {
+		    *--sse = 0;
+		    unsetparam(ss+1);
+		    *sse = ']';
+		}
+		paramtab = tht;
+	    } else {
+		zerrnam(name, "%s: invalid element for unset", s, 0);
+		returnval = 1;
+	    }
 	} else
-	    unsetparam(s);
+	    unsetparam_pm(pm, 0, 1);
+	if (ss)
+	    *ss = '[';
     }
     return returnval;
 }

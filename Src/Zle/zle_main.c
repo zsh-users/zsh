@@ -661,9 +661,16 @@ bin_vared(char *name, char **args, char *ops, int func)
 {
     char *s;
     char *t;
-    Param pm;
+    Value v;
+    Param pm = 0;
     int create = 0;
+    int type = PM_SCALAR;
     char *p1 = NULL, *p2 = NULL;
+
+    if (zleactive) {
+	zwarnnam(name, "ZLE cannot be used recursively (yet)", NULL, 0);
+	return 1;
+    }
 
     /* all options are handled as arguments */
     while (*args && **args == '-') {
@@ -673,6 +680,12 @@ bin_vared(char *name, char **args, char *ops, int func)
 		/* -c option -- allow creation of the parameter if it doesn't
 		yet exist */
 		create = 1;
+		break;
+	    case 'a':
+		type = PM_ARRAY;
+		break;
+	    case 'A':
+		type = PM_HASHED;
 		break;
 	    case 'p':
 		/* -p option -- set main prompt string */
@@ -709,6 +722,9 @@ bin_vared(char *name, char **args, char *ops, int func)
 	    }
 	args++;
     }
+    if (type && !create) {
+	zwarnnam(name, "-%s ignored", type == PM_ARRAY ? "a" : "A", 0);
+    }
 
     /* check we have a parameter name */
     if (!*args) {
@@ -716,17 +732,17 @@ bin_vared(char *name, char **args, char *ops, int func)
 	return 1;
     }
     /* handle non-existent parameter */
-    if (!(s = getsparam(args[0]))) {
-	if (create)
-	    createparam(args[0], PM_SCALAR);
-	else {
-	    zwarnnam(name, "no such variable: %s", args[0], 0);
-	    return 1;
-	}
-    }
-
-    if(zleactive) {
-	zwarnnam(name, "ZLE cannot be used recursively (yet)", NULL, 0);
+    s = args[0];
+    v = fetchvalue(&s, (!create || type == PM_SCALAR),
+		   SCANPM_WANTKEYS|SCANPM_WANTVALS|SCANPM_MATCHMANY);
+    if (!v && !create) {
+	zwarnnam(name, "no such variable: %s", args[0], 0);
+	return 1;
+    } else if (v) {
+	s = getstrvalue(v);
+	pm = v->pm;
+    } else if (*s) {
+	zwarnnam(name, "invalid parameter name: %s", args[0], 0);
 	return 1;
     }
 
@@ -744,14 +760,24 @@ bin_vared(char *name, char **args, char *ops, int func)
     if (t[strlen(t) - 1] == '\n')
 	t[strlen(t) - 1] = '\0';
     /* final assignment of parameter value */
-    pm = (Param) paramtab->getnode(paramtab, args[0]);
-    if (pm && PM_TYPE(pm->flags) == PM_ARRAY) {
+    if (create && (!pm || (type && PM_TYPE(pm->flags) != type))) {
+	if (pm)
+	    unsetparam(args[0]);
+	createparam(args[0], type);
+	pm = 0;
+    }
+    if (!pm)
+	pm = (Param) paramtab->getnode(paramtab, args[0]);
+    if (pm && (PM_TYPE(pm->flags) & (PM_ARRAY|PM_HASHED))) {
 	char **a;
 
 	PERMALLOC {
 	    a = spacesplit(t, 1);
 	} LASTALLOC;
-	setaparam(args[0], a);
+	if (PM_TYPE(pm->flags) == PM_ARRAY)
+	    setaparam(args[0], a);
+	else
+	    sethparam(args[0], a);
     } else
 	setsparam(args[0], t);
     return 0;
@@ -766,6 +792,10 @@ describekeybriefly(void)
 
     if (statusline)
 	return;
+    invalidatelist();
+    moveto(0, 0);
+    clearflag = 0;
+    resetneeded = 1; 
     statusline = "Describe key briefly: _";
     statusll = strlen(statusline);
     zrefresh();

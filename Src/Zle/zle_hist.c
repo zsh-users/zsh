@@ -663,6 +663,11 @@ doisearch(int dir)
     static char *previous_search = NULL;
     static int previous_search_len = 0;
 
+    invalidatelist();
+    moveto(0, 0);
+    clearflag = 0;
+    resetneeded = 1; 
+
     strcpy(ibuf, ISEARCH_PROMPT);
     memcpy(ibuf + NORM_PROMPT_POS, (dir == 1) ? "fwd" : "bck", 3);
     remember_edits();
@@ -943,6 +948,10 @@ getvisrchstr(void)
 	zsfree(visrchstr);
 	visrchstr = NULL;
     }
+    invalidatelist();
+    moveto(0, 0);
+    clearflag = 0;
+    resetneeded = 1; 
     statusline = sbuf;
     sbuf[0] = (visrchsense == -1) ? '?' : '/';
     selectkeymap("main", 1);

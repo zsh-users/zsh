@@ -111,12 +111,17 @@ zgetdir(struct dirsav *d)
 {
     char nbuf[PATH_MAX+3];
     char *buf;
-    int bufsiz, pos, len;
+    int bufsiz, pos;
     struct stat sbuf;
+    ino_t pino;
+    dev_t pdev;
+#ifndef __CYGWIN__
     struct dirent *de;
     DIR *dir;
-    ino_t ino, pino;
-    dev_t dev, pdev;
+    dev_t dev;
+    ino_t ino;
+    int len;
+#endif
 
     buf = halloc(bufsiz = PATH_MAX);
     pos = bufsiz - 1;
@@ -137,6 +142,7 @@ zgetdir(struct dirsav *d)
 #ifdef HAVE_FCHDIR
     else
 #endif
+#ifndef __CYGWIN__
 	holdintr();
 
     for (;;) {
@@ -221,6 +227,21 @@ zgetdir(struct dirsav *d)
     if (*buf)
 	zchdir(buf + pos + 1);
     noholdintr();
+
+#else  /* __CYGWIN__ case */
+
+    if (!getcwd(buf, bufsiz)) {
+	if (d) {
+	    return NULL;
+	}
+    } else {
+	if (d) {
+	    return d->dirname = ztrdup(buf);
+	}
+	return buf;
+    }
+#endif
+
     buf[0] = '.';
     buf[1] = '\0';
     return buf;

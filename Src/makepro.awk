@@ -40,6 +40,13 @@ BEGIN {
 	    aborting = 1
 	    exit 1
 	}
+	if (line == "" && $0 ~ /^[ \t]*#/) {
+            # Directly after the /**/ was a preprocessor line.
+            # Spit it out and re-start the outer loop.
+	    printf "%s\n", $0
+	    locals = locals $0 "\n"
+	    next
+	}
 	gsub(/\t/, " ")
 	line = line " " $0
 	gsub(/\/\*([^*]|\*+[^*\/])*\*+\//, " ", line)

@@ -49,7 +49,7 @@ void (*makecompparamsptr) _((void));
 /* pointers to functions required by compctl and defined by zle */
 
 /**/
-void (*addmatchesptr) _((char *, char *, char *, char *, char *, char *, char *, int, int, int, int, int, char **));
+void (*addmatchesptr) _((char *, char *, char *, char *, char *, char *, char *, char *, int, int, Cmatcher, char **));
 
 /**/
 char *(*comp_strptr) _((int*,int*));
@@ -95,7 +95,8 @@ int incompfunc;
 
 /**/
 long compcurrent,
-     compnmatches;
+     compnmatches,
+     compmatcher;
 
 /**/
 char *compcontext,
@@ -104,14 +105,8 @@ char *compcontext,
      *compsuffix,
      *compiprefix;
 
-/* This variable and the functions rembslash() and quotename() came from     *
- * zle_tricky.c, but are now used in compctl.c, too.                         */
-
-/* 1 if we are completing in a string */
-
-/**/
-int instring;
-
+/* The function rembslash() came from zle_tricky.c, but is now used *
+ * in compctl.c, too.                                               */
 
 /**/
 static void
@@ -393,70 +388,6 @@ rembslash(char *s)
 	    s++;
 
     return t;
-}
-
-/* Quote the string s and return the result.  If e is non-zero, the        *
- * pointer it points to may point to a position in s and in e the position *
- * of the corresponding character in the quoted string is returned.  Like  *
- * e, te may point to a position in the string and pl is used to return    *
- * the position of the character pointed to by te in the quoted string.    *
- * The string is metafied and may contain tokens.                          */
-
-/**/
-char *
-quotename(const char *s, char **e, char *te, int *pl)
-{
-    const char *u, *tt;
-    char *v, buf[PATH_MAX * 2];
-    int sf = 0;
-
-    tt = v = buf;
-    u = s;
-    for (; *u; u++) {
-	if (e && *e == u)
-	    *e = v, sf |= 1;
-	if (te == u)
-	    *pl = v - tt, sf |= 2;
-	if (ispecial(*u) &&
-	    (!instring || (isset(BANGHIST) &&
-			   *u == (char)bangchar) ||
-	     (instring == 2 &&
-	      (*u == '$' || *u == '`' || *u == '\"')) ||
-	     (instring == 1 && *u == '\''))) {
-	    if (*u == '\n' || (instring == 1 && *u == '\'')) {
-		if (unset(RCQUOTES)) {
-		    *v++ = '\'';
-		    if (*u == '\'')
-			*v++ = '\\';
-		    *v++ = *u;
-		    *v++ = '\'';
-		} else if (*u == '\n')
-		    *v++ = '"', *v++ = '\n', *v++ = '"';
-		else
-		    *v++ = '\'', *v++ = '\'';
-		continue;
-	    } else
-		*v++ = '\\';
-	}
-	if(*u == Meta)
-	    *v++ = *u++;
-	*v++ = *u;
-    }
-    *v = '\0';
-    if (strcmp(buf, s))
-	tt = dupstring(buf);
-    else
-	tt = s;
-    v += tt - buf;
-    if (e && (sf & 1))
-	*e += tt - buf;
-
-    if (e && *e == u)
-	*e = v;
-    if (te == u)
-	*pl = v - tt;
-
-    return (char *) tt;
 }
 
 /**/

@@ -28,10 +28,11 @@
  */
 
 #include "zsh.mdh"
-#include "init.pro"
 
 #include "zshpaths.h"
 #include "zshxmods.h"
+
+#include "init.pro"
 
 /**/
 int noexitct = 0;
@@ -300,22 +301,19 @@ init_io(void)
 
     /* Make sure the tty is opened read/write. */
     if (isatty(0)) {
-#ifdef TIOCNXCL
-	/*
-	 * See if the terminal claims to be busy.  If so, and fd 0
-	 * is a terminal, try and set non-exclusive use for that.
-	 * This is something to do with Solaris over-cleverness.
-	 */
-	int tmpfd;
-	if ((tmpfd = open("/dev/tty", O_RDWR | O_NOCTTY)) < 0) {
-	    if (errno == EBUSY)
-		ioctl(0, TIOCNXCL, 0);
-	} else
-	    close(tmpfd);
-#endif
 	zsfree(ttystrname);
-	if ((ttystrname = ztrdup(ttyname(0))))
+	if ((ttystrname = ztrdup(ttyname(0)))) {
 	    SHTTY = movefd(open(ttystrname, O_RDWR | O_NOCTTY));
+#ifdef TIOCNXCL
+	    /*
+	     * See if the terminal claims to be busy.  If so, and fd 0
+	     * is a terminal, try and set non-exclusive use for that.
+	     * This is something to do with Solaris over-cleverness.
+	     */
+	    if (SHTTY == -1 && errno == EBUSY)
+		ioctl(0, TIOCNXCL, 0);
+#endif
+	}
 	/*
 	 * xterm, rxvt and probably all terminal emulators except
 	 * dtterm on Solaris 2.6 & 7 have a bug. Applications are
@@ -936,6 +934,7 @@ noop_function_int(int nothing)
     /* do nothing */
 }
 
+/**/
 # ifdef UNLINKED_XMOD_zle
 
 /**/
@@ -947,6 +946,7 @@ autoload_zleread(char *lp, char *rp, int ha)
     return zleread(lp, rp, ha);
 }
 
+/**/
 # endif /* UNLINKED_XMOD_zle */
 
 /**/

@@ -148,6 +148,7 @@ parse_string(char *s)
     return l;
 }
 
+/**/
 #ifdef HAVE_GETRLIMIT
 
 /* the resource limits for the shell and its children */
@@ -184,6 +185,7 @@ setlimits(char *nam)
     return ret;
 }
 
+/**/
 #endif /* HAVE_GETRLIMIT */
 
 /* fork and set limits */

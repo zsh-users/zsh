@@ -32,7 +32,7 @@ local time=mtime tmod=m
 
 if ((! ARGC)) then
     if [[ $opts = *t* ]]; then
-        set *(O$tmod)
+        set *(o$tmod)
     else
         set *
     fi
@@ -44,7 +44,7 @@ elif [[ $opts = *t* && $ARGC -gt 1 ]]; then
     for (( f = 2; f <= $ARGC; f++ )); do
 	n="$n|\$$f"
     done
-    eval "argv=(($n)(O$tmod))"
+    eval "argv=(($n)(o$tmod))"
 fi
 
 for f in $*

@@ -328,3 +328,66 @@ Me: fix for unsetting special zle variables, 5111
 
 Drazen Kacar, modified by me: unlock terminal device on Solaris, 5118
 (5117 was wrong)
+
+  pws-7
+
+Me: patch for zls, 5054 (appeared in pws-6 but not in corresponding
+patchlist).
+
+Bart: finally added missing hunk from 4965 which allowed unsetting an
+assoc array when it was assigned to as a scalar which should have been
+there all along
+
+Bart: vared to edit associative arrays and array elements, 5129
+
+Matt Armstrong: makepro.awk can spit out preprocessor lines, 5132
+(+ move init.pro inclusion, 5151)
+
+Matt: cygwin needs to use native getcwd(), 5133
+
+Sven: partial word completion fix, 5144
+
+Sven: compadd -m, -F, -r, 5145, 5204
+
+Bart: unset can unset assoc array elements, 5174
+
+Sven: fix for command completion and pattern completions, 5178
+
+Sven: ${(P)...} 5183, 5199, 5200
+
+Me: compctl documentation tidy-up, 5185, 5198
+
+Sven: zle commands which use the minibuffer erase completion listings,
+5201
+
+Sven: glob qualifiers o -> f, O -> o, new O = ^o, 5203
+
+Sven: completion in arrays, 5206
+
+Sven: new completion in conditions, 5207
+
+Sven: ${foo:q}, 5208, preliminary
+
+Sven: use ${foo:q} for quoting prefix and suffix in new completion, 5120
+
+Me: bashautolist option, 5229; Sven's addition, 5234, and doc 5235; 5269
+
+Me: .zlogout doc, 5233
+
+Me: added note on Linux Alpha with egcs to Etc/MACHINES, not posted
+
+Me: typeset -T fix, 5247
+
+Bart: parameter scoping docs, 5258
+ 
+Bart: new mailing lists in Meta-FAQ, 5260
+
+Sven: GLOB_COMPLETE docs, 5261, 5268
+
+Sven: compctl -M and REC_EXACT fixes, 5262
+
+Sven: rewrite of $foo:q, 5265
+
+Sven: get matcher number in new completion function, 5266
+
+Me: interrupts in getquery() weren't gracefully handled, 5281

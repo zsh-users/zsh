@@ -150,6 +150,17 @@ In a glob pattern, treat a trailing set of parentheses as a qualifier
 list, if it contains no `tt(|)', `tt(LPAR())' or (if special) `tt(~)'
 characters.  See noderef(Filename Generation).
 )
+pindex(BASH_AUTO_LIST)
+cindex(completion, listing choices, bash style)
+item(tt(BASH_AUTO_LIST))(
+On an ambiguous completion, automatically list choices when the
+completion function is called twice in succession.  This takes
+precedence over tt(AUTO_LIST).  The setting of tt(LIST_AMBIGUOUS) is
+respected.  If tt(AUTO_MENU) is set, the menu behaviour will then start
+with the third press.  Note that this will not work with
+tt(MENU_COMPLETE), since repeated completion calls immediately cycle
+through the list in that case.
+)
 pindex(BEEP)
 cindex(beep, enabling)
 cindex(enabling the beep)
@@ -331,11 +342,12 @@ will be an array or a scalar.
 pindex(GLOB_COMPLETE)
 item(tt(GLOB_COMPLETE))(
 When the current word has a glob pattern, do not insert all the words
-resulting from the expansion but cycle through them like
-tt(MENU_COMPLETE). If no matches are found, a `tt(*)' is added to the end of the
-word or inserted at the cursor if tt(COMPLETE_IN_WORD) is set, and expansion
-is attempted again.  Using patterns works not only for files but for all
-completions, such as options, user names, etc.
+resulting from the expansion but generate matches as for completion and
+cycle through them like tt(MENU_COMPLETE). If no matches are found, a
+`tt(*)' is added to the end of the word or inserted at the cursor if
+tt(COMPLETE_IN_WORD) is set, and completion is attempted again using
+pattern matching.  Since this doesn't use globbing, it works not only for
+files but for all completions, such as options, user names, etc.
 )
 pindex(GLOB_DOTS)
 cindex(globbing, of . files)
@@ -488,9 +500,12 @@ pindex(LIST_AMBIGUOUS)
 cindex(ambiguous completion)
 cindex(completion, ambiguous)
 item(tt(LIST_AMBIGUOUS))(
-If this option is set, completions are shown only if the completions
-don't have a unambiguous prefix or suffix that could be inserted in
-the command line.
+This option works when tt(AUTO_LIST) or tt(BASH_AUTO_LIST) is also
+set.  If there is an unambiguous prefix to insert on the command line,
+that is done without a completion list being displayed; in other
+words, auto-listing behaviour only takes place when nothing would be
+inserted.  In the case of tt(BASH_AUTO_LIST), this means that the list
+will be delayed to the third call of the function.
 )
 pindex(LIST_BEEP)
 cindex(beep, ambiguous completion)

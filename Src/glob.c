@@ -1432,7 +1432,7 @@ glob(LinkList list, LinkNode np)
 			    }
 			}
 			break;
-		    case 'o':
+		    case 'f':
 			/* Match modes with chmod-spec. */
 			func = qualmodeflags;
 			data = qgetmodespec(&s);
@@ -1501,6 +1501,7 @@ glob(LinkList list, LinkNode np)
 			data = qgetnum(&s);
 			break;
 
+		    case 'o':
 		    case 'O':
 			{
 			    int t;
@@ -1524,7 +1525,7 @@ glob(LinkList list, LinkNode np)
 			    }
 			    gf_sorts |= t;
 			    gf_sortlist[gf_nsorts++] = t |
-				((sense & 1) ? GS_DESC : 0);
+				(((sense & 1) ^ (s[-1] == 'O')) ? GS_DESC : 0);
 			    s++;
 			    break;
 			}

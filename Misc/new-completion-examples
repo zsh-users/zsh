@@ -1,7 +1,7 @@
 # Define a new widget behaving like `expand-or-complete' but calling the
 # function `main-complete' to generate matches.
 
-zle -c my-comp expand-or-complete main-complete
+zle -C my-comp expand-or-complete main-complete
 
 bindkey '\C-i' my-comp
 
@@ -75,11 +75,8 @@ compalso() {
 # the arguments from the command line as its arguments.
 
 call-complete() {
-  local var
-
-  eval var\=\$\{\+$1\}
-  if (( var )); then
-    eval complist \$\{${1}\[\@\]\}
+  if [[ ${(P)+${1}} -eq 1 ]] then
+    complist ${(@P)${1}}
   else
     "$@"
   fi
@@ -96,15 +93,6 @@ main-complete() {
   setopt localoptions nullglob rcexpandparam globdots
   unsetopt markdirs globsubst shwordsplit nounset
 
-  # We first try the `compctl's. This is without first (-T) and default (-D)
-  # completion. If you want them add `-T' and/or `-D' to this command.
-  # If this produces any matches, we don't try new style completion. If you
-  # want to have that tried anyway, remove the `[[ -nmatches ... ]] ...'
-  # below.
-
-  compcall
-  [[ -nmatches 0 ]] || return
-
   # An entry for `--first--' is the replacement for `compctl -T'
   # The `|| return 1' is used throughout: if a function producing matches
   # returns non-zero this is interpreted as `do not try to produce more matches'
@@ -117,6 +105,15 @@ main-complete() {
   # convenience alias `compsub'.
 
   if [[ $CONTEXT == argument || $CONTEXT == command ]] then
+    # We first try the `compctl's. This is without first (-T) and default (-D)
+    # completion. If you want them add `-T' and/or `-D' to this command.
+    # If this produces any matches, we don't try new style completion. If you
+    # want to have that tried anyway, remove the `[[ -nmatches ... ]] ...'
+    # below.
+
+    compcall
+    [[ -nmatches 0 ]] || return
+
     compsub
   else
     # Let's see if we have a special completion definition for the other
@@ -191,7 +188,8 @@ do-complete() {
 # This is intended as a replacement for `complist -f', `complist -/', and
 # `complist -g ...' (but don't use it with other options).
 # This function behaves as if you have a matcher definition like:
-#   compctl -M 'r:|[-.,_/]=* r:|=* m:{a-z}={A-Z} m:-=_ m:.=,'
+#   compctl -M 'r:|[-.,_/]=* r:|=* m:{a-z}={A-Z} m:-=_ m:.=,' \
+#              'm:{a-z}={A-Z} l:|=* r:|=*'
 # so you may want to modify this.
 
 pfiles() {
@@ -205,7 +203,7 @@ pfiles() {
     if [[ "$a[1]" = '(' ]] then
       ppres=( $a[2,-2]/ )
     else
-      eval ppres\=\( \$$a/ \)
+      ppres=( ${(P)${a}} )
       [[ $#ppres -eq 0 ]] && ppres=( $a/ )
     fi
     [[ $#ppres -eq 0 ]] && ppres=( '' )
@@ -214,7 +212,7 @@ pfiles() {
     ppres=( '' )
   fi
 
-  str="$PREFIX*$SUFFIX"
+  str="${PREFIX:q}*${SUFFIX:q}"
 
   if [[ -z "$a[1]" || "$str[1]" = [~/] || "$str" = (.|..)/* ]] then
     a=()
@@ -259,7 +257,12 @@ pfiles() {
     str="${str#*/}"
   done
 
-  ostr="$str:gs/,/*,/:gs/_/*_/:gs./.*/.:gs/-/*[-_]/:gs/./*[.,]/:gs-*[.,]*[.,]*/-../-:gs.**.*."
+  if [[ -matcher 1 ]] then
+    ostr="$str:gs/,/*,/:gs/_/*_/:gs./.*/.:gs/-/*[-_]/:gs/./*[.,]/:gs-*[.,]*[.,]*/-../-:gs.**.*."
+  else
+    ostr="${str%/*}/*${str##*/}*"
+    ostr="$ostr:gs./.*/.:gs.**.*."
+  fi
 
   for ppre in "$ppres[@]"; do
     str="$ostr"
@@ -276,7 +279,6 @@ pfiles() {
         s=( "${(@)s:gs.**.*.}" )
         for i in $a; do
           b=( $~i/(#l)$~s )
-          eval b\=\( \$\{b:/\*\(${(j:|:)fignore}\)\} \)
           [[ $#b -ne 0 ]] && c=( $c $i )
         done
         if [[ $#c -eq 0 ]] then
@@ -284,10 +286,9 @@ pfiles() {
         elif [[ $#c -ne 1 ]] then
           a="$ppre$epre$pa"
           c=( $~c/(#l)$~s )
-          eval c\=\( \$\{c:/\*\(${(j:|:)fignore}\)\} \)
   	  c=( ${c#$a} )
           for i in $c; do
-            compadd -p "$pre$pa" -W "$a" -s "/${i#*/}" -f "${i%%/*}"
+            compadd -p "$pre$pa" -W "$a" -s "/${i#*/}" -fF -- "${i%%/*}"
           done
   	  continue 2
         fi
@@ -301,8 +302,7 @@ pfiles() {
     s=( $str$@ )
     s=( "${(@)s:gs.**.*.}" )
     b=( $~a(#l)$~s )
-    eval b\=\( \$\{b:/\*\(${(j:|:)fignore}\)\} \)
-    compadd -p "$pre$pa" -W "$ppre$epre$pa" -f ${b#$a}
+    compadd -p "$pre$pa" -W "$ppre$epre$pa" -fF -- ${b#$a}
   done
 }
 
@@ -332,11 +332,20 @@ __vars=( -v )
 
 defcomp __subscr --subscr--
 __subscr() {
-  local t
-
-  eval t\=\$\{\(t\)$COMMAND\}
   compalso --math-- "$@"
-  [[ $t = assoc* ]] && eval complist -k \"\(\$\{\(k\)$COMMAND\}\)\"
+  [[ ${(Pt)${COMMAND}} = assoc* ]] && complist -k "( ${(kP)${COMMAND}} )"
+}
+
+defcomp __cond --cond--
+__cond() {
+  if [[ -current -1 -o ]] then
+    complist -o -M 'L:|[nN][oO]= M:_= M:{A-Z}={a-z}'
+  elif [[ -current -1 -nt || -current -1 -ot || -current -1 -ef ]] then
+    files
+  else
+    files
+    complist -v
+  fi
 }
 
 # Do sub-completion for pre-command modifiers.

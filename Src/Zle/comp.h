@@ -210,6 +210,7 @@ struct cmatch {
     int flags;			/* see CMF_* below */
     int brpl;			/* the place where to put the brace prefix */
     int brsl;			/* ...and the suffix */
+    char *rems;			/* when to remove the suffix */
 };
 
 #define CMF_FILE     1		/* this is a file */
@@ -272,3 +273,12 @@ struct cline {
 
 #define CFN_FIRST   1
 #define CFN_DEFAULT 2
+
+/* Flags for compadd and addmatches(). */
+
+#define CAF_QUOTE    1
+#define CAF_MENU     2
+#define CAF_NOSORT   4
+#define CAF_ALT      8
+#define CAF_FIGNORE 16
+#define CAF_MATCH   32

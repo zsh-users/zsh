@@ -14,6 +14,7 @@ attachtty
 bangchar
 bin_notavail
 breaks
+bslashquote
 bufstack
 builtintab
 chline
@@ -55,6 +56,7 @@ exlast
 expanding
 fallback_compctlread
 fallback_zleread
+fetchvalue
 fignore
 file_type
 filesub
@@ -72,6 +74,7 @@ getkeystring
 getlinknode
 getshfunc
 getsparam
+getstrvalue
 gettempname
 glob_pre
 glob_suf
@@ -228,6 +231,7 @@ ugetnode
 uinsertlinknode
 unmeta
 unmetafy
+unsetparam
 unsetparam_pm
 untokenize
 uremnode

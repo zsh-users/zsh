@@ -612,6 +612,10 @@ executenamedcommand(char *prmt)
     char *ptr;
     char *okeymap = curkeymapname;
 
+    invalidatelist();
+    moveto(0, 0);
+    clearflag = 0;
+    resetneeded = 1; 
     cmdbuf = halloc(l + NAMLEN + 2);
     strcpy(cmdbuf, prmt);
     statusline = cmdbuf;
@@ -790,6 +794,49 @@ makeparamsuffix(int br, int n)
 	suffixlen['-'] = suffixlen['+'] = suffixlen['='] = n;
 	/*{*/ suffixlen['}'] = n;
     }
+}
+
+/* Set up suffix given a string containing the characters on which to   *
+ * remove the suffix. */
+
+/**/
+void
+makesuffixstr(char *s, int n)
+{
+    if (s) {
+	int inv, i, v, z = 0;
+
+	if (*s == '^' || *s == '!') {
+	    inv = 1;
+	    s++;
+	} else
+	    inv = 0;
+	s = getkeystring(s, &i, 5, &z);
+	s = metafy(s, i, META_USEHEAP);
+
+	if (inv) {
+	    v = 0;
+	    for (i = 0; i < 257; i++)
+		 suffixlen[i] = n;
+	} else
+	    v = n;
+
+	if (z)
+	    suffixlen[256] = v;
+
+	while (*s) {
+	    if (s[1] == '-' && s[2]) {
+		int b = (int) *s, e = (int) s[2];
+
+		while (b <= e)
+		    suffixlen[b++] = v;
+		s += 2;
+	    } else
+		suffixlen[STOUC(*s)] = v;
+	    s++;
+	}
+    } else
+	makesuffix(n);
 }
 
 /* Remove suffix, if there is one, when inserting character c. */

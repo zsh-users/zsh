@@ -1500,7 +1500,7 @@ setsparam(char *s, char *val)
     } else {
 	if (!(v = getvalue(&s, 1)))
 	    createparam(t, PM_SCALAR);
-	else if (PM_TYPE(v->pm->flags) == PM_ARRAY &&
+	else if ((PM_TYPE(v->pm->flags) & (PM_ARRAY|PM_HASHED)) &&
 		 !(v->pm->flags & (PM_SPECIAL|PM_TIED)) && unset(KSHARRAYS)) {
 	    unsetparam(t);
 	    createparam(t, PM_SCALAR);

@@ -161,8 +161,10 @@ Print the new command but do not execute it.  Only works with history
 expansion.
 )
 item(tt(q))(
-Quote the substituted words, escaping further substitutions.  Only
-works with history expansion.
+Quote the substituted words, escaping further substitutions.  Works
+with history expansion and parameter expansion, though in the second
+case it is only useful if the resulting text is to be re-evaluated
+such as by tt(eval).
 )
 item(tt(x))(
 Like tt(q), but break into words at each blank.
@@ -477,9 +479,10 @@ item(tt(${~)var(spec)tt(}))(
 pindex(GLOB_SUBST)
 Turn on the tt(GLOB_SUBST) option for the evaluation of
 var(spec); if the `tt(~)' is doubled, turn it off.  When this option is
-set, any pattern characters resulting
-from parameter expansion are eligible for filename expansion and filename
-generation.
+set, the string resulting from the expansion will be interpreted as a
+pattern anywhere that is possible, such as in filename expansion and
+filename generation and pattern-matching contexts like the right
+hand side of the `tt(=)' and `tt(!=)' operators in conditions.
 )
 enditem()
 
@@ -522,6 +525,15 @@ item(tt(e))(
 Perform em(parameter expansion), em(command substitution) and
 em(arithmetic expansion) on the result. Such expansions can be
 nested but too deep recursion may have unpredictable effects.
+)
+item(tt(P))(
+This makes the value of the parameter var(name) be taken as a
+parameter name on which to work. If it is used with a tt(${)...tt(})
+type parameter expression or a tt($LPAR())...tt(RPAR()) type command
+substitution in place of the parameter name this flag makes the result
+of the expansion be taken as a parameter name which is then
+used. E.g. if you have `tt(foo=bar)' and `tt(bar=baz)', the strings
+`tt(${(P)foo})' and `tt(${(P)${foo}})' will be expanded to `tt(baz)'.
 )
 item(tt(o))(
 Sort the resulting words in ascending order.
@@ -788,7 +800,8 @@ directory as its prefix.  If so, then the prefix portion
 is replaced with a `tt(~)' followed by the name of the directory.
 The shortest way of referring to the directory is used,
 with ties broken in favour of using a named directory,
-except when the directory is tt(/) itself.
+except when the directory is tt(/) itself.  The variables tt($PWD) and
+tt($OLDPWD) are never abbreviated in this fashion.
 
 If a word begins with an unquoted `tt(=)'
 and the tt(EQUALS) option is set,
@@ -1088,7 +1101,7 @@ setgid files (02000)
 item(tt(t))(
 files with the sticky bit (01000)
 )
-item(tt(o)var(spec))(
+item(tt(f)var(spec))(
 files with access rights matching var(spec). This var(spec) may be a
 octal number optionally preceded by a `tt(=)', a `tt(PLUS())', or a
 `tt(-)'. If none of these characters is given, the behavior is the
@@ -1101,7 +1114,7 @@ octal digit anywhere in the number ensures that the corresponding bits
 inthe file-modes are not checked, this is only useful in combination
 with `tt(=)'.
 
-If the qualifier `tt(o)' is followed by any other character anything
+If the qualifier `tt(f)' is followed by any other character anything
 up to the next matching character (`tt([)', `tt({)', and `tt(<)' match 
 `tt(])', `tt(})', and `tt(>)' respectively, any other character
 matches itself) is taken as a list of comma-separated
@@ -1122,11 +1135,11 @@ are to be expected: `tt(r)' for read access, `tt(w)' for write access,
 `tt(s)' for the setuid and setgid bits, and `tt(t)' for the sticky
 bit.
 
-Thus, `tt(*(o70?))' gives the files for which the owner has read,
+Thus, `tt(*(f70?))' gives the files for which the owner has read,
 write, and execute permission, and for which other group members have
 no rights, independent of the permissions for other user. The pattern
-`tt(*(o-100))' gives all files for which the owner does not have
-execute permission, and `tt(*(o:gu+w,o-rx))' gives the files for which 
+`tt(*(f-100))' gives all files for which the owner does not have
+execute permission, and `tt(*(f:gu+w,o-rx))' gives the files for which 
 the owner and the other members of the group have at least write
 permission, and fo which other users don't have read or execute
 permission.
@@ -1205,7 +1218,7 @@ item(tt(D))(
 sets the tt(GLOB_DOTS) option for the current pattern
 pindex(GLOB_DOTS, setting in pattern)
 )
-item(tt(O)var(c))(
+item(tt(o)var(c))(
 specifies how the names of the files should be sorted. If var(c) is
 tt(n) they are sorted by name (the default), if var(c) is tt(L) they
 are sorted depending on the size (length) of the files, tt(l) makes
@@ -1214,16 +1227,20 @@ make them be sorted by the time of the last access, modification, and
 inode change respectively. Note that tt(a), tt(m), and tt(c) compare
 the age to the current time, so the first name in the list is the 
 one of the youngest file. Also note that the modifiers tt(^) and tt(-) are 
-used, so `tt(*(^-OL))' gives a list of all files sorted by file size in 
+used, so `tt(*(^-oL))' gives a list of all files sorted by file size in 
 descending order working not on symbolic links but on the files they
 point to.
+)
+item(tt(O)var(c))(
+like `tt(o)', but sorts in descending order; i.e. `tt(*(^oc))' is the
+same as `tt(*(Oc))' and `tt(*(^Oc))' is the same as `tt(*(oc))'
 )
 item(tt([)var(beg)[tt(,)var(end)]tt(]))(
 specifies which of the matched filenames should be included in the
 returned list. The syntax is the same as for array
 subscripts. var(beg) and the optional var(end) may be mathematical
 expressions. As in parameter subscripting they may be negative to make 
-them count from the last match backward. E.g.: `tt(*(^-OL[1,3]))'
+them count from the last match backward. E.g.: `tt(*(-OL[1,3]))'
 gives a list of the names of three biggest files.
 )
 enditem()

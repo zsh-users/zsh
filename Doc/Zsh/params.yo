@@ -40,7 +40,8 @@ Shell function executions delimit scopes for shell parameters.
 (Parameters are dynamically scoped.)  The tt(typeset) builtin, and its
 alternative forms tt(declare), tt(integer), tt(local) and tt(readonly)
 (but not tt(export)), can be used to declare a parameter as being local
-to the innermost scope.
+to the innermost scope.  Note that em(special) parameters cannot be made
+local.
 
 When a parameter is read or assigned to, the
 innermost existing parameter of that name is used.  (That is, the
@@ -49,9 +50,8 @@ to a non-existent parameter, or declaring a new parameter with tt(export),
 causes it to be created in the em(outer)most scope.
 
 Local parameters disappear when their scope ends.
-tt(unset) can be used to delete a parameter while it is still in scope; this
-will reveal the next outer parameter of the same name.  However, em(special)
-parameters are still special when unset.
+tt(unset) can be used to delete a parameter while it is still in scope;
+any outer parameter of the same name remains hidden.
 texinode(Array Parameters)(Positional Parameters)(Local Parameters)(Parameters)
 sect(Array Parameters)
 The value of an array parameter may be assigned by writing:

@@ -1385,7 +1385,7 @@ printcompctl(char *s, Compctl cc, int printflags, int ispat)
 	    untokenize(p);
 	    quotedzputs(p, stdout);
 	} else
-	    quotedzputs(quotename(s, NULL, NULL, NULL), stdout);
+	    quotedzputs(bslashquote(s, NULL, NULL, NULL, 0), stdout);
     }
 
     /* loop through flags w/o args that are set, printing them if so */
@@ -1515,7 +1515,7 @@ printcompctl(char *s, Compctl cc, int printflags, int ispat)
 		char *p = dupstring(s);
 
 		untokenize(p);
-		quotedzputs(quotename(p, NULL, NULL, NULL), stdout);
+		quotedzputs(bslashquote(p, NULL, NULL, NULL, 0), stdout);
 	    }
 	}
 	putchar('\n');
@@ -1546,8 +1546,6 @@ bin_compctl(char *name, char **argv, char *ops, int func)
     /* clear static flags */
     cclist = 0;
     showmask = 0;
-
-    instring = 0;
 
     /* Parse all the arguments */
     if (*argv) {
@@ -1671,8 +1669,9 @@ bin_compadd(char *name, char **argv, char *ops, int func)
 {
     char *p, **sp, *e;
     char *ipre = NULL, *ppre = NULL, *psuf = NULL, *prpre = NULL;
-    char *pre = NULL, *suf = NULL, *group = NULL;
-    int f = 0, q = 0, m = 0, ns = 0, a = 0;
+    char *pre = NULL, *suf = NULL, *group = NULL, *m = NULL, *rs = NULL;
+    int f = 0, a = 0, dm;
+    Cmatcher match = NULL;
 
     if (incompfunc != 1) {
 	zerrnam(name, "can only be called from completion function", NULL, 0);
@@ -1681,21 +1680,25 @@ bin_compadd(char *name, char **argv, char *ops, int func)
     for (; *argv && **argv ==  '-'; argv++) {
 	for (p = *argv + 1; *p; p++) {
 	    sp = NULL;
+	    dm = 0;
 	    switch (*p) {
 	    case 'q':
 		f |= CMF_REMOVE;
 		break;
 	    case 'Q':
-		q = 1;
+		a |= CAF_QUOTE;
 		break;
 	    case 'f':
 		f |= CMF_FILE;
+		break;
+	    case 'F':
+		a |= CAF_FIGNORE;
 		break;
 	    case 'n':
 		f |= CMF_NOLIST;
 		break;
 	    case 'U':
-		m = 1;
+		a |= CAF_MENU;
 		break;
 	    case 'P':
 		sp = &pre;
@@ -1711,7 +1714,7 @@ bin_compadd(char *name, char **argv, char *ops, int func)
 		break;
 	    case 'V':
 		if (!group)
-		    ns = 1;
+		    a |= CAF_NOSORT;
 		sp = &group;
 		e = "group name expected after -%c";
 		break;
@@ -1732,7 +1735,19 @@ bin_compadd(char *name, char **argv, char *ops, int func)
 		e = "string expected after -%c";
 		break;
 	    case 'a':
-		a = 1;
+		a |= CAF_ALT;
+		break;
+	    case 'm':
+		a |= CAF_MATCH;
+		break;
+	    case 'M':
+		sp = &m;
+		e = "matching specification expected after -%c";
+		dm = 1;
+		break;
+	    case 'r':
+		sp = &rs;
+		e = "string expected after -%c";
 		break;
 	    case '-':
 		argv++;
@@ -1756,6 +1771,10 @@ bin_compadd(char *name, char **argv, char *ops, int func)
 		    zerrnam(name, e, NULL, *p);
 		    return 1;
 		}
+		if (dm && (match = parse_cmatcher(name, m)) == pcm_err) {
+		    match = NULL;
+		    return 1;
+		}
 	    }
 	}
     }
@@ -1764,7 +1783,7 @@ bin_compadd(char *name, char **argv, char *ops, int func)
 	return 1;
 
     addmatchesptr(ipre, ppre, psuf, prpre, pre, suf, group,
-		  f, q, m, ns, a, argv);
+		  rs, f, a, match, argv);
     return 0;
 }
 
@@ -1794,6 +1813,7 @@ static struct compparam {
     { "SUFFIX", PM_SCALAR, VAR(compsuffix) },
     { "IPREFIX", PM_SCALAR, VAR(compiprefix) },
     { "NMATCHES", PM_INTEGER, VAR(compnmatches) },
+    { "MATCHER", PM_INTEGER, VAR(compmatcher) },
     { NULL, 0, NULL }
 };
 
@@ -2096,6 +2116,15 @@ cond_nmatches(char **a, int id)
     return 0;
 }
 
+/**/
+static int
+cond_matcher(char **a, int id)
+{
+    if (comp_check())
+	return compmatcher == cond_val(a, 0);
+    return 0;
+}
+
 static struct builtin bintab[] = {
     BUILTIN("compctl", 0, bin_compctl, 0, -1, 0, NULL, NULL),
     BUILTIN("complist", 0, bin_complist, 1, -1, 0, NULL, NULL),
@@ -2119,6 +2148,7 @@ static struct conddef cotab[] = {
     CONDDEF("after", 0, cond_range, 1, 1, 0),
     CONDDEF("mafter", 0, cond_range, 1, 1, 1),
     CONDDEF("nmatches", 0, cond_nmatches, 1, 1, 0),
+    CONDDEF("matcher", 0, cond_matcher, 1, 1, 0),
 };
 
 static struct funcwrap wrapper[] = {

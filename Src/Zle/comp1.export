@@ -14,6 +14,7 @@ compcontext
 compctltab
 compcurrent
 compiprefix
+compmatcher
 compnmatches
 compprefix
 comp_strptr
@@ -30,5 +31,4 @@ makecomplistcallptr
 makecomplistctlptr
 makecompparamsptr
 patcomps
-quotename
 rembslash

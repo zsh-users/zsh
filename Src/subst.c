@@ -718,10 +718,12 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int ssub)
     int copied = 0;
     int arrasg = 0;
     int eval = 0;
+    int aspar = 0;
     int nojoin = 0;
     char inbrace = 0;		/* != 0 means ${...}, otherwise $... */
     char hkeys = 0;
     char hvals = 0;
+    int subexp;
 
     *s++ = '\0';
     if (!ialnum(*s) && *s != '#' && *s != Pound && *s != '-' &&
@@ -812,6 +814,9 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int ssub)
 		    break;
 		case 'e':
 		    eval = 1;
+		    break;
+		case 'P':
+		    aspar = 1;
 		    break;
 
 		case 'c':
@@ -949,7 +954,8 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int ssub)
 	    } else
 		globsubst = 1;
 	} else if (*s == '+') {
-	    if (iident(s[1]))
+	    if (iident(s[1]) || (aspar && isstring(s[1]) &&
+				 (s[2] == Inbrace || s[2] == Inpar)))
 		chkset = 1, s++;
 	    else if (!inbrace) {
 		*aptr = '$';
@@ -965,7 +971,8 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int ssub)
     globsubst = globsubst && !qt;
 
     idbeg = s;
-    if (s[-1] && isstring(*s) && (s[1] == Inbrace || s[1] == Inpar)) {
+    if ((subexp = (s[-1] && isstring(*s) &&
+		   (s[1] == Inbrace || s[1] == Inpar)))) {
 	int sav;
 	int quoted = *s == Qstring;
 
@@ -973,17 +980,28 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int ssub)
 	skipparens(*s, *s == Inpar ? Outpar : Outbrace, &s);
 	sav = *s;
 	*s = 0;
-	if (multsub(&val, &aval, &isarr, NULL) && quoted) {
+	if (multsub(&val, (aspar ? NULL : &aval), &isarr, NULL) && quoted) {
 	    isarr = -1;
 	    aval = alloc(sizeof(char *));
-	}
+	    aspar = 0;
+	} else if (aspar)
+	    idbeg = val;
 	if (isarr)
 	    isarr = -1;
 	copied = 1;
 	*s = sav;
 	v = (Value) NULL;
-    } else {
-	if (!(v = fetchvalue(&s, (wantt ? -1 :
+    } else if (aspar) {
+	if ((v = getvalue(&s, 1))) {
+	    val = idbeg = getstrvalue(v);
+	    subexp = 1;
+	} else
+	    vunset = 1;
+    }
+    if (!subexp || aspar) {
+	char *ov = val;
+
+	if (!(v = fetchvalue((subexp ? &ov : &s), (wantt ? -1 :
 				  ((unset(KSHARRAYS) || inbrace) ? 1 : -1)),
 			     hkeys|hvals)))
 	    vunset = 1;
@@ -1690,6 +1708,7 @@ modify(char **str, char **ptr)
 	    case 't':
 	    case 'l':
 	    case 'u':
+	    case 'q':
 		c = **ptr;
 		break;
 
@@ -1808,6 +1827,9 @@ modify(char **str, char **ptr)
 			if (hsubl && hsubr)
 			    subst(&copy, hsubl, hsubr, gbal);
 			break;
+		    case 'q':
+			copy = bslashquote(copy, NULL, NULL, NULL, 0);
+			break;
 		    }
 		    tc = *tt;
 		    *tt = '\0';
@@ -1858,6 +1880,9 @@ modify(char **str, char **ptr)
 			    zsfree(oldstr);
 			}
 		    }
+		    break;
+		case 'q':
+		    *str = bslashquote(*str, NULL, NULL, NULL, 0);
 		    break;
 		}
 	    }

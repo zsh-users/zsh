@@ -963,6 +963,7 @@ struct nameddir {
 /* flags for named directories */
 /* DISABLED is defined (1<<0) */
 #define ND_USERNAME	(1<<1)	/* nam is actually a username       */
+#define ND_NOABBREV	(1<<2)	/* never print as abbrev (PWD or OLDPWD) */
 
 
 /* flags for controlling printing of hash table nodes */
@@ -1056,6 +1057,7 @@ enum {
     BADPATTERN,
     BANGHIST,
     BAREGLOBQUAL,
+    BASHAUTOLIST,
     BEEP,
     BGNICE,
     BRACECCL,

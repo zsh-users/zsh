@@ -20,6 +20,12 @@ commands are read from tt(/etc/zshrc) and then tt($ZDOTDIR/.zshrc).
 Finally, if the shell is a login shell, tt(/etc/zlogin) and
 tt($ZDOTDIR/.zlogin) are read.
 
+When a login shell exits, the files tt($ZDOTDIR/.zlogout) and then
+tt(/etc/zlogout) are read.  This happens with either an explicit exit
+via the tt(exit) or tt(logout) commands, or an implict exit by reading
+end-of-file from the terminal.  However, if the shell terminates due
+to tt(exec)'ing another process, the logout files are not read.
+
 If tt(ZDOTDIR) is unset, tt(HOME) is used instead.
 Those files listed above as being in tt(/etc) may be in another
 directory, depending on the installation.

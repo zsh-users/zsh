@@ -55,6 +55,11 @@ Linux: Linux (i386) [3.1.4]
 	process reports that there is no lstat, edit config.h and change
 	HAVE_LSTAT to 1.  libc-5.2.18 or later does not have this problem.
 
+	Various problems have been reported when using optimisation
+	with the experimental GNU compiler, egcs.  In particular,
+	on Linux Alpha with egcs 1.0.3a and 1.1.1 using -O1 or greater,
+	the completion code is not correctly compiled.
+
 NetBSD: NetBSD 1.*
 	Should build `out-of-the-box'.
 

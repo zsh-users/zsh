@@ -446,7 +446,8 @@ finddir_scan(HashNode hn, int flags)
 {
     Nameddir nd = (Nameddir) hn;
 
-    if(nd->diff > finddir_best && !dircmp(nd->dir, finddir_full)) {
+    if(nd->diff > finddir_best && !dircmp(nd->dir, finddir_full)
+       && !(nd->flags & ND_NOABBREV)) {
 	finddir_last=nd;
 	finddir_best=nd->diff;
     }
@@ -514,9 +515,8 @@ adduserdir(char *s, char *t, int flags, int always)
      * with always==0.  Unless the AUTO_NAME_DIRS option is set, we  *
      * don't let such assignments actually create directory names.   *
      * Instead, a reference to the parameter as a directory name can *
-     * cause the actual creation of the hash table entry. Never hash *
-     * PWD unless it was explicitly requested (or already hashed).   */
-    if (!always && (unset(AUTONAMEDIRS) || !strcmp(s, "PWD")) &&
+     * cause the actual creation of the hash table entry.            */
+    if (!always && unset(AUTONAMEDIRS) &&
 	    !nameddirtab->getnode2(nameddirtab, s))
 	return;
 
@@ -534,6 +534,9 @@ adduserdir(char *s, char *t, int flags, int always)
     nd = (Nameddir) zcalloc(sizeof *nd);
     nd->flags = flags;
     nd->dir = ztrdup(t);
+    /* The variables PWD and OLDPWD are not to be displayed as ~PWD etc. */
+    if (!strcmp(s, "PWD") || !strcmp(s, "OLDPWD"))
+	nd->flags |= ND_NOABBREV;
     nameddirtab->addnode(nameddirtab, ztrdup(s), nd);
 }
 
@@ -1152,9 +1155,22 @@ checkrmall(char *s)
 
 /**/
 int
+read1char(void)
+{
+    char c;
+
+    while (read(SHTTY, &c, 1) != 1) {
+	if (errno != EINTR)
+	    return -1;
+    }
+    return STOUC(c);
+}
+
+/**/
+int
 getquery(char *valid_chars, int purge)
 {
-    char c, d;
+    int c, d;
     int isem = !strcmp(term, "emacs");
 
 #ifdef FIONREAD
@@ -1177,7 +1193,7 @@ getquery(char *valid_chars, int purge)
 	return 'n';
     }
 #endif
-    while (read(SHTTY, &c, 1) == 1) {
+    while ((c = read1char()) >= 0) {
 	if (c == 'Y' || c == '\t')
 	    c = 'y';
 	else if (c == 'N')
@@ -1199,13 +1215,13 @@ getquery(char *valid_chars, int purge)
     }
     if (isem) {
 	if (c != '\n')
-	    while (read(SHTTY, &d, 1) == 1 && d != '\n');
+	    while ((d = read1char()) >= 0 && d != '\n');
     } else {
 	settyinfo(&shttyinfo);
 	if (c != '\n' && !valid_chars)
 	    write(SHTTY, "\n", 1);
     }
-    return (int)c;
+    return c;
 }
 
 static int d;
@@ -3109,6 +3125,73 @@ hasspecial(char const *s)
     return 0;
 }
 
+/* Quote the string s and return the result.  If e is non-zero, the         *
+ * pointer it points to may point to a position in s and in e the position  *
+ * of the corresponding character in the quoted string is returned.  Like   *
+ * e, te may point to a position in the string and pl is used to return     *
+ * the position of the character pointed to by te in the quoted string.     *
+ * The last argument should be zero if this is to be used outside a string, *
+ * one if it is to be quoted for the inside of a single quoted string, and  *
+ * two if it is for the inside of  double quoted string.                    *
+ * The string may be metafied and contain tokens.                           */
+
+/**/
+char *
+bslashquote(const char *s, char **e, char *te, int *pl, int instring)
+{
+    const char *u, *tt;
+    char *v, buf[PATH_MAX * 2];
+    int sf = 0;
+
+    tt = v = buf;
+    u = s;
+    for (; *u; u++) {
+	if (e && *e == u)
+	    *e = v, sf |= 1;
+	if (te == u)
+	    *pl = v - tt, sf |= 2;
+	if (ispecial(*u) &&
+	    (!instring || (isset(BANGHIST) &&
+			   *u == (char)bangchar) ||
+	     (instring == 2 &&
+	      (*u == '$' || *u == '`' || *u == '\"')) ||
+	     (instring == 1 && *u == '\''))) {
+	    if (*u == '\n' || (instring == 1 && *u == '\'')) {
+		if (unset(RCQUOTES)) {
+		    *v++ = '\'';
+		    if (*u == '\'')
+			*v++ = '\\';
+		    *v++ = *u;
+		    *v++ = '\'';
+		} else if (*u == '\n')
+		    *v++ = '"', *v++ = '\n', *v++ = '"';
+		else
+		    *v++ = '\'', *v++ = '\'';
+		continue;
+	    } else
+		*v++ = '\\';
+	}
+	if(*u == Meta)
+	    *v++ = *u++;
+	*v++ = *u;
+    }
+    *v = '\0';
+    if (strcmp(buf, s))
+	tt = dupstring(buf);
+    else
+	tt = s;
+    v += tt - buf;
+    if (e && (sf & 1))
+	*e += tt - buf;
+
+    if (e && *e == u)
+	*e = v;
+    if (te == u)
+	*pl = v - tt;
+
+    return (char *) tt;
+}
+
 /* Unmetafy and output a string, quoted if it contains special characters. */
 
 /**/
@@ -3349,12 +3432,19 @@ getkeystring(char *s, int *len, int fromwhere, int *misc)
 	    case Meta:
 		*t++ = '\\', s--;
 		break;
+	    case '-':
+		if (fromwhere == 5) {
+		    *misc  = 1;
+		    break;
+		}
+		goto def;
 	    case 'c':
 		if (fromwhere < 2) {
 		    *misc = 1;
 		    break;
 		}
 	    default:
+	    def:
 		if ((idigit(*s) && *s < '8') || *s == 'x') {
 		    if (!fromwhere) {
 			if (*s == '0')
@@ -3386,7 +3476,7 @@ getkeystring(char *s, int *len, int fromwhere, int *misc)
 	} else if (fromwhere == 4 && *s == Snull) {
 	    for (u = t; (*u++ = *s++););
 	    return t + 1;
-	} else if (*s == '^' && fromwhere == 2) {
+	} else if (*s == '^' && (fromwhere == 2 || fromwhere == 5)) {
 	    control = 1;
 	    continue;
 	} else if (*s == Meta)
