@@ -118,21 +118,52 @@ strerror(int errnum)
  * some other flag value) in order to determine that the resource is *
  * unlimited.  What use is leaving errno unchanged?  Instead, define *
  * a wrapper that resets errno to 0 and returns 0 for "the system    *
- * does not have a limit."                                           *
+ * does not have a limit," so that -1 always means a real error.     *
  *                                                                   *
- * This is replaced by a macro from system.h if not HAVE_PATHCONF.   */
+ * This is replaced by a macro from system.h if not HAVE_PATHCONF.   *
+ *
+ * Note that the length of a relative path is compared without first *
+ * prepending the current directory, if pathconf() does not return   *
+ * an error.  This is for consistency with the macro and with older  *
+ * zsh behavior; it may be problematic in the ENOENT/ENOTDIR cases.  */
 
 /**/
 mod_export long
 zpathmax(char *dir)
 {
     long pathmax;
+
+    if (!dir || !*dir)
+	dir = ".";
     errno = 0;
     if ((pathmax = pathconf(dir, _PC_PATH_MAX)) >= 0) {
+	/* This code is redundant if pathconf works correctly, but   *
+	 * some versions of glibc pathconf return a hardwired value. */
 	if (strlen(dir) < pathmax)
 	    return pathmax;
 	else
 	    errno = ENAMETOOLONG;
+    } else if (errno == ENOENT || errno == ENOTDIR) {
+	/* Work backward to find a directory, until we run out of path. */
+	char *tail = strrchr(dir, '/');
+	while (tail > dir && tail[-1] == '/')
+	    --tail;
+	if (tail > dir) {
+	    *tail = 0;
+	    pathmax = zpathmax(dir);
+	    *tail = '/';
+	    if (pathmax > 0) {
+		if (strlen(dir) < pathmax)
+		    return pathmax;
+		else
+		    errno = ENAMETOOLONG;
+	    }
+	}
+	/* else                                                          *
+	 * Either we're at the root (tail == dir) or we're on the first  *
+	 * component of a relative path (tail == NULL).  Either way we   *
+	 * have nothing to do here, the error from pathconf() is real.   *
+	 * Perhaps our current working directory has been removed?       */
     }
     if (errno)
 	return -1;
@@ -141,19 +172,6 @@ zpathmax(char *dir)
 }
 #endif
 
-/**/
-mod_export char *
-zrealpath(const char *path, char *resolved_path)
-{
-#ifdef HAVE_REALPATH
-    return realpath(path, resolved_path);
-#else /* the following block should be replaced with a realpath() equiv. */
-    long pathmax;
-
-    if ((pathmax = zpathmax(path)) > 0)
-	return strncpy(resolved_path, path, pathmax);
-#endif
-}
 
 /**/
 mod_export char *

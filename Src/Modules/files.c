@@ -71,7 +71,6 @@ bin_mkdir(char *nam, char **args, char *ops, int func)
     mode_t oumask = umask(0);
     mode_t mode = 0777 & ~oumask;
     int err = 0;
-    char *head;
 
     umask(oumask);
     if(ops['m']) {
@@ -92,19 +91,8 @@ bin_mkdir(char *nam, char **args, char *ops, int func)
 
 	while(ptr > *args + (**args == '/') && *--ptr == '/')
 	    *ptr = 0;
-
-/* Drop the tail so that pathconf receives a potentially valid pathname */
-	head = (char *) ztrdup(*args);
-	if ((ptr = strrchr(head, '/')))
-	    *ptr = 0;
-	else {
-/* Relative to current directory */
-	    *head = '.';
-	    *(head + 1) = '\0';
-	}
-
-	if(zpathmax(unmeta(head)) < 0) {
-	    zwarnnam(nam, "%s: %e", head, errno);
+	if(zpathmax(unmeta(*args)) < 0) {
+	    zwarnnam(nam, "%s: %e", *args, errno);
 	    err = 1;
 	    continue;
 	}
@@ -133,8 +121,6 @@ bin_mkdir(char *nam, char **args, char *ops, int func)
 	    }
 	} else
 	    err |= domkdir(nam, *args, mode, 0);
-
-	free(head);
     }
     return err;
 }
