@@ -2127,7 +2127,7 @@ static int
 spdist(char *s, char *t, int thresh)
 {
     char *p, *q;
-    char *keymap =
+    const char qwertykeymap[] =
     "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\
 \t1234567890-=\t\
 \tqwertyuiop[]\t\
@@ -2139,6 +2139,23 @@ spdist(char *s, char *t, int thresh)
 \tASDFGHJKL:\"\n\t\
 \tZXCVBNM<>?\n\n\t\
 \n\n\n\n\n\n\n\n\n\n\n\n\n\n";
+    const char dvorakkeymap[] =
+    "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\
+\t1234567890[]\t\
+\t',.pyfgcrl/=\t\
+\taoeuidhtns-\n\t\
+\t;qjkxbmwvz\t\t\t\
+\n\n\n\n\n\n\n\n\n\n\n\n\n\n\
+\t!@#$%^&*(){}\t\
+\t\"<>PYFGCRL?+\t\
+\tAOEUIDHTNS_\n\t\
+\t:QJKXBMWVZ\n\n\t\
+\n\n\n\n\n\n\n\n\n\n\n\n\n\n";
+    const char *keymap;
+    if ( isset( DVORAK ) )
+      keymap = dvorakkeymap;
+    else
+      keymap = qwertykeymap;
 
     if (!strcmp(s, t))
 	return 0;

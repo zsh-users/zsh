@@ -210,6 +210,7 @@ static struct optname optns[] = {
 {NULL, "promptvars",	      OPT_ALIAS, /* bash */	 PROMPTSUBST},
 {NULL, "stdin",		      OPT_ALIAS, /* ksh */	 SHINSTDIN},
 {NULL, "trackall",	      OPT_ALIAS, /* ksh */	 HASHCMDS},
+{NULL, "dvorak",	      0,			 DVORAK},
 {NULL, NULL, 0, 0}
 };
 

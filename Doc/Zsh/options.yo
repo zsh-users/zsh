@@ -326,6 +326,12 @@ do not report an error unless all the patterns
 in a command have no matches.
 Overrides tt(NULL_GLOB).
 )
+pindex(DVORAK)
+item(tt(DVORAK))(
+Use the Dvorak keyboard instead of the standard qwerty keyboard as a basis
+for examining spelling mistakes for the tt(CORRECT) and tt(CORRECT_ALL)
+options and the tt(spell-word) editor command.
+)
 pindex(EQUALS)
 cindex(filename expansion, =)
 item(tt(EQUALS) <Z>)(

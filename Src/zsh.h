@@ -1431,6 +1431,7 @@ enum {
     VERBOSE,
     XTRACE,
     USEZLE,
+    DVORAK,
     OPT_SIZE
 };
 
