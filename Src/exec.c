@@ -2297,9 +2297,6 @@ execcmd(Estate state, int input, int output, int how, int last1)
 #ifdef PATH_DEV_FD
 		closem(2);
 #endif
-		if (isset(PRINTEXITVALUE) && isset(SHINSTDIN) && lastval && !subsh) {
-		    fprintf(stderr, "zsh: exit %ld\n", (long)lastval);
-		}
 		fflush(stdout);
 		if (save[1] == -2) {
 		    if (ferror(stdout)) {
@@ -2308,6 +2305,10 @@ execcmd(Estate state, int input, int output, int how, int last1)
 		    }
 		} else
 		    clearerr(stdout);
+	    }
+	    if (isset(PRINTEXITVALUE) && isset(SHINSTDIN) &&
+		lastval && !subsh) {
+		fprintf(stderr, "zsh: exit %ld\n", (long)lastval);
 	    }
 
 	    if (do_exec) {

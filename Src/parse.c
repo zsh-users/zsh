@@ -903,12 +903,16 @@ par_for(int *complex)
 	yylex();
 	type = WC_FOR_COND;
     } else {
+	int posix_in;
 	infor = 0;
 	if (tok != STRING || !isident(tokstr))
 	    YYERRORV(oecused);
 	ecstr(tokstr);
 	incmdpos = 1;
 	yylex();
+	posix_in = isnewlin;
+	while (isnewlin)
+	  yylex();
 	if (tok == STRING && !strcmp(tokstr, "in")) {
 	    int np, n;
 
@@ -920,7 +924,7 @@ par_for(int *complex)
 		YYERRORV(oecused);
 	    ecbuf[np] = n;
 	    type = (sel ? WC_SELECT_LIST : WC_FOR_LIST);
-	} else if (tok == INPAR) {
+	} else if (!posix_in && tok == INPAR) {
 	    int np, n;
 
 	    incmdpos = 0;

@@ -1,0 +1,321 @@
+#
+# This file contains tests corresponding to the `Shell Grammar' texinfo node.
+#
+
+%prep
+
+  mkdir basic.tmp && cd basic.tmp
+
+  touch foo bar
+
+%test
+#
+# Tests for `Simple Commands and Pipelines'
+#
+  echo foo | cat | sed 's/foo/bar/'
+0:Basic pipeline handling
+>bar
+
+  false | true
+0:Exit status of pipeline with builtins (true)
+
+  true | false
+1:Exit status of pipeline with builtins (false)
+
+  fn() { local foo; read foo; print $foo; }
+  coproc fn
+  print -p coproc test output
+  read -p bar
+  print $bar
+0:Basic coprocess handling
+>coproc test output
+
+  true | false && print true || print false
+0:Basic sublist (i)
+>false
+
+  false | true && print true || print false
+0:Basic sublist (ii)
+>true
+
+  (cd /NonExistentDirectory >&/dev/null) || print false
+0:Basic subshell list with error
+>false
+
+  { cd /NonExistentDirectory >&/dev/null } || print false
+0:Basic current shell list with error
+>false
+
+#
+# Tests for `Precommand Modifiers'
+#
+  - $ZTST_testdir/../Src/zsh -fc "[[ \$0 = \"-$ZTST_testdir/../Src/zsh\" ]]"
+0:`-' precommand modifier
+
+  echo f*
+  noglob echo f*
+0:`noglob' precommand modifier
+>foo
+>f*
+
+  (exec /bin/sh; echo bar)
+0:`exec' precommand modifier
+
+  cat() { echo Function cat executed; }
+  command cat && unfunction cat
+0:`command' precommand modifier
+<External command cat executed
+>External command cat executed
+
+  cd() { echo Not cd at all; }
+  builtin cd . && unfunction cd
+0:`builtin' precommand modifier
+
+#
+# Tests for `Complex Commands'
+#
+
+  if true; then
+    print true-1
+  elif true; then
+    print true-2
+  else
+    print false
+  fi
+0:`if ...' (i)
+>true-1
+
+  if false; then
+    print true-1
+  elif true; then
+    print true-2
+  else
+    print false
+  fi
+0:`if ...' (ii)
+>true-2
+
+  if false; then
+    print true-1
+  elif false; then
+    print true-2
+  else
+    print false
+  fi
+0:`if ...' (iii)
+>false
+
+  if true;
+    :
+  fi
+1d:`if ...' (iv)
+?ZTST_execchunk:-1: parse error near `fi'
+
+  for name in word to term; do
+    print $name
+  done
+0:`for' loop
+>word
+>to
+>term
+
+  for name
+  in word to term; do
+    print $name
+  done
+0:`for' loop with newline before in keyword
+>word
+>to
+>term
+
+  for (( name = 0; name < 3; name++ )); do
+    print $name
+  done
+0:arithmetic `for' loop
+>0
+>1
+>2
+
+  name=0
+  while (( name < 3 )); do
+    print $name
+    (( name++ ))
+  done
+0:`while' loop
+>0
+>1
+>2
+
+  name=0
+  until (( name == 3 )); do
+    print $name
+    (( name++ ))
+  done
+0:`until' loop
+>0
+>1
+>2
+
+  repeat 3 do
+    echo over and over
+  done
+0:`repeat' loop
+>over and over
+>over and over
+>over and over
+
+  word=Trinity
+  case $word in
+    Michaelmas) print 0
+                ;;
+    Hilary) print 1
+            ;;
+    Trinity) print 2
+             ;;
+    *) print 3
+       ;;
+  esac
+0:`case', old syntax
+>2
+
+  word=Trinity
+  case $word in
+    (Michaelmas) print 0
+                ;;
+    (Hilary) print 1
+            ;;
+    (Trinity) print 2
+             ;;
+    (*) print 3
+       ;;
+  esac
+0:`case', new syntax
+>2
+
+  word=Hilary
+  case $word in
+    (Michaelmas) print 0
+                ;;
+    (Hilary) print 1
+            ;&
+    (Trinity) print 2
+             ;&
+    (*) print 3
+       ;;
+  esac
+0:`case', new syntax, cascaded
+>1
+>2
+>3
+
+## This doesn't work, because zsh tries to read from the terminal
+## even in a non-interactive shell.  The manual implies it always reads
+## from stdin, even in an interactive shell.
+#  PS3="input> "
+#  select name in one two three; do
+#    print $name
+#  done
+#0:`select' loop
+#<2
+#>1) one     2) two     3) three   
+#>input> 
+#>two
+
+  function name1 name2 () { print This is $0; }
+  name2
+  name1 name2() { print This is still $0; }
+  name2
+0:`function' keyword
+>This is name2
+>This is still name2
+
+  (time cat) >&/dev/null
+0:`time' keyword (status only)
+
+  if [[ -f foo && -d . && -n $ZTST_testdir ]]; then
+    true
+  else
+    false
+  fi
+0:basic [[ ... ]] test
+
+#
+# Tests for `Alternate Forms For Complex Commands'
+#
+
+  if (true) { print true-1 } elif (true) { print true-2 } else { print false }
+  if (false) { print true-1 } elif (true) { print true-2 } else { print false }
+  if (false) { print true-1 } elif (false) { print true-2 } else { print false }
+0:Alternate `if' with braces
+>true-1
+>true-2
+>false
+
+  if true; print true
+0:Short form of `if'
+>true
+
+  for name ( word1 word2 word3 ) print $name
+0:Form of `for' with parentheses.
+>word1
+>word2
+>word3
+
+  for name in alpha beta gamma; print $name
+0:Short form of `for'
+>alpha
+>beta
+>gamma
+
+  for (( val = 2; val < 10; val *= val )) print $val
+0:Short arithmetic `for'
+>2
+>4
+
+  foreach name ( verbiage words periphrasis )
+    print $name
+  end
+0:Csh-like `for'
+>verbiage
+>words
+>periphrasis
+
+# see comment with braces used in if loops
+  val=0;
+  while (( val < 2 )) { print $((val++)); }
+0:Alternative `while'
+>0
+>1
+
+  val=2;
+  until (( val == 0 )) { print $((val--)); }
+0:Alternative `until'
+>2
+>1
+
+  repeat 3 print Hip hip hooray
+0:Short `repeat'
+>Hip hip hooray
+>Hip hip hooray
+>Hip hip hooray
+
+  case bravo {
+    (alpha) print schmalpha
+	    ;;
+    (bravo) print schmavo
+	    ;;
+    (charlie) print schmarlie
+	    ;;
+  }
+0:`case' with braces
+>schmavo
+
+  print 'This test hangs the shell when it fails...' >&8
+  name=0
+# The number 4375 here is chosen to produce more than 16384 bytes of output
+  while (( name < 4375 )); do
+    print -n $name
+    (( name++ ))
+  done < /dev/null | { read name; print done }
+0:Bug regression: `while' loop with redirection and pipeline
+>done

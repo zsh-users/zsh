@@ -102,7 +102,7 @@
 
  declare +m
 1:Differences of declare and typeset
-?(eval):1: bad option: -m
+?ZTST_execchunk:2: bad option: -m
 
  scope10
  print $outer
@@ -160,7 +160,7 @@
  r=failure
 1:Readonly declaration
 >success
-?(eval):3: read-only variable: r
+?ZTST_execchunk:2: read-only variable: r
 
  typeset r=success
  readonly r
@@ -168,7 +168,7 @@
  r=failure
 1:Convert to readonly
 >success
-?(eval):4: read-only variable: r
+?ZTST_execchunk:2: read-only variable: r
 
  typeset -gU array
  print $array
@@ -186,7 +186,7 @@
  typeset -T SCALAR array
  typeset +T SCALAR
 1:Untying is prohibited
-?(eval):typeset:2: use unset to remove tied variables
+?ZTST_execchunk:typeset:2: use unset to remove tied variables
 
  OUTER=outer
  scope13
@@ -197,7 +197,7 @@
 
  local array[2]=x
 1:Illegal local array element assignment
-?(eval):local:1: array[2]: can't create local array elements
+?ZTST_execchunk:local:2: array[2]: can't create local array elements
 
  local -a array
  typeset array[1]=a array[2]=b array[3]=c

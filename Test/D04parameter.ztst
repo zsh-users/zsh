@@ -3,7 +3,9 @@
 %prep
 
   mkdir parameter.tmp
+
   cd parameter.tmp
+
   touch boringfile evenmoreboringfile
 
 %test

@@ -1,0 +1,151 @@
+# Tests for _arguments.
+
+%prep
+  . $ZTST_srcdir/comptest
+
+  mkdir comp.tmp
+  cd comp.tmp
+
+  comptestinit -z $ZTST_testdir/../Src/zsh &&
+  {
+    comptesteval 'compdef _tst tst'
+    tst_arguments () { comptesteval "_tst () { _arguments ${${(@qq)*}} }" }
+  }
+
+%test
+ tst_arguments ':desc1:(arg1)'
+ comptest $'tst \t\C-wa\t\C-war\t\C-warg\t\C-warg1\t\C-wr\t\C-wx\t \ty \t'
+0:one non-option argument
+>line: {tst arg1 }{}
+>line: {tst arg1 }{}
+>line: {tst arg1 }{}
+>line: {tst arg1 }{}
+>line: {tst arg1 }{}
+>line: {tst r}{}
+>line: {tst x}{}
+>line: {tst x }{}
+>MESSAGE:{no more arguments}
+>line: {tst x y }{}
+>MESSAGE:{no more arguments}
+
+ tst_arguments ':desc1:(a b)'
+ comptest $'tst \t'
+0:a and b
+>line: {tst }{}
+>DESCRIPTION:{desc1}
+>NO:{a}
+>NO:{b}
+
+ tst_arguments ':desc1:(arg1)' ':desc2:(arg2)' ':desc3:(arg3)'
+ comptest $'tst \t\t\t\C-w\C-w\C-w\C-d'
+0:three arguments
+>line: {tst arg1 }{}
+>line: {tst arg1 arg2 }{}
+>line: {tst arg1 arg2 arg3 }{}
+>DESCRIPTION:{desc1}
+>NO:{arg1}
+
+ tst_arguments '1:desc1:(arg1)'
+ comptest $'tst \t\t'
+0:first argument
+>line: {tst arg1 }{}
+>line: {tst arg1 }{}
+>MESSAGE:{no more arguments}
+
+ tst_arguments '-\+[opt]'
+ comptest $'tst -\C-d'
+0:-+
+>DESCRIPTION:{option}
+>NO:{-+ -- opt}
+
+ tst_arguments -+o
+ comptest $'tst -\t\t\t\C-w\C-w+\t\t\t'
+0:option beginning with + and -.
+>line: {tst -o }{}
+>line: {tst -o +o }{}
+>line: {tst -o +o }{}
+>MESSAGE:{no arguments}
+>line: {tst +o }{}
+>line: {tst +o -o }{}
+>line: {tst +o -o }{}
+>MESSAGE:{no arguments}
+
+ tst_arguments '-o:1:(a):2:(b)'
+ comptest $'tst \t\t\t'
+0:two option arguments
+>line: {tst -o }{}
+>line: {tst -o a }{}
+>line: {tst -o a b }{}
+
+ tst_arguments '-x:arg:'
+ comptest $'tst -x\t'
+0:sticky option argument
+>line: {tst -x }{}
+
+ tst_arguments '-x[desc]'
+ comptest $'tst -x\t'
+0:end of option sequence
+>line: {tst -x }{}
+
+ tst_arguments '-x' ':arg:'
+ comptest $'tst -\t'
+0:argument beginning with minus
+>line: {tst -}{}
+>MESSAGE:{arg}
+>DESCRIPTION:{option}
+>NO:{-x}
+
+ tst_arguments '-o::optarg:(oa)' ':arg1:(a1)'
+ comptest $'tst -o\t\t'
+0:optional option argument
+>line: {tst -o }{}
+>line: {tst -o }{}
+>DESCRIPTION:{optarg}
+>NO:{oa}
+>DESCRIPTION:{arg1}
+>NO:{a1}
+
+ tst_arguments '-o:*a:a:(a)' ':A:(A)' ':B:(B)'
+ comptest $'tst A -o a \t'
+0:variable length option arguments
+>line: {tst A -o a B }{}
+
+ tst_arguments -s '-a' '-b' ':descr:{compadd - $+opt_args[-a]}'
+ comptest $'tst -ab \t'
+0:opt_args
+>line: {tst -ab 1 }{}
+
+ tst_arguments '-a' '*::rest:{compadd - -b}'
+ comptest $'tst arg -\t'
+0:rest arguments
+>line: {tst arg -b }{}
+
+ tst_arguments '-e:*last:::b:{compadd "${(j:,:)words}"}' ':arg1:(arg1)'
+ comptest $'tst -\t\tla\t\C-hst\t\t\eb\eb\C-b\t\t'
+0:words array in rest arguments
+>line: {tst -e }{}
+>line: {tst -e  }{}
+>line: {tst -e  la }{}
+>line: {tst -e  last }{}
+>line: {tst -e  last arg1 }{}
+>line: {tst -e ,last }{ last arg1}
+>line: {tst -e ,last ,last,,last }{ last arg1}
+
+ tst_arguments -s '-d+:msg1:' '*::msg2:{compadd $CURRENT}' 
+ comptest $'tst add \t\t\t'
+0:opt_args
+>line: {tst add 2 }{}
+>line: {tst add 2 3 }{}
+>line: {tst add 2 3 4 }{}
+
+ tst_arguments -s '-a' '-b' '-c' ':words:compadd - abyyy abzzz' 
+ comptest $'tst ab\t'
+0:options and words (zsh-workers:12257)
+>line: {tst ab}{}
+>DESCRIPTION:{words}
+>NO:{abyyy}
+>NO:{abzzz}
+
+%clean
+
+  zmodload -ui zsh/zpty

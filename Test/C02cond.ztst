@@ -85,7 +85,12 @@
   fi
 0dD:-p cond
 
-  [[ -r zerolength && ! -r unmodish ]]
+  if (( EUID == 0 )); then
+    print -u8 'Warning: Not testing [[ ! -r file ]] (root reads anything)'
+    [[ -r zerolength && -r unmodish ]]
+  else
+    [[ -r zerolength && ! -r unmodish ]]
+  fi
 0:-r cond
 
   [[ -s nonzerolength && ! -s zerolength ]]

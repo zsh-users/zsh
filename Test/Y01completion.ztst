@@ -1,0 +1,56 @@
+# Tests for completion system.
+
+%prep
+  . $ZTST_srcdir/comptest
+
+  mkdir comp.tmp
+  cd comp.tmp
+
+  comptestinit -z $ZTST_testdir/../Src/zsh &&
+  {
+    mkdir dir1
+    mkdir dir2
+    touch file1
+    touch file2
+  }
+
+%test
+
+  comptest $': \t\t\t\t\t\t\t'
+0:directories and files
+>line: {: }{}
+>DESCRIPTION:{file}
+>DI:{dir1}
+>DI:{dir2}
+>FI:{file1}
+>FI:{file2}
+>line: {: dir1/}{}
+>line: {: dir2/}{}
+>line: {: file1}{}
+>line: {: file2}{}
+>line: {: dir1/}{}
+>line: {: dir2/}{}
+
+  comptesteval '_users () { compadd user1 user2 }'
+  comptest $': ~\t\t\t\t\t'
+0:tilde
+>line: {: ~user}{}
+>line: {: ~user}{}
+>NO:{user1}
+>NO:{user2}
+>line: {: ~user1}{}
+>line: {: ~user2}{}
+>line: {: ~user1}{}
+
+  comptest $'echo ;:\C-b\C-b\t'
+0:tilde
+>line: {echo }{;:}
+>DESCRIPTION:{file}
+>DI:{dir1}
+>DI:{dir2}
+>FI:{file1}
+>FI:{file2}
+
+%clean
+
+  zmodload -ui zsh/zpty

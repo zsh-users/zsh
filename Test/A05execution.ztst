@@ -1,0 +1,159 @@
+%prep
+
+  storepath=($path)
+
+  mkdir command.tmp command.tmp/dir1 command.tmp/dir2
+
+  cd command.tmp
+
+  print '#!/bin/sh\necho This is top' >tstcmd
+
+  print '#!/bin/sh\necho This is dir1' >dir1/tstcmd
+
+  print '#!/bin/sh\necho This is dir2' >dir2/tstcmd
+
+  chmod 755 tstcmd dir1/tstcmd dir2/tstcmd
+
+%test
+  ./tstcmd
+0:./prog execution
+>This is top
+
+  path=($ZTST_testdir/command.tmp/dir1
+        $ZTST_testdir/command.tmp/dir2
+        .)
+  tstcmd
+  path=($storepath)
+0:path (1)
+>This is dir1
+
+  path=(. command.tmp/dir{1,2})
+  tstcmd
+  path=($storepath)
+0:path (2)
+>This is top
+
+  functst() { print $# arguments:; print -l $*; }
+  functst "Eines Morgens" "als Gregor Samsa"
+  functst ""
+  functst "aus unrühigen Träumen erwachte"
+  foo="fand er sich in seinem Bett"
+  bar=
+  rod="zu einem ungeheuren Ungeziefer verwandelt."
+  functst $foo $bar $rod
+# set up alias for next test
+  alias foo='print This is alias one'
+0:function argument passing
+>2 arguments:
+>Eines Morgens
+>als Gregor Samsa
+>1 arguments:
+>
+>1 arguments:
+>aus unrühigen Träumen erwachte
+>2 arguments:
+>fand er sich in seinem Bett
+>zu einem ungeheuren Ungeziefer verwandelt.
+
+  alias foo='print This is alias two'
+  fn() { foo; }
+  fn
+0:Aliases in functions
+>This is alias one
+
+  foo='Global foo'
+  traptst() { local foo="Local foo"; trap 'print $foo' EXIT; }
+  traptst
+0:EXIT trap environment
+>Global foo
+
+  functst() { return 0; print Ha ha; return 1; }
+  functst
+0:return (1)
+
+  functst() { return 1; print Ho ho; return 0; }
+  functst
+1:return (2)
+
+  unfunction functst
+  fpath=(.)
+  print "print This is functst." >functst
+  autoload functst
+  functst
+0:autoloading (1)
+>This is functst.
+
+  unfunction functst
+  print "functst() { print This, too, is functst; }; print Hello." >functst
+  typeset -fu functst
+  functst
+  functst
+0:autoloading with initialization
+>Hello.
+>This, too, is functst
+
+  unfunction functst
+  print "print Yet another version" >functst
+  functst() { autoload -X; }
+  functst
+0:autoloading via -X
+>Yet another version
+
+  chpwd() { print Changed to $PWD; }
+  cd .
+  unfunction chpwd
+0q:chpwd
+>Changed to $ZTST_testdir/command.tmp
+
+# Hard to test periodic, precmd and preexec non-interactively.
+
+  fn() { TRAPEXIT() { print Exit; }; }
+  fn
+0:TRAPEXIT
+>Exit
+
+  unfunction fn
+  print 'TRAPDEBUG() {
+      print Line $LINENO
+    }
+    :
+    unfunction TRAPDEBUG
+  ' > fn
+  autoload fn
+  fn
+  rm fn
+0:TRAPDEBUG
+>Line 1
+>Line 1
+
+  unfunction fn
+  print 'trap '\''print Line $LINENO'\'' DEBUG
+    :
+    trap - DEBUG
+  ' > fn
+  autoload fn
+  fn
+  rm fn
+0:trap DEBUG
+>Line 1
+>Line 2
+
+  TRAPZERR() { print Command failed; }
+  true
+  false
+  true
+  false
+  unfunction TRAPZERR
+0:TRAPZERR
+>Command failed
+>Command failed
+
+  trap 'print Command failed again.' ZERR
+  true
+  false
+  true
+  false
+  trap - ZERR
+0:trap ZERR
+>Command failed again.
+>Command failed again.

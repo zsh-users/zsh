@@ -1,3 +1,40 @@
+2001-10-16  Bart Schaefer  <schaefer@zsh.org>
+
+	* 15812: Doc/Zsh/zle.yo: Cross-reference parameters used by ZLE.
+
+	* 15702: Doc/Zsh/expn.yo: Alphabetize (mostly) parameter flag
+	descriptions; fix a couple of typos; parameter rule #12.
+
+	* 15676: Test/A01grammar.ztst, Test/A05execution.ztst,
+	Test/C02cond.ztst, Test/D04parameter.ztst, Test/E01options.ztst,
+	Test/E02xtrace.ztst, Test/Y01completion.ztst,
+	Test/Y03arguments.ztst:  Tweak %prep sections to exit sooner on
+	certain failures (by adding blank lines).  Other whitespace-only
+	changes.  Avoid [[ ! -r ... ]] test when running as root, as it
+	always fails in that case.  Test `typeset -ft' (function trace).
+
+	* 15488: Doc/Zsh/expn.yo: More index entry cleanup.  Reorder the
+	description section to look less as if it has two menus in info
+	and to add some cross-references.
+
+	* 15375: Doc/Zsh/options.yo: Explain the effect of CORRECT on
+	HASH_CMDS et al.
+
+	* 15198 (adapted): Completion/Zsh/Context/_tilde: Return nonzero
+	if no matches are found.
+
+	* 15060: Test/Y01completion.ztst, Test/Y02compmatch.ztst,
+	Test/Y03arguments.ztst, Test/comptest: Abandon the tests during
+	the %prep section if the zpty module can't be loaded.	
+
+	* 15057: Src/exec.c: PRINT_EXIT_VALUE for shell functions, too.
+
+	* Andrej: 15038: Test/A01grammar.ztst: test case for 15023.
+	(unposted) fix a couple of typos in test decriptions
+
+	* 15023, 15027: Src/parse.c: Accept newlines before the "in"
+	keyword in "for" and "select", per POSIX.
+
 2001-10-15  Clint Adams  <clint@zsh.org>
 
         * 15094: Functions/Prompts/prompt_clint_setup:
@@ -26,6 +63,12 @@
 	* 16018: acconfig.h, zshconfig.ac, Etc/MACHINES,
 	Test/C02cond.ztst: allow dynamic loading to work on MacOS X
 	if the dlcompat library is installed.
+
+2001-10-11  Bart Schaefer  <schaefer@zsh.org>
+
+	* 16013: Src/exec.c: Properly save/restore state around the
+	DEBUG trap, so that its return value does not alter the return
+	value of current command (among other things).
 
 2001-10-08  Oliver Kiddle  <opk@zsh.org>
 
