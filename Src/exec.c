@@ -1825,7 +1825,7 @@ execcmd(Estate state, int input, int output, int how, int last1)
 		    load_module(((Builtin) hn)->optstr);
 		    hn = builtintab->getnode(builtintab, cmdarg);
 		}
-		assign = (hn->flags & BINF_MAGICEQUALS);
+		assign = (hn && (hn->flags & BINF_MAGICEQUALS));
 		break;
 	    }
 	    cflags &= ~BINF_BUILTIN & ~BINF_COMMAND;
@@ -1939,7 +1939,18 @@ execcmd(Estate state, int input, int output, int how, int last1)
 		return;
 	    }
 
-	    if (errflag || checked ||
+	    /*
+	     * Quit looking for a command if:
+	     * - there was an error; or
+	     * - we checked the simple cases needing MAGIC_EQUAL_SUBST; or
+	     * - we know we already found a builtin (because either:
+	     *   - we loaded a builtin from a module, or
+	     *   - we have determined there are options which would
+	     *     require us to use the "command" builtin); or
+	     * - we aren't using POSIX and so BINF_COMMAND indicates a zsh
+	     *   precommand modifier is being used in place of the builtin
+	     */
+	    if (errflag || checked || is_builtin ||
 		(unset(POSIXBUILTINS) && (cflags & BINF_COMMAND)))
 		break;
 
