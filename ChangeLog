@@ -1,3 +1,8 @@
+2000-07-04  Sven Wischnowsky  <wischnow@zsh.org>
+
+	* 12156: Completion/Core/_expand, Completion/Core/_path_files: add
+ 	some $(print...)s because of possible math-parse errors
+	
 2000-07-03  Adam Spiers  <adam@spiers.net>
 
 	* 12152: Completion/User/_perl: tweak completion of Perl script
