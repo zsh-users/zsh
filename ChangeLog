@@ -1,5 +1,10 @@
 2000-05-08  Sven Wischnowsky  <wischnow@informatik.hu-berlin.de>
 
+	* 11244: Completion/Builtins/_zstyle, Completion/Core/_description,
+ 	Completion/Core/_expand, Doc/Zsh/compsys.yo: make _expand call
+ 	_complete when called from _expand_word; add ignore-line style to
+ 	ignore words already on the line
+	
 	* 11242: Completion/Builtins/_pids, Completion/Builtins/_zstyle,
  	Completion/Commands/_complete_help, Completion/Core/_all_labels,
  	Completion/Core/_approximate, Completion/Core/_expand,

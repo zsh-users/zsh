@@ -36,6 +36,7 @@ styles=(
   hosts			 c:_hosts
   hosts-ports		 c:host-port
   users-hosts-ports	 c:user-host-port
+  ignore-line            c:bool
   ignore-parents         c:ignorepar
   ignored-patterns	 c:
   insert-ids             c:insert-ids

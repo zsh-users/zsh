@@ -30,6 +30,7 @@ if [[ "$force" = *c* ]] ||
    { zstyle -s ":completion:${curcontext}:" completions expr &&
      [[ "${(e):-\$[$expr]}" -eq 1 ]] }; then
   compstate[insert]=all
+  [[ "$curcontext" = expand-word:* ]] && _complete && return 0
   return 1
 fi
 
