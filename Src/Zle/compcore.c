@@ -277,7 +277,7 @@ int fromcomp;
 /* This holds the end-position of the last string inserted into the line. */
 
 /**/
-int lastend;
+mod_export int lastend;
 
 #define inststr(X) inststrlen((X),1,-1)
 

@@ -1,3 +1,10 @@
+2003-08-11  Peter Stephenson  <pws@csr.com>
+
+	* 18938: Src/lex.c, Src/Math.c, Src/Zle/zle_main.c,
+	Src/Zle/compcore.c: Mark some data symbols for export, shutting
+	up Cygwin's dllwrap.  Note that c from zle_main.c is not marked
+	for export because no-one would ever export a symbol called c.
+
 2003-08-05  Oliver Kiddle  <opk@zsh.org>
 
 	* Completion/Unix/Command/_archie: archie servers no longer exist
