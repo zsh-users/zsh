@@ -25,7 +25,7 @@ fi
 zstyle -T ":completion:${curcontext}:$_type" verbose && _showd=yes
 
 zstyle -s ":completion:${curcontext}:$_type" list-separator _sep || _sep=--
-zstyle -s ":completion:${curcontext}:$_type" max-match-length _mlen ||
+zstyle -s ":completion:${curcontext}:$_type" max-matches-width _mlen ||
     _mlen=$((COLUMNS/2))
 
 _descr="$1"

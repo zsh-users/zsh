@@ -1766,9 +1766,9 @@ performed.
 
 The default value for this style is `tt(2 numeric)'.
 )
-kindex(max-match-length, completion style)
-item(tt(max-match-length))(
-This is used to define the maximum length to use for the matches when
+kindex(max-matches-width, completion style)
+item(tt(max-matches-width))(
+This is used to define the maximum width to use for the matches when
 listing matches with descriptions. In such lists, matches with the
 same description will be grouped together, but that means that in
 cases where many matches have the same description, the matches take

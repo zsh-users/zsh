@@ -80,7 +80,7 @@ styles=(
   matcher		 c:
   matcher-list		 c:
   max-errors		 c:
-  max-match-length       c:max-match-length
+  max-matches-width      c:max-matches-width
   menu			 c:boolauto
   muttrc                 c:_files
   numbers		 c:bool
@@ -383,8 +383,8 @@ while (( $#state )); do
       _message -e separators 'separator string'
       ;;
 
-    max-match-length)
-      _message -e numbers 'maximum display length for matches'
+    max-matches-width)
+      _message -e numbers 'maximum display width for matches'
       ;;
 
     urgh) 
