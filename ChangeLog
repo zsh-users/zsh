@@ -1,3 +1,16 @@
+2000-04-05  Peter Stephenson  <pws@pwstephenson.fsnet.co.uk>
+
+	* 10524: Util/mkdisttree.sh: always copy files to tarred tree;
+	chmod g-s.
+
+	* Oliver: 10519: Src/utils.c, Doc/Zsh/compsys.yo: AIX dependencies
+	and minor typo in docs.
+
+	* Alexandre: 10516: Completion/User/_prcs: diff options behaviour.
+	
+	* 10513: Src/glob.c, Doc/Zsh/expn.yo: glob order qualifier (od)
+	implements depth-first ordering.
+
 2000-04-05  Bart Schaefer  <schaefer@zsh.org>
 
 	* 10499: Makefile.in: Dependencies relative to $(sdir).

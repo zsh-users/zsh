@@ -2794,7 +2794,7 @@ are taken from the array parameter tt(expl) which will be set up
 before executing the var(action) and hence may be used in it (normally 
 in an expansion like `tt($expl[@])').
 
-If the var(action) starts with `tt(= )' (a equal sign followed by a
+If the var(action) starts with `tt(= )' (an equals sign followed by a
 space), tt(_arguments) will insert the contents of the var(argument)
 field of the current context as the new first element in the tt(words) 
 special array and increments the value of the tt(CURRENT) special

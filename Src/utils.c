@@ -2681,7 +2681,7 @@ niceztrdup(char const *s)
 }
 
 /**/
-char *
+mod_export char *
 nicedupstring(char const *s)
 {
     return nicedup(s, 1);

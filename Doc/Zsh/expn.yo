@@ -1619,19 +1619,24 @@ pindex(NUMERIC_GLOB_SORT, setting in pattern)
 )
 item(tt(o)var(c))(
 specifies how the names of the files should be sorted. If var(c) is
-tt(n) they are sorted by name (the default), if it is tt(L) they
-are sorted depending on the size (length) of the files, if tt(l) 
-they are sorted by the number of links, and if tt(a), tt(m), and tt(c)
+tt(n) they are sorted by name (the default); if it is tt(L) they
+are sorted depending on the size (length) of the files; if tt(l) 
+they are sorted by the number of links; if tt(a), tt(m), or tt(c)
 they are sorted by the time of the last access, modification, or
-inode change respectively. Note that tt(a), tt(m), and tt(c) compare
-the age against the current time, hence the first name in the list is the 
-the youngest file. Also note that the modifiers tt(^) and tt(-) are 
-used, so `tt(*(^-oL))' gives a list of all files sorted by file size in 
-descending order, following any symbolic links.
+inode change respectively; if var(d), files in subdirectories appear before
+those in the current directory at each level of the search --- this is best
+combined with other criteria, for example `tt(odon)' to sort on names for
+files within the same directory.  Note that tt(a), tt(m), and tt(c) compare
+the age against the current time, hence the first name in the list is the
+the youngest file. Also note that the modifiers tt(^) and tt(-) are used,
+so `tt(*(^-oL))' gives a list of all files sorted by file size in descending
+order, following any symbolic links.
 )
 item(tt(O)var(c))(
 like `tt(o)', but sorts in descending order; i.e. `tt(*(^oc))' is the
-same as `tt(*(Oc))' and `tt(*(^Oc))' is the same as `tt(*(oc))'
+same as `tt(*(Oc))' and `tt(*(^Oc))' is the same as `tt(*(oc))'; `tt(OD)'
+puts files in the current directory before those in subdirectories at each
+level of the search.
 )
 item(tt([)var(beg)[tt(,)var(end)]tt(]))(
 specifies which of the matched filenames should be included in the

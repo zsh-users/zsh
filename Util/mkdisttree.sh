@@ -42,10 +42,13 @@ sed_separate='
     s/;;*/;/g
 '
 
+filelist=filelist$$
+trap 'rm -f $filelist; rm -rf $disttree; exit 1' 1 2 15
 (
     cd $sdir_top
-    find . \( -name '*.*' -prune -false \) -o \( -name .distfiles -print \)
-) | while read dfn; do
+    find . -name '*.*' -prune -o -name .distfiles -print
+) > $filelist
+( while read dfn; do
     subdir=`echo $dfn | sed 's,/\.distfiles$,,'`
     echo >&2 "Processing directory $subdir..."
     eval "DISTFILES_$type="
@@ -55,15 +58,15 @@ sed_separate='
 	cmds=`echo "$distfiles" | sed -e "$sed_separate"`
 	eval "$cmds"
 	if test -n "$deplist" && test -f $dir_top/$subdir/Makefile; then
-	    ( cd $dir_top/$subdir && "$@" $deplist ) || exit 1
+	    ( trap '' 1 2 15; cd $dir_top/$subdir && "$@" $deplist ) || exit 1
 	fi
 	$sdir_top/mkinstalldirs $disttree/$subdir || exit 1
 	for f in $deplist `test -z "$globlist" || ( cd $dir_top/$subdir && eval "echo $globlist")`; do
 	    if test -f $dir_top/$subdir/$f; then
-		ln $dir_top/$subdir/$f $disttree/$subdir/$f || \
+#		ln $dir_top/$subdir/$f $disttree/$subdir/$f || \
 		    cp -p $dir_top/$subdir/$f $disttree/$subdir/$f || exit 1
 	    elif test -f $sdir_top/$subdir/$f; then
-		ln $sdir_top/$subdir/$f $disttree/$subdir/$f || \
+#		ln $sdir_top/$subdir/$f $disttree/$subdir/$f || \
 		    cp -p $sdir_top/$subdir/$f $disttree/$subdir/$f || exit 1
 	    else
 		echo >&2 "$0: can't find file $subdir/$f"
@@ -71,6 +74,14 @@ sed_separate='
 	    fi
 	done
     fi
-done
+done ) < $filelist
 
-exec chmod -R a+rX,u+w,go-w $disttree
+status=$?
+rm -f $filelist
+trap '' 1 2 15
+if test $status -ne 0; then
+    rm -rf $disttree
+    exit $status
+fi
+
+exec chmod -R a+rX,u+w,g-s,go-w $disttree
