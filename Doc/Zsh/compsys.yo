@@ -810,7 +810,7 @@ for types of whatever (e.g. address types for the tt(xhost) command)
 )
 kindex(urls, completion tag)
 item(tt(urls))(
-used to look up the tt(path) and tt(local) styles when completing URLs
+used to look up the tt(urls) and tt(local) styles when completing URLs
 )
 kindex(users, completion tag)
 item(tt(users))(
@@ -1808,18 +1808,8 @@ to be completed for `dpkg --status'.
 )
 kindex(path, completion style)
 item(tt(path))(
-This is used together with the the tt(urls) tag by completion
-functions that generate URLs as possible matches.  It should be set to
-the path of a directory containing sub-directories named after the
-retrieval methods which occur as the first part of a URL, i.e.
-`tt(http)', `tt(ftp)', `tt(bookmark)', and so on.  These
-sub-directories should contain files and other sub-directories whose
-pathnames are possible completions after the initial `tt(http://)',
-`tt(ftp://)', etc. See the description in the file tt(_urls) in the
-tt(User) sub-directory of the completion system for more information.
-
-The function that completes color names also uses this style with the 
-tt(colors) tag.  Here, the value should be the pathname of a file
+The function that completes color names uses this style with the 
+tt(colors) tag.  The value should be the pathname of a file
 containing color names in the format of an X11 tt(rgb.txt) file.  If
 the style is not set but this file is found in one of various standard
 locations it will be used as the default.
@@ -2117,6 +2107,26 @@ tags offered by the completion function will be used to provide a
 sensible default behavior that causes arguments (whether normal command
 arguments or arguments of options) to be completed before option names for
 most commands.
+)
+kindex(urls, completion style)
+item(tt(urls))(
+This is used together with the the tt(urls) tag by completion
+functions that generate URLs as possible matches.  If the value
+consists of more than one string or if the only string does not name a 
+file or directory, the strings are used as the URLs to complete.
+
+If the value contains only one string and that is the name of a normal 
+file, the URLs are taken from that file (where the URLs may be
+separated by white space or newlines).
+
+Finally, if the only string in the value names a directory, that
+should contain sub-directories named after the
+retrieval methods which occur as the first part of a URL, i.e.
+`tt(http)', `tt(ftp)', `tt(bookmark)', and so on.  These
+sub-directories should contain files and other sub-directories whose
+pathnames are possible completions after the initial `tt(http://)',
+`tt(ftp://)', etc. See the description in the file tt(_urls) in the
+tt(User) sub-directory of the completion system for more information.
 )
 kindex(use-cache, completion style)
 item(tt(use-cache))(

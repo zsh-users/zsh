@@ -6,7 +6,7 @@
 #
 # Configuration styles used:
 #
-#  path
+#  urls
 #    The path to a directory containing a URL database, such as:
 #
 #      % cd ~/.zsh/urls
@@ -29,6 +29,9 @@
 #      % cat bookmark/zsh/meta
 #      http://www.zsh.org/
 #
+#    Alternatively it may contain the path to a normal file and the URLs will
+#    be taken from that.  Or the style may contain the URLs as its values.
+#
 #  local
 #    Specify a local web server as an array with three elements:
 #      <hostname> <doc root> <user area>
@@ -39,9 +42,7 @@
 #      zstyle ':completion:*:urls' local www /usr/local/apache/htdocs public_html
 
 local ipre scheme host user uhosts ret=1 expl match glob suf
-local urls_path localhttp
-zstyle -s ":completion:${curcontext}:urls" path urls_path ||
-    urls_path="${ZDOTDIR:-$HOME}/.zsh/urls"
+local localhttp
 zstyle -a ":completion:${curcontext}:urls" local localhttp
 local localhttp_servername="$localhttp[1]"
 local localhttp_documentroot="$localhttp[2]"
@@ -51,6 +52,16 @@ if [[ "$1" = -f ]]; then
   shift
   _wanted -C -f files expl file _files "$@" && return 0
 fi
+
+zstyle -a ":completion:${curcontext}:urls" urls urls
+
+if [[ $#urls -gt 1 || ( $#urls -eq 1 && ! -d $urls[1] ) ]]; then
+  [[ $#urls -eq 1 && -f $urls[1] ]] && urls=( $(< $urls[1]) )
+  _wanted urls expl 'urls' compadd -a urls && return 0
+  urls=()
+fi
+
+urls="$urls[1]"
 
 glob=(-g '*(^/)')
 zparseopts -D -K -E 'g:=glob'
@@ -62,7 +73,7 @@ if ! compset -P '(#b)([-+.a-z0-9]#):'; then
   while _tags; do
     while _next_label prefixes expl 'URL prefix' -S '' "$@"; do
       compset -S '[^:/]*' && compstate[to_end]=''
-      [[ -d $urls_path/bookmark ]] &&
+      [[ -d $urls/bookmark ]] &&
         compadd "$expl[@]" bookmark: && ret=0
       compadd "$expl[@]" file: ftp:// gopher:// http:// && ret=0
     done
@@ -97,18 +108,18 @@ case "$scheme" in
     fi
   ;;
   bookmark)
-    if [[ -f "$urls_path/$scheme/${(Q)PREFIX}${(Q)SUFFIX}" &&
-	  -s "$urls_path/$scheme/${(Q)PREFIX}${(Q)SUFFIX}" ]]; then
+    if [[ -f "$urls/$scheme/${(Q)PREFIX}${(Q)SUFFIX}" &&
+	  -s "$urls/$scheme/${(Q)PREFIX}${(Q)SUFFIX}" ]]; then
       _wanted -C bookmark bookmarks expl bookmarks \
           compadd "$@" -U - \
-              "$ipre$(<"$urls_path/$scheme/${(Q)PREFIX}${(Q)SUFFIX}")" && ret=0
+              "$ipre$(<"$urls/$scheme/${(Q)PREFIX}${(Q)SUFFIX}")" && ret=0
     else
       _tags -C bookmark files
       while _tags; do
         while _next_label files expl 'bookmark'; do
-          _path_files -W "$urls_path/$scheme" "$expl[@]" -S '' "${glob[@]}" && 
+          _path_files -W "$urls/$scheme" "$expl[@]" -S '' "${glob[@]}" && 
               ret=0
-          _path_files -W "$urls_path/$scheme" -S/ -r '/' "$expl[@]" -/ && ret=0
+          _path_files -W "$urls/$scheme" -S/ -r '/' "$expl[@]" -/ && ret=0
         done
 	(( ret )) || return 0
       done
@@ -119,7 +130,7 @@ esac
 
 # Complete hosts
 if ! compset -P '(#b)([^:/]#)([:/])'; then
-  uhosts=($urls_path/$scheme/$PREFIX*$SUFFIX(/:t))
+  uhosts=($urls/$scheme/$PREFIX*$SUFFIX(/:t))
 
   _tags hosts
   while _tags; do
@@ -167,8 +178,8 @@ if [[ "$localhttp_servername" = "$host" ]]; then
 else
   while _tags; do
     while _next_label files expl 'local file'; do
-      _path_files "$expl[@]" "$@" -W $urls_path/$scheme/$host "${glob[@]}" && ret=0
-      _path_files -S/ -r '/' "$expl[@]" -W $urls_path/$scheme/$host -/ && ret=0
+      _path_files "$expl[@]" "$@" -W $urls/$scheme/$host "${glob[@]}" && ret=0
+      _path_files -S/ -r '/' "$expl[@]" -W $urls/$scheme/$host -/ && ret=0
     done
     (( ret )) || return 0
   done

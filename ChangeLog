@@ -1,5 +1,8 @@
 2001-03-28  Sven Wischnowsky  <wischnow@zsh.org>
 
+	* 13814: Completion/User/_urls, Doc/Zsh/compsys.yo: replace
+	`path' with more general `urls' style
+
 	* 13813: Completion/Core/_multi_parts: make sure _multi_parts
 	doesn't add the empty string as a possible completion
 
