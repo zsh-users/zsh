@@ -1834,7 +1834,7 @@ ztrftime(char *buf, int bufsize, char *fmt, struct tm *tm)
 		 * Remember we've already allowed for two characters
 		 * in the accounting in bufsize (but nowhere else).
 		 */
-		*buf = '\0';
+		*buf = '\1';
 		tmp[1] = fmt[-1];
 		if (!strftime(buf, bufsize + 2, tmp, tm))
 		{
