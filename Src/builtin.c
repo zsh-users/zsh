@@ -2897,7 +2897,7 @@ bin_print(char *name, char **args, char *ops, int func)
     int flags[5], *len;
     char *start, *endptr, *c, *d, *flag, spec[11], *fmt = NULL;
     char **first, *curarg, *flagch = "0+- #", save, nullstr = '\0';
-    zlong count = 0;
+    zlong count;
     FILE *fout = stdout;
 
     mnumber mnumval;
@@ -3096,6 +3096,7 @@ bin_print(char *name, char **args, char *ops, int func)
     /* printf style output */
     *spec='%';
     do {
+    	count = 0;
     	if (maxarg) {
 	    first += maxarg;
 	    argc -= maxarg;

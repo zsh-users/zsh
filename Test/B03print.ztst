@@ -144,6 +144,11 @@
 >two	b:0x2%
 >three	c:0x3%
 
+ printf '%d%n' 123 val val val > /dev/null
+ printf '%d\n' val
+0:%n count zeroed on format reuse
+>1
+
 # this should fill spec string with '%0+- #*.*d\0' - 11 characters
  printf '%1$0+- #-08.5dx\n' 123
 0:maximal length format specification
