@@ -1,3 +1,8 @@
+2000-05-10  Bart Schaefer  <schaefer@zsh.org>
+
+	* 11302: Functions/Zle/edit-command-line: Cursor placement and
+	defensive programming.
+
 2000-05-10  Oliver Kiddle  <opk@zsh.org>
 
 	* 11301: Src/Zle/zle_misc.c: AIX dependency fix

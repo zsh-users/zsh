@@ -7,12 +7,11 @@
 
 local tmpfile=${TMPPREFIX:-/tmp/zsh}ecl$$
 
-print $BUFFER >$tmpfile
+print -R - "$BUFFER" >$tmpfile
 exec </dev/tty
 ${VISUAL:-${EDITOR:-vi}} $tmpfile
-LBUFFER=
-RBUFFER=
-BUFFER=$(<$tmpfile)
+BUFFER="$(<$tmpfile)"
+CURSOR=$#BUFFER
 
-rm -f $tmpfile
+command rm -f $tmpfile
 zle redisplay
