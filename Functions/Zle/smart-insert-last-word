@@ -1,6 +1,7 @@
 # smart-insert-last-word
 # Inspired by Christoph Lange <langec@gmx.de> from zsh-users/3265;
-# rewritten to correct multiple-call behavior after zsh-users/3270.
+# rewritten to correct multiple-call behavior after zsh-users/3270;
+# modified to work with copy-earlier-word after zsh-users/5832.
 #
 # This function as a ZLE widget can replace insert-last-word, like so:
 #
@@ -50,14 +51,24 @@ else
     NUMERIC=1
     _ilw_lcursor=$lcursor
 fi
+# Handle the up to three arguments of .insert-last-word
+if (( $+1 )); then
+    if (( $+3 )); then
+	((NUMERIC = -($1)))
+    else
+	((NUMERIC = _ilw_count - $1))
+    fi
+    (( NUMERIC )) || LBUFFER[lcursor+1,cursor+1]=''
+    numeric=$((-(${2:--numeric})))
+fi
 _ilw_hist=$HISTNO
 _ilw_count=$NUMERIC
 
-zle .up-history || return 1   # Retrieve previous command
-lastcmd=( ${(z)BUFFER} )      # Split into shell words
-zle .down-history             # Return to current command
-CURSOR=$cursor                # Restore cursor position
-NUMERIC=${numeric:-1}         # In case of fall through
+zle .up-history || return 1      # Retrieve previous command
+lastcmd=( ${${(z)BUFFER}:#\;} )  # Split into shell words
+zle .down-history                # Return to current command
+CURSOR=$cursor                   # Restore cursor position
+NUMERIC=${numeric:-1}            # In case of fall through
 
 (( NUMERIC > $#lastcmd )) && return 1
 

@@ -5,15 +5,20 @@
 # and start from the word before last.  Otherwise, it will operate on
 # the current line.
 
+emulate -L zsh
+
 if (( ${NUMERIC:-0} )); then
-   # 1 means last word, 2 second last, etc.
-   (( __copyword = ${NUMERIC:-0} ))
+  # 1 means last word, 2 second last, etc.
+  (( __copyword = ${NUMERIC:-0} ))
+  zstyle -s :$WIDGET widget __copywidget
 elif [[ -n $__copyword && $WIDGET = $LASTWIDGET ]]; then
   (( __copyword-- ))
 elif [[ $LASTWIDGET = *insert-last-word ]]; then
   __copyword=-2
+  __copywidget=$LASTWIDGET
 else
   __copyword=-1
+  zstyle -s :$WIDGET widget __copywidget
 fi
 
-zle .insert-last-word 0 $__copyword
+zle ${__copywidget:-.insert-last-word} 0 $__copyword

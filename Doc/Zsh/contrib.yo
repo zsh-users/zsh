@@ -386,6 +386,23 @@ transpose-words; do
   zle -N $widget bash-$widget
 done)
 )
+tindex(copy-earlier-word)
+item(tt(copy-earlier-word))(
+This widget works like a combination of tt(insert-last-word) and
+tt(copy-prev-shell-word).  Repeated invocations of the widget retrieve
+earlier words on the relevant history line.  With a numeric argument
+var(N), insert the var(N)th word from the history line; var(N) may be
+negative to count from the end of the line.
+
+If tt(insert-last-word) has been used to retrieve the last word on a
+previous history line, repeated invocations will replace that word with
+earlier words from the same line.
+
+Otherwise, the widget applies to words on the line currently being edited.
+The tt(widget) style can be set to the name of another widget that should
+be called to retrieve words.  This widget must accept the same three
+arguments as tt(insert-last-word).
+)
 tindex(cycle-completion-positions)
 item(tt(cycle-completion-positions))(
 After inserting an unambiguous string into the command line, the new
@@ -571,13 +588,14 @@ zle -N predict-off
 bindkey '^X^Z' predict-on
 bindkey '^Z' predict-off)
 )
-findex(smart-insert-last-word)
+tindex(smart-insert-last-word)
 item(tt(smart-insert-last-word))(
 This function may replace the tt(insert-last-word) widget, like so:
 
 example(zle -N insert-last-word smart-insert-last-word)
 
-With a numeric prefix, it behaves like tt(insert-last-word), except that
+With a numeric prefix, or when passed command line arguments in a call
+from another widget, it behaves like tt(insert-last-word), except that
 words in comments are ignored when tt(INTERACTIVE_COMMENTS) is set.
 
 Otherwise, the rightmost ``interesting'' word from the previous command is
@@ -591,20 +609,6 @@ different widgets to use different patterns:
 example(zle -N insert-last-assignment smart-insert-last-word
 zstyle :insert-last-assignment match '[[:alpha:]][][[:alnum:]]#=*'
 bindkey '\e=' insert-last-assignment)
-)
-findex(copy-earlier-word)
-item(tt(copy-earlier-word))(
-This widget works like a combination of tt(insert-last-word) and
-tt(copy-prev-shell-word).  Repeated invocations of the widget retrieve
-earlier words on the relevant history line.  With a numeric argument
-var(N), insert the var(N)th word from the history line; var(N) may be
-negative to count from the end of the line.
-
-If tt(insert-last-word) has been used to retrieve the last word on a
-previous history line, repeated invocations will replace that word with
-earlier words from the same line.
-
-Otherwise, the widget applies to words on the line currently being edited.
 )
 enditem()
 
@@ -766,6 +770,19 @@ the context `tt(:predict)'.  If set to one of the standard `true' values,
 these widgets display a message below the prompt when the predictive state
 is toggled.  This is most useful in combination with the tt(toggle) style.
 The default does not display these messages.
+)
+kindex(widget, widget style)
+item(tt(widget))(
+This style is similar to the tt(command) style: For widget functions that
+use tt(zle) to call other widgets, this style can sometimes be used to
+override the widget which is called.  The context for this style is the
+name of the calling widget (em(not) the name of the calling function,
+because one function may be bound to multiple widget names).
+
+example(zstyle :copy-earlier-word widget smart-insert-last-word)
+
+Check the documentation for the calling widget or function to determine
+whether the tt(widget) style is used.
 )
 enditem()
 
