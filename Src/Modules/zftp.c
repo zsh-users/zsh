@@ -1303,8 +1303,7 @@ zfgetdata(char *name, char *rest, char *cmd, int getsize)
 #endif
 #if defined(F_SETFD) && defined(FD_CLOEXEC)
 	/* If the shell execs a program, we don't want this fd left open. */
-	len = FD_CLOEXEC;
-	fcntl(zfsess->dfd, F_SETFD, &len);
+	fcntl(zfsess->dfd, F_SETFD, FD_CLOEXEC);
 #endif
 
     return 0;
@@ -1988,8 +1987,7 @@ zftp_open(char *name, char **args, int flags)
 
 #if defined(F_SETFD) && defined(FD_CLOEXEC)
     /* If the shell execs a program, we don't want this fd left open. */
-    len = FD_CLOEXEC;
-    fcntl(zfsess->cfd, F_SETFD, &len);
+    fcntl(zfsess->cfd, F_SETFD, FD_CLOEXEC);
 #endif
 
     len = sizeof(zfsess->sock);
@@ -2057,8 +2055,7 @@ zftp_open(char *name, char **args, int flags)
 	DPUTS(zfstatfd == -1, "zfstatfd not created");
 #if defined(F_SETFD) && defined(FD_CLOEXEC)
 	/* If the shell execs a program, we don't want this fd left open. */
-	len = FD_CLOEXEC;
-	fcntl(zfstatfd, F_SETFD, &len);
+	fcntl(zfstatfd, F_SETFD, FD_CLOEXEC);
 #endif
 	unlink(fname);
     }
