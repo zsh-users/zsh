@@ -815,6 +815,7 @@ zleread(char **lp, char **rp, int flags, int context)
     histline = curhist;
     undoing = 1;
     line = (unsigned char *)zalloc((linesz = 256) + 2);
+    *line = '\0';
     virangeflag = lastcmd = done = cs = ll = mark = 0;
     vichgflag = 0;
     viinsbegin = 0;
