@@ -1,5 +1,8 @@
 2000-05-29  Sven Wischnowsky  <wischnow@zsh.org>
 
+	* 11635: Completion/Core/_path_files: make _path_files use glob
+ 	qualifiers from the line when doing pattern matching
+	
 	* users/3101: Doc/Zsh/compsys.yo: make handling of default tag clearer
  	in the docs
 	

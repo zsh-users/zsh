@@ -147,6 +147,29 @@ zstyle -s ":completion:${curcontext}:paths" special-dirs sdirs &&
 
 zstyle -s ":completion:${curcontext}:files" ignore-parents ignpar
 
+if [[ -n "$compstate[pattern_match]" &&
+      ( ( -z "$SUFFIX" && "$PREFIX" = *\([^\|\~]##\) ) ||
+        "$SUFFIX" =  *\([^\|\~]##\) ) ]]; then
+  if [[ "$SUFFIX" = *\([^\|\~]##\) ]]; then
+    tmp3="${${(M)SUFFIX%\([^\|\~]##\)}[2,-2]}"
+    SUFFIX="${SUFFIX%\($tmp3\)}"
+  else
+    tmp3="${${(M)PREFIX%\([^\|\~]##\)}[2,-2]}"
+    PREFIX="${PREFIX%\($tmp3\)}"
+  fi
+  tmp2=()
+  for tmp1 in "$pats[@]"; do
+    if [[ "$tmp1" = (#b)(?*)(\(\([^\|~]##\)\)) ]]; then
+      tmp2=( "$tmp2[@]" "${match[1]}((${tmp3}${match[2][3,-1]}" )
+    elif [[ "$tmp1" = (#b)(?*)(\([^\|~]##\)) ]]; then
+      tmp2=( "$tmp2[@]" "${match[1]}(${tmp3}${match[2][2,-1]}" )
+    else
+      tmp2=( "$tmp2[@]" "${tmp1}(${tmp3})" )
+    fi
+  done
+  pats=( "$tmp2[@]" )
+fi
+
 # We get the prefix and the suffix from the line and save the whole
 # original string. Then we see if we will do menucompletion.
 
