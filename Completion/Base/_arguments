@@ -822,12 +822,17 @@ while true; do
     if [[ -n "$sopts" && -n "$PREFIX" &&
       "$PREFIX" = [-+]${~soptseq}[$sopts] ]]; then
       if [[ "$PREFIX" = [-+]${~soptseq1} ]]; then
-        if [[ -n "$compconfig[describe_options]" &&
-              "$compconfig[describe_options]" != *\!${cmd}* ]]; then
-          _display tmp odescr
-        else
-          tmp="( ${(j: :)${(@)${(@M)${=:-${(k)opts} ${(k)dopts} ${(k)odopts}}:#[-+]?(|=)}#?}%=} )"
+        local dpre="$PREFIX" dsuf="$SUFFIX"
+
+	PREFIX=''
+	SUFFIX=''
+        if [[ -z "$compconfig[describe_options]" ||
+              "$compconfig[describe_options]" = *\!${cmd}* ]] ||
+           ! _display tmp odescr; then
+          tmp=( "${dpre[1]}${(@o)^${(@)${(@M)${=:-${(k)opts} ${(k)dopts} ${(k)odopts}}:#[-+]?(|=)}#?}%=}" )
         fi
+	PREFIX="$dpre"
+	SUFFIX="$dsuf"
         compadd "$expl[@]" -Q -M 'r:|[_-]=* r:|=*' -y tmp - \
                 "${PREFIX}${(@k)^opts[(I)${PREFIX[1]}?]#?}" \
 	        "${PREFIX}${(@k)^dopts[(I)${PREFIX[1]}?]#?}" \
