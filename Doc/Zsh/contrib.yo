@@ -524,6 +524,20 @@ example(zle -N insert-last-assignment smart-insert-last-word
 zstyle :insert-last-assignment match '[[:alpha:]][][[:alnum:]]#=*'
 bindkey '\e=' insert-last-assignment)
 )
+findex(copy-earlier-word)
+item(tt(copy-earlier-word))(
+This widget works like a combination of tt(insert-last-word) and
+tt(copy-prev-shell-word).  Repeated invocations of the widget retrieve
+earlier words on the relevant history line.  With a numeric argument
+var(N), insert the var(N)th word from the history line; var(N) may be
+negative to count from the end of the line.
+
+If tt(insert-last-word) has been used to retrieve the last word on a
+previous history line, repeated invocations will replace that word with
+earlier words from the same line.
+
+Otherwise, the widget applies to words on the line currently being edited.
+)
 enditem()
 
 subsect(Styles)

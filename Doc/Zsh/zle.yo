@@ -941,6 +941,37 @@ left (zero inserts the previous command word).  Repeating this command
 replaces the word just inserted with the last word from the
 history event prior to the one just used; numeric arguments can be used in
 the same way to pick a word from that event.
+
+When called from a shell function invoked from a user-defined widget, the
+command can take one to three arguments.  The first argument specifies a
+history offset which applies to successive calls to this widget: if is -1,
+the default behaviour is used, while if it is 1, successive calls will move
+forwards through the history.  The value 0 can be used to indicate that the
+history line examined by the previous execution of the command will be
+reexamined.  Note that negative numbers should be preceeded with a
+`tt(-)tt(-)' argument to avoid confusing them with options.
+
+If two arguments are given, the second specifies the word on the command
+line in normal array index notation (as a more natural alternative to the
+prefix argument).  Hence 1 is the first word, and -1 (the default) is the
+last word.
+
+If a third argument is given, its value is ignored, but it is used to
+signify that the history offset is relative to the current history line,
+rather than the one remembered after the previous invocations of
+tt(insert-last-word).
+
+For example, the default behaviour of the command corresponds to
+
+example(zle insert-last-word -- -1 -1)
+
+while the command
+
+example(zle insert-last-word -- -1 1 -)
+
+always copies the first word of the line in the history immediately before
+the line being edited.  This has the side effect that later invocations of
+the widget will be relative to that line.
 )
 tindex(vi-repeat-search)
 item(tt(vi-repeat-search) (unbound) (n) (unbound))(

@@ -1,3 +1,13 @@
+2002-03-05  Peter Stephenson  <pws@csr.com>
+
+	* 16767: Src/Zle/zle_hist.c, Doc/Zsh/zle.yo, Doc/Zsh/contrib.yo,
+	Functions/Zle/copy-earlier-word:  Enhance insert-last-word to
+	pick different lines from the history (including the current
+	line) and different words from that line.  Add copy-earlier-word
+	as suggested by Dominik Vogt to copy words from either the
+	current line, or (following an insert-last-word) a previous
+	history line.
+
 2002-03-04  Peter Stephenson  <pws@csr.com>
 
 	* 16759: Src/builtin.c: from Eric Norum <eric.norum@usask.ca>:
