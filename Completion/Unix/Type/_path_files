@@ -653,7 +653,7 @@ done
 
 if zstyle -t ":completion:${curcontext}:paths" expand prefix &&
    [[ nm -eq compstate[nmatches] && $#exppaths -ne 0 &&
-      "$exppaths" != "$eorig" ]]; then
+      "$linepath$exppaths" != "$eorig" ]]; then
   PREFIX="${opre}"
   SUFFIX="${osuf}"
   compadd -Q "$mopts[@]" -S '' -M "r:|/=* r:|=*" -p "$linepath" -a exppaths

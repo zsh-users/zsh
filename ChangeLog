@@ -1,3 +1,10 @@
+2001-08-17  Sven Wischnowsky  <wischnow@zsh.org>
+
+	* 15650: Completion/Unix/Type/_path_files, Src/Zle/compcore.c: fix 
+	test for expanded paths in _path_files; more intelligently move
+	glob flags (in particular those added by _approximate) after a
+	tilde
+
 2001-08-16  Peter Stephenson  <pws@csr.com>
 
 	* 15647: Functions/Misc/zcalc:  with output not showing the
