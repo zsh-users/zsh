@@ -1,3 +1,0 @@
-#compdef true false log times clear logname whoami
-
-_message 'no argument or option'
