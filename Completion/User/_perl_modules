@@ -22,11 +22,11 @@ zparseopts -D -a opts S: q
 
 if [[ ${+_perl_modules} -eq 0 ]]; then
   if zstyle -t ":completion:${curcontext}:modules" try-to-use-pminst \
-     && which pminst >/dev/null; then
+     && (( ${+commands[pminst]} )); then
     _perl_modules=( $(pminst) )
   else
     local inc libdir new_pms
-    if which perl >/dev/null; then
+    if (( ${+commands[perl]} )); then
       inc=( $( perl -e 'print "@INC"' ) )
     else
       # If perl isn't there, one wonders why the user's trying to
