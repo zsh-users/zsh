@@ -265,7 +265,7 @@ bin_zselect(char *nam, char **args, Options ops, int func)
 #else
     /* TODO: use poll */
     zerrnam(nam, "your system does not implement the select system call.",
-	    NULL, );
+	    NULL, 0);
     return 2;
 #endif
 }

@@ -8,6 +8,9 @@
 
 2004-03-03  Peter Stephenson  <pws@csr.com>
 
+	* 19528: Src/Modules/zselect.c: missing argument when neither
+	select nor poll was available.
+
 	* unposted: Config/version.mk: zsh 4.2.0-pre-2.
 
 	* 19523: Src/signames2.awk: attempt to work around awk
