@@ -165,7 +165,7 @@ getterminfo(HashTable ht, char *name)
 	pm->u.str = num ? dupstring("yes") : dupstring("no");
 	pm->flags |= PM_SCALAR;
     }
-    else if ((tistr = (char *)tigetstr(name)) != NULL)
+    else if ((tistr = (char *)tigetstr(name)) != NULL && tistr != (char *)-1)
     {
 	pm->u.str = dupstring(tistr);
 	pm->flags |= PM_SCALAR;
