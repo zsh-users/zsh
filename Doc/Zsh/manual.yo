@@ -28,9 +28,9 @@ menu(Parameters)
 menu(Options)
 menu(Shell Builtin Commands)
 menu(Zsh Line Editor)
-menu(Completion Using compctl)
 menu(Completion Widgets)
 menu(Completion System)
+menu(Completion Using compctl)
 menu(Zsh Modules)
 menu(Zftp Function System)
 
@@ -98,14 +98,6 @@ menu(Arguments)
 menu(Completion)
 menu(Miscellaneous)
 
-Completion Using compctl
-
-menu(Command Flags)
-menu(Option Flags)
-menu(Alternative Completion)
-menu(Extended Completion)
-menu(Example)
-
 Completion Widgets
 
 menu(Special Parameters)
@@ -121,6 +113,14 @@ menu(Control Functions)
 menu(Bindable Commands)
 menu(Completion Functions)
 menu(Completion Directories)
+
+Completion Using compctl
+
+menu(Command Flags)
+menu(Option Flags)
+menu(Alternative Completion)
+menu(Extended Completion)
+menu(Example)
 
 Zsh Modules
 
