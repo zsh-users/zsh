@@ -2619,7 +2619,7 @@ try_dump_file(char *dump, char *name, char *func)
 
 	    prog = (Eprog) zalloc(sizeof(*prog));
 
-	    prog->alloc = EA_MAP;
+	    prog->alloc = EA_REAL;
 	    prog->len = h->len + po;
 	    prog->npats = np = h->npats;
 	    prog->pats = pp = (Patprog *) d;

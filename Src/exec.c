@@ -3413,15 +3413,9 @@ stripkshdef(Eprog prog, char *name)
 	return NULL;
     code = *pc++;
     if (wc_code(code) != WC_LIST ||
-	(WC_LIST_TYPE(code) & (Z_SYNC|Z_END)) != (Z_SYNC|Z_END))
+	(WC_LIST_TYPE(code) & (Z_SYNC|Z_END|Z_SIMPLE)) != (Z_SYNC|Z_END|Z_SIMPLE))
 	return prog;
-    code = *pc++;
-    if (wc_code(code) != WC_SUBLIST ||
-	WC_SUBLIST_FLAGS(code) || WC_SUBLIST_TYPE(code) != WC_SUBLIST_END)
-	return prog;
-    code = *pc++;
-    if (wc_code(code) != WC_PIPE || WC_PIPE_TYPE(code) != WC_PIPE_END)
-	return prog;
+    pc++;
     code = *pc++;
     if (wc_code(code) != WC_FUNCDEF ||
 	*pc != 1 || strcmp(name, ecrawstr(prog, pc + 1, NULL)))
@@ -3450,6 +3444,7 @@ stripkshdef(Eprog prog, char *name)
 	    ret->alloc = EA_HEAP;
 	    ret->pats = pp = (Patprog *) zhalloc(len);
 	    ret->prog = (Wordcode) (ret->pats + npats);
+	    ret->strs = (char *) (ret->prog + nprg);
 	    memcpy(ret->prog, pc, plen);
 	    memcpy(ret->strs, prog->strs + sbeg, nstrs);
 	    ret->dump = NULL;
@@ -3458,7 +3453,6 @@ stripkshdef(Eprog prog, char *name)
 	ret->npats = npats;
 	for (i = npats; i--; pp++)
 	    *pp = dummy_patprog1;
-	ret->strs = (char *) (ret->prog + nprg);
 	ret->shf = NULL;
 
 	return ret;
