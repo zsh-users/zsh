@@ -1,5 +1,8 @@
 2001-05-02  Sven Wischnowsky  <wischnow@zsh.org>
 
+	* 14198: Src/Zle/computil.c: remove quotes when looking at
+	arguments in comparguments
+
 	* 14197: Completion/Base/Completer/_expand: missing star in
 	suffix-style test pattern
 
