@@ -529,7 +529,7 @@ for prepath in "$prepaths[@]"; do
       cpre="${cpre}${tpre%%/*}/"
       tpre="${tpre#*/}"
     elif [[ "$tsuf" = */* ]]; then
-      mid="$testpath"
+      [[ "$tsuf" != /* ]] && mid="$testpath"
       cpre="${cpre}${tpre}/"
       tpre="${tsuf#*/}"
       tsuf=
