@@ -79,7 +79,7 @@ if (( long )); then
       # Using (( ... )) gives a parse error.
 
       let "$tmpargv[(I)(|\([^\)]#\))(|\*)${opt}(|[-+]|=(|-))(|\[*\])(|:*)]" ||
-          tmp=( "$tmp[@]" "$opt" )
+          tmp=( "$tmp[@]" "$lopts[(r)$opt(|=*)]" )
     done
     lopts=( "$tmp[@]" )
 
@@ -102,7 +102,7 @@ if (( long )); then
     # makes those options be completed without an argument description.
 
     set -- "$@" '*=FILE*:file:_files' \
-           '*=(DIR|PATH)*:directory:_files -/' '*: :  '
+           '*=(DIR|PATH)*:directory:_files -/' '*=*:=: ' '*: :  '
 
     while (( $# )); do
 
@@ -136,12 +136,19 @@ if (( long )); then
       tmpo=("${(@M)tmp:#*\[\=*}")
       if (( $#tmpo )); then
         tmp=("${(@)tmp:#*\[\=*}")
-        tmpo=("${(@)${(@)tmpo%%\=*}//[^a-z0-9-]}")
 
-        if [[ "$descr" = ::* ]]; then
-	  cache=( "$cache[@]" "${(@)^tmpo}=${dir}${descr}" )
+        if [[ "$descr" = :\=* ]]; then
+          for opt in "$tmpo[@]"; do
+            cache=( "$cache[@]"
+                    "${${opt%%\=*}//[^a-zA-Z0-9-]}=::${(L)${opt%\]}#*\=}: " )
+          done
         else
-	  cache=( "$cache[@]" "${(@)^tmpo}=${dir}:${descr}" )
+          tmpo=("${(@)${(@)tmpo%%\=*}//[^a-zA-Z0-9-]}")
+          if [[ "$descr" = ::* ]]; then
+	    cache=( "$cache[@]" "${(@)^tmpo}=${dir}${descr}" )
+          else
+	    cache=( "$cache[@]" "${(@)^tmpo}=${dir}:${descr}" )
+          fi
         fi
       fi
 
@@ -150,9 +157,17 @@ if (( long )); then
       tmpo=("${(@M)tmp:#*\=*}")
       if (( $#tmpo )); then
         tmp=("${(@)tmp:#*\=*}")
-        tmpo=("${(@)${(@)tmpo%%\=*}//[^a-z0-9-]}")
 
-	cache=( "$cache[@]" "${(@)^tmpo}=${dir}${descr}" )
+        if [[ "$descr" = :\=* ]]; then
+          for opt in "$tmpo[@]"; do
+            cache=( "$cache[@]"
+                    "${${opt%%\=*}//[^a-zA-Z0-9-]}=:${(L)${opt%\]}#*\=}: " )
+          done
+        else
+          tmpo=("${(@)${(@)tmpo%%\=*}//[^a-z0-9-]}")
+
+	  cache=( "$cache[@]" "${(@)^tmpo}=${dir}${descr}" )
+        fi
       fi
 
       # Everything else is just added as an option without arguments or

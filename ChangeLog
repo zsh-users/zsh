@@ -1,5 +1,10 @@
 2002-05-23  Sven Wischnowsky  <wischnow@zsh.org>
 
+	* 17214: Completion/Base/Utility/_arguments: for automatic long
+	options completion, use the string after the equal signs (from
+	the --help-text) as the description to shown when completing
+	after the option
+
 	* 17213: Completion/Base/Utility/_describe,
 	Completion/Zsh/Command/_zstyle, Doc/Zsh/compsys.yo: rename
 	max-match-length style to max-matches-width
