@@ -1,3 +1,7 @@
+2000-04-02  Peter Stephenson  <pws@pwstephenson.fsnet.co.uk>
+
+	* pws: Config/version.mk: 3.1.6-dev-21.
+
 2000-04-01  Peter Stephenson  <pws@pwstephenson.fsnet.co.uk>
 
 	* pws: 10376: LICENCE: new file, with licence as it appears
