@@ -1,3 +1,9 @@
+2003-05-02  Peter Stephenson  <pws@csr.com>
+
+	* 18496: Etc/MACHINES: Paul Ackersviller reports the curses
+	problem has gone on HP-UX 11 but --disable-dynamic is needed
+	for use with Softbench.
+
 2003-04-30  Oliver Kiddle  <opk@zsh.org>
 
 	* 18486: Completion/Base/Utility/_describe: back-out 18458

@@ -79,11 +79,15 @@ HP: HP-UX 9, 10.20, 11.0
 	  is reported to fix.  An attempt to fix this in configure
 	  is apparently ineffective; more information would be appreciated
 	  as the maintainers do not have access to an HP-UX system.
+	  Recent reports indicated this is not necessary on recent versions
+	  of HP-UX 11.
 
-	  Problems with dynamic loading have been reported, but
-	  this should compile using the standard dlopen() function set
-	  (rather than the 10.20 shl_load() function set).  More details of
-	  any difficulties would be appreciated.
+	  The configure option `--disable-dynamic' may be necessary when
+	  compiling on HP-UX 11 using Softbench.  Various problems with
+	  dynamic loading have been reported; this should compile using the
+	  standard dlopen() function set (rather than the 10.20 shl_load()
+	  function set).  More details of any difficulties would be
+	  appreciated.
 
 	  Compiling with gcc 2.7.1 is known to fail with header file
 	  conflicts.  Use the HP ANSI C compiler.
