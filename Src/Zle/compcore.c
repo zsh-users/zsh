@@ -420,7 +420,7 @@ do_completion(Hookdef dummy, Compldat dat)
 	cs = origcs;
     }
     /* Print the explanation strings if needed. */
-    if (!showinglist && validlist && usemenu != 2 && 
+    if (!showinglist && validlist && usemenu != 2 && uselist &&
 	(nmatches != 1 || diffmatches) &&
 	useline >= 0 && useline != 2 && (!oldlist || !listshown)) {
 	onlyexpl = 3;

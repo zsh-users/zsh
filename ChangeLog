@@ -1,3 +1,12 @@
+2001-07-10  Sven Wischnowsky  <wischnow@zsh.org>
+
+	* 15357: Completion/Base/Completer/_prefix, Src/Zle/compcore.c,
+	Src/Zle/zle_tricky.c: prefix completion: make e-o-c-p leave a
+	space before the cursor, make _prefix leave the cursor after
+	the inserted match even if only a single match; and make the
+	C-code not show explanation strings if the completion function
+	it doesn't want a list
+
 2001-07-10  Bart Schaefer  <schaefer@zsh.org>
 
 	* 15354: Doc/Zsh/arith.yo, Doc/Zsh/builtins.yo, Doc/Zsh/compat.yo,

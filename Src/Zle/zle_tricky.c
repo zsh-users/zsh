@@ -2363,6 +2363,8 @@ expandorcompleteprefix(char **args)
 
     comppref = 1;
     ret = expandorcomplete(args);
+    if (cs && line[cs - 1] == ' ')
+        makesuffixstr(NULL, "\\-", 0);
     comppref = 0;
     return ret;
 }
