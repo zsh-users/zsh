@@ -1,3 +1,8 @@
+2002-05-28  Oliver Kiddle  <opk@zsh.org>
+
+	* 17245: Completion/Unix/Command/_texinfo: add handling for
+	the other texinfo commands (besides info)
+
 2002-05-28  Clint Adams  <clint@zsh.org>
 
 	* 17244: Completion/Debian/Command/_dpkg:
