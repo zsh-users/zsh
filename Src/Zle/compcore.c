@@ -934,7 +934,7 @@ makecomplist(char *s, int incmd, int lst)
 	    amatches = lastmatches;
 	    lmatches = lastlmatches;
 	    if (pmatches) {
-		freematches(pmatches);
+		freematches(pmatches, 1);
 		pmatches = NULL;
 		hasperm = 0;
 	    }
@@ -943,7 +943,7 @@ makecomplist(char *s, int incmd, int lst)
 	    return 0;
 	}
 	if (lastmatches) {
-	    freematches(lastmatches);
+	    freematches(lastmatches, 1);
 	    lastmatches = NULL;
 	}
 	permmatches(1);
@@ -2793,7 +2793,7 @@ permmatches(int last)
 
 	    if (g->perm) {
 		g->perm->next = NULL;
-		freematches(g->perm);
+		freematches(g->perm, 0);
 	    }
 	    g->perm = n;
 
@@ -2909,7 +2909,7 @@ freematch(Cmatch m, int nbeg, int nend)
 
 /**/
 mod_export void
-freematches(Cmgroup g)
+freematches(Cmgroup g, int cm)
 {
     Cmgroup n;
     Cmatch *m;
@@ -2938,5 +2938,6 @@ freematches(Cmgroup g)
 
 	g = n;
     }
-    minfo.cur = NULL;
+    if (cm)
+	minfo.cur = NULL;
 }

@@ -1848,7 +1848,7 @@ ccmakehookfn(Hookdef dummy, struct ccmakedat *dat)
 	    amatches = lastmatches;
 	    lmatches = lastlmatches;
 	    if (pmatches) {
-		freematches(pmatches);
+		freematches(pmatches, 1);
 		pmatches = NULL;
 		hasperm = 0;
 	    }
@@ -1858,7 +1858,7 @@ ccmakehookfn(Hookdef dummy, struct ccmakedat *dat)
 	    return 0;
 	}
 	if (lastmatches) {
-	    freematches(lastmatches);
+	    freematches(lastmatches, 1);
 	    lastmatches = NULL;
 	}
 	permmatches(1);

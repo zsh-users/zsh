@@ -2206,7 +2206,7 @@ invalidate_list(void)
     if (validlist) {
 	if (showinglist == -2)
 	    zrefresh();
-	freematches(lastmatches);
+	freematches(lastmatches, 1);
 	lastmatches = NULL;
 	hasoldlist = 0;
     }

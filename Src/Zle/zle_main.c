@@ -1129,6 +1129,7 @@ setup_(Module m)
     /* miscellaneous initialisations */
     stackhist = stackcs = -1;
     kungetbuf = (char *) zalloc(kungetsz = 32);
+    comprecursive = 0;
 
     /* initialise the keymap system */
     init_keymaps();

@@ -145,6 +145,11 @@ mod_export char **cfargs;
 /**/
 mod_export int cfret;
 
+/* != 0 if recursive calls to completion are (temporarily) allowed */
+
+/**/
+mod_export int comprecursive;
+
 /* Find out if we have to insert a tab (instead of trying to complete). */
 
 /**/
@@ -540,11 +545,12 @@ docomplete(int lst)
     char *s, *ol;
     int olst = lst, chl = 0, ne = noerrs, ocs, ret = 0, dat[2];
 
-    if (active) {
+    if (active && !comprecursive) {
 	zwarn("completion cannot be used recursively (yet)", NULL, 0);
 	return 1;
     }
     active = 1;
+    comprecursive = 0;
     if (undoing)
 	setlastline();
 

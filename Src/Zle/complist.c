@@ -1812,6 +1812,7 @@ domenuselect(Hookdef dummy, Chdata dat)
 	    amatches = pmatches = lastmatches = NULL;
 	    invalidate_list();
 	    iforcemenu = 1;
+	    comprecursive = 1;
 	    menucomplete(zlenoargs);
 	    iforcemenu = 0;
 
@@ -1865,6 +1866,7 @@ domenuselect(Hookdef dummy, Chdata dat)
 	    s->origll = origll;
 	    accept_last();
 	    handleundo();
+	    comprecursive = 1;
 	    do_menucmp(0);
 	    mselect = (*(minfo.cur))->gnum;
 
@@ -1909,7 +1911,7 @@ domenuselect(Hookdef dummy, Chdata dat)
 	    mlbeg = u->mlbeg;
 	    if (u->lastmatches && lastmatches != u->lastmatches) {
 		if (lastmatches)
-		    freematches(lastmatches);
+		    freematches(lastmatches, 0);
 		amatches = u->amatches;
 		pmatches = u->pmatches;
 		lastmatches = u->lastmatches;
@@ -2236,6 +2238,7 @@ domenuselect(Hookdef dummy, Chdata dat)
 		   !strcmp(cmd->nam, "expand-or-complete-prefix") ||
 		   !strcmp(cmd->nam, "menu-complete") ||
 		   !strcmp(cmd->nam, "menu-expand-or-complete")) {
+	    comprecursive = 1;
 	    do_menucmp(0);
 	    mselect = (*(minfo.cur))->gnum;
 	    setwish = 1;
@@ -2243,6 +2246,7 @@ domenuselect(Hookdef dummy, Chdata dat)
 	    continue;
 	} else if (cmd == Th(z_reversemenucomplete) ||
 		   !strcmp(cmd->nam, "reverse-menu-complete")) {
+	    comprecursive = 1;
 	    reversemenucomplete(zlenoargs);
 	    mselect = (*(minfo.cur))->gnum;
 	    setwish = 1;
@@ -2265,7 +2269,7 @@ domenuselect(Hookdef dummy, Chdata dat)
     if (u)
 	for (; u; u = u->prev)
 	    if (u->lastmatches != lastmatches)
-		freematches(u->lastmatches);
+		freematches(u->lastmatches, 0);
 
     selectlocalmap(NULL);
     mselect = mlastcols = mlastlines = -1;
