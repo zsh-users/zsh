@@ -11,7 +11,7 @@
 emulate -L zsh
 setopt extendedglob
 
-local curcontext=:zle:delete-whole-word
+local curcontext=:zle:$WIDGET
 local -a matched_words
 # Start and end of range of characters to remove.
 integer pos1 pos2

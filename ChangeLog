@@ -1,5 +1,8 @@
 2003-10-13  Peter Stephenson  <pws@csr.com>
 
+	* 19185: Functions/Zle/delete-whole-word-match: Bart spotted
+	context was wrong.
+
 	* unposted: Completion/Unix/Command/_perforce: make it
 	easier to use add-on commands with _perforce.
 
