@@ -1,3 +1,8 @@
+2001-06-01  Sven Wischnowsky  <wischnow@zsh.org>
+
+	* 14630: Src/Zle/computil.c: fix for exclusion of normal
+	arguments
+
 2001-06-01  Andrej Borsenkow  <bor@zsh.org>
 
 	* unposted: Etc/MACHINES: Cygwin belongs now to Red Hat. Mention

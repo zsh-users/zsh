@@ -1130,9 +1130,11 @@ ca_get_arg(Cadef d, int n)
     if (d->argsactive) {
 	Caarg a = d->args;
 
-	while (a && (n < a->min || n > a->num))
+	while (a && (!a->active || n < a->min || n > a->num)) {
+            if (!a->active)
+                n++;
 	    a = a->next;
-
+        }
 	if (a && a->min <= n && a->num >= n && a->active)
 	    return a;
 
@@ -1154,7 +1156,7 @@ ca_inactive(Cadef d, char **xor, int cur, int opts, char *optname)
 	int sl = (d->set ? strlen(d->set) : -1), set = 0;
 
 	for (; (x = (opts ? "-" : *xor)); xor++) {
-            if (optname && strcmp(optname, x))
+            if (optname && optname[0] == x[0] && strcmp(optname, x))
                 continue;
 	    if (ca_xor)
 		addlinknode(ca_xor, x);
@@ -1403,7 +1405,8 @@ ca_parse_line(Cadef d, int multi, int first)
 	    if (!state.oargs[state.curopt->num])
 		state.oargs[state.curopt->num] = znewlinklist();
 
-	    if (ca_inactive(d, state.curopt->xor, cur, 0, state.curopt->name))
+	    if (ca_inactive(d, state.curopt->xor, cur, 0,
+                            (cur == compcurrent ? state.curopt->name : NULL)))
 		return 1;
 
 	    /* Collect the argument strings. Maybe. */
@@ -1456,7 +1459,8 @@ ca_parse_line(Cadef d, int multi, int first)
 		    if (!state.oargs[tmpopt->num])
 			state.oargs[tmpopt->num] = znewlinklist();
 
-		    if (ca_inactive(d, tmpopt->xor, cur, 0, tmpopt->name))
+		    if (ca_inactive(d, tmpopt->xor, cur, 0,
+                                    (cur == compcurrent ? tmpopt->name : NULL)))
 			return 1;
 		}
 	    }
@@ -1523,6 +1527,8 @@ ca_parse_line(Cadef d, int multi, int first)
 		break;
 	    }
 	    zaddlinknode(state.args, ztrdup(line));
+            if (adef)
+                state.oopt = adef->num - state.nth;
 
 	    if (state.def)
 		argxor = state.def->xor;
