@@ -971,13 +971,13 @@ prepnexthistent(void)
 static int
 should_ignore_line(Eprog prog)
 {
-    if (!prog)
-	return 0;
-
     if (isset(HISTIGNORESPACE)) {
 	if (*chline == ' ' || aliasspaceflag)
 	    return 1;
     }
+
+    if (!prog)
+	return 0;
 
     if (isset(HISTNOFUNCTIONS)) {
 	Wordcode pc = prog->prog;
