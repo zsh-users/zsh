@@ -1,5 +1,10 @@
 2001-06-21  Bart Schaefer  <schaefer@zsh.org>
 
+	* 15020: Completion/Zsh/Command/_cd, Completion/Zsh/Context/_autocd,
+	Completion/Zsh/Type/_command_names: When AUTO_CD is set, complete
+	directory names (including along cdpath) as well as commands when
+	in command position.
+
 	* 15018: Completion/compinit: Fix exit status of compdef.
 
 2001-06-20  Bart Schaefer  <schaefer@zsh.org>
