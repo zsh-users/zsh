@@ -26,7 +26,7 @@ case $service in
     info=( $info {(kv)opt_args[(I)(-d|--directory|-f|--file)]} )
   ;;
   install-info)
-    if _pick_variant debian=Debian gnu --version; then
+    if [[ $(_call_program version $words[1] --version 2>&1) = *Debian* ]]; then
       _arguments -S \
         '(* -)--help[display help information]' \
         '(* -)--version[display version information]' \

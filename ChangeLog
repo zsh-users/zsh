@@ -1,3 +1,8 @@
+2003-08-06  Oliver Kiddle  <opk@zsh.org>
+
+	* unposted: Completion/Unix/Command/_texinfo: remove usage of 4.1
+	specific feature
+
 2003-08-01  Peter Stephenson  <pws@csr.com>
 
 	* 18920: Src/utils.c, Completion/Core/Base/_main_complete: update
