@@ -350,6 +350,7 @@ struct cldata {
     int nlist;			/* number of matches to list */
     int nlines;			/* number of lines needed */
     int hidden;			/* != 0 if there are hidden matches */
+    int onlyexpl;		/* != 0 if only explanations to print */
 };
 
 typedef void (*CLPrintFunc)(Cmgroup, Cmatch *, int, int, int, int,
@@ -440,8 +441,10 @@ struct chdata {
 #define CP_OLDINS      (1 << CPN_OLDINS)
 #define CPN_VARED      24
 #define CP_VARED       (1 << CPN_VARED)
-#define CPN_NNMATCHES  25
-#define CP_NNMATCHES   (1 << CPN_NNMATCHES)
+#define CPN_ANMATCHES  25
+#define CP_ANMATCHES   (1 << CPN_ANMATCHES)
+#define CPN_LISTLINES  26
+#define CP_LISTLINES   (1 << CPN_LISTLINES)
 
-#define CP_KEYPARAMS   26
-#define CP_ALLKEYS     ((unsigned int) 0xffffff)
+#define CP_KEYPARAMS   27
+#define CP_ALLKEYS     ((unsigned int) 0x7ffffff)

@@ -184,10 +184,13 @@ When completing inside quotes, this contains the quotation character
 is unset.
 )
 item(tt(nmatches))(
-The number of matches generated and accepted by the completion code so far.
+The number of matches generated and accepted by the completion code so
+far, excluding those matches that are only accepted by ignoring the
+tt(fignore) parameter and the tt(-a) option of the tt(compadd) builtin 
+command.
 )
-item(tt(normal_nmatches))(
-Like tt(nmatches), but counts only matches in the normal set. I.e. file
+item(tt(alternate_nmatches))(
+Like tt(nmatches), but counts only matches in the alternate set. I.e. file
 names with one of the suffixes from the tt(fignore) array and matches
 put into the alternate set using the tt(-a) option of the tt(compadd)
 builtin command (see below) are not counted.
@@ -216,11 +219,14 @@ sets it to any other string, they will not be restored.
 )
 item(tt(list))(
 This controls whether or how the list of matches will be displayed.  If it
-is unset or empty they will never be listed; if is set to tt(list), they
-will always be listed; if tt(autolist) or tt(ambiguous), they will be
-listed when the tt(AUTO_LIST) or tt(LIST_AMBIGUOUS) options respectively
-would normally cause them to be.  It will be set appropriately on entry to
-a completion widget and may be changed there.
+is unset or empty they will never be listed; if its value begins with
+tt(list), they will always be listed; if it begins with tt(autolist)
+or tt(ambiguous), they will be listed when the tt(AUTO_LIST) or
+tt(LIST_AMBIGUOUS) options respectively would normally cause them to
+be.  Finally, if the value contains the string tt(explanations), only
+the explanation strings, if any, will be listed. It will be set
+appropriately on entry to a completion widget and may be changed
+there.
 )
 item(tt(force_list))(
 If the value for the tt(list) key is tt(autolist) or tt(ambiguous), the list will
@@ -232,6 +238,13 @@ item(tt(list_max))(
 Initially this is set to the value of the tt(LISTMAX) parameter.
 It may be set to any other numeric value; when the widget exits this value
 will be used in the same way as the value of tt(LISTMAX).
+)
+item(tt(list_lines))(
+This gives the number of lines that are needed to display the full
+list of completions. Note that to calculate the total number of lines
+to display you need to add the number of lines needed for the command
+line to this value, this is available as the value of the tt(BLINES)
+special parameter.
 )
 item(tt(last_prompt))(
 If this is set to an non-empty string, the completion code will move

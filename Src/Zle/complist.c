@@ -525,9 +525,9 @@ struct menustack {
     char *line;
     char *brbeg;
     char *brend;
-    int cs, acc;
+    int cs, acc, nmatches;
     struct menuinfo info;
-    Cmgroup amatches, pmatches, lmatches;
+    Cmgroup amatches, pmatches, lastmatches, lastlmatches;
 };
 
 static int
@@ -538,7 +538,7 @@ domenuselect(Hookdef dummy, Chdata dat)
     Cmgroup *pg;
     Thingy cmd;
     Menustack u = NULL;
-    int i = 0, acc = 0, wishcol = 0, setwish = 0;
+    int i = 0, acc = 0, wishcol = 0, setwish = 0, oe = onlyexpl;
     char *s;
 
     HEAPALLOC {
@@ -555,6 +555,7 @@ domenuselect(Hookdef dummy, Chdata dat)
 	noselect = 0;
 	mselect = (*(minfo.cur))->gnum;
 	for (;;) {
+	    onlyexpl = 0;
 	    showinglist = -2;
 	    zrefresh();
 	    inselect = 1;
@@ -601,18 +602,23 @@ domenuselect(Hookdef dummy, Chdata dat)
 		memcpy(&(s->info), &minfo, sizeof(struct menuinfo));
 		s->amatches = amatches;
 		s->pmatches = pmatches;
-		s->lmatches = lmatches;
+		s->lastmatches = lastmatches;
+		s->lastlmatches = lastlmatches;
 		s->acc = menuacc;
 		s->brbeg = dupstring(brbeg);
 		s->brend = dupstring(brend);
+		s->nmatches = nmatches;
 		menucmp = menuacc = 0;
 		fixsuffix();
 		validlist = 0;
-		pmatches = NULL;
+		amatches = pmatches = lastmatches = NULL;
 		invalidatelist();
-		menucomplete(zlenoargs);
+		PERMALLOC {
+		    menucomplete(zlenoargs);
+		} LASTALLOC;
 		if (dat->num < 2 || !minfo.cur || !*(minfo.cur)) {
 		    noselect = clearlist = listshown = 1;
+		    onlyexpl = 0;
 		    zrefresh();
 		    break;
 		}
@@ -629,10 +635,12 @@ domenuselect(Hookdef dummy, Chdata dat)
 		s->line = dupstring((char *) line);
 		s->cs = cs;
 		memcpy(&(s->info), &minfo, sizeof(struct menuinfo));
-		s->amatches = s->pmatches = s->lmatches = NULL;
+		s->amatches = s->pmatches =
+		    s->lastmatches = s->lastlmatches = NULL;
 		s->acc = menuacc;
 		s->brbeg = dupstring(brbeg);
 		s->brend = dupstring(brend);
+		s->nmatches = nmatches;
 		acceptlast();
 		do_menucmp(0);
 		mselect = (*(minfo.cur))->gnum;
@@ -652,12 +660,15 @@ domenuselect(Hookdef dummy, Chdata dat)
 		menuacc = u->acc;
 		memcpy(&minfo, &(u->info), sizeof(struct menuinfo));
 		p = &(minfo.cur);
-		if (u->pmatches && pmatches != u->pmatches) {
-		    freematches();
+		if (u->lastmatches && lastmatches != u->lastmatches) {
+		    if (lastmatches)
+			freematches(lastmatches);
 		    amatches = u->amatches;
 		    pmatches = u->pmatches;
-		    lmatches = u->lmatches;
-		    hasperm = 1;
+		    lastmatches = u->lastmatches;
+		    lastlmatches = u->lastlmatches;
+		    nmatches = u->nmatches;
+		    hasoldlist = 1;
 		}
 		zsfree(brbeg);
 		zsfree(brend);
@@ -666,6 +677,7 @@ domenuselect(Hookdef dummy, Chdata dat)
 		u = u->prev;
 		clearlist = 1;
 		setwish = 1;
+		listdat.valid = 0;
 	    } else if (cmd == Th(z_redisplay)) {
 		redisplay(zlenoargs);
 		continue;
@@ -819,19 +831,11 @@ domenuselect(Hookdef dummy, Chdata dat)
 	    do_single(**p);
 	    mselect = (**p)->gnum;
 	}
-	if (u) {
-	    int hp = hasperm;
-	    Cmgroup m = pmatches;
+	if (u)
+	    for (; u; u = u->prev)
+		if (u->lastmatches != lastmatches)
+		    freematches(u->lastmatches);
 
-	    for (; u; u = u->prev) {
-		if (u->pmatches != m) {
-		    pmatches = u->pmatches;
-		    freematches();
-		}
-	    }
-	    pmatches = m;
-	    hasperm = hp;
-	}
 	selectlocalmap(NULL);
 	mselect = -1;
 	inselect = 0;
@@ -842,6 +846,7 @@ domenuselect(Hookdef dummy, Chdata dat)
 	}
 	if (!noselect) {
 	    showinglist = -2;
+	    onlyexpl = oe;
 	    zrefresh();
 	}
 	fdat = NULL;

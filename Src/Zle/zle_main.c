@@ -979,6 +979,9 @@ setup_zle(Module m)
     getcpatptr = getcpat;
     makecomplistcallptr = makecomplistcall;
     makecomplistctlptr = makecomplistctl;
+    num_matchesptr = num_matches;
+    list_linesptr = list_lines;
+    comp_listptr = comp_list;
     unambig_dataptr = unambig_data;
     set_comp_sepptr = set_comp_sep;
 
@@ -1059,6 +1062,9 @@ finish_zle(Module m)
     getcpatptr = NULL;
     makecomplistcallptr = NULL;
     makecomplistctlptr = NULL;
+    num_matchesptr = NULL;
+    list_linesptr = NULL;
+    comp_listptr = NULL;
     unambig_dataptr = NULL;
     set_comp_sepptr = NULL;
 

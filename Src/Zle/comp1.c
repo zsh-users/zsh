@@ -67,6 +67,15 @@ int (*makecomplistcallptr) _((Compctl));
 int (*makecomplistctlptr) _((int));
 
 /**/
+zlong (*num_matchesptr) _((int));
+
+/**/
+zlong (*list_linesptr) _((void));
+
+/**/
+void (*comp_listptr) _((char *));
+
+/**/
 char *(*unambig_dataptr) _((int *));
 
 /**/
@@ -104,11 +113,10 @@ int incompfunc;
 
 /**/
 zlong compcurrent,
-      compnmatches,
-      compnnmatches,
       compmatcher,
       compmatchertot,
-      complistmax;
+      complistmax,
+      complistlines;
 
 /**/
 char **compwords,

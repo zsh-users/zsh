@@ -1,7 +1,6 @@
-# incremental-complete-word() {
-
 # Autoload this function, run `zle -N <func-name>' and bind <func-name>
 # to a key.
+
 
 # This allows incremental completion of a word.  After starting this
 # command, a list of completion choices can be shown after every character
@@ -23,10 +22,12 @@
 #    such a common prefix, respectively. The sequence `%c' is replaced
 #    by the name of the completer function that generated the matches
 #    (without the leading underscore). Finally, `%n' is replaced by the
-#    number of matches generated and `%a' is replaced by an empty string
+#    number of matches generated, `%a' is replaced by an empty string
 #    if the matches are in the normal set (i.e. the one without file names
 #    with one of the suffixes from `fignore') and with ` -alt-' if the
-#    matches are in the alternate set.
+#    matches are in the alternate set, and if the `incremental_list' key
+#    (see below) is set, `%l' is replaced by `...' if the list of matches
+#    is too long to fit on the screen and with an empty string otherwise.
 #
 #  incremental_stop
 #    Pattern matching keys which will cause icompletion to stop and the
@@ -44,68 +45,37 @@
 #    key-press.
 
 
-emulate -L zsh
-unsetopt autolist menucomplete automenu # doesn't work well
+# The main widget function.
 
-local key lbuf="$LBUFFER" rbuf="$RBUFFER" pmpt word
-local lastl lastr wid twid num alt
+incremental-complete-word() {
+  emulate -L zsh
+  unsetopt autolist menucomplete automenu # doesn't work well
 
-[[ -n "$compconfig[incremental_completer]" ]] &&
-    set ${(s.:.)compconfig[incremental_completer]}
-pmpt="${compconfig[incremental_prompt]-incremental (%c): %u%s}"
+  local key lbuf="$LBUFFER" rbuf="$RBUFFER" pmpt word
+  local lastl lastr wid twid num alt post toolong
 
-if [[ -n "$compconfig[incremental_list]" ]]; then
-  wid=list-choices
-else
-  wid=complete-word
-fi
+  [[ -n "$compconfig[incremental_completer]" ]] &&
+      set ${(s.:.)compconfig[incremental_completer]}
+  pmpt="${compconfig[incremental_prompt]-incremental (%c): %u%s  %l}"
 
-zle $wid "$@"
-LBUFFER="$lbuf"
-RBUFFER="$rbuf"
-if (( ! _lastcomp[nmatches] )); then
-  word=''
-  state='-no match-'
-elif [[ "${LBUFFER}${RBUFFER}" = *${_lastcomp[unambiguous]}* ]]; then
-  word=''
-  state='-no prefix-'
-else
-  word="${_lastcomp[unambiguous]}"
-  state=''
-fi
-num=$_lastcomp[normal_nmatches]
-if (( ! num )); then
-  num="${_lastcomp[nmatches]}"
-  alt=' -alt-'
-fi
-zle -R "${${${${${pmpt//\\%u/$word}//\\%s/$state}//\\%c/${_lastcomp[completer][2,-1]}}//\\%n/$num}//\\%a/$alt}"
-read -k key
-
-while [[ '#key' -ne '#\\r' && '#key' -ne '#\\n' &&
-         '#key' -ne '#\\C-g' ]]; do
-  twid=$wid
-  if [[ "$key" = ${~compconfig[incremental_stop]} ]]; then
-    zle -U "$key"
-    return
-  elif [[ "$key" = ${~compconfig[incremental_break]} ]]; then
-    return
-  elif [[ '#key' -eq '#\\C-h' || '#key' -eq '#\\C-?' ]]; then
-    [[ $#LBUFFER -gt $#l ]] && LBUFFER="$LBUFFER[1,-2]"
-  elif [[ '#key' -eq '#\\t' ]]; then
-    zle complete-word "$@"
-    lbuf="$LBUFFER"
-    rbuf="$RBUFFER"
-  elif [[ '#key' -eq '#\\C-d' ]]; then
-    twid=list-choices
+  if [[ -n "$compconfig[incremental_list]" ]]; then
+    wid=list-choices
+    post=( icw-list-helper )
   else
-    LBUFFER="$LBUFFER$key"
+    wid=complete-word
+    post=()
   fi
-  lastl="$LBUFFER"
-  lastr="$RBUFFER"
-  zle $twid "$@"
-  LBUFFER="$lastl"
-  RBUFFER="$lastr"
-  if (( ! _lastcomp[nmatches] )); then
+
+  comppostfuncs=( "$post[@]" )
+  zle $wid "$@"
+  LBUFFER="$lbuf"
+  RBUFFER="$rbuf"
+  num=$_lastcomp[nmatches]
+  if (( ! num )); then
+    num="${_lastcomp[alternate_nmatches]}"
+    alt=' -alt-'
+  fi
+  if (( ! num )); then
     word=''
     state='-no match-'
   elif [[ "${LBUFFER}${RBUFFER}" = *${_lastcomp[unambiguous]}* ]]; then
@@ -115,20 +85,78 @@ while [[ '#key' -ne '#\\r' && '#key' -ne '#\\n' &&
     word="${_lastcomp[unambiguous]}"
     state=''
   fi
-  num=$_lastcomp[normal_nmatches]
-  if (( ! num )); then
-    num="${_lastcomp[nmatches]}"
-    alt=' -alt-'
-  else
-    alt=''
-  fi
-  zle -R "${${${${${pmpt//\\%u/$word}//\\%s/$state}//\\%c/${_lastcomp[completer][2,-1]}}//\\%n/$num}//\\%a/$alt}"
+  zle -R "${${${${${${pmpt//\\%u/$word}//\\%s/$state}//\\%c/${_lastcomp[completer][2,-1]}}//\\%n/$num}//\\%a/$alt}//\\%l/$toolong}"
   read -k key
-done
 
-if [[ '#key' -eq '#\\C-g' ]]; then
-  LBUFFER="$lbuf"
-  RBUFFER="$rbuf"
-fi
-zle -Rc
-# }
+  while [[ '#key' -ne '#\\r' && '#key' -ne '#\\n' &&
+           '#key' -ne '#\\C-g' ]]; do
+    twid=$wid
+    if [[ "$key" = ${~compconfig[incremental_stop]} ]]; then
+      zle -U "$key"
+      return
+    elif [[ "$key" = ${~compconfig[incremental_break]} ]]; then
+      return
+    elif [[ '#key' -eq '#\\C-h' || '#key' -eq '#\\C-?' ]]; then
+      [[ $#LBUFFER -gt $#l ]] && LBUFFER="$LBUFFER[1,-2]"
+    elif [[ '#key' -eq '#\\t' ]]; then
+      zle complete-word "$@"
+      lbuf="$LBUFFER"
+      rbuf="$RBUFFER"
+    elif [[ '#key' -eq '#\\C-d' ]]; then
+      twid=list-choices
+    else
+      LBUFFER="$LBUFFER$key"
+    fi
+    lastl="$LBUFFER"
+    lastr="$RBUFFER"
+    [[ "$twid" = "$wid" ]] && comppostfuncs=( "$post[@]" )
+    toolong=''
+    zle $twid "$@"
+    LBUFFER="$lastl"
+    RBUFFER="$lastr"
+    num=$_lastcomp[nmatches]
+    if (( ! num )); then
+      num="${_lastcomp[alternate_nmatches]}"
+      alt=' -alt-'
+    else
+      alt=''
+    fi
+    if (( ! num )); then
+      word=''
+      state='-no match-'
+    elif [[ "${LBUFFER}${RBUFFER}" = *${_lastcomp[unambiguous]}* ]]; then
+      word=''
+      state='-no prefix-'
+    else
+      word="${_lastcomp[unambiguous]}"
+      state=''
+    fi
+    zle -R "${${${${${${pmpt//\\%u/$word}//\\%s/$state}//\\%c/${_lastcomp[completer][2,-1]}}//\\%n/$num}//\\%a/$alt}//\\%l/$toolong}"
+    read -k key
+  done
+
+  if [[ '#key' -eq '#\\C-g' ]]; then
+    LBUFFER="$lbuf"
+    RBUFFER="$rbuf"
+  fi
+  zle -Rc
+}
+
+# Helper function used as a completion post-function used to make sure that
+# the list of matches in only shown if it fits on the screen.
+
+icw-list-helper() {
+
+  # +1 for the status line we will add...
+
+  if [[ compstate[list_lines]+BUFFERLINES+1 -gt LINES ]]; then
+    compstate[list]='list explanations'
+    if [[ compstate[list_lines]+BUFFERLINES+1 -gt LINES ]]; then
+      compstate[list]=''
+      compstate[force_list]=yes
+    fi
+    toolong='...'
+  fi
+}
+
+incremental-complete-word "$@"

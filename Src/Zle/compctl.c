@@ -2249,7 +2249,7 @@ static struct compparam comprparams[] = {
 };
 
 static struct compparam compkparams[] = {
-    { "nmatches", PM_INTEGER, VAL(compnmatches), NULL, NULL },
+    { "nmatches", PM_INTEGER | PM_READONLY, NULL, NULL, VAL(get_nmatches) },
     { "matcher", PM_INTEGER, VAL(compmatcher), NULL, NULL },
     { "matcher_string", PM_SCALAR, VAL(compmatcherstr), NULL, NULL },
     { "total_matchers", PM_INTEGER, VAL(compmatchertot), NULL, NULL },
@@ -2259,7 +2259,7 @@ static struct compparam compkparams[] = {
     { "quote", PM_SCALAR | PM_READONLY, VAL(compquote), NULL, NULL },
     { "quoting", PM_SCALAR | PM_READONLY, VAL(compquoting), NULL, NULL },
     { "restore", PM_SCALAR, VAL(comprestore), NULL, NULL },
-    { "list", PM_SCALAR, VAL(complist), NULL, NULL },
+    { "list", PM_SCALAR, NULL, VAL(set_complist), VAL(get_complist) },
     { "force_list", PM_SCALAR, VAL(compforcelist), NULL, NULL },
     { "insert", PM_SCALAR, VAL(compinsert), NULL, NULL },
     { "exact", PM_SCALAR, VAL(compexact), NULL, NULL },
@@ -2275,7 +2275,8 @@ static struct compparam compkparams[] = {
     { "old_list", PM_SCALAR, VAL(compoldlist), NULL, NULL },
     { "old_insert", PM_SCALAR, VAL(compoldins), NULL, NULL },
     { "vared", PM_SCALAR, VAL(compvared), NULL, NULL },
-    { "normal_nmatches", PM_INTEGER, VAL(compnnmatches), NULL, NULL },
+    { "alternate_nmatches", PM_INTEGER | PM_READONLY, NULL, NULL, VAL(get_anmatches) },
+    { "list_lines", PM_INTEGER | PM_READONLY, NULL, NULL, VAL(get_listlines) },
     { NULL, 0, NULL, NULL, NULL }
 };
 
@@ -2380,6 +2381,41 @@ set_compstate(Param pm, HashTable ht)
 		    break;
 		}
     deleteparamtable(ht);
+}
+
+/**/
+static zlong
+get_nmatches(Param pm)
+{
+    return num_matchesptr(1);
+}
+
+/**/
+static zlong
+get_anmatches(Param pm)
+{
+    return num_matchesptr(0);
+}
+
+/**/
+static zlong
+get_listlines(Param pm)
+{
+    return list_linesptr();
+}
+
+/**/
+static void
+set_complist(Param pm, char *v)
+{
+    comp_listptr(v);
+}
+
+/**/
+static char *
+get_complist(Param pm)
+{
+    return complist;
 }
 
 /**/

@@ -318,6 +318,12 @@ of the completer functions to decide if other completers should be
 called. If the return value is zero, no other completers are tried and the
 tt(_main_complete) function returns.
 
+Immediately before returning the tt(_main_complete) function calls all
+functions whose names are given in the tt(comppostfuncs) array and
+then resets it to an empty array. This can be used by completion
+functions or by other ZLE widgets calling completion to register code
+that is to be executed after all matches have been added.
+
 The widget function tt(_main_complete) also uses the configuration key 
 tt(last_prompt). If this is set to tt(always), the cursor is moved up
 to the last prompt after printing a list of matches even if a numeric
@@ -1718,10 +1724,14 @@ common prefix different from the word on the line or if there is such
 a common prefix, respectively. The sequence `tt(%c)' is replaced by
 the name of the completer function that generated the matches (without
 the leading underscore). Finally, `tt(%n)' is replaced by the number
-of matches generated and `tt(%a)' is replaced by an empty string if
+of matches generated, `tt(%a)' is replaced by an empty string if
 the matches are in the normal set (i.e. the one without file names
 with one of the suffixes from the tt(fignore) array) and with `tt(
--alt-)' if the matches are in the alternate set.
+-alt-)' if the matches are in the alternate set, and if the
+tt(incremental_list) key (see below) is set, `tt(%l)' is replaced by
+`tt(...)' if the list of matches is too long to fit on the screen and
+with an empty string otherwise. If tt(incremental_list) is not set or
+set to an empty string, `tt(%l)' will always be removed.
 )
 item(tt(incremental_stop))(
 This gives a pattern matching (keyboard-) keys which will cause

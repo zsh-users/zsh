@@ -73,6 +73,8 @@ static struct zleparam {
         unset_numeric, NULL },
     { "HISTNO", PM_INTEGER | PM_READONLY, NULL, FN(get_histno),
         zleunsetfn, NULL },
+    { "BUFFERLINES", PM_INTEGER | PM_READONLY, NULL, FN(get_bufferlines),
+        zleunsetfn, NULL },
     { NULL, 0, NULL, NULL, NULL, NULL }
 };
 
@@ -284,4 +286,11 @@ static zlong
 get_histno(Param pm)
 {
     return histline;
+}
+
+/**/
+static zlong
+get_bufferlines(Param pm)
+{
+    return nlnct;
 }
