@@ -267,8 +267,8 @@ newparamtable(int size, char const *name)
     ht->emptytable  = emptyhashtable;
     ht->filltable   = NULL;
     ht->addnode     = addhashnode;
-    ht->getnode     = gethashnode2;
-    ht->getnode2    = gethashnode2;
+    ht->getnode     = getparamnode;
+    ht->getnode2    = getparamnode;
     ht->removenode  = removehashnode;
     ht->disablenode = NULL;
     ht->enablenode  = NULL;
@@ -276,6 +276,23 @@ newparamtable(int size, char const *name)
     ht->printnode   = printparamnode;
 
     return ht;
+}
+
+/**/
+static HashNode
+getparamnode(HashTable ht, char *nam)
+{
+    HashNode hn = gethashnode2(ht, nam);
+    Param pm = (Param) hn;
+
+    if (pm && pm->u.str && (pm->flags & PM_AUTOLOAD)) {
+	char *mn = dupstring(pm->u.str);
+
+	if (!load_module(mn))
+	    return NULL;
+	hn = gethashnode2(ht, nam);
+    }
+    return hn;
 }
 
 /* Copy a parameter hash table */
@@ -542,7 +559,7 @@ createparam(char *name, int flags)
     Param pm, oldpm;
 
     if (name != nulstring) {
-	oldpm = (Param) paramtab->getnode(paramtab, name);
+	oldpm = (Param) gethashnode2(paramtab, name);
 
 	if (oldpm && oldpm->level == locallevel) {
 	    if (!(oldpm->flags & PM_UNSET) || (oldpm->flags & PM_SPECIAL)) {
@@ -2698,7 +2715,7 @@ printparamnode(HashNode hn, int printflags)
     Param p = (Param) hn;
     char *t, **u;
 
-    if (p->flags & PM_UNSET)
+    if (p->flags & (PM_UNSET | PM_AUTOLOAD))
 	return;
 
     /* Print the attributes of the parameter */

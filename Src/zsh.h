@@ -231,6 +231,7 @@ typedef struct hashtable *HashTable;
 typedef struct reswd     *Reswd;
 typedef struct alias     *Alias;
 typedef struct param     *Param;
+typedef struct paramdef  *Paramdef;
 typedef struct cmdnam    *Cmdnam;
 typedef struct shfunc    *Shfunc;
 typedef struct funcwrap  *FuncWrap;
@@ -850,6 +851,7 @@ struct module {
 
 #define MOD_BUSY    (1<<0)
 #define MOD_UNLOAD  (1<<1)
+#define MOD_SETUP   (1<<2)
 
 /* node used in parameter hash table (paramtab) */
 
@@ -923,6 +925,7 @@ struct param {
 #define PM_RESTRICTED	(1<<15) /* cannot be changed in restricted mode       */
 #define PM_UNSET	(1<<16)	/* has null value                             */
 #define PM_REMOVABLE	(1<<17)	/* special can be removed from paramtab */
+#define PM_AUTOLOAD     (1<<18) /* autoloaded from module */
 
 /* Flags for extracting elements of arrays and associative arrays */
 #define SCANPM_WANTVALS   (1<<0)
@@ -954,6 +957,27 @@ struct param {
 #define PF_TYPESET	0x01	/* argument handled like typeset foo=bar */
 #define PF_ASSIGN	0x02	/* argument handled like the RHS of foo=bar */
 #define PF_SINGLE	0x04	/* single word substitution */
+
+struct paramdef {
+    char *name;
+    int flags;
+    void *var;
+    void *set;
+    void *get;
+    void *unset;
+};
+
+#define PARAMDEF(name, flags, var, set, get, unset) \
+    { name, flags, (void *) var, (void *) set, (void *) get, (void *) unset }
+#define INTPARAMDEF(name, var) \
+    { name, PM_INTEGER, (void *) var, (void *) intvarsetfn, \
+      (void *) intvargetfn, (void *) stdunsetfn }
+#define STRPARAMDEF(name, var) \
+    { name, PM_SCALAR, (void *) var, (void *) strvarsetfn, \
+      (void *) strvargetfn, (void *) stdunsetfn }
+#define ARRPARAMDEF(name, var) \
+    { name, PM_ARRAY, (void *) var, (void *) arrvarsetfn, \
+      (void *) arrvargetfn, (void *) stdunsetfn }
 
 /* node for named directory hash table (nameddirtab) */
 
