@@ -1,3 +1,8 @@
+2000-06-17  Bart Schaefer  <schaefer@zsh.org>
+
+	* 11961: Src/subst.c: 11959 was really a bug in magicequalsubst,
+	it shouldn't have treated x:=y as a reason to expand =y.
+
 2000-06-17  Tanaka Akira  <akr@zsh.org>
 
 	* 11959: Completion/User/_urls: make it magicequalsubst aware.

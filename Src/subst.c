@@ -307,7 +307,7 @@ multsub(char **s, char ***a, int *isarr, char *sep)
 mod_export void
 filesub(char **namptr, int assign)
 {
-    char *sub = NULL, *str, *ptr;
+    char *eql = NULL, *sub = NULL, *str, *ptr;
     int len;
 
     filesubstr(namptr, assign);
@@ -316,7 +316,7 @@ filesub(char **namptr, int assign)
 	return;
 
     if (assign & PF_TYPESET) {
-	if ((*namptr)[1] && (sub = strchr(*namptr + 1, Equals))) {
+	if ((*namptr)[1] && (eql = sub = strchr(*namptr + 1, Equals))) {
 	    str = sub + 1;
 	    if ((sub[1] == Tilde || sub[1] == Equals) && filesubstr(&str, assign)) {
 		sub[1] = '\0';
@@ -330,7 +330,9 @@ filesub(char **namptr, int assign)
     while ((sub = strchr(ptr, ':'))) {
 	str = sub + 1;
 	len = sub - *namptr;
-	if ((sub[1] == Tilde || sub[1] == Equals) && filesubstr(&str, assign)) {
+	if (sub > eql &&
+	    (sub[1] == Tilde || sub[1] == Equals) &&
+	    filesubstr(&str, assign)) {
 	    sub[1] = '\0';
 	    *namptr = dyncat(*namptr, str);
 	}
