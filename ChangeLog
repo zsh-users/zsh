@@ -1,3 +1,8 @@
+2001-06-27  Peter Stephenson  <pws@pwstephenson.fsnet.co.uk>
+
+	* 15151: zshconfig.ac: enable-sitefndir should have been
+	enable-site-fndir, spotted by Jos Backus.
+
 2001-06-27  Sven Wischnowsky  <wischnow@zsh.org>
 
 	* 15123: Src/Zle/compmatch.c: (only the patch to compmatch.c

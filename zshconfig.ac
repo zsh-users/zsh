@@ -223,7 +223,7 @@ else
 fi], [fndir=${datadir}/${tzsh_name}/'${VERSION}'/functions])
 
 ifdef([sitefndir],[undefine([sitefndir])])dnl
-AC_ARG_ENABLE(sitefndir,
+AC_ARG_ENABLE(site-fndir,
 [  --enable-site-fndir=DIR    same for site functions (not version specific)],
 [if test $enableval = yes; then
   sitefndir=${datadir}/${tzsh_name}/site-functions
