@@ -20,10 +20,26 @@
 	* 21045: Src/Zle/compcore.c, Src/Zle/complete.c: more places
 	where completion didn't handled Meta characters.
 
+2005-03-21  Peter Stephenson  <pws@csr.com>
+
+	* 21042: Src/Zle/zle_main.c, Doc/Zsh/zle.yo: test for and
+	document limitation that execute-named-comand and
+	execute-last-named-command can't be redefined or called by name.
+
+2005-03-18  Peter Stephenson  <pws@csr.com>
+
+	* zsh-users/8609: Doc/Zsh/expn.yo: document order of (u), (o)
+	and (O) parameter expansion flags.
+
 2005-03-16  Peter Stephenson  <pws@csr.com>
 
 	* 20983: Test/D02glob.ztst, Src/glob.c: fixed string segments
 	in globbed paths could be copied wrongly, resulting in failed globs.
+
+2005-03-15  Peter Stephenson  <pws@csr.com>
+
+	* 20978: Src/zle_main.c: don't propagate EOFs from recursive
+	edit.
 
 2005-03-10  Peter Stephenson  <pws@csr.com>
 
@@ -57,6 +73,10 @@
 	* 20917: Completion/Unix/Command/_make: Don't try to expand
 	a single-character Makefile variable if it is a digit.  Avoids
 	an infinite recursion from a Makefile referencing $1.
+
+2005-02-28  Philippe Troin  <phil@fifi.org>
+
+	* 20886: configure.ac: Use TTOU with trap rather than SIGTTOU.
 
 2005-02-25  Oliver Kiddle  <opk@zsh.org>
 

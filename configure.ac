@@ -1862,7 +1862,7 @@ esac],[zsh_working_tcsetpgrp=check])
 if test "x$ac_cv_func_tcsetpgrp" = xyes; then
 case "x$zsh_working_tcsetpgrp" in
   xcheck)
-    trap "" SIGTTOU > /dev/null 2>&1 || :
+    ( trap "" SIGTTOU > /dev/null 2>&1 ) && trap "" SIGTTOU > /dev/null 2>&1 
     AC_CACHE_CHECK(if tcsetpgrp() actually works,
     zsh_cv_sys_tcsetpgrp,
     [AC_TRY_RUN([
@@ -1893,7 +1893,7 @@ esac
 Try running configure with --with-tcsetpgrp or --without-tcsetpgrp]);;
       *)      AC_MSG_ERROR([unexpected return status]);;
     esac
-    trap - SIGTTOU > /dev/null 2>&1 || :
+    ( trap - SIGTTOU > /dev/null 2>&1 ) && trap - SIGTTOU > /dev/null 2>&1 
     ;;
   xyes) :;;
   xno)  AC_DEFINE(BROKEN_TCSETPGRP);;

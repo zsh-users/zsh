@@ -2,6 +2,7 @@ texinode(Zsh Line Editor)(Completion Widgets)(Shell Builtin Commands)(Top)
 chapter(Zsh Line Editor)
 cindex(line editor)
 cindex(editor, line)
+cindex(ZLE)
 sect(Description)
 pindex(ZLE, use of)
 If the tt(ZLE) option is set (which it is by default in interactive shells)
@@ -19,6 +20,22 @@ cindex(editor ksh style)
 This mode
 is similar to bf(ksh), and uses no termcap sequences.  If tt(TERM) is
 "emacs", the tt(ZLE) option will be unset by default.
+
+vindex(BAUD, use of)
+vindex(COLUMNS, use of)
+vindex(LINES, use of)
+The parameters tt(BAUD), tt(COLUMNS), and tt(LINES) are also used by the
+line editor.
+ifzman(See em(Parameters Used By The Shell) in zmanref(zshparam))\
+ifnzman(noderef(Parameters Used By The Shell)).
+
+startmenu()
+menu(Keymaps)
+menu(Zle Builtins)
+menu(Zle Widgets)
+endmenu()
+
+texinode(Keymaps)(Zle Builtins)()(Zsh Line Editor)
 sect(Keymaps)
 cindex(keymaps)
 cindex(key bindings)
@@ -77,6 +94,465 @@ and the command reading process starts again using these fake keystrokes.
 This input can itself invoke further replacement strings, but in order to
 detect loops the process will be stopped if there are twenty such replacements
 without a real command being read.
+
+texinode(Zle Builtins)(Zle Widgets)(Keymaps)(Zsh Line Editor)
+sect(Zle Builtins)
+cindex(zle, builtin commands)
+The ZLE module contains three related builtin commands. The tt(bindkey)
+command manipulates keymaps and key bindings; the tt(vared) command invokes
+ZLE on the value of a shell parameter; and the tt(zle) command manipulates
+editing widgets and allows command line access to ZLE commands from within
+shell functions.
+
+startitem()
+findex(bindkey)
+cindex(keys, rebinding)
+cindex(rebinding keys)
+cindex(keys, binding)
+cindex(binding keys)
+cindex(keymaps)
+xitem(tt(bindkey) [ var(options) ] tt(-l))
+xitem(tt(bindkey) [ var(options) ] tt(-d))
+xitem(tt(bindkey) [ var(options) ] tt(-D) var(keymap) ...)
+xitem(tt(bindkey) [ var(options) ] tt(-A) var(old-keymap new-keymap))
+xitem(tt(bindkey) [ var(options) ] tt(-N) var(new-keymap) [ var(old-keymap) ])
+xitem(tt(bindkey) [ var(options) ] tt(-m))
+xitem(tt(bindkey) [ var(options) ] tt(-r) var(in-string) ...)
+xitem(tt(bindkey) [ var(options) ] tt(-s) var(in-string out-string) ...)
+xitem(tt(bindkey) [ var(options) ] var(in-string command) ...)
+item(tt(bindkey) [ var(options) ] [ var(in-string) ])(
+tt(bindkey)'s options can be divided into three categories: keymap selection,
+operation selection, and others.  The keymap selection options are:
+
+startitem()
+item(tt(-e))(
+Selects keymap `tt(emacs)', and also links it to `tt(main)'.
+)
+item(tt(-v))(
+Selects keymap `tt(viins)', and also links it to `tt(main)'.
+)
+item(tt(-a))(
+Selects keymap `tt(vicmd)'.
+)
+item(tt(-M) var(keymap))(
+The var(keymap) specifies a keymap name.
+)
+enditem()
+
+If a keymap selection is required and none of the options above are used, the
+`tt(main)' keymap is used.  Some operations do not permit a keymap to be
+selected, namely:
+
+startitem()
+item(tt(-l))(
+List all existing keymap names.  If the tt(-L)
+option is also used, list in the form of tt(bindkey)
+commands to create the keymaps.
+)
+item(tt(-d))(
+Delete all existing keymaps and reset to the default state.
+)
+item(tt(-D) var(keymap) ...)(
+Delete the named var(keymap)s.
+)
+item(tt(-A) var(old-keymap new-keymap))(
+Make the var(new-keymap) name an alias for var(old-keymap), so that
+both names refer to the same keymap.  The names have equal standing;
+if either is deleted, the other remains.  If there is already a keymap
+with the var(new-keymap) name, it is deleted.
+)
+item(tt(-N) var(new-keymap) [ var(old-keymap) ])(
+Create a new keymap, named var(new-keymap).  If a keymap already has that
+name, it is deleted.  If an var(old-keymap) name is given, the new keymap
+is initialized to be a duplicate of it, otherwise the new keymap will
+be empty.
+)
+enditem()
+
+To use a newly created keymap, it should be linked to tt(main).  Hence
+the sequence of commands to create and use a new keymap `tt(mymap)'
+initialized from the tt(emacs) keymap (which remains unchanged) is:
+
+example(bindkey -N mymap emacs
+bindkey -A mymap main)
+
+Note that while `tt(bindkey -A) var(newmap) tt(main)' will work when
+var(newmap) is tt(emacs) or tt(viins), it will not work for tt(vicmd), as
+switching from vi insert to command mode becomes impossible.
+
+The following operations act on the `tt(main)' keymap if no keymap
+selection option was given:
+
+startitem()
+item(tt(-m))(
+Add the built-in set of meta-key bindings to the selected keymap.
+Only keys that are unbound or bound to tt(self-insert) are affected.
+)
+item(tt(-r) var(in-string) ...)(
+Unbind the specified var(in-string)s in the selected keymap.
+This is exactly equivalent to binding the strings to tt(undefined-key).
+
+When tt(-R) is also used, interpret the var(in-string)s as ranges.
+
+When tt(-p) is also used, the var(in-string)s specify prefixes.  Any
+binding that has the given var(in-string) as a prefix, not including the
+binding for the var(in-string) itself, if any, will be removed.  For
+example,
+
+example(bindkey -rpM viins '^[')
+
+will remove all bindings in the vi-insert keymap beginning with an escape
+character (probably cursor keys), but leave the binding for the escape
+character itself (probably tt(vi-cmd-mode)).  This is incompatible with the
+option tt(-R).
+)
+item(tt(-s) var(in-string out-string) ...)(
+Bind each var(in-string) to each var(out-string).
+When var(in-string) is typed, var(out-string) will be
+pushed back and treated as input to the line editor.
+When tt(-R) is also used, interpret the var(in-string)s as ranges.
+)
+item(var(in-string command) ...)(
+Bind each var(in-string) to each var(command).
+When tt(-R) is used, interpret the var(in-string)s as ranges.
+)
+item([ var(in-string) ])(
+List key bindings.  If an var(in-string) is specified, the binding of
+that string in the selected keymap is displayed.  Otherwise, all key
+bindings in the selected keymap are displayed.  (As a special case,
+if the tt(-e) or tt(-v) option is used alone, the keymap is em(not)
+displayed - the implicit linking of keymaps is the only thing that
+happens.)
+
+When the option tt(-p) is used, the var(in-string) must be present.
+The listing shows all bindings which have the given key sequence as a
+prefix, not including any bindings for the key sequence itself.
+
+When the tt(-L) option is used, the list is in the form of tt(bindkey)
+commands to create the key bindings.
+)
+enditem()
+
+When the tt(-R) option is used as noted above, a valid range consists of
+two characters, with an optional `tt(-)' between them.  All characters
+between the two specified, inclusive, are bound as specified.
+
+For either var(in-string) or var(out-string), the following
+escape sequences are recognised:
+
+startsitem()
+sitem(tt(\a))(bell character)
+sitem(tt(\b))(backspace)
+sitem(tt(\e), tt(\E))(escape)
+sitem(tt(\f))(form feed)
+sitem(tt(\n))(linefeed (newline))
+sitem(tt(\r))(carriage return)
+sitem(tt(\t))(horizontal tab)
+sitem(tt(\v))(vertical tab)
+sitem(tt(\)var(NNN))(character code in octal)
+sitem(tt(\x)var(NN))(character code in hexadecimal)
+sitem(tt(\M)[tt(-)]var(X))(character with meta bit set)
+sitem(tt(\C)[tt(-)]var(X))(control character)
+sitem(tt(^)var(X))(control character)
+endsitem()
+
+In all other cases, `tt(\)' escapes the following character.  Delete is
+written as `tt(^?)'.  Note that `tt(\M^?)' and `tt(^\M?)' are not the same,
+and that (unlike emacs), the bindings `tt(\M-)var(X)' and `tt(\e)var(X)'
+are entirely distinct, although they are initialized to the same bindings
+by `tt(bindkey -m)'.
+)
+findex(vared)
+cindex(parameters, editing)
+cindex(editing parameters)
+xitem(tt(vared) [ tt(-Aache) ] [ tt(-p) var(prompt) ] [ tt(-r) var(rprompt) ])
+item(  [ -M var(main-keymap) ] [ -m var(vicmd-keymap) ] var(name))(
+The value of the parameter var(name) is loaded into the edit
+buffer, and the line editor is invoked.  When the editor exits,
+var(name) is set to the string value returned by the editor.
+When the tt(-c) flag is given, the parameter is created if it doesn't
+already exist.  The tt(-a) flag may be given with tt(-c) to create
+an array parameter, or the tt(-A) flag to create an associative array.
+If the type of an existing parameter does not match the type to be
+created, the parameter is unset and recreated.
+
+If an array or array slice is being edited, separator characters as defined
+in tt($IFS) will be shown quoted with a backslash, as will backslashes
+themselves.  Conversely, when the edited text is split into an array, a
+backslash quotes an immediately following separator character or backslash;
+no other special handling of backslashes, or any handling of quotes, is
+performed.
+
+Individual elements of existing array or associative array parameters
+may be edited by using subscript syntax on var(name).  New elements are
+created automatically, even without tt(-c).
+
+If the tt(-p) flag is given, the following string will be taken as
+the prompt to display at the left.  If the tt(-r) flag is given,
+the following string gives the prompt to display at the right.  If the
+tt(-h) flag is specified, the history can be accessed from ZLE. If the
+tt(-e) flag is given, typing tt(^D) (Control-D) on an empty line
+causes tt(vared) to exit immediately with a non-zero return value.
+
+The tt(-M) option gives a keymap to link to the tt(main) keymap during
+editing, and the tt(-m) option gives a keymap to link to the tt(vicmd)
+keymap during editing.  For vi-style editing, this allows a pair of keymaps
+to override tt(viins) and tt(vicmd).  For emacs-style editing, only tt(-M)
+is normally needed but the tt(-m) option may still be used.  On exit, the
+previous keymaps will be restored.
+)
+findex(zle)
+cindex(widgets, rebinding)
+cindex(rebinding widgets)
+cindex(widgets, binding)
+cindex(binding widgets)
+cindex(widgets, invoking)
+cindex(invoking widgets)
+cindex(widgets, calling)
+cindex(calling widgets)
+cindex(widgets, defining)
+cindex(defining widgets)
+xitem(tt(zle))
+xitem(tt(zle) tt(-l) [ tt(-L) | tt(-a) ] [ var(string) ... ])
+xitem(tt(zle) tt(-D) var(widget) ...)
+xitem(tt(zle) tt(-A) var(old-widget) var(new-widget))
+xitem(tt(zle) tt(-N) var(widget) [ var(function) ])
+xitem(tt(zle) tt(-C) var(widget) var(completion-widget) var(function))
+xitem(tt(zle) tt(-R) [ tt(-c) ] [ var(display-string) ] [ var(string) ... ])
+xitem(tt(zle) tt(-M) var(string))
+xitem(tt(zle) tt(-U) var(string))
+xitem(tt(zle) tt(-K) var(keymap))
+xitem(tt(zle) tt(-F) [ tt(-L) ] [ var(fd) [ var(handler) ] ])
+xitem(tt(zle) tt(-I))
+item(tt(zle) var(widget) tt([ -n) var(num) tt(]) tt([ -N ]) var(args) ...)(
+The tt(zle) builtin performs a number of different actions concerning
+ZLE.
+
+With no options and no arguments, only the return status will be
+set.  It is zero if ZLE is currently active and widgets could be
+invoked using this builtin command and non-zero otherwise.
+Note that even if non-zero status is returned, zle may still be active as
+part of the completion system; this does not allow direct calls to ZLE
+widgets.
+
+Otherwise, which operation it performs depends on its options:
+
+startitem()
+item(tt(-l) [ tt(-L) | tt(-a) ])(
+List all existing user-defined widgets.  If the tt(-L)
+option is used, list in the form of tt(zle)
+commands to create the widgets.
+
+When combined with the tt(-a) option, all widget names are listed,
+including the builtin ones. In this case the tt(-L) option is ignored.
+
+If at least one var(string) is given, nothing will be printed but the
+return status will be zero if all var(string)s are names of existing
+widgets (or of user-defined widgets if the tt(-a) flag is not given)
+and non-zero if at least one var(string) is not a name of an defined
+widget.
+)
+item(tt(-D) var(widget) ...)(
+Delete the named var(widget)s.
+)
+item(tt(-A) var(old-widget) var(new-widget))(
+Make the var(new-widget) name an alias for var(old-widget), so that
+both names refer to the same widget.  The names have equal standing;
+if either is deleted, the other remains.  If there is already a widget
+with the var(new-widget) name, it is deleted.
+)
+item(tt(-N) var(widget) [ var(function) ])(
+Create a user-defined widget.  If there is already a widget with the
+specified name, it is overwritten.  When the new
+widget is invoked from within the editor, the specified shell var(function)
+is called.  If no function name is specified, it defaults to
+the same name as the widget.  For further information, see the section
+em(Widgets) in
+ifzman(zmanref(zshzle))\
+ifnzman(noderef(Zsh Line Editor))\
+.
+)
+cindex(completion widgets, creating)
+item(tt(-C) var(widget) var(completion-widget) var(function))(
+Create a user-defined completion widget named var(widget). The 
+completion widget will behave like the built-in completion-widget
+whose name is given as var(completion-widget). To generate the
+completions, the shell function var(function) will be called.
+For further information, see
+ifzman(zmanref(zshcompwid))\
+ifnzman(noderef(Completion Widgets))\
+.
+)
+item(tt(-R) [ tt(-c) ] [ var(display-string) ] [ var(string) ... ])(
+Redisplay the command line; this is to be called from within a user-defined
+widget to allow changes to become visible.  If a var(display-string) is
+given and not empty, this is shown in the status line (immediately
+below the line being edited).
+
+If the optional var(string)s are given they are listed below the
+prompt in the same way as completion lists are printed. If no
+var(string)s are given but the tt(-c) option is used such a list is
+cleared.
+
+Note that this option is only useful for widgets that do not exit
+immediately after using it because the strings displayed will be erased 
+immediately after return from the widget.
+
+This command can safely be called outside user defined widgets; if zle is
+active, the display will be refreshed, while if zle is not active, the
+command has no effect.  In this case there will usually be no other
+arguments.
+
+The status is zero if zle was active, else one.
+)
+item(tt(-M) var(string))(
+As with the tt(-R) option, the var(string) will be displayed below the 
+command line; unlike the tt(-R) option, the string will not be put into
+the status line but will instead be printed normally below the
+prompt.  This means that the var(string) will still be displayed after
+the widget returns (until it is overwritten by subsequent commands).
+)
+item(tt(-U) var(string))(
+This pushes the characters in the var(string) onto the input stack of
+ZLE.  After the widget currently executed finishes ZLE will behave as
+if the characters in the var(string) were typed by the user.
+
+As ZLE uses a stack, if this option is used repeatedly
+the last string pushed onto the stack will be processed first.  However,
+the characters in each var(string) will be processed in the order in which
+they appear in the string.
+)
+item(tt(-K) var(keymap))(
+Selects the keymap named var(keymap).  An error message will be displayed if
+there is no such keymap.
+
+This keymap selection affects the interpretation of following keystrokes
+within this invocation of ZLE.  Any following invocation (e.g., the next
+command line) will start as usual with the `tt(main)' keymap selected.
+)
+item(tt(-F) [ tt(-L) ] [ var(fd) [ var(handler) ] ])(
+Only available if your system supports one of the `poll' or `select' system
+calls; most modern systems do.
+
+Installs var(handler) (the name of a shell function) to handle input from
+file descriptor var(fd).  When zle is attempting to read data, it will
+examine both the terminal and the list of handled var(fd)'s.  If data
+becomes available on a handled var(fd), zle will call var(handler) with
+the fd which is ready for reading as the only argument.  If the handler
+produces output to the terminal, it should call `tt(zle -I)' before doing
+so (see below).  The handler should not attempt to read from the terminal.
+Note that zle makes no attempt to check whether this fd is actually
+readable when installing the handler.  The user must make their own
+arrangements for handling the file descriptor when zle is not active.
+
+Any number of handlers for any number of readable file descriptors may be
+installed.  Installing a handler for an var(fd) which is already handled
+causes the existing handler to be replaced.
+
+If no var(handler) is given, but an var(fd) is present, any handler for
+that var(fd) is removed.  If there is none, an error message is printed
+and status 1 is returned.
+
+If no arguments are given, or the tt(-L) option is supplied, a list of
+handlers is printed in a form which can be stored for later execution.
+
+An var(fd) (but not a var(handler)) may optionally be given with the tt(-L)
+option; in this case, the function will list the handler if any, else
+silently return status 1.
+
+Note that this feature should be used with care.  Activity on one of the
+var(fd)'s which is not properly handled can cause the terminal to become
+unusable.
+
+Here is a simple example of using this feature.  A connection to a remote
+TCP port is created using the ztcp command; see 
+ifzman(the description of the tt(zsh/net/tcp) module in zmanref(zshmodules))\
+ifnzman(noderef(The zsh/net/tcp Module)).  Then a handler is installed
+which simply prints out any data which arrives on this connection.  Note
+that `select' will indicate that the file descriptor needs handling
+if the remote side has closed the connection; we handle that by testing
+for a failed read.
+example(if ztcp pwspc 2811; then
+  tcpfd=$REPLY
+  handler() {
+    zle -I
+    local line
+    if ! read -r line <&$1; then
+      # select marks this fd if we reach EOF,
+      # so handle this specially.
+      print "[Read on fd $1 failed, removing.]" >&2
+      zle -F $1
+      return 1
+    fi
+    print -r - $line
+  }
+  zle -F $tcpfd handler
+fi)
+)
+item(tt(-I))(
+Unusually, this option is most useful outside ordinary widget functions,
+though it may be used within if normal output to the terminal is required.
+It invalidates the current zle display in preparation for output; typically
+this will be from a trap function.  It has no effect if zle is not
+active.  When a trap exits, the shell checks to see if the display needs
+restoring, hence the following will print output in such a way as not to
+disturb the line being edited:
+
+example(TRAPUSR1() {
+    # Invalidate zle display
+  [[ -o zle ]] && zle -I
+    # Show output
+  print Hello
+})
+
+In general, the trap function may need to test whether zle is active before
+using this method (as shown in the example), since the tt(zsh/zle) module
+may not even be loaded; if it is not, the command can be skipped.
+
+It is possible to call `tt(zle -I)' several times before control is
+returned to the editor; the display will only be invalidated the first time
+to minimise disruption.
+
+Note that there are normally better ways of manipulating the display from
+within zle widgets; see, for example, `tt(zle -R)' above.
+
+The returned status is zero if zle was invalidated, even though
+this may have been by a previous call to `tt(zle -I)' or by a system
+notification.  To test if a zle widget may be called at this point, execute
+tt(zle) with no arguments and examine the return status.
+)
+item(var(widget) tt([ -n) var(num) tt(]) tt([ -N ]) var(args) ...)(
+Invoke the specified widget.  This can only be done when ZLE is
+active; normally this will be within a user-defined widget.
+
+With the options tt(-n) and tt(-N), the current numerical argument will be
+saved and then restored after the call to tt(widget); `tt(-n) var(num)'
+sets the numerical argument temporarily to var(num), while `tt(-N)' sets it
+to the default, i.e. as if there were none.
+
+Any further arguments will be passed to the widget.  If it is a shell
+function, these are passed down as positional parameters; for builtin
+widgets it is up to the widget in question what it does with them.
+Currently arguments are only handled by the incremental-search commands,
+the tt(history-search-forward) and tt(-backward) and the corresponding
+functions prefixed by tt(vi-), and by tt(universal-argument).  No error is
+flagged if the command does not use the arguments, or only uses some of
+them.
+
+The return status reflects the success or failure of the operation carried
+out by the widget, or if it is a user-defined widget the return status of
+the shell function.  
+
+A non-zero return status causes the shell to beep when the widget exits,
+unless the tt(BEEP) options was unset or the widget was called via the
+tt(zle) command.  Thus if a user defined widget requires an immediate beep,
+it should call the tt(beep) widget directly.
+)
+enditem()
+)
+enditem()
+
+texinode(Zle Widgets)()(Zle Builtins)(Zsh Line Editor)
 sect(Widgets)
 cindex(widgets)
 All actions in the editor are performed by `widgets'.  A widget's job is
@@ -103,8 +579,10 @@ cindex(widgets, user-defined)
 User-defined widgets, being implemented as shell functions,
 can execute any normal shell command.  They can also run other widgets
 (whether built-in or user-defined) using the tt(zle) builtin command.
-They can use tt(read -k) or tt(read -q) to read characters from standard
-input.  Finally, they can examine and edit the ZLE buffer being edited by
+The standard input of the function is closed to prevent external commands
+from unintentionally blocking ZLE by reading from the terminal, but
+tt(read -k) or tt(read -q) can be used to read characters.  Finally,
+they can examine and edit the ZLE buffer being edited by
 reading and setting the special parameters described below.
 
 cindex(parameters, editor)
@@ -125,6 +603,31 @@ The entire contents of the edit buffer.  If it is written to, the
 cursor remains at the same offset, unless that would put it outside the
 buffer.
 )
+vindex(BUFFERLINES)
+item(tt(BUFFERLINES) (integer))(
+The number of screen lines needed for the edit buffer currently
+displayed on screen (i.e. without any changes to the preceding
+parameters done after the last redisplay); read-only.
+)
+vindex(CONTEXT)
+item(tt(CONTEXT) (scalar))(
+The context in which zle was called to read a line; read-only.  One of
+the values:
+startitem()
+item(start)(
+The start of a command line (at prompt tt(PS1)).
+)
+item(cont)(
+A continuation to a command line (at prompt tt(PS2)).
+)
+item(select)(
+In a tt(select) loop.
+)
+item(vared)(
+Editing a variable in tt(vared).
+)
+enditem()
+)
 vindex(CURSOR)
 item(tt(CURSOR) (integer))(
 The offset of the cursor, within the edit buffer.  This is in the range
@@ -132,9 +635,50 @@ The offset of the cursor, within the edit buffer.  This is in the range
 Attempts to move the cursor outside the buffer will result in the
 cursor being moved to the appropriate end of the buffer.
 )
-vindex(MARK)
-item(tt(MARK) (integer))(
-Like tt(CURSOR), but for the mark.
+vindex(CUTBUFFER)
+item(tt(CUTBUFFER) (scalar))(
+The last item to be cut using one of the `tt(kill-)' commands; the
+string which the next yank would insert in the line.
+)
+vindex(HISTNO)
+item(tt(HISTNO) (integer))(
+The current history number.  Setting this has the same effect as
+moving up or down in the history to the corresponding history line.
+An attempt to set it is ignored if the line is not stored in the
+history.  Note this is not the same as the parameter tt(HISTCMD),
+which always gives the number of the history line being added to the main
+shell's history.  tt(HISTNO) refers to the line being retrieved within
+zle.
+)
+vindex(KEYMAP)
+item(tt(KEYMAP) (scalar))(
+The name of the currently selected keymap; read-only.
+)
+vindex(KEYS)
+item(tt(KEYS) (scalar))(
+The keys typed to invoke this widget, as a literal string; read-only.
+)
+vindex(killring)
+item(tt(killring) (array))(
+The array of previously killed items, with the most recently killed first.
+This gives the items that would be retrieved by a tt(yank-pop) in the
+same order.
+
+The default size for the kill ring is eight, however the length may be
+changed by normal array operations.  Any empty string in the kill ring is
+ignored by the tt(yank-pop) command, hence the size of the array
+effectively sets the maximum length of the kill ring, while the number of
+non-zero strings gives the current length, both as seen by the user at the
+command line.
+)
+
+vindex(LASTSEARCH)
+item(tt(LASTSEARCH) (scalar))(
+The last search string used by an interactive search ; read-only.
+)
+vindex(LASTWIDGET)
+item(tt(LASTWIDGET) (scalar))(
+The name of the last widget that was executed; read-only.
 )
 vindex(LBUFFER)
 item(tt(LBUFFER) (scalar))(
@@ -142,35 +686,9 @@ The part of the buffer that lies to the left of the cursor position.
 If it is assigned to, only that part of the buffer is replaced, and the
 cursor remains between the new tt($LBUFFER) and the old tt($RBUFFER).
 )
-vindex(RBUFFER)
-item(tt(RBUFFER) (scalar))(
-The part of the buffer that lies to the right of the cursor position.
-If it is assigned to, only that part of the buffer is replaced, and the
-cursor remains between the old tt($LBUFFER) and the new tt($RBUFFER).
-)
-vindex(BUFFERLINES)
-item(tt(BUFFERLINES))(
-The number of screen lines needed for the edit buffer currently
-displayed on screen (i.e. without any changes to the preceding
-parameters done after the last redisplay).
-)
-vindex(PREBUFFER)
-item(tt(PREBUFFER) (scalar))(
-In a multi-line input at the secondary prompt, this read-only parameter
-contains the contents of the lines before the one the cursor is
-currently in.
-)
-vindex(WIDGET)
-item(tt(WIDGET) (scalar))(
-The name of the widget currently being executed.
-)
-vindex(LASTWIDGET)
-item(tt(LASTWIDGET) (scalar))(
-The name of the last widget that was executed.
-)
-vindex(KEYS)
-item(tt(KEYS) (scalar))(
-The keys typed to invoke this widget, as a literal string.
+vindex(MARK)
+item(tt(MARK) (integer))(
+Like tt(CURSOR), but for the mark.
 )
 vindex(NUMERIC)
 item(tt(NUMERIC) (integer))(
@@ -180,17 +698,98 @@ called with the tt(zle) builtin command will use the value
 assigned. If it is unset inside a widget function, builtin widgets
 called behave as if no numeric argument was given.
 )
-vindex(HISTNO)
-item(tt(HISTNO) (integer))(
-The current history number.
+vindex(PENDING)
+item(tt(PENDING) (integer))(
+The number of bytes pending for input, i.e. the number of bytes which have
+already been typed and can immediately be read. On systems where the shell
+is not able to get this information, this parameter will always have a
+value of zero.  Read-only.
+)
+vindex(PREBUFFER)
+item(tt(PREBUFFER) (scalar))(
+In a multi-line input at the secondary prompt, this read-only parameter
+contains the contents of the lines before the one the cursor is
+currently in.
+)
+vindex(PREDISPLAY)
+item(tt(PREDISPLAY) (scalar))(
+Text to be displayed before the start of the editable text buffer.  This
+does not have to be a complete line; to display a complete line, a newline
+must be appended explicitly.    The text is reset on each new invocation
+(but not recursive invocation) of zle.
+)
+vindex(POSTDISPLAY)
+item(tt(POSTDISPLAY) (scalar))(
+Text to be displayed after the end of the editable text buffer.  This
+does not have to be a complete line; to display a complete line, a newline
+must be prepended explicitly.  The text is reset on each new invocation
+(but not recursive invocation) of zle.
+)
+vindex(RBUFFER)
+item(tt(RBUFFER) (scalar))(
+The part of the buffer that lies to the right of the cursor position.
+If it is assigned to, only that part of the buffer is replaced, and the
+cursor remains between the old tt($LBUFFER) and the new tt($RBUFFER).
+)
+vindex(WIDGET)
+item(tt(WIDGET) (scalar))(
+The name of the widget currently being executed; read-only.
+)
+vindex(WIDGETFUNC)
+item(tt(WIDGETFUNC) (scalar))(
+The name of the shell function that implements a widget defined with
+either tt(zle -N) or tt(zle -C).  In the former case, this is the second
+argument to the tt(zle -N) command that defined the widget, or
+the first argument if there was no second argument.  In the latter case
+this is the the third argument to the tt(zle -C) command that defined the
+widget.  Read-only.
+)
+vindex(WIDGETSTYLE)
+item(tt(WIDGETSTYLE) (scalar))(
+Describes the implementation behind the completion widget currently being
+executed; the second argument that followed tt(zle -C) when the widget was
+defined.  This is the name of a builtin completion widget.  For widgets
+defined with tt(zle -N) this is set to the empty string.  Read-only.
 )
 enditem()
+
+subsect(Special Widget)
+
+There is one user-defined widget which is special to the shell.
+If it does not exist, no special action is taken.  The environment
+provided is identical to that for any other editing widget.
+
+startitem()
+tindex(zle-line-init)
+item(tt(zle-line-init))(
+Executed every time the line editor is started to read a new line
+of input.  The following example puts the line editor into vi command
+mode when it starts up.
+
+example(zle-line-init() { zle -K vicmd; }
+zle -N zle-line-init)
+
+(The command inside the function sets the keymap directly; it is
+equivalent to tt(zle vi-cmd-mode).)
+)
+enditem()
+
 sect(Standard Widgets)
 cindex(widgets, standard)
 The following is a list of all the standard widgets,
 and their default bindings in emacs mode,
 vi command mode and vi insert mode
 (the `tt(emacs)', `tt(vicmd)' and `tt(viins)' keymaps, respectively).
+
+Note that cursor keys are bound to movement keys in all three keymaps;
+the shell assumes that the cursor keys send the key sequences reported
+by the terminal-handling library (termcap or terminfo).  The key sequences
+shown in the list are those based on the VT100, common on many modern
+terminals, but in fact these are not necessarily bound.  In the case of the
+tt(viins) keymap, the initial escape character of the sequences serves also
+to return to the tt(vicmd) keymap: whether this happens is determined by
+the tt(KEYTIMEOUT) parameter, see ifzman(zmanref(zshparam))\
+ifnzman(noderef(Parameters)).
 startmenu()
 menu(Movement)
 menu(History Control)
@@ -199,7 +798,7 @@ menu(Arguments)
 menu(Completion)
 menu(Miscellaneous)
 endmenu()
-texinode(Movement)(History Control)()(Zsh Line Editor)
+texinode(Movement)(History Control)()(Zle Widgets)
 subsect(Movement)
 startitem()
 tindex(vi-backward-blank-word)
@@ -212,7 +811,7 @@ item(tt(backward-char) (^B ESC-[D) (unbound) (unbound))(
 Move backward one character.
 )
 tindex(vi-backward-char)
-item(tt(vi-backward-char) (unbound) (^H h ^?) (unbound))(
+item(tt(vi-backward-char) (unbound) (^H h ^?) (ESC-[D))(
 Move backward one character, without changing lines.
 )
 tindex(backward-word)
@@ -263,7 +862,7 @@ item(tt(forward-char) (^F ESC-[C) (unbound) (unbound))(
 Move forward one character.
 )
 tindex(vi-forward-char)
-item(tt(vi-forward-char) (unbound) (space l) (unbound))(
+item(tt(vi-forward-char) (unbound) (space l) (ESC-[C))(
 Move forward one character.
 )
 tindex(vi-find-next-char)
@@ -329,7 +928,7 @@ item(tt(vi-rev-repeat-find) (unbound) (,) (unbound))(
 Repeat the last tt(vi-find) command in the opposite direction.
 )
 enditem()
-texinode(History Control)(Modifying Text)(Movement)(Zsh Line Editor)
+texinode(History Control)(Modifying Text)(Movement)(Zle Widgets)
 subsect(History Control)
 startitem()
 tindex(beginning-of-buffer-or-history)
@@ -347,7 +946,7 @@ item(tt(beginning-of-history))(
 Move to the first event in the history list.
 )
 tindex(down-line-or-history)
-item(tt(down-line-or-history) (^N ESC-[B) (j) (unbound))(
+item(tt(down-line-or-history) (^N ESC-[B) (j) (ESC-[B))(
 Move down a line in the buffer, or if already at the bottom line,
 move to the next event in the history list.
 )
@@ -526,6 +1125,37 @@ left (zero inserts the previous command word).  Repeating this command
 replaces the word just inserted with the last word from the
 history event prior to the one just used; numeric arguments can be used in
 the same way to pick a word from that event.
+
+When called from a shell function invoked from a user-defined widget, the
+command can take one to three arguments.  The first argument specifies a
+history offset which applies to successive calls to this widget: if is -1,
+the default behaviour is used, while if it is 1, successive calls will move
+forwards through the history.  The value 0 can be used to indicate that the
+history line examined by the previous execution of the command will be
+reexamined.  Note that negative numbers should be preceded with a
+`tt(-)tt(-)' argument to avoid confusing them with options.
+
+If two arguments are given, the second specifies the word on the command
+line in normal array index notation (as a more natural alternative to the
+prefix argument).  Hence 1 is the first word, and -1 (the default) is the
+last word.
+
+If a third argument is given, its value is ignored, but it is used to
+signify that the history offset is relative to the current history line,
+rather than the one remembered after the previous invocations of
+tt(insert-last-word).
+
+For example, the default behaviour of the command corresponds to
+
+example(zle insert-last-word -- -1 -1)
+
+while the command
+
+example(zle insert-last-word -- -1 1 -)
+
+always copies the first word of the line in the history immediately before
+the line being edited.  This has the side effect that later invocations of
+the widget will be relative to that line.
 )
 tindex(vi-repeat-search)
 item(tt(vi-repeat-search) (unbound) (n) (unbound))(
@@ -536,7 +1166,7 @@ item(tt(vi-rev-repeat-search) (unbound) (N) (unbound))(
 Repeat the last vi history search, but in reverse.
 )
 tindex(up-line-or-history)
-item(tt(up-line-or-history) (^P ESC-[A) (k) (unbound))(
+item(tt(up-line-or-history) (^P ESC-[A) (k) (ESC-[A))(
 Move up a line in the buffer, or if already at the top line,
 move to the previous event in the history list.
 )
@@ -567,7 +1197,7 @@ line up to the cursor.
 This leaves the cursor in its original position.
 )
 enditem()
-texinode(Modifying Text)(Arguments)(History Control)(Zsh Line Editor)
+texinode(Modifying Text)(Arguments)(History Control)(Zle Widgets)
 subsect(Modifying Text)
 startitem()
 tindex(vi-add-eol)
@@ -630,7 +1260,13 @@ Copy the area from the cursor to the mark to the kill buffer.
 )
 tindex(copy-prev-word)
 item(tt(copy-prev-word) (ESC-^_) (unbound) (unbound))(
-Duplicate the word behind the cursor.
+Duplicate the word to the left of the cursor.
+)
+tindex(copy-prev-shell-word)
+item(tt(copy-prev-shell-word))(
+Like tt(copy-prev-word), but the word is found by using shell parsing, 
+whereas tt(copy-prev-word) looks for blanks. This makes a difference
+when the word is quoted and contains spaces.
 )
 tindex(vi-delete)
 item(tt(vi-delete) (unbound) (d) (unbound))(
@@ -845,7 +1481,7 @@ into the kill buffer.
 Arguably, this is what Y should do in vi, but it isn't what it actually does.
 )
 enditem()
-texinode(Arguments)(Completion)(Modifying Text)(Zsh Line Editor)
+texinode(Arguments)(Completion)(Modifying Text)(Zle Widgets)
 subsect(Arguments)
 startitem()
 tindex(digit-argument)
@@ -858,7 +1494,7 @@ Inside a widget function, a call to this function treats the last key of
 the key sequence which called the widget as the digit.
 )
 tindex(neg-argument)
-item(tt(neg-argument) (ESC--) (unbound) (unbound))(
+item(tt(neg-argument) (ESC-DASH()) (unbound) (unbound))(
 Changes the sign of the following argument.
 )
 tindex(universal-argument)
@@ -876,7 +1512,7 @@ universal-argument) var(num)', the numerical argument will be set to
 var(num); this is equivalent to `tt(NUMERIC=)var(num)'.
 )
 enditem()
-texinode(Completion)(Miscellaneous)(Arguments)(Zsh Line Editor)
+texinode(Completion)(Miscellaneous)(Arguments)(Zle Widgets)
 subsect(Completion)
 startitem()
 tindex(accept-and-menu-complete)
@@ -951,7 +1587,7 @@ When a previous completion displayed a list below the prompt, this
 widget can be used to move the prompt below the list.
 )
 enditem()
-texinode(Miscellaneous)()(Completion)(Zsh Line Editor)
+texinode(Miscellaneous)()(Completion)(Zle Widgets)
 subsect(Miscellaneous)
 startitem()
 tindex(accept-and-hold)
@@ -1034,10 +1670,14 @@ possibilities if the tt(AUTO_LIST) option is set.
 Any other character that is not bound to tt(self-insert) or
 tt(self-insert-unmeta) will beep and be ignored.
 The bindings of the current insert mode will be used.
+
+Currently this command may not be redefined or called by name.
 )
 tindex(execute-last-named-cmd)
 item(tt(execute-last-named-cmd) (ESC-z) (unbound) (unbound))(
 Redo the last function executed with tt(execute-named-cmd).
+
+Currently this command may not be redefined or called by name.
 )
 tindex(get-line)
 item(tt(get-line) (ESC-G ESC-g) (unbound) (unbound))(
@@ -1085,9 +1725,65 @@ At a secondary (tt(PS2)) prompt, move the entire current multiline
 construct into the editor buffer.
 The latter is equivalent to tt(push-input) followed by tt(get-line).
 )
+tindex(recursive-edit)
+item(tt(recursive-edit))(
+Only useful from a user-defined widget.  At this point in the function,
+the editor regains control until one of the standard widgets which would
+normally cause zle to exit (typically an tt(accept-line) caused by
+hitting the return key) is executed.  Instead, control returns to the
+user-defined widget.  The status returned is non-zero if the return was
+caused by an error, but the function still continues executing and hence
+may tidy up.  This makes it safe for the user-defined widget to alter
+the command line or key bindings temporarily.
+
+
+The following widget, tt(caps-lock), serves as an example.
+example(self-insert-ucase() {
+  LBUFFER+=${(U)KEYS[-1]}
+}
+
+integer stat
+
+zle -N self-insert self-insert-ucase
+zle -A caps-lock save-caps-lock
+zle -A accept-line caps-lock
+
+zle recursive-edit
+stat=$?
+
+zle -A .self-insert self-insert
+zle -A save-caps-lock caps-lock
+zle -D save-caps-lock
+
+(( stat )) && zle send-break
+
+return $stat
+)
+This causes typed letters to be inserted capitalised until either
+tt(accept-line) (i.e. typically the return key) is typed or the
+tt(caps-lock) widget is invoked again; the later is handled by saving
+the old definition of tt(caps-lock) as tt(save-caps-lock) and then
+rebinding it to invoke tt(accept-line).  Note that an error from the
+recursive edit is detected as a non-zero return status and propagated by
+using the tt(send-break) widget.
+)
 tindex(redisplay)
 item(tt(redisplay) (unbound) (^R) (^R))(
 Redisplays the edit buffer.
+)
+tindex(reset-prompt)
+item(tt(reset-prompt) (unbound) (unbound) (unbound))(
+Force the prompts on both the left and right of the screen to be
+re-expanded, then redisplay the edit buffer.  This
+reflects changes both to the prompt variables themselves and changes
+in the expansion of the values (for example, changes in time or
+directory, or changes to the value of variables referred to by the
+prompt).
+
+Otherwise, the prompt is only expanded each time zle starts, and
+when the display as been interrupted by output from another part of the
+shell (such as a job notification) which causes the command line to be
+reprinted.
 )
 tindex(send-break)
 item(tt(send-break) (^G ESC-^G) (unbound) (unbound))(
@@ -1099,7 +1795,7 @@ tindex(run-help)
 item(tt(run-help) (ESC-H ESC-h) (unbound) (unbound))(
 Push the buffer onto the buffer stack, and execute the
 command `tt(run-help) var(cmd)', where var(cmd) is the current
-command.  tt(run-help) is normally aliased to var(man).
+command.  tt(run-help) is normally aliased to tt(man).
 )
 tindex(vi-set-buffer)
 item(tt(vi-set-buffer) (unbound) (") (unbound))(
