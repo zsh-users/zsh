@@ -41,7 +41,7 @@ typeset -U _lastdescr _comp_ignore
 if [[ "$compstate[insert]" = tab* && "$WIDGET" != *list* ]]; then
   { zstyle -T ":completion:${curcontext}:" insert-tab &&
     { [[ "$curcontext" != :* || -z "$compstate[vared]" ]] ||
-        zstyle -t ":completion:vared${curcontext}:" insert-tab } } && return 1
+        zstyle -t ":completion:vared${curcontext}:" insert-tab } } && return 0
 
   compstate[insert]="${compstate[insert]//tab /}"
 fi

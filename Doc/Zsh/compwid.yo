@@ -314,8 +314,7 @@ match to insert, given after a colon.  For example, `tt(menu:2)' says
 to start menucompletion, beginning with the second match.
 
 Note that a value containing the substring `tt(tab)' makes the
-matches generated be ignored and only the character that was used to
-call the completion widget be inserted.
+matches generated be ignored and only the TAB be inserted.
 
 Finally, it may also be set to tt(all), which makes all matches
 generated be inserted into the line.

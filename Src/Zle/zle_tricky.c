@@ -159,6 +159,8 @@ usetab(void)
     unsigned char *s = line + cs - 1;
 
     wouldinstab = 0;
+    if (keybuf[0] != '\t' || keybuf[1])
+	return 0;
     for (; s >= line && *s != '\n'; s--)
 	if (*s != '\t' && *s != ' ')
 	    return 0;

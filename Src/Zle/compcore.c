@@ -335,7 +335,7 @@ do_completion(Hookdef dummy, Compldat dat)
 	ret = 1;
 	minfo.cur = NULL;
 	if (useline < 0)
-	    selfinsert(zlenoargs);
+	    ret = selfinsert(zlenoargs);
 	goto compend;
     }
     zsfree(lastprebr);
@@ -345,7 +345,7 @@ do_completion(Hookdef dummy, Compldat dat)
     if (comppatmatch && *comppatmatch && comppatmatch != opm)
 	haspattern = 1;
     if (useline < 0)
-	selfinsert(zlenoargs);
+	ret = selfinsert(zlenoargs);
     else if (!useline && uselist) {
 	/* All this and the guy only wants to see the list, sigh. */
 	cs = 0;
