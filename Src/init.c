@@ -568,6 +568,9 @@ setupvals(void)
 
     init_eprog();
 
+    zero_mnumber.type = MN_INTEGER;
+    zero_mnumber.u.l = 0;
+
     getkeyptr = NULL;
 
     lineno = 1;

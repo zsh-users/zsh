@@ -37,6 +37,11 @@
 /**/
 int noeval;
  
+/* integer zero */
+
+/**/
+mnumber zero_mnumber;
+
 /* last input base we used */
 
 /**/
@@ -1018,13 +1023,13 @@ mathparse(int pc)
 	    push(yyval, NULL);
 	    break;
 	case ID:
-	    push(getnparam(yylval), yylval);
+	    push((noeval ? zero_mnumber : getnparam(yylval)), yylval);
 	    break;
 	case CID:
-	    push(getcvar(yylval), yylval);
+	    push((noeval ? zero_mnumber : getcvar(yylval)), yylval);
 	    break;
 	case FUNC:
-	    push(callmathfunc(yylval), yylval);
+	    push((noeval ? zero_mnumber : callmathfunc(yylval)), yylval);
 	    break;
 	case M_INPAR:
 	    mathparse(TOPPREC);
