@@ -280,24 +280,19 @@ latter case this will happen because the tt(AUTO_MENU) is set).
 On exit it may be set to any of the values above (where setting it to
 the empty string is the same as unsetting it), or to a number, in which
 case the match whose number is given will be inserted into the command line.
-It may also be set to a string of the form `var(group):var(match)' which
-specifies a match from a group of matches to be inserted, counting from 1
-upwards (e.g. `tt(2:4)' specifies the fourth match of the second group).
-Negative numbers count backward from the last match or group (with `tt(-1)'
-selecting the last match or group) and out-of-range values are wrapped
-around, so that a value of zero selects the last match or group and a value
+Negative numbers count backward from the last match (with `tt(-1)'
+selecting the last match) and out-of-range values are wrapped
+around, so that a value of zero selects the last match group and a value
 one more than the maximum selects the first. Unless the value of this
 key ends in a space, the match is inserted as in a menu-completion,
 i.e. without automatically appending a space.
 
 Both tt(menu) and tt(automenu) may also specify the the number of the
-match to insert, given after a colon, optionally followed by a second
-colon and a group number. For example, `tt(menu:2)' says to start
-menu-completion, beginning with the second match and `tt(menu:3:2)'
-says to start menu-completion with the third match in the second group.
+match to insert, given after a colon.  For example, `tt(menu:2)' says
+to start menu-completion, beginning with the second match.
 
-It may also be set to tt(all), which makes all matches generated be
-inserted into the line.
+Finally, it may also be set to tt(all), which makes all matches
+generated be inserted into the line.
 )
 vindex(to_end, compstate)
 item(tt(to_end))(

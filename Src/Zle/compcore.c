@@ -60,7 +60,11 @@ int movetoend;
 /* The match and group number to insert when starting menucompletion.   */
 
 /**/
-mod_export int insmnum, insgnum, insgroup, insspace;
+mod_export int insmnum, insspace;
+
+#if 0
+int insgnum, insgroup; /* mod_export */
+#endif
 
 /* Information about menucompletion. */
 
@@ -753,10 +757,12 @@ callcompfunc(char *s, char *fn)
 
 	    useline = 1; usemenu = 3;
 	    insmnum = atoi(compinsert);
+#if 0
 	    if ((m = strchr(compinsert, ':'))) {
 		insgroup = 1;
 		insgnum = atoi(m + 1);
 	    }
+#endif
 	    insspace = (compinsert[strlen(compinsert) - 1] == ' ');
 	} else {
 	    char *p;
@@ -770,10 +776,12 @@ callcompfunc(char *s, char *fn)
 
 	    if (useline && (p = strchr(compinsert, ':'))) {
 		insmnum = atoi(++p);
+#if 0
 		if ((p = strchr(p, ':'))) {
 		    insgroup = 1;
 		    insgnum = atoi(p + 1);
 		}
+#endif
 	    }
 	}
 	startauto = ((compinsert &&
@@ -840,8 +848,12 @@ makecomplist(char *s, int incmd, int lst)
 	mnum = 0;
 	unambig_mnum = -1;
 	isuf = NULL;
-	insmnum = insgnum = 1;
-	insgroup = oldlist = oldins = 0;
+	insmnum = 1;
+#if 0
+	insgnum = 1;
+	insgroup = 0;
+#endif
+	oldlist = oldins = 0;
 	begcmgroup("default", 0);
 	menucmp = menuacc = newmatches = onlyexpl = 0;
 

@@ -1076,6 +1076,7 @@ do_ambig_menu(void)
 	} else
 	    minfo.cur = NULL;
     }
+#if 0
     if (insgroup) {
 	insgnum = comp_mod(insgnum, lastpermgnum);
 	for (minfo.group = amatches;
@@ -1088,6 +1089,7 @@ do_ambig_menu(void)
 	}
 	insmnum = comp_mod(insmnum, (minfo.group)->mcount);
     } else {
+#endif
 	insmnum = comp_mod(insmnum, lastpermmnum);
 	for (minfo.group = amatches;
 	     minfo.group && (minfo.group)->mcount <= insmnum;
@@ -1098,7 +1100,9 @@ do_ambig_menu(void)
 	    minfo.asked = 0;
 	    return;
 	}
+#if 0
     }
+#endif
     mc = (minfo.group)->matches + insmnum;
     do_single(*mc);
     minfo.cur = mc;

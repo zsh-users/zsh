@@ -1,5 +1,9 @@
 2000-04-12  Sven Wischnowsky <wischnow@informatik.hu-berlin.de>
 
+	* 10690: Doc/Zsh/compwid.yo, Src/Zle/compcore.c, Src/Zle/compctl.c,
+ 	Src/Zle/compresult.c: comment out the code to allow
+ 	$compstate[insert] to select the group
+	
 	* 10686: Src/Zle/compresult.c, Src/Zle/zle_tricky.c: display
  	number of lines instead of number of matches when asking whether
  	to show completion lists
