@@ -4231,7 +4231,8 @@ bin_read(char *name, char **args, Options ops, int func)
 	}
     }
     if (OPT_ISSET(ops,'d')) {
-        delim = *OPT_ARG(ops,'d');
+	char *delimstr = OPT_ARG(ops,'d');
+        delim = (delimstr[0] == Meta) ? delimstr[1] ^ 32 : delimstr[0];
 	if (SHTTY != -1) {
 	    struct ttyinfo ti;
 	    gettyinfo(&ti);

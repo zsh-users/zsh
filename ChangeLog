@@ -1,3 +1,8 @@
+2003-07-09  Peter Stephenson  <pws@csr.com>
+
+	* 18836: Src/builtin.c, Test/B04read.ztst: `read -d' failed with
+	metafied delimiters, in particular null.
+
 2003-07-07  Peter Stephenson  <pws@csr.com>
 
 	* 18824: Functions/Zle/kill-word-match: deleted to the end

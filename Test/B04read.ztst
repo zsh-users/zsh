@@ -63,3 +63,9 @@
 0:read with timeout (no waiting should occur)
 >hello
 >0
+
+ print -n 'Testing the\0null hypothesis\0' |
+ while read -d $'\0' line; do print $line; done
+0:read with null delimiter
+>Testing the
+>null hypothesis
