@@ -1,3 +1,11 @@
+2000-10-05  Sven Wischnowsky  <wischnow@zsh.org>
+
+	* 12892: Completion/Core/_files, Completion/Core/_path_files,
+ 	Doc/Zsh/compsys.yo, Doc/Zsh/expn.yo: complete after autoloaded
+ 	directories (a rather ugly hack); remove old code in _files (comma
+ 	separated patterns); improve docs for fake style and for comma
+ 	separated qualifier lists
+	
 2000-10-04  Tanaka Akira  <akr@zsh.org>
 
 	* 12886: Completion/User/_cvs: make _cvs_vendor_branches to handle

@@ -1010,9 +1010,10 @@ components after the first ambiguous one.
 )
 kindex(fake, completion style)
 item(tt(fake))(
-Currently, this style is only used when completing files and lookup up 
+Currently, this style is only used when completing files and looked up 
 with the tag tt(files).  Its values are of the form
-`var(dir)tt(:)var(names...)'.  This will add the var(names) as
+`var(dir)tt(:)var(names...)'.  This will add the var(names) (strings
+separated by spaces) as
 possible matches when completing in the directory var(dir), even if no 
 such files really exist.
 

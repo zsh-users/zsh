@@ -55,7 +55,7 @@ for def in "$pats[@]"; do
   for sdef in "$def[@]"; do
 
     tag="${${sdef#*[^\\]:}%%:*}"
-    pat="${${${sdef%%:${tag}*}//\\:/:}//,/ }"
+    pat="${${sdef%%:${tag}*}//\\:/:}"
 
     (( $tried[(I)${(q)pat}] )) && continue
 

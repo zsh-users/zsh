@@ -315,6 +315,10 @@ for prepath in "$prepaths[@]"; do
       SUFFIX="${tsuf%%/*}"
     fi
 
+    # Force auto-mounting. There might be a better way...
+
+    : ${^tmp1}/${PREFIX}${SUFFIX}/.(N/)
+
     # Get the matching files by globbing.
 
     if [[ "$tpre$tsuf" = */* ]]; then
