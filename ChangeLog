@@ -1,3 +1,8 @@
+2000-05-10  Peter Stephenson  <pws@cambridgesiliconradio.com>
+
+	* Naoki Wakamatsu: 11287: Completion/Core/compinstall: tab had
+	incorrectly turned to spaces.
+
 2000-05-10  Sven Wischnowsky  <wischnow@zsh.org>
 
 	* 11294: Src/Zle/computil.c: fix for `-+opt' with mutex list

@@ -91,7 +91,7 @@ fi
 ifile=$newifile
 
 if [[ $foundold = true ]]; then
-  sed -n "/^[   ]*$startline/,/^[       ]*$endline/p" $ifile |
+  sed -n "/^[ 	]*$startline/,/^[ 	]*$endline/p" $ifile |
   # Use the default read behaviour to handle any continuation lines.
   while read line; do
     (( lines_found++ ))
