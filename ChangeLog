@@ -1,8 +1,7 @@
 2004-03-19  Peter Stephenson  <pws@csr.com>
 
 	* unposted: Config/version.mk, Etc/NEWS, Util/.distfiles:
-	zsh-4.2.0 released (note this entry didn't make it into the
-	released file).
+	zsh-4.2.0 released.
 
 2004-03-18  Peter Stephenson  <pws@csr.com>
 
