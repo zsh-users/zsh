@@ -121,7 +121,6 @@ char *glob_pre, *glob_suf;
 /* struct to easily save/restore current state */
 
 struct globdata {
-    int gd_badcshglob;
     int gd_pathpos;
     char *gd_pathbuf;
 
@@ -176,7 +175,6 @@ static struct globdata curglobdata;
 #define save_globstate(N) \
   do { \
     memcpy(&(N), &curglobdata, sizeof(struct globdata)); \
-    (N).gd_badcshglob = badcshglob; \
     (N).gd_pathpos = pathpos; \
     (N).gd_pathbuf = pathbuf; \
     (N).gd_glob_pre = glob_pre; \
@@ -186,7 +184,6 @@ static struct globdata curglobdata;
 #define restore_globstate(N) \
   do { \
     memcpy(&curglobdata, &(N), sizeof(struct globdata)); \
-    badcshglob = (N).gd_badcshglob; \
     pathpos = (N).gd_pathpos; \
     pathbuf = (N).gd_pathbuf; \
     glob_pre = (N).gd_glob_pre; \
