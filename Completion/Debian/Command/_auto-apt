@@ -1,0 +1,57 @@
+#compdef auto-apt
+
+local expl prev ret
+
+prev="$words[CURRENT-1]"
+
+# if there is a command in arguments ?
+if [[ -n $words[(r)(run|update|update-local|merge|del|check|list|search|debuilt|status)] ]] ; then
+
+    # yes, add completion for command arguments and command options
+    if [[ -n $words[(r)(update|update-local|merge)] && "$words[CURRENT]" = -* ]] ; then
+	_wanted option expl 'option' compadd - "-a" && return 0;
+    fi
+
+    if [[ -n $words[(r)(check|list|search)] && "$words[CURRENT]" = -* ]] ; then
+	_wanted option expl 'option' compadd - "-v" "-f" && return 0;
+    fi
+
+    case $prev in
+	"run")
+	    _wanted command expl 'command' _files -g '*(/,*)' && return 0 ;;
+	"del")
+	    _wanted package expl 'package' _deb_packages avail && return 0 ;;
+    esac
+else
+    # no, add completion for commands or options (and options arguments)
+    case $prev in 
+	"-a")
+	    local distribs
+	    distribs=("main" "contrib" "non-free" "non-US" "none")
+	    
+	    _values -s , 'distribution' $distribs ;;
+	"-p")
+	    local hooks
+	    hooks=("exec" "open" "access" "stat" "none")
+	    _values -s , 'hook' $hooks ;;
+	"-D")
+	    _wanted file expl 'dbfile' _files ;;
+	"-F")
+	    _wanted file expl 'filedb' _files ;;
+	*)
+	    
+	    local commands options
+	    
+	    commands=("run" "update" "update-local" "merge" "del" "check" "list" "search" "debuild" "status")
+	    options=("-h" "-s" "-y" "-q" "-i" "-X" "-x" "-a" "-p" "-D" "-F" "-L")
+	    
+	    if [[ "$words[CURRENT]" = -* ]] ; then
+		_wanted option expl 'option' compadd - $options
+	    else
+		_wanted command expl 'command' compadd $commands
+	    fi
+	    ;;
+    esac
+
+    return 0
+fi

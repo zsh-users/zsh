@@ -4,4 +4,5 @@ _apt
 _bts	_bug
 _dpkg       _dpkg_source  _dput  _dupload
 _update-alternatives   _make-kpkg    _debfoster
+_auto-apt
 '
