@@ -68,7 +68,7 @@ static struct builtin builtins[] =
     BUILTIN("functions", BINF_TYPEOPTS, bin_functions, 0, -1, 0, "mtuU", NULL),
     BUILTIN("getln", 0, bin_read, 0, -1, 0, "ecnAlE", "zr"),
     BUILTIN("getopts", 0, bin_getopts, 2, -1, 0, NULL, NULL),
-    BUILTIN("hash", BINF_MAGICEQUALS, bin_hash, 0, -1, 0, "dfmrv", NULL),
+    BUILTIN("hash", BINF_MAGICEQUALS, bin_hash, 0, -1, 0, "Ldfmrv", NULL),
 
 #ifdef ZSH_HASH_DEBUG
     BUILTIN("hashinfo", 0, bin_hashinfo, 0, 0, 0, NULL, NULL),
@@ -99,7 +99,7 @@ static struct builtin builtins[] =
     BUILTIN("r", BINF_R, bin_fc, 0, -1, BIN_FC, "nrl", NULL),
     BUILTIN("read", 0, bin_read, 0, -1, 0, "rzu0123456789pkqecnAlE", NULL),
     BUILTIN("readonly", BINF_TYPEOPTS | BINF_MAGICEQUALS | BINF_PSPECIAL, bin_typeset, 0, -1, 0, "AEFLRTUZafghiltux", "r"),
-    BUILTIN("rehash", 0, bin_hash, 0, 0, 0, "dfv", "r"),
+    BUILTIN("rehash", 0, bin_hash, 0, 0, 0, "df", "r"),
     BUILTIN("return", BINF_PSPECIAL, bin_break, 0, 1, BIN_RETURN, NULL, NULL),
     BUILTIN("set", BINF_PSPECIAL, bin_set, 0, -1, 0, NULL, NULL),
     BUILTIN("setopt", 0, bin_setopt, 0, -1, BIN_SETOPT, NULL, NULL),
@@ -2461,6 +2461,7 @@ bin_hash(char *name, char **argv, char *ops, int func)
     Patprog pprog;
     Asgment asg;
     int returnval = 0;
+    int printflags = 0;
 
     if (ops['d'])
 	ht = nameddirtab;
@@ -2485,9 +2486,11 @@ bin_hash(char *name, char **argv, char *ops, int func)
 	return 0;
     }
 
+    if (ops['L']) printflags |= PRINT_LIST;
+
     /* Given no arguments, display current hash table. */
     if (!*argv) {
-	scanhashtable(ht, 1, 0, 0, ht->printnode, 0);
+	scanhashtable(ht, 1, 0, 0, ht->printnode, printflags);
 	return 0;
     }
 
@@ -2498,7 +2501,7 @@ bin_hash(char *name, char **argv, char *ops, int func)
 	    tokenize(*argv);  /* expand */
 	    if ((pprog = patcompile(*argv, PAT_STATIC, NULL))) {
 		/* display matching hash table elements */
-		scanmatchtable(ht, pprog, 0, 0, ht->printnode, 0);
+		scanmatchtable(ht, pprog, 0, 0, ht->printnode, printflags);
 	    } else {
 		untokenize(*argv);
 		zwarnnam(name, "bad pattern : %s", *argv, 0);

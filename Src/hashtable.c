@@ -734,6 +734,13 @@ printcmdnamnode(HashNode hn, int printflags)
 	return;
     }
 
+    if (printflags & PRINT_LIST) {
+	printf("hash ");
+
+	if(cn->nam[0] == '-')
+	    printf("-- ");
+    }
+
     if (cn->flags & HASHED) {
 	quotedzputs(cn->nam, stdout);
 	putchar('=');
@@ -1370,6 +1377,13 @@ printnameddirnode(HashNode hn, int printflags)
 	zputs(nd->nam, stdout);
 	putchar('\n');
 	return;
+    }
+    
+    if (printflags & PRINT_LIST) {
+      printf("hash -d ");
+
+      if(nd->nam[0] == '-')
+	    printf("-- ");
     }
 
     quotedzputs(nd->nam, stdout);

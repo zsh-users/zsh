@@ -39,7 +39,7 @@ case ${words[1]} in
     use="Umtu"
     func=f
   ;;
-  integer) use="ghlrtux" ;;
+  integer) use="ghilrtux" ;;
   readonly) use="${use/r/}" ;;
   local) use="${use/f/}" ;&
   export) use="${${use/g/}/x/}" ;;
