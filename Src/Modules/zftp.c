@@ -3197,40 +3197,8 @@ bin_zftp(char *name, char **args, char *ops, int func)
     return ret;
 }
 
-/* The load/unload routines required by the zsh library interface */
-
-/**/
-int
-setup_(Module m)
-{
-    return 0;
-}
-
-/**/
-int
-boot_(Module m)
-{
-    int ret;
-    if ((ret = addbuiltins(m->nam, bintab,
-			   sizeof(bintab)/sizeof(*bintab))) == 1) {
-	/* if successful, set some default parameters */
-	off_t tmout_def = 60;
-	zfsetparam("ZFTP_VERBOSE", ztrdup("450"), ZFPM_IFUNSET);
-	zfsetparam("ZFTP_TMOUT", &tmout_def, ZFPM_IFUNSET|ZFPM_INTEGER);
-	zfsetparam("ZFTP_PREFS", ztrdup("PS"), ZFPM_IFUNSET);
-	/* default preferences if user deletes variable */
-	zfprefs = ZFPF_SNDP|ZFPF_PASV;
-    
-	zfsessions = znewlinklist();
-	newsession("default");
-    }
-
-    return !ret;
-}
-
-/**/
-int
-cleanup_(Module m)
+static void
+zftp_cleanup(void)
 {
     /*
      * There are various parameters hanging around, but they're
@@ -3252,7 +3220,55 @@ cleanup_(Module m)
     zfunsetparam("ZFTP_SESSION");
     freelinklist(zfsessions, (FreeFunc) freesession);
     zfree(zfstatusp, sizeof(int)*zfsesscnt);
-    deletebuiltins(m->nam, bintab, sizeof(bintab)/sizeof(*bintab));
+    deletebuiltins("zftp", bintab, sizeof(bintab)/sizeof(*bintab));
+}
+
+static int
+zftpexithook(Hookdef d, void *dummy)
+{
+    zftp_cleanup();
+    return 0;
+}
+
+/* The load/unload routines required by the zsh library interface */
+
+/**/
+int
+setup_(Module m)
+{
+    return 0;
+}
+
+/**/
+int
+boot_(Module m)
+{
+    int ret;
+    if ((ret = addbuiltins("zftp", bintab,
+			   sizeof(bintab)/sizeof(*bintab))) == 1) {
+	/* if successful, set some default parameters */
+	off_t tmout_def = 60;
+	zfsetparam("ZFTP_VERBOSE", ztrdup("450"), ZFPM_IFUNSET);
+	zfsetparam("ZFTP_TMOUT", &tmout_def, ZFPM_IFUNSET|ZFPM_INTEGER);
+	zfsetparam("ZFTP_PREFS", ztrdup("PS"), ZFPM_IFUNSET);
+	/* default preferences if user deletes variable */
+	zfprefs = ZFPF_SNDP|ZFPF_PASV;
+    
+	zfsessions = znewlinklist();
+	newsession("default");
+
+	addhookfunc("exit", zftpexithook);
+    }
+
+    return !ret;
+}
+
+/**/
+int
+cleanup_(Module m)
+{
+    deletehookfunc("exit", zftpexithook);
+    zftp_cleanup();
     return 0;
 }
 
