@@ -54,7 +54,7 @@ _apt_arguments () {
   case \$current_option in
   ${comp_hasarg}esac"
 
-  local short_seq false true bool __bool_ intlevel word word1 nul
+  local short_seq false true bool bool_prefix intlevel word word1 nul
   local comp_bool comp_intlevel comp_configfile comp_arbitem comp_long comp_opt
   local regex_short regex_long regex_all
 
@@ -66,7 +66,7 @@ _apt_arguments () {
   true=(yes true with on enable)
   bool=($false $true)
 
-  __bool_=(--${^bool}-)
+  bool_prefix=(--${^bool}-)
 
   intlevel='[0-9]##'
 
@@ -82,36 +82,28 @@ _apt_arguments () {
   comp_short=\
 'if [[ $PREFIX = -'"$short_seq"' ]]; then
   _apt_consume_short ${PREFIX[2,-1]}
-  tmp1=(${${(M)${(s:,:)${(kj:,:)options[(R)*~0]}}:#-?}#-})
-  if [[ $PREFIX = - ]]; then
-    compadd "$expl_opt[@]" - -${^tmp1}
-  else
-    tmp2=(-${^tmp1})
-    compadd "$expl_opt[@]" -y "($tmp2)" - ${PREFIX}${^tmp1}
-  fi
+  tmp1=(${(M)${(s:,:)${(kj:,:)options[(R)*~0]}}:#-?})
+  tmp2=(${PREFIX}${^tmp1#-})
+  _describe -o option tmp1 tmp2
 elif [[ -z "$PREFIX" ]]; then
-  compadd "$expl_opt[@]" - ${(M)${(s:,:)${(kj:,:)options[(R)*~0]}}:#-?}
+  tmp1=(${(M)${(s:,:)${(kj:,:)options[(R)*~0]}}:#-?})
+  _describe -o option tmp1
 fi'
 
   comp_long=\
 'tmp1="${(j:|:)${(@)${(@M)${(@s:,:)${(@kj:,:)options[(R)*~0]}}:#--*}#--}}"
 tmp2=(--${(M)^long_bool:#$~tmp1} --${(M)^long_intlevel:#$~tmp1})
-compadd "$expl_opt[@]" - $tmp2
-tmp2=(--${(M)^long_hasarg:#$~tmp1} --${(M)^long_configfile:#$~tmp1} --${(M)^long_arbitem:#$~tmp1})
-compadd "$expl_opt[@]" -S= - $tmp2
-compadd "$expl_opt[@]" -S "" - '"$__bool_"
+tmp3=(--${(M)^long_hasarg:#$~tmp1} --${(M)^long_configfile:#$~tmp1} --${(M)^long_arbitem:#$~tmp1})
+_describe -o option tmp2 -- tmp3 -S= -- bool_prefix -S ""'
 
   comp_long_prefix=\
 'tmp1="${(j:|:)${(@)${(@M)${(@s:,:)${(@kj:,:)options[(R)*~0]}}:#--*}#--}}"
 tmp2=($_ra_left${(M)^long_bool:#$~tmp1} $_ra_left${(M)^long_intlevel:#$~tmp1})
-compadd "$expl_opt[@]" - $tmp2
-tmp2=($_ra_left${(M)^long_hasarg:#$~tmp1} $_ra_left${(M)^long_configfile:#$~tmp1} $_ra_left${(M)^long_arbitem:#$~tmp1})
-compadd "$expl_opt[@]" -S= - $tmp2
+tmp3=($_ra_left${(M)^long_hasarg:#$~tmp1} $_ra_left${(M)^long_configfile:#$~tmp1} $_ra_left${(M)^long_arbitem:#$~tmp1})
 tmp1="${(j:|:)${(@)${(@M)${(@s:,:)${(@kj:,:)options[(R)*~0]}}:#-?}#-}}"
-tmp2=($_ra_left${(M)^short_bool:#$~tmp1} $_ra_left${(M)^short_intlevel:#$~tmp1})
-compadd "$expl_opt[@]" - $tmp2
-tmp2=($_ra_left${(M)^short_hasarg:#$~tmp1} $_ra_left${(M)^short_configfile:#$~tmp1} $_ra_left${(M)^short_arbitem:#$~tmp1})
-compadd "$expl_opt[@]" -S= - $tmp2'
+tmp2=("$tmp2[@]" $_ra_left${(M)^short_bool:#$~tmp1} $_ra_left${(M)^short_intlevel:#$~tmp1})
+tmp3=("$tmp3[@]" $_ra_left${(M)^short_hasarg:#$~tmp1} $_ra_left${(M)^short_configfile:#$~tmp1} $_ra_left${(M)^short_arbitem:#$~tmp1})
+_describe -o option tmp2 -- tmp3 -S='
 
   comp_opt='[[ -prefix - || -z "$compconfig[option_prefix]" || "$compconfig[option_prefix]" = *\!$words[1]* ]]'" && { $comp_short; $comp_long }"
 
@@ -321,6 +313,7 @@ compadd "$expl_opt[@]" -S= - $tmp2'
 
     local short_hasarg short_bool short_intlevel short_configfile short_arbitem
     local long_hasarg long_bool long_intlevel long_configfile long_arbitem
+    local bool_prefix
     short_hasarg=($short_hasarg)
     short_bool=($short_bool)
     short_intlevel=($short_intlevel)
@@ -331,13 +324,14 @@ compadd "$expl_opt[@]" -S= - $tmp2'
     long_intlevel=($long_intlevel)
     long_configfile=($long_configfile)
     long_arbitem=($long_arbitem)
+    bool_prefix=($bool_prefix)
 
     local expl_opt expl_bool expl_configfile
     _description expl_opt option
     _description expl_bool 'bool value'
     _description expl_configfile 'config file'
 
-    local current_option tmp1 tmp2
+    local current_option tmp1 tmp2 tmp3
 
     ${funcname}_sm
   }"

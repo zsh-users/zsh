@@ -227,7 +227,7 @@ builtin functions _cvs_history_x >&- ||
 _cvs_history_x () {
   compset -P '*'
 
-  compadd "$@" -y '(
+  compadd "$@" -S '' -d '(
   F\ --\ release
   O\ --\ checkout
   E\ --\ export

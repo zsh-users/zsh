@@ -58,7 +58,7 @@ while (( $# )); do
   (( nsets++ ))
   descr="$1"
   [[ -n "$showd" ]] && adescr=( "$adescr[@]" "${(@PM)^descr:#*:?*},$nsets" )
-  if [[ "$2" = -* ]]; then
+  if [[ $# = 1 || "$2" = -* ]]; then
     match=''
     shift
   else
