@@ -1,0 +1,95 @@
+#autoload
+
+# Usage:
+#   _combination [-s S] V[:K1:...] Ki1[:Ni1]=Pi1 Ki2[:Ni2]=Pi2 ... Kim[:Nim]=Pim Kj[:Nj] EXPL...
+#
+#  It is assumed that V is formed as PRE_K1_..._Kn if `:K1:...' is not specified.
+#
+# Example: telnet
+#
+#  Assume an user sets the variable `telnet_hosts_ports_users' as:
+#
+#    telnet_hosts_ports_users=(
+#      host0:: host1::user1 host2::user2
+#      mail-server:{smtp,pop3}:
+#      news-server:nntp:
+#      proxy-server:8000:
+#    )
+#
+#  `_telnet completes' hosts as:
+#
+#    _combination telnet_hosts_ports_users \
+#      ${options[-l]:+users=${options[-l]:q}} \
+#      hosts "$expl[@]"
+#
+#  This completes `host1', `host2', `mail-server', `news-server' and
+#  `proxy-server' according to the user given with `-l' if it is exists.
+#  And if it is failed, `_hosts' is called.
+# 
+#  `_telnet' completes ports as:
+#
+#    _combination telnet_hosts_ports_users \
+#      ${options[-l]:+users=${options[-l]:q}} \
+#      hosts="${line[2]:q}" \
+#      ports "$expl[@]"
+#
+#  This completes `smtp', `pop3', `nntp' and `8000' according to the
+#  host argument --- $line[2] and the user option argument if it is
+#  exists. And if it is failed, `_ports' is called.
+#
+#  `_telnet' completes users for an argument of option `-l' as:
+#
+#    _combination telnet_hosts_ports_users \
+#      ${line[2]:+hosts="${line[2]:q}"} \
+#      ${line[3]:+ports="${line[3]:q}"} \
+#      users "$expl[@]"
+#
+#  This completes `user1' and `user2' according to the host argument and
+#  the port argument if they are exist. And if it is failed, `_users' is
+#  called.
+
+local sep var keys pats key num tmp
+
+if [[ "$1" = -s ]]; then
+  sep="$2"
+  shift 2
+else
+  sep=:
+fi
+
+var=$1
+shift
+
+if [[ $var = *:* ]]; then
+  keys=( ${(s/:/)var} )
+  shift keys
+  var="${var%%:*}"
+else
+  keys=( "${(@s:_:)${var#*_}}" )
+fi
+pats=( "${(@)keys/*/*}" )
+
+while [[ "$1" = *=* ]]; do
+  tmp="${1%%\=*}"
+  key="${tmp%:*}"
+  num="${${tmp##*:}:-1}"
+  pats[$keys[(in:num:)$key]]="${1#*\=}"
+  shift
+done
+
+key="${1%:*}"
+num="${${1##*:}:-1}"
+shift
+
+if (( ${(P)+${var}} )); then
+  eval "tmp=( \"\${(@M)${var}:#\${(j($sep))~pats}}\" )"
+  if (( keys[(in:num:)$key] != 1 )); then
+    eval "tmp=( \${tmp#\${(j(${sep}))~\${(@)\${(@)keys[2,(rn:num:)\$key]}/*/*}}$sep} )"
+  fi
+  tmp=( ${tmp%%$sep*} )
+
+  compadd "$@" - $tmp || { builtin functions _$key >&- && _$key "$@" }
+else
+  builtin functions _$key >&- && _$key "$@"
+fi
+

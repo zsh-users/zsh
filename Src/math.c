@@ -161,7 +161,7 @@ static int prec[TOKCOUNT] =
      0,  16, 0
 };
 
-#define TOPPREC 16
+#define TOPPREC 17
 #define ARGPREC (TOPPREC-1)
 
 static int type[TOKCOUNT] =
@@ -498,31 +498,35 @@ callmathfunc(char *o)
 	    mnumber *argv = NULL, *q;
 	    LinkList l = newlinklist();
 	    LinkNode node;
-	    char *p;
 
-	    if (*a) {
-		for (p = a; *a; a++) {
-		    if (*a == '\\' && a[1])
-			a++;
-		    else if (*a == ',') {
-			*a = '\0';
-			addlinknode(l, p);
-			argc++;
-			p = a + 1;
-		    }
+	    while (iblank(*a))
+		a++;
+	    while (*a) {
+		if (*a) {
+		    argc++;
+ 		    q = (mnumber *)zhalloc(sizeof(mnumber));
+		    *q = mathevall(a, ARGPREC, &a);
+		    addlinknode(l, q);
+		    if (errflag || mtok != COMMA)
+			break;
+		    a++;
 		}
-		addlinknode(l, p);
-		argc++;
 	    }
-	    if (argc >= f->minargs && (f->maxargs < 0 || argc <= f->maxargs)) {
-		if (argc) {
-		    q = argv = (mnumber *) zhalloc(argc * sizeof(mnumber));
-		    for (node = firstnode(l); node; incnode(node))
-			*q++ = matheval((char *) getdata(node));
-		}
-		return f->nfunc(n, argc, argv, f->funcid);
-	    } else
-		zerr("wrong number of argument: %s", o, 0);
+	    if (*a && !errflag)
+		zerr("bad math expression: illegal character: %c",
+		     NULL, *a);
+	    if (!errflag) {
+		if (argc >= f->minargs && (f->maxargs < 0 ||
+					   argc <= f->maxargs)) {
+		    if (argc) {
+			q = argv = (mnumber *)zhalloc(argc * sizeof(mnumber));
+			for (node = firstnode(l); node; incnode(node))
+			    *q++ = *(mnumber *)getdata(node);
+		    }
+		    return f->nfunc(n, argc, argv, f->funcid);
+		} else
+		    zerr("wrong number of arguments: %s", o, 0);
+	    }
 	}
     } else
 	zerr("unknown function: %s", n, 0);

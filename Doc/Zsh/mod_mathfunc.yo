@@ -1,0 +1,52 @@
+texinode(The mathfunc Module)(The parameter Module)(The mapfile Module)(Zsh Modules)
+sect(The mathfunc Module)
+cindex(functions, mathematical)
+cindex(mathematical functions)
+The tt(mathfunc) module provides standard mathematical functions for use when
+evaluating mathematical formulae.  The syntax agrees with normal C and
+FORTRAN conventions, for example,
+
+example((( f = sin(0.3) )))
+
+assigns the sine of 0.3 to the parameter f.
+
+Most functions take floating point arguments and return a floating point
+value.  However, any necessary conversions from or to integer type will be
+performed automatically by the shell.  Apart from tt(atan) with a second
+argument and the tt(abs), tt(int) and tt(float) functions, all functions
+behave as noted in the manual page for the corresponding C function,
+except that any arguments out of range for the function in question will be
+detected by the shell and an error reported.
+
+The following functions take a single floating point argument: tt(acos),
+tt(acosh), tt(asin), tt(asinh), tt(atan), tt(atanh), tt(cbrt), tt(ceil),
+tt(cos), tt(cosh), tt(erf), tt(erfc), tt(exp), tt(expm1), tt(fabs),
+tt(floor), tt(gamma), tt(j0), tt(j1), tt(lgamma), tt(log), tt(log10),
+tt(log1p), tt(logb), tt(sin), tt(sinh), tt(sqrt), tt(tan), tt(tanh),
+tt(y0), tt(y1).  The tt(atan) function can optionally take a second
+argument, in which case it behaves like the C function tt(atan2).
+The tt(ilogb) function takes a single floating point argument, but
+returns an integer.
+
+The function tt(signgam) takes no arguments, and returns an integer, which
+is the C variable of the same name, as described in manref(gamma)(3).  Note
+that it is therefore only useful immediately after a call to tt(gamma) or
+tt(lgamma).  Note also that `tt(signgam())' and `tt(signgam)' are distinct
+expresssions.
+
+The following functions take two floating point arguments: tt(copysign),
+tt(drem), tt(fmod), tt(hypot), tt(nextafter).
+
+The following take an integer first argument and a floating point second
+argument: tt(jn), tt(yn).
+
+The following take a floating point first argument and an integer second
+argument: tt(ldexp), tt(scalb).
+
+The function tt(abs) does not convert the type of its single argument; it
+returns the absolute value of either a floating point number or an
+integer.  The functions tt(float) and tt(int) convert their arguments into
+a floating point or integer value (by truncation) respectively.
+
+Note that the C tt(pow) function is available in ordinary math evaluation
+as the `tt(**)' operator and is not provided here.

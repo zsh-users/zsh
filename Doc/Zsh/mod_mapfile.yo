@@ -1,4 +1,4 @@
-texinode(The mapfile Module)(The parameter Module)(The files Module)(Zsh Modules)
+texinode(The mapfile Module)(The mathfunc Module)(The files Module)(Zsh Modules)
 sect(The mapfile Module)
 cindex(parameter, file access via)
 The tt(mapfile) module provides one special associative array parameter of
