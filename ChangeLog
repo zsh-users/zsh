@@ -1,3 +1,10 @@
+2003-02-23  Peter Stephenson  <pws@pwstephenson.fsnet.co.uk>
+
+	* unposted, see 18276: Completion/Unix/Command/_perforce:
+	fix labels and clients after `@'; rationalise function and tag
+	names; add date completion; add service=p4-<subcommand> support;
+	note bug with tags looping.
+
 2003-02-21  Peter Stephenson  <pws@csr.com>
 
 	* 18264: Src/jobs.c: free unused bits of job table properly

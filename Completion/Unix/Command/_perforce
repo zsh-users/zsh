@@ -1,4 +1,4 @@
-#compdef p4 -value-,P4CLIENT,-default- -value-,P4PORT,-default-
+#compdef p4 -value-,P4CLIENT,-default- -value-,P4PORT,-default- -value-,P4MERGE,-default- -value-,P4USER,-default-
 
 # Increasingly loosely based on _cvs version 1.17.
 
@@ -7,13 +7,13 @@
 #
 # If the `verbose' style is set (it is assumed by default), verbose
 # descriptions are provided for many completed quantities derived
-# dynamically such as subcommand names, labels, changelists -- in fact,
+# dynamically such as subcommand names, labels, changes -- in fact,
 # just about anything for which Perforce itself produces a verbose,
 # one-line description.  It may be turned off in the context of each
 # subcommand e.g.
 #   zstyle ':completion:*:p4-labelsync:*' verbose false
-# or for a particular tag, e.g. changelists,
-#   zstyle ':completeion:*:changelists' verbose false
+# or for a particular tag, e.g. changes,
+#   zstyle ':completeion:*:changes' verbose false
 # or just for top-level completion (i.e. up to and including completion
 # of the subcommand):
 #   zstyle ':completion:*:p4:*' verbose false
@@ -23,12 +23,13 @@
 # Perforce completion system; it's mentioned here as verbosity adds
 # significantly to a lot of the Perforce completions.
 #
-# Note that completing changelists (which are just numbers) is not very
-# useful if `verbose' is turned off.  There is no speed advantage for
-# turning it off, either.
+# Note that completing change numbers is not very useful if `verbose' is
+# turned off.  There is no speed advantage for turning it off, either.
+# (Changes are also known as changelists or changesets.  The functions
+# and tags here all consistently use `changes'.)
 #
 # The style `max' can be set to a number which limits how many
-# possibilities can be shown when selecting changelists or jobs.  This is
+# possibilities can be shown when selecting changes or jobs.  This is
 # handled within Perforce, so the completion code may limit the number even
 # further.  If not set explicitly, the value is taken to be 20 to avoid a
 # huge database being output.  Set it to a larger number if necessary.
@@ -60,6 +61,12 @@
 #
 # File completion handles @ and # suffixes.  If the filename is completed,
 # typing @ or # removes the space which was automatically added.
+# The context used has `at-suffix' or `hash-suffix' in the position
+# before the tag to indicate suffix completion (as always, ^Xh will
+# show you all possible contexts).  This should make it possible
+# to select changes, dates, labels and clients using the tag-order
+# style, but unfortunately there is a bug which stops any tags afer
+# the first group from being displayed.
 #
 # A # is automatically quoted when handled in this way; if the file is
 # typed by hand or the completion didn't finish (e.g. you typed a character
@@ -69,8 +76,8 @@
 # (since e# matches any number of e's including one).  Hence this can look
 # like an expansion which expands to `filename'.
 #
-# After @, you can complete changelists (note the use of the style `max'
-# above), labels or clients (but not dates), while after `#' you can
+# After @, you can complete changes (note the use of the style `max'
+# above), labels, clients or even dates, while after `#' you can
 # complete numeric revisions or the special revision names head, none,
 # have.  These are available whether or not you completed the filename; if
 # the file doesn't exist, numeric revisions won't work, but the rest will
@@ -90,7 +97,8 @@
 # automatically if the documentation suggests the command accepts ranges at
 # that point.  This is an auto-removable suffix, so it will disappear if
 # you hit space or return.  Typing a `#' at this point will insert a
-# backslash, as before.
+# backslash, as before.  The # and @ are never added automatically; you
+# have to select one by hand.
 #
 # File completion for some functions is restricted by the Perforce
 # status of the file; for example, `p4 opened' only completes opened
@@ -147,6 +155,22 @@
 # In this case, the entire text of the word being completed is assumed
 # to constitute the job name (which is almost certainly correct).
 #
+# Completion of dates
+# ===================
+#
+# In a file revision specification it is possible to give a date
+# in the form file@YYYY/MM/DD:hh:mm:ss, which may be completed.  This
+# is ever so slightly less silly than it sounds.  Any component entered
+# by hand with the appropriate suffix will be ignored; any component
+# completed will be set to the current value.  Hence you can easily
+# specify, say, one month ago by using the completed value for all
+# components except the month and setting that to one less.  The shell
+# will also happily append the appropriate suffix if you try to complete
+# after anything which is already the appropriate width.  (Perforce
+# supports two-digit years, but these are confusing and no longer
+# particularly useful as they refer to the twentieth century, so
+# the shell does not.)
+#
 # Calls to p4
 # ===========
 #
@@ -172,7 +196,7 @@
 _perforce() {
     # rely on localoptions
     setopt nonomatch
-    local p4cmd==p4
+    local p4cmd==p4 match mbegin mend
     integer i
 
     if [[ $service = -value-* ]]; then
@@ -180,10 +204,14 @@ _perforce() {
 	# Some of these --- in particular P4PORT --- don't need
 	# the perforce server.
 	case $compstate[parameter] in
-	    (P4PORT) _perforce_host_port
+	    (P4PORT) _perforce_hosts_ports
 		     ;;
 	    (P4CLIENT) _perforce_clients
 		       ;;
+	    (P4MERGE) _command_names -e
+		      ;;
+	    (P4USER) _users
+		     ;;
 	esac
 	# We do not handle values anywhere else.
 	return
@@ -208,6 +236,20 @@ _perforce() {
 	done
     fi
 
+    # If we are given a service of the form p4-cmd, treat this
+    # as if it was after `p4 cmd'.  This provides an easy way in
+    # for scripts and functions that emulate the behaviour of
+    # p4 subcommands.  Note we don't shorten the command line arguments.
+    if [[ $service = p4-(#b)(*) ]]; then
+        local curcontext="$curcontext"
+	if (( $+functions[_perforce_cmd_${match[1]}] )); then
+	    curcontext="${curcontext%:*:*}:p4-$match[1]:"
+	    _perforce_cmd_${match[1]}
+	else
+	    _message "unhandled _perforce service: $service"
+	fi
+    fi
+
     # We need to try and check if we are before or after the
     # subcommand, since some of the options with arguments, in particular -c,
     # work differently.  It didn't work if I just added '*::...' to the
@@ -224,7 +266,7 @@ _perforce() {
     if (( i >= CURRENT )); then
 	_arguments -s : \
 	    '-c+[client]:client:_perforce_clients' \
-	    '-C+[charset]:charset:_perforce_charset' \
+	    '-C+[charset]:charset:_perforce_charsets' \
 	    '-d+[current directory]:directory:_path_files -g "*(/)"' \
 	    '-H+[hostname]:host:_hosts' \
 	    '-G[python output]' \
@@ -233,13 +275,13 @@ _perforce() {
 	    '-P+[password on server]:password: ' \
 	    '-s[output script tags]' \
 	    '-u+[user]:user name:_users' \
-	    '-x+[filename or -]:file:_perforce_file_or_Minus' \
-	    '1:perforce command:_perforce_command'
+	    '-x+[filename or -]:file:_perforce_files_or_minus' \
+	    '1:perforce command:_perforce_commands'
     else
 	(( i-- ))
 	(( CURRENT -= i ))
 	shift $i words
-	_perforce_command_arg
+	_perforce_command_args
     fi
 }
 
@@ -248,14 +290,14 @@ _perforce() {
 # Command and argument dispatchers
 #
 
-(( $+functions[_perforce_command] )) ||
-_perforce_command() {
+(( $+functions[_perforce_commands] )) ||
+_perforce_commands() {
     _describe -t p4-commands 'Perforce command' _perforce_cmd_list
 }
 
 
-(( $+functions[_perforce_command_arg] )) ||
-_perforce_command_arg() {
+(( $+functions[_perforce_command_args] )) ||
+_perforce_command_args() {
     local curcontext="$curcontext" cmd=${words[1]}
     if (( $+functions[_perforce_cmd_$cmd] )); then
 	 curcontext="${curcontext%:*:*}:p4-${cmd}:"
@@ -280,8 +322,8 @@ _perforce_branches() {
 }
 
 
-(( $+functions[_perforce_changelist] )) ||
-_perforce_changelist() {
+(( $+functions[_perforce_changes] )) ||
+_perforce_changes() {
     local cline match mbegin mend max ctype num comma file
     local -a cl cstatus
 
@@ -329,14 +371,14 @@ _perforce_changelist() {
     # output.
     cl=(
 ${${${${(f)"$(_call_program changes p4 changes -m ${max:-20} $cstatus \$file)"}##Change\ }//\ on\ /:}/\ by\ /\ }
-"default:changelist not yet numbered")
+"default:change not yet numbered")
     [[ $#cl -eq 1 && $cl[1] = '' ]] && cl=()
-    _describe -t changelists "${ctype}changelist" cl $comma
+    _describe -t changes "${ctype}change" cl $comma
 }
 
 
-(( $+functions[_perforce_charset] )) ||
-_perforce_charset() {
+(( $+functions[_perforce_charsets] )) ||
+_perforce_charsets() {
     local expl
     _wanted charset expl 'character set' \
 	 compadd eucjp iso8859-1 shiftjis utf8 winansi
@@ -348,8 +390,10 @@ _perforce_clients() {
     local cline match mbegin mend 
     local -a slash cl
 
-    # Are we completing a client view in a filespec?
-    compset -P '//' && slash=(-S/ -q)
+    # Are we completing after an @, or a client view in a filespec?
+    if ! compset -P '*@'; then
+	compset -P '//' && slash=(-S/ -q)
+    fi
 
     cl=(${${${(f)"$(_call_program clients p4 clients)"}##Client\ }/\ /:})
     [[ $#cl -eq 1 && $cl[1] = '' ]] && cl=()
@@ -368,8 +412,8 @@ _perforce_counters() {
 }
 
 
-(( $+functions[_perforce_counter_value] )) ||
-_perforce_counter_value() {
+(( $+functions[_perforce_counter_values] )) ||
+_perforce_counter_values() {
     if [[ -n $words[CURRENT-1] ]]; then
 	 local value="$(_call_program counter p4 counter $words[CURRENT-1] 2>/dev/null)"
 	 if [[ -n $value ]]; then
@@ -378,6 +422,46 @@ _perforce_counter_value() {
 	     _wanted value expl 'counter value' compadd $value
 	 fi
     fi
+}
+
+
+(( $+functions[_perforce_dates] )) ||
+_perforce_dates() {
+    # Only useful in a file spec after `@'.
+    compset -P '*@'
+
+    # Date/time now in format required by Perforce.
+    local now="$(date +%Y:%m:%d:%T)" name prefix
+    local -a nowarray offer opts matchpats suffixes names
+    nowarray=(${(s.:.)now})
+
+    names=(   year month day\ of\ month hour minute second)
+    suffixes=(  /    /    :               :     :     ''  )
+
+    integer i
+    prefix=${(Q)PREFIX}
+    for (( i = 6; i >= 1; i-- )); do
+	# Match from the most specific back.
+	# The following is one of those occasions where zsh
+	# substitution skips to the right answer without ever
+	# passing through the real world on the way.
+	if [[ $prefix = *${(j.*.)~suffixes[1,i-1]}* ]]; then
+	    (( i > 1 )) && compset -P "*$suffixes[i-1]"
+	    # If what's there already is the right length,
+	    # just accept it and add the suffix.
+	    prefix=${(Q)PREFIX}
+	    if [[ ${#prefix} = ${#nowarray[i]} ]]; then
+		offer=($prefix)
+	    else
+		offer=($nowarray[i])
+	    fi
+	    [[ -n $suffixes[i] ]] && opts=(-S $suffixes[i] -q)
+	    name=$names[i]
+	    break
+	fi
+    done
+
+    _describe -t dates $name offer $opts
 }
 
 
@@ -392,8 +476,8 @@ _perforce_depots() {
 }
 
 
-(( $+functions[_perforce_file_or_minus] )) ||
-_perforce_file_or_minus() {
+(( $+functions[_perforce_files_or_minus] )) ||
+_perforce_files_or_minus() {
     _alternative 'minus:minus sign:(-)' 'files:file name:_files'
 }
 
@@ -463,8 +547,8 @@ _perforce_resolved_files() {
     compadd "$@" -a files
 }
 
-(( $+functions[_perforce_subdir_search] )) ||
-_perforce_subdir_search() {
+(( $+functions[_perforce_subdirs] )) ||
+_perforce_subdirs() {
     # This has no other function than to offer to add the `...' used
     # by Perforce to indicate a recursive search of directories.
     # Bit pathetic, really.
@@ -591,6 +675,8 @@ _perforce_files() {
     local -a files types
 
     local dodirs unmaintained
+    # Suffix operations can modify context
+    local curcontext="$curcontext"
 
     while (( $# )); do
 	if [[ $1 = -t(#b)(?) ]]; then
@@ -618,15 +704,23 @@ _perforce_files() {
     # special by p4 files and p4 dirs, but worry about that later.
     pfx=${(Q)PREFIX}
     if [[ -prefix *@ ]]; then
+	# Modify context to indicate we are in a suffix.
+	curcontext="${curcontext%:*}:at-suffix"
 	# Check for existing range syntax
 	[[ $PREFIX = *[@\#]*,* ]] && range=
-	# After @ you can specify changelists, clients, labels or dates.
-	# Don't try to complete dates.
+	# After @ you can specify changes, clients, labels or dates.
+	# Note we don't remove the prefix here; we leave it to the
+	# subcommand.  This is in case it needs information from
+	# the prefix; _perforce_changes uses this to limit the
+	# output to relevant changes.
 	_alternative \
-	    "changelist:changelist:_perforce_changelist $range -tf" \
-	    client:client:_perforce_clients \
-	    label:label:_perforce_labels
+	    "changes:change:_perforce_changes $range -tf" \
+	    clients:client:_perforce_clients \
+	    labels:label:_perforce_labels \
+	    'dates:date (+ time):_perforce_dates'
     elif [[ -prefix *\# ]]; then
+	# Modify context to indicate we are in a suffx.
+	curcontext="${curcontext%:*}:hash-suffix"
 	# Check for existing range syntax
 	[[ $PREFIX = *[@\#]*,* ]] && range=
 	# Remove longest possible tail match to get name --- this
@@ -661,7 +755,7 @@ _perforce_files() {
 	    altfiles+=("client-dirs:client directory:_perforce_client_dirs")
 	fi
 	altfiles+=("depot-dirs:directory in depot:_perforce_depot_dirs"
-	    "subdirs:subdirectory search:_perforce_subdir_search")
+	    "subdirs:subdirectory search:_perforce_subdirs")
 	_alternative $altfiles
     elif [[ -n $unmaintained && -z $dodirs ]]; then
 	# a la _cvs_nonentried_files: directories are never maintained,
@@ -695,7 +789,7 @@ _perforce_files() {
 	done
 
 	altfiles+=("depot-dirs:directory in depot:_perforce_depot_dirs"
-	    "subdirs:subdirectory search:_perforce_subdir_search")
+	    "subdirs:subdirectory search:_perforce_subdirs")
 	_alternative $altfiles
     elif zstyle -t ":completion:${curcontext}:" depot-files; then
 	local -a altfiles
@@ -703,13 +797,13 @@ _perforce_files() {
 	    altfiles+=("depot-files:file in depot:_perforce_depot_files")
 	fi
 	altfiles+=("depot-dirs:directory in depot:_perforce_depot_dirs"
-	    "subdirs:subdirectory search:_perforce_subdir_search")
+	    "subdirs:subdirectory search:_perforce_subdirs")
 	_alternative $altfiles
     else
 	# Look locally.
 	_alternative \
 	    "files:file:_path_files -R _perforce_file_suffix $dodirs" \
-	    "subdirs:subdirectory search:_perforce_subdir_search"
+	    "subdirs:subdirectory search:_perforce_subdirs"
     fi
 }
 
@@ -754,8 +848,8 @@ _perforce_groups() {
 }
 
 
-(( $+functions[_perforce_host_port] )) ||
-_perforce_host_port() {
+(( $+functions[_perforce_hosts_ports] )) ||
+_perforce_hosts_ports() {
     if compset -P '*:'; then
 	_ports
     else
@@ -789,8 +883,8 @@ _perforce_jobs() {
     _describe -t jobs 'Perforce job' jl
 }
 
-(( $+functions[_perforce_jobview] )) ||
-_perforce_jobview() {
+(( $+functions[_perforce_jobviews] )) ||
+_perforce_jobviews() {
     # Jobviews (see `p4 help jobview') are ways of interrogating the
     # jobs/fixes database.  It's basically either a set of strings,
     # or a set of key=value pairs, or some combination, separated
@@ -872,6 +966,10 @@ _perforce_jobview() {
 _perforce_labels() {
     local lline match mbegin mend
     local -a ll
+
+    # May be completing after `@'.
+    compset -P '*@'
+
     _call_program labels p4 labels | while read lline; do
 	if [[ $lline = (#b)'Label '([^[:blank:]]##)' '(*) ]]; then
 	    ll+=("${match[1]}:${match[2]}")
@@ -918,8 +1016,8 @@ _perforce_revisions() {
 }
 
 
-(( $+functions[_perforce_status] )) ||
-_perforce_status() {
+(( $+functions[_perforce_statuses] )) ||
+_perforce_statuses() {
     # Perforce statuses are usually limited to a set of values
     # given by the jobspec.
     local jline match mbegin mend
@@ -935,7 +1033,7 @@ _perforce_status() {
 	# Couldn't find anything from the jobspec; add defaults.
 	statuses=(closed open suspended)
     fi
-    _describe -t status 'job status' statuses
+    _describe -t statuses 'job status' statuses
     return 1
 }
 
@@ -961,7 +1059,7 @@ _perforce_variables() {
 (( $+functions[_perforce_cmd_add] )) ||
 _perforce_cmd_add() {
     _arguments -s : \
-	'-c+[select by changelist]:changelist:_perforce_changelist -tp' \
+	'-c+[select by change]:change:_perforce_changes -tp' \
 	'-t+[set file type]:file type:_perforce_filetypes' \
 	'*:file:_perforce_files -tu'
 }
@@ -1021,7 +1119,7 @@ _perforce_cmd_change() {
 	'(-o -i)-d[describe newly created pending change]' \
 	'(-d -i -f)-o[output specification to standard output]' \
 	'(-d -o)-i[read specification from standard input]' \
-	'(-i)1::changelist:_perforce_changelist -tp'
+	'(-i)1::change:_perforce_changes -tp'
 }
 
 
@@ -1063,7 +1161,7 @@ _perforce_cmd_counter() {
 	'-d[delete counter]' \
 	'-f[force setting of internal counter]' \
 	'1:counter:_perforce_counters' \
-	'(-d)2::numeric value:_perforce_counter_value'
+	'(-d)2::numeric value:_perforce_counter_values'
 }
 
 
@@ -1077,7 +1175,7 @@ _perforce_cmd_counters() {
 (( $+functions[_perforce_cmd_delete] )) ||
 _perforce_cmd_delete() {
     _arguments -s : \
-	'-c[select changelist for deletion]:changelist:_perforce_changelist -tp' \
+	'-c[select change for deletion]:change:_perforce_changes -tp' \
 	'*::file:_perforce_files'
 }
 
@@ -1104,7 +1202,7 @@ _perforce_cmd_describe() {
     _arguments -s : \
 	'-d-[select diff option]:diff option:((b\:ignore\ blanks c\:context n\:RCS s\:summary u\:unified w\:ignore\ all\ whitespace))' \
 	'-s[short form]' \
-	'*::changelist:_perforce_changelist'
+	'*::change:_perforce_changes'
 }
 
 
@@ -1150,7 +1248,7 @@ _perforce_cmd_dirs() {
 (( $+functions[_perforce_cmd_edit] )) ||
 _perforce_cmd_edit() {
     _arguments -s : \
-	'-c[set changelist for edit]:changelist:_perforce_changelist -tp' \
+	'-c[set change for edit]:change:_perforce_changes -tp' \
 	'-t[set filetype]:filetype:_perforce_filetypes' \
 	'*::file:_perforce_files'
 }
@@ -1160,7 +1258,7 @@ _perforce_cmd_edit() {
 _perforce_cmd_filelog() {
     _arguments -s : \
 	'-i[follow branches]' \
-	'-l[long output, full changelist text]' \
+	'-l[long output, full change text]' \
 	'-m[set maximum number of revisions to show]:max revisions: ' \
 	'-t[include time with date]' \
 	'*::file:_perforce_files'
@@ -1179,9 +1277,9 @@ _perforce_cmd_files() {
 _perforce_cmd_fix() {
     _arguments -s : \
 	'-d[delete the fix]' \
-	'-s[set job status]:status:_perforce_status' \
+	'-s[set job status]:status:_perforce_statuses' \
 	'1::-c required:(-c)' \
-	'2::changelist:_perforce_changelist' \
+	'2::change:_perforce_changes' \
 	'3::job:_perforce_jobs'
 }
 
@@ -1189,9 +1287,9 @@ _perforce_cmd_fix() {
 (( $+functions[_perforce_cmd_fixes] )) ||
 _perforce_cmd_fixes() {
     _arguments -s : \
-	'-i[include integrated changelists]' \
+	'-i[include integrated changes]' \
 	'-j[select by job]:job:_perforce_jobs' \
-	'-c[select by changelist]:changelist:_perforce_changelist' \
+	'-c[select by change]:change:_perforce_changes' \
 	'*::fixed file:_perforce_files -tR'
 }
 
@@ -1208,7 +1306,7 @@ _perforce_cmd_flush() {
 (( $+functions[_perforce_cmd_fstat] )) ||
 _perforce_cmd_fstat() {
     _arguments -s : \
-	'-c+[select by changelist]:changelist:_perforce_changelist -ts' \
+	'-c+[select by change]:change:_perforce_changes -ts' \
 	'-C[select mapped files]' \
 	'-H[select synced files]' \
 	'-W[select opened files]' \
@@ -1273,7 +1371,7 @@ _perforce_cmd_integrate() {
     [[ ${words[(I)-s]} -eq 0 ]] && range=" -tR"
     _arguments -s : \
 	'-b[select branch]:branch:_perforce_branches' \
-	'-c[select changelist for integration]:changelist:_perforce_changelist -tp' \
+	'-c[select change for integration]:change:_perforce_changes -tp' \
 	'-f[force reintegration]' \
 	'-d[reintegrated deleted files]' \
 	'-h[integrate to revision had on client]' \
@@ -1308,7 +1406,7 @@ _perforce_cmd_job() {
 (( $+functions[_perforce_cmd_jobs] )) ||
 _perforce_cmd_jobs() {
     _arguments -s : \
-	'-e[select by jobview]:jobview:_perforce_jobview' \
+	'-e[select by jobview]:jobview:_perforce_jobviews' \
 	'-i[included integrated changes]' \
 	'-l[long output, full job descriptions]' \
 	'-r[reverse order of job names]' \
@@ -1359,7 +1457,7 @@ _perforce_cmd_labelsync() {
 (( $+functions[_perforce_cmd_lock] )) ||
 _perforce_cmd_lock() {
     _arguments -s : \
-	'-c[select by changelist]:changelist:_perforce_changelist -tp' \
+	'-c[select by change]:change:_perforce_changes -tp' \
 	'*::file:_perforce_files -to'
 }
 
@@ -1382,7 +1480,7 @@ _perforce_cmd_obliterate() {
 _perforce_cmd_opened() {
     _arguments -s : \
 	'-a[list for all clients]' \
-	'-c+[select by changelist]:changelist:_perforce_changelist -tp' \
+	'-c+[select by change]:change:_perforce_changes -tp' \
 	'*::file:_perforce_files -to'
 }
 
@@ -1417,7 +1515,7 @@ _perforce_cmd_protect() {
 (( $+functions[_perforce_cmd_reopen] )) ||
 _perforce_cmd_reopen() {
     _arguments -s : \
-	'-c+[select changelist to reopen on]:changelist:_perforce_changelist -tp' \
+	'-c+[select change to reopen on]:change:_perforce_changes -tp' \
 	'-t+[set file type]:file type:_perforce_filetypes' \
 	'*::file:_perforce_files -to'
 }
@@ -1446,7 +1544,7 @@ _perforce_cmd_resolved() {
 _perforce_cmd_revert() {
     _arguments -s : \
 	'-a[revert unaltered files]' \
-	'-c[limit reversions to changelist]:changelist:_perforce_changelist -tp' \
+	'-c[limit reversions to change]:change:_perforce_changes -tp' \
 	'-n[no action, show effect only]' \
 	'*::file:_perforce_files -to'
 }
@@ -1455,7 +1553,7 @@ _perforce_cmd_revert() {
 (( $+functions[_perforce_cmd_review] )) ||
 _perforce_cmd_review() {
     _arguments -s : \
-	'-c[select changelist for counter]:changelist:_perforce_changelist -ts' \
+	'-c[select change for counter]:change:_perforce_changes -ts' \
 	'-t[limit change number by counter]:counter:_perforce_counters'
 }
 
@@ -1463,7 +1561,7 @@ _perforce_cmd_review() {
 (( $+functions[_perforce_cmd_reviews] )) ||
 _perforce_cmd_reviews() {
     _arguments -s : \
-	'-c[show users by changelist]:changelist:_perforce_changelist -ts' \
+	'-c[show users by change]:change:_perforce_changes -ts' \
 	'*::file:_perforce_files'
 }
 
@@ -1483,8 +1581,8 @@ _perforce_cmd_submit() {
     _arguments -s : \
 	'-r[files open for add or edit remain open]' \
 	'-s[include fix status in list]' \
-	'(-s -i)-c[submit specific change]:changelist:_perforce_changelist -tp' \
-	'(-c)-i[read changelist spec from stdin]' \
+	'(-s -i)-c[submit specific change]:change:_perforce_changes -tp' \
+	'(-c)-i[read change spec from stdin]' \
 	'*::file:_perforce_files -to -tr' \
 }
 
@@ -1517,7 +1615,7 @@ _perforce_cmd_typemap() {
 (( $+functions[_perforce_cmd_unlock] )) ||
 _perforce_cmd_unlock() {
     _arguments -s : \
-	'-c[non-default changelist to unlock]:changelist:_perforce_changelist -tp' \
+	'-c[non-default change to unlock]:change:_perforce_changes -tp' \
 	'-f[allow superuser to unlock any file]' \
 	'*::file:_perforce_files'
 }
