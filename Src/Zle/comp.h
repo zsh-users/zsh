@@ -65,6 +65,7 @@ struct cmgroup {
     int num;			/* number of this group */
     int nbrbeg;			/* number of opened braces */
     int nbrend;			/* number of closed braces */
+    int new;			/* new matches since last permalloc() */
     /* The following is collected/used during listing. */
     int dcount;			/* number of matches to list in columns */
     int cols;			/* number of columns */
@@ -74,7 +75,6 @@ struct cmgroup {
     int totl;			/* total length */
     int shortest;		/* length of shortest match */
     Cmgroup perm;		/* perm. alloced version of this group */
-    int new;			/* new matches since last permalloc() */
 };
 
 

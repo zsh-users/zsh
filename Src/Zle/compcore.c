@@ -2339,13 +2339,14 @@ begcmgroup(char *n, int flags)
     }
     mgroup = (Cmgroup) zhalloc(sizeof(struct cmgroup));
     mgroup->name = dupstring(n);
-    mgroup->lcount = mgroup->llcount = mgroup->mcount = 0;
+    mgroup->lcount = mgroup->llcount = mgroup->mcount = mgroup->ecount = 
+	mgroup->ccount = 0;
     mgroup->flags = flags;
     mgroup->matches = NULL;
     mgroup->ylist = NULL;
     mgroup->expls = NULL;
     mgroup->perm = NULL;
-    mgroup->new = 0;
+    mgroup->new = mgroup->num = mgroup->nbrbeg = mgroup->nbrend = 0;
 
     mgroup->lexpls = expls = newlinklist();
     mgroup->lmatches = matches = newlinklist();
@@ -2353,7 +2354,9 @@ begcmgroup(char *n, int flags)
 
     mgroup->lallccs = allccs = ((flags & CGF_NOSORT) ? NULL : newlinklist());
 
-    mgroup->next = amatches;
+    if ((mgroup->next = amatches))
+	amatches->prev = mgroup;
+    mgroup->prev = NULL;
     amatches = mgroup;
 }
 
@@ -2713,6 +2716,7 @@ permmatches(int last)
 		for (eq = g->expls; (o = *eq); eq++, ep++) {
 		    *ep = e = (Cexpl) zcalloc(sizeof(struct cexpl));
 		    e->count = (fi ? o->fcount : o->count);
+		    e->fcount = 0;
 		    e->str = ztrdup(o->str);
 		}
 		*ep = NULL;
