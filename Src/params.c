@@ -2153,7 +2153,7 @@ stdunsetfn(Param pm, int exp)
 /* Function to get value of an integer parameter */
 
 /**/
-static zlong
+mod_export zlong
 intgetfn(Param pm)
 {
     return pm->u.val;

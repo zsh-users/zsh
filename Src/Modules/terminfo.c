@@ -181,6 +181,8 @@ getterminfo(HashTable ht, char *name)
     pm->flags = PM_READONLY;
     pm->sets.cfn = NULL;
     pm->gets.cfn = strgetfn;
+    pm->sets.ifn = NULL;
+    pm->gets.ifn = intgetfn;
     pm->unsetfn = NULL;
     pm->ct = 0;
     pm->env = NULL;
@@ -291,6 +293,8 @@ scanterminfo(HashTable ht, ScanFunc func, int flags)
     pm = (Param) zhalloc(sizeof(struct param));
     pm->sets.cfn = NULL;
     pm->gets.cfn = strgetfn;
+    pm->sets.ifn = NULL;
+    pm->gets.ifn = intgetfn;
     pm->unsetfn = NULL;
     pm->ct = 0;
     pm->env = NULL;
