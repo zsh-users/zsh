@@ -1,8 +1,8 @@
-#compdef find
+#defcomp find
 
 local prev="$words[CURRENT-1]"
 
-if compset -N '-(ok|exec)' '\;' then
+if compset -N '-(ok|exec)' '\;'; then
   _normal
 elif compset -P 1 -; then
   compgen -s 'daystart {max,min,}depth follow noleaf version xdev \
