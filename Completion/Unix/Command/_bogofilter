@@ -12,35 +12,45 @@ _bogoutil_caching_policy () {
 }
 
 _bogoutil() {
-  _arguments \
-  	'-v[verbose]' \
+
+	typeset -a _bogoutil_actions
+	_bogoutil_actions=(-h --help -V --version -d --dump -l --load -u
+		--upgrade -m -w -p -H --db-verify -r -R --db-prune --db-recover
+		--db-recover-harder --db-remove-environment -k --db-cachesize)
+
+  _arguments -s \
+  	'*'{-v,--verbosity}'[verbose]' \
   	'-n[replace non-ASCII characters]' \
-  	'-D[redirect debug output to stdout]' \
+	{-D,--debug-to-stdout}'[redirect debug output to stdout]' \
   	'-a[acceptable token age]:date or day count' \
   	'-c[acceptable count]:count threshold' \
   	'-s[acceptable size range]:min-max range' \
-  	'-y[date for when unknown]:date' \
-  	'-I[input file]:input file:_files' \
-  	'-x[debug flags]:debug flags:' \
-  	'-d[print contents of db]:database:_files -g "*.db"' \
-  	'-l[load file into db]:textfile:_files' \
-  	'-m[perform maintenance functions]' \
-  	'-w[display token information]:database file or directory:_files' \
-  	'-p[display token probability information]:database file or directory:_files' \
-  	'-H[print histogram]' \
-	'(--db_recover --db_recover-harder --db_prune -R -r --db_remove-environment)--db_verify[verify database]:database:_files -/' \
-  	'(--db_recover --db_recover-harder --db_prune -R --db_remove-environment)-r[recalculate ROBX]:database:_files -/' \
-  	'(--db_recover --db_recover-harder --db_prune -r --db_remove-environment)-R[recalculate and save ROBX]:database:_files -/' \
-	'(--db_recover-harder --db_prune -r -R --db_remove-environment)--db_recover[run regular recovery]:database:_files -/' \
-	'(--db_recover --db_prune -r -R --db_remove-environment)--db_recover-harder[run catastrophic recovery]:database:_files -/' \
-	'(--db_recover --db_recover-harder -r -R --db_remove-environment)--db_prune[checkpoint database]:database:_files -/' \
-	'(--db_recover --db_recover-harder -r -R --db_prune)--db_remove-environment:database:_files -/' \
+	{-y,--timestamp-date=}'[date for when unknown]:date in YYYYMMDD format' \
+	'(--input-file -I)'{-I,--input-file=}'[input file]:input file:_files' \
+	{-x,--debug-flags=}'[debug flags]:debug flags:' \
+	"($_bogoutil_actions)"{-d,--dump=}'[print contents of db]:database file:_files -g "*.db"' \
+  	"($_bogoutil_actions)"{-l,--load=}'[load file into db]:textfile:_files' \
+	"($_bogoutil_actions)"{-u,--upgrade=}'[upgrade wordlist version]:database file:_files -g "*.db"' \
+	"($_bogoutil_actions)"'-m[perform maintenance functions]:file:_files' \
+  	"($_bogoutil_actions)"'-w[display token information]:database file or directory:_files' \
+  	"($_bogoutil_actions)"'-p[display token probability information]:database file or directory:_files' \
+	"($_bogoutil_actions)"'-H[print histogram]:database file or directory:_files' \
+	"($_bogoutil_actions)"'-r[recalculate ROBX]:database:_files -/' \
+	"($_bogoutil_actions)"'-R[recalculate and save ROBX]:database:_files -/' \
+	"($_bogoutil_actions)"{-k,--db-cachesize=}'[set Berkeley DB cache size]:size in MB:' \
+	"($_bogoutil_actions)"'--db-verify[verify database]:database:_files -/' \
+	"($_bogoutil_actions)"'--db-recover[run regular recovery]:database:_files -/' \
+	"($_bogoutil_actions)"'--db-recover-harder[run catastrophic recovery]:database:_files -/' \
+	"($_bogoutil_actions)"'--db-prune[checkpoint database]:database:_files -/' \
+	"($_bogoutil_actions)"'--db-remove-environment:database:_files -/' \
 	'--db_lk_max_locks[set max lock count]' \
 	'--db_lk_max_objects[set max object count]' \
-  	'-h[help]' \
-  	'-V[version]' \
+  	"($_bogoutil_actions)"'-h[help]' \
+  	"($_bogoutil_actions)"'--help' \
+  	"($_bogoutil_actions)"'-V[version]' \
+  	"($_bogoutil_actions)"'--version' \
   	'*:tokens:->tokens' && ret=0
-  
+
   zstyle -s ":completion:${curcontext}:" cache-policy update_policy
   if [[ -z "$update_policy" ]]; then
     zstyle ":completion:${curcontext}:" cache-policy _bogoutil_caching_policy

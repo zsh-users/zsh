@@ -1,3 +1,8 @@
+2004-12-27  Clint Adams  <clint@zsh.org>
+
+	* 20639: Completion/Unix/Command/_bogofilter:
+	improve 'bogoutil' completion for 0.93.3.1.
+
 2004-12-25  Clint Adams  <clint@zsh.org>
 
 	* 20637: Completion/Debian/Command/_lintian: add
