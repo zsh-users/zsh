@@ -1232,7 +1232,7 @@ fillnameddirtable(HashTable ht)
 #if defined(HAVE_NIS) || defined(HAVE_NIS_PLUS)
 	FILE *pwf;
 	char buf[BUFSIZ], *p, *d, *de;
-	int skipping;
+	int skipping, oldct = nameddirtab->ct, usepwf = 1;
 
 # ifndef HAVE_NIS_PLUS
 	char domain[YPMAXDOMAIN];
@@ -1250,28 +1250,48 @@ fillnameddirtable(HashTable ht)
 	nis_list("passwd.org_dir", EXPAND_NAME|ALL_RESULTS|FOLLOW_LINKS|FOLLOW_PATH,
 		 add_userdir, 0);
 # endif
-	/* Don't forget the non-NIS matches from the flat passwd file */
-	if ((pwf = fopen(PASSWD_FILE, "r")) != NULL) {
-	    skipping = 0;
-	    while (fgets(buf, BUFSIZ, pwf) != NULL) {
-		if (strchr(buf, '\n') != NULL) {
-		    if (!skipping) {
-			if ((p = strchr(buf, ':')) != NULL) {
-			    *p++ = '\0';
-			    if ((de = strrchr(p, ':'))) {
-				*de = '\0';
-				if ((d = strrchr(p, ':'))) {
-				    if (*++d && buf[0])
-					adduserdir(buf, d, ND_USERNAME, 1);
+	if (nameddirtab->ct == oldct) {
+	    /* Using NIS or NIS+ didn't add any user directories. This seems
+	     * fishy, so we fall back to using getpwent(). If we don't have
+	     * that, we only use the passwd file. */
+#ifdef HAVE_GETPWENT
+	    struct passwd *pw;
+ 
+	    setpwent();
+ 
+	    /* loop through the password file/database *
+	     * and add all entries returned.           */
+	    while ((pw = getpwent()) && !errflag)
+		adduserdir(pw->pw_name, pw->pw_dir, ND_USERNAME, 1);
+ 
+	    endpwent();
+	    usepwf = 0;
+#endif /* HAVE_GETPWENT */
+	}
+	if (usepwf) {
+	    /* Don't forget the non-NIS matches from the flat passwd file */
+	    if ((pwf = fopen(PASSWD_FILE, "r")) != NULL) {
+		skipping = 0;
+		while (fgets(buf, BUFSIZ, pwf) != NULL) {
+		    if (strchr(buf, '\n') != NULL) {
+			if (!skipping) {
+			    if ((p = strchr(buf, ':')) != NULL) {
+				*p++ = '\0';
+				if ((de = strrchr(p, ':'))) {
+				    *de = '\0';
+				    if ((d = strrchr(p, ':'))) {
+					if (*++d && buf[0])
+					    adduserdir(buf, d, ND_USERNAME, 1);
+				    }
 				}
 			    }
-			}
+			} else
+			    skipping = 0;
 		    } else
-			skipping = 0;
-		} else
-		    skipping = 1;
+			skipping = 1;
+		}
+		fclose(pwf);
 	    }
-	    fclose(pwf);
 	}
 #else  /* no NIS or NIS_PLUS */
 #ifdef HAVE_GETPWENT

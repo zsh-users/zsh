@@ -182,7 +182,8 @@ scanpmparameters(HashTable ht, ScanFunc func, int flags)
 	for (hn = realparamtab->nodes[i]; hn; hn = hn->next) {
 	    pm.nam = hn->nam;
 	    if (func != scancountparams &&
-		(flags & (SCANPM_WANTVALS|SCANPM_MATCHVAL)))
+		((flags & (SCANPM_WANTVALS|SCANPM_MATCHVAL)) ||
+		 !(flags & SCANPM_WANTKEYS)))
 		pm.u.str = paramtypestr((Param) hn);
 	    func((HashNode) &pm, flags);
 	}
@@ -314,7 +315,8 @@ scanpmcommands(HashTable ht, ScanFunc func, int flags)
 	    pm.nam = hn->nam;
 	    cmd = (Cmdnam) hn;
 	    if (func != scancountparams &&
-		(flags & (SCANPM_WANTVALS|SCANPM_MATCHVAL))) {
+		((flags & (SCANPM_WANTVALS|SCANPM_MATCHVAL)) ||
+		 !(flags & SCANPM_WANTKEYS))) {
 		if (cmd->flags & HASHED)
 		    pm.u.str = cmd->u.cmd;
 		else {
@@ -516,7 +518,8 @@ scanfunctions(HashTable ht, ScanFunc func, int flags, int dis)
 	    if (dis ? (hn->flags & DISABLED) : !(hn->flags & DISABLED)) {
 		pm.nam = hn->nam;
 		if (func != scancountparams &&
-		    (flags & (SCANPM_WANTVALS|SCANPM_MATCHVAL))) {
+		    ((flags & (SCANPM_WANTVALS|SCANPM_MATCHVAL)) ||
+		     !(flags & SCANPM_WANTKEYS))) {
 		    if (((Shfunc) hn)->flags & PM_UNDEFINED) {
 			Shfunc shf = (Shfunc) hn;
 			pm.u.str =
@@ -625,7 +628,8 @@ scanbuiltins(HashTable ht, ScanFunc func, int flags, int dis)
 	    if (dis ? (hn->flags & DISABLED) : !(hn->flags & DISABLED)) {
 		pm.nam = hn->nam;
 		if (func != scancountparams &&
-		    (flags & (SCANPM_WANTVALS|SCANPM_MATCHVAL))) {
+		    ((flags & (SCANPM_WANTVALS|SCANPM_MATCHVAL)) ||
+		     !(flags & SCANPM_WANTKEYS))) {
 		    char *t = ((((Builtin) hn)->handlerfunc ||
 				(hn->flags & BINF_PREFIX)) ?
 			       "defined" : "undefined");
@@ -1059,7 +1063,8 @@ scanpmhistory(HashTable ht, ScanFunc func, int flags)
 
     while (he) {
 	if (func != scancountparams &&
-	    (flags & (SCANPM_WANTVALS|SCANPM_MATCHVAL))) {
+	    ((flags & (SCANPM_WANTVALS|SCANPM_MATCHVAL)) ||
+	     !(flags & SCANPM_WANTKEYS))) {
 	    sprintf(buf, "%d", he->histnum);
 	    pm.nam = dupstring(buf);
 	    pm.u.str = dupstring(he->text);
@@ -1181,7 +1186,8 @@ scanpmjobtexts(HashTable ht, ScanFunc func, int flags)
 	if (jobtab[job].stat && jobtab[job].procs &&
 	    !(jobtab[job].stat & STAT_NOPRINT)) {
 	    if (func != scancountparams &&
-		(flags & (SCANPM_WANTVALS|SCANPM_MATCHVAL))) {
+		((flags & (SCANPM_WANTVALS|SCANPM_MATCHVAL)) ||
+		 !(flags & SCANPM_WANTKEYS))) {
 		sprintf(buf, "%d", job);
 		pm.nam = dupstring(buf);
 		pm.u.str = pmjobtext(job);
@@ -1286,7 +1292,8 @@ scanpmjobstates(HashTable ht, ScanFunc func, int flags)
 	if (jobtab[job].stat && jobtab[job].procs &&
 	    !(jobtab[job].stat & STAT_NOPRINT)) {
 	    if (func != scancountparams &&
-		(flags & (SCANPM_WANTVALS|SCANPM_MATCHVAL))) {
+		((flags & (SCANPM_WANTVALS|SCANPM_MATCHVAL)) ||
+		 !(flags & SCANPM_WANTKEYS))) {
 		sprintf(buf, "%d", job);
 		pm.nam = dupstring(buf);
 		pm.u.str = pmjobstate(job);
@@ -1418,7 +1425,8 @@ scanpmnameddirs(HashTable ht, ScanFunc func, int flags)
 	    if (!((nd = (Nameddir) hn)->flags & ND_USERNAME)) {
 		pm.nam = hn->nam;
 		if (func != scancountparams &&
-		    (flags & (SCANPM_WANTVALS|SCANPM_MATCHVAL)))
+		    ((flags & (SCANPM_WANTVALS|SCANPM_MATCHVAL)) ||
+		     !(flags & SCANPM_WANTKEYS)))
 		    pm.u.str = dupstring(nd->dir);
 		func((HashNode) &pm, flags);
 	    }
@@ -1486,7 +1494,8 @@ scanpmuserdirs(HashTable ht, ScanFunc func, int flags)
 	    if ((nd = (Nameddir) hn)->flags & ND_USERNAME) {
 		pm.nam = hn->nam;
 		if (func != scancountparams &&
-		    (flags & (SCANPM_WANTVALS|SCANPM_MATCHVAL)))
+		    ((flags & (SCANPM_WANTVALS|SCANPM_MATCHVAL)) ||
+		     !(flags & SCANPM_WANTKEYS)))
 		    pm.u.str = dupstring(nd->dir);
 		func((HashNode) &pm, flags);
 	    }
@@ -1703,7 +1712,8 @@ scanaliases(HashTable ht, ScanFunc func, int flags, int global, int dis)
 		(dis ? (al->flags & DISABLED) : !(al->flags & DISABLED))) {
 		pm.nam = hn->nam;
 		if (func != scancountparams &&
-		    (flags & (SCANPM_WANTVALS|SCANPM_MATCHVAL)))
+		    ((flags & (SCANPM_WANTVALS|SCANPM_MATCHVAL)) ||
+		     !(flags & SCANPM_WANTKEYS)))
 		    pm.u.str = dupstring(al->text);
 		func((HashNode) &pm, flags);
 	    }
