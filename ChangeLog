@@ -1,3 +1,9 @@
+2001-09-14  Wayne Davison  <wayned@users.sourceforge.net>
+
+	* 15809: Src/hist.c: With HIST_NO_STORE, don't ignore what looks like
+	a history command if we're really going to call a user-defined shell
+	function.
+
 2001-09-13  Wayne Davison  <wayned@users.sourceforge.net>
 
 	* 15806: Src/builtin.c, Src/hist.c: Fixed "r" with an empty history
