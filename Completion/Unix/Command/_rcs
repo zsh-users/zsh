@@ -1,0 +1,14 @@
+#compdef co ci rcs rcsdiff
+
+local ret=1
+
+if [[ -d RCS && $service != ci ]]; then
+  local rep expl
+
+  rep=(RCS/*,v(D:t:s/\,v//))
+  (( $#rep )) && _wanted files expl 'RCS file' compadd -a rep && ret=0
+fi
+
+[[ $service = ci || $service = rcs || ret -eq 1 ]] && _files && ret=0
+
+return ret

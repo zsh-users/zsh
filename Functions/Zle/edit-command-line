@@ -1,0 +1,17 @@
+# Edit the command line using your usual editor.
+# Binding this to 'v' in the vi command mode map,
+#   autoload edit-command-line
+#   zle -N edit-command-line
+#   bindkey -M vicmd v edit-command-line
+# will give ksh-like behaviour for that key,
+# except that it will handle multi-line buffers properly.
+
+local tmpfile=${TMPPREFIX:-/tmp/zsh}ecl$$
+
+print -R - "$PREBUFFER$BUFFER" >$tmpfile
+exec </dev/tty
+${VISUAL:-${EDITOR:-vi}} $tmpfile
+print -Rz - "$(<$tmpfile)" 
+
+command rm -f $tmpfile
+zle send-break		# Force reload from the buffer stack

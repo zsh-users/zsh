@@ -129,6 +129,8 @@ _urpmi() {
 	"(--help)--noclean[do not clean RPM cache]" \
 	"(--help --src -s)"{--src,-s}"[next package is source package]" \
 	"(--help)--update[use only update media]" \
+	"(--help --verify-rpm)--no-verify-rpm[do not verify rpm signature before installation]" \
+	"(--help --no-verify-rpm)--verify-rpm[verify rpm signature before installation]" \
 	"(--help --curl)--wget[use wget to retrieve distant files]" \
 	"(--help)-a[select all packages matching command line]" \
 	"(--help -m -M)-m[choose minimum closure of requires (default)]" \
