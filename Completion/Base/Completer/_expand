@@ -35,7 +35,7 @@ fi
 
 zstyle -T ":completion:${curcontext}:" suffix &&
   [[ "$word" = (\~*/*|*\$(|[=~#^+])[a-zA-Z0-9_\[\]]##[^a-zA-Z0-9_\[\]]|*\$\{*\}?) &&
-     "${(e)word}" != *[][^*?\(\)\<\>\{\}\|]* ]] &&
+     "${(e)word}" != (#s)(*[^\\]|)[][^*?\(\)\<\>\{\}\|]* ]] &&
   return 1
 
 zstyle -s ":completion:${curcontext}:" accept-exact tmp ||

@@ -1,3 +1,8 @@
+2005-01-21  Oliver Kiddle  <opk@zsh.org>
+
+	* 20730 (modified): Completion/Base/Completer/_expand: fix 
+	suffix style to regard quoted special characters as not special
+
 2005-01-19  Peter Stephenson  <pws@csr.com>
 
 	* 20728 (with typo fixed): configure.ac, Doc/Zsh/builtins.yo,
