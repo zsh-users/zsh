@@ -1,3 +1,7 @@
+2003-02-26  Peter Stephenson  <pws@csr.com>
+
+	* unposted: whoops, left some debugging code in 18230.
+
 2003-02-25  Oliver Kiddle  <opk@zsh.org>
 
 	* 18296: Completion/Base/Widget/_next_tags: fake _all_labels and

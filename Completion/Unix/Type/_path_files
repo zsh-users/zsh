@@ -357,8 +357,6 @@ for prepath in "$prepaths[@]"; do
 		  tmp3+=/
 	      fi
 	      if [[ -e "$tmp3${(Q)PREFIX}${(Q)SUFFIX}" ]] then
-		  ## DEBUG
-		  print "added $tmp3${(Q)PREFIX}${(Q)SUFFIX}" >&2
 		  tmp1+=("$tmp3${(Q)PREFIX}${(Q)SUFFIX}")
 	      fi
 	  done
