@@ -950,6 +950,78 @@ mathevalarg(char *s, char **ss)
     return (x.type & MN_FLOAT) ? (zlong)x.u.d : x.u.l;
 }
 
+/**/
+mod_export mnumber
+mathnumber(char *s)
+{
+    mnumber ret;
+
+    ret.type = MN_INTEGER;
+
+    while (*s) {
+	switch (*s++) {
+	case '[':
+	    {
+		int base = zstrtol(s, &s, 10);
+
+		if (*s == ']')
+		    s++;
+		ret.u.l = zstrtol(s, &s, base);
+		return ret;
+	    }
+	case ' ':
+	case '\t':
+	case '\n':
+	    break;
+	case '0':
+	    if (*s == 'x' || *s == 'X') {
+		/* Should we set lastbase here? */
+		ret.u.l = zstrtol(++s, &s, 16);
+		return ret;
+	    }
+	/* Fall through! */
+	default:
+	    if (idigit(*--s) || *s == '.') {
+		char *nptr;
+#ifdef USE_LOCALE
+		char *prev_locale;
+#endif
+		for (nptr = s; idigit(*nptr); nptr++);
+
+		if (*nptr == '.' || *nptr == 'e' || *nptr == 'E') {
+		    /* it's a float */
+		    ret.type = MN_FLOAT;
+#ifdef USE_LOCALE
+		    prev_locale = setlocale(LC_NUMERIC, NULL);
+		    setlocale(LC_NUMERIC, "POSIX");
+#endif
+		    ret.u.d = strtod(s, &nptr);
+#ifdef USE_LOCALE
+		    setlocale(LC_NUMERIC, prev_locale);
+#endif
+		    if (s == nptr || *nptr == '.')
+			goto end;
+		    s = nptr;
+		} else {
+		    /* it's an integer */
+		    ret.u.l = zstrtol(s, &s, 10);
+
+		    if (*s == '#')
+			ret.u.l = zstrtol(++s, &s, ret.u.l);
+		}
+		return ret;
+	    }
+	    goto end;
+	}
+    }
+ end:
+
+    ret.type = MN_INTEGER;
+    ret.u.l = 0;
+
+    return ret;
+}
+
 /*
  * Make sure we have an operator or an operand, whatever is expected.
  * For this purpose, unary operators constitute part of an operand.
