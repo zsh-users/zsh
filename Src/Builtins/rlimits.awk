@@ -37,6 +37,7 @@ BEGIN {limidx = 0}
 	    if (limnam == "TCACHE")  { msg[limnum] = "cachedthreads" }
 	    if (limnam == "AIO_OPS") { msg[limnum] = "aiooperations" }
 	    if (limnam == "AIO_MEM") { msg[limnum] = "aiomemorylocked" }
+	    if (limnam == "SBSIZE")  { msg[limnum] = "sbsize" }
         }
     }
 }
