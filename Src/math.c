@@ -641,7 +641,8 @@ op(int what)
 		b.type = MN_INTEGER;
 		b.u.l = (zlong)b.u.d;
 	    }
-	} else if (a.type != b.type && what != COMMA) {
+	} else if (a.type != b.type && what != COMMA &&
+		   (a.type != MN_UNSET || what != EQ)) {
 	    /*
 	     * Different types, so coerce to float.
 	     * It may happen during an assigment that the LHS
