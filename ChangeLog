@@ -1,3 +1,8 @@
+2003-07-23  Peter Stephenson  <pws@csr.com>
+
+	* 18888: Philippe Troin: Src/Modules/clone.c: Allow clone to
+	acquire a controlling tty so that the clone can use job control.
+
 2003-07-22  Peter Stephenson  <pws@csr.com>
 
 	* 18880: Src/Modules/parameter.c: Don't return unset variables
