@@ -1,3 +1,9 @@
+2005-02-19  Wayne Davison  <wayned@users.sourceforge.net>
+
+	* unposted: Completion/Unix/Command/_rsync:  A little more
+	cleanup and 2 more options for the upcoming rsync 2.6.4
+	release.
+
 2005-02-19  Motoi Washida <a66@h8.dion.ne.jp>
 	* users/8522: Completion/Darwin/Command/_defaults: fixed the
 	number of spaces broken while sending the patch by email.
