@@ -447,21 +447,6 @@ match for tt(t*e) is substituted and the result is `tt(spy star)',
 while in the second case, the shortest matches are taken and the
 result is `tt(spy spy lispy star)'.
 )
-xitem(tt(${)var(name)tt(^)var(pattern)tt(^)var(then)tt(^)var(else)tt(}))
-item(tt(${)var(name)tt(^^)var(pattern)tt(^)var(then)tt(^)var(else)tt(}))(
-If the expansion of var(name) matches the var(pattern), the var(then)
-string is substituted, otherwise the var(else) string is
-substituted. In the second form the var(pattern) is taken to be
-negated (even if the tt(EXTENDED_GLOB) option is not set). The
-var(else) string with the preceding `tt(^)' may be omitted in which
-case the expansion behaves as if var(name) were unset (or, if
-var(name) is an array, as if the element compared did not exist). In
-the var(pattern) and the var(then) string a `tt(^)' may be included by 
-preceding it with two backslashes. Finally, the var(then) and
-var(else) string may consist of only a dot to make it expand to the
-original string. To make them expand to only a dot, the string
-`tt(\.)' has to be used.
-)
 item(tt(${#)var(spec)tt(}))(
 If var(spec) is one of the above substitutions, substitute
 the length in characters of the result instead of
@@ -1113,7 +1098,7 @@ to have a `tt(/)' within a group (this only applies for patterns used in
 filename generation).  There is one exception:  a group of the form
 tt(LPAR())var(pat)tt(/RPAR()#) appearing as a complete path segment can
 match a sequence of directories.  For example, tt(foo/(a*/)#bar) matches
-tt(foo/bar), tt(foo/any/bar), tt(foo/any/anyother/bar), and so on).
+tt(foo/bar), tt(foo/any/bar), tt(foo/any/anyother/bar), and so on.
 )
 item(var(x)tt(|)var(y))(
 Matches either var(x) or var(y).

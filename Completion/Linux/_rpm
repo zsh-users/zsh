@@ -3,7 +3,7 @@
 # This uses `_arguments' in a state-machine kind of way. These states
 # have names and before executing the default action for such a state
 # we try to call a function with the name `_rpm_<state>'. If such a
-# function exists, we return with it's return status immediatly. This
+# function exists, we return with its return status immediately. This
 # allows users to override the default completions by simply defining
 # these functions.
 # The states (and possible values for the `<state>' above) are:

@@ -55,7 +55,7 @@ def(texinfo)(2)(\
   NOTRANS(@c %**end of header)NL()\
   NL()\
   NOTRANS(@ifinfo)NL()\
-  NOTRANS(@set dsq @'@')NL()\
+  NOTRANS(@set dsq '@:')NL()\
   NOTRANS(@end ifinfo)NL()\
   NOTRANS(@iftex)NL()\
   NOTRANS(@set dsq '{}')NL()\

@@ -1,5 +1,169 @@
+1999-09-06  Peter Stephenson  <pws@ibmth.df.unipi.it>
+
+	* pws: Config/version.mk: 3.1.6-pws-3
+
+	* pws: 7651: Doc/Zsh/options.yo: document HIST_FIND_NO_DUPS.
+
+	* Sven: 7650: Doc/Zsh/compsys.yo, Completion/Base/_arguments,
+	  Completion/Core/_display, Completion/Core/compinit,
+	  Completion/Linux/_rpm, Completion/User/_urls,
+	  Completion/X/_x_color, Etc/completion-style-guide:
+	  urls_dir -> urls_path, colors_path allow paths for URLs and X
+	  colours; funcall; _arguments changes: options assoc, states
+	  available using '->name', option descriptions for mutually
+	  incompatible options, descriptions of individual options,
+	  option_prefix allows ~command; _display for compadd -y;
+	  new _rpm; style guide additions.
+
+	* pws: 7649: Src/pattern.c: bug with excluding multiple
+	  directories with ~ in 7611, 7626.
+
+	* Adam Spiers: 7647: Completion/User/_perl_basepods,
+	  Completion/User/_perl_builtin_funcs,
+	  Completion/User/_perl_modules, Completion/User/_perldoc:
+	  completion for perldoc.
+
+	* Tanaka Akira: 7641, 7646: Completion/Debian/_apt-get,
+	  Completion/Debian/_deb_packages: handle different apt-get
+	  keywords.
+
+1999-09-03  Peter Stephenson  <pws@ibmth.df.unipi.it>
+
+	* pws: 7639: Doc/Zsh/expn.yo, Src/glob.c: remember that
+	  (foo/)# is a special case for file globbing; fix bug that
+	  that pattern generated a null string.
+
+	* pws: 7637: Doc/Zsh/expn.yo: clarify some glob descriptions
+	  including change that / inside parentheses is error (rather than
+	  just screwing up pattern) for file globbing.
+
+	* Bart: zsh-users/2567: Doc/Zsh/options.yo: new improved
+	  GLOB_COMPLETE description.
+
+	* pws: 7636: Doc/Zsh/builtins.yo, Doc/Zsh/params.yo,
+	  Src/builtin.c, Src/zsh.h, Src/Modules/mapfile.c,
+	  Src/Modules/parameter.c: typeset -h allows locals to hide
+	  specials; turned on automatically for specials in mapfile and
+	  parameter modules.
+
+	* Sven: 7635: Completion/User/_urls: change configuration key to
+	  urls_dir.
+
+	* Tanaka Akira: 7634: Completion/Debian/_apt-get,
+	  Completion/Debian/_deb_packages: completion for apt-get.
+
+	* Tanaka Akira: 7633: Completion/User/_lynx,
+	  Completion/User/_urls: completion for lynx and general URL
+	  completion.	
+
+1999-09-02  Peter Stephenson  <pws@ibmth.df.unipi.it>
+
+	* pws: 7632: Doc/Zsh/zftpsys.yo, Functions/Zftp/zfautocheck,
+	  Functions/Zftp/zfinit, Functions/Zftp/zfrglob,
+	  Functions/Zftp/zftp_progress: bar-style progress meter, zfconfig
+	  associative array for configuration.
+
+	* Sven: 7631: Completion/User/_pbm: comment about overriding
+	  definitions.
+
+	* Sven: 7630: Src/zle_tricky.c: when using a matcher spec
+	  generating matches with missing characters, position on last set
+	  of missing characters instead of first.
+
+	* Sven: 7628: Src/params.c, Src/Modules/parameter.c,
+	  Completion/Core/_parameters, Completion/Core/_path_files:
+	  parameters gives `undefined' message; _parameters doesn't
+	  load undefined parameters; do partial path expansion after
+	  parameters.
+
+	* pws: 7627: Src/params.c: don't autoload parameter just to
+	  unset it (replaces 7616).
+
+	* Sven: 7625: Completion/Base/_arguments: expansion fix.
+
+	* Tanaka Akira: 7623: Completion/X/_xv: complete .jpg and .png
+	  files.
+
+	* Bart: 7618: Config/installfns.sh, Config/uninstallfns.sh:
+	  space required in $sdir substitution.
+
+	* Bart: 7617: Src/signals.c: set err to -1.
+
+1999-09-01  Peter Stephenson  <pws@ibmth.df.unipi.it>
+
+	* pws: 7613: Completion/User/_gv: typos
+
+	* pws: 7611, 7626: Src/pattern.c, Src/parse.c, Doc/Zsh/expn.yo:
+	  strip parentheses from case label with open and close
+	  parentheses; use unions for pattern alignment, optimize lowest
+	  level character reading routine, optimize ...*string pattern,
+	  optimize search for characters terminating processing, document
+	  some more existing pattern features.
+	
+	* Sven: 7607: Completion/Base/_arguments: behaviour after a
+	  non-option when using `*::'.
+
+	* Sven: 7605: Src/exec.c, Src/jobs.c: use killpg instead of
+	  altering process group when leader exits, fix fg test to use
+	  killpg.
+
+	* Sven: 7598: Src/Zle/zle_tricky.c: REC_EXACT behaviour.
+
+	* Sven: 7596, 7601: Completion/Base/_arguments: interaction of option
+	  arguments with default.
+
+	* pws: 7591: Src/utils.c: cap_free should take caps (not pointer
+	  to it) as arg.
+
+	* Bart: 7584: Src/jobs.c, Src/signals.c, Src/system.h: handle
+	  broken ESRCH by redefining ESRCH to EINVAL.
+
+	* Tanaka Akira: 7580: Completion/Cvs/_cvs,
+	  Completion/Cvs/_cvs_diff, Completion/Cvs/_cvs?history_x:
+	  arguments for options; cvs diff description.
+
+	* Sven: 7574, 7577, 7597: Src/subst.c, Doc/Zsh/expn.yo: modify
+	  7539 so that the % flag just does % expansion, while %% does
+	  full prompt expansion.
+	
+	* Sven: 7573: Src/signals.c, Src/exec.c, Src/utils.c: fix return
+	  value of killjb(); pipelines which lose their leader get a new
+	  one.
+
+1999-08-31  Peter Stephenson  <pws@ibmth.df.unipi.it>
+
+	* Will Day: 7362: Src/Makefile.in, Src/hist.c, Src/jobs.c,
+	  Src/signals.c, Src/system.h, acconfig.h: support for BeOS: test
+	  more capabilities.  This was present in 6-pws-1, but without
+	  a Changelog entry.
+
+	* Sven: -7540: withdrawn, use ${${${(M)name#pattern}:+then}:-else}.
+	
+	* Tanaka Akira: 7436: Src/exec.c: exec last command in sequence
+	  properly; don't increment SHLVL when exec'ing.
+
+	* Sven: 7564: Completion/X/_xterm, Completion/Pbmplus/_pgmtoppm,
+	  Completion/Pbmplus/_pnmalias, Completion/Pbmplus/_pnmmargin,
+	  Completion/Pbmplus/_ppmchange, Completion/Pbmplus/_ppmmake,
+	  Completion/Pbmplus/_ppmtoacad, Completion/User/_gs,
+	  Completion/X/_xdvi, Completion/X/_xfig, Completion/X/_xsetroot,
+	  Completion/X/_xt_arguments, Completion/X/_xterm,
+	  Completion/X/_xv: change some names.
+	
+	* Bart: 7562: corresponding fix for Config/uninstallfns.sh
+
+	* Tanaka Akira: 7561: Config/installfns.sh: administrative files
+	  from Functions and Completion were installed by mistake.
+
+	* Bart: 7414: Doc/ztexi.yo: @'@' breaks texinfo; use '@:'.
+
+	* Bart: 7557: Src/Makefile.in: typo adding $(DESTDIR) patch by
+	  hand.  (Also from Ollivier Robert, 7558, and Oliver Kiddle).
+
 1999-08-30  Peter Stephenson  <pws@ibmth.df.unipi.it>
 
+	* pws: Config/version.mk: 3.1.6-pws-2 made available.
+	
 	* Tanaka Akira: 7551: Doc/Zsh/expn.yo: mismatched parenthesis.
 
 	* Sven: 7549: Src/hist.c: shell wouldn't exit if writing history
@@ -238,7 +402,7 @@
 	* Sven: 7373: Src/Zle/comp.h, Src/Zle/zle_tricky.c,
 	  Completion/Base/_brace_parameter:  support nested parameter
 	  expansion type of deal.
-
+	
 1999-08-04  Peter Stephenson  <pws@ibmth.df.unipi.it>
 
 	* Sven: 7355: Src/Zle/compctl.c, Src/Zle/zle_tricky.c: make

@@ -1,8 +1,9 @@
 DISTFILES_SRC='
     .distfiles
-    _a2ps _bunzip2 _bzip2 _chown _colors _compress _configure _cursors _cvs
-    _dd _dir_list _dvi _exec_funcs _find _gdb _gprof _groups _gs _gs_name
-    _gunzip _gv _gzip _hosts _make _man _mh _patch _pbm _pdf _ps _pspdf
-    _rcs _rlogin _sh _strip _stty _su _tar _tar_archive _tex _uncompress
-    _use_lo _users _xargs
+    _a2ps _bunzip2 _bzip2 _chown _compress _configure _dd _dir_list _dvi
+    _exec_funcs _find _gdb _gprof _groups _gs _gs_name _gunzip _gv _gzip
+    _hosts _lynx _make _man _mh _nslookup _patch _pbm _pdf _perl_basepods
+    _perl_builtin_funcs _perl_modules _perldoc _ps _pspdf _rcs _rlogin _sh
+    _strip _stty _su _tar _tar_archive _tex _uncompress _urls _use_lo
+    _users _xargs
 '

@@ -15,9 +15,9 @@ if [[ $CURRENT -eq 3 && $words[2] == '-f' ]]; then
   _perl_builtin_funcs
 elif [[ $CURRENT -eq 3 && $words[2] == '-q' ]]; then
   zle -R "I can't read your mind!"
+  return 1
 else
   _perl_modules
   _perl_basepods
   _path_files -/ -g '*.(pod|pm)'
 fi
-

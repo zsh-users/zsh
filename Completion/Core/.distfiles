@@ -1,6 +1,6 @@
 DISTFILES_SRC='
     .distfiles
-    _approximate _compalso _complete _correct _description _expand
+    _approximate _compalso _complete _correct _description _display _expand
     _files _list _main_complete _match _menu _multi_parts
     _message _normal _oldlist _options _parameters _path_files
     _sep_parts _set_options _unset_options

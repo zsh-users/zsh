@@ -83,8 +83,7 @@ createmapfilehash()
     Param pm;
     HashTable ht;
 
-    if ((pm = (Param) gethashnode2(paramtab, mapfile_nam)))
-	unsetparam_pm(pm, 0, 1);
+    unsetparam(mapfile_nam);
     mapfile_pm = NULL;
 
     if (!(pm = createparam(mapfile_nam,

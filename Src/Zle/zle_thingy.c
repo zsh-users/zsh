@@ -399,10 +399,6 @@ bin_zle_refresh(char *name, char **args, char *ops, char func)
     char *s = statusline;
     int sl = statusll, ocl = clearlist;
 
-    if (!zleactive) {
-	zerrnam(name, "can only be called from widget function", NULL, 0);
-	return 1;
-    }
     statusline = NULL;
     statusll = 0;
     if (*args) {
@@ -439,10 +435,6 @@ bin_zle_unget(char *name, char **args, char *ops, char func)
 {
     char *p = *args;
 
-    if (!zleactive) {
-	zerrnam(name, "can only be called from widget function", NULL, 0);
-	return 1;
-    }
     while (*p)
 	ungetkey((int) *p++);
     return 0;
