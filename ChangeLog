@@ -1,3 +1,8 @@
+2004-06-03  Peter Stephenson  <pws@csr.com>
+
+	* users/7467: Completion/Base/Core/_dispatch: quoted commands
+	weren't found in dispatcher lookup.
+
 2004-06-02  Wayne Davison  <wayned@users.sourceforge.net>
 
 	* unposted: builtin.c, exec.c, glob.c, hashtable.c, hist.c, init.c,

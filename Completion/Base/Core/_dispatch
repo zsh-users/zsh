@@ -40,6 +40,10 @@ fi
 ret=1
 for str in "$@"; do
   [[ -n "$str" ]] || continue
+  # The following means we look up the names of commands
+  # after stripping quotes.  This is presumably correct,
+  # but do we need to do the same elsewhere?
+  str=${(Q)str}
   name="$str"
   comp="${_comps[$str]}"
   service="${_services[$str]:-$str}"
