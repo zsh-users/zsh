@@ -854,6 +854,8 @@ ca_get_sopt(Cadef d, char *line, int full, char **end)
 		break;
 	    } else if (!p || !p->active || (line[1] && p->args))
 		return NULL;
+	if (end)
+	    *end = line;
 	return p;
     }
     return NULL;
@@ -982,6 +984,9 @@ ca_parse_line(Cadef d)
 	    ddef = state.def = state.curopt->args;
 	    doff = pe - line;
 	    state.optbeg = state.argbeg = state.inopt = cur;
+	    state.singles = (d->single && (!pe || !*pe) &&
+			     state.curopt->name[1] && !state.curopt->name[2]);
+
 	    PERMALLOC {
 		state.oargs[state.curopt->num] = newlinklist();
 	    } LASTALLOC;
@@ -1010,7 +1015,7 @@ ca_parse_line(Cadef d)
 	    ddef = state.def = state.curopt->args;
 	    doff = pe - line;
 	    state.optbeg = state.argbeg = state.inopt = cur;
-	    state.singles = !*pe;
+	    state.singles = (!pe || !*pe);
 
 	    for (p = line + 1; p <= pe; p++) {
 		if ((tmpopt = d->single[STOUC(*p)])) {
@@ -1189,7 +1194,8 @@ bin_comparguments(char *nam, char **args, char *ops, int func)
 		setsparam(args[1], ztrdup(arg->descr));
 		setsparam(args[2], ztrdup(arg->action));
 
-		ignore_prefix(ca_laststate.doff);
+		if (ca_laststate.doff > 0)
+		    ignore_prefix(ca_laststate.doff);
 		if (arg->type == CAA_RARGS)
 		    restrict_range(ca_laststate.argbeg - 1,
 				   arrlen(compwords) - 1);

@@ -247,7 +247,7 @@ if comparguments -i "$compconfig[autodescribe_options]" "$@"; then
 	  compadd "$expl[@]" -QqS= - "${PREFIX}${SUFFIX}"
         else
 	  tmp1=( "$next[@]" "$direct[@]" "$odirect[@]" "$equal[@]" )
-	  tmp2=( "${PREFIX}${(@)^tmp1%%:*}" )
+	  tmp2=( "${PREFIX}${(@M)^${(@)${(@)tmp1%%:*}#[-+]}:#?}" )
 
           _describe -o -c "$cmd" option tmp1 tmp2 -Q -S ''
         fi
