@@ -1250,6 +1250,10 @@ bin_fc(char *nam, char **argv, char *ops, int func)
     while (*argv && equalsplit(*argv, &s)) {
 	Asgment a = (Asgment) zhalloc(sizeof *a);
 
+	if (!**argv) {
+	    zwarnnam(nam, "invalid replacement pattern: =%s", s, 0);
+	    return 1;
+	}
 	if (!asgf)
 	    asgf = asgl = a;
 	else {
