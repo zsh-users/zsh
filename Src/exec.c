@@ -2395,7 +2395,7 @@ save_params(Estate state, Wordcode pc, LinkList *restore_p, LinkList *remove_p)
 	    } else if (!(pm->flags & PM_READONLY) &&
 		       (unset(RESTRICTED) || !(pm->flags & PM_RESTRICTED))) {
 		Param tpm = (Param) zhalloc(sizeof *tpm);
-		tpm->nam = dupstring(s);
+		tpm->nam = pm->nam;
 		copyparam(tpm, pm, 1);
 		pm = tpm;
 	    }

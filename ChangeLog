@@ -1,7 +1,7 @@
 2001-06-20  Peter Stephenson  <pws@csr.com>
 
-	* 14988: Src/exec.c: names of saved special parameters need
-	to be copied.
+	* 14988 with mod suggested in 14989: Src/exec.c: avoid names of
+	saved special parameters being trashed.
 
 2001-06-19  Bart Schaefer  <schaefer@zsh.org>
 
