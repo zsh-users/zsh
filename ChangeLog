@@ -1,3 +1,10 @@
+2004-01-09  Clint Adams  <clint@zsh.org>
+
+	* 20654: Completion/Debian/Command/_dpkg,
+	Completion/Debian/Command/_wajig,
+	Completion/Debian/Type/_deb_packages: completion for wajig, and
+	dpkg/deb_packages improvements from Karl Chen.
+
 2004-01-07  Clint Adams  <clint@zsh.org>
 
 	* 20650: Completion/Unix/Command/_mencal:

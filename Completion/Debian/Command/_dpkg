@@ -113,10 +113,15 @@ case "$state" in
       - nonrecur \
 	'*:Debian package:_path_files -g "*.deb(-.)"'
   ;;
-  remove|purge|status|listfiles)
+  remove|status|listfiles)
     _call_function ret _dpkg_$state && return ret
     _arguments -C -A "-*" -s "$_dpkg_options[@]" \
        '*:package:_deb_packages installed'
+  ;;
+  purge)
+    _call_function ret _dpkg_$state && return ret
+    _arguments -C -A "-*" -s "$_dpkg_options[@]" \
+       '*:package:_deb_packages xinstalled'
   ;;
   list)
     _call_function ret _dpkg_$state && return ret
