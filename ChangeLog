@@ -1,5 +1,8 @@
 2001-10-22  Bart Schaefer  <schaefer@zsh.org>
 
+	* 16111: Src/Builtins/rlimits.c: Report error on attempt to set
+	limit to a string that is not a decimal number.
+
 	* 16109: Src/init.c: Use a fixed initial fdtable_size to fix crash
 	resulting from a huge memory allocation, as reported in 16082.
 

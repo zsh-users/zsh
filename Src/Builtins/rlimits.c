@@ -332,7 +332,12 @@ bin_limit(char *nam, char **argv, char *ops, int func)
 	} else if (limtype[lim] == ZLIMTYPE_NUMBER || limtype[lim] == ZLIMTYPE_UNKNOWN) {
 	    /* pure numeric resource -- only a straight decimal number is
 	    permitted. */
-	    val = zstrtorlimt(s, &s, 10);
+	    char *t = s;
+	    val = zstrtorlimt(t, &s, 10);
+	    if (s == t) {
+		zwarnnam("limit", "limit must be a number", NULL, 0);
+		return 1;
+	    }
 	} else {
 	    /* memory-type resource -- `k' and `M' modifiers are permitted,
 	    meaning (respectively) 2^10 and 2^20. */
