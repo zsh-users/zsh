@@ -1,3 +1,8 @@
+2004-06-24  Bart Schaefer  <schaefer@zsh.org>
+
+	* unposted (see 20092): Completion/Zsh/Context/_condition: fix
+	typos in descriptions.
+
 2004-06-23  Peter Stephenson  <pws@csr.com>
 
 	* 20089: Doc/Zsh/contrib.yo, Functions/Misc/zed,

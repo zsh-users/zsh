@@ -46,9 +46,9 @@ else
 	           -eq:numerically\ equal
 	           -ne:numerically\ not\ equal
 	           -lt:numerically\ less\ than
-	           -le:numerically\ less\ then\ or\ equal
-	           -lt:numerically\ greater\ than
-	           -le:numerically\ greater\ then\ or\ equal)' && ret=0
+	           -le:numerically\ less\ than\ or\ equal
+	           -gt:numerically\ greater\ than
+	           -ge:numerically\ greater\ than\ or\ equal)' && ret=0
     fi
   fi
   _alternative 'files:: _files' 'parameters:: _parameters' && ret=0
