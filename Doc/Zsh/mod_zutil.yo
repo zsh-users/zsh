@@ -111,4 +111,28 @@ The resulting strings are stored in the var(array).
 item(tt(zregexparse))(
 This implements the internals of the `tt(_regex_arguments)'.
 )
+item(tt(zparseopts) [ tt(-D) ] var(specs))(
+This builtin can be used to parse the positional arguments and put
+options found in them into separate arrays. Each var(spec) describes
+one option which is given as its first character. If the second
+character is either `tt(:)' or `tt(+)', the option takes an argument
+(either directly following the option in the same word or in the next
+word). After the option character or the `tt(:)' or `tt(+)' follows
+the name of the array in which the option should be stored. The only
+difference between the form with a `t(:)' and the one with a `tt(+)'
+is that in the first case the option and its argument will be put in
+the array only once (later occurrences overwriting earlier ones),
+whereas with `tt(+)' all occurrences are moved to the array.
+
+If the tt(-D) option is given, all options found are removed from the
+positional parameters leaving only those strings that did not match
+any of the var(specs).
+
+For example, calling `tt(zparseopts afoo b:bar c+bar)' with the
+strings `tt(-a)', `tt(-bx)', `tt(-c)', `tt(y)', `tt(-cz)', `tt(baz)'
+and `tt(-cend)' as positional arguments will set the array tt(foo) to
+contain the element `tt(-a)' and the array tt(bar) to the strings
+`tt(-bx)', `tt(-cy)' and `tt(-cz)'. The `tt(baz)' and any strings
+after it will not be used.
+)
 enditem()

@@ -22,19 +22,16 @@ local matchflags opt group expl nm=$compstate[nmatches] opre osuf opts match
 
 # Get the options.
 
-group=()
-expl=()
-opts=()
-while getopts "J:V:X:P:F:S:r:R:qM:12n" opt; do
-  case "$opt" in
-  [JV])   group=("-$opt" "$OPTARG");;
-  X)      expl=(-X "$OPTARG");;
-  [q12n]) opts=( "$opts[@]" "-$opt" );;
-  M)      match="$OPTARG";;
-  *)      opts=( "$opts[@]" "-$opt" "$OPTARG" );;
-  esac
-done
-shift OPTIND-1
+zparseopts -D \
+    J:group V:group \
+    P:opts F:opts S:opts r:opts R:opts qopts 1opts 2opts nopts \
+    X:expl M:match
+
+if (( $#match )); then
+  match="${match[1][3,-1]}"
+else
+  match=''
+fi
 
 # Get the string from the line.
 

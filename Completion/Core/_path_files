@@ -3,9 +3,9 @@
 # Utility function for in-path completion. This allows `/u/l/b<TAB>'
 # to complete to `/usr/local/bin'.
 
-local linepath realpath donepath prepath testpath exppath skips
+local linepath realpath donepath prepath testpath exppath skips skipped
 local tmp1 tmp2 tmp3 tmp4 i orig eorig pre suf tpre tsuf opre osuf cpre
-local pats haspats=no ignore group expl addpfx addsfx remsfx rem remt
+local pats haspats=no ignore pfxsfx rem remt sopt gopt opt
 local nm=$compstate[nmatches] menu mspec matcher mopts atmp sort match
 
 typeset -U prepaths exppaths
@@ -13,73 +13,50 @@ typeset -U prepaths exppaths
 setopt localoptions nullglob rcexpandparam
 unsetopt markdirs globsubst shwordsplit nounset
 
-local sopt='-' gopt='' opt
 exppaths=()
-prepaths=('')
-ignore=()
-group=()
-pats=()
-addpfx=()
-addsfx=()
-remsfx=()
-expl=()
-matcher=()
-mopts=()
 
 # Get the options.
 
-while getopts "P:S:qr:R:W:F:J:V:X:f/g:M:12n" opt; do
-  case "$opt" in
-  [12n]) mopts=( "$mopts[@]" "-$opt" )
-         ;;
-  P)     addpfx=(-P "$OPTARG")
-         ;;
-  S)     addsfx=(-S "$OPTARG")
-         ;;
-  q)     tmp1=yes
-         ;;
-  [rR])  remsfx=("-$opt" "$OPTARG")
-         ;;
-  W)     tmp1="$OPTARG"
-         if [[ "$tmp1[1]" = '(' ]]; then
-           prepaths=( ${^=tmp1[2,-2]%/}/ )
-	 elif [[ "$tmp1[1]" = '/' ]]; then
-           prepaths=( "$tmp1/" )
-         else
-	   # In this case the variable should be an array, so
-	   # don't use an extra ${=...}.
-           prepaths=( ${(P)^tmp1%/}/ )
-           (( ! $#prepaths )) && prepaths=( ${tmp1%/}/ )
-         fi
-         (( ! $#prepaths )) && prepaths=( '' )
-         ;;
-  F)     tmp1="$OPTARG"
-         if [[ "$tmp1[1]" = '(' ]]; then
-           ignore=( ${=tmp1[2,-2]} )
-         else
-           ignore=( ${(P)tmp1} )
-         fi
-         ;;
-  [JV])  group=("-$opt" "$OPTARG")
-         ;;
-  X)     expl=(-X "$OPTARG")
-         ;;
-  f)     sopt="${sopt}f"
-         pats=("$pats[@]" '*')
-	 ;;
-  /)     sopt="${sopt}/"
-         pats=("$pats[@]" '*(-/)')
-	 haspats=yes
-	 ;;
-  g)     gopt='-g'
-         pats=("$pats[@]" ${=OPTARG})
-	 haspats=yes
-	 ;;
-  M)     mspec="$OPTARG"
-         matcher=(-M "$OPTARG")
-         ;;
-  esac
-done
+zparseopts \
+    P:pfxsfx S:pfxsfx qpfxsfx r:pfxsfx R:pfxsfx \
+    W:prepaths F:ignore M+matcher \
+    J:mopts V:mopts X:mopts 1:mopts 2:mopts n:mopts \
+    ftmp1 /tmp1 g+tmp1
+
+sopt="-${(@j::M)${(@)tmp1#-}#?}"
+(( $tmp1[(I)-[/g]*] )) && haspats=yes
+(( $tmp1[(I)-g*] )) && gopt=yes
+if (( $tmp1[(I)-/] )); then
+  pats=( '*(-/)' ${=${(M)tmp1:#-g*}#-g} )
+else
+  pats=( "${(@)=${(@M)tmp1:#-g*}#-g}" )
+fi
+
+if (( $#prepaths )); then
+  tmp1="${prepaths[1][3,-1]}"
+  if [[ "$tmp1[1]" = '(' ]]; then
+    prepaths=( ${^=tmp1[2,-2]%/}/ )
+  elif [[ "$tmp1[1]" = '/' ]]; then
+    prepaths=( "$tmp1/" )
+  else
+    prepaths=( ${(P)^tmp1%/}/ )
+    (( ! $#prepaths )) && prepaths=( ${tmp1%/}/ )
+  fi
+  (( ! $#prepaths )) && prepaths=( '' )
+else
+  prepaths=( '' )
+fi
+
+if (( $#ignore )); then
+  tmp1="${ignore[1][3,-1]}"
+  if [[ "$tmp1[1]" = '(' ]]; then
+    ignore=( ${=tmp1[2,-2]} )
+  else
+    ignore=( ${(P)tmp1} )
+  fi
+fi  
+
+(( $#matcher )) && mspec="${matcher[1][3,-1]}"
 
 if [[ -z "$_file_pat_checked" ]] &&
    zstyle -s ":completion:${curcontext}:files" file-patterns tmp1 &&
@@ -88,20 +65,34 @@ if [[ -z "$_file_pat_checked" ]] &&
     gopt=''
     sopt=-/
   else
-    gopt='-g'
+    gopt=yes
     sopt=-
   fi
   pats=( $=tmp1 )
   haspats=yes
 fi
 
-if (( ! ( $#group + $#expl ) )); then
+# If we were given no file selection option, we behave as if we were given
+# a `-f'.
+
+if [[ "$sopt" = -(f|) ]]; then
+  if [[ -z "$gopt" ]]; then
+    sopt='-f'
+    pats=('*')
+  else
+    unset sopt
+  fi
+fi
+
+if (( ! $mopts[(I)-[JVX]*] )); then
+  local expl
+
   if [[ -z "$gopt" && "$sopt" = -/ ]]; then
     _description directories expl directory
   else
     _description files expl file
   fi
-  tmp1=$expl[(I)-M]
+  tmp1=$expl[(I)-M*]
   if (( tmp1 )); then
     mspec="$mspec $expl[1+tmp1]"
     if (( $#matcher )); then
@@ -110,20 +101,7 @@ if (( ! ( $#group + $#expl ) )); then
       matcher=(-M "$expl[1+tmp1]")
     fi
   fi
-fi
-
-[[ -n "$tmp1" && $#addsfx -ne 0 ]] && addsfx[1]=-qS
-
-# If we were given no file selection option, we behave as if we were given
-# a `-f'.
-
-if [[ "$sopt" = - ]]; then
-  if [[ -z "$gopt" ]]; then
-    sopt='-f'
-    pats=('*')
-  else
-    unset sopt
-  fi
+  mopts=( "$mopts[@]" "$expl[@]" )
 fi
 
 if zstyle -s ":completion:${curcontext}:files" sort tmp1; then
@@ -140,8 +118,7 @@ if zstyle -s ":completion:${curcontext}:files" sort tmp1; then
   if [[ "$sort" = on ]]; then
     sort=''
   else
-    group=( "${(@)group/#-J/-V}" )
-    expl=( "${(@)expl/#-J/-V}" )
+    mopts=( "${(@)mopts/#-J/-V}" )
 
     tmp2=()
     for tmp1 in "$pats[@]"; do
@@ -157,9 +134,15 @@ if zstyle -s ":completion:${curcontext}:files" sort tmp1; then
   fi
 fi
 
-# Skip over sequences of slashes.
+# Check if we have to skip over sequences of slashes. The value of $skips
+# is used below to match the pathname components we always have to accept
+# immediatly.
 
-zstyle -t ":completion:${curcontext}:paths" squeeze-slashes && skips=yes
+if zstyle -t ":completion:${curcontext}:paths" squeeze-slashes; then
+  skips='((.|..|)/)##'
+else
+  skips='((.|..)/)##'
+fi
 
 # We get the prefix and the suffix from the line and save the whole
 # original string. Then we see if we will do menucompletion.
@@ -182,7 +165,7 @@ eorig="$orig"
 
 if (( $#ignore )); then
   _comp_ignore=( "$_comp_ignore[@]" "$ignore[@]" )
-  (( $expl[(I)-F] )) || expl=( "$expl[@]" -F _comp_ignore )
+  (( $mopts[(I)-F*] )) || mopts=( "$mopts[@]" -F _comp_ignore )
 fi
 
 # Now let's have a closer look at the string to complete.
@@ -256,25 +239,12 @@ for prepath in "$prepaths[@]"; do
   tsuf="$suf"
   testpath="$donepath"
 
-  tmp1=( "$prepath$realpath$donepath" )
+  tmp2="${(M)tpre##${~skips}}"
+  tpre="${tpre#$tmp2}"
+
+  tmp1=( "$prepath$realpath$donepath$tmp2" )
 
   while true; do
-
-    # Skip over `./' and `../'.
-
-    if [[ "$tpre" = (.|..)/* ]]; then
-      tmp1=( ${^tmp1}${tpre%%/*}/ )
-      tpre="${tpre#*/}"
-      continue
-    fi
-
-    # Skip over multiple slashes?
-
-    if [[ -n "$skips" && "$tpre" = /* ]]; then
-      tmp1=( ${^tmp1}/ )
-      tpre="${tpre#/}"
-      continue
-    fi
 
     # Get the prefix and suffix for matching.
 
@@ -289,45 +259,24 @@ for prepath in "$prepaths[@]"; do
     # Get the matching files by globbing.
 
     if [[ "$tpre$tsuf" = */* ]]; then
-      tmp2=( ${^tmp1}*(-/) )
-      [[ ! -o globdots && "$PREFIX" = .* ]] &&
-          tmp2=( "$tmp2[@]" ${^tmp1}.*(-/) )
+      if [[ ! -o globdots && "$PREFIX" = .* ]]; then
+        tmp1=( ${^tmp1}${skipped}*(-/) ${^tmp1}${slash}.*(-/) )
+      else
+        tmp1=( ${^tmp1}${skipped}*(-/) )
+      fi
       if [[ -o globdots || "$PREFIX" = .* ]] &&
          zstyle -s ":completion:${curcontext}:paths" special-dirs atmp; then
 	if [[ "$atmp" = (yes|true|1|on) ]]; then
-	  tmp2=( "$tmp2[@]" . .. )
+	  tmp1=( "$tmp1[@]" . .. )
 	elif [[ "$atmp" = .. ]]; then
-	  tmp2=( "$tmp2[@]" .. )
+	  tmp1=( "$tmp1[@]" .. )
         fi
       fi
     else
-      tmp2=( ${^tmp1}${^~pats} )
-      [[ ! -o globdots && "$PREFIX" = .* ]] &&
-          tmp2=( "$tmp2[@]" ${^tmp1}.${^~pats} )
-      if (( $#tmp2 )) &&
-         zstyle -s ":completion:${curcontext}:files" ignore-parents rem &&
-	 [[ ( "$rem" != *dir* || "$pats" = '*(-/)' ) &&
-	    ( "$rem" != *..* || "$tmp1" = *../* ) ]]; then
-        if [[ "$rem" = *parent* ]]; then
-	  for i in "$tmp2[@]"; do
-	    if [[ -d "$i" && "$i" = */* ]]; then
-	      remt="${i%/*}"
-	      while [[ "$remt" = */* ]]; do
-		[[ "$remt" -ef "$i" ]] && break
-		remt="${remt%/*}"
-	      done
-	      [[ "$remt" = */* || "$remt" -ef "$i" ]] &&
-	          _comp_ignore=( "$_comp_ignore[@]" "${(q)i}" )
-	    fi
-	  done
-        fi
-        if [[ "$rem" = *pwd* ]]; then
-          for i in "$tmp2[@]"; do
-	    [[ "$i" -ef "$PWD" ]] && _comp_ignore=( "$_comp_ignore[@]" "${(q)i}" )
-	  done
-        fi
-       (( $#_comp_ignore )) && (( $expl[(I)-F] )) ||
-           expl=( "$expl[@]" -F _comp_ignore )
+      if [[ ! -o globdots && "$PREFIX" = .* ]]; then
+        tmp1=( ${^tmp1}${skipped}${^~pats} ${^tmp1}${slash}.${^~pats} )
+      else
+        tmp1=( ${^tmp1}${skipped}${^~pats} )
       fi
       if [[ "$sopt" = *[/f]* && ( -o globdots || "$PREFIX" = .* ) ]] &&
 	  zstyle -s ":completion:${curcontext}:paths" special-dirs atmp; then
@@ -338,22 +287,28 @@ for prepath in "$prepaths[@]"; do
         fi
       fi
     fi
-    tmp1=( "$tmp2[@]" )
 
     if [[ -n "$PREFIX$SUFFIX" ]]; then
       # See which of them match what's on the line.
 
-      builtin compadd -D tmp1 -F _comp_ignore "$matcher[@]" - "${(@)tmp1:t}"
+      if [[ -n "$_comp_correct" ]]; then
+        tmp2=( "$tmp1[@]" )
+        builtin compadd -D tmp1 -F _comp_ignore "$matcher[@]" - "${(@)tmp1:t}"
 
-      if [[ $#tmp1 -eq 0 && -n "$_comp_correct" ]]; then
-        tmp1=( "$tmp2[@]" )
-	compadd -D tmp1 -F _comp_ignore "$matcher[@]" - "${(@)tmp2:t}"
+        if [[ $#tmp1 -eq 0 && -n "$_comp_correct" ]]; then
+          tmp1=( "$tmp2[@]" )
+	  compadd -D tmp1 -F _comp_ignore "$matcher[@]" - "${(@)tmp2:t}"
+        fi
+      else
+        [[ "$tmp1[1]" = */* ]] && tmp2=( "$tmp1[@]" )
+
+        builtin compadd -D tmp1 -F _comp_ignore "$matcher[@]" - "${(@)tmp1:t}"
       fi
 
       # If no file matches, save the expanded path and continue with
       # the outer loop.
 
-      if [[ $#tmp1 -eq 0 ]]; then
+      if (( ! $#tmp1 )); then
  	if [[ "$tmp2[1]" = */* ]]; then
 	  tmp2=( "${(@)tmp2#${prepath}${realpath}}" )
 	  if [[ "$tmp2[1]" = */* ]]; then
@@ -384,8 +339,7 @@ for prepath in "$prepaths[@]"; do
 
       if [[ -z "$tpre$tsuf" && -n "$pre$suf" ]]; then
         tmp1=( "$tmp2[@]" )
-	addsfx=(-S '')
-	remsfx=()
+	pfxsfx=(-S '' "$pfxsfx[@]")
 	break;
       elif [[ "$haspats" = no && -z "$tpre$tsuf" &&
 	"$pre" = */ && -z "$suf" ]]; then
@@ -395,6 +349,29 @@ for prepath in "$prepaths[@]"; do
         tmp4=-
       fi
       continue 2
+    fi
+
+    if [[ "$tpre$tsuf" != */* && $#tmp1 -ne 0 ]] &&
+       zstyle -s ":completion:${curcontext}:files" ignore-parents rem &&
+       [[ ( "$rem" != *dir* || "$pats" = '*(-/)' ) &&
+	  ( "$rem" != *..* || "$tmp1" = *../* ) ]]; then
+      if [[ "$rem" = *parent* ]]; then
+	for i in ${(M)^tmp1:#*/*}(-/); do
+	  remt="${${i#$prepath$realpath$donepath}%/*}"
+	  while [[ "$remt" = */* ]]; do
+	    [[ "$prepath$realpath$donepath$remt" -ef "$i" ]] && break
+	    remt="${remt%/*}"
+	  done
+	  [[ "$remt" = */* || "$remt" -ef "$i" ]] &&
+	      _comp_ignore=( "$_comp_ignore[@]" "${(q)i}" )
+	done
+      fi
+      if [[ "$rem" = *pwd* ]]; then
+        for i in ${^tmp1}(-/); do
+	  [[ "$i" -ef "$PWD" ]] && _comp_ignore=( "$_comp_ignore[@]" "${(q)i}" )
+	done
+      fi
+      (( $#_comp_ignore && $mopts[(I)-F*] )) || mopts=( "$mopts[@]" -F _comp_ignore )
     fi
 
     # Step over to the next component, if any.
@@ -408,10 +385,16 @@ for prepath in "$prepaths[@]"; do
       break
     fi
 
-    # There are more components, so add a slash to the files we are
-    # collecting.
+    # There are more components, so skip over the next components and make a
+    # slash be added.
 
-    tmp1=( ${^tmp1}/ )
+    tmp2="${(M)tpre##((.|..|)/)##}"   ###
+    if [[ -n "$tmp2" ]]; then
+      skipped="/$tmp2"
+      tpre="${tpre#$tmp2}"
+    else
+      skipped=/
+    fi
   done
 
   # The next loop searches the first ambiguous component.
@@ -471,30 +454,30 @@ for prepath in "$prepaths[@]"; do
         if [[ "$tmp3" = */* ]]; then
 	  compadd -Qf "$mopts[@]" -p "$linepath$tmp2" -s "/${tmp3#*/}" \
 	          -W "$prepath$realpath$testpath" \
-		  "$addpfx[@]" "$addsfx[@]" "$remsfx[@]" \
-                  -M "r:|/=* r:|=* $mspec" "$group[@]" "$expl[@]" \
+		  "$pfxsfx[@]" \
+                  -M "r:|/=* r:|=* $mspec" \
 		  - "${(@)tmp1%%/*}"
 	else
 	  compadd -Qf "$mopts[@]" -p "$linepath$tmp2" \
 	          -W "$prepath$realpath$testpath" \
-		   "$addpfx[@]" "$addsfx[@]" "$remsfx[@]" \
-                   -M "r:|/=* r:|=* $mspec" "$group[@]" "$expl[@]" \
+		   "$pfxsfx[@]" \
+                   -M "r:|/=* r:|=* $mspec" \
 		   - "$tmp1[@]"
 	fi
       else
         if [[ "$tmp3" = */* ]]; then
 	  atmp=( -Qf "$mopts[@]" -p "$linepath$tmp2"
 	         -W "$prepath$realpath$testpath"
-	         "$addpfx[@]" "$addsfx[@]" "$remsfx[@]"
-                 -M "r:|/=* r:|=* $mspec" "$group[@]" "$expl[@]" )
+	         "$pfxsfx[@]" \
+                 -M "r:|/=* r:|=* $mspec" )
           for i in "$tmp1[@]"; do
 	    compadd "$atmp[@]" -s "/${i#*/}" - "${i%%/*}"
 	  done
         else
 	  compadd -Qf "$mopts[@]" -p "$linepath$tmp2" \
 		  -W "$prepath$realpath$testpath" \
-		  "$addpfx[@]" "$addsfx[@]" "$remsfx[@]" \
-                  -M "r:|/=* r:|=* $mspec" "$group[@]" "$expl[@]" \
+		  "$pfxsfx[@]" \
+                  -M "r:|/=* r:|=* $mspec" \
 		  - "$tmp1[@]"
         fi
       fi
@@ -543,8 +526,8 @@ for prepath in "$prepaths[@]"; do
     compquote tmp4 tmp1
     compadd -Qf "$mopts[@]" -p "$linepath$tmp4" \
 	    -W "$prepath$realpath$testpath" \
-	    "$addpfx[@]" "$addsfx[@]" "$remsfx[@]" \
-            -M "r:|/=* r:|=* $mspec" "$group[@]" "$expl[@]" \
+	    "$pfxsfx[@]" \
+            -M "r:|/=* r:|=* $mspec" \
 	    - "$tmp1[@]"
   fi
 done
@@ -553,14 +536,17 @@ done
 # expanded paths that are different from the string on the line, we add
 # them as possible matches.
 
-exppaths=( "${(@)exppaths:#$eorig}" )
-
 if zstyle -t ":completion:${curcontext}:paths" expand prefix &&
-   [[ $#exppaths -gt 0 && nm -eq compstate[nmatches] ]]; then
-  PREFIX="${opre}"
-  SUFFIX="${osuf}"
-  compadd -Q "$mopts[@]" -S '' "$group[@]" "$expl[@]" \
-          -M "r:|/=* r:|=* $mspec" -p "$linepath" - "$exppaths[@]"
+   [[ nm -eq compstate[nmatches] ]]; then
+
+  exppaths=( "${(@)exppaths:#$eorig}" )
+
+  if (( $#exppaths )); then
+    PREFIX="${opre}"
+    SUFFIX="${osuf}"
+    compadd -Q "$mopts[@]" -S '' \
+            -M "r:|/=* r:|=* $mspec" -p "$linepath" - "$exppaths[@]"
+  fi
 fi
 
 [[ nm -ne compstate[nmatches] ]]
