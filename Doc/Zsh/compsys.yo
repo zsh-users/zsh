@@ -2930,7 +2930,7 @@ put themselves into the arrays again.
 
 startitem()
 findex(_all_labels)
-item(tt(_all_labels) [ tt(-12VJ) ] var(tag) var(name) var(descr) [ var(command) var(args) ... ])(
+item(tt(_all_labels) [ tt(-x) ] [ tt(-12VJ) ] var(tag) var(name) var(descr) [ var(command) var(args) ... ])(
 This is a convenient interface to the tt(_next_label) function below,
 implementing the loop shown in the tt(_next_label) example.  The
 var(command) is the one that should be called to generate the matches. The
@@ -3587,7 +3587,7 @@ tt(_describe) uses the tt(_all_labels) function to generate the matches, so
 it does not need to appear inside a loop over tag labels.
 )
 findex(_description)
-item(tt(_description) [ tt(-12VJ) ] var(tag) var(name) var(descr) [ var(specs) ... ])(
+item(tt(_description) [ tt(-x) ] [ tt(-12VJ) ] var(tag) var(name) var(descr) [ var(specs) ... ])(
 This function is called before completions are added (typically by a call
 to tt(compadd)); it tests various styles and arranges for any necessary
 options to be passed on to tt(compadd).  The styles are tested in the
@@ -3609,7 +3609,10 @@ not contain an explanation string to be displayed above the matches.  If
 tt(_description) is called with more than three arguments,
 the additional var(specs) should be of the form `var(char)tt(:)var(str)'
 and every appearance of `tt(%)var(char)' in the format string will be
-replaced by var(string).
+replaced by var(string).  If the tt(-x) option is given, the
+description will be added using the tt(-x) option instead of the
+default tt(-X), i.e. the description will even be displayed if no
+matches are added for the description.
 
 The options placed in the array will also make sure that the matches
 are placed in a separate group, depending on the value of the
@@ -3692,7 +3695,7 @@ tt(_guard)), only the message will be displayed and if the `tt(-n)' is
 followed by another character, only options are completed.
 )
 findex(_message)
-xitem(tt(_message) [ tt(-r) ] var(descr))
+xitem(tt(_message) [ tt(-r12) ] [ tt(-VJ) var(group) ] var(descr))
 item(tt(_message -e) var(tag descr))(
 The var(descr) is used like the third
 argument to the tt(_description) function. However, the resulting
@@ -3708,6 +3711,9 @@ If the tt(-r) option is given, no style is used and the var(descr) is
 used literally as the string to display. This is only used in cases
 where that string is taken from some pre-processed argument list
 containing an expanded description.
+
+The tt(-12VJ) options and the var(group) are passed to tt(compadd) and
+hence determine the group the message string is added to.
 
 In the second form, the var(descr) is added like a description added
 by tt(_description) under the given var(tag), but the var(descr) will
@@ -3741,13 +3747,13 @@ Like other utility functions, this function accepts the `tt(-V)',
 them to the tt(compadd) builtin.
 )
 findex(_next_label)
-item(tt(_next_label) [ tt(-12VJ) ] var(tag) var(name) var(descr) [ var(options) ... ])(
+item(tt(_next_label) [ tt(-x) ] [ tt(-12VJ) ] var(tag) var(name) var(descr) [ var(options) ... ])(
 This function should be called repeatedly to generate the tag
 labels. On each call it will check if another tag label is to be used 
 and, if there is at least one, zero is returned. If no more tag
 labels are to be used, a non-zero status is returned.
 
-The tt(-12JV) options and the first three arguments are given to the
+The tt(-x12VJ) options and the first three arguments are given to the
 tt(_description) function using the tag label instead of the first
 argument as appropriate. The var(options) given after the var(descr)
 should be other options to be used for tt(compadd) or whatever
@@ -3932,7 +3938,7 @@ Either of the two var(spec)s can be matched.
 enditem()
 )
 findex(_requested)
-item(tt(_requested) [ tt(-12VJ) ] var(tag) [ var(name) var(descr) [ var(command) var(args) ... ] ])(
+item(tt(_requested) [ tt(-x) ] [ tt(-12VJ) ] var(tag) [ var(name) var(descr) [ var(command) var(args) ... ] ])(
 This function is called to decide whether a tag already registered by a
 call to tt(_tags) (see below) is requested and hence completion should be
 performed for it; it returns status zero if the tag is requested and
@@ -4159,7 +4165,7 @@ which case you have to make the parameter tt(curcontext) local instead
 of tt(context) (as described above).
 )
 findex(_wanted)
-item(tt(_wanted) [ tt(-C) var(name) ]  [ tt(-12VJ) ] var(tag) var(name) var(descr) var(command) var(args) ...)(
+item(tt(_wanted) [ tt(-x) ] [ tt(-C) var(name) ]  [ tt(-12VJ) ] var(tag) var(name) var(descr) var(command) var(args) ...)(
 In many contexts, completion will generate one particular set of
 matches (usually corresponding to a single tag); however, it is
 still necessary to decide whether the user requires matches of this type.
@@ -4183,7 +4189,8 @@ Note that, as for tt(_requested), the var(command) has to accept the options
 that have to be passed down to tt(compadd).
 
 Like tt(_tags) this function supports the tt(-C) option to give a
-different name for the argument context field.
+different name for the argument context field. The tt(-x) option has
+the same meaning as for tt(_description).
 )
 enditem()
 

@@ -1,3 +1,13 @@
+2002-02-12  Sven Wischnowsky  <wischnow@zsh.org>
+
+	* 16609: Completion/Base/Core/_all_labels,
+	Completion/Base/Core/_description, Completion/Base/Core/_message,
+	Completion/Base/Core/_next_label,
+	Completion/Base/Core/_requested, Completion/Base/Core/_wanted,
+	Doc/Zsh/compsys.yo: add -x option (to be passed on to compadd)
+	to _description and friends; make _message respect any -[12VJ]
+	options it gets, adding the message to that group
+
 2002-02-09  Clint Adams  <clint@zsh.org>
 
 	* unposted: Functions/Prompts/prompt_clint_setup:
