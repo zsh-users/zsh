@@ -28,7 +28,7 @@ if zstyle -a ":completion:${curcontext}:" file-patterns tmp; then
   [[ "$type" = */* ]] && glob="$glob,*(-/)"
   pats=()
 
-  for i in ${tmp//%p/${${glob:-\*}//:/\\:}}; do
+  for i in ${tmp//\%p/${${glob:-\*}//:/\\:}}; do
     if [[ $i = *[^\\]:* ]]; then
       pats=( "$pats[@]" " $i " )
     else
