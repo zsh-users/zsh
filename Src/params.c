@@ -2878,7 +2878,7 @@ pipestatsetfn(Param pm, char **x)
 
         for (i = 0; *x && i < MAX_PIPESTATS; i++, x++)
             pipestats[i] = atoi(*x);
-            numpipestats = i;
+        numpipestats = i;
     }
     else
         numpipestats = 0;
