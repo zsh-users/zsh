@@ -194,8 +194,8 @@ struct timezone {
 # define VARARR(X,Y,Z)	X *(Y) = (X *) alloca(sizeof(X) * (Z))
 #endif
 
-/* we should be getting this value from pathconf(_PC_PATH_MAX) */
-/* but this is too much trouble                                */
+/* we should handle unlimited sizes from pathconf(_PC_PATH_MAX) */
+/* but this is too much trouble                                 */
 #ifndef PATH_MAX
 # ifdef MAXPATHLEN
 #  define PATH_MAX MAXPATHLEN
@@ -203,6 +203,11 @@ struct timezone {
    /* so we will just pick something */
 #  define PATH_MAX 1024
 # endif
+#endif
+#ifndef HAVE_PATHCONF
+# define zpathmax(X) ((long)((strlen(X) >= PATH_MAX) ? \
+			     ((errno = ENAMETOOLONG), -1) : \
+			     ((errno = 0), PATH_MAX))
 #endif
 
 /* we should be getting this value from sysconf(_SC_OPEN_MAX) */

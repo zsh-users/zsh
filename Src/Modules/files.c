@@ -71,9 +71,6 @@ bin_mkdir(char *nam, char **args, char *ops, int func)
     mode_t oumask = umask(0);
     mode_t mode = 0777 & ~oumask;
     int err = 0;
-#ifdef HAVE_PATHCONF
-    int pathmax = 0;
-#endif
 
     umask(oumask);
     if(ops['m']) {
@@ -94,21 +91,11 @@ bin_mkdir(char *nam, char **args, char *ops, int func)
 
 	while(ptr > *args + (**args == '/') && *--ptr == '/')
 	    *ptr = 0;
-#ifdef HAVE_PATHCONF
-	errno = 0;
-	if(((pathmax = pathconf(*args,_PC_PATH_MAX)) == -1) && errno) {
-	  zwarnnam(nam, "%s: %e", *args, errno);
-	  err = 1;
-	  continue;
-	}
-	else if((ztrlen(*args) > pathmax - 1) && errno != -1) {
-#else
-	  if(ztrlen(*args) > PATH_MAX - 1) {
-#endif
-	    zwarnnam(nam, "%s: %e", *args, ENAMETOOLONG);
+	if(zpathmax(unmeta(*args)) < 0) {
+	    zwarnnam(nam, "%s: %e", *args, errno);
 	    err = 1;
 	    continue;
-	  }
+	}
 	if(ops['p']) {
 	    char *ptr = *args;
 

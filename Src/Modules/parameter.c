@@ -1397,20 +1397,9 @@ scanpmjobdirs(HashTable ht, ScanFunc func, int flags)
 static void
 setpmnameddir(Param pm, char *value)
 {
-#ifdef HAVE_PATHCONF
-    int pathmax = 0;
-
     errno = 0;
-    pathmax = pathconf(value, _PC_PATH_MAX);
-    if ((pathmax == -1) && errno) {
-      zwarn("%s: %e", value, errno);
-    }
-    else if (!value || *value != '/' || ((strlen(value) >= pathmax) &&
-            pathmax != -1))
-#else
-    if (!value || *value != '/' || strlen(value) >= PATH_MAX)
-#endif
-	zwarn("invalid value: %s", value, 0);
+    if (!value || *value != '/' || zpathmax(value) < 0)
+	zwarn((errno ? "%s: %e" : "invalid value: %s"), value, errno);
     else
 	adduserdir(pm->nam, value, 0, 1);
     zsfree(value);
@@ -1432,9 +1421,6 @@ setpmnameddirs(Param pm, HashTable ht)
 {
     int i;
     HashNode hn, next, hd;
-#ifdef HAVE_PATHCONF
-    int pathmax = 0;
-#endif
 
     if (!ht)
 	return;
@@ -1457,19 +1443,9 @@ setpmnameddirs(Param pm, HashTable ht)
 	    v.arr = NULL;
 	    v.pm = (Param) hn;
 
-#ifdef HAVE_PATHCONF
 	    errno = 0;
-            if((((pathmax = pathconf(val, _PC_PATH_MAX)) == -1)) && errno)
-                zwarn("%s: %e", val, errno);
-            else
-#endif
-	    if (!(val = getstrvalue(&v)) || *val != '/' ||
-#ifdef HAVE_PATHCONF
-                ((strlen(val) >= pathmax)) && pathmax != -1)
-#else
-		strlen(val) >= PATH_MAX)
-#endif
-		zwarn("invalid value: %s", val, 0);
+	    if (!(val = getstrvalue(&v)) || *val != '/' || zpathmax(val) < 0)
+		zwarn((errno ? "%s: %e" : "invalid value: %s"), val, errno);
 	    else
 		adduserdir(hn->nam, val, 0, 1);
 	}

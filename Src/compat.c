@@ -105,20 +105,62 @@ strerror(int errnum)
 #endif
 
 
+#ifdef HAVE_PATHCONF
+
+/* The documentation for pathconf() says something like:             *
+ *     The limit is returned, if one exists.  If the system  does    *
+ *     not  have  a  limit  for  the  requested  resource,  -1 is    *
+ *     returned, and errno is unchanged.  If there is  an  error,    *
+ *     -1  is returned, and errno is set to reflect the nature of    *
+ *     the error.                                                    *
+ *                                                                   *
+ * This is less useful than may be, as one must reset errno to 0 (or *
+ * some other flag value) in order to determine that the resource is *
+ * unlimited.  What use is leaving errno unchanged?  Instead, define *
+ * a wrapper that resets errno to 0 and returns 0 for "the system    *
+ * does not have a limit."                                           *
+ *                                                                   *
+ * This is replaced by a macro from system.h if not HAVE_PATHCONF.   */
+
 /**/
-char *
+mod_export long
+zpathmax(char *dir)
+{
+    long pathmax;
+    errno = 0;
+    if ((pathmax = pathconf(dir, _PC_PATH_MAX)) >= 0) {
+	if (strlen(dir) < pathmax)
+	    return pathmax;
+	else
+	    errno = ENAMETOOLONG;
+    }
+    if (errno)
+	return -1;
+    else
+	return 0; /* pathmax should be considered unlimited */
+}
+#endif
+
+
+/**/
+mod_export char *
 zgetdir(struct dirsav *d)
 {
     char nbuf[PATH_MAX+3];
     char *buf;
-    int bufsiz, pos, len;
+    int bufsiz, pos;
     struct stat sbuf;
+    ino_t pino;
+    dev_t pdev;
+#if !defined(__CYGWIN__) && !defined(USE_GETCWD)
     struct dirent *de;
     DIR *dir;
-    ino_t ino, pino;
-    dev_t dev, pdev;
+    dev_t dev;
+    ino_t ino;
+    int len;
+#endif
 
-    buf = halloc(bufsiz = PATH_MAX);
+    buf = zhalloc(bufsiz = PATH_MAX);
     pos = bufsiz - 1;
     buf[pos] = '\0';
     strcpy(nbuf, "../");
@@ -137,6 +179,7 @@ zgetdir(struct dirsav *d)
 #ifdef HAVE_FCHDIR
     else
 #endif
+#if !defined(__CYGWIN__) && !defined(USE_GETCWD)
 	holdintr();
 
     for (;;) {
@@ -196,7 +239,7 @@ zgetdir(struct dirsav *d)
 	len = strlen(nbuf + 2);
 	pos -= len;
 	while (pos <= 1) {
-	    char *newbuf = halloc(2*bufsiz);
+	    char *newbuf = zhalloc(2*bufsiz);
 	    memcpy(newbuf + bufsiz, buf, bufsiz);
 	    buf = newbuf;
 	    pos += bufsiz;
@@ -221,6 +264,21 @@ zgetdir(struct dirsav *d)
     if (*buf)
 	zchdir(buf + pos + 1);
     noholdintr();
+
+#else  /* __CYGWIN__, USE_GETCWD cases */
+
+    if (!getcwd(buf, bufsiz)) {
+	if (d) {
+	    return NULL;
+	}
+    } else {
+	if (d) {
+	    return d->dirname = ztrdup(buf);
+	}
+	return buf;
+    }
+#endif
+
     buf[0] = '.';
     buf[1] = '\0';
     return buf;
@@ -237,7 +295,7 @@ zgetcwd(void)
  * faliliure and -2 when chdir failed and the current directory is lost.  */
 
 /**/
-int
+mod_export int
 zchdir(char *dir)
 {
     char *s;
@@ -283,3 +341,21 @@ zchdir(char *dir)
     return currdir == -2 ? -1 : -2;
 #endif
 }
+
+/*
+ * How to print out a 64 bit integer.  This isn't needed (1) if longs
+ * are 64 bit, since ordinary %ld will work (2) if we couldn't find a
+ * 64 bit type anyway.
+ */
+/**/
+#ifdef ZSH_64_BIT_TYPE
+/**/
+mod_export char *
+output64(zlong val)
+{
+    static char llbuf[DIGBUFSIZE];
+    convbase(llbuf, val, 0);
+    return llbuf;
+}
+/**/
+#endif /* ZSH_64_BIT_TYPE */

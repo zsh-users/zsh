@@ -1,3 +1,9 @@
+2000-08-04  Bart Schaefer  <schaefer@zsh.org>
+
+	* 12516: Src/compat.c, Src/system.h, Src/Modules/files.c,
+	Src/Modules/parameter.c: Rewrite the pathconf() support using a
+	wrapper function in compat.c to isolate the #ifdefs.
+
 2000-08-03  Peter Stephenson  <pws@csr.com>
 
 	* Andrej: 12501: Src/params.c: getenv etc. become zgetenv etc.
