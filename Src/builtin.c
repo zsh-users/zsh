@@ -2970,6 +2970,25 @@ bin_print(char *name, char **args, char *ops, int func)
 	}
     }
 
+    /* -o and -O -- sort the arguments */
+    if (ops['o']) {
+	if (fmt && !*args) return 0;
+	if (ops['i'])
+	    qsort(args, arrlen(args), sizeof(char *), cstrpcmp);
+	else
+	    qsort(args, arrlen(args), sizeof(char *), strpcmp);
+    } else if (ops['O']) {
+	if (fmt && !*args) return 0;
+	if (ops['i'])
+	    qsort(args, arrlen(args), sizeof(char *), invcstrpcmp);
+	else
+	    qsort(args, arrlen(args), sizeof(char *), invstrpcmp);
+    }
+    /* after sorting arguments, recalculate lengths */
+    if(ops['o'] || ops['O'])
+	for(n = 0; n < argc; n++)
+	    len[n] = strlen(args[n]);
+
     /* -z option -- push the arguments onto the editing buffer stack */
     if (ops['z']) {
 	queue_signals();
@@ -3027,25 +3046,6 @@ bin_print(char *name, char **args, char *ops, int func)
 	    return 1;
 	}
     }
-
-    /* -o and -O -- sort the arguments */
-    if (ops['o']) {
-	if (fmt && !*args) return 0;
-	if (ops['i'])
-	    qsort(args, arrlen(args), sizeof(char *), cstrpcmp);
-	else
-	    qsort(args, arrlen(args), sizeof(char *), strpcmp);
-    } else if (ops['O']) {
-	if (fmt && !*args) return 0;
-	if (ops['i'])
-	    qsort(args, arrlen(args), sizeof(char *), invcstrpcmp);
-	else
-	    qsort(args, arrlen(args), sizeof(char *), invstrpcmp);
-    }
-    /* after sorting arguments, recalculate lengths */
-    if(ops['o'] || ops['O'])
-	for(n = 0; n < argc; n++)
-	    len[n] = strlen(args[n]);
 
     /* -c -- output in columns */
     if (ops['c']) {
@@ -3230,7 +3230,15 @@ bin_print(char *name, char **args, char *ops, int func)
 		if (curarg) {
 		    int l;
 		    char *b = getkeystring(curarg, &l, ops['b'] ? 2 : 0, &nnl);
+		    /* handle width/precision here and use fwrite so that
+		     * nul characters can be output */
+		    if (prec >= 0 && prec < l) l = prec;
+		    if (width > 0 && flags[2]) width = -width;
+		    if (width > 0 && l < width)
+		    	printf("%*c", width - l, ' ');
 		    fwrite(b, l, 1, fout);
+		    if (width < 0 && l < -width)
+		    	printf("%*c", -width - l, ' ');
 		    count += l;
 		}
 		break;

@@ -745,9 +745,10 @@ with the normal style and the handling of such mixed styles may be subject
 to future change.
 
 If arguments remain unused after formatting, the format string is reused
-until all arguments have been consumed. If more arguments are required by
-the format than have been specified, the behaviour is as if zero or an
-empty string had been specified as the argument.
+until all arguments have been consumed. With the tt(print) builtin, this
+can be suppressed by using the tt(-r) option. If more arguments are
+required by the format than have been specified, the behaviour is as if
+zero or an empty string had been specified as the argument.
 )
 findex(pushd)
 pindex(PUSHD_TO_HOME, use of)

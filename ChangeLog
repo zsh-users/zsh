@@ -1,3 +1,8 @@
+2001-11-09  Oliver Kiddle  <opk@zsh.org>
+
+	* 16228: Src/builtin.c, Doc/Zsh/builtins.yo: allow widths
+	and precisions to work with printf's %b format specifier
+
 2001-11-06  Oliver Kiddle  <opk@zsh.org>
 
 	* unposted: Functions/Misc/mere: fix for IRIX
