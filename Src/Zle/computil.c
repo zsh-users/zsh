@@ -1438,21 +1438,27 @@ ca_set_data(char *opt, Caarg arg, char **args, int single)
 	if (single)
 	    break;
 
-	if (!opt && arg->num >= 0 && !arg->next && miss)
-	    arg = ca_laststate.d->rest;
-	else {
-	    onum = arg->num;
-	    rest = (onum != arg->min && onum == ca_laststate.nth);
-	    if ((arg = arg->next)) {
-		if (arg->num != onum + 1)
-		    miss = 1;
-	    } else if (rest || (oopt > 0 && !opt)) {
+	if (!opt) {
+	    if (arg->num >= 0 && !arg->next && miss)
 		arg = ca_laststate.d->rest;
-		oopt = -1;
+	    else {
+		onum = arg->num;
+		rest = (onum != arg->min && onum == ca_laststate.nth);
+		if ((arg = arg->next)) {
+		    if (arg->num != onum + 1)
+			miss = 1;
+		} else if (rest || (oopt > 0 && !opt)) {
+		    arg = ca_laststate.d->rest;
+		    oopt = -1;
+		}
 	    }
+	} else {
+	    if (!lopt)
+		break;
+	    arg = arg->next;
 	}
     }
-    if (!single && opt && lopt) {
+    if (!single && opt && (lopt || ca_laststate.oopt)) {
 	opt = NULL;
 	arg = ca_get_arg(ca_laststate.d, ca_laststate.nth);
 

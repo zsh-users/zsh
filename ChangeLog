@@ -1,5 +1,8 @@
 2000-05-05  Sven Wischnowsky  <wischnow@informatik.hu-berlin.de>
 
+	* 11172: Src/Zle/computil.c: fix for completion arguments of
+ 	options, don't use all of them at once
+	
 	* 11170: Src/jobs.c: fix for jobs -l -d, check if directory of job
  	is already set
 	
