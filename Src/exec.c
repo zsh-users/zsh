@@ -2714,9 +2714,10 @@ gethere(char *str, int typ)
 
     for (s = str; *s; s++)
 	if (INULL(*s)) {
-	    *s = Nularg;
 	    qt = 1;
+	    break;
 	}
+    quotesubst(str);
     untokenize(str);
     if (typ == REDIR_HEREDOCDASH) {
 	strip = 1;

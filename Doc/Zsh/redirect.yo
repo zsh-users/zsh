@@ -70,12 +70,22 @@ occurs, `tt(\)' followed by a newline is removed,
 and `tt(\)' must be used to quote the characters
 `tt(\)', `tt($)', `tt(`)' and the first character of var(word).
 
+Note that var(word) itself does not undergo shell expansion.  Backquotes
+in var(word) do not have their usual effect; instead they behave
+similarly to double quotes, except that the backquotes themselves are
+passed through unchanged.  (This information is given for completeness
+and it is not recommended that backquotes be used.)  Quotes in the form
+tt($')var(...)tt(') have their standard effect of expanding backslashed
+references to special characters.
+
 If tt(<<-) is used, then all leading
 tabs are stripped from var(word) and from the document.
 )
 item(tt(<<<) var(word))(
 Perform shell expansion on var(word) and pass the result
 to standard input.  This is known as a em(here-string).
+Compare the use of var(word) in here-documents above, where var(word)
+does not undergo shell expansion.
 )
 xitem(tt(<&) var(number))
 item(tt(>&) var(number))(

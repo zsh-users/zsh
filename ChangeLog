@@ -1,3 +1,12 @@
+2004-06-28  Peter Stephenson  <pws@csr.com>
+
+	* 20112, changed as per 20113: Src/exec.c, Src/parse.c,
+	Src/subst.c, Doc/Zsh/redirect.yo, Test/A04redirect.yo:
+	Fix here-strings to do standard single-word expansion (which
+	was always intended but was partially broken), and also
+	attempt to parse the end string for here-documents in
+	a more standard fashion.
+
 2004-06-26  Peter Stephenson  <pws@pwstephenson.fsnet.co.uk>
 
 	* unposted: Functions/Zle/.distfiles: add zed-set-file-name.
