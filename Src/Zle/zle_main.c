@@ -684,7 +684,7 @@ execzlefunc(Thingy func, char **args)
 	    zsfree(msg);
 	    ret = 1;
 	} else {
-	    int osc = sfcontext, osi = movefd(0), olv = lastval;
+	    int osc = sfcontext, osi = movefd(0);
 	    LinkList largs = NULL;
 
 	    if (*args) {
@@ -696,9 +696,7 @@ execzlefunc(Thingy func, char **args)
 	    startparamscope();
 	    makezleparams(0);
 	    sfcontext = SFC_WIDGET;
-	    doshfunc(w->u.fnnam, prog, largs, 0, 0);
-	    ret = lastval;
-	    lastval = olv;
+	    ret = doshfunc(w->u.fnnam, prog, largs, 0, 1);
 	    sfcontext = osc;
 	    endparamscope();
 	    lastcmd = 0;

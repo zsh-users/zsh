@@ -3310,17 +3310,23 @@ loadautofn(Shfunc shf, int fksh, int autol)
     return shf;
 }
 
-/* execute a shell function */
+/*
+ * execute a shell function
+ *
+ * If noreturnval is nonzero, then reset the current return
+ * value (lastval) to its value before the shell function
+ * was executed.  However, in any case return the status value
+ * from the function (i.e. if noreturnval is not set, this
+ * will be the same as lastval).
+ */
 
 /**/
-mod_export void
+mod_export int
 doshfunc(char *name, Eprog prog, LinkList doshargs, int flags, int noreturnval)
-/* If noreturnval is nonzero, then reset the current return *
- * value (lastval) to its value before the shell function   *
- * was executed.                                            */
 {
     char **tab, **x, *oargv0;
-    int oldzoptind, oldlastval, oldoptcind;
+    int oldzoptind, oldlastval, oldoptcind, oldnumpipestats, ret;
+    int *oldpipestats = NULL;
     char saveopts[OPT_SIZE], *oldscriptname = scriptname, *fname = dupstring(name);
     int obreaks;
     struct funcstack fstack;
@@ -3335,6 +3341,16 @@ doshfunc(char *name, Eprog prog, LinkList doshargs, int flags, int noreturnval)
     if (trapreturn < 0)
 	trapreturn--;
     oldlastval = lastval;
+    oldnumpipestats = numpipestats;
+    if (noreturnval) {
+	/*
+	 * Easiest to use the heap here since we're bracketed
+	 * immediately by a pushheap/popheap pair.
+	 */
+	size_t bytes = sizeof(int)*numpipestats;
+	oldpipestats = (int *)zhalloc(bytes);
+	memcpy(oldpipestats, pipestats, bytes);
+    }
 
     starttrapscope();
 
@@ -3440,9 +3456,15 @@ doshfunc(char *name, Eprog prog, LinkList doshargs, int flags, int noreturnval)
 
     if (trapreturn < -1)
 	trapreturn++;
-    if (noreturnval)
+    ret = lastval;
+    if (noreturnval) {
 	lastval = oldlastval;
+	numpipestats = oldnumpipestats;
+	memcpy(pipestats, oldpipestats, sizeof(int)*numpipestats);
+    }
     popheap();
+
+    return ret;
 }
 
 /* This finally executes a shell function and any function wrappers     *

@@ -1,3 +1,11 @@
+2003-11-03  Peter Stephenson  <pws@csr.com>
+
+	* 19218: Src/exec.c, Src/Zle/zle_main.c: extend 19216 to
+	fix similar probably when calling zle widgets.
+
+	* 19216: Src/exec.c: save and restore $pipestatus on functions
+	when noreturnval flag is set.  Remove unnecessary debugging output.
+
 2003-10-28  Peter Stephenson  <pws@csr.com>
 
 	* 19209: Src/builtin.c, Src/exec.c, Src/hashtable.c, Src/hist.c,
