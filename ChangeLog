@@ -1,3 +1,8 @@
+2003-02-13  Peter Stephenson  <pws@csr.com>
+
+	* unposted: Completion/Unix/Command/_perforce: same again,
+	but do it properly.  Fix _perforce_revisions with named file.
+
 2003-02-11  Peter Stephenson  <pws@csr.com>
 
 	* unposted: Completion/Unix/Command/_p4: Oliver thinks _perforce
