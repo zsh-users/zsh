@@ -36,7 +36,7 @@
 #    the default web pages for the server and user area is the directory
 #    name used by a user placing web pages within their home area.
 #    E.g.:
-#      compstyle '*:urls:local' www /usr/local/apache/htdocs public_html
+#      zstyle '*:urls:local' www /usr/local/apache/htdocs public_html
 
 local ipre scheme host user uhosts ret=1 expl
 local urls_path localhttp

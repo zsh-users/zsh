@@ -6,7 +6,7 @@ local curcontext="${curcontext}:menu"
 # implemented with the new completion system.
 # Use this one before the normal _complete completer, as in:
 #
-#   compstyle "*" completer _menu _complete
+#   zstyle "*" completer _menu _complete
 
 if [[ -n "$compstate[old_list]" ]]; then
 

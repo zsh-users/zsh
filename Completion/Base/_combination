@@ -11,7 +11,7 @@
 #  Assume an user sets the style `hosts-ports-users' as for the my-accounts
 #  tag:
 #
-#    compstyle '*:telnet*:my-accounts' hosts-ports-users \
+#    zstyle '*:telnet*:my-accounts' hosts-ports-users \
 #      host0:: host1::user1 host2::user2
 #      mail-server:{smtp,pop3}:
 #      news-server:nntp:

@@ -1,7 +1,7 @@
 #autoload
 
 # This is intended to be used as a completer function after the normal
-# completer as in: `compstyle "*" completer _complete _match'.
+# completer as in: `zstyle "*" completer _complete _match'.
 # It temporarily switches on pattern matching, allowing you to try 
 # completion on patterns without having to setopt glob_complete.
 #
