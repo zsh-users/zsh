@@ -86,7 +86,7 @@ int trashedzle;
  * add non-editable text to that being displayed.
  */
 /**/
-unsigned char *predisplay, *postdisplay;
+ZLE_STRING_T predisplay, postdisplay;
 /**/
 int predisplaylen, postdisplaylen;
 
@@ -284,13 +284,17 @@ zrefresh(void)
 	t0 = -1,		/* tmp					     */
 	tosln = 0;		/* tmp in statusline stuff		     */
     unsigned char *s,		/* pointer into the video buffer	     */
-	*t,			/* pointer into the real buffer		     */
 	*sen,			/* pointer to end of the video buffer (eol)  */
+	*u;			/* pointer for status line stuff */
+    ZLE_STRING_T t,		/* pointer into the real buffer		     */
 	*scs;			/* pointer to cursor position in real buffer */
     char **qbuf;		/* tmp					     */
-    unsigned char *tmpline;	/* line with added pre/post text */
+    ZLE_STRING_T tmpline;	/* line with added pre/post text */
     int tmpcs, tmpll;		/* ditto cursor position and line length */
     int tmpalloced;		/* flag to free tmpline when finished */
+#ifdef ZLE_UNICODE_SUPPORT
+    mbstate_t shiftstate;	/* wcrtomb shift state */
+#endif
 
     if (trashedzle)
 	reexpandprompt();
@@ -304,13 +308,13 @@ zrefresh(void)
 
     if (predisplaylen || postdisplaylen) {
 	/* There is extra text to display at the start or end of the line */
-	tmpline = zalloc(zlell + predisplaylen + postdisplaylen);
+	tmpline = zalloc((zlell + predisplaylen + postdisplaylen)*ZLE_CHAR_SIZE);
 	if (predisplaylen)
-	    memcpy(tmpline, predisplay, predisplaylen);
+	    ZS_memcpy(tmpline, predisplay, predisplaylen);
 	if (zlell)
-	    memcpy(tmpline+predisplaylen, zleline, zlell);
+	    ZS_memcpy(tmpline+predisplaylen, zleline, zlell);
 	if (postdisplaylen)
-	    memcpy(tmpline+predisplaylen+zlell, postdisplay, postdisplaylen);
+	    ZS_memcpy(tmpline+predisplaylen+zlell, postdisplay, postdisplaylen);
 	tmpcs = zlecs + predisplaylen;
 	tmpll = predisplaylen + zlell + postdisplaylen;
 	tmpalloced = 1;
@@ -455,10 +459,10 @@ zrefresh(void)
 	if (t == scs)			/* if cursor is here, remember it */
 	    nvcs = s - (unsigned char *)(nbuf[nvln = ln]);
 
-	if (*t == '\n')	{		/* newline */
+	if (*t == ZLENL){		/* newline */
 	    nbuf[ln][winw + 1] = '\0';	/* text not wrapped */
 	    nextline
-	} else if (*t == '\t') {		/* tab */
+	} else if (*t == ZLETAB) {		/* tab */
 	    t0 = (char *)s - nbuf[ln];
 	    if ((t0 | 7) + 1 >= winw) {
 		nbuf[ln][winw + 1] = '\n';	/* text wrapped */
@@ -467,15 +471,31 @@ zrefresh(void)
 		do
 		    *s++ = ' ';
 		while ((++t0) & 7);
-	} else if (icntrl(*t)) {	/* other control character */
+	} else if (ZC_icntrl(*t)) {	/* other control character */
 	    *s++ = '^';
 	    if (s == sen) {
 		nbuf[ln][winw + 1] = '\n';	/* text wrapped */
 		nextline
 	    }
+#ifdef ZLE_UNICODE_SUPPORT
+# error What to do here
+#else
 	    *s++ = (*t == 127) ? '?' : (*t | '@');
-	} else				/* normal character */
+#endif
+	} else {			/* normal character */
+#ifdef ZLE_UNICODE_SUPPORT
+	    size_t i;
+
+	    i = wcrtomb(s, *t, &shiftstate);
+	    if (i == -1) {
+		/* error; what to do? */
+	    } else {
+		s += i;
+	    }
+#else
 	    *s++ = *t;
+#endif
+	}
 	if (s == sen) {
 	    nbuf[ln][winw + 1] = '\n';	/* text wrapped */
 	    nextline
@@ -501,17 +521,17 @@ zrefresh(void)
 	tosln = ln + 1;
 	nbuf[ln][winw + 1] = '\0';	/* text not wrapped */
 	snextline
-	t = (unsigned char *)statusline;
-	for (; t < (unsigned char *)statusline + statusll; t++) {
-	    if (icntrl(*t)) {	/* simplified processing in the status line */
+	u = (unsigned char *)statusline;
+	for (; u < (unsigned char *)statusline + statusll; u++) {
+	    if (icntrl(*u)) {	/* simplified processing in the status line */
 		*s++ = '^';
 		if (s == sen) {
 		    nbuf[ln][winw + 1] = '\n';	/* text wrapped */
 		    snextline
 		}
-		*s++ = (*t == 127) ? '?' : (*t | '@');
+		*s++ = (*u == 127) ? '?' : (*u | '@');
 	    } else
-		*s++ = *t;
+		*s++ = *u;
 	    if (s == sen) {
 		nbuf[ln][winw + 1] = '\n';	/* text wrapped */
 		snextline

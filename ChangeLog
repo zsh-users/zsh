@@ -1,3 +1,8 @@
+2005-01-26  Clint Adams  <clint@zsh.org>
+
+	* 20747: Src/Zle/zle_refresh.c, Src/system.h: some wide char
+	support in the zle refresh code.
+
 2005-01-26  Peter Stephenson  <pws@csr.com>
 
 	* 20750: Src/zle_utils.c: 20742 could cause hang when line
