@@ -52,9 +52,9 @@ execfor(Estate state, int do_exec)
     Wordcode end, loop;
     wordcode code = state->pc[-1];
     int iscond = (WC_FOR_TYPE(code) == WC_FOR_COND);
-    char *name, *str, *cond, *advance;
+    char *name, *str, *cond = NULL, *advance = NULL;
     zlong val = 0;
-    LinkList args;
+    LinkList args = NULL;
 
     name = ecgetstr(state, 0);
     end = state->pc + WC_FOR_SKIP(code);

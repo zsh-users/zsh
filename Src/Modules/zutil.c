@@ -785,7 +785,7 @@ rparseelt(RParseResult *result, jmp_buf *perr)
 	RParseState *st;
 	RParseBranch *br;
 	char *pattern, *lookahead;
-	int patternlen, lookaheadlen;
+	int patternlen, lookaheadlen = 0;
 
 	l = strlen(s);
 	if (!((2 <= l && s[l - 1] == '/') ||
