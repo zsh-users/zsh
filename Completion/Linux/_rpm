@@ -148,7 +148,7 @@ while [[ -n "$state" ]]; do
       '*:RPM package:->package' && ret=0
     ;;
   build_b)
-    tmp=( '*:spec file:_files -g \*.spec' )
+    tmp=( '*:spec file:_path_files -/ -g \*.spec' )
     ;&
   build_t)
     (( $#tmp )) || tmp=( '*:tar file:_files -g \*.\(\#i\)tar\(.\*\|\)' )
@@ -195,7 +195,7 @@ while [[ -n "$state" ]]; do
       _hosts -S/ && ret=0
     else
       _description expl 'RPM package file'
-      _files "$expl[@]" -g '*.(#i)rpm' && ret=0
+      _path_files "$expl[@]" -/ -g '*.(#i)rpm' && ret=0
       _description expl 'ftp URL prefix'
       compadd "$expl[@]" ftp://
     fi
