@@ -3,6 +3,7 @@
 local val nm="$compstate[nmatches]"
 
 if zstyle -a ":completion${curcontext}:$1" list-colors val; then
+  zmodload -e zsh/complist || zmodload -i zsh/complist
   if [[ "$1" = default ]]; then
     ZLS_COLORS="${(j.:.)${(@)val:gs/:/\\\:}}"
   else

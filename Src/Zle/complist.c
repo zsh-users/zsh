@@ -453,13 +453,13 @@ initiscol(Listcols c)
     curisbeg = curisend = 0;
 
     for (i = nrefs;  i < MAX_POS; i++)
-	begpos[i] = -1, endpos[i] = 0xfffffff;
+	begpos[i] = endpos[i] = -1;
 }
 
 static void
 doiscol(Listcols c, int pos)
 {
-    if (pos > endpos[curisend]) {
+    if (endpos[curisend] >= 0 && pos > endpos[curisend]) {
 	curisend++;
 	if (curiscol) {
 	    zcputs(c, NULL, COL_NO);
@@ -700,7 +700,7 @@ clprintm(Cmgroup g, Cmatch *mp, int mc, int ml, int lastc, int width,
 	else if (mselect >= 0 && (m->flags & (CMF_MULT | CMF_FMULT)))
 	    zcputs(&mcolors, g->name, COL_DU);
 	else if (buf)
-	    subcols = putfilecol(&mcolors, g->name, path, buf->st_mode);
+	    subcols = putfilecol(&mcolors, g->name, m->str, buf->st_mode);
 	else
 	    subcols = putmatchcol(&mcolors, g->name, (m->disp ? m->disp : m->str));
 
