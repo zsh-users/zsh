@@ -1,5 +1,8 @@
 2004-07-28  Peter Stephenson  <pws@csr.com>
 
+	* 20214: Src/parse.c: fix debugging test that didn't work
+	with recursive functions.
+
 	* 20204: Motoi Washida: Completion/Base/Utils/_retrieve_cache:
 	typo in definition of _cache_dir.
 

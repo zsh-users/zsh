@@ -2168,7 +2168,10 @@ freeeprog(Eprog p)
 	/* paranoia */
 	DPUTS(p->nref > 0 && (p->flags & EF_HEAP), "Heap EPROG has nref > 0");
 	DPUTS(p->nref < 0 && !(p->flags & EF_HEAP), "Real EPROG has nref < 0");
-	DPUTS(p->nref < -1 || p->nref > 256, "Uninitialised EPROG nref");
+	DPUTS(p->nref < -1, "Uninitialised EPROG nref");
+#ifdef MAX_FUNCTION_DEPTH
+	DPUTS(p->nref > MAX_FUNCTION_DEPTH + 10, "Overlarge EPROG nref");
+#endif
 	if (p->nref > 0 && !--p->nref) {
 	    for (i = p->npats, pp = p->pats; i--; pp++)
 		freepatprog(*pp);
