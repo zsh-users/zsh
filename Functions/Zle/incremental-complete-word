@@ -23,12 +23,12 @@ incremental-complete-word() {
   [[ -z "$curcontext" ]] && curcontext=:::
   curcontext="incremental:${curcontext#*:}"
 
-  zstyle -s ":completion:${curcontext}" prompt pmpt ||
+  zstyle -s ":incremental" prompt pmpt ||
     pmpt='incremental (%c): %u%s  %l'
-  zstyle -s ":completion:${curcontext}" stop-keys stop
-  zstyle -s ":completion:${curcontext}" break-keys brk
+  zstyle -s ":incremental" stop-keys stop
+  zstyle -s ":incremental" break-keys brk
 
-  if zstyle -t ":completion:${curcontext}" list; then
+  if zstyle -t ":incremental" list; then
     wid=list-choices
     post=( icw-list-helper )
   else
