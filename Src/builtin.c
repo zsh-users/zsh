@@ -3440,8 +3440,8 @@ bin_read(char *name, char **args, char *ops, int func)
 	     *readpmpt && *readpmpt != '?'; readpmpt++);
 	if (*readpmpt++) {
 	    if (keys || isatty(0)) {
-		zputs(readpmpt, shout);
-		fflush(shout);
+		zputs(readpmpt, (shout ? shout : stderr));
+		fflush(shout ? shout : stderr);
 	    }
 	    readpmpt[-1] = '\0';
 	}

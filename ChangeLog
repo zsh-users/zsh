@@ -1,5 +1,7 @@
 2000-05-23  Sven Wischnowsky  <wischnow@zsh.org>
 
+	* 11524: Src/builtin.c: fix for read -q without a shout
+	
 	* 11523: Src/hist.c, Src/init.c, Src/lex.c, Src/zsh.h, Src/Zle/zle.h,
  	Src/Zle/zle_main.c, Src/Zle/zle_tricky.c: save and restore more
  	variables in bufferwords(); move gotword() into core
