@@ -27,5 +27,5 @@
 # This must also serve as a shell script, so do not add spaces around the
 # `=' signs.
 
-VERSION=4.0.1-pre-5
-VERSION_DATE='May 21, 2001'
+VERSION=4.0.1
+VERSION_DATE='June 1, 2001'
