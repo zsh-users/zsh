@@ -1906,9 +1906,9 @@ execcmd(Cmd cmd, int input, int output, int how, int last1)
 		break;
 	    case MERGEIN:
 	    case MERGEOUT:
-		if(fn->fd2 < 10)
+		if (fn->fd2 < 10)
 		    closemn(mfds, fn->fd2);
-		if(fn->fd2 > 9) {
+		if (fn->fd2 > 9 && fdtable[fn->fd2]) {
 		    fil = -1;
 		    errno = EBADF;
 		} else {
@@ -1922,7 +1922,7 @@ execcmd(Cmd cmd, int input, int output, int how, int last1)
 
 		    closemnodes(mfds);
 		    fixfds(save);
-		    if(fn->fd2 != -2)
+		    if (fn->fd2 != -2)
 		    	sprintf(fdstr, "%d", fn->fd2);
 		    zerr("%s: %e", fn->fd2 == -2 ? "coprocess" : fdstr, errno);
 		    execerr();
