@@ -734,7 +734,7 @@ printjob(Job jn, int lng, int synch)
     if ((lng & 4) || (interact && job == thisjob &&
 		      jn->pwd && strcmp(jn->pwd, pwd))) {
 	fprintf(shout, "(pwd %s: ", (lng & 4) ? "" : "now");
-	fprintdir((lng & 4) ? jn->pwd : pwd, shout);
+	fprintdir(((lng & 4) && jn->pwd) ? jn->pwd : pwd, shout);
 	fprintf(shout, ")\n");
 	fflush(shout);
     }

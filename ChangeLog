@@ -1,3 +1,8 @@
+2000-05-05  Sven Wischnowsky  <wischnow@informatik.hu-berlin.de>
+
+	* 11170: Src/jobs.c: fix for jobs -l -d, check if directory of job
+ 	is already set
+	
 2000-05-04  Tanaka Akira  <akr@zsh.org>
 
 	* 11166: Completion/Base/_regex_arguments: remove debugging code.
