@@ -4,6 +4,9 @@
 
 2005-01-12  Peter Stephenson  <pws@csr.com>
 
+	* users/8359: Src/Zle/complete.mdd: add in Completion/Darwin
+	directories to default installation.
+
 	* users/8354: Doc/Zsh/options.yo: with glob_complete, completing
 	a word with a pattern does not use matching control.
 
