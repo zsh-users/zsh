@@ -367,6 +367,9 @@ AC_PROG_CPP                 dnl Figure out how to run C preprocessor.
 AC_PROG_GCC_TRADITIONAL     dnl Do we need -traditional flag for gcc.
 AC_C_CONST                  dnl Does compiler support `const'.
 
+AC_CYGWIN                   dnl Check for cygwin environment
+AC_EXEEXT                   dnl Check for executable extension, e.g. .exe
+
 fp_PROG_CC_STDC
 AC_MSG_CHECKING([whether to use prototypes])
 if test ."$ansi2knr" = .yes || test ."$ansi2knr" = .no; then
@@ -444,7 +447,7 @@ AC_CHECK_HEADERS(sys/time.h sys/times.h sys/select.h termcap.h termio.h \
 		 limits.h fcntl.h libc.h sys/utsname.h sys/resource.h \
 		 locale.h errno.h stdlib.h unistd.h sys/capability.h \
 		 utmp.h utmpx.h sys/types.h pwd.h grp.h poll.h sys/mman.h \
-		 linux/tasks.h)
+		 linux/tasks.h netinet/in_systm.h)
 if test $dynamic = yes; then
   AC_CHECK_HEADERS(dlfcn.h)
   AC_CHECK_HEADERS(dl.h)
@@ -838,7 +841,8 @@ AC_CHECK_FUNCS(strftime difftime gettimeofday \
 	       cap_get_proc \
 	       getrlimit \
 	       setlocale \
-	       uname)
+	       uname \
+	       signgam)
 AC_FUNC_STRCOLL
 
 if test $ac_cv_func_setpgrp = yes; then

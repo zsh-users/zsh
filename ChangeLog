@@ -1,3 +1,13 @@
+2000-05-26  Peter Stephenson  <pws@cambridgesiliconradio.com>
+
+	* 11590: configure.in, Config/defs.mk.in, Etc/MACHINES,
+	Src/Makefile.in, Src/Modules/mathfunc.c, Src/Modules/zftp.c:
+	Various Cygwin fixes: compilation glitches in zsh/mathfunc and
+	zsh/zftp; installation didn't handle .exe extension properly;
+	installation note.
+
+	* 11587: Felix Rosencrantz: Src/pattern.c: uninitialised variable.
+
 2000-05-26  Sven Wischnowsky  <wischnow@zsh.org>
 
 	* 11566: Src/Zle/zle_main.c: disable vared if zle is not enabled

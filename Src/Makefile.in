@@ -50,7 +50,7 @@ DLLINK      = $(DLLD) $(LDFLAGS) $(LIBLDFLAGS) $(DLLDFLAGS) -o $@
 all: bin modules
 .PHONY: all
 
-bin: zsh
+bin: zsh$(EXEEXT)
 .PHONY: bin
 
 modules: headers
@@ -74,7 +74,7 @@ NNTRYOBJ   =
 LDRUNPATH = LD_RUN_PATH=$(libdir)/$(tzsh)
 NDRUNPATH =
 
-zsh: $(@L@IBZSH) $(@L@STMP) $(MAIN_OBJS) zsh.export
+zsh$(EXEEXT): $(@L@IBZSH) $(@L@STMP) $(MAIN_OBJS) zsh.export
 	rm -f $@
 	$(@L@DRUNPATH) $(LINK) $(MAIN_OBJS) $(@L@LIST) $(ZSH_@E@XPORT) $(@L@IBZSH) $(LIBS)
 
@@ -176,16 +176,16 @@ uninstall.bin: uninstall.bin-here
 .PHONY: install.bin uninstall.bin
 
 # install binary, creating install directory if necessary
-install.bin-here: zsh install.bin-@L@
+install.bin-here: zsh$(EXEEXT) install.bin-@L@
 	$(sdir_top)/mkinstalldirs $(DESTDIR)$(bindir)
-	$(INSTALL_PROGRAM) $(STRIPFLAGS) zsh $(DESTDIR)$(bindir)/$(tzsh)-$(VERSION)
-	if test -f $(DESTDIR)$(bindir)/$(tzsh); then \
+	$(INSTALL_PROGRAM) $(STRIPFLAGS) zsh$(EXEEXT) $(DESTDIR)$(bindir)/$(tzsh)-$(VERSION)$(EXEEXT)
+	if test -f $(DESTDIR)$(bindir)/$(tzsh)$(EXEEXT); then \
 	    rm -f $(DESTDIR)$(bindir)/$(tzsh).old; \
-	    $(LN) $(DESTDIR)$(bindir)/$(tzsh) $(DESTDIR)$(bindir)/$(tzsh).old; \
+	    $(LN) $(DESTDIR)$(bindir)/$(tzsh)$(EXEEXT) $(DESTDIR)$(bindir)/$(tzsh).old; \
 	else :; fi
 	rm -f $(DESTDIR)$(bindir)/$(tzsh).new
-	$(LN) $(DESTDIR)$(bindir)/$(tzsh)-$(VERSION) $(DESTDIR)$(bindir)/$(tzsh).new
-	mv $(DESTDIR)$(bindir)/$(tzsh).new $(DESTDIR)$(bindir)/$(tzsh)
+	$(LN) $(DESTDIR)$(bindir)/$(tzsh)-$(VERSION)$(EXEEXT) $(DESTDIR)$(bindir)/$(tzsh).new
+	mv $(DESTDIR)$(bindir)/$(tzsh).new $(DESTDIR)$(bindir)/$(tzsh)$(EXEEXT)
 .PHONY: install.bin-here
 
 install.bin-N:
@@ -196,7 +196,7 @@ install.bin-L: $(LIBZSH)
 
 # uninstall binary
 uninstall.bin-here: uninstall.bin-@L@
-	rm -f $(DESTDIR)$(bindir)/$(tzsh)-$(VERSION) $(DESTDIR)$(bindir)/$(tzsh)
+	rm -f $(DESTDIR)$(bindir)/$(tzsh)-$(VERSION) $(DESTDIR)$(bindir)/$(tzsh)$(EXEEXT)
 .PHONY: uninstall.bin-here uninstall.bin-@L@
 
 uninstall.bin-N:
@@ -215,7 +215,7 @@ mostlyclean-here:
 .PHONY: mostlyclean-here
 
 clean-here:
-	rm -f modules.index.tmp modules.stamp zsh ansi2knr.o ansi2knr
+	rm -f modules.index.tmp modules.stamp zsh$(EXEEXT) ansi2knr.o ansi2knr
 	rm -f modules.index modules-bltin
 	rm -f libzsh-*.$(DL_EXT)
 .PHONY: clean-here

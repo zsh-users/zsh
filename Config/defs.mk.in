@@ -27,15 +27,23 @@
 # fundamentals
 SHELL = /bin/sh
 @SET_MAKE@
+EXEEXT = @EXEEXT@
+
+# install basename
+tzsh            = @tzsh@
 
 # installation directories
 prefix          = @prefix@
 exec_prefix     = @exec_prefix@
 bindir          = @bindir@
 libdir          = @libdir@
-MODDIR          = $(libdir)/zsh/$(VERSION)
+MODDIR          = $(libdir)/$(tzsh)/$(VERSION)
 infodir         = @infodir@
 mandir          = @mandir@
+datadir         = @datadir@
+fndir           = @fndir@
+sitefndir       = @sitefndir@
+htmldir         = $(datadir)/$(tzsh)/htmldoc
 
 # compilation
 CC              = @CC@
@@ -55,6 +63,9 @@ DLLD            = @DLLD@
 EXPOPT          = @EXPOPT@
 IMPOPT          = @IMPOPT@
 
+# choose modules not to compile and install
+OMIT_MODULES    = @OMIT_MODULES@
+
 # utilities
 AWK             = @AWK@
 YODL            = @YODL@
@@ -65,16 +76,22 @@ YODL2HTML       = $(YODL)2html
 INSTALL_PROGRAM = @INSTALL_PROGRAM@
 INSTALL_DATA    = @INSTALL_DATA@
 
+# variables used in determining what to install
+FUNCTIONS_INSTALL = @FUNCTIONS_INSTALL@
+FUNCTIONS_SUBDIRS = @FUNCTIONS_SUBDIRS@
+
 # flags passed to recursive makes in subdirectories
 MAKEDEFS = \
 prefix='$(prefix)' exec_prefix='$(exec_prefix)' bindir='$(bindir)' \
 libdir='$(libdir)' MODDIR='$(MODDIR)' infodir='$(infodir)' mandir='$(mandir)' \
+datadir='$(datadir)' fndir='$(fndir)' htmldir='$(htmldir)' \
 CC='$(CC)' CPPFLAGS='$(CPPFLAGS)' DEFS='$(DEFS)' CFLAGS='$(CFLAGS)' \
 LDFLAGS='$(LDFLAGS)' EXTRA_LDFLAGS='$(EXTRA_LDFLAGS)' \
 DLCFLAGS='$(DLCFLAGS)' DLLDFLAGS='$(DLLDFLAGS)' \
 LIBLDFLAGS='$(LIBLDFLAGS)' EXELDFLAGS='$(EXELDFLAGS)' \
 LIBS='$(LIBS)' DL_EXT='$(DL_EXT)' DLLD='$(DLLD)' \
-AWK='$(AWK)' YODL='$(YODL)' YODL2TXT='$(YODL2TXT)' YODL2HTML='$(YODL2HTML)'
+AWK='$(AWK)' YODL='$(YODL)' YODL2TXT='$(YODL2TXT)' YODL2HTML='$(YODL2HTML)' \
+FUNCTIONS_INSTALL='$(FUNCTIONS_INSTALL)' tzsh='$(tzsh)'
 
 # override built-in suffix list
 .SUFFIXES:

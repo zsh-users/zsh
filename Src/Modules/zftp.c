@@ -50,10 +50,20 @@ union zftp_sockaddr;
 struct zftp_session;
 typedef struct zftp_session *Zftp_session;
 
+/*
+ * We need to include the zsh headers later to avoid clashes with
+ * the definitions on some systems, however we need the configuration
+ * file to decide whether we can include netinet/in_systm.h, which
+ * doesn't exist on cygwin.
+ */
+#include "../../config.h"
+
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <netdb.h>
-#include <netinet/in_systm.h>
+#ifdef HAVE_NETINET_IN_SYSTM_H
+# include <netinet/in_systm.h>
+#endif
 #include <netinet/in.h>
 #include <netinet/ip.h>
 #include <arpa/inet.h>

@@ -25,6 +25,16 @@ Apple/NeXT OpenStep 4.2 for i386.
 Cray: Unicos (C90 and T90)
 	Should build `out-of-the-box'.
 
+Cygnus Solutions: Cygwin on Intel
+	Should build `out-of-the-box'.  The compilation directory should
+	be on a file system mounted as binary (the mount command shows
+	`binmode').
+
+	Dynamic loading does not work (this is automatically detected),
+	though libraries not compiled by default will work (see the file
+	INSTALL for how to add these to the base executable).  In
+	particular zsh/zftp and zsh/mathfunc are known to work.
+
 Data General: DG/UX 5.4R3.10 MU01 (various AViiONs)
 	Should build `out-of-the-box'.
 

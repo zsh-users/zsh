@@ -631,7 +631,7 @@ static long
 patcompbranch(int *flagp)
 {
     long chain, latest, starter;
-    int flags;
+    int flags = 0;
 
     *flagp = P_PURESTR;
 

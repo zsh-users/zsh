@@ -45,7 +45,6 @@ MF_CEIL,
 MF_COPYSIGN,
 MF_COS,
 MF_COSH,
-MF_DREM,
 MF_ERF,
 MF_ERFC,
 MF_EXP,
@@ -70,7 +69,9 @@ MF_LOGB,
 MF_NEXTAFTER,
 MF_RINT,
 MF_SCALB,
+#ifdef HAVE_SIGNGAM
 MF_SIGNGAM,
+#endif
 MF_SIN,
 MF_SINH,
 MF_SQRT,
@@ -78,7 +79,7 @@ MF_TAN,
 MF_TANH,
 MF_Y0,
 MF_Y1,
-MF_YN,
+MF_YN
 };
 
 /*
@@ -131,7 +132,6 @@ static struct mathfunc mftab[] = {
   NUMMATHFUNC("copysign", math_func, 2, 2, MF_COPYSIGN),
   NUMMATHFUNC("cos", math_func, 1, 1, MF_COS),
   NUMMATHFUNC("cosh", math_func, 1, 1, MF_COSH),
-  NUMMATHFUNC("drem", math_func, 2, 2, MF_DREM),
   NUMMATHFUNC("erf", math_func, 1, 1, MF_ERF),
   NUMMATHFUNC("erfc", math_func, 1, 1, MF_ERFC),
   NUMMATHFUNC("exp", math_func, 1, 1, MF_EXP),
@@ -157,7 +157,9 @@ static struct mathfunc mftab[] = {
   NUMMATHFUNC("nextafter", math_func, 2, 2, MF_NEXTAFTER),
   NUMMATHFUNC("rint", math_func, 1, 1, MF_RINT),
   NUMMATHFUNC("scalb", math_func, 2, 2, MF_SCALB | TFLAG(TF_INT2)),
+#ifdef HAVE_SIGNGAM
   NUMMATHFUNC("signgam", math_func, 0, 0, MF_SIGNGAM | TFLAG(TF_NOASS)),
+#endif
   NUMMATHFUNC("sin", math_func, 1, 1, MF_SIN),
   NUMMATHFUNC("sinh", math_func, 1, 1, MF_SINH),
   NUMMATHFUNC("sqrt", math_func, 1, 1, MF_SQRT | BFLAG(BF_NONNEG)),
@@ -296,10 +298,6 @@ math_func(char *name, int argc, mnumber *argv, int id)
       retd = cosh(argd);
       break;
 
-  case MF_DREM:
-      retd = drem(argd, argd2);
-      break;
-
   case MF_ERF:
       retd = erf(argd);
       break;
@@ -398,10 +396,12 @@ math_func(char *name, int argc, mnumber *argv, int id)
       retd = scalb(argd, argi);
       break;
 
+#ifdef HAVE_SIGNGAM
   case MF_SIGNGAM:
       ret.type = MN_INTEGER;
       ret.u.l = signgam;
       break;
+#endif
 
   case MF_SIN:
       retd = sin(argd);
@@ -450,23 +450,21 @@ math_func(char *name, int argc, mnumber *argv, int id)
 
 /**/
 int
-setup_mathfunc(Module m)
+setup_(Module m)
 {
     return 0;
 }
 
 /**/
 int
-boot_mathfunc(Module m)
+boot_(Module m)
 {
     return !addmathfuncs(m->nam, mftab, sizeof(mftab)/sizeof(*mftab));
 }
 
-#ifdef MODULE
-
 /**/
 int
-cleanup_mathfunc(Module m)
+cleanup_(Module m)
 {
     deletemathfuncs(m->nam, mftab, sizeof(mftab)/sizeof(*mftab));
     return 0;
@@ -474,9 +472,7 @@ cleanup_mathfunc(Module m)
 
 /**/
 int
-finish_mathfunc(Module m)
+finish_(Module m)
 {
     return 0;
 }
-
-#endif
