@@ -217,6 +217,35 @@
 # Perforce options, comme ca:
 #   compdef _perforce p4reopen=p4-job-global
 #
+# Anything more complicated should be modelled on one of the
+# _perforce_cmd_* handlers below.  To get this to work, the full
+# set of _perforce functions must be loaded; because of the way
+# autoloading works, a trick is required:  call "_perforce -l" which
+# causes the function to be executed, loading all the associated
+# functions as a side effect, but tells _perforce to return without
+# generating any completions.  For example, here is the completion
+# for my `p4desc' function which is an enhanced version of `p4 describe'
+# (without any handling for global Perforce arguments):
+#
+#  #compdef p4desc
+#
+#  _perforce -l
+#
+#  _arguments -s : \
+#    '-d-[select diff option]:diff option:((b\:ignore\ blanks c\:context d\:basic\ diff n\:RCS s\:summary u\:unified w\:ignore\ all\ whitespace))' \
+#    '-s[short form]' \
+#    '-j[select by job]:job:_perforce_jobs' \
+#    '*::change:_perforce_changes'
+#
+# To add handling of global options to this, see the end of the _perforce
+# function below.  Something like:
+#
+#   local -a _perforce_global_options _perforce_option_dispatch
+#   if _perforce_global_options; then
+#     _arguments -s : $_perforce_option_dispatch \
+#       '<other stuff>'
+#   fi
+#
 # TODO
 # ====
 #
@@ -231,6 +260,12 @@ _perforce() {
   setopt nonomatch
   local p4cmd==p4 match mbegin mend
   integer _perforce_cmd_ind
+
+  if [[ $1 = -l ]]; then
+    # Run to load _perforce and associated functions but do
+    # nothing else.
+    return
+  fi
 
   if [[ $service = -value-* ]]; then
     # Completing parameter value.
@@ -269,19 +304,6 @@ _perforce() {
   # get confused...
   local -a _perforce_global_options
   local -a _perforce_option_dispatch
-  _perforce_option_dispatch=(
-    '-c+[client]:client:_perforce_clients' \
-    '-C+[charset]:charset:_perforce_charsets' \
-    '-d+[current directory]:directory:_path_files -g "*(/)"' \
-    '-H+[hostname]:host:_perforce_hosts' \
-    '-G[python output]' \
-    '-L+[message language]:language: ' \
-    '-p+[server port]:port:_perforce_hosts_ports' \
-    '-P+[password on server]:password: ' \
-    '-s[output script tags]' \
-    '-u+[user]:user name:_perforce_users' \
-    '-x+[filename or -]:file:_perforce_files_or_minus' \
-  )
 
   # If we are given a service of the form p4-cmd, treat this
   # as if it was after `p4 cmd'.  This provides an easy way in
@@ -413,6 +435,24 @@ _perforce_global_options() {
   # with the argument in the same word as the option, in which
   # case they will be handled OK anyway.
   local argopts_ignore="Lx"
+
+  # The options we support in the form for _arguments.
+  # This is here for modularity and convenience, but note that since the
+  # actual dispatch takes place later, this is not local to this
+  # function and so must be made local in the caller.
+  _perforce_option_dispatch=(
+    '-c+[client]:client:_perforce_clients' \
+    '-C+[charset]:charset:_perforce_charsets' \
+    '-d+[current directory]:directory:_path_files -g "*(/)"' \
+    '-H+[hostname]:host:_perforce_hosts' \
+    '-G[python output]' \
+    '-L+[message language]:language: ' \
+    '-p+[server port]:port:_perforce_hosts_ports' \
+    '-P+[password on server]:password: ' \
+    '-s[output script tags]' \
+    '-u+[user]:user name:_perforce_users' \
+    '-x+[filename or -]:file:_perforce_files_or_minus' \
+  )
 
   integer i
 

@@ -1,5 +1,8 @@
 2003-10-13  Peter Stephenson  <pws@csr.com>
 
+	* unposted: Completion/Unix/Command/_perforce: make it
+	easier to use add-on commands with _perforce.
+
 	* 19183: Doc/Zsh/contrib.yo,
 	Functions/Zle/delete-whole-word-match:  New word-matching function
 	to delete entire word around cursor.
