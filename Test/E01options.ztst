@@ -52,21 +52,42 @@
 #    MENU_COMPLETE
 #    MONITOR
 #    NOTIFY
+#    OVERSTRIKE
+#    PRINT_EIGHT_BIT
+#    PROMPT_CR
+#    PUSHD_SILENT
+#    REC_EXACT
+#    RM_STAR_SILENT
+#    RM_STAR_WAIT
+#    SHARE_HISTORY
+#    SINGLE_LINE_ZLE
+#    SUN_KEYBOARD_HACK
+#    ZLE
 # The following require SHINSTDIN and are not (yet) tested:
 #    AUTO_CD
+#    SHINSTDIN
 #
 # Other difficult things I haven't done:
 #    GLOBAL_RCS (uses fixed files outside build area)
 #    HASH_CMDS     )
 #    HASH_DIRS     )  fairly seriously internal, hard to test at all
 #    HASH_LIST_ALL )
+#    PRINT_EXIT_STATUS   haven't worked out what this does yet, although
+#                        Bart suggested a fix.
+#    PRIVILEGED (similar to GLOBAL_RCS)
+#    RCS        (  "      "    "    " )
+#    SH_OPTION_LETTERS   even I found this too dull to set up a test for
+#    SINGLE_COMMAND      kills shell
+#    VERBOSE             hard because done on input (c.f. SHINSTDIN).
 
 %prep
   mkdir options.tmp && cd options.tmp
   mkdir tmpcd
   touch tmpfile1 tmpfile2
   mydir=$PWD
+  mydirt=`print -P %~`
   catpath=$(which cat)
+  lspath==ls
 
 %test
 
@@ -100,8 +121,8 @@
   setopt autopushd
   cd tmpcd
   dircount
-  cd ..
   unsetopt autopushd
+  popd >/dev/null
 0:AUTO_PUSHD option
 >1
 >2
@@ -614,3 +635,330 @@
 0:NULL_GLOB option
 >tmpcd tmpfile1 tmpfile2
 >frooble* tmpcd tmpfile1 tmpfile2
+
+  touch ngs1.txt ngs2.txt ngs10.txt ngs20.txt ngs100.txt ngs200.txt
+  setopt numericglobsort
+  print -l ngs*
+  unsetopt numericglobsort
+  print -l ngs*
+0:NUMERIC_GLOB_SORT option
+>ngs1.txt
+>ngs2.txt
+>ngs10.txt
+>ngs20.txt
+>ngs100.txt
+>ngs200.txt
+>ngs1.txt
+>ngs10.txt
+>ngs100.txt
+>ngs2.txt
+>ngs20.txt
+>ngs200.txt
+
+  typeset -i 10 oznum
+  setopt octalzeroes
+  (( oznum = 012 + 013 ))
+  print $oznum
+  unsetopt octalzeroes
+  (( oznum = 012 + 013 ))
+  print $oznum
+  unset oznum
+0:OCTAL_ZEROES options
+>21
+>25
+
+  typeset -a oldpath
+  oldpath=($path)
+  mkdir pdt_topdir pathtestdir pdt_topdir/pathtestdir
+  print "#!/bin/sh\necho File in upper dir" >pathtestdir/findme
+  print "#!/bin/sh\necho File in lower dir" >pdt_topdir/pathtestdir/findme
+  chmod u+x pathtestdir/findme pdt_topdir/pathtestdir/findme
+  pathtestdir/findme
+  rm -f pathtestdir/findme
+  setopt pathdirs
+  path=($PWD $PWD/pdt_topdir)
+  pathtestdir/findme
+  print unsetting option...
+  unsetopt pathdirs
+  pathtestdir/findme
+  path=($oldpath)
+  unset $oldpath
+  rm -rf pdt_topdir pathtestdir
+0:PATH_DIRS option
+>File in upper dir
+>File in lower dir
+>unsetting option...
+?ZTST_execchunk:2: no such file or directory: pathtestdir/findme
+
+  setopt posixbuiltins
+  command print foo
+  unsetopt posixbuiltins
+  print unsetting...
+  command print foo
+1:POSIX_BUILTINS option
+>foo
+>unsetting...
+?ZTST_execchunk:2: command not found: print
+
+# This option seems to be problematic.  I don't quite know how it works.
+##   func() {
+##     setopt localoptions printexitvalue
+##     false
+##   }
+##   func
+## 1:PRINT_EXIT_VALUE option
+## ?ZTST_execchunk:2: exit 1
+
+  setopt promptbang
+  print -P !
+  setopt nopromptbang
+  print -P !
+0:PROMPT_BANG option
+>0
+>!
+
+  unsetopt promptpercent
+  print -P '%/'
+  setopt promptpercent
+  print -P '%/'
+0q:PROMPT_PERCENT option
+>%/
+>$mydir
+
+  setopt promptsubst
+  print -P '`echo waaah`'
+  unsetopt promptsubst
+  print -P '`echo waaah`'
+0:PROMPT_SUBST option
+>waaah
+>`echo waaah`
+
+  dirs
+  pushd $mydir/tmpcd
+  dirs
+  pushd $mydir/tmpcd
+  dirs
+  setopt pushdignoredups
+  pushd $mydir/tmpcd
+  dirs
+  unsetopt pushdignoredups
+  popd >/dev/null
+  popd >/dev/null
+0q:PUSHD_IGNOREDUPS option
+>$mydirt
+>$mydirt/tmpcd $mydirt
+>$mydirt/tmpcd $mydirt/tmpcd $mydirt
+>$mydirt/tmpcd $mydirt/tmpcd $mydirt
+
+  mkdir newcd
+  cd $mydir
+  pushd $mydir/tmpcd
+  pushd $mydir/newcd
+  dirs
+  pushd -0
+  dirs
+  setopt pushdminus pushdsilent
+  pushd -0
+  dirs
+  unsetopt pushdminus
+  popd >/dev/null
+  popd >/dev/null
+  cd $mydir  
+0q:PUSHD_MINUS option
+>$mydirt/newcd $mydirt/tmpcd $mydirt
+>$mydirt
+>$mydirt $mydirt/newcd $mydirt/tmpcd
+>$mydirt
+>$mydirt $mydirt/newcd $mydirt/tmpcd
+
+# Do you have any idea how dull this is?
+
+  pushd $mydir/tmpcd
+  pushd
+  dirs
+  setopt pushdtohome
+  pushd
+  dirs
+  unsetopt pushdtohome
+  popd
+  pushd
+  popd
+  dirs
+0q:PUSHD_TO_HOME option
+>$mydirt $mydirt/tmpcd
+>~ $mydirt $mydirt/tmpcd
+>$mydirt
+
+  array=(one two three four)
+  setopt rcexpandparam
+  print aa${array}bb
+  unsetopt rcexpandparam
+  print aa${array}bb
+0:RC_EXPAND_PARAM option
+>aaonebb aatwobb aathreebb aafourbb
+>aaone two three fourbb
+
+  setopt rcquotes
+  # careful, this is done when parsing a complete block
+  eval "print 'one''quoted''expression'"
+  unsetopt rcquotes
+  eval "print 'another''quoted''expression'"
+0:RC_QUOTES option
+>one'quoted'expression
+>anotherquotedexpression
+
+  # too lazy to test jobs -Z and ARGV0.
+  (setopt restricted; cd /)
+  (setopt restricted; PATH=/bin:/usr/bin)
+  (setopt restricted; /bin/ls)
+  (setopt restricted; hash ls=/bin/ls)
+  (setopt restricted; print ha >outputfile)
+  (setopt restricted; exec ls)
+  (setopt restricted; unsetopt restricted)
+  :
+0:RESTRICTED option
+?ZTST_execchunk:cd:2: restricted
+?ZTST_execchunk:2: PATH: restricted
+?ZTST_execchunk:2: /bin/ls: restricted
+?ZTST_execchunk:hash:2: restricted: /bin/ls
+?ZTST_execchunk:2: writing redirection not allowed in restricted mode
+?ZTST_execchunk:exec:2: ls: restricted
+?ZTST_execchunk:unsetopt:2: can't change option: restricted
+
+  fn() {
+    print =ls ={ls,}
+    local foo='=ls'
+    print ${~foo}
+  }
+  setopt shfileexpansion
+  fn
+  unsetopt shfileexpansion
+  fn
+0q:SH_FILE_EXPANSION option
+>$lspath =ls =
+>=ls
+>$lspath $lspath =
+>$lspath
+
+  testpat() {
+    if [[ $1 = ${~2} ]]; then print $1 $2 yes; else print $1 $2 no; fi
+  }
+  print option on
+  setopt shglob
+  repeat 2; do
+    for str in 'a(b|c)' ab; do
+      testpat $str 'a(b|c)'
+    done
+    for str in 'a<1-10>' a9; do
+      testpat $str 'a<1-10>'
+    done
+    [[ ! -o shglob ]] && break
+    print option off
+    unsetopt shglob
+  done
+0:SH_GLOB option
+>option on
+>a(b|c) a(b|c) yes
+>ab a(b|c) no
+>a<1-10> a<1-10> yes
+>a9 a<1-10> no
+>option off
+>a(b|c) a(b|c) no
+>ab a(b|c) yes
+>a<1-10> a<1-10> no
+>a9 a<1-10> yes
+
+  print this is bar >bar
+  fn() {
+    local NULLCMD=cat READNULLCMD=cat
+    echo hello | >foo
+    cat foo
+    <bar
+  }
+  setopt shnullcmd
+  print option set
+  fn
+  unsetopt shnullcmd
+  print option unset
+  fn
+  rm -f foo bar
+0:SH_NULLCMD option
+>option set
+>option unset
+>hello
+>this is bar
+
+  fn() { 
+    eval 'for f in foo bar; print $f'
+    eval 'for f (word1 word2) print $f'
+    eval 'repeat 3 print nonsense'
+  }
+  unsetopt shortloops
+  print option unset
+  fn
+  setopt shortloops
+  print option set
+  fn
+0:SHORT_LOOPS option
+>option unset
+>option set
+>foo
+>bar
+>word1
+>word2
+>nonsense
+>nonsense
+>nonsense
+?fn:-1: parse error near `print'
+?fn:-1: parse error near `print'
+?fn:-1: parse error near `print'
+# Eugh, that line numbering behaviour with eval is probably a bug.
+
+  fn() { print -l $*; }
+  setopt shwordsplit
+  print option set
+  repeat 2; do
+    foo='two words'
+    fn $foo
+    fn "${=foo}"
+    [[ ! -o shwordsplit ]] && break
+    unsetopt shwordsplit
+    print option unset
+  done
+0:SH_WORD_SPLIT option
+>option set
+>two
+>words
+>two
+>words
+>option unset
+>two words
+>two
+>words
+
+  fn() { unset foo; print $foo; }
+  setopt nounset
+  print option unset unset by setting nounset
+  eval fn
+  print option unset reset
+  setopt unset
+  fn
+0:UNSET option
+>option unset unset by setting nounset
+>option unset reset
+>
+?fn: foo: parameter not set
+
+# This really just tests if XTRACE is egregiously broken.
+# To test it properly would need a full set of its own.
+  fn() { print message; }
+  setopt xtrace
+  fn
+  unsetopt xtrace
+  fn
+0:XTRACE option
+>message
+>message
+?+ZTST_execchunk:2> fn
+?+fn:0> print message
+?+ZTST_execchunk:2> unsetopt xtrace
