@@ -86,19 +86,12 @@
 emulate -L zsh
 setopt extendedglob
 
-# push to our own history file
-fc -p ~/.zcalc_history
-
-zcalc_restore() {
-    unfunction zcalc_restore
-    # pop back to original history
-    fc -P
-}
-trap zcalc_restore HUP INT QUIT EXIT
-
 local line ans base defbase forms match mbegin mend psvar optlist opt arg
 local compcontext="-math-"
 integer num outdigits outform=1
+
+# We use our own history file with an automatic pop on exit.
+history -ap ~/.zcalc_history
 
 forms=( '%2$g' '%.*g' '%.*f' '%.*E' )
 
