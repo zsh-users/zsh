@@ -1,3 +1,10 @@
+2001-04-27  Sven Wischnowsky  <wischnow@zsh.org>
+
+	* 14133: Completion/Base/Completer/_expand,
+	Completion/Unix/Type/_path_files, Doc/Zsh/compsys.yo: try to
+	improve testing for suffix style in _expand; make _path_files
+	fail to complete words like ...<pat>..<param-subst>...
+
 2001-04-26  Bart Schaefer  <schaefer@zsh.org>
 
 	* 14129: Completion/Base/Completer/_approximate: Use a trap to

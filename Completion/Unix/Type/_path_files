@@ -190,7 +190,7 @@ eorig="$orig"
 
 # Now let's have a closer look at the string to complete.
 
-if [[ "$pre" = *(\`[^\`]#\`|\$)*/* && "$compstate[quote]" != \' ]]; then
+if [[ "$pre" = [^][*?#^\|\<\>]#(\`[^\`]#\`|\$)*/* && "$compstate[quote]" != \' ]]; then
 
   # If there is a parameter expansion in the word from the line, we try
   # to complete the beast by expanding the prefix and completing anything

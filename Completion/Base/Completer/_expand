@@ -28,8 +28,13 @@ fi
    ( "$word" = *\$[a-zA-Z0-9_]## && $+parameters[${word##*\$}] -eq 0 ) ]] &&
     return 1
 
+### I'm not sure about the pattern to use in the following test.
+# It once was:
+#  [[ "$word" = (\~*/|\$(|[=~#^+])[a-zA-Z0-9_\[\]]##[^a-zA-Z0-9_\[\]]|\$\{*\}?)[^\$\{\}\(\)\<\>?^*#~]# ]] &&
+
 zstyle -T ":completion:${curcontext}:" suffix &&
-  [[ "$word" = (\~*/|\$(|[=~#^+])[a-zA-Z0-9_\[\]]##[^a-zA-Z0-9_\[\]]|\$\{*\}?)[^\$\{\}\(\)\<\>?^*#~]# ]] &&
+  [[ "$word" = (\~*/|*\$(|[=~#^+])[a-zA-Z0-9_\[\]]##[^a-zA-Z0-9_\[\]]|*\$\{*\}?) &&
+     "${(e)word}" != *[][^~*?\<\>\{\}\|]* ]] &&
   return 1
 
 zstyle -t ":completion:${curcontext}:" accept-exact ||

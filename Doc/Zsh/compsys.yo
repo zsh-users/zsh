@@ -1949,7 +1949,7 @@ The default is `true'.
 kindex(suffix, completion style)
 item(tt(suffix))(
 This is used by the tt(_expand) completer if the word starts with a
-tilde or parameter expansion. If it is set to `true', the word will
+tilde or contains a parameter expansion. If it is set to `true', the word will
 only be expanded if it doesn't have a suffix, i.e. if it is something
 like `tt(~foo)' or `tt($foo)', but not if it is `tt(~foo/)' or
 `tt($foo/bar)', unless that suffix itself contains characters eligible
@@ -2001,18 +2001,8 @@ of the tag in the context names used to look up styles.  If the
 var(label) starts with a hyphen, the var(tag) is prepended to the
 var(label) to form the name used for lookup.  This can be
 used to make the completion system try a certain tag more than once,
-supplying different style settings for each attempt.  For example,
-
-example(zstyle ':completion:*:*:-command-:*' \ 
-    tag-order 'functions:-non-comp'
-zstyle ':completion:*:functions-non-comp' \ 
-    ignored-patterns '_*')
-
-This makes completion in command position first try only names of shell
-functions that don't match the pattern `tt(_*)'. If that generates no
-matches, the default of trying all the other things that can be
-completed in command position is used, including the names of all
-shell functions.
+supplying different style settings for each attempt, see below for an
+example.
 
 The var(label) may optionally be followed by a second colon and a
 description.  This description will then be used for the `tt(%d)' in
