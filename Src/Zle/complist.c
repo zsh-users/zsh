@@ -1936,14 +1936,14 @@ domenuselect(Hookdef dummy, Chdata dat)
     static char *lastsearch = NULL;
     Cmatch **p;
     Cmgroup *pg;
-    Thingy cmd;
+    Thingy cmd = 0;
     int     do_last_key = 0;
     Menustack u = NULL;
     int i = 0, acc = 0, wishcol = 0, setwish = 0, oe = onlyexpl, wasnext = 0;
     int space, lbeg = 0, step = 1, wrap, pl = nlnct, broken = 0, first = 1;
     int nolist = 0, mode = 0, modecs, modell, modelen;
     char *s;
-    char status[MAX_STATUS], *modeline;
+    char status[MAX_STATUS], *modeline = NULL;
 
     msearchstack = NULL;
     msearchstr = "";
@@ -2166,8 +2166,8 @@ domenuselect(Hookdef dummy, Chdata dat)
                    (mode == MM_INTER && (cmd == Th(z_selfinsert) ||
                                          cmd == Th(z_selfinsertunmeta)))) {
             char *saveline = NULL;
-            int savell;
-            int savecs;
+            int savell = 0;
+            int savecs = 0;
 	    Menustack s = (Menustack) zhalloc(sizeof(*s));
 
 	    s->prev = u;
