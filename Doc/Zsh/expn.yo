@@ -680,9 +680,9 @@ item(tt(z))(
 Split the result of the expansion into words using shell parsing to
 find the words, i.e. taking into account any quoting in the value.
 
-Note that this is done very lately, as for the `tt((s))' flag. So to
+Note that this is done very late, as for the `tt((s))' flag. So to
 access single words in the result, one has to use nested expansions as 
-in `tt(${${(z)foo}[2]}'. Likewise, to remove the quotes in the
+in `tt(${${(z)foo}[2]})'. Likewise, to remove the quotes in the
 resulting words one would do: `tt(${(Q)${(z)foo}})'.
 )
 item(tt(t))(
