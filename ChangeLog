@@ -1,5 +1,8 @@
 2000-06-22  Sven Wischnowsky  <wischnow@zsh.org>
 
+	* 12033: Completion/Core/compinit: followup to compinit-security
+ 	patch
+	
 	* 12029: Completion/Builtins/_arrays, Completion/Builtins/_zstyle,
  	Completion/Commands/_bash_completions,
  	Completion/Commands/_history_complete_word,

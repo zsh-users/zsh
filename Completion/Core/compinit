@@ -348,7 +348,7 @@ if [[ -n "$_i_check" ]]; then
     typeset _i_q
 
     _i_wdirs=( ${^fpath}(Nf:g+w:,f:o+w:,^u0u${EUID}) )
-    _i_wfiles=( ${^~fpath:/.}/^([^_]*|*~|*.zwc)(N^u0u${EUID}) )
+    _i_wfiles=( ${^~fpath:/.}/^([^_]*|*~)(N^u0u${EUID}) )
 
     case "${#_i_wdirs}:${#_i_wfiles}" in
     0:0) _i_q= ;;
@@ -358,16 +358,20 @@ if [[ -n "$_i_check" ]]; then
     esac
 
     if [[ -n "$_i_q" ]]; then
-      if [[ "$_i_fail" = ask ]] &&
-         ! read -q "?There are insecure $_i_q, continue [yn]? "; then
-        unfunction compinit compdef
-        unset _comp_dumpfile _comp_secure compprefuncs comppostfuncs \
-              _comps _patcomps _postpatcomps _compautos _lastcomp
+      if [[ "$_i_fail" = ask ]]; then
+        if ! read -q "?There are insecure $_i_q, continue [yn]? "; then
+          unfunction compinit compdef
+          unset _comp_dumpfile _comp_secure compprefuncs comppostfuncs \
+                _comps _patcomps _postpatcomps _compautos _lastcomp
 
-        return 1
+          return 1
+        fi
+        _i_wfiles=()
+	_i_wdirs=()
+      else
+        (( $#_i_wfiles )) && _i_files=( "${(@)_i_files:#(${(j:|:)_i_wfiles})}"  )
+        (( $#_i_wdirs ))  && _i_files=( "${(@)_i_files:#(${(j:|:)_i_wdirs})/*}" )
       fi
-      (( $#_i_wfiles )) && _i_files=( "${(@)_i_files:#(${(j:|:)_i_wfiles})}"  )
-      (( $#_i_wdirs ))  && _i_files=( "${(@)_i_files:#(${(j:|:)_i_wdirs})/*}" )
     fi
     _comp_secure=yes
   fi
@@ -393,12 +397,15 @@ if [[ -f "$_comp_dumpfile" ]]; then
   fi
 fi
 if [[ -z "$_i_done" ]]; then
+  typeset -A _i_test
+
   for _i_dir in $fpath; do
     [[ $_i_dir = . ]] && continue
     (( $_i_wdirs[(I)$_i_dir] )) && continue
     for _i_file in $_i_dir/^([^_]*|*~|*.zwc)(N); do
       _i_name="${_i_file:t}"
-      (( $+functions[$_i_name] + $_i_wfiles[(I)$_i_file] )) && continue
+      (( $+_i_test[$_i_name] + $_i_wfiles[(I)$_i_file] )) && continue
+      _i_test[$_i_name]=yes
       read -rA _i_line < $_i_file
       _i_tag=$_i_line[1]
       shift _i_line
