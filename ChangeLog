@@ -1,3 +1,8 @@
+2004-02-09  Wayne Davison  <wayned@users.sourceforge.net>
+
+	* 19406: Src/Zle/compmatch.c: Optimized the check for a
+	widowed Meta character.
+
 2004-02-08  Peter Stephenson  <pws@pwstephenson.fsnet.co.uk>
 
 	* 19408: Src/Builtins/rlimits.c: fix option handling for ulimit -aH.
