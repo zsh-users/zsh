@@ -1177,9 +1177,10 @@ bin_vared(char *name, char **args, Options ops, int func)
 
 	/*
 	 * Use spacesplit with fourth argument 1: identify quoted separators,
-	 * unquote but don't split.
+	 * and unquote.  This duplicates the string, so we still need to free.
 	 */
 	a = spacesplit(t, 1, 0, 1);
+	zsfree(t);
 	if (PM_TYPE(pm->flags) == PM_ARRAY)
 	    setaparam(args[0], a);
 	else

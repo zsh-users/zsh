@@ -1,3 +1,8 @@
+2003-05-19  Peter Stephenson  <pws@csr.com>
+
+	* 18548: Src/Zle/zle_main.c: memory leak when vared'ing arrays
+	spotted by valgrind (18543).
+
 2003-05-15  Oliver Kiddle  <opk@zsh.org>
 
 	* 18530: Src/builtin.c, Src/options.c, Doc/Zsh/builtins.yo:
