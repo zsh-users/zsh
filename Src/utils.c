@@ -3311,15 +3311,12 @@ getkeystring(char *s, int *len, int fromwhere, int *misc)
     char *inptr, *outptr;
 #  endif
     size_t count;
-    size_t buflen = MB_LEN_MAX * (strlen(s) / 6) + (strlen(s) % 6) + 1;
-#else
-    size_t buflen = strlen(s) + 1;
 #endif
 
     if (fromwhere == 6)
 	t = buf = tmp;
     else if (fromwhere != 4)
-	t = buf = zhalloc(buflen);
+	t = buf = zhalloc(strlen(s) + 1);
     else {
 	t = buf = s;
 	s += 2;
