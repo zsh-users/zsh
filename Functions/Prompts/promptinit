@@ -35,6 +35,7 @@ promptinit () {
 }
 
 prompt () {
+  emulate -L zsh
   local opt preview theme usage old_theme
 
   usage='Usage: prompt <options>
@@ -91,7 +92,7 @@ Options:
          print "$usage"
          return
        fi
-       prompt_$1_setup "$*[2,-1]"
+       prompt_$1_setup $*[2,-1]
        prompt_theme=( $* )
 
        # Avoid screwing up the environment listing

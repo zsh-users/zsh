@@ -21,7 +21,7 @@ prompt_fire_setup () {
     PS1=$COLOR1$GRAD1$COLOR2'%n@%m'$COLOR3$GRAD2$COLOR4$GRAD1$COLOR6' %D{%a %b %d} %D{%I:%M:%S%P} '$NONE'$prompt_newline'$COLOR5'%~/'$GRAD0' '
     PS2=$COLOR1$GRAD1$COLOR3$GRAD2$COLOR4$GRAD1$COLOR5'>'$GRAD0' '
 
-  precmd () { }
+  precmd () { setopt promptsubst }
   preexec () { }
 }
 

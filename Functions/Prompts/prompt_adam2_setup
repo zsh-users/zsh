@@ -4,7 +4,7 @@ prompt_adam2_help () {
   cat <<'EOF'
 This prompt is color-theme-able.  You can invoke it thus:
 
-  prompt adam2 [ simple ] <color1> <color2> <color3>
+  prompt adam2 [ plain ] <color1> <color2> <color3>
 
 where the colors are for the hyphens, current directory, and user@host
 bits respectively.
@@ -70,7 +70,7 @@ prompt_adam2_setup () {
 
   prompt_char="%(!.#.>)"
 
-  precmd () { prompt_adam2_precmd }
+  precmd () { prompt_adam2_precmd; setopt promptsubst }
   preexec () { prompt_adam2_preexec }
 }
 
