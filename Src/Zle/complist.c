@@ -346,11 +346,12 @@ clprintm(Cmgroup g, Cmatch *mp, int mc, int ml, int lastc, int width,
 
 	    mtab[mm] = mp;
 	    mgtab[mm] = g;
-	    mmtabp = mtab + mm;
-	    mgtabp = mgtab + mm;
 	}
 	if (m->gnum == mselect) {
+	    int mm = (mcols * ml) + (mcols >> 1);
 	    mline = ml;
+	    mmtabp = mtab + mm;
+	    mgtabp = mgtab + mm;
 	    cc = COL_MA;
 	} else
 	    cc = COL_NO;
@@ -377,12 +378,14 @@ clprintm(Cmgroup g, Cmatch *mp, int mc, int ml, int lastc, int width,
 
 	    mtab[mx + mm] = mp;
 	    mgtab[mx + mm] = g;
-	    mmtabp = mtab + mx + mm;
-	    mgtabp = mgtab + mx + mm;
 	}
 	if (m->gnum == mselect) {
+	    int mm = mcols * ml;
+
 	    mcol = mx;
 	    mline = ml;
+	    mmtabp = mtab + mx + mm;
+	    mgtabp = mgtab + mx + mm;
 	    zcputs(&mcolors, COL_MA);
 	} else if (buf)
 	    putcolstr(&mcolors, path, buf->st_mode);
@@ -514,6 +517,8 @@ typedef struct menustack *Menustack;
 struct menustack {
     Menustack prev;
     char *line;
+    char *brbeg;
+    char *brend;
     int cs, acc;
     struct menuinfo info;
     Cmgroup amatches, pmatches, lmatches;
@@ -559,6 +564,7 @@ domenuselect(Hookdef dummy, Chdata dat)
 	}
 	p = mmtabp;
 	pg = mgtabp;
+	minfo.cur = *p;
 
     getk:
 
@@ -579,6 +585,8 @@ domenuselect(Hookdef dummy, Chdata dat)
 	    s->pmatches = pmatches;
 	    s->lmatches = lmatches;
 	    s->acc = menuacc;
+	    s->brbeg = dupstring(brbeg);
+	    s->brend = dupstring(brend);
 	    menucmp = menuacc = 0;
 	    fixsuffix();
 	    validlist = 0;
@@ -604,6 +612,8 @@ domenuselect(Hookdef dummy, Chdata dat)
 	    memcpy(&(s->info), &minfo, sizeof(struct menuinfo));
 	    s->amatches = s->pmatches = s->lmatches = NULL;
 	    s->acc = menuacc;
+	    s->brbeg = dupstring(brbeg);
+	    s->brend = dupstring(brend);
 	    acceptlast();
 	    do_menucmp(0);
 	    mselect = (*(minfo.cur))->gnum;
@@ -629,6 +639,10 @@ domenuselect(Hookdef dummy, Chdata dat)
 		lmatches = u->lmatches;
 		hasperm = 1;
 	    }
+	    zsfree(brbeg);
+	    zsfree(brend);
+	    brbeg = ztrdup(u->brbeg);
+	    brend = ztrdup(u->brend);
 	    u = u->prev;
 	    clearlist = 1;
 	} else if (cmd == Th(z_redisplay)) {

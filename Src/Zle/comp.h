@@ -239,13 +239,14 @@ struct cmatch {
     int gnum;			/* global number */
 };
 
-#define CMF_FILE      1		/* this is a file */
-#define CMF_REMOVE    2		/* remove the suffix */
-#define CMF_ISPAR     4		/* is paramter expansion */
-#define CMF_PARBR     8		/* paramter expansion with a brace */
-#define CMF_PARNEST  16		/* nested paramter expansion */
-#define CMF_NOLIST   32		/* should not be listed */
-#define CMF_DISPLINE 64		/* display strings one per line */
+#define CMF_FILE       1	/* this is a file */
+#define CMF_REMOVE     2	/* remove the suffix */
+#define CMF_ISPAR      4	/* is paramter expansion */
+#define CMF_PARBR      8	/* paramter expansion with a brace */
+#define CMF_PARNEST   16	/* nested paramter expansion */
+#define CMF_NOLIST    32	/* should not be listed */
+#define CMF_DISPLINE  64	/* display strings one per line */
+#define CMF_HIDE     128	/* temporarily hide this one */
 
 /* Stuff for completion matcher control. */
 
@@ -297,6 +298,8 @@ struct menuinfo {
     int we;			/* non-zero if the cursor was at the end */
     int insc;			/* length of suffix inserted */
     int asked;			/* we asked if the list should be shown */
+    char *prebr;		/* prefix before a brace, if any */
+    char *postbr;		/* suffix after a brace */
 };
 
 /* Flags for compadd and addmatches(). */
@@ -342,6 +345,7 @@ typedef struct cldata *Cldata;
 struct cldata {
     int columns;		/* screen width */
     int lines;			/* screen height */
+    int menuacc;		/* value of global menuacc */
     int valid;			/* no need to calculate anew */
     int nlist;			/* number of matches to list */
     int nlines;			/* number of lines needed */
