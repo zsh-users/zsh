@@ -1,3 +1,14 @@
+2000-07-19  Wayne Davison  <wayned@users.sourceforge.net>
+
+	* 12318: Doc/Zsh/options.yo, Src/builtin.c, Src/exec.c, Src/hist.c,
+	Src/init.c, Src/lex.c, Src/parse.c, Src/Zle/zle_main.c: Removed
+	remhist() and the HA_JUNKED flag.  Now hend() is called with an
+	Eprog pointer so that it can access the lexer's data for the
+	current command.  Added shouldIgnoreLine() so that hend() can
+	determine in advance if a command should be saved in the history.
+	Added the aliasspaceflag variable to note when we expand an alias
+	that starts with a space.
+
 2000-07-19  Sven Wischnowsky  <wischnow@zsh.org>
 
 	* 12314: Src/Zle/compmatch.c: a bit of security for a VARARR()
