@@ -691,10 +691,10 @@
 ?(eval):14: no such file or directory: pathtestdir/findme
 
   setopt posixbuiltins
-  command print foo
+  PATH= command print foo
   unsetopt posixbuiltins
   print unsetting...
-  command print foo
+  PATH= command print foo
 127:POSIX_BUILTINS option
 >foo
 >unsetting...
