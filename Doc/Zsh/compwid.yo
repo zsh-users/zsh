@@ -58,8 +58,8 @@ endmenu()
 texinode(Special Parameters)(Builtin Commands)()(Completion Widgets)
 sect(Special Parameters)
 
-Inside completion widgets, and any functions called from those, some
-parameters have special meaning; outside these function they are not
+Inside completion widgets, and any functions called from them, some
+parameters have special meaning; outside these functions they are not
 special to the shell in any way.  These parameters are used to pass
 information between the completion code and the completion widget. Some of
 the builtin commands and the condition codes use or change the current

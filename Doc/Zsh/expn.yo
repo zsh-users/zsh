@@ -918,7 +918,7 @@ that this is a scalar, so that (despite the `tt((@))' flag) the subscript
 picks the first character. 
 )
 item(tt("${${(@)foo}[1]}"))(
-The produces the result `tt(bar)'.  In this case, the inner substitution
+This produces the result `tt(bar)'.  In this case, the inner substitution
 tt("${(@)foo}") produces the array `tt(LPAR()bar baz)tt(RPAR())'.  The outer
 substitution tt("${...[1]}") detects that this is an array and picks the
 first word.  This is similar to the simple case tt("${foo[1]}").

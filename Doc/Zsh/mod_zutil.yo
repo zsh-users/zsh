@@ -123,7 +123,7 @@ many characters.  After all `tt(%)' sequences for the given var(specs)
 have been processed, the resulting string is stored in the parameter
 var(param).
 
-The second form, using the tt(-a) option, can be used for alignin
+The second form, using the tt(-a) option, can be used for aligning
 strings.  Here, the var(specs) are of the form
 `var(left)tt(:)var(right)' where `var(left)' and `var(right)' are
 arbitrary strings.  These strings are modified by replacing the colons

@@ -1,3 +1,9 @@
+2000-07-05  Oliver Kiddle  <opk@zsh.org>
+
+	* 12177: Doc/Zsh/compsys.yo, Completion/Builtins/_unhash,
+	Doc/Zsh/compwid.yo, Doc/Zsh/expn.yo, Doc/Zsh/mod_zutil.yo: add more
+	standard tags to docs and fix typos
+
 2000-07-05  Sven Wischnowsky  <wischnow@zsh.org>
 
 	* 12171: Completion/User/_arp: get return status right
