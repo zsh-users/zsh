@@ -274,10 +274,12 @@ gettext2(Estate state)
 	    break;
 	case WC_SUBLIST:
 	    if (!s) {
+                if (wc_code(*state->pc) != WC_PIPE)
+                    stack = 1;
 		if (WC_SUBLIST_FLAGS(code) & WC_SUBLIST_NOT)
-		    taddstr("! ");
+		    taddstr(stack ? "!" : "! ");
 		if (WC_SUBLIST_FLAGS(code) & WC_SUBLIST_COPROC)
-		    taddstr("coproc ");
+		    taddstr(stack ? "coproc" : "coproc ");
 		s = tpush(code, (WC_SUBLIST_TYPE(code) == WC_SUBLIST_END));
 	    } else {
 		if (!(stack = (WC_SUBLIST_TYPE(code) == WC_SUBLIST_END))) {
