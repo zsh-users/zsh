@@ -1,5 +1,9 @@
 2001-03-26  Sven Wischnowsky  <wischnow@zsh.org>
 
+	* 13768: Completion/Core/_main_complete,
+	Completion/Core/_setup: unset ZLS_COLORS if list-colors not
+	set
+
 	* 13767: Src/Zle/zle_utils.c: avoid adding empty strings to
 	the kill ring
 

@@ -302,8 +302,10 @@ fi
 
 if [[ "$compstate[old_list]" = keep ]]; then
   ZLS_COLORS="$_saved_colors"
-else
+elif (( $#_comp_colors )); then
   ZLS_COLORS="${(j.:.)_comp_colors}"
+else
+  unset ZLS_COLORS
 fi
 
 # Now call the post-functions.
