@@ -29,19 +29,31 @@ _cvs () {
 	_complete_opts k: "$complete_k" m: "$complete_m" || _cvsaddp
 	;;
       admin|adm|rcs) # "+ib::c:a:A:e:l::u::LUn:N:m:o:s:t::IqxV:k:"
-	_complete_opts i '' b:: '' c: '' a: '' A: '' e: '' l:: '' u:: '' L '' U '' n: '' N: '' m: "$complete_m" o: '' s: '' t:: '' I '' q '' x '' V: '' k: "$complete_k" || _cvstargets
+	_complete_opts i '' b:: '' c: '' a: '' A: '' e: '' l:: '' u:: '' L '' \
+	  U '' n: '' N: '' m: "$complete_m" o: '' s: '' t:: '' I '' q '' x '' \
+	    V: '' k: "$complete_k" ||
+	_cvstargets
 	;;
       annotate|ann) # "+lr:D:fR"
 	_complete_opts l '' r: '' D: '' f '' R '' || _cvstargets
 	;;
       checkout|co|get) # "+ANnk:d:flRpQqcsr:D:j:P"
-	_complete_opts A '' N '' n '' k: "$complete_k" d: '' f '' l '' R '' p '' Q '' q '' c '' s '' r: "$complete_r" D: "$complete_D" j: '' P '' || _cvsrepositories
+	_complete_opts A '' N '' n '' k: "$complete_k" d: '' f '' l '' R ''\
+	  p '' Q '' q '' c '' s '' r: "$complete_r" D: "$complete_D" j: '' \
+	  P '' ||
+	_cvsrepositories
 	;;
       commit|ci|com) # "+nlRm:fF:r:"
-	_complete_opts n '' l '' R '' m: "$complete_m" f '' F: '' r: "$complete_r" || _cvstargets_modified
+	_complete_opts n '' l '' R '' m: "$complete_m" f '' F: '' \
+	  r: "$complete_r" ||
+	_cvstargets_modified
 	;;
       diff|di|dif) # "+abcdefhilnpstuw0123456789BHNRC:D:F:I:L:U:V:W:k:r:"
-	_complete_opts a '' b '' c '' d '' e '' f '' h '' i '' l '' n '' p '' s '' t '' u '' w '' 0 '' 1 '' 2 '' 3 '' 4 '' 5 '' 6 '' 7 '' 8 '' 9 '' B '' H '' N '' R '' C: '' D: "$complete_D" F: '' I: '' L: '' U: '' V: '' W: '' k: "$complete_k" r: "$complete_r" || _cvstargets_modified || _cvstargets
+	_complete_opts a '' b '' c '' d '' e '' f '' h '' i '' l '' n '' p '' \
+	  s '' t '' u '' w '' 0 '' 1 '' 2 '' 3 '' 4 '' 5 '' 6 '' 7 '' 8 '' \
+	  9 '' B '' H '' N '' R '' C: '' D: "$complete_D" F: '' I: '' L: '' \
+	  U: '' V: '' W: '' k: "$complete_k" r: "$complete_r" ||
+	_cvstargets_modified || _cvstargets
 	;;
       edit) # "+lRa:"
 	_complete_opts l '' R '' a: '' || _cvstargets
@@ -50,13 +62,21 @@ _cvs () {
 	_complete_opts l '' R '' || _cvstargets
 	;;
       export|exp|ex) # "+ANnk:d:flRpQqcsr:D:j:P"
-	_complete_opts A '' N '' n '' k: "$complete_k" d: '' f '' l '' R '' p '' Q '' q '' c '' s '' r: "$complete_r" D: "$complete_D" j: '' P '' || _cvsrepositories
+	_complete_opts A '' N '' n '' k: "$complete_k" d: '' f '' l '' R '' \
+	  p '' Q '' q '' c '' s '' r: "$complete_r" D: "$complete_D" j: '' \
+	  P '' ||
+	_cvsrepositories
 	;;
       history|hi|his) # "+Tacelow?D:b:f:m:n:p:r:t:u:x:X:z:"
-	_complete_opts T '' a '' c '' e '' l '' o '' w '' \? '' D: "$complete_D" b: '' f: '' m: "$complete_m" n: '' p: '' r: '' t: '' u: '' x: '' X: '' z: '' || _cvstargets
+	_complete_opts T '' a '' c '' e '' l '' o '' w '' \? '' \
+	  D: "$complete_D" b: '' f: '' m: "$complete_m" n: '' p: '' r: '' \
+	  t: '' u: '' x: '' X: '' z: '' ||
+	_cvstargets
 	;;
       import|im|imp) # "+Qqdb:m:I:k:W:"
-	_complete_opts Q '' q '' d '' b: '' m: "$complete_m" I: '' k: "$complete_k" W: '' || case $[CURRENT-com] in
+	_complete_opts Q '' q '' d '' b: '' m: "$complete_m" I: '' \
+	  k: "$complete_k" W: '' ||
+	case $[CURRENT-com] in
 	  1) _cvsrepositories;;
 	  2) compadd -UX "Enter vendor tag name" -n '' && eval "$showhint";;
 	  3) compadd -UX "Enter release tag name" -n '' && eval "$showhint";;
@@ -70,7 +90,9 @@ _cvs () {
 	_complete_opts || _files
 	;;
       rdiff|patch|pa) # "+V:k:cuftsQqlRD:r:"
-	_complete_opts V: '' k: "$complete_k" c '' u '' f '' t '' s '' Q '' q '' l '' R '' D: "$complete_D" r: "$complete_r" || _cvstargets
+	_complete_opts V: '' k: "$complete_k" c '' u '' f '' t '' s '' Q '' \
+	  q '' l '' R '' D: "$complete_D" r: "$complete_r" ||
+	_cvstargets
 	;;
       release|re|rel) # "+Qdq"
 	_complete_opts Q '' d '' q '' || _files -/
@@ -82,13 +104,18 @@ _cvs () {
 	_complete_opts v '' l '' R '' || _cvstargets
 	;;
       tag|ta|freeze) # "+FQqlRcdr:D:bf"
-	_complete_opts F '' Q '' q '' l '' R '' c '' d '' r: "$complete_r" D: "$complete_D" b '' f '' || _cvstargets
+	_complete_opts F '' Q '' q '' l '' R '' c '' d '' r: "$complete_r" \
+	  D: "$complete_D" b '' f '' ||
+	_cvstargets
 	;;
       unedit) # "+lR"
 	_complete_opts l '' R '' || _cvstargets
 	;;
       update|up|upd) # "+ApPflRQqduk:r:D:j:I:W:"
-	_complete_opts A '' p '' P '' f '' l '' R '' Q '' q '' d '' u '' k: "$complete_k" r: "$complete_r" D: "$complete_D" j: '' I: '' W: '' || _cvstargets
+	_complete_opts A '' p '' P '' f '' l '' R '' Q '' q '' d '' u '' \
+	  k: "$complete_k" r: "$complete_r" D: "$complete_D" j: '' I: '' \
+	  W: '' ||
+	_cvstargets
 	;;
       watch)
 	if (( CURRENT == com + 1 )); then
@@ -136,6 +163,24 @@ _cvs () {
   compadd ${(kv)=commands}
 }
 
+_cvsrevisions () {
+  compadd - ${${${(M)${(f)"$(cvs -q status -vl .)"}:#	*}##[ 	]##}%%[ 	]*}
+}
+
+_cvsrepositories () {
+  local root=$CVSROOT
+  [[ -f CVS/Root ]] && root=$(<CVS/Root)
+
+  if [[ $root = :* || ! -d $root ]]; then
+    compadd -UX "Enter repository name" -n '' &&
+    { compstate[list]=list; compstate[force_list]=yes; compstate[insert]='' }
+  else
+    compadd - \
+      $root/^CVSROOT(:t) \
+      ${${(M)${(f)"$(<$root/CVSROOT/modules)"}:#[^#]*}%%[ 	]*}
+  fi
+}
+
 _cvsprefix () {
   local f
   qpref=$PREFIX
@@ -154,102 +199,117 @@ _cvsprefix () {
   [[ -n "$pref" && "$pref" != */ ]] && qpref=$qpref/ pref=$pref/
 }
 
+_cvsdirentries () {
+  setopt localoptions nullglob unset
+  if [[ -f ${pref}CVS/Entries ]]; then
+    entries=( ${${${(M)${(f)"$(<${pref}CVS/Entries)"}:#D/*}#D/}%%/*} )
+  fi
+}
+
 _cvsentries () {
   setopt localoptions nullglob unset
   if [[ -f ${pref}CVS/Entries ]]; then
-      entries=( ${${${${(f)"$(<${pref}CVS/Entries)"}:#D}#(D|)/}%%/*} )
+    entries=( ${${${${(f)"$(<${pref}CVS/Entries)"}:#D}#(D|)/}%%/*} )
   fi
 }
 
 _cvsentries_modified () {
-  local LANG=C
-  local OLDTZ="$TZ"; if ! (( $+TZ )); then unset OLDTZ; fi; export TZ=GMT
+  if (( $+_cvsentries_modified_disable_stat )) ||
+    ! { zmodload -e stat || zmodload stat }; then
+    _cvsentries
+    return
+  fi
 
   local line Entries
   typeset -A mtime
 
   if [[ -f "${pref}CVS/Entries" ]]; then
     Entries="$(<${pref}CVS/Entries)"
+  else
+    return
   fi
 
-  if ! zmodload -e stat; then zmodload stat; fi
-  if zmodload -e stat; then
-    mtime=( ${(s:/:)${(j:/:)${${${${(M)${(f)Entries}:#/*}#/}%/*/*}/\\/*\\///}}} )
-    entries=( ${${${(M)${(f)Entries}:#D/*}#D/}%%/*} )
-    builtin stat -n +mtime -F '%a %b %e %T %Y' "$pref${(@k)^mtime}" |
-    while read line
-    do
-      line=${line#$pref}
-      if [[ x"$mtime[${line%% *}]" == x"${line#* }" ]]; then
-        #print up-to-date "${line%% *}"
-      else
-        #print locally-modified "${line%% *}"
-        entries=($entries "${line%% *}")
-      fi
-    done
-  else
-    entries=( ${${${${(f)Entries}:#D}#(D|)/}%%/*} )
-  fi
+  local LANG=C
+  local OLDTZ="$TZ"; if ! (( $+TZ )); then unset OLDTZ; fi; export TZ=GMT
+
+  mtime=( ${(s:/:)${(j:/:)${${${${(M)${(f)Entries}:#/*}#/}%/*/*}/\\/*\\///}}} )
+  entries=( ${${${(M)${(f)Entries}:#D/*}#D/}%%/*} )
+  builtin stat -n +mtime -F '%a %b %e %T %Y' "$pref${(@k)^mtime}" |
+  while read line
+  do
+    line=${line#$pref}
+    if [[ x"$mtime[${line%% *}]" != x"${line#* }" ]]; then
+      entries=($entries "${line%% *}")
+    fi
+  done
 
   if (( $+OLDTZ )); then TZ="$OLDTZ"; else unset TZ; fi
+}
+
+_cvsdirs () {
+  local qpref pref entries
+  _cvsprefix
+  if [[ -d ${pref}CVS ]]; then
+    _cvsdirentries
+    compadd -fP "$qpref" -W "$pref" - $entries
+  else
+    _files
+  fi
 }
 
 _cvstargets () {
   local qpref pref entries
   _cvsprefix
-  _cvsentries
-
-  compadd -fP "$qpref" -W "$pref" - $entries
+  if [[ -d ${pref}CVS ]]; then
+    _cvsentries
+    compadd -fP "$qpref" -W "$pref" - $entries
+  else
+    _files
+  fi
 }
 
 _cvstargets_modified () {
   local qpref pref entries
   _cvsprefix
-  _cvsentries_modified
-
-  compadd -fp "$qpref" -W "$pref" - $entries
-}
-
-_cvsrevisions () {
-  compadd - ${${${(M)${(f)"$(cvs -q status -vl .)"}:#	*}##[ 	]##}%%[ 	]*}
-}
-
-_cvsrepositories () {
-  local root=$CVSROOT
-  [[ -f CVS/Root ]] && root=$(<CVS/Root)
-
-  if [[ $root = :* || ! -d $root ]]; then
-    compadd -UX "Enter repository name" -n '' && { compstate[list]=list; compstate[force_list]=yes; compstate[insert]='' }
+  if [[ -d ${pref}CVS ]]; then
+    _cvsentries_modified
+    compadd -fP "$qpref" -W "$pref" - $entries
   else
-    compadd - \
-      $root/^CVSROOT(:t) \
-      ${${(M)${(f)"$(<$root/CVSROOT/modules)"}:#[^#]*}%%[ 	]*}
+    _files
   fi
 }
 
 _cvsremovep () {
   local qpref pref entries
   _cvsprefix
-  _cvsentries
-  setopt localoptions unset
-  local omit
-  omit=( ${pref}*(D:t) )
-  eval 'compadd -fp "$qpref" -W "$pref" - ${entries:#('${(j:|:)omit}')}' ||
-    compadd -fp "$qpref" -W "$pref" - ${pref}*~${pref}CVS(/:t)
+  if [[ -d ${pref}CVS ]]; then
+    _cvsentries
+    setopt localoptions unset
+    local omit
+    omit=( ${pref}*(D:t) )
+    eval 'compadd -fP "$qpref" -W "$pref" - ${entries:#('${(j:|:)omit}')}' ||
+    _cvsdirs
+  else
+    _files
+  fi
 }
 
 _cvsaddp () {
   local qpref pref entries
   _cvsprefix
-  _cvsentries
-  setopt localoptions unset
-  local all omit
-  all=( ${pref}*~${pref}CVS(D:t) )
-  omit=( $entries ${=cvsignore} )
-  [[ -r ~/.cvsignore ]] && omit=( $omit $(<~/.cvsignore) )
-  [[ -r ${pref}.cvsignore ]] && omit=( $omit $(<${pref}.cvsignore) )
-  eval 'compadd -fp "$qpref" -W "$pref" - ${all:#('${(j:|:)omit}')}' ||
-    compadd -fp "$qpref" -W "$pref" - ${pref}*~${pref}CVS(/:t)
+  if [[ -d ${pref}CVS ]]; then
+    _cvsentries
+    setopt localoptions unset
+    local all omit
+    all=( ${pref}*~${pref}CVS(D:t) )
+    omit=( $entries ${=cvsignore} )
+    [[ -r ~/.cvsignore ]] && omit=( $omit $(<~/.cvsignore) )
+    [[ -r ${pref}.cvsignore ]] && omit=( $omit $(<${pref}.cvsignore) )
+    eval 'compadd -fP "$qpref" -W "$pref" - ${all:#('${(j:|:)omit}')}' ||
+    _cvsdirs
+  else
+    _files
+  fi
 }
 
 _cvs "$@"
