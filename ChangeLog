@@ -1,3 +1,8 @@
+2001-10-26  Wayne Davison  <wayned@users.sourceforge.net>
+
+	* 16184: Src/hist.c: Improved readhistline() to reject binary data
+	better.
+
 2001-10-26  Peter Stephenson  <pws@csr.com>
 
 	* 16176: Src/Modules/tcp.c, Src/Modules/zftp.c: after fdclose(),
