@@ -1,5 +1,8 @@
 2000-05-15  Sven Wischnowsky  <wischnow@zsh.org>
 
+	* 11365: Src/Zle/zle_tricky.c: fix for completion of string with
+ 	single quote
+	
 	* 11364: Completion/Core/_path_files, Src/Zle/compmatch.c: fix for
  	suffix-matching; better in-path completion in _path_files
 	

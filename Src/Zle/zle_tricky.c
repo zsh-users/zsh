@@ -1326,10 +1326,12 @@ get_comp_string(void)
 	autoq = ztrdup(q);
     }
     /* While building the quoted form, we also clean up the command line. */
-    for (p = s, tt = qword, i = wb; *p; p++, tt++, i++)
+    for (p = s, tt = qword, i = wb, j = 0; *p; p++, tt++, i++)
 	if (INULL(*p)) {
 	    if (i < cs)
 		offs--;
+	    if (*p == Snull && isset(RCQUOTES))
+		j = 1-j;
 	    if (p[1] || *p != Bnull) {
 		if (*p == Bnull) {
 		    *tt = '\\';
@@ -1356,7 +1358,8 @@ get_comp_string(void)
 		we--;
 	    }
 	    chuck(p--);
-	}
+	} else if (j && *p == '\'' && i < cs)
+	    offs--;
 
     zsfree(origword);
     origword = ztrdup(s);
