@@ -941,7 +941,7 @@ getarg(char **str, int *inv, Value v, int a2, zlong *w)
 	    r = isset(KSHARRAYS) ? 1 : 0;
 	} else {
 	    r = mathevalarg(s, &s);
-	    if ((!r && !a2) || (isset(KSHARRAYS) && r >= 0))
+	    if (isset(KSHARRAYS) && r >= 0)
 		r++;
 	}
 	if (word && !v->isarr) {
@@ -1185,19 +1185,19 @@ getindex(char **pptr, Value v)
 	} else {
 	    int com;
 
-	    if (start > 0)
-		start--;
 	    if ((com = (*s == ','))) {
 		s++;
 		len = getarg(&s, &inv, v, 1, &dummy);
 		if (len > 0) {
-		    len -= start;
+		    len -= start - 1;
 		    if (len < 0)
 			len = 0;
 		}
 	    } else {
 		len = wlen ? wlen : 1;
 	    }
+	    if (start > 0)
+		start--;
 	    if (*s == ']' || *s == Outbrack) {
 		s++;
 		if (v->isarr && len == 1 && !com &&
