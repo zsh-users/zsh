@@ -1,7 +1,9 @@
 #compdef patch
 
+local comp_p='compadd "$expl[@]" -S0 -r "1-9" - ""'
+
 _arguments -s \
-  '(--strip)-p+:number:(0)' \
+  '(--strip)-p+:number:'"{$comp_p}" \
   '(--fuzz)-F+:lines:' \
   '(--context)-c' \
   '(--ed)-e' \
@@ -30,7 +32,8 @@ _arguments -s \
   ':original file:_files' \
   ':patch file:_files' \
   -- \
-  '*=NUM*:number:(0)' \
+  '*strip=NUM*:number:'"{$comp_p}"  \
+  '*get=NUM*:get files from RCS etc:' \
   '*=LINES*:lines:' \
   '*=PATCHFILE*:patch file:_files' \
   '*=FILE*:file:_files' \
