@@ -1076,11 +1076,6 @@ bin_vared(char *name, char **args, Options ops, int func)
 	zwarnnam(name, "-%s ignored", type == PM_ARRAY ? "a" : "A", 0);
     }
 
-    /* check we have a parameter name */
-    if (!*args) {
-	zwarnnam(name, "missing variable", NULL, 0);
-	return 1;
-    }
     /* handle non-existent parameter */
     s = args[0];
     queue_signals();
@@ -1366,7 +1361,7 @@ zleaftertrap(Hookdef dummy, void *dat)
 
 static struct builtin bintab[] = {
     BUILTIN("bindkey", 0, bin_bindkey, 0, -1, 0, "evaM:ldDANmrsLRp", NULL),
-    BUILTIN("vared",   0, bin_vared,   1,  7, 0, "aAcehM:m:p:r:", NULL),
+    BUILTIN("vared",   0, bin_vared,   1,  1, 0, "aAcehM:m:p:r:", NULL),
     BUILTIN("zle",     0, bin_zle,     0, -1, 0, "aAcCDFgGIKlLmMNRU", NULL),
 };
 

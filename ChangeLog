@@ -1,5 +1,8 @@
 2004-04-27  Peter Stephenson  <pws@csr.com>
 
+	* 19840: Src/Zle/zle_main.c: also, vared now only takes
+	one normal argument.
+
 	* 19837: Src/Zle/zle_main.c: fix 19733 which accidentally
 	removed the -e option to vared.
 
