@@ -1445,7 +1445,7 @@ bin_fc(char *nam, char **argv, Options ops, int func)
 	char *fil;
 
 	retval = 1;
-	fil = gettempname();
+	fil = gettempname(NULL, 1);
 	if (((tempfd = open(fil, O_WRONLY | O_CREAT | O_EXCL | O_NOCTTY, 0600))
 	     == -1) ||
 	    ((out = fdopen(tempfd, "w")) == NULL)) {
@@ -3534,8 +3534,10 @@ bin_print(char *name, char **args, Options ops, int func)
     	if ((fout = open_memstream(&buf, &mcount)) == NULL)
 	    zwarnnam(name, "open_memstream failed", NULL, 0);
 #else
-	char *tmpf = gettempname();
-    	if ((fout = fopen(tmpf, "w+")) == NULL)
+	int tempfd;
+	char *tmpf = gettempname(NULL, 1);
+	if ((tempfd = open(tmpf, O_RDWR|O_CREAT|O_EXCL, 0644)) < 0
+	 || (fout = fdopen(tempfd, "w+")) == NULL)
 	    zwarnnam(name, "can't open temp file: %e", NULL, errno);
 	unlink(tmpf);
 #endif
