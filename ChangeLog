@@ -1,5 +1,8 @@
 2001-03-13  Bart Schaefer  <schaefer@zsh.org>
 
+	* Zvi Har'El: 13619: Completion/User/_rcs: Add the D qualifier
+	when matching file names in the RCS subdirectory.
+
 	* 13613, 13620: Completion/User/_ncftp, Completion/User/_lftp:
 	Unify completion for ncftp and lftp in _ncftp (removed _lftp).
 
