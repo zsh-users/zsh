@@ -30,7 +30,7 @@
 >  %M:  $HOST
 >  %m:  ${HOST%%.*}
 >  %n:  $USERNAME
->  %N:  ZTST_execchunk
+>  %N:  (eval)
 >  %i:  2
 >  a%{...%}b:  ab
 >  

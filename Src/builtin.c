@@ -3420,6 +3420,9 @@ int
 bin_eval(char *nam, char **argv, char *ops, int func)
 {
     Eprog prog;
+    char *oscriptname = scriptname;
+
+    scriptname = "(eval)";
 
     prog = parse_string(zjoin(argv, ' ', 1));
     if (!prog) {
@@ -3431,6 +3434,9 @@ bin_eval(char *nam, char **argv, char *ops, int func)
 	lastval = errflag;
 	errflag = 0;
     }
+
+    scriptname = oscriptname;
+
     return lastval;
 }
 

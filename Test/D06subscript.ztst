@@ -95,7 +95,7 @@
 
   eval 'A[*]=star'
 1:Illegal associative array assignment
-?ZTST_execchunk:1: A: attempt to set slice of associative array
+?(eval):1: A: attempt to set slice of associative array
 
   x='*'
   A[$x]=xstar

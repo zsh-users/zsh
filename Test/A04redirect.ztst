@@ -189,7 +189,7 @@
   unset NULLCMD
   >out1
 1:null redir with NULLCMD unset
-?ZTST_execchunk:2: redirection with no command
+?(eval):2: redirection with no command
 
   echo this should still work >out1
   print "$(<out1)"
@@ -200,7 +200,7 @@
   print cat input >out1
   <out1
 1:READNULLCMD with NULLCMD unset
-?ZTST_execchunk:3: redirection with no command
+?(eval):3: redirection with no command
 
   NULLCMD=:
   >out1

@@ -108,7 +108,7 @@
     :
   fi
 1d:`if ...' (iv)
-?ZTST_execchunk:3: parse error near `fi'
+?(eval):3: parse error near `fi'
 
   for name in word to term; do
     print $name

@@ -74,8 +74,8 @@
 1:${...:?...}, ${...?...}
 >set1v
 >
-?ZTST_execchunk:1: unset1: exiting1
-?ZTST_execchunk:2: null1: exiting2
+?(eval):1: unset1: exiting1
+?(eval):2: null1: exiting2
 
   print ${set1:+word1} ${set1+word2} ${null1:+word3} ${null1+word4}
   print ${unset1:+word5} ${unset1+word6}
@@ -279,7 +279,7 @@
   foo='unmatched "'
   print ${(QX)foo}
 1:${(QX)...}
-?ZTST_execchunk:2: unmatched "
+?(eval):2: unmatched "
 
   array=(characters in an array)
   print ${(c)#array}

@@ -133,7 +133,7 @@
   print [b
 1:BAD_PATTERN option
 >[a
-?ZTST_execchunk:4: bad pattern: [b
+?(eval):4: bad pattern: [b
 
   unsetopt bareglobqual nomatch
   print *(.)
@@ -192,8 +192,8 @@
 1q:CDABLE_VARS option
 >`print -P '%~'`/tmpcd
 >back in options.tmp
-?ZTST_execchunk:cd:4: no such file or directory: cdablevar1
-?ZTST_execchunk:cd:10: no such file or directory: cdablevar2
+?(eval):cd:4: no such file or directory: cdablevar1
+?(eval):cd:10: no such file or directory: cdablevar2
 
 # CHASE_DOTS should go with CHASE_LINKS in B01cd.ztst
 # which saves me having to write it here.
@@ -227,8 +227,8 @@
 >wimpole
 >royston
 >foxton
-?ZTST_execchunk:4: file exists: foo1
-?ZTST_execchunk:6: no such file or directory: bar1
+?(eval):4: file exists: foo1
+?(eval):6: no such file or directory: bar1
 
    setopt cshjunkieloops
    eval 'for f in swaffham bulbeck; print $f; end'
@@ -239,7 +239,7 @@
 >swaffham
 >bulbeck
 ?next one should fail
-?ZTST_execchunk:1: parse error near `end'
+?(eval):1: parse error near `end'
 
   setopt cshjunkiequotes
   print this should cause an error >&2
@@ -253,7 +253,7 @@
 >line three
 >  line four
 ?this should cause an error
-?ZTST_execchunk:1: unmatched '
+?(eval):1: unmatched '
 ?this should not
 
   nullcmd() { print '$NULLCMD run'; }
@@ -279,10 +279,10 @@
 >Running $READNULLCMD
 >$NULLCMD run
 ?This should fail
-?ZTST_execchunk:8: redirection with no command
+?(eval):8: redirection with no command
 ?This should succeed
 ?This should also fail
-?ZTST_execchunk:13: redirection with no command
+?(eval):13: redirection with no command
 
 # nomatch should be overridden by cshnullglob
   setopt nomatch cshnullglob
@@ -297,7 +297,7 @@
 >tmpcd tmpfile1 tmpfile2 blah
 >tmpcd tmpfile1 tmpfile2 nothing* blah
 >nothing* blah
-?hoping for no match: ZTST_execchunk:4: no match
+?hoping for no match: (eval):4: no match
 ?
 
 # The trick is to avoid =cat being expanded in the output while $catpath is.
@@ -625,7 +625,7 @@
   print with nomatch flooble*
 1:NOMATCH option
 >with nonomatch: flooble*
-?ZTST_execchunk:4: no matches found: flooble*
+?(eval):4: no matches found: flooble*
 
 # NULL_GLOB should override NONOMATCH...
   setopt nullglob nomatch
@@ -688,7 +688,7 @@
 >File in upper dir
 >File in lower dir
 >unsetting option...
-?ZTST_execchunk:14: no such file or directory: pathtestdir/findme
+?(eval):14: no such file or directory: pathtestdir/findme
 
   setopt posixbuiltins
   command print foo
@@ -698,7 +698,7 @@
 127:POSIX_BUILTINS option
 >foo
 >unsetting...
-?ZTST_execchunk:5: command not found: print
+?(eval):5: command not found: print
 
 # This option seems to be problematic.  I don't quite know how it works.
 ##   func() {
@@ -707,7 +707,7 @@
 ##   }
 ##   func
 ## 1:PRINT_EXIT_VALUE option
-## ?ZTST_execchunk:2: exit 1
+## ?(eval):2: exit 1
 
   setopt promptbang
   print -P !
@@ -817,13 +817,13 @@
   (setopt restricted; unsetopt restricted)
   :
 0:RESTRICTED option
-?ZTST_execchunk:cd:1: restricted
-?ZTST_execchunk:2: PATH: restricted
-?ZTST_execchunk:3: /bin/ls: restricted
-?ZTST_execchunk:hash:4: restricted: /bin/ls
-?ZTST_execchunk:5: writing redirection not allowed in restricted mode
-?ZTST_execchunk:exec:6: ls: restricted
-?ZTST_execchunk:unsetopt:7: can't change option: restricted
+?(eval):cd:1: restricted
+?(eval):2: PATH: restricted
+?(eval):3: /bin/ls: restricted
+?(eval):hash:4: restricted: /bin/ls
+?(eval):5: writing redirection not allowed in restricted mode
+?(eval):exec:6: ls: restricted
+?(eval):unsetopt:7: can't change option: restricted
 
   fn() {
     print =ls ={ls,}
@@ -909,9 +909,9 @@
 >nonsense
 >nonsense
 >nonsense
-?fn:1: parse error near `print'
-?fn:1: parse error near `print'
-?fn:1: parse error near `print'
+?(eval):1: parse error near `print'
+?(eval):1: parse error near `print'
+?(eval):1: parse error near `print'
 
   fn() { print -l $*; }
   setopt shwordsplit
@@ -958,6 +958,6 @@
 0:XTRACE option
 >message
 >message
-?+ZTST_execchunk:3> fn
+?+(eval):3> fn
 ?+fn:0> print message
-?+ZTST_execchunk:4> unsetopt xtrace
+?+(eval):4> unsetopt xtrace
