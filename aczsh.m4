@@ -683,3 +683,31 @@ AC_DEFUN(zsh_COMPILE_FLAGS,
 	then LIBS="$4"
 	else LIBS="$enable_libs"
 	fi)])
+
+dnl 
+dnl zsh_CHECK_SOCKLEN_T
+dnl
+dnl	check type of third argument of some network functions; currently
+dnl	tested are size_t *, unsigned long *, int *.
+dnl
+AC_DEFUN([zsh_CHECK_SOCKLEN_T],[
+  AC_CACHE_CHECK(
+    [base type of the third argument to accept],
+    [zsh_cv_type_socklen_t],
+    [zsh_cv_type_socklen_t=
+    for zsh_type in int "unsigned long" size_t ; do
+      AC_TRY_COMPILE(
+        [#include <sys/types.h>
+         #include <sys/socket.h>],
+        [extern int accept (int, struct sockaddr *, $zsh_type *);],
+        [zsh_cv_type_socklen_t="$zsh_type"; break],
+        []
+      )
+    done
+    if test -z "$zsh_cv_type_socklen_t"; then
+      zsh_cv_type_socklen_t=int
+    fi]
+  )
+  AC_DEFINE_UNQUOTED([SOCKLEN_T], [$zsh_cv_type_socklen_t])]
+)
+

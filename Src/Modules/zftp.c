@@ -972,7 +972,8 @@ zfopendata(char *name, union tcp_sockaddr *zdsockp, int *is_passivep)
 #else
 	char portcmd[40];
 #endif
-	int ret, len;
+	SOCKLEN_T len;
+	int ret;
 
 	if (!(zfprefs & ZFPF_SNDP)) {
 	    zwarnnam(name, "only sendport mode available for data", NULL, 0);
@@ -1064,7 +1065,8 @@ zfclosedata(void)
 static int
 zfgetdata(char *name, char *rest, char *cmd, int getsize)
 {
-    int len, newfd, is_passive;
+    SOCKLEN_T len;
+    int newfd, is_passive;
     union tcp_sockaddr zdsock;
 
     if (zfopendata(name, &zdsock, &is_passive))
@@ -1698,7 +1700,8 @@ zftp_open(char *name, char **args, int flags)
     struct servent *zservp;
     struct hostent *zhostp = NULL;
     char **addrp, *fname;
-    int err, len, tmout;
+    int err, tmout;
+    SOCKLEN_T  len;
     int herrno, af, hlen;
 
     if (!*args) {

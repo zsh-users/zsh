@@ -1,3 +1,9 @@
+2001-06-19  Andrej Borsenkow  <bor@zsh.org>
+
+	* 14973: acconfig.h, aczsh.m4, zshconfig.ac, Src/Modules/zftp.c:
+	fix for reported problems on AIX 4.x. Still no feedback if it
+	finally works (or even compiles)
+
 2001-06-18  Sven Wischnowsky  <wischnow@zsh.org>
 
 	* 14962: Completion/Unix/Type/_path_files: make special-dirs

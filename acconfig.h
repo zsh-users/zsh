@@ -320,3 +320,6 @@
 
 /* Define if term.h chokes without curses.h */
 #undef TERM_H_NEEDS_CURSES_H
+
+/* Define to the base type of the third argument of accept */
+#undef SOCKLEN_T
