@@ -194,7 +194,7 @@ zsh_getipnodebyname(char const *name, int af, int flags, int *errorp)
 
 /**/
 mod_export void
-zfreehostent(struct hostent *ptr)
+freehostent(struct hostent *ptr)
 {
 }
 
