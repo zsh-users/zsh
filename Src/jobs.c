@@ -1504,20 +1504,29 @@ bin_kill(char *nam, char **argv, char *ops, int func)
     	    if ((*argv)[1] == 'n' && (*argv)[2] == '\0') {
 	    	char *endp;
 
-	    	sig = zstrtol(*++argv, &endp, 10);
+	    	if (!*++argv) {
+		    zwarnnam(nam, "-n: argument expected", NULL, 0);
+		    return 1;
+		}
+		sig = zstrtol(*argv, &endp, 10);
 		if (*endp) {
 		    zwarnnam(nam, "invalid signal number", signame, 0);
 		    return 1;
 		}
 	    } else {
-		if ((*argv)[1] == 's' && (*argv)[2] == '\0')
-		    signame = *++argv;
-		else
+		if (!((*argv)[1] == 's' && (*argv)[2] == '\0'))
 		    signame = *argv + 1;
+		else if (!(*++argv)) {
+		    zwarnnam(nam, "-s: argument expected", NULL, 0);
+		    return 1;
+		} else
+		    signame = *argv;
+		makeuppercase(&signame);
+		if (!strncmp(signame, "SIG", 3)) signame+=3;
 
 		/* check for signal matching specified name */
 		for (sig = 1; sig <= SIGCOUNT; sig++)
-		    if (!cstrpcmp(sigs + sig, &signame))
+		    if (!strcmp(*(sigs + sig), signame))
 			break;
 		if (*signame == '0' && !signame[1])
 		    sig = 0;
@@ -1529,6 +1538,11 @@ bin_kill(char *nam, char **argv, char *ops, int func)
 	    }
 	}
 	argv++;
+    }
+
+    if (!*argv) {
+    	zwarnnam(nam, "not enough arguments", NULL, 0);
+	return 1;
     }
 
     queue_signals();

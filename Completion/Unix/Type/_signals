@@ -21,9 +21,10 @@ fi
 
 if [[ -z "$minus" ]] ||
    ! zstyle -T ":completion:${curcontext}:signals" prefix-needed ||
-   [[ "$PREFIX" = -* ]]; then
+   [[ -prefix -* ]]; then
   local disp tmp
 
+  [[ -prefix ${minus}SIG* ]] && minus+=SIG
   if zstyle -t ":completion:${curcontext}:signals" prefix-hidden; then
     tmp=( "${(@)signals[1,last]}" )
     disp=(-d tmp)
