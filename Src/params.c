@@ -108,13 +108,12 @@ mod_export int termflags;
  
 /* Nodes for special parameters for parameter hash table */
 
-static
 #ifdef HAVE_UNION_INIT
 # define BR(X) {X}
-struct param
+typedef struct param initparam;
 #else
 # define BR(X) X
-struct iparam {
+typedef struct iparam {
     struct hashnode *next;
     char *nam;			/* hash data                             */
     int flags;			/* PM_* flags (defined in zsh.h)         */
@@ -127,9 +126,10 @@ struct iparam {
     char *ename;		/* name of corresponding environment var */
     Param old;			/* old struct for use with local         */
     int level;			/* if (old != NULL), level of localness  */
-}
+} initparam;
 #endif
-special_params[] ={
+
+static initparam special_params[] ={
 #define SFN(X) BR(((void (*)_((Param, char *)))(X)))
 #define GFN(X) BR(((char *(*)_((Param)))(X)))
 #define IPDEF1(A,B,C,D) {NULL,A,PM_INTEGER|PM_SPECIAL|D,BR(NULL),SFN(C),GFN(B),stdunsetfn,10,NULL,NULL,NULL,0}
@@ -248,6 +248,15 @@ IPDEF10("pipestatus", pipestatgetfn, pipestatsetfn),
 
 {NULL, NULL}
 };
+
+/*
+ * Special way of referring to the positional parameters.  Unlike $*
+ * and $@, this is not readonly.  This parameter is not directly
+ * visible in user space.
+ */
+initparam argvparam_pm = IPDEF9F("", &pparams, NULL, \
+				 PM_ARRAY|PM_SPECIAL|PM_DONTIMPORT);
+
 #undef BR
 
 #define IS_UNSET_VALUE(V) \
@@ -502,7 +511,7 @@ createparamtable(void)
 	while ((++ip)->nam)
 	    paramtab->addnode(paramtab, ztrdup(ip->nam), ip);
 
-    argvparam = (Param) paramtab->getnode(paramtab, "*");
+    argvparam = (Param) &argvparam_pm;
 
     noerrs = 2;
 

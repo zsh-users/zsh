@@ -1,9 +1,18 @@
+2001-06-15  Peter Stephenson  <pws@csr.com>
+
+	* 14929: Src/params.c: after 14915, assigning to individual
+	positional parameters failed.
+
 2001-06-15  Andrej Borsenkow  <bor@zsh.org>
 
 	* 14931: Src/Modules/tcp.c, Src/Modules/zftp.c: fix length
 	calculation in tcp_connect and zftp_open
 
 2001-06-14  Peter Stephenson  <pws@csr.com>
+
+	* 14921: Functions/Zftp/zfinit, Completion/Zsh/Command/_zftp:
+	Load tcp module for zftp; autoload zfget_match and zfcd_match
+	for _zftp.
 
 	* 14915: Doc/Zsh/builtins.yo, Doc/Zsh/Params.yo, Src/builtin.c,
 	Src/params.c: special parameters can't have readonly turned off;
