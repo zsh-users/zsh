@@ -3,5 +3,5 @@ DISTFILES_SRC='
 _apt	_apt-show-versions
 _bts	_bug
 _debchange _dpkg       _dpkg_source  _dput  _dupload
-_update-alternatives   _make-kpkg
+_update-alternatives   _make-kpkg    _debfoster
 '

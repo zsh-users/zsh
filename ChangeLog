@@ -1,3 +1,8 @@
+2002-04-30  Clint Adams  <clint@zsh.org>
+
+	* 17057: Completion/Debian/Command/.distfiles,
+	Completion/Debian/Command/_debfoster: completion for debfoster.
+
 2002-04-29  Clint Adams  <clint@zsh.org>
 
 	* 17055: zshconfig.ac: shared object linkage on the Hurd.

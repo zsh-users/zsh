@@ -1,0 +1,93 @@
+#compdef debfoster
+
+_arguments \
+'(--verbose)-v[Be a loudmouth]' \
+'(-v)--verbose[Be a loudmouth]' \
+'(--version)-V[Show version and copyright information]' \
+'(-V)--version[Show version and copyright information]' \
+'(--help)-h[Show this message]' \
+'(-h)--help[Show this message]' \
+'(--quiet)-q[Silently build keeper file]' \
+'(-q)--quiet[Silently build keeper file]' \
+'(--force)-f[Force system to conform to keeper file]' \
+'(-f)--force[Force system to conform to keeper file]' \
+'(--mark-only)-m[Do not install or delete packages]' \
+'(-m)--mark-only[Do not install or delete packages]' \
+'(--upgrade)-u[Try to upgrade dependencies]' \
+'(-u)--upgrade[Try to upgrade dependencies]' \
+'(--config FILE)-c[Specify configuration file]' \
+'(-c)--config FILE[Specify configuration file]' \
+'(--keeperfile FILE)-k[Specify keeper file]' \
+'(-k)--keeperfile FILE[Specify keeper file]' \
+'(--no-keeperfile)-n[Do not read keeper file]' \
+'(-n)--no-keeperfile[Do not read keeper file]' \
+'(--ignore-default-rules)-i[Ignore default rules]' \
+'(-i)--ignore-default-rules[Ignore default rules]' \
+'(--show-keepers)-a[Show packages on keeper list]' \
+'(-a)--show-keepers[Show packages on keeper list]' \
+'(--show-orphans)-s[Show orphaned packages]' \
+'(-s)--show-orphans[Show orphaned packages]' \
+'(--show-depends)-d[Show all depends of PACKAGE]:package:_deb_packages avail'   \
+'(-d)--show-depends[Show all depends of PACKAGE]:package:_deb_packages avail'   \
+'(--show-dependents)-e[Show dependents of PACKAGE]:package:_deb_packages avail' \
+'(-e)--show-dependents[Show dependents of PACKAGE]:package:_deb_packages avail' \
+'(--show-providers)-p[Show packages providing PACKAGE]:package:_deb_packages avail' \
+'(-p)--show-providers[Show packages providing PACKAGE]:package:_deb_packages avail' \
+'(--show-related)-r[Show packages brought in by PACKAGE]:package:_deb_packages avail' \
+'(-r)--show-related[Show packages brought in by PACKAGE]:package:_deb_packages avail' \
+'(--use-tasks)-t[Make tasks visible as packages]' \
+'(-t)--use-tasks[Make tasks visible as packages]' \
+'*-'{-option,o}'[Override any configuration option]:option string:->option' \
+'*:package markings: _alternative "installed:installed packages:_deb_packages -S- installed" "uninstalled:uninstalled packages:_deb_packages uninstalled"' \
+&& return 0
+
+ret=1
+
+while [[ -n "$state" ]]; do
+      lstate="$state"
+      state=''
+
+      case "$lstate" in
+      option)
+        if compset -P '*='; then
+          case "$IPREFIX" in
+          *(#i)(install|remove|info)cmd*)
+            _wanted values expl 'command string' _command && ret=0
+            ;;
+	  *(#i)(keeperfile|dpkg(status|available))*)
+	    _wanted values expl 'metadata file' _files && ret=0
+	    ;;
+	  *(#i)maxpriority*)
+	    _wanted values expl 'package priority' \
+	      compadd required important standard optional extra ANY && ret=0
+	    ;;
+          *(#i)(use(hold|essential|predepends|recommends|suggests|tasks)|negativekeepers|verbose|force|quiet)*)
+            _wanted values expl 'truth value' \
+              compadd yes no && ret=0
+            ;;
+	  *(#i)(no|)keepsections*)
+            _wanted values expl 'section' \
+	      compadd x11 web utils text tex sound shells science \
+	       otherosfs oldlibs news net misc math mail libs \
+	       interpreters hamradio graphics games electronics \
+	       editors doc devel comm base admin && ret=0
+	    ;;
+	  *(#i)guessdepends*)
+            _wanted values expl 'name extension' \
+	      compadd doc dev && ret=0
+	    ;;
+	  esac
+	else
+          _wanted values expl 'configure file option' \
+              compadd -M 'm:{a-z}={A-Z}' -S '=' - \
+                  InstallCmd RemoveCmd InfoCmd KeeperFile DpkgStatus \
+                  DpkgAvailable MaxPriority UseHold UseEssential \
+                  UsePreDepends UseRecommends UseSuggests UseTasks \
+                  KeepSections NokeepSections GuessDepends NegativeKeepers \
+		  Verbose Force Quiet && ret=0
+        fi
+        ;;
+      esac
+done
+
+return ret
