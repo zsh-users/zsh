@@ -380,37 +380,53 @@ execwhile(Estate state, int do_exec)
     cmdpush(isuntil ? CS_UNTIL : CS_WHILE);
     loops++;
     loop = state->pc;
-    for (;;) {
-	state->pc = loop;
-	noerrexit = 1;
-	execlist(state, 1, 0);
-	noerrexit = olderrexit;
-	if (!((lastval == 0) ^ isuntil)) {
-	    if (breaks)
-		breaks--;
-	    lastval = oldval;
-	    break;
-	}
-	if (retflag) {
-	    lastval = oldval;
-	    break;
-	}
-	execlist(state, 1, 0);
-	if (breaks) {
-	    breaks--;
-	    if (breaks || !contflag)
-		break;
-	    contflag = 0;
-	}
-	if (errflag) {
-	    lastval = 1;
-	    break;
-	}
-	if (retflag)
-	    break;
-	freeheap();
-	oldval = lastval;
-    }
+
+    if (loop[0] == WC_END && loop[1] == WC_END) {
+
+        /* This is an empty loop.  Make sure the signal handler sets the
+        * flags and then just wait for someone hitting ^C. */
+
+        int old_simple_pline = simple_pline;
+
+        simple_pline = 1;
+
+        while (!breaks)
+            ;
+        breaks--;
+
+        simple_pline = old_simple_pline;
+    } else
+        for (;;) {
+            state->pc = loop;
+            noerrexit = 1;
+            execlist(state, 1, 0);
+            noerrexit = olderrexit;
+            if (!((lastval == 0) ^ isuntil)) {
+                if (breaks)
+                    breaks--;
+                lastval = oldval;
+                break;
+            }
+            if (retflag) {
+                lastval = oldval;
+                break;
+            }
+            execlist(state, 1, 0);
+            if (breaks) {
+                breaks--;
+                if (breaks || !contflag)
+                    break;
+                contflag = 0;
+            }
+            if (errflag) {
+                lastval = 1;
+                break;
+            }
+            if (retflag)
+                break;
+            freeheap();
+            oldval = lastval;
+        }
     cmdpop();
     popheap();
     loops--;

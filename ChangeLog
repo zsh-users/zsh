@@ -1,5 +1,8 @@
 2002-02-25  Sven Wischnowsky  <wischnow@zsh.org>
 
+	* 16711: Src/loop.c: allow nterruption of empty while-loops
+	with ^C
+
 	* 16710: Completion/Base/Core/_message, Test/Y03arguments.ztst:
 	make _message inhibit insertion of matches unless there are
 	faked ones
