@@ -104,7 +104,7 @@ BEGIN {
 	gsub(/@!/, ",", dcltor)
 
 	# If this is a module boot/cleanup function, conditionally rename it.
-	if(" " dtype " " ~ / int / && dcltor ~ / *@\+(boot|cleanup)_[_0-9A-Za-z]+@- *_\(\( *Module +[_0-9A-Za-z]+ *\)\) */) {
+	if(" " dtype " " ~ / int / && dcltor ~ / *@\+(boot|cleanup|setup|finish)_[_0-9A-Za-z]+@- *_\(\( *Module +[_0-9A-Za-z]+ *\)\) */) {
 	    modtype = dnam
 	    sub(/_.*$/, "", modtype)
 	    output = output "# if defined(DYNAMIC_NAME_CLASH_OK) && defined(MODULE)\n"

@@ -62,9 +62,9 @@
 /* it's a TELNET based protocol, but don't think I like doing this */
 #include <arpa/telnet.h>
 
-/* bet there are machines which have neither INADDR_NONE nor in_addr_t. */
+/* pinch the definition from <netinet/in.h> for deficient headers */
 #ifndef INADDR_NONE
-#define INADDR_NONE (in_addr_t)-1
+#define INADDR_NONE 0xffffffff
 #endif
 
 /*
@@ -1354,7 +1354,11 @@ zfsenddata(char *name, int recv, int progress, long startat)
 	 * We do this here in case we needed to wait for a RETR
 	 * command to tell us how many bytes are coming.
 	 */
+	int osc = sfcontext;
+
+	sfcontext = SFC_HOOK;
 	doshfunc("zftp_progress", l, NULL, 0, 1);
+	sfcontext = osc;
 	/* Now add in the bit of the file we've got/sent already */
 	sofar = last_sofar = startat;
     }
@@ -1482,8 +1486,12 @@ zfsenddata(char *name, int recv, int progress, long startat)
 	    break;
 	if (!ret && sofar != last_sofar && progress &&
 	    (l = getshfunc("zftp_progress")) != &dummy_list) {
+	    int osc = sfcontext;
+
 	    zfsetparam("ZFTP_COUNT", &sofar, ZFPM_READONLY|ZFPM_INTEGER);
+	    sfcontext = SFC_HOOK;
 	    doshfunc("zftp_progress", l, NULL, 0, 1);
+	    sfcontext = osc;
 	    last_sofar = sofar;
 	}
     }
@@ -1650,7 +1658,7 @@ zftp_open(char *name, char **args, int flags)
 	zfsetparam("ZFTP_HOST", ztrdup(zhostp->h_name), ZFPM_READONLY);
     }
 
-    zsock.sin_port = ntohs(zservp->s_port);
+    zsock.sin_port = zservp->s_port;
     zcfd = zfmovefd(socket(zsock.sin_family, SOCK_STREAM, 0));
     if (zcfd < 0) {
 	zwarnnam(name, "socket failed: %e", NULL, errno);
@@ -2102,9 +2110,13 @@ zfgetcwd(void)
      * front end.  By putting it here, and in close when ZFTP_PWD is unset,
      * we at least cover the bases.
      */
-    if ((l = getshfunc("zftp_chpwd")) != &dummy_list)
-	doshfunc("zftp_chpwd", l, NULL, 0, 1);
+    if ((l = getshfunc("zftp_chpwd")) != &dummy_list) {
+	int osc = sfcontext;
 
+	sfcontext = SFC_HOOK;
+	doshfunc("zftp_chpwd", l, NULL, 0, 1);
+	sfcontext = osc;
+    }
     return 0;
 }
 
@@ -2303,9 +2315,13 @@ zftp_getput(char *name, char **args, int flags)
 	zsfree(ln);
 	if (progress && (l = getshfunc("zftp_progress")) != &dummy_list) {
 	    /* progress to finish: ZFTP_TRANSFER set to GF or PF */
+	    int osc = sfcontext;
+
 	    zfsetparam("ZFTP_TRANSFER", ztrdup(recv ? "GF" : "PF"),
 		       ZFPM_READONLY);
+	    sfcontext = SFC_HOOK;
 	    doshfunc("zftp_progress", l, NULL, 0, 1);
+	    sfcontext = osc;
 	}
 	if (rest) {
 	    zsfree(rest);
@@ -2428,9 +2444,13 @@ zftp_close(char *name, char **args, int flags)
 	zfunsetparam(*aptr);
 
     /* Now ZFTP_PWD is unset.  It's up to zftp_chpwd to notice. */
-    if ((l = getshfunc("zftp_chpwd")) != &dummy_list)
-	doshfunc("zftp_chpwd", l, NULL, 0, 1);
+    if ((l = getshfunc("zftp_chpwd")) != &dummy_list) {
+	int osc = sfcontext;
 
+	sfcontext = SFC_HOOK;
+	doshfunc("zftp_chpwd", l, NULL, 0, 1);
+	sfcontext = osc;
+    }
     /* tidy up status variables, because mess is bad */
     zfclosing = zfdrrrring = 0;
 
@@ -2558,6 +2578,13 @@ bin_zftp(char *name, char **args, char *ops, int func)
 
 /**/
 int
+setup_zftp(Module m)
+{
+    return 0;
+}
+
+/**/
+int
 boot_zftp(Module m)
 {
     int ret;
@@ -2590,6 +2617,13 @@ cleanup_zftp(Module m)
     if (zfuserparams)
 	freearray(zfuserparams);
     deletebuiltins(m->nam, bintab, sizeof(bintab)/sizeof(*bintab));
+    return 0;
+}
+
+/**/
+int
+finish_zftp(Module m)
+{
     return 0;
 }
 

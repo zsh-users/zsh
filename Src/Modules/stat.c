@@ -571,6 +571,13 @@ static struct builtin bintab[] = {
 
 /**/
 int
+setup_stat(Module m)
+{
+    return 0;
+}
+
+/**/
+int
 boot_stat(Module m)
 {
     return !addbuiltins(m->nam, bintab, sizeof(bintab)/sizeof(*bintab));
@@ -583,6 +590,13 @@ int
 cleanup_stat(Module m)
 {
     deletebuiltins(m->nam, bintab, sizeof(bintab)/sizeof(*bintab));
+    return 0;
+}
+
+/**/
+int
+finish_stat(Module m)
+{
     return 0;
 }
 

@@ -36,6 +36,13 @@
 
 /**/
 int
+setup_zsh(Module m)
+{
+    return 0;
+}
+
+/**/
+int
 boot_zsh(Module m)
 {
     return 0;
@@ -114,7 +121,6 @@ addwrapper(Module m, FuncWrap w)
     w->next = NULL;
     w->flags |= WRAPF_ADDED;
     w->module = m;
-    w->count = 0;
 
     return 0;
 }
@@ -256,24 +262,58 @@ load_and_bind(const char *fn)
 #ifdef HAVE_DLFCN_H
 # include <dlfcn.h>
 #else
-# include <sys/types.h>
-# include <nlist.h>
-# include <link.h>
+# ifdef HAVE_DL_H
+#  include <dl.h>
+#  define RTLD_LAZY BIND_DEFERRED
+#  define RTLD_GLOBAL DYNAMIC_PATH
+# else
+#  include <sys/types.h>
+#  include <nlist.h>
+#  include <link.h>
+# endif
 #endif
-#ifndef HAVE_DLCLOSE
-# define dlclose(X) ((X), 0)
+
+#ifdef HPUXDYNAMIC
+# define dlopen(file,mode) (void *)shl_load((file), (mode), (long) 0)
+# define dlclose(handle) shl_unload((shl_t)(handle))
+
+/**/
+static
+void *
+hpux_dlsym(void *handle, char *name)
+{
+    void *sym_addr;
+    if (!shl_findsym((shl_t *)&handle, name, TYPE_UNDEFINED, &sym_addr))
+	return sym_addr;
+    return NULL;
+}
+
+# define dlsym(handle,name) hpux_dlsym(handle,name)
+# define dlerror() 0
+#else
+# ifndef HAVE_DLCLOSE
+#  define dlclose(X) ((X), 0)
+# endif
 #endif
 
 #ifdef DLSYM_NEEDS_UNDERSCORE
+# define STR_SETUP     "_setup_"
+# define STR_SETUP_S   "_setup_%s"
 # define STR_BOOT      "_boot_"
 # define STR_BOOT_S    "_boot_%s"
 # define STR_CLEANUP   "_cleanup_"
 # define STR_CLEANUP_S "_cleanup_%s"
+# define STR_FINISH    "_finish_"
+# define STR_FINISH_S  "_finish_%s"
 #else /* !DLSYM_NEEDS_UNDERSCORE */
+# define STR_SETUP     "setup_"
+# define STR_SETUP_S   "setup_%s"
 # define STR_BOOT      "boot_"
 # define STR_BOOT_S    "boot_%s"
 # define STR_CLEANUP   "cleanup_"
 # define STR_CLEANUP_S "cleanup_%s"
+# define STR_FINISH    "finish_"
+# define STR_FINISH_S  "finish_%s"
 #endif /* !DLSYM_NEEDS_UNDERSCORE */
 
 #endif /* !AIXDYNAMIC */
@@ -357,6 +397,13 @@ find_module(const char *name)
 
 /**/
 static int
+setup_module(Module m)
+{
+    return ((int (*)_((int,Module))) m->handle)(0, m);
+}
+
+/**/
+static int
 init_module(Module m)
 {
     return ((int (*)_((int,Module))) m->handle)(1, m);
@@ -366,14 +413,20 @@ init_module(Module m)
 static int
 cleanup_module(Module m)
 {
-    return ((int (*)_((int,Module))) m->handle)(0, m);
+    return ((int (*)_((int,Module))) m->handle)(2, m);
+}
+
+/**/
+static int
+finish_module(Module m)
+{
+    return ((int (*)_((int,Module))) m->handle)(3, m);
 }
 
 #else
 
-/**/
-static int
-init_module(Module m)
+static Module_func
+module_func(Module m, char *name, char *name_s)
 {
     char *s, *t;
 #ifndef DYNAMIC_NAME_CLASH_OK
@@ -389,13 +442,34 @@ init_module(Module m)
     if ((t = strrchr(s, '.')))
 	*t = '\0';
 #ifdef DYNAMIC_NAME_CLASH_OK
-    fn = (Module_func) dlsym(m->handle, STR_BOOT);
+    fn = (Module_func) dlsym(m->handle, name);
 #else /* !DYNAMIC_NAME_CLASH_OK */
     if (strlen(s) + 6 > PATH_MAX)
-	return 1;
-    sprintf(buf, STR_BOOT_S, s);
+	return NULL;
+    sprintf(buf, name_s, s);
     fn = (Module_func) dlsym(m->handle, buf);
 #endif /* !DYNAMIC_NAME_CLASH_OK */
+    return fn;
+}
+
+/**/
+static int
+setup_module(Module m)
+{
+    Module_func fn = module_func(m, STR_SETUP, STR_SETUP_S);
+
+    if (fn)
+	return fn(m);
+    zwarnnam(m->nam, "no setup function", NULL, 0);
+    return 1;
+}
+
+/**/
+static int
+init_module(Module m)
+{
+    Module_func fn = module_func(m, STR_BOOT, STR_BOOT_S);
+
     if(fn)
 	return fn(m);
     zwarnnam(m->nam, "no boot function", NULL, 0);
@@ -406,31 +480,32 @@ init_module(Module m)
 static int
 cleanup_module(Module m)
 {
-    char *s, *t;
-#ifndef DYNAMIC_NAME_CLASH_OK
-    char buf[PATH_MAX + 1];
-#endif
-    Module_func fn;
+    Module_func fn = module_func(m, STR_CLEANUP, STR_CLEANUP_S);
 
-    s = strrchr(m->nam, '/');
-    if (s)
-	s = dupstring(++s);
-    else
-	s = m->nam;
-    if ((t = strrchr(s, '.')))
-	*t = '\0';
-#ifdef DYNAMIC_NAME_CLASH_OK
-    fn = (Module_func) dlsym(m->handle, STR_CLEANUP);
-#else /* !DYNAMIC_NAME_CLASH_OK */
-    if (strlen(s) + 9 > PATH_MAX)
-	return 1;
-    sprintf(buf, STR_CLEANUP_S, s);
-    fn = (Module_func) dlsym(m->handle, buf);
-#endif /* !DYNAMIC_NAME_CLASH_OK */
     if(fn)
 	return fn(m);
     zwarnnam(m->nam, "no cleanup function", NULL, 0);
     return 1;
+}
+
+/* Note that this function does more than just calling finish_foo(), *
+ * it really unloads the module. */
+
+/**/
+static int
+finish_module(Module m)
+{
+    Module_func fn = module_func(m, STR_FINISH, STR_FINISH_S);
+    int r;
+
+    if (fn)
+	r = fn(m);
+    else {
+	zwarnnam(m->nam, "no finish function", NULL, 0);
+	r = 1;
+    }
+    dlclose(m->handle);
+    return r;
 }
 
 #endif /* !AIXDYNAMIC */
@@ -449,8 +524,8 @@ load_module(char const *name)
 	m = zcalloc(sizeof(*m));
 	m->nam = ztrdup(name);
 	m->handle = handle;
-	if (init_module(m)) {
-	    dlclose(handle);
+	if (setup_module(m) || init_module(m)) {
+	    finish_module(m);
 	    zsfree(m->nam);
 	    zfree(m, sizeof(*m));
 	    return NULL;
@@ -459,25 +534,35 @@ load_module(char const *name)
 	    addlinknode(modules, m);
 	} LASTALLOC;
 	return m;
-    }
+    } 
     m = (Module) getdata(node);
-    if (m->handle)
+    if (m->flags & MOD_UNLOAD)
+	m->flags &= ~MOD_UNLOAD;
+    else if (m->handle)
 	return m;
     if (m->flags & MOD_BUSY) {
 	zerr("circular dependencies for module %s", name, 0);
 	return NULL;
     }
     m->flags |= MOD_BUSY;
-    for (n = firstnode(m->deps); n; incnode(n))
-	if (!load_module((char *) getdata(n))) {
-	    m->flags &= ~MOD_BUSY;
+    if (m->deps)
+	for (n = firstnode(m->deps); n; incnode(n))
+	    if (!load_module((char *) getdata(n))) {
+		m->flags &= ~MOD_BUSY;
+		return NULL;
+	    }
+    m->flags &= ~MOD_BUSY;
+    if (!m->handle) {
+	if (!(m->handle = do_load_module(name)))
+	    return NULL;
+	if (setup_module(m)) {
+	    finish_module(m->handle);
+	    m->handle = NULL;
 	    return NULL;
 	}
-    m->flags &= ~MOD_BUSY;
-    if (!(m->handle = do_load_module(name)))
-	return NULL;
+    }
     if (init_module(m)) {
-	dlclose(m->handle);
+	finish_module(m->handle);
 	m->handle = NULL;
 	return NULL;
     }
@@ -756,12 +841,53 @@ bin_zmodload_cond(char *nam, char **args, char *ops)
 int
 unload_module(Module m, LinkNode node)
 {
-    if (m->handle && cleanup_module(m))
+    if (m->handle && !(m->flags & MOD_UNLOAD) && cleanup_module(m))
 	return 1;
     else {
+	int del = (m->flags & MOD_UNLOAD);
+
+	if (m->wrapper) {
+	    m->flags |= MOD_UNLOAD;
+	    return 0;
+	}
+	m->flags &= ~MOD_UNLOAD;
 	if (m->handle)
-	    dlclose(m->handle);
+	    finish_module(m);
 	m->handle = NULL;
+	if (del && m->deps) {
+	    /* The module was unloaded delayed, unload all modules *
+	     * on which it depended. */
+	    LinkNode n;
+
+	    for (n = firstnode(m->deps); n; incnode(n)) {
+		LinkNode dn = find_module((char *) getdata(n));
+		Module dm;
+
+		if (dn && (dm = (Module) getdata(dn)) &&
+		    (dm->flags & MOD_UNLOAD)) {
+		    /* See if this is the only module depending on it. */
+
+		    LinkNode an;
+		    Module am;
+		    int du = 1;
+
+		    for (an = firstnode(modules); du && an; incnode(an)) {
+			am = (Module) getdata(an);
+			if (am != m && am->handle && am->deps) {
+			    LinkNode sn;
+
+			    for (sn = firstnode(am->deps); du && sn;
+				 incnode(sn)) {
+				if (!strcmp((char *) getdata(sn), dm->nam))
+				    du = 0;
+			    }
+			}
+		    }
+		    if (du)
+			unload_module(dm, NULL);
+		}
+	    }
+	}
 	if(!m->deps) {
 	    if (!node) {
 		for (node = firstnode(modules); node; incnode(node))
@@ -791,24 +917,29 @@ bin_zmodload_load(char *nam, char **args, char *ops)
 	    node = find_module(*args);
 	    if (node) {
 		LinkNode mn, dn;
+		int del = 0;
 
 		for (mn = firstnode(modules); mn; incnode(mn)) {
 		    m = (Module) getdata(mn);
 		    if (m->deps && m->handle)
 			for (dn = firstnode(m->deps); dn; incnode(dn))
 			    if (!strcmp((char *) getdata(dn), *args)) {
-				zwarnnam(nam, "module %s is in use by another module and cannot be unloaded", *args, 0);
-				ret = 1;
-				goto cont;
+				if (m->flags & MOD_UNLOAD)
+				    del = 1;
+				else {
+				    zwarnnam(nam, "module %s is in use by another module and cannot be unloaded", *args, 0);
+				    ret = 1;
+				    goto cont;
+				}
 			    }
 		}
 		m = (Module) getdata(node);
-		if (!(m->flags & MOD_WRAPPER)) {
-		    if (unload_module(m, node))
-			ret = 1;
-		}
-		else
-		    m->flags |= MOD_UNLOAD;
+		if (del)
+		    m->wrapper++;
+		if (unload_module(m, node))
+		    ret = 1;
+		if (del)
+		    m->wrapper--;
 	    } else if (!ops['i']) {
 		zwarnnam(nam, "no such module %s", *args, 0);
 		ret = 1;
@@ -820,7 +951,7 @@ bin_zmodload_load(char *nam, char **args, char *ops)
 	/* list modules */
 	for (node = firstnode(modules); node; incnode(node)) {
 	    m = (Module) getdata(node);
-	    if (m->handle) {
+	    if (m->handle && !(m->flags & MOD_UNLOAD)) {
 		if(ops['L']) {
 		    printf("zmodload ");
 		    if(m->nam[0] == '-')
@@ -835,8 +966,11 @@ bin_zmodload_load(char *nam, char **args, char *ops)
     } else {
 	/* load modules */
 	for (; *args; args++) {
+	    Module m;
+
 	    node = find_module(*args);
-	    if (node && ((Module) getdata(node))->handle) {
+	    if (node && (m = ((Module) getdata(node)))->handle &&
+		!(m->flags & MOD_UNLOAD)) {
 		if (!ops['i']) {
 		    zwarnnam(nam, "module %s already loaded.", *args, 0);
 		    ret = 1;
@@ -894,8 +1028,6 @@ getconddef(int inf, char *name, int autol)
     return p;
 }
 
-#ifdef DYNAMIC
-
 /* This adds the given condition definition. The return value is zero on *
  * success and 1 on failure. If there is a matching definition for an    *
  * autoloaded condition, it is removed. */
@@ -909,10 +1041,11 @@ addconddef(Conddef c)
     if (p) {
 	if (!p->module || (p->flags & CONDF_ADDED))
 	    return 1;
-
+#ifdef DYNAMIC
 	/* There is an autoload definition. */
 
 	deleteconddef(p);
+#endif
     }
     c->next = condtab;
     condtab = c;
@@ -941,6 +1074,8 @@ addconddefs(char const *nam, Conddef c, int size)
     }
     return hadf ? hads : 1;
 }
+
+#ifdef DYNAMIC
 
 /* This adds a definition for autoloading a module for a condition. */
 
@@ -1014,4 +1149,4 @@ deleteconddefs(char const *nam, Conddef c, int size)
     return hadf ? hads : 1;
 }
 
-#endif /* DYNAMIC */
+#endif

@@ -703,6 +703,8 @@ dotrapargs(int sig, int *sigtr, void *sigfn)
     execsave();
     breaks = 0;
     if (*sigtr & ZSIG_FUNC) {
+	int osc = sfcontext;
+
 	PERMALLOC {
 	    args = newlinklist();
 	    name = (char *) zalloc(5 + strlen(sigs[sig]));
@@ -712,7 +714,9 @@ dotrapargs(int sig, int *sigtr, void *sigfn)
 	    addlinknode(args, num);
 	} LASTALLOC;
 	trapreturn = -1;
+	sfcontext = SFC_SIGNAL;
 	doshfunc(name, sigfn, args, 0, 1);
+	sfcontext = osc;
 	freelinklist(args, (FreeFunc) NULL);
 	zsfree(name);
     } else HEAPALLOC {

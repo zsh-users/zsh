@@ -992,9 +992,13 @@ cd_new_pwd(int func, LinkNode dir, int chaselinks)
 
     /* execute the chpwd function */
     if ((l = getshfunc("chpwd")) != &dummy_list) {
+	int osc = sfcontext;
+
 	fflush(stdout);
 	fflush(stderr);
+	sfcontext = SFC_HOOK;
 	doshfunc("chpwd", l, NULL, 0, 1);
+	sfcontext = osc;
     }
 
     dirstacksize = getiparam("DIRSTACKSIZE");
@@ -1469,7 +1473,7 @@ bin_typeset(char *name, char **argv, char *ops, int func)
     Param pm;
     Asgment asg;
     Comp com;
-    char *optstr = "aiLRZlurtxU----A";
+    char *optstr = "aiALRZlurtxU";
     int on = 0, off = 0, roff, bit = PM_ARRAY;
     int initon, initoff, of, i;
     int returnval = 0, printflags = 0;

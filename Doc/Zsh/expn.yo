@@ -5,15 +5,15 @@ sect(Description)
 The types of expansions performed are
 
 startlist()
-list(em(history expansion))
-list(em(alias expansion))
-list(em(process substitution))
-list(em(parameter expansion))
-list(em(command substitution))
-list(em(arithmetic expansion))
-list(em(brace expansion))
-list(em(filename expansion))
-list(em(filename generation))
+list(em(History Expansion))
+list(em(Alias Expansion))
+list(em(Process Substitution))
+list(em(Parameter Expansion))
+list(em(Command Substitution))
+list(em(Arithmetic Expansion))
+list(em(Brace Expansion))
+list(em(Filename Expansion))
+list(em(Filename Generation))
 endlist()
 
 Expansion is done in the above specified order in five steps.  The
@@ -29,8 +29,8 @@ em(filename expansion) followed by em(filename generation).
 
 If the tt(SH_FILE_EXPANSION) option is set, the order of expansion is modified
 for compatibility with bf(sh) and bf(ksh).  em(Filename expansion)
-is performed immediately after em(alias substitution),
-preceding the set of five substitutions mentioned above.
+is performed immediately after em(alias expansion),
+preceding the set of five expansions mentioned above.
 startmenu()
 menu(History Expansion)
 menu(Process Substitution)
@@ -52,7 +52,7 @@ corrections and the repetition of complicated commands or arguments.
 Command lines are saved in the history list, the size of which
 is controlled by the tt(HISTSIZE)
 vindex(HISTSIZE, use of)
-variable.  The most recent command is retained in any case.
+parameter.  The most recent command is retained in any case.
 A history expansion begins with the first character of the
 tt(histchars) parameter which is `tt(!)'
 by default and may occur anywhere on the command line; history
@@ -175,8 +175,8 @@ Convert the words to all uppercase.
 )
 item(tt(f))(
 (This and the following
-tt(F), tt(w) and tt(W) modifier only work with parameter and
-filename expansion.)
+tt(F), tt(w) and tt(W) modifier only work with parameter expansion and
+filename generation.)
 Repeats the immediately (without a colon) following modifier until the
 resulting word doesn't change any more.
 )
@@ -200,13 +200,13 @@ item(tt(s/)var(l)tt(/)var(r)[tt(/)])(
 Substitute var(r) for var(l) as described below.
 Unless preceded immediately by a tt(g), with no colon between,
 the substitution is done only for the
-first string that matches var(l).  For arrays and filename
-expansion, this applies to each word of the expanded text.
+first string that matches var(l).  For arrays and for filename
+generation, this applies to each word of the expanded text.
 )
 item(tt(&))(
 Repeat the previous tt(s) substitution.  Like tt(s), may be preceded
 immediately by a tt(g).  In variable expansion the tt(&) must appear
-inside braces, and in filename expansion it must be quoted with a
+inside braces, and in filename generation it must be quoted with a
 backslash.
 )
 enditem()
@@ -309,25 +309,27 @@ zmanref(zshparam)
 ifnzman(\
 noderef(Parameters)
 )\
-for a description of parameters.
+for a description of parameters, including arrays, associative arrays,
+and subscript notation to access individual array elements.
+
 In the expansions discussed below that require a pattern, the form of
 the pattern is the same as that used for filename generation;
 see noderef(Filename Generation).  Note that this pattern, along with
-the replacement text of a substitution, is itself subject to
-parameter, command and arithmetic substitution.  In addition to the
-following operations, the file modifiers described in
+the replacement text of any substitutions, are themselves subject to
+parameter expansion, command substitution, and arithmetic expansion.
+In addition to the following operations, the file modifiers described in
 noderef(Modifiers) in noderef(History Expansion) can be
 applied:  for example, tt(${i:s/foo/bar/}) performs string
-substitution on the value of parameter tt($i).
+substitution on the expansion of parameter tt($i).
 
 startitem()
 item(tt(${)var(name)tt(}))(
 The value, if any, of the parameter var(name) is substituted.
-The braces are required if var(name) is followed by
+The braces are required if the expansion is to be followed by
 a letter, digit, or underscore that is not to be interpreted
-as part of its name.
+as part of var(name).
 
-If var(name) is an array parameter, then the values of each
+If var(name) is an array parameter, then the value of each
 element of var(name) is substituted, one element per word.
 Otherwise, the expansion results in one word only; no field
 splitting is done on the result unless the tt(SH_WORD_SPLIT)
@@ -342,10 +344,12 @@ If var(name) is set and is non-null then substitute its
 value; otherwise substitute var(word). If var(name) is
 missing, substitute var(word).
 )
-item(tt(${)var(name)tt(:=)var(word)tt(}))(
-If var(name) is unset or is null then
-set it to var(word); the value of the parameter is then
-substituted.
+xitem(tt(${)var(name)tt(:=)var(word)tt(}))
+item(tt(${)var(name)tt(::=)var(word)tt(}))(
+In the first form, if var(name) is unset or is null then
+set it to var(word); in the second form, unconditionally
+set var(name) to var(word).  In both forms, the value of
+the parameter is then substituted.
 )
 item(tt(${)var(name)tt(:?)var(word)tt(}))(
 If var(name) is set and is non-null, then substitute
@@ -360,13 +364,14 @@ enditem()
 
 If the colon is omitted from one of the above expressions
 containing a colon, then the shell only checks whether
-var(name) is set or not, not whether it is null.
+var(name) is set, not whether its value is null.
+
+In the following expressions, when var(name) is an array and
+the substitution is not quoted, or if the tt((@)) flag or the
+`var(name)tt([@])' syntax is used, matching and replacement is
+performed on each array element separately.
 
 startitem()
-item(tt(${)var(name)tt(::=)var(word)tt(}))(
-Set var(name) to var(word); the value of the parameter is then
-substituted.
-)
 xitem(tt(${)var(name)tt(#)var(pattern)tt(}))
 item(tt(${)var(name)tt(##)var(pattern)tt(}))(
 If the var(pattern) matches the beginning of the value of
@@ -375,9 +380,7 @@ the matched portion deleted; otherwise, just
 substitute the value of var(name).  In the first
 form, the smallest matching pattern is preferred;
 in the second form, the largest matching pattern is
-preferred. If var(name) is an array and the substitution
-is not quoted or the tt((@)) flag or the `var(name)tt([@])' syntax
-is used, matching is performed on each array elements separately.
+preferred.
 )
 xitem(tt(${)var(name)tt(%)var(pattern)tt(}))
 item(tt(${)var(name)tt(%%)var(pattern)tt(}))(
@@ -387,43 +390,38 @@ the matched portion deleted; otherwise, just
 substitute the value of var(name).  In the first
 form, the smallest matching pattern is preferred;
 in the second form, the largest matching pattern is
-preferred. If var(name) is an array and the substitution
-is not quoted or the tt((@)) flag or the `var(name)tt([@])' syntax
-is used, matching is performed on each array elements separately.
+preferred.
 )
 item(tt(${)var(name)tt(:#)var(pattern)tt(}))(
 If the var(pattern) matches the value of var(name), then substitute
 the empty string; otherwise, just substitute the value of var(name).
-If var(name) is an array and the substitution
-is not quoted or the tt((@)) flag or the `var(name)tt([@])' syntax
-is used, matching is performed on each array elements separately, and
-the matched array elements are removed (use the tt((M)) flag to
+If var(name) is an array
+the matching array elements are removed (use the tt((M)) flag to
 remove the non-matched elements).
 )
 xitem(tt(${)var(name)tt(/)var(pattern)tt(/)var(repl)tt(}))
 item(tt(${)var(name)tt(//)var(pattern)tt(/)var(repl)tt(}))(
-Substitute the longest possible match of var(pattern) in the value of
-variable var(name) with the string var(repl).  The first form
-substitutes just the first occurrence, the second all occurrences.
+Replace by string var(repl), the longest possible match of
+var(pattern) in the expansion of parameter var(name).  The first form
+replaces just the first occurrence, the second form all occurrences.
 The var(pattern) may begin with a var(#), in which case the
 var(pattern) must match at the start of the string, or var(%), in
 which case it must match at the end of the string.  The var(repl) may
 be an empty string, in which case the final tt(/) may also be omitted.
 To quote the final tt(/) in other cases it should be preceded by two
 backslashes (i.e., a quoted backslash); this is not necessary if the
-tt(/) occurs inside a substituted paramter.  Substitution of an array
-is as described for tt(#) and tt(%) above.
+tt(/) occurs inside a substituted parameter.
 
 The first tt(/) may be preceded by a tt(:), in which case the match
 will only succeed if it matches the entire word.  Note also the
-effect of the tt(I) and tt(S) parameter expansion flags below:  the
-flags tt(M), tt(R), tt(B), tt(E) and tt(N) are not useful, however.
+effect of the tt(I) and tt(S) parameter expansion flags below; however,
+the flags tt(M), tt(R), tt(B), tt(E) and tt(N) are not useful.
 
 For example,
 
-nofill(tt(foo="twinkle twinkle little star" sub="t*e" rep="spy"))
-nofill(tt(print ${foo//${~sub}/$rep}))
-nofill(tt(print ${(S)foo//${~sub}/$rep}))
+nofill(tt(foo="twinkle twinkle little star" sub="t*e" rep="spy")
+tt(print ${foo//${~sub}/$rep})
+tt(print ${(S)foo//${~sub}/$rep}))
 
 Here, the tt(~) ensures that the text of tt($sub) is treated as a
 pattern rather than a plain string.  In the first case, the longest
@@ -436,6 +434,8 @@ If var(spec) is one of the above substitutions, substitute
 the length in characters of the result instead of
 the result itself.  If var(spec) is an array expression,
 substitute the number of elements of the result.
+Note that tt(^), tt(=), and tt(~), below, must appear
+to the left of tt(#) when these forms are combined.
 )
 item(tt(${^)var(spec)tt(}))(
 pindex(RC_EXPAND_PARAM, use of)
@@ -465,24 +465,27 @@ cindex(sh, field splitting style)
 Turn on the tt(SH_WORD_SPLIT) option for the
 evaluation of var(spec); if the `tt(=)' is doubled, turn it off.
 vindex(IFS, use of)
-When this option is set, parameter values are split into
-separate words using tt(IFS) as a delimiter
-before substitution.
+When this option is set, parameter expansions are split into
+separate words before substitution, using tt(IFS) as a delimiter.
 This is done by default in most other shells.
+
+Note that splitting is applied to var(word) in the assignment forms
+of var(spec) em(before) the assignment to var(name) is performed.
+This affects the result of array assignments with the tt(A) flag.
 )
 item(tt(${~)var(spec)tt(}))(
 pindex(GLOB_SUBST)
 Turn on the tt(GLOB_SUBST) option for the evaluation of
 var(spec); if the `tt(~)' is doubled, turn it off.  When this option is
 set, any pattern characters resulting
-from the substitution become eligible for file expansion and filename
+from parameter expansion are eligible for filename expansion and filename
 generation.
 )
 enditem()
 
 If a tt(${)...tt(}) type parameter expression or a
 tt($LPAR())...tt(RPAR()) type command substitution is used in place of
-var(name) above, it is substituted first and the result is used as if
+var(name) above, it is expanded first and the result is used as if
 it were the value of var(name).  Thus it is
 possible to perform nested operations:  tt(${${foo#head}%tail})
 substitues the value of tt($foo) with both tt(head) and tt(tail)
@@ -491,7 +494,7 @@ combination with the flags described next; see the example below.
 subsect(Parameter Expansion Flags)
 cindex(parameter expansion flags)
 cindex(flags, parameter expansion)
-cindex(expansion, parameter, flags)
+cindex(substitution, parameter, flags)
 If the opening brace is directly followed by an opening parenthesis,
 the string up to the matching closing parenthesis will be taken as a
 list of flags.  Where arguments are valid, any character, or the
@@ -501,9 +504,14 @@ in place of the colon as delimiters.  The following flags are supported:
 
 startitem()
 item(tt(A))(
-Create an array parameter with
+Create an array parameter with tt(${)...tt(=)...tt(}),
 tt(${)...tt(:=)...tt(}) or tt(${)...tt(::=)...tt(}).
-Assignment is made before sorting or padding.
+If this flag is repeated (as in tt(AA)), create an associative
+array parameter.  Assignment is made before sorting or padding.
+The var(name) part may be a subscripted range for ordinary
+arrays; the var(word) part em(must) be converted to an array, for
+example by using tt(${(AA)=)...tt(}) to activate word splitting,
+when creating an associative array.
 )
 item(tt(@))(
 In double quotes, array elements are put into separate words.
@@ -531,7 +539,9 @@ item(tt(U))(
 Convert all letters in the result to upper case.
 )
 item(tt(C))(
-Capitalize the resulting words.
+Capitalize the resulting words.  `Words' in this case refers to sequences
+of alphanumeric characters separated by non-alphanumerics, em(not) to words
+that result from field splitting.
 )
 item(tt(c))(
 With tt(${#)var(name)tt(}), count the total number of characters in an array,
@@ -545,9 +555,22 @@ item(tt(W))(
 Similar to tt(w) with the difference that empty words between
 repeated delimiters are also counted.
 )
+item(tt(k))(
+If var(name) refers to an associative array, substitute the em(keys)
+(element names) rather than the values of the elements.  Used with
+subscripts (including ordinary arrays), force indices or keys to be
+substituted even if the subscript form refers to values.  However,
+this flag may not be combined with subscript ranges.
+)
+item(tt(v))(
+Used with tt(k), substitute (as two consecutive words) both the key
+and the value of each associative array element.  Used with subscripts,
+force values to be substituted even if the subscript form refers to
+indices or keys.
+)
 item(tt(p))(
 Recognize the same escape sequences as the tt(print) builtin
-in string arguments to subsequent flags.
+in string arguments to any of the flags described below.
 )
 item(tt(l:)var(expr)tt(::)var(string1)tt(::)var(string2)tt(:))(
 Pad the resulting words on the left.  Each word will be truncated if
@@ -579,9 +602,13 @@ item(tt(f))(
 Split the result of the expansion to lines. This is a shorthand
 for `tt(ps:\n:)'.
 )
+enditem()
+
+The following flags are meaningful with the tt(${)...tt(#)...tt(}),
+tt(${)...tt(%)...tt(}), or tt(${)...tt(/)...tt(}) forms.
+
+startitem()
 item(tt(S))(
-(This and all remaining flags are used with the tt(${)...tt(#)...tt(}) or
-tt(${)...tt(%)...tt(}) forms.)
 Search substrings as well as beginnings or ends; with tt(#) start
 from the beginning and with tt(%) start from the end of the string.
 With substitution via tt(${)...tt(/)...tt(}) or

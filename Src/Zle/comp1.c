@@ -430,7 +430,7 @@ quotename(const char *s, char **e, char *te, int *pl)
 
 /**/
 int
-boot_comp1(Module m)
+setup_comp1(Module m)
 {
     compctlreadptr = compctlread;
     clwords = (char **) zcalloc((clwsize = 16) * sizeof(char *));
@@ -446,11 +446,25 @@ boot_comp1(Module m)
     return 0;
 }
 
+/**/
+int
+boot_comp1(Module m)
+{
+    return 0;
+}
+
 #ifdef MODULE
 
 /**/
 int
 cleanup_comp1(Module m)
+{
+    return 0;
+}
+
+/**/
+int
+finish_comp1(Module m)
 {
     deletehashtable(compctltab);
     zfree(clwords, clwsize * sizeof(char *));

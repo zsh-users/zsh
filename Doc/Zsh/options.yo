@@ -139,7 +139,7 @@ pindex(BANG_HIST)
 cindex(history, enable substitution)
 cindex(enable history substitution)
 item(tt(BANG_HIST) (tt(PLUS()K)))(
-Perform textual history substitution, bf(csh)-style,
+Perform textual history expansion, bf(csh)-style,
 treating the character `tt(!)' specially.
 )
 pindex(BARE_GLOB_QUAL)
@@ -263,9 +263,9 @@ in a command have no matches.
 Overrides tt(NULL_GLOB).
 )
 pindex(EQUALS)
-cindex(filename substitution, =)
+cindex(filename expansion, =)
 item(tt(EQUALS))(
-Perform tt(=) filename substitution.
+Perform tt(=) filename expansion.
 (See noderef(Filename Expansion).)
 )
 pindex(ERR_EXIT)
@@ -344,7 +344,7 @@ Do not require a leading `tt(.)' in a filename to be matched explicitly.
 )
 pindex(GLOB_SUBST)
 item(tt(GLOB_SUBST))(
-Treat any characters resulting from parameter substitution as being
+Treat any characters resulting from parameter expansion as being
 eligible for file expansion and filename generation, and any
 characters resulting from command substitution as being eligible for
 filename generation.
@@ -412,9 +412,9 @@ being added to the history list.
 pindex(HIST_VERIFY)
 cindex(history, verifying substitution)
 item(tt(HIST_VERIFY))(
-Whenever the user enters a line with history substitution,
+Whenever the user enters a line with history expansion,
 don't execute the line directly; instead, perform
-history substitution and reload the line into the editing buffer.
+history expansion and reload the line into the editing buffer.
 )
 pindex(HUP)
 cindex(jobs, HUP)

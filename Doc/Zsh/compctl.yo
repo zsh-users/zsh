@@ -348,8 +348,9 @@ words are used as prefixes.
 item(tt(-q))(
 If used with a suffix as specified by the tt(-S) option, this
 causes the suffix to be removed if the next character typed is a blank
-or does not insert anything (the same rule as used for the
-tt(AUTO_REMOVE_SLASH) option).  The option is most useful for list
+or does not insert anything or if the suffix consists of only one character
+and the next character typed is the same character (the same rule as used
+for the tt(AUTO_REMOVE_SLASH) option).  The option is most useful for list
 separators (comma, colon, etc.).
 )
 item(tt(-l) var(cmd))(

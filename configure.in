@@ -45,6 +45,9 @@ AC_DEFINE_UNQUOTED(OSTYPE,   "$host_os")
 dnl -----------------------------
 dnl CHECKING COMMAND LINE OPTIONS
 dnl -----------------------------
+dnl Handle --program-prefix, --program-suffix, etc.
+AC_ARG_PROGRAM
+
 dnl Do you want to debug zsh?
 undefine([zsh-debug])dnl
 AC_ARG_ENABLE(zsh-debug,
@@ -211,7 +214,7 @@ if test -n "$auto_cflags"; then
 fi
 if test -n "$auto_ldflags"; then
   case "${enable_zsh_debug}$host_os" in
-    yesaix*) ;;  # AIX ld does not accept -g
+    yesaix*|yeshpux*) ;;  # AIX ld does not accept -g
     yes*)    LDFLAGS=-g ;;
     *)       LDFLAGS=-s ;;
   esac
@@ -340,6 +343,7 @@ AC_CHECK_HEADERS(sys/time.h sys/times.h sys/select.h termcap.h termio.h \
 		 utmp.h utmpx.h sys/types.h pwd.h grp.h)
 if test $dynamic = yes; then
   AC_CHECK_HEADERS(dlfcn.h)
+  AC_CHECK_HEADERS(dl.h)
 fi
 
 dnl Some SCO systems cannot include both sys/time.h and sys/select.h
@@ -619,7 +623,8 @@ AC_CHECK_FUNCS(memcpy memmove \
 	      getgrgid getgrnam getpwent getpwnam getpwuid)
 
 if test $dynamic = yes; then
-  AC_CHECK_FUNCS(dlopen dlerror dlsym dlclose load loadquery loadbind unload)
+  AC_CHECK_FUNCS(dlopen dlerror dlsym dlclose load loadquery loadbind unload \
+		shl_load shl_unload shl_findsym)
 fi
 
 
@@ -902,6 +907,7 @@ dnl dynamic loading
 dnl ---------------
 L=N
 aixdynamic=no
+hpuxdynamic=no
 if test "$ac_cv_func_dlopen"  != yes ||
    test "$ac_cv_func_dlsym"   != yes ||
    test "$ac_cv_func_dlerror" != yes; then
@@ -909,7 +915,19 @@ if test "$ac_cv_func_dlopen"  != yes ||
      test "$ac_cv_func_unload"    != yes ||
      test "$ac_cv_func_loadbind"  != yes ||
      test "$ac_cv_func_loadquery" != yes; then
-    dynamic=no
+    if test "$ac_cv_func_shl_load" != yes ||
+       test "$ac_cv_func_shl_unload" != yes ||
+       test "$ac_cv_func_shl_findsym" != yes; then
+      dynamic=no
+    elif test "x$dynamic" = xyes; then
+      hpuxdynamic=yes
+      DL_EXT="${DL_EXT=sl}"
+      dnl autoheader won't allow us to define anything which isn't
+      dnl going into a header, and we can't undefine anything, so
+      dnl just define this anyway and rely on the later tests to
+      dnl define DYNAMIC or not.
+      AC_DEFINE(HPUXDYNAMIC)dnl
+    fi
   elif test "x$dynamic" = xyes; then
     aixdynamic=yes
   fi
@@ -990,12 +1008,25 @@ EOM
     $DLLD -o conftest.$DL_EXT $LDFLAGS $DLLDFLAGS conftest.o 1>&5 2>&5 &&
     AC_TRY_RUN([
 #include <stdio.h>
+#ifdef HPUXDYNAMIC
+#include <dl.h>
+#define RTLD_LAZY BIND_DEFERRED
+#define RTLD_GLOBAL DYNAMIC_PATH
+
+char *zsh_gl_sym_addr ;
+
+#define dlopen(file,mode) (void *)shl_load((file), (mode), (long) 0)
+#define dlclose(handle) shl_unload((shl_t)(handle))
+#define dlsym(handle,name) (zsh_gl_sym_addr=0,shl_findsym((shl_t *)&(handle),name,TYPE_UNDEFINED,&zsh_gl_sym_addr), (void *)zsh_gl_sym_addr)
+#define dlerror() 0
+#else
 #ifdef HAVE_DLFCN_H
 #include <dlfcn.h>
 #else
 #include <sys/types.h>
 #include <nlist.h>
 #include <link.h>
+#endif
 #endif
 #ifndef RTLD_LAZY
 #define RTLD_LAZY 1

@@ -23,6 +23,8 @@ closem
 cmdnamtab
 columns
 compctlreadptr
+cond_str
+cond_val
 coprocin
 coprocout
 countlinknodes
@@ -173,6 +175,7 @@ sethparam
 setlimits
 setsparam
 settyinfo
+sfcontext
 shfunctab
 shingetline
 shout

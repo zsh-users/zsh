@@ -73,6 +73,13 @@ deltochar(void)
 
 /**/
 int
+setup_deltochar(Module m)
+{
+    return 0;
+}
+
+/**/
+int
 boot_deltochar(Module m)
 {
     w_deletetochar = addzlefunction("delete-to-char", deltochar,
@@ -93,4 +100,12 @@ cleanup_deltochar(Module m)
     deletezlefunction(w_deletetochar);
     return 0;
 }
+
+/**/
+int
+finish_deltochar(Module m)
+{
+    return 0;
+}
+
 #endif

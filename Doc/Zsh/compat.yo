@@ -32,9 +32,9 @@ The usual zsh startup/shutdown scripts are not executed.  Login shells
 source tt(/etc/profile) followed by tt($HOME/.profile).  If the
 tt(ENV) environment variable is set on invocation, tt($ENV) is sourced
 after the profile scripts.  The value of tt(ENV) is subjected to
-parameter expansion, command substitution, and arithmetic expansion before
-being interpreted as a pathname.  Note that the tt(PRIVILEGED) option
-also affects the execution of startup files.
+parameter expansion, command substitution, and arithmetic expansion
+before being interpreted as a pathname.  Note that the tt(PRIVILEGED)
+option also affects the execution of startup files.
 
 The following options are set if the shell is invoked as tt(sh) or
 tt(ksh):

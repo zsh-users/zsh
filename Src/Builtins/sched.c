@@ -185,6 +185,13 @@ static struct builtin bintab[] = {
 
 /**/
 int
+setup_sched(Module m)
+{
+    return 0;
+}
+
+/**/
+int
 boot_sched(Module m)
 {
     if(!addbuiltins(m->nam, bintab, sizeof(bintab)/sizeof(*bintab)))
@@ -208,6 +215,13 @@ cleanup_sched(Module m)
     }
     uremnode(prepromptfns, &n_checksched);
     deletebuiltins(m->nam, bintab, sizeof(bintab)/sizeof(*bintab));
+    return 0;
+}
+
+/**/
+int
+finish_sched(Module m)
+{
     return 0;
 }
 

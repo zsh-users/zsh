@@ -427,7 +427,7 @@ get_username(void)
 	    cached_username = ztrdup("");
     }
 #else /* !HAVE_GETPWUID */
-    cached_uid = current_uid;
+    cached_uid = getuid();
 #endif /* !HAVE_GETPWUID */
     return cached_username;
 }
@@ -510,16 +510,13 @@ adduserdir(char *s, char *t, int flags, int always)
     if ((flags & ND_USERNAME) && nameddirtab->getnode2(nameddirtab, s))
 	return;
 
-    /* Never hash PWD unless it was explicitly requested */
-    if (!always && !strcmp(s, "PWD"))
-	return;
-
     /* Normal parameter assignments generate calls to this function, *
      * with always==0.  Unless the AUTO_NAME_DIRS option is set, we  *
      * don't let such assignments actually create directory names.   *
      * Instead, a reference to the parameter as a directory name can *
-     * cause the actual creation of the hash table entry.            */
-    if (!always && unset(AUTONAMEDIRS) &&
+     * cause the actual creation of the hash table entry. Never hash *
+     * PWD unless it was explicitly requested (or already hashed).   */
+    if (!always && (unset(AUTONAMEDIRS) || !strcmp(s, "PWD")) &&
 	    !nameddirtab->getnode2(nameddirtab, s))
 	return;
 
@@ -633,8 +630,13 @@ preprompt(void)
 
     /* If a shell function named "precmd" exists, *
      * then execute it.                           */
-    if ((list = getshfunc("precmd")) != &dummy_list)
+    if ((list = getshfunc("precmd")) != &dummy_list) {
+	int osc = sfcontext;
+
+	sfcontext = SFC_HOOK;
 	doshfunc("precmd", list, NULL, 0, 1);
+	sfcontext = osc;
+    }
     if (errflag)
 	return;
 
@@ -643,7 +645,11 @@ preprompt(void)
      * executed "periodic", then execute it now.                    */
     if (period && (time(NULL) > lastperiodic + period) &&
 	(list = getshfunc("periodic")) != &dummy_list) {
+	int osc = sfcontext;
+
+	sfcontext = SFC_HOOK;
 	doshfunc("periodic", list, NULL, 0, 1);
+	sfcontext = osc;
 	lastperiodic = time(NULL);
     }
     if (errflag)

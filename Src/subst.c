@@ -720,8 +720,8 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int ssub)
     int eval = 0;
     int nojoin = 0;
     char inbrace = 0;		/* != 0 means ${...}, otherwise $... */
-    char hkeys = 0;		/* 1 means get keys from associative array */
-    char hvals = 0;		/* > hkeys get values of associative array */
+    char hkeys = 0;
+    char hvals = 0;
 
     *s++ = '\0';
     if (!ialnum(*s) && *s != '#' && *s != Pound && *s != '-' &&
@@ -739,7 +739,7 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int ssub)
 	inbrace = 1;
 	s++;
 	if (*s == '!' && s[1] != Outbrace && emulation == EMULATE_KSH) {
-	    hkeys = 1;
+	    hkeys = SCANPM_WANTKEYS;
 	    s++;
 	} else if (*s == '(' || *s == Inpar) {
 	    char *t, sav;
@@ -762,7 +762,7 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int ssub)
 		case Outpar:
 		    break;
 		case 'A':
-		    arrasg = 1;
+		    ++arrasg;
 		    break;
 		case '@':
 		    nojoin = 1;
@@ -897,10 +897,10 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int ssub)
 		    break;
 
 		case 'k':
-		    hkeys = 1;
+		    hkeys = SCANPM_WANTKEYS;
 		    break;
 		case 'v':
-		    hvals = 2;
+		    hvals = SCANPM_WANTVALS;
 		    break;
 
 		default:
@@ -979,9 +979,8 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int ssub)
 	*s = sav;
 	v = (Value) NULL;
     } else {
-	/* 2 == SCANPM_WANTKEYS, 1 == SCANPM_WANTVALS, see params.c */
 	if (!(v = fetchvalue(&s, (unset(KSHARRAYS) || inbrace) ? 1 : -1,
-			     (hkeys ? 2 : 0) + ((hvals > hkeys) ? 1 : 0))))
+			     hkeys|hvals)))
 	    vunset = 1;
     }
     while (v || ((inbrace || (unset(KSHARRAYS) && vunset)) && isbrack(*s))) {
@@ -1010,7 +1009,11 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int ssub)
 	if ((isarr = v->isarr)) {
 	    /* No way to get here with v->inv != 0, so getvaluearr() *
 	     * is called by getarrvalue(); needn't test PM_HASHED.   */
-	    aval = getarrvalue(v);
+	    if (v->isarr == SCANPM_WANTINDEX) {
+		isarr = v->isarr = 0;
+		val = dupstring(v->pm->nam);
+	    } else
+		aval = getarrvalue(v);
 	} else {
 	    if (v->pm->flags & PM_ARRAY) {
 		int tmplen = arrlen(v->pm->gets.afn(v->pm));
@@ -1260,7 +1263,12 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int ssub)
 			*p++ = ztrdup(*t++);
 		    }
 		    *p++ = NULL;
-		    setaparam(idbeg, a);
+		    if (arrasg > 1) {
+			Param pm = sethparam(idbeg, a);
+			if (pm)
+			    aval = paramvalarr(pm->gets.hfn(pm), hkeys|hvals);
+		    } else
+			setaparam(idbeg, a);
 		} else {
 		    untokenize(val);
 		    setsparam(idbeg, ztrdup(val));

@@ -113,7 +113,12 @@ pid_t cmdoutpid;
  
 /**/
 int cmdoutval;
- 
+
+/* The context in which a shell function is called, see SFC_* in zsh.h. */ 
+
+/**/
+int sfcontext;
+
 /* Stack to save some variables before executing a signal handler function */
 
 /**/
@@ -2771,19 +2776,14 @@ runshfunc(List list, FuncWrap wrap, char *name)
     char *ou;
 
     while (wrap) {
-	wrap->module->flags |= MOD_WRAPPER;
-	wrap->count++;
+	wrap->module->wrapper++;
 	cont = wrap->handler(list, wrap->next, name);
-	wrap->count--;
-	if (!wrap->count) {
-	    wrap->module->flags &= ~MOD_WRAPPER;
+	wrap->module->wrapper--;
 #ifdef DYNAMIC
-	    if (wrap->module->flags & MOD_UNLOAD) {
-		wrap->module->flags &= ~MOD_UNLOAD;
-		unload_module(wrap->module, NULL);
-	    }
+	if (!wrap->module->wrapper &&
+	    (wrap->module->flags & MOD_UNLOAD))
+	    unload_module(wrap->module, NULL);
 #endif
-	}
 	if (!cont)
 	    return;
 	wrap = wrap->next;

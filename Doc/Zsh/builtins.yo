@@ -47,7 +47,7 @@ cindex(aliases, listing)
 item(tt(alias) [ tt(-gmrL) ] [ var(name)[tt(=)var(value)] ... ])(
 For each var(name) with a corresponding var(value), define an alias
 with that value.  A trailing space in var(value) causes the next word
-to be checked for alias substitution.  If the tt(-g) flag is present,
+to be checked for alias expansion.  If the tt(-g) flag is present,
 define a global alias; global aliases are expanded even if they do not
 occur in command position.
 
@@ -879,23 +879,50 @@ findex(typeset)
 cindex(parameters, setting)
 cindex(parameters, declaring)
 item(tt(typeset) [ {tt(PLUS())|tt(-)}tt(ALRUZafilrtuxm) [var(n)]] [ var(name)[tt(=)var(value)] ... ])(
-Set attributes and values for shell parameters.
-When invoked inside a function a new parameter is created which will be
-unset when the function completes.  The new parameter will not be
-exported unless tt(ALL_EXPORT) is set, in which case the parameter will be
-exported provided no parameter of that name already exists.
-The following attributes are valid:
+Set or display attributes and values for shell parameters.
+
+A parameter is created for each var(name) that does not already refer
+to one.  When inside a function, a new parameter is created for every
+var(name) (even those that already exist), and is unset again when the
+function completes.  See
+ifzman(`Local Parameters' in zmanref(zshparam))\
+ifnzman(noderef(Local Parameters))\
+.  Local parameters are not exported unless tt(ALL_EXPORT) is set, in
+which case the parameter is exported em(only) when var(name) does not
+already appear in the environment.
+
+For each nofill(var(name)tt(=)var(value)) assignment, the parameter
+var(name) set to var(value).  Note that arrays currently cannot be
+assigned in tt(typeset) expressions; scalars and integers only.
+
+For each remaining var(name) that refers to a parameter that is set,
+the name and value of the parameter are printed in the form of an
+assignment.  Nothing is printed for newly-created parameters.
+
+If no var(name) is present, the names and values of all parameters are
+printed.  In this case the attribute flags restrict the the display to
+only those parameters that have the specified attributes.  Using
+`tt(PLUS())' rather than `tt(-)' to introduce the flag causes the
+attribute to be turned off, and suppresses printing of the names and
+values.  If only the tt(-m) flag is given the arguments are taken as
+patterns (should be quoted) and all parameters (or functions with the
+tt(-f) flag) with matching names are printed.
+
+The following attribute flags may be specified:
 
 startitem()
 item(tt(-A))(
-Declare var(name) to be an em(A)ssociation parameter (also known as a hash).
+The names refer to associative array parameters; see
+ifzman(`Array Parameters' in zmanref(zshparam))\
+ifnzman(noderef(Array Parameters))\
+.
 )
 item(tt(-L))(
 Left justify and remove leading blanks from var(value).
 If var(n) is nonzero, it defines the width of the field;
 otherwise it is determined by the width of the value of the first
 assignment.
-When the parameter is printed, it is filled on the right with
+When the parameter is expanded, it is filled on the right with
 blanks or truncated if necessary to fit the field.
 Leading zeros are removed if the tt(-Z) flag is also set.
 )
@@ -904,13 +931,13 @@ Right justify and fill with leading blanks.  If var(n) is nonzero
 if defines the width of the field;
 otherwise it is determined by the width of the value of the first
 assignment.
-When the parameter is printed, the field is left filled with
+When the parameter is expanded, the field is left filled with
 blanks or truncated from the end.
 )
 item(tt(-U))(
-For arrays keep only the first element of each duplications. It can also be
-set for colon separated special parameters like tt(PATH) or tt(FIGNORE),
-etc.
+For arrays (but not for associative arrays), keep only the first
+occurrence of each duplicated value.  This may also be set for
+colon-separated special parameters like tt(PATH) or tt(FIGNORE), etc.
 )
 item(tt(-Z))(
 Right justify and fill with leading zeros if the first non-blank
@@ -920,8 +947,9 @@ otherwise it is determined by the width of the value of the
 first assignment.
 )
 item(tt(-a))(
-On its own, this option produces a list of all array parameters.
-If any non-options are provided, the tt(typeset) command is silently ignored.
+The names refer to array parameters.  For historical reasons, scalar
+parameters are created even when this flag is specified, but the
+output is restricted to arrays (including associative arrays).
 )
 item(tt(-f))(
 The names refer to functions rather than parameters.  No assignments
@@ -933,12 +961,13 @@ function definition when the function is first referenced; see
 noderef(Functions).
 )
 item(tt(-i))(
-Use an internal integer representation.  If var(n) is nonzero
-it defines the output arithmetic base, otherwise it is determined by the first
-assignment.
+Use an internal integer representation.  If var(n) is nonzero it
+defines the output arithmetic base, otherwise it is determined by the
+first assignment.
 )
 item(tt(-l))(
-Convert to lower case.
+Convert the result to lower case whenever the parameter is expanded.
+The value is em(not) converted when assigned.
 )
 item(tt(-r))(
 The given var(name)s are marked readonly.
@@ -947,22 +976,14 @@ item(tt(-t))(
 Tags the named parameters.  Tags have no special meaning to the shell.
 )
 item(tt(-u))(
-Convert to upper case.
+Convert the result to upper case whenever the parameter is expanded.
+The value is em(not) converted when assigned.
 )
 item(tt(-x))(
 Mark for automatic export to the environment of subsequently
 executed commands.
 )
 enditem()
-
-Using `tt(PLUS())' rather than `tt(-)' causes these flags to be turned off.
-If no arguments are given but flags are specified,
-a list of named parameters which have these flags set is printed.
-Using `tt(PLUS())' instead of `tt(-)' keeps their values from being printed.
-If no arguments or options are given, the names and attributes
-of all parameters are printed. If only the tt(-m) flag is given the
-arguments are taken as patterns (should be quoted) and all parameters
-or functions (with the tt(-f) flag) with matching names are printed.
 )
 findex(ulimit)
 cindex(resource limits)

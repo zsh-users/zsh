@@ -98,7 +98,7 @@ struct compcond {
 struct compctl {
     int refc;			/* reference count                         */
     Compctl next;		/* next compctl for -x                     */
-    unsigned long mask, mask2;		/* mask of things to complete (CC_*)       */
+    unsigned long mask, mask2;	/* masks of things to complete (CC_*)      */
     char *keyvar;		/* for -k (variable)                       */
     char *glob;			/* for -g (globbing)                       */
     char *str;			/* for -s (expansion)                      */
@@ -110,7 +110,7 @@ struct compctl {
     char *withd;		/* for -w (with directory                  */
     char *hpat;			/* for -H (history pattern)                */
     int hnum;			/* for -H (number of events to search)     */
-    char *gname;
+    char *gname;		/* for -J and -V (group name)              */
     Compctl ext;		/* for -x (first of the compctls after -x) */
     Compcond cond;		/* for -x (condition for this compctl)     */
     Compctl xor;		/* for + (next of the xor'ed compctls)     */
@@ -169,7 +169,6 @@ struct cexpl {
     char *str;			/* the string */
     int count;			/* the number of matches */
     int fcount;			/* number of matches with fignore ignored */
-
 };
 
 /* This describes a group of matches. */

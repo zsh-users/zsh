@@ -56,12 +56,25 @@ $DLLD -o conftest1.$DL_EXT $LDFLAGS $DLLDFLAGS conftest1.o $LIBS 1>&5 2>&5 &&
 $CC -c $CFLAGS $CPPFLAGS $DLCFLAGS conftest2.c 1>&5 2>&5 &&
 $DLLD -o conftest2.$DL_EXT $LDFLAGS $DLLDFLAGS conftest2.o $LIBS 1>&5 2>&5; then
     AC_TRY_RUN([
+#ifdef HPUXDYNAMIC
+#include <dl.h>
+#define RTLD_LAZY BIND_DEFERRED
+#define RTLD_GLOBAL DYNAMIC_PATH
+
+char *zsh_gl_sym_addr ;
+
+#define dlopen(file,mode) (void *)shl_load((file), (mode), (long) 0)
+#define dlclose(handle) shl_unload((shl_t)(handle))
+#define dlsym(handle,name) (zsh_gl_sym_addr=0,shl_findsym((shl_t *)&(handle),name,TYPE_UNDEFINED,&zsh_gl_sym_addr), (void *)zsh_gl_sym_addr)
+#define dlerror() 0
+#else
 #ifdef HAVE_DLFCN_H
 #include <dlfcn.h>
 #else
 #include <sys/types.h>
 #include <nlist.h>
 #include <link.h>
+#endif
 #endif
 #ifndef RTLD_LAZY
 #define RTLD_LAZY 1
@@ -116,6 +129,18 @@ $DLLD -o conftest1.$DL_EXT $LDFLAGS $DLLDFLAGS conftest1.o $LIBS 1>&5 2>&5 &&
 $CC -c $CFLAGS $CPPFLAGS $DLCFLAGS conftest2.c 1>&5 2>&5 &&
 $DLLD -o conftest2.$DL_EXT $LDFLAGS $DLLDFLAGS conftest2.o $LIBS 1>&5 2>&5; then
     AC_TRY_RUN([
+#ifdef HPUXDYNAMIC
+#include <dl.h>
+#define RTLD_LAZY BIND_DEFERRED
+#define RTLD_GLOBAL DYNAMIC_PATH
+
+char *zsh_gl_sym_addr ;
+
+#define dlopen(file,mode) (void *)shl_load((file), (mode), (long) 0)
+#define dlclose(handle) shl_unload((shl_t)(handle))
+#define dlsym(handle,name) (zsh_gl_sym_addr=0,shl_findsym((shl_t *)&(handle),name,TYPE_UNDEFINED,&zsh_gl_sym_addr), (void *)zsh_gl_sym_addr)
+#define dlerror() 0
+#else
 #ifdef HAVE_DLFCN_H
 #include <dlfcn.h>
 #else
@@ -123,12 +148,14 @@ $DLLD -o conftest2.$DL_EXT $LDFLAGS $DLLDFLAGS conftest2.o $LIBS 1>&5 2>&5; then
 #include <nlist.h>
 #include <link.h>
 #endif
+#endif
 #ifndef RTLD_LAZY
 #define RTLD_LAZY 1
 #endif
 #ifndef RTLD_GLOBAL
 #define RTLD_GLOBAL 0
 #endif
+
 
 main()
 {
@@ -177,12 +204,25 @@ $DLLD -o conftest1.$DL_EXT $LDFLAGS $DLLDFLAGS conftest1.o $LIBS 1>&5 2>&5 &&
 $CC -c $CFLAGS $CPPFLAGS $DLCFLAGS conftest2.c 1>&5 2>&5 &&
 $DLLD -o conftest2.$DL_EXT $LDFLAGS $DLLDFLAGS conftest2.o $LIBS 1>&5 2>&5; then
     AC_TRY_RUN([
+#ifdef HPUXDYNAMIC
+#include <dl.h>
+#define RTLD_LAZY BIND_DEFERRED
+#define RTLD_GLOBAL DYNAMIC_PATH
+
+char *zsh_gl_sym_addr ;
+
+#define dlopen(file,mode) (void *)shl_load((file), (mode), (long) 0)
+#define dlclose(handle) shl_unload((shl_t)(handle))
+#define dlsym(handle,name) (zsh_gl_sym_addr=0,shl_findsym((shl_t *)&(handle),name,TYPE_UNDEFINED,&zsh_gl_sym_addr), (void *)zsh_gl_sym_addr)
+#define dlerror() 0
+#else
 #ifdef HAVE_DLFCN_H
 #include <dlfcn.h>
 #else
 #include <sys/types.h>
 #include <nlist.h>
 #include <link.h>
+#endif
 #endif
 #ifndef RTLD_LAZY
 #define RTLD_LAZY 1
@@ -234,12 +274,25 @@ $DLLD -o conftest1.$DL_EXT $LDFLAGS $DLLDFLAGS conftest1.o $LIBS 1>&5 2>&5; then
     save_ldflags=$LDFLAGS
     LDFLAGS="$LDFLAGS $EXTRA_LDFLAGS"
     AC_TRY_RUN([
+#ifdef HPUXDYNAMIC
+#include <dl.h>
+#define RTLD_LAZY BIND_DEFERRED
+#define RTLD_GLOBAL DYNAMIC_PATH
+
+char *zsh_gl_sym_addr ;
+
+#define dlopen(file,mode) (void *)shl_load((file), (mode), (long) 0)
+#define dlclose(handle) shl_unload((shl_t)(handle))
+#define dlsym(handle,name) (zsh_gl_sym_addr=0,shl_findsym((shl_t *)&(handle),name,TYPE_UNDEFINED,&zsh_gl_sym_addr), (void *)zsh_gl_sym_addr)
+#define dlerror() 0
+#else
 #ifdef HAVE_DLFCN_H
 #include <dlfcn.h>
 #else
 #include <sys/types.h>
 #include <nlist.h>
 #include <link.h>
+#endif
 #endif
 #ifndef RTLD_LAZY
 #define RTLD_LAZY 1
@@ -294,12 +347,25 @@ elif
     save_ldflags=$LDFLAGS
     LDFLAGS="$LDFLAGS $EXTRA_LDFLAGS -s"
     AC_TRY_RUN([
+#ifdef HPUXDYNAMIC
+#include <dl.h>
+#define RTLD_LAZY BIND_DEFERRED
+#define RTLD_GLOBAL DYNAMIC_PATH
+
+char *zsh_gl_sym_addr ;
+
+#define dlopen(file,mode) (void *)shl_load((file), (mode), (long) 0)
+#define dlclose(handle) shl_unload((shl_t)(handle))
+#define dlsym(handle,name) (zsh_gl_sym_addr=0,shl_findsym((shl_t *)&(handle),name,TYPE_UNDEFINED,&zsh_gl_sym_addr), (void *)zsh_gl_sym_addr)
+#define dlerror() 0
+#else
 #ifdef HAVE_DLFCN_H
 #include <dlfcn.h>
 #else
 #include <sys/types.h>
 #include <nlist.h>
 #include <link.h>
+#endif
 #endif
 #ifndef RTLD_LAZY
 #define RTLD_LAZY 1
@@ -348,12 +414,25 @@ echo 'int fred () { return 42; }' > conftest1.c
 if $CC -c $CFLAGS $CPPFLAGS $DLCFLAGS conftest1.c 1>&5 2>&5 &&
 $DLLD -o conftest1.$DL_EXT $LDFLAGS $DLLDFLAGS -s conftest1.o $LIBS 1>&5 2>&5; then
     AC_TRY_RUN([
+#ifdef HPUXDYNAMIC
+#include <dl.h>
+#define RTLD_LAZY BIND_DEFERRED
+#define RTLD_GLOBAL DYNAMIC_PATH
+
+char *zsh_gl_sym_addr ;
+
+#define dlopen(file,mode) (void *)shl_load((file), (mode), (long) 0)
+#define dlclose(handle) shl_unload((shl_t)(handle))
+#define dlsym(handle,name) (zsh_gl_sym_addr=0,shl_findsym((shl_t *)&(handle),name,TYPE_UNDEFINED,&zsh_gl_sym_addr), (void *)zsh_gl_sym_addr)
+#define dlerror() 0
+#else
 #ifdef HAVE_DLFCN_H
 #include <dlfcn.h>
 #else
 #include <sys/types.h>
 #include <nlist.h>
 #include <link.h>
+#endif
 #endif
 #ifndef RTLD_LAZY
 #define RTLD_LAZY 1
@@ -389,7 +468,7 @@ dnl
 
 AC_DEFUN(zsh_PATH_UTMP,
 [AC_CACHE_CHECK([for $1 file], [zsh_cv_path_$1],
-[for dir in /etc /usr/etc /var/adm /usr/adm /var/run ./conftest; do
+[for dir in /etc /usr/etc /var/adm /usr/adm /var/run /var/log ./conftest; do
   zsh_cv_path_$1=${dir}/$1
   test -f $zsh_cv_path_$1 && break
   zsh_cv_path_$1=no

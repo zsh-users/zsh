@@ -51,16 +51,14 @@ bin_example(char *nam, char **args, char *ops, int func)
 
 /**/
 static int
-cond_p_len(Conddef c, char **a)
+cond_p_len(char **a, int id)
 {
-    char *s1 = a[0], *s2 = a[1];
+    char *s1 = cond_str(a, 0);
 
-    singsub(&s1);
-    untokenize(s1);
-    if (s2) {
-	singsub(&s2);
-	untokenize(s2);
-	return strlen(s1) == matheval(s2);
+    if (a[1]) {
+	long v = cond_val(a, 1);
+
+	return strlen(s1) == v;
     } else {
 	return !s1[0];
     }
@@ -68,14 +66,10 @@ cond_p_len(Conddef c, char **a)
 
 /**/
 static int
-cond_i_ex(Conddef c, char **a)
+cond_i_ex(char **a, int id)
 {
-    char *s1 = a[0], *s2 = a[1];
+    char *s1 = cond_str(a, 0), *s2 = cond_str(a, 1);
 
-    singsub(&s1);
-    untokenize(s1);
-    singsub(&s2);
-    untokenize(s2);
     return !strcmp("example", dyncat(s1, s2));
 }
 
@@ -105,13 +99,22 @@ static struct builtin bintab[] = {
 };
 
 static struct conddef cotab[] = {
-    CONDDEF("len", 0, 1, 2, cond_p_len),
-    CONDDEF("ex", CONDF_INFIX, 0, 0, cond_i_ex),
+    CONDDEF("len", 0, cond_p_len, 1, 2, 0),
+    CONDDEF("ex", CONDF_INFIX, cond_i_ex, 0, 0, 0),
 };
 
 static struct funcwrap wrapper[] = {
     WRAPDEF(ex_wrapper),
 };
+
+/**/
+int
+setup_example(Module m)
+{
+    printf("The example module has now been set up.\n");
+    fflush(stdout);
+    return 0;
+}
 
 /**/
 int
@@ -133,4 +136,14 @@ cleanup_example(Module m)
     deletewrapper(m, wrapper);
     return 0;
 }
+
+/**/
+int
+finish_example(Module m)
+{
+    printf("Thank you for using the example module.  Have a nice day.\n");
+    fflush(stdout);
+    return 0;
+}
+
 #endif

@@ -45,13 +45,8 @@ while [[ -n "$pref" ]]; do
   if [[ "$head" = *[\[\(\*\?\$\~]* ]]; then
     wild=$head
   else
-    [[ -z "$pref" ]] && globdir=
-    # if path segment contains wildcards, don't add another.
-    if [[ "$head" = *[\[\(\*\?\$\~]* || -z "$head" ]]; then
-      wild=$head
-    else
     # Simulate case-insensitive globbing for ASCII characters
-    wild="[${(j(][))${(s())head:l}}]*" # :gs/a/[a]/ etc.
+    wild="[${(j(][))${(s())head:l}}]*"	# :gs/a/[a]/ etc.
     # The following could all be one expansion, but for readability:
     wild=$wild:gs/a/aA/:gs/b/bB/:gs/c/cC/:gs/d/dD/:gs/e/eE/:gs/f/fF/
     wild=$wild:gs/g/gG/:gs/h/hH/:gs/i/iI/:gs/j/jJ/:gs/k/kK/:gs/l/lL/

@@ -1947,7 +1947,7 @@ getmatch(char **sp, char *pat, int fl, int n, char *replstr)
 {
     Comp c;
     char *s = *sp, *t, *start, sav;
-    int i, j, l = strlen(*sp), matched;
+    int i, l = strlen(*sp), matched;
 
     MUSTUSEHEAP("getmatch");	/* presumably covered by prefork() test */
     repllist = NULL;

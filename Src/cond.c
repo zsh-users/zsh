@@ -48,7 +48,8 @@ evalcond(Cond c)
 	{
 	    Conddef cd;
 
-	    if ((cd = getconddef((c->type == COND_MODI), (char *) c->left, 1))) {
+	    if ((cd = getconddef((c->type == COND_MODI),
+				 ((char *) c->left) + 1, 1))) {
 		if (c->type == COND_MOD) {
 		    int l = arrlen((char **) c->right);
 
@@ -57,10 +58,24 @@ evalcond(Cond c)
 			return 0;
 		    }
 		}
-		return cd->handler(cd, (char **) c->right);
+		return cd->handler((char **) c->right, cd->condid);
 	    }
-	    else
-		zerr("unrecognized condition: `-%s'", (char *) c->left, 0);
+	    else {
+		char **a = (char **) c->right, *s = a[0];
+
+		if (s && s[0] == '-' &&
+		    (cd = getconddef(0, s + 1, 1))) {
+		    int l = arrlen(a);
+
+		    if (l < cd->min || (cd->max >= 0 && l > cd->max)) {
+			zerr("unrecognized condition: `-%s'", (char *) c->left, 0);
+			return 0;
+		    }
+		    a[0] = (char *) c->left;
+		    return cd->handler(a, cd->condid);
+		} else
+		    zerr("unrecognized condition: `-%s'", (char *) c->left, 0);
+	    }
 	    return 0;
 	}
     }
@@ -243,4 +258,39 @@ optison(char *s)
 	return unset(-i);
     else
 	return isset(i);
+}
+
+/**/
+char *
+cond_str(char **args, int num)
+{
+    char *s = args[num];
+
+    singsub(&s);
+    untokenize(s);
+
+    return s;
+}
+
+/**/
+long
+cond_val(char **args, int num)
+{
+    char *s = args[num];
+
+    singsub(&s);
+    untokenize(s);
+
+    return matheval(s);
+}
+
+/**/
+int
+cond_match(char **args, int num, char *str)
+{
+    char *s = args[num];
+
+    singsub(&s);
+
+    return matchpat(str, s);
 }

@@ -603,11 +603,15 @@ execzlefunc(Thingy func)
 	    zsfree(msg);
 	    feep();
 	} else {
-	  startparamscope();
-	  makezleparams();
-	  doshfunc(w->u.fnnam, l, NULL, 0, 1);
-	  endparamscope();
-	  lastcmd = 0;
+	    int osc = sfcontext;
+
+	    startparamscope();
+	    makezleparams();
+	    sfcontext = SFC_WIDGET;
+	    doshfunc(w->u.fnnam, l, NULL, 0, 1);
+	    sfcontext = osc;
+	    endparamscope();
+	    lastcmd = 0;
 	}
     }
 }
@@ -856,7 +860,7 @@ static struct builtin bintab[] = {
 
 /**/
 int
-boot_zle(Module m)
+setup_zle(Module m)
 {
     /* Set up editor entry points */
     trashzleptr = trashzle;
@@ -875,6 +879,13 @@ boot_zle(Module m)
     /* initialise the keymap system */
     init_keymaps();
 
+    return 0;
+}
+
+/**/
+int
+boot_zle(Module m)
+{
     addbuiltins(m->nam, bintab, sizeof(bintab)/sizeof(*bintab));
     return 0;
 }
@@ -885,15 +896,21 @@ boot_zle(Module m)
 int
 cleanup_zle(Module m)
 {
-    int i;
-
     if(zleactive) {
 	zerrnam(m->nam, "can't unload the zle module while zle is active",
 	    NULL, 0);
 	return 1;
     }
-
     deletebuiltins(m->nam, bintab, sizeof(bintab)/sizeof(*bintab));
+    return 0;
+}
+
+/**/
+int
+finish_zle(Module m)
+{
+    int i;
+
     cleanup_keymaps();
     deletehashtable(thingytab);
 

@@ -16,7 +16,7 @@ input/output specifications.
 
 The following may appear anywhere in a simple command
 or may precede or follow a complex command.
-Substitution occurs before var(word) or var(digit)
+Expansion occurs before var(word) or var(digit)
 is used except as noted below.
 If the result of substitution on var(word)
 produces more than one filename,
@@ -57,7 +57,7 @@ exist, even if tt(CLOBBER) is unset.
 item(tt(<<)[tt(-)] var(word))(
 The shell input is read up to a line that is the same as
 var(word), or to an end-of-file.
-No parameter substitution, command substitution or
+No parameter expansion, command substitution or
 filename generation is performed on var(word).
 The resulting document, called a
 em(here-document), becomes the standard input.

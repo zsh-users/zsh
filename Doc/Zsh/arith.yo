@@ -53,7 +53,7 @@ gives the ascii value of this character and an expression of the form
 of the parameter var(foo).
 
 Named parameters and subscripted arrays can be referenced by name within an
-arithmetic expression without using the parameter substitution syntax.
+arithmetic expression without using the parameter expansion syntax.
 
 An internal integer representation of a named parameter
 can be specified with the tt(integer) builtin.

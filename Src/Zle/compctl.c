@@ -1638,13 +1638,20 @@ static struct builtin bintab[] = {
 
 /**/
 int
+setup_compctl(Module m)
+{
+    compctltab->printnode = printcompctlp;
+    printcompctlptr = printcompctl;
+    compctl_widgetptr = compctl_widget;
+    return 0;
+}
+
+/**/
+int
 boot_compctl(Module m)
 {
     if(!addbuiltins(m->nam, bintab, sizeof(bintab)/sizeof(*bintab)))
 	return 1;
-    compctltab->printnode = printcompctlp;
-    printcompctlptr = printcompctl;
-    compctl_widgetptr = compctl_widget;
     return 0;
 }
 
@@ -1654,10 +1661,18 @@ boot_compctl(Module m)
 int
 cleanup_compctl(Module m)
 {
-    compctltab->printnode = NULL;
     deletebuiltins(m->nam, bintab, sizeof(bintab)/sizeof(*bintab));
+    return 0;
+}
+
+/**/
+int
+finish_compctl(Module m)
+{
+    compctltab->printnode = NULL;
     printcompctlptr = NULL;
     compctl_widgetptr = NULL;
     return 0;
 }
+
 #endif

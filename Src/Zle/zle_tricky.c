@@ -3801,15 +3801,23 @@ makecomplistflags(Compctl cc, char *s, int incmd, int compadd)
 
 	/* Completion after `~', maketildelist adds the usernames *
 	 * and named directories.                                 */
-	if (ic == Tilde)
+	if (ic == Tilde) {
+	    char *oi = ipre;
+
+	    ipre = (ipre ? dyncat("~", ipre) : "~");
 	    maketildelist();
-	else if (ic == Equals) {
+	    ipre = oi;
+	} else if (ic == Equals) {
 	    /* Completion after `=', get the command names from *
 	     * the cmdnamtab and aliases from aliastab.         */
+	    char *oi = ipre;
+
+	    ipre = (ipre ? dyncat("=", ipre) : "=");
 	    if (isset(HASHLISTALL))
 		cmdnamtab->filltable(cmdnamtab);
 	    dumphashtable(cmdnamtab, -7);
 	    dumphashtable(aliastab, -2);
+	    ipre = oi;
 	} else {
 	    /* Normal file completion... */
 	    if (ispattern & 1) {
@@ -4082,6 +4090,7 @@ makecomplistflags(Compctl cc, char *s, int incmd, int compadd)
 	if ((list = getshfunc(cc->func)) != &dummy_list) {
 	    /* We have it, so build a argument list. */
 	    LinkList args = newlinklist();
+	    int osc = sfcontext;
 
 	    addlinknode(args, cc->func);
 
@@ -4099,8 +4108,10 @@ makecomplistflags(Compctl cc, char *s, int incmd, int compadd)
 
 	    /* This flag allows us to use read -l and -c. */
 	    incompctlfunc = 1;
+	    sfcontext = SFC_COMPLETE;
 	    /* Call the function. */
 	    doshfunc(cc->func, list, args, 0, 1);
+	    sfcontext = osc;
 	    incompctlfunc = 0;
 	    /* And get the result from the reply parameter. */
 	    if ((r = get_user_var("reply")))
@@ -4246,6 +4257,7 @@ makecomplistflags(Compctl cc, char *s, int incmd, int compadd)
 	    LinkList args = newlinklist();
 	    LinkNode ln;
 	    Cmatch m;
+	    int osc = sfcontext;
 
 	    addlinknode(args, cc->ylist);
 	    for (ln = firstnode(matches); ln; ln = nextnode(ln)) {
@@ -4263,7 +4275,9 @@ makecomplistflags(Compctl cc, char *s, int incmd, int compadd)
 
 	    /* No harm in allowing read -l and -c here, too */
 	    incompctlfunc = 1;
+	    sfcontext = SFC_COMPLETE;
 	    doshfunc(cc->ylist, list, args, 0, 1);
+	    sfcontext = osc;
 	    incompctlfunc = 0;
 	    uv = "reply";
 	}

@@ -169,3 +169,47 @@ Bart's associative array patches for implentation of subscripting flags,
 4763, plus fix 4766; typeset output 4764
 
 Sven's completion listing fix, 4767
+
+  Fourth edition
+
+Compilation fix for static linking, 4779
+
+Phil's patch for wtmp in /var/log on Linux, which someone else sent
+before... except it needs to be applied to aczsh.m4 and propagated
+from there, 4783
+
+Phil's removal of now useless j in glob.c, 4784
+
+Bart's collection in 4788:  put back some missing patches.
+
+Param's patches from Bart in 4789, 4794, 4795: fix sethparam() and move
+flags; make sure setsparam() and sethparam() are consistent with
+existing parameters; allow assoc array assignment with
+${(AA)=assoc::=key1 value1 key2 value2}
+
+Return to not hashing PWD from Bart in 4791
+
+Handle --program-suffix and --program-prefix (but not --target, so I
+removed the comment) from Bart in 4792
+
+Compilation with no HAVE_GETPWUID, 4801
+
+INADDR_NONE in zftp, 4805
+
+Sven's unloading modules, 4806, 4815, 4820, plus my AIX (and
+DYNAMIC_NAME_CLASH_OK) fix, 4822, then Sven's 4830
+
+Parameter's documentation changes by Bart, 4817
+
+Network order fix for zftp from Sven, 4821
+
+My patch (with Gene Cohler's suggestions) for dynamical loading under
+HPUX 10, 4824, plus fixes, 4833, 4843
+
+Bart's random assoc array fixes, 4826, 4836, plus Sven's 4831
+
+Sven's ignored character fix, 4828
+
+More Sven condition patches, 4837, 4842
+
+Final (???) isident() fix from Sven, 4845

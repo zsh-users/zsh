@@ -111,13 +111,17 @@ loop(int toplevel, int justonce)
 	    if (toplevel && (prelist = getshfunc("preexec")) != &dummy_list) {
 		Histent he = gethistent(curhist);
 		LinkList args;
+		int osc = sfcontext;
+
 		PERMALLOC {
 		    args = newlinklist();
 		    addlinknode(args, "preexec");
 		    if (he && he->text)
 			addlinknode(args, he->text);
 		} LASTALLOC;
+		sfcontext = SFC_HOOK;
 		doshfunc("preexec", prelist, args, 0, 1);
+		sfcontext = osc;
 		freelinklist(args, (FreeFunc) NULL);
 		errflag = 0;
 	    }
@@ -613,6 +617,7 @@ setupvals(void)
     breaks = loops = 0;
     lastmailcheck = time(NULL);
     locallevel = sourcelevel = 0;
+    sfcontext = SFC_DIRECT;
     trapreturn = 0;
     noerrexit = -1;
     nohistsave = 1;

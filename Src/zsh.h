@@ -460,23 +460,24 @@ struct cond {
 #define COND_MOD   16
 #define COND_MODI  17
 
-typedef int (*CondHandler) _((Conddef, char **));
+typedef int (*CondHandler) _((char **, int));
 
 struct conddef {
     Conddef next;		/* next in list                       */
     char *name;			/* the condition name                 */
     int flags;			/* see CONDF_* below                  */
+    CondHandler handler;	/* handler function                   */
     int min;			/* minimum number of strings          */
     int max;			/* maximum number of strings          */
-    CondHandler handler;	/* handler function                   */
+    int condid;			/* for overloading handler functions  */
     char *module;		/* module to autoload                 */
 };
 
 #define CONDF_INFIX  1
 #define CONDF_ADDED  2
 
-#define CONDDEF(name, flags, min, max, handler) \
-    { NULL, name, flags, min, max, handler, NULL }
+#define CONDDEF(name, flags, handler, min, max, condid) \
+    { NULL, name, flags, handler, min, max, condid, NULL }
 
 struct forcmd {			/* for/select */
 /* Cmd->args contains list of words to loop thru */
@@ -772,6 +773,14 @@ struct shfunc {
     List funcdef;		/* function definition    */
 };
 
+/* Shell function context types. */
+
+#define SFC_DIRECT   0		/* called directly from the user */
+#define SFC_SIGNAL   1		/* signal handler */
+#define SFC_HOOK     2		/* one of the special functions */
+#define SFC_WIDGET   3		/* user defined widget */
+#define SFC_COMPLETE 4		/* called from completion code */
+
 /* node in list of function call wrappers */
 
 typedef int (*WrapFunc) _((List, FuncWrap, char *));
@@ -781,13 +790,12 @@ struct funcwrap {
     int flags;
     WrapFunc handler;
     Module module;
-    int count;
 };
 
 #define WRAPF_ADDED 1
 
 #define WRAPDEF(func) \
-    { NULL, 0, func, NULL, 0 }
+    { NULL, 0, func, NULL }
 
 /* node in builtin command hash table (builtintab) */
 
@@ -836,11 +844,11 @@ struct module {
     int flags;
     void *handle;
     LinkList deps;
+    int wrapper;
 };
 
 #define MOD_BUSY    (1<<0)
-#define MOD_WRAPPER (1<<1)
-#define MOD_UNLOAD  (1<<2)
+#define MOD_UNLOAD  (1<<1)
 
 /* node used in parameter hash table (paramtab) */
 
@@ -890,28 +898,37 @@ struct param {
 #define PM_SCALAR	0	/* scalar                                     */
 #define PM_ARRAY	(1<<0)	/* array                                      */
 #define PM_INTEGER	(1<<1)	/* integer                                    */
-#define PM_HASHED	(1<<15)	/* association                                */
+#define PM_HASHED	(1<<2)	/* association                                */
 
 #define PM_TYPE(X) (X & (PM_SCALAR|PM_INTEGER|PM_ARRAY|PM_HASHED))
 
-#define PM_LEFT		(1<<2)	/* left justify and remove leading blanks     */
-#define PM_RIGHT_B	(1<<3)	/* right justify and fill with leading blanks */
-#define PM_RIGHT_Z	(1<<4)	/* right justify and fill with leading zeros  */
-#define PM_LOWER	(1<<5)	/* all lower case                             */
+#define PM_LEFT		(1<<3)	/* left justify and remove leading blanks     */
+#define PM_RIGHT_B	(1<<4)	/* right justify and fill with leading blanks */
+#define PM_RIGHT_Z	(1<<5)	/* right justify and fill with leading zeros  */
+#define PM_LOWER	(1<<6)	/* all lower case                             */
 
 /* The following are the same since they *
  * both represent -u option to typeset   */
-#define PM_UPPER	(1<<6)	/* all upper case                             */
-#define PM_UNDEFINED	(1<<6)	/* undefined (autoloaded) shell function      */
+#define PM_UPPER	(1<<7)	/* all upper case                             */
+#define PM_UNDEFINED	(1<<7)	/* undefined (autoloaded) shell function      */
 
-#define PM_READONLY	(1<<7)	/* readonly                                   */
-#define PM_TAGGED	(1<<8)	/* tagged                                     */
-#define PM_EXPORTED	(1<<9)	/* exported                                   */
-#define PM_UNIQUE	(1<<10)	/* remove duplicates                          */
-#define PM_SPECIAL	(1<<11) /* special builtin parameter                  */
-#define PM_DONTIMPORT	(1<<12)	/* do not import this variable                */
-#define PM_RESTRICTED	(1<<13) /* cannot be changed in restricted mode       */
-#define PM_UNSET	(1<<14)	/* has null value                             */
+#define PM_READONLY	(1<<8)	/* readonly                                   */
+#define PM_TAGGED	(1<<9)	/* tagged                                     */
+#define PM_EXPORTED	(1<<10)	/* exported                                   */
+#define PM_UNIQUE	(1<<11)	/* remove duplicates                          */
+#define PM_SPECIAL	(1<<12) /* special builtin parameter                  */
+#define PM_DONTIMPORT	(1<<13)	/* do not import this variable                */
+#define PM_RESTRICTED	(1<<14) /* cannot be changed in restricted mode       */
+#define PM_UNSET	(1<<15)	/* has null value                             */
+
+/* Flags for extracting elements of arrays and associative arrays */
+#define SCANPM_WANTVALS   (1<<0)
+#define SCANPM_WANTKEYS   (1<<1)
+#define SCANPM_WANTINDEX  (1<<2)
+#define SCANPM_MATCHKEY   (1<<3)
+#define SCANPM_MATCHVAL   (1<<4)
+#define SCANPM_MATCHMANY  (1<<5)
+#define SCANPM_ISVAR_AT   ((-1)<<15)	/* Only sign bit is significant */
 
 /*
  * Flags for doing matches inside parameter substitutions, i.e.

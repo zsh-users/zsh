@@ -301,14 +301,6 @@ copyparamtable(HashTable ht, char *name)
     return nht;
 }
 
-#define SCANPM_WANTVALS   (1<<0)
-#define SCANPM_WANTKEYS   (1<<1)
-#define SCANPM_WANTINDEX  (1<<2)	/* Useful only if nested arrays */
-#define SCANPM_MATCHKEY   (1<<3)
-#define SCANPM_MATCHVAL   (1<<4)
-#define SCANPM_MATCHMANY  (1<<5)
-#define SCANPM_ISVAR_AT   ((-1)<<15)	/* Only sign bit is significant */
-
 static unsigned numparamvals;
 
 /**/
@@ -641,6 +633,7 @@ isident(char *s)
 	if (!iident(*ss))
 	    break;
 
+#if 0
     /* If this exhaust `s' or the next two characters *
      * are [(, then it is a valid identifier.         */
     if (!*ss || (*ss == '[' && ss[1] == '('))
@@ -650,6 +643,7 @@ isident(char *s)
      * definitely not a valid identifier.              */
     if (*ss != '[')
 	return 0;
+
     noeval = 1;
     (void)mathevalarg(++ss, &ss);
     if (*ss == ',')
@@ -658,6 +652,19 @@ isident(char *s)
     if (*ss != ']' || ss[1])
 	return 0;
     return 1;
+#else
+    /* If the next character is not [, then it is *
+     * definitely not a valid identifier.              */
+    if (!*ss)
+	return 1;
+    if (*ss != '[')
+	return 0;
+
+    /* Require balanced [ ] pairs */
+    if (skipparens('[', ']', &ss))
+	return 0;
+    return !*ss;
+#endif
 }
 
 static char **garr;
@@ -755,6 +762,8 @@ getarg(char **str, int *inv, Value v, int a2, long *w)
 	if (ind) {
 	    v->isarr |= SCANPM_WANTKEYS;
 	    v->isarr &= ~SCANPM_WANTVALS;
+	} else if (rev) {
+	    v->isarr |= SCANPM_WANTVALS;
 	}
 	if (!down)
 	    v->isarr &= ~SCANPM_MATCHMANY;
@@ -788,8 +797,9 @@ getarg(char **str, int *inv, Value v, int a2, long *w)
 		v->pm = createparam(s, PM_SCALAR|PM_UNSET);
 		paramtab = tht;
 	    }
-	    v->isarr = 0;
+	    v->isarr = (*inv ? SCANPM_WANTINDEX : 0);
 	    v->a = 0;
+	    *inv = 0;	/* We've already obtained the "index" (key) */
 	    *w = v->b = -1;
 	    r = isset(KSHARRAYS) ? 1 : 0;
 	} else
@@ -979,9 +989,11 @@ getindex(char **pptr, Value v)
 	    }
 	    if (a > 0 && (isset(KSHARRAYS) || (v->pm->flags & PM_HASHED)))
 		a--;
-	    v->inv = 1;
-	    v->isarr = 0;
-	    v->a = v->b = a;
+	    if (v->isarr != SCANPM_WANTINDEX) {
+		v->inv = 1;
+		v->isarr = 0;
+		v->a = v->b = a;
+	    }
 	    if (*s == ',') {
 		zerr("invalid subscript", NULL, 0);
 		while (*s != ']' && *s != Outbrack)
@@ -1546,35 +1558,37 @@ setaparam(char *s, char **val)
 
 /**/
 Param
-sethparam(char *s, char **kvarr)
+sethparam(char *s, char **val)
 {
     Value v;
-    Param pm;
-    char *t;
+    char *t = s;
 
     if (!isident(s)) {
 	zerr("not an identifier: %s", s, 0);
-	freearray(kvarr);
+	freearray(val);
 	errflag = 1;
 	return NULL;
     }
-    t=ztrdup(s); /* Is this a memory leak? */
-    /* Why does getvalue(s, 1) set s to empty string? */
-    if ((v = getvalue(&t, 1)))
-	if (v->pm->flags & PM_SPECIAL) {
-	    zerr("not overriding a special: %s", s, 0);
-	    freearray(kvarr);
-	    errflag = 1;
+    if (strchr(s, '[')) {
+	freearray(val);
+	zerr("attempt to set slice of associative array", NULL, 0);
+	errflag = 1;
+	return NULL;
+    } else {
+	if (!(v = getvalue(&s, 1)))
+	    createparam(t, PM_HASHED);
+	else if (!(PM_TYPE(v->pm->flags) & (PM_ARRAY|PM_HASHED)) &&
+		 !(v->pm->flags & PM_SPECIAL)) {
+	    unsetparam(t);
+	    createparam(t, PM_HASHED);
+	    v = NULL;
+	}
+    }
+    if (!v)
+	if (!(v = getvalue(&t, 1)))
 	    return NULL;
-	} else
-	    unsetparam(s);
-
-    pm = createparam(s, PM_HASHED);
-    DPUTS(!pm, "BUG: parameter not created");
-
-    arrhashsetfn(pm, kvarr);
-
-    return pm;
+    setarrvalue(v, val);
+    return v->pm;
 }
 
 /**/

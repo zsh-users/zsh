@@ -1339,7 +1339,7 @@ par_cond_double(char *a, char *b)
 
 	n->ntype = NT_SET(N_COND, NT_STR, NT_STR | NT_ARR, 0, 0);
 	n->type = COND_MOD;
-	n->left = (void *) (a + 1);
+	n->left = (void *) a;
 	d[0] = b;
 	d[1] = NULL;
 	n->right = (void *) arrdup(d);
@@ -1386,7 +1386,7 @@ par_cond_triple(char *a, char *b, char *c)
 
 	    n->ntype = NT_SET(N_COND, NT_STR, NT_STR | NT_ARR, 0, 0);
 	    n->type = COND_MODI;
-	    n->left = (void *) (b + 1);
+	    n->left = (void *) b;
 	    d[0] = a;
 	    d[1] = c;
 	    d[2] = NULL;
@@ -1397,7 +1397,7 @@ par_cond_triple(char *a, char *b, char *c)
 
 	n->ntype = NT_SET(N_COND, NT_STR, NT_STR | NT_ARR, 0, 0);
 	n->type = COND_MOD;
-	n->left = (void *) (a + 1);
+	n->left = (void *) a;
 	d[0] = b;
 	d[1] = c;
 	d[2] = NULL;

@@ -7,7 +7,8 @@ A name may be any sequence of alphanumeric
 characters and underscores, or the single characters
 `tt(*)', `tt(@)', `tt(#)', `tt(?)', `tt(-)', `tt($)', or `tt(!)'.
 The value may be a em(scalar) (a string),
-an integer, or an array.
+an integer, an array (indexed numerically), or an em(associative)
+array (an unordered set of name-value pairs, indexed by name).
 To assign a scalar or integer value to a parameter,
 use the tt(typeset) builtin.
 findex(typeset, use of)
@@ -17,10 +18,12 @@ The value of a parameter may also be assigned by writing:
 
 nofill(var(name)tt(=)var(value))
 
-If the integer attribute, tt(-i), is set for var(name),
-the var(value) is subject to arithmetic evaluation.
+If the integer attribute, tt(-i), is set for var(name), the var(value)
+is subject to arithmetic evaluation.  See noderef(Array Parameters)
+for additional forms of assignment.
 
-In the parameter lists, the mark `<S>' indicates that the parameter is special.
+In the parameter lists that follow, the mark `<S>' indicates that the
+parameter is special.
 Special parameters cannot have their type changed, and they stay special even
 if unset.  `<Z>' indicates that the parameter does not exist when the shell
 initialises in tt(sh) or tt(ksh) emulation mode.
@@ -55,6 +58,15 @@ The value of an array parameter may be assigned by writing:
 
 nofill(var(name)tt(=LPAR())var(value) ...tt(RPAR()))
 
+If no parameter var(name) exists, an ordinary array parameter is created.
+Associative arrays must be declared first, by `tt(typeset -A) var(name)'.
+When var(name) refers to an associative array, the parenthesized list is
+interpreted as alternating keys and values:
+
+nofill(var(name)tt(=LPAR())var(key) var(value) ...tt(RPAR()))
+
+Every var(key) must have a var(value) in this case.
+
 Individual elements of an array may be selected using a
 subscript.  A subscript of the form `tt([)var(exp)tt(])'
 selects the single element var(exp), where var(exp) is
@@ -63,6 +75,9 @@ expansion as if it were surrounded by `tt($LPAR()LPAR())...tt(RPAR()RPAR())'.
 The elements are numbered beginning with 1 unless the
 tt(KSH_ARRAYS) option is set when they are numbered from zero.
 pindex(KSH_ARRAYS, use of)
+
+The same subscripting syntax is used for associative arrays,
+except that no arithmetic expansion is applied to var(EXP).
 
 A subscript of the form `tt([*])' or `tt([@])' evaluates to all
 elements of an array; there is no difference between the two
@@ -73,6 +88,7 @@ except when they appear within double quotes.
 A subscript of the form `tt([)var(exp1)tt(,)var(exp2)tt(])'
 selects all elements in the range var(exp1) to var(exp2),
 inclusive.
+(Associative arrays are unordered, and so do not support ranges.)
 If one of the subscripts evaluates to a negative number,
 say tt(-)var(n), then the var(n)th element from the end
 of the array is used.  Thus `tt($foo[-3])' is the third element
@@ -90,7 +106,9 @@ option is set, the braced form is the only one that will
 work, the subscript otherwise not being treated specially.
 
 If a subscript is used on the left side of an assignment the selected
-range is replaced by the expression on the right side.
+element or range is replaced by the expression on the right side.  An
+array (but not an associative array) may be created by assignment to a
+range or element.
 
 If the opening bracket or the comma is directly followed by an opening
 parentheses the string up to the matching closing one is considered to
@@ -123,21 +141,27 @@ result is the first matching array element, substring or word (if the
 parameter is an array, if it is a scalar, or if it is a scalar and the
 `tt(w)' flag is given, respectively); note that this is like giving a
 number: `tt($foo[(r))var(??)tt(,3])' and `tt($foo[(r))var(??)tt(,(r)f*])' work.
+If the parameter is an associative array, only the value part of each pair
+is compared to the pattern.
 )
 item(tt(R))(
-like `tt(r)', but gives the last match.
+like `tt(r)', but gives the last match.  For associative arrays, gives
+all possible matches.
 )
 item(tt(i))(
 like `tt(r)', but gives the index of the match instead; this may not
-be combined with a second argument.
+be combined with a second argument.  For associative arrays, the key
+part of each pair is compared to the pattern, and the first matching
+key found is used.
 )
 item(tt(I))(
-like `tt(i), but gives the index of the last match.
+like `tt(i), but gives the index of the last match, or all possible
+matching keys in an associative array.
 )
 item(tt(n:)var(expr)tt(:))(
 if combined with `tt(r)', `tt(R)', `tt(i)' or `tt(I)', makes them give
 the var(n)th or var(n)th last match (if var(expr) evaluates to
-var(n)).
+var(n)).  This flag is ignored when the array is associative.
 )
 enditem()
 texinode(Positional Parameters)(Parameters Set By The Shell)(Array Parameters)(Parameters)
@@ -417,7 +441,7 @@ vindex(histchars)
 item(tt(histchars) <S>)(
 Three characters used by the shell's history and lexical analysis
 mechanism.  The first character signals the start of a history
-substitution (default `tt(!)').  The second character signals the
+expansion (default `tt(!)').  The second character signals the
 start of a quick history substitution (default `tt(^)').  The third
 character is the comment character (default `tt(#)').
 )
@@ -442,7 +466,7 @@ vindex(IFS)
 item(tt(IFS) <S>)(
 Internal field separators (by default space, tab, newline and NUL), that
 are used to separate words which result from
-command or parameter substitution and words read by
+command or parameter expansion and words read by
 the tt(read) builtin.  Any characters from the set space, tab and
 newline that appear in the IFS are called em(IFS white space).
 One or more IFS white space characters or one non-IFS white space
@@ -518,7 +542,7 @@ An array (colon-separated list) of filenames to check for
 new mail.  Each filename can be followed by a `tt(?)' and a
 message that will be printed.  The message will undergo
 parameter expansion, command substitution and arithmetic
-substitution with the variable tt($_) defined as the name
+expansion with the variable tt($_) defined as the name
 of the file that has changed.  The default message is
 `tt(You have new mail)'.  If an element is a directory
 instead of a file the shell will recursively check every

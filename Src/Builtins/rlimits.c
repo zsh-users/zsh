@@ -576,6 +576,13 @@ static struct builtin bintab[] = {
 
 /**/
 int
+setup_rlimits(Module m)
+{
+    return 0;
+}
+
+/**/
+int
 boot_rlimits(Module m)
 {
     return !addbuiltins(m->nam, bintab, sizeof(bintab)/sizeof(*bintab));
@@ -590,4 +597,12 @@ cleanup_rlimits(Module m)
     deletebuiltins(m->nam, bintab, sizeof(bintab)/sizeof(*bintab));
     return 0;
 }
+
+/**/
+int
+finish_rlimits(Module m)
+{
+    return 0;
+}
+
 #endif
