@@ -1,0 +1,15 @@
+#compdef bug
+
+_arguments '-c[exclude configs from report]' \
+           '-d[debug - send mail to postmaster@localhost]' \
+           '-f[argument is a file, not a package]' \
+           '-H[special header]:custom header:' \
+           '-m[maintainer-only]' \
+           '-p[print to stdout instead of mail]' \
+           '-q[quiet - no e-mail forwarding]' \
+           '-s[set subject]:subject:' \
+           '-S[set severity]:severity:(wishlist normal important grave critical)' \
+           '-x[do not cc submitter]' \
+           '-z[send configs verbatim]' \
+           '-h[help]' \
+           '*:package:_deb_packages installed'
