@@ -1,3 +1,9 @@
+2000-05-16  Peter Stephenson  <pws@cambridgesiliconradio.com>
+
+	* 11410: Src/glob.c: tokenize `=' in tokenize(), so that `=cmd'
+	will be a candidate for expansion if `~user' is (respecting
+	any relevant options).
+
 2000-05-16  Sven Wischnowsky  <wischnow@zsh.org>
 
 	* 11408: Completion/Core/_main_complete, Completion/Core/_normal,
