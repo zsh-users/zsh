@@ -1,5 +1,7 @@
 2003-07-04  Peter Stephenson  <pws@csr.com>
 
+	* unposte: Functions/TCP/.distfiles: forgot this.
+
 	* 18810: Doc/Zsh/tcpsys.yo, Functions/TCP/tcp_expect,
 	Functions/TCP/tcp_open, Functions/TCP/tcp_output,
 	Functions/TCP/tcp_point, Functions/TCP/tcp_read,
