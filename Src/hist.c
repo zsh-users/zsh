@@ -2057,16 +2057,16 @@ unlockhistfile(char *fn)
 mod_export LinkList
 bufferwords(LinkList list, char *buf, int *index)
 {
-    int num = 0, cur = -1, got = 0, ne = noerrs, ocs = cs;
-    int owb = wb, owe = we, oadx = addedx, ozp = zleparse, oexp = expanding;
+    int num = 0, cur = -1, got = 0, ne = noerrs, ocs = cs, oll = ll;
+    int owb = wb, owe = we, oadx = addedx, ozp = zleparse, onc = nocomments;
     char *p;
 
     if (!list)
 	list = newlinklist();
 
-    zleparse = 3;
+    zleparse = 1;
     addedx = 0;
-    noerrs = expanding = 1;
+    noerrs = 1;
     lexsave();
     if (buf) {
 	int l = strlen(buf);
@@ -2076,7 +2076,8 @@ bufferwords(LinkList list, char *buf, int *index)
 	p[l] = ' ';
 	p[l + 1] = '\0';
 	inpush(p, 0, NULL);
-	cs = 0;
+	cs = strlen(p) + 1;
+	nocomments = 1;
     } else if (!isfirstln && chline) {
 	p = (char *) zhalloc(hptr - chline + ll + 2);
 	memcpy(p, chline, hptr - chline);
@@ -2092,6 +2093,7 @@ bufferwords(LinkList list, char *buf, int *index)
 	p[ll + 1] = '\0';
 	inpush(p, 0, NULL);
     }
+    ll = strlen(p);
     if (cs)
 	cs--;
     strinbeg(0);
@@ -2133,10 +2135,11 @@ bufferwords(LinkList list, char *buf, int *index)
     inpop();
     errflag = 0;
     zleparse = ozp;
-    expanding = oexp;
+    nocomments = onc;
     noerrs = ne;
     lexrestore();
     cs = ocs;
+    ll = oll;
     wb = owb;
     we = owe;
     addedx = oadx;

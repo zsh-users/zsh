@@ -116,7 +116,12 @@ mod_export int parbegin;
 
 /**/
 mod_export int parend;
+
+/* don't recognize comments */
  
+/**/
+mod_export int nocomments;
+
 /* text of puctuation tokens */
 
 /**/
@@ -672,8 +677,8 @@ gettok(void)
 
     /* chars in initial position in word */
 
-    if (c == hashchar &&
-	((zleparse != 3 && isset(INTERACTIVECOMMENTS)) ||
+    if (c == hashchar && !nocomments &&
+	(isset(INTERACTIVECOMMENTS) ||
 	 (!zleparse && !expanding &&
 	  (!interact || unset(SHINSTDIN) || strin)))) {
 	/* History is handled here to prevent extra  *
