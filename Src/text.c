@@ -350,6 +350,8 @@ gettext2(Estate state)
 		taddnl();
 		n = tpush(code, 1);
 		n->u._subsh.end = state->pc + WC_SUBSH_SKIP(code);
+		/* skip word only use for try/always */
+		state->pc++;
 	    } else {
 		state->pc = s->u._subsh.end;
 		tindent--;
@@ -365,6 +367,8 @@ gettext2(Estate state)
 		taddnl();
 		n = tpush(code, 1);
 		n->u._subsh.end = state->pc + WC_CURSH_SKIP(code);
+		/* skip word only use for try/always */
+		state->pc++;
 	    } else {
 		state->pc = s->u._subsh.end;
 		tindent--;
@@ -720,6 +724,30 @@ gettext2(Estate state)
 	    taddstr(ecgetstr(state, EC_NODUP, NULL));
 	    taddstr("))");
 	    stack = 1;
+	    break;
+	case WC_TRY:
+	    if (!s) {
+		taddstr("{");
+		tindent++;
+		taddnl();
+		n = tpush(code, 0);
+		state->pc++;
+		/* this is the end of the try block alone */
+		n->u._subsh.end = state->pc + WC_CURSH_SKIP(state->pc[-1]);
+	    } else if (!s->pop) {
+		state->pc = s->u._subsh.end;
+		tindent--;
+		taddnl();
+		taddstr("} always {");
+		tindent++;
+		taddnl();
+		s->pop = 1;
+	    } else {
+		tindent--;
+		taddnl();
+		taddstr("}");
+		stack = 1;
+	    }
 	    break;
 	case WC_END:
 	    stack = 1;

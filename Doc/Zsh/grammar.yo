@@ -234,6 +234,62 @@ are reset to their default values while executing var(list).
 item(tt({) var(list) tt(}))(
 Execute var(list).
 )
+findex(always)
+cindex(always blocks)
+cindex(try blocks)
+item(tt({) var(try-list) tt(} always {) var(always-list) tt(}))(
+First execute var(try-list).  Regardless of errors, or tt(break),
+tt(continue), or tt(return) commands encountered within var(try-list),
+execute var(always-list).  Execution then continues from the
+result of the execution of var(try-list); in other words, any error,
+or tt(break), tt(continue), or tt(return) command is treated in the
+normal way, as if var(always-list) were not present.  The two
+chunks of code are referred to as the `try block' and the `always block'.
+
+Optional newlines or semicolons may appear after the tt(always);
+note, however, that they may em(not) appear between the preceeding
+closing brace and the tt(always).
+
+An `error' in this context is a condition such as a syntax error which
+causes the shell to abort execution of the current function, script, or
+list.  Syntax errors encountered while the shell is parsing the
+code do not cause the var(always-list) to be executed.  For example,
+an erroneously constructed tt(if) block in tt(try-list) would cause the
+shell to abort during parsing, so that tt(always-list) would not be
+executed, while an erroneous substitution such as tt(${*foo*}) would
+cause a run-time error, after which tt(always-list) would be executed.
+
+An error condition can be tested and reset with the special integer
+variable tt(TRY_BLOCK_ERROR).  Outside an tt(always-list) the value is
+irrelevant, but it is initialised to tt(-1).  Inside tt(always-list), the
+value is 1 if an error occurred in the tt(try-list), else 0.  If
+tt(TRY_BLOCK_ERROR) is set to 0 during the tt(always-list), the error
+condition caused by the tt(try-list) is reset, and shell execution
+continues normally after the end of tt(always-list).  Altering the value
+during the tt(try-list) is not useful (unless this forms part of an
+enclosing tt(always) block).
+
+Regardless of tt(TRY_BLOCK_ERROR), after the end of tt(always-list) the
+normal shell status tt($?) is the value returned from tt(always-list).
+This will be non-zero if there was an error, even if tt(TRY_BLOCK_ERROR)
+was set to zero.
+
+The following executes the given code, ignoring any errors it causes.
+This is an alternative to the usual convention of protecting code by
+executing it in a subshell.
+
+example({
+    # code which may cause an error
+  } always {
+    # This code is executed regardless of the error.
+    (( TRY_BLOCK_ERROR = 0 ))
+}
+# The error condition has been reset.)
+
+An tt(exit) command encountered in tt(try-list) does em(not) cause the
+execution of var(always-list).  Instead, the shell exits immediately
+after any tt(EXIT) trap has been executed.
+)
 findex(function)
 xitem(tt(function) var(word) ... [ tt(()) ] [ var(term) ] tt({) var(list) tt(}))
 xitem(var(word) ... tt(()) [ var(term) ] tt({) var(list) tt(}))

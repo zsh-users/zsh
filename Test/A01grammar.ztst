@@ -263,6 +263,85 @@
 0:basic [[ ... ]] test
 
 #
+# Current shell execution with try/always form.
+# We put those with errors in subshells so that any unhandled error doesn't
+# propagate.
+#
+
+  {
+     print The try block.
+  } always {
+     print The always block.
+  }
+  print After the always block.
+0:Basic `always' syntax
+>The try block.
+>The always block.
+>After the always block.
+
+  ({
+    print Position one.
+    print ${*this is an error*}
+    print Position two.
+  } always {
+    if (( TRY_BLOCK_ERROR )); then
+      print An error occurred.
+    else
+      print No error occurred.
+    fi
+  }
+  print Position three)
+1:Always block with error not reset
+>Position one.
+>An error occurred.
+?(eval):3: bad substitution
+
+  ({
+    print Stelle eins.
+    print ${*voici une erreur}
+    print Posizione due.
+  } always {
+    if (( TRY_BLOCK_ERROR )); then
+      print Erratum factum est. Retro ponetur.
+      (( TRY_BLOCK_ERROR = 0 ))
+    else
+      print unray touay foay anguageslay
+    fi
+  }
+  print Status after always block is $?.)
+0:Always block with error reset
+>Stelle eins.
+>Erratum factum est. Retro ponetur.
+>Status after always block is 1.
+?(eval):3: bad substitution
+
+# Outputting of structures from the wordcode is distinctly non-trivial,
+# we probably ought to have more like the following...
+  fn1() { { echo foo; } }
+  fn2() { { echo foo; } always { echo bar; } }
+  fn3() { ( echo foo; ) }
+  functions fn1 fn2 fn3
+0:Output of syntactic structures with and without always blocks
+>fn1 () {
+>	{
+>		echo foo
+>	}
+>}
+>fn2 () {
+>	{
+>		echo foo
+>	} always {
+>		echo bar
+>	}
+>}
+>fn3 () {
+>	(
+>		echo foo
+>	)
+>}
+
+
+#
 # Tests for `Alternate Forms For Complex Commands'
 #
 

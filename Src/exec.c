@@ -137,10 +137,10 @@ static char *STTYval;
 
 /* Execution functions. */
 
-static int (*execfuncs[]) _((Estate, int)) = {
+static int (*execfuncs[WC_COUNT-WC_CURSH]) _((Estate, int)) = {
     execcursh, exectime, execfuncdef, execfor, execselect,
     execwhile, execrepeat, execcase, execif, execcond,
-    execarith, execautofn
+    execarith, execautofn, exectry
 };
 
 /* structure for command builtin for when it is used with -v or -V */
@@ -324,6 +324,9 @@ static int
 execcursh(Estate state, int do_exec)
 {
     Wordcode end = state->pc + WC_CURSH_SKIP(state->pc[-1]);
+
+    /* Skip word only used for try/always */
+    state->pc++;
 
     if (!list_pipe && thisjob != list_pipe_job && !hasprocs(thisjob))
 	deletejob(jobtab + thisjob);
@@ -2475,6 +2478,9 @@ execcmd(Estate state, int input, int output, int how, int last1)
                 subsh_close = -1;
 		/* If we're forked (and we should be), no need to return */
 		DPUTS(last1 != 1 && !forked, "BUG: not exiting?");
+		DPUTS(type != WC_SUBSH, "Not sure what we're doing.");
+		/* Skip word only used for try/always blocks */
+		state->pc++;
 		execlist(state, 0, 1);
 	    }
 	}

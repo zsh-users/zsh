@@ -1,3 +1,10 @@
+2004-06-22  Peter Stephenson  <pws@csr.com>
+
+	* 20076, 20084: Doc/Zsh/grammar.yo, Doc/Zsh/params.yo, Src/exec.c,
+	Src/loop.c, Src/params.c, Src/parse.c, Src/prompt.c, Src/text.c,
+	Src/zsh.h, Test/A01grammar.ztst: { ... } always { ... } syntax
+	for making sure tidy-up code is run.
+
 2004-06-21  Bart Schaefer  <schaefer@zsh.org>
 
 	* unposted: Doc/Zsh/zle.yo: copy-prev-shell-word has no default

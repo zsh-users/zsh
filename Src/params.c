@@ -106,6 +106,7 @@ struct timeval shtimer;
  
 /* 0 if this $TERM setup is usable, otherwise it contains TERM_* flags */
 
+
 /**/
 mod_export int termflags;
  
@@ -191,6 +192,7 @@ IPDEF5("COLUMNS", &columns, zlevarsetfn),
 IPDEF5("LINES", &lines, zlevarsetfn),
 IPDEF5("OPTIND", &zoptind, intvarsetfn),
 IPDEF5("SHLVL", &shlvl, intvarsetfn),
+IPDEF5("TRY_BLOCK_ERROR", &try_errflag, intvarsetfn),
 
 #define IPDEF7(A,B) {NULL,A,PM_SCALAR|PM_SPECIAL,BR((void *)B),SFN(strvarsetfn),GFN(strvargetfn),stdunsetfn,0,NULL,NULL,NULL,0}
 IPDEF7("OPTARG", &zoptarg),

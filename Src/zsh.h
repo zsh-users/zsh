@@ -580,6 +580,10 @@ struct eccstr {
 #define WC_COND    17
 #define WC_ARITH   18
 #define WC_AUTOFN  19
+#define WC_TRY     20
+
+/* increment as necessary */
+#define WC_COUNT   21
 
 #define WCB_END()           wc_bld(WC_END, 0)
 
@@ -656,6 +660,9 @@ struct eccstr {
 
 #define WC_REPEAT_SKIP(C)   wc_data(C)
 #define WCB_REPEAT(O)       wc_bld(WC_REPEAT, (O))
+
+#define WC_TRY_SKIP(C)	    wc_data(C)
+#define WCB_TRY(O)	    wc_bld(WC_TRY, (O))
 
 #define WC_CASE_TYPE(C)     (wc_data(C) & 3)
 #define WC_CASE_HEAD        0
@@ -1695,6 +1702,10 @@ struct ttyinfo {
 #define CS_HEREDOCD    28
 #define CS_BRACE       29
 #define CS_BRACEPAR    30
+#define CS_ALWAYS      31
+
+/* Increment as necessary */
+#define CS_COUNT       32
 
 /*********************
  * Memory management *

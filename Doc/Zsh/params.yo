@@ -619,6 +619,14 @@ vindex(signals)
 item(tt(signals))(
 An array containing the names of the signals.
 )
+vindex(TRY_BLOCK_ERROR)
+item(tt(TRY_BLOCK_ERROR) <S>)(
+In an tt(always) block, indicates whether the preceding list of code
+caused an error.  The value is 1 to indicate an error, 0 otherwise.
+It may be reset, clearing the error condition.  See
+ifzman(em(Complex Commands) in zmanref(zshmisc))\
+ifnzman(noderef(Complex Commands))
+)
 vindex(TTY)
 item(tt(TTY))(
 The name of the tty associated with the shell, if any.

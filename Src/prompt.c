@@ -49,7 +49,7 @@ int cmdsp;
 
 /* parser states, for %_ */
 
-static char *cmdnames[] = {
+static char *cmdnames[CS_COUNT] = {
     "for",      "while",     "repeat",    "select",
     "until",    "if",        "then",      "else",
     "elif",     "math",      "cond",      "cmdor",
@@ -57,7 +57,7 @@ static char *cmdnames[] = {
     "case",     "function",  "subsh",     "cursh",
     "array",    "quote",     "dquote",    "bquote",
     "cmdsubst", "mathsubst", "elif-then", "heredoc",
-    "heredocd", "brace",     "braceparam",
+    "heredocd", "brace",     "braceparam", "always",
 };
  
 /* The buffer into which an expanded and metafied prompt is being written, *
