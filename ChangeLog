@@ -1,3 +1,8 @@
+2003-05-12  Oliver Kiddle  <opk@zsh.org>
+
+	* unposted: Completion/Unix/Command/_chown: use of _message -e:
+	a 4.1 feature had found its way in
+
 2003-05-12  Peter Stephenson  <pws@csr.com>
 
 	* 18524: Src/utils.c: sepjoin didn't respect !heap for an empty
@@ -18,6 +23,14 @@
 	separating source and replacment text in ${foo//bar/stuff} was
 	buggy.
 
+2003-04-24  Oliver Kiddle  <opk@zsh.org>
+
+	* unposted: Completion/Unix/Type/_perl_basepods: use _message
+	instead of echo for error message
+
+	* 18468: Completion/Unix/Type/_perl_builtin_funcs: follow Bart's
+	suggestion of using perldoc itself to retrieve the documentation
+
 2003-04-23  Peter Stephenson  <pws@pwstephenson.fsnet.co.uk>
 
 	* 18467: Src/Zle/computil.c: null pointer dereferenced with
@@ -25,6 +38,17 @@
 
 	* IKEGAMI Tsutomu: SourceForge bug 722366: initialisation of pwd
 	from PWD in environment didn't metafy.
+
+2003-04-23  Oliver Kiddle  <opk@zsh.org>
+
+	* 18462: Completion/Unix/Command/_sh: complete files in addition
+	to commands
+
+2003-04-22  Oliver Kiddle  <opk@zsh.org>
+
+	* unposted: Completion/Unix/Command/_imagemagick: correct return codes
+	
+	* 18458: Completion/Unix/Command/_renice: new completion for renice
 
 2003-04-18  Oliver Kiddle  <opk@zsh.org>
 
@@ -63,6 +87,16 @@
 
 	* 18346: Completion/Unix/Type/_pids, Completion/Unix/Type/_users:
 	complete for more commands using existing completions
+
+2003-03-11  Oliver Kiddle  <opk@zsh.org>
+
+	* 18337: Src/params.c: use C locale when converting floats to scalars
+	to avoid problems in locales where `,' is the decimal separator
+
+2003-03-10  Oliver Kiddle  <opk@zsh.org>
+
+	* 18330: Src/math.c: save output of setlocale as the pointer it
+	returns gets clobbered
 
 2003-03-07  Peter Stephenson  <pws@csr.com>
 

@@ -1,0 +1,15 @@
+#compdef sh ksh bash zsh csh tcsh rc
+
+if (( CURRENT == ${words[(i)-c]} + 1 )); then
+  compset -q
+  _normal
+else
+  local n=${words[(b:2:i)[^-]*]}
+  if (( n <= CURRENT )); then
+    compset -n $n
+    _alternative \
+      'files:file:_files' \
+      'commands:command:_normal' && return 0
+  fi
+  _default
+fi

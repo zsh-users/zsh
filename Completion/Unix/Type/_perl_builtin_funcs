@@ -1,0 +1,9 @@
+#autoload
+
+local expl
+
+: ${(A)_perl_builtin_funcs:=${(u)${${(M)${(f)"$(_call_program functions \
+    perldoc -u perlfunc 2>/dev/null)"}:#\=item [a-z]*}#* }%%[^a-z]*}}
+
+_wanted functions expl 'perl built-in function' compadd "$@" -a - \
+    _perl_builtin_funcs

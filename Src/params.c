@@ -3213,6 +3213,10 @@ char *
 convfloat(double dval, int digits, int flags, FILE *fout)
 {
     char fmt[] = "%.*e";
+    char *ret;
+#ifdef USE_LOCALE
+    char *prev_locale;
+#endif 
 
     /*
      * The difficulty with the buffer size is that a %f conversion
@@ -3247,14 +3251,22 @@ convfloat(double dval, int digits, int flags, FILE *fout)
 	    digits--;
 	}
     }
+#ifdef USE_LOCALE
+    prev_locale = dupstring(setlocale(LC_NUMERIC, NULL));
+    setlocale(LC_NUMERIC, "POSIX");
+#endif
     if (fout) {
 	fprintf(fout, fmt, digits, dval);
-	return NULL;
+	ret = NULL;
     } else {
 	VARARR(char, buf, 512 + digits);
 	sprintf(buf, fmt, digits, dval);
-	return dupstring(buf);
+	ret = dupstring(buf);
     }
+#ifdef USE_LOCALE
+    if (prev_locale) setlocale(LC_NUMERIC, prev_locale);
+#endif
+    return ret;
 }
 
 /* Start a parameter scope */
