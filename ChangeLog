@@ -1,3 +1,8 @@
+2001-08-08  Wayne Davison  <wayned@users.sourceforge.net>
+
+	* 15596: Src/Zle/compmatch.c, Src/Zle/compresult.c,
+	Src/Zle/computil.c: Silence some compiler warnings.
+
 2001-08-08  Sven Wischnowsky  <wischnow@zsh.org>
 
 	* 15597: Completion/Unix/Command/_dd, Doc/Zsh/compsys.yo,
