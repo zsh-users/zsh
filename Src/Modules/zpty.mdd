@@ -1,0 +1,5 @@
+name=zsh/zpty
+
+autobins="zpty"
+
+objects="zpty.o"
