@@ -3616,7 +3616,7 @@ tt(compadd) when generating matches from the style value, or to
 the functions for the fields if they are called.
 )
 findex(_describe)
-item(tt(_describe) [ tt(-o) ] var(descr) var(name1) [ var(name2) ] var(opts) ... tt(-)tt(-) ...)(
+item(tt(_describe) [ tt(-o) | tt(-t) var(tag) ] var(descr) var(name1) [ var(name2) ] var(opts) ... tt(-)tt(-) ...)(
 This function is useful for preparing a list of command options or
 arguments, together with their descriptions var(descr), as matches.
 Multiple groups separated by tt(-)tt(-) can be supplied, potentially with
@@ -3639,6 +3639,9 @@ will be treated as option names (typically following a `tt(-)',
 the tt(prefix-hidden), tt(prefix-needed) and tt(verbose) styles to find out
 if the strings should be added at all and if the descriptions should be
 shown.  Without the `tt(-o)' option, only the tt(verbose) style is used.
+With the tt(-t) option a var(tag) can be specified that should be used
+instead of the default `tt(values)' or, if the tt(-o) option is given,
+`tt(options)'.
 
 If selected by the tt(list-grouped) style, strings with the same
 description will be added in a way that they appear together in the list.

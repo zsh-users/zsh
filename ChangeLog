@@ -1,3 +1,8 @@
+2002-05-14  Sven Wischnowsky  <wischnow@zsh.org>
+
+	* 17146: Doc/Zsh/compsys.yo: fix doc for _describe, mention -t
+	option
+
 2002-05-13  Peter Stephenson  <pws@csr.com>
 
 	* 17120, 17121: Src/init.c: work around problem that NIS ties up a
