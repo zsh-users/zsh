@@ -1,3 +1,7 @@
+2001-04-25  Sven Wischnowsky  <wischnow@zsh.org>
+
+	* 14089: Src/Zle/computil.c: fix a sizeof() to strlen(). ahem.
+
 2001-04-23  Bart Schaefer  <schaefer@brasslantern.com>
 
 	* 14081: configure.in, Src/termcap.c, Src/terminfo.c: Fix linking
@@ -77,10 +81,6 @@
 	* 14008: Src/builtin.c: Keep track of the new Param created when
 	typeset_single() calls setsparam() in some circumstances; drop a
 	redundant isident() test.
-
-2001-04-25  Sven Wischnowsky  <wischnow@zsh.org>
-
-	* ?????: Src/Zle/computil.c: fix a sizeof() to strlen(). ahem.
 
 2001-04-19  Peter Stephenson  <pws@pwstephenson.fsnet.co.uk>
 
