@@ -224,7 +224,7 @@ _mysqladmin_commands () {
 }
 
 _mysql_utils () {
-  case "${words[1]:t}" in
+  case "$service" in
     mysql)
       _mysql "$@"
     ;;

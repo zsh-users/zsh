@@ -1,10 +1,10 @@
-#compdef gzip gunzip gzcat
+#compdef gzip gunzip gzcat=gunzip
 
 local decompress expl curcontext="$curcontext" state line
 typeset -A opt_args
 
-case "${words[1]:t}" in
-gunzip|zcat|gzcat)
+case "$service" in
+gunzip)
   decompress=yes
   ;&
 gzip)

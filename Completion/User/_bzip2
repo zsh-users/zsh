@@ -1,12 +1,12 @@
-#compdef bzip2 bzcat bunzip2 bzip2recover
+#compdef bzip2 bunzip2 bzcat=bunzip2 bzip2recover
 
 local decompress expl state line curcontext="$curcontext"
 typeset -A opt_args
 
-case "${words[1]:t}" in
+case "$service" in
   bzip2recover) [[ $CURRENT = 2 ]] && state=files;;
   bzip2) decompress=no;&
-  bunzip2|bzcat) _arguments -C -s \
+  bunzip2) _arguments -C -s \
     '(--help)-h[display help message]' \
     '(-h)--help[display help message]' \
     '(--decompress --compress -z --test -t)-d[decompress]' \

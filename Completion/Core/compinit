@@ -100,12 +100,13 @@ while [[ $# -gt 0 && $1 = -[dDiuC] ]]; do
   esac
 done
 
-# The associative array containing the definitions for the commands.
+# The associative array containing the definitions for the commands and
+# services.
 # Definitions for patterns will be stored in the associations `_patcomps'
 # and `_postpatcomps'. `_compautos' contains the names and options
 # for autoloaded functions that get options.
 
-typeset -gA _comps _patcomps _postpatcomps _compautos
+typeset -gA _comps _services _patcomps _postpatcomps _compautos
 
 # The associative array use to report information about the last
 # cmpletion to the outside.
@@ -198,12 +199,12 @@ comppostfuncs=()
 #   delete the definitions for the command names `bar' and `baz'
 
 compdef() {
-  local opt autol type func delete new i
+  local opt autol type func delete new i ret=0 cmd svc
 
   # Get the options.
 
   if [[ $#* -eq 0 ]]; then
-    echo "compdef needs parameters"
+    echo "$0: I needs arguments"
     return 1
   fi
   
@@ -233,11 +234,38 @@ compdef() {
   shift OPTIND-1
 
   if [[ $#* -eq 0 ]]; then
-    echo "compdef needs parameters"
+    echo "$0: I needs arguments"
     return 1
   fi
   
   if [[ -z "$delete" ]]; then
+    # If the first word contains an equal sign, all words must contain one
+    # and we define which services to use for the commands.
+
+    if [[ "$1" = *\=* ]]; then
+      for i; do
+        if [[ "$i" = *\=* ]]; then
+	  cmd="${i%%\=*}"
+	  svc="${i#*\=}"
+          func="$_comps[${(k)_services[(R)$svc]:-$svc}]"
+	  [[ -z "$func" ]] &&
+	    func="${_patcomps[(K)$svc][1]:-${_postpatcomps[(K)$svc][1]}}"
+          if [[ -n "$func" ]]; then
+	    _comps[$cmd]="$func"
+	    _services[$cmd]="$svc"
+	  else
+	    echo "$0: unknown command or service: $svc"
+	    ret=1
+	  fi
+	else
+	  echo "$0: invalid argument: $i"
+	  ret=1
+	fi
+      done
+
+      return ret
+    fi
+
     # Adding definitions, first get the name of the function name
     # and probably do autoloading.
 
@@ -307,15 +335,19 @@ compdef() {
     *)
       # For commands store the function name in the `_comps'
       # associative array, command names as keys.
-      if [[ -z "$new" ]]; then
-	for i; do
-	  _comps[$i]="$func"
-	done
-      else
-        for i; do
-          [[ "${+_comps[$i]}" -eq 0 ]] && _comps[$i]="$func"
-        done
-      fi
+      for i; do
+        if [[ "$i" = *\=* ]]; then
+	  cmd="${i%%\=*}"
+	  svc=yes
+        else
+	  cmd="$i"
+	  svc=
+        fi
+        if [[ -z "$new" || "${+_comps[$i]}" -eq 0 ]]; then
+          _comps[$cmd]="$func"
+	  [[ -n "$svc" ]] && _services[$cmd]="${i#*\=}"
+	fi
+      done
       ;;
     esac
   else
@@ -331,7 +363,7 @@ compdef() {
       # Oops, cannot do that yet.
 
       echo "$0: cannot restore key bindings"
-      return 1
+      return 1v
       ;;
     *)
       unset "_comps[$^@]"

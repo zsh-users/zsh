@@ -164,6 +164,14 @@ in it will be called when completing var(names), each of which is
 either the name of a command whose arguments are to be completed or one of
 a number of special contexts in the form tt(-)var(context)tt(-) described
 below for the tt(_complete) function.
+
+Each var(name) may also be of the form `var(cmd)tt(=)var(service)'.  This
+is used by functions that offer multiple services, i.e. different
+completion behaviour for multiple commands.  Such a string
+makes the completion system call the function when completing
+arguments for the command `tt(cmd)', setting the parameter tt($service) 
+to the string `tt(service)'.  The function can then use that parameter 
+to decide what to complete.
 )
 item(tt(#compdef -p) var(pattern))(
 The file will be made autoloadable and the function defined in it will be
@@ -253,7 +261,15 @@ xitem(tt(compdef -k) [ tt(-an) ] var(function style key-sequences...))
 item(tt(compdef -K) [ tt(-an) ] var(function name style key-sequences ...))(
 The first form tells the completion system to call the given
 var(function) when completing for the contexts or commands
-whose var(names) are given:  this is like the tt(#compdef) tag.  If the
+whose var(names) are given:  this is like the tt(#compdef) tag unless
+the first word contains an equal sign.  In this case all words have to 
+be of the form `var(cmd)tt(=)var(service)' where var(service) is the
+name of a command or of a service defined by an autoloaded function
+with the tt(#compdef) tag and an argument of the form
+`var(cmd)tt(=)var(service)'.  This kind of use makes the arguments of
+the var(cmd)s be completed as those for the var(services).
+
+If the
 tt(-n) option is given, any existing completion behaviour for particular
 contexts or commands will not be altered.  These definitions can be deleted
 by giving the tt(-d) option as in the second form.

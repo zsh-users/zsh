@@ -4,7 +4,7 @@
 # a normal completion function, but as one possible value for the
 # completer style.
 
-local comp name oldcontext ret=1
+local comp name oldcontext ret=1 service
 typeset -T curcontext="$curcontext" ccarray
 
 oldcontext="$curcontext"
@@ -95,6 +95,7 @@ fi
 
 comp="$_comps[-first-]"
 if [[ ! -z "$comp" ]]; then
+  service="${_services[-first-]:--first-}"
   ccarray[3]=-first-
   "$comp" && ret=0
   if [[ "$_compskip" = all ]]; then
@@ -123,6 +124,7 @@ else
   ccarray[3]="$cname"
 
   comp="$_comps[$cname]"
+  service="${_services[$cname]:-$cname}"
 
   # If not, we use default completion, if any.
 
@@ -133,7 +135,8 @@ else
     fi
     comp="$_comps[-default-]"
   fi
-  [[ -z "$comp" ]] || "$comp" && ret=0
+  [[ -z "$comp" ]] ||
+      service="${_services[-default-]:--default-}" && "$comp" && ret=0
 fi
 
 _compskip=

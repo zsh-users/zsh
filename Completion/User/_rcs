@@ -1,14 +1,14 @@
 #compdef co ci rcs
 
-local cmd="${words[1]:t}" ret=1
+local ret=1
 
-if [[ -d RCS && $cmd != ci ]]; then
+if [[ -d RCS && $service != ci ]]; then
   local rep expl
 
   rep=(RCS/*,v(:t:s/\,v//))
   (( $#rep )) && _wanted files expl 'RCS file' compadd -a rep && ret=0
 fi
 
-[[ $cmd = ci || $cmd = rcs || ret -eq 1 ]] && _files && ret=0
+[[ $service = ci || $service = rcs || ret -eq 1 ]] && _files && ret=0
 
 return ret

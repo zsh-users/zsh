@@ -17,7 +17,7 @@ common_args2=( \
   '(-q)-v[display compression statistics]' \
   "${common_args1[@]}" )
 
-case "${words[1]:t}" in
+case "$service" in
   compress)
     _arguments -C -s \
       "-b[specify maximum number of bits used to replace common substring]:bits:(${bits[*]})" \

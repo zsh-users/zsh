@@ -6,14 +6,14 @@
 # defaults can be overridden by simply defining completion functions
 # for those commands whose arguments you want to complete differently.
 
-local pat expl ret=1 cmd="${words[1]:t}"
+local pat expl ret=1
 
-if [[ "$cmd" = pnm* ]]; then
+if [[ "$service" = pnm* ]]; then
   pat='*.(#i)p[bgp]m'
-elif [[ "$cmd" = *top[bgpn]m ]]; then
-  pat="*.(#i)${cmd%%top[bgpn]m}"
+elif [[ "$service" = *top[bgpn]m ]]; then
+  pat="*.(#i)${service%%top[bgpn]m}"
 else
-  pat="*.(#i)${cmd[1,3]}"
+  pat="*.(#i)${service[1,3]}"
 fi
   
 if [[ $# -ne 0 || $+_in_pbm -ne 0 ]]; then
@@ -24,7 +24,7 @@ fi
 
 local _in_pbm=yes
 
-case "$cmd" in
+case "$service" in
 asciitop[gn]m)
   _arguments \
     '-d[specify divisor]:divisor:' \

@@ -18,7 +18,7 @@ _rb_commonargs=('(--bts)-B[use alternate BTS]:system:(debian gnome kde tdyc kde-
 	   '(--http_proxy)--proxy=:proxyhost:_hosts' \
 	   '(--proxy)--http_proxy=:proxyhost:_hosts')
 
-case "${words[1]:t}" in
+case "$service" in
 bug)
 _arguments '-c[exclude configs from report]' \
            '-f[argument is a file, not a package]' \

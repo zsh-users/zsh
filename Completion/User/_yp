@@ -14,7 +14,7 @@ if (( ! $+_yp_cache_maps )); then
   )
 fi
 
-case "${words[1]:t}" in
+case "$service" in
 ypcat)
   _arguments -C -s "$_yp_args[@]" ':map name:->map' && ret=0
   ;;

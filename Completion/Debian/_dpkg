@@ -86,7 +86,7 @@ _dpkg_options_recursive=('(--recursive)-R[recursive]' '(-R)--recursive')
 #  _dpkg_actions_install=('(--install)-i[install]' '(-i)--install')
 #  _dpkg_actions_record_avail=('(--record-avail)-A[record available]' '(-A)--record-avail')
 
-case "${words[1]:t}" in
+case "$service" in
 dpkg)
 _arguments -C -s "$_dpkg_actions[@]" \
            "$_dpkg_deb_actions[@]" \

@@ -18,7 +18,7 @@ if (( $# )); then
   return
 fi
 
-case "${words[1]:t}" in
+case "$service" in
 display)
   _arguments -M 'm:{a-z}={A-Z}' \
       '*-backdrop[use full screen]' \

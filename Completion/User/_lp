@@ -5,7 +5,7 @@ local expl ret=1 printer list disp strs shown
 if compset -P -P || [[ "$words[CURRENT-1]" = -P ]]; then
   _printers
 else
-  if [[ "${words[1]:t}" = (lpq|lprm) ]]; then
+  if [[ "$service" = (lpq|lprm) ]]; then
     if [[ "$words" = *-P* ]]; then
       printer=(-P "${${words##*-P( |)}%% *}")
     else

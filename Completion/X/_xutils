@@ -1,6 +1,6 @@
 #compdef xdpyinfo xwininfo xkill xfontsel xfd xev xhost xon xsetroot xwd xwud xrdb
 
-case "${words[1]:t}" in
+case "$service" in
 xdpyinfo)
   _x_arguments \
     -queryExtensions \

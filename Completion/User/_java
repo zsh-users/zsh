@@ -6,7 +6,7 @@ typeset -A opt_args tmpassoc
 
 jdb_args=()
 
-case "${words[1]:t}" in
+case "$service" in
 javac)
   _arguments \
     '-g-[generate debugging information]:debug:->debug' \

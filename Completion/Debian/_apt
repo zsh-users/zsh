@@ -1,12 +1,12 @@
 #compdef apt-get apt-cache apt-cdrom apt-config
 
 _apt () {
-  case "${words[1]:t}" in
+  case "$service" in
     apt-get) _apt-get "$@";;
     apt-cache) _apt-cache "$@";;
     apt-cdrom) _apt-cdrom "$@";;
     apt-config) _apt-config "$@";;
-    *) _message "unknown command $words[1]";;
+    *) _message "unknown command $service";;
   esac
 }
 

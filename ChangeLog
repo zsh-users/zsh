@@ -1,3 +1,23 @@
+2001-01-15  Sven Wischnowsky  <wischnow@zsh.org>
+
+	* 13346: Completion/Bsd/_bsd_pkg, Completion/Bsd/_kld,
+ 	Completion/Core/_compalso, Completion/Core/_complete,
+ 	Completion/Core/_normal, Completion/Core/compdump,
+ 	Completion/Core/compinit, Completion/Debian/_apt,
+ 	Completion/Debian/_bug, Completion/Debian/_dpkg,
+ 	Completion/User/_bzip2, Completion/User/_chown,
+ 	Completion/User/_compress, Completion/User/_dvi,
+ 	Completion/User/_gzip, Completion/User/_imagemagick,
+ 	Completion/User/_ispell, Completion/User/_java,
+ 	Completion/User/_lp, Completion/User/_make,
+ 	Completion/User/_mount, Completion/User/_mysql_utils,
+ 	Completion/User/_pack, Completion/User/_pbm,
+ 	Completion/User/_psutils, Completion/User/_rcs,
+ 	Completion/User/_rlogin, Completion/User/_ssh,
+ 	Completion/User/_tiff, Completion/User/_yp, Completion/X/_xutils,
+ 	Doc/Zsh/compsys.yo: add `services', allowing easier re-use of
+ 	(parts of) completion functions (see also: 12977)
+	
 2001-01-12  Sven Wischnowsky  <wischnow@zsh.org>
 
 	* 13343: Src/Zle/compmatch.c, Src/Zle/compresult.c: fix for 13339

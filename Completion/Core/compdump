@@ -35,12 +35,19 @@ fi
 
 print "#files: $#_d_files" > $_d_file
 
-# First dump the arrays _comps and _patcomps.  The quoting hieroglyphyics
-# ensure that a single quote inside a variable is itself correctly quoted.
+# First dump the arrays _comps, _services and _patcomps.  The quoting
+# hieroglyphyics ensure that a single quote inside a variable is itself
+# correctly quoted.
 
 print "_comps=(" >> $_d_file
 for _d_f in ${(ok)_comps}; do
     print -r - "${(q)_d_f}" "${(q)_comps[$_d_f]}"
+done  >> $_d_file
+print ")" >> $_d_file
+
+print "_services=(" >> $_d_file
+for _d_f in ${(ok)_services}; do
+    print -r - "${(q)_d_f}" "${(q)_services[$_d_f]}"
 done  >> $_d_file
 print ")" >> $_d_file
 

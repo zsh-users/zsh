@@ -1,7 +1,7 @@
-#compdef rlogin rsh remsh rcp
+#compdef rlogin rsh remsh=rsh rcp
 
 _rlogin () {
-  case "${words[1]:t}" in
+  case "$service" in
   rlogin)
     _arguments -s \
       '-8[allow 8-Bit data]' \

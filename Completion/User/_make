@@ -25,7 +25,7 @@ else
     file=Makefile
   elif [[ -e makefile ]]; then
     file=makefile
-  elif [[ -e GNUmakefile ]]; then
+  elif [[ -n "$_is_gnu[$words[1]]" && -e GNUmakefile ]]; then
     file=GNUmakefile
   else
     file=''

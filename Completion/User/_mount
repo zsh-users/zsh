@@ -368,7 +368,7 @@ if (( ! $+_fs_any )); then
   esac
 fi
 
-if [[ "${words[1]:t}" = mount ]]; then
+if [[ "$service" = mount ]]; then
 
   # Here are the tests and tables for the arguments and options for
   # the `mount' program. The `fss' array has to be set to the names

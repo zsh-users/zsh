@@ -1,7 +1,7 @@
 #compdef -command-line-
 
 local comp command cmd1 cmd2 pat val name i ret=1 _compskip="$_compskip"
-local curcontext="$curcontext"
+local curcontext="$curcontext" service
 
 # If we get the option `-s', we don't reset `_compskip'. This ensures
 # that a value set in the function for the `-first-' context is kept,
@@ -44,6 +44,7 @@ fi
 # See if there are any matching pattern completions.
 
 if [[ "$_compskip" != (all|*patterns*) ]]; then
+  service="${_services[$cmd1]:-$cmd1}"
   for i in "${(@)_patcomps[(K)$cmd1]}"; do
     "$i" && ret=0
     if [[ "$_compskip" = *patterns* ]]; then
@@ -54,6 +55,7 @@ if [[ "$_compskip" != (all|*patterns*) ]]; then
     fi
   done
   if [[ -n "$cmd2" ]]; then
+    service="${_services[$cmd2]:-$cmd2}"
     for i in "${(@)_patcomps[(K)$cmd2]}"; do
       "$i" && ret=0
       if [[ "$_compskip" = *patterns* ]]; then
@@ -71,8 +73,10 @@ fi
 ret=1
 name="$cmd1"
 comp="$_comps[$cmd1]"
+service="${_services[$cmd1]:-$cmd1}"
 
-[[ -z "$comp" ]] && name="$cmd2" comp="$_comps[$cmd2]"
+[[ -z "$comp" ]] &&
+    name="$cmd2" comp="$_comps[$cmd2]" service="${_services[$cmd2]:-$cmd2}"
 
 # And generate the matches, probably using default completion.
 
@@ -86,6 +90,7 @@ elif [[ "$_compskip" != *default* ]]; then
 fi
 
 if [[ "$_compskip" != (all|*patterns*) ]]; then
+  service="${_services[$cmd1]:-$cmd1}"
   for i in "${(@)_postpatcomps[(K)$cmd1]}"; do
     _compskip=default
     "$i" && ret=0
@@ -97,6 +102,7 @@ if [[ "$_compskip" != (all|*patterns*) ]]; then
     fi
   done
   if [[ -n "$cmd2" ]]; then
+    service="${_services[$cmd2]:-$cmd2}"
     for i in "${(@)_postpatcomps[(K)$cmd2]}"; do
       _compskip=default
       "$i" && ret=0
@@ -111,7 +117,7 @@ if [[ "$_compskip" != (all|*patterns*) ]]; then
 fi
 
 [[ "$name" = -default- && -n "$comp" && "$_compskip" != (all|*default*) ]] &&
-  "$comp" && ret=0
+  service="${_services[-default-]:--default-}" && "$comp" && ret=0
 
 _compskip=''
 

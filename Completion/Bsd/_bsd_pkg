@@ -13,7 +13,7 @@ _bsd_pkg_packages() {
 }
 
 _bsd_pkg() {
-  case "${words[1]:t}" in
+  case "$service" in
   pkg_add)
     _arguments -s \
         '-v[be verbose]' \

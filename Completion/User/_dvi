@@ -9,7 +9,7 @@ args=(
   ':output DVI file:_files -g \*.\(dvi\|DVI\)'
 )
 
-case "${words[1]:t}" in
+case "$service" in
 dvips)
   _arguments -s \
     '-a[make three passes]' \

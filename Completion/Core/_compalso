@@ -7,11 +7,11 @@
 # `_compalso -math-' to get the completions that would be generated for a
 # mathematical context.
 
-local i tmp ret=1
+local i tmp ret=1 service
 
 for i; do
-  tmp="$_comps[$1]"
-  [[ -z "$tmp" ]] || "$tmp" && ret=0
+  tmp="$_comps[$i]"
+  [[ -z "$tmp" ]] || service="${_services[$i]:-$i}" && "$tmp" && ret=0
 done
 
 return ret

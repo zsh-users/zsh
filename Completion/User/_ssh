@@ -1,9 +1,12 @@
-#compdef ssh slogin scp ssh-add ssh-agent ssh-keygen
+#compdef ssh slogin=ssh scp ssh-add ssh-agent ssh-keygen
 
 _remote_files () {
   # This is extremely simple-minded; could parse "ls -F" output to do
   # colorings and LIST_TYPES and so on, but I'm just not that ambitious.
-  compadd $(ssh -a -x ${words[CURRENT]%:*} echo ${words[CURRENT]#*:}\*)
+  local expl
+
+  _wanted files expl 'remote files' \
+      compadd $(ssh -a -x ${words[CURRENT]%:*} echo ${words[CURRENT]#*:}\*)
 }
 
 _ssh () {
@@ -14,8 +17,8 @@ _ssh () {
 
   # ssh-opt is a pseudo-command used to complete ssh options for `scp -o'.
 
-  case "${words[1]:t}" in
-  ssh|slogin)
+  case "$service" in
+  ssh)
     args=(
       ':remote host name:->userhost'
       '(-):command: _command_names -e'
@@ -179,6 +182,7 @@ _ssh () {
       compset -q
       words=(ssh-opt "$words[@]" )
       (( CURRENT++ ))
+      service=ssh-opt
       _ssh
       return
     elif [[ -n "$state" ]]; then

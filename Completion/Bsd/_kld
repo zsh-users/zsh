@@ -21,7 +21,7 @@ _kld_unload_id() {
 }
 
 _kld() {
-  case "${words[1]:t}" in
+  case "$service" in
   kldload)
     _arguments -s \
         '-v[be verbose]' \
