@@ -18,8 +18,8 @@
 
 2001-06-27  Peter Stephenson  <pws@pwstephenson.fsnet.co.uk>
 
-	* 15151: zshconfig.ac: enable-sitefndir should have been
-	enable-site-fndir, spotted by Jos Backus.
+	* 15151: zshconfig.ac: --enable-sitefndir should be
+	--enable-site-fndir, spotted by Jos Backus.
 
 2001-06-27  Sven Wischnowsky  <wischnow@zsh.org>
 
@@ -55,6 +55,9 @@
 2001-06-25  Peter Stephenson  <pws@pwstephenson.fsnet.co.uk>
 
 	* zsh-users/3942: source installed as Etc/FAQ.yo: latest FAQ.
+	
+	* unposted: Completion/Zsh/Context/.distfiles: add _autocd.
+
 
 2001-06-25  Clint Adams  <clint@zsh.org>
 
