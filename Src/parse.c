@@ -399,6 +399,13 @@ bld_eprog(void)
     return ret;
 }
 
+/**/
+mod_export int
+empty_eprog(Eprog p)
+{
+    return (!p || !p->prog || *p->prog == WCB_END());
+}
+
 /*
  * event	: ENDINPUT
  *			| SEPER

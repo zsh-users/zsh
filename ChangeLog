@@ -1,5 +1,8 @@
 2000-04-10  Sven Wischnowsky <wischnow@informatik.hu-berlin.de>
 
+	* 10625: Src/parse.c, Src/signals.c: detect ignored signals
+ 	correctly
+	
 	* 10622: Completion/Core/_files: typo caused ignored-patterns to
  	be ignored
 	

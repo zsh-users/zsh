@@ -34,12 +34,12 @@
  * 0 for the default action or some ZSIG_* flags ored together.   */
 
 /**/
-int sigtrapped[VSIGCOUNT];
+mod_export int sigtrapped[VSIGCOUNT];
 
 /* trap functions for each signal */
 
 /**/
-List sigfuncs[VSIGCOUNT];
+mod_export Eprog sigfuncs[VSIGCOUNT];
 
 /* Variables used by signal queueing */
 
@@ -82,7 +82,7 @@ static sigset_t blocked_set;
  * system calls are not restarted.                    */
 
 /**/
-void
+mod_export void
 install_handler(int sig)
 {
 #ifdef POSIX_SIGNALS
@@ -122,17 +122,16 @@ install_handler(int sig)
 /* enable ^C interrupts */
  
 /**/
-void
+mod_export void
 intr(void)
 {
     if (interact)
         install_handler(SIGINT);
 }
 
-#if 0
 /* disable ^C interrupts */
  
-/**/
+#if 0 /**/
 void
 nointr(void)
 {
@@ -144,7 +143,7 @@ nointr(void)
 /* temporarily block ^C interrupts */
  
 /**/
-void
+mod_export void
 holdintr(void)
 {
     if (interact)
@@ -154,7 +153,7 @@ holdintr(void)
 /* release ^C interrupts */
  
 /**/
-void
+mod_export void
 noholdintr(void)
 {
     if (interact)
@@ -178,20 +177,25 @@ signal_mask(int sig)
 
 /* Block the signals in the given signal *
  * set. Return the old signal set.       */
- 
+
 /**/
+#ifdef POSIX_SIGNALS
+
+/**/
+mod_export sigset_t dummy_sigset1, dummy_sigset2;
+
+/**/
+#else
+
+/**/
+#ifndef BSD_SIGNALS
+
 sigset_t
 signal_block(sigset_t set)
 {
     sigset_t oset;
  
-#ifdef POSIX_SIGNALS
-    sigprocmask(SIG_BLOCK, &set, &oset);
-#else
-# ifdef BSD_SIGNALS
-    oset = sigblock(set);
-# else
-#  ifdef SYSV_SIGNALS
+#ifdef SYSV_SIGNALS
     int i;
  
     oset = blocked_set;
@@ -201,7 +205,7 @@ signal_block(sigset_t set)
             sighold(i);
         }
     }
-#  else  /* NO_SIGNAL_BLOCKING */
+#else  /* NO_SIGNAL_BLOCKING */
 /* We will just ignore signals if the system doesn't have *
  * the ability to block them.                             */
     int i;
@@ -213,25 +217,27 @@ signal_block(sigset_t set)
             signal_ignore(i);
         }
    }
-#  endif /* SYSV_SIGNALS  */
-# endif  /* BSD_SIGNALS   */
-#endif   /* POSIX_SIGNALS */
+#endif /* SYSV_SIGNALS  */
  
     return oset;
 }
 
+/**/
+#endif /* BSD_SIGNALS */
+
+/**/
+#endif /* POSIX_SIGNALS */
+
 /* Unblock the signals in the given signal *
  * set. Return the old signal set.         */
 
-/**/
+#ifndef POSIX_SIGNALS
+
 sigset_t
 signal_unblock(sigset_t set)
 {
     sigset_t oset;
  
-#ifdef POSIX_SIGNALS
-    sigprocmask(SIG_UNBLOCK, &set, &oset);
-#else
 # ifdef BSD_SIGNALS
     sigfillset(&oset);
     oset = sigsetmask(oset);
@@ -261,10 +267,11 @@ signal_unblock(sigset_t set)
    }
 #  endif /* SYSV_SIGNALS  */
 # endif  /* BSD_SIGNALS   */
-#endif   /* POSIX_SIGNALS */
  
     return oset;
 }
+
+#endif   /* POSIX_SIGNALS */
 
 /* set the process signal mask to *
  * be the given signal mask       */
@@ -327,14 +334,23 @@ signal_suspend(int sig, int sig2)
  
 #ifdef POSIX_SIGNALS
     sigset_t set;
+#ifdef BROKEN_POSIX_SIGSUSPEND
+    sigset_t oset;
+#endif /* BROKEN_POSIX_SIGSUSPEND */
 
     sigfillset(&set);
     sigdelset(&set, sig);
     sigdelset(&set, SIGHUP);  /* still don't know why we add this? */
     if (sig2)
         sigdelset(&set, sig2);
+#ifdef BROKEN_POSIX_SIGSUSPEND
+    sigprocmask(SIG_SETMASK, &set, &oset);
+    pause();
+    sigprocmask(SIG_SETMASK, &oset, NULL);
+#else /* not BROKEN_POSIX_SIGSUSPEND */
     ret = sigsuspend(&set);
-#else
+#endif /* BROKEN_POSIX_SIGSUSPEND */
+#else /* not POSIX_SIGNALS */
 # ifdef BSD_SIGNALS
     sigset_t set;
 
@@ -505,7 +521,7 @@ handler(int sig)
 
 #ifdef SIGWINCH
     case SIGWINCH:
-        adjustwinsize();  /* check window size and adjust */
+        adjustwinsize(1);  /* check window size and adjust */
 	if (sigtrapped[SIGWINCH])
 	    dotrap(SIGWINCH);
         break;
@@ -515,8 +531,9 @@ handler(int sig)
         if (sigtrapped[SIGALRM]) {
 	    int tmout;
             dotrap(SIGALRM);
-            if ((tmout = getiparam("TMOUT")))
-                alarm(tmout);           /* reset the alarm */
+
+	    if ((tmout = getiparam("TMOUT")))
+		alarm(tmout);           /* reset the alarm */
         } else {
 	    int idle = ttyidlegetfn(NULL);
 	    int tmout = getiparam("TMOUT");
@@ -562,11 +579,12 @@ killrunjobs(int from_signal)
         if ((from_signal || i != thisjob) && (jobtab[i].stat & STAT_LOCKED) &&
             !(jobtab[i].stat & STAT_NOPRINT) &&
             !(jobtab[i].stat & STAT_STOPPED)) {
-            if (killpg(jobtab[i].gleader, SIGHUP) != -1)
+            if (jobtab[i].gleader != getpid() &&
+		killpg(jobtab[i].gleader, SIGHUP) != -1)
                 killed++;
         }
     if (killed)
-        zerr("warning: %d jobs SIGHUPed", NULL, killed);
+        zwarn("warning: %d jobs SIGHUPed", NULL, killed);
 }
 
 
@@ -583,29 +601,86 @@ killjb(Job jn, int sig)
         if (jn->stat & STAT_SUPERJOB) {
             if (sig == SIGCONT) {
                 for (pn = jobtab[jn->other].procs; pn; pn = pn->next)
-                    kill(pn->pid, sig);
+                    if (killpg(pn->pid, sig) == -1)
+			if (kill(pn->pid, sig) == -1 && errno != ESRCH)
+			    err = -1;
  
                 for (pn = jn->procs; pn->next; pn = pn->next)
-                    err = kill(pn->pid, sig);
- 
+                    if (kill(pn->pid, sig) == -1 && errno != ESRCH)
+			err = -1;
+
+		if (!jobtab[jn->other].procs && pn)
+		    if (kill(pn->pid, sig) == -1 && errno != ESRCH)
+			err = -1;
+
                 return err;
             }
- 
-            killpg(jobtab[jn->other].gleader, sig);
-            return killpg(jn->gleader, sig);
+            if (killpg(jobtab[jn->other].gleader, sig) == -1 && errno != ESRCH)
+		err = -1;
+		
+	    if (killpg(jn->gleader, sig) == -1 && errno != ESRCH)
+		err = -1;
+
+	    return err;
         }
         else
-            return (killpg(jn->gleader, sig));
+	    return killpg(jn->gleader, sig);
     }
     for (pn = jn->procs; pn; pn = pn->next)
-        if ((err = kill(pn->pid, sig)) == -1 && errno != ESRCH)
+        if ((err = kill(pn->pid, sig)) == -1 && errno != ESRCH && sig != 0)
             return -1;
     return err;
 }
 
+/*
+ * List for saving traps.  We don't usually have that many traps
+ * at once, so just use a linked list.
+ */
+struct savetrap {
+    int sig, flags, local;
+    void *list;
+};
+
+static LinkList savetraps;
+
+/*
+ * Save the current trap and unset it.
+ */
+
+static void
+dosavetrap(int sig, int level)
+{
+    struct savetrap *st;
+    st = (struct savetrap *)zalloc(sizeof(*st));
+    st->sig = sig;
+    st->local = level;
+    if ((st->flags = sigtrapped[sig]) & ZSIG_FUNC) {
+	/*
+	 * Get the old function: this assumes we haven't added
+	 * the new one yet.
+	 */
+	char func[20];
+	sprintf(func, "TRAP%s", sigs[sig]);
+	/* We call removehashnode() directly because otherwise
+	 * removeshfuncnode() would be called which in turn would
+	 * call us again so that we would end up with a NULL pointer
+	 * instead of the list for the trap. */
+	st->list = removehashnode(shfunctab, func);
+    } else {
+	st->list = sigfuncs[sig];
+	sigfuncs[sig] = NULL;
+    }
+    if (!savetraps)
+	savetraps = znewlinklist();
+    /*
+     * Put this at the front of the list
+     */
+    zinsertlinknode(savetraps, (LinkNode)savetraps, st);
+}
+
 /**/
-int
-settrap(int sig, List l)
+mod_export int
+settrap(int sig, Eprog l)
 {
     if (sig == -1)
         return 1;
@@ -613,10 +688,15 @@ settrap(int sig, List l)
         zerr("can't trap SIG%s in interactive shells", sigs[sig], 0);
         return 1;
     }
-    if (sigfuncs[sig])
-	unsettrap(sig);
+
+    /*
+     * Call unsettrap() unconditionally, to make sure trap is saved
+     * if necessary.
+     */
+    unsettrap(sig);
+
     sigfuncs[sig] = l;
-    if (!l) {
+    if (empty_eprog(l)) {
 	sigtrapped[sig] = ZSIG_IGNORED;
         if (sig && sig <= SIGCOUNT &&
 #ifdef SIGWINCH
@@ -633,6 +713,12 @@ settrap(int sig, List l)
             sig != SIGCHLD)
             install_handler(sig);
     }
+    /*
+     * Note that introducing the locallevel does not affect whether
+     * sigtrapped[sig] is zero or not, i.e. a test without a mask
+     * works just the same.
+     */
+    sigtrapped[sig] |= (locallevel << ZSIG_SHIFT);
     return 0;
 }
 
@@ -642,10 +728,23 @@ unsettrap(int sig)
 {
     int trapped;
 
-    if (sig == -1 || !(trapped = sigtrapped[sig]) ||
-	(jobbing && (sig == SIGTTOU || sig == SIGTSTP || sig == SIGTTIN))) {
+    if (sig == -1 ||
+	(jobbing && (sig == SIGTTOU || sig == SIGTSTP || sig == SIGTTIN)))
+	return;
+
+    trapped = sigtrapped[sig];
+    /*
+     * Note that we save the trap here even if there isn't an existing
+     * one, to aid in removing this one.  However, if there's
+     * already one at the current locallevel we just overwrite it.
+     */
+    if (isset(LOCALTRAPS) && locallevel &&
+	(!trapped || locallevel > (sigtrapped[sig] >> ZSIG_SHIFT)))
+	dosavetrap(sig, locallevel);
+
+    if (!trapped)
         return;
-    }
+
     sigtrapped[sig] = 0;
     if (sig == SIGINT && interact) {
 	/* PWS 1995/05/16:  added test for interactive, also noholdintr() *
@@ -660,16 +759,109 @@ unsettrap(int sig)
 #endif
              sig != SIGCHLD)
         signal_default(sig);
+
+    /*
+     * At this point we free the appropriate structs.  If we don't
+     * want that to happen (e.g. we are saving the trap), then
+     * either the function should already have been removed from shfunctab,
+     * or the entry in sigfuncs should have been set to NULL, and then
+     * we're laughing, in a sort of vague virtual sense.
+     */
     if (trapped & ZSIG_FUNC) {
 	char func[20];
 	HashNode hn;
 
 	sprintf(func, "TRAP%s", sigs[sig]);
-	if ((hn = shfunctab->removenode(shfunctab, func)))
+	/*
+	 * As in dosavetrap(), don't call removeshfuncnode() because
+	 * that calls back into unsettrap();
+	 */
+	if ((hn = removehashnode(shfunctab, func)))
 	    shfunctab->freenode(hn);
     } else if (sigfuncs[sig]) {
-	freestruct(sigfuncs[sig]);
+	freeeprog(sigfuncs[sig]);
 	sigfuncs[sig] = NULL;
+    }
+}
+
+/**/
+void
+starttrapscope(void)
+{
+    /*
+     * SIGEXIT needs to be restored at the current locallevel,
+     * so give it the next higher one. dosavetrap() is called
+     * automatically where necessary.
+     */
+    if (sigtrapped[SIGEXIT]) {
+	locallevel++;
+	unsettrap(SIGEXIT);
+	locallevel--;
+    }
+}
+
+/*
+ * Reset traps after the end of a function: must be called after
+ * endparamscope() so that the locallevel has been decremented.
+ */
+
+/**/
+void
+endtrapscope(void)
+{
+    LinkNode ln;
+    struct savetrap *st;
+    int exittr;
+    void *exitfn = NULL;
+
+    /*
+     * Remember the exit trap, but don't run it until
+     * after all the other traps have been put back.
+     */
+    if ((exittr = sigtrapped[SIGEXIT])) {
+	if (exittr & ZSIG_FUNC) {
+	    exitfn = removehashnode(shfunctab, "TRAPEXIT");
+	} else {
+	    exitfn = sigfuncs[SIGEXIT];
+	    sigfuncs[SIGEXIT] = NULL;
+	}
+	unsettrap(SIGEXIT);
+    }
+
+    if (savetraps) {
+	while ((ln = firstnode(savetraps)) &&
+	       (st = (struct savetrap *) ln->dat) &&
+	       st->local > locallevel) {
+	    int sig = st->sig;
+
+	    remnode(savetraps, ln);
+
+	    if (sigtrapped[sig])
+		unsettrap(sig);
+	    sigtrapped[sig] = st->flags;
+	    if (st->flags) {
+		Eprog prog = (st->flags & ZSIG_FUNC) ?
+		    ((Shfunc) st->list)->funcdef : (Eprog) st->list;
+		/* prevent settrap from saving this */
+		int oldlt = opts[LOCALTRAPS];
+		opts[LOCALTRAPS] = 0;
+		settrap(sig, prog);
+		opts[LOCALTRAPS] = oldlt;
+		if ((sigtrapped[sig] = st->flags) & ZSIG_FUNC)
+		    shfunctab->addnode(shfunctab, ((Shfunc)st->list)->nam,
+				       (Shfunc) st->list);
+	    }
+	    zfree(st, sizeof(*st));
+	}
+    }
+
+    if (exittr) {
+	dotrapargs(SIGEXIT, &exittr, (exittr & ZSIG_FUNC) ?
+		   ((Shfunc)exitfn)->funcdef : (Eprog) exitfn);
+	if (exittr & ZSIG_FUNC)
+	    shfunctab->freenode((HashNode)exitfn);
+	else
+	    freeeprog(exitfn);
     }
 }
 
@@ -702,22 +894,27 @@ dotrapargs(int sig, int *sigtr, void *sigfn)
     lexsave();
     execsave();
     breaks = 0;
+    runhookdef(BEFORETRAPHOOK, NULL);
     if (*sigtr & ZSIG_FUNC) {
-	PERMALLOC {
-	    args = newlinklist();
-	    name = (char *) zalloc(5 + strlen(sigs[sig]));
-	    sprintf(name, "TRAP%s", sigs[sig]);
-	    addlinknode(args, name);
-	    sprintf(num, "%d", sig);
-	    addlinknode(args, num);
-	} LASTALLOC;
+	int osc = sfcontext;
+
+	args = znewlinklist();
+	name = (char *) zalloc(5 + strlen(sigs[sig]));
+	sprintf(name, "TRAP%s", sigs[sig]);
+	zaddlinknode(args, name);
+	sprintf(num, "%d", sig);
+	zaddlinknode(args, num);
+
 	trapreturn = -1;
-	doshfunc(sigfn, args, 0, 1);
+	sfcontext = SFC_SIGNAL;
+	doshfunc(name, sigfn, args, 0, 1);
+	sfcontext = osc;
 	freelinklist(args, (FreeFunc) NULL);
 	zsfree(name);
-    } else HEAPALLOC {
-	execlist(dupstruct(sigfn), 1, 0);
-    } LASTALLOC;
+    } else
+	execode(sigfn, 1, 0);
+    runhookdef(AFTERTRAPHOOK, NULL);
+
     if (trapreturn > 0)
 	trapret = trapreturn;
     else if (errflag)
