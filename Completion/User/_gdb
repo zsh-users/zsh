@@ -52,6 +52,6 @@ else
     return ret
   else
     _description expl executable
-    _files -/g '*(*)'
+    _files "$expl[@]" -/g '*(*)'
   fi
 fi

@@ -4,8 +4,8 @@ local expl
 
 if [[ "$PREFIX" = :* ]]; then
   _description expl 'character class'
-  compadd -p: -S ':]' alnum alpha blank cntrl digit graph lower print punct \
-      space upper xdigit
+  compadd "$expl[@]" -p: -S ':]' alnum alpha blank cntrl digit graph \
+                                 lower print punct space upper xdigit
 elif [[ ${(Pt)${compstate[parameter]}} = assoc* ]]; then
   _description expl 'association key'
   if [[ "$RBUFFER" = \]* ]]; then

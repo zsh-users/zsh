@@ -260,10 +260,10 @@ if [[ "$str" = *\=* ]]; then
         compadd "$expl[@]" - ${=action[2,-2]}
       elif (( $#action )); then
         if [[ "$action" = \ * ]]; then
-          $=action
+          ${(e)=~action}
         else
 	  action=($=action)
-	  $action[1] "$expl[@]" $action[2,-1]
+	  ${(e)action[1]} "$expl[@]" ${(e)~action[2,-1]}
         fi
       fi
 
@@ -310,10 +310,10 @@ if [[ "$str" = *\=* ]]; then
       if [[ "$parta[1]" = (\[|\() ]]; then
         compadd "$expl[@]" - ${=parta[2,-2]}
       elif [[ "$parta" = \ * ]]; then
-        $=parta
+        ${(e)=~parta}
       else
 	action=($=parta)
-	$action[1] "$expl[@]" $action[2,-1]
+	${(e)~parta[1]} "$expl[@]" ${(e)~action[2,-1]}
       fi
     else
       compadd -S '' - "$PREFIX"

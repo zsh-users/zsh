@@ -372,13 +372,13 @@ else
 
       # If the action starts with a space, we just call it.
 
-      $=action
+      ${(e)=~action}
     else
 
       # Otherwise we call it with the description-arguments built above.
 
       action=( $=action )
-      "$action[1]" "$expl[@]" "${(@)action[2,-1]}"
+      ${(e)action[1]} "$expl[@]" ${(e)~action[2,-1]}
     fi
   fi
 

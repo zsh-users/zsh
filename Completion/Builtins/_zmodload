@@ -7,8 +7,8 @@ if [[ "$fl" = -*(a*u|u*a)* || "$fl" = -*a* && CURRENT -ge 4 ]]; then
   compgen "$expl[@]" -B
 elif [[ "$fl" = -*u* ]]; then
   _description expl module
-  compadd - $(zmodload)
+  compadd "$expl[@]" - $(zmodload)
 else
   _description expl 'module file'
-  compadd - ${^module_path}/*(N:t:r)
+  compadd "$expl[@]" - ${^module_path}/*(N:t:r)
 fi
