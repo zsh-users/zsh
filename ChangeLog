@@ -1,5 +1,10 @@
 2002-03-25  Oliver Kiddle  <opk@zsh.org>
 
+	* 16396: Completion/Unix/Command/_chown: fix argument handling bugs
+
+	* Akinori Musha: 16534: Completion/BSD/Command/_bsd_pkg:
+	a few bug fixes and some wording fixes
+
 	* users/4561: Completion/Unix/Command/_zip: fix bug with finding
 	the zipfile's name in the current command-line.
 
