@@ -1,30 +1,41 @@
 #autoload
 
-# This is needlessly mutt-biased and should be fixed.
+emulate -L zsh
+setopt nullglob
 
-local expl muttboxes mboxes dirboxes MHboxes maildirboxes muttrc="~/.muttrc" maildirectory="~/Mail"
+# This is still needlessly mutt-biased and should be fixed.
 
-test -f "$compconfig[muttrc_path]" && muttrc=$compconfig[muttrc_path]
-test -f "$compconfig[maildirectory]" && maildirectory=$compconfig[maildirectory]
+local -U muttboxes mboxes dirboxes MHboxes maildirboxes
+local i j expl muttrc="${muttrc:-~/.muttrc}"
+local pinedirectory="${pinedirectory:-~/mail}"
+local maildirectory="${maildirectory:-~/Mail}"
 
 if (( ! $+_mailbox_cache )) then
 
-test ${muttrc} || test -f ${~muttrc} && muttboxes=( ${(@)$(grep mailboxes ${~muttrc})[2,-1]} )
+[[ -f "${~muttrc}" ]] && muttboxes=( ${$(grep mailboxes ${~muttrc})[2,-1]} )
 
-mboxes=(${~maildirectory}/*(^/))
-dirboxes=(${~maildirectory}/*(/))
+mboxes=( ${~maildirectory}/*(^/) ${~pinedirectory}/**/*(.) )
+dirboxes=( ${~maildirectory}/*(/) )
 
-for i in $dirboxes
+while (( $#dirboxes ))
 do 
-if test -d "${i}/cur"
-then
-maildirboxes=($maildirboxes $i)
-else
-MHboxes=($MHboxes $i)
-fi
+    i=$dirboxes[1]
+    shift dirboxes
+    if [[ -d "$i/cur" ]]
+    then
+	maildirboxes=( $maildirboxes $i )
+    elif j=( $i/<1-> ) && [[ -n "$j" ]]
+    then
+	MHboxes=( $MHboxes $i )
+    else
+	mboxes=( $mboxes $i/*(.) )
+	dirboxes=( $dirboxes $i/*(/) )
+    fi
 done
 
-_mailbox_cache=(\! \< \> $muttboxes $mboxes $maildirboxes $MHboxes)
+[[ -n "$muttboxes" ]] &&
+    _mailbox_cache=(\! \< \> $muttboxes)
+_mailbox_cache=($_mailbox_cache $mboxes $maildirboxes $MHboxes)
 
 fi
 
