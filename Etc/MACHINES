@@ -131,3 +131,9 @@ Sun: Solaris 2.*
 	To avoid this, make sure you compile zsh without any reference
 	to /usr/ucblib in your LD_LIBRARY_PATH.  You can easily do this
 	by just unsetting LD_LIBRARY_PATH before building zsh.
+
+	Problems have been reported using --enable-lfs (the default) to
+	enable large file system and integer support on Solaris 2 with gcc.
+	Apparently upgrading to gcc version 2.95.2 fixes this.  If this
+	is not feasible, configure with --disable-lfs.  We would be
+	grateful for more detailed information.
