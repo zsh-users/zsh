@@ -1,3 +1,8 @@
+2001-05-31  Oliver Kiddle  <opk@zsh.org>
+
+	* unposted: Doc/Makefile.in, Doc/Zsh/compsys.yo: correct alphabetical
+	ordering of lists of styles, tags, completion functions and modules
+
 2001-05-31  Peter Stephenson  <pws@csr.com>
 
 	* as per 14577 from Bart: README, INSTALL: we don't support

@@ -518,15 +518,15 @@ kindex(accounts, completion tag)
 item(tt(accounts))(
 used to look up the tt(users-hosts) style
 )
-kindex(all-files, completion tag)
-item(tt(all-files))(
-for the names of all files (as distinct from a particular subset, see the
-tt(globbed-files) tag).
-)
 kindex(all-expansions, completion tag)
 item(tt(all-expansions))(
 used by the tt(_expand) completer when adding the single string containing
 all possible expansions
+)
+kindex(all-files, completion tag)
+item(tt(all-files))(
+for the names of all files (as distinct from a particular subset, see the
+tt(globbed-files) tag).
 )
 kindex(arguments, completion tag)
 item(tt(arguments))(
@@ -671,11 +671,6 @@ kindex(keysyms, completion tag)
 item(tt(keysyms))(
 for names of X keysyms
 )
-kindex(local-directories, completion tag)
-item(tt(local-directories))(
-for names of directories which are subdirectories of the current working
-directory when completing for the tt(cd) and related builtin commands
-)
 kindex(libraries, completion tag)
 item(tt(libraries))(
 for names of system libraries
@@ -683,6 +678,11 @@ for names of system libraries
 kindex(limits, completion tag)
 item(tt(limits))(
 for system limits
+)
+kindex(local-directories, completion tag)
+item(tt(local-directories))(
+for names of directories which are subdirectories of the current working
+directory when completing for the tt(cd) and related builtin commands
 )
 kindex(manuals, completion tag)
 item(tt(manuals))(
@@ -1790,15 +1790,6 @@ setting the completer field in the context name to
 tt(correct-)var(num) or tt(approximate-)var(num), where var(num) is
 the number of errors that were accepted.
 )
-kindex(regular, completion style)
-item(tt(regular))(
-This style is used by the tt(_expand_alias) completer and bindable 
-command.  If set to `true' (the default), regular aliases will be
-expanded but only in command position.  If it is set to `false', regular
-aliases will never be expanded and if it is set to the string
-`tt(always)', regular aliases will be expanded even if not in command
-position.
-)
 kindex(packageset, completion style)
 item(tt(packageset))(
 This style is used when completing arguments of the Debian `tt(dpkg)'
@@ -1855,6 +1846,15 @@ yields no matches, the var(slice) words before those will be tried and
 so on, until either at least one match is generated or var(max) words
 have been tried.  The default is to complete all words from the
 history at once.
+)
+kindex(regular, completion style)
+item(tt(regular))(
+This style is used by the tt(_expand_alias) completer and bindable 
+command.  If set to `true' (the default), regular aliases will be
+expanded but only in command position.  If it is set to `false', regular
+aliases will never be expanded and if it is set to the string
+`tt(always)', regular aliases will be expanded even if not in command
+position.
 )
 kindex(remove-all-dups, completion style)
 item(tt(remove-all-dups))(
@@ -2752,6 +2752,13 @@ Once a string has been read, the next call to tt(_read_comp) will use the
 existing string instead of reading a new one.  To force a new string to be
 read, call tt(_read_comp) with a numeric argument.
 )
+findex(_complete_debug (^X?))
+item(tt(_complete_debug (^X?)))(
+This widget performs ordinary completion, but captures in a temporary file
+a trace of the shell commands executed by the completion system.  Each
+completion attempt gets its own file.  A command to view each of these
+files is pushed onto the editor buffer stack.
+)
 findex(_complete_help (^Xh))
 item(tt(_complete_help (^Xh)))(
 This widget displays information about the context names, 
@@ -2763,13 +2770,6 @@ used and the contexts for which they are used will be shown, too.
 Note that the information about styles may be incomplete; it depends on the
 information available from the completion functions called, which in turn
 is determined by the user's own styles and other settings.
-)
-findex(_complete_debug (^X?))
-item(tt(_complete_debug (^X?)))(
-This widget performs ordinary completion, but captures in a temporary file
-a trace of the shell commands executed by the completion system.  Each
-completion attempt gets its own file.  A command to view each of these
-files is pushed onto the editor buffer stack.
 )
 findex(_complete_tag (^Xt))
 item(tt(_complete_tag (^Xt)))(
@@ -3358,8 +3358,17 @@ example(_example_caching_policy () {
     (( $#oldp ))
 })
 )
+findex(_call_function)
+item(tt(_call_function) var(return) var(name) [ var(args) ... ])(
+If a function var(name) exists, it is called with the arguments
+var(args). Unless it is the empty string or a single hyphen,
+var(return) is taken as the name of a parameter and the return status
+from the called function is stored in it.
+The return value of tt(_call_function) itself is zero if the function
+var(name) exists and was called and non-zero otherwise.
+)
 findex(_call_program)
-item(tt(_call-program) var(tag) var(string) ...)(
+item(tt(_call_program) var(tag) var(string) ...)(
 This function is used in places where a command is called, making it
 possible for the user to override the default command call.  It looks up
 the tt(command) style with the supplied var(tag).  If the style is set, its
@@ -3501,14 +3510,24 @@ tt(file-patterns) style.
 See tt(_path_files) below for a description of the full set of options
 accepted by tt(_files).
 )
-findex(_call_function)
-item(tt(_call_function) var(return) var(name) [ var(args) ... ])(
-If a function var(name) exists, it is called with the arguments
-var(args). Unless it is the empty string or a single hyphen,
-var(return) is taken as the name of a parameter and the return status
-from the called function is stored in it.
-The return value of tt(_call_function) itself is zero if the function
-var(name) exists and was called and non-zero otherwise.
+findex(_gnu_generic)
+item(tt(_gnu_generic))(
+This function is a simple wrapper around the tt(_arguments) function
+described above.  It can be used to automatically complete long
+options for commands that understand the `tt(-)tt(-help)' option.
+It is not intended to be used from completion functions but as a
+top-level completion function in its own right.  For example, to
+enable option completion for the commands tt(foo) and tt(bar), one
+would call:
+
+example(compdef _gnu_generic foo bar)
+
+in one of the initialization files after the call to tt(compinit).
+
+The default installation uses this function only to generate
+completions for some GNU-commands because to complete the options, the 
+command has to be called and hence it shouldn't be used if one can't
+be sure that the command understands the `tt(-)tt(-help)' option.
 )
 findex(_guard)
 item(tt(_guard) [ var(options) ] var(pattern) [ var(descr) ])(
@@ -3906,25 +3925,6 @@ tt(_tags)) stored in the argument field of the context name in the
 tt(curcontext) parameter. This allows tt(_tags) to be made to use a more
 specific context name without having to change and reset the
 tt(curcontext) parameter (which would otherwise have the same effect).
-)
-findex(_gnu_generic)
-item(tt(_gnu_generic))(
-This function is a simple wrapper around the tt(_arguments) function
-described above.  It can be used to automatically complete long
-options for commands that understand the `tt(-)tt(-help)' option.
-It is not intended to be used from completion functions but as a
-top-level completion function in its own right.  For example, to
-enable option completion for the commands tt(foo) and tt(bar), one
-would call:
-
-example(compdef _gnu_generic foo bar)
-
-in one of the initialization files after the call to tt(compinit).
-
-The default installation uses this function only to generate
-completions for some GNU-commands because to complete the options, the 
-command has to be called and hence it shouldn't be used if one can't
-be sure that the command understands the `tt(-)tt(-help)' option.
 )
 findex(_values)
 item(tt(_values) var(specs) ...)(
