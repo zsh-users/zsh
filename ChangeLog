@@ -7,6 +7,9 @@
 	[#<base>] in math mode specifies output base for printing and any
 	implicit type conversions.
 
+	* zsh-users/3066: Src/system.h: undef HAVE_MMAP for cygwin;
+	creates problems running external commands.
+
 2000-05-19  Oliver Kiddle  <opk@zsh.org>
 
 	* 11470: Completion/User/_su: fix to use user's shell after -c
