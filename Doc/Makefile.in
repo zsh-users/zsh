@@ -82,7 +82,7 @@ everything: all zsh.dvi zsh_us.ps zsh_a4.ps zsh_toc.html
 zsh.dvi: $(sdir)/zsh.texi
 	$(TEXI2DVI) $(sdir)/zsh.texi
 
-zsh.texi $(sdir)/zsh.texi:
+$(sdir)/zsh.texi:
 	case $@ in \
 	  */*) target=$@ ;; \
 	  *) target=$(sdir)/$@ ;; \
