@@ -1,4 +1,159 @@
+1999-09-26  Peter Stephenson  <pws@ibmth.df.unipi.it>
+
+	* pws: Config/version.mk: 3.1.6-pws-6
+
+	* pws: 8051: Completion/User/_users_on: typos.
+
+	* pws: 8050: Src/utils.c: getkeystring() used in ##<char>
+	  (formally #\<char>) should return unsigned char.
+
+	* pws: 8049: Src/math.c: use HEAPALLOC for math evals.
+
+	* Adam: 8048: Completion/User/_my_accounts,
+	  Completion/User/_other_accounts, Completion/User/_rlogin,
+	  Completion/User/_ssh, Completion/User/_users_on: use
+	  my_accounts and other_accounts for ssh and friends;
+	  user users for write and potentially elsewhere.
+	
+	* Adam: 8047: Completion/User/_users: lasts uses _users.
+
+	* Tanaka Akira: 8044: Completion/Base/_regex_arguments,
+	  Completion/Debian/_apt: remove NULs from cache files,
+	  fix some typos.
+
+	* Tanaka Akira: 8042: Doc/Zsh/expn.yo, Src/subst.c, Src/utils.c:
+	  ${(qqqq)...} now does $'...' quotation; rejigging unprintable
+	  characters is now ${(V)...}.
+
+1999-09-24  Peter Stephenson  <pws@ibmth.df.unipi.it>
+	* Tanaka Akira: 8039: Src/utils.c: quoting of backslashes inside
+	  ${(qqq)...}.
+
+	* pws: 8038: Completion/User/_tar: wouldn't use tar archives
+	  beginning with a ~.
+
+1999-09-23  Peter Stephenson  <pws@ibmth.df.unipi.it>
+
+	* pws: 8033: Src/math.c: use '##' to get code for literal
+	  character as less error-prone than `#\'.
+
+	* Sven: 8030: Src/utils.c: 8019 needed to expand the buffer
+	  even more.
+
+	* pws: 8026: Src/math.c: idiotically made buffer too short
+	  for error message.
+
+	* Sven: 8023: Src/subst.c, Src/utils.c, Doc/Zsh/expn.yo:
+	  ${(qqqq)...} quotes unprintables in bindkey fashion.
+
+	* pws: 8022: Src/Zle/zle_misc.c: digit argument with metafied
+	  digits didn't work.
+
+	* Sven: 8021: Src/Zle/complist.c: keep better track of cursor
+	  position when moving in a menu selection.
+
+	* Vin Shelton and pws: 8020: Src/Zle/deltochar.c,
+	  Doc/Zsh/mod_deltochar.yo: new zap-to-char, uses deltochar()
+	  function but doesn't delete last occurrence (replaces 8010).
+
+	* Sven: 8019: Src/utils.c: buffer overflow quoting newlines.
+
+	* Sven: 8015: Completion/Commands/_history_complete_word,
+	  Src/Zle/zle_tricky.c:  bug without history_stop in
+	  _history_complete_word; go backwards on line when scanning
+	  history words.
+
+	* pws: 8014: Src/math.c: arguments after the first in math
+	  function skipped first character.
+
+	* Sven: 8013: Completion/X/_x_keysym, Completion/X/_x_modifier,
+	  Completion/X/_xmodmap: completion for keys and modifiers
+	  in xmodmap.
+
+	* Sven: 8012: Doc/Zsh/compsys.yo: document
+	  incremental-complete-word configuration keys.
+
+	* Sven: 8011: Src/Zle/comp.h, Src/Zle/complist.c,
+	  Src/Zle/zle_tricky.c: better menu insertion with braces.
+
+1999-09-22  Peter Stephenson  <pws@ibmth.df.unipi.it>
+
+	* Sven: 8004: Src/Zle/complist.c, Src/Zle/zle_tricky.c,
+	  Doc/Zsh/compctl.yo, Doc/Zsh/compwid.yo: crash in selecting;
+	  documentation for 8001.
+
+	* Sven: 8001: Src/Zle/comp.h, Src/Zle/compctl.c,
+	  Src/Zle/zle_tricky.c, Doc/Zsh/compctl.yo, Doc/Zsh/compsys.yo,
+	  Doc/Zsh/compwid.yo, Completion/Core/_description: -1 and -2
+	  flags to completion commands allow removal of consecutive and
+	  non-consecutive duplicates.
+
+	* pws: 7999, 8000: Doc/Makefile.in, Doc/Zsh/guide.yo,
+	  Doc/Zsh/mod_mapfile.yo, Doc/Zsh/mod_mathfunc.yo,
+	  Doc/Zsh/modules.yo, Doc/Zsh/mod_parameter.yo,
+	  Src/Modules/mathfunc.c, Src/Modules/mathfunc.mdd, Src/math.c:
+	  mathfunc module, contains 46 functions for use in math
+	  evaluations; make function arguments behave like normal mathevals.
+
+	* Sven: 7998: Src/Zle/comp.h, Src/Zle/complist.c,
+	  Src/Zle/zle_tricky.c, Src/options.c, Src/zsh.h,
+	  Doc/Zsh/options.yo: Display column sizes can be different
+	  for different completion groups; LIST_PACKED and LIST_ROWS_FIRST
+	  options change listing display behaviour; clean functions up.
+
+	* pws: 7995: Completion/Builtin/_zmodload: when looking for module,
+	  restrict to *.s[ol].
+
+	* Tanaka Akira: 7989: Completion/Base/_combination,
+	  Completion/Debian/_apt, Completion/Base/_regex_arguments,
+	  Doc/Zsh/compsys.yo: document _combination and _regex_arguments,
+	  clean up relevant completion functions.
+
+1999-09-21  Peter Stephenson  <pws@ibmth.df.unipi.it>
+
+	* Sven: 7985: Src/Zle/zle_tricky.c: crash in old completion
+	  with non-existent file.
+
+	* pws: 7983: Src/hist.c: bug that hungetc() blindly went
+	  ahead after keyboard interrupt fixed by testing for errflag
+	  in hungetc().
+
+	* pws: 7981, 7982: Src/math.c, Src/zsh.h: use dupstring()
+	  instead of lvalue stack; better ternary expression parsing;
+	  old `unbalanced stack' messages shouldn't show up so become
+	  debugging messages; arithmetical errors in unevaluated
+	  portions don't cause shell errors.
+
+	* Sven: 7978: Src/exec.c, Src/init.c, Src/utils.c: grow and shrink
+	  underscore parameters properly.
+
+	* Sven: 7976, 7977: Src/builtin.c, Src/math.c, Src/mkbltnmlst.sh,
+	  Src/mkmakemod.sh, Src/module.c, Src/zsh.h, Src/Modules/example.c,
+	  Src/Modules/example.mdd, Doc/Zsh/arith.yo, Doc/Zsh/builtins.yo,
+	  Etc/zsh-development-guide: system for loading math functions
+	  for use in math evals.
+
+	* Sven: 7974: Src/Zle/zle_tricky.c: remove duplicates.
+
+	* Bart: 7968: Completion/User/_mailboxes: mutt fixes.
+
 1999-09-20  Peter Stephenson  <pws@ibmth.df.unipi.it>
+
+	* pws: 7963: Src/math.c, Src/subst.c: better error checking
+	  for math evals; don't pass surrounding parentheses down for
+	  $(( ... )).
+
+	* Adam: 7961: Completion/User/_mailboxes: fun with variables and
+	  elm.
+
+	* Sven: 7960: Src/Zle/zle_tricky.c: too much deleted in path
+	  completion.
+
+	* Sven: 7959: Completion/Core/_path_files, Doc/Zsh/compsys.yo:
+	  fixes from previous patches which missed 3.1.6-pws-5.
+
+	* pws: 7957: Src/module.c: `zmodload -e modname' in statically
+	  linked shell didn't work.
 
 	* pws: Config/version.mk: version 3.1.6-pws-5
 
@@ -15,7 +170,7 @@
 	* Sven: 7950: Src/utils.c, Src/Zle/complist.c: more careful
 	  with VARARR's.
 
-	* Sven: 7949: 7949: Completion/X/_x_color,
+	* Sven: 7949: Completion/X/_x_color,
 	  Completion/X/_x_extension, Completion/X/_x_window,
 	  Completion/X/_xutils: completion for standard X utilities.
 
@@ -25,6 +180,9 @@
 
 	* Sven: 7947: Src/Zle/zle_tricky.c, Doc/Zsh/compwid.yo:
 	  compstate[insert] can be all to insert all matches.
+
+	* Sven: 7945: Src/Zle/zle_tricky.c, Completion/Core/_multi_parts,
+	  Completion/Core/_path_files: better path completion with braces
 
 	* Sven: 7944: Src/Zle/zle_tricky.c, Completion/Core/_multi_parts,
 	  Completion/Core/_path_files, Completion/Core/_sep_parts:
@@ -87,7 +245,7 @@
 
 	* Sven: 7896: Src/Zle/zle_tricky.c: cursor positioning.
 
-	* Adam: 7892: Completion/User/_webbrowser: initial
+	* Tanaka Akira: 7892: Completion/User/_webbrowser: initial
 	  implementation of completion for web browsers.
 
 	* Adam: 7891: Completion/Core/compinit: error message in compdef.
@@ -116,7 +274,7 @@
 	* Sven: 7863: Doc/Zsh/mod_parameter.yo, Src/Modules/parameter.c,
 	  Src/Modules/parameter.mdd: $dirstack and $modules special
 	  parameters.
-	
+
 	* Sven: 7866: Doc/Zsh/compsys.yo, Completion/User/_mutt:
 	  action necessary.
 

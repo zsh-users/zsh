@@ -7,6 +7,8 @@ addhashnode
 addhistnum
 addhookdefs
 addhookfunc
+addmathfunc
+addmathfuncs
 addparamdefs
 addwrapper
 arrvargetfn
@@ -49,6 +51,8 @@ deleteconddefs
 deletehashtable
 deletehookdefs
 deletehookfunc
+deletemathfunc
+deletemathfuncs
 deleteparamdefs
 deleteparamtable
 deletewrapper

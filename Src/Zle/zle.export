@@ -2,9 +2,14 @@
 acceptlast
 addzlefunction
 amatches
+asklist
 backdel
 backkill
+bindk
 bindkey
+brbeg
+brend
+calclist
 clearflag
 clearlist
 clearscreen
@@ -21,7 +26,9 @@ getzlequery
 hasperm
 invalidatelist
 lastambig
+lbindk
 linkkeymap
+listdat
 listshown
 lmatches
 menuacc
@@ -32,6 +39,7 @@ newkeymap
 nlnct
 pmatches
 printfmt
+printlist
 redisplay
 refthingy
 reversemenucomplete
