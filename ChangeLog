@@ -1,5 +1,8 @@
 2000-04-27  Sven Wischnowsky  <wischnow@informatik.hu-berlin.de>
 
+	* 10967: Completion/Base/_arguments: fix for automatic
+ 	option-argument completion with partially typed option in _arguments
+	
 	* 10965: and Felix: 10952: Completion/User/_urls,
  	Doc/Zsh/compsys.yo: document _wanted -C; fix for call to _wanted
  	in _urls

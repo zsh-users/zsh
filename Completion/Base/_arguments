@@ -346,10 +346,9 @@ if (( $# )) && comparguments "$multi[@]" "$autod" "$@"; then
 	IPREFIX="${IPREFIX}${equal[1]%%:*}="
 	matched=yes
 
-	comparguments -L "${equal[1]%%:*}" descr action subc
-	curcontext="${oldcontext%:*}:$subc"
+	comparguments -L "${equal[1]%%:*}" descrs actions subcs
 
-	_tags arguments
+	_tags "$subcs[@]"
 
 	continue
       fi
