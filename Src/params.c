@@ -224,7 +224,8 @@ IPDEF8("MODULE_PATH", &module_path, "module_path", PM_DONTIMPORT|PM_RESTRICTED),
 #define IPDEF9(A,B,C) IPDEF9F(A,B,C,0)
 IPDEF9F("*", &pparams, NULL, PM_ARRAY|PM_SPECIAL|PM_DONTIMPORT|PM_READONLY),
 IPDEF9F("@", &pparams, NULL, PM_ARRAY|PM_SPECIAL|PM_DONTIMPORT|PM_READONLY),
-{NULL, NULL},
+{NULL,NULL,0,BR(NULL),SFN(NULL),GFN(NULL),NULL,0,NULL,NULL,NULL,0},
+
 #define IPDEF10(A,B,C) {NULL,A,PM_ARRAY|PM_SPECIAL,BR(NULL),SFN(C),GFN(B),stdunsetfn,10,NULL,NULL,NULL,0}
 
 /* The following parameters are not available in sh/ksh compatibility *
@@ -252,7 +253,7 @@ IPDEF9F("path", &path, "PATH", PM_RESTRICTED),
 
 IPDEF10("pipestatus", pipestatgetfn, pipestatsetfn),
 
-{NULL, NULL}
+{NULL,NULL,0,BR(NULL),SFN(NULL),GFN(NULL),NULL,0,NULL,NULL,NULL,0},
 };
 
 /*
@@ -3335,7 +3336,7 @@ findenv(char *name, int *pos)
 
 
     eq = strchr(name, '=');
-    nlen = eq ? eq - name : strlen(name);
+    nlen = eq ? eq - name : (int)strlen(name);
     for (ep = environ; *ep; ep++) 
 	if (!strncmp (*ep, name, nlen) && *((*ep)+nlen) == '=') {
 	    if (pos)
@@ -3709,6 +3710,8 @@ static const struct paramtypes pmtypes[] = {
     { PM_EXPORTED, "exported", 'x', 0}
 };
 
+#define PMTYPES_SIZE ((int)(sizeof(pmtypes)/sizeof(struct paramtypes)))
+
 /**/
 mod_export void
 printparamnode(HashNode hn, int printflags)
@@ -3727,8 +3730,7 @@ printparamnode(HashNode hn, int printflags)
 	int doneminus = 0, i;
 	const struct paramtypes *pmptr;
 
-	for (pmptr = pmtypes, i = 0; i < sizeof(pmtypes)/sizeof(*pmptr);
-	     i++, pmptr++) {
+	for (pmptr = pmtypes, i = 0; i < PMTYPES_SIZE; i++, pmptr++) {
 	    int doprint = 0;
 	    if (pmptr->flags & PMTF_TEST_LEVEL) {
 		if (p->level)
