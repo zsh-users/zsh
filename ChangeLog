@@ -1,3 +1,9 @@
+2005-04-05  Peter Stephenson  <pws@csr.com>
+
+	* 21095 slightly tweaked to include bits of users/8658:
+	Etc/FAQ.yo: update completion FAQ and the most out-of-date
+	parts of the description of bugs and features.
+
 2005-04-04  Peter Stephenson  <pws@csr.com>
 
 	* Toby Peterson: 21083: On Mac OS X 10.4, the AS and RSS rlimits
