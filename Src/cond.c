@@ -37,15 +37,26 @@ static char *condstr[COND_MOD] = {
     "-ne", "-lt", "-gt", "-le", "-ge"
 };
 
+/*
+ * Evaluate a conditional expression given the arguments.
+ * If fromtest is set, the caller is the test or [ builtin;
+ * with the pointer giving the name of the command.
+ * for POSIX conformance this supports a more limited range
+ * of functionality.
+ *
+ * Return status is the final shell status, i.e. 0 for true,
+ * 1 for false and 2 for error.
+ */
+
 /**/
 int
-evalcond(Estate state)
+evalcond(Estate state, char *fromtest)
 {
     struct stat *st;
     char *left, *right;
     Wordcode pcode;
     wordcode code;
-    int ctype, htok = 0;
+    int ctype, htok = 0, ret;
 
  rec:
 
@@ -58,24 +69,28 @@ evalcond(Estate state)
     case COND_NOT:
 	if (tracingcond)
 	    fprintf(xtrerr, " %s", condstr[ctype]);
-	return !evalcond(state);
+	ret = evalcond(state, fromtest);
+	if (ret == 2)
+	    return ret;
+	else
+	    return !ret;
     case COND_AND:
-	if (evalcond(state)) {
+	if (!(ret = evalcond(state, fromtest))) {
 	    if (tracingcond)
 		fprintf(xtrerr, " %s", condstr[ctype]);
 	    goto rec;
 	} else {
 	    state->pc = pcode + (WC_COND_SKIP(code) + 1);
-	    return 0;
+	    return ret;
 	}
     case COND_OR:
-	if (!evalcond(state)) {
+	if ((ret = evalcond(state, fromtest)) == 1) {
 	    if (tracingcond)
 		fprintf(xtrerr, " %s", condstr[ctype]);
 	    goto rec;
 	} else {
 	    state->pc = pcode + (WC_COND_SKIP(code) + 1);
-	    return 1;
+	    return ret;
 	}
     case COND_MOD:
     case COND_MODI:
@@ -99,12 +114,13 @@ evalcond(Estate state)
 	    if ((cd = getconddef((ctype == COND_MODI), name + 1, 1))) {
 		if (ctype == COND_MOD &&
 		    (l < cd->min || (cd->max >= 0 && l > cd->max))) {
-		    zerr("unrecognized condition: `%s'", name, 0);
-		    return 0;
+		    zwarnnam(fromtest, "unrecognized condition: `%s'",
+			     name, 0);
+		    return 2;
 		}
 		if (tracingcond)
 		    tracemodcond(name, strs, ctype == COND_MODI);
-		return cd->handler(strs, cd->condid);
+		return !cd->handler(strs, cd->condid);
 	    }
 	    else {
 		char *s = strs[0];
@@ -115,16 +131,20 @@ evalcond(Estate state)
 		if (name && name[0] == '-' &&
 		    (cd = getconddef(0, name + 1, 1))) {
 		    if (l < cd->min || (cd->max >= 0 && l > cd->max)) {
-			zerr("unrecognized condition: `%s'", name, 0);
-			return 0;
+			zwarnnam(fromtest, "unrecognized condition: `%s'",
+				 name, 0);
+			return 2;
 		    }
 		    if (tracingcond)
 			tracemodcond(name, strs, ctype == COND_MODI);
-		    return cd->handler(strs, cd->condid);
-		} else
-		    zerr("unrecognized condition: `%s'", name, 0);
+		    return !cd->handler(strs, cd->condid);
+		} else {
+		    zwarnnam(fromtest,
+			     "unrecognized condition: `%s'", name, 0);
+		}
 	    }
-	    return 0;
+	    /* module not found, error */
+	    return 2;
 	}
     }
     left = ecgetstr(state, EC_DUPTOK, &htok);
@@ -147,15 +167,46 @@ evalcond(Estate state)
 		singsub(&rt);
 		untokenize(rt);
 	    }
-	    fprintf(xtrerr, " %s %s %s", left, condstr[ctype], rt);
-	} else
-	    fprintf(xtrerr, " -%c %s", ctype, left);
+	    fputc(' ',xtrerr);
+	    quotedzputs(left, xtrerr);
+	    fprintf(xtrerr, " %s ", condstr[ctype]);
+	    quotedzputs(rt, xtrerr);
+	} else {
+	    fprintf(xtrerr, " -%c ", ctype);
+	    quotedzputs(left, xtrerr);
+	}
     }
 
     if (ctype >= COND_EQ && ctype <= COND_GE) {
 	mnumber mn1, mn2;
-	mn1 = matheval(left);
-	mn2 = matheval(right);
+	if (fromtest) {
+	    /*
+	     * For test and [, the expressions must be base 10 integers,
+	     * not integer expressions.
+	     */
+	    char *eptr, *err;
+
+	    mn1.u.l = zstrtol(left, &eptr, 10);
+	    if (!*eptr)
+	    {
+		mn2.u.l = zstrtol(right, &eptr, 10);
+		err = right;
+	    }
+	    else
+		err = left;
+
+	    if (*eptr)
+	    {
+		zwarnnam(fromtest, "integer expression expected: %s",
+			 err, 0);
+		return 2;
+	    }
+
+	    mn1.type = mn2.type = MN_INTEGER;
+	} else {
+	    mn1 = matheval(left);
+	    mn2 = matheval(right);
+	}
 
 	if (((mn1.type|mn2.type) & (MN_INTEGER|MN_FLOAT)) ==
 	    (MN_INTEGER|MN_FLOAT)) {
@@ -171,23 +222,23 @@ evalcond(Estate state)
 	}
 	switch(ctype) {
 	case COND_EQ:
-	    return (mn1.type & MN_FLOAT) ? (mn1.u.d == mn2.u.d) :
-		(mn1.u.l == mn2.u.l);
+	    return !((mn1.type & MN_FLOAT) ? (mn1.u.d == mn2.u.d) :
+		     (mn1.u.l == mn2.u.l));
 	case COND_NE:
-	    return (mn1.type & MN_FLOAT) ? (mn1.u.d != mn2.u.d) :
-		(mn1.u.l != mn2.u.l);
+	    return !((mn1.type & MN_FLOAT) ? (mn1.u.d != mn2.u.d) :
+		     (mn1.u.l != mn2.u.l));
 	case COND_LT:
-	    return (mn1.type & MN_FLOAT) ? (mn1.u.d < mn2.u.d) :
-		(mn1.u.l < mn2.u.l);
+	    return !((mn1.type & MN_FLOAT) ? (mn1.u.d < mn2.u.d) :
+		     (mn1.u.l < mn2.u.l));
 	case COND_GT:
-	    return (mn1.type & MN_FLOAT) ? (mn1.u.d > mn2.u.d) :
-		(mn1.u.l > mn2.u.l);
+	    return !((mn1.type & MN_FLOAT) ? (mn1.u.d > mn2.u.d) :
+		     (mn1.u.l > mn2.u.l));
 	case COND_LE:
-	    return (mn1.type & MN_FLOAT) ? (mn1.u.d <= mn2.u.d) :
-		(mn1.u.l <= mn2.u.l);
+	    return !((mn1.type & MN_FLOAT) ? (mn1.u.d <= mn2.u.d) :
+		     (mn1.u.l <= mn2.u.l));
 	case COND_GE:
-	    return (mn1.type & MN_FLOAT) ? (mn1.u.d >= mn2.u.d) :
-		(mn1.u.l >= mn2.u.l);
+	    return !((mn1.type & MN_FLOAT) ? (mn1.u.d >= mn2.u.d) :
+		     (mn1.u.l >= mn2.u.l));
 	}
     }
 
@@ -202,89 +253,91 @@ evalcond(Estate state)
 		char *opat;
 		int save;
 
-		right = opat = dupstring(ecrawstr(state->prog, state->pc,
+		right = dupstring(opat = ecrawstr(state->prog, state->pc,
 						  &htok));
 		if (htok)
 		    singsub(&right);
-		save = (state->prog->alloc != EA_HEAP &&
+		save = (!(state->prog->flags & EF_HEAP) &&
 			!strcmp(opat, right) && pprog != dummy_patprog2);
 
 		if (!(pprog = patcompile(right, (save ? PAT_ZDUP : PAT_STATIC),
-					 NULL)))
-		    zerr("bad pattern: %s", right, 0);
+					 NULL))) {
+		    zwarnnam(fromtest, "bad pattern: %s", right, 0);
+		    return 2;
+		}
 		else if (save)
 		    state->prog->pats[npat] = pprog;
 	    }
 	    state->pc += 2;
 	    test = (pprog && pattry(pprog, left));
 
-	    return (ctype == COND_STREQ ? test : !test);
+	    return !(ctype == COND_STREQ ? test : !test);
 	}
     case COND_STRLT:
-	return strcmp(left, right) < 0;
+	return !(strcmp(left, right) < 0);
     case COND_STRGTR:
-	return strcmp(left, right) > 0;
+	return !(strcmp(left, right) > 0);
     case 'e':
     case 'a':
-	return (doaccess(left, F_OK));
+	return (!doaccess(left, F_OK));
     case 'b':
-	return (S_ISBLK(dostat(left)));
+	return (!S_ISBLK(dostat(left)));
     case 'c':
-	return (S_ISCHR(dostat(left)));
+	return (!S_ISCHR(dostat(left)));
     case 'd':
-	return (S_ISDIR(dostat(left)));
+	return (!S_ISDIR(dostat(left)));
     case 'f':
-	return (S_ISREG(dostat(left)));
+	return (!S_ISREG(dostat(left)));
     case 'g':
-	return (!!(dostat(left) & S_ISGID));
+	return (!(dostat(left) & S_ISGID));
     case 'k':
-	return (!!(dostat(left) & S_ISVTX));
+	return (!(dostat(left) & S_ISVTX));
     case 'n':
-	return (!!strlen(left));
+	return (!strlen(left));
     case 'o':
-	return (optison(left));
+	return (optison(fromtest, left));
     case 'p':
-	return (S_ISFIFO(dostat(left)));
+	return (!S_ISFIFO(dostat(left)));
     case 'r':
-	return (doaccess(left, R_OK));
+	return (!doaccess(left, R_OK));
     case 's':
-	return ((st = getstat(left)) && !!(st->st_size));
+	return !((st = getstat(left)) && !!(st->st_size));
     case 'S':
-	return (S_ISSOCK(dostat(left)));
+	return (!S_ISSOCK(dostat(left)));
     case 'u':
-	return (!!(dostat(left) & S_ISUID));
+	return (!(dostat(left) & S_ISUID));
     case 'w':
-	return (doaccess(left, W_OK));
+	return (!doaccess(left, W_OK));
     case 'x':
 	if (privasserted()) {
 	    mode_t mode = dostat(left);
-	    return (mode & S_IXUGO) || S_ISDIR(mode);
+	    return !((mode & S_IXUGO) || S_ISDIR(mode));
 	}
-	return doaccess(left, X_OK);
+	return !doaccess(left, X_OK);
     case 'z':
-	return (!strlen(left));
+	return !!(strlen(left));
     case 'h':
     case 'L':
-	return (S_ISLNK(dolstat(left)));
+	return (!S_ISLNK(dolstat(left)));
     case 'O':
-	return ((st = getstat(left)) && st->st_uid == geteuid());
+	return !((st = getstat(left)) && st->st_uid == geteuid());
     case 'G':
-	return ((st = getstat(left)) && st->st_gid == getegid());
+	return !((st = getstat(left)) && st->st_gid == getegid());
     case 'N':
-	return ((st = getstat(left)) && st->st_atime <= st->st_mtime);
+	return !((st = getstat(left)) && st->st_atime <= st->st_mtime);
     case 't':
-	return isatty(mathevali(left));
+	return !isatty(mathevali(left));
     case COND_NT:
     case COND_OT:
 	{
 	    time_t a;
 
 	    if (!(st = getstat(left)))
-		return 0;
+		return 1;
 	    a = st->st_mtime;
 	    if (!(st = getstat(right)))
-		return 0;
-	    return (ctype == COND_NT) ? a > st->st_mtime : a < st->st_mtime;
+		return 1;
+	    return !((ctype == COND_NT) ? a > st->st_mtime : a < st->st_mtime);
 	}
     case COND_EF:
 	{
@@ -292,17 +345,18 @@ evalcond(Estate state)
 	    ino_t i;
 
 	    if (!(st = getstat(left)))
-		return 0;
+		return 1;
 	    d = st->st_dev;
 	    i = st->st_ino;
 	    if (!(st = getstat(right)))
-		return 0;
-	    return d == st->st_dev && i == st->st_ino;
+		return 1;
+	    return !(d == st->st_dev && i == st->st_ino);
 	}
     default:
-	zerr("bad cond code", NULL, 0);
+	zwarnnam(fromtest, "bad cond code", NULL, 0);
+	return 2;
     }
-    return 0;
+    return 1;
 }
 
 
@@ -324,6 +378,8 @@ static struct stat st;
 static struct stat *
 getstat(char *s)
 {
+    char *us;
+
 /* /dev/fd/n refers to the open file descriptor n.  We always use fstat *
  * in this case since on Solaris /dev/fd/n is a device special file     */
     if (!strncmp(s, "/dev/fd/", 8)) {
@@ -332,7 +388,9 @@ getstat(char *s)
         return &st;
     }
 
-    if (stat(unmeta(s), &st))
+    if (!(us = unmeta(s)))
+        return NULL;
+    if (stat(us, &st))
 	return NULL;
     return &st;
 }
@@ -362,9 +420,13 @@ dolstat(char *s)
 }
 
 
+/*
+ * optison returns evalcond-friendly statuses (true, false, error).
+ */
+
 /**/
 static int
-optison(char *s)
+optison(char *name, char *s)
 {
     int i;
 
@@ -373,12 +435,12 @@ optison(char *s)
     else
 	i = optlookup(s);
     if (!i) {
-	zerr("no such option: %s", s, 0);
-	return 0;
+	zwarnnam(name, "no such option: %s", s, 0);
+	return 2;
     } else if(i < 0)
-	return unset(-i);
+	return !unset(-i);
     else
-	return isset(i);
+	return !isset(i);
 }
 
 /**/
