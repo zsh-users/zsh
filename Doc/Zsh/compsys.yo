@@ -1673,6 +1673,14 @@ This function also uses the tt(format) style for the tt(messages) tag in
 preference to the tt(format) style for the tt(descriptions) tag. The
 latter is used only if the former is unset.
 )
+item(tt(_setup))(
+This function expects a tag as its argument and sets up the special
+parameters used by the completion system appropriately for the tag,
+using styles such as tt(list-colors) and tt(last-prompt).
+
+Note that this function is called automatically from tt(_description)
+so that one normally don't have to call it explicitly.
+)
 item(tt(_tags))(
 If called with arguments, these are taken as the names of the tags for 
 the types of matches the calling completion function can generate in

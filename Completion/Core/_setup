@@ -6,7 +6,7 @@ if _style -a "$1" list-colors val; then
   if [[ "$1" = default ]]; then
     ZLS_COLORS="${(j.:.)${(@)val:gs/:/\\\:}}"
   else
-    eval "ZLS_COLORS=\"(${i})\${(j.:(${i}).)\${(@)val:gs/:/\\\:}}:\${ZLS_COLORS}\""
+    eval "ZLS_COLORS=\"(${1})\${(j.:(${1}).)\${(@)val:gs/:/\\\:}}:\${ZLS_COLORS}\""
   fi
 fi
 
