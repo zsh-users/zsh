@@ -324,7 +324,7 @@ compconf() {
       if [[ $list = long ]]; then
 	print "compconf $i='$compconfig[$i]'"
       else
-        print ${(r:25:)i} $compconfig[$i]
+        print ${(r:25:)i} "$compconfig[$i]"
       fi
     done
   fi
