@@ -3943,7 +3943,7 @@ Finally, the tt(_path_files) function  uses the styles tt(expand),
 tt(ambiguous), tt(special-dirs), tt(list-suffixes) and tt(file-sort).
 )
 findex(_pick_variant)
-item(tt(_pick_variant [ tt(-c) var(command) ] [ tt(-r) var(name) ] var(command)tt(=)var(pattern) ... var(command) [ var(args ... ]))(
+item(tt(_pick_variant [ tt(-c) var(command) ] [ tt(-r) var(name) ] var(command)tt(=)var(pattern) ... var(command) [ var(args) ... ]))(
 This function is used to resolve situations where a command has more
 than one variant, each requiring different handling or where there is a
 name clash between two different commands.
