@@ -1,3 +1,9 @@
+2002-02-07  Clint Adams  <clint@zsh.org>
+
+        * unposted: Functions/Prompts/.distfiles,
+        Functions/Prompts/prompt_walters_setup: Colin Walters's
+        prompt, adapted for the theme system.
+
 2002-02-03  Clint Adams  <clint@zsh.org>
 
         * 16514: Completion/Unix/Command/_init_d: do not attempt
