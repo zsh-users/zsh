@@ -955,10 +955,11 @@ struct funcwrap {
 /* Option was set as +X */
 #define OPT_PLUS(ops,c)		((ops)->ind[c] & 2)
 /*
- * Option was set any old how, maybe including an argument 
- * (cheap test when we don't care).
+ * Option was set any old how, maybe including an argument
+ * (cheap test when we don't care).  Some bits of code
+ * expect this to be 1 or 0.
  */
-#define OPT_ISSET(ops,c)	((ops)->ind[c])
+#define OPT_ISSET(ops,c)	((ops)->ind[c] != 0)
 /* Option has an argument */
 #define OPT_HASARG(ops,c)	((ops)->ind[c] > 3)
 /* The argument for the option; not safe if it doesn't have one */

@@ -47,6 +47,19 @@ or not the expression occurs in double quotes.  For example:
   % foo=word/bird
   % print ${foo/\//-} "${foo/\//+}"
   word-bird word+bird
+Note also the following workaround which is valid in all versions of the
+shell that support this syntax:
+  % slash=/
+  % foo=word/bird
+  % print ${foo/$slash/-} "${foo/$slash/+}"
+
+In 4.0, the -M option to bindkey used the first non-option argument to
+specify the keymap, whereas it now uses an argument to the option.  Hence:
+  bindkey -M -R keymap a-z self-insert
+needs to be rewritten as
+  bindkey -M keymap -R a-z self-insert
+The following form works in both versions:
+  bindkey -R -M keymap a-z self-insert
 
 Documentation
 -------------

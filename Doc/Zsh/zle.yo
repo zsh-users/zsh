@@ -134,9 +134,8 @@ Selects keymap `tt(viins)', and also links it to `tt(main)'.
 item(tt(-a))(
 Selects keymap `tt(vicmd)'.
 )
-item(tt(-M))(
-The first non-option argument is used as a keymap name,
-and does not otherwise count as an argument.
+item(tt(-M) var(keymap))(
+The var(keymap) specifies a keymap name.
 )
 enditem()
 

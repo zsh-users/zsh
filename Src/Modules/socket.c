@@ -62,7 +62,6 @@ bin_zsocket(char *nam, char **args, Options ops, int func)
 {
     int err=1, verbose=0, test=0, targetfd=0;
     SOCKLEN_T len;
-    char **dargs;
     struct sockaddr_un soun;
     int sfd;
 
@@ -73,26 +72,23 @@ bin_zsocket(char *nam, char **args, Options ops, int func)
 	test = 1;
 
     if (OPT_ISSET(ops,'d')) {
-	targetfd = atoi(args[0]);
-	dargs = args + 1;
+	targetfd = atoi(OPT_ARG(ops,'d'));
 	if (!targetfd) {
-	    zwarnnam(nam, "%s is an invalid argument to -d", args[0], 0);
+	    zwarnnam(nam, "%s is an invalid argument to -d",
+		     OPT_ARG(ops, 'd'), 0);
 	    return 1;
 	}
     }
-    else
-	dargs = args;
-
 
     if (OPT_ISSET(ops,'l')) {
 	char *localfn;
 
-	if (!dargs[0]) {
+	if (!args[0]) {
 	    zwarnnam(nam, "-l requires an argument", NULL, 0);
 	    return 1;
 	}
 
-	localfn = dargs[0];
+	localfn = args[0];
 
 	sfd = socket(PF_UNIX, SOCK_STREAM, 0);
 
@@ -139,12 +135,12 @@ bin_zsocket(char *nam, char **args, Options ops, int func)
     {
 	int lfd, rfd;
 
-	if (!dargs[0]) {
+	if (!args[0]) {
 	    zwarnnam(nam, "-a requires an argument", NULL, 0);
 	    return 1;
 	}
 
-	lfd = atoi(dargs[0]);
+	lfd = atoi(args[0]);
 
 	if (!lfd) {
 	    zwarnnam(nam, "invalid numerical argument", NULL, 0);
@@ -212,7 +208,7 @@ bin_zsocket(char *nam, char **args, Options ops, int func)
     }
     else
     {
-	if (!dargs[0]) {
+	if (!args[0]) {
 	    zwarnnam(nam, "zsocket requires an argument", NULL, 0);
 	    return 1;
 	}
@@ -225,7 +221,7 @@ bin_zsocket(char *nam, char **args, Options ops, int func)
 	}
 
 	soun.sun_family = AF_UNIX;
-	strncpy(soun.sun_path, dargs[0], UNIX_PATH_MAX);
+	strncpy(soun.sun_path, args[0], UNIX_PATH_MAX);
 	
 	if ((err = connect(sfd, (struct sockaddr *)&soun, sizeof(struct sockaddr_un)))) {
 	    zwarnnam(nam, "connection failed: %e", NULL, errno);
@@ -251,7 +247,7 @@ bin_zsocket(char *nam, char **args, Options ops, int func)
 }
 
 static struct builtin bintab[] = {
-    BUILTIN("zsocket", 0, bin_zsocket, 0, 3, 0, "adltv", NULL),
+    BUILTIN("zsocket", 0, bin_zsocket, 0, 3, 0, "ad:ltv", NULL),
 };
 
 /* The load/unload routines required by the zsh library interface */

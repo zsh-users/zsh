@@ -74,12 +74,8 @@ bin_mkdir(char *nam, char **args, Options ops, int func)
 
     umask(oumask);
     if(OPT_ISSET(ops,'m')) {
-	char *str = *args++, *ptr;
+	char *str = OPT_ARG(ops,'m'), *ptr;
 
-	if(!*args) {
-	    zwarnnam(nam, "not enough arguments", NULL, 0);
-	    return 1;
-	}
 	mode = zstrtol(str, &ptr, 8);
 	if(!*str || *ptr) {
 	    zwarnnam(nam, "invalid mode `%s'", str, 0);
@@ -703,7 +699,7 @@ static struct builtin bintab[] = {
     BUILTIN("chgrp", 0, bin_chown, 2, -1, BIN_CHGRP, "Rs",    NULL),
     BUILTIN("chown", 0, bin_chown, 2, -1, BIN_CHOWN, "Rs",    NULL),
     BUILTIN("ln",    0, bin_ln,    1, -1, BIN_LN,    LN_OPTS, NULL),
-    BUILTIN("mkdir", 0, bin_mkdir, 1, -1, 0,         "pm",    NULL),
+    BUILTIN("mkdir", 0, bin_mkdir, 1, -1, 0,         "pm:",   NULL),
     BUILTIN("mv",    0, bin_ln,    2, -1, BIN_MV,    "fi",    NULL),
     BUILTIN("rm",    0, bin_rm,    1, -1, 0,         "dfirs", NULL),
     BUILTIN("rmdir", 0, bin_rmdir, 1, -1, 0,         NULL,    NULL),

@@ -656,11 +656,7 @@ bin_bindkey(char *name, char **argv, Options ops, int func)
 	else if(OPT_ISSET(ops,'a'))
 	    kmname = "vicmd";
 	else if(OPT_ISSET(ops,'M')) {
-	    kmname = *argv++;
-	    if(!kmname) {
-		zwarnnam(name, "-M option requires a keymap argument", NULL, 0);
-		return 1;
-	    }
+	    kmname = OPT_ARG(ops,'M');
 	} else
 	    kmname = "main";
 	km = openkeymap(kmname);

@@ -7,7 +7,7 @@ startitem()
 findex(ztcp)
 cindex(TCP)
 cindex(sockets, TCP)
-item(tt(ztcp) [ tt(-acdflLtv) ] [ var(args) ])(
+item(tt(ztcp) [ tt(-acflLtv) ] [ tt(-d) var(fd) ] [ var(args) ])(
 tt(ztcp) is implemented as a builtin to allow full use of shell
 command line editing, file I/O, and job control mechanisms.
 
@@ -75,9 +75,8 @@ be added to the session table and the shell parameter
 tt(REPLY) will be set to the file descriptor associated
 with that connection.
 
-If tt(-d) is specified, the first non-option argument
-will be taken as the target file descriptor for the
-connection.
+If tt(-d) is specified, its argument will be taken as the target file
+descriptor for the connection.
 
 In order to elicit more verbose output, use tt(-v).
 )
@@ -94,9 +93,8 @@ session table and the shell parameter tt(REPLY)
 will be set to the file descriptor associated
 with that listener.
 
-If tt(-d) is specified, the first non-option argument
-will be taken as the target file descriptor for
-the connection.
+If tt(-d) is specified, its argument will be taken as the target file
+descriptor for the connection.
 
 In order to elicit more verbose output, use tt(-v).
 )
@@ -108,7 +106,7 @@ table and the shell parameter tt(REPLY) will
 be set to the file descriptor associated with
 the inbound connection.
 
-If tt(-d) is specified, the first non-option argument
+If tt(-d) is specified, its argument
 will be taken as the target file descriptor for the
 connection.
 

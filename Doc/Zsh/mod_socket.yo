@@ -7,7 +7,7 @@ startitem()
 findex(zsocket)
 cindex(sockets)
 cindex(sockets, Unix domain)
-item(tt(zsocket) [ tt(-adltv) ] [ var(args) ])(
+item(tt(zsocket) [ tt(-altv) ] [ tt(-d) var(fd) ] [ var(args) ])(
 tt(zsocket) is implemented as a builtin to allow full use of shell
 command line editing, file I/O, and job control mechanisms.
 
@@ -21,7 +21,7 @@ The shell parameter tt(REPLY) will be set to the file descriptor
 associated with that connection.  Currently, only stream connections
 are supported.
 
-If tt(-d) is specified, the first non-option argument
+If tt(-d) is specified, its argument
 will be taken as the target file descriptor for the
 connection.
 
@@ -38,7 +38,7 @@ tt(zsocket -l) will open a socket listening on var(filename).
 The shell parameter tt(REPLY) will be set to the file descriptor
 associated with that listener.
 
-If tt(-d) is specified, the first non-option argument
+If tt(-d) is specified, its argument
 will be taken as the target file descriptor for
 the connection.
 
@@ -51,7 +51,7 @@ The shell parameter tt(REPLY) will
 be set to the file descriptor associated with
 the inbound connection.
 
-If tt(-d) is specified, the first non-option argument
+If tt(-d) is specified, its argument
 will be taken as the target file descriptor for the
 connection.
 
