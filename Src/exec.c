@@ -1954,7 +1954,7 @@ execcmd(Estate state, int input, int output, int how, int last1)
      *    be needed after the current command.  This is typically the case    *
      *    when when the command is the last stage in a subshell, or is the    *
      *    last command after the option `-c'.                                 *
-     * 2) We are not trapping EXIT or ZERR.                                   *
+     * 2) We don't have any traps set.                                        *
      * 3) We don't have any files to delete.                                  *
      *                                                                        *
      * The condition above for a `fake exec' will also work for a current     *
@@ -1966,8 +1966,7 @@ execcmd(Estate state, int input, int output, int how, int last1)
     if ((how & Z_ASYNC) ||
 	(!do_exec &&
 	 (((is_builtin || is_shfunc) && output) ||
-	  (!is_cursh && (last1 != 1 || sigtrapped[SIGZERR] ||
-			 sigtrapped[SIGEXIT] || havefiles()))))) {
+	  (!is_cursh && (last1 != 1 || nsigtrapped || havefiles()))))) {
 
 	pid_t pid;
 	int synch[2];

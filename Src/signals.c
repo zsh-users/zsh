@@ -41,6 +41,11 @@ mod_export int sigtrapped[VSIGCOUNT];
 /**/
 mod_export Eprog sigfuncs[VSIGCOUNT];
 
+/* Total count of trapped signals */
+
+/**/
+mod_export int nsigtrapped;
+
 /* Variables used by signal queueing */
 
 /**/
@@ -716,6 +721,7 @@ settrap(int sig, Eprog l)
             sig != SIGCHLD)
             signal_ignore(sig);
     } else {
+	nsigtrapped++;
         sigtrapped[sig] = ZSIG_TRAPPED;
         if (sig && sig <= SIGCOUNT &&
 #ifdef SIGWINCH
@@ -773,6 +779,8 @@ removetrap(int sig)
 	unqueue_signals();
         return NULL;
     }
+    if (sigtrapped[sig] & ZSIG_TRAPPED)
+	nsigtrapped--;
     sigtrapped[sig] = 0;
     if (sig == SIGINT && interact) {
 	/* PWS 1995/05/16:  added test for interactive, also noholdintr() *
@@ -860,6 +868,8 @@ endtrapscope(void)
 	    exitfn = sigfuncs[SIGEXIT];
 	}
 	sigfuncs[SIGEXIT] = NULL;
+	if (sigtrapped[SIGEXIT] & ZSIG_TRAPPED)
+	    nsigtrapped--;
 	sigtrapped[SIGEXIT] = 0;
     }
 
@@ -878,6 +888,12 @@ endtrapscope(void)
 		dontsavetrap++;
 		settrap(sig, prog);
 		dontsavetrap--;
+		/*
+		 * counting of nsigtrapped should presumably be handled
+		 * in settrap...
+		 */
+		DPUTS((sigtrapped[sig] ^ st->flags) & ZSIG_TRAPPED,
+		      "BUG: settrap didn't restore correct ZSIG_TRAPPED");
 		if ((sigtrapped[sig] = st->flags) & ZSIG_FUNC)
 		    shfunctab->addnode(shfunctab, ((Shfunc)st->list)->nam,
 				       (Shfunc) st->list);
