@@ -1,3 +1,7 @@
+2000-10-17  Bart Schaefer  <schaefer@brasslantern.com>
+
+	* unposted: Functions/Misc/zmv: Small typo in example in comment.
+
 2000-10-17  Sven Wischnowsky  <wischnow@zsh.org>
 
 	* 13005: Src/Zle/computil.c: make _arguments ignore unspecified

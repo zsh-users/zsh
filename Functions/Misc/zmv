@@ -35,7 +35,7 @@
 # around glob qualifiers, if you use the -Q option, and globbing flags) may
 # be referred to by a positional parameter in <outstring>, i.e. the first
 # (...) matched is given by $1, and so on.  For example,
-#   zmv '([a-z])(*).txt' '${(U)1}$2.txt'
+#   zmv '([a-z])(*).txt' '${(C)1}$2.txt'
 # renames algernon.txt to Algernon.txt, boris.txt to Boris.txt and so on.
 # The original file matched can be referred to as $f in the second
 # argument; accidental or deliberate use of other parameters is at owner's
