@@ -1,3 +1,9 @@
+2000-04-19  Oliver Kiddle  <opk@zsh.org>
+
+	* 10833: Completion/Builtins/_print, Completion/Builtins/.distfiles,
+	Completion/Builtins/_nothing: new print completion, no arguments to
+	clear and logname
+
 2000-04-19  Peter Stephenson  <pws@cambridgesiliconradio.com>
 
 	* 10830: Doc/Makefile.in: don't force dvips to use 300 dpi.
