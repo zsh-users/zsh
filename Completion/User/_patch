@@ -3,21 +3,17 @@
 _arguments -s \
   '-p+:number:(0)' \
   '-F+:lines:' \
-  '-l' '-c' '-e' '-n' '-u' '-N' '-R' \
+  -{l,c,e,n,u,N,R,E,Z,T,b,t,f,s,v} \
   '-i+:patch file:_files' \
   '-o+:output file:_files' \
   '-r+:reject file:_files' \
   '-D+:name:' \
-  '-E' '-Z' '-T' \
-  '-b' \
   '-V+:version control style:(simple numbered existing)' \
   '-B+:backup path prefix:' \
   '-Y+:backup basename prefix:_files' \
   '-z+:backup file suffix:(.bak)' \
   '-g+:NUM:' \
-  '-t' '-f' '-s' \
   '-d+:chdir to:_files -/' \
-  '-v' \
   ':original file:_files' \
   ':patch file:_files' \
   -- \

@@ -1,11 +1,12 @@
-#compdef gs gsbj gsdj gsdj500 gslj gslp gsnd ps2ascii ghostview gv gview mgv ggv pstoedit pstotgif
+#compdef gsbj gsdj gsdj500 gslj gslp gsnd ps2ascii ghostview mgv ggv pstoedit pstotgif
 
-local ret=1
+local ret=1 expl
 
 # ghostscript:
 #  gs gsbj gsdj gsdj500 gslj gslp gsnd ps2ascii
 
 _ps && ret=0
-_pdf && ret=0
+_description expl 'PDF file'
+_path_files "$expl[@]" -g '*.(#i)pdf'
 
 return ret

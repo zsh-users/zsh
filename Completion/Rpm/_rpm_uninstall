@@ -1,0 +1,7 @@
+#autoload
+
+_rpm_arguments \
+  --{allmatches,justdb,nodeps,noorder,noscripts,notriggers} \
+  '--root:RPM root directory:_files -/' \
+  '--dbpath:RPM database path:_files -/' \
+  '*:RPM package:_rpm_package'

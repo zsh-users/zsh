@@ -5,9 +5,10 @@
 
 local cur="$words[CURRENT]" prev w list ret=1 expl
 
-_long_options -t '*=(CORE|SYM)FILE:core file:_files' \
-		 '*=EXECFILE:executable:_files *(*)' \
-		 '*=TTY:terminal device:compadd /dev/tty*' && return 0
+[[ "$PREFIX" = --* ]] &&
+    _arguments -- '*=(CORE|SYM)FILE:core file:_files' \
+		  '*=EXECFILE:executable:_files \*\(\*\)' \
+		  '*=TTY:terminal device:compadd /dev/tty\*' && return 0
 
 if compset -P '-(cd|directory)='; then
   _files -/

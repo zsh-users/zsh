@@ -1,0 +1,8 @@
+#autoload
+
+_arguments \
+  -{v,vv} \
+  '-rcfile:resource file:_files' \
+  '--ftpproxy:FTP proxy server:_hosts' \
+  '--ftpport:FTP port number:' \
+  "$@"

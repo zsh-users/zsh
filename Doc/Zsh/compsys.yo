@@ -821,8 +821,6 @@ are used to store the option settings in effect before the completion
 widget locally sets the options it needs.
 )
 item(tt(_long_options))(
-This function resides in the tt(Base) subdirectory of the example
-completion system because it is not used by the core system.
 
 This function is used to complete long options for commands that
 support the `tt(--help)' option as, for example, most of the GNU
@@ -832,53 +830,10 @@ names. Note that this means that you should be careful to make sure
 that this function is not called for a command that does not support
 this option.
 
-For options that get an argument after a `tt(=)', the function also tries
-to automatically find out what should be completed as the argument.
-The possible completions for option-arguments can be described with
-the arguments to this function. Each argument contains one description
-of the form `tt(<pattern>:<message>:<action>)'. The message will be printed 
-above the possible completion if the `description_format' configuration
-key is set (see above). The actions specify what
-should be done to complete arguments of those options that match 
-the pattern. In both the message and the action a colon can be
-included by preceding it with a backslash. The action may be a list of
-words in brackets or in
-parentheses, separated by spaces. A list in brackets denotes
-possible values for an optional argument, a list in parentheses
-gives words to complete for mandatory arguments. If the action does
-not start with a bracket or parentheses, it should be the name of a
-command (probably with arguments) that should be invoked to complete 
-after the equal sign or a string in braces that will be evaluated. E.g.:
-
-example(_long_options '*\*'     '(yes no)' \ 
-              '*=FILE*' '_files' \ 
-              '*=DIR*'  '_files -/')
-
-Here, `tt(yes)' and `tt(no)' will be completed as the argument of
-options whose description ends in a star, file names for options that
-contain the substring `tt(=FILE)' in the description, and paths for
-options whose description contains `tt(=DIR)'. In fact, the last two
-patterns are not needed since this function always completes files
-for option descriptions containing `tt(=FILE)' and paths for option
-descriptions that contain `tt(=DIR)' or `tt(=PATH)'. These builtin
-patterns can be overridden by patterns given as arguments, however.
-
-If the
-option `tt(-t)' is given, completion is only done on words starting
-with two hyphens. The option `tt(-i) var(patterns)' can be used to
-give patterns for options which should not be completed. The patterns
-can be given as the name of an array parameter or as a literal list in 
-parentheses. E.g. `tt(-i "(--(en|dis)able-FEATURE*)")' will ignore the
-options `tt(--enable-FEATURE)' and `tt(--disable-FEATURE)'. Finally,
-the option `tt(-s) var(pairs)' can be used to describe options
-aliases. Each var(pair) consists of a pattern and a
-replacement. E.g. some tt(configure)-scripts describe options only as
-`tt(--enable-foo)', but also accept `tt(disable-foo)'. To allow
-completion of the second form, one would use
-`tt(-s "(#--enable- --disable-)")'.
 )
 item(tt(_arguments))(
-Like tt(_long_options), this function is in the tt(Base) subdirectory.
+This function resides in the tt(Base) subdirectory of the example
+completion system because it is not used by the core system.
 
 This function can be used to complete words on the line by simply
 describing the arguments the command on the line gets. The description 
@@ -906,7 +861,7 @@ that any number of arguments can be completed.
 If there are two colons before the message (as in
 `tt(*::)var(message)tt(:)var(action)') the tt(words) special array and 
 the tt(CURRENT) special parameter will be restricted to only the
-normal arguments when the var(Action) is executed or evaluated.
+normal arguments when the var(action) is executed or evaluated.
 )
 item(var(opt-spec)[var(description) ...])(
 This describes an option and (if at least one var(description) is
@@ -941,7 +896,10 @@ em(in the same word), a minus sign should be added to the end of the
 var(opt-spec), as in `tt(-foo-)'. If the first argument may be given
 in one string with the option name, but may also be given as a
 separate argument after the option, a plus sign should be used
-instead. Finally, if the option may be given more than once, a star
+instead. If the argument may be given as the next string or in same
+string as the option name but separated by it from an equal sign, a
+`tt(=)' should be used instead of the minus or plus sign.
+Finally, if the option may be given more than once, a star
 (`tt(*)') should be added in front of the var(opt-spec).
 )
 enditem()
@@ -976,10 +934,57 @@ none). By giving the tt(-s) option to this function (as the first
 argument), options are considered to be one-character options and the
 string from the line may contain more than one such option letter.
 
-This function can also be made to automatically call the
-tt(_long_options) function where appropriate by giving it the string
-`tt(--)' as an argument. All arguments after this will be given
-unchanged to the tt(_long_options) function.
+The function can also be made to automatically complete long options
+for commands that support the `tt(--help)' option as, for example,
+most of the GNU commands do. For this, the string `tt(--)' must be
+given as one argument and if it is, the command from the line is
+invoked with the `tt(--help)' option and its output is parsed to find
+possible option names. Note that this means that you should be careful
+to make sure that this feature is not used for a command that does not
+support this option.
+
+For options that get an argument after a `tt(=)', the function also tries
+to automatically find out what should be completed as the argument.
+The possible completions for option-arguments can be described with
+the arguments after the `tt(--)' (which are not used as described
+above). Each argument contains one description of the form
+`var(pattern)tt(:)var(message)tt(:)var(action)'. The var(message) and
+the var(action) have the same format as for the normal option
+descriptions described above. The var(action) will be executed to
+complete arguments of options whose description in the output of the
+command from the line with the `tt(--help)' option matches the
+var(pattern). For example:
+
+example(_arguments -- '*\*'     '(yes no)' \ 
+              '*=FILE*' '_files' \ 
+              '*=DIR*'  '_files -/')
+
+Here, `tt(yes)' and `tt(no)' will be completed as the argument of
+options whose description ends in a star, file names for options that
+contain the substring `tt(=FILE)' in the description, and paths for
+options whose description contains `tt(=DIR)'. In fact, the last two
+patterns are not needed since this function always completes files
+for option descriptions containing `tt(=FILE)' and paths for option
+descriptions that contain `tt(=DIR)' or `tt(=PATH)'. These builtin
+patterns can be overridden by patterns given as arguments, however.
+
+Note also that tt(_arguments) tries to find out automatically if the
+argument for an option is optional. If it fails to automatically
+detect this, the colon before the var(message) can be doubled to tell
+it about this as described for the normal option descriptions above.
+
+The option `tt(-i) var(patterns)' (which must be given after the
+`tt(--)') can be used to give patterns for options which should not be
+completed. The patterns can be given as the name of an array parameter
+or as a literal list in parentheses. E.g. `tt(-i
+"(--(en|dis)able-FEATURE*)")' will make the options
+`tt(--enable-FEATURE)' and `tt(--disable-FEATURE)' be ignored. The
+option `tt(-s) var(pairs)' (again, after the `tt(--)') can be used to
+describe option aliases. Each var(pair) consists of a pattern and a
+replacement. E.g. some tt(configure)-scripts describe options only as
+`tt(--enable-foo)', but also accept `tt(disable-foo)'. To allow
+completion of the second form, one would use `tt(-s "(#--enable-
+--disable-)")'.
 
 Finally, this function uses one configuration key: tt(option_prefix). If
 this is set to a string containing `tt(short)' or `tt(all)' as a

@@ -3,4 +3,6 @@
 # This is for GNU-like commands which understand the --help option,
 # but which do not otherwise require special completion handling.
 
-_long_options -t || _default
+[[ "$PREFIX" = --* ]] && _arguments -- && return 0
+
+_default

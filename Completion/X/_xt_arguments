@@ -21,8 +21,8 @@
 # cf. XrmParseCommand(3X11), X11R6.4/xc/lib/Xt/Initialize.c, X(5)
 
 _arguments \
-  '+rv' '-rv' '-reverse' \
-  '+synchronous' '-synchronous' \
+  -+{rv,synchronous} \
+  -{reverse,iconic} \
   '-background:background color:_colors' \
   '-bd:border color:_colors' \
   '-bg:background color:_colors' \
@@ -31,10 +31,10 @@ _arguments \
   '-bw:border width:_x_borderwidth' \
   '-display:display:_x_display' \
   '-fg:foreground color:_colors' \
+  '-font:font:_x_font' \
   '-fn:font:_x_font' \
   '-foreground:foreground color:_colors' \
   '-geometry:geometry:_x_geometry' \
-  '-iconic' \
   '-name:name:_x_name' \
   '-selectionTimeout:selection timeout (milliseconds):_x_selection_timeout' \
   '-title:title:_x_title' \

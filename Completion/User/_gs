@@ -1,0 +1,19 @@
+#compdef gs ghostscript
+
+if compset -N --; then
+  if [[ CURRENT -eq 1 ]]; then
+    _ps
+  else
+    _message 'userdict ARGUMENTS'
+    return 1
+  fi
+else
+  _x_options \
+    -q \
+    '-g-:device size (<width>x<height>):' \
+    '-r-:resolution (<val> or <x>x<y>):' \
+    '-I:search paths:_dir_list' \
+    \*-{d,D}'-:def: _gs_name -d' \
+    \*-{s,S}'-:def: _gs_name -s' \
+    '*:PostScript file:_ps'
+fi

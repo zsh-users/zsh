@@ -1,60 +1,24 @@
 #compdef xterm
 
 _xt_arguments \
-  '-version' \
-  '-help' \
-  '-132' \
-  '-ah' '+ah' \
-  '-ai' '+ai' \
-  '-aw' '+aw' \
+  -+{ah,ai,aw,bc,bdc,cb,cm,cn,cu,dc,hf,ie,im,j,ls,mb,nul,pc,rw,s,sb,sf,si,sk,sp,t,u8,ulc,ut,vb,wc,wf,samename} \
+  -{version,help,132,leftbar,rightbar,C} \
   '-b:inner border size:' \
-  '-bc' '+bc' \
   '-bcf:time text cursor is off when blinking (milliseconds):' \
   '-bcn:time text cursor is on when blinking (milliseconds):' \
-  '-bdc' '+bdc' \
-  '-cb' '+cb' \
   '-cc:character class:' \
-  '-cm' '+cm' \
-  '-cn' '+cn' \
   '-cr:text cursor color:_colors' \
-  '-cu' '+cu' \
-  '-dc' '+dc' \
   '-e:program: _command_names -e:*::program arguments: _normal' \
   '-fb:bold font:_x_font' \
   '-fi:icon font:_x_font' \
   '-hc:background color for highlighted text:_colors' \
-  '-hf' '+hf' \
-  '-ie' '+ie' \
-  '-im' '+im' \
-  '-j' '+j' \
-  '-leftbar' \
-  '-ls' '+ls' \
-  '-mb' '+mb' \
   '-mc:multi-click threshold (milliseconds):' \
   '-ms:pointer cursor color:_colors' \
   '-nb:margin bell number:' \
-  '-nul' '+nul' \
-  '-pc' '+pc' \
-  '-rightbar' \
-  '-rw' '+rw' \
-  '-s' '+s' \
-  '-samename' '+samename' \
-  '-sb' '+sb' \
-  '-sf' '+sf' \
-  '-si' '+si' \
-  '-sk' '+sk' \
   '-sl:save lines:' \
-  '-sp' '+sp' \
-  '-t' '+t' \
   '-ti:terminal ID:(vt52 vt100 vt101 vt102 vt220)' \
   '-tm:terminal setting:' \
   '-tn:terminal type:' \
-  '-u8' '+u8' \
-  '-ulc' '+ulc' \
-  '-ut' '+ut' \
-  '-vb' '+vb' \
-  '-wc' '+wc' \
-  '-wf' '+wf' \
   '-ziconbeep:iconbeep (percent):' \
   '-C' \
-  '-S-:pseudo-terminal and file descriptor:' \
+  '-S-:pseudo-terminal and file descriptor:'

@@ -1,0 +1,5 @@
+#autoload
+
+_rpm_arguments \
+  --no{pgp,md5} \
+  '*:RPM package file:_rpm_pkg_or_file'

@@ -1,0 +1,7 @@
+#autoload
+
+if compset -P ftp:; then
+  _hosts -S/
+else
+  _files -g '*.(#i)rpm'
+fi

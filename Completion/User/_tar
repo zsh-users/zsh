@@ -72,11 +72,11 @@ if [[ "$PREFIX" = --* ]]; then
 
   # ...long options after `--'.
 
-  _long_options '--owner*:user:_users' \
-                '*=(PROG|COMMAND)*:program:_command_names' \
-		'*=ARCHIVE*:archive: _tar_archive' \
-		'*=NAME*:file:_files' \
-		'*=CONTROL*:version control:[t numbered nil existing never simple]'
+  _arguements -- '--owner*:user:_users' \
+                 '*=(PROG|COMMAND)*:program:_command_names -e' \
+		 '*=ARCHIVE*:archive: _tar_archive' \
+		 '*=NAME*:file:_files' \
+		 '*=CONTROL*::version control:(t numbered nil existing never simple)'
 
 elif [[ ( CURRENT -gt 2 && "$words[CURRENT-1]" = -*f* &&
           "$words[CURRENT-1]" != --* ) ||
