@@ -1,3 +1,8 @@
+2001-04-19  Clint Adams  <schizo@debian.org>
+
+	* 14018: Src/mkmakemod.sh: honor STRIPFLAGS when installing
+	modules.
+
 2001-04-18  Bart Schaefer  <schaefer@zsh.org>
 
 	* 14004 (plus typo fix per Sven 14009): Improve completion in the

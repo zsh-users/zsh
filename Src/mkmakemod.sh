@@ -321,7 +321,7 @@ if $first_stage; then
 	    instsubdir=`echo $name | sed 's,^,/,;s,/[^/]*$,,'`
 	    echo "install.modules.${mddname}: ${mddname}.\$(DL_EXT)"
 	    echo "	\$(sdir_top)/mkinstalldirs \$(DESTDIR)\$(MODDIR)${instsubdir}"
-	    echo "	\$(INSTALL_PROGRAM) ${mddname}.\$(DL_EXT) \$(DESTDIR)\$(MODDIR)/${name}.\$(DL_EXT)"
+	    echo "	\$(INSTALL_PROGRAM) \$(STRIPFLAGS) ${mddname}.\$(DL_EXT) \$(DESTDIR)\$(MODDIR)/${name}.\$(DL_EXT)"
 	    echo
 	    echo "uninstall.modules.${mddname}:"
 	    echo "	rm -f \$(DESTDIR)\$(MODDIR)/${name}.\$(DL_EXT)"
