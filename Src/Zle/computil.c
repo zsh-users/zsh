@@ -821,7 +821,7 @@ parse_cadef(char *nam, char **args)
 		int num = 0;
 
 		while (*p && idigit(*p))
-		    num = (num * 10) + ((int) *p++);
+		    num = (num * 10) + (((int) *p++) - '0');
 
 		anum = num + 1;
 	    } else
