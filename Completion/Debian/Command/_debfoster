@@ -1,43 +1,43 @@
 #compdef debfoster
 
 _arguments \
-'(--verbose)-v[Be a loudmouth]' \
-'(-v)--verbose[Be a loudmouth]' \
-'(--version)-V[Show version and copyright information]' \
-'(-V)--version[Show version and copyright information]' \
-'(--help)-h[Show this message]' \
-'(-h)--help[Show this message]' \
-'(--quiet)-q[Silently build keeper file]' \
-'(-q)--quiet[Silently build keeper file]' \
-'(--force)-f[Force system to conform to keeper file]' \
-'(-f)--force[Force system to conform to keeper file]' \
-'(--mark-only)-m[Do not install or delete packages]' \
-'(-m)--mark-only[Do not install or delete packages]' \
-'(--upgrade)-u[Try to upgrade dependencies]' \
-'(-u)--upgrade[Try to upgrade dependencies]' \
-'(--config FILE)-c[Specify configuration file]' \
-'(-c)--config FILE[Specify configuration file]' \
-'(--keeperfile FILE)-k[Specify keeper file]' \
-'(-k)--keeperfile FILE[Specify keeper file]' \
-'(--no-keeperfile)-n[Do not read keeper file]' \
-'(-n)--no-keeperfile[Do not read keeper file]' \
-'(--ignore-default-rules)-i[Ignore default rules]' \
-'(-i)--ignore-default-rules[Ignore default rules]' \
-'(--show-keepers)-a[Show packages on keeper list]' \
-'(-a)--show-keepers[Show packages on keeper list]' \
-'(--show-orphans)-s[Show orphaned packages]' \
-'(-s)--show-orphans[Show orphaned packages]' \
-'(--show-depends)-d[Show all depends of PACKAGE]:package:_deb_packages avail'   \
-'(-d)--show-depends[Show all depends of PACKAGE]:package:_deb_packages avail'   \
-'(--show-dependents)-e[Show dependents of PACKAGE]:package:_deb_packages avail' \
-'(-e)--show-dependents[Show dependents of PACKAGE]:package:_deb_packages avail' \
-'(--show-providers)-p[Show packages providing PACKAGE]:package:_deb_packages avail' \
-'(-p)--show-providers[Show packages providing PACKAGE]:package:_deb_packages avail' \
-'(--show-related)-r[Show packages brought in by PACKAGE]:package:_deb_packages avail' \
-'(-r)--show-related[Show packages brought in by PACKAGE]:package:_deb_packages avail' \
-'(--use-tasks)-t[Make tasks visible as packages]' \
-'(-t)--use-tasks[Make tasks visible as packages]' \
-'*-'{-option,o}'[Override any configuration option]:option string:->option' \
+'(--verbose)-v[be a loudmouth]' \
+'(-v)--verbose[be a loudmouth]' \
+'(--version)-V[show version and copyright information]' \
+'(-V)--version[show version and copyright information]' \
+'(--help)-h[show this message]' \
+'(-h)--help[show this message]' \
+'(--quiet)-q[silently build keeper file]' \
+'(-q)--quiet[silently build keeper file]' \
+'(--force)-f[force system to conform to keeper file]' \
+'(-f)--force[force system to conform to keeper file]' \
+'(--mark-only)-m[do not install or delete packages]' \
+'(-m)--mark-only[do not install or delete packages]' \
+'(--upgrade)-u[try to upgrade dependencies]' \
+'(-u)--upgrade[try to upgrade dependencies]' \
+'(--config FILE)-c[specify configuration file]' \
+'(-c)--config FILE[specify configuration file]' \
+'(--keeperfile FILE)-k[specify keeper file]' \
+'(-k)--keeperfile FILE[specify keeper file]' \
+'(--no-keeperfile)-n[do not read keeper file]' \
+'(-n)--no-keeperfile[do not read keeper file]' \
+'(--ignore-default-rules)-i[ignore default rules]' \
+'(-i)--ignore-default-rules[ignore default rules]' \
+'(--show-keepers)-a[show packages on keeper list]' \
+'(-a)--show-keepers[show packages on keeper list]' \
+'(--show-orphans)-s[show orphaned packages]' \
+'(-s)--show-orphans[show orphaned packages]' \
+'(--show-depends)-d[show all depends of PACKAGE]:package:_deb_packages avail'   \
+'(-d)--show-depends[show all depends of PACKAGE]:package:_deb_packages avail'   \
+'(--show-dependents)-e[show dependents of PACKAGE]:package:_deb_packages avail' \
+'(-e)--show-dependents[show dependents of PACKAGE]:package:_deb_packages avail' \
+'(--show-providers)-p[show packages providing PACKAGE]:package:_deb_packages avail' \
+'(-p)--show-providers[show packages providing PACKAGE]:package:_deb_packages avail' \
+'(--show-related)-r[show packages brought in by PACKAGE]:package:_deb_packages avail' \
+'(-r)--show-related[show packages brought in by PACKAGE]:package:_deb_packages avail' \
+'(--use-tasks)-t[make tasks visible as packages]' \
+'(-t)--use-tasks[make tasks visible as packages]' \
+'*-'{-option,o}'[override any configuration option]:option string:->option' \
 '*:package markings: _alternative "installed:installed packages:_deb_packages -S- installed" "uninstalled:uninstalled packages:_deb_packages uninstalled"' \
 && return 0
 

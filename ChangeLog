@@ -235,6 +235,12 @@
 
 	* 18346: Completion/Unix/Type/_pids, Completion/Unix/Type/_users:
 	complete for more commands using existing completions
+2003-03-12  Doug Kearns  <djkea2@mugca.its.monash.edu.au>
+
+	* unposted: Completion/Debian/Command/_debfoster,
+	Completion/Linux/Command/_valgrind, Completion/Unix/Command/_cvs,
+	Completion/Unix/Command/_global: remove initial capitalisation from
+	descriptions
 
 2003-03-11  Oliver Kiddle  <opk@zsh.org>
 

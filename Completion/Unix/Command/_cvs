@@ -367,9 +367,9 @@ _cvs_history_x () {
     'G[merge succeed]' \
     'U[working file was copied]' \
     'W[working file was deleted]' \
-    'A[A file was added]' \
-    'M[A file was modified]' \
-    'R[A file was removed]'
+    'A[a file was added]' \
+    'M[a file was modified]' \
+    'R[a file was removed]'
 }
 
 (( $+functions[_cvs_import] )) ||

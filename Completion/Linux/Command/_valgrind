@@ -38,7 +38,7 @@ typeset -A opt_args
     '--I1=-:set I1 cache manually(size,assoc,line_size):' \
     '--D1=-:set D1 cache manually(size,assoc,line_size):' \
     '--L2=-:set L2 cache manually(size,assoc,line_size):' \
-    '--weird-hacks=-:Weird Hacks (comma separated)[no hacks selected]:(ioctl-VTIME truncate-writes)' \
+    '--weird-hacks=-:weird hacks (comma separated)[no hacks selected]:(ioctl-VTIME truncate-writes)' \
     '--sanity-level=-:level of sanity checking to do [1]:' \
     '--single-step=-:translate each instr separately? [no]:(no yes)' \
     '--optimise=-:improve intermediate code? [yes]:(no yes)' \
@@ -53,5 +53,5 @@ typeset -A opt_args
     '--trace-pthread=-:show pthread event details? [none]:(none some all)' \
     '--stop-after=-:switch to real CPU after executing <number> basic blocks [infinity]:' \
     "--dump-error=-:show translation for basic block associated with <number>'th error context [0=don't show any]:" \
-    '1:Command name:_command_names -e' \
-    '*::Args :_normal'  && return 0
+    '1:command name:_command_names -e' \
+    '*::args :_normal'  && return 0
