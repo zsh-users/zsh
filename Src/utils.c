@@ -2950,9 +2950,7 @@ hasspecial(char const *s)
 
 /* Quote the string s and return the result.  If e is non-zero, the         *
  * pointer it points to may point to a position in s and in e the position  *
- * of the corresponding character in the quoted string is returned.  Like   *
- * e, te may point to a position in the string and pl is used to return     *
- * the position of the character pointed to by te in the quoted string.     *
+ * of the corresponding character in the quoted string is returned.         *
  * The last argument should be zero if this is to be used outside a string, *
  * one if it is to be quoted for the inside of a single quoted string, and  *
  * two if it is for the inside of  double quoted string.                    *
@@ -2964,14 +2962,14 @@ bslashquote(const char *s, char **e, int instring)
 {
     const char *u, *tt;
     char *v;
-    VARARR(char, buf, 2 * strlen(s) + 1);
+    char *buf = ncalloc(2 * strlen(s) + 1);
     int sf = 0;
 
     tt = v = buf;
     u = s;
     for (; *u; u++) {
 	if (e && *e == u)
-	    *e = v, sf |= 1;
+	    *e = v, sf = 1;
 	if (ispecial(*u) &&
 	    (!instring || (isset(BANGHIST) &&
 			   *u == (char)bangchar) ||
@@ -2998,15 +2996,12 @@ bslashquote(const char *s, char **e, int instring)
 	*v++ = *u;
     }
     *v = '\0';
-    tt = dupstring(buf);
-    v += tt - buf;
-    if (e && (sf & 1))
-	*e += tt - buf;
 
     if (e && *e == u)
-	*e = v;
+	*e = v, sf = 1;
+    DPUTS(!e || sf, "BUG: Wild pointer *e in bslashquote()");
 
-    return (char *) tt;
+    return buf;
 }
 
 /* Unmetafy and output a string, quoted if it contains special characters. */
