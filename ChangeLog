@@ -1,5 +1,8 @@
 2004-02-16  Oliver Kiddle  <opk@zsh.org>
 
+	* unposted: Completion/Unix/Command/_apachectl: complete also for
+	apache2ctl
+
 	* Frank v Waveren: 19423: Completion/X/Command/_mplayer: correct
 	typo in one of the options
 
