@@ -911,8 +911,9 @@ executenamedcommand(char *prmt)
 		    showinglist = 0;
 		    zmult = zmultsav;
 		} else if (!nextnode(firstnode(namedcmdll))) {
-		    ZLE_STRING_T ztmp = stringaszleline(peekfirst(namedcmdll),
-							&len, NULL);
+		    char *peekstr = ztrdup(peekfirst(namedcmdll));
+		    ZLE_STRING_T ztmp = stringaszleline(peekstr, &len, NULL);
+		    zsfree(peekstr);
 		    ZS_memcpy(ptr = cmdbuf, ztmp, len);
 		    ptr += len;
 		    free(ztmp);
@@ -920,8 +921,9 @@ executenamedcommand(char *prmt)
 			goto unambiguous;
 		} else {
 		    int ltmp;
-		    ZLE_STRING_T ztmp = stringaszleline(peekfirst(namedcmdll),
-							&ltmp, NULL);
+		    char *peekstr = ztrdup(peekfirst(namedcmdll));
+		    ZLE_STRING_T ztmp = stringaszleline(peekstr, &ltmp, NULL);
+		    zsfree(peekstr);
 		    ZS_memcpy(cmdbuf, ztmp, ltmp);
 		    free(ztmp);
 		    ptr = cmdbuf + namedcmdambig;

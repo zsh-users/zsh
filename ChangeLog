@@ -1,3 +1,8 @@
+2005-03-11  Peter Stephenson  <pws@csr.com>
+
+	* 20966: Src/Zle/zle_misc.c: need to copy strings to avoid
+	crash in completion for execute-named-command.
+
 2005-03-09  Clint Adams  <clint@zsh.org>
 
 	* 20961: Completion/Unix/Command/_baz: fix completion of status and
