@@ -438,7 +438,7 @@ and tt(down-line-or-search):  if in a multiline buffer they move up or
 down within the buffer, otherwise they search for a history line matching
 the start of the current line.  In this case, however, they search for
 a line which matches the current line up to the current cursor position, in
-the manner of tt(history-begining-search-backward) and tt(-forward), rather
+the manner of tt(history-beginning-search-backward) and tt(-forward), rather
 than the first word on the line.
 )
 tindex(incarg)
@@ -909,7 +909,7 @@ evaluated using radians, and so on.
 Each line typed is evaluated as an expression.  The prompt shows a number,
 which corresponds to a positional parameter where the result of that
 calculation is stored.  For example, the result of the calculation on the
-line preceeded by `tt(4> )' is available as tt($4).  Full command line
+line preceded by `tt(4> )' is available as tt($4).  Full command line
 editing, including the history of previous calculations, is available; the
 history is saved in the file tt(~/.zcalc_history).  To exit, enter a blank
 line or type `tt(q)' on its own.
@@ -923,7 +923,7 @@ Parameter assignment is possible, but note that all parameters will be put
 into the global namespace.
 
 An extra facility is provided for changing the default output base.  Use,
-for example, `tt([#16])' to display hexadecimal output preceeded by an
+for example, `tt([#16])' to display hexadecimal output preceded by an
 indication of the base, or `tt([##16])' just to display the raw number in
 the given base.  Bases themselves are always specified in decimal.
 `tt([#])' restores the normal output format.

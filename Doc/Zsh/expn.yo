@@ -1680,11 +1680,11 @@ If the qualifier `tt(f)' is followed by any other character anything
 up to the next matching character (`tt([)', `tt({)', and `tt(<)' match 
 `tt(])', `tt(})', and `tt(>)' respectively, any other character
 matches itself) is taken as a list of comma-separated
-var(sub-spec)s. Each var(sub-spec) may be either a octal number as
+var(sub-spec)s. Each var(sub-spec) may be either an octal number as
 described above or a list of any of the characters `tt(u)', `tt(g)',
 `tt(o)', and `tt(a)', followed by a `tt(=)', a `tt(PLUS())', or a
 `tt(-)', followed by a list of any of the characters `tt(r)', `tt(w)', 
-`tt(x)', `tt(s)', and `tt(t)', or a octal digit. The first list of
+`tt(x)', `tt(s)', and `tt(t)', or an octal digit. The first list of
 characters specify which access rights are to be checked. If a `tt(u)'
 is given, those for the owner of the file are used, if a `tt(g)' is
 given, those of the group are checked, a `tt(o)' means to test those
@@ -1886,5 +1886,5 @@ example(print b*.pro(#q:s/pro/shmo/)(#q.:s/builtin/shmiltin/))
 demonstrates how colon modifiers and other qualifiers may be chained
 together.  The ordinary qualifier `tt(.)' is applied first, then the colon
 modifiers in order from left to right.  So if tt(EXTENDED_GLOB) is set and
-the base battern matches the regular file tt(builtin.pro), the shell will
+the base pattern matches the regular file tt(builtin.pro), the shell will
 print `tt(shmiltin.shmo)'.

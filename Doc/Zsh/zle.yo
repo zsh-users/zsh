@@ -1045,7 +1045,7 @@ history offset which applies to successive calls to this widget: if is -1,
 the default behaviour is used, while if it is 1, successive calls will move
 forwards through the history.  The value 0 can be used to indicate that the
 history line examined by the previous execution of the command will be
-reexamined.  Note that negative numbers should be preceeded with a
+reexamined.  Note that negative numbers should be preceded with a
 `tt(-)tt(-)' argument to avoid confusing them with options.
 
 If two arguments are given, the second specifies the word on the command
