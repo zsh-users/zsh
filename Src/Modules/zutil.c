@@ -285,6 +285,7 @@ bin_zstyle(char *nam, char **args, char *ops, int func)
     case 'a': min = 3; max =  3; break;
     case 'h': min = 3; max =  3; break;
     case 't': min = 2; max = -1; break;
+    case 'T': min = 2; max = -1; break;
     case 'm': min = 3; max =  3; break;
     case 'g': min = 1; max =  3; break;
     default:
@@ -417,6 +418,7 @@ bin_zstyle(char *nam, char **args, char *ops, int func)
 	}
 	break;
     case 't':
+    case 'T':
 	{
 	    Stypat s;
 
@@ -438,7 +440,7 @@ bin_zstyle(char *nam, char **args, char *ops, int func)
 			     !strcmp(s->vals[0], "on") ||
 			     !strcmp(s->vals[0], "1"));
 	    }
-	    return 1;
+	    return (args[0][1] == 't');
 	}
 	break;
     case 'm':

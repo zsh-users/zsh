@@ -3,12 +3,15 @@
 local val nm="$compstate[nmatches]"
 
 if zstyle -a ":completion:${curcontext}:$1" list-colors val; then
-  zmodload -e zsh/complist || zmodload -i zsh/complist
+  zmodload -i zsh/complist
   if [[ "$1" = default ]]; then
     ZLS_COLORS="${(j.:.)${(@)val:gs/:/\\\:}}"
   else
     eval "ZLS_COLORS=\"(${1})\${(j.:(${1}).)\${(@)val:gs/:/\\\:}}:\${ZLS_COLORS}\""
   fi
+elif [[ "$1" = default && -n "$ZLS_COLORS$ZLS_COLOURS" ]]; then
+  zmodload -i zsh/complist
+  ZLS_COLORS="$ZLS_COLORS$ZLS_COLOURS"
 fi
 
 if zstyle -s ":completion:${curcontext}:$1" list-packed val; then

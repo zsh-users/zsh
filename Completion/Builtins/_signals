@@ -22,7 +22,7 @@ done
 
 if _wanted signals expl signal &&
        { [[ -z "$minus" ]] ||
-         ! zstyle -t ":completion:${curcontext}:signals" prefix-needed ||
+         ! zstyle -T ":completion:${curcontext}:signals" prefix-needed ||
          [[ "$PREFIX" = -* ]] } ; then
   local disp tmp
 

@@ -37,7 +37,7 @@ fi
 
 if compset -P -P || [[ "$words[CURRENT-1]" = -P ]]; then
   if _wanted printers expl printer; then
-    if zstyle -t ":completion:${curcontext}:printers" verbose; then
+    if zstyle -T ":completion:${curcontext}:printers" verbose; then
       zformat -a list ' -- ' "$_lp_cache[@]"
       disp=(-ld list)
     else
@@ -47,7 +47,7 @@ if compset -P -P || [[ "$words[CURRENT-1]" = -P ]]; then
 
     (( $+_lp_alias_cache )) || return 1
 
-    if zstyle -t ":completion:${curcontext}:printers" verbose; then
+    if zstyle -T ":completion:${curcontext}:printers" verbose; then
       zformat -a list ' -- ' "$_lp_alias_cache[@]"
       disp=(-ld list)
     else
@@ -73,7 +73,7 @@ else
         if _requested users expl user; then
           strs=( "${(@)${(@)list##[^ 	]##[ 	]##[^ 	]##[ 	]##}%%[ 	]*}" )
           if [[ -z "$shown" ]] &&
-             zstyle -t ":completion:${curcontext}:users" verbose; then
+             zstyle -T ":completion:${curcontext}:users" verbose; then
             disp=(-ld list)
   	  shown=yes
           else
@@ -84,7 +84,7 @@ else
         if _requested jobs expl job; then
           strs=( "${(@)${(@)list##[^ 	]##[ 	]##[^ 	]##[ 	]##[^ 	]##[ 	]##}%%[ 	]*}" )
           if [[ -z "$shown" ]] &&
-             zstyle -t ":completion:${curcontext}:jobs" verbose; then
+             zstyle -T ":completion:${curcontext}:jobs" verbose; then
             disp=(-ld list)
   	  shown=yes
           else

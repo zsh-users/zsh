@@ -17,7 +17,7 @@ local curcontext="${curcontext}" oldcontext opm="$compstate[pattern_match]"
 
 oldcontext="$curcontext"
 
-zstyle -s ":completion:${curcontext}:" max-errors cfgacc
+zstyle -s ":completion:${curcontext}:" max-errors cfgacc || cfgacc='2 numeric'
 
 # Get the number of errors to accept.
 

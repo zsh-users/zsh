@@ -35,9 +35,6 @@ if (( $# )); then
 
   comptags -i "$curcontext" "$@"
 
-  _offered_tags=( "$_offered_tags[@]" "$@" )
-  _last_tags=()
-
   # Sort the tags.
 
   if [[ -n "$_sort_tags" ]]; then
@@ -55,6 +52,15 @@ if (( $# )); then
 
     [[ -z "$nodef" ]] && comptry "$@"
   else
+
+    # The first ones give the default behaviour.
+
+    comptry arguments values
+    comptry options
+    comptry globbed-files
+    comptry directories
+    comptry all-files
+
     comptry "$@"
   fi
 
@@ -67,20 +73,4 @@ fi
 
 # The other mode: switch to the next set of tags.
 
-local tags
-
-_failed_tags=( "$_failed_tags[@]" "$_last_tags[@]" )
-
-# Return failure if no sets remaining.
-
-comptags -N || return 1
-
-# Otherwise get the next tags.
-
-comptags -S _last_tags
-
-_tried_tags=( "$_tried_tags[@]" "$_last_tags[@]" )
-
-shift 1 "$prios"
-
-return 0
+comptags -N

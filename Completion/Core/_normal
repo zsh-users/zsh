@@ -66,10 +66,7 @@ fi
 name="$cmd1"
 comp="$_comps[$cmd1]"
 
-if [[ -z "$comp" ]]; then
-  name="$cmd2"
-  comp="$_comps[$cmd2]"
-fi
+[[ -z "$comp" ]] && name="$cmd2" comp="$_comps[$cmd2]"
 
 # And generate the matches, probably using default completion.
 
@@ -77,11 +74,9 @@ if [[ -n "$comp" ]]; then
   _compskip=patterns
   "$comp" && ret=0
   [[ "$_compskip" = (all|*patterns*) ]] && return ret
-else
-  if [[ "$_compskip" != *default* ]]; then
-    name=-default-
-    comp="$_comps[-default-]"
-  fi
+elif [[ "$_compskip" != *default* ]]; then
+  name=-default-
+  comp="$_comps[-default-]"
 fi
 
 if [[ "$_compskip" != (all|*patterns*) ]]; then

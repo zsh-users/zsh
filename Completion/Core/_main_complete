@@ -19,7 +19,7 @@
 setopt localoptions nullglob rcexpandparam extendedglob
 unsetopt markdirs globsubst shwordsplit nounset ksharrays
 
-local comp post ret=1 _compskip _prio_num=1 format _comp_ignore \
+local comp post ret=1 _compskip format _comp_ignore \
       _completers _completers_left _comp_matcher \
       context state line opt_args val_args curcontext="$curcontext" \
       _last_nmatches=-1 _last_menu_style _def_menu_style _menu_style sel \
@@ -27,12 +27,6 @@ local comp post ret=1 _compskip _prio_num=1 format _comp_ignore \
       _saved_lastprompt="${compstate[last_prompt]}" \
       _saved_list="${compstate[list]}" \
       _saved_insert="${compstate[insert]}"
-
-typeset -U _offered_tags _tried_tags _failed_tags _used_tags _unused_tags
-
-_offered_tags=()
-_tried_tags=()
-_failed_tags=()
 
 typeset -U _lastdescr
 
@@ -50,17 +44,13 @@ fi
 # Initial setup.
 
 _setup default
-_def_menu_style=( "$_last_menu_style[@]" )
+_def_menu_style=( "$_last_menu_style[@]"
+                  ${SELECTMIN+select${SELECTMIN:+\=$SELECTMIN}} )
 _last_menu_style=()
 
 # Get the names of the completers to use in the positional parameters.
 
-if (( ! $# )); then
-  local tmp
-
-  zstyle -a ":completion:${curcontext}:" completer tmp
-  set -- "$tmp[@]"
-fi
+(( $# )) || zstyle -a ":completion:${curcontext}:" completer argv || set _complete
 
 # And now just call the completer functions defined.
 
@@ -75,7 +65,7 @@ for comp; do
   shift 1 _completers_left
 done
 
-if (( $compstate[nmatches] )); then
+if [[ $compstate[nmatches] -gt 1 ]]; then
   [[ _last_nmatches -ge 0 && _last_nmatches -ne compstate[nmatches] ]] &&
       _menu_style=( "$_last_menu_style[@]" "$_menu_style[@]" )
 
@@ -128,7 +118,7 @@ if (( $compstate[nmatches] )); then
       fi
     fi
   fi
-elif [[ $#_lastdescr -ne 0 ]] &&
+elif [[ $compstate[nmatches] -eq 0 && $#_lastdescr -ne 0 ]] &&
      zstyle -s ":completion:${curcontext}:warnings" format format; then
   local str
 
@@ -147,11 +137,6 @@ elif [[ $#_lastdescr -ne 0 ]] &&
   compadd -UX "$format" -n ''
 fi
 
-# See which tags were or were not used.
-
-_used_tags=( "${(@)_tried_tags:#${(j:|:)~${(@)_failed_tags//\[/\\[}//\]/\\]}}" )
-_unused_tags=( "${(@)_offered_tags:#${(j:|:)~${(@)_used_tags//\[/\\[}//\]/\\]}}" )
-
 # Now call the post-functions.
 
 for post in "$comppostfuncs[@]"; do
@@ -167,10 +152,5 @@ _lastcomp[iprefix]="$IPREFIX"
 _lastcomp[isuffix]="$ISUFFIX"
 _lastcomp[qiprefix]="$QIPREFIX"
 _lastcomp[qisuffix]="$QISUFFIX"
-_lastcomp[offered_tags]="${(j.:.)_offered_tags}"
-_lastcomp[tried_tags]="${(j.:.)_tried_tags}"
-_lastcomp[failed_tags]="${(j.:.)_failed_tags}"
-_lastcomp[unused_tags]="${(j.:.)_unused_tags}"
-_lastcomp[used_tags]="${(j.:.)_used_tags}"
 
 return ret

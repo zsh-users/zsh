@@ -15,6 +15,7 @@ xitem(tt(zstyle -b) var(context) var(style) var(name))
 xitem(tt(zstyle -a) var(context) var(style) var(name))
 xitem(tt(zstyle -h) var(context) var(style) var(name))
 xitem(tt(zstyle -t) var(context) var(style) [ var(strings) ...])
+xitem(tt(zstyle -T) var(context) var(style) [ var(strings) ...])
 item(tt(zstyle -m) var(context) var(style) var(pattern))(
 This builtin command is used to define and lookup styles. Styles are
 pairs of names and values, where the values consist of any number of
@@ -63,13 +64,16 @@ makes it be returned as an associative array (with the first, third,
 etc. string being used as the keys and the other strings being used as 
 the values).
 
-The tt(-t) option can be used to test the value of a style, i.e. it
+The tt(-t) options can be used to test the value of a style, i.e. it
 only sets the return value. Without any var(strings) arguments it is
 zero if the style is defined for at least one matching pattern, has
 only one string in its value and that is equal to one of tt(true),
 tt(yes), tt(on) or tt(1). If any var(strings) are given the return
 zero if and only if at least one of the var(strings) is equal to at
 least one of the strings in the value.
+
+The tt(-T) option is like tt(-t) but returns zero if the style is not
+set for any matching pattern.
 
 The tt(-m) option can be used to match a value. It returns zero if the 
 var(pattern) matches at least one of the strings in the value.

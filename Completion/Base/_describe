@@ -16,7 +16,7 @@ fi
 
 _tags "$_type" || return 1
 
-zstyle -t ":completion:${curcontext}:$_type" verbose && _showd=yes
+zstyle -T ":completion:${curcontext}:$_type" verbose && _showd=yes
 
 _description "$_type" _expl "$1"
 shift

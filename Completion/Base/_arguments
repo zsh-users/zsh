@@ -17,9 +17,8 @@ if (( long )); then
   fi
 
   name=${~words[1]}
-  if [[ "$name" != /* ]]; then
-    tmp="$PWD/$name"
-  fi
+  [[ "$name" != /* ]] && tmp="$PWD/$name"
+
   name="_args_cache_${name}"
   name="${name//[^a-zA-Z0-9_]/_}"
 
@@ -255,7 +254,7 @@ if (( $# )) && comparguments -i "$autod" "$@"; then
       fi
 
       if [[ -z "$matched" ]] && _requested options &&
-          { ! zstyle -t ":completion:${curcontext}:options" prefix-needed ||
+          { ! zstyle -T ":completion:${curcontext}:options" prefix-needed ||
           [[ "$origpre" = [-+]* ||
              ( -z "$aret$mesg" && nm -eq compstate[nmatches] ) ]] } ; then
 	local prevpre="$PREFIX" previpre="$IPREFIX"

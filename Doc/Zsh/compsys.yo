@@ -713,6 +713,9 @@ only completion for prediction one could use:
 example(zstyle ':completion:::::' completer _complete _correct _approximate
 zstyle ':completion:incremental::::' completer _complete _correct
 zstyle ':completion:predict::::' completer _complete)
+
+The default value for this style is tt(_complete), i.e. normally only
+completion will be done.
 )
 item(tt(completions))(
 This style is used by the tt(_expand) completer function.
@@ -1115,7 +1118,10 @@ will em(not) try to generate corrected
 completions when given a numeric argument, so in this case the number given
 should be greater than zero.  For example, `tt(2 not-numeric)' specifies that
 correcting completion with two errors will usually be performed, but if a
-numeric argument is given, correcting completion will not be performed.
+numeric argument is given, correcting completion will not be
+performed.
+
+The default value for this style contains tt(2) and tt(numeric).
 )
 item(tt(menu))(
 This style is tested for the tt(default) tag and the tags used when
@@ -1219,6 +1225,8 @@ item(tt(prefix-hidden))(
 This is used when matches with a common prefix are added (e.g. option
 names). If it is `true', this prefix will not be shown in the list of
 matches.
+
+The default value for this style is `false'.
 )
 item(tt(prefix-needed))(
 This, too, is used for matches with a common prefix. If it is set to
@@ -1226,6 +1234,8 @@ This, too, is used for matches with a common prefix. If it is set to
 matches. E.g. for options this means that the `tt(-)', `tt(+)', or
 `tt(-)tt(-)' has to be on the line to make option names be completed at
 all.
+
+The default style for this style is `true'.
 )
 item(tt(prompt))(
 The tt(incremental-complete-word) widget shows the value of this
@@ -1344,7 +1354,10 @@ in which order tags are to be used based on additional context
 information. See the tt(_sort_tags) function below for a description
 of how such functions can be implemented.
 
-If no style has been defined for a context, all tags will be used.
+If no style has been defined for a context, the strings tt(arguments
+values), tt(options), tt(globbed-files), tt(directories) and
+tt(all-files) plus all tags offered by the completion function will be 
+used.
 )
 item(tt(users))(
 This may be set to a list of names that should be completed whenever 
@@ -1369,7 +1382,9 @@ the tt(accounts) tag.
 item(tt(verbose))(
 This is used in several contexts to decide if only a simple or a
 verbose list of matches should be generated. For example some commands 
-show descriptions for option names if this style is true.
+show descriptions for option names if this style is `true'.
+
+The default value for this style is `true'.
 )
 item(tt(word))(
 To find out if listing should be performed on its own, the tt(_list)

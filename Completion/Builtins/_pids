@@ -16,7 +16,7 @@ zstyle -a ":completion:${curcontext}:ps" arguments args
 
 out="$(command ps $args 2>/dev/null)"
 
-if zstyle -t ":completion:${curcontext}:processes" verbose; then
+if zstyle -T ":completion:${curcontext}:processes" verbose; then
   zstyle -a ":completion:${curcontext}:ps" list-arguments listargs
   (( $#listargs )) || listargs=( "$args[@]" )
   if [[ "$listargs" = "$args" ]]; then

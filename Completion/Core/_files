@@ -16,17 +16,14 @@ else
 fi
 (( $opts[(I)-F] )) && hasign=yes
 
-if [[ "$group[2]" = files ]]; then
-  opts=("$opts[@]" "$group[@]")
-  group=()
-fi
+[[ "$group[2]" = files ]] && opts=("$opts[@]" "$group[@]") group=()
 
 ign=()
 
-if zstyle -s ":completion:${curcontext}:all-files" file-patterns tmp &&
-   [[ -n "$tmp" ]]; then
-  aopts=(-g "$tmp")
-fi
+zstyle -s ":completion:${curcontext}:all-files" file-patterns tmp &&
+    [[ -n "$tmp" ]] &&
+        aopts=(-g "$tmp")
+
 if zstyle -s ":completion:${curcontext}:directories" file-patterns tmp &&
    [[ -n "$tmp" ]]; then
   dopts=(-g "$tmp")
