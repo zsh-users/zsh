@@ -392,10 +392,7 @@ putpromptchar(int doprint, int endchar)
 		    for (ss = hostnam; *ss; ss++)
 			if (*ss == '.' && !--arg)
 			    break;
-		    t0 = *ss;
-		    *ss = '\0';
-		    stradd(hostnam);
-		    *ss = t0;
+		    stradd(*ss ? dupstrpfx(hostnam, ss - hostnam) : hostnam);
 		}
 		unqueue_signals();
 		break;

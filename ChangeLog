@@ -1,6 +1,9 @@
 2001-03-29  Peter Stephenson  <pws@csr.com>
 
-	* 13837: Src/builtin.c: disallows changing of parameter type
+	* 13838: Src/prompt.c: don't assume we can change the string
+	returned by getsparam("HOST").
+
+	* 13837: Src/builtin.c: disallow changing of parameter type
 	for autoloadable parameter (bug 219459 on Sourceforge).
 
 2001-03-29  Sven Wischnowsky  <wischnow@zsh.org>
