@@ -454,6 +454,7 @@ createparamtable(void)
 {
     Param ip, pm;
     char **new_environ, **envp, **envp2, **sigptr, **t;
+    char **old_environ = environ;
     char buf[50], *str, *iname;
     int num_env, oae = opts[ALLEXPORT];
 #ifdef HAVE_UNAME
@@ -516,9 +517,12 @@ createparamtable(void)
 		    pm->flags |= PM_EXPORTED;
 		    pm->env = *envp++ = ztrdup(*envp2);
 		    *envp = NULL;
-		    if (pm->flags & PM_SPECIAL)
+		    if (pm->flags & PM_SPECIAL) {
+			environ = new_environ;
 			pm->env = replenv(pm->env, getsparam(pm->nam),
 					  pm->flags);
+			environ = old_environ;
+		    }
 		}
 	    }
 	    *str = '=';

@@ -1,5 +1,8 @@
 2000-04-13  Peter Stephenson  <pws@cambridgesiliconradio.com>
 
+	* 10743: Src/params.c: replenv() failed importing special params
+	at start up because it was using the wrong environment block.
+
 	* 10738: Doc/Zsh/builtins.yo, Doc/Zsh/params.yo, Src/builtin.c,
 	Src/params.c: local parameters can be exported; typeset +g -x
 	and local -x work in a natural way; currently typeset -g still
