@@ -914,25 +914,31 @@ gethistent(int ev, int nearmatch)
 }
 
 static void
-putoldhistentryontop(void)
+putoldhistentryontop(short keep_going)
 {
-    Histent he = hist_ring->down;
+    static Histent next = NULL;
+    Histent he = keep_going? next : hist_ring->down;
+    next = he->down;
     if (isset(HISTEXPIREDUPSFIRST) && !(he->flags & HIST_DUP)) {
-	int max_unique_ct = getiparam("SAVEHIST");
+	static int max_unique_ct = 0;
+	if (!keep_going)
+	    max_unique_ct = getiparam("SAVEHIST");
 	do {
 	    if (max_unique_ct-- <= 0) {
+		max_unique_ct = 0;
 		he = hist_ring->down;
 		break;
 	    }
-	    he = he->down;
+	    he = next;
+	    next = he->down;
 	} while (he != hist_ring->down && !(he->flags & HIST_DUP));
-	if (he != hist_ring->down) {
-	    he->up->down = he->down;
-	    he->down->up = he->up;
-	    he->up = hist_ring;
-	    he->down = hist_ring->down;
-	    hist_ring->down = he->down->up = he;
-	}
+    }
+    if (he != hist_ring->down) {
+	he->up->down = he->down;
+	he->down->up = he->up;
+	he->up = hist_ring;
+	he->down = hist_ring->down;
+	hist_ring->down = he->down->up = he;
     }
     hist_ring = he;
 }
@@ -963,7 +969,7 @@ prepnexthistent(void)
 	histlinect++;
     }
     else {
-	putoldhistentryontop();
+	putoldhistentryontop(0);
 	freehistdata(hist_ring, 0);
     }
     hist_ring->histnum = ++curhist;
@@ -1762,9 +1768,13 @@ inithist(void)
 void
 resizehistents(void)
 {
-    while (histlinect > histsiz) {
-	putoldhistentryontop();
+    if (histlinect > histsiz) {
+	putoldhistentryontop(0);
 	freehistnode((HashNode)hist_ring);
+	while (histlinect > histsiz) {
+	    putoldhistentryontop(1);
+	    freehistnode((HashNode)hist_ring);
+	}
     }
 }
 
