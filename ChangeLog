@@ -1,5 +1,8 @@
 2004-04-05  Peter Stephenson  <pws@csr.com>
 
+	* 19728: Doc/Zsh/expn.yo: explain that (^F) (from 19717)
+	doesn't mean `non-empty directories', you need (/^F) for that.
+
 	* unposted: ChangeLog, ChangeLog-4.1: move stuff up to 4.2.0
 	out of ChangeLog.
 
