@@ -1316,12 +1316,17 @@ struct paramdef {
 
 #define PARAMDEF(name, flags, var, gsu) \
     { name, flags, (void *) var, (void *) gsu, }
+/*
+ * Note that the following definitions are appropriate for defining
+ * parameters that reference a variable (var).  Hence the get/set/unset
+ * methods used will assume var needs dereferencing to get the value.
+ */
 #define INTPARAMDEF(name, var) \
-    { name, PM_INTEGER, (void *) var, (void *) &stdinteger_gsu }
+    { name, PM_INTEGER, (void *) var, NULL }
 #define STRPARAMDEF(name, var) \
-    { name, PM_SCALAR, (void *) var, (void *) &varscalar_gsu }
+    { name, PM_SCALAR, (void *) var, NULL }
 #define ARRPARAMDEF(name, var) \
-    { name, PM_ARRAY, (void *) var, (void *) &vararray_gsu }
+    { name, PM_ARRAY, (void *) var, NULL }
 
 #define setsparam(S,V) assignsparam(S,V,0)
 #define setaparam(S,V) assignaparam(S,V,0)

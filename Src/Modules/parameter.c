@@ -1812,6 +1812,13 @@ struct pardef {
     Param pm;
 };
 
+/*
+ * This is a duplicate of nullsethash_gsu.  On some systems
+ * (such as Cygwin) we can't put a pointer to an imported variable
+ * in a compile-time initialiser, so we use this instead.
+ */
+static const struct gsu_hash pmnullsethash_gsu =
+{ hashgetfn, nullsethashfn, NULL };
 static const struct gsu_hash pmcommands_gsu =
 { hashgetfn, setpmcommands, stdunsetfn };
 static const struct gsu_hash pmfunctions_gsu =
@@ -1848,7 +1855,7 @@ static const struct gsu_array historywords_gsu =
 
 static struct pardef partab[] = {
     { "parameters", PM_READONLY,
-      getpmparameter, scanpmparameters, &nullsethash_gsu,
+      getpmparameter, scanpmparameters, &pmnullsethash_gsu,
       NULL, NULL },
     { "commands", 0,
       getpmcommand, scanpmcommands, &pmcommands_gsu,

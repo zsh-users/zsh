@@ -1894,7 +1894,31 @@ addparamdef(Paramdef d)
 
     pm->level = 0;
     pm->u.data = d->var;
-    pm->gsu.i = (GsuInteger) d->gsu;
+    if (d->gsu)
+	pm->gsu.i = (GsuInteger) d->gsu;
+    else {
+	/*
+	 * If no get/set/unset class, use the appropriate
+	 * variable type.
+	 */
+	switch (PM_TYPE(pm->flags)) {
+	case PM_SCALAR:
+	    pm->gsu.s = &varscalar_gsu;
+	    break;
+
+	case PM_INTEGER:
+	    pm->gsu.i = &varinteger_gsu;
+	    break;
+
+	case PM_ARRAY:
+	    pm->gsu.a = &vararray_gsu;
+	    break;
+
+	default:
+	    unsetparam_pm(pm, 0, 1);
+	    return 1;
+	}
+    }
 
     return 0;
 }

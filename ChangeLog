@@ -3,6 +3,11 @@
 	* unposted: Config/version.mk, README, Etc/FAQ.yo: release
 	zsh version 4.2.2.
 
+	* 20695: Src/module.c, Src/zsh.h, Src/Modules/parameter.c,
+	Src/Zle/zleparameter.c: Cygwin barfs on an attempt to
+	use a pointer to an imported variable in a compile-time
+	initialiser.
+
 	* unposted: Fix .distfiles and .cvsignore for distribution.
 
 	* unposted: Completion/Unix/Command/_perforce: minor comment

@@ -167,12 +167,19 @@ struct pardef {
     Param pm;
 };
 
+/*
+ * This is a duplicate of stdhash_gsu.  On some systems
+ * (such as Cygwin) we can't put a pointer to an imported variable
+ * in a compile-time initialiser, so we use this instead.
+ */
+static const struct gsu_hash zlestdhash_gsu =
+{ hashgetfn, hashsetfn, stdunsetfn };
 static const struct gsu_array keymaps_gsu =
 { keymapsgetfn, arrsetfn, stdunsetfn };
 
 static struct pardef partab[] = {
     { "widgets", PM_READONLY,
-      getpmwidgets, scanpmwidgets, &stdhash_gsu,
+      getpmwidgets, scanpmwidgets, &zlestdhash_gsu,
       NULL, NULL },
     { "keymaps", PM_ARRAY|PM_SPECIAL|PM_READONLY,
       NULL, NULL, NULL,
