@@ -1,5 +1,9 @@
 2003-09-25  Peter Stephenson  <pws@csr.com>
 
+	* unposted: Completion/Unix/Command/_perforce: suggested by
+	Felix: use hostname from client, if any, for p4 -H completion
+	since no other name makes sense there.
+
 	* 19139: Test/B02typeset.ztst: add extra tests for typeset -T.
 
 2003-09-25  Wayne Davison  <wayned@users.sourceforge.net>

@@ -273,7 +273,7 @@ _perforce() {
     '-c+[client]:client:_perforce_clients' \
     '-C+[charset]:charset:_perforce_charsets' \
     '-d+[current directory]:directory:_path_files -g "*(/)"' \
-    '-H+[hostname]:host:_hosts' \
+    '-H+[hostname]:host:_perforce_hosts' \
     '-G[python output]' \
     '-L+[message language]:language: ' \
     '-p+[server port]:port:_perforce_hosts_ports' \
@@ -1005,6 +1005,23 @@ _perforce_filetypes() {
 (( $+functions[_perforce_groups] )) ||
 _perforce_groups() {
   _describe -t groups 'Perforce group' $(_perforce_call_p4 groups groups)
+}
+
+
+(( $+functions[_perforce_hosts] )) ||
+_perforce_hosts() {
+  local expl host
+  # Completion for p4 -H; other forms of host completion
+  # go through _perforce_hosts_ports.
+  # From Felix: if the client specifies a hostname, there's
+  # no point using any other host, since it won't work.
+  host=$(_perforce_call_p4 client client -o |
+    awk '$1 ~ /^Host:/ {print $2}' )
+  if [[ -n $host ]]; then
+    _wanted hosts expl host compadd "$@" $host
+  else
+    _hosts
+  fi
 }
 
 
