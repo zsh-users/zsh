@@ -1,3 +1,9 @@
+2004-10-29  Peter Stephenson  <pws@csr.com>
+
+	* 20528: Src/exec.c: Clint spotted that fix in 18492 to make
+	> >(...) synchronous failed in the case of an fd opened for the
+	shell's own use with an	exec.
+
 2004-10-26  Peter Stephenson  <pws@csr.com>
 
 	* 20522: Src/glob.c, Test/D02glob.ztst: must-match optimisation

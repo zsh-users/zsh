@@ -2205,7 +2205,7 @@ execcmd(Estate state, int input, int output, int how, int last1)
 
     /* Do process substitutions */
     if (redir)
-	spawnpipes(redir);
+	spawnpipes(redir, nullexec);
 
     /* Do io redirections */
     while (redir && nonempty(redir)) {
@@ -3113,11 +3113,17 @@ getproc(char *cmd)
 #endif   /* HAVE_FIFOS and PATH_DEV_FD not defined */
 }
 
-/* > >(...) or < <(...) (does not use named pipes) */
+/*
+ * > >(...) or < <(...) (does not use named pipes)
+ *
+ * If the second argument is 1, this is part of
+ * an "exec < <(...)" or "exec > >(...)" and we shouldn't
+ * wait for the job to finish before continuing.
+ */
 
 /**/
 static int
-getpipe(char *cmd)
+getpipe(char *cmd, int nullexec)
 {
     Eprog prog;
     int pipes[2], out = *cmd == Inang;
@@ -3133,7 +3139,8 @@ getpipe(char *cmd)
 	    zclose(pipes[!out]);
 	    return -1;
 	}
-	addproc(pid, NULL, 1, &bgtime);
+	if (!nullexec)
+	    addproc(pid, NULL, 1, &bgtime);
 	return pipes[!out];
     }
     entersubsh(Z_ASYNC, 1, 0, 0);
@@ -3157,11 +3164,17 @@ mpipe(int *pp)
     pp[1] = movefd(pp[1]);
 }
 
-/* Do process substitution with redirection */
+/*
+ * Do process substitution with redirection
+ *
+ * If the second argument is 1, this is part of
+ * an "exec < <(...)" or "exec > >(...)" and we shouldn't
+ * wait for the job to finish before continuing.
+ */
 
 /**/
 static void
-spawnpipes(LinkList l)
+spawnpipes(LinkList l, int nullexec)
 {
     LinkNode n;
     Redir f;
@@ -3172,7 +3185,7 @@ spawnpipes(LinkList l)
 	f = (Redir) getdata(n);
 	if (f->type == REDIR_OUTPIPE || f->type == REDIR_INPIPE) {
 	    str = f->name;
-	    f->fd2 = getpipe(str);
+	    f->fd2 = getpipe(str, nullexec);
 	}
     }
 }
