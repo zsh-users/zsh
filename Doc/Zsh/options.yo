@@ -452,6 +452,13 @@ than tt(SAVEHIST) in order to give you some room for the duplicated
 events, otherwise this option will behave just like
 tt(HIST_IGNORE_ALL_DUPS) once the history fills up with unique events.
 )
+pindex(HIST_FIND_NO_DUPS)
+cindex(history, ignoring duplicates in search)
+item(tt(HIST_FIND_NO_DUPS))(
+When searching for history entries in the line editor, do not display
+duplicates of a line previously found, even if the duplicates are not
+contiguous.
+)
 pindex(HIST_IGNORE_ALL_DUPS)
 cindex(history, ignoring all duplicates)
 item(tt(HIST_IGNORE_ALL_DUPS))(
