@@ -1,3 +1,7 @@
+2005-01-12  Oliver Kiddle  <opk@zsh.org>
+
+	* 20701: Src/system.h: fix compilation on Mac OS X
+
 2005-01-12  Peter Stephenson  <pws@csr.com>
 
 	* users/8354: Doc/Zsh/options.yo: with glob_complete, completing
@@ -19,7 +23,7 @@
 	* 20692: Test/ztst.zsh: having POSIXLY_CORRECT set makes
 	GNU tail report warning with -<NUM>.
 
-2004-01-11  Clint Adams  <clint@zsh.org>
+2005-01-11  Clint Adams  <clint@zsh.org>
 
 	* unposted: config.guess, config.sub: update to 2004-11-12 and
 	2004-11-30, respectively.
@@ -46,7 +50,7 @@
 	creating an unnecessary multio if a later redirect re-opens that
 	descriptor.
 
-2004-01-10  Clint Adams  <clint@zsh.org>
+2005-01-10  Clint Adams  <clint@zsh.org>
 
 	* 20665: Completion/Unix/Command/_gnome-gv,
 	Completion/Unix/Type/_pspdf: improve completion for
@@ -61,7 +65,7 @@
 
 	* 20662: Completion/X/Command/_nedit: update for nedit 5.5
 
-2004-01-09  Clint Adams  <clint@zsh.org>
+2005-01-09  Clint Adams  <clint@zsh.org>
 
 	* 20655: Completion/Debian/Type/_deb_packages:
 	_deb_packages fix from Karl Chen.
@@ -71,7 +75,7 @@
 	Completion/Debian/Type/_deb_packages: completion for wajig, and
 	dpkg/deb_packages improvements from Karl Chen.
 
-2004-01-07  Clint Adams  <clint@zsh.org>
+2005-01-07  Clint Adams  <clint@zsh.org>
 
 	* 20650: Completion/Unix/Command/_mencal:
 	completion for mencal.
