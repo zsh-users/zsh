@@ -1,5 +1,8 @@
 2000-05-25  Sven Wischnowsky  <wischnow@zsh.org>
 
+	* 11570: Completion/Core/_path_files: fix for special-dirs when
+ 	used with -g patterns
+	
 	* 11569: Src/Zle/complist.c: better cursor-movement in
  	menu-selection
 	

@@ -142,6 +142,9 @@ fi
 zstyle -s ":completion:${curcontext}:paths" special-dirs sdirs &&
     [[ "$sdirs" = (yes|true|on|1) ]] && sdirs=yes
 
+[[ "$pats" = ((|*[[:blank:]])\*(|[[:blank:]]*)|*\([^[:blank:]]#/[^[:blank:]]#\)*) ]] &&
+    sopt=$sopt/
+
 zstyle -s ":completion:${curcontext}:files" ignore-parents ignpar
 
 # We get the prefix and the suffix from the line and save the whole
@@ -293,9 +296,9 @@ for prepath in "$prepaths[@]"; do
       fi
       if [[ -n "$sdirs" && ( -o globdots || "$PREFIX" = .* ) ]]; then
 	if [[ "$sdirs" = yes ]]; then
-	  tmp1=( "$tmp1[@]" . .. )
+	  tmp1=( "$tmp1[@]" $^tmp2${skipped}{.,..} )
 	elif [[ "$sdirs" = .. ]]; then
-	  tmp1=( "$tmp1[@]" .. )
+	  tmp1=( "$tmp1[@]" $^tmp2${skipped}.. )
         fi
       fi
     else
@@ -304,13 +307,12 @@ for prepath in "$prepaths[@]"; do
       else
         tmp1=( ${^tmp1}${skipped}${^~pats} )
       fi
-      if [[ -n "$sdirs" &&
-            ( "$sopt" = *[/f]* || "$pats" = *\([^[:blank:]]#/[^[:blank:]]#\)* ) &&
+      if [[ -n "$sdirs" && "$sopt" = *[/f]* &&
             ( -o globdots || "$PREFIX" = .* ) ]]; then
 	if [[ "$sdirs" = yes ]]; then
-	  tmp1=( "$tmp1[@]" . .. )
+	  tmp1=( "$tmp1[@]" $^tmp2${skipped}{.,..} )
 	elif [[ "$sdirs" = .. ]]; then
-	  tmp1=( "$tmp1[@]" .. )
+	  tmp1=( "$tmp1[@]" $^tmp2${skipped}.. )
         fi
       fi
     fi
