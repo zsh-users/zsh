@@ -5,7 +5,7 @@
 	Src/Modules/socket.c, Src/Modules/tcp.c Src/Zle/zle_keymap.c
 	Src/Zle/zle_main.c: zsocket -d, ztcp -d, bindkey -M and
 	mkdir -m now take arguments of their own instead of swallowing the
-	first normal argument.  Also updgrade comment in README for 18512.
+	first normal argument.  Also upgrade comment in README for 18512.
 
 2003-05-21  Peter Stephenson  <pws@csr.com>
 
