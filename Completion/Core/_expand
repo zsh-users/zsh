@@ -61,9 +61,9 @@ if [[ "$force" = *s* ]] ||
    zstyle -T ":completion:${curcontext}:" substitute; then
   [[ ! -o ignorebraces && "${#${exp}//[^\{]}" = "${#${exp}//[^\}]}" ]] &&
       eval exp\=\( ${${(q)exp}:gs/\\{/\{/:gs/\\}/\}/} \)
-  exp=( $(print -r ${${(e)exp//\\[ 	
+  eval 'exp=( ${${(e)exp//\\[ 	
 ]/ }//(#b)([ 	
-])/\\$match[1]}) ) 2>/dev/null
+])/\\$match[1]} )' 2>/dev/null
 else
   exp=( ${exp:s/\\\$/\$} )
 fi
@@ -95,7 +95,7 @@ subd=("$exp[@]")
 
 zstyle -s ":completion:${curcontext}:" keep-prefix tmp || tmp=changed
 if [[ "$word" = [\~\$]*/* && "$tmp" = (yes|true|on|1|changed) ]]; then
-  epre=( $(print -r ${(e)~${word%%/*}}) ) 2>/dev/null
+  eval 'epre=( ${(e)~${word%%/*}} )' 2>/dev/null
   if [[ -n "$epre" && $#epre -eq 1 ]]; then
     opre="${word%%/*}"
     pre="$epre[1]"

@@ -4,6 +4,11 @@
 	Doc/Zsh/compsys.yo: Separate compinit security checks into their
 	own callable function.
 
+	* 12162: Completion/Core/_expand, Completion/Core/_path_files,
+	Src/utils.c: Use `eval' instead of `$(print ...)' to suppress
+	some syntax error failures; this requires that zwarn() does not
+	trashzle() when the output is not going to the terminal.
+	
 2000-07-26  Sven Wischnowsky  <wischnow@zsh.org>
 
 	* 12378: Completion/Base/_arguments: make `_arguments --' use

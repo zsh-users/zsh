@@ -67,7 +67,8 @@ zwarn(const char *fmt, const char *str, int num)
 {
     if (errflag || noerrs)
 	return;
-    trashzle();
+    if (isatty(2))
+	trashzle();
     /*
      * scriptname is set when sourcing scripts, so that we get the
      * correct name instead of the generic name of whatever
