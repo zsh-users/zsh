@@ -1,3 +1,8 @@
+2001-06-01  Clint Adams  <clint@zsh.org>
+
+	* 14635: Completion/Unix/Command/_gdb: presume
+	'*core' glob for coredump files.
+
 2001-06-01  Sven Wischnowsky  <wischnow@zsh.org>
 
 	* 14630: Src/Zle/computil.c: fix for exclusion of normal
