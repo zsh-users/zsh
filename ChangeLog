@@ -1,3 +1,8 @@
+2003-02-21  Peter Stephenson  <pws@csr.com>
+
+	* 18264: Src/jobs.c: free unused bits of job table properly
+	when we enter a subshell.
+
 2003-02-21  Oliver Kiddle  <opk@zsh.org>
 
 	* 18269: Completion/Unix/Command/_sccs: improve file completion

@@ -789,14 +789,9 @@ deletefilelist(LinkList file_list)
 
 /**/
 void
-deletejob(Job jn)
+freejob(Job jn, int deleting)
 {
     struct process *pn, *nx;
-
-    if (jn->stat & STAT_ATTACH) {
-	attachtty(mypgrp);
-	adjustwinsize(0);
-    }
 
     pn = jn->procs;
     jn->procs = NULL;
@@ -804,20 +799,41 @@ deletejob(Job jn)
 	nx = pn->next;
 	zfree(pn, sizeof(struct process));
     }
-    deletefilelist(jn->filelist);
 
     if (jn->ty)
 	zfree(jn->ty, sizeof(struct ttyinfo));
     if (jn->pwd)
 	zsfree(jn->pwd);
     jn->pwd = NULL;
-    if (jn->stat & STAT_WASSUPER)
-	deletejob(jobtab + jn->other);
+    if (jn->stat & STAT_WASSUPER) {
+	if (deleting)
+	    deletejob(jobtab + jn->other);
+	else
+	    freejob(jobtab + jn->other, 0);
+    }
     jn->gleader = jn->other = 0;
     jn->stat = jn->stty_in_env = 0;
     jn->procs = NULL;
     jn->filelist = NULL;
     jn->ty = NULL;
+}
+
+/*
+ * We are actually finished with this job, rather
+ * than freeing it to make space.
+ */
+
+/**/
+void
+deletejob(Job jn)
+{
+    deletefilelist(jn->filelist);
+    if (jn->stat & STAT_ATTACH) {
+	attachtty(mypgrp);
+	adjustwinsize(0);
+    }
+
+    freejob(jn, 1);
 }
 
 /* add a process to the current job */
@@ -975,24 +991,16 @@ clearjobtab(int monitor)
     int i;
 
     for (i = 1; i < MAXJOB; i++) {
-	if (jobtab[i].ty) {
-	    zfree(jobtab[i].ty, sizeof(struct ttyinfo));
-	    jobtab[i].ty = NULL;
-	}
-	if (jobtab[i].pwd) {
-	    zsfree(jobtab[i].pwd);
-	    jobtab[i].pwd = NULL;
-	}
-	if (monitor) {
-	    /*
-	     * See if there is a jobtable worth saving.
-	     * We never free the saved version; it only happens
-	     * once for each subshell of a shell with job control,
-	     * so doesn't create a leak.
-	     */
-	    if (jobtab[i].stat)
-		oldmaxjob = i+1;
-	}
+	/*
+	 * See if there is a jobtable worth saving.
+	 * We never free the saved version; it only happens
+	 * once for each subshell of a shell with job control,
+	 * so doesn't create a leak.
+	 */
+	if (monitor && jobtab[i].stat)
+	    oldmaxjob = i+1;
+	else if (jobtab[i].stat & STAT_INUSE)
+	    freejob(jobtab + i, 0);
     }
 
     if (monitor && oldmaxjob) {
