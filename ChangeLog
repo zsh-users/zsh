@@ -1,3 +1,7 @@
+2003-04-15  Oliver Kiddle  <opk@zsh.org>
+
+	* 18443: Completion/X/Command/_dcop: new completion for dcop
+
 2003-04-14  Peter Stephenson  <pws@csr.com>
 
 	* unposted: Doc/Zsh/compsys.yo: large-scale but unfinished
