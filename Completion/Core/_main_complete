@@ -185,7 +185,7 @@ if [[ $compstate[old_list] = keep || nm -gt 1 ]]; then
       compstate[insert]=unambiguous
     fi
   fi
-
+set -x
   if [[ "$compstate[insert]" = *menu* ]]; then
     if [[ -n "$_menu_style[(r)no-select*]" ]]; then
       unset MENUSELECT

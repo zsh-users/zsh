@@ -378,9 +378,14 @@ add_match_part(Cmatcher m, char *l, char *w, int wl,
 	matchsubs = matchlastsub = NULL;
     }
     /* Store the arguments in the last part-cline. */
-    lp->line = l; lp->llen = wl;
-    lp->word = w; lp->wlen = wl;
-    lp->orig = o; lp->olen = ol;
+    if (lp->llen || lp->wlen) {
+	lp->next = get_cline(l, wl, w, wl, o, ol, CLF_NEW);
+	lp = lp->next;
+    } else {
+	lp->line = l; lp->llen = wl;
+	lp->word = w; lp->wlen = wl;
+	lp->orig = o; lp->olen = ol;
+    }
     if (o || ol)
 	lp->flags &= ~CLF_NEW;
 
