@@ -1,8 +1,8 @@
 #compdef javac java javadoc appletviewer jar jdb javah javap extcheck rmic rmiregistry rmid serialvar native2ascii keytool jarsigner policytool
 
-local expl tmp jdb_args jar_cmd
+local expl tmp jdb_args jar_cmd match basedir
 local curcontext="$curcontext" state line
-typeset -A opt_args
+typeset -A opt_args tmpassoc
 
 jdb_args=()
 
@@ -21,7 +21,7 @@ javac)
     '-d[specify destination directory]:directory:_files -/' \
     '-encoding[specify character encoding for source files]:encoding:->encoding' \
     '-target[specify VM version]:release:(1.1 1.2)' \
-    ':java source file:_files -g \*.java' && return 0
+    '*:java source file:_files -g \*.java' && return 0
   ;;
 
 jdb)
@@ -104,22 +104,25 @@ jar)
   if (( CURRENT == 2 )); then
     compset -P -
     _values -s '' 'jar command' \
-      '(  t x)c[create new archive]' \
-      '(c   x)t[list the table of archive]' \
-      '(c t  )x[extract files from archive]' \
+      '(  t x u)c[create new archive]' \
+      '(c   x u)t[list the table of archive]' \
+      '(c t   u)x[extract files from archive]' \
+      '(c t x  )u[update archive]' \
       'f[specify archive file]' \
       'v[verbose mode]' \
       'm[specify manifest file]' \
       '0[store only without using ZIP compression]' \
-      'M[do not create manifest file]' \
-      'u[update archive]'
+      'M[do not create manifest file]'
   else
     jar_cmd="${words[2]#-}"
+    tmpassoc=(
+      m ':manifest file:_files'
+      f ':archive file:_files -g \*.\(jar\|zip\)'
+    )
     _arguments \
       "${jar_cmd/[^-]*/:dummy:}" \
-      ${${(M)jar_cmd:#*m*}:+:minifest file:_files} \
-      ${${(M)jar_cmd:#*f*}:+:archive file:_files -g \\\*.jar} \
-      "*:file:_files" && return 0
+      ${${(s::)jar_cmd}/(#b)(?)/$tmpassoc[$match[1]]} \
+      '*:file:->jararg' && return 0
   fi
   ;;
 
@@ -136,7 +139,7 @@ javah|javah_g)
     '-bootclasspath[specify path for bootstrap class files]:bootstrap class path:->bootstrapclasspath' \
     '-old[generate old JDK1.0-style header files]' \
     '-force[force output]' \
-    '*:fully qualified classname:' && return 0
+    '*:fully qualified classname:->class' && return 0
   ;;
 
 javap)
@@ -178,7 +181,7 @@ rmic)
     '-verbose[print verbose messages]' \
     '-v1.1[JDK 1.1 stub protocol]' \
     '-v1.2[JDK 1.2 stub protocol]' \
-    '*:package qualified class name:' && return 0
+    '*:package qualified class name:->class' && return 0
   ;;
 
 rmiregistry)
@@ -330,14 +333,14 @@ jarsigner)
     '-storepass[specify password for keystore]:password:' \
     '-keypass[specify password for private key]:password:' \
     '-sigfile[specify base file name of .SF and .DSA files to be generated]:sigfile:_files' \
-    '-signedjar[specify signed JAR file]:_files -g \*.jar' \
+    '-signedjar[specify signed JAR file]:_files -g \*.\(jar\|zip\)' \
     '(2)-verify[verify mode]' \
     '-certs[output certificate information in verify mode]' \
     '-verbose[print verbose messages]' \
     '-internalsf[old behaviour]' \
     '-sectionsonly[omit header of hash of the whole manifest file]' \
     '-J-[specify java option]:java option:' \
-    ':jar file:_files -g \*.jar' \
+    ':jar file:_files -g \*.\(jar\|zip\)' \
     ':alias:' && return 0
   ;;
 
@@ -366,7 +369,7 @@ debug)
 classpath|sourcepath|bootstrapclasspath|docletpath)
   compset -P '*:'
   _alternative \
-    "classpath:$state:_path_files -qS: -g '*.(zip|jar)'" \
+    "classpath:$state:_path_files -qS: -g '*.(jar|zip)'" \
     "classpath:$state:_path_files -r': ' -/"
   ;;
 
@@ -498,14 +501,32 @@ property)
   ;;
 
 class|doclet)
-  _wanted class expl 'class' compadd *.class(:s/.class//)
+  match=()
+  compset -P '(#b)(*.)'
+  basedir=${match[1]//.//}
+  _alternative \
+    'classes:class:compadd $basedir*.class(.:t:s/.class//)' \
+    'packages:package:compadd -qS. $basedir*~$basedir*.*(/:t)'
   ;;
 
 docsrc)
   if compset -P @; then
-    _wanted file expl 'pacakge/source list file' _files
+    _wanted files expl 'pacakge/source list file' _files
   else
-    _wanted file expl 'package or source' _files -g '*.java'
+    _wanted files expl 'package or source' _files -g '*.java'
+  fi
+  ;;
+
+jararg)
+  if [[ -prefix - ]]; then
+    tmp=('-C:chdir')
+    _describe -o 'option' tmp --
+  elif [[ "$words[CURRENT - 2]" == -C ]]; then
+    _wanted file expl 'input file' _files -W "($words[CURRENT - 1])"
+  elif [[ "$words[CURRENT - 1]" == -C ]]; then
+    _wanted directories expl 'chdir to' _files -/
+  else
+    _wanted files expl 'input file' _files
   fi
   ;;
 

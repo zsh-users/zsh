@@ -1,3 +1,8 @@
+2000-07-08  Tanaka Akira  <akr@zsh.org>
+
+	* 12201: Completion/User/_java: fix completion for jar. complete
+	package qualified class names. fix typos.
+
 2000-07-07  Bart Schaefer  <schaefer@brasslantern.com>
 
 	* 12193: configure.in, Src/Builtins/rlimits.mdd: Fix unnecessary
