@@ -1,3 +1,10 @@
+2001-01-08  Sven Wischnowsky  <wischnow@zsh.org>
+
+	* 13331: Src/Zle/compcore.c, Src/Zle/compresult.c: fix for
+ 	listpacked for matches as long as screen is wide (minus added
+ 	spaces); more security when freeing matches: make sure current
+ 	menu match pointer isn't used afterwards
+	
 2001-01-07  Peter Stephenson  <pws@pwstephenson.fsnet.co.uk>
 
 	* 13327: Etc/MACHINES: builds out of the box on SCO UnixWare

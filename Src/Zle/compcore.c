@@ -2932,4 +2932,5 @@ freematches(Cmgroup g)
 
 	g = n;
     }
+    minfo.cur = NULL;
 }

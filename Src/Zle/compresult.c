@@ -1495,7 +1495,7 @@ calclist(int showall)
 				ws[tcol++] = maxlen;
 				width += maxlen;
 			    }
-			    if (!count && width < columns &&
+			    if (!count && width <= columns &&
 				(tcols <= 0 || beg == end))
 				break;
 
@@ -1536,7 +1536,7 @@ calclist(int showall)
 				ws[tcols++] = maxlen;
 				width += maxlen;
 			    }
-			    if (nth == yl && width < columns &&
+			    if (nth == yl && width <= columns &&
 				(beg == end || tlines >= g->lins))
 				break;
 
@@ -1593,7 +1593,7 @@ calclist(int showall)
 			    ws[tcol++] = maxlen;
 			    width += maxlen;
 			}
-			if (!count && width < columns &&
+			if (!count && width <= columns &&
 			    (tcols <= 0 || beg == end))
 			    break;
 
@@ -1642,7 +1642,7 @@ calclist(int showall)
 			    ws[tcols++] = maxlen;
 			    width += maxlen;
 			}
-			if (nth == g->dcount && width < columns &&
+			if (nth == g->dcount && width <= columns &&
 			    (beg == end || tlines >= g->lins))
 			    break;
 
