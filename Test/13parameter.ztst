@@ -157,7 +157,7 @@
 >IFonce bitten twice shyTHEN
 >IFonceTHEN IFbittenTHEN IFtwiceTHEN IFshyTHEN
 
-  # WHY DO I NEED TO QUOTE ${array} HERE?????
+  # Quote ${array} here because {...,...} doesn't like unquoted spaces.
   print IF{"${array}",THEN}ELSE
   print IF{${^array},THEN}ELSE
 0:combined ${^...} and {...,...}
@@ -221,8 +221,6 @@
 0:${(P)...}
 >I'm nearly out of my mind with tedium
 
-  # it doesn't *say* these are case-insensitive without i...
-  # I think this is a bug.
   foo=(I could be watching that programme I recorded)
   print ${(o)foo}
   print ${(oi)foo}
@@ -466,7 +464,7 @@
 >b* e*
 >boringfile evenmoreboringfile
 
-  # ${bar} -> $bar  turns this into $$, which doesn't strike me as correct.
+  # ${bar} -> $bar  here would yield "bad substitution".
   bar=confinement
   print ${(el.20..X.)${bar}}
 0:Rule 11: Padding

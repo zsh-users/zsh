@@ -6,10 +6,9 @@
 
 %test
 
-# 'mydir=$PWD; hash -d mydir; print -P %~' doesn't seem to abbreviate
-# to ~mydir in a non-interactive shell.  Is this correct?
-
+  hash -d mydir=$mydir
   print -P '  %%%):  %)
+  %%~:  %~
   %%d:  %d
   %%1/: %1/
   %%h:  %h
@@ -23,6 +22,7 @@
   '
 0q:Basic prompt escapes as shown.
 >  %):  )
+>  %~:  ~mydir
 >  %d:  $mydir
 >  %1/: ${mydir:t}
 >  %h:  0
@@ -93,7 +93,7 @@
   if [[ $date3 != [0-9][0-9]-[0-9][0-9]-[0-9][0-9] ]]; then
     print "Date \`$date3' is not in the form \`YY-MM-DD'"
   fi
-  if (( $date1[5,-1] != $date2[4,5] )) || (( $date2[4,5] != $date3[8,9] ))
+  if (( $date1[5,-1] != $date2[4,5] )) || (( $date2[4,5] != $date3[7,8] ))
   then
     print "Days of month do not agree in $date1, $date2, $date3"
   fi

@@ -336,6 +336,8 @@ $ZTST_code"
 typeset -A ZTST_sects
 ZTST_sects=(prep 0 test 0 clean 0)
 
+print "$ZTST_testname: starting."
+
 # Now go through all the different sections until the end.
 while ZTST_getsect; do
   case $ZTST_cursect in

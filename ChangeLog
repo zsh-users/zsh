@@ -4,6 +4,11 @@
 
 2001-03-24  Bart Schaefer  <schaefer@zsh.org>
 
+	* 13744: Test/01grammar.ztst, Test/10prompt.ztst,
+	Test/13parameter.ztst, Test/ztst.zsh: Delete or correct comments
+	that refer to (non-)bugs or other confusion; enable another test;
+	print the name of each test as it begins as well as when it ends.
+
 	* 13740: Completion/User/_mailboxes: Fixes for mh (based on PWS's
 	patch in 13737): handle sub-folders; handle +folder abbreviations;
 	add commented-out lines that might eventually handle @folder, too.

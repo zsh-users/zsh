@@ -289,8 +289,6 @@
 >Hip hip hooray
 >Hip hip hooray
 
-# Why doesn't this one work here?  It works from the command line
-# or with zsh -fc.
   case bravo {
     (alpha) print schmalpha
 	    ;;
