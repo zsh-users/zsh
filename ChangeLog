@@ -1,3 +1,8 @@
+2001-10-17  Clint Adams  <clint@zsh.org>
+
+	* 16078: Completion/Unix/Command/_zip:
+	add -r, change description for -R.
+
 2001-10-17  Sven Wischnowsky  <wischnow@zsh.org>
 
 	* 16076: Completion/Unix/Type/_path_files: don't use
