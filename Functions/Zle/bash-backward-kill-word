@@ -1,9 +1,0 @@
-# This implements a bash-style backward-kill-word.
-# To use,
-#   zle -N bash-backward-kill-word
-#   bindkey '...' bash-backward-kill-word
-# or if you wish to replace existing backward-kill-word bindings,
-#   zle -N backward-kill-word bash-backward-kill-word
-
-local WORDCHARS=''
-zle .backward-kill-word

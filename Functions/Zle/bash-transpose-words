@@ -1,9 +1,0 @@
-# This implements a bash-style transpose-words.
-# To use,
-#   zle -N bash-transpose-words
-#   bindkey '...' bash-transpose-words
-# or if you wish to replace existing transpose-words bindings,
-#   zle -N transpose-words bash-transpose-words
-
-local WORDCHARS=''
-zle .transpose-words

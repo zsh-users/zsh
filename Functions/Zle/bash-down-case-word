@@ -1,9 +1,0 @@
-# This implements a bash-style down-case-word.
-# To use,
-#   zle -N bash-down-case-word
-#   bindkey '...' bash-down-case-word
-# or if you wish to replace existing down-case-word bindings,
-#   zle -N down-case-word bash-down-case-word
-
-local WORDCHARS=''
-zle .down-case-word

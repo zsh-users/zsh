@@ -1,9 +1,0 @@
-# This implements a bash-style kill-word.
-# To use,
-#   zle -N bash-kill-word
-#   bindkey '...' bash-kill-word
-# or if you wish to replace existing kill-word bindings,
-#   zle -N kill-word bash-kill-word
-
-local WORDCHARS=''
-zle .kill-word

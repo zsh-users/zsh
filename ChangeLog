@@ -1,5 +1,11 @@
 2003-04-03  Peter Stephenson  <pws@csr.com>
 
+	* unposted: Functions/Zle/.distfiles, Functions/Zle/bash-*: remove
+	bash-* word functions in favour of selectable ones (18394).
+
+	* unposted (c.f. 18407): Zle/Function/select-word-style: fix short
+	prompt.
+
 	* c.f. 18431: acconfig.h, aczsh.m4, zshconfig.ac,
 	Doc/Zsh/builtins.yo, Src/Builtins/rlimits.c:  Attempt
 	to resolve the raging RLIIMT_* problems.  Use configure tests
