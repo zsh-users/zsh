@@ -121,7 +121,6 @@ while [[ -n "$state" ]]; do
     ;&
   install)
     (( $#tmp )) || tmp=(-i)
-#set -x
     _arguments -s "$tmp[@]" \
       '*-v' \
       '--rcfile:resource file:_files' \
