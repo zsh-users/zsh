@@ -41,8 +41,8 @@ INSTALL         = @INSTALL@
 # ========== DEPENDENCIES FOR TESTING ==========
 
 check test:
-	for f in *.ztst; do \
-	  ../Src/zsh -f ztst.zsh $$f; \
+	for f in $(sdir)/*.ztst; do \
+	  ../Src/zsh -f $(sdir)/ztst.zsh $$f; \
 	done
 
 # ========== DEPENDENCIES FOR CLEANUP ==========

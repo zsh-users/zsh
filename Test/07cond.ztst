@@ -84,7 +84,7 @@
   [[ -u modish && ! -u zerolength ]]
 0:-u cond
 
-  [[ -x $ZTST_testdir/ztst.zsh && ! -x zerolength ]]
+  [[ -x $ZTST_srcdir/ztst.zsh && ! -x zerolength ]]
 0:-x cond
 
   [[ -z $bar && -z '' && ! -z $foo ]]

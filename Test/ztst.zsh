@@ -43,6 +43,9 @@ ZTST_mainopts=(${(kv)options})
 ZTST_testdir=$PWD
 ZTST_testname=$1
 
+# The source directory is not necessarily the current directory
+ZTST_srcdir=${0%/*}
+
 : ${TMPPREFIX:=/tmp/zsh}
 # Temporary files for redirection inside tests.
 ZTST_in=${TMPPREFIX}.ztst.in.$$
