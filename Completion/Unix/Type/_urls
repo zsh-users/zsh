@@ -91,6 +91,7 @@ case "$scheme" in
     fi
   ;;
   file)
+    [[ -prefix //localhost/ ]] && compset -P //localhost
     [[ -prefix /// ]] && compset -P //
     if ! compset -P //; then
       _tags -C file files
