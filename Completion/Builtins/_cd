@@ -55,7 +55,7 @@ elif [[ $PREFIX = [-+]* ]]; then
   # get the array of numbers only
   list=(${lines%% *})
   _description expl 'directory stack index'
-  compadd "$expl[@]" -d lines -Q - "$list[@]" && ret=0
+  compadd "$expl[@]" -ld lines -Q - "$list[@]" && ret=0
   [[ -z $compstate[list] ]] && compstate[list]=list && ret=0
   [[ -n $compstate[insert] ]] && compstate[insert]=menu && ret=0
 

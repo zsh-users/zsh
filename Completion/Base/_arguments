@@ -8,7 +8,7 @@ setopt localoptions extendedglob
 local args rest ws cur nth def nm expl descr action opt arg tmp xor
 local single uns ret=1 aret soptseq soptseq1 sopts prefix _line odescr
 local beg optbeg argbeg nargbeg inopt inrest fromrest cmd="$words[1]"
-local matched curopt noargs i
+local matched curopt noargs i tmp1 tmp2 tmp3 suffix
 
 # Associative arrays used to collect information about the options.
 
@@ -793,13 +793,8 @@ while true; do
 
         eval ws\=\( "${action[3,-3]}" \)
 
-	if [[ -n "$compconfig[describe_values]" &&
-              "$compconfig[describe_values]" != *\!${cmd}* ]] &&
-           _display tmp "$ws[@]"; then
-	  compadd "$expl[@]" -M 'r:|[_-]=* r:|=*' -ld tmp - "${(@)ws%%:*}"
-        else
-	  compadd "$expl[@]" - "${(@)ws%%:*}"
-        fi
+        _describe -c "$cmd" "$descr" ws -M 'r:|[_-]=* r:|=*'
+
       elif [[ "$action" = \(*\) ]]; then
 
         # Anything inside `(...)' is added directly.
@@ -837,62 +832,36 @@ while true; do
     if [[ -n "$sopts" && -n "$PREFIX" &&
       "$PREFIX" = [-+]${~soptseq}[$sopts] ]]; then
       if [[ "$PREFIX" = [-+]${~soptseq1} ]]; then
-        if [[ -z "$compconfig[describe_options]" ||
-              "$compconfig[describe_options]" = *\!${cmd}* ]]; then
-          tmp=( "${PREFIX[1]}${(@)^${(@)${(@M)${=:-${(k)opts} ${(k)dopts} ${(k)odopts}}:#[-+]?(|=)}#?}%=}" )
-          compadd "$expl[@]" -Q -M 'r:|[_-]=* r:|=*' -d tmp - \
-                "${PREFIX}${(@k)^opts[(I)${PREFIX[1]}?]#?}" \
-	        "${PREFIX}${(@k)^dopts[(I)${PREFIX[1]}?]#?}" \
-	        "${PREFIX}${(@)^${(@k)odopts[(I)${PREFIX[1]}?(|=)]#?}%=}" && 
-              ret=0
-        elif _display tmp "${(@Mo)odescr:#[-+]?:*}"; then
-          compadd "$expl[@]" -Q -M 'r:|[_-]=* r:|=*' -ld tmp - \
-	          "${PREFIX}${(@)^${(@)${(@Mo)odescr:#[-+]?:*}%%:*}#?}" && ret=0
-        else
-          compadd "$expl[@]" -Q -M 'r:|[_-]=* r:|=*' -d tmp - \
-	          "${PREFIX}${(@)^${(@)${(@Mo)odescr:#[-+]?:*}%%:*}#?}" && ret=0
-        fi
+        tmp1=( "${(@Mo)odescr:#[-+]?:*}" )
+        tmp2=(
+               "${PREFIX}${(@k)^opts[(I)${PREFIX[1]}?]#?}" \
+	       "${PREFIX}${(@k)^dopts[(I)${PREFIX[1]}?]#?}" \
+	       "${PREFIX}${(@)^${(@k)odopts[(I)${PREFIX[1]}?(|=)]#?}%=}"
+        )
+        tmp2=( "${(@o)tmp2}" )
+
+        _describe -o -c "$cmd" option \
+        tmp1 tmp2  -Q -M 'r:|[_-]=* r:|=*'
       else
         # The last option takes an argument in the next word.
 
         compadd "$expl[@]" -Q -M 'r:|[_-]=* r:|=*' - "${PREFIX}" && ret=0
       fi
     else
-      if [[ -n "$compconfig[describe_options]" &&
-            "$compconfig[describe_options]" != *\!${cmd}* ]] &&
-	 _display descr "$odescr[@]"; then
-	ws=( "${(k)opts[@]}" "${(@k)odopts[(I)*[^=]]}" )
-	if (( $#ws )); then
-	  tmp=( "${(@M)descr:#(${(j:|:)~ws}) *}" )
-          compadd "$expl[@]" -Q -M 'r:|[_-]=* r:|=*' -ld tmp - \
-                  "$ws[@]" && ret=0
-	fi
-	if (( $#dopts )); then
-	  tmp=( "${(@M)descr:#(${(kj:|:)~dopts}) *}" )
-          compadd "$expl[@]" -QS '' -M 'r:|[_-]=* r:|=*' -ld tmp - \
-                  "${(@k)dopts}" && ret=0
-        fi
-	if (( ${(@k)#odopts[(I)*=]} )); then
-	  tmp=( "${(@M)descr:#(${(kj:|:)~odopts[(I)*=]}) *}" )
-          compadd "$expl[@]" -QqS= -M 'r:|[_-]=* r:|=*' -ld tmp - \
-                  "${(@k)odopts[(I)*=]%=}" && ret=0
-        fi
-      else
-        compadd "$expl[@]" -Q -M 'r:|[_-]=* r:|=*' - \
-                "${(@k)opts}" "${(@k)odopts[(I)*[^=]]}" && ret=0
-        compadd "$expl[@]" -QqS= -M 'r:|[_-]=* r:|=*' - \
-                "${(@k)odopts[(I)*=]%=}" && ret=0
-        compadd "$expl[@]" -QS '' -M 'r:|[_-]=* r:|=*' - \
-                "${(@k)dopts}" && ret=0
-      fi
+      tmp1=( "${(k)opts[@]}" "${(@k)odopts[(I)*[^=]]}" )
+      tmp1=( "${(@M)odescr:#(${(kj:|:)~tmp1}):*}" )
+      tmp2=( "${(@M)odescr:#(${(kj:|:)~dopts}):*}" )
+      tmp3=( "${(@M)odescr:#(${(kj:|:)~odopts[(I)*=]}):*}" )
+      _describe -o -c "$cmd" option \
+        tmp1 -Q -M 'r:|[_-]=* r:|=*' -- \
+        tmp2 -QS '' -M 'r:|[_-]=* r:|=*' -- \
+        tmp3 -QqS= -M 'r:|[_-]=* r:|=*'
     fi
   fi
 
   if [[ nm -eq compstate[nmatches] && 
         ( -z "$single" ||
           ( $#_args_cache_long -ne 0 && "$PREFIX" = --*=* ) ) ]]; then
-    local suffix
-
     tmp=( "${(@Mk)odopts:#[^:]#\=}" )
     prefix="${PREFIX#*\=}"
     suffix="$SUFFIX"

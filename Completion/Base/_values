@@ -3,7 +3,7 @@
 setopt localoptions extendedglob
 
 local name arg def descr xor str tmp ret=1 expl nm="$compstate[nmatches]"
-local snames odescr gdescr sep esep spat
+local snames odescr gdescr sep esep spat tmp1 tmp2 tmp3 opts
 typeset -A names onames xors _values
 
 # Probably fill our cache.
@@ -280,34 +280,21 @@ else
 
   # No `=', just complete value names.
 
-  _description expl "$gdescr"
-
-  [[ -n "$sep" && ${#snames}+${#names}+${#onames} -ne 1 ]] &&
-      expl=( "-qS$sep" "$expl[@]" )
-
-  if [[ -n "$compconfig[describe_values]" &&
-        "$compconfig[describe_values]" != *\!${words[1]}* ]] &&
-     _display descr "$odescr[@]"; then
-    if (( $#snames )); then
-      tmp=( "${(@M)descr:#(${(j:|:)~snames}) *}" )
-      compadd "$expl[@]" -ld tmp -M 'r:|[_-]=* r:|=*' - \
-              "${(@)tmp%% *}" && ret=0
-    fi
-    if (( $#names )); then
-      tmp=( "${(@M)descr:#(${(kj:|:)~names}) *}" )
-      compadd -S= "$expl[@]" -ld tmp -M 'r:|[_-]=* r:|=*' - \
-              "${(@)tmp%% *}" && ret=0
-    fi
-    if (( $#onames )); then
-      tmp=( "${(@M)descr:#(${(kj:|:)~onames}) *}" )
-      compadd -qS= "$expl[@]" -ld tmp -M 'r:|[_-]=* r:|=*' - \
-              "${(@)tmp%% *}" && ret=0
-    fi
+  if [[ -n "$sep" && ${#snames}+${#names}+${#onames} -ne 1 ]]; then
+    opts=( "-qS$sep" )
   else
-    compadd "$expl[@]" -M 'r:|[_-]=* r:|=*' - "$snames[@]" && ret=0
-    compadd -S= "$expl[@]" -M 'r:|[_-]=* r:|=*' - "${(@k)names}" && ret=0
-    compadd -qS= "$expl[@]" -M 'r:|[_-]=* r:|=*' - "${(@k)onames}" && ret=0
+    opts=()
   fi
+
+  tmp1=( "${(@M)odescr:#(${(j:|:)~snames}):*}" )
+  tmp2=( "${(@M)odescr:#(${(kj:|:)~names}):*}" )
+  tmp3=( "${(@M)odescr:#(${(kj:|:)~onames}):*}" )
+
+  _describe "$gdescr" \
+  tmp1 "$opts[@]" -M 'r:|[_-]=* r:|=*' -- \
+  tmp2 -S= "$opts[@]" -M 'r:|[_-]=* r:|=*' -- \
+  tmp3 -qS= "$opts[@]" -M 'r:|[_-]=* r:|=*'
+
   return ret
 fi
 

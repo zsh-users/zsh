@@ -9,7 +9,7 @@
 
 setopt localoptions extendedglob
 
-local d s dirs list
+local d s dirs list lines
 
 if [[ "$SUFFIX" = */* ]]; then
   ISUFFIX="/${SUFFIX#*/}$ISUFFIX"
@@ -36,7 +36,7 @@ if [[ -prefix [-+] ]]; then
 
   compset -P '[-+]'
   _description d 'directory stack'
-  compadd "$d[@]" -d lines -Q - "$list[@]" 
+  compadd "$d[@]" -ld lines -Q - "$list[@]" 
 else
   if (( $# )); then
     d=( "$@" )

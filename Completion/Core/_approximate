@@ -168,10 +168,21 @@ while [[ _comp_correct -le comax ]]; do
           "${#compstate[unambiguous]}" -ge "${#:-$PREFIX$SUFFIX}" ]]; then
       compstate[pattern_insert]=unambiguous
     elif [[ compstate[nmatches] -gt 1 || "$cfgorig" = *always* ]]; then
+      local expl
+
+      if [[ "$cfgorig" = *show* ]]; then
+        if [[ -n "$compconfig[description_format]" ]]; then
+	  expl=(-X "${compconfig[description_format]//\\%d/original}")
+        else
+	  expl=()
+        fi
+      else
+        expl=(-n)
+      fi
       if [[ "$cfgorig" = *last* ]]; then
-        builtin compadd -U -V _correct_original -nQ - "$PREFIX$SUFFIX"
+        builtin compadd "$expl[@]" -U -V _correct_original -Q - "$PREFIX$SUFFIX"
       elif [[ -n "$cfgorig" ]]; then
-	builtin compadd -U -nQ - "$PREFIX$SUFFIX"
+	builtin compadd "$expl[@]" -U -Q - "$PREFIX$SUFFIX"
       fi
 
       # If you always want to see the list of possible corrections,

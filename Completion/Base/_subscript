@@ -26,9 +26,9 @@ elif [[ ${(Pt)${compstate[parameter]}} = array* ]]; then
   done
 
   if [[ "$RBUFFER" = \]* ]]; then
-    compadd "$expl[@]" -S '' -V default -y list - "$ind[@]"
+    compadd "$expl[@]" -S '' -V default -d list - "$ind[@]"
   else
-    compadd "$expl[@]" -S ']' -V default -y list - "$ind[@]"
+    compadd "$expl[@]" -S ']' -V default -d list - "$ind[@]"
   fi
 else
   _compalso -math-

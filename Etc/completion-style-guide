@@ -74,8 +74,8 @@ For now this is just a list of things one should or shouldn't do.
       fi
 
     Finally, it is good style to display descriptions for options that
-    aren't self-explanatory. See the `_display' function and its use
-    in `_arguments'.
+    aren't self-explanatory. See the `_display' and `_describe' functions
+    and their uses in `_arguments'.
 
     All this should make it look like a really good idea to just use the
     supplied `_arguments' function to complete options.

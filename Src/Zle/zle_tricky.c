@@ -3925,7 +3925,8 @@ addmatches(Cadata dat, char **argv)
 		aign = get_user_var(dat->ign);
 	    /* Get the display strings. */
 	    if (dat->disp)
-		disp = get_user_var(dat->disp) - 1;
+		if ((disp = get_user_var(dat->disp)))
+		    disp--;
 	    /* Get the contents of the completion variables if we have
 	     * to perform matching. */
 	    if (dat->aflags & CAF_MATCH) {
@@ -8194,6 +8195,16 @@ printfmt(char *fmt, int n, int dopr, int doesc)
 	} else {
 	    cc++;
 	    if (*p == '\n') {
+		if (dopr) {
+		    if (tccan(TCCLEAREOL))
+			tcout(TCCLEAREOL);
+		    else {
+			int s = columns - 1 - (cc % columns);
+
+			while (s-- > 0)
+			    putc(' ', shout);
+		    }
+		}
 		l += 1 + (cc / columns);
 		cc = 0;
 	    }
@@ -8201,7 +8212,16 @@ printfmt(char *fmt, int n, int dopr, int doesc)
 		putc(*p, shout);
 	}
     }
+    if (dopr) {
+	if (tccan(TCCLEAREOL))
+	    tcout(TCCLEAREOL);
+	else {
+	    int s = columns - 1 - (cc % columns);
 
+	    while (s-- > 0)
+		putc(' ', shout);
+	}
+    }
     return l + (cc / columns);
 }
 
@@ -8291,7 +8311,7 @@ ilistmatches(Hookdef dummy, Chdata dat)
 		    if (m->flags & CMF_DISPLINE) {
 			nlines += 1 + printfmt(m->disp, 0, 0, 0);
 			g->flags |= CGF_HASDL;
-		    } else if ((l = strlen(m->disp)) > longest)
+		    } else if ((l = niceztrlen(m->disp)) > longest)
 			longest = l;
 		    nlist++;
 		} else if (!(m->flags & CMF_NOLIST)) {
@@ -8310,7 +8330,7 @@ ilistmatches(Hookdef dummy, Chdata dat)
 	}
     }
     longest += 2 + of;
-    if ((ncols = (columns + 1) / longest)) {
+    if ((ncols = columns / longest)) {
 	for (g = amatches; g; g = g->next)
 	    nlines += (g->lcount + ncols - 1) / ncols;
     } else {
@@ -8328,7 +8348,12 @@ ilistmatches(Hookdef dummy, Chdata dat)
 		}
 	    } else
 		for (p = g->matches; (m = *p); p++)
-		    if (!(m->flags & CMF_NOLIST))
+		    if (m->disp) {
+			if (m->flags & CMF_DISPLINE)
+			    nlines += 1 + printfmt(m->disp, 0, 0, 0);
+			else
+			    nlines += 1 + (niceztrlen(m->disp) / columns);
+		    } else if (!(m->flags & CMF_NOLIST))
 			nlines += 1 + ((1 + niceztrlen(m->str)) / columns);
 	}
     }
@@ -8476,7 +8501,7 @@ ilistmatches(Hookdef dummy, Chdata dat)
 
 			a--;
 		    }
-		    if (i && !opl)
+		    if (i && !opl && a > 0)
 			while (a--)
 			    putc(' ', shout);
 		    if (--n)

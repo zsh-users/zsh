@@ -375,7 +375,7 @@ complistmatches(Hookdef dummy, Chdata dat)
 		    if (m->flags & CMF_DISPLINE) {
 			nlines += 1 + printfmt(m->disp, 0, 0, 0);
 			g->flags |= CGF_HASDL;
-		    } else if ((l = strlen(m->disp)) > longest)
+		    } else if ((l = niceztrlen(m->disp)) > longest)
 			longest = l;
 		    nlist++;
 		} else if (!(m->flags & CMF_NOLIST)) {
@@ -395,7 +395,7 @@ complistmatches(Hookdef dummy, Chdata dat)
 	}
     }
     longest += 2 + of;
-    if ((ncols = (columns + 1) / longest)) {
+    if ((ncols = columns / longest)) {
 	for (g = amatches; g; g = g->next)
 	    nlines += (g->lcount - g->llcount + ncols - 1) / ncols;
     } else {
@@ -417,7 +417,7 @@ complistmatches(Hookdef dummy, Chdata dat)
 			if (m->flags & CMF_DISPLINE)
 			    nlines += 1 + printfmt(m->disp, 0, 0, 0);
 			else
-			    nlines += 1 + ((1 + niceztrlen(m->disp)) / columns);
+			    nlines += 1 + (niceztrlen(m->disp) / columns);
 		    } else if (!(m->flags & CMF_NOLIST))
 			nlines += 1 + ((1 + niceztrlen(m->str)) / columns);
 	}
@@ -678,7 +678,7 @@ complistmatches(Hookdef dummy, Chdata dat)
 			    putc(' ', shout);
 		    }
 		    a = longest - niceztrlen(m->disp ? m->disp : m->str) - 2 - of;
-		    while (a--)
+		    while (a-- > 0)
 			putc(' ', shout);
 		    if (col.cols[COL_EC])
 			tputs(col.cols[COL_EC], 1, putshout);

@@ -595,6 +595,36 @@ array built is stored in it.
 The return value of tt(_display) is zero if there was at least one
 match with a description non-zero otherwise.
 )
+item(tt(_describe))(
+This function can be used to add options or values with descriptions
+as matches. The first argument is taken as a string to display above
+the matches if the tt(description_format) configuration key is set.
+
+After this one or two names of arrays followed by options to give
+to tt(compadd) must be given. The first array contains the possible
+completions with their descriptions (with the description separated
+by a colon from the completion string). If the second array is given,
+it should have the same number of elements as the first one and these
+elements are added as possible completions instead of the strings from 
+the first array. In any case, however, the completion list will show
+the strings from the first array.
+
+Any number of array/option sequences may be given separated by
+`tt(-)tt(-)'. This allows one to display matches together that need
+to be added with different options for tt(compadd).
+
+Before the first argument, two options may be given. A `tt(-o)' says
+that the matches added are option names. This will make tt(_describe)
+use the tt(option_prefix) and tt(describe_options) configuration keys
+to find out if the strings should be added at all and if the
+descriptions should be shown. Without the `tt(-o)' option, the
+tt(describe_values) key is used.
+
+The `tt(-c)' option, followed by a string, may be used to give the
+name of the current command for testing the configuration keys. If the 
+first element of the tt(words) special array contains the correct
+command name, this option need not be used.
+)
 item(tt(_multi_parts))(
 This function gets two arguments: a separator character and an
 array.  As usual, the array may be either the
@@ -1147,7 +1177,9 @@ possible matches when no other completions could be found or if the
 string on the line begins with a option prefix character (a minus or a 
 plus sign). This value may also contain strings of the form
 `tt(!)var(command)' which makes options be always completed for all
-var(command)s given in this way.
+var(command)s given in this way. Finally, if the value of this key
+begins with `tt(hide)', the prefix characters `tt(-)', `tt(+)', or
+`tt(-)tt(-)' will not be shown in the list.
 )
 item(tt(last_prompt))(
 If this is set to tt(always), the cursor will always be moved back to
@@ -1199,7 +1231,9 @@ corrected strings.  If the value for this key contains the substring
 that it appears just before wrapping around to the first corrected
 string again.  Also, if the value contains the substring `tt(always)',
 the original string will always be included; normally it is
-included only if more than one possible correction was generated.
+included only if more than one possible correction was generated. And
+finally, if the value contains the substring `tt(show)', the original
+string will be shown in the list of corrections.
 )
 item(tt(approximate_prompt))(
 This can be set to a string to be displayed on top of the
@@ -1246,9 +1280,11 @@ menucompletion. Unless the value contains the substring `tt(only)',
 the user will still be offered all expansions at once as one of the
 strings to insert in the command line; normally, this possibility is
 offered first, but if the value contains the
-substring `tt(last)', it is offered last. Finally, if the value contains
+substring `tt(last)', it is offered last. Also, if the value contains
 the substring `tt(sort)', the expansions will be sorted alphabetically,
 normally they are kept in the order the expansion produced them in.
+And finally, if the value contains the substring `tt(showall)', the
+string of all words will be shown in the list of expansions.
 )
 item(tt(expand_original))(
 If this is set to an non-empty string, the original string from the
@@ -1256,7 +1292,9 @@ line will be included in the list of strings the user can cycle
 through as in a menucompletion. If the value contains the substring
 `tt(last)', the original string will appear as the last string, with
 other values it is inserted as the first one (so that the command line
-does not change immediately).
+does not change immediately). Also, if the value contains the
+substring `tt(show)', the original string will be shown in the list of 
+expansions.
 )
 item(tt(expand_prompt))(
 This may be set to a string that should be displayed before the

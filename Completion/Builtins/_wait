@@ -17,6 +17,6 @@ _description expl job
 compgen "$expl[@]" -P '%' -j && ret=0
 list=("${(@Mr:COLUMNS-1:)${(f)$(ps ${compconfig[ps_listargs]:-$compconfig[ps_args]} 2>/dev/null)}[2,-1]:#[ 	]#${PREFIX}[0-9]#${SUFFIX}[ 	]*}")
 _description expl 'process ID'
-compadd "$expl[@]" -y list - ${${${(f)"$(ps $compconfig[ps_args] 2>/dev/null)"}[2,-1]## #}%% *} && ret=0
+compadd "$expl[@]" -ld list - ${${${(f)"$(ps $compconfig[ps_args] 2>/dev/null)"}[2,-1]## #}%% *} && ret=0
 
 return ret
