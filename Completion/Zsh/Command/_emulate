@@ -1,0 +1,6 @@
+#compdef emulate
+
+_arguments -C -s -A "-*" \
+  '-L[set local_options and local_traps as well]' \
+  '-R[reset all options instead of only those needed for script portability]' \
+  '::shell to emulate:(zsh sh ksh csh)'
