@@ -1,3 +1,7 @@
+2004-04-15  Peter Stephenson  <pws@csr.com>
+
+	* see 19778 etc.: Doc/Makefile.in: remove change from 19735.
+
 2004-04-15  Clint Adams  <clint@zsh.org>
 
 	* 19606: Completion/Unix/Command/_tla: switch tla completion to

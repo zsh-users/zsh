@@ -303,7 +303,7 @@ uninstall.info:
 # install HTML manual
 install.html: html
 	${SHELL} $(sdir_top)/mkinstalldirs $(DESTDIR)$(htmldir)
-	for file in ${sdir}/zsh*.html; do \
+	for file in zsh*.html; do \
 	    $(INSTALL_DATA) $$file $(DESTDIR)$(htmldir) || exit 1; \
 	done
 .PHONY: install.html
