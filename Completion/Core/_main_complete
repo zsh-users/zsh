@@ -57,7 +57,7 @@ _def_menu_style=( "$_last_menu_style[@]"
 _last_menu_style=()
 
 zstyle -s ":completion:${curcontext}:default" list-prompt LISTPROMPT ||
-    LISTPROMPT='%SCurrent position at %p: continue? %s'
+    LISTPROMPT='%SAt %p: Hit TAB for more, or the character to insert%s'
 if [[ -n "$LISTPROMPT" ]]; then
   zmodload -i zsh/complist
   compstate[list_max]=scroll

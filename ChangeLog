@@ -1,5 +1,8 @@
 2000-04-26  Sven Wischnowsky  <wischnow@informatik.hu-berlin.de>
 
+	* 10923: Completion/Core/_main_complete: better default value for
+ 	list-prompt style
+	
 	* 10922: Completion/Core/_path_files: file-sort made $fignore fail
 	
 2000-04-25  Sven Wischnowsky  <wischnow@informatik.hu-berlin.de>
