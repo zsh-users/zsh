@@ -383,17 +383,20 @@ tcp_connect(Tcp_session sess, char *addrp, struct hostent *zhost, int d_port)
 static int
 bin_ztcp(char *nam, char **args, char *ops, int func)
 {
-    int herrno, err=1, destport, force=0, verbose=0, len;
+    int herrno, err=1, destport, force=0, verbose=0, test=0, len;
     char **addrp, *desthost, *localname, *remotename;
     struct hostent *zthost = NULL, *ztpeer = NULL;
     struct servent *srv;
     Tcp_session sess;
 
     if (ops['f'])
-	force=1;
+	force = 1;
 
     if (ops['v'])
-	verbose=1;
+	verbose = 1;
+
+    if (ops['t'])
+        test = 1;
     
     if (ops['c']) {
 	if (!args[0]) {
@@ -428,7 +431,7 @@ bin_ztcp(char *nam, char **args, char *ops, int func)
 	    return 1;
 	}
 
-	srv = getservbyname(args[0],"tcp");
+	srv = getservbyname(args[0], "tcp");
 	if (srv)
 	    lport = srv->s_port;
 	else
@@ -509,6 +512,20 @@ bin_ztcp(char *nam, char **args, char *ops, int func)
 	    return 1;
 	}
 
+	if(test) {
+	    struct pollfd pfd;
+	    int ret;
+
+	    pfd.fd = lfd;
+	    pfd.events = POLLIN;
+	    if((ret = poll(&pfd, 1, 0)) == 0) return 1;
+	    else if (ret == -1)
+	    {
+		zwarnnam(nam, "poll error: %e", NULL, errno);
+		return 1;
+	    }
+
+	}
 	sess = zts_alloc(ZTCP_INBOUND);
 
 	if ((rfd = accept(lfd, (struct sockaddr *)&sess->peer.in, &len)) == -1)
@@ -613,7 +630,7 @@ bin_ztcp(char *nam, char **args, char *ops, int func)
 }
 
 static struct builtin bintab[] = {
-    BUILTIN("ztcp", 0, bin_ztcp, 0, 2, 0, "acflv", NULL),
+    BUILTIN("ztcp", 0, bin_ztcp, 0, 2, 0, "acfltv", NULL),
 };
 
 /* The load/unload routines required by the zsh library interface */
