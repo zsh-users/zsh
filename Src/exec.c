@@ -3120,8 +3120,6 @@ execfuncdef(Estate state, int do_exec)
 	}
 	shfunctab->addnode(shfunctab, ztrdup(s), shf);
     }
-    if (isset(HISTNOFUNCTIONS))
-	remhist();
     state->pc = end;
     return 0;
 }

@@ -1208,8 +1208,6 @@ bin_fc(char *nam, char **argv, char *ops, int func)
 	savehistfile(*argv, 1, HFILE_APPEND | (ops['I'] ? HFILE_SKIPOLD : 0));
 	return 0;
     }
-    if (!(ops['l'] && unset(HISTNOSTORE)))
-	remhist();
     /* put foo=bar type arguments into the substitution list */
     while (*argv && equalsplit(*argv, &s)) {
 	Asgment a = (Asgment) zhalloc(sizeof *a);
