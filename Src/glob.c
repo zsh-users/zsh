@@ -2002,7 +2002,7 @@ static int
 igetmatch(char **sp, Patprog p, int fl, int n, char *replstr)
 {
     char *s = *sp, *t, *start, sav;
-    int i, l = strlen(*sp), matched = 1;
+    int i, l = strlen(*sp), ml = ztrlen(*sp), matched = 1;
 
     MUSTUSEHEAP("igetmatch");	/* presumably covered by prefork() test */
     repllist = NULL;
@@ -2053,8 +2053,8 @@ igetmatch(char **sp, Patprog p, int fl, int n, char *replstr)
 	    /* Smallest possible match at tail of string:  *
 	     * move back down string until we get a match. *
 	     * There's no optimization here.               */
-	    for (t = s + l; t >= s; t--) {
-		patoffset = t - s;
+	    patoffset = ml;
+	    for (t = s + l; t >= s; t--, patoffset--) {
 		if (pattry(p, t)) {
 		    *sp = get_match_ret(*sp, t - s, l, fl, replstr);
 		    patoffset = 0;
@@ -2070,8 +2070,7 @@ igetmatch(char **sp, Patprog p, int fl, int n, char *replstr)
 	    /* Largest possible match at tail of string:       *
 	     * move forward along string until we get a match. *
 	     * Again there's no optimisation.                  */
-	    for (i = 0, t = s; i < l; i++, t++) {
-		patoffset = i;
+	    for (i = 0, t = s; i < l; i++, t++, patoffset++) {
 		if (pattry(p, t)) {
 		    *sp = get_match_ret(*sp, i, l, fl, replstr);
 		    patoffset = 0;
@@ -2091,15 +2090,14 @@ igetmatch(char **sp, Patprog p, int fl, int n, char *replstr)
 	    } /* fall through */
 	case (SUB_SUBSTR|SUB_LONG):
 	    /* longest or smallest at start with substrings */
-	    start = s;
+	    t = s;
 	    if (fl & SUB_GLOBAL)
 		repllist = newlinklist();
 	    do {
 		/* loop over all matches for global substitution */
 		matched = 0;
-		for (t = start; t < s + l; t++) {
+		for (; t < s + l; t++, patoffset++) {
 		    /* Find the longest match from this position. */
-		    patoffset = t - start;
 		    if (pattry(p, t) && patinput > t) {
 			char *mpos = patinput;
 			if (!(fl & SUB_LONG) && !(p->flags & PAT_PURES)) {
@@ -2117,8 +2115,8 @@ igetmatch(char **sp, Patprog p, int fl, int n, char *replstr)
 			}
 			if (!--n || (n <= 0 && (fl & SUB_GLOBAL))) {
 			    *sp = get_match_ret(*sp, t-s, mpos-s, fl, replstr);
-			    if (mpos == start)
-				mpos++;
+			    if (mpos == t)
+				METAINC(mpos);
 			}
 			if (!(fl & SUB_GLOBAL)) {
 			    if (n) {
@@ -2139,7 +2137,9 @@ igetmatch(char **sp, Patprog p, int fl, int n, char *replstr)
 			 * which is already marked for replacement.
 			 */
 			matched = 1;
-			start = mpos;
+			for ( ; t < mpos; t++, patoffset++)
+			    if (*t == Meta)
+				t++;
 			break;
 		    }
 		    if (*t == Meta)
@@ -2161,17 +2161,16 @@ igetmatch(char **sp, Patprog p, int fl, int n, char *replstr)
 
 	case (SUB_END|SUB_SUBSTR):
 	    /* Shortest at end with substrings */
-	    patoffset = l;
+	    patoffset = ml;
 	    if (pattry(p, s + l) && !--n) {
 		*sp = get_match_ret(*sp, l, l, fl, replstr);
 		patoffset = 0;
 		return 1;
 	    } /* fall through */
-	    patoffset = 0;
 	case (SUB_END|SUB_LONG|SUB_SUBSTR):
 	    /* Longest/shortest at end, matching substrings.       */
-	    for (t = s + l - 1; t >= s; t--) {
-		patoffset = t - s;
+	    patoffset--;
+	    for (t = s + l - 1; t >= s; t--, patoffset--) {
 		if (t > s && t[-1] == Meta)
 		    t--;
 		if (pattry(p, t) && patinput > t && !--n) {
@@ -2195,7 +2194,7 @@ igetmatch(char **sp, Patprog p, int fl, int n, char *replstr)
 		    return 1;
 		}
 	    }
-	    patoffset = l;
+	    patoffset = ml;
 	    if ((fl & SUB_LONG) && pattry(p, s + l) && !--n) {
 		*sp = get_match_ret(*sp, l, l, fl, replstr);
 		patoffset = 0;

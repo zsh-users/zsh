@@ -1335,15 +1335,15 @@ pattry(Patprog prog, char *string)
 		 * in the pattern matching part.
 		 */
 		char *str;
-		int len = patinput - patinstart;
+		int mlen = ztrsub(patinput, patinstart);
 
 		PERMALLOC {
-		    str = dupstrpfx(patinstart, len);
+		    str = dupstrpfx(patinstart, patinput - patinstart);
 		} LASTALLOC;
 		setsparam("MATCH", str);
 		setiparam("MBEGIN", (zlong)(patoffset + !isset(KSHARRAYS)));
 		setiparam("MEND",
-			  (zlong)(len + patoffset + !isset(KSHARRAYS) - 1));
+			  (zlong)(mlen + patoffset + !isset(KSHARRAYS) - 1));
 	    }
 	    if (prog->patnpar && !(patflags & PAT_FILE)) {
 		/*
@@ -1374,11 +1374,11 @@ pattry(Patprog prog, char *string)
 			 * corresponds to indexing as ${foo[1,1]}.
 			 */
 			sprintf(numbuf, "%ld",
-				(long)((*sp - patinstart) + patoffset +
+				(long)(ztrsub(*sp, patinstart) + patoffset +
 				       !isset(KSHARRAYS)));
 			mbeginarr[i] = ztrdup(numbuf);
 			sprintf(numbuf, "%ld",
-				(long)((*ep - patinstart) + patoffset +
+				(long)(ztrsub(*ep, patinstart) + patoffset +
 				       !isset(KSHARRAYS) - 1));
 			mendarr[i] = ztrdup(numbuf);
 			sp++;
