@@ -966,6 +966,7 @@ cindex(parameters, listing)
 cindex(parameters, positional)
 cindex(parameters, setting array)
 cindex(array parameters, setting)
+pindex(KSH_ARRAYS, use of)
 item(tt(set) [ {tt(PLUS())|tt(-)}var(options) | {tt(PLUS())|tt(-)}tt(o) var(option_name) ] ... [ {tt(PLUS())|tt(-)}tt(A) [ var(name) ] ] [ var(arg) ... ])(
 Set the options for the shell and/or set the positional parameters, or
 declare and set an array.  If the tt(-s) option is given, it causes the
@@ -976,14 +977,34 @@ ifzman(zmanref(zshoptions))\
 ifnzman(noderef(Options))\
 .  Flags may be specified by name using the tt(-o) option.
 
-If the tt(-A) flag is specified, var(name) is
-set to an array containing the given var(arg)s. if tt(PLUS()A) is used and
-var(name) is an array, the given arguments will replace the initial
-elements of that array; if no var(name) is specified, all arrays are
-printed.  Otherwise the positional parameters are set.  If no arguments are
-given, then the names and values of all parameters are printed on the
-standard output.  If the only argument is `tt(PLUS())',
-the names of all parameters are printed.
+If the tt(-A) flag is specified, var(name) is set to an array containing
+the given var(arg)s; if no var(name) is specified, all arrays are printed
+together with their values.
+
+If tt(PLUS()A) is used and var(name) is an array, the
+given arguments will replace the initial elements of that array; if no
+var(name) is specified, all arrays are printed without their values.
+
+The behaviour of arguments after tt(-A) var(name) or tt(PLUS()A) var(name)
+depends on whether the option tt(KSH_ARRAYS) is set.  If it is not set, all
+arguments following var(name) are treated as values for the array,
+regardless of their form.  If the option is set, normal option processing
+continues at that point; only regular arguments are treated as values for
+the array.  This means that
+
+example(set -A array -x -- foo)
+
+sets tt(array) to `tt(-x -- foo)' if tt(KSH_ARRAYS) is not set, but sets
+the array to tt(foo) and turns on the option `tt(-x)' if it is set.
+
+If the tt(-A) flag is not present, but there are arguments beyond the
+options, the positional parameters are set.  If the option list (if any)
+is terminated by `tt(-)tt(-)', and there are no further arguments, the
+positional parameters will be unset.
+
+If no arguments and no `tt(-)tt(-)' are given, then the names and values of
+all parameters are printed on the standard output.  If the only argument is
+`tt(PLUS())', the names of all parameters are printed.
 )
 module(setcap)(zsh/cap)
 findex(setopt)

@@ -531,7 +531,7 @@ bin_set(char *nam, char **args, Options ops, int func)
 {
     int action, optno, array = 0, hadopt = 0,
 	hadplus = 0, hadend = 0, sort = 0;
-    char **x;
+    char **x, *arrayname = NULL;
 
     /* Obsolescent sh compatibility: set - is the same as set +xv *
      * and set - args is the same as set +xv -- args              */
@@ -575,7 +575,15 @@ bin_set(char *nam, char **args, Options ops, int func)
 		if(!*++*args)
 		    args++;
 		array = action ? 1 : -1;
-		goto doneoptions;
+		arrayname = *args;
+		if (!arrayname)
+		    goto doneoptions;
+		else if  (!isset(KSHARRAYS))
+		{
+		    args++;
+		    goto doneoptions;
+		}
+		break;
 	    } else if (**args == 's')
 		sort = action ? 1 : -1;
 	    else {
@@ -592,30 +600,31 @@ bin_set(char *nam, char **args, Options ops, int func)
 
     /* Show the parameters, possibly with values */
     queue_signals();
-    if (!hadopt && !*args)
-	scanhashtable(paramtab, 1, 0, 0, paramtab->printnode,
-		      hadplus ? PRINT_NAMEONLY : 0);
+    if (!arrayname)
+    {
+	if (!hadopt && !*args)
+	    scanhashtable(paramtab, 1, 0, 0, paramtab->printnode,
+			  hadplus ? PRINT_NAMEONLY : 0);
 
-    if (array && !*args) {
-	/* display arrays */
-	scanhashtable(paramtab, 1, PM_ARRAY, 0, paramtab->printnode,
-		      hadplus ? PRINT_NAMEONLY : 0);
+	if (array) {
+	    /* display arrays */
+	    scanhashtable(paramtab, 1, PM_ARRAY, 0, paramtab->printnode,
+			  hadplus ? PRINT_NAMEONLY : 0);
+	}
+	if (!*args && !hadend) {
+	    unqueue_signals();
+	    return 0;
+	}
     }
-    if (!*args && !hadend) {
-	unqueue_signals();
-	return 0;
-    }
-    if (array)
-	args++;
     if (sort)
 	qsort(args, arrlen(args), sizeof(char *),
 	      sort > 0 ? strpcmp : invstrpcmp);
     if (array) {
 	/* create an array with the specified elements */
-	char **a = NULL, **y, *name = args[-1];
+	char **a = NULL, **y;
 	int len = arrlen(args);
 
-	if (array < 0 && (a = getaparam(name))) {
+	if (array < 0 && (a = getaparam(arrayname))) {
 	    int al = arrlen(a);
 
 	    if (al > len)
@@ -627,7 +636,7 @@ bin_set(char *nam, char **args, Options ops, int func)
 	    *y++ = ztrdup(*args++);
 	}
 	*y++ = NULL;
-	setaparam(name, x);
+	setaparam(arrayname, x);
     } else {
 	/* set shell arguments */
 	freearray(pparams);

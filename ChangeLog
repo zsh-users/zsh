@@ -1,3 +1,8 @@
+2003-02-07  Peter Stephenson  <pws@csr.com>
+
+	* 18204: Doc/Zsh/builtins.yo, Src/builtin.c: KSH_ARRAYS gives
+	ksh behaviour with set -A <optargs> <args>.
+
 2003-02-06  Peter Stephenson  <pws@csr.com>
 
 	* 18202: Functions/TCP/*, Doc/Makefile.in, Doc/zsh.yo,
