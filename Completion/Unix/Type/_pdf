@@ -1,11 +1,11 @@
-#compdef acroread pdf2dsc pdf2ps pdfimages pdfinfo pdftopbm pdftops pdftotext xpdf
+#compdef acroread pdf2dsc pdf2ps pdfimages pdfinfo pdftopbm pdftops pdftotext xpdf pdfopt pdffonts
 
 local expl ext=''
 
 # ghostscript:
-#  pdf2dsc pdf2ps
+#  pdf2dsc pdf2ps pdfopt
 # xpdf:
-#  pdfimages pdfinfo pdftopbm pdftops pdftotext xpdf
+#  pdfimages pdfinfo pdftopbm pdftops pdftotext xpdf pdffonts
 
 if [[ "$1" == '-z' ]]; then
   ext='(|.gz|.Z)'

@@ -1,3 +1,9 @@
+2003-04-18  Oliver Kiddle  <opk@zsh.org>
+
+	* users/6013: GoTaR <gotar@poczta.onet.pl>: Completion/Unix/Type/_ps,
+	Completion/Unix/Type/_pdf, Completion/X/Command/_gqview:
+	new gqview completion and complete .ps/.pdf files for more commands
+
 2003-04-16  Oliver Kiddle  <opk@zsh.org>
 
 	* 18446: Completion/Linux/Command/_modutils: handle modinfo and
