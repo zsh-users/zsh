@@ -550,12 +550,15 @@ finish_module(Module m)
 #endif /* !AIXDYNAMIC */
 
 /**/
-Module
+int
 load_module(char const *name)
 {
     Module m;
     void *handle;
     LinkNode node, n;
+
+    if (module_linked(name))
+	return 1;
 
     if (!(node = find_module(name))) {
 	if (!(handle = do_load_module(name)))
@@ -576,36 +579,36 @@ load_module(char const *name)
 	    return NULL;
 	}
 	m->flags &= ~MOD_SETUP;
-	return m;
+	return 1;
     } 
     m = (Module) getdata(node);
     if (m->flags & MOD_SETUP)
-	return m;
+	return 1;
     if (m->flags & MOD_UNLOAD)
 	m->flags &= ~MOD_UNLOAD;
     else if (m->handle)
-	return m;
+	return 1;
     if (m->flags & MOD_BUSY) {
 	zerr("circular dependencies for module %s", name, 0);
-	return NULL;
+	return 0;
     }
     m->flags |= MOD_BUSY;
     if (m->deps)
 	for (n = firstnode(m->deps); n; incnode(n))
 	    if (!load_module((char *) getdata(n))) {
 		m->flags &= ~MOD_BUSY;
-		return NULL;
+		return 0;
 	    }
     m->flags &= ~MOD_BUSY;
     if (!m->handle) {
 	if (!(m->handle = do_load_module(name)))
-	    return NULL;
+	    return 0;
 	m->flags |= MOD_SETUP;
 	if (setup_module(m)) {
 	    finish_module(m->handle);
 	    m->handle = NULL;
 	    m->flags &= ~MOD_SETUP;
-	    return NULL;
+	    return 0;
 	}
     }
     m->flags |= MOD_SETUP;
@@ -613,10 +616,10 @@ load_module(char const *name)
 	finish_module(m->handle);
 	m->handle = NULL;
 	m->flags &= ~MOD_SETUP;
-	return NULL;
+	return 0;
     }
     m->flags &= ~MOD_SETUP;
-    return m;
+    return 1;
 }
 
 /* This ensures that the module with the name given as the second argument
@@ -650,7 +653,7 @@ require_module(char *nam, char *module, int res, int test)
 	zwarnnam(nam, "%s: restricted", module, 0);
 	return 0;
     } else
-	return !!load_module(module);
+	return load_module(module);
 
     return 1;
 }
