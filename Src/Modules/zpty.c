@@ -279,7 +279,6 @@ newptycmd(char *nam, char *pname, char **args, int echo, int block)
     }
     if ((pid = fork()) == -1) {
 	close(master);
-	close(slave);
 	zwarnnam(nam, "couldn't create pty command: %s", pname, 0);
 	return 1;
     } else if (!pid) {

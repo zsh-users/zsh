@@ -1,5 +1,7 @@
 2000-06-27  Sven Wischnowsky  <wischnow@zsh.org>
 
+	* Andrej: 12084: Src/Modules/zpty.c: don't close slave if not yet open
+
 	* 12082: Doc/Zsh/compsys.yo: document _use_lo
 	
 2000-06-27  Peter Stephenson  <pws@cambridgesiliconradio.com>
