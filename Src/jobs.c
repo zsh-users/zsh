@@ -266,7 +266,7 @@ get_usage(void)
 #ifdef HAVE_GETRUSAGE
     getrusage(RUSAGE_CHILDREN, &child_usage);
 #else
-    times(shtms);
+    times(&shtms);
 #endif
 }
 
