@@ -40,7 +40,7 @@ INSTALL         = @INSTALL@
 
 # ========== DEPENDENCIES FOR TESTING ==========
 
-tests:
+check test:
 	for f in *.ztst; do \
 	  ../Src/zsh ztst.zsh $$f; \
 	done

@@ -46,9 +46,6 @@ all: config.h
 	  (cd $$subdir && $(MAKE) $(MAKEDEFS) $@) || exit 1; \
 	done
 
-check test:
-	@echo zsh test suite not available yet
-
 # prepare module configuration
 prep:
 	@cd Src && $(MAKE) $(MAKEDEFS) $@
@@ -86,6 +83,10 @@ install.fns uninstall.fns:
 # install/uninstall just the info pages
 install.info uninstall.info:
 	@cd Doc && $(MAKE) $(MAKEDEFS) $@
+
+# ========== DEPENDENCIES FOR TESTING ==========
+check test:
+	cd Test ; $(MAKE) check
 
 # ========== DEPENDENCIES FOR CLEANUP ==========
 

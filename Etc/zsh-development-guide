@@ -60,7 +60,7 @@ Testing
   e.g. `expect').
 
 * The directory is not part of the usual process of building and
-  installation.  To run the tests, go to Test and `make test'.  Please
+  installation.  To run the tests, go to Test and `make check'.  Please
   report any errors with all the usual information about the zsh version
   and the system you are using.
 
