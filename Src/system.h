@@ -207,7 +207,7 @@ struct timezone {
 #ifndef HAVE_PATHCONF
 # define zpathmax(X) ((long)((strlen(X) >= PATH_MAX) ? \
 			     ((errno = ENAMETOOLONG), -1) : \
-			     ((errno = 0), PATH_MAX))
+			     ((errno = 0), PATH_MAX)))
 #endif
 
 /* we should be getting this value from sysconf(_SC_OPEN_MAX) */
