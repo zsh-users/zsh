@@ -23,10 +23,6 @@ tools:
   of the config.status files that get generated.  See the comments in
   configure.in and at the end of Src/mkmakemod.sh for an explanation.)
 
-  Note that configure.in has not yet been modified to work with autoconf
-  2.50.  Use version 2.13 until configure.in and associated files have
-  been updated.
-
 * GNU m4.  (Required by autoconf.)
 
 * yodl.
