@@ -81,9 +81,9 @@ matches should be added. So the example becomes:
   _wanted names expl 'name' && compadd "$expl[@]" alice bob
 
 Note that you can also give the `-J' and `-V' options with the
-optional `1' or `2' following them supported by `_description':
+optional `1' or `2' preceding them supported by `_description':
 
-  _wanted -V2 names expl 'name' && compadd ...
+  _wanted -2V names expl 'name' && compadd ...
 
 The more complicated case is where you can offer multiple types of
 matches. In this case the user should be able to say which types he
@@ -284,16 +284,16 @@ throughout the completion system) and do:
   compadd "$expl@]" - <matches ...>
 
 Note that this function also accepts `-V' und `-J', optionally (in the 
-same word) followed by `1' or `2' to describe the type of group you
+same word) preceded by `1' or `2' to describe the type of group you
 want to use. For example:
 
   _description tag expl '...'
-  compadd "$expl[@]" -V1 foo - ...    # THIS IS WRONG!!!
+  compadd "$expl[@]" -1V foo - ...    # THIS IS WRONG!!!
 
 is *not* the right way to use a unsorted group. Instead do the
 simpler:
 
-  _description -V1 tag expl '...'
+  _description -1V tag expl '...'
   compadd "$expl[@]" - ...
 
 and everything will work fine.
@@ -308,11 +308,11 @@ often be using the tags function that allow you to give the
 explanation to the same function that is used to test if the tags are
 requested (again: see above). Just as a reminder:
 
-  _wanted [ -V[1,2] | -J[1,2] ] <tag> expl <descr>
+  _wanted [ -[1,2]V | -[1,2]J ] <tag> expl <descr>
 
 and
 
-  _requested [ -V[1,2] | -J[1,2] ] <tag> expl <descr>
+  _requested [ -[1,2]V | -[1,2]J ] <tag> expl <descr>
 
 is all you need to make your function work correctly with both tags
 and description at the same time.

@@ -17,15 +17,15 @@ group=()
 expl=()
 opts=()
 sopts=()
-while getopts "J:V:X:P:S:r:R:qM:" opt; do
+while getopts "J:V:X:P:S:r:R:qM:12n" opt; do
   case "$opt" in
-  [JV])  group=("-$opt" "$OPTARG");;
-  X)     expl=(-X "$OPTARG");;
-  P)     opts=( "$opts[@]" -P "$OPTARG")
-         sopts=( "$sopts[@]" -P "$OPTARG");;
-  [SrR]) sopts=( "$sopts[@]" -P "$OPTARG");;
-  q)     sopts=( "$sopts[@]" -q);;
-  M)     match="$OPTARG";;
+  [JV])   group=("-$opt" "$OPTARG");;
+  X)      expl=(-X "$OPTARG");;
+  P)      opts=( "$opts[@]" -P "$OPTARG")
+          sopts=( "$sopts[@]" -P "$OPTARG");;
+  [SrR])  sopts=( "$sopts[@]" -P "$OPTARG");;
+  [q12n]) sopts=( "$sopts[@]" "-$opt");;
+  M)      match="$OPTARG";;
   esac
 done
 shift OPTIND-1

@@ -4,13 +4,13 @@ local opts opt type=file group
 
 opts=()
 group=()
-while getopts "P:S:qr:R:W:F:J:V:X:f/g:M:" opt; do
+while getopts "P:S:qr:R:W:F:J:V:X:f/g:M:12n" opt; do
   case "$opt" in
-  /)    [[ "$type" = file       ]] && type=dir       ;;
-  g)    [[ "$type" = (file|dir) ]] && type="$OPTARG" ;;
-  q)    opts=("$opts[@]" -q               )          ;;
-  [JV]) group=(          "-$opt" "$OPTARG")          ;;
-  [^f]) opts=("$opts[@]" "-$opt" "$OPTARG")          ;;
+  /)      [[ "$type" = file       ]] && type=dir       ;;
+  g)      [[ "$type" = (file|dir) ]] && type="$OPTARG" ;;
+  [qn12]) opts=("$opts[@]" "-$opt"          )          ;;
+  [JV])   group=(          "-$opt" "$OPTARG")          ;;
+  [^f])   opts=("$opts[@]" "-$opt" "$OPTARG")          ;;
   esac
 done
 

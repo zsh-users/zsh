@@ -5,11 +5,8 @@ local name gropt format gname hidden hide
 gropt=(-J)
 hide=()
 
-if [[ "$1" = -[VJ] ]]; then
+if [[ "$1" = -([12]|)[VJ] ]]; then
   gropt=("$1")
-  shift
-elif [[ "$1" = -[VJ] ]]; then
-  gropt=("-${1[3,-1]}" "${1[1,2]}")
   shift
 fi
 
@@ -20,6 +17,7 @@ _setup "$1"
 name="$2"
 
 _style -s "$1" format format || _style -s descriptions format format
+
 _style -s "$1" hidden hidden
 if [[ "$hidden" = (all|yes|true|1|on) ]]; then
   [[ "$hidden" = all ]] && format=''

@@ -25,13 +25,13 @@ local matchflags opt group expl nm=$compstate[nmatches] opre osuf opts match
 group=()
 expl=()
 opts=()
-while getopts "J:V:X:P:S:r:R:qM:" opt; do
+while getopts "J:V:X:P:S:r:R:qM:12n" opt; do
   case "$opt" in
-  [JV]) group=("-$opt" "$OPTARG");;
-  X)    expl=(-X "$OPTARG");;
-  q)    opts=( "$opts[@]" -q );;
-  M)    match="$OPTARG";;
-  *)    opts=( "$opts[@]" "-$opt" "$OPTARG" );;
+  [JV])   group=("-$opt" "$OPTARG");;
+  X)      expl=(-X "$OPTARG");;
+  [q12n]) opts=( "$opts[@]" "-$opt" );;
+  M)      match="$OPTARG";;
+  *)      opts=( "$opts[@]" "-$opt" "$OPTARG" );;
   esac
 done
 shift OPTIND-1

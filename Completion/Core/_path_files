@@ -6,7 +6,7 @@
 local linepath realpath donepath prepath testpath exppath
 local tmp1 tmp2 tmp3 tmp4 i orig pre suf tpre tsuf opre osuf cpre
 local pats haspats=no ignore group expl addpfx addsfx remsfx
-local nm=$compstate[nmatches] menu match matcher
+local nm=$compstate[nmatches] menu match matcher mopts
 
 typeset -U prepaths exppaths
 
@@ -24,11 +24,14 @@ addsfx=()
 remsfx=()
 expl=()
 matcher=()
+mopts=()
 
 # Get the options.
 
-while getopts "P:S:qr:R:W:F:J:V:X:f/g:M:" opt; do
+while getopts "P:S:qr:R:W:F:J:V:X:f/g:M:12n" opt; do
   case "$opt" in
+  [12n]) mopts=( "$mopts[@]" "-$opt" )
+         ;;
   P)     addpfx=(-P "$OPTARG")
          ;;
   S)     addsfx=(-S "$OPTARG")
@@ -347,13 +350,13 @@ for prepath in "$prepaths[@]"; do
       if [[ -n $menu ]] || ! _style paths expand '*suffix*'; then
         _style paths cursor && compstate[to_end]=''
         if [[ "$tmp3" = */* ]]; then
-	  compadd -Qf -p "$linepath$tmp4" -s "/${tmp3#*/}" \
+	  compadd -Qf "$mopts[@]" -p "$linepath$tmp4" -s "/${tmp3#*/}" \
 	          -W "$prepath$realpath$testpath" "$ignore[@]" \
 		  "$addpfx[@]" "$addsfx[@]" "$remsfx[@]" \
                   -M "r:|/=* r:|=* $match" "$group[@]" "$expl[@]" \
 		  - "${(@)tmp1%%/*}"
 	else
-	  compadd -Qf -p "$linepath$tmp4" \
+	  compadd -Qf "$mopts[@]" -p "$linepath$tmp4" \
 	          -W "$prepath$realpath$testpath" "$ignore[@]" \
 		   "$addpfx[@]" "$addsfx[@]" "$remsfx[@]" \
                    -M "r:|/=* r:|=* $match" "$group[@]" "$expl[@]" \
@@ -362,14 +365,14 @@ for prepath in "$prepaths[@]"; do
       else
         if [[ "$tmp3" = */* ]]; then
           for i in "$tmp1[@]"; do
-	    compadd -Qf -p "$linepath$tmp4" -s "/${i#*/}" \
+	    compadd -Qf "$mopts[@]" -p "$linepath$tmp4" -s "/${i#*/}" \
 		    -W "$prepath$realpath$testpath" "$ignore[@]" \
 		    "$addpfx[@]" "$addsfx[@]" "$remsfx[@]" \
                     -M "r:|/=* r:|=* $match" "$group[@]" "$expl[@]" \
 		    - "${i%%/*}"
 	  done
         else
-	  compadd -Qf -p "$linepath$tmp4" \
+	  compadd -Qf "$mopts[@]" -p "$linepath$tmp4" \
 		  -W "$prepath$realpath$testpath" "$ignore[@]" \
 		  "$addpfx[@]" "$addsfx[@]" "$remsfx[@]" \
                   -M "r:|/=* r:|=* $match" "$group[@]" "$expl[@]" \
@@ -419,7 +422,7 @@ for prepath in "$prepaths[@]"; do
     fi
     tmp4="$testpath"
     compquote tmp4 tmp1
-    compadd -Qf -p "$linepath$tmp4" \
+    compadd -Qf "$mopts[@]" -p "$linepath$tmp4" \
 	    -W "$prepath$realpath$testpath" "$ignore[@]" \
 	    "$addpfx[@]" "$addsfx[@]" "$remsfx[@]" \
             -M "r:|/=* r:|=* $match" "$group[@]" "$expl[@]" \
@@ -437,7 +440,7 @@ if _style paths expand '*prefix*' &&
    [[ $#exppaths -gt 0 && nm -eq compstate[nmatches] ]]; then
   PREFIX="${opre}"
   SUFFIX="${osuf}"
-  compadd -Q -S '' "$group[@]" "$expl[@]" \
+  compadd -Q "$mopts[@]" -S '' "$group[@]" "$expl[@]" \
           -M "r:|/=* r:|=* $match" -p "$linepath" - "$exppaths[@]"
 fi
 

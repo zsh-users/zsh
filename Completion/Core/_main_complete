@@ -136,11 +136,10 @@ if [[ "$compstate[insert]" = *menu ]]; then
   fi
 fi
 
-_style -s warnings format format
-
 if [[ compstate[nmatches] -eq 0 &&
       compstate[matcher] -eq compstate[total_matchers] &&
-      -n "$format" && $#_lastdescr -ne 0 ]]; then
+      $#_lastdescr -ne 0 ]] &&
+   _style -s warnings format format; then
   local str
 
   compstate[list]='list force'
