@@ -84,6 +84,7 @@ if compvalues -i "$@"; then
   # We add the separator character as a autoremovable suffix unless
   # we have only one possible value left.
 
+  sep=()
   [[ ${#snames}+${#names}+${#onames} -ne 1 ]] && compvalues -s sep &&
       expl=( "-qS$sep" "$expl[@]" ) sep=( "-qS$sep" )
 

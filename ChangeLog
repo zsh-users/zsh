@@ -1,5 +1,9 @@
 2001-05-31  Sven Wischnowsky  <wischnow@zsh.org>
 
+	* 14602: Completion/Base/Utility/_values,
+	Functions/Misc/nslookup: better prompt matching in nslookup;
+	fix separator handling in _multi_parts
+
 	* 14599: Completion/Base/Utility/_multi_parts: always use
 	supplied matchers
 
