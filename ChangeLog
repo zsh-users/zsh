@@ -1,3 +1,8 @@
+2005-03-07  Clint Adams  <clint@zsh.org>
+
+	* 20936: Completion/Linux/Command/_acpi: completion for acpi
+	command.
+
 2005-03-05  Andrey Borzenkov  <bor@zsh.org>
 
 	* Tobias Gruetzmacher: 20932: Completion/X/Command/_kfmclient:
