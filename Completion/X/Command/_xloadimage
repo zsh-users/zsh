@@ -33,8 +33,13 @@ else
     '*-global[following option applies to all images]'
   )
 fi
-ipath=( . ${=rc[1]#*:} )
-extension=( ${=rc[2]#*:} )
+ipath=( . ${=${(M)rc:#*path:*}#*:} )
+extension=( ${=${(M)rc:#*extensions:*}#*:} )
+# set default file extensions if there are none
+(( $#extension )) || extension=(
+  .gif .jpg .jpeg .png .rle .csun .msun .sun .face
+  .xbm .bm .fbm .pcx .ppm .pgm .pbm .tga .xpm
+)
 
 # all options are valid after -help so no exclusion lists below
 _x_arguments "$args[@]" \
