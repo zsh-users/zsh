@@ -1555,7 +1555,7 @@ real_no_create=$no_create
 no_create=yes
 
 AC_OUTPUT(Config/defs.mk Makefile Doc/Makefile Etc/Makefile Src/Makefile \
-Completion/Makefile Functions/Makefile, \
+Test/Makefile Completion/Makefile Functions/Makefile, \
 [test -z "$CONFIG_HEADERS" || echo > stamp-h])
 
 dnl The standard config.status is missing some essential features.

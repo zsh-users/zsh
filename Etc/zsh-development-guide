@@ -40,6 +40,30 @@ Patches
   archive, send them to the mailing list with a Subject: line starting
   with "PATCH:".
 
+Testing
+-------
+
+* Because zsh has a huge number of different options and interacts with
+  a wide range of human and artificial life, it is very difficult to
+  test the shell thoroughly.  For this purpose, the Test subdirectory
+  exists.  It consists of a driver script (ztst.zsh) and various test
+  files (*.ztst) in a format which is described in cd.ztst, which acts
+  as a template.  It is designed to make it easy to provide input to
+  chunks of shell code and to test the corresponding standard output,
+  error output and exit status.
+
+* There is not much there yet, but please don't let that put you off adding
+  tests for basic syntactic features, builtins, options etc. which you
+  know to be flakey or to have had difficulties in the past.  Better
+  support for testing job control and interactive features is expected
+  to follow eventually (this may require additional external software
+  e.g. `expect').
+
+* The directory is not part of the usual process of building and
+  installation.  To run the tests, go to Test and `make test'.  Please
+  report any errors with all the usual information about the zsh version
+  and the system you are using.
+
 C coding style
 --------------
 
