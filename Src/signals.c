@@ -572,7 +572,8 @@ killrunjobs(int from_signal)
         if ((from_signal || i != thisjob) && (jobtab[i].stat & STAT_LOCKED) &&
             !(jobtab[i].stat & STAT_NOPRINT) &&
             !(jobtab[i].stat & STAT_STOPPED)) {
-            if (killpg(jobtab[i].gleader, SIGHUP) != -1)
+            if (jobtab[i].gleader != getpid() &&
+		killpg(jobtab[i].gleader, SIGHUP) != -1)
                 killed++;
         }
     if (killed)
