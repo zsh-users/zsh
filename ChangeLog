@@ -1,3 +1,8 @@
+2002-01-08  Sven Wischnowsky  <wischnow@zsh.org>
+
+	* 16417: Src/Zle/computil.c: don't report _arguments-specs more
+	than once (not even shared options with multiple sets)
+
 2002-01-07  Sven Wischnowsky  <wischnow@zsh.org>
 
 	* 16408: Src/Zle/compcore.c: make sure auto menu isn't started

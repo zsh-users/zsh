@@ -2315,6 +2315,7 @@ bin_comparguments(char *nam, char **args, char *ops, int func)
 	    LinkList direct = newlinklist();
 	    LinkList odirect = newlinklist();
 	    LinkList equal = newlinklist(), l;
+            LinkNode node;
 	    Caopt p;
 	    char *str;
 	    int ret = 1;
@@ -2349,7 +2350,13 @@ bin_comparguments(char *nam, char **args, char *ops, int func)
 				strcat(str, p->descr);
 			    } else
 				str = bslashcolon(p->name);
-			    addlinknode(l, str);
+
+                            for (node = firstnode(l); node; incnode(node))
+                                if (!strcmp(str, (char *) getdata(node)))
+                                    break;
+
+                            if (!node)
+                                addlinknode(l, str);
 			}
 		    }
 		}
