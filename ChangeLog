@@ -1,3 +1,8 @@
+2003-11-19  Clint Adams  <clint@zsh.org>
+
+	* 19258: Doc/Zsh/mod_terminfo.yo, Src/Modules/terminfo.c:
+	arg support for echoti.
+
 2003-11-14  Clint Adams  <clint@zsh.org>
 
 	* unposted: config.guess, config.sub:
