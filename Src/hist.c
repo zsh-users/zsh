@@ -707,7 +707,7 @@ nohwe(void)
 /* initialize the history mechanism */
 
 /**/
-void
+mod_export void
 hbegin(int dohist)
 {
     isfirstln = isfirstch = 1;
@@ -927,7 +927,7 @@ prepnexthistent(int histnum)
 /* say we're done using the history mechanism */
 
 /**/
-int
+mod_export int
 hend(void)
 {
     int flag, save = 1;

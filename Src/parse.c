@@ -2365,7 +2365,7 @@ execompile(List list)
 }
 
 /**/
-Eprog
+mod_export Eprog
 dupeprog(Eprog p)
 {
     Eprog r;
