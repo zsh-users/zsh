@@ -872,7 +872,7 @@ down_histent(Histent he)
 }
 
 /**/
-Histent
+mod_export Histent
 gethistent(int ev, int nearmatch)
 {
     Histent he;
