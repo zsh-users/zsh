@@ -406,7 +406,7 @@ compstyle '*:options' prefix-hidden yes"
       tmp="':expand-word' ${name#expandword_} ${(qq)val}"
       ;;
     history_*)
-      tmp="'*:history-words ${name#history_} ${(qq)val}"
+      tmp="'*:history-words' ${name#history_} ${(qq)val}"
       ;;
     completer)
       tmp="'*' completer ${${(qqs.:.)val}}"
@@ -421,7 +421,7 @@ compstyle '*:options' prefix-hidden yes"
 
   eval "${style}"
 
-  print "$style" >> ${HOME}/.zsh-styles
+  print "$style" >>! ${HOME}/.zsh-styles
 }
 
 # Very simple interface for setting styles:

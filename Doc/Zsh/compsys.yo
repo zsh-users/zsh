@@ -1598,7 +1598,7 @@ more specific context name without havin to change and reset the
 tt(curcontext) parameter (which would otherwise have the same effect).
 )
 item(tt(_requested))(
-A function that uses t(_tags) to register tags and then calls it to
+A function that uses tt(_tags) to register tags and then calls it to
 loop over the requested sets of tags should call this function to
 check if a certain tag is currently requested. This normally has to be 
 done in a loop such as:
