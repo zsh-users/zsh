@@ -4,6 +4,9 @@
 
 2000-05-15  Sven Wischnowsky  <wischnow@zsh.org>
 
+	* 11374: Src/Zle/compcore.c: extra paranoia for empty
+ 	prefix/suffix in completion matching
+	
 	* 11368: Src/utils.c: fix for empty (s::) separator and strings
  	with meta-characters
 	
