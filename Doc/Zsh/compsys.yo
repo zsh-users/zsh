@@ -855,13 +855,18 @@ arguments are preceded with backslashes.
 
 Normally the option names are taken as multi-character names and a
 word from the line is considered to contain only one option (or
-none). By giving the tt(-s) option to this function (as the first
-argument), options are considered to be one-character options and the
+none). By giving the tt(-s) option to this function (before the first
+description), options are considered to be one-character options and the
 strings from the line may contain more than one such option
 letter. However, strings beginning with two hyphens (like
 `tt(-)tt(-prefix)') are still considered to contain only one option
 name. This allows the use of the `tt(-s)' option to describe
 single-letter options together with such long option names.
+
+Also, the tt(-M) option followed by a string may be given before the
+first description. The string will be used as the match specification
+when completing option names and values instead of the default
+`tt(r:|[_-]=* r:|=*)'. 
 
 The function can also be made to automatically complete long options
 for commands that support the `tt(-)tt(-help)' option as, for example,

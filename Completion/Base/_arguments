@@ -8,7 +8,7 @@ setopt localoptions extendedglob
 local args rest ws cur nth def nm expl descr action opt arg tmp xor
 local single uns ret=1 aret soptseq soptseq1 sopts prefix _line odescr
 local beg optbeg argbeg nargbeg inopt inrest fromrest cmd="$words[1]"
-local matched curopt noargs i tmp1 tmp2 tmp3 suffix
+local matched curopt noargs i tmp1 tmp2 tmp3 suffix match
 
 # Associative arrays used to collect information about the options.
 
@@ -22,14 +22,26 @@ if [[ "$*" != "$_args_cache_descr" ]]; then
   unset _args_cache_{opts,dopts,odopts,odescr,xors}
   typeset -gA _args_cache_{opts,dopts,odopts,xors}
 
-  unset _args_cache_{long,longcmd,single,rest,args,sopts,soptseq,soptseq1}
+  unset _args_cache_{long,longcmd,single,match,rest,args,sopts,soptseq,soptseq1}
 
-  # See if we are using single-letter options.
+  # Default match spec.
 
-  if [[ "$1" = -s ]]; then
-    shift
-    _args_cache_single=yes
-  fi
+  _args_cache_match='r:|[_-]=* r:|=*'
+
+  # See if we are using single-letter options or have a match spec.
+
+  while [[ "$1" = -(s|M*) ]]; do
+    if [[ "$1" = -s ]]; then
+      shift
+      _args_cache_single=yes
+    elif [[ "$1" = -M?* ]]; then
+      _args_cache_match="${1[3,-1]}"
+      shift
+    else
+      _args_cache_match="$2"
+      shift 2
+    fi
+  done
 
   # See if we support long options, too.
 
@@ -336,6 +348,7 @@ odopts=( "${(@kv)_args_cache_odopts}" )
 odescr=( "$_args_cache_odescr[@]" )
 xors=( "${(@kv)_args_cache_xors}" )
 single="$_args_cache_single"
+match="$_args_cache_match"
 
 # Parse the command line...
 
@@ -793,7 +806,7 @@ while true; do
 
         eval ws\=\( "${action[3,-3]}" \)
 
-        _describe -c "$cmd" "$descr" ws -M 'r:|[_-]=* r:|=*'
+        _describe -c "$cmd" "$descr" ws -M "$match"
 
       elif [[ "$action" = \(*\) ]]; then
 
@@ -841,11 +854,11 @@ while true; do
         tmp2=( "${(@o)tmp2}" )
 
         _describe -o -c "$cmd" option \
-        tmp1 tmp2  -Q -M 'r:|[_-]=* r:|=*'
+          tmp1 tmp2  -Q -M 'r:|[_-]=* r:|=*'
       else
         # The last option takes an argument in the next word.
 
-        compadd "$expl[@]" -Q -M 'r:|[_-]=* r:|=*' - "${PREFIX}" && ret=0
+        compadd "$expl[@]" -Q -M "$match" - "${PREFIX}" && ret=0
       fi
     else
       tmp1=( "${(@k)opts}" "${(@k)odopts[(I)*[^=]]}" )
@@ -853,9 +866,9 @@ while true; do
       tmp2=( "${(@M)odescr:#(${(kj:|:)~dopts}):*}" )
       tmp3=( "${(@M)odescr:#(${(kj:|:)~odopts[(I)*=]%=}):*}" )
       _describe -o -c "$cmd" option \
-        tmp1 -Q -M 'r:|[_-]=* r:|=*' -- \
-        tmp2 -QS '' -M 'r:|[_-]=* r:|=*' -- \
-        tmp3 -QqS= -M 'r:|[_-]=* r:|=*'
+        tmp1 -Q -M "$match" -- \
+        tmp2 -QS '' -M "$match" -- \
+        tmp3 -QqS= -M "$match"
     fi
   fi
 
@@ -867,7 +880,7 @@ while true; do
     suffix="$SUFFIX"
     PREFIX="${PREFIX%%\=*}"
     SUFFIX=''
-    compadd -M 'r:|[_-]=* r:|=*' -D tmp - "${(@)tmp%\=}"
+    compadd -M "$match" -D tmp - "${(@)tmp%\=}"
 
     if [[ $#tmp -eq 1 ]]; then
       def="$odopts[$tmp[1]]"
@@ -882,9 +895,9 @@ while true; do
   break
 done
 
-[[ -n "$noargs" ]] && _message "$noargs"
-
 [[ -n "$aret" ]] && return 300
+
+[[ -n "$noargs" ]] && _message "$noargs"
 
 # Set the return value.
 
