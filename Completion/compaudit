@@ -55,11 +55,11 @@ if [[ -n $_compdir ]]; then
     # Too few files: we need some more directories, or we need to check
     # that all directories (not just Base) are present.
     _i_addfiles=()
-    if [[ $_compdir = */Base ]]; then
-      # Add all the Completion subdirectories
-      _i_addfiles=(${_compdir:h}/*(/))
+    if [[ -d $_compdir/Base/Core ]]; then
+      # Add all the Completion subdirectories (CVS-layout)
+      _i_addfiles=(${_compdir}/*/*(/))
     elif [[ -d $_compdir/Base ]]; then
-      # Likewise
+      # Likewise (installation-layout)
       _i_addfiles=(${_compdir}/*(/))
     fi
     for _i_line in {1..$#i_addfiles}; do

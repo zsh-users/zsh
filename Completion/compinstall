@@ -190,7 +190,9 @@ __ci_set_compdir() {
 
 __ci_set_compdir $fpath
 
-if [[ -d $compdir/Base ]]; then
+if [[ -d $compdir/Base/Core ]]; then
+  subdirs=2
+elif [[ -d $compdir/Base ]]; then
   subdirs=1
   ### compdir=${compdir:h}
 fi
@@ -229,12 +231,18 @@ initialised completion in this shell, you should do so, then run
 compinstall again."
     fi
   fi
-  if [[ -n $subdirs ]]; then
+  if [[ $subdirs = 2 ]]; then
+    fpath_line=($compdir/[A-Z]*/[A-Z]*)
+    fpath_line="fpath=($fpath ${(F)fpath_line})"
+  elif [[ -n $subdirs ]]; then
     fpath_line=($compdir/[A-Z]*)
     fpath_line="fpath=($fpath ${(F)fpath_line})"
   fi
 else
-  if [[ -n $subdirs ]]; then
+  if [[ $subdirs = 2 ]]; then
+    print "Completion directories $compdir/*/*
+are already in your \$fpath, good."
+  elif [[ -n $subdirs ]]; then
     print "Completion directories $compdir/*
 are already in your \$fpath, good."
   else

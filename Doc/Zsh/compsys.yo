@@ -142,9 +142,10 @@ contains the required directories for the standard functions.
 For incomplete installations, if tt(compinit) does not find enough files
 beginning with an underscore (fewer than twenty) in the search path, it
 will try to find more by adding the directory tt(_compdir) to the search
-path.  Furthermore, if the directory in question ends in the path segment
-tt(Base), or has a subdirectory named tt(Base), tt(compinit) will add all
-subdirectories of the directory where tt(Base) is to the path: this allows
+path.  If that directory has a subdirectory named tt(Base), all
+subdirectories will be added to the path.  Furthermore, if the subdirectory
+tt(Base) has a subdirectory named tt(Core), tt(compinit) will add all
+subdirectories of the subdirectories is to the path: this allows
 the functions to be in the same format as in the tt(zsh) source
 distribution.
 

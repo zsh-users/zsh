@@ -1,5 +1,9 @@
 2001-04-26  Sven Wischnowsky  <wischnow@zsh.org>
 
+	* 14107: Completion/compaudit, Completion/compinstall,
+	Doc/Zsh/compsys.yo: handle sub-sub-directories of $_compdir as
+	in the CVS-layout
+
 	* 14105: Completion/Base/Utility/_arguments,
 	Completion/Base/Utility/_guard,
 	Completion/X/Utility/_x_arguments,
