@@ -341,7 +341,7 @@ statprint(struct stat *sbuf, char *outbuf, char *fname, int iwhich, int flags)
  */
 /**/
 static int
-bin_stat(char *name, char **args, char *ops, int func)
+bin_stat(char *name, char **args, Options ops, int func)
 {
     char **aptr, *arrnam = NULL, **array = NULL, **arrptr = NULL;
     char *hashnam = NULL, **hash = NULL, **hashptr = NULL;
@@ -376,12 +376,12 @@ bin_stat(char *name, char **args, char *ops, int func)
 	    }
 	    /* if name of link requested, turn on lstat */
 	    if (iwhich == ST_READLINK)
-		ops['L'] = 1;
+		ops->ind['L'] = 1;
 	    flags |= STF_PICK;
 	} else {
 	    for (; *arg; arg++) {
 		if (strchr("glLnNorstT", *arg))
-		    ops[STOUC(*arg)] = 1;
+		    ops->ind[STOUC(*arg)] = 1;
 		else if (*arg == 'A') {
 		    if (arg[1]) {
 			arrnam = arg+1;
@@ -404,7 +404,7 @@ bin_stat(char *name, char **args, char *ops, int func)
 		    break;
 		} else if (*arg == 'f') {
 		    char *sfd;
-		    ops['f'] = 1;
+		    ops->ind['f'] = 1;
 		    if (arg[1]) {
 			sfd = arg+1;
 		    } else if (!(sfd = *++args)) {
@@ -425,7 +425,7 @@ bin_stat(char *name, char **args, char *ops, int func)
 			return 1;
 		    }
 		    /* force string format in order to use time format */
-		    ops['s'] = 1;
+		    ops->ind['s'] = 1;
 		    break;
 		} else {
 		    zwarnnam(name, "bad option: -%c", NULL, *arg);
@@ -444,7 +444,7 @@ bin_stat(char *name, char **args, char *ops, int func)
 	 * be similar to stat -A foo -A bar filename                 */
     }
 
-    if (ops['l']) {
+    if (OPT_ISSET(ops,'l')) {
 	/* list types and return:  can also list to array */
 	if (arrnam) {
 	    arrptr = array = (char **)zalloc((ST_COUNT+1)*sizeof(char *));
@@ -468,34 +468,34 @@ bin_stat(char *name, char **args, char *ops, int func)
 	return 0;
     }
 
-    if (!*args && !ops['f']) {
+    if (!*args && !OPT_ISSET(ops,'f')) {
 	zwarnnam(name, "no files given", NULL, 0);
 	return 1;
-    } else if (*args && ops['f']) {
+    } else if (*args && OPT_ISSET(ops,'f')) {
 	zwarnnam(name, "no files allowed with -f", NULL, 0);
 	return 1;
     }
 
     nargs = 0;
-    if (ops['f'])
+    if (OPT_ISSET(ops,'f'))
 	nargs = 1;
     else
 	for (aptr = args; *aptr; aptr++)
 	    nargs++;
 
-    if (ops['g']) {
+    if (OPT_ISSET(ops,'g')) {
 	flags |= STF_GMT;
-	ops['s'] = 1;
+	ops->ind['s'] = 1;
     }
-    if (ops['s'] || ops['r'])
+    if (OPT_ISSET(ops,'s') || OPT_ISSET(ops,'r'))
 	flags |= STF_STRING;
-    if (ops['r'] || !ops['s'])
+    if (OPT_ISSET(ops,'r') || !OPT_ISSET(ops,'s'))
 	flags |= STF_RAW;
-    if (ops['n'])
+    if (OPT_ISSET(ops,'n'))
 	flags |= STF_FILE;
-    if (ops['o'])
+    if (OPT_ISSET(ops,'o'))
 	flags |= STF_OCTAL;
-    if (ops['t'])
+    if (OPT_ISSET(ops,'t'))
 	flags |= STF_NAME;
 
     if (!(arrnam || hashnam)) {
@@ -505,9 +505,9 @@ bin_stat(char *name, char **args, char *ops, int func)
 	    flags |= STF_NAME;
     }
 
-    if (ops['N'] || ops['f'])
+    if (OPT_ISSET(ops,'N') || OPT_ISSET(ops,'f'))
 	flags &= ~STF_FILE;
-    if (ops['T'] || ops['H'])
+    if (OPT_ISSET(ops,'T') || OPT_ISSET(ops,'H'))
 	flags &= ~STF_NAME;
 
     if (hashnam) {
@@ -529,16 +529,18 @@ bin_stat(char *name, char **args, char *ops, int func)
 	arrptr = array = (char **)zcalloc((arrsize+1)*sizeof(char *));
     }
 
-    for (; ops['f'] || *args; args++) {
+    for (; OPT_ISSET(ops,'f') || *args; args++) {
 	char outbuf[PATH_MAX + 9]; /* "link   " + link name + NULL */
-	int rval = ops['f'] ? fstat(fd, &statbuf) :
-	    ops['L'] ? lstat(*args, &statbuf) : stat(*args, &statbuf);
+	int rval = OPT_ISSET(ops,'f') ? fstat(fd, &statbuf) :
+	    OPT_ISSET(ops,'L') ? lstat(*args, &statbuf) :
+	    stat(*args, &statbuf);
 	if (rval) {
-	    if (ops['f'])
+	    if (OPT_ISSET(ops,'f'))
 		sprintf(outbuf, "%d", fd);
-	    zwarnnam(name, "%s: %e", ops['f'] ? outbuf : *args, errno);
+	    zwarnnam(name, "%s: %e", OPT_ISSET(ops,'f') ? outbuf : *args,
+		     errno);
 	    ret = 1;
-	    if (ops['f'] || arrnam)
+	    if (OPT_ISSET(ops,'f') || arrnam)
 		break;
 	    else
 		continue;
@@ -558,7 +560,7 @@ bin_stat(char *name, char **args, char *ops, int func)
 	    if (arrnam)
 		*arrptr++ = ztrdup(outbuf);
 	    else if (hashnam) {
-		/* STF_NAME explicitly turned off for ops['H'] above */
+		/* STF_NAME explicitly turned off for ops.ind['H'] above */
 	    	*hashptr++ = ztrdup(statelts[iwhich]);
 		*hashptr++ = ztrdup(outbuf);
 	    } else
@@ -570,14 +572,14 @@ bin_stat(char *name, char **args, char *ops, int func)
 		if (arrnam)
 		    *arrptr++= ztrdup(outbuf);
 		else if (hashnam) {
-		    /* STF_NAME explicitly turned off for ops['H'] above */
+		    /* STF_NAME explicitly turned off for ops.ind['H'] above */
 		    *hashptr++ = ztrdup(statelts[i]);
 		    *hashptr++ = ztrdup(outbuf);
 		} else
 		    printf("%s\n", outbuf);
 	    }
 	}
-	if (ops['f'])
+	if (OPT_ISSET(ops,'f'))
 	    break;
 
 	if (!arrnam && !hashnam && args[1] && !(flags & STF_PICK))

@@ -481,7 +481,7 @@ setoption(HashNode hn, int value)
 
 /**/
 int
-bin_setopt(char *nam, char **args, char *ops, int isun)
+bin_setopt(char *nam, char **args, Options ops, int isun)
 {
     int action, optno, match = 0;
 

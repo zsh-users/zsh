@@ -48,15 +48,16 @@
 #define BIN_EVAL     14
 #define BIN_SCHED    15
 #define BIN_FC       16
-#define BIN_PUSHLINE 17
-#define BIN_LOGOUT   18
-#define BIN_TEST     19
-#define BIN_BRACKET  20
-#define BIN_EXPORT   21
-#define BIN_ECHO     22
-#define BIN_DISABLE  23
-#define BIN_ENABLE   24
-#define BIN_PRINTF   25
+#define BIN_R	     17
+#define BIN_PUSHLINE 18
+#define BIN_LOGOUT   19
+#define BIN_TEST     20
+#define BIN_BRACKET  21
+#define BIN_EXPORT   22
+#define BIN_ECHO     23
+#define BIN_DISABLE  24
+#define BIN_ENABLE   25
+#define BIN_PRINTF   26
 
 /* These currently depend on being 0 and 1. */
 #define BIN_SETOPT    0

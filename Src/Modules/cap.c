@@ -33,7 +33,7 @@
 #ifdef HAVE_CAP_GET_PROC
 
 static int
-bin_cap(char *nam, char **argv, char *ops, int func)
+bin_cap(char *nam, char **argv, Options ops, int func)
 {
     int ret = 0;
     cap_t caps;
@@ -48,7 +48,7 @@ bin_cap(char *nam, char **argv, char *ops, int func)
 	    ret = 1;
 	}
     } else {
-	char *result;
+	char *result = NULL;
 	ssize_t length;
 	caps = cap_get_proc();
 	if(caps)
@@ -59,17 +59,17 @@ bin_cap(char *nam, char **argv, char *ops, int func)
 	} else
 	    puts(result);
     }
-    cap_free(&caps);
+    cap_free(caps);
     return ret;
 }
 
 static int
-bin_getcap(char *nam, char **argv, char *ops, int func)
+bin_getcap(char *nam, char **argv, Options ops, int func)
 {
     int ret = 0;
 
     do {
-	char *result;
+	char *result = NULL;
 	ssize_t length;
 	cap_t caps = cap_get_file(*argv);
 	if(caps)
@@ -79,13 +79,13 @@ bin_getcap(char *nam, char **argv, char *ops, int func)
 	    ret = 1;
 	} else
 	    printf("%s %s\n", *argv, result);
-	cap_free(&caps);
+	cap_free(caps);
     } while(*++argv);
     return ret;
 }
 
 static int
-bin_setcap(char *nam, char **argv, char *ops, int func)
+bin_setcap(char *nam, char **argv, Options ops, int func)
 {
     cap_t caps;
     int ret = 0;
@@ -102,7 +102,7 @@ bin_setcap(char *nam, char **argv, char *ops, int func)
 	    ret = 1;
 	}
     } while(*++argv);
-    cap_free(&caps);
+    cap_free(caps);
     return ret;
 }
 
@@ -124,18 +124,29 @@ static struct builtin bintab[] = {
 
 /**/
 int
-boot_cap(Module m)
+setup_(Module m)
+{
+    return 0;
+}
+
+/**/
+int
+boot_(Module m)
 {
     return !addbuiltins(m->nam, bintab, sizeof(bintab)/sizeof(*bintab));
 }
 
-#ifdef MODULE
-
 /**/
 int
-cleanup_cap(Module m)
+cleanup_(Module m)
 {
     deletebuiltins(m->nam, bintab, sizeof(bintab)/sizeof(*bintab));
     return 0;
 }
-#endif
+
+/**/
+int
+finish_(Module m)
+{
+    return 0;
+}

@@ -1175,7 +1175,7 @@ mod_export CompctlReadFn compctlreadptr = fallback_compctlread;
 
 /**/
 mod_export int
-fallback_compctlread(char *name, char **args, char *ops, char *reply)
+fallback_compctlread(char *name, char **args, Options ops, char *reply)
 {
     zwarnnam(name, "option valid only in functions called from completion",
 	    NULL, 0);

@@ -58,7 +58,7 @@
 #endif
 
 static int
-bin_zsocket(char *nam, char **args, char *ops, int func)
+bin_zsocket(char *nam, char **args, Options ops, int func)
 {
     int err=1, verbose=0, test=0, targetfd=0;
     SOCKLEN_T len;
@@ -66,13 +66,13 @@ bin_zsocket(char *nam, char **args, char *ops, int func)
     struct sockaddr_un soun;
     int sfd;
 
-    if (ops['v'])
+    if (OPT_ISSET(ops,'v'))
 	verbose = 1;
 
-    if (ops['t'])
+    if (OPT_ISSET(ops,'t'))
 	test = 1;
 
-    if (ops['d']) {
+    if (OPT_ISSET(ops,'d')) {
 	targetfd = atoi(args[0]);
 	dargs = args + 1;
 	if (!targetfd) {
@@ -84,7 +84,7 @@ bin_zsocket(char *nam, char **args, char *ops, int func)
 	dargs = args;
 
 
-    if (ops['l']) {
+    if (OPT_ISSET(ops,'l')) {
 	char *localfn;
 
 	if (!dargs[0]) {
@@ -135,7 +135,7 @@ bin_zsocket(char *nam, char **args, char *ops, int func)
 	return 0;
 
     }
-    else if (ops['a'])
+    else if (OPT_ISSET(ops,'a'))
     {
 	int lfd, rfd;
 

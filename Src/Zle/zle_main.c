@@ -951,7 +951,7 @@ mod_export char *varedarg;
 
 /**/
 static int
-bin_vared(char *name, char **args, char *ops, int func)
+bin_vared(char *name, char **args, Options ops, int func)
 {
     char *s, *t, *ova = varedarg;
     struct value vbuf;
@@ -1012,11 +1012,11 @@ bin_vared(char *name, char **args, char *ops, int func)
 		break;
 	    case 'h':
 		/* -h option -- enable history */
-		ops['h'] = 1;
+		ops->ind['h'] = 1;
 		break;
 	    case 'e':
 		/* -e option -- enable EOF */
-		ops['e'] = 1;
+		ops->ind['e'] = 1;
 		break;
 	    default:
 		/* unrecognised option character */
@@ -1113,14 +1113,14 @@ bin_vared(char *name, char **args, char *ops, int func)
 
     varedarg = *args;
     ifl = isfirstln;
-    if (ops['h'])
+    if (OPT_ISSET(ops,'h'))
 	hbegin(2);
-    isfirstln = ops['e'];
+    isfirstln = OPT_ISSET(ops,'e');
     ieof = opts[IGNOREEOF];
     opts[IGNOREEOF] = 0;
-    t = (char *) zleread(p1, p2, ops['h'] ? ZLRF_HISTORY : 0);
+    t = (char *) zleread(p1, p2, OPT_ISSET(ops,'h') ? ZLRF_HISTORY : 0);
     opts[IGNOREEOF] = ieof;
-    if (ops['h'])
+    if (OPT_ISSET(ops,'h'))
 	hend(NULL);
     isfirstln = ifl;
     varedarg = ova;

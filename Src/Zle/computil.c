@@ -717,7 +717,7 @@ cd_get(char **params)
 
 /**/
 static int
-bin_compdescribe(char *nam, char **args, char *ops, int func)
+bin_compdescribe(char *nam, char **args, Options ops, int func)
 {
     int n = arrlen(args);
 
@@ -2259,7 +2259,7 @@ ca_set_data(LinkList descr, LinkList act, LinkList subc,
 }
 
 static int
-bin_comparguments(char *nam, char **args, char *ops, int func)
+bin_comparguments(char *nam, char **args, Options ops, int func)
 {
     int min, max, n;
     Castate lstate = &ca_laststate;
@@ -3136,7 +3136,7 @@ cv_parse_word(Cvdef d)
 }
 
 static int
-bin_compvalues(char *nam, char **args, char *ops, int func)
+bin_compvalues(char *nam, char **args, Options ops, int func)
 {
     int min, max, n;
 
@@ -3349,7 +3349,7 @@ comp_quote(char *str, int prefix)
 }
 
 static int
-bin_compquote(char *nam, char **args, char *ops, int func)
+bin_compquote(char *nam, char **args, Options ops, int func)
 {
     char *name;
     struct value vbuf;
@@ -3372,7 +3372,8 @@ bin_compquote(char *nam, char **args, char *ops, int func)
 	if ((v = getvalue(&vbuf, &name, 0))) {
 	    switch (PM_TYPE(v->pm->flags)) {
 	    case PM_SCALAR:
-		setstrvalue(v, ztrdup(comp_quote(getstrvalue(v), ops['p'])));
+		setstrvalue(v, ztrdup(comp_quote(getstrvalue(v), 
+						 OPT_ISSET(ops,'p'))));
 		break;
 	    case PM_ARRAY:
 		{
@@ -3382,7 +3383,7 @@ bin_compquote(char *nam, char **args, char *ops, int func)
 		    char **p = new;
 
 		    for (; *val; val++, p++)
-			*p = ztrdup(comp_quote(*val, ops['p']));
+			*p = ztrdup(comp_quote(*val, OPT_ISSET(ops,'p')));
 		    *p = NULL;
 
 		    setarrvalue(v, new);
@@ -3499,7 +3500,7 @@ arrcontains(char **a, char *s, int colon)
 }
 
 static int
-bin_comptags(char *nam, char **args, char *ops, int func)
+bin_comptags(char *nam, char **args, Options ops, int func)
 {
     int min, max, n, level;
 
@@ -3629,7 +3630,7 @@ bin_comptags(char *nam, char **args, char *ops, int func)
 }
 
 static int
-bin_comptry(char *nam, char **args, char *ops, int func)
+bin_comptry(char *nam, char **args, Options ops, int func)
 {
     if (incompfunc != 1) {
 	zwarnnam(nam, "can only be called from completion function", NULL, 0);
@@ -4321,7 +4322,7 @@ cf_remove_other(char **names, char *pre, int *amb)
 }
 
 static int
-bin_compfiles(char *nam, char **args, char *ops, int func)
+bin_compfiles(char *nam, char **args, Options ops, int func)
 {
     if (incompfunc != 1) {
 	zwarnnam(nam, "can only be called from completion function", NULL, 0);
@@ -4423,7 +4424,7 @@ bin_compfiles(char *nam, char **args, char *ops, int func)
 }
 
 static int
-bin_compgroups(char *nam, char **args, char *ops, int func)
+bin_compgroups(char *nam, char **args, Options ops, int func)
 {
     Heap oldheap;
     char *n;

@@ -187,7 +187,7 @@ freecompcond(void *a)
 
 /**/
 int
-compctlread(char *name, char **args, char *ops, char *reply)
+compctlread(char *name, char **args, Options ops, char *reply)
 {
     char *buf, *bptr;
 
@@ -198,15 +198,15 @@ compctlread(char *name, char **args, char *ops, char *reply)
 	return 1;
     }
 
-    if (ops['l']) {
+    if (OPT_ISSET(ops,'l')) {
 	/* -ln gives the index of the word the cursor is currently on, which is
 	available in cs (but remember that Zsh counts from one, not zero!) */
-	if (ops['n']) {
+	if (OPT_ISSET(ops,'n')) {
 	    char nbuf[14];
 
-	    if (ops['e'] || ops['E'])
+	    if (OPT_ISSET(ops,'e') || OPT_ISSET(ops,'E'))
 		printf("%d\n", cs + 1);
-	    if (!ops['e']) {
+	    if (!OPT_ISSET(ops,'e')) {
 		sprintf(nbuf, "%d", cs + 1);
 		setsparam(reply, ztrdup(nbuf));
 	    }
@@ -214,11 +214,11 @@ compctlread(char *name, char **args, char *ops, char *reply)
 	}
 	/* without -n, the current line is assigned to the given parameter as a
 	scalar */
-	if (ops['e'] || ops['E']) {
+	if (OPT_ISSET(ops,'e') || OPT_ISSET(ops,'E')) {
 	    zputs((char *) line, stdout);
 	    putchar('\n');
 	}
-	if (!ops['e'])
+	if (!OPT_ISSET(ops,'e'))
 	    setsparam(reply, ztrdup((char *) line));
     } else {
 	int i;
@@ -226,12 +226,12 @@ compctlread(char *name, char **args, char *ops, char *reply)
 	/* -cn gives the current cursor position within the current word, which
 	is available in clwpos (but remember that Zsh counts from one, not
 	zero!) */
-	if (ops['n']) {
+	if (OPT_ISSET(ops,'n')) {
 	    char nbuf[14];
 
-	    if (ops['e'] || ops['E'])
+	    if (OPT_ISSET(ops,'e') || OPT_ISSET(ops,'E'))
 		printf("%d\n", clwpos + 1);
-	    if (!ops['e']) {
+	    if (!OPT_ISSET(ops,'e')) {
 		sprintf(nbuf, "%d", clwpos + 1);
 		setsparam(reply, ztrdup(nbuf));
 	    }
@@ -239,7 +239,7 @@ compctlread(char *name, char **args, char *ops, char *reply)
 	}
 	/* without -n, the words of the current line are assigned to the given
 	parameters separately */
-	if (ops['A'] && !ops['e']) {
+	if (OPT_ISSET(ops,'A') && !OPT_ISSET(ops,'e')) {
 	    /* the -A option means that one array is specified, instead of
 	    many parameters */
 	    char **p, **b = (char **)zcalloc((clwnum + 1) * sizeof(char *));
@@ -250,13 +250,13 @@ compctlread(char *name, char **args, char *ops, char *reply)
 	    setaparam(reply, b);
 	    return 0;
 	}
-	if (ops['e'] || ops['E']) {
+	if (OPT_ISSET(ops,'e') || OPT_ISSET(ops,'E')) {
 	    for (i = 0; i < clwnum; i++) {
 		zputs(clwords[i], stdout);
 		putchar('\n');
 	    }
 
-	    if (ops['e'])
+	    if (OPT_ISSET(ops,'e'))
 		return 0;
 	}
 
@@ -1572,7 +1572,7 @@ printcompctlp(HashNode hn, int printflags)
 
 /**/
 static int
-bin_compctl(char *name, char **argv, char *ops, int func)
+bin_compctl(char *name, char **argv, Options ops, int func)
 {
     Compctl cc = NULL;
     int ret = 0;
@@ -1678,14 +1678,14 @@ bin_compctl(char *name, char **argv, char *ops, int func)
 #define CFN_DEFAULT 2
 
 static int
-bin_compcall(char *name, char **argv, char *ops, int func)
+bin_compcall(char *name, char **argv, Options ops, int func)
 {
     if (incompfunc != 1) {
 	zwarnnam(name, "can only be called from completion function", NULL, 0);
 	return 1;
     }
-    return makecomplistctl((ops['T'] ? 0 : CFN_FIRST) |
-			   (ops['D'] ? 0 : CFN_DEFAULT));
+    return makecomplistctl((OPT_ISSET(ops,'T') ? 0 : CFN_FIRST) |
+			   (OPT_ISSET(ops,'D') ? 0 : CFN_DEFAULT));
 }
 
 /*

@@ -603,20 +603,23 @@ ptywrite(Ptycmd cmd, char **args, int nonl)
 
 /**/
 static int
-bin_zpty(char *nam, char **args, char *ops, int func)
+bin_zpty(char *nam, char **args, Options ops, int func)
 {
-    if ((ops['r'] && ops['w']) ||
-	((ops['r'] || ops['w']) && (ops['d'] || ops['e'] ||
-				    ops['b'] || ops['L'])) ||
-	(ops['w'] && ops['t']) ||
-	(ops['n'] && (ops['b'] || ops['e'] || ops['r'] || ops['t'] ||
-		      ops['d'] || ops['L'])) ||
-	(ops['d'] && (ops['b'] || ops['e'] || ops['L'] || ops['t'])) ||
-	(ops['L'] && (ops['b'] || ops['e']))) {
+    if ((OPT_ISSET(ops,'r') && OPT_ISSET(ops,'w')) ||
+	((OPT_ISSET(ops,'r') || OPT_ISSET(ops,'w')) && 
+	 (OPT_ISSET(ops,'d') || OPT_ISSET(ops,'e') ||
+	  OPT_ISSET(ops,'b') || OPT_ISSET(ops,'L'))) ||
+	(OPT_ISSET(ops,'w') && OPT_ISSET(ops,'t')) ||
+	(OPT_ISSET(ops,'n') && (OPT_ISSET(ops,'b') || OPT_ISSET(ops,'e') ||
+				OPT_ISSET(ops,'r') || OPT_ISSET(ops,'t') ||
+				OPT_ISSET(ops,'d') || OPT_ISSET(ops,'L'))) ||
+	(OPT_ISSET(ops,'d') && (OPT_ISSET(ops,'b') || OPT_ISSET(ops,'e') ||
+				OPT_ISSET(ops,'L') || OPT_ISSET(ops,'t'))) ||
+	(OPT_ISSET(ops,'L') && (OPT_ISSET(ops,'b') || OPT_ISSET(ops,'e')))) {
 	zwarnnam(nam, "illegal option combination", NULL, 0);
 	return 1;
     }
-    if (ops['r'] || ops['w']) {
+    if (OPT_ISSET(ops,'r') || OPT_ISSET(ops,'w')) {
 	Ptycmd p;
 
 	if (!*args) {
@@ -628,13 +631,14 @@ bin_zpty(char *nam, char **args, char *ops, int func)
 	}
 	if (p->fin)
 	    return 2;
-	if (ops['t'] && p->read == -1 && !read_poll(p->fd, &p->read, 0))
+	if (OPT_ISSET(ops,'t') && p->read == -1 &&
+	    !read_poll(p->fd, &p->read, 0))
 	    return 1;
 
-	return (ops['r'] ?
+	return (OPT_ISSET(ops,'r') ?
 		ptyread(nam, p, args + 1) :
-		ptywrite(p, args + 1, ops['n']));
-    } else if (ops['d']) {
+		ptywrite(p, args + 1, OPT_ISSET(ops,'n')));
+    } else if (OPT_ISSET(ops,'d')) {
 	Ptycmd p;
 	int ret = 0;
 
@@ -650,7 +654,7 @@ bin_zpty(char *nam, char **args, char *ops, int func)
 	    deleteallptycmds();
 
 	return ret;
-    } else if (ops['t']) {
+    } else if (OPT_ISSET(ops,'t')) {
 	Ptycmd p;
 
 	if (!*args) {
@@ -671,14 +675,15 @@ bin_zpty(char *nam, char **args, char *ops, int func)
 	    zwarnnam(nam, "pty command name already used: %s", *args, 0);
 	    return 1;
 	}
-	return newptycmd(nam, *args, args + 1, ops['e'], ops['b']);
+	return newptycmd(nam, *args, args + 1, OPT_ISSET(ops,'e'), 
+			 OPT_ISSET(ops,'b'));
     } else {
 	Ptycmd p;
 	char **a;
 
 	for (p = ptycmds; p; p = p->next) {
 	    checkptycmd(p);
-	    if (ops['L'])
+	    if (OPT_ISSET(ops,'L'))
 		printf("%s %s%s%s ", nam, (p->echo ? "-e " : ""),
 		       (p->nblock ? "-b " : ""), p->name);
 	    else if (p->fin)

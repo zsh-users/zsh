@@ -46,14 +46,14 @@ static struct builtin builtins[] =
     BUILTIN(".", BINF_PSPECIAL, bin_dot, 1, -1, 0, NULL, NULL),
     BUILTIN(":", BINF_PSPECIAL, bin_true, 0, -1, 0, NULL, NULL),
     BUILTIN("alias", BINF_MAGICEQUALS | BINF_PLUSOPTS, bin_alias, 0, -1, 0, "Lgmr", NULL),
-    BUILTIN("autoload", BINF_TYPEOPTS, bin_functions, 0, -1, 0, "tUXwkz", "u"),
+    BUILTIN("autoload", BINF_PLUSOPTS, bin_functions, 0, -1, 0, "tUXwkz", "u"),
     BUILTIN("bg", 0, bin_fg, 0, -1, BIN_BG, NULL, NULL),
     BUILTIN("break", BINF_PSPECIAL, bin_break, 0, 1, BIN_BREAK, NULL, NULL),
     BUILTIN("bye", 0, bin_break, 0, 1, BIN_EXIT, NULL, NULL),
     BUILTIN("cd", 0, bin_cd, 0, 2, BIN_CD, NULL, NULL),
     BUILTIN("chdir", 0, bin_cd, 0, 2, BIN_CD, NULL, NULL),
     BUILTIN("continue", BINF_PSPECIAL, bin_break, 0, 1, BIN_CONTINUE, NULL, NULL),
-    BUILTIN("declare", BINF_TYPEOPTS | BINF_MAGICEQUALS | BINF_PSPECIAL, bin_typeset, 0, -1, 0, "AEFHLRTUZafghilprtux", NULL),
+    BUILTIN("declare", BINF_PLUSOPTS | BINF_MAGICEQUALS | BINF_PSPECIAL, bin_typeset, 0, -1, 0, "AE:%F:%HL:%R:%TUZ:%afghi:%lprtux", NULL),
     BUILTIN("dirs", 0, bin_dirs, 0, -1, 0, "clpv", NULL),
     BUILTIN("disable", 0, bin_enable, 0, -1, BIN_DISABLE, "afmr", NULL),
     BUILTIN("disown", 0, bin_fg, 0, -1, BIN_DISOWN, NULL, NULL),
@@ -62,12 +62,18 @@ static struct builtin builtins[] =
     BUILTIN("enable", 0, bin_enable, 0, -1, BIN_ENABLE, "afmr", NULL),
     BUILTIN("eval", BINF_PSPECIAL, bin_eval, 0, -1, BIN_EVAL, NULL, NULL),
     BUILTIN("exit", BINF_PSPECIAL, bin_break, 0, 1, BIN_EXIT, NULL, NULL),
-    BUILTIN("export", BINF_TYPEOPTS | BINF_MAGICEQUALS | BINF_PSPECIAL, bin_typeset, 0, -1, BIN_EXPORT, "EFHLRTUZafhilprtu", "xg"),
+    BUILTIN("export", BINF_PLUSOPTS | BINF_MAGICEQUALS | BINF_PSPECIAL, bin_typeset, 0, -1, BIN_EXPORT, "E:%F:%HL:%R:%TUZ:%afhi:%lprtu", "xg"),
     BUILTIN("false", 0, bin_false, 0, -1, 0, NULL, NULL),
-    BUILTIN("fc", BINF_FCOPTS, bin_fc, 0, -1, BIN_FC, "nlreIRWAdDfEim", NULL),
+    /*
+     * We used to behave as if the argument to -e was optional.
+     * But that's actually not useful, so it's more consistent to
+     * cause an error.
+     */
+    BUILTIN("fc", 0, bin_fc, 0, -1, BIN_FC, "nlre:IRWAdDfEim",
+	    NULL),
     BUILTIN("fg", 0, bin_fg, 0, -1, BIN_FG, NULL, NULL),
-    BUILTIN("float", BINF_TYPEOPTS | BINF_MAGICEQUALS | BINF_PSPECIAL, bin_typeset, 0, -1, 0, "EFHghlprtux", "E"),
-    BUILTIN("functions", BINF_TYPEOPTS, bin_functions, 0, -1, 0, "mtuU", NULL),
+    BUILTIN("float", BINF_PLUSOPTS | BINF_MAGICEQUALS | BINF_PSPECIAL, bin_typeset, 0, -1, 0, "E:%F:%Hghlprtux", "E"),
+    BUILTIN("functions", BINF_PLUSOPTS, bin_functions, 0, -1, 0, "mtuU", NULL),
     BUILTIN("getln", 0, bin_read, 0, -1, 0, "ecnAlE", "zr"),
     BUILTIN("getopts", 0, bin_getopts, 2, -1, 0, NULL, NULL),
     BUILTIN("hash", BINF_MAGICEQUALS, bin_hash, 0, -1, 0, "Ldfmrv", NULL),
@@ -77,11 +83,11 @@ static struct builtin builtins[] =
 #endif
 
     BUILTIN("history", 0, bin_fc, 0, -1, BIN_FC, "nrdDfEim", "l"),
-    BUILTIN("integer", BINF_TYPEOPTS | BINF_MAGICEQUALS | BINF_PSPECIAL, bin_typeset, 0, -1, 0, "Hghilprtux", "i"),
+    BUILTIN("integer", BINF_PLUSOPTS | BINF_MAGICEQUALS | BINF_PSPECIAL, bin_typeset, 0, -1, 0, "Hghi:%lprtux", "i"),
     BUILTIN("jobs", 0, bin_fg, 0, -1, BIN_JOBS, "dlpZrs", NULL),
     BUILTIN("kill", 0, bin_kill, 0, -1, 0, NULL, NULL),
     BUILTIN("let", 0, bin_let, 1, -1, 0, NULL, NULL),
-    BUILTIN("local", BINF_TYPEOPTS | BINF_MAGICEQUALS | BINF_PSPECIAL, bin_typeset, 0, -1, 0, "AEFHLRTUZahilprtux", NULL),
+    BUILTIN("local", BINF_PLUSOPTS | BINF_MAGICEQUALS | BINF_PSPECIAL, bin_typeset, 0, -1, 0, "AE:%F:%HL:%R:%TUZ:%ahi:%lprtux", NULL),
     BUILTIN("log", 0, bin_log, 0, 0, 0, NULL, NULL),
     BUILTIN("logout", 0, bin_break, 0, 1, BIN_LOGOUT, NULL, NULL),
 
@@ -94,14 +100,14 @@ static struct builtin builtins[] =
 #endif
 
     BUILTIN("popd", 0, bin_cd, 0, 2, BIN_POPD, NULL, NULL),
-    BUILTIN("print", BINF_PRINTOPTS, bin_print, 0, -1, BIN_PRINT, "RDPbnrsflzNu0123456789pioOcm-", NULL),
+    BUILTIN("print", BINF_PRINTOPTS, bin_print, 0, -1, BIN_PRINT, "RDPbnrsf:lzNu:pioOcm-", NULL),
     BUILTIN("printf", 0, bin_print, 1, -1, BIN_PRINTF, NULL, NULL),
     BUILTIN("pushd", 0, bin_cd, 0, 2, BIN_PUSHD, NULL, NULL),
     BUILTIN("pushln", BINF_PRINTOPTS, bin_print, 0, -1, BIN_PRINT, NULL, "-nz"),
     BUILTIN("pwd", 0, bin_pwd, 0, 0, 0, "rLP", NULL),
-    BUILTIN("r", BINF_R, bin_fc, 0, -1, BIN_FC, "nrl", NULL),
-    BUILTIN("read", 0, bin_read, 0, -1, 0, "ceklnpqrstzuAE0123456789", NULL),
-    BUILTIN("readonly", BINF_TYPEOPTS | BINF_MAGICEQUALS | BINF_PSPECIAL, bin_typeset, 0, -1, 0, "AEFHLRTUZafghilptux", "r"),
+    BUILTIN("r", 0, bin_fc, 0, -1, BIN_R, "nrl", NULL),
+    BUILTIN("read", 0, bin_read, 0, -1, 0, "cek:%lnpqrstzu:AE", NULL),
+    BUILTIN("readonly", BINF_PLUSOPTS | BINF_MAGICEQUALS | BINF_PSPECIAL, bin_typeset, 0, -1, 0, "AE:%F:%HL:%R:%TUZ:%afghi:%lptux", "r"),
     BUILTIN("rehash", 0, bin_hash, 0, 0, 0, "df", "r"),
     BUILTIN("return", BINF_PSPECIAL, bin_break, 0, 1, BIN_RETURN, NULL, NULL),
     BUILTIN("set", BINF_PSPECIAL, bin_set, 0, -1, 0, NULL, NULL),
@@ -115,7 +121,7 @@ static struct builtin builtins[] =
     BUILTIN("trap", BINF_PSPECIAL, bin_trap, 0, -1, 0, NULL, NULL),
     BUILTIN("true", 0, bin_true, 0, -1, 0, NULL, NULL),
     BUILTIN("type", 0, bin_whence, 0, -1, 0, "ampfsw", "v"),
-    BUILTIN("typeset", BINF_TYPEOPTS | BINF_MAGICEQUALS | BINF_PSPECIAL, bin_typeset, 0, -1, 0, "AEFHLRTUZafghilprtuxm", NULL),
+    BUILTIN("typeset", BINF_PLUSOPTS | BINF_MAGICEQUALS | BINF_PSPECIAL, bin_typeset, 0, -1, 0, "AE:%F:%HL:%R:%TUZ:%afghi:%lprtuxm", NULL),
     BUILTIN("umask", 0, bin_umask, 0, 1, 0, "S", NULL),
     BUILTIN("unalias", 0, bin_unhash, 1, -1, 0, "m", "a"),
     BUILTIN("unfunction", 0, bin_unhash, 1, -1, 0, "m", "f"),
@@ -201,29 +207,49 @@ freebuiltinnode(HashNode hn)
     }
 }
 
-static char *auxdata;
-static int auxlen;
+/* Make sure we have space for a new option and increment. */
+
+#define OPT_ALLOC_CHUNK 16
+
+/**/
+static int
+new_optarg(Options ops)
+{
+    /* Argument index must be a non-zero 6-bit number. */
+    if (ops->argscount == 63)
+	return 1;
+    if (ops->argsalloc == ops->argscount) {
+	char **newptr = 
+	    (char **)zhalloc((ops->argsalloc + OPT_ALLOC_CHUNK) *
+			     sizeof(char *));
+	if (ops->argsalloc)
+	    memcpy(newptr, ops->args, ops->argsalloc * sizeof(char *));
+	ops->args = newptr;
+	ops->argsalloc += OPT_ALLOC_CHUNK;
+    }
+    ops->argscount++;
+    return 0;
+}
+
 
 /* execute a builtin handler function after parsing the arguments */
-
-#define MAX_OPS 128
 
 /**/
 int
 execbuiltin(LinkList args, Builtin bn)
 {
     LinkNode n;
-    char ops[MAX_OPS], *arg, *pp, *name, *optstr;
+    char *arg, *pp, *name, *optstr;
     char *oxarg, *xarg = NULL;
-    char typenumstr[] = TYPESET_OPTNUM;
     int flags, sense, argc = 0, execop, xtr = isset(XTRACE), lxarg = 0;
+    struct options ops;
 
-    /* initialise some static variables */
-    auxdata = NULL;
-    auxlen = 0;
+    /* initialise options structure */
+    memset(ops.ind, 0, MAX_OPS*sizeof(unsigned char));
+    ops.args = NULL;
+    ops.argscount = ops.argsalloc = 0;
 
     /* initialize some local variables */
-    memset(ops, 0, MAX_OPS);
     name = (char *) ugetnode(args);
 
     arg = (char *) ugetnode(args);
@@ -239,7 +265,7 @@ execbuiltin(LinkList args, Builtin bn)
 
     /* Sort out the options. */
     if ((flags & BINF_ECHOPTS) && isset(BSDECHO))
-	ops['E'] = 1;
+	ops.ind['E'] = 1;
     if (optstr)
 	/* while arguments look like options ... */
 	while (arg &&
@@ -269,26 +295,62 @@ execbuiltin(LinkList args, Builtin bn)
 		    lxarg = strlen(xarg);
 		}
 	    }
-	    /* handle -- or - (ops['-']), and + (ops['-'] and ops['+']) */
+	    /* handle -- or - (ops.ind['-']), and +
+	     * (ops.ind['-'] and ops.ind['+']) */
 	    if (arg[1] == '-')
 		arg++;
 	    if (!arg[1]) {
-		ops['-'] = 1;
+		ops.ind['-'] = 1;
 		if (!sense)
-		    ops['+'] = 1;
+		    ops.ind['+'] = 1;
 	    }
 	    /* save options in ops, as long as they are in bn->optstr */
 	    execop = -1;
-	    while (*++arg)
-		if (strchr(optstr, execop = (int)*arg))
-		    ops[(int)*arg] = (sense) ? 1 : 2;
-		else
+	    while (*++arg) {
+		char *optptr;
+		if ((optptr = strchr(optstr, execop = (int)*arg))) {
+		    ops.ind[(int)*arg] = (sense) ? 1 : 2;
+		    if (optptr[1] == ':') {
+			char *argptr = NULL;
+			if (optptr[2] == ':') {
+			    if (arg[1])
+				argptr = arg+1;
+			    /* Optional argument in same word*/
+			} else if (optptr[2] == '%') {
+			    /* Optional numeric argument in same
+			     * or next word. */
+			    if (arg[1] && idigit(arg[1]))
+				argptr = arg+1;
+			    else if (firstnode(args) &&
+				     idigit(*(char *)peekfirst(args)))
+				argptr = arg = (char *)ugetnode(args);
+			} else {
+			    /* Mandatory argument */
+			    if (arg[1])
+				argptr = arg+1;
+			    else if ((arg = (char *)ugetnode(args)))
+				argptr = arg;
+			    else {
+				zwarnnam(name, "argument expected: -%c", NULL,
+					 execop);
+				return 1;
+			    }
+			}
+			if (argptr) {
+			    if (new_optarg(&ops)) {
+				zwarnnam(name, 
+					 "too many option arguments", NULL, 0);
+				return 1;
+			    }
+			    ops.ind[execop] |= ops.argscount << 2;
+			    ops.args[ops.argscount-1] = argptr;
+			    while (arg[1])
+				arg++;
+			}
+		    }
+		} else
 		    break;
-	    /* "typeset" may take a numeric argument *
-	     * at the tail of the options            */
-	    if (idigit(*arg) && (flags & BINF_TYPEOPT) &&
-		strchr(typenumstr, arg[-1]))
-		auxlen = (int)zstrtol(arg, &arg, 10);
+	    }
 	    /* The above loop may have exited on an invalid option.  (We  *
 	     * assume that any option requiring metafication is invalid.) */
 	    if (*arg) {
@@ -299,41 +361,24 @@ execbuiltin(LinkList args, Builtin bn)
 	    }
 	    arg = (char *) ugetnode(args);
 	    /* for the "print" builtin, the options after -R are treated as
-	       options to "echo" and -f takes an extra argument */
-	    if (flags & BINF_PRINTOPTS) {
-		if (ops['R'] && !ops['f']) {
-		    optstr = "ne";
-		    flags |= BINF_ECHOPTS;
-		} else if (execop == 'f') {
-		    if (!arg) {
-			zwarnnam(name, "-f: format argument expected", NULL, 0);
-			return 1;
-		    }
-		    auxdata = arg;
-		    arg = (char *) ugetnode(args);
-		}
+	       options to "echo" */
+	    if ((flags & BINF_PRINTOPTS) && ops.ind['R'] && !ops.ind['f']) {
+		optstr = "ne";
+		flags |= BINF_ECHOPTS;
 	    }
 	    /* the option -- indicates the end of the options */
-	    if (ops['-'])
+	    if (ops.ind['-'])
 		break;
-	    /* for "fc", -e takes an extra argument */
-	    if ((flags & BINF_FCOPTS) && execop == 'e') {
-		auxdata = arg;
-		arg = (char *) ugetnode(args);
-	    }
-	    /* some "typeset" options take a numeric extra argument */
-	    if ((flags & BINF_TYPEOPT) && strchr(typenumstr, execop) &&
-		arg && idigit(*arg)) {
-		auxlen = atoi(arg);
-		arg = (char *) ugetnode(args);
-	    }
 	}
-    if (flags & BINF_R)
-	auxdata = "-";
     /* handle built-in options, for overloaded handler functions */
-    if ((pp = bn->defopts))
-	while (*pp)
-	    ops[(int)*pp++] = 1;
+    if ((pp = bn->defopts)) {
+	while (*pp) {
+	    /* only if not already set */
+	    if (!ops.ind[(int)*pp])
+		ops.ind[(int)*pp] = 1;
+	    pp++;
+	}
+    }
 
     /* Set up the argument list. */
     if (arg) {
@@ -381,7 +426,7 @@ execbuiltin(LinkList args, Builtin bn)
 	    fflush(xtrerr);
 	}
 	/* call the handler function, and return its return value */
-	return (*(bn->handlerfunc)) (name, argv, ops, bn->funcid);
+	return (*(bn->handlerfunc)) (name, argv, &ops, bn->funcid);
     }
 }
 
@@ -391,7 +436,7 @@ execbuiltin(LinkList args, Builtin bn)
 
 /**/
 int
-bin_enable(char *name, char **argv, char *ops, int func)
+bin_enable(char *name, char **argv, Options ops, int func)
 {
     HashTable ht;
     HashNode hn;
@@ -401,11 +446,11 @@ bin_enable(char *name, char **argv, char *ops, int func)
     int match = 0, returnval = 0;
 
     /* Find out which hash table we are working with. */
-    if (ops['f'])
+    if (OPT_ISSET(ops,'f'))
 	ht = shfunctab;
-    else if (ops['r'])
+    else if (OPT_ISSET(ops,'r'))
 	ht = reswdtab;
-    else if (ops['a'])
+    else if (OPT_ISSET(ops,'a'))
 	ht = aliastab;
     else
 	ht = builtintab;
@@ -431,7 +476,7 @@ bin_enable(char *name, char **argv, char *ops, int func)
     }
 
     /* With -m option, treat arguments as glob patterns. */
-    if (ops['m']) {
+    if (OPT_ISSET(ops,'m')) {
 	for (; *argv; argv++) {
 	    /* parse pattern */
 	    tokenize(*argv);
@@ -471,7 +516,7 @@ bin_enable(char *name, char **argv, char *ops, int func)
 
 /**/
 int
-bin_set(char *nam, char **args, char *ops, int func)
+bin_set(char *nam, char **args, Options ops, int func)
 {
     int action, optno, array = 0, hadopt = 0,
 	hadplus = 0, hadend = 0, sort = 0;
@@ -590,9 +635,10 @@ int doprintdir = 0;		/* set in exec.c (for autocd) */
 
 /**/
 int
-bin_pwd(char *name, char **argv, char *ops, int func)
+bin_pwd(char *name, char **argv, Options ops, int func)
 {
-    if (ops['r'] || ops['P'] || (isset(CHASELINKS) && !ops['L']))
+    if (OPT_ISSET(ops,'r') || OPT_ISSET(ops,'P') ||
+	(isset(CHASELINKS) && !OPT_ISSET(ops,'L')))
 	printf("%s\n", zgetcwd());
     else {
 	zputs(pwd, stdout);
@@ -610,33 +656,34 @@ mod_export LinkList dirstack;
 
 /**/
 int
-bin_dirs(char *name, char **argv, char *ops, int func)
+bin_dirs(char *name, char **argv, Options ops, int func)
 {
     LinkList l;
 
     queue_signals();
     /* with -v, -p or no arguments display the directory stack */
-    if (!(*argv || ops['c']) || ops['v'] || ops ['p']) {
+    if (!(*argv || OPT_ISSET(ops,'c')) || OPT_ISSET(ops,'v') || 
+	OPT_ISSET(ops,'p')) {
 	LinkNode node;
 	char *fmt;
 	int pos = 1;
 
 	/* with the -v option, display a numbered list, starting at zero */
-	if (ops['v']) {
+	if (OPT_ISSET(ops,'v')) {
 	    printf("0\t");
 	    fmt = "\n%d\t";
 	/* with the -p option, display entries one per line */
-	} else if (ops['p'])
+	} else if (OPT_ISSET(ops,'p'))
 	    fmt = "\n";
 	else
 	    fmt = " ";
-	if (ops['l'])
+	if (OPT_ISSET(ops,'l'))
 	    fputs(pwd, stdout);
 	else
 	    fprintdir(pwd, stdout);
 	for (node = firstnode(dirstack); node; incnode(node)) {
 	    printf(fmt, pos++);
-	    if (ops['l'])
+	    if (OPT_ISSET(ops,'l'))
 		fputs(getdata(node), stdout);
 	    else
 		fprintdir(getdata(node), stdout);
@@ -704,7 +751,7 @@ static int chasinglinks;
 
 /**/
 int
-bin_cd(char *nam, char **argv, char *ops, int func)
+bin_cd(char *nam, char **argv, Options ops, int func)
 {
     LinkNode dir;
     struct stat st1, st2;
@@ -728,10 +775,11 @@ bin_cd(char *nam, char **argv, char *ops, int func)
 		goto brk;
 	    }
 	} while (*++s);
-	for (s = *argv; *++s; ops[STOUC(*s)] = 1);
+	for (s = *argv; *++s; ops->ind[STOUC(*s)] = 1);
     }
  brk:
-    chasinglinks = ops['P'] || (isset(CHASELINKS) && !ops['L']);
+    chasinglinks = OPT_ISSET(ops,'P') || 
+	(isset(CHASELINKS) && !OPT_ISSET(ops,'L'));
     queue_signals();
     zpushnode(dirstack, ztrdup(pwd));
     if (!(dir = cd_get_dest(nam, argv, ops, func))) {
@@ -764,7 +812,7 @@ bin_cd(char *nam, char **argv, char *ops, int func)
 
 /**/
 static LinkNode
-cd_get_dest(char *nam, char **argv, char *ops, int func)
+cd_get_dest(char *nam, char **argv, Options ops, int func)
 {
     LinkNode dir = NULL;
     LinkNode target;
@@ -834,7 +882,7 @@ cd_get_dest(char *nam, char **argv, char *ops, int func)
     if (!dir) {
 	dir = firstnode(dirstack);
     }
-    if (!(dest = cd_do_chdir(nam, getdata(dir), ops['s']))) {
+    if (!(dest = cd_do_chdir(nam, getdata(dir), OPT_ISSET(ops,'s')))) {
 	if (!target)
 	    zsfree(getlinknode(dirstack));
 	if (func == BIN_POPD)
@@ -1232,7 +1280,7 @@ printif(char *str, int c)
 
 /**/
 int
-bin_fc(char *nam, char **argv, char *ops, int func)
+bin_fc(char *nam, char **argv, Options ops, int func)
 {
     int first = -1, last = -1, retval;
     char *s;
@@ -1246,7 +1294,7 @@ bin_fc(char *nam, char **argv, char *ops, int func)
     }
     /* with the -m option, the first argument is taken *
      * as a pattern that history lines have to match   */
-    if (*argv && ops['m']) {
+    if (*argv && OPT_ISSET(ops,'m')) {
 	tokenize(*argv);
 	if (!(pprog = patcompile(*argv++, 0, NULL))) {
 	    zwarnnam(nam, "invalid match pattern", NULL, 0);
@@ -1254,21 +1302,22 @@ bin_fc(char *nam, char **argv, char *ops, int func)
 	}
     }
     queue_signals();
-    if (ops['R']) {
+    if (OPT_ISSET(ops,'R')) {
 	/* read history from a file */
-	readhistfile(*argv, 1, ops['I'] ? HFILE_SKIPOLD : 0);
+	readhistfile(*argv, 1, OPT_ISSET(ops,'I') ? HFILE_SKIPOLD : 0);
 	unqueue_signals();
 	return 0;
     }
-    if (ops['W']) {
+    if (OPT_ISSET(ops,'W')) {
 	/* write history to a file */
-	savehistfile(*argv, 1, ops['I'] ? HFILE_SKIPOLD : 0);
+	savehistfile(*argv, 1, OPT_ISSET(ops,'I') ? HFILE_SKIPOLD : 0);
 	unqueue_signals();
 	return 0;
     }
-    if (ops['A']) {
+    if (OPT_ISSET(ops,'A')) {
 	/* append history to a file */
-	savehistfile(*argv, 1, HFILE_APPEND | (ops['I'] ? HFILE_SKIPOLD : 0));
+	savehistfile(*argv, 1, HFILE_APPEND | 
+		     (OPT_ISSET(ops,'I') ? HFILE_SKIPOLD : 0));
 	unqueue_signals();
 	return 0;
     }
@@ -1318,7 +1367,7 @@ bin_fc(char *nam, char **argv, char *ops, int func)
     }
     /* default values of first and last, and range checking */
     if (last == -1) {
-	if (ops['l'] && first < curhist) {
+	if (OPT_ISSET(ops,'l') && first < curhist) {
 	    last = addhistnum(curline.histnum,-1,0);
 	    if (last < firsthist())
 		last = firsthist();
@@ -1327,18 +1376,16 @@ bin_fc(char *nam, char **argv, char *ops, int func)
 	    last = first;
     }
     if (first == -1) {
-	first = ops['l']? addhistnum(curline.histnum,-16,0)
+	first = OPT_ISSET(ops,'l')? addhistnum(curline.histnum,-16,0)
 			: addhistnum(curline.histnum,-1,0);
 	if (first < 1)
 	    first = 1;
 	if (last < first)
 	    last = first;
     }
-    if (ops['l']) {
+    if (OPT_ISSET(ops,'l')) {
 	/* list the required part of the history */
-	retval = fclist(stdout, !ops['n'], ops['r'], ops['D'],
-			ops['d'] + ops['f'] * 2 + ops['E'] * 4 + ops['i'] * 8,
-			first, last, asgf, pprog);
+	retval = fclist(stdout, ops, first, last, asgf, pprog);
 	unqueue_signals();
     }
     else {
@@ -1355,10 +1402,16 @@ bin_fc(char *nam, char **argv, char *ops, int func)
 	    unqueue_signals();
 	    zwarnnam("fc", "can't open temp file: %e", NULL, errno);
 	} else {
-	    if (!fclist(out, 0, ops['r'], 0, 0, first, last, asgf, pprog)) {
+	    ops->ind['n'] = 1;	/* No line numbers here. */
+	    if (!fclist(out, ops, first, last, asgf, pprog)) {
 		char *editor;
 
-		editor = auxdata ? auxdata : getsparam("FCEDIT");
+		if (func == BIN_R)
+		    editor = "-";
+		else if (OPT_HASARG(ops, 'e'))
+		    editor = OPT_ARG(ops, 'e');
+		else
+		    editor = getsparam("FCEDIT");
 		if (!editor)
 		    editor = DEFAULT_FCEDIT;
 
@@ -1456,17 +1509,17 @@ fcsubs(char **sp, struct asgment *sub)
 
 /**/
 static int
-fclist(FILE *f, int n, int r, int D, int d, int first, int last, struct asgment *subs, Patprog pprog)
+fclist(FILE *f, Options ops, int first, int last, struct asgment *subs, Patprog pprog)
 {
-    int fclistdone = 0;
+    int fclistdone = 0, tmp;
     char *s;
     Histent ent;
 
     /* reverse range if required */
-    if (r) {
-	r = last;
+    if (OPT_ISSET(ops,'r')) {
+	tmp = last;
 	last = first;
-	first = r;
+	first = tmp;
     }
     /* suppress "no substitution" warning if no substitution is requested */
     if (!subs)
@@ -1489,34 +1542,33 @@ fclist(FILE *f, int n, int r, int D, int d, int first, int last, struct asgment 
 	    fclistdone |= fcsubs(&s, subs);
 
 	    /* do numbering */
-	    if (n) {
+	    if (!OPT_ISSET(ops,'n')) {
 		fprintf(f, "%5d%c ", ent->histnum,
 			ent->flags & HIST_FOREIGN? '*' : ' ');
 	    }
 	    /* output actual time (and possibly date) of execution of the
 	       command, if required */
-	    if (d) {
+	    if (OPT_ISSET(ops,'d') || OPT_ISSET(ops,'f') ||
+		OPT_ISSET(ops,'E') || OPT_ISSET(ops,'i')) {
 		struct tm *ltm;
 		ltm = localtime(&ent->stim);
-		if (d >= 2) {
-		    if (d >= 8) {
-			fprintf(f, "%d-%02d-%02d ",
-				ltm->tm_year + 1900,
-				ltm->tm_mon + 1, ltm->tm_mday);
-		    } else if (d >= 4) {
-			fprintf(f, "%d.%d.%d ",
-				ltm->tm_mday, ltm->tm_mon + 1,
-				ltm->tm_year + 1900);
-		    } else {
-			fprintf(f, "%d/%d/%d ",
-				ltm->tm_mon + 1, ltm->tm_mday,
-				ltm->tm_year + 1900);
-		    }
+		if (OPT_ISSET(ops,'i')) {
+		    fprintf(f, "%d-%02d-%02d ",
+			    ltm->tm_year + 1900,
+			    ltm->tm_mon + 1, ltm->tm_mday);
+		} else if (OPT_ISSET(ops,'E')) {
+		    fprintf(f, "%d.%d.%d ",
+			    ltm->tm_mday, ltm->tm_mon + 1,
+			    ltm->tm_year + 1900);
+		} else if (OPT_ISSET(ops,'f')) {
+		    fprintf(f, "%d/%d/%d ",
+			    ltm->tm_mon + 1, ltm->tm_mday,
+			    ltm->tm_year + 1900);
 		}
 		fprintf(f, "%02d:%02d  ", ltm->tm_hour, ltm->tm_min);
 	    }
 	    /* display the time taken by the command, if required */
-	    if (D) {
+	    if (OPT_ISSET(ops,'D')) {
 		long diff;
 		diff = (ent->ftim) ? ent->ftim - ent->stim : 0;
 		fprintf(f, "%ld:%02ld  ", diff / 60, diff % 60);
@@ -1609,10 +1661,10 @@ getasg(char *s)
 /* function to set a single parameter */
 
 /**/
-Param
+static Param
 typeset_single(char *cname, char *pname, Param pm, int func,
 	       int on, int off, int roff, char *value, Param altpm,
-	       char *ops)
+	       Options ops, int auxlen)
 {
     int usepm, tc, keeplocal = 0, newspecial = 0;
     char *subscript;
@@ -1693,9 +1745,9 @@ typeset_single(char *cname, char *pname, Param pm, int func,
     if (usepm) {
 	on &= ~PM_LOCAL;
 	if (!on && !roff && !value) {
-	    if (ops['p'])
+	    if (OPT_ISSET(ops,'p'))
 		paramtab->printnode((HashNode)pm, PRINT_TYPESET);
-	    else if (unset(TYPESETSILENT) || ops['m'])
+	    else if (unset(TYPESETSILENT) || OPT_ISSET(ops,'m'))
 		paramtab->printnode((HashNode)pm, PRINT_INCLUDEVALUE);
 	    return pm;
 	}
@@ -1741,7 +1793,7 @@ typeset_single(char *cname, char *pname, Param pm, int func,
 	    return NULL;
 	}
 	pm->flags |= (on & PM_READONLY);
-	if (ops['p'])
+	if (OPT_ISSET(ops,'p'))
 	    paramtab->printnode((HashNode)pm, PRINT_TYPESET);
 	return pm;
     }
@@ -1931,7 +1983,7 @@ typeset_single(char *cname, char *pname, Param pm, int func,
 	return NULL;
     }
 
-    if (ops['p'])
+    if (OPT_ISSET(ops,'p'))
 	paramtab->printnode((HashNode)pm, PRINT_TYPESET);
 
     return pm;
@@ -1941,7 +1993,7 @@ typeset_single(char *cname, char *pname, Param pm, int func,
 
 /**/
 int
-bin_typeset(char *name, char **argv, char *ops, int func)
+bin_typeset(char *name, char **argv, Options ops, int func)
 {
     Param pm;
     Asgment asg;
@@ -1949,20 +2001,38 @@ bin_typeset(char *name, char **argv, char *ops, int func)
     char *optstr = TYPESET_OPTSTR;
     int on = 0, off = 0, roff, bit = PM_ARRAY;
     int i;
-    int returnval = 0, printflags = 0;
+    int returnval = 0, printflags = 0, auxlen = 0;
 
     /* hash -f is really the builtin `functions' */
-    if (ops['f'])
+    if (OPT_ISSET(ops,'f'))
 	return bin_functions(name, argv, ops, func);
 
     /* Translate the options into PM_* flags.   *
      * Unfortunately, this depends on the order *
      * these flags are defined in zsh.h         */
     for (; *optstr; optstr++, bit <<= 1)
-	if (ops[STOUC(*optstr)] == 1)
+    {
+	int optval = STOUC(*optstr);
+	if (OPT_MINUS(ops,optval))
 	    on |= bit;
-	else if (ops[STOUC(*optstr)] == 2)
+	else if (OPT_PLUS(ops,optval))
 	    off |= bit;
+	/*
+	 * There is only a single field in struct param for widths,
+	 * precisions and bases.  Until this gets fixed, we can therefore
+	 * bundle all optional arguments up into a single word.  You
+	 * may think this is very nasty, but then you should have seen the
+	 * code before option arguments were handled properly.
+	 */
+	if (OPT_HASARG(ops,optval)) {
+	    char *eptr, *arg = OPT_ARG(ops,optval);
+	    auxlen = (int)zstrtol(arg, &eptr, 10);
+	    if (*eptr) {
+		zwarnnam(name, "bad integer value: %s", arg, 0);
+		return 1;
+	    }
+	}
+    }
     roff = off;
 
     /* Sanity checks on the options.  Remove conflicting options. */
@@ -1998,13 +2068,13 @@ bin_typeset(char *name, char **argv, char *ops, int func)
     queue_signals();
 
     /* Given no arguments, list whatever the options specify. */
-    if (ops['p'])
+    if (OPT_ISSET(ops,'p'))
 	printflags |= PRINT_TYPESET;
     if (!*argv) {
-	if (!ops['p']) {
+	if (!OPT_ISSET(ops,'p')) {
 	    if (!(on|roff))
 		printflags |= PRINT_TYPE;
-	    if (roff || ops['+'])
+	    if (roff || OPT_ISSET(ops,'+'))
 		printflags |= PRINT_NAMEONLY;
 	}
 	scanhashtable(paramtab, 1, on|roff, 0, paramtab->printnode, printflags);
@@ -2012,8 +2082,9 @@ bin_typeset(char *name, char **argv, char *ops, int func)
 	return 0;
     }
 
-    if (!(ops['g'] || ops['x'] || ops['m']) || ops['g'] == 2 || *name == 'l' ||
-	(!isset(GLOBALEXPORT) && !ops['g']))
+    if (!(OPT_ISSET(ops,'g') || OPT_ISSET(ops,'x') || OPT_ISSET(ops,'m')) || 
+	OPT_ISSET(ops,'g') == 2 || *name == 'l' ||
+	(!isset(GLOBALEXPORT) && !OPT_ISSET(ops,'g')))
 	on |= PM_LOCAL;
 
     if (on & PM_TIED) {
@@ -2021,7 +2092,7 @@ bin_typeset(char *name, char **argv, char *ops, int func)
 	struct asgment asg0;
 	char *oldval = NULL;
 
-	if (ops['m']) {
+	if (OPT_ISSET(ops,'m')) {
 	    zwarnnam(name, "incompatible options for -T", NULL, 0);
 	    unqueue_signals();
 	    return 1;
@@ -2072,7 +2143,7 @@ bin_typeset(char *name, char **argv, char *ops, int func)
 				 (Param)paramtab->getnode(paramtab,
 							  asg->name),
 				 func, (on | PM_ARRAY) & ~PM_EXPORTED,
-				 off, roff, asg->value, NULL, ops))) {
+				 off, roff, asg->value, NULL, ops, auxlen))) {
 	    unqueue_signals();
 	    return 1;
 	}
@@ -2084,7 +2155,7 @@ bin_typeset(char *name, char **argv, char *ops, int func)
 				(Param)paramtab->getnode(paramtab,
 							 asg0.name),
 				func, on, off, roff, asg0.value, apm,
-				ops))) {
+				ops, auxlen))) {
 	    if (oldval)
 		zsfree(oldval);
 	    unsetparam_pm(apm, 1, 1);
@@ -2106,8 +2177,8 @@ bin_typeset(char *name, char **argv, char *ops, int func)
     }
 
     /* With the -m option, treat arguments as glob patterns */
-    if (ops['m']) {
-	if (!ops['p']) {
+    if (OPT_ISSET(ops,'m')) {
+	if (!OPT_ISSET(ops,'p')) {
 	    if (!(on|roff))
 		printflags |= PRINT_TYPE;
 	    if (!on)
@@ -2125,7 +2196,7 @@ bin_typeset(char *name, char **argv, char *ops, int func)
 		returnval = 1;
 		continue;
 	    }
-	    if (ops['m'] == 2 && !asg->value) {
+	    if (OPT_PLUS(ops,'m') == 2 && !asg->value) {
 		scanmatchtable(paramtab, pprog, on|roff, 0,
 			       paramtab->printnode, printflags);
 		continue;
@@ -2151,7 +2222,7 @@ bin_typeset(char *name, char **argv, char *ops, int func)
 	    for (pmnode = firstnode(pmlist); pmnode; incnode(pmnode)) {
 		pm = (Param) getdata(pmnode);
 		if (!typeset_single(name, pm->nam, pm, func, on, off, roff,
-				    asg->value, NULL, ops))
+				    asg->value, NULL, ops, auxlen))
 		    returnval = 1;
 	    }
 	}
@@ -2166,7 +2237,7 @@ bin_typeset(char *name, char **argv, char *ops, int func)
 				     gethashnode2(paramtab, asg->name) :
 				     paramtab->getnode(paramtab, asg->name)),
 			    func, on, off, roff, asg->value, NULL,
-			    ops))
+			    ops, auxlen))
 	    returnval = 1;
     }
     unqueue_signals();
@@ -2177,7 +2248,7 @@ bin_typeset(char *name, char **argv, char *ops, int func)
 
 /**/
 int
-eval_autoload(Shfunc shf, char *name, char *ops, int func)
+eval_autoload(Shfunc shf, char *name, Options ops, int func)
 {
     if (!(shf->flags & PM_UNDEFINED))
 	return 1;
@@ -2186,7 +2257,7 @@ eval_autoload(Shfunc shf, char *name, char *ops, int func)
 	freeeprog(shf->funcdef);
 	shf->funcdef = &dummy_eprog;
     }
-    if (ops['X'] == 1) {
+    if (OPT_MINUS(ops,'X')) {
 	char *fargv[3];
 	fargv[0] = name;
 	fargv[1] = "\"$@\"";
@@ -2195,7 +2266,8 @@ eval_autoload(Shfunc shf, char *name, char *ops, int func)
 	return bin_eval(name, fargv, ops, func);
     }
 
-    return !loadautofn(shf, (ops['k'] ? 2 : (ops['z'] ? 0 : 1)), 1);
+    return !loadautofn(shf, (OPT_ISSET(ops,'k') ? 2 : 
+			     (OPT_ISSET(ops,'z') ? 0 : 1)), 1);
 }
 
 /* Display or change the attributes of shell functions.   *
@@ -2204,7 +2276,7 @@ eval_autoload(Shfunc shf, char *name, char *ops, int func)
 
 /**/
 int
-bin_functions(char *name, char **argv, char *ops, int func)
+bin_functions(char *name, char **argv, Options ops, int func)
 {
     Patprog pprog;
     Shfunc shf;
@@ -2212,27 +2284,27 @@ bin_functions(char *name, char **argv, char *ops, int func)
     int on = 0, off = 0, pflags = 0;
 
     /* Do we have any flags defined? */
-    if (ops['u'] == 2)
+    if (OPT_ISSET(ops,'u') == 2)
 	off |= PM_UNDEFINED;
-    else if (ops['u'] == 1 || ops['X'])
+    else if (OPT_MINUS(ops,'u') || OPT_ISSET(ops,'X'))
 	on |= PM_UNDEFINED;
-    if (ops['U'] == 1)
+    if (OPT_MINUS(ops,'U'))
 	on |= PM_UNALIASED|PM_UNDEFINED;
-    else if (ops['U'] == 2)
+    else if (OPT_PLUS(ops,'U'))
 	off |= PM_UNALIASED;
-    if (ops['t'] == 1)
+    if (OPT_MINUS(ops,'t'))
 	on |= PM_TAGGED;
-    else if (ops['t'] == 2)
+    else if (OPT_PLUS(ops,'t'))
 	off |= PM_TAGGED;
 
-    if ((off & PM_UNDEFINED) || (ops['k'] && ops['z']) ||
-	(ops['X'] != 2 && (ops['k'] || ops['z'])) ||
-	(ops['X'] == 1 && (ops['m'] || *argv || !scriptname))) {
+    if ((off & PM_UNDEFINED) || (OPT_ISSET(ops,'k') && OPT_ISSET(ops,'z')) ||
+	(!OPT_PLUS(ops,'X') && (OPT_ISSET(ops,'k') || OPT_ISSET(ops,'z'))) ||
+	(OPT_MINUS(ops,'X') && (OPT_ISSET(ops,'m') || *argv || !scriptname))) {
 	zwarnnam(name, "invalid option(s)", NULL, 0);
 	return 1;
     }
 
-    if (ops['f'] == 2 || ops['+'])
+    if (OPT_PLUS(ops,'f') || OPT_ISSET(ops,'+'))
 	pflags |= PRINT_NAMEONLY;
 
     /* If no arguments given, we will print functions.  If flags *
@@ -2242,7 +2314,7 @@ bin_functions(char *name, char **argv, char *ops, int func)
 	int ret = 0;
 
 	queue_signals();
-	if (ops['X'] == 1) {
+	if (OPT_MINUS(ops,'X')) {
 	    if ((shf = (Shfunc) shfunctab->getnode(shfunctab, scriptname))) {
 		DPUTS(!shf->funcdef,
 		      "BUG: Calling autoload from empty function");
@@ -2253,7 +2325,7 @@ bin_functions(char *name, char **argv, char *ops, int func)
 	    shf->flags = on;
 	    ret = eval_autoload(shf, scriptname, ops, func);
 	} else {
-	    if (ops['U'] && !ops['u'])
+	    if (OPT_ISSET(ops,'U') && !OPT_ISSET(ops,'u'))
 		on &= ~PM_UNDEFINED;
 	    scanhashtable(shfunctab, 1, on|off, DISABLED, shfunctab->printnode,
 			  pflags);
@@ -2263,7 +2335,7 @@ bin_functions(char *name, char **argv, char *ops, int func)
     }
 
     /* With the -m option, treat arguments as glob patterns */
-    if (ops['m']) {
+    if (OPT_ISSET(ops,'m')) {
 	on &= ~PM_UNDEFINED;
 	for (; *argv; argv++) {
 	    /* expand argument */
@@ -2283,7 +2355,7 @@ bin_functions(char *name, char **argv, char *ops, int func)
 				!(shf->flags & DISABLED)) {
 				shf->flags = (shf->flags |
 					      (on & ~PM_UNDEFINED)) & ~off;
-				if (ops['X'] &&
+				if (OPT_ISSET(ops,'X') &&
 				    eval_autoload(shf, shf->nam, ops, func)) {
 				    returnval = 1;
 				}
@@ -2303,14 +2375,15 @@ bin_functions(char *name, char **argv, char *ops, int func)
     /* Take the arguments literally -- do not glob */
     queue_signals();
     for (; *argv; argv++) {
-	if (ops['w'])
+	if (OPT_ISSET(ops,'w'))
 	    returnval = dump_autoload(name, *argv, on, ops, func);
 	else if ((shf = (Shfunc) shfunctab->getnode(shfunctab, *argv))) {
 	    /* if any flag was given */
 	    if (on|off) {
 		/* turn on/off the given flags */
 		shf->flags = (shf->flags | (on & ~PM_UNDEFINED)) & ~off;
-		if (ops['X'] && eval_autoload(shf, shf->nam, ops, func))
+		if (OPT_ISSET(ops,'X') && 
+		    eval_autoload(shf, shf->nam, ops, func))
 		    returnval = 1;
 	    } else
 		/* no flags, so just print */
@@ -2322,7 +2395,7 @@ bin_functions(char *name, char **argv, char *ops, int func)
 	    shf->flags = on;
 	    shf->funcdef = mkautofn(shf);
 	    shfunctab->addnode(shfunctab, ztrdup(*argv), shf);
-	    if (ops['X'] && eval_autoload(shf, shf->nam, ops, func))
+	    if (OPT_ISSET(ops,'X') && eval_autoload(shf, shf->nam, ops, func))
 		returnval = 1;
 	} else
 	    returnval = 1;
@@ -2361,7 +2434,7 @@ mkautofn(Shfunc shf)
 
 /**/
 int
-bin_unset(char *name, char **argv, char *ops, int func)
+bin_unset(char *name, char **argv, Options ops, int func)
 {
     Param pm, next;
     Patprog pprog;
@@ -2370,11 +2443,11 @@ bin_unset(char *name, char **argv, char *ops, int func)
     int i;
 
     /* unset -f is the same as unfunction */
-    if (ops['f'])
+    if (OPT_ISSET(ops,'f'))
 	return bin_unhash(name, argv, ops, func);
 
     /* with -m option, treat arguments as glob patterns */
-    if (ops['m']) {
+    if (OPT_ISSET(ops,'m')) {
 	while ((s = *argv++)) {
 	    /* expand */
 	    tokenize(s);
@@ -2453,7 +2526,7 @@ bin_unset(char *name, char **argv, char *ops, int func)
 
 /**/
 int
-bin_whence(char *nam, char **argv, char *ops, int func)
+bin_whence(char *nam, char **argv, Options ops, int func)
 {
     HashNode hn;
     Patprog pprog;
@@ -2464,24 +2537,24 @@ bin_whence(char *nam, char **argv, char *ops, int func)
     char *cnam;
 
     /* Check some option information */
-    csh = ops['c'];
-    v   = ops['v'];
-    all = ops['a'];
-    wd  = ops['w'];
+    csh = OPT_ISSET(ops,'c');
+    v   = OPT_ISSET(ops,'v');
+    all = OPT_ISSET(ops,'a');
+    wd  = OPT_ISSET(ops,'w');
 
-    if (ops['w'])
+    if (OPT_ISSET(ops,'w'))
 	printflags |= PRINT_WHENCE_WORD;
-    else if (ops['c'])
+    else if (OPT_ISSET(ops,'c'))
 	printflags |= PRINT_WHENCE_CSH;
-    else if (ops['v'])
+    else if (OPT_ISSET(ops,'v'))
 	printflags |= PRINT_WHENCE_VERBOSE;
     else
 	printflags |= PRINT_WHENCE_SIMPLE;
-    if (ops['f'])
+    if (OPT_ISSET(ops,'f'))
 	printflags |= PRINT_WHENCE_FUNCDEF;
 
     /* With -m option -- treat arguments as a glob patterns */
-    if (ops['m']) {
+    if (OPT_ISSET(ops,'m')) {
 	for (; *argv; argv++) {
 	    /* parse the pattern */
 	    tokenize(*argv);
@@ -2492,7 +2565,7 @@ bin_whence(char *nam, char **argv, char *ops, int func)
 		continue;
 	    }
 	    queue_signals();
-	    if (!ops['p']) {
+	    if (!OPT_ISSET(ops,'p')) {
 		/* -p option is for path search only.    *
 		 * We're not using it, so search for ... */
 
@@ -2528,7 +2601,7 @@ bin_whence(char *nam, char **argv, char *ops, int func)
     for (; *argv; argv++) {
 	informed = 0;
 
-	if (!ops['p']) {
+	if (!OPT_ISSET(ops,'p')) {
 	    /* Look for alias */
 	    if ((hn = aliastab->getnode(aliastab, *argv))) {
 		aliastab->printnode(hn, printflags);
@@ -2585,7 +2658,7 @@ bin_whence(char *nam, char **argv, char *ops, int func)
 			if (v && !csh)
 			    zputs(*argv, stdout), fputs(" is ", stdout);
 			zputs(buf, stdout);
-			if (ops['s'])
+			if (OPT_ISSET(ops,'s'))
 			    print_if_link(buf);
 			fputc('\n', stdout);
 		    }
@@ -2606,7 +2679,7 @@ bin_whence(char *nam, char **argv, char *ops, int func)
 		if (v && !csh)
 		    zputs(*argv, stdout), fputs(" is ", stdout);
 		zputs(cnam, stdout);
-		if (ops['s'])
+		if (OPT_ISSET(ops,'s'))
 		    print_if_link(cnam);
 		fputc('\n', stdout);
 	    }
@@ -2643,7 +2716,7 @@ bin_whence(char *nam, char **argv, char *ops, int func)
 
 /**/
 int
-bin_hash(char *name, char **argv, char *ops, int func)
+bin_hash(char *name, char **argv, Options ops, int func)
 {
     HashTable ht;
     Patprog pprog;
@@ -2651,12 +2724,12 @@ bin_hash(char *name, char **argv, char *ops, int func)
     int returnval = 0;
     int printflags = 0;
 
-    if (ops['d'])
+    if (OPT_ISSET(ops,'d'))
 	ht = nameddirtab;
     else
 	ht = cmdnamtab;
 
-    if (ops['r'] || ops['f']) {
+    if (OPT_ISSET(ops,'r') || OPT_ISSET(ops,'f')) {
 	/* -f and -r can't be used with any arguments */
 	if (*argv) {
 	    zwarnnam("hash", "too many arguments", NULL, 0);
@@ -2664,17 +2737,17 @@ bin_hash(char *name, char **argv, char *ops, int func)
 	}
 
 	/* empty the hash table */
-	if (ops['r'])
+	if (OPT_ISSET(ops,'r'))
 	    ht->emptytable(ht);
 
 	/* fill the hash table in a standard way */
-	if (ops['f'])
+	if (OPT_ISSET(ops,'f'))
 	    ht->filltable(ht);
 
 	return 0;
     }
 
-    if (ops['L']) printflags |= PRINT_LIST;
+    if (OPT_ISSET(ops,'L')) printflags |= PRINT_LIST;
 
     /* Given no arguments, display current hash table. */
     if (!*argv) {
@@ -2687,7 +2760,7 @@ bin_hash(char *name, char **argv, char *ops, int func)
     queue_signals();
     while (*argv) {
 	void *hn;
-	if (ops['m']) {
+	if (OPT_ISSET(ops,'m')) {
 	    /* with the -m option, treat the argument as a glob pattern */
 	    tokenize(*argv);  /* expand */
 	    if ((pprog = patcompile(*argv, PAT_STATIC, NULL))) {
@@ -2705,7 +2778,7 @@ bin_hash(char *name, char **argv, char *ops, int func)
 	    } else {
 		/* The argument is of the form foo=bar, *
 		 * so define an entry for the table.    */
-		if(ops['d']) {
+		if(OPT_ISSET(ops,'d')) {
 		    Nameddir nd = hn = zcalloc(sizeof *nd);
 		    nd->flags = 0;
 		    nd->dir = ztrdup(asg->value);
@@ -2715,13 +2788,13 @@ bin_hash(char *name, char **argv, char *ops, int func)
 		    cn->u.cmd = ztrdup(asg->value);
 		}
 		ht->addnode(ht, ztrdup(asg->name), hn);
-		if(ops['v'])
+		if(OPT_ISSET(ops,'v'))
 		    ht->printnode(hn, 0);
 	    }
 	} else if (!(hn = ht->getnode2(ht, asg->name))) {
 	    /* With no `=value' part to the argument, *
 	     * work out what it ought to be.          */
-	    if(ops['d']) {
+	    if(OPT_ISSET(ops,'d')) {
 		if(!getnameddir(asg->name)) {
 		    zwarnnam(name, "no such directory name: %s", asg->name, 0);
 		    returnval = 1;
@@ -2732,9 +2805,9 @@ bin_hash(char *name, char **argv, char *ops, int func)
 		    returnval = 1;
 		}
 	    }
-	    if(ops['v'] && (hn = ht->getnode2(ht, asg->name)))
+	    if(OPT_ISSET(ops,'v') && (hn = ht->getnode2(ht, asg->name)))
 		ht->printnode(hn, 0);
-	} else if(ops['v'])
+	} else if(OPT_ISSET(ops,'v'))
 	    ht->printnode(hn, 0);
 	argv++;
     }
@@ -2746,7 +2819,7 @@ bin_hash(char *name, char **argv, char *ops, int func)
 
 /**/
 int
-bin_unhash(char *name, char **argv, char *ops, int func)
+bin_unhash(char *name, char **argv, Options ops, int func)
 {
     HashTable ht;
     HashNode hn, nhn;
@@ -2755,18 +2828,18 @@ bin_unhash(char *name, char **argv, char *ops, int func)
     int i;
 
     /* Check which hash table we are working with. */
-    if (ops['d'])
+    if (OPT_ISSET(ops,'d'))
 	ht = nameddirtab;	/* named directories */
-    else if (ops['f'])
+    else if (OPT_ISSET(ops,'f'))
 	ht = shfunctab;		/* shell functions   */
-    else if (ops['a'])
+    else if (OPT_ISSET(ops,'a'))
 	ht = aliastab;		/* aliases           */
     else
 	ht = cmdnamtab;		/* external commands */
 
     /* With -m option, treat arguments as glob patterns. *
      * "unhash -m '*'" is legal, but not recommended.    */
-    if (ops['m']) {
+    if (OPT_ISSET(ops,'m')) {
 	for (; *argv; argv++) {
 	    /* expand argument */
 	    tokenize(*argv);
@@ -2816,7 +2889,7 @@ bin_unhash(char *name, char **argv, char *ops, int func)
 
 /**/
 int
-bin_alias(char *name, char **argv, char *ops, int func)
+bin_alias(char *name, char **argv, Options ops, int func)
 {
     Alias a;
     Patprog pprog;
@@ -2826,21 +2899,22 @@ bin_alias(char *name, char **argv, char *ops, int func)
     int printflags = 0;
 
     /* Did we specify the type of alias? */
-    if (ops['r'] || ops['g']) {
-	if (ops['r'] && ops['g']) {
+    if (OPT_ISSET(ops,'r') || OPT_ISSET(ops,'g')) {
+	if (OPT_ISSET(ops,'r') && OPT_ISSET(ops,'g')) {
 	    zwarnnam(name, "illegal combination of options", NULL, 0);
 	    return 1;
 	}
 	haveflags = 1;
-	if (ops['g'])
+	if (OPT_ISSET(ops,'g'))
 	    flags1 |= ALIAS_GLOBAL;
 	else
 	    flags2 |= ALIAS_GLOBAL;
     }
 
-    if (ops['L'])
+    if (OPT_ISSET(ops,'L'))
 	printflags |= PRINT_LIST;
-    else if (ops['r'] == 2 || ops['g'] == 2 || ops['m'] == 2 || ops['+'])
+    else if (OPT_PLUS(ops,'r') || OPT_PLUS(ops,'g')|| OPT_PLUS(ops,'m') ||
+	     OPT_ISSET(ops,'+'))
 	printflags |= PRINT_NAMEONLY;
 
     /* In the absence of arguments, list all aliases.  If a command *
@@ -2854,7 +2928,7 @@ bin_alias(char *name, char **argv, char *ops, int func)
 
     /* With the -m option, treat the arguments as *
      * glob patterns of aliases to display.       */
-    if (ops['m']) {
+    if (OPT_ISSET(ops,'m')) {
 	for (; *argv; argv++) {
 	    tokenize(*argv);  /* expand argument */
 	    if ((pprog = patcompile(*argv, PAT_STATIC, NULL))) {
@@ -2875,7 +2949,7 @@ bin_alias(char *name, char **argv, char *ops, int func)
     /* Take arguments literally.  Don't glob */
     queue_signals();
     while ((asg = getasg(*argv++))) {
-	if (asg->value && !ops['L']) {
+	if (asg->value && !OPT_ISSET(ops,'L')) {
 	    /* The argument is of the form foo=bar and we are not *
 	     * forcing a listing with -L, so define an alias      */
 	    aliastab->addnode(aliastab, ztrdup(asg->name),
@@ -2883,8 +2957,8 @@ bin_alias(char *name, char **argv, char *ops, int func)
 	} else if ((a = (Alias) aliastab->getnode(aliastab, asg->name))) {
 	    /* display alias if appropriate */
 	    if (!haveflags ||
-		(ops['r'] && !(a->flags & ALIAS_GLOBAL)) ||
-		(ops['g'] &&  (a->flags & ALIAS_GLOBAL)))
+		(OPT_ISSET(ops,'r') && !(a->flags & ALIAS_GLOBAL)) ||
+		(OPT_ISSET(ops,'g') &&  (a->flags & ALIAS_GLOBAL)))
 		aliastab->printnode((HashNode) a, printflags);
 	} else
 	    returnval = 1;
@@ -2900,7 +2974,7 @@ bin_alias(char *name, char **argv, char *ops, int func)
 
 /**/
 int
-bin_true(char *name, char **argv, char *ops, int func)
+bin_true(char *name, char **argv, Options ops, int func)
 {
     return 0;
 }
@@ -2909,7 +2983,7 @@ bin_true(char *name, char **argv, char *ops, int func)
 
 /**/
 int
-bin_false(char *name, char **argv, char *ops, int func)
+bin_false(char *name, char **argv, Options ops, int func)
 {
     return 1;
 }
@@ -2929,7 +3003,7 @@ mod_export LinkList bufstack;
 
 /**/
 int
-bin_print(char *name, char **args, char *ops, int func)
+bin_print(char *name, char **args, Options ops, int func)
 {
     int flen, width, prec, type, argc, n, narg;
     int nnl = 0, ret = 0, maxarg = 0;
@@ -2950,14 +3024,18 @@ bin_print(char *name, char **args, char *ops, int func)
     zulong zulongval;
     char *stringval;
     
-    if (func == BIN_PRINTF) auxdata = *args++;
-    if (auxdata)
-	fmt = getkeystring(auxdata, &flen, ops['b'] ? 2 : 0, &nnl);
+    if (func == BIN_PRINTF)
+	fmt = *args++;
+    else if (OPT_HASARG(ops,'f'))
+	fmt = OPT_ARG(ops,'f');
+    if (fmt)
+	fmt = getkeystring(fmt, &flen, OPT_ISSET(ops,'b') ? 2 : 0, &nnl);
+
     first = args;
     
     /* -m option -- treat the first argument as a pattern and remove
      * arguments not matching */
-    if (ops['m']) {
+    if (OPT_ISSET(ops,'m')) {
 	Patprog pprog;
 	char **t, **p;
 	
@@ -2979,13 +3057,16 @@ bin_print(char *name, char **args, char *ops, int func)
     len = (int *) hcalloc(argc * sizeof(int));
     for(n = 0; n < argc; n++) {
 	/* first \ sequences */
-	if (fmt || (!ops['e'] && (ops['R'] || ops['r'] || ops['E'])))
+	if (fmt || 
+	    (!OPT_ISSET(ops,'e') && 
+	     (OPT_ISSET(ops,'R') || OPT_ISSET(ops,'r') || OPT_ISSET(ops,'E'))))
 	    unmetafy(args[n], &len[n]);
 	else
-	    args[n] = getkeystring(args[n], &len[n], ops['b'] ? 2 :
-				   (func != BIN_ECHO && !ops['e']), &nnl);
+	    args[n] = getkeystring(args[n], &len[n], OPT_ISSET(ops,'b') ? 2 :
+				   (func != BIN_ECHO && !OPT_ISSET(ops,'e')),
+				   &nnl);
 	/* -P option -- interpret as a prompt sequence */
-	if(ops['P']) {
+	if(OPT_ISSET(ops,'P')) {
 	    /*
 	     * promptexpand uses permanent storage: to avoid
 	     * messy memory management, stick it on the heap
@@ -2997,7 +3078,7 @@ bin_print(char *name, char **args, char *ops, int func)
 	    free(str);
 	}
 	/* -D option -- interpret as a directory, and use ~ */
-	if(ops['D']) {
+	if(OPT_ISSET(ops,'D')) {
 	    Nameddir d;
 	    
 	    queue_signals();
@@ -3014,48 +3095,57 @@ bin_print(char *name, char **args, char *ops, int func)
     }
     
     /* -u and -p -- output to other than standard output */
-    if (ops['u'] || ops['p']) {
+    if (OPT_HASARG(ops,'u') || OPT_ISSET(ops,'p')) {
 	int fd;
 
-	if (ops['u']) {
-	    for (fd = 0; fd < 10; fd++)
-		if (ops[fd + '0'])
-		    break;
-	    if (fd == 10)
-		fd = 0;
-	} else
+	if (OPT_ISSET(ops, 'p'))
 	    fd = coprocout;
+	else {
+	    char *argptr = OPT_ARG(ops,'u'), *eptr;
+	    /* Handle undocumented feature that -up worked */
+	    if (!strcmp(argptr, "p")) {
+		fd = coprocout;
+	    } else {
+		fd = (int)zstrtol(argptr, &eptr, 10);
+		if (*eptr) {
+		    zwarnnam(name, "number expected after -u: %s", argptr, 0);
+		    return 1;
+		}
+	    }
+	}
+
 	if ((fd = dup(fd)) < 0) {
-	    zwarnnam(name, "bad file number", NULL, 0);
+	    zwarnnam(name, "bad file number: %d", NULL, fd);
 	    return 1;
 	}
 	if ((fout = fdopen(fd, "w")) == 0) {
-	    zwarnnam(name, "bad mode on fd", NULL, 0);
+	    close(fd);
+	    zwarnnam(name, "bad mode on fd %d", NULL, fd);
 	    return 1;
 	}
     }
 
     /* -o and -O -- sort the arguments */
-    if (ops['o']) {
+    if (OPT_ISSET(ops,'o')) {
 	if (fmt && !*args) return 0;
-	if (ops['i'])
+	if (OPT_ISSET(ops,'i'))
 	    qsort(args, arrlen(args), sizeof(char *), cstrpcmp);
 	else
 	    qsort(args, arrlen(args), sizeof(char *), strpcmp);
-    } else if (ops['O']) {
+    } else if (OPT_ISSET(ops,'O')) {
 	if (fmt && !*args) return 0;
-	if (ops['i'])
+	if (OPT_ISSET(ops,'i'))
 	    qsort(args, arrlen(args), sizeof(char *), invcstrpcmp);
 	else
 	    qsort(args, arrlen(args), sizeof(char *), invstrpcmp);
     }
     /* after sorting arguments, recalculate lengths */
-    if(ops['o'] || ops['O'])
+    if(OPT_ISSET(ops,'o') || OPT_ISSET(ops,'O'))
 	for(n = 0; n < argc; n++)
 	    len[n] = strlen(args[n]);
 
     /* -c -- output in columns */
-    if (ops['c']) {
+    if (OPT_ISSET(ops,'c')) {
 	int l, nc, nr, sc, n, t, i;
 	char **ap;
 
@@ -3079,7 +3169,7 @@ bin_print(char *name, char **args, char *ops, int func)
 		    for (; l < sc; l++)
 			fputc(' ', fout);
 	    } while (*ap);
-	    fputc(ops['N'] ? '\0' : '\n', fout);
+	    fputc(OPT_ISSET(ops,'N') ? '\0' : '\n', fout);
 	}
 	/* Testing EBADF special-cases >&- redirections */
 	if ((fout != stdout) ? (fclose(fout) != 0) :
@@ -3093,14 +3183,14 @@ bin_print(char *name, char **args, char *ops, int func)
     /* normal output */
     if (!fmt) {
 	/* -z option -- push the arguments onto the editing buffer stack */
-	if (ops['z']) {
+	if (OPT_ISSET(ops,'z')) {
 	    queue_signals();
 	    zpushnode(bufstack, sepjoin(args, NULL, 0));
 	    unqueue_signals();
 	    return 0;
 	}
 	/* -s option -- add the arguments to the history list */
-	if (ops['s']) {
+	if (OPT_ISSET(ops,'s')) {
 	    int nwords = 0, nlen, iwords;
 	    char **pargs = args;
 
@@ -3130,10 +3220,11 @@ bin_print(char *name, char **args, char *ops, int func)
 	for (; *args; args++, len++) {
 	    fwrite(*args, *len, 1, fout);
 	    if (args[1])
-		fputc(ops['l'] ? '\n' : ops['N'] ? '\0' : ' ', fout);
+		fputc(OPT_ISSET(ops,'l') ? '\n' : 
+		      OPT_ISSET(ops,'N') ? '\0' : ' ', fout);
 	}
-	if (!(ops['n'] || nnl))
-	    fputc(ops['N'] ? '\0' : '\n', fout);
+	if (!(OPT_ISSET(ops,'n') || nnl))
+	    fputc(OPT_ISSET(ops,'N') ? '\0' : '\n', fout);
 	/* Testing EBADF special-cases >&- redirections */
 	if ((fout != stdout) ? (fclose(fout) != 0) :
 	    (fflush(fout) != 0 && errno != EBADF)) {
@@ -3143,7 +3234,7 @@ bin_print(char *name, char **args, char *ops, int func)
 	return ret;
     }
     
-    if (ops['z'] || ops['s']) {
+    if (OPT_ISSET(ops,'z') || OPT_ISSET(ops,'s')) {
 #ifdef HAVE_OPEN_MEMSTREAM
     	if ((fout = open_memstream(&buf, &mcount)) == NULL)
 	    zwarnnam(name, "open_memstream failed", NULL, 0);
@@ -3291,7 +3382,8 @@ bin_print(char *name, char **args, char *ops, int func)
 	    case 'b':
 		if (curarg) {
 		    int l;
-		    char *b = getkeystring(curarg, &l, ops['b'] ? 2 : 0, &nnl);
+		    char *b = getkeystring(curarg, &l, 
+					   OPT_ISSET(ops,'b') ? 2 : 0, &nnl);
 		    /* handle width/precision here and use fwrite so that
 		     * nul characters can be output */
 		    if (prec >= 0 && prec < l) l = prec;
@@ -3402,9 +3494,9 @@ bin_print(char *name, char **args, char *ops, int func)
 
     	if (maxarg) args = first + maxarg;
 	/* if there are remaining args, reuse format string */
-    } while (*args && args != first && !ops['r']);
+    } while (*args && args != first && !OPT_ISSET(ops,'r'));
 
-    if (ops['z'] || ops['s']) {
+    if (OPT_ISSET(ops,'z') || OPT_ISSET(ops,'s')) {
 #ifdef HAVE_OPEN_MEMSTREAM
 	putc(0, fout);
 	fflush(fout);
@@ -3416,7 +3508,7 @@ bin_print(char *name, char **args, char *ops, int func)
 	buf[count] = '\0';
 #endif
 	queue_signals();
-	if (ops['z']) {
+	if (OPT_ISSET(ops,'z')) {
 	    zpushnode(bufstack, buf);
 	} else {
 	    ent = prepnexthistent();
@@ -3442,7 +3534,7 @@ bin_print(char *name, char **args, char *ops, int func)
 
 /**/
 int
-bin_shift(char *name, char **argv, char *ops, int func)
+bin_shift(char *name, char **argv, Options ops, int func)
 {
     int num = 1, l, ret = 0;
     char **s;
@@ -3493,7 +3585,7 @@ int optcind;
 
 /**/
 int
-bin_getopts(char *name, char **argv, char *ops, int func)
+bin_getopts(char *name, char **argv, Options ops, int func)
 {
     int lenstr, lenoptstr, quiet, lenoptbuf;
     char *optstr = unmetafy(*argv++, &lenoptstr), *var = *argv++;
@@ -3600,7 +3692,7 @@ exit_pending;
 
 /**/
 int
-bin_break(char *name, char **argv, char *ops, int func)
+bin_break(char *name, char **argv, Options ops, int func)
 {
     int num = lastval, nump = 0;
 
@@ -3746,7 +3838,7 @@ zexit(int val, int from_where)
 
 /**/
 int
-bin_dot(char *name, char **argv, char *ops, int func)
+bin_dot(char *name, char **argv, Options ops, int func)
 {
     char **old, *old0 = NULL;
     int ret, diddot = 0, dotdot = 0;
@@ -3824,10 +3916,10 @@ bin_dot(char *name, char **argv, char *ops, int func)
 
 /**/
 int
-bin_emulate(char *nam, char **argv, char *ops, int func)
+bin_emulate(char *nam, char **argv, Options ops, int func)
 {
-    emulate(*argv, ops['R']);
-    if (ops['L'])
+    emulate(*argv, OPT_ISSET(ops,'R'));
+    if (OPT_ISSET(ops,'L'))
 	opts[LOCALOPTIONS] = opts[LOCALTRAPS] = 1;
     return 0;
 }
@@ -3836,7 +3928,7 @@ bin_emulate(char *nam, char **argv, char *ops, int func)
 
 /**/
 int
-bin_eval(char *nam, char **argv, char *ops, int func)
+bin_eval(char *nam, char **argv, Options ops, int func)
 {
     Eprog prog;
     char *oscriptname = scriptname;
@@ -3873,7 +3965,7 @@ file/buffer. */
 
 /**/
 int
-bin_read(char *name, char **args, char *ops, int func)
+bin_read(char *name, char **args, Options ops, int func)
 {
     char *reply, *readpmpt;
     int bsiz, c = 0, gotnl = 0, al = 0, first, nchars = 1, bslash, keys = 0;
@@ -3887,26 +3979,30 @@ bin_read(char *name, char **args, char *ops, int func)
     char d;
 
 
-    if ((ops['k'] || ops['b']) && *args && idigit(**args)) {
-	if (!(nchars = atoi(*args)))
-	    nchars = 1;
-	args++;
+    if ((OPT_HASARG(ops,c='k') || OPT_HASARG(ops,c='b'))) {
+	char *eptr, *optarg = OPT_ARG(ops,c);
+	nchars = (int)zstrtol(optarg, &eptr, 10);
+	if (*eptr) {
+	    zwarnnam(name, "number expected after -%c: %s", optarg, c);
+	    return 1;
+	}
     }
     /* This `*args++ : *args' looks a bit weird, but it works around a bug
      * in gcc-2.8.1 under DU 4.0. */
     firstarg = (*args && **args == '?' ? *args++ : *args);
-    reply = *args ? *args++ : ops['A'] ? "reply" : "REPLY";
+    reply = *args ? *args++ : OPT_ISSET(ops,'A') ? "reply" : "REPLY";
 
-    if (ops['A'] && *args) {
+    if (OPT_ISSET(ops,'A') && *args) {
 	zwarnnam(name, "only one array argument allowed", NULL, 0);
 	return 1;
     }
 
     /* handle compctl case */
-    if(ops['l'] || ops['c'])
+    if(OPT_ISSET(ops,'l') || OPT_ISSET(ops,'c'))
 	return compctlread(name, args, ops, reply);
 
-    if ((ops['k'] && !ops['u'] && !ops['p']) || ops['q']) {
+    if ((OPT_ISSET(ops,'k') && !OPT_ISSET(ops,'u') && 
+	 !OPT_ISSET(ops,'p')) || OPT_ISSET(ops,'q')) {
 	if (!zleactive) {
 	    if (SHTTY == -1) {
 		/* need to open /dev/tty specially */
@@ -3930,24 +4026,38 @@ bin_read(char *name, char **args, char *ops, int func)
 		gettyinfo(&shttyinfo);
 	    /* attach to the tty */
 	    attachtty(mypgrp);
-	    if (!isem && ops['k'])
+	    if (!isem && OPT_ISSET(ops,'k'))
 		setcbreak();
 	    readfd = SHTTY;
 	}
 	keys = 1;
-    } else if (ops['u'] && !ops['p']) {
-	/* -u means take input from the specified file descriptor. *
-	 * -up means take input from the coprocess.                */
-	for (readfd = 9; readfd && !ops[readfd + '0']; --readfd);
+    } else if (OPT_HASARG(ops,'u') && !OPT_ISSET(ops,'p')) {
+	/* -u means take input from the specified file descriptor. */
+	char *eptr, *argptr = OPT_ARG(ops,'u');
+	/* The old code handled -up, but that was never documented. Still...*/
+	if (!strcmp(argptr, "p")) {
+	    readfd = coprocin;
+	} else {
+	    readfd = (int)zstrtol(argptr, &eptr, 10);
+	    if (*eptr) {
+		zwarnnam(name, "number expected after -u: %s", argptr, 0);
+		return 1;
+	    }
+	}
+#if 0
+	/* This code is left as a warning to future generations --- pws. */
+	for (readfd = 9; readfd && !OPT_ISSET(ops,readfd + '0'); --readfd);
+#endif
 	izle = 0;
-    } else if (ops['p']) {
+    } else if (OPT_ISSET(ops,'p')) {
 	readfd = coprocin;
 	izle = 0;
     } else
 	readfd = izle = 0;
 
-    if (ops['t'] && !read_poll(readfd, &readchar, keys && !zleactive)) {
-	if (ops['k'] && !zleactive && !isem)
+    if (OPT_ISSET(ops,'t') && 
+	!read_poll(readfd, &readchar, keys && !zleactive)) {
+	if (OPT_ISSET(ops,'k') && !zleactive && !isem)
 	    settyinfo(&shttyinfo);
 	if (haso) {
 	    fclose(shout);
@@ -3956,7 +4066,7 @@ bin_read(char *name, char **args, char *ops, int func)
 	}
 	return 1;
     }
-    if (ops['s'] && SHTTY != -1) {
+    if (OPT_ISSET(ops,'s') && SHTTY != -1) {
 	struct ttyinfo ti;
 	gettyinfo(&ti);
 	saveti = ti;
@@ -3983,7 +4093,7 @@ bin_read(char *name, char **args, char *ops, int func)
     }
 
     /* option -k means read only a given number of characters (default 1) */
-    if (ops['k']) {
+    if (OPT_ISSET(ops,'k')) {
 	/* allocate buffer space for result */
 	bptr = buf = (char *)zalloc(nchars+1);
 
@@ -4010,7 +4120,7 @@ bin_read(char *name, char **args, char *ops, int func)
 	    }
 	} while (nchars > 0);
 	
-	if (!izle && !ops['u'] && !ops['p']) {
+	if (!izle && !OPT_ISSET(ops,'u') && !OPT_ISSET(ops,'p')) {
 	    /* dispose of result appropriately, etc. */
 	    if (isem)
 		while (val > 0 && read(SHTTY, &d, 1) == 1 && d != '\n');
@@ -4025,9 +4135,9 @@ bin_read(char *name, char **args, char *ops, int func)
 	    }
 	}
 
-	if (ops['e'] || ops['E'])
+	if (OPT_ISSET(ops,'e') || OPT_ISSET(ops,'E'))
 	    fwrite(buf, bptr - buf, 1, stdout);
-	if (!ops['e'])
+	if (!OPT_ISSET(ops,'e'))
 	    setsparam(reply, metafy(buf, bptr - buf, META_REALLOC));
 	else
 	    zfree(buf, bptr - buf + 1);
@@ -4037,7 +4147,7 @@ bin_read(char *name, char **args, char *ops, int func)
     }
 
     /* option -q means get one character, and interpret it as a Y or N */
-    if (ops['q']) {
+    if (OPT_ISSET(ops,'q')) {
 	char readbuf[2];
 
 	/* set up the buffer */
@@ -4058,9 +4168,9 @@ bin_read(char *name, char **args, char *ops, int func)
 		SHTTY = -1;
 	    }
 	}
-	if (ops['e'] || ops['E'])
+	if (OPT_ISSET(ops,'e') || OPT_ISSET(ops,'E'))
 	    printf("%s\n", readbuf);
-	if (!ops['e'])
+	if (!OPT_ISSET(ops,'e'))
 	    setsparam(reply, ztrdup(readbuf));
 
 	if (resettty && SHTTY != -1)
@@ -4073,11 +4183,11 @@ bin_read(char *name, char **args, char *ops, int func)
        onto the last parameter.  If an array is specified, all the words become
        separate elements of the array. */
 
-    zbuforig = zbuf = (!ops['z']) ? NULL :
+    zbuforig = zbuf = (!OPT_ISSET(ops,'z')) ? NULL :
 	(nonempty(bufstack)) ? (char *) getlinknode(bufstack) : ztrdup("");
     first = 1;
     bslash = 0;
-    while (*args || (ops['A'] && !gotnl)) {
+    while (*args || (OPT_ISSET(ops,'A') && !gotnl)) {
 	sigset_t s = child_unblock();
 	buf = bptr = (char *)zalloc(bsiz = 64);
 	/* get input, a character at a time */
@@ -4108,7 +4218,7 @@ bin_read(char *name, char **args, char *ops, int func)
 		first |= !iwsep(c);
 		continue;
 	    }
-	    bslash = c == '\\' && !bslash && !ops['r'];
+	    bslash = c == '\\' && !bslash && !OPT_ISSET(ops,'r');
 	    if (bslash)
 		continue;
 	    first = 0;
@@ -4130,19 +4240,19 @@ bin_read(char *name, char **args, char *ops, int func)
 	    gotnl = 1;
 	*bptr = '\0';
 	/* dispose of word appropriately */
-	if (ops['e'] || ops['E']) {
+	if (OPT_ISSET(ops,'e') || OPT_ISSET(ops,'E')) {
 	    zputs(buf, stdout);
 	    putchar('\n');
 	}
-	if (!ops['e'] && (*buf || first)) {
-	    if (ops['A']) {
+	if (!OPT_ISSET(ops,'e') && (*buf || first)) {
+	    if (OPT_ISSET(ops,'A')) {
 		addlinknode(readll, buf);
 		al++;
 	    } else
 		setsparam(reply, buf);
 	} else
 	    free(buf);
-	if (!ops['A'])
+	if (!OPT_ISSET(ops,'A'))
 	    reply = *args++;
     }
     /* handle EOF */
@@ -4154,15 +4264,15 @@ bin_read(char *name, char **args, char *ops, int func)
 	}
     }
     /* final assignment (and display) of array parameter */
-    if (ops['A']) {
+    if (OPT_ISSET(ops,'A')) {
 	char **pp, **p = NULL;
 	LinkNode n;
 
-	p = (ops['e'] ? (char **)NULL
+	p = (OPT_ISSET(ops,'e') ? (char **)NULL
 	     : (char **)zalloc((al + 1) * sizeof(char *)));
 
 	for (pp = p, n = firstnode(readll); n; incnode(n)) {
-	    if (ops['e'] || ops['E']) {
+	    if (OPT_ISSET(ops,'e') || OPT_ISSET(ops,'E')) {
 		zputs((char *) getdata(n), stdout);
 		putchar('\n');
 	    }
@@ -4202,7 +4312,7 @@ bin_read(char *name, char **args, char *ops, int func)
 		    continue;
 		}
 	    }
-	    bslash = c == '\\' && !bslash && !ops['r'];
+	    bslash = c == '\\' && !bslash && !OPT_ISSET(ops,'r');
 	    if (bslash)
 		continue;
 	    if (imeta(c)) {
@@ -4226,11 +4336,11 @@ bin_read(char *name, char **args, char *ops, int func)
     if (resettty && SHTTY != -1)
 	settyinfo(&saveti);
     /* final assignment of reply, etc. */
-    if (ops['e'] || ops['E']) {
+    if (OPT_ISSET(ops,'e') || OPT_ISSET(ops,'E')) {
 	zputs(buf, stdout);
 	putchar('\n');
     }
-    if (!ops['e'])
+    if (!OPT_ISSET(ops,'e'))
 	setsparam(reply, buf);
     else
 	zsfree(buf);
@@ -4345,7 +4455,7 @@ testlex(void)
 
 /**/
 int
-bin_test(char *name, char **argv, char *ops, int func)
+bin_test(char *name, char **argv, Options ops, int func)
 {
     char **s;
     Eprog prog;
@@ -4400,7 +4510,7 @@ bin_test(char *name, char **argv, char *ops, int func)
 
 /**/
 int
-bin_times(char *name, char **argv, char *ops, int func)
+bin_times(char *name, char **argv, Options ops, int func)
 {
     struct tms buf;
 
@@ -4422,7 +4532,7 @@ bin_times(char *name, char **argv, char *ops, int func)
 
 /**/
 int
-bin_trap(char *name, char **argv, char *ops, int func)
+bin_trap(char *name, char **argv, Options ops, int func)
 {
     Eprog prog;
     char *arg, *s;
@@ -4498,11 +4608,11 @@ bin_trap(char *name, char **argv, char *ops, int func)
 
 /**/
 int
-bin_ttyctl(char *name, char **argv, char *ops, int func)
+bin_ttyctl(char *name, char **argv, Options ops, int func)
 {
-    if (ops['f'])
+    if (OPT_ISSET(ops,'f'))
 	ttyfrozen = 1;
-    else if (ops['u'])
+    else if (OPT_ISSET(ops,'u'))
 	ttyfrozen = 0;
     else
 	printf("tty is %sfrozen\n", ttyfrozen ? "" : "not ");
@@ -4513,7 +4623,7 @@ bin_ttyctl(char *name, char **argv, char *ops, int func)
 
 /**/
 int
-bin_let(char *name, char **argv, char *ops, int func)
+bin_let(char *name, char **argv, Options ops, int func)
 {
     zlong val = 0;
 
@@ -4531,7 +4641,7 @@ bin_let(char *name, char **argv, char *ops, int func)
 
 /**/
 int
-bin_umask(char *nam, char **args, char *ops, int func)
+bin_umask(char *nam, char **args, Options ops, int func)
 {
     mode_t um;
     char *s = *args;
@@ -4541,7 +4651,7 @@ bin_umask(char *nam, char **args, char *ops, int func)
     umask(um);
     /* No arguments means to display the current setting. */
     if (!s) {
-	if (ops['S']) {
+	if (OPT_ISSET(ops,'S')) {
 	    char *who = "ugo";
 
 	    while (*who) {
@@ -4642,7 +4752,7 @@ bin_umask(char *nam, char **args, char *ops, int func)
 
 /**/
 mod_export int
-bin_notavail(char *nam, char **argv, char *ops, int func)
+bin_notavail(char *nam, char **argv, Options ops, int func)
 {
     zwarnnam(nam, "not available on this system", NULL, 0);
     return 1;

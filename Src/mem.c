@@ -1238,7 +1238,7 @@ calloc(MALLOC_ARG_T n, MALLOC_ARG_T size)
 
 /**/
 int
-bin_mem(char *name, char **argv, char *ops, int func)
+bin_mem(char *name, char **argv, Options ops, int func)
 {
     int i, ii, fi, ui, j;
     struct m_hdr *m, *mf, *ms;
@@ -1246,21 +1246,21 @@ bin_mem(char *name, char **argv, char *ops, int func)
     long u = 0, f = 0, to, cu;
 
     queue_signals();
-    if (ops['v']) {
+    if (OPT_ISSET(ops,'v')) {
 	printf("The lower and the upper addresses of the heap. Diff gives\n");
 	printf("the difference between them, i.e. the size of the heap.\n\n");
     }
     printf("low mem %ld\t high mem %ld\t diff %ld\n",
 	   (long)m_l, (long)m_high, (long)(m_high - ((char *)m_l)));
 
-    if (ops['v']) {
+    if (OPT_ISSET(ops,'v')) {
 	printf("\nThe number of bytes that were allocated using sbrk() and\n");
 	printf("the number of bytes that were given back to the system\n");
 	printf("via brk().\n");
     }
     printf("\nsbrk %d\tbrk %d\n", m_s, m_b);
 
-    if (ops['v']) {
+    if (OPT_ISSET(ops,'v')) {
 	printf("\nInformation about the sizes that were allocated or freed.\n");
 	printf("For each size that were used the number of mallocs and\n");
 	printf("frees is shown. Diff gives the difference between these\n");
@@ -1282,7 +1282,7 @@ bin_mem(char *name, char **argv, char *ops, int func)
     if (m_m[i] || m_f[i])
 	printf("big\t%d\t%d\t%d\n", m_m[i], m_f[i], m_m[i] - m_f[i]);
 
-    if (ops['v']) {
+    if (OPT_ISSET(ops,'v')) {
 	printf("\nThe list of memory blocks. For each block the following\n");
 	printf("information is shown:\n\n");
 	printf("num\tthe number of this block\n");
@@ -1334,7 +1334,7 @@ bin_mem(char *name, char **argv, char *ops, int func)
 	    mf = mf->next;
     }
 
-    if (ops['v']) {
+    if (OPT_ISSET(ops,'v')) {
 	printf("\nHere is some information about the small blocks used.\n");
 	printf("For each size the arrays with the number of free and the\n");
 	printf("number of used blocks are shown.\n");
@@ -1353,7 +1353,7 @@ bin_mem(char *name, char **argv, char *ops, int func)
 	    }
 	    putchar('\n');
 	}
-    if (ops['v']) {
+    if (OPT_ISSET(ops,'v')) {
 	printf("\n\nBelow is some information about the allocation\n");
 	printf("behaviour of the zsh heaps. First the number of times\n");
 	printf("pushheap(), popheap(), and freeheap() were called.\n");
@@ -1362,7 +1362,7 @@ bin_mem(char *name, char **argv, char *ops, int func)
 
     printf("push %d\tpop %d\tfree %d\n\n", h_push, h_pop, h_free);
 
-    if (ops['v']) {
+    if (OPT_ISSET(ops,'v')) {
 	printf("\nThe next list shows for several sizes the number of times\n");
 	printf("memory of this size were taken from heaps.\n\n");
     }

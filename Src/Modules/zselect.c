@@ -62,7 +62,7 @@ handle_digits(char *nam, char *argptr, fd_set *fdset, int *fdmax)
 
 /**/
 static int
-bin_zselect(char *nam, char **args, char *ops, int func)
+bin_zselect(char *nam, char **args, Options ops, int func)
 {
 #ifdef HAVE_SELECT
     int i, fd, fdsetind = 0, fdmax = 0, fdcount;

@@ -103,7 +103,7 @@ ztgetflag(char *s)
 
 /**/
 static int
-bin_echotc(char *name, char **argv, char *ops, int func)
+bin_echotc(char *name, char **argv, Options ops, int func)
 {
     char *s, buf[2048], *t, *u;
     int num, argct;

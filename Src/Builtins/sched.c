@@ -46,7 +46,7 @@ static struct schedcmd *schedcmds;
 
 /**/
 static int
-bin_sched(char *nam, char **argv, char *ops, int func)
+bin_sched(char *nam, char **argv, Options ops, int func)
 {
     char *s = *argv++;
     time_t t;
@@ -143,9 +143,7 @@ bin_sched(char *nam, char **argv, char *ops, int func)
     of scheduled commands. */
     sch = (struct schedcmd *) zcalloc(sizeof *sch);
     sch->time = t;
-    PERMALLOC {
-	sch->cmd = zjoin(argv, ' ');
-    } LASTALLOC;
+    sch->cmd = zjoin(argv, ' ', 0);
     sch->next = NULL;
     for (sch2 = (struct schedcmd *)&schedcmds; sch2->next; sch2 = sch2->next);
     sch2->next = sch;
@@ -185,7 +183,14 @@ static struct builtin bintab[] = {
 
 /**/
 int
-boot_sched(Module m)
+setup_(Module m)
+{
+    return 0;
+}
+
+/**/
+int
+boot_(Module m)
 {
     if(!addbuiltins(m->nam, bintab, sizeof(bintab)/sizeof(*bintab)))
 	return 1;
@@ -193,11 +198,9 @@ boot_sched(Module m)
     return 0;
 }
 
-#ifdef MODULE
-
 /**/
 int
-cleanup_sched(Module m)
+cleanup_(Module m)
 {
     struct schedcmd *sch, *schn;
 
@@ -211,4 +214,9 @@ cleanup_sched(Module m)
     return 0;
 }
 
-#endif
+/**/
+int
+finish_(Module m)
+{
+    return 0;
+}

@@ -2396,24 +2396,26 @@ dump_find_func(Wordcode h, char *name)
 
 /**/
 int
-bin_zcompile(char *nam, char **args, char *ops, int func)
+bin_zcompile(char *nam, char **args, Options ops, int func)
 {
     int map, flags, ret;
     char *dump;
 
-    if ((ops['k'] && ops['z']) || (ops['R'] && ops['M']) ||
-	(ops['c'] && (ops['U'] || ops['k'] || ops['z'])) ||
-	(!(ops['c'] || ops['a']) && ops['m'])) {
+    if ((OPT_ISSET(ops,'k') && OPT_ISSET(ops,'z')) ||
+	(OPT_ISSET(ops,'R') && OPT_ISSET(ops,'M')) ||
+	(OPT_ISSET(ops,'c') &&
+	 (OPT_ISSET(ops,'U') || OPT_ISSET(ops,'k') || OPT_ISSET(ops,'z'))) ||
+	(!(OPT_ISSET(ops,'c') || OPT_ISSET(ops,'a')) && OPT_ISSET(ops,'m'))) {
 	zwarnnam(nam, "illegal combination of options", NULL, 0);
 	return 1;
     }
-    if ((ops['c'] || ops['a']) && isset(KSHAUTOLOAD))
+    if ((OPT_ISSET(ops,'c') || OPT_ISSET(ops,'a')) && isset(KSHAUTOLOAD))
 	zwarnnam(nam, "functions will use zsh style autoloading", NULL, 0);
 
-    flags = (ops['k'] ? FDHF_KSHLOAD :
-	     (ops['z'] ? FDHF_ZSHLOAD : 0));
+    flags = (OPT_ISSET(ops,'k') ? FDHF_KSHLOAD :
+	     (OPT_ISSET(ops,'z') ? FDHF_ZSHLOAD : 0));
 
-    if (ops['t']) {
+    if (OPT_ISSET(ops,'t')) {
 	Wordcode f;
 
 	if (!*args) {
@@ -2443,21 +2445,23 @@ bin_zcompile(char *nam, char **args, char *ops, int func)
 	zwarnnam(nam, "too few arguments", NULL, 0);
 	return 1;
     }
-    map = (ops['M'] ? 2 : (ops['R'] ? 0 : 1));
+    map = (OPT_ISSET(ops,'M') ? 2 : (OPT_ISSET(ops,'R') ? 0 : 1));
 
-    if (!args[1] && !(ops['c'] || ops['a'])) {
+    if (!args[1] && !(OPT_ISSET(ops,'c') || OPT_ISSET(ops,'a'))) {
 	queue_signals();
-	ret = build_dump(nam, dyncat(*args, FD_EXT), args, ops['U'], map, flags);
+	ret = build_dump(nam, dyncat(*args, FD_EXT), args, OPT_ISSET(ops,'U'),
+			 map, flags);
 	unqueue_signals();
 	return ret;
     }
     dump = (strsfx(FD_EXT, *args) ? *args : dyncat(*args, FD_EXT));
 
     queue_signals();
-    ret = ((ops['c'] || ops['a']) ?
-	   build_cur_dump(nam, dump, args + 1, ops['m'], map,
-			  (ops['c'] ? 1 : 0) | (ops['a'] ? 2 : 0)) :
-	   build_dump(nam, dump, args + 1, ops['U'], map, flags));
+    ret = ((OPT_ISSET(ops,'c') || OPT_ISSET(ops,'a')) ?
+	   build_cur_dump(nam, dump, args + 1, OPT_ISSET(ops,'m'), map,
+			  (OPT_ISSET(ops,'c') ? 1 : 0) | 
+			  (OPT_ISSET(ops,'a') ? 2 : 0)) :
+	   build_dump(nam, dump, args + 1, OPT_ISSET(ops,'U'), map, flags));
     unqueue_signals();
 
     return ret;
@@ -3217,7 +3221,7 @@ closedumps(void)
 
 /**/
 int
-dump_autoload(char *nam, char *file, int on, char *ops, int func)
+dump_autoload(char *nam, char *file, int on, Options ops, int func)
 {
     Wordcode h;
     FDHead n, e;
@@ -3236,7 +3240,7 @@ dump_autoload(char *nam, char *file, int on, char *ops, int func)
 	shf->flags = on;
 	shf->funcdef = mkautofn(shf);
 	shfunctab->addnode(shfunctab, ztrdup(fdname(n) + fdhtail(n)), shf);
-	if (ops['X'] && eval_autoload(shf, shf->nam, ops, func))
+	if (OPT_ISSET(ops,'X') && eval_autoload(shf, shf->nam, ops, func))
 	    ret = 1;
     }
     return ret;

@@ -57,7 +57,7 @@ static Param terminfo_pm;
 
 /**/
 static int
-bin_echoti(char *name, char **argv, char *ops, int func)
+bin_echoti(char *name, char **argv, Options ops, int func)
 {
     char *s, *t;
     int num;

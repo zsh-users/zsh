@@ -298,6 +298,7 @@ typedef struct cmdnam    *Cmdnam;
 typedef struct shfunc    *Shfunc;
 typedef struct funcstack *Funcstack;
 typedef struct funcwrap  *FuncWrap;
+typedef struct options	 *Options;
 typedef struct builtin   *Builtin;
 typedef struct nameddir  *Nameddir;
 typedef struct module    *Module;
@@ -934,7 +935,49 @@ struct funcwrap {
 
 /* node in builtin command hash table (builtintab) */
 
-typedef int (*HandlerFunc) _((char *, char **, char *, int));
+/*
+ * Handling of options.
+ *
+ * Option strings are standard in that a trailing `:' indicates
+ * a mandatory argument.  In addtion, `::' indicates an optional
+ * argument which must immediately follow the option letter if it is present.
+ * `:%' indicates an optional numeric argument which may follow
+ * the option letter or be in the next word; the only test is
+ * that the next character is a digit, and no actual conversion is done.
+ */
+
+#define MAX_OPS 128
+
+/* Macros taking struct option * and char argument */
+/* Option was set as -X */
+#define OPT_MINUS(ops,c)	((ops)->ind[c] & 1)
+/* Option was set as +X */
+#define OPT_PLUS(ops,c)		((ops)->ind[c] & 2)
+/*
+ * Option was set any old how, maybe including an argument 
+ * (cheap test when we don't care).
+ */
+#define OPT_ISSET(ops,c)	((ops)->ind[c])
+/* Option has an argument */
+#define OPT_HASARG(ops,c)	((ops)->ind[c] > 3)
+/* The argument for the option; not safe if it doesn't have one */
+#define OPT_ARG(ops,c)		((ops)->args[((ops)->ind[c] >> 2) - 1])
+/* Ditto, but safely returns NULL if there is no argument. */
+#define OPT_ARG_SAFE(ops,c)	(OPT_HASARG(ops,c) ? OPT_ARG(ops,c) : NULL)
+
+struct options {
+    unsigned char ind[MAX_OPS];
+    char **args;
+    int argscount, argsalloc;
+};
+
+/*
+ * Handler arguments are: builtin name, null-terminated argument
+ * list excluding command name, option structure, the funcid element from the
+ * builtin structure.
+ */
+
+typedef int (*HandlerFunc) _((char *, char **, Options, int));
 #define NULLBINCMD ((HandlerFunc) 0)
 
 struct builtin {
@@ -957,22 +1000,17 @@ struct builtin {
 /* builtin flags */
 /* DISABLE IS DEFINED AS (1<<0) */
 #define BINF_PLUSOPTS		(1<<1)	/* +xyz legal */
-#define BINF_R			(1<<2)	/* this is the builtin `r' (fc -e -) */
-#define BINF_PRINTOPTS		(1<<3)
-#define BINF_ADDED		(1<<4)	/* is in the builtins hash table */
-#define BINF_FCOPTS		(1<<5)
-#define BINF_TYPEOPT		(1<<6)
-#define BINF_ECHOPTS		(1<<7)
-#define BINF_MAGICEQUALS	(1<<8)  /* needs automatic MAGIC_EQUAL_SUBST substitution */
-#define BINF_PREFIX		(1<<9)
-#define BINF_DASH		(1<<10)
-#define BINF_BUILTIN		(1<<11)
-#define BINF_COMMAND		(1<<12)
-#define BINF_EXEC		(1<<13)
-#define BINF_NOGLOB		(1<<14)
-#define BINF_PSPECIAL		(1<<15)
-
-#define BINF_TYPEOPTS   (BINF_TYPEOPT|BINF_PLUSOPTS)
+#define BINF_PRINTOPTS		(1<<2)
+#define BINF_ADDED		(1<<3)	/* is in the builtins hash table */
+#define BINF_ECHOPTS		(1<<4)
+#define BINF_MAGICEQUALS	(1<<5)  /* needs automatic MAGIC_EQUAL_SUBST substitution */
+#define BINF_PREFIX		(1<<6)
+#define BINF_DASH		(1<<7)
+#define BINF_BUILTIN		(1<<8)
+#define BINF_COMMAND		(1<<9)
+#define BINF_EXEC		(1<<10)
+#define BINF_NOGLOB		(1<<11)
+#define BINF_PSPECIAL		(1<<12)
 
 struct module {
     char *nam;
@@ -1711,7 +1749,7 @@ struct heap {
 
 /* compctl entry point pointers */
 
-typedef int (*CompctlReadFn) _((char *, char **, char *, char *));
+typedef int (*CompctlReadFn) _((char *, char **, Options, char *));
 
 /* ZLE entry point pointers */
 

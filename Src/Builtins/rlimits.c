@@ -283,15 +283,15 @@ printulimit(int lim, int hard, int head)
 
 /**/
 static int
-bin_limit(char *nam, char **argv, char *ops, int func)
+bin_limit(char *nam, char **argv, Options ops, int func)
 {
     char *s;
     int hard, limnum, lim;
     rlim_t val;
     int ret = 0;
 
-    hard = ops['h'];
-    if (ops['s'] && !*argv)
+    hard = OPT_ISSET(ops,'h');
+    if (OPT_ISSET(ops,'s') && !*argv)
 	return setlimits(NULL);
     /* without arguments, display limits */
     if (!*argv) {
@@ -380,7 +380,7 @@ bin_limit(char *nam, char **argv, char *ops, int func)
 	    return 1;
 	} else
 	    limits[lim].rlim_cur = val;
-	if (ops['s'] && zsetlimit(lim, "limit"))
+	if (OPT_ISSET(ops,'s') && zsetlimit(lim, "limit"))
 	    ret++;
     }
     return ret;
@@ -391,13 +391,13 @@ bin_limit(char *nam, char **argv, char *ops, int func)
 
 /**/
 static int
-bin_unlimit(char *nam, char **argv, char *ops, int func)
+bin_unlimit(char *nam, char **argv, Options ops, int func)
 {
     int hard, limnum, lim;
     int ret = 0;
     uid_t euid = geteuid();
 
-    hard = ops['h'];
+    hard = OPT_ISSET(ops,'h');
     /* Without arguments, remove all limits. */
     if (!*argv) {
 	for (limnum = 0; limnum != RLIM_NLIMITS; limnum++) {
@@ -409,7 +409,7 @@ bin_unlimit(char *nam, char **argv, char *ops, int func)
 	    } else
 		limits[limnum].rlim_cur = limits[limnum].rlim_max;
 	}
-	if (ops['s'])
+	if (OPT_ISSET(ops,'s'))
 	    ret += setlimits(nam);
 	if (ret)
 	    zwarnnam(nam, "can't remove hard limits", NULL, 0);
@@ -443,7 +443,7 @@ bin_unlimit(char *nam, char **argv, char *ops, int func)
 		    limits[lim].rlim_max = RLIM_INFINITY;
 	    } else
 		limits[lim].rlim_cur = limits[lim].rlim_max;
-	    if (ops['s'] && zsetlimit(lim, nam))
+	    if (OPT_ISSET(ops,'s') && zsetlimit(lim, nam))
 		ret++;
 	}
     }
@@ -454,7 +454,7 @@ bin_unlimit(char *nam, char **argv, char *ops, int func)
 
 /**/
 static int
-bin_ulimit(char *name, char **argv, char *ops, int func)
+bin_ulimit(char *name, char **argv, Options ops, int func)
 {
     int res, resmask = 0, hard = 0, soft = 0, nres = 0;
     char *options;

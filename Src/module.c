@@ -92,9 +92,9 @@ register_module(char *n, Module_func setup, Module_func boot,
 
 /**/
 static void
-printmodalias(Module m, char *ops)
+printmodalias(Module m, Options ops)
 {
-    if (ops['L']) {
+    if (OPT_ISSET(ops,'L')) {
 	printf("zmodload -A ");
 	if (m->nam[0] == '-')
 	    fputs("-- ", stdout);
@@ -956,10 +956,11 @@ autoloadscan(HashNode hn, int printflags)
 
 /**/
 int
-bin_zmodload(char *nam, char **args, char *ops, int func)
+bin_zmodload(char *nam, char **args, Options ops, int func)
 {
-    int ops_bcpf = ops['b'] || ops['c'] || ops['p'] || ops['f'];
-    int ops_au = ops['a'] || ops['u'];
+    int ops_bcpf = OPT_ISSET(ops,'b') || OPT_ISSET(ops,'c') || 
+	OPT_ISSET(ops,'p') || OPT_ISSET(ops,'f');
+    int ops_au = OPT_ISSET(ops,'a') || OPT_ISSET(ops,'u');
     int ret = 1;
 
     if (ops_bcpf && !ops_au) {
@@ -967,41 +968,45 @@ bin_zmodload(char *nam, char **args, char *ops, int func)
 		 NULL, 0);
 	return 1;
     }
-    if (ops['A'] || ops['R']) {
-	if (ops_bcpf || ops_au || ops['d'] || (ops['R'] && ops['e'])) {
+    if (OPT_ISSET(ops,'A') || OPT_ISSET(ops,'R')) {
+	if (ops_bcpf || ops_au || OPT_ISSET(ops,'d') || 
+	    (OPT_ISSET(ops,'R') && OPT_ISSET(ops,'e'))) {
 	    zwarnnam(nam, "illegal flags combined with -A or -R", NULL, 0);
 	    return 1;
 	}
-	if (!ops['e'])
+	if (!OPT_ISSET(ops,'e'))
 	    return bin_zmodload_alias(nam, args, ops);
     }
-    if (ops['d'] && ops['a']) {
+    if (OPT_ISSET(ops,'d') && OPT_ISSET(ops,'a')) {
 	zwarnnam(nam, "-d cannot be combined with -a", NULL, 0);
 	return 1;
     }
-    if (ops['u'] && !*args) {
+    if (OPT_ISSET(ops,'u') && !*args) {
 	zwarnnam(nam, "what do you want to unload?", NULL, 0);
 	return 1;
     }
-    if (ops['e'] && (ops['I'] || ops['L'] || ops['a'] || ops['d'] ||
-		     ops['i'] || ops['u'])) {
+    if (OPT_ISSET(ops,'e') && (OPT_ISSET(ops,'I') || OPT_ISSET(ops,'L') || 
+			       OPT_ISSET(ops,'a') || OPT_ISSET(ops,'d') ||
+			       OPT_ISSET(ops,'i') || OPT_ISSET(ops,'u'))) {
 	zwarnnam(nam, "-e cannot be combined with other options", NULL, 0);
 	return 1;
     }
     queue_signals();
-    if (ops['e'])
+    if (OPT_ISSET(ops,'e'))
 	ret = bin_zmodload_exist(nam, args, ops);
-    else if (ops['d'])
+    else if (OPT_ISSET(ops,'d'))
 	ret = bin_zmodload_dep(nam, args, ops);
-    else if ((ops['a'] || ops['b']) && !(ops['c'] || ops['p'] || ops['f']))
+    else if ((OPT_ISSET(ops,'a') || OPT_ISSET(ops,'b')) && 
+	     !(OPT_ISSET(ops,'c') || OPT_ISSET(ops,'p') || OPT_ISSET(ops,'f')))
 	ret = bin_zmodload_auto(nam, args, ops);
-    else if (ops['c'] && !(ops['b'] || ops['p']))
+    else if (OPT_ISSET(ops,'c') && !(OPT_ISSET(ops,'b') || OPT_ISSET(ops,'p')))
 	ret = bin_zmodload_cond(nam, args, ops);
-    else if (ops['f'] && !(ops['b'] || ops['p']))
+    else if (OPT_ISSET(ops,'f') && !(OPT_ISSET(ops,'b') || OPT_ISSET(ops,'p')))
 	ret = bin_zmodload_math(nam, args, ops);
-    else if (ops['p'] && !(ops['b'] || ops['c']))
+    else if (OPT_ISSET(ops,'p') && !(OPT_ISSET(ops,'b') || OPT_ISSET(ops,'c')))
 	ret = bin_zmodload_param(nam, args, ops);
-    else if (!(ops['a'] || ops['b'] || ops['c'] || ops['p']))
+    else if (!(OPT_ISSET(ops,'a') || OPT_ISSET(ops,'b') || 
+	       OPT_ISSET(ops,'c') || OPT_ISSET(ops,'p')))
 	ret = bin_zmodload_load(nam, args, ops);
     else
 	zwarnnam(nam, "use only one of -b, -c, or -p", NULL, 0);
@@ -1012,7 +1017,7 @@ bin_zmodload(char *nam, char **args, char *ops, int func)
 
 /**/
 static int
-bin_zmodload_alias(char *nam, char **args, char *ops)
+bin_zmodload_alias(char *nam, char **args, Options ops)
 {
     /*
      * TODO: while it would be too nasty to have aliases, as opposed
@@ -1032,7 +1037,7 @@ bin_zmodload_alias(char *nam, char **args, char *ops)
     int ret = 0;
 
     if (!*args) {
-	if (ops['R']) {
+	if (OPT_ISSET(ops,'R')) {
 	    zwarnnam(nam, "no module alias to remove", NULL, 0);
 	    return 1;
 	}
@@ -1053,7 +1058,7 @@ bin_zmodload_alias(char *nam, char **args, char *ops)
 	    zwarnnam(nam, "invalid module name `%s'", *args, 0);
 	    return 1;
 	}
-	if (ops['R']) {
+	if (OPT_ISSET(ops,'R')) {
 	    if (aliasname) {
 		zwarnnam(nam, "bad syntax for removing module alias: %s",
 			 *args, 0);
@@ -1123,7 +1128,7 @@ bin_zmodload_alias(char *nam, char **args, char *ops)
 
 /**/
 static int
-bin_zmodload_exist(char *nam, char **args, char *ops)
+bin_zmodload_exist(char *nam, char **args, Options ops)
 {
     LinkNode node;
     Module m;
@@ -1135,7 +1140,8 @@ bin_zmodload_exist(char *nam, char **args, char *ops)
 	    modname = m->nam;
 	    if (m->flags & MOD_ALIAS) {
 		LinkNode node2;
-		if (ops['A'] && (node2 = find_module(m->u.alias, 1, NULL)))
+		if (OPT_ISSET(ops,'A') && 
+		    (node2 = find_module(m->u.alias, 1, NULL)))
 		    m = (Module) getdata(node2);
 		else
 		    continue;
@@ -1161,11 +1167,11 @@ bin_zmodload_exist(char *nam, char **args, char *ops)
 
 /**/
 static int
-bin_zmodload_dep(char *nam, char **args, char *ops)
+bin_zmodload_dep(char *nam, char **args, Options ops)
 {
     LinkNode node;
     Module m;
-    if (ops['u']) {
+    if (OPT_ISSET(ops,'u')) {
 	/* remove dependencies, which can't pertain to aliases */
 	const char *tnam = *args++;
 	node = find_module(tnam, 1, &tnam);
@@ -1201,7 +1207,7 @@ bin_zmodload_dep(char *nam, char **args, char *ops)
 	    m = (Module) getdata(node);
 	    if (m->deps && (!args[0] || !strcmp(args[0], m->nam))) {
 		LinkNode n;
-		if (ops['L']) {
+		if (OPT_ISSET(ops,'L')) {
 		    printf("zmodload -d ");
 		    if(m->nam[0] == '-')
 			fputs("-- ", stdout);
@@ -1212,7 +1218,7 @@ bin_zmodload_dep(char *nam, char **args, char *ops)
 		}
 		for (n = firstnode(m->deps); n; incnode(n)) {
 		    putchar(' ');
-		    if(ops['L'])
+		    if(OPT_ISSET(ops,'L'))
 			quotedzputs((char *) getdata(n), stdout);
 		    else
 			nicezputs((char *) getdata(n), stdout);
@@ -1234,15 +1240,15 @@ bin_zmodload_dep(char *nam, char **args, char *ops)
 
 /**/
 static int
-bin_zmodload_auto(char *nam, char **args, char *ops)
+bin_zmodload_auto(char *nam, char **args, Options ops)
 {
     int ret = 0;
-    if(ops['u']) {
+    if(OPT_ISSET(ops,'u')) {
 	/* remove autoloaded builtins */
 	for (; *args; args++) {
 	    Builtin bn = (Builtin) builtintab->getnode2(builtintab, *args);
 	    if (!bn) {
-		if(!ops['i']) {
+		if(!OPT_ISSET(ops,'i')) {
 		    zwarnnam(nam, "%s: no such builtin", *args, 0);
 		    ret = 1;
 		}
@@ -1256,7 +1262,7 @@ bin_zmodload_auto(char *nam, char **args, char *ops)
     } else if(!*args) {
 	/* list autoloaded builtins */
 	scanhashtable(builtintab, 0, 0, 0,
-	    autoloadscan, ops['L'] ? PRINT_LIST : 0);
+	    autoloadscan, OPT_ISSET(ops,'L') ? PRINT_LIST : 0);
 	return 0;
     } else {
 	/* add autoloaded builtins */
@@ -1267,7 +1273,7 @@ bin_zmodload_auto(char *nam, char **args, char *ops)
 	    if (strchr(bnam, '/')) {
 		zwarnnam(nam, "%s: `/' is illegal in a builtin", bnam, 0);
 		ret = 1;
-	    } else if (add_autobin(bnam, modnam) && !ops['i']) {
+	    } else if (add_autobin(bnam, modnam) && !OPT_ISSET(ops,'i')) {
 		zwarnnam(nam, "failed to add builtin %s", bnam, 0);
 		ret = 1;
 	    }
@@ -1278,17 +1284,17 @@ bin_zmodload_auto(char *nam, char **args, char *ops)
 
 /**/
 static int
-bin_zmodload_cond(char *nam, char **args, char *ops)
+bin_zmodload_cond(char *nam, char **args, Options ops)
 {
     int ret = 0;
 
-    if (ops['u']) {
+    if (OPT_ISSET(ops,'u')) {
 	/* remove autoloaded conditions */
 	for (; *args; args++) {
-	    Conddef cd = getconddef(ops['I'], *args, 0);
+	    Conddef cd = getconddef(OPT_ISSET(ops,'I'), *args, 0);
 
 	    if (!cd) {
-		if (!ops['i']) {
+		if (!OPT_ISSET(ops,'i')) {
 		    zwarnnam(nam, "%s: no such condition", *args, 0);
 		    ret = 1;
 		}
@@ -1305,7 +1311,7 @@ bin_zmodload_cond(char *nam, char **args, char *ops)
 
 	for (p = condtab; p; p = p->next) {
 	    if (p->module) {
-		if (ops['L']) {
+		if (OPT_ISSET(ops,'L')) {
 		    fputs("zmodload -ac", stdout);
 		    if (p->flags & CONDF_INFIX)
 			putchar('I');
@@ -1330,7 +1336,8 @@ bin_zmodload_cond(char *nam, char **args, char *ops)
 	    if (strchr(cnam, '/')) {
 		zwarnnam(nam, "%s: `/' is illegal in a condition", cnam, 0);
 		ret = 1;
-	    } else if (add_autocond(cnam, ops['I'], modnam) && !ops['i']) {
+	    } else if (add_autocond(cnam, OPT_ISSET(ops,'I'), modnam) &&
+		       !OPT_ISSET(ops,'i')) {
 		zwarnnam(nam, "failed to add condition `%s'", cnam, 0);
 		ret = 1;
 	    }
@@ -1341,17 +1348,17 @@ bin_zmodload_cond(char *nam, char **args, char *ops)
 
 /**/
 static int
-bin_zmodload_math(char *nam, char **args, char *ops)
+bin_zmodload_math(char *nam, char **args, Options ops)
 {
     int ret = 0;
 
-    if (ops['u']) {
+    if (OPT_ISSET(ops,'u')) {
 	/* remove autoloaded math functions */
 	for (; *args; args++) {
 	    MathFunc f = getmathfunc(*args, 0);
 
 	    if (!f) {
-		if (!ops['i']) {
+		if (!OPT_ISSET(ops,'i')) {
 		    zwarnnam(nam, "%s: no such math function", *args, 0);
 		    ret = 1;
 		}
@@ -1368,7 +1375,7 @@ bin_zmodload_math(char *nam, char **args, char *ops)
 
 	for (p = mathfuncs; p; p = p->next) {
 	    if (p->module) {
-		if (ops['L']) {
+		if (OPT_ISSET(ops,'L')) {
 		    fputs("zmodload -af", stdout);
 		    printf(" %s %s\n", p->module, p->name);
 		} else
@@ -1387,7 +1394,7 @@ bin_zmodload_math(char *nam, char **args, char *ops)
 		zwarnnam(nam, "%s: `/' is illegal in a math function",
 			 fnam, 0);
 		ret = 1;
-	    } else if (add_automathfunc(fnam, modnam) && !ops['i']) {
+	    } else if (add_automathfunc(fnam, modnam) && !OPT_ISSET(ops,'i')) {
 		zwarnnam(nam, "failed to add math function `%s'", fnam, 0);
 		ret = 1;
 	    }
@@ -1411,17 +1418,17 @@ printautoparams(HashNode hn, int lon)
 
 /**/
 static int
-bin_zmodload_param(char *nam, char **args, char *ops)
+bin_zmodload_param(char *nam, char **args, Options ops)
 {
     int ret = 0;
 
-    if (ops['u']) {
+    if (OPT_ISSET(ops,'u')) {
 	/* remove autoloaded parameters */
 	for (; *args; args++) {
 	    Param pm = (Param) gethashnode2(paramtab, *args);
 
 	    if (!pm) {
-		if (!ops['i']) {
+		if (!OPT_ISSET(ops,'i')) {
 		    zwarnnam(nam, "%s: no such parameter", *args, 0);
 		    ret = 1;
 		}
@@ -1433,7 +1440,7 @@ bin_zmodload_param(char *nam, char **args, char *ops)
 	}
 	return ret;
     } else if (!*args) {
-	scanhashtable(paramtab, 1, 0, 0, printautoparams, ops['L']);
+	scanhashtable(paramtab, 1, 0, 0, printautoparams, OPT_ISSET(ops,'L'));
 	return 0;
     } else {
 	/* add autoloaded parameters */
@@ -1544,12 +1551,12 @@ unload_module(Module m, LinkNode node)
 
 /**/
 static int
-bin_zmodload_load(char *nam, char **args, char *ops)
+bin_zmodload_load(char *nam, char **args, Options ops)
 {
     LinkNode node;
     Module m;
     int ret = 0;
-    if(ops['u']) {
+    if(OPT_ISSET(ops,'u')) {
 	/* unload modules */
 	const char *mname = *args;
 	for(; *args; args++) {
@@ -1579,7 +1586,7 @@ bin_zmodload_load(char *nam, char **args, char *ops)
 		    ret = 1;
 		if (del)
 		    m->wrapper--;
-	    } else if (!ops['i']) {
+	    } else if (!OPT_ISSET(ops,'i')) {
 		zwarnnam(nam, "no such module %s", *args, 0);
 		ret = 1;
 	    }
@@ -1591,7 +1598,7 @@ bin_zmodload_load(char *nam, char **args, char *ops)
 	for (node = firstnode(modules); node; incnode(node)) {
 	    m = (Module) getdata(node);
 	    if (m->u.handle && !(m->flags & (MOD_UNLOAD|MOD_ALIAS))) {
-		if(ops['L']) {
+		if(OPT_ISSET(ops,'L')) {
 		    printf("zmodload ");
 		    if(m->nam[0] == '-')
 			fputs("-- ", stdout);
@@ -1605,7 +1612,7 @@ bin_zmodload_load(char *nam, char **args, char *ops)
     } else {
 	/* load modules */
 	for (; *args; args++)
-	    if (!require_module(nam, *args, 1, (!ops['i'])))
+	    if (!require_module(nam, *args, 1, (!OPT_ISSET(ops,'i'))))
 		ret = 1;
 
 	return ret;

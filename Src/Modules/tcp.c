@@ -336,7 +336,7 @@ tcp_connect(Tcp_session sess, char *addrp, struct hostent *zhost, int d_port)
 }
 
 static int
-bin_ztcp(char *nam, char **args, char *ops, int func)
+bin_ztcp(char *nam, char **args, Options ops, int func)
 {
     int herrno, err=1, destport, force=0, verbose=0, test=0, targetfd=0;
     SOCKLEN_T  len;
@@ -345,16 +345,16 @@ bin_ztcp(char *nam, char **args, char *ops, int func)
     struct servent *srv;
     Tcp_session sess = NULL;
 
-    if (ops['f'])
+    if (OPT_ISSET(ops,'f'))
 	force = 1;
 
-    if (ops['v'])
+    if (OPT_ISSET(ops,'v'))
 	verbose = 1;
 
-    if (ops['t'])
+    if (OPT_ISSET(ops,'t'))
         test = 1;
 
-    if (ops['d']) {
+    if (OPT_ISSET(ops,'d')) {
 	targetfd = atoi(args[0]);
 	dargs = args + 1;
 	if (!targetfd) {
@@ -366,7 +366,7 @@ bin_ztcp(char *nam, char **args, char *ops, int func)
 	dargs = args;
 
 
-    if (ops['c']) {
+    if (OPT_ISSET(ops,'c')) {
 	if (!dargs[0]) {
 	    tcp_cleanup();
 	}
@@ -395,7 +395,7 @@ bin_ztcp(char *nam, char **args, char *ops, int func)
 	    }
 	}
     }
-    else if (ops['l']) {
+    else if (OPT_ISSET(ops,'l')) {
 	int lport = 0;
 
 	if (!dargs[0]) {
@@ -462,7 +462,7 @@ bin_ztcp(char *nam, char **args, char *ops, int func)
 	return 0;
 
     }
-    else if (ops['a'])
+    else if (OPT_ISSET(ops,'a'))
     {
 	int lfd, rfd;
 
@@ -571,7 +571,7 @@ bin_ztcp(char *nam, char **args, char *ops, int func)
 			remotename = ztpeer->h_name;
 		    else
 			remotename = ztrdup(inet_ntoa(sess->peer.in.sin_addr));
-		    if (ops['L']) {
+		    if (OPT_ISSET(ops,'L')) {
 			int schar;
 			if (sess->flags & ZTCP_ZFTP)
 			    schar = 'Z';

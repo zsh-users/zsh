@@ -1,3 +1,21 @@
+2002-08-27  Peter Stephenson  <pws@pwstephenson.fsnet.co.uk>
+
+	* unposted: Config/version.mk: Update version to 4.1.0-dev-6.
+	
+	* 17582: Doc/Zsh/builtins.yo, Src/builtin.c, Src/hashtable.c,
+	Src/hashtable.h, Src/init.c, Src/jobs.c, Src/mem.c, Src/module.c,
+	Src/options.c, Src/parse.c, Src/watch.c, Src/zsh.h,
+	Src/Builtins/rlimits.c, Src/Builtins/sched.c, Src/Modules/cap.c,
+	Src/Modules/clone.c, Src/Modules/datetime.c,
+	Src/Modules/example.c, Src/Modules/files.c, Src/Modules/pcre.c,
+	Src/Modules/socket.c, Src/Modules/stat.c, Src/Modules/tcp.c,
+	Src/Modules/termcap.c, Src/Modules/terminfo.c, Src/Modules/zftp.c,
+	Src/Modules/zprof.c, Src/Modules/zpty.c, Src/Modules/zselect.c,
+	Src/Modules/zutil.c, Src/Zle/compctl.c, Src/Zle/complete.c,
+	Src/Zle/computil.c, Src/Zle/zle_keymap.c, Src/Zle/zle_main.c,
+	Src/Zle/zle_thingy.c: Improve handling of arguments to options
+	of builtins by replacing character array with `struct options'.
+
 2002-08-24  Oliver Kiddle  <opk@zsh.org>
 
 	* 17577: Completion/Unix/Command/_ant, Completion/Unix/Command/_zip,

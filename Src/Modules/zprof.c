@@ -136,9 +136,9 @@ cmpparcs(Parc *a, Parc *b)
 }
 
 static int
-bin_zprof(char *nam, char **args, char *ops, int func)
+bin_zprof(char *nam, char **args, Options ops, int func)
 {
-    if (ops['c']) {
+    if (OPT_ISSET(ops,'c')) {
 	freepfuncs(calls);
 	calls = NULL;
 	ncalls = 0;

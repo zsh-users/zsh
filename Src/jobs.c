@@ -1252,11 +1252,11 @@ init_hackzero(char **argv, char **envp)
 
 /**/
 int
-bin_fg(char *name, char **argv, char *ops, int func)
+bin_fg(char *name, char **argv, Options ops, int func)
 {
     int job, lng, firstjob = -1, retval = 0, ofunc = func;
 
-    if (ops['Z']) {
+    if (OPT_ISSET(ops,'Z')) {
 	int len;
 
 	if(isset(RESTRICTED)) {
@@ -1277,8 +1277,8 @@ bin_fg(char *name, char **argv, char *ops, int func)
 	return 0;
     }
 
-    lng = (ops['l']) ? 1 : (ops['p']) ? 2 : 0;
-    if (ops['d'])
+    lng = (OPT_ISSET(ops,'l')) ? 1 : (OPT_ISSET(ops,'p')) ? 2 : 0;
+    if (OPT_ISSET(ops,'d'))
 	lng |= 4;
     
     if ((func == BIN_FG || func == BIN_BG) && !jobbing) {
@@ -1327,10 +1327,11 @@ bin_fg(char *name, char **argv, char *ops, int func)
 	    }
 	    for (job = 0; job != maxjob; job++, jobptr++)
 		if (job != ignorejob && jobptr->stat) {
-		    if ((!ops['r'] && !ops['s']) ||
-			(ops['r'] && ops['s']) ||
-			(ops['r'] && !(jobptr->stat & STAT_STOPPED)) ||
-			(ops['s'] && jobptr->stat & STAT_STOPPED))
+		    if ((!OPT_ISSET(ops,'r') && !OPT_ISSET(ops,'s')) ||
+			(OPT_ISSET(ops,'r') && OPT_ISSET(ops,'s')) ||
+			(OPT_ISSET(ops,'r') && 
+			 !(jobptr->stat & STAT_STOPPED)) ||
+			(OPT_ISSET(ops,'s') && jobptr->stat & STAT_STOPPED))
 			printjob(jobptr, lng, 2);
 		}
 	    unqueue_signals();
@@ -1498,7 +1499,7 @@ bin_fg(char *name, char **argv, char *ops, int func)
 
 /**/
 int
-bin_kill(char *nam, char **argv, char *ops, int func)
+bin_kill(char *nam, char **argv, Options ops, int func)
 {
     int sig = SIGTERM;
     int returnval = 0;
@@ -1642,10 +1643,10 @@ bin_kill(char *nam, char **argv, char *ops, int func)
 
 /**/
 int
-bin_suspend(char *name, char **argv, char *ops, int func)
+bin_suspend(char *name, char **argv, Options ops, int func)
 {
     /* won't suspend a login shell, unless forced */
-    if (islogin && !ops['f']) {
+    if (islogin && !OPT_ISSET(ops,'f')) {
 	zwarnnam(name, "can't suspend login shell", NULL, 0);
 	return 1;
     }

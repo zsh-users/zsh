@@ -559,7 +559,7 @@ dowatch(void)
 
 /**/
 int
-bin_log(char *nam, char **argv, char *ops, int func)
+bin_log(char *nam, char **argv, Options ops, int func)
 {
     if (!watch)
 	return 1;
@@ -581,7 +581,7 @@ void dowatch(void)
 
 /**/
 int
-bin_log(char *nam, char **argv, char *ops, int func)
+bin_log(char *nam, char **argv, Options ops, int func)
 {
     return bin_notavail(nam, argv, ops, func);
 }

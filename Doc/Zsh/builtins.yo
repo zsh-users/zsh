@@ -846,9 +846,6 @@ Read only one (or var(num)) characters.  All are assigned to the first
 var(name), without word splitting.  This flag is ignored when tt(-q) is
 present.  Input is read from the terminal unless one of tt(-u) or tt(-p)
 is present.  This option may also be used within zle widgets.
-
-Note that var(num) must be in the argument word that follows tt(-k), not
-in the same word.  See tt(-u).
 )
 item(tt(-z))(
 Read one entry from the editor buffer stack and assign it to the first
@@ -884,8 +881,7 @@ and that when the cursor is at the end of the line, its character
 index is the length of the line plus one.
 )
 item(tt(-u)var(n))(
-Input is read from file descriptor var(n), where var(n) is a single
-digit and must em(not) be separated from tt(-u) by any whitespace.
+Input is read from file descriptor var(n).
 )
 item(tt(-p))(
 Input is read from the coprocess.

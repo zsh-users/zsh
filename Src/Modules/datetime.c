@@ -32,7 +32,7 @@
 #include <time.h>
 
 static int
-bin_strftime(char *nam, char **argv, char *ops, int func)
+bin_strftime(char *nam, char **argv, Options ops, int func)
 {
     int bufsize, x;
     char *endptr = NULL, *buffer = NULL;

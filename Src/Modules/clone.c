@@ -41,7 +41,7 @@
 
 /**/
 static int
-bin_clone(char *nam, char **args, char *ops, int func)
+bin_clone(char *nam, char **args, Options ops, int func)
 {
     int ttyfd, pid;
 

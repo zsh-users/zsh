@@ -557,7 +557,7 @@ printhashtabinfo(HashTable ht)
 
 /**/
 int
-bin_hashinfo(char *nam, char **args, char *ops, int func)
+bin_hashinfo(char *nam, char **args, Options ops, int func)
 {
     HashTable ht;
 

@@ -40,15 +40,15 @@ static pcre_extra *pcre_hints;
 
 /**/
 static int
-bin_pcre_compile(char *nam, char **args, char *ops, int func)
+bin_pcre_compile(char *nam, char **args, Options ops, int func)
 {
     int pcre_opts = 0, pcre_errptr;
     const char *pcre_error;
     
-    if(ops['a']) pcre_opts |= PCRE_ANCHORED;
-    if(ops['i']) pcre_opts |= PCRE_CASELESS;
-    if(ops['m']) pcre_opts |= PCRE_MULTILINE;
-    if(ops['x']) pcre_opts |= PCRE_EXTENDED;
+    if(OPT_ISSET(ops,'a')) pcre_opts |= PCRE_ANCHORED;
+    if(OPT_ISSET(ops,'i')) pcre_opts |= PCRE_CASELESS;
+    if(OPT_ISSET(ops,'m')) pcre_opts |= PCRE_MULTILINE;
+    if(OPT_ISSET(ops,'x')) pcre_opts |= PCRE_EXTENDED;
     
     pcre_hints = NULL;  /* Is this necessary? */
     
@@ -68,7 +68,7 @@ bin_pcre_compile(char *nam, char **args, char *ops, int func)
 
 /**/
 static int
-bin_pcre_study(char *nam, char **args, char *ops, int func)
+bin_pcre_study(char *nam, char **args, Options ops, int func)
 {
     const char *pcre_error;
     
@@ -92,12 +92,12 @@ bin_pcre_study(char *nam, char **args, char *ops, int func)
 
 /**/
 static int
-bin_pcre_match(char *nam, char **args, char *ops, int func)
+bin_pcre_match(char *nam, char **args, Options ops, int func)
 {
     int ret, capcount, *ovec, ovecsize;
     char **captures, **matches, *receptacle = NULL;
     
-    if(ops['a']) {
+    if(OPT_ISSET(ops,'a')) {
 	receptacle = *args++;
 	if(!*args) {
 	    zwarnnam(nam, "not enough arguments", NULL, 0);

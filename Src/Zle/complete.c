@@ -421,7 +421,7 @@ parse_class(Cpattern p, unsigned char *s, unsigned char e)
 
 /**/
 static int
-bin_compadd(char *name, char **argv, char *ops, int func)
+bin_compadd(char *name, char **argv, Options ops, int func)
 {
     struct cadata dat;
     char *p, **sp, *e, *m = NULL, *mstr = NULL;
@@ -866,7 +866,7 @@ do_comp_vars(int test, int na, char *sa, int nb, char *sb, int mod)
 
 /**/
 static int
-bin_compset(char *name, char **argv, char *ops, int func)
+bin_compset(char *name, char **argv, Options ops, int func)
 {
     int test = 0, na = 0, nb = 0;
     char *sa = NULL, *sb = NULL;
