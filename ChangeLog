@@ -1,5 +1,8 @@
 2002-01-31  Oliver Kiddle  <opk@zsh.org>
 
+	* unposted: Functions/Prompts/prompt_oliver_setup: add example of
+	RPROMPT2 use
+
 	* Derek Peschel: 16494: Src/prompt.c: extract outermost words with
 	negative arguments to %_ prompt expansion and add %^ for a reverse
 	ordered status list

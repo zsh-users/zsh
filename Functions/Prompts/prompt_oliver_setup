@@ -36,6 +36,8 @@ prompt_oliver_setup() {
   [[ ${USER:-`whoami`} == (root|${(j(|))~normal_users}) ]] && user=""
 
   PS1="%{$pcolr%}$user$host%~%"'$((COLUMNS-12))'"(l.$prompt_newline. )[%h%1(j.%%%j.)%0(?..:%?)]%# %{$tcolr%}"
+  RPS2='<%^'
+  PS2=''
 }
 
 prompt_oliver_setup "$@"
