@@ -22,7 +22,7 @@ else
   [[ -n "$file" ]] &&
     compadd "$expl[@]" - \
       $(awk '/^[a-zA-Z0-9][^\/ \t]+:/ {print $1}
-	     /^\.include  *<bsd\.port\.(subdir\.|pre\.)\?mk>/ || /^\.include  *".*mk\/bsd\.pkg\.(subdir\.)\?mk"/ {
+	     /^\.include  *<bsd\.port\.(subdir\.|pre\.)?mk>/ || /^\.include  *".*mk\/bsd\.pkg\.(subdir\.)\?mk"/ {
 	       print "fetch fetch-list extract patch configure build install reinstall deinstall package describe checkpatch checksum makesum" }' \
 	    FS=: $file) && ret=0
   (( ret )) && { compset -P 1 '*\='; _files }
