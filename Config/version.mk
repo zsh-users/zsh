@@ -28,4 +28,4 @@
 # `=' signs.
 
 VERSION=4.2.3-dev-1
-VERSION_DATE='January 14, 2006'
+VERSION_DATE='January 14, 2005'
