@@ -1,6 +1,6 @@
 2000-06-14  Sven Wischnowsky  <wischnow@zsh.org>
 
-	* ?????: Src/parse.c: nix kaboom with `time time'
+	* 11885: Src/parse.c: nix kaboom with `time time'
 	
 	* ?????: Src/Zle/complist.c: better fix for menu selection on dumb 
 	terminal
