@@ -24,7 +24,7 @@
 
 2001-09-10  Clint Adams  <clint@zsh.org>
 
-	* 15783: Doc/Zsh/builtins.yo Doc/Zsh/mod_tcp.c,
+	* 15783: Doc/Zsh/builtins.yo, Doc/Zsh/mod_tcp.yo,
 	Doc/Zsh/.distfiles: document ztcp builtin.
 
 	* 15780: Src/Modules/tcp.c: tweak variable name.
