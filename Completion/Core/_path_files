@@ -354,10 +354,10 @@ for prepath in "$prepaths[@]"; do
       # it as far as possible.
 
       if [[ "$tmp3" = */* ]]; then
-        PREFIX="${linepath}${cpre}${tmp3%%/*}"
+        PREFIX="${donepath}${linepath}${cpre}${tmp3%%/*}"
 	SUFFIX="/${tmp3#*/}"
       else
-        PREFIX="${linepath}${cpre}${tmp3}"
+        PREFIX="${donepath}${linepath}${cpre}${tmp3}"
 	SUFFIX=""
       fi
 
