@@ -1,0 +1,87 @@
+#compdef bug reportbug querybts
+
+local _bug_commonargs _rb_commonargs
+
+_bug_commonargs=('-d[debug: send mail to postmaster@localhost]' \
+           '-m[maintainer-only]' \
+           '-p[print to stdout instead of mail]' \
+           '-h[help]' \
+           '-v[version]' \
+           '*:package:_deb_packages installed')
+
+
+_rb_commonargs=('(--bts)-B[use alternate BTS]:system:(debian gnome kde tdyc kde-debian)' \
+           '(-B)--bts=:system:(debian gnome kde tdyc kde-debian)' \
+           '(--ldap)-l[enable LDAP support]' \
+           '(-l)--ldap' \
+           '--no-ldap[disable LDAP support]' \
+	   '(--http_proxy)--proxy=:proxyhost:_hosts' \
+	   '(--proxy)--http_proxy=:proxyhost:_hosts')
+
+case "$service" in
+bug)
+_arguments '-c[exclude configs from report]' \
+           '-f[argument is a file, not a package]' \
+           '-H[special header]:custom header:' \
+           '-p[print to stdout instead of mail]' \
+           '-q[quiet - no e-mail forwarding]' \
+           '-s[set subject]:subject:' \
+           '-S[set severity]:severity:(wishlist normal important grave critical)' \
+           '-x[do not cc submitter]' \
+           '-z[send configs verbatim]' \
+           "$_bug_commonargs[@]"
+;;
+
+reportbug)
+_arguments '(--no-config-files)-c[exclude configs from report]' \
+           '(-c)--no-config-files' \
+           '(--file)-f[argument is a file, not a package]:filename:' \
+           '(-f)--file=:filename:_files' \
+           '(--header)-H[special header]:custom header:' \
+           '(-H)--header=:custom header:' \
+           '(--subject)-s[set subject]:subject:' \
+           '(-s)--subject=:subject:' \
+           '(--severity)-S[set severity]:severity:(wishlist normal important grave critical)' \
+           '(-S)--severity=:severity:(wishlist normal important grave critical)' \
+           '(--no-cc)-x[do not cc submitter]' \
+           '(-x)--no-cc' \
+           '(--no-compress)-z[send configs verbatim]' \
+           '(-z)--no-compress[send configs verbatim]' \
+           '(--af)-a[use af instead of editor]' \
+           '(-a)--af[use af instead of editor]' \
+           '(--no-bts-query)-b[do not check bts]' \
+           '(-b)--no-bts-query' \
+           '(--gnupg)-g[sign report with GnuPG]' \
+           '(-g)--gnupg[sign report with GnuPG]' \
+           '(--include)-i[include text]:include file:_files' \
+           '(-i)--include=:include file:_files' \
+           '(--mutt)-M[use mutt instead of editor]' \
+           '(-M)--mutt' \
+           '--mua=[use specified mua instead of editor]' \
+           '(--nmh --mh)-n[use comp instead of editor]' \
+           '(-n --mh)--nmh' \
+           '(--nmh -n)--mh' \
+           '(--output)-o[output to file instead of mail]:output file:_files' \
+           '(-o)--output=:output file:_files' \
+           '(--pgp)-P[sign report with PGP]' \
+           '(-P)--pgp' \
+           '--realname=' \
+           '(--replyto)--reply-to=' \
+           '(--reply-to)--replyto=' \
+           '(--print)-p[print to stdout instead of mail]' \
+           '(-p)--print' \
+           '(--quiet)-q[quiet - no e-mail forwarding]' \
+           '(-q)--quiet' \
+           '(--query-only)-Q[do not submit]' \
+           '(-Q)--query-only' \
+           "$_bug_commonargs[@]" \
+	   "$_rb_commonargs[@]"
+;;
+
+querybts)
+_arguments '(--web)-w[launch external web browser]' \
+           '(-w)--web' \
+           "$_rb_commonargs[@]" \
+           '*:package:_deb_packages avail'
+
+esac
