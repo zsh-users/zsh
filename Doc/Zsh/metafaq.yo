@@ -55,8 +55,8 @@ tt(http://www.cs.elte.hu/pub/zsh/)
 tt(ftp://ftp.kfki.hu/pub/packages/zsh/))
 )
 item(Israel)(
-nofill(tt(ftp://ftp.math.technion.ac.il/mirror/ftp.zsh.org/pub/zsh/)
-tt(http://www.math.technion.ac.il/mirror/ftp.zsh.org/pub/zsh/))
+nofill(tt(ftp://ftp.math.technion.ac.il/pub/zsh/)
+tt(http://www.math.technion.ac.il/pub/zsh/))
 )
 item(Italy)(
 nofill(tt(ftp://ftp.unina.it/pub/Unix/pkgs/shell/zsh/))

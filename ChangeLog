@@ -1,3 +1,8 @@
+2001-03-18  Peter Stephenson  <pws@pwstephenson.fsnet.co.uk>
+
+	* From Zvi Har'El: unposted: Doc/Zsh/metafaq.yo: shorter
+	address for Israeli mirror.
+
 2001-03-18  Clint Adams  <schizo@debian.org>
 
 	* 13662: Completion/Debian/_apt: new build-dep command
