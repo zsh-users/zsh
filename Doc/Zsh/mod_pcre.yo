@@ -1,0 +1,22 @@
+COMMENT(!MOD!zsh/pcre
+Interface to the PCRE library.
+!MOD!)
+cindex(regular expressions, perl-compatible)
+The tt(zsh/pcre) module makes some commands available as builtins:
+
+startitem()
+findex(pcre_compile)
+item(tt(pcre_compile) [ tt(-aimx) ] var(PCRE))(
+Compiles a perl-compatible regular expression.
+)
+findex(pcre_study)
+item(tt(pcre_study))(
+Studies the previously-compiled PCRE which may result in faster
+matching.
+)
+findex(pcre_match)
+item(tt(pcre_match) var(string))(
+Returns successfully if tt(string) matches the previously-compiled
+PCRE.
+)
+enditem()

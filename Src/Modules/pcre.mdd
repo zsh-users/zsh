@@ -1,0 +1,7 @@
+name=zsh/pcre
+link=either
+load=no
+
+autobins="pcre_compile pcre_study pcre_match"
+
+objects="pcre.o"
