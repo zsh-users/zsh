@@ -1,3 +1,10 @@
+2002-09-17  Peter Stephenson  <pws@csr.com>
+
+	* 17673: Src/exec.c, Test/A01grammar.ztst:
+	  for X in Y; true || B; done && X
+	executed X on every iteration.  Same bug with true -> false,
+	|| -> &&, && -> ||.
+
 2002-09-16  Oliver Kiddle  <opk@zsh.org>
 
 	* 17678: Src/builtin.c: ignore initial `--' argument to printf

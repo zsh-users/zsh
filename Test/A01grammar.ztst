@@ -319,3 +319,21 @@
   done < /dev/null | { read name; print done }
 0:Bug regression: `while' loop with redirection and pipeline
 >done
+
+# This used to be buggy and print X at the end of each iteration.
+  for f in 1 2 3 4; do
+    print $f || break
+  done && print X
+0:Handling of ||'s and &&'s with a for loop in between
+>1
+>2
+>3
+>4
+>X
+
+# Same bug for &&, used to print `no' at the end of each iteration
+  for f in 1 2 3 4; do
+    false && print strange
+  done || print no
+0:Handling of &&'s and ||'s with a for loop in between
+>no
