@@ -50,7 +50,7 @@ fi
 # unless that option argument also contains a `C'.
 
 tmp="$words[(I)--file=*]"
-tmpb="$words[(I)-*Cf*~--*]}"
+tmpb="$words[(I)-*Cf*~--*]"
 
 if (( tmp )); then
   tf=${~words[tmp][8,-1]}
