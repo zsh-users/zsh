@@ -10,11 +10,11 @@ _arguments -C '--verbose' \
            '--version' \
            '--altdir:altdir:_files -/' \
            '--admindir:admindir:_files -/' \
-    '--install:*::alt:->install' \
-    '--remove:*::alt:->remove' \
-    '--auto:altname:_files -W /var/lib/dpkg/alternatives' \
-    '--display:altname:_files -W /var/lib/dpkg/alternatives' \
-    '--config:altname:_files -W /var/lib/dpkg/alternatives' && return 0
+    '--install:*::alt:= ->install' \
+    '--remove:*::alt:= ->remove' \
+    '--auto:name:_files -W /var/lib/dpkg/alternatives' \
+    '--display:name:_files -W /var/lib/dpkg/alternatives' \
+    '--config:name:_files -W /var/lib/dpkg/alternatives' && return 0
 
 _call_function ret _update_alternatives_$state && return ret
 case "$state" in
@@ -34,7 +34,7 @@ case "$state" in
 
 	remove)
 	_arguments \
-                   '1:altname:_files -W /var/lib/dpkg/alternatives' \
+                   '1:name:_files -W /var/lib/dpkg/alternatives' \
                    '2:path:_files'
 	;;
 

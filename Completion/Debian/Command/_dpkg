@@ -58,7 +58,7 @@ _dpkg_actions=('(--install)-i[install packages]:*:Debian packages:->install' \
            '--print-architecture[print target architecture]' \
            '--print-gnu-build-architecture[print GNU version of target architecture]' \
            '--print-installation-architecture[print host architecture]' \
-           '--compare-versions[compare version numbers]:*:expression:->compare_versions')
+           '--compare-versions[compare version numbers]:*::expression:= ->compare_versions')
 
 _dpkg_options=('--abort-after[abort after errors]:number of errors:' \
            '--admindir=[data directory]:directory:_files -/' \
