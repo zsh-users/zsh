@@ -1,3 +1,9 @@
+2004-10-14  Peter Stephenson  <pws@csr.com>
+
+	* 20482: Src/Zle/complist.c: A TAB after entering interactive
+	completion caused nonsense to be inserted into the command
+	line.  The behaviour of TAB is still probably not ideal.
+
 2004-10-12  Wayne Davison  <wayned@users.sourceforge.net>
 
 	* unposted: Completion/Unix/Command/_make: got rid of an unused

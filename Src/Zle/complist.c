@@ -1730,8 +1730,18 @@ struct menustack {
     int cs, acc, nmatches, mline, mlbeg, nolist;
     struct menuinfo info;
     Cmgroup amatches, pmatches, lastmatches, lastlmatches;
+    /*
+     * Status for how line looked like previously.
+     */
     char *origline;
     int origcs, origll;
+    /*
+     * Status for interactive mode.  status is the line
+     * printed above the matches saying what the interactive
+     * completion prefix is.  mode says whether we are in
+     * interactive or some search mode.
+     * typed.
+     */
     char *status;
     int mode;
 };
@@ -1925,6 +1935,9 @@ msearch(Cmatch **ptr, int ins, int back, int rep, int *wrapp)
     return NULL;
 }
 
+/*
+ * Values to assign to mode: interactive, etc.
+ */
 #define MM_INTER   1
 #define MM_FSEARCH 2
 #define MM_BSEARCH 3
@@ -1972,6 +1985,14 @@ domenuselect(Hookdef dummy, Chdata dat)
         if (!strcmp(s, "interactive")) {
             int l = strlen(origline);
 
+	    /*
+	     * In interactive completion mode we don't insert
+	     * the completion onto the command line, instead
+	     * we show just what the user has typed and
+	     * the match so far underneath (stored in "status").
+	     * So put the command line back to how it
+	     * was before completion started.
+	     */
             mode = MM_INTER;
             cs = 0;
             foredel(ll);
@@ -2062,7 +2083,16 @@ domenuselect(Hookdef dummy, Chdata dat)
         if (first && !listshown && isset(LISTBEEP))
             zbeep();
         if (first) {
-            modeline = dyncat(complastprefix, complastsuffix);
+	    /*
+	     * remember the original data that we will use when
+	     * performing interactive completion to restore the
+	     * command line when a menu completion is inserted.
+	     * this is because menu completion will insert
+	     * the next match in the loop; for interactive
+	     * completion we don't want that, we always want to
+	     * be able to type the next character.
+	     */
+	    modeline = dupstring(line);
             modecs = cs;
             modell = ll;
             modelen = minfo.len;
@@ -2152,6 +2182,11 @@ domenuselect(Hookdef dummy, Chdata dat)
             else {
                 int l = strlen(origline);
 
+		/*
+		 * Entering interactive completion mode:
+		 * same code as when we enter it on menu selection
+		 * start.
+		 */
                 mode = MM_INTER;
                 cs = 0;
                 foredel(ll);
@@ -2205,6 +2240,13 @@ domenuselect(Hookdef dummy, Chdata dat)
             if (cmd != Th(z_acceptandinfernexthistory)) {
                 int l = strlen(origline);
 
+		/*
+		 * Interactive mode: we need to restore the
+		 * line, add the character, then remember how
+		 * this new line looks in order to keep
+		 * the command line as it is with just the
+		 * characters typed by the user.
+		 */
                 cs = 0;
                 foredel(ll);
                 spaceinline(l);
@@ -2699,6 +2741,12 @@ domenuselect(Hookdef dummy, Chdata dat)
 		   !strcmp(cmd->nam, "menu-complete") ||
 		   !strcmp(cmd->nam, "menu-expand-or-complete")) {
             if (mode == MM_INTER) {
+		/*
+		 * do_menucmp() has inserted the completion onto
+		 * the command line.  In interactive mode we
+		 * don't want that, just what the user typed,
+		 * so restore the information.
+		 */
                 origline = modeline;
                 origcs = modecs;
                 origll = modell;
