@@ -1,3 +1,11 @@
+2000-08-07  Peter Stephenson  <pws@csr.com>
+
+	* 12555: Fix static linking on cygwin.
+
+2000-08-07  Bart Schaefer  <schaefer@zsh.org>
+
+	* users/3358: Zero shout when closing SHTTY in subshells.
+
 2000-08-05  Bart Schaefer  <schaefer@zsh.org>
 
 	* unposted (Wayne, 12549): Src/system.h: Missing paren.

@@ -2503,6 +2503,7 @@ entersubsh(int how, int cl, int fake)
     if (!fake)
 	subsh = 1;
     if (SHTTY != -1) {
+	shout = NULL;
 	zclose(SHTTY);
 	SHTTY = -1;
     }
