@@ -477,15 +477,17 @@ example(bindkey '^Xf' insert-files)
 )
 tindex(narrow-to-region)
 tindex(narrow-to-region-invisible)
-xitem(tt(narrow-to-region [ -p) var(pre) tt(] [ -P) var(post) tt(] [ -n ] [) var(start) var(end) tt(]))
+xitem(tt(narrow-to-region [ -p) var(pre) tt(] [ -P) var(post) tt(]))
+xitem(    tt([ -S) var(statepm) tt(| -R) var(statepm) tt(] [ -n ] [) var(start) var(end) tt(])))
 item(tt(narrow-to-region-invisible))(
 Narrow the editable portion of the buffer to the region between the cursor
 and the mark, which may be in either order.  The region may not be empty.
 
 tt(narrow-to-region) may be used as a widget or called as a function from a
 user-defined widget; by default, the text outside the editable area remains
-visible.  Various options and arguments are available when it is called as
-a function.
+visible.  A tt(recursive-edit) is performed and the original widening
+status is then restored.  Various options and arguments are available when
+it is called as a function.
 
 The options tt(-p) var(pretext) and tt(-P) var(posttext) may be
 used to replace the text before and after the display for the duration of
@@ -498,16 +500,37 @@ will be made invisible.
 Two numeric arguments may be given which will be used instead of the cursor
 and mark positions.
 
+The option tt(-S) var(statepm) is used to narrow according to the other
+options while saving the original state in the parameter with name
+var(statepm), while the option tt(-R) var(statepm) is used to restore the
+state from the parameter; note in both cases the em(name) of the parameter
+is required.  In the second case, other options and arguments are
+irrelevant.  When this method is used, no tt(recursive-edit) is performed;
+the calling widget should call this function with the option tt(-S),
+perform its own editing on the command line or pass control to the user
+via `tt(zle recursive-edit)', then call this function with the option
+tt(-R).  The argument var(statepm) must be a suitable name for an ordinary
+parameter, except that parameters beginning with the prefix tt(_ntr_) are
+reserved for use within tt(narrow-to-region).  Typically the parameter will
+be local to the calling function.
+
 tt(narrow-to-region-invisible) is a simple widget which calls
 tt(narrow-to-region) with arguments which replace any text outside the
 region with `tt(...)'.
 
-On return from both widgets, the display is restored by any zle command
+The display is restored (and the widget returns) upon any zle command
 which would usually cause the line to be accepted or aborted.  Hence an
 additional such command is required to accept or abort the current line.
 
 The return status of both widgets is zero if the line was accepted, else
 non-zero.
+
+Here is a trivial example of a widget using this feature.
+example(local state
+narrow-to-region -p $'Editing restricted region\n' \ 
+  -P '' -S state
+zle recursive-edit
+narrow-to-region -R state)
 )
 tindex(predict-on)
 tindex(predict-off)

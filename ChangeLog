@@ -1,3 +1,9 @@
+2002-07-05  Peter Stephenson  <pws@csr.com>
+
+	* 17414: Doc/Zsh/contrib.yo, Functions/Zle/narrow-to-region:
+	allow narrow-to-region to save and restore state, a bit
+	like save-restriction in emacs only completely different.
+
 2002-07-05  Sven Wischnowsky  <wischnow@zsh.org>
 
 	* 17429: Src/Zle/complist.c: improve interactive mode when
