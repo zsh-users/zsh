@@ -8,7 +8,7 @@
 local curcontext="$curcontext" state line expl
 typeset -A opt_args
 
-if (( ! $+_telnet_short )); then
+if (( ! $+_telnet_args )); then
   local k help="$(telnet -\? < /dev/null 2>&1)"
   local -A optionmap
   optionmap=( "[-8]" '-8[allow 8-Bit data]' \
@@ -30,34 +30,21 @@ if (( ! $+_telnet_short )); then
               "[-r]" '-r[rlogin like user interface]' \
               "[-s src_addr]" '-s+[set source IP address]:src_addr:' \
               "[-x]" '-x' \
-              "[-t transcom]" '-t+:transcom:' )
-
-  _telnet_short=()
-  for k in ${(k)optionmap}
-  do
-    [[ "$help" = *"$k"* ]] &&
-      _telnet_short=( "$_telnet_short[@]" "$optionmap[$k]" )
-  done
-
-  # _arguments cannot handle following three options.
-  optionmap=( "[-noasynch]" '-noasynch' \
+              "[-t transcom]" '-t+:transcom:' \
+              "[-noasynch]" '-noasynch' \
               "[-noasyncnet]" '-noasyncnet' \
               "[-noasynctty]" '-noasynctty' )
 
-  _telnet_long=()
+  _telnet_args=()
   for k in ${(k)optionmap}
   do
     [[ "$help" = *"$k"* ]] &&
-      _telnet_long=( "$_telnet_long[@]" "$optionmap[$k]" )
+      _telnet_args=( "$_telnet_args[@]" "$optionmap[$k]" )
   done
 fi
 
-(( $#_telnet_long )) && _wanted options expl option &&
-   { ! _style options prefix-needed || [[ "$PREFIX" = [-+]* ]] } &&
-    _describe -o option _telnet_long "$expl[@]"
-
 _arguments -C -s \
-  "$_telnet_short[@]" \
+  "$_telnet_args[@]" \
   ':host:->hosts' \
   ':port:->ports'
 
