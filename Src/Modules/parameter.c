@@ -967,14 +967,16 @@ scanpmmodules(HashTable ht, ScanFunc func, int flags)
 static void
 dirssetfn(Param pm, char **x)
 {
+    char **ox = x;
+
     if (!incleanup) {
 	freelinklist(dirstack, freestr);
 	dirstack = znewlinklist();
 	while (x && *x)
 	    zaddlinknode(dirstack, ztrdup(*x++));
     }
-    if (x)
-	freearray(x);
+    if (ox)
+	freearray(ox);
 }
 
 /**/
