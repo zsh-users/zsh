@@ -1,3 +1,7 @@
+2000-11-27  Bart Schaefer  <schaefer@zsh.org>
+
+	* 132xx: Completion/Builtins/_zstyle: Add missing quote.
+
 2000-11-27  Sven Wischnowsky  <wischnow@zsh.org>
 
 	* 13199: .cvsignore, Completion/User/_gprof: pattern-fix in

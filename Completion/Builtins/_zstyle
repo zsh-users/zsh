@@ -294,7 +294,7 @@ while [[ -n $state ]]; do
       ;;
 
     insunambig) 
-      _wanted values expl 'insert unambiguous string compadd true false pattern
+      _wanted values expl 'insert unambiguous string' compadd true false pattern
       ;;
 
     urgh) 
