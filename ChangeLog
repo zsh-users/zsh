@@ -1,3 +1,9 @@
+2001-06-13  Peter Stephenson  <pws@csr.com>
+
+	* unposted: Completion/compinstall: spotted by Bart: assignments
+	when finding $fpath if not set in current shell were completely
+	garbled.
+
 2001-06-11  Peter Stephenson  <pws@csr.com>
 
 	* 14840: Doc/Zsh/options.yo: document search behaviour with
