@@ -166,6 +166,9 @@
 /* Define for Maildir support */
 #undef MAILDIR_SUPPORT
 
+/* Define if you want locale features.  By default this is defined. */
+#undef CONFIG_LOCALE
+
 /* Define to 1 if your termcap library has the ospeed variable */
 #undef HAVE_OSPEED
 /* Define to 1 if you have ospeed, but it is not defined in termcap.h */

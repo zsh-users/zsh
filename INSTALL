@@ -358,3 +358,4 @@ Features:
      function-subdirs    # if functions will be installed into subdirectories
      dynamic             # allow dynamically loaded binary modules
      lfs                 # allow configure check for large files
+     locale              # allow use of locale library

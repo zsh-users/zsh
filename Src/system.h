@@ -632,3 +632,9 @@ extern short ospeed;
 #undef ESRCH
 #define ESRCH EINVAL
 #endif /* BROKEN_KILL_ESRCH */
+
+/* Can we do locale stuff? */
+#undef USE_LOCALE
+#if defined(CONFIG_LOCALE) && defined(HAVE_SETLOCALE) && defined(LC_ALL)
+# define USE_LOCALE 1
+#endif /* CONFIG_LOCALE && HAVE_SETLOCALE && LC_ALL */

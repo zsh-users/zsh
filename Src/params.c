@@ -146,7 +146,7 @@ IPDEF2("WORDCHARS", wordcharsgetfn, wordcharssetfn, 0),
 IPDEF2("IFS", ifsgetfn, ifssetfn, PM_DONTIMPORT),
 IPDEF2("_", underscoregetfn, nullsetfn, PM_READONLY),
 
-#ifdef LC_ALL
+#ifdef USE_LOCALE
 # define LCIPDEF(name) IPDEF2(name, strgetfn, lcsetfn, PM_UNSET)
 IPDEF2("LANG", strgetfn, langsetfn, PM_UNSET),
 IPDEF2("LC_ALL", strgetfn, lc_allsetfn, PM_UNSET),
@@ -162,7 +162,7 @@ LCIPDEF("LC_MESSAGES"),
 # ifdef LC_TIME
 LCIPDEF("LC_TIME"),
 # endif
-#endif
+#endif /* USE_LOCALE */
 
 #define IPDEF4(A,B) {NULL,A,PM_INTEGER|PM_READONLY|PM_SPECIAL,BR((void *)B),SFN(nullsetfn),GFN(intvargetfn),stdunsetfn,10,NULL,NULL,NULL,0}
 IPDEF4("!", &lastpid),
@@ -2444,7 +2444,7 @@ ifssetfn(Param pm, char *x)
 
 /* Functions to set value of special parameters `LANG' and `LC_*' */
 
-#ifdef LC_ALL
+#ifdef USE_LOCALE
 static struct localename {
     char *name;
     int category;
@@ -2511,7 +2511,7 @@ lcsetfn(Param pm, char *x)
 	if (!strcmp(ln->name, pm->nam))
 	    setlocale(ln->category, x ? x : "");
 }
-#endif
+#endif /* USE_LOCALE */
 
 /* Function to get value for special parameter `HISTSIZE' */
 

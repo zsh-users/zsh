@@ -35,7 +35,7 @@ int
 main(int argc, char **argv)
 {
     char **t;
-#ifdef LC_ALL
+#ifdef USE_LOCALE
     setlocale(LC_ALL, "");
 #endif
 
