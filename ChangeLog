@@ -4,6 +4,9 @@
 
 2000-05-05  Sven Wischnowsky  <wischnow@informatik.hu-berlin.de>
 
+	* 11188: Completion/Core/_main_complete, Completion/Core/_message:
+ 	make _message independent of when it is called
+	
 	* 11186: Functions/Misc/nslookup: use `eval' in nslookup for
  	pager, in case someone has PAGER='less -foo' or some such
 	
