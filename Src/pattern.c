@@ -1818,10 +1818,9 @@ patmatch(Upat prog)
 			syncstrp->p = (unsigned char *)zshcalloc(patinlen);
 			while ((ret = patmatch(P_OPERAND(scan)))) {
 			    unsigned char *syncpt;
-			    char savchar, *testptr;
-			    char *savpatinstart = patinstart;
+			    char *savpatinstart, *origsave, *origpatinstart;
 			    int savforce = forceerrs, savpatinlen = patinlen;
-			    int savpatflags = patflags;
+			    int savpatflags = patflags, synclen;
 			    forceerrs = -1;
 			    savglobdots = globdots;
 			    matchederrs = errsfound;
@@ -1837,16 +1836,38 @@ patmatch(Upat prog)
 			     */
 			    for (syncpt = syncstrp->p; !*syncpt; syncpt++)
 				;
-			    testptr = patinstart + (syncpt - syncstrp->p);
-			    DPUTS(testptr > matchpt, "BUG: EXCSYNC failed");
-			    savchar = *testptr;
-			    /*
-			     * If this isn't really the end of the string,
-			     * remember this for the (#e) assertion.
-			     */
-			    if (savchar)
+			    synclen = syncpt - syncstrp->p;
+			    if (patinstart[synclen]) {
+				/*
+				 * We need to truncate the string at
+				 * this point.  Copy a whole load of
+				 * stuff to avoid modifying the string.
+				 * This includes (at least) patinstart,
+				 * patinput and save.
+				 */
+				origsave = save;
+				origpatinstart = patinstart;
+
+				DPUTS(patinstart + synclen > matchpt,
+				      "BUG: EXCSYNC failed");
+
+				savpatinstart = patinstart =
+				    ztrduppfx(patinstart, synclen);
+				patinput = patinstart +
+				    (patinput - origpatinstart);
+				save = patinstart + (save - origpatinstart);
+				/*
+				 * If this isn't really the end of the string,
+				 * remember this for the (#e) assertion.
+				 */
 				patflags |= PAT_NOTEND;
-			    *testptr = '\0';
+			    }
+			    else
+			    {
+				/* Don't need to copy, already right length */
+				origsave = origpatinstart = NULL;
+				savpatinstart = patinstart;
+			    }
 			    next = PATNEXT(scan);
 			    while (next && P_ISEXCLUDE(next)) {
 				char *buf = NULL;
@@ -1893,7 +1914,17 @@ patmatch(Upat prog)
 				    break;
 				next = PATNEXT(next);
 			    }
-			    *testptr = savchar;
+			    /*
+			     * Free copied string and restore if
+			     * we needed to truncate.
+			     */
+			    if (origpatinstart) {
+				patinput = origpatinstart +
+				    (patinput - patinstart);
+				zfree(patinstart, synclen+1);
+				patinstart = origpatinstart;
+				save = origsave;
+			    }
 			    patflags = savpatflags;
 			    globdots = savglobdots;
 			    forceerrs = savforce;

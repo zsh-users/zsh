@@ -1124,6 +1124,12 @@ xitem(tt(test) [ var(arg) ... ])
 item(tt([) [ var(arg) ... ] tt(]))(
 Like the system version of tt(test).  Added for compatibility;
 use conditional expressions instead (see noderef(Conditional Expressions)).
+The main differences between the conditional expression syntax and the
+tt(test) and tt([) builtins are:  these commands are not handled
+syntactically, so for example an empty variable expansion may cause an
+argument to be omitted; syntax errors cause status 2 to be returned instead
+of a shell error; and arithmetic operators expect integer arguments rather
+than arithemetic expressions.
 )
 findex(times)
 cindex(shell, timing)

@@ -4851,7 +4851,7 @@ bin_test(char *name, char **argv, UNUSED(Options ops), int func)
     state.strs = prog->strs;
 
 
-    return !evalcond(&state);
+    return evalcond(&state, name);
 }
 
 /* display a time, provided in units of 1/60s, as minutes and seconds */

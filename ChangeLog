@@ -1,3 +1,13 @@
+2004-10-05  Peter Stephenson  <pws@csr.com>
+
+	* 20435: Src/pattern.c: fix crash in negative matching.  Could do
+	with being streamlined but that might be a big change.
+
+	* 20412 (tweaked): Doc/Zsh/builtins.yo, Src/builtin.c, Src/cond.c,
+	Src/exec.c, Src/utils.c: Make test and [ builtins more POSIX
+	compatible: return status 2 for errors, require integer
+	constants for numeric tests.
+
 2004-10-01  Wayne Davison  <wayned@users.sourceforge.net>
 
 	* 20438: Src/builtin.c, Src/hist.c, Src/params.c, Src/zsh.h:

@@ -3187,7 +3187,13 @@ execcond(Estate state, UNUSED(int do_exec))
 	tracingcond++;
     }
     cmdpush(CS_COND);
-    stat = !evalcond(state);
+    stat = evalcond(state, NULL);
+    /*
+     * 2 indicates a syntax error.  For compatibility, turn this
+     * into a shell error.
+     */
+    if (stat == 2)
+	errflag = 1;
     cmdpop();
     if (isset(XTRACE)) {
 	fprintf(xtrerr, " ]]\n");

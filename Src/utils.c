@@ -96,6 +96,10 @@ zwarn(const char *fmt, const char *str, int num)
 mod_export void
 zwarnnam(const char *cmd, const char *fmt, const char *str, int num)
 {
+    if (!cmd) {
+	zwarn(fmt, str, num);
+	return;
+    }
     if (errflag || noerrs)
 	return;
     trashzle();
@@ -103,10 +107,8 @@ zwarnnam(const char *cmd, const char *fmt, const char *str, int num)
 	nicezputs(scriptname ? scriptname : argzero, stderr);
 	fputc((unsigned char)':', stderr);
     }
-    if (cmd) {
-	nicezputs(cmd, stderr);
-	fputc((unsigned char)':', stderr);
-    }
+    nicezputs(cmd, stderr);
+    fputc((unsigned char)':', stderr);
     zerrmsg(fmt, str, num);
 }
 
