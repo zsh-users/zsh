@@ -2873,11 +2873,15 @@ pipestatgetfn(Param pm)
 static void
 pipestatsetfn(Param pm, char **x)
 {
-    int i;
+    if (x) {
+        int i;
 
-    for (i = 0; *x && i < MAX_PIPESTATS; i++, x++)
-	pipestats[i] = atoi(*x);
-    numpipestats = i;
+        for (i = 0; *x && i < MAX_PIPESTATS; i++, x++)
+            pipestats[i] = atoi(*x);
+            numpipestats = i;
+    }
+    else
+        numpipestats = 0;
 }
 
 /**/

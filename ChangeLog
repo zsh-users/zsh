@@ -1,5 +1,7 @@
 2001-04-06  Sven Wischnowsky  <wischnow@zsh.org>
 
+	* 13917: Src/params.c: test for unset in pipestatussetfn()
+
 	* 13916: Src/params.c: like 13907, but for backward searches
 
 2001-04-05 Felix Rosencrantz <f_rosencrantz@yahoo.com>
