@@ -1,3 +1,7 @@
+2000-06-20  Oliver Kiddle  <opk@zsh.org>
+
+	* unposted: Src/exec.c: AIX dependency fix
+
 2000-06-20  Peter Stephenson  <pws@cambridgesiliconradio.com>
 
 	* 12000: Functions/Misc/zmv: emulate zsh doesn't unset MARKDIRS,
@@ -5,7 +9,7 @@
 
 2000-06-20  Sven Wischnowsky  <wischnow@zsh.org>
 
-	* 11998: ChangeLog, Completion/Builtins/_pids, Completion/Core/compdump,
+	* 11998: Completion/Builtins/_pids, Completion/Core/compdump,
  	Completion/Core/compinit, Doc/Zsh/compsys.yo: a bit of security
  	for compinit (avoid using things writable by others); avoid
  	handling files with the same name twice; remove compconf
@@ -15,9 +19,9 @@
 	* 11992: Src/Zle/complist.c: make undo break out of menu selection
  	if nothing to undo inside it
 	
-	* 11985: Completion/Debian/_dpkg, Doc/Zsh/compsys.yo, Src/Zle/computil.c:
- 	_arguments: small fix for -s and new `!...' for things not to
- 	complete (but to understand)
+	* 11985: Completion/Debian/_dpkg, Doc/Zsh/compsys.yo,
+	Src/Zle/computil.c: _arguments: small fix for -s and new `!...' for
+	things not to complete (but to understand)
 	
 	* 11982: Test/comptest: update comptest to not set ZLS_COLORS
  	directly

@@ -715,7 +715,7 @@ execstring(char *s, int dont_change_job, int exiting)
 }
 
 /**/
-void
+mod_export void
 execode(Eprog p, int dont_change_job, int exiting)
 {
     struct estate s;
