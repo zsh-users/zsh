@@ -369,7 +369,6 @@ bin_ztcp(char *nam, char **args, char *ops, int func)
 	dargs = args;
 
 
-    
     if (ops['c']) {
 	if (!dargs[0]) {
 	    tcp_cleanup();
@@ -575,13 +574,29 @@ bin_ztcp(char *nam, char **args, char *ops, int func)
 			remotename = ztpeer->h_name;
 		    else
 			remotename = ztrdup(inet_ntoa(sess->peer.in.sin_addr));
-		    printf("%s:%d %s %s:%d is on fd %d%s\n",
-			    localname, ntohs(sess->sock.in.sin_port),
-			    ((sess->flags & ZTCP_LISTEN) ? "-<" :
-			     ((sess->flags & ZTCP_INBOUND) ? "<-" : "->")),
-			    remotename, ntohs(sess->peer.in.sin_port),
-			    sess->fd,
-			    (sess->flags & ZTCP_ZFTP) ? " ZFTP" : "");
+		    if (ops['L']) {
+			int schar;
+			if (sess->flags & ZTCP_ZFTP)
+			    schar = 'Z';
+			else if (sess->flags & ZTCP_LISTEN)
+			    schar = 'L';
+			else if (sess->flags & ZTCP_INBOUND)
+			    schar = 'I';
+			else
+			    schar = 'O';
+			printf("%d %c %s %d %s %d\n",
+			       sess->fd, schar,
+			       localname, ntohs(sess->sock.in.sin_port),
+			       remotename, ntohs(sess->peer.in.sin_port));
+		    } else {
+			printf("%s:%d %s %s:%d is on fd %d%s\n",
+			       localname, ntohs(sess->sock.in.sin_port),
+			       ((sess->flags & ZTCP_LISTEN) ? "-<" :
+				((sess->flags & ZTCP_INBOUND) ? "<-" : "->")),
+			       remotename, ntohs(sess->peer.in.sin_port),
+			       sess->fd,
+			       (sess->flags & ZTCP_ZFTP) ? " ZFTP" : "");
+		    }
 		}
 	    }
 	    return 0;
@@ -660,7 +675,7 @@ bin_ztcp(char *nam, char **args, char *ops, int func)
 }
 
 static struct builtin bintab[] = {
-    BUILTIN("ztcp", 0, bin_ztcp, 0, 3, 0, "acdfltv", NULL),
+    BUILTIN("ztcp", 0, bin_ztcp, 0, 3, 0, "acdflLtv", NULL),
 };
 
 /* The load/unload routines required by the zsh library interface */

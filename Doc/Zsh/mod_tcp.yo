@@ -7,12 +7,60 @@ startitem()
 findex(ztcp)
 cindex(TCP)
 cindex(sockets, TCP)
-item(tt(ztcp) [ tt(-acdfltv) ] [ var(args) ])(
+item(tt(ztcp) [ tt(-acdflLtv) ] [ var(args) ])(
 tt(ztcp) is implemented as a builtin to allow full use of shell
 command line editing, file I/O, and job control mechanisms.
 
 If tt(ztcp) is run with no options, it will output
 the contents of its session table.
+
+If it is run with only the option tt(-L), it will output the contents of
+the session table in a format suitable for automatic parsing.  The option
+is ignored if given with a command to open or close a session.  The output
+consists of a set of lines, one per session, each containing the following
+elements separated by spaces:
+
+startitem()
+item(File descriptor)(
+The file descriptor in use for the connection.  For normal inbound (tt(I))
+and outbound (tt(O)) connections this may be read and written by the usual
+shell mechanisms.  However, it should only be close with `tt(ztcp -c)'.
+)
+item(Connection type)(
+A letter indicating how the session was created:
+
+startitem()
+item(tt(Z))(
+A session created with the tt(zftp) command.
+)
+item(tt(L))(
+A connection opened for listening with `tt(ztcp -l)'.
+)
+item(tt(I))(
+An inbound connection accepted with `tt(ztcp -a)'.
+)
+item(tt(O))(
+An outbound connection created with `tt(ztcp) var(host) var(...)'.
+)
+enditem()
+
+)
+item(The local host)(
+This is usually set to an all-zero IP address as the address of the
+localhost is irrelevant.
+)
+item(The local port)(
+This is likely to be zero unless the connection is for listening.
+)
+item(The remote host)(
+This is the fully qualified domain name of the peer, if available, else an
+IP address.  It is an all-zero IP adress for a session opened for
+listening.
+)
+item(The remote port)(
+This is zero for a connection opened for listening.
+)
+enditem()
 )
 enditem()
 
