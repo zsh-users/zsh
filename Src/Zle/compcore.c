@@ -400,7 +400,7 @@ do_completion(Hookdef dummy, Compldat dat)
 	if (nmatches > 1 && diffmatches) {
 	    /* There is more than one match. */
 	    ret = do_ambiguous();
-	} else if (nmatches == 1 || !diffmatches) {
+	} else if (nmatches == 1 || (nmatches > 1 && !diffmatches)) {
 	    /* Only one match. */
 	    Cmgroup m = amatches;
 

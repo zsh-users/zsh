@@ -1,3 +1,8 @@
+2000-05-12  Sven Wischnowsky  <wischnow@zsh.org>
+
+	* 11335: Src/Zle/compcore.c: fix for compadd -x when there are no
+ 	matches
+	
 2000-05-11  Bart Schaefer  <schaefer@zsh.org>
 
 	* 11332: Completion/Commands/_complete_debug: Test descriptors
