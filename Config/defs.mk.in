@@ -64,6 +64,7 @@ EXPOPT          = @EXPOPT@
 IMPOPT          = @IMPOPT@
 
 # extra libraries
+MAINLIBS        = @MAINLIBS@
 LIBS_M          = @LIBS_M@
 LIBS_CAP        = @LIBS_CAP@
 LIBS_SOCKET     = @LIBS_SOCKET@

@@ -7,4 +7,4 @@ autobins="zftp"
 
 objects="zftp.o"
 
-#extralibs="socket"
+extralibs="socket"

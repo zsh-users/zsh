@@ -898,7 +898,8 @@ if test $zsh_cv_func_tgetent_accepts_null = yes; then
   AC_DEFINE(TGETENT_ACCEPTS_NULL)
 fi
 
-LIBS="$LIBS_CAP $LIBS_SOCKET $LIBS_M $LIBS_TERMCAP $LIBS_TERMINFO $LIBS_YP $SAVELIBS"
+MAINLIBS="$LIBS_CAP $LIBS_SOCKET $LIBS_M $LIBS_TERMCAP $LIBS_TERMINFO $LIBS_YP $SAVELIBS"
+LIBS=$SAVELIBS
 
 AC_FUNC_MMAP
 if test x$ac_cv_func_mmap_fixed_mapped = xyes; then
@@ -1688,16 +1689,16 @@ if test "x$dynamic" = xyes; then
   test "$zsh_cv_shared_environ" = yes || dynamic=no
 dnl  test "$zsh_cv_sys_dynamic_broken" = no || dynamic=no
   if test "$ac_cv_func_tgetent" = yes; then
-#    SAVELIBS=$LIBS
-#    LIBS="$LIBS_TERMCAP $LIBS"
+    SAVELIBS=$LIBS
+    LIBS="$LIBS_TERMCAP $LIBS"
     zsh_SHARED_FUNCTION([tgetent])
-#    LIBS=$SAVELIBS
+    LIBS=$SAVELIBS
   fi
   if test "$ac_cv_func_tigetstr" = yes; then
-#    SAVELIBS=$LIBS
-#    LIBS="$LIBS_TERMINFO $LIBS"
+    SAVELIBS=$LIBS
+    LIBS="$LIBS_TERMINFO $LIBS"
     zsh_SHARED_FUNCTION([tigetstr])
-#    LIBS=$SAVELIBS
+    LIBS=$SAVELIBS
   fi
 fi
 
@@ -1771,6 +1772,7 @@ AC_SUBST(MOD_EXPORT)dnl
 AC_SUBST(MOD_IMPORT_VARIABLE)dnl
 AC_SUBST(MOD_IMPORT_FUNCTION)dnl
 AC_SUBST(EXTRAZSHOBJS)dnl
+AC_SUBST(MAINLIBS)dnl
 AC_SUBST(LIBS_M)dnl
 AC_SUBST(LIBS_CAP)dnl
 AC_SUBST(LIBS_SOCKET)dnl
@@ -1927,7 +1929,8 @@ if test "$dynamic" = yes; then
 module linker flags       : ${LDFLAGS} ${LIBLDFLAGS} ${DLLDFLAGS}"
 fi
 echo "\
-library flags             : ${LIBS}
+main library flags        : ${MAINLIBS}
+base library flags        : ${LIBS}
 installation basename     : ${tzsh_name}
 binary install path       : ${zshbin2}
 man page install path     : ${zshman}

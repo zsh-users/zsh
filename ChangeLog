@@ -1,5 +1,10 @@
 2001-04-19  Clint Adams  <schizo@debian.org>
 
+	* 14041: configure.in, Config/defs.mk.in, Src/Makefile.in,
+	Src/Modules/cap.mdd, Src/Modules/termcap.mdd,
+	Src/Modules/terminfo.mdd, Src/Modules/zftp.mdd:
+	only link modules against needed libraries.
+
 	* 14039: configure.in, Config/defs.mk.in, Src/zsh.mdd,
 	Src/Modules/cap.mdd, Src/Modules/termcap.mdd,
 	Src/Modules/terminfo.mdd, Src/Modules/zftp.mdd:
