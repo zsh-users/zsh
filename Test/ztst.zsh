@@ -52,6 +52,7 @@ ZTST_tout=${TMPPREFIX-:/tmp/zsh}.ztst.tout.$$
 ZTST_terr=${TMPPREFIX-:/tmp/zsh}.ztst.terr.$$
 
 ZTST_cleanup() {
+  cd $ZTST_testdir
   rm -rf $ZTST_testdir/dummy.tmp $ZTST_testdir/*.tmp \
          $ZTST_in $ZTST_out $ZTST_err $ZTST_tout $ZTST_terr
 }
