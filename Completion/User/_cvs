@@ -198,7 +198,7 @@ _cvsprefix () {
 _cvsdirentries () {
   setopt localoptions nullglob unset
   if [[ -f ${pref}CVS/Entries ]]; then
-    entries=( ${${${${(M)${(f)"$(<${pref}CVS/Entries)"}:#D/*}#D/}%%/*}:q} )
+    entries=( ${${${(M)${(f)"$(<${pref}CVS/Entries)"}:#D/*}#D/}%%/*} )
   else
     entries=()
   fi
@@ -207,7 +207,7 @@ _cvsdirentries () {
 _cvsentries () {
   setopt localoptions nullglob unset
   if [[ -f ${pref}CVS/Entries ]]; then
-    entries=( ${${${${${(f)"$(<${pref}CVS/Entries)"}:#D}#(D|)/}%%/*}:q} )
+    entries=( ${${${${(f)"$(<${pref}CVS/Entries)"}:#D}#(D|)/}%%/*} )
   else
     entries=()
   fi
@@ -234,13 +234,13 @@ _cvsentries_modified () {
   local OLDTZ="$TZ"; if ! (( $+TZ )); then unset OLDTZ; fi; export TZ=GMT
 
   mtime=( ${(s:/:)${(j:/:)${${${${(M)${(f)Entries}:#/*}#/}%/*/*}/\\/*\\///}}} )
-  entries=( ${${${${(M)${(f)Entries}:#D/*}#D/}%%/*}:q} )
+  entries=( ${${${(M)${(f)Entries}:#D/*}#D/}%%/*} )
   builtin stat -n +mtime -F '%a %b %e %T %Y' "$pref${(@k)^mtime}" |
   while read line
   do
     line=${line#$pref}
     if [[ x"$mtime[${line%% *}]" != x"${line#* }" ]]; then
-      entries=($entries "${${line%% *}:q}")
+      entries=($entries "${line%% *}")
     fi
   done
 
@@ -252,8 +252,8 @@ _cvsdirs () {
     _cvsdirentries
     case $#entries in
       0) false;;
-      1) compgen "$@" -g "$entries";;
-      *) compgen "$@" -g '('${(j:|:)entries}')';;
+      1) compgen "$@" -g "${entries:q}";;
+      *) compgen "$@" -g '('${(j:|:)entries:q}')';;
     esac
   else
     _files
@@ -267,8 +267,8 @@ _cvstargets () {
     _cvsentries
     case $#entries in
       0) false;;
-      1) compgen -g "$entries";;
-      *) compgen -g '('${(j:|:)entries}')';;
+      1) compgen -g "${entries:q}";;
+      *) compgen -g '('${(j:|:)entries:q}')';;
     esac
   else
     _files
@@ -282,8 +282,8 @@ _cvstargets_modified () {
     _cvsentries_modified
     case $#entries in
       0) false;;
-      1) compgen -g "$entries";;
-      *) compgen -g '('${(j:|:)entries}')';;
+      1) compgen -g "${entries:q}";;
+      *) compgen -g '('${(j:|:)entries:q}')';;
     esac
   else
     _files 
@@ -297,9 +297,9 @@ _cvsremovep () {
     _cvsentries
     setopt localoptions unset
     local omit
-    omit=( ${pref}*(D:t:q) )
-    eval 'entries=( ${entries:#('${(j:|:)omit}')} )'
-    compadd -P "$qpref" - ${entries} ||
+    omit=( ${pref}*(D:t) )
+    eval 'entries=( ${entries:#('${(j:|:)omit:q}')} )'
+    compadd -P "$qpref" - ${entries:q} ||
     _cvsdirs
   else
     _files
@@ -313,11 +313,11 @@ _cvsaddp () {
     _cvsentries
     setopt localoptions unset
     local omit
-    omit=( CVS $entries ${=cvsignore} )
+    omit=( CVS ${entries:q} ${=cvsignore} )
     [[ -r ~/.cvsignore ]] && omit=( $omit $(<~/.cvsignore) )
     [[ -r ${pref}.cvsignore ]] && omit=( $omit $(<${pref}.cvsignore) )
     compgen -g '*~(*/|)('${(j:|:)omit}')(D)' ||
-    { _cvsdirentries; compgen -g '('${(j:|:)entries}')(D)' }
+    { _cvsdirentries; compgen -g '('${(j:|:)entries:q}')(D)' }
   else
     _files
   fi
