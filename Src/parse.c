@@ -478,9 +478,10 @@ par_event(void)
     } else {
 	int oec = ecused;
 
-	par_event();
-	if (ecused == oec)
+	if (!par_event()) {
+	    ecused = oec;
 	    ecbuf[p] |= wc_bdata(Z_END);
+	}
     }
     return 1;
 }

@@ -1,5 +1,7 @@
 2000-10-05  Sven Wischnowsky  <wischnow@zsh.org>
 
+	* 12898: Src/parse.c: don't return invalid Eprog after parse error
+	
 	* 12897: Src/Zle/computil.c: comparguments: don't use
  	rest-argument-specification if it was inactivated
 	
