@@ -1,3 +1,8 @@
+2002-11-13  Clint Adams  <clint@zsh.org>
+
+	* 17935: Src/text.c: beautify bin_whence indentation of ()
+	and {} contents.
+
 2002-11-13  Peter Stephenson  <pws@csr.com>
 
 	* 17931: Philippe Troin <phil@fifi.org>: Src/init.c: restore

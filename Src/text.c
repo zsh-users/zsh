@@ -345,27 +345,31 @@ gettext2(Estate state)
 	    break;
 	case WC_SUBSH:
 	    if (!s) {
-		taddstr("( ");
+		taddstr("(");
 		tindent++;
+		taddnl();
 		n = tpush(code, 1);
 		n->u._subsh.end = state->pc + WC_SUBSH_SKIP(code);
 	    } else {
 		state->pc = s->u._subsh.end;
 		tindent--;
-		taddstr(" )");
+		taddnl();
+		taddstr(")");
 		stack = 1;
 	    }
 	    break;
 	case WC_CURSH:
 	    if (!s) {
-		taddstr("{ ");
+		taddstr("{");
 		tindent++;
+		taddnl();
 		n = tpush(code, 1);
 		n->u._subsh.end = state->pc + WC_CURSH_SKIP(code);
 	    } else {
 		state->pc = s->u._subsh.end;
 		tindent--;
-		taddstr(" }");
+		taddnl();
+		taddstr("}");
 		stack = 1;
 	    }
 	    break;
