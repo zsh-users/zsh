@@ -367,7 +367,7 @@ zzlex(void)
 #ifdef USE_LOCALE
 		    setlocale(LC_NUMERIC, prev_locale);
 #endif
-		    if (ptr == nptr || *nptr == '.' ) {
+		    if (ptr == nptr || *nptr == '.') {
 			zerr("bad floating point constant", NULL, 0);
 			return EOI;
 		    }

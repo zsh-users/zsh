@@ -398,7 +398,7 @@ AC_PROG_MAKE_SET            dnl Does make define $MAKE
 AC_PROG_INSTALL             dnl Check for BSD compatible `install'
 AC_PROG_AWK                 dnl Check for mawk,gawk,nawk, then awk.
 AC_PROG_LN                  dnl Check for working ln, for "make install"
-AC_CHECK_PROGS([YODL], [yodl], [exit 0; yodl])
+AC_CHECK_PROGS([YODL], [yodl], [: yodl])
 
 dnl ------------------
 dnl CHECK HEADER FILES
