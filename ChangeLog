@@ -1,5 +1,7 @@
 2003-08-19  Adam Spiers  <adam@spiers.net>
 
+	* unposted: Completion/Unix/Command/_irssi: fix quoting bug.
+
 	* unposted: Functions/Prompts/prompt_adam2_setup: fix colouring
 	and bug introduced since % needed to be quoted inside ${//}
 	substitution.

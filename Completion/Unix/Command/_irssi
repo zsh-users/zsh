@@ -28,9 +28,9 @@ _arguments -s \
   '(-p --port)'{-p,--port=}'[specify a port]:port:_irssi_ports' \
   '-![disable autoconnect]' \
   '--noconnect[disable autoconnect]' \
-  '(-n --nick)'{-n,--nick=}'[set nick name]:nick:_irssi_nick" \
+  '(-n --nick)'{-n,--nick=}'[set nick name]:nick:_irssi_nick' \
   '(-h --hostname)'{-h,--hostname=}'[specify hostname]:hostname:_hosts' \
   '(-)'{-v,--version}'[display version information]' \
   '(-)'{-\?,--help}'[display help information]' \
-  '(-)--usage[display usage]' \
+  '(-)--usage[display usage]'
 
