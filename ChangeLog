@@ -1,3 +1,22 @@
+2004-06-02  Wayne Davison  <wayned@users.sourceforge.net>
+
+	* unposted: builtin.c, exec.c, glob.c, hashtable.c, hist.c, init.c,
+	jobs.c, loop.c, mem.c, module.c, options.c, params.c, parse.c,
+	subst.c, system.h, utils.c, watch.c, Builtins/rlimits.c,
+	Builtins/sched.c, Modules/cap.c, Modules/clone.c,
+	Modules/datetime.c, Modules/example.c, Modules/files.c,
+	Modules/langinfo.c, Modules/mapfile.c, Modules/mathfunc.c,
+	Modules/parameter.c, Modules/socket.c, Modules/stat.c,
+	Modules/system.c, Modules/tcp.c, Modules/termcap.c,
+	Modules/terminfo.c, Modules/zftp.c, Modules/zprof.c,
+	Modules/zpty.c, Modules/zselect.c, Modules/zutil.c, Zle/compcore.c,
+	Zle/compctl.c, Zle/complete.c, Zle/complist.c, Zle/compresult.c,
+	Zle/computil.c, Zle/deltochar.c, Zle/zle_hist.c, Zle/zle_keymap.c,
+	Zle/zle_main.c, Zle/zle_misc.c, Zle/zle_move.c, Zle/zle_params.c,
+	Zle/zle_refresh.c, Zle/zle_thingy.c, Zle/zle_tricky.c,
+	Zle/zle_utils.c, Zle/zle_vi.c, Zle/zle_word.c, Zle/zleparameter.c:
+	Silenced unused-parameter compiler warnings.
+
 2004-05-28  Wayne Davison  <wayned@users.sourceforge.net>
 
 	* 19980: Src/glob.c, Src/hashtable.c, Src/jobs.c, Src/loop.c,
