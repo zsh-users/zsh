@@ -7348,7 +7348,7 @@ cline_str(Cline l, int ins, int *csp)
 		    inststrlen(s->line, 1, s->llen);
 		else
 		    inststrlen(s->word, 1, s->wlen);
-		if (d < 0 && (s->flags & CLF_DIFF))
+		if (s->flags & CLF_DIFF)
 		    d = cs;
 		if (ins) {
 		    li += s->llen;
@@ -7363,7 +7363,7 @@ cline_str(Cline l, int ins, int *csp)
 	}
 	/* Remember the position if this is the first prefix with
 	 * missing characters. */
-	if (pm < 0 && (l->flags & CLF_MISS) && !(l->flags & CLF_SUF))
+	if ((l->flags & CLF_MISS) && !(l->flags & CLF_SUF))
 	    pm = cs;
 	pcs = cs;
 	/* Insert the anchor. */
@@ -7384,7 +7384,7 @@ cline_str(Cline l, int ins, int *csp)
 	if (l->flags & CLF_MISS) {
 	    if (l->flags & CLF_MID)
 		b = cs;
-	    else if (sm < 0 && (l->flags & CLF_SUF))
+	    else if (l->flags & CLF_SUF)
 		sm = cs;
 	}
 	/* And now insert the suffix or the original string. */
@@ -7402,10 +7402,11 @@ cline_str(Cline l, int ins, int *csp)
 	    }
 	} else {
 	    int hp = 0, hs = 0;
+	    Cline js = NULL;
 
 	    for (j = -1, i = 0, s = l->suffix; s; s = s->next) {
 		if (j < 0 && (s->flags & CLF_DIFF))
-		    j = i;
+		    j = i, js = s;
 		if (s->flags & CLF_LINE) {
 		    inststrlen(s->line, 0, s->llen);
 		    i += s->llen; pcs = cs + s->llen;
@@ -7428,7 +7429,7 @@ cline_str(Cline l, int ins, int *csp)
 	    if (hs)
 		spos += i;
 	    cs += i;
-	    if (d < 0 && j >= 0)
+	    if (j >= 0)
 		d = cs - j;
 	}
 	/* If we reached the right positions, re-insert the braces. */
