@@ -18,16 +18,20 @@
 # `-X explanation' options.
 
 local str arr sep test testarr tmparr prefix suffixes matchers autosuffix
-local matchflags opt group expl nm=$compstate[nmatches] opre osuf
+local matchflags opt group expl nm=$compstate[nmatches] opre osuf opts match
 
 # Get the options.
 
 group=()
 expl=()
-while getopts "J:V:X:" opt; do
+opts=()
+while getopts "J:V:X:P:S:r:R:qM:" opt; do
   case "$opt" in
   [JV]) group=("-$opt" "$OPTARG");;
   X)    expl=(-X "$OPTARG");;
+  q)    opts=( "$opts[@]" -q );;
+  M)    match="$OPTARG";;
+  *)    opts=( "$opts[@]" "-$opt" "$OPTARG" );;
   esac
 done
 shift OPTIND-1
@@ -142,14 +146,14 @@ done
 # If we have collected matching specifications, we build an array
 # from it that can be used as arguments to `compadd'.
 
-[[ $#matchers -gt 0 ]] && matchers=(-M "$matchers")
+[[ $#matchers+$#match -gt 0 ]] && matchers=(-M "$matchers $match")
 
 # Add the matches for each of the suffixes.
 
 PREFIX="$pre"
 SUFFIX="$suf"
 for i in "$suffixes[@]"; do
-  compadd -U "$group[@]" "$expl[@]" "$matchers[@]" "$autosuffix[@]" \
+  compadd -U "$group[@]" "$expl[@]" "$matchers[@]" "$autosuffix[@]" "$opts[@]" \
           -i "$IPREFIX" -I "$ISUFFIX" -p "$prefix" -s "$i" - "$testarr[@]"
 done
 

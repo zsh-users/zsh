@@ -7,6 +7,8 @@ if [[ "$1" = -[VJ]* ]]; then
   shift
 fi
 
+_lastdescr=( "$_lastdescr[@]" "$2" )
+
 if [[ -n "$compconfig[group_matches]" ]]; then
   if [[ -n "$compconfig[description_format]" ]]; then
     eval "$1=($gropt ${(q)2} -X ${(q)compconfig[description_format]//\\%d/$2})"

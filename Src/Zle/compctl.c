@@ -122,6 +122,33 @@ cpcpattern(Cpattern o)
     return r;
 }
 
+/* Set the global match specs. */
+
+/**/
+static int
+set_gmatcher(char *name, char **argv)
+{
+    Cmlist l = NULL, *q = &l, n;
+    Cmatcher m;
+
+    while (*argv) {
+	if ((m = parse_cmatcher(name, *argv)) == pcm_err)
+	    return 1;
+	*q = n = (Cmlist) zhalloc(sizeof(struct cmlist));
+	n->next = NULL;
+	n->matcher = m;
+	n->str = *argv++;
+
+	q = &(n->next);
+    }
+    freecmlist(cmatcher);
+    PERMALLOC {
+	cmatcher = cpcmlist(l);
+    } LASTALLOC;
+
+    return 1;
+}
+
 /* Try to get the global matcher from the given compctl. */
 
 /**/
@@ -130,27 +157,13 @@ get_gmatcher(char *name, char **argv)
 {
     if (!strcmp(*argv, "-M")) {
 	char **p = ++argv;
-	Cmlist l = NULL, *q = &l, n;
-	Cmatcher m;
 
 	while (*p) {
 	    if (**p++ == '-')
 		return 0;
 	}
-	while (*argv) {
-	    if ((m = parse_cmatcher(name, *argv)) == pcm_err)
-		return 2;
-	    *q = n = (Cmlist) zhalloc(sizeof(struct cmlist));
-	    n->next = NULL;
-	    n->matcher = m;
-	    n->str = *argv++;
-
-	    q = &(n->next);
-	}
-	freecmlist(cmatcher);
-	PERMALLOC {
-	    cmatcher = cpcmlist(l);
-	} LASTALLOC;
+	if (set_gmatcher(name, argv))
+	    return 2;
 
 	return 1;
     }
@@ -2586,6 +2599,42 @@ cond_range(char **a, int id)
 			(id ? cond_str(a, 1, 1) : NULL), 0);
 }
 
+/**/
+static void
+cmsetfn(Param pm, char **v)
+{
+    set_gmatcher(pm->nam, v);
+}
+
+/**/
+static char **
+cmgetfn(Param pm)
+{
+    int num;
+    Cmlist p;
+    char **ret, **q;
+
+    for (num = 0, p = cmatcher; p; p = p->next, num++);
+
+    ret = (char **) zhalloc((num + 1) * sizeof(char *));
+
+    for (q = ret, p = cmatcher; p; p = p->next, q++)
+	*q = dupstring(p->str);
+    *q = NULL;
+
+    return ret;
+}
+
+/**/
+static void
+cmunsetfn(Param pm, int exp)
+{
+    char *dummy[1];
+
+    dummy[0] = NULL;
+    set_gmatcher(pm->nam, dummy);
+}
+
 static struct builtin bintab[] = {
     BUILTIN("compctl", 0, bin_compctl, 0, -1, 0, NULL, NULL),
     BUILTIN("compgen", 0, bin_compgen, 1, -1, 0, NULL, NULL),
@@ -2605,6 +2654,10 @@ static struct funcwrap wrapper[] = {
     WRAPDEF(comp_wrapper),
 };
 
+static struct paramdef patab[] = {
+    PARAMDEF("compmatchers", PM_ARRAY|PM_SPECIAL, NULL, cmsetfn, cmgetfn, cmunsetfn)
+};
+
 /**/
 int
 setup_compctl(Module m)
@@ -2621,6 +2674,7 @@ boot_compctl(Module m)
 {
     if(!(addbuiltins(m->nam, bintab, sizeof(bintab)/sizeof(*bintab)) |
 	 addconddefs(m->nam, cotab, sizeof(cotab)/sizeof(*cotab)) |
+	 addparamdefs(m->nam, patab, sizeof(patab)/sizeof(*patab)) |
 	 !addwrapper(m, wrapper)))
 	return 1;
     return 0;
@@ -2634,6 +2688,7 @@ cleanup_compctl(Module m)
 {
     deletebuiltins(m->nam, bintab, sizeof(bintab)/sizeof(*bintab));
     deleteconddefs(m->nam, cotab, sizeof(cotab)/sizeof(*cotab));
+    deleteparamdefs(m->nam, patab, sizeof(patab)/sizeof(*patab));
     deletewrapper(m, wrapper);
     return 0;
 }

@@ -8,16 +8,24 @@
 # separator character are then completed independently.
 
 local sep matches pref npref i tmp1 group expl menu pre suf opre osuf cpre
+local opts sopts match
 typeset -U tmp2
 
 # Get the options.
 
 group=()
 expl=()
-while getopts "J:V:X:" opt; do
+opts=()
+sopts=()
+while getopts "J:V:X:P:S:r:R:qM:" opt; do
   case "$opt" in
-  [JV]) group=("-$opt" "$OPTARG");;
-  X)    expl=(-X "$OPTARG");;
+  [JV])  group=("-$opt" "$OPTARG");;
+  X)     expl=(-X "$OPTARG");;
+  P)     opts=( "$opts[@]" -P "$OPTARG")
+         sopts=( "$sopts[@]" -P "$OPTARG");;
+  [SrR]) sopts=( "$sopts[@]" -P "$OPTARG");;
+  q)     sopts=( "$sopts[@]" -q);;
+  M)     match="$OPTARG";;
   esac
 done
 shift OPTIND-1
@@ -57,7 +65,7 @@ pref=''
 # If the string from the line matches at least one of the strings,
 # we use only the matching strings.
 
-compadd -O tmp1 -M "r:|${sep}=* r:|=*" - "$matches[@]"
+compadd -O tmp1 -M "r:|${sep}=* r:|=* $match" - "$matches[@]"
 
 (( $#tmp1 )) && matches=( "$tmp1[@]" )
 
@@ -106,11 +114,11 @@ while true; do
 	SUFFIX="$suf"
 
 	if (( $#tmp2 )); then
-	  compadd "$group[@]" "$expl[@]" -p "$pref" -qS "$sep" \
-                  -M "r:|${sep}=* r:|=*" - "$tmp1[1]"
+	  compadd "$group[@]" "$expl[@]" -p "$pref" -qS "$sep" "$opts[@]" \
+                  -M "r:|${sep}=* r:|=* $match" - "$tmp1[1]"
         else
-	  compadd "$group[@]" "$expl[@]" -p "$pref" \
-                  -M "r:|${sep}=* r:|=*" - "$tmp1[1]"
+	  compadd "$group[@]" "$expl[@]" -p "$pref" "$sopts[@]" \
+                  -M "r:|${sep}=* r:|=* $match" - "$tmp1[1]"
         fi
 	return 0
       fi
@@ -121,7 +129,7 @@ while true; do
 
       PREFIX="$pre"
       SUFFIX="$suf"
-      compadd -O matches -M "r:|${sep}=* r:|=*" - "$matches[@]"
+      compadd -O matches -M "r:|${sep}=* r:|=* $match" - "$matches[@]"
 
       if [[ "$pre" = *${sep}* ]]; then
  	PREFIX="${cpre}${pre%%${sep}*}"
@@ -138,12 +146,12 @@ while true; do
 
         tmp2="$pre$suf"
         if [[ "$tmp2" = *${sep}* ]]; then
-          compadd "$group[@]" "$expl[@]" \
+          compadd "$group[@]" "$expl[@]" "$sopts[@]" \
                   -p "$pref" -s "${sep}${tmp2#*${sep}}" \
-                  -M "r:|${sep}=* r:|=*" - "$tmp1[@]"
+                  -M "r:|${sep}=* r:|=* $match" - "$tmp1[@]"
         else
-          compadd "$group[@]" "$expl[@]" -p "$pref"\
-                  -M "r:|${sep}=* r:|=*" - "$tmp1[@]"
+          compadd "$group[@]" "$expl[@]" -p "$pref" "$sopts[@]" \
+                  -M "r:|${sep}=* r:|=* $match" - "$tmp1[@]"
         fi
       else
         # With normal completion we add all matches one-by-one with
@@ -152,12 +160,12 @@ while true; do
 
         for i in "${(@M)matches:#(${(j:|:)~tmp1})*}"; do
 	  if [[ "$i" = *${sep}* ]]; then
-            compadd "$group[@]" "$expl[@]" -S '' \
+            compadd "$group[@]" "$expl[@]" -S '' "$opts[@]" \
 	            -p "$pref" -s "${i#*${sep}}" \
-                    -M "r:|${sep}=* r:|=*" - "${i%%${sep}*}${sep}"
+                    -M "r:|${sep}=* r:|=* $match" - "${i%%${sep}*}${sep}"
           else
-            compadd "$group[@]" "$expl[@]" -S '' -p "$pref" \
-                    -M "r:|${sep}=* r:|=*" - "$i"
+            compadd "$group[@]" "$expl[@]" -S '' "$opts[@]" -p "$pref" \
+                    -M "r:|${sep}=* r:|=* $match" - "$i"
           fi
         done
       fi
@@ -173,11 +181,11 @@ while true; do
       SUFFIX="$suf"
 
       if [[ -n "$suf" ]]; then
-        compadd "$group[@]" "$expl[@]" -s "$suf" \
-                -M "r:|${sep}=* r:|=*" - "$pref$pre"
+        compadd "$group[@]" "$expl[@]" -s "$suf" "$sopts[@]" \
+                -M "r:|${sep}=* r:|=* $match" - "$pref$pre"
       else
-        compadd "$group[@]" "$expl[@]" -S '' \
-                -M "r:|${sep}=* r:|=*" - "$pref$pre"
+        compadd "$group[@]" "$expl[@]" -S '' "$opts[@]" \
+                -M "r:|${sep}=* r:|=* $match" - "$pref$pre"
       fi
       return 0
     fi
@@ -208,7 +216,8 @@ while true; do
     SUFFIX=""
 
     [[ -n "$pref" && "$orig" != "$pref" ]] &&
-        compadd "$group[@]" "$expl[@]" -S '' -M "r:|${sep}=* r:|=*" - "$pref"
+        compadd "$group[@]" "$expl[@]" -S '' "$opts[@]" \
+                -M "r:|${sep}=* r:|=* $match" - "$pref"
 
     return
   fi

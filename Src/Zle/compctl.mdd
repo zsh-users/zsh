@@ -4,4 +4,6 @@ autobins="compctl compgen compadd compset"
 
 autoprefixconds="prefix suffix between after"
 
+autoparams="compmatchers"
+
 objects="compctl.o"

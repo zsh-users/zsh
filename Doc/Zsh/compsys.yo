@@ -13,14 +13,18 @@ completion behaviour and which may be bound to keystrokes, are referred to
 as `widgets'.
 
 Note that with the function-based completions described here, it
-is also possible to use the `tt(compctl -M ...)' mechanism to specify
+is also possible to use the `tt(compctl -M ...)' mechanism and the
+tt(compmatchers) special array to specify
 global matching control, such as case-insensitivity (`tt(abc)' will complete
 to a string beginning `tt(ABC)'), or wildcard behaviour on
 certain anchors (`tt(a-d)' will complete to abc-def as if there were a
 `tt(*)' after the `a').  See
 ifzman(the section `Matching Control' in zmanref(zshcompctl))\
 ifnzman(noderef(Matching Control))
-for further details.
+for further details. Note that it is recommended to use the the
+tt(compmatchers) array instead of tt(compctl) to define global
+matchers when using the function based completion system, although
+using tt(compctl -M) still works.
 
 startmenu()
 menu(Initialization)
@@ -674,8 +678,8 @@ names in the way normal filenames are completed by the
 tt(_path_files) function.
 
 Like other utility functions, this function accepts the `tt(-V)',
-`tt(-J)', and `tt(-X)' options with an argument and passes them to the
-tt(compadd) builtin.
+`tt(-J)', `tt(-X)', `tt(-M)', `tt(-P)', `tt(-S)', `tt(-r)', `tt(-R)', and
+`tt(-q)' options and passes them to the tt(compadd) builtin.
 )
 item(tt(_sep_parts))(
 This function gets as arguments alternating arrays and separators.
@@ -686,8 +690,9 @@ a quoted list of words in parentheses. For example, with the array
 complete the string  `tt(f)' to `tt(foo)' and the string `tt(b@n)' to
 `tt(bar@news)'.
 
-This function passes the `tt(-V)', `tt(-J)', and `tt(-X)' options and
-their arguments to the tt(compadd) builtin used to add the matches.
+This function passes the `tt(-V)', `tt(-J)', `tt(-X)', `tt(-M)', `tt(-P)',
+`tt(-S)', `tt(-r)', `tt(-R)', and `tt(-q)' options and their arguments
+to the tt(compadd) builtin used to add the matches.
 )
 item(tt(_path_files) and tt(_files))(
 The function tt(_path_files) is used throughout the shell code
@@ -705,9 +710,9 @@ The function tt(_files) calls tt(_path_files) with all the arguments
 it was passed and, if that generated no matches, calls tt(_path_files) again
 without any tt(-g) or tt(-/) option, thus generating all filenames.
 
-These functions also accept the `tt(-J)', `tt(-V)', `tt(-X)', `tt(-P)',
-`tt(-S)', `tt(-q)', `tt(-r)', and `tt(-R)' options from the
-tt(compadd) builtin.
+These functions also accept the `tt(-J)', `tt(-V)', `tt(-X)',
+`tt(-M)', `tt(-P)', `tt(-S)', `tt(-q)', `tt(-r)', and `tt(-R)' options
+from the tt(compadd) builtin.
 
 Finally, the tt(_path_files) function supports two configuration keys.
 startitem()
@@ -865,7 +870,16 @@ the global parameter tt(state) and the function returns with a return
 value of 300 (to make it distinguishable from other return values)
 after setting the global `tt(line)' and `tt(opt_args)'
 parameters as described below and without resetting any changes made
-to the special parameters such as tt(PREFIX) and tt(words).
+to the special parameters such as tt(PREFIX) and tt(words). Note that
+this means that a function calling tt(_arguments) with at least one
+action containing such a `tt(->)var(string)' has to declare
+appropriate local parameters as in:
+
+example(local state line
+typeset -A opt_args)
+
+This will ensure that tt(_arguments) does not create unused global
+parameters.
 
 A string in
 braces will be evaluated to generate the matches and if the
@@ -1047,7 +1061,14 @@ tt(describe_options) is used by the tt(_arguments) function.
 
 One last difference is that this function uses the associative array
 tt(val_args) to report values and their arguments (but otherwise this
-is the same as the tt(opt_args) association used by tt(_arguments)).
+is the same as the tt(opt_args) association used by
+tt(_arguments)). This also means that the function calling tt(_values) 
+should declare the tt(state) and tt(val_args) parameters as in:
+
+example(local state line
+typeset -A val_args)
+
+when using an action of the form `tt(->)var(string)'.
 )
 item(tt(_regex_arguments))(
 This function is a compiler to generate a completion function.  The
@@ -1386,6 +1407,12 @@ attributes, such as `tt(%b)' and `tt(%s)'.
 item(tt(message_format))(
 Like tt(description_format), but used when displaying messages in
 those places where no completions can automatically be generated.
+)
+item(tt(warning_format))(
+Like the previous two, but used by tt(_main_complete) to show a
+warning if no matches could be generated. Any `tt(%d)' sequence in the 
+value will be replaced by the descriptions for the matches that were
+expected.
 )
 item(tt(option_prefix))(
 If set to a non-empty value, options will only be generated as

@@ -6,7 +6,7 @@
 local linepath realpath donepath prepath testpath exppath
 local tmp1 tmp2 tmp3 tmp4 i orig pre suf tpre tsuf opre osuf cpre
 local pats haspats=no ignore group expl addpfx addsfx remsfx
-local nm=$compstate[nmatches] menu
+local nm=$compstate[nmatches] menu match matcher
 
 typeset -U prepaths exppaths
 
@@ -23,10 +23,11 @@ addpfx=()
 addsfx=()
 remsfx=()
 expl=()
+matcher=()
 
 # Get the options.
 
-while getopts "P:S:qr:R:W:F:J:V:X:f/g:" opt; do
+while getopts "P:S:qr:R:W:F:J:V:X:f/g:M:" opt; do
   case "$opt" in
   P)     addpfx=(-P "$OPTARG")
          ;;
@@ -68,6 +69,9 @@ while getopts "P:S:qr:R:W:F:J:V:X:f/g:" opt; do
          pats=("$pats[@]" ${=OPTARG})
 	 haspats=yes
 	 ;;
+  M)     match="$OPTARG"
+         matcher=(-M "$OPTARG")
+         ;;
   esac
 done
 
@@ -124,9 +128,11 @@ if [[ -z "$suf" && $#ignore -eq 0 && $#remsfx -eq 0 &&
   # Now call compgen.
 
   if [[ -z "$gopt" ]]; then
-    compgen "$addpfx[@]" "$addsfx[@]" "$group[@]" "$expl[@]" "$tmp1[@]" $sopt
+    compgen "$addpfx[@]" "$addsfx[@]" "$group[@]" "$expl[@]" \
+            "$tmp1[@]" "$matcher[@]" $sopt
   else
-    compgen "$addpfx[@]" "$addsfx[@]" "$group[@]" "$expl[@]" "$tmp1[@]" $sopt -g "$pats"
+    compgen "$addpfx[@]" "$addsfx[@]" "$group[@]" "$expl[@]" \
+            "$tmp1[@]" "$matcher[@]" $sopt -g "$pats"
   fi
 
   # If this generated any matches, we don't want to do in-path completion.
@@ -243,7 +249,7 @@ for prepath in "$prepaths[@]"; do
       # See which of them match what's on the line.
 
       tmp2=("$tmp1[@]")
-      compadd -D tmp1 "$ignore[@]" - "${(@)tmp1:t}"
+      compadd -D tmp1 "$ignore[@]" "$matcher[@]" - "${(@)tmp1:t}"
 
       # If no file matches, save the expanded path and continue with
       # the outer loop.
@@ -346,14 +352,14 @@ for prepath in "$prepaths[@]"; do
         if [[ "$tmp3" = */* ]]; then
 	  compadd -Qf -p "$linepath${testpath:q}" -s "/${tmp3#*/}" \
 	          -W "$prepath$realpath$testpath" "$ignore[@]" \
-		  "$addpfx[@]" "$addsfx[@]" "$remsfx[@]" -M 'r:|/=* r:|=*' \
-		  "$group[@]" "$expl[@]" \
+		  "$addpfx[@]" "$addsfx[@]" "$remsfx[@]" \
+                  -M "r:|/=* r:|=* $match" "$group[@]" "$expl[@]" \
 		  - "${(@)${(@)tmp1%%/*}:q}"
 	else
 	  compadd -Qf -p "$linepath${testpath:q}" \
 	          -W "$prepath$realpath$testpath" "$ignore[@]" \
-		   "$addpfx[@]" "$addsfx[@]" "$remsfx[@]" -M 'r:|/=* r:|=*' \
-		   "$group[@]" "$expl[@]" \
+		   "$addpfx[@]" "$addsfx[@]" "$remsfx[@]" \
+                   -M "r:|/=* r:|=* $match" "$group[@]" "$expl[@]" \
 		   - "${(@)tmp1:q}"
 	fi
       else
@@ -361,15 +367,15 @@ for prepath in "$prepaths[@]"; do
           for i in "$tmp1[@]"; do
 	    compadd -Qf -p "$linepath${testpath:q}" -s "/${${i#*/}:q}" \
 		    -W "$prepath$realpath$testpath" "$ignore[@]" \
-		    "$addpfx[@]" "$addsfx[@]" "$remsfx[@]" -M 'r:|/=* r:|=*' \
-		    "$group[@]" "$expl[@]" \
+		    "$addpfx[@]" "$addsfx[@]" "$remsfx[@]" \
+                    -M "r:|/=* r:|=* $match" "$group[@]" "$expl[@]" \
 		    - "${${i%%/*}:q}"
 	  done
         else
 	  compadd -Qf -p "$linepath${testpath:q}" \
 		  -W "$prepath$realpath$testpath" "$ignore[@]" \
-		  "$addpfx[@]" "$addsfx[@]" "$remsfx[@]" -M 'r:|/=* r:|=*' \
-		  "$group[@]" "$expl[@]" \
+		  "$addpfx[@]" "$addsfx[@]" "$remsfx[@]" \
+                  -M "r:|/=* r:|=* $match" "$group[@]" "$expl[@]" \
 		  - "${(@)tmp1:q}"
         fi
       fi
@@ -400,8 +406,8 @@ for prepath in "$prepaths[@]"; do
     SUFFIX=""
     compadd -Qf -p "$linepath${testpath:q}" \
 	    -W "$prepath$realpath$testpath" "$ignore[@]" \
-	    "$addpfx[@]" "$addsfx[@]" "$remsfx[@]" -M 'r:|/=* r:|=*' \
-	    "$group[@]" "$expl[@]" \
+	    "$addpfx[@]" "$addsfx[@]" "$remsfx[@]" \
+            -M "r:|/=* r:|=* $match" "$group[@]" "$expl[@]" \
 	    - "${(@)tmp1:q}"
   fi
 done
@@ -417,7 +423,7 @@ if [[ -n "$compconfig[path_expand]" &&
   PREFIX="${opre}${osuf}"
   SUFFIX=""
   compadd -Q -S '' "$group[@]" "$expl[@]" \
-          -M 'r:|/=* r:|=*' -p "$linepath" - "$exppaths[@]"
+          -M "r:|/=* r:|=* $match" -p "$linepath" - "$exppaths[@]"
 fi
 
 [[ nm -ne compstate[nmatches] ]]

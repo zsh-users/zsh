@@ -17,9 +17,12 @@ if [[ $# -ne 0 && compstate[nmatches] -eq nm ]]; then
   # files and give up immediatly.
 
   opts=()
-  while getopts "P:S:W:F:J:V:X:f/g:" opt; do
-    [[ "$opt" = f ]] && return
-    [[ "$opt" = [PSWFJVX] ]] && opts=("$opts[@]" "-$opt" "$OPTARG")
+  while getopts "P:S:qr:R:W:F:J:V:X:f/g:M:" opt; do
+    case "$opt" in
+    f)            return;;
+    [PSrRWFJVXM]) opts=("$opts[@]" "-$opt" "$OPTARG");;
+    q)            opts=("$opts[@]" -q);;
+    esac
   done
 
   _path_files "$opts[@]" && ret=0

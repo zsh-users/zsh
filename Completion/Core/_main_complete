@@ -24,6 +24,8 @@
 
 local comp ret=1 _compskip
 
+typeset -U _lastdescr
+
 setopt localoptions nullglob rcexpandparam
 unsetopt markdirs globsubst shwordsplit nounset ksharrays
 
@@ -55,6 +57,24 @@ for post in "$comppostfuncs[@]"; do
   "$post"
 done
 comppostfuncs=()
+
+_lastdescr=( "\`${(@)^_lastdescr:#}'" )
+if [[ compstate[nmatches] -eq 0 &&
+      -n "$compconfig[warning_format]" && $#_lastdescr -ne 0 ]]; then
+  local str
+
+  compstate[list]=list
+  compstate[force_list]=yes
+  compstate[insert]=''
+
+  case $#_lastdescr in
+  1) str="$_lastdescr[1]";;
+  2) str="$_lastdescr[1] or $_lastdescr[2]";;
+  *) str="${(j:, :)_lastdescr[1,-2]}, or $_lastdescr[-1]";;
+  esac
+
+  compadd -UX "${compconfig[warning_format]//\\%d/$str}" -n ''
+fi
 
 [[ "$compconfig[last_prompt]" = always ]] && compstate[last_prompt]=yes
 

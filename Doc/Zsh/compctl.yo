@@ -132,7 +132,8 @@ the default.  In other words, completion will subsequently use the
 options specified by the tt(-D) flag.
 
 The form with tt(-M) as the first and only option defines global
-matching specifications, as described below in noderef(Matching Control).
+matching specifications, as described below in noderef(Matching
+Control).
 
 texinode(Option Flags)(Alternative Completion)(Command Flags)(Programmable Completion Using compctl)
 sect(Option Flags)
@@ -820,7 +821,9 @@ option applies only to a particular command.  In this case, when
 completion is attempted for any command, the code will try the
 specifications in order until one matches.  This allows one to define
 simple and fast matches to be used first, more powerful matchers as a
-second choice, and so on.
+second choice, and so on. These global matchers can also be defined by 
+setting the tt(compmatchers) special array to the strings that would
+otherwise be given to tt(compctl -M) as arguments.
 
 For example, one can make the code match trial completions that contain
 the string on the command line as a substring, not just at the
