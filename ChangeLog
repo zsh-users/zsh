@@ -1,5 +1,8 @@
 2001-05-08  Sven Wischnowsky  <wischnow@zsh.org>
 
+	* 14252: Completion/Base/Core/_description, Doc/Zsh/compsys.yo:
+	empty description means: don't add a -X option
+
 	* 14251: Src/Zle/complist.c, Src/Zle/zle_tricky.c: print
 	space/backspace when reaching the last column while printing
 	descriptions and the like to avoid a cursor positioning bug

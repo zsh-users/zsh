@@ -9,7 +9,8 @@ if [[ "$1" = -([12]|)[VJ] ]]; then
   shift
 fi
 
-_lastdescr=( "$_lastdescr[@]" "$3" )
+3="${${3##[[:blank:]]#}%%[[:blank:]]#}"
+[[ -n "$3" ]] && _lastdescr=( "$_lastdescr[@]" "$3" )
 
 zstyle -s ":completion:${curcontext}:$1" group-name gname &&
     [[ -z "$gname" ]] && gname="$1"
@@ -51,7 +52,11 @@ else
 fi
 
 shift 2
-[[ -n "$format" ]] && zformat -f format "$format" "d:$1" "${(@)argv[2,-1]}"
+if [[ -z "$1" && $# -eq 1 ]]; then
+  format=
+elif [[ -n "$format" ]]; then
+  zformat -f format "$format" "d:$1" "${(@)argv[2,-1]}"
+fi
 
 if [[ -n "$gname" ]]; then
   if [[ -n "$format" ]]; then

@@ -2879,7 +2879,9 @@ item(var(n)tt(::)var(message)tt(:)var(action))(
 This describes the var(n)'th normal argument.  The var(message) will be 
 printed above the matches generated and the var(action) says what can
 be completed in this position (see below).  If there are two colons
-before the var(message), this describes an optional argument.
+before the var(message), this describes an optional argument.  If the
+var(message) contains only white space, nothing will be printed above
+the matches unless the action adds an explanation string itself.
 )
 xitem(tt(:)var(message)tt(:)var(action))
 item(tt(::)var(message)tt(:)var(action))(
@@ -3008,7 +3010,8 @@ xitem(tt(:)var(message)tt(:)var(action))
 item(tt(::)var(message)tt(:)var(action))(
 Describes a mandatory argument with one colon, or an optional argument
 with two colons.  As in other forms of var(spec), the var(message) will be
-printed above the matches generated and the var(action) says what can be
+printed above the matches generated (unless it contains only white
+space, see above) and the var(action) says what can be
 completed in this position.
 )
 xitem(tt(:*)var(pattern)tt(:)var(message)tt(:)var(action))
@@ -3460,7 +3463,11 @@ function which tests some more styles.
 
 The string returned by the tt(format) style (if any) will be modified so
 that the sequence `tt(%d)' is replaced by the var(descr) given as the third
-argument.  If tt(_description) is called with more than three arguments,
+argument without any leading or trailing white space.  If, after
+removing the white space, the var(descr) is the empty string, the format
+style will not be used and the options put into the var(name) array will
+not contain an explantion string to be displayed above the matches.If
+tt(_description) is called with more than three arguments,
 the additional var(specs) should be of the form `var(char)tt(:)var(str)'
 and every appearance of `tt(%)var(char)' in the format string will be
 replaced by var(string).
