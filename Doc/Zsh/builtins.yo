@@ -397,7 +397,7 @@ findex(fc)
 cindex(history, editing)
 cindex(editing history)
 xitem(tt(fc) [ tt(-e) var(ename) ] [ tt(-nlrdDfEim) ] [ var(old)tt(=)var(new) ... ] [ var(first) [ var(last) ] ])
-xitem(tt(fc) tt(-p) [ var(filename) [ var(histsize) [ var(savehistsize) ] ] ])
+xitem(tt(fc) tt(-p) [ tt(-a) ] [ var(filename) [ var(histsize) [ var(savehistsize) ] ] ])
 xitem(tt(fc) tt(-P))
 item(tt(fc) tt(-ARWI) [ var(filename) ])(
 Select a range of commands from var(first) to var(last) from the
@@ -439,18 +439,32 @@ cindex(history, stack)
 cindex(stack, history)
 
 `tt(fc -p)' pushes the current history list onto a stack and switches to a
-new history list.  If no arguments are specified, the history list is
-empty, tt($HISTFILE) is unset, and tt($HISTSIZE) & tt($SAVEHIST) are set to
-their default values.  If one argument is given, tt($HISTFILE) is set to
-the filename, tt($HISTSIZE) & tt($SAVEHIST) are left unchanged, and the
-history file is read in (if it exists) to initialize the new history list.
-If a second argument is specified, tt($HISTSIZE) & tt($SAVEHIST) are
-instead set to the specified numeric value.  Finally, if a third argument
-is specified, tt($SAVEHIST) is set to a separate value from tt($HISTSIZE).
+new history list.  If the tt(-a) option is also specified, this history list
+will be automatically popped when the current function scope is exited, which
+is a much better solution than creating a trap function to call `tt(fc -P)'
+manually.  If no arguments are specified, the history list is left empty,
+tt($HISTFILE) is unset, and tt($HISTSIZE) & tt($SAVEHIST) are set to their
+default values.  If one argument is given, tt($HISTFILE) is set to that
+filename, tt($HISTSIZE) & tt($SAVEHIST) are left unchanged, and the history
+file is read in (if it exists) to initialize the new list.  If a second
+argument is specified, tt($HISTSIZE) & tt($SAVEHIST) are instead set to the
+single specified numeric value.  Finally, if a third argument is specified,
+tt($SAVEHIST) is set to a separate value from tt($HISTSIZE).  You are free to
+change these environment values for the new history list however you desire
+in order to manipulate the new history list.
 
 `tt(fc -P)' pops the history list back to an older list saved by `tt(fc -p)'.
-The current list is saved to its tt($HISTFILE) before it is destroyed (as long
-as tt($HISTFILE) and tt($SAVEHIST) are set appropriately, of course).
+The current list is saved to its tt($HISTFILE) before it is destroyed
+(assuming that tt($HISTFILE) and tt($SAVEHIST) are set appropriately, of
+course).  The values of tt($HISTFILE), tt($HISTSIZE), and tt($SAVEHIST) are
+restored to the values they had when `tt(fc -p)' was called.  Note that this
+restoration can conflict with making these variables "local", so your best
+bet is to avoid local declarations for these variables in functions that use
+`tt(fc -p)'.  The one other guaranteed-safe combination is declaring these
+variables to be local at the top of your function and using the automatic
+option (tt(-a)) with `tt(fc -p)'.  Finally, note that it is legal to manually
+pop a push marked for automatic popping if you need to do so before the
+function exits.
 
 cindex(history, file)
 cindex(file, history)
