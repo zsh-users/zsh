@@ -293,7 +293,7 @@ distclean-here: clean-here
 .PHONY: distclean-here
 
 realclean-here: distclean-here
-	cd $(sdir) && rm -f Zsh/modlist.yo Zsh/modmenu.yo
+	cd $(sdir) && rm -f Zsh/modlist.yo Zsh/modmenu.yo Zsh/manmodmenu.yo
 	cd $(sdir) && rm -f version.yo ../META-FAQ zsh.texi $(MAN)
 .PHONY: realclean-here
 
