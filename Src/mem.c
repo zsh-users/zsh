@@ -441,6 +441,7 @@ hrealloc(char *p, size_t old, size_t new)
 #endif
 	    return NULL;
 	}
+#ifndef USE_MMAP
 	if (old > HEAP_ARENA_SIZE || new > HEAP_ARENA_SIZE) {
 	    size_t n = HEAP_ARENA_SIZE > new ? HEAPSIZE : new + sizeof(*h);
 
@@ -451,6 +452,7 @@ hrealloc(char *p, size_t old, size_t new)
 	}
 	h->used = new;
 	return arena(h);
+#endif
     }
     DPUTS(h->used > HEAP_ARENA_SIZE, "BUG: hrealloc at invalid address");
     if (h->used + (new - old) <= HEAP_ARENA_SIZE) {
