@@ -214,6 +214,17 @@ uninstall.info:
 	rm -f $(DESTDIR)$(infodir)/$(tzsh).info
 	rm -f $(DESTDIR)$(infodir)/$(tzsh).info-[1-9]*
 
+# install HTML manual
+install.html: zsh_toc.html
+	$(sdir_top)/mkinstalldirs $(DESTDIR)$(htmldir)
+	for file in zsh_*.html; do \
+	    $(INSTALL_DATA) $$file $(DESTDIR)$(htmldir) || exit 1; \
+	done
+
+# uninstall HTML manual
+uninstall.html:
+	rm -f $(DESTDIR)$(htmldir)/zsh_*.html
+
 # ========== DEPENDENCIES FOR CLEANUP ==========
 
 clean-here:

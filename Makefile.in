@@ -59,7 +59,7 @@ META-FAQ: FORCE
 install-strip:
 	$(MAKE) install STRIPFLAGS="-s"
 
-# install/uninstall everything (except info)
+# install/uninstall most things
 install: install.bin install.modules install.man install.fns
 uninstall: uninstall.bin uninstall.modules uninstall.man uninstall.fns
 
@@ -82,6 +82,10 @@ install.fns uninstall.fns:
 
 # install/uninstall just the info pages
 install.info uninstall.info:
+	@cd Doc && $(MAKE) $(MAKEDEFS) $@
+
+# install/uninstall just the HTML manual
+install.html uninstall.html:
 	@cd Doc && $(MAKE) $(MAKEDEFS) $@
 
 # install/uninstall just the html pages
