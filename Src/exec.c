@@ -3018,7 +3018,7 @@ doshfunc(char *name, List list, LinkList doshargs, int flags, int noreturnval)
 		argzero = ztrdup(argzero);
 	    }
 	}
-	runshfunc(list, wrappers, name);
+	runshfunc(list, wrappers, dupstring(name));
 	if (retflag) {
 	    retflag = 0;
 	    breaks = obreaks;
