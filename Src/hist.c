@@ -1766,31 +1766,34 @@ static struct {
 
 static int histfile_linect;
 
-static int readhistline(int start, char **bufp, int *bufsiz, FILE *in)
+static int
+readhistline(int start, char **bufp, int *bufsiz, FILE *in)
 {
     char *buf = *bufp;
     if (fgets(buf + start, *bufsiz - start, in)) {
-	int l = strlen(buf);
-
-	if (start >= l)
+	int len = start + strlen(buf + start);
+	if (len == start)
 	    return -1;
-
-	if (l) {
-	    if (buf[l - 1] != '\n' && !feof(in)) {
+	if (buf[len - 1] != '\n') {
+	    if (!feof(in)) {
+		if (len < (*bufsiz) - 1)
+		    return -1;
 		*bufp = zrealloc(buf, 2 * (*bufsiz));
 		*bufsiz = 2 * (*bufsiz);
-		return readhistline(l, bufp, bufsiz, in);
-	    }
-	    buf[l - 1] = '\0';
-	    if (l > 1 && buf[l - 2] == '\\') {
-		buf[--l - 1] = '\n';
-		if (!feof(in))
-		    return readhistline(l, bufp, bufsiz, in);
+		return readhistline(len, bufp, bufsiz, in);
 	    }
 	}
-	return l;
-    } else
-	return 0;
+	else {
+	    buf[len - 1] = '\0';
+	    if (len > 1 && buf[len - 2] == '\\') {
+		buf[--len - 1] = '\n';
+		if (!feof(in))
+		    return readhistline(len, bufp, bufsiz, in);
+	    }
+	}
+	return len;
+    }
+    return 0;
 }
 
 /**/
