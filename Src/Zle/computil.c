@@ -3200,7 +3200,7 @@ cfp_matcher_pats(char *matcher, char *add)
 		    }
 	}
 	if (*add) {
-	    char *ret = "", buf[259], *oadd = add;
+	    char *ret = "", buf[259];
 
 	    for (mp = ms; *add; add++, mp++) {
 		if (!(m = *mp)) {
@@ -3661,6 +3661,32 @@ bin_compfiles(char *nam, char **args, char *ops, int func)
     return 1;
 }
 
+static int
+bin_compgroups(char *nam, char **args, char *ops, int func)
+{
+    Heap oldheap;
+    char *n;
+
+    SWITCHHEAPS(oldheap, compheap) {
+	while ((n = *args++)) {
+	    endcmgroup(NULL);
+	    begcmgroup(n, 0);
+	    endcmgroup(NULL);
+	    begcmgroup(n, CGF_NOSORT);
+	    endcmgroup(NULL);
+	    begcmgroup(n, CGF_UNIQALL);
+	    endcmgroup(NULL);
+	    begcmgroup(n, CGF_NOSORT|CGF_UNIQCON);
+	    endcmgroup(NULL);
+	    begcmgroup(n, CGF_UNIQALL);
+	    endcmgroup(NULL);
+	    begcmgroup(n, CGF_NOSORT|CGF_UNIQCON);
+	}
+    } SWITCHBACKHEAPS(oldheap);
+
+    return 0;
+}
+
 static struct builtin bintab[] = {
     BUILTIN("compdescribe", 0, bin_compdescribe, 3, -1, 0, NULL, NULL),
     BUILTIN("comparguments", 0, bin_comparguments, 1, -1, 0, NULL, NULL),
@@ -3670,6 +3696,7 @@ static struct builtin bintab[] = {
     BUILTIN("comptry", 0, bin_comptry, 0, -1, 0, NULL, NULL),
     BUILTIN("compfmt", 0, bin_compfmt, 2, -1, 0, NULL, NULL),
     BUILTIN("compfiles", 0, bin_compfiles, 1, -1, 0, NULL, NULL),
+    BUILTIN("compgroups", 0, bin_compgroups, 1, -1, 0, NULL, NULL),
 };
 
 

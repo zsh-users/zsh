@@ -2268,13 +2268,14 @@ static int cdepth = 0;
 static int
 makecomplistctl(int flags)
 {
+    Heap oldheap;
     int ret;
 
     if (cdepth == MAX_CDEPTH)
 	return 0;
 
     cdepth++;
-    SWITCHHEAPS(compheap) {
+    SWITCHHEAPS(oldheap, compheap) {
 	int ooffs = offs, lip, lp;
 	char *str = comp_str(&lip, &lp, 0), *t;
 	char *os = cmdstr, **ow = clwords, **p, **q, qc;
@@ -2333,7 +2334,7 @@ makecomplistctl(int flags)
 	clwords = ow;
 	clwnum = on;
 	clwpos = op;
-    } SWITCHBACKHEAPS;
+    } SWITCHBACKHEAPS(oldheap);
     cdepth--;
 
     return ret;

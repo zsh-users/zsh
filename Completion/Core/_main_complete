@@ -34,7 +34,7 @@ local func funcs ret=1 tmp _compskip format nm call match \
       _saved_insert="${compstate[insert]}" \
       _saved_colors="$ZLS_COLORS"
 
-typeset -U _lastdescr _comp_ignore
+typeset -U _lastdescr _comp_ignore _comp_colors
 
 [[ -z "$curcontext" ]] && curcontext=:::
 
@@ -263,7 +263,11 @@ fi
    ( "$_comp_force_list" = ?*  && nm -ge _comp_force_list ) ]] &&
     compstate[list]="${compstate[list]//messages} force"
 
-[[ "$compstate[old_list]" = keep ]] && ZLS_COLORS="$_saved_colors"
+if [[ "$compstate[old_list]" = keep ]]; then
+  ZLS_COLORS="$_saved_colors"
+else
+  ZLS_COLORS="${(j.:.)_comp_colors}"
+fi
 
 # Now call the post-functions.
 

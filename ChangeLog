@@ -1,3 +1,17 @@
+2000-06-22  Sven Wischnowsky  <wischnow@zsh.org>
+
+	* 12029: Completion/Builtins/_arrays, Completion/Builtins/_zstyle,
+ 	Completion/Commands/_bash_completions,
+ 	Completion/Commands/_history_complete_word,
+ 	Completion/Core/_history, Completion/Core/_main_complete,
+ 	Completion/Core/_parameters, Completion/Core/_setup,
+ 	Completion/Core/_tags, Completion/Debian/_apt,
+ 	Completion/X/_x_extension, Doc/Zsh/compsys.yo, Doc/Zsh/compwid.yo,
+ 	Src/zsh.h, Src/Zle/compcore.c, Src/Zle/compctl.c,
+ 	Src/Zle/complist.c, Src/Zle/computil.c: allow subscripts for
+ 	compadd -[ak]; new style for history completion; better
+ 	list-colors handling
+	
 2000-06-22  Clint Adams  <schizo@debian.org>
 
 	* 12027: Completion/User/_mailboxes: fix splitting problem in

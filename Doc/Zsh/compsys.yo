@@ -386,6 +386,22 @@ ifnzman(noderef(The zsh/zutil Module))).
 When looking up styles the completion system uses full context names,
 including the tag.
 
+To have more control over when certain values for styles are used one
+can use the special parameters available in completion widgets (see
+ifzman(see zmanref(zshcompwid))\
+ifnzman(noderef(Completion Widgets)))\
+) and the tt(-e) option to tt(zstyle) that makes the value be
+evaluated when looked up.  For example, to make the tt(completer)
+style have a different value when completion for the tt(cvs) command,
+one could use the tt(words) special array:
+
+example(zstyle -e ':completion:*' completer '
+    if [[ $words[1] = cvs ]]; then
+      reply=(_complete)
+    else
+      reply=(_complete _approximate)
+    fi')
+
 Styles determine such things as how the matches are generated; some of them
 correspond to shell options (for example, the use of menu completion), but
 styles provide more specific control.  They can have any number of strings as
@@ -1731,6 +1747,19 @@ Replaced by the unambiguous part of all matches, if there
 is any, and if it is different from the word on the line.
 )
 enditem()
+)
+kindex(range, completion style)
+item(tt(range))(
+This is used by the tt(_history) completer and the
+tt(_history_complete_word) bindable command to decide which words
+should be completed.  It may be set to a number, var(N), to say that
+only the last var(N) words from the history should be completed.  The
+value may also be of the form `var(max)tt(:)var(slice)'.  This means
+that first the last var(slice) words will be completed.  If that
+yields no matches, the var(slice) words before those will be tried and 
+so on, until either at least one match is generated or var(max) words
+have been tried.  The default is to complete all words from the
+history at once.
 )
 kindex(remove-all-dups, completion style)
 item(tt(remove-all-dups))(

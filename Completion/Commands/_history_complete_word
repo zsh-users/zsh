@@ -7,20 +7,26 @@
 #
 # Available styles:
 #
-#   :history-words:list -- display lists of available matches
-#   :history-words:stop -- prevent looping at beginning and end of matches
-#                          during menu-completion
-#   :history-words:sort -- sort matches lexically (default is to sort by age)
-#   :history-words:remove-all-dups --
-#                          remove /all/ duplicate matches rather than just
-#                          consecutives
-#
+#   list --  display lists of available matches
+#   stop --  prevent looping at beginning and end of matches during
+#            menu-completion
+#   sort --  sort matches lexically (default is to sort by age)
+#   remove-all-dups --
+#            remove /all/ duplicate matches rather than just consecutives
+#   range -- range of history words to complete
 
 _history_complete_word () {
   setopt localoptions nullglob rcexpandparam extendedglob
   unsetopt markdirs globsubst shwordsplit nounset ksharrays
 
-  local expl direction stop
+  local expl direction stop curcontext="$curcontext"
+  local max slice hmax=$#historywords
+
+  if [[ -z "$curcontext" ]]; then
+    curcontext=history-words:::
+  else
+    curcontext="history-words${curcontext#*:}"
+  fi
 
   if [[ $WIDGET = *newer ]]; then
     direction=newer
@@ -31,6 +37,19 @@ _history_complete_word () {
   zstyle -s ":completion:${curcontext}:history-words" stop stop
 
   zstyle -t ":completion:${curcontext}:history-words" list || compstate[list]=''
+
+  if zstyle -s ":completion:${curcontext}:history-words" range max; then
+    if [[ $max = *:* ]]; then
+      slice=${max#*:}
+      max=${max%:*}
+    else
+      slice=$max
+    fi
+    [[ max -gt hmax ]] && max=$hmax
+  else
+    max=$hmax
+    slice=$max
+  fi
 
   if [[ -n "$compstate[old_list]" &&
         ( -n "$stop" || "$compstate[insert]" = menu ) ]] ; then
@@ -66,11 +85,11 @@ _history_complete_word () {
     _history_complete_word_gen_matches
   fi
 
-  [[ -n "$compstate[nmatches]" ]]
+  (( $compstate[nmatches] ))
 }
 
 _history_complete_word_gen_matches () {
-  local opt h_words
+  local opt beg=2
 
   [[ -n "$_hist_stop" ]] && PREFIX="$_hist_old_prefix"
 
@@ -90,9 +109,11 @@ _history_complete_word_gen_matches () {
   SUFFIX="$SUFFIX$ISUFFIX"
   ISUFFIX=
 
-  h_words=( "${(@)historywords[2,-1]}" )
-  _wanted "$opt" history-words expl 'history word' \
-      compadd -Q -a h_words
+  while [[ $compstate[nmatches] -eq 0 && beg -lt max ]]; do
+    _main_complete - history _wanted "$opt" history-words expl 'history word' \
+                                 compadd -Q -a 'historywords[beg,beg+slice]'
+    (( beg+=slice ))
+  done
 
   zstyle -t ":completion:${curcontext}:history-words" list ||
       compstate[list]=

@@ -485,11 +485,14 @@ Like tt(-i), but gives an ignored suffix.
 )
 item(tt(-a))(
 With this flag the var(words) are taken as names of arrays and the
-possible matches are their values.
+possible matches are their values.  If only some elements of the
+arrays are needed, the var(words) may also contain subscripts, as in
+`tt(foo[2,-1])'.
 )
 item(tt(-k))(
 With this flag the var(words) are taken as names of associative arrays
-and the possible matches are their keys.
+and the possible matches are their keys.  As for tt(-a), the
+var(words) may also contain subscripts, as in `tt(foo[(R)*bar*])'.
 )
 item(tt(-d) var(array))(
 This adds per-match display strings. The var(array) should contain one 

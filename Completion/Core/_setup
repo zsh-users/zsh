@@ -7,16 +7,10 @@ local val nm="$compstate[nmatches]"
 if zstyle -a ":completion:${curcontext}:$1" list-colors val; then
   zmodload -i zsh/complist
   if [[ "$1" = default ]]; then
-    ZLS_COLORS="${(j.:.)${(@)val:gs/:/\\\:}}"
+    _comp_colors=( "$val[@]" )
   else
-    local simple grouped
-
-    simple=( "(${2})${(@)^val:#\(*\)*}" )
-    grouped=( "${(M@)val:#\(*\)*}" )
-    simple="${(j.:.)simple}:"
-    grouped="${(j.:.)grouped}:"
-    [[ "$ZLS_COLORS" != *${simple}*  ]] && ZLS_COLORS="${simple}$ZLS_COLORS"
-    [[ "$ZLS_COLORS" != *${grouped}* ]] && ZLS_COLORS="${grouped}$ZLS_COLORS"
+    _comp_colors=( "$_comp_colors[@]"
+                   "(${2})${(@)^val:#\(*\)*}" "${(M@)val:#\(*\)*}" )
   fi
 
 # Here is the problem mentioned in _main_complete.

@@ -30,18 +30,8 @@ if (( $# )); then
 
   [[ "$1" = -(|-) ]] && shift
 
-  if zstyle -a ":completion:${curcontext}:" group-order order; then
-    local name
-
-    for name in "$order[@]"; do
-      compadd -J "$name"
-      compadd -V "$name"
-      compadd -J "$name" -1
-      compadd -V "$name" -1
-      compadd -J "$name" -2
-      compadd -V "$name" -2
-    done
-  fi
+  zstyle -a ":completion:${curcontext}:" group-order order &&
+      compgroups "$order[@]"
 
   # Set and remember offered tags.
 

@@ -136,7 +136,7 @@ while [[ -n $state ]]; do
         ctop=cz
       fi
       _wanted styles expl style \
-         compadd -M 'r:|-=* r:|=*' - ${(k)styles[(R)[^:]#[$ctop][^:]#:*]}
+         compadd -M 'r:|-=* r:|=*' -k "styles[(R)[^:]#[$ctop][^:]#:*]"
       ;;
       
     style-arg)

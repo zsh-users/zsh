@@ -1,8 +1,8 @@
 #autoload
 
 # This should be used to complete parameter names if you need some of the
-# extra options of compadd. It first tries to complete only non-local
-# parameters. All arguments are given to compadd.
+# extra options of compadd. It completes only non-local parameters.
 
-compadd "$@" - "${(@)${(@)${(@)${(@f)$(typeset)}:#*local *\=*}%%\=*}##* }" ||
-    compadd "$@" - "${(@)${(@)${(@f)$(typeset)}%%\=*}##* }"
+local expl
+
+_wanted parameters expl parameter compadd "$@" -k 'parameters[(R)^*local*]'

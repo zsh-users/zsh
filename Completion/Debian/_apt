@@ -469,7 +469,7 @@ _apt-config () {
     -- \
     /$'shell\0'/ \
       \( \
-	/$'[^\0]#\0'/ ':parameters:shell variable to assign:compadd "$expl[@]" - "${(@k)parameters}"' \
+	/$'[^\0]#\0'/ ':parameters:shell variable to assign:_parameters' \
 	/$'[^\0]#\0'/ ':values:configuration key:compadd "$expl[@]" - ${${(f)"$(apt-config dump 2>&1)"}% *}' \
       \) \# \| \
     /$'dump\0'/ \| \

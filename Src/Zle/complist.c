@@ -1750,8 +1750,6 @@ domenuselect(Hookdef dummy, Chdata dat)
 	}
 	setwish = wasnext = 0;
 
-    getk:
-
 	if (!(cmd = getkeycmd()) || cmd == Th(z_sendbreak)) {
 	    zbeep();
 	    break;

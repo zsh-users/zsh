@@ -1553,14 +1553,17 @@ get_user_var(char *nam)
 }
 
 static char **
-get_user_keys(char *nam)
+get_data_arr(char *name, int keys)
 {
-    char **ret;
+    struct value vbuf;
+    Value v;
 
-    if ((ret = gethkparam(nam)))
-	return (incompfunc ? arrdup(ret) : ret);
+    if (!(v = fetchvalue(&vbuf, &name, 1,
+			 (keys ? SCANPM_WANTKEYS : SCANPM_WANTVALS) |
+			 SCANPM_MATCHMANY)))
+	return NULL;
 
-    return NULL;
+    return getarrvalue(v);
 }
 
 /* This is used by compadd to add a couple of matches. The arguments are
@@ -1586,9 +1589,10 @@ addmatches(Cadata dat, char **argv)
     Patprog cp = NULL, *pign = NULL;
     LinkList aparl = NULL, oparl = NULL, dparl = NULL;
     Brinfo bp, bpl = brbeg, obpl, bsl = brend, obsl;
+    Heap oldheap;
 
     if (!*argv) {
-	SWITCHHEAPS(compheap) {
+	SWITCHHEAPS(oldheap, compheap) {
 	    /* Select the group in which to store the matches. */
 	    gflags = (((dat->aflags & CAF_NOSORT ) ? CGF_NOSORT  : 0) |
 		      ((dat->aflags & CAF_UNIQALL) ? CGF_UNIQALL : 0) |
@@ -1602,7 +1606,7 @@ addmatches(Cadata dat, char **argv)
 	    }
 	    if (dat->mesg)
 		addmesg(dat->mesg);
-	} SWITCHBACKHEAPS;
+	} SWITCHBACKHEAPS(oldheap);
 
 	return 1;
     }
@@ -1638,7 +1642,7 @@ addmatches(Cadata dat, char **argv)
 
     /* Switch back to the heap that was used when the completion widget
      * was invoked. */
-    SWITCHHEAPS(compheap) {
+    SWITCHHEAPS(oldheap, compheap) {
 	if ((doadd = (!dat->apar && !dat->opar && !dat->dpar))) {
 	    if (dat->aflags & CAF_MATCH)
 		hasmatched = 1;
@@ -1887,17 +1891,22 @@ addmatches(Cadata dat, char **argv)
 	obpl = bpl;
 	obsl = bsl;
 	if (dat->aflags & CAF_ARRAYS) {
-	    arrays = argv;
-	    argv = NULL;
-	    while (*arrays && (!(argv = ((dat->aflags & CAF_KEYS) ?
-					 get_user_keys(*arrays) :
-					 get_user_var(*arrays))) || !*argv))
+	    Heap oldheap2;
+
+	    SWITCHHEAPS(oldheap2, oldheap) {
+		arrays = argv;
+		argv = NULL;
+		while (*arrays &&
+		       (!(argv = get_data_arr(*arrays,
+					      (dat->aflags & CAF_KEYS))) ||
+			!*argv))
+		    arrays++;
 		arrays++;
-	    arrays++;
-	    if (!argv) {
-		ms = NULL;
-		argv = &ms;
-	    }
+		if (!argv) {
+		    ms = NULL;
+		    argv = &ms;
+		}
+	    } SWITCHBACKHEAPS(oldheap2);
 	}
 	if (dat->ppre)
 	    ppl = strlen(dat->ppre);
@@ -1994,17 +2003,22 @@ addmatches(Cadata dat, char **argv)
 		free_cline(lc);
 	    }
 	    if ((dat->aflags & CAF_ARRAYS) && !argv[1]) {
-		argv = NULL;
-		while (*arrays && (!(argv = ((dat->aflags & CAF_KEYS) ?
-					     get_user_keys(*arrays) :
-					     get_user_var(*arrays))) || !*argv))
+		Heap oldheap2;
+
+		SWITCHHEAPS(oldheap2, oldheap) {
+		    argv = NULL;
+		    while (*arrays &&
+			   (!(argv = get_data_arr(*arrays,
+						  (dat->aflags & CAF_KEYS))) ||
+			    !*argv))
+			arrays++;
 		    arrays++;
-		arrays++;
-		if (!argv) {
-		    ms = NULL;
-		    argv = &ms;
-		}
-		argv--;
+		    if (!argv) {
+			ms = NULL;
+			argv = &ms;
+		    }
+		    argv--;
+		} SWITCHBACKHEAPS(oldheap2);
 	    }
 	}
 	if (dat->apar)
@@ -2015,7 +2029,7 @@ addmatches(Cadata dat, char **argv)
 	    set_list_array(dat->dpar, dparl);
 	if (dat->exp)
 	    addexpl();
-    } SWITCHBACKHEAPS;
+    } SWITCHBACKHEAPS(oldheap);
 
     /* We switched back to the current heap, now restore the stack of
      * matchers. */

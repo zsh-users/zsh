@@ -11,12 +11,12 @@
 #
 # Available styles:
 #
-#   :history-words:sort -- sort matches lexically (default is to sort by age)
-#   :history-words:remove-all-dups --
-#                          remove /all/ duplicate matches rather than just
-#                          consecutives
+#   sort --  sort matches lexically (default is to sort by age)
+#   remove-all-dups --
+#            remove /all/ duplicate matches rather than just consecutives
+#   range -- range of history words to complete
 
-local opt expl h_words
+local opt expl max slice hmax=$#historywords beg=2
 
 if zstyle -t ":completion:${curcontext}:" remove-all-dups; then
   opt=-
@@ -30,6 +30,19 @@ else
   opt="${opt}V"
 fi
 
+if zstyle -s ":completion:${curcontext}:" range max; then
+  if [[ $max = *:* ]]; then
+    slice=${max#*:}
+    max=${max%:*}
+  else
+    slice=$max
+  fi
+  [[ max -gt hmax ]] && max=$hmax
+else
+  max=$hmax
+  slice=$max
+fi
+
 PREFIX="$IPREFIX$PREFIX"
 IPREFIX=
 SUFFIX="$SUFFIX$ISUFFIX"
@@ -37,5 +50,11 @@ ISUFFIX=
 
 # We skip the first element of historywords so the current word doesn't
 # interfere with the completion
-h_words=( "${(@)historywords[2,-1]}" )
-_wanted "$opt" history-words expl 'history word' compadd -Q -a h_words
+
+while [[ $compstate[nmatches] -eq 0 && beg -lt max ]]; do
+  _wanted "$opt" history-words expl 'history word' \
+      compadd -Q -a 'historywords[beg,beg+slice]'
+  (( beg+=slice ))
+done
+
+(( $compstate[namtches] ))

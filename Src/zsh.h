@@ -1629,8 +1629,8 @@ struct heap {
 # define NEWHEAPS(h)    do { Heap _switch_oldheaps = h = new_heaps(); do
 # define OLDHEAPS       while (0); old_heaps(_switch_oldheaps); } while (0);
 
-# define SWITCHHEAPS(h)  do { Heap _switch_oldheaps = switch_heaps(h); do
-# define SWITCHBACKHEAPS while (0); switch_heaps(_switch_oldheaps); } while (0);
+# define SWITCHHEAPS(o, h)  do { o = switch_heaps(h); do
+# define SWITCHBACKHEAPS(o) while (0); switch_heaps(o); } while (0);
 
 /****************/
 /* Debug macros */

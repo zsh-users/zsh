@@ -1,3 +1,5 @@
-#defcomp shift
+#compdef shift
 
-complist -A
+local expl
+
+_wanted arrays expl array compadd -k "parameters[(R)*array*~*local*]"
