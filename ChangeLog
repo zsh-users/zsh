@@ -1,5 +1,9 @@
 2000-04-07  Sven Wischnowsky <wischnow@informatik.hu-berlin.de>
 
+	* 10579: Completion/Base/_arguments, Completion/Base/_values,
+ 	Completion/Core/_alternative: make sure caller-supplied
+ 	explanation takes precedence
+	
 	* 10575: Completion/User/_make: complete make targets of the form
  	`foo bar:'
 	
@@ -11,10 +15,13 @@
  	multiple directories didn't work
 
 2000-04-06  Clint Adams  <schizo@debian.org>
+
 	* Felix Rosencrantz: 10564: Completion/X/_x_display:
 	typo in _wanted.
+
 	* 10565: acconfig.h, configure.in, Src/exec.c:
 	add configure option for function depth limit.
+
 	* 10566: Src/glob.c: change invocation of patgetglobflags
 	to use two arguments.
 

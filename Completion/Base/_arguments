@@ -258,8 +258,9 @@ if (( $# )) && comparguments -i "$autod" "$@"; then
             # Otherwise we call it with the description-arguments.
 
             eval "action=( $action )"
-            _all_labels arguments expl "$descr" \
-                "$action[1]" "$subopts[@]" "${(@)action[2,-1]}"
+            while _next_label arguments expl "$descr"; do
+              "$action[1]" "$subopts[@]" "$expl[@]" "${(@)action[2,-1]}"
+	    done
           fi
         fi
       fi
