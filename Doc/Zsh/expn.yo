@@ -973,16 +973,24 @@ quoted and the option tt(SH_WORD_SPLIT) is set, the word is split on
 occurrences of any of the characters in tt($IFS).  Note this step, too,
 takes place at all levels of a nested substitution.
 )
-item(tt(10.) em(Re-Evaluation))(
+item(tt(10.) em(Uniqueness))(
+If the result is an array and the `tt((u))' flag was present, duplicate
+elements are removed from the array.
+)
+item(tt(11.) em(Ordering))(
+If the result is still an array and one of the `tt((o))' or `tt((O))' flags
+was present, the array is reordered.
+)
+item(tt(12.) em(Re-Evaluation))(
 Any `tt((e))' flag is applied to the value, forcing it to be re-examined
 for new parameter substitutions, but also for command and arithmetic
 substitutions.
 )
-item(tt(11.) em(Padding))(
+item(tt(13.) em(Padding))(
 Any padding of the value by the `tt(LPAR()l.)var(fill)tt(.RPAR())' or
 `tt(LPAR()r.)var(fill)tt(.RPAR())' flags is applied.
 )
-item(tt(12.) em(Semantic Joining))(
+item(tt(14.) em(Semantic Joining))(
 In contexts where expansion semantics requires a single word to
 result, all words are rejoined with the first character of tt(IFS)
 between.  So in `tt(${LPAR()P)tt(RPAR()${LPAR()f)tt(RPAR()lines}})'

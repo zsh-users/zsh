@@ -1,3 +1,8 @@
+2005-03-18  Peter Stephenson  <pws@csr.com>
+
+	* zsh-users/8609: Doc/Zsh/expn.yo: document order of (u), (o)
+	and (O) parameter expansion flags.
+
 2005-03-16  Peter Stephenson  <pws@csr.com>
 
 	* 20983: Test/D02glob.ztst, Src/glob.c: fixed string segments
