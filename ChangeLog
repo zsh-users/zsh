@@ -1,3 +1,8 @@
+2001-10-24  Peter Stephenson  <pws@csr.com>
+
+	* 16130: Doc/.cvsignore, Doc/Zsh/manual.yo: Fix for texi2html
+	1.64.
+
 2001-10-24  Geoff Wing  <gcw@zsh.org>
 
 	* 16063: Src/zsh.h, Src/options.c, Src/Zle/zle_main.c,
