@@ -1946,7 +1946,7 @@ bin_typeset(char *name, char **argv, char *ops, int func)
     }
 
     if (!(ops['g'] || ops['x'] || ops['m']) || ops['g'] == 2 || *name == 'l' ||
-	!isset(GLOBALEXPORT))
+	(!isset(GLOBALEXPORT) && !ops['g']))
 	on |= PM_LOCAL;
 
     if (on & PM_TIED) {

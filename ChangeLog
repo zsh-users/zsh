@@ -1,3 +1,8 @@
+2001-05-15  Peter Stephenson  <pws@csr.com>
+
+	* 14348: Src/builtin.c: some idiot forgot to make GLOBAL_EXPORT
+	work with typeset -g.
+
 2001-05-15  Sven Wischnowsky  <wischnow@zsh.org>
 
 	* 14346: Src/parse.c: calculate the length of the region to map
