@@ -1,3 +1,8 @@
+2003-07-24  Oliver Kiddle  <opk@zsh.org>
+
+	* 18900: Completion/Linux/Command/_iptables,
+	Completion/Unix/Command/_nmap: new iptables and nmap completions
+
 2003-07-23  Oliver Kiddle  <opk@zsh.org>
 
 	* 18890: Completion/Unix/Command/_sablotron: new sabcmd completion
