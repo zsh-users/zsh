@@ -28,6 +28,7 @@
 "clear-screen", clearscreen, ZLE_MENUCMP | ZLE_KEEPSUFFIX | ZLE_LASTCOL | ZLE_NOTCOMMAND
 "complete-word", completeword, ZLE_MENUCMP | ZLE_KEEPSUFFIX | ZLE_ISCOMP
 "copy-prev-word", copyprevword, ZLE_KEEPSUFFIX
+"copy-prev-shell-word", copyprevshellword, ZLE_KEEPSUFFIX
 "copy-region-as-kill", copyregionaskill, ZLE_KEEPSUFFIX
 "delete-char", deletechar, ZLE_KEEPSUFFIX
 "delete-char-or-list", deletecharorlist, ZLE_MENUCMP | ZLE_KEEPSUFFIX | ZLE_ISCOMP

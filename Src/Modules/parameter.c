@@ -1093,10 +1093,14 @@ static char **
 histwgetfn(Param pm)
 {
     char **ret, **p, *h, *e, sav;
-    LinkList l = newlinklist();
+    LinkList l = newlinklist(), ll;
     LinkNode n;
     int i = addhistnum(curhist, -1, HIST_FOREIGN), iw;
     Histent he = quietgethistent(i, GETHIST_UPWARD);
+
+    ll = bufferwords(NULL);
+    for (n = firstnode(ll); n; incnode(n))
+	pushnode(l, getdata(n));
 
     while (he) {
 	for (iw = he->nwords - 1; iw >= 0; iw--) {

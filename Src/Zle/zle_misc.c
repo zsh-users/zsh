@@ -42,7 +42,7 @@ doinsert(char *str)
     int neg = zmult < 0;             /* insert *after* the cursor? */
     int m = neg ? -zmult : zmult;    /* number of copies to insert */
 
-    iremovesuffix(c1);
+    iremovesuffix(c1, 0);
     invalidatelist();
 
     if(insmode)
@@ -57,8 +57,8 @@ doinsert(char *str)
 }
 
 /**/
-void
-selfinsert(void)
+int
+selfinsert(char **args)
 {
     char s[3], *p = s;
 
@@ -69,56 +69,61 @@ selfinsert(void)
     *p++ = c;
     *p = 0;
     doinsert(s);
+    return 0;
 }
 
 /**/
-void
-selfinsertunmeta(void)
+int
+selfinsertunmeta(char **args)
 {
     c &= 0x7f;
     if (c == '\r')
 	c = '\n';
-    selfinsert();
+    return selfinsert(args);
 }
 
 /**/
-void
-deletechar(void)
+int
+deletechar(char **args)
 {
     if (zmult < 0) {
+	int ret;
 	zmult = -zmult;
-	backwarddeletechar();
+	ret = backwarddeletechar(args);
 	zmult = -zmult;
-	return;
+	return ret;
     }
     if (cs + zmult <= ll) {
 	cs += zmult;
 	backdel(zmult);
-    } else
-	feep();
+	return 0;
+    }
+    return 1;
 }
 
 /**/
-void
-backwarddeletechar(void)
+int
+backwarddeletechar(char **args)
 {
     if (zmult < 0) {
+	int ret;
 	zmult = -zmult;
-	deletechar();
+	ret = deletechar(args);
 	zmult = -zmult;
-	return;
+	return ret;
     }
     backdel(zmult > cs ? cs : zmult);
+    return 0;
 }
 
 /**/
-void
-killwholeline(void)
+int
+killwholeline(char **args)
 {
     int i, fg, n = zmult;
 
     if (n < 0)
-	return;
+	return 1;
     while (n--) {
 	if ((fg = (cs && cs == ll)))
 	    cs--;
@@ -127,27 +132,32 @@ killwholeline(void)
 	for (i = cs; i != ll && line[i] != '\n'; i++);
 	forekill(i - cs + (i != ll), fg);
     }
+    clearlist = 1;
+    return 0;
 }
 
 /**/
-void
-killbuffer(void)
+int
+killbuffer(char **args)
 {
     cs = 0;
     forekill(ll, 0);
+    clearlist = 1;
+    return 0;
 }
 
 /**/
-void
-backwardkillline(void)
+int
+backwardkillline(char **args)
 {
     int i = 0, n = zmult;
 
     if (n < 0) {
+	int ret;
 	zmult = -n;
-	killline();
+	ret = killline(args);
 	zmult = n;
-	return;
+	return ret;
     }
     while (n--) {
 	if (cs && line[cs - 1] == '\n')
@@ -157,11 +167,13 @@ backwardkillline(void)
 		cs--, i++;
     }
     forekill(i, 1);
+    clearlist = 1;
+    return 0;
 }
 
 /**/
-void
-gosmacstransposechars(void)
+int
+gosmacstransposechars(char **args)
 {
     int cc;
 
@@ -169,19 +181,19 @@ gosmacstransposechars(void)
 	if (cs == ll || line[cs] == '\n' ||
 	    ((cs + 1 == ll || line[cs + 1] == '\n') &&
 	     (!cs || line[cs - 1] == '\n'))) {
-	    feep();
-	    return;
+	    return 1;
 	}
 	cs += (cs == 0 || line[cs - 1] == '\n') ? 2 : 1;
     }
     cc = line[cs - 2];
     line[cs - 2] = line[cs - 1];
     line[cs - 1] = cc;
+    return 0;
 }
 
 /**/
-void
-transposechars(void)
+int
+transposechars(char **args)
 {
     int cc, ct;
     int n = zmult;
@@ -191,10 +203,8 @@ transposechars(void)
 	n = -n;
     while (n--) {
 	if (!(ct = cs) || line[cs - 1] == '\n') {
-	    if (ll == cs || line[cs] == '\n') {
-		feep();
-		return;
-	    }
+	    if (ll == cs || line[cs] == '\n')
+		return 1;
 	    if (!neg)
 		cs++;
 	    ct++;
@@ -211,29 +221,28 @@ transposechars(void)
 	}
 	if (ct == ll || line[ct] == '\n')
 	    ct--;
-	if (ct < 1 || line[ct - 1] == '\n') {
-	    feep();
-	    return;
-	}
+	if (ct < 1 || line[ct - 1] == '\n')
+	    return 1;
 	cc = line[ct - 1];
 	line[ct - 1] = line[ct];
 	line[ct] = cc;
     }
+    return 0;
 }
 
 /**/
-void
-poundinsert(void)
+int
+poundinsert(char **args)
 {
     cs = 0;
-    vifirstnonblank();
+    vifirstnonblank(zlenoargs);
     if (line[cs] != '#') {
 	spaceinline(1);
 	line[cs] = '#';
 	cs = findeol();
 	while(cs != ll) {
 	    cs++;
-	    vifirstnonblank();
+	    vifirstnonblank(zlenoargs);
 	    spaceinline(1);
 	    line[cs] = '#';
 	    cs = findeol();
@@ -243,42 +252,46 @@ poundinsert(void)
 	cs = findeol();
 	while(cs != ll) {
 	    cs++;
-	    vifirstnonblank();
+	    vifirstnonblank(zlenoargs);
 	    if(line[cs] == '#')
 		foredel(1);
 	    cs = findeol();
 	}
     }
     done = 1;
+    return 0;
 }
 
 /**/
-void
-acceptline(void)
+int
+acceptline(char **args)
 {
     done = 1;
+    return 0;
 }
 
 /**/
-void
-acceptandhold(void)
+int
+acceptandhold(char **args)
 {
-    pushnode(bufstack, metafy((char *)line, ll, META_DUP));
+    zpushnode(bufstack, metafy((char *)line, ll, META_DUP));
     stackcs = cs;
     done = 1;
+    return 0;
 }
 
 /**/
-void
-killline(void)
+int
+killline(char **args)
 {
     int i = 0, n = zmult;
 
     if (n < 0) {
+	int ret;
 	zmult = -n;
-	backwardkillline();
+	ret = backwardkillline(args);
 	zmult = n;
-	return;
+	return ret;
     }
     while (n--) {
 	if (line[cs] == '\n')
@@ -288,11 +301,13 @@ killline(void)
 		cs++, i++;
     }
     backkill(i, 0);
+    clearlist = 1;
+    return 0;
 }
 
 /**/
-void
-killregion(void)
+int
+killregion(char **args)
 {
     if (mark > ll)
 	mark = ll;
@@ -300,11 +315,12 @@ killregion(void)
 	forekill(mark - cs, 0);
     else
 	backkill(cs - mark, 1);
+    return 0;
 }
 
 /**/
-void
-copyregionaskill(void)
+int
+copyregionaskill(char **args)
 {
     if (mark > ll)
 	mark = ll;
@@ -312,25 +328,24 @@ copyregionaskill(void)
 	cut(cs, mark - cs, 0);
     else
 	cut(mark, cs - mark, 1);
+    return 0;
 }
 
 static int kct, yankb, yanke;
 
 /**/
-void
-yank(void)
+int
+yank(char **args)
 {
     Cutbuffer buf = &cutbuf;
     int n = zmult;
 
     if (n < 0)
-	return;
+	return 1;
     if (zmod.flags & MOD_VIBUF)
 	buf = &vibuf[zmod.vibuf];
-    if (!buf->buf) {
-	feep();
-	return;
-    }
+    if (!buf->buf)
+	return 1;
     mark = cs;
     yankb = cs;
     while (n--) {
@@ -340,18 +355,17 @@ yank(void)
 	cs += buf->len;
 	yanke = cs;
     }
+    return 0;
 }
 
 /**/
-void
-yankpop(void)
+int
+yankpop(char **args)
 {
     int cc;
 
-    if (!(lastcmd & ZLE_YANK) || !kring[kct].buf) {
-	feep();
-	return;
-    }
+    if (!(lastcmd & ZLE_YANK) || !kring[kct].buf)
+	return 1;
     cs = yankb;
     foredel(yanke - yankb);
     cc = kring[kct].len;
@@ -360,17 +374,20 @@ yankpop(void)
     cs += cc;
     yanke = cs;
     kct = (kct + KRINGCT - 1) % KRINGCT;
+    return 0;
 }
 
 /**/
-void
-overwritemode(void)
+int
+overwritemode(char **args)
 {
     insmode ^= 1;
+    return 0;
 }
+
 /**/
-void
-whatcursorposition(void)
+int
+whatcursorposition(char **args)
 {
     char msg[100];
     char *s = msg;
@@ -404,18 +421,19 @@ whatcursorposition(void)
     sprintf(s, "  point %d of %d(%d%%)  column %d", cs+1, ll+1,
 	    ll ? 100 * cs / ll : 0, cs - bol);
     showmsg(msg);
+    return 0;
 }
 
 /**/
-void
-undefinedkey(void)
+int
+undefinedkey(char **args)
 {
-    feep();
+    return 1;
 }
 
 /**/
-void
-quotedinsert(void)
+int
+quotedinsert(char **args)
 {
 #ifndef HAS_TIO
     struct sgttyb sob;
@@ -426,19 +444,23 @@ quotedinsert(void)
 #endif
     c = getkey(0);
 #ifndef HAS_TIO
-    setterm();
+    zsetterm();
 #endif
     if (c < 0)
-	feep();
+	return 1;
     else
-	selfinsert();
+	return selfinsert(args);
 }
 
 /**/
-void
-digitargument(void)
+int
+digitargument(char **args)
 {
     int sign = (zmult < 0) ? -1 : 1;
+
+    /* allow metafied as well as ordinary digits */
+    if ((c & 0x7f) < '0' || (c & 0x7f) > '9')
+	return 1;
 
     if (!(zmod.flags & MOD_TMULT))
 	zmod.tmult = 0;
@@ -451,26 +473,31 @@ digitargument(void)
 	zmod.tmult = zmod.tmult * 10 + sign * (c & 0xf);
     zmod.flags |= MOD_TMULT;
     prefixflag = 1;
+    return 0;
 }
 
 /**/
-void
-negargument(void)
+int
+negargument(char **args)
 {
-    if(zmod.flags & MOD_TMULT) {
-	feep();
-	return;
-    }
+    if (zmod.flags & MOD_TMULT)
+	return 1;
     zmod.tmult = -1;
     zmod.flags |= MOD_TMULT|MOD_NEG;
     prefixflag = 1;
+    return 0;
 }
 
 /**/
-void
-universalargument(void)
+int
+universalargument(char **args)
 {
     int digcnt = 0, pref = 0, minus = 1, gotk;
+    if (*args) {
+	zmod.mult = atoi(*args);
+	zmod.flags |= MOD_MULT;
+	return 0;
+    }
     while ((gotk = getkey(0)) != EOF) {
 	if (gotk == '-' && !digcnt) {
 	    minus = -1;
@@ -489,11 +516,12 @@ universalargument(void)
 	zmod.tmult *= 4;
     zmod.flags |= MOD_TMULT;
     prefixflag = 1;
+    return 0;
 }
 
 /**/
-void
-copyprevword(void)
+int
+copyprevword(char **args)
 {
     int len, t0;
 
@@ -509,18 +537,46 @@ copyprevword(void)
     spaceinline(len);
     memcpy((char *)&line[cs], (char *)&line[t0], len);
     cs += len;
+    return 0;
 }
 
 /**/
-void
-sendbreak(void)
+int
+copyprevshellword(char **args)
+{
+    LinkList l;
+    LinkNode n;
+    int i;
+    char *p = NULL;
+
+    l = bufferwords(&i);
+
+    for (n = firstnode(l); n; incnode(n))
+	if (!i--) {
+	    p = getdata(n);
+	    break;
+	}
+    if (p) {
+	int len = strlen(p);
+
+	spaceinline(len);
+	memcpy(line + cs, p, len);
+	cs += len;
+    }
+    return 0;
+}
+
+/**/
+int
+sendbreak(char **args)
 {
     errflag = 1;
+    return 1;
 }
 
 /**/
-void
-quoteregion(void)
+int
+quoteregion(char **args)
 {
     char *str;
     size_t len;
@@ -540,11 +596,12 @@ quoteregion(void)
     memcpy((char *)&line[cs], str, len);
     mark = cs;
     cs += len;
+    return 0;
 }
 
 /**/
-void
-quoteline(void)
+int
+quoteline(char **args)
 {
     char *str;
     size_t len = ll;
@@ -553,6 +610,7 @@ quoteline(void)
     sizeline(len);
     memcpy(line, str, len);
     cs = ll = len;
+    return 0;
 }
 
 /**/
@@ -567,7 +625,7 @@ makequote(char *str, size_t *len)
 	if (*l == '\'')
 	    qtct++;
     *len += 2 + qtct*3;
-    l = ol = (char *)halloc(*len);
+    l = ol = (char *)zhalloc(*len);
     *l++ = '\'';
     for (; str < end; str++)
 	if (*str == '\'') {
@@ -608,11 +666,13 @@ Thingy
 executenamedcommand(char *prmt)
 {
     Thingy cmd;
-    int len, l = strlen(prmt);
+    int len, l = strlen(prmt), feep = 0, listed = 0, curlist = 0;
+    int ols = (listshown && validlist), olll = lastlistlen;
     char *ptr;
     char *okeymap = curkeymapname;
 
-    cmdbuf = halloc(l + NAMLEN + 2);
+    clearlist = 1;
+    cmdbuf = zhalloc(l + NAMLEN + 2);
     strcpy(cmdbuf, prmt);
     statusline = cmdbuf;
     selectkeymap("main", 1);
@@ -621,40 +681,67 @@ executenamedcommand(char *prmt)
     for (;;) {
 	*ptr = '_';
 	statusll = l + len + 1;
-	refresh();
+	zrefresh();
 	if (!(cmd = getkeycmd()) || cmd == Th(z_sendbreak)) {
 	    statusline = NULL;
 	    selectkeymap(okeymap, 1);
+	    if ((listshown = ols)) {
+		showinglist = -2;
+		lastlistlen = olll;
+	    } else if (listed)
+		clearlist = listshown = 1;
+
 	    return NULL;
 	}
 	if(cmd == Th(z_clearscreen)) {
-	    clearscreen();
+	    clearscreen(zlenoargs);
+	    if (curlist) {
+		int zmultsav = zmult;
+
+		zmult = 1;
+		listlist(cmdll);
+		showinglist = 0;
+		zmult = zmultsav;
+	    }
 	} else if(cmd == Th(z_redisplay)) {
-	    redisplay();
+	    redisplay(zlenoargs);
+	    if (curlist) {
+		int zmultsav = zmult;
+
+		zmult = 1;
+		listlist(cmdll);
+		showinglist = 0;
+		zmult = zmultsav;
+	    }
 	} else if(cmd == Th(z_viquotedinsert)) {
 	    *ptr = '^';
-	    refresh();
+	    zrefresh();
 	    c = getkey(0);
 	    if(c == EOF || !c || len == NAMLEN)
-		feep();
+		feep = 1;
 	    else
-		*ptr++ = c, len++;
+		*ptr++ = c, len++, curlist = 0;
 	} else if(cmd == Th(z_quotedinsert)) {
 	    if((c = getkey(0)) == EOF || !c || len == NAMLEN)
-		feep();
+		feep = 1;
 	    else
-		*ptr++ = c, len++;
+		*ptr++ = c, len++, curlist = 0;
 	} else if(cmd == Th(z_backwarddeletechar) ||
 	    	cmd == Th(z_vibackwarddeletechar)) {
 	    if (len)
-		len--, ptr--;
+		len--, ptr--, curlist = 0;
 	} else if(cmd == Th(z_killregion) || cmd == Th(z_backwardkillword) ||
-	    	cmd == Th(z_vibackwardkillword)) {
+		  cmd == Th(z_vibackwardkillword)) {
+	    if (len)
+		curlist = 0;
 	    while (len && (len--, *--ptr != '-'));
 	} else if(cmd == Th(z_killwholeline) || cmd == Th(z_vikillline) ||
 	    	cmd == Th(z_backwardkillline)) {
 	    len = 0;
 	    ptr = cmdbuf;
+	    if (listed)
+		clearlist = listshown = 1;
+	    curlist = 0;
 	} else {
 	    if(cmd == Th(z_acceptline) || cmd == Th(z_vicmdmode)) {
 		Thingy r;
@@ -665,6 +752,11 @@ executenamedcommand(char *prmt)
 		    unrefthingy(r);
 		    statusline = NULL;
 		    selectkeymap(okeymap, 1);
+		    if ((listshown = ols)) {
+			showinglist = -2;
+			lastlistlen = olll;
+		    } else if (listed)
+			clearlist = listshown = 1;
 		    return r;
 		}
 		unrefthingy(r);
@@ -681,21 +773,25 @@ executenamedcommand(char *prmt)
 		cmd == Th(z_acceptline) || c == ' ' || c == '\t') {
 		cmdambig = 100;
 
-		HEAPALLOC {
-		    cmdll = newlinklist();
-		    *ptr = 0;
+		cmdll = newlinklist();
+		*ptr = 0;
 
-		    scanhashtable(thingytab, 1, 0, DISABLED, scancompcmd, 0);
-		} LASTALLOC;
-		if (empty(cmdll))
-		    feep();
-		else if (cmd == Th(z_listchoices) ||
+		scanhashtable(thingytab, 1, 0, DISABLED, scancompcmd, 0);
+
+		if (empty(cmdll)) {
+		    feep = 1;
+		    if (listed)
+			clearlist = listshown = 1;
+		    curlist = 0;
+		} else if (cmd == Th(z_listchoices) ||
 		    cmd == Th(z_deletecharorlist)) {
 		    int zmultsav = zmult;
 		    *ptr = '_';
 		    statusll = l + len + 1;
 		    zmult = 1;
 		    listlist(cmdll);
+		    listed = curlist = 1;
+		    showinglist = 0;
 		    zmult = zmultsav;
 		} else if (!nextnode(firstnode(cmdll))) {
 		    strcpy(ptr = cmdbuf, peekfirst(cmdll));
@@ -710,22 +806,26 @@ executenamedcommand(char *prmt)
 			!(isset(LISTAMBIGUOUS) && cmdambig > len)) {
 			int zmultsav = zmult;
 			if (isset(LISTBEEP))
-			    feep();
+			    feep = 1;
 			statusll = l + cmdambig + 1;
 			zmult = 1;
 			listlist(cmdll);
+			listed = curlist = 1;
+			showinglist = 0;
 			zmult = zmultsav;
 		    }
 		    len = cmdambig;
 		}
 	    } else {
 		if (len == NAMLEN || icntrl(c) || cmd != Th(z_selfinsert))
-		    feep();
+		    feep = 1;
 		else
-		    *ptr++ = c, len++;
+		    *ptr++ = c, len++, curlist = 0;
 	    }
 	}
-	handlefeep();
+	if (feep)
+	    handlefeep(zlenoargs);
+	feep = 0;
     }
 }
 
@@ -761,16 +861,22 @@ executenamedcommand(char *prmt)
  * suffixlen[256] is the length to remove for non-insertion editing actions. */
 
 /**/
-int suffixlen[257];
+mod_export int suffixlen[257];
+
+/* Shell function to call to remove the suffix. */
+
+/**/
+static char *suffixfunc;
 
 /* Set up suffix: the last n characters are a suffix that should be *
  * removed in the usual word end conditions.                        */
 
 /**/
-void
+mod_export void
 makesuffix(int n)
 {
-    suffixlen[256] = suffixlen[' '] = suffixlen['\t'] = suffixlen['\n'] = n;
+    suffixlen[256] = suffixlen[' '] = suffixlen['\t'] = suffixlen['\n'] = 
+	suffixlen[';'] = suffixlen['&'] = suffixlen['|'] = n;
 }
 
 /* Set up suffix for parameter names: the last n characters are a suffix *
@@ -780,7 +886,7 @@ makesuffix(int n)
  * characters that can only be used in braces are included.              */
 
 /**/
-void
+mod_export void
 makeparamsuffix(int br, int n)
 {
     if(br || unset(KSHARRAYS))
@@ -788,20 +894,91 @@ makeparamsuffix(int br, int n)
     if(br) {
 	suffixlen['#'] = suffixlen['%'] = suffixlen['?'] = n;
 	suffixlen['-'] = suffixlen['+'] = suffixlen['='] = n;
-	/*{*/ suffixlen['}'] = n;
+	/*{*/ suffixlen['}'] = suffixlen['/'] = n;
     }
+}
+
+/* Set up suffix given a string containing the characters on which to   *
+ * remove the suffix. */
+
+/**/
+mod_export void
+makesuffixstr(char *f, char *s, int n)
+{
+    if (f) {
+	zsfree(suffixfunc);
+	suffixfunc = ztrdup(f);
+	suffixlen[0] = n;
+    } else if (s) {
+	int inv, i, v, z = 0;
+
+	if (*s == '^' || *s == '!') {
+	    inv = 1;
+	    s++;
+	} else
+	    inv = 0;
+	s = getkeystring(s, &i, 5, &z);
+	s = metafy(s, i, META_USEHEAP);
+
+	if (inv) {
+	    v = 0;
+	    for (i = 0; i < 257; i++)
+		 suffixlen[i] = n;
+	} else
+	    v = n;
+
+	if (z)
+	    suffixlen[256] = v;
+
+	while (*s) {
+	    if (s[1] == '-' && s[2]) {
+		int b = (int) *s, e = (int) s[2];
+
+		while (b <= e)
+		    suffixlen[b++] = v;
+		s += 2;
+	    } else
+		suffixlen[STOUC(*s)] = v;
+	    s++;
+	}
+    } else
+	makesuffix(n);
 }
 
 /* Remove suffix, if there is one, when inserting character c. */
 
 /**/
-void
-iremovesuffix(int c)
+mod_export void
+iremovesuffix(int c, int keep)
 {
-    int sl = suffixlen[c];
-    if(sl) {
-	backdel(sl);
-	invalidatelist();
+    if (suffixfunc) {
+	Eprog prog = getshfunc(suffixfunc);
+
+	if (prog != &dummy_eprog) {
+	    LinkList args = newlinklist();
+	    char buf[20];
+	    int osc = sfcontext;
+
+	    sprintf(buf, "%d", suffixlen[0]);
+	    addlinknode(args, suffixfunc);
+	    addlinknode(args, buf);
+
+	    startparamscope();
+	    makezleparams(0);
+	    sfcontext = SFC_COMPLETE;
+	    doshfunc(suffixfunc, prog, args, 0, 1);
+	    sfcontext = osc;
+	    endparamscope();
+	}
+	zsfree(suffixfunc);
+	suffixfunc = NULL;
+    } else {
+	int sl = suffixlen[c];
+	if(sl) {
+	    backdel(sl);
+	    if (!keep)
+		invalidatelist();
+	}
     }
     fixsuffix();
 }
@@ -809,7 +986,7 @@ iremovesuffix(int c)
 /* Fix the suffix in place, if there is one, making it non-removable. */
 
 /**/
-void
+mod_export void
 fixsuffix(void)
 {
     memset(suffixlen, 0, sizeof(suffixlen));

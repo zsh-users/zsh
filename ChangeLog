@@ -1,3 +1,10 @@
+2000-04-12  Sven Wischnowsky <wischnow@informatik.hu-berlin.de>
+
+	* 10685: Doc/Zsh/zle.yo, Src/hist.c, Src/Modules/parameter.c,
+ 	Src/Zle/iwidgets.list, Src/Zle/zle_misc.c: new widget
+ 	copy-prev-shell-word, like copy-prev-word but uses shell parsing
+ 	to find word
+	
 2000-04-11  Clint Adams  <schizo@debian.org>
 
 	* 10680: Completion/User/_diff_options: spelling corrections.
