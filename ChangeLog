@@ -1,3 +1,8 @@
+2002-06-24  Peter Stephenson  <pws@csr.com>
+
+	* 17350: Src/zle_params.c, Doc/Zsh/zle.yo: Add $CUTBUFFER and
+	$killring zle parameters.
+
 2002-06-22  Bart Schaefer  <schaefer@zsh.org>
 
 	* users/5073: Completion/compdump: use `typeset +f' instead of

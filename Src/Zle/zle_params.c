@@ -81,6 +81,10 @@ static struct zleparam {
         zleunsetfn, NULL },
     { "PENDING", PM_INTEGER | PM_READONLY, NULL, FN(get_pending),
         zleunsetfn, NULL },
+    { "CUTBUFFER", PM_SCALAR, FN(set_cutbuffer), FN(get_cutbuffer),
+	unset_cutbuffer, NULL },
+    { "killring", PM_ARRAY, FN(set_killring), FN(get_killring),
+	unset_killring, NULL },
     { NULL, 0, NULL, NULL, NULL, NULL }
 };
 
@@ -332,4 +336,129 @@ static zlong
 get_pending(Param pm)
 {
     return noquery(0);
+}
+
+/**/
+static char *
+get_cutbuffer(Param pm)
+{
+    if (cutbuf.buf)
+	return metafy(cutbuf.buf, cutbuf.len, META_HEAPDUP);
+    else
+	return "";
+}
+
+
+/**/
+static void
+set_cutbuffer(Param pm, char *x)
+{
+    if (cutbuf.buf)
+	free(cutbuf.buf);
+    cutbuf.flags = 0;
+    if (x) {
+	unmetafy(x, &cutbuf.len);
+	cutbuf.buf = zalloc(cutbuf.len);
+	strcpy((char *)cutbuf.buf, x);
+	zsfree(x);
+    } else {
+	cutbuf.buf = NULL;
+	cutbuf.len = 0;
+    }
+}
+
+/**/
+static void
+unset_cutbuffer(Param pm, int exp)
+{
+    if (exp) {
+	stdunsetfn(pm, exp);
+	if (cutbuf.buf) {
+	    free(cutbuf.buf);
+	    cutbuf.buf = NULL;
+	    cutbuf.len = 0;
+	}
+    }
+}
+
+/**/
+static void
+set_killring(Param pm, char **x)
+{
+    int kpos, kcnt;
+    char **p;
+
+    kcnt = 0;
+    kpos = kringnum;
+
+    if (x) {
+	/*
+	 * Insert the elements into the kill ring, up to a maximum
+	 * of KRINGCT.  We always handle the ring in the order
+	 * a series of yank-pops would show, i.e. starting with
+	 * the most recently cut and going backwards.
+	 */
+	for (p = x; kcnt < KRINGCT && *p; kcnt++, p++) {
+	    Cutbuffer kptr = kring + kpos;
+	    if (kptr->buf)
+		free(kptr->buf);
+	    kptr->buf = (char *)zalloc(strlen(*p));
+	    strcpy(kptr->buf, *p);
+	    unmetafy(kptr->buf, &kptr->len);
+	    kptr->flags = 0;
+	    kpos = (kpos + KRINGCT - 1) % KRINGCT;
+	}
+	freearray(x);
+    }
+    /*
+     * Any values unsupplied are to be unset.
+     */
+    for (; kcnt < KRINGCT; kcnt++) {
+	Cutbuffer kptr = kring + kpos;
+	if (kptr->buf) {
+	    free(kptr->buf);
+	    kptr->buf = NULL;
+	    kptr->flags = kptr->len = 0;
+	}
+	kpos = (kpos + KRINGCT - 1) % KRINGCT;
+    }
+}
+
+/**/
+static char **
+get_killring(Param pm)
+{
+    /*
+     * Return the kill ring with the most recently killed first.
+     * Stop as soon as we find something which isn't set, i.e.
+     * don't fill in bogus entries.
+     */
+    int kpos, kcnt;
+    char **ret, **p;
+
+    for (kpos = kringnum, kcnt = 0; kcnt < KRINGCT; kcnt++) {
+	if (!kring[kpos].buf)
+	    break;
+	kpos = (kpos + KRINGCT - 1) % KRINGCT;
+    }
+
+    p = ret = (char **)zhalloc((kcnt+1) * sizeof(char *));
+
+    for (kpos = kringnum; kcnt; kcnt--) {
+	*p++ = metafy((char *)kring[kpos].buf, kring[kpos].len, META_HEAPDUP);
+	kpos = (kpos + KRINGCT - 1) % KRINGCT;
+    }
+    *p = NULL;
+
+    return ret;
+}
+
+/**/
+static void
+unset_killring(Param pm, int exp)
+{
+    if (exp) {
+	set_killring(pm, NULL);
+	stdunsetfn(pm, exp);
+    }
 }

@@ -589,10 +589,10 @@ cursor remains at the same offset, unless that would put it outside the
 buffer.
 )
 vindex(BUFFERLINES)
-item(tt(BUFFERLINES))(
+item(tt(BUFFERLINES) (integer))(
 The number of screen lines needed for the edit buffer currently
 displayed on screen (i.e. without any changes to the preceding
-parameters done after the last redisplay).
+parameters done after the last redisplay); read-only.
 )
 vindex(CURSOR)
 item(tt(CURSOR) (integer))(
@@ -601,21 +601,35 @@ The offset of the cursor, within the edit buffer.  This is in the range
 Attempts to move the cursor outside the buffer will result in the
 cursor being moved to the appropriate end of the buffer.
 )
+vindex(CUTBUFFER)
+item(tt(CUTBUFFER) (scalar))(
+The last item to be cut using one of the `tt(kill-)' commands; the
+string which the next yank would insert in the line.
+)
 vindex(HISTNO)
 item(tt(HISTNO) (integer))(
-The current history number.
+The current history number; read-only.
 )
 vindex(KEYMAP)
 item(tt(KEYMAP) (scalar))(
-The name of the currently selected keymap.
+The name of the currently selected keymap; read-only.
 )
 vindex(KEYS)
 item(tt(KEYS) (scalar))(
-The keys typed to invoke this widget, as a literal string.
+The keys typed to invoke this widget, as a literal string; read-only.
+)
+vindex(killring)
+item(tt(killring) (array))(
+The array of previously killed items, with the most recently killed first.
+This gives the items that would be retrieved by a tt(yank-pop) in the
+same order, up to eight (which is the maximum stored internally).
+Unlike a normal array, only a maximum of eight elements may be written;
+any extra are ignored.  If fewer than eight elements are given, the
+remaining elements of the kill ring will be treated as undefined.
 )
 vindex(LASTWIDGET)
 item(tt(LASTWIDGET) (scalar))(
-The name of the last widget that was executed.
+The name of the last widget that was executed; read-only.
 )
 vindex(LBUFFER)
 item(tt(LBUFFER) (scalar))(
@@ -640,7 +654,7 @@ item(tt(PENDING) (integer))(
 The number of bytes pending for input, i.e. the number of bytes which have
 already been typed and can immediately be read. On systems where the shell
 is not able to get this information, this parameter will always have a
-value of zero.
+value of zero.  Read-only.
 )
 vindex(PREBUFFER)
 item(tt(PREBUFFER) (scalar))(
@@ -656,7 +670,7 @@ cursor remains between the old tt($LBUFFER) and the new tt($RBUFFER).
 )
 vindex(WIDGET)
 item(tt(WIDGET) (scalar))(
-The name of the widget currently being executed.
+The name of the widget currently being executed; read-only.
 )
 enditem()
 sect(Standard Widgets)
