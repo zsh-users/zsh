@@ -740,6 +740,10 @@ bin_vared(char *name, char **args, char *ops, int func)
     char *p1 = NULL, *p2 = NULL;
     FILE *oshout = NULL;
 
+    if (unset(USEZLE)) {
+	zwarnnam(name, "ZLE not enabled", NULL, 0);
+	return 1;
+    }
     if (zleactive) {
 	zwarnnam(name, "ZLE cannot be used recursively (yet)", NULL, 0);
 	return 1;

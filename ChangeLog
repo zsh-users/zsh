@@ -1,3 +1,7 @@
+2000-05-26  Sven Wischnowsky  <wischnow@zsh.org>
+
+	* 11566: Src/Zle/zle_main.c: disable vared if zle is not enabled
+	
 2000-05-25  Oliver Kiddle  <opk@u.genie.co.uk>
 
 	* 11579: Completion/Builtins/_compdef, Completion/Builtins/_zpty:
