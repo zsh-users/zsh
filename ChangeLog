@@ -1,5 +1,8 @@
 2000-04-25  Sven Wischnowsky  <wischnow@informatik.hu-berlin.de>
 
+	* 10912: Src/Zle/compresult.c: don't always ignore backslashes in
+ 	paths when testing file type
+	
 	* 10910: Completion/Base/_tilde, Completion/Core/_all_labels,
  	Completion/Core/_requested: small fix for _requested to be able to
  	use _all_labels from within it

@@ -705,6 +705,9 @@ ztat(char *nam, struct stat *buf, int ls)
 {
     char b[PATH_MAX], *p;
 
+    if (!(ls ? lstat(nam, buf) : stat(nam, buf)))
+	return 0;
+
     for (p = b; p < b + sizeof(b) - 1 && *nam; nam++)
 	if (*nam == '\\' && nam[1])
 	    *p++ = *++nam;
