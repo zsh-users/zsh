@@ -63,6 +63,7 @@ int movetoend;
 mod_export int insmnum, insspace;
 
 #if 0
+/* group-numbers in compstate[insert] */
 int insgnum, insgroup; /* mod_export */
 #endif
 
@@ -754,11 +755,13 @@ callcompfunc(char *s, char *fn)
 	    useline = 2, usemenu = 0;
 	else if (idigit(*compinsert)) {
 #if 0
+	    /* group-numbers in compstate[insert] */
 	    char *m;
 #endif
 	    useline = 1; usemenu = 3;
 	    insmnum = atoi(compinsert);
 #if 0
+	    /* group-numbers in compstate[insert] */
 	    if ((m = strchr(compinsert, ':'))) {
 		insgroup = 1;
 		insgnum = atoi(m + 1);
@@ -778,6 +781,7 @@ callcompfunc(char *s, char *fn)
 	    if (useline && (p = strchr(compinsert, ':'))) {
 		insmnum = atoi(++p);
 #if 0
+		/* group-numbers in compstate[insert] */
 		if ((p = strchr(p, ':'))) {
 		    insgroup = 1;
 		    insgnum = atoi(p + 1);
@@ -851,6 +855,7 @@ makecomplist(char *s, int incmd, int lst)
 	isuf = NULL;
 	insmnum = 1;
 #if 0
+	/* group-numbers in compstate[insert] */
 	insgnum = 1;
 	insgroup = 0;
 #endif

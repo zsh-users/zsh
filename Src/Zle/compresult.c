@@ -1077,6 +1077,7 @@ do_ambig_menu(void)
 	    minfo.cur = NULL;
     }
 #if 0
+    /* group-numbers in compstate[insert] */
     if (insgroup) {
 	insgnum = comp_mod(insgnum, lastpermgnum);
 	for (minfo.group = amatches;
@@ -1101,6 +1102,7 @@ do_ambig_menu(void)
 	    return;
 	}
 #if 0
+	/* group-numbers in compstate[insert] */
     }
 #endif
     mc = (minfo.group)->matches + insmnum;

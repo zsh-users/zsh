@@ -1,5 +1,9 @@
 2000-04-13  Sven Wischnowsky <wischnow@informatik.hu-berlin.de>
 
+	* 10725: Src/Zle/compcore.c, Src/Zle/compctl.c,
+ 	Src/Zle/compresult.c: comment the `#if's for group numbers in
+ 	$compstate[insert]
+	
 	* 10724: Src/Zle/compresult.c, Src/Zle/zle_tricky.c: display
  	number of matches again when asking if a completion list should be
  	shown (only when not zero)

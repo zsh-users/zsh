@@ -1814,6 +1814,7 @@ ccmakehookfn(Hookdef dummy, struct ccmakedat *dat)
 	isuf = NULL;
 	insmnum = 1;
 #if 0
+	/* group-numbers in compstate[insert] */
 	insgnum = 1;
 	insgroup = 0;
 #endif
