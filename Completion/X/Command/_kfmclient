@@ -73,8 +73,9 @@ case $line[1] in
     _webbrowser
     return
   elif [[ $state = firstarg ]]; then
+    local appdata=${$(kde-config --path data 2> /dev/null):-~/.kde/share/apps/}
     _wanted profile expl 'Konqueror profile' \
-      compadd -- ~/.kde/share/apps/konqueror/profiles/*(:t)
+      compadd -- ${(s/:/)^${appdata}}konqueror/profiles/*(:t)
     return
   fi
   ;;

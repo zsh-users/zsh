@@ -1,3 +1,8 @@
+2005-03-24  Andrey Borzenkov  <bor@zsh.org>
+
+	* 21053: Completion/X/Command/_kfmclient: use kde search path
+	to find profiles in openProfile
+
 2005-03-22  Andrey Borzenkov  <bor@zsh.org>
 
 	* 21051 (modifed as suugested by Oliver in 21052):
