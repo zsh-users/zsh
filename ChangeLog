@@ -4,6 +4,26 @@
 	for numeric globbing (with the "-").  Also fix the bug whereby
 	"echo 1<2-3>" would lose the "1".
 
+2000-04-03  Sven Wischnowsky <wischnow@informatik.hu-berlin.de>
+	* 10408: Completion/Core/_path_files: better quoting
+
+	* 10409: Completion/Core/_path_files: completion after ~+<num>
+
+	* 10412: Src/Zle/compmatch.c: better partial word completion for
+ 	new parts
+
+	* 10413: Completion/Commands/_complete_help, Doc/Zsh/compsys.yo:
+	style list optional in _complete_help
+
+	* 10416: Completion/Core/_main_complete, Doc/Zsh/compsys.yo:
+ 	default completer style contains _ignored
+
+	* 10425: Completion/Core/_files, Completion/User/_gdb,
+	Completion/User/_getconf, Completion/User/_mh,
+	Completion/User/_netscape, Completion/User/_tiff,
+	Completion/User/_urls, Completion/X/_xmodmap,
+	Doc/Zsh/compsys.yo, Src/Zle/computil.c: Various completion fixes.
+
 2000-04-02  Peter Stephenson  <pws@pwstephenson.fsnet.co.uk>
 
 	* pws: Config/version.mk: 3.1.6-dev-21.
