@@ -66,7 +66,7 @@ dopestring;
 /* The line before completion was tried. */
 
 static char *origline;
-static int origcs;
+static int origcs, origll;
 
 /* wb and we hold the beginning/end position of the word we are completing. */
 
@@ -936,6 +936,7 @@ docomplete(int lst)
     ocs = cs;
     origline = dupstring((char *) line);
     origcs = cs;
+    origll = ll;
     if (!isfirstln && chline != NULL) {
 	/* If we are completing in a multi-line buffer (which was not  *
 	 * taken from the history), we have to prepend the stuff saved *
@@ -8272,14 +8273,10 @@ do_ambiguous(void)
 	 * completion options.                                             */
 	do_ambig_menu();
     } else if (ainfo) {
-	int atend = (cs == we), oll = ll, la, eq, tcs;
-	VARARR(char, oline, ll);
+	int atend = (cs == we), la, eq, tcs;
 
 	minfo.cur = NULL;
 	minfo.asked = 0;
-
-	/* Copy the line buffer to be able to easily test if it changed. */
-	memcpy(oline, line, ll);
 
 	fixsuffix();
 
@@ -8299,7 +8296,7 @@ do_ambiguous(void)
 	/* la is non-zero if listambiguous may be used. Copying and
 	 * comparing the line looks like BFI but it is the easiest
 	 * solution. Really. */
-	la = (ll != oll || strncmp(oline, (char *) line, ll));
+	la = (ll != origll || strncmp(origline, (char *) line, ll));
 
 	/* If REC_EXACT and AUTO_MENU are set and what we inserted is an  *
 	 * exact match, we want menu completion the next time round       *
