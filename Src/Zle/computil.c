@@ -628,7 +628,6 @@ parse_cadef(char *nam, char **args)
 
     all = ret = alloc_cadef(oargs, single, match, flags);
     optp = &(ret->opts);
-    single = flags = 0;
     anum = 1;
 
     sargs = args;
@@ -664,7 +663,7 @@ parse_cadef(char *nam, char **args)
 		set_cadef_opts(ret);
 		ret = ret->snext = alloc_cadef(NULL, single, NULL, flags);
 		optp = &(ret->opts);
-		single = flags = nopts = ndopts = nodopts = 0;
+		nopts = ndopts = nodopts = 0;
 		anum = 1;
 	    }
 	    continue;

@@ -1,3 +1,8 @@
+2000-05-24  Sven Wischnowsky  <wischnow@zsh.org>
+
+	* 11552: Completion/Linux/_rpm, Src/Zle/computil.c: fix for
+ 	comparguments to make -s have an effect again
+	
 2000-05-24  Clint Adams  <schizo@debian.org>
 
 	* 11548: Completion/User/_ispell: add -h switch to

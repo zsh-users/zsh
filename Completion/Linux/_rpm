@@ -96,7 +96,7 @@ while [[ -n "$state" ]]; do
   case "$lstate" in
   query)
     _arguments -s \
-      '*-v[verbose mode]' -q \
+      '*-v[verbose mode]' -q -c \
       '--rcfile:resource file:_files' \
       '--ftpproxy:FTP proxy server:_hosts' \
       '--ftpport:FTP port number:' \
