@@ -4,4 +4,5 @@ DISTFILES_SRC='
     _command_names _condition _default _describe _equal _first _in_vared
     _jobs _math _parameter _precommand _redirect _regex_arguments
     _retrieve_cache _store_cache _subscript _tilde _value _values
+    _sub_commands
 '
