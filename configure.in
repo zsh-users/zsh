@@ -530,6 +530,21 @@ AC_TRY_COMPILE([#include <curses.h>
 #include <term.h>], [char **test = strcodes;],
 AC_DEFINE(HAVE_STRCODES) strcodes=yes, strcodes=no)
 AC_MSG_RESULT($strcodes)
+AC_MSG_CHECKING(if boolnames is available)
+AC_TRY_COMPILE([#include <curses.h>
+#include <term.h>], [char **test = boolnames;],
+AC_DEFINE(HAVE_BOOLNAMES) boolnames=yes, boolnames=no)
+AC_MSG_RESULT($boolnames)
+AC_MSG_CHECKING(if numnames is available)
+AC_TRY_COMPILE([#include <curses.h>
+#include <term.h>], [char **test = numnames;],
+AC_DEFINE(HAVE_NUMNAMES) numnames=yes, numnames=no)
+AC_MSG_RESULT($numnames)
+AC_MSG_CHECKING(if strnames is available)
+AC_TRY_COMPILE([#include <curses.h>
+#include <term.h>], [char **test = strnames;],
+AC_DEFINE(HAVE_STRNAMES) strnames=yes, strnames=no)
+AC_MSG_RESULT($strnames)
 
 dnl Some systems (Solaris 2.x, Linux Redhat 5.x) require
 dnl libnsl (Network Services Library) to find yp_all

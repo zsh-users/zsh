@@ -300,11 +300,20 @@
 /* Define to 1 if h_errno is not defined by the system */
 #undef USE_LOCAL_H_ERRNO
 
-/* Define if you have the terminfo boolcodes symbol.  */
+/* Define if you have the termcap boolcodes symbol.  */
 #undef HAVE_BOOLCODES
 
-/* Define if you have the terminfo numcodes symbol.  */
+/* Define if you have the termcap numcodes symbol.  */
 #undef HAVE_NUMCODES
 
-/* Define if you have the terminfo strcodes symbol.  */
+/* Define if you have the termcap strcodes symbol.  */
 #undef HAVE_STRCODES
+
+/* Define if you have the terminfo boolnames symbol.  */
+#undef HAVE_BOOLNAMES
+
+/* Define if you have the terminfo numnames symbol.  */
+#undef HAVE_NUMNAMES
+
+/* Define if you have the terminfo strnames symbol.  */
+#undef HAVE_STRNAMES

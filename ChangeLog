@@ -1,5 +1,8 @@
 2001-04-12  Clint Adams  <schizo@debian.org>
 
+	* 13955: acconfig.h, configure.in, Src/Modules/terminfo.c:
+	s/codes/names/.
+
 	* 13953: acconfig.h, configure.in, Src/Modules/terminfo.c:
 	have configure check for the existence of boolcodes,
 	numcodes, and strcodes symbols, and presume that they
