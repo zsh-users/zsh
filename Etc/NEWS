@@ -22,6 +22,7 @@ Syntax and builtins:
   function zsh-mime-setup uses existing mailcap and mime.types files
   to set up suitable aliases.  Supplied function pick-web-browser is
   suitable for finding a browser to show .html etc. files by suffix alias.
+- new option `no_case_glob' for case-insensitive globbing.
 
 Add-on modules and functions:
 - zsh/datetime modules makes date formatting and seconds since EPOCH
