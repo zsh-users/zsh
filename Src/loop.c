@@ -154,7 +154,7 @@ execselect(Cmd cmd, LinkList args, int flags)
     Forcmd node;
     char *str, *s;
     LinkNode n;
-    int i;
+    int i, usezle;
     FILE *inp;
     size_t more;
 
@@ -172,12 +172,13 @@ execselect(Cmd cmd, LinkList args, int flags)
     lastval = 0;
     pushheap();
     cmdpush(CS_SELECT);
-    inp = fdopen(dup((SHTTY == -1) ? 0 : SHTTY), "r");
+    usezle = interact && SHTTY != -1 && isset(USEZLE);
+    inp = fdopen(dup(usezle ? SHTTY : 0), "r");
     more = selectlist(args, 0);
     for (;;) {
 	for (;;) {
 	    if (empty(bufstack)) {
-	    	if (interact && SHTTY != -1 && isset(USEZLE)) {
+	    	if (usezle) {
 		    int oef = errflag;
 
 		    isfirstln = 1;

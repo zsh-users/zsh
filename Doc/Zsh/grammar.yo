@@ -205,9 +205,10 @@ item(tt(select) var(name) [ tt(in) var(word) ... var(term) ] tt(do) var(list) tt
 where var(term) is one or more newline or tt(;) to terminate the var(word)s.
 Print the set of var(word)s, each preceded by a number.
 If the tt(in) var(word) is omitted, use the positional parameters.
-The tt(PROMPT3) prompt is printed and a line is read from standard
-input.  If this line consists of the number of one of the listed
-var(word)s, then the parameter var(name)
+The tt(PROMPT3) prompt is printed and a line is read from the line editor
+if the shell is interactive and that is active, or else standard input.
+If this line consists of the
+number of one of the listed var(word)s, then the parameter var(name)
 is set to the var(word) corresponding to this number.
 If this line is empty, the selection list is printed again.
 Otherwise, the value of the parameter var(name) is set to null.
@@ -263,11 +264,26 @@ versions of complex commands should be considered deprecated and may be
 removed in the future.  The versions in the previous section should be
 preferred instead.  The short versions below only work if var(sublist)
 is of the form `tt({) var(list) tt(})' or if the tt(SHORT_LOOPS)
-option is set.
+option is set.  In this case, the test part of the loop must also be
+suitably delimited, such as by `tt([[ ... ]])' or `tt((( ... )))', else
+the end of the test will not be recognized.
 
 startitem()
 item(tt(if) var(list) tt({) var(list) tt(}) [ tt(elif) var(list) tt({) var(list) tt(}) ] ... [ tt(else {) var(list) tt(}) ])(
-An alternate form of tt(if).
+An alternate form of tt(if).  The rules mean that
+
+example(if [[ -o ignorebraces ]] {
+  print yes
+})
+
+works, but
+
+example(if true {  # Does not work!
+  print yes
+}
+)
+
+does em(not), since the test is not suitably delimited.
 )
 item(tt(if) var(list) var(sublist))(
 A short form of the alternate `if'.

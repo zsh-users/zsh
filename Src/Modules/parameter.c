@@ -838,8 +838,10 @@ scanpmoptions(HashTable ht, ScanFunc func, int flags)
 
     for (i = 0; i < optiontab->hsize; i++)
 	for (hn = optiontab->nodes[i]; hn; hn = hn->next) {
+	    int optno = ((Optname) hn)->optno, ison;
 	    pm.nam = hn->nam;
-	    pm.u.str = dupstring(opts[((Optname) hn)->optno] ? "on" : "off");
+	    ison = optno < 0 ? !opts[-optno] : opts[optno];
+	    pm.u.str = dupstring(ison ? "on" : "off");
 	    func((HashNode) &pm, flags);
 	}
 }
