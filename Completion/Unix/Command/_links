@@ -25,5 +25,5 @@ _arguments -C \
        ':url:->html' && return 0
 
 if [[ "$state" = html ]]; then
-  _alternative 'files:file:_files "*.html"' 'urls:url:_urls'
+  _alternative 'files:file:_files -g "*.x#html"' 'urls:url:_urls'
 fi
