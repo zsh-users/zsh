@@ -1,3 +1,9 @@
+2003-03-06  Doug Kearns  <djkea2@mugca.its.monash.edu.au>
+
+	* 18314: Completion/Unix/Command/_ruby: allow -I, -r, -e and script
+	arguments to be given multiple times; complete -T with the legal taint
+	levels; complete with *.rb instead of all files
+
 2003-03-05  Peter Stephenson  <pws@csr.com>
 
 	* 18318: Src/Zle/zle_params.c: memory leak in PREDISPLAY and
