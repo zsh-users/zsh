@@ -1148,11 +1148,11 @@ set_comp_sep(void)
     LinkNode n;
     int owe = we, owb = wb, ocs = cs, swb, swe, scs, soffs, ne = noerrs;
     int tl, got = 0, i = 0, cur = -1, oll = ll, sl, remq;
-    int ois = instring, oib = inbackt, noffs = lip + lp;
+    int ois = instring, oib = inbackt, noffs = lp;
     char *tmp, *p, *ns, *ol = (char *) line, sav, *qp, *qs, *ts, qc = '\0';
 
-    if (compisuffix)
-	s = dyncat(s, compisuffix);
+    s += lip;
+    wb += lip;
     untokenize(s);
 
     swb = swe = soffs = 0;
@@ -1343,16 +1343,16 @@ set_comp_sep(void)
 	    untokenize(ss);
 	    compsuffix = ztrdup(ss);
 	}
+	tmp = tricat(compqiprefix, compiprefix, multiquote(qp, 1));
+	zsfree(compqiprefix);
+	compqiprefix = tmp;
+	tmp = tricat(multiquote(qs, 1), compisuffix, compqisuffix);
+	zsfree(compqisuffix);
+	compqisuffix = tmp;
 	zsfree(compiprefix);
 	compiprefix = ztrdup("");
 	zsfree(compisuffix);
 	compisuffix = ztrdup("");
-	tmp = tricat(compqiprefix, "", multiquote(qp, 1));
-	zsfree(compqiprefix);
-	compqiprefix = tmp;
-	tmp = tricat(multiquote(qs, 1), "", compqisuffix);
-	zsfree(compqisuffix);
-	compqisuffix = tmp;
 	freearray(compwords);
 	i = countlinknodes(foo);
 	compwords = (char **) zalloc((i + 1) * sizeof(char *));
