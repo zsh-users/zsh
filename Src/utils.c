@@ -798,11 +798,13 @@ printprompt4(void)
     if (!xtrerr)
 	xtrerr = stderr;
     if (prompt4) {
-	int l;
+	int l, t = opts[XTRACE];
 	char *s = dupstring(prompt4);
 
+	opts[XTRACE] = 0;
 	unmetafy(s, &l);
 	s = unmetafy(promptexpand(metafy(s, l, META_NOALLOC), 0, NULL, NULL), &l);
+	opts[XTRACE] = t;
 
 	fprintf(xtrerr, "%s", s);
     }
