@@ -18,6 +18,6 @@ _last         _loadkeys     _ruby         _sysctl       _links        _samba
 _user_admin   _rsync        _arping	  _spamassassin _mtools       _ifconfig
 _fsh          _chkconfig    _cdcd         _irssi        _mysqldiff    _sccs
 _netcat       _larch        _texinfo	  _figlet       _elinks       _tidy
-_global       _global_tags  _ant          _lsof         _mt           _xsltproc
-_p4           _xmllint
+_global       _global_tags  _ant          _lsof         _mt           _xmlsoft
+_p4
 '

@@ -1,5 +1,9 @@
 2003-02-18  Oliver Kiddle  <opk@zsh.org>
 
+	* 18257: Completion/Unix/Command/_xmlsoft,
+	Completion/Unix/Command/_xmllint, Completion/Unix/Command/_xsltproc:
+	merge _xmllint and _xsltproc into _xmlsoft
+
 	* Doug Kearns: 18259: Completion/Unix/Command/_webbrowser,
 	Completion/Unix/Type/_urls: added more browsers and correct
 	'urls' description to 'url'
