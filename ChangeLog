@@ -1,3 +1,9 @@
+2000-06-26  Peter Stephenson  <pws@cambridgesiliconradio.com>
+
+	* 12076: Completion/Core/compinstall: overwrote file if no
+	style information; overwrote symbolic link instead of following;
+	didn't check file name for sanity.
+
 2000-06-26  Bart Schaefer  <schaefer@zsh.org>
 
 	* 12074: Doc/Zsh/builtins.yo, Doc/Zsh/manual.yo: Remove one more

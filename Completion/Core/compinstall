@@ -35,7 +35,7 @@ integer lines_found
 #
 # This relies on the stuff we find being only minimally edited from
 # the stuff we originally saved.  A better way of doing this would
-# almost certianly be to use the style mechanism directly:  save the
+# almost certainly be to use the style mechanism directly:  save the
 # current styles in a variable, delete all styles, read in and evaluate
 # any styles found, manipulate styles directly using zstyle, write out
 # using zstyle -L, and if necessary restore the original styles.  One
@@ -147,17 +147,19 @@ elif [[ -n $warn_comment ]]; then
   print "All the comments in your configuration section will be lost.
 If you want to keep them, you should copy them somewhere else first."
 elif (( ! $lines_found )); then
-  print -n "Starting a new completion configuration from scratch.
-This will be "
-  if [[ ! -f $ifile ]]; then
-    print "written to the new file $ifile."
-  elif [[ ! -w $ifile ]]; then
-    print "written to the file ~/.compinstall for copying to $ifile."
-    ifile=$HOME/.compinstall
-  else
-    print "appended to the file $ifile.  It is up to you to ensure
+  print "Starting a new completion configuration from scratch."
+  if [[ -n $ifile && ! -d $ifile ]]; then
+    print -n "This will be "
+    if [[ ! -f $ifile ]]; then
+      print "written to the new file $ifile."
+    elif [[ ! -w $ifile ]]; then
+      print "written to the file ~/.compinstall for copying to $ifile."
+      ifile=$HOME/.compinstall
+    else
+      print "appended to the file $ifile.  It is up to you to ensure
 that these lines are actually executed.  They will not be if your .zshrc
 usually returns before the end."
+    fi
   fi
 fi
 print "Note that you will be given a chance to save the new setup
@@ -1711,8 +1713,9 @@ zstyle ${(qq)stylevals[1]} $style $stylevals[2]"
   done
 fi
 
-if ! read -q key"?Save new settings to $ifile? "; then
-   print "Enter a different filename (~ will be expanded), or return to abort:"
+if [[ -z $ifile || -d $ifile ]] ||
+  ! read -q key"?Save new settings to $ifile? "; then
+   print "Enter file to save in (~ will be expanded), or return to abort:"
    ifile=
    vared -ch -p 'file> ' ifile
    ifile=${~ifile}
@@ -1759,8 +1762,8 @@ future use."
   if { { grep "$endline" $ifile >/dev/null 2>&1 &&
          sed -e "/^[ 	]*$endline/r $tmpout
 /^[ 	]*$startline/,/^[ 	]*$endline/d" $ifile >${tmpout}2 } || 
-        cat $tmpout >>${tmpout}2 } &&
-  mv ${tmpout}2 $ifile; then
+        { cp $ifile ${tmpout}2 && cat $tmpout >>${tmpout}2 } } &&
+  cp ${tmpout}2 $ifile && rm -f ${tmpout}2; then
     print "\nSuccessfully added compinstall lines to $ifile."
     rm -f $tmpout
   else
