@@ -41,8 +41,8 @@ Version 3.1.7
 * Felix Rosencrantz <f_rosencrantz@yahoo.com>: design, testing and patches
   for completion system, documentation, various other fixes
 
-* Bart Schaefer <bart@zsh.org>: documentation and many other bits, archive
-  maintainance
+* Bart Schaefer <schaefer@zsh.org>: documentation and many other bits,
+  archive maintainance
 
 * Adam Spiers <adam@spiers.net>: various completion functions, source code
   archive maintenance, documentation fixes, prompt themes
@@ -51,7 +51,7 @@ Version 3.1.7
   enhancements, typeset and local variables, zftp maintenance, general
   configuration, floating point support
 
-* Tanaka Akira <akr@m17n.org>: CVS archive, numerous completion functions
+* Tanaka Akira <akr@zsh.org>: CVS archive, numerous completion functions
   for common commands, regex shell function state machine
 
 * Geoff Wing <geoff@zsh.org>: mailing list and FTP archive, various other

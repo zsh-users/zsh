@@ -1,3 +1,8 @@
+2000-05-05  Peter Stephenson  <pws@cambridgesiliconradio.com>
+
+	* pws: unposted: fixes for Etc/CONTRIBUTORS based on suggestions
+	in 11187 and 11197
+
 2000-05-05  Sven Wischnowsky  <wischnow@informatik.hu-berlin.de>
 
 	* 11195: Completion/AIX/_lsdev, Completion/Builtins/_bindkey,
