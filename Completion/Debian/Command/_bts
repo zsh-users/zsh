@@ -66,11 +66,15 @@ case "$words[1]" in
     elif [[ CURRENT -eq 4 ]]; then
       _wanted tag expl 'tag' \
 	 compadd patch wontfix moreinfo unreproducible fixed security \
-	 potato woody sid help pending upstream sarge experimental
+	 potato woody sid help pending upstream lfs sarge experimental \
+	 sarge-ignore d-i confirmed ipv6 fixed-in-experimental \
+	 fixed-upstream
     else
       _wanted tag expl 'tag' \
-	  compadd patch wontfix moreinfo unreproducible fixed security \
-	  potato woody sid help pending upstream sarge experimental
+	 compadd patch wontfix moreinfo unreproducible fixed security \
+	 potato woody sid help pending upstream lfs sarge experimental \
+	 sarge-ignore d-i confirmed ipv6 fixed-in-experimental \
+	 fixed-upstream
       _wanted sep expl 'separator' compadd -S ' ' , .
     fi
   ;;
