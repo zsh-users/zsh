@@ -1,5 +1,10 @@
 2001-07-03  Clint Adams  <clint@zsh.org>
 
+	* 15242: Doc/Zsh/mod_pcre.yo,
+	Src/Modules/pcre.c: set $match
+	instead of pparams.  pcre_match -a
+	sets specified array instead of $match.
+
 	* 15234: Doc/Zsh/mod_pcre.yo: describe
 	behavior introduced by 15228.
 

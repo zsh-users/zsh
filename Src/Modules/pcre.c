@@ -90,7 +90,15 @@ static int
 bin_pcre_match(char *nam, char **args, char *ops, int func)
 {
     int ret, capcount, *ovec, ovecsize;
-    char **captures;
+    char **captures, **matches, *receptacle = NULL;
+    
+    if(ops['a']) {
+	receptacle = *args++;
+	if(!*args) {
+	    zwarnnam(nam, "not enough arguments", NULL, 0);
+	    return 1;
+	}
+    }
     
     if (pcre_fullinfo(pcre_pattern, pcre_hints, PCRE_INFO_CAPTURECOUNT, &capcount))
     {
@@ -107,9 +115,12 @@ bin_pcre_match(char *nam, char **args, char *ops, int func)
     else if (ret==PCRE_ERROR_NOMATCH) return 1; /* no match */
     else if (ret>0) {
 	if(!pcre_get_substring_list(*args, ovec, ret, (const char ***)&captures)) {
-
-	    freearray(pparams);
-	    pparams = zarrdup(&captures[1]); /* first one would be entire string */
+	    
+	    matches = zarrdup(&captures[1]); /* first one would be entire string */
+	    if (receptacle == NULL)
+		setaparam("match", matches);
+	    else
+		setaparam(receptacle, matches);
 	    
 	    pcre_free_substring_list((const char **)captures);
 	    return 0;
@@ -128,7 +139,7 @@ static struct builtin bintab[] = {
 #ifdef HAVE_PCRE_STUDY
     BUILTIN("pcre_study",   0, bin_pcre_study,   0, 0, 0, NULL,    NULL),
 #endif
-    BUILTIN("pcre_match",   0, bin_pcre_match,   1, 1, 0, NULL,    NULL)
+    BUILTIN("pcre_match",   0, bin_pcre_match,   1, 2, 0, "a",    NULL)
 };
 
 /**/
