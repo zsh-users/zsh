@@ -1,0 +1,66 @@
+#compdef dict
+
+local expl dictresults dictwords j dict
+
+_dictwords() {
+
+[[ -z $words[CURRENT] ]] && return 1
+
+dictresults=(${${(f)${"$(dict -m $words[CURRENT])":gs/    
+  / /}}:#[0-9]*matches found})
+
+for j in ${dictresults}
+do
+dict=${j%%:*}
+dictwords=(${(z)j#*:})
+
+_wanted $dict expl "words from $dict" \
+  compadd -M 'm:{a-zA-Z}={A-Za-z} r:|=*' -a "$@" - dictwords
+done
+}
+
+_arguments \
+	'(--host)-h[host]:dict server:_hosts' \
+	'(-h)--host:dict server:_hosts' \
+	'(--port)-p[port]:service:' \
+	'(-p)--port:service:' \
+	'(--database)-d[database]:db name:' \
+	'(-d)--database:db name:' \
+	'(--match)-m[match]' \
+	'(-m)--match' \
+	'(--strategy)-s[strategy]:strategy:' \
+	'(-s)--strategy:strategy:' \
+	'(--nocorrect)-C[nocorrect]' \
+	'(-C)--nocorrect' \
+	'(--config)-c[config]:config file:_files' \
+	'(-c)--config:config file:_files' \
+	'(--dbs)-D[list dbs]' \
+	'(-D)--dbs' \
+	'(--strats)-S[strats]' \
+	'(-S)--strats' \
+	'(--serverhelp)-H[server help]' \
+	'(-H)--serverhelp' \
+	'(--info)-i[db info]:db name:' \
+	'(-i)--info:db name:' \
+	'(--noauth)-a[disable authentication]' \
+	'(-a)--noauth' \
+	'(--user)-u[user]:user name:' \
+	'(-u)--user:user name:' \
+	'(--key)-k[key]:shared secret:' \
+	'(-k)--key:shared secret:' \
+	'(--version)-V[display version]' \
+	'(-V)--version' \
+	'(--license)-L[display license]' \
+	'(-L)--license' \
+	'--help' \
+	'(--verbose)-v[be verbose]' \
+	'(-v)--verbose' \
+	'(--raw)-r[be very verbose]' \
+	'(-r)--raw' \
+	'(--pager)-P[pager]:program:_command_names -e' \
+	'(-P)--pager:_command_names -e:' \
+	'--html' \
+	'--pipesize:buffer size:' \
+	'--client:client text:' \
+	'--debug:debug flag:(verbose raw scan parse pipe serial time)' \
+	':word:_dictwords'
