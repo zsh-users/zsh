@@ -1456,7 +1456,8 @@ completed.
 )
 item(tt(users-hosts))(
 The values of this style should be of the form
-`var(user)tt(:)var(host)'. It is used for commands that need pairs of
+`var(user)tt(@)var(host)' or `var(user)tt(:)var(host)'. It is used for
+commands that need pairs of
 user- and hostnames. For such commands, only the pairs from this style 
 are used and if, for example, the username is already typed, then only 
 the hostnames for which there is a pair with that username is defined.
@@ -2637,7 +2638,7 @@ Either of two `var(spec)'s can be matched.
 enditem()
 )
 findex(_combination)
-item(tt(_combination) [ tt(-s) var(spec) ] var(tag) var(style) var(specs) ... var(field) var(opts) ...)(
+item(tt(_combination) [ tt(-s) var(pattern) ] var(tag) var(style) var(specs) ... var(field) var(opts) ...)(
 This function is used to complete combinations of values such as pairs 
 of hostnames and usernames. The possible values will be taken from the 
 var(style) whose name is given as the second argument. The first argument
@@ -2652,8 +2653,10 @@ generated.
 
 The matches generated will be taken from the value of the style. These 
 values should contain the possible values for the combinations where
-the values for the different fields are separated by colons or the
-character given after the tt(-s) option to tt(_combination).
+the values for the different fields are separated by colons or
+characters matching the pattern given after the tt(-s) option to
+tt(_combination) (normally this is used to define character classes
+like the `tt(-s "[:@]")' used for the tt(users-hosts) style).
 
 Only the values for the requested fields for which the patterns given
 in the `var(field)tt(=)var(pattern)' match the respective fields in

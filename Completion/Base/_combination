@@ -55,6 +55,9 @@ local sep tag style keys pats key num tmp
 if [[ "$1" = -s ]]; then
   sep="$2"
   shift 2
+elif [[ "$1" = -s* ]]; then
+  sep="${1[3,-1]}"
+  shift
 else
   sep=:
 fi
@@ -81,9 +84,9 @@ shift
 if zstyle -a ":completion:${curcontext}:$tag" "$style" tmp; then
   eval "tmp=( \"\${(@M)tmp:#\${(j($sep))~pats}}\" )"
   if (( keys[(in:num:)$key] != 1 )); then
-    eval "tmp=( \${tmp#\${(j(${sep}))~\${(@)\${(@)keys[2,(rn:num:)\$key]}/*/*}}$sep} )"
+    eval "tmp=( \${tmp#\${(j(${sep}))~\${(@)\${(@)keys[2,(rn:num:)\$key]}/*/*}}${~sep}} )"
   fi
-  tmp=( ${tmp%%$sep*} )
+  tmp=( ${tmp%%${~sep}*} )
 
   compadd "$@" - $tmp || { (( $+functions[_$key] )) && "_$key" "$@" }
 else

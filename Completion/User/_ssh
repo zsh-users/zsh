@@ -223,14 +223,14 @@ _ssh () {
 }
 
 _ssh_users () {
-  _combination my-accounts users-hosts users "$@"
+  _combination -s '[:@]' my-accounts users-hosts users "$@"
 }
 
 _ssh_hosts () {
   if [[ "$IPREFIX" == *@ ]]; then
-    _combination my-accounts users-hosts "users=${IPREFIX/@}" hosts "$@"
+    _combination -s '[:@]' my-accounts users-hosts "users=${IPREFIX/@}" hosts "$@"
   else
-    _combination my-accounts users-hosts \
+    _combination -s '[:@]' my-accounts users-hosts \
       ${opt_args[-l]:+"users=${opt_args[-l]:q}"} hosts "$@"
   fi
 }
