@@ -1,3 +1,8 @@
+2002-04-09  Peter Stephenson  <pws@csr.com>
+
+	* 16942: Src/glob.c:  Allow zero-length matches in parameter
+	substitutions.
+
 2002-04-04  Clint Adams  <clint@zsh.org>
 
         * 16934: Completion/Unix/Command/_ssh: complete -1 as well as -2.

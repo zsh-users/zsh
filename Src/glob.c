@@ -2172,7 +2172,7 @@ igetmatch(char **sp, Patprog p, int fl, int n, char *replstr)
 		for (; t < s + l; t++, patoffset++) {
 		    /* Find the longest match from this position. */
 		    set_pat_start(p, t-s);
-		    if (pattry(p, t) && patinput > t) {
+		    if (pattry(p, t)) {
 			char *mpos = patinput;
 			if (!(fl & SUB_LONG) && !(p->flags & PAT_PURES)) {
 			    char *ptr;
@@ -2252,7 +2252,7 @@ igetmatch(char **sp, Patprog p, int fl, int n, char *replstr)
 		if (t > s && t[-1] == Meta)
 		    t--;
 		set_pat_start(p, t-s);
-		if (pattry(p, t) && patinput > t && !--n) {
+		if (pattry(p, t) && !--n) {
 		    /* Found the longest match */
 		    char *mpos = patinput;
 		    if (!(fl & SUB_LONG) && !(p->flags & PAT_PURES)) {
