@@ -81,20 +81,7 @@ _regex_arguments () {
 	_ra_left="$_ra_line[_ra_p1 + 1, _ra_p2]"
 	_ra_right="$_ra_line[_ra_p2 + 1, -1]"
 	compset -p $(( $#PREFIX - $#_ra_line + $_ra_p1 ))
-	tmp=("${(@)_ra_actions%%:*}")
-	if (( $#tmp )); then
-	  _tags "$tmp[@]"
-	  while _tags; do
-	    for _ra_com in "$_ra_actions[@]"; do
-	      if _requested "${_ra_com%%:*}"; then
-		while _next_label "${_ra_com%%:*}" expl "${${_ra_com#*:}%%:*}"; do
-		  eval "${_ra_com#*:*:}"
-		done
-		[[ nm -ne "$compstate[nmatches]" ]] && break 2
-	      fi
-	    done
-	  done
-	fi
+	(( $#_ra_actions )) && _alternative "$_ra_actions[@]"
       fi
       ;;
     3) _message "invalid regex";;

@@ -3292,11 +3292,12 @@ right.
 
 If no test succeeds and the remaining command line string contains no null
 character, the completion target is restricted to the remainder of the
-command line string and var(action)s for the target are evaluated.
+command line string and var(action)s for the target are executed.
 In this case, nothing is actually removed from the command line string
 so that any previous or neighbouring state may also have var(actions)s.
-var(actions)s evaluation are ordered by the tt(tag-order) style and
-specified var(tag).  var(descr) is used for set up the array parameter
+var(actions)s evaluation are ordered by the tt(tag-order) style and specified
+var(tag) by tt(_alternative).  So, various format supported by tt(_alternative)
+can be used in var(action).  var(descr) is used for set up the array parameter
 tt(expl).
 )
 item(tt(/)var(pattern)tt(/+) [tt(%)var(lookahead)tt(%)] [tt(-)var(guard)] [tt(:)var(tag)tt(:)var(descr)tt(:)var(action)])(

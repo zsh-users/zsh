@@ -44,67 +44,67 @@ Font Path:
 
 _regex_arguments _xset_parse \
   "/$word/" \
-  \( "/-d(isplay|)$nul/" "$guard" "/$word/" ':option-display:display:_x_display "$expl[@]"' \
+  \( "/-d(isplay|)$nul/" "$guard" "/$word/" ':option-display:display:_x_display' \
   \| "/-c$nul/" "$guard" \
   \| "/c$nul/" "$guard" \
-    \( "/(on|off)$nul/" ':option-c-bool:click:compadd "$expl[@]" on off' \
-    \| "/[0-9]##$nul/" ':option-c-volume:volume:_message volume' \
+    \( "/(on|off)$nul/" ':option-c-bool:click:(on off)' \
+    \| "/[0-9]##$nul/" ':option-c-volume:volume:' \
     \| \) \
   \| "/-b$nul/" "$guard" \
   \| "/b$nul/" "$guard" \
-    \( "/(on|off)$nul/" ':option-b-bool:bell:compadd "$expl[@]" on off' \
-    \| "/[0-9]##$nul/" ':option-b-volume:bell volume:_message volume' \
-      \( "/[0-9]##$nul/" ':option-b-pitch:bell pitch:_message pitch' \
-	\( "/[0-9]##$nul/" ':option-b-duration:bell duration:_message duration' \
+    \( "/(on|off)$nul/" ':option-b-bool:bell:(on off)' \
+    \| "/[0-9]##$nul/" ':option-b-volume:bell volume:' \
+      \( "/[0-9]##$nul/" ':option-b-pitch:bell pitch:' \
+	\( "/[0-9]##$nul/" ':option-b-duration:bell duration:' \
 	\| \) \
       \| \) \
     \| \) \
   \| "/bc$nul/" "$guard" \
   \| "/-bc$nul/" "$guard" \
-  \| "/fp$nul/" "$guard" "/$word/" ':option-fp:font path:compadd "$expl[@]" default rehash' \
-  \| "/(fp[+=]|[+]fp)$nul/" "$guard" "/$word/" ':option-fp-add:font path:compset -P "*,"; _xset_compfpadd' \
-  \| "/(fp-|-fp)$nul/" "$guard" "/$word/" ':option-fp-del:font path:compset -P "*,"; _xset_compfpdel' \
+  \| "/fp$nul/" "$guard" "/$word/" ':option-fp:font path:(default rehash)' \
+  \| "/(fp[+=]|[+]fp)$nul/" "$guard" "/$word/" ':option-fp-add:font path:{compset -P "*,"; _xset_compfpadd}' \
+  \| "/(fp-|-fp)$nul/" "$guard" "/$word/" ':option-fp-del:font path:{compset -P "*,"; _xset_compfpdel}' \
   \| "/-led$nul/" "$guard" \
-    \( "/[0-9]##$nul/" ':option-led-number:led number:_message "led number"' \
+    \( "/[0-9]##$nul/" ':option-led-number:led number:' \
     \| \) \
   \| "/led$nul/" "$guard" \
-    \( "/(on|off)$nul/" ':option-led-bool:led:compadd "$expl[@]" on off' \
-    \| "/[0-9]##$nul/" ':option-led-number:led number:_message "led number"' \
+    \( "/(on|off)$nul/" ':option-led-bool:led:(on off)' \
+    \| "/[0-9]##$nul/" ':option-led-number:led number:' \
     \| \) \
   \| "/m(ouse|)$nul/" "$guard" \
-    \( "/default$nul/" ':option-mouse-default:mouse parameter:compadd "$expl[@]" default' \
-    \| "/[0-9]##(/[0-9]##|)$nul/" ':option-mouse-mult-div:accel_mult/accel_div:_message accel_mult/accel_div' \
-      \( "/[0-9]##$nul/" ':option-mouse-threshold:threshold:_message threshold' \
+    \( "/default$nul/" ':option-mouse-default:mouse parameter:(default)' \
+    \| "/[0-9]##(/[0-9]##|)$nul/" ':option-mouse-mult-div:accel_mult/accel_div:' \
+      \( "/[0-9]##$nul/" ':option-mouse-threshold:threshold:' \
       \| \) \
     \| \) \
   \| "/[-+]dpms$nul/" "$guard" \
   \| "/dpms$nul/" "$guard" \
-    \( "/[0-9]##$nul/" ':option-dpms-standby:standby timeout:_message "standby timeout"' \
-      \( "/[0-9]##$nul/" ':option-dpms-suspend:suspend timeout:_message "suspend timeout"' \
-	\( "/[0-9]##$nul/" ':option-dpms-off:off timeout:_message "off timeout"' \
+    \( "/[0-9]##$nul/" ':option-dpms-standby:standby timeout:' \
+      \( "/[0-9]##$nul/" ':option-dpms-suspend:suspend timeout:' \
+	\( "/[0-9]##$nul/" ':option-dpms-off:off timeout:' \
 	\| \) \
       \| \) \
-    \| "/force/" ':option-dpms-force:force DPMS state:compadd "$expl[@]" force' \
-       "/(on|standby|suspend|off)$nul/" ':option-dpms-state:DPMS state:compadd "$expl[@]" on standby suspend off' \
+    \| "/force$nul/" ':option-dpms-force:force DPMS state:(force)' \
+       "/(on|standby|suspend|off)$nul/" ':option-dpms-state:DPMS state:(on standby suspend off)' \
     \) \
   \| "/s$nul/" "$guard" \
     \( "/(blank|noblank|expose|noexpose|default|on|activate|reset)$nul/" \
-       ':option-s:screen saver:compadd "$expl[@]" blank noblank expose noexpose default on activate reset off' \
-    \| "/off$nul/" \( "/off$nul/" ':option-s-off-period:period off:compadd "$expl[@]" off' \| \) \
-    \| "/[0-9]##$nul/" ':option-s-timeout:length:_message length' \
-      \( "/[0-9]##$nul/" ':option-s-period:period:_message period' \
+       ':option-s:screen saver:(blank noblank expose noexpose default on activate reset off)' \
+    \| "/off$nul/" \( "/off$nul/" ':option-s-off-period:period off:(off)' \| \) \
+    \| "/[0-9]##$nul/" ':option-s-timeout:length:' \
+      \( "/[0-9]##$nul/" ':option-s-period:period:' \
       \| \) \
     \| \) \
   \| "/-r$nul/" "$guard" \
-    \( "/[0-9]##$nul/" ':option-r-keycode:keycode:_message keycode' \
+    \( "/[0-9]##$nul/" ':option-r-keycode:keycode:' \
     \| \) \
   \| "/r$nul/" "$guard" \
-    \( "/(on|off)$nul/" ':option-r-autorepeat:autorepeat:compadd "$expl[@]" on off' \
-    \| "/[0-9]##$nul/" ':option-r-keycode:keycode:_message keycode' \
+    \( "/(on|off)$nul/" ':option-r-autorepeat:autorepeat:(on off)' \
+    \| "/[0-9]##$nul/" ':option-r-keycode:keycode:' \
     \| \) \
   \| "/p$nul/" "$guard" \
-    "/[0-9]##$nul/" ':option-p-pixel:pixel:_message pixel' \
-    "/$word/" ':option-p-color:color:_x_color "$expl[@]"' \
+    "/[0-9]##$nul/" ':option-p-pixel:pixel:' \
+    "/$word/" ':option-p-color:color:_x_color' \
   \| "/(-|)k$nul/" "$guard" \
   \| "/(-|)q$nul/" "$guard" \
   \| "/[]/" ':options:options:_xset_compopts' \

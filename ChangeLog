@@ -1,3 +1,9 @@
+2000-05-06  Tanaka Akira  <akr@zsh.org>
+
+	* 11223: Completion/Base/_regex_arguments, Completion/Debian/_apt,
+	Completion/X/_xset, Completion/X/_xwit, Doc/Zsh/compsys.yo:
+	_regex_arguments use _alternative.
+
 2000-05-05  Tanaka Akira  <akr@zsh.org>
 
 	* 11219: Completion/User/_cvs, Completion/User/_diff_options: add
