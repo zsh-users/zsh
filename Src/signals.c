@@ -484,7 +484,7 @@ zhandler(int sig)
 			*procsubval = (0200 | WTERMSIG(status));
 		    else
 			*procsubval = WEXITSTATUS(status);
-		    times(&shtms);
+		    get_usage();
 		    goto cont;
 		}
 		if (!es)
@@ -514,7 +514,7 @@ zhandler(int sig)
 		 * children in sub processes anyway:  otherwise, this
 		 * will get added on to the next found process that terminates.
 		 */
-		times(&shtms);
+		get_usage();
 	    }
         }
         break;

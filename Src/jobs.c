@@ -80,7 +80,15 @@ static int oldmaxjob;
 /* shell timings */
  
 /**/
-struct tms shtms;
+#ifdef HAVE_GETRUSAGE
+/**/
+static struct rusage child_usage;
+/**/
+#else
+/**/
+static struct tms shtms;
+/**/
+#endif
  
 /* 1 if ttyctl -f has been executed */
  
@@ -92,8 +100,6 @@ int ttyfrozen;
 
 /**/
 int prev_errflag, prev_breaks, errbrk_saved;
-
-static struct timeval dtimeval, now;
 
 /**/
 int numpipestats, pipestats[MAX_PIPESTATS];
@@ -250,6 +256,21 @@ handle_sub(int job, int fg)
     return 0;
 }
 
+
+/* Get the latest usage information */
+
+/**/
+void 
+get_usage(void)
+{
+#ifdef HAVE_GETRUSAGE
+    getrusage(RUSAGE_CHILDREN, &child_usage);
+#else
+    times(shtms);
+#endif
+}
+
+
 /* Update status of process that we have just WAIT'ed for */
 
 /**/
@@ -257,17 +278,31 @@ void
 update_process(Process pn, int status)
 {
     struct timezone dummy_tz;
+#ifdef HAVE_GETRUSAGE
+    struct timeval childs, childu;
+#else
     long childs, childu;
+#endif
 
+#ifdef HAVE_GETRUSAGE
+    childs = child_usage.ru_stime;
+    childu = child_usage.ru_utime;
+#else
     childs = shtms.tms_cstime;
     childu = shtms.tms_cutime;
-    times(&shtms);                          /* get time-accounting info          */
+#endif
+    /* get time-accounting info          */
+    get_usage();
+    gettimeofday(&pn->endtime, &dummy_tz);  /* record time process exited        */
 
     pn->status = status;                    /* save the status returned by WAIT  */
+#ifdef HAVE_GETRUSAGE
+    dtime(&pn->ti.sys, &childs, &child_usage.ru_stime);
+    dtime(&pn->ti.usr, &childu, &child_usage.ru_utime);
+#else
     pn->ti.st  = shtms.tms_cstime - childs; /* compute process system space time */
     pn->ti.ut  = shtms.tms_cutime - childu; /* compute process user space time   */
-
-    gettimeofday(&pn->endtime, &dummy_tz);  /* record time process exited        */
+#endif
 }
 
 /* Update status of job, possibly printing it */
@@ -473,6 +508,8 @@ setprevjob(void)
     prevjob = -1;
 }
 
+/**/
+#ifndef HAVE_GETRUSAGE
 static long clktck = 0;
 
 /**/
@@ -501,6 +538,8 @@ set_clktck(void)
 # endif
 #endif
 }
+/**/
+#endif
 
 /**/
 static void
@@ -519,9 +558,8 @@ printhhmmss(double secs)
 	fprintf(stderr,           "%.3f",              secs);
 }
 
-/**/
 static void
-printtime(struct timeval *real, struct timeinfo *ti, char *desc)
+printtime(struct timeval *real, child_times_t *ti, char *desc)
 {
     char *s;
     double elapsed_time, user_time, system_time;
@@ -530,13 +568,21 @@ printtime(struct timeval *real, struct timeinfo *ti, char *desc)
     if (!desc)
 	desc = "";
 
-    set_clktck();
     /* go ahead and compute these, since almost every TIMEFMT will have them */
     elapsed_time = real->tv_sec + real->tv_usec / 1000000.0;
+
+#ifdef HAVE_GETRUSAGE
+    user_time = ti->usr.tv_sec + ti->usr.tv_usec / 1000000.0;
+    system_time = ti->sys.tv_sec + ti->sys.tv_usec / 1000000.0;
+    percent = 100.0 * (user_time + system_time)
+	/ (real->tv_sec + real->tv_usec / 1000000.0);
+#else
+    set_clktck();
     user_time    = ti->ut / (double) clktck;
     system_time  = ti->st / (double) clktck;
     percent      =  100.0 * (ti->ut + ti->st)
 	/ (clktck * real->tv_sec + clktck * real->tv_usec / 1000000.0);
+#endif
 
     queue_signals();
     if (!(s = getsparam("TIMEFMT")))
@@ -598,11 +644,13 @@ static void
 dumptime(Job jn)
 {
     Process pn;
+    struct timeval dtimeval;
 
     if (!jn->procs)
 	return;
     for (pn = jn->procs; pn; pn = pn->next)
-	printtime(dtime(&dtimeval, &pn->bgtime, &pn->endtime), &pn->ti, pn->text);
+	printtime(dtime(&dtimeval, &pn->bgtime, &pn->endtime), &pn->ti,
+		  pn->text);
 }
 
 /* Check whether shell should report the amount of time consumed   *
@@ -617,7 +665,7 @@ should_report_time(Job j)
     struct value vbuf;
     Value v;
     char *s = "REPORTTIME";
-    int reporttime;
+    zlong reporttime;
 
     /* if the time keyword was used */
     if (j->stat & STAT_TIMED)
@@ -634,8 +682,15 @@ should_report_time(Job j)
     if (!j->procs)
 	return 0;
 
+#ifdef HAVE_GETRUSAGE
+    reporttime -= j->procs->ti.usr.tv_sec + j->procs->ti.sys.tv_sec;
+    if (j->procs->ti.usr.tv_usec + j->procs->ti.sys.tv_usec >= 1000000)
+	reporttime--;
+    return reporttime <= 0;
+#else
     set_clktck();
     return ((j->procs->ti.ut + j->procs->ti.st) / clktck >= reporttime);
+#endif
 }
 
 /* !(lng & 3) means jobs    *
@@ -899,10 +954,9 @@ deletejob(Job jn)
 
 /**/
 void
-addproc(pid_t pid, char *text, int aux)
+addproc(pid_t pid, char *text, int aux, struct timeval *bgtime)
 {
     Process pn, *pnlist;
-    struct timezone dummy_tz;
 
     DPUTS(thisjob == -1, "No valid job in addproc.");
     pn = (Process) zshcalloc(sizeof *pn);
@@ -916,7 +970,7 @@ addproc(pid_t pid, char *text, int aux)
 
     if (!aux)
     {
-	gettimeofday(&pn->bgtime, &dummy_tz);
+	pn->bgtime = *bgtime;
 	/* if this is the first process we are adding to *
 	 * the job, then it's the group leader.          */
 	if (!jobtab[thisjob].gleader)
@@ -1158,18 +1212,40 @@ spawnjob(void)
 void
 shelltime(void)
 {
-    struct timeinfo ti;
     struct timezone dummy_tz;
+    struct timeval dtimeval, now;
+#ifdef HAVE_GETRUSAGE
+    struct rusage ru;
+    child_times_t ti;
+#else
+    struct timeinfo ti;
     struct tms buf;
+#endif
 
+    gettimeofday(&now, &dummy_tz);
+
+#ifdef HAVE_GETRUSAGE
+    getrusage(RUSAGE_SELF, &ru);
+    ti.sys = ru.ru_stime;
+    ti.usr = ru.ru_utime;
+#else
     times(&buf);
+
     ti.ut = buf.tms_utime;
     ti.st = buf.tms_stime;
-    gettimeofday(&now, &dummy_tz);
+#endif
     printtime(dtime(&dtimeval, &shtimer, &now), &ti, "shell");
+
+#ifdef HAVE_GETRUSAGE
+    getrusage(RUSAGE_CHILDREN, &ru);
+    ti.sys = ru.ru_stime;
+    ti.usr = ru.ru_utime;
+#else
     ti.ut = buf.tms_cutime;
     ti.st = buf.tms_cstime;
-    printtime(dtime(&dtimeval, &shtimer, &now), &ti, "children");
+#endif
+    printtime(&dtimeval, &ti, "children");
+
 }
 
 /* see if jobs need printing */

@@ -1043,7 +1043,7 @@ AC_CHECK_FUNCS(strftime difftime gettimeofday \
 	       initgroups nis_list \
 	       setuid seteuid setreuid setresuid setsid \
 	       memcpy memmove strstr strerror \
-	       getrlimit \
+	       getrlimit getrusage \
 	       setlocale \
 	       uname \
 	       signgam \

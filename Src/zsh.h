@@ -739,12 +739,21 @@ struct timeinfo {
 
 /* node in job process lists */
 
+#ifdef HAVE_GETRUSAGE
+typedef struct {
+    struct timeval sys;
+    struct timeval usr;
+} child_times_t;
+#else
+typedef struct timeinfo child_times_t;
+#endif
+
 struct process {
     struct process *next;
     pid_t pid;                  /* process id                       */
     char text[JOBTEXTSIZE];	/* text to print when 'jobs' is run */
     int status;			/* return code from waitpid/wait3() */
-    struct timeinfo ti;
+    child_times_t ti;
     struct timeval bgtime;	/* time job was spawned             */
     struct timeval endtime;	/* time job exited                  */
 };

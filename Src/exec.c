@@ -212,9 +212,10 @@ setlimits(char *nam)
 
 /**/
 static pid_t
-zfork(void)
+zfork(struct timeval *tv)
 {
     pid_t pid;
+    struct timezone dummy_tz;
 
     /*
      * Is anybody willing to explain this test?
@@ -223,6 +224,8 @@ zfork(void)
 	zerr("job table full", NULL, 0);
 	return -1;
     }
+    if (tv)
+	gettimeofday(tv, &dummy_tz);
     pid = fork();
     if (pid == -1) {
 	zerr("fork failed: %e", NULL, errno);
@@ -313,6 +316,7 @@ zfork(void)
 int list_pipe = 0, simple_pline = 0;
 
 static pid_t list_pipe_pid;
+static struct timeval list_pipe_start;
 static int nowait, pline_level = 0;
 static int list_pipe_child = 0, list_pipe_job;
 static char list_pipe_text[JOBTEXTSIZE];
@@ -1101,7 +1105,8 @@ execpline(Estate state, wordcode slcode, int how, int last1)
 
 		    curjob = newjob;
 		    DPUTS(!list_pipe_pid, "invalid list_pipe_pid");
-		    addproc(list_pipe_pid, list_pipe_text, 0);
+		    addproc(list_pipe_pid, list_pipe_text, 0,
+			    &list_pipe_start);
 
 		    /* If the super-job contains only the sub-shell, the
 		       sub-shell is the group leader. */
@@ -1157,9 +1162,13 @@ execpline(Estate state, wordcode slcode, int how, int last1)
 		      (jobtab[list_pipe_job].stat & STAT_STOPPED)))) {
 		    pid_t pid;
 		    int synch[2];
+		    struct timezone dummy_tz;
+		    struct timeval bgtime;
 
 		    pipe(synch);
 
+		    gettimeofday(&bgtime, &dummy_tz);
+		    /* Any reason this isn't zfork? */
 		    if ((pid = fork()) == -1) {
 			trashzle();
 			close(synch[0]);
@@ -1177,6 +1186,7 @@ execpline(Estate state, wordcode slcode, int how, int last1)
 			lpforked = 
 			    (killpg(jobtab[list_pipe_job].gleader, 0) == -1 ? 2 : 1);
 			list_pipe_pid = pid;
+			list_pipe_start = bgtime;
 			nowait = errflag = 1;
 			breaks = loops;
 			close(synch[1]);
@@ -1289,8 +1299,12 @@ execpline2(Estate state, wordcode pcode,
 	 * rest of the pipeline in the current shell.         */
 	if (wc_code(code) >= WC_CURSH && (how & Z_SYNC)) {
 	    int synch[2];
+	    struct timeval bgtime;
+	    struct timezone dummy_tz;
 
 	    pipe(synch);
+	    gettimeofday(&bgtime, &dummy_tz);
+	    /* any reason this isn't zfork? */
 	    if ((pid = fork()) == -1) {
 		close(synch[0]);
 		close(synch[1]);
@@ -1299,7 +1313,7 @@ execpline2(Estate state, wordcode pcode,
 		char dummy, *text;
 
 		text = getjobtext(state->prog, state->pc);
-		addproc(pid, text, 0);
+		addproc(pid, text, 0, &bgtime);
 		close(synch[1]);
 		read(synch[0], &dummy, 1);
 		close(synch[0]);
@@ -1437,8 +1451,9 @@ closemn(struct multio **mfds, int fd)
 	char buf[TCBUFSIZE];
 	int len, i;
 	pid_t pid;
+	struct timeval bgtime;
 
-	if ((pid = zfork())) {
+	if ((pid = zfork(&bgtime))) {
 	    for (i = 0; i < mn->ct; i++)
 		zclose(mn->fds[i]);
 	    zclose(mn->pipe);
@@ -1448,7 +1463,7 @@ closemn(struct multio **mfds, int fd)
 	    }
 	    mn->ct = 1;
 	    mn->fds[0] = fd;
-	    addproc(pid, NULL, 1);
+	    addproc(pid, NULL, 1, &bgtime);
 	    return;
 	}
 	/* pid == 0 */
@@ -2108,11 +2123,12 @@ execcmd(Estate state, int input, int output, int how, int last1)
 	pid_t pid;
 	int synch[2];
 	char dummy;
+	struct timeval bgtime;
 
 	child_block();
 	pipe(synch);
 
-	if ((pid = zfork()) == -1) {
+	if ((pid = zfork(&bgtime)) == -1) {
 	    close(synch[0]);
 	    close(synch[1]);
             opts[AUTOCONTINUE] = oautocont;
@@ -2140,7 +2156,7 @@ execcmd(Estate state, int input, int output, int how, int last1)
 			  3 : WC_ASSIGN_NUM(ac) + 2);
 		}
 	    }
-	    addproc(pid, text, 0);
+	    addproc(pid, text, 0, &bgtime);
             opts[AUTOCONTINUE] = oautocont;
 	    return;
 	}
@@ -2697,7 +2713,7 @@ entersubsh(int how, int cl, int fake, int revertpgrp)
     zleactive = 0;
     if (cl)
 	clearjobtab(monitor);
-    times(&shtms);
+    get_usage();
     forklevel = locallevel;
 }
 
@@ -2843,7 +2859,7 @@ getoutput(char *cmd, int qt)
     mpipe(pipes);
     child_block();
     cmdoutval = 0;
-    if ((cmdoutpid = pid = zfork()) == -1) {
+    if ((cmdoutpid = pid = zfork(NULL)) == -1) {
 	/* fork error */
 	zclose(pipes[0]);
 	zclose(pipes[1]);
@@ -2979,7 +2995,7 @@ getoutputfile(char *cmd)
     child_block();
     fd = open(nam, O_WRONLY | O_CREAT | O_EXCL | O_NOCTTY, 0600);
 
-    if (fd < 0 || (cmdoutpid = pid = zfork()) == -1) {
+    if (fd < 0 || (cmdoutpid = pid = zfork(NULL)) == -1) {
 	/* fork or open error */
 	child_unblock();
 	return nam;
@@ -3040,6 +3056,7 @@ getproc(char *cmd)
     int out = *cmd == Inang;
     char *pnam;
     pid_t pid;
+    struct timeval bgtime;
 
 #ifndef PATH_DEV_FD
     int fd;
@@ -3054,11 +3071,11 @@ getproc(char *cmd)
 	jobtab[thisjob].filelist = znewlinklist();
     zaddlinknode(jobtab[thisjob].filelist, ztrdup(pnam));
 
-    if ((pid = zfork())) {
+    if ((pid = zfork(&bgtime))) {
 	if (pid == -1)
 	    return NULL;
 	if (!out)
-	    addproc(pid, NULL, 1);
+	    addproc(pid, NULL, 1, &bgtime);
 	return pnam;
     }
     closem(0);
@@ -3078,7 +3095,7 @@ getproc(char *cmd)
     if (!(prog = parsecmd(cmd)))
 	return NULL;
     mpipe(pipes);
-    if ((pid = zfork())) {
+    if ((pid = zfork(&bgtime))) {
 	sprintf(pnam, "%s/%d", PATH_DEV_FD, pipes[!out]);
 	zclose(pipes[out]);
 	if (pid == -1)
@@ -3089,7 +3106,7 @@ getproc(char *cmd)
 	fdtable[pipes[!out]] = 2;
 	if (!out)
 	{
-	    addproc(pid, NULL, 1);
+	    addproc(pid, NULL, 1, &bgtime);
 	}
 	return pnam;
     }
@@ -3116,17 +3133,18 @@ getpipe(char *cmd)
     Eprog prog;
     int pipes[2], out = *cmd == Inang;
     pid_t pid;
+    struct timeval bgtime;
 
     if (!(prog = parsecmd(cmd)))
 	return -1;
     mpipe(pipes);
-    if ((pid = zfork())) {
+    if ((pid = zfork(&bgtime))) {
 	zclose(pipes[out]);
 	if (pid == -1) {
 	    zclose(pipes[!out]);
 	    return -1;
 	}
-	addproc(pid, NULL, 1);
+	addproc(pid, NULL, 1, &bgtime);
 	return pipes[!out];
     }
     entersubsh(Z_ASYNC, 1, 0, 0);

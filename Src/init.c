@@ -856,7 +856,7 @@ setupvals(void)
 #endif
     }
 
-    times(&shtms);
+    get_usage();
 
     /* Close the file descriptors we opened to block off 0 to 9 */
     for (i = 0; i < 10; i++)
