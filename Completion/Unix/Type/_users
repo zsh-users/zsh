@@ -1,0 +1,8 @@
+#compdef passwd groups
+
+local expl users
+
+zstyle -a ":completion:${curcontext}:" users users &&
+    _wanted users expl user compadd "$@" -a users && return 0
+
+_wanted users expl user compadd "$@" -k userdirs
