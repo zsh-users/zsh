@@ -1,6 +1,7 @@
 2001-03-12  Chmouel Boudjnah <chmouel@mandrakesoft.com>
 
-	* 13605: New tar options -j.
+	* 13605: Completion/User/_tar, Completion/User/_tar_archive: New tar
+	options -j.
 
 2001-03-12  Oliver Kiddle  <opk@zsh.org>
 
