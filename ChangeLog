@@ -8,6 +8,11 @@
 	* unposted: Doc/Zsh/metafaq.yo: update distribution sites - remove four
 	sites, add three, change one path
 
+2002-02-13  Wayne Davison  <wayned@users.sourceforge.net>
+
+	* 16618: Src/hist.c: Improved resizehistents() so that it honors
+	HIST_EXPIRE_DUPS_FIRST.
+
 2002-02-12  Wayne Davison  <wayned@users.sourceforge.net>
 
 	* unposted: Src/params.c: The minimum size of histsiz (aka HISTSIZE)
