@@ -1148,7 +1148,7 @@ mod_export ZleVoidIntFn zlesetkeymapptr = noop_function_int;
 
 /**/
 unsigned char *
-autoload_zleread(char *lp, char *rp, int ha, int con)
+autoload_zleread(char **lp, char **rp, int ha, int con)
 {
     zlereadptr = fallback_zleread;
     if (load_module("zsh/zle"))
@@ -1158,12 +1158,12 @@ autoload_zleread(char *lp, char *rp, int ha, int con)
 
 /**/
 mod_export unsigned char *
-fallback_zleread(char *lp, UNUSED(char *rp), UNUSED(int ha), UNUSED(int con))
+fallback_zleread(char **lp, UNUSED(char **rp), UNUSED(int ha), UNUSED(int con))
 {
     char *pptbuf;
     int pptlen;
 
-    pptbuf = unmetafy(promptexpand(lp, 0, NULL, NULL), &pptlen);
+    pptbuf = unmetafy(promptexpand(lp ? *lp : NULL, 0, NULL, NULL), &pptlen);
     write(2, (WRITE_ARG_2_T)pptbuf, pptlen);
     free(pptbuf);
 

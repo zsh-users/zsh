@@ -1768,6 +1768,9 @@ calclist(int showall)
 		g->width += (max - (g->width * g->cols - CM_SPACE)) / g->cols;
 	}
     }
+    else
+	for (g = amatches; g; g = g->next)
+	    zfree(g->widths, 0);
     listdat.valid = 1;
     listdat.hidden = hidden;
     listdat.nlist = nlist;

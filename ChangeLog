@@ -1,3 +1,13 @@
+2004-07-11  Peter Stephenson  <pws@pwstephenson.fsnet.co.uk>
+
+	* 20150: Src/Zle/compresult.c: repost of ancient attempt
+	to fix memory leak in completion.
+
+	* 20149: Doc/Zsh/zle.yo, Src/init.c, Src/input.c, Src/loop.c,
+	Src/zsh.h, Src/Zle/zle_main.c: alter users/7650 so that
+	prompt variable is always reread; fixes bug that if PS1
+	was altered the prompt string was invalid.
+
 2004-07-07  Peter Stephenson  <pws@csr.com>
 
 	* 20142: Test/A06assign.ztst: add test for bug fixed in
@@ -26,8 +36,9 @@
 
 2004-07-01  Peter Stephenson  <pws@csr.com>
 
-	* 7650: Doc/Zsh/zle.yo, Src/Zle/iwidgets.list, Src/Zle/zle_main.c:
-	new zle widget prompt-reset redisplays screen with prompt updated.
+	* users/7650: Doc/Zsh/zle.yo, Src/Zle/iwidgets.list,
+	Src/Zle/zle_main.c: new zle widget prompt-reset redisplays screen
+	with prompt updated.
 
 2004-06-30  Peter Stephenson  <pws@csr.com>
 

@@ -1740,13 +1740,13 @@ Redisplays the edit buffer.
 tindex(reset-prompt)
 item(tt(reset-prompt) (unbound) (unbound) (unbound))(
 Force the prompts on both the left and right of the screen to be
-re-expanded, then redisplay the edit buffer.  Note that this
-does not reflect changes to the prompt variables themselves, only changes
+re-expanded, then redisplay the edit buffer.  This
+reflects changes both to the prompt variables themselves and changes
 in the expansion of the values (for example, changes in time or
 directory, or changes to the value of variables referred to by the
 prompt).
 
-Otherwise, the prompt is only expaned each time zle starts, and
+Otherwise, the prompt is only expanded each time zle starts, and
 when the display as been interrupted by output from another part of the
 shell (such as a job notification) which causes the command line to be
 reprinted.

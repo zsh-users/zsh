@@ -150,7 +150,7 @@ int kungetct;
 /**/
 mod_export char *zlenoargs[1] = { NULL };
 
-static char *raw_lp, *raw_rp;
+static char **raw_lp, **raw_rp;
 
 #ifdef FIONREAD
 static int delayzsetterm;
@@ -742,7 +742,7 @@ zlecore(void)
 
 /**/
 unsigned char *
-zleread(char *lp, char *rp, int flags, int context)
+zleread(char **lp, char **rp, int flags, int context)
 {
     unsigned char *s;
     int old_errno = errno;
@@ -761,7 +761,8 @@ zleread(char *lp, char *rp, int flags, int context)
 	char *pptbuf;
 	int pptlen;
 
-	pptbuf = unmetafy(promptexpand(lp, 0, NULL, NULL), &pptlen);
+	pptbuf = unmetafy(promptexpand(lp ? *lp : NULL, 0, NULL, NULL),
+			  &pptlen);
 	write(2, (WRITE_ARG_2_T)pptbuf, pptlen);
 	free(pptbuf);
 	return (unsigned char *)shingetline();
@@ -788,10 +789,10 @@ zleread(char *lp, char *rp, int flags, int context)
     eofsent = 0;
     resetneeded = 0;
     raw_lp = lp;
-    lpromptbuf = promptexpand(lp, 1, NULL, NULL);
+    lpromptbuf = promptexpand(lp ? *lp : NULL, 1, NULL, NULL);
     pmpt_attr = txtchange;
     raw_rp = rp;
-    rpromptbuf = promptexpand(rp, 1, NULL, NULL);
+    rpromptbuf = promptexpand(rp ? *rp : NULL, 1, NULL, NULL);
     rpmpt_attr = txtchange;
     free_prepostdisplay();
 
@@ -1169,7 +1170,7 @@ bin_vared(char *name, char **args, Options ops, UNUSED(int func))
     if (OPT_ISSET(ops,'h'))
 	hbegin(2);
     isfirstln = OPT_ISSET(ops,'e');
-    t = (char *) zleread(p1, p2, OPT_ISSET(ops,'h') ? ZLRF_HISTORY : 0,
+    t = (char *) zleread(&p1, &p2, OPT_ISSET(ops,'h') ? ZLRF_HISTORY : 0,
 			 ZLCON_VARED);
     if (OPT_ISSET(ops,'h'))
 	hend(NULL);
@@ -1315,9 +1316,9 @@ void
 reexpandprompt(void)
 {
     free(lpromptbuf);
-    lpromptbuf = promptexpand(raw_lp, 1, NULL, NULL);
+    lpromptbuf = promptexpand(raw_lp ? *raw_lp : NULL, 1, NULL, NULL);
     free(rpromptbuf);
-    rpromptbuf = promptexpand(raw_rp, 1, NULL, NULL);
+    rpromptbuf = promptexpand(raw_rp ? *raw_rp : NULL, 1, NULL, NULL);
 }
 
 /**/

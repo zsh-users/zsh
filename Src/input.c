@@ -222,21 +222,21 @@ ingetc(void)
 static int
 inputline(void)
 {
-    char *ingetcline, *ingetcpmptl = NULL, *ingetcpmptr = NULL;
+    char *ingetcline, **ingetcpmptl = NULL, **ingetcpmptr = NULL;
     int context = ZLCON_LINE_START;
 
     /* If reading code interactively, work out the prompts. */
     if (interact && isset(SHINSTDIN)) {
 	if (!isfirstln) {
-	    ingetcpmptl = prompt2;
+	    ingetcpmptl = &prompt2;
 	    if (rprompt2)
-		ingetcpmptr = rprompt2;
+		ingetcpmptr = &rprompt2;
 	    context = ZLCON_LINE_CONT;
 	}
 	else {
-	    ingetcpmptl = prompt;
+	    ingetcpmptl = &prompt;
 	    if (rprompt)
-		ingetcpmptr = rprompt;
+		ingetcpmptr = &rprompt;
 	}
     }
     if (!(interact && isset(SHINSTDIN) && SHTTY != -1 && isset(USEZLE))) {
@@ -255,7 +255,8 @@ inputline(void)
 	     */
 	    char *pptbuf;
 	    int pptlen;
-	    pptbuf = unmetafy(promptexpand(ingetcpmptl, 0, NULL, NULL), &pptlen);
+	    pptbuf = unmetafy(promptexpand(ingetcpmptl ? *ingetcpmptl : NULL,
+					   0, NULL, NULL), &pptlen);
 	    write(2, (WRITE_ARG_2_T)pptbuf, pptlen);
 	    free(pptbuf);
 	}
