@@ -29,7 +29,6 @@ if [[ CURRENT -eq 2 ]]; then
                                    _POSIX_NO_TRUNC _POSIX_VDISABLE && ret=0
           compadd "$expl[@]" -S ' ' LINK_MAX MAX_CANON MAX_INPUT NAME_MAX \
                                     PATH_MAX PIPE_BUF && ret=0
-          (( ret )) || break
         done
     (( ret )) || return 0
   done

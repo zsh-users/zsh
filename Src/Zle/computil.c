@@ -2405,7 +2405,7 @@ bin_comptry(char *nam, char **args, char *ops, int func)
 		while (*s) {
 		    while (*s && iblank(*s))
 			s++;
-		    for (p = q = s, c = NULL; *s && !iblank(*s); s++) {
+		    for (p = q = s, c = NULL; *s && !inblank(*s); s++) {
 			if (!c && *s == ':')
 			    c = p;
 			if (*s == '\\' && s[1])
@@ -2423,12 +2423,26 @@ bin_comptry(char *nam, char **args, char *ops, int func)
 			tokenize(qq);
 			if (haswilds(qq)) {
 			    Patprog prog;
+			    LinkNode node;
 
 			    if ((prog = patcompile(qq, PAT_STATIC, NULL))) {
 				char **a, *n;
 				int l = (c ? strlen(c + 1) + 2 : 1), al;
 
 				for (a = all; *a; a++) {
+				    for (node = firstnode(list); node;
+					 incnode(node)) {
+					char *as, *ls;
+
+					for (as = *a, ls = (char *) getdata(node);
+					     *as && *ls && *ls != ':'; as++, ls++)
+					    if (*as != *ls)
+						break;
+					if (!*as && (!*ls || *ls == ':'))
+					    break;
+				    }
+				    if (node)
+					continue;
 				    if (pattry(prog, *a)) {
 					n = (char *) zhalloc((al = strlen(*a)) + l);
 					strcpy(n, *a);

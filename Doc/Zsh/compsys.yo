@@ -1651,10 +1651,10 @@ will be considered.
 Of course, this can also be used to split the matches for one tag into 
 different groups. For example:
 
-example(zstyle ':completion:*:options' tag-order \
-    'options:-long:long options
-     options:-short:short options
-     options:-single-letter:single letter options'
+example(zstyle ':completion:*' tag-order \
+    'options:-long:long\ options
+     options:-short:short\ options
+     options:-single-letter:single\ letter\ options'
 
 zstyle ':completion:*:options-long' ignored-patterns '[-+](|-|[^-]*)'
 zstyle ':completion:*:options-short' ignored-patterns '--*' '[-+]?'

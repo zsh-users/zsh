@@ -86,7 +86,6 @@ if [[ -n "$state" ]]; then
       while _next_label commands expl command; do
         compadd "$expl[@]" -S ' ' keycode keysym clear add remove && ret=0
         compadd "$expl[@]" -S ' = ' pointer && ret=0
-        (( ret )) || return 0
       done
     fi
   fi

@@ -82,7 +82,6 @@ if [[ "$state" = "urls" ]]; then
       while _next_label prefixes expl 'URL prefix'; do
         compadd "$expl[@]" -S '' about: mocha: javascript: && ret=0
         _urls "$@" && ret=0
-	(( ret )) || return 0
       done
     fi
   fi

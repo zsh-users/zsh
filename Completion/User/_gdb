@@ -23,8 +23,8 @@ elif [[ "$PREFIX" = -* ]]; then
                                   -directory\= -cd\= -tty\= && ret=0
       compadd "$expl[@]"        - -help -h -s -e -c -x -d -nx -n -quiet -q \
 	    		          -batch -fullname -f -b && ret=0
-      (( ret )) || return 0
     done
+    (( ret )) || return 0
   fi
 else
   prev="$words[CURRENT-1]"

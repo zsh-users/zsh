@@ -78,7 +78,6 @@ else
         ret=0
       compadd "$expl[@]" reply next cur prev first last all unseen && ret=0
       _files "$expl[@]" -W folddir -g '<->' && ret=0
-      (( ret )) || return 0
     done
   fi
   return ret
