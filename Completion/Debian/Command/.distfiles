@@ -2,6 +2,6 @@ DISTFILES_SRC='
 .distfiles
 _apt
 _bts	_bug
-_debchange _dpkg       _dpkg_source  _dput  _dupload
+_dpkg       _dpkg_source  _dput  _dupload
 _update-alternatives   _make-kpkg    _debfoster
 '

@@ -3,4 +3,5 @@ DISTFILES_SRC='
     BUGS CONTRIBUTORS FAQ FAQ.yo FEATURES MACHINES NEWS
     FTP-README pubring.pgp
     completion-style-guide zsh-development-guide
+    TODO
 '

@@ -17,5 +17,5 @@ _diff         _gs           _make         _psutils      _tin	_apm  _mail
 _loadkeys     _modutils     _ruby         _samba        _sysctl       _links
 _user_admin   _rsync        _arping	  _spamassassin _mtools	      _fsh
 _chkconfig    _cdcd         _irssi	  _sccs
-_global       _global_tags
+_global       _global_tags  _figlet       _ifconfig     _last
 '
