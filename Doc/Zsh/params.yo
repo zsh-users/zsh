@@ -146,7 +146,7 @@ part of each pair is compared to the pattern, and the first matching
 key found is used.
 )
 item(tt(I))(
-like `tt(i), but gives the index of the last match, or all possible
+like `tt(i)', but gives the index of the last match, or all possible
 matching keys in an associative array.
 )
 item(tt(n:)var(expr)tt(:))(
