@@ -42,7 +42,7 @@ INSTALL         = @INSTALL@
 
 check test:
 	if test -n "$(DLLD)"; then \
-	  cd $(dir_top) && \
+	  cd $(dir_top) && DESTDIR= \
 	  $(MAKE) MODDIR=`pwd`/$(subdir)/Modules install.modules > /dev/null; \
 	fi
 	-for f in $(sdir)/$(TESTNUM)*.ztst; do \
