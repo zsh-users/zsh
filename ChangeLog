@@ -1,5 +1,10 @@
 2000-06-13  Sven Wischnowsky  <wischnow@zsh.org>
 
+	* ?????: Doc/Zsh/compsys.yo, Src/Zle/computil.c: make -A take a
+	pattern as argument to match non-arguments; allow single-letter
+	option strings to have multiple arguments; fix to allow option
+	completion with multiple sets
+	
 	* ?????: Completion/Commands/_generic, Doc/Zsh/compsys.yo: new
 	_generic widget to call completion with $WIDGET in function field
 	of context

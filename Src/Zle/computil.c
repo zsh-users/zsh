@@ -308,10 +308,10 @@ struct cadef {
     char *set;			/* set name prefix (<name>-), shared */
     char *sname;		/* set name */
     int flags;			/* see CDF_* below */
+    char *nonarg;		/* pattern for non-args (-A argument) */
 };
 
 #define CDF_SEP 1
-#define CDF_ARG 2
 
 /* Description for an option. */
 
@@ -423,6 +423,7 @@ freecadef(Cadef d)
 	}
 	freecaargs(d->args);
 	freecaargs(d->rest);
+	zsfree(d->nonarg);
 	if (d->single)
 	    zfree(d->single, 256 * sizeof(Caopt));
 	zfree(d, sizeof(*d));
@@ -518,7 +519,7 @@ parse_caarg(int mult, int type, int num, int opt, char *oname, char **def,
 }
 
 static Cadef
-alloc_cadef(char **args, int single, char *match, int flags)
+alloc_cadef(char **args, int single, char *match, char *nonarg, int flags)
 {
     Cadef ret;
 
@@ -526,6 +527,7 @@ alloc_cadef(char **args, int single, char *match, int flags)
     ret->next = ret->snext = NULL;
     ret->opts = NULL;
     ret->args = ret->rest = NULL;
+    ret->nonarg = ztrdup(nonarg);
     if (args) {
 	ret->defs = zarrdup(args);
 	ret->ndefs = arrlen(args);
@@ -569,6 +571,7 @@ parse_cadef(char *nam, char **args)
     Caopt *optp;
     char **oargs = args, *p, *q, *match = "r:|[_-]=* r:|=*", **xor, **sargs;
     char *adpre, *adsuf, *axor = NULL, *doset = NULL, **setp = NULL;
+    char *nonarg = NULL;
     int single = 0, anum = 1, xnum, nopts, ndopts, nodopts, flags = 0;
     int state = 0;
 
@@ -591,10 +594,10 @@ parse_cadef(char *nam, char **args)
     args++;
     while ((p = *args) && *p == '-' && p[1]) {
 	for (q = ++p; *q; q++)
-	    if (*q == 'M') {
+	    if (*q == 'M' || *q == 'A') {
 		q = "";
 		break;
-	    } else if (*q != 's' && *q != 'S' && *q != 'A')
+	    } else if (*q != 's' && *q != 'S')
 		break;
 
 	if (*q)
@@ -605,9 +608,15 @@ parse_cadef(char *nam, char **args)
 		single = 1;
 	    else if (*p == 'S')
 		flags |= CDF_SEP;
-	    else if (*p == 'A')
-		flags |= CDF_ARG;
-	    else if (*p == 'M') {
+	    else if (*p == 'A') {
+		if (p[1]) {
+		    nonarg = p + 1;
+		    p = "" - 1;
+		} else if (args[1])
+		    nonarg = *++args;
+		else
+		    break;
+	    } else if (*p == 'M') {
 		if (p[1]) {
 		    match = p + 1;
 		    p = "" - 1;
@@ -625,9 +634,12 @@ parse_cadef(char *nam, char **args)
     if (!*args)
 	return NULL;
 
+    if (nonarg)
+	tokenize(nonarg = dupstring(nonarg));
+
     /* Looks good. Optimistically allocate the cadef structure. */
 
-    all = ret = alloc_cadef(oargs, single, match, flags);
+    all = ret = alloc_cadef(oargs, single, match, nonarg, flags);
     optp = &(ret->opts);
     anum = 1;
 
@@ -662,7 +674,7 @@ parse_cadef(char *nam, char **args)
 		ret->ndopts = ndopts;
 		ret->nodopts = nodopts;
 		set_cadef_opts(ret);
-		ret = ret->snext = alloc_cadef(NULL, single, NULL, flags);
+		ret = ret->snext = alloc_cadef(NULL, single, NULL, nonarg, flags);
 		optp = &(ret->opts);
 		nopts = ndopts = nodopts = 0;
 		anum = 1;
@@ -1064,21 +1076,21 @@ ca_get_opt(Cadef d, char *line, int full, char **end)
 /* Same as above, only for single-letter-style. */
 
 static Caopt
-ca_get_sopt(Cadef d, char *line, int full, char **end)
+ca_get_sopt(Cadef d, char *line, char **end, LinkList *lp)
 {
     Caopt p;
     char pre = *line++;
+    LinkList l = NULL;
 
-    if (full) {
-	for (p = NULL; *line; line++)
-	    if (!(p = d->single[STOUC(*line)]) || !p->active ||
-		(line[1] && p->args))
-		return NULL;
-	return p;
-    } else {
-	for (p = NULL; *line; line++)
-	    if ((p = d->single[STOUC(*line)]) && p->active &&
-		p->args && p->type != CAO_NEXT && p->name[0] == pre) {
+    *lp = NULL;
+    for (p = NULL; *line; line++)
+	if ((p = d->single[STOUC(*line)]) && p->active &&
+	    p->args && p->name[0] == pre) {
+	    if (p->type == CAO_NEXT) {
+		if (!l)
+		    *lp = l = newlinklist();
+		addlinknode(l, p);
+	    } else {
 		if (end) {
 		    line++;
 		    if ((p->type == CAO_OEQUAL || p->type == CAO_EQUAL) &&
@@ -1087,14 +1099,12 @@ ca_get_sopt(Cadef d, char *line, int full, char **end)
 		    *end = line;
 		}
 		break;
-	    } else if (!p || !p->active || (line[1] && p->args) ||
-		       p->name[0] != pre)
-		return NULL;
-	if (p && end)
-	    *end = line;
-	return p;
-    }
-    return NULL;
+	    }
+	} else if (!p || (!p->active && p->name[0] != pre))
+	    return NULL;
+    if (p && end)
+	*end = line;
+    return p;
 }
 
 /* Return the n'th argument definition. */
@@ -1228,7 +1238,8 @@ ca_parse_line(Cadef d, int multi, int first)
     struct castate state;
     char *line, *pe, **argxor = NULL;
     int cur, doff, argend, arglast;
-    Patprog endpat = NULL;
+    Patprog endpat = NULL, napat = NULL;
+    LinkList sopts = NULL;
 
     /* Free old state. */
 
@@ -1279,6 +1290,9 @@ ca_parse_line(Cadef d, int multi, int first)
 
 	goto end;
     }
+    if (d->nonarg)
+	napat = patcompile(d->nonarg, 0, NULL);
+
     /* Loop over the words from the line. */
 
     for (line = compwords[1], cur = 2, state.curopt = NULL, state.def = NULL;
@@ -1315,6 +1329,15 @@ ca_parse_line(Cadef d, int multi, int first)
 	    } else if ((state.def = state.def->next)) {
 		state.argbeg = cur;
 		state.argend = argend;
+	    } else if (sopts && nonempty(sopts)) {
+		state.curopt = (Caopt) uremnode(sopts, firstnode(sopts));
+		state.def = state.curopt->args;
+		state.opt = 0;
+		state.argbeg = state.optbeg = state.inopt = cur;
+		state.argend = argend;
+		doff = state.doff = 0;
+		state.singles = 1;
+		goto cont;
 	    } else {
 		state.curopt = NULL;
 		state.opt = 1;
@@ -1378,11 +1401,15 @@ ca_parse_line(Cadef d, int multi, int first)
 		state.curopt = NULL;
 	    }
 	} else if (state.opt == 2 && d->single &&
-		   (state.curopt = ca_get_sopt(d, line, 0, &pe))) {
+		   ((state.curopt = ca_get_sopt(d, line, &pe, &sopts)) ||
+		    (sopts && nonempty(sopts)))) {
 	    /* Or maybe it's a single-letter option? */
 
 	    char *p;
 	    Caopt tmpopt;
+
+	    if (sopts && nonempty(sopts))
+		state.curopt = (Caopt) uremnode(sopts, firstnode(sopts));
 
 	    ddef = state.def = state.curopt->args;
 	    dopt = state.curopt;
@@ -1419,9 +1446,9 @@ ca_parse_line(Cadef d, int multi, int first)
 		state.curopt = NULL;
 	} else if (multi && (*line == '-' || *line == '+') && cur != compcurrent)
 	    return 1;
-	else if (state.arg) {
+	else if (state.arg && (!napat || !pattry(napat, line))) {
 	    /* Otherwise it's a normal argument. */
-	    if ((d->flags & CDF_ARG) && ca_inactive(d, NULL, cur + 1, 1))
+	    if (napat && ca_inactive(d, NULL, cur + 1, 1))
 		return 1;
 
 	    arglast = 1;
@@ -1438,9 +1465,7 @@ ca_parse_line(Cadef d, int multi, int first)
 		state.inrest = 0;
 		state.opt = (cur == state.nargbeg + 1 &&
 			     (!multi || !*line || 
-			      ((*line == '-' || *line == '+') &&
-			       (!line[1] ||
-				(*line == '-' && line[1] == '-' && !line[2])))));
+			      *line == '-' || *line == '+'));
 		state.optbeg = state.nargbeg;
 		state.argbeg = cur - 1;
 		state.argend = argend;
@@ -1517,9 +1542,7 @@ ca_parse_line(Cadef d, int multi, int first)
 	    } else {
 		ca_laststate.def = adef;
 		ca_laststate.opt = (!arglast || !multi || !*line || 
-				    ((*line == '-' || *line == '+') &&
-				     (!line[1] ||
-				      (*line == '-' && line[1] == '-' && !line[2]))));
+				    *line == '-' || *line == '+');
 		ca_laststate.ddef = NULL;
 		ca_laststate.dopt = NULL;
 		ca_laststate.optbeg = state.nargbeg;

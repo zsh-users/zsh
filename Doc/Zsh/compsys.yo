@@ -2931,10 +2931,15 @@ example(_arguments \
     {-d,--decompress}'[decompress]')
 
 To simplify the specifications for commands with standard option
-parsing, the options tt(-A) and tt(-S) may be given. With tt(-A) no
-options will be completed after the first non-option argument on the
-line. With tt(-S), no option will be completed after a `tt(-)tt(-)' on 
-the line and this argument will otherwise be ignored.
+parsing, the options tt(-S) and tt(-A) may be given.  With tt(-S), no
+option will be completed after a `tt(-)tt(-)' on the line and this
+argument will otherwise be ignored. With tt(-A), no options will be
+completed after the first non-option argument on the line.  The tt(-A) 
+has to be followed by a pattern matching all strings which are not to
+be taken as arguemnts. For example, to make tt(_arguments) stop
+completing options after the first normal argument, but ignoring all
+strings starting with a hyphen even if they are not described by one
+of the var(optspec)s, one would use: `tt(-A "-*")'.
 
 Note that using multiple sets will be slower than using only one set
 because the completion code has to parse the command line once for
