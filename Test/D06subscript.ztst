@@ -146,8 +146,8 @@
 >\2 backcbrack cbrack star
 >\\\4 \\\? star zounds
 
-  typeset "A[one\"two\"three\"quotes]"=QQQ
-  typeset 'A[one\"two\"three\"quotes]'=qqq
+  typeset -g "A[one\"two\"three\"quotes]"=QQQ
+  typeset -g 'A[one\"two\"three\"quotes]'=qqq
   print -R "$A[one\"two\"three\"quotes]"
   print -R $A[one\"two\"three\"quotes]
   A[one"two"three"four"quotes]=QqQq

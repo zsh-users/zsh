@@ -3,8 +3,9 @@
 	* 15613 (plus unposted additions): Test/B02typeset.ztst: Tests for
 	correct behavior of typeset options and arguments.
 
-	* 15611: Src/builtin.c: Fix crash bug when assigning to array
-	elements in a function in the arguments of typeset or local.
+	* 15611: Src/builtin.c, Test/D06subscript.ztst: Fix crash bug when
+	assigning to array elements in a function in the arguments of
+	typeset or local.  Change test for new typeset restrictions.
 
 2001-08-13  Sven Wischnowsky  <wischnow@zsh.org>
 
