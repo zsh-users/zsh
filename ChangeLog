@@ -1,3 +1,8 @@
+2001-10-05  Clint Adams  <clint@zsh.org>
+
+	* 15938: Completion/Unix/Command/_mount:
+	complete ext3 mount options.
+
 2001-09-30  Clint Adams  <clint@zsh.org>
 
         * 15915: Completion/Debian/Command/_bts:
