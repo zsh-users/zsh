@@ -25,19 +25,17 @@
 # error message.
 
 predict-on() {
-    setopt localoptions nounset noksharrays
+    setopt localoptions unset noksharrays
     zle -N self-insert insert-and-predict
     zle -N magic-space insert-and-predict
     zle -N backward-delete-char delete-backward-and-predict
-    [[ $compmatchers[2] != 'r:|=*' ]] &&
-      compmatchers=('' 'r:|=*' $compmatchers)
+    zle -N delete-char-or-list delete-no-predict
 }
 predict-off() {
-    setopt localoptions nounset noksharrays
+    setopt localoptions unset noksharrays
     zle -A .self-insert self-insert
     zle -A .magic-space magic-space
     zle -A .backward-delete-char backward-delete-char
-    [[ $compmatchers[2] != 'r:|=*' ]] || shift 2 compmatchers
 }
 insert-and-predict () {
   emulate -L zsh
@@ -75,11 +73,14 @@ delete-backward-and-predict() {
       zle .history-beginning-search-forward || RBUFFER=""
       return 0
     else
-      # Depending on preference, you might call "predict-off" here,
-      # and also set up forward deletions to turn off prediction.
+      # Depending on preference, you might call "predict-off" here.
       LBUFFER="$LBUFFER[1,-2]"
     fi
   fi
+}
+delete-no-predict() {
+  predict-off
+  zle .$WIDGET "$@"
 }
 
 [[ -o kshautoload ]] || predict-on "$@"
