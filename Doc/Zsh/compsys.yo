@@ -2084,7 +2084,10 @@ var(action). Note that only one such `tt(:*)'-specification is useful
 and no other argument specification may be given after it.
 
 In the simplest form the var(opt-spec) is just the option name
-beginning with a minus or a plus sign, such as `tt(-foo)'. In this
+beginning with a minus or a plus sign, such as `tt(-foo)'. If the
+command accepts the option both with a leading minus and a plus sign,
+one can use either tt(-+foo) or tt(+-foo) to define both options at
+once. In this
 case, the first argument for the option (if any) has to come as a
 separate word directly after the option and the option may appear only 
 once on the line (and if it is already on the line, the option name
@@ -2097,6 +2100,10 @@ separate argument after the option, a plus sign should be used
 instead. If the argument may be given as the next string or in same
 string as the option name but separated from it by an equal sign, a
 `tt(=)' should be used instead of the minus or plus sign.
+
+Note that this and the shortcut syntax with a leading tt(-+) or tt(+-) 
+means that for options like tt(-+) the second character has to be
+quoted with a backslash.
 
 If the option may be given more than once, a star
 (`tt(*)') has to be added in front of the var(opt-spec).
