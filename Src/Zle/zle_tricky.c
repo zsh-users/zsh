@@ -1422,7 +1422,7 @@ get_comp_string(void)
 	    if (parend >= 0 && !tmp)
 		line = (unsigned char *) dupstring(tmp = (char *)line);
 	    linptr = (char *) line + ll + addedx - parbegin + 1;
-	    if ((linptr - (char *) line) < 2 ||
+	    if ((linptr - (char *) line) < 3 || *linptr != '(' ||
 		linptr[-1] != '(' || linptr[-2] != '$') {
 		if (parend >= 0) {
 		    ll -= parend;
@@ -1482,6 +1482,7 @@ get_comp_string(void)
 		tmp = NULL;
 		linptr = (char *)line;
 		lexrestore();
+		addedx = 0;
 		goto start;
 	    }
 	    noaliases = 0;
