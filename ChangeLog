@@ -1,3 +1,7 @@
+2000-05-03  Tanaka Akira  <akr@m17n.org>
+
+	* 11137: Test/07cond.ztst: detect block device file using find.
+
 2000-05-03  Bart Schaefer  <schaefer@zsh.org>
 
 	* 11136: Doc/Zsh/expn.yo: Reorganize history expansion doc.

@@ -27,11 +27,7 @@
 0:-a cond
 
   # Find a block special file system.  This is a little tricky.
-  block=$(df / | awk '
-    $NF == "/" {print $1}
-    $1 == "/" && substr($2,0,1) == "(" {
-      if((l = index($2,")") - 2) < 0) l = length($2) - 1;
-      print substr($2,2,l)}') &&
+  block=$(find /dev /devices -type b -print 2>/dev/null|head -1) &&
   [[ -b $block && ! -b zerolength ]]
 0:-b cond
 
