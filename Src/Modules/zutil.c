@@ -1261,8 +1261,8 @@ add_opt_val(Zoptdesc d, char *arg)
 static int
 bin_zparseopts(char *nam, char **args, char *ops, int func)
 {
-    char *o, *p, *n, **pp, **aval, **ap, *assoc = NULL;
-    int del = 0, f;
+    char *o, *p, *n, **pp, **aval, **ap, *assoc = NULL, **cp, **np;
+    int del = 0, f, extract = 0;
     Zoptdesc sopts[256], d;
     Zoptarr a, defarr = NULL;
     Zoptval v;
@@ -1289,6 +1289,14 @@ bin_zparseopts(char *nam, char **args, char *ops, int func)
 		    break;
 		}
 		del = 1;
+		break;
+	    case 'E':
+		if (o[2]) {
+		    args--;
+		    o = NULL;
+		    break;
+		}
+		extract = 1;
 		break;
 	    case 'a':
 		if (defarr) {
@@ -1400,10 +1408,19 @@ bin_zparseopts(char *nam, char **args, char *ops, int func)
 	if (!o[1])
 	    sopts[STOUC(*o)] = d;
     }
-    for (pp = pparams; (o = *pp); pp++) {
-	if (*o != '-')
-	    break;
+    np = cp = pp = ((extract && del) ? arrdup(pparams) : pparams);
+    for (; (o = *pp); pp++) {
+	if (*o != '-') {
+	    if (extract) {
+		if (del)
+		    *cp++ = o;
+		continue;
+	    } else
+		break;
+	}
 	if (!o[1] || (o[1] == '-' && !o[2])) {
+	    if (del && extract)
+		*cp++ = o;
 	    pp++;
 	    break;
 	}
@@ -1429,8 +1446,14 @@ bin_zparseopts(char *nam, char **args, char *ops, int func)
 		} else
 		    add_opt_val(d, NULL);
 	    }
-	    if (!o)
-		break;
+	    if (!o) {
+		if (extract) {
+		    if (del)
+			*cp++ = *pp;
+		    continue;
+		} else
+		    break;
+	    }
 	} else {
 	    if (d->flags & ZOF_ARG) {
 		char *e = o + strlen(d->name) + 1;
@@ -1450,6 +1473,10 @@ bin_zparseopts(char *nam, char **args, char *ops, int func)
 		add_opt_val(d, NULL);
 	}
     }
+    if (extract && del)
+	while (*pp)
+	    *cp++ = *pp++;
+
     for (a = opt_arrs; a; a = a->next) {
 	aval = (char **) zalloc((a->num + 1) * sizeof(char *));
 	for (ap = aval, v = a->vals; v; ap++, v = v->next) {
@@ -1498,9 +1525,15 @@ bin_zparseopts(char *nam, char **args, char *ops, int func)
 	sethparam(assoc, aval);
     }
     if (del) {
-	pp = zarrdup(pp);
-	freearray(pparams);
-	pparams = pp;
+	if (extract) {
+	    *cp = NULL;
+	    freearray(pparams);
+	    pparams = zarrdup(np);
+	} else {
+	    pp = zarrdup(pp);
+	    freearray(pparams);
+	    pparams = pp;
+	}
     }
     return 0;
 }

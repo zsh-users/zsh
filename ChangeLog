@@ -1,5 +1,8 @@
 2000-05-23  Sven Wischnowsky  <wischnow@zsh.org>
 
+	* 11530: Doc/Zsh/mod_zutil.yo, Src/Modules/zutil.c: add -E option
+ 	to zparseopts
+	
 	* 11525: Completion/Base/_arguments, Completion/Commands/_complete_help,
  	Completion/Commands/_next_tags, Completion/Core/_description,
  	Completion/Core/_next_label: use `set -A' instead of `eval' in
