@@ -656,9 +656,13 @@ done
 
 # If we are configured to expand paths as far as possible and we collected
 # expanded paths that are different from the string on the line, we add
-# them as possible matches.
+# them as possible matches. Do that only if we are currently trying the
+# last entry in the matcher-list style, otherwise other match specs might
+# make the suffix that didn't match this time match in one of the following
+# attempts.
 
-if zstyle -t ":completion:${curcontext}:paths" expand prefix &&
+if [[ _matcher_num -eq ${#_matchers} ]] &&
+   zstyle -t ":completion:${curcontext}:paths" expand prefix &&
    [[ nm -eq compstate[nmatches] && $#exppaths -ne 0 &&
       "$linepath$exppaths" != "$eorig" ]]; then
   PREFIX="${opre}"

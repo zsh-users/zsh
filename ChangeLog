@@ -1,3 +1,9 @@
+2001-10-11  Sven Wischnowsky  <wischnow@zsh.org>
+
+	* 16002: Completion/Unix/Type/_path_files: use expanded paths
+	(expand style with value prefix) only when we are at the last
+	matcher spec
+
 2001-10-10  Clint Adams  <clint@zsh.org>
 
 	* 16006: Completion/Unix/Type/_mailboxes, Doc/Zsh/compsys.yo:
