@@ -1,3 +1,8 @@
+2004-06-18  Peter Stephenson  <pws@csr.com>
+
+	* 20033: Completion/Base/Utility/_arguments: unconfirmed fix
+	for configure output parsing with square brackets.
+
 2004-06-17  Oliver Kiddle  <opk@zsh.org>
 
 	* 20069: Completion/Unix/Command/_iconv: complete character

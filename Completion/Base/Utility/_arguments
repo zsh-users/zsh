@@ -67,9 +67,9 @@ if (( long )); then
     # those hyphens and anything from the space or tab after the
     # option up to the end.
 
-    lopts=("--${(@)^${(@)${(@)${(@M)${(@ps:\n:j:\n:)${(@)${(@M)${(@f)$(_call_program options ${~words[1]} --help 2>&1)//\[--/
+    lopts=("--${(@)${(@)^${(@)${(@)${(@M)${(@ps:\n:j:\n:)${(@)${(@M)${(@f)$(_call_program options ${~words[1]} --help 2>&1)//\[--/
 --}:#[ 	]#-*}//,/
-}}:#[ 	]#--*}#*--}%%[]	 ]*}:#}")
+}}:#[ 	]#--*}#*--}%%[]	 ]*}:#}//\[=/=}")
 
     # Remove options also described by user-defined specs.
 
