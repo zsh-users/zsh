@@ -7184,11 +7184,8 @@ permmatches(void)
 	n->mcount = g->mcount;
 	n->matches = p = (Cmatch *) ncalloc((n->mcount + 1) *
 					    sizeof(Cmatch));
-	for (rn = 1, q = g->matches; *q; q++, p++, rn) {
+	for (q = g->matches; *q; q++, p++)
 	    *p = dupmatch(*q);
-	    (*p)->rnum = rn++;
-	    (*p)->gnum = mn++;
-	}
 	*p = NULL;
 
 	n->lcount = g->lcount;
@@ -7218,6 +7215,12 @@ permmatches(void)
 	} else
 	    n->ccs = NULL;
 	g = g->next;
+    }
+    for (g = amatches; g; g = g->next) {
+	for (rn = 1, q = g->matches; *q; q++) {
+	    (*q)->rnum = rn++;
+	    (*q)->gnum = mn++;
+	}
     }
     pmatches = amatches;
     hasperm = 1;
@@ -7289,6 +7292,7 @@ freematches(void)
 	g = n;
     }
     hasperm = 0;
+    minfo.cur = NULL;
 }
 
 /* Insert the given string into the command line.  If move is non-zero, *
@@ -7950,7 +7954,7 @@ do_ambig_menu(void)
 	minfo.cur = NULL;
     } else {
 	if (oldlist) {
-	    if (oldins)
+	    if (oldins && minfo.cur)
 		acceptlast();
 	} else
 	    minfo.cur = NULL;
@@ -7967,11 +7971,9 @@ do_ambig_menu(void)
 	}
 	insmnum = comp_mod(insmnum, (minfo.group)->mcount);
     } else {
-	int c = 0;
-
 	insmnum = comp_mod(insmnum, permmnum);
 	for (minfo.group = amatches;
-	     minfo.group && (c += (minfo.group)->mcount) <= insmnum;
+	     minfo.group && (minfo.group)->mcount <= insmnum;
 	     minfo.group = (minfo.group)->next)
 	    insmnum -= (minfo.group)->mcount;
 	if (!minfo.group) {
