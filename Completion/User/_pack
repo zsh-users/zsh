@@ -1,6 +1,6 @@
-#compdef gzip
+#compdef pack 
 
 local expl
 
 _description expl 'file to compress'
-_files "$expl[@]" -g '*~*.[gG][zZ]'
+_files "$expl[@]" -g '*~*.z'
