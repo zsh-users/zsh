@@ -1,0 +1,26 @@
+#autoload
+
+local __targs __gopt=-J
+
+if [[ "$1" = -C?* ]]; then
+  __targs=( -C "${1[3,-1]}" )
+  shift
+elif [[ "$1" = -C ]]; then
+  __targs=( -C "$2" )
+  shift 2
+else
+  __targs=()
+fi
+
+if [[ "$1" = -([12]|)[VJ] ]]; then
+  __gopt="$1"
+  shift
+fi
+
+_tags "$__targs[@]" "$1"
+
+while _tags; do
+  _all_labels "$__gopt" "$@" && return 0
+done
+
+return 1
