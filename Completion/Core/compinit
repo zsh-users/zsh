@@ -112,6 +112,11 @@ fi
   compconfig[correct_prompt]='correct to:'
 (( ${+compconfig[completer]} )) || compconfig[completer]=_complete
 
+# This can hold names of functions that are to be called after all
+# matches have been generated.
+
+comppostfuncs=()
+
 # This function is used to register or delete completion functions. For
 # registering completion functions, it is invoked with the name of the
 # function as it's first argument (after the options). The other

@@ -49,6 +49,13 @@ for comp; do
   fi
 done
 
+# Now call the post-functions.
+
+for post in "$comppostfuncs[@]"; do
+  "$post"
+done
+comppostfuncs=()
+
 [[ "$compconfig[last_prompt]" = always ]] && compstate[last_prompt]=yes
 
 _lastcomp=( "${(@kv)compstate}" )
