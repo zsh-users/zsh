@@ -1608,6 +1608,7 @@ execcmd(Estate state, int input, int output, int how, int last1)
     LinkList redir;
     wordcode code;
     Wordcode beg = state->pc, varspc;
+    FILE *oxtrerr = xtrerr;
 
     doneps4 = 0;
     redir = (wc_code(*state->pc) == WC_REDIR ? ecgetredirs(state) : NULL);
@@ -2317,10 +2318,10 @@ execcmd(Estate state, int input, int output, int how, int last1)
     fixfds(save);
 
  done:
-    if (xtrerr != stderr) {
+    if (xtrerr != oxtrerr) {
 	fil = fileno(xtrerr);
 	fclose(xtrerr);
-	xtrerr = stderr;
+	xtrerr = oxtrerr;
 	zclose(fil);
     }
 }
