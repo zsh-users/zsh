@@ -1,3 +1,8 @@
+2002-06-05  Peter Stephenson  <pws@pwstephenson.fsnet.co.uk>
+
+	* 17294: Src/Modules/tcp.c: remove session even if closing fd
+	failed; remove builtin from hash table when unloading module.
+
 2002-06-05  Peter Stephenson  <pws@csr.com>
 
 	* 17292: Src/builtin.c: shut up compiler if no OPEN_MEMSTREAM.

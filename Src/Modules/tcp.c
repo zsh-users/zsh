@@ -299,10 +299,7 @@ tcp_close(Tcp_session sess)
 	{
 	    err = close(sess->fd);
 	    if (err)
-	    {
 		zwarn("connection close failed: %e", NULL, errno);
-		return -1;
-	    }
 	}
 	zts_delete(sess);
 	return 0;
@@ -701,6 +698,7 @@ int
 cleanup_(Module m)
 {
     tcp_cleanup();
+    deletebuiltins(m->nam, bintab, sizeof(bintab)/sizeof(*bintab));
     freelinklist(ztcp_sessions, (FreeFunc) ztcp_free_session);
     return 0;
 }
