@@ -1,3 +1,9 @@
+2004-09-27  Peter Stephenson  <pws@csr.com>
+
+	* unposted: Completion/Unix/Command/_perforce: when adding
+	files, ignore files already open for whatever reason,
+	including those already being added.
+
 2004-09-24  Wayne Davison  <wayned@users.sourceforge.net>
 
 	* 20409: Completion/Unix/Command/_darcs: Completion for the darcs
