@@ -1,3 +1,8 @@
+2002-07-01  Clint Adams  <clint@zsh.org>
+
+	* 17391: Completion/Debian/Command/_dpkg: complete files after
+	dpkg -S.
+
 2002-06-26  Bart Schaefer  <schaefer@zsh.org>
 
 	* 17357: Src/mkbltnmlst.sh: predefine autoloads for zsh emulation
