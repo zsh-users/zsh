@@ -8333,7 +8333,7 @@ ilistmatches(Hookdef dummy, Chdata dat)
     longest += 2 + of;
     if ((ncols = columns / longest)) {
 	for (g = amatches; g; g = g->next)
-	    nlines += (g->lcount + ncols - 1) / ncols;
+	    nlines += (g->lcount - g->llcount + ncols - 1) / ncols;
     } else {
 	ncols = 1;
 	opl = 1;
