@@ -384,6 +384,7 @@ bin_ztcp(char *nam, char **args, char *ops, int func)
     int herrno, err=1, destport, force=0, verbose=0, len, rfd;
     char **addrp, *desthost, *localname, *remotename;
     struct hostent *zthost = NULL, *ztpeer = NULL;
+    struct servent *srv;
     Tcp_session sess;
 
     if (ops['f'])
@@ -419,18 +420,22 @@ bin_ztcp(char *nam, char **args, char *ops, int func)
 	}
     }
     else if (ops['l']) {
-	int lport;
+	int lport = 0;
 
 	if (!args[0]) {
 	    zwarnnam(nam, "-l requires an argument", NULL, 0);
 	    return 1;
 	}
-	lport = atoi(args[0]);
-	if (!lport) {
-	    zwarnnam(nam, "bad port number", NULL, 0);
-	    return 1;
+
+	srv = getservbyname(args[0],"tcp");
+	if (srv)
+	    lport = srv->s_port;
+	else
+	    lport = htons(atoi(args[0]));
+	if (!lport) { zwarnnam(nam, "bad service name or port number", NULL, 0);
+	return 1;
 	}
-	sess = tcp_socket(PF_INET, SOCK_STREAM, 0, 0);
+	sess = tcp_socket(PF_INET, SOCK_STREAM, 0, ZTCP_INBOUND);
 
 	if (!sess) {
 	    zwarnnam(nam, "unable to allocate a TCP session slot", NULL, 0);
@@ -447,7 +452,7 @@ bin_ztcp(char *nam, char **args, char *ops, int func)
 	}
 
 	sess->sock.in.sin_family = AF_INET;
-	sess->sock.in.sin_port = htons(lport);
+	sess->sock.in.sin_port = lport;
 
 
 	if (bind(sess->fd, (struct sockaddr *)&sess->sock.in, sizeof(struct sockaddr_in)))
@@ -482,7 +487,10 @@ bin_ztcp(char *nam, char **args, char *ops, int func)
 	}
 	sess->fd = rfd;
 
-	fprintf(shout, "%d is on fd %d\n", ntohs(sess->peer.in.sin_port), sess->fd);
+	setiparam("REPLY", sess->fd);
+
+	if(verbose)
+	    fprintf(shout, "%d is on fd %d\n", ntohs(sess->peer.in.sin_port), sess->fd);
 
 	return 0;
 
@@ -504,16 +512,21 @@ bin_ztcp(char *nam, char **args, char *ops, int func)
 			remotename = ztpeer->h_name;
 		    else
 			remotename = ztrdup(inet_ntoa(sess->sock.in.sin_addr));
-		    fprintf(shout, "%s:%d -> %s:%d is on fd %d%s%s\n", localname, ntohs(sess->sock.in.sin_port), remotename, ntohs(sess->peer.in.sin_port), sess->fd, (sess->flags & ZTCP_ZFTP) ? " ZFTP" : "", (sess->flags & ZTCP_INBOUND) ? "INBOUND" : "");
+		    fprintf(shout, "%s:%d %s %s:%d is on fd %d%s\n", localname, ntohs(sess->sock.in.sin_port), (sess->flags & ZTCP_INBOUND) ? "<-" : "->", remotename, ntohs(sess->peer.in.sin_port), sess->fd, (sess->flags & ZTCP_ZFTP) ? " ZFTP" : "");
 		}
 	    }
 	    return 0;
 	}
 	else if (!args[1]) {
-	    destport = 23;
+	    destport = htons(23);
 	}
 	else {
-	    destport = atoi(args[1]);
+
+	    srv = getservbyname(args[1],"tcp");
+	    if (srv)
+		destport = srv->s_port;
+	    else
+		destport = htons(atoi(args[1]));
 	}
 	
 	desthost = ztrdup(args[0]);
@@ -547,7 +560,7 @@ bin_ztcp(char *nam, char **args, char *ops, int func)
 	    if (zthost->h_length != 4)
 		zwarnnam(nam, "address length mismatch", NULL, 0);
 	    do {
-		err = tcp_connect(sess, *addrp, zthost, htons(destport));
+		err = tcp_connect(sess, *addrp, zthost, destport);
 	    } while (err && errno == EINTR && !errflag);
 	}
 	
@@ -555,10 +568,10 @@ bin_ztcp(char *nam, char **args, char *ops, int func)
 	    zwarnnam(nam, "connection failed: %e", NULL, errno);
 	else
 	{
+	    setiparam("REPLY", sess->fd);
+
 	    if (verbose)
 		fprintf(shout, "%s:%d is now on fd %d\n", desthost, destport, sess->fd);
-	    else
-		fprintf(shout, "%d\n", sess->fd);
 	}
 	
 	zsfree(desthost);
