@@ -1,3 +1,9 @@
+2001-12-19  Oliver Kiddle  <opk@zsh.org>
+
+	* 16366: Completion/Unix/Type/_net_interfaces,
+	Completion/Unix/Command/_ifconfig, Completion/Unix/Type/.distfiles,
+	Completion/Unix/Command/.distfiles: new ifconfig completion
+
 2001-12-18  Oliver Kiddle  <opk@zsh.org>
 
 	* 16364: Src/params.c: further to 16351, except specials

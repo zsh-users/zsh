@@ -1,0 +1,22 @@
+#autoload
+
+local expl list intf sep
+local -a disp
+
+case $OSTYPE in
+  aix*)
+    intf=( ${(f)"$(lsdev -C -c if -F 'name:description')"} )
+    if zstyle -T ":completion:${curcontext}" verbose; then
+      zstyle -s ":completion:${curcontext}:" list-separator sep || sep=--
+      zformat -a list " $sep " "$intf[@]"
+      disp=(-ld list)
+    fi
+  ;;
+  darwin*|freebsd*) intf=( $(ifconfig -l) ) ;;
+  irix*) intf=( ${${${(f)"$(/usr/etc/netstat -i)"}%% *}[2,-1]} ) ;;
+  linux*) intf=( /proc/sys/net/ipv4/conf/*~*(all|default)(N:t) ) ;;
+  *) intf=( $(ifconfig -a|sed -n 's/^\([^ 	:]*\).*/\1/p') ) ;;
+esac
+
+_wanted interfaces expl 'network interface' \
+    compadd "$@" "$disp[@]" - "${(@)intf%%:*}"
