@@ -1,3 +1,8 @@
+2000-05-15  Sven Wischnowsky  <wischnow@zsh.org>
+
+	* 11364: Completion/Core/_path_files, Src/Zle/compmatch.c: fix for
+ 	suffix-matching; better in-path completion in _path_files
+	
 2000-05-15  Peter Stephenson  <pws@cambridgesiliconradio.com>
 
 	* 11362: Doc/Zsh/manual.yo, Doc/Zsh/metafaq.yo, Doc/Zsh/seealso.yo:

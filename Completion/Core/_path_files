@@ -6,7 +6,7 @@
 local linepath realpath donepath prepath testpath exppath skips skipped
 local tmp1 tmp2 tmp3 tmp4 i orig eorig pre suf tpre tsuf opre osuf cpre
 local pats haspats ignore pfxsfx remt sopt gopt opt sdirs ignpar
-local nm=$compstate[nmatches] menu matcher mopts sort match
+local nm=$compstate[nmatches] menu matcher mopts sort match mid
 
 typeset -U prepaths exppaths
 
@@ -529,6 +529,7 @@ for prepath in "$prepaths[@]"; do
       cpre="${cpre}${tpre%%/*}/"
       tpre="${tpre#*/}"
     elif [[ "$tsuf" = */* ]]; then
+      mid="$testpath"
       cpre="${cpre}${tpre}/"
       tpre="${tsuf#*/}"
       tsuf=
@@ -539,17 +540,32 @@ for prepath in "$prepaths[@]"; do
   done
 
   if [[ -z "$tmp4" ]]; then
-    if [[ "$osuf" = */* ]]; then
-      PREFIX="${opre}${osuf}"
-      SUFFIX=
-    else
+    if [[ "$mid" = */ ]]; then
       PREFIX="${opre}"
       SUFFIX="${osuf}"
+
+      tmp4="${testpath#${mid}}"
+      tmp3="${mid%/*/}"
+      tmp2="${${mid%/}##*/}"
+      compquote tmp4 tmp3 tmp2 tmp1
+      for i in "$tmp1[@]"; do
+        compadd -Qf "$mopts[@]" -p "$linepath$tmp3/" -s "/$tmp4$i" \
+                -W "$prepath$realpath${mid%/*/}/" \
+	        "$pfxsfx[@]" -M "r:|/=* r:|=*" - "$tmp2"
+      done
+    else
+      if [[ "$osuf" = */* ]]; then
+        PREFIX="${opre}${osuf}"
+        SUFFIX=
+      else
+        PREFIX="${opre}"
+        SUFFIX="${osuf}"
+      fi
+      tmp4="$testpath"
+      compquote tmp4 tmp1
+      compadd -Qf "$mopts[@]" -p "$linepath$tmp4" -W "$prepath$realpath$testpath" \
+	      "$pfxsfx[@]" -M "r:|/=* r:|=*" - "$tmp1[@]"
     fi
-    tmp4="$testpath"
-    compquote tmp4 tmp1
-    compadd -Qf "$mopts[@]" -p "$linepath$tmp4" -W "$prepath$realpath$testpath" \
-	    "$pfxsfx[@]" -M "r:|/=* r:|=*" - "$tmp1[@]"
   fi
 done
 

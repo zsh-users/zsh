@@ -482,9 +482,10 @@ match_str(char *l, char *w, Brinfo *bpp, int bc, int *rwlp,
 	 */
 
 	bslash = 0;
-	if (test && (l[ind] == w[ind] ||
-		     (bslash = (lw > 1 && w[ind] == '\\' &&
-				(ind ? (w[0] == l[0]) : (w[1] == l[0])))))) {
+	if (test && !sfx &&
+	    (l[ind] == w[ind] ||
+	     (bslash = (lw > 1 && w[ind] == '\\' &&
+			(ind ? (w[0] == l[0]) : (w[1] == l[0])))))) {
 	    /* No matcher could be used, but the strings have the same
 	     * character here, skip over it. */
 	    l += add; w += (bslash ? (add + add ) : add);
@@ -562,10 +563,8 @@ match_str(char *l, char *w, Brinfo *bpp, int bc, int *rwlp,
 
 		    /* Fine, now we call ourselves recursively to find the
 		     * string matched by the `*'. */
-		    if (sfx) {
-			savl = l[-(llen + zoff)];
+		    if (sfx && (savl = l[-(llen + zoff)]))
 			l[-(llen + zoff)] = '\0';
-		    }
 		    for (t = 0, tp = w, ct = 0, ict = lw - alen + 1;
 			 ict;
 			 tp += add, ct++, ict--) {
@@ -585,11 +584,12 @@ match_str(char *l, char *w, Brinfo *bpp, int bc, int *rwlp,
 				!match_parts(l + aoff , tp - moff, alen, part))
 				break;
 			    if (sfx) {
-				savw = tp[-zoff];
-				tp[-zoff] = '\0';
+				if ((savw = tp[-zoff]))
+				    tp[-zoff] = '\0';
 				t = match_str(l - ll, w - lw,
 					      NULL, 0, NULL, 1, 2, part);
-				tp[-zoff] = savw;
+				if (savw)
+				    tp[-zoff] = savw;
 			    } else
 				t = match_str(l + llen + moff, tp + moff,
 					      NULL, 0, NULL, 0, 1, part);
@@ -598,7 +598,7 @@ match_str(char *l, char *w, Brinfo *bpp, int bc, int *rwlp,
 			}
 		    }
 		    ict = ct;
-		    if (sfx)
+		    if (sfx && savl)
 			l[-(llen + zoff)] = savl;
 
 		    /* Have we found a position in w where the rest of l
@@ -794,9 +794,10 @@ match_str(char *l, char *w, Brinfo *bpp, int bc, int *rwlp,
 	/* Same code as at the beginning, used in top-level calls. */
 
 	bslash = 0;
-	if (!test && (l[ind] == w[ind] ||
-		      (bslash = (lw > 1 && w[ind] == '\\' &&
-				 (ind ? (w[0] == l[0]) : (w[1] == l[0])))))) {
+	if ((!test || sfx) &&
+	    (l[ind] == w[ind] ||
+	     (bslash = (lw > 1 && w[ind] == '\\' &&
+			(ind ? (w[0] == l[0]) : (w[1] == l[0])))))) {
 	    /* No matcher could be used, but the strings have the same
 	     * character here, skip over it. */
 	    l += add; w += (bslash ? (add + add ) : add);
@@ -811,6 +812,8 @@ match_str(char *l, char *w, Brinfo *bpp, int bc, int *rwlp,
 	    lm = NULL;
 	    he = 0;
 	} else {
+	    if (!lw)
+		break;
 	    /* No matcher and different characters: l does not match w. */
 	    if (test)
 		return 0;
@@ -873,10 +876,15 @@ match_parts(char *l, char *w, int n, int part)
     char lsav = l[n], wsav = w[n];
     int ret;
 
-    l[n] = w[n] = '\0';
+    if (lsav)
+	l[n] = '\0';
+    if (wsav)
+	w[n] = '\0';
     ret = match_str(l, w, NULL, 0, NULL, 0, 1, part);
-    l[n] = lsav;
-    w[n] = wsav;
+    if (lsav)
+	l[n] = lsav;
+    if (wsav)
+	w[n] = wsav;
 
     return ret;
 }
