@@ -406,9 +406,9 @@ _cvs_root () {
   if [[ -f "${cvspassfile::=${CVS_PASSFILE:-$HOME/.cvspass}}" ]]; then
     _cvs_loadstat
     if (( $+builtins[stat] )); then
-      id="$(LANG=C builtin stat -g +mtime -F '%Y/%m/%d-%T' "$cvspassfile")"
+      id="$(LC_ALL=C builtin stat -g +mtime -F '%Y/%m/%d-%T' "$cvspassfile")"
     else
-      id="$(LANG=C ls -l "$cvspassfile")"
+      id="$(LC_ALL=C ls -l "$cvspassfile")"
     fi
     if [[ "$id" != "$_cvs_pass_id" ]]; then
       _cvs_roots=($_cvs_roots ${${(f)"$(<$cvspassfile)"}%% *})
@@ -526,7 +526,7 @@ _cvs_extract_modifiedfile_entries () {
 
   local ents pats
   ents=(${${${${(M)rawentries:#/*}#/}/\\/[^\\/]#\\///}%/[^/]#/[^/]#})
-  pats=(${${${(f)"$(LANG=C builtin stat -gn +mtime -F '%a %b %e %T %Y' ${pref}*(D))"}##*/}/ //})
+  pats=(${${${(f)"$(LC_ALL=C builtin stat -gn +mtime -F '%a %b %e %T %Y' ${pref}*(D))"}##*/}/ //})
   eval 'ents=(${ents:#('${(j:|:)${(@)pats:q}}')})'
   entries=($entries ${ents%%/*})
 }
