@@ -491,15 +491,18 @@ item(tt(HASH_CMDS) <D>)(
 Note the location of each command the first time it is executed.
 Subsequent invocations of the same command will use the
 saved location, avoiding a path search.
-If this option is unset, no path hashing will be done at all.
+If this option is unset, no path hashing is done at all.
+However, when tt(CORRECT) is set, commands whose names do not appear in
+the functions or aliases hash tables are hashed in order to avoid
+reporting them as spelling errors.
 )
 pindex(HASH_DIRS)
 cindex(hashing, of directories)
 cindex(directories, hashing)
 item(tt(HASH_DIRS) <D>)(
-Whenever a command is executed, hash the directory containing it,
+Whenever a command name is hashed, hash the directory containing it,
 as well as all directories that occur earlier in the path.
-Has no effect if tt(HASH_CMDS) is unset.
+Has no effect if neither tt(HASH_CMDS) nor tt(CORRECT) is set.
 )
 pindex(HASH_LIST_ALL)
 item(tt(HASH_LIST_ALL) <D>)(
