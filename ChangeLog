@@ -1,3 +1,9 @@
+2003-09-10  Wayne Davison  <wayned@users.sourceforge.net>
+
+	* users/6529 + unposted: StartupFiles/zshenv: updated the comments
+	to no longer suggest that setting the PATH here (without proper
+	precautions) is a safe thing to do.
+
 2003-08-30  Peter Stephenson  <pws@pwstephenson.fsnet.co.uk>
 
 	* c.f. somewhat terse reference in zsh-users/6493:
