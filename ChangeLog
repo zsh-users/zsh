@@ -1,5 +1,9 @@
 2000-06-27  Sven Wischnowsky  <wischnow@zsh.org>
 
+	* 3219: Completion/Core/_main_complete, Doc/Zsh/compsys.yo: menu
+ 	style accepts yes=x to start menu completion if there are at least
+ 	x matches
+	
 	* Andrej: 12084: Src/Modules/zpty.c: don't close slave if not yet open
 
 	* 12082: Doc/Zsh/compsys.yo: document _use_lo

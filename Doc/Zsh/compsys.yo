@@ -1593,6 +1593,10 @@ option.  Finally, if one of the values is explicitly set to false, menu
 completion will be turned off even if it would otherwise be active (for
 example, with the tt(MENU_COMPLETE) option).
 
+Using the form `tt(yes=)var(num)', where `tt(yes)' may be any of the
+true values (`tt(yes)', `tt(true)', `tt(on)' and `tt(1)') turns on
+menu completion if there at least var(num) matches.
+
 In addition to (or instead of) the above possibilities, the value may
 contain the string `tt(select)', optionally followed by an equal sign and a
 number.  In this case menu-selection (as defined by the tt(zsh/complist)
