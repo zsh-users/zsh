@@ -1,0 +1,13 @@
+#compdef ftp ping rwho rup xping traceroute host aaaa zone mx ns soa txt
+
+local expl hosts
+
+if ! zstyle -a ":completion:${curcontext}:hosts" hosts hosts; then
+  (( $+_cache_hosts )) ||
+      : ${(A)_cache_hosts:=${(s: :)${(ps:\t:)${${(f)~~"$(</etc/hosts)"}%%\#*}##[:blank:]#[^[:blank:]]#}}}
+
+  hosts=( "$_cache_hosts[@]" )
+fi
+
+_wanted hosts expl host \
+    compadd -M 'm:{a-zA-Z}={A-Za-z} r:|.=* r:|=*' "$@" -a hosts

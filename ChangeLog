@@ -1,3 +1,8 @@
+2002-04-12  Clint Adams  <clint@zsh.org>
+
+        * 16972: Completion/Unix/Type/_hosts: complete for aaaa, zone, mx,
+	soa, txt.
+
 2002-04-09  Peter Stephenson  <pws@csr.com>
 
 	* 16942: Src/glob.c:  Allow zero-length matches in parameter
