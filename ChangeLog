@@ -1,5 +1,15 @@
 2003-05-12  Oliver Kiddle  <opk@zsh.org>
 
+	* 18520, 13691 (Mario Lang), 13701 (Sven):
+	Completion/Unix/Command/_ecasound: completion for ecasound
+
+	* 18520, 15822/15838 (Bruno Bonfils): Completion/Unix/Command/_gpg:
+	new completion for gpg
+
+	* 18520 based on 16380, 16541 (Bruno Bonfils) and users/6013
+	(GoTaR <gotar@poczta.onet.pl>): Completion/X/Command/_mplayer:
+	new completion for mplayer
+
 	* 18519: Completion/Unix/Command/_init_d: was broken due to
 	changes in option parsing for the read builtin
 

@@ -1,0 +1,157 @@
+#compdef gpg gpgv
+
+local curcontext="$curcontext" state line expl
+typeset -A opt_args
+
+_arguments -C -s -S -A "-*" \
+  '(-s --sign)'{-s,--sign}'[make a signature]' \
+  '--clearsign[make a clear text signature]' \
+  '(-b --detach-sign)'{-b,--detach-sign}'[make a detached signature]' \
+  '(-e --encrypt)'{-e,--encrypt}'[encrypt data. this option may be combined  with --sign]' \
+  '(-c --symmetric)'{-c,--symmetric}'[encrypt with symmetric cypher only]' \
+  '--store[store only]' \
+  '--decrypt[decrypt file or stdin]' \
+  '--verify[verify a signature]:file attachment:_files' \
+  '--verify-files[verify a list of files]:_files attachment_files' \
+  '(-f --encrypt-files)'{-f,--encrypt-files}'[encrypt files]' \
+  '--decrypt-files[decrypt files]' \
+  '--list-keys[list all keys]' \
+  '--list-public-keys[list all public keys]' \
+  '--list-secret-keys[list all secret keys]' \
+  '--list-sigs[lists keys and signatures]:key attachment:_pub-keys-list' \
+  '--check-sigs[lists key, signatures and check them]:key attachment:_pub-keys-list' \
+  '--fingerprint[list all keys with their fingerprints]:key attachment:_pub-keys-list' \
+  '--list-packets[list only the sequence of packets]' \
+  '--gen-key[generate a new pair key]' \
+  '--edit-key[a menu for edit yours keys]:key attachment:_pub-keys-list' \
+  '--sign-key[sign a key]:key attachment:_pub-keys-list '\
+  '--lsign-key[sign a key but mark as non-exportable]:key attachment:_pub-keys-list' \
+  '--nrsign-key[sign a key non-revocably]' \
+  '--delete-key[remove key from public keyring]:key attachment:_pub-keys-list' \
+  '--delete-secret-key[remove key from public & private keyring]:key attachment:_sec-keys-list' \
+  '--delete-secret-and-public-key:key attachment:_sec-keys-list' \
+  '--gen-revoke[generate a revocation certificate]' \
+  '--desig-revoke[generate a designated revocation certificate]' \
+  '--export[export all key from all keyrings]' \
+  '--send-keys[send keys to a keyserver]:key attachment:_pub-keys-list' \
+  '--export-all[export all key and not OpenPGP compatible keys]' \
+  '--export-secret-keys:key attachment:_sec-keys-list' \
+  '--export-secret-subkeys:key attachment:_sec-keys-list' \
+  '--import[import a gpg key from a file]:_files attachment:_files' \
+  '--fast-import[import a file without build trustdb]:_files attachment:_files' \
+  '--recv-keys[receive a list of keys from a keyserver]:key attachment:_pub-keys-list' \
+  '--refresh-keys[update all keys from a keyserver]' \
+  '--search-keys[search for keys on a key server]' \
+  '--update-trustdb[update the trust database]' \
+  '--check-trustdb[unattended trust database update]' \
+  '--fix-trustdb[fix a corrupted trust database]' \
+  '--export-ownertrust[list the assigned ownertrust values in ASCII format]:file:_files' \
+  '--import-ownertrust[update the trustdb with a file]:file:_files' \
+  '--dearmor[de-Armor a file or stdin]' \
+  '--enarmor[en-Armor a file or stdin]' \
+  '--print-md[print message digests]:algorithm:->ciphers::file:_files' \
+  '--print-mds[print message digests]::file:_files' \
+  '--gen-random:count' --gen-prime \
+  '--version[print info on program version and supported algorithms]' \
+  '--warranty[print warranty info]' \
+  '(-h --help)'{-h,--help}'[display usage information]' \
+  '(-a --armor)'{-a,--armor}'[create ASCII armored output]' \
+  '(-o --output)'{-o+,--output}'[write output to file]:output file:_files' \
+  '(-u --local-user)'{-u+,--local-user}'[use name as the user ID to sign]:user attachment:_users'\
+  '--default-key[specify default user-id for signatures]:key:->secret-key' \
+  '*'{-r+,--recipient}'[specify user to encrypt for]:recipient:->public-key' \
+  '--default-recipient[specify default recipient]:recipient:->public-key' \
+  '--default-recipient-self[use default key as default recipient]' \
+  '--no-default-recipient[reset default recipient]' \
+  '*--encrypt-to[specify recipient]:->public-key' \
+  '(--encrypt-to)--no-encrypt-to[disable the use of all --encrypt-to keys]' \
+  '(-q --quiet)*'{-v,--verbose}'[increase amount of output]' \
+  '(-q --quiet -v --verbose)'{-q,--quiet}'[reduce amount of output]' \
+  '(-z --compress)'{-z,--compress}'[specify compression level]:compression level:((0\:no\ compression 1\:minimum 2 3 4 5 6\:default 7 8 9\:maximum))' \
+  '(-t --textmode)'{-t,--textmode}'[use canonical text mode]' \
+  '(-n --dry-run)'{-n,--dry-run}"[don't make any changes]" \
+  '(-i --interactive --batch)'{-i,--interactive}'[prompt before overwriting files]' \
+  '(-i --interactive --no-batch)--batch[use batch mode]' \
+  '--no-tty[never output to tty]' \
+  '(--batch)--no-batch[disable batch mode]' \
+  '(--no)--yes[assume "yes" on most questions]' \
+  '(--yes)--no[assume "no" on most questions]' \
+  '--default-cert-check-level:check level:((0\:no\ claim 1\:no\ verification 2\:casual\ verification 3\:extensive\ verification))' \
+  '--trusted-key[assume that the specified key is trustworthy]:long key id' \
+  '--always-trust[skip key validation]' \
+  '--keyserver[specify key server to use]:key server:_hosts' \
+  '--keyserver-options[specify keyserver options]:options' \
+  '--import-options[specify options for importing keys]:options' \
+  '--export-options[specify options for exporting keys]:options' \
+  --show-photos --no-show-photos '--photo-viewer:command:_command_names -e'\
+  --exec-path:path:_dir_list' \
+  --show-keyring[display keyring name when listing keys]' \
+  '--keyring[add specified file to list of keyrings]:file' \
+  '--secret-keyring[add specified file to list of secret keyrings]:file' \
+  --homedir:directory:_directories \
+  '--charset:character set:(iso-8859-1 iso-8859-2 koi8-r utf-8)' \
+  '--utf8-strings' '--no-utf8-strings[arguments are not in UTF8]' \
+  '(--no-options)--options[specify file to read options from]:options file:_files' \
+  "(--options)--no-options[don't read options file]" \
+  --{status,logger,attribute,passphrase,command}-fd:file\ descriptor:_file_descriptors \
+  '--sk-comments[include secret key comments when exporting keys]' \
+  '(--emit-version)--no-version[omit version string in clear text signatures]' \
+  '(--no-version)--emit-version[force writing of version string in clear text signatures]' \
+  '(-N --notation-data)'{-N,--notation-data}'[put parameter in signature]:name=value' \
+  '(--no-show-notation)--show-notation[show key signature notations]' \
+  "(--show-notation)--no-show-notation[don't show key signature notations]" \
+  '--set-policy-url:policy url' \
+  '(--no-show-policy-url)--show-policy-url' \
+  "(--show-policy-url)--no-show-policy-url" \
+  '--set-filename[specify file which is stored in messages]:file:_files' \
+  '(--for-your-eyes-only)--for-your-eyes-only' \
+  "(--for-your-eyes-only)--no-for-your-eyes-only" \
+  --completes-needed:number --marginals-needed:number --max-cert-depth:number \
+  --{{,disable-,s2k-}cipher,{,s2k-,cert-}digest,disable-pubkey}'-algo:cipher:->ciphers' \
+  --s2k-mode:value --simple-sk-checksum \
+  '--compress-algo:compression algorithm:((0\:disable\ compression 1\:zlib 2\:rfc1950))' \
+  --no-sig-cache --no-sig-create-check --{,no-}auto-check-trustdb --throw-keyid \
+  --not-dash-escaped --escape-from-lines --use-agent \
+  --rfc1991 --{,no-}pgp2 --{,no}pgp6 --{,no}pgp7 --openpgp \
+  --{,no-}force-v3-sigs --{,no}force-v4-certs --force-mdc --disable-mdc \
+  --{,no-}allow-non-selfsigned-uid --allow-freeform-uid \
+  --ignore-time-conflict --ignore-valid-from \
+  --ignore-crc-error --ignore-mdc-error --lock-once --lock-multiple --lock-never \
+  --no-random-seed-file --no-verbose --no-greeting --no-secmem-warning \
+  --no-permission-warning --no-mdc-warning --no-armor --no-default-keyring \
+  --skip-verify --with-colons --with-key-data --with-fingerprint \
+  --fast-list-mode --fixed-list-mode --list-only --no-literal --set-filesize \
+  --emulate-md-encode-bug --show-session-key --override-session-key:string \
+  --{,no-}ask-sig-expire --{,no}ask-cert-expire --{,no}expert \
+  --merge-only --allow-secret-key-import --try-all-secrets \
+  --enable-special-filenames --no-expensive-trust-checks --group:name=value \
+  --preserve-permissions --personal-{cipher,digest,compress}-preferences:string \
+  --default-preference-list:string \
+  '*:args:->args' && return
+
+if [[ $state = args ]]; then
+  if (( ${+opt_args[--export]} || ${+opt_args[--list-keys]} )); then
+    state=public-key
+  elif (( ${+opt_args[--list-secret-keys]} )); then
+    state=secret-key
+  else
+    _files && return
+  fi
+fi
+
+case "$state" in
+  public-key)
+    _wanted public-keys expl 'public key' \
+	compadd ${${(Mo)$(gpg --list-keys 2>/dev/null):%<*>}//(<|>)/} && return
+  ;;
+  secret-key)
+    _wanted secretkeys expl 'secret key' compadd \
+	${${(Mo)$(gpg --list-secret-keys 2>/dev/null):%<*>}//(<|>)/} && return
+  ;;
+  ciphers)
+    _wanted ciphers expl cipher compadd \
+        ${${(s.,.)${(M)${(f)"$(gpg --version)"}:#Cipher*}#*:}# } && return
+  ;;
+esac
+
+return 1
