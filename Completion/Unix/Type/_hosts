@@ -1,4 +1,4 @@
-#compdef ftp ping rwho rup xping traceroute host
+#compdef ftp ping rwho rup xping traceroute host aaaa zone mx ns soa txt
 
 local expl hosts
 
