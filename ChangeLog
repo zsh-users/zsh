@@ -1,3 +1,9 @@
+2004-06-30  Peter Stephenson  <pws@csr.com>
+
+	* 20118: Doc/Zsh/builtins.yo, Src/Builtins/rlimits.c:
+	Attempt to handle unknown limits by number.  Also improve
+	output and collect common code.
+
 2004-06-28  Peter Stephenson  <pws@csr.com>
 
 	* 20112, changed as per 20113: Src/exec.c, Src/parse.c,

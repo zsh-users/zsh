@@ -649,6 +649,10 @@ set the limit to the specified value.  If the tt(-h) flag
 is given, use hard limits instead of soft limits.
 If no var(resource) is given, print all limits.
 
+When looping over multiple resources, the shell will abort immediately if
+it detects a badly formed argument.  However, if it fails to set a limit
+for some other reason it will continue trying to set the remaining limits.
+
 var(resource) can be one of:
 
 startsitem()
@@ -672,7 +676,15 @@ sitem(tt(vmemorysize))(Maximum amount of virtual memory.)
 endsitem()
 
 Which of these resource limits are available depends on the system.
-var(resource) can be abbreviated to any unambiguous prefix.
+var(resource) can be abbreviated to any unambiguous prefix.  It
+can also be an integer, which corresponds to the integer defined
+for the resource by the operating system.
+
+If argument corresponds to a number which is out of the range of the
+resources configured into the shell, the shell will try to read or write
+the limit anyway, and will report an error if this fails.  As the shell
+does not store such resources internally, an attempt to set the limit will
+fail unless the tt(-s) option is present.
 
 var(limit) is a number, with an optional scaling factor, as follows:
 
@@ -1403,7 +1415,7 @@ enditem()
 findex(ulimit)
 cindex(resource limits)
 cindex(limits, resource)
-item(tt(ulimit) [ tt(-SHacdflmnpstv) [ var(limit) ] ... ])(
+item(tt(ulimit) [ [ tt(-SHacdflmnpstv) | tt(-N) var(resource) [ var(limit) ] ... ])(
 Set or display resource limits of the shell and the processes started by
 the shell.  The value of var(limit) can be a number in the unit specified
 below or the value `tt(unlimited)'.  By default, only soft limits are
@@ -1414,6 +1426,10 @@ options are used, the file size limit (tt(-f)) is assumed.  If
 var(limit) is omitted the current value of the specified resources are
 printed.  When more than one resource values are printed the limit name and
 unit is printed before each value.
+
+When looping over multiple resources, the shell will abort immediately if
+it detects a badly formed argument.  However, if it fails to set a limit
+for some other reson it will continue trying to set the remaining limits.
 
 startsitem()
 sitem(tt(-a))(Lists all of the current resource limits.)
@@ -1429,6 +1445,16 @@ sitem(tt(-u))(processes available to the user.)
 sitem(tt(-v))(K-bytes on the size of virtual memory.  On some systems this
 refers to the limit called `address space'.)
 endsitem()
+
+A resource may also be specified by integer in the form `tt(-N)
+var(resource)', where var(resource) corresponds to the integer defined for
+the resource by the operating system.  This may be used to set the limits
+for resources known to the shell which do not correspond to option letters.
+Such limits will be shown by number in the output of `tt(ulimit -a)'.
+
+The number may alternatively be out of the range of limits compiled into
+the shell.  The shell will try to read or write the limit anyway, and
+will report an error if this fails.
 )
 findex(umask)
 cindex(umask)
