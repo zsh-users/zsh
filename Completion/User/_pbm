@@ -1,4 +1,4 @@
-#compdef -p p[bgpn]m*
+#compdef -p (p[bgpn]m*|*top[bgpn]m)
 
 local pat opts ret=1
 
@@ -51,6 +51,15 @@ if (( ! $+_pbm_options )); then
     pnmtosgi 'imagename'
     pnmtotiff 'predictor rowsperstrip'
     pnmtoxwd 'pseudodepth'
+    asciitopgm 'd'
+    fitstopgm 'image'
+    fitstopnm 'image min max'
+    giftopnm 'image'
+    macptopbm 'extraskip'
+    pstopnm 'llx lly urx ury xborder xmax xsize yborder ymax ysize'
+    rawtopgm 'headerskip rowskip'
+    rawtoppm 'headerskip rowskip'
+    sldtoppm 'height ysize lib Lib scale width xsize'
   )
 
   # Options without arguments.
@@ -99,6 +108,17 @@ if (( ! $+_pbm_options )); then
     pnmtosgi 'verbatim rle'
     pnmtotiff 'none packbits lzw g3 g4 2d fill msb2lsb lsb2msb'
     pnmtoxwd 'directcolor'
+    fitstopnm 'noraw scanmax printmax'
+    g3topbm 'kludge reversebits stretch'
+    giftopnm 'verbose comments'
+    picttoppm 'verbose'
+    pstopnm 'forceplain help landscape portrait nocrop pbm pgm ppm verbose'
+    rawtoppm 'rgb rbg grb gbr brg bgr interpixel interrow'
+    sgitopnm 'verbose'
+    sldtoppm 'adjust dir info verbose'
+    tgatoppm 'debug'
+    tifftopnm 'headerdump'
+    zeisstopnm 'pgm ppm'
   )
 fi
 
