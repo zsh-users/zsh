@@ -1,6 +1,6 @@
 #compdef make gmake pmake dmake
 
-local prev="$words[CURRENT-1]" file expl tmp is_gnu cmdargs useperl
+local prev="$words[CURRENT-1]" file expl tmp is_gnu useperl
 
 zstyle -t ":completion:${curcontext}:" use-perl && useperl=1
 _pick_variant -r is_gnu gnu=GNU unix -v -f
@@ -27,11 +27,10 @@ else
     if [[ $is_gnu = gnu ]] &&
        zstyle -t ":completion:${curcontext}:targets" call-command; then
        if [[ -n $useperl ]]; then
-        cmdargs=(perl -ne '/^([a-zA-Z0-9][^\/\t=]+):([^=]|$)/ && print "$1\n"')
+        tmp=( $(_call_program targets "$words[1]" -nsp --no-print-directory -f "$file" .PHONY 2> /dev/null | perl -ne '/^([a-zA-Z0-9][^\/\t=]+):([^=]|$)/ && print "$1\n"') )
        else
-        cmdargs=(awk '/^[a-zA-Z0-9][^\/\t=]+:([^=]|$)/ {print $1}' FS=:)
+        tmp=(${${(M)${(f)"$(_call_program targets "$words[1]" -nsp --no-print-directory -f /tmp/rules .PHONY 2>/dev/null)"}:#[a-zA-Z0-9][^/\t=]##:([^=]*|(#e))}%:*})
        fi
-       tmp=( $(_call_program targets "$words[1]" -nsp --no-print-directory -f "$file" .PHONY 2> /dev/null | $cmdargs) )
     elif [[ -n $useperl ]]; then
       tmp=(
       $(perl -ne '/^([a-zA-Z0-9][^\/\t=]+):([^=]|$)/ and print "$1\n";
@@ -42,11 +41,9 @@ if (/^\.include\s+\<bsd\.port\.(subdir\.|pre\.)?mk>/ ||
 ' $file)
 	)
     else
-      tmp=(
-            $(awk '/^[a-zA-Z0-9][^\/\t=]+:([^=]|$)/ {print $1}
- 	      /^\.include  *<bsd\.port\.(subdir\.|pre\.)?mk>/ || /^\.include  *".*mk\/bsd\.pkg\.(subdir\.)?mk"/ {
- 	        print "fetch fetch-list extract patch configure build install reinstall deinstall package describe checkpatch checksum makesum" }' \
- 	     FS=: $file)
+      tmp=( ${${(M)${(f)"$(<$file)"}:#[a-zA-Z0-9][^/\t=]##:([^=]*|(#e))}%:*}
+            $(grep -E '^\.include  *(<bsd\.port\.(subdir\.|pre\.)?mk>|".*mk\/bsd\.pkg\.(subdir\.)?mk")' $file >/dev/null &&
+ 	        print "fetch fetch-list extract patch configure build install reinstall deinstall package describe checkpatch checksum makesum" )
            )
     fi
     _wanted targets expl 'make target' compadd -a tmp && return 0
