@@ -18,6 +18,11 @@
 	* 18347: Completion/Base/Utility/_alternative: fix problems
 	with having more than one ((val\:desc ...)) style action
 
+2003-03-12  Oliver Kiddle  <opk@zsh.org>
+
+	* 18346: Completion/Unix/Type/_pids, Completion/Unix/Type/_users:
+	complete for more commands using existing completions
+
 2003-03-07  Peter Stephenson  <pws@csr.com>
 
 	* 18325: Src/Modules/parameter.c: options on by default weren't
