@@ -1379,7 +1379,14 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int ssub)
 	case '-':
 	    if (vunset) {
 		val = dupstring(s);
-		multsub(&val, NULL, &isarr, NULL);
+		/*
+		 * This is not good enough for sh emulation!  Sh would
+		 * split unquoted substrings, yet not split quoted ones
+		 * (except according to $@ rules); but this leaves the
+		 * unquoted substrings unsplit, and other code below
+		 * for spbreak splits even within the quoted substrings.
+		 */
+		multsub(&val, (aspar ? NULL : &aval), &isarr, NULL);
 		copied = 1;
 	    }
 	    break;
@@ -1446,6 +1453,14 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int ssub)
 		}
 		*idend = sav;
 		copied = 1;
+		if (isarr) {
+		  if (nojoin)
+		    isarr = -1;
+		  if (qt && !getlen && isarr > 0) {
+		    val = sepjoin(aval, sep, 1);
+		    isarr = 0;
+		  }
+		}
 	    }
 	    break;
 	case '?':
