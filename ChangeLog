@@ -1,3 +1,9 @@
+2000-07-10  Bart Schaefer  <schaefer@zsh.org>
+
+	* unposted: Completion/User/_killall: Complete process IDs and
+	names for all processes when EUID is 0 (root); suggested by
+	Thomas Kohler in 12202 and followups.
+
 2000-07-10  Sven Wischnowsky  <wischnow@zsh.org>
 
 	* 12208: Completion/Core/_path_files: avoid insertion of `+'
