@@ -39,7 +39,7 @@ if (( $#_arr )); then
   # descriptions.
 
   _simple=()
-  _len=1
+  _len=-1
   for _i in "$_arr[@]";  do
     _tmp="${#_i%%:*}"
     if [[ "$_i" = *:?* ]]; then
@@ -48,6 +48,11 @@ if (( $#_arr )); then
       _simple=( "$_simple[@]" "${_i%:}" )
     fi
   done
+
+  if [[ _len -lt 0 ]]; then
+    eval "${_param}=''"
+    return 1
+  fi
 
   # Now we build the list in `_tmp', adding one line per string.
 

@@ -3951,15 +3951,20 @@ addmatches(Cadata dat, char **argv)
 		} else
 		    dat->prpre = dupstring(dat->prpre);
 		/* Select the group in which to store the matches. */
-		if (dat->group || dat->ylist) {
+		if (dat->group) {
 		    endcmgroup(NULL);
-		    begcmgroup((dat->ylist ? NULL : dat->group),
-			       (dat->aflags & CAF_NOSORT));
+		    begcmgroup(dat->group, (dat->aflags & CAF_NOSORT));
 		    if (dat->aflags & CAF_NOSORT)
 			mgroup->flags |= CGF_NOSORT;
 		} else {
 		    endcmgroup(NULL);
 		    begcmgroup("default", 0);
+		}
+		if (dat->ylist) {
+		    endcmgroup(NULL);
+		    begcmgroup(NULL, (dat->aflags & CAF_NOSORT));
+		    if (dat->aflags & CAF_NOSORT)
+			mgroup->flags |= CGF_NOSORT;
 		}
 		/* Select the set of matches. */
 		oisalt = (dat->aflags & CAF_ALT);
@@ -5944,9 +5949,13 @@ makecomplistflags(Compctl cc, char *s, int incmd, int compadd)
     curcc = cc;
 
     mflags = 0;
-    if (cc->ylist || cc->gname) {
+    if (cc->gname) {
 	endcmgroup(NULL);
-	begcmgroup((cc->ylist ? NULL : cc->gname), cc->mask2 & CC_NOSORT);
+	begcmgroup(cc->gname, cc->mask2 & CC_NOSORT);
+    }
+    if (cc->ylist) {
+	endcmgroup(NULL);
+	begcmgroup(NULL, cc->mask2 & CC_NOSORT);
     }
     if (cc->mask & CC_REMOVE)
 	mflags |= CMF_REMOVE;
