@@ -52,7 +52,7 @@ void (*comp_setunsetptr) _((int, int));
 /* pointers to functions required by compctl and defined by zle */
 
 /**/
-int (*addmatchesptr) _((char *, char *, char *, char *, char *, char *, char *, char *, char *, char *, char *, int, int, Cmatcher, char *, char *, char *, char **));
+int (*addmatchesptr) _((Cadata, char **));
 
 /**/
 char *(*comp_strptr) _((int *, int *, int));
