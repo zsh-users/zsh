@@ -642,7 +642,7 @@ ihungetc(int c)
 {
     int doit = 1;
 
-    while (!lexstop) {
+    while (!lexstop && !errflag) {
 	if (hptr[-1] != (char) c && stophist < 4 &&
 	    hptr > chline + 1 && hptr[-1] == '\n' && hptr[-2] == '\\')
 	    hungetc('\n'), hungetc('\\');
