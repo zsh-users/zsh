@@ -1,3 +1,8 @@
+2001-05-15  Wayne Davison  <wayned@users.sourceforge.net>
+
+	* 14357: Src/hashtable.c, Src/hist.c, Src/zsh.h, Doc/Zsh/options.yo:
+	Added a "delayed drop" for ignored history entries.
+
 2001-05-15  Oliver Kiddle  <opk@zsh.org>
 
 	* 14355: Completion/Unix/Command/_modutils: fix bug where /sbin/lsmod
