@@ -1,3 +1,8 @@
+2003-12-05  Oliver Kiddle  <opk@zsh.org>
+
+	* 19276: Completion/Base/Completer/_prefix: fix fallback used to
+	get completer list if the style lookup failed
+
 2003-12-04  Oliver Kiddle  <opk@zsh.org>
 
 	* Baptiste Daroussin: 19272: Completion/Unix/Command/_chown,
