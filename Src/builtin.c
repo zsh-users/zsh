@@ -51,7 +51,7 @@ static struct builtin builtins[] =
     BUILTIN("chdir", 0, bin_cd, 0, 2, BIN_CD, NULL, NULL),
     BUILTIN("continue", BINF_PSPECIAL, bin_break, 0, 1, BIN_CONTINUE, NULL, NULL),
     BUILTIN("declare", BINF_TYPEOPTS | BINF_MAGICEQUALS | BINF_PSPECIAL, bin_typeset, 0, -1, 0, "AEFHLRTUZafghilrtux", NULL),
-    BUILTIN("dirs", 0, bin_dirs, 0, -1, 0, "v", NULL),
+    BUILTIN("dirs", 0, bin_dirs, 0, -1, 0, "clpv", NULL),
     BUILTIN("disable", 0, bin_enable, 0, -1, BIN_DISABLE, "afmr", NULL),
     BUILTIN("disown", 0, bin_fg, 0, -1, BIN_DISOWN, NULL, NULL),
     BUILTIN("echo", BINF_PRINTOPTS | BINF_ECHOPTS, bin_print, 0, -1, BIN_ECHO, "neE", "-"),
@@ -607,37 +607,44 @@ bin_dirs(char *name, char **argv, char *ops, int func)
 {
     LinkList l;
 
-    /* with the -v option, provide a numbered list of directories, starting at
-       zero */
     queue_signals();
-    if (ops['v']) {
+    /* with -v, -p or no arguments display the directory stack */
+    if (!(*argv || ops['c']) || ops['v'] || ops ['p']) {
 	LinkNode node;
+	char *fmt;
 	int pos = 1;
 
-	printf("0\t");
-	fprintdir(pwd, stdout);
+	/* with the -v option, display a numbered list, starting at zero */
+	if (ops['v']) {
+	    printf("0\t");
+	    fmt = "\n%d\t";
+	/* with the -p option, display entries one per line */
+	} else if (ops['p'])
+	    fmt = "\n";
+	else
+	    fmt = " ";
+	if (ops['l'])
+	    fputs(pwd, stdout);
+	else
+	    fprintdir(pwd, stdout);
 	for (node = firstnode(dirstack); node; incnode(node)) {
-	    printf("\n%d\t", pos++);
-	    fprintdir(getdata(node), stdout);
+	    printf(fmt, pos++);
+	    if (ops['l'])
+		fputs(getdata(node), stdout);
+	    else
+		fprintdir(getdata(node), stdout);
+
 	}
+	unqueue_signals();
 	putchar('\n');
-	unqueue_signals();
-	return 0;
-    }
-    /* given no arguments, list the stack normally */
-    if (!*argv) {
-	printdirstack();
-	unqueue_signals();
 	return 0;
     }
     /* replace the stack with the specified directories */
     l = znewlinklist();
-    if (*argv) {
-	while (*argv)
-	    zaddlinknode(l, ztrdup(*argv++));
-	freelinklist(dirstack, freestr);
-	dirstack = l;
-    }
+    while (*argv)
+	zaddlinknode(l, ztrdup(*argv++));
+    freelinklist(dirstack, freestr);
+    dirstack = l;
     unqueue_signals();
     return 0;
 }

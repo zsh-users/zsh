@@ -200,15 +200,30 @@ var(n)-1 loops and resume at the var(n)th enclosing loop.
 alias(declare)(typeset)
 findex(dirs)
 cindex(directory stack, printing)
-item(tt(dirs) [ tt(-v) ] [ var(arg) ... ])(
+xitem(tt(dirs) [ tt(-c) ] [ var(arg) ... ])
+item(tt(dirs) [ tt(-lpv) ])(
 With no arguments, print the contents of the directory stack.
-If the tt(-v) option is given, number the directories
-in the stack when printing.
 Directories are added to this stack with the tt(pushd) command,
 and removed with the tt(cd) or tt(popd) commands.
 If arguments are specified, load them onto the directory stack,
 replacing anything that was there, and push the current directory
 onto the stack.
+
+startitem()
+item(tt(-c))(
+clear the directory stack.
+)
+item(tt(-l))(
+print directory names in full instead of using of using tt(~) expressions.
+)
+item(tt(-p))(
+print directory entries one per line.
+)
+item(tt(-v))(
+number the directories in the stack when printing.
+)
+enditem()
+
 )
 findex(disable)
 cindex(disabling commands)

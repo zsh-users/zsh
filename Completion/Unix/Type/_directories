@@ -1,3 +1,5 @@
-#compdef rmdir df du dircmp dirs
+#compdef rmdir df du dircmp
 
-_path_files -/ "$@"
+local expl
+
+_wanted directories expl directory _files -/ "$@" -

@@ -1,3 +1,9 @@
+2002-02-20  Oliver Kiddle  <opk@zsh.org>
+
+	* 16619, 16676: Src/builtin.c, Doc/Zsh/builtins.yo,
+	Completion/Zsh/Command/_dirs, Completion/Unix/Type/_directories:
+	add -c, -l and -p options to the dirs builtin for bash compatibility
+
 2002-02-19  Clint Adams  <clint@zsh.org>
 
 	* 16673: zshconfig.ac, Doc/Zsh/.distfiles, Doc/Zsh/mod_langinfo.yo,
