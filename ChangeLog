@@ -29,7 +29,7 @@
 	early.
 
 	* 12220: Src/exec.c: print error message for unfound autoload
-	function body at lower locallevel.a
+	function body at lower locallevel.
 
 2000-07-10  Bart Schaefer  <schaefer@zsh.org>
 
