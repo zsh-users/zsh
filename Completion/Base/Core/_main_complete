@@ -35,8 +35,8 @@ typeset -U _lastdescr _comp_ignore _comp_colors
 
 zstyle -s ":completion:${curcontext}:" insert-tab tmp || tmp=no
 
-if [[ "$tmp" = *pending(|[[:blank:]]*) ||
-      ( "$tmp" = *pending=(#b)([0-9]##)(|[[:blank:]]*) && 
+if [[ ( "$tmp" = *pending(|[[:blank:]]*) && PENDING -gt 0 ) ||
+      ( "$tmp" = *pending=(#b)([0-9]##)(|[[:blank:]]*) &&
         PENDING -ge $match[1] ) ]]; then
   compstate[insert]=tab
 

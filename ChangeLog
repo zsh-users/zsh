@@ -1,3 +1,8 @@
+2001-06-20  Bart Schaefer  <schaefer@zsh.org>
+
+	* 14880: Completion/Base/Core/_main_complete: Fix insert-tab style
+	when value is `pending'.  (Belated commit, out of number order.)
+
 2001-06-20  Peter Stephenson  <pws@csr.com>
 
 	* 14988 with mod suggested in 14989: Src/exec.c: avoid names of
