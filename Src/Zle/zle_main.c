@@ -348,13 +348,12 @@ raw_getkey(int keytmout, char *cptr)
 {
     long exp100ths;
     int ret;
+#ifdef HAS_TIO
+    struct ttyinfo ti;
+#endif
 #ifndef HAVE_POLL
 # ifdef HAVE_SELECT
     fd_set foofd;
-# else
-#  ifdef HAS_TIO
-    struct ttyinfo ti;
-#  endif
 # endif
 #endif
 
@@ -379,9 +378,40 @@ raw_getkey(int keytmout, char *cptr)
 	    int i, errtry = 0, selret;
 # ifdef HAVE_POLL
 	    int poll_timeout;
-	    int nfds = keytmout ? 1 : 1 + nwatch;
+	    int nfds;
+	    struct pollfd *fds;
+# else
+	    int fdmax;
+	    struct timeval *tvptr;
+	    struct timeval expire_tv;
+# endif
+# if defined(HAS_TIO) && defined(sun)
+	    /*
+	     * Yes, I know this is complicated.  Yes, I know we
+	     * already have three bits of code to poll the terminal
+	     * down below.  No, I don't want to do this either.
+	     * However, it turns out on certain OSes, specifically
+	     * Solaris, that you can't poll typeahead for love nor
+	     * money without actually trying to read it.  But
+	     * if we are trying to select (and we need to if we
+	     * are watching other fd's) we won't pick that up.
+	     * So we just try and read it without blocking in
+	     * the time-honoured (i.e. absurdly baroque) termios
+	     * fashion.
+	     */
+	    gettyinfo(&ti);
+	    ti.tio.c_cc[VMIN] = 0;
+	    settyinfo(&ti);
+	    ret = read(SHTTY, cptr, 1);
+	    ti.tio.c_cc[VMIN] = 1;
+	    settyinfo(&ti);
+	    if (ret > 0)
+		return 1;
+# endif
+# ifdef HAVE_POLL
+	    nfds = keytmout ? 1 : 1 + nwatch;
 	    /* First pollfd is SHTTY, following are the nwatch fds */
-	    struct pollfd *fds = zalloc(sizeof(struct pollfd) * nfds);
+	    fds = zalloc(sizeof(struct pollfd) * nfds);
 	    if (exp100ths)
 		poll_timeout = exp100ths * 10;
 	    else
@@ -400,9 +430,8 @@ raw_getkey(int keytmout, char *cptr)
 		}
 	    }
 # else
-	    int fdmax = SHTTY;
-	    struct timeval *tvptr = NULL;
-	    struct timeval expire_tv;
+	    fdmax = SHTTY;
+	    tvptr = NULL;
 	    if (exp100ths) {
 		expire_tv.tv_sec = exp100ths / 100;
 		expire_tv.tv_usec = (exp100ths % 100) * 10000L;

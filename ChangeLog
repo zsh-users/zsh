@@ -1,5 +1,8 @@
 2003-02-14  Peter Stephenson  <pws@csr.com>
 
+	* 18243: Src/Zle/zle_main.c: On Solaris, poll the tty for
+	typeahead before selecting.
+
 	* modified from 18236: zshconfig.ac, Etc/MACHINES: Attempt to fix
 	HP-UX problem with curses, which apparently failed; however, it is
 	documented in MACHINES.
