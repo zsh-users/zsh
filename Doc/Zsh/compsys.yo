@@ -309,14 +309,19 @@ takes arguments.
 
 The completion system represents such a context as a hierarchical name 
 with components separated by colons. For example the name
-tt(:complete:dvips:-o-1) is used when completing the first argument of 
+tt(:complete::dvips::-o-1) is used when completing the first argument of 
 the tt(-o) option of the tt(dvips) command. The tt(:complete) at the
 beginning just says that we are currently trying completion as opposed 
 to, say, correction, which can also be done using the function based
 completion system (see
 ifzman(the section `Control Functions' below)\
 ifnzman(noderef(Control Functions)) 
-for more information).
+for more information). And the tt(::dvips:) shows that we are
+completing arguments for the tt(dvips) command. Such a doubled colon
+will appear only before and after the name of the command, but note
+that the second colon after the command name is really only added when 
+there is at least one more component (otherwise the whole name ends in 
+a colon).
 
 In many of the possible contexts the completion system can generate
 matches, and often it can generate multiple types of matches. Whenever 
@@ -344,7 +349,7 @@ this definition for tt(_sort_tags):
 
 example(_sort_tags() {
   case $curcontext in
-  (*:dvips:*)
+  (*::dvips:*)
     comptry globbed-files directories
     comptry all-files
     ;;
@@ -419,7 +424,7 @@ last tt(comptry). For example:
 example(_sort_tags() {
   ...
   case $curcontext in
-  (*:kill:*)
+  (*::kill:*)
     comptry processes
     return
     ;;
@@ -481,7 +486,7 @@ and the command lines of the processes (the latter is achieved by
 calling the tt(ps) command). To make this builtin list the matches
 only as numbers one could call:
 
-example(compstyle '*:kill:*' description no)
+example(compstyle '*::kill:*' description no)
 
 And if one wants to see the command lines for processes but not the
 job texts one could use the fact that the tag name is appended to the
@@ -489,14 +494,14 @@ context name when styles are looked up and instead of the previous
 call use (remember that the function for the tt(kill) builtin command
 uses the tags tt(jobs) and tt(processes)): 
 
-example(compstyle '*:kill*:jobs' description no)
+example(compstyle '*::kill:*:jobs' description no)
 
 As said above, the patterns given to the tt(compstyle) function are
 tested in the order in which they were given. But that isn't
 completely true. In fact, this function roughly sorts the patterns so
 that more specialized patterns are compared before more general
 patterns. Due to this, the last two examples could be defined after
-the first one because both `tt(*:kill:*)' and `tt(*:kill*:jobs)' are
+the first one because both `tt(*::kill:*)' and `tt(*::kill:*:jobs)' are
 considered to be more specific then the pattern `tt(*)' from the first
 example. To decide how specific a pattern is, the function looks at 
 the number of colons (corresponding to the number of components) used

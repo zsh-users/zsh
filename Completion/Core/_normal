@@ -26,14 +26,16 @@ else
   if [[ "$command[1]" == '=' ]]; then
     eval cmd1\=$command
     cmd2="$command[2,-1]"
+    curcontext="${curcontext}::${cmd1}:"
   elif [[ "$command" == */* ]]; then
     cmd1="$command"
     cmd2="${command:t}"
+    curcontext="${curcontext}::${cmd1}:"
   else
     cmd1="$command"
     cmd2="$commands[$command]"
+    curcontext="${curcontext}::${cmd1}:"
   fi
-  curcontext="${curcontext}:${cmd1}"
 fi
 
 # See if there are any matching pattern completions.
