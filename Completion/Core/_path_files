@@ -5,7 +5,7 @@
 
 local linepath realpath donepath prepath testpath exppath
 local tmp1 tmp2 tmp3 tmp4 i orig eorig pre suf tpre tsuf opre osuf cpre
-local pats haspats=no ignore group expl addpfx addsfx remsfx
+local pats haspats=no ignore group expl addpfx addsfx remsfx rem remt
 local nm=$compstate[nmatches] menu mspec matcher mopts atmp sort match
 
 typeset -U prepaths exppaths
@@ -300,8 +300,31 @@ for prepath in "$prepaths[@]"; do
       tmp2=( ${^tmp1}${^~pats} )
       [[ ! -o globdots && "$PREFIX" = .* ]] &&
           tmp2=( "$tmp2[@]" ${^tmp1}.${^~pats} )
+      if (( $#tmp2 )) &&
+         zstyle -s ":completion${curcontext}:files" ignore-parents rem &&
+	 [[ ( "$rem" != *dir* || "$pats" = '*(-/)' ) &&
+	    ( "$rem" != *..* || "$tmp1" = *../* ) ]]; then
+        if [[ "$rem" = *parent* ]]; then
+	  for i in "$tmp2[@]"; do
+	    if [[ -d "$i" && "$i" = */* ]]; then
+	      remt="${i/*}"
+	      while [[ "$remt" = */* ]]; do
+		[[ "$remt" -ef "$i" ]] && break
+		remt="${remt%/*}"
+	      done
+	      [[ "$remt" = */* || "$remt" -ef "$i" ]] &&
+	          _comp_ignore=( "$_comp_ignore[@]" "${(q)i}" )
+	    fi
+	  done
+        fi
+        if [[ "$rem" = *pwd* ]]; then
+          for i in "$tmp2[@]"; do
+	    [[ "$i" -ef "$PWD" ]] && _comp_ignore=( "$_comp_ignore[@]" "${(q)i}" )
+	  done
+        fi
+      fi
       if [[ "$sopt" = *[/f]* && ( -o globdots || "$PREFIX" = .* ) ]] &&
-	 zstyle -s ":completion${curcontext}:paths" special-dirs atmp; then
+	  zstyle -s ":completion${curcontext}:paths" special-dirs atmp; then
 	if [[ "$atmp" = (yes|true|1|on) ]]; then
 	  tmp2=( "$tmp2[@]" . .. )
 	elif [[ "$atmp" = .. ]]; then

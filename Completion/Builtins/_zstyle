@@ -28,6 +28,7 @@ styles=(
   hosts			 c:_hosts
   hosts-ports		 c:host-port
   hosts-ports-users	 c:host-port-user
+  ignore-parents         c:ignorepar
   ignored-patterns	 c:
   insert-unambiguous	 c:bool
   last-prompt		 c:bool
@@ -165,6 +166,11 @@ while [[ -n $state ]]; do
       else
 	_users
       fi
+      ;;
+
+    ignorepar)
+      _wanted values expl 'which parents to ignore' &&
+        compadd "$expl[@]" parent pwd .. directory
       ;;
 
     _*)

@@ -876,6 +876,29 @@ item(tt(hosts-ports-users))(
 Like tt(hosts-ports) but used for commands like tt(telnet) and
 containing strings of the form `var(host)tt(:)var(port)tt(:)var(user)'.
 )
+item(tt(ignore-parents))(
+When completing files it is possible to make names of directories
+already mentioned on the line or the current working directory be
+ignored. The style is tested for the tt(files) tag and if its value
+contains the string tt(parent), then the name of any directory whose
+path is already contained in the word on the line is ignored. For
+example, when completing after tt(foo/../), the directory tt(foo) will
+not be considered a valid completion.
+
+If the style contains the string tt(pwd), then the name of the current 
+working directory will not be completed, so that, for example,
+completion after tt(../) will not use the name of the current
+directory.
+
+If the style contains the string tt(..) both tests will only be
+performed if the word on the line contains the substring tt(../) and
+if the value contains the string tt(directory), then the tests will
+only be performed if only names of directories are completed.
+
+Note that names of directories ignored because of one of the tests
+will be placed in the alternate set of completions so that they will
+be completed if there are no other possible completions.
+)
 item(tt(ignored-patterns))(
 This style is used with the tags used when adding matches and gives a
 number of patterns. All matches that are matched by any of these
