@@ -232,6 +232,20 @@ printulimit(int lim, int hard, int head)
 	    limit /= 1024;
 	break;
 # endif /* RLIMIT_AIO_MEM */
+# ifdef RLIMIT_SBSIZE
+    case RLIMIT_SBSIZE:
+	if (head)
+	    printf("socket buffer size (kb)    ");
+	if (limit != RLIM_INFINITY)
+	    limit /= 1024;
+	break;
+# endif /* RLIMIT_SBSIZE */
+# ifdef RLIMIT_PTHREAD
+    case RLIMIT_PTHREAD:
+	if (head)
+	    printf("threads per process        ");
+	break;
+# endif /* RLIMIT_PTHREAD */
     }
     /* display the limit */
     if (limit == RLIM_INFINITY)
