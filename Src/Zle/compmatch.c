@@ -1705,11 +1705,17 @@ sub_join(Cline a, Cline b, Cline e, int anew)
 	    a->prefix = cp_cline(ca, 0);
 
 	    if (anew) {
+		int f = e->flags;
+
 		join_psfx(e, a, NULL, NULL, 0);
+		e->flags = f;
 		if (e->prefix)
 		    return max - min;
 	    } else {
+		int f = e->flags;
+
 		join_psfx(a, e, NULL, NULL, 0);
+		e->flags = f;
 		if (a->prefix)
 		    return max - min;
 	    }

@@ -1,5 +1,8 @@
 2000-04-07  Sven Wischnowsky <wischnow@informatik.hu-berlin.de>
 
+	* 10573: Src/Zle/compmatch.c: cursor placed on wrong word part
+ 	with ** match spec
+	
 	* 10571: Completion/Core/_main_complete,
  	Completion/Core/_path_files: missing initialisations, -W with
  	multiple directories didn't work
