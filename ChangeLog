@@ -1,3 +1,7 @@
+2005-03-28  Wayne Davison  <wayned@users.sourceforge.net>
+
+	* unposted: Completion/Unix/Command/_rsync: added --protocol.
+
 2005-03-21  Peter Stephenson  <pws@csr.com>
 
 	* 21045: Src/Zle/compcore.c, Src/Zle/complete.c: more places
@@ -37,7 +41,7 @@
 
 2005-03-02  Wayne Davison  <wayned@users.sourceforge.net>
 
-	* unposted: Completion/Unix/Command/_make: Don't try to expand
+	* 20917: Completion/Unix/Command/_make: Don't try to expand
 	a single-character Makefile variable if it is a digit.  Avoids
 	an infinite recursion from a Makefile referencing $1.
 
