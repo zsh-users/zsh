@@ -50,7 +50,6 @@ deletehookfunc
 deleteparamdefs
 deleteparamtable
 deletewrapper
-domatch
 dosetopt
 doshfunc
 down_histent
@@ -177,10 +176,11 @@ paramtab
 parbegin
 parend
 parse_string
-parsereg
 parsestr
+patcompile
 path
 pathchecked
+pattry
 popheap
 postedit
 ppid

@@ -178,8 +178,13 @@ execselect(Cmd cmd, LinkList args, int flags)
 	for (;;) {
 	    if (empty(bufstack)) {
 	    	if (interact && SHTTY != -1 && isset(USEZLE)) {
+		    int oef = errflag;
+
 		    isfirstln = 1;
 		    str = (char *)zleread(prompt3, NULL, 0);
+		    if (errflag)
+			str = NULL;
+		    errflag = oef;
 	    	} else {
 		    str = promptexpand(prompt3, 0, NULL, NULL);
 		    zputs(str, stderr);

@@ -227,7 +227,8 @@ struct cmatch {
 #define CMF_FILE     1		/* this is a file */
 #define CMF_REMOVE   2		/* remove the suffix */
 #define CMF_PARBR    4		/* paramter expansion with a brace */
-#define CMF_NOLIST   8		/* should not be listed */
+#define CMF_PARNEST  8		/* nested paramter expansion */
+#define CMF_NOLIST  16		/* should not be listed */
 
 
 /* Stuff for completion matcher control. */

@@ -260,6 +260,7 @@ typedef struct builtin   *Builtin;
 typedef struct nameddir  *Nameddir;
 typedef struct module    *Module;
 
+typedef struct patprog   *Patprog;
 typedef struct process   *Process;
 typedef struct job       *Job;
 typedef struct value     *Value;
@@ -270,7 +271,6 @@ typedef struct cmd       *Cmd;
 typedef struct pline     *Pline;
 typedef struct sublist   *Sublist;
 typedef struct list      *List;
-typedef struct comp      *Comp;
 typedef struct redir     *Redir;
 typedef struct complist  *Complist;
 typedef struct heap      *Heap;
@@ -905,6 +905,57 @@ struct hookdef {
 #define HOOKF_ALL 1
 
 #define HOOKDEF(name, func, flags) { NULL, name, (Hookfn) func, flags, NULL }
+
+/*
+ * Types used in pattern matching.  Most of these longs could probably
+ * happily be ints.
+ */
+
+#define NSUBEXP  10
+struct patprog {
+    long		startoff;  /* length before start of programme */
+    long		size;	   /* total size from start of struct */
+    long		mustoff;   /* offset to string that must be present */
+    int			globflags; /* globbing flags to set at start */
+    int			globend;   /* globbing flags set after finish */
+    int			flags;	   /* PAT_* flags */
+    int			patmlen;
+    char		patstartch;
+#ifdef BACKREFERENCES
+    unsigned char *	ppStartp[NSUBEXP];
+    unsigned char *	ppEndp[NSUBEXP];
+};
+
+/* Same as patprog, but without the backreference storage.
+ * Note the calling code must test PAT_BACKR to know which is
+ * which, since they are both passed back as a Patprog.
+ */
+
+struct patprog_short {
+    long		startoff;
+    long		size;
+    long		mustoff;
+    int			globflags;
+    int			globend;
+    int			flags;
+    int			patmlen;
+    char		patstartch;
+#endif
+};
+
+/* Flags used in pattern matchers (Patprog) and passed down to patcompile */
+
+#define PAT_FILE	0x0001	/* Pattern is a file name */
+#define PAT_FILET	0x0002	/* Pattern is top level file, affects ~ */
+#define PAT_ANY		0x0004	/* Match anything (cheap "*") */
+#define PAT_NOANCH	0x0008	/* Not anchored at end */
+#define PAT_NOGLD	0x0010	/* Don't glob dots */
+#define PAT_PURES	0x0020	/* Pattern is a pure string: set internally */
+#define PAT_STATIC	0x0040	/* Don't copy pattern to heap as per default */
+#define PAT_SCAN	0x0080	/* Scanning, so don't try must-match test */
+#ifdef BACKREFERENCES
+#define PAT_BACKR	0x0100	/* Parentheses make backreferences */
+#endif
 
 /* node used in parameter hash table (paramtab) */
 

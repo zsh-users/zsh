@@ -285,11 +285,12 @@ Note that no preprocessing is done on the strings. This means that
 no substitutions are performed on them and that they will be
 tokenized. There are three helper functions available:
 
-  - char *cond_str(args, num)
+  - char *cond_str(args, num, raw)
     The first argument is the array of strings the handler function
     got as an argument and the second one is an index into this array.
     The return value is the num'th string from the array with
-    substitutions performed and untokenized.
+    substitutions performed. If the last argument is zero, the string
+    will also be untokenized.
   - long cond_val(args, num)
     The arguments are the same as for cond_str(). The return value is
     the result of the mathematical evaluation of the num'th string

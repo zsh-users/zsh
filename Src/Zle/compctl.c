@@ -1947,25 +1947,25 @@ do_comp_vars(int test, int na, char *sa, int nb, char *sb, int mod)
 
 	    if (compcurrent - 1 < na || compcurrent - 1 > nb)
 		return 0;
-
-	    restrict_range(na, nb);
+	    if (mod)
+		restrict_range(na, nb);
 	    return 1;
 	}
     case CVT_RANGEPAT:
 	{
 	    char **p;
 	    int i, l = arrlen(compwords), t = 0, b = 0, e = l - 1;
-	    Comp c;
+	    Patprog pp;
 
 	    i = compcurrent - 1;
 	    if (i < 0 || i >= l)
 		return 0;
 
 	    singsub(&sa);
-	    c = parsereg(sa);
+	    pp = patcompile(sa, PAT_STATIC, NULL);
 
 	    for (i--, p = compwords + i; i >= 0; p--, i--) {
-		if (domatch(*p, c, 0)) {
+		if (pattry(pp, *p)) {
 		    b = i + 1;
 		    t = 1;
 		    break;
@@ -1975,10 +1975,10 @@ do_comp_vars(int test, int na, char *sa, int nb, char *sb, int mod)
 		int tt = 0;
 
 		singsub(&sb);
-		c = parsereg(sb);
+		pp = patcompile(sb, PAT_STATIC, NULL);
 
 		for (i++, p = compwords + i; i < l; p++, i++) {
-		    if (domatch(*p, c, 0)) {
+		    if (pattry(pp, *p)) {
 			e = i - 1;
 			tt = 1;
 			break;
@@ -1989,7 +1989,7 @@ do_comp_vars(int test, int na, char *sa, int nb, char *sb, int mod)
 	    }
 	    if (e < b)
 		t = 0;
-	    if (t)
+	    if (t && mod)
 		restrict_range(b, e);
 	    return t;
 	}
@@ -2011,12 +2011,12 @@ do_comp_vars(int test, int na, char *sa, int nb, char *sb, int mod)
     case CVT_PREPAT:
     case CVT_SUFPAT:
 	{
-	    Comp c;
+	    Patprog pp;
 
 	    if (!na)
 		return 0;
 
-	    if (!(c = parsereg(sa)))
+	    if (!(pp = patcompile(sa, PAT_STATIC, 0)))
 		return 0;
 
 	    if (test == CVT_PREPAT) {
@@ -2036,15 +2036,15 @@ do_comp_vars(int test, int na, char *sa, int nb, char *sb, int mod)
 		for (; l; l--, p += add) {
 		    sav = *p;
 		    *p = '\0';
-		    test = domatch(compprefix, c, 0);
+		    test = pattry(pp, compprefix);
 		    *p = sav;
 		    if (test && !--na)
 			break;
 		}
 		if (!l)
 		    return 0;
-
-		ignore_prefix(p - compprefix);
+		if (mod)
+		    ignore_prefix(p - compprefix);
 	    } else {
 		int l, ol, add;
 		char *p;
@@ -2060,13 +2060,13 @@ do_comp_vars(int test, int na, char *sa, int nb, char *sb, int mod)
 		    add = -1;
 		}
 		for (; l; l--, p += add)
-		    if (domatch(p, c, 0) && !--na)
+		    if (pattry(pp, p) && !--na)
 			break;
 
 		if (!l)
 		    return 0;
-
-		ignore_suffix(ol - (p - compsuffix));
+		if (mod)
+		    ignore_suffix(ol - (p - compsuffix));
 	    }
 	    return 1;
 	}
@@ -2126,9 +2126,11 @@ bin_compset(char *name, char **argv, char *ops, int func)
     case CVT_RANGEPAT:
 	tokenize(sa);
 	sa = rembslash(sa);
+	remnulargs(sa);
 	if (sb) {
 	    tokenize(sb);
 	    sb = rembslash(sb);
+	    remnulargs(sb);
 	}
 	break;
     case CVT_PRENUM:
@@ -2144,6 +2146,7 @@ bin_compset(char *name, char **argv, char *ops, int func)
 	    na = -1;
 	tokenize(sa);
 	sa = rembslash(sa);
+	remnulargs(sa);
 	break;
     }
     return !do_comp_vars(test, na, sa, nb, sb, 1);
@@ -2469,10 +2472,10 @@ cond_psfix(char **a, int id)
 {
     if (comp_check()) {
 	if (a[1])
-	    return do_comp_vars(id, cond_val(a, 0), cond_str(a, 1),
+	    return do_comp_vars(id, cond_val(a, 0), cond_str(a, 1, 1),
 				0, NULL, 0);
 	else
-	    return do_comp_vars(id, -1, cond_str(a, 0), 0, NULL, 0);
+	    return do_comp_vars(id, -1, cond_str(a, 0, 1), 0, NULL, 0);
     }
     return 0;
 }
@@ -2481,8 +2484,8 @@ cond_psfix(char **a, int id)
 static int
 cond_range(char **a, int id)
 {
-    return do_comp_vars(CVT_RANGEPAT, 0, cond_str(a, 0), 0,
-			(id ? cond_str(a, 1) : NULL), 0);
+    return do_comp_vars(CVT_RANGEPAT, 0, cond_str(a, 0, 1), 0,
+			(id ? cond_str(a, 1, 1) : NULL), 0);
 }
 
 static struct builtin bintab[] = {

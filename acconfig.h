@@ -198,6 +198,9 @@
 /* Define to 1 if there is a prototype defined for ioctl() on your system */
 #undef HAVE_IOCTL_PROTO
 
+/* Define to 1 if select() is defined in <sys/socket.h>, ie BeOS R4.51*/
+#undef SELECT_IN_SYS_SOCKET_H
+
 /* Define to 1 if system has working FIFO's */
 #undef HAVE_FIFOS
 
@@ -215,6 +218,21 @@
 
 /* Define to 1 if /bin/sh does not interpret \ escape sequences */
 #undef SH_USE_BSD_ECHO
+
+/* Define to 1 if system has working link() */
+#undef HAVE_LINK
+
+/* Define to 1 if kill(pid, 0) doesn't return ESRCH, ie BeOS R4.51 */
+#undef BROKEN_KILL_ESRCH
+
+/* Define to 1 if sigsuspend() is broken, ie BeOS R4.51 */
+#undef BROKEN_POSIX_SIGSUSPEND
+
+/* Define to 1 if getpwnam() is faked, ie BeOS R4.51 */
+#undef GETPWNAM_FAKED
+
+/* Define to 1 if tcsetpgrp() doesn't work, ie BeOS R4.51 */
+#undef BROKEN_TCSETPGRP
 
 /* Define to 1 if an underscore has to be prepended to dlsym() argument */
 #undef DLSYM_NEEDS_UNDERSCORE

@@ -74,7 +74,7 @@ zsh.dvi: zsh.texi
 	$(TEXI2DVI) $(sdir)/zsh.texi
 
 zsh.info: zsh.texi
-	$(MAKEINFO) $(sdir)/zsh.texi; exit 0
+	$(MAKEINFO) $(sdir)/zsh.texi || exit 0
 
 zsh.texi: zsh.yo
 	$(YODL) -o $(sdir)/zsh.texi -I$(sdir) -w ztexi.yo version.yo zsh.yo

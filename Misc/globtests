@@ -14,6 +14,11 @@ while read res str pat; do
     (( failed++ ))
   fi
 done <<EOT
+# a few simple things certain nameless idiots have been known to mess up
+t foo~                foo~
+t foo.c               *.c~boo*
+f foo.c               *.c~boo*~foo*
+# closures
 t fofo                (fo#)#
 t ffo                 (fo#)#
 t foooofo             (fo#)#
@@ -95,6 +100,8 @@ t zoox          (^z*|*x)
 t foo           (^foo)#
 f foob          (^foo)b*
 t foobb         (^foo)b*
+f foob          (*~foo)b*
+t foobb         (*~foo)b*
 f zsh           ^z*
 t a%1X          [[:alpha:][:punct:]]#[[:digit:]][^[:lower:]]
 f a%1           [[:alpha:][:punct:]]#[[:digit:]][^[:lower:]]
@@ -115,6 +122,16 @@ f fooxx         ((#i)FOOX)X
 f BAR           (bar|(#i)foo)
 t FOO           (bar|(#i)foo)
 t Modules       (#i)*m*
+t fooGRUD       (#i)(bar|(#I)foo|(#i)rod)grud
+f FOOGRUD       (#i)(bar|(#I)foo|(#i)rod)grud
+t readme        (#i)readme~README|readme
+# the readme doesn't get excluded the second time...
+t readme        (#i)readme~README|readme~README
+# Ranges with backtracking
+t 633           <1-1000>33
+t 633           <-1000>33
+t 633           <1->33
+t 633           <->33
 # Approximate matching
 t READ.ME       (#ia1)readme
 f READ..ME      (#ia1)readme
@@ -143,6 +160,8 @@ t dcba          (#a3)abcd
 t aabaXaaabY    (#a1)(a#b)#Y
 t aabaXaaabY    (#a1)(a#b)(a#b)Y
 t aaXaaaaabY    (#a1)(a#b)(a#b)Y
+t aaaXaaabY     (#a1)(a##b)##Y
+t aaaXbaabY     (#a1)(a##b)##Y
 f read.me       (#ia1)README~READ.ME
 t read.me       (#ia1)README~READ_ME
 f read.me       (#ia1)README~(#a1)READ_ME

@@ -1,3 +1,54 @@
+1999-08-06  Peter Stephenson  <pws@ibmth.df.unipi.it>
+
+	* pws: Config/version.mk: 3.1.6-pws-1 made available.
+
+	* Sven: 7386: Src/subst.c: Order of q and Q parameter flags matters.
+
+1999-08-05  Peter Stephenson  <pws@ibmth.df.unipi.it>
+
+	* Sven: 7380: Src/hist.c, Src/subst.c, Doc/Zsh/expn.yo: flag X for
+	  reporting errors de-quoting.
+
+	* Sven: 7374: Src/subst.c, Doc/Zsh/expn.yo: modifier to remove one
+	  level of quotation, corresponding flags.
+
+	* Sven: 7373: Src/Zle/comp.h, Src/Zle/zle_tricky.c,
+	  Completion/Base/_brace_parameter:  support nested parameter
+	  expansion type of deal.
+
+1999-08-04  Peter Stephenson  <pws@ibmth.df.unipi.it>
+
+	* Sven: 7355: Src/Zle/compctl.c, Src/Zle/zle_tricky.c: make
+	  compadd quoting consistent with compgen.	
+
+1999-08-02  Peter Stephenson  <pws@ibmth.df.unipi.it>
+
+	* Sven: 7349: Src/loop.c, Src/signals.c:  restore errflags in
+	  select after a zleread; fix problem restoring function-style trap
+	  after a function set it to something else.
+
+	* Sven: 7348: Completion/Core/_path_files, Doc/Zsh/compsys.yo:
+	  remove path_keepdir configuration key but don't do keepdir
+	  trick unless _files had no type arguments.
+
+	* Sven: 7345, 7346, 7347: Src/Zle/zle_tricky.c: match control
+	  problems.
+
+	* Sven: 7344, 7353: Src/cond.c, Src/Modules/example.c,
+	  Src/Zle/compctl.c, Util/zsh-development-guide:  conditions can
+	  get the tokenized string; better quoting behaviour in
+	  IPREFIX/ISUFFIX.
+
+	* Sven: 7343: Src/Zle/zle_tricky.c: quote path prefix and suffix
+	  earlier.
+
+	* pws: 7342: Doc/Makfile.in: use makeinfo ... || exit 0 to
+	  ignore result of makeinfo.
+
+	* Irving Wolfe: 7336: utils.c: same fcntl() change.
+
+	* Geoff: 7335: init.c: third argument for fcntl().
+
 1999-08-01  Peter Stephenson  <pws@ibmth.df.unipi.it>
 
 	* pws: Config/version.mk: zsh 3.1.6 released.

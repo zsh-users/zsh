@@ -86,6 +86,10 @@ static struct builtin builtins[] =
     BUILTIN("mem", 0, bin_mem, 0, 0, 0, "v", NULL),
 #endif
 
+#if defined(ZSH_PAT_DEBUG)
+    BUILTIN("patdebug", 0, bin_patdebug, 1, -1, 0, "p", NULL),
+#endif
+
     BUILTIN("popd", 0, bin_cd, 0, 2, BIN_POPD, NULL, NULL),
     BUILTIN("print", BINF_PRINTOPTS, bin_print, 0, -1, BIN_PRINT, "RDPbnrslzNu0123456789pioOcm-", NULL),
     BUILTIN("pushd", 0, bin_cd, 0, 2, BIN_PUSHD, NULL, NULL),
@@ -377,7 +381,7 @@ bin_enable(char *name, char **argv, char *ops, int func)
     HashTable ht;
     HashNode hn;
     ScanFunc scanfunc;
-    Comp com;
+    Patprog pprog;
     int flags1 = 0, flags2 = 0;
     int match = 0, returnval = 0;
 
@@ -414,8 +418,8 @@ bin_enable(char *name, char **argv, char *ops, int func)
 	for (; *argv; argv++) {
 	    /* parse pattern */
 	    tokenize(*argv);
-	    if ((com = parsereg(*argv)))
-		match += scanmatchtable(ht, com, 0, 0, scanfunc, 0);
+	    if ((pprog = patcompile(*argv, PAT_STATIC, 0)))
+		match += scanmatchtable(ht, pprog, 0, 0, scanfunc, 0);
 	    else {
 		untokenize(*argv);
 		zwarnnam(name, "bad pattern : %s", *argv, 0);
@@ -1174,7 +1178,7 @@ bin_fc(char *nam, char **argv, char *ops, int func)
     int first = -1, last = -1, retval, minflag = 0;
     char *s;
     struct asgment *asgf = NULL, *asgl = NULL;
-    Comp com = NULL;
+    Patprog pprog = NULL;
 
     /* fc is only permitted in interactive shells */
     if (!interact) {
@@ -1185,7 +1189,7 @@ bin_fc(char *nam, char **argv, char *ops, int func)
      * as a pattern that history lines have to match   */
     if (*argv && ops['m']) {
 	tokenize(*argv);
-	if (!(com = parsereg(*argv++))) {
+	if (!(pprog = patcompile(*argv++, 0, NULL))) {
 	    zwarnnam(nam, "invalid match pattern", NULL, 0);
 	    return 1;
 	}
@@ -1257,7 +1261,7 @@ bin_fc(char *nam, char **argv, char *ops, int func)
 	/* list the required part of the history */
 	retval = fclist(stdout, !ops['n'], ops['r'], ops['D'],
 			ops['d'] + ops['f'] * 2 + ops['E'] * 4 + ops['i'] * 8,
-			first, last, asgf, com);
+			first, last, asgf, pprog);
     else {
 	/* edit history file, and (if successful) use the result as a new command */
 	int tempfd;
@@ -1271,7 +1275,7 @@ bin_fc(char *nam, char **argv, char *ops, int func)
 		((out = fdopen(tempfd, "w")) == NULL)) {
 	    zwarnnam("fc", "can't open temp file: %e", NULL, errno);
 	} else {
-	    if (!fclist(out, 0, ops['r'], 0, 0, first, last, asgf, com)) {
+	    if (!fclist(out, 0, ops['r'], 0, 0, first, last, asgf, pprog)) {
 		char *editor;
 
 		editor = auxdata ? auxdata : getsparam("FCEDIT");
@@ -1372,7 +1376,7 @@ fcsubs(char **sp, struct asgment *sub)
 
 /**/
 static int
-fclist(FILE *f, int n, int r, int D, int d, int first, int last, struct asgment *subs, Comp com)
+fclist(FILE *f, int n, int r, int D, int d, int first, int last, struct asgment *subs, Patprog pprog)
 {
     int fclistdone = 0;
     char *s;
@@ -1400,7 +1404,7 @@ fclist(FILE *f, int n, int r, int D, int d, int first, int last, struct asgment 
     for (;;) {
 	s = dupstring(ent->text);
 	/* this if does the pattern matching, if required */
-	if (!com || domatch(s, com, 0)) {
+	if (!pprog || pattry(pprog, s)) {
 	    /* perform substitution */
 	    fclistdone |= fcsubs(&s, subs);
 
@@ -1775,7 +1779,7 @@ bin_typeset(char *name, char **argv, char *ops, int func)
 {
     Param pm;
     Asgment asg;
-    Comp com;
+    Patprog pprog;
     char *optstr = "aiALRZlurtxUT";
     int on = 0, off = 0, roff, bit = PM_ARRAY;
     int i;
@@ -1914,7 +1918,7 @@ bin_typeset(char *name, char **argv, char *ops, int func)
 	    LinkNode pmnode;
 
 	    tokenize(asg->name);   /* expand argument */
-	    if (!(com = parsereg(asg->name))) {
+	    if (!(pprog = patcompile(asg->name, 0, NULL))) {
 		untokenize(asg->name);
 		zwarnnam(name, "bad pattern : %s", argv[-1], 0);
 		returnval = 1;
@@ -1934,7 +1938,7 @@ bin_typeset(char *name, char **argv, char *ops, int func)
 		    if (((pm->flags & PM_RESTRICTED) && isset(RESTRICTED)) ||
 			(pm->flags & PM_UNSET))
 			continue;
-		    if (domatch(pm->nam, com, 0))
+		    if (pattry(pprog, pm->nam))
 			addlinknode(pmlist, pm);
 		}
 	    }
@@ -1974,7 +1978,7 @@ bin_typeset(char *name, char **argv, char *ops, int func)
 int
 bin_functions(char *name, char **argv, char *ops, int func)
 {
-    Comp com;
+    Patprog pprog;
     Shfunc shf;
     int i, returnval = 0;
     int on = 0, off = 0, pflags = 0;
@@ -2018,16 +2022,18 @@ bin_functions(char *name, char **argv, char *ops, int func)
 	for (; *argv; argv++) {
 	    /* expand argument */
 	    tokenize(*argv);
-	    if ((com = parsereg(*argv))) {
+	    if ((pprog = patcompile(*argv, PAT_STATIC, 0))) {
 		/* with no options, just print all functions matching the glob pattern */
 		if (!(on|off)) {
-		    scanmatchtable(shfunctab, com, 0, DISABLED,
+		    scanmatchtable(shfunctab, pprog, 0, DISABLED,
 				   shfunctab->printnode, pflags);
 		} else {
 		/* apply the options to all functions matching the glob pattern */
 		    for (i = 0; i < shfunctab->hsize; i++) {
-			for (shf = (Shfunc) shfunctab->nodes[i]; shf; shf = (Shfunc) shf->next)
-			    if (domatch(shf->nam, com, 0) && !(shf->flags & DISABLED))
+			for (shf = (Shfunc) shfunctab->nodes[i]; shf;
+			     shf = (Shfunc) shf->next)
+			    if (pattry(pprog, shf->nam) &&
+				!(shf->flags & DISABLED))
 				shf->flags = (shf->flags | on) & (~off);
 		    }
 		}
@@ -2097,7 +2103,7 @@ int
 bin_unset(char *name, char **argv, char *ops, int func)
 {
     Param pm, next;
-    Comp com;
+    Patprog pprog;
     char *s;
     int match = 0, returnval = 0;
     int i;
@@ -2111,14 +2117,15 @@ bin_unset(char *name, char **argv, char *ops, int func)
 	while ((s = *argv++)) {
 	    /* expand */
 	    tokenize(s);
-	    if ((com = parsereg(s))) {
+	    if ((pprog = patcompile(s, PAT_STATIC, NULL))) {
 		/* Go through the parameter table, and unset any matches */
 		for (i = 0; i < paramtab->hsize; i++) {
 		    for (pm = (Param) paramtab->nodes[i]; pm; pm = next) {
 			/* record pointer to next, since we may free this one */
 			next = (Param) pm->next;
 			if ((!(pm->flags & PM_RESTRICTED) ||
-			    unset(RESTRICTED)) && domatch(pm->nam, com, 0)) {
+			    unset(RESTRICTED)) &&
+			    pattry(pprog, pm->nam)) {
 			    unsetparam_pm(pm, 0, 1);
 			    match++;
 			}
@@ -2184,7 +2191,7 @@ int
 bin_whence(char *nam, char **argv, char *ops, int func)
 {
     HashNode hn;
-    Comp com;
+    Patprog pprog;
     int returnval = 0;
     int printflags = 0;
     int csh, all, v, wd;
@@ -2213,7 +2220,7 @@ bin_whence(char *nam, char **argv, char *ops, int func)
 	for (; *argv; argv++) {
 	    /* parse the pattern */
 	    tokenize(*argv);
-	    if (!(com = parsereg(*argv))) {
+	    if (!(pprog = patcompile(*argv, PAT_STATIC, NULL))) {
 		untokenize(*argv);
 		zwarnnam(nam, "bad pattern : %s", *argv, 0);
 		returnval = 1;
@@ -2224,21 +2231,26 @@ bin_whence(char *nam, char **argv, char *ops, int func)
 		 * We're not using it, so search for ... */
 
 		/* aliases ... */
-		scanmatchtable(aliastab, com, 0, DISABLED, aliastab->printnode, printflags);
+		scanmatchtable(aliastab, pprog, 0, DISABLED,
+			       aliastab->printnode, printflags);
 
 		/* and reserved words ... */
-		scanmatchtable(reswdtab, com, 0, DISABLED, reswdtab->printnode, printflags);
+		scanmatchtable(reswdtab, pprog, 0, DISABLED,
+			       reswdtab->printnode, printflags);
 
 		/* and shell functions... */
-		scanmatchtable(shfunctab, com, 0, DISABLED, shfunctab->printnode, printflags);
+		scanmatchtable(shfunctab, pprog, 0, DISABLED,
+			       shfunctab->printnode, printflags);
 
 		/* and builtins. */
-		scanmatchtable(builtintab, com, 0, DISABLED, builtintab->printnode, printflags);
+		scanmatchtable(builtintab, pprog, 0, DISABLED,
+			       builtintab->printnode, printflags);
 	    }
 	    /* Done search for `internal' commands, if the -p option *
 	     * was not used.  Now search the path.                   */
 	    cmdnamtab->filltable(cmdnamtab);
-	    scanmatchtable(cmdnamtab, com, 0, 0, cmdnamtab->printnode, printflags);
+	    scanmatchtable(cmdnamtab, pprog, 0, 0,
+			   cmdnamtab->printnode, printflags);
 
 	}
     return returnval;
@@ -2367,7 +2379,7 @@ int
 bin_hash(char *name, char **argv, char *ops, int func)
 {
     HashTable ht;
-    Comp com;
+    Patprog pprog;
     Asgment asg;
     int returnval = 0;
 
@@ -2405,9 +2417,9 @@ bin_hash(char *name, char **argv, char *ops, int func)
 	if (ops['m']) {
 	    /* with the -m option, treat the argument as a glob pattern */
 	    tokenize(*argv);  /* expand */
-	    if ((com = parsereg(*argv))) {
+	    if ((pprog = patcompile(*argv, PAT_STATIC, NULL))) {
 		/* display matching hash table elements */
-		scanmatchtable(ht, com, 0, 0, ht->printnode, 0);
+		scanmatchtable(ht, pprog, 0, 0, ht->printnode, 0);
 	    } else {
 		untokenize(*argv);
 		zwarnnam(name, "bad pattern : %s", *argv, 0);
@@ -2464,7 +2476,7 @@ bin_unhash(char *name, char **argv, char *ops, int func)
 {
     HashTable ht;
     HashNode hn, nhn;
-    Comp com;
+    Patprog pprog;
     int match = 0, returnval = 0;
     int i;
 
@@ -2484,13 +2496,13 @@ bin_unhash(char *name, char **argv, char *ops, int func)
 	for (; *argv; argv++) {
 	    /* expand argument */
 	    tokenize(*argv);
-	    if ((com = parsereg(*argv))) {
+	    if ((pprog = patcompile(*argv, PAT_STATIC, NULL))) {
 		/* remove all nodes matching glob pattern */
 		for (i = 0; i < ht->hsize; i++) {
 		    for (hn = ht->nodes[i]; hn; hn = nhn) {
 			/* record pointer to next, since we may free this one */
 			nhn = hn->next;
-			if (domatch(hn->nam, com, 0)) {
+			if (pattry(pprog, hn->nam)) {
 			    ht->freenode(ht->removenode(ht, hn->nam));
 			    match++;
 			}
@@ -2529,7 +2541,7 @@ int
 bin_alias(char *name, char **argv, char *ops, int func)
 {
     Alias a;
-    Comp com;
+    Patprog pprog;
     Asgment asg;
     int haveflags = 0, returnval = 0;
     int flags1 = 0, flags2 = DISABLED;
@@ -2565,9 +2577,10 @@ bin_alias(char *name, char **argv, char *ops, int func)
     if (ops['m']) {
 	for (; *argv; argv++) {
 	    tokenize(*argv);  /* expand argument */
-	    if ((com = parsereg(*argv))) {
+	    if ((pprog = patcompile(*argv, PAT_STATIC, NULL))) {
 		/* display the matching aliases */
-		scanmatchtable(aliastab, com, flags1, flags2, aliastab->printnode, printflags);
+		scanmatchtable(aliastab, pprog, flags1, flags2,
+			       aliastab->printnode, printflags);
 	    } else {
 		untokenize(*argv);
 		zwarnnam(name, "bad pattern : %s", *argv, 0);
@@ -2636,17 +2649,17 @@ bin_print(char *name, char **args, char *ops, int func)
     /* -m option -- treat the first argument as a pattern and remove
      * arguments not matching */
     if (ops['m']) {
-	Comp com;
+	Patprog pprog;
 	char **t, **p;
 
 	tokenize(*args);
-	if (!(com = parsereg(*args))) {
+	if (!(pprog = patcompile(*args, PAT_STATIC, NULL))) {
 	    untokenize(*args);
 	    zwarnnam(name, "bad pattern : %s", *args, 0);
 	    return 1;
 	}
 	for (p = ++args; *p; p++)
-	    if (!domatch(*p, com, 0))
+	    if (!pattry(pprog, *p))
 		for (t = p--; (*t = t[1]); t++);
     }
     /* compute lengths, and interpret according to -P, -D, -e, etc. */

@@ -1249,7 +1249,7 @@ setblock_stdin(void)
     long mode;
 
     if (!fstat(0, &st) && !S_ISREG(st.st_mode)) {
-	mode = fcntl(0, F_GETFL);
+	mode = fcntl(0, F_GETFL, 0);
 	if (mode != -1 && (mode & NONBLOCK) &&
 	    !fcntl(0, F_SETFL, mode & ~NONBLOCK))
 	    return 1;

@@ -18,7 +18,7 @@ at <coordinator@zsh.org>.
 Version 3.1.6
 -------------
 
-* Sven Wishnowsky <wischnow@informatik.hu-berlin.de>: completion code,
+* Sven Wischnowsky <wischnow@informatik.hu-berlin.de>: completion code,
   major rewrite and enhancements, including matching control, completion
   widgets and function system, complist module; zle code additions; job
   control code changes; parameters code changes; parameter module;

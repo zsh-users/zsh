@@ -7,6 +7,8 @@ local lp ls n q suf=''
 if [[ "$SUFFIX" = *\}* ]]; then
   ISUFFIX="${SUFFIX#*\}}$ISUFFIX"
   SUFFIX="${SUFFIX%%\}*}"
+elif [[ "$LBUFFER" = *\$\{[^}]#\$\{[^}]#$PREFIX ]]; then
+  suf='}'
 else
   suf='} '
 fi
@@ -18,4 +20,4 @@ q=${(M)lp%%\"#}
 
 [[ n -gt 0 ]] && suf=''
 
-_parameters -Qs "${q[1,-n-1]}" -S "$suf" -r '-:?#%+=[/'
+_parameters -Qs "${q[1,-n-1]}" -S "$suf" -r '-:?#%+=[/}'

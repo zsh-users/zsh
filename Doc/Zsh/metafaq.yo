@@ -71,7 +71,8 @@ item(Poland)(
 nofill(tt(ftp://sunsite.icm.edu.pl/pub/unix/shells/zsh/))
 )
 item(Romania)(
-nofill(tt(ftp://ftp.roedu.net/pub/mirrors/ftp.zsh.org/pub/zsh/))
+nofill(tt(ftp://ftp.roedu.net/pub/mirrors/ftp.zsh.org/pub/zsh/)
+tt(ftp://ftp.kappa.ro/pub/mirrors/ftp.zsh.org/pub/zsh/))
 )
 item(Slovenia)(
 nofill(tt(ftp://ftp.siol.net/mirrors/zsh/))

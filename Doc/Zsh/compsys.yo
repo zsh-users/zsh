@@ -738,7 +738,7 @@ These functions also accept the `tt(-J)', `tt(-V)', `tt(-X)', `tt(-P)',
 `tt(-S)', `tt(-q)', `tt(-r)', and `tt(-R)' options from the
 tt(compadd) builtin.
 
-Finally, the tt(_path_files) function supports three configuration keys.
+Finally, the tt(_path_files) function supports two configuration keys.
 startitem()
 item(tt(path_expand))(
 If this is set to any non-empty string, the partially
@@ -749,14 +749,6 @@ item(tt(path_cursor))(
 If this is set to a non-empty string, the cursor will be left
 after the first ambiguous pathname component even when menucompletion
 is used.
-)
-item(tt(path_keepdir))(
-If this is set to a non-empty string, then if completion immediately after
-a slash fails, treat the original string as a successful completion.  This
-prevents a valid directory being treated as a candidate for correction.
-However, it has the side effect that a pattern completion, such as
-`tt(files -g *(*))', will no longer try to complete directories in this
-position if there are no file matches.
 )
 enditem()
 )

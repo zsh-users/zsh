@@ -353,7 +353,7 @@ init_io(void)
 	 * Try both stdin and stdout before trying /dev/tty. -- Bart
 	 */
 #if defined(HAVE_FCNTL_H) && defined(F_GETFL)
-#define rdwrtty(fd)	((fcntl(fd, F_GETFL) & O_RDWR) == O_RDWR)
+#define rdwrtty(fd)	((fcntl(fd, F_GETFL, 0) & O_RDWR) == O_RDWR)
 #else
 #define rdwrtty(fd)	1
 #endif

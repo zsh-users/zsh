@@ -48,14 +48,3 @@ Numeric ranges are still too greedy with using characters; for example,
 <1-1000>33 will not match 633 because the 633 matches the range.  Some
 backtracking will be necessary.
 ------------------------------------------------------------------------
-Matching control can leave the wrong thing in the line.  For example,
-        touch Abc-Def-Ghij.txt
-        touch Abc-def.ghi.jkl_mno.pqr.txt
-        touch Abc_def_ghi_jkl_mno_pqr.txt
-        compctl -M 'm:{a-z}={A-Z} r:|[.,_-]=*'
-        ls a<TAB>
-produces
-        ls Abcdefghi
-which won't complete further.  It seems to get confused over the choice of
-possible punctuation characters, and the string won't complete further.
-------------------------------------------------------------------------

@@ -380,6 +380,7 @@ dnl ------------------
 AC_PROG_MAKE_SET            dnl Does make define $MAKE
 AC_PROG_INSTALL             dnl Check for BSD compatible `install'
 AC_PROG_AWK                 dnl Check for mawk,gawk,nawk, then awk.
+AC_PROG_LN                  dnl Check for working ln, for "make install"
 AC_CHECK_PROGS([YODL], [yodl], [:])
 
 dnl ------------------
@@ -1046,6 +1047,20 @@ if test "$ac_cv_prog_cc_stdc" != no; then
   fi
 fi
 
+dnl -------------------
+dnl select() defined in <sys/socket.h>, ie BeOS R4.51
+dnl -------------------
+if test $ac_cv_header_sys_select_h != yes; then
+  AC_CACHE_CHECK(for select() in <sys/socket.h>,
+  zsh_cv_header_socket_h_select_proto,
+  [AC_TRY_COMPILE([#include <sys/socket.h>], [fd_set fd;],
+  zsh_cv_header_socket_h_select_proto=yes, 
+  zsh_cv_header_socket_h_select_proto=no)])
+  if test $zsh_cv_header_socket_h_select_proto = yes; then
+    AC_DEFINE(SELECT_IN_SYS_SOCKET_H)
+  fi
+fi
+
 dnl -----------
 dnl named FIFOs
 dnl -----------
@@ -1097,6 +1112,156 @@ else
 fi])
 if test $zsh_cv_prog_sh_echo_escape = no; then
   AC_DEFINE(SH_USE_BSD_ECHO)
+fi
+
+dnl -----------
+dnl test for whether link() works
+dnl for instance, BeOS R4.51 doesn't support hard links yet
+dnl -----------
+AC_CACHE_CHECK(if link() works,
+zsh_cv_sys_link,
+[AC_TRY_RUN([
+#include <unistd.h>
+#include <fcntl.h>
+main()
+{
+    int ret;
+    char *tmpfile, *newfile;
+    tmpfile="/tmp/zsh.linktest$$";
+    newfile="/tmp/zsh.linktest2$$";
+    unlink(tmpfile);
+    unlink(newfile);
+    if(creat(tmpfile, 0644) < 0)
+	exit(1);
+    ret = link(tmpfile, newfile);
+    unlink(tmpfile);
+    unlink(newfile);
+    exit(ret<0);
+}
+],
+  zsh_cv_sys_link=yes,
+  zsh_cv_sys_link=no,
+  zsh_cv_sys_link=yes)])
+if test $zsh_cv_sys_link = yes; then
+  AC_DEFINE(HAVE_LINK)
+fi
+
+dnl -----------
+dnl test for whether kill(pid, 0) where pid doesn't exit
+dnl should set errno to ESRCH, but some like BeOS R4.51 set to EINVAL
+dnl -----------
+AC_CACHE_CHECK(if kill(pid, 0) returns ESRCH correctly,
+zsh_cv_sys_killesrch,
+[AC_TRY_RUN([
+#include <unistd.h>
+#include <signal.h>
+#include <errno.h>
+main()
+{
+    int pid, ret;
+    pid=getpid() + 10000;
+    ret=kill(pid, 0);
+    exit(ret<0 && errno!=ESRCH);
+}
+],
+  zsh_cv_sys_killesrch=yes,
+  zsh_cv_sys_killesrch=no,
+  zsh_cv_sys_killesrch=yes)])
+if test $zsh_cv_sys_killesrch = no; then
+  AC_DEFINE(BROKEN_KILL_ESRCH)
+fi
+
+dnl -----------
+dnl if POSIX, test for working sigsuspend().
+dnl for instance, BeOS R4.51 is broken.
+dnl -----------
+if test $signals_style=POSIX_SIGNALS; then
+    AC_CACHE_CHECK(if POSIX sigsuspend() works,
+    zsh_cv_sys_sigsuspend,
+    [AC_TRY_RUN([
+#include <signal.h>
+#include <unistd.h>
+int child=0;
+void handler(sig)
+    int sig;
+{if(sig==SIGCHLD) child=1;}
+main() {
+    struct sigaction act;
+    sigset_t set;
+    int pid, ret;
+    act.sa_handler = &handler;
+    sigfillset(&act.sa_mask);
+    act.sa_flags = 0;
+    sigaction(SIGCHLD, &act, 0);
+    sigfillset(&set);
+    sigprocmask(SIG_SETMASK, &set, 0);
+    pid=fork();
+    if(pid==0) return 0;
+    if(pid>0) {
+    sigemptyset(&set);
+        ret=sigsuspend(&set);
+        exit(child==0);
+    }
+}
+],
+      zsh_cv_sys_sigsuspend=yes,
+      zsh_cv_sys_sigsuspend=no,
+      zsh_cv_sys_sigsuspend=yes)])
+    if test $zsh_cv_sys_sigsuspend = no; then
+      AC_DEFINE(BROKEN_POSIX_SIGSUSPEND)
+    fi
+fi
+
+dnl -----------
+dnl if found tcsetpgrp, test to see if it actually works
+dnl for instance, BeOS R4.51 does not support it yet
+dnl -----------
+if test $ac_cv_func_tcsetpgrp=yes; then
+    AC_CACHE_CHECK(if tcsetpgrp() actually works,
+    zsh_cv_sys_tcsetpgrp,
+    [AC_TRY_RUN([
+#include <sys/types.h>
+#include <unistd.h>
+main() {
+    int ret;
+    ret=tcsetpgrp(0, tcgetpgrp(0));
+    exit(ret<0);
+}
+],
+      zsh_cv_sys_tcsetpgrp=yes,
+      zsh_cv_sys_tcsetpgrp=no,
+      zsh_cv_sys_tcsetpgrp=yes)])
+    if test $zsh_cv_sys_tcsetpgrp = no; then
+      AC_DEFINE(BROKEN_TCSETPGRP)
+    fi
+fi
+
+dnl -----------
+dnl test for faked getpwnam() entry, ie a single entry returned for any username
+dnl for instance, BeOS R4.51 is not multiuser yet, and fakes getpwnam()
+dnl test by looking up two usernames that shouldn't succeed, and compare entry
+dnl -----------
+if test $ac_cv_func_getpwnam=yes; then
+    AC_CACHE_CHECK(if getpwnam() is faked,
+    zsh_cv_sys_getpwnam_faked,
+    [AC_TRY_RUN([
+#include <pwd.h>
+main() {
+    struct passwd *pw1, *pw2;
+    char buf[1024];
+    sprintf(buf, "%d:%d", getpid(), rand());
+    pw1=getpwnam(buf);
+    sprintf(buf, "%d:%d", rand(), getpid());
+    pw2=getpwnam(buf);
+    exit(pw1!=0 && pw2!=0 && !strcmp(pw1->pw_name, pw2->pw_name));
+}
+],
+      zsh_cv_sys_getpwnam_faked=no,
+      zsh_cv_sys_getpwnam_faked=yes,
+      zsh_cv_sys_getpwnam_faked=no)])
+    if test $zsh_cv_sys_getpwnam_faked = yes; then
+      AC_DEFINE(GETPWNAM_FAKED)
+    fi
 fi
 
 dnl ---------------

@@ -6,7 +6,7 @@ DISTFILES_SRC='
     builtin.c compat.c cond.c exec.c glob.c hashtable.c hashtable.h
     hist.c init.c input.c jobs.c lex.c linklist.c loop.c main.c makepro.awk
     math.c mem.c mkbltnmlst.sh mkmakemod.sh mkmodindex.sh
-    module.c options.c params.c parse.c prompt.c prototypes.h
+    module.c options.c params.c parse.c pattern.c prompt.c prototypes.h
     signals.c signals.h subst.c system.h text.c utils.c
     watch.c xmods.conf zsh.h zsh.mdd ztype.h zsh.export
 '

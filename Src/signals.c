@@ -326,14 +326,23 @@ signal_suspend(int sig, int sig2)
  
 #ifdef POSIX_SIGNALS
     sigset_t set;
+#ifdef BROKEN_POSIX_SIGSUSPEND
+    sigset_t oset;
+#endif /* BROKEN_POSIX_SIGSUSPEND */
 
     sigfillset(&set);
     sigdelset(&set, sig);
     sigdelset(&set, SIGHUP);  /* still don't know why we add this? */
     if (sig2)
         sigdelset(&set, sig2);
+#ifdef BROKEN_POSIX_SIGSUSPEND
+    sigprocmask(SIG_SETMASK, &set, &oset);
+    pause();
+    sigprocmask(SIG_SETMASK, &oset, NULL);
+#else /* not BROKEN_POSIX_SIGSUSPEND */
     ret = sigsuspend(&set);
-#else
+#endif /* BROKEN_POSIX_SIGSUSPEND */
+#else /* not POSIX_SIGNALS */
 # ifdef BSD_SIGNALS
     sigset_t set;
 
@@ -601,6 +610,9 @@ killjb(Job jn, int sig)
     }
     for (pn = jn->procs; pn; pn = pn->next)
         if ((err = kill(pn->pid, sig)) == -1 && errno != ESRCH)
+#ifdef BROKEN_KILL_ESRCH
+          if(errno != EINVAL || sig != 0)
+#endif /* BROKEN_KILL_ESRCH */
             return -1;
     return err;
 }
@@ -640,7 +652,11 @@ dosavetrap(int sig, int level)
 	 */
 	char func[20];
 	sprintf(func, "TRAP%s", sigs[sig]);
-	st->list = shfunctab->removenode(shfunctab, func);
+	/* We call removehashnode() directly because otherwise
+	 * removeshfuncnode() would be called which in turn would
+	 * call us again so that we would end up with a NULL pointer
+	 * instead of the list for the trap. */
+	st->list = removehashnode(shfunctab, func);
     } else {
 	st->list = sigfuncs[sig];
 	unsettrap(sig);

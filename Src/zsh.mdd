@@ -5,7 +5,7 @@ alwayslink=1
 
 objects="builtin.o compat.o cond.o exec.o glob.o hashtable.o \
 hist.o init.o input.o jobs.o lex.o linklist.o loop.o math.o \
-mem.o module.o options.o params.o parse.o prompt.o signals.o \
+mem.o module.o options.o params.o parse.o pattern.o prompt.o signals.o \
 signames.o subst.o text.o utils.o watch.o"
 
 headers="../config.h system.h zsh.h sigcount.h signals.h \

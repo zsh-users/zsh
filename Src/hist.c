@@ -577,6 +577,18 @@ histsubchar(int c)
 	    case 'q':
 		quote(&sline);
 		break;
+	    case 'Q':
+		{
+		    int one = noerrs, oef = errflag;
+
+		    noerrs = 1;
+		    parse_subst_string(sline);
+		    noerrs = one;
+		    errflag = oef;
+		    remnulargs(sline);
+		    untokenize(sline);
+		}
+		break;
 	    case 'x':
 		quotebreak(&sline);
 		break;
@@ -1947,6 +1959,7 @@ lockhistfile(char *fn, int keep_trying)
 	int fd, len = strlen(fn);
 	char *tmpfile, *lockfile;
 
+#ifdef HAVE_LINK
 	tmpfile = zalloc(len + 10 + 1);
 	sprintf(tmpfile, "%s.%ld", fn, (long)mypid);
 	if ((fd = open(tmpfile, O_RDWR|O_CREAT|O_EXCL, 0644)) >= 0) {
@@ -1973,6 +1986,21 @@ lockhistfile(char *fn, int keep_trying)
 	}
 	unlink(tmpfile);
 	free(tmpfile);
+#else /* not HAVE_LINK */
+	lockfile = zalloc(len + 5 + 1);
+	sprintf(lockfile, "%s.LOCK", fn);
+	while ((fd = open(lockfile, O_CREAT|O_EXCL, 0644)) < 0) {
+		if (errno == EEXIST) continue;
+		else if (keep_trying) {
+		    if (time(NULL) - sb.st_mtime < 10)
+			sleep(1);
+		    continue;
+		}
+		lockhistct--;
+		break;
+	}
+	free(lockfile);
+#endif /* HAVE_LINK */
     }
     return ct != lockhistct;
 }

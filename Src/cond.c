@@ -303,12 +303,13 @@ optison(char *s)
 
 /**/
 char *
-cond_str(char **args, int num)
+cond_str(char **args, int num, int raw)
 {
     char *s = args[num];
 
     singsub(&s);
-    untokenize(s);
+    if (!raw)
+	untokenize(s);
 
     return s;
 }

@@ -267,6 +267,8 @@ struct timezone {
 # ifndef TIME_H_SELECT_H_CONFLICTS
 #  include <sys/select.h>
 # endif
+#elif defined(SELECT_IN_SYS_SOCKET_H)
+# include <sys/socket.h>
 #endif
 
 #ifdef HAVE_SYS_FILIO_H
@@ -613,3 +615,8 @@ extern short ospeed;
 #define ftell ftello
 #endif
 #endif
+
+/* Can't support job control without working tcsetgrp() */
+#ifdef BROKEN_TCSETPGRP
+#undef JOB_CONTROL
+#endif /* BROKEN_TCSETPGRP */

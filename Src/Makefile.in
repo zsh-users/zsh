@@ -35,6 +35,7 @@ VPATH           = @srcdir@
 sdir            = @srcdir@
 sdir_top        = @top_srcdir@
 INSTALL         = @INSTALL@
+LN		= @LN@
 
 @DEFS_MK@
 
@@ -163,10 +164,10 @@ install.bin-here: zsh install.bin-@L@
 	$(INSTALL_PROGRAM) $(STRIPFLAGS) zsh $(bindir)/zsh-$(VERSION)
 	if test -f $(bindir)/zsh; then \
 	    rm -f $(bindir)/zsh.old; \
-	    ln $(bindir)/zsh $(bindir)/zsh.old; \
+	    $(LN) $(bindir)/zsh $(bindir)/zsh.old; \
 	else :; fi
 	rm -f $(bindir)/zsh.new
-	ln $(bindir)/zsh-$(VERSION) $(bindir)/zsh.new
+	$(LN) $(bindir)/zsh-$(VERSION) $(bindir)/zsh.new
 	mv $(bindir)/zsh.new $(bindir)/zsh
 
 install.bin-N:

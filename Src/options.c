@@ -526,7 +526,7 @@ bin_setopt(char *nam, char **args, char *ops, int isun)
     } else {
 	/* Globbing option (-m) set. */
 	while (*args) {
-	    Comp com;
+	    Patprog pprog;
 	    char *s, *t;
 
 	    t = s = dupstring(*args);
@@ -540,12 +540,12 @@ bin_setopt(char *nam, char **args, char *ops, int isun)
 
 	    /* Expand the current arg. */
 	    tokenize(s);
-	    if (!(com = parsereg(s))) {
+	    if (!(pprog = patcompile(s, PAT_STATIC, NULL))) {
 		zwarnnam(nam, "bad pattern: %s", *args, 0);
 		continue;
 	    }
 	    /* Loop over expansions. */
-	    scanmatchtable(optiontab, com, 0, OPT_ALIAS, setoption, !isun);
+	    scanmatchtable(optiontab, pprog, 0, OPT_ALIAS, setoption, !isun);
 	    args++;
 	}
     }
@@ -653,6 +653,14 @@ dosetopt(int optno, int value, int force)
 	setuid(getuid());
 	setgid(getgid());
 #endif /* HAVE_SETUID */
+#ifndef JOB_CONTROL
+    } else if(optno == MONITOR && value) {
+	    return -1;
+#endif /* not JOB_CONTROL */
+#ifdef GETPWNAM_FAKED
+    } else if(optno == CDABLEVARS && value) {
+	    return -1;
+#endif /* GETPWNAM_FAKED */
     }
     opts[optno] = value;
     if (optno == BANGHIST || optno == SHINSTDIN)

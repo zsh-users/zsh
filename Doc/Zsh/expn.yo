@@ -166,6 +166,9 @@ with history expansion and parameter expansion, though in the second
 case it is only useful if the resulting text is to be re-evaluated
 such as by tt(eval).
 )
+item(tt(Q))(
+Remove one level of quotes from the substituted words.
+)
 item(tt(x))(
 Like tt(q), but break into words at each blank.
 )
@@ -577,6 +580,17 @@ item(tt(C))(
 Capitalize the resulting words.  `Words' in this case refers to sequences
 of alphanumeric characters separated by non-alphanumerics, em(not) to words
 that result from field splitting.
+)
+item(tt(q))(
+Quote the resulting words with backslashes.
+)
+item(tt(Q))(
+Remove one level of quotes from the resulting words.
+)
+item(tt(X))(
+With this flag parsing errors occuring with the tt(Q) flag or the
+pattern matching forms such as `tt(${)var(name)tt(#)var(pattern)tt(})' 
+are reported. Without the flag they are silently ignored.
 )
 item(tt(c))(
 With tt(${#)var(name)tt(}), count the total number of characters in an array,

@@ -721,6 +721,7 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int ssub)
     int flnum = 0;
     int sortit = 0, casind = 0;
     int casmod = 0;
+    int quotemod = 0, quoteerr = 0;
     char *sep = NULL, *spsep = NULL;
     char *premul = NULL, *postmul = NULL, *preone = NULL, *postone = NULL;
     char *replstr = NULL;	/* replacement string for /orig/repl */
@@ -822,6 +823,17 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int ssub)
 		case 'i':
 		    casind = 1;
 		    break;
+
+		case 'q':
+		    quotemod++;
+		    break;
+		case 'Q':
+		    quotemod--;
+		    break;
+		case 'X':
+		    quoteerr = 1;
+		    break;
+
 		case 'e':
 		    eval = 1;
 		    break;
@@ -1379,12 +1391,23 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int ssub)
 	case '#':
 	case Pound:
 	case '/':
-	    if (qt)
-		if (parse_subst_string(s)) {
+	    if (qt) {
+		int one = noerrs, oef = errflag, haserr;
+
+		if (!quoteerr)
+		    noerrs = 1;
+		haserr = parse_subst_string(s);
+		noerrs = one;
+		if (!quoteerr) {
+		    errflag = oef;
+		    if (haserr)
+			tokenize(s);
+		} else if (haserr || errflag) {
 		    zerr("parse error in ${...%c...} substitution",
 			 NULL, s[-1]);
 		    return NULL;
 		}
+	    }
 	    {
 		char t = s[-1];
 
@@ -1544,6 +1567,58 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int ssub)
 		makelowercase(&val);
 	    else
 		makecapitals(&val);
+	}
+    }
+    if (quotemod) {
+	if (isarr) {
+	    char **ap;
+
+	    if (!copied)
+		aval = arrdup(aval), copied = 1;
+	    ap = aval;
+
+	    if (quotemod > 0)
+		for (; *ap; ap++)
+		    *ap = bslashquote(*ap, NULL, 0);
+	    else {
+		int one = noerrs, oef = errflag, haserr = 0;
+
+		if (!quoteerr)
+		    noerrs = 1;
+		for (; *ap; ap++) {
+		    haserr |= parse_subst_string(*ap);
+		    remnulargs(*ap);
+		    untokenize(*ap);
+		}
+		noerrs = one;
+		if (!quoteerr)
+		    errflag = oef;
+		else if (haserr || errflag) {
+		    zerr("parse error in parameter value", NULL, 0);
+		    return NULL;
+		}
+	    }
+	} else {
+	    if (!copied)
+		val = dupstring(val), copied = 1;
+	    if (quotemod > 0)
+		val = bslashquote(val, NULL, 0);
+	    else {
+		int one = noerrs, oef = errflag, haserr;
+
+		if (!quoteerr)
+		    noerrs = 1;
+		haserr = parse_subst_string(val);
+		noerrs = one;
+		if (!quoteerr)
+		    errflag = oef;
+		else if (haserr || errflag) {
+		    zerr("parse error in parameter value", NULL, 0);
+		    return NULL;
+		}
+		remnulargs(val);
+		untokenize(val);
+	    }
 	}
     }
     if (isarr) {
@@ -1747,6 +1822,7 @@ modify(char **str, char **ptr)
 	    case 'l':
 	    case 'u':
 	    case 'q':
+	    case 'Q':
 		c = **ptr;
 		break;
 
@@ -1868,6 +1944,18 @@ modify(char **str, char **ptr)
 		    case 'q':
 			copy = bslashquote(copy, NULL, 0);
 			break;
+		    case 'Q':
+			{
+			    int one = noerrs, oef = errflag;
+
+			    noerrs = 1;
+			    parse_subst_string(copy);
+			    noerrs = one;
+			    errflag = oef;
+			    remnulargs(copy);
+			    untokenize(copy);
+			}
+			break;
 		    }
 		    tc = *tt;
 		    *tt = '\0';
@@ -1921,6 +2009,18 @@ modify(char **str, char **ptr)
 		    break;
 		case 'q':
 		    *str = bslashquote(*str, NULL, 0);
+		    break;
+		case 'Q':
+		    {
+			int one = noerrs, oef = errflag;
+
+			noerrs = 1;
+			parse_subst_string(*str);
+			noerrs = one;
+			errflag = oef;
+			remnulargs(*str);
+			untokenize(*str);
+		    }
 		    break;
 		}
 	    }

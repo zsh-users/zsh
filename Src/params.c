@@ -354,7 +354,7 @@ scancountparams(HashNode hn, int flags)
 	++numparamvals;
 }
 
-static Comp scancomp;
+static Patprog scanprog;
 static char **paramvals;
 
 /**/
@@ -366,7 +366,8 @@ scanparamvals(HashNode hn, int flags)
 	!(flags & SCANPM_MATCHMANY))
 	return;
     v.pm = (Param)hn;
-    if ((flags & SCANPM_MATCHKEY) && !domatch(v.pm->nam, scancomp, 0)) {
+    if ((flags & SCANPM_MATCHKEY) &&
+	!pattry(scanprog, v.pm->nam)) {
 	return;
     }
     if (flags & SCANPM_WANTKEYS) {
@@ -380,7 +381,7 @@ scanparamvals(HashNode hn, int flags)
     v.b = -1;
     paramvals[numparamvals] = getstrvalue(&v);
     if (flags & SCANPM_MATCHVAL) {
-	if (domatch(paramvals[numparamvals], scancomp, 0)) {
+	if (pattry(scanprog, paramvals[numparamvals])) {
 	    numparamvals += ((flags & SCANPM_WANTVALS) ? 1 :
 			     !(flags & SCANPM_WANTKEYS));
 	} else if (flags & SCANPM_WANTKEYS)
@@ -724,7 +725,7 @@ getarg(char **str, int *inv, Value v, int a2, zlong *w)
     int hasbeg = 0, word = 0, rev = 0, ind = 0, down = 0, l, i, ishash;
     char *s = *str, *sep = NULL, *t, sav, *d, **ta, **p, *tt;
     zlong num = 1, beg = 0, r = 0;
-    Comp c;
+    Patprog pprog;
 
     ishash = (v->pm && PM_TYPE(v->pm->flags) == PM_HASHED);
 
@@ -923,12 +924,12 @@ getarg(char **str, int *inv, Value v, int a2, zlong *w)
 	}
 	tokenize(s);
 
-	if ((c = parsereg(s))) {
+	if ((pprog = patcompile(s, 0, NULL))) {
 	    int len;
 
 	    if (v->isarr) {
 		if (ishash) {
-		    scancomp = c;
+		    scanprog = pprog;
 		    if (ind)
 			v->isarr |= SCANPM_MATCHKEY;
 		    else
@@ -952,12 +953,12 @@ getarg(char **str, int *inv, Value v, int a2, zlong *w)
 			if (!hasbeg)
 			    beg = len - 1;
 			for (r = 1 + beg, p = ta + beg; p >= ta; r--, p--) {
-			    if (domatch(*p, c, 0) && !--num)
+			    if (pattry(pprog, *p) && !--num)
 				return r;
 			}
 		    } else
 			for (r = 1 + beg, p = ta + beg; *p; r++, p++)
-			    if (domatch(*p, c, 0) && !--num)
+			    if (pattry(pprog, *p) && !--num)
 				return r;
 		}
 	    } else if (word) {
@@ -970,13 +971,13 @@ getarg(char **str, int *inv, Value v, int a2, zlong *w)
 			if (!hasbeg)
 			    beg = len - 1;
 			for (r = 1 + beg, p = ta + beg; p >= ta; p--, r--)
-			    if (domatch(*p, c, 0) && !--num)
+			    if (pattry(pprog, *p) && !--num)
 				break;
 			if (p < ta)
 			    return 0;
 		    } else {
 			for (r = 1 + beg, p = ta + beg; *p; r++, p++)
-			    if (domatch(*p, c, 0) && !--num)
+			    if (pattry(pprog, *p) && !--num)
 				break;
 			if (!*p)
 			    return 0;
@@ -1007,7 +1008,8 @@ getarg(char **str, int *inv, Value v, int a2, zlong *w)
 			    for (r = beg, t = d + beg; t >= d; r--, t--) {
 				sav = *t;
 				*t = '\0';
-				if (domatch(d, c, 0) && !--num) {
+				if (pattry(pprog, d)
+				    && !--num) {
 				    *t = sav;
 				    return r;
 				}
@@ -1017,7 +1019,8 @@ getarg(char **str, int *inv, Value v, int a2, zlong *w)
 			    for (r = beg, t = d + beg; *t; r++, t++) {
 				sav = *t;
 				*t = '\0';
-				if (domatch(d, c, 0) && !--num) {
+				if (pattry(pprog, d) &&
+				    !--num) {
 				    *t = sav;
 				    return r;
 				}
@@ -1028,12 +1031,14 @@ getarg(char **str, int *inv, Value v, int a2, zlong *w)
 			    if (!hasbeg)
 				beg = len - 1;
 			    for (r = beg + 1, t = d + beg; t >= d; r--, t--) {
-				if (domatch(t, c, 0) && !--num)
+				if (pattry(pprog, t) &&
+				    !--num)
 				    return r;
 			    }
 			} else
 			    for (r = beg + 1, t = d + beg; *t; r++, t++)
-				if (domatch(t, c, 0) && !--num)
+				if (pattry(pprog, t) &&
+				    !--num)
 				    return r;
 		    }
 		}

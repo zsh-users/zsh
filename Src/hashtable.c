@@ -418,7 +418,7 @@ scanhashtable(HashTable ht, int sorted, int flags1, int flags2, ScanFunc scanfun
 
 /**/
 int
-scanmatchtable(HashTable ht, Comp com, int flags1, int flags2, ScanFunc scanfunc, int scanflags)
+scanmatchtable(HashTable ht, Patprog pprog, int flags1, int flags2, ScanFunc scanfunc, int scanflags)
 {
     int i, hsize = ht->hsize;
     HashNode *nodes = ht->nodes;
@@ -433,7 +433,7 @@ scanmatchtable(HashTable ht, Comp com, int flags1, int flags2, ScanFunc scanfunc
 	    HashNode hn = st.u.u;
 	    st.u.u = st.u.u->next;
 	    if ((hn->flags & flags1) + !flags1 && !(hn->flags & flags2) &&
-		domatch(hn->nam, com, 0)) {
+		pattry(pprog, hn->nam)) {
 		scanfunc(hn, scanflags);
 		match++;
 	    }

@@ -80,7 +80,7 @@ bin_example(char *nam, char **args, char *ops, int func)
 static int
 cond_p_len(char **a, int id)
 {
-    char *s1 = cond_str(a, 0);
+    char *s1 = cond_str(a, 0, 0);
 
     if (a[1]) {
 	zlong v = cond_val(a, 1);
@@ -95,7 +95,7 @@ cond_p_len(char **a, int id)
 static int
 cond_i_ex(char **a, int id)
 {
-    char *s1 = cond_str(a, 0), *s2 = cond_str(a, 1);
+    char *s1 = cond_str(a, 0, 0), *s2 = cond_str(a, 1, 0);
 
     return !strcmp("example", dyncat(s1, s2));
 }

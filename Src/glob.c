@@ -76,12 +76,14 @@ struct gmatch {
 /**/
 int badcshglob;
  
-static int mode;		/* != 0 if we are parsing glob patterns */
-static int scanning;		/* != 0 if we are scanning file paths   */
-static int pathpos;		/* position in pathbuf                  */
+/**/
+int pathpos;		/* position in pathbuf (needed by pattern code) */
+
+/**/
+char *pathbuf;		/* pathname buffer (needed by pattern code) */
+
 static int matchsz;		/* size of matchbuf                     */
 static int matchct;		/* number of matches found              */
-static char *pathbuf;		/* pathname buffer                      */
 static int pathbufsz;		/* size of pathbuf			*/
 static int pathbufcwd;		/* where did we chdir()'ed		*/
 static Gmatch matchbuf;		/* array of matches                     */
@@ -135,40 +137,10 @@ char *glob_pre, *glob_suf;
 
 struct complist {
     Complist next;
-    Comp comp;
+    Patprog pat;
     int closure;		/* 1 if this is a (foo/)# */
     int follow; 		/* 1 to go thru symlinks */
 };
-struct comp {
-    Comp left, right, next, exclude;
-    char *str;
-    int stat, errsmax;
-};
-
-/* Type of Comp:  a closure with one or two #'s, the end of a *
- * pattern or path component, a piece of path to be added.    */
-#define C_ONEHASH	1
-#define C_TWOHASH	2
-#define C_OPTIONAL	4
-#define C_STAR		8    
-#define C_CLOSURE	(C_ONEHASH|C_TWOHASH|C_OPTIONAL|C_STAR)
-#define C_LAST		16
-#define C_PATHADD	32
-#define C_LCMATCHUC	64
-#define C_IGNCASE	128
-
-/* Test macros for the above */
-#define CLOSUREP(c)	(c->stat & C_CLOSURE)
-#define ONEHASHP(c)	(c->stat & (C_ONEHASH|C_STAR))
-#define TWOHASHP(c)	(c->stat & C_TWOHASH)
-#define OPTIONALP(c)	(c->stat & C_OPTIONAL)
-#define STARP(c)	(c->stat & C_STAR)
-#define LASTP(c)	(c->stat & C_LAST)
-#define PATHADDP(c)	(c->stat & C_PATHADD)
-
-/* Flags passed down to guts when compiling */
-#define GF_PATHADD	1	/* file glob, adding path components */
-#define GF_TOPLEV	2	/* outside (), so ~ ends main match */
 
 /* Next character after one which may be a Meta (x is any char *) */
 #define METANEXT(x)	(*(x) == Meta ? (x)+2 : (x)+1)
@@ -181,12 +153,6 @@ struct comp {
  * Return unmetafied char from string (x is any char *)
  */
 #define UNMETA(x)	(*(x) == Meta ? (x)[1] ^ 32 : *(x))
-
-static char *pptr;		/* current place in string being matched */
-static Comp tail;
-static int first;		/* are leading dots special? */
-static int longest;		/* always match longest piece of path. */
-static int inclosure;		/* see comment in doesmatch() */
 
 /* Add a component to pathbuf: This keeps track of how    *
  * far we are into a file name, since each path component *
@@ -377,25 +343,6 @@ haswilds(char *str)
     return 0;
 }
 
-/* Flags to apply to current level of grouping */
-
-static int addflags;
-
-/*
- * Approximate matching.
- *
- * errsmax is used while parsing to store the current number
- * of errors allowed.  While executing it is usually set to -1,
- * but can be set to something else to fix a different maximum
- * no. of errors which acts as a limit on the local value:  see
- * scanner() for why this is necessary.
- *
- * errsfound is used while executing a pattern to record the
- * number of errors found so far.
- */
-
-static int errsmax, errsfound;
-
 /* Do the globbing:  scanner is called recursively *
  * with successive bits of the path until we've    *
  * tried all of it.                                */
@@ -404,12 +351,11 @@ static int errsmax, errsfound;
 static void
 scanner(Complist q)
 {
-    Comp c;
+    Patprog p;
     int closure;
     int pbcwdsav = pathbufcwd;
     int errssofar = errsfound;
     struct dirsav ds;
-    char *str;
 
     ds.ino = ds.dev = 0;
     ds.dirname = NULL;
@@ -424,19 +370,14 @@ scanner(Complist q)
 	else
 	    scanner(q->next);
     }
-    c = q->comp;
-    str = c->str;
+    p = q->pat;
     /* Now the actual matching for the current path section. */
-    if (!(c->next || c->left) && !haswilds(str)
-	&& (!((c->stat & (C_LCMATCHUC|C_IGNCASE)) || c->errsmax)
-	    || !*str || !strcmp(".", str) || !strcmp("..", str))) {
+    if (p->flags & PAT_PURES) {
 	/*
-	 * We always need to match . and .. explicitly, even if we're
-	 * checking other strings for case-insensitive matches.
-	 *
 	 * It's a straight string to the end of the path section.
 	 */
-	int l = strlen(str);
+	char *str = (char *)p + p->startoff;
+	int l = p->patmlen;
 
 	if (l + !l + pathpos - pathbufcwd >= PATH_MAX) {
 	    int err;
@@ -481,7 +422,7 @@ scanner(Complist q)
 		 || (glob_suf && !strsfx(glob_suf, fn))))
 		continue;
 	    errsfound = errssofar;
-	    if (domatch(fn, c, gf_noglobdots)) {
+	    if (pattry(p, fn)) {
 		/* if this name matchs the pattern... */
 		if (pbcwdsav == pathbufcwd &&
 		    strlen(fn) + pathpos - pathbufcwd >= PATH_MAX) {
@@ -505,8 +446,6 @@ scanner(Complist q)
 		     * If not the last component in the path:
 		     *
 		     * If we made an approximation in the new path segment,
-		     * and the pattern includes closures other than a
-		     * trailing * (we only test if it is not a string),
 		     * then it is possible we made too many errors.  For
 		     * example, (ab)#(cb)# will match the directory abcb
 		     * with one error if allowed to, even though it can
@@ -518,16 +457,16 @@ scanner(Complist q)
 		     * in the last part of the path which is not affected
 		     * by this problem.
 		     */
-		    if (errsfound > errssofar && (c->next || c->left)) {
-			errsmax = errsfound - 1;
-			while (errsmax >= errssofar) {
+		    if (errsfound > errssofar) {
+			forceerrs = errsfound - 1;
+			while (forceerrs >= errssofar) {
 			    errsfound = errssofar;
-			    if (!domatch(fn, c, gf_noglobdots))
+			    if (!pattry(p, fn))
 				break;
-			    errsmax = errsfound - 1;
+			    forceerrs = errsfound - 1;
 			}
-			errsfound = errsmax + 1;
-			errsmax = -1;
+			errsfound = forceerrs + 1;
+			forceerrs = -1;
 		    }
 		    if (closure) {
 			/* if matching multiple directories */
@@ -583,495 +522,72 @@ scanner(Complist q)
     }
 }
 
-/* Parse a series of path components pointed to by pptr */
-
-/**/
-static Comp
-compalloc(void)
-{
-    Comp c = (Comp) alloc(sizeof *c);
-    c->stat |= addflags;
-    c->errsmax = errsmax;
-    return c;
-}
-
-/**/
-static int
-getglobflags(void)
-{
-    char *nptr;
-    /* (#X): assumes we are still positioned on the initial '(' */
-    pptr++;
-    while (*++pptr && *pptr != Outpar) {
-	switch (*pptr) {
-	case 'a':
-	    /* Approximate matching, max no. of errors follows */
-	    errsmax = zstrtol(++pptr, &nptr, 10);
-	    if (pptr == nptr)
-		return 1;
-	    pptr = nptr-1;
-	    break;
-
-	case 'l':
-	    /* Lowercase in pattern matches lower or upper in target */
-	    addflags |= C_LCMATCHUC;
-	    break;
-
-	case 'i':
-	    /* Fully case insensitive */
-	    addflags |= C_IGNCASE;
-	    break;
-
-	case 'I':
-	    /* Restore case sensitivity */
-	    addflags &= ~(C_LCMATCHUC|C_IGNCASE);
-	    break;
-
-	default:
-	    return 1;
-	}
-    }
-    if (*pptr != Outpar)
-	return 1;
-    pptr++;
-    return 0;
-}
-
-/**/
-static void
-parse_charset(void)
-{
-    /* Character set: brackets had better match */
-    if (pptr[1] == Outbrack)
-	*++pptr = ']';
-    else if ((pptr[1] == Hat || pptr[1] == '^' || pptr[1] == '!') &&
-	     pptr[2] == Outbrack)
-	*(pptr += 2) = ']';
-    while (*++pptr && *pptr != Outbrack) {
-	if (itok(*pptr)) {
-	    /* POSIX classes: make sure it's a real one,
-	     * leave the Inbrack tokenised if so.
-	     * We need to untokenize the Outbrack since otherwise
-	     * it might look like we got to the end of the range without
-	     * matching; we also need to accept ']' instead of
-	     * Outbrack in case this has already happened.
-	     */
-	    char *nptr;
-	    if (*pptr == Inbrack && pptr[1] == ':'
-		&& (nptr = strchr(pptr+2, ':')) && 
-		(*++nptr == Outbrack || *nptr == ']'))
-		*(pptr = nptr) = ']';
-	    else
-		*pptr = ztokens[*pptr - Pound];
-	}
-    }
-}
-
-/* enum used with ksh-like patterns, @(...) etc. */
-
-enum { KF_NONE, KF_AT, KF_QUEST, KF_STAR, KF_PLUS, KF_NOT };
-
-/* parse lowest level pattern */
-
-/**/
-static Comp
-parsecomp(int gflag)
-{
-    int kshfunc;
-    Comp c = compalloc(), c1, c2;
-    char *cstr, *ls = NULL;
-
-    /* In case of alternatives, code coming up is stored in tail. */
-    c->next = tail;
-    cstr = pptr;
-
-    while (*pptr && (mode || *pptr != '/') && *pptr != Bar &&
-	   (unset(EXTENDEDGLOB) || *pptr != Tilde ||
-	    !pptr[1] || pptr[1] == Outpar || pptr[1] == Bar) &&
-	   *pptr != Outpar) {
-	/* Go through code until we find something separating alternatives,
-	 * or path components if relevant.
-	 */
-	if (*pptr == Hat && isset(EXTENDEDGLOB)) {
-	    /* negate remaining pattern */
-	    Comp stail = tail;
-	    tail = NULL;
-	    c->str = dupstrpfx(cstr, pptr - cstr);
-	    pptr++;
-
-	    c1 = compalloc();
-	    c1->stat |= C_STAR;
-
-	    c2 = compalloc();
-	    if (!(c2->exclude = parsecomp(gflag)))
-		return NULL;
-	    if (!*pptr || *pptr == '/')
-		c2->stat |= C_LAST;
-	    c2->left = c1;
-	    c2->next = stail;
-	    c->next = c2;
-	    tail = stail;
-	    return c;
-	}
-
-	/* Ksh-type globs */
-	kshfunc = KF_NONE;
-	if (isset(KSHGLOB) && *pptr && pptr[1] == Inpar) {
-	    switch (*pptr) {
-	    case '@':		/* just do paren as usual */
-		kshfunc = KF_AT;
-		break;
-
-	    case Quest:
-	    case '?':		/* matched optionally, treat as (...|) */
-		kshfunc = KF_QUEST;
-		break;
-
-	    case Star:
-	    case '*':		/* treat as (...)# */
-		kshfunc = KF_STAR;
-		break;
-
-	    case '+':		/* treat as (...)## */
-		kshfunc = KF_PLUS;
-		break;
-
-	    case '!':		/* treat as (*~...) */
-		kshfunc = KF_NOT;
-		break;
-	    }
-	    if (kshfunc != KF_NONE)
-		pptr++;
-	}
-
-	if (*pptr == Inpar && pptr[1] == Pound && isset(EXTENDEDGLOB)) {
-	    /* Found some globbing flags */
-	    char *eptr = pptr;
-	    if (kshfunc != KF_NONE)
-		eptr--;
-	    if (getglobflags())
-		return NULL;
-	    if (eptr == cstr) {
-		/* if no string yet, carry on and get one. */
-		c->stat = addflags;
-		c->errsmax = errsmax;
-		cstr = pptr;
-		continue;
-	    }
-	    c->str = dupstrpfx(cstr, eptr - cstr);
-	    /*
-	     * The next bit simply handles the case where . or ..
-	     * is followed by a set of flags, but we need to force
-	     * them to be handled as a string.  Hardly worth it.
-	     */
-	    if (!*pptr || (!mode && *pptr == '/') || *pptr == Bar ||
-		(isset(EXTENDEDGLOB) && *pptr == Tilde &&
-		 pptr[1] && pptr[1] != Outpar && pptr[1] != Bar) ||
-		*pptr == Outpar) {
-		if (*pptr == '/' || !*pptr ||
-		    ((*pptr == Bar ||
-		      (isset(EXTENDEDGLOB) && *pptr == Tilde)) &&
-		     (gflag & GF_TOPLEV)))
-		    c->stat |= C_LAST;
-		return c;
-	    }
-	    if (!(c->next = parsecomp(gflag)))
-		return NULL;
-	    return c;
-	}
-	if (*pptr == Inpar) {
-	    /* Found a group (...) */
-	    char *startp = pptr, *endp;
-	    Comp stail = tail;
-	    int dpnd = 0;
-
-	    /* Need matching close parenthesis */
-	    if (skipparens(Inpar, Outpar, &pptr)) {
-		errflag = 1;
-		return NULL;
-	    }
-	    if (kshfunc == KF_STAR)
-		dpnd = 1;
-	    else if (kshfunc == KF_PLUS)
-		dpnd = 2;
-	    else if (kshfunc == KF_QUEST)
-		dpnd = 3;
-	    if (*pptr == Pound && isset(EXTENDEDGLOB)) {
-		/* Zero (or one) or more repetitions of group */
-		pptr++;
-		if(*pptr == Pound) {
-		    pptr++;
-		    if(dpnd == 0)
-			dpnd = 2;
-		    else if(dpnd == 3)
-			dpnd = 1;
-		} else
-		    dpnd = 1;
-	    }
-	    /* Parse the remaining pattern following the group... */
-	    if (!(c1 = parsecomp(gflag)))
-		return NULL;
-	    /* ...remembering what comes after it... */
-	    tail = (dpnd || kshfunc == KF_NOT) ? NULL : c1;
-	    /* ...before going back and parsing inside the group. */
-	    endp = pptr;
-	    pptr = startp;
-	    c->str = dupstrpfx(cstr, (pptr - cstr) - (kshfunc != KF_NONE));
-	    pptr++;
-	    c2 = compalloc();
-	    c->next = c2;
-	    c2->next = (dpnd || kshfunc == KF_NOT) ?
-		c1 : compalloc();
-	    if (!(c2->left = parsecompsw(0)))
-		return NULL;
-	    if (kshfunc == KF_NOT) {
-		/* we'd actually rather it didn't match.  Instead, match *
-		 * a star and put the parsed pattern into exclude.       */
-		Comp c3 = compalloc();
-		c3->stat |= C_STAR;
-
-		c2->exclude = c2->left;
-		c2->left = c3;
-	    }
-	    /* Remember closures for group. */
-	    if (dpnd)
-		c2->stat |= (dpnd == 3) ? C_OPTIONAL
-		    : (dpnd == 2) ? C_TWOHASH : C_ONEHASH;
-	    pptr = endp;
-	    tail = stail;
-	    return c;
-	}
-	if (*pptr == Star && pptr[1] &&
-	    (unset(EXTENDEDGLOB) || !(gflag & GF_TOPLEV) ||
-	     pptr[1] != Tilde || !pptr[2] || pptr[2] == Bar ||
-	     pptr[2] == Outpar) && (mode || pptr[1] != '/')) {
-	    /* Star followed by other patterns is now treated as a special
-	     * type of closure in doesmatch().
-	     */
-	    c->str = dupstrpfx(cstr, pptr - cstr);
-	    pptr++;
-	    c1 = compalloc();
-	    c1->stat |= C_STAR;
-	    if (!(c2 = parsecomp(gflag)))
-		return NULL;
-	    c1->next = c2;
-	    c->next = c1;
-	    return c;
-	}
-	if (*pptr == Pound && isset(EXTENDEDGLOB)) {
-	    /* repeat whatever we've just had (ls) zero or more times */
-	    if (!ls)
-		return NULL;
-	    c2 = compalloc();
-	    c2->str = dupstrpfx(ls, pptr - ls);
-	    pptr++;
-	    if (*pptr == Pound) {
-		/* need one or more matches: cheat by copying previous char */
-		pptr++;
-		c->next = c1 = compalloc();
-		c1->str = c2->str;
-	    } else
-		c1 = c;
-	    c1->next = c2;
-	    c2->stat |= C_ONEHASH;
-	    /* parse the rest of the pattern and return. */
-	    c2->next = parsecomp(gflag);
-	    if (!c2->next)
-		return NULL;
-	    c->str = dupstrpfx(cstr, ls - cstr);
-	    return c;
-	}
-	ls = pptr;		/* whatever we just parsed */
-	if (*pptr == Inang) {
-	    /* Numeric glob */
-	    int dshct;
-
-	    dshct = (pptr[1] == Outang);
-	    while (*++pptr && *pptr != Outang)
-		if (*pptr == '-' && !dshct)
-		    dshct = 1;
-		else if (!idigit(*pptr))
-		    break;
-	    if (*pptr != Outang)
-		return NULL;
-	} else if (*pptr == Inbrack) {
-	    parse_charset();
-	    if (*pptr != Outbrack)
-		return NULL;
-	} else if (itok(*pptr) && *pptr != Star && *pptr != Quest)
-	    /* something that can be tokenised which isn't otherwise special */
-	    *pptr = ztokens[*pptr - Pound];
-	pptr++;
-    }
-    /* mark if last pattern component in path component or pattern */
-    if (*pptr == '/' || !*pptr ||
-	((*pptr == Bar ||
-	 (isset(EXTENDEDGLOB) && *pptr == Tilde)) && (gflag & GF_TOPLEV)))
-	c->stat |= C_LAST;
-    c->str = dupstrpfx(cstr, pptr - cstr);
-    return c;
-}
-
-/* Parse pattern possibly with different alternatives (|) */
-
-/**/
-static Comp
-parsecompsw(int gflag)
-{
-    Comp c1, c2, c3, excl = NULL, stail = tail;
-    int oaddflags = addflags;
-    int oerrsmax = errsmax;
-    char *sptr;
-
-    /*
-     * Check for a tilde in the expression.  We need to know this in 
-     * advance so as to be able to treat the whole a~b expression by
-     * backtracking:  see exclusion code in doesmatch().
-     */
-    if (isset(EXTENDEDGLOB)) {
-	int pct = 0;
-	for (sptr = pptr; *sptr; sptr++) {
-	    if (*sptr == Inpar)
-		pct++;
-	    else if (*sptr == Outpar && --pct < 0)
-		break;
-	    else if (*sptr == Bar && !pct)
-		break;
-	    else if (*sptr == Inbrack) {
-		/*
-		 * Character classes can have tokenized characters in,
-		 * so we have to parse them properly.
-		 */
-		char *bstart = pptr;
-
-		pptr = sptr;
-		parse_charset();
-		sptr = pptr;
-		pptr = bstart;
-		if (*sptr != Outbrack)
-		    break;
-	    } else if (*sptr == Tilde && !pct) {
-		tail = NULL;
-		break;
-	    }
-	}
-    }
-
-    c1 = parsecomp(gflag);
-    if (!c1)
-	return NULL;
-    if (isset(EXTENDEDGLOB) && *pptr == Tilde) {
-	/* Matching remainder of pattern excludes the pattern from matching */
-	int oldmode = mode, olderrsmax = errsmax;
-
-	mode = 1;
-	errsmax = 0;
-	pptr++;
-	excl = parsecomp(gflag);
-	mode = oldmode;
-	errsmax = olderrsmax;
-	if (!excl)
-	    return NULL;
-    }
-    tail = stail;
-    if (*pptr == Bar || excl) {
-	/* found an alternative or something to exclude */
-	c2 = compalloc();
-	if (*pptr == Bar) {
-	    /* get the next alternative after the | */
-	    pptr++;
-	    c3 = parsecompsw(gflag);
-	    if (!c3)
-		return NULL;
-	} else
-	    c3 = NULL;
-	/* mark if end of pattern or path component */
-	if (!*pptr || *pptr == '/')
-	    c1->stat |= c2->stat = C_LAST;
-	c2->str = dupstring("");
-	c2->left = c1;
-	c2->right = c3;
-	if ((c2->exclude = excl))
-	    c2->next = stail;
-	if (gflag & GF_PATHADD)
-	    c2->stat |= C_PATHADD;
-	c1 = c2;
-    }
-    if (!(gflag & GF_TOPLEV)) {
-	addflags = oaddflags;
-	errsmax = oerrsmax;
-    }
-    return c1;
-}
-
 /* This function tokenizes a zsh glob pattern */
 
 /**/
 static Complist
-parsecomplist(void)
+parsecomplist(char *instr)
 {
-    Comp c1;
-    Complist p1;
+    Patprog p1;
+    Complist l1;
     char *str;
+    int compflags = gf_noglobdots ? (PAT_FILE|PAT_NOGLD) : PAT_FILE;
 
-    if (pptr[0] == Star && pptr[1] == Star &&
-        (pptr[2] == '/' || (pptr[2] == Star && pptr[3] == '/'))) {
+    if (instr[0] == Star && instr[1] == Star &&
+        (instr[2] == '/' || (instr[2] == Star && instr[3] == '/'))) {
 	/* Match any number of directories. */
 	int follow;
 
 	/* with three stars, follow symbolic links */
-	follow = (pptr[2] == Star);
-	pptr += (3 + follow);
+	follow = (instr[2] == Star);
+	instr += (3 + follow);
 
 	/* Now get the next path component if there is one. */
-	p1 = (Complist) alloc(sizeof *p1);
-	if ((p1->next = parsecomplist()) == NULL) {
+	l1 = (Complist) alloc(sizeof *l1);
+	if ((l1->next = parsecomplist(instr)) == NULL) {
 	    errflag = 1;
 	    return NULL;
 	}
-	p1->comp = compalloc();
-	p1->comp->stat |= C_LAST;	/* end of path component  */
-	p1->comp->str = dupstring("*");
-	*p1->comp->str = Star;		/* match anything...      */
-	p1->closure = 1;		/* ...zero or more times. */
-	p1->follow = follow;
-	return p1;
+	l1->pat = patcompile(NULL, compflags | PAT_ANY, NULL);
+	l1->closure = 1;		/* ...zero or more times. */
+	l1->follow = follow;
+	return l1;
     }
 
     /* Parse repeated directories such as (dir/)# and (dir/)## */
-    if (*(str = pptr) == Inpar && !skipparens(Inpar, Outpar, &str) &&
+    if (*(str = instr) == Inpar && !skipparens(Inpar, Outpar, (char **)&str) &&
         *str == Pound && isset(EXTENDEDGLOB) && str[-2] == '/') {
-	pptr++;
-	if (!(c1 = parsecompsw(0)))
+	instr++;
+	if (!(p1 = patcompile(instr, compflags, &instr)))
 	    return NULL;
-	if (pptr[0] == '/' && pptr[1] == Outpar && pptr[2] == Pound) {
+	if (instr[0] == '/' && instr[1] == Outpar && instr[2] == Pound) {
 	    int pdflag = 0;
 
-	    pptr += 3;
-	    if (*pptr == Pound) {
+	    instr += 3;
+	    if (*instr == Pound) {
 		pdflag = 1;
-		pptr++;
+		instr++;
 	    }
-	    p1 = (Complist) alloc(sizeof *p1);
-	    p1->comp = c1;
-	    p1->closure = 1 + pdflag;
-	    p1->follow = 0;
-	    p1->next = parsecomplist();
-	    return (p1->comp) ? p1 : NULL;
+	    l1 = (Complist) alloc(sizeof *l1);
+	    l1->pat = p1;
+	    l1->closure = 1 + pdflag;
+	    l1->follow = 0;
+	    l1->next = parsecomplist(instr);
+	    return (l1->pat) ? l1 : NULL;
 	}
     } else {
 	/* parse single path component */
-	if (!(c1 = parsecompsw(GF_PATHADD|GF_TOPLEV)))
+	if (!(p1 = patcompile(instr, compflags|PAT_FILET, &instr)))
 	    return NULL;
 	/* then do the remaining path compoents */
-	if (*pptr == '/' || !*pptr) {
-	    int ef = *pptr == '/';
+	if (*instr == '/' || !*instr) {
+	    int ef = *instr == '/';
 
-	    p1 = (Complist) alloc(sizeof *p1);
-	    p1->comp = c1;
-	    p1->closure = 0;
-	    p1->next = ef ? (pptr++, parsecomplist()) : NULL;
-	    return (ef && !p1->next) ? NULL : p1;
+	    l1 = (Complist) alloc(sizeof *l1);
+	    l1->pat = p1;
+	    l1->closure = 0;
+	    l1->next = ef ? parsecomplist(instr+1) : NULL;
+	    return (ef && !l1->next) ? NULL : l1;
 	}
     }
     errflag = 1;
@@ -1084,31 +600,31 @@ parsecomplist(void)
 static Complist
 parsepat(char *str)
 {
-    mode = 0;			/* path components present */
-    addflags = 0;
-    errsmax = 0;
-    pptr = str;
-    tail = NULL;
+    patcompstart();
     /*
      * Check for initial globbing flags, so that they don't form
      * a bogus path component.
      */
-    if (*pptr == Inpar && pptr[1] == Pound && isset(EXTENDEDGLOB) &&
-	getglobflags())
-	return NULL;
+    if ((*str == Inpar && str[1] == Pound && isset(EXTENDEDGLOB)) ||
+	(isset(KSHGLOB) && *str == '@' && str[1] == Inpar &&
+	 str[2] == Pound)) {
+	str += (*str == Inpar) ? 2 : 3;
+	if (!patgetglobflags(&str))
+	    return NULL;
+    }
 
     /* Now there is no (#X) in front, we can check the path. */
     if (!pathbuf)
 	pathbuf = zalloc(pathbufsz = PATH_MAX);
     DPUTS(pathbufcwd, "BUG: glob changed directory");
-    if (*pptr == '/') {		/* pattern has absolute path */
-	pptr++;
+    if (*str == '/') {		/* pattern has absolute path */
+	str++;
 	pathbuf[0] = '/';
 	pathbuf[pathpos = 1] = '\0';
     } else			/* pattern is relative to pwd */
 	pathbuf[pathpos = 0] = '\0';
 
-    return parsecomplist();
+    return parsecomplist(str);
 }
 
 /* get number after qualifier */
@@ -1718,14 +1234,11 @@ glob(LinkList list, LinkNode np)
     matchptr = matchbuf = (Gmatch)zalloc((matchsz = 16) *
 					 sizeof(struct gmatch));
     matchct = 0;
-    errsfound = 0;
-    errsmax = -1;
+    pattrystart();
 
     /* The actual processing takes place here: matches go into  *
      * matchbuf.  This is the only top-level call to scanner(). */
-    scanning = 1;
     scanner(q);
-    scanning = 0;
 
     /* Deal with failures to match depending on options */
     if (matchct)
@@ -2174,13 +1687,13 @@ xpandbraces(LinkList list, LinkNode *np)
 int
 matchpat(char *a, char *b)
 {
-    Comp c = parsereg(b);
+    Patprog p = patcompile(b, PAT_STATIC, NULL);
 
-    if (!c) {
+    if (!p) {
 	zerr("bad pattern: %s", b, 0);
 	return 0;
     }
-    return domatch(a, c, 0);
+    return pattry(p, a);
 }
 
 /* do the ${foo%%bar}, ${foo#bar} stuff */
@@ -2284,29 +1797,6 @@ get_match_ret(char *s, int b, int e, int fl, char *replstr)
 }
 
 /*
- * Run the pattern so that we always get the longest possible match.
- * This eliminates a loop where we gradually shorten the target string
- * to find same.  We also need to check pptr (the point successfully
- * reached along the target string) explicitly.
- *
- * For this to work, we need the full hairy closure code, so
- * set inclosure.
- */
-
-/**/
-static int
-dolongestmatch(char *str, Comp c, int fist)
-{
-    int ret;
-    longest = 1;
-    inclosure++;
-    ret = domatch(str, c, fist);
-    inclosure--;
-    longest = 0;
-    return ret;
-}
-
-/*
  * This is called from paramsubst to get the match for ${foo#bar} etc.
  * fl is a set of the SUB_* flags defined in zsh.h
  * *sp points to the string we have to modify. The n'th match will be
@@ -2323,15 +1813,19 @@ dolongestmatch(char *str, Comp c, int fist)
 int
 getmatch(char **sp, char *pat, int fl, int n, char *replstr)
 {
-    Comp c;
+    Patprog p;
+    int patflags = PAT_STATIC|PAT_SCAN|PAT_NOANCH;
 
     MUSTUSEHEAP("getmatch");	/* presumably covered by prefork() test */
-    c = parsereg(pat);
-    if (!c) {
+
+    if ((fl & SUB_ALL) || ((fl & SUB_END) && !(fl & SUB_SUBSTR)))
+	patflags &= ~PAT_NOANCH;
+    p = patcompile(pat, patflags, NULL);
+    if (!p) {
  	zerr("bad pattern: %s", pat, 0);
  	return 1;
     }
-    return igetmatch(sp, c, fl, n, replstr);
+    return igetmatch(sp, p, fl, n, replstr);
 }
 
 /**/
@@ -2339,200 +1833,219 @@ void
 getmatcharr(char ***ap, char *pat, int fl, int n, char *replstr)
 {
     char **arr = *ap, **pp;
-    Comp c;
+    Patprog p;
+    /*
+     * Flags to pattern compiler:  use static buffer since we only
+     * have one pattern at a time; we will try the must-match test ourselves,
+     * so tell the pattern compiler we are scanning.
+     */
+    int patflags = PAT_STATIC|PAT_SCAN|PAT_NOANCH;
 
     MUSTUSEHEAP("getmatch");	/* presumably covered by prefork() test */
 
-    c = parsereg(pat);
-    if (!c) {
+    /*
+     * Search is anchored to the end of the string if we want to match
+     * it all, or if we are matching at the end of the string and not
+     * using substrings.
+     */
+    if ((fl & SUB_ALL) || ((fl & SUB_END) && !(fl & SUB_SUBSTR)))
+	patflags &= ~PAT_NOANCH;
+    p = patcompile(pat, patflags, NULL);
+    if (!p) {
 	zerr("bad pattern: %s", pat, 0);
 	return;
     }
     *ap = pp = ncalloc(sizeof(char *) * (arrlen(arr) + 1));
     while ((*pp = *arr++))
-	if (igetmatch(pp, c, fl, n, replstr))
+	if (igetmatch(pp, p, fl, n, replstr))
 	    pp++;
 }
 
 /**/
 static int
-igetmatch(char **sp, Comp c, int fl, int n, char *replstr)
+igetmatch(char **sp, Patprog p, int fl, int n, char *replstr)
 {
     char *s = *sp, *t, *start, sav;
-    int i, l = strlen(*sp), matched;
+    int i, l = strlen(*sp), matched = 1;
 
     repllist = NULL;
 
+    /* perform must-match test for complex closures */
+    if (p->mustoff && !strstr((char *)s, (char *)p + p->mustoff))
+	matched = 0;
+
     if (fl & SUB_ALL) {
-	i = domatch(s, c, 0);
+	i = matched && pattry(p, s);
 	*sp = get_match_ret(*sp, 0, i ? l : 0, fl, i ? replstr : 0);
 	if (! **sp && (((fl & SUB_MATCH) && !i) || ((fl & SUB_REST) && i)))
 	    return 0;
 	return 1;
     }
-    switch (fl & (SUB_END|SUB_LONG|SUB_SUBSTR)) {
-    case 0:
-    case SUB_LONG:
-	/*
-	 * Largest/smallest possible match at head of string.
-	 * First get the longest match...
-	 */
-	if (dolongestmatch(s, c, 0)) {
-	    char *mpos = pptr;
-	    if (!(fl & SUB_LONG)) {
-	      /*
-	       * ... now we know whether it's worth looking for the
-	       * shortest, which we do by brute force.
-	       */
-	      for (t = s; t < mpos; METAINC(t)) {
-		sav = *t;
-		*t = '\0';
-		if (dolongestmatch(s, c, 0)) {
-		  mpos = pptr;
-		  *t = sav;
-		  break;
-		}
-		*t = sav;
-	      }
-	    }
-	    *sp = get_match_ret(*sp, 0, mpos-s, fl, replstr);
-	    return 1;
-	}
-	break;
-
-    case SUB_END:
-	/* Smallest possible match at tail of string:  *
-	 * move back down string until we get a match. *
-	 * There's no optimization here.               */
-	for (t = s + l; t >= s; t--) {
-	    if (domatch(t, c, 0)) {
-		*sp = get_match_ret(*sp, t - s, l, fl, replstr);
-		return 1;
-	    }
-	    if (t > s+1 && t[-2] == Meta)
-		t--;
-	}
-	break;
-
-    case (SUB_END|SUB_LONG):
-	/* Largest possible match at tail of string:       *
-	 * move forward along string until we get a match. *
-	 * Again there's no optimisation.                  */
-	for (i = 0, t = s; i < l; i++, t++) {
-	    if (domatch(t, c, 0)) {
-		*sp = get_match_ret(*sp, i, l, fl, replstr);
-		return 1;
-	    }
-	    if (*t == Meta)
-		i++, t++;
-	}
-	break;
-
-    case SUB_SUBSTR:
-	/* Smallest at start, but matching substrings. */
-	if (!(fl & SUB_GLOBAL) && domatch(s + l, c, 0) && !--n) {
-	    *sp = get_match_ret(*sp, 0, 0, fl, replstr);
-	    return 1;
-	} /* fall through */
-    case (SUB_SUBSTR|SUB_LONG):
-	/* longest or smallest at start with substrings */
-	start = s;
-	if (fl & SUB_GLOBAL)
-	    repllist = newlinklist();
-	do {
-	    /* loop over all matches for global substitution */
-	    matched = 0;
-	    for (t = start; t < s + l; t++) {
-		/* Find the longest match from this position. */
-		if (dolongestmatch(t, c, 0) && pptr > t) {
-		    char *mpos = pptr;
-		    while (!(fl & SUB_LONG) && pptr > t) {
-			/* Now reduce to find the smallest match */
-			char *p = (pptr > t + 1 && pptr[-2] == Meta) ?
-			    pptr - 2 : pptr - 1;
-			sav = *p;
-			*p = '\0';
-			if (!dolongestmatch(t, c, 0)) {
-			    *p = sav;
+    if (matched) {
+	switch (fl & (SUB_END|SUB_LONG|SUB_SUBSTR)) {
+	case 0:
+	case SUB_LONG:
+	    /*
+	     * Largest/smallest possible match at head of string.
+	     * First get the longest match...
+	     */
+	    if (pattry(p, s)) {
+		char *mpos = patinput;
+		if (!(fl & SUB_LONG) && !(p->flags & PAT_PURES)) {
+		    /*
+		     * ... now we know whether it's worth looking for the
+		     * shortest, which we do by brute force.
+		     */
+		    for (t = s; t < mpos; METAINC(t)) {
+			sav = *t;
+			*t = '\0';
+			if (pattry(p, s)) {
+			    mpos = patinput;
+			    *t = sav;
 			    break;
 			}
-			mpos = pptr;
-			*p = sav;
+			*t = sav;
 		    }
-		    if (!--n || (n <= 0 && (fl & SUB_GLOBAL)))
-			*sp = get_match_ret(*sp, t-s, mpos-s, fl, replstr);
-		    if (!(fl & SUB_GLOBAL)) {
-			if (n) {
-			    /*
-			     * Looking for a later match: in this case,
-			     * we can continue looking for matches from
-			     * the next character, even if it overlaps
-			     * with what we just found.
-			     */
-			    continue;
-			} else
-			    return 1;
-		    }
-		    /*
-		     * For a global match, we need to skip the stuff
-		     * which is already marked for replacement.
-		     */
-		    matched = 1;
-		    start = mpos;
-		    break;
 		}
-		if (*t == Meta)
-		    t++;
-	    }
-	} while (matched);
-	/*
-	 * check if we can match a blank string, if so do it
-	 * at the start.  Goodness knows if this is a good idea
-	 * with global substitution, so it doesn't happen.
-	 */
-	if ((fl & (SUB_LONG|SUB_GLOBAL)) == SUB_LONG &&
-	    domatch(s + l, c, 0) && !--n) {
-	    *sp = get_match_ret(*sp, 0, 0, fl, replstr);
-	    return 1;
-	}
-	break;
-
-    case (SUB_END|SUB_SUBSTR):
-	/* Shortest at end with substrings */
-	if (domatch(s + l, c, 0) && !--n) {
-	    *sp = get_match_ret(*sp, l, l, fl, replstr);
-	    return 1;
-	} /* fall through */
-    case (SUB_END|SUB_LONG|SUB_SUBSTR):
-	/* Longest/shortest at end, matching substrings.       */
-	for (t = s + l - 1; t >= s; t--) {
-	    if (t > s && t[-1] == Meta)
-		t--;
-	    if (dolongestmatch(t, c, 0) && pptr > t && !--n) {
-		/* Found the longest match */
-		char *mpos = pptr;
-		while (!(fl & SUB_LONG) && pptr > t) {
-		    /* Look for the shortest match */
-		    char *p = (pptr > t+1 && pptr[-2] == Meta) ?
-			pptr-2 : pptr-1;
-		    sav = *p;
-		    *p = '\0';
-		    if (!dolongestmatch(t, c, 0) || pptr == t) {
-			*p = sav;
-			break;
-		    }
-		    *p = sav;
-		    mpos = pptr;
-		}
-		*sp = get_match_ret(*sp, t-s, mpos-s, fl, replstr);
+		*sp = get_match_ret(*sp, 0, mpos-s, fl, replstr);
 		return 1;
 	    }
+	    break;
+
+	case SUB_END:
+	    /* Smallest possible match at tail of string:  *
+	     * move back down string until we get a match. *
+	     * There's no optimization here.               */
+	    for (t = s + l; t >= s; t--) {
+		if (pattry(p, t)) {
+		    *sp = get_match_ret(*sp, t - s, l, fl, replstr);
+		    return 1;
+		}
+		if (t > s+1 && t[-2] == Meta)
+		    t--;
+	    }
+	    break;
+
+	case (SUB_END|SUB_LONG):
+	    /* Largest possible match at tail of string:       *
+	     * move forward along string until we get a match. *
+	     * Again there's no optimisation.                  */
+	    for (i = 0, t = s; i < l; i++, t++) {
+		if (pattry(p, t)) {
+		    *sp = get_match_ret(*sp, i, l, fl, replstr);
+		    return 1;
+		}
+		if (*t == Meta)
+		    i++, t++;
+	    }
+	    break;
+
+	case SUB_SUBSTR:
+	    /* Smallest at start, but matching substrings. */
+	    if (!(fl & SUB_GLOBAL) && pattry(p, s + l) && !--n) {
+		*sp = get_match_ret(*sp, 0, 0, fl, replstr);
+		return 1;
+	    } /* fall through */
+	case (SUB_SUBSTR|SUB_LONG):
+	    /* longest or smallest at start with substrings */
+	    start = s;
+	    if (fl & SUB_GLOBAL)
+		repllist = newlinklist();
+	    do {
+		/* loop over all matches for global substitution */
+		matched = 0;
+		for (t = start; t < s + l; t++) {
+		    /* Find the longest match from this position. */
+		    if (pattry(p, t) && patinput > t) {
+			char *mpos = patinput;
+			if (!(fl & SUB_LONG) && !(p->flags & PAT_PURES)) {
+			    char *ptr;
+			    for (ptr = t; ptr < mpos; METAINC(ptr)) {
+				sav = *ptr;
+				*ptr = '\0';
+				if (pattry(p, t)) {
+				    mpos = patinput;
+				    *ptr = sav;
+				    break;
+				}
+				*ptr = sav;
+			    }
+			}
+			if (!--n || (n <= 0 && (fl & SUB_GLOBAL)))
+			    *sp = get_match_ret(*sp, t-s, mpos-s, fl, replstr);
+			if (!(fl & SUB_GLOBAL)) {
+			    if (n) {
+				/*
+				 * Looking for a later match: in this case,
+				 * we can continue looking for matches from
+				 * the next character, even if it overlaps
+				 * with what we just found.
+				 */
+				continue;
+			    } else
+				return 1;
+			}
+			/*
+			 * For a global match, we need to skip the stuff
+			 * which is already marked for replacement.
+			 */
+			matched = 1;
+			start = mpos;
+			break;
+		    }
+		    if (*t == Meta)
+			t++;
+		}
+	    } while (matched);
+	    /*
+	     * check if we can match a blank string, if so do it
+	     * at the start.  Goodness knows if this is a good idea
+	     * with global substitution, so it doesn't happen.
+	     */
+	    if ((fl & (SUB_LONG|SUB_GLOBAL)) == SUB_LONG &&
+		pattry(p, s + l) && !--n) {
+		*sp = get_match_ret(*sp, 0, 0, fl, replstr);
+		return 1;
+	    }
+	    break;
+
+	case (SUB_END|SUB_SUBSTR):
+	    /* Shortest at end with substrings */
+	    if (pattry(p, s + l) && !--n) {
+		*sp = get_match_ret(*sp, l, l, fl, replstr);
+		return 1;
+	    } /* fall through */
+	case (SUB_END|SUB_LONG|SUB_SUBSTR):
+	    /* Longest/shortest at end, matching substrings.       */
+	    for (t = s + l - 1; t >= s; t--) {
+		if (t > s && t[-1] == Meta)
+		    t--;
+		if (pattry(p, t) && patinput > t && !--n) {
+		    /* Found the longest match */
+		    char *mpos = patinput;
+		    if (!(fl & SUB_LONG) && !(p->flags & PAT_PURES)) {
+			char *ptr;
+			for (ptr = t; ptr < mpos; METAINC(ptr)) {
+			    sav = *ptr;
+			    *ptr = '\0';
+			    if (pattry(p, t)) {
+				mpos = patinput;
+				*ptr = sav;
+				break;
+			    }
+			    *ptr = sav;
+			}
+		    }
+		    *sp = get_match_ret(*sp, t-s, mpos-s, fl, replstr);
+		    return 1;
+		}
+	    }
+	    if ((fl & SUB_LONG) && pattry(p, s + l) && !--n) {
+		*sp = get_match_ret(*sp, l, l, fl, replstr);
+		return 1;
+	    }
+	    break;
 	}
-	if ((fl & SUB_LONG) && domatch(s + l, c, 0) && !--n) {
-	    *sp = get_match_ret(*sp, l, l, fl, replstr);
-	    return 1;
-	}
-	break;
     }
 
     if (repllist && nonempty(repllist)) {
@@ -2563,811 +2076,13 @@ igetmatch(char **sp, Comp c, int fl, int n, char *replstr)
 	}
 	memcpy(t, s + i, l - i);
 	start[lleft] = '\0';
-	*sp = start;
+	*sp = (char *)start;
 	return 1;
     }
 
     /* munge the whole string: no match, so no replstr */
     *sp = get_match_ret(*sp, 0, 0, fl, 0);
     return 1;
-}
-
-/* The main entry point for matching a string str against  *
- * a compiled pattern c.  `fist' indicates whether leading *
- * dots are special.                                       */
-
-/**/
-int
-domatch(char *str, Comp c, int fist)
-{
-    int ret;
-    pptr = str;
-    first = fist;
-    /*
-     * If scanning paths, keep the error count over the whole
-     * filename
-     */
-    if (!scanning) {
-	errsfound = 0;
-	errsmax = -1;
-    }
-    if (*pptr == Nularg)
-	pptr++;
-    PERMALLOC {
-	ret = doesmatch(c);
-    } LASTALLOC;
-    return ret;
-}
-
-#define untok(C)  (itok(C) ? ztokens[(C) - Pound] : (C))
-
-/* See if pattern has a matching exclusion (~...) part */
-
-/**/
-static int
-excluded(Comp c, char *eptr)
-{
-    char *saves = pptr;
-    int savei = first, savel = longest, savee = errsfound, ret;
-
-    first = 0;
-    /*
-     * Even if we've been told always to match the longest string,
-     * i.e. not anchored to the end, we want to match the full string
-     * we've already matched when we're trying to exclude it.
-     * Likewise, approximate matching here is treated separately.
-     */
-    longest = 0;
-    errsfound = 0;
-    if (PATHADDP(c) && pathpos) {
-	VARARR(char, buf, pathpos + strlen(eptr) + 1);
-
-	strcpy(buf, pathbuf);
-	strcpy(buf + pathpos, eptr);
-	pptr = buf;
-	ret = doesmatch(c->exclude);
-    } else {
-	pptr = eptr;
-	ret = doesmatch(c->exclude);
-    }
-    if (*pptr)
-	ret = 0;
-
-    pptr = saves;
-    first = savei;
-    longest = savel;
-    errsfound = savee;
-
-    return ret;
-}
-
-/*
- * Structure for storing instances of a pattern in a closured.
- */
-struct gclose {
-    char *start;		/* Start of this instance */
-    char *end;			/* End of this instance */
-    int errsfound;		/* Errors found up to start of instance */
-};
-typedef struct gclose *Gclose;
-
-/* Add a list of matches that fit the closure.  trystring is a string of
- * the same length as the target string; a non-zero in that string
- * indicates that we have already tried to match the patterns following
- * the closure (c->next) at that point and failed.  This means that not
- * only should we not bother using the corresponding match, we should
- * also not bother going any further, since the first time we got to
- * that position (when it was marked), we must already have failed on
- * and backtracked over any further closure matches beyond that point.
- * If we are using approximation, the number in the string is incremented
- * by the current error count; if we come back to that point with a
- * lower error count, it is worth trying from that point again, but
- * we must now mark that point in trystring with the new error.
- */
-
-/**/
-static void
-addclosures(Comp c, LinkList closlist, int *pdone, unsigned char *trystring)
-{
-    Gclose gcnode;
-    char *opptr = pptr;
-    unsigned char *tpos;
-
-    while (*pptr) {
-	if (STARP(c)) {
-	    if (*(tpos = trystring + ((pptr+1) - opptr))) {
-		if ((unsigned)(errsfound+1) >= *tpos)
-		    break;
-		*tpos = (unsigned)(errsfound+1);
-	    }
-	    gcnode = (Gclose)zalloc(sizeof(struct gclose));
-	    gcnode->start = pptr;
-	    gcnode->end = METAINC(pptr);
-	    gcnode->errsfound = errsfound;
-	} else {
-	    char *saves = pptr;
-	    int savee = errsfound;
-	    if (OPTIONALP(c) && *pdone >= 1)
-		return;
-	    if (!matchonce(c) || saves == pptr ||
-		(*(tpos = trystring + (pptr-opptr)) &&
-		 (unsigned)(errsfound+1) >= *tpos)) {
-		pptr = saves;
-		break;
-	    }
-	    if (*tpos)
-		*tpos = (unsigned)(errsfound+1);
-	    gcnode = (Gclose)zalloc(sizeof(struct gclose));
-	    gcnode->start = saves;
-	    gcnode->end = pptr;
-	    gcnode->errsfound = savee;
-	}
-	pushnode(closlist, gcnode);
-	(*pdone)++;
-    }
-}
-
-/*
- * Match characters with case-insensitivity.  Note charmatch(x,y) !=
- * charmatch(y,x): the first argument comes from the target string, the
- * second from the pattern.  This used to be a macro, and in principle
- * could be turned back into one.
- */
-
-/**/
-static int
-charmatch(Comp c, char *x, char *y)
-{
-    /*
-     * This takes care of matching two characters which may be a
-     * two byte sequence, Meta followed by something else.
-     * Here we bypass tulower() and tuupper() for speed.
-     */
-    int xi = (STOUC(UNMETA(x)) & 0xff), yi = (STOUC(UNMETA(y)) & 0xff);
-    /* A NULL is a real null, since a \000 would be metafied. */
-    if (!*x || !*y)
-	return 0;
-    return xi == yi ||
-	(((c->stat & C_IGNCASE) ?
-	  ((isupper(xi) ? tolower(xi) : xi) ==
-	   (isupper(yi) ? tolower(yi) : yi)) :
-	  (c->stat & C_LCMATCHUC) ?
-	  (islower(yi) && toupper(yi) == xi) : 0));
-}
-
-/* see if current string in pptr matches c */
-
-/**/
-static int
-doesmatch(Comp c)
-{
-    if (CLOSUREP(c)) {
-	int done, retflag = 0;
-	char *saves, *opptr;
-	unsigned char *trystring, *tpos;
-	int savee;
-	LinkList closlist;
-	Gclose gcnode;
-
-	if (first && *pptr == '.')
-	    return 0;
-
-	if (!inclosure && !c->left && !c->errsmax) {
-	    /* We are not inside another closure, and the current
-	     * pattern is a simple string.  We handle this very common
-	     * case specially: otherwise, matches like *foo* are
-	     * extremely slow.  Here, instead of backtracking, we track
-	     * forward until we get a match.  At top level, we are bound
-	     * to get there eventually, so this is OK.
-	     */
-	    char looka;
-
-	    if (STARP(c) && c->next &&
-		!c->next->left && (looka = *c->next->str) &&
-		!itok(looka)) {
-		/* Another simple optimisation for a very common case:
-		 * we are processing a * and there is
-		 * an ordinary character match (which may not be a Metafied
-		 * character, just to make it easier) next.  We look ahead
-		 * for that character, taking care of Meta bytes.
-		 */
-		while (*pptr) {
-		    for (; *pptr; pptr++) {
-			if (*pptr == Meta)
-			    pptr++;
-			else if (charmatch(c, pptr, &looka))
-			    break;
-		    }
-		    if (!*(saves = pptr))
-			break;
-		    savee = errsfound;
-		    if (doesmatch(c->next))
-			return 1;
-		    pptr = saves+1;
-		    errsfound = savee;
-		}
-	    } else {
-		/* Standard track-forward code */
-		for (done = 0; ; done++) {
-		    saves = pptr;
-		    savee = errsfound;
-		    if ((done || ONEHASHP(c) || OPTIONALP(c)) &&
-			((!c->next && (!LASTP(c) || !*pptr || longest)) ||
-			 (c->next && doesmatch(c->next))))
-			return 1;
-		    if (done && OPTIONALP(c))
-			return 0;
-		    pptr = saves;
-		    errsfound = savee;
-		    first = 0;
-		    if (STARP(c)) {
-			if (!*pptr)
-			    return 0;
-			pptr++;
-		    } else if (!matchonce(c) || pptr == saves)
-			return 0;
-		}
-	    }
-	    return 0;
-	}
-	/* The full, gory backtracking code is now necessary. */
-	inclosure++;
-	closlist = newlinklist();
-	trystring = (unsigned char *)zcalloc(strlen(pptr)+1);
-	opptr = pptr;
-
-	/* Start by making a list where each match is as long
-	 * as possible.  We later have to take account of the
-	 * fact that earlier matches may be too long.
-	 */
-	done = 0;
-	addclosures(c, closlist, &done, trystring);
-	for (;;) {
-	    if (TWOHASHP(c) && !done)
-		break;
-	    saves = pptr;
-	    /* do we really want this LASTP here?? */
-	    if ((!c->next && (!LASTP(c) || !*pptr || longest)) ||
-		(c->next && doesmatch(c->next))) {
-		retflag = 1;
-		break;
-	    }
-	    trystring[saves-opptr] = (unsigned)(errsfound + 1);
-	    /*
-	     * If we failed, the first thing to try is whether we can
-	     * shorten the match using the last pattern in the closure.
-	     */
-	    gcnode = firstnode(closlist) ? peekfirst(closlist) : NULL;
-	    if (gcnode && --gcnode->end > gcnode->start
-		&& (gcnode->end[-1] != Meta ||
-		    --gcnode->end > gcnode->start)) {
-		char savec = *gcnode->end;
-		*gcnode->end = '\0';
-		pptr = gcnode->start;
-		errsfound = gcnode->errsfound;
-		if (matchonce(c) && pptr != gcnode->start
-		    && (!*(tpos = trystring + (pptr-opptr)) ||
-			*tpos > (unsigned)(errsfound+1))) {
-		    if (*tpos)
-			*tpos = (unsigned)(errsfound+1);
-		    *gcnode->end = savec;
-		    gcnode->end = pptr;
-		    /* Try again to construct a list based on
-		     * this new position
-		     */
-		    addclosures(c, closlist, &done, tpos);
-		    continue;
-		}
-		*gcnode->end = savec;
-	    }
-	    /* We've now exhausted the possibilities with that match,
-	     * backtrack to the previous.
-	     */
-	    if ((gcnode = (Gclose)getlinknode(closlist))) {
-		pptr = gcnode->start;
-		errsfound = gcnode->errsfound;
-		zfree(gcnode, sizeof(struct gclose));
-		done--;
-	    } else
-		break;
-	}
-	freelinklist(closlist, free);
-	zfree(trystring, strlen(opptr)+1);
-	inclosure--;
-
-	return retflag;
-    } else
-	return matchonce(c);
-}
-
-/**/
-static int
-posix_range(char **patptr, int ch)
-{
-    /* Match POSIX ranges, which correspond to ctype macros,  *
-     * e.g. [:alpha:] -> isalpha.  It just doesn't seem worth * 
-     * the palaver of creating a hash table for this.         */
-    char *start = *patptr;
-    int len;
-
-    /* we made sure in parsecomp() there was a ':' to search for */
-    *patptr = strchr(start, ':');
-    len = (*patptr)++ - start;
-
-    if (!strncmp(start, "alpha", len))
-	return isalpha(ch);
-    if (!strncmp(start, "alnum", len))
-	return isalnum(ch);
-    if (!strncmp(start, "blank", len))
-	return ch == ' ' || ch == '\t';
-    if (!strncmp(start, "cntrl", len))
-	return iscntrl(ch);
-    if (!strncmp(start, "digit", len))
-	return isdigit(ch);
-    if (!strncmp(start, "graph", len))
-	return isgraph(ch);
-    if (!strncmp(start, "lower", len))
-	return islower(ch);
-    if (!strncmp(start, "print", len))
-	return isprint(ch);
-    if (!strncmp(start, "punct", len))
-	return ispunct(ch);
-    if (!strncmp(start, "space", len))
-	return isspace(ch);
-    if (!strncmp(start, "upper", len))
-	return isupper(ch);
-    if (!strncmp(start, "xdigit", len))
-	return isxdigit(ch);
-    return 0;
-}
-
-/**/
-static void
-rangematch(char **patptr, int ch, int rchar)
-{
-    /* Check for a character in a [...] or [^...].  The [ *
-     * and optional ^ have already been skipped.          */
-
-    char *pat = *patptr;
-    /* We don't use strcoll() for ranges, since it can have side
-     * effects.  It's less necessary now we have [:posix:] ranges.
-     */
-#if 0
-    char l_buf[2], r_buf[2], ch_buf[2];
-
-    ch_buf[0] = ch;
-    l_buf[1] = r_buf[1] = ch_buf[1] = '\0';
-#endif
-
-#define PAT(X) (pat[X] == Meta ? pat[(X)+1] ^ 32 : untok(pat[X]))
-#define PPAT(X) (pat[(X)-1] == Meta ? pat[X] ^ 32 : untok(pat[X]))
-
-    for (pat++; *pat != Outbrack && *pat; METAINC(pat)) {
-	if (*pat == Inbrack) {
-	    /* Inbrack can only occur inside a range if we found [:...:]. */
-	    pat += 2;
-	    if (posix_range(&pat, ch))
-		break;
-	} else if (*pat == '-' && pat[-1] != rchar &&
-		   pat[1] != Outbrack) {
-#if 0
-	    l_buf[0] = PPAT(-1);
-	    r_buf[0] = PAT(1);
-	    if (strcoll(l_buf, ch_buf) <= 0 &&
-		strcoll(ch_buf, r_buf) <= 0)
-#else
-		if (PPAT(-1) <= ch && PAT(1) >= ch)
-#endif
-		    break;
-	} else if (ch == PAT(0))
-	    break;
-    }
-
-    *patptr = pat;
-}
-
-/*
- * matchonce() is the core of the pattern matching, handling individual
- * strings and instances of a pattern in a closure.
- *
- * Note on approximate matching:  The rule is supposed to be
- *   (1) Take the longest possible match without approximation.
- *   (2) At any failure, make the single approximation that results
- *       in the longest match for the remaining part (which may
- *       include further approximations).
- *   (3) If we match the same distance, take the one with fewer
- *       approximations.
- * If this is wrong, I haven't yet discovered a counterexample.  Email
- * lines are now open.
- *                   pws 1999/02/23
- */
-
-/**/
-static int
-matchonce(Comp c)
-{
-    char *pat = c->str;
-    for (;;) {
-	/* loop until success or failure of pattern */
-	if (!pat || !*pat) {
-	    /* No current pattern (c->str). */
-	    char *saves;
-	    int savee, savei;
-
-	    if (errflag)
-		return 0;
-	    /* Remember state in case we need to go back and   *
-	     * check for exclusion of pattern or alternatives. */
-	    saves = pptr;
-	    savei = first;
-	    savee = errsfound;
-	    /* Loop over alternatives with exclusions: (foo~bar|...). *
-	     * Exclusions apply to the pattern in c->left.            */
-	    if (c->left || c->right) {
-		int ret = 0, ret2 = 0;
-		if (c->exclude) {
-		    char *exclend = 0;
-
-		    /* We may need to back up on things like `(*~foo)'
-		     * if the `*' matched `foo' but needs to match `fo'.
-		     * exclend marks the end of the shortened text.  We
-		     * need to restore it to match the tail.
-		     * We set `inclosure' because we need the more
-		     * sophisticated code in doesmatch() for any nested
-		     * closures.
-		     */
-		    inclosure++;
-
-		    while (!exclend || exclend >= pptr) {
-			char exclsav = 0;
-			if (exclend) {
-			     exclsav = *exclend;
-			    *exclend = '\0';
-			}
-			if ((ret = doesmatch(c->left))) {
-			    if (exclend)
-				*exclend = exclsav;
-			    exclsav = *(exclend = pptr);
-			    *exclend = '\0';
-			    ret2 = !excluded(c, saves);
-			}
-			if (exclend)
-			    *exclend = exclsav;
-
-			if (!ret)
-			    break;
-			if ((ret = ret2 &&
-			     ((!c->next && (!LASTP(c) || !*pptr || longest))
-			      || (c->next && doesmatch(c->next)))) ||
-			    (!c->next && LASTP(c)))
-			    break;
-			/* Back up if necessary: exclend gives the position
-			 * of the end of the match we are excluding,
-			 * so only try to match to there.
-			 */
-			exclend--;
-			pptr = saves;
-			errsfound = savee;
-		    }
-		    inclosure--;
-		    if (ret)
-			return 1;
-		} else
-		    ret = doesmatch(c->left);
-		ret2 = 0;
-		if (c->right && (!ret || inclosure)) {
-		    /* If in a closure, we always want the longest match. */
-		    char *newpptr = pptr;
-		    int newerrsfound = errsfound;
-		    pptr = saves;
-		    first = savei;
-		    errsfound = savee;
-		    ret2 = doesmatch(c->right);
-		    if (ret && (!ret2 || pptr < newpptr)) {
-			pptr = newpptr;
-			errsfound = newerrsfound;
-		    }
-		}
-		if (!ret && !ret2) {
-		    pptr = saves;
-		    first = savei;
-		    errsfound = savee;
-		    break;
-		}
-	    }
-	    if (CLOSUREP(c))
-		return 1;
-	    if (!c->next) {
-		/*
-		 * No more patterns left, but we may still be in the middle
-		 * of a match, in which case alles in Ordnung...
-		 */ 
-		if (!LASTP(c))
-		    return 1;
-		/*
-		 * ...else we're at the last pattern, so this is our last
-		 * ditch attempt at an approximate match: try to omit the
-		 * last few characters.
-		 */
-		for (; *pptr && errsfound < c->errsmax &&
-			 (errsmax == -1 || errsfound < errsmax);
-		     METAINC(pptr))
-		    errsfound++;
-		return !*pptr || longest;
-	    }
-	    /* optimisation when next pattern is not a closure */
-	    if (!CLOSUREP(c->next)) {
-		c = c->next;
-		pat = c->str;
-		continue;
-	    }
-	    return doesmatch(c->next);
-	}
-	/*
-	 * Don't match leading dot if first is set
-	 * (don't even try for an approximate match)
-	 */
-	if (first && *pptr == '.' && *pat != '.')
-	    return 0;
-	if (*pat == Star) {	/* final * is not expanded to ?#; returns success */
-	    while (*pptr)
-		pptr++;
-	    return 1;
-	}
-	first = 0;		/* finished checking start of pattern */
-	if (*pat == Quest) {
-	    /* match exactly one character */
-	    if (!*pptr)
-		break;
-	    METAINC(pptr);
-	    pat++;
-	    continue;
-	}
-	if (*pat == Inbrack) {
-	    /* Match groups of characters */
-	    char ch;
-	    char *saves, *savep;
-
-	    if (!*pptr)
-		break;
-	    saves = pptr;
-	    savep = pat;
-	    ch = UNMETA(pptr);
-	    if (pat[1] == Hat || pat[1] == '^' || pat[1] == '!') {
-		/* group is negated */
-		*++pat = Hat;
-		rangematch(&pat, ch, Hat);
-		DPUTS(!*pat, "BUG: something is very wrong in doesmatch()");
-		if (*pat != Outbrack) {
-		    pptr = saves;
-		    pat = savep;
-		    break;
-		}
-		pat++;
-		METAINC(pptr);
-		continue;
-	    } else {
-		/* pattern is not negated (affirmed? asserted?) */
-		rangematch(&pat, ch, Inbrack);
-		DPUTS(!pat || !*pat, "BUG: something is very wrong in doesmatch()");
-		if (*pat == Outbrack) {
-		    pptr = saves;
-		    pat = savep;
-		    break;
-		}
-		for (METAINC(pptr); *pat != Outbrack; pat++);
-		pat++;
-		continue;
-	    }
-	}
-	if (*pat == Inang) {
-	    /* Numeric globbing. */
-#ifdef ZSH_64_BIT_TYPE
-/* zstrtol returns zlong anyway */
-# define RANGE_CAST()
-	    zlong t1, t2, t3;
-#else
-# define RANGE_CAST() (unsigned long)
-	    unsigned long t1, t2, t3;
-#endif
-	    char *ptr, *saves = pptr, *savep = pat;
-
-	    if (!idigit(*pptr))
-		break;
-	    if (*++pat == Outang || 
-		(*pat == '-' && pat[1] == Outang && ++pat)) {
-		/* <> or <->:  any number matches */
-		while (idigit(*++pptr));
-		pat++;
-	    } else {
-		/* Flag that there is no upper limit */
-		int not3 = 0;
-		char *opptr = pptr;
-		/*
-		 * Form is <a-b>, where a or b are numbers or blank.
-		 * t1 = number supplied:  must be positive, so use
-		 * unsigned arithmetic.
-		 */
-		t1 = RANGE_CAST() zstrtol(pptr, &ptr, 10);
-		pptr = ptr;
-		/* t2 = lower limit */
-		if (idigit(*pat))
-		    t2 = RANGE_CAST() zstrtol(pat, &ptr, 10);
-		else
-		    t2 = 0, ptr = pat;
-		if (*ptr != '-' || (not3 = (ptr[1] == Outang)))
-				/* exact match or no upper limit */
-		    t3 = t2, pat = ptr + not3;
-		else		/* t3 = upper limit */
-		    t3 = RANGE_CAST() zstrtol(ptr + 1, &pat, 10);
-		DPUTS(*pat != Outang, "BUG: wrong internal range pattern");
-		pat++;
-		/*
-		 * If the number found is too large for the pattern,
-		 * try matching just the first part.  This way
-		 * we always get the longest possible match.
-		 */
-		while (!not3 && t1 > t3 && pptr > opptr+1) {
-		  pptr--;
-		  t1 /= 10;
-		}
-		if (t1 < t2 || (!not3 && t1 > t3)) {
-		    pptr = saves;
-		    pat = savep;
-		    break;
-		}
-	    }
-	    continue;
-#undef RANGE_CAST
-	}
-	/* itok(Meta) is zero */
-	DPUTS(itok(*pat), "BUG: matching tokenized character");
-	if (charmatch(c, pptr, pat)) {
-	    /* just plain old characters (or maybe unplain new characters) */
-	    METAINC(pptr);
-	    METAINC(pat);
-	    continue;
-	}
-	if (errsfound < c->errsmax &&
-	    (errsmax == -1 || errsfound < errsmax)) {
-	    /*
-	     * We tried to match literal characters and failed.  Now it's
-	     * time to match approximately.  Note this doesn't handle the
-	     * case where we *didn't* try to match literal characters,
-	     * including the case where we were already at the end of the
-	     * pattern, because then we never get here.  In that case the
-	     * pattern has to be matched exactly, but we could maybe
-	     * advance up the target string before trying it, so we have to
-	     * handle that case elsewhere.
-	     */
-	    char *saves = pptr, *savep = c->str;
-	    char *maxpptr = pptr, *patnext = METANEXT(pat);
-	    int savee, maxerrs = -1;
-
-	    /* First try to advance up the pattern. */
-	    c->str = patnext;
-	    savee = ++errsfound;
-	    if (matchonce(c)) {
-		maxpptr = pptr;
-		maxerrs = errsfound;
-	    }
-	    errsfound = savee;
-
-	    if (*saves) {
-		/*
-		 * If we have characters on both strings, we have more
-		 * choice.
-		 *
-		 * Try to edge up the target string.
-		 */
-		char *strnext = METANEXT(saves);
-		pptr = strnext;
-		c->str = pat;
-		if (matchonce(c) &&
-		    (maxerrs == -1 || pptr > maxpptr ||
-		     (pptr == maxpptr && errsfound <= maxerrs))) {
-		    maxpptr = pptr;
-		    maxerrs = errsfound;
-		}
-		errsfound = savee;
-
-		/*
-		 * Try edging up both of them at once.
-		 * Note this takes precedence in the case of equal
-		 * length as we get further up the pattern.
-		 */
-		c->str = patnext;
-		pptr = strnext;
-		if (matchonce(c) &&
-		    (maxerrs == -1 || pptr > maxpptr ||
-		     (pptr == maxpptr && errsfound <= maxerrs))) {
-		    maxpptr = pptr;
-		    maxerrs = errsfound;
-		}
-		errsfound = savee;
-
-		/*
-		 * See if we can transpose: that counts as just one error.
-		 *
-		 * Note, however, `abanana' and `banana': transposing
-		 * is wrong here, as it gets us two errors,
-		 * [ab][a]nana vs [ba][]nana, instead of the correct
-		 * [a]banana vs []banana, so we still need to try
-		 * the other possibilities.
-		 */
-		if (strnext && patnext && !itok(*patnext) &&
-		    charmatch(c, strnext, pat) &&
-		    charmatch(c, saves, patnext)) {
-		    c->str = patnext;
-		    METAINC(c->str);
-
-		    pptr = strnext;
-		    METAINC(pptr);
-
-		    if (matchonce(c) &&
-			(maxerrs == -1 || pptr > maxpptr ||
-			 (pptr == maxpptr && errsfound <= maxerrs))) {
-			maxpptr = pptr;
-			maxerrs = errsfound;
-		    }
-		}
-	    }
-	    /*
-	     * We don't usually restore state on failure, but we need
-	     * to fix up the Comp structure which we altered to
-	     * look at the tail of the pattern.
-	     */
-	    c->str = savep;
-	    /*
-	     * If that failed, game over:  we don't want to break
-	     * and try the other approximate test, because we just did
-	     * that.
-	     */
-	    if (maxerrs == -1)
-		return 0;
-	    pptr = maxpptr;
-	    errsfound = maxerrs;
-	    return 1;
-	}
-	break;
-    }
-    if (*pptr && errsfound < c->errsmax &&
-	(errsmax == -1 || errsfound < errsmax)) {
-	/*
-	 * The pattern failed, but we can try edging up the target string
-	 * and rematching with an error.  Note we do this from wherever we
-	 * got to in the pattern string c->str, not the start. hence the
-	 * need to modify c->str.
-	 *
-	 * At this point, we don't have a literal character in the pattern
-	 * (handled above), so we don't try any funny business on the
-	 * pattern itself.
-	 */
-	int ret;
-	char *savep = c->str;
-	errsfound++;
-	METAINC(pptr);
-	c->str = pat;
-	ret = matchonce(c);
-	c->str = savep;
-	return ret;
-    }
-    return 0;
-}
-
-/* turn a string into a Comp struct:  this doesn't treat / specially */
-
-/**/
-Comp
-parsereg(char *str)
-{
-    remnulargs(str);
-    mode = 1;			/* no path components */
-    addflags = 0;
-    errsmax = 0;
-    pptr = str;
-    tail = NULL;
-    return parsecompsw(GF_TOPLEV);
 }
 
 /* blindly turn a string into a tokenised expression without lexing */
