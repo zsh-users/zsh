@@ -67,7 +67,7 @@ bin_echoti(char *name, char **argv, char *ops, int func)
     
 /* get a string-type capability */
     t = (char *)tigetstr(s);
-    if (!t || !*t) {
+    if (!t || t == (char *)-1 || !*t) {
 	/* capability doesn't exist, or (if boolean) is off */
 	zwarnnam(name, "no such terminfo capability: %s", s, 0);
 	return 1;
