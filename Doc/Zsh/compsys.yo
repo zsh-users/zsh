@@ -1153,6 +1153,29 @@ An array holding the names of the groups that should be completed. If
 this is not set by the user, it will automatically be set to a list
 of group names taken from the YP database or the file `tt(/etc/group)'.
 )
+item(tt(hosts))(
+An array holding the names of hosts that should be completed. If this
+is not set by the user it will automatically be set to a list of the
+hostnames in `tt(/etc/hosts)'.
+)
+item(tt(ports))(
+An array holding the service names of ports to complete. If this is
+not set by the user, it will be set to a list of the service names
+from `tt(/etc/services)'.
+)
+item(tt(telnet_hosts_ports_users))(
+This array is used by the completion function for tt(telnet). It
+should contain elements of the form
+`var(host)tt(:)var(port)tt(:)var(user)'. These triples will be used to 
+complete names of hosts, ports, and usernames depending on the
+information already on the line, so that if, for example, the hostname 
+is already typed, only those ports and usernames will be completed for 
+which triples with the hostname from the line exist.
+)
+item(tt(socket_hosts_ports))(
+Like tt(telnet_hosts_ports_users), but used for the tt(socket) command 
+and containing pairs of hostnames and ports.
+)
 enditem()
 
 subsect(Configuration keys)
