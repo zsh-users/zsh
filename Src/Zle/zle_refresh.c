@@ -81,6 +81,16 @@ mod_export int clearlist;
 /**/
 int trashedzle;
 
+/*
+ * Information used by PREDISPLAY and POSTDISPLAY parameters which
+ * add non-editable text to that being displayed.
+ */
+/**/
+unsigned char *predisplay, *postdisplay;
+/**/
+int predisplaylen, postdisplaylen;
+
+
 #ifdef HAVE_SELECT
 /* cost of last update */
 /**/
@@ -278,6 +288,10 @@ zrefresh(void)
 	*sen,			/* pointer to end of the video buffer (eol)  */
 	*scs;			/* pointer to cursor position in real buffer */
     char **qbuf;		/* tmp					     */
+    unsigned char *tmpline;	/* line with added pre/post text */
+    int tmpcs, tmpll;		/* ditto cursor position and line length */
+    int tmpalloced;		/* flag to free tmpline when finished */
+	
 
     /* If this is called from listmatches() (indirectly via trashzle()), and *
      * that was called from the end of zrefresh(), then we don't need to do  *
@@ -285,6 +299,25 @@ zrefresh(void)
      * improves speed a little in a common case.                             */
     if (inlist)
 	return;
+
+    if (predisplaylen || postdisplaylen) {
+	/* There is extra text to display at the start or end of the line */
+	tmpline = zalloc(ll + predisplaylen + postdisplaylen);
+	if (predisplaylen)
+	    memcpy(tmpline, predisplay, predisplaylen);
+	if (ll)
+	    memcpy(tmpline+predisplaylen, line, ll);
+	if (postdisplaylen)
+	    memcpy(tmpline+predisplaylen+ll, postdisplay, postdisplaylen);
+	tmpcs = cs + predisplaylen;
+	tmpll = predisplaylen + ll + postdisplaylen;
+	tmpalloced = 1;
+    } else {
+	tmpline = line;
+	tmpcs = cs;
+	tmpll = ll;
+	tmpalloced = 0;
+    }
 
     if (clearlist && listshown > 0) {
 	if (tccan(TCCLEAREOD)) {
@@ -392,18 +425,18 @@ zrefresh(void)
    width comparisons can be made with winw, height comparisons with winh */
 
     if (termflags & TERM_SHORT) {
-	singlerefresh();
+	singlerefresh(tmpline, tmpll, tmpcs);
 	goto singlelineout;
     }
 
-    if (cs < 0) {
+    if (tmpcs < 0) {
 #ifdef DEBUG
 	fprintf(stderr, "BUG: negative cursor position\n");
 	fflush(stderr); 
 #endif
-	cs = 0;
+	tmpcs = 0;
     }
-    scs = line + cs;
+    scs = tmpline + tmpcs;
     numscrolls = 0;
 
 /* first, we generate the video line buffers so we know what to put on
@@ -414,9 +447,9 @@ zrefresh(void)
 	*nbuf = (char *)zalloc(winw + 2);
 
     s = (unsigned char *)(nbuf[ln = 0] + lpromptw);
-    t = line;
+    t = tmpline;
     sen = (unsigned char *)(*nbuf + winw);
-    for (; t < line+ll; t++) {
+    for (; t < tmpline+tmpll; t++) {
 	if (t == scs)			/* if cursor is here, remember it */
 	    nvcs = s - (unsigned char *)(nbuf[nvln = ln]);
 
@@ -459,7 +492,7 @@ zrefresh(void)
 	nvln++;
     }
 
-    if (t != line + ll)
+    if (t != tmpline + tmpll)
 	more_end = 1;
 
     if (statusline) {
@@ -645,6 +678,9 @@ individually */
 	vmaxln = nlnct;
 singlelineout:
     fflush(shout);		/* make sure everything is written out */
+
+    if (tmpalloced)
+	zfree(tmpline, tmpll);
 
     /* if we have a new list showing, note it; if part of the list has been
     overwritten, redisplay it. */
@@ -1082,7 +1118,7 @@ redisplay(char **args)
 
 /**/
 static void
-singlerefresh(void)
+singlerefresh(unsigned char *tmpline, int tmpll, int tmpcs)
 {
     char *vbuf, *vp,		/* video buffer and pointer    */
 	**qbuf,			/* tmp			       */
@@ -1093,19 +1129,19 @@ singlerefresh(void)
 
     nlnct = 1;
 /* generate the new line buffer completely */
-    for (vsiz = 1 + lpromptw, t0 = 0; t0 != ll; t0++, vsiz++)
-	if (line[t0] == '\t')
+    for (vsiz = 1 + lpromptw, t0 = 0; t0 != tmpll; t0++, vsiz++)
+	if (tmpline[t0] == '\t')
 	    vsiz = (vsiz | 7) + 1;
-	else if (icntrl(line[t0]))
+	else if (icntrl(tmpline[t0]))
 	    vsiz++;
     vbuf = (char *)zalloc(vsiz);
 
-    if (cs < 0) {
+    if (tmpcs < 0) {
 #ifdef DEBUG
 	fprintf(stderr, "BUG: negative cursor position\n");
 	fflush(stderr); 
 #endif
-	cs = 0;
+	tmpcs = 0;
     }
 
     /* only use last part of prompt */
@@ -1113,25 +1149,25 @@ singlerefresh(void)
     vbuf[lpromptw] = '\0';
     vp = vbuf + lpromptw;
 
-    for (t0 = 0; t0 != ll; t0++) {
-	if (line[t0] == '\t')
+    for (t0 = 0; t0 != tmpll; t0++) {
+	if (tmpline[t0] == '\t')
 	    for (*vp++ = ' '; (vp - vbuf) & 7; )
 		*vp++ = ' ';
-	else if (line[t0] == '\n') {
+	else if (tmpline[t0] == '\n') {
 	    *vp++ = '\\';
 	    *vp++ = 'n';
-	} else if (line[t0] == 0x7f) {
+	} else if (tmpline[t0] == 0x7f) {
 	    *vp++ = '^';
 	    *vp++ = '?';
-	} else if (icntrl(line[t0])) {
+	} else if (icntrl(tmpline[t0])) {
 	    *vp++ = '^';
-	    *vp++ = line[t0] | '@';
+	    *vp++ = tmpline[t0] | '@';
 	} else
-	    *vp++ = line[t0];
-	if (t0 == cs)
+	    *vp++ = tmpline[t0];
+	if (t0 == tmpcs)
 	    nvcs = vp - vbuf - 1;
     }
-    if (t0 == cs)
+    if (t0 == tmpcs)
 	nvcs = vp - vbuf;
     *vp = '\0';
 

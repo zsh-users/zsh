@@ -85,6 +85,10 @@ static struct zleparam {
 	unset_cutbuffer, NULL },
     { "killring", PM_ARRAY, FN(set_killring), FN(get_killring),
 	unset_killring, NULL },
+    { "PREDISPLAY", PM_SCALAR, FN(set_predisplay), FN(get_predisplay),
+	zleunsetfn, NULL },
+    { "POSTDISPLAY", PM_SCALAR, FN(set_postdisplay), FN(get_postdisplay),
+	zleunsetfn, NULL },
     { NULL, 0, NULL, NULL, NULL, NULL }
 };
 
@@ -461,4 +465,54 @@ unset_killring(Param pm, int exp)
 	set_killring(pm, NULL);
 	stdunsetfn(pm, exp);
     }
+}
+
+static void
+set_prepost(unsigned char **textvar, int *lenvar, char *x)
+{
+    if (*lenvar) {
+	zfree(*textvar, *lenvar);
+	*textvar = NULL;
+	*lenvar = 0;
+    }
+    if (x) {
+	unmetafy(x, lenvar);
+	*textvar = (unsigned char *)zalloc(*lenvar);
+	memcpy((char *)*textvar, x, *lenvar);
+	free(x);
+    }
+}
+
+static char *
+get_prepost(unsigned char *text, int len)
+{
+    return metafy((char *)text, len, META_HEAPDUP);
+}
+
+/**/
+static void
+set_predisplay(Param pm, char *x)
+{
+    set_prepost(&predisplay, &predisplaylen, x);
+}
+
+/**/
+static char *
+get_predisplay(Param pm)
+{
+    return get_prepost(predisplay, predisplaylen);
+}
+
+/**/
+static void
+set_postdisplay(Param pm, char *x)
+{
+    set_prepost(&postdisplay, &postdisplaylen, x);
+}
+
+/**/
+static char *
+get_postdisplay(Param pm)
+{
+    return get_prepost(postdisplay, postdisplaylen);
 }
