@@ -5,9 +5,9 @@ typeset -A opt_args
 
 _arguments -C \
     '::recipient:->userhost' \
-    '-a:MIME attachment:_files' \
-    '-b:BCC recipient:->userhost' \
-    '-c:CC recipient:->userhost' \
+    '*-a:MIME attachment:_files' \
+    '*-b:BCC recipient:->userhost' \
+    '*-c:CC recipient:->userhost' \
     '-e:post-init configuration:' \
     '-f+:mailbox: _mailboxes' \
     '-F+:init file:_files' \

@@ -1,3 +1,8 @@
+2000-07-22  Clint Adams  <schizo@debian.org>
+
+	* 12347: Completion/User/_mutt: options -a, -b, and -c are
+	repeatable.
+
 2000-07-21  Sven Wischnowsky  <wischnow@zsh.org>
 
 	* 12337: Src/parse.c: fix parsing of `time' without a command
