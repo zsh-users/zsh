@@ -1,6 +1,6 @@
 2000-08-04  Bart Schaefer  <schaefer@zsh.org>
 
-	* 12547: configure.in, Src/compat.c, Src/Modules/files.c:
+	* 12547, 12458: configure.in, Src/compat.c, Src/Modules/files.c:
 	Handle ENOENT and ENOTDIR within zpathmax(), and therefore back
 	out the changes from 12541 and 12533.
 

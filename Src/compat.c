@@ -133,8 +133,6 @@ zpathmax(char *dir)
 {
     long pathmax;
 
-    if (!dir || !*dir)
-	dir = ".";
     errno = 0;
     if ((pathmax = pathconf(dir, _PC_PATH_MAX)) >= 0) {
 	/* This code is redundant if pathconf works correctly, but   *
@@ -152,18 +150,19 @@ zpathmax(char *dir)
 	    *tail = 0;
 	    pathmax = zpathmax(dir);
 	    *tail = '/';
-	    if (pathmax > 0) {
-		if (strlen(dir) < pathmax)
-		    return pathmax;
-		else
-		    errno = ENAMETOOLONG;
-	    }
+	} else {
+	    errno = 0;
+	    if (tail)
+		pathmax = pathconf("/", _PC_PATH_MAX);
+	    else
+		pathmax = pathconf(".", _PC_PATH_MAX);
 	}
-	/* else                                                          *
-	 * Either we're at the root (tail == dir) or we're on the first  *
-	 * component of a relative path (tail == NULL).  Either way we   *
-	 * have nothing to do here, the error from pathconf() is real.   *
-	 * Perhaps our current working directory has been removed?       */
+	if (pathmax > 0) {
+	    if (strlen(dir) < pathmax)
+		return pathmax;
+	    else
+		errno = ENAMETOOLONG;
+	}
     }
     if (errno)
 	return -1;
