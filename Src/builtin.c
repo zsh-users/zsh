@@ -79,7 +79,7 @@ static struct builtin builtins[] =
     BUILTIN("jobs", 0, bin_fg, 0, -1, BIN_JOBS, "dlpZrs", NULL),
     BUILTIN("kill", 0, bin_kill, 0, -1, 0, NULL, NULL),
     BUILTIN("let", 0, bin_let, 1, -1, 0, NULL, NULL),
-    BUILTIN("local", BINF_TYPEOPTS | BINF_MAGICEQUALS | BINF_PSPECIAL, bin_typeset, 0, -1, 0, "AEFLRTUZahilrtu", NULL),
+    BUILTIN("local", BINF_TYPEOPTS | BINF_MAGICEQUALS | BINF_PSPECIAL, bin_typeset, 0, -1, 0, "AEFLRTUZahilrtux", NULL),
     BUILTIN("log", 0, bin_log, 0, 0, 0, NULL, NULL),
     BUILTIN("logout", 0, bin_break, 0, 1, BIN_LOGOUT, NULL, NULL),
 
@@ -644,14 +644,12 @@ set_pwd_env(void)
     setsparam("OLDPWD", ztrdup(oldpwd));
 
     pm = (Param) paramtab->getnode(paramtab, "PWD");
-    if (!(pm->flags & PM_EXPORTED) &&
-	(!pm->level || (isset(ALLEXPORT) && !pm->old))) {
+    if (!(pm->flags & PM_EXPORTED)) {
 	pm->flags |= PM_EXPORTED;
 	pm->env = addenv("PWD", pwd, pm->flags);
     }
     pm = (Param) paramtab->getnode(paramtab, "OLDPWD");
-    if (!(pm->flags & PM_EXPORTED) &&
-	(!pm->level || (isset(ALLEXPORT) && !pm->old))) {
+    if (!(pm->flags & PM_EXPORTED)) {
 	pm->flags |= PM_EXPORTED;
 	pm->env = addenv("OLDPWD", oldpwd, pm->flags);
     }
@@ -1589,7 +1587,6 @@ typeset_single(char *cname, char *pname, Param pm, int func,
     }
 
     /*
-     * According to the manual, local parameters don't get exported.
      * A parameter will be local if
      * 1. we are re-using an existing local parameter
      *    or
@@ -1598,10 +1595,6 @@ typeset_single(char *cname, char *pname, Param pm, int func,
      *     or
      *   ii. we are creating a new local parameter
      */
-    if ((usepm && pm->level) ||
-	(!usepm && (pm || (locallevel && (on & PM_LOCAL)))))
-	on &= ~PM_EXPORTED;
-
     if (usepm) {
 	on &= ~PM_LOCAL;
 	if (!on && !roff && !value) {
@@ -1630,9 +1623,7 @@ typeset_single(char *cname, char *pname, Param pm, int func,
 	    if (pm->flags & PM_EXPORTED) {
 		if (!(pm->flags & PM_UNSET) && !pm->env && !value)
 		    pm->env = addenv(pname, getsparam(pname), pm->flags);
-	    } else if (pm->env &&
-		       (!pm->level || (isset(ALLEXPORT) && !pm->old &&
-				       !(pm->flags & PM_HASHELEM)))) {
+	    } else if (pm->env && !(pm->flags & PM_HASHELEM)) {
 		delenv(pm->env);
 		zsfree(pm->env);
 		pm->env = NULL;
@@ -1708,7 +1699,11 @@ typeset_single(char *cname, char *pname, Param pm, int func,
 	tpm->old = pm->old;
 	tpm->level = pm->level;
 	tpm->ct = pm->ct;
-	tpm->env = pm->env;
+	if (pm->env) {
+	    delenv(pm->env);
+	    zsfree(pm->env);
+	}
+	tpm->env = pm->env = NULL;
 
 	pm->old = tpm;
 	/*
@@ -1725,7 +1720,6 @@ typeset_single(char *cname, char *pname, Param pm, int func,
 	    pm->ct = auxlen;
 	else
 	    pm->ct = 0;
-	pm->env = NULL;
     } else {
 	/*
 	 * Create a new node for a parameter with the flags in `on' minus the
@@ -1856,7 +1850,7 @@ bin_typeset(char *name, char **argv, char *ops, int func)
 	return 0;
     }
 
-    if (!ops['g'] && !ops['x'])
+    if ((!ops['g'] && !ops['x']) || ops['g'] == 2 || *name == 'l')
 	on |= PM_LOCAL;
 
     if (on & PM_TIED) {

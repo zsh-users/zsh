@@ -1,3 +1,10 @@
+2000-04-13  Peter Stephenson  <pws@cambridgesiliconradio.com>
+
+	* 10738: Doc/Zsh/builtins.yo, Doc/Zsh/params.yo, Src/builtin.c,
+	Src/params.c: local parameters can be exported; typeset +g -x
+	and local -x work in a natural way; currently typeset -g still
+	behaves like typeset -gx.
+
 2000-04-13  Sven Wischnowsky <wischnow@informatik.hu-berlin.de>
 
 	* 10733: Completion/Builtins/_pids, Completion/User/_killall,

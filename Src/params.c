@@ -643,13 +643,21 @@ createparam(char *name, int flags)
 	} else {
 	    pm = (Param) zcalloc(sizeof *pm);
 	    if ((pm->old = oldpm)) {
-		/* needed to avoid freeing oldpm */
+		/*
+		 * needed to avoid freeing oldpm, but we do take it
+		 * out of the environment when it's hidden.
+		 */
+		if (oldpm->env) {
+		    delenv(oldpm->env);
+		    zsfree(oldpm->env);
+		    oldpm->env = NULL;
+		}
 		paramtab->removenode(paramtab, name);
 	    }
 	    paramtab->addnode(paramtab, ztrdup(name), pm);
 	}
 
-	if (isset(ALLEXPORT) && !oldpm && !(flags & PM_HASHELEM))
+	if (isset(ALLEXPORT) && !(flags & PM_HASHELEM))
 	    flags |= PM_EXPORTED;
     } else {
 	pm = (Param) zhalloc(sizeof *pm);
@@ -1446,11 +1454,30 @@ getnumvalue(Value v)
 }
 
 /**/
+void
+export_param(Param pm)
+{
+    char buf[(sizeof(zlong) * 8) + 4], *val;
+
+    if (PM_TYPE(pm->flags) == PM_INTEGER)
+	convbase(val = buf, pm->gets.ifn(pm), pm->ct);
+    else if (pm->flags & (PM_EFLOAT|PM_FFLOAT))
+	val = convfloat(pm->gets.ffn(pm), pm->ct,
+			pm->flags, NULL);
+    else
+	val = pm->gets.cfn(pm);
+    if (pm->env)
+	pm->env = replenv(pm->env, val, pm->flags);
+    else {
+	pm->flags |= PM_EXPORTED;
+	pm->env = addenv(pm->nam, val, pm->flags);
+    }
+}
+
+/**/
 mod_export void
 setstrvalue(Value v, char *val)
 {
-    char buf[(sizeof(zlong) * 8) + 4];
-
     if (v->pm->flags & PM_READONLY) {
 	zerr("read-only variable: %s", v->pm->nam, 0);
 	zsfree(val);
@@ -1523,22 +1550,10 @@ setstrvalue(Value v, char *val)
 	break;
     }
     if ((!v->pm->env && !(v->pm->flags & PM_EXPORTED) &&
-	 !(isset(ALLEXPORT) && !v->pm->old && !(v->pm->flags & PM_HASHELEM))) ||
+	 !(isset(ALLEXPORT) && !(v->pm->flags & PM_HASHELEM))) ||
 	(v->pm->flags & PM_ARRAY) || v->pm->ename)
 	return;
-    if (PM_TYPE(v->pm->flags) == PM_INTEGER)
-	convbase(val = buf, v->pm->gets.ifn(v->pm), v->pm->ct);
-    else if (v->pm->flags & (PM_EFLOAT|PM_FFLOAT))
-	val = convfloat(v->pm->gets.ffn(v->pm), v->pm->ct,
-			v->pm->flags, NULL);
-    else
-	val = v->pm->gets.cfn(v->pm);
-    if (v->pm->env)
-	v->pm->env = replenv(v->pm->env, val, v->pm->flags);
-    else {
-	v->pm->flags |= PM_EXPORTED;
-	v->pm->env = addenv(v->pm->nam, val, v->pm->flags);
-    }
+    export_param(v->pm);
 }
 
 /**/
@@ -1969,6 +1984,15 @@ unsetparam_pm(Param pm, int altflag, int exp)
 	if ((PM_TYPE(oldpm->flags) == PM_SCALAR) &&
 	    oldpm->sets.cfn == strsetfn)
 	    adduserdir(oldpm->nam, oldpm->u.str, 0, 0);
+	if (oldpm->flags & PM_EXPORTED) {
+	    /*
+	     * Re-export the old value which we removed in typeset_single().
+	     * I don't think we need to test for ALL_EXPORT here, since if
+	     * it was used to export the parameter originally the parmeter
+	     * should still have the PM_EXPORTED flag.
+	     */
+	    export_param(oldpm);
+	}
     }
 
     paramtab->freenode((HashNode) pm); /* free parameter node */
@@ -2745,7 +2769,7 @@ arrfixenv(char *s, char **t)
      */
     if (t == path)
 	cmdnamtab->emptytable(cmdnamtab);
-    if ((pm->flags & PM_HASHELEM) || (isset(ALLEXPORT) ? !!pm->old : pm->level))
+    if (pm->flags & PM_HASHELEM)
 	return;
     u = t ? zjoin(t, ':', 1) : "";
     len_s = strlen(s);
@@ -3013,7 +3037,11 @@ scanendscope(HashNode hn, int flags)
 	    pm->flags = (tpm->flags & ~PM_NORESTORE);
 	    pm->level = tpm->level;
 	    pm->ct = tpm->ct;
-	    pm->env = tpm->env;
+	    if (pm->env) {
+		delenv(pm->env);
+		zsfree(pm->env);
+	    }
+	    pm->env = NULL;
 
 	    if (!(tpm->flags & PM_NORESTORE))
 		switch (PM_TYPE(pm->flags)) {
@@ -3035,6 +3063,9 @@ scanendscope(HashNode hn, int flags)
 		    break;
 		}
 	    zfree(tpm, sizeof(*tpm));
+
+	    if (pm->flags & PM_EXPORTED)
+		export_param(pm);
 	} else
 	    unsetparam_pm(pm, 0, 0);
     }

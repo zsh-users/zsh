@@ -595,9 +595,10 @@ sitem([var(mm)tt(:)]var(ss))(minutes and seconds)
 endsitem()
 )
 findex(local)
-item(tt(local) [ {tt(PLUS())|tt(-)}tt(AEFLRUZahilrtu) [var(n)]] [ var(name)[tt(=)var(value)] ] ...)(
-Same as tt(typeset), except that the options tt(-g), tt(-x) and
-tt(-f) are not permitted.
+item(tt(local) [ {tt(PLUS())|tt(-)}tt(AEFLRUZahilrtux) [var(n)]] [ var(name)[tt(=)var(value)] ] ...)(
+Same as tt(typeset), except that the options tt(-g), and
+tt(-f) are not permitted.  In this case the tt(-x) option does not force
+the use of tt(-g), i.e. exported variables will be local to functions.
 )
 findex(log)
 vindex(watch, use of)
@@ -1003,9 +1004,7 @@ var(name) (even those that already exist), and is unset again when the
 function completes.  See
 ifzman(`Local Parameters' in zmanref(zshparam))\
 ifnzman(noderef(Local Parameters))\
-.  Local parameters are not exported unless tt(ALL_EXPORT) is set, in
-which case the parameter is exported em(only) when var(name) does not
-already exist.  The same rules apply to special shell parameters, which
+.  The same rules apply to special shell parameters, which
 retain their special attributes when made local.
 
 For each var(name)tt(=)var(value) assignment, the parameter
@@ -1161,7 +1160,9 @@ This flag has a different meaning when used with tt(-f); see above.
 )
 item(tt(-x))(
 Mark for automatic export to the environment of subsequently
-executed commands.
+executed commands.  Currently this implies the option tt(-g), unless tt(+g)
+is also explicitly given, in other words the parameter is not made local to
+the enclosing function.  This is for compatibility with other shells.
 )
 enditem()
 )
