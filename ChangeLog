@@ -1,3 +1,8 @@
+2000-05-15  Sven Wischnowsky  <wischnow@zsh.org>
+
+	* 11360: Src/Modules/zutil.c: zparseopts should detect if it is
+ 	called without option descriptions
+	
 2000-05-15  Oliver Kiddle  <opk@zsh.org>
 
 	* 11xxx: Src/builtin.c, Src/hashtable.c, Completion/Builtins/_hash,

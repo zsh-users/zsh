@@ -1326,12 +1326,18 @@ bin_zparseopts(char *nam, char **args, char *ops, int func)
 		}
 		break;
 	    }
-	    if (!o)
+	    if (!o) {
+		o = "";
 		break;
+	    }
 	} else {
 	    args--;
 	    break;
 	}
+    }
+    if (!o) {
+	zwarnnam(nam, "missing option descriptions", NULL, 0);
+	return 1;
     }
     while ((o = dupstring(*args++))) {
 	if (!*o) {
