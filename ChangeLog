@@ -1,3 +1,8 @@
+2001-10-06  Clint Adams  <clint@zsh.org>
+
+        * Norbert Koch: 15954: Doc/Zsh/arith.yo:
+        fix inconsistency of variable name in example.
+
 2001-10-05  Clint Adams  <clint@zsh.org>
 
 	* 15941: Completion/Unix/Command/_mount:
