@@ -53,7 +53,7 @@ for def in "$pats[@]"; do
   for sdef in "$def[@]"; do
 
     tag="${${sdef#*[^\\]:}%%:*}"
-    pat="${${${sdef%%:${tag}*}//\\\\:/:}//,/ }"
+    pat="${${${sdef%%:${tag}*}//\\:/:}//,/ }"
 
     if [[ "$sdef" = *:${tag}:* ]]; then
       descr="${(Q)sdef#*:${tag}:}"
