@@ -1,3 +1,7 @@
+2003-07-23  Oliver Kiddle  <opk@zsh.org>
+
+	* 18877: Etc/completion-style-guide: add a few more points
+
 2003-07-23  Peter Stephenson  <pws@csr.com>
 
 	* 18888: Philippe Troin: Src/Modules/clone.c: Allow clone to

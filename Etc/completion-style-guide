@@ -17,7 +17,8 @@ Coding style:
   isn't room for it (see the next point) in which case put it on the
   next line un-indented.
 
-* Please try not to use lines longer than 79 characters.
+* Please try not to use lines longer than 79 characters. Don't worry
+  about breaking long `_arguments' or `_values' specs though.
 
 Descriptions:
 
@@ -49,6 +50,11 @@ for example, do not use:
 but use:
   '--timeout[specify connection timeout]:timeout (ms)'
   
+Group descriptions should be singular because only one thing is being
+completed even though many may be listed. This applies even where you
+complete a list of the things. Tags, functions for completing types of
+things (such as _files), and states should have plural names.
+
 In a function, allow any descriptions passed as an argument to override
 the default you define. For example:
   _wanted directories expl directory _files -/ "$@" -
@@ -64,6 +70,14 @@ multiple times. It can also be useful to use the same description for
 matches which are completely opposite in their meaning if it shortens
 the completion listing provided that the names of the matches makes it
 clear what their effect is.
+
+Command Versions:
+
+In most cases multiple versions (releases) of commands are not
+supported. The functions are merely updated to reflect the latest stable
+version. Exceptions to this can be made where are particular version
+continues to be commonly distributed. Where there is more than one variant
+of the same command however, the separate variants should be supported.
 
 Contexts, tags and all that
 ---------------------------
