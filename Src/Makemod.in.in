@@ -40,6 +40,12 @@ INSTALL         = @INSTALL@
 
 @DEFS_MK@
 
+.PHONY: all modobjs modules headers proto prep FORCE install uninstall \
+	install.bin uninstall.bin install.modules uninstall.modules \
+	install.bin-here uninstall.bin-here install.modules-here \
+	uninstall.modules-here mostlyclean-here clean-here distclean-here \
+	
+
 sdir_src      = $(sdir_top)/Src
 dir_src       = $(dir_top)/Src
 

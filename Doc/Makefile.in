@@ -37,6 +37,10 @@ INSTALL         = @INSTALL@
 
 @DEFS_MK@
 
+.PHONY: all everything install uninstall install.man uninstall.man \
+	install.info uninstall.info install.html uninstall.html \
+	clean-here distclean-here realclean-here
+
 MAKEINFO = makeinfo
 TEXI2DVI = texi2dvi
 DVIPS = dvips -D 300

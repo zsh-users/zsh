@@ -39,6 +39,12 @@ LN		= @LN@
 
 @DEFS_MK@
 
+.PHONY: all bin headers modules modobjs modules prep rm-modobjs-tmp \
+	FORCE mostlyclean-here clean-here distclean-here mostlyclean \
+	clean distclean realclean mostlyclean-modules clean-modules \
+	distclean-modules realclean-modules install.modules \
+	uninstall.modules proto
+
 sdir_src      = $(sdir)
 dir_src       = .
 
