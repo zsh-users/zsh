@@ -1,0 +1,14 @@
+#compdef darcs
+
+_darcs() {
+    # 1 based array
+    if (($CURRENT == 2)); then
+        compadd -- $( darcs --commands | grep "^$PREFIX" )
+        return 0
+    fi
+
+    compadd -- $( darcs ${words[2]} --list-option |  grep "^$PREFIX" )
+    return 0
+}
+
+_darcs "$@"
