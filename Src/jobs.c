@@ -1248,6 +1248,7 @@ bin_fg(char *name, char **argv, char *ops, int func)
 	return 1;
     }
 
+    queue_signals();
     /* If necessary, update job table. */
     if (unset(NOTIFY))
 	scanjobs();
@@ -1267,6 +1268,7 @@ bin_fg(char *name, char **argv, char *ops, int func)
 	    point or else. */
 	    if (curjob == -1 || (jobtab[curjob].stat & STAT_NOPRINT)) {
 		zwarnnam(name, "no current job", NULL, 0);
+		unqueue_signals();
 		return 1;
 	    }
 	    firstjob = curjob;
@@ -1280,11 +1282,13 @@ bin_fg(char *name, char **argv, char *ops, int func)
 			(ops['s'] && jobtab[job].stat & STAT_STOPPED))
 			printjob(job + jobtab, lng, 2);
 		}
+	    unqueue_signals();
 	    return 0;
 	} else {   /* Must be BIN_WAIT, so wait for all jobs */
 	    for (job = 0; job != MAXJOB; job++)
 		if (job != thisjob && jobtab[job].stat)
 		    zwaitjob(job, SIGINT);
+	    unqueue_signals();
 	    return 0;
 	}
     }
@@ -1319,6 +1323,7 @@ bin_fg(char *name, char **argv, char *ops, int func)
 	if (!(jobtab[job].stat & STAT_INUSE) ||
 	    (jobtab[job].stat & STAT_NOPRINT)) {
 	    zwarnnam(name, "no such job: %d", 0, job);
+	    unqueue_signals();
 	    return 1;
 	}
 	/* We have a job number.  Now decide what to do with it. */
@@ -1334,6 +1339,7 @@ bin_fg(char *name, char **argv, char *ops, int func)
 		/* Silly to bg a job already running. */
 		zwarnnam(name, "job already in background", NULL, 0);
 		thisjob = ocj;
+		unqueue_signals();
 		return 1;
 	    }
 	    /* It's time to shuffle the jobs around!  Reset the current job,
@@ -1391,6 +1397,7 @@ bin_fg(char *name, char **argv, char *ops, int func)
 	}
 	thisjob = ocj;
     }
+    unqueue_signals();
     return retval;
 }
 
@@ -1473,6 +1480,7 @@ bin_kill(char *nam, char **argv, char *ops, int func)
 	argv++;
     }
 
+    queue_signals();
     setcurjob();
 
     /* Remaining arguments specify processes.  Loop over them, and send the
@@ -1509,6 +1517,8 @@ bin_kill(char *nam, char **argv, char *ops, int func)
 	    returnval++;
 	}
     }
+    unqueue_signals();
+
     return returnval < 126 ? returnval : 1;
 }
 
