@@ -4,26 +4,29 @@ local curcontext="$curcontext" state line
 typeset -A opt_args
 
 _arguments -C \
-       '-async-dns:bool:(0 1)' \
-       '-max-connections:max:' \
-       '-max-connections-to-host:max:' \
-       '-retries:retries:' \
-       '-receive-timeout:secs:' \
-       '-unrestartable-receive-timeout:secs:' \
-       '-format-cache-size:pages:' \
-       '-memory-cache-size:kilobytes:' \
-       '-http-proxy:hostport:_hosts' \
-       '-ftp-proxy:hostport:_hosts' \
-       '-download-dir:_files -/' \
-       '-assume-codepage:codepage:' \
-       '-anonymous' \
-       '-dump' \
-       '-no-connect' \
-       '-source' \
-       '-version' \
-       '-help' \
-       ':url:->html' && return 0
-
+  '(-help)-anonymous[restrict links so that it can run on an anonymous account]' \
+  '(-help)-assume-codepage[use the given codepage when the webpage did not specify its]:codepage:' \
+  '(-help)-async-dns[asynchronous DNS resolver]:bool:((0\:on 1\:off))' \
+  '(-help)-download-dir[default download directory]:_files -/' \
+  '(-help)-driver[graphics driver to use]:driver:(x svgalib fb pmshell atheos)' \
+  '(-help)-dump[dump the page as pure text]' \
+  '(-help)-format-cache-size[number of formatted document pages cached]:pages:' \
+  '(-help)-ftp-proxy[host and port number of the FTP proxy, or blank]:hostport:_hosts' \
+  '(-help)-g[run in graphics mode rather than plain text mode]' \
+  '-help[prints the help screen]' \
+  '(-help)-http-proxy[host and port number of the HTTP proxy, or blank]:hostport:_hosts' \
+  '(-help)-image-cache-size[image cache memory]:kilobytes:' \
+  '(-help)-max-connections[maximum number of concurrent connections]:max:' \
+  '(-help)-max-connections-to-host[maximum number of concurrent connection to a given host]:max:' \
+  '(-help)-memory-cache-size[cache memory]:kilobytes:' \
+  '(-help)-no-connect[runs links as a separate instance]' \
+  '(-help)-receive-timeout[timeout on receive]:secs:' \
+  '(-help)-retries[number of retries]:retries' \
+  '(-help)-source[dump the source page]' \
+  '(-help)-unrestartable-receive-timeout[timeout on non restartable connections]:secs:' \
+  '(-help)-version[prints the links version number and exit]' \
+  ':url:->html' && return 0
+  
 if [[ "$state" = html ]]; then
   _alternative 'files:file:_files -g "*.x#html"' 'urls:url:_urls'
 fi
