@@ -48,7 +48,7 @@ bin_strftime(char *nam, char **argv, Options ops, int func)
     }
 
     secs = (time_t)strtoul(argv[1], &endptr, 10);
-    if (secs == ULONG_MAX) {
+    if (secs == (time_t)ULONG_MAX) {
 	zwarnnam(nam, "%s: %e", argv[1], errno);
 	return 1;
     } else if (*endptr != '\0') {
