@@ -110,9 +110,19 @@ orig="${PREFIX}${SUFFIX}"
    ( $#compstate[pattern_match] -ne 0 &&
      "${orig#\~}" != "${${orig#\~}:q}" ) ]] && menu=yes
 
-# If given no `-F' option, we want to use `fignore'.
+# If given no `-F' option, we want to use the `ignored-suffixes'-style.
 
-(( $#ignore )) || ignore=(-F fignore)
+if (( ! $#ignore )); then
+  if _style -a files ignored-suffixes ignore; then
+    ignore=(-F "( $ignore )")
+  else
+
+    # For now we still use the fignore parameter.
+    # This may be removed some day.
+
+    ignore=(-F fignore)
+  fi
+fi
 
 # Now let's have a closer look at the string to complete.
 

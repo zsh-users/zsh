@@ -73,7 +73,7 @@ ports)
   _wanted ports expl port &&
       _combination '' hosts-ports-users \
           ${opt_args[-l]:+users=${opt_args[-l]:q}} \
-          hosts="${line[2]:q}" \
+          hosts="${line[1]:q}" \
           ports "$expl[@]"
   ;;
 

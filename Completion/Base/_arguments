@@ -199,7 +199,7 @@ if comparguments -i "$autod" "$@"; then
           comparguments -W line opt_args
           state="${${action[3,-1]##[ 	]#}%%[ 	]#}"
 	  if [[ -n "$usecc" ]]; then
-	    curcontext="$subc"
+	    curcontext="${oldcontext}:$subc"
 	  else
 	    context="$subc"
 	  fi
