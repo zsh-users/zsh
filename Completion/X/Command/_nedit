@@ -3,16 +3,18 @@
 local state line expl nedit_common curcontext="$curcontext" ret=1
 typeset -A opt_args
 
-nedit_common=( \
-  '-read[open file read only]' \
-  "-create[create file if it doesn't already exist]" \
-  '-line[go to specified line number]:line number' \
-  '-do[execute macro or action commands]' \
-  '-lm[specify language mode]:language mode:->lang' \
-  '-svrname[name the server]:nedit server name' \
-  '(-noiconic)-iconic[set initial window state to iconic]' \
-  '*-xrm:resource:_x_resource' \
-  '*:file:_files' )
+nedit_common=(
+  '-read[open file read only]'
+  "-create[create file if it doesn't already exist]"
+  '-line[go to specified line number]:line number'
+  '-do[execute macro or action commands]:macro command'
+  '-lm[specify language mode]:language mode:->lang'
+  '-svrname[name the server]:nedit server name'
+  '(-noiconic)-iconic[set initial window state to iconic]'
+  '(- *)'{-V,-version}'[display version information]'
+  '*-xrm:resource:_x_resource'
+  '*:file:_files'
+)
 
 if [[ $service = nc ]]; then
   _x_arguments -C \
