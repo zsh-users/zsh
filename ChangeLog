@@ -1,3 +1,10 @@
+2005-02-24  Peter Stephenson  <pws@csr.com>
+
+	* 20861: Src/Zle/complist.c, Src/Zle/zle.h, Src/Zle/zle_hist.c,
+	Src/Zle/zle_main.c, Src/Zle/zle_misc.c, Src/Zle/zle_refresh.c,
+	Src/Zle/zle_thingy.c, Src/Zle/zle_vi.c: Fix use of statusline
+	with Unicode, apart from isearch.
+
 2005-02-23  Andrey Borzenkov  <bor@zsh.org>
 
 	* 20857 (modified): Src/Zle/zle.h, Src/Zle/zle_refresh.c: use

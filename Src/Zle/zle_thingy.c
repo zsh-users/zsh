@@ -407,7 +407,7 @@ bin_zle_list(UNUSED(char *name), char **args, Options ops, UNUSED(char func))
 static int
 bin_zle_refresh(UNUSED(char *name), char **args, Options ops, UNUSED(char func))
 {
-    char *s = statusline;
+    ZLE_STRING_T s = statusline;
     int sl = statusll, ocl = clearlist;
 
     if (!zleactive)
@@ -416,8 +416,8 @@ bin_zle_refresh(UNUSED(char *name), char **args, Options ops, UNUSED(char func))
     statusll = 0;
     if (*args) {
 	if (**args) {
-	    statusline = *args;
-	    statusll = strlen(statusline);
+	    statusline = stringaszleline((unsigned char *)*args, &statusll,
+					 NULL);
 	}
 	if (*++args) {
 	    LinkList l = newlinklist();
@@ -441,6 +441,9 @@ bin_zle_refresh(UNUSED(char *name), char **args, Options ops, UNUSED(char func))
 	lastlistlen = 0;
     }
     zrefresh();
+
+    if (statusline)
+	free(statusline);
 
     clearlist = ocl;
     statusline = s;

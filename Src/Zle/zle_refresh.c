@@ -320,9 +320,8 @@ zrefresh(void)
     ZLE_STRING_T s,		/* pointer into the video buffer	     */
 	sen,			/* pointer to end of the video buffer (eol)  */
 	t,			/* pointer into the real buffer		     */
-	scs;			/* pointer to cursor position in real buffer */
-    unsigned char *u;		/* pointer for status line stuff
-				   TODO convert to wide characters */
+	scs,			/* pointer to cursor position in real buffer */
+	u;			/* pointer for status line stuff */
     ZLE_STRING_T tmpline,	/* line with added pre/post text */
 	*qbuf;			/* tmp					     */
     int tmpcs, tmpll;		/* ditto cursor position and line length */
@@ -509,7 +508,11 @@ zrefresh(void)
 		nbuf[ln][winw + 1] = ZWC('\n');	/* text wrapped */
 		nextline
 	    }
+#ifdef ZLE_UNICODE_SUPPORT
 	    *s++ = ((*t == 127) || (*t > 255)) ? ZWC('?') : (*t | ZWC('@'));
+#else
+	    *s++ = (*t == 127) ? ZWC('?') : (*t | ZWC('@'));
+#endif
 	} else {			/* normal character */
 	    *s++ = *t;
 	}
@@ -538,9 +541,9 @@ zrefresh(void)
 	tosln = ln + 1;
 	nbuf[ln][winw + 1] = ZWC('\0');	/* text not wrapped */
 	snextline
-	u = (unsigned char *)statusline;
-	for (; u < (unsigned char *)statusline + statusll; u++) {
-	    if (icntrl(*u)) {	/* simplified processing in the status line */
+	u = statusline;
+	for (; u < statusline + statusll; u++) {
+	    if (ZC_icntrl(*u)) { /* simplified processing in the status line */
 		*s++ = ZWC('^');
 		if (s == sen) {
 		    nbuf[ln][winw + 1] = ZWC('\n');	/* text wrapped */
@@ -771,7 +774,7 @@ refreshline(int ln)
 /* 0: setup */
     nl = nbuf[ln];
     rnllen = nllen = nl ? ZS_strlen(nl) : 0;
-    ol = obuf[ln] ? obuf[ln] : ZWC("");
+    ol = obuf[ln] ? obuf[ln] : ZWS("");
     ollen = ZS_strlen(ol);
 
 /* optimisation: can easily happen for clearing old lines.  If the terminal has

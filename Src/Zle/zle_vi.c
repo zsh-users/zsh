@@ -831,8 +831,8 @@ vicapslockpanic(UNUSED(char **args))
 {
     clearlist = 1;
     zbeep();
-    statusline = "press a lowercase key to continue";
-    statusll = strlen(statusline);
+    statusline = ZWS("press a lowercase key to continue");
+    statusll = ZS_strlen(statusline);
     zrefresh();
 #ifdef ZLE_UNICODE_SUPPORT
     while (!iswlower(getfullchar(0)));

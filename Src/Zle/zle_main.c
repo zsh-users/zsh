@@ -137,7 +137,7 @@ mod_export Widget compwidget;
 /* the status line, and its length */
 
 /**/
-mod_export char *statusline;
+mod_export ZLE_STRING_T statusline;
 /**/
 mod_export int statusll;
 
@@ -1374,8 +1374,8 @@ describekeybriefly(UNUSED(char **args))
     if (statusline)
 	return 1;
     clearlist = 1;
-    statusline = "Describe key briefly: _";
-    statusll = strlen(statusline);
+    statusline = ZWS("Describe key briefly: _");
+    statusll = ZS_strlen(statusline);
     zrefresh();
     seq = getkeymapcmd(curkeymap, &func, &str);
     statusline = NULL;

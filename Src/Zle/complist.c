@@ -2115,8 +2115,8 @@ domenuselect(Hookdef dummy, Chdata dat)
         }
         first = 0;
         if (mode == MM_INTER) {
-            statusline = status;
-            statusll = strlen(status);
+	    statusline = stringaszleline((unsigned char *)status,
+					 &statusll, NULL);
         } else if (mode) {
             int l = sprintf(status, "%s%sisearch%s: ",
                             ((msearchstate & MS_FAILED) ? "failed " : ""),
@@ -2125,15 +2125,18 @@ domenuselect(Hookdef dummy, Chdata dat)
 
             strncat(status, msearchstr, MAX_STATUS - l - 1);
 
-            statusline = status;
-            statusll = strlen(status);
+            statusline = stringaszleline((unsigned char *)status,
+					 &statusll, NULL);
         } else {
             statusline = NULL;
             statusll = 0;
         }
         zrefresh();
-        statusline = NULL;
-        statusll = 0;
+	if (statusline) {
+	    free(statusline);
+	    statusline = NULL;
+	    statusll = 0;
+	}
         inselect = 1;
         if (noselect) {
             broken = 1;
@@ -2291,9 +2294,13 @@ domenuselect(Hookdef dummy, Chdata dat)
 	    if (nmatches < 1 || !minfo.cur || !*(minfo.cur)) {
 		nolist = 1;
                 if (mode == MM_INTER) {
-                    statusline = status;
-                    statusll = strlen(status);
-                }
+                    statusline = stringaszleline((unsigned char *)status,
+						 &statusll, NULL);
+                } else {
+		    /* paranoia */
+		    statusline = NULL;
+		    statusll = 0;
+		}
 		if (nmessages) {
 		    showinglist = -2;
 		    zrefresh();
@@ -2310,8 +2317,11 @@ domenuselect(Hookdef dummy, Chdata dat)
 		    zrefresh();
 		    showinglist = clearlist = 0;
 		}
-                statusline = NULL;
-                statusll = 0;
+		if (statusline) {
+		    free(statusline);
+		    statusline = NULL;
+		    statusll = 0;
+		}
 
 		goto getk;
 	    }
@@ -2425,12 +2435,19 @@ domenuselect(Hookdef dummy, Chdata dat)
 
             if (nolist) {
                 if (mode == MM_INTER) {
-                    statusline = status;
-                    statusll = strlen(status);
-                }
+                    statusline = stringaszleline((unsigned char *)status,
+						 &statusll, NULL);
+                } else {
+		    /* paranoia */
+		    statusline = NULL;
+		    statusll = 0;
+		}
                 zrefresh();
-                statusline = NULL;
-                statusll = 0;
+		if (statusline) {
+		    free(statusline);
+		    statusline = NULL;
+		    statusll = 0;
+		}
                 goto getk;
             }
             if (mode)

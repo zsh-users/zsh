@@ -46,6 +46,7 @@ typedef wint_t   ZLE_INT_T;
 
 /* Convert character or string to wide character or string */
 #define ZWC(c)	L ## c
+#define ZWS(s)	L ## s
 
 #define ZLEEOF	WEOF
 
@@ -68,8 +69,9 @@ typedef unsigned char *ZLE_STRING_T;
 typedef int ZLE_INT_T;
 #define ZLE_CHAR_SIZE	sizeof(unsigned char)
 
-/* Leave character or string as is */
+/* Leave character or string as is, but string must be unsigned char * */
 #define ZWC(c)	c
+#define ZWS(s)	(unsigned char *)s
 
 #define ZLEEOF	EOF
 
