@@ -1,5 +1,8 @@
 2001-03-23  Sven Wischnowsky  <wischnow@zsh.org>
 
+	* 13733: Completion/Builtins/_pids: don't auto-start menu
+	* completion after a `%' when completing pids or jobs
+
 	* 13730: Completion/Core/_approximate: probably no reason to
 	put the (#a?) flag after an initial tilde in _approximate
 	anymore

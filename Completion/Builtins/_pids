@@ -11,7 +11,7 @@ if [[ "$1" = -m ]]; then
   all=()
   match="*[[:blank:]]${PREFIX}[0-9]#${SUFFIX}[[:blank:]]*[/[:blank:]]${2}*"
   shift 2
-elif [[ "$PREFIX$SUFFIX" = [0-9]# ]]; then
+elif [[ "$PREFIX$SUFFIX" = (%*|[0-9]#) ]]; then
   all=()
   match="*[[:blank:]]${PREFIX}[0-9]#${SUFFIX}[[:blank:]]*"
 else
