@@ -1,3 +1,7 @@
+2000-04-13  Clint Adams  <schizo@debian.org>
+	* 10745: acconfig.h, configure.in, Src/zsh.h: set MAXJOB
+	to MAX_TASKS_PER_USER if available under Linux.
+
 2000-04-13  Peter Stephenson  <pws@cambridgesiliconradio.com>
 
 	* 10743: Src/params.c: replenv() failed importing special params

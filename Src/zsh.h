@@ -661,8 +661,9 @@ struct eccstr {
 /* Defintions for job table and job control */
 /********************************************/
 
-/* size of job table */
-#define MAXJOB 50
+#ifdef NEED_LINUX_TASKS_H
+#include <linux/tasks.h>
+#endif
 
 /* entry in the job table */
 

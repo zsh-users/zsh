@@ -443,7 +443,8 @@ AC_CHECK_HEADERS(sys/time.h sys/times.h sys/select.h termcap.h termio.h \
 		 termios.h sys/param.h sys/filio.h string.h memory.h \
 		 limits.h fcntl.h libc.h sys/utsname.h sys/resource.h \
 		 locale.h errno.h stdlib.h unistd.h sys/capability.h \
-		 utmp.h utmpx.h sys/types.h pwd.h grp.h poll.h sys/mman.h)
+		 utmp.h utmpx.h sys/types.h pwd.h grp.h poll.h sys/mman.h \
+		 linux/tasks.h)
 if test $dynamic = yes; then
   AC_CHECK_HEADERS(dlfcn.h)
   AC_CHECK_HEADERS(dl.h)
@@ -496,6 +497,27 @@ if test $zsh_cv_header_termios_h_tiocgwinsz = no; then
 fi
  
 AC_CHECK_HEADER([sys/ptem.h], AC_DEFINE(WINSIZE_IN_PTEM))
+
+dnl Try to get a sane value for MAXJOB
+linux_tasks_defines_mtpu=no
+AC_MSG_CHECKING(what to set MAXJOB to)
+if test $ac_cv_header_linux_tasks_h = yes; then
+AC_EGREP_CPP(yes,
+[#include <linux/tasks.h>
+ #ifdef MAX_TASKS_PER_USER
+ yes
+ #endif
+], linux_tasks_defines_mtpu=yes)
+fi
+
+if test $linux_tasks_defines_mtpu = yes; then
+AC_DEFINE(MAXJOB, MAX_TASKS_PER_USER)
+AC_DEFINE(NEED_LINUX_TASKS_H)
+AC_MSG_RESULT(${msg}MAX_TASKS_PER_USER)
+else
+AC_DEFINE(MAXJOB, 50)
+AC_MSG_RESULT(${msg}50)
+fi
 
 dnl -------------------
 dnl CHECK FOR LIBRARIES
