@@ -233,12 +233,13 @@ _baz_log_versions () {
 # commands with different versions
 
 local cmd_register_archive cmd_archives cmd_ls_archives cmd_redo
-local cmd_redo_changes cmd_changes cmd_what_changed cmd_categories
+local cmd_redo_changes cmd_what_changed cmd_categories
 local cmd_branches cmd_versions cmd_cacherev cmd_logs cmd_log_versions
 local cmd_log_ls cmd_update cmd_join_branch cmd_replay cmd_deltapatch
 local cmd_delta_patch cmd_apply_delta cmd_sync_tree cmd_make_sync_tree
 local cmd_delta cmd_revdelta cmd_library_categories cmd_library_branches
 local cmd_library_versions cmd_library_revisions
+local cmd_status cmd_diff
 
 cmd_log_ls=('*:version:_baz_log_versions')
 cmd_log_versions=()
@@ -247,7 +248,8 @@ cmd_log_versions=()
 cmd_register_archive=('::archive:_baz_archives' ':location:_files -/')
 cmd_archives=('::regex:')
 cmd_redo=('::changeset:_files -/')
-cmd_changes=('::revision:_baz_revisions'
+cmd_status=('::dir:_files -/')
+cmd_diff=('::revision:_baz_revisions'
   #  ':separator:(--)' '*::limit:_files'
   #don't understand the limit usage
 )

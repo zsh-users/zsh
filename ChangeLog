@@ -1,3 +1,8 @@
+2005-03-09  Clint Adams  <clint@zsh.org>
+
+	* 20961: Completion/Unix/Command/_baz: fix completion of status and
+	diff subcommands.
+
 2005-03-10  Andrey Borzenkov  <bor@zsh.org>
 
 	* 20957: Completion/Unix/Command/_fuser:
