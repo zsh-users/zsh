@@ -5,7 +5,7 @@
 #
 # SYNOPSIS:
 #	reporter [all | aliases | bindings | completion | functions |
-#			limits | options | variables]
+#			limits | options | variables | zstyles]
 #
 # DESCRIPTION:
 #	"reporter" prints your current environment variables, shell
@@ -30,6 +30,7 @@
 #	"modules"	prints "zmodload" commands.
 #	"options"	prints "setopt" commands.
 #	"variables"	prints both shell and environment variables.
+#	"zstyles"	prints "zstyle" commands
 #
 #	"all"		tries to find every useful setting under your shell.
 #			This is the default, and it's the same as typing all
@@ -40,6 +41,7 @@
 #		awk, cut, echo, grep, sed, sort
 #	Assumes that your C preprocessor lives in /lib/cpp or /usr/ccs/lib/cpp.
 #	Uses (and unsets) variables beginning with "reporter_".
+#	Won't work for versions of zsh that are older than 3.1.3 or so.
 #
 # RESTRICTIONS:
 #	DON'T:	pretend you wrote it, sell it, or blame me if it breaks.
@@ -85,9 +87,9 @@ AWK=${AWK:-awk}
 
 reporter_do_all=yes
 
-for each in $*
+for reporter_each
 do
-	case "$each"
+	case "$reporter_each"
 	in
 		ali*)	reporter_do_aliases=yes; reporter_do_all=no ;;
 		b*)	reporter_do_bindings=yes; reporter_do_all=no ;;
@@ -97,6 +99,7 @@ do
 		m*)	reporter_do_mod=yes; reporter_do_all=no ;;
 		o*)	reporter_do_setopt=yes; reporter_do_all=no ;;
 		v*)	reporter_do_vars=yes; reporter_do_all=no ;;
+		zs*|s*)	reporter_do_zstyle=yes; reporter_do_all=no ;;
 		*)	;;
 	esac
 done
@@ -104,15 +107,34 @@ done
 #
 #	The "cshjunkiequotes" option can break some of the commands
 #	used in the remainder of this script, so we check for that first
-#	and disable it.  We'll re-enable it later.
+#	and disable it.  Similarly "shwordsplit" and "kshoptionprint".
+#	We'll re-enable them later.
 #
 
 reporter_junkiequotes="no"
+reporter_shwordsplit="no"
+reporter_kshoptprint="no"
+reporter_nounset="no"
 
-if setopt | grep "cshjunkiequotes" > /dev/null
+if [[ -o cshjunkiequotes ]]
 then
 	reporter_junkiequotes="yes"
 	unsetopt cshjunkiequotes
+fi
+if [[ -o shwordsplit ]]
+then
+	reporter_shwordsplit="yes"
+	unsetopt shwordsplit
+fi
+if [[ -o kshoptionprint ]]
+then
+	reporter_kshoptprint="yes"
+	unsetopt kshoptionprint
+fi
+if [[ -o nounset ]]
+then
+	reporter_nounset="yes"
+	unsetopt nounset
 fi
 
 #
@@ -134,7 +156,7 @@ fi
 #	Additional error checking and sed hacking added by Ken Phelps.
 #
 
-reporter_cppdef=`strings -3 ${CPP} |
+reporter_cppdef=(`strings -3 ${CPP} |
 	sed -n '
 	/^[a-zA-Z_][a-zA-Z0-9_]*$/{
 	s/.*/#ifdef &/p
@@ -144,15 +166,15 @@ reporter_cppdef=`strings -3 ${CPP} |
 	' | ${CPP} |sed '
 	/^[	 ]*$/d
 	/^#/d
-	s/.*"\(.*\)".*/\1/'`
+	s/.*"\(.*\)".*/\1/'`)
 
 reporter_uname=""
 
-for each in `echo $PATH | sed -e 's/:/ /g'`
+for reporter_each in `echo $PATH | sed -e 's/:/ /g'`
 do
-	if [ -x $each/uname ]
+	if [[ -x $reporter_each/uname ]]
 	then
-		reporter_uname="$each/uname"
+		reporter_uname="$reporter_each/uname"
 		break
 	fi
 done
@@ -163,23 +185,22 @@ in
 	*)	;;
 esac
 
-for each in $reporter_cppdef
+for reporter_each in $reporter_cppdef
 do
-	case "$each"
+	case "$reporter_each"
 	in
 		pyr)	reporter_uname="/bin/att uname" ;;
 		*)	;;
 	esac
 done
 
-str=`eval $reporter_uname -a`
-
 echo '# START zsh saveset'
-echo '# uname: ' $str
+echo '# uname: ' `eval $reporter_uname -a`
 echo
 
 unset reporter_cppdef
 unset reporter_uname
+unset reporter_each
 
 #
 #	ALIASES
@@ -187,7 +208,7 @@ unset reporter_uname
 #	Use "alias -L" to get a listing of the aliases in the form we want.
 #
 
-if test "$reporter_do_all" = "yes" -o "$reporter_do_aliases" = "yes"
+if [[ "$reporter_do_all" = "yes" || "$reporter_do_aliases" = "yes" ]]
 then
 	echo '# Aliases.'
 	echo
@@ -202,17 +223,18 @@ fi
 #	avoid modifying things that will be recorded later.
 #
 
-if test "$reporter_do_all" = "yes" -o "$reporter_do_bindings" = "yes"
+if [[ "$reporter_do_all" = "yes" || "$reporter_do_bindings" = "yes" ]]
 then
 	echo
 	echo "# Key bindings."
 	echo
-	bindkey -lL
+	bindkey -lL | grep -v ' \.safe$'
 	(
 		alias bindkey=bindkey
 		bindkey () {
 			[[ "$1" == "-N" ]] || return
 			[[ "$2" == "--" ]] && shift
+			[[ "$2" == ".safe" ]] && return
 			echo
 			builtin bindkey -L -M -- "$2"
 		}
@@ -225,7 +247,7 @@ fi
 #	Warning:  this won't work for zsh-2.5.03.
 #
 
-if test "$reporter_do_all" = "yes" -o "$reporter_do_compctl" = "yes"
+if [[ "$reporter_do_all" = "yes" || "$reporter_do_compctl" = "yes" ]]
 then
 	echo
 	echo "# Completions."
@@ -238,19 +260,22 @@ fi
 #	FUNCTIONS
 #
 
-if test "$reporter_do_all" = "yes" -o "$reporter_do_fun" = "yes"
+if [[ "$reporter_do_all" = "yes" || "$reporter_do_fun" = "yes" ]]
 then
 	echo 
 	echo "# Undefined functions."
 	echo
 
-	functions | grep "undefined" | ${AWK} '{print "autoload " $2}'
+	autoload + | ${AWK} '{print "autoload " $1}'
 
 	echo 
 	echo "# Defined functions."
 	echo
 
-	functions | grep -v "undefined"
+	(
+		unfunction `autoload +` 2>/dev/null
+		functions
+	)
 fi
 
 #
@@ -260,7 +285,7 @@ fi
 #	the time as just hours, or "minutes:seconds".
 #
 
-if test "$reporter_do_all" = "yes" -o "$reporter_do_lim" = "yes"
+if [[ "$reporter_do_all" = "yes" || "$reporter_do_lim" = "yes" ]]
 then
 	echo
 	echo '# Limits.'
@@ -294,7 +319,7 @@ fi
 #	MODULE LOADING COMMANDS
 #
 
-if test "$reporter_do_all" = "yes" -o "$reporter_do_mod" = "yes"
+if [[ "$reporter_do_all" = "yes" || "$reporter_do_mod" = "yes" ]]
 then
 	echo
 	if ( zmodload ) >& /dev/null; then
@@ -302,7 +327,11 @@ then
 		echo
 		zmodload -d -L
 		echo
-		zmodload -a -L
+		zmodload -ab -L
+		echo
+		zmodload -ac -L
+		echo
+		zmodload -ap -L
 		echo
 		zmodload -L
 	else
@@ -313,62 +342,61 @@ fi
 #
 #	NON-ARRAY VARIABLES
 #
-#	We run this in a subshell to preserve the TERMCAP and TERM settings
+#	We run this in a subshell to preserve the parameter module state
 #	in the current shell.  Also, reset the prompt to show you're now
-#	in a test shell.  I can't find an easy way to do IFS, so I ignore it.
-#
-#	Most of the sed nonsense is to make sure that variables are quoted
-#	when being set.  We also have to make sure that single-quotes and
-#	back-quotes are escaped.  This is why variable settings are
-#	surrounded by double quotes; some variables like SPROMPT have single
-#	quotes and back-quotes, and it's just too hard to escape those
-#	properly when setting them.
+#	in a test shell.
 #
 
-if test "$reporter_do_all" = "yes" -o "$reporter_do_vars" = "yes"
+if [[ "$reporter_do_all" = "yes" || "$reporter_do_vars" = "yes" ]]
 then
 	echo
 	echo "# Non-array variables."
 	echo
 
 	(
-		echo "TERMCAP='$TERMCAP'"
-		echo "TERM='$TERM'"
-		unset TERMCAP
+		zmodload -u `zmodload | grep parameter` 2>/dev/null
 
-		set | grep '=' | grep -v 'prompt=' |
-			grep -v 'reporter_do' |
-			grep -v '^[!#$*0?@_-]=' |
-			grep -v '=(' | sed -e "s/'/\\\'/g" |
-                        sed -e 's/`/\\`/g' |
-			sed -e 's/=/="/' -e 's/$/"/' |
-			grep -v '^IFS=' |
-			grep -v '^TERMCAP=' |
-			grep -v '^TERM='
-
+		echo "ARGC=0"
+		eval `typeset + |
+			grep -v 'array ' |
+			grep -v 'association ' |
+			grep -v 'undefined ' |
+			grep -v ' ARGC$' |
+			grep -v '^reporter_' |
+			grep -wv '[!#$*0?@_-]$' |
+			sed -e 's/.* \(.*\)/print -r -- \1=${(qq)\1};/' \
+			    -e 's/^\([^ ]*\)$/print -r -- \1=${(qq)\1};/'`
 		echo "prompt='test%'"
 	)
 
 #
 #	ARRAY VARIABLES
 #
-#	The "grep -v" nonsense is to keep from setting shell variables
-#	that caused me some trouble from a script.
+#	Run this in a subshell to preserve the parameter module state in
+#	the current shell.
 #
 
 	echo
 	echo "# Array variables."
 	echo
 
-	echo "argv=()"
-	set | grep '=' | grep -v 'argv=' |
-		grep -v 'reporter_do' | grep -v '^[!#$*0?@_-]=' |
-		grep '=('
+	(
+		zmodload -u `zmodload | grep parameter` 2>/dev/null
+
+		echo "argv=()"
+		eval `{ typeset + | grep 'array ' ;
+				typeset + | grep 'association ' } |
+			grep -v 'undefined ' |
+			grep -v ' argv$' |
+			grep -v ' reporter_' |
+			grep -v ' [!#$*0?@_-]$' |
+			sed 's/.* \(.*\)/print -r -- \1=\\\(${(qq)\1}\\\);/'`
+	)
 
 #
 #	EXPORTED VARIABLES
 #
-#	Run this in a subshell to preserve the TERM and TERMCAP setting in
+#	Run this in a subshell to preserve the parameter module state in
 #	the current shell.
 #
 
@@ -377,13 +405,10 @@ then
 	echo
 
 	(
-		echo "export TERMCAP"
-		echo "export TERM"
-		unset TERMCAP
+		zmodload -u `zmodload | grep parameter` 2>/dev/null
 
-		export | grep -v '^[!#$*0?@_-]=' |
-			${AWK} -F='=' '{print "export " $1}' |
-			grep -v '^TERM=' | grep -v '^TERMCAP='
+		export | grep -v "^'*"'[!#$*0?@_-]'"'*=" |
+			${AWK} -F'=' '{print "export " $1}'
 	)
 fi
 
@@ -391,11 +416,11 @@ fi
 #	SETOPT
 #
 #	We exclude interactive because "setopt interactive" has no effect.
-#	The cshjunkiequotes option is dealt with separately; see the
-#	comments near the start of the script.
+#	A few special options are dealt with separately; see the comments
+#	near the start of the script.
 #
 
-if test "$reporter_do_all" = "yes" -o "$reporter_do_setopt" = "yes"
+if [[ "$reporter_do_all" = "yes" || "$reporter_do_setopt" = "yes" ]]
 then
 	echo
 	echo '# Setopt.'
@@ -409,7 +434,35 @@ then
 			yes)	echo "setopt cshjunkiequotes" ;;
 			*)	;;
 		esac
+		case "$reporter_shwordsplit"
+		in
+			yes)	echo "setopt shwordsplit" ;;
+			*)	;;
+		esac
+		case "$reporter_kshoptprint"
+		in
+			yes)	echo "setopt kshoptionprint" ;;
+			*)	;;
+		esac
+		case "$reporter_nounset"
+		in
+			yes)	echo "setopt nounset" ;;
+			*)	;;
+		esac
 	) | sort
+fi
+
+#
+#	STYLES
+#
+
+if [[ "$reporter_do_all" = "yes" || "$reporter_do_zstyle" = "yes" ]]
+then
+	echo
+	echo '# Styles.'
+	echo
+
+	zstyle -L
 fi
 
 echo
@@ -431,7 +484,7 @@ unset reporter_do_setopt
 unset reporter_do_vars
 
 #
-#	Turn cshjunkiequotes back on if necessary.
+#	Turn various options back on if necessary, in case run via ".".
 #
 
 case "$reporter_junkiequotes"
@@ -439,6 +492,25 @@ in
 	yes)	setopt cshjunkiequotes ;;
 	*)	;;
 esac
+case "$reporter_shwordsplit"
+in
+	yes)	setopt shwordsplit ;;
+	*)	;;
+esac
+case "$reporter_kshoptprint"
+in
+	yes)	setopt kshoptionprint ;;
+	*)	;;
+esac
+case "$reporter_nounset"
+in
+	yes)	setopt nounset ;;
+	*)	;;
+esac
 
 unset reporter_junkiequotes
+unset reporter_shwordsplit
+unset reporter_kshoptprint
+unset reporter_nounset
 
+unset reporter_OSVersion

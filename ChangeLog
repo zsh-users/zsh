@@ -1,3 +1,8 @@
+2000-09-02  Bart Schaefer  <schaefer@zsh.org>
+
+	* 12723: Util/reporter: Modernize variables and options handling;
+	add zstyle to output.
+
 2000-09-02  Andrew Main  <zefram@zsh.org>
 
 	* 12722: Doc/Zsh/arith.yo, Src/math.c, Src/params.c: Allow
