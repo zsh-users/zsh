@@ -15,7 +15,7 @@
   print 'Garbuglio' >nonzerolength
 
   mkdir modish
-  chmod g+s modish
+  chmod g+xs modish
   chmod u+s modish
   chmod +t modish
 
