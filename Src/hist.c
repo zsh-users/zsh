@@ -55,12 +55,7 @@ void (*addtoline) _((int));
  
 /**/
 mod_export int stophist;
- 
-/* this line began with a space, so junk it if HISTIGNORESPACE is on */
- 
-/**/
-int spaceflag;
- 
+
 /* if != 0, we are expanding the current line */
 
 /**/
@@ -741,7 +736,7 @@ mod_export void
 hbegin(int dohist)
 {
     isfirstln = isfirstch = 1;
-    errflag = histdone = spaceflag = 0;
+    errflag = histdone = 0;
     stophist = (!dohist || !interact || unset(SHINSTDIN)) ? 2 : 0;
     if (stophist == 2 || (inbufflags & INP_ALIAS)) {
 	chline = hptr = NULL;
@@ -976,8 +971,10 @@ hend(void)
      && (hist_ignore_all_dups = isset(HISTIGNOREALLDUPS)) != 0)
 	histremovedups();
     /* For history sharing, lock history file once for both read and write */
-    if (isset(SHAREHISTORY) && lockhistfile(hf, 0))
+    if (isset(SHAREHISTORY) && lockhistfile(hf, 0)) {
 	readhistfile(hf, 0, HFILE_USE_OPTIONS | HFILE_FAST);
+	curline.histnum = curhist+1;
+    }
     flag = histdone;
     histdone = 0;
     if (hptr < chline + 1)
@@ -990,8 +987,7 @@ hend(void)
 	    } else
 		save = 0;
 	}
-	if (!*chline || !strcmp(chline, "\n") ||
-	    (isset(HISTIGNORESPACE) && spaceflag))
+	if (chwordpos <= 2 || (isset(HISTIGNORESPACE) && *chline == ' '))
 	    save = 0;
     }
     if (flag & (HISTFLAG_DONE | HISTFLAG_RECALL)) {
@@ -1038,6 +1034,7 @@ hend(void)
 	     */
 	    keepflags = he->flags & HIST_OLD; /* Avoid re-saving */
 	    freehistdata(he, 0);
+	    curline.histnum = curhist;
 	} else {
 	    keepflags = 0;
 	    he = prepnexthistent();
@@ -1073,7 +1070,7 @@ remhist(void)
     if (hist_ring == &curline)
 	return;
     if (!(histactive & HA_ACTIVE)) {
-	if (!(histactive & HA_JUNKED)) {
+	if (!(histactive & HA_JUNKED) && curline.histnum == curhist) {
 	    freehistnode((HashNode)hist_ring);
 	    histactive |= HA_JUNKED;
 	    /* curhist-- is delayed until the next hbegin() */
