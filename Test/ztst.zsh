@@ -111,6 +111,7 @@ ZTST_verbose() {
 }
 ZTST_hashmark() {
   [[ ZTST_verbose -le 0 && -t 8 ]] && print -nu8 ${(pl:SECONDS::\#::\#\r:)}
+  (( SECONDS > COLUMNS+1 && (SECONDS -= COLUMNS) ))
 }
 
 [[ ! -r $ZTST_testname ]] && ZTST_testfailed "can't read test file."
