@@ -940,7 +940,9 @@ getarg(char **str, int *inv, Value v, int a2, zlong *w)
 			v->isarr |= SCANPM_MATCHVAL;
 		    if (down)
 			v->isarr |= SCANPM_MATCHMANY;
-		    if ((ta = getvaluearr(v)) && *ta) {
+		    if ((ta = getvaluearr(v)) &&
+			(*ta || ((v->isarr & SCANPM_MATCHMANY) &&
+				 (v->isarr & (SCANPM_MATCHKEY | SCANPM_MATCHVAL))))) {
 			*inv = v->inv;
 			*w = v->b;
 			return 1;
@@ -1117,7 +1119,9 @@ getindex(char **pptr, Value v)
 	    }
 	    if (*s == ']' || *s == Outbrack) {
 		s++;
-		if (v->isarr && a == b)
+		if (v->isarr && a == b && 
+		    (!(v->isarr & SCANPM_MATCHMANY) ||
+		     !(v->isarr & (SCANPM_MATCHKEY | SCANPM_MATCHVAL))))
 		    v->isarr = 0;
 		v->a = a;
 		v->b = b;
