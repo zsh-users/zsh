@@ -4,7 +4,8 @@
 	out of ChangeLog.
 
 	* unposted: Config/version.mk: update version to 4.2.0-dev-1;
-	not tagged or released, this is just to 
+	not tagged or released, this is just to avoid clashes with
+	the released version.
 
 2004-04-01  Peter Stephenson  <pws@pwstephenson.fsnet.co.uk>
 
