@@ -1,5 +1,10 @@
 2005-03-03  Oliver Kiddle  <opk@zsh.org>
 
+	* 20921, 20924: Src/utils.c, Completion/Unix/Command/_iconv:
+	using UCS-4BE instead of ISO-10646 to identify character
+	encoding is more portable; make error message more specific;
+	find more encodings in iconv completion on Solaris
+
 	* Henryk Konsek: 20918 (modified): Completion/Unix/Command/_unace:
 	new completion for unace
 

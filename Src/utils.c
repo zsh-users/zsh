@@ -3617,13 +3617,13 @@ getkeystring(char *s, int *len, int fromwhere, int *misc)
 		    ICONV_CONST char *inptr = inbuf;
     	    	    inbytes = 4;
 		    outbytes = 6;
-		    /* assume big endian convention for UCS-4 */
+		    /* store value in big endian form */
 		    for (i=3;i>=0;i--) {
 			inbuf[i] = wval & 0xff;
 			wval >>= 8;
 		    }
 
-    	    	    cd = iconv_open(nl_langinfo(CODESET), "ISO-10646");
+    	    	    cd = iconv_open(nl_langinfo(CODESET), "UCS-4BE");
 		    if (cd == (iconv_t)-1) {
 			zerr("cannot do charset conversion", NULL, 0);
 			if (fromwhere == 4) {
@@ -3637,7 +3637,7 @@ getkeystring(char *s, int *len, int fromwhere, int *misc)
                     count = iconv(cd, &inptr, &inbytes, &t, &outbytes);
 		    iconv_close(cd);
 		    if (count == (size_t)-1) {
-                        zerr("cannot do charset conversion", NULL, 0);
+                        zerr("character not in range", NULL, 0);
 		        *t = '\0';
 			*len = t - buf;
 			return buf;
