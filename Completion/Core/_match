@@ -8,21 +8,6 @@
 # Note, however, that this is only really useful if you don't use the
 # expand-or-complete function because otherwise the pattern will
 # be expanded using globbing.
-#
-# Configuration keys used:
-#
-#  match_original
-#    If this is set to a `only', pattern matching will only be tried
-#    with the string from the line. If it is set to any other non-empty
-#    string, the original pattern will be tried first and if that yields
-#    no completions, matching will be tried again with a `*' inserted
-#    at the cursor position. If this key is not set or set to an empty
-#    string, matching will only be attempted with the `*' inserted.
-#
-#  match_insert
-#    If this is set to a string starting with `unambig', menucompletion
-#    will only be turned on if no unambiguous string could be built
-#    that is at least as long as the original string.
 
 local tmp opm="$compstate[pattern_match]" ret=0
 

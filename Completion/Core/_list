@@ -3,30 +3,6 @@
 # This completer function makes the other completer functions used
 # insert possible completions only after the list has been shown at
 # least once.
-#
-# Configuration keys:
-#
-#  list_condition
-#    If this key is unset or set to the empty string, this completer
-#    will delay the insertion of matches unconditionally. However,
-#    if this value is set, it should be set to an expression usable
-#    inside a $[...] arithmetical expression. In this case, delaying
-#    will be done if the expression evaluates to `1'.
-#    For example, with
-#
-#      compconf list_condition='${NUMERIC:-1} != 1'
-#
-#    delaying will be done only if given an explicit numeric argument
-#    other than `1'.
-#
-#  list_word
-#    To find out if only listing should be done, the code normally
-#    compares the contents of the line with the contents the line
-#    had at the time of the last invocation. If this key is set to
-#    an non-empty string comparison is done using only the current
-#    word. So if it is set, attempting completion on a word equal
-#    to the one completion was called on the last time will not
-#    delay the generation of matches.
 
 local pre suf
 

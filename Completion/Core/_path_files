@@ -1,27 +1,7 @@
 #autoload
 
-# Utility function for in-path completion.
-# Supported arguments are: `-f', `-/', `-g <patterns>', `-J <group>',
-# `-V <group>', `-W paths', `-X explanation', `-P prefix', `-S suffix',
-# `-q', `-r remove-chars', `-R remove-func', and `-F <ignore>'. All but 
-# the last have the same syntax and meaning as for `compgen' or
-# `compadd', respectively. The `-F <ignore>' option may be used to give
-# a list of suffixes either by giving the name of an array or
-# literally by giving them in a string surrounded by parentheses. Files
-# with one of the suffixes thus given are treated like files with one
-# of the suffixes in the `fignore' array in normal completion.
-#
-# This function supports two configuration keys:
-#
-#  path_expand
-#    If this is set to a non-empty string, the partially typed path
-#    from the line will be expanded as far as possible even if trailing
-#    pathname components can not be completed.
-#
-#  path_cursor
-#    If this is set to an non-empty string, the cursor will be placed
-#    in the path after the ambiguous pathname component even when using
-#    menucompletion.
+# Utility function for in-path completion. This allows `/u/l/b<TAB>'
+# to complete to `/usr/local/bin'.
 
 local linepath realpath donepath prepath testpath exppath
 local tmp1 tmp2 tmp3 tmp4 i orig pre suf tpre tsuf opre osuf cpre

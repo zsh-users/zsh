@@ -1,21 +1,25 @@
 #compdef -default-
 
-# We first try the `compctl's. This is without first (-T) and default (-D)
-# completion. If you want them add `-T' and/or `-D' to this command.
-# If there is a `compctl' for the command we are working on, we return
-# immediatly. If you want to use new style completion anyway, remove the
-# `|| return'. Also, you may want to use new style completion if the 
-# `compctl' didn't produce any matches. In that case remove the `|| return'
-# and insert the line `[[ compstate[nmatches] -eq 0 ]] || return' after
-# `compcall'.
+local expl
 
-compcall || return 0
+# You can first try the `compctl's by uncommenting the `compcall' line
+# below.
+# This is without first (-T) and default (-D) completion. If you want
+# them add `-T' and/or `-D' to this command. If there is a `compctl'
+# for the command we are working on, we return immediatly. If you want
+# to use new style completion anyway, remove the `|| return'. Also,
+# you may want to use new style completion if the `compctl' didn't
+# produce any matches. In that case remove the `|| return' and insert
+# the line `[[ compstate[nmatches] -eq 0 ]] || return' after `compcall'.
 
-_files && return
+# compcall || return 0
+
+_description expl file
+_files "$expl[@]" && return
 
 # magicequalsubst allows arguments like <any-old-stuff>=~/foo to do
 # file name expansion after the =.  In that case, it's natural to
 # allow completion to handle file names after any equals sign.
 if [[ -o magicequalsubst ]] && compset -P 1 '*='; then
-  _files
+  _files "$expl[@]"
 fi

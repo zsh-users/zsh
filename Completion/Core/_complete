@@ -36,20 +36,7 @@ else
   # Let's see if we have a special completion definition for the other
   # possible contexts.
 
-  comp=''
-
-  case $compstate[context] in
-  equal)           comp="$_comps[-equal-]";;
-  tilde)           comp="$_comps[-tilde-]";;
-  redirect)        comp="$_comps[-redirect-]";;
-  math)            comp="$_comps[-math-]";;
-  subscript)       comp="$_comps[-subscript-]";;
-  value)           comp="$_comps[-value-]";;
-  array_value)     comp="$_comps[-array-value-]";;
-  condition)       comp="$_comps[-condition-]";;
-  parameter)       comp="$_comps[-parameter-]";;
-  brace_parameter) comp="$_comps[-brace-parameter-]";;
-  esac
+  comp="$_comps[-${compstate[context]:s/_/-/}-]"
 
   # If not, we use default completion, if any.
 

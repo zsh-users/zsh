@@ -4,62 +4,6 @@
 # strings generated for the context. These corrected strings will be
 # shown in a list and one can cycle through them as in a menucompletion
 # or get the corrected prefix.
-#
-# Supported configuration keys:
-#
-#  approximate_accept
-#    This should be set to a number, specifying the maximum number
-#    of errors that should be accepted. If the string also contains
-#    a `n' or `N', the code will use the numeric argument as the
-#    maximum number of errors if a numeric argument was given. If no
-#    numeric argument was given, the number from the value of this
-#    key will be used. E.g. with `compconf approximate_accept=2n' two
-#    errors will be accepted, but if the user gives another number
-#    with the numeric argument, this will be prefered. Also, with
-#    `compconf approximate_accept=0n', normally no correction will be
-#    tried, but if a numeric argument is given, automatic correction
-#    will be used. On the other hand, if the string contains an `!'
-#    and a `n' or `N', correction is not attempted if a numeric
-#    argument is given. Once the number of errors to accept is
-#    determined, the code will repeatedly try to generate matches by
-#    allowing one error, two errors, and so on. Independent of the
-#    number of errors the user wants to accept, the code will allow
-#    only fewer errors than there are characters in the string from
-#    the line.
-#
-#  approximate_original
-#    This value is used to determine if the original string should
-#    be included in the list (and thus be presented to the user when
-#    cycling through the corrections). If it is set to any non-empty
-#    value, the original string will be offered. If it contains the
-#    sub-string `last', the original string will appear as the last
-#    string when cycling through the corrections, otherwise it will
-#    appear as the first one (so that the command line does not
-#    change immediately). Also, if the value contains the sub-string
-#    `always', the original string will always be included, whereas
-#    normally it is included only if more than one possible
-#    correction was generated.
-#
-#  approximate_prompt
-#    This can be set to a string that should be printed before the
-#    list of corrected strings when cycling through them. This string
-#    may contain the control sequences `%n', `%B', etc. known from
-#    the `-X' option of `compctl'. Also, the sequence `%e' will be
-#    replaced by the number of errors accepted to generate the
-#    corrected strings.
-#
-#  approximate_insert
-#    If this is set to a string starting with `unambig', the code
-#    will try to insert a usable unambiguous string in the command
-#    line instead of always cycling through the corrected strings.
-#    If such a unambiguous string could be found, the original
-#    string is not used, independent of the setting of
-#    `approximate_original'. If no sensible string could be found,
-#    one can cycle through the corrected strings as usual.
-#
-# If any of these keys is not set, but the the same key with the
-# prefix `correct' instead of `approximate' is set, that value will
-# be used.
 
 local _comp_correct _correct_prompt comax
 local cfgacc cfgorig cfgps cfgins

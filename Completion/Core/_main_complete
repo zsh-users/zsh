@@ -2,44 +2,6 @@
 
 # The main loop of the completion code. This is what is called when 
 # completion is attempted from the command line.
-#
-# Configuration keys used:
-#
-#  completer
-#    This should be set to the names of the functions to generate the
-#    matches separated by colons. E.g. with
-#
-#      compconf completer=_complete:_correct:_approximate
-#
-#    the code will first try normal completion. If that doesn't yield
-#    any matches, correction is tried and if that doesn't yield
-#    anything either, correcting completion is attempted.
-#
-#    These completer functions are only used when this function is called
-#    without arguments. If arguments are given, they should be names of
-#    completer functions which will then be called.
-#
-#  last_prompt
-#    If this is set to `always' the cursor is moved up to the last prompt
-#    after printing a list even if a numeric argument was given.
-#
-#
-# Also, most completion functions use the configuration keys:
-#
-#  description_format
-#    If this is set to a non-empty string, it will be displayed above
-#    all matches generated. The sequence `%d' in this string is replaced
-#    by a short description of what is completed in the current position
-#    of the command line.
-#
-#  message_format
-#    Like `description_format', but used in places where no completions
-#    can automatically be generated but the completion system still wants
-#    to give a hint what is expected in that position.
-#
-#  group_matches
-#    If this is set to a non-empty string, different types of matches will
-#    be put in different groups.
 
 
 # If you want to complete only set or unset options for the unsetopt
