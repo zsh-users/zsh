@@ -1,0 +1,1560 @@
+#compdef p4 -value-,P4CLIENT,-default- -value-,P4PORT,-default-
+
+# Increasingly loosely based on _cvs version 1.17.
+
+# Styles, tags and contexts
+# =========================
+#
+# If the `verbose' style is set (it is assumed by default), verbose
+# descriptions are provided for many completed quantities derived
+# dynamically such as subcommand names, labels, changelists -- in fact,
+# just about anything for which Perforce itself produces a verbose,
+# one-line description.  It may be turned off in the context of each
+# subcommand e.g.
+#   zstyle ':completion:*:p4-labelsync:*' verbose false
+# or for a particular tag, e.g. changelists,
+#   zstyle ':completeion:*:changelists' verbose false
+# or just for top-level completion (i.e. up to and including completion
+# of the subcommand):
+#   zstyle ':completion:*:p4:*' verbose false
+# or for p4 as a whole,
+#   zstyle  ':completion:*:p4(-*|):*' verbose false
+# This is actually handled by the `_describe' function underneath the
+# Perforce completion system; it's mentioned here as verbosity adds
+# significantly to a lot of the Perforce completions.
+#
+# Note that completing changelists (which are just numbers) is not very
+# useful if `verbose' is turned off.  There is no speed advantage for
+# turning it off, either.
+#
+# The style `max' can be set to a number which limits how many
+# possibilities can be shown when selecting changelists or jobs.  This is
+# handled within Perforce, so the completion code may limit the number even
+# further.  If not set explicitly, the value is taken to be 20 to avoid a
+# huge database being output.  Set it to a larger number if necessary.
+#
+# The style `all-files' is used to tell the completion system to
+# complete any file in a given context.  This is for use in places
+# where it would, for example, only complete files opened for editing.
+# See the next section for more.
+#
+# The style `depot-files' tells the system to complete files by asking
+# Perforce for a list where it would otherwise complete files locally by
+# the standard mechanism --- basically any time you don't use // notation
+# and there is no restriction e.g. to opened files only.  There is likely
+# to be a significant speed penalty for this; it is turned off by default
+# in all contexts.  The advantage is that it cuts out files not maintained
+# by Perforce.  (Again, note this is a style, not a tag.)  Contexts
+# where this might be particularly useful include p4-diff or p4-diff2.
+#
+# The tags depot-files and depot-dirs also exist; they are used whenever
+# the system is completing files or directories by asking Perforce
+# to list them, rather than by using normal file completion.
+#
+# The tag subdirs is used to complete the special `...' which tells
+# Perforce to search all subdirectories.  Hence you can turn this
+# feature off by suitably manipulating your tags.
+#
+# Completion of files and their revisions
+# =======================================
+#
+# File completion handles @ and # suffixes.  If the filename is completed,
+# typing @ or # removes the space which was automatically added.
+#
+# A # is automatically quoted when handled in this way; if the file is
+# typed by hand or the completion didn't finish (e.g. you typed a character
+# in the middle of menu completion), you probably need to type `\#' by
+# hand.  The problem is that the completion system uses extended globbing
+# and hence a pattern of the form `filename#' always matches `filename'
+# (since e# matches any number of e's including one).  Hence this can look
+# like an expansion which expands to `filename'.
+#
+# After @, you can complete changelists (note the use of the style `max'
+# above), labels or clients (but not dates), while after `#' you can
+# complete numeric revisions or the special revision names head, none,
+# have.  These are available whether or not you completed the filename; if
+# the file doesn't exist, numeric revisions won't work, but the rest will
+# (though what Perforce will do with the resulting command is another matter).
+#
+# In addition, when completing after `file@', only changes specific to `file'
+# will be shown (exactly the list of changes Perforce shows from the
+# command `p4 changes file').  If this doesn't work, chances are that
+# `file' does not exist.  Having a multi-directory match (literal `...')
+# in `file' should work fine, since `p4 changes' recognises all normal
+# Perforce file syntax.
+#
+# Some perforce commands allow you to specify a range of revisions or
+# changes as `file@1,@2' or `file#1,#2'.  Currently, the second part of the
+# revision range can always be completed (whether the command accepts them
+# or not), but the comma after the first part of the range is only added
+# automatically if the documentation suggests the command accepts ranges at
+# that point.  This is an auto-removable suffix, so it will disappear if
+# you hit space or return.  Typing a `#' at this point will insert a
+# backslash, as before.
+#
+# File completion for some functions is restricted by the Perforce
+# status of the file; for example, `p4 opened' only completes opened
+# files (surprised?)  However, you can set the style (N.B. not tag)
+# all-files; so, for example, you can turn off the limit in this case by
+#   zstyle ':completion:*:p4-opened:*' all-files true
+# Normally the file-patterns style would be used to control matching,
+# but as the file types are not selected by globbing it doesn't work here
+# However, if you set the all-files style, all filename completion is done
+# by the standard mechanism; in this case, the file-patterns style works
+# as usual.  The style ignored-patterns is available in any case, even
+# without all-files; this is therefore generally the one to use.
+#
+# With `p4 diff', the shell will spot if you have used an option that
+# allows you to diff unopened files (such as -f) and in that case offer
+# all files; otherwise, it just offers opened files.
+#
+# Completion of changes
+# =====================
+#
+# There is various extra magic available any time change numbers
+# are completed, regardless of how this was reached, i.e.
+# `p4 fixes -c ...' and `p4 diff filename.c@...' are treated the same way.
+# Note, however, these only work if you are at the point where a change
+# number would be completed.
+#
+# Firstly, as mentioned above there is a maximum for the number of
+# changes which will be shown, given by the style max, or defaulting to 20.
+# Only the most recent changes will be shown.  This is to avoid a speed
+# penalty or clumsy output.  If a positive numeric argument is given
+# when changes are being completed, the maximum is set (unconditionally)
+# to that number instead.
+#
+# It is also possible to give a negative numeric prefix to a listing widget
+# (i.e. typically whatever is bound to ^D).  If there is already a change
+# number on the line, e.g. from cycling through a menu of choices, the full
+# description for that change is shown in the format of a completion
+# listing.  [TODO: this could be made configurable with a style.]
+#
+# It may be necessary to abandon the current completion attempt before
+# typing this to force the completion system to display the new text.
+# Replacing delete-char-or-list with the following user defined widget
+# (create with `zle -N ...') will force this for any negative prefix argument.
+#    (( ${NUMERIC:-0} < 0 )) && (( CURSOR = CURSOR ))
+#    zle delete-char-or-list
+#
+# Completion of jobs
+# =================
+#
+# Completing jobs uses the same logic for the numeric prefix as completing
+# changes: a positive prefix changes the maximum number of jobs which
+# will be shown, and a negative prefix when listing shows the full
+# text for the job whose name is currently inserted on the command line.
+# In this case, the entire text of the word being completed is assumed
+# to constitute the job name (which is almost certainly correct).
+#
+# Calls to p4
+# ===========
+#
+# Much of the information from Perforce is provided by calls to p4
+# commands.  This is done via the _call_program interface, as described
+# in the zshcompletesys manual page.  Hence a suitable context with the
+# `command' style allows the user to take control of this call.
+# The tags used are the name of the p4 command, or in the case of
+# calls to help subcommands, `help-<subcommand>'.  Note that if the
+# value of the style begins with `-', the arguments to the perforce
+# command are appended to the remaining words of the style before calling
+# the command.
+#
+# TODO
+# ====
+#
+# No mechanism is provided for completely ignoring certain files not
+# handled by Perforce as with .cvsignore.  This could be done ad hoc.
+# However, the ignored-patterns style and the parameter $fignore are
+# of course applied as usual, so setting ignored-patterns for the
+# context `:completion:*:p4[-:]*' should work.
+
+_p4() {
+    # rely on localoptions
+    setopt nonomatch
+    local p4cmd==p4
+    integer i
+
+    if [[ $service = -value-* ]]; then
+	# Completing parameter value.
+	# Some of these --- in particular P4PORT --- don't need
+	# the perforce server.
+	case $compstate[parameter] in
+	    (P4PORT) _p4_host_port
+		     ;;
+	    (P4CLIENT) _p4_clients
+		       ;;
+	esac
+	# We do not handle values anywhere else.
+	return
+    fi
+
+    if [[ $p4cmd = '=p4' ]]; then
+	_message "p4 excutable not found: completion not available"
+	return
+    fi
+
+    if (( ! ${#_p4_cmd_list} )); then
+	(( ${+_p4_cmd_list} )) || typeset -ga _p4_cmd_list
+	local hline
+	# Output looks like <tab>command-name<space>description in words...
+	# Ignore blank lines and the heading line beginning `Perforce...'
+	# Just gets run once, then cached, so don't bother optimising
+	# this to a grossly unreadable parameter substitution.
+	_call_program help-commands p4 help commands | while read -A hline; do
+	    (( ${#hline} < 2 )) && continue
+	    [[ $hline[1] = (#i)perforce ]] && continue
+	    _p4_cmd_list+=("${hline[1]}:${hline[2,-1]}")
+	done
+    fi
+
+    # We need to try and check if we are before or after the
+    # subcommand, since some of the options with arguments, in particular -c,
+    # work differently.  It didn't work if I just added '*::...' to the
+    # end of the arguments list, anyway.
+    for (( i = 2; i < CURRENT; i++ )); do
+	if [[ $words[i] = -[cCdHLpPux] ]]; then
+	    # word with following argument
+	    (( i++ ))
+	elif [[ $words[i] != -* ]]; then
+	    break
+	fi
+    done
+
+    if (( i >= CURRENT )); then
+	_arguments -s : \
+	    '-c+[client]:client:_p4_clients' \
+	    '-C+[charset]:charset:_p4_charset' \
+	    '-d+[current directory]:directory:_path_files -g "*(/)"' \
+	    '-H+[hostname]:host:_hosts' \
+	    '-G[python output]' \
+	    '-L+[message language]:language: ' \
+	    '-p+[server port]:port:_ports' \
+	    '-P+[password on server]:password: ' \
+	    '-s[output script tags]' \
+	    '-u+[user]:user name:_users' \
+	    '-x+[filename or -]:file:_p4_file_or_Minus' \
+	    '1:perforce command:_p4_command'
+    else
+	(( i-- ))
+	(( CURRENT -= i ))
+	shift $i words
+	_p4_command_arg
+    fi
+}
+
+
+#
+# Command and argument dispatchers
+#
+
+(( $+functions[_p4_command] )) ||
+_p4_command() {
+    _describe -t p4-commands 'Perforce command' _p4_cmd_list
+}
+
+
+(( $+functions[_p4_command_arg] )) ||
+_p4_command_arg() {
+    local curcontext="$curcontext" cmd=${words[1]}
+    if (( $+functions[_p4_cmd_$cmd] )); then
+	 curcontext="${curcontext%:*:*}:p4-${cmd}:"
+	 _p4_cmd_$cmd
+    else
+	 _message "unhandled perforce command: $cmd"
+    fi
+}
+
+
+#
+# Helper functions
+#
+
+(( $+functions[_p4_branches] )) ||
+_p4_branches() {
+    local bline match mbegin mend
+    local -a bl
+    bl=(${${${(f)"$(_call_program branches p4 branches 2>/dev/null)"}##Branch }/ /:})
+    [[ $#bl -eq 1 && $bl[1] = '' ]] && bl=()
+    (( $#bl )) && _describe -t branches 'Perforce branch' bl
+}
+
+
+(( $+functions[_p4_changelist] )) ||
+_p4_changelist() {
+    local cline match mbegin mend max ctype num comma file
+    local -a cl cstatus
+
+    zstyle -s ":completion:${curcontext}:" max max
+    if [[ ${NUMERIC:-0} -lt 0 && -z $compstate[insert] ]]; then
+	 # Not inserting (i.e. just listing) and given a negative
+	 # prefix argument.  Instead of listing possible completions,
+	 # show the full description for the change number on the line at
+	 # the moment.
+	 [[ $PREFIX = (|*[^[:digit:]])(#b)(<->) ]] && num+=$match[1]
+	 [[ $SUFFIX = (#b)(<->)* ]] && num+=$match[1]
+	 if [[ -n $num ]]; then
+	     _message -r "$(_call_program describe p4 describe $num)"
+	     return 0
+	 fi
+    elif [[ ${NUMERIC:-0} -gt 0 ]]; then
+	 max=$NUMERIC
+    fi
+
+    # Hack: assume the arguments we want are at the end.
+    while [[ $argv[-1] = -t? ]]; do
+	 case $argv[-1] in
+	     # Change embedded in filename; extract that and remove
+	     # the corresponding prefix.  Remove possible `#'s, too,
+	     # in case we are looking at a range.
+	     (-tf) file=${${(Q)PREFIX}%%[\#@]*}
+		   compset -P '*@'
+		   ;;
+	     # Changes already submitted
+	     (-ts) cstatus=(-s submitted)
+		   ctype="submitted "
+		   ;;
+	     # Changes still pending
+	     (-tp)
+		   cstatus=(-s pending)
+		   ctype="pending "
+		   ;;
+	     # Range allowed: append comma and supply rules for
+	     # removing and handling subsequent `#'.
+	     (-tR) comma=(-S, -R _p4_file_suffix)
+	 esac
+	 argv=($argv[1,-2])
+    done
+    # Limit to the 20 most recent changes by default to avoid huge
+    # output.
+    cl=(
+${${${${(f)"$(_call_program changes p4 changes -m ${max:-20} $cstatus \$file)"}##Change\ }//\ on\ /:}/\ by\ /\ }
+"default:changelist not yet numbered")
+    [[ $#cl -eq 1 && $cl[1] = '' ]] && cl=()
+    _describe -t changelists "${ctype}changelist" cl $comma
+}
+
+
+(( $+functions[_p4_charset] )) ||
+_p4_charset() {
+    local expl
+    _wanted charset expl 'character set' \
+	 compadd eucjp iso8859-1 shiftjis utf8 winansi
+}
+
+
+(( $+functions[_p4_clients] )) ||
+_p4_clients() {
+    local cline match mbegin mend 
+    local -a slash cl
+
+    # Are we completing a client view in a filespec?
+    compset -P '//' && slash=(-S/ -q)
+
+    cl=(${${${(f)"$(_call_program clients p4 clients)"}##Client\ }/\ /:})
+    [[ $#cl -eq 1 && $cl[1] = '' ]] && cl=()
+    _describe -t clients 'Perforce client' cl $slash
+}
+
+
+(( $+functions[_p4_counters] )) ||
+_p4_counters() {
+    local cline match mbegin mend
+    local -a cl
+
+    cl=(${${${(f)"$(_call_program counters p4 counters)"}/\ /:}/\=/current value})
+    [[ $#cl -eq 1 && $cl[1] = '' ]] && cl=()
+    _describe -t counters 'Perforce counter' cl
+}
+
+
+(( $+functions[_p4_counter_value] )) ||
+_p4_counter_value() {
+    if [[ -n $words[CURRENT-1] ]]; then
+	 local value="$(_call_program counter p4 counter $words[CURRENT-1] 2>/dev/null)"
+	 if [[ -n $value ]]; then
+	     # No space.  This allows stuff like incarg and decarg.
+	     compstate[insert]=1
+	     _wanted value expl 'counter value' compadd $value
+	 fi
+    fi
+}
+
+
+(( $+functions[_p4_depots] )) ||
+_p4_depots() {
+    local dline match mbegin mend max
+    local -a dl
+
+    dl=(${${${(f)"$(_call_program depots p4 depots)"}##Depot\ }/\ /:})
+    [[ $#dl -eq 1 && $dl[1] = '' ]] && dl=()
+    _describe -t depots 'depot name' dl
+}
+
+
+(( $+functions[_p4_file_or_minus] )) ||
+_p4_file_or_minus() {
+    _alternative 'minus:minus sign:(-)' 'files:file name:_files'
+}
+
+
+(( $+functions[_p4_file_suffx] )) ||
+_p4_file_suffix() {
+    # Used with compadd -R to handle @ or # after a file name.
+    # Differs from compadd -r '...' in that it quotes `#' if typed.
+    [[ $1 = 1 ]] || return
+
+    if [[ $LBUFFER[-1] = [\ ,] ]]; then
+	 if [[ $KEYS = '#' ]]; then
+	     if [[ $LBUFFER[-1] = , ]]; then
+		 # Range: no suffix removal but add a backslash
+		 LBUFFER+=\\
+	     else
+		 # Suffix removal with an added backslash
+		 LBUFFER="$LBUFFER[1,-2]\\"
+	     fi
+	 elif [[ $KEYS = (*[^[:print:]]*|[[:blank:]\;\&\|]) || \
+		 ( $KEYS = @ && $LBUFFER[-1] = ' ' ) ]] ; then
+	     # Normal suffix removal
+	     LBUFFER="$LBUFFER[1,-2]"
+	 fi
+    fi
+}
+
+
+#
+# Helper functions for the helper function _p4_files.  These files
+# are low-level enough that they don't handle tags; this is done
+# by the _alternative handler in _p4_files.
+#
+
+(( $+functions[_p4_integrated_files] )) ||
+_p4_integrated_files() {
+    local pfx=${(Q)PREFIX} type
+    local -a files
+
+    compset -P '*/'
+    files=(${${${(f)"$(_call_program integrated p4 integrated \"\$pfx\*\$\{\(Q\)SUFFIX\}\" 2>/dev/null)"}%\#*}##*/})
+    [[ $#files -eq 1 && $files[1] = '' ]] && files=()
+    compadd "$@" -a files
+}
+
+
+(( $+functions[_p4_opened_files] )) ||
+_p4_opened_files() {
+    local pfx=${(Q)PREFIX} type
+    local -a files
+
+    compset -P '*/'
+    files=(${${${(f)"$(_call_program opened p4 opened \"\$pfx\*\$\{\(Q\)SUFFIX\}\" 2>/dev/null)"}%\#*}##*/})
+    [[ $#files -eq 1 && $files[1] = '' ]] && files=()
+    compadd "$@" -a files
+}
+
+
+(( $+functions[_p4_resolved_files] )) ||
+_p4_resolved_files() {
+    local pfx=${(Q)PREFIX} type
+    local -a files
+
+    compset -P '*/'
+    files=(${${${(f)"$(_call_program resolved p4 resolved \"\$pfx\*\$\{\(Q\)SUFFIX\}\" 2>/dev/null)"}%\#*}##*/})
+    [[ $#files -eq 1 && $files[1] = '' ]] && files=()
+    compadd "$@" -a files
+}
+
+(( $+functions[_p4_subdir_search] )) ||
+_p4_subdir_search() {
+    # This has no other function than to offer to add the `...' used
+    # by Perforce to indicate a recursive search of directories.
+    # Bit pathetic, really.
+    compset -P '*/'
+    compadd "$@" '...'
+}
+
+(( $+functions[_p4_depot_dirs] )) ||
+_p4_depot_dirs() {
+    # Normal completion of directories in depots
+    local pfx=${(Q)PREFIX} expl
+    local -a files
+
+    compset -P '*/'
+    files=(${"${(f)$(_call_program dirs p4 dirs \"\$pfx\*\$\{\(Q\)SUFFIX\}\" 2>/dev/null)}"##*/})
+    [[ $#files -eq 1 && $files[1] = '' ]] && files=()
+    compadd "$@" -S / -q -a files
+}
+
+(( $+functions[_p4_depot_files] )) ||
+_p4_depot_files() {
+    # Normal completion of files in depots
+    local pfx=${(Q)PREFIX} expl
+    local -a files
+
+    compset -P '*/'
+    files=(${${${(f)"$(_call_program files p4 files \"\$pfx\*\$\{\(Q\)SUFFIX\}\" 2>/dev/null)"}%\#*}##*/})
+    [[ $#files -eq 1 && $files[1] = '' ]] && files=()
+    compadd "$@" -R _p4_file_suffix -a files
+}
+
+(( $+functions[_p4_client_dirs] )) ||
+_p4_client_dirs() {
+    # This is a slightly odd addition which isn't often necessary.
+    # When completing directories in a client specification, Perforce
+    # doesn't tell you about intermediate directories which are in
+    # the client, but not in the depot.  (Well... sometimes.  I've
+    # had some odd results with this.  I suspect there may be a bug
+    # but I don't really know enough to be sure.)
+    #
+    # For example, if my view contains
+    #   //depot/branches/rev1.2/...   //pws_client/branches/rev1.2/...
+    # then `p4 dirs "//pws_client/*"' won't mention the `branches'
+    # directory because the view actually starts lower down.  So
+    # we add it by hand when necessary.
+    #
+    # We don't want to waste time on this, since it's not the usual
+    # case, so we cache the results where necessary.  This means
+    # recording all the clients that we can later ask about if necessary.
+    # To flush the cache, `unset _p4_client_list _p4_client_dirs'.
+    if (( ! ${+_p4_client_list} )); then
+	# Retrieve the list of clients.
+	typeset -gA _p4_client_list
+	local -a tmplist
+	local tmpelt
+	tmplist=(${${${(f)"$(_call_program clients p4 clients)"}##Client\ }%%\ *})
+	[[ $#tmplist -eq 1 && $tmplist[1] = '' ]] && tmplist=()
+	for tmpelt in $tmplist; do
+	    _p4_client_list[$tmpelt]=1
+	done
+    fi
+
+    # See if the first path element is a client.  Very often it
+    # will actually be a depot, so we test this as quickly as possible.
+    local client=${${PREFIX##//}%%/*}
+    [[ -z ${_p4_client_list[$client]} ]] && return 1
+
+    local oldifs=$IFS IFS= type dir line dirs
+
+    (( ${+_p4_client_dirs} )) || typeset -gA _p4_client_dirs
+
+    if (( ${+_p4_client_dirs[$client]} )); then
+	# Already cached, although may be empty.
+	dirs=${_p4_client_dirs[$client]}
+    else
+	# We need to look at the View stanza of the client record
+	# to see what directories exist in the client view.
+	_call_program client "p4 client -o $client" 2>/dev/null | while read line; do
+	    case $line in
+		([[:blank:]]##) type=
+			        ;;
+		((#b)([[:alpha:]]##):*) type=${match[1]}
+				        ;;
+		(*) if [[ $type = View ]]; then
+	                dir=${${line##[[:blank:]]##//*[[:blank:]]//$client}%%/...(/*|)}
+			if [[ $#dir -gt 1 ]]; then
+			    dirs+="${dirs:+ }${(q)dir##/}"
+			fi
+		    fi
+		    ;;
+	    esac
+	done
+    fi
+
+    (( ${#dirs} )) || return 1
+
+    # Turn our string of space-separated backquoted elements into an array.
+    dirs=(${(z)dirs})
+    # Get the current prefix also as an array of elements
+    compset -P '//[^/]##/'
+    pfx=(${(s./.)${(Q)PREFIX}})
+
+    local -a ndirs
+    local match mbegin mend
+    # Check matching path segments
+    while (( ${#pfx} > 1 )); do
+	ndirs=()
+	for dir in $dirs; do
+	    if [[ $dir = $pfx/(#b)(*) ]]; then
+		ndirs+=($match[1])
+	    fi
+	done
+	(( ${#ndirs} )) || return 1
+	dirs=($ndirs)
+	shift pfx
+	compset -P '[^/]'
+    done
+    compadd -S / -q "$@" -- ${dirs%%/*}
+}
+
+(( $+functions[_p4_files] )) ||
+_p4_files() {
+    local pfx fline expl opt match mbegin mend range type
+    local -a files types
+
+    local dodirs unmaintained
+
+    while (( $# )); do
+	if [[ $1 = -t(#b)(?) ]]; then
+	    case $match[1] in
+		(d) dodirs=-/
+		    ;;
+		(u) unmaintained=1
+		    ;;
+		(i) types+=(integrated)
+		    ;;
+		(o) types+=(opened)
+		    ;;
+		(r) types+=(resolved)
+		    ;;
+		(R) range="-tR"
+		    ;;
+	    esac
+	fi
+	shift
+    done
+
+    # Remove the quotes present in the word on the command line,
+    # since we will treat this as a literal string from now on.
+    # We might get into problems with characters recognised as
+    # special by p4 files and p4 dirs, but worry about that later.
+    pfx=${(Q)PREFIX}
+    if [[ -prefix *@ ]]; then
+	# Check for existing range syntax
+	[[ $PREFIX = *[@\#]*,* ]] && range=
+	# After @ you can specify changelists, clients, labels or dates.
+	# Don't try to complete dates.
+	_alternative \
+	    "changelist:changelist:_p4_changelist $range -tf" \
+	    client:client:_p4_clients \
+	    label:label:_p4_labels
+    elif [[ -prefix *\# ]]; then
+	# Check for existing range syntax
+	[[ $PREFIX = *[@\#]*,* ]] && range=
+	# Remove longest possible tail match to get name --- this
+	# automatically handles filenames in ranges e.g. `foo#1,#3'.
+	# (Note the compset removes the maximum possible head match,
+	# so we only complete the second part of the range in that case.)
+	_p4_revisions $range
+    elif [[ $PREFIX = //* ]]; then
+	# This specifies files already handled by Perforce, so there's
+	# no point trying to look for unmaintained files.  Assume
+	# the user knows what they're doing.
+	local -a altfiles
+
+	if [[ $PREFIX = //[^/]# ]]; then
+	    # Complete //clientname spec.  Don't complete non-directories...
+	    # I don't actually know if they are valid here.
+	    altfiles+=("clients:Perforce client:_p4_clients")
+	else
+	    local donefiles=1
+	    if [[ -z $dodirs ]]; then
+		if [[ ${#types} -gt 0 ]] &&
+		    ! zstyle -t ":completion:${curcontext}:" all-files; then
+		    for type in $types; do
+			altfiles+=("$type-files:$type file:_p4_${type}_files")
+		    done
+		else
+		    altfiles+=("depot-files:file in depot:_p4_depot_files")
+		fi
+	    fi
+	    # Intermediate directories in a client view.
+	    # See function for notes.
+	    altfiles+=("client-dirs:client directory:_p4_client_dirs")
+	fi
+	altfiles+=("depot-dirs:directory in depot:_p4_depot_dirs"
+	    "subdirs:subdirectory search:_p4_subdir_search")
+	_alternative $altfiles
+    elif [[ -n $unmaintained && -z $dodirs ]]; then
+	# a la _cvs_nonentried_files: directories are never maintained,
+	# so skip 'em.  Unmaintained files can't be integrated, opened
+	# or resolved, so treat as exclusive (just as well, since
+	# this bit's messy).
+	local MATCH MBEGIN MEND
+	local -a omitpats
+
+	match=()
+	: ${PREFIX:#(#b)(*/)(*)}
+	pfx="$match[1]"
+	pfx=${(e)~pfx}
+	omitpats=(
+	    ${${${${(f)"$(_call_program files p4 files \"\$pfx\*\$\{\(Q\)SUFFIX\}\" 2>/dev/null)"}%\#*}##*/}//(#m)[][*?()<|^~#\\]/\\$MATCH}
+	)
+
+	[[ $#omitpats -eq 1 && $omitpats[1] = '' ]] && omitpats=()
+	if (( ${#omitpats} )); then
+	    _path_files -g "*~(*/|)(${(j:|:)~omitpats})(D.)"
+	else
+	    _path_files
+	fi
+	# Don't handle suffixes for non-entried files
+    elif (( ${#types} )) && ! zstyle -t ":completion:${curcontext}:" all-files
+    then
+	local -a altfiles
+
+	for type in $types; do
+	    altfiles+=("$type-files:$type file:_p4_${type}_files")
+	done
+
+	altfiles+=("depot-dirs:directory in depot:_p4_depot_dirs"
+	    "subdirs:subdirectory search:_p4_subdir_search")
+	_alternative $altfiles
+    elif zstyle -t ":completion:${curcontext}:" depot-files; then
+	local -a altfiles
+	if [[ -z $dodirs ]]; then
+	    altfiles+=("depot-files:file in depot:_p4_depot_files")
+	fi
+	altfiles+=("depot-dirs:directory in depot:_p4_depot_dirs"
+	    "subdirs:subdirectory search:_p4_subdir_search")
+	_alternative $altfiles
+    else
+	# Look locally.
+	_alternative \
+	    "files:file:_path_files -R _p4_file_suffix $dodirs" \
+	    "subdirs:subdirectory search:_p4_subdir_search"
+    fi
+}
+
+
+#
+# Remaining helpers for other types of Perforce metadata.
+#
+
+(( $+functions[_p4_filetypes] )) ||
+_p4_filetypes() {
+    local -a values
+    if compset -P '*+*'; then
+	# That second `*' is deliberate --- only complete the last
+	# letter since we can have a whole string of them.
+	values=(
+	    "m:always set modtime on client"
+	    "w:always writeable on client"
+	    "x:set exec bit on client"
+	    "k:full RCS keyword expansion"
+	    "k:RCS expansion only for Id, Header"
+	    "l:exclusive open, disallow multiple opens"
+	    "C:server stores compress file per revision"
+	    "D:server stores deltas in RCS format"
+	    "F:server stores full file per revision"
+	    "S:server stores only head revision")
+	_describe -t file-modifiers 'Perforce file modifier' values
+    else
+	values=(
+	    "text:text, translate newlines"
+	    "binary:raw bytes"
+	    "symlink:symbolic link"
+	    "apple:Mac resource + data"
+	    "unicode:text, translate newlines, store as UTF-8")
+	_describe -t file-types 'Perforce file type' values -S+ -q
+    fi
+}
+
+
+(( $+functions[_p4_groups] )) ||
+_p4_groups() {
+    _describe -t groups 'Perforce group' $(_call_program groups p4 groups)
+}
+
+
+(( $+functions[_p4_host_port] )) ||
+_p4_host_port() {
+    if compset -P '*:'; then
+	_ports
+    else
+	# is this -q-able?
+	_hosts -S :
+    fi
+}
+
+(( $+functions[_p4_jobs] )) ||
+_p4_jobs() {
+    local jline match mbegin mend max
+    local -a jl
+
+    zstyle -s ":completion:${curcontext}:" max max
+    if [[ ${NUMERIC:-0} -lt 0 && -z $compstate[insert] ]]; then
+	# Not inserting (i.e. just listing) and given a negative
+	# prefix argument.  Instead of listing possible completions,
+	# show the full description for the job which is on the line at
+	# the moment.
+	_message -r "$(_call_program jobs p4 jobs -e \"Job=\$PREFIX\$SUFFIX\" -l 2>/dev/null)"
+	return 0
+    elif [[ ${NUMERIC:-0} -gt 0 ]]; then
+	max=$NUMERIC
+    fi
+
+    _call_program jobs p4 jobs -m ${max:-20} | while read jline; do
+	if [[ $jline = (#b)([^[:blank:]]##)' '[^[:blank:]]##' '(*) ]]; then
+	    jl+=("${match[1]}:${match[2]}")
+	fi
+    done
+    _describe -t jobs 'Perforce job' jl
+}
+
+(( $+functions[_p4_jobview] )) ||
+_p4_jobview() {
+    # Jobviews (see `p4 help jobview') are ways of interrogating the
+    # jobs/fixes database.  It's basically either a set of strings,
+    # or a set of key=value pairs, or some combination, separated
+    # by various logical operators.  The `=' could be a comparison,
+    # but we don't currently bother with that here; it's a bit cumbersome
+    # to complete.
+    local line type oldifs=$IFS IFS= key value
+    local match mbegin mend
+    # This is simply to split out two space-delimited words a backreferences.
+    local m2words
+    m2words='(#b)[[:blank:]]##([[:alnum:]]##)[[:blank:]]##([^[:blank:]]##)'
+
+    local -a valuespec
+    local -A p4fields p4values
+
+    # All the characters which can separate multiple match attempts.
+    # Ignore up to the last one.  We don't try to complete these.
+    compset -P '*[[:blank:]\^\&\|\(\)]'
+
+    # According to the manual, `p4 jobspec' requires admin priveleges.
+    # If this is true even of `p4 jobspec -o', we are a bit screwed.
+    _call_program jobspec p4 jobspec -o 2>/dev/null | while read line; do
+	case $line in
+	    ([[:blank:]]##) type=
+			    ;;
+	    ((#b)([[:alpha:]]##):*) type=${match[1]}
+				    ;;
+	    (*) case $type in
+	        # This stanza tells us all the allowed fields.
+	        (Fields) if [[ $line = [[:blank:]]##<->${~m2words}* ]]
+	                 then
+			     p4fields[${(L)match[1]}]=${match[2]}
+			 fi
+			 ;;
+	        # This stanza gives allowed values for the `select' types.
+		(Values) if [[ $line = ${~m2words}* ]]; then
+			     p4values[${(L)match[1]}]=${match[2]}
+			 fi
+			 ;;
+	        esac
+	        ;;
+	esac
+    done
+
+    IFS=$oldifs
+
+    if (( ! ${#p4fields} )); then
+	# We didn't get anything; add the defaults.
+	p4fields=(
+	    date	date
+	    description text
+	    job		word
+	    status	select
+	    user	word
+	)
+	p4values=(
+	    status	open/suspended/closed
+	)
+    fi
+
+    for key in ${(k)p4fields}; do
+	if [[ -n ${p4values[$key]} ]]; then
+	    valuespec+=("${key}:${p4fields[$key]}:(${p4values[$key]//\\// })")
+	elif [[ $key = job ]]; then
+	    # Nothing special for jobs; add our own completion.
+	    valuespec+=("${key}:Perforce job:_p4_jobs")
+	elif [[ $key = user ]]; then
+	    # Nothing provided for user; add our own completion.
+	    valuespec+=("${key}:user:_users")
+	else
+	    valuespec+=("${key}:${p4fields[$key]}: ")
+	fi
+    done
+
+    _values 'Job specification parameter' $valuespec
+}
+
+(( $+functions[_p4_labels] )) ||
+_p4_labels() {
+    local lline match mbegin mend
+    local -a ll
+    _call_program labels p4 labels | while read lline; do
+	if [[ $lline = (#b)'Label '([^[:blank:]]##)' '(*) ]]; then
+	    ll+=("${match[1]}:${match[2]}")
+	fi
+    done
+    _describe -t labels 'Perforce label' ll
+}
+
+
+(( $+functions[_p4_revisions] )) ||
+_p4_revisions() {
+    # Doesn't handle standard completion options; requires space
+    # in front if used as action in _arguments.
+
+    local rline match mbegin mend comma expl pfx
+    local -a rl
+
+    if [[ $1 = -tR ]]; then
+	# handle ranges
+	comma=(-S, -R _p4_file_suffix)
+	shift
+    fi
+
+    # Beware of @foo,#bar; stupid but probably valid.
+    pfx=${${(Q)PREFIX}%%[\#@]*}
+    compset -P '*\#'
+
+    # Numerical revision numbers, possibly with text.
+    if [[ -z $PREFIX || $PREFIX = <-> ]]; then
+	# always allowed (same as none)
+	rl+=(0)
+	_call_program filelog p4 filelog $1 2>/dev/null | while read rline; do
+	    if [[ $rline = (#b)'... #'(<->)*\'(*)\' ]]; then
+		rl+=("${match[1]}:${match[2]}")
+	    fi
+	done
+    fi
+    # Non-numerical (special) revision names.
+    if [[ -z $PREFIX || $PREFIX != <-> ]]; then
+	rl+=('head:head revision' 'none:empty revision'
+		'have:current synced revision')
+    fi
+    _describe -t revisions 'revision' rl $comma
+}
+
+
+(( $+functions[_p4_status] )) ||
+_p4_status() {
+    # Perforce statuses are usually limited to a set of values
+    # given by the jobspec.
+    local jline match mbegin mend
+    local -a statuses
+
+    _call_program jobspec p4 jobspec -o | while read jline; do
+	if [[ $jline = (#b)Status[[:blank:]]##(*/*) ]]; then
+	    statuses=(${(s./.)match[1]})
+	    break
+	fi
+    done
+    if (( !${#statuses} )); then
+	# Couldn't find anything from the jobspec; add defaults.
+	statuses=(closed open suspended)
+    fi
+    _describe -t status 'job status' statuses
+    return 1
+}
+
+
+(( $+functions[_p4_variables] )) ||
+_p4_variables() {
+    local line match mbegin mend expl
+    local -a vars
+
+    _call_program help-environment p4 help environment | while IFS= read line; do
+	if [[ $line = $'\t'(#b)([A-Z][A-Z0-9_]##)* ]]; then
+	   vars+=($match[1])
+	fi
+    done
+
+    _wanted variable expl 'environment variable' compadd -S= -q $vars
+}
+
+#
+# Completions for p4 commands
+#
+
+(( $+functions[_p4_cmd_add] )) ||
+_p4_cmd_add() {
+    _arguments -s : \
+	'-c+[select by changelist]:changelist:_p4_changelist -tp' \
+	'-t+[set file type]:file type:_p4_filetypes' \
+	'*:file:_p4_files -tu'
+}
+
+
+(( $+functions[_p4_cmd_admin] )) ||
+_p4_cmd_admin() {
+    if (( CURRENT == 2 )); then
+	local -a adcmds
+	adcmds=(
+	    "checkpoint:checkpoint, save copy of journal file"
+	    "journal:save and truncate journal file"
+	    "stop:stop the server")
+        _describe -t commands 'Perforce admin command' adcmds
+    elif [[ $words[2] == (checkpoint|journal) ]]; then
+	shift words
+	(( CURRENT-- ))
+	_arguments -s : \
+	    '-z[gzip journal file]' \
+	    '1::journal file prefix: '
+    fi
+}
+
+
+(( $+functions[_p4_cmd_annotate] )) ||
+_p4_cmd_annotate() {
+    # If you don't have this, it's new in release 2002.2.
+    _arguments -s : \
+	'-a[all, show both added and deleted lines]' \
+	'-q[quiet, suppress one-line file header]' \
+	'*::file:_p4_files -tR'
+}
+
+(( $+functions[_p4_cmd_branch] )) ||
+_p4_cmd_branch() {
+    _arguments -s : \
+	'(-o)-f[force operation by superuser]' \
+	'(-o -i)-d[delete branch]' \
+	'(-d -i -f)-o[write specification to standard output]' \
+	'(-d -o)-i[read specificationf from standard input]' \
+	'(-i)*::branch name:_p4_branches'
+}
+
+
+(( $+functions[_p4_cmd_branches] )) ||
+_p4_cmd_branches() {
+    # No arguments.
+    _arguments -s :
+}
+
+
+(( $+functions[_p4_cmd_change] )) ||
+_p4_cmd_change() {
+    _arguments -s : \
+	'(-o)-f[allow force by superuser]' \
+	'-s[joblist includes the fix status]' \
+	'(-o -i)-d[describe newly created pending change]' \
+	'(-d -i -f)-o[output specification to standard output]' \
+	'(-d -o)-i[read specification from standard input]' \
+	'(-i)1::changelist:_p4_changelist -tp'
+}
+
+
+(( $+functions[_p4_cmd_changes] )) ||
+_p4_cmd_changes() {
+    _arguments -s : \
+      '-i[include integrated changes]' \
+      '-l[long output]' \
+      '-c[select by client]:client:_p4_clients' \
+      '-m[most recent N changes]:max changes: ' \
+      '-s[select by status]:status:(pending submitted)' \
+      '-u[select by user]:user:_users' \
+      '*::file:_p4_files -tR'
+}
+
+
+(( $+functions[_p4_cmd_client] )) ||
+_p4_cmd_client() {
+    _arguments -s : \
+	'-f[force modification by superuser]' \
+	'-t[use template]:template client:_p4_clients' \
+	'(-o -i -t)-d[delete client]' \
+	'(-d -i -f)-o[print to standard output]' \
+	'(-d -o -t)-i[read from standard input]' \
+	'1::file:_p4_clients'
+}
+
+
+(( $+functions[_p4_cmd_clients] )) ||
+_p4_cmd_clients() {
+    # No arguments.
+    _arguments -s :
+}
+
+
+(( $+functions[_p4_cmd_counter] )) ||
+_p4_cmd_counter() {
+    _arguments -s : \
+	'-d[delete counter]' \
+	'-f[force setting of internal counter]' \
+	'1:counter:_p4_counters' \
+	'(-d)2::numeric value:_p4_counter_value'
+}
+
+
+(( $+functions[_p4_cmd_counters] )) ||
+_p4_cmd_counters() {
+    # No arguments
+    _arguments -s :
+}
+
+
+(( $+functions[_p4_cmd_delete] )) ||
+_p4_cmd_delete() {
+    _arguments -s : \
+	'-c[select changelist for deletion]:changelist:_p4_changelist -tp' \
+	'*::file:_p4_files'
+}
+
+
+(( $+functions[_p4_cmd_depot] )) ||
+_p4_cmd_depot() {
+    _arguments -s : \
+	'-d[delete depot]' \
+	'-o[print to stdout]' \
+	'-i[read name from stdin]' \
+	'(-i)*::depot name:_p4_depots'
+}
+
+
+(( $+functions[_p4_cmd_depots] )) ||
+_p4_cmd_depots() {
+    # No arguments
+    _arguments -s :
+}
+
+
+(( $+functions[_p4_cmd_describe] )) ||
+_p4_cmd_describe() {
+    _arguments -s : \
+	'-d-[select diff option]:diff option:((b\:ignore\ blanks c\:context n\:RCS s\:summary u\:unified w\:ignore\ all\ whitespace))' \
+	'-s[short form]' \
+	'*::changelist:_p4_changelist'
+}
+
+
+(( $+functions[_p4_cmd_diff] )) ||
+_p4_cmd_diff() {
+    local limit
+    [[ ${words[(I)-(f|sd|se)]} -eq 0 ]] && limit=" -to"
+    _arguments -s : \
+	'-d-[select diff option]:diff option:((b\:ignore\ blanks c\:context n\:RCS s\:summary u\:unified w\:ignore\ all\ whitespace))' \
+	'-f[diff every file]' \
+	'(-sd -se -sr)-sa[opened files, different or missing]' \
+	'(-sa -se -sr)-sd[unopened files, missing]' \
+	'(-sa -sd -sr)-se[unopened files, different]' \
+	'(-sa -sd -se)-sr[opened files, same as depot]' \
+	'-t[include non-text files]' \
+	"*::file:_p4_files$limit"
+}
+
+
+(( $+functions[_p4_cmd_diff2] )) ||
+_p4_cmd_diff2() {
+    _arguments -s : \
+	'-b[specify branch view]:branch name:_p4_branches' \
+	'-d-[select diff option]:diff option:((b\:ignore\ blanks c\:context n\:RCS s\:summary u\:unified w\:ignore\ all\ whitespace))' \
+	'-q[only list different files]' \
+	'-t[include non-text files]' \
+	'-u[use patch-friendly output]' \
+	'1::first file:_p4_files' \
+	'2::second file:_p4_files'
+}
+
+
+(( $+functions[_p4_cmd_dirs] )) ||
+_p4_cmd_dirs() {
+    _arguments -s : \
+	'-C[only dirs on current client]' \
+	'-D[include dirs with deleted files]' \
+	'-H[only dirs on the `have'\'' list]' \
+	'*::directory:_p4_files -td'
+}
+
+
+(( $+functions[_p4_cmd_edit] )) ||
+_p4_cmd_edit() {
+    _arguments -s : \
+	'-c[set changelist for edit]:changelist:_p4_changelist -tp' \
+	'-t[set filetype]:filetype:_p4_filetypes' \
+	'*::file:_p4_files'
+}
+
+
+(( $+functions[_p4_cmd_filelog] )) ||
+_p4_cmd_filelog() {
+    _arguments -s : \
+	'-i[follow branches]' \
+	'-l[long output, full changelist text]' \
+	'-m[set maximum number of revisions to show]:max revisions: ' \
+	'-t[include time with date]' \
+	'*::file:_p4_files'
+}
+
+
+(( $+functions[_p4_cmd_files] )) ||
+_p4_cmd_files() {
+    _arguments -s : \
+	'-a[display all revisions in given range]' \
+	'*::file:_p4_files -tR'
+}
+
+
+(( $+functions[_p4_cmd_fix] )) ||
+_p4_cmd_fix() {
+    _arguments -s : \
+	'-d[delete the fix]' \
+	'-s[set job status]:status:_p4_status' \
+	'1::-c required:(-c)' \
+	'2::changelist:_p4_changelist' \
+	'3::job:_p4_jobs'
+}
+
+
+(( $+functions[_p4_cmd_fixes] )) ||
+_p4_cmd_fixes() {
+    _arguments -s : \
+	'-i[include integrated changelists]' \
+	'-j[select by job]:job:_p4_jobs' \
+	'-c[select by changelist]:changelist:_p4_changelist' \
+	'*::fixed file:_p4_files -tR'
+}
+
+
+(( $+functions[_p4_cmd_flush] )) ||
+_p4_cmd_flush() {
+    _arguments -s : \
+	'-f[force resynchronisation]' \
+	'-n[show operations but don'\''t perform them]' \
+	'*::file:_p4_files -tR'
+}
+
+
+(( $+functions[_p4_cmd_fstat] )) ||
+_p4_cmd_fstat() {
+    _arguments -s : \
+	'-c+[select by changelist]:changelist:_p4_changelist -ts' \
+	'-C[select mapped files]' \
+	'-H[select synced files]' \
+	'-W[select opened files]' \
+	'-l[include fileSize, possibly slow]' \
+	'-P[output clientFile in full Perforce syntax]' \
+	'-s[shorten, no client-related data]' \
+	'*::file:_p4_files'
+}
+
+
+(( $+functions[_p4_cmd_group] )) ||
+_p4_cmd_group() {
+    _arguments -s : \
+	'-d[delete group]' \
+	'-o[output to stdout]' \
+	'-i[read from stdin]' \
+	'1::perforce group:_p4_groups'
+}
+
+
+(( $+functions[_p4_cmd_groups] )) ||
+_p4_cmd_groups() {
+    _arguments -s : \
+	'1::user name:_users'
+}
+
+
+(( $+functions[_p4_cmd_have] )) ||
+_p4_cmd_have() {
+    _p4_files
+}
+
+
+(( $+functions[_p4_cmd_help] )) ||
+_p4_cmd_help() {
+    local hline
+    if (( ! ${#_p4_help_list} )); then
+	(( ${+_p4_help_list} )) || typeset -ga _p4_help_list
+	# All commands have help.
+	_p4_help_list=($_p4_cmd_list)
+	_call_program help p4 help | while read -A hline; do
+	    if [[ $hline[1] = p4 && $hline[2] = help ]]; then
+		_p4_help_list+=("$hline[3]:${hline[4,-1]}")
+	    fi
+	done
+    fi
+    _describe -t help-options 'Perforce help option' _p4_help_list
+}
+
+
+(( $+functions[_p4_cmd_info] )) ||
+_p4_cmd_info() {
+    # No arguments
+    _arguments -s :
+}
+
+
+(( $+functions[_p4_cmd_integrate] )) ||
+_p4_cmd_integrate() {
+    local range
+    # If -s is present, the first normal argument can't have revRange.
+    [[ ${words[(I)-s]} -eq 0 ]] && range=" -tR"
+    _arguments -s : \
+	'-b[select branch]:branch:_p4_branches' \
+	'-c[select changelist for integration]:changelist:_p4_changelist -tp' \
+	'-f[force reintegration]' \
+	'-d[reintegrated deleted files]' \
+	'-h[integrate to revision had on client]' \
+	'-i[integrate if no common file base]' \
+	'-n[no action, dummy run]' \
+	'-r[reverse direction of integration with branch]' \
+	'-s[select source]:source file:_p4_files -tR' \
+	'-t[propagate type changes]' \
+	'-v[leave newly branched files uncopied till sync]' \
+	"1:file:_p4_files$range" \
+	'*::file:_p4_files'
+}
+
+
+(( $+functions[_p4_cmd_integrated] )) ||
+_p4_cmd_integrated() {
+    _p4_files -ti
+}
+
+
+(( $+functions[_p4_cmd_job] )) ||
+_p4_cmd_job() {
+    _arguments -s : \
+	'(-d -o -i)-f[force setting of readonly fields]' \
+	'(-f -o -i)-d[delete job]' \
+	'(-f -d -i)-o[print to stdout]' \
+	'(-d -o)-i[read from stdin]' \
+	'(-i)1::job:_p4_jobs'
+}
+
+
+(( $+functions[_p4_cmd_jobs] )) ||
+_p4_cmd_jobs() {
+    _arguments -s : \
+	'-e[select by jobview]:jobview:_p4_jobview' \
+	'-i[included integrated changes]' \
+	'-l[long output, full job descriptions]' \
+	'-r[reverse order of job names]' \
+	'-m[limit to most recent N jobs]:most recent jobs: ' \
+	'(-e -i -l -m)-R[]' \
+	'*::file:_p4_files -tR'
+}
+
+
+(( $+functions[_p4_cmd_jobspec] )) ||
+_p4_cmd_jobspec() {
+    _arguments -s : \
+	'-i[read form from stdin]' \
+	'-o[write form from to stdout]'
+}
+
+
+(( $+functions[_p4_cmd_label] )) ||
+_p4_cmd_label() {
+    _arguments -s : \
+	'-f[force operation]' \
+	'-t+[copy template]:template: ' \
+	'(-o -i -t)-d[delete label]' \
+	'(-d -f -i)-o[write to standard output]' \
+	'(-o -d -t)-i[read from standard input]' \
+	'*::label:_p4_labels'
+}
+
+
+(( $+functions[_p4_cmd_labels] )) ||
+_p4_cmd_labels() {
+    _arguments -s : \
+	'1::file or revisions which must contain label:_p4_files -tR'
+}
+
+
+(( $+functions[_p4_cmd_labelsync] )) ||
+_p4_cmd_labelsync() {
+    _arguments -s : \
+	'-a[add files to label]' \
+	'-d[delete files from label]' \
+	'-n[no effect, dummy run]' \
+	'-l[specify lable]:label:_p4_labels' \
+	'*::file:_p4_files -tR'
+}
+
+
+(( $+functions[_p4_cmd_lock] )) ||
+_p4_cmd_lock() {
+    _arguments -s : \
+	'-c[select by changelist]:changelist:_p4_changelist -tp' \
+	'*::file:_p4_files -to'
+}
+
+
+(( $+functions[_p4_cmd_logger] )) ||
+_p4_cmd_logger() {
+    _arguments -s : \
+	'-c[limit by counter no]:number: ' \
+	'-t[use counter instead of logger]:counter:_p4_counters'
+}
+
+
+(( $+functions[_p4_cmd_obliterate] )) ||
+_p4_cmd_obliterate() {
+    _message "obliterate is dangerous: you're on your own here."
+}
+
+
+(( $+functions[_p4_cmd_opened] )) ||
+_p4_cmd_opened() {
+    _arguments -s : \
+	'-a[list for all clients]' \
+	'-c+[select by changelist]:changelist:_p4_changelist -tp' \
+	'*::file:_p4_files -to'
+}
+
+
+(( $+functions[_p4_cmd_passwd] )) ||
+_p4_cmd_passwd() {
+    _arguments -s : : \
+	'-O[explicit old password]:old password: ' \
+	'-P[explicit new password]:new password: ' \
+	'1::user name:_users'
+}
+
+
+(( $+functions[_p4_cmd_print] )) ||
+_p4_cmd_print() {
+    _arguments -s : \
+	'-a[display all revisions in a range]' \
+	'-o[Select output file]:output file:_files' \
+	'-q[Suppress header]' \
+	'*::file:_p4_files -tR'
+}
+
+
+(( $+functions[_p4_cmd_protect] )) ||
+_p4_cmd_protect() {
+    _arguments -s : \
+	'-o[write spec to stdout]' \
+	'-i[read spec from stdin]'
+}
+
+
+(( $+functions[_p4_cmd_reopen] )) ||
+_p4_cmd_reopen() {
+    _arguments -s : \
+	'-c+[select changelist to reopen on]:changelist:_p4_changelist -tp' \
+	'-t+[set file type]:file type:_p4_filetypes' \
+	'*::file:_p4_files -to'
+}
+
+
+(( $+functions[_p4_cmd_resolve] )) ||
+_p4_cmd_resolve() {
+    _arguments -s : \
+	'-a-[select automatic merge type]:automation type:((f\:force\ acceptance m\:skip\ conflicts s\:safe t\:use\ theirs y\:use\ yours))' \
+	'-d-[select diff option]:diff option:((b\:ignore\ blanks w\:ignore\ all\ whitespace))' \
+	'-f[force re-resolution]' \
+	'-n[no action, just list]' \
+	'-t[force textual merge on binary files]' \
+	'-v[verbose, mark all changes]' \
+	'*::file:_p4_files -to'
+}
+
+
+(( $+functions[_p4_cmd_resolved] )) ||
+_p4_cmd_resolved() {
+    _p4_files -tr
+}
+
+
+(( $+functions[_p4_cmd_revert] )) ||
+_p4_cmd_revert() {
+    _arguments -s : \
+	'-a[revert unaltered files]' \
+	'-c[limit reversions to changelist]:changelist:_p4_changelist -tp' \
+	'-n[no action, show effect only]' \
+	'*::file:_p4_files -to'
+}
+
+
+(( $+functions[_p4_cmd_review] )) ||
+_p4_cmd_review() {
+    _arguments -s : \
+	'-c[select changelist for counter]:changelist:_p4_changelist -ts' \
+	'-t[limit change number by counter]:counter:_p4_counters'
+}
+
+
+(( $+functions[_p4_cmd_reviews] )) ||
+_p4_cmd_reviews() {
+    _arguments -s : \
+	'-c[show users by changelist]:changelist:_p4_changelist -ts' \
+	'*::file:_p4_files'
+}
+
+
+(( $+functions[_p4_cmd_set] )) ||
+_p4_cmd_set() {
+    # Only works under Windoze but maybe we are on Cygwin.
+    _arguments -s : \
+	'-s[set for whole system]' \
+	'-S[set for specified service]:service: ' \
+	"*::environment variable:_p4_variables"
+}
+
+
+(( $+functions[_p4_cmd_submit] )) ||
+_p4_cmd_submit() {
+    _arguments -s : \
+	'-r[files open for add or edit remain open]' \
+	'-s[include fix status in list]' \
+	'(-s -i)-c[submit specific change]:changelist:_p4_changelist -tp' \
+	'(-c)-i[read changelist spec from stdin]' \
+	'*::file:_p4_files -to -tr' \
+}
+
+
+(( $+functions[_p4_cmd_sync] )) ||
+_p4_cmd_sync() {
+    _arguments -s : \
+	'-f[force resynchronisation]' \
+	'-n[show operations but don'\''t perform them]' \
+	'*::file:_p4_files -tR'
+}
+
+
+(( $+functions[_p4_cmd_triggers] )) ||
+_p4_cmd_triggers() {
+    _arguments -s : \
+	'-o[output form to stdout]' \
+	'-i[read from from stdin]'
+}
+
+
+(( $+functions[_p4_cmd_typemap] )) ||
+_p4_cmd_typemap() {
+    _arguments -s : \
+	'-o[output table to stdout]' \
+	'-i[read table from stdin]'
+}
+
+
+(( $+functions[_p4_cmd_unlock] )) ||
+_p4_cmd_unlock() {
+    _arguments -s : \
+	'-c[non-default changelist to unlock]:changelist:_p4_changelist -tp' \
+	'-f[allow superuser to unlock any file]' \
+	'*::file:_p4_files'
+}
+
+
+(( $+functions[_p4_cmd_user] )) ||
+_p4_cmd_user() {
+    _arguments -s : \
+	'(-o)-f[force edit by superuser]' \
+	'(-o -i)-d[delete user]' \
+	'(-o -d)-i[read form from stdin]' \
+	'(-f -i -d)-o[write form to stdout]' \
+	'(-i)1::username:_users'
+}
+
+
+(( $+functions[_p4_cmd_users] )) ||
+_p4_cmd_users() {
+    _arguments -s : \
+	'*::username:_users'
+}
+
+
+(( $+functions[_p4_cmd_verify] )) ||
+_p4_cmd_verify() {
+    _arguments -s : \
+	'-q[operate quietly]' \
+	'-u[compute and save digest if missing]' \
+	'-v[compute and save all digets]' \
+	'*::file:_p4_files -tR'
+}
+
+
+(( $+functions[_p4_cmd_where] )) ||
+_p4_cmd_where() {
+    _p4_files
+}
+
+
+_p4 "$@"

@@ -1,3 +1,8 @@
+2003-02-11  Peter Stephenson  <pws@csr.com>
+
+	* unposted: Completion/Unix/Command/_p4: Oliver thinks _perforce
+	is a better name than _p4.
+
 2003-02-08  Clint Adams  <clint@zsh.org>
 
 	* 18207: Src/Builtins/rlimits.c: add maxfilelocks to ulimit output.
