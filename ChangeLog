@@ -1,3 +1,8 @@
+2001-10-10  Clint Adams  <clint@zsh.org>
+
+	* 16005: Completion/Unix/Command/_mount:
+	check /etc/filesystems under Linux.
+
 2001-10-10  Oliver Kiddle  <opk@zsh.org>
 
 	* 16xxx: acconfig.h, zshconfig.ac, Etc/MACHINES,

@@ -559,11 +559,13 @@ if [[ "$service" = mount ]]; then
       ':dev or dir:->devordir'
       ':mount point:_files -/'
     )
-    fss=( minix ext ext2 xiafs hpfs msdos umsdos vfat proc nfs iso9660
-          smbfs ncpfs affs ufs romfs sysv adfs autofs coda devpts efs
-          hfs ntfs qnx4 smbfs udf ext3 xfs reiserfs )
+    typeset -aU fss
+    fss=( adfs bfs cramfs ext2 ext3 hfs hpfs iso9660 minix ntfs qnx4
+          reiserfs romfs swap udf ufs vxfs xfs xiafs )
     [[ -r /proc/filesystems ]] &&
-        fss=( ${$(</proc/filesystems)#nodev} )
+        fss=( $fss ${$(</proc/filesystems)#nodev} )
+    [[ -r /etc/filesystems ]] &&
+        fss=( $fss ${$(</etc/filesystems)#nodev} )
     ;;
   osf*)
     args=( -s
