@@ -697,8 +697,9 @@ enditem()
 )
 enditem()
 
-The following flags are meaningful with the tt(${)...tt(#)...tt(}),
-tt(${)...tt(%)...tt(}), or tt(${)...tt(/)...tt(}) forms.
+The following flags are meaningful with the tt(${)...tt(#)...tt(}) or
+tt(${)...tt(%)...tt(}) forms.  The tt(S) and tt(I) flags may also be
+used with the tt(${)...tt(/)...tt(}) forms.
 
 startitem()
 item(tt(S))(
