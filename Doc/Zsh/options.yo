@@ -206,6 +206,19 @@ Make the tt(echo) builtin compatible with the BSD manref(echo)(1) command.
 This disables backslashed escape sequences in echo strings unless the
 tt(-e) option is specified.
 )
+pindex(C_BASES)
+cindex(bases, output in C format)
+cindex(hexadecimal, output in C format)
+cindex(octal, output in C format)
+item(tt(C_BASES))(
+Output hexadecimal numbers in the standard C format, for example `tt(0xFF)'
+instead of the usual `tt(16#FF)'.  If the option tt(OCTAL_ZEROES) is also
+set (it is not by default), octal numbers will be treated similarly and
+hence appear as `tt(077)' instead of `tt(8#77)'.  This option has no effect
+on the choice of the output base, nor on the output of bases other than
+hexadecimal and octal.  Note that these formats will be understood on input
+irrespective of the setting of tt(C_BASES).
+)
 pindex(CDABLE_VARS)
 cindex(cd, to parameter)
 item(tt(CDABLE_VARS) (tt(-T)))(

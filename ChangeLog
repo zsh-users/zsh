@@ -1,3 +1,9 @@
+2000-08-10  Peter Stephenson  <pws@csr.com>
+
+	* 12581: Doc/Zsh/options.yo, Src/options.c, Src/params.c,
+	Src/zsh.h: Add C_BASES option to output hexadecimal as 0xFF
+	instead of 16#FF, and similarly for octal if OCTAL_ZEROES is set.
+
 2000-08-09  Oliver Kiddle  <opk@zsh.org>
 
 	* 12578: Completion/Builtins/_read, Completion/Builtins/_vars,
