@@ -314,6 +314,17 @@ _cvs_remove () {
     '*:file:_cvs_files_removed'
 }
 
+(( $+functions[_cvs_rtag] )) ||
+_cvs_rtag () {
+  # "+FanfQqlRdbr:D:"
+  _arguments -s \
+    -{F,a,n,f,Q,q,l,R,d,b} \
+    '*-D+:date:_cvs_D' \
+    '*-r+:tag:_cvs_revisions' \
+    ':tag:' \
+    '*:module:_cvs_modules'
+}
+
 (( $+functions[_cvs_status] )) ||
 _cvs_status () {
   # "+vlR"
@@ -343,7 +354,7 @@ _cvs_unedit () {
 
 (( $+functions[_cvs_update] )) ||
 _cvs_update () {
-  # "+ApPflRQqduk:r:D:j:I:W:"
+  # "+ApCPflRQqduk:r:D:j:I:W:"
   _arguments -s \
     -{A,C,p,P,f,l,R,Q,q,d,u} \
     '-k+:keyword substitution:_cvs_k' \
