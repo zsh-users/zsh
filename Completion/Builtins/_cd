@@ -13,7 +13,7 @@
 
 setopt localoptions nonomatch
 
-local expl
+local expl ret=1
 
 if [[ CURRENT -eq 3 ]]; then
   # cd old new: look for old in $PWD and see what can replace it
@@ -23,25 +23,32 @@ if [[ CURRENT -eq 3 ]]; then
   # Now remove all the common parts of $PWD and the completions from this
   rep=(${${rep#${PWD%%$words[2]*}}%${PWD#*$words[2]}})
   (( $#rep )) && _wanted -C replacement strings expl replacement compadd -a rep
-elif _popd || [[ $PREFIX != (\~|/|./|../)* && $#cdpath -ne 0 ]]; then
-  local tdir tdir2
-
-  # With cdablevars, we can convert foo/bar/... to ~foo/bar/... if
-  # there is no directory foo.  In that case we could also complete
-  # variable names, but it hardly seems worth it.
-  # Note we need a tilde because cdablevars also allows user home
-  # directories, hence we also need nonomatch to suppress error messages.
-  if [[ -o cdablevars && -n "$PREFIX" && ! -d ${tdir::=${PREFIX%%/*}} &&
-        -d ${~tdir2::="~$tdir"} ]]; then
-      PREFIX="~$PREFIX"
-      _wanted directories expl directory _path_files -/
-  else
-    local tmpcdpath
-    tmpcdpath=(${${(@)cdpath:#.}:#$PWD})
-    _alternative \
-        'local-directories:local directories:_path_files -/' \
-	"path-directories:directories in cdpath:_path_files -W tmpcdpath -/"
-  fi
 else
-  _wanted directories expl directory _path_files -/
+  _popd && ret=0
+
+  if [[ $PREFIX != (\~|/|./|../)* && $#cdpath -ne 0 ]]; then
+    local tdir tdir2
+
+    # With cdablevars, we can convert foo/bar/... to ~foo/bar/... if
+    # there is no directory foo.  In that case we could also complete
+    # variable names, but it hardly seems worth it.
+    # Note we need a tilde because cdablevars also allows user home
+    # directories, hence we also need nonomatch to suppress error messages.
+    if [[ -o cdablevars && -n "$PREFIX" && ! -d ${tdir::=${PREFIX%%/*}} &&
+          -d ${~tdir2::="~$tdir"} ]]; then
+      PREFIX="~$PREFIX"
+      _wanted directories expl directory _path_files -/ && ret=0
+    else
+      local tmpcdpath
+
+      tmpcdpath=(${${(@)cdpath:#.}:#$PWD})
+      _alternative \
+          'local-directories:local directories:_path_files -/' \
+	  "path-directories:directories in cdpath:_path_files -W tmpcdpath -/" && ret=0
+    fi
+  else
+    _wanted directories expl directory _path_files -/ && ret=0
+  fi
+
+  return ret
 fi
