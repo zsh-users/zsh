@@ -2499,6 +2499,7 @@ struct cvdef {
     char **defs;		/* original strings */
     int ndefs;			/* number of ... */
     int lastt;			/* last time used */
+    int words;                  /* if to look at other words */
 };
 
 /* One value definition. */
@@ -2556,18 +2557,23 @@ parse_cvdef(char *nam, char **args)
     Cvval val, *valp;
     Caarg arg;
     char **oargs = args, sep = '\0', asep = '=', *name, *descr, *p, *q, **xor, c;
-    int xnum, multi, vtype, hassep = 0;
+    int xnum, multi, vtype, hassep = 0, words = 0;
 
-    while (args[0][0] == '-' && (args[0][1] == 's' || args[0][1] == 'S') &&
+    while (args[0][0] == '-' &&
+           (args[0][1] == 's' || args[0][1] == 'S' || args[0][1] == 'w') &&
            !args[0][2]) {
 
         if (args[0][1] == 's') {
             hassep = 1;
             sep = args[1][0];
-        } else
+            args += 2;
+        } else if (args[0][1] == 'S') {
             asep = args[1][0];
-
-	args += 2;
+            args += 2;
+        } else {
+            words = 1;
+            args++;
+        }
     }
     if (!args[0] || !args[1]) {
 	zwarnnam(nam, "not enough arguments", NULL, 0);
@@ -2585,6 +2591,7 @@ parse_cvdef(char *nam, char **args)
     ret->defs = zarrdup(oargs);
     ret->ndefs = arrlen(oargs);
     ret->lastt = time(0);
+    ret->words = words;
 
     for (valp = &(ret->vals); *args; args++) {
 	int bs = 0;
@@ -2892,6 +2899,35 @@ cv_parse_word(Cvdef d)
 
     cv_alloced = 1;
 
+    if (d->words && compwords[0]) {
+        int i;
+
+        for (i = 1; compwords[i]; i++)
+            if (i != compcurrent - 1)
+                for (str = compwords[i]; str && *str; ) {
+                    if ((val = cv_next(d, &str, &arg))) {
+                        zaddlinknode(state.vals, ztrdup(val->name));
+                        if (arg) {
+                            char sav = '\0';
+
+                            if (str) {
+                                sav = str[-1];
+                                str[-1] = '\0';
+                            }
+                            zaddlinknode(state.vals, ztrdup(arg));
+                            if (str)
+                                str[-1] = sav;
+                        } else
+                            zaddlinknode(state.vals, ztrdup(""));
+
+                        if (i + 1 < compcurrent)
+                            cv_inactive(d, val->xor);
+                    }
+                }
+
+        val = NULL;
+        arg = NULL;
+    }
     for (str = compprefix; str && *str; ) {
         if ((val = cv_next(d, &str, &arg))) {
             zaddlinknode(state.vals, ztrdup(val->name));

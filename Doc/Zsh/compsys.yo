@@ -3975,6 +3975,10 @@ next argument is used as the character that separates multiple values.
 Thus the values completed appear in the same word on the command line,
 unlike completion using tt(_arguments).
 
+Normally, tt(_values) will only use the current word to determine
+which values are already present on the command line.  If the tt(-w)
+option is given, the other arguments are used, too.
+
 The first argument (after the options and separator character if they
 are given) is used as a string to print as a description before
 listing the values.

@@ -1,3 +1,9 @@
+2001-08-08  Sven Wischnowsky  <wischnow@zsh.org>
+
+	* 15597: Completion/Unix/Command/_dd, Doc/Zsh/compsys.yo,
+	Src/Zle/computil.c: follow-up to 15588; add -w option to
+	_values (look at all words); change _dd back
+
 2001-08-07  Wayne Davison  <wayned@users.sourceforge.net>
 
 	* users/4092: Src/hist.c: Don't lose the last history line

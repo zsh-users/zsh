@@ -2,21 +2,15 @@
 
 local opts
 
-opts=(
-  'if[specify input file]:input file:_tilde_files'
-  'of[specify output file]:output file:_tilde_files'
-  'ibs[input block size]:block size (bytes)'
-  'obs[output block size]:block size (bytes)'
-  'bs[block size]:block size (bytes)'
-  'cbs[conversion buffer size]:buffer size (bytes)'
-  'skip[input blocks initially skipped]:blocks'
-  'seek[output blocks initially skipped]:blocks'
-  'files[specify number of input files to copy and concatenate]:number of files'
-  'count[number of input blocks to copy]:blocks'
+_values -w 'option' \
+  'if[specify input file]:input file:_tilde_files' \
+  'of[specify output file]:output file:_tilde_files' \
+  'ibs[input block size]:block size (bytes)' \
+  'obs[output block size]:block size (bytes)' \
+  'bs[block size]:block size (bytes)' \
+  'cbs[conversion buffer size]:buffer size (bytes)' \
+  'skip[input blocks initially skipped]:blocks' \
+  'seek[output blocks initially skipped]:blocks' \
+  'files[specify number of input files to copy and concatenate]:number of files' \
+  'count[number of input blocks to copy]:blocks' \
   'conv[specify conversions to apply]:conversion:_values -s , "conversion" ascii ebcdic ibm block unblock lcase ucase swab noerror sync'
-)
-
-[[ "$PREFIX$SUFFIX" != *\=* ]] &&
-    opts=( "${(@)opts:#(${(j:|:)~words[2,-1]%%\=*})\[*}" )
-
-_values -S '=' 'option' "$opts[@]"
