@@ -225,24 +225,14 @@ Functions with the tt(#autoload) tag are marked for autoloading but
 are not otherwise treated specially.  Typically they are to be called
 from within one of the completion functions.  Any var(options) supplied
 will be passed to the tt(autoload) builtin; a typical use is tt(+X) to
-force the function to be loaded immediately.  Note that the tt(-U) flag is
-always added implicitly.
+force the function to be loaded immediately.  Note that the tt(-U) and
+tt(-z) flags are always added implicitly.
 )
 enditem()
 
 The tt(#) is part of the tag name and no white space is allowed after it.
 The tt(#compdef) tags use the tt(compdef) function described below; the
 main difference is that the name of the function is supplied implicitly.
-
-Note also that the functions for the completion system assume that the
-tt(KSH_AUTOLOAD) option is not set.  They cannot be loaded if it is
-set.  To avoid having to unset tt(KSH_AUTOLOAD), you can instead use one or
-more tt(zwc) file(s) that have been created with the command tt(zcompile
--z) to load the functions for the completion system; see
-ifzman(zmanref(zshbuiltins))\
-ifnzman(noderef(Shell Builtin Commands))\
-.  This forces the functions to be autoloaded the way zsh normally
-loads functions.
 
 The special contexts for which completion functions can be defined are:
 

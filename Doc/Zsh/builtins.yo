@@ -103,9 +103,9 @@ which no alias has been defined.
 findex(autoload)
 cindex(functions, autoloading)
 cindex(autoloading functions)
-item(tt(autoload) [ {tt(PLUS())|tt(-)}tt(UXmt) ] [ tt(-wkz) ] [ var(name) ... ])(
-Equivalent to tt(functions -u), with the exception of tt(-X)/tt(+X),
-tt(-w), tt(-k) and tt(-z).
+item(tt(autoload) [ {tt(PLUS())|tt(-)}tt(UXktz) ] [ tt(-w) ] [ var(name) ... ])(
+Equivalent to tt(functions -u), with the exception of tt(-X)/tt(+X) and
+tt(-w).
 
 The flag tt(-X) may be used only inside a shell function, and may not be
 followed by a var(name).  It causes the calling function to be marked for
@@ -120,16 +120,10 @@ function was not previously defined em(and) a definition for it was found.
 This does em(not) replace any existing definition of the function.  The
 exit status is nonzero (failure) if the function was already defined or
 when no definition was found.  In the latter case the function remains
-undefined and marked for autoloading.
-
-The flag tt(+X) may be combined with either tt(-k) or tt(-z) to make
-the function be loaded using ksh-style or zsh-style autoloading,
-respectively. If neither is given, the current setting of the
-tt(KSH_AUTOLOAD) options determines how the function is loaded. With
-ksh-style autoloading, the contents of the file will not be executed
-immediately. Instead, the function created will contain the contents of 
-the file plus a call to the function itself appended to it, thus given 
-normal ksh autoloading behaviour on the first call to the function.
+undefined and marked for autoloading.  If ksh-style autoloading is
+enabled, the function created will contain the contents of the file
+plus a call to the function itself appended to it, thus giving normal
+ksh autoloading behaviour on the first call to the function.
 
 With the tt(-w) flag, the var(name)s are taken as names of files compiled
 with the tt(zcompile) builtin, and all functions defined in them are
@@ -494,7 +488,7 @@ Equivalent to tt(typeset -E), except that options irrelevant to floating
 point numbers are not permitted.
 )
 findex(functions)
-item(tt(functions) [ {tt(PLUS())|tt(-)}tt(UXmtu) ] [ var(name) ... ])(
+item(tt(functions) [ {tt(PLUS())|tt(-)}tt(UXkmtuz) ] [ var(name) ... ])(
 Equivalent to tt(typeset -f).
 )
 module(getcap)(zsh/cap)
@@ -1192,7 +1186,7 @@ Equivalent to tt(whence -v).
 findex(typeset)
 cindex(parameters, setting)
 cindex(parameters, declaring)
-xitem(tt(typeset) [ {tt(PLUS())|tt(-)}tt(AEFHLRUZafghilprtuxm) [var(n)]] [ \
+xitem(tt(typeset) [ {tt(PLUS())|tt(-)}tt(AEFHLRUZafghiklprtuxmz) [var(n)]] [ \
 var(name)[tt(=)var(value)] ... ])
 item(tt(typeset) -T [ {tt(PLUS()|tt(-))}tt(LRUZrux) ] \
   var(SCALAR)[tt(=)var(value)] var(array) tt([) var(sep) tt(]))(
@@ -1323,13 +1317,16 @@ shown.
 )
 item(tt(-f))(
 The names refer to functions rather than parameters.  No assignments
-can be made, and the only other valid flags are tt(-t), tt(-u) and
-tt(-U).  The flag tt(-t) turns on execution tracing for this
+can be made, and the only other valid flags are tt(-t), tt(-k), tt(-u),
+tt(-U) and tt(-z).  The flag tt(-t) turns on execution tracing for this
 function.  The tt(-u) and tt(-U) flags cause the function to be
 marked for autoloading; tt(-U) also causes alias expansion to be
 suppressed when the function is loaded.  The tt(fpath) parameter
 will be searched to find the function definition when the function
-is first referenced; see noderef(Functions).
+is first referenced; see noderef(Functions). The tt(-k) and tt(-z) flags
+make the function be loaded using ksh-style or zsh-style autoloading
+respectively. If neither is given, the setting of the KSH_AUTOLOAD option
+determines how the function is loaded.
 )
 item(tt(-h))(
 Hide: only useful for special parameters (those marked `<S>' in the table in
@@ -1667,9 +1664,11 @@ are to be autoloaded. If tt(-z) is given, the
 function will be autoloaded as if the tt(KSH_AUTOLOAD) option is
 em(not) set, even if it is set at the time the compiled file is
 read, while if the tt(-k) is given, the function will be loaded as if
-tt(KSH_AUTOLOAD) em(is) set.  If neither of these options is given, the
-function will be loaded as determined by the setting of the
-tt(KSH_AUTOLOAD) option at the time the compiled file is read.
+tt(KSH_AUTOLOAD) em(is) set.  These options also take precedence over
+any tt(-k) or tt(-z) options specified to the tt(autoload) builtin. If
+neither of these options is given, the function will be loaded as
+determined by the setting of the tt(KSH_AUTOLOAD) option at the time
+the compiled file is read.
 ifzman( )
 These options may also appear as many times as necessary between the listed
 var(name)s to specify the loading style of all following functions, up to
