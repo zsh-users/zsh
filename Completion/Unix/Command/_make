@@ -1,10 +1,97 @@
 #compdef make gmake pmake dmake
 
-local prev="$words[CURRENT-1]" file expl tmp is_gnu useperl
+local prev="$words[CURRENT-1]" file expl tmp is_gnu cmdargs dir incl
 
-zstyle -t ":completion:${curcontext}:" use-perl && useperl=1
+expandVars() {
+    local open close var val tmp=$1 ret=$1
+    while :; do
+	var=${tmp#*\$}
+	if [[ $var != $tmp ]]; then
+	    tmp=$var
+	    case $var in
+	    (\(*)
+		open='('
+		close=')'
+		;;
+	    ({*)
+		open='{'
+		close='}'
+		;;
+	    ([[:alnum:]]*)
+		open=''
+		close=''
+		var=${(s::)var[1]}
+		;;
+	    (*)
+		continue
+		;;
+	    esac
+	    if [[ $open != '' ]]; then
+		var=${var#$open}
+		var=${var%%$close*}
+	    fi
+	    case $var in
+	    ([[:alnum:]_]#)
+		val=${(P)var}
+		val=$(expandVars $val)
+		ret=${ret//\$$open$var$close/$val}
+		;;
+	    esac
+	else
+	    print $ret
+	    return
+	fi
+    done
+}
+
+parseMakefile() {
+    local input var val TAB=$'\t' dir=$1
+
+    while read input; do
+	case "$input " in
+	([[:alnum:]][[:alnum:]_]#[ $TAB]#=*)
+	    var=${input%%[ $TAB]#=*}
+	    val=${input#*=}
+	    val=${val##[ $TAB]#}
+	    eval $var=\$val
+	    ;;
+	([[:alnum:]][[:alnum:]_]#[ $TAB]#:=*)
+	    var=${input%%[ $TAB]#:=*}
+	    val=${input#*=}
+	    val=${val##[ $TAB]#}
+	    val=$(expandVars $val)
+	    eval $var=\$val
+	    ;;
+	([[:alnum:]][^$TAB:=]#:[^=]*)
+	    input=${input%%:*}
+	    print $(expandVars $input)
+	    ;;
+	($incl *)
+	    local f=${input##$incl ##}
+	    if [[ $incl = '.include' ]]; then
+		f=${f#[\"<]}
+		f=${f%[\">]}
+	    fi
+	    f=$(expandVars $f)
+	    case $f in
+	    (/*) ;;
+	    (*)  f=$dir/$f ;;
+	    esac
+	    if [ -r $f ]; then
+		parseMakefile ${f%%/[^/]##} < $f
+	    fi
+	    ;;
+	esac
+    done
+}
+
 _pick_variant -r is_gnu gnu=GNU unix -v -f
 
+if [[ $is_gnu = gnu ]]; then
+    incl=include
+else
+    incl=.include
+fi
 if [[ "$prev" = -[CI] ]]; then
   _files -/
 elif [[ "$prev" = -[foW] ]]; then
@@ -26,25 +113,9 @@ else
   if [[ -n "$file" ]] && _tags targets; then
     if [[ $is_gnu = gnu ]] &&
        zstyle -t ":completion:${curcontext}:targets" call-command; then
-       if [[ -n $useperl ]]; then
-        tmp=( $(_call_program targets "$words[1]" -nsp --no-print-directory -f "$file" .PHONY 2> /dev/null | perl -ne '/^([a-zA-Z0-9][^\/\t=]+):([^=]|$)/ && print "$1\n"') )
-       else
-        tmp=(${${(M)${(f)"$(_call_program targets "$words[1]" -nsp --no-print-directory -f /tmp/rules .PHONY 2>/dev/null)"}:#[a-zA-Z0-9][^/\t=]##:([^=]*|(#e))}%:*})
-       fi
-    elif [[ -n $useperl ]]; then
-      tmp=(
-      $(perl -ne '/^([a-zA-Z0-9][^\/\t=]+):([^=]|$)/ and print "$1\n";
-if (/^\.include\s+\<bsd\.port\.(subdir\.|pre\.)?mk>/ ||
-    /^\.include\s+\".*mk\/bsd\.pkg\.(subdir\.)?mk\"/) {
-    print "fetch fetch-list extract patch configure build install reinstall deinstall package describe checkpatch checksum makesum\n";
-}
-' $file)
-	)
+       tmp=( $(_call_program targets "$words[1]" -nsp --no-print-directory -f "$file" .PHONY 2> /dev/null | parseMakefile $PWD) )
     else
-      tmp=( ${${(M)${(f)"$(<$file)"}:#[a-zA-Z0-9][^/\t=]##:([^=]*|(#e))}%:*}
-            $(grep -E '^\.include  *(<bsd\.port\.(subdir\.|pre\.)?mk>|".*mk\/bsd\.pkg\.(subdir\.)?mk")' $file >/dev/null &&
- 	        print "fetch fetch-list extract patch configure build install reinstall deinstall package describe checkpatch checksum makesum" )
-           )
+       tmp=( $(parseMakefile $PWD < $file) )
     fi
     _wanted targets expl 'make target' compadd -a tmp && return 0
   fi
