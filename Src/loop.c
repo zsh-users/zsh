@@ -357,7 +357,7 @@ execrepeat(Cmd cmd, LinkList args, int flags)
     pushheap();
     cmdpush(CS_REPEAT);
     loops++;
-    while (count--) {
+    while (count-- > 0) {
 	execlist(cmd->u.list, 1, 0);
 	freeheap();
 	if (breaks) {
