@@ -1,7 +1,7 @@
 #autoload
 
 local tags def expl descr action mesgs nm="$compstate[nmatches]" subopts
-local opt curcontext="$curcontext"
+local opt ws curcontext="$curcontext"
 
 subopts=()
 while getopts 'O:C:' opt; do
@@ -33,13 +33,12 @@ while _tags; do
 
         mesgs=( "$mesgs[@]" "${def%%:*}:$descr")
       elif [[ "$action" = \(\(*\)\) ]]; then
-        local ws
 
         # ((...)) contains literal strings with descriptions.
 
         eval ws\=\( "${action[3,-3]}" \)
 
-        _describe "$descr" ws -M 'r:|[_-]=* r:|=*' "$subopts[@]"
+        _describe -t "${def%%:*}" "$descr" ws -M 'r:|[_-]=* r:|=*' "$subopts[@]"
       elif [[ "$action" = \(*\) ]]; then
 
         # Anything inside `(...)' is added directly.

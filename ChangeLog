@@ -1,3 +1,8 @@
+2003-03-13  Oliver Kiddle  <opk@zsh.org>
+
+	* 18347: Completion/Base/Utility/_alternative: fix problems
+	with having more than one ((val\:desc ...)) style action
+
 2003-03-12  Oliver Kiddle  <opk@zsh.org>
 
 	* 18346: Completion/Unix/Command/_cdcd, Completion/Unix/Type/_users,
