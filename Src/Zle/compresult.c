@@ -665,7 +665,9 @@ do_ambiguous(void)
 	 * prefix was inserted, return now, bypassing the list-displaying  *
 	 * code.  On the way, invalidate the list and note that we don't   *
 	 * want to enter an AUTO_MENU imediately.                          */
-	if (uselist == 3 && la) {
+	if ((uselist == 3 ||
+	     (!uselist && isset(BASHAUTOLIST) && isset(LISTAMBIGUOUS))) &&
+	    la) {
 	    int fc = fromcomp;
 
 	    invalidatelist();

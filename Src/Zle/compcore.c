@@ -776,8 +776,9 @@ callcompfunc(char *s, char *fn)
 		}
 	    }
 	}
-	startauto = (compinsert &&
-		     !strcmp(compinsert, "automenu-unambiguous"));
+	startauto = ((compinsert &&
+		      !strcmp(compinsert, "automenu-unambiguous")) ||
+		     (bashlistfirst && (!compinsert || !*compinsert)));
 	useexact = (compexact && !strcmp(compexact, "accept"));
 
 	if (!comptoend || !*comptoend)

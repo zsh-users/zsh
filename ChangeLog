@@ -1,3 +1,8 @@
+2000-04-10  Sven Wischnowsky <wischnow@informatik.hu-berlin.de>
+
+	* 10609: Src/Zle/compcore.c, Src/Zle/compresult.c, Src/Zle/zle_tricky.c:
+ 	fix for bashautolist+automenu
+	
 2000-04-09  Bart Schaefer  <schaefer@zsh.org>
 
 	* 10606: Fix thinko in 10598.
