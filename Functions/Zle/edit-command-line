@@ -11,7 +11,7 @@ local tmpfile=${TMPPREFIX:-/tmp/zsh}ecl$$
 print -R - "$PREBUFFER$BUFFER" >$tmpfile
 exec </dev/tty
 ${VISUAL:-${EDITOR:-vi}} $tmpfile
-print -z - "$(<$tmpfile)" 
+print -Rz - "$(<$tmpfile)" 
 
 command rm -f $tmpfile
 zle send-break		# Force reload from the buffer stack

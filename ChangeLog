@@ -1,5 +1,9 @@
 2002-11-12  Oliver Kiddle  <opk@zsh.org>
 
+	* 17928: Zvi Har'El <rl@math.technion.ac.il>:
+	Functions/Zle/edit-command-line: don't interpret escapes when
+	setting the command buffer
+
 	* Thierry Vignaud <tvignaud@mandrakesoft.com>:
 	Completion/Unix/Command/_links, Completion/Mandrake/Command/_urpmi:
 	add option descriptions and missing options
