@@ -1,5 +1,8 @@
 2002-05-21  Sven Wischnowsky  <wischnow@zsh.org>
 
+	* 17194: Src/Zle/computil.c: improve calculation of used
+	columns for match-max-length
+
 	* 17193: Completion/Unix/Command/_init_d: let _init_d use a
 	pre-pattern
 

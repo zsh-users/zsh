@@ -46,6 +46,7 @@ struct cdstate {
     int pre;                    /* longest prefix (before description) */
     int suf;                    /* longest suffix (description) */
     int maxg;                   /* size of largest group */
+    int maxglen;                /* columns for matches of largest group */
     int groups;                 /* number of groups */
     int descs;                  /* number of non-group matches with desc */
     int gpre;                   /* prefix length for group display */
@@ -118,11 +119,20 @@ freecdsets(Cdset p)
 /* Find matches with same descriptions and group them. */
 
 static void
-cd_group()
+cd_group(int maxg)
 {
     Cdset set1, set2;
     Cdstr str1, str2, *strp;
     int num, len;
+
+    cd_state.groups = cd_state.descs = cd_state.maxglen = 0;
+    cd_state.maxg = 0;
+
+    for (set1 = cd_state.sets; set1; set1 = set1->next)
+        for (str1 = set1->strs; str1; str1 = str1->next) {
+            str1->kind = 0;
+            str1->other = NULL;
+        }
 
     for (set1 = cd_state.sets; set1; set1 = set1->next) {
         for (str1 = set1->strs; str1; str1 = str1->next) {
@@ -131,6 +141,8 @@ cd_group()
 
             num = 1;
             len = str1->len + cd_state.slen;
+            if (len > cd_state.maxglen)
+                cd_state.maxglen = len;
             strp = &(str1->other);
 
             for (set2 = set1; set2; set2 = set2->next) {
@@ -138,8 +150,10 @@ cd_group()
                      str2; str2 = str2->next)
                     if (str2->desc && !strcmp(str1->desc, str2->desc)) {
                         len += 2 + str2->len;
-                        if (len > cd_state.maxmlen)
+                        if (len > cd_state.maxmlen || num == maxg)
                             break;
+                        if (len > cd_state.maxglen)
+                            cd_state.maxglen = len;
                         str1->kind = 1;
                         str2->kind = 2;
                         num++;
@@ -151,11 +165,6 @@ cd_group()
             }
             *strp = NULL;
 
-            if (len >= columns) {
-                cd_state.groups = 0;
-
-                return;
-            }
             if (num > 1)
                 cd_state.groups++;
             else
@@ -200,7 +209,7 @@ cd_sort(const void *a, const void *b)
     return strcmp((*((Cdstr *) a))->str, (*((Cdstr *) b))->str);
 }
 
-static void
+static int
 cd_prep()
 {
     Cdrun run, *runp;
@@ -252,6 +261,13 @@ cd_prep()
             }
 
         qsort(grps, lines, sizeof(Cdstr), cd_sort);
+
+        cd_state.gpre = 0;
+        for (i = 0; i < cd_state.maxg; i++)
+            cd_state.gpre += wids[i] + 2;
+
+        if (cd_state.gpre > cd_state.maxmlen && cd_state.maxglen > 1)
+            return 1;
 
         expl =  (Cdrun) zalloc(sizeof(*run));
         expl->type = CRT_EXPL;
@@ -325,9 +341,6 @@ cd_prep()
                 run->count = i;
             }
         }
-        cd_state.gpre = 0;
-        for (i = 0; i < cd_state.maxg; i++)
-            cd_state.gpre += wids[i] + 2;
     } else if (cd_state.showd) {
         for (set = cd_state.sets; set; set = set->next) {
             if (set->desc) {
@@ -370,6 +383,8 @@ cd_prep()
             }
     }
     *runp = NULL;
+
+    return 0;
 }
 
 /* Duplicate and concatenate two arrays.  Return the result. */
@@ -495,12 +510,19 @@ cd_init(char *nam, char *hide, char *mlen, char *sep,
 	if ((*args = tmp))
 	    args++;
     }
-    if (disp && grp)
-        cd_group();
+    if (disp && grp) {
+        int mg = columns;
 
-    cd_calc();
-    cd_prep();
+        do {
+            cd_group(mg);
+            mg = cd_state.maxg - 1;
+            cd_calc();
+        } while (cd_prep());
 
+    } else {
+        cd_calc();
+        cd_prep();
+    }
     cd_parsed = 1;
     return 0;
 }
