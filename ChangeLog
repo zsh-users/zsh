@@ -1,3 +1,9 @@
+2001-06-01  Peter Stephenson  <pws@csr.com>
+
+	* 14644: configure.in: only undefine M4 macros if they are
+	defined, since new autoconf complains.  Undefining the macros
+	in question is probably only a historical curiosity.
+
 2001-06-01  Clint Adams  <clint@zsh.org>
 
 	* 14635: Completion/Unix/Command/_gdb: presume
