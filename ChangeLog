@@ -1,5 +1,10 @@
 2002-05-21  Sven Wischnowsky  <wischnow@zsh.org>
 
+	* 17191: Completion/Base/Utility/_arguments,
+	Completion/Unix/Command/_rsync: fix removal of automatically
+	added specs (from the -- option) for which a user-defined one
+	is present
+
 	* 17190: Src/Zle/computil.c: avoid printing in the last screen
 	column when preparing a completion listing with compdescribe
 

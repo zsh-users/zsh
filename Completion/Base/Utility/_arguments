@@ -74,11 +74,11 @@ if (( long )); then
     # Remove options also described by user-defined specs.
 
     tmp=()
-    for opt in "${(@)lopts:#--}"; do
+    for opt in "${(@)${(@)lopts:#--}%%\=*}"; do
 
       # Using (( ... )) gives a parse error.
 
-      let "$tmpargv[(I)(|\([^\)]#\))(|\*)${opt}(|[-+=])(|\[*\])(|:*)]" ||
+      let "$tmpargv[(I)(|\([^\)]#\))(|\*)${opt}(|[-+]|=(|-))(|\[*\])(|:*)]" ||
           tmp=( "$tmp[@]" "$opt" )
     done
     lopts=( "$tmp[@]" )

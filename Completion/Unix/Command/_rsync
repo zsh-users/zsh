@@ -121,7 +121,7 @@ _arguments -C -s \
  	'(--whole-file)-W[copy whole files]' \
  	'(-W)--whole-file[copy whole files]' \
  	'(--one-file-system)-x[do not cross filesystem boundaries]' \
- 	'(-x)-one-file-system[do not cross filesystem boundaries]' \
+ 	'(-x)--one-file-system[do not cross filesystem boundaries]' \
  	'(--block-size)-B[checksum blocking size]:block size:' \
  	'(-B)--block-size=[checksum blocking size]:block size:' \
  	'(--rsh)-e[rsh command]:remote command:(rsh ssh)' \
