@@ -36,7 +36,7 @@ _arguments -C -s \
   '(--quota -Q)'{--quota=,-Q+}'[set retrieval quota]:number' \
   '--bind-address=:address to bind to (hostname or IP):_hosts' \
   '--limit-rate=[specify limit to download rate]:download rate limit' \
-  '--dns-cache=off[disable caching DNS lookups]' \
+  '--dns-cache=[disable caching DNS lookups]:dns cache:(on off)' \
   '--restrict-file-names=[restrict chars in file names to ones OS allows]:OS:(unix windows)' \
   '(--force-directories -x)'{--force-directories,-x}'[force creation of directories]' \
   '(--directory-prefix -P)'{--directory-prefix=,-P+}'[specify prefix to save files to]:prefix:_files -/' \

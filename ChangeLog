@@ -1,3 +1,8 @@
+2003-11-17  Doug Kearns  <djkea2@mugca.its.monash.edu.au>
+
+	* unposted: Completion/Unix/Command/_wget: --dns-cache option takes a
+	boolean argument
+
 2003-11-14  Oliver Kiddle  <opk@zsh.org>
 
 	* 19244: Completion/Linux/Command/_mondo,
