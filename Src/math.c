@@ -342,21 +342,34 @@ zzlex(void)
 	    return EOI;
 	case '[':
 	    {
-		int base, setradix = 0;
-		if (*ptr == '#') {
-		    ptr++;
-		    setradix = 1;
-		}
-		base = zstrtol(ptr, &ptr, 10);
+		int n;
 
-		if (*ptr == ']')
-		    ptr++;
-		if (setradix)
-		    outputradix = base;
-		else {
-		    yyval.u.l = zstrtol(ptr, &ptr, lastbase = base);
+		if (idigit(*ptr)) {
+		    n = zstrtol(ptr, &ptr, 10);
+		    if (*ptr != ']' || !idigit(*++ptr)) {
+			zerr("bad base syntax", NULL, 0);
+			return EOI;
+		    }
+		    yyval.u.l = zstrtol(ptr, &ptr, lastbase = n);
 		    return NUM;
 		}
+		if (*ptr == '#') {
+		    n = 1;
+		    if (*++ptr == '#') {
+			n = -1;
+			ptr++;
+		    }
+		    if (!idigit(*ptr))
+			goto bofs;
+		    outputradix = n * zstrtol(ptr, &ptr, 10);
+		} else {
+		    bofs:
+		    zerr("bad output format specification", NULL, 0);
+		    return EOI;
+		}
+		if(*ptr != ']')
+			goto bofs;
+		ptr++;
 		break;
 	    }
 	case ' ':

@@ -1,3 +1,10 @@
+2000-09-02  Andrew Main  <zefram@zsh.org>
+
+	* 12722: Doc/Zsh/arith.yo, Src/math.c, Src/params.c: Allow
+	[##base] as well as [#base]; the doubled # suppresses output
+	of a base prefix.  Also clean up parsing of [] base-selection
+	constructs.
+
 2000-09-01  Bart Schaefer  <schaefer@zsh.org>
 
 	* 12721: Functions/Misc/allopt: Remove "emulate" which changes the

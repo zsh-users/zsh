@@ -65,6 +65,11 @@ have output base 16, while tt(x) (assuming it does not already exist) is
 implicitly typed by the arithmetic evaluation, where it acquires the output
 base 8.
 
+When an output base is specified using the `tt([#)var(base)tt(])' syntax,
+an appropriate base prefix will be output if necessary, so that the value
+output is valid syntax for input.  If the tt(#) is doubled, for example
+`tt([##16])', then no base prefix is output.
+
 Floating point constants are recognized by the presence of a decimal point
 or an exponent.  The decimal point may be the first character of the
 constant, but the exponent character tt(e) or tt(E) may not, as it will be
