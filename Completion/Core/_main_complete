@@ -97,7 +97,7 @@ if zstyle -s ":completion:${curcontext}:" single-ignored tmp &&
   esac
 fi
 
-if [[ -n "$tmp" || $compstate[nmatches] -gt 1 ]]; then
+if [[ -n "$tmp" || $compstate[nmatches]+$compstate[alternate_nmatches] -gt 1 ]]; then
   [[ _last_nmatches -ge 0 && _last_nmatches -ne compstate[nmatches] ]] &&
       _menu_style=( "$_last_menu_style[@]" "$_menu_style[@]" )
 
@@ -146,27 +146,35 @@ if [[ -n "$tmp" || $compstate[nmatches] -gt 1 ]]; then
 	  (( min )) || break
         done
 
+        zmodload -i zsh/complist
         SELECTMIN="$min"
       fi
     fi
   fi
-elif [[ $compstate[nmatches] -eq 0 && $#_lastdescr -ne 0 ]] &&
+elif [[ $compstate[nmatches]+$compstate[alternate_nmatches] -eq 0 &&
+        $#_lastdescr -ne 0 ]] &&
      zstyle -s ":completion:${curcontext}:warnings" format format; then
-  local str
-
-  _lastdescr=( "\`${(@)^_lastdescr:#}'" )
 
   compstate[list]='list force'
   compstate[insert]=''
 
-  case $#_lastdescr in
-  1) str="$_lastdescr[1]";;
-  2) str="$_lastdescr[1] or $_lastdescr[2]";;
-  *) str="${(j:, :)_lastdescr[1,-2]}, or $_lastdescr[-1]";;
-  esac
+  if [[ "$format" = *%d* ]]; then
+    local str mesg
 
-  zformat -f format "$format" "d:$str"
-  compadd -UX "$format" -n ''
+    _lastdescr=( "\`${(@)^_lastdescr:#}'" )
+
+    case $#_lastdescr in
+    1) str="$_lastdescr[1]";;
+    2) str="$_lastdescr[1] or $_lastdescr[2]";;
+    *) str="${(j:, :)_lastdescr[1,-2]}, or $_lastdescr[-1]";;
+    esac
+
+    zformat -f mesg "$format" "d:$str"
+    compadd -UX "$mesg" -n - ''
+  else
+    _setup warnings
+    compadd -UQX "$format" -V warnings - "${(@)_lastdescr:#}"
+  fi
 fi
 
 # Now call the post-functions.

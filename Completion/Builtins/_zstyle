@@ -54,6 +54,7 @@ styles=(
   prefix-needed		 c:bool
   prompt		 c:
   remove-all-dups	 c:bool
+  single-ignored         c:single-ignored
   sort			 c:bool
   tag-order		 c:tag
   special-dirs		 c:sdirs
@@ -206,6 +207,11 @@ while [[ -n $state ]]; do
     ignorepar)
       _wanted values expl 'which parents to ignore' &&
         compadd "$expl[@]" parent pwd .. directory
+      ;;
+
+    single-ignored)
+      _wanted values expl 'how to handle single alternate match' &&
+          compadd "$expl[@]" - show menu
       ;;
 
     _*)

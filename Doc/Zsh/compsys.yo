@@ -841,7 +841,12 @@ replaced with the message given by the completion function.
 
 Finally, for the tt(warnings) tag, it is printed when no matches could 
 be generated at all. In this case the `tt(%d)' is replaced with the
-descriptions for the matches that were expected.
+descriptions for the matches that were expected. If the value does not 
+contain a `tt(%d)', then those descriptions are added in the same way
+as matches are added, i.e. they appear below the value for the
+tt(format) style laid out in columns. The descriptions are added as if 
+for the tag tt(warnings) so that you can use the tt(list-colors) style 
+for that tag to highlight them.
 
 Here and in all other cases where the completion system uses `tt(%)'
 sequences, the `tt(%)' may be followed by field width specifications as 
@@ -1302,6 +1307,17 @@ item(tt(remove-all-dups))(
 The tt(_history_complete_word) bindable command uses this to decide if 
 all duplicate matches should be removed, rather than just consecutive
 duplicates.
+)
+item(tt(single-ignored))(
+Using styles like tt(ignored-patterns) allows one to put some matches
+in the alternate set of matches which is only used if there are no
+`normal' matches. Having only one such normally ignored match is often 
+a special case because one probably doesn't want that match to be
+inserted immediatly. This style allows to configure what to do in such 
+a case. If its value is tt(show), the single match will only be shown, 
+not inserted. If the value is tt(menu), then the single match and the
+original string are both added as matches and menucompletion is
+started so that one can easily select either of them.
 )
 item(tt(sort))(
 If set to `true', completion functions that generate words from the
