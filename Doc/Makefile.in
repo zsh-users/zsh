@@ -78,12 +78,12 @@ zsh.dvi: zsh.texi
 %.info: zsh.texi
 	$(MAKEINFO) $(sdir)/zsh.texi || exit 0
 
-zsh.texi: zsh.yo
+zsh.texi: $(sdir)/zsh.yo
 	$(YODL) -o $(sdir)/zsh.texi -I$(sdir) -w ztexi.yo version.yo zsh.yo
 	test -f $(sdir)/zsh.texi
 
-zsh.yo: zsh.yo.in
-	sed 's,@@TEXINFO@@,texinfo\($(tzsh).info\)\($(tzsh)\),' $(sdir)/zsh.yo.in >zsh.yo
+$(sdir)/zsh.yo: $(sdir)/zsh.yo.in
+	sed 's,@@TEXINFO@@,texinfo\($(tzsh).info\)\($(tzsh)\),' $(sdir)/zsh.yo.in > $(sdir)/zsh.yo
 
 .yo.1:
 	case $@ in \
