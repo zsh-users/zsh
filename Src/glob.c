@@ -1815,6 +1815,7 @@ matchpat(char *a, char *b)
 
 struct repldata {
     int b, e;			/* beginning and end of chunk to replace */
+    char *replstr;		/* replacement string to use */
 };
 typedef struct repldata *Repldata;
 
@@ -1844,11 +1845,17 @@ get_match_ret(char *s, int b, int e, int fl, char *replstr)
     int ll = 0, l = strlen(s), bl = 0, t = 0, i;
 
     if (replstr) {
+	if (fl & SUB_DOSUBST) {
+	    replstr = dupstring(replstr);
+	    singsub(&replstr);
+	    untokenize(replstr);
+	}
 	if ((fl & SUB_GLOBAL) && repllist) {
 	    /* We are replacing the chunk, just add this to the list */
 	    Repldata rd = (Repldata) zhalloc(sizeof(*rd));
 	    rd->b = b;
 	    rd->e = e;
+	    rd->replstr = replstr;
 	    addlinknode(repllist, rd);
 	    return s;
 	}
@@ -1910,6 +1917,45 @@ get_match_ret(char *s, int b, int e, int fl, char *replstr)
     return r;
 }
 
+static Patprog
+compgetmatch(char *pat, int *flp, char **replstrp)
+{
+    Patprog p;
+    /*
+     * Flags to pattern compiler:  use static buffer since we only
+     * have one pattern at a time; we will try the must-match test ourselves,
+     * so tell the pattern compiler we are scanning.
+     */
+    int patflags = PAT_STATIC|PAT_SCAN|PAT_NOANCH;
+
+    /*
+     * Search is anchored to the end of the string if we want to match
+     * it all, or if we are matching at the end of the string and not
+     * using substrings.
+     */
+    if ((*flp & SUB_ALL) || ((*flp & SUB_END) && !(*flp & SUB_SUBSTR)))
+	patflags &= ~PAT_NOANCH;
+    p = patcompile(pat, patflags, NULL);
+    if (!p) {
+	zerr("bad pattern: %s", pat, 0);
+	return NULL;
+    }
+    if (*replstrp) {
+	if (p->patnpar || (p->globend & GF_MATCHREF)) {
+	    /*
+	     * Either backreferences or match references, so we
+	     * need to re-substitute replstr each time round.
+	     */
+	    *flp |= SUB_DOSUBST;
+	} else {
+	    singsub(replstrp);
+	    untokenize(*replstrp);
+	}
+    }
+
+    return p;
+}
+
 /*
  * This is called from paramsubst to get the match for ${foo#bar} etc.
  * fl is a set of the SUB_* flags defined in zsh.h
@@ -1928,17 +1974,10 @@ int
 getmatch(char **sp, char *pat, int fl, int n, char *replstr)
 {
     Patprog p;
-    int patflags = PAT_STATIC|PAT_SCAN|PAT_NOANCH;
 
-    MUSTUSEHEAP("getmatch");	/* presumably covered by prefork() test */
+    if (!(p = compgetmatch(pat, &fl, &replstr)))
+	return 1;
 
-    if ((fl & SUB_ALL) || ((fl & SUB_END) && !(fl & SUB_SUBSTR)))
-	patflags &= ~PAT_NOANCH;
-    p = patcompile(pat, patflags, NULL);
-    if (!p) {
- 	zerr("bad pattern: %s", pat, 0);
- 	return 1;
-    }
     return igetmatch(sp, p, fl, n, replstr);
 }
 
@@ -1948,27 +1987,10 @@ getmatcharr(char ***ap, char *pat, int fl, int n, char *replstr)
 {
     char **arr = *ap, **pp;
     Patprog p;
-    /*
-     * Flags to pattern compiler:  use static buffer since we only
-     * have one pattern at a time; we will try the must-match test ourselves,
-     * so tell the pattern compiler we are scanning.
-     */
-    int patflags = PAT_STATIC|PAT_SCAN|PAT_NOANCH;
 
-    MUSTUSEHEAP("getmatch");	/* presumably covered by prefork() test */
-
-    /*
-     * Search is anchored to the end of the string if we want to match
-     * it all, or if we are matching at the end of the string and not
-     * using substrings.
-     */
-    if ((fl & SUB_ALL) || ((fl & SUB_END) && !(fl & SUB_SUBSTR)))
-	patflags &= ~PAT_NOANCH;
-    p = patcompile(pat, patflags, NULL);
-    if (!p) {
-	zerr("bad pattern: %s", pat, 0);
+    if (!(p = compgetmatch(pat, &fl, &replstr)))
 	return;
-    }
+
     *ap = pp = ncalloc(sizeof(char *) * (arrlen(arr) + 1));
     while ((*pp = *arr++))
 	if (igetmatch(pp, p, fl, n, replstr))
@@ -1982,6 +2004,7 @@ igetmatch(char **sp, Patprog p, int fl, int n, char *replstr)
     char *s = *sp, *t, *start, sav;
     int i, l = strlen(*sp), matched = 1;
 
+    MUSTUSEHEAP("igetmatch");	/* presumably covered by prefork() test */
     repllist = NULL;
 
     /* perform must-match test for complex closures */
@@ -2031,13 +2054,16 @@ igetmatch(char **sp, Patprog p, int fl, int n, char *replstr)
 	     * move back down string until we get a match. *
 	     * There's no optimization here.               */
 	    for (t = s + l; t >= s; t--) {
+		patoffset = t - s;
 		if (pattry(p, t)) {
 		    *sp = get_match_ret(*sp, t - s, l, fl, replstr);
+		    patoffset = 0;
 		    return 1;
 		}
 		if (t > s+1 && t[-2] == Meta)
 		    t--;
 	    }
+	    patoffset = 0;
 	    break;
 
 	case (SUB_END|SUB_LONG):
@@ -2045,13 +2071,16 @@ igetmatch(char **sp, Patprog p, int fl, int n, char *replstr)
 	     * move forward along string until we get a match. *
 	     * Again there's no optimisation.                  */
 	    for (i = 0, t = s; i < l; i++, t++) {
+		patoffset = i;
 		if (pattry(p, t)) {
 		    *sp = get_match_ret(*sp, i, l, fl, replstr);
+		    patoffset = 0;
 		    return 1;
 		}
 		if (*t == Meta)
 		    i++, t++;
 	    }
+	    patoffset = 0;
 	    break;
 
 	case SUB_SUBSTR:
@@ -2070,6 +2099,7 @@ igetmatch(char **sp, Patprog p, int fl, int n, char *replstr)
 		matched = 0;
 		for (t = start; t < s + l; t++) {
 		    /* Find the longest match from this position. */
+		    patoffset = t - start;
 		    if (pattry(p, t) && patinput > t) {
 			char *mpos = patinput;
 			if (!(fl & SUB_LONG) && !(p->flags & PAT_PURES)) {
@@ -2099,8 +2129,10 @@ igetmatch(char **sp, Patprog p, int fl, int n, char *replstr)
 				 * with what we just found.
 				 */
 				continue;
-			    } else
+			    } else {
+				patoffset = 0;
 				return 1;
+			    }
 			}
 			/*
 			 * For a global match, we need to skip the stuff
@@ -2114,6 +2146,7 @@ igetmatch(char **sp, Patprog p, int fl, int n, char *replstr)
 			t++;
 		}
 	    } while (matched);
+	    patoffset = 0;
 	    /*
 	     * check if we can match a blank string, if so do it
 	     * at the start.  Goodness knows if this is a good idea
@@ -2128,13 +2161,17 @@ igetmatch(char **sp, Patprog p, int fl, int n, char *replstr)
 
 	case (SUB_END|SUB_SUBSTR):
 	    /* Shortest at end with substrings */
+	    patoffset = l;
 	    if (pattry(p, s + l) && !--n) {
 		*sp = get_match_ret(*sp, l, l, fl, replstr);
+		patoffset = 0;
 		return 1;
 	    } /* fall through */
+	    patoffset = 0;
 	case (SUB_END|SUB_LONG|SUB_SUBSTR):
 	    /* Longest/shortest at end, matching substrings.       */
 	    for (t = s + l - 1; t >= s; t--) {
+		patoffset = t - s;
 		if (t > s && t[-1] == Meta)
 		    t--;
 		if (pattry(p, t) && patinput > t && !--n) {
@@ -2154,13 +2191,17 @@ igetmatch(char **sp, Patprog p, int fl, int n, char *replstr)
 			}
 		    }
 		    *sp = get_match_ret(*sp, t-s, mpos-s, fl, replstr);
+		    patoffset = 0;
 		    return 1;
 		}
 	    }
+	    patoffset = l;
 	    if ((fl & SUB_LONG) && pattry(p, s + l) && !--n) {
 		*sp = get_match_ret(*sp, l, l, fl, replstr);
+		patoffset = 0;
 		return 1;
 	    }
+	    patoffset = 0;
 	    break;
 	}
     }
@@ -2169,15 +2210,14 @@ igetmatch(char **sp, Patprog p, int fl, int n, char *replstr)
 	/* Put all the bits of a global search and replace together. */
 	LinkNode nd;
 	Repldata rd;
-	int rlen;
 	int lleft = 0;		/* size of returned string */
+	char *ptr;
 
 	i = 0;			/* start of last chunk we got from *sp */
-	rlen = strlen(replstr);
 	for (nd = firstnode(repllist); nd; incnode(nd)) {
 	    rd = (Repldata) getdata(nd);
 	    lleft += rd->b - i; /* previous chunk of *sp */
-	    lleft += rlen;	/* the replaced bit */
+	    lleft += strlen(rd->replstr);	/* the replaced bit */
 	    i = rd->e;		/* start of next chunk of *sp */
 	}
 	lleft += l - i;	/* final chunk from *sp */
@@ -2187,8 +2227,9 @@ igetmatch(char **sp, Patprog p, int fl, int n, char *replstr)
 	    rd = (Repldata) getdata(nd);
 	    memcpy(t, s + i, rd->b - i);
 	    t += rd->b - i;
-	    memcpy(t, replstr, rlen);
-	    t += rlen;
+	    ptr = rd->replstr;
+	    while (*ptr)
+		*t++ = *ptr++;
 	    i = rd->e;
 	}
 	memcpy(t, s + i, l - i);

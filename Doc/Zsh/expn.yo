@@ -211,7 +211,7 @@ generation, this applies to each word of the expanded text.
 )
 item(tt(&))(
 Repeat the previous tt(s) substitution.  Like tt(s), may be preceded
-immediately by a tt(g).  In variable expansion the tt(&) must appear
+immediately by a tt(g).  In parameter expansion the tt(&) must appear
 inside braces, and in filename generation it must be quoted with a
 backslash.
 )
@@ -988,7 +988,7 @@ directory as its prefix.  If so, then the prefix portion
 is replaced with a `tt(~)' followed by the name of the directory.
 The shortest way of referring to the directory is used,
 with ties broken in favour of using a named directory,
-except when the directory is tt(/) itself.  The variables tt($PWD) and
+except when the directory is tt(/) itself.  The parameters tt($PWD) and
 tt($OLDPWD) are never abbreviated in this fashion.
 
 If a word begins with an unquoted `tt(=)'
@@ -1202,6 +1202,70 @@ upper case characters.
 item(I)(
 Case sensitive:  locally negates the effect of tt(i) or tt(l) from
 that point on.
+)
+item(b)(
+Activate backreferences for parenthesised groups in the pattern;
+this does not work in filename generation.  When a pattern with a set of
+active parentheses is matched, the strings matched by the groups are
+stored in the array tt($match), the indices of the beginning of the matched
+parentheses in the array tt($mbegin), and the indices of the end in the array
+tt($mend), with the first element of each array corresponding to the first
+parenthesised group, and so on.  These arrays are not otherwise special to
+the shell.  The indices use the same convention as does parameter
+substitution, so that elements of tt($mend) and tt($mbegin) may be used in
+subscripts; the tt(KSH_ARRAYS) option is respected.  Sets of globbing flags
+are not considered parenthesised groups.
+
+For example,
+
+example(foo="a string with a message"
+if [[ $foo = (a|an)' '(#b)(*)' '* ]]; then
+  print ${foo[$mbegin[1],$mend[1]]}
+fi)
+
+prints `tt(string with a)'.  Note that the first parenthesis is before the
+tt((#b)) and does not create a backreference.
+
+Backreferences work with all forms of pattern matching other than filename
+generation, but note that when performing matches on an entire array, such
+as tt(${)var(array)tt(#)var(pattern)tt(}), or a global substitution, such
+as tt(${)var(param)tt(//)var(pat)tt(/)var(repl)tt(}), only the data for the
+last match remains available.  In the case of global replacements this may
+still be useful.  See the example for the tt(m) flag below.
+
+If the match fails none of the parameters is altered, so in some cases it
+may be necessary to initialise them beforehand.
+
+Pattern matching with backreferences is slightly slower than without.
+)
+item(B)(
+Deactivate backreferences, negating the effect of the tt(b) flag from that
+point on.
+)
+item(m)(
+Set references to the match data for the entire string matched; this is
+similar to backreferencing and does not work in filename generation.  The
+flag must be in effect at the end of the pattern, i.e. not local to a
+group. The parameters tt($MATCH),  tt($MBEGIN) and tt($MEND) will be set to
+the string matched and to the indices of the beginning and end of the
+string, respectively.  This is most useful in parameter substitutions, as
+otherwise the string matched is obvious.
+
+For example,
+
+example(arr=(veldt jynx grimps waqf zho buck)
+print ${arr//(#m)[aeiou]/${(U)MATCH}})
+
+forces all the matches (i.e. all vowels) into uppercase, printing
+`tt(vEldt jynx grImps wAqf zhO bUck)'.
+
+Unlike backreferences, there is no speed penalty for using match
+references, other than the extra substitutions required for the
+replacement strings in cases such as the example shown.
+)
+item(M)(
+Deactivate the tt(m) flag, hence no references to match data will be
+created.
 )
 item(tt(a)var(num))(
 Approximate matching: var(num) errors are allowed in the string matched by

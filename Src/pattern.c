@@ -70,11 +70,8 @@ typedef union upat *Upat;
 
 #include "pattern.pro"
 
-/*
- * Globbing flags: lower 8 bits gives approx count
- */
-#define C_LCMATCHUC	0x0100
-#define C_IGNCASE	0x0200
+/* Number of active parenthesised expressions allowed in backreferencing */
+#define NSUBEXP  9
 
 /* definition	number	opnd?	meaning */
 #define	P_END	  0x00	/* no	End of program. */
@@ -205,8 +202,8 @@ typedef unsigned long zrange_t;
  * Characters which terminate a pattern segment.  We actually use
  * a pointer patendseg which skips the first character if we are not
  * parsing a file pattern.
- * Note that the size of this and the next array are hard-wired into
- * patcompile.
+ * Note that the size of this and the next array are hard-wired
+ * via the definitions.
  */
 
 static char endseg[] = {
@@ -214,6 +211,9 @@ static char endseg[] = {
     '\0', Bar, Outpar,		/* all patterns */
     Tilde			/* extended glob only */
 };
+
+#define PATENDSEGLEN_NORM 4
+#define PATENDSEGLEN_EXT  5
 
 /* Characters which terminate a simple string */
 
@@ -223,6 +223,10 @@ static char endstr[] = {
 				/* all patterns */
     Tilde, Hat, Pound		/* extended glob only */
 };
+
+#define PATENDSTRLEN_NORM 9
+#define PATENDSTRLEN_EXT  12
+
 
 /* Default size for pattern buffer */
 #define P_DEF_ALLOC 256
@@ -291,18 +295,13 @@ patcompstart(void)
 Patprog
 patcompile(char *exp, int inflags, char **endexp)
 {
-    int flags, len;
+    int flags = 0, len = 0;
     long startoff;
     Upat pscan;
-    char *lng;
+    char *lng, *strp = NULL;
     Patprog p;
 
-#ifdef BACKREFERENCES
-    startoff = (inflags & PAT_BACKR) ? sizeof(struct patprog) :
-	sizeof(struct patprog_short);
-#else
     startoff = sizeof(struct patprog);
-#endif
     /* Ensure alignment of start of program string */
     startoff = (startoff + sizeof(union upat) - 1) & ~(sizeof(union upat) - 1);
 
@@ -312,13 +311,17 @@ patcompile(char *exp, int inflags, char **endexp)
     patcode = patout + startoff;
     patsize = patcode - patout;
     patstart = patparse = exp;
+    /*
+     * Note global patnpar numbers parentheses 1..9, while patnpar
+     * in struct is actual count of parentheses.
+     */
     patnpar = 1;
-    patflags = inflags;
+    patflags = inflags & ~PAT_PURES;
 
     patendseg = endseg;
-    patendseglen = isset(EXTENDEDGLOB) ? 5 : 4;
+    patendseglen = isset(EXTENDEDGLOB) ? PATENDSEGLEN_EXT : PATENDSEGLEN_NORM;
     patendstr = endstr;
-    patendstrlen = isset(EXTENDEDGLOB) ? 12 : 9;
+    patendstrlen = isset(EXTENDEDGLOB) ? PATENDSTRLEN_EXT : PATENDSTRLEN_NORM;
 
     if (!(patflags & PAT_FILE)) {
 	patendseg++;
@@ -333,66 +336,87 @@ patcompile(char *exp, int inflags, char **endexp)
      */
     ((Patprog)patout)->globflags = patglobflags;
 
-    if (patflags & PAT_ANY)
-	flags = 0;
-    else if (patcompswitch(0, &flags) == 0)
-	return NULL;
+    if (!(patflags & PAT_ANY)) {
+	/* Look for a really pure string, with no tokens at all. */
+	for (strp = exp; *strp &&
+		 (!(patflags & PAT_FILE) || *strp != '/') && !itok(*strp);
+	     strp++)
+	    ;
+	if (*strp && *strp != '/') {
+	    /* No, do normal compilation. */
+	    strp = NULL;
+	    if (patcompswitch(0, &flags) == 0)
+		return NULL;
+	} else {
+	    /* Yes, copy the string and skip compilation altogether */
+	    patparse = strp;
+	    len = strp - exp;
+	    patadd(exp, 0, len + 1, 0);
+	    patout[startoff + len] = '\0';
+	    patflags |= PAT_PURES;
+	}
+    }
 
     /* end of compilation: safe to use pointers */
     p = (Patprog)patout;
     p->startoff = startoff;
     p->patstartch = '\0';
     p->globend = patglobflags;
-    p->flags = (patflags & ~PAT_PURES);
+    p->flags = patflags;
     p->mustoff = 0;
     p->size = patsize;
-    p->patmlen = 0;
-    pscan = (Upat)(patout + startoff);
+    p->patmlen = len;
+    p->patnpar = patnpar-1;
 
-    if (!(patflags & PAT_ANY) && P_OP(PATNEXT(pscan)) == P_END) {
-	/* only one top level choice */
-	pscan = P_OPERAND(pscan);
+    if (!strp) {
+	pscan = (Upat)(patout + startoff);
 
-	if (flags & P_PURESTR) {
-	    /*
-	     * The pattern can be matched with a simple strncmp/strcmp.
-	     * Careful in case we've overwritten the node for the next ptr.
-	     */
-	    char *dst = patout + startoff;
-	    Upat next;
-	    p->flags |= PAT_PURES;
-	    for (; pscan; pscan = next) {
-		next = PATNEXT(pscan);
-		if (P_OP(pscan) == P_EXACTLY) {
-		    char *opnd = (char *)P_OPERAND(pscan);
-		    while ((*dst = *opnd++))
-			dst++;
-		}
-	    }
-	    *dst++ = '\0';
-	    p->size = dst - patout;
-	    /* patmlen is really strlen, don't include null byte */
-	    p->patmlen = p->size - startoff - 1;
-	} else {
-	    /* starting point info */
-	    if (P_OP(pscan) == P_EXACTLY && !p->globflags)
-		p->patstartch = *(char *)P_OPERAND(pscan);
-	    /* Find the longest literal string in something expensive.
-	     * This is itself not all that cheap if we have case-insensitive
-	     * matching or approximation, so don't.
-	     */
-	    if ((flags & P_HSTART) && !p->globflags) {
-		lng = NULL;
-		len = 0;
-		for (; pscan; pscan = PATNEXT(pscan))
-		    if (P_OP(pscan) == P_EXACTLY &&
-			strlen((char *)P_OPERAND(pscan)) >= len) {
-			lng = (char *)P_OPERAND(pscan);
-			len = strlen(lng);
+	if (!(patflags & PAT_ANY) && P_OP(PATNEXT(pscan)) == P_END) {
+	    /* only one top level choice */
+	    pscan = P_OPERAND(pscan);
+
+	    if (flags & P_PURESTR) {
+		/*
+		 * The pattern can be matched with a simple strncmp/strcmp.
+		 * Careful in case we've overwritten the node for the next ptr.
+		 */
+		char *dst = patout + startoff;
+		Upat next;
+		p->flags |= PAT_PURES;
+		for (; pscan; pscan = next) {
+		    next = PATNEXT(pscan);
+		    if (P_OP(pscan) == P_EXACTLY) {
+			char *opnd = (char *)P_OPERAND(pscan);
+			while ((*dst = *opnd++))
+			    dst++;
 		    }
-		if (lng) {
-		    p->mustoff = lng - patout;
-		    p->patmlen = len;
+		}
+		*dst++ = '\0';
+		p->size = dst - patout;
+		/* patmlen is really strlen, don't include null byte */
+		p->patmlen = p->size - startoff - 1;
+	    } else {
+		/* starting point info */
+		if (P_OP(pscan) == P_EXACTLY && !p->globflags)
+		    p->patstartch = *(char *)P_OPERAND(pscan);
+		/*
+		 * Find the longest literal string in something expensive.
+		 * This is itself not all that cheap if we have
+		 * case-insensitive matching or approximation, so don't.
+		 */
+		if ((flags & P_HSTART) && !p->globflags) {
+		    lng = NULL;
+		    len = 0;
+		    for (; pscan; pscan = PATNEXT(pscan))
+			if (P_OP(pscan) == P_EXACTLY &&
+			    strlen((char *)P_OPERAND(pscan)) >= len) {
+			    lng = (char *)P_OPERAND(pscan);
+			    len = strlen(lng);
+			}
+		    if (lng) {
+			p->mustoff = lng - patout;
+			p->patmlen = len;
+		    }
 		}
 	    }
 	}
@@ -424,26 +448,22 @@ static long
 patcompswitch(int paren, int *flagp)
 {
     long starter, br, ender, excsync = 0;
-#ifdef BACKREFERENCES
     int parno = 0;
-#endif
     int flags, gfchanged = 0, savglobflags = patglobflags;
     Upat ptr;
 
     *flagp = 0;
 
-#ifdef BACKREFERENCES
-    if (paren && (patflags & PAT_BACKR)) {
+    if (paren && (patglobflags & GF_BACKREF) && patnpar <= NSUBEXP) {
 	/*
 	 * parenthesized:  make an open node.
 	 * We can only refer to the first nine parentheses.
 	 * For any others, we just use P_OPEN on its own; there's
 	 * no gain in arbitrarily limiting the number of parentheses.
 	 */
-	parno = patnpar >= NSUBEXP ? 0 : patnpar++;
+	parno = patnpar++;
 	starter = patnode(P_OPEN + parno);
     } else
-#endif
 	starter = 0;
 
     br = patnode(P_BRANCH);
@@ -559,12 +579,7 @@ patcompswitch(int paren, int *flagp)
      * branch at that point would indicate the current choices continue,
      * which they don't.
      */
-#ifdef BACKREFERENCES
-    ender = patnode(paren ? (patflags & PAT_BACKR) ? P_CLOSE+parno
-		    : P_NOTHING : P_END);
-#else
-    ender = patnode(paren ? P_NOTHING : P_END);
-#endif
+    ender = patnode(paren ? parno ? P_CLOSE+parno : P_NOTHING : P_END);
     pattail(starter, ender);
 
     /*
@@ -708,17 +723,37 @@ patgetglobflags(char **strp)
 
 	case 'l':
 	    /* Lowercase in pattern matches lower or upper in target */
-	    patglobflags = (patglobflags & ~C_IGNCASE) | C_LCMATCHUC;
+	    patglobflags = (patglobflags & ~GF_IGNCASE) | GF_LCMATCHUC;
 	    break;
 
 	case 'i':
 	    /* Fully case insensitive */
-	    patglobflags = (patglobflags & ~C_LCMATCHUC) | C_IGNCASE;
+	    patglobflags = (patglobflags & ~GF_LCMATCHUC) | GF_IGNCASE;
 	    break;
 
 	case 'I':
 	    /* Restore case sensitivity */
-	    patglobflags &= ~(C_LCMATCHUC|C_IGNCASE);
+	    patglobflags &= ~(GF_LCMATCHUC|GF_IGNCASE);
+	    break;
+
+	case 'b':
+	    /* Make backreferences */
+	    patglobflags |= GF_BACKREF;
+	    break;
+
+	case 'B':
+	    /* Don't make backreferences */
+	    patglobflags &= ~GF_BACKREF;
+	    break;
+
+	case 'm':
+	    /* Make references to complete match */
+	    patglobflags |= GF_MATCHREF;
+	    break;
+
+	case 'M':
+	    /* Don't */
+	    patglobflags &= ~GF_MATCHREF;
 	    break;
 
 	default:
@@ -1204,11 +1239,20 @@ char *patinput;		/* String input pointer */
 
 /* Length of input string, plus null byte, if needed */
 static int patinlen;
-#ifdef BACKREFERENCES
-static char **patstartp;		/* Pointer to backref starts */
-static char **patendp;			/* Pointer to backref ends */
-static int parsfound;			/* parentheses found */
-#endif
+
+/*
+ * Offset of string at which we are trying to match.
+ * This is added in to the positions recorded in patbeginp and patendp
+ * when we are looking for substrings.  Currently this only happens
+ * in the parameter substitution code.
+ */
+/**/
+int patoffset;
+
+static char *patbeginp[NSUBEXP];	/* Pointer to backref beginnings */
+static char *patendp[NSUBEXP];		/* Pointer to backref ends */
+static int parsfound;			/* parentheses (with backrefs) found */
+
 static int globdots;			/* Glob initial dots? */
 
 /*
@@ -1233,10 +1277,8 @@ pattrystart(void)
 int
 pattry(Patprog prog, char *string)
 {
-#ifdef BACKREFERENCES
     int i;
     char **sp, **ep;
-#endif
     char *progstr = (char *)prog + prog->startoff;
 
     /* inherited from domatch, but why, exactly? */
@@ -1274,40 +1316,78 @@ pattry(Patprog prog, char *string)
 	    errsfound = 0;
 	}
 	globdots = !(patflags & PAT_NOGLD);
-#ifdef BACKREFERENCES
 	parsfound = 0;
-	if (patflags & PAT_BACKR) {
-	    patstartp = prog->ppStartp;
-	    patendp = prog->ppEndp;
-	} else {
-	    patstartp = patendp = NULL;
-	}
-#endif
 
 	if (patmatch((Upat)progstr)) {
-#ifdef BACKREFERENCES
-	    if (patflags & PAT_BACKR) {
-		prog->ppStartp[0] = string;
-		prog->ppEndp[0] = patinput;
-
-		sp = patstartp+1;
-		ep = patendp + 1;
-		for (i = 1; i < NSUBEXP; i++) {
-		    if (!(parsfound & (1 << (i - 1))))
-			*sp = 0;
-		    if (!(parsfound & (1 << (i + 15))))
-			*ep = 0;
-		    sp++;
-		    ep++;
-		}
-		
-	    }
-#endif
 	    /*
 	     * we were lazy and didn't save the globflags if an exclusion
 	     * failed, so set it now
 	     */
 	    patglobflags = prog->globend;
+	    /*
+	     * Should we clear backreferences and matches on a failed
+	     * match?
+	     */
+	    if ((patglobflags & GF_MATCHREF) && !(patflags & PAT_FILE)) {
+		/*
+		 * m flag: for global match.  This carries no overhead
+		 * in the pattern matching part.
+		 */
+		char *str;
+		int len = patinput - patinstart;
+
+		PERMALLOC {
+		    str = dupstrpfx(patinstart, len);
+		} LASTALLOC;
+		setsparam("MATCH", str);
+		setiparam("MBEGIN", (zlong)(patoffset + !isset(KSHARRAYS)));
+		setiparam("MEND",
+			  (zlong)(len + patoffset + !isset(KSHARRAYS) - 1));
+	    }
+	    if (prog->patnpar && !(patflags & PAT_FILE)) {
+		/*
+		 * b flag: for backreferences using parentheses.
+		 */
+		int palen = prog->patnpar+1;
+		char **matcharr, **mbeginarr, **mendarr;
+		char numbuf[DIGBUFSIZE];
+
+		matcharr = zcalloc(palen*sizeof(char *));
+		mbeginarr = zcalloc(palen*sizeof(char *));
+		mendarr = zcalloc(palen*sizeof(char *));
+
+		sp = patbeginp;
+		ep = patendp;
+
+		PERMALLOC {
+		    for (i = 0; i < prog->patnpar; i++) {
+			DPUTS(!*sp || !*ep, "BUG: backrefs not set.");
+			matcharr[i] = dupstrpfx(*sp, *ep - *sp);
+			/*
+			 * mbegin and mend give indexes into the string
+			 * in the standard notation, i.e. respecting
+			 * KSHARRAYS, and with the end index giving
+			 * the last character, not one beyond.
+			 * For example, foo=foo; [[ $foo = (f)oo ]] gives
+			 * (without KSHARRAYS) indexes 1 and 1, which
+			 * corresponds to indexing as ${foo[1,1]}.
+			 */
+			sprintf(numbuf, "%ld",
+				(long)((*sp - patinstart) + patoffset +
+				       !isset(KSHARRAYS)));
+			mbeginarr[i] = ztrdup(numbuf);
+			sprintf(numbuf, "%ld",
+				(long)((*ep - patinstart) + patoffset +
+				       !isset(KSHARRAYS) - 1));
+			mendarr[i] = ztrdup(numbuf);
+			sp++;
+			ep++;
+		    }
+		} LASTALLOC;
+		setaparam("match", matcharr);
+		setaparam("mbegin", mbeginarr);
+		setaparam("mend", mendarr);
+	    }
 	    return 1;
 	} else
 	    return 0;
@@ -1319,10 +1399,10 @@ pattry(Patprog prog, char *string)
  * comes from the input string, the second the current pattern.
  */
 #define CHARMATCH(chin, chpa) (chin == chpa || \
-        ((patglobflags & C_IGNCASE) ? \
+        ((patglobflags & GF_IGNCASE) ? \
 	 ((isupper(chin) ? tolower(chin) : chin) == \
 	  (isupper(chpa) ? tolower(chpa) : chpa)) : \
-	 (patglobflags & C_LCMATCHUC) ? \
+	 (patglobflags & GF_LCMATCHUC) ? \
 	 (islower(chpa) && toupper(chpa) == chin) : 0))
 
 /*
@@ -1480,7 +1560,6 @@ patmatch(Upat prog)
 	case P_GFLAGS:
 	    patglobflags = P_OPERAND(scan)->l;
 	    break;
-#ifdef BACKREFERENCES
 	case P_OPEN:
 	case P_OPEN+1:
 	case P_OPEN+2:
@@ -1495,13 +1574,12 @@ patmatch(Upat prog)
 	    save = patinput;
 
 	    if (patmatch(next)) {
-		DPUTS(!patstartp, "patstartp not set for backreferencing");
 		/*
-		 * Don't set ppStartp if some later invocation of
+		 * Don't set patbeginp if some later invocation of
 		 * the same parentheses already has.
 		 */
 		if (no && !(parsfound & (1 << (no - 1)))) {
-		    patstartp[no] = save;
+		    patbeginp[no-1] = save;
 		    parsfound |= 1 << (no - 1);
 		}
 		return 1;
@@ -1524,14 +1602,13 @@ patmatch(Upat prog)
 	    if (patmatch(next)) {
 		DPUTS(!patendp, "patendp not set for backreferencing");
 		if (no && !(parsfound & (1 << (no + 15)))) {
-		    patendp[no] = save;
+		    patendp[no-1] = save;
 		    parsfound |= 1 << (no + 15);
 		}
 		return 1;
 	    } else
 		return 0;
 	    break;
-#endif
 	case P_EXCSYNC:
 	    /* See the P_EXCLUDE code below for where syncptr comes from */
 	    {
@@ -1605,9 +1682,7 @@ patmatch(Upat prog)
 			unsigned char *oldsyncstr;
 			char *matchpt = NULL;
 			int ret, savglobdots, matchederrs = 0;
-#ifdef BACKREFERENCES
 			int savparsfound = parsfound;
-#endif
 			DPUTS(P_OP(scan) == P_WBRANCH,
 			      "BUG: excluded WBRANCH");
 			syncstrp = P_OPERAND(next);
@@ -1674,14 +1749,12 @@ patmatch(Upat prog)
 				}
 				if (patmatch(opnd)) {
 				    ret = 0;
-#ifdef BACKREFERENCES
 				    /*
 				     * Another subtlety: if we exclude the
 				     * match, any parentheses just found
 				     * become invalidated.
 				     */
 				    parsfound = savparsfound;
-#endif
 				}
 				if (buf)
 				    zfree(buf, pathpos + patinlen);
@@ -2184,18 +2257,16 @@ patdump(Patprog r)
 	printf("start `%c' ", r->patstartch);
     if (!(r->flags & PAT_NOANCH))
 	printf("EOL-anchor ");
-#ifdef BACKREFERENCES
-    if (r->flags & PAT_BACKR)
-	printf("backreferences ");
-#endif
+    if (r->patnpar)
+	printf("%d active backreferences ", r->patnpar);
     if (r->mustoff)
 	printf("must have \"%s\"", (char *)r + r->mustoff);
     printf("\n");
     if (r->globflags) {
 	printf("Globbing flags: ");
-	if (r->globflags & C_LCMATCHUC)
+	if (r->globflags & GF_LCMATCHUC)
 	    printf("LC matches UC ");
-	if (r->globflags & C_IGNCASE)
+	if (r->globflags & GF_IGNCASE)
 	    printf("Ignore case");
 	printf("\n");
 	if (r->globflags & 0xff)
@@ -2317,16 +2388,11 @@ int
 bin_patdebug(char *name, char **args, char *ops, int func)
 {
     Patprog prog;
-    int ret = 0, flags;
+    int ret = 0;
 
     tokenize(*args);
 
-#ifdef BACKREFERENCES
-    flags = ops['b'] ? PAT_BACKR : 0;
-#else
-    flags = 0;
-#endif
-    if (!(prog = patcompile((char *)*args, flags, 0)))
+    if (!(prog = patcompile((char *)*args, 0, 0)))
 	return 1;
     if (ops['p'] || !args[1]) {
 	patdump(prog);

@@ -911,7 +911,6 @@ struct hookdef {
  * happily be ints.
  */
 
-#define NSUBEXP  10
 struct patprog {
     long		startoff;  /* length before start of programme */
     long		size;	   /* total size from start of struct */
@@ -919,28 +918,9 @@ struct patprog {
     int			globflags; /* globbing flags to set at start */
     int			globend;   /* globbing flags set after finish */
     int			flags;	   /* PAT_* flags */
-    int			patmlen;
+    int			patmlen;   /* length of pure string or longest match */
+    int			patnpar;   /* number of active parentheses */
     char		patstartch;
-#ifdef BACKREFERENCES
-    unsigned char *	ppStartp[NSUBEXP];
-    unsigned char *	ppEndp[NSUBEXP];
-};
-
-/* Same as patprog, but without the backreference storage.
- * Note the calling code must test PAT_BACKR to know which is
- * which, since they are both passed back as a Patprog.
- */
-
-struct patprog_short {
-    long		startoff;
-    long		size;
-    long		mustoff;
-    int			globflags;
-    int			globend;
-    int			flags;
-    int			patmlen;
-    char		patstartch;
-#endif
 };
 
 /* Flags used in pattern matchers (Patprog) and passed down to patcompile */
@@ -953,9 +933,12 @@ struct patprog_short {
 #define PAT_PURES	0x0020	/* Pattern is a pure string: set internally */
 #define PAT_STATIC	0x0040	/* Don't copy pattern to heap as per default */
 #define PAT_SCAN	0x0080	/* Scanning, so don't try must-match test */
-#ifdef BACKREFERENCES
-#define PAT_BACKR	0x0100	/* Parentheses make backreferences */
-#endif
+
+/* Globbing flags: lower 8 bits gives approx count */
+#define GF_LCMATCHUC	0x0100
+#define GF_IGNCASE	0x0200
+#define GF_BACKREF	0x0400
+#define GF_MATCHREF	0x0800
 
 /* node used in parameter hash table (paramtab) */
 
@@ -1067,6 +1050,7 @@ struct param {
 #define SUB_LEN		0x0080	/* length of match */
 #define SUB_ALL		0x0100	/* match complete string */
 #define SUB_GLOBAL	0x0200	/* global substitution ${..//all/these} */
+#define SUB_DOSUBST	0x0400	/* replacement string needs substituting */
 
 /* Flags as the second argument to prefork */
 #define PF_TYPESET	0x01	/* argument handled like typeset foo=bar */
