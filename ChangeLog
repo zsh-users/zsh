@@ -1,5 +1,8 @@
 2005-01-21  Oliver Kiddle  <opk@zsh.org>
 
+	* 20734: Completion/Linux/Command/_valgrind: rewrite to handle
+	version 2.2.0 of valgrind
+
 	* 20730 (modified): Completion/Base/Completer/_expand: fix 
 	suffix style to regard quoted special characters as not special
 
