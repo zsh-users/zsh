@@ -14,6 +14,7 @@ _arguments -C -A '-*' \
   '*-dump-charset[codepage to use with -dump]:codepage:' \
   '*-dump-width[width of document formatted with -dump]:width:' \
   '*-eval[evaluate given configuration option]:configuration option:' \
+  '*-force-html[assume the file is HTML]' \
   '(- 1)-'{\?,h,help}'[print usage help and exit]' \
   '(- 1)-long-help[print detailed usage help and exit]' \
   '(- 1)-config-help[print help for configuration options]' \

@@ -1,3 +1,7 @@
+2003-11-28  Doug Kearns  <djkea2@mugca.its.monash.edu.au>
+
+	* unposted: Completion/Unix/Command/_elinks: update for version 0.4.3
+
 2003-11-21  Oliver Kiddle  <opk@zsh.org>
 
 	* 19265: Completion/Unix/Command/_ls, Completion/X/Command/_mozilla:
