@@ -1,5 +1,8 @@
 2003-06-05  Peter Stephenson  <pws@csr.com>
 
+	* users/6154: Src/subst.c: anchors didn't work with //
+	parameter substitution.
+
 	* 18526 tweaked (c.f. 18527): Completion/Base/Utility/_arguments,
 	Completion/Base/Utility/_describe, Doc/Zsh/compsys.yo:
 	fix use of style prefix-needed in _arguments by adding an
