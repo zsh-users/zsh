@@ -674,7 +674,6 @@ dosavetrap(int sig, int level)
 #ifdef DEBUG
 	else dputs("BUG: no function present with function trap flag set.");
 #endif
-	    
 	st->list = newshf;
     } else if (sigtrapped[sig]) {
 	st->list = sigfuncs[sig] ? dupeprog(sigfuncs[sig], 0) : NULL;
