@@ -1398,9 +1398,12 @@ calclist(int showall)
 	if (!onlyexpl && pp) {
 	    /* We have an ylist, lets see, if it contains newlines. */
 	    hidden = 1;
-	    while (!nl && *pp)
-		nl = !!strchr(*pp++, '\n');
-
+	    while (!nl && *pp) {
+                if (ztrlen(*pp) >= columns)
+                    nl = 1;
+                else
+                    nl = !!strchr(*pp++, '\n');
+            }
 	    pp = g->ylist;
 	    if (nl || !pp[1]) {
 		/* Yup, there are newlines, count lines. */
@@ -1411,17 +1414,17 @@ calclist(int showall)
 		while ((sptr = *pp)) {
 		    while (sptr && *sptr) {
 			nlines += (nlptr = strchr(sptr, '\n'))
-			    ? 1 + (nlptr-sptr) / columns
-			    : strlen(sptr) / columns;
+			    ? 1 + (nlptr - sptr - 1) / columns
+			    : (ztrlen(sptr) - 1) / columns;
 			sptr = nlptr ? nlptr+1 : NULL;
 		    }
 		    nlines++;
 		    pp++;
 		}
-		nlines--;
+		/*** nlines--; */
 	    } else {
 		while (*pp) {
-		    l = strlen(*pp);
+		    l = ztrlen(*pp);
 		    ndisp++;
 		    if (l > glong)
 			glong = l;
@@ -1524,7 +1527,7 @@ calclist(int showall)
 			g->width = 1;
 			
 			while (*pp)
-			    glines += 1 + (strlen(*pp++) / columns);
+			    glines += 1 + (ztrlen(*pp++) / columns);
 		    }
 		}
 	    } else {
@@ -1566,7 +1569,7 @@ calclist(int showall)
 		    VARARR(int, ylens, yl);
 
 		    for (i = 0; *pp; i++, pp++)
-			ylens[i] = strlen(*pp) + add;
+			ylens[i] = ztrlen(*pp) + add;
 
 		    if (g->flags & CGF_ROWS) {
 			int count, tcol, first, maxlines = 0, llines;
@@ -1913,10 +1916,16 @@ printlist(int over, CLPrintFunc printm, int showall)
 		}
 	    }
 	    if (g->flags & CGF_LINES) {
-		while (*pp) {
-		    zputs(*pp, shout);
-		    if (*++pp)
-			putc('\n', shout);
+                char *p;
+
+		while ((p = *pp++)) {
+		    zputs(p, shout);
+		    if (*pp) {
+                        if (ztrlen(p) % columns)
+                            putc('\n', shout);
+                        else
+                            fputs(" \010", shout);
+                    }
 		}
 	    } else {
 		int n = g->lcount, nl, nc, i, a;

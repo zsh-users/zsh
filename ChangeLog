@@ -1,5 +1,8 @@
 2001-05-28  Sven Wischnowsky  <wischnow@zsh.org>
 
+	* 14507: Src/Zle/compresult.c: fix for cursor positioning with
+	that -y option of compctl (display strings)
+
 	* 14504: Src/Modules/zprof.c: make the zprof wrapper function
 	be more careful, avoiding almost all of the code when the
 	module is being unloaded
