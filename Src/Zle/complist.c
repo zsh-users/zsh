@@ -1652,7 +1652,7 @@ complistmatches(Hookdef dummy, Chdata dat)
     last_cap = (char *) zhalloc(max_caplen + 1);
     *last_cap = '\0';
 
-    if (!mnew && onlnct == nlnct && mlbeg >= 0 && mlbeg == molbeg)
+    if (!mnew && inselect && onlnct == nlnct && mlbeg >= 0 && mlbeg == molbeg)
         singledraw();
     else if (!compprintlist(mselect >= 0) || !clearflag)
 	noselect = 1;

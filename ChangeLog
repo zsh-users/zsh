@@ -1,3 +1,9 @@
+2002-06-05  Sven Wischnowsky  <wischnow@zsh.org>
+
+	* 17286: Src/Zle/complist.c: don't use optimised completion
+	list display code after the list has been erased or we're not
+	in menu selection anymore anyway
+
 2002-06-04  Peter Stephenson  <pws@pwstephenson.fsnet.co.uk>
 
 	* 17283: Src/parse.c: `func() { ... } this bit was ignored'.
