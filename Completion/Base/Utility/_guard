@@ -1,0 +1,17 @@
+#autoload
+
+local mesg pat garbage
+
+mesg=()
+zparseopts -K -D -a garbage M: J: V: 1 2 n F: X:=mesg 
+
+[[ "$PREFIX$SUFFIX" != $~1 ]] && return 1
+
+if [[ $# -gt 1 || $#mesg -eq 0 ]]; then
+  shift
+  _message "$*"
+else
+  _message -r "$mesg[2]"
+fi
+
+[[ -n "$PREFIX$SUFFIX" ]]

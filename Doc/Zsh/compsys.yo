@@ -2930,12 +2930,24 @@ two hyphens (like `tt(-)tt(-prefix)') are still considered to contain only
 one option name.  This allows the use of the `tt(-s)' option to describe
 single-letter options together with such long option names.
 
-The tt(-s) option may be combined with the option tt(-W) to say that more
+The tt(-s) option may be combined with the option tt(-w) to say that more
 option characters are to be expected even after an option that takes an
 argument.  For example, if a command takes the options `tt(a)' and `tt(b)',
 where `tt(a)' takes an argument in the next word, tt(_arguments) would
 normally not complete the other option directly after `tt(-a)', but it would
-allow that if given the tt(-W) option.
+allow that if given the tt(-w) option.
+
+Similarly, the option tt(-W) may be given to force completion of options
+even after options that get an argument in the same word.  For example,
+if a command takes the options `tt(a)' and `tt(b)', where `tt(a)' needs
+an argument in the same word, directly after the option character,
+tt(_arguments) would normally only execute the action for that argument
+and not offer other options as possible completions.  If given the
+tt(-W) option, it will offer other options as possible completions after
+executing the action for the argument.  Note that, depending on the
+action, this may mean that the other options can't really be completed,
+but at least they will be listed.  For more control, use an utility
+function like tt(_guard) in the argument's action.
 
 The forms of var(optspec) are:
 
@@ -3498,6 +3510,38 @@ var(return) is taken as the name of a parameter and the return status
 from the called function is stored in it.
 The return value of tt(_call_function) itself is zero if the function
 var(name) exists and was called and non-zero otherwise.
+)
+findex(_guard)
+item(tt(_guard) [ var(options) ] var(pattern) [ var(descr) ])(
+This function is intended to be used in an action of functions like
+tt(_arguments).  It returns immediately with a non-zero return value if
+the string to be completed does not match the var(pattern).  If the
+pattern matches, the var(descr) is displayed and the function returns
+zero if the word to complete is not empty and non-zero otherwise.
+
+The var(pattern) may be preceded by those options understood by
+tt(compadd) that are passed down from tt(_description), namely tt(-M),
+tt(-J), tt(-V), tt(-1), tt(-2), tt(-n), tt(-F) and tt(-X).  All of these
+options, except tt(-X), will be ignored.  If the tt(-X) option appears,
+the description following it will be used as the string to display if
+the var(pattern) matches, unless the option var(descr) is given to
+tt(_guard) itself, which will then take precedence.
+
+As an example, consider a command taking the options tt(-n) and
+tt(-none), where tt(-n) has to be followed by a numeric value in the
+same word.  By using either of:
+
+example(_argument '-n-:numeric value:_guard "[0-9]#"' '-none')
+
+or
+
+example(_argument '-n-: :_guard "[0-9]#" "numeric value"' '-none')
+
+tt(_arguments) can be made to both display the message `tt(numeric
+value)' and complete options after `tt(-n<TAB>)'.  If the `tt(-n)' is
+already followed by one or more digits (matching the pattern given to
+tt(_guard)), only the message will be displayed and if the `tt(-n)' is
+followed by another character, only options are completed.
 )
 findex(_message)
 item(tt(_message) [ -r ] var(descr))(

@@ -4,7 +4,7 @@
 # descriptions given as arguments to this function.
 
 local long cmd="$words[1]" descr mesg subopts opt usecc autod
-local oldcontext="$curcontext" hasopts rawret optarg singopt
+local oldcontext="$curcontext" hasopts rawret optarg singopt alwopt
 
 long=$argv[(I)--]
 if (( long )); then
@@ -174,21 +174,22 @@ fi
 
 subopts=()
 singopt=()
-while [[ "$1" = -(O*|[CRWs]) ]]; do
+while [[ "$1" = -(O*|[CRWsw]) ]]; do
   case "$1" in
   -C)  usecc=yes; shift ;;
   -O)  subopts=( "${(@P)2}" ); shift 2 ;;
   -O*) subopts=( "${(@P)1[3,-1]}" ); shift ;;
   -R)  rawret=yes; shift;;
-  -W)  optarg=yes; shift;;
+  -w)  optarg=yes; shift;;
   -s)  singopt=(-s); shift;;
+  -W)  alwopt=yes; shift;;
   esac
 done
 
 zstyle -s ":completion:${curcontext}:options" auto-description autod
 
 if (( $# )) && comparguments -i "$autod" "$singopt[@]" "$@"; then
-  local action noargs aret expl local tried
+  local action noargs aret expl local tried ret=1
   local next direct odirect equal single matcher matched ws tmp1 tmp2 tmp3
   local opts subc tc prefix suffix descrs actions subcs anum
   local origpre="$PREFIX" origipre="$IPREFIX" nm="$compstate[nmatches]"
@@ -280,7 +281,8 @@ if (( $# )) && comparguments -i "$autod" "$singopt[@]" "$@"; then
 
               eval ws\=\( "${action[3,-3]}" \)
 
-              _describe -t "$subc" "$descr" ws -M "$matcher" "$subopts[@]"
+              _describe -t "$subc" "$descr" ws -M "$matcher" "$subopts[@]" ||
+                  alwopt=yes
 	      tried=yes
 
             elif [[ "$action" = \(*\) ]]; then
@@ -289,15 +291,17 @@ if (( $# )) && comparguments -i "$autod" "$singopt[@]" "$@"; then
 
               eval ws\=\( "${action[2,-2]}" \)
 
-              _all_labels "$subc" expl "$descr" compadd "$subopts[@]" -a - ws
+              _all_labels "$subc" expl "$descr" compadd "$subopts[@]" -a - ws ||
+                  alwopt=yes
 	      tried=yes
             elif [[ "$action" = \{*\} ]]; then
 
               # A string in braces is evaluated.
 
               while _next_label "$subc" expl "$descr"; do
-                eval "$action[2,-2]"
+                eval "$action[2,-2]" && ret=0
               done
+              (( ret )) && alwopt=yes
 	      tried=yes
             elif [[ "$action" = \ * ]]; then
 
@@ -305,8 +309,9 @@ if (( $# )) && comparguments -i "$autod" "$singopt[@]" "$@"; then
 
 	      eval "action=( $action )"
               while _next_label "$subc" expl "$descr"; do
-                "$action[@]"
+                "$action[@]" && ret=0
               done
+              (( ret )) && alwopt=yes
 	      tried=yes
             else
 
@@ -314,15 +319,17 @@ if (( $# )) && comparguments -i "$autod" "$singopt[@]" "$@"; then
 
 	      eval "action=( $action )"
               while _next_label "$subc" expl "$descr"; do
-                "$action[1]" "$subopts[@]" "$expl[@]" "${(@)action[2,-1]}"
+                "$action[1]" "$subopts[@]" "$expl[@]" "${(@)action[2,-1]}" && ret=0
 	      done
+              (( ret )) && alwopt=yes
 	      tried=yes
             fi
           fi
         fi
       done
-
-      if [[ -z "$matched$hasopts" && ( -z "$aret" || "$PREFIX" = "$origpre" ) ]] &&
+      if [[ -z "$hasopts" &&
+            ( -z "$matched" || -n "$alwopt" ) &&
+            ( -z "$aret" || "$PREFIX" = "$origpre" ) ]] &&
           _requested options &&
           { ! zstyle -T ":completion:${curcontext}:options" prefix-needed ||
             [[ "$origpre" = [-+]* || -z "$aret$mesg$tried" ]] } ; then
@@ -378,9 +385,10 @@ if (( $# )) && comparguments -i "$autod" "$singopt[@]" "$@"; then
 	PREFIX="$prevpre"
 	IPREFIX="$previpre"
       fi
-      [[ -n "$tried" && "$PREFIX" != [-+]* ]] && break
+      [[ -n "$tried" && "${${alwopt:+$origpre}:-$PREFIX}" != [-+]* ]] && break
     done
-    if [[ -n "$opts" && -z "$aret$matched$mesg" &&
+    if [[ -n "$opts" && -z "$aret" &&
+          ( -z "$matched$mesg" || -n "$alwopt" ) &&
           nm -eq compstate[nmatches] ]]; then
 
       PREFIX="$origpre"

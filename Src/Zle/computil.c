@@ -1941,7 +1941,12 @@ bin_comparguments(char *nam, char **args, char *ops, int func)
     case 's':
 	for (; lstate; lstate = lstate->snext)
 	    if (lstate->d->single && lstate->singles &&
-		lstate->actopts && lstate->opt) {
+		lstate->actopts
+#if 0
+                /* let's try without, for the -W option of _arguments */
+                && lstate->opt
+#endif
+                ) {
 		setsparam(args[1],
 			  ztrdup((lstate->ddef && lstate->dopt) ?
 				 (lstate->dopt->type == CAO_DIRECT ?

@@ -1,5 +1,14 @@
 2001-04-26  Sven Wischnowsky  <wischnow@zsh.org>
 
+	* 14105: Completion/Base/Utility/_arguments,
+	Completion/Base/Utility/_guard,
+	Completion/X/Utility/_x_arguments,
+	Completion/X/Utility/_xt_arguments, Doc/Zsh/compsys.yo,
+	Src/Zle/computil.c: rename -W option to -w, add new -W option
+	which makes _arguments complete options even after options that
+	get their argument in the same word; new _guard function for
+	conditionally displaying messages
+
 	* 14092: Completion/Base/Completer/_expand: make keep-prefix
 	keep everything up to the first component with a parameter
 	expansion, not only if that is at the beginning of the string
