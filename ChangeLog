@@ -1,3 +1,8 @@
+2004-12-06  Doug Kearns  <djkea2@gus.gscit.monash.edu.au>
+
+	* 20601: Completion/Unix/Command/_python: update python completion for
+	version 2.4
+
 2004-12-01  Wayne Davison  <wayned@users.sourceforge.net>
 
 	* 20595 (modified): Src/compat.c: some style tweaks to zchdir().
