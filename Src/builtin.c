@@ -3981,11 +3981,11 @@ checkjobs(void)
 {
     int i;
 
-    for (i = 1; i < MAXJOB; i++)
+    for (i = 1; i <= maxjob; i++)
 	if (i != thisjob && (jobtab[i].stat & STAT_LOCKED) &&
 	    !(jobtab[i].stat & STAT_NOPRINT))
 	    break;
-    if (i < MAXJOB) {
+    if (i <= maxjob) {
 	if (jobtab[i].stat & STAT_STOPPED) {
 
 #ifdef USE_SUSPENDED

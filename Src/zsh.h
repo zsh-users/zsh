@@ -684,10 +684,6 @@ struct eccstr {
 /* Definitions for job table and job control */
 /********************************************/
 
-#ifdef NEED_LINUX_TASKS_H
-#include <linux/tasks.h>
-#endif
-
 /* entry in the job table */
 
 struct job {
@@ -730,6 +726,9 @@ struct timeinfo {
 };
 
 #define JOBTEXTSIZE 80
+
+/* Size to initialise the job table to, and to increment it by when needed. */
+#define MAXJOBS_ALLOC	(50)
 
 /* node in job process lists */
 

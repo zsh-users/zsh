@@ -291,7 +291,7 @@ putpromptchar(int doprint, int endchar)
 			test = 1;
 		    break;
 		case 'j':
-		    for (numjobs = 0, j = 1; j < MAXJOB; j++)
+		    for (numjobs = 0, j = 1; j <= maxjob; j++)
 			if (jobtab[j].stat && jobtab[j].procs &&
 		    	    !(jobtab[j].stat & STAT_NOPRINT)) numjobs++;
 		    if (numjobs >= arg)
@@ -383,7 +383,7 @@ putpromptchar(int doprint, int endchar)
 		bp += strlen(bp);
 		break;
 	    case 'j':
-		for (numjobs = 0, j = 1; j < MAXJOB; j++)
+		for (numjobs = 0, j = 1; j <= maxjob; j++)
 		    if (jobtab[j].stat && jobtab[j].procs &&
 		    	!(jobtab[j].stat & STAT_NOPRINT)) numjobs++;
 		addbufspc(DIGBUFSIZE);

@@ -417,43 +417,6 @@ if test $zsh_cv_c_variable_length_arrays = yes; then
   AC_DEFINE(HAVE_VARIABLE_LENGTH_ARRAYS)
 fi
 
-AC_MSG_CHECKING(what to set MAXJOB to)
-dnl Do you want to alter the maximum job table size?
-ifdef([max_jobtable_size],[undefine([max_jobtable_size])])dnl
-AC_ARG_ENABLE(max-jobtable-size,
-[  --enable-max-jobtable-size=MAX    limit job table size to MAX],
-
-[if test x$enableval = xyes; then
-
-   AC_EGREP_CPP(yes,
-   [#include <linux/tasks.h>
-    #ifdef MAX_TASKS_PER_USER
-    yes
-    #endif
-   ],
-   maxj=max)
-
-   if test x$maxj = xmax; then
-    AC_DEFINE(MAXJOB, MAX_TASKS_PER_USER)
-    AC_DEFINE(NEED_LINUX_TASKS_H)
-    AC_MSG_RESULT(${msg}MAX_TASKS_PER_USER)
-   else
-    AC_DEFINE(MAXJOB, 256)
-    AC_MSG_RESULT(${msg}256)
-   fi
-
- elif test x$enableval = xno; then
- AC_DEFINE(MAXJOB,512)
- AC_MSG_RESULT(${msg}512)
- else
- AC_DEFINE_UNQUOTED(MAXJOB,$enableval)
- AC_MSG_RESULT(${msg}${enableval}) 
-fi],
-[
-AC_DEFINE(MAXJOB, 50)
- AC_MSG_RESULT(${msg}50) 
-])
-
 dnl ------------------
 dnl CHECK FOR PROGRAMS
 dnl ------------------

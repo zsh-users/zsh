@@ -1181,7 +1181,7 @@ getpmjobtext(HashTable ht, char *name)
     pm->old = NULL;
     pm->level = 0;
 
-    if ((job = atoi(name)) >= 1 && job < MAXJOB &&
+    if ((job = atoi(name)) >= 1 && job <= maxjob &&
 	jobtab[job].stat && jobtab[job].procs &&
 	!(jobtab[job].stat & STAT_NOPRINT))
 	pm->u.str = pmjobtext(job);
@@ -1210,7 +1210,7 @@ scanpmjobtexts(HashTable ht, ScanFunc func, int flags)
     pm.old = NULL;
     pm.level = 0;
 
-    for (job = 1; job < MAXJOB; job++) {
+    for (job = 1; job <= maxjob; job++) {
 	if (jobtab[job].stat && jobtab[job].procs &&
 	    !(jobtab[job].stat & STAT_NOPRINT)) {
 	    if (func != scancountparams) {
@@ -1291,7 +1291,7 @@ getpmjobstate(HashTable ht, char *name)
     pm->old = NULL;
     pm->level = 0;
 
-    if ((job = atoi(name)) >= 1 && job < MAXJOB &&
+    if ((job = atoi(name)) >= 1 && job <= maxjob &&
 	jobtab[job].stat && jobtab[job].procs &&
 	!(jobtab[job].stat & STAT_NOPRINT))
 	pm->u.str = pmjobstate(job);
@@ -1320,7 +1320,7 @@ scanpmjobstates(HashTable ht, ScanFunc func, int flags)
     pm.old = NULL;
     pm.level = 0;
 
-    for (job = 1; job < MAXJOB; job++) {
+    for (job = 1; job <= maxjob; job++) {
 	if (jobtab[job].stat && jobtab[job].procs &&
 	    !(jobtab[job].stat & STAT_NOPRINT)) {
 	    if (func != scancountparams) {
@@ -1366,7 +1366,7 @@ getpmjobdir(HashTable ht, char *name)
     pm->old = NULL;
     pm->level = 0;
 
-    if ((job = atoi(name)) >= 1 && job < MAXJOB &&
+    if ((job = atoi(name)) >= 1 && job <= maxjob &&
 	jobtab[job].stat && jobtab[job].procs &&
 	!(jobtab[job].stat & STAT_NOPRINT))
 	pm->u.str = pmjobdir(job);
@@ -1395,7 +1395,7 @@ scanpmjobdirs(HashTable ht, ScanFunc func, int flags)
     pm.old = NULL;
     pm.level = 0;
 
-    for (job = 1; job < MAXJOB; job++) {
+    for (job = 1; job <= maxjob; job++) {
        if (jobtab[job].stat && jobtab[job].procs &&
            !(jobtab[job].stat & STAT_NOPRINT)) {
            if (func != scancountparams) {

@@ -3631,7 +3631,7 @@ makecomplistflags(Compctl cc, char *s, int incmd, int compadd)
 	int i;
 	char *j;
 
-	for (i = 0; i < MAXJOB; i++)
+	for (i = 0; i <= maxjob; i++)
 	    if ((jobtab[i].stat & STAT_INUSE) &&
 		jobtab[i].procs && jobtab[i].procs->text) {
 		int stopped = jobtab[i].stat & STAT_STOPPED;

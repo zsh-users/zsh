@@ -1,3 +1,11 @@
+2003-11-13  Peter Stephenson  <pws@csr.com>
+
+	* 19242: acconfig.h, zshconfig.ac, Src/Builtin.c, Src/exec.c,
+	Src/init.c, Src/jobs.c, Src/prompt.c, Src/signals.c, Src/zsh.h,
+	Src/Modules/parameter.c, Src/Zle/compctl.c: Make the job table
+	dynamically reallocatable.  Expand as needed, reduce only at
+	top level.
+
 2003-11-11  Peter Stephenson  <pws@csr.com>
 
 	* unposted: Completion/Unix/Command/_perforce: bug in

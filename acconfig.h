@@ -142,10 +142,6 @@
 /* Define to be a string corresponding the vendor of the machine */
 #undef VENDOR
 
-/* Define to limit job table size */
-#undef MAXJOB
-#undef NEED_LINUX_TASKS_H
-
 /* Define if your system defines `struct winsize' in sys/ptem.h.  */
 #undef WINSIZE_IN_PTEM
 

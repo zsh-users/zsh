@@ -1207,7 +1207,7 @@ zsh_main(int argc, char **argv)
     setlocale(LC_ALL, "");
 #endif
 
-    init_hackzero(argv, environ);
+    init_jobs(argv, environ);
 
     /*
      * Provisionally set up the type table to allow metafication.
@@ -1261,6 +1261,13 @@ zsh_main(int argc, char **argv)
     init_misc();
 
     for (;;) {
+	/*
+	 * See if we can free up some of jobtab.
+	 * We only do this at top level, because if we are
+	 * executing stuff we may refer to them by job pointer.
+	 */
+	maybeshrinkjobtab();
+
 	do
 	    loop(1,0);
 	while (tok != ENDINPUT && (tok != LEXERR || isset(SHINSTDIN)));

@@ -582,7 +582,7 @@ killrunjobs(int from_signal)
  
     if (unset(HUP))
         return;
-    for (i = 1; i < MAXJOB; i++)
+    for (i = 1; i <= maxjob; i++)
         if ((from_signal || i != thisjob) && (jobtab[i].stat & STAT_LOCKED) &&
             !(jobtab[i].stat & STAT_NOPRINT) &&
             !(jobtab[i].stat & STAT_STOPPED)) {

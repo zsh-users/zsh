@@ -59,7 +59,17 @@ mod_export int prevjob;
 /* the job table */
  
 /**/
-mod_export struct job jobtab[MAXJOB];
+mod_export struct job *jobtab;
+
+/* Size of the job table. */
+
+/**/
+mod_export size_t jobtabsize;
+
+/* The highest numbered job in the jobtable */
+
+/**/
+mod_export size_t maxjob;
 
 /* If we have entered a subshell, the original shell's job table. */
 static struct job *oldjobtab;
@@ -135,7 +145,7 @@ findproc(pid_t pid, Job *jptr, Process *pptr, int aux)
     Process pn;
     int i;
 
-    for (i = 1; i < MAXJOB; i++)
+    for (i = 1; i <= maxjob; i++)
     {
 	for (pn = aux ? jobtab[i].auxprocs : jobtab[i].procs;
 	     pn; pn = pn->next)
@@ -168,7 +178,7 @@ super_job(int sub)
 {
     int i;
 
-    for (i = 1; i < MAXJOB; i++)
+    for (i = 1; i <= maxjob; i++)
 	if ((jobtab[i].stat & STAT_SUPERJOB) &&
 	    jobtab[i].other == sub &&
 	    jobtab[i].gleader)
@@ -446,14 +456,14 @@ setprevjob(void)
 {
     int i;
 
-    for (i = MAXJOB - 1; i; i--)
+    for (i = maxjob; i; i--)
 	if ((jobtab[i].stat & STAT_INUSE) && (jobtab[i].stat & STAT_STOPPED) &&
 	    !(jobtab[i].stat & STAT_SUBJOB) && i != curjob && i != thisjob) {
 	    prevjob = i;
 	    return;
 	}
 
-    for (i = MAXJOB - 1; i; i--)
+    for (i = maxjob; i; i--)
 	if ((jobtab[i].stat & STAT_INUSE) && !(jobtab[i].stat & STAT_SUBJOB) &&
 	    i != curjob && i != thisjob) {
 	    prevjob = i;
@@ -650,7 +660,10 @@ printjob(Job jn, int lng, int synch)
     if (jn->stat & STAT_NOPRINT)
 	return;
 
-    if (jn < jobtab || jn >= jobtab + MAXJOB)
+    /*
+     * Wow, what a hack.  Did I really write this? --- pws
+     */
+    if (jn < jobtab || jn >= jobtab + jobtabsize)
 	job = jn - oldjobtab;
     else
 	job = jn - jobtab;
@@ -838,15 +851,24 @@ freejob(Job jn, int deleting)
 	zsfree(jn->pwd);
     jn->pwd = NULL;
     if (jn->stat & STAT_WASSUPER) {
+	/* careful in case we shrink and move the job table */
+	int job = jn - jobtab;
 	if (deleting)
 	    deletejob(jobtab + jn->other);
 	else
 	    freejob(jobtab + jn->other, 0);
+	jn = jobtab + job;
     }
     jn->gleader = jn->other = 0;
     jn->stat = jn->stty_in_env = 0;
     jn->filelist = NULL;
     jn->ty = NULL;
+
+    /* Find the new highest job number. */
+    if (maxjob == jn - jobtab) {
+	while (maxjob && !(jobtab[maxjob].stat & STAT_INUSE))
+	    maxjob--;
+    }
 }
 
 /*
@@ -932,7 +954,7 @@ havefiles(void)
 {
     int i;
 
-    for (i = 1; i < MAXJOB; i++)
+    for (i = 1; i <= maxjob; i++)
 	if (jobtab[i].stat && jobtab[i].filelist)
 	    return 1;
     return 0;
@@ -1032,7 +1054,7 @@ clearjobtab(int monitor)
 {
     int i;
 
-    for (i = 1; i < MAXJOB; i++) {
+    for (i = 1; i <= maxjob; i++) {
 	/*
 	 * See if there is a jobtable worth saving.
 	 * We never free the saved version; it only happens
@@ -1054,6 +1076,21 @@ clearjobtab(int monitor)
     memset(jobtab, 0, sizeof(jobtab)); /* zero out table */
 }
 
+static int initnewjob(int i)
+{
+    jobtab[i].stat = STAT_INUSE;
+    if (jobtab[i].pwd) {
+	zsfree(jobtab[i].pwd);
+	jobtab[i].pwd = NULL;
+    }
+    jobtab[i].gleader = 0;
+
+    if (i > maxjob)
+	maxjob = i;
+
+    return i;
+}
+
 /* Get a free entry in the job table and initialize it. */
 
 /**/
@@ -1062,16 +1099,12 @@ initjob(void)
 {
     int i;
 
-    for (i = 1; i < MAXJOB; i++)
-	if (!jobtab[i].stat) {
-	    jobtab[i].stat = STAT_INUSE;
-	    if (jobtab[i].pwd) {
-		zsfree(jobtab[i].pwd);
-		jobtab[i].pwd = NULL;
-	    }
-	    jobtab[i].gleader = 0;
-	    return i;
-	}
+    for (i = 1; i < jobtabsize; i++)
+	if (!jobtab[i].stat)
+	    return initnewjob(i);
+
+    if (expandjobtab())
+	return initnewjob(i);
 
     zerr("job table full or recursion limit exceeded", NULL, 0);
     return -1;
@@ -1083,7 +1116,7 @@ setjobpwd(void)
 {
     int i;
 
-    for (i = 1; i < MAXJOB; i++)
+    for (i = 1; i <= maxjob; i++)
 	if (jobtab[i].stat && !jobtab[i].pwd)
 	    jobtab[i].pwd = ztrdup(pwd);
 }
@@ -1144,7 +1177,7 @@ scanjobs(void)
 {
     int i;
  
-    for (i = 1; i < MAXJOB; i++)
+    for (i = 1; i <= maxjob; i++)
         if (jobtab[i].stat & STAT_CHANGED)
             printjob(jobtab + i, 0, 1);
 }
@@ -1220,7 +1253,7 @@ getjob(char *s, char *prog)
     /* a digit here means we have a job number */
     if (idigit(*s)) {
 	jobnum = atoi(s);
-	if (jobnum && jobnum < MAXJOB && jobtab[jobnum].stat &&
+	if (jobnum && jobnum <= maxjob && jobtab[jobnum].stat &&
 	    !(jobtab[jobnum].stat & STAT_SUBJOB) && jobnum != thisjob) {
 	    returnval = jobnum;
 	    goto done;
@@ -1233,7 +1266,7 @@ getjob(char *s, char *prog)
     if (*s == '?') {
 	struct process *pn;
 
-	for (jobnum = MAXJOB - 1; jobnum >= 0; jobnum--)
+	for (jobnum = maxjob; jobnum >= 0; jobnum--)
 	    if (jobtab[jobnum].stat && !(jobtab[jobnum].stat & STAT_SUBJOB) &&
 		jobnum != thisjob)
 		for (pn = jobtab[jobnum].procs; pn; pn = pn->next)
@@ -1267,17 +1300,33 @@ getjob(char *s, char *prog)
 static char *hackzero;
 static int hackspace;
 
-/* Initialise the jobs -Z system.  The technique is borrowed from perl: *
- * check through the argument and environment space, to see how many of *
- * the strings are in contiguous space.  This determines the value of   *
- * hackspace.                                                           */
+
+/* Initialise job handling. */
 
 /**/
 void
-init_hackzero(char **argv, char **envp)
+init_jobs(char **argv, char **envp)
 {
     char *p, *q;
+    size_t init_bytes = MAXJOBS_ALLOC*sizeof(struct job);
 
+    /*
+     * Initialise the job table.  If this fails, we're in trouble.
+     */
+    jobtab = (struct job *)zalloc(init_bytes);
+    if (!jobtab) {
+	zerr("failed to allocate job table, aborting.", NULL, 0);
+	exit(1);
+    }
+    jobtabsize = MAXJOBS_ALLOC;
+    memset(jobtab, 0, init_bytes);
+
+    /*
+     * Initialise the jobs -Z system.  The technique is borrowed from
+     * perl: check through the argument and environment space, to see
+     * how many of the strings are in contiguous space.  This determines
+     * the value of hackspace.
+     */
     hackzero = *argv;
     p = strchr(hackzero, 0);
     while(*++argv) {
@@ -1295,6 +1344,77 @@ init_hackzero(char **argv, char **envp)
     done:
     hackspace = p - hackzero;
 }
+
+
+/*
+ * We have run out of space in the job table.
+ * Expand it by an additional MAXJOBS_ALLOC slots.
+ */
+
+/*
+ * An arbitrary limit on the absolute maximum size of the job table.
+ * This prevents us taking over the entire universe.
+ * Ought to be a multiple of MAXJOBS_ALLOC, but doesn't need to be.
+ */
+#define MAX_MAXJOBS	1000
+
+/**/
+int
+expandjobtab(void)
+{
+    size_t newsize = jobtabsize + MAXJOBS_ALLOC;
+    struct job *newjobtab;
+
+    if (newsize > MAX_MAXJOBS)
+	return 0;
+
+    newjobtab = (struct job *)zrealloc(jobtab, newsize * sizeof(struct job));
+    if (!newjobtab)
+	return 0;
+
+    /*
+     * Clear the new section of the table; this is necessary for
+     * the jobs to appear unused.
+     */
+    memset(newjobtab + jobtabsize, 0, MAXJOBS_ALLOC * sizeof(struct job));
+
+    jobtab = newjobtab;
+    jobtabsize = newsize;
+
+    return 1;
+}
+
+
+/*
+ * See if we can reduce the job table.  We can if we go over
+ * a MAXJOBS_ALLOC boundary.  However, we leave a boundary,
+ * currently 20 jobs, so that we have a place for immediate
+ * expansion and don't play ping pong with the job table size.
+ */
+
+/**/
+void
+maybeshrinkjobtab(void)
+{
+    size_t jobbound;
+
+    queue_signals();
+    jobbound = maxjob + MAXJOBS_ALLOC - (maxjob % MAXJOBS_ALLOC);
+    if (jobbound < jobtabsize && jobbound > maxjob + 20) {
+	struct job *newjobtab;
+
+	/* Hope this can't fail, but anyway... */
+	newjobtab = (struct job *)zrealloc(jobtab,
+					   jobbound*sizeof(struct job));
+
+	if (newjobtab) {
+	    jobtab = newjobtab;
+	    jobtabsize = jobbound;
+	}
+    }
+    unqueue_signals();
+}
+
 
 /* bg, disown, fg, jobs, wait: most of the job control commands are     *
  * here.  They all take the same type of argument.  Exception: wait can *
@@ -1365,17 +1485,17 @@ bin_fg(char *name, char **argv, Options ops, int func)
 	} else if (func == BIN_JOBS) {
 	    /* List jobs. */
 	    struct job *jobptr;
-	    int maxjob, ignorejob;
+	    int curmaxjob, ignorejob;
 	    if (unset(MONITOR) && oldmaxjob) {
 		jobptr = oldjobtab;
-		maxjob = oldmaxjob;
+		curmaxjob = oldmaxjob;
 		ignorejob = 0;
 	    } else {
 		jobptr = jobtab;
-		maxjob = MAXJOB;
+		curmaxjob = maxjob;
 		ignorejob = thisjob;
 	    }
-	    for (job = 0; job != maxjob; job++, jobptr++)
+	    for (job = 0; job != curmaxjob; job++, jobptr++)
 		if (job != ignorejob && jobptr->stat) {
 		    if ((!OPT_ISSET(ops,'r') && !OPT_ISSET(ops,'s')) ||
 			(OPT_ISSET(ops,'r') && OPT_ISSET(ops,'s')) ||
@@ -1387,7 +1507,7 @@ bin_fg(char *name, char **argv, Options ops, int func)
 	    unqueue_signals();
 	    return 0;
 	} else {   /* Must be BIN_WAIT, so wait for all jobs */
-	    for (job = 0; job != MAXJOB; job++)
+	    for (job = 0; job <= maxjob; job++)
 		if (job != thisjob && jobtab[job].stat)
 		    zwaitjob(job, SIGINT);
 	    unqueue_signals();
@@ -1731,7 +1851,7 @@ findjobnam(char *s)
 {
     int jobnum;
 
-    for (jobnum = MAXJOB - 1; jobnum >= 0; jobnum--)
+    for (jobnum = maxjob; jobnum >= 0; jobnum--)
 	if (!(jobtab[jobnum].stat & (STAT_SUBJOB | STAT_NOPRINT)) &&
 	    jobtab[jobnum].stat && jobtab[jobnum].procs && jobnum != thisjob &&
 	    jobtab[jobnum].procs->text && strpfx(s, jobtab[jobnum].procs->text))

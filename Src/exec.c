@@ -216,7 +216,10 @@ zfork(void)
 {
     pid_t pid;
 
-    if (thisjob >= MAXJOB - 1) {
+    /*
+     * Is anybody willing to explain this test?
+     */
+    if (thisjob >= jobtabsize - 1 && !expandjobtab()) {
 	zerr("job table full", NULL, 0);
 	return -1;
     }
@@ -1024,7 +1027,12 @@ execpline(Estate state, wordcode slcode, int how, int last1)
     ipipe[0] = ipipe[1] = opipe[0] = opipe[1] = 0;
     child_block();
 
-    /* get free entry in job table and initialize it */
+    /*
+     * Get free entry in job table and initialize it.
+     * This is currently the only call to initjob(), so this
+     * is also the only place where we can expand the job table
+     * under us.
+     */
     if ((thisjob = newjob = initjob()) == -1) {
 	child_unblock();
 	return 1;
