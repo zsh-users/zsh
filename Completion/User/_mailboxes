@@ -1,26 +1,68 @@
 #autoload
 
-#emulate -L zsh
-setopt localoptions nullglob
+_mailboxes() {
+  #emulate -L zsh
+  local expl nm="$compstate[nmatches]"
+  local pinedirectory="${pinedirectory:-~/mail}"
+  local maildirectory="${maildirectory:-~/Mail}"
 
-# This is still needlessly mutt-biased and should be fixed.
+  if (( ! $+_mailbox_cache )) then
+    _mailbox_cache "$@"
+  fi
 
-local -U dirboxes
-local i j expl muttrc="${muttrc:-~/.muttrc}" files nm="$compstate[nmatches]"
-local pinedirectory="${pinedirectory:-~/mail}"
-local maildirectory="${maildirectory:-~/Mail}"
+  case "${curcontext}" in
+    (*:mail:*)
+      if [[ "$PREFIX" == +* ]]; then
+	_tags mailboxes
+      else
+        _tags mailboxes files
+      fi;;
+    (*:(mush|zmail|zmlite):*)
+      if [[ "$PREFIX" == [%+]* ]]; then
+	_tags mailboxes
+      else
+        _tags mailboxes files
+      fi;;
+    (*:pine:*)
+      # Files for pine must be absolute paths.
+      if [[ "$PREFIX" == (|-f)[/\~]* ]]; then
+        pinedirectory=''
+        _tags mailboxes files
+      else
+        _tags mailboxes
+      fi;;
+    (*)
+      if [[ "$PREFIX" == (|-f)+* ]]; then
+	_tags mailboxes
+      else
+        _tags mailboxes files
+      fi;;
+  esac
 
-if (( ! $+_mailbox_cache )) then
+  while _tags; do
+    if _requested mailboxes expl 'mailbox specification'; then
+      _mua_mailboxes "$expl[@]"
+    fi
+    if _requested files expl 'mailbox file'; then
+      [[ "${curcontext}" != *:(mail|mush|zmail|zmlite):* ]] &&
+	compset -P -f
+      _path_files "$expl[@]"
+    fi
+    [[ nm -ne $compstate[nmatches] ]] && return 0
+  done
 
-  typeset -U -g _mailbox_cache
-  typeset -U -g _maildir_cache _mbox_cache _mh_cache _mutt_cache _pine_cache
+  return 1
+}
 
-  _mailbox_cache=()
-  _mbox_cache=()
-  _maildir_cache=()
-  _mh_cache=()
-  _mutt_cache=()
-  _pine_cache=()
+_mailbox_cache () {
+  # Depends on $maildirectory and $pinedirectory from _mailboxes!
+
+  local i j muttrc="${muttrc:-~/.muttrc}"
+  local -aU dirboxes
+  typeset -aU -g _mailbox_cache
+  typeset -aU -g _maildir_cache _mbox_cache _mh_cache _mutt_cache _pine_cache
+
+  setopt localoptions nullglob
 
   [[ -f ${~muttrc:-.} ]] &&
     _mutt_cache=( ${$(grep mailboxes ${~muttrc})[2,-1]} )
@@ -43,39 +85,25 @@ if (( ! $+_mailbox_cache )) then
     fi
   done
 
-  [[ -n "$_mutt_cache" || -d ~/.elm || -d ~/.mutt ]] &&
-      _mailbox_cache=( \! \< \> )
   [[ -n "$mailpath" ]] &&
       _mailbox_cache=( "${_mailbox_cache[@]}" "${(@)mailpath%%\?*}" )
 
   [[ -n "$MAIL" ]] && _mailbox_cache=( "${_mailbox_cache[@]}" $MAIL )
-fi
+}
 
-# Files for pine must be absolute paths.
+_mua_mailboxes() {
+  # Depends on $maildirectory and $pinedirectory from _mailboxes!
 
-if [[ "$PREFIX" != (|-f)+* &&
-      ( "${curcontext}" = *:(mail|mush|zmail|zmlite):* ||
-        ( "${curcontext}" = *:pine:* && "$PREFIX" = (|-f)[/\~]* ) ) ]]; then
-  _tags mailboxes files
-else
-  _tags mailboxes
-fi
+  local -a mbox_short
+  local -aU mbox_names
 
-while _tags; do
-  if _requested mailboxes expl 'mailbox specification'; then
-    local mbox_short
-    local -U mbox_names
-
-    mbox_short=()
-    mbox_names=()
-
-    case "${curcontext}" in
+  case "${curcontext}" in
     (*:elm:*) # I've probably got this wrong, or at least incomplete
       mbox_names=( "${_mbox_cache[@]}" "${_mailbox_cache[@]}" )
       mbox_short=( \! \< \> )
       ;;
     (*:mail:*)
-      if compset -P '+|-f+'; then
+      if compset -P +; then
         mbox_names=( "${(@)_mbox_cache#$~maildirectory/}" )
       else
         mbox_names=( +"${(@)^_mbox_cache#$~maildirectory/}"
@@ -86,12 +114,14 @@ while _tags; do
       (( $#_mh_cache )) && _multi_parts "${expl[@]}" / _mh_cache
       ;;
     (*:mush:*)
-      if compset -P '+|-f+'; then
+      if compset -P %; then
+        mbox_short=( "${(@k)userdirs}" )
+      elif compset -P +; then
         mbox_names=( "${(@)_mbox_cache#$~maildirectory/}" )
       else
         mbox_names=( +"${(@)^_mbox_cache#$~maildirectory/}"
 		     "${_mailbox_cache[@]}" )
-        mbox_short=( % \& )
+        mbox_short=( \& % %"${(@k)^userdirs}" )
       fi
       ;;
     (*:mutt:*)
@@ -109,28 +139,26 @@ while _tags; do
 		   "${_mailbox_cache[@]}" "${_mh_cache[@]}" )
       ;;
     (*:(zmail|zmlite):*)
-      if compset -P '+|-f+'; then
+      if compset -P %; then
+        mbox_short=( "${(@k)userdirs}" )
+      elif compset -P +; then
         mbox_names=( "${(@)_mbox_cache#$~maildirectory/}" )
       else
         mbox_names=( +"${(@)^_mbox_cache#$~maildirectory/}"
 		     "${_mailbox_cache[@]}" "${_mh_cache[@]}" )
-        mbox_short=( % \& )
+        mbox_short=( \& % %"${(@k)^userdirs}" )
       fi
       ;;
     (*) # Some other program wants mailbox names?  Use them all?
        mbox_names=( "${_mailbox_cache[@]}" "${_mbox_cache[@]}"
 		    "${_mh_cache[@]}" "${_mutt_cache[@]}" "${_pine_cache[@]}" )
        ;;
-    esac
+  esac
 
-    (( $#mbox_names )) && _multi_parts "${expl[@]}" / mbox_names
-    (( $#mbox_short )) && compadd "$expl[@]" - "$mbox_short[@]"
-  fi
-  if _requested files expl 'mailbox file'; then
-    compset -P -f
-    _path_files "$expl[@]"
-  fi
-  [[ nm -ne $compstate[nmatches] ]] && return 0
-done
+  local ret=1
+  (( $#mbox_names )) && _multi_parts "$@" / mbox_names && ret=0
+  (( $#mbox_short )) && compadd "$@" - "$mbox_short[@]" && ret=0
+  return ret
+}
 
-return 1
+[[ -o kshautoload ]] || _mailboxes "$@"
