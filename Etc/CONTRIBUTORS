@@ -26,7 +26,7 @@ configuration, completion functions.
 
 Chmouel Boudjnah <chmouel@mandrakesoft.com>: configuration support.
 
-Wayne Davison <wayned@users.sourceforege.net>: History code.
+Wayne Davison <wayned@users.sourceforge.net>: History code.
 
 Alexandre Duret-Lutz: completion functions and substitution code.
 
@@ -50,11 +50,11 @@ Tanaka Akira <akr@zsh.org>: Completion and test functions.
 Geoff Wing <gcw@zsh.org>: FTP and mailing list archive
 
 Sven Wischnowsky <wischnow@zsh.org>: Most of the completion code, zpty,
-signal queuing, parameters, builtins, builtouts, built-here-and-theres;
+signal queueing, parameters, builtins, builtouts, built-here-and-theres;
 mend garden shed, rewire electricity, reinstall shutters, fix TV aerial in
 howling gale...
 
-Other patches from E. Jay Birkenbilt,, Jan Fedak, Ulrik Haugen, Paul
+Other patches from E. Jay Birkenbilt, Jan Fedak, Ulrik Haugen, Paul
 Johnson, Fr. Br. George (George V Kouryachy).
 
 Versions 3.1.7 to 3.1.9
@@ -84,7 +84,7 @@ Versions 3.1.7 to 3.1.9
   for completion system, documentation, various other fixes
 
 * Bart Schaefer <schaefer@zsh.org>: documentation and many other bits,
-  archive maintainance
+  archive maintenance
 
 * Adam Spiers <adam@spiers.net>: various completion functions, source code
   archive maintenance, documentation fixes, prompt themes

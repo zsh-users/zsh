@@ -1,3 +1,14 @@
+2001-03-12  Oliver Kiddle  <opk@zsh.org>
+
+	* 13610: INSTALL, README, Completion/Core/compinit,
+	Completion/Core/compinstall, Doc/Zsh/builtins.yo, Doc/Zsh/compsys.yo
+	Doc/Zsh/compwid.yo, Doc/Zsh/contrib.yo, Doc/Zsh/expn.yo,
+	Doc/Zsh/options.yo, Doc/Zsh/zftpsys.yo, Etc/CONTRIBUTORS: spelling
+	corrections and improve to wording
+
+	* unposted: Completion/Commands/_complete_help: fix to declare tmp
+	as a local variable
+
 2001-03-12  Chmouel Boudjnah <chmouel@mandrakesoft.com>
 
 	* 13605: Completion/User/_tar, Completion/User/_tar_archive: New tar

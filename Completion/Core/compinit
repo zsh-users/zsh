@@ -109,7 +109,7 @@ done
 typeset -gA _comps _services _patcomps _postpatcomps _compautos
 
 # The associative array use to report information about the last
-# cmpletion to the outside.
+# completion to the outside.
 
 typeset -gA _lastcomp
 
@@ -165,7 +165,7 @@ comppostfuncs=()
 # trying to find a function defined for the command on the line if no
 # such function could be found.
 # With the `-k' option a function for a special completion keys is 
-# defined and immediatly bound to those keys. Here, the extra arguments
+# defined and immediately bound to those keys. Here, the extra arguments
 # are the name of one of the builtin completion widgets and any number
 # of key specifications as accepted by the `bindkey' builtin.
 # In any case the `-a' option may be given which makes the function

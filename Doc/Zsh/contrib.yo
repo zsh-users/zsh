@@ -111,7 +111,7 @@ Without the tt(-t) option, the return status is zero if all files that
 needed re-compilation could be compiled and non-zero if compilation for at
 least one of the files failed.
 
-If the tt(-p) option is given, the var(args) are interepted as one
+If the tt(-p) option is given, the var(args) are interpreted as one
 or more sets of arguments for tt(zcompile), separated by `tt(-)tt(-)'.
 For example:
 
@@ -326,7 +326,7 @@ position it considers to be the most interesting one, i.e. the one
 where one can disambiguate between as many matches as possible with as 
 little typing as possible.
 
-This widget allows to easily move the cursor to the other interesting
+This widget allows the cursor to be easily moved to the other interesting
 spots.  It can be invoked repeatedly to cycle between all positions
 reported by the completion system.
 )
@@ -367,7 +367,7 @@ Typing the keystrokes for this widget with the cursor placed on or to the
 left of an integer causes that integer to be incremented by one.  With a
 numeric prefix argument, the number is incremented by the amount of the
 argument (decremented if the prefix argument is negative).  The shell
-paramter tt(incarg) may be set to change the default increment something
+parameter tt(incarg) may be set to change the default increment something
 other than one.
 
 example(bindkey '^X+' incarg)

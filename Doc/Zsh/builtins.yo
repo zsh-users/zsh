@@ -834,7 +834,7 @@ Note that read does not attempt to alter the input processing mode.  The
 default mode is canonical input, in which an entire line is read at a time,
 so usually `tt(read -t)' will not read anything until an entire line has
 been typed.  However, when reading from the terminal with tt(-k)
-this is automatically handled; note that only availablity of the first
+this is automatically handled; note that only availability of the first
 character is tested, so that e.g. `tt(read -t -k 2)' can still block on the
 second character.
 )
@@ -1610,7 +1610,7 @@ of things implemented by modules.  In this case, any aliases are
 automatically resolved and the tt(-A) flag is not used.
 )
 item(tt(zmodload) tt(-A) [ tt(-L) ] [ var(modalias)[tt(=)var(module)] ... ])(
-For each argument, if both var(modlias) and var(module) are given,
+For each argument, if both var(modalias) and var(module) are given,
 define var(modalias) to be an alias for the module var(module).
 If the module var(modalias) is ever subsequently requested, either via a
 call to tt(zmodload) or implicitly, the shell will attempt to load

@@ -261,7 +261,7 @@ can be overriden using one of the options below when invoking "configure".
 
 Any startup/shutdown script can be disabled by giving the
 --disable-scriptname option to "configure".  The --disable-etcdir option
-disables all startup/shutdown files which are not explicitely enabled.
+disables all startup/shutdown files which are not explicitly enabled.
 
 Shell functions
 ---------------

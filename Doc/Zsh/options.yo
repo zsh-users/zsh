@@ -254,7 +254,7 @@ cindex(symbolic links)
 item(tt(CHASE_LINKS) (tt(-w)))(
 Resolve symbolic links to their true values when changing directory.
 This also has the effect of tt(CHASE_DOTS), i.e. a `tt(..)' path segment
-will be treated as referring to the physical parent, even if the preceeding
+will be treated as referring to the physical parent, even if the preceding
 path segment is a symbolic link.
 )
 pindex(CHECK_JOBS)

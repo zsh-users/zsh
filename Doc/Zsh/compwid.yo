@@ -14,7 +14,7 @@ and users with no interest in adding to that system (or, potentially,
 writing their own --- see dictionary entry for `hubris') should skip this
 section.  The older system based on the tt(compctl) builtin command is
 described in
-ifzman(zmanref(zshcompctly))\
+ifzman(zmanref(zshcompctl))\
 ifnzman(the chapter noderef(Completion Using compctl)).
 
 Completion widgets are defined by the tt(-C) option to the tt(zle)
@@ -410,7 +410,7 @@ item(tt(unambiguous_positions))(
 This contains all positions where characters in the unambiguous string
 are missing or where the character inserted differs from at least one
 of the matches.  The positions are given as indexes into the string
-given by the value of the tt(uanmbiguous) key.
+given by the value of the tt(unambiguous) key.
 )
 vindex(vared, compstate)
 item(tt(vared))(
@@ -656,7 +656,7 @@ match, the var(n)'th element of the var(array) is removed.  Elements
 for which the corresponding var(word) is matched are retained.
 )
 item(tt(-C))(
-This option adds a special match which expands to all other metches
+This option adds a special match which expands to all other matches
 when inserted into the line, even those that are added after this
 option is used.  Together with the tt(-d) option it is possible to
 specify a string that should be displayed in the list for this special 
@@ -851,7 +851,7 @@ item(tt(B:)var(lpat)tt(=)var(tpat))(
 These letters are for patterns that are anchored by another pattern on
 the left side. Matching for var(lpat) and var(tpat) is as for tt(m) and
 tt(M), but the pattern var(lpat) matched on the command line must be
-preceeded by the pattern var(lanchor).  The var(lanchor) can be blank to
+preceded by the pattern var(lanchor).  The var(lanchor) can be blank to
 anchor the match to the start of the command line string; otherwise the
 anchor can occur anywhere, but must match in both the command line and
 trial completion strings.

@@ -1248,7 +1248,7 @@ The precedence of the operators given above is (highest) `tt(^)', `tt(/)',
 `tt(~)', `tt(|)' (lowest); the
 remaining operators are simply treated from left to right as part of a
 string, with `tt(#)' and `tt(##)' applying to the shortest possible
-preceeding unit (i.e. a character, `tt(?)', `tt([)...tt(])',
+preceding unit (i.e. a character, `tt(?)', `tt([)...tt(])',
 `tt(<)...tt(>)', or a parenthesised expression).  As mentioned
 above, a `tt(/)' used as a directory separator may not appear inside
 parentheses, while a `tt(|)' must do so; in patterns used in other contexts

@@ -204,7 +204,7 @@ can be bound to any other keys using tt(bindkey) as usual.
 )
 item(tt(#compdef -K) var(widget-name) var(style) var(key-sequences) ...)(
 This is similar to tt(-k), with the same var(style) and var(key-sequences)
-arguments, preceeded by a string giving the name of a widget.
+arguments, preceded by a string giving the name of a widget.
 In this case only one var(key-sequences) argument may be given, but the
 entire set of three arguments may be repeated with a different set of
 arguments.  In particular, the var(widget-name) must be distinct in each
@@ -334,7 +334,7 @@ subsect(Overview)
 When completion is attempted somewhere on a command line the
 completion system first tries to find out the context where completion 
 was tried.  The context depends on such things as the name of the
-command when completing an argument, and possibily also
+command when completing an argument, and possibly also
 the name of an option when completing an argument to that option.
 
 The `context' of a completion is a string consisting of multiple fields. This
@@ -1601,7 +1601,7 @@ item(tt(max-errors))(
 This is used by the tt(_approximate) and tt(_correct) completer functions
 to determine the maximum number of errors to allow.  The completer will try
 to generate completions by first allowing one error, then two errors, and
-so on, until either a match or matches wer found or the maximum number of
+so on, until either a match or matches were found or the maximum number of
 errors given by this style has been reached.
 
 If the value for this style contains the string `tt(numeric)', the 
@@ -1748,8 +1748,8 @@ the number of errors that were accepted.
 kindex(regular, completion style)
 item(tt(regular))(
 This style is used by the tt(_expand_alias) completer and bindable 
-command.  If is set to `true' (the default) regular alias will be
-expanded only in command position.  If it is set to `false', regular
+command.  If set to `true' (the default), regular aliases will be
+expanded but only in command position.  If it is set to `false', regular
 aliases will never be expanded and if it is set to the string
 `tt(always)', regular aliases will be expanded even if not in command
 position.
@@ -2426,7 +2426,7 @@ tt(glob) and tt(-o) to tt(subst-globs-only).
 findex(_expand_alias)
 item(tt(_expand_alias))(
 If the word the cursor is on is an alias, it is expanded and no other
-completers are called.  Which types of aliases are to be expanded can
+completers are called.  The types of aliases which are to be expanded can
 be controlled with the tt(regular), tt(global) and tt(disabled)
 styles.
 
@@ -2578,7 +2578,7 @@ tt(_bash_list-choices).  It exists to provide compatibility with
 completion bindings in bash.  The last character of the binding determines
 what is completed: `tt(!)', command names; `tt($)', environment variables;
 `tt(@)', host names; `tt(/)', file names; `tt(~)' user names.  In bash, the
-binding preceeded by `tt(\e)' gives completion, and preceeded by `tt(^X)'
+binding preceded by `tt(\e)' gives completion, and preceded by `tt(^X)'
 lists options.  As some of these bindings clash with standard zsh
 bindings, only `tt(\e~)' and `tt(^X~)' are bound by default.  To add the
 rest, the following should be added to tt(.zshrc) after tt(compinit) has
@@ -2609,14 +2609,14 @@ then calls the tt(_correct) completer.
 findex(_expand_alias (^Xa))
 item(tt(_expand_alias (^Xa)))(
 This function can be used as a completer and as a bindable command.
-It expands the word the cursor on if it is an alias.  The types of
-aliases used can be controlled with the tt(regular), tt(global) and
+It expands the word the cursor is on if it is an alias.  The types of
+aliases expanded can be controlled with the tt(regular), tt(global) and
 tt(disabled) styles.
 
 When used as a bindable command there is one additional feature that
 can be selected by setting the tt(complete) style to `true'.  In this
 case, if the word isn't the name of an alias, tt(_expand_alias) tries
-to complete the word to an full alias name without expanding it (but
+to complete the word to a full alias name without expanding it (but
 leaving the cursor directly after the completed word so that invoking
 tt(_expand_alias) once more will expand the now-complete alias name).
 )
@@ -2631,8 +2631,8 @@ item(tt(_generic))(
 This function is not defined as a widget and not bound by
 default. However, it can be used to define a widget and will then
 store the name of the widget in the var(function) field of the context 
-and call the completion system. This allows to easily define custom
-completion widgets with their own sets of style settings. For example, 
+and call the completion system. This allows custom completion widgets
+with their own set of style settings to be easily defined. For example, 
 to define a widget that does normal completion and starts
 menu selection, one could do:
 
@@ -2748,7 +2748,7 @@ into the var(args) given to the var(command).  Normally, they are put
 directly after the var(command), but if one of the var(args) is a single
 hyphen, they are inserted directly before that. If the hyphen is the last
 argument, that will be removed from the argument list before the
-var(command) is called. This allows to use tt(_all_labels) in almost all
+var(command) is called. This allows tt(_all_labels) to be used in almost all
 cases where the matches can be generated by a single call to the
 tt(compadd) builtin command or by a call to one of the utility functions.
 
@@ -3125,7 +3125,7 @@ option will be completed after a `tt(-)tt(-)' on the line and this
 argument will otherwise be ignored. With tt(-A), no options will be
 completed after the first non-option argument on the line.  The tt(-A) 
 has to be followed by a pattern matching all strings which are not to
-be taken as arguemnts. For example, to make tt(_arguments) stop
+be taken as arguments. For example, to make tt(_arguments) stop
 completing options after the first normal argument, but ignoring all
 strings starting with a hyphen even if they are not described by one
 of the var(optspec)s, one would use: `tt(-A "-*")'.
@@ -3134,8 +3134,8 @@ Note that using multiple sets will be slower than using only one set
 because the completion code has to parse the command line once for
 every set. So more than one set should only be used if the command
 syntax is too complicated. Note also that an option specification with
-rest-arguments (as in `tt(-foo:*:...)') often allows to avoid the use
-of multiple sets.
+rest-arguments (as in `tt(-foo:*:...)') often allows the use of
+multiple sets to be avoided.
 
 Another option supported is `tt(-O) var(name)'. The var(name) will be
 taken as the name of an array and its elements will be given to
@@ -3202,7 +3202,7 @@ it about this as described for the normal option descriptions above.
 If the var(pattern) ends in `tt((-))', this will removed from the
 pattern and the var(action) will be used only directly after the
 `tt(=)', not in the next word. I.e., this is like a normal
-specification as descrobed above using `tt(=-)'.
+specification as described above using `tt(=-)'.
 
 The option `tt(-i) var(patterns)' (which must be given after the
 `tt(-)tt(-)') can be used to give patterns for options which should not be
@@ -3573,10 +3573,10 @@ This function is a compiler to generate a completion function.  The
 first argument specifies the name of the generated function while the
 remaining arguments specify a completion as a set of regular
 expressions with actions.  The generated function has the structure of a
-finite-state machine whose states corresponds to the state (i.e. the
+finite-state machine whose states correspond to the state (i.e. the
 context) of the completion. This state machine uses a command line,
-which comes from concatenating the tt(words) array up to the current
-cursor position using null characters as separators with no extra
+which comes from the concatenation of the tt(words) array up to the
+current cursor position using null characters as separators with no extra
 quotation.  This is analysed and at the end the appropriate action is
 executed.
 
@@ -3589,9 +3589,9 @@ item(tt(/)var(pattern)tt(/) [tt(%)var(lookahead)tt(%)] [tt(-)var(guard)] [tt(:)v
 This is a primitive element, corresponding to one
 state of the compiled state machine.  The state is entered if
 `tt((#b)LPAR()(#B))var(pattern)tt(RPAR()(#B))var(lookahead)tt(*)' matches
-the command line string.  If it is matched, `var(guard)' is evaluated and
+the command line string.  If it matches, `var(guard)' is evaluated and
 its return status is examined; if this is successful, the state is entered,
-else the test fails and other candidates are tried.  The var(pattern)
+otherwise the test fails and other candidates are tried.  The var(pattern)
 string `tt([])' is guaranteed never to match.
 
 If the test succeeds and the state is entered, the left part of the
@@ -3605,12 +3605,12 @@ command line string and var(action)s for the target are executed.
 In this case, nothing is actually removed from the command line string
 so that any previous or neighbouring state may also have var(actions)s.
 var(actions)s evaluation are ordered by the tt(tag-order) style and specified
-var(tag) by tt(_alternative).  So, various format supported by tt(_alternative)
-can be used in var(action).  var(descr) is used for set up the array parameter
-tt(expl).
+var(tag) by tt(_alternative).  So, the various formats supported by
+tt(_alternative) can be used in var(action).  var(descr) is used for
+setting up the array parameter tt(expl).
 )
 item(tt(/)var(pattern)tt(/+) [tt(%)var(lookahead)tt(%)] [tt(-)var(guard)] [tt(:)var(tag)tt(:)var(descr)tt(:)var(action)])(
-This is similar to `tt(/)var(pattern)tt(/) ...' but the left part of
+This is similar to `tt(/)var(pattern)tt(/) ...' but the left part of the
 command line string is also considered as part of the completion target.
 )
 item(tt(/)var(pattern)tt(/-) [tt(%)var(lookahead)tt(%)] [tt(-)var(guard)] [tt(:)var(tag)tt(:)var(descr)tt(:)var(action)])(

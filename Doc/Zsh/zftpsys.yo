@@ -493,7 +493,7 @@ unless the output is going to a terminal; however, if you transfer files in
 the background, you should turn off progress reports by hand using
 `tt(zstyle ':zftp:*' progress none)'.  Note also that if you alter it, any
 output em(must) be to standard error, as standard output may be a file
-being received.  The form of the progess meter, or whether it is used at
+being received.  The form of the progress meter, or whether it is used at
 all, can be configured without altering the function, as described in the
 next section.
 )

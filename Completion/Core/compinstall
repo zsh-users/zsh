@@ -717,7 +717,7 @@ c.     Set condition to perform completion: ${compl:-unset}
 	   case $key in
 	     g) vared -eh -c -p 'globbing condition> ' glob
 		;;
-	     s) vared -eh -c -p 'substituion condition> ' subst
+	     s) vared -eh -c -p 'substitution condition> ' subst
 		;;
 	     c) vared -eh -c -p 'completion condition> ' compl
 		;;
@@ -768,7 +768,7 @@ __ci_do_completers() {
          _correct
 'Correction:  correct existing word, no completion.'
          _expand
-'Expansion: use globbing and parameter substituion, if possible.'
+'Expansion: use globbing and parameter substitution, if possible.'
 
 	 _ignored
 'Use patterns that were previously ignored if no matches so far.'
@@ -923,7 +923,7 @@ __ci_do_matchers() {
 special way.  Numbers in parentheses show matchers to be tried and the order.
 The same number can be assigned to different matchers, meaning apply at the
 same time.  Omit a sequence number to try normal matching at that point.
-A \`+' in the first line indicates the element is added to preceeding matchers
+A \`+' in the first line indicates the element is added to preceding matchers
 instead of replacing them; toggle this with \`t'.  You don't need to set
 all four, or indeed any matchers --- then the style will not be set.
 
@@ -1702,7 +1702,7 @@ while true; do
   print "\
                *** compinstall: main menu ***
 Note that hitting \`q' in menus does not abort the set of changes from
-lower level menus.  However, qutting at top level will ensure that nothing
+lower level menus.  However, quitting at top level will ensure that nothing
 at all is actually written out.
 
 1.  Completers:  choose completion behaviour for tasks such as
