@@ -571,7 +571,9 @@ bin_ulimit(char *name, char **argv, char *ops, int func)
 # ifdef RLIMIT_MEMLOCK
 	    case RLIMIT_MEMLOCK:
 # endif /* RLIMIT_MEMLOCK */
-# ifdef RLIMIT_VMEM
+/* If RLIMIT_VMEM and RLIMIT_RSS are defined and equal, avoid *
+ * duplicate case statement.  Observed on QNX Neutrino 6.1.0. */
+# if defined(RLIMIT_VMEM) && (!defined(RLIMIT_RSS) || RLIMIT_RSS != RLIMIT_VMEM)
 	    case RLIMIT_VMEM:
 # endif /* RLIMIT_VMEM */
 # ifdef RLIMIT_AIO_MEM
