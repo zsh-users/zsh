@@ -1,7 +1,8 @@
 #compdef make gmake pmake dmake
 
-local prev="$words[CURRENT-1]" file expl tmp is_gnu
+local prev="$words[CURRENT-1]" file expl tmp is_gnu cmdargs useperl
 
+zstyle -t ":completion:${curcontext}:" use-perl && useperl=1
 _pick_variant -r is_gnu gnu=GNU unix -v -f
 
 if [[ "$prev" = -[CI] ]]; then
@@ -25,7 +26,22 @@ else
   if [[ -n "$file" ]] && _tags targets; then
     if [[ $is_gnu = gnu ]] &&
        zstyle -t ":completion:${curcontext}:targets" call-command; then
-      tmp=( $(_call_program targets "$words[1]" -nsp --no-print-directory -f "$file" .PHONY 2> /dev/null | awk '/^[a-zA-Z0-9][^\/\t=]+:/ {print $1}' FS=:) )
+       if [[ -n $useperl ]]; then
+        cmdargs=(perl -F: -ane '/^[a-zA-Z0-9][^\/\t=]+:/ && print "$F[0]\n"')
+       else
+        cmdargs=(awk '/^[a-zA-Z0-9][^\/\t=]+:/ {print $1}' FS=:)
+       fi
+       tmp=( $(_call_program targets "$words[1]" -nsp --no-print-directory -f "$file" .PHONY 2> /dev/null | $cmdargs) )
+    elif [[ -n $useperl ]]; then
+      tmp=(
+      $(perl -ne '@matches = /^(?:([a-zA-Z0-9]+[^\/\t=\s]+)\s*)+:/  and
+	print join(" ", @matches);
+if (/^\.include\s+\<bsd\.port\.(subdir\.|pre\.)?mk>/ ||
+    /^\.include\s+\".*mk\/bsd\.pkg\.(subdir\.)?mk\"/) {
+    print "fetch fetch-list extract patch configure build install reinstall deinstall package describe checkpatch checksum makesum\n";
+    }
+' $file)
+	)
     else
       tmp=(
             $(awk '/^[a-zA-Z0-9][^\/\t=]+:/ {print $1}

@@ -2315,6 +2315,17 @@ example, while completing arguments to the command tt(foo), if this was
 handled by a command function tt(_foo), tt(compctl) would never be tried,
 while if it was handled by tt(_default), tt(compctl) would be tried.
 )
+kindex(use-perl, completion style)
+item(tt(use-perl))(
+Various parts of the function system use awk to extract words from
+files or command output as this universally available.  However, many
+versions of awk have arbitrary limits on the size of input.  If this
+style is set, perl will be used instead.  This is almost always
+preferable if perl is available on your system.
+
+Currently this is only used in completions for `make', but it may be
+extended depending on authorial frustration.
+)
 kindex(users, completion style)
 item(tt(users))(
 This may be set to a list of names that should be completed whenever 
