@@ -82,7 +82,7 @@ if (( long )); then
     # ... and add "same" options
 
     while (( $#sopts )); do
-      lopts=( $lopts ${lopts/$sopts[1]/$sopts[2]} )
+      lopts=( $lopts ${lopts/$~sopts[1]/$sopts[2]} )
       shift 2 sopts
     done
 

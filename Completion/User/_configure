@@ -1,12 +1,9 @@
-#defcomp configure
+#compdef configure
 
-if [[ $PREFIX = *=* ]]; then
-  # Complete filenames after e.g. --prefix=
-  IPREFIX=${PREFIX%%=*}=
-  PREFIX=${PREFIX#*=}
-  complist -f
-else
-  # Generate a list of options from configure --help
-  complist -s '$($COMMAND --help |
-  sed -n -e '\''s/^ *\(--[-a-z0-9]*\)[    =,].*$/\1/p'\'')'
-fi
+_arguments -- -i '(--(disable|enable)-FEATURE* --(with|without)-PACKAGE*)' \
+              -s '((#s)--disable- --enable-
+	           (#s)--enable- --disable-
+		   (#s)--with- --without-
+		   (#s)--without- --with-)' \
+	      '*=(E|)PREFIX*:prefix directory:_files -/' \
+              '*=PROGRAM*:program:_command_names -e'

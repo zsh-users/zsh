@@ -27,9 +27,8 @@ typeset startline='# The following lines were added by compinstall'
 typeset endline='# End of lines added by compinstall'
 typeset ifile line fpath_line
 typeset -A styles
-typeset match mbegin mend matchers warn_unknown warn_old warn_comment
+typeset match mbegin mend warn_unknown warn_old warn_comment
 integer lines_found
-matchers=()
 
 #
 # Check the user's .zshrc, if any.
@@ -48,12 +47,17 @@ __ci_test_ifile() {
 }
 
 local foundold=false
-ifile=${ZDOTDIR:-~}/.zshrc
-if __ci_test_ifile ${ZDOTDIR:-~}/.compinstall; then
-  ifile=${ZDOTDIR:-~}/.compinstall
+if zstyle -s :compinstall filename ifile &&
+  __ci_test_ifile $ifile; then
   foundold=true
-elif __ci_test_ifile $ifile; then
-  foundold=true
+else
+  ifile=${ZDOTDIR:-~}/.zshrc
+  if __ci_test_ifile ${ZDOTDIR:-~}/.compinstall; then
+    ifile=${ZDOTDIR:-~}/.compinstall
+    foundold=true
+  elif __ci_test_ifile $ifile; then
+    foundold=true
+  fi
 fi
 
 local newifile=$ifile
@@ -113,7 +117,8 @@ ${match[3]}"
       warn_comment=1
     elif [[ $line != [[:blank:]]# &&
       $line != [[:blank:]]#'autoload -U compinit' &&
-      $line != [[:blank:]]#compinit ]]; then
+      $line != [[:blank:]]#compinit &&
+      $line != [[:blank:]]#zstyle[[:blank:]]#:compinstall* ]]; then
       warn_unknown="${warn_unknown:+$warn_unknown
 }$line"
     fi
@@ -834,6 +839,16 @@ __ci_toggle_matcher() {
   if [[ ${${(P)1}[$2]} = ' ' ]]; then
     # toggle on
     eval "${1}[$2]=$2"
+    if [[ $1 = n* ]]; then
+      # no matcher turned on, turn off the others
+      c_list[$2]=' '
+      C_list[$2]=' '
+      p_list[$2]=' '
+      s_list[$2]=' '
+    else
+      # something else turned on, turn off no matcher
+      n_list[$2]=' '
+    fi
     return 0
   else
     # toggle off
@@ -859,10 +874,11 @@ __ci_do_matchers() {
   # ?_list say whether the four possible matchers are set for passes 1,
   # 2, 3, 4, in an easy-to-read manner, i.e. the Nth part of the string
   # is either N (on) or space (off).
-  c_list="    "
-  C_list="    "
-  p_list="    "
-  s_list="    "
+  n_list="    "			# null completion, i.e. standard
+  c_list="    "			# case match one way
+  C_list="    "			# case match both ways
+  p_list="    "			# partial word completion
+  s_list="    "			# substring completion
   # $pws_seps gives the separators used for partial-word completion
   # by element of the matcher list; these can be edited separately.
   pw_seps=('._-' '._-' '._-' '._-')
@@ -870,7 +886,8 @@ __ci_do_matchers() {
 
   # See what's in the matcher initially.  If these have been edited,
   # we're in trouble, but that's pretty much true of everything.
-  for (( eltcnt = 1; eltcnt <= 4; eltcnt++ )); do
+  for (( eltcnt = 1; eltcnt <= $#mlist; eltcnt++ )); do
+    [[ -z $mlist[$eltcnt] ]] && n_list[$eltcnt]=$eltcnt
     [[ $mlist[$eltcnt] = *"m:{a-z}={A-Z}"* ]] && c_list[$eltcnt]=$eltcnt
     [[ $mlist[$eltcnt] = *"m:{a-zA-Z}={A-Za-z}"* ]] && C_list[$eltcnt]=$eltcnt
     # For partial word stuff, we use backreferences to find out what
@@ -895,11 +912,13 @@ the string on the command line with a possible match, as listed below.
 A list of different matchers can be given; each is tried until at least
 one possible completion is found.  The numbers given below show what is
 included in each element of the list; everything for 1 is tried at the same
-time, and if necessary everything for 2, etc. If nothing is set for element
-1, it will do ordinary matching, so special matching won't kick until
-element 2.  Elements from 1 to 4 can be set; empty trailing elements will
-be removed, and if nothing is set, the style will not be set.
+time, and if necessary everything for 2, etc.  If no matcher is set
+ordinary completion will be done at that point.  Elements from 1 to 4 can
+be set; empty trailing elements will be removed, and if nothing is set, the
+style will not be set.
 
+n. ($n_list)\
+ No matchers; you may want to try this as the first choice.
 c. ($c_list)\
  Case-insensitive completion (lowercase matches uppercase)
 C. ($C_list)\
@@ -918,7 +937,7 @@ q.        Return without saving.
     read -k key'?--- Hit selection --- '
     print
 
-    if [[ $key = [cCpPsS] ]]; then
+    if [[ $key = [nNcCpPsS] ]]; then
       while true; do
 	read -k key2'?Set/unset for element number (1234)? '
 	print
@@ -928,6 +947,10 @@ q.        Return without saving.
     fi
 
     case $key in
+      [nN]) __ci_toggle_matcher n_list $key2
+         if [[ $n_list[$key2] != ' ' ]]; then
+	 fi
+         ;;
       c) __ci_toggle_matcher c_list $key2
 	 ;;
       C) __ci_toggle_matcher C_list $key2
@@ -984,7 +1007,7 @@ terminators to be matched in this way? (y/n) [n] "
 	elt="${elt:+$elt }l:|=* r:|=*"
       fi
     fi
-    [[ -n $elt ]] && lastnz=$eltcnt
+    [[ -n $elt || $n_list[$eltcnt] != ' ' ]] && lastnz=$eltcnt
     mlist[$eltcnt]=$elt
   done
 
@@ -1657,6 +1680,13 @@ zstyle ${(qq)stylevals[1]} $style $stylevals[2]"
   done
 fi
 
+if ! read -q key"?Save new settings to $ifile? "; then
+   print "Enter a different filename (~ will be expanded), or return to abort:"
+   ifile=
+   vared -ch -p 'file> ' ifile
+   ifile=${~ifile}
+fi
+
 local tmpout=${TMPPREFIX:-/tmp/zsh}compinstall$$
 #
 # Assemble the complete set of lines to
@@ -1668,17 +1698,24 @@ compinit"
 
   [[ -n $fpath_line ]] && print -r "$fpath_line"
 
-  print -r "$output
-$endline" } >$tmpout
-
-if ! read -q key"?Save new settings to $ifile? "; then
-   print "Enter a different filename (~ will be expanded), or return to abort:"
-   ifile=
-   vared -ch -p 'file> ' ifile
-   ifile=${~ifile}
-fi
+  print -r "$output"
+  if [[ -n $ifile ]]; then
+    line="zstyle :compinstall filename ${(qq)ifile}"
+    print -r "$line"
+    eval "$line"
+  fi
+  print -r "$endline"
+} >$tmpout
 
 if [[ -n $ifile ]]; then
+  if [[ $ifile != *(zshrc|zlogin|zshenv) ]]; then 
+    print "\
+If you want this file to be run automatically, you should add
+  . $ifile
+to your .zshrc.  compinstall will remember the name of this file for
+future use."
+    __ci_newline || return 1
+  fi
   #
   # Now use sed to update the file.
   #

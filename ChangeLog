@@ -37,6 +37,20 @@
 	* 11216: Doc/Zsh/builtins.yo, Src/loop.c: small doc fix and AIX
 	dependency fix
 
+2000-05-05  Peter Stephenson  <pws@cambridgesiliconradio.com>
+
+	* 11214: Completion/Core/compinstall: remember file in
+	filename style for :compinstall context; make null matchers
+	more obvious.
+
+	* 11200: Src/subst.c, Doc/Zsh/expn.yo: backout change that
+	${foo/$subst/repl} would allow # and % anchors inside $subst.
+
+	* Andrej Borsenkow: 11194: Completion/Base/_arguments,
+	Completion/User/_configure: use globsubst for substitutions
+	via -s option to _arguments and hence use (#s) for anchor
+	in _substitutions from _configure.
+
 2000-05-05  Tanaka Akira  <akr@zsh.org>
 
 	* 11213: Completion/User/_cvs: don't complete files which is

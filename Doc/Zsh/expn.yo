@@ -456,13 +456,21 @@ item(tt(${)var(name)tt(//)var(pattern)tt(/)var(repl)tt(}))(
 Replace the longest possible match of var(pattern) in the expansion of
 parameter var(name) by string var(repl).  The first form
 replaces just the first occurrence, the second form all occurrences.
+Both var(pattern) and var(repl) are subject to double-quoted substitution,
+so that expressions like tt(${name/$opat/$npat}) will work, but note the
+usual rule that pattern characters in tt($opat) are not treated specially
+unless either the option tt(GLOB_SUBST) is set, or tt($opat) is instead
+substituted as tt(${~opat}).
+
 The var(pattern) may begin with a `tt(#)', in which case the
 var(pattern) must match at the start of the string, or `tt(%)', in
 which case it must match at the end of the string.  The var(repl) may
 be an empty string, in which case the final `tt(/)' may also be omitted.
 To quote the final `tt(/)' in other cases it should be preceded by two
 backslashes (i.e., a quoted backslash); this is not necessary if the
-`tt(/)' occurs inside a substituted parameter.
+`tt(/)' occurs inside a substituted parameter.  Note also that the `tt(#)'
+and `tt(%)' are not active if they occur inside a substituted parameter,
+even at the start.
 
 The first `tt(/)' may be preceded by a `tt(:)', in which case the match
 will only succeed if it matches the entire word.  Note also the

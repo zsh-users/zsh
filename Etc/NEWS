@@ -20,7 +20,7 @@ Further enhancements to new completion system:
    behave in the usual way   
  - $fpath now set up to use installed functions by default; functions
    can be loaded just by `autoload -U compinit; compinit'
- - Much improved handling of nested quoting
+ - Much improved handling of nested quoting and nested braces
  - New LIST_PACKED and LIST_ROWS_FIRST completion options and corresponding
    styles
  - compctl library separated out (frozen but still supported)

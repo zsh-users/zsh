@@ -1466,6 +1466,13 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int ssub)
 		char t = s[-1];
 
 		singsub(&s);
+#if 0
+		/*
+		 * This allows # and % to be at the start of
+		 * a parameter in the substitution, which is
+		 * a bit nasty, and can be done (although
+		 * less efficiently) with anchors.
+		 */
 		if (t == '/' && (flags & SUB_SUBSTR)) {
 		    if ((c = *s) == '#' || c == '%') {
 			flags &= ~SUB_SUBSTR;
@@ -1476,6 +1483,7 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int ssub)
 			s++;
 		    }
 		}
+#endif
 	    }
 
 	    if (!vunset && isarr) {
