@@ -20,7 +20,7 @@
 _perl_modules () {
   local opts
   zparseopts -D -a opts S: q
-  
+
   # Set a sensible default caching policy.  This has to be done inside
   # this function otherwise we wouldn't know the context for the style.
   local update_policy
@@ -29,54 +29,66 @@ _perl_modules () {
     zstyle ":completion:${curcontext}:" cache-policy \
       _perl_modules_caching_policy
   fi
-  
-  if ( [[ ${+_perl_modules} -eq 0 ]] || _cache_invalid perl_modules ) &&
-     ! _retrieve_cache perl_modules;
+
+  local perl=${words[0]%doc} perl_modules
+  if whence $perl >/dev/null; then
+    perl_modules=_${${perl//[^[:alnum:]]/_}#_}_modules
+  elif (( ${+commands[perl]} )); then
+    perl=perl
+    perl_modules=_perl_modules
+  else
+    perl=
+    perl_modules=_unknown_perl_modules
+  fi
+
+  if ( [[ ${(P)+perl_modules} -eq 0 ]] || _cache_invalid $perl_modules ) &&
+     ! _retrieve_cache ${perl_modules#_};
   then
     if zstyle -t ":completion:${curcontext}:modules" try-to-use-pminst &&
        (( ${+commands[pminst]} ));
     then
-      _perl_modules=( $(pminst) )
+      set -A $perl_modules $(pminst)
     else
       local inc libdir new_pms
-      if (( ${+commands[perl]} )); then
-        inc=( $( perl -e 'print "@INC"' ) )
+
+      if [[ ${+perl} -eq 1 ]]; then
+        inc=( $( $perl -e 'print "@INC"' ) )
       else
         # If perl isn't there, one wonders why the user's trying to
         # complete Perl modules.  Maybe her $path is wrong?
         _message "Didn't find perl on \$PATH; guessing @INC ..."
-  
+
         inc=( /usr/lib/perl5{,/{site_perl/,}<5->.([0-9]##)}(N) 
               ${(s.:.)PERL5LIB} )
       fi
-  
-      typeset -agU _perl_modules  # _perl_modules is global, no duplicates
-      _perl_modules=( )
-  
+
+      typeset -agU $perl_modules  # $perl_modules is global, no duplicates
+      set -A $perl_modules
+
       for libdir in $inc; do
         # Ignore cwd - could be too expensive e.g. if we're near /
         if [[ $libdir == '.' ]]; then break; fi
-  
+
         # Find all modules
         if [[ -d $libdir && -x $libdir ]]; then
-        cd $libdir
+        builtin cd $libdir
         new_pms=( {[A-Z]*/***/,}*.pm~*blib* )
-        cd $OLDPWD
+        builtin cd $OLDPWD
         fi
-  
+
         # Convert to Perl nomenclature
         new_pms=( ${new_pms:r:fs#/#::#} )
-  
-        _perl_modules=( $new_pms $_perl_modules )
+
+        set -A $perl_modules $new_pms ${(P)perl_modules}
       done
     fi
-  
-    _store_cache perl_modules _perl_modules
+
+    _store_cache ${perl_modules#_} $perl_modules
   fi
-  
+
   local expl
-  
-  _wanted modules expl 'Perl modules' compadd "$opts[@]" -a _perl_modules
+
+  _wanted modules expl 'Perl modules' compadd "$opts[@]" -a $perl_modules
 }
 
 _perl_modules_caching_policy () {

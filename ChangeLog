@@ -1,3 +1,17 @@
+2000-11-14  Bart Schaefer  <schaefer@zsh.org>
+
+	* 13165 plus unposted: Completion/User/_perl_modules: `builtin cd'
+	is better than chdir; make sure the variable name used for the cache
+	has a leading underscore, but strip that off to get the name under
+	which the cache is stored and retrieved; cache separately for each
+	command basename (e.g., perl5.00405 v. perl5.00503), not just each
+	full path name.
+	
+	* Paul Johnson: 13164: Completion/User/_perl_modules: If a full
+	path was given for the command after which perl modules are being
+	completed, look up and cache the modules under the full name; use
+	chdir instead of cd in case of a function wrapper for cd.
+
 2000-11-14  Sven Wischnowsky  <wischnow@zsh.org>
 
 	* 13163: Src/Modules/zpty.c: don't be sure that read-ahead doesn't
