@@ -1713,9 +1713,8 @@ For example:
 example(zstyle ':completion:*:complete:-command-:*' tag-order \ 
     'commands functions')
 
-specifies that completion in command position after tt(gunzip) should
-offer only completions for external commands and shell functions
-immediately.
+specifies that completion in command position should offer only
+completions for external commands and shell functions immediately.
 
 In addition to tag names, each string in the value may take one of the
 following forms:
@@ -2908,7 +2907,7 @@ Finally, the var(opt-spec) may contain a explanation string. This is
 given in brackets at the end, as in `tt(-q[query operation])'. The
 tt(verbose) style is used to decide if these
 explanation strings should be printed when options are listed. If no
-explanation string is given but the tt(auto-describe) style is
+explanation string is given but the tt(auto-description) style is
 set and only one argument is described for this var(opt-spec), the
 option will be described by the value of the style with any appearance
 of the sequence `tt(%d)' in it replaced by the description for the

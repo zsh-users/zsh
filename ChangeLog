@@ -1,3 +1,7 @@
+2000-05-02  Sven Wischnowsky  <wischnow@informatik.hu-berlin.de>
+
+	* 11060: Doc/Zsh/compsys.yo: two more doc fixes
+	
 2000-05-02  Peter Stephenson  <pws@cambridgesiliconradio.com>
 
 	* 11057: Src/builtin.c:  getopts for options with arguments
