@@ -57,12 +57,17 @@
 # will appear in <whitespace-after-cursor> if it is whitespace, else in
 # <word-after-cursor>.  This style is mostly useful for forcing
 # transposition to ignore the current character.
-
+#
+# The values of the styles can be overridden by options to the function:
+#  -w <word-style>
+#  -s <skip-chars>
+#  -c <word-class>
+#  -C <word-chars>
 
 emulate -L zsh
 setopt extendedglob
 
-local wordstyle spacepat wordpat1 wordpat2 opt charskip
+local wordstyle spacepat wordpat1 wordpat2 opt charskip wordchars wordclass
 local match mbegin mend pat1 pat2 word1 word2 ws1 ws2 ws3 skip
 local MATCH MBEGIN MEND
 
@@ -70,8 +75,32 @@ if [[ -z $curcontext ]]; then
     local curcontext=:zle:match-words-by-style
 fi
 
-zstyle -s $curcontext word-style wordstyle
-zstyle -s $curcontext skip-chars skip
+while getopts "w:s:c:C:" opt; do
+  case $opt in
+    (w)
+    wordstyle=$OPTARG
+    ;;
+
+    (s)
+    skip=$OPTARG
+    ;;
+
+    (c)
+    wordclass=$OPTARG
+    ;;
+
+    (C)
+    wordchars=$OPTARG
+    ;;
+
+    (*)
+    return 1
+    ;;
+  esac
+done
+
+[[ -z $wordstyle ]] && zstyle -s $curcontext word-style wordstyle
+[[ -z $skip ]] && zstyle -s $curcontext skip-chars skip
 [[ -z $skip ]] && skip=0
 
 case $wordstyle in
@@ -107,20 +136,24 @@ case $wordstyle in
 	   ;;
   (*) local wc
       # See if there is a character class.
-      if zstyle -s $curcontext word-class wc; then
-	  # Treat as a character class: do minimal quoting.
-	  wc=${wc//(#m)[\'\"\`\$\(\)\^]/\\$MATCH}
+      wc=$wordclass
+      if [[ -n $wc ]] || zstyle -s $curcontext word-class wc; then
+	# Treat as a character class: do minimal quoting.
+	wc=${wc//(#m)[\'\"\`\$\(\)\^]/\\$MATCH}
       else
-          # See if there is a local version of $WORDCHARS.
+	# See if there is a local version of $WORDCHARS.
+	wc=$wordchars
+	if [[ -z $wc ]]; then
 	  zstyle -s $curcontext word-chars wc ||
 	  wc=$WORDCHARS
-	  if [[ $wc = (#b)(?*)-(*) ]]; then
-              # We need to bring any `-' to the front to avoid confusing
-              # character classes... we get away with `]' since in zsh
-              # this isn't a pattern character if it's quoted.
-	      wc=-$match[1]$match[2]
-	  fi
-	  wc="${(q)wc}"
+	fi
+	if [[ $wc = (#b)(?*)-(*) ]]; then
+	  # We need to bring any `-' to the front to avoid confusing
+	  # character classes... we get away with `]' since in zsh
+          # this isn't a pattern character if it's quoted.
+	  wc=-$match[1]$match[2]
+	fi
+	wc="${(q)wc}"
       fi
       # Quote $wc where necessary, because we don't want those
       # characters to be considered as pattern characters later on.

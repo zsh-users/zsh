@@ -513,6 +513,18 @@ tt(skip-chars) style, (5) the word at or following the cursor (6) any
 non-word characters following that word (7) the remainder of the line.  Any
 of the elements may be an empty string; the calling function should test
 for this to decide whether it can perform its function.
+
+It is possible to pass options with arguments to tt(match-words-by-style)
+to override the use of styles.  The options are:
+startsitem()
+sitem(tt(-w))(var(word-style))
+sitem(tt(-s))(var(skip-chars))
+sitem(tt(-c))(var(word-class))
+sitem(tt(-C))(var(word-chars))
+endsitem()
+
+For example, tt(match-words-by-style -w shell -c 0) may be used to
+extract the command argument around the cursor.
 )
 tindex(delete-whole-word-match)
 item(tt(delete-whole-word-match))(
