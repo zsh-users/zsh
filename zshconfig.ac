@@ -1377,10 +1377,9 @@ zsh_cv_sys_killesrch,
 #include <errno.h>
 main()
 {
-    int pid, ret;
-    pid=getpid() + 10000;
-    ret=kill(pid, 0);
-    exit(ret<0 && errno!=ESRCH);
+    int pid = (getpid() + 10000) & 0xffffff;
+    while (pid && (kill(pid, 0) == 0 || errno != ESRCH)) pid >>= 1;
+    exit(errno!=ESRCH);
 }
 ],
   zsh_cv_sys_killesrch=yes,

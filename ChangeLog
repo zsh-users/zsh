@@ -1,3 +1,7 @@
+2001-06-08  Bart Schaefer  <schaefer@zsh.org>
+
+	* 14796: zshconfig.ac: More reliable BROKEN_KILL_ESRCH test.
+
 2001-06-07  Bart Schaefer  <schaefer@zsh.org>
 
 	* 14792: Test/comptest: Don't import the current terminal type for
