@@ -14,6 +14,8 @@ fi
 
 _lastdescr=( "$_lastdescr[@]" "$3" )
 
+_setup "$1"
+
 _style -s descriptions format format
 _style -s "$1" group-name gname && [[ -z "$gname" ]] && gname="$1"
 

@@ -39,6 +39,10 @@ elif [[ "$PREFIX" != */* && "$PREFIX[1]" = '~' ]]; then
   compstate[context]=tilde
 fi
 
+# Initial setup.
+
+_setup default
+
 # Get the names of the completers to use in the positional parameters.
 
 if (( ! $# )); then

@@ -27,19 +27,31 @@ esac
 
 while _tags; do
   if _requested all-files; then
-    (( $#group )) && group[2]=all-files
+    if (( $#group )); then
+      group[2]=all-files
+      _setup all-files
+    fi
     _path_files "$opts[@]" -f
     return
   elif _requested directories; then
     if _requested globbed-files; then
-      (( $#group )) && group[2]=globbed-files
+      if (( $#group )); then
+        group[2]=globbed-files
+	_setup globbed-files
+      fi
       _path_files "$opts[@]" -/g "$type" && return 0
     else
-      (( $#group )) && group[2]=directories
+      if (( $#group )); then
+        group[2]=directories
+	_setup directories
+      fi
       _path_files "$opts[@]" -/ && return 0
     fi
   elif _requested globbed-files; then
-    (( $#group )) && group[2]=globbed-files
+    if (( $#group )); then
+      group[2]=globbed-files
+      _setup globbed-files
+    fi
     _path_files "$opts[@]" -g "$type" && return 0
   fi
 done

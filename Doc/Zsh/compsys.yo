@@ -964,6 +964,27 @@ item(tt(list-arguments))(
 Like the tt(arguments) style, but used when calling the tt(ps) command 
 to generate the list to display.
 )
+item(tt(list-colors))(
+If the tt(complist) module is used, this style can be used to set
+color specifications as with the tt(ZLS_COLORS) and tt(ZLS_COLOURS)
+parameters (see
+ifzman(the section `The complist Module' in zmanref(zshmodules))\
+ifnzman(noderef(The complist Module))\
+).
+
+If this style is set for the tt(default) tag, the strings in the value 
+are taken as specifications that are to be used everywhere. If it is
+set for other tags, the specifications are used only for matches of
+the type described by the tag.
+
+To be able to share the same specifications one has set up for the GNU
+version of the tt(ls) command one can use:
+
+example(compstyle '*:default' list-colors ${(s.:.)LS_COLORS})
+
+And to get the default colors (which are the same as for the GNU
+tt(ls) command) one should set the style to an empty value.
+)
 item(tt(local))(
 This style is used by completion functions which generate URLs as
 possible matches to add suitable matches when a URL points to a

@@ -118,6 +118,13 @@ The default values are ISO 6429 (ANSI) compliant and can be used on
 vt100 compatible terminals such as tt(xterm)s. On monochrome terminals
 the default values will have no visual effect.
 
+If the shell function based completion system is used, these
+parameters should not be set directly because the system controls them 
+itself. Instead, the tt(list-colors) style should be used (see
+ifzman(the section `Completion System Configuration' in zmanref(zshcompsys))\
+ifnzman(noderef(Completion System Configuration))\
+).
+
 subsect(Menu selection)
 cindex(completion, selecting by cursor)
 vindex(SELECTMIN)

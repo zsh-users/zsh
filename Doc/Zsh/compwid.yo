@@ -372,7 +372,7 @@ sect(Builtin Commands)
 startitem()
 findex(compadd)
 cindex(completion widgets, adding specified matches)
-xitem(tt(compadd) [ tt(-qQfenUaml12) ] [ tt(-F) var(array) ])
+xitem(tt(compadd) [ tt(-qQfenUal12) ] [ tt(-F) var(array) ])
 xitem([ tt(-P) var(prefix) ] [ tt(-S) var(suffix) ])
 xitem([ tt(-p) var(hidden-prefix) ] [ tt(-s) var(hidden-suffix) ])
 xitem([ tt(-i) var(ignored-prefix) ] [ tt(-I) var(ignored-suffix) ])
@@ -449,7 +449,7 @@ ignored.
 )
 item(tt(-l))(
 This option only has an effect if used together with the tt(-d)
-options. If it is given, the display strings are listed one per line,
+option. If it is given, the display strings are listed one per line,
 not arrayed in columns.
 )
 item(tt(-J) var(name))(

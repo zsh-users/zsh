@@ -2436,7 +2436,7 @@ bin_compstyles(char *nam, char **args, char *ops, int func)
 	return 1;
     }
     switch (args[0][1]) {
-    case 'a': min = 3; max = -1; break;
+    case 'a': min = 2; max = -1; break;
     case 'd': min = 0; max =  2; break;
     case 'S': min = 3; max =  3; break;
     case 'A': min = 3; max =  3; break;
