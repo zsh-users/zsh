@@ -13,6 +13,7 @@ link='if test "x$ac_cv_func_tgetent" = xyes; then
 load=yes
 
 autobins="echotc"
+autoparams="termcap"
 
 objects="termcap.o"
 

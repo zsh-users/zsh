@@ -1,6 +1,11 @@
+2001-04-20  Clint Adams  <schizo@debian.org>
+
+	* 14053: Src/Modules/termcap.c, Src/Modules/termcap.mdd:
+	add ${termcap} special parameter in the style of ${terminfo}.
+
 2001-04-19  Bart Schaefer  <schaefer@zsh.org>
 
-	* 14008, 1405x: Src/lex.c, Src/math.c, Src/params.c,
+	* 14008, 14051: Src/lex.c, Src/math.c, Src/params.c,
 	Test/D06subscript.ztst: Improve parsing of subscripts so that
 	many forms that failed before, work now, particularly for assoc
 	array keys; create a test suite.
