@@ -1,6 +1,6 @@
 #autoload
 
-local opts tmp glob pat pats expl tag i def descr end ign ret=1 match
+local opts tmp glob pat pats expl tag i def descr end ign ret=1 match tried
 
 zparseopts -a opts \
     '/=tmp' 'f=tmp' 'g+:-=tmp' q n 1 2 P: S: r: R: W: X+: M+: F: J+: V+:
@@ -26,7 +26,8 @@ fi
 if zstyle -a ":completion:${curcontext}:" file-patterns tmp; then
   [[ "$type" = */* ]] && glob="$glob,*(-/)"
   pats=()
-  for i in ${tmp//%p/${${glob:-\*}//:/\\:} }; do
+
+  for i in ${tmp//%p/${${glob:-\*}//:/\\:}}; do
     if [[ $i = *[^\\]:* ]]; then
       pats=( "$pats[@]" " $i " )
     else
@@ -48,12 +49,17 @@ else
   fi
 fi
 
+tried=()
 for def in "$pats[@]"; do
   eval "def=( ${${def:s/\\:/\\\\\\\\\\\\:}//(#b)([][()|*?^#~<>])/\\${match[1]}} )"
   for sdef in "$def[@]"; do
 
     tag="${${sdef#*[^\\]:}%%:*}"
     pat="${${${sdef%%:${tag}*}//\\:/:}//,/ }"
+
+    (( $tried[(I)${(q)pat}] )) && continue
+
+    tried=( "$tried[@]" "$pat" )
 
     if [[ "$sdef" = *:${tag}:* ]]; then
       descr="${(Q)sdef#*:${tag}:}"
@@ -75,6 +81,7 @@ for def in "$pats[@]"; do
       done
       (( ret )) || break
     done
+    [[ "$pat" = '*' ]] && return ret
   done
   (( ret )) || return 0
 done

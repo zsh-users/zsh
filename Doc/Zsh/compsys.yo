@@ -1033,6 +1033,10 @@ achieve this, one could do:
 example(zstyle ':completion:*' file-patterns \ 
     '%p:globbed-files *(-/):directories' '*:all-files')
 
+This works even for contexts in which all files would be completed,
+because tt(_files) will not try a pattern more than once and it stops
+when the pattern `tt(*)' was tried.
+
 Note also that during the execution of completion functions, the
 tt(EXTENDED_GLOB) option is in effect, so the characters `tt(#)',
 `tt(~)' and `tt(^)' have special meanings in the patterns.
