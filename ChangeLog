@@ -1,5 +1,8 @@
 2000-06-28  Sven Wischnowsky  <wischnow@zsh.org>
 
+	* 12099: Completion/Core/_oldlist: make _oldlist not use the dummy
+ 	match added for the warning
+	
 	* 12093: Src/Zle/compcore.c, Src/Zle/complist.c, Src/Zle/compresult.c:
  	make a-a-i-n-h in menu selection work with one match; better undo
  	behaviour for menu selection

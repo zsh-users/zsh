@@ -1,6 +1,6 @@
 #autoload
 
-[[ _matcher_num -gt 1 ]] && return 1
+[[ _matcher_num -gt 1 || $_lastcomp[nmatches] -eq 0 ]] && return 1
 
 local list
 
