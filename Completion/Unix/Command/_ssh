@@ -1,4 +1,4 @@
-#compdef ssh slogin=ssh scp ssh-add ssh-agent ssh-keygen
+#compdef ssh slogin=ssh scp ssh-add ssh-agent ssh-keygen sftp
 
 _remote_files () {
   # There should be coloring based on all the different ls -F classifiers.
@@ -28,216 +28,62 @@ _remote_files () {
 }
 
 _ssh () {
-  local curcontext="$curcontext" state lstate line ret=1 expl args tmp
+  local curcontext="$curcontext" state line expl common tmp ret=1
   typeset -A opt_args
 
-  args=()
-
-  # ssh-opt is a pseudo-command used to complete ssh options for `scp -o'.
+  common=(
+    '-c+[select encryption cipher]:encryption cipher:(idea des 3des blowfish arcfour tss none)'
+    '-C[compress data]'
+    '-F+[specify alternate config file]:config file:_files'
+    '-i+[select identity file]:SSH identity file:_files'
+    '*-o+[specify extra options]:option string:->option'
+    '(-2)-1[forces ssh to try protocol version 1 only]'
+    '(-1)-2[forces ssh to try protocol version 2 only]'
+    '(-6)-4[forces ssh to use IPv4 addresses only]'
+    '(-4)-6[forces ssh to use IPv6 addresses only]'
+  )
 
   case "$service" in
   ssh)
-    args=(
-      ':remote host name:->userhost'
-      '(-):command: _command_names -e'
-      '*::args:->command'
-    )
-    ;&
-  ssh-opt)
     _arguments -C -s \
-      '-a[disable forwarding of authentication agent connection]' \
-      '-A[enables forwarding of the authentication agent connection]' \
-      '-c[select encryption cipher]:encryption cipher:(idea des 3des blowfish arcfour tss none)' \
-      '-e[set escape character]:escape character (or `none'"'"'):' \
+      '(-A)-a[disable forwarding of authentication agent connection]' \
+      '(-a)-A[enables forwarding of the authentication agent connection]' \
+      '(-P)-b+[specify interface to transmit on]:bind address' \
+      '-D+[specify a dynamic port forwarding]:port' \
+      '-e+[set escape character]:escape character (or `none'"'"'):' \
       '(-n)-f[go to background]' \
-      '-g[allows remote hosts to connect to local forwarded ports]'\
-      '-i[select identity file]:SSH identity file:_files' \
+      '-g[allow remote hosts to connect to local forwarded ports]' \
+      '-I+[specify smartcard device]:device:_files' \
       '-k[disable forwarding of kerberos tickets]' \
-      '-l[specify login name]:login name:_ssh_users' \
+      '-l+[specify login name]:login name:_ssh_users' \
+      '(-1)-m+[specify mac algorithms]:mac spec' \
       '-n[redirect stdin from /dev/null]' \
-      '-N[do not execute a remote command. (protocol version 2 only)]'\
-      '*-o[specify extra options]:option string:->option' \
-      '-p[specify port on remote host]:port number on remote host:_ports' \
+      '(-1)-N[do not execute a remote command. (protocol version 2 only)]' \
+      '-p+[specify port on remote host]:port number on remote host' \
       '-P[use non privileged port]' \
-      '-q[quiet operation]' \
-      '-t[force pseudo-tty allocation]' \
-      '-T[disable pseudo-tty allocation (protocol version 2 only)]'\
-      '-v[verbose mode]' \
+      '(-v)*-q[quiet operation]' \
+      '(-1)-s[invoke subsystem]' \
+      '(-T)-t[force pseudo-tty allocation]' \
+      '(-1 -t)-T[disable pseudo-tty allocation (protocol version 2 only)]' \
+      '(-q)*-v[verbose mode]' \
       '-V[show version number]' \
-      '-x[disable X11 forwarding]' \
-      '-X[enable X11 forwarding]' \
-      '-C[compress all data]' \
+      '(-X)-x[disable X11 forwarding]' \
+      '(-x)-X[enable X11 forwarding]' \
       '-L[specify local port forwarding]:local port forwarding:->forward' \
       '-R[specify remote port forwarding]:remote port forwarding:->forward' \
-      '-1[forces ssh to try protocol version 1 only]'\
-      '-2[forces ssh to try protocol version 2 only]'\
-      '-4[forces ssh to use IPv4 addresses only]' \
-      '-6[forces ssh to use IPv6 addresses only]' \
-      "$args[@]" && ret=0
-
-    while [[ -n "$state" ]]; do
-      lstate="$state"
-      state=''
-
-      case "$lstate" in
-      option)
-        if compset -P '*[= ]'; then
-          case "$IPREFIX" in
-          *(#i)(batchmode|compression|fallbacktorsh|forward(agent|x11)|keepalive|passwordauthentication|rhosts(|rsa)authentication|rsaauthentication|usersh|kerberos(authetication|tgtparsing)|useprivileged)*)
-	    _wanted values expl 'truth value' compadd yes no && ret=0
-            ;;
-          *(#i)ciphers*)
-            _values -s , 'encryption cipher' \
-		'aes128-cbc' \
-		'3des-cbc' \
-		'blowfish-cbc' \
-		'cast128-cbc' \
-		'arcfour' \
-		'aes192-cbc' \
-		'aes256-cbc' \
-		'rijndael128-cbc' \
-		'rijndael192-cbc' \
-		'rijndael256-cbc' \
-		'rijndael-cbc@lysator.liu.se' && ret=0
-            ;;
-          *(#i)cipher*)
-	    _wanted values expl 'encryption cipher' \
-                compadd idea des 3des blowfish arcfour tss none && ret=0
-            ;;
-          *(#i)globalknownhostsfile*)
-            _description files expl 'global file with known hosts'
-            _files "$expl[@]" && ret=0
-            ;;
-          *(#i)hostname*)
-	    _wanted hosts expl 'real host name to log into' _ssh_hosts && ret=0
-            ;;
-          *(#i)identityfile*)
-            _description files expl 'SSH identity file'
-            _files "$expl[@]" && ret=0
-            ;;
-          *(#i)(local|remote)forward*)
-            state=forward
-            ;;
-          *(#i)protocol*)
-            _values -s , 'protocol version' \
-		'1' \
-		'2' && ret=0
-	    ;;
-          *(#i)proxycommand*)
-            compset -q
-            shift 1 words
-            (( CURRENT-- ))
-            _normal && ret=0
-            ;;
-          *(#i)stricthostkeychecking*)
-            _wanted values expl 'checking type' compadd yes no ask && ret=0
-            ;;
-          *(#i)userknownhostsfile*)
-            _description files expl 'user file with known hosts'
-            _files "$expl[@]" && ret=0
-            ;;
-          *(#i)user*)
-	    _wanted users expl 'user to log in as' _ssh_users && ret=0
-            ;;
-          *(#i)xauthlocation*)
-            _description files expl 'xauth program'
-            _files "$expl[@]" -g '*(-*)' && ret=0
-            ;;
-          esac
-        else
-          _wanted values expl 'configure file option' \
-              compadd -M 'm:{a-z}={A-Z}' -S '=' - \
-                  BatchMode ClearAllForwardings Cipher Ciphers Compression \
-                  CompressionLevel Host ConnectionAttempts EscapeChar \
-                  FallBackToRsh ForwardAgent ForwardX11 \
-                  GlobalKnownHostsFile HostName IdentityFile KeepAlive \
-                  KerberosAuthentication KerberosTgtPassing LocalForward \
-                  NumberOfPasswordPrompts PasswordAuthentication Port \
-                  ProxyCommand RemoteForward RhostsAuthentication \
-                  RhostsRSAAuthentication RSAAuthentication \
-                  StrictHostKeyChecking TISAuthentication \
-                  UsePrivilegedPort Protocol User UserKnownHostsFile UseRsh \
-                  XAuthLocation && ret=0
-        fi
-        ;;
-      forward)
-        if compset -P 1 '*:'; then
-          if compset -P '*:'; then
-            _message 'port number'
-          else
-	    _wanted hosts expl host _ssh_hosts -qS:
-          fi
-        else
-          _message 'listen-port number'
-        fi
-        return
-        ;;
-      command)
-        shift 1 words
-        (( CURRENT-- ))
-        _normal
-        return
-        ;;
-      userhost)
-        if compset -P '*@'; then
-	  _wanted hosts expl 'remote host name' _ssh_hosts && ret=0
-        elif compset -S '@*'; then
-          _wanted users expl 'login name' _ssh_users -S '' && ret=0
-        else
-          if (( $+opt_args[-l] )); then
-	    tmp=()
-	  else
-	    tmp=( 'users:login name:_ssh_users -qS@' )
-	  fi
-	  _alternative \
-	      'hosts:remote host name:_ssh_hosts' \
-	      "$tmp[@]" && ret=0
-        fi
-        ;;
-      esac
-
-      break;
-    done
-
-    return ret
+      ':remote host name:->userhost' \
+      '*::args:->command' "$common[@]" && ret=0
     ;;
   scp)
     _arguments -C -s \
-      '-c[select encryption cipher]:encryption cipher:(idea des 3des blowfish arcfour tss none)' \
-      '-i[select identity file]:SSH identity file:_files' \
       '-p[preserve modification times]' \
       '-r[recursively copy directories]' \
       '-v[verbose mode]' \
       '-B[batch mode]' \
       '-q[disables the progress meter]' \
-      '-C[compress data]' \
-      '-P[specify port on remote host]:port number on remote host:' \
-      '-4[forces scp to use IPv4 addresses only]' \
-      '-6[forces scp to use IPv6 addresses only]' \
-      '-S[specify path to ssh]:path to ssh:_files -g \*\(-\*\)' \
-      '-o[give SSH options]:options:->options' \
-      '*:file:->file' && ret=0
-
-    if [[ "$state" = options ]]; then
-      compset -q
-      words=(ssh-opt "$words[@]" )
-      (( CURRENT++ ))
-      service=ssh-opt
-      _ssh
-      return
-    elif [[ -n "$state" ]]; then
-      if compset -P '*:'; then
-        _remote_files && ret=0
-      elif compset -P '*@'; then
-        _wanted hosts expl host _ssh_hosts -S: && ret=0
-      else
-        _alternative \
-	    'files:: _files' \
-	    'hosts:host:_ssh_hosts -S:' \
-	    'users:user:_ssh_users -qS@' && ret=0
-      fi
-    fi
-    return ret
+      '-P+[specify port on remote host]:port number on remote host:' \
+      '-S+[specify path to ssh]:path to ssh:_files -g \*\(-\*\)' \
+      '*:file:->file' "$common[@]" && ret=0
     ;;
   ssh-add)
     _arguments -s \
@@ -251,9 +97,10 @@ _ssh () {
     ;;
   ssh-agent)
     _arguments -s \
-      '(:)-k[kill agent automatically]' \
-      '(:)-s[force sh-style shell]' \
-      '(:)-c[force csh-style shell]' \
+      '(*)-k[kill agent automatically]' \
+      '(-c)-s[force sh-style shell]' \
+      '(-s)-c[force csh-style shell]' \
+      '(-k)-d[debug mode]' \
       '*::command: _normal'
     return
     ;;
@@ -275,7 +122,169 @@ _ssh () {
       '(-b -N -C -p -c)-u[change key cipher to default]'
     return
     ;;
+  sftp)
+    _arguments -C -s \
+      '-C[compress data]' \
+      '-F+[specify alternate config file]:config file:_files' \
+      '(-1)-s[invoke subsystem]' \
+      '-S+[specify program]:program:_command_names -e' \
+      '-b+[specify batch file to read]:batch file:_files' \
+      '*-v[verbose mode]' \
+      '-1[forces ssh to try protocol version 1 only]' \
+      '*-o+[specify extra options]:option string:->option' \
+      '1:file:->rfile' '*:file:->file' && ret=0
+    ;;
   esac
+
+  while [[ -n "$state" ]]; do
+    lstate="$state"
+    state=''
+
+    case "$lstate" in
+    option)
+      if compset -P '*[= ]'; then
+        case "$IPREFIX" in
+        *(#i)(afstokenpassing|batchmode|compression|fallbacktorsh|forward(agent|x11)|keepalive|passwordauthentication|rhosts(|rsa)authentication|rsaauthentication|usersh|kerberos(authetication|tgtparsing)|useprivileged)*)
+	  _wanted values expl 'truth value' compadd yes no && ret=0
+          ;;
+        *(#i)ciphers*)
+          _values -s , 'encryption cipher' \
+	      'aes128-cbc' \
+	      '3des-cbc' \
+	      'blowfish-cbc' \
+	      'cast128-cbc' \
+	      'arcfour' \
+	      'aes192-cbc' \
+	      'aes256-cbc' \
+	      'rijndael128-cbc' \
+	      'rijndael192-cbc' \
+	      'rijndael256-cbc' \
+	      'rijndael-cbc@lysator.liu.se' && ret=0
+          ;;
+        *(#i)cipher*)
+	  _wanted values expl 'encryption cipher' \
+              compadd idea des 3des blowfish arcfour tss none && ret=0
+          ;;
+        *(#i)globalknownhostsfile*)
+          _description files expl 'global file with known hosts'
+          _files "$expl[@]" && ret=0
+          ;;
+        *(#i)hostname*)
+	  _wanted hosts expl 'real host name to log into' _ssh_hosts && ret=0
+          ;;
+        *(#i)identityfile*)
+          _description files expl 'SSH identity file'
+          _files "$expl[@]" && ret=0
+          ;;
+        *(#i)(local|remote)forward*)
+          state=forward
+          ;;
+        *(#i)protocol*)
+          _values -s , 'protocol version' \
+	      '1' \
+	      '2' && ret=0
+	  ;;
+        *(#i)proxycommand*)
+          compset -q
+          shift 1 words
+          (( CURRENT-- ))
+          _normal && ret=0
+          ;;
+        *(#i)stricthostkeychecking*)
+          _wanted values expl 'checking type' compadd yes no ask && ret=0
+          ;;
+        *(#i)userknownhostsfile*)
+          _description files expl 'user file with known hosts'
+          _files "$expl[@]" && ret=0
+          ;;
+        *(#i)user*)
+	  _wanted users expl 'user to log in as' _ssh_users && ret=0
+          ;;
+        *(#i)xauthlocation*)
+          _description files expl 'xauth program'
+          _files "$expl[@]" -g '*(-*)' && ret=0
+          ;;
+        esac
+      else
+        _wanted values expl 'configure file option' \
+            compadd -M 'm:{a-z}={A-Z}' -S '=' - \
+                AFSTokenPassing BatchMode BindAddress CheckHostIP \
+		Cipher Ciphers ClearAllForwardings Compression \
+                CompressionLevel ConnectionAttempts DynamicForward \
+		EscapeChar FallBackToRsh ForwardAgent ForwardX11 \
+                GatewayPorts GlobalKnownHostsFile HostbasedAuthentication \
+		HostKeyAlgorithms HostKeyAlias HostName IdentityFile \
+		KeepAlive KerberosAuthentication KerberosTgtPassing \
+		LocalForward LogLevel MACs NoHostAuthenticationForLocalhost \
+		NumberOfPasswordPrompts PreferredAuthentications \
+		PasswordAuthentication Port Protocol ProtocolKeepAlives \
+                ProxyCommand PubkeyAuthentication RemoteForward \
+		RhostsAuthentication RhostsRSAAuthentication \
+		RSAAuthentication ChallengeResponseAuthentication \
+		SetupTimeOut SmartcardDevice StrictHostKeyChecking \
+                UsePrivilegedPort User UserKnownHostsFile UseRsh \
+                XAuthLocation && ret=0
+      fi
+      ;;
+    forward)
+      if compset -P 1 '*:'; then
+        if compset -P '*:'; then
+          _message 'port number'
+        else
+	  _wanted hosts expl host _ssh_hosts -qS:
+        fi
+      else
+        _message 'listen-port number'
+      fi
+      return
+      ;;
+    command)
+      shift 1 words
+      (( CURRENT-- ))
+      _normal
+      return
+      ;;
+    userhost)
+      if compset -P '*@'; then
+	_wanted hosts expl 'remote host name' _ssh_hosts && ret=0
+      elif compset -S '@*'; then
+        _wanted users expl 'login name' _ssh_users -S '' && ret=0
+      else
+        if (( $+opt_args[-l] )); then
+	  tmp=()
+	else
+	  tmp=( 'users:login name:_ssh_users -qS@' )
+	fi
+	_alternative \
+	    'hosts:remote host name:_ssh_hosts' \
+	    "$tmp[@]" && ret=0
+      fi
+      ;;
+    file)
+      if compset -P '*:'; then
+        _remote_files && ret=0
+      elif compset -P '*@'; then
+        _wanted hosts expl host _ssh_hosts -S: && ret=0
+      else
+        _alternative \
+	    'files:: _files' \
+	    'hosts:host:_ssh_hosts -S:' \
+	    'users:user:_ssh_users -qS@' && ret=0
+      fi
+      ;;
+    rfile)
+      if compset -P '*:'; then
+        _remote_files && ret=0
+      elif compset -P '*@'; then
+        _wanted hosts expl host _ssh_hosts -S: && ret=0
+      else
+        _alternative \
+	    'hosts:host:_ssh_hosts -S:' \
+	    'users:user:_ssh_users -qS@' && ret=0
+      fi
+      ;;
+    esac
+  done
 }
 
 _ssh_users () {
