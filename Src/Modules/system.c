@@ -358,6 +358,8 @@ static struct builtin bintab[] = {
     BUILTIN("syswrite", 0, bin_syswrite, 1, 1, 0, "c:o:", NULL),
 };
 
+static const struct gsu_array errnos_gsu =
+{ errnosgetfn, arrsetfn, stdunsetfn };
 
 /* The load/unload routines required by the zsh library interface */
 
@@ -390,9 +392,7 @@ boot_(Module m)
     if (!(pm_nos = createparam("errnos", PM_ARRAY|PM_SPECIAL|PM_READONLY|
 			       PM_HIDE|PM_HIDEVAL|PM_REMOVABLE)))
 	return 1;
-    pm_nos->gets.afn = errnosgetfn;
-    pm_nos->sets.afn = arrsetfn;
-    pm_nos->unsetfn = stdunsetfn;
+    pm_nos->gsu.a = &errnos_gsu;
 
     if (!addbuiltins(m->nam, bintab, sizeof(bintab)/sizeof(*bintab))) {
 	tidyparam(pm_nos);

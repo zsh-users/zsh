@@ -1894,9 +1894,7 @@ addparamdef(Paramdef d)
 
     pm->level = 0;
     pm->u.data = d->var;
-    pm->sets.ifn = (void (*)(Param, zlong)) d->set;
-    pm->gets.ifn = (zlong (*)(Param)) d->get;
-    pm->unsetfn = (void (*)(Param, int)) d->unset;
+    pm->gsu.i = (GsuInteger) d->gsu;
 
     return 0;
 }

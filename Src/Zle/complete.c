@@ -943,56 +943,82 @@ bin_compset(char *name, char **argv, UNUSED(Options ops), UNUSED(int func))
  * order of the CP_* bits in comp.h */
 
 #define VAL(X) ((void *) (&(X)))
+#define GSU(X) ((GsuScalar)(void *) (&(X)))
 struct compparam {
     char *name;
     int type;
-    void *var, *set, *get;
+    void *var;
+    GsuScalar gsu;
 };
 
+static const struct gsu_scalar compvarscalar_gsu =
+{ strvargetfn, strvarsetfn, compunsetfn };
+static const struct gsu_scalar complist_gsu =
+{ get_complist, set_complist, compunsetfn };
+static const struct gsu_scalar unambig_gsu =
+{ get_unambig, nullstrsetfn, compunsetfn };
+static const struct gsu_scalar unambig_pos_gsu =
+{ get_unambig_pos, nullstrsetfn, compunsetfn };
+static const struct gsu_scalar insert_pos_gsu =
+{ get_insert_pos, nullstrsetfn, compunsetfn };
+
+static const struct gsu_integer compvarinteger_gsu =
+{ intvargetfn, intvarsetfn, compunsetfn };
+static const struct gsu_integer nmatches_gsu =
+{ get_nmatches, NULL, compunsetfn };
+static const struct gsu_integer unambig_curs_gsu =
+{ get_unambig_curs, NULL, compunsetfn };
+static const struct gsu_integer listlines_gsu =
+{ get_listlines, NULL, compunsetfn };
+
+static const struct gsu_array compvararray_gsu =
+{ arrvargetfn, arrvarsetfn, compunsetfn };
+
+
 static struct compparam comprparams[] = {
-    { "words", PM_ARRAY, VAL(compwords), NULL, NULL },
-    { "redirections", PM_ARRAY, VAL(compredirs), NULL, NULL },
-    { "CURRENT", PM_INTEGER, VAL(compcurrent), NULL, NULL },
-    { "PREFIX", PM_SCALAR, VAL(compprefix), NULL, NULL },
-    { "SUFFIX", PM_SCALAR, VAL(compsuffix), NULL, NULL },
-    { "IPREFIX", PM_SCALAR, VAL(compiprefix), NULL, NULL },
-    { "ISUFFIX", PM_SCALAR, VAL(compisuffix), NULL, NULL },
-    { "QIPREFIX", PM_SCALAR | PM_READONLY, VAL(compqiprefix), NULL, NULL },
-    { "QISUFFIX", PM_SCALAR | PM_READONLY, VAL(compqisuffix), NULL, NULL },
-    { NULL, 0, NULL, NULL, NULL }
+    { "words", PM_ARRAY, VAL(compwords), NULL },
+    { "redirections", PM_ARRAY, VAL(compredirs), NULL },
+    { "CURRENT", PM_INTEGER, VAL(compcurrent), NULL },
+    { "PREFIX", PM_SCALAR, VAL(compprefix), NULL },
+    { "SUFFIX", PM_SCALAR, VAL(compsuffix), NULL },
+    { "IPREFIX", PM_SCALAR, VAL(compiprefix), NULL },
+    { "ISUFFIX", PM_SCALAR, VAL(compisuffix), NULL },
+    { "QIPREFIX", PM_SCALAR | PM_READONLY, VAL(compqiprefix), NULL },
+    { "QISUFFIX", PM_SCALAR | PM_READONLY, VAL(compqisuffix), NULL },
+    { NULL, 0, NULL, NULL }
 };
 
 static struct compparam compkparams[] = {
-    { "nmatches", PM_INTEGER | PM_READONLY, NULL, NULL, VAL(get_nmatches) },
-    { "context", PM_SCALAR, VAL(compcontext), NULL, NULL },
-    { "parameter", PM_SCALAR, VAL(compparameter), NULL, NULL },
-    { "redirect", PM_SCALAR, VAL(compredirect), NULL, NULL },
-    { "quote", PM_SCALAR | PM_READONLY, VAL(compquote), NULL, NULL },
-    { "quoting", PM_SCALAR | PM_READONLY, VAL(compquoting), NULL, NULL },
-    { "restore", PM_SCALAR, VAL(comprestore), NULL, NULL },
-    { "list", PM_SCALAR, NULL, VAL(set_complist), VAL(get_complist) },
-    { "insert", PM_SCALAR, VAL(compinsert), NULL, NULL },
-    { "exact", PM_SCALAR, VAL(compexact), NULL, NULL },
-    { "exact_string", PM_SCALAR, VAL(compexactstr), NULL, NULL },
-    { "pattern_match", PM_SCALAR, VAL(comppatmatch), NULL, NULL },
-    { "pattern_insert", PM_SCALAR, VAL(comppatinsert), NULL, NULL },
-    { "unambiguous", PM_SCALAR | PM_READONLY, NULL, NULL, VAL(get_unambig) },
-    { "unambiguous_cursor", PM_INTEGER | PM_READONLY, NULL, NULL,
-      VAL(get_unambig_curs) },
-    { "unambiguous_positions", PM_SCALAR | PM_READONLY, NULL, NULL,
-      VAL(get_unambig_pos) },
-    { "insert_positions", PM_SCALAR | PM_READONLY, NULL, NULL,
-      VAL(get_insert_pos) },
-    { "list_max", PM_INTEGER, VAL(complistmax), NULL, NULL },
-    { "last_prompt", PM_SCALAR, VAL(complastprompt), NULL, NULL },
-    { "to_end", PM_SCALAR, VAL(comptoend), NULL, NULL },
-    { "old_list", PM_SCALAR, VAL(compoldlist), NULL, NULL },
-    { "old_insert", PM_SCALAR, VAL(compoldins), NULL, NULL },
-    { "vared", PM_SCALAR, VAL(compvared), NULL, NULL },
-    { "list_lines", PM_INTEGER | PM_READONLY, NULL, NULL, VAL(get_listlines) },
-    { "all_quotes", PM_SCALAR | PM_READONLY, VAL(compqstack), NULL, NULL },
-    { "ignored", PM_INTEGER | PM_READONLY, VAL(compignored), NULL, NULL },
-    { NULL, 0, NULL, NULL, NULL }
+    { "nmatches", PM_INTEGER | PM_READONLY, NULL, GSU(nmatches_gsu) },
+    { "context", PM_SCALAR, VAL(compcontext), NULL },
+    { "parameter", PM_SCALAR, VAL(compparameter), NULL },
+    { "redirect", PM_SCALAR, VAL(compredirect), NULL },
+    { "quote", PM_SCALAR | PM_READONLY, VAL(compquote), NULL },
+    { "quoting", PM_SCALAR | PM_READONLY, VAL(compquoting), NULL },
+    { "restore", PM_SCALAR, VAL(comprestore), NULL },
+    { "list", PM_SCALAR, NULL, GSU(complist_gsu) },
+    { "insert", PM_SCALAR, VAL(compinsert), NULL },
+    { "exact", PM_SCALAR, VAL(compexact), NULL },
+    { "exact_string", PM_SCALAR, VAL(compexactstr), NULL },
+    { "pattern_match", PM_SCALAR, VAL(comppatmatch), NULL },
+    { "pattern_insert", PM_SCALAR, VAL(comppatinsert), NULL },
+    { "unambiguous", PM_SCALAR | PM_READONLY, NULL, GSU(unambig_gsu) },
+    { "unambiguous_cursor", PM_INTEGER | PM_READONLY, NULL,
+      GSU(unambig_curs_gsu) },
+    { "unambiguous_positions", PM_SCALAR | PM_READONLY, NULL,
+      GSU(unambig_pos_gsu) },
+    { "insert_positions", PM_SCALAR | PM_READONLY, NULL,
+      GSU(insert_pos_gsu) },
+    { "list_max", PM_INTEGER, VAL(complistmax), NULL },
+    { "last_prompt", PM_SCALAR, VAL(complastprompt), NULL },
+    { "to_end", PM_SCALAR, VAL(comptoend), NULL },
+    { "old_list", PM_SCALAR, VAL(compoldlist), NULL },
+    { "old_insert", PM_SCALAR, VAL(compoldins), NULL },
+    { "vared", PM_SCALAR, VAL(compvared), NULL },
+    { "list_lines", PM_INTEGER | PM_READONLY, NULL, GSU(listlines_gsu) },
+    { "all_quotes", PM_SCALAR | PM_READONLY, VAL(compqstack), NULL },
+    { "ignored", PM_INTEGER | PM_READONLY, VAL(compignored), NULL },
+    { NULL, 0, NULL, NULL }
 };
 
 #define COMPSTATENAME "compstate"
@@ -1012,26 +1038,24 @@ addcompparams(struct compparam *cp, Param *pp)
 	if ((pm->u.data = cp->var)) {
 	    switch(PM_TYPE(cp->type)) {
 	    case PM_SCALAR:
-		pm->sets.cfn = strvarsetfn;
-		pm->gets.cfn = strvargetfn;
+		pm->gsu.s = &compvarscalar_gsu;
 		break;
 	    case PM_INTEGER:
-		pm->sets.ifn = intvarsetfn;
-		pm->gets.ifn = intvargetfn;
-		pm->ct = 10;
+		pm->gsu.i = &compvarinteger_gsu;
+		pm->base = 10;
 		break;
 	    case PM_ARRAY:
-		pm->sets.afn = arrvarsetfn;
-		pm->gets.afn = arrvargetfn;
+		pm->gsu.a = &compvararray_gsu;
 		break;
 	    }
 	} else {
-	    pm->sets.cfn = (void (*) _((Param, char *))) cp->set;
-	    pm->gets.cfn = (char *(*) _((Param))) cp->get;
+	    pm->gsu.s = cp->gsu;
 	}
-	pm->unsetfn = compunsetfn;
     }
 }
+
+static const struct gsu_hash compstate_gsu =
+{ get_compstate, set_compstate, compunsetfn };
 
 /**/
 void
@@ -1050,9 +1074,7 @@ makecompparams(void)
     comprpms[CPN_COMPSTATE] = cpm;
     tht = paramtab;
     cpm->level = locallevel + 1;
-    cpm->gets.hfn = get_compstate;
-    cpm->sets.hfn = set_compstate;
-    cpm->unsetfn = compunsetfn;
+    cpm->gsu.h = &compstate_gsu;
     cpm->u.hash = paramtab = newparamtable(31, COMPSTATENAME);
     addcompparams(compkparams, compkpms);
     paramtab = tht;

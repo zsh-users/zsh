@@ -483,7 +483,8 @@ Bring each specified var(job) in turn to the foreground.
 If no var(job) is specified, resume the current job.
 )
 findex(float)
-item(tt(float) [ {tt(PLUS())|tt(-)}tt(EFHghlprtux) ] [ var(name)[tt(=)var(value)] ... ])(
+item(tt(float) [ {tt(PLUS())|tt(-)}tt(EFHghlprtux) ] [ tt(-LRZ) [ var(n) ]] \
+[ var(name)[tt(=)var(value)] ... ])(
 Equivalent to tt(typeset -E), except that options irrelevant to floating
 point numbers are not permitted.
 )
@@ -585,7 +586,8 @@ the form of a call to hash.
 )
 alias(history)(fc -l)
 findex(integer)
-item(tt(integer) [ {tt(PLUS())|tt(-)}tt(Hghilprtux) ] [ var(name)[tt(=)var(value)] ... ])(
+item(tt(integer) [ {tt(PLUS())|tt(-)}tt(Hghilprtux) ] \
+[ tt(-LRZ) [ var(n) ]] [ var(name)[tt(=)var(value)] ... ])(
 Equivalent to tt(typeset -i), except that options irrelevant to
 integers are not permitted.
 )
@@ -704,7 +706,8 @@ sitem([var(mm)tt(:)]var(ss))(minutes and seconds)
 endsitem()
 )
 findex(local)
-item(tt(local) [ {tt(PLUS())|tt(-)}tt(AEFHLRUZahilprtux) [var(n)]] [ var(name)[tt(=)var(value)] ] ...)(
+item(tt(local) [ {tt(PLUS())|tt(-)}tt(AEFHUahlprtux) ] \
+[ tt(-LRZi) [ var(n) ]] [ var(name)[tt(=)var(value)] ] ...)(
 Same as tt(typeset), except that the options tt(-g), and
 tt(-f) are not permitted.  In this case the tt(-x) option does not force
 the use of tt(-g), i.e. exported variables will be local to functions.
@@ -1217,10 +1220,12 @@ Equivalent to tt(whence -v).
 findex(typeset)
 cindex(parameters, setting)
 cindex(parameters, declaring)
-xitem(tt(typeset) [ {tt(PLUS())|tt(-)}tt(AEFHLRUZafghiklprtuxmz) [var(n)]] [ \
+xitem(tt(typeset) [ {tt(PLUS())|tt(-)}tt(AEFHUafghklprtuxmz) ] [ tt(-LRZi) \
+[ var(n) ]] [ \
 var(name)[tt(=)var(value)] ... ])
-item(tt(typeset) -T [ {tt(PLUS()|tt(-))}tt(LRUZrux) ] \
-  var(SCALAR)[tt(=)var(value)] var(array) tt([) var(sep) tt(]))(
+item(tt(typeset) -T [ {tt(PLUS()|tt(-))}tt(Urux) ] \
+ [ tt(-LRZ) [ var(n) ]] \
+ var(SCALAR)[tt(=)var(value)] var(array) tt([) var(sep) tt(]))(
 Set or display attributes and values for shell parameters.
 
 A parameter is created for each var(name) that does not already refer
@@ -1312,20 +1317,21 @@ ifnzman(noderef(Array Parameters))\
 )
 item(tt(-L))(
 Left justify and remove leading blanks from var(value).
-If var(n) is nonzero, it defines the width of the field;
-otherwise it is determined by the width of the value of the first
-assignment.
+If var(n) is nonzero, it defines the width of the field.
+If var(n) is zero, the width is determined by the width of the value of
+the first assignment.  In the case of numeric parameters, the length of the
+complete value assigned to the parameter is used to determine the width,
+not the value that would be output.
 When the parameter is expanded, it is filled on the right with
 blanks or truncated if necessary to fit the field.
+Note truncation can lead to unexpected results with numeric parameters.
 Leading zeros are removed if the tt(-Z) flag is also set.
 )
 item(tt(-R))(
-Right justify and fill with leading blanks.  If var(n) is nonzero
-if defines the width of the field;
-otherwise it is determined by the width of the value of the first
-assignment.
-When the parameter is expanded, the field is left filled with
-blanks or truncated from the end.
+Similar to tt(-L), except that right justification is used;
+when the parameter is expanded, the field is left filled with
+blanks or truncated from the end.  May not be combined with the tt(-Z)
+flag.
 )
 item(tt(-U))(
 For arrays (but not for associative arrays), keep only the first
@@ -1334,11 +1340,12 @@ colon-separated special parameters like tt(PATH) or tt(FIGNORE), etc.
 This flag has a different meaning when used with tt(-f); see below.
 )
 item(tt(-Z))(
-Right justify and fill with leading zeros if the first non-blank
-character is a digit and the tt(-L) flag has not been set.
-If var(n) is nonzero it defines the width of the field;
-otherwise it is determined by the width of the value of the
-first assignment.
+Specially handled if set along with the tt(-L) flag.
+Otherwise, similar to tt(-R), except that leading zeros are used for
+padding instead of blanks if the first non-blank character is a digit.
+Numeric parameters are specially handled: they are always eligible
+for padding with zeroes, and the zeroes are inserted at an appropriate
+place in the output.
 )
 item(tt(-a))(
 The names refer to array parameters.  An array parameter may be

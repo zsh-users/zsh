@@ -2592,20 +2592,20 @@ restore_params(LinkList restorelist, LinkList removelist)
 		tpm->flags = pm->flags;
 		switch (PM_TYPE(pm->flags)) {
 		case PM_SCALAR:
-		    tpm->sets.cfn(tpm, pm->u.str);
+		    tpm->gsu.s->setfn(tpm, pm->u.str);
 		    break;
 		case PM_INTEGER:
-		    tpm->sets.ifn(tpm, pm->u.val);
+		    tpm->gsu.i->setfn(tpm, pm->u.val);
 		    break;
 		case PM_EFLOAT:
 		case PM_FFLOAT:
-		    tpm->sets.ffn(tpm, pm->u.dval);
+		    tpm->gsu.f->setfn(tpm, pm->u.dval);
 		    break;
 		case PM_ARRAY:
-		    tpm->sets.afn(tpm, pm->u.arr);
+		    tpm->gsu.a->setfn(tpm, pm->u.arr);
 		    break;
 		case PM_HASHED:
-		    tpm->sets.hfn(tpm, pm->u.hash);
+		    tpm->gsu.h->setfn(tpm, pm->u.hash);
 		    break;
 		}
 		pm = tpm;

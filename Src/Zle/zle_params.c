@@ -44,60 +44,86 @@
  * RBUFFER  (scalar)   portion of buffer to the right of the cursor
  */
 
-#define FN(X) ( (void (*) _((void))) (X) )
+static const struct gsu_scalar buffer_gsu =
+{ get_buffer, set_buffer, zleunsetfn };
+static const struct gsu_scalar context_gsu =
+{ get_context, nullstrsetfn, zleunsetfn };
+static const struct gsu_scalar cutbuffer_gsu =
+{ get_cutbuffer, set_cutbuffer, unset_cutbuffer };
+static const struct gsu_scalar keymap_gsu =
+{ get_keymap, nullstrsetfn, zleunsetfn };
+static const struct gsu_scalar keys_gsu =
+{ get_keys, nullstrsetfn, zleunsetfn };
+static const struct gsu_scalar lastsearch_gsu =
+{ get_lsearch, nullstrsetfn, zleunsetfn };
+static const struct gsu_scalar lastwidget_gsu =
+{ get_lwidget, nullstrsetfn, zleunsetfn };
+static const struct gsu_scalar lbuffer_gsu =
+{ get_lbuffer, set_lbuffer, zleunsetfn };
+static const struct gsu_scalar postdisplay_gsu =
+{ get_postdisplay, set_postdisplay, zleunsetfn };
+static const struct gsu_scalar prebuffer_gsu =
+{ get_prebuffer, nullstrsetfn, zleunsetfn };
+static const struct gsu_scalar predisplay_gsu =
+{ get_predisplay, set_predisplay, zleunsetfn };
+static const struct gsu_scalar rbuffer_gsu =
+{ get_rbuffer, set_rbuffer, zleunsetfn };
+static const struct gsu_scalar widget_gsu =
+{ get_widget, nullstrsetfn, zleunsetfn };
+static const struct gsu_scalar widgetfunc_gsu =
+{ get_widgetfunc, nullstrsetfn, zleunsetfn };
+static const struct gsu_scalar widgetstyle_gsu =
+{ get_widgetstyle, nullstrsetfn, zleunsetfn };
+
+static const struct gsu_integer bufferlines_gsu =
+{ get_bufferlines, NULL, zleunsetfn };
+static const struct gsu_integer cursor_gsu =
+{ get_cursor, set_cursor, zleunsetfn };
+static const struct gsu_integer histno_gsu =
+{ get_histno, set_histno, zleunsetfn };
+static const struct gsu_integer mark_gsu =
+{ get_mark, set_mark, zleunsetfn };
+static const struct gsu_integer numeric_gsu =
+{ get_numeric, set_numeric, unset_numeric };
+static const struct gsu_integer pending_gsu =
+{ get_pending, NULL, zleunsetfn };
+
+static const struct gsu_array killring_gsu =
+{ get_killring, set_killring, unset_killring };
+
+#define GSU(X) ( (GsuScalar)(void*)(&(X)) )
 static struct zleparam {
     char *name;
     int type;
-    void (*setfn) _((void));
-    void (*getfn) _((void));
-    void (*unsetfn) _((Param, int));
+    GsuScalar gsu;
     void *data;
 } zleparams[] = {
-    { "BUFFER",  PM_SCALAR,  FN(set_buffer),  FN(get_buffer),
-	zleunsetfn, NULL },
-    { "BUFFERLINES", PM_INTEGER | PM_READONLY, NULL, FN(get_bufferlines),
-        zleunsetfn, NULL },
-    { "CONTEXT", PM_SCALAR | PM_READONLY, NULL, FN(get_context),
-	zleunsetfn, NULL },
-    { "CURSOR",  PM_INTEGER, FN(set_cursor),  FN(get_cursor),
-	zleunsetfn, NULL },
-    { "CUTBUFFER", PM_SCALAR, FN(set_cutbuffer), FN(get_cutbuffer),
-	unset_cutbuffer, NULL },
-    { "HISTNO", PM_INTEGER, FN(set_histno), FN(get_histno),
-        zleunsetfn, NULL },
-    { "KEYMAP", PM_SCALAR | PM_READONLY, NULL, FN(get_keymap),
-        zleunsetfn, NULL },
-    { "KEYS", PM_SCALAR | PM_READONLY, NULL, FN(get_keys),
-        zleunsetfn, NULL },
-    { "killring", PM_ARRAY, FN(set_killring), FN(get_killring),
-	unset_killring, NULL },
-    { "LASTSEARCH", PM_SCALAR | PM_READONLY, NULL, FN(get_lsearch),
-        zleunsetfn, NULL },
-    { "LASTWIDGET", PM_SCALAR | PM_READONLY, NULL, FN(get_lwidget),
-        zleunsetfn, NULL },
-    { "LBUFFER", PM_SCALAR,  FN(set_lbuffer), FN(get_lbuffer),
-	zleunsetfn, NULL },
-    { "MARK",  PM_INTEGER, FN(set_mark),  FN(get_mark),
-	zleunsetfn, NULL },
-    { "NUMERIC", PM_INTEGER | PM_UNSET, FN(set_numeric), FN(get_numeric),
-        unset_numeric, NULL },
-    { "PENDING", PM_INTEGER | PM_READONLY, NULL, FN(get_pending),
-        zleunsetfn, NULL },
-    { "POSTDISPLAY", PM_SCALAR, FN(set_postdisplay), FN(get_postdisplay),
-	zleunsetfn, NULL },
-    { "PREBUFFER",  PM_SCALAR | PM_READONLY,  NULL,  FN(get_prebuffer),
-	zleunsetfn, NULL },
-    { "PREDISPLAY", PM_SCALAR, FN(set_predisplay), FN(get_predisplay),
-	zleunsetfn, NULL },
-    { "RBUFFER", PM_SCALAR,  FN(set_rbuffer), FN(get_rbuffer),
-	zleunsetfn, NULL },
-    { "WIDGET", PM_SCALAR | PM_READONLY, NULL, FN(get_widget),
-        zleunsetfn, NULL },
-    { "WIDGETFUNC", PM_SCALAR | PM_READONLY, NULL, FN(get_widgetfunc),
-        zleunsetfn, NULL },
-    { "WIDGETSTYLE", PM_SCALAR | PM_READONLY, NULL, FN(get_widgetstyle),
-	zleunsetfn, NULL },
-    { NULL, 0, NULL, NULL, NULL, NULL }
+    { "BUFFER",  PM_SCALAR,  GSU(buffer_gsu), NULL },
+    { "BUFFERLINES", PM_INTEGER | PM_READONLY, GSU(bufferlines_gsu),
+        NULL },
+    { "CONTEXT", PM_SCALAR | PM_READONLY, GSU(context_gsu),
+	NULL },
+    { "CURSOR",  PM_INTEGER, GSU(cursor_gsu),
+	NULL },
+    { "CUTBUFFER", PM_SCALAR, GSU(cutbuffer_gsu), NULL },
+    { "HISTNO", PM_INTEGER, GSU(histno_gsu), NULL },
+    { "KEYMAP", PM_SCALAR | PM_READONLY, GSU(keymap_gsu), NULL },
+    { "KEYS", PM_SCALAR | PM_READONLY, GSU(keys_gsu), NULL },
+    { "killring", PM_ARRAY, GSU(killring_gsu), NULL },
+    { "LASTSEARCH", PM_SCALAR | PM_READONLY, GSU(lastsearch_gsu), NULL },
+    { "LASTWIDGET", PM_SCALAR | PM_READONLY, GSU(lastwidget_gsu), NULL },
+    { "LBUFFER", PM_SCALAR,  GSU(lbuffer_gsu), NULL },
+    { "MARK",  PM_INTEGER, GSU(mark_gsu), NULL },
+    { "NUMERIC", PM_INTEGER | PM_UNSET, GSU(numeric_gsu), NULL },
+    { "PENDING", PM_INTEGER | PM_READONLY, GSU(pending_gsu), NULL },
+    { "POSTDISPLAY", PM_SCALAR, GSU(postdisplay_gsu), NULL },
+    { "PREBUFFER",  PM_SCALAR | PM_READONLY,  GSU(prebuffer_gsu), NULL },
+    { "PREDISPLAY", PM_SCALAR, GSU(predisplay_gsu), NULL },
+    { "RBUFFER", PM_SCALAR,  GSU(rbuffer_gsu), NULL },
+    { "WIDGET", PM_SCALAR | PM_READONLY, GSU(widget_gsu), NULL },
+    { "WIDGETFUNC", PM_SCALAR | PM_READONLY, GSU(widgetfunc_gsu), NULL },
+    { "WIDGETSTYLE", PM_SCALAR | PM_READONLY, GSU(widgetstyle_gsu), NULL },
+    { NULL, 0, NULL, NULL }
 };
 
 /**/
@@ -117,20 +143,16 @@ makezleparams(int ro)
 	pm->u.data = zp->data;
 	switch(PM_TYPE(zp->type)) {
 	    case PM_SCALAR:
-		pm->sets.cfn = (void (*) _((Param, char *))) zp->setfn;
-		pm->gets.cfn = (char *(*) _((Param))) zp->getfn;
+		pm->gsu.s = zp->gsu;
 		break;
 	    case PM_ARRAY:
-		pm->sets.afn = (void (*) _((Param, char **))) zp->setfn;
-		pm->gets.afn = (char **(*) _((Param))) zp->getfn;
+		pm->gsu.a = (GsuArray)zp->gsu;
 		break;
 	    case PM_INTEGER:
-		pm->sets.ifn = (void (*) _((Param, zlong))) zp->setfn;
-		pm->gets.ifn = (zlong (*) _((Param))) zp->getfn;
-		pm->ct = 10;
+		pm->gsu.i = (GsuInteger)zp->gsu;
+		pm->base = 10;
 		break;
 	}
-	pm->unsetfn = zp->unsetfn;
 	if ((zp->type & PM_UNSET) && (zmod.flags & MOD_MULT))
 	    pm->flags &= ~PM_UNSET;
     }

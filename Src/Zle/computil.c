@@ -3377,7 +3377,7 @@ bin_compquote(char *nam, char **args, Options ops, UNUSED(int func))
 		break;
 	    case PM_ARRAY:
 		{
-		    char **val = v->pm->gets.afn(v->pm);
+		    char **val = v->pm->gsu.a->getfn(v->pm);
 		    char **new = (char **) zalloc((arrlen(val) + 1) *
 						  sizeof(char *));
 		    char **p = new;

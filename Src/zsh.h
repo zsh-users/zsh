@@ -1123,6 +1123,49 @@ struct patprog {
 #define dummy_patprog1 ((Patprog) 1)
 #define dummy_patprog2 ((Patprog) 2)
 
+/* standard node types for get/set/unset union in parameter */
+
+/*
+ * note non-standard const in pointer declaration: structures are
+ * assumed to be read-only.
+ */
+typedef const struct gsu_scalar *GsuScalar;
+typedef const struct gsu_integer *GsuInteger;
+typedef const struct gsu_float *GsuFloat;
+typedef const struct gsu_array *GsuArray;
+typedef const struct gsu_hash *GsuHash;
+
+struct gsu_scalar {
+    char *(*getfn) _((Param));
+    void (*setfn) _((Param, char  *));
+    void (*unsetfn) _((Param, int));
+};
+
+struct gsu_integer {
+    zlong (*getfn) _((Param));
+    void (*setfn) _((Param, zlong));
+    void (*unsetfn) _((Param, int));
+};
+
+struct gsu_float {
+    double (*getfn) _((Param));
+    void (*setfn) _((Param, double));
+    void (*unsetfn) _((Param, int));
+};
+
+struct gsu_array {
+    char **(*getfn) _((Param));
+    void (*setfn) _((Param, char **));
+    void (*unsetfn) _((Param, int));
+};
+
+struct gsu_hash {
+    HashTable (*getfn) _((Param));
+    void (*setfn) _((Param, HashTable));
+    void (*unsetfn) _((Param, int));
+};
+
+
 /* node used in parameter hash table (paramtab) */
 
 struct param {
@@ -1142,28 +1185,24 @@ struct param {
         HashTable hash;		/* value if declared assoc   (PM_HASHED)  */
     } u;
 
-    /* pointer to function to set value of this parameter */
+    /*
+     * get/set/unset methods.
+     *
+     * Unlike the data union, this points to a single instance
+     * for every type (although there are special types, e.g.
+     * tied arrays have a different gsu_scalar struct from the
+     * normal one).  It's really a poor man's vtable.
+     */
     union {
-	void (*cfn) _((Param, char *));
-	void (*ifn) _((Param, zlong));
-	void (*ffn) _((Param, double));
-	void (*afn) _((Param, char **));
-        void (*hfn) _((Param, HashTable));
-    } sets;
+	GsuScalar s;
+	GsuInteger i;
+	GsuFloat f;
+	GsuArray a;
+	GsuHash h;
+    } gsu;
 
-    /* pointer to function to get value of this parameter */
-    union {
-	char *(*cfn) _((Param));
-	zlong (*ifn) _((Param));
-	double (*ffn) _((Param));
-	char **(*afn) _((Param));
-        HashTable (*hfn) _((Param));
-    } gets;
-
-    /* pointer to function to unset this parameter */
-    void (*unsetfn) _((Param, int));
-
-    int ct;			/* output base or field width            */
+    int base;			/* output base or floating point prec    */
+    int width;			/* field width                           */
     char *env;			/* location in environment, if exported  */
     char *ename;		/* name of corresponding environment var */
     Param old;			/* old struct for use with local         */
@@ -1272,22 +1311,17 @@ struct paramdef {
     char *name;
     int flags;
     void *var;
-    void *set;
-    void *get;
-    void *unset;
+    void *gsu;			/* get/set/unset structure */
 };
 
-#define PARAMDEF(name, flags, var, set, get, unset) \
-    { name, flags, (void *) var, (void *) set, (void *) get, (void *) unset }
+#define PARAMDEF(name, flags, var, gsu) \
+    { name, flags, (void *) var, (void *) gsu, }
 #define INTPARAMDEF(name, var) \
-    { name, PM_INTEGER, (void *) var, (void *) intvarsetfn, \
-      (void *) intvargetfn, (void *) stdunsetfn }
+    { name, PM_INTEGER, (void *) var, (void *) &stdinteger_gsu }
 #define STRPARAMDEF(name, var) \
-    { name, PM_SCALAR, (void *) var, (void *) strvarsetfn, \
-      (void *) strvargetfn, (void *) stdunsetfn }
+    { name, PM_SCALAR, (void *) var, (void *) &varscalar_gsu }
 #define ARRPARAMDEF(name, var) \
-    { name, PM_ARRAY, (void *) var, (void *) arrvarsetfn, \
-      (void *) arrvargetfn, (void *) stdunsetfn }
+    { name, PM_ARRAY, (void *) var, (void *) &vararray_gsu }
 
 #define setsparam(S,V) assignsparam(S,V,0)
 #define setaparam(S,V) assignaparam(S,V,0)

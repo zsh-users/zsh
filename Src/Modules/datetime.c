@@ -86,9 +86,12 @@ static struct builtin bintab[] = {
     BUILTIN("strftime",    0, bin_strftime,    2,   2, 0, "s:", NULL),
 };
 
+static const struct gsu_integer epochseconds_gsu =
+{ getcurrentsecs, NULL, stdunsetfn };
+
 static struct paramdef patab[] = {
     PARAMDEF("EPOCHSECONDS", PM_INTEGER|PM_SPECIAL|PM_READONLY,
-		    NULL, NULL, &getcurrentsecs, stdunsetfn),
+		    NULL, &epochseconds_gsu),
 };
 
 /**/

@@ -1975,7 +1975,7 @@ addmatch(char *s, char *t)
     } else if (addwhat == CC_QUOTEFLAG || addwhat == -2  ||
 	      (addwhat == -3 && !(hn->flags & DISABLED)) ||
 	      (addwhat == -4 && (PM_TYPE(pm->flags) == PM_SCALAR) &&
-	       !pm->level && (tt = pm->gets.cfn(pm)) && *tt == '/')    ||
+	       !pm->level && (tt = pm->gsu.s->getfn(pm)) && *tt == '/') ||
 	      (addwhat == -9 && !(hn->flags & PM_UNSET) && !pm->level) ||
 	      (addwhat > 0 &&
 	       ((!(hn->flags & PM_UNSET) &&
@@ -3750,7 +3750,7 @@ makecomplistflags(Compctl cc, char *s, int incmd, int compadd)
 	dumphashtable(aliastab, t | (cc->mask & (CC_DISCMDS|CC_EXCMDS)));
     if (keypm && cc == &cc_dummy) {
 	/* Add the keys of the parameter in keypm. */
-	HashTable t = keypm->gets.hfn(keypm);
+	HashTable t = keypm->gsu.h->getfn(keypm);
 
 	if (t)
 	    scanhashtable(t, 0, 0, PM_UNSET, addhnmatch, 0);

@@ -513,9 +513,9 @@ zfsetparam(char *name, void *val, int flags)
 	return;
     }
     if (type == PM_INTEGER)
-	pm->sets.ifn(pm, *(off_t *)val);
+	pm->gsu.i->setfn(pm, *(off_t *)val);
     else
-	pm->sets.cfn(pm, (char *)val);
+	pm->gsu.s->setfn(pm, (char *)val);
 }
 
 /*

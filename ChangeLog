@@ -1,5 +1,17 @@
 2004-12-07  Peter Stephenson  <pws@csr.com>
 
+	* 20605: Doc/Zsh/builtins.yo, Src/builtin.c, Src/exec.c,
+	Src/module.c, Src/params.c, Src/subst.c, Src/zsh.h,
+	Src/Modules/datetime.c, Src/Modules/langinfo.c,
+	Src/Modules/mapfile.c, Src/Modules/parameter.c,
+	Src/Modules/system.c, Src/Modules/termcap.c,
+	Src/Modules/terminfo.c, Src/Modules/zftp.c, Src/Zle/compctl.c,
+	Src/Zle/complete.c, Src/Zle/computil.c, Src/Zle/zle_params.c,
+	Src/Zle/zleparameter.c, Test/B02typeset.ztst: Use separate
+	structures for get, set and unset methods of parameters.
+	Separate width and base/precision for parameters, so that
+	justification works for integers.
+
 	* 20606: Test/V03mathfunc.ztst: simple verification of
 	pseudorandom numbers.
 

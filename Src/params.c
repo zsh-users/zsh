@@ -106,10 +106,114 @@ struct timeval shtimer;
  
 /* 0 if this $TERM setup is usable, otherwise it contains TERM_* flags */
 
-
 /**/
 mod_export int termflags;
- 
+
+/* Standard methods for get/set/unset pointers in parameters */
+
+/**/
+mod_export const struct gsu_scalar stdscalar_gsu =
+{ strgetfn, strsetfn, stdunsetfn };
+/**/
+mod_export const struct gsu_scalar varscalar_gsu =
+{ strvargetfn, strvarsetfn, stdunsetfn };
+/**/
+mod_export const struct gsu_scalar nullsetscalar_gsu =
+{ strgetfn, nullstrsetfn, NULL };
+
+/**/
+mod_export const struct gsu_integer stdinteger_gsu =
+{ intgetfn, intsetfn, stdunsetfn };
+/**/
+mod_export const struct gsu_integer varinteger_gsu =
+{ intvargetfn, intvarsetfn, stdunsetfn };
+/**/
+mod_export const struct gsu_integer nullsetinteger_gsu =
+{ intgetfn, NULL, NULL };
+
+/**/
+mod_export const struct gsu_float stdfloat_gsu =
+{ floatgetfn, floatsetfn, stdunsetfn };
+
+/**/
+mod_export const struct gsu_array stdarray_gsu =
+{ arrgetfn, arrsetfn, stdunsetfn };
+/**/
+mod_export const struct gsu_array vararray_gsu =
+{ arrvargetfn, arrvarsetfn, stdunsetfn };
+
+/**/
+mod_export const struct gsu_hash stdhash_gsu =
+{ hashgetfn, hashsetfn, stdunsetfn };
+/**/
+mod_export const struct gsu_hash nullsethash_gsu =
+{ hashgetfn, nullsethashfn, NULL };
+
+
+/* Non standard methods (not exported) */
+static const struct gsu_integer pound_gsu =
+{ poundgetfn, nullintsetfn, stdunsetfn };
+static const struct gsu_integer errno_gsu =
+{ errnogetfn, errnosetfn, stdunsetfn };
+static const struct gsu_integer gid_gsu =
+{ gidgetfn, gidsetfn, stdunsetfn };
+static const struct gsu_integer egid_gsu =
+{ egidgetfn, egidsetfn, stdunsetfn };
+static const struct gsu_integer histsize_gsu =
+{ histsizegetfn, histsizesetfn, stdunsetfn };
+static const struct gsu_integer random_gsu =
+{ randomgetfn, randomsetfn, stdunsetfn };
+static const struct gsu_integer savehist_gsu =
+{ savehistsizegetfn, savehistsizesetfn, stdunsetfn };
+static const struct gsu_integer intseconds_gsu =
+{ intsecondsgetfn, intsecondssetfn, stdunsetfn };
+static const struct gsu_float floatseconds_gsu =
+{ floatsecondsgetfn, floatsecondssetfn, stdunsetfn };
+static const struct gsu_integer uid_gsu =
+{ uidgetfn, uidsetfn, stdunsetfn };
+static const struct gsu_integer euid_gsu =
+{ euidgetfn, euidsetfn, stdunsetfn };
+static const struct gsu_integer ttyidle_gsu =
+{ ttyidlegetfn, nullintsetfn, stdunsetfn };
+
+static const struct gsu_scalar username_gsu =
+{ usernamegetfn, usernamesetfn, stdunsetfn };
+static const struct gsu_scalar dash_gsu =
+{ dashgetfn, nullstrsetfn, stdunsetfn };
+static const struct gsu_scalar histchars_gsu =
+{ histcharsgetfn, histcharssetfn, stdunsetfn };
+static const struct gsu_scalar home_gsu =
+{ homegetfn, homesetfn, stdunsetfn };
+static const struct gsu_scalar term_gsu =
+{ termgetfn, termsetfn, stdunsetfn };
+static const struct gsu_scalar wordchars_gsu =
+{ wordcharsgetfn, wordcharssetfn, stdunsetfn };
+static const struct gsu_scalar ifs_gsu =
+{ ifsgetfn, ifssetfn, stdunsetfn };
+static const struct gsu_scalar underscore_gsu =
+{ underscoregetfn, nullstrsetfn, stdunsetfn };
+#ifdef USE_LOCALE
+static const struct gsu_scalar lc_blah_gsu =
+{ strgetfn, lcsetfn, stdunsetfn };
+static const struct gsu_scalar lang_gsu =
+{ strgetfn, langsetfn, stdunsetfn };
+static const struct gsu_scalar lc_all_gsu =
+{ strgetfn, lc_allsetfn, stdunsetfn };
+#endif
+
+static const struct gsu_integer varint_readonly_gsu =
+{ intvargetfn, nullintsetfn, stdunsetfn };
+static const struct gsu_integer zlevar_gsu =
+{ intvargetfn, zlevarsetfn, stdunsetfn };
+
+static const struct gsu_scalar colonarr_gsu =
+{ colonarrgetfn, colonarrsetfn, stdunsetfn };
+
+static const struct gsu_integer argc_gsu =
+{ poundgetfn, nullintsetfn, stdunsetfn };
+static const struct gsu_array pipestatus_gsu =
+{ pipestatgetfn, pipestatsetfn, stdunsetfn };
+
 /* Nodes for special parameters for parameter hash table */
 
 #ifdef HAVE_UNION_INIT
@@ -122,10 +226,9 @@ typedef struct iparam {
     char *nam;			/* hash data                             */
     int flags;			/* PM_* flags (defined in zsh.h)         */
     void *value;
-    void (*func1) _((void));	/* set func                              */
-    char *(*func2) _((void));	/* get func                              */
-    void (*unsetfn) _((Param, int));	/* unset func                    */
-    int ct;			/* output base or field width            */
+    void *gsu;			/* get/set/unset methods */
+    int base;			/* output base                           */
+    int width;			/* output field width                    */
     char *env;			/* location in environment, if exported  */
     char *ename;		/* name of corresponding environment var */
     Param old;			/* old struct for use with local         */
@@ -134,35 +237,35 @@ typedef struct iparam {
 #endif
 
 static initparam special_params[] ={
-#define SFN(X) BR(((void (*)_((Param, char *)))(X)))
-#define GFN(X) BR(((char *(*)_((Param)))(X)))
-#define IPDEF1(A,B,C,D) {NULL,A,PM_INTEGER|PM_SPECIAL|D,BR(NULL),SFN(C),GFN(B),stdunsetfn,10,NULL,NULL,NULL,0}
-IPDEF1("#", poundgetfn, nullintsetfn, PM_READONLY),
-IPDEF1("ERRNO", errnogetfn, errnosetfn, 0),
-IPDEF1("GID", gidgetfn, gidsetfn, PM_DONTIMPORT | PM_RESTRICTED),
-IPDEF1("EGID", egidgetfn, egidsetfn, PM_DONTIMPORT | PM_RESTRICTED),
-IPDEF1("HISTSIZE", histsizegetfn, histsizesetfn, PM_RESTRICTED),
-IPDEF1("RANDOM", randomgetfn, randomsetfn, 0),
-IPDEF1("SAVEHIST", savehistsizegetfn, savehistsizesetfn, PM_RESTRICTED),
-IPDEF1("SECONDS", intsecondsgetfn, intsecondssetfn, 0),
-IPDEF1("UID", uidgetfn, uidsetfn, PM_DONTIMPORT | PM_RESTRICTED),
-IPDEF1("EUID", euidgetfn, euidsetfn, PM_DONTIMPORT | PM_RESTRICTED),
-IPDEF1("TTYIDLE", ttyidlegetfn, nullintsetfn, PM_READONLY),
+#define GSU(X) BR((GsuScalar)(void *)(&(X)))
+#define NULL_GSU BR((GsuScalar)(void *)NULL)
+#define IPDEF1(A,B,C) {NULL,A,PM_INTEGER|PM_SPECIAL|C,BR(NULL),GSU(B),10,0,NULL,NULL,NULL,0}
+IPDEF1("#", pound_gsu, PM_READONLY),
+IPDEF1("ERRNO", errno_gsu, 0),
+IPDEF1("GID", gid_gsu, PM_DONTIMPORT | PM_RESTRICTED),
+IPDEF1("EGID", egid_gsu, PM_DONTIMPORT | PM_RESTRICTED),
+IPDEF1("HISTSIZE", histsize_gsu, PM_RESTRICTED),
+IPDEF1("RANDOM", random_gsu, 0),
+IPDEF1("SAVEHIST", savehist_gsu, PM_RESTRICTED),
+IPDEF1("SECONDS", intseconds_gsu, 0),
+IPDEF1("UID", uid_gsu, PM_DONTIMPORT | PM_RESTRICTED),
+IPDEF1("EUID", euid_gsu, PM_DONTIMPORT | PM_RESTRICTED),
+IPDEF1("TTYIDLE", ttyidle_gsu, PM_READONLY),
 
-#define IPDEF2(A,B,C,D) {NULL,A,PM_SCALAR|PM_SPECIAL|D,BR(NULL),SFN(C),GFN(B),stdunsetfn,0,NULL,NULL,NULL,0}
-IPDEF2("USERNAME", usernamegetfn, usernamesetfn, PM_DONTIMPORT|PM_RESTRICTED),
-IPDEF2("-", dashgetfn, nullstrsetfn, PM_READONLY),
-IPDEF2("histchars", histcharsgetfn, histcharssetfn, PM_DONTIMPORT),
-IPDEF2("HOME", homegetfn, homesetfn, 0),
-IPDEF2("TERM", termgetfn, termsetfn, 0),
-IPDEF2("WORDCHARS", wordcharsgetfn, wordcharssetfn, 0),
-IPDEF2("IFS", ifsgetfn, ifssetfn, PM_DONTIMPORT),
-IPDEF2("_", underscoregetfn, nullstrsetfn, PM_READONLY),
+#define IPDEF2(A,B,C) {NULL,A,PM_SCALAR|PM_SPECIAL|C,BR(NULL),GSU(B),0,0,NULL,NULL,NULL,0}
+IPDEF2("USERNAME", username_gsu, PM_DONTIMPORT|PM_RESTRICTED),
+IPDEF2("-", dash_gsu, PM_READONLY),
+IPDEF2("histchars", histchars_gsu, PM_DONTIMPORT),
+IPDEF2("HOME", home_gsu, 0),
+IPDEF2("TERM", term_gsu, 0),
+IPDEF2("WORDCHARS", wordchars_gsu, 0),
+IPDEF2("IFS", ifs_gsu, PM_DONTIMPORT),
+IPDEF2("_", underscore_gsu, PM_READONLY),
 
 #ifdef USE_LOCALE
-# define LCIPDEF(name) IPDEF2(name, strgetfn, lcsetfn, PM_UNSET)
-IPDEF2("LANG", strgetfn, langsetfn, PM_UNSET),
-IPDEF2("LC_ALL", strgetfn, lc_allsetfn, PM_UNSET),
+# define LCIPDEF(name) IPDEF2(name, lc_blah_gsu, PM_UNSET)
+IPDEF2("LANG", lang_gsu, PM_UNSET),
+IPDEF2("LC_ALL", lc_all_gsu, PM_UNSET),
 # ifdef LC_COLLATE
 LCIPDEF("LC_COLLATE"),
 # endif
@@ -180,7 +283,7 @@ LCIPDEF("LC_TIME"),
 # endif
 #endif /* USE_LOCALE */
 
-#define IPDEF4(A,B) {NULL,A,PM_INTEGER|PM_READONLY|PM_SPECIAL,BR((void *)B),SFN(nullintsetfn),GFN(intvargetfn),stdunsetfn,10,NULL,NULL,NULL,0}
+#define IPDEF4(A,B) {NULL,A,PM_INTEGER|PM_READONLY|PM_SPECIAL,BR((void *)B),GSU(varint_readonly_gsu),10,0,NULL,NULL,NULL,0}
 IPDEF4("!", &lastpid),
 IPDEF4("$", &mypid),
 IPDEF4("?", &lastval),
@@ -188,14 +291,14 @@ IPDEF4("HISTCMD", &curhist),
 IPDEF4("LINENO", &lineno),
 IPDEF4("PPID", &ppid),
 
-#define IPDEF5(A,B,F) {NULL,A,PM_INTEGER|PM_SPECIAL,BR((void *)B),SFN(F),GFN(intvargetfn),stdunsetfn,10,NULL,NULL,NULL,0}
-IPDEF5("COLUMNS", &columns, zlevarsetfn),
-IPDEF5("LINES", &lines, zlevarsetfn),
-IPDEF5("OPTIND", &zoptind, intvarsetfn),
-IPDEF5("SHLVL", &shlvl, intvarsetfn),
-IPDEF5("TRY_BLOCK_ERROR", &try_errflag, intvarsetfn),
+#define IPDEF5(A,B,F) {NULL,A,PM_INTEGER|PM_SPECIAL,BR((void *)B),GSU(varinteger_gsu),10,0,NULL,NULL,NULL,0}
+IPDEF5("COLUMNS", &columns, zlevar_gsu),
+IPDEF5("LINES", &lines, zlevar_gsu),
+IPDEF5("OPTIND", &zoptind, varinteger_gsu),
+IPDEF5("SHLVL", &shlvl, varinteger_gsu),
+IPDEF5("TRY_BLOCK_ERROR", &try_errflag, varinteger_gsu),
 
-#define IPDEF7(A,B) {NULL,A,PM_SCALAR|PM_SPECIAL,BR((void *)B),SFN(strvarsetfn),GFN(strvargetfn),stdunsetfn,0,NULL,NULL,NULL,0}
+#define IPDEF7(A,B) {NULL,A,PM_SCALAR|PM_SPECIAL,BR((void *)B),GSU(varscalar_gsu),0,0,NULL,NULL,NULL,0}
 IPDEF7("OPTARG", &zoptarg),
 IPDEF7("NULLCMD", &nullcmd),
 IPDEF7("POSTEDIT", &postedit),
@@ -211,7 +314,7 @@ IPDEF7("PS4", &prompt4),
 IPDEF7("SPROMPT", &sprompt),
 IPDEF7("0", &argzero),
 
-#define IPDEF8(A,B,C,D) {NULL,A,D|PM_SCALAR|PM_SPECIAL,BR((void *)B),SFN(colonarrsetfn),GFN(colonarrgetfn),stdunsetfn,0,NULL,C,NULL,0}
+#define IPDEF8(A,B,C,D) {NULL,A,D|PM_SCALAR|PM_SPECIAL,BR((void *)B),GSU(colonarr_gsu),0,0,NULL,C,NULL,0}
 IPDEF8("CDPATH", &cdpath, "cdpath", 0),
 IPDEF8("FIGNORE", &fignore, "fignore", 0),
 IPDEF8("FPATH", &fpath, "fpath", 0),
@@ -223,18 +326,18 @@ IPDEF8("PSVAR", &psvar, "psvar", 0),
 /* MODULE_PATH is not imported for security reasons */
 IPDEF8("MODULE_PATH", &module_path, "module_path", PM_DONTIMPORT|PM_RESTRICTED),
 
-#define IPDEF9F(A,B,C,D) {NULL,A,D|PM_ARRAY|PM_SPECIAL|PM_DONTIMPORT,BR((void *)B),SFN(arrvarsetfn),GFN(arrvargetfn),stdunsetfn,0,NULL,C,NULL,0}
+#define IPDEF9F(A,B,C,D) {NULL,A,D|PM_ARRAY|PM_SPECIAL|PM_DONTIMPORT,BR((void *)B),GSU(vararray_gsu),0,0,NULL,C,NULL,0}
 #define IPDEF9(A,B,C) IPDEF9F(A,B,C,0)
 IPDEF9F("*", &pparams, NULL, PM_ARRAY|PM_SPECIAL|PM_DONTIMPORT|PM_READONLY),
 IPDEF9F("@", &pparams, NULL, PM_ARRAY|PM_SPECIAL|PM_DONTIMPORT|PM_READONLY),
-{NULL,NULL,0,BR(NULL),SFN(NULL),GFN(NULL),NULL,0,NULL,NULL,NULL,0},
+{NULL,NULL,0,BR(NULL),NULL_GSU,0,0,NULL,NULL,NULL,0},
 
-#define IPDEF10(A,B,C) {NULL,A,PM_ARRAY|PM_SPECIAL,BR(NULL),SFN(C),GFN(B),stdunsetfn,10,NULL,NULL,NULL,0}
+#define IPDEF10(A,B) {NULL,A,PM_ARRAY|PM_SPECIAL,BR(NULL),GSU(B),10,0,NULL,NULL,NULL,0}
 
 /* The following parameters are not available in sh/ksh compatibility *
  * mode. All of these have sh compatible equivalents.                */
-IPDEF1("ARGC", poundgetfn, nullintsetfn, PM_READONLY),
-IPDEF2("HISTCHARS", histcharsgetfn, histcharssetfn, PM_DONTIMPORT),
+IPDEF1("ARGC", argc_gsu, PM_READONLY),
+IPDEF2("HISTCHARS", histchars_gsu, PM_DONTIMPORT),
 IPDEF4("status", &lastval),
 IPDEF7("prompt", &prompt),
 IPDEF7("PROMPT", &prompt),
@@ -254,9 +357,9 @@ IPDEF9("watch", &watch, "WATCH"),
 IPDEF9F("module_path", &module_path, "MODULE_PATH", PM_RESTRICTED),
 IPDEF9F("path", &path, "PATH", PM_RESTRICTED),
 
-IPDEF10("pipestatus", pipestatgetfn, pipestatsetfn),
+IPDEF10("pipestatus", pipestatus_gsu),
 
-{NULL,NULL,0,BR(NULL),SFN(NULL),GFN(NULL),NULL,0,NULL,NULL,NULL,0},
+{NULL,NULL,0,BR(NULL),NULL_GSU,0,0,NULL,NULL,NULL,0},
 };
 
 /*
@@ -456,9 +559,9 @@ getvaluearr(Value v)
     if (v->arr)
 	return v->arr;
     else if (PM_TYPE(v->pm->flags) == PM_ARRAY)
-	return v->arr = v->pm->gets.afn(v->pm);
+	return v->arr = v->pm->gsu.a->getfn(v->pm);
     else if (PM_TYPE(v->pm->flags) == PM_HASHED) {
-	v->arr = paramvalarr(v->pm->gets.hfn(v->pm), v->isarr);
+	v->arr = paramvalarr(v->pm->gsu.h->getfn(v->pm), v->isarr);
 	/* Can't take numeric slices of associative arrays */
 	v->start = 0;
 	v->end = numparamvals + 1;
@@ -631,31 +734,25 @@ assigngetset(Param pm)
 {
     switch (PM_TYPE(pm->flags)) {
     case PM_SCALAR:
-	pm->sets.cfn = strsetfn;
-	pm->gets.cfn = strgetfn;
+	pm->gsu.s = &stdscalar_gsu;
 	break;
     case PM_INTEGER:
-	pm->sets.ifn = intsetfn;
-	pm->gets.ifn = intgetfn;
+	pm->gsu.i = &stdinteger_gsu;
 	break;
     case PM_EFLOAT:
     case PM_FFLOAT:
-	pm->sets.ffn = floatsetfn;
-	pm->gets.ffn = floatgetfn;
+	pm->gsu.f = &stdfloat_gsu;
 	break;
     case PM_ARRAY:
-	pm->sets.afn = arrsetfn;
-	pm->gets.afn = arrgetfn;
+	pm->gsu.a = &stdarray_gsu;
 	break;
     case PM_HASHED:
-	pm->sets.hfn = hashsetfn;
-	pm->gets.hfn = hashgetfn;
+	pm->gsu.h = &stdhash_gsu;
 	break;
     default:
 	DPUTS(1, "BUG: tried to create param node without valid flag");
 	break;
     }
-    pm->unsetfn = stdunsetfn;
 }
 
 /* Create a parameter, so that it can be assigned to.  Returns NULL if the *
@@ -699,7 +796,7 @@ createparam(char *name, int flags)
 	    }
 
 	    pm = oldpm;
-	    pm->ct = 0;
+	    pm->base = pm->width = 0;
 	    oldpm = pm->old;
 	} else {
 	    pm = (Param) zshcalloc(sizeof *pm);
@@ -741,25 +838,26 @@ copyparam(Param tpm, Param pm, int toplevel)
      * with sets.?fn() usage).
      */
     tpm->flags = pm->flags;
-    tpm->ct = pm->ct;
+    tpm->base = pm->base;
+    tpm->width = pm->width;
     if (!toplevel)
 	tpm->flags &= ~PM_SPECIAL;
     switch (PM_TYPE(pm->flags)) {
     case PM_SCALAR:
-	tpm->u.str = ztrdup(pm->gets.cfn(pm));
+	tpm->u.str = ztrdup(pm->gsu.s->getfn(pm));
 	break;
     case PM_INTEGER:
-	tpm->u.val = pm->gets.ifn(pm);
+	tpm->u.val = pm->gsu.i->getfn(pm);
 	break;
     case PM_EFLOAT:
     case PM_FFLOAT:
-	tpm->u.dval = pm->gets.ffn(pm);
+	tpm->u.dval = pm->gsu.f->getfn(pm);
 	break;
     case PM_ARRAY:
-	tpm->u.arr = zarrdup(pm->gets.afn(pm));
+	tpm->u.arr = zarrdup(pm->gsu.a->getfn(pm));
 	break;
     case PM_HASHED:
-	tpm->u.hash = copyparamtable(pm->gets.hfn(pm), pm->nam);
+	tpm->u.hash = copyparamtable(pm->gsu.h->getfn(pm), pm->nam);
 	break;
     }
     /*
@@ -985,10 +1083,10 @@ getarg(char **str, int *inv, Value v, int a2, zlong *w)
 	remnulargs(s);	/* This is probably always a no-op, but ... */
     if (!rev) {
 	if (ishash) {
-	    HashTable ht = v->pm->gets.hfn(v->pm);
+	    HashTable ht = v->pm->gsu.h->getfn(v->pm);
 	    if (!ht) {
 		ht = newparamtable(17, v->pm->nam);
-		v->pm->sets.hfn(v->pm, ht);
+		v->pm->gsu.h->setfn(v->pm, ht);
 	    }
 	    untokenize(s);
 	    if (!(v->pm = (Param) ht->getnode(ht, s))) {
@@ -1447,15 +1545,16 @@ getstrvalue(Value v)
 	}
 	return s;
     case PM_INTEGER:
-	convbase(buf, v->pm->gets.ifn(v->pm), v->pm->ct);
+	convbase(buf, v->pm->gsu.i->getfn(v->pm), v->pm->base);
 	s = dupstring(buf);
 	break;
     case PM_EFLOAT:
     case PM_FFLOAT:
-	s = convfloat(v->pm->gets.ffn(v->pm), v->pm->ct, v->pm->flags, NULL);
+	s = convfloat(v->pm->gsu.f->getfn(v->pm),
+		      v->pm->base, v->pm->flags, NULL);
 	break;
     case PM_SCALAR:
-	s = v->pm->gets.cfn(v->pm);
+	s = v->pm->gsu.s->getfn(v->pm);
 	break;
     default:
 	s = NULL;
@@ -1526,9 +1625,9 @@ getintvalue(Value v)
     if (v->inv)
 	return v->start;
     if (PM_TYPE(v->pm->flags) == PM_INTEGER)
-	return v->pm->gets.ifn(v->pm);
+	return v->pm->gsu.i->getfn(v->pm);
     if (v->pm->flags & (PM_EFLOAT|PM_FFLOAT))
-	return (zlong)v->pm->gets.ffn(v->pm);
+	return (zlong)v->pm->gsu.f->getfn(v->pm);
     return mathevali(getstrvalue(v));
 }
 
@@ -1544,10 +1643,10 @@ getnumvalue(Value v)
     } else if (v->inv) {
 	mn.u.l = v->start;
     } else if (PM_TYPE(v->pm->flags) == PM_INTEGER) {
-	mn.u.l = v->pm->gets.ifn(v->pm);
+	mn.u.l = v->pm->gsu.i->getfn(v->pm);
     } else if (v->pm->flags & (PM_EFLOAT|PM_FFLOAT)) {
 	mn.type = MN_FLOAT;
-	mn.u.d = v->pm->gets.ffn(v->pm);
+	mn.u.d = v->pm->gsu.f->getfn(v->pm);
     } else
 	return matheval(getstrvalue(v));
     return mn;
@@ -1572,12 +1671,12 @@ export_param(Param pm)
 #endif
 	    return;
     } else if (PM_TYPE(pm->flags) == PM_INTEGER)
-	convbase(val = buf, pm->gets.ifn(pm), pm->ct);
+	convbase(val = buf, pm->gsu.i->getfn(pm), pm->base);
     else if (pm->flags & (PM_EFLOAT|PM_FFLOAT))
-	val = convfloat(pm->gets.ffn(pm), pm->ct,
+	val = convfloat(pm->gsu.f->getfn(pm), pm->base,
 			pm->flags, NULL);
     else
-	val = pm->gets.cfn(pm);
+	val = pm->gsu.s->getfn(pm);
 
     addenv(pm, val);
 }
@@ -1605,14 +1704,15 @@ setstrvalue(Value v, char *val)
     switch (PM_TYPE(v->pm->flags)) {
     case PM_SCALAR:
 	if (v->start == 0 && v->end == -1) {
-	    (v->pm->sets.cfn) (v->pm, val);
-	    if (v->pm->flags & (PM_LEFT | PM_RIGHT_B | PM_RIGHT_Z) && !v->pm->ct)
-		v->pm->ct = strlen(val);
+	    v->pm->gsu.s->setfn(v->pm, val);
+	    if ((v->pm->flags & (PM_LEFT | PM_RIGHT_B | PM_RIGHT_Z)) &&
+		!v->pm->width)
+		v->pm->width = strlen(val);
 	} else {
 	    char *z, *x;
 	    int zlen;
 
-	    z = dupstring((v->pm->gets.cfn) (v->pm));
+	    z = dupstring(v->pm->gsu.s->getfn(v->pm));
 	    zlen = strlen(z);
 	    if (v->inv && unset(KSHARRAYS))
 		v->start--, v->end--;
@@ -1631,25 +1731,31 @@ setstrvalue(Value v, char *val)
 	    strncpy(x, z, v->start);
 	    strcpy(x + v->start, val);
 	    strcat(x + v->start, z + v->end);
-	    (v->pm->sets.cfn) (v->pm, x);
+	    v->pm->gsu.s->setfn(v->pm, x);
 	    zsfree(val);
 	}
 	break;
     case PM_INTEGER:
 	if (val) {
-	    (v->pm->sets.ifn) (v->pm, mathevali(val));
+	    v->pm->gsu.i->setfn(v->pm, mathevali(val));
 	    zsfree(val);
+	    if ((v->pm->flags & (PM_LEFT | PM_RIGHT_B | PM_RIGHT_Z)) &&
+		!v->pm->width)
+		v->pm->width = strlen(val);
 	}
-	if (!v->pm->ct && lastbase != -1)
-	    v->pm->ct = lastbase;
+	if (!v->pm->base && lastbase != -1)
+	    v->pm->base = lastbase;
 	break;
     case PM_EFLOAT:
     case PM_FFLOAT:
 	if (val) {
 	    mnumber mn = matheval(val);
-	    (v->pm->sets.ffn) (v->pm, (mn.type & MN_FLOAT) ? mn.u.d :
+	    v->pm->gsu.f->setfn(v->pm, (mn.type & MN_FLOAT) ? mn.u.d :
 			       (double)mn.u.l);
 	    zsfree(val);
+	    if ((v->pm->flags & (PM_LEFT | PM_RIGHT_B | PM_RIGHT_Z)) &&
+		!v->pm->width)
+		v->pm->width = strlen(val);
 	}
 	break;
     case PM_ARRAY:
@@ -1663,7 +1769,7 @@ setstrvalue(Value v, char *val)
 	break;
     case PM_HASHED:
         {
-	    (foundparam->sets.cfn) (foundparam, val);
+	    foundparam->gsu.s->setfn(foundparam, val);
         }
 	break;
     }
@@ -1700,14 +1806,14 @@ setnumvalue(Value v, mnumber val)
 	setstrvalue(v, ztrdup(p));
 	break;
     case PM_INTEGER:
-	(v->pm->sets.ifn) (v->pm, (val.type & MN_INTEGER) ? val.u.l :
-			   (zlong) val.u.d);
+	v->pm->gsu.i->setfn(v->pm, (val.type & MN_INTEGER) ? val.u.l :
+			    (zlong) val.u.d);
 	setstrvalue(v, NULL);
 	break;
     case PM_EFLOAT:
     case PM_FFLOAT:
-	(v->pm->sets.ffn) (v->pm, (val.type & MN_INTEGER) ?
-			   (double)val.u.l : val.u.d);
+	v->pm->gsu.f->setfn(v->pm, (val.type & MN_INTEGER) ?
+			    (double)val.u.l : val.u.d);
 	setstrvalue(v, NULL);
 	break;
     }
@@ -1737,7 +1843,7 @@ setarrvalue(Value v, char **val)
 	if (PM_TYPE(v->pm->flags) == PM_HASHED)
 	    arrhashsetfn(v->pm, val, 0);
 	else
-	    (v->pm->sets.afn) (v->pm, val);
+	    v->pm->gsu.a->setfn(v->pm, val);
     } else if (v->start == -1 && v->end == 0 &&
     	    PM_TYPE(v->pm->flags) == PM_HASHED) {
     	arrhashsetfn(v->pm, val, 1);
@@ -1758,7 +1864,7 @@ setarrvalue(Value v, char **val)
 	}
 	if (v->end < v->start)
 	    v->end = v->start;
-	q = old = v->pm->gets.afn(v->pm);
+	q = old = v->pm->gsu.a->getfn(v->pm);
 	n = arrlen(old);
 	if (v->start < 0) {
 	    v->start += n;
@@ -1786,7 +1892,7 @@ setarrvalue(Value v, char **val)
 		*p++ = ztrdup(*q++);
 	*p = NULL;
 
-	(v->pm->sets.afn) (v->pm, new);
+	v->pm->gsu.a->setfn(v->pm, new);
 	freearray(val);
     }
 }
@@ -1848,7 +1954,7 @@ getaparam(char *s)
 
     if (!idigit(*s) && (v = getvalue(&vbuf, &s, 0)) &&
 	PM_TYPE(v->pm->flags) == PM_ARRAY)
-	return v->pm->gets.afn(v->pm);
+	return v->pm->gsu.a->getfn(v->pm);
     return NULL;
 }
 
@@ -1863,7 +1969,7 @@ gethparam(char *s)
 
     if (!idigit(*s) && (v = getvalue(&vbuf, &s, 0)) &&
 	PM_TYPE(v->pm->flags) == PM_HASHED)
-	return paramvalarr(v->pm->gets.hfn(v->pm), SCANPM_WANTVALS);
+	return paramvalarr(v->pm->gsu.h->getfn(v->pm), SCANPM_WANTVALS);
     return NULL;
 }
 
@@ -1878,7 +1984,7 @@ gethkparam(char *s)
 
     if (!idigit(*s) && (v = getvalue(&vbuf, &s, 0)) &&
 	PM_TYPE(v->pm->flags) == PM_HASHED)
-	return paramvalarr(v->pm->gets.hfn(v->pm), SCANPM_WANTKEYS);
+	return paramvalarr(v->pm->gsu.h->getfn(v->pm), SCANPM_WANTKEYS);
     return NULL;
 }
 
@@ -1952,7 +2058,7 @@ assignsparam(char *s, char *val, int augment)
 		return v->pm; /* avoid later setstrvalue() call */
 	    case PM_ARRAY:
 	    	if (unset(KSHARRAYS)) {
-		    v->start = arrlen(v->pm->gets.afn(v->pm));
+		    v->start = arrlen(v->pm->gsu.a->getfn(v->pm));
 		    v->end = v->start + 1;
 		} else {
 		    /* ksh appends scalar to first element */
@@ -1967,7 +2073,7 @@ assignsparam(char *s, char *val, int augment)
     		if (v->end > 0)
 		    v->start = v->end;
 		else
-		    v->start = v->end = strlen(v->pm->gets.cfn(v->pm)) +
+		    v->start = v->end = strlen(v->pm->gsu.s->getfn(v->pm)) +
 			v->end + 1;
 	    	break;
 	    case PM_INTEGER:
@@ -2064,7 +2170,7 @@ assignaparam(char *s, char **val, int augment)
     if (augment) {
     	if (v->start == 0 && v->end == -1) {
 	    if (PM_TYPE(v->pm->flags) & PM_ARRAY) {
-	    	v->start = arrlen(v->pm->gets.afn(v->pm));
+	    	v->start = arrlen(v->pm->gsu.a->getfn(v->pm));
 	    	v->end = v->start + 1;
 	    } else if (PM_TYPE(v->pm->flags) & PM_HASHED)
 	    	v->start = -1, v->end = 0;
@@ -2072,7 +2178,7 @@ assignaparam(char *s, char **val, int augment)
 	    if (v->end > 0)
 		v->start = v->end--;
 	    else if (PM_TYPE(v->pm->flags) & PM_ARRAY) {
-		v->end = arrlen(v->pm->gets.afn(v->pm)) + v->end;
+		v->end = arrlen(v->pm->gsu.a->getfn(v->pm)) + v->end;
 		v->start = v->end + 1;
 	    }
 	}
@@ -2147,7 +2253,7 @@ setiparam(char *s, zlong val)
 	if (ss) {
 	    *ss = '[';
 	} else {
-	    pm->ct = outputradix;
+	    pm->base = outputradix;
 	}
 	v = getvalue(&vbuf, &t, 1);
 	DPUTS(!v, "BUG: value not found for new parameter");
@@ -2190,7 +2296,7 @@ setnparam(char *s, mnumber val)
 	if (ss) {
 	    *ss = '[';
 	} else if (val.type & MN_INTEGER) {
-	    pm->ct = outputradix;
+	    pm->base = outputradix;
 	}
 	v = getvalue(&vbuf, &t, 1);
 	DPUTS(!v, "BUG: value not found for new parameter");
@@ -2232,7 +2338,7 @@ unsetparam_pm(Param pm, int altflag, int exp)
 	zerr("%s: restricted", pm->nam, 0);
 	return 1;
     }
-    pm->unsetfn(pm, exp);
+    pm->gsu.s->unsetfn(pm, exp);
     if (pm->env)
 	delenv(pm);
 
@@ -2281,7 +2387,7 @@ unsetparam_pm(Param pm, int altflag, int exp)
 	if ((PM_TYPE(oldpm->flags) == PM_SCALAR) &&
 	    !(pm->flags & PM_HASHELEM) &&
 	    (oldpm->flags & PM_NAMEDDIR) &&
-	    oldpm->sets.cfn == strsetfn)
+	    oldpm->gsu.s == &stdscalar_gsu)
 	    adduserdir(oldpm->nam, oldpm->u.str, 0, 0);
 	if (oldpm->flags & PM_EXPORTED) {
 	    /*
@@ -2300,16 +2406,20 @@ unsetparam_pm(Param pm, int altflag, int exp)
 }
 
 /* Standard function to unset a parameter.  This is mostly delegated to *
- * the specific set function.                                           */
+ * the specific set function.
+ *
+ * This could usefully be made type-specific, but then we need
+ * to be more careful when calling the unset method directly.
+ */
 
 /**/
 mod_export void
 stdunsetfn(Param pm, UNUSED(int exp))
 {
     switch (PM_TYPE(pm->flags)) {
-	case PM_SCALAR: pm->sets.cfn(pm, NULL); break;
-	case PM_ARRAY:  pm->sets.afn(pm, NULL); break;
-	case PM_HASHED: pm->sets.hfn(pm, NULL); break;
+	case PM_SCALAR: pm->gsu.s->setfn(pm, NULL); break;
+	case PM_ARRAY:  pm->gsu.a->setfn(pm, NULL); break;
+	case PM_HASHED: pm->gsu.h->setfn(pm, NULL); break;
 	default:
 	    if (!(pm->flags & PM_SPECIAL))
 	    	pm->u.str = NULL;
@@ -2425,6 +2535,15 @@ hashsetfn(Param pm, HashTable x)
     pm->u.hash = x;
 }
 
+/* Function to dispose of setting of an unsettable hash */
+
+/**/
+mod_export void
+nullsethashfn(Param pm, HashTable x)
+{
+    deleteparamtable(x);
+}
+
 /* Function to set value of an association parameter using key/value pairs */
 
 /**/
@@ -2433,7 +2552,7 @@ arrhashsetfn(Param pm, char **val, int augment)
 {
     /* Best not to shortcut this by using the existing hash table,   *
      * since that could cause trouble for special hashes.  This way, *
-     * it's up to pm->sets.hfn() what to do.                         */
+     * it's up to pm->gsu.h->setfn() what to do.                     */
     int alen = arrlen(val);
     HashTable opmtab = paramtab, ht = 0;
     char **aptr = val;
@@ -2447,7 +2566,7 @@ arrhashsetfn(Param pm, char **val, int augment)
 	return;
     }
     if (alen)
-    	if (!(augment && (ht = paramtab = pm->gets.hfn(pm))))
+    	if (!(augment && (ht = paramtab = pm->gsu.h->getfn(pm))))
 	    ht = paramtab = newparamtable(17, pm->nam);
     while (*aptr) {
 	/* The parameter name is ztrdup'd... */
@@ -2463,7 +2582,7 @@ arrhashsetfn(Param pm, char **val, int augment)
 	setstrvalue(v, *aptr++);
     }
     paramtab = opmtab;
-    pm->sets.hfn(pm, ht);
+    pm->gsu.h->setfn(pm, ht);
     free(val);		/* not freearray() */
 }
 
@@ -2671,7 +2790,7 @@ tiedarrunsetfn(Param pm, UNUSED(int exp))
      * in typeset_single to hold the special data which we now
      * need to delete.
      */
-    pm->sets.cfn(pm, NULL);
+    pm->gsu.s->setfn(pm, NULL);
     zfree(pm->u.data, sizeof(struct tieddata));
     /* paranoia -- shouldn't need these, but in case we reuse the struct... */
     pm->u.data = NULL;
@@ -2822,13 +2941,11 @@ setsecondstype(Param pm, int on, int off)
     /* Only one of the numeric types is allowed. */
     if (tp == PM_EFLOAT || tp == PM_FFLOAT)
     {
-	pm->gets.ffn = floatsecondsgetfn;
-	pm->sets.ffn = floatsecondssetfn;
+	pm->gsu.f = &floatseconds_gsu;
     }
     else if (tp == PM_INTEGER)
     {
-	pm->gets.ifn = intsecondsgetfn;
-	pm->sets.ifn = intsecondssetfn;
+	pm->gsu.i = &intseconds_gsu;
     }
     else
 	return 1;
@@ -2881,10 +2998,10 @@ uidgetfn(UNUSED(Param pm))
 
 /**/
 void
-uidsetfn(UNUSED(Param pm), uid_t x)
+uidsetfn(UNUSED(Param pm), zlong x)
 {
 #ifdef HAVE_SETUID
-    setuid(x);
+    setuid((uid_t)x);
 #endif
 }
 
@@ -2901,10 +3018,10 @@ euidgetfn(UNUSED(Param pm))
 
 /**/
 void
-euidsetfn(UNUSED(Param pm), uid_t x)
+euidsetfn(UNUSED(Param pm), zlong x)
 {
 #ifdef HAVE_SETEUID
-    seteuid(x);
+    seteuid((uid_t)x);
 #endif
 }
 
@@ -2921,10 +3038,10 @@ gidgetfn(UNUSED(Param pm))
 
 /**/
 void
-gidsetfn(UNUSED(Param pm), gid_t x)
+gidsetfn(UNUSED(Param pm), zlong x)
 {
 #ifdef HAVE_SETUID
-    setgid(x);
+    setgid((gid_t)x);
 #endif
 }
 
@@ -2941,10 +3058,10 @@ egidgetfn(UNUSED(Param pm))
 
 /**/
 void
-egidsetfn(UNUSED(Param pm), gid_t x)
+egidsetfn(UNUSED(Param pm), zlong x)
 {
 #ifdef HAVE_SETEUID
-    setegid(x);
+    setegid((gid_t)x);
 #endif
 }
 
@@ -3650,27 +3767,28 @@ scanendscope(HashNode hn, UNUSED(int flags))
 	    pm->old = tpm->old;
 	    pm->flags = (tpm->flags & ~PM_NORESTORE);
 	    pm->level = tpm->level;
-	    pm->ct = tpm->ct;
+	    pm->base = tpm->base;
+	    pm->width = tpm->width;
 	    if (pm->env)
 		delenv(pm);
 
 	    if (!(tpm->flags & PM_NORESTORE))
 		switch (PM_TYPE(pm->flags)) {
 		case PM_SCALAR:
-		    pm->sets.cfn(pm, tpm->u.str);
+		    pm->gsu.s->setfn(pm, tpm->u.str);
 		    break;
 		case PM_INTEGER:
-		    pm->sets.ifn(pm, tpm->u.val);
+		    pm->gsu.i->setfn(pm, tpm->u.val);
 		    break;
 		case PM_EFLOAT:
 		case PM_FFLOAT:
-		    pm->sets.ffn(pm, tpm->u.dval);
+		    pm->gsu.f->setfn(pm, tpm->u.dval);
 		    break;
 		case PM_ARRAY:
-		    pm->sets.afn(pm, tpm->u.arr);
+		    pm->gsu.a->setfn(pm, tpm->u.arr);
 		    break;
 		case PM_HASHED:
-		    pm->sets.hfn(pm, tpm->u.hash);
+		    pm->gsu.h->setfn(pm, tpm->u.hash);
 		    break;
 		}
 	    zfree(tpm, sizeof(*tpm));
@@ -3696,7 +3814,7 @@ freeparamnode(HashNode hn)
     /* Since the second flag to unsetfn isn't used, I don't *
      * know what its value should be.                       */
     if (delunset)
-	pm->unsetfn(pm, 1);
+	pm->gsu.s->unsetfn(pm, 1);
     zsfree(pm->nam);
     /* If this variable was tied by the user, ename was ztrdup'd */
     if (pm->flags & PM_TIED)
@@ -3707,8 +3825,9 @@ freeparamnode(HashNode hn)
 /* Print a parameter */
 
 enum paramtypes_flags {
-    PMTF_USE_CT		= (1<<0),
-    PMTF_TEST_LEVEL	= (1<<1)
+    PMTF_USE_BASE	= (1<<0),
+    PMTF_USE_WIDTH	= (1<<1),
+    PMTF_TEST_LEVEL	= (1<<2)
 };
 
 struct paramtypes {
@@ -3720,15 +3839,15 @@ struct paramtypes {
 
 static const struct paramtypes pmtypes[] = {
     { PM_AUTOLOAD, "undefined", 0, 0},
-    { PM_INTEGER, "integer", 'i', PMTF_USE_CT},
+    { PM_INTEGER, "integer", 'i', PMTF_USE_BASE},
     { PM_EFLOAT, "float", 'E', 0},
     { PM_FFLOAT, "float", 'F', 0},
     { PM_ARRAY, "array", 'a', 0},
     { PM_HASHED, "association", 'A', 0},
     { 0, "local", 0, PMTF_TEST_LEVEL},
-    { PM_LEFT, "left justified", 'L', PMTF_USE_CT},
-    { PM_RIGHT_B, "right justified", 'R', PMTF_USE_CT},
-    { PM_RIGHT_Z, "zero filled", 'Z', PMTF_USE_CT},
+    { PM_LEFT, "left justified", 'L', PMTF_USE_WIDTH},
+    { PM_RIGHT_B, "right justified", 'R', PMTF_USE_WIDTH},
+    { PM_RIGHT_Z, "zero filled", 'Z', PMTF_USE_WIDTH},
     { PM_LOWER, "lowercase", 'l', 0},
     { PM_UPPER, "uppercase", 'u', 0},
     { PM_READONLY, "readonly", 'r', 0},
@@ -3776,8 +3895,12 @@ printparamnode(HashNode hn, int printflags)
 		} else {
 		    printf("%s ", pmptr->string);
 		}
-		if ((pmptr->flags & PMTF_USE_CT) && p->ct) {
-		    printf("%d ", p->ct);
+		if ((pmptr->flags & PMTF_USE_BASE) && p->base) {
+		    printf("%d ", p->base);
+		    doneminus = 0;
+		}
+		if ((pmptr->flags & PMTF_USE_WIDTH) && p->width) {
+		    printf("%d ", p->width);
 		    doneminus = 0;
 		}
 	    }
@@ -3812,27 +3935,27 @@ printparamnode(HashNode hn, int printflags)
     switch (PM_TYPE(p->flags)) {
     case PM_SCALAR:
 	/* string: simple output */
-	if (p->gets.cfn && (t = p->gets.cfn(p)))
+	if (p->gsu.s->getfn && (t = p->gsu.s->getfn(p)))
 	    quotedzputs(t, stdout);
 	break;
     case PM_INTEGER:
 	/* integer */
 #ifdef ZSH_64_BIT_TYPE
-	fputs(output64(p->gets.ifn(p)), stdout);
+	fputs(output64(p->gsu.i->getfn(p)), stdout);
 #else
-	printf("%ld", p->gets.ifn(p));
+	printf("%ld", p->gsu.i->getfn(p));
 #endif
 	break;
     case PM_EFLOAT:
     case PM_FFLOAT:
 	/* float */
-	convfloat(p->gets.ffn(p), p->ct, p->flags, stdout);
+	convfloat(p->gsu.f->getfn(p), p->base, p->flags, stdout);
 	break;
     case PM_ARRAY:
 	/* array */
 	if (!(printflags & PRINT_KV_PAIR))
 	    putchar('(');
-	u = p->gets.afn(p);
+	u = p->gsu.a->getfn(p);
 	if(*u) {
 	    quotedzputs(*u++, stdout);
 	    while (*u) {
@@ -3848,7 +3971,7 @@ printparamnode(HashNode hn, int printflags)
 	if (!(printflags & PRINT_KV_PAIR))
 	    putchar('(');
 	{
-            HashTable ht = p->gets.hfn(p);
+            HashTable ht = p->gsu.h->getfn(p);
             if (ht)
 		scanhashtable(ht, 0, 0, PM_UNSET,
 			      ht->printnode, PRINT_KV_PAIR);

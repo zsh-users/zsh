@@ -1649,7 +1649,7 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int ssub)
 		 * necessary joining of arrays until this point
 		 * to avoid the multsub() horror.
 		 */
-		int tmplen = arrlen(v->pm->gets.afn(v->pm));
+		int tmplen = arrlen(v->pm->gsu.a->getfn(v->pm));
 
 		if (v->start < 0)
 		    v->start += tmplen + v->inv;
@@ -1667,7 +1667,7 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int ssub)
 		 * Bet that's easier said than done.
 		 */
 		val = getstrvalue(v);
-		fwidth = v->pm->ct ? v->pm->ct : (int)strlen(val);
+		fwidth = v->pm->width ? v->pm->width : (int)strlen(val);
 		switch (v->pm->flags & (PM_LEFT | PM_RIGHT_B | PM_RIGHT_Z)) {
 		    char *t;
 		    unsigned int t0;
@@ -1695,17 +1695,67 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int ssub)
 			int zero = 1;
 
 			if (strlen(val) < fwidth) {
+			    char *valprefend = val;
 			    if (v->pm->flags & PM_RIGHT_Z) {
-				for (t = val; iblank(*t); t++);
-				if (!*t || !idigit(*t))
+				/*
+				 * This is a documented feature: when deciding
+				 * whether to pad with zeroes, ignore
+				 * leading blanks already in the value;
+				 * only look for numbers after that.
+				 * Not sure how useful this really is.
+				 * It's certainly confusing to code around.
+				 */
+				for (t = val; iblank(*t); t++)
+				    ;
+				/*
+				 * Allow padding after initial minus
+				 * for numeric variables.
+				 */
+				if ((v->pm->flags &
+				     (PM_INTEGER|PM_EFLOAT|PM_FFLOAT)) &&
+				    *t == '-')
+				    t++;
+				/*
+				 * Allow padding after initial 0x or
+				 * base# for integer variables.
+				 */
+				if (v->pm->flags & PM_INTEGER) {
+				    if (isset(CBASES) &&
+					t[0] == '0' && t[1] == 'x')
+					t += 2;
+				    else if ((valprefend = strchr(t, '#')))
+					t = valprefend + 1;
+				}
+				valprefend = t;
+				if (!*t)
+				    zero = 0;
+				else if (v->pm->flags &
+					 (PM_INTEGER|PM_EFLOAT|PM_FFLOAT)) {
+				    /* zero always OK */
+				} else if (!idigit(*t))
 				    zero = 0;
 			    }
 			    t = (char *) hcalloc(fwidth + 1);
 			    memset(t, (((v->pm->flags & PM_RIGHT_B) || !zero) ?
 				       ' ' : '0'), fwidth);
+			    /*
+			     * How can the following trigger?  We
+			     * haven't altered val or fwidth since
+			     * the last time we tested this.
+			     */
 			    if ((t0 = strlen(val)) > fwidth)
 				t0 = fwidth;
-			    strcpy(t + (fwidth - t0), val);
+			    /*
+			     * Copy - or 0x or base# before any padding
+			     * zeroes.
+			     */
+			    if (zero && val != valprefend) {
+				int preflen = valprefend - val;
+				memcpy(t, val, preflen);
+				strcpy(t + (fwidth - t0) + preflen,
+				       valprefend);
+			    } else
+				strcpy(t + (fwidth - t0), val);
 			    val = t;
 			} else {
 			    t = (char *) hcalloc(fwidth + 1);
@@ -2019,7 +2069,7 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int ssub)
 		    if (arrasg > 1) {
 			Param pm = sethparam(idbeg, a);
 			if (pm)
-			    aval = paramvalarr(pm->gets.hfn(pm), hkeys|hvals);
+			    aval = paramvalarr(pm->gsu.h->getfn(pm), hkeys|hvals);
 		    } else
 			setaparam(idbeg, a);
 		} else {

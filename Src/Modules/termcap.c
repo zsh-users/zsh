@@ -197,9 +197,7 @@ createtchash()
 	return NULL;
 
     pm->level = pm->old ? locallevel : 0;
-    pm->gets.hfn = hashgetfn;
-    pm->sets.hfn = hashsetfn;
-    pm->unsetfn = stdunsetfn;
+    pm->gsu.h = &stdhash_gsu;
     pm->u.hash = ht = newhashtable(7, termcap_nam, NULL);
 
     ht->hash        = hasher;
@@ -233,29 +231,21 @@ gettermcap(UNUSED(HashTable ht), char *name)
 
     unmetafy(name, &len);
 
-    pm = (Param) zhalloc(sizeof(struct param));
+    pm = (Param) hcalloc(sizeof(struct param));
     pm->nam = dupstring(name);
     pm->flags = PM_READONLY;
-    pm->unsetfn = NULL;
-    pm->ct = 0;
-    pm->env = NULL;
-    pm->ename = NULL;
-    pm->old = NULL;
-    pm->level = 0;
     u = buf;
 
     /* logic in the following cascade copied from echotc, above */
 
     if ((num = tgetnum(name)) != -1) {
-	pm->sets.ifn = NULL;
-	pm->gets.ifn = intgetfn;
+	pm->gsu.i = &nullsetinteger_gsu;
 	pm->u.val = num;
 	pm->flags |= PM_INTEGER;
 	return (HashNode) pm;
     }
 
-    pm->sets.cfn = NULL;
-    pm->gets.cfn = strgetfn;
+    pm->gsu.s = &nullsetscalar_gsu;
     switch (ztgetflag(name)) {
     case -1:
 	break;
@@ -338,17 +328,11 @@ scantermcap(UNUSED(HashTable ht), ScanFunc func, int flags)
 	"MT", "Xh", "Xl", "Xo", "Xr", "Xt", "Xv", "sA", "sL", NULL};
 #endif
 
-    pm = (Param) zhalloc(sizeof(struct param));
-    pm->unsetfn = NULL;
-    pm->ct = 0;
-    pm->env = NULL;
-    pm->ename = NULL;
-    pm->old = NULL;
+    pm = (Param) hcalloc(sizeof(struct param));
     u = buf;
 
     pm->flags = PM_READONLY | PM_SCALAR;
-    pm->sets.cfn = NULL;
-    pm->gets.cfn = strgetfn;
+    pm->gsu.s = &nullsetscalar_gsu;
 
     for (capcode = (char **)boolcodes; *capcode; capcode++) {
 	if ((num = ztgetflag(*capcode)) != -1) {
@@ -359,8 +343,7 @@ scantermcap(UNUSED(HashTable ht), ScanFunc func, int flags)
     }
 
     pm->flags = PM_READONLY | PM_INTEGER;
-    pm->sets.ifn = NULL;
-    pm->gets.ifn = intgetfn;
+    pm->gsu.i = &nullsetinteger_gsu;
 
     for (capcode = (char **)numcodes; *capcode; capcode++) {
 	if ((num = tgetnum(*capcode)) != -1) {
@@ -371,8 +354,7 @@ scantermcap(UNUSED(HashTable ht), ScanFunc func, int flags)
     }
 
     pm->flags = PM_READONLY | PM_SCALAR;
-    pm->sets.cfn = NULL;
-    pm->gets.cfn = strgetfn;
+    pm->gsu.s = &nullsetscalar_gsu;
 
     for (capcode = (char **)strcodes; *capcode; capcode++) {
 	if ((tcstr = (char *)tgetstr(*capcode,&u)) != NULL &&

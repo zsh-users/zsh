@@ -18,7 +18,6 @@
 #  Function tracing (typeset -ft)		E02xtrace
 
 # Not yet tested:
-#  Justification (-L, -R, -Z)
 #  Case conversion (-l, -u)
 #  Assorted illegal flag combinations
 
@@ -243,6 +242,99 @@
  print $scalar
 0:Local scalar subscript assignment
 >abc
+
+ typeset -L 10 fools
+ for fools in "   once" "twice"  "      thrice" "   oops too long here"; do
+   print "'$fools'"
+ done
+0:Left justification of scalars
+>'once      '
+>'twice     '
+>'thrice    '
+>'oops too l'
+
+ typeset -L 10 -F 3 foolf
+ for foolf in 1.3 4.6 -2.987 -4.91031; do
+   print "'$foolf'"
+ done
+0:Left justification of floating point
+>'1.300     '
+>'4.600     '
+>'-2.987    '
+>'-4.910    '
+
+ typeset -L 10 -Z foolzs
+ for foolzs in 001.3 04.6 -2.987 -04.91231; do
+   print "'$foolzs'"
+ done
+0:Left justification of scalars with zero suppression
+>'1.3       '
+>'4.6       '
+>'-2.987    '
+>'-04.91231 '
+
+ typeset -R 10 foors
+ for foors in short longer even-longer; do
+   print "'$foors'"
+ done
+0:Right justification of scalars
+>'     short'
+>'    longer'
+>'ven-longer'
+
+ typeset -Z 10 foozs
+ for foozs in 42 -42 " 43" " -43"; do
+   print "'$foozs'"
+ done
+0:Right justification of scalars with zeroes
+>'0000000042'
+>'       -42'
+>' 000000043'
+>'       -43'
+
+ integer -Z 10 foozi
+ for foozi in 42 -42 " 43" " -43"; do
+   print "'$foozi'"
+ done
+0:Right justification of integers with zero, no initial base
+>'0000000042'
+>'-000000042'
+>'0000000043'
+>'-000000043'
+# In case you hadn't twigged, the spaces are absorbed in the initial
+# math evaluation, so don't get through.
+
+ unsetopt cbases
+ integer -Z 10 -i 16 foozi16
+ for foozi16 in 42 -42 " 43" " -43"; do
+   print "'$foozi16'"
+ done
+0:Right justification of integers with zero, base 16, C_BASES off
+>'16#000002A'
+>'-16#00002A'
+>'16#000002B'
+>'-16#00002B'
+
+ setopt cbases
+ integer -Z 10 -i 16 foozi16c
+ for foozi16c in 42 -42 " 43" " -43"; do
+   print "'$foozi16c'"
+ done
+0:Right justification of integers with zero, base 16, C_BASES on
+>'0x0000002A'
+>'-0x000002A'
+>'0x0000002B'
+>'-0x000002B'
+
+ typeset -F 3 -Z 10 foozf
+ for foozf in 3.14159 -3.14159 4 -4; do
+   print "'$foozf'"
+ done
+0:Right justification of fixed point numbers with zero
+>'000003.142'
+>'-00003.142'
+>'000004.000'
+>'-00004.000'
 
  stress00
  print $scalar $array

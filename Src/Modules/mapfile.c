@@ -74,6 +74,9 @@ shempty(void)
 {
 }
 
+static const struct gsu_hash mapfiles_gsu =
+{ hashgetfn, setpmmapfiles, stdunsetfn };
+
 /* Create the special hash parameter. */
 
 /**/
@@ -91,9 +94,7 @@ createmapfilehash()
 	return NULL;
 
     pm->level = pm->old ? locallevel : 0;
-    pm->gets.hfn = hashgetfn;
-    pm->sets.hfn = setpmmapfiles;
-    pm->unsetfn = stdunsetfn;
+    pm->gsu.h = &mapfiles_gsu;
     pm->u.hash = ht = newhashtable(7, mapfile_nam, NULL);
 
     ht->hash        = hasher;
@@ -257,6 +258,9 @@ get_contents(char *fname)
     return val;
 }
 
+static const struct gsu_scalar mapfile_gsu =
+{ strgetfn, setpmmapfile, unsetpmmapfile };
+
 /**/
 static HashNode
 getpmmapfile(UNUSED(HashTable ht), char *name)
@@ -264,18 +268,10 @@ getpmmapfile(UNUSED(HashTable ht), char *name)
     char *contents;
     Param pm = NULL;
 
-    pm = (Param) zhalloc(sizeof(struct param));
+    pm = (Param) hcalloc(sizeof(struct param));
     pm->nam = dupstring(name);
     pm->flags = PM_SCALAR;
-    pm->sets.cfn = setpmmapfile;
-    pm->gets.cfn = strgetfn;
-    pm->unsetfn = unsetpmmapfile;
-    pm->ct = 0;
-    pm->env = NULL;
-    pm->ename = NULL;
-    pm->old = NULL;
-    pm->level = 0;
-
+    pm->gsu.s = &mapfile_gsu;
     pm->flags |= (mapfile_pm->flags & PM_READONLY);
 
     /* Set u.str to contents of file given by name */
@@ -288,6 +284,7 @@ getpmmapfile(UNUSED(HashTable ht), char *name)
     return (HashNode) pm;
 }
 
+
 /**/
 static void
 scanpmmapfile(UNUSED(HashTable ht), ScanFunc func, int flags)
@@ -298,16 +295,9 @@ scanpmmapfile(UNUSED(HashTable ht), ScanFunc func, int flags)
     if (!(dir = opendir(".")))
 	return;
 
+    memset((void *)&pm, 0, sizeof(struct param));
     pm.flags = PM_SCALAR;
-    pm.sets.cfn = setpmmapfile;
-    pm.gets.cfn = strgetfn;
-    pm.unsetfn = unsetpmmapfile;
-    pm.ct = 0;
-    pm.env = NULL;
-    pm.ename = NULL;
-    pm.old = NULL;
-    pm.level = 0;
-
+    pm.gsu.s = &mapfile_gsu;
     pm.flags |= (mapfile_pm->flags & PM_READONLY);
 
     /* Here we scan the current directory, calling func() for each file */
