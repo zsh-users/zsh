@@ -1778,6 +1778,7 @@ domenuselect(Hookdef dummy, Chdata dat)
 	    s->origcs = origcs;
 	    s->origll = origll;
 	    menucmp = menuacc = hasoldlist = 0;
+	    minfo.cur = NULL;
 	    fixsuffix();
 	    validlist = 0;
 	    amatches = pmatches = lastmatches = NULL;

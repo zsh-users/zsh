@@ -512,6 +512,7 @@ after_complete(Hookdef dummy, int *dat)
 	if ((ret = runhookdef(MENUSTARTHOOK, (void *) &cdat))) {
 	    dat[1] = 0;
 	    menucmp = menuacc = 0;
+	    minfo.cur = NULL;
 	    if (ret == 2) {
 		fixsuffix();
 		cs = 0;
