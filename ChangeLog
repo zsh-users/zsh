@@ -1,3 +1,8 @@
+2000-06-16  Clint Adams  <schizo@debian.org>
+
+	* 11951: Completion/Debian/_dpkg: replaced _arguments -A
+	for install and record-avail  with an evaluation kludge.
+
 2000-06-16  Sven Wischnowsky  <wischnow@zsh.org>
 
 	* 11939: Src/Zle/compmatch.c, Src/Zle/compresult.c, Src/Zle/zle_tricky.c:

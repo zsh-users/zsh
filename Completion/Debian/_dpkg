@@ -1,7 +1,7 @@
 #compdef dpkg dpkg-deb
 
 local _dpkg_deb_actions _dpkg_common_actions _dpkg_actions _dpkg_options
-local _dpkg_options_recursive
+local _dpkg_options_recursive _dpkg_actions_install _dpkg_actions_record_avail
 local curcontext="$curcontext" context state line expl ret
 typeset -A opt_args
 
@@ -81,6 +81,8 @@ _dpkg_options=('--abort-after[abort after errors]:number of errors:' \
            --{force,refuse,no-force}'--[forcing options]:what:(auto-select downgrade configure-any hold bad-path not-root overwrite overwrite-diverted depends-version depends confnew confold confdef confmiss conflicts architecture overwrite-dir remove-reinstreq remove-essential)')
 
 _dpkg_options_recursive=('(--recursive)-R[recursive]' '(-R)--recursive')
+_dpkg_actions_install=('(--install)-i[install]' '(-i)--install')
+_dpkg_actions_record_avail=('(--record-avail)-A[record available]' '(-A)--record-avail')
 
 case "${words[1]:t}" in
 dpkg)
@@ -102,7 +104,8 @@ esac
 case "$state" in
   install|record_avail)
         _funcall ret _dpkg_$state && return ret
-        _arguments -C -A "-*" -s "$_dpkg_options[@]" \
+        _arguments -C -s "$_dpkg_options[@]" \
+           "${(@e):-\$_dpkg_actions_${state}}" \
 	   - recur \
 	   '(--recursive)-R[recursive]' \
 	   '(-R)--recursive' \
