@@ -1,45 +1,29 @@
 #compdef global
 
+local cmds="(-c --completion -f --file -g --grep -I --idutils -p --print-dbpath -P --path -u --update --version --help)"
+
 _arguments \
-	'(--completion)-c[completion on prefix]:prefix:' \
-	'(-c)--completion:prefix:' \
-	'(--file)-f[print function definitions in file]' \
-	'(-f)--file' \
-	'(--grep)-g[print all lines which match pattern using grep]:pattern' \
-	'(-g)--grep' \
-	'(--idutils)-I[print all lines which match pattern using id-utils]:pattern' \
-	'(-I)--idutils' \
-	'(--print-dbpath)-p[print location of GTAGS]' \
-	'(-p)--print-dbpath' \
-	'(--path)-P[print paths matching pattern]:pattern:' \
-	'(-P)--path' \
-	'(--update)-u[locate tag files and update incrementally]' \
-	'(-u)--update' \
-	'(--absolute)-a[print absolute path names]' \
-	'(-a)--absolute' \
-	'(--ignore-case)-i[ignore case in patterns]' \
-	'(-i)--ignore-case' \
-	'(--local)-l[print just objects which exist under the current directory]' \
-	'(-l)--local' \
-	'(--nofilter)-n[suppress sort filter and path conversion filter]' \
-	'(-n)--nofilter' \
-	'(--other)-o[search in other files, not just source files (with -g)]' \
-	'(-o)--other' \
-	'(--quiet)-q[quiet mode]' \
-	'(-q)--quiet' \
-	'(--reference --rootdir)-r[find object references instead of definitions]' \
-	'(-r --rootdir)--rereference' \
-	'(-r --reference)--rootdir' \
-	'(--symbol)-s[find symbols instead of function names]:pattern:' \
-	'(-s)--symbol' \
-	'(--tags)-t[output in standard ctags format]' \
-	'(-t)--tags' \
-	'(--through -s -r -l)-T[search through all tag files in GTAGSLIBPATH]' \
-	'(-T -s -r -l)--through' \
-	'(--verbose)-v[verbose mode]' \
-	'(-v)--verbose' \
-	'(--cxref)-x[in addition to default output, list line number and contents]' \
-	'(-x)--cxref' \
-	'--version:show version number:' \
-	'--help:show help:' \
-	':word:_global_tags'
+  "$cmds"{-c,--completion}'[completion on prefix]:prefix:' \
+  "$cmds"{-f,--file}'[print function definitions in file]' \
+  "$cmds"{-g,--grep}'[print all lines which match pattern using grep]:pattern' \
+  "$cmds"{-I,--idutils}'[print all lines which match pattern using id-utils]:pattern' \
+  "$cmds"{-p,--print-dbpath}'[print location of GTAGS]' \
+  "$cmds"{-P,--path}'[print paths matching pattern]:pattern:' \
+  "$cmds"{-u,--update}'[locate tag files and update incrementally]' \
+  '(-a --absolute)'{-a,--absolute}'[print absolute path names]' \
+  '(-e --regexp :)'{-e,--regexp}'[specify pattern]:pattern:_global_tags' \
+  '(-G --basic-regexp :)'{-G,--basic-regexp}'[specify basic regexp to use]:word:_global_tags' \
+  '(-i --ignore-case)'{-i,--ignore-case}'[ignore case in patterns]' \
+  '(-l --local)'{-l,--local}'[print just objects which exist under the current directory]' \
+  '(-n --nofilter)'{-n,--nofilter}'[suppress sort filter and path conversion filter]' \
+  '(-o --other)'{-o,--other}'[search in other files, not just source files (with -g)]' \
+  '(-q --quiet)'{-q,--quiet}'[quiet mode]' \
+  '(-r --reference --rootdir)'{-r,--reference,--rootdir}'[find object references instead of definitions]' \
+  '(-s --symbol)'{-s,--symbol}'[find symbols instead of function names]:pattern' \
+  '(-t --tags)'{-t,--tags}'[output in standard ctags format]' \
+  '(-T --through -s -r -l)'{-T,--through}'[search through all tag files in GTAGSLIBPATH]' \
+  '(-v --verbose)'{-v,--verbose}'[verbose mode]' \
+  '(-x --cxref)'{-x,--cxref}'[additionally list line number and contents]' \
+  '(- :)--version[display version information]' \
+  '(- :)--help[display help information]' \
+  ':word:_global_tags'

@@ -1,4 +1,4 @@
-#compdef dpkg dpkg-deb
+#compdef dpkg dpkg-deb dpkg-reconfigure
 
 local _dpkg_deb_actions _dpkg_common_actions _dpkg_actions _dpkg_options
 local _dpkg_options_recursive _dpkg_actions_install _dpkg_actions_record_avail
@@ -73,63 +73,72 @@ _dpkg_options_recursive=( '(--recursive -R)'{--recursive,-R}'[recursive]' )
 #  _dpkg_actions_record_avail=('(--record-avail)-A[record available]' '(-A)--record-avail')
 
 case "$service" in
-dpkg)
-_arguments -C -s "$_dpkg_actions[@]" \
-           "$_dpkg_deb_actions[@]" \
-           "$_dpkg_common_actions[@]" \
-           "$_dpkg_options[@]" \
-	   "$_dpkg_options_recursive[@]" && return 0
-;;
+  dpkg)
+    _arguments -C -s \
+      "$_dpkg_actions[@]" \
+      "$_dpkg_deb_actions[@]" \
+      "$_dpkg_common_actions[@]" \
+      "$_dpkg_options[@]" \
+      "$_dpkg_options_recursive[@]" && return 0
+  ;;
 
-dpkg-deb)
-_arguments "$_dpkg_deb_actions[@]" \
-           "$_dpkg_common_actions[@]" && return 0
-
-;;
-
+  dpkg-deb)
+    _arguments "$_dpkg_deb_actions[@]" \
+	"$_dpkg_common_actions[@]" && return 0
+  ;;
+  dpkg-reconfigure)
+    _arguments -s \
+      '(-f --frontend)'{-f,--frontend}'[select frontend to use]:frontend' \
+      '(-p --priority)'{-p,--priority}'[specify min priority of questions]:priority' \
+      '--default-priority[use default question priority]' \
+      '(*)--all[reconfigure all installed packages using debconf]' \
+      '(-u --unseen-only)'{-u,--unseen-only}'[only ask questions not yet seen are asked]' \
+      '--force[reconfigure even packages in broken state]' \
+      '(-)'{-h,--help}'[display help information]' \
+      '*:package:_deb_packages installed' && return 0
+  ;;
 esac
 
 case "$state" in
   install|record_avail)
-	_call_function ret _dpkg_$state && return ret
+    _call_function ret _dpkg_$state && return ret
 # not needed anymore?
 #            "${(@e):-\$_dpkg_actions_${state}}" \
-	_arguments -C -A '-*' -s \
-             "$_dpkg_options[@]" \
-             \!${^_dpkg_actions%%:*} \
-	   - recur \
-             "$_dpkg_options_recursive[@]" \
-	     '*:directory:_path_files -/' \
-	   - nonrecur \
-	     '*:Debian package:_path_files -g \*.deb'
+    _arguments -C -A '-*' -s \
+	"$_dpkg_options[@]" \
+	\!${^_dpkg_actions%%:*} \
+      - recur \
+	"$_dpkg_options_recursive[@]" \
+	'*:directory:_path_files -/' \
+      - nonrecur \
+	'*:Debian package:_path_files -g \*.deb'
   ;;
   remove|purge|status|listfiles)
-	_call_function ret _dpkg_$state && return ret
-	_arguments -C -A "-*" -s "$_dpkg_options[@]" \
-	   '*:package:_deb_packages installed'
+    _call_function ret _dpkg_$state && return ret
+    _arguments -C -A "-*" -s "$_dpkg_options[@]" \
+       '*:package:_deb_packages installed'
   ;;
   list)
-	_call_function ret _dpkg_$state && return ret
-	_arguments -C -A "-*" -s "$_dpkg_options[@]" \
-           '*:packages:_deb_packages avail'
+    _call_function ret _dpkg_$state && return ret
+    _arguments -C -A "-*" -s "$_dpkg_options[@]" \
+       '*:packages:_deb_packages avail'
   ;;
   compare_versions)
-	_call_function ret _dpkg_$state && return ret
-	_arguments -C -A "-*" -s \
-	'1:version A:' \
-	'2:operator:(lt le eq ne ge gt lt-nl le-nl ge-nl gt-nl)' \
-	'3:version B:'
+    _call_function ret _dpkg_$state && return ret
+    _arguments -C -A "-*" -s \
+    '1:version A:' \
+    '2:operator:(lt le eq ne ge gt lt-nl le-nl ge-nl gt-nl)' \
+    '3:version B:'
   ;;
   configure)
-	_call_function ret _dpkg_$state && return ret
-	_arguments -C -A "-*" -s '--configure' \
-	   "$_dpkg_options[@]" \
-	  '(* --pending)-a[pending packages]' \
-	  '(* -a)--pending' \
-	  '*:package:_deb_packages installed'
+    _call_function ret _dpkg_$state && return ret
+    _arguments -C -A "-*" -s '--configure' \
+       "$_dpkg_options[@]" \
+      '(* -a --pending)'{-a,--pending}'[pending packages]' \
+      '*:package:_deb_packages installed'
   ;;
   search)
-	_call_function ret _dpkg_$state && return ret
-	_files
+    _call_function ret _dpkg_$state && return ret
+    _files
   ;;
 esac

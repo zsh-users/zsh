@@ -10,6 +10,10 @@
 	* 18947: Completion/Unix/Command/_chown: also complete options using
 	_arguments
 
+2003-08-19  Adam Spiers  <adam@spiers.net>
+
+	* unposted: Completion/Unix/Command/_irssi: fix quoting bug.
+
 2003-08-16  Doug Kearns  <djkea2@mugca.its.monash.edu.au>
 
 	* 18944: Completion/Unix/Command/_ruby: update ruby completion for
@@ -30,6 +34,8 @@
 
 	* 18928: Completion/Unix/Command/_cdrecord: new cdrecord completion
 
+	* 18927: Completion/Unix/Command/_cvs: fix recent mistake with quoting
+
 2003-08-01  Peter Stephenson  <pws@csr.com>
 
 	* 18920: Src/utils.c, Completion/Core/Base/_main_complete: update
@@ -44,6 +50,30 @@
 
 	* 18916: Src/utils.c: Unsetting IFS could cause segmentation
 	fault (any time IFS was used to join an array).
+
+2003-07-31  Oliver Kiddle  <opk@zsh.org>
+
+	* 18914: Completion/Base/Utility/_nothing,
+	Completion/Debian/Command/_auto-apt, Completion/Debian/Command/_bug,
+	Completion/Debian/Command/_debchange,
+	Completion/Debian/Command/_debfoster,
+	Completion/Debian/Command/_debsign, Completion/Debian/Command/_dpkg,
+	Completion/Debian/Command/_dpkg_source,
+	Completion/Debian/Command/_dput, Completion/Debian/Command/_dupload,
+	Completion/Debian/Command/_update-alternatives,
+	Completion/Linux/Command/_iptables,
+	Completion/Linux/Command/_pkgtool, Completion/Redhat/Command/_rpm,
+	Completion/Unix/Command/_apm, Completion/Unix/Command/_arping,
+	Completion/Unix/Command/_cvs, Completion/Unix/Command/_fakeroot,
+	Completion/Unix/Command/_fsh, Completion/Unix/Command/_global,
+	Completion/Unix/Type/_global_tags, Completion/Unix/Command/_vorbis,
+	Completion/Unix/Command/_imagemagick, Completion/Unix/Command/_irssi,
+	Completion/Unix/Command/_mysql_utils, Completion/Unix/Command/_pbm,
+	Completion/Unix/Command/_rar, Completion/Unix/Command/_rsync,
+	Completion/Unix/Command/_slrn, Completion/Unix/Command/_user_admin,
+	Completion/X/Command/_acroread, Completion/X/Type/_x_color:
+	tidy up a number of completion functions (includes fixes, updates,
+	improvements and simple aesthetic changes)
 
 2003-07-24  Oliver Kiddle  <opk@zsh.org>
 

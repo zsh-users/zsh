@@ -17,7 +17,7 @@ _diff         _gs           _make         _psutils      _tin	      _mail
 _loadkeys     _apm          _ruby         _samba        _sysctl       _links
 _user_admin   _rsync        _arping	  _spamassassin _mtools	      _fsh
 _chkconfig    _cdcd         _irssi	  _sccs         _texinfo      _ant
-_global       _global_tags  _figlet       _ifconfig     _last         _larch
+_global                     _figlet       _ifconfig     _last         _larch
 _lsof         _mt           _xmlsoft      _elinks       _tidy         _python
 _antiword     _renice       _sablotron    _cdrecord     _aap          _du
 _rar          _vorbis       _subversion

@@ -1,0 +1,4 @@
+#autoload
+
+_wanted global-tags expl 'tag' compadd -M 'm:{a-zA-Z}={A-Za-z}' \
+    -a "$@" - $(_call_program global-tags global --completion $PREFIX)
