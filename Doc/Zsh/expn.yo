@@ -606,8 +606,8 @@ item(tt(%))(
 Expand all tt(%) escapes in the resulting words in the same way as in
 prompts (see noderef(Prompt Expansion)). If this flag is given twice,
 full prompt expansion is done on the resulting words, depending on the 
-setting of the tt(PROMPT_SUBST) and tt(PROMPT_BANG) options. The
-tt(PROMPT_PERCENT) option is temporarily turned on in any case.
+setting of the tt(PROMPT_PERCENT), tt(PROMPT_SUBST) and
+tt(PROMPT_BANG) options.
 )
 item(tt(X))(
 With this flag parsing errors occuring with the tt(Q) flag or the

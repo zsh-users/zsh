@@ -1662,9 +1662,10 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int ssub)
 	int ops = opts[PROMPTSUBST], opb = opts[PROMPTBANG];
 	int opp = opts[PROMPTPERCENT], len;
 
-	opts[PROMPTPERCENT] = 1;
-	if (presc < 2)
+	if (presc < 2) {
+	    opts[PROMPTPERCENT] = 1;
 	    opts[PROMPTSUBST] = opts[PROMPTBANG] = 0;
+	}
 	if (isarr) {
 	    char **ap;
 
