@@ -67,6 +67,38 @@ static char termcap_nam[] = "termcap";
 
 static Param termcap_pm;
 
+#ifndef HAVE_BOOLCODES
+static char *boolcodes[] = {
+    "bw", "am", "ut", "cc", "xs", "YA", "YF", "YB", "xt", "xn", "eo",
+    "gn", "hc", "HC", "km", "YC", "hs", "hl", "in", "YG", "da", "db",
+    "mi", "ms", "nx", "xb", "NP", "ND", "NR", "os", "5i", "YD", "YE",
+    "es", "hz", "ul", "xo", NULL};
+#endif
+
+/**/
+static int
+ztgetflag(char *s)
+{
+    char **b;
+
+    /* ncurses can tell if an existing boolean capability is *
+     * off, but other curses variants can't, so we fudge it. *
+     * This feature of ncurses appears to have gone away as  *
+     * of NCURSES_MAJOR_VERSION == 5, so don't rely on it.   */
+    switch (tgetflag(s)) {
+    case -1:
+	break;
+    case 0:
+	for (b = (char **)boolcodes; *b; ++b)
+	    if (s[0] == (*b)[0] && s[1] == (*b)[1])
+		return 0;
+	break;
+    default:
+	return 1;
+    }
+    return -1;
+}
+
 /* echotc: output a termcap */
 
 /**/
@@ -86,16 +118,8 @@ bin_echotc(char *name, char **argv, char *ops, int func)
 	printf("%d\n", num);
 	return 0;
     }
-    /* if the specified termcap is boolean, and set, say so  *
-     * ncurses can tell if an existing boolean capability is *
-     * off so in this case we print "no".                    */
-#if !defined(NCURSES_VERSION) || !defined(COLOR_PAIR)
-    if (tgetflag(s) > 0) {
-	puts("yes");
-	return (0);
-    }
-#else /* NCURSES_VERSION && COLOR_PAIR */
-    switch (tgetflag(s)) {
+    /* if the specified termcap is boolean, and set, say so  */
+    switch (ztgetflag(s)) {
     case -1:
 	break;
     case 0:
@@ -105,7 +129,6 @@ bin_echotc(char *name, char **argv, char *ops, int func)
 	puts("yes");
 	return 0;
     }
-#endif /* NCURSES_VERSION && COLOR_PAIR */
     /* get a string-type capability */
     u = buf;
     t = tgetstr(s, &u);
@@ -232,14 +255,7 @@ gettermcap(HashTable ht, char *name)
 	pm->flags |= PM_INTEGER;
 	return (HashNode) pm;
     }
-#if !defined(NCURSES_VERSION) || !defined(COLOR_PAIR)
-    if ((num = tgetflag(name)) > 0) {
-	pm->u.str = dupstring("yes");
-	pm->flags |= PM_SCALAR;
-	return (HashNode) pm;
-    }
-#else /* NCURSES_VERSION && COLOR_PAIR */
-    switch (tgetflag(name)) {
+    switch (ztgetflag(name)) {
     case -1:
 	break;
     case 0:
@@ -251,7 +267,6 @@ gettermcap(HashTable ht, char *name)
 	pm->flags |= PM_SCALAR;
 	return (HashNode) pm;
     }
-#endif /* NCURSES_VERSION && COLOR_PAIR */
     if ((tcstr = tgetstr(name, &u)) != NULL && tcstr != (char *)-1)
     {
 	pm->u.str = dupstring(tcstr);
@@ -273,14 +288,6 @@ scantermcap(HashTable ht, ScanFunc func, int flags)
     Param pm = NULL;
     int num;
     char **capcode, *tcstr, buf[2048], *u;
-
-#ifndef HAVE_BOOLCODES
-    static char *boolcodes[] = {
-	"bw", "am", "ut", "cc", "xs", "YA", "YF", "YB", "xt", "xn", "eo",
-	"gn", "hc", "HC", "km", "YC", "hs", "hl", "in", "YG", "da", "db",
-	"mi", "ms", "nx", "xb", "NP", "ND", "NR", "os", "5i", "YD", "YE",
-	"es", "hz", "ul", "xo", NULL};
-#endif
 
 #ifndef HAVE_NUMCODES
     static char *numcodes[] = {
@@ -344,7 +351,7 @@ scantermcap(HashTable ht, ScanFunc func, int flags)
 
     pm->flags = PM_READONLY | PM_SCALAR;
     for (capcode = (char **)boolcodes; *capcode; capcode++) {
-	if ((num = tgetflag(*capcode)) != -1) {
+	if ((num = ztgetflag(*capcode)) != -1) {
 	    pm->u.str = num ? dupstring("yes") : dupstring("no");
 	    pm->nam = dupstring(*capcode);
 	    func((HashNode) pm, flags);
