@@ -50,7 +50,7 @@ setopts=(
 if [[ -n "$compcontext" ]]; then
   if [[ CURRENT -eq 1 ]]; then
 
-    funcall ret _nslookup_command && return ret
+    _funcall ret _nslookup_command && return ret
 
     _alternative \
         'commands:command:compadd server lserver root finger ls view help set' \
@@ -58,7 +58,7 @@ if [[ -n "$compcontext" ]]; then
     return ret
   elif [[ "$compstate[context]" = redirect ]]; then
 
-    funcall ret _nslookup_redirect && return ret
+    _funcall ret _nslookup_redirect && return ret
 
     _tags -C redirection files || return 1
 
@@ -79,9 +79,9 @@ if [[ -n "$compcontext" ]]; then
   fi
 
   if [[ "$words[1]" = [a-z]## ]]; then
-    funcall ret _nslookup_$words[1] && return ret
+    _funcall ret _nslookup_$words[1] && return ret
   else
-    funcall ret _nslookup_host && return ret
+    _funcall ret _nslookup_host && return ret
   fi
 
   case "$words[1]" in

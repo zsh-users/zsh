@@ -79,7 +79,7 @@ while [[ -n "$state" ]]; do
 
   # First try to call a user-defined function.
 
-  funcall ret _rpm_$state && return ret
+  _funcall ret _rpm_$state && return ret
 
   # Copy the state and reset `state', to simplify the test above.
 

@@ -167,8 +167,8 @@ tt(menu-expand-or-complete), or tt(reverse-menu-complete). If the
 tt(complist) module is loaded (see
 ifzman(zmanref(zshmodules))\
 ifnzman(noderef(The complist Module))\
-), the tt(menu-select) widget can be used, too.  If the option tt(-n) is
-also given, the bindings will not be used if the key is already bound (that
+), the tt(menu-select) widget can be used, too.  Note that the
+bindings will not be used if the key is already bound (that
 is, is bound to something other than tt(undefined-key)).
 
 The widget is then bound to all the var(key-sequences) given, if any: when
@@ -202,7 +202,7 @@ completion functions.
 enditem()
 
 Note that the tt(#) is part of the tag name and no white space is allowed
-after it.  The tt(#compdef) tags use the tt(compdef) function defined
+after it.  The tt(#compdef) tags use the tt(compdef) function described
 below; the main difference is that the name of the function is supplied
 implicitly.
 
@@ -256,7 +256,7 @@ underscore.
 
 In each of the forms supporting it the tt(-a) option makes the
 var(function) autoloadable (exactly equivalent to
-tt(autoload )var(function)).
+tt(autoload -U )var(function)).
 )
 findex(compstyle)
 cindex(completion system, configuring)
@@ -273,7 +273,7 @@ ifnzman(noderef(Completion System Configuration))\
 .
 
 In the first form a new var(style) is defined for a certain
-var(pattern), setting it the value given by the var(strings). If there 
+var(pattern), setting it to the value given by the var(strings). If there 
 was already a definition for the same var(pattern)/var(style) pair,
 only the value is changed.
 
@@ -287,15 +287,6 @@ pattern.
 In the last form (without arguments) all definitions are listed. If
 the tt(-L) option is given this is done in the form of calls to
 tt(compstyle).
-)
-findex(funcall)
-item(tt(funcall) var(return) var(name) [ var(args) ... ])(
-If a function var(name) exists, it is called with the arguments
-var(args). Unless it is the empty string or a single hyphen,
-var(return) is taken as the name of a parameter and the return status
-from the called function is stored in it.
-The return value of tt(funcall) itself is zero if the function
-var(name) exists and was called and non-zero otherwise.
 )
 enditem()
 
@@ -324,8 +315,8 @@ beginning just says that we are currently trying completion as opposed
 to, say, correction, which can also be done using the function based
 completion system (see
 ifzman(the section `Control Functions' below)\
-ifnzman(noderef(Control Functions))\
- for more information).
+ifnzman(noderef(Control Functions)) 
+for more information).
 
 In many of the possible contexts the completion system can generate
 matches, and often it can generate multiple types of matches. Whenever 
@@ -333,9 +324,9 @@ a completion function is about to generate such matches it first calls
 a utility function, telling it what types of matches can be
 generated. These types are represented as simple names calld
 `tags'. This utility function in turn calls another function
-(tt(_sort_tags)) and gives the list of tags to it as the positional
+(tt(_sort_tags)) and gives the list of tags to it as
 arguments. The function tt(_sort_tags) can then say in which order the 
-tags are to be used by the completion function. The function will then 
+tags are to be used by the completion function. The function will 
 only generate those types of matches whose tags were selected by the
 user's implementation of the tt(_sort_tags) function. And it will
 try to generate the different types of matches in the order in which
@@ -348,8 +339,8 @@ system is often called to generate only filenames matching a given
 glob pattern and then uses the tags tt(globbed-files),
 tt(directories), and tt(all-files). This means that the function
 offers to generate filenames matching the pattern, names of
-directories or all filenames as possible matches. Now, the user may
-have definition for tt(_sort_tags):
+directories or all filenames as possible matches. Now, if the user has
+this definition for tt(_sort_tags):
 
 example(_sort_tags() {
   case $curcontext in
@@ -367,13 +358,13 @@ example(_sort_tags() {
 
 Every call to the tt(comptry) function (well, it's actually a builtin
 command defined by the tt(computil) module, but never mind) gives a
-set of tags to use. So, the first calls says which tags are to be used 
+set of tags to use. So, the first call says which tags are to be used 
 first. If there are no matches for those tags, the tags from the
 second call to tt(comptry) will be tried, and so on. In the example
 this means that for the tt(dvips) command on the first attempt the
 names of DVI files and directories will be generated (first call to
 tt(comptry)). If none of those names match the string from the command
-line the completion function will then generate all filenames as
+line the completion function will generate all filenames as
 possible matches (second call to tt(comptry)).
 
 For all other context names the second case-pattern matches, so that
@@ -394,7 +385,6 @@ you may write in your tt(_sort_tags) function:
 
 example(_sort_tags() {
   comptry arguments options
-
   case $curcontext in
   ...
   esac
@@ -405,7 +395,6 @@ or
 example(_sort_tags() {
   comptry arguments
   comptry options
-
   case $curcontext in
   ...
   esac
@@ -419,13 +408,13 @@ for the argument, which normally means that you have to type the
 hyphen the option names start with yourself to see the list of option
 names that can be completed.
 
-Since the completion function are free to choose the tag names they
+Since the completion functions are free to choose the tag names they
 use, there can't be a complete list. So to make sure that all types of 
 matches are eventually tried as completions, one should  use a call to 
-tt(comptry) with all positional argument at the end of
-tt(_sort_tags). For those contexts where one really wants to make sure 
-that certain tags are never used one can then use a call to tt(return) 
-to circumvent that last tt(comptry). For example:
+tt(comptry) with all arguments at the end of tt(_sort_tags). For those
+contexts where one really wants to make sure that certain tags are
+never used one can then use a call to tt(return) to circumvent that
+last tt(comptry). For example:
 
 example(_sort_tags() {
   ...
@@ -449,10 +438,10 @@ not executed.
 
 The tt(_complete_help) bindable command described in 
 ifzman(the section `Bindable Commands' below)\
-ifnzman(noderef(Bindable Commands))\
-can be used to find out the context and tag names used by completion
+ifnzman(noderef(Bindable Commands))
+can be used to find out the contexts and tag names used by completion
 functions. If it is invoked, it shows a list of context names and the
-tag names used in those contexts if completion were tried in the
+tag names used in those contexts if completion were tried at the
 current cursor position. This allows one to easily find out all the
 information needed to change the tt(_sort_tags) function when one
 wants to change the way matches are generated for that context.
@@ -506,14 +495,14 @@ As said above, the patterns given to the tt(compstyle) function are
 tested in the order in which they were given. But that isn't
 completely true. In fact, this function roughly sorts the patterns so
 that more specialized patterns are compared before more general
-patterns. Due to this, the last two examples could be defined before
+patterns. Due to this, the last two examples could be defined after
 the first one because both `tt(*:kill:*)' and `tt(*:kill*:jobs)' are
-considered to be more special then the pattern `tt(*)' from the first
-example. When decided how specific a pattern is, the function looks at 
+considered to be more specific then the pattern `tt(*)' from the first
+example. To decide how specific a pattern is, the function looks at 
 the number of colons (corresponding to the number of components) used
 in the pattern, and if these components are actual patterns (like the
 `tt(*)') or simple strings (like the `tt(jobs)' in the last
-example). Patterns with fewer patterns and fewer simple strings are
+example). Patterns with fewer colons and fewer simple strings are
 considered to be less specific.
 
 As for tags, completion functions can use any number of styles, so
@@ -597,7 +586,7 @@ item(tt(fonts))(
 used for X font names
 )
 item(tt(functions))(
-names of functions (shell function or other kinds of functions for
+names of functions (shell functions or other kinds of functions for
 some commands)
 )
 item(tt(globbed-files))(
@@ -638,7 +627,7 @@ item(tt(maps))(
 for map names (e.g. YP maps)
 )
 item(tt(matches))(
-used to look up the tt(matches) style
+used to look up the tt(group) style
 )
 item(tt(messages))(
 used to look up the tt(format) style for messages
@@ -647,7 +636,7 @@ item(tt(modifiers))(
 for names of X modifiers
 )
 item(tt(modules))(
-for zsh modules
+for modules (e.g. tt(zsh) modules)
 )
 item(tt(named-directories))(
 for named directories (you wouldn't have guessed that, would you?)
@@ -662,13 +651,13 @@ item(tt(options))(
 for command options
 )
 item(tt(packages))(
-for RPM packages
+for packages (e.g. tt(rpm) packages)
 )
 item(tt(parameters))(
 for names of parameters
 )
 item(tt(paths))(
-used to look up the values of the tt(expand) and tt(cursor) style
+used to look up the values of the tt(expand) and tt(cursor) styles
 )
 item(tt(pods))(
 for perl pods
@@ -689,7 +678,7 @@ item(tt(regex))(
 used to look up tt(cache-path) style
 )
 item(tt(sequences))(
-for MH sequences
+for sequences (e.g. tt(mh) sequences)
 )
 item(tt(sessions))(
 for sessions in the tt(zftp) function suite
@@ -702,7 +691,7 @@ for strings (e.g. the replacement strings for the tt(cd) builtin
 command)
 )
 item(tt(tags))(
-for RPM tags
+for tags (e.g. tt(rpm) tags)
 )
 item(tt(targets))(
 for makefile targets
@@ -779,13 +768,12 @@ The value of this style is given to the tt(ps) command by functions
 that call it when generating process identifiers as matches.
 )
 item(tt(auto-description))(
-If set, this string will be used as the description for options which
+If set, this style's value will be used as the description for options which
 are not described by the completion functions, but that have exactly
-one argument (note that this may not work for all commands).
-
-The sequence `tt(%d)' in the value will be replaced by the description
-for this argument. Depending on personal preferences, it may be useful
-to set this style to something like `tt(specify: %d)'.
+one argument. The sequence `tt(%d)' in the value will be replaced by
+the description for this argument. Depending on personal preferences,
+it may be useful to set this style to something like `tt(specify: %d)'. 
+Note that this may not work for some commands.
 )
 item(tt(cache-path))(
 The tt(_regex_arguments) utility function used by some completion
@@ -796,7 +784,7 @@ anew when the completion function is used in another shell.
 )
 item(tt(completer))(
 The strings given as the value of this style give the names of the
-completer function to use. The available completer functions are
+completer functions to use. The available completer functions are
 described in
 ifzman(the section `Control Functions' below)\
 ifnzman(noderef(Control Functions))\
@@ -807,9 +795,9 @@ This style is used by the tt(_expand) completer function.
 
 If this is set to an non-empty string it should be an expression
 usable inside a `tt($((...)))' arithmetical expression. The completer
-function evaluates this expression and if the result is `tt(1)' no
+function evaluates this expression and if the result is `tt(1)', no
 expansions will be generated, but instead the completions will be
-generated as normal and all of them will be inserted in the command
+generated as normal and all of them will be inserted into the command
 line.
 )
 item(tt(condition))(
@@ -828,14 +816,14 @@ other than `tt(1)'.
 )
 item(tt(cursor))(
 This is used together with the tt(paths) tag by the function
-generating filenames as matches to say that the cursor will be left
+generating filenames as matches to find out if the cursor will be left
 after the first ambiguous pathname component even when menucompletion
 is used.
 )
 item(tt(description))(
 This is used in several contexts to decide if only a simple or a
 verbose list of matches should be generated. For example some commands 
-show descriptions for option names if the style is true.
+show descriptions for option names if this style is true.
 )
 item(tt(disable-stat))(
 This is used with the tt(cvs) tag by the function completing for the
@@ -843,7 +831,7 @@ tt(cvs) command to decide if the tt(stat) module should be used to
 generate only names of modified files in the appropriate places.
 )
 item(tt(expand))(
-Like tt(cursor) this style is used with the tt(paths) tag. If it is
+Like tt(cursor), this style is used with the tt(paths) tag. If it is
 set to `true', the partially typed path from the line will be
 expanded as far as possible even if trailing pathname components can
 not be completed.
@@ -855,16 +843,16 @@ string to display above matches in completion lists. The sequence
 what these matches are. This string may also contain the sequences to
 specify output attributes, such as `tt(%b)' and `tt(%s)'.
 
-For the tt(messages) tag, this defines a string to display messages
-from the completion functions. Here, the `tt(%d)' is replaced with the 
-message given by the completion function.
+For the tt(messages) tag, this defines a string used by some
+completion functions to display messages. Here, the `tt(%d)' is
+replaced with the message given by the completion function.
 
 Finally, for the tt(warnings) tag, it is printed when no matches could 
 be generated at all. In this case the `tt(%d)' is replaced with the
 descriptions for the matches that were expected.
 )
 item(tt(glob))(
-Like tt(complete) this is used by the tt(_expand) completer.
+Like tt(complete), this is used by the tt(_expand) completer.
 
 The value is used like the one for tt(complete) and if it evaluates to 
 `tt(1)', globbing will be attempted on the words resulting from
@@ -923,8 +911,9 @@ matches generated on the first attempt will be used again.
 The tt(_history_complete_word) bindable command uses this style to
 decide if the available matches should be shown.
 
-In the tt(incremental-complete-word) widget, if it is `true', then the 
-matches are listed on every key press.
+When using the tt(incremental-complete-word) widget, this style says
+if the matches should be listed on every key press (if they fit on the 
+screen).
 )
 item(tt(list-arguments))(
 Like the tt(arguments) style, but used when calling the tt(ps) command 
@@ -1315,7 +1304,7 @@ corrected completions are found, the completer will normally start
 menucompletion allowing you to cycle through these strings.
 
 The exact behavior of this completer can be changed by using the
-style tt(accept), tt(original), tt(prompt), and tt(insert), see
+styles tt(accept), tt(original), tt(prompt), and tt(insert), see
 ifzman(the section `Completion System Configuration' above)\
 ifnzman(noderef(Completion System Configuration)).
 
@@ -1324,7 +1313,7 @@ undersccore as the top-level context name. Once it has started trying
 to generate matches, it will add another context name component
 containing the number of errors accepted in this attempt. So on the
 first try the context name starts with `tt(:approximate:1)', on the
-second try with `tt(:approximate:1)', and so on.
+second try with `tt(:approximate:2)', and so on.
 )
 item(tt(_correct))(
 Generate corrections (but not completions) for the current word; this is
@@ -1335,7 +1324,7 @@ For example, with:
 
 example(compstyle '*' completer _complete _correct _approximate
 compstyle ':correct' accept '2n!'
-compstyle ':approximate' accept 3n)
+compstyle ':approximate' accept '3n')
 
 correction will accept up to two errors. If a numeric argument is
 given, correction will not be performed, but correcting completion
@@ -1460,12 +1449,12 @@ standard output.
 item(tt(_correct_word) (^Xc))(
 Performs correction of the current argument using the usual contextual
 completions as possible choices. This uses the top-level context name
-`tt(correct-word)' and then calls the tt(_correct) completer.
+`tt(:correct-word)' and then calls the tt(_correct) completer.
 )
 item(tt(_expand_word (^Xe)))(
 Performs expansion on the current word:  equivalent to the standard
 tt(expand-word) command, but using the tt(_expand) completer. Before
-calling it, the top-level context name is set to `tt(expand-word)'.
+calling it, the top-level context name is set to `tt(:expand-word)'.
 )
 item(tt(_history_complete_word) (\e/))(
 Complete words from the shell's command history.
@@ -1499,9 +1488,9 @@ Once a string has been read, the next call to tt(_read_comp) will use the
 existing string instead of reading a new one.  To force a new string to be
 read, call tt(_read_comp) with a numeric argument.
 )
-item(tt(_complete_help))(
+item(tt(_complete_help (^Xh)))(
 This widget displays information about the context names and tags used 
-when completing for the place where the cursor is on the line.
+when completing at the current cursor position.
 )
 enditem()
 
@@ -1518,6 +1507,15 @@ generated completions and non-zero if no matching completions could be
 added.
 
 startitem()
+findex(_funcall)
+item(tt(_funcall) var(return) var(name) [ var(args) ... ])(
+If a function var(name) exists, it is called with the arguments
+var(args). Unless it is the empty string or a single hyphen,
+var(return) is taken as the name of a parameter and the return status
+from the called function is stored in it.
+The return value of tt(_funcall) itself is zero if the function
+var(name) exists and was called and non-zero otherwise.
+)
 item(tt(_compalso))(
 This function looks up the definitions for the context and command
 names given as arguments and calls the handler functions for them if
@@ -1575,7 +1573,7 @@ generated. This is useful to display help texts in places where no
 completions can be generated automatically.
 
 This function also uses the tt(format) style for the tt(messages) tag in
-preference to tt(format) style for the tt(descriptions) tag. The
+preference to the tt(format) style for the tt(descriptions) tag. The
 latter is used only if the former is unset.
 )
 item(tt(_tags))(
@@ -1588,13 +1586,14 @@ second, etc. set of tags requested by the user. To test if a certain
 tag should be tried, the tt(_requested) function has to be called (see 
 below).
 
-The return value is zero if tags are requested and non-zero otherwise.
+The return value is zero if at least one of the tags is requested and
+non-zero otherwise. 
 
 This function also accepts the tt(-C) option followed by a name. This
 name is temporarily (i.e. not visible outside tt(_tags)) appended
 (with a colon before it) to the contents of the tt(curcontext)
 parameter. This allows to make tt(_tags) and tt(_sort_tags) use a
-more specific context name without havin to change and reset the
+more specific context name without having to change and reset the
 tt(curcontext) parameter (which would otherwise have the same effect).
 )
 item(tt(_requested))(
@@ -1604,7 +1603,6 @@ check if a certain tag is currently requested. This normally has to be
 done in a loop such as:
 
 example(_tags foo bar baz
-
 while _tags; do
   if _requested foo; then
     ...
@@ -1615,18 +1613,16 @@ done)
 
 So, the first argument for tt(_requested) is used as the name of a tag 
 and if that tag is currently requested, the return value is zero (and
-non-zero otheriwse).
+non-zero otherwise).
 
-If more than one argument is given, tt(_requested) call the
+If more than one argument is given, tt(_requested) calls the
 tt(_description) function with all arguments except the first
 one. This is often useful to do both the testing of the tag and
-getiing the description for the matches one is about to add at
+getting the description for the matches one is about to add at
 once. E.g.:
 
 example(local expl ret=1
-
 _tags foo bar baz
-
 while _tags; do
   _requested foo expl 'description' &&
       compadd "$expl[@]" foobar foobaz && ret=0
@@ -1657,7 +1653,7 @@ example(_tags tag && _helper)
 item(tt(_alternative))(
 This function is useful if you offer multiple tags and building the
 matches for them is easy enough. It basically implements a loop like
-the one described above for the tt(_tags) function.
+the one described above.
 
 The tags to use and what to do if the tags are requested are described 
 using the arguments which are of the form:
@@ -1677,7 +1673,7 @@ example(_alternative \
 to offer usernames and hostnames as possible matches (which are
 generated by the tt(_users) and tt(_hosts) functions respectively).
 
-Like tt(_tags) this function supports the tt(-C) option to give a
+Like tt(_tags) this function supports the tt(-C) option to give an
 additional context name component.
 )
 item(tt(_style))(
@@ -1687,20 +1683,22 @@ a style-name. The tag (if non-empty) is temporarily appended to the
 current context name (preceded by a colon) and the patterns defined by 
 the user with the tt(compstyle) function will be compared to that
 combined name. If any of those pattern matches the name and the given
-style is defined for it and its boolean value is `true', tt(_style)
+style is defined for it and its boolean value is `true' (i.e. its
+value is one of `tt(true)', `tt(on)', `tt(yes)', and `tt(1)'), tt(_style)
 returns zero and non-zero otherwise. If you want to test the style not 
 only for a boolean value, you can give a third argument which is then
 used as a pattern and tt(_style) returns zero if the pattern matches
 the value defined for the style.
 
-If you want to retireve the value defined for the style, you can use
+If you want to retrieve the value defined for the style, you can use
 one of the options tt(-b) (to retrieve it as a boolean value, i.e. one 
 of tt(yes) or tt(no)), tt(-s) (to get it as a scalar, i.e. a string
 concatenated from the value strings defined by the user, separated by
 spaces), tt(-a) (to get it as an array), and tt(-h) (to get it as an
-associative array). In each of this cases the arguments after the
-option are the tag, the style-name and the name of the parameter into
-which the result will be stored.
+associative array; in this case the first, third, etc. strings from the 
+value are used as the keys and the others as their values). In each of
+these cases the arguments after the option are the tag, the style-name
+and the name of the parameter into which the result will be stored.
 
 For example, to test if the tt(description) style is set to `true' for 
 the current context and the tag tt(foo):
@@ -1718,19 +1716,6 @@ _style -a foo path tmp)
 In any case, the return value of this function is zero, if a
 definition for the style was found and non-zero if no definition was
 found.
-)
-item(tt(_display))(
-This function generates a display list usable for the `tt(-d)' option
-of tt(compadd). For this it takes its arguments except the first one
-as possible matches with descriptions. The strings should contain the
-match, optionally followed by a colon and the description for this
-match. From this tt(_display) builds an array with elements containing 
-the matches and their descriptions, where the descriptions are aligned.
-After that, the first argument is taken as a parameter name and the
-array built is stored in it.
-
-The return value of tt(_display) is zero if there was at least one
-match with a description non-zero otherwise.
 )
 item(tt(_describe))(
 This function can be used to add options or values with descriptions
@@ -1886,7 +1871,7 @@ If there are two colons before the var(message) (as in
 `tt(*::)var(message)tt(:)var(action)') the tt(words) special array and 
 the tt(CURRENT) special parameter will be restricted to only the
 normal arguments when the var(action) is executed or evaluated. With
-three colons before the var(message) they will be restructed to only
+three colons before the var(message) they will be restricted to only
 the normal arguments covered by this description.
 )
 item(var(opt-spec)[var(description) ...])(
@@ -1942,7 +1927,7 @@ should not be used if the option described is on the line.
 
 Finally, the var(opt-spec) may contain a explanation string. This is
 given in brackets at the end, as in `tt(-q[query operation])'. The
-style tt(description) for the tt(options) tag is used to decide if these
+tt(description) style for the tt(options) tag is used to decide if these
 explanation strings should be printed when options are listed. If no
 explanation string is given but the tt(auto-describe) style is
 set and only one argument is described for this var(opt-spec), the
@@ -1959,7 +1944,7 @@ a list in parentheses, as in `tt(:foo:(foo bar baz))'. Such a list in
 doubled parentheses, as in `tt(:foo:((a\:bar b\:baz)))' should contain 
 strings consisting of the string to complete followed by a colon
 (which needs to be preceded by a backslash) and a description. The
-matches will be listed together with their descriptions the
+matches will be listed together with their descriptions if the
 tt(description) style for the tt(values) tag is set.
 
 An var(action) of the form `tt(->)var(string)' is used by functions
@@ -1985,7 +1970,7 @@ braces will be evaluated to generate the matches and if the
 var(action) does not begin with an opening parentheses or brace, it
 will be split into separate words and executed. If the var(action)
 starts with a space, this list of words will be invoked unchanged,
-otherwise it will be invoked with some extra string placed after the
+otherwise it will be invoked with some extra strings placed after the
 first word which can be given as arguments to the tt(compadd) builtin
 command and which make sure that the var(message) given
 in the description will be shown above the matches. These arguments
@@ -2015,18 +2000,13 @@ will be set to the automatically created context name. This is either
 a string of the form `var(-opt)tt(-)var(n)' for the var(n)'th argument 
 of the option var(-opt), or a string of the form `tt(argument-)var(n)' 
 for the var(n)'th argument (for rest arguments the var(n) is the
-string `tt(rest)').
-
-Also, during the evaluation of the var(action), the context name will
-be changed by adding another component describing the option or
-argument for which the action is executed. For arguments of options,
-the name is build from the name of the option followed by a hyphen and 
-the number of the argument (starting with `tt(1)'). For arguments the
-name added is the string tt(argument-) followed by the number of the
-argument or the string tt(rest) if this is for a `tt(*:...)'
-definition. For example, when completing the argument of the tt(-o)
+string `tt(rest)'). For example, when completing the argument of the tt(-o)
 option, the name is `tt(-o-1)' and for the second normal (non-option-)
 argument it is `tt(argument-2)'.
+
+Also, during the evaluation of the var(action), the context name in
+the tt(curcontext) parameter will be changed by appending the same
+string that is stored in the tt(context) parameter.
 
 Normally the option names are taken as multi-character names and a
 word from the line is considered to contain only one option (or
@@ -2042,7 +2022,7 @@ Another option supported is `tt(-O) var(name)'. The var(name) will be
 taken as the name of an array and its elements will be given to
 functions called to generate matches when executing the
 var(actions). For example, this allows one to give options for the
-tt(compadd) builtin that should be used.
+tt(compadd) builtin that should be used for all var(action)s.
 
 Also, the tt(-M) option followed by a string may be given before the
 first description. The string will be used as the match specification
@@ -2069,7 +2049,8 @@ possible option names. Note that this means that you should be careful
 to make sure that this feature is not used for a command that does not
 support this option.
 
-For options that get an argument after a `tt(=)', the function also tries
+For such automatically found options that get an argument after a
+`tt(=)', the function also tries
 to automatically find out what should be completed as the argument.
 The possible completions for option-arguments can be described with
 the arguments after the `tt(-)tt(-)' (which are not used as described
@@ -2112,18 +2093,19 @@ replacement. E.g. some tt(configure)-scripts describe options only as
 completion of the second form, one would use `tt(-s "LPAR()#-)tt(-enable-
 -)tt(-disable-RPAR()")'.
 
-Finally, this function uses the styles tt(prefix-hidden) and
-tt(prefix-needed).
+Finally, this function uses the styles tt(description),
+tt(prefix-hidden) and tt(prefix-needed) with the tt(options) tag when
+generating option names as matches.
 
 Example:
 
-example(_arguments '-l+:left border:' \
-           '-format:paper size:(letter A4)' \
-	   '*-copy:output file:_files::resolution:(300 600)' \
-	   ':postscript file:_files -g *.(ps|eps)' \
+example(_arguments '-l+:left border:' \ 
+           '-format:paper size:(letter A4)' \ 
+	   '*-copy:output file:_files::resolution:(300 600)' \ 
+	   ':postscript file:_files -g *.(ps|eps)' \ 
 	   '*:page number:')
 
-This describes three options `tt(-l)', `tt(-format)', and
+This describes three options: `tt(-l)', `tt(-format)', and
 `tt(-copy)'. The first one gets one argument described as `var(left
 border)' for which no completion will be offered because of the empty
 action. The argument may come directly after the `tt(-l)' or it may be 
@@ -2154,7 +2136,7 @@ and when executing an action.
 
 Otherwise, if the first argument (or the first argument after the
 `tt(-O) var(name)' option if that is used) is the option `tt(-s)', the
-second argument is used as the character that separates multiple values.
+next argument is used as the character that separates multiple values.
 
 The first argument (after the options and separator character if they
 are given) is used as a string to print as a description before
@@ -2168,9 +2150,9 @@ values can have only one argument.
 
 Example:
 
-example(_values -s , '...' \
+example(_values -s , 'description' \ 
         '*foo[bar]' \
-        '(two)*one[number]:first count:' \
+        '(two)*one[number]:first count:' \ 
         'two[another number]::second count:(1 2 3)')
 
 This describes three possible values: `tt(foo)', `tt(one)', and
@@ -2179,7 +2161,7 @@ and may appear more than once. The second one is described as
 `tt(number)', may appear more than once, and gets one mandatory
 argument described as `tt(first count)' for which no action is
 specified so that it will not be completed automatically. The
-`tt((one))' at the beginning says that if the value `tt(one)' is on
+`tt((two))' at the beginning says that if the value `tt(one)' is on
 the line, the value `tt(two)' will not be  considered to be a possible
 completion any more. Finally, the last value (`tt(two)') is described
 as `tt(another number)' and gets an optional argument decribed as
@@ -2196,7 +2178,8 @@ To decide if the descriptions for the values (not those for the
 arguments) should be printed, the style tt(description) for the
 tt(values) tag is used.
 
-One last difference is that this function uses the associative array
+One last difference to tt(_arguments) is that this function uses the
+associative array
 tt(val_args) to report values and their arguments (but otherwise this
 is the same as the tt(opt_args) association used by
 tt(_arguments)). This also means that the function calling tt(_values) 
