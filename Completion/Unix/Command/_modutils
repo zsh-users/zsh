@@ -47,11 +47,25 @@ case "$service" in
              '(--autoclean)-k[set autoclean]' \
              '(-k)--autoclean' \
              '(--show)-n[do not act]' \
-             '(-n)--show'
+             '(-n)--show' \
+             '(--quiet)-q[do not complain about insmod failures]' \
+             '(-q)--quiet' \
+             '(--syslog)-s[report via syslog instead of stderr]' \
+             '(-s)--syslog' \
+             '(--type)-t[module type]:moduletype:' \
+             '(-t)--type:moduletype:' \
+             '(--verbose)-v[print all commands as executed]' \
+             '(-v)--verbose' \
+             '(--version)-V[show release version]' \
+             '(-V)--version' \
+             '(--config)-C[config file]:config file:_files' \
+             '(-C)--config:config file:_files'
   )
 
   _arguments '(--remove)-r[remove]:*:loaded module:->modprobe_remove' \
              '(-r)--remove:*:loaded module:->modprobe_remove' \
+             '(--list)-l[list matching modules]:*:module file:->modprobe_list' \
+             '(-l)--list:*:module file:->modprobe_list' \
 	     "$_modprobe_arguments[@]" && return 0
 
   ;;
@@ -64,5 +78,10 @@ case "$state" in
         _arguments "$_modprobe_arguments[@]" \
                    '*:loaded module:_modutils_loaded_modules'
   ;;
+
+  modprobe_list)
+        _call_function ret _modutils_$state && return ret
+        _arguments "$_modprobe_arguments[@]" \
+                   '*:module file:compadd ${^${(M)${(f)"$(modprobe -c)"}:#path*}#*[=]}/**/*.o(:t)'
 
 esac
