@@ -1,3 +1,8 @@
+2002-08-07  Clint Adams  <clint@zsh.org>
+
+	* 17509: Completion/Unix/Command/_lynx: complete .xhtml files as well
+	as .html files.
+
 2002-08-06  Clint Adams  <clint@zsh.org>
 
 	* 17508: Completion/Unix/Type/_urls: complete local files after
