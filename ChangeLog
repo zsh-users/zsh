@@ -1,3 +1,8 @@
+2000-05-09  Oliver Kiddle  <opk@zsh.org>
+
+	* 11282: Completion/Builtins/_vars_eq: complete using _arguments
+	for typeset and its variants
+
 2000-05-09  Tanaka Akira  <akr@zsh.org>
 
 	* 11280: Completion/User/_make: suppress an error with closed stdin
