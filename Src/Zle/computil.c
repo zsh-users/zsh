@@ -1112,7 +1112,7 @@ ca_get_sopt(Cadef d, char *line, char **end, LinkList *lp)
 	    }
 	} else if (!p || (p && !p->active))
 	    return NULL;
-	pp = p;
+	pp = (p->name[0] == pre ? p : NULL);
 	p = NULL;
     }
     if (pp && end)
