@@ -25,7 +25,7 @@ __ci_newline() {
 
 typeset startline='# The following lines were added by compinstall'
 typeset endline='# End of lines added by compinstall'
-typeset ifile line fpath_line
+typeset ifile line fpath_line compinit_args
 typeset -A styles
 typeset match mbegin mend warn_unknown warn_old warn_comment
 integer lines_found
@@ -115,6 +115,9 @@ ${match[3]}"
       # no-op
     elif [[ $line = [[:blank:]]#\#* ]]; then
       warn_comment=1
+    elif [[ $line = [[:blank:]]#compinit[[:blank:]]##(#b)([^[:blank:]]*) ]]
+    then
+      compinit_args=$match[1]
     elif [[ $line != [[:blank:]]# &&
       $line != [[:blank:]]#'autoload -U compinit' &&
       $line != [[:blank:]]#compinit &&
@@ -856,6 +859,10 @@ __ci_toggle_matcher() {
   else
     # toggle off
     eval "${1}[$2]=' '"
+    if [[ $c_list[$2] == ' ' && $C_list[$2] == ' ' && \
+	  $p_list[$2] == ' ' && $s_list[$2] == ' ' ]]; then
+      a_or_r[$2]=' '
+    fi
     return 1
   fi
 }
@@ -867,7 +874,7 @@ __ci_do_matchers() {
   # More specific use of matchers is usually covered by completion functions.
 
   local mlist m_ci m_pw m_sub c_list C_list p_list s_list pw_seps key key2 elt
-  local pw_dstar
+  local pw_dstar a_or_r i
   integer eltcnt lastnz
 
   __ci_get_this_style matcher-list mlist
@@ -876,13 +883,14 @@ __ci_do_matchers() {
   eval "mlist=($mlist)"
   # ?_list say whether the four possible matchers are set for passes 1,
   # 2, 3, 4, in an easy-to-read manner, i.e. the Nth part of the string
-  # is either N (on) or space (off).
+  # is one of N (on) or space (off).
+  a_or_r="    "                 # replace by default
   n_list="    "			# null completion, i.e. standard
   c_list="    "			# case match one way
   C_list="    "			# case match both ways
   p_list="    "			# partial word completion
   s_list="    "			# substring completion
-  # $pws_seps gives the separators used for partial-word completion
+  # $pw_seps gives the separators used for partial-word completion
   # by element of the matcher list; these can be edited separately.
   pw_seps=('._-' '._-' '._-' '._-')
   pw_dstar=('' '' '' '')
@@ -890,6 +898,7 @@ __ci_do_matchers() {
   # See what's in the matcher initially.  If these have been edited,
   # we're in trouble, but that's pretty much true of everything.
   for (( eltcnt = 1; eltcnt <= $#mlist; eltcnt++ )); do
+    [[ $mlist[eltcnt] == "+"* ]] && a_or_r[$eltcnt]='+'
     [[ -z $mlist[$eltcnt] ]] && n_list[$eltcnt]=$eltcnt
     [[ $mlist[$eltcnt] = *"m:{a-z}={A-Z}"* ]] && c_list[$eltcnt]=$eltcnt
     [[ $mlist[$eltcnt] = *"m:{a-zA-Z}={A-Za-z}"* ]] && C_list[$eltcnt]=$eltcnt
@@ -910,16 +919,16 @@ __ci_do_matchers() {
     print "\
               *** compinstall: matcher menu ***
 
-\`Matchers' allow the completion code to play extra tricks when comparing
-the string on the command line with a possible match, as listed below.
-A list of different matchers can be given; each is tried until at least
-one possible completion is found.  The numbers given below show what is
-included in each element of the list; everything for 1 is tried at the same
-time, and if necessary everything for 2, etc.  If no matcher is set
-ordinary completion will be done at that point.  Elements from 1 to 4 can
-be set; empty trailing elements will be removed, and if nothing is set, the
-style will not be set.
+\`Matchers' compare the completion code with the possible matches in some
+special way.  Numbers in parentheses show matchers to be tried and the order.
+The same number can be assigned to different matchers, meaning apply at the
+same time.  Omit a sequence number to try normal matching at that point.
+A \`+' in the first line indicates the element is added to preceeding matchers
+instead of replacing them; toggle this with \`t'.  You don't need to set
+all four, or indeed any matchers --- then the style will not be set.
 
+   ($a_or_r)\
+   \`+' indicates add to previous matchers, else replace
 n. ($n_list)\
  No matchers; you may want to try this as the first choice.
 c. ($c_list)\
@@ -933,6 +942,7 @@ s. ($s_list)\
  Substring completion:  complete on substrings, not just initial
           strings.  Warning: it is recommended this not be used for element 1.
 
+t.        Toggle replacing previous matchers (\` ' at top) or add (\`+')
 q.        Return without saving.
 0.        Done setting matchers.
 "
@@ -981,6 +991,18 @@ terminators to be matched in this way? (y/n) [n] "
 	      read -q key && pw_dstar[$key2]='*'
 	    fi
 	    ;;
+      [tT])
+	    read -k key2'?Toggle augment/replace for elements number (1234)? '
+	    if [[ $key2 == [1234] ]]; then
+	      if [[ $a_or_r[$key2] == ' ' ]]; then
+	        a_or_r[$key2]='+'
+	      else
+	        a_or_r[$key2]=' '
+	      fi
+	    else
+	      print "Only 1, 2, 3 and 4 are handled."
+	    fi
+	    ;;
       [sS]) __ci_toggle_matcher s_list $key2
 	    ;;
       [qQ]) return 1
@@ -1010,6 +1032,7 @@ terminators to be matched in this way? (y/n) [n] "
 	elt="${elt:+$elt }l:|=* r:|=*"
       fi
     fi
+    [[ $a_or_r[$eltcnt] != ' ' ]] && elt="+$elt"
     [[ -n $elt || $n_list[$eltcnt] != ' ' ]] && lastnz=$eltcnt
     mlist[$eltcnt]=$elt
   done
@@ -1758,7 +1781,7 @@ $output"
 
   print -r "
 autoload -U compinit
-compinit"
+compinit${compinit_args:+ $compinit_args}"
 
   print -r "$endline"
 } >$tmpout

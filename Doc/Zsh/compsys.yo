@@ -1556,6 +1556,13 @@ completion one would do:
 
 example(zstyle ':completion:*' matcher-list '' 'm:{a-zA-Z}={A-Za-z}')
 
+By default every specification replaces previous ones. If specification
+is prefixed with tt(+), it is added to the existing list. This allows
+testing more general patterns without repeating the whole list every
+time, as in:
+
+example(zstyle ':completion:*' matcher-list '' '+m{a-Z}={A-Z}' '+m{A-Z}={a-z}')
+
 The style allows even finer control by specifying a particular completer,
 without the leading underscore, in the third field of the completion
 context.  For example, if one uses the completers tt(_complete) and

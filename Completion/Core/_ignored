@@ -10,7 +10,8 @@ zstyle -a ":completion:${curcontext}:" completer comp ||
   comp=( "${(@)_completers[1,_completer_num-1][(R)_ignored(|:*),-1]}" )
 
 local _comp_no_ignore=yes tmp expl \
-      _completer _completer_num _matcher _matchers _matcher_num
+      _completer _completer_num \
+      _matcher _c_matcher _matchers _matcher_num
 
 _completer_num=1
 
@@ -30,7 +31,13 @@ for tmp in "$comp[@]"; do
       _matchers=( '' )
 
   _matcher_num=1
-  for _matcher in "$_matchers[@]"; do
+  _matcher=''
+  for _c_matcher in "$_matchers[@]"; do
+    if [[ "$_c_matcher" == +* ]]; then
+      _matcher="$_matcher $_c_matcher[2,-1]"
+    else
+      _matcher="$_c_matcher"
+    fi
     if [[ "$tmp" != _ignored ]] && "$tmp"; then
       if zstyle -s ":completion:${curcontext}:" single-ignored tmp &&
          [[ $compstate[old_list] != shown &&

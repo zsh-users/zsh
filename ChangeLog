@@ -1,3 +1,12 @@
+2001-03-06  Andrej Borsenkow <bor@zsh.org>
+
+	* 13544, 13568 (Peter): Completion/Core/_ignored,
+	Completion/Core/_main_complete, Completion/Core/_prefix,
+	Completion/Core/compinstall, Doc/Zsh/compsys.yo: allow
+	matchers in matcher-list to augment as well as replace
+	previous matcher list
+
+
 2001-03-05  Sven Wischnowsky  <wischnow@zsh.org>
 
 	* 13566: Completion/Builtins/_aliases, Completion/Core/_expand_alias,

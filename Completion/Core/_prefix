@@ -5,7 +5,8 @@
 [[ _matcher_num -gt 1 || -z "$SUFFIX" ]] && return 1
 
 local comp curcontext="$curcontext" tmp \
-      _completer _completer_num _matcher _matchers _matcher_num
+      _completer _completer_num \
+      _matcher _c_matcher _matchers _matcher_num
 
 zstyle -a ":completion:${curcontext}:" completer comp ||
   comp=( "${(@)_completers[1,_completer_num-1][(R)_prefix(|:*),-1]}" )
@@ -35,7 +36,14 @@ for tmp in "$comp[@]"; do
       _matchers=( '' )
 
   _matcher_num=1
-  for _matcher in "$_matchers[@]"; do
+  _matcher=''
+  for _c_matcher in "$_matchers[@]"; do
+    if [[ "$_c_matcher" == +* ]]; then
+      _matcher="$_matcher $_c_matcher[2,-1]"
+    else
+      _matcher="$_c_matcher"
+    fi
+
     [[ "$tmp" != _prefix ]] && "$tmp" && return 0
     (( _matcher_num++ ))
   done
