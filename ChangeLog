@@ -1,3 +1,11 @@
+2002-04-25  Peter Stephenson  <pws@csr.com>
+
+	* 17041: Src/Modules/zftp.c: Minor but fatal typos creating a data
+	connection for zftp using IPv6.
+
+	* 17040: Src/Modules/tcp.c: AF_INET6 wasn't copied into the
+	socket structure for IPv6.
+
 2002-04-25  Sven Wischnowsky  <wischnow@zsh.org>
 
 	* 17035: Src/Modules/zutil.c: remove one half of 17029; the
