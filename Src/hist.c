@@ -1067,8 +1067,6 @@ hend(Eprog prog)
 	Histent he;
 	int keepflags;
 
-	for (he = hist_ring; he && he->flags & hist_skip_flags;
-	     he = up_histent(he)) ;
 #ifdef DEBUG
 	/* debugging only */
 	if (chwordpos%2) {
@@ -1083,13 +1081,14 @@ hend(Eprog prog)
 	    if (isset(HISTREDUCEBLANKS))
 		histreduceblanks();
 	}
-	if ((isset(HISTIGNOREDUPS) || isset(HISTIGNOREALLDUPS)) && he
-	 && histstrcmp(chline, he->text) == 0) {
+	if ((isset(HISTIGNOREDUPS) || isset(HISTIGNOREALLDUPS)) && hist_ring
+	 && histstrcmp(chline, hist_ring->text) == 0) {
 	    /* This history entry compares the same as the previous.
 	     * In case minor changes were made, we overwrite the
 	     * previous one with the current one.  This also gets the
 	     * timestamp right.  Perhaps, preserve the HIST_OLD flag.
 	     */
+	    he = hist_ring;
 	    keepflags = he->flags & HIST_OLD; /* Avoid re-saving */
 	    freehistdata(he, 0);
 	    curline.histnum = curhist;
