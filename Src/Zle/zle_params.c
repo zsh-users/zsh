@@ -75,7 +75,7 @@ static struct zleparam {
         zleunsetfn, NULL },
     { "NUMERIC", PM_INTEGER | PM_UNSET, FN(set_numeric), FN(get_numeric),
         unset_numeric, NULL },
-    { "HISTNO", PM_INTEGER | PM_READONLY, NULL, FN(get_histno),
+    { "HISTNO", PM_INTEGER, FN(set_histno), FN(get_histno),
         zleunsetfn, NULL },
     { "BUFFERLINES", PM_INTEGER | PM_READONLY, NULL, FN(get_bufferlines),
         zleunsetfn, NULL },
@@ -323,6 +323,17 @@ unset_numeric(Param pm, int exp)
 	zmod.flags = 0;
 	zmult = 1;
     }
+}
+
+/**/
+static void
+set_histno(UNUSED(Param pm), zlong x)
+{
+    Histent he;
+
+    if (!(he = quietgethist((int)x)))
+	return;
+    zle_setline(he);
 }
 
 /**/

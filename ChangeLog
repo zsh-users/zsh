@@ -1,5 +1,10 @@
 2004-07-29  Peter Stephenson  <pws@csr.com>
 
+	* 20219: Doc/Zsh/contrib.yo, Doc/Zsh/zle.yo,
+	Functions/Zle/.distfiles, Functions/Zle/history-pattern-search,
+	Src/Zle/zle_hist.c, Src/Zle/zle_params.c: make zle parameter
+	HISTNO writeable, add history-pattern-search sample to use it.
+
 	* 20208: Src/prompt.c, Doc/Zsh/prompt.yo: ternary code character C
 	etc. treat / as path with zero elements.
 

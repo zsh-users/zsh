@@ -634,7 +634,10 @@ string which the next yank would insert in the line.
 )
 vindex(HISTNO)
 item(tt(HISTNO) (integer))(
-The current history number; read-only.
+The current history number.  Setting this has the same effect as
+moving up or down in the history to the corresponding history line.
+An attempt to set it is ignored if the line is not stored in the
+history.
 )
 vindex(KEYMAP)
 item(tt(KEYMAP) (scalar))(

@@ -591,6 +591,25 @@ zle -N history-beginning-search-forward-end \
 bindkey '\e^P' history-beginning-search-backward-end
 bindkey '\e^N' history-beginning-search-forward-end)
 )
+tindex(history-pattern-search)
+tindex(history-pattern-search-backward)
+tindex(history-pattern-search-forward)
+item(tt(history-pattern-search))(
+The function tt(history-pattern-search) implements widgets which prompt
+for a pattern with which to search the history backwards or forwards.  The
+pattern is in the usual zsh format, however the first character may be
+tt(^) to anchor the search to the start of the line, and the last character
+may be tt($) to anchor the search to the end of the line.  If the
+search was not anchored to the end of the line the cursor is positioned
+just after the pattern found.
+
+The commands to create bindable widgets are similar to those in the
+example immediately above:
+
+example(autoload -U history-pattern-search
+zle -N history-pattern-search-backward history-pattern-search
+zle -N history-pattern-search-forward history-pattern-search)
+)
 tindex(up-line-or-beginning-search)
 tindex(down-line-or-beginning-search)
 item(tt(up-line-or-beginning-search), tt(down-line-or-beginning-search))(

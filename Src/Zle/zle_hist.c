@@ -715,6 +715,8 @@ void
 free_isrch_spots(void)
 {
     zfree(isrch_spots, max_spot * sizeof(*isrch_spots));
+    max_spot = 0;
+    isrch_spots = NULL;
 }
 
 /**/
