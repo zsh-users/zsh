@@ -44,12 +44,17 @@ enum {
 
 # include "rlimits.h"
 
-# if defined(RLIM_T_IS_QUAD_T) || defined(RLIM_T_IS_LONG_LONG) || defined(RLIM_T_IS_UNSIGNED)
 static rlim_t
 zstrtorlimt(const char *s, char **t, int base)
 {
     rlim_t ret = 0;
- 
+
+    if (strcmp(s, "unlimited") == 0) {
+	if (t)
+	    *t = (char *) s + 9;
+	return RLIM_INFINITY;
+    }
+# if defined(RLIM_T_IS_QUAD_T) || defined(RLIM_T_IS_LONG_LONG) || defined(RLIM_T_IS_UNSIGNED)
     if (!base) {
 	if (*s != '0')
 	    base = 10;
@@ -67,11 +72,11 @@ zstrtorlimt(const char *s, char **t, int base)
 	    ret = ret * base + (idigit(*s) ? (*s - '0') : (*s & 0x1f) + 9);
     if (t)
 	*t = (char *)s;
+# else /* !RLIM_T_IS_QUAD_T && !RLIM_T_IS_LONG_LONG && !RLIM_T_IS_UNSIGNED */
+    ret = zstrtol(s, t, base);
+# endif /* !RLIM_T_IS_QUAD_T && !RLIM_T_IS_LONG_LONG && !RLIM_T_IS_UNSIGNED */
     return ret;
 }
-# else /* !RLIM_T_IS_QUAD_T && !RLIM_T_IS_LONG_LONG && !RLIM_T_IS_UNSIGNED */
-#  define zstrtorlimt(a, b, c)	zstrtol((a), (b), (c))
-# endif /* !RLIM_T_IS_QUAD_T && !RLIM_T_IS_LONG_LONG && !RLIM_T_IS_UNSIGNED */
 
 /* Display resource limits.  hard indicates whether `hard' or `soft'  *
  * limits should be displayed.  lim specifies the limit, or may be -1 *
@@ -348,9 +353,10 @@ bin_limit(char *nam, char **argv, char *ops, int func)
 	    /* memory-type resource -- `k' and `M' modifiers are permitted,
 	    meaning (respectively) 2^10 and 2^20. */
 	    val = zstrtorlimt(s, &s, 10);
-	    if (!*s || ((*s == 'k' || *s == 'K') && !s[1]))
-		val *= 1024L;
-	    else if ((*s == 'M' || *s == 'm') && !s[1])
+	    if (!*s || ((*s == 'k' || *s == 'K') && !s[1])) {
+		if (val != RLIM_INFINITY)
+		    val *= 1024L;
+	    } else if ((*s == 'M' || *s == 'm') && !s[1])
 		val *= 1024L * 1024;
 	    else {
 		zwarnnam("limit", "unknown scaling factor: %s", s, 0);

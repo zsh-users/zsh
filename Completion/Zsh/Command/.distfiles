@@ -1,10 +1,10 @@
 DISTFILES_SRC='
 .distfiles
-_autoload    _disable     _kill        _sched       _typeset     _zed
-_bindkey     _echotc      _mere        _set         _unhash      _zftp
-_builtin     _emulate     _precommand  _setopt      _unsetopt    _zle
-_cd          _enable      _print       _source      _wait        _zmodload
-_command     _fc          _prompt      _stat        _which       _zpty
-_compdef     _hash        _read        _trap        _zcompile    _zstyle
-_echoti      _ttyctl      _ulimit      _vared       _alias       _jobs_builtin
+_alias     _disable  _jobs_builtin  _read    _ttyctl    _which     _zstyle
+_autoload  _echotc   _kill          _sched   _typeset   _zcompile
+_bindkey   _echoti   _limit         _set     _ulimit    _zed
+_builtin   _emulate  _mere          _setopt  _unhash    _zftp
+_cd        _enable   _precommand    _source  _unsetopt  _zle
+_command   _fc       _print         _stat    _vared     _zmodload
+_compdef   _hash     _prompt        _trap    _wait      _zpty
 '

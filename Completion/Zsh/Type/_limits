@@ -1,4 +1,4 @@
-#compdef limit unlimit
+#compdef unlimit
 
 local expl
 
