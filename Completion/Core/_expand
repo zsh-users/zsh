@@ -54,7 +54,7 @@ fi
 
 # If the array is empty, store the original string again.
 
-(( $#exp )) || exp=("$word")
+[[ -z "$exp" ]] && exp=("$word")
 
 subd=("$exp[@]")
 
@@ -92,7 +92,7 @@ zstyle -s ":completion:${curcontext}:" sort sort
 if (( $#exp == 1 )); then
   if [[ -d $exp && "$exp[1]" != */ ]]; then
     suf=/
-  elif zstyle -T ":completion:${curcontext}:" add-space; then
+  elif ! zstyle -T ":completion:${curcontext}:" add-space; then
     suf=
   fi
 fi

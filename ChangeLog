@@ -1,5 +1,8 @@
 2000-06-06  Sven Wischnowsky  <wischnow@zsh.org>
 
+	* 11777: Completion/Core/_expand: make _expand ignore empty
+ 	expansions
+	
 	* 11776: Completion/Core/_path_files: fix for _path_files and
  	globcomplete, better test if word contains wildcards
 	
