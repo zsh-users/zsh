@@ -1585,8 +1585,8 @@ mod_export int asklist(void)
 	 (!complistmax && listdat.nlines >= lines))) {
 	int qup;
 	zsetterm();
-	qup = printfmt("zsh: do you wish to see all %n possibilities? ",
-		       listdat.nlist, 1, 1);
+	qup = printfmt("zsh: do you wish to see all %n lines? ",
+		       listdat.nlines, 1, 1);
 	fflush(shout);
 	if (getzlequery() != 'y') {
 	    if (clearflag) {

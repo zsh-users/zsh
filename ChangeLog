@@ -1,5 +1,9 @@
 2000-04-12  Sven Wischnowsky <wischnow@informatik.hu-berlin.de>
 
+	* 10686: Src/Zle/compresult.c, Src/Zle/zle_tricky.c: display
+ 	number of lines instead of number of matches when asking whether
+ 	to show completion lists
+	
 	* 10685: Doc/Zsh/zle.yo, Src/hist.c, Src/Modules/parameter.c,
  	Src/Zle/iwidgets.list, Src/Zle/zle_misc.c: new widget
  	copy-prev-shell-word, like copy-prev-word but uses shell parsing

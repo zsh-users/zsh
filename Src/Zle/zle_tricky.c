@@ -1991,8 +1991,8 @@ listlist(LinkList l)
 	int qup;
 
 	zsetterm();
-	qup = printfmt("zsh: do you wish to see all %n possibilities? ",
-		       num, 1, 1);
+	qup = printfmt("zsh: do you wish to see all %n lines? ",
+		       nlines, 1, 1);
 	fflush(shout);
 	if (getzlequery() != 'y') {
 	    if (clearflag) {
