@@ -1,3 +1,9 @@
+2000-05-09  Sven Wischnowsky  <wischnow@zsh.org>
+
+	* 11270: Doc/Zsh/compsys.yo, Src/Zle/computil.c: new -A and -S
+ 	options to _arguments; `-opt=-' specs for options whose argument
+ 	has to come after the `='
+	
 2000-05-08  Oliver Kiddle  <opk@zsh.org>
 
 	* 11268: Doc/Zsh/compsys.yo, Doc/Zsh/builtins.yo: minor typo fixes

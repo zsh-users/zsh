@@ -305,7 +305,11 @@ struct cadef {
     int argsactive;		/* if arguments are still allowed */
 				/* used while parsing a command line */
     char *set;			/* set name, shared */
+    int flags;			/* see CDF_* below */
 };
+
+#define CDF_SEP 1
+#define CDF_ARG 2
 
 /* Description for an option. */
 
@@ -325,6 +329,7 @@ struct caopt {
 #define CAO_DIRECT  2
 #define CAO_ODIRECT 3
 #define CAO_EQUAL   4
+#define CAO_OEQUAL  5
 
 /* Description for an argument */
 
@@ -515,7 +520,7 @@ parse_cadef(char *nam, char **args, int multi)
     Caarg argp;
     char **oargs = args, *p, *q, *match = "r:|[_-]=* r:|=*", **xor;
     char *adpre, *adsuf, *set = NULL, *doset = NULL;
-    int single = 0, anum = 1, xnum, nopts, ndopts, nodopts;
+    int single = 0, anum = 1, xnum, nopts, ndopts, nodopts, flags = 0;
 
     nopts = ndopts = nodopts = 0;
 
@@ -536,23 +541,40 @@ parse_cadef(char *nam, char **args, int multi)
     } else
 	adpre = adsuf = NULL;
 
-    /* Now get the -s and -M options. */
+    /* Now get the -s, -A, -S and -M options. */
 
     args++;
-    while ((p = *args)) {
-	if (!strcmp(p, "-s"))
-	    single = 1;
-	else if (p[0] == '-' && p[1] == 'M') {
-	    if (p[2])
-		match = p + 2;
-	    else if (args[1])
-		match = *++args;
-	    else {
-		args++;
+    while ((p = *args) && *p == '-') {
+	for (q = ++p; *q; q++)
+	    if (*q == 'M') {
+		q = "";
 		break;
-	    }
-	} else
+	    } else if (*q != 's' && *q != 'S' && *q != 'A')
+		break;
+
+	if (*q)
 	    break;
+
+	for (; *p; p++) {
+	    if (*p == 's')
+		single = 1;
+	    else if (*p == 'S')
+		flags |= CDF_SEP;
+	    else if (*p == 'A')
+		flags |= CDF_ARG;
+	    else if (*p == 'M') {
+		if (p[1]) {
+		    match = p + 1;
+		    p = "" - 1;
+		} else if (args[1])
+		    match = *++args;
+		else
+		    break;
+	    }
+	}
+	if (*p)
+	    break;
+
 	args++;
     }
     if (!*args)
@@ -574,6 +596,7 @@ parse_cadef(char *nam, char **args, int multi)
     } else
 	ret->single = NULL;
     ret->match = ztrdup(match);
+    ret->flags = flags;
 
     /* Get the definitions. */
 
@@ -659,8 +682,10 @@ parse_cadef(char *nam, char **args, int multi)
 
 	    /* Skip over the name. */
 	    for (p++; *p && *p != ':' && *p != '[' &&
-		     ((*p != '-' && *p != '+' && *p != '=') ||
-		      (p[1] != ':' && p[1] != '[')); p++)
+		     ((*p != '-' && *p != '+') ||
+		      (p[1] != ':' && p[1] != '[')) &&
+		     (*p != '=' ||
+		      (p[1] != ':' && p[1] != '[' && p[1] != '-')); p++)
 		if (*p == '\\' && p[1])
 		    p++;
 
@@ -674,8 +699,11 @@ parse_cadef(char *nam, char **args, int multi)
 		otype = CAO_ODIRECT;
 		c = *++p;
 	    } else if (c == '=') {
-		otype = CAO_EQUAL;
-		c = *++p;
+		otype = CAO_OEQUAL;
+		if ((c = *++p) == '-') {
+		    otype = CAO_EQUAL;
+		    c = *++p;
+		}
 	    }
 	    /* Get the optional description, if any. */
 	    if (c == '[') {
@@ -797,9 +825,9 @@ parse_cadef(char *nam, char **args, int multi)
 	    opt->args = oargs;
 	    opt->num = nopts++;
 
-	    if (otype == CAO_DIRECT)
+	    if (otype == CAO_DIRECT || otype == CAO_EQUAL)
 		ndopts++;
-	    else if (otype == CAO_ODIRECT || otype == CAO_EQUAL)
+	    else if (otype == CAO_ODIRECT || otype == CAO_OEQUAL)
 		nodopts++;
 
 	    /* If this is for single-letter option we also store a
@@ -952,7 +980,8 @@ ca_get_opt(Cadef d, char *line, int full, char **end)
 		    /* Return a pointer to the end of the option. */
 		    int l = strlen(p->name);
 
-		    if (p->type == CAO_EQUAL && line[l] == '=')
+		    if ((p->type == CAO_OEQUAL || p->type == CAO_EQUAL) &&
+			line[l] == '=')
 			l++;
 
 		    *end = line + l;
@@ -983,7 +1012,8 @@ ca_get_sopt(Cadef d, char *line, int full, char **end)
 		p->args && p->type != CAO_NEXT && p->name[0] == pre) {
 		if (end) {
 		    line++;
-		    if (p->type == CAO_EQUAL && *line == '=')
+		    if ((p->type == CAO_OEQUAL || p->type == CAO_EQUAL) &&
+			*line == '=')
 			line++;
 		    *end = line;
 		}
@@ -1022,14 +1052,14 @@ ca_get_arg(Cadef d, int n)
 static LinkList ca_xor;
 
 static int
-ca_inactive(Cadef d, char **xor, int cur)
+ca_inactive(Cadef d, char **xor, int cur, int opts)
 {
-    if (xor && cur <= compcurrent) {
+    if ((xor || opts) && cur <= compcurrent) {
 	Caopt opt;
 	char *x;
 	int sl = (d->set ? strlen(d->set) : -1);
 
-	for (; (x = *xor); xor++) {
+	for (; (x = (opts ? "-" : *xor)); xor++) {
 	    if (ca_xor)
 		addlinknode(ca_xor, x);
 	    if (sl > 0) {
@@ -1059,6 +1089,9 @@ ca_inactive(Cadef d, char **xor, int cur)
 		    a->active = 0;
 	    } else if ((opt = ca_get_opt(d, x, 1, NULL)))
 		opt->active = 0;
+
+	    if (opts)
+		break;
 	}
     }
     return 0;
@@ -1145,10 +1178,13 @@ ca_parse_line(Cadef d, int multi)
 	ddef = adef = NULL;
 	doff = state.singles = 0;
 
-	if (ca_inactive(d, argxor, cur))
-	    return 1;
-
-	/* We've a definition for an argument, skip to the next. */
+	if (ca_inactive(d, argxor, cur, 0) ||
+	    ((d->flags & CDF_SEP) && !strcmp(line, "--"))) {
+	    if (ca_inactive(d, NULL, cur, 1))
+		return 1;
+	    continue;
+	}
+	/* We've got a definition for an argument, skip to the next. */
 
 	if (state.def) {
 	    state.arg = 0;
@@ -1186,10 +1222,14 @@ ca_parse_line(Cadef d, int multi)
 	/* See if it's an option. */
 
 	if (state.opt == 2 && (state.curopt = ca_get_opt(d, line, 0, &pe)) &&
-	    (state.curopt->type != CAO_EQUAL || 
-	     compwords[cur] || pe[-1] == '=')) {
+	    (state.curopt->type == CAO_OEQUAL ?
+	     (compwords[cur] || pe[-1] == '=') :
+	     (state.curopt->type == CAO_EQUAL ?
+	      (pe[-1] == '=' || !pe[0]) : 1))) {
 
-	    ddef = state.def = state.curopt->args;
+	    ddef = state.def = ((state.curopt->type != CAO_EQUAL ||
+				 pe[-1] == '=') ?
+				state.curopt->args : NULL);
 	    doff = pe - line;
 	    state.optbeg = state.argbeg = state.inopt = cur;
 	    state.singles = (d->single && (!pe || !*pe) &&
@@ -1197,15 +1237,16 @@ ca_parse_line(Cadef d, int multi)
 
 	    state.oargs[state.curopt->num] = znewlinklist();
 
-	    if (ca_inactive(d, state.curopt->xor, cur))
+	    if (ca_inactive(d, state.curopt->xor, cur, 0))
 		return 1;
 
 	    /* Collect the argument strings. Maybe. */
 
 	    if (state.def &&
 		(state.curopt->type == CAO_DIRECT ||
+		 state.curopt->type == CAO_EQUAL ||
 		 (state.curopt->type == CAO_ODIRECT && pe[0]) ||
-		 (state.curopt->type == CAO_EQUAL &&
+		 (state.curopt->type == CAO_OEQUAL &&
 		  (pe[0] || pe[-1] == '=')))) {
 		if (state.def->type != CAA_REST &&
 		    state.def->type != CAA_RARGS &&
@@ -1237,14 +1278,15 @@ ca_parse_line(Cadef d, int multi)
 		if ((tmpopt = d->single[STOUC(*p)])) {
 		    state.oargs[tmpopt->num] = znewlinklist();
 
-		    if (ca_inactive(d, tmpopt->xor, cur))
+		    if (ca_inactive(d, tmpopt->xor, cur, 0))
 			return 1;
 		}
 	    }
 	    if (state.def &&
 		(state.curopt->type == CAO_DIRECT ||
+		 state.curopt->type == CAO_EQUAL ||
 		 (state.curopt->type == CAO_ODIRECT && pe[0]) ||
-		 (state.curopt->type == CAO_EQUAL &&
+		 (state.curopt->type == CAO_OEQUAL &&
 		  (pe[0] || pe[-1] == '=')))) {
 		if (state.def->type != CAA_REST &&
 		    state.def->type != CAA_RARGS &&
@@ -1261,6 +1303,9 @@ ca_parse_line(Cadef d, int multi)
 	    return 1;
 	else if (state.arg) {
 	    /* Otherwise it's a normal argument. */
+	    if ((d->flags & CDF_ARG) && ca_inactive(d, NULL, cur + 1, 1))
+		return 1;
+
 	    if (state.inopt) {
 		state.inopt = 0;
 		state.nargbeg = cur - 1;
@@ -1541,7 +1586,7 @@ bin_comparguments(char *nam, char **args, char *ops, int func)
 		ca_xor = newlinklist();
 		if ((xor = getaparam(args[1]))) {
 		    if (arrcontains(xor, args[2], 0) ||
-			ca_inactive(def, xor, compcurrent)) {
+			ca_inactive(def, xor, compcurrent, 0)) {
 			ca_xor = cax;
 			return 1;
 		    }
@@ -1645,7 +1690,8 @@ bin_comparguments(char *nam, char **args, char *ops, int func)
 		      ztrdup(ca_laststate.ddef ?
 			     (ca_laststate.ddef->type == CAO_DIRECT ?
 			      "direct" :
-			      (ca_laststate.ddef->type == CAO_EQUAL ?
+			      ((ca_laststate.ddef->type == CAO_OEQUAL ||
+				ca_laststate.ddef->type == CAO_EQUAL) ?
 			       "equal" : "next")) : ""));
 	    return 0;
 	}

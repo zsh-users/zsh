@@ -2951,7 +2951,10 @@ in one string with the option name, but may also be given as a
 separate argument after the option, a plus sign should be used
 instead. If the argument may be given as the next string or in same
 string as the option name but separated from it by an equal sign, a
-`tt(=)' should be used instead of the minus or plus sign.
+`tt(=)' should be used instead of the minus or plus sign and if the
+argument to the option has to be given in the same string after an
+equal sign and may not be given in the next argument, `tt(=-)' should
+be used.
 
 Note that this and the shortcut syntax with a leading tt(-+) or tt(+-) 
 means that for options like tt(-+) the second character has to be
@@ -3092,6 +3095,12 @@ letter. However, strings beginning with two hyphens (like
 `tt(-)tt(-prefix)') are still considered to contain only one option
 name. This allows the use of the `tt(-s)' option to describe
 single-letter options together with such long option names.
+
+To simplify the specifications for commands with standard option
+parsing, the options tt(-A) and tt(-S) may be given. With tt(-A) no
+options will be completed after the first non-option argument on the
+line. With tt(-S), no option will be completed after a `tt(-)tt(-)' on 
+the line and this argument will otherwise be ignored.
 
 Another option supported is `tt(-O) var(name)'. The var(name) will be
 taken as the name of an array and its elements will be given to
