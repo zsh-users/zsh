@@ -4,6 +4,16 @@
 
 2000-04-05  Sven Wischnowsky <wischnow@informatik.hu-berlin.de>
 
+	* 10511: Completion/Debian/_apt, Completion/Debian/_bug,
+	Completion/Debian/_dpkg, Completion/User/_chown,
+	Completion/User/_dvi, Completion/User/_imagemagick,
+	Completion/User/_ispell, Completion/User/_lp,
+	Completion/User/_mount, Completion/User/_mysql_utils,
+	Completion/User/_pbm, Completion/User/_psutils,
+	Completion/User/_rcs, Completion/User/_rlogin,
+	Completion/User/_ssh, Completion/User/_tiff, Completion/User/_yp,:
+	Completion/X/_xutils: use basename of commands instead of $words[1]
+
 	* 10508: Completion/Builtins/_zstyle, Completion/Core/_path_files,
 	Doc/Zsh/compsys.yo, Functions/Zle/incremental-complete-word: 
 	renaming some styles

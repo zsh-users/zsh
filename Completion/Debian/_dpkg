@@ -20,7 +20,7 @@ _dpkg_common_args=('--help[show help]' \
            '--version[show version]' \
            '--licence[show licensing]')
 
-case "$words[1]" in
+case "${words[1]:t}" in
 dpkg)
 _arguments -s '(--install)-i[install packages]:Debian package:_files -g \*.deb' \
            '(-i)--install:Debian package:_files -g \*.deb' \

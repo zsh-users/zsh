@@ -24,33 +24,33 @@ _mysql_hosts () {
   local _mysql_user _mysql_port _mysql_host _mysql_params
   _mysql_get_identity
 
-  _wanted hosts expl 'server host' &&
+  _wanted hosts expl 'server host' \
     _combination -s '[:@]' '' hosts-ports-users \
       ${_mysql_user:+users=${_mysql_user:q}} \
       ${_mysql_port:+ports=${_mysql_port:q}} \
-      hosts "$expl[@]"
+      hosts -
 }
 
 _mysql_ports () {
   local _mysql_user _mysql_port _mysql_host _mysql_params
   _mysql_get_identity
 
-  _wanted ports expl 'server port' &&
+  _wanted ports expl 'server port' \
     _combination -s '[:@]' '' hosts-ports-users \
       ${_mysql_user:+users=${_mysql_user:q}} \
       ${_mysql_host:+hosts=${_mysql_host:q}} \
-      ports "$expl[@]"
+      ports -
 }
 
 _mysql_users () {
   local _mysql_user _mysql_port _mysql_host _mysql_params
   _mysql_get_identity
 
-  _wanted users expl 'server username' &&
+  _wanted users expl 'server username' \
     _combination -s '[:@]' '' hosts-ports-users \
       ${_mysql_host:+hosts=${_mysql_host:q}} \
       ${_mysql_port:+ports=${_mysql_port:q}} \
-      users "$expl[@]"
+      users -
 }
 
 _mysql_databases () {
@@ -205,15 +205,13 @@ _mysqladmin_commands () {
        )
 
   if (( CURRENT == 1 )); then
-    _tags commands && compadd "$@" $cmds
+    _wanted commands expl command compadd "$@" - $cmds
   else
     local curcontext="$curcontext"
 
-    case "$words[1]" in
-      (create)
-      ;&
-      (drop)
-        _wanted mysqldbs expl "MySQL databases" && _mysql_databases
+    case "${words[1]:t}" in
+      (create|drop)
+        _wanted mysqldbs expl "MySQL databases" _mysql_databases
       ;;
       (kill)
         _message 'thread ids'
@@ -226,7 +224,7 @@ _mysqladmin_commands () {
 }
 
 _mysql_utils () {
-  case "$words[1]" in
+  case "${words[1]:t}" in
     mysql)
       _mysql "$@"
     ;;

@@ -59,7 +59,7 @@ if compset -P -P || [[ "$words[CURRENT-1]" = -P ]]; then
     return 1
   fi
 else
-  if [[ "$words[1]" = (lpq|lprm) ]]; then
+  if [[ "${words[1]:t}" = (lpq|lprm) ]]; then
     if [[ "$words" = *-P* ]]; then
       printer=(-P "${${words##*-P( |)}%% *}")
     else

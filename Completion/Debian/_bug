@@ -1,15 +1,62 @@
-#compdef bug
+#compdef bug reportbug
 
-_arguments '-c[exclude configs from report]' \
-           '-d[debug - send mail to postmaster@localhost]' \
-           '-f[argument is a file, not a package]' \
-           '-H[special header]:custom header:' \
+_bug_commonargs=('-d[debug: send mail to postmaster@localhost]' \
            '-m[maintainer-only]' \
            '-p[print to stdout instead of mail]' \
            '-q[quiet - no e-mail forwarding]' \
+           '-h[help]' \
+           '-v[version]' \
+           '*:package:_deb_packages installed')
+
+case "${words[1]:t}" in
+bug)
+_arguments '-c[exclude configs from report]' \
+           '-f[argument is a file, not a package]' \
+           '-H[special header]:custom header:' \
            '-s[set subject]:subject:' \
            '-S[set severity]:severity:(wishlist normal important grave critical)' \
            '-x[do not cc submitter]' \
            '-z[send configs verbatim]' \
-           '-h[help]' \
-           '*:package:_deb_packages installed'
+           "$_bug_commonargs[@]"
+;;
+
+reportbug)
+_arguments '(--no-config-files)-c[exclude configs from report]' \
+           '(-c)--no-config-files' \
+           '(--file)-f[argument is a file, not a package]:filename:' \
+           '(-f)--file=:filename:' \
+           '(--header)-H[special header]:custom header:' \
+           '(-H)--header=:custom header:' \
+           '(--subject)-s[set subject]:subject:' \
+           '(-s)--subject=:subject:' \
+           '(--severity)-S[set severity]:severity:(wishlist normal important grave critical)' \
+           '(-S)--severity=:severity:(wishlist normal important grave critical)' \
+           '(--no-cc)-x[do not cc submitter]' \
+           '(-x)--no-cc' \
+           '(--no-compress)-z[send configs verbatim]' \
+           '(-z)--no-compress[send configs verbatim]' \
+           '(--af)-a[use af instead of editor]' \
+           '(-a)--af[use af instead of editor]' \
+           '(--no-bts-query)-b[do not check bts]' \
+           '(-b)--no-bts-query' \
+           '(--bts)-B[use alternate BTS]:system:(debian gnome kde tdyc)' \
+           '(-B)--bts=:system:(debian gnome kde tdyc)' \
+           '-g[sign report with GnuPG]' \
+           '(--include)-i[include text]:' \
+           '(-i)--include=:' \
+           '(--no-ldap)-l[disable LDAP support]' \
+           '(-l)--no-ldap' \
+           '(--mutt)-M[use mutt instead of editor]' \
+           '(-M)--mutt' \
+           '--mua=[use specified mua instead of editor]' \
+           '(--nmh --mh)-n[use comp instead of editor]' \
+           '(-n --mh)--nmh' \
+           '(--nmh -n)--mh' \
+           '(--output)-o[output to file instead of mail]' \
+           '(-o)--output=' \
+           '(--pgp)-P[sign report with PGP]' \
+           '(-P)--pgp' \
+           '--ldap[enable LDAP support]' \
+           "$_bug_commonargs[@]"
+;;
+esac

@@ -1,6 +1,6 @@
 #compdef ispell buildhash munchlist findaffix tryaffix icombine ijoin
 
-case "$words[1]" in
+case "${words[1]:t}" in
 ispell)
   _arguments -s \
     '(-n)-t[input file is in TeX/LaTeX format]' \

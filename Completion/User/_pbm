@@ -1,63 +1,90 @@
 #compdef -P (p[bgpn]m*|*top[bgpn]m)
 
-local pat expl ret=1
+# Completion for all (or most, you'll never know) pbmplus commands.
+# For some of them there are special cases in the biggish `case' below.
+# Note that since this function is a post-pattern function, these
+# defaults can be overridden by simply defining completion functions
+# for those commands whose arguments you want to complete differently.
 
-if [[ "$words[1]" = pnm* ]]; then
+local pat expl ret=1 cmd="${words[1]:t}"
+
+if [[ "$cmd" = pnm* ]]; then
   pat='*.(#i)p[bgp]m'
-elif [[ "$words[1]" = *top[bgpn]m ]]; then
-  pat="*.(#i)${words[1]%%top[bgpn]m}"
+elif [[ "$cmd" = *top[bgpn]m ]]; then
+  pat="*.(#i)${cmd%%top[bgpn]m}"
 else
-  pat="*.(#i)${words[1][1,3]}"
+  pat="*.(#i)${cmd[1,3]}"
 fi
   
 if [[ $# -ne 0 || $+_in_pbm -ne 0 ]]; then
-  if (( ! $# )); then
-    _description expl 'picture file'
-    set -- "$expl[@]"
-  fi
-  _path_files "$@" -g "$pat" || _files "$@" -g '*.(#i)p[bgp]m'
+  _wanted files expl 'picture file' _path_files "$@" -g "$pat" - ||
+      _files "$@" "$expl[@]" -g '*.(#i)p[bgp]m'
   return
 fi
 
 local _in_pbm=yes
-  
-case "$words[1]" in
-asciitopnm)
-  _arguments '-d:divisor:' ':height:' ':width:' ':file: _pbm'
+
+case "$cmd" in
+asciitop[gn]m)
+  _arguments \
+    '-d[specify divisor]:divisor:' \
+    ':height:' ':width:' ':file: _pbm'
   ;;
 
 fitstopgm)
-  _arguments '-image:image number:' ':file: _pbm'
+  _arguments \
+    '-image[specify image number]:image number:' \
+    ':file: _pbm'
   ;;
 
 fitstopnm)
-  _arguments -{noraw,scanmax,printmax} '-image:image number:' \
-             '-min:minimum value:' '-max:maximum value:' ':file: _pbm'
+  _arguments \
+    '-image[specify image number]:image number:' \
+    '-noraw[produce ASCII pnm file]' \
+    '(-min -max)-scanmax[force scanning data for minimum and maximum]' \
+    '-printmax[only print minimum and maximum values]' \
+    '(-scanmax)-min[override minimum value]:minimum value:' \
+    '(-scanmax)-max[override maximum value]:maximum value:' \
+    ':file: _pbm'
   ;;
 
 g3topbm)
-  _arguments -{kludge,reversebits,stretch} ':file: _pbm'
+  _arguments \
+    '-kludge[ignore first few lines]' \
+    '-reversebits[interpret bits least-significant first]' \
+    '-stretch[duplicate each row]' \
+    ':file: _pbm'
   ;;
 
 giftopnm)
-  _arguments -{verbose,comments} '-image:image number:' \
-             ':file: _pbm'
+  _arguments \
+    '-verbose[verbose mode]' \
+    '-comments[only print comment fields]' \
+    '-image[specify image number]:image number:' \
+    ':file: _pbm'
   ;;
-
 macptopbm)
   _arguments '-extraskip:number of bytes to skip:' ':file: _pbm'
   ;;
 
 pbmclean)
-  _arguments '-connect' ':file: _pbm'
+  if [[ "$PREFIX" = -* ]]; then
+    _message 'maximum number of identical neighbours'
+  else
+    _pbm
+  fi
   ;;
 
 pbmmake)
-  _arguments -{white,black,gray} ':width:' ':height:'
+  _arguments \
+    '(-black -gray)-white[produce white pbm file]' \
+    '(-white -gray)-black[produce black pbm file]' \
+    '(-white -black)-gray[produce gray pbm file (stippled)]' \
+    ':width:' ':height:'
   ;;
 
 pbmmask)
-  _arguments '-expand' ':file: _pbm'
+  _arguments '-expand[expand mask by one pixel]' ':file: _pbm'
   ;;
 
 pbmpscale)
@@ -65,16 +92,23 @@ pbmpscale)
   ;;
 
 pbmreduce)
-  _arguments -{floyd,fs,threshold} '-value:threshold value:' \
-             ':reduction factor:' ':file: _pbm'
+  _arguments \
+    '(-fs -threshold)-floyd[use Floyd-Steinberg error diffusion]' \
+    '(-floyd -threshold)-fs[use Floyd-Steinberg error diffusion]' \
+    '(-floy -fs)-threshold[use simple thresholding]' \
+    '-value[specify thresholding value]:threshold value:' \
+    ':reduction factor:' ':file: _pbm'
   ;;
 
 pbmtext)
-  _arguments '-font:font file:_files -g \*.\(\#i\)pbm' '*:text:'
+  _arguments \
+    '(-builtin)-font[specify font file]:font file:_files -g \*.\(\#i\)pbm' \
+    '(-font)-builtin[select builtin font]:builtin font:(bdf fixed)' \
+    '*:text:'
   ;;
 
 pbmto10x)
-  _arguments '-h' ':file: _pbm'
+  _arguments '-h[use resolution 120 x 144]' ':file: _pbm'
   ;;
 
 pbmtobg|pbmtobbnbg)
@@ -82,24 +116,37 @@ pbmtobg|pbmtobbnbg)
   ;;
 
 pbmtoepsi)
-  _arguments '-bbonly' ':file: _pbm'
+  _arguments '-bbonly[only create boundary box]' ':file: _pbm'
   ;;
 
 pbmtolj)
-  _arguments '-resolution:resolution:(75 100 150 300)' ':file: _pbm'
+  _arguments \
+    '-float[suppress positioning information]' \
+    '-norest[don'"'"'t write reset sequences]' \
+    '-resolution[specify output device resolution]:resolution:(75 100 150 300)' \
+    ':file: _pbm'
   ;;
 
 pbmtoln03)
-  _arguments -{l:left,r:right,t:top,b:bottom}' margin:' \
-             '-f:form length:' ':file: _pbm'
+  _arguments \
+    '-l[specify left margin]:left margin:' \
+    '-r[specify right margin]:right margin:' \
+    '-t[specify top margin]:top margin:' \
+    '-b[specify bottom margin]:bottom margin:' \
+    '-f[specify form length]:form length:' ':file: _pbm'
   ;;
 
 pbmtolps)
-  _arguments '-dpi:resolution:' ':file: _pbm'
+  _arguments '-dpi[specify output resolution]:resolution:' ':file: _pbm'
   ;;
 
 pbmtomacp)
-  _arguments -{l:left,r:right,t:top,b:bottom}' offset:' ':file: _pbm'
+  _arguments \
+    '-l[specify left offset]:left offset:' \
+    '-r[specify right offset]:right offset:' \
+    '-t[specify top offset]:top offset:' \
+    '-b[specify bottom offset]:bottom offset:' \
+    ':file: _pbm'
   ;;
 
 pbmtopgm)
@@ -109,13 +156,23 @@ pbmtopgm)
 pbmtopk)
   # This could be improved...
   
-  _arguments '-s:design size:' '-C:coding scheme:' '-F:font family:' \
-             '-f:option file:_files' '-c:character number:' \
-             '-W:width:' '-H:height:' '-D:depth:' '-I:italic correction:' \
-             '-h:horizontal escapement:' '-v:vertical escapement:' \
-             '-x:x offset:' '-y:y offset:' \
-             ':pk file:_files -g \*.\(\#i\)pk' ':tfm file:_files -g \*.\(\#i\)tfm' \
-             '*:file: _pbm'
+  _arguments \
+    '-s[set design size]:design size:' \
+    '-C[set coding scheme]:coding scheme:' \
+    '-F[set font family comment]:font family:' \
+    '-f[specify file with options]:option file:_files' \
+    '*-c[specify next character number]:character number:' \
+    '*-W[specify TFM width of next character]:width:' \
+    '*-H[specify TFM height of next character]:height:' \
+    '*-D[specify TFM depth of next character]:depth:' \
+    '*-I[specify italic correction of next character]:italic correction:' \
+    '*-h[specify horizontal escapement of next character]:horizontal escapement:' \
+    '*-v[specify vertical escapement of next character]:vertical escapement:' \
+    '*-x[specify x offset of next character]:x offset:' \
+    '*-y[specify y offset of next character]:y offset:' \
+    ':pk file:_files -g \*.\(\#i\)pk' \
+    ':tfm file:_files -g \*.\(\#i\)tfm' \
+    '*:file: _pbm'
   ;;
 
 pbmupc)
@@ -124,8 +181,13 @@ pbmupc)
   ;;
 
 pgmcrater)
-  _arguments '-number:number of craters:' '-gamma:factor:' \
-             -{height,ysize}:height: -{width,xsize}:width:
+  _arguments \
+    '-number[specify number of craters]:number of craters:' \
+    '-gamma[specify gamma correction factor]:gamma factor:' \
+    '(-ysize)-height[specify picture height]:height:' \
+    '(-height)-ysize[specify picture height]:height:' \
+    '(-xsize)-width[specify picture width]:width:' \
+    '(-width)-xsize[specify picture width]:width:'
   ;;
 
 pgmkernel)
@@ -137,26 +199,48 @@ pgmnoise)
   ;;
 
 pgmnorm|ppmnorm)
-  _arguments '-bpercent:black percentage:' '-bvalue:black pixel value:' \
-             '-wpercent:white percentage:' '-wvalue:white pixel value:' \
-             ':file: _pbm'
+  _arguments \
+    '(-bvalue)-bpercent[specify percentage to map to black]:black percentage:' \
+    '(-bpercent)-bvalue[specify pixel value to map to black]:black pixel value:' \
+    '(-wvalue)-wpercent[specify percentage to map to white]:white percentage:' \
+    '(-wpercent)-wvalue[specify pixel value to map to white]:white pixel value:' \
+    ':file: _pbm'
   ;;
 
 pgmoil)
-  _arguments '-n:smear size:' ':file: _pbm'
+  _arguments '-n[specify smear size]:smear size:' ':file: _pbm'
   ;;
 
 pgmramp)
-  _arguments -{lr,tb,rectangle,ellipse} ':width:' ':height:'
+  _arguments \
+    '(-tb -rectangle -ellipse)-lr[produce left to right ramp]' \
+    '(-lr -rectangle -ellipse)-tb[produce top to bottom ramp]' \
+    '(-lr -tb -ellipse)-rectangle[produce rectangular ramp]' \
+    '(-lr -tb -rectangle)-ellipse[produce elliptical ramp]' \
+    ':width:' ':height:'
   ;;
 
 pgmtexture)
-  _arguments '-d:distance:' ':file: _pbm'
+  _arguments '-d[specify distance]:distance:' ':file: _pbm'
   ;;
 
 pgmtopbm)
-  _arguments -{floyd,fs,threshold,dither8,d8,cluster3,c3,cluster4,c4,cluster8,c8} \
-             '-value:threshold value:' ':file: _pbm'
+  _arguments \
+    '(-fs -threshold -hilbert -dither8 -d8 -cluster3 -c3 -cluster4 -c4 -cluster8 -c8 -clump)-floyd[use FLoyd-Steinberg error diffusion]' \
+    '(-floyd -threshold -hilbert -dither8 -d8 -cluster3 -c3 -cluster4 -c4 -cluster8 -c8 -clump)-fs[use FLoyd-Steinberg error diffusion]' \
+    '(-floyd -fs -hilbert -dither8 -d8 -cluster3 -c3 -cluster4 -c4 -cluster8 -c8 -clump)-threshold[use simple thresholding]' \
+    '(-floyd -fs -threshold -dither8 -d8 -cluster3 -c3 -cluster4 -c4 -cluster8 -c8 -value)-hilbert[use space filling curve halftoning (hilbert curve)]' \
+    '(-floyd -fs -threshold -hilbert -d8 -cluster3 -c3 -cluster4 -c4 -cluster8 -c8 -value -clump)-dither8[use Bayer'"'"'s ordered dither (16 x 16 matrix)]' \
+    '(-floyd -fs -threshold -hilbert -dither8 -cluster3 -c3 -cluster4 -c4 -cluster8 -c8 -value -clump)-d8[use Bayer'"'"'s ordered dither (16 x 16 matrix)]' \
+    '(-floyd -fs -threshold -hilbert -dither8 -d8 -c3 -cluster4 -c4 -cluster8 -c8 -value -clump)-cluster3[use 45 degree clustered dither]' \
+    '(-floyd -fs -threshold -hilbert -dither8 -d8 -cluster3 -cluster4 -c4 -cluster8 -c8 -value -clump)-c3[use 45 degree clustered dither]' \
+    '(-floyd -fs -threshold -hilbert -dither8 -d8 -cluster3 -c3 -c4 -cluster8 -c8 -value -clump)-cluster4[use 45 degree clustered dither]' \
+    '(-floyd -fs -threshold -hilbert -dither8 -d8 -cluster3 -c3 -cluster4 -cluster8 -c8 -value -clump)-c4[use 45 degree clustered dither]' \
+    '(-floyd -fs -threshold -hilbert -dither8 -d8 -cluster3 -c3 -cluster4 -c4 -c8 -value -clump)-cluster8[use 45 degree clustered dither]' \
+    '(-floyd -fs -threshold -hilbert -dither8 -d8 -cluster3 -c3 -cluster4 -c4 -cluster8 -value -clump)-c8[use 45 degree clustered dither]' \
+    '-value[specify thresholding value]:threshold value:' \
+    '-clump[specify number of pixels per clump]:number of pixel:' \
+':file: _pbm'
   ;;
 
 pgmtoppm)
@@ -167,12 +251,11 @@ pgmtoppm)
     fi
     _x_color && ret=0
   
-    _description expl option
-    compadd "$expl[@]" - -map && ret=0
+    _wanted options expl option compadd - -map && ret=0
   
     return ret
   elif [[ CURRENT -eq 3 && "$words[2]" = -map ]]; then
-    _description expl 'map file'
+    _description files expl 'map file'
     _files "$expl[@]" -g '*.(#i)ppm'
   else
     _pbm
@@ -180,30 +263,54 @@ pgmtoppm)
   ;;
 
 pktopbm)
-  _arguments ':pk file:_files -g \*.\(\#i\)pk' '-c:character number:' \
-             '*:file: _pbm'
+  _arguments \
+    '*-x[set width of next bitmap]:width:' \
+    '*-y[set height of next bitmap]:height:' \
+    '*-c[set next character number]:character number:' \
+    ':pk file:_files -g \*.\(\#i\)pk' \
+    '*:file: _pbm'
   ;;
 
 pnmalias)
-  _arguments '-bgcolor:background color:_x_color' \
-             '-fgcolor:foreground color:_x_color' \
-             -{f,b}only -{f,b}alias \
-             '-weight:central aliasing weight:' ':file: _pbm'
+  _arguments \
+    '-bgcolor[specify background color]:background color:_x_color' \
+    '-fgcolor[specify background color]:foreground color:_x_color' \
+    '(-bonly)-fonly[apply antialias only to foreground pixels]' \
+    '(-fonly)-bonly[apply antialias only to background pixels]' \
+    '(-balias)-falias[apply antialias to all pixels around foreground pixels]' \
+    '(-falias)-balias[apply antialias to all pixels around foreground pixels]' \
+    '-weight[set central aliasing weight]:central aliasing weight:' \
+    ':file: _pbm'
   ;;
 
 pnmarith)
-  _arguments -{add,subtract,multiply} '*:file: _pbm'
+  _arguments \
+    -{add,subtract,multiply,difference,minimum,maximum} \
+    '*:file: _pbm'
   ;;
 
 pnmcat)
-  _arguments -{white,black,leftright,lr,topbottom,tb,jtop,jbottom,jleft,jright} \
-             '*:file: _pbm'
+  _arguments \
+    '(-black)-white[]' \
+    '(-white)-black[]' \
+    '(-lr -topbottom -tb -jleft -jright)-leftright[place pictures left to right]' \
+    '(-leftright -topbottom -tb -jleft -jright)-lr[place pictures left to right]' \
+    '(-tb -leftright -lr -jtop -jbottom)-topbottom[place pictures top to bottom]' \
+    '(-topbottom -leftright -lr -jtop -jbottom)-tb[place pictures top to bottom]' \
+    '(-topbottom -tb -jbottom -jleft -jright)-jtop[align pictures at top]' \
+    '(-topbottom -tb -jtop -jleft -jright)-jbottom[align pictures at bottom]' \
+    '(-leftright -lr -jright -jtop -jbottom)-jleft[align pictures at left side]' \
+    '(-leftright -lr -jleft -jtop -jbottom)-jright[align pictures at right side]' \
+    '*:file: _pbm'
   ;;
 
 pnmcomp)
-  _arguments '-invert' '-xoff:x offset:' '-yoff:y offset:' \
-             '-alpha:alpha mask file:_files -g \*.\(\#i\)pgm' \
-             ':overlay file:_pbm' '*:file: _pbm'
+  _arguments \
+    '-invert[invert overlay pixel values]' \
+    '-xoff[specify overlay x offset]:x offset:' \
+    '-yoff[specify overlay y offset]:y offset:' \
+    '-alpha[specify alpha mask file]:alpha mask file:_files -g \*.\(\#i\)pgm' \
+    ':overlay file:_pbm' '*:file: _pbm'
   ;;
 
 pnmconvol)
@@ -211,7 +318,11 @@ pnmconvol)
   ;;
 
 pnmcrop)
-  _arguments -{white,black} ':file: _pbm'
+  _arguments \
+    '(-black)-white' \
+    '(-white)-black' \
+    -{left,right,top,bottom} \
+    ':file: _pbm'
   ;;
 
 pnmcut)
@@ -227,7 +338,7 @@ pnmenlarge)
   ;;
 
 pnmflip)
-  _arguments -{leftright,lr,topbottom,tb,transpose,xy,rotate90,r90,ccw,rotate270,r270,cw} \
+  _arguments \*-{leftright,lr,topbottom,tb,transpose,xy,rotate90,r90,ccw,rotate270,r270,cw} \
              ':file: _pbm'
   ;;
 
@@ -246,18 +357,34 @@ pnmgamma)
   return ret
   ;;
 
+pnmhisteq)
+  _arguments \
+    '-verbose[verbose mode]' \
+    '-gray[modify only gray pixels]' \
+    '-rmap[specify input luminosity map file]:luminosity map file:_files -g \*.\(\#i\)pgm' \
+    '-wmap[specify output luminosity map file]:luminosity map file:_files -g \*.\(\#i\)pgm' \
+    ':file: _pbm'
+  ;;
 pnmhistmap)
   _arguments -{black,white,verbose} '-max:maximum value:' ':file: _pbm'
   ;;
 
 pnmindex)
-  _arguments '-size:image size:' '-across:images per row:' \
-             '-colors:number of colors:' '-black' '*:file: _pbm'
+  _arguments \
+    '-size[set size of index pictures]:image size:' \
+    '-across[specify number of pictures per ros]:images per row:' \
+    '-colors[specify maximum number of colors]:number of colors:' \
+    '-black[use black padding]' \
+    '*:file: _pbm'
   ;;
 
 pnmmargin)
-  _arguments -{white,black} '-color:color: _x_color' \
-             ':border width:' ':file: _pbm'
+  _arguments \
+    '(-black -colors)-white' \
+    '(-white -colors)-black' \
+    '(-white -black)-color:color: _x_color' \
+    ':border width:' \
+    ':file: _pbm'
   ;;
 
 pnmnlfilt)
@@ -265,14 +392,25 @@ pnmnlfilt)
   ;;
 
 pnmpad)
-  _arguments -{black,white} \
-             -{l-:left,r-:right,t-:top,b-:bottom}' border width:' \
-             ':file: _pbm'
+  _arguments \
+    '(-white)-black[add black border]' \
+    '(-black)-white[add white border]' \
+    '-l-[specify left border width]:left border width:' \
+    '-r-[specify right border width]:right border width:' \
+    '-t-[specify top border width]:top border width:' \
+    '-b-[specify bottom border width]:bottom border width:' \
+    ':file: _pbm'
   ;;
 
 pnmpaste)
-  _arguments -{replace,or,and,xor} ':"from" picture file:_pbm' \
-             :{x,y}' position:'    ':"into" picture file:_pbm'
+  _arguments \
+    '(-or -and -xor)-replace' \
+    '(-replace -and -xor)-or' \
+    '(-replace -or -xor)-and' \
+    '(-replace -or -and)-xor' \
+     ':"from" picture file:_pbm' \
+    :{x,y}' position:' \
+    ':"into" picture file:_pbm'
   ;;
 
 pnmrotate)
@@ -288,11 +426,17 @@ pnmscale)
     scale=( ':scale factor:' )
   fi
   
-  _arguments -{xsize,width}:width: -{ysize,height}:height: \
-             '-xscale:horizontal scale factor:' \
-             '-yscale:vertical scale factor:' \
-             '-xysize:width::height:' "$scale[@]" \
-             ':file: _pbm'
+  _arguments \
+    '(-width)-xsize:width:' \
+    '(-xsize)-width:width:' \
+    '(-height)-ysize:height:' \
+    '(-ysize)-height:height:' \
+    '-xscale:horizontal scale factor:' \
+    '-yscale:vertical scale factor:' \
+    '(-width -xsize -height -ysize -xscale -yscale -pixels)-xysize:width::height:' \
+    '(-width -xsize -height -ysize -xscale -yscale -xysize)-pixels:total number of pixels:' \
+    "$scale[@]" \
+    ':file: _pbm'
   ;;
 
 pnmshear)
@@ -313,23 +457,39 @@ pnmtofits)
   ;;
 
 pnmtops)
-  _arguments -{turn,noturn,rle,runlength} '-scale:scale factor:' \
-             '-dpi:output resolution:' \
-             '-width:page width:' '-height:page height' ':file: _pbm'
+  _arguments \
+    '(-noturn)-turn' '(-turn)-noturn' \
+    '(-nocenter)-center '(-center)-nocenter \
+    '(-rle)-runlength' '(-runlength)-rle' \
+    '-scale:scale factor:' \
+    '-dpi:output resolution:' \
+    '-width:page width:' '-height:page height' ':file: _pbm'
   ;;
 
 pnmtorast)
-  _arguments -{standard,rle} ':file: _pbm'
+  _arguments '(-rle)-standard' '(-standard)-rle' ':file: _pbm'
   ;;
 
 pnmtosgi)
-  _arguments -{verbatim,rle} '-imagename:image name:' ':file: _pbm'
+  _arguments \
+    '(-rle)-verbatim' '(-verbatim)-rle' \
+    '-imagename:image name:' \
+    ':file: _pbm'
   ;;
 
 pnmtotiff)
-  _arguments -{none,packbits,lzw,g3,g4,2d,fill,msb2lsb,lsb2msb} \
-             '-predictor:LZW predictor:((1\:without\ differencing 2\:with\ differencing))' \
-             '-rowsperstrip:number of rows per strip:' ':file: _pbm'
+  _arguments \
+    '(-packbits -lzw -g3 -g4 -2d -fill -predictor)-none' \
+    '(-none -lzw -g3 -g4 -2d -fill -predictor)-packbits' \
+    '(-none -packbits -g3 -g4 -2d -fill -predictor)-lzw' \
+    '(-none -packbits -lzw -g4 -predictor)-g3' \
+    '(-none -packbits -lzw -g3 -2d -fill -predictor)-g4' \
+    '-2d' \
+    '-fill' \
+    '(-lsb2msb)-msb2lsb' \
+    '(-msb2lsb)-lsb2msb' \
+    '-predictor:LZW predictor:((1\:without\ differencing 2\:with\ differencing))' \
+    '-rowsperstrip:number of rows per strip:' ':file: _pbm'
   ;;
 
 pnmtoxwd)
@@ -342,16 +502,20 @@ ppm3d)
   ;;
 
 ppmbrighten)
-  _arguments '-n' '-s:saturation:' '-v:value:' ':file: _pbm'
+  _arguments \
+    '-n[normalize value]' \
+    '-s[specify saturation difference]:saturation difference:' \
+    '-v[specify value difference]:value difference:' \
+    ':file: _pbm'
   ;;
 
 ppmchange)
   _pbm && ret=0
   
   if (( CURRENT & 1 )); then
-    _description expl 'new color'
+    _description colors expl 'new color'
   else
-    _description expl 'old color'
+    _description colors expl 'old color'
   fi
   
   _x_color "$expl[@]" && ret=0
@@ -364,7 +528,10 @@ ppmdim)
   ;;
 
 ppmdist)
-  _arguments -{intensity,frequency} ':file: _pbm'
+  _arguments \
+    '(-frequency)-intensity[sort colors by grayscale intensity]' \
+    '(-intensity)-frequency[sort colors by frequency]' \
+    ':file: _pbm'
   ;;
 
 ppmdither)
@@ -382,14 +549,15 @@ ppmflash)
 ppmforge)
   _arguments -{clouds,night} \
              '-dimension:fractal dimension:' '-hour:hour angle:' \
-             '-inclination:inclination angle:' \
-             '-tilt:inclination angle:' \
+             '(-tilt)-inclination:inclination angle:' \
+             '(-inclination)-tilt:inclination angle:' \
              '-mesh:FFT mesh size:' '-power:elevations power factor:' \
              '-glaciers:glacier elevation:' '-ice:polar ice cap extent:' \
              '-saturation:star color saturation:' \
              '-seed:randum number seed:' \
              '-stars:minimum star pixel percentage:' \
-             -{width,xsize}:width: -{height,ysize}:height:
+ 	     '(-xsize)-width:width:'   '(-width)-xsize:width:' \
+ 	     '(-ysize)-height:height:' '(-height)-ysize:height:'
   ;;
 
 ppmmake)
@@ -405,7 +573,7 @@ ppmntsc)
   ;;
 
 ppmpat)
-  _arguments -{gingham{2,3},g{2,3},madras,tartan,poles,squig,camo,anticamo} \
+  _arguments '(gingham2 -gingham3 -g2 -g3 -madras -tartan -poles -squig -camo -anticamo)'-{gingham{2,3},g{2,3},madras,tartan,poles,squig,camo,anticamo} \
              ':width:' ':height:'
   ;;
 
@@ -419,17 +587,16 @@ ppmquant)
   fi
   
   if [[ CURRENT -eq 2 ]]; then
-    _description expl option
     if [[ -n "$opt" ]]; then
-      compadd "$expl[@]" - -map -fs -floyd && ret=0
+      _wanted options expl option compadd - -map -fs -floyd && ret=0
     else
-      compadd "$expl[@]" - -map && ret=0
+      _wanted options expl option compadd - -map && ret=0
     fi
     _message 'number of colors'
   
     return ret
   elif [[ CURRENT -eq 3 && "$words[2]" = -map ]]; then
-    _description expl 'map file'
+    _description files expl 'map file'
     _files "$expl[@]" -g '*.(#i)ppm'
   else
     _pbm
@@ -449,12 +616,18 @@ ppmspread)
   ;;
 
 ppmtoacad)
-  _arguments -{dxb,poly,white,8} '-background:background color:_x_color' \
-             '-aspect:pixel aspect ratio:' ':file: _pbm'
+  _arguments \
+    '(-poly)-dxb[write AutoCAD binary database import file]' \
+    '(-dxb)-poly[render pixels as filled polygons]' \
+    '-8[restrict colors to the 8 RGB shades]' \
+    '(-background)-white[use white background]' \
+    '(-white)-background:background color (0-255):' \
+    '-aspect:pixel aspect ratio:' \
+    ':file: _pbm'
   ;;
 
 ppmtobmp)
-  _arguments -{os2,windows} ':file: _pbm'
+  _arguments '(-windows)-os2' '(-os2)-windows' ':file: _pbm'
   ;;
 
 ppmtogif)
@@ -490,12 +663,17 @@ ppmtopj)
   ;;
 
 ppmtopjxl)
-  _arguments -{nopack,presentation,dark,diffuse,cluster,dither} \
-             '-gamma:gamma value:' \
-             '-xshift:x shift:' '-yshift:y shift:' \
-             -{xscale:x,yscale:y}' scale factor:' \
-             -{xsize,width}:width: -{ysize,height}:height: \
-             ':file: _pbm'
+  _arguments \
+    -{nopack,presentation,dark,diffuse,cluster,dither} \
+    '-gamma:gamma value:' \
+    '-xshift:x shift:' '-yshift:y shift:' \
+    '(-width -xscale)-xscale:width:' \
+    '(-xsize -xscale)-width:width:' \
+    '(-xsize -width)-xscale:horizontal scale factor:' \
+    '(-height -yscale)-ysize:height:' \
+    '(-ysize -yscale)-height:height:' \
+    '(-ysize -height)-yscale:vertical scale factor:' \
+    ':file: _pbm'
   ;;
 
 ppmtosixel)
@@ -518,15 +696,20 @@ psidtopgm)
   _arguments ':width:' ':height:' ':bits per sample:' \
              ':postscript file:_files -g \*.\(\#i\)\(ps\|eps\)'
   ;;
-
 pstopnm)
-  _arguments -{forceplain,help,landscape,portrait,nocrop,pbm,pgm,ppm,verbose} \
-             '-llx:loxer left x position:' '-lly:lower left y position:' \
-             '-urx:upper right x position:' '-ury:upper right y position:' \
-             '-xborder:x border fraction:' '-yborder:y border fraction:' \
-             '-xmax:maximum width:' '-ymax:maximum height' \
-             '-xsize:width:' '-ysize:height:' \
-             ':postscript file:_files -g \*.\(\#i\)\(ps\|eps\)'
+  _arguments \
+    '(-portrait)-landscape' \
+    '(-landscape)-portrait' \
+    '(-pgm -ppm)-pbm' \
+    '(-pbm -ppm)-pgm' \
+    '(-pbm -pgm)-ppm' \
+    -{forceplain,help,nocrop,verbose} \
+    '-llx:loxer left x position:' '-lly:lower left y position:' \
+    '-urx:upper right x position:' '-ury:upper right y position:' \
+    '-xborder:x border fraction:' '-yborder:y border fraction:' \
+    '-xmax:maximum width:' '-ymax:maximum height' \
+    '-xsize:width:' '-ysize:height:' \
+    ':postscript file:_files -g \*.\(\#i\)\(ps\|eps\)'
   ;;
 
 rawtopgm)
@@ -536,10 +719,13 @@ rawtopgm)
   ;;
 
 rawtoppm)
-  _arguments '-headerskip:header bytes to skip:' \
-             '-rowskip:row padding to skip:' \
-             -{rgb,rbg,grb,gbr,brg,bgr,interpixel,interrow} \
-             ':width:' ':height:' ':grayscale bytes:'
+  _arguments \
+    '-headerskip:header bytes to skip:' \
+    '-rowskip:row padding to skip:' \
+    '(-rgb -rbg -grb -gbr -brg -bgr)'-{rgb,rbg,grb,gbr,brg,bgr} \
+    '(-interrow)-interpixel' \
+    '(-interpixel)-interrow' \
+    ':width:' ':height:' ':grayscale bytes:'
   ;;
 
 rgb3toppm)
@@ -552,7 +738,7 @@ rgb3toppm)
   fi
   
   if [[ -n "$expl" ]]; then
-    _description expl "$expl"
+    _description files expl "$expl"
     _files "$expl" -g '*.(#i)pgm'
   fi
   ;;
@@ -563,9 +749,11 @@ sgitopnm)
 
 sldtoppm)
   _arguments -{adjust,dir,info,verbose} \
-             -{width,xsize}:width: -{height,ysize}:height: \
+             '(-width -xsize)'-{width,xsize}:width: \
+             '(-height -ysize)'-{height,ysize}:height: \
              '-scale:scale factor:' \
-             '-lib:slide name:' '-Lib:slide name:' ':file: _pbm'
+             '(-lib -Lib)'-{l,L}'ib:slide name:' \
+             ':file: _pbm'
   ;;
 
 yuvsplittoppm)
@@ -577,10 +765,10 @@ yuvtoppm)
   ;;
 
 zeisstopnm)
-  _arguments -p{g,p}m ':file: _pbm'
+  _arguments '(-pgm -ppm)'-p{g,p}m ':file: _pbm'
   ;;
 
-*) 
-  _description expl 'picture file'
-  _path_files "$expl[@]" -g "$pat" || _files "$expl[@]" -g '*.(#i)p[bgp]m'
+*)
+  _wanted files expl 'picture file' _path_files -g "$pat" ||
+      _files "$expl[@]" -g '*.(#i)p[bgp]m'
 esac

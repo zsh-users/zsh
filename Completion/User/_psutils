@@ -1,6 +1,6 @@
 #compdef epsffit extractres fixdlsrps fixfmps fixmacps fixpsditps fixpspps fixscribeps fixtpps fixwfwps fixwpps fixwwps includeres psbook psmerge psnup psresize psselect pstops getafm showchar
 
-case "$words[1]" in
+case "${words[1]:t}" in
 epsffit)
   _arguments \
     '-v[print version]' \
