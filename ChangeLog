@@ -1,5 +1,8 @@
 2003-07-17  Oliver Kiddle  <opk@zsh.org>
 
+	* 18866: Etc/completion-style-guide: document conventions used
+	in completion functions
+
 	* unposted: Completion/Unix/Command/_aap: adjust return code
 	in the same way as was done for old completions in 18631
 

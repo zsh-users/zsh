@@ -1,3 +1,70 @@
+Conventions
+-----------
+
+There are a number of conventions related to writing completion
+functions and it is useful if they are followed for functions which are
+to be distributed as part of zsh to maintain a level of consistency.
+
+Coding style:
+
+* Use two spaces for indentation and four for continuation lines except
+  where there are many continutation lines such as `_arguments' or
+  `_values' specs. Lines tend to be longer than in C code so less
+  indentation makes sense.
+
+* For constructs such as `if' and `while', the `then' or `do' should be
+  on the end of the line after a semi-colon and space unless there
+  isn't room for it (see the next point) in which case put it on the
+  next line un-indented.
+
+* Please try not to use lines longer than 79 characters.
+
+Descriptions:
+
+Descriptions should not have a trailing full stop and initial capital
+letter. Though capitals are fine where you have an acronym which
+generally appears in uppercase. 
+
+It is a good idea to copy descriptions from the command's man page or
+--help output. If you do this, be careful that the description still
+makes sense. Some commands have a description like `print help message
+(this one) and exit' for --help but the `(this one)' part no longer
+makes sense. A less obvious example is where the help output looks like:
+  -X, --encoding=NAME        use input encoding NAME
+copying this description exactly would result in completion output that
+looks like this:
+  --encoding   -X    -- use input encoding NAME
+In the help output, it is much clearer what is meant by `NAME' because
+it appears after `--encoding=' but it doesn't in the completion
+listing. So it is better to use a description of this form:
+  --encoding   -X    -- use specified input encoding
+The word specify is commonly used with options that take arguments.
+
+Another example of where --help output may not be suitable unedited is
+where default values or units are indicated. Do not put them in
+per-match descriptions; they are better placed in the group
+descriptions. Put the units in parentheses after the description. So
+for example, do not use:
+  '--timeout[specifiy connection timeout in milliseconds]:timeout'
+but use:
+  '--timeout[specify connection timeout]:timeout (ms)'
+  
+In a function, allow any descriptions passed as an argument to override
+the default you define. For example:
+  _wanted directories expl directory _files -/ "$@" -
+The "$@" adds descriptions passed as parameters and the trailing `-'
+tells _wanted where to put options specifying the `directory' description.
+
+Where two matches have identical meaning, give them the same
+description so that the completion system can group them together.
+Conventionally a brace exapansion of this form is used:
+  '(--context,-C)'{--context=,-C-}'[specify lines of context]:lines'
+You won't need the exclusion list if the option can be specified
+multiple times. It can also be useful to use the same description for
+matches which are completely opposite in their meaning if it shortens
+the completion listing provided that the names of the matches makes it
+clear what their effect is.
+
 Contexts, tags and all that
 ---------------------------
 
@@ -410,4 +477,4 @@ Misc. remarks
     with its exit status. After this call to `call_function' the
     completion function would contain the code for the default way to
     generate the matches.
-    See the `_rpm' and `_nslookup' files for examples.
+    See the `_email_addresses', `_rpm' and `_nslookup' files for examples.
