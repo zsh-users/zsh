@@ -3763,10 +3763,11 @@ makecomplistflags(Compctl cc, char *s, int incmd, int compadd)
 	    for (ln = firstnode(matches); ln; ln = nextnode(ln)) {
 		m = (Cmatch) getdata(ln);
 		if (m->ppre) {
+		    char *s = (m->psuf ? m->psuf : "");
 		    char *p = (char *) zhalloc(strlen(m->ppre) + strlen(m->str) +
-					      strlen(m->psuf) + 1);
+					      strlen(s) + 1);
 
-		    sprintf(p, "%s%s%s", m->ppre, m->str, m->psuf);
+		    sprintf(p, "%s%s%s", m->ppre, m->str, s);
 		    addlinknode(args, dupstring(p));
 		} else
 		    addlinknode(args, dupstring(m->str));
@@ -3799,6 +3800,9 @@ makecomplistflags(Compctl cc, char *s, int incmd, int compadd)
 		endcmgroup(yaptr);
 		begcmgroup("default", 0);
 	    }
+	} else {
+	    endcmgroup(yaptr);
+	    begcmgroup("default", 0);
 	}
     } else if ((tt = cc->explain)) {
 	tt = dupstring(tt);
