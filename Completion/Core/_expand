@@ -7,7 +7,7 @@
 # the expansions done produce no result or do not change the original
 # word from the line.
 
-local exp word="$PREFIX$SUFFIX" sort expr expl subd
+local exp word="$PREFIX$SUFFIX" sort expr expl subd suf=" "
 local curcontext="${curcontext/:[^:]#:/:expand:}"
 
 # First, see if we should insert all *completions*.
@@ -41,7 +41,7 @@ subd="$exp"
 zstyle -s ":completion:${curcontext}:" glob expr &&
     [[ "${(e):-\$[$expr]}" -eq 1 ]] &&
     exp=( ${~exp}(N) )
- 
+
 # If we don't have any expansions or only one and that is the same
 # as the original string, we let other completers run.
 
@@ -60,16 +60,19 @@ zstyle -s ":completion:${curcontext}:" sort sort
 
 [[ "$sort" = (yes|true|1|on) ]] && exp=( "${(@o)exp}" )
 
+# If there is only one expansion, add a suitable suffix
+(($#exp == 1)) && suf='' && [[ -d $exp ]] && suf='/'  
+
 if [[ -z "$compstate[insert]" ]] ;then
   _description all-expansions expl 'all expansions' "o:$word"
 
-  compadd "$expl[@]" -UQ - "$exp"
+  compadd "$expl[@]" -UQ -qS "$suf" - "$exp"
 else
   _tags all-expansions expansions original
 
 
   _requested all-expansions expl 'all expansions' "o:$word" &&
-      compadd "$expl[@]" -UQ "$exp"
+      compadd "$expl[@]" -UQ -qS "$suf" - "$exp"
 
   if _requested expansions; then
     if [[ "$sort" = menu ]]; then
