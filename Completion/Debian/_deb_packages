@@ -2,7 +2,7 @@
 
 # Usage: _deb_packages expl... avail|installed|uninstalled
 
-_deb_packages_updage_avail () {
+_deb_packages_update_avail () {
   if (( ! $+_deb_packages_cache_uninstalled )); then
     _deb_packages_cache_avail=(
       ${(f)"$(apt-cache dumpavail | awk '/^Package:/ { print $2 }')"}
@@ -11,7 +11,7 @@ _deb_packages_updage_avail () {
   cachevar=_deb_packages_cache_avail
 }
 
-_deb_packages_updage_installed () {
+_deb_packages_update_installed () {
   if (( ! $+_deb_packages_cache_installed )); then
     _deb_packages_cache_installed=(
       ${${${(f)"$(dpkg --get-selections)"}:#*deinstall}%%	*}
@@ -20,9 +20,9 @@ _deb_packages_updage_installed () {
   cachevar=_deb_packages_cache_installed
 }
 
-_deb_packages_updage_uninstalled () {
-  _deb_packages_updage_avail
-  _deb_packages_updage_installed
+_deb_packages_update_uninstalled () {
+  _deb_packages_update_avail
+  _deb_packages_update_installed
   if (( ! $+_deb_packages_cache_uninstalled )); then
     _deb_packages_cache_uninstalled=(
       ${_deb_packages_cache_avail:#${(j:|:)~${_deb_packages_cache_installed:q}}}
@@ -49,9 +49,9 @@ _deb_packages () {
 
   expl=("${(@)argv[1,-2]}")
 
-  _deb_packages_updage_$pkgset
+  _deb_packages_update_$pkgset
 
-  _tags packages && compadd "$expl[@]" - "${(e):-"\${(@)$cachevar}"}"
+  _tags packages && compadd "$expl[@]" - "${(@P)cachevar}"
 }
 
 _deb_packages "$@"
