@@ -588,6 +588,8 @@ bin_zle_complete(char *name, char **args, char *ops, char func)
 	zwarnnam(name, "widget name `%s' is protected", args[0], 0);
 	return 1;
     }
+    hascompwidgets++;
+
     return 0;
 }
 
