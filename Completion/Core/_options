@@ -1,0 +1,5 @@
+#autoload
+
+# This should be used to complete all option names.
+
+compgen "$@" -M 'L:|[nN][oO]= M:_= M:{A-Z}={a-z}' -o

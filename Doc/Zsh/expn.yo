@@ -329,7 +329,12 @@ item(tt(${)var(name)tt(}))(
 The value, if any, of the parameter var(name) is substituted.
 The braces are required if the expansion is to be followed by
 a letter, digit, or underscore that is not to be interpreted
-as part of var(name).
+as part of var(name).  In addition, more complicated forms of substitution
+usually require the braces to be present; exceptions, which only apply if
+the option tt(KSH_ARRAYS) is not set, are a single subscript or any colon
+modifiers appearing after the name, or any of the characters tt(^), tt(=),
+tt(~), tt(#) or tt(+) appearing before the name, all of which work with or
+without braces.
 
 If var(name) is an array parameter, then the value of each
 element of var(name) is substituted, one element per word.
@@ -492,14 +497,9 @@ tt($LPAR())...tt(RPAR()) type command substitution is used in place of
 var(name) above, it is expanded first and the result is used as if
 it were the value of var(name).  Thus it is
 possible to perform nested operations:  tt(${${foo#head}%tail})
-substitues the value of tt($foo) with both tt(head) and tt(tail)
+substitutes the value of tt($foo) with both tt(head) and tt(tail)
 deleted.  The form with tt($LPAR())...tt(RPAR()) is often useful in
-combination with the flags described next; see the example below.
-
-Note that when nested parameter expansion takes place the flags are em(not)
-propagated back.  Each level of expansion uses three factors: whether it
-is in double quotes, what flags it has been provided with, and whether the
-value it has is a scalar or an array.  Some examples are given below.
+combination with the flags described next; see the examples below.
 
 subsect(Parameter Expansion Flags)
 cindex(parameter expansion flags)
@@ -681,7 +681,7 @@ flag, or with tt(${)...tt(/)...tt(}) (only the var(expr)th match is
 substituted) or tt(${)...tt(//)...tt(}) (all matches from the
 var(expr)th on are substituted).  The var(expr)th match is counted
 such that there is either one or zero matches from each starting
-position in the string, although for global subsitution matches
+position in the string, although for global substitution matches
 overlapping previous replacements are ignored.
 )
 item(tt(M))(
@@ -703,57 +703,82 @@ enditem()
 
 subsect(Rules)
 
-Here is a summary of the rules for substitution.  Some particular examples
-are given below.  Note that the Zsh Development Group accepts em(no
-responsibility) for any brain damage which may occur during the reading of
-the following rules.
+Here is a summary of the rules for substitution; this assumes that braces
+are present around the substitution, i.e. tt(${...}).  Some particular
+examples are given below.  Note that the Zsh Development Group accepts
+em(no responsibility) for any brain damage which may occur during the
+reading of the following rules.
 
 startitem()
-item(tt(1.))(
+item(tt(1.) em(Nested Substitution))(
 If multiple nested tt(${...}) forms are present, substitution is
 performed from the inside outwards.  At each level, the substitution takes
 account of whether the current value is a scalar or an array, whether the
 whole substitution is in double quotes, and what flags are supplied to the
-current level of substitution.  If the value is a raw parameter reference
-with a subscript, such as tt(${)var(var)tt([3]}), the effect of
-subscripting is applied directly to the parameter.  The value passed back
-to an enclosing substitution is always an array, which however will consist
-of one word if the value was not itself an array.
+current level of substitution; the flags are not propagated up to enclosing
+substitutions.  The value passed back to an enclosing substitution is
+always an array, which however will consist of one word if the value was
+not itself an array.  All the following steps take place where applicable
+at all levels of substitution.
 )
-item(tt(2.))(
+item(tt(2.) em(Parameter Subscripting))(
+If the value is a raw parameter reference with a subscript, such as
+tt(${)var(var)tt([3]}), the effect of subscripting is applied directly to
+the parameter.  If the parameter is an array, any second subscript,
+indexing on the character in the word, may appear,
+e.g. tt(${)var(var)tt([1][2]}).
+)
+item(tt(3.) em(Parameter Name Replacement))(
+The effect of any tt((P)) flag, which treats the value so far as a
+parameter name and replaces it with the corresponding value, is applied.
+)
+item(tt(4.) em(Double-Quoted Joining))(
 If the value after this process is an array, and the substitution
 appears in double quotes, and no tt((@)) flag is present at the current
 level, the words of the value are joined with the first character of the
 parameter tt($IFS), by default a space, between each word (single word
 arrays are not modified).  If the tt((j)) flag is present, that is used for
-joining instead of tt($IFS). Any remaining subscript is evaluated at
-this point, based on whether the value is an array or a scalar.
+joining instead of tt($IFS).
 )
-item(tt(3.))(
+item(tt(5.) em(Nested Subscripting))(
+Any remaining subscript (i.e. of a nested substitution) is evaluated at
+this point, based on whether the value is an array or a scalar; if it was
+an array, a second subscript for the character in the word may also appear.
+)
+item(tt(6.) em(Modifiers))(
 Any modifiers, as specified by a trailing tt(#), tt(%), tt(/)
 (possibly doubled) or by a set of modifiers of the form tt(:...) (see
 noderef(Modifiers) in noderef(History Expansion)), are applied to the words
 of the value at this level.
 )
-item(tt(4.))(
+item(tt(7.) em(Forced Joining))(
 If the tt((j)) flag is present, or no tt((j)) flag is present but
-the string is to be split as given by rules tt(5.) or tt(6.), and joining
-did not take place at step tt(2.), any words in the value are joined
+the string is to be split as given by rules tt(8.) or tt(9.), and joining
+did not take place at step tt(4.), any words in the value are joined
 together using the given string or the first character of tt($IFS) if none.
 Note that the tt((F)) flag implicitly supplies a string for joining in this
 manner.
 )
-item(tt(5.))(
+item(tt(8.) em(Forced Splitting))(
 If one of the tt((s)) or tt((f)) flags are present, or the tt(=)
-specifier was present (e.g. tt(${=)var(var)tt(})), the word is joined on
+specifier was present (e.g. tt(${=)var(var)tt(})), the word is split on
 occurrences of the specified string, or (for tt(=) with neither of the two
 flags present) any of the characters in tt($IFS).
 )
-item(tt(6.))(
+item(tt(9.) em(Shell Word Splitting))(
 If no tt((s)), tt((f)) or tt(=) was given, but the word is not
 quoted and the option tt(SH_WORD_SPLIT) is set, the word is split on
-occurrences of any of the characters in tt($IFS).  Note that all steps,
-including this one, take place at all levels of a nested substitution.
+occurrences of any of the characters in tt($IFS).  Note this step, too,
+take place at all levels of a nested substitution.
+)
+item(tt(10.) em(Re-Evaluation))(
+Any tt((e)) flag is applied to the value, forcing it to be re-examined for
+new parameter substitutions, but also for command and arithmetic
+substitutions.
+)
+item(tt(11.) em(Padding))(
+Any padding of the value by the tt(LPAR()l.)var(fill)tt(.RPAR()) or
+tt(LPAR()r.)var(fill)tt(.RPAR()) flags is applied.
 )
 enditem()
 
@@ -1272,13 +1297,13 @@ item(tt(f)var(spec))(
 files with access rights matching var(spec). This var(spec) may be a
 octal number optionally preceded by a `tt(=)', a `tt(PLUS())', or a
 `tt(-)'. If none of these characters is given, the behavior is the
-same as for `tt(=)'. The octal number decribes the mode bits to be
+same as for `tt(=)'. The octal number describes the mode bits to be
 expected, if combined with a `tt(=)', the value given must match the
 file-modes exactly, with a `tt(PLUS())', at least the bits in the
 given number must be set in the file-modes, and with a `tt(-)', the
 bits in the number must not be set. Giving a `tt(?)' instead of a
 octal digit anywhere in the number ensures that the corresponding bits 
-inthe file-modes are not checked, this is only useful in combination
+in the file-modes are not checked, this is only useful in combination
 with `tt(=)'.
 
 If the qualifier `tt(f)' is followed by any other character anything
@@ -1290,7 +1315,7 @@ described above or a list of any of the characters `tt(u)', `tt(g)',
 `tt(o)', and `tt(a)', followed by a `tt(=)', a `tt(PLUS())', or a
 `tt(-)', followed by a list of any of the characters `tt(r)', `tt(w)', 
 `tt(x)', `tt(s)', and `tt(t)', or a octal digit. The first list of
-characters specify which acess rights are to be checked. If a `tt(u)'
+characters specify which access rights are to be checked. If a `tt(u)'
 is given, those for the owner of the file are used, if a `tt(g)' is
 given, those of the group are checked, a `tt(o)' means to test those
 of other users, and the `tt(a)' says to test all three groups. The
@@ -1308,7 +1333,7 @@ no rights, independent of the permissions for other user. The pattern
 `tt(*(f-100))' gives all files for which the owner does not have
 execute permission, and `tt(*(f:gu+w,o-rx))' gives the files for which 
 the owner and the other members of the group have at least write
-permission, and fo which other users don't have read or execute
+permission, and for which other users don't have read or execute
 permission.
 )
 item(tt(d)var(dev))(

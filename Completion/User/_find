@@ -2,14 +2,14 @@
 
 local prev="$words[CURRENT-1]"
 
-if [[ -mbetween -(ok|exec) \\\; ]]; then
+if compset -N '-(ok|exec)' '\;' then
   _normal
-elif [[ -iprefix - ]]; then
+elif compset -P 1 -; then
   compgen -s 'daystart {max,min,}depth follow noleaf version xdev \
     {a,c,}newer {a,c,m}{min,time} empty false {fs,x,}type gid inum links \
     {i,}{l,}name {no,}{user,group} path perm regex size true uid used \
     exec {f,}print{f,0,} ok prune ls'
-elif [[ -position 2 ]]; then
+elif [[ CURRENT -eq 2 ]]; then
   local ret=1
 
   compgen -g '. ..' && ret=0

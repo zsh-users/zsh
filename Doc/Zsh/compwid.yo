@@ -50,7 +50,7 @@ from the completion code to the completion widget and can be set to
 give information to the completion code from the completion
 widget. Some of the builtin commands and the condition codes use or
 change the current values of these parameters. While the completion
-widget is active, these parameters are reseton each function exit to
+widget is active, these parameters are reset on each function exit to
 the values they had when the function was entered.
 
 startitem()
@@ -79,6 +79,10 @@ This should be set to that part of the current word that should be
 taken as the string every possible match has to end with. The
 completion code sets this to the part of the current word from the
 cursor position to the end.
+)
+item(tt(ISUFFIX))(
+Like tt(IPREFIX), but for a suffix that should not be considered part
+of the matches.
 )
 item(tt(compstate))(
 This is an associative array with various keys and values the
@@ -201,11 +205,30 @@ otherwise.
 )
 item(tt(pattern_match))(
 If the option tt(GLOB_COMPLETE) is set, this is initially set to
-tt(yes) and unset otherwise. If the completion widget sets it to a
-non-empty string, the completion code will from then on behave as if
-tt(GLOB_COMPLETE) is set, i.e.. if the strings in tt(PREFIX) and
+`tt(*)' and unset otherwise. If the completion widget sets it to a
+`tt(*)', the completion code will from then on behave as if
+tt(GLOB_COMPLETE) is set, i.e. if the strings in tt(PREFIX) and
 tt(SUFFIX) contain unquoted metacharacters, they will be treated as
-patterns.
+patterns. If the string is set to any other non-empty string, the
+strings will be treated as patterns but the code will not automatically
+insert a star at the cursor position.
+)
+item(tt(pattern_insert))(
+Normally this is set to tt(menu) which means that menu-completion will be
+used whenever the matches were generated using pattern matching. If this
+is set to any other non-empty string by the user and menu-completion is
+not selected by other option settings, the code will insert an
+unambiguous string for the generated matches as with normal completion.
+)
+item(tt(unambiguous))(
+This key is read-only and will always be set to the unambiguous string
+the completion code has generated for all matches added so far.
+)
+item(tt(unambiguous_cursor))(
+This gives the position the cursor would be placed at when the
+unambiguous string would be inserted, relative to the value of the
+tt(unambiguous) key. The cursor would be placed before the character
+whise index is given by this key.
 )
 enditem()
 )
@@ -241,7 +264,8 @@ if at least one match was added and non-zero otherwise.
 xitem(tt(compadd) [ tt(-qQfnUam) ] [ tt(-F) var(array) ])
 xitem([ tt(-P) var(prefix) ] [ tt(-S) var(suffix) ])
 xitem([ tt(-p) var(hidden-prefix) ] [ tt(-s) var(hidden-suffix) ])
-xitem([ tt(-i) var(ignored-prefix) ] [ tt(-W) var(file-prefix) ])
+xitem([ tt(-i) var(ignored-prefix) ] [ tt(-I) var(ignored-suffix) ])
+xitem([ tt(-W) var(file-prefix) ])
 xitem([ tt(-J) var(name) ] [ tt(-V) var(name) ] [ tt(-X) var(explanation) ])
 xitem([ tt(-r) var(remove-chars) ] [ tt(-R) var(remove-func) ])
 item([ tt(-M) var(match-spec) ] [ tt(--) ] [ var(words) ... ])(
@@ -255,7 +279,7 @@ The completion code breaks the string to complete into six fields in
 the order: 
 
 indent(
-var(<ipre><apre><hpre><word><hsuf><asuf>)
+var(<ipre><apre><hpre><word><hsuf><asuf><isuf>)
 )
 
 The first field
@@ -273,7 +297,8 @@ appear in the list of completions, one of the tt(words) given at the
 end. The field var(<hsuf>) is like var(<hpre>) but gives a suffix that 
 should be matched but will not be listed. Finally, var(<asuf>) is the
 suffix given with tt(-S) that should automatically be added by the
-completion code.
+completion code and var(<isuf>) is like var(<ipre>), but taken from
+the tt(ISUFFIX) parameter and the tt(-I) option.
 
 The supported flags are:
 
@@ -300,6 +325,9 @@ This gives a string to insert into the command line just before any
 string given with the `tt(-P)' option. Without `tt(-P)' the string is
 inserted before the string given with `tt(-p)' or directly before the
 match.
+)
+item(tt(-I) var(ignored-suffix))(
+Like tt(-i), but gives an ignored suffix.
 )
 item(tt(-J) var(name))(
 As for tt(compctl) and tt(compgen) this gives the name of the group
@@ -416,6 +444,87 @@ hyphens.
 )
 enditem()
 )
+xitem(tt(compset -p) var(number))
+xitem(tt(compset -P) [ var(number) ] var(pattern))
+xitem(tt(compset -s) var(number))
+xitem(tt(compset -S) [ var(number) ] var(pattern))
+xitem(tt(compset -n) var(begin) [ var(end) ])
+item(tt(compset -p) var(beg-pat) [ var(end-pat) ])(
+This builtin allows to easily modify the special parameters and at
+the same time, to do tests on their values.
+
+The options are:
+
+startitem()
+item(tt(-p) var(number))(
+If the contents of the tt(PREFIX) parameter is longer than var(number)
+characters, the first var(number) characters are removed from it and
+appended to the contents of the tt(IPREFIX) parameter.
+)
+item(tt(-P) [ var(number) ] var(pattern))(
+If the value of the tt(PREFIX) parameter begins with anything that
+matches the var(pattern), the matched portion is removed from
+tt(PREFIX) and appended to tt(IPREFIX).
+
+Without the optional var(number), the longest match is taken, but
+if var(number) is given, anything up to the var(number)'th match is
+moved. If the var(number) is negative, the var(number)'th longest
+match is moved. For example, if tt(PREFIX) contains the string
+`tt(a=b=c)' doing tt(compset -P '*\=') will move the string `tt(a=b=)' 
+into the tt(IPREFIX) parameter, but tt(compset -P 1 '*\=') moves only
+the string `tt(a=)'.
+)
+item(tt(-s) var(number))(
+Like tt(-p), but prepend the last var(number) characters from the
+parameter tt(SUFFIX) to the contents of the parameter tt(ISUFFIX).
+)
+item(tt(-S) [ var(number) ] var(pattern))(
+Like tt(-P), but matching from the end of tt(SUFFIX) and moving the
+matched portion into the parameter tt(ISUFFIX).
+)
+item(tt(-n) var(begin) [ var(end) ])(
+If the current word position as specified by the parameter tt(CURRENT) 
+is greater than or equal to var(begin), anything up to the
+var(begin)'th word is removed from the tt(words) array and the value
+of the parameter tt(CURRENT) is decremented by var(begin).
+
+If the optional var(end) is given, the modification is done only if
+the current word position is also less than or equal to var(end). In
+this case, the words from position var(end) onwards are removed from
+the tt(words) array, too.
+
+Both of these numbers may be negative to make them count backwards
+from the last element of the tt(words) array.
+)
+item(tt(-N) var(beg-pat) [ var(end-pat) ])(
+If one of the elements of the tt(words) array up to the one at the
+index given by the value of the parameter tt(CURRENT) matches the
+pattern var(beg-pat), all elements up to the matching one are removed
+from the tt(words) array and the value of tt(CURRENT) is changed to
+point to the same word in the changed array.
+
+If the optional pattern var(end-pat) is also given and there is an
+element in the tt(words) array matching this pattern, the parameters
+are modified only if the index of this word is higher than the one
+given by the tt(CURRENT) parameter (meaning that the matching word has 
+to be after the cursor). In this case, the words from the word
+matching tt(end-pat) onwards are also removed from the tt(words)
+array. If tt(words) contains no word matching var(end-pat), the
+testing and modification is done as if it were not given.
+)
+enditem()
+
+In all of these cases the return value is zero if the test succeded
+and the parameters were modified, and non-zero otherwise. This allows
+one to use this builtin in tests as in:
+
+indent(
+tt(if compset -P '*\='; then ...)
+)
+
+Which makes anything up to and including the last equal sign be
+ignored by the completion code.
+)
 item(tt(compcall) [ tt(-TD) ])(
 
 This allows one to use completion definitions given with the
@@ -441,84 +550,26 @@ Inside completion widgets not only the builtin commands described
 above can be used, but also some additional condition codes. These
 work on the special parameters and can be used to easily build
 completion functions that generate different matches depending on the
-strings on the line.
+strings on the line. All of these condition codes perform tests also
+done by the tt(compset) builtin, but they don't modify the contents of 
+the special parameters.
 
 The following condition codes are made available inside completion
 widgets:
 
 startitem()
-item(tt(-prefix) var(string))(
-true if the content of tt(PREFIX) starts with var(string)
+item(tt(-prefix) [ var(number) ] var(pattern))(
+true if the test for the tt(-P) option of tt(compset) would succeed
 )
-item(tt(-iprefix) var(string))(
-like tt(-prefix), but the var(string) is removed from tt(PREFIX) and
-added to tt(IPREFIX)
+item(tt(-suffix) [ var(number) ] var(pattern))(
+true if the test for the tt(-S) option of tt(compset) would succeed
 )
-item(tt(-position) var(beg) [ var(end) ])(
-true if tt(CURRENT) is equal to var(beg) or, if var(end) is given,
-equal to or greater than var(beg) and equal to or less than var(end);
-both of var(beg) and var(end) may be arithmetic expressions, if they
-are less than zero the number of words in tt(words) are added to them
-before comparing them to tt(CURRENT); thus, tt(-1) is the last word,
-tt(-2) is the word before that and so on; note that positions are
-taken as indexes into the tt(words) array and thus are counted as if
-the tt(ksharray) is not set
+item(tt(-after) var(beg-pat))(
+true if the test of the tt(-N) option with only the var(beg-pat) given 
+would succeed
 )
-item(tt(-word) var(index) var(string))(
-true if the word number var(index) in tt(words) is equal to
-var(string); again, var(index) may be negative, counting backwards
-)
-item(tt(-mword) var(index) var(pattern))(
-like tt(-word) but using pattern matching
-)
-item(tt(-current) var(offset) var(string))(
-like tt(-word) but var(offset) is relative to the value of
-tt(CURRENT)
-)
-item(tt(-mcurrent) var(offset) var(pattern))(
-like tt(-current) but using pattern matching
-)
-item(tt(-string) [ var(number) ] var(string))(
-true if the current word contains var(string); anything up to the last 
-occurrence of this string will be ingnored by removing it from
-tt(PREFIX) and adding it to tt(IPREFIX); if var(number) is given,
-anything up to the var(number)'th occurrence of the var(string) will
-be ignored; again, var(number) may be any arithmetic expression and
-negative values count backward
-)
-item(tt(-class) [ var(number) ] var(class))(
-like tt(-string) but the var(class) is used as a character class so
-that anything up to and including the last or the var(number)'th
-occurrence of any character from the string var(class) is ignored
-)
-item(tt(-words) var(min) [ var(max) ])(
-true if the number of words is equal to var(min); if var(max) is
-given, it is true if the number of words is equal to or greater than
-var(min) and equal to or less than var(max)
-)
-item(tt(-after) var(string))(
-true if the cursor is after a word that is equal to var(string); this
-removes all words up to and including the matched word from the
-tt(words) array
-)
-item(tt(-mafter) var(pattern))(
-like tt(-after) but using pattern matching
-)
-item(tt(-between) var(string1) var(string2))(
-true if the cursor is after a word that is equal to var(string1), if
-there is also a word that is equal to var(string2), this is true only
-if the cursor is before it; as a side effect, all words before
-var(string1) and after var(string2) (both inclusive) are removed from
-the tt(words) array
-)
-item(tt(-mbetween) var(pattern1) var(pattern2))(
-like tt(-between) but using pattern matching
-)
-item(tt(-nmatches) var(number))(
-true if the the value of tt(compstate[nmatches]) is equal to var(number)
-)
-item(tt(-matcher) var(number))(
-true if the value of tt(compstate[matcher]) is equal to var(number)
+item(tt(-between) var(beg-pat end-pat))(
+true if the test for the tt(-N) option with both patterns would succeed
 )
 enditem()
 

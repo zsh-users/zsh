@@ -798,8 +798,66 @@ for some other reason).
 Sven: 5831: in subscripts and math environments, the whole string is always
 passed down to the function handler.
 
+pws: 5844: don't set errflag if noerrs = 2.
+
 Sven: 5852: warnings about _long_options
 
 pws: 5854: man page dependencies in Doc/Makefile.in
 
 Sven: 5862: _path_files (turning on menu) and _cd (include . in path)
+
+pws: 5863: substitution rules
+
+  pws-14
+
+Bart: 5868: expn.yo fixes
+
+Sven: 5871, 5875: big zle_tricky.c cleanup, with compstate changes and
+IFSUFFIX
+
+Sven: 5872, 5881, 5889: corresponding Completion function rewrite
+
+Sven: 5879, 5899: completion documentation
+
+Sven: 5890: _match completer
+
+Sven: 5895, 5898, 5906: fix completion prefixes
+
+Sven: 5904: print local for parameters
+
+pws: 5905: _main_complete should at least try to get _unset_options correct.
+
+Sven: 5912: compiler warnings
+
+Sven: 5913: zle -C test
+
+Sven: 5914: _main_complete takes optional completer arguments
+
+pws: 5915: minor type fixes
+
+Sven: 5916: _expand completer
+
+Sven: 5918: _list completer
+
+Sven: 5925: path_expand
+
+Sven: 5926: $HISTNO
+
+Sven: 5928: copy context in zle_tricky
+
+pws: 5931: more parameter substitution rules
+
+Sven: 5933: don't complete local parameters; _setopt/_unsetopt complete all
+options (code to use currently unset/set options remains in comments)
+
+pws: 5934: option GLOBAL_RCS_FIRST runs /etc/z* files before user's files.
+
+Sven: 5938, 5937: compset to replace modifying conditions
+
+Sven: 5940: move cursor
+
+Sven: 5942: spaces in file names with old completion
+
+Sven: 5947: completion functions fix
+
+pws: unposted: updated .distfiles under Completion

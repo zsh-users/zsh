@@ -1,0 +1,52 @@
+#autoload
+
+# Generate all possible completions. Note that this is not intended as
+# a normal completion function, but as one possible value for the
+# compconfig[completer] parameter.
+
+local comp name
+
+# An entry for `-first-' is the replacement for `compctl -T'
+# Completion functions may set `_compskip' to any value to make the 
+# main loops stop calling other completion functions.
+
+comp="$_comps[-first-]"
+if [[ ! -z "$comp" ]]; then
+  "$comp"
+  if (( $+_compskip )); then
+    unset _compskip
+    (( compstate[nmatches] ))
+    return
+  fi
+fi
+
+# For arguments and command names we use the `_normal' function.
+
+if [[ "$compstate[context]" = command ]]; then
+  _normal
+else
+  # Let's see if we have a special completion definition for the other
+  # possible contexts.
+
+  comp=''
+
+  case $compstate[context] in
+  equal)           comp="$_comps[-equal-]";;
+  tilde)           comp="$_comps[-tilde-]";;
+  redirect)        comp="$_comps[-redirect-]";;
+  math)            comp="$_comps[-math-]";;
+  subscript)       comp="$_comps[-subscript-]";;
+  value)           comp="$_comps[-value-]";;
+  array_value)     comp="$_comps[-array-value-]";;
+  condition)       comp="$_comps[-condition-]";;
+  parameter)       comp="$_comps[-parameter-]";;
+  brace_parameter) comp="$_comps[-brace-parameter-]";;
+  esac
+
+  # If not, we use default completion, if any.
+
+  [[ -z "$comp" ]] && comp="$_comps[-default-]"
+  [[ -z "$comp" ]] || "$comp"
+fi
+
+(( compstate[nmatches] ))

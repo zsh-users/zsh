@@ -36,7 +36,6 @@ typedef struct patcomp   *Patcomp;
 typedef struct cmatcher  *Cmatcher;
 typedef struct cmlist    *Cmlist;
 typedef struct cpattern  *Cpattern;
-typedef struct cline     *Cline;
 
 /* node for compctl hash table (compctltab) */
 
@@ -203,6 +202,7 @@ struct cmatch {
     char *str;			/* the match itself */
     char *ipre;			/* ignored prefix, has to be re-inserted */
     char *ripre;		/* ignored prefix, unquoted */
+    char *isuf;			/* ignored suffix */
     char *ppre;			/* the path prefix */
     char *psuf;			/* the path suffix */
     char *prpre;		/* path prefix for opendir */
@@ -255,28 +255,6 @@ struct cpattern {
     int equiv;			/* if this is a {...} class */
 };
 
-
-struct cline {
-    Cline next;			/* next chunk */
-    char *line;			/* string to insert if !word */
-    int llen;			/* length of line */
-    char *word;			/* prefered string to insert */
-    int wlen;			/* length of word */
-    int flags;			/* see CLF_* below */
-    Cline prefix;		/* prefix we've build for new parts */
-    Cline suffix;		/* suffix we've build for new parts */
-};
-
-#define CLF_END    1
-#define CLF_MID    2
-#define CLF_MISS   4
-#define CLF_DIFF   8
-#define CLF_SUF   16
-#define CLF_PNEW  32
-#define CLF_SNEW  64
-#define CLF_VAR  128
-#define CLF_JOIN 256
-
 /* Flags for makecomplist*(). Things not to do. */
 
 #define CFN_FIRST   1
@@ -296,27 +274,31 @@ struct cline {
 #define CP_PREFIX     (1 <<  2)
 #define CP_SUFFIX     (1 <<  3)
 #define CP_IPREFIX    (1 <<  4)
-#define CP_COMPSTATE  (1 <<  5)
+#define CP_ISUFFIX    (1 <<  5)
+#define CP_COMPSTATE  (1 <<  6)
 
-#define CP_REALPARAMS        6
+#define CP_REALPARAMS        7
 
-#define CP_NMATCHES   (1 <<  6)
-#define CP_MATCHER    (1 <<  7)
-#define CP_MATCHERSTR (1 <<  8)
-#define CP_MATCHERTOT (1 <<  9)
-#define CP_CONTEXT    (1 << 10)
-#define CP_PARAMETER  (1 << 11)
-#define CP_REDIRECT   (1 << 12)
-#define CP_QUOTE      (1 << 13)
-#define CP_QUOTING    (1 << 14)
-#define CP_RESTORE    (1 << 15)
-#define CP_LIST       (1 << 16)
-#define CP_FORCELIST  (1 << 17)
-#define CP_INSERT     (1 << 18)
-#define CP_EXACT      (1 << 19)
-#define CP_EXACTSTR   (1 << 20)
-#define CP_PATMATCH   (1 << 21)
+#define CP_NMATCHES   (1 <<  7)
+#define CP_MATCHER    (1 <<  8)
+#define CP_MATCHERSTR (1 <<  9)
+#define CP_MATCHERTOT (1 << 10)
+#define CP_CONTEXT    (1 << 11)
+#define CP_PARAMETER  (1 << 12)
+#define CP_REDIRECT   (1 << 13)
+#define CP_QUOTE      (1 << 14)
+#define CP_QUOTING    (1 << 15)
+#define CP_RESTORE    (1 << 16)
+#define CP_LIST       (1 << 17)
+#define CP_FORCELIST  (1 << 18)
+#define CP_INSERT     (1 << 19)
+#define CP_EXACT      (1 << 20)
+#define CP_EXACTSTR   (1 << 21)
+#define CP_PATMATCH   (1 << 22)
+#define CP_PATINSERT  (1 << 23)
+#define CP_UNAMBIG    (1 << 24)
+#define CP_UNAMBIGC   (1 << 25)
 
-#define CP_NUM              22
+#define CP_NUM              26
 
 #define CP_ALLMASK    ((1 << CP_NUM) - 1)

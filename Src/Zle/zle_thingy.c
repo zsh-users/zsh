@@ -492,7 +492,7 @@ bin_zle_complete(char *name, char **args, char *ops, char func)
     t = rthingy(args[1]);
     cw = t->widget;
     unrefthingy(t);
-    if (!(cw->flags & ZLE_ISCOMP)) {
+    if (!cw || !(cw->flags & ZLE_ISCOMP)) {
 	zerrnam(name, "invalid widget `%s'", args[1], 0);
 	return 1;
     }

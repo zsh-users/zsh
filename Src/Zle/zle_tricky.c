@@ -143,7 +143,8 @@ static Comp patcomp, filecomp;
  * lppre/lpsuf -- the path prefix/suffix, unexpanded                       *
  * fpre/fsuf   -- prefix/suffix of the pathname component the cursor is in *
  * prpre       -- ppre in expanded form usable for opendir                 *
- * ipre,ripre  -- the ignored prefix (quotes and unquoted)                 *
+ * ipre,ripre  -- the ignored prefix (quoted and unquoted)                 *
+ * isuf        -- the ignored suffix                                       *
  *                                                                         *
  * The integer variables hold the lengths of lpre, lsuf, rpre, rsuf,       *
  * fpre, fsuf, lppre, and lpsuf.  noreal is non-zero if we have rpre/rsuf. */
@@ -153,6 +154,7 @@ static char *rpre, *rsuf;
 static char *ppre, *psuf, *lppre, *lpsuf, *prpre;
 static char *fpre, *fsuf;
 static char *ipre, *ripre;
+static char *isuf;
 static int lpl, lsl, rpl, rsl, fpl, fsl, lppl, lpsl;
 static int noreal;
 
@@ -176,6 +178,10 @@ static Cmgroup mgroup;
 /* A match counter. */
 
 static int mnum;
+
+/* The match counter when unambig_data() was called. */
+
+static int unambig_mnum;
 
 /* Match flags for all matches in this group. */
 
@@ -215,6 +221,39 @@ static Cmlist bmatchers;
 
 static LinkList matchers;
 
+/* Information about what to put on the line as the unambiguous string.
+ * The code always keeps lists of these structs up to date while
+ * matches are added (in the aminfo structs below).
+ * The lists have two levels: in the first one we have one struct per
+ * word-part, where parts are separated by the anchors of `*' patterns.
+ * These structs have pointers (in the prefix and suffix fields) to
+ * lists of cline structs describing the strings before or after the
+ * the anchor. */
+
+typedef struct cline *Cline;
+typedef struct clsub Clsub;
+
+struct cline {
+    Cline next;
+    int flags;
+    char *line;
+    int llen;
+    char *word;
+    int wlen;
+    char *orig;
+    int olen;
+    int slen;
+    Cline prefix, suffix;
+};
+
+#define CLF_MISS  1
+#define CLF_DIFF  2
+#define CLF_SUF   4
+#define CLF_MID   8
+#define CLF_NEW  16
+#define CLF_LINE 32
+#define CLF_JOIN 64
+
 /* A heap of free Cline structures. */
 
 static Cline freecl;
@@ -225,19 +264,11 @@ static Cline freecl;
 typedef struct aminfo *Aminfo;
 
 struct aminfo {
-    int cpl, csl, icpl, icsl;	/* common prefix/suffix lengths           */
-    int minlen;			/* minimum match length                   */
-    int suflen;			/* minimum suffix length                  */
     Cmatch firstm;		/* the first match                        */
-    char *pprefix;		/* common part of the -P prefixes         */
-    char *aprefix;		/* common line prefix                     */
-    int noipre;			/* if the was no ignored prefix           */
-    char *iprefix;		/* common ignored prefix                  */
-    char *iaprefix;		/* like aprefix, without ignored prefixes */
     int exact;			/* if there was an exact match            */
     Cmatch exactm;		/* the exact match (if any)               */
-    Cline linecl, ilinecl;	/* what to put on the line as a Cline     */
     int count;			/* number of matches                      */
+    Cline line;			/* unambiguous line string                */
 };
 
 static Aminfo ainfo, fainfo;
@@ -489,7 +520,7 @@ acceptandmenucomplete(void)
 /* These are flags saying if we are completing in the command *
  * position, in a redirection, or in a parameter expansion.   */
 
-static int lincmd, linredir, ispar;
+static int lincmd, linredir, ispar, linwhat;
 
 /* The string for the redirection operator. */
 
@@ -516,7 +547,7 @@ int instring, inbackt;
 /* Convenience macro for calling bslashquote() (formerly quotename()). *
  * This uses the instring variable above.                              */
 
-#define quotename(s, e, te, pl) bslashquote(s, e, te, pl, instring)
+#define quotename(s, e) bslashquote(s, e, instring)
 
 /* Check if the given string is the name of a parameter and if this *
  * parameter is one worth expanding.                                */
@@ -658,12 +689,12 @@ check_param(char *s, int set)
 		    mflags |= CMF_PARBR;
 
 		/* Get the prefix (anything up to the character before the name). */
-		lpsuf = dupstring(quotename(e, NULL, NULL, NULL));
+		lpsuf = dupstring(quotename(e, NULL));
 		*e = '\0';
 		lpsl = strlen(lpsuf);
 		ripre = dupstring(s);
 		ripre[b - s] = '\0';
-		ipre = dupstring(quotename(ripre, NULL, NULL, NULL));
+		ipre = dupstring(quotename(ripre, NULL));
 		untokenize(ipre);
 	    }
 	    /* And adjust wb, we, and offs again. */
@@ -1008,7 +1039,7 @@ static char *
 dupstrspace(const char *str)
 {
     int len = strlen((char *)str);
-    char *t = (char *)ncalloc(len + 2);
+    char *t = (char *) ncalloc(len + 2);
     strcpy(t, str);
     strcpy(t+len, " ");
     return t;
@@ -1572,7 +1603,7 @@ doexpansion(char *s, int lst, int olst, int explincmd)
 	foredel(we - wb);
 	while ((ss = (char *)ugetnode(vl))) {
 	    untokenize(ss);
-	    ss = quotename(ss, NULL, NULL, NULL);
+	    ss = quotename(ss, NULL);
 	    inststr(ss);
 #if 0
 	    if (nonempty(vl)) {
@@ -1602,99 +1633,6 @@ gotword(void)
 	wb = ll - wordbeg + addedx;
 	zleparse = 0;
     }
-}
-
-/* This adds a string to the currently built match. The last argument  *
- * is non zero if we are building the suffix, where we have to prepend *
- * the given string. */
-
-static char *
-addtoword(char **rwp, int *rwlenp, char *nw,
-	  Cmatcher m, char *l, char *w, int wl, int prep)
-{
-    int al, rwlen = *rwlenp, nl;
-    char *as, *rw = *rwp;
-
-    /* Get the string and length to insert: either from the line 
-     * or from the match. */
-    if (m && (m->flags & CMF_LINE)) {
-	al = m->llen;
-	as = l;
-    } else {
-	al = wl;
-	as = w;
-    }
-    /* Allocate some more space if needed. */
-    if (!rwlen || (nl = al + (nw - rw)) >= rwlen) {
-	char *np;
-
-	if (!rwlen)
-	    nl = al + 20;
-
-	np = (char *) zalloc(nl + 1);
-
-	*rwlenp = nl;
-	if (rwlen) {
-	    memcpy(np, rw, rwlen);
-	    nw += np - rw;
-	    zfree(rw, rwlen);
-	} else
-	    nw = np;
-	*rwp = rw = np;
-	rwlen = nl;
-    }
-    /* Copy it in the buffer. */
-    if (prep) {
-	memmove(rw + al, rw, rwlen - al);
-	memcpy(rw, as, al);
-    } else
-	memcpy(nw, as, al);
-
-    return nw + al;
-}
-
-/* This returns a new Cline structure. */
-
-static Cline
-getcline(char *l, int ll, char *w, int wl, int fl)
-{
-    Cline r;
-
-    /* Preverably take it from the buffer list (freecl), if there
-     * is none, allocate a new one. */
-    if ((r = freecl))
-	freecl = r->next;
-    else
-	r = (Cline) zhalloc(sizeof(*r));
-
-    r->next = NULL;
-    r->line = l;
-    r->llen = ll;
-    r->word = w;
-    r->wlen = wl;
-    r->flags = fl;
-    r->prefix = r->suffix = NULL;
-
-    return r;
-}
-
-/* This adds a Cline structure with the given parameters to the list we
- * are building during matching. */
-
-static void
-addtocline(Cline *retp, Cline *lrp,
-	   char *l, int ll, char *w, int wl, Cmatcher m, int fl)
-{
-    Cline ln = getcline(l, ll, w, wl, fl);
-
-    if (m && (m->flags & CMF_LINE))
-	ln->word = NULL;
-    if (*retp)
-	(*lrp)->next = ln;
-    else
-	*retp = ln;
-
-    *lrp = ln;
 }
 
 /* This compares two cpattern lists and returns non-zero if they are
@@ -1774,1367 +1712,53 @@ update_bmatchers(void)
     }
 }
 
-/* When building up cline lists that are to be inserted at the end of the
- * string or on the left hand side in the middle, we do this separately for
- * multiple runs of characters separated by the anchors of `*' match patterns.
- * This function builds such a list from the given string. */
+/* This returns a new Cline structure. */
 
 static Cline
-end_list(int len, char *str)
+get_cline(char *l, int ll, char *w, int wl, char *o, int ol, int fl)
 {
-    Cline ret = NULL, *q = &ret;
-    Cmlist ms;
-    Cmatcher mp;
-    int t;
-    char *p = str;
+    Cline r;
 
-    while (len) {
-	for (t = 0, ms = bmatchers; ms && !t; ms = ms->next) {
-	    mp = ms->matcher;
-	    if (mp->flags == CMF_RIGHT && mp->wlen == -1 &&
-		!mp->llen && len >= mp->ralen && mp->ralen &&
-		pattern_match(mp->right, str, NULL, NULL)) {
-		/* This is one of those patterns, so add a cline struct.
-		 * We store the anchor string in the line and the contents
-		 * (i.e. the strings between the anchors) in the word field. */
-		*q = getcline(str, mp->ralen, p, str - p, 0);
-		q = &((*q)->next);
-		str += mp->ralen;
-		len -= mp->ralen;
-		p = str;
-		t = 1;
-	    }
-	}
-	if (!t) {
-	    str++;
-	    len--;
-	}
-    }
-    /* This is the cline struct for the remaining string at the end. */
-    if (p != str) {
-	*q = getcline("", 0, p, str - p, 0);
-	q = &((*q)->next);
-    }
-    *q = NULL;
+    /* Preverably take it from the buffer list (freecl), if there
+     * is none, allocate a new one. */
 
-    return ret;
-}
-
-/* This builds a string that may be put on the line that fully matches the
- * given strings. The return value is NULL if no such string could be built
- * or that string in local static memory, dup it.
- * All this is a lot like the procedure in bld_new_pfx(), only slightly
- * simpler, see that function for more comments. */
-
-static char *
-join_strs(int la, char *sa, int lb, char *sb)
-{
-    static unsigned char *ea = NULL;
-    static int ealen = 0;
-    static char *line = NULL;
-    static int llen = 0;
-    static char *rs = NULL;
-    static int rl = 0;
-
-    Cmlist ms;
-    Cmatcher mp;
-    int t, bl, rr = rl;
-    char *rp = rs;
-
-    /* This is a buffer for the characters to use for pairs of correspondence
-     * classes. */
-    if (la + 1 > ealen || lb + 1 > ealen) {
-	if (ealen)
-	    zfree(ea, ealen);
-	ea = (unsigned char *) zalloc(ealen = (la > lb ? la : lb) + 20);
-    }
-    while (la && lb) {
-	if (*sa != *sb) {
-	    for (t = 0, ms = bmatchers; ms && !t; ms = ms->next) {
-		mp = ms->matcher;
-		if (!mp->flags && mp->wlen > 0 && mp->llen > 0 &&
-		    mp->wlen <= la && mp->wlen <= lb) {
-		    if (pattern_match(mp->word, sa, NULL, ea)) {
-			if (mp->llen + 1 > llen) {
-			    if (llen)
-				zfree(line, llen);
-			    line = (char *) zalloc(llen = mp->llen + 20);
-			}
-			if ((bl = bld_line_pfx(mp->line, line, line,
-					       lb, sb, ea))) {
-			    line[mp->llen] = '\0';
-			    if (rr <= mp->llen) {
-				char *or = rs;
-
-				rs = realloc(rs, (rl += 20));
-				rr += 20;
-				rp += rs - or;
-			    }
-			    memcpy(rp, line, mp->llen);
-			    rp += mp->llen;
-			    rr -= mp->llen;
-			    sa += mp->wlen;
-			    sb += bl;
-			    la -= mp->wlen;
-			    lb -= bl;
-			    t = 1;
-			}
-		    } else if (pattern_match(mp->word, sb, NULL, ea)) {
-			if (mp->llen + 1 > llen) {
-			    if (llen)
-				zfree(line, llen);
-			    line = (char *) zalloc(llen = mp->llen + 20);
-			}
-			if ((bl = bld_line_pfx(mp->line, line, line,
-					       la, sa, ea))) {
-			    line[mp->llen] = '\0';
-			    if (rr <= mp->llen) {
-				char *or = rs;
-
-				rs = realloc(rs, (rl += 20));
-				rr += 20;
-				rp += rs - or;
-			    }
-			    memcpy(rp, line, mp->llen);
-			    rp += mp->llen;
-			    rr -= mp->llen;
-			    sa += bl;
-			    sb += mp->wlen;
-			    la -= bl;
-			    lb -= mp->wlen;
-			    t = 1;
-			}
-		    }
-		}
-	    }
-	    if (!t)
-		break;
-	} else {
-	    if (rr <= 1) {
-		char *or = rs;
-
-		rs = realloc(rs, (rl += 20));
-		rr += 20;
-		rp += rs - or;
-	    }
-	    *rp++ = *sa;
-	    rr--;
-	    sa++;
-	    sb++;
-	    la--;
-	    lb--;
-	}
-    }
-    if (la || lb)
-	return NULL;
-
-    *rp = '\0';
-
-    return rs;
-}
-
-/* This gets two cline lists with separated runs and joins the corresponding
- * elements in these lists. In olp and nlp we return the lengths of the matched
- * portions in o and n respectively. As always the list in o is the one that
- * contains the joined result after this function. */
-
-static Cline
-join_ends(Cline o, Cline n, int *olp, int *nlp)
-{
-    Cline ret = o;
-    int mol, mnl, smol = 0, smnl = 0;
-    char *j;
-
-    while (o && n) {
-	if (o->llen == n->llen && !strncmp(o->line, n->line, o->llen)) {
-	    /* The anchors are the same, so join the contents. */
-	    bld_pfx(o, n, &mol, &mnl);
-	    smol += mol + o->llen;
-	    smnl += mnl + n->llen;
-	} else if (!(o->flags & CLF_JOIN) &&
-		   (j = join_strs(o->llen, o->line, n->llen, n->line))) {
-	    /* We could build a string matching both anchors, so use that
-	     * and mark the cline so that we don't try to join it again. */
-	    o->flags |= CLF_JOIN;
-	    o->llen = strlen(j);
-	    o->line = dupstring(j);
-	    bld_pfx(o, n, &mol, &mnl);
-	    smol += mol + o->llen;
-	    smnl += mnl + n->llen;
-	} else {
-	    /* Different anchors, see if we can find matching anchors
-	     * further down the lists. */
-	    Cline to, tn = NULL;
-	    int t = 0;
-
-	    /* But first build the common prefix. */
-	    bld_pfx(o, n, &mol, &mnl);
-	    smol += mol;
-	    smnl += mnl;
-
-	    for (to = o; to && !t; to = to->next) {
-		for (tn = n; tn && !t; tn = tn->next) {
-		    if ((t = ((to->llen == tn->llen &&
-			       !strncmp(to->line, tn->line, to->llen)) ||
-			      (!(to->flags & CLF_JOIN) &&
-			       join_strs(to->llen, to->line,
-					 tn->llen, tn->line)))))
-			break;
-		}
-		if (t)
-		    break;
-	    }
-	    if (t) {
-		/* Found matching anchors, continue with them. */
-		o->line = to->line;
-		o->llen = to->llen;
-		o->next = to->next;
-		o->flags |= CLF_MISS;
-		n = tn;
-	    } else {
-		/* No matching anchors found, shorten the list. */
-		o->flags |= CLF_MISS;
-		o->next = NULL;
-		o->llen = 0;
-		if (olp)
-		    *olp = smol;
-		if (nlp)
-		    *nlp = smnl;
-		return ret;
-	    }
-	}
-	/* If we reached the end of the new list but not the end of the old
-	 * list, we mark the old list (saying that characters are missing 
-	 * here). */
-	if (!(n = n->next) && o->next)
-	    o->flags |= CLF_MISS;
-	o = o->next;
-    }
-    if (o) {
-	/* Shorten the list if we haven't reached the end. */
-	if (n)
-	    o->flags |= CLF_MISS;
-	o->next = NULL;
-	o->llen = 0;
-    }
-    if (olp)
-	*olp = smol;
-    if (nlp)
-	*nlp = smnl;
-    return ret;
-}
-
-/* This builds all the possible line patterns for the pattern pat in the
- * buffer line. Initially line is the same as lp, but during recursive
- * calls lp is incremented for storing successive characters. Whenever
- * a full possible string is build, we test if this line matches the
- * string given by wlen and word. The last argument contains the characters
- * to use for the correspondence classes, it was filled by a call to 
- * pattern_match() in the calling function.
- * The return value is the length of the string matched in the word, it
- * is zero if we couldn't build a line that matches the word. */
-
-/**/
-static int
-bld_line_pfx(Cpattern pat, char *line, char *lp,
-	     int wlen, char *word, unsigned char *in)
-{
-    if (pat) {
-	/* Still working on the pattern. */
-
-	int i, l;
-	unsigned char c = 0;
-
-	/* Get the number of the character for a correspondence class
-	 * if it has a correxponding class. */
-	if (pat->equiv)
-	    if ((c = *in))
-		in++;
-
-	/* Walk through the table in the pattern and try the characters
-	 * that may appear in the current position. */
-	for (i = 0; i < 256; i++)
-	    if ((pat->equiv && c) ? (c == pat->tab[i]) : pat->tab[i]) {
-		*lp = i;
-		/* We stored the character, now call ourselves to build
-		 * the rest. */
-		if ((l = bld_line_pfx(pat->next, line, lp + 1,
-				      wlen, word, in)))
-		    return l;
-	    }
-    } else {
-	/* We reached the end, i.e. the line string is fully build, now
-	 * see if it matches the given word. */
-	static unsigned char *ea = NULL;
-	static int ealen = 0;
-
-	Cmlist ms;
-	Cmatcher mp;
-	int l = lp - line, t, rl = 0;
-
-	/* Quick test if the strings are exactly the same. */
-	if (l == wlen && !strncmp(line, word, l))
-	    return l;
-
-	/* We need another buffer for correspondence classes. */
-	if (l + 1 > ealen) {
-	    if (ealen)
-		zfree(ea, ealen);
-	    ea = (unsigned char *) zalloc(ealen = l + 20);
-	}
-	/* We loop through the whole line string built. */
-	while (l && wlen) {
-	    if (*word == *line) {
-		/* The same character in both strings, skip over. */
-		line++;
-		word++;
-		l--;
-		wlen--;
-		rl++;
-	    } else {
-		t = 0;
-		for (ms = bmatchers; ms && !t; ms = ms->next) {
-		    mp = ms->matcher;
-		    if (!mp->flags && mp->wlen <= wlen && mp->llen <= l &&
-			pattern_match(mp->line, line, NULL, ea) &&
-			pattern_match(mp->word, word, ea, NULL)) {
-			/* Both the line and the word pattern matched,
-			 * now skip over the matched portions. */
-			line += mp->llen;
-			word += mp->wlen;
-			l -= mp->llen;
-			wlen -= mp->wlen;
-			rl += mp->wlen;
-			t = 1;
-		    }
-		}
-		if (!t)
-		    /* Didn't match, give up. */
-		    return 0;
-	    }
-	}
-	if (!l)
-	    /* Unmatched portion in the line built, return no-match. */
-	    return rl;
-    }
-    return 0;
-}
-
-/* This builds a list of cline structs describing a string to insert in
- * the line in a place where we didn't had something on the line when
- * completion was invoked. This is called after we get the second match
- * so we have two strings to start with given by (ol,ow) and (nl,nw) and
- * the cline list returned describes a string that matches both of these
- * strings.
- * In olp and nlp we return the number of characters in ow and nw that
- * are not matched by the cline list returned. Especially this means that
- * they are non-zero if there are such unmatched portions.
- * In lp we return a pointer to the last cline struct created. */
-
-static Cline
-bld_new_pfx(int ol, char *ow, int nl, char *nw, int *olp, int *nlp, Cline *lp)
-{
-    static unsigned char *ea = NULL;
-    static int ealen = 0;
-    static char *line = NULL;
-    static int llen = 0;
-
-    Cmlist ms;
-    Cmatcher mp;
-    Cline ret = NULL, l = NULL, n;
-    char *p = ow;
-    int t, bl;
-
-    /* This is a buffer for the characters to use for pairs of correspondence
-     * classes. */
-    if (ol + 1 > ealen || nl + 1 > ealen) {
-	if (ealen)
-	    zfree(ea, ealen);
-	ea = (unsigned char *) zalloc(ealen = (ol > nl ? ol : nl) + 20);
-    }
-    /* Loop through the strings. */
-    while (ol && nl) {
-	if (*ow != *nw) {
-	    /* Not the same character, use the patterns. */
-	    for (t = 0, ms = bmatchers; ms && !t; ms = ms->next) {
-		mp = ms->matcher;
-		/* We use only those patterns that match a non-empty
-		 * string in both the line and the word, that match
-		 * strings no longer than the string we still have
-		 * to compare, that don't have anchors, and that don't
-		 * use the line strings for insertion. */
-		if (!mp->flags && mp->wlen > 0 && mp->llen > 0 &&
-		    mp->wlen <= ol && mp->wlen <= nl) {
-		    /* Try the pattern only if the word-pattern matches
-		     * one of the strings. */
-		    if (pattern_match(mp->word, ow, NULL, ea)) {
-			/* Make the buffer where we build the possible
-			 * line patterns big enough. */
-			if (mp->llen + 1 > llen) {
-			    if (llen)
-				zfree(line, llen);
-			    line = (char *) zalloc(llen = mp->llen + 20);
-			}
-			/* Then build all the possible lines and see
-			 * if one of them matches the othe string. */
-			if ((bl = bld_line_pfx(mp->line, line, line,
-					       nl, nw, ea))) {
-			    /* Yep, one of the lines matched the other
-			     * string. */
-			    if (p != ow) {
-				/* There is still a substring that is
-				 * the same in both strings, so add
-				 * a cline for it. */
-				char sav = *ow;
-
-				*ow = '\0';
-				n = getcline(NULL, 0, dupstring(p),
-					     ow - p, 0);
-				*ow = sav;
-				if (l)
-				    l->next = n;
-				else
-				    ret = n;
-				l = n;
-			    }
-			    /* Then we add the line string built. */
-			    line[mp->llen] = '\0';
-			    n = getcline(dupstring(line), mp->llen,
-					 NULL, 0, CLF_DIFF);
-			    if (l)
-				l->next = n;
-			    else
-				ret = n;
-			    l = n;
-			    ow += mp->wlen;
-			    nw += bl;
-			    ol -= mp->wlen;
-			    nl -= bl;
-			    p = ow;
-			    t = 1;
-			}
-		    } else if (pattern_match(mp->word, nw, NULL, ea)) {
-			/* Now do the same for the other string. */
-			if (mp->llen + 1 > llen) {
-			    if (llen)
-				zfree(line, llen);
-			    line = (char *) zalloc(llen = mp->llen + 20);
-			}
-			if ((bl = bld_line_pfx(mp->line, line, line,
-					       ol, ow, ea))) {
-			    if (p != ow) {
-				char sav = *ow;
-
-				*ow = '\0';
-				n = getcline(NULL, 0, dupstring(p),
-					     ow - p, 0);
-				*ow = sav;
-				if (l)
-				    l->next = n;
-				else
-				    ret = n;
-				l = n;
-			    }
-			    line[mp->llen] = '\0';
-			    n = getcline(dupstring(line), mp->llen,
-					 NULL, 0, CLF_DIFF);
-			    if (l)
-				l->next = n;
-			    else
-				ret = n;
-			    l = n;
-			    ow += bl;
-			    nw += mp->wlen;
-			    ol -= bl;
-			    nl -= mp->wlen;
-			    p = ow;
-			    t = 1;
-			}
-		    }
-		}
-	    }
-	    if (!t)
-		/* No pattern matched, so give up. */
-		break;
-	} else {
-	    /* Same character, skip over. */
-	    ow++;
-	    nw++;
-	    ol--;
-	    nl--;
-	}
-    }
-    if (p != ow) {
-	/* There is a equal substring in both strings, build a cline
-	 * for it. */
-	char sav = *ow;
-
-	*ow = '\0';
-	n = getcline(NULL, 0, dupstring(p), ow - p, 0);
-	*ow = sav;
-	if (l)
-	    l->next = n;
-	else
-	    ret = n;
-	l = n;
-    }
-    if (l)
-	l->next = NULL;
+    if ((r = freecl))
+	freecl = r->next;
     else
-	ret = NULL;
-
-    if (olp)
-	*olp = ol;
-    if (nlp)
-	*nlp = nl;
-    if (lp)
-	*lp = l;
-
-    return ret;
-}
-
-/* Given a cline list for an unmatched part of the string to insert in the
- * line and a new match substring, modify the cline list so that it also
- * matches this string. The cline list is shortened in the place where
- * we can't build a cline matching the new string.
- * However, the resulting cline list is returned. The string is described
- * by len and word. In missp we return non-zero if the cline list returned
- * had to be shortened (and hence doesn't fully match the strings it was
- * built from anymore) or if it doesn't fully match the given string.
- * This function checks the string left to right and thus is to be used
- * for strings where we want a common prefix. */
-
-static Cline
-join_new_pfx(Cline line, int len, char *word, int *missp)
-{
-    static unsigned char *ea = NULL;
-    static int ealen = 0;
-
-    Cline ret = NULL, l = NULL, next;
-    int miss = 0;
-
-    /* Walk through the list and the string. */
-    while (line && len) {
-	next = line->next;
-	/* The line element is used in those places where a new line
-	 * string was built. */
-	if (line->line) {
-	    Cmlist ms;
-	    Cmatcher mp;
-	    int ll = line->llen, t;
-	    char *p = line->line;
-
-	    /* Make the buffer for the correspondence classes big enough. */
-	    if (line->llen + 1 > ealen) {
-		if (ealen)
-		    zfree(ea, ealen);
-		ea = (unsigned char *) zalloc(ealen = line->llen + 20);
-	    }
-	    /* Check if the line string from the cline list matches the
-	     * new string. */
-	    while (ll && len) {
-		if (*p == *word) {
-		    p++;
-		    word++;
-		    ll--;
-		    len--;
-		} else {
-		    for (t = 0, ms = bmatchers; ms && !t; ms = ms->next) {
-			mp = ms->matcher;
-			if (!mp->flags && mp->wlen > 0 && mp->llen > 0 &&
-			    mp->wlen <= len && mp->llen <= len &&
-			    pattern_match(mp->word, word, NULL, ea) &&
-			    pattern_match(mp->line, p, ea, NULL)) {
-			    /* We have a matched substring, skip over. */
-			    p += mp->llen;
-			    word += mp->wlen;
-			    ll -= mp->llen;
-			    len -= mp->wlen;
-			    t = 1;
-			}
-		    }
-		    if (!t)
-			/* No match, give up. */
-			break;
-		}
-	    }
-	    if (p == line->line) {
-		/* We couldn't match any character from the string in the
-		 * cline, so shorten the list and don't even keep this
-		 * struct. */
-		miss = 1;
-		len = 0;
-	    } else {
-		/* At least the beginning of the cline string can be used. */
-		if (ll) {
-		    /* But there is a portion of the string that can't be
-		     * used, so we have to shorten the list. */
-		    miss = 1;
-		    *p = '\0';
-		    line->llen -= ll;
-		    len = 0;
-		}
-		line->next = NULL;
-		if (l)
-		    l->next = line;
-		else
-		    ret = line;
-		l = line;
-	    }
-	} else {
-	    /* The cline doesn't have a string built by reverse matching,
-	     * so we have to work on the original substring in the cline
-	     * and the new string. */
-	    if (line->wlen == len && !strncmp(line->word, word, len)) {
-		/* They are equal, accept and return. If there was
-		 * another element in the list, shorten the list. */
-		if (next)
-		    miss = 1;
-		line->next = NULL;
-		if (l)
-		    l->next = line;
-		else
-		    ret = line;
-		l = line;
-		len = 0;
-	    } else {
-		char sav = word[len];
-
-		/* Check if one is the prefix of the other one. */
-		word[len] = '\0';
-		if (strpfx(word, line->word)) {
-		    word[len] = sav;
-
-		    line->word[len] = '\0';
-		    line->wlen = len;
-		    miss = 1;
-		    line->next = NULL;
-		    if (l)
-			l->next = line;
-		    else
-			ret = line;
-		    l = line;
-		    len = 0;
-		} else if (strpfx(line->word, word)) {
-		    word[len] = sav;
-
-		    miss = 1;
-		    line->next = NULL;
-		    if (l)
-			l->next = line;
-		    else
-			ret = line;
-		    l = line;
-		    len = 0;
-		} else {
-		    /* Not the same and no prefix, so we try to build a
-		     * new line string matching the string in the cline
-		     * and the new string. */
-		    int mol, mnl;
-		    Cline sl, send;
-
-		    word[len] = sav;
-
-		    if ((sl = bld_new_pfx(line->wlen, line->word,
-					  len, word, &mol, &mnl, &send))) {
-			/* We could build such a string, use it in the
-			 * cline structure. */
-			if (l)
-			    l->next = sl;
-			else
-			    ret = sl;
-			l = sl;
-			if (!mol) {
-			    send->next = next;
-			    word += len - mnl;
-			    len = mnl;
-			} else
-			    len = 0;
-			l = send;
-		    } else
-			len = 0;
-		}
-	    }
-	}
-	line = next;
-    }
-    *missp = (line || len || miss);
-
-    return ret;
-}
-
-/* This function gets two cline structs for which we want to build a
- * common prefix to put on the line. The result is placed in the cline
- * struct given as first argument.
- * In olp and nlp we return the matched lengths for o and n, respectively
- * (but this is only guaranteed to give correct results if this is the
- * first call for the given o and n). */
-
-/**/
-static void
-bld_pfx(Cline o, Cline n, int *olp, int *nlp)
-{
-    if (olp)
-	*olp = 0;
-    if (nlp)
-	*nlp = 0;
-    if (o->flags & CLF_PNEW) {
-	if (o->flags & (CLF_END | CLF_MID))
-	    /* We split the suffix in the middle and at the end into
-	     * separate runs. */
-	    o->prefix = join_ends(o->prefix, end_list(n->wlen, n->word),
-				  NULL, NULL);
-	else {
-	    /* This flag is set if we already built a cline list for such
-	     * a prefix. We join it with the string from the other cline
-	     * struct. */
-	    int miss;
-
-	    o->prefix = join_new_pfx(o->prefix, n->wlen, n->word, &miss);
-	    if (miss)
-		o->flags |= CLF_MISS;
-	}
-    } else if (o->flags & (CLF_END | CLF_MID)) {
-	o->flags |= CLF_PNEW;
-	o->prefix = join_ends(end_list(o->wlen, o->word),
-			      end_list(n->wlen, n->word), olp, nlp);
-    } else if (o->wlen && n->wlen) {
-	/* We haven't built a cline list for it yet. */
-	char so = o->word[o->wlen], sn = n->word[n->wlen];
-	char *new = o->word;
-	int newl = o->wlen, mol, mnl;
-
-	/* If one of the strings is a prefix of the other one, just keep
-	 * that prefix. */
-	o->word[o->wlen] = n->word[n->wlen] = '\0';
-	if (strpfx(n->word, o->word)) {
-	    new = dupstring(n->word);
-	    newl = n->wlen;
-	    if (olp)
-		*olp = *nlp = n->wlen;
-	} else if (strpfx(o->word, n->word)) {
-	    if (olp)
-		*olp = *nlp = o->wlen;
-	} else {
-	    /* Otherwise build a cline list describing a string that
-	     * matches both strings from the original cline structs
-	     * and thus can be put in the command line to represent
-	     * them. This cline list is stored in o. */
-	    o->flags |= CLF_PNEW;
-	    o->prefix = bld_new_pfx(o->wlen, o->word, n->wlen, n->word,
-				    &mol, &mnl, NULL);
-	    newl = 0;
-	    new = "";
-	    if (mol || mnl)
-		o->flags |= CLF_MISS;
-	    if (olp) {
-		*olp = o->wlen - mol;
-		*nlp = n->wlen - mnl;
-	    }
-	}
-	o->word[o->wlen] = so;
-	n->word[n->wlen] = sn;
-
-	o->word = new;
-	o->wlen = newl;
-
-	if (!o->prefix && n->wlen != o->wlen)
-	    o->flags |= CLF_MISS;
-    } else
-	o->wlen = 0;
-}
-
-/* The following function are like their counterparts above, only for
- * the other direction. */
-
-static int
-bld_line_sfx(Cpattern pat, char *line, char *lp,
-	     int wlen, char *word, unsigned char *in)
-{
-    if (pat) {
-	int i, l;
-	unsigned char c = 0;
-
-	if (pat->equiv)
-	    if ((c = *in))
-		in++;
-
-	for (i = 0; i < 256; i++)
-	    if ((pat->equiv && c) ? (c == pat->tab[i]) : pat->tab[i]) {
-		*lp = i;
-		if ((l = bld_line_pfx(pat->next, line, lp + 1,
-				      wlen, word, in)))
-		    return l;
-	    }
-    } else {
-	static unsigned char *ea = NULL;
-	static int ealen = 0;
-
-	Cmlist ms;
-	Cmatcher mp;
-	int l = lp - line, t, rl = 0;
-
-	if (l == wlen && !strncmp(line, word, l))
-	    return l;
-
-	line = lp;
-	word += wlen;
-	
-	if (l + 1 > ealen) {
-	    if (ealen)
-		zfree(ea, ealen);
-	    ea = (unsigned char *) zalloc(ealen = l + 20);
-	}
-	while (l && wlen) {
-	    if (word[-1] == line[-1]) {
-		line--;
-		word--;
-		l--;
-		wlen--;
-		rl++;
-	    } else {
-		t = 0;
-		for (ms = bmatchers; ms && !t; ms = ms->next) {
-		    mp = ms->matcher;
-		    if (!mp->flags && mp->wlen <= wlen && mp->llen <= l &&
-			pattern_match(mp->line, line - mp->llen,
-				      NULL, ea) &&
-			pattern_match(mp->word, word - mp->wlen,
-				      ea, NULL)) {
-			line -= mp->llen;
-			word -= mp->wlen;
-			l -= mp->llen;
-			wlen -= mp->wlen;
-			rl += mp->wlen;
-			t = 1;
-		    }
-		}
-		if (!t)
-		    return 0;
-	    }
-	}
-	if (!l)
-	    return rl;
-    }
-    return 0;
-}
-
-static Cline
-bld_new_sfx(int ol, char *ow, int nl, char *nw, int *olp, int *nlp, Cline *lp)
-{
-    static unsigned char *ea = NULL;
-    static int ealen = 0;
-    static char *line = NULL;
-    static int llen = 0;
-
-    Cmlist ms;
-    Cmatcher mp;
-    Cline ret = NULL, l = NULL, n;
-    char *p;
-    int t, bl;
-
-    ow += ol;
-    nw += nl;
-    p = ow;
-
-    if (ol + 1 > ealen || nl + 1 > ealen) {
-	if (ealen)
-	    zfree(ea, ealen);
-	ea = (unsigned char *) zalloc((ealen = (ol > nl ? ol : nl) + 20));
-    }
-    while (ol && nl) {
-	if (ow[-1] != nw[-1]) {
-	    for (t = 0, ms = bmatchers; ms && !t; ms = ms->next) {
-		mp = ms->matcher;
-		if (!mp->flags && mp->wlen > 0 && mp->llen > 0 &&
-		    mp->wlen <= ol && mp->wlen <= nl) {
-		    if (pattern_match(mp->word, ow - mp->wlen,
-				      NULL, ea)) {
-			if (mp->llen + 1 > llen) {
-			    if (llen)
-				zfree(line, llen);
-			    line = (char *) zalloc(llen = mp->llen + 20);
-			}
-			if ((bl = bld_line_sfx(mp->line, line, line,
-					       nl, nw, ea))) {
-			    if (p != ow) {
-				char sav = *p;
-
-				*p = '\0';
-				n = getcline(NULL, 0, dupstring(ow),
-					     p - ow, 0);
-				*p = sav;
-				if (l)
-				    l->next = n;
-				else
-				    ret = n;
-				l = n;
-			    }
-			    line[mp->llen] = '\0';
-			    n = getcline(dupstring(line), mp->llen,
-					 NULL, 0, CLF_DIFF);
-			    if (l)
-				l->next = n;
-			    else
-				ret = n;
-			    l = n;
-			    ow -= mp->wlen;
-			    nw -= bl;
-			    ol -= mp->wlen;
-			    nl -= bl;
-			    p = ow;
-			    t = 1;
-			}
-		    } else if (pattern_match(mp->word, nw - mp->wlen,
-					     NULL, ea)) {
-			if (mp->llen + 1 > llen) {
-			    if (llen)
-				zfree(line, llen);
-			    line = (char *) zalloc(llen = mp->llen + 20);
-			}
-			if ((bl = bld_line_sfx(mp->line, line, line,
-					       ol, ow, ea))) {
-			    if (p != ow) {
-				char sav = *p;
-
-				*p = '\0';
-				n = getcline(NULL, 0, dupstring(ow),
-					     p - ow, 0);
-				*p = sav;
-				if (l)
-				    l->next = n;
-				else
-				    ret = n;
-				l = n;
-			    }
-			    line[mp->llen] = '\0';
-			    n = getcline(dupstring(line), mp->llen,
-					 NULL, 0, CLF_DIFF);
-			    if (l)
-				l->next = n;
-			    else
-				ret = n;
-			    l = n;
-			    ow -= bl;
-			    nw -= mp->wlen;
-			    ol -= bl;
-			    nl -= mp->wlen;
-			    p = ow;
-			    t = 1;
-			}
-		    }
-		}
-	    }
-	    if (!t)
-		break;
-	} else {
-	    ow--;
-	    nw--;
-	    ol--;
-	    nl--;
-	}
-    }
-    if (p != ow) {
-	char sav = *p;
-
-	*p = '\0';
-	n = getcline(NULL, 0, dupstring(ow), p - ow, 0);
-	*p = sav;
-	if (l)
-	    l->next = n;
-	else
-	    ret = n;
-	l = n;
-    }
-    if (l)
-	l->next = NULL;
-    else
-	ret = NULL;
-
-    if (olp)
-	*olp = ol;
-    if (nlp)
-	*nlp = nl;
-    if (lp)
-	*lp = l;
-
-    return ret;
-}
-
-static Cline
-join_new_sfx(Cline line, int len, char *word, int *missp)
-{
-    static unsigned char *ea = NULL;
-    static int ealen = 0;
-
-    Cline ret = NULL, l = NULL, next;
-    int miss = 0, ind = 0;
-
-    word += len;
-
-    while (line && len) {
-	next = line->next;
-	if (line->line) {
-	    Cmlist ms;
-	    Cmatcher mp;
-	    int ll = line->llen, t;
-	    char *p = line->line + ll;
-
-	    if (line->llen + 1 > ealen) {
-		if (ealen)
-		    zfree(ea, ealen);
-		ea = (unsigned char *) zalloc(ealen = line->llen + 20);
-	    }
-	    while (ll && len) {
-		if (p[-1] == word[-1]) {
-		    p--;
-		    word--;
-		    ll--;
-		    len--;
-		    ind++;
-		} else {
-		    for (t = 0, ms = bmatchers; ms && !t; ms = ms->next) {
-			mp = ms->matcher;
-			if (!mp->flags && mp->wlen > 0 && mp->llen > 0 &&
-			    mp->wlen <= len && mp->llen <= len &&
-			    pattern_match(mp->word, word - mp->wlen,
-					  NULL, ea) &&
-			    pattern_match(mp->line, p - mp->llen,
-					  ea, NULL)) {
-			    p -= mp->llen;
-			    word -= mp->wlen;
-			    ll -= mp->llen;
-			    len -= mp->wlen;
-			    ind += mp->wlen;
-			    t = 1;
-			}
-		    }
-		    if (!t)
-			break;
-		}
-	    }
-	    if (p == line->line + line->llen) {
-		miss = 1;
-		len = 0;
-	    } else {
-		if (ll) {
-		    miss = 1;
-		    line->line = p;
-		    line->llen -= ll;
-		    len = 0;
-		}
-		line->next = NULL;
-		if (l)
-		    l->next = line;
-		else
-		    ret = line;
-	    }
-	} else {
-	    if (line->wlen == len && !strncmp(line->word, word - len, len)) {
-		if (next)
-		    miss = 1;
-		line->next = NULL;
-		if (l)
-		    l->next = line;
-		else
-		    ret = line;
-		len = 0;
-	    } else {
-		char sav = word[ind];
-
-		word[ind] = '\0';
-		if (strpfx(word - len, line->word)) {
-		    word[ind] = sav;
-
-		    line->word += line->wlen - len;
-		    line->wlen = ind;
-		    miss = 1;
-		    line->next = NULL;
-		    if (l)
-			l->next = line;
-		    else
-			ret = line;
-		    len = 0;
-		} else if (strpfx(line->word, word - len)) {
-		    word[ind] = sav;
-
-		    miss = 1;
-		    line->next = NULL;
-		    if (l)
-			l->next = line;
-		    else
-			ret = line;
-		    len = 0;
-		} else {
-		    int mol, mnl;
-		    Cline sl, send;
-
-		    word[len] = sav;
-
-		    if ((sl = bld_new_sfx(line->wlen, line->word,
-					  len, word - len,
-					  &mol, &mnl, &send))) {
-			if (l)
-			    l->next = sl;
-			else
-			    ret = sl;
-			if (!mol) {
-			    send->next = next;
-			    word -= len - mnl;
-			    len = mnl;
-			} else
-			    len = 0;
-			l = send;
-		    } else
-			len = 0;
-		}
-	    }
-	}
-	line = next;
-    }
-    *missp = (line || len || miss);
-
-    return ret;
-}
-
-/**/
-static void
-bld_sfx(Cline o, Cline n)
-{
-    if (o->flags & CLF_SNEW) {
-	int miss;
-
-	o->suffix = join_new_sfx(o->suffix, n->wlen, n->word, &miss);
-	if (miss)
-	    o->flags |= CLF_MISS;
-    } else if (o->wlen && n->wlen) {
-	char so = o->word[o->wlen], sn = n->word[n->wlen];
-	char *new = o->word;
-	int newl = o->wlen, mol, mnl;
-
-	o->word[o->wlen] = n->word[n->wlen] = '\0';
-	if (strpfx(n->word, o->word)) {
-	    new = dupstring(n->word);
-	    newl = n->wlen;
-	} else if (!strpfx(o->word, n->word)) {
-	    o->flags |= CLF_SNEW;
-	    o->suffix = bld_new_sfx(o->wlen, o->word, n->wlen, n->word,
-				    &mol, &mnl, NULL);
-	    newl = 0;
-	    new = "";
-	    if (mol || mnl)
-		o->flags |= CLF_MISS;
-	}
-	o->word[o->wlen] = so;
-	n->word[n->wlen] = sn;
-
-	o->word = new;
-	o->wlen = newl;
-
-	if (!o->suffix && n->wlen != o->wlen)
-	    o->flags |= CLF_MISS;
-    } else
-	o->wlen = 0;
-}
-
-/* Joins two Cline lists, building the most specific line string *
- * that is possible and returns it. This is done by modifying the
- * cline list given as the first argument. */
-
-static Cline
-join_clines(Cline o, Cline n)
-{
-    Cline oo = o;
-
-    if (!o)
-	/* This is the first time we are being called, so just return
-	 * the second list. In future calls we will get this list as
-	 * the first argument. */
-	return n;
-    else {
-	Cline f = freecl, q, op = NULL;
-	int ol, nl;
-
-	freecl = NULL;
-
-	while (o && n) {
-	    /* CLF_MID is set in the cline struct where the prefix and the
-	     * suffix from the line meet. If we have reached the cline
-	     * for it in one of the lists, search the corresponding 
-	     * cline in the other list, removing all structs up to it. */
-	    if (o->flags & CLF_MID) {
-		while (n && !(n->flags & CLF_MID)) {
-		    q = n->next;
-		    n->next = f;
-		    f = n;
-
-		    n = q;
-		}
-	    }
-	    if (n && n->flags & CLF_MID) {
-		while (o && !(o->flags & CLF_MID)) {
-		    o->word = NULL;
-		    o->flags |= CLF_DIFF;
-
-		    o = o->next;
-		}
-	    }
-	    if (o && n && !((o->flags | n->flags) & CLF_MID)) {
-		ol = o->llen;
-		nl = n->llen;
-
-		while (o && n && ol != nl) {
-		    /* The matched strings have different lengths, so    *
-		     * continue walking the lists until we have the same *
-		     * matched lengths. */
-		    o->word = NULL;
-		    o->flags |= CLF_DIFF;
-		    if (ol < nl) {
-			op = o;
-			if ((o = o->next))
-			    ol += o->llen;
-		    } else {
-			q = n->next;
-			n->next = f;
-			f = n;
-
-			if ((n = q))
-			    nl += n->llen;
-		    }
-		}
-	    }
-	    if (!o || !n)
-		break;
-	    if (o->flags & CLF_MID) {
-		/* These are the structs in the middle, so simplify the
-		 * prefix and the suffix in it to their longest common
-		 * versions. */
-		
-		char *os, *ns, *oss = o->line, *nss = n->line;
-		int ol, nl, mol, mnl, oll = o->llen, nll = n->llen;
-
-		os = o->word;
-		ol = o->wlen;
-		ns = n->word;
-		nl = n->wlen;
-
-		o->word = o->line;
-		o->wlen = o->llen;
-		n->word = n->line;
-		n->wlen = n->llen;
-		bld_pfx(o, n, &mol, &mnl);
-		o->line = o->word;
-		o->llen = o->wlen;
-
-		o->word = os;
-		o->wlen = ol;
-		n->word = ns;
-		n->wlen = nl;
-
-		if (o->wlen < 0) {
-		    o->word = oss + mol;
-		    o->wlen = oll - mol;
-		}
-		if (n->wlen < 0) {
-		    n->word = nss + mnl;
-		    n->wlen = nll - mnl;
-		}
-		bld_sfx(o, n);
-	    } else if (o->word) {
-		if (n->word) {
-		    if (o->llen == n->llen &&
-			(o->flags & CLF_VAR) && (n->flags & CLF_VAR) &&
-			(o->flags & (CLF_END | CLF_SUF)) ==
-			(n->flags & (CLF_END | CLF_SUF))) {
-			/* We have two chunks from `*' patterns,
-			 * reduce them to the common prefix/suffix. */
-			if (o->flags & CLF_SUF)
-			    bld_sfx(o, n);
-			else
-			    bld_pfx(o, n, NULL, NULL);
-		    } else if (o->wlen == n->wlen) {
-			/* Otherwise keep them if they are equal. */
-			if (strncmp(o->word, n->word, o->wlen)) {
-			    /* If they are not equal, we make them *
-			     * be left unchanged on the line. */
-			    o->word = NULL;
-			    o->flags |= CLF_DIFF;
-			}
-		    } else {
-			o->word = NULL;
-			o->flags |= CLF_DIFF;
-		    }
-		} else {
-		    o->word = NULL;
-		    o->flags |= CLF_DIFF;
-		}
-	    } else if (n->word)
-		o->flags |= CLF_DIFF;
-
-	    q = n->next;
-	    n->next = f;
-	    f = n;
-
-	    n = q;
-	    op = o;
-	    o = o->next;
-	}
-	if (o) {
-	    /* The old list has elements not matched by the second list
-	     * we put all these elements in the free list. */
-	    for (q = o; q->next; q = q->next);
-
-	    q->next = f;
-	    f = o;
-
-	    if (op)
-		op->next = NULL;
-	    else
-		return NULL;
-	}
-	if (n) {
-	    /* We always put the chunks from the second list back on *
-	     * the free list. */
-	    for (q = n; q->next; q = q->next);
-
-	    q->next = f;
-	    f = n;
-	}
-	freecl = f;
-    }
-    return oo;
-}
-
-/* This returns a Cline for the given string. In lp we return a pointer to
- * the last cline struct created. */
-
-static Cline
-str_cline(char *s, int l, Cline *lp)
-{
-    Cline r = NULL, *p = &r, n = NULL;
-
-    if (l < 0)
-	l = strlen(s);
-    /* We build one struct per character, this makes joining it faster
-     * and easier. */
-    while (l) {
-	*p = n = getcline(s, 1, NULL, 0, 0);
-
-	p = &(n->next);
-	s++;
-	l--;
-    }
-    if (lp)
-	*lp = n;
-
+	r = (Cline) zhalloc(sizeof(*r));
+
+    r->next = NULL;
+    r->line = l; r->llen = ll;
+    r->word = w; r->wlen = wl;
+    r->orig = o; r->olen = ol;
+    r->slen = 0;
+    r->flags = fl;
+    r->prefix = r->suffix = NULL;
     return r;
+}
+
+/* This frees a cline list. */
+
+static void
+free_cline(Cline l)
+{
+    Cline n;
+
+    while (l) {
+	n = l->next;
+	l->next = freecl;
+	freecl = l;
+	free_cline(l->prefix);
+	free_cline(l->suffix);
+	l = n;
+    }
 }
 
 /* This reverts the order of the elements of the given cline list and
  * returns a pointer to the new head. */
 
 static Cline
-revert_clines(Cline p)
+revert_cline(Cline p)
 {
     Cline r = NULL, n;
 
@@ -3145,232 +1769,6 @@ revert_clines(Cline p)
 	p = n;
     }
     return r;
-}
-
-/* Prepend a string to a Cline and return a pointer to the new cline list. */
-
-static Cline
-prepend_cline(char *s, Cline l)
-{
-    Cline n, r = str_cline(s, -1, &n), *p = &(n->next);
-
-    while (l) {
-	*p = n = getcline(l->line, l->llen, l->word, l->wlen,
-			  l->flags);
-
-	p = &(n->next);
-	l = l->next;
-    }
-    return r;
-}
-
-/* This simplifies the Cline to match the given strings. The strings are:
- * the common prefix and its length, a string with the suffix at the end
- * and the suffix length. */
-
-static void
-merge_cline(Cline lc, char *p, int pl, char *s, int sl, int psl)
-{
-    int pll, sll;
-    Cline l = NULL, *q = &l, n;
-
-    pll = strlen(p);
-    if (s) {
-	/* If there is a suffix, get a pointer to the beginning of the
-	 * common suffix. */
-	int i = strlen(s);
-
-	if (ainfo->suflen < 10000)
-	    s = s + i - ainfo->suflen;
-	else {
-	    s = s + i - sl;
-	    p[pll - (sl - psl)] = '\0';
-	    pll -= sl - psl;
-	}
-	sll = strlen(s) - sl;
-    } else
-	sll = 0;
-
-    pll -= pl;
-
-    /* Now build a cline list from the string(s) and join it with the
-     * cline list we have built while testing possible matches. */
-    l = str_cline(p, pl, &n);
-    q = &(n->next);
-    if (!sl)
-	*q = getcline(NULL, 0, p + pl, pll, CLF_END | CLF_VAR);
-    else {
-	*q = n = getcline(p + pl, pll, s, sll, CLF_MID);
-
-	n->next = str_cline(s + sll, sl, NULL);
-    }
-    join_clines(lc, l);
-}
-
-/* This inserts the Cline built into the command line. The last two
- * arguments are the relative positions where the begining and the
- * end of the brace expansion strings have to be re-inserted. */
-
-static void
-inst_cline(Cline l, int pl, int sl)
-{
-    int m = -1, d = -1, b = -1, hb = 0, i = 0;
-
-    /* Adjust the position of the braces. */
-    pl += brpl;
-    sl += brbsl;
-
-    i = cs - wb;
-
-    /* Insert the brace strings now? */
-    if (pl >= 0 && i >= pl && brbeg && *brbeg) {
-	inststrlen(brbeg, 1, -1);
-	pl = -1;
-	hb = 1;
-    }
-    if (sl >= 0 && i >= sl && brend && *brend) {
-	inststrlen(brend, 1, -1);
-	sl = -1;
-	hb = 1;
-    }
-    /* Walk the list. */
-    while (l) {
-	/* If this cline describes a suffix where something is missing
-	 * for some matches, remember the position. */
-	if (m < 0 && (l->flags & (CLF_MISS | CLF_SUF)) == (CLF_MISS | CLF_SUF))
-	    m = cs;
-
-	if (l->prefix) {
-	    Cline sl = l->prefix, ssl;
-	    int hm;
-
-	    if (l->flags & (CLF_END | CLF_MID)) {
-		/* At the end and in the middle the suffix we have
-		 * separate runs. */
-		for (; sl; sl = sl->next) {
-		    hm = 0;
-		    if (sl->prefix) {
-			for (ssl = sl->prefix; ssl; ssl = ssl->next) {
-			    if (ssl->line)
-				/* line for a string derived from applying
-				 * the matchers the other way round. */
-				inststrlen(ssl->line, 1, ssl->llen);
-			    else
-				/* and word for substrings equal in all
-				 * matches. */
-				inststrlen(ssl->word, 1, ssl->wlen);
-			    /* If the string differs from any of the 
-			     * matches, remember the position. */
-			    if (d < 0 && (ssl->flags & CLF_DIFF))
-				d = cs;
-			}
-		    } else if (sl->wlen)
-			inststrlen(sl->word, 1, sl->wlen);
-
-		    if (m < 0 && (sl->flags & CLF_MISS))
-			m = cs;
-		    if (sl->llen)
-			inststrlen(sl->line, 1, sl->llen);
-		    hm = (sl->flags & CLF_MISS);
-		}
-		if ((l->flags & CLF_MID) &&hm && b < 0) {
-		    b = cs;
-		    hb = 1;
-		}
-	    } else {
-		/* The cline contains a newly build part of the string 
-		 * in a sub-list. */
-		for (; sl; sl = sl->next) {
-		    if (sl->line)
-			/* line for a string derived from applying the 
-			 * matchers the other way round. */
-			inststrlen(sl->line, 1, sl->llen);
-		    else
-			/* and word for substrings equal in all matches. */
-			inststrlen(sl->word, 1, sl->wlen);
-		    /* If the string differs from any of the matches,
-		     * remember the position. */
-		    if (d < 0 && (sl->flags & CLF_DIFF))
-			d = cs;
-		}
-	    }
-	    if (!(l->flags & (CLF_END | CLF_MID)))
-		i += l->llen;
-	}
-	if (l->suffix) {
-	    Cline sl = revert_clines(l->suffix);
-
-	    if ((sl->flags & CLF_MISS) && b < 0) {
-		b = cs;
-		hb = 1;
-	    }
-	    for (; sl; sl = sl->next) {
-		if (sl->line)
-		    inststrlen(sl->line, 1, sl->llen);
-		else
-		    inststrlen(sl->word, 1, sl->wlen);
-		if (d < 0 && (sl->flags & CLF_DIFF))
-		    d = cs;
-	    }
-	}
-	if (l->flags & CLF_MID) {
-	    /* The cline in the middle, insert the prefix and the 
-	     * suffix. */
-	    if (!l->prefix && l->llen) {
-		inststrlen(l->line, 1, l->llen);
-		if (b < 0) {
-		    b = cs;
-		    hb = l->flags & CLF_MISS;
-		}
-	    }
-	    if (!l->suffix && l->wlen > 0)
-		inststrlen(l->word, 1, l->wlen);
-	} else if (!l->prefix && !l->suffix) {
-	    if (l->word &&
-		!((pl >= 0 && brbeg && *brbeg &&
-		   i < pl && i + l->llen >= pl) ||
-		  (sl >= 0 && brend && *brend &&
-		   i < sl && i + l->llen >= sl))) {
-		/* We insert the prefered string stored in word only if we
-		 * don't have to put the brace beginning or end here. */
-		inststrlen(l->word, 1, l->wlen);
-	    } else {
-		/* Otherwise just re-insert the original string. */
-		inststrlen(l->line, 1, l->llen);
-	    }
-	    i += l->llen;
-	}
-	/* Remember the position if there is a difference or a missing
-	 * substring. */
-	if (d < 0 && (l->flags & CLF_DIFF))
-	    d = cs;
-	if (m < 0 && (l->flags & CLF_MISS))
-	    m = cs;
-
-	/* Probably insert the brace beginning or end. */
-	if (pl >= 0 && i >= pl && brbeg && *brbeg) {
-	    cs -= i - pl;
-	    inststrlen(brbeg, 1, -1);
-	    cs += i - pl;
-	    pl = -1;
-	    hb = 1;
-	}
-	if (sl >= 0 && i > sl && brend && *brend) {
-	    cs -= i - sl;
-	    inststrlen(brend, 1, -1);
-	    cs += i - sl;
-	    sl = -1;
-	    hb = 1;
-	}
-	l = l->next;
-    }
-    lastend = cs;
-    /* Now place the cursor. Preferably in a position where something
-     * is missing, otherwise in a place where the string differs from
-     * any of the matches, or just leave it at the end. */
-    cs = (b >= 0 && hb ? b : (m >= 0 ? m : (d >= 0 ? d : cs)));
-    if (cs > ll)
-	cs = ll;
 }
 
 /* Check if the given pattern matches the given string.             *
@@ -3415,456 +1813,571 @@ pattern_match(Cpattern p, char *s, unsigned char *in, unsigned char *out)
     return 1;
 }
 
-/* Do the matching for a prefix. l and w contain the strings on the line and
- * for the generated word, respectively. In nlp we return a cline list for this
- * match. In lp we return the length of the matched string. rlp is used to
- * return a pointer to the last cline struct in the list returned in nlp, and
- * in bplp we return the relative position where the brace beginning would
- * have to be insrted in the string returned, which is the string to use
- * as the completion. */
+/* This splits the given string into a list of cline structs, separated
+ * at those places where one of the anchors of an `*' pattern was found.
+ * plen gives the number of characters on the line that matched this
+ * string. In lp we return a pointer to the last cline struct we build. */
 
-static char *
-match_pfx(char *l, char *w, Cline *nlp, int *lp, Cline *rlp, int *bplp)
+static Cline
+bld_parts(char *str, int len, int plen, Cline *lp)
 {
-    static unsigned char *ea;
-    static int ealen = 0;
-    static char *rw;
-    static int rwlen;
-
-    int ll = strlen(l), lw = strlen(w), oll = ll, olw = lw, mlw;
-    int il = 0, iw = 0, t, bc = brpl;
-    char *nw = rw;
+    Cline ret = NULL, *q = &ret, n;
     Cmlist ms;
-    Cmatcher mp, lm = NULL;
-    Cline lr = NULL;
+    Cmatcher mp;
+    int t, op = plen;
+    char *p = str;
 
-    if (nlp) {
-	*nlp = NULL;
+    while (len) {
+	for (t = 0, ms = bmatchers; ms && !t; ms = ms->next) {
+	    mp = ms->matcher;
+	    if (mp->flags == CMF_RIGHT && mp->wlen == -1 &&
+		!mp->llen && len >= mp->ralen && mp->ralen &&
+		pattern_match(mp->right, str, NULL, NULL)) {
+		int olen = str - p, llen;
 
-	if (ll + 1 > ealen) {
-	    /* This is the `in'/`out' string for pattern matching. */
-	    if (ealen)
-		zfree(ea, ealen);
-	    ea = (unsigned char *) zalloc(ealen = ll + 20);
+		/* We found an anchor, create a new cline. The NEW flag
+		 * is set if the characters before the anchor were not
+		 * on the line. */
+		*q = n = get_cline(NULL, mp->ralen, str, mp->ralen, NULL, 0,
+				   ((plen < 0) ? CLF_NEW : 0));
+
+		/* If there were any characters before the anchor, add
+		 * them as a cline struct. */
+
+		if (p != str) {
+		    llen = (op < 0 ? 0 : op);
+
+		    if (llen > olen)
+			llen = olen;
+		    n->prefix = get_cline(NULL, llen, p, olen, NULL, 0, 0);
+		}
+		q = &(n->next);
+		str += mp->ralen; len -= mp->ralen;
+		plen -= mp->ralen;
+		op -= olen;
+		p = str;
+		t = 1;
+	    }
+	}
+	if (!t) {
+	    /* No anchor was found here, skip. */
+	    str++; len--;
+	    plen--;
 	}
     }
-    while (ll && lw) {
-	t = 0;
-	/* First try the matchers. */
-	for (ms = mstack; ms; ms = ms->next) {
-	    for (mp = ms->matcher; mp; mp = mp->next) {
-		if (lm == mp)
-		    continue;
+    /* This is the cline struct for the remaining string at the end. */
 
+    *q = n = get_cline(NULL, 0, NULL, 0, NULL, 0, (plen < 0 ? CLF_NEW : 0));
+    if (p != str) {
+	int olen = str - p, llen = (op < 0 ? 0 : op);
+
+	if (llen > olen)
+	    llen = olen;
+	n->prefix = get_cline(NULL, llen, p, olen, NULL, 0, 0);
+    }
+    n->next = NULL;
+
+    if (lp)
+	*lp = n;
+
+    return ret;
+}
+
+/* Global variables used during matching: a char-buffer for the string to
+ * use for the match, and two cline lists for the two levels we use. */
+
+static char *matchbuf = NULL;
+static int matchbuflen = 0, matchbufadded;
+
+static Cline matchparts, matchlastpart;
+static Cline matchsubs, matchlastsub;
+
+/* This initialises the variables above. */
+
+static void
+start_match(void)
+{
+    if (matchbuf)
+	*matchbuf = '\0';
+    matchbufadded = 0;
+    matchparts = matchlastpart = matchsubs = matchlastsub = NULL;
+}
+
+/* This aborts a matching, freeing the cline lists build. */
+
+static void
+abort_match(void)
+{
+    free_cline(matchparts);
+    free_cline(matchsubs);
+}
+
+/* This adds a new string in the static char buffer. The arguments are
+ * the matcher used (if any), the strings from the line and the word
+ * and the length of the string from the word. The last argument is
+ * non-zero if we are matching a suffix (where the given string has to 
+ * be prepended to the contents of the buffer). */
+
+static void
+add_match_str(Cmatcher m, char *l, char *w, int wl, int sfx)
+{
+    /* Get the string and length to insert: either from the line 
+     * or from the match. */
+    if (m && (m->flags & CMF_LINE)) {
+	wl = m->llen; w = l;
+    }
+    if (wl) {
+	/* Probably resie the buffer. */
+	if (matchbuflen - matchbufadded <= wl) {
+	    int blen = matchbuflen + wl + 20;
+	    char *buf;
+
+	    buf = (char *) zalloc(blen);
+	    memcpy(buf, matchbuf, matchbuflen);
+	    zfree(matchbuf, matchbuflen);
+	    matchbuf = buf;
+	    matchbuflen = blen;
+	}
+	/* Insert the string. */
+	if (sfx) {
+	    memmove(matchbuf + wl, matchbuf, matchbufadded + 1);
+	    memcpy(matchbuf, w, wl);
+	} else
+	    memcpy(matchbuf + matchbufadded, w, wl);
+	matchbufadded += wl;
+	matchbuf[matchbufadded] = '\0';
+    }
+}
+
+/* This adds a cline for a word-part during matching. Arguments are the
+ * matcher used, pointers to the line and word strings for the anchor,
+ * a pointer to the original line string for the whole part, the string
+ * before (or after) the anchor that has not yet been added, the length
+ * of the line-string for that, and a flag saying if we are matching a 
+ * suffix. */
+
+static void
+add_match_part(Cmatcher m, char *l, char *w, int wl,
+	       char *o, int ol, char *s, int sl, int osl, int sfx)
+{
+    Cline p, lp;
+
+    /* If the anchors are equal, we keep only one. */
+
+    if (!strncmp(l, w, wl))
+	l = NULL;
+
+    /* Split the new part into parts and turn the last one into a `suffix'
+     * if we have a left anchor. */
+
+    p = bld_parts(s, sl, osl, &lp);
+
+    p->flags &= ~CLF_NEW;
+    if (m && (m->flags & CMF_LEFT)) {
+	lp->flags |= CLF_SUF;
+	lp->suffix = lp->prefix;
+	lp->prefix = NULL;
+    }
+    /* cline lists for suffixes are sorted from back to front, so we have
+     * to revert the list we got. */
+    if (sfx)
+	p = revert_cline(lp = p);
+    /* Now add the sub-clines we already had. */
+    if (matchsubs) {
+	matchlastsub->next = p->prefix;
+	p->prefix = matchsubs;
+	matchsubs = matchlastsub = NULL;
+    }
+    /* Store the arguments in the last part-cline. */
+    lp->line = l; lp->llen = wl;
+    lp->word = w; lp->wlen = wl;
+    lp->orig = o; lp->olen = ol;
+    lp->flags &= ~CLF_NEW;
+
+    /* Finally, put the new parts on the list. */
+    if (matchlastpart)
+	matchlastpart->next = p;
+    else
+	matchparts = p;
+    matchlastpart = lp;
+}
+
+/* This adds a new sub-cline. Arguments are the matcher and the strings from
+ * the line and the word. */
+
+static void
+add_match_sub(Cmatcher m, char *l, int ll, char *w, int wl)
+{
+    int flags;
+    Cline n;
+
+    /* Check if we are interested only in the string from the line. */
+    if (m && (m->flags & CMF_LINE)) {
+	w = NULL; wl = 0;
+	flags = CLF_LINE;
+    } else
+	flags = 0;
+
+    /* And add the cline. */
+    if (wl || ll) {
+	n = get_cline(l, ll, w, wl, NULL, 0, flags);
+	if (matchlastsub)
+	    matchlastsub->next = n;
+	else
+	    matchsubs = n;
+	matchlastsub = n;
+    }
+}
+
+/* This tests if the string from the line l matches the word w. In bp
+ * the offset for the brace is returned, in rwlp the length of the
+ * matched prefix or suffix, not including the stuff before or after
+ * the last anchor is given. When sfx is non-zero matching is done from
+ * the ends of the strings backward, if test is zero, the global variables
+ * above are used to build the string for the match and the cline. */
+
+static int
+match_str(char *l, char *w, int *bp, int *rwlp, int sfx, int test)
+{
+    int ll = strlen(l), lw = strlen(w), oll = ll, olw = lw;
+    int il = 0, iw = 0, t, ind, add, bc;
+    VARARR(unsigned char, ea, ll + 1);
+    char *ow;
+    Cmlist ms;
+    Cmatcher mp, lm = NULL;
+
+    if (!test)
+	start_match();
+
+    /* Adjust the pointers and get the values for subscripting and
+     * incrementing. */
+
+    if (sfx) {
+	l += ll; w += lw;
+	ind = -1; add = -1; bc = brsl;
+    } else {
+	ind = 0; add = 1; bc = brpl;
+    }
+    /* ow will always point to the beginning (or end) of that sub-string
+     * in w that wasn't put in the match-variables yet. */
+
+    ow = w;
+
+    /* If the brace is at the beginning, we have to treat it now. */
+
+    if (!test && !bc && bp) {
+	*bp = 0;
+	bp = NULL;
+    }
+    while (ll && lw) {
+	/* First try the matchers. */
+	for (mp = NULL, ms = mstack; !mp && ms; ms = ms->next) {
+	    for (mp = ms->matcher; mp; mp = mp->next) {
 		t = 1;
-		if ((oll == ll || olw == lw) && !nlp && mp->wlen < 0)
+		if (lm == mp ||
+		    ((oll == ll || olw == lw) && test && mp->wlen < 0))
 		    /* If we were called recursively, don't use `*' patterns
 		     * at the beginning (avoiding infinite recursion). */
-		    t = 0;
-		else if (mp->flags & CMF_LEFT) {
-		    /* Try to match the left anchor, if any. */
-		    if (il < mp->lalen || iw < mp->lalen)
-			t = 0;
-		    else if (mp->left)
-			t = pattern_match(mp->left, l - mp->lalen, NULL, NULL) &&
-			    pattern_match(mp->left, w - mp->lalen, NULL, NULL);
-		    else
-			t = (!il && !iw);
-		}
-		if (t) {
-		    /* Now match the line pattern. */
-		    if (ll < mp->llen || lw < mp->wlen)
-			t = 0;
-		    else if (mp->wlen < 0) {
-			/* This is reached if we have a `*' pattern. */
-			if ((t = pattern_match(mp->line, l, NULL, NULL))) {
-			    if (mp->flags & CMF_RIGHT)
-				/* Check if the anchor matches what's on the
-				 * line. If it also matches the word, we don't
-				 * use the matcher since we don't want one of
-				 * these patterns on the line to match more
-				 * than one such sub-string in the word. */
-				t = (mp->right && ll >= mp->llen + mp->ralen &&
-				     pattern_match(mp->right, l + mp->llen,
-						   NULL, NULL) &&
-				     lw >= mp->ralen &&
-				     !pattern_match(mp->right, w, NULL, NULL));
-			    if (t) {
-				/* The anchor matched, so find out how many
-				 * characters are matched by the `*' pattern.
-				 * We do this by looping over the string
-				 * and calling this function recursively. */
-				int i = 0, j = iw, k = lw, m = 0;
-				int jj = il + mp->llen, kk = ll - mp->llen;
-				char *p = l + mp->llen, *q = w;
-
-				for (; k; i++, j++, k--, q++) {
-				    if ((mp->flags & CMF_RIGHT) &&
-					(mp->right && k >= mp->ralen &&
-					 pattern_match(mp->right, q, 
-						       NULL, NULL))) {
-					if (m++) {
-					    k = 0;
-					    break;
-					}
-				    }
-				    if (match_pfx(p, q, NULL, NULL, NULL, NULL))
-					break;
-				}
-				if (k && i) {
-				    /* We found a position where the rest of
-				     * the line matched again (k != 0) and
-				     * we skipped over at least one character
-				     * (i != 0), so add a cline for this */
-				    if (nlp) {
-					nw = addtoword(&rw, &rwlen, nw, mp,
-						       l, w, i, 0);
-					addtocline(nlp, &lr, l, mp->llen,
-						   w, i, mp, 
-						   ((mp->flags & CMF_LEFT) ?
-						    CLF_SUF : 0) | CLF_VAR);
-				    }
-				    /* ...and adjust the pointers and counters
-				     * to continue after the matched portion. */
-				    w = q;
-				    iw = j;
-				    lw = k;
-				    l = p;
-				    il = jj;
-				    ll = kk;
-				    bc -= mp->llen;
-
-				    /* In bc we count the characters used
-				     * backward starting with the original
-				     * position of the brace beginning. So, 
-				     * if it becomes less than or equal to
-				     * zero, we have reached the place where
-				     * the brace string would have to be 
-				     * inserted. */
-				    if (bc <= 0 && bplp) {
-					*bplp = nw - rw;
-					bplp = NULL;
-				    }
-				    lm = mp;
-				    break;
-				} else
-				    t = 0;
-			    } else
-				t = 0;
-			}
-		    } else {
-			/* No `*', just try to match the line and word *
-			 * patterns. */
-			t = pattern_match(mp->line, l, NULL, ea) &&
-			    pattern_match(mp->word, w, ea, NULL);
-			mlw = mp->wlen;
-		    }
-		}
-		/* Now test the right anchor, if any. */
-		if (t && (mp->flags & CMF_RIGHT)) {
-		    if (ll < mp->llen + mp->ralen || lw < mlw + mp->ralen)
-			t = 0;
-		    else if (mp->right)
-			t = pattern_match(mp->right, l + mp->llen, NULL, NULL) &&
-			    pattern_match(mp->right, w + mlw, NULL, NULL);
-		    else
-			t = 0;
-		}
-		if (t) {
-		    /* If it matched, build a new chunk on the Cline list *
-		     * and add the string to the built match. */
-		    if (nlp) {
-			nw = addtoword(&rw, &rwlen, nw, mp, l, w, mlw, 0);
-			addtocline(nlp, &lr, l, mp->llen, w, mlw, mp, 0);
-		    }
-		    l += mp->llen;
-		    w += mlw;
-		    ll -= mp->llen;
-		    lw -= mlw;
-		    il += mp->llen;
-		    iw += mlw;
-		    bc -= mp->llen;
-
-		    if (bc <= 0 && bplp) {
-			*bplp = nw - rw;
-			bplp = NULL;
-		    }
-		    break;
-		}
-	    }
-	    if (mp) {
-		if (mp != lm)
-		    lm = NULL;
-		break;
-	    }
-	}
-	if (t)
-	    continue;
-	if (*l == *w) {
-	    /* Same character, take it. */
-	    if (nlp) {
-		nw = addtoword(&rw, &rwlen, nw, NULL, NULL, l, 1, 0);
-		addtocline(nlp, &lr, l, 1, NULL, 0, NULL, 0);
-	    }
-	    l++;
-	    w++;
-	    il++;
-	    iw++;
-	    ll--;
-	    lw--;
-	    bc--;
-
-	    if (bc <= 0 && bplp) {
-		*bplp = nw - rw;
-		bplp = NULL;
-	    }
-	    lm = NULL;
-	} else {
-	    if (nlp && *nlp) {
-		lr->next = freecl;
-		freecl = *nlp;
-	    }
-	    return NULL;
-	}
-    }
-    if (lp)
-	*lp = iw;
-    if (lw) {
-	if (nlp) {
-	    /* There is a unmatched portion in the word, keep it. */
-	    if (rlp) {
-		w = dupstring(w);
-		addtocline(nlp, &lr, w, lw, w, -1, NULL, CLF_MID);
-
-		*rlp = lr;
-	    } else {
-		addtocline(nlp, &lr, l, 0, dupstring(w), lw, NULL,
-			   CLF_VAR | CLF_END);
-		nw = addtoword(&rw, &rwlen, nw, NULL, NULL, w, lw, 0);
-	    }
-	}
-    } else if (rlp) {
-	if (nlp && lr) {
-	    lr->next = freecl;
-	    freecl = *nlp;
-	}
-	return NULL;
-    }
-    if (nlp && nw)
-	*nw = '\0';
-
-    if (ll) {
-	if (nlp && *nlp) {
-	    lr->next = freecl;
-	    freecl = *nlp;
-	}
-	return NULL;
-    }
-    if (nlp)
-	/* Finally, return the built match string. */
-	return dupstring(rw);
-    
-    return ((char *) 1);
-}
-
-/* Do the matching for a suffix. Almost the same as match_pfx(), only in the
-* other direction. */
-
-static char *
-match_sfx(char *l, char *w, Cline *nlp, int *lp, int *bslp)
-{
-    static unsigned char *ea;
-    static int ealen = 0;
-    static char *rw;
-    static int rwlen;
-
-    int ll = strlen(l), lw = strlen(w), mlw;
-    int il = 0, iw = 0, t, bc = brsl;
-    char *nw = rw;
-    Cmlist ms;
-    Cmatcher mp, lm = NULL;
-    Cline lr = NULL;
-
-    l += ll;
-    w += lw;
-
-    if (nlp) {
-	*nlp = NULL;
-
-	if (ll + 1 > ealen) {
-	    if (ealen)
-		zfree(ea, ealen);
-	    ea = (unsigned char *) zalloc(ealen = ll + 20);
-	}
-    }
-    while (ll && lw) {
-	t = 0;
-	for (ms = mstack; ms; ms = ms->next) {
-	    for (mp = ms->matcher; mp; mp = mp->next) {
-		if (lm == mp)
 		    continue;
 
-		t = 1;
-		if (mp->flags & CMF_RIGHT) {
-		    if (il < mp->ralen || iw < mp->ralen)
-			t = 0;
-		    else if (mp->right)
-			t = pattern_match(mp->right, l, NULL, NULL) &&
-			    pattern_match(mp->right, w, NULL, NULL);
-		    else
-			t = (!il && !iw);
-		}
-		if (t) {
-		    if (ll < mp->llen || lw < mp->wlen)
-			t = 0;
-		    else if (mp->wlen < 0) {
-			if ((t = pattern_match(mp->line, l - mp->llen,
-					       NULL, NULL))) {
-			    if (mp->flags & CMF_LEFT)
-				t = (mp->left && ll >= mp->llen + mp->lalen &&
-				     pattern_match(mp->left,
-						   l - mp->llen - mp->lalen,
-						   NULL, NULL) &&
-				     lw >= mp->lalen &&
-				     !pattern_match(mp->left, w - mp->lalen,
-						    NULL, NULL));
-			    if (t) {
-				int i = 0, j = iw, k = lw, m = 0;
-				int jj = il + mp->llen, kk = ll - mp->llen;
-				char *p = l - mp->llen - 1, *q = w - 1;
+		if (mp->wlen < 0) {
+		    int both, loff, aoff, llen, alen, zoff, moff, ct, ict;
+		    char *tp, savl = '\0', savw;
+		    Cpattern ap;
 
-				for (; k; i++, j++, k--, q--) {
-				    if ((mp->flags & CMF_LEFT) &&
-					(mp->left && k >= mp->lalen &&
-					 pattern_match(mp->left, q - mp->lalen, 
-						       NULL, NULL))) {
-					if (m++) {
-					    k = 0;
-					    break;
-					}
-				    }
-				    if (match_pfx(p, q, NULL, NULL, NULL, NULL))
-					break;
-				}
-				if (k && i) {
-				    if (nlp) {
-					nw = addtoword(&rw, &rwlen, nw, mp,
-						       l - mp->llen, w - i,
-						       i, 1);
-					addtocline(nlp, &lr, l - mp->llen,
-						   mp->llen, w - i, i, mp, 
-						   ((mp->flags & CMF_LEFT) ?
-						    CLF_SUF : 0) | CLF_VAR);
-				    }
-				    w = q + 1;
-				    iw = j;
-				    lw = k;
-				    l = p + 1;
-				    il = jj;
-				    ll = kk;
-				    bc -= mp->llen;
+		    /* This is for `*' patterns, first initialise some
+		     * local variables. */
+		    llen = mp->llen;
+		    alen = (mp->flags & CMF_LEFT ? mp->lalen : mp->ralen);
 
-				    if (bc <= 0 && bslp) {
-					*bslp = nw - rw;
-					bslp = NULL;
-				    }
-				    lm = mp;
-				    break;
-				} else
-				    t = 0;
-			    }
+		    /* Give up if we don't have enough characters for the
+		     * line-string and the anchor. */
+		    if (ll < llen + alen || lw < alen)
+			continue;
+
+		    if (mp->flags & CMF_LEFT) {
+			ap = mp->left; zoff = 0; moff = alen;
+			if (sfx) {
+			    both = 0; loff = -llen; aoff = -(llen + alen);
+			} else {
+			    both = 1; loff = alen; aoff = 0;
 			}
 		    } else {
-			t = pattern_match(mp->line, l - mp->llen, NULL, ea) &&
-			    pattern_match(mp->word, w - mp->wlen, ea, NULL);
-			mlw = mp->wlen;
+			ap = mp->right; zoff = alen; moff = 0;
+			if (sfx) {
+			    both = 1; loff = -(llen + alen); aoff = -alen;
+			} else {
+			    both = 0; loff = 0; aoff = llen;
+			}
 		    }
-		}
-		if (t && (mp->flags & CMF_LEFT)) {
-		    if (ll < mp->llen + mp->lalen || lw < mlw + mp->lalen)
-			t = 0;
-		    else if (mp->left)
-			t = pattern_match(mp->right, l - mp->llen - mp->lalen,
-					  NULL, NULL) &&
-			    pattern_match(mp->right, w - mlw - mp->lalen,
-					  NULL, NULL);
+		    /* Try to match the line pattern and the anchor. */
+		    if (!pattern_match(mp->line, l + loff, NULL, NULL))
+			continue;
+		    if (ap) {
+			if (!pattern_match(ap, l + aoff, NULL, NULL) ||
+			    (both && !pattern_match(ap, w + aoff, NULL, NULL)))
+			    continue;
+		    } else if (!both || il || iw)
+			continue;
+
+		    /* Fine, now we call ourselves recursively to find the
+		     * string matched by the `*'. */
+		    if (sfx) {
+			savl = l[-(llen + zoff)];
+			l[-(llen + zoff)] = '\0';
+		    }
+		    for (t = 0, tp = w, ct = 0, ict = lw - alen;
+			 ict;
+			 tp += add, ct++, ict--) {
+			if (both ||
+			    pattern_match(ap, tp - moff, NULL, NULL)) {
+			    if (sfx) {
+				savw = tp[-zoff];
+				tp[-zoff] = '\0';
+				t = match_str(l - ll, w - lw,
+					      NULL, NULL, 1, 1);
+				tp[-zoff] = savw;
+			    } else
+				t = match_str(l + llen + moff, tp + moff,
+					      NULL, NULL, 0, 1);
+			    if (t || !both)
+				break;
+			}
+		    }
+		    ict = ct;
+		    if (sfx)
+			l[-(llen + zoff)] = savl;
+
+		    /* Have we found a position in w where the rest of l
+		     * matches? */
+		    if (!t)
+			continue;
+
+		    /* Yes, add the strings and clines if this is a 
+		     * top-level call. */
+		    if (!test) {
+			char *op, *lp, *map, *wap, *wmp;
+			int ol;
+
+			if (sfx) {
+			    op = w; ol = ow - w; lp = l - (llen + alen);
+			    map = tp - alen;
+			    if (mp->flags & CMF_LEFT) {
+				wap = tp - alen; wmp = tp;
+			    } else {
+				wap = w - alen; wmp = tp - alen;
+			    }
+			} else {
+			    op = ow; ol = w - ow; lp = l;
+			    map = ow;
+			    if (mp->flags & CMF_LEFT) {
+				wap = w; wmp = w + alen;
+			    } else {
+				wap = tp; wmp = ow;
+			    }
+			}
+			/* If the matcher says that we are only interested
+			 * in the line pattern, we just add that and the
+			 * anchor and the string not added yet. Otherwise
+			 * we add a new part. */
+			if (mp->flags & CMF_LINE) {
+			    add_match_str(NULL, NULL, op, ol, sfx);
+			    add_match_str(NULL, NULL, lp, llen + alen, sfx);
+			    add_match_sub(NULL, NULL, ol, op, ol);
+			    add_match_sub(NULL, NULL, llen + alen,
+					  lp, llen + alen);
+			} else {
+			    add_match_str(NULL, NULL,
+					  map, ct + ol + alen, sfx);
+			    if (both) {
+				add_match_sub(NULL, NULL, ol, op, ol);
+				ol = -1;
+			    } else
+				ct += ol;
+			    add_match_part(mp, l + aoff, wap, alen,
+					   l + loff, llen, wmp, ct, ol, sfx);
+			}
+		    }
+		    /* Now skip over the matched portion and the anchor. */
+		    llen += alen; alen += ict;
+		    if (sfx) {
+			l -= llen; w -= alen;
+		    } else {
+			l += llen; w += alen;
+		    }
+		    ll -= llen; il += llen;
+		    lw -= alen; iw += alen;
+		    bc -= llen;
+
+		    if (!test && bc <= 0 && bp) {
+			*bp = matchbufadded + bc;
+			bp = NULL;
+		    }
+		    ow = w;
+
+		    if (!ict)
+			lm = mp;
 		    else
-			t = 0;
-		}
-		if (t) {
-		    if (nlp) {
-			nw = addtoword(&rw, &rwlen, nw, mp, l - mp->llen,
-				       w - mlw, mlw, 1);
-			addtocline(nlp, &lr, l - mp->llen, mp->llen,
-				   w - mlw, mlw, mp, 0);
+			lm = NULL;
+		    break;
+		} else if (ll >= mp->llen && lw >= mp->wlen) {
+		    /* Non-`*'-pattern. */
+		    char *tl, *tw;
+		    int tll, tlw, til, tiw;
+
+		    /* We do this only if the line- and word-substrings
+		     * are not equal. */
+		    if (!(mp->flags & (CMF_LEFT | CMF_RIGHT)) &&
+			mp->llen == mp->wlen &&
+			!(sfx ? strncmp(l - mp->llen, w - mp->wlen, mp->llen) :
+			  strncmp(l, w, mp->llen)))
+			continue;
+
+		    /* Using local variables to make the following
+		     * independent of whether we match a prefix or a
+		     * suffix. */
+		    if (sfx) {
+			tl = l - mp->llen; tw = w - mp->wlen;
+			til = ll - mp->llen; tiw = lw - mp->wlen;
+			tll = il + mp->llen; tlw = iw + mp->wlen;
+		    } else {
+			tl = l; tw = w;
+			til = il; tiw = iw;
+			tll = ll; tlw = lw;
 		    }
-		    l -= mp->llen;
-		    w -= mlw;
-		    ll -= mp->llen;
-		    lw -= mlw;
-		    il += mp->llen;
-		    iw += mlw;
+		    if (mp->flags & CMF_LEFT) {
+			/* Try to match the left anchor, if any. */
+			if (til < mp->lalen || tiw < mp->lalen)
+			    continue;
+			else if (mp->left)
+			    t = pattern_match(mp->left, tl - mp->lalen,
+					      NULL, NULL) &&
+				pattern_match(mp->left, tw - mp->lalen,
+					      NULL, NULL);
+			else
+			    t = (!sfx && !il && !iw);
+		    }
+		    if (mp->flags & CMF_RIGHT) {
+			/* Try to match the right anchor, if any. */
+			if (tll < mp->llen + mp->ralen ||
+			    tlw < mp->wlen + mp->ralen)
+			    continue;
+			else if (mp->left)
+			    t = pattern_match(mp->right,
+					      tl + mp->llen - mp->ralen,
+					      NULL, NULL) &&
+				pattern_match(mp->right,
+					      tw + mp->wlen - mp->ralen,
+					      NULL, NULL);
+			else
+			    t = (sfx && !il && !iw);
+		    }
+		    /* Now try to match the line and word patterns. */
+		    if (!t ||
+			!pattern_match(mp->line, tl, NULL, ea) ||
+			!pattern_match(mp->word, tw, ea, NULL))
+			continue;
+
+		    /* Probably add the matched strings. */
+		    if (!test) {
+			if (sfx)
+			    add_match_str(NULL, NULL, w, ow - w, 0);
+			else
+			    add_match_str(NULL, NULL, ow, w - ow, 0);
+			add_match_str(mp, tl, tw, mp->wlen, 0);
+			if (sfx)
+			    add_match_sub(NULL, NULL, 0, w, ow - w);
+			else
+			    add_match_sub(NULL, NULL, 0, ow, w - ow);
+
+			add_match_sub(mp, tl, mp->llen, tw, mp->wlen);
+		    }
+		    if (sfx) {
+			l = tl;	w = tw;
+		    } else {
+			l += mp->llen; w += mp->wlen;
+		    }
+		    il += mp->llen; iw += mp->wlen;
+		    ll -= mp->llen; lw -= mp->wlen;
 		    bc -= mp->llen;
-		    if (bc <= 0 && bslp) {
-			*bslp = nw - rw;
-			bslp = NULL;
+
+		    if (!test && bc <= 0 && bp) {
+			*bp = matchbufadded + bc;
+			bp = NULL;
 		    }
+		    ow = w;
+		    lm = NULL;
 		    break;
 		}
 	    }
-	    if (mp) {
-		if (mp != lm)
-		    lm = NULL;
-		break;
-	    }
 	}
-	if (t)
+	if (mp)
 	    continue;
-	if (l[-1] == w[-1]) {
-	    if (nlp) {
-		nw = addtoword(&rw, &rwlen, nw, NULL, NULL, l - 1, 1, 1);
-		addtocline(nlp, &lr, l - 1, 1, NULL, 0, NULL, 0);
-	    }
-	    l--;
-	    w--;
-	    il++;
-	    iw++;
-	    ll--;
-	    lw--;
+
+	if (l[ind] == w[ind]) {
+	    /* No matcher could be used, but the strings have the same
+	     * character here, skip over it. */
+	    l += add; w += add;
+	    il++; iw++;
+	    ll--; lw--;
 	    bc--;
-	    if (bc <= 0 && bslp) {
-		*bslp = nw - rw;
-		bslp = NULL;
+	    if (!test && bc <= 0 && bp) {
+		*bp = matchbufadded + (sfx ? (ow - w) : (w - ow));
+		bp = NULL;
 	    }
 	    lm = NULL;
 	} else {
-	    if (nlp && *nlp) {
-		lr->next = freecl;
-		freecl = *nlp;
-	    }
-	    return NULL;
+	    /* No matcher and different characters: l does not match w. */
+	    abort_match();
+
+	    return (test ? 0 : -1);
 	}
     }
-    if (lp)
-	*lp = iw;
-    if (nlp && nw)
-	*nw = '\0';
+    /* If this is a recursive call, we just return if l matched w or not. */
+    if (test)
+	return !ll;
 
+    /* In top-level calls, if ll is non-zero (unmatched portion in l),
+     * we have to free the collected clines. */
     if (ll) {
-	if (nlp && *nlp) {
-	    lr->next = freecl;
-	    freecl = *nlp;
-	}
-	return NULL;
-    }
-    if (nlp)
-	return dupstring(rw);
+	abort_match();
 
-    return ((char *) 1);
+	return -1;
+    }
+    if (rwlp)
+	*rwlp = iw - (sfx ? ow - w : w - ow);
+
+    /* If we matched a suffix, the anchors stored in the top-clines
+     * will be in the wrong clines: shifted by one. Adjust this. */
+    if (sfx && matchparts) {
+	Cline t, tn, s;
+
+	if (matchparts->prefix || matchparts->suffix) {
+	    t = get_cline(NULL, 0, NULL, 0, NULL, 0, 0);
+	    t->next = matchparts;
+	    if (matchparts->prefix)
+		t->prefix = (Cline) 1;
+	    else
+		t->suffix = (Cline) 1;
+	    matchparts = t;
+	}
+	for (t = matchparts; (tn = t->next); t = tn) {
+	    s = (tn->prefix ? tn->prefix : tn->suffix);
+	    if (t->prefix)
+		t->prefix = s;
+	    else
+		t->suffix = s;
+	}
+	t->prefix = t->suffix = NULL;
+    }
+    /* Finally, return the number of matched characters. */
+
+    return iw;
 }
 
-/* Check if the word `w' is matched by the strings in pfx and sfx (the prefix
- * and the suffix from the line. In clp a cline list is returned for w.
+/* Check if the word w is matched by the strings in pfx and sfx (the prefix
+ * and the suffix from the line) or the pattern cp. In clp a cline list for
+ * w is returned.
  * qu is non-zero if the words has to be quoted before processed any further.
  * bpl and bsl are used to report the positions where the brace-strings in
  * the prefix and the suffix have to be re-inserted if this match is inserted
@@ -3873,157 +2386,1016 @@ match_sfx(char *l, char *w, Cline *nlp, int *lp, int *bslp)
  * and the suffix don't match the word w. */
 
 static char *
-comp_match(char *pfx, char *sfx, char *w, Cline *clp, int qu, int *bpl, int *bsl)
+comp_match(char *pfx, char *sfx, char *w, Comp cp,
+	   Cline *clp, int qu, int *bpl, int *bsl, int *exact)
 {
     char *r = NULL;
-    Cline pli;
-    int pl;
 
-    if (qu)
-	w = quotename(w, NULL, NULL, NULL);
+    if (cp) {
+	/* We have a globcomplete-like pattern, just use that. */
+	int wl;
 
-    if (*sfx) {
-	/* We have a suffix, so this gets a bit more complicated. */
-	char *p, *s;
-	int sl;
-	Cline sli, last;
+	r = w;
+	if (!domatch(r, cp, 0))
+	    return NULL;
+    
+	r = (qu ? quotename(r, NULL) : dupstring(r));
 
-	/* First see if the prefix matches. In pl we get the length of
-	 * the string matched by it. */
-	if ((p = match_pfx(pfx, w, &pli, &pl, &last, bpl))) {
-	    /* Then try to match the rest of the string with the suffix. */
-	    if ((s = match_sfx(sfx, w + pl, &sli, &sl, bsl))) {
-		int pml, sml;
+	/* We still break it into parts here, trying to build a sensible
+	 * cline list for these matches, too. */
+	wl = strlen(w);
+	*clp = bld_parts(w, wl, wl, NULL);
+	*exact = 0;
+    } else {
+	Cline pli, plil;
+	int mpl, rpl, wl;
 
-		/* Now append the cline list for the suffix to the one
-		 * for the prefix. */
-		last->llen -= sl;
-		last->next = revert_clines(sli);
+	if (qu)
+	    w = quotename(w, NULL);
 
-		/* And store the correct parts of the prefix and the suffix
-		 * in the cline struct in the middle. */
-		pml = strlen(p);
-		sml = strlen(s);
-		r = (char *) zhalloc(pml + sml + last->llen + 1);
-		strcpy(r, p);
-		strncpy(r + pml, last->line, last->llen);
-		strcpy(r + pml + last->llen, s);
-	    } else {
-		/* Suffix didn't match, so free the cline list for the
-		 * prefix. */
-		last->next = freecl;
-		freecl = pli;
+	wl = strlen(w);
+
+	/* Always try to match the prefix. */
+
+	if ((mpl = match_str(pfx, w, bpl, &rpl, 0, 0)) < 0)
+	    return NULL;
+
+	if (sfx && *sfx) {
+	    int wpl = matchbufadded, msl, rsl;
+	    VARARR(char, wpfx, wpl);
+	    Cline mli, mlil;
+
+	    /* We also have a suffix to match, so first save the
+	     * contents of the global matching variables. */
+	    memcpy(wpfx, matchbuf, wpl);
+	    if (matchsubs) {
+		Cline tmp = get_cline(NULL, 0, NULL, 0, NULL, 0, 0);
+
+		tmp->prefix = matchsubs;
+		if (matchlastpart)
+		    matchlastpart->next = tmp;
+		else
+		    matchparts = tmp;
+	    }
+	    pli = matchparts;
+	    plil = matchlastpart;
+
+	    /* The try to match the suffix. */
+	    if ((msl = match_str(sfx, w + mpl, bsl, &rsl, 1, 0)) < 0) {
+		free_cline(pli);
 
 		return NULL;
 	    }
+	    /* Matched, so add the string in the middle and the saved
+	     * string for the prefix, and build a combined cline list
+	     * for the prefix and the suffix. */
+	    if (matchsubs) {
+		Cline tmp = get_cline(NULL, 0, NULL, 0, NULL, 0, CLF_SUF);
+
+		tmp->suffix = matchsubs;
+		if (matchlastpart)
+		    matchlastpart->next = tmp;
+		else
+		    matchparts = tmp;
+	    }
+	    add_match_str(NULL, NULL, w + rpl, wl - rpl - rsl, 1);
+	    add_match_str(NULL, NULL, wpfx, wpl, 1);
+
+	    mli = bld_parts(w + rpl, wl - rpl - rsl, (mpl - rpl), &mlil);
+	    mlil->flags |= CLF_MID;
+	    mlil->slen = msl - rsl;
+	    mlil->next = revert_cline(matchparts);
+
+	    if (plil)
+		plil->next = mli;
+	    else
+		pli = mli;
+	} else {
+	    /* Only a prefix, add the string and a part-cline for it. */
+	    add_match_str(NULL, NULL, w + rpl, wl - rpl, 0);
+
+	    add_match_part(NULL, NULL, NULL, 0, NULL, 0, w + rpl, wl - rpl,
+			   mpl - rpl, 0);
+	    pli = matchparts;
+	}
+	r = dupstring(matchbuf);
+	*clp = pli;
+
+	/* Test if the string built is equal to the one from the line. */
+	if (sfx && *sfx) {
+	    int pl = strlen(pfx);
+
+	    *exact = (!strncmp(pfx, w, pl) && !strcmp(sfx, w + pl));
 	} else
-	    return NULL;
-    } else if (!(r = match_pfx(pfx, w, &pli, &pl, NULL, bpl)))
-	/* We had only the prefix to match and that didn't match. */
+	    *exact = !strcmp(pfx, w);
+    }
+    return r;
+}
+
+/* This builds all the possible line patterns for the pattern pat in the
+ * buffer line. Initially line is the same as lp, but during recursive
+ * calls lp is incremented for storing successive characters. Whenever
+ * a full possible string is build, we test if this line matches the
+ * string given by wlen and word. The in argument contains the characters
+ * to use for the correspondence classes, it was filled by a call to 
+ * pattern_match() in the calling function.
+ * The return value is the length of the string matched in the word, it
+ * is zero if we couldn't build a line that matches the word. */
+
+static int
+bld_line(Cpattern pat, char *line, char *lp,
+	 char *word, int wlen, unsigned char *in, int sfx)
+{
+    if (pat) {
+	/* Still working on the pattern. */
+
+	int i, l;
+	unsigned char c = 0;
+
+	/* Get the number of the character for a correspondence class
+	 * if it has a correxponding class. */
+	if (pat->equiv)
+	    if ((c = *in))
+		in++;
+
+	/* Walk through the table in the pattern and try the characters
+	 * that may appear in the current position. */
+	for (i = 0; i < 256; i++)
+	    if ((pat->equiv && c) ? (c == pat->tab[i]) : pat->tab[i]) {
+		*lp = i;
+		/* We stored the character, now call ourselves to build
+		 * the rest. */
+		if ((l = bld_line(pat->next, line, lp + 1, word, wlen,
+				  in, sfx)))
+		    return l;
+	    }
+    } else {
+	/* We reached the end, i.e. the line string is fully build, now
+	 * see if it matches the given word. */
+
+	Cmlist ms;
+	Cmatcher mp;
+	int l = lp - line, t, rl = 0, ind, add;
+	VARARR(unsigned char, ea, l + 1);
+
+	/* Quick test if the strings are exactly the same. */
+	if (l == wlen && !strncmp(line, word, l))
+	    return l;
+
+	if (sfx) {
+	    line = lp; word += wlen;
+	    ind = -1; add = -1;
+	} else {
+	    ind = 0; add = 1;
+	}
+	/* We loop through the whole line string built. */
+	while (l && wlen) {
+	    if (word[ind] == line[ind]) {
+		/* The same character in both strings, skip over. */
+		line += add; word += add;
+		l--; wlen--; rl++;
+	    } else {
+		t = 0;
+		for (ms = bmatchers; ms && !t; ms = ms->next) {
+		    mp = ms->matcher;
+		    if (!mp->flags && mp->wlen <= wlen && mp->llen <= l &&
+			pattern_match(mp->line, (sfx ? line - mp->llen : line),
+				      NULL, ea) &&
+			pattern_match(mp->word, (sfx ? word - mp->wlen : word),
+				      ea, NULL)) {
+			/* Both the line and the word pattern matched,
+			 * now skip over the matched portions. */
+			if (sfx) {
+			    line -= mp->llen; word -= mp->wlen;
+			} else {
+			    line += mp->llen; word += mp->wlen;
+			}
+			l -= mp->llen; wlen -= mp->wlen; rl += mp->wlen;
+			t = 1;
+		    }
+		}
+		if (!t)
+		    /* Didn't match, give up. */
+		    return 0;
+	    }
+	}
+	if (!l)
+	    /* Unmatched portion in the line built, return matched length. */
+	    return rl;
+    }
+    return 0;
+}
+
+/* This builds a string that may be put on the line that fully matches the
+ * given strings. The return value is NULL if no such string could be built
+ * or that string in local static memory, dup it. */
+
+static char *
+join_strs(int la, char *sa, int lb, char *sb)
+{
+    static char *rs = NULL;
+    static int rl = 0;
+
+    VARARR(unsigned char, ea, (la > lb ? la : lb) + 1);
+    Cmlist ms;
+    Cmatcher mp;
+    int t, bl, rr = rl;
+    char *rp = rs;
+
+    while (la && lb) {
+	if (*sa != *sb) {
+	    /* Different characters, try the matchers. */
+	    for (t = 0, ms = bmatchers; ms && !t; ms = ms->next) {
+		mp = ms->matcher;
+		if (!mp->flags && mp->wlen > 0 && mp->llen > 0 &&
+		    mp->wlen <= la && mp->wlen <= lb) {
+		    /* The pattern has no anchors and the word
+		     * pattern fits, try it. */
+		    if ((t = pattern_match(mp->word, sa, NULL, ea)) ||
+			pattern_match(mp->word, sb, NULL, ea)) {
+			/* It matched one of the strings, t says which one. */
+			VARARR(char, line, mp->llen + 1);
+			char **ap, **bp;
+			int *alp, *blp;
+
+			if (t) {
+			    ap = &sa; alp = &la;
+			    bp = &sb; blp = &lb;
+			} else {
+			    ap = &sb; alp = &lb;
+			    bp = &sa; blp = &la;
+			}
+			/* Now try to build a string that matches the other
+			 * string. */
+			if ((bl = bld_line(mp->line, line, line,
+					   *bp, *blp, ea, 0))) {
+			    /* Found one, put it into the return string. */
+			    line[mp->llen] = '\0';
+			    if (rr <= mp->llen) {
+				char *or = rs;
+
+				rs = realloc(rs, (rl += 20));
+				rr += 20;
+				rp += rs - or;
+			    }
+			    memcpy(rp, line, mp->llen);
+			    rp += mp->llen; rr -= mp->llen;
+			    *ap += mp->wlen; *alp -= mp->wlen;
+			    *bp += bl; *blp -= bl;
+			    t = 1;
+			}
+		    }
+		}
+	    }
+	    if (!t)
+		break;
+	} else {
+	    /* Same character, just take it. */
+	    if (rr <= 1) {
+		char *or = rs;
+
+		rs = realloc(rs, (rl += 20));
+		rr += 20;
+		rp += rs - or;
+	    }
+	    *rp++ = *sa; rr--;
+	    sa++; sb++;
+	    la--; lb--;
+	}
+    }
+    if (la || lb)
 	return NULL;
 
-    /* If there are path prefixes or suffixes, pre- and append them to
-     * the cline list built. */
-    if (lppre && *lppre) {
-	Cline l, t = str_cline(lppre, -1, &l);
+    *rp = '\0';
 
-	l->next = pli;
-	pli = t;
-    }
-    if (lpsuf && *lpsuf) {
-	Cline n, t = str_cline(lpsuf, -1, NULL);
-
-	if ((n = pli)) {
-	    while (n->next) n = n->next;
-
-	    n->next = t;
-	} else
-	    pli = t;
-    }
-    *clp = pli;
-
-    return r;
+    return rs;
 }
 
-/* Insert the given string into the command line.  If move is non-zero, *
- * the cursor position is changed and len is the length of the string   *
- * to insert (if it is -1, the length is calculated here).              */
+/* This compares the anchors stored in two top-level clines. */
 
-/**/
-static void
-inststrlen(char *str, int move, int len)
-{
-    if (!len || !str)
-	return;
-    if (len == -1)
-	len = strlen(str);
-    spaceinline(len);
-    strncpy((char *)(line + cs), str, len);
-    if (move)
-	cs += len;
-}
-
-/* Insert the given match. This returns the number of characters inserted.*/
-
-/**/
 static int
-instmatch(Cmatch m)
+cmp_anchors(Cline o, Cline n, int join)
 {
-    int l, r = 0, ocs, a = cs;
+    int line = 0;
+    char *j;
 
-    /* Ignored prefix. */
-    if (m->ipre) {
-	inststrlen(m->ipre, 1, (l = strlen(m->ipre)));
-	r += l;
+    /* First try the exact strings. */
+    if ((!(o->flags & CLF_LINE) && o->wlen == n->wlen &&
+	 (!o->word || !strncmp(o->word, n->word, o->wlen))) ||
+	(line = ((!o->line && !n->line) ||
+		 (o->llen == n->llen && o->line && n->line &&
+		  !strncmp(o->line, n->line, o->llen))))) {
+	if (line) {
+	    o->flags |= CLF_LINE;
+	    o->word = NULL;
+	    n->wlen = 0;
+	}
+	return 1;
     }
-    /* -P prefix. */
-    if (m->pre) {
-	inststrlen(m->pre, 1, (l = strlen(m->pre)));
-	r += l;
+    /* Didn't work, try to build a string matching both anchors. */
+    if (join && !(o->flags & CLF_JOIN) &&
+	(j = join_strs(o->wlen, o->word, n->wlen, n->word))) {
+	o->flags |= CLF_JOIN;
+	o->wlen = strlen(j);
+	o->word = dupstring(j);
+
+	return 2;
     }
-    /* Path prefix. */
-    if (m->ppre) {
-	inststrlen(m->ppre, 1, (l = strlen(m->ppre)));
-	r += l;
+    return 0;
+}
+
+/* Below is the code to join two cline lists. This struct is used to walk
+ * through a sub-list. */
+
+typedef struct cmdata *Cmdata;
+
+struct cmdata {
+    Cline cl, pcl;
+    char *str, *astr;
+    int len, alen, olen, line;
+};
+
+/* This is used to ensure that a cmdata struct contains usable data.
+ * The return value is non-zero if we reached the end. */
+
+static int
+check_cmdata(Cmdata md, int sfx)
+{
+    /* We will use the str and len fields to contain the next sub-string
+     * in the list. If len is zero, we have to use the next cline. */
+    if (!md->len) {
+	/* If there is none, we reached the end. */
+	if (!md->cl)
+	    return 1;
+
+	/* Otherwise, get the string. Only the line-string or both.
+	 * We also have to adjust the pointer if this is for a suffix. */
+	if (md->cl->flags & CLF_LINE) {
+	    md->line = 1;
+	    md->len = md->cl->llen;
+	    md->str = md->cl->line;
+	} else {
+	    md->line = 0;
+	    md->len = md->olen = md->cl->wlen;
+	    if ((md->str = md->cl->word) && sfx)
+		md->str += md->len;
+	    md->alen = md->cl->llen;
+	    if ((md->astr = md->cl->line) && sfx)
+		md->astr += md->alen;
+	}
+	md->pcl = md->cl;
+	md->cl = md->cl->next;
     }
-    /* The string itself. */
-    inststrlen(m->str, 1, (l = strlen(m->str)));
-    r += l;
-    ocs = cs;
-    /* Re-insert the brace beginning, if any. */
-    if (brbeg && *brbeg) {
-	cs = a + m->brpl + (m->pre ? strlen(m->pre) : 0);
-	l = strlen(brbeg);
-	brpcs = cs;
-	inststrlen(brbeg, 1, l);
-	r += l;
-	ocs += l;
-	cs = ocs;
+    return 0;
+}
+
+/* This puts the not-yet-matched portion back into the last cline and 
+ * returns that. */
+
+static Cline
+undo_cmdata(Cmdata md, int sfx)
+{
+    Cline r = md->pcl;
+
+    if (md->line) {
+	r->word = NULL;
+	r->wlen = 0;
+	r->flags |= CLF_LINE;
+	r->llen = md->len;
+	r->line = md->str - (sfx ? md->len : 0);
+    } else if (md->len != md->olen) {
+	r->wlen = md->len;
+	r->word = md->str - (sfx ? md->len : 0);
     }
-    /* Path suffix. */
-    if (m->psuf) {
-	inststrlen(m->psuf, 1, (l = strlen(m->psuf)));
-	r += l;
-    }
-    /* Re-insert the brace end. */
-    if (brend && *brend) {
-	a = cs;
-	cs -= m->brsl;
-	ocs = brscs = cs;
-	l = strlen(brend);
-	inststrlen(brend, 1, l);
-	r += l;
-	cs = a + l;
-    } else
-	brscs = -1;
-    /* -S suffix */
-    if (m->suf) {
-	inststrlen(m->suf, 1, (l = strlen(m->suf)));
-	r += l;
-    }
-    lastend = cs;
-    cs = ocs;
     return r;
+}
+
+/* This tries to build a string matching a sub-string in a sub-cline
+ * that could not be matched otherwise. */
+
+static Cline
+join_sub(Cmdata md, char *str, int len, int *mlen, int sfx, int join)
+{
+    if (!check_cmdata(md, sfx)) {
+	char *ow = str, *nw = md->str;
+	int ol = len, nl = md->len;
+	Cmlist ms;
+	Cmatcher mp;
+	VARARR(unsigned char, ea, (ol > nl ? ol : nl) + 1);
+	int t;
+
+	if (sfx) {
+	    ow += ol; nw += nl;
+	}
+	for (t = 0, ms = bmatchers; ms && !t; ms = ms->next) {
+	    mp = ms->matcher;
+	    /* We use only those patterns that match a non-empty
+	     * string in both the line and the word and that have
+	     * no anchors. */
+	    if (!mp->flags && mp->wlen > 0 && mp->llen > 0) {
+		/* We first test, if the old string matches already the
+		 * new one. */
+		if (mp->llen <= ol && mp->wlen <= nl &&
+		    pattern_match(mp->line, ow - (sfx ? mp->llen : 0),
+				  NULL, ea) &&
+		    pattern_match(mp->word, nw - (sfx ? mp->wlen : 0),
+				  ea, NULL)) {
+		    /* It did, update the contents of the cmdata struct
+		     * and return a cline for the matched part. */
+		    if (sfx)
+			md->str -= mp->wlen;
+		    else
+			md->str += mp->wlen;
+		    md->len -= mp->wlen;
+		    *mlen = mp->llen;
+
+		    return get_cline(NULL, 0, ow - (sfx ? mp->llen : 0),
+				     mp->llen, NULL, 0, 0);
+		}
+		/* Otherwise we will try to build a string that matches
+		 * both strings. But try the pattern only if the word-
+		 * pattern matches one of the strings. */
+		if (join && mp->wlen <= ol && mp->wlen <= nl &&
+		    ((t = pattern_match(mp->word, ow - (sfx ? mp->wlen : 0),
+				       NULL, ea)) ||
+		     pattern_match(mp->word, nw - (sfx ? mp->wlen : 0),
+				   NULL, ea))) {
+		    VARARR(char, line, mp->llen + 1);
+		    int bl;
+
+		    /* Then build all the possible lines and see
+		     * if one of them matches the other string. */
+		    if ((bl = bld_line(mp->line, line, line,
+				       (t ? nw : ow), (t ? nl : ol),
+				       ea, sfx))) {
+			/* Yep, one of the lines matched the other
+			 * string. */
+			line[mp->llen] = '\0';
+
+			if (t) {
+			    ol = mp->wlen; nl = bl;
+			} else {
+			    ol = bl; nl = mp->wlen;
+			}
+			if (sfx)
+			    md->str -= nl;
+			else
+			    md->str += nl;
+			md->len -= nl;
+			*mlen = ol;
+
+			return get_cline(NULL, 0, dupstring(line), mp->llen,
+					 NULL, 0, CLF_JOIN);
+		    }
+		}
+	    }
+	}
+    }
+    return NULL;
+}
+
+/* This is used to match a sub-string in a sub-cline. The length of the
+ * matched portion is returned. This tests only for exact equality. */
+
+static int
+sub_match(Cmdata md, char *str, int len, int sfx)
+{
+    int ret = 0, l, ind, add;
+    char *p, *q;
+
+    if (sfx) {
+	str += len;
+	ind = -1; add = -1;
+    } else {
+	ind = 0; add = 1;
+    }
+    /* str and len describe the old string, in md we have the new one. */
+    while (len) {
+	if (check_cmdata(md, sfx))
+	    return ret;
+
+	for (l = 0, p = str, q = md->str;
+	     l < len && l < md->len && p[ind] == q[ind];
+	     l++, p += add, q += add);
+
+	if (l) {
+	    /* There was a common prefix, use it. */
+	    md->len -= l; len -= l;
+	    if (sfx) {
+		md->str -= l; str -= l;
+	    } else {
+		md->str += l; str += l;
+	    }
+	    ret += l;
+	} else if (md->line || md->len != md->olen || !md->astr)
+	    return ret;
+	else {
+	    /* We still have the line string to try. */
+	    md->line = 1;
+	    md->len = md->alen;
+	    md->str = md->astr;
+	}
+    }
+    return ret;
+}
+
+/* This is used to build a common prefix or suffix sub-list. If requested
+ * it returns the unmatched cline lists in orest and nrest. */
+
+static void
+join_psfx(Cline ot, Cline nt, Cline *orest, Cline *nrest, int sfx)
+{
+    Cline p = NULL, o, n;
+    struct cmdata md, omd;
+    char **sstr = NULL;
+    int len, join = 0, line = 0, *slen = NULL;
+
+    if (sfx) {
+	o = ot->suffix; n = nt->suffix;
+    } else {
+	o = ot->prefix;	n = nt->prefix;
+    }
+    if (!o) {
+	if (orest)
+	    *orest = NULL;
+	if (nrest)
+	    *nrest = n;
+
+	return;
+    }
+    if (!n) {
+	if (sfx)
+	    ot->suffix = NULL;
+	else
+	    ot->prefix = NULL;
+
+	if (orest)
+	    *orest = o;
+	else
+	    free_cline(o);
+	if (nrest)
+	    *nrest = NULL;
+	return;
+    }
+    md.cl = n;
+    md.len = 0;
+
+    /* Walk through the old list. */
+    while (o) {
+	join = 0;
+	memcpy(&omd, &md, sizeof(struct cmdata));
+
+	/* We first get the length of the prefix equal in both strings. */
+	if (o->flags & CLF_LINE) {
+	    if ((len = sub_match(&md, o->line, o->llen, sfx)) != o->llen) {
+		join = 1; line = 1; slen = &(o->llen); sstr = &(o->line);
+	    }
+	} else if ((len = sub_match(&md, o->word, o->wlen, sfx)) != o->wlen) {
+	    if (o->line) {
+		memcpy(&md, &omd, sizeof(struct cmdata));
+		o->flags |= CLF_LINE | CLF_DIFF;
+
+		continue;
+	    }
+	    join = 1; line = 0; slen = &(o->wlen); sstr = &(o->word);
+	}
+	if (join) {
+	    /* There is a rest that is different in the two lists,
+	     * we try to build a new cline matching both strings. */
+	    Cline joinl;
+	    int jlen;
+
+	    if ((joinl = join_sub(&md, *sstr + len, *slen - len,
+				  &jlen, sfx, !(o->flags & CLF_JOIN)))) {
+		/* We have one, insert it into the list. */
+		joinl->flags |= CLF_DIFF;
+		if (len + jlen != *slen) {
+		    Cline rest;
+
+		    rest = get_cline(NULL, 0, *sstr + (sfx ? 0 : len + jlen),
+				     *slen - len - jlen, NULL, 0, 0);
+
+		    rest->next = o->next;
+		    joinl->next = rest;
+		} else
+		    joinl->next = o->next;
+
+		if (len) {
+		    if (sfx)
+			*sstr += *slen - len;
+		    *slen = len;
+		    o->next = joinl;
+		} else {
+		    o->next = NULL;
+		    free_cline(o);
+		    if (p)
+			p->next = joinl;
+		    else if (sfx)
+			ot->suffix = joinl;
+		    else
+			ot->prefix = joinl;
+		}
+		o = joinl;
+		join = 0;
+	    }
+	}
+	if (join) {
+	    /* We couldn't build a cline for a common string, so we
+	     * cut the list here. */
+	    if (len) {
+		Cline r;
+
+		if (orest) {
+		    if (line)
+			r = get_cline(o->line + len, *slen - len,
+				      NULL, 0, NULL, 0, o->flags);
+		    else
+			r = get_cline(NULL, 0, o->word + len, *slen - len,
+				      NULL, 0, o->flags);
+
+		    r->next = o->next;
+		    *orest = r;
+
+		    *slen = len;
+		    o->next = NULL;
+		} else {
+		    if (sfx)
+			*sstr += *slen - len;
+		    *slen = len;
+		    free_cline(o->next);
+		    o->next = NULL;
+		}
+	    } else {
+		if (p)
+		    p->next = NULL;
+		else if (sfx)
+		    ot->suffix = NULL;
+		else
+		    ot->prefix = NULL;
+
+		if (orest)
+		    *orest = o;
+		else
+		    free_cline(o);
+	    }
+	    if (!orest || !nrest)
+		ot->flags |= CLF_MISS;
+
+	    if (nrest)
+		*nrest = undo_cmdata(&md, sfx);
+
+	    return;
+	}
+	p = o;
+	o = o->next;
+    }
+    if (md.len || md.cl)
+	ot->flags |= CLF_MISS;
+    if (orest)
+	*orest = NULL;
+    if (nrest)
+	*nrest = undo_cmdata(&md, sfx);
+}
+
+/* This builds the common prefix and suffix for a mid-cline -- the one
+ * describing the place where the prefix and the suffix meet. */
+
+static void
+join_mid(Cline o, Cline n)
+{
+    if (o->flags & CLF_JOIN) {
+	/* The JOIN flag is set in the old cline struct if it was
+	 * already joined with another one. In this case the suffix
+	 * field contains the suffix from previous calls. */
+	Cline nr;
+
+	join_psfx(o, n, NULL, &nr, 0);
+
+	n->suffix = revert_cline(nr);
+
+	join_psfx(o, n, NULL, NULL, 1);
+    } else {
+	/* This is the first time for both structs, so the prefix field
+	 * contains the whole sub-list. */
+	Cline or, nr;
+
+	o->flags |= CLF_JOIN;
+
+	/* We let us give both rests and use them as the suffixes. */
+	join_psfx(o, n, &or, &nr, 0);
+
+	if (or)
+	    or->llen = (o->slen > or->wlen ? or->wlen : o->slen);
+	o->suffix = revert_cline(or);
+	n->suffix = revert_cline(nr);
+
+	join_psfx(o, n, NULL, NULL, 1);
+    }
+    n->suffix = NULL;
+}
+
+/* This simplifies the cline list given as the first argument so that
+ * it also matches the second list. */
+
+static Cline
+join_clines(Cline o, Cline n)
+{
+    /* First time called, just return the new list. On further invocations
+     * we will get it as the first argument. */
+    if (!o)
+	return n;
+    else {
+	Cline oo = o, nn = n, po = NULL, pn = NULL;
+
+	/* Walk through the lists. */
+	while (o && n) {
+	    /* If one of them describes a new part and the other one does
+	     * not, synchronise them by searching an old part in the
+	     * other list. */
+	    if ((o->flags & CLF_NEW) && !(n->flags & CLF_NEW)) {
+		Cline t, tn;
+
+		for (t = o; (tn = t->next) && (tn->flags & CLF_NEW); t = tn);
+		if (tn && cmp_anchors(tn, n, 0)) {
+		    Cline tmp;
+
+		    tmp = o->prefix;
+		    o->prefix = tn->prefix;
+		    tn->prefix = tmp;
+
+		    if (po)
+			po->next = tn;
+		    else
+			oo = tn;
+		    t->next = NULL;
+		    free_cline(o);
+		    o = tn;
+		    o->flags |= CLF_MISS;
+		    continue;
+		}
+	    }
+	    if (!(o->flags & CLF_NEW) && (n->flags & CLF_NEW)) {
+		Cline t, tn;
+
+		for (t = n; (tn = t->next) && (tn->flags & CLF_NEW); t = tn);
+		if (tn && cmp_anchors(o, tn, 0)) {
+		    Cline tmp;
+
+		    tmp = n->prefix;
+		    n->prefix = tn->prefix;
+		    tn->prefix = tmp;
+
+		    n = tn;
+		    o->flags |= CLF_MISS;
+		    continue;
+		}
+	    }
+	    /* Almost the same as above, but for the case that they
+	     * describe different types of parts (prefix, suffix, or mid). */
+	    if ((o->flags & (CLF_SUF | CLF_MID)) !=
+		(n->flags & (CLF_SUF | CLF_MID))) {
+		Cline t, tn;
+
+		for (t = n;
+		     (tn = t->next) &&
+			 (tn->flags & (CLF_SUF | CLF_MID)) !=
+			 (o->flags  & (CLF_SUF | CLF_MID));
+		     t = tn);
+		if (tn && cmp_anchors(o, tn, 1)) {
+		    n = tn;
+		    continue;
+		}
+		for (t = o;
+		     (tn = t->next) &&
+			 (tn->flags & (CLF_SUF | CLF_MID)) !=
+			 (n->flags  & (CLF_SUF | CLF_MID));
+		     t = tn);
+		if (tn && cmp_anchors(tn, n, 1)) {
+		    if (po)
+			po->next = tn;
+		    else
+			oo = tn;
+		    t->next = NULL;
+		    free_cline(o);
+		    o = tn;
+		    continue;
+		}
+		if (o->flags & CLF_MID) {
+		    o->flags = (o->flags & ~CLF_MID) | (n->flags & CLF_SUF);
+		    if (n->flags & CLF_SUF) {
+			free_cline(o->prefix);
+			o->prefix = NULL;
+		    } else {
+			free_cline(o->suffix);
+			o->suffix = NULL;
+		    }
+		}
+		break;
+	    }
+	    /* Now see if they have matching anchors. If not, cut the list. */
+	    if (!(o->flags & CLF_MID) && !cmp_anchors(o, n, 1)) {
+		Cline t, tn;
+
+		for (t = n; (tn = t->next) && !cmp_anchors(o, tn, 1); t = tn);
+
+		if (tn) {
+		    n = tn;
+		    continue;
+		} else {
+		    if (o->flags & CLF_SUF)
+			break;
+
+		    o->word = o->line = o->orig = NULL;
+		    o->wlen = 0;
+		    free_cline(o->next);
+		    o->next = NULL;
+		}
+	    }
+	    /* Ok, they are equal, now join the sub-lists. */
+	    if (o->flags & CLF_MID)
+		join_mid(o, n);
+	    else
+		join_psfx(o, n, NULL, NULL, (o->flags & CLF_SUF));
+
+	    po = o;
+	    o = o->next;
+	    pn = n;
+	    n = n->next;
+	}
+	/* Free the rest of the old list. */
+	if (o) {
+	    if (po)
+		po->next = NULL;
+	    else
+		oo = NULL;
+
+	    free_cline(o);
+	}
+	free_cline(nn);
+
+	return oo;
+    }
+}
+
+/* This adds all the data we have for a match. */
+
+static Cmatch
+add_match_data(int alt, char *str, Cline line,
+	       char *ipre, char *ripre, char *isuf,
+	       char *pre, char *prpre, char *ppre, char *psuf, char *suf,
+	       int bpl, int bsl, int flags, int exact)
+{
+    Cmatch cm;
+    Aminfo ai = (alt ? fainfo : ainfo);
+    int palen = 0, salen = 0, ipl = 0, pl = 0, ppl = 0, isl = 0, psl = 0;
+
+    DPUTS(!line, "BUG: add_match_data() without cline");
+
+    /* If there is a path suffix, we build a cline list for it and
+     * append it to the list for the match itself. */
+    if (psuf)
+	salen = (psl = strlen(psuf));
+    if (isuf)
+	salen += (isl = strlen(isuf));
+
+    if (salen) {
+	char *asuf = (char *) zhalloc(salen);
+	Cline pp, p, s;
+
+	if (psl)
+	    memcpy(asuf, psuf, psl);
+	if (isl)
+	    memcpy(asuf + psl, isuf, isl);
+
+	s = bld_parts(asuf, salen, salen, NULL);
+
+	for (pp = NULL, p = line; p->next; pp = p, p = p->next);
+
+	if (!(p->flags & (CLF_SUF | CLF_MID)) &&
+	    !p->llen && !p->wlen && !p->olen) {
+	    if (p->prefix) {
+		Cline q;
+
+		for (q = p->prefix; q->next; q = q->next);
+		q->next = s->prefix;
+		s->prefix = p->prefix;
+		p->prefix = NULL;
+	    }
+	    free_cline(p);
+	    if (pp)
+		pp->next = s;
+	    else
+		line = s;
+	} else
+	    p->next = s;
+    }
+    /* And the same for the prefix. */
+    if (ipre)
+	palen = (ipl = strlen(ipre));
+    if (pre)
+	palen += (pl = strlen(pre));
+    if (ppre)
+	palen += (ppl = strlen(ppre));
+
+    if (palen) {
+	char *apre = (char *) zhalloc(palen);
+	Cline p, lp;
+
+	if (ipl)
+	    memcpy(apre, ipre, ipl);
+	if (pl)
+	    memcpy(apre + ipl, pre, pl);
+	if (ppl)
+	    memcpy(apre + ipl + pl, ppre, ppl);
+
+	p = bld_parts(apre, palen, palen, &lp);
+	if (lp->prefix && !(line->flags & (CLF_SUF | CLF_MID))) {
+	    lp->prefix->next = line->prefix;
+	    line->prefix = lp->prefix;
+	    lp->prefix = NULL;
+
+	    free_cline(lp);
+
+	    if (p != lp) {
+		Cline q;
+
+		for (q = p; q->next != lp; q = q->next);
+
+		q->next = line;
+		line = p;
+	    }
+	} else {
+	    lp->next = line;
+	    line = p;
+	}
+    }
+    /* Then build the unambiguous cline list. */
+    ai->line = join_clines(ai->line, line);
+
+    mnum++;
+    ai->count++;
+    
+    /* Allocate and fill the match structure. */
+    cm = (Cmatch) zhalloc(sizeof(struct cmatch));
+    cm->str = str;
+    cm->ppre = (ppre && *ppre ? ppre : NULL);
+    cm->psuf = (psuf && *psuf ? psuf : NULL);
+    cm->prpre = ((flags & CMF_FILE) && prpre && *prpre ? prpre : NULL);
+    cm->ipre = (ipre && *ipre ? ipre : NULL);
+    cm->ripre = (ripre && *ripre ? ripre : NULL);
+    cm->isuf = (isuf && *isuf ? isuf : NULL);
+    cm->pre = pre;
+    cm->suf = suf;
+    cm->flags = flags;
+    cm->brpl = bpl;
+    cm->brsl = bsl;
+    cm->rems = cm->remf = NULL;
+    addlinknode((alt ? fmatches : matches), cm);
+
+    /* One more match for this explanation. */
+    if (expl) {
+	if (alt)
+	    expl->fcount++;
+	else
+	    expl->count++;
+    }
+    if (!ai->firstm)
+	ai->firstm = cm;
+
+    /* Do we have an exact match? More than one? */
+    if (exact) {
+	if (!ai->exact) {
+	    ai->exact = 1;
+	    if (incompfunc) {
+		/* If a completion widget is active, we make the exact
+		 * string available in `compstate'. */
+
+		int sl = strlen(str);
+		int lpl = (cm->ppre ? strlen(cm->ppre) : 0);
+		int lsl = (cm->psuf ? strlen(cm->psuf) : 0);
+		char *e;
+
+		zsfree(compexactstr);
+		compexactstr = e = (char *) zalloc(lpl + sl + lsl + 1);
+		if (cm->ppre) {
+		    strcpy(e, cm->ppre);
+		    e += lpl;
+		}
+		strcpy(e, str);
+		e += sl;
+		if (cm->psuf)
+		    strcpy(e, cm->psuf);
+		comp_setunsetptr(CP_EXACTSTR, 0);
+	    }
+	    ai->exactm = cm;
+	} else {
+	    ai->exact = 2;
+	    ai->exactm = NULL;
+	    if (incompfunc)
+		comp_setunsetptr(0, CP_EXACTSTR);
+	}
+    }
+    return cm;
 }
 
 /* This is used by compadd to add a couple of matches. The arguments are
@@ -4032,16 +3404,16 @@ instmatch(Cmatch m)
 
 /**/
 int
-addmatches(char *ipre, char *ppre, char *psuf, char *prpre, char *pre,
+addmatches(char *ipre, char *isuf,
+	   char *ppre, char *psuf, char *prpre, char *pre,
 	   char *suf, char *group, char *rems, char *remf, char *ign,
 	   int flags, int aflags, Cmatcher match, char *exp, char **argv)
 {
-    char *s, *t, *e, *me, *ms, *lipre = NULL, *lpre = NULL, *lsuf = NULL;
+    char *s, *ms, *lipre = NULL, *lisuf = NULL, *lpre = NULL, *lsuf = NULL;
     char **aign = NULL;
-    int lpl, lsl, i, pl, sl, test, bpl, bsl, llpl = 0, llsl = 0, nm = mnum;
-    Aminfo ai = NULL;
+    int lpl, lsl, pl, sl, bpl, bsl, llpl = 0, llsl = 0, nm = mnum;
+    int oisalt = 0, isalt, isexact;
     Cline lc = NULL;
-    LinkList l = NULL;
     Cmatch cm;
     struct cmlist mst;
     Cmlist oms = mstack;
@@ -4080,6 +3452,7 @@ addmatches(char *ipre, char *ppre, char *psuf, char *prpre, char *pre,
 	     * to perform matching. */
 	    if (aflags & CAF_MATCH) {
 		lipre = dupstring(compiprefix);
+		lisuf = dupstring(compisuffix);
 		lpre = dupstring(compprefix);
 		lsuf = dupstring(compsuffix);
 		llpl = strlen(lpre);
@@ -4091,16 +3464,18 @@ addmatches(char *ipre, char *ppre, char *psuf, char *prpre, char *pre,
 		    lpre += pl;
 		}
 		if (comppatmatch && *comppatmatch) {
+		    int is = (*comppatmatch == '*');
 		    char *tmp = (char *) zhalloc(2 + llpl + llsl);
 
 		    strcpy(tmp, lpre);
 		    tmp[llpl] = 'x';
-		    strcpy(tmp + llpl + 1, lsuf);
+		    strcpy(tmp + llpl + is, lsuf);
 
 		    tokenize(tmp);
 		    remnulargs(tmp);
 		    if (haswilds(tmp)) {
-			tmp[llpl] = Star;
+			if (is)
+			    tmp[llpl] = Star;
 			if ((cp = parsereg(tmp)))
 			    haspattern = 1;
 		    }
@@ -4111,6 +3486,10 @@ addmatches(char *ipre, char *ppre, char *psuf, char *prpre, char *pre,
 		ipre = (lipre ? dyncat(lipre, ipre) : dupstring(ipre));
 	    else if (lipre)
 		ipre = lipre;
+	    if (isuf)
+		isuf = (lisuf ? dyncat(lisuf, isuf) : dupstring(isuf));
+	    else if (lisuf)
+		isuf = lisuf;
 	    if (ppre) {
 		ppre = dupstring(ppre);
 		lpl = strlen(ppre);
@@ -4162,237 +3541,45 @@ addmatches(char *ipre, char *ppre, char *psuf, char *prpre, char *pre,
 		    begcmgroup("default", 0);
 		}
 		/* Select the set of matches. */
-		if (aflags & CAF_ALT) {
-		    l = fmatches;
-		    ai = fainfo;
-		} else {
-		    l = matches;
-		    ai = ainfo;
-		}
+		oisalt = (aflags & CAF_ALT);
+
 		if (remf) {
 		    remf = dupstring(remf);
 		    rems = NULL;
 		} else if (rems)
 		    rems = dupstring(rems);
-		/* Build the common -P prefix. */
-		if (ai->pprefix) {
-		    if (pre)
-			ai->pprefix[pfxlen(ai->pprefix, pre)] = '\0';
-		    else
-			ai->pprefix[0] = '\0';
-		} else
-		    ai->pprefix = dupstring(pre ? pre : "");
 	    }
 	    /* Walk through the matches given. */
 	    for (; (s = dupstring(*argv)); argv++) {
-		sl = pl = strlen(s);
-		lc = NULL;
-		ms = NULL;
+		sl = strlen(s);
 		bpl = brpl;
 		bsl = brsl;
+		isalt = oisalt;
 		if ((!psuf || !*psuf) && aign) {
 		    /* Do the suffix-test. If the match has one of the
 		     * suffixes from ign, we put it in the alternate set. */
 		    char **pt = aign;
 		    int filell;
 
-		    for (test = 1; test && *pt; pt++)
+		    for (isalt = 0; !isalt && *pt; pt++)
 			if ((filell = strlen(*pt)) < sl
 			    && !strcmp(*pt, s + sl - filell))
-			    test = 0;
-
-		    if (!test) {
-			l = fmatches;
-			ai = fainfo;
-		    } else {
-			l = matches;
-			ai = ainfo;
-		    }
+			    isalt = 1;
 		}
-		if (aflags & CAF_MATCH) {
-		    /* Do the matching. */
-		    if (cp) {
-			if ((test = domatch(s, cp, 0)))
-			    e = me = s + sl;
-			else
-			    continue;
-		    } else {
-			test = (sl >= llpl + llsl &&
-				strpfx(lpre, s) && strsfx(lsuf, s));
-			if (!test && mstack &&
-			    (ms = comp_match(lpre, lsuf, s,
-					     &lc, (aflags & CAF_QUOTE),
-					     &bpl, &bsl)))
-			    test = 1;
+		if (!(aflags & CAF_MATCH)) {
+		    ms = s;
+		    lc = bld_parts(s, sl, -1, NULL);
+		    isexact = 0;
+		} else if (!(ms = comp_match(lpre, lsuf, s, cp, &lc,
+					     (aflags & CAF_QUOTE),
+					     &bpl, &bsl, &isexact)))
+		    continue;
 
-			if (!test)
-			    continue;
-			pl = sl - llsl;
-			me = s + sl - llsl;
-			e = s + llpl;
-		    }
-		} else {
-		    e = s;
-		    me = s + sl;
-		    pl = sl;
-		}
-		/* Quoting? */
-		if (!(aflags & CAF_QUOTE)) {
-		    int tmp = me - s;
-
-		    s = quotename(s, &e, me, &tmp);
-		    me = s + tmp;
-		    sl = strlen(s);
-		}
-		/* The rest is almost the same as in addmatch(). */
-		if (!ms) {
-		    if (sl < ai->minlen)
-			ai->minlen = sl;
-		    if (!cp && !mstack && ai->firstm &&
-			(i = sfxlen(ai->firstm->str, s)) < ai->suflen)
-			ai->suflen = i;
-		}
-		t = s;
-		if (ppre)
-		    t = dyncat(ppre, t);
-		if (!cp && !ms && (mstack || psuf)) {
-		    int bl = ((aflags & CAF_MATCH) ? llpl : 0);
-		    Cline *clp = &lc, tlc;
-		    char *ss = dupstring(s), *ee = me + (ss - s);
-
-		    DPUTS(me < s || me > s + sl,
-			  "BUG: invalid end-pointer (me)");
-
-		    if (ppre && *ppre) {
-			*clp = tlc = getcline(NULL, 0, ppre, lpl, CLF_VAR);
-			clp = &(tlc->next);
-		    }
-		    if (bl) {
-			*clp = str_cline(ss, bl, &tlc);
-			clp = &(tlc->next);
-		    }
-		    if (ee != ss + sl) {
-			*clp = tlc = getcline(ss + bl, ee - ss - bl,
-					      NULL, 0, CLF_MID);
-			clp = &(tlc->next);
-			*clp = str_cline(ee, (ss + sl) - ee, &tlc);
-			clp = &(tlc->next);
-		    } else {
-			*clp = tlc = getcline(NULL, 0, ss + bl, sl - bl,
-					      CLF_END | CLF_VAR);
-			clp = &(tlc->next);
-		    }
-		    if (psuf && *psuf) {
-			*clp = tlc = getcline(NULL, 0, psuf, lsl,
-					      CLF_END | CLF_VAR);
-			clp = &(tlc->next);
-		    }
-		    *clp = NULL;
-		} else if (!cp && mstack) {
-		    Cline tlc;
-
-		    if (ppre && *ppre) {
-			tlc = getcline(NULL, 0, ppre, lpl, CLF_VAR);
-			tlc->next = lc;
-			lc = tlc;
-		    }
-		    if (psuf && *psuf) {
-			if (lc) {
-			    for (tlc = lc; tlc->next; tlc = tlc->next);
-			    tlc->next = getcline(NULL, 0, psuf, lsl,
-						 CLF_END | CLF_VAR);
-			} else
-			    lc = getcline(NULL, 0, psuf, lsl,
-					  CLF_END | CLF_VAR);
-		    }
-		}
-		if (ipre && *ipre) {
-		    Cline tlc = prepend_cline(ipre, lc);
-
-		    ai->noipre = 0;
-		    if (!ms && !mstack) {
-			if ((aflags & CAF_MATCH) || ai->icpl > pl)
-			    ai->icpl = pl;
-			if ((aflags & CAF_MATCH) || ai->icsl > lsl)
-			    ai->icsl = lsl;
-			if (ai->iaprefix)
-			    ai->iaprefix[pfxlen(ai->iaprefix, t)] = '\0';
-			else
-			    ai->iaprefix = dupstring(t);
-		    } else
-			ai->ilinecl = join_clines(ai->ilinecl, lc);
-		    if (ai->iprefix) {
-			if (strcmp(ipre, ai->iprefix))
-			    ai->iprefix = "";
-		    } else
-			ai->iprefix = dupstring(ipre);
-
-		    t = dyncat(ipre, t);
-		    lc = tlc;
-		} else
-		    ai->iprefix = "";
-		if (!ms && !mstack && !lc) {
-		    if ((aflags & CAF_MATCH) || ai->cpl > pl)
-			ai->cpl = pl;
-		    if ((aflags & CAF_MATCH) || ai->csl > lsl)
-			ai->csl = lsl;
-		    if (ai->aprefix)
-			ai->aprefix[pfxlen(ai->aprefix, t)] = '\0';
-		    else
-			ai->aprefix = dupstring(t);
-		} else
-		    ai->linecl = join_clines(ai->linecl, lc);
-
-		mnum++;
-		ai->count++;
-
-		/* Finally add the match. */
-		cm = (Cmatch) zhalloc(sizeof(struct cmatch));
-		cm->ppre = ppre;
-		cm->psuf = psuf;
-		cm->prpre = prpre;
-		cm->str = (ms ? ms : dupstring(s));
-		cm->ipre = cm->ripre = (ipre && *ipre ? ipre : NULL);
-		cm->pre = pre;
-		cm->suf = suf;
-		cm->flags = flags;
-		cm->brpl = bpl;
-		cm->brsl = bsl;
-		cm->remf = remf;
+		cm = add_match_data(isalt, ms, lc, ipre, ipre, isuf, pre, prpre,
+				    ppre, psuf, suf, bpl, bsl,
+				    flags, isexact);
 		cm->rems = rems;
-		addlinknode(l, cm);
-
-		if (exp) {
-		    if (l == matches)
-			expl->count++;
-		    else
-			expl->fcount++;
-		}
-		if (!ms) {
-		    if (!ai->firstm)
-			ai->firstm = cm;
-		    if (!cp && (aflags & CAF_MATCH) && !(e - (s + pl))) {
-			if (!ai->exact) {
-			    ai->exact = 1;
-			    zsfree(compexactstr);
-			    compexactstr = e = (char *) zalloc(lpl + sl + lsl + 1);
-			    if (ppre) {
-				strcpy(e, ppre);
-				e += lpl;
-			    }
-			    strcpy(e, s);
-			    e += sl;
-			    if (psuf)
-				strcpy(e, psuf);
-			    comp_setunsetptr(CP_EXACTSTR, 0);
-			} else {
-			    ai->exact = 2;
-			    cm = NULL;
-			    comp_setunsetptr(0, CP_EXACTSTR);
-			}
-			ai->exactm = cm;
-		    }
-		}
+		cm->remf = remf;
 	    }
 	    compnmatches = mnum;
 	    if (exp)
@@ -4419,16 +3606,11 @@ addmatches(char *ipre, char *ppre, char *psuf, char *prpre, char *pre,
 static void
 addmatch(char *s, char *t)
 {
-    int test = 0, sl = strlen(s), pl = rpl, cc = 0, isf = 0;
-    int mpl = 0, msl = 0, bpl = brpl, bsl = brsl;
-    char *e = NULL, *tt, *te, *ms = NULL;
-    Comp cp = patcomp;
+    int isfile = 0, isalt = 0, isexact, bpl = brpl, bsl = brsl;
+    char *ms = NULL, *tt;
     HashNode hn;
     Param pm;
-    LinkList l = matches;
-    Cmatch cm;
     Cline lc = NULL;
-    Aminfo ai = ainfo;
 
 /*
  * addwhat: -5 is for files,
@@ -4440,7 +3622,7 @@ addmatch(char *s, char *t)
  *          -3 is for executable command names.
  *          -2 is for anything unquoted
  *          -1 is for other file specifications
- *          (things with `~' of `=' at the beginning, ...).
+ *          (things with `~' or `=' at the beginning, ...).
  */
 
     /* Just to make the code cleaner */
@@ -4449,90 +3631,34 @@ addmatch(char *s, char *t)
 
     if (incompfunc)
 	s = dupstring(s);
-    e = s + sl;
-    if (!addwhat) {
-	test = 1;
-    } else if (addwhat == -1 || addwhat == -5 || addwhat == -6 ||
-	       addwhat == CC_FILES || addwhat == -7 || addwhat == -8) {
-	if (sl < fpl + fsl)
-	    return;
 
+    if (addwhat == -1 || addwhat == -5 || addwhat == -6 ||
+	addwhat == CC_FILES || addwhat == -7 || addwhat == -8) {
 	if ((addwhat == CC_FILES ||
 	     addwhat == -5) && !*psuf) {
 	    /* If this is a filename, do the fignore check. */
 	    char **pt = fignore;
-	    int filell;
+	    int filell, sl = strlen(s);
 
-	    for (test = 1; test && *pt; pt++)
-		if ((filell = strlen(*pt)) < sl
-		    && !strcmp(*pt, s + sl - filell))
-		    test = 0;
+	    for (isalt = 0; !isalt && *pt; pt++)
+		if ((filell = strlen(*pt)) < sl &&
+		    !strcmp(*pt, s + sl - filell))
+		    isalt = 1;
+	}
+	if (!(ms = comp_match(fpre, fsuf, s, filecomp, &lc,
+			      (addwhat == CC_FILES || addwhat == -6 ||
+			       addwhat == -5 || addwhat == -8),
+			      &bpl, &bsl, &isexact)))
+	    return;
 
-	    if (!test) {
-		l = fmatches;
-		ai = fainfo;
-	    }
-	}
-	pl = fpl;
-	if (addwhat == -5 || addwhat == -8) {
-	    test = 1;
-	    cp = filecomp;
-	    cc = cp || ispattern;
-	    e = s + sl - fsl;
-	    mpl = fpl; msl = fsl;
-	} else {
-	    if ((cp = filecomp)) {
-		if ((test = domatch(s, filecomp, 0))) {
-		    e = s + sl;
-		    cc = 1;
-		}
-	    } else {
-		e = s + sl - fsl;
-		if ((test = !strncmp(s, fpre, fpl)))
-		    if ((test = !strcmp(e, fsuf))) {
-			mpl = fpl; msl = fsl;
-		    }
-		if (!test && mstack &&
-		    (ms = comp_match(fpre, fsuf, s, &lc,
-				     (addwhat == CC_FILES ||
-				      addwhat == -6), &bpl, &bsl)))
-		    test = 1;
-		if (ispattern)
-		    cc = 1;
-	    }
-	}
-	if (test) {
-	    if (addwhat == -7 && !findcmd(s, 0))
-		return;
-	    isf = CMF_FILE;
-
-	    if (addwhat == CC_FILES || addwhat == -6 ||
-		addwhat == -5 || addwhat == -8) {
-		te = s + pl;
-		s = quotename(s, &e, te, &pl);
-		sl = strlen(s);
-	    } else if (!cc) {
-		s = dupstring(t = s);
-		e += s - t;
-	    }
-	    if (cc) {
-		tt = (char *)zhalloc(lppl + lpsl + sl + 1);
-		tt[0] = '\0';
-		if (lppre)
-		    strcpy(tt, lppre);
-		strcat(tt, s);
-		if (lpsuf)
-		    strcat(tt, lpsuf);
-		e += (tt - s);
-		untokenize(s = tt);
-		sl = strlen(s);
-	    }
-	}
+	if (addwhat == -7 && !findcmd(s, 0))
+	    return;
+	isfile = CMF_FILE;
     } else if (addwhat == CC_QUOTEFLAG || addwhat == -2  ||
 	      (addwhat == -3 && !(hn->flags & DISABLED)) ||
 	      (addwhat == -4 && (PM_TYPE(pm->flags) == PM_SCALAR) &&
-	       (tt = pm->gets.cfn(pm)) && *tt == '/')    ||
-	      (addwhat == -9 && !(hn->flags & PM_UNSET)) ||
+	       !pm->level && (tt = pm->gets.cfn(pm)) && *tt == '/')    ||
+	      (addwhat == -9 && !(hn->flags & PM_UNSET) && !pm->level) ||
 	      (addwhat > 0 &&
 	       ((!(hn->flags & PM_UNSET) &&
 		 (((addwhat & CC_ARRAYS)    &&  (hn->flags & PM_ARRAY))    ||
@@ -4541,7 +3667,8 @@ addmatch(char *s, char *t)
 		  ((addwhat & CC_SCALARS)   &&  (hn->flags & PM_SCALAR))   ||
 		  ((addwhat & CC_READONLYS) &&  (hn->flags & PM_READONLY)) ||
 		  ((addwhat & CC_SPECIALS)  &&  (hn->flags & PM_SPECIAL))  ||
-		  ((addwhat & CC_PARAMS)    && !(hn->flags & PM_EXPORTED)))) ||
+		  ((addwhat & CC_PARAMS)    && !(hn->flags & PM_EXPORTED))) &&
+		 !pm->level) ||
 		((( addwhat & CC_SHFUNCS)				  ||
 		  ( addwhat & CC_BUILTINS)				  ||
 		  ( addwhat & CC_EXTCMDS)				  ||
@@ -4551,211 +3678,23 @@ addmatch(char *s, char *t)
 		 (((addwhat & CC_DISCMDS) && (hn->flags & DISABLED)) ||
 		  ((addwhat & CC_EXCMDS)  && !(hn->flags & DISABLED)))) ||
 		((addwhat & CC_BINDINGS) && !(hn->flags & DISABLED))))) {
-	if (sl >= rpl + rsl || mstack || cp) {
-	    if (cp) {
-		test = domatch(s, patcomp, 0);
-		e = s + sl;
-	    } else {
-		e = s + sl - rsl;
-		if ((test = !strncmp(s, rpre, rpl)))
-		    if ((test = !strcmp(e, rsuf))) {
-			mpl = rpl; msl = rsl;
-		    }
-		if (!test && mstack &&
-		    (ms = comp_match(rpre, rsuf, s, &lc,
-				     (addwhat == CC_QUOTEFLAG), &bpl, &bsl)))
-		    test = 1;
-	    }
-	}
-	if (!test && sl < lpl + lsl && !mstack)
+	if (!(ms = comp_match(rpre, rsuf, s, patcomp, &lc,
+			      (addwhat == CC_QUOTEFLAG),
+			      &bpl, &bsl, &isexact)) &&
+	    !(ms = comp_match(lpre, lsuf, s, NULL, &lc,
+			      (addwhat == CC_QUOTEFLAG),
+			      &bpl, &bsl, &isexact)))
 	    return;
-	if (!test && lpre && lsuf) {
-	    e = s + sl - lsl;
-	    if ((test = !strncmp(s, lpre, lpl)))
-		if ((test = !strcmp(e, lsuf))) {
-		    mpl = lpl; msl = lsl;
-		}
-	    if (!test && mstack &&
-		(ms = comp_match(lpre, lsuf, s, &lc,
-				 (addwhat == CC_QUOTEFLAG), &bpl, &bsl)))
-		test = 1;
-	    pl = lpl;
-	}
-	if (addwhat == CC_QUOTEFLAG) {
-	    te = s + pl;
-	    s = quotename(s, &e, te, &pl);
-	    sl = strlen(s);
-	}
     }
-    if (!test)
+    if (!ms)
 	return;
-    if (!ms) {
-	if (sl < ai->minlen)
-	    ai->minlen = sl;
-	if (!mstack && !ispattern && ai->firstm &&
-	    (test = sfxlen(ai->firstm->str, s)) < ai->suflen)
-	    ai->suflen = test;
-    }
-
-    /* Generate the common -P prefix. */
-
-    if (ai->pprefix) {
-	if (curcc->prefix)
-	    ai->pprefix[pfxlen(ai->pprefix, curcc->prefix)] = '\0';
-	else
-	    ai->pprefix[0] = '\0';
-    } else
-	ai->pprefix = dupstring(curcc->prefix ? curcc->prefix : "");
-
-    /* Generate the prefix to insert for ambiguous completions. */
-    t = s;
-    if (lppre)
-	t = dyncat(lppre, t);
-    if (!ispattern && !ms && mstack) {
-	Cline *clp = &lc, tlc;
-	char *ss = dupstring(s), *ee = e + (ss - s);
-
-	DPUTS(e < s || e > s + sl, "BUG: invalid end-pointer (e)");
-
-	if (lppre && *lppre) {
-	    *clp = str_cline(lppre, strlen(lppre), &tlc);
-	    clp = &(tlc->next);
-	}
-	if (pl) {
-	    *clp = str_cline(ss, pl, &tlc);
-	    clp = &(tlc->next);
-	}
-	if (ee != ss + sl || (lpsuf && *lpsuf)) {
-	    *clp = tlc = getcline(ss + pl, (ee - ss) - pl, NULL, 0, CLF_MID);
-	    clp = &(tlc->next);
-	    if (ee != ss + sl) {
-		*clp = str_cline(ee, (ss + sl) - ee, &tlc);
-		clp = &(tlc->next);
-	    }
-	    if (lpsuf && *lpsuf) {
-		*clp = str_cline(lpsuf, strlen(lpsuf), &tlc);
-		clp = &(tlc->next);
-	    }
-	} else {
-	    *clp = tlc = getcline(NULL, 0, ss + pl, sl - pl,
-				  CLF_END | CLF_VAR);
-	    clp = &(tlc->next);
-	}
-	*clp = NULL;
-    }
-    if (ipre && *ipre) {
-	Cline tlc = prepend_cline(ipre, lc);
-
-	ai->noipre = 0;
-	if (!ms && !mstack) {
-	    ai->icpl = lppl + mpl;
-	    ai->icsl = lpsl + msl;
-	    if (ai->iaprefix)
-		ai->iaprefix[pfxlen(ai->iaprefix, t)] = '\0';
-	    else
-		ai->iaprefix = dupstring(t);
-	} else
-	    ai->ilinecl = join_clines(ai->ilinecl, lc);
-	if (ai->iprefix) {
-	    if (strcmp(ipre, ai->iprefix))
-		ai->iprefix = "";
-	} else
-	    ai->iprefix = dupstring(ipre);
-
-	t = dyncat(ipre, t);
-	lc = tlc;
-    } else
-	ai->iprefix = "";
-
-    if (!ms && !mstack) {
-	ai->cpl = lppl + mpl;
-	ai->csl = lpsl + msl;
-	if (ai->aprefix)
-	    ai->aprefix[pfxlen(ai->aprefix, t)] = '\0';
-	else
-	    ai->aprefix = dupstring(t);
-    } else
-	ai->linecl = join_clines(ai->linecl, lc);
-
-    mnum++;
-    ai->count++;
-
-    /* Allocate and fill the match structure. */
-    cm = (Cmatch) zhalloc(sizeof(struct cmatch));
-    if (ispattern) {
-	if (lpsuf && *lpsuf && strsfx(lpsuf, s)) {
-	    s[sl - lpsl] = '\0';
-	    cm->psuf = lpsuf;
-	} else
-	    cm->psuf = NULL;
-
-	if (lppre && *lppre && strpfx(lppre, s)) {
-	    s += lppl;
-	    cm->ppre = lppre;
-	    cm->prpre = (isf && prpre && *prpre ? prpre : NULL);
-	} else
-	    cm->ppre = cm->prpre = NULL;
-    } else {
-	cm->ppre = (lppre && *lppre ? lppre : NULL);
-	cm->psuf = (lpsuf && *lpsuf ? lpsuf : NULL);
-	cm->prpre = (isf && prpre && *prpre ? prpre : NULL);
-    }
-    cm->str = (ms ? ms : s);
-    cm->ipre = (ipre && *ipre ? ipre : NULL);
-    cm->ripre = (ripre && *ripre ? ripre : NULL);
-    if (incompfunc) {
-	cm->pre = dupstring(curcc->prefix);
-	cm->suf = dupstring(curcc->suffix);
-    } else {
-	cm->pre = curcc->prefix;
-	cm->suf = curcc->suffix;
-    }
-    cm->flags = mflags | isf;
-    cm->brpl = bpl;
-    cm->brsl = bsl;
-    cm->rems = cm->remf = NULL;
-    addlinknode(l, cm);
-
-    /* One more match for this explanation. */
-    if (expl) {
-	if (l == matches)
-	    expl->count++;
-	else
-	    expl->fcount++;
-    }
-    if (!ms) {
-	if (!ai->firstm)
-	    ai->firstm = cm;
-
-	/* Do we have an exact match? More than one? */
-	if (!ispattern && !(e - (s + pl))) {
-	    if (!ai->exact) {
-		ai->exact = 1;
-		if (incompfunc) {
-		    int lpl = (cm->ppre ? strlen(cm->ppre) : 0);
-		    int lsl = (cm->psuf ? strlen(cm->psuf) : 0);
-
-		    zsfree(compexactstr);
-		    compexactstr = e = (char *) zalloc(lpl + sl + lsl + 1);
-		    if (cm->ppre) {
-			strcpy(e, cm->ppre);
-			e += lpl;
-		    }
-		    strcpy(e, s);
-		    e += sl;
-		    if (cm->psuf)
-			strcpy(e, cm->psuf);
-		    comp_setunsetptr(CP_EXACTSTR, 0);
-		}
-	    } else {
-		ai->exact = 2;
-		cm = NULL;
-		if (incompfunc)
-		    comp_setunsetptr(0, CP_EXACTSTR);
-	    }
-	    ai->exactm = cm;
-	}
-    }
+    add_match_data(isalt, ms, lc, ipre, ripre, isuf, 
+		   (incompfunc ? dupstring(curcc->prefix) : curcc->prefix),
+		   prpre, 
+		   (isfile ? lppre : NULL),
+		   (isfile ? lpsuf : NULL),
+		   (incompfunc ? dupstring(curcc->suffix) : curcc->suffix),
+		   bpl, bsl, (mflags | isfile), isexact);
 }
 
 #ifdef HAVE_NIS_PLUS
@@ -5011,9 +3950,10 @@ gen_matches_files(int dirs, int execs, int all)
 			strcpy(p + o, psuf);
 
 			/* Do we have to use globbing? */
-			if (ispattern || (ns && comppatmatch && *comppatmatch)) {
+			if (ispattern ||
+			    (ns && comppatmatch && *comppatmatch)) {
 			    /* Yes, so append a `*' if needed. */
-			    if (ns) {
+			    if (ns && comppatmatch && *comppatmatch == '*') {
 				int tl = strlen(p);
 
 				p[tl] = Star;
@@ -5068,7 +4008,9 @@ docompletion(char *s, int lst, int incmd)
 		   ((isset(AUTOLIST) && !isset(BASHAUTOLIST)) ? 
 		    (isset(LISTAMBIGUOUS) ? 3 : 2) : 0) : 1);
 	zsfree(comppatmatch);
-	opm = comppatmatch = ztrdup(useglob ? "yes" : "");
+	opm = comppatmatch = ztrdup(useglob ? "*" : "");
+	zsfree(comppatinsert);
+	comppatinsert = ztrdup("menu");
 	zsfree(compforcelist);
 	compforcelist = ztrdup("");
 	haspattern = 0;
@@ -5173,7 +4115,7 @@ callcompfunc(char *s, char *fn)
 	compparameter = compredirect = "";
 	if (ispar)
 	    compcontext = (ispar == 2 ? "brace_parameter" : "parameter");
-	else if (inwhat == IN_MATH) {
+	else if (linwhat == IN_MATH) {
 	    if (insubscr) {
 		compcontext = "subscript";
 		if (varname) {
@@ -5195,7 +4137,7 @@ callcompfunc(char *s, char *fn)
 		compredirect = rdstr;
 	    set |= CP_REDIRECT;
 	} else
-	    switch (inwhat) {
+	    switch (linwhat) {
 	    case IN_ENV:
 		compcontext = "array_value";
 		compparameter = varname;
@@ -5263,20 +4205,20 @@ callcompfunc(char *s, char *fn)
 	zsfree(compprefix);
 	zsfree(compsuffix);
 	if (unset(COMPLETEINWORD)) {
-	    if (inwhat == IN_MATH)
+	    if (linwhat == IN_MATH)
 		tmp = s;
 	    else
-		tmp = quotename(s, NULL, NULL, NULL);
+		tmp = quotename(s, NULL);
 	    untokenize(tmp);
 	    compprefix = ztrdup(tmp);
 	    compsuffix = ztrdup("");
 	} else {
 	    char *ss = s + offs, sav;
 	    
-	    if (inwhat == IN_MATH)
+	    if (linwhat == IN_MATH)
 		tmp = s;
 	    else
-		tmp = quotename(s, &ss, NULL, NULL);
+		tmp = quotename(s, &ss);
 	    sav = *ss;
 	    *ss = '\0';
 	    untokenize(tmp);
@@ -5287,6 +4229,8 @@ callcompfunc(char *s, char *fn)
 	}
 	zsfree(compiprefix);
 	compiprefix = ztrdup("");
+	zsfree(compisuffix);
+	compisuffix = ztrdup("");
 	compcurrent = (usea ? (clwpos + 1 - aadd) : 0);
 	compnmatches = mnum;
 
@@ -5411,6 +4355,8 @@ makecomplist(char *s, int incmd, int lst)
     } else
 	compmatcher = 0;
 
+    linwhat = inwhat;
+
     /* Walk through the global matchers. */
     for (;;) {
 	bmatchers = NULL;
@@ -5432,16 +4378,14 @@ makecomplist(char *s, int incmd, int lst)
 	ainfo = (Aminfo) hcalloc(sizeof(struct aminfo));
 	fainfo = (Aminfo) hcalloc(sizeof(struct aminfo));
 
-	ainfo->minlen = ainfo->suflen = 
-	    fainfo->minlen = fainfo->suflen = 10000;
-	ainfo->noipre = fainfo->noipre= 1;
-
 	freecl = NULL;
 
 	if (!validlist)
 	    lastambig = 0;
 	amatches = 0;
 	mnum = 0;
+	unambig_mnum = -1;
+	isuf = NULL;
 	begcmgroup("default", 0);
 
 	ccused = newlinklist();
@@ -5529,9 +4473,9 @@ comp_str(int *ipl, int *pl, int untok)
 	ctokenize(ip);
 	remnulargs(ip);
     }
+    lp = strlen(p);
     ls = strlen(s);
     lip = strlen(ip);
-    lp = strlen(p);
     str = zhalloc(lip + lp + ls + 1);
     strcpy(str, ip);
     strcat(str, p);
@@ -5555,12 +4499,17 @@ makecomplistcall(Compctl cc)
 	HEAPALLOC {
 	    int ooffs = offs, lip, lp;
 	    char *str = comp_str(&lip, &lp, 0);
+	    char *oisuf = isuf;
 
+	    isuf = dupstring(compisuffix);
+	    ctokenize(isuf);
+	    remnulargs(isuf);
 	    offs = lip + lp;
 	    cc->refc++;
 	    ccont = 0;
 	    makecomplistor(cc, str, lincmd, lip, 0);
 	    offs = ooffs;
+	    isuf = oisuf;
 	    compnmatches = mnum;
 	} LASTALLOC;
     } SWITCHBACKHEAPS;
@@ -5591,7 +4540,11 @@ makecomplistctl(int flags)
 	    char *str = comp_str(&lip, &lp, 0), *t;
 	    char *os = cmdstr, **ow = clwords, **p, **q;
 	    int on = clwnum, op = clwpos;
+	    char *oisuf = isuf;
 
+	    isuf = dupstring(compisuffix);
+	    ctokenize(isuf);
+	    remnulargs(isuf);
 	    clwnum = arrlen(compwords);
 	    clwpos = compcurrent - 1;
 	    cmdstr = ztrdup(compwords[0]);
@@ -5607,6 +4560,7 @@ makecomplistctl(int flags)
 	    incompfunc = 2;
 	    ret = makecomplistglobal(str, !clwpos, COMP_COMPLETE, flags);
 	    incompfunc = 1;
+	    isuf = oisuf;
 	    offs = ooffs;
 	    compnmatches = mnum;
 	    zsfree(cmdstr);
@@ -5634,15 +4588,15 @@ makecomplistglobal(char *os, int incmd, int lst, int flags)
 
     ccont = CC_CCCONT;
 
-    if (inwhat == IN_ENV) {
+    if (linwhat == IN_ENV) {
         /* Default completion for parameter values. */
         cc = &cc_default;
-    } else if (inwhat == IN_MATH) {
+    } else if (linwhat == IN_MATH) {
         /* Parameter names inside mathematical expression. */
         cc_dummy.mask = CC_PARAMS;
 	cc = &cc_dummy;
 	cc_dummy.refc = 10000;
-    } else if (inwhat == IN_COND) {
+    } else if (linwhat == IN_COND) {
 	/* We try to be clever here: in conditions we complete option   *
 	 * names after a `-o', file names after `-nt', `-ot', and `-ef' *
 	 * and file names and parameter names elsewhere.                */
@@ -6206,9 +5160,10 @@ makecomplistflags(Compctl cc, char *s, int incmd, int compadd)
 
     if (ispattern) {
 	/* The word should be treated as a pattern, so compute the matcher. */
-	p = (char *)ncalloc(rpl + rsl + 2);
+	p = (char *) zhalloc(rpl + rsl + 2);
 	strcpy(p, rpre);
-	if (rpl && p[rpl - 1] != Star) {
+	if (rpl && p[rpl - 1] != Star &&
+	    (!comppatmatch || *comppatmatch == '*')) {
 	    p[rpl] = Star;
 	    strcpy(p + rpl + 1, rsuf);
 	} else
@@ -6294,9 +5249,10 @@ makecomplistflags(Compctl cc, char *s, int incmd, int compadd)
 
 	    /* We have to use globbing, so compute the pattern from *
 	     * the file prefix and suffix with a `*' between them.  */
-	    p = (char *)ncalloc((t2 = strlen(fpre)) + strlen(fsuf) + 2);
+	    p = (char *) zhalloc((t2 = strlen(fpre)) + strlen(fsuf) + 2);
 	    strcpy(p, fpre);
-	    if ((!t2 || p[t2 - 1] != Star) && *fsuf != Star)
+	    if ((!t2 || p[t2 - 1] != Star) && *fsuf != Star &&
+		(!comppatmatch || *comppatmatch == '*'))
 		p[t2++] = Star;
 	    strcpy(p + t2, fsuf);
 	    filecomp = parsereg(p);
@@ -6340,7 +5296,7 @@ makecomplistflags(Compctl cc, char *s, int incmd, int compadd)
 		opts[NULLGLOB] = 1;
 
 		addwhat = 0;
-		p = (char *)zhalloc(lpl + lsl + 3);
+		p = (char *) zhalloc(lpl + lsl + 3);
 		strcpy(p, lpre);
 		if (*lsuf != '*' && *lpre && lpre[lpl - 1] != '*')
 		    strcat(p, "*");
@@ -6888,9 +5844,9 @@ makecomplistflags(Compctl cc, char *s, int incmd, int compadd)
 void
 invalidatelist(void)
 {
-    if(showinglist == -2)
+    if (showinglist == -2)
 	listmatches();
-    if(validlist)
+    if (validlist)
 	freematches();
     lastambig = menucmp = validlist = showinglist = fromcomp = 0;
     menucur = NULL;
@@ -6930,7 +5886,7 @@ get_user_var(char *nam)
 		notempty = 0;
 	    } else {
 		notempty = 1;
-		if(*ptr == Meta)
+		if (*ptr == Meta)
 		    ptr++;
 	    }
 	    if (brk)
@@ -6939,7 +5895,7 @@ get_user_var(char *nam)
 	if (!brk || !count)
 	    return NULL;
 	*ptr = '\0';
-	aptr = uarr = (char **)ncalloc(sizeof(char *) * (count + 1));
+	aptr = uarr = (char **) zhalloc(sizeof(char *) * (count + 1));
 
 	while ((*aptr++ = (char *)ugetnode(arrlist)));
 	uarr[count] = NULL;
@@ -6952,7 +5908,7 @@ get_user_var(char *nam)
 	    return (incompfunc ? arrdup(arr) : arr);
 
 	if ((val = getsparam(nam))) {
-	    arr = (char **)ncalloc(2*sizeof(char *));
+	    arr = (char **) zhalloc(2*sizeof(char *));
 	    arr[0] = (incompfunc ? dupstring(val) : val);
 	    arr[1] = NULL;
 	}
@@ -7021,8 +5977,8 @@ makearray(LinkList l, int s, int *np, int *nlp)
     int n, nl = 0;
 
     /* Build an array for the matches. */
-    rp = ap = (Cmatch *)ncalloc(((n = countlinknodes(l)) + 1) *
-				sizeof(Cmatch));
+    rp = ap = (Cmatch *) ncalloc(((n = countlinknodes(l)) + 1) *
+				 sizeof(Cmatch));
 
     /* And copy them into it. */
     for (nod = firstnode(l); nod; incnode(nod))
@@ -7156,6 +6112,7 @@ dupmatch(Cmatch m)
     r->str = ztrdup(m->str);
     r->ipre = ztrdup(m->ipre);
     r->ripre = ztrdup(m->ripre);
+    r->isuf = ztrdup(m->isuf);
     r->ppre = ztrdup(m->ppre);
     r->psuf = ztrdup(m->psuf);
     r->prpre = ztrdup(m->prpre);
@@ -7272,6 +6229,7 @@ freematch(Cmatch m)
     zsfree(m->str);
     zsfree(m->ipre);
     zsfree(m->ripre);
+    zsfree(m->isuf);
     zsfree(m->ppre);
     zsfree(m->psuf);
     zsfree(m->pre);
@@ -7325,14 +6283,323 @@ freematches(void)
     }
 }
 
+/* Insert the given string into the command line.  If move is non-zero, *
+ * the cursor position is changed and len is the length of the string   *
+ * to insert (if it is -1, the length is calculated here).              */
+
+/**/
+static void
+inststrlen(char *str, int move, int len)
+{
+    if (!len || !str)
+	return;
+    if (len == -1)
+	len = strlen(str);
+    spaceinline(len);
+    strncpy((char *)(line + cs), str, len);
+    if (move)
+	cs += len;
+}
+
+/* This builds the unambiguous string. If ins is non-zero, it is
+ * immediatly inserted in the line. Otherwise csp is used to return
+ * the relative cursor position in the string returned. */
+
+static char *
+cline_str(Cline l, int ins, int *csp)
+{
+    Cline s;
+    int ocs = cs, ncs, pcs, pm, sm, d, b, i, j, li = 0;
+    int pl, sl, hasp, hass, ppos, spos, plen, slen;
+
+    ppos = spos = plen = slen = hasp = hass = 0;
+    pm = sm = d = b = pl = sl = -1;
+
+    /* Get the information about the brace beginning and end we have
+     * to re-insert. */
+    if (ins) {
+	if ((hasp = (brbeg && *brbeg))) {
+	    plen = strlen(brbeg); pl = brpl;
+	}
+	if ((hass = (brend && *brend))) {
+	    slen = strlen(brend); sl = we - wb - brsl - plen - slen + 1;
+	}
+	if (!pl) {
+	    inststrlen(brbeg, 1, -1);
+	    pl = -1; hasp = 0;
+	}
+	if (!sl) {
+	    inststrlen(brend, 1, -1);
+	    sl = -1; hass = 0;
+	}
+    }
+    /* Walk through the top-level cline list. */
+    while (l) {
+	if (pl >= 0)
+	    ppos = -1;
+	if (sl >= 0)
+	    spos = -1;
+	/* Insert the original string if no prefix. */
+	if (l->olen && !(l->flags & CLF_SUF) && !l->prefix) {
+	    inststrlen(l->orig, 1, l->olen);
+	    if (ins) {
+		li += l->olen;
+		if (pl >= 0 && li >= pl) {
+		    ppos = cs - (li - pl); pl = -1;
+		}
+		if (sl >= 0 && li >= sl) {
+		    spos = cs - (li - sl) - 1; sl = -1;
+		}
+	    }
+	} else {
+	    /* Otherwise insert the prefix. */
+	    for (s = l->prefix; s; s = s->next) {
+		pcs = cs;
+		if (s->flags & CLF_LINE)
+		    inststrlen(s->line, 1, s->llen);
+		else
+		    inststrlen(s->word, 1, s->wlen);
+		if (d < 0 && (s->flags & CLF_DIFF))
+		    d = cs;
+		if (ins) {
+		    li += s->llen;
+		    if (pl >= 0 && li >= pl) {
+			ppos = pcs + s->llen - (li - pl); pl = -1;
+		    }
+		    if (sl >= 0 && li >= sl) {
+			spos = pcs + s->llen - (li - sl) - 1; sl = -1;
+		    }
+		}
+	    }
+	}
+	/* Remember the position if this is the first prefix with
+	 * missing characters. */
+	if (pm < 0 && (l->flags & CLF_MISS) && !(l->flags & CLF_SUF))
+	    pm = cs;
+	pcs = cs;
+	/* Insert the anchor. */
+	if (l->flags & CLF_LINE)
+	    inststrlen(l->line, 1, l->llen);
+	else
+	    inststrlen(l->word, 1, l->wlen);
+	if (ins) {
+	    li += l->llen;
+	    if (pl >= 0 && li >= pl) {
+		ppos = pcs + l->llen - (li - pl); pl = -1;
+	    }
+	    if (sl >= 0 && li >= sl) {
+		spos = pcs + l->llen - (li - sl) - 1; sl = -1;
+	    }
+	}
+	/* Remember the cursor position for suffixes and mids. */
+	if (l->flags & CLF_MISS) {
+	    if (l->flags & CLF_MID)
+		b = cs;
+	    else if (sm < 0 && (l->flags & CLF_SUF))
+		sm = cs;
+	}
+	/* And now insert the suffix or the original string. */
+	if (l->olen && (l->flags & CLF_SUF) && !l->suffix) {
+	    pcs = cs;
+	    inststrlen(l->orig, 1, l->olen);
+	    if (ins) {
+		li += l->olen;
+		if (pl >= 0 && li >= pl) {
+		    ppos = pcs + l->olen - (li - pl); pl = -1;
+		}
+		if (sl >= 0 && li >= sl) {
+		    spos = pcs + l->olen - (li - sl) - 1; sl = -1;
+		}
+	    }
+	} else {
+	    int hp = 0, hs = 0;
+
+	    for (j = -1, i = 0, s = l->suffix; s; s = s->next) {
+		if (j < 0 && (s->flags & CLF_DIFF))
+		    j = i;
+		if (s->flags & CLF_LINE) {
+		    inststrlen(s->line, 0, s->llen);
+		    i += s->llen; pcs = cs + s->llen;
+		} else {
+		    inststrlen(s->word, 0, s->wlen);
+		    i += s->wlen; pcs = cs + s->wlen;
+		}
+		if (ins) {
+		    li += s->llen;
+		    if (pl >= 0 && li >= pl) {
+			hp = 1; ppos = pcs - (li - pl) - i; pl = -1;
+		    }
+		    if (sl >= 0 && li >= sl) {
+			hs = 1; spos = pcs - (li - sl) - i; sl = -1;
+		    }
+		}
+	    }
+	    if (hp)
+		ppos += i;
+	    if (hs)
+		spos += i;
+	    cs += i;
+	    if (d < 0 && j >= 0)
+		d = cs - j;
+	}
+	/* If we reached the right positions, re-insert the braces. */
+	if (ins) {
+	    if (hasp && ppos >= 0) {
+		i = cs;
+		cs = ppos;
+		inststrlen(brbeg, 1, plen);
+		cs = i + plen;
+		hasp = 0;
+	    }
+	    if (hass && spos >= 0) {
+		i = cs;
+		cs = spos;
+		inststrlen(brend, 1, slen);
+		cs = i + slen;
+		hass = 0;
+	    }
+	}
+	l = l->next;
+    }
+    if (pl >= 0)
+	inststrlen(brbeg, 1, plen);
+    if (sl >= 0)
+	inststrlen(brend, 1, slen);
+
+    /* This calculates the new cursor position. If we had a mid cline
+     * with missing characters, we take this, otherwise if we have a
+     * prefix with missing characters, we take that, the same for a
+     * suffix, and finally a place where the matches differ. */
+    ncs = (b >= 0 ? b : (pm >= 0 ? pm : (sm >= 0 ? sm : (d >= 0 ? d : cs))));
+
+    if (!ins) {
+	/* We always inserted the string in the line. If that was not
+	 * requested, we copy it and remove from the line. */
+	char *r = zalloc((i = cs - ocs) + 1);
+
+	memcpy(r, (char *) (line + ocs), i);
+	r[i] = '\0';
+	cs = ocs;
+	foredel(i);
+
+	*csp = ncs - ocs;
+
+	return r;
+    }
+    if (ncs >= ppos)
+	ncs += plen;
+    if (ncs > spos)
+	ncs += slen;
+
+    lastend = cs;
+    cs = ncs;
+
+    return NULL;
+}
+
+/* This is a utility function using the function above to allow access
+ * to the unambiguous string and cursor position via compstate. */
+
+/**/
+char *
+unambig_data(int *cp)
+{
+    static char *scache = NULL;
+    static int ccache;
+
+    if (mnum && ainfo) {
+	if (mnum != unambig_mnum) {
+	    zsfree(scache);
+	    scache = cline_str((ainfo->count ? ainfo->line : fainfo->line),
+			       0, &ccache);
+	}
+    } else {
+	zsfree(scache);
+	scache = ztrdup("");
+	ccache = 0;
+    }
+    unambig_mnum = mnum;
+    if (cp)
+	*cp = ccache + 1;
+
+    return scache;
+}
+
+/* Insert the given match. This returns the number of characters inserted.*/
+
+/**/
+static int
+instmatch(Cmatch m)
+{
+    int l, r = 0, ocs, a = cs;
+
+    /* Ignored prefix. */
+    if (m->ipre) {
+	inststrlen(m->ipre, 1, (l = strlen(m->ipre)));
+	r += l;
+    }
+    /* -P prefix. */
+    if (m->pre) {
+	inststrlen(m->pre, 1, (l = strlen(m->pre)));
+	r += l;
+    }
+    /* Path prefix. */
+    if (m->ppre) {
+	inststrlen(m->ppre, 1, (l = strlen(m->ppre)));
+	r += l;
+    }
+    /* The string itself. */
+    inststrlen(m->str, 1, (l = strlen(m->str)));
+    r += l;
+    ocs = cs;
+    /* Re-insert the brace beginning, if any. */
+    if (brbeg && *brbeg) {
+	cs = a + m->brpl + (m->pre ? strlen(m->pre) : 0);
+	l = strlen(brbeg);
+	brpcs = cs;
+	inststrlen(brbeg, 1, l);
+	r += l;
+	ocs += l;
+	cs = ocs;
+    }
+    /* Path suffix. */
+    if (m->psuf) {
+	inststrlen(m->psuf, 1, (l = strlen(m->psuf)));
+	r += l;
+    }
+    /* Re-insert the brace end. */
+    if (brend && *brend) {
+	a = cs;
+	cs -= m->brsl;
+	ocs = brscs = cs;
+	l = strlen(brend);
+	inststrlen(brend, 1, l);
+	r += l;
+	cs = a + l;
+    } else
+	brscs = -1;
+    /* -S suffix */
+    if (m->suf) {
+	inststrlen(m->suf, 1, (l = strlen(m->suf)));
+	r += l;
+    }
+    /* ignored suffix */
+    if (m->isuf) {
+	inststrlen(m->isuf, 1, (l = strlen(m->isuf)));
+	r += l;
+    }
+    lastend = cs;
+    cs = ocs;
+
+    return r;
+}
+
 /* Handle the case were we found more than one match. */
 
 /**/
 static void
 do_ambiguous(void)
 {
-    int p = (usemenu || haspattern), atend = (cs == we);
-
     menucmp = 0;
 
     /* If we have to insert the first match, call do_single().  This is *
@@ -7349,22 +6616,17 @@ do_ambiguous(void)
      * unambiguous prefix.                                               */
     lastambig = 1;
 
-    if (p) {
-	/* p is set if we are in a position to start using menu completion *
-	 * due to one of the menu completion options, or due to the        *
-	 * menu-complete-word command, or due to using GLOB_COMPLETE which *
-	 * does menu-style completion regardless of the setting of the     *
-	 * normal menu completion options.                                 */
+    if (usemenu || (haspattern && comppatinsert &&
+		    !strcmp(comppatinsert, "menu"))) {
+	/* We are in a position to start using menu completion due to one  *
+	 * of the menu completion options, or due to the menu-complete-    *
+	 * word command, or due to using GLOB_COMPLETE which does menu-    *
+	 * style completion regardless of the setting of the normal menu   *
+	 * completion options.                                             */
 	do_ambig_menu();
-    } else {
+    } else if (ainfo) {
+	int atend = (cs == we), oll = ll, la;
 	VARARR(char, oline, ll);
-	int sl = 0, oll = ll;
-	int ocs, pl = 0, l, lp, ls, la = 0;
-	char *ps;
-	Cline lc;
-
-	if (!ainfo)
-	    return;
 
 	/* Copy the line buffer to be able to easily test if it changed. */
 	memcpy(oline, line, ll);
@@ -7375,69 +6637,9 @@ do_ambiguous(void)
 	cs = wb;
 	foredel(we - wb);
 
-	/* Sort-of general case: we have an ambiguous completion, and aren't *
-	 * starting menu completion or doing anything really weird.  We need *
-	 * to insert any unambiguous prefix and suffix, if possible.         */
+	/* Now get the unambiguous string and insert it into the line. */
+	cline_str(ainfo->line, 1, NULL);
 
-	if (ainfo->iprefix && *ainfo->iprefix) {
-	    inststrlen(ainfo->iprefix, 1, -1);
-	    inststrlen(ainfo->pprefix, 1, -1);
-	    ps = ainfo->iaprefix;
-	    lc = ainfo->ilinecl;
-	    lp = ainfo->icpl;
-	    ls = ainfo->icsl;
-	} else {
-	    if (ainfo->noipre && ainfo->pprefix) {
-		pl = strlen(ainfo->pprefix);
-		inststrlen(ainfo->pprefix, 1, pl);
-	    }
-	    ps = ainfo->aprefix;
-	    lc = ainfo->linecl;
-	    lp = ainfo->cpl;
-	    ls = ainfo->csl;
-	}
-	if (lc) {
-	    if (!ps)
-		ps = "";
-	    if (lp) {
-		if (ls) {
-		    DPUTS(!ainfo->firstm, "BUG: merge without firtsm");
-		    if (ainfo->firstm->psuf)
-			merge_cline(lc, ps, lp,
-				    dyncat(ainfo->firstm->str,
-					   ainfo->firstm->psuf),
-				    ls, (sl = strlen(ainfo->firstm->psuf)));
-		    else
-			merge_cline(lc, ps, lp, ainfo->firstm->str, ls, 0);
-		} else
-		    merge_cline(lc, ps, lp, NULL, 0, 0);
-	    }
-	    inst_cline(lc, pl, sl);
-	} else {
-	    inststrlen(ps, 1, -1);
-	    ocs = cs;
-	    if (brbeg && *brbeg) {
-		cs = wb + brpl + pl;
-		l = strlen(brbeg);
-		inststrlen(brbeg, 1, l);
-		ocs += l;
-		cs = ocs;
-	    }
-	    if(ainfo->suflen && !atend) {
-		DPUTS(!ainfo->firstm, "BUG: suffix without firstm");
-		inststrlen(ainfo->firstm->str +
-			   strlen(ainfo->firstm->str) - ainfo->suflen, 1,
-			   ainfo->suflen);
-	    }
-	    if (ainfo->firstm && ainfo->firstm->psuf)
-		inststrlen(ainfo->firstm->psuf, 0, -1);
-	    if (brend && *brend) {
-		cs -= brsl;
-		inststrlen(brend, 1, -1);
-	    }
-	    lastend = cs;
-	    cs = ocs;
-	}
 	/* la is non-zero if listambiguous may be used. Copying and
 	 * comparing the line looks like BFI but it is the easiest
 	 * solution. Really. */
@@ -7451,8 +6653,7 @@ do_ambiguous(void)
 	fromcomp = ((isset(AUTOMENU) ? FC_LINE : 0) |
 		    ((atend && cs != lastend) ? FC_INWORD : 0));
 
-	/*
-	 * If the LIST_AMBIGUOUS option (meaning roughly `show a list only *
+	/* If the LIST_AMBIGUOUS option (meaning roughly `show a list only *
 	 * if the completion is completely ambiguous') is set, and some    *
 	 * prefix was inserted, return now, bypassing the list-displaying  *
 	 * code.  On the way, invalidate the list and note that we don't   *
@@ -7463,9 +6664,12 @@ do_ambiguous(void)
 	    invalidatelist();
 	    fromcomp = fc;
 	    lastambig = 0;
+	    clearlist = 1;
 	    return;
 	}
-    }
+    } else
+	return;
+
     /* At this point, we might want a completion listing.  Show the listing *
      * if it is needed.                                                     */
     if (isset(LISTBEEP))
@@ -7503,9 +6707,8 @@ ztat(char *nam, struct stat *buf, int ls)
 static void
 do_single(Cmatch m)
 {
-    int l;
+    int l, sr = 0;
     int havesuff = 0;
-
     char *str = m->str, *ppre = m->ppre, *psuf = m->psuf, *prpre = m->prpre;
 
     if (!prpre) prpre = "";
@@ -7553,7 +6756,7 @@ do_single(Cmatch m)
     } else {
 	/* There is no user-specified suffix, *
 	 * so generate one automagically.     */
-	if(m->ripre && (m->flags & CMF_PARBR)) {
+	if (m->ripre && (m->flags & CMF_PARBR)) {
 	    /*{{*/
 	    /* Completing a parameter in braces.  Add a removable `}' suffix. */
 	    inststrlen("}", 1, 1);
@@ -7561,48 +6764,20 @@ do_single(Cmatch m)
 	    if (menuwe)
 		menuend++;
 	}
-	if((m->flags & CMF_FILE) || (m->ripre && isset(AUTOPARAMSLASH))) {
+	if ((m->flags & CMF_FILE) || (m->ripre && isset(AUTOPARAMSLASH))) {
 	    /* If we have a filename or we completed a parameter name      *
 	     * and AUTO_PARAM_SLASH is set, lets see if it is a directory. *
 	     * If it is, we append a slash.                                */
-	    char *p;
 	    struct stat buf;
+	    char *p;
 
 	    /* Build the path name. */
-	    if (haspattern || ic || m->ripre) {
-		int ne = noerrs;
+	    p = (char *) zhalloc(strlen(prpre) + strlen(str) +
+				 strlen(psuf) + 3);
+	    sprintf(p, "%s%s%s", (prpre && *prpre) ? prpre : "./", str, psuf);
 
-		noerrs = 1;
-
-		if (m->ripre) {
-		    int pl = strlen(m->ripre);
-
-		    p = (char *) ncalloc(pl + strlen(str) + strlen(psuf) + 1);
-		    sprintf(p, "%s%s%s", m->ripre, str, psuf);
-		    if (pl && p[pl-1] == Inbrace)
-			strcpy(p+pl-1, p+pl);
-		} else if (ic) {
-		    p = (char *) ncalloc(strlen(ppre) + strlen(str) +
-					 strlen(psuf) + 2);
-		    sprintf(p, "%c%s%s%s", ic, ppre, str, psuf);
-		} else {
-		    p = (char *) ncalloc(strlen(ppre) + strlen(str) +
-					 strlen(psuf) + 1);
-		    sprintf(p, "%s%s%s", ppre, str, psuf);
-		}
-		parsestr(p);
-		if (ic)
-		    *p = ic;
-		singsub(&p);
-
-		noerrs = ne;
-	    } else {
-		p = (char *) ncalloc(strlen(prpre) + strlen(str) +
-				     strlen(psuf) + 3);
-		sprintf(p, "%s%s%s", (prpre && *prpre) ? prpre : "./", str, psuf);
-	    }
 	    /* And do the stat. */
-	    if (!ztat(p, &buf, 0) && S_ISDIR(buf.st_mode)) {
+	    if (!(sr = ztat(p, &buf, 0)) && S_ISDIR(buf.st_mode)) {
 		/* It is a directory, so add the slash. */
 		havesuff = 1;
 		inststrlen("/", 1, 1);
@@ -7632,12 +6807,13 @@ do_single(Cmatch m)
 	    inststrlen(",", 1, 1);
 	    menuinsc++;
 	    makesuffix(1);
-	    if (menuwe && isset(AUTOPARAMKEYS))
+	    if ((!menucmp || menuwe) && isset(AUTOPARAMKEYS))
 		suffixlen[','] = suffixlen['}'] = 1;
 	}
-    } else if (!menucmp && !havesuff) {
+    } else if (!menucmp && !havesuff && (!(m->flags & CMF_FILE) || !sr)) {
 	/* If we didn't add a suffix, add a space, unless we are *
-	 * doing menu completion.                                */
+	 * doing menu completion or we are completing files and  *
+	 * the string doesn't name an existing file.             */
 	inststrlen(" ", 1, 1);
 	menuinsc++;
 	if (menuwe)
@@ -7680,7 +6856,7 @@ pfxlen(char *s, char *t)
 
 /* Return the length of the common suffix of s and t. */
 
-/**/
+#if 0
 static int
 sfxlen(char *s, char *t)
 {
@@ -7695,6 +6871,7 @@ sfxlen(char *s, char *t)
     } else
 	return 0;
 }
+#endif
 
 /* This is used to print the explanation string. *
  * It returns the number of lines printed.       */
@@ -7798,7 +6975,7 @@ listmatches(void)
 
 #ifdef DEBUG
     /* Sanity check */
-    if(!validlist) {
+    if (!validlist) {
 	showmsg("BUG: listmatches called with bogus list");
 	return;
     }
@@ -8199,7 +7376,7 @@ processcmd(void)
     inststr(" ");
     untokenize(s);
     HEAPALLOC {
-	inststr(quotename(s, NULL, NULL, NULL));
+	inststr(quotename(s, NULL));
     } LASTALLOC;
     zsfree(s);
     done = 1;

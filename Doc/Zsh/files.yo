@@ -20,6 +20,13 @@ commands are read from tt(/etc/zshrc) and then tt($ZDOTDIR/.zshrc).
 Finally, if the shell is a login shell, tt(/etc/zlogin) and
 tt($ZDOTDIR/.zlogin) are read.
 
+If the option tt(GLOBAL_RCS_FIRST) is set when the shell is invoked or in
+the file tt(/etc/zshenv), then all the applicable global startup files are
+read before all the users', so that the order becomes tt(/etc/zshenv)
+... tt(/etc/zlogin), tt($ZDOTDIR/.zshenv) ... tt($ZDOTDIR/.zlogin).
+After tt(/etc/zshenv) has been read, changing the option has no further
+effect.
+
 When a login shell exits, the files tt($ZDOTDIR/.zlogout) and then
 tt(/etc/zlogout) are read.  This happens with either an explicit exit
 via the tt(exit) or tt(logout) commands, or an implict exit by reading

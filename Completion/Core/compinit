@@ -71,11 +71,12 @@ typeset -A compconfig
 
 # Standard initialisation for `compconfig'.
 
-(( $# )) && compconfig[dump_file]="$1"
-[[ -z "$compconfig[dump_file]" ]] && compconfig[dump_file]="$0.dump"
+(( $# )) && compconfig[dumpfile]="$1"
+[[ -z "$compconfig[dumpfile]" ]] && compconfig[dumpfile]="$0.dump"
 
+compconfig[correct_accept]=2n
 compconfig[correct_prompt]='correct to:'
-
+compconfig[completer]=_complete
 
 # This function is used to register or delete completion functions. For
 # registering completion functions, it is invoked with the name of the
@@ -246,10 +247,10 @@ _i_done=''
 
 # If we have a dump file, load it.
 
-if [[ -f "$compconfig[dump_file]" ]]; then
-  read -rA _i_line < "$compconfig[dump_file]"
+if [[ -f "$compconfig[dumpfile]" ]]; then
+  read -rA _i_line < "$compconfig[dumpfile]"
   if [[ _i_autodump -eq 1 && $_i_line[2] -eq $#_i_files ]]; then
-    builtin . "$compconfig[dump_file]"
+    builtin . "$compconfig[dumpfile]"
     _i_done=yes
   fi
   unset _i_line

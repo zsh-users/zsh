@@ -757,25 +757,43 @@ run_init_scripts(void)
 	source(GLOBAL_ZSHENV);
 #endif
 	if (isset(RCS)) {
+	    int globalfirst = isset(GLOBALRCSFIRST);
+	    if (globalfirst) {
+#ifdef GLOBAL_ZPROFILE
+		if (islogin)
+		    source(GLOBAL_ZPROFILE);
+#endif
+#ifdef GLOBAL_ZSHRC
+		if (interact)
+		    source(GLOBAL_ZSHRC);
+#endif
+#ifdef GLOBAL_ZLOGIN
+		if (islogin)
+		    source(GLOBAL_ZLOGIN);
+#endif
+	    }
 	    if (unset(PRIVILEGED))
 		sourcehome(".zshenv");
 	    if (islogin) {
 #ifdef GLOBAL_ZPROFILE
-		source(GLOBAL_ZPROFILE);
+		if (!globalfirst)
+		    source(GLOBAL_ZPROFILE);
 #endif
 		if (unset(PRIVILEGED))
 		    sourcehome(".zprofile");
 	    }
 	    if (interact) {
 #ifdef GLOBAL_ZSHRC
-		source(GLOBAL_ZSHRC);
+		if (!globalfirst)
+		    source(GLOBAL_ZSHRC);
 #endif
 		if (unset(PRIVILEGED))
 		    sourcehome(".zshrc");
 	    }
 	    if (islogin) {
 #ifdef GLOBAL_ZLOGIN
-		source(GLOBAL_ZLOGIN);
+		if (!globalfirst)
+		    source(GLOBAL_ZLOGIN);
 #endif
 		if (unset(PRIVILEGED))
 		    sourcehome(".zlogin");

@@ -30,7 +30,7 @@
 #include "zle.mdh"
 #include "zle_move.pro"
 
-static vimarkcs[27], vimarkline[27];
+static int vimarkcs[27], vimarkline[27];
 
 /**/
 void

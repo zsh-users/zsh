@@ -1,6 +1,6 @@
 DISTFILES_SRC='
     .distfiles 
     _brace_parameter _command_names _condition _default _equal
-    _long_options _match_pattern _match_pattern.orig _match_test _parameter
+    _long_options _match_pattern _match_test _math _parameter
     _precommand _redirect _subscript _tilde _vars 
 '

@@ -1,0 +1,8 @@
+#autoload
+
+# This should be used to complete parameter names if you need some of the
+# extra options of compadd. It first tries to complete only non-local
+# parameters. All arguments are given to compadd.
+
+compadd "$@" - "${(@)${(@)${(@)${(@f)$(typeset)}:#*local *\=*}%%\=*}##* }" ||
+    compadd "$@" - "${(@)${(@)${(@f)$(typeset)}%%\=*}##* }"

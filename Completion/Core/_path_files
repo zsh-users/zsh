@@ -12,6 +12,14 @@
 # like files with one of the suffixes in the `fignore' array in normal
 # completion.
 #
+# This function supports one configuration key:
+#
+#  path_expand
+#    If this is set to a non-empty string, the partially typed path
+#    from the line will be expanded as far as possible even if trailing
+#    pathname components can not be completed.
+#
+#
 # This function uses the helper functions `_match_test' and `_match_pattern'.
 
 # First see if we should generate matches for the global matcher in use.
@@ -20,14 +28,17 @@ _match_test _path_files || return 1
 
 # Yes, so...
 
-local nm prepaths str linepath realpath donepath patstr prepath testpath rest
+local nm str linepath realpath donepath patstr prepath testpath rest
 local tmp1 collect tmp2 suffixes i ignore matchflags opt group sopt pats gopt
 local addpfx addsfx expl orig ostr nm=$compstate[nmatches] menu remsfx patlast
-local origflags mflags
+local origflags mflags tmp3 tmp4 exppaths
+
+typeset -U prepaths
 
 setopt localoptions nullglob rcexpandparam extendedglob
 unsetopt markdirs globsubst shwordsplit nounset
 
+exppaths=()
 prepaths=('')
 ignore=()
 group=()
@@ -102,7 +113,11 @@ fi
 # the prefix and the suffix. Then we see if we will do menucompletion.
 
 if [[ $#compstate[pattern_match] -ne 0 ]]; then
-  str="${PREFIX}*${SUFFIX}"
+  if [[ "${compstate[pattern_match]-*}" = \** ]]; then
+    str="${PREFIX}*${SUFFIX}"
+  else
+    str="${PREFIX}${SUFFIX}"
+  fi
 else
   str="${PREFIX:q}*${SUFFIX:q}"
   [[ "$str" = \\\~* ]] && str="$str[2,-1]"
@@ -200,7 +215,7 @@ origflags="$matchflags"
 # have special meaning for globbing, we remove them. But before that, we
 # add the pattern for matching any characters before a slash.
 
-patstr="$patstr:gs-/-*/-:gs/*.*./../:gs-/*.-/.-:gs/**/*/:gs-.*/-./-"
+patstr="$patstr:gs-/-*/-:gs/*.*./../:gs/**/*/:gs-.*/-./-"
 
 # We take the last pathname component from the pattern and store it in
 # `patlast', replacing `*'s in it with patterns that match any character
@@ -214,16 +229,16 @@ patstr="$patstr:gs-/-*/-:gs/*.*./../:gs-/*.-/.-:gs/**/*/:gs-.*/-./-"
 
 if [[ "$patstr" = */* ]]; then
   if [[ -n "$_comp_correct" && "${#orig##*/}" -le _comp_correct ]]; then
-    patlast="*/${origflags}${${patstr##*/}//\*/[^/]#}"
+    patlast="*/${origflags}${${${patstr##*/}//\*/[^/]#}:gs.\[^/]#.\\\*.}"
   else
-    patlast="*/${matchflags}${${patstr##*/}//\*/[^/]#}"
+    patlast="*/${matchflags}${${${patstr##*/}//\*/[^/]#}:gs.\[^/]#.\\\*.}"
   fi
   patstr="${patstr%/*}/"
 else
   if [[ -n "$_comp_correct" && "$#orig" -le _comp_correct ]]; then
-    patlast="${origflags}${patstr//\*/[^/]#}"
+    patlast="${origflags}${${patstr//\*/[^/]#}:gs.\[^/]#.\\\*.}"
   else
-    patlast="${matchflags}${patstr//\*/[^/]#}"
+    patlast="${matchflags}${${patstr//\*/[^/]#}:gs.\[^/]#.\\\*.}"
   fi
   patstr=""
 fi
@@ -234,7 +249,7 @@ fi
 # to `donepath'.
 
 while [[ "$orig" = */* ]] do
-  tmp1=( $realpath$donepath${orig%%/*}/${~matchflags}${~patstr#*/}$^pats )
+  tmp1=( $realpath$donepath${orig%%/*}/${~matchflags}${~patstr#*/}${^~pats} )
   tmp1=("${(@M)tmp1:#$~patlast}")
   [[ $#tmp1 -gt 0 && -e "$realpath$donepath${orig%%/*}" ]] || break
   donepath="$donepath${orig%%/*}/"
@@ -311,6 +326,24 @@ for prepath in "$prepaths[@]"; do
       # next `-W' path.
 
       if [[ $#collect -eq 0 ]]; then
+        # Before giving, we first try to get the longest expandable path-
+	# prefix, though. The result is stored in `exppaths'
+
+        tmp2=()
+	tmp3="$rest"
+	tmp4="${ostr##*/}"
+	ostr="${ostr%/*}"
+	while [[ "$tmp3" = */* ]]; do
+	  tmp2=( ${^tmp1}/${~mflags}${~tmp3} )
+	  if [[ $#tmp2 -eq 1 ]]; then
+	    exppaths=( "$exppaths[@]" "${tmp2[1]}${tmp4}" )
+	    exppaths=( "${(@)exppaths#${prepath}${realpath}}" )
+	    break;
+          fi
+	  tmp3="${tmp3%/*}"
+	  tmp4="${ostr##*/}/${tmp4}"
+	  ostr="${ostr%/*}"
+        done
         continue 2
       elif [[ $#collect -ne 1 ]]; then
         # If we have more than one possible match, this means that the
@@ -338,13 +371,14 @@ for prepath in "$prepaths[@]"; do
 
 	if [[ -n "$menu" ]]; then
           compadd -QU "$addpfx[@]" "$addsfx[@]" "$group[@]" "$expl[@]" \
-                  -i "$IPREFIX" -p "$linepath${testpath:q}" \
+                  -i "$IPREFIX" -I "$ISUFFIX" -p "$linepath${testpath:q}" \
 		  -s "/${ostr#*/}" \
 		  -W "$tmp1" -f "$ignore[@]" - "${(@)${(@)collect%%/*}:q}"
 	else
           for i in $collect; do
             compadd -QU "$addpfx[@]" "$addsfx[@]" "$group[@]" "$expl[@]" \
-	            -i "$IPREFIX" -p "$linepath${testpath:q}" -s "/${${i#*/}:q}" \
+	            -i "$IPREFIX" -I "$ISUFFIX" \
+                    -p "$linepath${testpath:q}" -s "/${${i#*/}:q}" \
 		    -M 'r:|/=*' -W "$tmp1" -f "$ignore[@]" - "${${i%%/*}:q}"
           done
 	fi
@@ -371,7 +405,8 @@ for prepath in "$prepaths[@]"; do
 
       if [[ $#tmp1 -ne $#tmp2 ]]; then
         compadd -QU "$addpfx[@]" -S '' "$group[@]" "$expl[@]" \
-                -i "$IPREFIX" -p "$linepath${testpath:q}" -s "/${ostr#*/}" \
+                -i "$IPREFIX" -I "$ISUFFIX" \
+                -p "$linepath${testpath:q}" -s "/${ostr#*/}" \
 		- "${${tmp1#${prepath}${realpath}${testpath}}:q}"
         continue 2
       fi
@@ -399,8 +434,11 @@ for prepath in "$prepaths[@]"; do
   suffixes=( $str$^pats )
   suffixes=( "${(@)suffixes:gs.**.*.}" )
   tmp2=( ${~tmp1}${~matchflags}${~suffixes} )
-  tmp2=("${(@M)tmp2:#$~patlast}")
-
+  if [[ "$tmp1" = */* && "$patlast" != \*/* ]]; then
+    tmp2=("${(@M)tmp2:#*${~patlast}}")
+  else
+    tmp2=("${(@M)tmp2:#$~patlast}")
+  fi
   if [[ $#tmp2 -eq 0 ]]; then
     # No match, insert the expanded path and add the original tail.
 
@@ -409,16 +447,28 @@ for prepath in "$prepaths[@]"; do
     [[ -n "$ostr" && -n "$linepath$testpath" ]] && ostr="/$ostr"
 
     # But only if something changed.
-    [[ "$linepath$testpath$ostr" = "$PREFIX$SUFFIX" ]] && return 1
+    [[ "${PREFIX}${SUFFIX}" = $linepath$testpath$ostr(|/) ]] && return 1
 
     compadd -QU -S '' "$group[@]" "$expl[@]" \
-            -i "$IPREFIX" -f - "$linepath${testpath:q}$ostr"
+            -i "$IPREFIX" -I "$ISUFFIX" -f - "$linepath${testpath:q}$ostr"
   else
     compadd -QU "$addpfx[@]" "$addsfx[@]" "$remsfx[@]" "$group[@]" "$expl[@]" \
-            -i "$IPREFIX" -p "$linepath${testpath:q}" -f "$ignore[@]" \
+            -i "$IPREFIX" -I "$ISUFFIX" \
+            -p "$linepath${testpath:q}" -f "$ignore[@]" \
 	    -W "$prepath$realpath$testpath" - "${(@)${(@)tmp2#$tmp1}:q}"
   fi
 done
+
+# If no matches were found but we have expanded paths which are different
+# from the original string, use them.
+
+exppaths=( "${(@)exppaths:#$orig}" )
+
+if [[ -n "$compconfig[path_expand]" &&
+      nm -eq compstate[nmatches] && $#exppaths -ne 0 ]]; then
+  compadd -UQ -S '' "$group[@]" "$expl[@]" -i "$IPREFIX" -I "$ISUFFIX" - \
+          "${linepath}${(@)^exppaths}"
+fi
 
 # This sets the return value to indicate that we added matches (or not).
 

@@ -2,7 +2,7 @@
 
 local list
 
-if [[ -iprefix '-' ]]; then
+if compset -P 1 -; then
   compgen -k "($signals[1,-3])"
 else
   local ret=1

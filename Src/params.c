@@ -2709,6 +2709,8 @@ printparamnode(HashNode hn, int printflags)
 	    printf("array ");
 	else if (p->flags & PM_HASHED)
 	    printf("association ");
+	if (p->level)
+	    printf("local ");
 	if (p->flags & PM_LEFT)
 	    printf("left justified %d ", p->ct);
 	if (p->flags & PM_RIGHT_B)

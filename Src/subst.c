@@ -702,7 +702,7 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int ssub)
     int spbreak = isset(SHWORDSPLIT) && !ssub && !qt;
     char *val = NULL, **aval = NULL;
     unsigned int fwidth = 0;
-    Value v;
+    Value v = NULL;
     int flags = 0;
     int flnum = 0;
     int sortit = 0, casind = 0;
@@ -1828,7 +1828,7 @@ modify(char **str, char **ptr)
 			    subst(&copy, hsubl, hsubr, gbal);
 			break;
 		    case 'q':
-			copy = bslashquote(copy, NULL, NULL, NULL, 0);
+			copy = bslashquote(copy, NULL, 0);
 			break;
 		    }
 		    tc = *tt;
@@ -1882,7 +1882,7 @@ modify(char **str, char **ptr)
 		    }
 		    break;
 		case 'q':
-		    *str = bslashquote(*str, NULL, NULL, NULL, 0);
+		    *str = bslashquote(*str, NULL, 0);
 		    break;
 		}
 	    }

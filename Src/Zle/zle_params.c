@@ -67,7 +67,9 @@ static struct zleparam {
         zleunsetfn, NULL },
     { "keys", PM_ARRAY | PM_READONLY, NULL, FN(get_keys),
         zleunsetfn, NULL },
-    { "NUMERIC", PM_INTEGER | PM_READONLY, FN(set_numeric), FN(get_numeric),
+    { "NUMERIC", PM_INTEGER, FN(set_numeric), FN(get_numeric),
+        zleunsetfn, NULL },
+    { "HISTNO", PM_INTEGER | PM_READONLY, NULL, FN(get_histno),
         zleunsetfn, NULL },
     { NULL, 0, NULL, NULL, NULL, NULL }
 };
@@ -260,4 +262,11 @@ static long
 get_numeric(Param pm)
 {
     return zmult;
+}
+
+/**/
+static long
+get_histno(Param pm)
+{
+    return histline;
 }

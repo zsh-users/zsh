@@ -391,7 +391,7 @@ zfpipe()
 
 /**/
 static void
-zfunalarm()
+zfunalarm(void)
 {
     if (oalremain) {
 	/*
@@ -670,7 +670,7 @@ zfgetline(char *ln, int lnsize, int tmout)
 
 /**/
 static int 
-zfgetmsg()
+zfgetmsg(void)
 {
     char line[256], *ptr, *verbose;
     int stopit, printing = 0, tmout;

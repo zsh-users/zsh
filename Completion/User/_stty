@@ -5,7 +5,7 @@ if [[ "$words[CURRENT-1]" = \
 then
      compadd -Q '^-' '^h' '^?' '^c' '^u'
 else
-  [[ -string '-' || -string '+' ]]
+  compset -P '[-+]'
   compadd rows columns intr quit erase kill eof eol \
     eol2 start stop susp dsusp reprint discard werase lnext \
     parenb parodd cs8 cstopb hupcl cread clocal parext \

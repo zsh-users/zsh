@@ -114,6 +114,7 @@ static struct optname optns[] = {
 {NULL, "flowcontrol",	      OPT_ALL,			 FLOWCONTROL},
 {NULL, "functionargzero",     OPT_EMULATE|OPT_NONBOURNE, FUNCTIONARGZERO},
 {NULL, "glob",		      OPT_ALL,			 GLOBOPT},
+{NULL, "globalrcsfirst",      0,			 GLOBALRCSFIRST},
 {NULL, "globassign",	      OPT_EMULATE|OPT_CSH,	 GLOBASSIGN},
 {NULL, "globcomplete",	      0,			 GLOBCOMPLETE},
 {NULL, "globdots",	      0,			 GLOBDOTS},
@@ -228,7 +229,7 @@ static short zshletters[LAST_OPT - FIRST_OPT + 1] = {
     /* > */  0,
     /* ? */  0,
     /* @ */  0,
-    /* A */  0,
+    /* A */  0,			/* use with set for arrays */
     /* B */ -BEEP,
     /* C */ -CLOBBER,
     /* D */  PUSHDTOHOME,
@@ -261,9 +262,9 @@ static short zshletters[LAST_OPT - FIRST_OPT + 1] = {
     /* _ */  0,
     /* ` */  0,
     /* a */  ALLEXPORT,
-    /* b */  0,
-    /* c */  0,
-    /* d */  0,
+    /* b */  0,			/* in non-Bourne shells, end of options */
+    /* c */  0,			/* command follows */
+    /* d */  GLOBALRCSFIRST,
     /* e */  ERREXIT,
     /* f */ -RCS,
     /* g */  HISTIGNORESPACE,
@@ -274,7 +275,7 @@ static short zshletters[LAST_OPT - FIRST_OPT + 1] = {
     /* l */  LOGINSHELL,
     /* m */  MONITOR,
     /* n */ -EXECOPT,
-    /* o */  0,
+    /* o */  0,			/* long option name follows */
     /* p */  PRIVILEGED,
     /* q */  0,
     /* r */  RESTRICTED,

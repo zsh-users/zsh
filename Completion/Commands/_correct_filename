@@ -45,7 +45,7 @@ fi
 if [[ -z $testcmd && -e "$file" ]] ||
   { [[ -n $testcmd ]] && whence "$file" >&/dev/null }; then
   if [[ -n $WIDGET ]]; then
-    compadd -QUf -i "$IPREFIX" "${file/#$etilde/$tilde}"
+    compadd -QUf -i "$IPREFIX" -I "$ISUFFIX" "${file/#$etilde/$tilde}"
     [[ -n "$compstate[insert]" ]] && compstate[insert]=menu
   else
     print "$file"
@@ -65,7 +65,7 @@ done
 (( $#trylist )) || return 1
 
 if [[ -n $WIDGET ]]; then
-  compadd -QUf -i "$IPREFIX" "${trylist[@]/#$etilde/$tilde}"
+  compadd -QUf -i "$IPREFIX" -I "$ISUFFIX" "${trylist[@]/#$etilde/$tilde}"
   [[ -n "$compstate[insert]" ]] && compstate[insert]=menu
 else
   print "$IPREFIX${^trylist[@]}"

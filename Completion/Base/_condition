@@ -3,7 +3,7 @@
 local prev="$words[CURRENT-1]"
 
 if [[ "$prev" = -o ]]; then
-  compgen -o -M 'L:|[nN][oO]= M:_= M:{A-Z}={a-z}'
+  _options
 elif [[ "$prev" = -([no]t|ef) ]]; then
   _files
 else

@@ -18,12 +18,14 @@ compexactstr
 compforcelist
 compinsert
 compiprefix
+compisuffix
 complist
 compmatcher
 compmatcherstr
 compmatchertot
 compnmatches
 compparameter
+comppatinsert
 comppatmatch
 comppms
 compprefix
@@ -48,3 +50,4 @@ makecomplistctlptr
 makecompparamsptr
 patcomps
 rembslash
+unambig_dataptr

@@ -7,4 +7,10 @@
 #   `(( compstate[nmatches] )) || compgen -nu -qS/'
 # below that.
 
-compgen -nu -qS/
+if [[ "$SUFFIX" = */* ]]; then
+  ISUFFIX="/${SUFFIX#*/}$ISUFFIX"
+  SUFFIX="${SUFFIX%%/*}"
+  compgen -nu -S ''
+else
+  compgen -nu -qS/
+fi

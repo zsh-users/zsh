@@ -45,7 +45,11 @@ fi
 # the original string in `orig'.
 
 if [[ $#compstate[pattern_match] -ne 0 ]]; then
-  patstr="${PREFIX}*${SUFFIX}*"
+  if [[ "${compstate[pattern_match]-*}" = \** ]]; then
+    str="${PREFIX}*${SUFFIX}*"
+  else
+    str="${PREFIX}${SUFFIX}"
+  fi
 else
   patstr="${PREFIX:q}*${SUFFIX:q}*"
 fi
@@ -145,7 +149,8 @@ if (( $#tmp1 )); then
   # found. Strings that have a separator will be added with a suffix.
 
   if [[ -z "$orig" && "$PREFIX$SUFFIX" != "$pref$orig" ]]; then
-    compadd -QU  "$group[@]" "$expl[@]" -i "$IPREFIX" -S '' - "${pref}${orig}"
+    compadd -QU  "$group[@]" "$expl[@]" -i "$IPREFIX" -I "$ISUFFIX" -S '' - \
+            "${pref}${orig}"
   elif [[ -n "$menu" ]]; then
     if [[ "$orig" = *${sep}* ]]; then
       orig="${sep}${orig#*${sep}}"
@@ -154,20 +159,21 @@ if (( $#tmp1 )); then
     fi
     for i in "$matches[@]" ; do
       if [[ "$i" = *${sep}* ]]; then
-        compadd -U "$group[@]" "$expl[@]" -i "$IPREFIX" \
+        compadd -U "$group[@]" "$expl[@]" -i "$IPREFIX" -I "$ISUFFIX" \
 	        -p "$pref" -s "$orig" - "${i%%${sep}*}${sep}"
       else
-        compadd -U "$group[@]" "$expl[@]" -i "$IPREFIX" \
+        compadd -U "$group[@]" "$expl[@]" -i "$IPREFIX" -I "$ISUFFIX" \
 	        -p "$pref" -s "$orig" - "${i%%${sep}*}"
       fi
     done
   else
     for i in "$matches[@]" ; do
       if [[ "$i" = *${sep}* ]]; then
-        compadd -U -i "$IPREFIX" -p "$pref" -s "${i#*${sep}}" \
+        compadd -U -i "$IPREFIX" -I "$ISUFFIX" -p "$pref" -s "${i#*${sep}}" \
 	        "$group[@]" "$expl[@]" -M "r:|${sep:q}=*" - "${i%%${sep}*}${sep}"
       else
-        compadd -U "$group[@]" "$expl[@]" -i "$IPREFIX" -p "$pref" - "$i"
+        compadd -U "$group[@]" "$expl[@]" -i "$IPREFIX" -I "$ISUFFIX" \
+                -p "$pref" - "$i"
       fi
     done
   fi
@@ -201,8 +207,8 @@ elif [[ "$patstr" = *${sep}* ]]; then
       # the completion code together with our prefix and the rest of
       # the string from the line as the suffix.
 
-      compadd -U "$group[@]" "$expl[@]" -S '' -i "$IPREFIX" -p "$pref" \
-              -s "${sep}${orig#*${sep}}" - "${(@)matches%%${sep}*}"
+      compadd -U "$group[@]" "$expl[@]" -S '' -i "$IPREFIX" -I "$ISUFFIX" \
+              -p "$pref" -s "${sep}${orig#*${sep}}" - "${(@)matches%%${sep}*}"
       return 0
     fi
 
@@ -218,7 +224,8 @@ elif [[ "$patstr" = *${sep}* ]]; then
   # Finally, add the unambiguous prefix and the rest of the string
   # from the line.
 
-  compadd -U "$group[@]" "$expl[@]" -S '' -i "$IPREFIX" -p "$pref" - "$orig"
+  compadd -U "$group[@]" "$expl[@]" -S '' -i "$IPREFIX" -I "$ISUFFIX" \
+          -p "$pref" - "$orig"
 fi
 
 # This sets the return value to indicate that we added matches (or not).

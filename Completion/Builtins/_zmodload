@@ -2,7 +2,7 @@
 
 local fl="$words[2]"
 
-if [[ "$fl" = -*(a*u|u*a)* || "$fl" = -*a* && -position 4 -1 ]]; then
+if [[ "$fl" = -*(a*u|u*a)* || "$fl" = -*a* && CURRENT -ge 4 ]]; then
   compgen -B
 elif [[ "$fl" = -*u* ]]; then
   compgen -s '$(zmodload)'

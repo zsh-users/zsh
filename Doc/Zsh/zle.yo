@@ -158,6 +158,10 @@ vindex(NUMERIC)
 item(tt(NUMERIC) (integer))(
 The numeric argument.
 )
+vindex(HISTNO)
+item(tt(HISTNO) (integer))(
+The current history number.
+)
 enditem()
 sect(Standard Widgets)
 cindex(widgets, standard)

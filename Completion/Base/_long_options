@@ -212,6 +212,7 @@ if [[ "$str" = *\=* ]]; then
   pat="${pre}*"
   patflags=''
   _match_pattern _long_options pat patflags
+
   [[ -n "$_comp_correct" ]] && patflags="$patflags(#a$_comp_correct)"
 
   # Then we walk through the array names. For each array we test if it 

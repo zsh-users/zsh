@@ -101,6 +101,8 @@ if [[ $# -le 1 || "$str" != *${2}* ]]; then
   _match_pattern _sep_parts test matchflags
   [[ -n "$_comp_correct" ]] && matchflags="$matchflags(#a$_comp_correct)"
 
+  [[ "${compstate[pattern_match]-*}" != \** ]] && test="$test:gs/*//"
+
   test="${matchflags}${test}"
   testarr=( "${(@M)${(@P)arr}:#${~test}*}" )
   testarr=( "${(@)testarr:#}" )
@@ -131,6 +133,9 @@ while [[ $# -gt 0 && "$str" == *${1}* ]]; do
   matchflags=""
   _match_pattern _sep_parts test matchflags
   [[ -n "$_comp_correct" ]] && matchflags="$matchflags(#a$_comp_correct)"
+
+  [[ "${compstate[pattern_match]-*}" != \** ]] && test="$test:gs/*//"
+
   test="${matchflags}${test}"
 
   # We incrementally add suffixes by appending to them the seperators
@@ -163,7 +168,7 @@ done
 # Add the matches for each of the suffixes.
 for i in "$suffixes[@]"; do
   compadd -U "$group[@]" "$expl[@]" "$matchers[@]" "$autosuffix[@]" \
-          -i "$IPREFIX" -p "$prefix" -s "$i" - "$testarr[@]"
+          -i "$IPREFIX" -I "$ISUFFIX" -p "$prefix" -s "$i" - "$testarr[@]"
 done
 
 # This sets the return value to indicate that we added matches (or not).

@@ -1,5 +1,9 @@
 #defcomp -brace-parameter-
 
-# Simple but without spiffy suffix handling: compgen -v -S '} '
-
-compadd -S '} ' -r '-:?#%+=[/'  - "${(@)${(@)${(@f)$(set)}%%\=*}:gs/'//}"
+if [[ "$SUFFIX" = *\}* ]]; then
+  ISUFFIX="${SUFFIX#*\}}$ISUFFIX"
+  SUFFIX="${SUFFIX%%\}*}"
+  _parameters -S '} ' -r '-:?#%+=[/'
+else
+  _parameters -S '} ' -r '-:?#%+=[/'
+fi

@@ -1,11 +1,10 @@
 #defcomp unsetopt
 
-local nm=$compstate[nmatches] ret=1
+# If you first want to complete only unset options, uncomment the lines
+# setting the _set_options  array and then use:
+#
+#   _set_options || _options
+#
+# here.
 
-compgen -M 'L:|[nN][oO]= M:_= M:{A-Z}={a-z}' \
-         -s '$({ unsetopt kshoptionprint; setopt } 2>/dev/null)' && ret=0
-
-[[ compstate[nmatches] -eq nm ]] &&
-    compgen -M 'L:|[nN][oO]= M:_= M:{A-Z}={a-z}' -o && ret=0
-
-return ret
+_options

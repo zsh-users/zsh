@@ -3,229 +3,56 @@
 # The main loop of the completion code. This is what is called when 
 # completion is attempted from the command line.
 #
-# This code will automatically try to correct the string on the line
-# based on the strings generated for the context if
-# `compconfig[correct]' is set and normal completion didn't yield any
-# matches. These corrected strings will be shown in a list and one can
-#cycle through them as in a menucompletion. To use this feature,
-#`compconfig[correct]' should be set to a number, specifying the 
-# maximum number of errors that should be accepted. If the string also
-# contains a `n' or `N', the code will use the numeric argument as the
-# maximum number of errors if a numeric argument was given. If no
-# numeric argument was given, the number from the value of
-# `compconfig[correct]' will be used. E.g. with `compconfig[correct]=2n'
-# two errors will be accepted, but if the user gives another number
-# with the numeric argument, this will be prefered. Also, with
-# `compconfig[correct]=0n',normally no automatic correction will be
-# tried, but if a numeric argument is given, automatic correction will
-# be used. Once the number of errors to accept is determined, the code
-# will repeatedly try to generate matches by allowing one error, two
-# errors, and so on. Independent of the number of errors the user
-# wants to accept, the code will allow only fewer errors than there
-# are characters in the string from the line.
-# The value of `compconfig[correct_orig]' is used to determine if the
-# original string should be included in the list (and thus be
-# presented to the user when cycling through the corrections). If it
-# is set to any non-empty value, the original string will be
-# offered. If it contains the sub-string `last', the original string
-# will apear as the last string when cycling through the corrections,
-# otherwise it will appear as the first one (so that the command line
-# does not change immediatly). Also, if the value of
-# `compconfig[correct_orig]' contains the sub-string `always', the
-# original string will always be included, whereas normally it is
-# included only if more than one possible correction was generated.
-# Finally, `compconfig[correct_prompt]' may be set to a string that
-# should be printed before the list of corrected strings when cycling
-# through them. This string may contain the control sequences `%n',
-# `%B', etc. known from the `-X' option of `compctl'. Also, the
-# sequence `%e' will be replaced by the number of errors accepted to
-# generate the corrected strings.
+# Configuration keys used:
+#
+#  completer
+#    This should be set to the names of the functions to generate the
+#    matches separated by colons. E.g. with
+#
+#      compconf completer=_complete:_correct:_approximate
+#
+#    the code will first try normal completion. If that doesn't yield
+#    any matches, correction is tried and if that doesn't yield
+#    anything either, correcting completion is attempted.
+#
+# These completer functions are only used when this function is called
+# without arguments. If arguments are given, they should be names of
+# completer functions which will then be called.
 
-local comp name _comp_correct _correct_prompt comax
+
+# If you want to complete only set or unset options for the unsetopt
+# and setopt builtin, un-comment these lines:
+#
+#   local _set_options _unset_options
+#
+#   _set_options=("${(@f)$({ unsetopt kshoptionprint; setopt } 2>/dev/null)}")
+#   _unset_options=("${(@f)$({ unsetopt kshoptionprint; unsetopt } 2>/dev/null)}")
+#
+# This is needed because completion function may set options locally
+# which makes the output of setopt and unsetopt reflect a different
+# state than the global one for which you are completing.
+
+
+local comp
 
 setopt localoptions nullglob rcexpandparam
 unsetopt markdirs globsubst shwordsplit nounset ksharrays
 
 # Special completion contexts after `~' and `='.
 
-if [[ -iprefix '=' ]]; then
+if compset -P 1 '\='; then
   compstate[context]=equal
-elif [[ "$PREFIX$SUFFIX" != */* && -iprefix '~' ]]; then
+elif [[ "$PREFIX" != */* && "$PREFIX[1]" = '~' ]]; then
+  compset -p 1
   compstate[context]=tilde
 fi
 
-# This is not an endless loop.
+# Get the names of the completers to use in the positional parameters.
 
-while true; do
+(( $# )) || set ${(s.:.)compconfig[completer]}
 
-  # An entry for `-first-' is the replacement for `compctl -T'
-  # Completion functions may set `_compskip' to any value to make the 
-  # main loops stop calling other completion functions.
+# And now just call the completer functions defined.
 
-  comp="$_comps[-first-]"
-  if [[ ! -z "$comp" ]]; then
-    "$comp"
-    if (( $+_compskip )); then
-      unset _compskip
-      return
-    fi
-  fi
-
-  # For arguments and command names we use the `_normal' function.
-
-  if [[ "$compstate[context]" = command ]]; then
-    _normal
-  else
-    # Let's see if we have a special completion definition for the other
-    # possible contexts.
-
-    comp=''
-
-    case $compstate[context] in
-    equal)           comp="$_comps[-equal-]";;
-    tilde)           comp="$_comps[-tilde-]";;
-    redirect)        comp="$_comps[-redirect-]";;
-    math)            comp="$_comps[-math-]";;
-    subscript)       comp="$_comps[-subscript-]";;
-    value)           comp="$_comps[-value-]";;
-    array_value)     comp="$_comps[-array-value-]";;
-    condition)       comp="$_comps[-condition-]";;
-    parameter)       comp="$_comps[-parameter-]";;
-    brace_parameter) comp="$_comps[-brace-parameter-]";;
-    esac
-
-    # If not, we use default completion, if any.
-
-    [[ -z "$comp" ]] && comp="$_comps[-default-]"
-    [[ -z "$comp" ]] || "$comp"
-  fi
-
-  # Use automatic correction?
-
-  if (( $+compconfig[correct] )); then
-
-    # Do we have matches?
-    if (( compstate[nmatches] )); then
-
-      # Yes, were they added using correction? (More than one match?)
-
-      if [[ -n "$_comp_correct" &&
-            ( "$compconfig[correct_orig]" = *always* ||
-	      compstate[nmatches] -gt 1 ) ]]; then
-
-        if [[ "$compconfig[correct_orig]" = *last* ]]; then
-	  builtin compadd -V _correct_orig -nQ - "$PREFIX$SUFFIX"
-        elif [[ -n "$compconfig[correct_orig]" ]]; then
-	  builtin compadd -nQ - "$PREFIX$SUFFIX"
-	fi
-
-	# If you always want to see the list of possible corrections,
-	# set `compstate[list]=list' here.
-
-	compstate[force_list]=list
-      fi
-      # Since we have matches, we don't want to try again.
-
-      break
-    fi
-
-    # No matches, so let's see if we already tried correction.
-
-    if [[ -n "$_comp_correct" ]]; then
-
-      # Yes, give up if we reached the maximum number of tries or the
-      # string from the line is too short, otherwise increment our 
-      # counter.
-
-      [[ _comp_correct -eq comax ||
-         "${#${:-$PREFIX$SUFFIX}}" -le _comp_correct+1 ]] && break
-      (( _comp_correct++ ))
-
-      _correct_prompt="${compconfig[correct_prompt]//\%e/$_comp_correct}"
-
-    elif [[ compstate[matcher] -eq compstate[total_matchers] ]]; then
-
-      # We don't try correction if the string is too short.
-
-      [[ "${#${:-$PREFIX$SUFFIX}}" -le 1 ]] && return
-
-      # No matches and no correction tried yet, but we just tried the
-      # last global match specification, so let's see if we should use
-      # correction now. First, get the maximum number of errors.
-
-      if [[ "$compconfig[correct]" = *[nN]* && NUMERIC -ne 1 ]]; then
-        # Prefer the numeric argument if that has a sensible value.
-        comax="$NUMERIC"
-      else
-        comax="${compconfig[correct]//[^0-9]}"
-      fi
-      # If the number of errors to accept is too small, give up.
-
-      [[ "$comax" -lt 1 ]] && break
-
-      # Otherwise temporarily define functions to use instead of
-      # the builtins that add matches. This is used to be able
-      # to stick the `(#a...)' into the right place (after an
-      # ignored prefix).
-
-      compadd() {
-        [[ "$*" != *-([a-zA-Z/]#|)U* &&
-           "${#${:-$PREFIX$SUFFIX}}" -le _comp_correct ]] && return
-
-        if [[ "$PREFIX" = \~*/* ]]; then
-	  PREFIX="${PREFIX%%/*}/(#a${_comp_correct})${PREFIX#*/}"
-	else
-          PREFIX="(#a${_comp_correct})$PREFIX"
-	fi
-	if [[ -n "$_correct_prompt" ]]; then
-	  builtin compadd -X "$_correct_prompt" -J _correct "$@"
-	else
-	  builtin compadd -J _correct "$@"
-	fi
-      }
-      compgen() {
-        [[ "$*" != *-([a-zA-Z/]#|)U* &&
-           "${#${:-$PREFIX$SUFFIX}}" -le _comp_correct ]] && return
-
-        if [[ "$PREFIX" = \~*/* ]]; then
-	  PREFIX="${PREFIX%%/*}/(#a${_comp_correct})${PREFIX#*/}"
-	else
-          PREFIX="(#a${_comp_correct})$PREFIX"
-	fi
-	if [[ -n "$_correct_prompt" ]]; then
-	  builtin compgen "$@" -X "$_correct_prompt" -J _correct
-	else
-	  builtin compgen "$@" -J _correct
-	fi
-      }
-      # Now initialise our counter. We also set `compstate[matcher]'
-      # to `-1'. This allows completion functions to use the simple
-      # `[[ compstate[matcher] -gt 1 ]] && return' to avoid being
-      # called for multiple global match specs and still be called 
-      # again when correction is done. Also, this makes it easy to
-      # test if correction is attempted since `compstate[matcher]'
-      # will never be set to a negative value by the completion code.
-
-      _comp_correct=1
-      compstate[matcher]=-1
-
-      _correct_prompt="${compconfig[correct_prompt]//\%e/$_comp_correct}"
-
-      # We also need to set `extendedglob' and to make the completion
-      # code behave as if globcomplete were set.
-
-      setopt extendedglob
-      compstate[pattern_match]=yes
-    else
-      # We are still trying global match specifications...
-      break
-    fi
-  else
-    # No automatic correction to try, just give up.
-    break
-  fi
+for comp; do
+  "$comp" && return
 done
-
-# If we added wrapper functions, remove them.
-
-[[ -n "$_comp_correct" ]] && unfunction compadd compgen

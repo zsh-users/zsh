@@ -52,10 +52,10 @@ void (*comp_setunsetptr) _((int, int));
 /* pointers to functions required by compctl and defined by zle */
 
 /**/
-int (*addmatchesptr) _((char *, char *, char *, char *, char *, char *, char *, char *, char *, char *, int, int, Cmatcher, char *, char **));
+int (*addmatchesptr) _((char *, char *, char *, char *, char *, char *, char *, char *, char *, char *, char *, int, int, Cmatcher, char *, char **));
 
 /**/
-char *(*comp_strptr) _((int*, int*, int));
+char *(*comp_strptr) _((int *, int *, int));
 
 /**/
 int (*getcpatptr) _((char *, int, char *, int));
@@ -65,6 +65,9 @@ int (*makecomplistcallptr) _((Compctl));
 
 /**/
 int (*makecomplistctlptr) _((int));
+
+/**/
+char *(*unambig_dataptr) _((int *));
 
 /* Hash table for completion info for commands */
  
@@ -107,6 +110,7 @@ char **compwords,
      *compprefix,
      *compsuffix,
      *compiprefix,
+     *compisuffix,
      *compmatcherstr,
      *compcontext,
      *compparameter,
@@ -119,7 +123,8 @@ char **compwords,
      *compinsert,
      *compexact,
      *compexactstr,
-     *comppatmatch;
+     *comppatmatch,
+     *comppatinsert;
 
 /**/
 Param *comppms;
@@ -430,10 +435,11 @@ setup_comp1(Module m)
     cc_first.mask2 = CC_CCCONT;
     comppms = NULL;
     compwords = NULL;
-    compprefix = compsuffix = compiprefix = compmatcherstr = 
+    compprefix = compsuffix = compiprefix = compisuffix = compmatcherstr = 
 	compcontext = compparameter = compredirect = compquote =
 	compquoting = comprestore = complist = compinsert =
-	compexact = compexactstr = comppatmatch = compforcelist = NULL;
+	compexact = compexactstr = comppatmatch = comppatinsert =
+	compforcelist = NULL;
     makecompparamsptr = NULL;
     comp_setunsetptr = NULL;
     return 0;
@@ -466,6 +472,7 @@ finish_comp1(Module m)
     zsfree(compprefix);
     zsfree(compsuffix);
     zsfree(compiprefix);
+    zsfree(compisuffix);
     zsfree(compmatcherstr);
     zsfree(compcontext);
     zsfree(compparameter);
@@ -479,6 +486,7 @@ finish_comp1(Module m)
     zsfree(compexact);
     zsfree(compexactstr);
     zsfree(comppatmatch);
+    zsfree(comppatinsert);
     return 0;
 }
 

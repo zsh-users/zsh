@@ -918,6 +918,7 @@ setup_zle(Module m)
     getcpatptr = getcpat;
     makecomplistcallptr = makecomplistcall;
     makecomplistctlptr = makecomplistctl;
+    unambig_dataptr = unambig_data;
 
     /* initialise the thingies */
     init_thingies();
@@ -989,6 +990,7 @@ finish_zle(Module m)
     getcpatptr = NULL;
     makecomplistcallptr = NULL;
     makecomplistctlptr = NULL;
+    unambig_dataptr = NULL;
 
     return 0;
 }

@@ -3140,7 +3140,7 @@ hasspecial(char const *s)
 
 /**/
 char *
-bslashquote(const char *s, char **e, char *te, int *pl, int instring)
+bslashquote(const char *s, char **e, int instring)
 {
     const char *u, *tt;
     char *v, buf[PATH_MAX * 2];
@@ -3151,8 +3151,6 @@ bslashquote(const char *s, char **e, char *te, int *pl, int instring)
     for (; *u; u++) {
 	if (e && *e == u)
 	    *e = v, sf |= 1;
-	if (te == u)
-	    *pl = v - tt, sf |= 2;
 	if (ispecial(*u) &&
 	    (!instring || (isset(BANGHIST) &&
 			   *u == (char)bangchar) ||
@@ -3189,8 +3187,6 @@ bslashquote(const char *s, char **e, char *te, int *pl, int instring)
 
     if (e && *e == u)
 	*e = v;
-    if (te == u)
-	*pl = v - tt;
 
     return (char *) tt;
 }

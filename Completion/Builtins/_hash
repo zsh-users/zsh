@@ -1,12 +1,12 @@
 #defcomp hash
 
 if [[ "$words[2]" = -*d* ]]; then
-  if [[ -string 1 '=' ]]; then
+  if compset -P 1 '*\='; then
     _path_files -g '*(-/)'
   else
     compgen -n -q -S '='
   fi
-elif [[ -string 1 '=' ]]; then
+elif compset -P 1 '*\='; then
   _files -/g '*(*)'
 else
   compgen -m -q -S '='

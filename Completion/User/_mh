@@ -13,7 +13,7 @@ local prev="$words[CURRENT-1]"
 # To be on the safe side, check this exists and if not, get it anyway.
 [[ -d $mymhdir ]] || mymhdir=$(mhpath +)
 
-if [[ -iprefix - ]]; then
+if compset -P 1 -; then
   # get list of options, which MH commands can generate themselves
   # awk is just too icky to use for this, sorry.  send me one if
   # you come up with it.
@@ -23,7 +23,7 @@ if [[ -iprefix - ]]; then
     print $n =~ s/^\[([a-z]+)\]// ? "$n\n$1$n\n" : "$n\n";
   }')
   return
-elif [[ -iprefix '+' || -iprefix '@' || "$prev" = -draftfolder ]]; then
+elif compset -P 1 '[+@] || [ "$prev" = -draftfolder ]]; then
   # Complete folder names.
   local mhpath
 

@@ -583,7 +583,7 @@ compalloc(void)
 
 /**/
 static int
-getglobflags()
+getglobflags(void)
 {
     char *nptr;
     /* (#X): assumes we are still positioned on the initial '(' */

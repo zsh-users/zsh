@@ -19,4 +19,4 @@ if [[ $PREFIX = \~*/* ]]; then
 else
   file=($~PREFIX*$~SUFFIX(om[$NUMERIC]N))
 fi
-(( $#file )) && compadd -U -f -Q $file
+(( $#file )) && compadd -U -i "$IPREFIX" -I "$ISUFFIX" -f -Q $file
