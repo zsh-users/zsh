@@ -56,7 +56,7 @@ insert-and-predict () {
   else
     LBUFFER="$LBUFFER$KEYS"
     if [[ $LASTWIDGET == (self-insert|magic-space|backward-delete-char) ||
-	  $LASTWIDGET == (complete-word|accept-*|predict-*) ]]
+	  $LASTWIDGET == (complete-word|accept-*|predict-*|zle-line-init) ]]
     then
       if ! zle .history-beginning-search-backward
       then
@@ -120,6 +120,8 @@ delete-backward-and-predict() {
       zle .history-beginning-search-forward || RBUFFER=""
       return 0
     fi
+  else
+    zle .kill-whole-line
   fi
 }
 delete-no-predict() {
