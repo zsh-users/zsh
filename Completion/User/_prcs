@@ -84,6 +84,9 @@ else
 	  '-i[expand the entire project immediately]' \
           ':project name:_prcs_projects'
         ;;
+      *)
+	_message "unknown prcs administrative subfunction: $words[1]"
+	;;
       esac
     fi
     ;;
@@ -197,7 +200,7 @@ else
       ':project name:_prcs_projects'
     ;;
   *)
-    _message "unknown prcs command: $words[2]"
+    _message "unknown prcs command: $words[1]"
   ;;
   esac
 fi
