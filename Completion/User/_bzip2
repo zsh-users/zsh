@@ -23,8 +23,8 @@ case "${words[1]:t}" in
     '(-c)--stdout[write on standard output]' \
     '(--quiet)-q[suppress all warnings]' \
     '(-q)--quiet[suppress all warnings]' \
-    '(--verbose)*-v[verbose mode]' \
-    '(-v)*--verbose[verbose mode]' \
+    '*-v[verbose mode]' \
+    '*--verbose[verbose mode]' \
     '(--license)-L[display software license]' \
     '(-L)--license[display software license]' \
     '(--version)-V[display version number]' \
@@ -45,7 +45,7 @@ esac
 
 if [[ "$state" = files ]]; then
   (( $+opt_args[-z] || $+opt_args[--compress] )) && decompress=no
-  (( $+opt_args[-d] || $+opt_args[--decompress] || $+opt_args[-t] || \
+  (( $+opt_args[-d] || $+opt_args[--decompress] || $+opt_args[-t] ||
       $+opt_args[--test] )) && unset decompress
   if [[ -z "$decompress" ]] ; then
     _description files expl 'compressed file'

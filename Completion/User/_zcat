@@ -15,6 +15,5 @@ if [[ -n "$_is_gnu[$words[1]]" ]]
 then
   _gzip "$@"
 else
-  _description files expl 'compressed file'
-  _files "$expl[@]" -g '*.Z'
+  _compress "$@"
 fi

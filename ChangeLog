@@ -1,3 +1,10 @@
+2000-05-05  Oliver Kiddle  <opk@zsh.org>
+
+	* 11184: Completion/User/.distfiles, Completion/User/_bzip2,
+	Completion/User/_compress, Completion/User/_lzop,
+	Completion/User/_pack, Completion/User/_zcat: Use one function for
+	each of compress/uncompress and pack/unpack and new lzop completion
+
 2000-05-05  Sven Wischnowsky  <wischnow@informatik.hu-berlin.de>
 
 	* 11181: Src/Modules/zpty.c: make zpty -r stoppable even when
