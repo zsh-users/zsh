@@ -350,7 +350,7 @@ if $first_stage; then
 	    echo
 	done | sed 's,^\(.*\)@%@\(.*\)@%@\(.*\)/\([^/]*\)$,\1\3\2\4,'
 	if test -n "$other_mdhs"; then
-	    echo "${other_mdhs}:"
+	    echo "${other_mdhs}:" | sed 's,^ ,,'
 	    echo "	false # should only happen with make -n"
 	    echo
 	fi
@@ -360,7 +360,7 @@ if $first_stage; then
 	    echo
 	done | sed 's,^\(.*\)@%@\(.*\)@%@\(.*\)/\([^/]*\)$,\1\3\2\4,'
 	if test -n "$other_exports"; then
-	    echo "${other_exports}:"
+	    echo "${other_exports}:" | sed 's,^ ,,'
 	    echo "	false # should only happen with make -n"
 	    echo
 	fi
