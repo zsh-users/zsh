@@ -440,7 +440,7 @@ added by explicit specification.  If has no effect if used with tt(-f).
 )
 alias(history)(fc -l)
 findex(integer)
-item(tt(integer) [ {tt(PLUS())|tt(-)}tt(glrtux) ] [ var(name)[tt(=)var(value)] ... ])(
+item(tt(integer) [ {tt(PLUS())|tt(-)}tt(ghlrtux) ] [ var(name)[tt(=)var(value)] ... ])(
 Equivalent to tt(typeset -i), except that options irrelevant to
 integers are not permitted.
 )
@@ -533,7 +533,7 @@ sitem([var(mm)tt(:)]var(ss))(minutes and seconds)
 endsitem()
 )
 findex(local)
-item(tt(local) [ {tt(PLUS())|tt(-)}tt(ALRUZailrtu) [var(n)]] [ var(name)[tt(=)var(value)] ] ...)(
+item(tt(local) [ {tt(PLUS())|tt(-)}tt(ALRUZahilrtu) [var(n)]] [ var(name)[tt(=)var(value)] ] ...)(
 Same as tt(typeset), except that the options tt(-g), tt(-x) and
 tt(-f) are not permitted.
 )
@@ -922,7 +922,7 @@ Equivalent to tt(whence -v).
 findex(typeset)
 cindex(parameters, setting)
 cindex(parameters, declaring)
-xitem(tt(typeset) [ {tt(PLUS())|tt(-)}tt(ALRUZafgilrtuxm) [var(n)]] [ \
+xitem(tt(typeset) [ {tt(PLUS())|tt(-)}tt(ALRUZafghilrtuxm) [var(n)]] [ \
 var(name)[tt(=)var(value)] ... ])
 item(tt(typeset) -T [ {tt(PLUS()|tt(-))}tt(LRUZrux) ] \
   var(SCALAR)[tt(=)var(value)] var(array))(
@@ -1037,6 +1037,24 @@ marked for autoloading; tt(-U) also causes alias expansion to be
 suppressed when the function is loaded.  The tt(fpath) parameter
 will be searched to find the function definition when the function
 is first referenced; see noderef(Functions).
+)
+item(tt(-h))(
+Hide: only useful for special parameters (those marked `<S>' in the table in
+ifzman(zmanref(zshparams))\
+ifnzman(noderef(Parameters))\
+), and for local parameters with the same name as a special parameter,
+though harmless for others.  A special parameter with this attribute will
+not retain its special effect when made local.  Thus after `tt(typeset -h
+PATH)', a function containing `tt(typeset PATH)' will create an ordinary
+local parameter without the usual behaviour of tt(PATH).  Alternatively,
+the local parameter may itself be given this attribute; hence inside a
+function `tt(typeset -h PATH)' creates an ordinary local parameter and the
+special tt(PATH) parameter is not altered in any way.  It is also possible
+to create a local parameter using `tt(typeset +h )var(special)', where the
+local copy of var(special) will retain its special properties regardless of
+having the tt(-h) attribute.  Global special parameters loaded from shell
+modules (currently those in tt(mapfile) and tt(parameter)) are
+automatically given the tt(-h) attribute to avoid name clashes.
 )
 item(tt(-i))(
 Use an internal integer representation.  If var(n) is nonzero it

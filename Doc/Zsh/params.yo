@@ -203,15 +203,17 @@ tt(unset) can be used to delete a parameter while it is still in scope;
 any outer parameter of the same name remains hidden.
 
 Special parameters may also be made local; they retain their special
-attributes.  This may have unexpected effects.  Firstly, there is no
-default value, so if there is no assigment at the point the variable is
-made local, it will be set to an empty value (or zero in the case of
-integers).  Secondly, special parameters which are made local will not be
-exported (as with other parameters), so that the global value of the
-parameter remains present in the environment if it is already there.  This
-should be particularly noted in the case of tt(PATH): the shell will use
-the local version of tt(PATH) for finding programmes, but programmes using
-the shell's environment will inherit the global version.  The following:
+attributes unless either the existing or the newly-created parameter
+has the tt(-h) (hide) attribute.  This may have unexpected effects.
+Firstly, there is no default value, so if there is no assigment at the
+point the variable is made local, it will be set to an empty value (or zero
+in the case of integers).  Secondly, special parameters which are made
+local will not be exported (as with other parameters), so that the global
+value of the parameter remains present in the environment if it is already
+there.  This should be particularly noted in the case of tt(PATH): the
+shell will use the local version of tt(PATH) for finding programmes, but
+programmes using the shell's environment will inherit the global version.
+The following:
 
 example(typeset PATH=/new/directory:$PATH)
 

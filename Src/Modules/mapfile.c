@@ -87,7 +87,8 @@ createmapfilehash()
 	unsetparam_pm(pm, 0, 1);
     mapfile_pm = NULL;
 
-    if (!(pm = createparam(mapfile_nam, PM_SPECIAL|PM_REMOVABLE|PM_HASHED)))
+    if (!(pm = createparam(mapfile_nam,
+			   PM_SPECIAL|PM_HIDE|PM_REMOVABLE|PM_HASHED)))
 	return NULL;
 
     pm->level = pm->old ? locallevel : 0;

@@ -1028,15 +1028,18 @@ struct param {
 #define PM_UNIQUE	(1<<11)	/* remove duplicates                        */
 #define PM_UNALIASED	(1<<11)	/* do not expand aliases when autoloading   */
 
-#define PM_TIED 	(1<<12)	/* array tied to colon-path or v.v.         */
-#define PM_LOCAL	(1<<13) /* this parameter will be made local        */
-#define PM_SPECIAL	(1<<14) /* special builtin parameter                */
-#define PM_DONTIMPORT	(1<<15)	/* do not import this variable              */
-#define PM_RESTRICTED	(1<<16) /* cannot be changed in restricted mode     */
-#define PM_UNSET	(1<<17)	/* has null value                           */
-#define PM_REMOVABLE	(1<<18)	/* special can be removed from paramtab     */
-#define PM_AUTOLOAD	(1<<19) /* autoloaded from module                   */
-#define PM_NORESTORE	(1<<20)	/* do not restore value of local special    */
+#define PM_HIDE		(1<<12)	/* Special behaviour hidden by local        */
+#define PM_TIED 	(1<<13)	/* array tied to colon-path or v.v.         */
+
+/* Remaining flags do not correspond directly to command line arguments */
+#define PM_LOCAL	(1<<14) /* this parameter will be made local        */
+#define PM_SPECIAL	(1<<15) /* special builtin parameter                */
+#define PM_DONTIMPORT	(1<<16)	/* do not import this variable              */
+#define PM_RESTRICTED	(1<<17) /* cannot be changed in restricted mode     */
+#define PM_UNSET	(1<<18)	/* has null value                           */
+#define PM_REMOVABLE	(1<<19)	/* special can be removed from paramtab     */
+#define PM_AUTOLOAD	(1<<20) /* autoloaded from module                   */
+#define PM_NORESTORE	(1<<21)	/* do not restore value of local special    */
 
 /* Flags for extracting elements of arrays and associative arrays */
 #define SCANPM_WANTVALS   (1<<0)
