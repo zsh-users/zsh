@@ -126,6 +126,22 @@ inet_ntop(int af, void const *cp, char *buf, size_t len)
 #ifndef HAVE_INET_PTON
 
 /**/
+# ifndef HAVE_INET_ATON
+
+#  ifndef INADDR_NONE
+#   define INADDR_NONE 0xffffffffUL
+#  endif
+
+/**/
+static int inet_aton(char const *src, struct in_addr *dst)
+{
+    return (dst->s_addr = inet_addr(src)) != INADDR_NONE;
+}
+
+/**/
+# endif /* !HAVE_INET_ATON */
+
+/**/
 static int
 inet_pton(int af, char const *src, void *dst)
 {
