@@ -502,6 +502,22 @@
 >unset
 >globassign
 
+  setopt kshtypeset
+  ktvars=(ktv1 ktv2)
+  typeset ktfoo=`echo arg1 arg2` $ktvars
+  print $+ktv1 $+ktv2 $+ktv3
+  print $ktfoo
+  unsetopt kshtypeset
+  typeset noktfoo=`echo noktarg1 noktarg2`
+  print $noktfoo
+  print $+noktarg1 $+noktarg2
+  unset ktfoo ktv1 ktv2 noktfoo noktarg2
+0:KSH_TYPESET option
+>1 1 0
+>arg1 arg2
+>noktarg1
+>0 1
+
   showopt() { setopt | egrep 'localoptions|ksharrays'; }
   f1() { setopt localoptions ksharrays; showopt }
   f2() { setopt ksharrays; showopt }
@@ -526,14 +542,28 @@
 
 # LOCAL_TRAPS was tested in C03traps (phew).
 
-  fn() { local HOME=/any/old/name; print var=~ 'anything goes/here'=~; }
+  fn() {
+    local HOME=/any/old/name
+    print -l var=~ 'anything goes/here'=~ split=`echo maybe not`;
+  }
   setopt magicequalsubst
   fn
-  unsetopt magicequalsubst
+  setopt kshtypeset
+  fn
+  unsetopt magicequalsubst kshtypeset
   fn
 0:MAGIC_EQUAL_SUBST option
->var=/any/old/name anything goes/here=/any/old/name
->var=~ anything goes/here=~
+>var=/any/old/name
+>anything goes/here=/any/old/name
+>split=maybe
+>not
+>var=/any/old/name
+>anything goes/here=/any/old/name
+>split=maybe not
+>var=~
+>anything goes/here=~
+>split=maybe
+>not
 
   setopt MARK_DIRS
   print tmp*

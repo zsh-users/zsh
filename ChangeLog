@@ -1,3 +1,9 @@
+2001-06-12  Peter Stephenson  <pws@csr.com>
+
+	* 14858: Doc/Zsh/options.yo, Src/options.c, Src/subst.c,
+	Src/zsh.h, Test/E01options.ztst: KSH_TYPESET option allows
+	assignments after typeset not to be split.
+
 2001-06-11  Clint Adams  <clint@zsh.org>
 
 	* 14843: Src/Modules/tcp.c, Src/Modules/zftp.c:

@@ -50,6 +50,7 @@ mod_export void
 prefork(LinkList list, int flags)
 {
     LinkNode node;
+    int asssub = (flags & PF_TYPESET) && isset(KSHTYPESET);
 
     queue_signals();
     for (node = firstnode(list); node; incnode(node)) {
@@ -70,7 +71,7 @@ prefork(LinkList list, int flags)
 	    if (isset(SHFILEEXPANSION))
 		filesub((char **)getaddrdata(node),
 			flags & (PF_TYPESET|PF_ASSIGN));
-	    if (!(node = stringsubst(list, node, flags & PF_SINGLE))) {
+	    if (!(node = stringsubst(list, node, flags & PF_SINGLE, asssub))) {
 		unqueue_signals();
 		return;
 	    }
@@ -97,7 +98,7 @@ prefork(LinkList list, int flags)
 
 /**/
 static LinkNode
-stringsubst(LinkList list, LinkNode node, int ssub)
+stringsubst(LinkList list, LinkNode node, int ssub, int asssub)
 {
     int qt;
     char *str3 = (char *)getdata(node);
@@ -211,6 +212,12 @@ stringsubst(LinkList list, LinkNode node, int ssub)
 	    str3 = str2;
 	    setdata(node, str3);
 	    continue;
+	} else if (asssub && ((c == '=') || c == Equals) && str != str3) {
+	    /*
+	     * We are in a normal argument which looks like an assignment
+	     * and is to be treated like one, with no word splitting.
+	     */
+	    ssub = 1;
 	}
 	str++;
     }
@@ -1885,7 +1892,7 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int ssub)
 
 	    *--fstr = Marker;
 	    init_list1(tl, fstr);
-	    if (!eval && !stringsubst(&tl, firstnode(&tl), ssub))
+	    if (!eval && !stringsubst(&tl, firstnode(&tl), ssub, 0))
 		return NULL;
 	    *str = aptr;
 	    tn = firstnode(&tl);
