@@ -1,3 +1,7 @@
+2000-05-09  Tanaka Akira  <akr@zsh.org>
+
+	* 11276: fix build on OpenBSD.
+
 2000-05-09  Sven Wischnowsky  <wischnow@zsh.org>
 
 	* 11274: Completion/Builtins/_zstyle, Completion/Core/_main_complete,
