@@ -69,8 +69,8 @@
 >117
 
   print $((##))
-0:## without following character
->0
+1:## without following character
+?(eval):1: character missing after ##
 
   print $((## ))
 0:## followed by a space
