@@ -78,6 +78,9 @@ HP: HP-UX 9, 10.20, 11.0
 	(rather than the 10.20 shl_load() function set).  More details of
 	any difficulties would be appreciated.
 
+	Compiling with gcc 2.7.1 is known to fail with header file
+	conflicts on HP-UX 11.  Use the HP ANSI C compiler.
+
 IBM: AIX 3.2, 4.1
 	Should build `out-of-the-box', but --enable-zsh-mem will not work.
 
@@ -171,4 +174,5 @@ Sun: Solaris 2.*
 	enable large file system and integer support on Solaris 2 with gcc.
 	Apparently upgrading to gcc version 2.95.2 fixes this.  If this
 	is not feasible, configure with --disable-lfs.  We would be
-	grateful for more detailed information.
+	grateful for more detailed information.  The most problems seem
+	to occur on Solaris 2.6, where --disable-lfs is recommended.

@@ -1,3 +1,8 @@
+2001-05-27  Bart Schaefer  <schaefer@zsh.org>
+
+	* unposted: Etc/MACHINES: Mention failure of gcc 2.7.1 on HPUX,
+	and need for --disable-lfs on Solaris 2.6.
+
 2001-05-27  Clint Adams  <clint@zsh.org>
 
   	* 14492: Functions/Prompts/.distfiles,
