@@ -58,3 +58,14 @@ the same name as a command in PATH.
 All parameters in ksh are indexed arrays.  That's why $array has to mean
 ${array[0]}, and why subscripts can't be used to extract substrings from
 scalars.
+
+In ksh,
+	exec 3<file
+causes file 3 to be close on exec.  DGK says: "This allows scripts to
+use file descriptors 3-9 without side effects on commands that are
+subsequently executed.
+	command 3< file
+will not use close on exec, and
+	{
+	} 3< file
+will not use close on exec for any commands inside {...}."
