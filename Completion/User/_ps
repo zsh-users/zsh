@@ -1,3 +1,10 @@
-#compdef  gs ghostview gv gview psnup psselect pswrap pstops pstruct lpr lp
+#compdef ps2epsi ps2pdf epsffit extractres fixdlsrps fixfmps fixmacps fixpsditps fixpspps fixscribeps fixtpps fixwfwps fixwpps fixwwps includeres psbook psmerge psnup psresize psselect pstops psmulti pswrap lpr lp
 
-_files -g '*([pP][sS]|eps)'
+# ghostscript:
+#  ps2epsi ps2pdf
+# psutils:
+#  epsffit extractres fixdlsrps fixfmps fixmacps fixpsditps fixpspps
+#  fixscribeps fixtpps fixwfwps fixwpps fixwwps includeres psbook psmerge
+#  psnup psresize psselect pstops
+
+_files -g '*.(#i)(ps|eps)'

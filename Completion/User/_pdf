@@ -1,3 +1,8 @@
-#compdef acroread
+#compdef acroread pdf2dsc pdf2ps pdfimages pdfinfo pdftopbm pdftops pdftotext xpdf
 
-_files -g '*.(pdf|PDF)'
+# ghostscript:
+#  pdf2dsc pdf2ps
+# xpdf:
+#  pdfimages pdfinfo pdftopbm pdftops pdftotext xpdf
+
+_files -g '*.(#i)pdf'
