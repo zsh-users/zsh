@@ -490,6 +490,7 @@ AC_PROG_INSTALL             dnl Check for BSD compatible `install'
 AC_PROG_AWK                 dnl Check for mawk,gawk,nawk, then awk.
 AC_PROG_LN                  dnl Check for working ln, for "make install"
 AC_CHECK_PROGS([YODL], [yodl], [: yodl])
+AC_CHECK_PROGS([PDFETEX], [pdfetex], [: pdfetex])
 AC_CHECK_PROGS([ANSI2KNR], [ansi2knr], [: ansi2knr])
 
 if test x"$ansi2knr" = xyes && test x"$ANSI2KNR" = x": ansi2knr"; then

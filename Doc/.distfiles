@@ -15,4 +15,5 @@ DISTFILES_DOC='
     zsh.info zsh.info-[0-9]*
     zsh.html zsh_*toc.html zsh_[0-9]*.html
     zsh.dvi zsh_us.ps zsh_a4.ps
+    zsh.pdf
 '

@@ -69,6 +69,7 @@ ANSI2KNR        = @ANSI2KNR@
 YODL            = @YODL@
 YODL2TXT        = $(YODL)2txt
 YODL2HTML       = $(YODL)2html
+PDFETEX		= @PDFETEX@
 
 # install utility
 INSTALL_PROGRAM = @INSTALL_PROGRAM@

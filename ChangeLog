@@ -1,5 +1,9 @@
 2005-02-04  Peter Stephenson  <pws@csr.com>
 
+	* 20787: configure.ac, Config/defs.mk.in, Doc/.distfiles,
+	Doc/Makefile.in: generate zsh.pdf from zsh.texi using pdfetex;
+	much better output than PS from DVI.
+
 	* Motoi Washida: 20785: configure.ac: libiconv test needed
 	for Mac OS X 3.
 
