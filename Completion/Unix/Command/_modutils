@@ -32,12 +32,37 @@ case "$service" in
              '(-v)--verbose' \
              '(--version)-V[print version]' \
              '(-V)--version' \
-             '*:loaded module:_modutils_loaded_modules'
+             '*:loaded module:_modutils_loaded_modules' && return 0
   ;;
 
   modprobe)
-  _arguments '(--remove)-r[remove]:loaded module:_modutils_loaded_modules' \
-             '(-r)--remove:loaded module:_modutils_loaded_modules'
+
+  _modprobe_arguments=(
+             '(--all)-a[all]' \
+             '(-a)--all' \
+             '(--showconfig)-c[showconfig]' \
+             '(-c)--showconfig' \
+             '(--debug)-d[debug]' \
+             '(-d)--debug' \
+             '(--autoclean)-k[set autoclean]' \
+             '(-k)--autoclean' \
+             '(--show)-n[do not act]' \
+             '(-n)--show'
+  )
+
+  _arguments '(--remove)-r[remove]:*:loaded module:->modprobe_remove' \
+             '(-r)--remove:*:loaded module:->modprobe_remove' \
+	     "$_modprobe_arguments[@]" && return 0
+
+  ;;
+
+esac 
+
+case "$state" in
+  modprobe_remove)
+        _call_function ret _modutils_$state && return ret
+        _arguments "$_modprobe_arguments[@]" \
+                   '*:loaded module:_modutils_loaded_modules'
   ;;
 
 esac

@@ -1,3 +1,10 @@
+2001-05-16  Clint Adams  <clint@zsh.org>
+
+	* 14361: Completion/Unix/Command/_modutils: use
+	state for modprobe so that modprobe -r will
+	complete multiple loaded modules.  Also
+	handle more of modprobe's options.
+
 2001-05-16  Sven Wischnowsky  <wischnow@zsh.org>
 
 	* 14359: Src/Zle/zle_tricky.c: more fixage for expansion: just
