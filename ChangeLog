@@ -401,6 +401,10 @@
 	Completion/Zsh/Command/_zstyle, Doc/Zsh/compsys.yo: add
 	preserve-prefix style to keep pathname prefix unchanged
 
+2001-07-13  Andrej Borsenkow  <bor@zsh.org>
+
+	* 15390: Completion/Unix/Command/_mount: Cygwin support
+
 2001-07-10  Sven Wischnowsky  <wischnow@zsh.org>
 
 	* 15357: Completion/Base/Completer/_prefix, Src/Zle/compcore.c,

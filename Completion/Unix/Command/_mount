@@ -1,5 +1,49 @@
 #compdef mount umount
 
+if [[ "$OSTYPE" == cygwin ]]; then
+  if [[ "$service" == mount ]] ; then
+    _arguments -s \
+      - mount \
+        '(-b -t --text)--binary[Unix line endings LF]' \
+        '(--binary -t --text)-b[Unix line endings LF]' \
+        '(-f)--force[be silent]' \
+        '(--force)-f[be silent]' \
+        '(-s -u --user)--system[system-wide mount point]' \
+        '(--system -u --user)-s[system-wide mount point]' \
+        '(-t -b --binary)--text[(default) DOS line endings CR-LF]' \
+        '(--text -b --binary)-t[(default) DOS line endings CR-LF]' \
+        '(-u -s --system)--user[(default)user private mount point]' \
+        '(--user -s --system)-u[(default)user private mount point]' \
+        '(-x -X --cygwin-executable)--executable[all files under mountpoint are executables]' \
+        '(--executable -X --cygwin-executable)-x[all files under mountpoint are executables]' \
+        '(-X -x --executable)--cygwin-executable[all files under mountpoint are cygwin executables]' \
+        '(--cygwin-executable -x --executable)-X[all files under mountpoint are cygwin executables]' \
+        ':Windows path:' \
+        ':Unix path:_path_files -P/ -W "(/)" -/' \
+      - control \
+        '(-i -p --show-cygdrive-prefix -c --change-cygdrive-prefix)--import-old-mounts[import old mounts]' \
+        '(--import-old-mounts -p --show-cygdrive-prefix -c --change-cygdrive-prefix)-i[import old mounts]' \
+        '(-p -i --import-old-mounts -c --change-cygdrive-prefix)--show-cygdrive-prefix[show cygdrive prefix]' \
+        '(--show-cygdrive-prefix -i --import-old-mounts -c --change-cygdrive-prefix)-p[show cygdrive prefix]' \
+        '(-c -i --import-old-mounts -p --show-cygdrive-prefix)--change-cygdrive-prefix[cygdrive prefix]:cygdrive prefix (POSIX path):_files -P/ -W "(/)" -/' \
+        '(--change-cygdrive-prefix -i --import-old-mounts -p --show-cygdrive-prefix)-c[cygdrive prefix]:cygdrive prefix (POSIX path):_files -P/ -W "(/)" -/' 
+  
+    return
+  else
+    local line
+    local -a wpaths upaths
+    mount | while read -r line; do
+      [[ $line == ?:\ * ]] && continue
+      wpaths=($wpaths ${line%% on*})
+      upaths=($upaths ${${line##*on }%% type*})
+    done
+    _alternative \
+      'windowspath:WIndows path:compadd -a wpaths' \
+      'unixpath:Unix path:compadd -a upaths'
+    return
+  fi
+fi
+
 # This is table-driven: the tables for the values for the different
 # file system types are directly below. The tables describing the
 # arguments for the `mount' command for different operating systems
