@@ -1,3 +1,9 @@
+2000-05-30  Sven Wischnowsky  <wischnow@zsh.org>
+
+	* 11647: Completion/Base/_arguments, Completion/Linux/_rpm,
+ 	Src/Zle/computil.c, Test/53completion.ztst: fixes for _arguments
+ 	without multiple sets; change completion test for empty actions
+	
 2000-05-29  Bart Schaefer  <schaefer@zsh.org>
 
 	* 11644: Use `print -s' in _complete_debug, now that it works.

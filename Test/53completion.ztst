@@ -129,8 +129,7 @@
  comptesteval 'compdef _tst tst; _tst () { _arguments "-x" ":arg:" }'
  comptest $'tst -\t'
 0:_arguments
->line: {tst -}{}
->MESSAGE:{arg}
+>line: {tst -x }{}
 
  comptesteval 'compdef _tst tst; _tst () { _arguments "-x:arg:" }'
  comptest $'tst -x\t'

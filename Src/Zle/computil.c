@@ -1437,7 +1437,7 @@ ca_parse_line(Cadef d, int multi, int first)
 		 state.def->type == CAA_RARGS)) {
 		state.inrest = 0;
 		state.opt = (cur == state.nargbeg + 1 &&
-			     (!*line || 
+			     (!multi || !*line || 
 			      ((*line == '-' || *line == '+') &&
 			       (!line[1] ||
 				(*line == '-' && line[1] == '-' && !line[2])))));
@@ -1516,7 +1516,7 @@ ca_parse_line(Cadef d, int multi, int first)
 		}
 	    } else {
 		ca_laststate.def = adef;
-		ca_laststate.opt = (!arglast || !*line || 
+		ca_laststate.opt = (!arglast || !multi || !*line || 
 				    ((*line == '-' || *line == '+') &&
 				     (!line[1] ||
 				      (*line == '-' && line[1] == '-' && !line[2]))));

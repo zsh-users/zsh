@@ -117,6 +117,8 @@ while [[ -n "$state" ]]; do
 
   case "$lstate" in
   query)
+    # --dump requires on of -{l,c,d}
+    # --triggers requires --script
     _arguments -s \
       -q "${commonopts[@]}" "${packageopts[@]}" "${pathopts[@]}" \
       '--queryformat:RPM query format:->tags' \
@@ -126,11 +128,11 @@ while [[ -n "$state" ]]; do
       '-s[show file states]' \
       '-d[documentation files only]' \
       '-c[configuration files only]' \
-      '--dump[show all information]'     # Requires one of -{l,c,d} ... \
+      '--dump[show all information]' \
       --provides \
       -{R,-requires}'[list dependencies]' \
       '--scripts[show (un)install scripts]' \
-      '--triggers[show trigger scripts]' # Requires --scripts ... \
+      '--triggers[show trigger scripts]' \
       '*:RPM package:->package_or_file' && ret=0
     ;;
   setattrs)
@@ -195,14 +197,14 @@ while [[ -n "$state" ]]; do
     ;;
   target)
     _wanted target expl 'Target platforms' \
-        compadd $(_call target rpm --showrc |grep 'compatible archs'|sed 's/.*: //') && ret=0
+        compadd $(_call target rpm --showrc 2> /dev/null |grep 'compatible archs'|sed 's/.*: //') && ret=0
     ;;
   package_or_file)
     state=package_file
     ;&
   package)
     _wanted packages expl 'RPM package' \
-        compadd -M 'r:|-=* r:|=*' - $(_call packages rpm -qa) && ret=0
+        compadd -M 'r:|-=* r:|=*' - $(_call packages rpm -qa 2> /dev/null) && ret=0
     ;;
   spec_file)
     _wanted specfiles expl 'spec file' \
@@ -224,7 +226,7 @@ while [[ -n "$state" ]]; do
     if compset -P '*%*\{'; then
       _wanted tags expl 'RPM tag' \
           compadd -M 'm:{a-z}={A-Z}' -S '\}' - \
-                  "${(@)${(@f)$(_call tags rpm --querytags)}#RPMTAG_}" && ret=0
+                  "${(@)${(@f)$(_call tags rpm --querytags 2> /dev/null)}#RPMTAG_}" && ret=0
     else
       _message 'RPM format'
     fi

@@ -319,6 +319,7 @@ if (( $# )) && comparguments -i "$autod" "$@"; then
 	        compadd -QqS= - "${PREFIX}${SUFFIX}"
           else
 	    tmp1=( "$next[@]" "$direct[@]" "$odirect[@]" "$equal[@]" )
+	    [[ "$PREFIX" != --* ]] && tmp1=( "${(@)tmp1:#--*}" )
 	    tmp3=( "${(M@)tmp1:#[-+]?[^:]*}" )
 	    tmp1=( "${(M@)tmp1:#[-+]?(|:*)}" )
 	    tmp2=( "${PREFIX}${(@M)^${(@)${(@)tmp1%%:*}#[-+]}:#?}" )
