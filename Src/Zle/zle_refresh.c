@@ -478,7 +478,7 @@ zrefresh(void)
 		nextline
 	    }
 #ifdef ZLE_UNICODE_SUPPORT
-# error What to do here
+	    *s++ = ((*t == 127) || (*t > 255)) ? '?' : (*t | '@');
 #else
 	    *s++ = (*t == 127) ? '?' : (*t | '@');
 #endif
@@ -488,7 +488,7 @@ zrefresh(void)
 
 	    i = wcrtomb(s, *t, &shiftstate);
 	    if (i == -1) {
-		/* error; what to do? */
+		*s++ = '?';
 	    } else {
 		s += i;
 	    }
