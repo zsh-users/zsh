@@ -178,18 +178,18 @@ Zsh/modlist.yo: $(MODDOCSRC)
 		echo ")"; \
 	    done; \
 	    echo "enditem()"; \
-	    echo "includefile(Zsh/modmenu.yo)"; \
+	    echo "includefile(Zsh/modmenu.yo)"; \
 	    set '' $(MODDOCSRC); \
-	    unset mod1 mod2 mod3; \
-	    test ".$$2" != . && \
+	    unset mod1 mod2 mod3 || true; \
+	    test ".$$2" = . || \
 		mod2=`sed -n '1{s|^COMMENT(!MOD!||;p;q;}' < $(sdir)/$$2`; \
 	    while test ".$$2" != .; do \
-		unset mod3; \
-		test ".$$3" != . && \
+		unset mod3 || true; \
+		test ".$$3" = . || \
 		    mod3=`sed -n '1{s|^COMMENT(!MOD!||;p;q;}' < $(sdir)/$$3`; \
 		echo "texinode(The $$mod2 Module)($${mod3+The $$mod3 Module})($${mod1:+The $$mod1 Module})(Zsh Modules)"; \
 		echo "sect(The $$mod2 Module)"; \
-		echo "includefile($${2})"; \
+		echo "includefile($${2})"; \
 		shift; \
 		mod1=$$mod2; \
 		mod2=$$mod3; \
