@@ -51,13 +51,14 @@ Line editor:
 - supplied highly configurable word widgets forward-word-match etc., can
   set what constitutes a word interactively or in startup script
   (implement bash-style behaviour, replacing previous bash-* word widgets)
-- interface to increment search via $LASTSEARCH
+- interface to incremental search via $LASTSEARCH
 - better handling of keymaps in zle and widgets
 - better support for output from user-defined widgets while zle is active
 - tetris game which runs entirely in zle
 
 Local internal improvements:
 - disowned jobs are automatically restarted
+- \u and \U print escapes for Unicode
 - line numbers in error messages and $PS4 output are more consistent
 - `=prog' expands only paths, no longer aliases for consistency
 - job display in prompts; `jobs' command output can be piped
@@ -65,7 +66,7 @@ Local internal improvements:
 - rand48() function for better randomness in arithmetic
   (if the corresponding math library function is present)
 - $SECONDS parameter can be made floating point via `typeset -F SECONDS'
-  for better accuracy
+  for better timing accuracy
 - improvements to command line history mechanism
 - many bugfixes
 

@@ -35,6 +35,10 @@ up for bash-style word handling:
   autoload -U select-word-style
   select-word-style bash
 
+The `=prog' facility for expanding command paths (provided the EQUALS
+option is enabled, as it is by default) no longer expands aliases.  It was
+felt this feature was underused and confusing.
+
 Documentation
 -------------
 

@@ -1,5 +1,8 @@
 2003-05-02  Peter Stephenson  <pws@csr.com>
 
+	* 18497: README, Etc/NEWS, Fuctions/TCP/tcp_spam: Tweak
+	info for 4.1.1; tcp_spam used incorrect syntax when verbose.
+
 	* 18492: Doc/Zsh/expn.yo, Doc/Zsh/redirect.yo, Src/exec.c,
 	Src/jobs.c, Src/signals.c, Src/utils.c, Src/zsh.h,
 	Test/A04redirect.ztst, Test/D03procsubst.ztst:  Work around long

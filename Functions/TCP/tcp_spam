@@ -95,7 +95,7 @@ for TCP_SESS in $sessions; do
     tcp_on_spam $TCP_SESS $cmd $*
     [[ $REPLY = done ]] && continue
   fi
-  [[ -n $verbose ]] && zformat REPLY $TCP_PROMPT "s:$TCP_SESS" \
-    "f:${tcp_by_name[$TCP_SESS]}"
+  [[ -n $verbose ]] && zformat -f REPLY $TCP_PROMPT "s:$TCP_SESS" \
+    "f:${tcp_by_name[$TCP_SESS]}" && print -r $REPLY
   eval $cmd '$*'
 done
