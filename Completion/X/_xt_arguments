@@ -1,0 +1,45 @@
+#autoload
+
+# How to convert XrmOptionDescRec:
+
+# XrmOptionDescRec optionDescList[] = {
+#   ...
+#   {option, specifier, argKind, value},
+#   ...
+# };
+
+#  argKind		argument for _xt_arguments
+#  XrmoptionNoArg	option
+#  XrmoptionIsArg	option
+#  XrmoptionStickyArg	option-:message:action
+#  XrmoptionSepArg	option:message:action
+#  XrmoptionResArg	option:message:_x_resource
+#  XrmoptionSkipArg	option:message:action
+#  XrmoptionSkipLine	option:*::message:action
+#  XrmoptionSkipNArgs	option:message[1]:action[1]:...:message[value]:action[value]
+
+# cf. XrmParseCommand(3X11), X11R6.4/xc/lib/Xt/Initialize.c, X(5)
+
+_arguments \
+  '+rv' '-rv' '-reverse' \
+  '+synchronous' '-synchronous' \
+  '-background:background color:_colors' \
+  '-background:background color:_colors' \
+  '-bd:border color:_colors' \
+  '-bg:background color:_colors' \
+  '-bordercolor:border color:_colors' \
+  '-borderwidth:border width:_x_borderwidth' \
+  '-bw:border width:_x_borderwidth' \
+  '-display:display:_x_display' \
+  '-fg:foreground color:_colors' \
+  '-fn:font:_x_font' \
+  '-foreground:foreground color:_colors' \
+  '-geometry:geometry:_x_geometry' \
+  '-iconic' \
+  '-name:name:_x_name' \
+  '-selectionTimeout:selection timeout (milliseconds):_x_selection_timeout' \
+  '-title:title:_x_title' \
+  '-xnllanguage:locale:_x_locale' \
+  '-xrm:resource:_x_resource' \
+  '-xtsessionID:session ID:_xt_session_id' \
+  "$@"
