@@ -1014,30 +1014,51 @@ printreswdnode(HashNode hn, int printflags)
 /**/
 mod_export HashTable aliastab;
  
-/* Create new hash table for aliases */
+/* has table containing suffix aliases */
+
+/**/
+mod_export HashTable sufaliastab;
+ 
+/* Create new hash tables for aliases */
 
 /**/
 void
-createaliastable(void)
+createaliastable(HashTable ht)
 {
+    ht->hash        = hasher;
+    ht->emptytable  = NULL;
+    ht->filltable   = NULL;
+    ht->cmpnodes    = strcmp;
+    ht->addnode     = addhashnode;
+    ht->getnode     = gethashnode;
+    ht->getnode2    = gethashnode2;
+    ht->removenode  = removehashnode;
+    ht->disablenode = disablehashnode;
+    ht->enablenode  = enablehashnode;
+    ht->freenode    = freealiasnode;
+    ht->printnode   = printaliasnode;
+}
+
+/**/
+void
+createaliastables(void)
+{
+    /* Table for regular and global aliases */
+
     aliastab = newhashtable(23, "aliastab", NULL);
 
-    aliastab->hash        = hasher;
-    aliastab->emptytable  = NULL;
-    aliastab->filltable   = NULL;
-    aliastab->cmpnodes    = strcmp;
-    aliastab->addnode     = addhashnode;
-    aliastab->getnode     = gethashnode;
-    aliastab->getnode2    = gethashnode2;
-    aliastab->removenode  = removehashnode;
-    aliastab->disablenode = disablehashnode;
-    aliastab->enablenode  = enablehashnode;
-    aliastab->freenode    = freealiasnode;
-    aliastab->printnode   = printaliasnode;
+    createaliastable(aliastab);
 
     /* add the default aliases */
     aliastab->addnode(aliastab, ztrdup("run-help"), createaliasnode(ztrdup("man"), 0));
     aliastab->addnode(aliastab, ztrdup("which-command"), createaliasnode(ztrdup("whence"), 0));
+
+
+    /* Table for suffix aliases --- make this smaller */
+
+    sufaliastab = newhashtable(11, "sufaliastab", NULL);
+
+    createaliastable(sufaliastab);
 }
 
 /* Create a new alias node */
@@ -1093,10 +1114,12 @@ printaliasnode(HashNode hn, int printflags)
 
     if (printflags & PRINT_WHENCE_CSH) {
 	nicezputs(a->nam, stdout);
-	if (a->flags & ALIAS_GLOBAL)
-	    printf(": globally aliased to ");
-	else
-	    printf(": aliased to ");
+	printf(": ");
+	if (a->flags & ALIAS_SUFFIX)
+	    printf("suffix ");
+	else if (a->flags & ALIAS_GLOBAL)
+	    printf("globally ");
+	printf (" aliased to ");
 	nicezputs(a->text, stdout);
 	putchar('\n');
 	return;
@@ -1104,10 +1127,14 @@ printaliasnode(HashNode hn, int printflags)
 
     if (printflags & PRINT_WHENCE_VERBOSE) {
 	nicezputs(a->nam, stdout);
-	if (a->flags & ALIAS_GLOBAL)
-	    printf(" is a global alias for ");
+	printf(" is a");
+	if (a->flags & ALIAS_SUFFIX)
+	    printf(" suffix");
+	else if (a->flags & ALIAS_GLOBAL)
+	    printf(" global");
 	else
-	    printf(" is an alias for ");
+	    printf("n");
+	printf(" alias for");
 	nicezputs(a->text, stdout);
 	putchar('\n');
 	return;
@@ -1115,7 +1142,9 @@ printaliasnode(HashNode hn, int printflags)
 
     if (printflags & PRINT_LIST) {
 	printf("alias ");
-	if (a->flags & ALIAS_GLOBAL)
+	if (a->flags & ALIAS_SUFFIX)
+	    printf("-s ");
+	else if (a->flags & ALIAS_GLOBAL)
 	    printf("-g ");
 
 	/* If an alias begins with `-', then we must output `-- ' *
@@ -1127,6 +1156,7 @@ printaliasnode(HashNode hn, int printflags)
     quotedzputs(a->nam, stdout);
     putchar('=');
     quotedzputs(a->text, stdout);
+
     putchar('\n');
 }
 

@@ -60,23 +60,40 @@ which may have effects on shell parameters.  A zero exit code is returned.
 findex(alias)
 cindex(aliases, defining)
 cindex(aliases, listing)
-item(tt(alias) [ {tt(PLUS()|tt(-))}tt(gmrL) ] [ var(name)[tt(=)var(value)] ... ])(
+item(tt(alias) [ {tt(PLUS()|tt(-))}tt(gmrsL) ] [ var(name)[tt(=)var(value)] ... ])(
 For each var(name) with a corresponding var(value), define an alias
 with that value.  A trailing space in var(value) causes the next word
 to be checked for alias expansion.  If the tt(-g) flag is present,
 define a global alias; global aliases are expanded even if they do not
 occur in command position.
 
+If the tt(-s) flags is present, define a suffix alias: if the command
+word on a command line is in the form `var(text)tt(.)var(name)', where
+var(text) is any non-empty string, it is replaced by the text
+`var(value) var(text)tt(.)var(name)'.  Note that var(name) is treated as
+a literal string, not a pattern.  A trailing space in var(value) is not
+special in this case.  For example,
+
+example(alias -s ps=gv)
+
+will cause the command `tt(*.ps)' to be expanded to `tt(gv *.ps)'.  As
+alias expansion is carried out earlier than globbing, the `tt(*.ps)' will
+then be expanded.  Suffix aliases constitute a different name space from
+other aliases (so in the above example it is still possible
+to create an alias for the command tt(ps)) and the two sets are never
+listed together.
+
 For each var(name) with no var(value),
 print the value of var(name), if any.  With no arguments, print all
-currently defined aliases.  If the tt(-m) flag is given the arguments
-are taken as patterns (they should be quoted to preserve them from being
-interpreted as glob patterns), and the aliases matching these patterns
-are printed.  When printing aliases and the tt(-g) or tt(-r) flags
-are present, then restrict the printing to global or regular
-aliases, respectively.  Using `tt(PLUS())' instead of `tt(-)', or ending
-the option list with a single `tt(PLUS())', prevents the values of the
-aliases from being printed.
+currently defined aliases other than suffix aliases.  If the tt(-m) flag
+is given the arguments are taken as patterns (they should be quoted to
+preserve them from being interpreted as glob patterns), and the aliases
+matching these patterns are printed.  When printing aliases and one of
+the tt(-g), tt(-r) or tt(-s) flags is present, restrict the printing to
+global, regular or suffix aliases, respectively; a regular alias is one
+which is neither a global nor a suffix alias.   Using `tt(PLUS())'
+instead of `tt(-)', or ending the option list with a single
+`tt(PLUS())', prevents the values of the aliases from being printed.
 
 If the tt(-L) flag is present, then print each
 alias in a manner suitable for putting in a startup script.  The exit
@@ -228,11 +245,12 @@ enditem()
 findex(disable)
 cindex(disabling commands)
 cindex(commands, disabling)
-item(tt(disable) [ tt(-afmr) ] var(name) ...)(
+item(tt(disable) [ tt(-afmrs) ] var(name) ...)(
 Temporarily disable the var(name)d hash table elements.  The default
 is to disable builtin commands.  This allows you to use an external
 command with the same name as a builtin command.  The tt(-a) option
-causes tt(disable) to act on aliases.  The tt(-f) option causes
+causes tt(disable) to act on regular or global aliases.  The tt(-s)
+option causes tt(disable) to act on suffix aliases.  The tt(-f) option causes
 tt(disable) to act on shell functions.  The tt(-r) options causes
 tt(disable) to act on reserved words.  Without arguments all disabled
 hash table elements from the corresponding hash table are printed.
@@ -323,11 +341,12 @@ modes except tt(ksh).
 findex(enable)
 cindex(enabling commands)
 cindex(commands, enabling)
-item(tt(enable) [ tt(-afmr) ] var(name) ...)(
+item(tt(enable) [ tt(-afmrs) ] var(name) ...)(
 Enable the var(name)d hash table elements, presumably disabled
 earlier with tt(disable).  The default is to enable builtin commands.
-The tt(-a) option causes tt(enable) to act on aliases.  The tt(-f)
-option causes tt(enable) to act on shell functions.  The tt(-r)
+The tt(-a) option causes tt(enable) to act on regular or global aliases.
+The tt(-s) option causes tt(enable) to act on suffix aliases.
+The tt(-f) option causes tt(enable) to act on shell functions.  The tt(-r)
 option causes tt(enable) to act on reserved words.  Without arguments
 all enabled hash table elements from the corresponding hash table are
 printed.  With the tt(-m) flag the arguments are taken as patterns
@@ -1380,10 +1399,12 @@ alias(unalias)(unhash -a)
 cindex(functions, removing)
 alias(unfunction)(unhash -f)
 findex(unhash)
-item(tt(unhash) [ tt(-adfm) ] var(name) ...)(
+item(tt(unhash) [ tt(-adfms) ] var(name) ...)(
 Remove the element named var(name) from an internal hash table.  The
 default is remove elements from the command hash table.  The tt(-a)
-option causes tt(unhash) to remove aliases.  The tt(-f) option causes
+option causes tt(unhash) to remove regular or global aliases.
+The tt(-s) option causes tt(unhash) to remove suffix aliases.
+The tt(-f) option causes
 tt(unhash) to remove shell functions.  The tt(-d) options causes
 tt(unhash) to remove named directories.  If the tt(-m) flag is given
 the arguments are taken as patterns (should be quoted) and all elements

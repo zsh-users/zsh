@@ -1510,7 +1510,7 @@ parse_subscript(char *s, int sub)
 mod_export int
 parse_subst_string(char *s)
 {
-    int c, l = strlen(s), err, olen;
+    int c, l = strlen(s), err, olen, lexstop_ret;
 
     if (!*s || !strcmp(s, nulstring))
 	return 0;
@@ -1522,6 +1522,7 @@ parse_subst_string(char *s)
     bptr = tokstr = s;
     bsiz = l + 1;
     c = hgetc();
+    lexstop_ret = lexstop;
     c = gettokstr(c, 1);
     err = errflag;
     strinend();
@@ -1603,17 +1604,32 @@ exalias(void)
 
 	if (tok == STRING) {
 	    /* Check for an alias */
-	    an = (noaliases || unset(ALIASESOPT)) ? NULL :
-		(Alias) aliastab->getnode(aliastab, yytext);
-	    if (an && !an->inuse && ((an->flags & ALIAS_GLOBAL) || incmdpos ||
-				     inalmore)) {
-		inpush(an->text, INP_ALIAS, an);
-		if (an->text[0] == ' ')
-		    aliasspaceflag = 1;
-		lexstop = 0;
-		if (yytext == copy)
-		    yytext = tokstr;
-		return 1;
+	    if (!noaliases && isset(ALIASESOPT)) {
+		char *suf;
+		
+		an = (Alias) aliastab->getnode(aliastab, yytext);
+		if (an && !an->inuse &&
+		    ((an->flags & ALIAS_GLOBAL) || incmdpos || inalmore)) {
+		    inpush(an->text, INP_ALIAS, an);
+		    if (an->text[0] == ' ')
+			aliasspaceflag = 1;
+		    lexstop = 0;
+		    if (yytext == copy)
+			yytext = tokstr;
+		    return 1;
+		}
+		if ((suf = strrchr(yytext, '.')) && suf[1] &&
+		    suf > yytext && suf[-1] != Meta &&
+		    (an = (Alias)sufaliastab->getnode(sufaliastab, suf+1)) &&
+		    !an->inuse && incmdpos) {
+		    inpush(dupstring(yytext), INP_ALIAS, NULL);
+		    inpush(" ", INP_ALIAS, NULL);
+		    inpush(an->text, INP_ALIAS, an);
+		    lexstop = 0;
+		    if (yytext == copy)
+			yytext = tokstr;
+		    return 1;
+		}
 	    }
 
 	    /* Then check for a reserved word */

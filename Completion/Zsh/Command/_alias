@@ -5,6 +5,7 @@ local curcontext="$curcontext" state line suf
 _arguments -C -s -A "-*" -S \
   '-+g[list or define global aliases]' \
   '-+r[list or define regular aliases]' \
+  '-+s[list or define suffix aliases]' \
   '-+m[print aliases matching specified pattern]' \
   '-L[print each alias in the form of calls to alias]' \
   '*::alias definition:->defn'
@@ -18,4 +19,3 @@ if [[ -n "$state" ]]; then
     _wanted alias expl 'alias definition' _aliases -S "$suf"
   fi
 fi
-

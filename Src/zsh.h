@@ -872,8 +872,11 @@ struct alias {
     int inuse;			/* alias is being expanded  */
 };
 
-/* is this alias global */
+/* bit 0 of flags is the DISABLED flag */
+/* is this alias global? */
 #define ALIAS_GLOBAL	(1<<1)
+/* is this an alias for suffix handling? */
+#define ALIAS_SUFFIX	(1<<2)
 
 /* node in command path hash table (cmdnamtab) */
 

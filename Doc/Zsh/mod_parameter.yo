@@ -64,15 +64,23 @@ expansions.
 )
 vindex(dis_aliases)
 item(tt(dis_aliases))(
-Like tt(raliases) but for disabled regular aliases.
+Like tt(aliases) but for disabled regular aliases.
 )
 vindex(galiases)
 item(tt(galiases))(
-Like tt(raliases), but for global aliases.
+Like tt(aliases), but for global aliases.
 )
 vindex(dis_galiases)
 item(tt(dis_galiases))(
 Like tt(galiases) but for disabled global aliases.
+)
+vindex(saliases)
+item(tt(saliases))(
+Like tt(raliases), but for suffix aliases.
+)
+vindex(dis_saliases)
+item(tt(dis_saliases))(
+Like tt(saliases) but for disabled suffix aliases.
 )
 vindex(parameters)
 item(tt(parameters))(

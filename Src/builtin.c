@@ -45,7 +45,7 @@ static struct builtin builtins[] =
     BUILTIN("[", 0, bin_test, 0, -1, BIN_BRACKET, NULL, NULL),
     BUILTIN(".", BINF_PSPECIAL, bin_dot, 1, -1, 0, NULL, NULL),
     BUILTIN(":", BINF_PSPECIAL, bin_true, 0, -1, 0, NULL, NULL),
-    BUILTIN("alias", BINF_MAGICEQUALS | BINF_PLUSOPTS, bin_alias, 0, -1, 0, "Lgmr", NULL),
+    BUILTIN("alias", BINF_MAGICEQUALS | BINF_PLUSOPTS, bin_alias, 0, -1, 0, "Lgmrs", NULL),
     BUILTIN("autoload", BINF_PLUSOPTS, bin_functions, 0, -1, 0, "tUXwkz", "u"),
     BUILTIN("bg", 0, bin_fg, 0, -1, BIN_BG, NULL, NULL),
     BUILTIN("break", BINF_PSPECIAL, bin_break, 0, 1, BIN_BREAK, NULL, NULL),
@@ -55,11 +55,11 @@ static struct builtin builtins[] =
     BUILTIN("continue", BINF_PSPECIAL, bin_break, 0, 1, BIN_CONTINUE, NULL, NULL),
     BUILTIN("declare", BINF_PLUSOPTS | BINF_MAGICEQUALS | BINF_PSPECIAL, bin_typeset, 0, -1, 0, "AE:%F:%HL:%R:%TUZ:%afghi:%lprtux", NULL),
     BUILTIN("dirs", 0, bin_dirs, 0, -1, 0, "clpv", NULL),
-    BUILTIN("disable", 0, bin_enable, 0, -1, BIN_DISABLE, "afmr", NULL),
+    BUILTIN("disable", 0, bin_enable, 0, -1, BIN_DISABLE, "afmrs", NULL),
     BUILTIN("disown", 0, bin_fg, 0, -1, BIN_DISOWN, NULL, NULL),
     BUILTIN("echo", BINF_PRINTOPTS | BINF_SKIPINVALID, bin_print, 0, -1, BIN_ECHO, "neE", "-"),
     BUILTIN("emulate", 0, bin_emulate, 1, 1, 0, "LR", NULL),
-    BUILTIN("enable", 0, bin_enable, 0, -1, BIN_ENABLE, "afmr", NULL),
+    BUILTIN("enable", 0, bin_enable, 0, -1, BIN_ENABLE, "afmrs", NULL),
     BUILTIN("eval", BINF_PSPECIAL, bin_eval, 0, -1, BIN_EVAL, NULL, NULL),
     BUILTIN("exit", BINF_PSPECIAL, bin_break, 0, 1, BIN_EXIT, NULL, NULL),
     BUILTIN("export", BINF_PLUSOPTS | BINF_MAGICEQUALS | BINF_PSPECIAL, bin_typeset, 0, -1, BIN_EXPORT, "E:%F:%HL:%R:%TUZ:%afhi:%lprtu", "xg"),
@@ -123,9 +123,9 @@ static struct builtin builtins[] =
     BUILTIN("type", 0, bin_whence, 0, -1, 0, "ampfsw", "v"),
     BUILTIN("typeset", BINF_PLUSOPTS | BINF_MAGICEQUALS | BINF_PSPECIAL, bin_typeset, 0, -1, 0, "AE:%F:%HL:%R:%TUZ:%afghi:%lprtuxm", NULL),
     BUILTIN("umask", 0, bin_umask, 0, 1, 0, "S", NULL),
-    BUILTIN("unalias", 0, bin_unhash, 1, -1, 0, "m", "a"),
+    BUILTIN("unalias", 0, bin_unhash, 1, -1, 0, "ms", "a"),
     BUILTIN("unfunction", 0, bin_unhash, 1, -1, 0, "m", "f"),
-    BUILTIN("unhash", 0, bin_unhash, 1, -1, 0, "adfm", NULL),
+    BUILTIN("unhash", 0, bin_unhash, 1, -1, 0, "adfms", NULL),
     BUILTIN("unset", BINF_PSPECIAL, bin_unset, 1, -1, 0, "fmv", NULL),
     BUILTIN("unsetopt", 0, bin_setopt, 0, -1, BIN_UNSETOPT, NULL, NULL),
     BUILTIN("wait", 0, bin_fg, 0, -1, BIN_WAIT, NULL, NULL),
@@ -461,6 +461,8 @@ bin_enable(char *name, char **argv, Options ops, int func)
 	ht = shfunctab;
     else if (OPT_ISSET(ops,'r'))
 	ht = reswdtab;
+    else if (OPT_ISSET(ops,'s'))
+	ht = sufaliastab;
     else if (OPT_ISSET(ops,'a'))
 	ht = aliastab;
     else
@@ -2671,9 +2673,20 @@ bin_whence(char *nam, char **argv, Options ops, int func)
 	informed = 0;
 
 	if (!OPT_ISSET(ops,'p')) {
+	    char *suf;
+
 	    /* Look for alias */
 	    if ((hn = aliastab->getnode(aliastab, *argv))) {
 		aliastab->printnode(hn, printflags);
+		if (!all)
+		    continue;
+		informed = 1;
+	    }
+	    /* Look for suffix alias */
+	    if ((suf = strrchr(*argv, '.')) && suf[1] &&
+		suf > *argv && suf[-1] != Meta &&
+		(hn = sufaliastab->getnode(sufaliastab, suf+1))) {
+		sufaliastab->printnode(hn, printflags);
 		if (!all)
 		    continue;
 		informed = 1;
@@ -2901,6 +2914,8 @@ bin_unhash(char *name, char **argv, Options ops, int func)
 	ht = nameddirtab;	/* named directories */
     else if (OPT_ISSET(ops,'f'))
 	ht = shfunctab;		/* shell functions   */
+    else if (OPT_ISSET(ops,'s'))
+	ht = sufaliastab;	/* suffix aliases, must precede aliases */
     else if (OPT_ISSET(ops,'a'))
 	ht = aliastab;		/* aliases           */
     else
@@ -2963,34 +2978,48 @@ bin_alias(char *name, char **argv, Options ops, int func)
     Alias a;
     Patprog pprog;
     Asgment asg;
-    int haveflags = 0, returnval = 0;
+    int returnval = 0;
     int flags1 = 0, flags2 = DISABLED;
     int printflags = 0;
+    int type_opts;
+    HashTable ht = aliastab;
 
     /* Did we specify the type of alias? */
-    if (OPT_ISSET(ops,'r') || OPT_ISSET(ops,'g')) {
-	if (OPT_ISSET(ops,'r') && OPT_ISSET(ops,'g')) {
+    type_opts = OPT_ISSET(ops, 'r') + OPT_ISSET(ops, 'g') +
+	OPT_ISSET(ops, 's');
+    if (type_opts) {
+	if (type_opts > 1) {
 	    zwarnnam(name, "illegal combination of options", NULL, 0);
 	    return 1;
 	}
-	haveflags = 1;
 	if (OPT_ISSET(ops,'g'))
 	    flags1 |= ALIAS_GLOBAL;
 	else
 	    flags2 |= ALIAS_GLOBAL;
+	if (OPT_ISSET(ops, 's')) {
+	    /*
+	     * Although we keep suffix aliases in a different table,
+	     * it is useful to be able to distinguish Alias structures
+	     * without reference to the table, so we have a separate
+	     * flag, too.
+	     */
+	    flags1 |= ALIAS_SUFFIX;
+	    ht = sufaliastab;
+	} else
+	    flags2 |= ALIAS_SUFFIX;
     }
 
     if (OPT_ISSET(ops,'L'))
 	printflags |= PRINT_LIST;
-    else if (OPT_PLUS(ops,'r') || OPT_PLUS(ops,'g')|| OPT_PLUS(ops,'m') ||
-	     OPT_ISSET(ops,'+'))
+    else if (OPT_PLUS(ops,'g') || OPT_PLUS(ops,'r') || OPT_PLUS(ops,'s') ||
+	     OPT_PLUS(ops,'m') || OPT_ISSET(ops,'+'))
 	printflags |= PRINT_NAMEONLY;
 
     /* In the absence of arguments, list all aliases.  If a command *
      * line flag is specified, list only those of that type.        */
     if (!*argv) {
 	queue_signals();
-	scanhashtable(aliastab, 1, flags1, flags2, aliastab->printnode, printflags);
+	scanhashtable(ht, 1, flags1, flags2, ht->printnode, printflags);
 	unqueue_signals();
 	return 0;
     }
@@ -3003,8 +3032,8 @@ bin_alias(char *name, char **argv, Options ops, int func)
 	    if ((pprog = patcompile(*argv, PAT_STATIC, NULL))) {
 		/* display the matching aliases */
 		queue_signals();
-		scanmatchtable(aliastab, pprog, flags1, flags2,
-			       aliastab->printnode, printflags);
+		scanmatchtable(ht, pprog, flags1, flags2,
+			       ht->printnode, printflags);
 		unqueue_signals();
 	    } else {
 		untokenize(*argv);
@@ -3021,14 +3050,15 @@ bin_alias(char *name, char **argv, Options ops, int func)
 	if (asg->value && !OPT_ISSET(ops,'L')) {
 	    /* The argument is of the form foo=bar and we are not *
 	     * forcing a listing with -L, so define an alias      */
-	    aliastab->addnode(aliastab, ztrdup(asg->name),
-			      createaliasnode(ztrdup(asg->value), flags1));
-	} else if ((a = (Alias) aliastab->getnode(aliastab, asg->name))) {
+	    ht->addnode(ht, ztrdup(asg->name),
+			createaliasnode(ztrdup(asg->value), flags1));
+	} else if ((a = (Alias) ht->getnode(ht, asg->name))) {
 	    /* display alias if appropriate */
-	    if (!haveflags ||
-		(OPT_ISSET(ops,'r') && !(a->flags & ALIAS_GLOBAL)) ||
-		(OPT_ISSET(ops,'g') &&  (a->flags & ALIAS_GLOBAL)))
-		aliastab->printnode((HashNode) a, printflags);
+	    if (!type_opts || ht == sufaliastab ||
+		(OPT_ISSET(ops,'r') && 
+		 !(a->flags & (ALIAS_GLOBAL|ALIAS_SUFFIX))) ||
+		(OPT_ISSET(ops,'g') && (a->flags & ALIAS_GLOBAL)))
+		ht->printnode((HashNode) a, printflags);
 	} else
 	    returnval = 1;
     }

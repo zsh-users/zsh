@@ -1611,49 +1611,56 @@ scanpmuserdirs(HashTable ht, ScanFunc func, int flags)
 	}
 }
 
-/* Functions for the regularaliases and globalaliases special parameters. */
+/* Functions for the raliases, galiases and saliases special parameters. */
 
 /**/
 static void
-setralias(Param pm, char *value, int dis)
+setalias(HashTable ht, Param pm, char *value, int flags)
 {
-    aliastab->addnode(aliastab, ztrdup(pm->nam), createaliasnode(value, dis));
+    ht->addnode(aliastab, ztrdup(pm->nam),
+		createaliasnode(value, flags));
 }
 
 /**/
 static void
 setpmralias(Param pm, char *value)
 {
-    setralias(pm, value, 0);
+    setalias(aliastab, pm, value, 0);
 }
 
 /**/
 static void
 setpmdisralias(Param pm, char *value)
 {
-    setralias(pm, value, DISABLED);
-}
-
-/**/
-static void
-setgalias(Param pm, char *value, int dis)
-{
-    aliastab->addnode(aliastab, ztrdup(pm->nam),
-		      createaliasnode(value, dis | ALIAS_GLOBAL));
+    setalias(aliastab, pm, value, DISABLED);
 }
 
 /**/
 static void
 setpmgalias(Param pm, char *value)
 {
-    setgalias(pm, value, 0);
+    setalias(aliastab, pm, value, ALIAS_GLOBAL);
 }
 
 /**/
 static void
 setpmdisgalias(Param pm, char *value)
 {
-    setgalias(pm, value, DISABLED);
+    setgalias(aliastab, pm, value, ALIAS_GLOBAL|DISABLED);
+}
+
+/**/
+static void
+setpmsalias(Param pm, char *value)
+{
+    setgalias(sufaliastab, pm, value, 0);
+}
+
+/**/
+static void
+setpmdissalias(Param pm, char *value)
+{
+    setgalias(sufaliastab, pm, value, DISABLED);
 }
 
 /**/
@@ -1668,7 +1675,17 @@ unsetpmalias(Param pm, int exp)
 
 /**/
 static void
-setaliases(Param pm, HashTable ht, int global, int dis)
+unsetpmsalias(Param pm, int exp)
+{
+    HashNode hd = sufaliastab->removenode(sufaliastab, pm->nam);
+
+    if (hd)
+	sufaliastab->freenode(hd);
+}
+
+/**/
+static void
+setaliases(HashTable alht, Param pm, HashTable ht, int flags)
 {
     int i;
     HashNode hn, next, hd;
@@ -1676,13 +1693,18 @@ setaliases(Param pm, HashTable ht, int global, int dis)
     if (!ht)
 	return;
 
-    for (i = 0; i < aliastab->hsize; i++)
-	for (hn = aliastab->nodes[i]; hn; hn = next) {
+    for (i = 0; i < alht->hsize; i++)
+	for (hn = alht->nodes[i]; hn; hn = next) {
 	    next = hn->next;
-	    if (((global && (((Alias) hn)->flags & ALIAS_GLOBAL)) ||
-		 (!global && !(((Alias) hn)->flags & ALIAS_GLOBAL))) &&
-		(hd = aliastab->removenode(aliastab, hn->nam)))
-		aliastab->freenode(hd);
+	    /*
+	     * The following respects the DISABLED flag, e.g.
+	     * we get a different behaviour for raliases and dis_raliases.
+	     * The predecessor to this code didn't do that; presumably
+	     * that was a bug.
+	     */
+	    if (flags == ((Alias)hn)->flags &&
+		(hd = alht->removenode(alht, hn->nam)))
+		alht->freenode(hd);
 	}
 
     for (i = 0; i < ht->hsize; i++)
@@ -1696,10 +1718,8 @@ setaliases(Param pm, HashTable ht, int global, int dis)
 	    v.pm = (Param) hn;
 
 	    if ((val = getstrvalue(&v)))
-		aliastab->addnode(aliastab, ztrdup(hn->nam),
-				  createaliasnode(ztrdup(val),
-						  (global ? ALIAS_GLOBAL : 0) |
-						  (dis ? DISABLED : 0)));
+		alht->addnode(alht, ztrdup(hn->nam),
+			      createaliasnode(ztrdup(val), flags));
 	}
     deleteparamtable(ht);
 }
@@ -1708,53 +1728,103 @@ setaliases(Param pm, HashTable ht, int global, int dis)
 static void
 setpmraliases(Param pm, HashTable ht)
 {
-    setaliases(pm, ht, 0, 0);
+    setaliases(aliastab, pm, ht, 0);
 }
 
 /**/
 static void
 setpmdisraliases(Param pm, HashTable ht)
 {
-    setaliases(pm, ht, 0, DISABLED);
+    setaliases(aliastab, pm, ht, DISABLED);
 }
 
 /**/
 static void
 setpmgaliases(Param pm, HashTable ht)
 {
-    setaliases(pm, ht, 1, 0);
+    setaliases(aliastab, pm, ht, ALIAS_GLOBAL);
 }
 
 /**/
 static void
 setpmdisgaliases(Param pm, HashTable ht)
 {
-    setaliases(pm, ht, 1, DISABLED);
+    setaliases(aliastab, pm, ht, ALIAS_GLOBAL|DISABLED);
+}
+
+/**/
+static void
+setpmsaliases(Param pm, HashTable ht)
+{
+    setaliases(sufaliastab, pm, ht, ALIAS_SUFFIX);
+}
+
+/**/
+static void
+setpmdissaliases(Param pm, HashTable ht)
+{
+    setaliases(sufaliastab, pm, ht, ALIAS_SUFFIX|DISABLED);
+}
+
+/**/
+static void
+assignaliasdefs(Param pm, int flags)
+{
+    pm->flags = PM_SCALAR;
+
+    /* we really need to squirrel the flags away somewhere... */
+    switch (flags) {
+    case 0:
+	    pm->sets.cfn = setpmralias;
+	    break;
+
+    case ALIAS_GLOBAL:
+	    pm->sets.cfn = setpmgalias;
+	    break;
+
+    case ALIAS_SUFFIX:
+	    pm->sets.cfn = setpmsalias;
+	    break;
+
+    case DISABLED:
+	    pm->sets.cfn = setpmdisralias;
+	    break;
+
+    case ALIAS_GLOBAL|DISABLED:
+	    pm->sets.cfn = setpmdisgalias;
+	    break;
+
+    case ALIAS_SUFFIX|DISABLED:
+	    pm->sets.cfn = setpmdissalias;
+	    break;
+   }
+
+    pm->gets.cfn = strgetfn;
+    if (flags & ALIAS_SUFFIX)
+	pm->unsetfn = unsetpmsalias;
+    else
+	pm->unsetfn = unsetpmalias;
+    pm->ct = 0;
+    pm->env = NULL;
+    pm->ename = NULL;
+    pm->old = NULL;
+    pm->level = 0;
 }
 
 /**/
 static HashNode
-getalias(HashTable ht, char *name, int global, int dis)
+getalias(HashTable alht, HashTable ht, char *name, int flags)
 {
     Param pm = NULL;
     Alias al;
 
     pm = (Param) zhalloc(sizeof(struct param));
     pm->nam = dupstring(name);
-    pm->flags = PM_SCALAR;
-    pm->sets.cfn = (global ? (dis ? setpmdisgalias : setpmgalias) :
-		    (dis ? setpmdisralias : setpmralias));
-    pm->gets.cfn = strgetfn;
-    pm->unsetfn = unsetpmalias;
-    pm->ct = 0;
-    pm->env = NULL;
-    pm->ename = NULL;
-    pm->old = NULL;
-    pm->level = 0;
-    if ((al = (Alias) aliastab->getnode2(aliastab, name)) &&
-	((global && (al->flags & ALIAS_GLOBAL)) ||
-	 (!global && !(al->flags & ALIAS_GLOBAL))) &&
-	(dis ? (al->flags & DISABLED) : !(al->flags & DISABLED)))
+
+    assignaliasdefs(pm, flags);
+
+    if ((al = (Alias) alht->getnode2(alht, name)) &&
+	flags == al->flags)
 	pm->u.str = dupstring(al->text);
     else {
 	pm->u.str = dupstring("");
@@ -1767,61 +1837,64 @@ getalias(HashTable ht, char *name, int global, int dis)
 static HashNode
 getpmralias(HashTable ht, char *name)
 {
-    return getalias(ht, name, 0, 0);
+    return getalias(aliastab, ht, name, 0);
 }
 
 /**/
 static HashNode
 getpmdisralias(HashTable ht, char *name)
 {
-    return getalias(ht, name, 0, 0);
+    return getalias(aliastab, ht, name, DISABLED);
 }
 
 /**/
 static HashNode
 getpmgalias(HashTable ht, char *name)
 {
-    return getalias(ht, name, 1, 0);
+    return getalias(aliastab, ht, name, ALIAS_GLOBAL);
 }
 
 /**/
 static HashNode
 getpmdisgalias(HashTable ht, char *name)
 {
-    return getalias(ht, name, 1, DISABLED);
+    return getalias(aliastab, ht, name, ALIAS_GLOBAL|DISABLED);
+}
+
+/**/
+static HashNode
+getpmsalias(HashTable ht, char *name)
+{
+    return getalias(sufaliastab, ht, name, ALIAS_SUFFIX);
+}
+
+/**/
+static HashNode
+getpmdissalias(HashTable ht, char *name)
+{
+    return getalias(sufaliastab, ht, name, ALIAS_SUFFIX|DISABLED);
 }
 
 /**/
 static void
-scanaliases(HashTable ht, ScanFunc func, int flags, int global, int dis)
+scanaliases(HashTable alht, HashTable ht, ScanFunc func,
+	    int pmflags, int alflags)
 {
     struct param pm;
     int i;
-    HashNode hn;
     Alias al;
 
-    pm.flags = PM_SCALAR;
-    pm.sets.cfn = (global ? (dis ? setpmdisgalias : setpmgalias) :
-		   (dis ? setpmdisralias : setpmralias));
-    pm.gets.cfn = strgetfn;
-    pm.unsetfn = unsetpmalias;
-    pm.ct = 0;
-    pm.env = NULL;
-    pm.ename = NULL;
-    pm.old = NULL;
-    pm.level = 0;
+    assignaliasdefs(&pm, alflags);
 
-    for (i = 0; i < aliastab->hsize; i++)
-	for (hn = aliastab->nodes[i]; hn; hn = hn->next) {
-	    if (((global && ((al = (Alias) hn)->flags & ALIAS_GLOBAL)) ||
-		 (!global && !((al = (Alias) hn)->flags & ALIAS_GLOBAL))) &&
-		(dis ? (al->flags & DISABLED) : !(al->flags & DISABLED))) {
-		pm.nam = hn->nam;
+    for (i = 0; i < alht->hsize; i++)
+	for (al = (Alias) alht->nodes[i]; al; al = (Alias) al->next) {
+	    if (alflags == al->flags) {
+		pm.nam = al->nam;
 		if (func != scancountparams &&
-		    ((flags & (SCANPM_WANTVALS|SCANPM_MATCHVAL)) ||
-		     !(flags & SCANPM_WANTKEYS)))
+		    ((pmflags & (SCANPM_WANTVALS|SCANPM_MATCHVAL)) ||
+		     !(pmflags & SCANPM_WANTKEYS)))
 		    pm.u.str = dupstring(al->text);
-		func((HashNode) &pm, flags);
+		func((HashNode) &pm, pmflags);
 	    }
 	}
 }
@@ -1830,28 +1903,42 @@ scanaliases(HashTable ht, ScanFunc func, int flags, int global, int dis)
 static void
 scanpmraliases(HashTable ht, ScanFunc func, int flags)
 {
-    scanaliases(ht, func, flags, 0, 0);
+    scanaliases(aliastab, ht, func, flags, 0);
 }
 
 /**/
 static void
 scanpmdisraliases(HashTable ht, ScanFunc func, int flags)
 {
-    scanaliases(ht, func, flags, 0, DISABLED);
+    scanaliases(aliastab, ht, func, flags, DISABLED);
 }
 
 /**/
 static void
 scanpmgaliases(HashTable ht, ScanFunc func, int flags)
 {
-    scanaliases(ht, func, flags, 1, 0);
+    scanaliases(aliastab, ht, func, flags, ALIAS_GLOBAL);
 }
 
 /**/
 static void
 scanpmdisgaliases(HashTable ht, ScanFunc func, int flags)
 {
-    scanaliases(ht, func, flags, 1, DISABLED);
+    scanaliases(aliastab, ht, func, flags, ALIAS_GLOBAL|DISABLED);
+}
+
+/**/
+static void
+scanpmsaliases(HashTable ht, ScanFunc func, int flags)
+{
+    scanaliases(sufaliastab, ht, func, flags, ALIAS_SUFFIX);
+}
+
+/**/
+static void
+scanpmdissaliases(HashTable ht, ScanFunc func, int flags)
+{
+    scanaliases(sufaliastab, ht, func, flags, ALIAS_SUFFIX|DISABLED);
 }
 
 /* Table for defined parameters. */
@@ -1932,11 +2019,17 @@ static struct pardef partab[] = {
     { "galiases", 0,
       getpmgalias, scanpmgaliases, setpmgaliases,
       NULL, NULL, stdunsetfn, NULL },
+    { "saliases", 0,
+      getpmsalias, scanpmsaliases, setpmsaliases,
+      NULL, NULL, stdunsetfn, NULL },
     { "dis_aliases", 0,
       getpmdisralias, scanpmdisraliases, setpmdisraliases,
       NULL, NULL, stdunsetfn, NULL },
     { "dis_galiases", 0,
       getpmdisgalias, scanpmdisgaliases, setpmdisgaliases,
+      NULL, NULL, stdunsetfn, NULL },
+    { "dis_saliases", 0,
+      getpmdissalias, scanpmdissaliases, setpmdissaliases,
       NULL, NULL, stdunsetfn, NULL },
     { NULL, 0, NULL, NULL, NULL, NULL, NULL, NULL, NULL }
 };

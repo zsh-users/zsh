@@ -1,3 +1,14 @@
+2003-09-03  Peter Stephenson  <pws@csr.com>
+
+	* 19014: Completion/Zsh/Command/_alias,
+	Completion/Zsh/Type/.distfiles, Completion/Zsh/Type/_aliases,
+	Completion/Zsh/Type/_command_names,
+	Completion/Zsh/Type/_suffix_alias_files, Doc/Zsh/builtins.yo,
+	Doc/Zsh/mod_parameter.yo, Src/builtin.c, Src/hashtable.c,
+	Src/init.c, Src/lex.c, Src/zsh.h, Src/Modules/parameter.c:
+	add `alias -s suf=cmd' capability to expand `anything.suf'
+	to `cmd anything.suf'.
+
 2003-08-30  Peter Stephenson  <pws@pwstephenson.fsnet.co.uk>
 
 	* c.f. somewhat terse reference in zsh-users/6493:

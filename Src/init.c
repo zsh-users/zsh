@@ -792,7 +792,7 @@ setupvals(void)
     initlextabs();    /* initialize lexing tables    */
 
     createreswdtable();     /* create hash table for reserved words    */
-    createaliastable();     /* create hash table for aliases           */
+    createaliastables();    /* create hash tables for aliases           */
     createcmdnamtable();    /* create hash table for external commands */
     createshfunctable();    /* create hash table for shell functions   */
     createbuiltintable();   /* create hash table for builtin commands  */
