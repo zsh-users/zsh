@@ -553,7 +553,7 @@ setupvals(void)
     char *fpath_subdirs[] = FPATH_SUBDIRS;
     int j;
 # endif
-# ifdef SITEPATH_DIR
+# ifdef SITEFPATH_DIR
     int fpathlen = 1;
 # else
     int fpathlen = 0;
