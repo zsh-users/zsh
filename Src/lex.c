@@ -1447,7 +1447,7 @@ parsestr(char *s)
 int
 parse_subst_string(char *s)
 {
-    int c, l = strlen(s), err;
+    int c, l = strlen(s), err, olen;
 
     if (! *s)
 	return 0;
@@ -1464,6 +1464,7 @@ parse_subst_string(char *s)
     strinend();
     inpop();
     DPUTS(cmdsp, "BUG: parse_subst_string: cmdstack not empty.");
+    olen = len;
     lexrestore();
     errflag = err;
     if (c == LEXERR) {
@@ -1471,9 +1472,9 @@ parse_subst_string(char *s)
 	return 1;
     }
 #ifdef DEBUG
-    if (c != STRING || len != l || errflag) {
+    if (c != STRING || olen != l || errflag) {
 	fprintf(stderr, "Oops. Bug in parse_subst_string: %s\n",
-		len < l ? "len < l" : errflag ? "errflag" : "c != STRING");
+		olen < l ? "len < l" : errflag ? "errflag" : "c != STRING");
 	fflush(stderr);
 	untokenize(s);
 	return 1;

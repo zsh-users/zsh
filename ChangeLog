@@ -1,5 +1,8 @@
 2000-05-04  Sven Wischnowsky  <wischnow@informatik.hu-berlin.de>
 
+	* 11145: Src/lex.c: parse_subst_string() should use modified
+ 	version of `len'
+	
 	* 11144: Src/Modules/zpty.c: make pty the controlling terminal of
 	their commands
 
