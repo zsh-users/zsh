@@ -2123,6 +2123,7 @@ abort_match(void)
 {
     free_cline(matchparts);
     free_cline(matchsubs);
+    matchparts = matchsubs = NULL;
 }
 
 /* This adds a new string in the static char buffer. The arguments are
