@@ -2299,10 +2299,9 @@ colonarrsetfn(Param pm, char *x)
 }
 
 /**/
-int
+void
 uniqarray(char **x)
 {
-    int changes = 0;
     char **t, **p = x;
 
     if (!x || !*x)
@@ -2312,10 +2311,8 @@ uniqarray(char **x)
 	    if (!strcmp(*p, *t)) {
 		zsfree(*p);
 		for (t = p--; (*t = t[1]) != NULL; t++);
-		changes++;
 		break;
 	    }
-    return changes;
 }
 
 /* Function to get value of special parameter `#' and `ARGC' */
@@ -2759,7 +2756,7 @@ pipestatsetfn(Param pm, char **x)
  * do the replacing, since we've already scanned for the string. */
 
 /**/
-static void
+void
 arrfixenv(char *s, char **t)
 {
     char **ep, *u;

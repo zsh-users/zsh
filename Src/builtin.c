@@ -1607,11 +1607,20 @@ typeset_single(char *cname, char *pname, Param pm, int func,
 	}
 	if ((on & PM_UNIQUE) && !(pm->flags & PM_READONLY & ~off)) {
 	    Param apm;
-	    if (PM_TYPE(pm->flags) == PM_ARRAY)
-		uniqarray((*pm->gets.afn) (pm));
-	    else if (PM_TYPE(pm->flags) == PM_SCALAR && pm->ename &&
-		     (apm = (Param) paramtab->getnode(paramtab, pm->ename)))
-		uniqarray((*apm->gets.afn) (apm));
+	    char **x;
+	    if (PM_TYPE(pm->flags) == PM_ARRAY) {
+		x = (*pm->gets.afn)(pm);
+		uniqarray(x);
+		if (pm->ename && x)
+		    arrfixenv(pm->ename, x);
+	    } else if (PM_TYPE(pm->flags) == PM_SCALAR && pm->ename &&
+		       (apm =
+			(Param) paramtab->getnode(paramtab, pm->ename))) {
+		x = (*apm->gets.afn)(apm);
+		uniqarray(x);
+		if (x)
+		    arrfixenv(pm->nam, x);
+	    }
 	}
 	pm->flags = (pm->flags | on) & ~(off | PM_UNSET);
 	/* This auxlen/pm->ct stuff is a nasty hack. */

@@ -1,3 +1,8 @@
+2000-05-10  Peter Stephenson  <pws@pwstephenson.fsnet.co.uk>
+
+	* 11314: Src/builtin.c, Src/params.c: typeset -Uing tied variables
+	didn't update the value in the environment.
+
 2000-05-10  Bart Schaefer  <schaefer@zsh.org>
 
 	* 11312: Config/config.mk: defs.mk depends on config.status.
