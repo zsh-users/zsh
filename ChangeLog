@@ -1,3 +1,8 @@
+2001-08-25  Bart Schaefer  <schaefer@zsh.org>
+
+	* 15707: Src/init.c: Fix history crash caused by re-entering
+	loop() when the `precmd' shell function uses `source' or `.'.
+
 2001-08-24  Sven Wischnowsky  <wischnow@zsh.org>
 
 	* 15705: Src/Zle/complete.c: test if hash table pointer is NULL

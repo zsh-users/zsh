@@ -107,6 +107,8 @@ loop(int toplevel, int justonce)
     pushheap();
     for (;;) {
 	freeheap();
+	if (stophist == 3)	/* re-entry via preprompt() */
+	    hend(NULL);
 	hbegin(1);		/* init history mech        */
 	if (isset(SHINSTDIN)) {
 	    setblock_stdin();
@@ -114,7 +116,10 @@ loop(int toplevel, int justonce)
 	        int hstop = stophist;
 		stophist = 3;
 		preprompt();
-		stophist = hstop;
+		if (stophist != 3)
+		    hbegin(1);
+		else
+		    stophist = hstop;
 		errflag = 0;
 	    }
 	}
