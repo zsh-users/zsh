@@ -6,6 +6,7 @@
 setopt localoptions unset
 unsetopt ksharrays
 
+[[ $curcontext = :zf*: ]] || local curcontext=:zfstat:
 local i stat=0 opt opt_v
 
 while getopts :v opt; do

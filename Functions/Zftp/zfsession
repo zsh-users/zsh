@@ -3,6 +3,7 @@
 
 emulate -L zsh
 
+[[ $curcontext = :zf*: ]] || local curcontext=:zfsession:
 local opt opt_l opt_v opt_o opt_d hadopts
 
 while getopts ":lovd" opt; do

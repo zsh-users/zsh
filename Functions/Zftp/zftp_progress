@@ -1,7 +1,7 @@
 # function zftp_progress {
 # Basic progress metre, showing the percent of the file transferred.
 # You want growing bars?  You gottem.
-# zfconfig keys:
+# styles used (context :zftp:zfparent_function:):
 #   progress
 #       empty or `none'                  no progress meter
 #       `bar'                            use a growing bar of inverse video
@@ -11,16 +11,17 @@
 #   update
 #       Minimum time in seconds between updates of the progress display.
 
-# Don't show progress unless stderr is a terminal
-[[ ! -t 2 || ${zfconfig[progress]} = (|none) ]] && return 0
+local style update=1
 
-# Tunable parameters.
-# How many seconds to wait before printing an updated progress report.
-integer update=${zfconfig[update]:-1}
 # What style: either bar for growing bars, or anything else for simple
 # percentage.  For bar we need to have the terminal width in COLUMNS,
 # which is often set automatically, but you never know.
-local style=${zfconfig[progress]}
+zstyle -s ":zftp$curcontext" progress style
+# How many seconds to wait before printing an updated progress report.
+zstyle -s ":zftp$curcontext" update update
+
+# Don't show progress unless stderr is a terminal
+[[ ! -t 2 || $style = (|none) ]] && return 0
 
 if [[ -n $ZFTP_TRANSFER ]]; then
   # avoid a `parameter unset' message

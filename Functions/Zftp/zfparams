@@ -1,6 +1,7 @@
 # function zfparams {
 
 emulate -L zsh
+[[ $curcontext = :zf*: ]] || local curcontext=:zfparams:
 
 if [[ $# -eq 1 && $1 = - ]]; then
   # Delete existing parameter set.

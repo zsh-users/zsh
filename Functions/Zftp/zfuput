@@ -11,6 +11,7 @@
 
 emulate -L zsh
 
+[[ $curcontext = :zf*: ]] || local curcontext=:zfuput:
 local loc rem locstats remstats doit tmpfile=${TMPPREFIX}zfuput$$
 local rstat opt opt_v opt_s
 integer stat do_close

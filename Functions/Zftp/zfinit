@@ -1,10 +1,19 @@
 emulate -L zsh
 
-[[ $1 = -n ]] || zmodload -e zftp || zmodload -ia zftp
+[[ $1 = -n ]] || zmodload -e zftp || zmodload -ia zftp || return 1
 
-if [[ ${+zfconfig} = 0 ]]; then
+if zmodload -i zutil; then
+  local arr
+  # Set defaults for styles if none set.
+  zstyle -g arr ':zftp:*' progress || zstyle ':zftp:*' progress bar
+  zstyle -g arr ':zftp:*' update   || zstyle ':zftp:*' update   1
+  zstyle -g arr ':zftp:*' titlebar || zstyle ':zftp:*' titlebar true
+  if functions chpwd >&/dev/null && ! zstyle -g arr ':zftp:*' chpwd; then
+    zstyle ':zftp:*' chpwd true
+  fi
+
   typeset -gA zfconfig
-  zfconfig=(progress bar update 1 lastsession default)
+  zfconfig=(lastsession default)
 fi
 
 alias zfcd='noglob zfcd'
@@ -22,7 +31,7 @@ autoload -U zfstat zftp_chpwd zftp_progress zftransfer zftype zfuget zfuput
 # zftp completions: only use these if new-style completion is not
 # active.
 #
-if [[ ${#_patcomps} -eq 0 || ${_patcomps[(i)zf*]} -gt ${#_patcomps} ]]; then
+if [[ ${#_patcomps} -eq 0 || -z ${_patcomps[(i)zf*]} ]]; then
   # only way of getting that noglob out of the way: this is unnecessary with
   # widget-based completion
   setopt completealiases
@@ -55,3 +64,5 @@ if [[ ${#_patcomps} -eq 0 || ${_patcomps[(i)zf*]} -gt ${#_patcomps} ]]; then
   compctl -s '$(zftp session)' -S : -x 'C[0,*:*]' \
     -K zftransfer_match -- zftransfer
 fi
+
+return 0

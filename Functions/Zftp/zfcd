@@ -20,6 +20,7 @@
 #     work just as long as the directory structures under the home match.
 
 emulate -L zsh
+[[ $curcontext = :zf*: ]] || local curcontext=:zfcd:
 
 if [[ $1 = /* ]]; then
   zfautocheck -dn || return 1

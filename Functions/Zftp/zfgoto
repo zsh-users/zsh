@@ -8,6 +8,7 @@
 
 emulate -L zsh
 setopt extendedglob
+[[ $curcontext = :zf*: ]] || local curcontext=:zfgoto:
 
 # Set ZFTP_BMFILE if not already set.  This should agree with
 # the corresponding line in zfmark.

@@ -22,14 +22,13 @@ if [[ -z $ZFTP_USER ]]; then
   zfconfig[lastdir_$ZFTP_SESSION]=
 
   # return the display to standard
-  # uncomment the following line if you have a chpwd which shows directories
-  chpwd
+  zstyle -t ":zftp$curcontext" chpwd && chpwd
 else
   [[ -n $ZFTP_PWD ]] && zfconfig[lastdir_$ZFTP_SESSION]=$ZFTP_PWD
   zfconfig[lastloc_$ZFTP_SESSION]="$ZFTP_HOST:$ZFTP_PWD"
   zfconfig[lastuser_$ZFTP_SESSION]="$ZFTP_USER"
   local args
-  if [[ -t 1 && -t 2 ]]; then
+  if [[ -t 1 && -t 2 ]] && zstyle -t ":zftp$curcontext" titlebar; then
     local str=$zfconfig[lastloc_$ZFTP_SESSION]
     [[ ${#str} -lt 70 ]] && str="%m: %~  $str"
     case $TERM in

@@ -7,6 +7,7 @@
 
 emulate -L zsh
 
+[[ $curcontext = :zf*: ]] || local curcontext=:zfopen:
 local opt dir opt_1 setparams
 
 while getopts :1 opt; do

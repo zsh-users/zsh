@@ -22,6 +22,7 @@
 emulate -L zsh
 setopt extendedglob
 
+[[ $curcontext = :zf*: ]] || local curcontext=:zfdir:
 local file opt optlist redir i newargs force
 local curdir=$zfconfig[curdir_$ZFTP_SESSION]
 local otherdir=$zfconfig[otherdir_$ZFTP_SESSION]

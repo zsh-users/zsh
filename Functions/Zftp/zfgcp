@@ -16,6 +16,7 @@
 
 emulate -L zsh
 
+[[ $curcontext = :zf*: ]] || local curcontext=:zfgcp:
 local opt remlist rem loc opt_G opt_t
 integer stat do_close
 

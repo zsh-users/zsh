@@ -2,6 +2,7 @@
 
 emulate -L zsh
 
+[[ $curcontext = :zf*: ]] || local curcontext=:zfanon:
 local opt opt_1 dir
 
 while getopts :1 opt; do

@@ -12,6 +12,7 @@
 
 emulate -L zsh
 
+[[ $curcontext = :zf*: ]] || local curcontext=:zfcput:
 local loc rem stat=0 locst remst offs tailtype
 local tmpfile=${TMPPREFIX}zfcget$$ rstat
 

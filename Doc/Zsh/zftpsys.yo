@@ -271,10 +271,15 @@ enditem()
 subsect(Sending files)
 startitem()
 findex(zfput)
-item(tt(zfput var(file1) ...))(
+item(tt(zfput [ -r ] var(file1) ...))(
 Send all the var(file1) ... given separately to the remote server.  If a
 filename contains a `tt(/)', the full filename is used locally to find the
 file, but only the basename is used for the remote file name.
+
+With the option tt(-r), if any of the var(files) are directories they are
+sent recursively with all their subdirectories, including files beginning
+with `tt(.)'.  This requires that the remote machine understand UNIX file
+semantics. as `tt(/)' is used as a directory separator.
 )
 findex(zfuput)
 item(tt(zfuput [ -vs ] var(file1) ...))(
@@ -486,11 +491,11 @@ item(tt(zftp_progress))(
 This function shows the status of the transfer.  It will not write anything
 unless the output is going to a terminal; however, if you transfer files in
 the background, you should turn off progress reports by hand using
-`tt(zfconfig[progress]=none)'.  (Background file transfers don't work on all
-OSes.) Note also that if you alter it, any output em(must) be to standard
-error, as standard output may be a file being received.  The form of the
-progess meter, or whether it is used at all, can be configured without
-altering the function, as described in the next section.
+`tt(zstyle ':zftp:*' progress none)'.  Note also that if you alter it, any
+output em(must) be to standard error, as standard output may be a file
+being received.  The form of the progess meter, or whether it is used at
+all, can be configured without altering the function, as described in the
+next section.
 )
 findex(zffcache)
 item(tt(zffcache))(
@@ -504,38 +509,77 @@ sect(Miscellaneous Features)
 
 subsect(Configuration)
 cindex(zftp function system, configuration)
-pindex(zfconfig)
+cindex(zftp function system, styles)
+cindex(styles in zftp functions)
 
-The tt(zfinit) function defines an associative array tt(zfconfig).
-Elements of this may subsequently be set to change the behaviour of the
-tt(zftp) functions using standard syntax (for example,
-`tt(zfconfig[progress]=percent)'.  tt(zfconfig) may also contain
-various other values used by the function system, so it should not be used
-as the target of an assignment for a complete array.  The following keys
-are understood.
+Various styles are available using the standard shell style mechanism,
+described in
+ifzman(zmanref(zshmodules))\
+ifnzman(noderef(The zutil Module)). Briefly, the
+command `tt(zstyle ':zftp:*') var(style) var(value) ...'.
+defines the var(style) to have value var(value) (more than one may be
+given, although that is not useful in the cases described here).  These
+values will then be used throughout the zftp function system.  For more
+precise control, the first argument, which gives a context in which the
+style applies, can be modified to include a particular function, as for
+example `tt(:zftp:zfget:)': the style will then have the given value only
+in the tt(zfget) function.  Values for the same style in different contexts
+may be set; the most specific function will be used, where
+strings are held to be more specific than patterns, and longer patterns and
+shorter patterns.  Note that only the top level function name, as called by
+the user, is used; calling of lower level functions is transparent to the
+user.  Hence modifications to the title bar in tt(zftp_chpwd) use the
+contexts tt(:zftp:zfopen:), tt(:zftp:zfcd:), etc., depending where it was
+called from.  The following styles are understood:
 
 startitem()
 item(tt(progress))(
 Controls the way that tt(zftp_progress) reports on the progress of a
 transfer.  If empty, unset, or `tt(none)', no progress report is made; if
-`tt(bar)' (the default), a growing bar of inverse video is shown; if
-`tt(percent)' (or any other string, though this may change in future), the
-percentage of the file transferred is shown.  The bar meter requires that
-the width of the terminal be available via the tt($COLUMNS) parameter
-(normally this is set automatically).  If the size of the file being
-transferred is not available, tt(bar) and tt(percent) meters will simply
-show the number of bytes transferred so far.
+`tt(bar)' a growing bar of inverse video is shown; if `tt(percent)' (or any
+other string, though this may change in future), the percentage of the file
+transferred is shown.  The bar meter requires that the width of the
+terminal be available via the tt($COLUMNS) parameter (normally this is set
+automatically).  If the size of the file being transferred is not
+available, tt(bar) and tt(percent) meters will simply show the number of
+bytes transferred so far.
+
+When tt(zfinit) is run, if this style is not defined for the context
+tt(:zftp:*), it will be set to `bar'.
 )
 item(tt(update))(
 Specifies the minimum time interval between updates of the progress meter
 in seconds.  No update is made unless new data has been received, so the
 actual time interval is limited only by tt($ZFTP_TIMEOUT).
+
+As described for tt(progress), tt(zfinit) will force this to default to 1.
 )
 item(tt(remote_glob))(
-If set to a non-zero length, filename generation (globbing) is
+If set to `1', `yes' or `true', filename generation (globbing) is
 performed on the remote machine instead of by zsh itself; see below.
 )
+item(tt(titlebar))(
+If set to `1', `yes' or `true', tt(zftp_chpwd) will put the remote host and
+remote directory into the titlebar of terminal emulators such as xterm or
+sun-cmd that allow this.
+
+As described for tt(progress), tt(zfinit) will force this to default to 1.
+)
+item(tt(chpwd))(
+If set to `1' `yes' or `true', tt(zftp_chpwd) will call the function
+tt(chpwd) when a connection is closed.  This is useful if the remote host
+details were put into the terminal title bar by tt(zftp_chpwd) and your
+usual tt(chpwd) also modifies the title bar.
+
+When tt(zfinit) is run, it will determine whether tt(chpwd) exists and if
+so it will set the default value for the style to 1 if none exists
+already.
+)
 enditem()
+
+Note that there is also an associative array tt(zfconfig) which contains
+values used by the function system.  This should not be modified or
+overwritten.
 
 subsect(Remote globbing)
 cindex(zftp function system, remote globbing)
@@ -554,13 +598,12 @@ within the current directory.  The list of files in the current directory,
 if retrieved, will be cached, so that subsequent globs in the same
 directory without an intervening tt(zfcd) are much faster.
 
-If the key tt(remote_glob) of the tt(zfconfig) associative array (see
-above) is set to a non-zero length, globbing is instead performed on the
-remote host: the server is asked for a list of matching files.  This is
-highly dependent on how the server is implemented, though typically UNIX
-servers will provide support for basic glob patterns.  This may in some
-cases be faster, as it avoids retrieving the entire list of directory
-contents.
+If the tt(remote_glob) style (see above) is set, globbing is instead
+performed on the remote host: the server is asked for a list of matching
+files.  This is highly dependent on how the server is implemented, though
+typically UNIX servers will provide support for basic glob patterns.  This
+may in some cases be faster, as it avoids retrieving the entire list of
+directory contents.
 
 subsect(Automatic and temporary reopening)
 cindex(zftp function system, automatic reopening)
