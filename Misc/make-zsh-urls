@@ -1,6 +1,4 @@
 #!/usr/bin/perl -w
-#
-# $Id: make-zsh-urls,v 1.2 2000/04/01 20:49:47 pws Exp $
 
 use strict;
 
