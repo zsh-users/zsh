@@ -1,3 +1,8 @@
+2003-02-27  Doug Kearns  <djkea2@mugca.its.monash.edu.au>
+
+	* 18305: Completion/Zsh/Command/_python: new completion for
+	python.
+
 2003-02-27  Geoff Wing  <gcw@zsh.org>
 
 	* 18306: Src/Zle/zle_refresh.c: fix redisplay of rprompt when line
