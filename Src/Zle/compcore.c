@@ -1887,7 +1887,7 @@ add_match_data(int alt, char *str, Cline line,
 		p = bld_parts(ppre, ppl, ppl, &lp);
 
 	    if (lp->prefix && !(line->flags & (CLF_SUF | CLF_MID)) &&
-		!p->llen && !p->wlen && !p->olen) {
+		!lp->llen && !lp->wlen && !lp->olen) {
 		Cline lpp;
 
 		for (lpp = lp->prefix; lpp->next; lpp = lpp->next);
@@ -1952,7 +1952,7 @@ add_match_data(int alt, char *str, Cline line,
 	    for (p = lp = cp_cline(pline, 1); lp->next; lp = lp->next);
 
 	if (lp->prefix && !(line->flags & (CLF_SUF | CLF_MID)) &&
-	    !p->llen && !p->wlen && !p->olen) {
+	    !lp->llen && !lp->wlen && !lp->olen) {
 	    Cline lpp;
 
 	    for (lpp = lp->prefix; lpp->next; lpp = lpp->next);
