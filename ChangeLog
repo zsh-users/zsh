@@ -1,5 +1,9 @@
 2003-08-20  Peter Stephenson  <pws@csr.com>
 
+	* 18951: Completion/Unix/Command/_perforce: Improve 18948 to
+	limit options retained, also make argument to p4 -p complete
+	better.
+
 	* 18942: Completion/Unix/Command/_perforce: Fix autoremoval
 	of slashes which were stomped on by the special suffix handler.
 

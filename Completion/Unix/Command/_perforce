@@ -251,26 +251,40 @@ _perforce() {
 	fi
     fi
 
-    # We need to try and check if we are before or after the
-    # subcommand, since some of the options with arguments, in particular -c,
-    # work differently.  It didn't work if I just added '*::...' to the
-    # end of the arguments list, anyway.
-    for (( i = 2; i < CURRENT; i++ )); do
-	if [[ $words[i] = -[cCdHLpPux] ]]; then
-	    # word with following argument
-	    (( i++ ))
-	elif [[ $words[i] != -* ]]; then
-	    break
-	fi
-    done
+    # Options with arguments we need to pass down when calling
+    # p4 from completers.  There are no options without arguments
+    # we need to pass.  (Don't pass down -L language since we
+    # parse based on English output.)
+    local argopts_pass="cCdHpPu"
+    # Other options which have arguments but we shouldn't pass down.
+    # There are some debugging options, but they tend to get used
+    # with the argument in the same word as the option, in which
+    # case they will be handled OK anyway.
+    local argopts_ignore="Lx"
 
     # If we are at or after the command word, remember the
     # global arguments to p4 as we will need to pass these down
     # when generating completion lists.
     local -a _perforce_global_options
-    if (( i <= CURRENT && i > 2 )); then
-	_perforce_global_options=(${words[2,i-1]})
-    fi
+
+    # We need to try and check if we are before or after the
+    # subcommand, since some of the options with arguments, in particular -c,
+    # work differently.  It didn't work if I just added '*::...' to the
+    # end of the arguments list, anyway.
+    for (( i = 2; i < CURRENT; i++ )); do
+	if [[ $words[i] = -[$argopts_pass$argopts_ignore] ]]; then
+	    # word with following argument
+	    if [[ $words[i] = -[$argopts_pass] ]]; then
+		_perforce_global_options+=(${words[i,i+1]})
+	    fi
+	    (( i++ ))
+	elif [[ $words[i] = -[$argopts_pass]* ]]; then
+	    # word including argument which we want to keep
+	    _perforce_global_options+=(${words[i]})
+	elif [[ $words[i] != -* ]]; then
+	    break
+	fi
+    done
 
     if (( i >= CURRENT )); then
 	_arguments -s : \
@@ -280,7 +294,7 @@ _perforce() {
 	    '-H+[hostname]:host:_hosts' \
 	    '-G[python output]' \
 	    '-L+[message language]:language: ' \
-	    '-p+[server port]:port:_ports' \
+	    '-p+[server port]:port:_perforce_hosts_ports' \
 	    '-P+[password on server]:password: ' \
 	    '-s[output script tags]' \
 	    '-u+[user]:user name:_users' \
@@ -305,6 +319,9 @@ _perforce() {
 _perforce_call_p4() {
     local cp_tag=$1
     shift
+    # This is for our own use for parsing, and we need English output,
+    # so...
+    local +x P4LANGUAGE
     _call_program $cp_tag p4 "${_perforce_global_options[@]}" "$@"
 }
 
