@@ -760,10 +760,18 @@ parse_cadef(char *nam, char **args)
 		opt->name = ztrdup(rembslashcolon(name));
 		if (descr)
 		    opt->descr = ztrdup(descr);
-		else if (adpre && oargs && !oargs->next &&
-			 oargs->descr && oargs->descr[0])
-		    opt->descr = tricat(adpre, oargs->descr, adsuf);
-		else
+		else if (adpre && oargs && !oargs->next) {
+		    char *d;
+
+		    for (d = oargs->descr; *d; d++)
+			if (!iblank(*d))
+			    break;
+
+		    if (*d)
+			opt->descr = tricat(adpre, oargs->descr, adsuf);
+		    else
+			opt->descr = NULL;
+		} else
 		    opt->descr = NULL;
 		opt->xor = xor;
 		opt->type = otype;
