@@ -149,12 +149,21 @@ If each tt(elif) var(list) returns nonzero, the tt(else) var(list) is executed.
 findex(for)
 cindex(for loops)
 cindex(loops, for)
-item(tt(for) var(name) [ tt(in) var(word) ... var(term) ] tt(do) var(list) tt(done))(
+item(tt(for) var(name) ... [ tt(in) var(word) ... ] var(term) tt(do) var(list) tt(done))(
 where var(term) is at least one newline or tt(;).
 Expand the list of var(word)s, and set the parameter
 var(name) to each of them in turn, executing
 var(list) each time.  If the tt(in) var(word) is omitted,
 use the positional parameters instead of the var(word)s.
+
+More than one parameter var(name) can appear before the list of
+var(word)s.  If var(N) var(name)s are given, then on each execution of the
+loop the next tt(N) var(word)s are assigned to the corresponding
+parameters.  If there are more var(name)s than remaining var(word)s, the
+remaining parameters are each set to the empty string.  Execution of the
+loop ends when there is no remaining var(word) to assign to the first
+var(name).  It is only possible for tt(in) to appear as the first var(name)
+in the list, else it will be treated as marking the end of the list.
 )
 item(tt(for LPAR()LPAR()) [var(expr1)] tt(;) [var(expr2)] tt(;) [var(expr3)] tt(RPAR()RPAR() do) var(list) tt(done))(
 The arithmetic expression var(expr1) is evaluated first (see
@@ -289,17 +298,17 @@ does em(not), since the test is not suitably delimited.
 item(tt(if) var(list) var(sublist))(
 A short form of the alternate `if'.
 )
-item(tt(for) var(name) tt(LPAR()) var(word) ... tt(RPAR()) var(sublist))(
+item(tt(for) var(name) ... tt(LPAR()) var(word) ... tt(RPAR()) var(sublist))(
 A short form of tt(for).
 )
-item(tt(for) var(name) [ tt(in) var(word) ... var(term) ] var(sublist))(
+item(tt(for) var(name) ... [ tt(in) var(word) ... ] var(term) var(sublist))(
 where var(term) is at least one newline or tt(;).
 Another short form of tt(for).
 )
 item(tt(for LPAR()LPAR()) [var(expr1)] tt(;) [var(expr2)] tt(;) [var(expr3)] tt(RPAR()RPAR()) var(sublist))(
 A short form of the arithmetic tt(for) command.
 )
-item(tt(foreach) var(name) tt(LPAR()) var(word) ... tt(RPAR()) var(list) tt(end))(
+item(tt(foreach) var(name) ... tt(LPAR()) var(word) ... tt(RPAR()) var(list) tt(end))(
 Another form of tt(for).
 )
 item(tt(while) var(list) tt({) var(list) tt(}))(

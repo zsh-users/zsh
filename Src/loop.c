@@ -52,15 +52,15 @@ execfor(Estate state, int do_exec)
     Wordcode end, loop;
     wordcode code = state->pc[-1];
     int iscond = (WC_FOR_TYPE(code) == WC_FOR_COND), ctok = 0, atok = 0;
+    int last = 0;
     char *name, *str, *cond = NULL, *advance = NULL;
     zlong val = 0;
-    LinkList args = NULL;
+    LinkList vars = NULL, args = NULL;
 
-    name = ecgetstr(state, EC_NODUP, NULL);
     end = state->pc + WC_FOR_SKIP(code);
 
     if (iscond) {
-	str = dupstring(name);
+	str = dupstring(ecgetstr(state, EC_NODUP, NULL));
 	singsub(&str);
 	if (isset(XTRACE)) {
 	    char *str2 = dupstring(str);
@@ -77,28 +77,32 @@ execfor(Estate state, int do_exec)
 	}
 	cond = ecgetstr(state, EC_NODUP, &ctok);
 	advance = ecgetstr(state, EC_NODUP, &atok);
-    } else if (WC_FOR_TYPE(code) == WC_FOR_LIST) {
-	int htok = 0;
-
-	if (!(args = ecgetlist(state, *state->pc++, EC_DUPTOK, &htok))) {
-	    state->pc = end;
-	    return 0;
-	}
-	if (htok)
-	    execsubst(args);
     } else {
-	char **x;
+	vars = ecgetlist(state, *state->pc++, EC_NODUP, NULL);
 
-	args = newlinklist();
-	for (x = pparams; *x; x++)
-	    addlinknode(args, dupstring(*x));
+	if (WC_FOR_TYPE(code) == WC_FOR_LIST) {
+	    int htok = 0;
+
+	    if (!(args = ecgetlist(state, *state->pc++, EC_DUPTOK, &htok))) {
+		state->pc = end;
+		return 0;
+	    }
+	    if (htok)
+		execsubst(args);
+	} else {
+	    char **x;
+
+	    args = newlinklist();
+	    for (x = pparams; *x; x++)
+		addlinknode(args, dupstring(*x));
+	}
     }
     lastval = 0;
     loops++;
     pushheap();
     cmdpush(CS_FOR);
     loop = state->pc;
-    for (;;) {
+    while (!last) {
 	if (iscond) {
 	    if (ctok) {
 		str = dupstring(cond);
@@ -127,14 +131,29 @@ execfor(Estate state, int do_exec)
 	    if (!val)
 		break;
 	} else {
-	    if (!args || !(str = (char *) ugetnode(args)))
-		break;
-	    if (isset(XTRACE)) {
-		printprompt4();
-		fprintf(xtrerr, "%s=%s\n", name, str);
-		fflush(xtrerr);
+	    LinkNode node;
+	    int count = 0;
+	    for (node = firstnode(vars); node; incnode(node))
+	    {
+		name = (char *)getdata(node);
+		if (!args || !(str = (char *) ugetnode(args)))
+		{
+		    if (count) { 
+			str = "";
+			last = 1;
+		    } else
+			break;
+		}
+		if (isset(XTRACE)) {
+		    printprompt4();
+		    fprintf(xtrerr, "%s=%s\n", name, str);
+		    fflush(xtrerr);
+		}
+		setsparam(name, ztrdup(str));
+		count++;
 	    }
-	    setsparam(name, ztrdup(str));
+	    if (!count)
+		break;
 	}
 	state->pc = loop;
 	execlist(state, 1, do_exec && args && empty(args));

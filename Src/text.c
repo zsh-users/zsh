@@ -415,7 +415,7 @@ gettext2(Estate state)
 		    taddstr(ecgetstr(state, EC_NODUP, NULL));
 		    taddstr(")) do");
 		} else {
-		    taddstr(ecgetstr(state, EC_NODUP, NULL));
+		    taddlist(state, *state->pc++);
 		    if (WC_FOR_TYPE(code) == WC_FOR_LIST) {
 			taddstr(" in ");
 			taddlist(state, *state->pc++);

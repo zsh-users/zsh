@@ -1,3 +1,10 @@
+2001-06-25  Peter Stephenson  <pws@csr.com>
+
+	* 15030: Doc/Zsh/grammar.yo, Src/loop.c, Src/parse.c, Src/text.c:
+	`for' loops can take multiple parameter names before the `in'
+	or left parenthesis, each of which takes one word from the list
+	on each iteration.
+
 2001-06-25  Sven Wischnowsky  <wischnow@zsh.org>
 
 	* user/3940: Src/Zle/zle_tricky.c: make expand-word not always
