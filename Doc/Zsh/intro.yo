@@ -24,6 +24,7 @@ list(em(zshcompwid)   Zsh completion widgets)
 list(em(zshcompctl)   Zsh completion control)
 list(em(zshmodules)   Zsh loadable modules)
 list(em(zshcompsys)   Zsh completion system)
+list(em(zshzftpsys)   Zsh built-in FTP client)
 ifzshone(\
 list(em(zshall)       Meta-man page containing all of the above)
 )\
