@@ -682,12 +682,7 @@ item(tt(pwd) [ tt(-rLP) ])(
 Print the absolute pathname of the current working directory.
 If the tt(-r) or the tt(-P) flag is specified, or the tt(CHASE_LINKS)
 option is set and the tt(-L) flag is not given, the printed path will not
-contain symbolic links.  Otherwise, the shell will print the stored
-directory, i.e. the value to which tt($PWD) was last set.  In this case, it
-will check that the current tt($PWD) is still valid; if it is, or if it is
-unable to find a valid path because the current directory no longer exists,
-it will print that, and if it is not, it will print the full path without
-symbolic links and update tt($PWD) accordingly.
+contain symbolic links.
 )
 alias(r)(fc -e -)
 findex(read)
