@@ -22,7 +22,7 @@ if [[ "$words[1]" != "$_a2ps_cache_cmd" ]]; then
   )
 fi
 
-_arguments '*:text file:_files -g \*\~\*.\(\#i)\(ps\|eps\)' -- \
+_arguments '*:text file:_files -g \*\~\*.\(\#i\)\(ps\|eps\)' -- \
            '*\*:toggle:(yes no)' \
            '*=DIRECTION:direction:(rows columns)' \
            '*=TYPE:type:(r n nr rn any)' \
