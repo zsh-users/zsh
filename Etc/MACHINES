@@ -25,10 +25,11 @@ Apple/NeXT OpenStep 4.2 for i386.
 Cray: Unicos (C90 and T90)
 	Should build `out-of-the-box'.
 
-Cygnus Solutions: Cygwin on Intel
+Red Hat Inc.: Cygwin
 	Should build `out-of-the-box'.  The compilation directory should
 	be on a file system mounted as binary (the mount command shows
-	`binmode').
+	`binmode'). There are various issues with Cygwin versions before
+	1.3.2 - you are adviced to update to the latest release.
 
 	Dynamic loading works as of cygwin-1.1.3 and binutils-20000722-1.
 	It was not tested for earlier versions. This does not imply

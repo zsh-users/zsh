@@ -1,3 +1,8 @@
+2001-06-01  Andrej Borsenkow  <bor@zsh.org>
+
+	* unposted: Etc/MACHINES: Cygwin belongs now to Red Hat. Mention
+	the release where everything appears to work for the first time.
+
 2001-06-01  Tanaka Akira  <akr@zsh.org>
 
 	* 14628: Completion/Unix/Command/_ruby: new completion function.
@@ -22,6 +27,7 @@
 
 2001-05-31  Sven Wischnowsky  <wischnow@zsh.org>
 
+>>>>>>> 1.1182
 	* 14605: Src/params.c, Src/Modules/parameter.c,
 	Src/Zle/complete.c, Src/Zle/computil.c, Src/Zle/zleparameter.c:
 	fix two memory leaks (at least I hope they are fixed) and some
