@@ -1,0 +1,62 @@
+#autoload
+
+# This can be used to add options or values with descriptions as matches.
+
+local _opt _expl _tmps _tmpd _tmpmd _tmpms _ret=1 _showd _nm _hide _args
+local _type=values _descr
+
+# Get the option.
+
+if [[ "$1" = -o ]]; then
+  _type=options
+  shift
+elif [[ "$1" = -t ]]; then
+  _type="$2"
+  shift 2
+elif [[ "$1" = -t* ]]; then
+  _type="${1[3,-1]}"
+  shift
+fi
+
+# Do the tests. `showd' is set if the descriptions should be shown.
+
+zstyle -T ":completion:${curcontext}:$_type" verbose && _showd=yes
+
+_descr="$1"
+shift
+
+[[ "$_type" = options ]] &&
+    zstyle -t ":completion:${curcontext}:options" prefix-hidden && _hide=yes
+
+_tags "$_type"
+while _tags; do
+  while _next_label "$_type" _expl "$_descr"; do
+
+    if [[ -n "$_showd" ]]; then
+      compdescribe -I ' -- ' "$@"
+    else
+      compdescribe -i "$@"
+    fi
+
+    while compdescribe -g _args _tmpd _tmpmd _tmps _tmpms; do
+
+      # See if we should remove the option prefix characters.
+
+      if [[ -n "$_hide" ]]; then
+        if [[ "$PREFIX" = --* ]]; then
+          _tmpd=( "${(@)_tmpd#--}" )
+          _tmps=( "${(@)_tmps#--}" )
+        elif [[ "$PREFIX" = [-+]* ]]; then
+          _tmpd=( "${(@)_tmpd#[-+]}" )
+          _tmps=( "${(@)_tmps#[-+]}" )
+        fi
+      fi
+
+      compadd "$_args[@]" "$_expl[@]" -ld _tmpd -a _tmpmd && _ret=0
+      compadd "$_args[@]" "$_expl[@]" -d _tmps  -a _tmpms && _ret=0
+    done
+  done
+  (( _ret )) || return 0
+done
+
+return 1
