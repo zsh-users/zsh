@@ -117,7 +117,8 @@ evalcond(Cond c)
 	if (c->type < COND_MOD) {
 	    char *rt = (char *) right;
 	    if (c->type == COND_STREQ || c->type == COND_STRNEQ) {
-		rt = dupstring(rt);
+		rt = dupstring(c->right);
+		singsub(&rt);
 		untokenize(rt);
 	    }
 	    fprintf(stderr, " %s %s %s", (char *)left, condstr[c->type],
