@@ -6340,7 +6340,7 @@ makecomplistflags(Compctl cc, char *s, int incmd, int compadd)
 				/* It's a simple pattern, so append it to *
 				 * the path we have on the command line.  */
 				    int minlen = o + strlen(g);
-				    if (minlen > paalloc)
+				    if (minlen >= paalloc)
 					pa = (char *)
 					    zrealloc(pa, paalloc = minlen+1);
 				    strcpy(pa + o, g);
