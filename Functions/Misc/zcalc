@@ -74,6 +74,10 @@
 # also understood.  However, leading 0 for octal is not understood --- it's
 # too confusing in a calculator.  Use 8#777 etc.
 #
+# Options: -#<base> is the same as a line containing just `[#<base>],
+# similarly -##<base>; they set the default output base, with and without
+# a base discriminator in front, respectively.
+#
 #
 # To do:
 # - separate zcalc history from shell history using arrays --- or allow
@@ -84,7 +88,7 @@
 emulate -L zsh
 setopt extendedglob
 
-local line latest base defbase match mbegin mend psvar
+local line latest base defbase match mbegin mend psvar optlist opt arg
 integer num
 
 zmodload -i zsh/mathfunc 2>/dev/null
@@ -94,6 +98,36 @@ zmodload -i zsh/mathfunc 2>/dev/null
 # Supply some constants.
 float PI E
 (( PI = 4 * atan(1), E = exp(1) ))
+
+# Process command line
+while [[ -n $1 && $1 = -(|[#-]*) ]]; do
+  optlist=${1[2,-1]}
+  shift
+  [[ $optlist = (|-) ]] && break
+  while [[ -n $optlist ]]; do
+    opt=${optlist[1]}
+    optlist=${optlist[2,-1]}
+    case $opt in
+      ('#') # Default base
+            if [[ -n $optlist ]]; then
+	       arg=$optlist
+	       optlist=
+	    elif [[ -n $1 ]]; then
+	       arg=$1
+	       shift
+	    else
+	       print "-# requires an argument" >&2
+	       return 1
+	    fi
+	    if [[ $arg != (|\#)[[:digit:]]## ]]; then
+	      print - "-# requires a decimal number as an argument" >&2
+	      return 1
+	    fi
+            defbase="[#${arg}]"
+	    ;;
+    esac
+  done
+done
 
 for (( num = 1; num <= $#; num++ )); do
   # Make sure all arguments have been evaluated.

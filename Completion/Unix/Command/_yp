@@ -19,7 +19,8 @@ ypcat)
   _arguments -C -s "$_yp_args[@]" ':map name:->map' && ret=0
   ;;
 ypmatch)
-  _arguments -C -s "$_yp_args[@]" '*::key map:->keymap' && ret=0
+  _arguments -C -s "$_yp_args[@]" '::key map:->keymap' ':map name:->map' && 
+    ret=0
   ;;
 yppasswd)
   _users
