@@ -43,21 +43,20 @@ whenlatex(report(ARG1)(ARG2)(ARG3))\
 whenman(report(ARG1)(ARG2)(ARG3))\
 whenms(report(ARG1)(ARG2)(ARG3))\
 whensgml(report(ARG1)(ARG2)(ARG3)))
-myreport(Z-Shell Frequently-Asked Questions)(Peter Stephenson)(2001/03/04)
+myreport(Z-Shell Frequently-Asked Questions)(Peter Stephenson)(2001/05/25)
 COMMENT(-- the following are for Usenet and must appear first)\
 description(\
 mydit(Archive-Name:) unix-faq/shell/zsh
-mydit(Last-Modified:) 2001/03/04
+mydit(Last-Modified:) 2001/05/24
 mydit(Submitted-By:) email(pws@pwstephenson.fsnet.co.uk (Peter Stephenson))
 mydit(Posting-Frequency:) Monthly
 mydit(Copyright:) (C) P.W. Stephenson, 1995--2001 (see end of document)
 )
 
-bf(Changes since issue posted January 2001:)
+bf(Changes since last issue posted:)
 description(
-  mydit(3.26) New item: effect of multios on pipes.
-  mydit(5.3)  Add parameter code changes to wishlist.
-  mydit(5.4)  Rewrite for historical reasons.
+  mydit()     Nothing substantive, but many minor tweaks in preparation for
+       the release of 4.0.1.
 )
 
 This document contains a list of frequently-asked (or otherwise
@@ -240,16 +239,16 @@ sect(What is it good at?)
   itemize(
   it() Command line editing:
   itemize(
-    it() programmable completion: incorporates the ability to use
-       the full power of zsh globbing (compctl -g),
+    it() programmable completion: incorporates the ability to use the
+       full power of zsh's globbing and shell programming features,
     it() multi-line commands editable as a single buffer (even files!),
     it() variable editing (vared),
     it() command buffer stack,
     it() print text straight into the buffer for immediate editing (print -z),
     it() execution of unbound commands,
-    it() menu completion,
+    it() menu completion in two flavours,
     it() variable, editing function and option name completion,
-    it() inline expansion of variables, history commands.  
+    it() inline expansion of variables and history commands.  
   )
   it() Globbing --- extremely powerful, including:
   itemize(
@@ -263,8 +262,9 @@ sect(What is it good at?)
   it() Adaptable messages for spelling, watch, time as well as prompt
      (including conditional expressions).
   it() Named directories.
-  it() Comprehensive integer arithmetic.
+  it() Comprehensive integer and floating point arithmetic.
   it() Manipulation of arrays (including reverse subscripting).
+  it() Associative arrays (key-to-value hashes)
   it() Spelling correction.
   )
 
@@ -299,21 +299,23 @@ sect(On what machines will it run?)
 
 sect(What's the latest version?)
 
-  Zsh 3.0.8 is the latest production version. The new major number 3.0
-  largely reflects the considerable internal changes in zsh to make it more
+  Zsh 4.0.1 is the latest production version.
+
+  Zsh 3.0.8 was the previous production version.  The major number 3.0
+  largely reflected considerable internal changes in zsh to make it more
   reliable, consistent and (where possible) compatible.  Those planning on
   upgrading their zsh installation should take a look at the list of
   incompatibilities at the end of link(5.1)(51).  This is longer than usual
   due to enhanced sh, ksh and POSIX compatibility.
 
-  It is unlikely that there will be more 3.0 releases before 4.0 becomes
+  There will not be any further 3.0 releases now that 4.0 has become
   the stable version.  However, a few patches to 3.0.8 are available from
   the patch manager at Sourceforge, \
 url(http://sourceforge.net/patch/?group_id=4068)\
 (http://www.sourceforge.net/patch/?group_id=4068)
   Official patches are posted by Bart Schaefer (user name tt(barts)).
 
-  The beta version 3.1.9 is also available.  Development of zsh is usually
+  A beta of the next version is often available.  Development of zsh is
   patch by patch, with each intermediate version publicly available.  Note
   that this `open' development system does mean bugs are sometimes
   introduced into the most recent archived version.  These are usually
@@ -327,7 +329,7 @@ url(http://sourceforge.net/patch/?group_id=4068)\
   Changes of this kind are almost always forced by an awkward or
   unnecessary feature in the original design (as perceived by current
   users), or to enhance compatibility with other Bourne shell
-  derivatives, or (most recently) to provide POSIX compliancy.
+  derivatives, or (mostly in the 3.0 series) to provide POSIX compliancy.
 
 
 sect(Where do I get it?)
@@ -366,11 +368,11 @@ label(16)
     mydit()          url(ftp://ftp.kfki.hu/pub/packages/zsh/)
 (ftp://ftp.kfki.hu/pub/packages/zsh/)
     mydit(Israel)    \
-url(ftp://ftp.math.technion.ac.il/mirror/ftp.zsh.org/pub/zsh/)
-(ftp://ftp.math.technion.ac.il/mirror/ftp.zsh.org/pub/zsh/)
+url(ftp://ftp.math.technion.ac.il/pub/zsh/)
+(ftp://ftp.math.technion.ac.il/pub/zsh/)
     mydit()          \
-url(http://www.math.technion.ac.il/mirror/ftp.zsh.org/pub/zsh/)
-(http://www.math.technion.ac.il/mirror/ftp.zsh.org/pub/zsh/)
+url(http://www.math.technion.ac.il/pub/zsh/)
+(http://www.math.technion.ac.il/pub/zsh/)
     mydit(Italy)     url(ftp://ftp.unina.it/pub/Unix/pkgs/shell/zsh/)
 (ftp://ftp.unina.it/pub/Unix/pkgs/shell/zsh/)
     mydit(Japan)     url(ftp://ftp.nisiq.net/pub/shells/zsh/)
@@ -406,15 +408,15 @@ url(http://www.math.technion.ac.il/mirror/ftp.zsh.org/pub/zsh/)
 
   The Windows port mentioned above is maintained separately by email(Amol
   Deshpande <amold@microsoft.com>); please mail Amol directly about any
-  Windows-specific problems.  This is quite new, so don't expect it to
-  be perfect.  You can get it from:
+  Windows-specific problems.  This is based on 3.0.5, and probably will
+  not be developed further.  You can get it from:
 
   description(
     mydit()        url(ftp://ftp.blarg.net/users/amol/zsh)
 (ftp://ftp.blarg.net/users/amol/zsh)  
   )
 
-  There is no port of 3.1 for Windows, but newer releases compile under
+  There is no port of 4.0 for Windows, but newer releases compile under
   Cygwin, a freely available UNIX-style environment for the Win32 API.  You
   can find information about this at 
   url(http://sourceware.cygnus.com/cygwin)\
@@ -539,31 +541,33 @@ label(21)
   myeit() also from 3.0, the command `emulate' is available: `emulate
      ksh' and `emulate sh' set various options as well as changing the
      effect of single-letter option flags as if the shell had been
-     invoked with the appropriate name.  Including the commands
+     invoked with the appropriate name.  Including the command
      `emulate sh; setopt localoptions' in a shell function will
-     turn on sh emulation for that function only.
+     turn on sh emulation for that function only.  In 4.0 (and in
+     3.0.6 through 8), this can be abbreviated as `emulate -L sh'.
    )
 
-  The classic difference is word splitting, discussed in link(3.1)(31); this
-  catches out very many beginning zsh users.  As explained there, this
-  is actually a bug in every other shell.  The answer is to set
+  The classic difference is word splitting, discussed in question \
+link(3.1)(31);
+  this catches out very many beginning zsh users.  As explained there,
+  this is actually a bug in every other shell.  The answer is to set
   tt(SH_WORD_SPLIT) for backward compatibility.  The next most classic
-  difference is that unmatched glob patterns cause the command to
-  abort; set tt(NO_NOMATCH) for those.
+  difference is that unmatched glob patterns cause the command to abort;
+  set tt(NO_NOMATCH) for those.
 
   Here is a list of various options which will increase ksh
   compatibility, though maybe decrease zsh's abilities: see the manual
   entries for tt(GLOB_SUBST), tt(IGNORE_BRACES) (though brace expansion occurs
   in some versions of ksh), tt(KSH_ARRAYS), tt(KSH_GLOB), tt(KSH_OPTION_PRINT),
   tt(LOCAL_OPTIONS), tt(NO_BAD_PATTERN), tt(NO_BANG_HIST), tt(NO_EQUALS), \
-tt(NO_HUP,)
+tt(NO_HUP),
   tt(NO_NOMATCH), tt(NO_RCS), tt(NO_SHORT_LOOPS), tt(PROMPT_SUBST), \
 tt(RM_STAR_SILENT),
   tt(POSIX_BUILTINS), tt(SH_FILE_EXPANSION), tt(SH_GLOB), \
 tt(SH_OPTION_LETTERS),
   tt(SH_WORD_SPLIT) (see question link(3.1)(31)) and tt(SINGLE_LINE_ZLE).
   Note that you can also disable any built-in commands which get in
-  your way.  If invoked as `ksh', the shell will try and set suitable
+  your way.  If invoked as `ksh', the shell will try to set suitable
   options.
 
   Here are some differences from ksh which might prove significant for
@@ -602,8 +606,8 @@ PROMPT_SUBST).
         Equivalents:
   verb(
 ----------------------------------------------------------------------
-      ksh             zsh          Meaning
-      -----           -----        ---------
+      ksh              zsh         Meaning
+     ------           ------       ---------
      !(foo)            ^foo        Anything but foo.
                 or   foo1~foo2     Anything matching foo1 but foo2[1].
 @(foo1|foo2|...)  (foo1|foo2|...)  One of foo1 or foo2 or ...
@@ -656,6 +660,10 @@ link(2.3)(23).
     it()* Options are not local to functions (use LOCAL_OPTIONS; note this
         may always be unset locally to propagate options settings from a
         function to the calling level).
+    it()  Functions defined with `function funcname { body }' behave the
+        same way as those defined with `funcname () { body }'.  In ksh,
+        the former behave as if the body were read from a file with `.',
+        and only the latter behave as true functions.
   )
     it() Traps and signals:
   itemize(
@@ -673,7 +681,7 @@ link(2.3)(23).
     it()  The mytt(keyword) option does not exist and mytt(-k) is instead
         interactivecomments.  (mytt(keyword) will not be in the next ksh
         release either.)
-    it()  Management of histories in multiple shells is different:
+    it()* Management of histories in multiple shells is different:
         the history list is not saved and restored after each command.
         The option tt(SHARE_HISTORY) appeared in 3.1.6 and is set in ksh
         compatibility mode to remedy this.
@@ -852,13 +860,13 @@ sect(Similarities with tcsh)
 
   (The sections on csh apply too, of course.)  Certain features have
   been borrowed from tcsh, including tt($watch), tt(run-help), tt($savehist),
-  tt($histlit), periodic commands etc., extended prompts, tt(sched)
-  and tt(which) built-ins.  Programmable completion was inspired by,
-  but is entirely different to, tcsh's mytt(complete).  (There is a perl
-  script called tt(lete2ctl) in the Misc directory of the source
-  distribution to convert mytt(complete) to mytt(compctl) statements.)
-  This list is not definitive:  some features have gone in the other
-  direction. 
+  periodic commands etc., extended prompts, tt(sched) and tt(which) built-ins.
+  Programmable completion was inspired by, but is entirely different to,
+  tcsh's mytt(complete).  (There is a perl script called tt(lete2ctl) in the
+  Misc directory of the source distribution to convert mytt(complete) to \
+mytt(compctl)
+  statements.)  This list is not definitive: some features have gone in
+  the other direction.
 
   If you're missing the editor function tt(run-fg-editor), try something
   with mytt(bindkey -s) (which binds a string to a keystroke), e.g.
@@ -879,8 +887,8 @@ sect(Similarities with tcsh)
   verb(
     bindkey '\eq' push-input
   )
-  to save the entire buffer.  In recent versions of zsh 3.1, you have
-  the following more sophisticated option,
+  to save the entire buffer.  In 4.0 and recent versions of zsh 3.1, you
+  have the following more sophisticated option,
   verb(
     run-fg-editor() {
       zle push-input
@@ -903,7 +911,7 @@ sect(Similarities with bash)
   interactive features (programmable completion, etc.) that zsh has.
 
   In recent years there has been a certain amount of crossover in the
-  extensions, however.  Zsh now (3.1.6) has bash's `tt(${var/old/new})'
+  extensions, however.  Zsh (as of 3.1.6) has bash's `tt(${var/old/new})'
   feature for replacing the text tt(old) with the text tt(new) in the
   parameter tt($var).  Note one difference here:  while both shells
   implement the syntax `tt(${var/#old/new})' and `tt(${var/%old/new})' for
@@ -1059,7 +1067,7 @@ sect(In which startup file do I put...?)
   you use the tt(-f) option) is tt(.zshenv), so this is a good place to \
   put
   things you want even if the shell is non-interactive: options for
-  changing the the syntax, like tt(EXTENDED_GLOB), any changes to set with
+  changing the syntax, like tt(EXTENDED_GLOB), any changes to set with
   mytt(limit), any more variables you want to make sure are set as for
   example tt($fpath) to find functions.  You almost certainly do not
   want tt(.zshenv) to produce any output.  Some people prefer not to
@@ -1213,7 +1221,9 @@ sect(Why do the cursor (arrow) keys not work?)
   )
   
   If you use vi mode, use mytt(vi-backward-char) and mytt(vi-forward-char)
-  where appropriate.
+  where appropriate.  As of version 4.0.1, zsh attempts to look up these
+  codes and to set the key bindings for you (both emacs and vi), but in
+  some circumstances this may not work.
 
   Note, however, that up to version 3.0 binding arbitrary multiple key
   sequences can cause problems, so check that this works with your set
@@ -1284,10 +1294,9 @@ sect(Why does my terminal act funny in some way?)
     ttyctl -u
     STTY='lnext "^-"' commandname
   )
-  (in this example), or just export STTY for all commands to see.  Note
-  that zsh doesn't reset the terminal completely afterwards: just the
-  modes it uses itself and a number of special processing characters
-  (see the tt(stty(1)) manual page).
+  (in this example).  Note that zsh doesn't reset the terminal completely
+  afterwards: just the modes it uses itself and a number of special
+  processing characters (see the tt(stty(1)) manual page).
 
 
 sect(Why does zsh not work in an Emacs shell mode any more?)
@@ -1423,8 +1432,8 @@ label(313)
   mytt(unsetopt cshjunkiequotes) and mytt(setopt cshjunkiequotes), or put it
   in your tt(.zshrc) before the option is set.
 
-  In all recent versions of zsh, there is a form of quoting which will
-  interpret print sequences like `tt(\n)' but otherwise acts like single
+  In recent versions of zsh (not 3.0), there is a form of quoting which
+  interprets print sequences like `tt(\n)' but otherwise acts like single
   quotes: surround the string with tt($'...').  Hence:
   verb(
     PROMPT=$'Hi Joe,\nwhat now?%# '
@@ -1600,7 +1609,7 @@ sect(How do I get a variable's value to be evaluated as another variable?)
   )
   produces the same result.
 
-  Versions 3.1.6 of allows you to do this directly with a new flag;
+  Versions since 3.1.6 allow you to do this directly with a new flag;
   mytt(${(P)E}).
 
   As a slight aside, sometimes people note that the syntax mytt(${${E}})
@@ -1691,39 +1700,39 @@ sect(How do I get coloured prompts on my colour xterm?)
 
 sect(Why is my output duplicated with `tt(foo 2>&1 >foo.out | bar)'?)
 
-This is a slightly unexpected effect of the option tt(MULTIOS), which is
-set by default.  Let's look more closely:
-verb(
-  foo 2>&1 >foo.out | bar
-)
-What you're probably expecting is that the command mytt(foo) sends its
-standadrd output to the pipe and so to the input of the command mytt(bar),
-while it sends its standard error to the file mytt(foo.out).  What you
-actually see is that the output is going both to the pipe and into the file.
-To be more explicit, here's the same example with real commands:
-verb(
-  % { print output; print error >&2 } 2>&1 >foo.out | sed 's/error/erratic'
-  erratic
-  output
-  % cat foo.out
-  output
-)
-and you can see `tt(output)' appears twice.
+  This is a slightly unexpected effect of the option tt(MULTIOS), which is
+  set by default.  Let's look more closely:
+  verb(
+    foo 2>&1 >foo.out | bar
+  )
+  What you're probably expecting is that the command mytt(foo) sends its
+  standard output to the pipe and so to the input of the command mytt(bar),
+  while it sends its standard error to the file mytt(foo.out).  What you
+  actually see is that the output is going both to the pipe and into the
+  file.  To be more explicit, here's the same example with real commands:
+  verb(
+    % { print output; print error >&2 } 2>&1 >foo.out | sed 's/error/erratic'
+    erratic
+    output
+    % cat foo.out
+    output
+  )
+  and you can see `tt(output)' appears twice.
 
-It becomes clearer what's going on if we write:
-verb(
-  % print output >foo1.out >foo2.out
-  % cat foo1.out
-  output
-  % cat foo2.out
-  output
-)
-You might recognise this as a standard feature of zsh, called `tt(multios)'
-and controlled by the option of the same name, whereby output is copied to
-both files when the redirector appears twice.  What's going on in the first
-example is exactly the same, however the second redirector is disguised as
-a pipe.  So if you want to turn this effect off, you need to unset the
-option mytt(MULTIOS).
+  It becomes clearer what's going on if we write:
+  verb(
+    % print output >foo1.out >foo2.out
+    % cat foo1.out
+    output
+    % cat foo2.out
+    output
+  )
+  You might recognise this as a standard feature of zsh, called `tt(multios)'
+  and controlled by the option of the same name, whereby output is copied
+  to both files when the redirector appears twice.  What's going on in the
+  first example is exactly the same, however the second redirector is
+  disguised as a pipe.  So if you want to turn this effect off, you need
+  to unset the option mytt(MULTIOS).
 
 
 chapter(The mysteries of completion)
@@ -2059,9 +2068,10 @@ this applies
   with more detail.
 
   itemize(
+  it() Parameter expansions using the tt(${param+word}) and tt(${param-word})
+    forms may fail to behave in Bourne-shell-compatible fashion when the
+    tt(SH_WORD_SPLIT) option is set and the word contains spaces.
   it() mytt(time) is ignored with builtins and can't be used with mytt({...}).
-  it() When showing completion lists with exactly 80 columns, some
-       terminals print an extra newline which messes up zsh's logic.  
   it() mytt(set -x) (mytt(setopt xtrace)) still has a few glitches; these
      are mostly fixed in 3.1.6.
   it() Zsh's notion of the current line number (via tt($LINENO)) is
@@ -2078,18 +2088,18 @@ this applies
   verb(
       [[ fofo = (fo#)# ]]
   )
-     were not correctly handled, and there were problems with
-     complicated exclusions using mytt(^) or mytt(~).  These
-     are fixed in version 3.1.3.
+     were once not correctly handled, and there were problems with
+     complicated exclusions using mytt(^) or mytt(~).  These are fixed
+     since version 3.1.3.
   )
   it() Handling of the mytt(:q) and mytt(:x) with parameter subsitutions is
-  erratic: neither work in any 3.0 release, and tt(:x) doesn't work in
-  any release so far.
+    erratic: neither work in any 3.0 release, and tt(:x) doesn't work in
+    any release so far.
 
   Note that a few recent changes introduce incompatibilities (these
   are not bugs):
 
-  Changes after zsh 3.0 (3.1.x is still currently in beta):
+  Changes after zsh 3.0:
   itemize(
   it() The options tt(ALWAYS_LAST_PROMPT) (return to the line you were
      editing after displaying completion lists) and tt(LIST_AMBIGUOUS)
