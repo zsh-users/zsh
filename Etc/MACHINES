@@ -119,6 +119,9 @@ Next: NextStep 3.*
 OpenBSD: OpenBSD 2.6
 	Should build `out-of-the-box'.
 
+SCO: UnixWare 2.1.3
+       Builds `out-of-the-box'.
+
 SIEMENS: Reliant UNIX
        Builds `out-of-the-box'. Dynamic loading is supported. 
        Large Files and 64-bit integers are supported as of version 5.44
