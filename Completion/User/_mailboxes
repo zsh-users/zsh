@@ -118,14 +118,14 @@ _mua_mailboxes() {
       fi
       ;;
     (*:mh:*)
-#     local lastmhbox=???	# Where does this come from?
+      local lastmhbox=$(mhpath)
       if compset -P +; then
 	mbox_names=( "${(@)_mh_cache#$~maildirectory/}" )
-#     elif compset -P @; then
-#	mbox_names=( "${(@)${(@M)_mh_cache:#$~lastmhbox/*}#$~lastmhbox/}" )
+      elif compset -P @; then
+	mbox_names=( "${(@)${(@M)_mh_cache:#$~lastmhbox/*}#$~lastmhbox/}" )
       else
 	mbox_names=( +"${(@)^_mh_cache#$~maildirectory/}"
-#		     @"${(@)^${(@M)_mh_cache:#$~lastmhbox/*}#$~lastmhbox/}"
+		     @"${(@)^${(@M)_mh_cache:#$~lastmhbox/*}#$~lastmhbox/}"
 		     "${_mh_cache[@]}" )
       fi
       ;;

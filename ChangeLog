@@ -1,3 +1,7 @@
+2001-03-25  Peter Stephenson  <pws@pwstephenson.fsnet.co.uk>
+
+	* 13743: Completion/User/_mailboxes: handle @folder in MH.
+
 2001-03-24  Bart Schaefer  <schaefer@zsh.org>
 
 	* 13740: Completion/User/_mailboxes: Fixes for mh (based on PWS's
