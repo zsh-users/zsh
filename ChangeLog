@@ -1,3 +1,402 @@
+1999-11-21  Peter Stephenson  <pws@supanet.com>
+
+	* Clint: 8702: Completion/Debian/_dpkg: typo.
+
+	* Bart: 8696: Completion/User/_cvs: `cvs watch add' failed.
+
+	* Clint: 8695: Doc/Zsh/params.yo, Src/params.c: LC_NUMERIC support.
+
+	* Clint: 8609, 8693: Src/math.c: make decimal point use
+	  independent of locale.
+	
+	* Bart: 8692: Src/Zle/computil.c: core dump in completion.
+
+	* Alexandre: 8691: Completion/User/_mount: upgrade for
+	  Solaris (tested),  OSF and Linux (not).
+
+	* Oliver: 8690: Src/makepro.awk: printf locals -> print locals
+	  avoiding buffer size limit on some systems.
+
+	* Sven: 8679: Completion/Base/_jobs, Doc/Zsh/compsys.yo: use
+	  strings style in _jobs.	  
+
+	* Tanaka Akira: 8678: Completion/User/_cvs: tag name after `cvs
+	  tag'.
+
+	* Sven: 8677: Completion/User/_killall: careful with incompatible
+	  versions.
+
+	* Sven: zsh-users/2742: Src/Makefile.in: remove comp1 from Makefile.in
+	  for building into statically linked shells.
+
+	* Sven: 8675: Completion/Builtins/_kill,
+	  Completion/Builtins/_signals, Completion/Builtins/_trap,
+	  Completion/User/_killall: better use of tags with signal
+	  handling completion.
+
+	* Bart: 8674: Src/builtin.c: make `typeset -x' equivalent to export
+	  by forcing -g.
+
+	* Adam: 8672: Functions/Prompts/.distfiles,
+	  Functions/Prompts/prompt_adam2_setup,
+	  Functions/Prompts/prompt_fire_setup,
+	  Fuanctions/Prompts/promptinit: fix $prompt_theme use; restore after
+	  preview; add distfiles.
+
+	* Sven: 8681: Completion/Builtins/.distfiles: and _signals.
+
+	* Sven: 8683: Completion/Core/.distfiles: add _funcall.
+
+	* Oliver: 8684: Prompts/prompt_off_setup,
+	  Prompts/prompt_oliver_setup, Prompts/prompt_redhat_setup,
+	  Prompts/prompt_suse_setup, Prompts/prompt_zefram_setup,
+	  Prompts/promptinit: tweaks for 8667.
+
+	* Adam: 8669: Misc/bash2zshprompt: and this one, too.
+
+	* Adam: 8667: Functions/Misc/colors,
+	  Functions/Prompts/prompt_adam1_setup,
+	  Functions/Prompts/prompt_adam2_setup,
+	  Functions/Prompts/prompt_bigfade_setup,
+	  Functions/Prompts/prompt_blue_setup,
+	  Functions/Prompts/prompt_combo_setup,
+	  Functions/Prompts/prompt_cyan_setup,
+	  Functions/Prompts/prompt_elite2_setup,
+	  Functions/Prompts/prompt_elite_setup,
+	  Functions/Prompts/prompt_fade_setup,
+	  Functions/Prompts/prompt_fire_setup,
+	  Functions/Prompts/prompt_green_setup,
+	  Functions/Prompts/prompt_magenta_setup,
+	  Functions/Prompts/prompt_off_setup,
+	  Functions/Prompts/prompt_oliver_setup,
+	  Functions/Prompts/prompt_red_setup,
+	  Functions/Prompts/prompt_suse_setup,
+	  Functions/Prompts/prompt_white_setup,
+	  Functions/Prompts/prompt_yellow_setup,
+	  Functions/Prompts/prompt_zefram_setup,
+	  Functions/Prompts/promptinit: new prompt themes with better
+	  handling of colours.
+
+	* Sven: 8665, 8664: Doc/Zsh/compsys.yo, Completion/Core/_funcall,
+	  Completion/Core/compinit, Completion/Linux/_rpm,
+	  Completion/User/_nslookup: manual clean-ups.
+
+	* Adam: 8658: Completion/Core/compinit, Doc/Zsh/compsys.yo:
+	  fix some typos.
+
+	* Tanaka Akira: 8657: Completion/Base/.distfiles,
+	  Completion/Builtins/.distfiles, Completion/Commands/.distfiles,
+	  Completion/Core/.distfiles, Completion/Debian/.distfiles,
+	  Misc/.distfiles, Src/Zle/.distfiles: new and moved files.
+
+	* Sven: 8655: Completion/Base/_arguments: for 8654.
+	
+	* Sven: 8654: Doc/Zsh/compsys.yo,
+	  Functions/Zle/incremental-complete-word,
+	  Functions/Zle/predict-on, Completion/Base/_describe,
+	  Completion/Base/_first, Completion/Base/_regex_arguments,
+	  Completion/Builtins/_echotc,
+	  Completion/Commands/_history_complete_word,
+	  Completion/Core/compinit: documentation for new tags code.
+
+	* Sven: 8648: Completion/Base/_brace_parameter,
+	  Completion/Base/_subscript, Completion/Builtins/_sched,
+	  Completion/Builtins/_stat, Completion/User/_tar: get rid of some 
+	  _requested and rationalise tag names.
+
+	* Sven: 8647: Completion/Builtins/_hash,
+	  Completion/Builtins/_sched, Completion/Builtins/_stat,
+	  Completion/Core/compinit, Completion/User/_cvs,
+	  Completion/User/_urls, Completion/User/_user_at_host,
+	  Completion/User/_whois, Completion/X/_xutils: additional fixes
+	  for latest tags code.
+
+	* Sven: 8646: Src/Zle/computil.c: add comments
+
+	* Tanaka Akira: 8645: Completion/User/_make, Doc/Zsh/compsys.yo:
+	  fixes for 8639.
+
+	* Sven: 8644: Completion/Base/_arguments, Completion/Base/_values:
+	  loop for only a few options, so don't use getopts.
+
+	* Sven: 8642: Completion/Base/_arguments, Completion/Base/_values: 
+	  don't shift OPTINDS-1.
+
+	* Sven: 8640: Completion/Commands/.distfiles: remove _verbose_list.
+
+	* Sven: 8639: Src/Zle/computil.c, Src/Zle/computil.mdd,
+	  Completion/Base/_arg_compile, Completion/Base/_arguments,
+	  Completion/Base/_brace_parameter,
+	  Completion/Base/_command_names, Completion/Base/_condition,
+	  Completion/Base/_default, Completion/Base/_describe,
+	  Completion/Base/_equal, Completion/Base/_first,
+	  Completion/Base/_jobs, Completion/Base/_math,
+	  Completion/Base/_parameter, Completion/Base/_regex_arguments,
+	  Completion/Base/_subscript, Completion/Base/_tilde,
+	  Completion/Base/_values, Completion/Builtins/_aliases,
+	  Completion/Builtins/_arrays, Completion/Builtins/_autoload,
+	  Completion/Builtins/_bindkey, Completion/Builtins/_builtin,
+	  Completion/Builtins/_cd, Completion/Builtins/_command,
+	  Completion/Builtins/_compdef, Completion/Builtins/_disable,
+	  Completion/Builtins/_echotc, Completion/Builtins/_enable,
+	  Completion/Builtins/_functions, Completion/Builtins/_hash,
+	  Completion/Builtins/_kill, Completion/Builtins/_limits,
+	  Completion/Builtins/_pids, Completion/Builtins/_popd,
+	  Completion/Builtins/_sched, Completion/Builtins/_stat,
+	  Completion/Builtins/_trap, Completion/Builtins/_unhash,
+	  Completion/Builtins/_vars, Completion/Builtins/_wait,
+	  Completion/Builtins/_which, Completion/Builtins/_zftp,
+	  Completion/Builtins/_zle, Completion/Builtins/_zmodload,
+	  Completion/Commands/_complete_help,
+	  Completion/Commands/_correct_word,
+	  Completion/Commands/_expand_word,
+	  Completion/Commands/_history_complete_word,
+	  Completion/Commands/_read_comp, Completion/Core/.distfiles,
+	  Completion/Core/_alternative, Completion/Core/_approximate,
+	  Completion/Core/_complete, Completion/Core/_correct,
+	  Completion/Core/_description, Completion/Core/_expand,
+	  Completion/Core/_files, Completion/Core/_list,
+	  Completion/Core/_main_complete, Completion/Core/_match,
+	  Completion/Core/_menu, Completion/Core/_message,
+	  Completion/Core/_normal, Completion/Core/_oldlist,
+	  Completion/Core/_options, Completion/Core/_parameters,
+	  Completion/Core/_path_files, Completion/Core/_requested,
+	  Completion/Core/_set_options, Completion/Core/_sort_tags,
+	  Completion/Core/_style, Completion/Core/_tags,
+	  Completion/Core/_unset_options, Completion/Core/_wanted,
+	  Completion/Core/compdump, Completion/Core/compinit,
+	  Completion/Core/compinstall, Completion/Debian/_apt,
+	  Completion/Debian/_deb_packages, Completion/Linux/_rpm,
+	  Completion/User/_archie, Completion/User/_cvs,
+	  Completion/User/_dd, Completion/User/_flex,
+	  Completion/User/_gcc, Completion/User/_gdb,
+	  Completion/User/_gprof, Completion/User/_groups,
+	  Completion/User/_gs, Completion/User/_hosts,
+	  Completion/User/_killall, Completion/User/_lynx,
+	  Completion/User/_mailboxes, Completion/User/_make,
+	  Completion/User/_man, Completion/User/_mh,
+	  Completion/User/_mount, Completion/User/_mutt,
+	  Completion/User/_netscape, Completion/User/_nslookup,
+	  Completion/User/_pbm, Completion/User/_perl_basepods,
+	  Completion/User/_perl_builtin_funcs,
+	  Completion/User/_perl_modules, Completion/User/_ports,
+	  Completion/User/_rcs, Completion/User/_rlogin,
+	  Completion/User/_socket, Completion/User/_ssh,
+	  Completion/User/_stty, Completion/User/_tar,
+	  Completion/User/_telnet, Completion/User/_tiff,
+	  Completion/User/_urls, Completion/User/_use_lo,
+	  Completion/User/_user_at_host, Completion/User/_users,
+	  Completion/User/_users_on, Completion/User/_wget,
+	  Completion/User/_whois, Completion/User/_yp,
+	  Completion/X/_x_arguments, Completion/X/_x_color,
+	  Completion/X/_x_cursor, Completion/X/_x_display,
+	  Completion/X/_x_extension, Completion/X/_x_font,
+	  Completion/X/_x_keysym, Completion/X/_x_modifier,
+	  Completion/X/_x_window, Completion/X/_xmodmap,
+	  Completion/X/_xt_arguments, Completion/X/_xutils,
+	  Doc/Zsh/compsys.yo, Doc/Zsh/mod_computil.yo,
+	  Etc/completion-style-guide: contexts extended to multiple levels;
+	  tags and styles replace configuration keys; _complete_help (C-xh)
+	  shows context and accepted tags.
+
+	* Bart: 8638: Completion/Base/.distfiles,
+	  Completion/Builtins/.distfiles: mv _vars from Base to _Builtins.
+	
+	* Sven: 8633: Doc/Zsh/compsys.yo: documentation for -O options
+	  to _arguments and _values.o
+
+	* Sven: 8632: Completion/User/_telnet: remove set -x
+
+	* Sven: 8630: Src/Zle/computil.c, Doc/Zsh/compsys.yo,
+	  Completion/Base/_arguments, Completion/Base/_brace_parameter,
+	  Completion/Base/_command_names, Completion/Base/_condition,
+	  Completion/Base/_default, Completion/Base/_describe,
+	  Completion/Base/_equal, Completion/Base/_jobs,
+	  Completion/Base/_math, Completion/Base/_parameter,
+	  Completion/Base/_subscript, Completion/Base/_tilde,
+	  Completion/Base/_values, Completion/Base/_vars,
+	  Completion/Builtins/_aliases, Completion/Builtins/_arrays,
+	  Completion/Builtins/_autoload, Completion/Builtins/_bindkey,
+	  Completion/Builtins/_builtin, Completion/Builtins/_cd,
+	  Completion/Builtins/_command, Completion/Builtins/_compdef,
+	  Completion/Builtins/_disable, Completion/Builtins/_echotc,
+	  Completion/Builtins/_enable, Completion/Builtins/_functions,
+	  Completion/Builtins/_hash, Completion/Builtins/_kill,
+	  Completion/Builtins/_limits, Completion/Builtins/_pids,
+	  Completion/Builtins/_popd, Completion/Builtins/_sched,
+	  Completion/Builtins/_stat, Completion/Builtins/_trap,
+	  Completion/Builtins/_unhash, Completion/Builtins/_wait,
+	  Completion/Builtins/_which, Completion/Builtins/_zftp,
+	  Completion/Builtins/_zle, Completion/Builtins/_zmodload,
+	  Completion/Core/_alternative, Completion/Core/_complete,
+	  Completion/Core/_files, Completion/Core/_main_complete,
+	  Completion/Core/_message, Completion/Core/_normal,
+	  Completion/Core/_options, Completion/Core/_parameters,
+	  Completion/Core/_requested, Completion/Core/_set_options,
+	  Completion/Core/_sort_tags, Completion/Core/_style,
+	  Completion/Core/_tags, Completion/Core/_unset_options,
+	  Completion/Core/compinit, Completion/Debian/_apt,
+	  Completion/Linux/_rpm, Completion/User/_archie,
+	  Completion/User/_flex, Completion/User/_gcc,
+	  Completion/User/_gprof, Completion/User/_groups,
+	  Completion/User/_gs, Completion/User/_hosts,
+	  Completion/User/_lynx, Completion/User/_mount,
+	  Completion/User/_mutt, Completion/User/_netscape,
+	  Completion/User/_nslookup, Completion/User/_pbm,
+	  Completion/User/_ports, Completion/User/_rlogin,
+	  Completion/User/_socket, Completion/User/_ssh,
+	  Completion/User/_telnet, Completion/User/_tiff,
+	  Completion/User/_urls, Completion/User/_user_at_host,
+	  Completion/User/_users, Completion/User/_users_on,
+	  Completion/User/_wget, Completion/User/_whois,
+	  Completion/User/_yp, Completion/X/_x_color,
+	  Completion/X/_x_cursor, Completion/X/_x_display,
+	  Completion/X/_x_extension, Completion/X/_x_font,
+	  Completion/X/_x_keysym, Completion/X/_x_modifier,
+	  Completion/X/_x_window, Completion/X/_xmodmap: tags rewrite.
+
+	* Bart: 8617: Src/signals.c: warning, not error, if jobs running
+	  at exit.
+
+	* Akim Demaille <akim@epita.fr>, Tanaka Akira: 8612, 8615:
+	  Completion/User/_make: avoid empty branch in awk pattern by
+	  using `?'.
+
+	* Clint: 8611: Completion/Debian/_apt: complete package to show.
+
+	* Sven: 8607: Src/builtin.c, Src/math.c: initialize mathevall()
+	  return value, but not hunk reset errflag in zexit() (except
+	  kept braces).
+
+	* Sven: 8604: Src/Builtins/.cvsignore, Src/Modules/.cvsignore,
+	  Src/Zle/.cvsignore: ignore so_locations.
+
+	* Sven: 8603: Completion/Base/_arguments, Completion/Base/_describe,
+	  Completion/Base/_values, Completion/Builtins/_kill,
+	  Completion/Builtins/_wait, Completion/Core/_alternative,
+	  Completion/Core/_files, Completion/Core/_main_complete,
+	  Completion/Core/_requested, Completion/Core/_style,
+	  Completion/Core/_tags, Completion/Core/compinit: simplified tags 
+	  mechanism and new style mechanism.
+
+	* Bart: 8601: Src/Zle/compcore.c: add DPUTS for 8599.
+
+	* Sven: 8599: Src/Zle/compcore.c: fix problems with quoting
+
+	* Adam: 8598: Misc/make-zsh-urls: perl script for creating URLs to
+	  complete.
+
+	* Tanaka Akira: 8597: Completion/User/_whois: handle fwhois.
+
+	* Clint: 8594: Completion/Debian/_bug: improvements.
+
+	* Sven: 8591: Src/Zle/zle_main.c: fix up vared in subshell by
+	  re-opening file
+
+	* Sven: 8590: Src/Zle/zle.h, Src/Zle/zle_tricky.c,
+	  Src/Zle/zle_utils.c, Completion/Core/_path_files: keeping
+	  track of prefixes and suffixes in file completion and tracking
+	  cursor position for undo.
+
+	* Sven: 8588, 8589: Src/Zle/comp.h, Src/Zle/compcore.c,
+	  Src/Zle/compctl.c, Src/Zle/complete.c, Src/Zle/compmatch.c,
+	  Src/Zle/compresult.c, Src/Zle/computil.c, Src/Zle/computil.mdd,
+	  Src/Zle/zle_tricky.c, Src/params.c, Doc/Zsh/compwid.yo,
+	  Doc/Zsh/mod_computil.yo, Completion/Core/_path_files: mega patch
+	  for nested quotes in completion.
+
+	* Clint: 8585: Src/Zle/compresult.c: count mismatch displaying lines
+
+	* Clint: 8576: configure.in: fix up options descriptions
+
+	* Clint: 8575: Completion/Debian.new/_bug: handle reportbug
+
+	* Sven: 8573: Src/utils.c: more careful quoting re-inserted ~, too.
+
+	* Sven: 8569: Src/utils.c: 8565 after colon.
+
+	* Sven: 8566: Completion/Core/_tags: local var is $ttags, not $tags.
+
+	* Sven: 8565: Src/utils.c, Completion/Core/_expand: don't quote =
+	  in normal argument except at start.
+
+1999-11-19  Peter Stephenson  <pws@supanet.com>
+
+	* Sven: 8562: Completion/Core/_path_files: handle noglobdots but
+	  still find explicitly typed dotfiles.
+
+	* Sven: 8560: Src/Zle/complete.export, Src/Zle/compresult.c,
+	  Src/Zle/zle.export, Src/Zle/zle_tricky.c, Src/zsh.export: move
+	  functions around.
+
+	* Bart: 8558: Completion/Builtins/.distfiles: update
+
+	* Oliver: 8547: zle.export, complete.export, zsh.export
+
+	* Clint: 8545, 7546: Functions/Misc/run-help: .->dot and :->colon;
+	  check $HELPDIR and english, don't invoke man if not necessary.
+
+	* Bart: 8541: configure.in, Completion/Base/.distfiles,
+	  Completion/Builtins/.distfiles, Completion/Core/.distfiles,
+	  Completion/Debian/.distfiles: fix getpwent() test and update
+	  .distfiles.
+
+	* Clint: 8540: Completion/Debian/_bug: completion for Debian `bug'.
+
+	* Sven: 8537: Completion/Base/_describe, Completion/Base/_values,
+	  Completion/Builtins/_kill, Completion/Builtins/_pids,
+	  Completion/Builtins/_wait, Completion/Core/_tags,
+	  Completion/User/_gdb: _pids to complete PIDs; -i option to _tags.
+
+	* Sven: 8536: Src/lex.c: don't try to balance parentheses in
+	  parameter expressions inside math evals.
+
+	* Sven: 8535: Src/Zle/compcore.c, Src/Zle/complist.c,
+	  Src/Zle/zle_tricky.c: drop back to ordinary completion to query
+	  user for listing when in menu-select.	
+
+	* Sven: 8533: Completion/Base/_arguments, Completion/Base/_describe,
+	  Completion/Base/_values, Completion/Builtins/_kill,
+	  Completion/Builtins/_wait, Completion/Core/_files,
+	  Completion/Core/_main_complete, Completion/Core/_tags: remove
+	  prios parameters by using $funcstack.
+
+	* Clint: 8532: Completion/Debian/_dpkg,
+	  Completion/Debian/_dpkg-source: new support for Debian package
+	  management functions.
+
+	* 8520: Completion/Base/_arguments, Completion/Base/_describe,
+	  Completion/Base/_values, Completion/Builtins/_kill,
+	  Completion/Builtins/_wait, Completion/Core/_files,
+	  Completion/Core/_main_complete, Completion/Core/_tags,
+	  Completion/Core/compinit: add _tags functionality
+
+	* Sven: 8519: Src/Zle/complist.c: don't use old list after a menu
+	  selction.
+
+	* Sven: 8518: Src/Modules/parameter.c, Src/Modules/parameter.mdd,
+	  Completion/Base/_command_names, Completion/Builtins/_aliases,
+	  Completion/Builtins/_enable, Completion/Builtins/_unhash,
+	  Completion/Builtins/_which, Doc/Zsh/builtins.yo,
+	  Doc/Zsh/mod_parameter.yo: dis* parameter keys are now all
+	  dis_*.
+
+	* Sven: 8517: Src/Zle/zleparameter.c: when to calculate values
+	  for zle parameters (update to 8474).
+
+	* Sven: 8515: Src/Zle/comp.h, Src/Zle/compctl.h, Src/builtin.c,
+	  Src/module.c, Doc/Zsh/builtins.yo,
+	  Completion/Base/_command_names, Completion/Builtins/_bg_jobs,
+	  Completion/Builtins/_fg_jobs, Completion/Builtins/_hash,
+	  Completion/Builtins/_jobs, Completion/Builtins/_kill,
+	  Completion/Builtins/_wait, Completion/User/_gdb,
+	  Completion/User/_perldoc: completion file headers;
+	  zmodload in static shells; changes in job control
+	  completion.
+
+	* Bart: 8512: Completion/Core/compinit: workaround zmodload -i
+	  unavailibity in statically linked shell.
+
 1999-11-03  Bart Schaefer  <schaefer@zsh.org>
 
 	* Config/version.mk: Set version string to 3.1.6-bart-8.

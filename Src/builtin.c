@@ -3212,7 +3212,6 @@ zexit(int val, int from_signal)
 	if (isset(MONITOR)) {
 	    /* send SIGHUP to any jobs left running  */
 	    killrunjobs(from_signal);
-	    errflag = 0;
 	}
 	if (isset(RCS) && interact) {
 	    if (!nohistsave)

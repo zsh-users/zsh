@@ -2027,6 +2027,12 @@ Another option supported is `tt(-O) var(name)'. The var(name) will be
 taken as the name of an array and its elements will be given to
 functions called to generate matches when executing the
 var(actions). For example, this allows one to give options for the
+tt(compadd) builtin that should be used.
+
+Another option supported is `tt(-O) var(name)'. The var(name) will be
+taken as the name of an array and its elements will be given to
+functions called to generate matches when executing the
+var(actions). For example, this allows one to give options for the
 tt(compadd) builtin that should be used for all var(action)s.
 
 Also, the tt(-M) option followed by a string may be given before the
