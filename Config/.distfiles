@@ -1,4 +1,5 @@
 DISTFILES_SRC='
-    .distfiles
-    clean.mk config.mk defs.mk version.mk
+    .distfiles .cvsignore
+    clean.mk config.mk defs.mk.in version.mk
+    installfns.sh uninstallfns.sh
 '

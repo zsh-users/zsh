@@ -1,5 +1,3 @@
 DISTFILES_SRC='
-    .distfiles
-    acx cat cdmatch cdmatch2 checkmail cx harden mere multicomp proto
-    pushd randline run-help yp yu zed zls
+    .cvsignore .distfiles README.zftp
 '
