@@ -513,9 +513,10 @@ AC_CHECK_LIB(c, printf)
 AC_CHECK_LIB(m, pow)
 
 dnl Prefer BSD termcap library to SysV curses library, except on certain
-dnl versions of AIX and HP-UX.
+dnl SYSV-derived systems.
 case "$host_os" in
-  aix*|hpux10.*|hpux11.*) termcap_curses_order="curses ncurses termcap" ;;
+  aix*|hpux10.*|hpux11.*|solaris*)
+      termcap_curses_order="curses ncurses termcap" ;;
   *)             termcap_curses_order="termcap curses ncurses" ;;
 esac
 
