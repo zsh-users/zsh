@@ -938,7 +938,7 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int ssub)
 		    break;
 
 		case '%':
-		    presc = 1;
+		    presc++;
 		    break;
 
 		default:
@@ -1659,8 +1659,12 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int ssub)
 	}
     }
     if (presc) {
-	int len;
+	int ops = opts[PROMPTSUBST], opb = opts[PROMPTBANG];
+	int opp = opts[PROMPTPERCENT], len;
 
+	opts[PROMPTPERCENT] = 1;
+	if (presc < 2)
+	    opts[PROMPTSUBST] = opts[PROMPTBANG] = 0;
 	if (isarr) {
 	    char **ap;
 
@@ -1679,6 +1683,9 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int ssub)
 	    val = unmetafy(promptexpand(metafy(val, len, META_NOALLOC),
 					0, NULL, NULL), &len);
 	}
+	opts[PROMPTSUBST] = ops;
+	opts[PROMPTBANG] = opb;
+	opts[PROMPTPERCENT] = opp;
     }
     if (quotemod) {
 	if (isarr) {
