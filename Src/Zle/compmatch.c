@@ -1767,7 +1767,7 @@ join_clines(Cline o, Cline n)
 		    free_cline(o);
 		    x = o;
 		    o = tn;
-		    if (po && cmp_anchors(x, po, 0)) {
+		    if (po && po->prefix && cmp_anchors(x, po, 0)) {
 			po->flags |= CLF_MISS;
 			po->max += diff;
 		    } else {
@@ -1784,7 +1784,7 @@ join_clines(Cline o, Cline n)
 		if (tn && cmp_anchors(o, tn, 0)) {
 		    diff = sub_join(o, n, tn, 0);
 
-		    if (po && cmp_anchors(n, pn, 0)) {
+		    if (po && po->prefix && cmp_anchors(n, pn, 0)) {
 			po->flags |= CLF_MISS;
 			po->max += diff;
 		    } else {
@@ -1850,7 +1850,7 @@ join_clines(Cline o, Cline n)
 		if (tn) {
 		    diff = sub_join(o, n, tn, 0);
 
-		    if (po && cmp_anchors(n, pn, 0)) {
+		    if (po && po->prefix && cmp_anchors(n, pn, 0)) {
 			po->flags |= CLF_MISS;
 			po->max += diff;
 		    } else {
@@ -1864,19 +1864,21 @@ join_clines(Cline o, Cline n)
 		    n = n->next;
 		    continue;
 		} else {
-		    for (t = o; (tn = t->next) && !cmp_anchors(n, tn, 1);
-			 t = tn);
+		    Cline to;
 
-		    if (tn) {
-			diff = sub_join(n, o, tn, 1);
+		    for (t = o; (to = t->next) && !cmp_anchors(n, to, 1);
+			 t = to);
+
+		    if (to) {
+			diff = sub_join(n, o, to, 1);
 
 			if (po)
-			    po->next = tn;
+			    po->next = to;
 			else
-			    oo = tn;
+			    oo = to;
 			x = o;
-			o = tn;
-			if (po && cmp_anchors(x, po, 0)) {
+			o = to;
+			if (po && po->prefix && cmp_anchors(x, po, 0)) {
 			    po->flags |= CLF_MISS;
 			    po->max += diff;
 			} else {
@@ -1885,14 +1887,42 @@ join_clines(Cline o, Cline n)
 			}
 			continue;
 		    } else {
-			if (o->flags & CLF_SUF)
-			    break;
+			Cline tt = NULL;
 
-			o->word = o->line = o->orig = NULL;
-			o->wlen = 0;
-			free_cline(o->next);
-			o->next = NULL;
-			o->flags |= CLF_MISS;
+			for (t = n; (tn = t->next); t = tn) {
+			    for (tt = o;
+				 (to = tt->next) &&
+				     !cmp_anchors(tn, to, 1); tt = to);
+			    if (tt)
+				break;
+			}
+			if (tt) {
+			    diff = sub_join(n, o, to, 1);
+
+			    if (po)
+				po->next = to;
+			    else
+				oo = to;
+			    x = o;
+			    o = to;
+			    if (po && po->prefix && cmp_anchors(x, po, 0)) {
+				po->flags |= CLF_MISS;
+				po->max += diff;
+			    } else {
+				o->flags |= CLF_MISS;
+				o->max += diff;
+			    }
+			    continue;
+			} else {
+			    if (o->flags & CLF_SUF)
+				break;
+
+			    o->word = o->line = o->orig = NULL;
+			    o->wlen = 0;
+			    free_cline(o->next);
+			    o->next = NULL;
+			    o->flags |= CLF_MISS;
+			}
 		    }
 		}
 	    }
