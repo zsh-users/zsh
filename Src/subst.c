@@ -725,6 +725,8 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int ssub)
     char *sep = NULL, *spsep = NULL;
     char *premul = NULL, *postmul = NULL, *preone = NULL, *postone = NULL;
     char *replstr = NULL;	/* replacement string for /orig/repl */
+    char *thenstr, *elsestr;    /* then and else for ${..^..^..^..} */
+    int negpat = 0;
     zlong prenum = 0, postnum = 0;
     int copied = 0;
     int arrasg = 0;
@@ -1227,7 +1229,8 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int ssub)
 		    *s == '%' ||
 		    *s == '#' || *s == Pound ||
 		    *s == '?' || *s == Quest ||
-		    *s == '/')) {
+		    *s == '/' ||
+		    *s == '^' || *s == Hat)) {
 
 	if (!flnum)
 	    flnum++;
@@ -1282,7 +1285,47 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int ssub)
 	    untokenize(replstr);
 	    *ptr = '\0';
 	}
+	if (s[-1] == '^' || s[-1] == Hat) {
+	    char *ptr = s;
 
+	    if (*s == s[-1]) {
+		s++;
+		negpat = 1;
+	    }
+	    for (ptr = s; *ptr && *ptr != '^' && *ptr != Hat; ptr++)
+		if (*ptr == '\\' && (ptr[1] == '^' || ptr[1] == Hat))
+		    chuck(ptr);
+	    if (!*ptr || !ptr[1]) {
+		zerr("missing `then' string", NULL, 0);
+		return NULL;
+	    }
+	    *ptr++ = '\0';
+	    thenstr = ptr;
+	    for (; *ptr && *ptr != '^' && *ptr != Hat; ptr++)
+		if (*ptr == '\\' && (ptr[1] == '^' || ptr[1] == Hat))
+		    chuck(ptr);
+	    if (*ptr) {
+		elsestr = ptr + 1;
+		if (elsestr[0] == '\\' && elsestr[1] == '.')
+		    elsestr++;
+		if (elsestr[0] == '.' && !elsestr[1])
+		    elsestr = (char *) 1;
+		else {
+		    singsub(&elsestr);
+		    untokenize(elsestr);
+		}
+		*ptr = '\0';
+	    } else
+		elsestr = NULL;
+	    if (thenstr[0] == '\\' && thenstr[1] == '.')
+		thenstr++;
+	    if (thenstr[0] == '.' && !thenstr[1])
+		thenstr = (char *) 1;
+	    else {
+		singsub(&thenstr);
+		untokenize(thenstr);
+	    }
+	}
 	if (colf)
 	    flags |= SUB_ALL;
 	/*
@@ -1396,6 +1439,8 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int ssub)
 	case '#':
 	case Pound:
 	case '/':
+	case '^':
+	case Hat:
 	    if (qt) {
 		int one = noerrs, oef = errflag, haserr;
 
@@ -1417,26 +1462,65 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int ssub)
 		char t = s[-1];
 
 		singsub(&s);
-		if (t == '/' && (flags & SUB_SUBSTR)) {
-		    if (*s == '#' || *s == '%') {
-			flags &= ~SUB_SUBSTR;
-			if (*s == '%')
-			    flags |= SUB_END;
-			s++;
-		    } else if (*s == '\\') {
-			s++;
+		if (t == '^' || t == Hat) {
+		    if (!vunset && isarr) {
+			char **ap, **pp;
+			Patprog pprg;
+
+			if (!(pprg = patcompile(s, PAT_STATIC, NULL))) {
+			    zerr("bad pattern: %s", s, 0);
+			    return NULL;
+			}
+			if (!copied)
+			    aval = arrdup(aval), copied = 1;
+			for (ap = pp = aval; *ap; ap++) {
+			    if ((!!pattry(pprg, *ap)) ^ negpat)
+				*pp++ = dupstring(thenstr == ((char *) 1) ?
+						  *ap : thenstr);
+			    else if (elsestr)
+				*pp++ = dupstring(elsestr == ((char *) 1) ?
+						  *ap : elsestr);
+			}
+			*pp = NULL;
+		    } else {
+			Patprog pprg;
+
+			if (vunset)
+			    val = dupstring("");
+			if ((pprg = patcompile(s, PAT_STATIC, NULL)) &&
+			    ((!!pattry(pprg, val)) ^ negpat))
+			    val = dupstring(thenstr == ((char *) 1) ?
+					    val : thenstr);
+			else if (elsestr)
+			    val = dupstring(elsestr == ((char *) 1) ?
+					    val : elsestr);
+			else {
+			    vunset = 1;
+			    val = dupstring("");
+			}
+			copied = 1;
+		    }
+		} else {
+		    if (t == '/' && (flags & SUB_SUBSTR)) {
+			if (*s == '#' || *s == '%') {
+			    flags &= ~SUB_SUBSTR;
+			    if (*s == '%')
+				flags |= SUB_END;
+			    s++;
+			} else if (*s == '\\') {
+			    s++;
+			}
+		    }
+		    if (!vunset && isarr) {
+			getmatcharr(&aval, s, flags, flnum, replstr);
+			copied = 1;
+		    } else {
+			if (vunset)
+			    val = dupstring("");
+			getmatch(&val, s, flags, flnum, replstr);
+			copied = 1;
 		    }
 		}
-	    }
-
-	    if (!vunset && isarr) {
-		getmatcharr(&aval, s, flags, flnum, replstr);
-		copied = 1;
-	    } else {
-		if (vunset)
-		    val = dupstring("");
-		getmatch(&val, s, flags, flnum, replstr);
-		copied = 1;
 	    }
 	    break;
 	}
