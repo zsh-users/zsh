@@ -1,3 +1,8 @@
+2000-07-04  Bart Schaefer  <schaefer@zsh.org>
+
+	* 12160: Completion/Core/compdump: Return failure early if the
+	dot-file directory is not writable.
+
 2000-07-04  Oliver Kiddle  <opk@zsh.org>
 
 	* unposted: Src/params.c, Src/Zle/compcore.c, Src/Zle/zle_utils.c:
@@ -7,15 +12,15 @@
 
 	* 12158: Src/Modules/parameter.c: cast pid_t to int for printing.
 
-2000-07-03  Peter Stephenson  <pws@cambridgesiliconradio.com>
-
-	* 12149: acconfig.h, configure.in, Src/Modules/zftp.c:
-	h_errno wasn't found on HPUX 10.20.  Maybe in some library.
-
 2000-07-04  Sven Wischnowsky  <wischnow@zsh.org>
 
 	* 12156: Completion/Core/_expand, Completion/Core/_path_files: add
  	some $(print...)s because of possible math-parse errors
+
+2000-07-03  Peter Stephenson  <pws@cambridgesiliconradio.com>
+
+	* 12149: acconfig.h, configure.in, Src/Modules/zftp.c:
+	h_errno wasn't found on HPUX 10.20.  Maybe in some library.
 	
 2000-07-03  Adam Spiers  <adam@spiers.net>
 

@@ -21,6 +21,8 @@ typeset _d_file _d_f _d_bks _d_line _d_als _d_files
 _d_file=${_comp_dumpfile-${0:h}/compinit.dump}.$HOST.$$
 [[ $_d_file = //* ]] && _d_file=${_d_file[2,-1]}
 
+[[ -w ${_d_file:h} ]] || return 1
+
 _d_files=( ${^~fpath:/.}/^([^_]*|*~|*.zwc)(N) )
 
 if [[ -n "$_comp_secure" ]]; then
