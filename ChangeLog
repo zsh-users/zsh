@@ -1,5 +1,7 @@
 2000-05-17  Bart Schaefer  <schaefer@brasslantern.com>
 
+	* 11435: Test/53completion.ztst: Update for 11406.
+
 	* 11431: Doc/Zsh/mod_zutil.yo: Chop up the zstyle entry into
 	an itemized list for easier reference.
 
@@ -45,18 +47,18 @@
  	Doc/Zsh/compsys.yo: fixed configuration of menu-selection with
  	menu style; pseudo-context `-command-line-', handy for completion
  	in vared
-	
+
 	* 11407: Completion/Base/_tilde, Completion/Core/_path_files:
  	avoid tilde- and parameter-completion in quotes
-	
+
 	* 11406: Completion/Base/_arguments: make _arguments take the
  	attempt to add matches as an indication not to do default
  	option-completion
-	
+
 	* 11403: Completion/Core/_expand, Src/Zle/compcore.c,
 	Src/Zle/complist.c: fix scrolling in menu-selection with matches
 	spanning multiple lines
-	
+
 2000-05-16  Peter Stephenson  <pws@cambridgesiliconradio.com>
 
 	* pws: one hunk of 11381: Completion/Builtins/_vars_eq:

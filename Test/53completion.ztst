@@ -121,7 +121,8 @@
  code='compdef _tst tst; _tst () { _arguments "-x" ":arg:" }'
  comptest -c "$code" $'tst -\t'
 0:_arguments
->line: {tst -x }{}
+>line: {tst -}{}
+>MESSAGE:{arg}
 
  code='compdef _tst tst; _tst () { _arguments "-x:arg:" }'
  comptest -c "$code" $'tst -x\t'
