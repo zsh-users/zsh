@@ -16,12 +16,12 @@ elif [[ ${(Pt)${compstate[parameter]}} = assoc* ]]; then
 elif [[ ${(Pt)${compstate[parameter]}} = array* ]]; then
   local list i j ret=1 disp
 
-  _tags indexes parameters
+  _tags indices parameters
 
   while _tags; do
-    if _requested -V indexes expl 'array index'; then
+    if _requested -V indices expl 'array index'; then
       ind=( {1..${#${(P)${compstate[parameter]}}}} )
-      if zstyle -t ":completion${curcontext}:indexes" verbose; then
+      if zstyle -t ":completion${curcontext}:indices" verbose; then
         list=()
         for i in "$ind[@]"; do
           [[ "$i" = ${PREFIX}*${SUFFIX} ]] &&

@@ -483,8 +483,8 @@ for words from the history
 item(tt(hosts))(
 for hostnames
 )
-item(tt(indexes))(
-used for array indexes
+item(tt(indices))(
+used for array indices
 )
 item(tt(jobs))(
 used for jobs
