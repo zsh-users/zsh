@@ -845,7 +845,8 @@ getarg(char **str, int *inv, Value v, int a2, zlong *w)
 		sep = "\n";
 		break;
 	    case 'e':
-		/* obsolate compatibility flag without any real effect */
+		/* Compatibility flag with no effect except to prevent *
+		 * special interpretation by getindex() of `*' or `@'. */
 		break;
 	    case 'n':
 		t = get_strarg(++s);
@@ -876,7 +877,7 @@ getarg(char **str, int *inv, Value v, int a2, zlong *w)
 		break;
 	    case 's':
 		/* This gives the string that separates words *
-		 * (for use with the `w' flag.                */
+		 * (for use with the `w' flag).               */
 		t = get_strarg(++s);
 		if (!*t)
 		    goto flagerr;
@@ -1177,11 +1178,10 @@ getarg(char **str, int *inv, Value v, int a2, zlong *w)
 
 /**/
 int
-getindex(char **pptr, Value v)
+getindex(char **pptr, Value v, int dq)
 {
     int start, end, inv = 0;
     char *s = *pptr, *tbrack;
-    int dq = !!strchr(s, Dnull);
 
     *s++ = '[';
     s = parse_subscript(s, dq);	/* Error handled after untokenizing */
@@ -1358,7 +1358,7 @@ fetchvalue(Value v, char **pptr, int bracks, int flags)
 	v->start = 0;
 	v->end = -1;
 	if (bracks > 0 && (*s == '[' || *s == Inbrack)) {
-	    if (getindex(&s, v)) {
+	    if (getindex(&s, v, (flags & SCANPM_DQUOTED))) {
 		*pptr = s;
 		return v;
 	    }
@@ -1409,7 +1409,7 @@ getstrvalue(Value v)
 	/* (!v->isarr) should be impossible unless emulating ksh */
 	if (!v->isarr && emulation == EMULATE_KSH) {
 	    s = dupstring("[0]");
-	    if (getindex(&s, v) == 0)
+	    if (getindex(&s, v, 0) == 0)
 		s = getstrvalue(v);
 	    return s;
 	} /* else fall through */
@@ -1575,6 +1575,10 @@ setstrvalue(Value v, char *val)
 	zsfree(val);
 	return;
     }
+    if (v->pm->flags & PM_HASHED) {
+	zerr("%s: attempt to set slice of associative array", v->pm->nam, 0);
+	return;
+    }
     v->pm->flags &= ~PM_UNSET;
     switch (PM_TYPE(v->pm->flags)) {
     case PM_SCALAR:
@@ -1698,7 +1702,8 @@ setarrvalue(Value v, char **val)
     }
     if (!(PM_TYPE(v->pm->flags) & (PM_ARRAY|PM_HASHED))) {
 	freearray(val);
-	zerr("attempt to assign array value to non-array", NULL, 0);
+	zerr("%s: attempt to assign array value to non-array",
+	     v->pm->nam, 0);
 	return;
     }
     if (v->start == 0 && v->end == -1) {
@@ -1712,7 +1717,8 @@ setarrvalue(Value v, char **val)
 
 	if ((PM_TYPE(v->pm->flags) == PM_HASHED)) {
 	    freearray(val);
-	    zerr("attempt to set slice of associative array", NULL, 0);
+	    zerr("%s: attempt to set slice of associative array",
+		 v->pm->nam, 0);
 	    return;
 	}
 	if (v->inv && unset(KSHARRAYS))
@@ -1906,7 +1912,8 @@ setaparam(char *s, char **val)
 	*ss = '[';
 	if (v && PM_TYPE(v->pm->flags) == PM_HASHED) {
 	    unqueue_signals();
-	    zerr("attempt to set slice of associative array", NULL, 0);
+	    zerr("%s: attempt to set slice of associative array",
+		 v->pm->nam, 0);
 	    freearray(val);
 	    errflag = 1;
 	    return NULL;

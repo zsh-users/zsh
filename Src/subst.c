@@ -1068,7 +1068,7 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int ssub)
 	    s++;
 	v = (Value) NULL;
     } else if (aspar) {
-	if ((v = getvalue(&vbuf, &s, 1))) {
+	if ((v = fetchvalue(&vbuf, &s, 1, (qt ? SCANPM_DQUOTED : 0)))) {
 	    val = idbeg = getstrvalue(v);
 	    subexp = 1;
 	} else
@@ -1080,7 +1080,9 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int ssub)
 	if (!(v = fetchvalue(&vbuf, (subexp ? &ov : &s),
 			     (wantt ? -1 :
 			      ((unset(KSHARRAYS) || inbrace) ? 1 : -1)),
-			     hkeys|hvals|(arrasg ? SCANPM_ASSIGNING : 0))) ||
+			     hkeys|hvals|
+			     (arrasg ? SCANPM_ASSIGNING : 0)|
+			     (qt ? SCANPM_DQUOTED : 0))) ||
 	    (v->pm && (v->pm->flags & PM_UNSET)))
 	    vunset = 1;
 
@@ -1151,7 +1153,7 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int ssub)
 	    v->isarr = isarr;
 	    v->pm = pm;
 	    v->end = -1;
-	    if (getindex(&s, v) || s == os)
+	    if (getindex(&s, v, qt) || s == os)
 		break;
 	}
 	if ((isarr = v->isarr)) {

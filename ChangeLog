@@ -1,6 +1,14 @@
+2001-04-23  Bart Schaefer  <schaefer@brasslantern.com>
+
+	* 14080: Src/glob.c, Src/params.c, Src/subst.c, Src/zsh.h,
+	Test/D06subscript.ztst: Optimize subscript parsing slightly by
+	passing down an indication of whether the expression is in double
+	quotes; fail noisily rather than silently on certain illegal
+	associative array assignments; still more subscripting tests.
+
 2001-04-23  Clint Adams <schizo@debian.org>
 
-	* 14xxx: Doc/Zsh/mod_termcap.yo, Doc/Zsh/mod_terminfo.yo:
+	* 14078: Doc/Zsh/mod_termcap.yo, Doc/Zsh/mod_terminfo.yo:
 	Document $termcap, change reference to termcap/terminfo
 	'strings' to 'values'.
 

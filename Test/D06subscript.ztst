@@ -93,14 +93,15 @@
 >\? \2 \? \?
 >\\]
 
+  eval 'A[*]=star'
+1:Illegal associative array assignment
+?ZTST_execchunk:2: A: attempt to set slice of associative array
+
   x='*'
   A[$x]=xstar
   A[${(q)x}]=qxstar
   print -R ${(k)A[(r)xstar]} $A[$x]
   print -R ${(k)A[(r)qxstar]} $A[${(q)x}]
-  # A[*] is interpreted specially, assignment to it fails silently (oops)
-  A[*]=star
-  print -R ${(k)A[(r)star]} $A[$x]
   A[(e)*]=star
   A[\*]=backstar
   print -R ${(k)A[(r)star]} $A[(e)*]
@@ -108,7 +109,6 @@
 0:Associative array assignment
 >* xstar
 >\* qxstar
->xstar
 >* star
 >\* backstar
 
@@ -160,3 +160,21 @@
 >QqQq
 >qqq
 >QQQ
+
+  print ${x::=$A[$A[(i)one\"two\"three\"quotes]]}
+  print $x
+  print ${x::="$A[$A[(i)one\"two\"three\"quotes]]"}
+  print $x
+0:More keys with double quotes, used in assignment-expansion
+>qqq
+>qqq
+>QQQ
+>QQQ
+
+  qqq=lower
+  QQQ=upper
+  print ${(P)A[one\"two\"three\"quotes]}
+  print "${(P)A[$A[(i)one\"two\"three\"quotes]]}"
+0:Keys with double quotes and the (P) expansion flag
+>lower
+>upper

@@ -1344,7 +1344,7 @@ glob(LinkList list, LinkNode np, int nountok)
 			    v.pm = NULL;
 			    v.end = -1;
 			    v.inv = 0;
-			    if (getindex(&s, &v) || s == os) {
+			    if (getindex(&s, &v, 0) || s == os) {
 				zerr("invalid subscript", NULL, 0);
 				restore_globstate(saved);
 				return;
