@@ -1,3 +1,11 @@
+2001-07-09  Peter Stephenson  <pws@csr.com>
+
+	* 15327: Src/builtin.c, Src/exec.c, Src/glob.c, Src/parse.c,
+	Src/Modules/parameter.c, Src/Modules/zpty.c, Src/Modules/zutil.c:
+	Always use local LINENOs in parse_string().  Currently we only
+	do this sometimes in order for existing $LINENO to show through.
+	This seems to cause more problems than it solves.
+
 2001-07-07  Bart Schaefer  <schaefer@zsh.org>
 
 	* 15308: Src/builtin.c: Fix infinite loop on `r OLD=NEW' when OLD

@@ -276,7 +276,7 @@ newptycmd(char *nam, char *pname, char **args, int echo, int nblock)
     int master, slave, pid;
     Eprog prog;
 
-    prog = parse_string(zjoin(args, ' ', 1), 0);
+    prog = parse_string(zjoin(args, ' ', 1));
     if (!prog) {
 	errflag = 0;
 	return 1;

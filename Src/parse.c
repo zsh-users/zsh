@@ -2602,7 +2602,7 @@ build_dump(char *nam, char *dump, char **files, int ali, int map, int flags)
 	close(fd);
 	file = metafy(file, flen, META_REALLOC);
 
-	if (!(prog = parse_string(file, 1)) || errflag) {
+	if (!(prog = parse_string(file)) || errflag) {
 	    errflag = 0;
 	    close(dfd);
 	    zfree(file, flen);

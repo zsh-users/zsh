@@ -3421,7 +3421,7 @@ bin_eval(char *nam, char **argv, char *ops, int func)
 {
     Eprog prog;
 
-    prog = parse_string(zjoin(argv, ' ', 1), 0);
+    prog = parse_string(zjoin(argv, ' ', 1));
     if (!prog) {
 	errflag = 0;
 	return 1;
@@ -4027,7 +4027,7 @@ bin_trap(char *name, char **argv, char *ops, int func)
     arg = *argv++;
     if (!*arg)
 	prog = &dummy_eprog;
-    else if (!(prog = parse_string(arg, 0))) {
+    else if (!(prog = parse_string(arg))) {
 	zwarnnam(name, "couldn't parse trap command", NULL, 0);
 	return 1;
     }

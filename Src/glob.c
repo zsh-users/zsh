@@ -2632,7 +2632,7 @@ qualsheval(char *name, struct stat *buf, off_t days, char *str)
 {
     Eprog prog;
 
-    if ((prog = parse_string(str, 0))) {
+    if ((prog = parse_string(str))) {
 	int ef = errflag, lv = lastval, ret;
 
 	unsetparam("reply");

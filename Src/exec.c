@@ -147,15 +147,15 @@ static int (*execfuncs[]) _((Estate, int)) = {
 
 /**/
 mod_export Eprog
-parse_string(char *s, int ln)
+parse_string(char *s)
 {
     Eprog p;
     int oldlineno = lineno;
 
     lexsave();
-    inpush(s, (ln ? INP_LINENO : 0), NULL);
+    inpush(s, INP_LINENO, NULL);
     strinbeg(0);
-    lineno = ln ? 1 : -1;
+    lineno = 1;
     p = parse_list();
     lineno = oldlineno;
     strinend();
@@ -711,7 +711,7 @@ execstring(char *s, int dont_change_job, int exiting)
     Eprog prog;
 
     pushheap();
-    if ((prog = parse_string(s, 0)))
+    if ((prog = parse_string(s)))
 	execode(prog, dont_change_job, exiting);
     popheap();
 }
@@ -2669,7 +2669,7 @@ getoutput(char *cmd, int qt)
     pid_t pid;
     Wordcode pc;
 
-    if (!(prog = parse_string(cmd, 0)))
+    if (!(prog = parse_string(cmd)))
 	return NULL;
 
     pc = prog->prog;
@@ -2800,7 +2800,7 @@ parsecmd(char *cmd)
 	return NULL;
     }
     *str = '\0';
-    if (str[1] || !(prog = parse_string(cmd + 2, 0))) {
+    if (str[1] || !(prog = parse_string(cmd + 2))) {
 	zerr("parse error in process substitution", NULL, 0);
 	return NULL;
     }
@@ -3496,7 +3496,7 @@ getfpfunc(char *s, int *ksh)
 		    d = metafy(d, len, META_REALLOC);
 
 		    scriptname = dupstring(s);
-		    r = parse_string(d, 1);
+		    r = parse_string(d);
 		    scriptname = oldscriptname;
 
 		    zfree(d, len + 1);
