@@ -1,3 +1,7 @@
+2000-05-05  Peter Stephenson  <pws@cambridgesiliconradio.com>
+
+	* 11185: Etc/CONTRIBUTORS: updated for 3.1.7.
+
 2000-05-05  Sven Wischnowsky  <wischnow@informatik.hu-berlin.de>
 
 	* 11186: Functions/Misc/nslookup: use `eval' in nslookup for
