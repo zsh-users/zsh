@@ -1606,6 +1606,12 @@ If the tt(matcher) style is not set for one of the invocations of
 tt(_matcher), this has the same effect as setting it to the empty
 string: it makes the following completion function not use any match
 specifications besides those used by the functions themselves.
+
+Note that currently only the tt(_complete) completer and the
+tt(_prefix) completer (if it has its own tt(completer) style
+containing tt(_complete)) use the match specifications, so one doesn't 
+need to repeat all completers one wants to use after each call to
+tt(_matcher) in the completer list.
 )
 findex(_expand)
 item(tt(_expand))(
