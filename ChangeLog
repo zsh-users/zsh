@@ -1,3 +1,8 @@
+2005-02-16  Peter Stephenson  <pws@csr.com>
+
+	* 20816: Src/Builtins/rlimits.awk: extra tricks to get limit
+	names and numbers required with new glibc.
+
 2005-02-09  Bart Schaefer  <schaefer@zsh.org>
 
 	* Kris Shannon: 20801: Completion/Unix/Command/_init_d: fix
