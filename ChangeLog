@@ -1,10 +1,15 @@
+2000-06-13  Sven Wischnowsky  <wischnow@zsh.org>
+
+	* ?????: Src/Zle/complist.c: fix for longer capability strings;
+	very bad
+
 2000-06-13  Peter Stephenson  <pws@cambridgesiliconradio.com>
 
 	* TBA: Src/zsh.h: make PRINT_ flags unique again.
 
 2000-06-13  Sven Wischnowsky  <wischnow@zsh.org>
 
-	* ?????: Completion/Core/_path_files, Src/Zle/complete.c,
+	* 11870: Completion/Core/_path_files, Src/Zle/complete.c,
  	Src/Zle/compmatch.c, Src/Zle/computil.c: fixes for calling
 	compfiles, for completing words with special characters; make
 	compfiles optimisations work with globcomplete and simple match

@@ -122,13 +122,17 @@ struct listcols {
     Extcol exts;		/* strings for extensions */
 };
 
+/* Combined length of LC and RC, maximum length of capability strings. */
+
+static int lr_caplen, max_caplen;
+
 /* This parses the value of a definition (the part after the `=').
  * The return value is a pointer to the character after it. */
 
 static char *
 getcolval(char *s, int multi)
 {
-    char *p;
+    char *p, *o = s;
 
     for (p = s; *s && *s != ':' && (!multi || *s != '='); p++, s++) {
 	if (*s == '\\' && s[1]) {
@@ -172,6 +176,8 @@ getcolval(char *s, int multi)
     }
     if (p != s)
 	*p = '\0';
+    if ((s - o) > max_caplen)
+	max_caplen = s - o;
     return s;
 }
 
@@ -325,10 +331,6 @@ filecol(char *col)
     return fc;
 }
 
-/* Combined length of LC and RC, maximum length of capability strings. */
-
-static int lr_caplen, max_caplen;
-
 /* This initializes the given terminal color structure. */
 
 static void
@@ -337,6 +339,7 @@ getcols(Listcols c)
     char *s;
     int i, l;
 
+    max_caplen = lr_caplen = 0;
     if (!(s = getsparam("ZLS_COLORS")) &&
 	!(s = getsparam("ZLS_COLOURS"))) {
 	for (i = 0; i < NUM_COLS; i++)
@@ -362,7 +365,6 @@ getcols(Listcols c)
 	s = getcoldef(c, s);
 
     /* Use default values for those that aren't set explicitly. */
-    max_caplen = lr_caplen = 0;
     for (i = 0; i < NUM_COLS; i++) {
 	if (!c->files[i] || !c->files[i]->col)
 	    c->files[i] = filecol(defcols[i]);
