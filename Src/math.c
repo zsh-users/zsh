@@ -45,7 +45,7 @@ int lastbase;
 static char *ptr;
 
 static mnumber yyval;
-static LV yylval;
+static char *yylval;
 
 static int mlevel = 0;
 
@@ -153,12 +153,12 @@ static int prec[TOKCOUNT] =
      6,   8,  8,  8,   9,
      9,   3,  3, 10,  10,
     10,  10, 11, 11,  12,
-    13,  13, 14, 14,  15,
-    15,  15, 15, 15,  15,
-    15,  15, 15, 15,  15,
-    15,  15, 15, 16, 200,
+    13,  13, 14, 15,  16,
+    16,  16, 16, 16,  16,
+    16,  16, 16, 16,  16,
+    16,  16, 16, 17, 200,
      2,   2,  0,  0,   7,
-     0,  15, 0
+     0,  16, 0
 };
 
 #define TOPPREC 16
@@ -178,13 +178,6 @@ static int type[TOKCOUNT] =
 /* 45 */  RL, RL, LR|OP_OPF, LR|OP_OPF, RL|OP_A2,
 /* 50 */  LR|OP_OPF, RL|OP_E2, LR|OP_OPF
 };
-
-#define LVCOUNT 32
-
-/* list of lvalues (variables) */
-
-static int lvc;
-static char **lvals;
 
 
 /**/
@@ -325,7 +318,6 @@ zzlex(void)
 	case '?':
 	    if (unary) {
 		yyval.u.l = lastval;
-		unary = 0;
 		return NUM;
 	    }
 	    return QUEST;
@@ -397,10 +389,6 @@ zzlex(void)
 		char *p, q;
 
 		p = ptr;
-		if (lvc == LVCOUNT) {
-		    zerr("too many identifiers (complain to author)", NULL, 0);
-		    return EOI;
-		}
 		while (iident(*++ptr));
 		if (*ptr == '[' || (!cct && *ptr == '(')) {
 		    char op = *ptr, cp = ((*ptr == '[') ? ']' : ')');
@@ -417,7 +405,7 @@ zzlex(void)
 		}
 		q = *ptr;
 		*ptr = '\0';
-		lvals[yylval = lvc++] = ztrdup(p);
+		yylval = dupstring(p);
 		*ptr = q;
 		return (func ? FUNC : (cct ? CID : ID));
 	    }
@@ -436,7 +424,7 @@ static int mtok;			/* last token */
 static int sp = -1;			/* stack pointer */
 
 struct mathvalue {
-    LV lval;
+    char *lval;
     mnumber val;
 };
 
@@ -444,7 +432,7 @@ static struct mathvalue *stack;
 
 /**/
 static void
-push(mnumber val, LV lval)
+push(mnumber val, char *lval)
 {
     if (sp == STACKSZ - 1)
 	zerr("stack overflow", NULL, 0);
@@ -457,13 +445,13 @@ push(mnumber val, LV lval)
 
 /**/
 static mnumber
-getcvar(LV s)
+getcvar(char *s)
 {
     char *t;
     mnumber mn;
     mn.type = MN_INTEGER;
 
-    if (!(t = getsparam(lvals[s])))
+    if (!(t = getsparam(s)))
 	mn.u.l = 0;
     else
         mn.u.l = STOUC(*t == Meta ? t[1] ^ 32 : *t);
@@ -473,16 +461,16 @@ getcvar(LV s)
 
 /**/
 static mnumber
-setvar(LV s, mnumber v)
+setvar(char *s, mnumber v)
 {
-    if (s == -1 || s >= lvc) {
+    if (!s) {
 	zerr("lvalue required", NULL, 0);
 	v.type = MN_INTEGER;
 	v.u.l = 0;
     }
     if (noeval)
 	return v;
-    setnparam(lvals[s], v);
+    setnparam(s, v);
     return v;
 }
 
@@ -507,7 +495,7 @@ callmathfunc(char *o)
 	    return f->sfunc(n, a, f->funcid);
 	else {
 	    int argc = 0;
-	    mnumber *argv, *q;
+	    mnumber *argv = NULL, *q;
 	    LinkList l = newlinklist();
 	    LinkNode node;
 	    char *p;
@@ -563,7 +551,7 @@ void
 op(int what)
 {
     mnumber a, b, c, *spval;
-    LV lv;
+    char *lv;
     int tp = type[what];
 
     if (errflag)
@@ -574,10 +562,8 @@ op(int what)
     }
 
     if (tp & (OP_A2|OP_A2IR|OP_A2IO|OP_E2|OP_E2IO)) {
-	if (sp < 1) {
- 	    zerr("bad math expression: unbalanced stack", NULL, 0); \
-	    return;
-	}
+	/* Make sure anyone seeing this message reports it. */
+	DPUTS(sp < 1, "BUG: math: not enough wallabies in outback.");
 	b = stack[sp--].val;
 	a = stack[sp--].val;
 
@@ -610,141 +596,147 @@ op(int what)
 		b.u.d = (double)b.u.l;
 	    }
 	}
-	/*
-	 * type for operation: usually same as operands, but e.g.
-	 * (a == b) returns int.
-	 */
-	c.type = (tp & OP_A2IR) ? MN_INTEGER : a.type;
 
-	switch(what) {
-	case AND:
-	case ANDEQ:
-	    c.u.l = a.u.l & b.u.l;
-	    break;
-	case XOR:
-	case XOREQ:
-	    c.u.l = a.u.l ^ b.u.l;
-	    break;
-	case OR:
-	case OREQ:
-	    c.u.l = a.u.l | b.u.l;
-	    break;
-	case MUL:
-	case MULEQ:
-	    if (c.type == MN_FLOAT)
-		c.u.d = a.u.d * b.u.d;
-	    else
-		c.u.l = a.u.l * b.u.l;
-	    break;
-	case DIV:
-	case DIVEQ:
-	    if (!notzero(b))
-		return;
-	    if (c.type == MN_FLOAT)
-		c.u.d = a.u.d / b.u.d;
-	    else
-		c.u.l = a.u.l / b.u.l;
-	    break;
-	case MOD:
-	case MODEQ:
-	    if (!notzero(b))
-		return;
-	    c.u.l = a.u.l % b.u.l;
-	    break;
-	case PLUS:
-	case PLUSEQ:
-	    if (c.type == MN_FLOAT)
-		c.u.d = a.u.d + b.u.d;
-	    else
-		c.u.l = a.u.l + b.u.l;
-	    break;
-	case MINUS:
-	case MINUSEQ:
-	    if (c.type == MN_FLOAT)
-		c.u.d = a.u.d - b.u.d;
-	    else
-		c.u.l = a.u.l - b.u.l;
-	    break;
-	case SHLEFT:
-	case SHLEFTEQ:
-	    c.u.l = a.u.l << b.u.l;
-	    break;
-	case SHRIGHT:
-	case SHRIGHTEQ:
-	    c.u.l = a.u.l >> b.u.l;
-	    break;
-	case LES:
-	    c.u.l = (zlong)
-		(a.type == MN_FLOAT ? (a.u.d < b.u.d) : (a.u.l < b.u.l));
-	    break;
-	case LEQ:
-	    c.u.l = (zlong)
-		(a.type == MN_FLOAT ? (a.u.d <= b.u.d) : (a.u.l <= b.u.l));
-	    break;
-	case GRE:
-	    c.u.l = (zlong)
-		(a.type == MN_FLOAT ? (a.u.d > b.u.d) : (a.u.l > b.u.l));
-	    break;
-	case GEQ:
-	    c.u.l = (zlong)
-		(a.type == MN_FLOAT ? (a.u.d >= b.u.d) : (a.u.l >= b.u.l));
-	    break;
-	case DEQ:
-	    c.u.l = (zlong)
-		(a.type == MN_FLOAT ? (a.u.d == b.u.d) : (a.u.l == b.u.l));
-	    break;
-	case NEQ:
-	    c.u.l = (zlong)
-		(a.type == MN_FLOAT ? (a.u.d != b.u.d) : (a.u.l != b.u.l));
-	    break;
-	case DAND:
-	case DANDEQ:
-	    c.u.l = (zlong)(a.u.l && b.u.l);
-	    break;
-	case DOR:
-	case DOREQ:
-	    c.u.l = (zlong)(a.u.l || b.u.l);
-	    break;
-	case DXOR:
-	case DXOREQ:
-	    c.u.l = (zlong)((a.u.l && !b.u.l) || (!a.u.l && b.u.l));
-	    break;
-	case COMMA:
-	    c = b;
-	    break;
-	case POWER:
-	case POWEREQ:
-	    if (c.type == MN_INTEGER && b.u.l < 0) {
-		/* produces a real result, so cast to real. */
-		a.type = b.type = c.type = MN_FLOAT;
-		a.u.d = (double) a.u.l;
-		b.u.d = (double) b.u.l;
-	    }
-	    if (c.type == MN_INTEGER) {
-		for (c.u.l = 1; b.u.l--; c.u.l *= a.u.l);
-	    } else {
-		if (b.u.d <= 0 && !notzero(a))
+	if (noeval) {
+	    c.type = MN_INTEGER;
+	    c.u.l = 0;
+	} else {
+	    /*
+	     * type for operation: usually same as operands, but e.g.
+	     * (a == b) returns int.
+	     */
+	    c.type = (tp & OP_A2IR) ? MN_INTEGER : a.type;
+
+	    switch(what) {
+	    case AND:
+	    case ANDEQ:
+		c.u.l = a.u.l & b.u.l;
+		break;
+	    case XOR:
+	    case XOREQ:
+		c.u.l = a.u.l ^ b.u.l;
+		break;
+	    case OR:
+	    case OREQ:
+		c.u.l = a.u.l | b.u.l;
+		break;
+	    case MUL:
+	    case MULEQ:
+		if (c.type == MN_FLOAT)
+		    c.u.d = a.u.d * b.u.d;
+		else
+		    c.u.l = a.u.l * b.u.l;
+		break;
+	    case DIV:
+	    case DIVEQ:
+		if (!notzero(b))
 		    return;
-		if (a.u.d < 0) {
-		    /* Error if (-num ** b) and b is not an integer */
-		    double tst = (double)(zlong)b.u.d;
-		    if (tst != b.u.d) {
-			zerr("imaginary power", NULL, 0);
-			return;
-		    }
+		if (c.type == MN_FLOAT)
+		    c.u.d = a.u.d / b.u.d;
+		else
+		    c.u.l = a.u.l / b.u.l;
+		break;
+	    case MOD:
+	    case MODEQ:
+		if (!notzero(b))
+		    return;
+		c.u.l = a.u.l % b.u.l;
+		break;
+	    case PLUS:
+	    case PLUSEQ:
+		if (c.type == MN_FLOAT)
+		    c.u.d = a.u.d + b.u.d;
+		else
+		    c.u.l = a.u.l + b.u.l;
+		break;
+	    case MINUS:
+	    case MINUSEQ:
+		if (c.type == MN_FLOAT)
+		    c.u.d = a.u.d - b.u.d;
+		else
+		    c.u.l = a.u.l - b.u.l;
+		break;
+	    case SHLEFT:
+	    case SHLEFTEQ:
+		c.u.l = a.u.l << b.u.l;
+		break;
+	    case SHRIGHT:
+	    case SHRIGHTEQ:
+		c.u.l = a.u.l >> b.u.l;
+		break;
+	    case LES:
+		c.u.l = (zlong)
+		    (a.type == MN_FLOAT ? (a.u.d < b.u.d) : (a.u.l < b.u.l));
+		break;
+	    case LEQ:
+		c.u.l = (zlong)
+		    (a.type == MN_FLOAT ? (a.u.d <= b.u.d) : (a.u.l <= b.u.l));
+		break;
+	    case GRE:
+		c.u.l = (zlong)
+		    (a.type == MN_FLOAT ? (a.u.d > b.u.d) : (a.u.l > b.u.l));
+		break;
+	    case GEQ:
+		c.u.l = (zlong)
+		    (a.type == MN_FLOAT ? (a.u.d >= b.u.d) : (a.u.l >= b.u.l));
+		break;
+	    case DEQ:
+		c.u.l = (zlong)
+		    (a.type == MN_FLOAT ? (a.u.d == b.u.d) : (a.u.l == b.u.l));
+		break;
+	    case NEQ:
+		c.u.l = (zlong)
+		    (a.type == MN_FLOAT ? (a.u.d != b.u.d) : (a.u.l != b.u.l));
+		break;
+	    case DAND:
+	    case DANDEQ:
+		c.u.l = (zlong)(a.u.l && b.u.l);
+		break;
+	    case DOR:
+	    case DOREQ:
+		c.u.l = (zlong)(a.u.l || b.u.l);
+		break;
+	    case DXOR:
+	    case DXOREQ:
+		c.u.l = (zlong)((a.u.l && !b.u.l) || (!a.u.l && b.u.l));
+		break;
+	    case COMMA:
+		c = b;
+		break;
+	    case POWER:
+	    case POWEREQ:
+		if (c.type == MN_INTEGER && b.u.l < 0) {
+		    /* produces a real result, so cast to real. */
+		    a.type = b.type = c.type = MN_FLOAT;
+		    a.u.d = (double) a.u.l;
+		    b.u.d = (double) b.u.l;
 		}
-		c.u.d = pow(a.u.d, b.u.d);
+		if (c.type == MN_INTEGER) {
+		    for (c.u.l = 1; b.u.l--; c.u.l *= a.u.l);
+		} else {
+		    if (b.u.d <= 0 && !notzero(a))
+			return;
+		    if (a.u.d < 0) {
+			/* Error if (-num ** b) and b is not an integer */
+			double tst = (double)(zlong)b.u.d;
+			if (tst != b.u.d) {
+			    zerr("imaginary power", NULL, 0);
+			    return;
+			}
+		    }
+		    c.u.d = pow(a.u.d, b.u.d);
+		}
+		break;
+	    case EQ:
+		c = b;
+		break;
 	    }
-	    break;
-	case EQ:
-	    c = b;
-	    break;
 	}
 	if (tp & (OP_E2|OP_E2IO)) {
 	    lv = stack[sp+1].lval;
 	    push(setvar(lv,c), lv);
 	} else
-	    push(c,-1);
+	    push(c,NULL);
 	return;
     }
 
@@ -756,7 +748,7 @@ op(int what)
 	    spval->type = MN_INTEGER;
 	} else
 	    spval->u.l = !spval->u.l;
-	stack[sp].lval = -1;
+	stack[sp].lval = NULL;
 	break;
     case COMP:
 	if (spval->type & MN_FLOAT) {
@@ -764,7 +756,7 @@ op(int what)
 	    spval->type = MN_INTEGER;
 	} else
 	    spval->u.l = ~spval->u.l;
-	stack[sp].lval = -1;
+	stack[sp].lval = NULL;
 	break;
     case POSTPLUS:
 	a = *spval;
@@ -783,25 +775,22 @@ op(int what)
 	(void)setvar(stack[sp].lval, a);
 	break;
     case UPLUS:
-	stack[sp].lval = -1;
+	stack[sp].lval = NULL;
 	break;
     case UMINUS:
 	if (spval->type & MN_FLOAT)
 	    spval->u.d = -spval->u.d;
 	else
 	    spval->u.l = -spval->u.l;
-	stack[sp].lval = -1;
+	stack[sp].lval = NULL;
 	break;
     case QUEST:
-	if (sp < 2) {
- 	    zerr("bad math expression: unbalanced stack", NULL, 0);
-	    return;
-	}
+	DPUTS(sp < 2, "BUG: math: three shall be the number of the counting.");
 	c = stack[sp--].val;
 	b = stack[sp--].val;
 	a = stack[sp--].val;
 	/* b and c can stay different types in this case. */
-	push(((a.type & MN_FLOAT) ? a.u.d : a.u.l) ? b : c, -1);
+	push(((a.type & MN_FLOAT) ? a.u.d : a.u.l) ? b : c, NULL);
 	break;
     case COLON:
 	break;
@@ -852,48 +841,41 @@ bop(int tk)
 static mnumber
 mathevall(char *s, int prek, char **ep)
 {
-    int t0;
-    int xlastbase, xnoeval, xunary, xlvc;
+    int xlastbase, xnoeval, xunary;
     char *xptr;
     mnumber xyyval;
-    LV xyylval;
-    char **xlvals = 0, *nlvals[LVCOUNT];
+    char *xyylval;
     int xsp;
     struct mathvalue *xstack = 0, nstack[STACKSZ];
     mnumber ret;
 
+    MUSTUSEHEAP("mathevall");
     if (mlevel++) {
 	xlastbase = lastbase;
 	xnoeval = noeval;
 	xunary = unary;
-	xlvc = lvc;
 	xptr = ptr;
 	xyyval = yyval;
 	xyylval = yylval;
-	xlvals = lvals;
 
 	xsp = sp;
 	xstack = stack;
     } else {
-	xlastbase = xnoeval = xunary = xlvc = xyylval = xsp = 0;
+	xlastbase = xnoeval = xunary = xsp = 0;
 	xyyval.type = MN_INTEGER;
 	xyyval.u.l = 0;
+	xyylval = NULL;
 	xptr = NULL;
     }
     stack = nstack;
     lastbase = -1;
-    memset(nlvals, 0, LVCOUNT*sizeof(char *));
-    lvals = nlvals;
-    lvc = 0;
     ptr = s;
     sp = -1;
     unary = 1;
     mathparse(prek);
     *ep = ptr;
-    if (sp)
-	zerr("bad math expression: unbalanced stack", NULL, 0);
-    for (t0 = 0; t0 != lvc; t0++)
-	zsfree(lvals[t0]);
+    DPUTS(!errflag && sp,
+	  "BUG: math: wallabies roaming too freely in outback");
 
     ret = stack[0].val;
 
@@ -901,11 +883,9 @@ mathevall(char *s, int prek, char **ep)
 	lastbase = xlastbase;
 	noeval = xnoeval;
 	unary = xunary;
-	lvc = xlvc;
 	ptr = xptr;
 	yyval = xyyval;
 	yylval = xyylval;
-	lvals = xlvals;
 
 	sp = xsp;
 	stack = xstack;
@@ -964,9 +944,10 @@ mathevalarg(char *s, char **ss)
 
 /**/
 static void
-checkunary(int tp, char *ptr)
+checkunary(int mtokc, char *ptr)
 {
     int errmsg = 0;
+    int tp = type[mtokc];
     if (tp & (OP_A2|OP_A2IR|OP_A2IO|OP_E2|OP_E2IO|OP_OP)) {
 	if (unary)
 	    errmsg = 1;
@@ -1005,22 +986,22 @@ mathparse(int pc)
     if (errflag)
 	return;
     mtok = zzlex();
-    checkunary(type[mtok], optr);
+    checkunary(mtok, optr);
     while (prec[mtok] <= pc) {
 	if (errflag)
 	    return;
 	switch (mtok) {
 	case NUM:
-	    push(yyval, -1);
+	    push(yyval, NULL);
 	    break;
 	case ID:
-	    push(getnparam(lvals[yylval]), yylval);
+	    push(getnparam(yylval), yylval);
 	    break;
 	case CID:
 	    push(getcvar(yylval), yylval);
 	    break;
 	case FUNC:
-	    push(callmathfunc(lvals[yylval]), yylval);
+	    push(callmathfunc(yylval), yylval);
 	    break;
 	case M_INPAR:
 	    mathparse(TOPPREC);
@@ -1036,10 +1017,15 @@ mathparse(int pc)
 
 	    if (!q)
 		noeval++;
-	    mathparse(prec[QUEST] - 1);
+	    mathparse(prec[COLON] - 1);
 	    if (!q)
 		noeval--;
-	    else
+	    if (mtok != COLON) {
+		if (!errflag)
+		    zerr("':' expected", NULL, 0);
+		return;
+	    }
+	    if (q)
 		noeval++;
 	    mathparse(prec[QUEST]);
 	    if (q)
@@ -1058,6 +1044,6 @@ mathparse(int pc)
 	}
 	optr = ptr;
 	mtok = zzlex();
-	checkunary(type[mtok], optr);
+	checkunary(mtok, optr);
     }
 }
