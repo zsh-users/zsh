@@ -16,7 +16,7 @@ def(ifzshone)(1)()\
 def(ifzshall)(1)()\
 )\
 ifztexi(
-texinfo(zsh.info)(zsh)
+@@TEXINFO@@
 NOTRANS(@iftex
 @finalout
 @end iftex)
