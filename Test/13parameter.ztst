@@ -489,3 +489,40 @@
 >1
 >a
 > b
+
+  set If "this test fails" "we have broken" the shell again
+  print -l ${1+"$@"}
+0:Regression test of ${1+"$@"} bug
+>If
+>this test fails
+>we have broken
+>the
+>shell
+>again
+
+  set If "this test fails" "we have broken" the shell again
+  print -l "${(A)foo::=$@}"
+  print -l $foo
+0:Regression test of "${(A)foo=$@}" bug
+>If this test fails we have broken the shell again
+>If
+>this test fails
+>we have broken
+>the
+>shell
+>again
+
+  set If "this test fails" maybe "we have finally fixed" the shell
+  print -l ${=1+"$@"}
+0:Regression test of unfixed ${=1+"$@"} bug
+>If
+>this
+>test
+>fails
+>maybe
+>we
+>have
+>finally
+>fixed
+>the
+>shell
