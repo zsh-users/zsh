@@ -643,7 +643,7 @@ completing for the tt(cd) builtin command
 )
 kindex(paths, completion tag)
 item(tt(paths))(
-used to look up the values of the tt(expand), tt(cursor) and
+used to look up the values of the tt(expand), tt(ambiguous) and
 tt(special-dirs) styles
 )
 kindex(pids, completion tag)
@@ -760,6 +760,13 @@ item(tt(add-space))(
 This style is used by the tt(_prefix) completer to decide if a space
 should be inserted before the suffix.
 )
+kindex(ambiguous, completion style)
+item(tt(ambiguous))(
+This is used with the tt(paths) tag by the function
+generating filenames as matches to find out if the cursor should be left
+after the first ambiguous pathname component even when menucompletion
+is used.
+)
 kindex(auto-description, completion style)
 item(tt(auto-description))(
 If set, this style's value will be used as the description for options which
@@ -769,8 +776,8 @@ the description for this argument. Depending on personal preferences,
 it may be useful to set this style to something like `tt(specify: %d)'. 
 Note that this may not work for some commands.
 )
-kindex(break, completion style)
-item(tt(break))(
+kindex(break-keys, completion style)
+item(tt(break-keys))(
 This style is used by the tt(incremental-complete-word) widget (found
 in the tt(Functions/Zle) directory of the distribution). Its value
 should be a pattern and all keys matching this pattern will cause the
@@ -874,11 +881,6 @@ other than `tt(1)'.
 )
 kindex(cursor, completion style)
 item(tt(cursor))(
-This is used together with the tt(paths) tag by the function
-generating filenames as matches to find out if the cursor should be left
-after the first ambiguous pathname component even when menucompletion
-is used.
-
 The tt(predict-on) widget uses this style to decide where to place the 
 cursor after completion has been tried. If it is set to tt(complete),
 the cursor is left at the place where completion left it, but only if
@@ -969,6 +971,20 @@ example(zstyle ':completion:*' file-patterns \
 Note also that during the execution of completion functions, the
 tt(EXTENDED_GLOB) option is in effect, so the characters `tt(#)',
 `tt(~)' and `tt(^)' have special meanings in the patterns.
+)
+kindex(file-sort, completion style)
+item(tt(file-sort))(
+The completion function that generates filenames as possible matches
+uses this style with the tt(files) tag to determine in which order the 
+names should be listed and completed when using menucompletion. The
+value may be one of tt(size) to sort them by the size of the file,
+tt(links) to sort them by the number of links to the file,
+tt(modification) (or tt(time) or tt(date)) to sort them by the last
+modification time, tt(access) to sort them by the last access time, or 
+tt(inode) (or tt(change)) to sort them by the last inode change
+time. Any other value (or not setting this style at all) makes them be 
+sorted alphabetically by name. If the value contains the string
+tt(reverse), sorting is done in decreasing order.
 )
 kindex(format, completion style)
 item(tt(format))(
@@ -1499,18 +1515,6 @@ history as possible matches sort these words alphabetically instead of
 keeping them in the order in which they appear in the history (from
 youngest to oldest).
 
-The completion function that generates filenames as possible matches
-uses this style with the tt(files) tag to determine in which order the 
-names should be listed and completed when using menucompletion. The
-value may be one of tt(size) to sort them by the size of the file,
-tt(links) to sort them by the number of links to the file,
-tt(modification) (or tt(time) or tt(date)) to sort them by the last
-modification time, tt(access) to sort them by the last access time, or 
-tt(inode) (or tt(change)) to sort them by the last inode change
-time. Any other value (or not setting this style at all) makes them be 
-sorted alphabetically by name. If the value contains the string
-tt(reverse), sorting is done in decreasing order.
-
 This is also used by the tt(_expand) completer. Here, if it is set to
 `true', the expansions generated will always be sorted. If it is set
 to tt(menu), then the expansions are only sorted when they are offered 
@@ -1535,9 +1539,11 @@ If set to `true', the tt(_history_complete_word) bindable
 command will always insert matches as if menucompletion were started
 and it will stop when the last match is inserted. If this style is set
 to tt(verbose) a message will be displayed when the last match is reached.
-
-This style is also used by the tt(incremental-complete-word)
-widget. Here its value is used like the one for the tt(break)
+)
+kindex(stop-keys, completion style)
+item(tt(stop-keys))(
+This style is used by the tt(incremental-complete-word)
+widget. Its value is used like the one for the tt(break-keys)
 style. But all keys matching the pattern given as its value will stop
 incremental completion and will then execute their usual function.
 )
@@ -2612,7 +2618,7 @@ These functions also accept the `tt(-J)', `tt(-V)', `tt(-1)',
 `tt(-r)', and `tt(-R)' options from the tt(compadd) builtin.
 
 Finally, the tt(_path_files) function  uses the styles tt(expand),
-tt(cursor) and tt(special-dirs) with the tt(paths) tag.
+tt(ambiguous) and tt(special-dirs) with the tt(paths) tag.
 )
 findex(_parameters)
 item(tt(_parameters))(

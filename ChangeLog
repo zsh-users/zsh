@@ -4,6 +4,10 @@
 
 2000-04-05  Sven Wischnowsky <wischnow@informatik.hu-berlin.de>
 
+	* 10508: Completion/Builtins/_zstyle, Completion/Core/_path_files,
+	Doc/Zsh/compsys.yo, Functions/Zle/incremental-complete-word: 
+	renaming some styles
+
 	* 10507: Completion/Core/_files, Completion/Core/_main_complete:
 	two small fixes (-g in _files and menu style)
 

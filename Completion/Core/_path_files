@@ -86,7 +86,7 @@ if (( ! $mopts[(I)-[JVX]] )); then
   mopts=( "$mopts[@]" "$expl[@]" )
 fi
 
-if zstyle -s ":completion:${curcontext}:files" sort tmp1; then
+if zstyle -s ":completion:${curcontext}:files" file-sort tmp1; then
   case "$tmp1" in
   *size*)             sort=oL;;
   *links*)            sort=ol;;
@@ -464,7 +464,7 @@ for prepath in "$prepaths[@]"; do
 
       if [[ -n $menu || -z "$compstate[insert]" ]] ||
          ! zstyle -t ":completion:${curcontext}:paths" expand suffix; then
-        (( tmp4 )) && zstyle -t ":completion:${curcontext}:paths" cursor &&
+        (( tmp4 )) && zstyle -t ":completion:${curcontext}:paths" ambiguous &&
             compstate[to_end]=''
         if [[ "$tmp3" = */* ]]; then
 	  compadd -Qf "$mopts[@]" -p "$linepath$tmp2" -s "/${tmp3#*/}" \

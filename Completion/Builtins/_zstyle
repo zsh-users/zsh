@@ -11,9 +11,10 @@ typeset -A styles
 styles=(
   accept-exact		 c:bool
   add-space		 c:bool
+  ambiguous              c:bool
   arguments		 c:
   auto-description	 c:
-  break                  c:
+  break-keys             c:
   completer		 c:completer
   completions		 c:
   condition		 c:
@@ -22,6 +23,7 @@ styles=(
   domains                c:
   expand		 c:
   file-patterns		 c:filepat
+  file-sort              c:fsort
   format		 c:
   glob			 c:
   group-name		 c:
@@ -58,6 +60,7 @@ styles=(
   special-dirs		 c:sdirs
   squeeze-slashes	 c:bool
   stop			 c:stop
+  stop-keys		 c:
   subst-glob-only        c:
   substitute		 c:
   tag-order		 c:tag
@@ -134,20 +137,18 @@ while [[ -n $state ]]; do
       ;;
 
     cursor)
-      if [[ "$words[2]" = *:completion:inc* ]]; then
-        _wanted values expl 'cursor positioning' compadd complete key default
-      elif [[ "$words[2]" = *:completion::* ]]; then
-        _wanted values expl 'cursor positioning' compadd true false
-      else
-        _wanted values expl 'cursor positioning' \
-	  compadd complete key default true false
-      fi
+      _wanted values expl 'cursor positioning' compadd complete key default
       ;;
 
     completer)
       _wanted values expl completer \
 	compadd _complete _approximate _correct _match \
                 _expand _list _menu _oldlist _next_tags
+      ;;
+
+    fsort)
+      _wanted values expl 'how to sort files' \
+	compadd name size links time date modification access inode change reverse
       ;;
 
     user-host-port)
