@@ -3075,8 +3075,9 @@ bslashquote(const char *s, char **e, int instring)
 	}
 	else if (ispecial(*u) &&
 		 ((*u != '=' && *u != '~') ||
-		  (u == s || (isset(MAGICEQUALSUBST) &&
-			      (u[-1] == '=' || u[-1] == ':')))) &&
+		  u == s ||
+		  (isset(MAGICEQUALSUBST) && (u[-1] == '=' || u[-1] == ':')) ||
+		  (*u == '~' && isset(EXTENDEDGLOB))) &&
 	    (!instring ||
 	     (isset(BANGHIST) && *u == (char)bangchar) ||
 	     (instring == 2 &&
