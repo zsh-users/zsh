@@ -1,4 +1,4 @@
-2000-05-02  Tanaka Akira      <akr@m17n.org>
+2000-05-02  Tanaka Akira  <akr@m17n.org>
 
 	* 11075: install completion functions for AIX and BSD.
 
