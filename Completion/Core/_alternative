@@ -1,6 +1,6 @@
 #autoload
 
-local tags def expl descr action mesgs nm="$compstack[nmatches]" subopts
+local tags def expl descr action mesgs nm="$compstate[nmatches]" subopts
 local opt curcontext="$curcontext"
 
 subopts=()
