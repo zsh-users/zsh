@@ -1,3 +1,10 @@
+2001-04-11  Wayne Davison  <wayned@users.sourceforge.net>
+
+	* 13942: Src/init.c, Doc/Zsh/func.yo: Fixed a bug in the
+	calling of "preexec" to prevent the passing of the wrong
+	history info as arg #1.  Added 2 extra args with expanded
+	command info.  Documented the new calling syntax.
+
 2001-04-11  Peter Stephenson  <pws@pwstephenson.fsnet.co.uk>
 
 	* 13944: Src/Modules/mapfile.c (from Bart): dupstring the
