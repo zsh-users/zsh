@@ -82,8 +82,11 @@
 
 %prep
   mkdir options.tmp && cd options.tmp
+
   mkdir tmpcd
+
   touch tmpfile1 tmpfile2
+
   mydir=$PWD
   mydirt=`print -P %~`
   catpath=$(which cat)

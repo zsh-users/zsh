@@ -8,10 +8,10 @@
 
   comptestinit -z $ZTST_testdir/../Src/zsh &&
   {
-  mkdir dir1
-  mkdir dir2
-  touch file1
-  touch file2
+    mkdir dir1 &&
+    mkdir dir2 &&
+    touch file1 &&
+    touch file2
   }
 
 %test

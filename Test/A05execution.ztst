@@ -7,7 +7,9 @@
   cd command.tmp
 
   print '#!/bin/sh\necho This is top' >tstcmd
+
   print '#!/bin/sh\necho This is dir1' >dir1/tstcmd
+
   print '#!/bin/sh\necho This is dir2' >dir2/tstcmd
 
   chmod 755 tstcmd dir1/tstcmd dir2/tstcmd

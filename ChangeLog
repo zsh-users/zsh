@@ -1,5 +1,13 @@
 2001-08-22  Bart Schaefer  <schaefer@zsh.org>
 
+	* 15676: Test/A01grammar.ztst, Test/A05execution.ztst,
+	Test/C02cond.ztst, Test/D04parameter.ztst, Test/E01options.ztst,
+	Test/E02xtrace.ztst, Test/Y01completion.ztst,
+	Test/Y03arguments.ztst:  Tweak %prep sections to exit sooner on
+	certain failures (by adding blank lines).  Other whitespace-only
+	changes.  Avoid [[ ! -r ... ]] test when running as root, as it
+	always fails in that case.  Test `typeset -ft' (function trace).
+	
 	* 15608: Completion/Zsh/Command/_cd: Don't treat numbers as
 	cd-able vars.
 

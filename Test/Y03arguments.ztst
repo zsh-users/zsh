@@ -8,8 +8,8 @@
 
   comptestinit -z $ZTST_testdir/../Src/zsh &&
   {
-  comptesteval 'compdef _tst tst'
-  tst_arguments () { comptesteval "_tst () { _arguments ${${(@qq)*}} }" }
+    comptesteval 'compdef _tst tst'
+    tst_arguments () { comptesteval "_tst () { _arguments ${${(@qq)*}} }" }
   }
 
 %test

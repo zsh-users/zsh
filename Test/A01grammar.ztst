@@ -5,6 +5,7 @@
 %prep
 
   mkdir basic.tmp && cd basic.tmp
+
   touch foo bar
 
 %test

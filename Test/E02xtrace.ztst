@@ -2,6 +2,7 @@
 
 %prep
   mkdir xtrace.tmp && cd xtrace.tmp
+
   function xtf {
     local regression_test_dummy_variable
     print "$*"
@@ -81,3 +82,10 @@
 ?+(eval):21> . ./xt.in Tracing: source 2>file
 ?+./xt.in:1> print Tracing: source 2>file
 ?+(eval):22> set +x
+
+ typeset -ft xtf
+ xtf 'Tracing: function'
+0:
+>Tracing: function
+?+xtf:1> local regression_test_dummy_variable
+?+xtf:2> print Tracing: function
