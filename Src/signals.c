@@ -350,11 +350,15 @@ signal_suspend(int sig, int sig2)
     sigset_t oset;
 #endif /* BROKEN_POSIX_SIGSUSPEND */
 
-    sigfillset(&set);
-    sigdelset(&set, sig);
-    sigdelset(&set, SIGHUP);  /* still don't know why we add this? */
-    if (sig2)
-        sigdelset(&set, sig2);
+    if (isset(TRAPSASYNC)) {
+	sigemptyset(&set);
+    } else {
+	sigfillset(&set);
+	sigdelset(&set, sig);
+	sigdelset(&set, SIGHUP);  /* still don't know why we add this? */
+	if (sig2)
+	    sigdelset(&set, sig2);
+    }
 #ifdef BROKEN_POSIX_SIGSUSPEND
     sigprocmask(SIG_SETMASK, &set, &oset);
     pause();
@@ -366,11 +370,15 @@ signal_suspend(int sig, int sig2)
 # ifdef BSD_SIGNALS
     sigset_t set;
 
-    sigfillset(&set);
-    sigdelset(&set, sig);
-    if (sig2)
-      sigdelset(&set, sig2);
-    ret = sigpause(set);
+    if (isset(TRAPSASYNC)) {
+	sigemptyset(&set);
+    } else {
+	sigfillset(&set);
+	sigdelset(&set, sig);
+	if (sig2)
+	    sigdelset(&set, sig2);
+	ret = sigpause(set);
+    }
 # else
 #  ifdef SYSV_SIGNALS
     ret = sigpause(sig);
@@ -426,7 +434,7 @@ zhandler(int sig)
     do_jump = suspend_longjmp;              /* do we need to longjmp to signal_suspend */
     suspend_longjmp = 0;                    /* In case a SIGCHLD somehow arrives       */
 
-    if (sig == SIGCHLD) {                   /* Traps can cause nested child_suspend()  */
+    if (sig == SIGCHLD) {                   /* Traps can cause nested signal_suspend()  */
         if (do_jump)
             jump_to = suspend_jmp_buf;      /* Copy suspend_jmp_buf                    */
     }
@@ -1064,18 +1072,6 @@ dotrap(int sig)
     /* Copied from dotrapargs(). */
     if ((sigtrapped[sig] & ZSIG_IGNORED) || !sigfuncs[sig] || errflag)
 	return;
-
-    /* Adapted from signal queueing in zhandler */
-    if (trap_queueing_enabled && !isset(TRAPSASYNC)) {
-	int temp_rear = ++trap_queue_rear % MAX_QUEUE_SIZE;
-
-	DPUTS(temp_rear == trap_queue_front, "BUG: trap queue full");
-	if (temp_rear != trap_queue_front) {
-	    trap_queue_rear = temp_rear;
-	    trap_queue[trap_queue_rear] = sig;
-	}
-	return;
-    }
 
     dotrapargs(sig, sigtrapped+sig, sigfuncs[sig]);
 }

@@ -1,3 +1,9 @@
+2004-05-02  Peter Stephenson  <pws@pwstephenson.fsnet.co.uk>
+
+	* 19858: Doc/Zsh/options.yo, Src/jobs.c, Src/options.c,
+	Src/signals.c, Src/signals.h: TRAPS_ASYNC option done properly,
+	not blocking signals during sigsuspend to wait for children.
+
 2004-05-01  Clint Adams  <clint@zsh.org>
 
 	* 19863: Completion/Zsh/Type/_command_names, Doc/Zsh/compsys.yo:

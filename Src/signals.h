@@ -58,7 +58,6 @@
  
 #define child_block()      signal_block(sigchld_mask)
 #define child_unblock()    signal_unblock(sigchld_mask)
-#define child_suspend(S)   signal_suspend(SIGCHLD, S)
 
 /* ignore a signal */
 #define signal_ignore(S)   signal(S, SIG_IGN)
@@ -100,24 +99,6 @@
 } while (0)
 
 #define restore_queue_signals(q) (queueing_enabled = (q))
-
-/*
- * Similar (but simpler) mechanism used for queueing traps.
- * Only needed if NO_TRAPS_ASYNC is set.
- */
-#define queue_traps()	(trap_queueing_enabled++)
-
-#define run_queued_traps() do { \
-    while (trap_queue_front != trap_queue_rear) { /* while traps in queue */ \
-	trap_queue_front = (trap_queue_front + 1) % MAX_QUEUE_SIZE; \
-	dotrap(trap_queue[trap_queue_front]);  /* handle queued trap   */ \
-    } \
-} while (0)
-
-#define dont_queue_traps() do { \
-    trap_queueing_enabled = 0; \
-    run_queued_traps(); \
-} while (0)
 
 /* Make some signal functions faster. */
 

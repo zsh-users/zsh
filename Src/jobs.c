@@ -971,14 +971,14 @@ waitforpid(pid_t pid)
 
     /* child_block() around this loop in case #ifndef WNOHANG */
     dont_queue_signals();
-    child_block();		/* unblocked in child_suspend() */
+    child_block();		/* unblocked in signal_suspend() */
     while (!errflag && (kill(pid, 0) >= 0 || errno != ESRCH)) {
 	if (first)
 	    first = 0;
 	else
 	    kill(pid, SIGCONT);
 
-	child_suspend(SIGINT);
+	signal_suspend(SIGCHLD, SIGINT);
 	child_block();
     }
     child_unblock();
@@ -995,8 +995,7 @@ zwaitjob(int job, int sig)
     Job jn = jobtab + job;
 
     dont_queue_signals();
-    queue_traps();
-    child_block();		 /* unblocked during child_suspend() */
+    child_block();		 /* unblocked during signal_suspend() */
     if (jn->procs || jn->auxprocs) { /* if any forks were done         */
 	jn->stat |= STAT_LOCKED;
 	if (jn->stat & STAT_CHANGED)
@@ -1004,7 +1003,7 @@ zwaitjob(int job, int sig)
 	while (!errflag && jn->stat &&
 	       !(jn->stat & STAT_DONE) &&
 	       !(interact && (jn->stat & STAT_STOPPED))) {
-	    child_suspend(sig);
+	    signal_suspend(SIGCHLD, sig);
 	    /* Commenting this out makes ^C-ing a job started by a function
 	       stop the whole function again.  But I guess it will stop
 	       something else from working properly, we have to find out
@@ -1026,7 +1025,6 @@ zwaitjob(int job, int sig)
 	numpipestats = 1;
     }
     child_unblock();
-    dont_queue_traps();
     restore_queue_signals(q);
 }
 
