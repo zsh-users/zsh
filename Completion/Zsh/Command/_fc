@@ -1,13 +1,13 @@
 #compdef fc history r
 
-local expl fc_common fc_hist fc_r
+local fc_common fc_hist fc_r
 
 fc_common=(
   '(-A -R -W -I)-r[reverse order of the commands]'
   '(-A -R -W -I -e)-n[suppress line numbers]'
   '(-A -R -W -I)*::commands:_command_names -e' )
 
-fc_hist=( \
+fc_hist=(
   '(-A -R -W -I)-m[treat first argument as a pattern]'
   '(-A -R -W -I -e -f -E -i)-d[print time-stamps]'
   '(-A -R -W -I -e -d -E -i)-f[mm/dd/yyyy format time-stamps]'
@@ -19,13 +19,13 @@ fc_r='(-A -R -W -I -e)-l[list resulting commands on stdout]'
 
 case $service in
   history)
-    _arguments -C -s -S "$fc_common[@]" "$fc_hist[@]" && return 0
+    _arguments -s -S "$fc_common[@]" "$fc_hist[@]" && return 0
   ;;
   r)
-    _arguments -C -s -S "$fc_common[@]" "$fc_r" && return 0
+    _arguments -s -S "$fc_common[@]" "$fc_r" && return 0
   ;;
   *)
-  _arguments -C -s -S \
+  _arguments -s -S \
     '(-A -R -W -I -l -n -d -f -E -i -D)-e[specify editor to invoke]:editor to invoke:_command_names -e' \
     '(-l -m -e -r -n -d -f -E -i -D -A -W *)-R[read history from file]:history file:_files' \
     '(-l -m -e -r -n -d -f -E -i -D -R -W *)-A[append history to file]:history file:_files' \

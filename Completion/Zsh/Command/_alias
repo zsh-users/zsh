@@ -1,0 +1,8 @@
+#compdef alias
+
+_arguments -C -s -A "-*" -S \
+  '-+g[list or define global aliases]' \
+  '-+r[list or define regular aliases]' \
+  '-+m[print aliases matching specified pattern]' \
+  '-L[print each alias in the form of calls to alias]' \
+  '*::alias definition:_aliases -S ='

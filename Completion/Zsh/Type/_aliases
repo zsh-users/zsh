@@ -1,4 +1,4 @@
-#compdef alias unalias
+#compdef unalias
 
 local expl sel args opts
 
