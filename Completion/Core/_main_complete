@@ -60,6 +60,7 @@ comppostfuncs=()
 
 _lastdescr=( "\`${(@)^_lastdescr:#}'" )
 if [[ compstate[nmatches] -eq 0 &&
+      compstate[matcher] -eq compstate[total_matchers] &&
       -n "$compconfig[warning_format]" && $#_lastdescr -ne 0 ]]; then
   local str
 

@@ -368,7 +368,7 @@ compconf() {
 
 # Utility function to call a function if it exists.
 #
-# Usage: call <return> <name> [ <args> ... ]
+# Usage: funcall <return> <name> [ <args> ... ]
 #
 # If a function named <name> is defined (or defined to be autoloaded),
 # it is called. If <return> is given not the string `-' or empty, it is
@@ -385,10 +385,11 @@ funcall() {
 
   shift
 
-  if builtin functions "$1"; then
+  if builtin functions "$1" >& /dev/null; then
     "$@"
     _ret="$?"
     [[ -n "$_name" ]] && eval "${_name}=${_ret}"
+    compstate[restore]=''
     return 0
   fi
   return 1

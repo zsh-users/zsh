@@ -4118,23 +4118,6 @@ addmatches(Cadata dat, char **argv)
 		    llpl -= pl;
 		    lpre += pl;
 		}
-		if (comppatmatch && *comppatmatch) {
-		    int is = (*comppatmatch == '*');
-		    char *tmp = (char *) zhalloc(2 + llpl + llsl);
-
-		    strcpy(tmp, lpre);
-		    tmp[llpl] = 'x';
-		    strcpy(tmp + llpl + is, lsuf);
-
-		    tokenize(tmp);
-		    remnulargs(tmp);
-		    if (haswilds(tmp)) {
-			if (is)
-			    tmp[llpl] = Star;
-			if ((cp = patcompile(tmp, 0, NULL)))
-			    haspattern = 1;
-		    }
-		}
 	    }
 	    /* Now duplicate the strings we have from the command line. */
 	    if (dat->ipre)
@@ -4195,6 +4178,23 @@ addmatches(Cadata dat, char **argv)
 			lsuf[llsl - lsl] = '\0';
 		    else
 			*argv = NULL;
+		}
+		if (comppatmatch && *comppatmatch) {
+		    int is = (*comppatmatch == '*');
+		    char *tmp = (char *) zhalloc(2 + llpl + llsl);
+
+		    strcpy(tmp, lpre);
+		    tmp[llpl] = 'x';
+		    strcpy(tmp + llpl + is, lsuf);
+
+		    tokenize(tmp);
+		    remnulargs(tmp);
+		    if (haswilds(tmp)) {
+			if (is)
+			    tmp[llpl] = Star;
+			if ((cp = patcompile(tmp, 0, NULL)))
+			    haspattern = 1;
+		    }
 		}
 	    }
 	    if (*argv) {

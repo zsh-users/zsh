@@ -347,7 +347,7 @@ for prepath in "$prepaths[@]"; do
 	SUFFIX=""
       fi
 
-      if [[ -n $menu ]]; then
+      if [[ -n $menu || "$compconfig[path_expand]" != *suffix* ]]; then
         [[ -n "$compconfig[path_cursor]" ]] && compstate[to_end]=''
         if [[ "$tmp3" = */* ]]; then
 	  compadd -Qf -p "$linepath${testpath:q}" -s "/${tmp3#*/}" \
@@ -418,7 +418,7 @@ done
 
 exppaths=( "${(@)exppaths:#$orig}" )
 
-if [[ -n "$compconfig[path_expand]" &&
+if [[ "$compconfig[path_expand]" = *prefix* &&
       $#exppaths -gt 0 && nm -eq compstate[nmatches] ]]; then
   PREFIX="${opre}${osuf}"
   SUFFIX=""
