@@ -5,7 +5,7 @@
 
 (( $+functions[_prcs_projects] )) ||
 _prcs_projects() {
-  compadd $@ - ${opt_args[-R]:-${opt_args[--repository]:-${PRCS_REPOSITORY:-$HOME/PRCS}}}/*(/:t)
+  compadd $@ - ${~opt_args[-R]:-${opt_args[--repository]:-${PRCS_REPOSITORY:-$HOME/PRCS}}}/*(/:t)
 }	   
 
 # standard options for all subcommands 
