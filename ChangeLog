@@ -1,8 +1,26 @@
+2001-05-21  Clint Adams  <clint@zsh.org>
+
+	* 14419: Src/Builtins/rlimits.awk: handle glibc 2.2.3
+	rlimits enum.
+
 2001-05-21  Oliver Kiddle  <opk@zsh.org>
 
 	* 14416: Completion/Base/Core/_tags: include + options for tag order
 
 2001-05-21  Clint Adams  <clint@zsh.org>
+
+	* unposted: Completion/Unix/Type/_diff_options: quote $@
+	in calls to _arguments.
+
+2001-05-21  Oliver Kiddle  <opk@zsh.org>
+
+	* 14409: Completion/Zsh/Command/_set: make use of _arguments in _set
+
+2001-05-21  Peter Stephenson  <pws@csr.com>
+
+	* 14408: Test/C02cond.ztst: do chmod +w to work around rm -f
+	problem in Cygwin.
+
 
 	* unposted: Completion/Unix/Type/_diff_options: quote $@
 	in calls to _arguments.
