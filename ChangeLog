@@ -1,5 +1,8 @@
 2005-01-12  Peter Stephenson  <pws@csr.com>
 
+	* users/8354: Doc/Zsh/options.yo: with glob_complete, completing
+	a word with a pattern does not use matching control.
+
 	* unposted: Config/version.mk, README, Etc/FAQ.yo: release
 	zsh version 4.2.2.
 

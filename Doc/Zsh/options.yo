@@ -215,6 +215,11 @@ a `tt(*)' was added to the end of the word, or inserted at the cursor when
 tt(COMPLETE_IN_WORD) is set.  This actually uses pattern matching, not
 globbing, so it works not only for files but for any completion, such as
 options, user names, etc.
+
+Note that when the pattern matcher is used, matching control (for example,
+case-insensitive or anchored matching) cannot be used.  This limitation
+only applies when the current word contains a pattern; simply turning
+on the tt(GLOB_COMPLETE) option does not have this effect.
 )
 pindex(HASH_LIST_ALL)
 item(tt(HASH_LIST_ALL) <D>)(
