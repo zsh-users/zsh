@@ -2082,6 +2082,13 @@ tar file in an array and then calls this function to complete these
 names in the way normal filenames are completed by the
 tt(_path_files) function.
 
+If given the tt(-i) option a single match left will be accepted
+immediatly even if that means that additional parts for which no
+separators were on the line are to be inserted. When completing from a 
+fixed set of possible completions which are really words, this is
+often the expected behaviour. But if tt(_multi_parts) should behave
+like completing pathnames, the tt(-i) option should not be used.
+
 Like other utility functions, this function accepts the `tt(-V)',
 `tt(-J)', `tt(-1)', `tt(-2)', `tt(-n)', `tt(-X)', `tt(-M)', `tt(-P)',
 `tt(-S)', `tt(-r)', `tt(-R)', and `tt(-q)' options and passes them to

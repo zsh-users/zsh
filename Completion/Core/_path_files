@@ -439,7 +439,7 @@ for prepath in "$prepaths[@]"; do
       tmp2="$testpath"
       compquote tmp1 tmp2
 
-      if [[ -n $menu ]] ||
+      if [[ -n $menu || -z "$compstate[insert]" ]] ||
          ! zstyle -t ":completion:${curcontext}:paths" expand suffix; then
         (( tmp4 )) && zstyle -t ":completion:${curcontext}:paths" cursor &&
             compstate[to_end]=''

@@ -8,14 +8,14 @@
 # separator character are then completed independently.
 
 local sep matches pref npref i tmp1 group expl menu pre suf opre osuf cpre
-local opts sopts match
+local opts sopts match imm
 typeset -U tmp2
 
 # Get the options.
 
 zparseopts -D -a sopts \
     'J:=group' 'V:=group' 'X:=expl' 'P:=opts' 'F:=opts' \
-    S: r: R: q 1 2 n 'M+:=match'
+    S: r: R: q 1 2 n 'M+:=match' 'i=imm'
 
 sopts=( "$sopts[@]" "$opts[@]" )
 if (( $#match )); then
@@ -93,7 +93,6 @@ while true; do
       compadd -O tmp1 - "${(@)matches%%${sep}*}"
 
     tmp2=( "$tmp1[@]" )
-    tmp1=( "$tmp2[@]" )
 
     if [[ $#tmp1 -eq 1 ]]; then
 
@@ -106,17 +105,23 @@ while true; do
         npref="${tmp1[1]}${sep}"
       else
         matches=( "${(@M)matches:#${tmp1[1]}*}" )
-	tmp2=( "${(@M)matches:#${tmp1[1]}${sep}*}" )
 
 	PREFIX="${cpre}${pre}"
 	SUFFIX="$suf"
 
-	if (( $#tmp2 )); then
-	  compadd "$group[@]" "$expl[@]" -p "$pref" -qS "$sep" "$opts[@]" \
-                  -M "r:|${sep}=* r:|=* $match" - "$tmp1[1]"
+	if [[ $#imm -ne 0 && $#matches -eq 1 ]]; then
+	  compadd "$group[@]" "$expl[@]" "$opts[@]" \
+                  -M "r:|${sep}=* r:|=* $match" - "$pref$matches[1]"
         else
-	  compadd "$group[@]" "$expl[@]" -p "$pref" "$sopts[@]" \
-                  -M "r:|${sep}=* r:|=* $match" - "$tmp1[1]"
+	  tmp2=( "${(@M)matches:#${tmp1[1]}${sep}*}" )
+
+	  if (( $#tmp2 )); then
+	    compadd "$group[@]" "$expl[@]" -p "$pref" -qS "$sep" "$opts[@]" \
+                    -M "r:|${sep}=* r:|=* $match" - "$tmp1[1]"
+          else
+	    compadd "$group[@]" "$expl[@]" -p "$pref" "$sopts[@]" \
+                    -M "r:|${sep}=* r:|=* $match" - "$tmp1[1]"
+          fi
         fi
 	return 0
       fi
@@ -137,20 +142,44 @@ while true; do
 	SUFFIX="$suf"
       fi
 
-      if [[ -n "$menu" ]]; then
+      if [[ -n "$menu" || -z "$compstate[insert]" ]]; then
+
+        # With menucompletion we add only the ambiguous component with
+        # the prefix collected and a spearator for the matches that
+        # have more components.
+
+        tmp2="$pre$suf"
+        if [[ "$tmp2" = *${sep}* ]]; then
+          tmp2=(-s "${sep}${tmp2#*${sep}}")
+        else
+	  tmp2=()
+        fi
+        for i in "${(@M)matches:#(${(j:|:)~tmp1})*}"; do
+	  if [[ "$i" = *${sep}* ]]; then
+            compadd "$group[@]" "$expl[@]" -S '' "$opts[@]" \
+	            -p "$pref" \
+                    -M "r:|${sep}=* r:|=* $match" - "${i%%${sep}*}${sep}"
+          else
+            compadd "$group[@]" "$expl[@]" -S '' "$opts[@]" -p "$pref" \
+                    -M "r:|${sep}=* r:|=* $match" - "$i"
+          fi
+        done
+
+# The old code and its comment:
+
         # With menucompletion we just add matches for the matching
         # components with the prefix we collected and the rest from the
         # line as a suffix.
 
-        tmp2="$pre$suf"
-        if [[ "$tmp2" = *${sep}* ]]; then
-          compadd "$group[@]" "$expl[@]" "$sopts[@]" \
-                  -p "$pref" -s "${sep}${tmp2#*${sep}}" \
-                  -M "r:|${sep}=* r:|=* $match" - "$tmp1[@]"
-        else
-          compadd "$group[@]" "$expl[@]" -p "$pref" "$sopts[@]" \
-                  -M "r:|${sep}=* r:|=* $match" - "$tmp1[@]"
-        fi
+#        tmp2="$pre$suf"
+#        if [[ "$tmp2" = *${sep}* ]]; then
+#          compadd "$group[@]" "$expl[@]" "$sopts[@]" \
+#                  -p "$pref" -s "${sep}${tmp2#*${sep}}" \
+#                  -M "r:|${sep}=* r:|=* $match" - "$tmp1[@]"
+#        else
+#          compadd "$group[@]" "$expl[@]" -p "$pref" "$sopts[@]" \
+#                  -M "r:|${sep}=* r:|=* $match" - "$tmp1[@]"
+#        fi
       else
         # With normal completion we add all matches one-by-one with
 	# the unmatched part as a suffix. This will insert the longest
