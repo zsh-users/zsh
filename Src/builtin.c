@@ -836,14 +836,31 @@ cd_do_chdir(char *cnam, char *dest, int hard)
 {
     char **pp, *ret;
     int hasdot = 0, eno = ENOENT;
-    /* nocdpath indicates that cdpath should not be used.  This is the case iff
-    dest is a relative path whose first segment is . or .., but if the path is
-    absolute then cdpath won't be used anyway. */
-    int nocdpath = dest[0] == '.' &&
-    (dest[1] == '/' || !dest[1] || (dest[1] == '.' &&
+    /*
+     * nocdpath indicates that cdpath should not be used.
+     * This is the case iff dest is a relative path
+     * whose first segment is . or .., but if the path is
+     * absolute then cdpath won't be used anyway.
+     */
+    int nocdpath;
+#ifdef __CYGWIN__
+    /*
+     * Normalize path under Cygwin to avoid messing with
+     * DOS style names with drives in them
+     */
+    static char buf[PATH_MAX];
+    void cygwin_conv_to_posix_path(const char *, char *);
+
+    cygwin_conv_to_posix_path(dest, buf);
+    dest = buf;
+#endif
+    nocdpath = dest[0] == '.' &&
+		(dest[1] == '/' || !dest[1] || (dest[1] == '.' &&
 				    (dest[2] == '/' || !dest[2])));
 
-    /* if we have an absolute path, use it as-is only */
+    /*
+     * If we have an absolute path, use it as-is only
+     */
     if (*dest == '/') {
 	if ((ret = cd_try_chdir(NULL, dest, hard)))
 	    return ret;

@@ -1,3 +1,8 @@
+2001-01-26  Andrej Borsenkow <Andrej.Borsenkow@mow.siemens.ru>
+
+	* 13389: Src/builtin.c: on Cygwin convert path to posix form in
+	cd_do_chdir() to avoid dealing with driver letters
+
 2001-01-25  Sven Wischnowsky  <wischnow@zsh.org>
 
 	* 13388: Src/Zle/compmatch.c: fix for mergin two CLF_MID entries
