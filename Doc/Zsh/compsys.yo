@@ -1834,6 +1834,16 @@ all.
 
 The default style for this style is `true'.
 )
+kindex(preserve-prefix, completion style)
+item(tt(preserve-prefix))(
+This style is used when completing path names.  Its value should be a
+pattern matching an initial prefix of the word to complete that should
+be left unchanged under all circumstances.  For example, on some Unices
+an initial `tt(//)' (double slash) has a special meaning and hence
+should be kept.  For that one could set this style to the string
+`tt(//)'.  As another example, setting this style to `tt(?:/)' under
+Cygwin would allow completion after `tt(a:/...)' and the like.
+)
 kindex(range, completion style)
 item(tt(range))(
 This is used by the tt(_history) completer and the

@@ -75,6 +75,7 @@ styles=(
   ports			 c:_ports
   prefix-hidden		 c:bool
   prefix-needed		 c:bool
+  preserve-prefix        c:preserve-prefix
   range                  c:
   regular                c:bool
   remote-access		 c:bool
@@ -302,6 +303,10 @@ while [[ -n $state ]]; do
 
     insunambig) 
       _wanted values expl 'insert unambiguous string' compadd true false pattern
+      ;;
+
+    preserve-prefix)
+      _message 'pattern matching prefix to keep'
       ;;
 
     urgh) 
