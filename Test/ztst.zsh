@@ -31,6 +31,8 @@ emulate -R zsh
 # Set the module load path to correspond to this build of zsh.
 # This Modules directory should have been created by "make check".
 [[ -d Modules/zsh ]] && module_path=( $PWD/Modules )
+# Allow this to be passed down.
+export MODULE_PATH
 
 # We need to be able to save and restore the options used in the test.
 # We use the $options variable of the parameter module for this.

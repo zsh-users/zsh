@@ -3495,7 +3495,8 @@ doshfunc(char *name, Eprog prog, LinkList doshargs, int flags, int noreturnval)
 	memcpy(oldpipestats, pipestats, bytes);
     }
 
-    starttrapscope();
+    if (!intrap)
+	starttrapscope();
 
     tab = pparams;
     if (!(flags & PM_UNDEFINED))
@@ -3595,7 +3596,8 @@ doshfunc(char *name, Eprog prog, LinkList doshargs, int flags, int noreturnval)
 	opts[LOCALOPTIONS] = saveopts[LOCALOPTIONS];
     }
 
-    endtrapscope();
+    if (!intrap)
+	endtrapscope();
 
     if (trapreturn < -1)
 	trapreturn++;

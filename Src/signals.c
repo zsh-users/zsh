@@ -939,6 +939,10 @@ endtrapscope(void)
  * with non-standard sigtrapped & sigfuncs values
  */
 
+/* Are we already executing a trap? */
+/**/
+int intrap;
+
 /**/
 void
 dotrapargs(int sig, int *sigtr, void *sigfn)
@@ -948,9 +952,6 @@ dotrapargs(int sig, int *sigtr, void *sigfn)
     int trapret = 0;
     int obreaks = breaks;
     int isfunc;
-
-    /* Are we already executing a trap? */
-    static int intrap;
 
     /* if signal is being ignored or the trap function		      *
      * is NULL, then return					      *

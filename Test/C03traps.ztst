@@ -57,6 +57,13 @@
 >Function 1 going
 >Function 2 going
 
+# $ZTST_exe is relative to the parent directory.
+# We ought to fix this in ztst.zsh...
+  cd ..
+  $ZTST_exe -fc 'TRAPEXIT() { print Exited.; }'
+0:EXIT traps on a script
+>Exited.
+
   fn1() {
     trap
     trap 'print INT1' INT

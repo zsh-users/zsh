@@ -1,3 +1,9 @@
+2004-07-26  Peter Stephenson  <pws@csr.com>
+
+	* 20198: Src/exec.c, Src/signals.c, Test/C03traps.ztst,
+	Test/Makefile.in, Test/ztst.zsh: EXIT traps were freed before
+	being run.  This isn't recommended by most programming text books.
+
 2004-07-25  Bart Schaefer  <schaefer@zsh.org>
 
 	* unposted: Doc/Zsh/contrib.yo: documentation for "zargs".
