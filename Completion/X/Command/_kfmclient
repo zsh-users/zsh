@@ -54,38 +54,43 @@ download copy sortDesktop configure configureDesktop)' \
 
 # Argument to previous command.
 
-print $line >/tmp/tmp.out
-
 case $line[1] in
   (openURL)
   if [[ $state = secondarg ]]; then
-    _mime_types && return 0
+    _mime_types
+    return
   elif [[ $state = firstarg ]]; then
-    _urls && return 0
+    _urls
+    return
   fi
   ;;
 
   (openProfile)
   if [[ $state = secondarg ]]; then
-    _urls && return 0
+    _urls
+    return
   elif [[ $state = firstarg ]]; then
     _wanted profile expl 'Konqueror profile' \
-      compadd -- ~/.kde/share/apps/konqueror/profiles/*(:t) && return 0
+      compadd -- ~/.kde/share/apps/konqueror/profiles/*(:t)
+    return
   fi
   ;;
 
   (exec)
   if [[ $state = secondarg ]]; then
     # TODO: could probe inside Desktop files.
-    _message "KDE binding" && return 0
+    _message "KDE binding"
+    return
   elif [[ $state = firstarg ]]; then
-    _urls && return 0
+    _urls
+    return
   fi
   ;;
 
   (move|download|openProperties)
   if [[ $state = firstarg ]]; then
-      _urls && return 0
+      _urls
+      return
   fi
   ;;
 esac

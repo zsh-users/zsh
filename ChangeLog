@@ -1,3 +1,10 @@
+2004-07-28  Peter Stephenson  <pws@csr.com>
+
+	* 20200: Completion/Unix/Command/_kfmclient,
+	Completion/Unix/Type/_mime_types: fix some points made by Oliver
+	to tidy up.  Also unposted: don't let _kfmclient drop through
+	to `no more arguments' on failed completion.
+
 2004-07-26  Peter Stephenson  <pws@csr.com>
 
 	* 20199: Completion/Unix/Command/_elinks,
