@@ -1,6 +1,6 @@
 #compdef compress uncompress -redirect-,<,uncompress=uncompress -redirect-,>,compress=uncompress -redirect-,<,compress=compress
 
-local expl state line bits common_args1 common_args2 decompress
+local expl state line bits common_args1 common_args2 decompress ret=1
 local curcontext="$curcontext"
 typeset -A opt_args
 bits=( {9..16} )
@@ -23,14 +23,14 @@ case "$service" in
       "-b[specify maximum number of bits used to replace common substring]:bits:(${bits[*]})" \
       '-C[produce output compatible with BSD 2.0]' \
       '(-b -C)-d[decompress]' \
-      "${common_args2[@]}" && return 0
+      "${common_args2[@]}" && ret=0
   ;;
   uncompress)
-    _arguments -C -s "${common_args2[@]}" && return 0
+    _arguments -C -s "${common_args2[@]}" && ret=0
     decompress=yes
   ;;
   zcat)
-    _arguments -C -s "${common_args1[@]}" && return 0
+    _arguments -C -s "${common_args1[@]}" && ret=0
     decompress=yes
   ;;
 esac
@@ -38,11 +38,11 @@ esac
 if [[ "$state" = files ]]; then
   if [[ -z "$decompress" ]] || (( $+opt_args[-d] )); then
     _description files expl 'file to compress'
-    _files "$expl[@]" -g '*~*.Z' && return 0
+    _files "$expl[@]" -g '*~*.Z' && return
   else
     _description files expl 'compressed file'
-    _files "$expl[@]" -g '*.Z' && return 0
+    _files "$expl[@]" -g '*.Z' && return
   fi
 fi
 
-return 1
+return ret

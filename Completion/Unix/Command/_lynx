@@ -1,6 +1,6 @@
 #compdef lynx
 
-local curcontext="$curcontext" state line
+local curcontext="$curcontext" state line ret=1
 typeset -A opt_args
 
 _arguments -C \
@@ -128,7 +128,7 @@ _arguments -C \
   '-vikeys' \
   '-width=:NUMBER:' \
   '-with_backspaces' \
-  ':url:->html' && return 0
+  ':url:->html' && ret=0
 
 case "$state" in
 restrictions)
@@ -137,9 +137,11 @@ restrictions)
     disk_save dotfiles download editor exec exec_frozen externals file_url \
     goto inside_ftp inside_news inside_rlogin inside_telnet jump mail \
     multibook news_post options_save outside_ftp outside_news outside_rlogin \
-    outside_telnet print shell suspend telnet_port useragent
+    outside_telnet print shell suspend telnet_port useragent && return
   ;;
 html)
-  _alternative 'files:file:_files -g "*.x#html"' 'urls:url:_urls'
+  _alternative 'files:file:_files -g "*.x#html"' 'urls:url:_urls' && return
   ;;
 esac
+
+return ret

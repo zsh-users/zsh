@@ -1,3 +1,20 @@
+2003-06-25  Oliver Kiddle  <opk@zsh.org>
+
+	* 18631: Completion/AIX/Command/_smit,
+	Completion/Linux/Command/_modutils, Completion/Linux/Command/_uml,
+	Completion/Unix/Command/_ant, Completion/Unix/Command/_arp,
+	Completion/Unix/Command/_bzip2, Completion/Unix/Command/_compress,
+	Completion/Unix/Command/_elinks, Completion/Unix/Command/_finger,
+	Completion/Unix/Command/_gpg, Completion/Unix/Command/_gzip,
+	Completion/Unix/Command/_java, Completion/Unix/Command/_links,
+	Completion/Unix/Command/_look, Completion/Unix/Command/_lynx,
+	Completion/Unix/Command/_lzop, Completion/Unix/Command/_mt,
+	Completion/Unix/Command/_prcs, Completion/Unix/Command/_sccs,
+	Completion/Unix/Command/_telnet, Completion/Unix/Command/_w3m,
+	Completion/Unix/Command/_zip, Completion/Zsh/Command/_compdef,
+	Completion/Zsh/Command/_hash, Completion/Zsh/Command/_which:
+	returning too early breaks prefix-needed style set to false
+
 2003-06-25  Clint Adams  <clint@zsh.org>
 
 	* 18628: Completion/Debian/Command/_bug: update completion of

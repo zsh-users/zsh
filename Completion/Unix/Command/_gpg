@@ -1,6 +1,6 @@
 #compdef gpg gpgv
 
-local curcontext="$curcontext" state line expl
+local curcontext="$curcontext" state line expl ret=1
 typeset -A opt_args
 
 _arguments -C -s -S -A "-*" \
@@ -127,7 +127,7 @@ _arguments -C -s -S -A "-*" \
   --enable-special-filenames --no-expensive-trust-checks --group:name=value \
   --preserve-permissions --personal-{cipher,digest,compress}-preferences:string \
   --default-preference-list:string \
-  '*:args:->args' && return
+  '*:args:->args' && ret=0
 
 if [[ $state = args ]]; then
   if (( ${+opt_args[--export]} || ${+opt_args[--list-keys]} )); then
@@ -154,4 +154,4 @@ case "$state" in
   ;;
 esac
 
-return 1
+return ret

@@ -1,7 +1,7 @@
 #compdef ant -value-,ANT_ARGS,-default-
 
 typeset -A opt_args
-local buildfile tmp state line curcontext="$curcontext"
+local buildfile tmp state line curcontext="$curcontext" ret=1
 local c target='*:target:->target'
 
 c=( $ANT_HOME/lib/*.jar )
@@ -30,7 +30,7 @@ _arguments -C \
   '-propertyfile[load properties from specified file]:property file:_files' \
   '-inputhandler[specify class which will handle input requests]:class:_java_class -cp ${(j.\:.)c}' \
   '(-f -file -buildfile)-find[search for build file towards the root of filesystem]:build file:(build.xml)' \
-  $target && return
+  $target && ret=0
 
 case $state in
   property)
@@ -78,7 +78,7 @@ case $state in
           esac
 	done
       )//$'\015'}"
-      _describe 'target' tmp
+      _describe 'target' tmp && ret=0
     else
       if [[ -n $opt_args[-find] ]]; then
 	buildfile=( (../)#${opt_args[-find]:-build.xml}(N[-1]) )
@@ -87,10 +87,12 @@ case $state in
       fi
       if [[ -f $buildfile ]]; then
 	targets=( $(sed -n 's/ *<target name="\([^"]*\)".*/\1/p' < $buildfile) )
-	_wanted targets expl target compadd -a targets
+	_wanted targets expl target compadd -a targets && ret=0
       else
 	_message -e targets target
       fi
     fi
   ;;
 esac
+
+return ret

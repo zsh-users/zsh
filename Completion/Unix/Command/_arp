@@ -7,7 +7,7 @@ _arguments -C \
  '(-a -s -f 1)-d[delete entry from table]:host:->hostintable' \
  '(-a -d -f 1)-s[create an arp entry]:host:_hosts:ethernet address::*:option:(temp trail pub)' \
  '(-a -d -s 1)-f[read multiple entries from file]:file:_files' \
- '(-a)1:host:->hostintable' && return 0
+ '(-a)1:host:->hostintable'
 
 [[ "$state" = hostintable ]] &&
   _wanted hosts expl 'host' compadd ${${${(f)"$(${words[1]} -a)"}##[ ?(]#}%%[ )]*}

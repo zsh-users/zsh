@@ -18,10 +18,8 @@ _arguments -C \
   '-v[verbose]' \
   '-x[do not run any execute commands]' \
   '-X[do not run any commands]' \
-  '1:fastpath:->fastpath' && return 0
+  '1:fast path:->fastpath'
 
-[[ "$state" = fastpath ]] &&
+[[ "$state" = fastpath ]] && (( $+commands[odmget] )) &&
   _wanted fastpaths expl 'fast path' compadd \
       $(odmget sm_cmd_hdr sm_name_hdr|sed -n 's/^	id = \"\(.*\)\"/\1/p')
-
-  

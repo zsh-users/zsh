@@ -1,6 +1,6 @@
 #compdef lsmod modinfo modprobe rmmod
 
-local curcontext="$curcontext" expl state line modules ign args
+local curcontext="$curcontext" expl state line modules ign args ret=1
 
 args=(
   '(-)'{-V,--version}'[print version]'
@@ -18,7 +18,7 @@ case "$service" in
       '(-)'{-l,--license}"[display the module's license]" \
       '(-)'{-n,--filename}"[display the module's filename]" \
       '(-)'{-p,--parameters}'[display the typed parameters that a module may support]' \
-      '1:module file:->all_modules' && return
+      '1:module file:->all_modules' && ret=0
   ;;
 
   modprobe)
@@ -37,7 +37,7 @@ case "$service" in
       "(-r --remove -l --list -t --type -a --all $ign)"{-r,--remove}'[remove module (stacks)]' \
       "(* -l --list -r --remove $ign)"{-l,--list}'[list matching modules]' \
       "(-c $ign)1:modules:->all_modules" \
-      "(-c -l --list -t --type $ign)*:params:->params" && return
+      "(-c -l --list -t --type $ign)*:params:->params" && ret=0
       
       [[ -n $state ]] && (( $+opt_args[-r] )) && state=loaded_modules        
   ;;
@@ -49,7 +49,7 @@ case "$service" in
       '(-r --stacks)'{-r,--stacks}'[remove a module stack]' \
       '(-s --syslog)'{-s,--syslog}'[output to syslog]' \
       '(-v --verbose)'{-v,--verbose}'[be verbose]' \
-      '*:loaded module:->loaded_modules' && return
+      '*:loaded module:->loaded_modules' && ret=0
   ;;
 esac 
 
@@ -80,4 +80,4 @@ case "$state" in
   ;;
 esac
 
-return 1
+return ret

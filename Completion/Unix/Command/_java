@@ -1,6 +1,6 @@
 #compdef javac java javadoc appletviewer jar jdb javah javap extcheck rmic rmiregistry rmid serialvar native2ascii keytool jarsigner policytool
 
-local expl tmp jdb_args jar_cmd match basedir
+local expl tmp jdb_args jar_cmd match basedir ret=1
 local curcontext="$curcontext" state line jf
 typeset -A opt_args tmpassoc
 
@@ -89,7 +89,7 @@ javadoc)
     '-helpfile[specify alternative help link]:helpfile path/filename:' \
     '-stylesheet[specify alternative HTML style sheet]:stylesheet path/filename:' \
     '-docencoding[specify character encoding for output HTML files]:encoding:->encoding' \
-    '*:package name, source file or @list:->docsrc' && return 0
+    '*:package name, source file or @list:->docsrc' && ret=0
   ;;
 
 appletviewer)
@@ -112,7 +112,7 @@ jar)
       'v[verbose mode]' \
       'm[specify manifest file]' \
       '0[store only without using ZIP compression]' \
-      'M[do not create manifest file]'
+      'M[do not create manifest file]' && return
   else
     jar_cmd="${words[2]#-}"
     tmpassoc=(
@@ -186,7 +186,7 @@ rmic)
 
 rmiregistry)
   if (( CURRENT == 2 )); then
-    _wanted ports expl 'port to listen' _ports
+    _wanted ports expl 'port to listen' _ports && return
   else
     _message 'no more arguments'
   fi
@@ -359,11 +359,11 @@ case "$state" in
 debug)
   if [[ -prefix :*, ]]; then
     compset -P :
-    _values -s , "debug info" lines vars source
+    _values -s , "debug info" lines vars source && return
   else
     _description debuginfo expl "debug info"
-    compadd -P: "$expl[@]" none
-    compadd -P: -qS, "$expl[@]" lines vars source
+    compadd -P: "$expl[@]" none && ret=0
+    compadd -P: -qS, "$expl[@]" lines vars source && ret=0
   fi
   ;;
 
@@ -372,12 +372,12 @@ classpath|sourcepath|bootstrapclasspath|docletpath)
   compset -S ':*'
   _alternative \
     "classpath:$state:_path_files -qS: -g '*.(jar|zip)'" \
-    "classpath:$state:_path_files -r': ' -/"
+    "classpath:$state:_path_files -r': ' -/" && return
   ;;
 
 extdirs)
   compset -P '*:'
-  _path_files -/
+  _path_files -/ && return
   ;;
 
 encoding)
@@ -540,7 +540,7 @@ encoding)
 
 property)
   if compset -P '*='; then
-    _default
+    _default && return
   else
     _message -e property-names 'property name'
   fi
@@ -548,30 +548,30 @@ property)
 
 docsrc)
   if compset -P @; then
-    _wanted files expl 'package/source list file' _files
+    _wanted files expl 'package/source list file' _files && return
   else
-    _wanted files expl 'package or source' _files -g '*.java'
+    _wanted files expl 'package or source' _files -g '*.java' && return
   fi
   ;;
 
 jararg)
   if [[ -prefix - ]]; then
     tmp=('-C:chdir')
-    _describe -o 'option' tmp --
+    _describe -o 'option' tmp -- && return
   elif [[ "$words[CURRENT - 2]" == -C ]]; then
-    _wanted file expl 'input file' _files -W "($words[CURRENT - 1])"
+    _wanted file expl 'input file' _files -W "($words[CURRENT - 1])" && return
   elif [[ "$words[CURRENT - 1]" == -C ]]; then
-    _wanted directories expl 'chdir to' _files -/
+    _wanted directories expl 'chdir to' _files -/ && return
   elif [[ $words[2] = *x* ]]; then
-        jf="$words[3]"
-        if [[ $jf != $_jar_cache_name && -f $jf ]]; then
-            _jar_cache_list=("${(@f)$($words[1] tf $jf)}")
-            _jar_cache_name=$jf
-        fi
+    jf="$words[3]"
+    if [[ $jf != $_jar_cache_name && -f $jf ]]; then
+      _jar_cache_list=("${(@f)$($words[1] tf $jf)}")
+      _jar_cache_name=$jf
+    fi
 
-        _wanted files expl 'file from archive' _multi_parts / _jar_cache_list
+    _wanted files expl 'file from archive' _multi_parts / _jar_cache_list && return
   else
-    _wanted files expl 'input file' _files
+    _wanted files expl 'input file' _files && return
   fi
   ;;
 
@@ -579,3 +579,5 @@ jararg)
   _message "unknown state: $state"
   ;;
 esac
+
+return ret

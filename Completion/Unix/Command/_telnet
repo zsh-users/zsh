@@ -5,7 +5,7 @@
 #  telnet_hosts_ports_users
 #    The array that contains 3-tuples `host:port:user'.
 
-local curcontext="$curcontext" state line expl
+local curcontext="$curcontext" state line expl ret=1
 typeset -A opt_args
 
 if (( ! $+_telnet_args )); then
@@ -43,14 +43,14 @@ fi
 _arguments -C -s \
   "$_telnet_args[@]" \
   ':host:->hosts' \
-  ':port:->ports' && return 0
+  ':port:->ports' && ret=0
 
 case "$state" in
 hosts)
   _wanted hosts expl host \
       _combination -s '[@:]' '' users-hosts-ports \
           ${opt_args[-l]:+users=${opt_args[-l]:q}} \
-          hosts -
+          hosts - && ret=0
   ;;
 
 ports)
@@ -58,7 +58,7 @@ ports)
       _combination -s '[@:]' '' users-hosts-ports \
           ${opt_args[-l]:+users=${opt_args[-l]:q}} \
           hosts="${line[1]:q}" \
-          ports -
+          ports - && ret=0
   ;;
 
 users)
@@ -66,6 +66,8 @@ users)
       _combination -s '[@:]' '' users-hosts-ports \
       ${line[2]:+hosts="${line[2]:q}"} \
       ${line[3]:+ports="${line[3]:q}"} \
-      users -
+      users - && ret=0
   ;;
 esac
+
+return ret

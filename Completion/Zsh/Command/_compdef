@@ -32,7 +32,7 @@ _arguments -C -s -S \
   '*-P[completion for command matching pattern]' \
   ':completion function:->cfun' \
   '*:commands:->com' \
-  "$args2[@]" && return 0
+  "$args2[@]" && ret=0
 
 if [[ $state = multi ]]; then
   case $(( CURRENT % 3 )) in
@@ -50,20 +50,20 @@ case $state in
     if (( pat && pat > normal )); then
       _message -e patterns 'pattern'
     else
-      _command_names
+      _command_names && ret=0
     fi
   ;;
   ccom)
-    _wanted commands expl 'completed command' compadd -k _comps
+    _wanted commands expl 'completed command' compadd -k _comps && ret=0
   ;;
   cfun)
     list=( ${^fpath:/.}/_(|*[^~])(:t) )
     if zstyle -T ":completion:${curcontext}:functions" prefix-hidden; then
       disp=( ${list[@]#_} )
       _wanted functions expl 'completion function' \
-          compadd -d disp -a list
+          compadd -d disp -a list && ret=0
     else
-      _wanted functions expl 'completion function' compadd -a list
+      _wanted functions expl 'completion function' compadd -a list && ret=0
     fi
   ;;
   style)
@@ -71,6 +71,8 @@ case $state in
         compadd -M 'r:|-=* r:|=*' \
             complete-word delete-char-or-list expand-or-complete \
             expand-or-complete-prefix list-choices menu-complete \
-            menu-expand-or-complete reverse-menu-complete
+            menu-expand-or-complete reverse-menu-complete && ret=0
   ;;
 esac
+
+return ret

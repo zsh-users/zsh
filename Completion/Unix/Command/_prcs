@@ -1,6 +1,6 @@
 #compdef prcs
 
-local curcontext="$curcontext" state line subcmds
+local curcontext="$curcontext" state line subcmds ret=1
 typeset -A opt_args
 
 # lookup project names in the repository
@@ -34,7 +34,7 @@ _prcs_arguments() {
 _arguments -C \
   '(* -)'{-h,-H,--help}'[print out help]' \
   '(* -)--version[display program version]' \
-  '*:: :->subcmd' && return 0
+  '*:: :->subcmd' && ret=0
 
 if (( CURRENT == 1 )); then
   subcmds=(
@@ -54,8 +54,8 @@ if (( CURRENT == 1 )); then
     'unpackage:unpackage project in packagefile'
   )
   
-  _describe -t commands 'prcs command' subcmds
-  return
+  _describe -t commands 'prcs command' subcmds && ret=0
+  return ret
 fi
 
 curcontext="${curcontext%:*}-$words[1]:"

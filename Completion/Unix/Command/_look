@@ -1,6 +1,6 @@
 #compdef look
 
-local curcontext="$curcontext" state line
+local curcontext="$curcontext" state line ret=1
 typeset -A opt_args
 
 _arguments -C -s \
@@ -8,14 +8,9 @@ _arguments -C -s \
   '-f[case insensitive]' \
   '-d[dictionary order]' \
   ':string:->string' \
-  ':dictionary file:_files' && return 0
+  ':dictionary file:_files' && ret=0
 
-case "$state" in
-string)
-  if [[ -n "$PREFIX" ]]; then
-    _wanted values expl 'word prefix' compadd - $(_call_program values $words[1] $PREFIX)
-  else
-    _message -e prefixes 'word prefix'
-  fi
-  ;;
-esac
+[[ -n "$state" && ! -prefix - ]] && _wanted values expl 'word prefix' \
+    compadd - $(_call_program words $words[1] '"$PREFIX"') && return
+
+return ret

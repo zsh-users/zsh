@@ -15,7 +15,7 @@ _sccs_files() {
   return ret
 }
 
-local curcontext="$curcontext" state line
+local curcontext="$curcontext" state line ret=1
 typeset -A opt_args
 local subcmds ropt copt sfiles finalpath
 
@@ -56,12 +56,13 @@ if [[ $service = sccs ]]; then
     '-r[run with real and not effective user ID]' \
     '-d+[specify root prefix]:root prefix:_directories' \
     '-p+[specify subdirectory of history file]:path to history file:_directories' \
-    '*::command:->subcmd' && return 0
+    '*::command:->subcmd' && ret=0
 
   if (( CURRENT == 1 )); then
-    _describe -t commands 'sccs command' subcmds
-    return
+    _describe -t commands 'sccs command' subcmds && ret=0
   fi
+  (( ret )) || return 0
+
   service="$words[1]"
   sfiles=':file:_sccs_files'
   curcontext="${curcontext%:*}-$service:"

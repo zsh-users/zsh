@@ -1,10 +1,10 @@
 #compdef finger
 
-local curcontext="$curcontext" state line match
+local curcontext="$curcontext" state line match ret=1
 typeset -A opt_args
 
 if (( ! $+_finger_args )); then
-  local help="$(_call_program options finger -\? 2>&1)"
+  local help="$(_call_program options finger -\\\? 2>&1)"
   local -A optionmap
 
 ## `finger -\?':
@@ -69,10 +69,12 @@ if (( ! $+_finger_args )); then
   fi
 fi
 
-_arguments -C -s $_finger_args '*:finger targets:->finger-targets' && return 0
+_arguments -C -s $_finger_args '*:finger targets:->finger-targets' && ret=0
 
 case "$state" in
 finger-targets)
-  _user_at_host -t other-accounts "$@"
+  _user_at_host -t other-accounts "$@" && return
   ;;
 esac
+
+return ret

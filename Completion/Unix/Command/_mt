@@ -1,7 +1,7 @@
 #compdef mt
 
 local -a args cmds
-local state line curcontext="$curcontext"
+local state line curcontext="$curcontext" ret=1
 
 args=( '(-)-f[specify raw tape device]:tape device:_files' )
 cmds=(
@@ -73,6 +73,8 @@ elif [[ $OSTYPE = solaris* ]]; then
 fi
 
 _arguments -C "$args[@]" '(--help --version -V)1:operation:->operation' \
-    '2:count:' && return
+    '2:count:' && ret=0
 
-[[ -n "$state" ]] && _describe -t operations 'operation' cmds
+[[ -n "$state" ]] && _describe -t operations 'operation' cmds && ret=0
+
+return ret

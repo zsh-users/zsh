@@ -1,6 +1,6 @@
 #compdef lzop
 
-local expl state line decompress disp curcontext="$curcontext" sep
+local expl state line decompress disp curcontext="$curcontext" sep ret=1
 typeset -A opt_args
 
 _arguments -C -s \
@@ -74,7 +74,7 @@ _arguments -C -s \
   '--color[assume a color ANSI terminal]' \
   '--intro[display intro sequence]' \
   '--filter=[preprocess data with a special multimedia filter]:number' \
-  '*:files:->files' && return 0
+  '*:files:->files' && ret=0
 
 case "$state" in
   files)
@@ -83,10 +83,10 @@ case "$state" in
 	$+opt_args[--test] || $+opt_args[-t] || $+opt_args[--list] ||
 	$+opt_args[-l] || $+opt_args[--ls] || $+opt_args[--info] )); then
       _description files expl 'compressed file'
-      _files "$expl[@]" -g '*.[tl]zo'
+      _files "$expl[@]" -g '*.[tl]zo' && ret=0
     else
       _description files expl 'file to compress'
-      _files "$expl[@]" -g '*~*.[tl]zo'
+      _files "$expl[@]" -g '*~*.[tl]zo' && ret=0
 
     fi
   ;;
@@ -98,6 +98,8 @@ case "$state" in
       "Q $sep Enclose file names in double quotes" )
     disp=( ${disp[@]:#[Z$PREFIX]*} )
     compset -P '[FGQ]*'
-    compadd -d disp - ${disp[@]%% *}
+    compadd -d disp - ${disp[@]%% *} && ret=0
   ;;
 esac
+
+return ret
