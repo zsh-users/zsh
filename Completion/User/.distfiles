@@ -5,7 +5,7 @@ DISTFILES_SRC='
     _domains _dvi _enscript
     _find _finger _fakeroot _flex _gcc _gdb  _getconf _gprof _groups
     _gs _gv _gzip _hosts _imagemagick _ispell
-    _joe _killall _lp _look _lynx _lzop
+    _java _joe _killall _lp _look _lynx _lzop
     _mailboxes _make _man _mh _mount _mutt _my_accounts _mysql_utils _nedit
     _netscape _nslookup _other_accounts _pack _patch _pbm _pdf _perl
     _perl_basepods _perl_builtin_funcs _perl_modules _perldoc

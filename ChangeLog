@@ -1,5 +1,7 @@
 2000-06-17  Tanaka Akira  <akr@zsh.org>
 
+	* 11959: Completion/User/_urls: make it magicequalsubst aware.
+
 	* 11958: Completion/User/_java: new completion for Java.
 
 2000-06-17  Bart Schaefer  <schaefer@zsh.org>

@@ -53,7 +53,7 @@ if [[ "$1" = -f ]]; then
 fi
 
 glob=(-g '*(^/)')
-zparseopts -D -K -E g:=glob
+zparseopts -D -K -E 'g:=glob'
 
 ipre="$IPREFIX"
 
