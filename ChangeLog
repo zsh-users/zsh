@@ -1,3 +1,13 @@
+2000-05-27  Bart Schaefer  <schaefer@zsh.org>
+
+	* 11606: Src/parse.c, Test/01grammar.ztst: Propagate parse errors
+	out of parse_list() and parse_event(), and test that it worked.
+
+	* 11607: Src/builtin.c: For "read -q", open shout if necessary
+	even when SHTTY is already a valid descriptor; just don't close
+	it again in that case.  Restores behavior from 10727 that was
+	lost in 11524.
+
 2000-05-26  Clint Adams  <schizo@debian.org>
 
 	* 11599: Completion/User/_perl_modules: check to make sure
