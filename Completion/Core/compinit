@@ -180,9 +180,15 @@ compdef() {
     *)
       # For commands store the function name in the `_comps'
       # associative array, command names as keys.
-      for i; do
-        [[ -z "$new" || "${+_comps[$i]}" -eq 0 ]] && _comps[$i]="$func"
-      done
+      if [[ -z "$new" ]]; then
+	for i; do
+	  _comps[$i]="$func"
+	done
+      else
+        for i; do
+          [[ "${+_comps[$i]}" -eq 0 ]] && _comps[$i]="$func"
+        done
+      fi
       ;;
     esac
   else
@@ -286,31 +292,36 @@ if [[ -z "$_i_done" ]]; then
       read -rA _i_line < $_i_file
       _i_tag=$_i_line[1]
       shift _i_line
-      if [[ $_i_tag = '#compdef' ]]; then
+      case $_i_tag in
+      (\#compdef)
 	if [[ $_i_line[1] = -[pk] ]]; then
 	  compdef ${_i_line[1]}a "${_i_file:t}" "${(@)_i_line[2,-1]}"
 	else
 	  compdef -na "${_i_file:t}" "${_i_line[@]}"
 	fi
-      elif [[ $_i_tag = '#autoload' ]]; then
+	;;
+      (\#autoload)
 	autoload ${_i_file:t}
-      fi
+	;;
+      esac
     done
   done
 
   bindkey |
     while read -rA _i_line; do
-      if [[ "$_i_line[2]" = complete-word ||
-	"$_i_line[2]" = delete-char-or-list ||
-	"$_i_line[2]" = expand-or-complete ||
-	"$_i_line[2]" = expand-or-complete-prefix ||
-	"$_i_line[2]" = list-choices ||
-	"$_i_line[2]" = menu-complete ||
-	"$_i_line[2]" = menu-expand-or-complete ||
-	"$_i_line[2]" = reverse-menu-complete ]]; then
+      case "$_i_line[2]" in
+      (complete-word) ;&
+      (delete-char-or-list) ;&
+      (expand-or-complete) ;&
+      (expand-or-complete-prefix) ;&
+      (list-choices) ;&
+      (menu-complete) ;&
+      (menu-expand-or-complete) ;&
+      (reverse-menu-complete)
 	zle -C _complete_$_i_line[2] $_i_line[2] _main_complete
 	bindkey "${_i_line[1][2,-2]}" _complete_$_i_line[2]
-      fi
+	;;
+      esac
     done
 
   unset _i_dir _i_line _i_file _i_tag
