@@ -93,6 +93,11 @@ mod_export int inwhat;
 /**/
 mod_export int addedx;
 
+/* wb and we hold the beginning/end position of the word we are completing. */
+
+/**/
+mod_export int wb, we;
+
 /* 1 if aliases should not be expanded */
  
 /**/
@@ -111,7 +116,12 @@ mod_export int parbegin;
 
 /**/
 mod_export int parend;
+
+/* don't recognize comments */
  
+/**/
+mod_export int nocomments;
+
 /* text of puctuation tokens */
 
 /**/
@@ -167,7 +177,6 @@ struct lexstack {
     int isfirstch;
     int histactive;
     int histdone;
-    int spaceflag;
     int stophist;
     int hlinesz;
     char *hline;
@@ -178,6 +187,7 @@ struct lexstack {
     char *yytext;
     char *bptr;
     int bsiz;
+    int len;
     short *chwords;
     int chwordlen;
     int chwordpos;
@@ -222,7 +232,6 @@ lexsave(void)
     ls->isfirstch = isfirstch;
     ls->histactive = histactive;
     ls->histdone = histdone;
-    ls->spaceflag = spaceflag;
     ls->stophist = stophist;
     ls->hline = chline;
     ls->hptr = hptr;
@@ -236,6 +245,7 @@ lexsave(void)
     ls->yytext = yytext;
     ls->bptr = bptr;
     ls->bsiz = bsiz;
+    ls->len = len;
     ls->chwords = chwords;
     ls->chwordlen = chwordlen;
     ls->chwordpos = chwordpos;
@@ -260,6 +270,7 @@ lexsave(void)
     inredir = 0;
     hdocs = NULL;
     histactive = 0;
+    ecbuf = NULL;
 
     ls->next = lstack;
     lstack = ls;
@@ -282,7 +293,6 @@ lexrestore(void)
     isfirstch = lstack->isfirstch;
     histactive = lstack->histactive;
     histdone = lstack->histdone;
-    spaceflag = lstack->spaceflag;
     stophist = lstack->stophist;
     chline = lstack->hline;
     hptr = lstack->hptr;
@@ -296,6 +306,7 @@ lexrestore(void)
     yytext = lstack->yytext;
     bptr = lstack->bptr;
     bsiz = lstack->bsiz;
+    len = lstack->len;
     chwords = lstack->chwords;
     chwordlen = lstack->chwordlen;
     chwordpos = lstack->chwordpos;
@@ -308,6 +319,8 @@ lexrestore(void)
     hwbegin = lstack->hwbegin;
     hwend = lstack->hwend;
     addtoline = lstack->addtoline;
+    if (ecbuf)
+	zfree(ecbuf, eclen);
     eclen = lstack->eclen;
     ecused = lstack->ecused;
     ecnpats = lstack->ecnpats;
@@ -339,13 +352,13 @@ yylex(void)
 	    char *name;
 
 	    hwbegin(0);
-	    cmdpush(hdocs->type == HEREDOC ? CS_HEREDOC : CS_HEREDOCD);
+	    cmdpush(hdocs->type == REDIR_HEREDOC ? CS_HEREDOC : CS_HEREDOCD);
 	    STOPHIST
 	    name = gethere(hdocs->str, hdocs->type);
 	    ALLOWHIST
 	    cmdpop();
 	    hwend();
-	    setheredoc(hdocs->pc, HERESTR, name);
+	    setheredoc(hdocs->pc, REDIR_HERESTR, name);
 	    zfree(hdocs, sizeof(struct heredocs));
 	    hdocs = next;
 	}
@@ -569,6 +582,43 @@ cmd_or_math_sub(void)
     return skipcomm();
 }
 
+/* Check whether we're looking at valid numeric globbing syntax      *
+ * (/\<[0-9]*-[0-9]*\>/).  Call pointing just after the opening "<". *
+ * Leaves the input in the same place, returning 0 or 1.             */
+
+/**/
+static int
+isnumglob(void)
+{
+    int c, ec = '-', ret = 0;
+    int tbs = 256, n = 0;
+    char *tbuf = (char *)zalloc(tbs);
+
+    while(1) {
+	c = hgetc();
+	if(lexstop) {
+	    lexstop = 0;
+	    break;
+	}
+	tbuf[n++] = c;
+	if(!idigit(c)) {
+	    if(c != ec)
+		break;
+	    if(ec == '>') {
+		ret = 1;
+		break;
+	    }
+	    ec = '>';
+	}
+	if(n == tbs)
+	    tbuf = (char *)realloc(tbuf, tbs *= 2);
+    }
+    while(n--)
+	hungetc(tbuf[n]);
+    zfree(tbuf, tbs);
+    return ret;
+}
+
 /**/
 int
 gettok(void)
@@ -605,7 +655,18 @@ gettok(void)
 	return DOUTPAR;
     } else if (idigit(c)) {	/* handle 1< foo */
 	d = hgetc();
-	if (d == '>' || d == '<') {
+	if(d == '&') {
+	    d = hgetc();
+	    if(d == '>') {
+		peekfd = c - '0';
+		hungetc('>');
+		c = '&';
+	    } else {
+		hungetc(d);
+		lexstop = 0;
+		hungetc('&');
+	    }
+	} else if (d == '>' || d == '<') {
 	    peekfd = c - '0';
 	    c = d;
 	} else {
@@ -616,7 +677,7 @@ gettok(void)
 
     /* chars in initial position in word */
 
-    if (c == hashchar &&
+    if (c == hashchar && !nocomments &&
 	(isset(INTERACTIVECOMMENTS) ||
 	 (!zleparse && !expanding &&
 	  (!interact || unset(SHINSTDIN) || strin)))) {
@@ -665,6 +726,7 @@ gettok(void)
 	else if (d == '!' || d == '|')
 	    return AMPERBANG;
 	else if (d == '>') {
+	    tokfd = peekfd;
 	    d = hgetc();
 	    if (d == '!' || d == '|')
 		return OUTANGAMPBANG;
@@ -678,7 +740,6 @@ gettok(void)
 	    }
 	    hungetc(d);
 	    lexstop = 0;
-	    tokfd = -1;
 	    return AMPOUTANG;
 	}
 	hungetc(d);
@@ -719,41 +780,15 @@ gettok(void)
 	if (!incmdpos && d == '(') {
 	    hungetc(d);
 	    lexstop = 0;
+	    unpeekfd:
+	    if(peekfd != -1) {
+		hungetc(c);
+		c = '0' + peekfd;
+	    }
 	    break;
 	}
-	if (d == '>')
+	if (d == '>') {
 	    peek = INOUTANG;
-	else if (idigit(d) || d == '-') {
-	    int tbs = 256, n = 0, nc;
-	    char *tbuf, *tbp, *ntb;
-
-	    tbuf = tbp = (char *)zalloc(tbs);
-	    hungetc(d);
-
-	    while ((nc = hgetc()) && !lexstop) {
-		if (!idigit(nc) && nc != '-')
-		    break;
-		*tbp++ = (char)nc;
-		if (++n == tbs) {
-		    ntb = (char *)realloc(tbuf, tbs *= 2);
-		    tbp += ntb - tbuf;
-		    tbuf = ntb;
-		}
-	    }
-	    if (nc == '>' && !lexstop) {
-		hungetc(nc);
-		while (n--)
-		    hungetc(*--tbp);
-		zfree(tbuf, tbs);
-		break;
-	    }
-	    if (nc && !lexstop)
-		hungetc(nc);
-	    lexstop = 0;
-	    while (n--)
-		hungetc(*--tbp);
-	    zfree(tbuf, tbs);
-	    peek = INANG;
 	} else if (d == '<') {
 	    int e = hgetc();
 
@@ -770,12 +805,13 @@ gettok(void)
 		lexstop = 0;
 		peek = DINANG;
 	    }
-	} else if (d == '&')
+	} else if (d == '&') {
 	    peek = INANGAMP;
-	else {
-	    peek = INANG;
+	} else {
 	    hungetc(d);
-	    lexstop = 0;
+	    if(isnumglob())
+		goto unpeekfd;
+	    peek = INANG;
 	}
 	tokfd = peekfd;
 	return peek;
@@ -783,7 +819,7 @@ gettok(void)
 	d = hgetc();
 	if (d == '(') {
 	    hungetc(d);
-	    break;
+	    goto unpeekfd;
 	} else if (d == '&') {
 	    d = hgetc();
 	    if (d == '!' || d == '|')
@@ -957,8 +993,12 @@ gettokstr(int c, int sub)
 	    c = Outbrack;
 	    break;
 	case LX2_INPAR:
-	    if ((sub || in_brace_param) && isset(SHGLOB))
-		break;
+	    if (isset(SHGLOB)) {
+		if (sub || in_brace_param)
+		    break;
+		if (incasepat && !len)
+		    return INPAR;
+	    }
 	    if (!in_brace_param) {
 		if (!sub) {
 		    e = hgetc();
@@ -1056,29 +1096,27 @@ gettokstr(int c, int sub)
 	    if (isset(SHGLOB) && sub)
 		break;
 	    e = hgetc();
-	    if (!(idigit(e) || e == '-' || (e == '(' && intpos))) {
-		hungetc(e);
-		lexstop = 0;
-		if (in_brace_param || sub)
-		    break;
-		goto brk;
-	    }
-	    c = Inang;
-	    if (e == '(') {
-		add(c);
+	    if(e == '(' && intpos) {
+		add(Inang);
 		if (skipcomm()) {
 		    peek = LEXERR;
 		    goto brk;
 		}
 		c = Outpar;
-	    } else {
-		add(c);
-		c = e;
-		while (c != '>' && !lexstop)
-		    add(c), c = hgetc();
-		c = Outang;
+		break;
 	    }
-	    break;
+	    hungetc(e);
+	    if(isnumglob()) {
+		add(Inang);
+		while ((c = hgetc()) != '>')
+		    add(c);
+		c = Outang;
+		break;
+	    }
+	    lexstop = 0;
+	    if (in_brace_param || sub)
+		break;
+	    goto brk;
 	case LX2_EQUALS:
 	    if (intpos) {
 		e = hgetc();
@@ -1161,7 +1199,7 @@ gettokstr(int c, int sub)
 		    goto brk;
 		}
 		e = hgetc();
-		if (e != '\'' || unset(RCQUOTES))
+		if (e != '\'' || unset(RCQUOTES) || strquote)
 		    break;
 		add(c);
 	    }
@@ -1268,10 +1306,14 @@ dquote_parse(char endchar, int sub)
 	    c = hgetc();
 	    if (c != '\n') {
 		if (c == '$' || c == '\\' || (c == '}' && !intick && bct) ||
-		    c == endchar || c == '`')
+		    c == endchar || c == '`' ||
+		    (endchar == ']' && (c == '[' || c == ']' ||
+					c == '(' || c == ')' ||
+					c == '{' || c == '}' ||
+					(c == '"' && sub))))
 		    add(Bnull);
 		else {
-		    /* lexstop is implicitely handled here */
+		    /* lexstop is implicitly handled here */
 		    add('\\');
 		    goto cont;
 		}
@@ -1353,7 +1395,7 @@ dquote_parse(char endchar, int sub)
 		err = (!brct-- && math);
 	    break;
 	case '"':
-	    if (intick || (!endchar && !bct))
+	    if (intick || ((endchar == ']' || !endchar) && !bct))
 		break;
 	    if (bct) {
 		add(Dnull);
@@ -1390,6 +1432,22 @@ dquote_parse(char endchar, int sub)
 mod_export int
 parsestr(char *s)
 {
+    int err;
+
+    if ((err = parsestrnoerr(s))) {
+	untokenize(s);
+	if (err > 32 && err < 127)
+	    zerr("parse error near `%c'", NULL, err);
+	else
+	    zerr("parse error", NULL, 0);
+    }
+    return err;
+}
+
+/**/
+mod_export int
+parsestrnoerr(char *s)
+{
     int l = strlen(s), err;
 
     lexsave();
@@ -1405,14 +1463,39 @@ parsestr(char *s)
     inpop();
     DPUTS(cmdsp, "BUG: parsestr: cmdstack not empty.");
     lexrestore();
-    if (err) {
-	untokenize(s);
-	if (err > 32 && err < 127)
-	    zerr("parse error near `%c'", NULL, err);
-	else
-	    zerr("parse error", NULL, 0);
-    }
     return err;
+}
+
+/**/
+mod_export char *
+parse_subscript(char *s, int sub)
+{
+    int l = strlen(s), err;
+    char *t;
+
+    if (!*s || *s == ']')
+	return 0;
+    lexsave();
+    untokenize(t = dupstring(s));
+    inpush(t, 0, NULL);
+    strinbeg(0);
+    len = 0;
+    bptr = tokstr = s;
+    bsiz = l + 1;
+    err = dquote_parse(']', sub);
+    if (err) {
+	err = *bptr;
+	*bptr = 0;
+	untokenize(s);
+	*bptr = err;
+	s = 0;
+    } else
+	s = bptr;
+    strinend();
+    inpop();
+    DPUTS(cmdsp, "BUG: parse_subscript: cmdstack not empty.");
+    lexrestore();
+    return s;
 }
 
 /* Tokenize a string given in s. Parsing is done as if s were a normal *
@@ -1420,10 +1503,10 @@ parsestr(char *s)
  * to parse the right-hand side of ${...%...} substitutions.           */
 
 /**/
-int
+mod_export int
 parse_subst_string(char *s)
 {
-    int c, l = strlen(s), err;
+    int c, l = strlen(s), err, olen;
 
     if (! *s)
 	return 0;
@@ -1440,6 +1523,7 @@ parse_subst_string(char *s)
     strinend();
     inpop();
     DPUTS(cmdsp, "BUG: parse_subst_string: cmdstack not empty.");
+    olen = len;
     lexrestore();
     errflag = err;
     if (c == LEXERR) {
@@ -1447,15 +1531,28 @@ parse_subst_string(char *s)
 	return 1;
     }
 #ifdef DEBUG
-    if (c != STRING || len != l || errflag) {
+    if (c != STRING || olen != l || errflag) {
 	fprintf(stderr, "Oops. Bug in parse_subst_string: %s\n",
-		len < l ? "len < l" : errflag ? "errflag" : "c != STRING");
+		olen < l ? "len < l" : errflag ? "errflag" : "c != STRING");
 	fflush(stderr);
 	untokenize(s);
 	return 1;
     }
 #endif
     return 0;
+}
+
+/* Called below to report word positions. */
+
+/**/
+mod_export void
+gotword(void)
+{
+    we = ll + 1 - inbufct + (addedx == 2 ? 1 : 0);
+    if (cs <= we) {
+	wb = ll - wordbeg + addedx;
+	zleparse = 0;
+    }
 }
 
 /* expand aliases and reserved words */
@@ -1502,14 +1599,13 @@ exalias(void)
 
 	if (tok == STRING) {
 	    /* Check for an alias */
-	    an = noaliases ? NULL :
+	    an = (noaliases || unset(ALIASESOPT)) ? NULL :
 		(Alias) aliastab->getnode(aliastab, yytext);
 	    if (an && !an->inuse && ((an->flags & ALIAS_GLOBAL) || incmdpos ||
 				     inalmore)) {
 		inpush(an->text, INP_ALIAS, an);
-		/* remove from history if it begins with space */
-		if (isset(HISTIGNORESPACE) && an->text[0] == ' ')
-		    remhist();
+		if (an->text[0] == ' ')
+		    aliasspaceflag = 1;
 		lexstop = 0;
 		if (yytext == copy)
 		    yytext = tokstr;

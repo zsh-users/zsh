@@ -1028,6 +1028,8 @@ par_case(int *complex)
 	    yylex();
 	if (tok == OUTBRACE)
 	    break;
+	if (tok == INPAR)
+	    yylex();
 	if (tok != STRING)
 	    YYERRORV(oecused);
 	if (!strcmp(tokstr, "esac"))
