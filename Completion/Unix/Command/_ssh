@@ -69,6 +69,7 @@ _ssh () {
       '-C[compress all data]' \
       '-L[specify local port forwarding]:local port forwarding:->forward' \
       '-R[specify remote port forwarding]:remote port forwarding:->forward' \
+      '-1[forces ssh to try protocol version 1 only]'\
       '-2[forces ssh to try protocol version 2 only]'\
       '-4[forces ssh to use IPv4 addresses only]' \
       '-6[forces ssh to use IPv6 addresses only]' \

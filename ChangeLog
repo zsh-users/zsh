@@ -1,3 +1,7 @@
+2002-04-04  Clint Adams  <clint@zsh.org>
+
+        * 16934: Completion/Unix/Command/_ssh: complete -1 as well as -2.
+
 2002-03-27  Oliver Kiddle  <opk@zsh.org>
 
 	* John Beppu: 16866 (tweaked): Completion/Unix/Command/_figlet:
