@@ -1388,6 +1388,34 @@ example(zstyle ':completion:*:expand:::' substitute '${NUMERIC:-1} != 1')
 substitution will be performed only if given an explicit numeric
 argument other than `tt(1)', as by typing `tt(ESC 2 TAB)'.
 )
+item(tt(tag-aliases))(
+This allows to give aliases for tags that are to be used whenever the
+tag this style is set for is used (see the tt(tag-order) style below
+for a description of tag aliases).
+
+The value is a list of strings of the same form used by the
+tt(tag-order) style: `var(tag)tt(:)var(alias)', optionally followed by 
+a second colon and a description.
+
+The effect of using this style is that the var(tag) is offered more
+than once, once for each alias. For example, together with the
+tt(ignored-patterns) style this allows to split the matches for the
+tag into different groups, as in:
+
+example(zstyle ':completion:*:options' tag-aliases \
+    'options:-long:long options' \
+    'options:-short:short options' \
+    'options:-single-letter:single letter options'
+
+zstyle ':completion:*:options-long' ignored-patterns '[-+](|-|[^-]*)'
+zstyle ':completion:*:options-short' ignored-patterns '--*' '[-+]?'
+zstyle ':completion:*:options-single-letter' ignored-patterns '???*')
+
+With the tt(group-names) style set, this makes options beginning with
+`tt(-)tt(-)', options beginning with a single `tt(-)' or `tt(+)' but
+containing multiple characters and single-letter options be displayed
+in separate groups with different descriptions.
+)
 item(tt(tag-order))(
 This provides a mechanism for sorting how the tags available in a
 particular context will be used.
@@ -1420,22 +1448,20 @@ to specify tag aliases instead of only tags. These are of the form
 by the completion function for the current context and var(alias) is a 
 name. For this, the completion function will generate matches in the
 same way as for the var(tag) but it will use the var(alias) in place
-of the tag in the context names used to look up styles. This can be
+of the tag in the context names used to look up styles. If the
+var(alias) starts with a hyphen, the var(tag) is prepended to the
+var(alias) to form the name used for lookup. This can be
 used to make the completion system try a certain tag more than once,
 supplying different style settings for each attempt. For example,
 
 example(zstyle ':completion:*:*:-command-:*' tag-order 'functions:-non-comp'
-zstyle '*:-non-comp' ignored-patterns '_*')
+zstyle ':completion:*:functions-non-comp' ignored-patterns '_*')
 
 Makes completion in command position first try only names of shell
 functions that don't match the pattern `tt(_*)'. If that generates no
 matches, the default of trying all the other things that can be
 completed in command position is used, including the names of all
-shell functions. Note that the var(alias) used in this example
-`tt(-non-comp)' with the hyphen at the bginning is not in any way
-special to the completion system. But since no other tag starts with a 
-hyphen, using such a name allows to use a context pattern as short as
-the one in the second line without making it ambiguous.
+shell functions.
 
 The var(alias) may optionally be followed by a second colon and a
 description. This description will then be used for the `tt(%d)' in
@@ -1444,6 +1470,53 @@ supplied by the completion function. Spaces in the description have to
 be quoted by preceding them with a backslash and a `tt(%d)' appearing
 in the description is replaced with the description given by the
 completion function.
+
+In each of the cases above, the tag may also be a pattern. In this
+case all of the offered tags matching this pattern will be used except 
+for those that are given explicitly in the same string. There are
+probably two main uses of this. One is the case where one wants to try
+one of the tags more than once, setting other styles differently for
+each try, but still wants to use all the other tags without having to
+bother to repeat them all. For example, to make completion of function
+names in command position first ignore all the completion functions
+starting with an underscore one could do:
+
+example(zstyle ':completion:*:*:-command-:*' tag-order \
+    'functions:-non-comp *' functions
+zstyle ':completion:*:functions-non-comp' ignored-patterns '_*')
+
+Here, the completion system will first try all tags offered, but will
+use the tag alias tt(functions-non-comp) when looking up styles for
+the function names completed. For this, the tt(ignored-patterns) style 
+is set to make functions starting with an underscore be not considered 
+as possible matches. If none of the generated matches match the string 
+on the line, the completion system will use the second value of the
+tt(tag-order) style and complete functions names again, but this time
+using so name tt(functions) to look up styles, so that the
+tt(ignored-patterns) style will not be used and all function names
+will be considered.
+
+The second interesting use of patterns is the case where one wants to
+try multiple match specifications one after another. The
+tt(atcher-list) style offers something similar, but it is tested very
+early in the completion system and hence can't be set for single
+commands or even more specific contexts. So, to make completion for
+the arguments of the command tt(foo) and only for this command first
+try normal completion with out any match specification and, if that
+generates no matches, try again with case-insensitive matching, one
+could do:
+
+example(zstyle ':completion:*:*:foo:*' tag-order '*' '*:-case'
+zstyle ':completion:*-case' matcher 'm:{a-z}={A-Z}')
+
+This will make the completion system first try all the tags offered
+when completing after tt(foo) and use the tags to do the lookup. If
+that generates no matches, the second value of tt(tag-order) is
+used. This will make all tags be tried again, but this time using the
+names of the tags with the tt(-case) appended to them for lookup of
+styles. I.e. in this second attempt, the value for the tt(matcher)
+style from the second call to tt(zstyle) in the example will be used
+to make completion case-insensitive.
 
 Strings in the value may also be of the form `var(func)tt(())'. In
 this case the function var(func) will be called which can then define

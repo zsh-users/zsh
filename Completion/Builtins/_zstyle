@@ -55,6 +55,7 @@ styles=(
   remove-all-dups	 c:bool
   single-ignored         c:single-ignored
   sort			 c:bool
+  tag-aliases            c:tag
   tag-order		 c:tag
   special-dirs		 c:sdirs
   squeeze-slashes	 c:bool
