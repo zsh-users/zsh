@@ -1,4 +1,4 @@
-#autoload
+#compdef -T redirs -default-
 
 local opts tmp glob pat pats expl tag i def descr end ign ret=1 match tried
 local type sdef

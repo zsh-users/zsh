@@ -6,6 +6,7 @@ typeset -A opt_args
 _arguments -C -s -A "-*" -S \
   '(-d)-a[make function autoloadable]' \
   '(-d -p -P)-n[leave existing definitions intact]' \
+  "*-T[select type of completion function]:completion function type:($_comp_assocs)" \
   ':completion function:->cfun' \
   '*:commands: _command_names' \
  - d \

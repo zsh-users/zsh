@@ -1,3 +1,3 @@
-#autoload
+#compdef -T values DISPLAY
 
 _tags displays && _hosts -S ':0 ' -r :

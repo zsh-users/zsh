@@ -11,8 +11,10 @@
 #     If the first line looks like this, the file is autoloaded as a
 #     function and that function will be called to generate the matches
 #     when completing for one of the commands whose <names> are given.
+#     The names may also be interspersed with `-T <assoc>' options
+#     specifying for which set of functions this should be added.
 #
-#   `#compdef -p <pattern>'
+#   `#compdef -[pP] <patterns ...>'
 #     This defines a function that should be called to generate matches
 #     for commands whose name matches <pattern>. Note that only one pattern
 #     may be given.
@@ -100,13 +102,26 @@ while [[ $# -gt 0 && $1 = -[dDiuC] ]]; do
   esac
 done
 
-# The associative array containing the definitions for the commands and
-# services.
-# Definitions for patterns will be stored in the associations `_patcomps'
-# and `_postpatcomps'. `_compautos' contains the names and options
-# for autoloaded functions that get options.
+# The name suffixes for the associative arrays containing the functions
+# to call.
 
-typeset -gA _comps _services _patcomps _postpatcomps _compautos
+typeset -gUa _comp_assocs
+
+_comp_assocs=(comps)
+
+# The associative arrays containing the definitions for the commands and
+# services.
+# Definitions for patterns will be stored in the associations `_pat*'
+# and `_postpat*'.
+# The assocs for the other function types are created automatically by
+# compdef.
+
+typeset -gA _comps _servicecomps _patcomps _postpatcomps
+
+# `_compautos' contains the names and options for autoloaded functions
+# that get options.
+
+typeset -gA _compautos
 
 # The associative array use to report information about the last
 # completion to the outside.
@@ -176,6 +191,9 @@ comppostfuncs=()
 # The option `-P' is like `-p', but the function will be called after
 # trying to find a function defined for the command on the line if no
 # such function could be found.
+# In each of these cases the argument list may also contain `-T assoc'
+# options to specify the associactive arrays to which the following
+# definitions should be added.
 # With the `-k' option a function for a special completion keys is 
 # defined and immediately bound to those keys. Here, the extra arguments
 # are the name of one of the builtin completion widgets and any number
@@ -191,7 +209,8 @@ comppostfuncs=()
 # whose names are given as arguments. If combined with the `-p' option
 # it deletes the definitions for the patterns given as argument.
 # The `-d' option may not be combined with the `-k' option, i.e.
-# definitions for key function can not be removed.
+# definitions for key function can not be removed. But one `-T assoc'
+# option may follow the `-d' to say which definitions should be removed.
 #
 # Examples:
 #
@@ -213,12 +232,12 @@ comppostfuncs=()
 #   delete the definitions for the command names `bar' and `baz'
 
 compdef() {
-  local opt autol type func delete new i ret=0 cmd svc
+  local opt autol type func delete new i ret=0 cmd svc assoc=comps
 
   # Get the options.
 
-  if [[ $#* -eq 0 ]]; then
-    echo "$0: I needs arguments"
+  if (( ! $# )); then
+    echo "$0: I need arguments"
     return 1
   fi
 
@@ -247,8 +266,8 @@ compdef() {
   done
   shift OPTIND-1
 
-  if [[ $#* -eq 0 ]]; then
-    echo "$0: I needs arguments"
+  if (( ! $# )); then
+    echo "$0: I need arguments"
     return 1
   fi
 
@@ -257,25 +276,39 @@ compdef() {
     # and we define which services to use for the commands.
 
     if [[ "$1" = *\=* ]]; then
-      for i; do
-        if [[ "$i" = *\=* ]]; then
-	  cmd="${i%%\=*}"
-	  svc="${i#*\=}"
-          func="$_comps[${(k)_services[(R)$svc]:-$svc}]"
-          (( $+_services[$svc] )) && svc=$_services[$svc]
-	  [[ -z "$func" ]] &&
-	    func="${_patcomps[(K)$svc][1]:-${_postpatcomps[(K)$svc][1]}}"
-          if [[ -n "$func" ]]; then
-	    _comps[$cmd]="$func"
-	    _services[$cmd]="$svc"
+      while (( $# )); do
+        if [[ $1 = -T ]]; then
+          shift
+          if (( ! $# )); then
+            echo "$0: missing type"
+            return 1
+          fi
+          _comp_assocs=( "$_comp_assocs[@]" "$1" )
+          typeset -gA _$1 _service$1 _pat$1 _postpat$1
+          assoc="$1"
+          shift
+        else
+          if [[ "$1" = *\=* ]]; then
+	    cmd="${1%%\=*}"
+	    svc="${1#*\=}"
+            func="$_comps[${(e):-\${(k)_service${assoc}[(R)$svc]:-$svc}}]"
+            [[ -n ${(e):-\$_service${assoc}[$svc]} ]] &&
+                svc=${(e):-\$_service${assoc}[$svc]}
+	    [[ -z "$func" ]] &&
+	        func="${${(e):-\$_pat${assoc}[(K)$svc][1]}:-${(e):-\$_postpat${assoc}[(K)$svc][1]}}"
+            if [[ -n "$func" ]]; then
+	      eval "_${assoc}"'[$cmd]="$func"'
+	      eval "_service${assoc}"'[$cmd]="$svc"'
+	    else
+	      echo "$0: unknown command or service: $svc"
+	      ret=1
+	    fi
 	  else
-	    echo "$0: unknown command or service: $svc"
+	    echo "$0: invalid argument: $1"
 	    ret=1
 	  fi
-	else
-	  echo "$0: invalid argument: $i"
-	  ret=1
-	fi
+          shift
+        fi
       done
 
       return ret
@@ -290,18 +323,40 @@ compdef() {
 
     case "$type" in
     pattern)
-      if [[ $# -gt 1 ]]; then
-        echo "$0: only one pattern allowed"
-	return 1
-      fi
-      _patcomps[$1]="$func"
+      while (( $# )); do
+        if [[ $1 = -T ]]; then
+          shift
+          if (( ! $# )); then
+            echo "$0: missing type"
+            return 1
+          fi
+          _comp_assocs=( "$_comp_assocs[@]" "$1" )
+          typeset -gA _$1 _service$1 _pat$1 _postpat$1
+          assoc="$1"
+          shift
+        else
+          eval "_pat${assoc}"'[$1]="$func"'
+          shift
+        fi
+      done
       ;;
     postpattern)
-      if [[ $# -gt 1 ]]; then
-        echo "$0: only one pattern allowed"
-	return 1
-      fi
-      _postpatcomps[$1]="$func"
+      while (( $# )); do
+        if [[ $1 = -T ]]; then
+          shift
+          if (( ! $# )); then
+            echo "$0: missing type"
+            return 1
+          fi
+          _comp_assocs=( "$_comp_assocs[@]" "$1" )
+          typeset -gA _$1 _service$1 _pat$1 _postpat$1
+          assoc="$1"
+          shift
+        else
+          eval "_postpat${assoc}"'[$1]="$func"'
+          shift
+        fi
+      done
       ;;
     widgetkey)
       while [[ -n $1 ]]; do
@@ -321,7 +376,7 @@ compdef() {
 	fi
 	shift 3
       done
-      ;;	 
+      ;;
     key)
       if [[ $# -lt 2 ]]; then
         echo "$0: missing keys"
@@ -348,40 +403,66 @@ compdef() {
       done
       ;;
     *)
-      # For commands store the function name in the `_comps'
+      # For commands store the function name in the
       # associative array, command names as keys.
-      for i; do
-        if [[ "$i" = *\=* ]]; then
-	  cmd="${i%%\=*}"
-	  svc=yes
+      while (( $# )); do
+        if [[ $1 = -T ]]; then
+          shift
+          if (( ! $# )); then
+            echo "$0: missing type"
+            return 1
+          fi
+          _comp_assocs=( "$_comp_assocs[@]" "$1" )
+          typeset -gA _$1 _service$1 _pat$1 _postpat$1
+          assoc="$1"
+          shift
         else
-	  cmd="$i"
-	  svc=
+          if [[ "$1" = *\=* ]]; then
+	    cmd="${1%%\=*}"
+	    svc=yes
+          else
+	    cmd="$1"
+	    svc=
+          fi
+          if [[ -z "$new" || -z "${(e):-\$_${assoc}[$1]}" ]]; then
+            eval "_${assoc}"'[$cmd]="$func"'
+	    [[ -n "$svc" ]] && eval "_service${assoc}"'[$cmd]="${1#*\=}"'
+	  fi
+          shift
         fi
-        if [[ -z "$new" || "${+_comps[$i]}" -eq 0 ]]; then
-          _comps[$cmd]="$func"
-	  if [[ -n "$svc" ]]; then _services[$cmd]="${i#*\=}"; fi
-	fi
       done
       ;;
     esac
   else
     # Handle the `-d' option, deleting.
+
+    if [[ $1 = -T ]]; then
+      shift
+      if (( ! $# )); then
+        echo "$0: missing type"
+        return 1
+      fi
+      _comp_assocs=( "$_comp_assocs[@]" "$1" )
+      typeset -gA _$1 _service$1 _pat$1 _postpat$1
+      assoc="$1"
+      shift
+    fi
+
     case "$type" in
     pattern)
-      unset "_patcomps[$^@]"
+      unset "_pat${assoc}[$^@]"
       ;;
     postpattern)
-      unset "_postpatcomps[$^@]"
+      unset "_postpat${assoc}[$^@]"
       ;;
     key)
       # Oops, cannot do that yet.
 
       echo "$0: cannot restore key bindings"
-      return 1v
+      return 1
       ;;
     *)
-      unset "_comps[$^@]"
+      unset "_${assoc}[$^@]"
     esac
   fi
 }

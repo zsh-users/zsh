@@ -1,4 +1,4 @@
-#autoload
+#compdef -T values PRINTER LPDEST
 
 local expl ret=1 list disp sep
 

@@ -95,7 +95,7 @@ fi
 
 comp="$_comps[-first-]"
 if [[ -n "$comp" ]]; then
-  service="${_services[-first-]:--first-}"
+  service="${_servicecomps[-first-]:--first-}"
   ccarray[3]=-first-
   eval "$comp" && ret=0
   if [[ "$_compskip" = all ]]; then
@@ -124,7 +124,7 @@ else
   ccarray[3]="$cname"
 
   comp="$_comps[$cname]"
-  service="${_services[$cname]:-$cname}"
+  service="${_servicecomps[$cname]:-$cname}"
 
   # If not, we use default completion, if any.
 
@@ -134,9 +134,9 @@ else
       return 1
     fi
     comp="$_comps[-default-]"
+    service="${_servicecomps[-default-]:--default-}"
   fi
-  [[ -n "$comp" ]] &&
-      service="${_services[-default-]:--default-}" && eval "$comp" && ret=0
+  [[ -n "$comp" ]] && eval "$comp" && ret=0
 fi
 
 _compskip=

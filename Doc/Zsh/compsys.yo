@@ -173,14 +173,32 @@ makes the completion system call the function when completing
 arguments for the command `tt(cmd)', setting the parameter tt($service) 
 to the string `tt(service)'.  The function can then use that parameter 
 to decide what to complete.
+
+Finally, the list of var(names) may contain tt(-T) options, each
+followed by a type name.  These type names describe in which set of
+completion function definitions the function is to be stored.  The
+default without a tt(-T) option is `tt(comps)', saying that the
+function is a normal completion function.  Other type names currently
+understood by the completion system are tt(redirs) and tt(values).
+The first is used to define specialised completion functions for
+use after redirection operators for certain commands and the latter is
+used to define functions used when completing values of parameters.
+For example, to define the function that should be used when
+completing after `tt(foo=<TAB>)' one would use the tag line:
+
+example(#compdef -T values foo)
+
+When the function is called, the parameter tt($comptype) will be set
+to the type name, making it easy to distinguish what should be
+completed.
 )
-item(tt(#compdef -p) var(pattern))(
+item(tt(#compdef -p) var(patterns...))(
 The file will be made autoloadable and the function defined in it will be
 called when completing for a command whose name matches the given
-var(pattern) (a standard globbing pattern).  Note that only one
-var(pattern) may be given.
+var(pattern) (a standard globbing pattern).  As in the first case, the
+list of var(patterns) may contain tt(-T) options.
 )
-item(tt(#compdef -P) var(pattern))(
+item(tt(#compdef -P) var(patterns...))(
 Like the previous one, but the function will be called only if no
 completion function for the command on the line could be found.
 )
@@ -254,10 +272,10 @@ also be called directly by the user.
 findex(compdef)
 cindex(completion system, adding definitions)
 startitem()
-xitem(tt(compdef) [ tt(-an) ] var(function names...))
-xitem(tt(compdef -d) var(names...))
-xitem(tt(compdef -p) [ tt(-a) ] var(function pattern))
-xitem(tt(compdef -P) [ tt(-a) ] var(function pattern))
+xitem(tt(compdef) [ tt(-an) ] var(function names) [ tt(-T) var(type) ] ...))
+xitem(tt(compdef -d) [ tt(-T) var(type) ] var(names...))
+xitem(tt(compdef -p) [ tt(-a) ] var(function patterns) [ tt(-T) var(type) ] ...)
+xitem(tt(compdef -P) [ tt(-a) ] var(function patterns) [ tt(-T) var(type) ] ...)
 xitem(tt(compdef -k) [ tt(-an) ] var(function style key-sequences...))
 item(tt(compdef -K) [ tt(-an) ] var(function name style key-sequences ...))(
 The first form tells the completion system to call the given
@@ -278,6 +296,14 @@ arguments.  For example to make files ending in `tt(.h)' be completed as
 arguments to the command tt(foo), one would use:
 
 example(compdef '_files -g "*.h"' foo)
+
+The tt(-T) options in the list of var(names) define for which type of
+completions the function is to be used, i.e. in which set of
+completion functions definitions it should be added.  Currently used
+tt(type)s are tt(comps) (the default, for normal completion functions
+for command completion), tt(values) for completion of parameter values
+in assignments and tt(redirs) for completion after redirection
+operators.
 
 If the
 tt(-n) option is given, any existing completion behaviour for particular
@@ -3552,19 +3578,6 @@ All arguments after the requested field name are passed to
 tt(compadd) when generating matches from the style value, or to 
 the functions for the fields if they are called.
 )
-findex(_contexts)
-item(tt(_contexts) [ tt(-o) ] var(names) ...)(
-This function looks up the definitions for the context and command
-names given as arguments and calls the handler functions for them if
-there is a definition (given with the tt(compdef) function).  For
-example, the function completing inside subscripts might use
-`tt(_contexts -math-)' to include the completions generated for
-mathematical environments.
-
-If the tt(-o) option is given, tt(_contexts) returns after the first
-context for which completions could be generated, without trying the
-other contexts.
-)
 findex(_describe)
 item(tt(_describe) [ tt(-o) ] var(descr) var(name1) [ var(name2) ] var(opts) ... tt(-)tt(-) ...)(
 This function is useful for preparing a list of command options or
@@ -3642,6 +3655,19 @@ Note the use of the parameter tt(expl), the hyphen, and the list of
 matches.  Almost all calls to tt(compadd) within the completion system use
 a similar format; this ensures that user-specified styles are correctly
 passed down to the builtins which implement the internals of completion.
+)
+findex(_dispatch)
+item(tt(_dispatch) [ tt(-d) ] var(type strings ...))(
+This function looks up the function defined for the first var(string)
+in the set of definitions named var(type) (these are those definitions
+defined with `tt(-T )var(type)').  If one is found, it is called to
+generate completions.  Otherwise the definition for the second
+var(string) is looked up and so on.  If none is found and the tt(-d)
+option is given, the definition for the special name tt(-default-) is
+used.
+
+This function is the one responsible for setting the parameters
+tt($service) and tt($comptype).
 )
 findex(_files)
 item(tt(_files))(
@@ -3789,7 +3815,7 @@ return ret
 )
 )
 findex(_normal)
-item(tt(_normal))(
+item(tt(_normal) [ var(type) ])(
 This function is used for normal command completion.  It has two tasks:
 completing the first word on the command line as the name of a command, and
 completing the arguments to this command.  In the second case, the name of
@@ -3808,6 +3834,13 @@ If the command name matches a pattern, the parameter tt(_compskip) is
 checked after the call to the corresponding completion function.  This has
 the same effect here as in the tt(-first-) context: if it is set, no more
 completion functions are called even if there are no matches so far.
+
+If the optional var(type) argument is given, tt(_normal) does not use
+the normal associative arrays for its lookup but instead uses the ones
+defined for the given var(type), which may currently be one of
+tt(comps) for normal completion, tt(redirs) for completion of
+command-specific redirections or tt(values) to complete on the right
+hand side of parameter assignments.
 )
 findex(_options)
 item(tt(_options))(

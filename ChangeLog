@@ -1,3 +1,22 @@
+2002-03-04  Sven Wischnowsky  <wischnow@zsh.org>
+
+	* 16755: Completion/compdump, Completion/compinit,
+	Completion/Base/Completer/_complete,
+	Completion/Base/Core/_dispatch, Completion/Base/Core/_normal,
+	Completion/Base/Utility/_contexts,
+	Completion/Base/Utility/_set_command,
+	Completion/Unix/Command/_gcc, Completion/Unix/Command/_su,
+	Completion/Unix/Type/_files, Completion/Unix/Type/_printers,
+	Completion/Unix/Type/_terminals, Completion/Unix/Type/_time_zone,
+	Completion/X/Type/_x_display, Completion/Zsh/Command/_compdef,
+	Completion/Zsh/Context/_default,
+	Completion/Zsh/Context/_in_vared,
+	Completion/Zsh/Context/_redirect,
+	Completion/Zsh/Context/_subscript, Completion/Zsh/Context/_value,
+	Doc/Zsh/compsys.yo: allow different sets of completion
+	definitions selected with option -T to compdef; use this for
+	parameter values and redirections
+
 2002-03-01  Sven Wischnowsky  <wischnow@zsh.org>
 
 	* 16751: Src/Zle/comp.h, Src/Zle/compcore.c, Src/Zle/complete.c,

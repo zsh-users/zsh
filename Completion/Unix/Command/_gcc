@@ -1,7 +1,20 @@
-#compdef gcc
+#compdef gcc g++ -T values LDFLAGS CFLAGS CPPFLAGS
 
-local curcontext="$curcontext" state line ret=1 expl args
+local curcontext="$curcontext" state line ret=1 expl args args2
 typeset -A opt_args
+
+if [[ "$comptype" = values ]]; then
+  compset -q
+  words=( fake "$words[@]" )
+  (( CURRENT++ ))
+  if ("$service" = LDFLAGS ]]; then
+    args2=( '-R:runtime path:->rundir' )
+  else
+    args2=()
+  fi
+else
+  args2=( '*:input file:_files -g \*.\(\[cCmisSoak\]\|cc\|cxx\|ii\|k\[ih\]\)' )
+fi
 
 args=()
 case $MACHTYPE in
@@ -243,7 +256,7 @@ _arguments -C -M 'L:|-{fW}no-=-{fW} r:|[_-]=* r:|=*' \
   -freg-struct-return -fshared-data -fshort-enums \
   -fshort-double -fvolatile -fvolatile-global \
   -fverbose-asm -fpack-struct \
-  '*:input file:_files -g \*.\(\[cCmisSoak\]\|cc\|cxx\|ii\|k\[ih\]\)' && ret=0
+  "$args2[@]" && ret=0
 
 
 case "$state" in
@@ -275,6 +288,11 @@ dump)
 library)
   _wanted libraries expl library \
       compadd - ${^=LD_LIBRARY_PATH:-/usr/lib /usr/local/lib}/lib*.(a|so*)(:t:fr:s/lib//) && ret=0
+  ;;
+rundir)
+  compset -P '*:'
+  compset -S ':*'
+  _files -/ -S/ -r '\n\t\- /:' "$@"
   ;;
 esac
 

@@ -19,7 +19,7 @@ _files "$@" && return 0
 # allow completion to handle file names after any equals sign.
 
 if [[ -o magicequalsubst && "$PREFIX" = *\=* ]]; then
-  compstate[parameter]="${words[1]:t}-${PREFIX%%\=*}"
+  compstate[parameter]="${PREFIX%%\=*}"
   compset -P 1 '*='
   _value "$@"
 else

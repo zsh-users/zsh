@@ -1,19 +1,39 @@
-#compdef -value- -array-value-
+#compdef -value- -array-value- -T values -default-
 
-_value () {
-  # You can customize completion for different parameters by writing a
-  # function `_value:<name>', where <name> is the name of the parameter.
-  # When completing values of elements of associative arrays, we first
-  # search for a function `_value:<assoc>-<key>' and then for 
-  # `_value:<assoc>', so it's simple to define different functions
-  # for different keys or one function for a whole association.
+# You can customize completion for different parameters by writing
+# functions with the tag-line `#compdef -T value <name>'.
+# The function searches for the strings `<param-name>:<param-type>'
+# and `<param-name>'. If the line contains a command (as in `make foo=<TAB>')
+# the string `<command>:<param-name>:<param-type>' is also searched for.
 
-  if (( $+functions[_value:$compstate[parameter]] )); then
-    "_value:$compstate[parameter]" "$@"
-  elif (( $+functions[_value:${compstate[parameter]%%-*}] )); then
-    "_value:${compstate[parameter]%%-*}" "$@"
-  elif [[ "$compstate[parameter]" != *-* &&
-          "${(Pt)${compstate[parameter]}}" = assoc* ]]; then
+if [[ "$service" != -default- ]]; then
+  local strs type
+
+  type="${(Pt)compstate[parameter]}"
+
+  if [[ -z "$type" ]]; then
+    if [[ "$compstate[parameter]" = *-* ]]; then
+      type=association-value
+    elif [[ "$compstate[context]" = value ]]; then
+      type=scalar
+    else
+      type=array
+    fi
+  fi
+
+  strs=( "${compstate[parameter]}:$type" "$compstate[parameter]" )
+
+  if [[ "$compstate[context]" != *value && -n "$_comp_command1" ]]; then
+    strs=( "${_comp_command1}:$^strs[@]" "$strs[@]" )
+    [[ -n "$_comp_command2" ]] &&
+        strs=( "${_comp_command2}:${(@)^strs[-2,-1]}" "$strs[@]" )
+  fi
+
+  _dispatch -d values "$strs[@]"
+else
+  if [[ "$compstate[parameter]" != *-* &&
+        "$compstate[context]" = *value &&
+        "${(Pt)${compstate[parameter]}}" = assoc* ]]; then
     if (( CURRENT & 1 )); then
       _wanted association-keys expl 'association key' \
           compadd -k "$compstate[parameter]"
@@ -34,37 +54,4 @@ _value () {
       _default "$@"
     fi
   fi
-}
-
-_value:CPPFLAGS () {
-  compset -q
-  if compset -P '-I'; then
-    _files -/ "$@"
-  else
-    _default "$@"
-  fi
-}
-
-_value:LDFLAGS () {
-  compset -q
-  if compset -P '-L'; then
-    _files -/ "$@"
-  elif compset -P '-R'; then
-    compset -P '*:'
-    compset -S ':*'
-    _files -/ -S/ -r '\n\t\- /:' "$@"
-  else
-    _default "$@"
-  fi
-}
-
-_value:DISPLAY() { _x_display "$@" }
-
-_value:PRINTER() { _printers "$@" }
-_value:LPDEST() { _printers "$@" }
-
-_value:TERM() { _terminals "$@" }
-
-_value:TZ() { _time_zone "$@" }
-
-_value "$@"
+fi

@@ -1,3 +1,17 @@
 #compdef -redirect-
 
-_files
+# This searches for `<command-name>:<redir-op>' and `<redir-op>', where
+# `<redir-op>' is something like `<' or `2>'.
+
+local strs _comp_command1 _comp_command2
+
+_set_command
+
+strs=( "$compstate[redirect]" )
+
+if [[ -n "$_comp_command1" ]]; then
+  strs=( "${_comp_command1}:$strs[-1]" "$strs[@]" )
+  [[ -n "$_comp_command2" ]] && strs=( "${_comp_command2}:$strs[1]" "$strs[@]" )
+fi
+
+_dispatch -d redirs "$strs[@]"
