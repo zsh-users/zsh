@@ -910,7 +910,7 @@ execzlefunc(Thingy func, char **args)
 	    zsfree(msg);
 	    ret = 1;
 	} else {
-	    int osc = sfcontext, osi = movefd(0), olv = lastval;
+	    int osc = sfcontext, osi = movefd(0);
 	    int oxt = isset(XTRACE);
 	    LinkList largs = NULL;
 
@@ -924,10 +924,8 @@ execzlefunc(Thingy func, char **args)
 	    makezleparams(0);
 	    sfcontext = SFC_WIDGET;
 	    opts[XTRACE] = 0;
-	    doshfunc(w->u.fnnam, prog, largs, shf->flags, 0);
+	    ret = doshfunc(w->u.fnnam, prog, largs, shf->flags, 1);
 	    opts[XTRACE] = oxt;
-	    ret = lastval;
-	    lastval = olv;
 	    sfcontext = osc;
 	    endparamscope();
 	    lastcmd = 0;
