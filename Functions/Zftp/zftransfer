@@ -4,6 +4,7 @@
 
 emulate -L zsh
 
+[[ $curcontext = :zf* ]] || local curcontext=:zftransfer
 local sess1 sess2 file1 file2 oldsess=${ZFTP_SESSION}
 
 if [[ $# -ne 2 ]]; then
@@ -39,7 +40,9 @@ zfautocheck || return 1
 # the size from the pipe --- and if it does, it's probably wrong.
 # To avoid that, try to get the size and set it for the progress to
 # see.
-if [[ $zfconfig[progress] != none ]]; then
+local style
+zstyle -s ':zftp:zftransfer' progress style
+if [[ -n $style && $style != none ]]; then
   local ZFTP_TSIZE array tmpfile=${TMPPREFIX}zft$$
   zftp remote $file1 >$tmpfile 2>/dev/null
   array=($(<$tmpfile))
@@ -49,7 +52,7 @@ fi
 
 # We do the RHS of the pipeline in a subshell, too, so that
 # the LHS can get SIGPIPE when it exits.
-{ zfconfig[progress]=none
+{ zstyle '*' progress none
   zftp get $file1 } |
 ( zftp session $sess2
   zfautocheck && zftp put $file2 )

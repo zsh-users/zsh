@@ -22,7 +22,10 @@
 emulate -L zsh
 setopt extendedglob
 
+[[ $curcontext = :zf* ]] || local curcontext=:zfdir
 local file opt optlist redir i newargs force
+local curdir=$zfconfig[curdir_$ZFTP_SESSION]
+local otherdir=$zfconfig[otherdir_$ZFTP_SESSION]
 
 while [[ $1 = -* ]]; do
   if [[ $1 = - || $1 = -- ]]; then
@@ -40,9 +43,9 @@ while [[ $1 = -* ]]; do
 	 ;;
       f) force=1
 	 ;;
-      d) [[ -n $zfcurdir && -f $zfcurdir ]] && rm -f $zfcurdir
-	 [[ -n $zfotherdir && -f $zfotherdir ]] && rm -f $zfotherdir
-	 zftp_fcache=()
+      d) [[ -n $curdir && -f $curdir ]] && rm -f $curdir
+	 [[ -n $otherdir && -f $otherdir ]] && rm -f $otherdir
+	 zffcache -d
 	 return 0
 	 ;;
     esac
@@ -50,7 +53,7 @@ while [[ $1 = -* ]]; do
   shift
 done
 
-zfautocheck -d
+zfautocheck -d || return 1
 
 # directory hack, see zfcd
 for (( i = 1; i <= $#argv; i++ )); do
@@ -62,26 +65,32 @@ done
 if [[ $# -eq 0 ]]; then
   # Cache it in the current directory file.  This means that repeated
   # calls to zfdir with no arguments always use a cached file.
-  [[ -z $zfcurdir ]] && zfcurdir=${TMPPREFIX}zfcurdir$$
-  file=$zfcurdir
+  if [[ -z $curdir ]]; then
+    curdir=${TMPPREFIX}zfcurdir_${ZFTP_SESSION}_$$
+    zfconfig[curdir_$ZFTP_SESSION]=$curdir
+  fi
+  file=$curdir
 else
   # Last directly looked at was not the current one, or at least
   # had non-standard arguments.
-  [[ -z $zfotherdir ]] && zfotherdir=${TMPPREFIX}zfotherdir$$
-  file=$zfotherdir
+  if [[ -z $otherdir ]]; then
+    otherdir=${TMPPREFIX}zfotherdir_${ZFTP_SESSION}_$$
+    zfconfig[otherdir_$ZFTP_SESSION]=$otherdir
+  fi
+  file=$otherdir
   newargs="$*"
   if [[ -f $file && $redir != 1 && $force -ne 1 ]]; then
     # Don't use the cached file if the arguments changed.
-    [[ $newargs = $zfotherargs ]] || rm -f $file
+    [[ $newargs = $zfconfig[otherargs_$ZFTP_SESSION] ]] || rm -f $file
   fi
-  zfotherargs=$newargs
+  zfconfig[otherargs_$ZFTP_SESSION]=$newargs
 fi
 
 if [[ $force -eq 1 ]]; then
   rm -f $file
   # if it looks like current directory has changed, better invalidate
   # the filename cache, too.
-  (( $# == 0 )) && zftp_fcache=()
+  (( $# == 0 )) && zffcache -d
 fi
 
 if [[ -n $file && -f $file ]]; then
@@ -89,11 +98,11 @@ if [[ -n $file && -f $file ]]; then
 else
   if (zftp test); then
     # Works OK in subshells
-    zftp dir $* | tee $file | eval ${PAGER-:more}
+    zftp dir $* | tee $file | eval ${PAGER:-more}
   else
     # Doesn't work in subshells (IRIX 6.2 --- why?)
     zftp dir $* >$file
-    eval ${PAGER-:more} $file
+    eval ${PAGER:-more} $file
   fi
 fi
 # }

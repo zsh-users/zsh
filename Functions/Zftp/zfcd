@@ -20,11 +20,12 @@
 #     work just as long as the directory structures under the home match.
 
 emulate -L zsh
+[[ $curcontext = :zf* ]] || local curcontext=:zfcd
 
 if [[ $1 = /* ]]; then
-  zfautocheck -dn
+  zfautocheck -dn || return 1
 else
-  zfautocheck -d
+  zfautocheck -d || return 1
 fi
 
 if [[ $1 = $HOME || $1 = $HOME/* ]]; then
@@ -36,7 +37,7 @@ if (( $# == 0 )); then
   set -- '~'
 elif [[ $# -eq 1 && $1 = - ]]; then
   # Emulate `cd -' behaviour.
-  set -- $zflastdir
+  set -- $zfconfig[lastdir_$ZFTP_SESSION]
 elif [[ $# -eq 2 ]]; then
   # Emulate `cd old new' behaviour.
   # We have to find a character not in $1 or $2; ! is a good bet.
@@ -47,6 +48,8 @@ fi
 # if we want to keep it.
 local lastdir=$ZFTP_PWD
 
-zftp cd "$@"  &&  zflastdir=$lastdir
-print $zflastsession
+zftp cd "$@" && [[ $lastdir != $ZFTP_PWD ]] &&
+zfconfig[lastdir_$ZFTP_SESSION]=$lastdir
+
+print $zfconfig[lastloc_$ZFTP_SESSION]
 # }

@@ -1,10 +1,16 @@
 # function zfget {
 # Get files from remote server.  Options:
+#   -c   cat: dump files to stdout.
+#          alias zfcat="zfget -c"
+#          zfpage() { zfget -c "$@" | eval $PAGER }
+#        are sensible things to do, but aren't done for you.  Note the
+#        second doesn't work on all OS's.
 #   -G   don't to remote globbing, else do
 #   -t   update the local file times to the same time as the remote.
 #        Currently this only works if you have the `perl' command,
 #        and that perl is version 5 with the standard library.
-#        See the function zfrtime for more gory details.
+#        See the function zfrtime for more gory details.  This has
+#        no effect with the -c option.
 #
 # If the connection is not currently open, try to open it with the current
 # parameters (set by a previous zfopen or zfparams), then close it after
@@ -13,46 +19,38 @@
 
 emulate -L zsh
 
-local loc rem optlist opt nglob remlist time
+[[ $curcontext = :zf* ]] || local curcontext=:zfget
+local loc rem opt remlist opt_G opt_t opt_c
 integer stat do_close
 
-while [[ $1 == -* ]]; do
-  if [[ $1 == - || $1 == -- ]]; then
-    shift;
-    break;
-  fi
-  optlist=${1#-}
-  for (( i = 1; i <= $#optlist; i++)); do
-    opt=$optlist[$i]
-    case $opt in
-      G) nglob=1
-	 ;;
-      t) time=1
-	 ;;
-      *) print option $opt not recognised >&2
-	 ;;
-    esac
-  done
-  shift
+while getopts :Gtc opt; do
+  [[ $opt = '?' ]] && print "zfget: bad option: -$OPTARG" && return 1
+  eval "opt_$opt=1"
 done
+(( OPTIND > 1 )) && shift $(( OPTIND - 1 ))
 
-zfautocheck
+zfautocheck || return 1
 
 for remlist in $*; do
   # zfcd directory hack to put the front back to ~
   if [[ $remlist == $HOME || $remlist == $HOME/* ]]; then
     remlist="~${remlist#$HOME}"
   fi
-  if [[ $nglob != 1 ]]; then
+  if [[ $opt_G != 1 ]]; then
     zfrglob remlist
   fi
   if (( $#remlist )); then
     for rem in $remlist; do
-      loc=${rem:t}
-      if zftp get $rem >$loc; then
-	[[ $time = 1 ]] && zfrtime $rem $loc
+      if [[ -n $opt_c ]]; then
+	zftp get $rem
+	stat=$?
       else
-	stat=1
+	loc=${rem:t}
+	if zftp get $rem >$loc; then
+	  [[ $opt_t = 1 ]] && zfrtime $rem $loc
+	else
+	  stat=1
+	fi
       fi
     done
   fi

@@ -1,5 +1,6 @@
 # function zftype {
 local type zftmp=${TMPPREFIX}zftype$$
+[[ $curcontext = :zf* ]] || local curcontext=:zftype
 
 zfautocheck -d
 

@@ -14,10 +14,11 @@
 
 emulate -L zsh
 
+[[ $curcontext = :zf* ]] || local curcontext=:zfpcp
 local rem loc
 integer stat do_close
 
-zfautocheck
+zfautocheck || return 1
 
 if [[ $# -gt 2 || $2 = (.|..) || $2 = */ ]]; then
   local dir=$argv[-1]
@@ -32,6 +33,9 @@ if [[ $# -gt 2 || $2 = (.|..) || $2 = */ ]]; then
     zftp put $rem <$loc || stat=1
   done
 else
+  if [[ $2 = $HOME || $2 = $HOME/* ]]; then
+    2="~${2#$HOME}"
+  fi
   zftp put $2 <$1
   stat=$?
   if [[ stat -ne 0 && $ZFTP_CODE = 553 && $ZFTP_REPLY = *'Is a directory'* ]]

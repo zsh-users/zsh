@@ -7,36 +7,45 @@
 
 emulate -L zsh
 
-local optlist opt once
+[[ $curcontext = :zf* ]] || local curcontext=:zfopen
+local opt dir opt_1 setparams
 
-while [[ $1 = -* ]]; do
-  if [[ $1 = - || $1 = -- ]]; then
-    shift;
-    break;
-  fi
-  optlist=${1#-}
-  for (( i = 1; i <= $#optlist; i++)); do
-    opt=$optlist[$i]
-    case $optlist[$i] in
-      1) once=1
-	 ;;
-      *) print option $opt not recognised >&2
-	 ;;
-    esac
-  done
-  shift
+while getopts :1 opt; do
+  [[ $opt = "?" ]] && print "zfopen: bad option: -$OPTARG" >&2 && return 1
+  eval "opt_$opt=1"
 done
+(( OPTIND > 1 )) && shift $(( OPTIND - 1 ))
 
 # This is where we should try and do same name-lookupage in
 # both .netrc and .ncftp/bookmarks .  We could even try saving
 # the info in their for new hosts, like ncftp does.
 
-if [[ $once = 1 ]]; then
-  zftp open $*
+if [[ $1 = */* ]]; then
+  1=${1##ftp://}
+  dir=${1#*/}
+  1=${1%%/*}
+fi
+
+if [[ $opt_1 = 1 ]]; then
+  zftp open $* || return 1
+  if [[ $# = 1 ]]; then
+    if ! zftp login; then
+      zftp close
+      return 1
+    fi
+  fi
 else
   # set parameters, but only if there was at least a host
-  (( $# > 0 )) && zfparams $*
+  (( $# > 0 )) && zfparams $* && setparams=1
   # now call with no parameters
-  zftp open
+  if ! zftp open; then
+    [[ -n $ZFTP_HOST ]] && zftp close
+    [[ -n $setparams ]] && zfparams -
+    return 1
+  fi
+fi
+
+if [[ -n $dir ]]; then
+  zfcd $dir
 fi
 # }

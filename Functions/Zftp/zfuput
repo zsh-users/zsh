@@ -11,8 +11,9 @@
 
 emulate -L zsh
 
+[[ $curcontext = :zf* ]] || local curcontext=:zfuput
 local loc rem locstats remstats doit tmpfile=${TMPPREFIX}zfuput$$
-local rstat verbose optlist opt bad i silent
+local rstat opt opt_v opt_s
 integer stat do_close
 
 zfuput_print_time() {
@@ -29,29 +30,13 @@ zfuput_print () {
   print ", $locstats[1] bytes)"
 }
 
-while [[ $1 = -* ]]; do
-  if [[ $1 = - || $1 = -- ]]; then
-    shift;
-    break;
-  fi
-  optlist=${1#-}
-  for (( i = 1; i <= $#optlist; i++)); do
-    opt=$optlist[$i]
-    case $optlist[$i] in
-      v) verbose=1
-	 ;;
-      s) silent=1
-	 ;;
-      *) print option $opt not recognised >&2
-	 ;;
-    esac
-  done
-  shift
+while getopts :vs opt; do
+  [[ $opt = "?" ]] && print "zfuget: bad option: -$OPTARG" >&2 && return 1
+  eval "opt_$opt=1"
 done
+(( OPTIND > 1 )) && shift $(( OPTIND - 1 ))
 
-[[ -n $bad ]] && return 1
-
-zfautocheck
+zfautocheck || return 1
 
 if [[ $ZFTP_VERBOSE = *5* ]]; then
   # should we turn it off locally?
@@ -77,13 +62,13 @@ for rem in $*; do
     print "Server does not implement full command set required." 1>&2
     return 1
   elif [[ $rstat = 1 ]]; then
-    [[ $verbose = 1 ]] && print New file $loc
+    [[ $opt_v = 1 ]] && print New file $loc
   else
-    [[ $verbose = 1 ]] && zfuput_print
+    [[ $opt_v = 1 ]] && zfuput_print
     if (( $locstats[1] != $remstats[1] )); then
       # Files have different sizes
-      if [[ $locstats[2] < $remstats[2] && $silent != 1 ]]; then
-	[[ $verbose != 1 ]] && zfuput_print
+      if [[ $locstats[2] < $remstats[2] && $opt_s != 1 ]]; then
+	[[ $opt_v != 1 ]] && zfuput_print
 	print "Remote file $rem more recent than local," 1>&2
 	print -n "but sizes are different.  Transfer anyway [y/n]? " 1>&2
 	read -q doit
@@ -91,15 +76,15 @@ for rem in $*; do
     else
       # Files have same size
       if [[ $locstats[2] > $remstats[2] ]]; then
-	if [[ $silent != 1 ]]; then
-	  [[ $verbose != 1 ]] && zfuput_print
+	if [[ $opt_s != 1 ]]; then
+	  [[ $opt_v != 1 ]] && zfuput_print
 	  print "Remote file $rem has same size as local," 1>&2
 	  print -n "but remote file is older. Transfer anyway [y/n]? " 1>&2
 	  read -q doit
 	fi
       else
 	# presumably same file, so don't get it.
-	[[ $verbose = 1 ]] && print Not transferring
+	[[ $opt_v = 1 ]] && print Not transferring
 	doit=n
       fi
     fi
