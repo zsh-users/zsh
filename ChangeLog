@@ -1,3 +1,8 @@
+2001-06-28  Oliver Kiddle  <opk@zsh.org>
+
+	* 15159: Completion/X/Command/_vnc: fix for two digit display numbers,
+	use _values for -encodings option and complete for xvncviewer
+
 2001-06-28  Peter Stephenson  <pws@pwstephenson.fsnet.co.uk>
 
 	* 15151: zshconfig.ac: --enable-sitefndir should be

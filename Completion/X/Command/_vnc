@@ -1,0 +1,31 @@
+#compdef vncserver vncviewer xvncviewer
+
+local displays args
+displays=( ~/.vnc/$HOST:<->.pid(N:r:t:s/$HOST//) )
+displays=( \\${^displays} ) 
+
+case $service in
+  vncserver)
+    # currently lacking Xvnc arguments
+    _arguments \
+      - start \
+	'-name:desktop name:_x_name' \
+	'-geometry:geometry:(1600x1200 1280x1024 1152x864 1024x768 800x600 640x480)' \
+	'-depth:pixel depth:(8 16 24 32)' \
+	'-pixelformat:pixel format' \
+	'1::display number:_guard "(|:[0-9]#)"' \
+      - kill \
+	"-kill:display number:($displays)" \
+      - help \
+	'-help'
+  ;;
+  *vncviewer) 
+    _xt_arguments -shared -viewonly -fullscreen -bgr233 -owncmap -truecolour \
+      '-encodings:encodings:_values -s " " copyrect hextile corre rre raw' \
+      '-depth:depth' \
+      '-passwd:file:_files' \
+      '(1)-listen:display number' \
+      '(-listen)1::display:_x_display'
+  ;;
+esac
+    
