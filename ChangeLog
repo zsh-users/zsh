@@ -1,3 +1,8 @@
+2000-07-08  Tanaka Akira  <akr@zsh.org>
+
+	* 12274: Test/53completion.ztst, Test/55arguments.ztst,
+	Test/.distfiles: separates _arguments tests.
+
 2000-07-17  Peter Stephenson  <pws@cambridgesiliconradio.com>
 
 	* Config/version.mk: 3.1.9-dev-3.

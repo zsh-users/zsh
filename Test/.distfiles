@@ -6,5 +6,5 @@ DISTFILES_SRC='
     10prompt.ztst 11glob.ztst 12procsubst.ztst 13parameter.ztst
     14array.ztst
     50cd.ztst 51xtrace.ztst 52zregexparse.ztst
-    53completion.ztst 54compmatch.ztst
+    53completion.ztst 54compmatch.ztst 55arguments.ztst
 '
