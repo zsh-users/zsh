@@ -37,6 +37,14 @@
 #endif
 #endif
 
+#ifdef __linux
+/*
+ * Turn on numerous extensions.
+ * This is in order to get the functions for manipulating /dev/ptmx.
+ */
+#define _GNU_SOURCE 1
+#endif
+
 /* NeXT has half-implemented POSIX support *
  * which currently fools configure         */
 #ifdef __NeXT__

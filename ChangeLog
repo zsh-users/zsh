@@ -1,3 +1,8 @@
+2004-02-20  Peter Stephenson  <pws@csr.com>
+
+	* 19456: configure.ac, Src/system.h, Src/Modules/zpty.c,
+	Src/Zle/iwidgets.list, Src/Zle/zle_hist.c: Fix 19428.
+
 2004-02-20  Oliver Kiddle  <opk@zsh.org>
 
 	* 19455: Completion/Unix/Command/_mount: complete hostnames

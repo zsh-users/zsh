@@ -56,7 +56,7 @@
 "expand-word", expandword, 0
 "forward-char", forwardchar, 0
 "forward-word", forwardword, 0
-"get-line", getline, 0
+"get-line", zgetline, 0
 "gosmacs-transpose-chars", gosmacstransposechars, 0
 "history-beginning-search-backward", historybeginningsearchbackward, 0
 "history-beginning-search-forward", historybeginningsearchforward, 0

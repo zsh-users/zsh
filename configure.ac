@@ -1802,8 +1802,6 @@ dnl Check for pty multiplexer for use in pty module.
 dnl We need to open it read/write, so make sure it is writeable.
 dnl Yet another test which won't work when cross-compiling.
 dnl ---------------
-AH_TEMPLATE([HAVE_DEV_PTMX],
-[Define to 1 if your system can use /dev/ptmx for creating ptys.])
 AC_CACHE_CHECK(if your system has /dev/ptmx,
 ac_cv_have_dev_ptmx,
 [if test -w /dev/ptmx; then
@@ -1811,9 +1809,37 @@ ac_cv_have_dev_ptmx,
 else
   ac_cv_have_dev_ptmx=no
 fi])
-if test $ac_cv_have_dev_ptmx = yes; then
-  AC_DEFINE(HAVE_DEV_PTMX)
+
+dnl --------
+dnl Check if the ptmx functions are usable.
+dnl We need to be able to find the prototypes, which may
+dnl require non-POSIX source definitions.  So test to see
+dnl if ptsname is correctly recognised as returning a char *.
+dnl We do this by making sure a program where ptsname() is declared
+dnl as returning int does *not* compile.
+dnl On Linux we need the XOPEN extensions.  The easiest way to get
+dnl these is by defining _GNU_SOURCE.
+dnl -------
+AH_TEMPLATE([USE_DEV_PTMX],
+[Define to 1 if all the kit for using /dev/ptmx for ptys is available.])
+if test $ac_cv_have_dev_ptmx = yes && \
+   test $ac_cv_func_grantpt = yes && \
+   test $ac_cv_func_unlockpt = yes && \
+   test $ac_cv_func_ptsname = yes; then
+   AC_CACHE_CHECK([if /dev/ptmx is usable],
+   ac_cv_use_dev_ptmx,
+   [AC_TRY_COMPILE([#ifdef __linux
+#define _GNU_SOURCE 1
+#endif
+#include <stdlib.h>
+int ptsname();], ,
+   ac_cv_use_dev_ptmx=no,
+   ac_cv_use_dev_ptmx=yes)])
+   if test $ac_cv_use_dev_ptmx = yes; then
+     AC_DEFINE(USE_DEV_PTMX)
+   fi
 fi
+
 
 dnl ---------------
 dnl dynamic loading

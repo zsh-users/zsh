@@ -154,8 +154,7 @@ getptycmd(char *name)
     return NULL;
 }
 
-#if defined(HAVE_DEV_PTMX) && defined(HAVE_GRANTPT) && \
-    defined(HAVE_PTSNAME) && defined(HAVE_UNLOCKPT)
+#ifdef USE_DEV_PTMX
 
 #ifdef HAVE_SYS_STROPTS_H
 #include <sys/stropts.h>
@@ -190,7 +189,7 @@ get_pty(int master, int *retfd)
 	close(mfd);
 	return 1;
     }
-#if defined(I_FIND) && defined(I_PUSH)
+#if defined(I_FIND) && defined(I_PUSH) && defined(__SVR4)
     /*
      * Use if STREAMS is available.  The test is probably OK,
      * but we could use e.g. the sys/stropts.h test.

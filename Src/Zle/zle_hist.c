@@ -660,9 +660,10 @@ pushinput(char **args)
     return ret;
 }
 
+/* Renamed to avoid clash with library function */
 /**/
 int
-getline(char **args)
+zgetline(char **args)
 {
     char *s = (char *)getlinknode(bufstack);
 
