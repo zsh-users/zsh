@@ -27,4 +27,4 @@ _xt_arguments \
   '-topmargin:top margin:' \
   '-xoffset:horizontal offset:' \
   '-yoffset:vertical offset:' \
-  '*:DVI file:_files -g \*.\(\#i\)dvi'
+  '*:DVI file:_files -g \*.\(\#i\)dvi\(\|.Z\|.gz\|.bz2\)'

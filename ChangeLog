@@ -1,3 +1,8 @@
+2002-03-17  Clint Adams  <clint@zsh.org>
+
+	* 16846: Completion/X/Command/_xdvi: complete .dvi.gz and .dvi.bz2
+	too.
+
 2002-03-16  Bart Schaefer  <schaefer@zsh.org>
 
 	* 16820: Test/E01options.ztst: change tests to match 16759.
