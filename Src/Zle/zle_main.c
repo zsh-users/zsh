@@ -119,12 +119,16 @@ zsetterm(void)
 {
     struct ttyinfo ti;
 
-#if defined(CLOBBERS_TYPEAHEAD) && defined(FIONREAD)
+#if defined(FIONREAD)
     int val;
 
     ioctl(SHTTY, FIONREAD, (char *)&val);
-    if (val)
-	return;
+    if (val) {
+	char *tmpline = (char *)zalloc(val);
+	read(SHTTY, tmpline, val);
+	ungetkeys(tmpline, val);
+	zfree(tmpline, val);
+    }
 #endif
 
 /* sanitize the tty */
@@ -656,14 +660,18 @@ handleprefixes(void)
 	initmodifier(&zmod);
 }
 
+/* this exports the argument we are currently vared'iting if != NULL */
+
+/**/
+char *varedarg;
+
 /* vared: edit (literally) a parameter value */
 
 /**/
 static int
 bin_vared(char *name, char **args, char *ops, int func)
 {
-    char *s;
-    char *t;
+    char *s, *t, *ova = varedarg;
     Value v;
     Param pm = 0;
     int create = 0;
@@ -753,7 +761,9 @@ bin_vared(char *name, char **args, char *ops, int func)
     PERMALLOC {
 	pushnode(bufstack, ztrdup(s));
     } LASTALLOC;
+    varedarg = *args;
     t = (char *) zleread(p1, p2, ops['h'] ? ZLRF_HISTORY : 0);
+    varedarg = ova;
     if (!t || errflag) {
 	/* error in editing */
 	errflag = 0;
@@ -926,6 +936,8 @@ setup_zle(Module m)
 
     /* initialise the keymap system */
     init_keymaps();
+
+    varedarg = NULL;
 
     return 0;
 }

@@ -189,9 +189,6 @@
 /* Define to 1 if struct timezone is defined by a system header */
 #undef HAVE_STRUCT_TIMEZONE
 
-/* Define if your system's typeahead disappears from the shell editor. */
-#undef CLOBBERS_TYPEAHEAD
-
 /* Define to 1 if there is a prototype defined for brk() on your system */
 #undef HAVE_BRK_PROTO
 
