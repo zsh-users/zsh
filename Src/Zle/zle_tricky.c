@@ -58,11 +58,6 @@ mod_export int clwsize, clwnum, clwpos;
 /**/
 mod_export char **clwords;
 
-/* wb and we hold the beginning/end position of the word we are completing. */
-
-/**/
-mod_export int wb, we;
-
 /* offs is the cursor position within the tokenized *
  * current word after removing nulargs.             */
 
@@ -76,6 +71,11 @@ mod_export int offs;
 
 /**/
 mod_export int usemenu, useglob;
+
+/* != 0 if we would insert a TAB if we weren't calling a completion widget. */
+
+/**/
+mod_export int wouldinstab;
 
 /* != 0 if we are in the middle of a menu completion. May be == 2 to force *
  * menu completion even if using different widgets.                        */
@@ -136,7 +136,7 @@ mod_export char *compfunc = NULL;
  * lastambig == 2.                                                    */
 
 /**/
-mod_export int lastambig;
+mod_export int lastambig, bashlistfirst;
 
 /* Arguments for and return value of completion widget. */
 
@@ -144,6 +144,11 @@ mod_export int lastambig;
 mod_export char **cfargs;
 /**/
 mod_export int cfret;
+
+/* != 0 if recursive calls to completion are (temporarily) allowed */
+
+/**/
+mod_export int comprecursive;
 
 /* Find out if we have to insert a tab (instead of trying to complete). */
 
@@ -153,9 +158,16 @@ usetab(void)
 {
     unsigned char *s = line + cs - 1;
 
+    if (keybuf[0] != '\t' || keybuf[1])
+	return 0;
     for (; s >= line && *s != '\n'; s--)
 	if (*s != '\t' && *s != ' ')
 	    return 0;
+    if (compfunc) {
+	wouldinstab = 1;
+
+	return 0;
+    }
     return 1;
 }
 
@@ -179,12 +191,15 @@ completeword(char **args)
 {
     usemenu = !!isset(MENUCOMPLETE);
     useglob = isset(GLOBCOMPLETE);
+    wouldinstab = 0;
     if (c == '\t' && usetab())
 	return selfinsert(args);
     else {
 	int ret;
 	if (lastambig == 1 && isset(BASHAUTOLIST) && !usemenu && !menucmp) {
+	    bashlistfirst = 1;
 	    ret = docomplete(COMP_LIST_COMPLETE);
+	    bashlistfirst = 0;
 	    lastambig = 2;
 	} else
 	    ret = docomplete(COMP_COMPLETE);
@@ -198,6 +213,7 @@ menucomplete(char **args)
 {
     usemenu = 1;
     useglob = isset(GLOBCOMPLETE);
+    wouldinstab = 0;
     if (c == '\t' && usetab())
 	return selfinsert(args);
     else
@@ -210,6 +226,7 @@ listchoices(char **args)
 {
     usemenu = !!isset(MENUCOMPLETE);
     useglob = isset(GLOBCOMPLETE);
+    wouldinstab = 0;
     return docomplete(COMP_LIST_COMPLETE);
 }
 
@@ -218,6 +235,7 @@ int
 spellword(char **args)
 {
     usemenu = useglob = 0;
+    wouldinstab = 0;
     return docomplete(COMP_SPELL);
 }
 
@@ -227,6 +245,7 @@ deletecharorlist(char **args)
 {
     usemenu = !!isset(MENUCOMPLETE);
     useglob = isset(GLOBCOMPLETE);
+    wouldinstab = 0;
 
     if (cs != ll) {
 	fixsuffix();
@@ -241,6 +260,7 @@ int
 expandword(char **args)
 {
     usemenu = useglob = 0;
+    wouldinstab = 0;
     if (c == '\t' && usetab())
 	return selfinsert(args);
     else
@@ -253,12 +273,15 @@ expandorcomplete(char **args)
 {
     usemenu = !!isset(MENUCOMPLETE);
     useglob = isset(GLOBCOMPLETE);
+    wouldinstab = 0;
     if (c == '\t' && usetab())
 	return selfinsert(args);
     else {
 	int ret;
 	if (lastambig == 1 && isset(BASHAUTOLIST) && !usemenu && !menucmp) {
+	    bashlistfirst = 1;
 	    ret = docomplete(COMP_LIST_COMPLETE);
+	    bashlistfirst = 0;
 	    lastambig = 2;
 	} else
 	    ret = docomplete(COMP_EXPAND_COMPLETE);
@@ -272,6 +295,7 @@ menuexpandorcomplete(char **args)
 {
     usemenu = 1;
     useglob = isset(GLOBCOMPLETE);
+    wouldinstab = 0;
     if (c == '\t' && usetab())
 	return selfinsert(args);
     else
@@ -284,6 +308,7 @@ listexpand(char **args)
 {
     usemenu = !!isset(MENUCOMPLETE);
     useglob = isset(GLOBCOMPLETE);
+    wouldinstab = 0;
     return docomplete(COMP_LIST_EXPAND);
 }
 
@@ -291,6 +316,7 @@ listexpand(char **args)
 mod_export int
 reversemenucomplete(char **args)
 {
+    wouldinstab = 0;
     if (!menucmp)
 	return menucomplete(args);
 
@@ -302,6 +328,7 @@ reversemenucomplete(char **args)
 int
 acceptandmenucomplete(char **args)
 {
+    wouldinstab = 0;
     if (!menucmp)
 	return 1;
     runhookdef(ACCEPTCOMPHOOK, NULL);
@@ -513,21 +540,34 @@ parambeg(char *s)
 static int
 docomplete(int lst)
 {
-    char *s, *ol;
-    int olst = lst, chl = 0, ne = noerrs, ocs, ret = 0;
+    static int active = 0;
 
+    char *s, *ol;
+    int olst = lst, chl = 0, ne = noerrs, ocs, ret = 0, dat[2];
+
+    if (active && !comprecursive) {
+	zwarn("completion cannot be used recursively (yet)", NULL, 0);
+	return 1;
+    }
+    active = 1;
+    comprecursive = 0;
     if (undoing)
 	setlastline();
 
-    if (runhookdef(BEFORECOMPLETEHOOK, (void *) &lst))
-	return 0;
+    if (!module_loaded("zsh/complete"))
+	load_module("zsh/compctl");
 
+    if (runhookdef(BEFORECOMPLETEHOOK, (void *) &lst)) {
+	active = 0;
+	return 0;
+    }
     /* Expand history references before starting completion.  If anything *
      * changed, do no more.                                               */
 
-    if (doexpandhist())
+    if (doexpandhist()) {
+	active = 0;
 	return 0;
-
+    }
     metafy_line();
 
     ocs = cs;
@@ -556,7 +596,8 @@ docomplete(int lst)
     qisuf = ztrdup("");
     zsfree(autoq);
     autoq = NULL;
-    /* Get the word to complete. */
+    /* Get the word to complete.
+     * NOTE: get_comp_string() calls pushheap(), but not popheap(). */
     noerrs = 1;
     s = get_comp_string();
     DPUTS(wb < 0 || cs < wb || cs > we,
@@ -578,7 +619,11 @@ docomplete(int lst)
 	    strcpy((char *) line, ol);
 	    ll = strlen((char *) line);
 	    cs = ocs;
+	    popheap();
 	    unmetafy_line();
+	    zsfree(s);
+	    zsfree(qword);
+	    active = 0;
 	    return 1;
 	}
 	ocs = cs;
@@ -738,8 +783,20 @@ docomplete(int lst)
 			}
 		}
 		ret = docompletion(s, lst, lincmd);
-	    } else if (ret)
-		clearlist = 1;
+            } else {
+                if (ret)
+                    clearlist = 1;
+                if (!strcmp(ol, (char *)line)) {
+                    /* We may have removed some quotes. For completion, other
+                     * parts of the code re-install them, but for expansion
+                     * we have to do it here. */
+                    cs = 0;
+                    foredel(ll);
+                    spaceinline(origll);
+                    memcpy(line, origline, origll);
+                    cs = origcs;
+                }
+            }
 	} else
 	    /* Just do completion. */
 	    ret = docompletion(s, lst, lincmd);
@@ -752,9 +809,12 @@ docomplete(int lst)
     zsfree(qword);
     unmetafy_line();
 
-    runhookdef(AFTERCOMPLETEHOOK, (void *) &lst);
+    dat[0] = lst;
+    dat[1] = ret;
+    runhookdef(AFTERCOMPLETEHOOK, (void *) dat);
 
-    return ret;
+    active = 0;
+    return dat[1];
 }
 
 /* 1 if we are completing the prefix */
@@ -786,7 +846,8 @@ addx(char **ptmp)
 
     if (!line[cs] || line[cs] == '\n' ||
 	(iblank(line[cs]) && (!cs || line[cs-1] != '\\')) ||
-	line[cs] == ')' || line[cs] == '`' ||
+	line[cs] == ')' || line[cs] == '`' || line[cs] == '}' ||
+	line[cs] == ';' || line[cs] == '|' || line[cs] == '&' ||
 	(instring && (line[cs] == '"' || line[cs] == '\'')) ||
 	(addspace = (comppref && !iblank(line[cs])))) {
 	*ptmp = (char *)line;
@@ -915,6 +976,7 @@ static char *
 get_comp_string(void)
 {
     int t0, tt0, i, j, k, cp, rd, sl, ocs, ins, oins, ia, parct, varq = 0;
+    int ona = noaliases;
     char *s = NULL, *linptr, *tmp, *p, *tt = NULL;
 
     freebrinfo(brbeg);
@@ -970,13 +1032,10 @@ get_comp_string(void)
      * the previously massaged command line using the lexer.  It stores *
      * each token in each command (commands being regarded, roughly, as *
      * being separated by tokens | & &! |& || &&).  The loop stops when *
-     * the end of the command containing the cursor is reached.  It's a *
-     * simple way to do things, but suffers from an inability to        *
-     * distinguish actual command arguments from, for example,          *
-     * filenames in redirections.  (But note that code elsewhere checks *
-     * if we are completing *in* a redirection.)  The only way to fix   *
-     * this would be to pass the command line through the parser too,   *
-     * and get the arguments that way.  Maybe in 3.1...                 */
+     * the end of the command containing the cursor is reached.  What   *
+     * makes this messy is checking for things like redirections, loops *
+    * and whatnot. */
+
     do {
 	lincmd = ((incmdpos && !ins && !incond) || (oins == 2 && i == 2) ||
 		  (ins == 3 && i == 1));
@@ -1126,6 +1185,7 @@ get_comp_string(void)
 		line[ll + addedx] = '\0';
 	    }
 	    lexrestore();
+	    tt = NULL;
 	    goto start;
 	}
     }
@@ -1186,12 +1246,12 @@ get_comp_string(void)
 	    addedx = 0;
 	    goto start;
 	}
-	noaliases = 0;
+	noaliases = ona;
 	lexrestore();
 	return NULL;
     }
 
-    noaliases = 0;
+    noaliases = ona;
 
     /* Check if we are in an array subscript.  We simply assume that  *
      * we are in a subscript if we are in brackets.  Correct solution *
@@ -1281,6 +1341,7 @@ get_comp_string(void)
 	    } else
 		insubscr = 1;
 	}
+	parse_subst_string(s);
     }
     /* This variable will hold the current word in quoted form. */
     qword = ztrdup(s);
@@ -1291,6 +1352,19 @@ get_comp_string(void)
 		*p = '"';
 	    else if (*p == Snull)
 		*p = '\'';
+    } else {
+        int level = 0;
+
+        for (p = s; *p; p++) {
+            if (level && *p == Snull)
+                *p = '\'';
+            else if (level && *p == Dnull)
+                *p = '"';
+            else if ((*p == String || *p == Qstring) && p[1] == Inbrace)
+                level++;
+            else if (*p == Outbrace)
+                level--;
+        }
     }
     if ((*s == Snull || *s == Dnull) && !has_real_token(s + 1)) {
 	char *q = (*s == Snull ? "'" : "\""), *n = tricat(qipre, q, "");
@@ -1307,10 +1381,12 @@ get_comp_string(void)
 	autoq = ztrdup(q);
     }
     /* While building the quoted form, we also clean up the command line. */
-    for (p = s, tt = qword, i = wb; *p; p++, tt++, i++)
+    for (p = s, tt = qword, i = wb, j = 0; *p; p++, tt++, i++)
 	if (INULL(*p)) {
 	    if (i < cs)
 		offs--;
+	    if (*p == Snull && isset(RCQUOTES))
+		j = 1-j;
 	    if (p[1] || *p != Bnull) {
 		if (*p == Bnull) {
 		    *tt = '\\';
@@ -1337,7 +1413,8 @@ get_comp_string(void)
 		we--;
 	    }
 	    chuck(p--);
-	}
+	} else if (j && *p == '\'' && i < cs)
+	    offs--;
 
     zsfree(origword);
     origword = ztrdup(s);
@@ -1408,6 +1485,14 @@ get_comp_string(void)
 		    break;
 		}
 		if (*p == Inbrace) {
+		    char *tp = p;
+
+		    if (!skipparens(Inbrace, Outbrace, &tp)) {
+			i += tp - p - 1;
+			dp += tp - p - 1;
+			p = tp - 1;
+			continue;
+		    }
 		    if (bbeg) {
 			Brinfo new;
 			int len = bend - bbeg;
@@ -1423,11 +1508,12 @@ get_comp_string(void)
 			lastbrbeg = new;
 
 			new->next = NULL;
-			new->str = ztrduppfx(bbeg, len);
+			new->str = dupstrpfx(bbeg, len);
+			new->str = ztrdup(bslashquote(new->str, NULL, instring));
 			untokenize(new->str);
 			new->pos = begi;
 			*dbeg = '\0';
-			new->qpos = strlen(quotename(predup, NULL));
+			new->qpos = strlen(bslashquote(predup, NULL, instring));
 			*dbeg = '{';
 			i -= len;
 			boffs -= len;
@@ -1444,6 +1530,14 @@ get_comp_string(void)
 		}
 	    } else {
 		if (*p == Inbrace) {
+		    char *tp = p;
+
+		    if (!skipparens(Inbrace, Outbrace, &tp)) {
+			i += tp - p - 1;
+			dp += tp - p - 1;
+			p = tp - 1;
+			continue;
+		    }
 		    cant = 1;
 		    break;
 		}
@@ -1462,11 +1556,12 @@ get_comp_string(void)
 			    brbeg = new;
 			lastbrbeg = new;
 
-			new->str = ztrduppfx(bbeg, len);
+			new->str = dupstrpfx(bbeg, len);
+			new->str = ztrdup(bslashquote(new->str, NULL, instring));
 			untokenize(new->str);
 			new->pos = begi;
 			*dbeg = '\0';
-			new->qpos = strlen(quotename(predup, NULL));
+			new->qpos = strlen(bslashquote(predup, NULL, instring));
 			*dbeg = '{';
 			i -= len;
 			boffs -= len;
@@ -1478,7 +1573,7 @@ get_comp_string(void)
 		if (*p == Comma) {
 		    if (!bbeg)
 			bbeg = p;
-		    hascom = 1;
+		    hascom = 2;
 		} else if (*p == Outbrace) {
 		    Brinfo new;
 		    int len;
@@ -1498,7 +1593,8 @@ get_comp_string(void)
 		    new->next = brend;
 		    brend = new;
 
-		    new->str = ztrduppfx(bbeg, len);
+		    new->str = dupstrpfx(bbeg, len);
+		    new->str = ztrdup(bslashquote(new->str, NULL, instring));
 		    untokenize(new->str);
 		    new->pos = dp - predup - len + 1;
 		    new->qpos = len;
@@ -1526,11 +1622,12 @@ get_comp_string(void)
 		    brbeg = new;
 		lastbrbeg = new;
 
-		new->str = ztrduppfx(bbeg, len);
+		new->str = dupstrpfx(bbeg, len);
+		new->str = ztrdup(bslashquote(new->str, NULL, instring));
 		untokenize(new->str);
 		new->pos = begi;
 		*dbeg = '\0';
-		new->qpos = strlen(quotename(predup, NULL));
+		new->qpos = strlen(bslashquote(predup, NULL, instring));
 		*dbeg = '{';
 		boffs -= len;
 		strcpy(dbeg, dbeg + len);
@@ -1545,7 +1642,7 @@ get_comp_string(void)
 		    p = bp->pos;
 		    l = bp->qpos;
 		    bp->pos = strlen(predup + p + l);
-		    bp->qpos = strlen(quotename(predup + p + l, NULL));
+		    bp->qpos = strlen(bslashquote(predup + p + l, NULL, instring));
 		    strcpy(predup + p, predup + p + l);
 		}
 	    }
@@ -1596,13 +1693,20 @@ inststrlen(char *str, int move, int len)
 static int
 doexpansion(char *s, int lst, int olst, int explincmd)
 {
-    int ret = 1;
+    int ret = 1, first = 1;
     LinkList vl;
-    char *ss;
+    char *ss, *ts;
 
     pushheap();
     vl = newlinklist();
     ss = dupstring(s);
+    /* get_comp_string() leaves these quotes unchanged when they are
+     * inside parameter expansions. */
+    for (ts = ss; *ts; ts++)
+        if (*ts == '"')
+            *ts = Dnull;
+        else if (*ts == '\'')
+            *ts = Snull;
     addlinknode(vl, ss);
     prefork(vl, 0);
     if (errflag)
@@ -1630,9 +1734,15 @@ doexpansion(char *s, int lst, int olst, int explincmd)
 	goto end;
     }
     if (lst == COMP_LIST_EXPAND) {
-	/* Only the list of expansions was requested. */
-	ret = listlist(vl);
-	showinglist = 0;
+	/* Only the list of expansions was requested. Restore the 
+         * command line. */
+        cs = 0;
+        foredel(ll);
+        spaceinline(origll);
+        memcpy(line, origline, origll);
+        cs = origcs;
+        ret = listlist(vl);
+        showinglist = 0;
 	goto end;
     }
     /* Remove the current word and put the expansions there. */
@@ -1647,28 +1757,16 @@ doexpansion(char *s, int lst, int olst, int explincmd)
 	if (olst != COMP_EXPAND_COMPLETE || nonempty(vl) ||
 	    (cs && line[cs-1] != '/')) {
 #endif
-	if (nonempty(vl)) {
+	if (nonempty(vl) || !first) {
 	    spaceinline(1);
 	    line[cs++] = ' ';
 	}
+	first = 0;
     }
     end:
     popheap();
 
     return ret;
-}
-
-/* This is called from the lexer to give us word positions. */
-
-/**/
-void
-gotword(void)
-{
-    we = ll + 1 - inbufct + (addedx == 2 ? 1 : 0);
-    if (cs <= we) {
-	wb = ll - wordbeg + addedx;
-	zleparse = 0;
-    }
 }
 
 /**/
@@ -1851,14 +1949,19 @@ printfmt(char *fmt, int n, int dopr, int doesc)
 			    putc(' ', shout);
 		    }
 		}
-		l += 1 + (cc / columns);
+		l += 1 + ((cc - 1) / columns);
 		cc = 0;
 	    }
-	    if (dopr)
+	    if (dopr) {
 		putc(*p, shout);
+                if (!(cc % columns))
+                    fputs(" \010", shout);
+            }
 	}
     }
     if (dopr) {
+        if (!(cc % columns))
+            fputs(" \010", shout);
 	if (tccan(TCCLEAREOL))
 	    tcout(TCCLEAREOL);
 	else {
@@ -1983,13 +2086,16 @@ listlist(LinkList l)
 
     max = getiparam("LISTMAX");
     if ((max && num > max) || (!max && nlines > lines)) {
-	int qup;
+	int qup, l;
 
 	zsetterm();
-	qup = printfmt("zsh: do you wish to see all %n possibilities? ",
-		       num, 1, 1);
+	l = (num > 0 ?
+	     fprintf(shout, "zsh: do you wish to see all %d possibilities (%d lines)? ",
+		     num, nlines) :
+	     fprintf(shout, "zsh: do you wish to see all %d lines? ", nlines));
+	qup = ((l + columns - 1) / columns) - 1;
 	fflush(shout);
-	if (getzlequery() != 'y') {
+	if (getzlequery(1) != 'y') {
 	    if (clearflag) {
 		putc('\r', shout);
 		tcmultout(TCUP, TCMULTUP, qup);
@@ -2073,7 +2179,7 @@ int
 doexpandhist(void)
 {
     unsigned char *ol;
-    int oll, ocs, ne = noerrs, err;
+    int oll, ocs, ne = noerrs, err, ona = noaliases;
 
     pushheap();
     metafy_line();
@@ -2100,7 +2206,7 @@ doexpandhist(void)
      * means that the expanded string is unusable.                       */
     err = errflag;
     noerrs = ne;
-    noaliases = 0;
+    noaliases = ona;
     strinend();
     inpop();
     zleparse = 0;

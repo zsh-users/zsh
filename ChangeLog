@@ -1,3 +1,9 @@
+2001-06-13  Sven Wischnowsky  <wischnow@zsh.org>
+
+	* 14903: Src/Zle/complist.c, Src/Zle/zle_tricky.c: fixes for
+	display bugs for completion lists (cursor left one line to far
+	up or down)
+
 2001-06-13  Peter Stephenson  <pws@csr.com>
 
 	* 14893: Src/signals.c: make handler mod_export because it's
