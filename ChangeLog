@@ -1,3 +1,8 @@
+2000-07-24  Sven Wischnowsky  <wischnow@zsh.org>
+
+	* 12354: Completion/Core/_multi_parts: optimisations for
+ 	_multi_parts
+	
 2000-07-22  Clint Adams  <schizo@debian.org>
 
 	* 12347: Completion/User/_mutt: options -a, -b, and -c are
