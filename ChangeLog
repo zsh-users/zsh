@@ -1,3 +1,8 @@
+2003-08-20  Peter Stephenson  <pws@csr.com>
+
+	* 18942: Completion/Unix/Command/_perforce: Fix autoremoval
+	of slashes which were stomped on by the special suffix handler.
+
 2003-08-20  Oliver Kiddle  <opk@zsh.org>
 
 	* 18947: Completion/Unix/Command/_chown: also complete options using

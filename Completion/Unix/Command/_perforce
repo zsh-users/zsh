@@ -179,7 +179,7 @@
 #
 # Much of the information from Perforce is provided by calls to p4
 # commands.  This is done via the _call_program interface, as described
-# in the zshcompletesys manual page.  Hence a suitable context with the
+# in the zshcompsys manual page.  Hence a suitable context with the
 # `command' style allows the user to take control of this call.
 # The tags used are the name of the p4 command, or in the case of
 # calls to help subcommands, `help-<subcommand>'.  Note that if the
@@ -540,6 +540,11 @@ _perforce_file_suffix() {
 	     # Normal suffix removal
 	     LBUFFER="$LBUFFER[1,-2]"
 	 fi
+    elif [[ $LBUFFER[-1] = / ]]; then
+	# Normal suffix removal for directories.
+	if [[ $KEYS = (*[^[:print:]]*|[[:blank:]\;\&\|/]) ]]; then
+	    LBUFFER="$LBUFFER[1,-2]"
+	fi
     fi
 }
 
