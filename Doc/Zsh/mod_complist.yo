@@ -100,7 +100,7 @@ character and `tt(0)' for the rest.
 All three forms of var(name) may be preceded by a pattern in
 parentheses. If such a pattern is given, the var(value) will be used
 only for matches in groups whose names are matched by the pattern
-given in the parentheses. E.g. `tt((g*)~m*=43)' says to highlight all
+given in the parentheses. E.g. `tt((g*)m*=43)' says to highlight all
 matches beginning with `tt(m)' in groups whose names  begin with
 `tt(g)' using the color code `tt(43)'. In case of the `tt(lc)',
 `tt(rc)', and `tt(ec)' codes, the group pattern is ignored.
