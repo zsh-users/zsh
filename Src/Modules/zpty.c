@@ -275,12 +275,12 @@ newptycmd(char *nam, char *pname, char **args, int echo, int block)
 	return 1;
     }
     if (get_pty(1, &master)) {
-	zwarnnam(nam, "can't open pseudo terminal", NULL, 0);
+	zwarnnam(nam, "can't open pseudo terminal: %e", NULL, errno);
 	return 1;
     }
     if ((pid = fork()) == -1) {
+	zwarnnam(nam, "can't create pty command %s: %e", pname, errno);
 	close(master);
-	zwarnnam(nam, "couldn't create pty command: %s", pname, 0);
 	return 1;
     } else if (!pid) {
 
@@ -438,7 +438,8 @@ checkptycmd(Ptycmd cmd)
 {
     if (cmd->read != -1)
 	return;
-    if (!read_poll(cmd->fd, &cmd->read, 1) && kill(cmd->pid, 0) < 0) {
+    if (!read_poll(cmd->fd, &cmd->read, !cmd->block) &&
+	kill(cmd->pid, 0) < 0) {
 	cmd->fin = 1;
 	zclose(cmd->fd);
     }
@@ -447,7 +448,7 @@ checkptycmd(Ptycmd cmd)
 static int
 ptyread(char *nam, Ptycmd cmd, char **args)
 {
-    int blen = 256, used = 0, ret = 1;
+    int blen = 256, used = 0, seen = 0, ret = 1;
     char *buf = (char *) zhalloc((blen = 256) + 1);
     Patprog prog = NULL;
 
@@ -465,7 +466,9 @@ ptyread(char *nam, Ptycmd cmd, char **args)
 	    zwarnnam(nam, "bad pattern: %s", args[1], 0);
 	    return 1;
 	}
-    }
+    } else
+	fflush(stdout);
+
     if (cmd->read != -1) {
 	buf[0] = (char) cmd->read;
 	buf[1] = '\0';
@@ -479,29 +482,18 @@ ptyread(char *nam, Ptycmd cmd, char **args)
 		break;
 	}
 	if ((ret = read(cmd->fd, buf + used, 1)) == 1) {
+	    seen = 1;
 	    if (++used == blen) {
-		buf = hrealloc(buf, blen, blen << 1);
-		blen <<= 1;
+		if (!*args) {
+		    write(1, buf, used);
+		    used = 0;
+		} else {
+		    buf = hrealloc(buf, blen, blen << 1);
+		    blen <<= 1;
+		}
 	    }
 	}
 	buf[used] = '\0';
-
-#if 0
-	/* This once used the following test, to make sure to return
-	 * non-zero if there are no characters to read.  That looks
-	 * like a thinko now, because it disables non-blocking ptys. */
-
-	if (ret < 0 && (cmd->block
-#ifdef EWOULDBLOCK
-			|| errno != EWOULDBLOCK
-#else
-#ifdef EAGAIN
-			|| errno != EAGAIN
-#endif
-#endif
-			))
-	    break;
-#endif
 
 	if (!prog && ret <= 0)
 	    break;
@@ -511,11 +503,10 @@ ptyread(char *nam, Ptycmd cmd, char **args)
 
     if (*args)
 	setsparam(*args, ztrdup(metafy(buf, used, META_HREALLOC)));
-    else {
-	fflush(stdout);
+    else
 	write(1, buf, used);
-    }
-    return !used;
+
+    return !seen;
 }
 
 static int
@@ -524,21 +515,7 @@ ptywritestr(Ptycmd cmd, char *s, int len)
     int written;
 
     for (; len; len -= written, s += written) {
-	if ((written = write(cmd->fd, s, len)) < 0
-#if 0
-	    /* Same as above. */
-	    &&
-	    (cmd->block
-#ifdef EWOULDBLOCK
-			|| errno != EWOULDBLOCK
-#else
-#ifdef EAGAIN
-			|| errno != EAGAIN
-#endif
-#endif
-	     )
-#endif
-	    )
+	if ((written = write(cmd->fd, s, len)) < 0)
 	    return 1;
 	if (written < 0) {
 	    checkptycmd(cmd);

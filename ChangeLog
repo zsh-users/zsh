@@ -1,3 +1,9 @@
+2000-11-04  Bart Schaefer  <schaefer@zsh.org>
+
+	* 13116: Src/Modules/zpty.c: More informative error output; better
+	streaming behavior of `zpty -r'; prevent hang on `zpty -t' when
+	the command was started with `zpty -b'.
+
 2000-11-02  Sven Wischnowsky  <wischnow@zsh.org>
 
 	* users/3503: Doc/Zsh/mod_parameter.yo, Src/jobs.c,
