@@ -16,7 +16,9 @@ else
   local n=${words[(b:2:i)[^-]*]}
   if (( n <= CURRENT )); then
     compset -n $n
-    _normal && return 0
+    _alternative \
+      'files:file:_files' \
+      'commands:command:_normal' && return 0
   fi
   _default
 fi

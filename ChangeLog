@@ -1,5 +1,8 @@
 2003-04-23  Oliver Kiddle  <opk@zsh.org>
 
+	* 18462: Completion/Unix/Command/_sh: complete files in addition
+	to commands
+
 	* 18461: Completion/Unix/Type/_perl_builtin_funcs: handle cases
 	where the perlfunc man page is compressed
 
@@ -14,7 +17,7 @@
 
 	* 18458: Completion/Unix/Command/_renice: new completion for renice
 
-	* 18458: Completion/Base/Utility/_describe: handle the prefix-needed style
+	* 18458: Completion/Base/Utility/_describe: handle prefix-needed style
 
 2003-04-19  Felix Rosencrantz <f_rosencrantz@yahoo.com>
 
