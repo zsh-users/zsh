@@ -129,10 +129,10 @@ if [[ -n $pats ]]; then
 	# old file by renaming it.
 
 	if [[ -z "$quiet" ]] &&
-           { [[ ! -f $zwc ]] || mv $zwc ${zwc}.old } &&
+           { [[ ! -f $zwc ]] || mv -f $zwc ${zwc}.old } &&
            zcompile $map $tmp $zwc $files; then
           print succeeded
-	elif ! { { [[ ! -f $zwc ]] || mv $zwc ${zwc}.old } &&
+	elif ! { { [[ ! -f $zwc ]] || mv -f $zwc ${zwc}.old } &&
                  zcompile $map $tmp $zwc $files 2> /dev/null } then
           [[ -z $quiet ]] && print "re-compiling ${zwc}: failed"
           ret=1
@@ -233,10 +233,10 @@ for zwc; do
 	# old file by renaming it.
 
 	if [[ -z "$quiet" ]] &&
-           mv $zwc ${zwc}.old &&
+           mv -f $zwc ${zwc}.old &&
            zcompile $map $zwc $files; then
           print $mesg
-	elif ! { mv $zwc ${zwc}.old &&
+	elif ! { mv -f $zwc ${zwc}.old &&
                  zcompile $map $zwc $files 2> /dev/null } then
           [[ -z $quiet ]] && print "re-compiling ${zwc}: failed"
           ret=1

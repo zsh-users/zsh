@@ -1,3 +1,9 @@
+2004-03-31  Bart Schaefer  <schaefer@zsh.org>
+
+	* unposted: Functions/Misc/zrecompile: change "mv" to "mv -f"
+	when backing up .zwc files, because zcompile creates the files
+	read-only.  See thread ending at users/7269.
+
 2004-03-30  Oliver Kiddle  <opk@zsh.org>
 
 	* 19708: Completion/compaudit: change getent() function to
