@@ -1,4 +1,11 @@
+2005-02-04  Peter Stephenson  <pws@csr.com>
+
+	* Motoi Washida: 20785: configure.ac: libiconv test needed
+	for Mac OS X 3.
+
 2005-02-02  Peter Stephenson  <pws@csr.com>
+
+	* unposted: 4.2.4 released.
 
 	* 20777: Test/A06assign.ztst, Test/C02cond.ztst: tests for
 	users/8422 and 20774.

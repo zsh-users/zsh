@@ -729,10 +729,11 @@ AC_CHECK_LIB(socket, socket)
 
 AC_CHECK_LIB(iconv, iconv)
 
-if test "$host_os" = cygwin; then
-dnl cygwin iconv() is really libiconv()
-AC_CHECK_LIB(iconv, libiconv)
-fi
+case "$host_os" in
+  cygwin | darwin*)
+    dnl cygwin iconv() is really libiconv()
+    AC_CHECK_LIB(iconv, libiconv) ;;
+esac
 
 if test x$enable_pcre = xyes; then
 dnl pcre-config should probably be employed here
