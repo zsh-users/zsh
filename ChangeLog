@@ -1,3 +1,8 @@
+2001-08-17  Adam Spiers  <adam@spiers.net>
+
+	* unposted: Functions/Prompts/prompt_adam2_setup: eliminate
+	horrible inefficiencies resulting from avoidable fork()s
+
 2001-08-17  Sven Wischnowsky  <wischnow@zsh.org>
 
 	* 15653: Completion/Base/Core/_main_complete: make insert-tab

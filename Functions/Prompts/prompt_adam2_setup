@@ -2,115 +2,112 @@
 
 prompt_adam2_help () {
   cat <<'EOF'
-This prompt is color-theme-able.  You can invoke it thus:
+This prompt is color-scheme-able.  You can invoke it thus:
 
-  prompt adam2 [ simple ] <color1> <color2> <color3>
+  prompt adam2 [ 8bit ] [<color1> [<color2> [<color3>] [<color4>]]
 
-where the colors are for the hyphens, current directory, and user@host
-bits respectively.
+where the colors are for the hyphens, current directory, user@host,
+and user input bits respectively.  The default colors are cyan, green,
+cyan, and white.  This theme works best with a dark background.
 
-And you probably thought adam1 was overkill.  If you've ever seen a
-more complex prompt in your whole life, please e-mail it to me at
-<adam@spiers.net>; I'd love to know that I'm not the saddest person
-on the planet.
+If you have the `nexus' or `vga' console fonts or similar, you
+can specify the `8bit' option to use 8-bit replacements for the
+7-bit characters.
+
+And you probably thought adam1 was overkill ...
 EOF
 }
 
 prompt_adam2_setup () {
   # Some can't be local
-  local prompt_gfx_tlc prompt_gfx_mlc prompt_gfx_blc prompt_gfx_bbox 
+  local prompt_gfx_tlc prompt_gfx_mlc prompt_gfx_blc
 
-  if [[ $1 == 'plain' ]]; then
+  if [[ $1 == '8bit' ]]; then
     shift
+    prompt_gfx_tlc=$'\xda'
+    prompt_gfx_mlc=$'\xc3'
+    prompt_gfx_blc=$'\xc0'
+    prompt_gfx_hyphen=$'\xc4'
+  else
     prompt_gfx_tlc='.'
     prompt_gfx_mlc='|'
     prompt_gfx_blc='\`'
     prompt_gfx_hyphen='-'
-  else
-    prompt_gfx_tlc=$(echo "\xda")
-    prompt_gfx_mlc=$(echo "\xc3")
-    prompt_gfx_blc=$(echo "\xc0")
-    prompt_gfx_hyphen=$(echo "\xc4")
   fi
 
   # Colour scheme
-  prompt_scheme_color1=${1:-'cyan'}    # hyphens
-  prompt_scheme_color2=${2:-'green'}   # current directory
-  prompt_scheme_color3=${3:-'cyan'}    # user@host
+  prompt_adam2_color1=${1:-'cyan'}    # hyphens
+  prompt_adam2_color2=${2:-'green'}   # current directory
+  prompt_adam2_color3=${3:-'cyan'}    # user@host
+  prompt_adam2_color4=${4:-'white'}   # user input
 
-  local num
-  for num in 1 2 3; do
-    # Grok this!
-    eval "prompt_color$num="'${(P)$(echo "fg_no_bold_$prompt_scheme_color'"$num\")}"
-    eval "prompt_bold_color$num="'${(P)$(echo "fg_bold_$prompt_scheme_color'"$num\")}"
-  done
-
-  prompt_gfx_tbox=$(echo "%{$prompt_bold_color1%}${prompt_gfx_tlc}%{$prompt_color1%}${prompt_gfx_hyphen}")
-  prompt_gfx_bbox=$(echo "%{$prompt_bold_color1%}${prompt_gfx_blc}${prompt_gfx_hyphen}%{$prompt_color1%}")
+  local prompt_gfx_bbox 
+  prompt_gfx_tbox="%{$fg_bold[$prompt_adam2_color1]%}${prompt_gfx_tlc}%{$fg_no_bold[$prompt_adam2_color1]%}${prompt_gfx_hyphen}"
+  prompt_gfx_bbox="%{$fg_bold[$prompt_adam2_color1]%}${prompt_gfx_blc}${prompt_gfx_hyphen}%{$fg_no_bold[$prompt_adam2_color1]%}"
 
   # This is a cute hack.  Well I like it, anyway.
-  prompt_gfx_bbox_to_mbox=$(echo "%{\e[A\r$prompt_bold_color1${prompt_gfx_mlc}$prompt_color1${prompt_gfx_hyphen}\e[B%}")
+  prompt_gfx_bbox_to_mbox=$'%{\e[A\r'"$fg_bold[$prompt_adam2_color1]${prompt_gfx_mlc}$fg_no_bold[$prompt_adam2_color1]${prompt_gfx_hyphen}"$'\e[B%}'
 
-  prompt_l_paren=$(echo "%{$fg_bold_grey%}(")
-  prompt_r_paren=$(echo "%{$fg_bold_grey%})")
+  prompt_l_paren="%{$fg_bold[grey]%}("
+  prompt_r_paren="%{$fg_bold[grey]%})"
 
-  prompt_l_bracket=$(echo "%{$fg_bold_grey%}[")
-  prompt_r_bracket=$(echo "%{$fg_bold_grey%}]")
+  prompt_user_host="%{$fg_no_bold[$prompt_adam2_color3]%}%n%{$fg_bold[$prompt_adam2_color3]%}@%{$fg_no_bold[$prompt_adam2_color3]%}%m"
 
-  prompt_machine=$(echo "%{$prompt_color3%}%n%{$prompt_bold_color3%}@%{$prompt_color3%}%m")
+  prompt_line_1a="$prompt_gfx_tbox$prompt_l_paren%{$fg_bold[$prompt_adam2_color2]%}%~$prompt_r_paren%{$fg_no_bold[$prompt_adam2_color1]%}"
+  prompt_line_1b="$prompt_l_paren$prompt_user_host$prompt_r_paren%{$fg_no_bold[$prompt_adam2_color1]%}${prompt_gfx_hyphen}"
 
-  prompt_padding_text=`perl -e "print qq{${prompt_gfx_hyphen}} x 200"`
-
-  prompt_line_1a="$prompt_gfx_tbox$prompt_l_paren%{$prompt_bold_color2%}%~$prompt_r_paren%{$prompt_color1%}"
-  prompt_line_1a_no_color=$(echo "$prompt_line_1a" | perl -pe "s/%{.*?%}//g")
-  prompt_line_1b=$(echo "$prompt_l_paren$prompt_machine$prompt_r_paren%{$prompt_color1%}${prompt_gfx_hyphen}")
-  prompt_line_1b_no_color=$(echo "$prompt_line_1b" | perl -pe "s/%{.*?%}//g")
-
-  prompt_line_2="$prompt_gfx_bbox${prompt_gfx_hyphen}%{$fg_bold_white%}"
+  prompt_line_2="$prompt_gfx_bbox${prompt_gfx_hyphen}%{$fg_bold[white]%}"
 
   prompt_char="%(!.#.>)"
 
-  precmd () { prompt_adam2_precmd }
+  precmd () { prompt_adam2_precmd; setopt promptsubst }
   preexec () { prompt_adam2_preexec }
 }
 
 prompt_adam2_precmd () {
-  setopt noxtrace localoptions
-  local prompt_line_1a_no_color_expanded prompt_line_2a_no_color_expanded
-  local prompt_padding_size prompt_padding prompt_line_1 pre_prompt
-  local prompt_pwd_size
+  setopt noxtrace localoptions extendedglob
+  local prompt_line_1
 
-  prompt_line_1a_no_color_expanded=$(print -P "$prompt_line_1a_no_color")
-  prompt_line_1b_no_color_expanded=$(print -P "$prompt_line_1b_no_color")
-  prompt_padding_size=$(( $COLUMNS
-                            - $#prompt_line_1a_no_color_expanded 
-                            - $#prompt_line_1b_no_color_expanded ))
+  prompt_adam2_choose_prompt
 
-  if [[ $prompt_padding_size -ge 0 ]]; then
-    prompt_padding=$(printf "%$prompt_padding_size.${prompt_padding_size}s" "$prompt_padding_text")
+  PS1="$prompt_line_1$prompt_newline$prompt_line_2%{$fg_bold[white]%}$prompt_char %{$fg_bold[$prompt_adam2_color4]%}"
+  PS2="$prompt_line_2%{$prompt_gfx_bbox_to_mbox$fg_bold[white]%}%_> %{$fg_bold[$prompt_adam2_color4]%}"
+  PS3="$prompt_line_2%{$prompt_gfx_bbox_to_mbox$fg_bold[white]%}?# %{$fg_bold[$prompt_adam2_color4]%}"
+}
+
+prompt_adam2_choose_prompt () {
+  local prompt_line_1a_width=${#${(S%%)prompt_line_1a//%\{*%\}}}
+  local prompt_line_1b_width=${#${(S%%)prompt_line_1b//%\{*%\}}}
+
+  local prompt_padding_size=$(( COLUMNS
+                                  - prompt_line_1a_width
+                                  - prompt_line_1b_width ))
+
+  # Try to fit in long path and user@host.
+  if (( prompt_padding_size > 0 )); then
+    local prompt_padding
+    eval "prompt_padding=\${(l:${prompt_padding_size}::${prompt_gfx_hyphen}:)_empty_zz}"
     prompt_line_1="$prompt_line_1a$prompt_padding$prompt_line_1b"
-  else
-    prompt_padding_size=$(( $COLUMNS
-                              - $#prompt_line_1a_no_color_expanded ))
-
-    if [[ $prompt_padding_size -ge 0 ]]; then
-      prompt_padding=$(printf "%$prompt_padding_size.${prompt_padding_size}s" "$prompt_padding_text")
-      prompt_line_1="$prompt_line_1a$prompt_padding"
-    else
-      prompt_pwd_size=$(( $COLUMNS - 5 ))
-      prompt_line_1="$prompt_gfx_tbox$prompt_l_paren%{$prompt_bold_color2%}%$prompt_pwd_size<...<%~%<<$prompt_r_paren%{$prompt_color1$prompt_gfx_hyphen%}"
-    fi
+    return
   fi
 
-  pre_prompt="$prompt_line_1$prompt_newline$prompt_line_2"
+  prompt_padding_size=$(( COLUMNS - prompt_line_1a_width ))
 
-  PS1="$pre_prompt%{$fg_bold_white%}$prompt_char "
-  PS2="$prompt_line_2%{$prompt_gfx_bbox_to_mbox$fg_bold_white%}%_> "
-  PS3="$prompt_line_2%{$prompt_gfx_bbox_to_mbox$fg_bold_white%}?# "
+  # Didn't fit; try to fit in just long path.
+  if (( prompt_padding_size > 0 )); then
+    local prompt_padding
+    eval "prompt_padding=\${(l:${prompt_padding_size}::${prompt_gfx_hyphen}:)_empty_zz}"
+    prompt_line_1="$prompt_line_1a$prompt_padding"
+    return
+  fi
+
+  # Still didn't fit; truncate 
+  local prompt_pwd_size=$(( COLUMNS - 5 ))
+  prompt_line_1="$prompt_gfx_tbox$prompt_l_paren%{$fg_bold[$prompt_adam2_color2]%}%$prompt_pwd_size<...<%~%<<$prompt_r_paren%{$fg_no_bold[$prompt_adam2_color1]$prompt_gfx_hyphen%}"
 }
 
 prompt_adam2_preexec () {
-  print -n "$fg_no_bold_white"
+  print -n "$fg_no_bold[white]"
 }
 
 prompt_adam2_setup "$@"
