@@ -1,14 +1,15 @@
 #compdef antiword
 
-# Version: 0.33  (05 Jul 2002)
+# Version: 0.35  (14 Nov 2003)
 
 _arguments -s -S \
-  '(-p)-t[text output (default)]' \
-  '(-t -w)-p+[PostScript output]:paper size:(10x14 a3 a4 a5 b4 b5 executive folio legal letter note quarto statement tabloid)' \
+  '(-i -L -p -x)-t[text output (default)]' \
+  '(-t -w -x)-p+[PostScript output]:paper size:(10x14 a3 a4 a5 b4 b5 executive folio legal letter note quarto statement tabloid)' \
+  '(-i -L -p -t -w)-x[XML output]:DTD:(db)' \
   '-m+[character mapping file]:mapping file:_files' \
-  '(-p)-w+[width in characters of text output]:line width:' \
-  '(-t -w)-i+[image level (PostScript only)]:image level:((0\:use\ non\ standard\ extensions\ from\ Ghostscript 1\:show\ no\ images 2\:PostScript\ level\ 2\ compatible 3\:PostScript\ level\ 3\ compatible))' \
-  '(-t -w)-L[use landscape mode (PostScript only)]' \
+  '(-i -L -p -x)-w+[width in characters of text output]:line width:' \
+  '(-t -w -x)-i+[image level (PostScript only)]:image level:((0\:use\ non\ standard\ extensions\ from\ Ghostscript 1\:show\ no\ images 2\:PostScript\ level\ 2\ compatible 3\:PostScript\ level\ 3\ compatible))' \
+  '(-t -w -x)-L[use landscape mode (PostScript only)]' \
   '-s[show hidden (by Word) text]' \
   '(* -)-h[give a help message]' \
   '*:MS Word file:_files -g "*.doc(-.)"' && return
