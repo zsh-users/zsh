@@ -1378,7 +1378,11 @@ remtpath(char **junkptr)
     while (str >= *junkptr && !IS_DIRSEP(*str))
 	--str;
     if (str < *junkptr) {
-	*junkptr = dupstring (".");
+	if (IS_DIRSEP(**junkptr))
+	    *junkptr = dupstring ("/");
+	else
+	    *junkptr = dupstring (".");
+
 	return 0;
     }
     /* repeated slashes are considered like a single slash */
