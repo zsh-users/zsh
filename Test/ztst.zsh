@@ -69,11 +69,11 @@ rm -rf dummy.tmp *.tmp
 # Report failure.  Note that all output regarding the tests goes to stdout.
 # That saves an unpleasant mixture of stdout and stderr to sort out.
 ZTST_testfailed() {
-  print "Test $ZTST_testname failed: $1"
+  print -r "Test $ZTST_testname failed: $1"
   if [[ -n $ZTST_message ]]; then
-    print "Was testing: $ZTST_message"
+    print -r "Was testing: $ZTST_message"
   fi
-  print "$ZTST_testname: test failed."
+  print -r "$ZTST_testname: test failed."
   ZTST_cleanup
   exit 1
 }

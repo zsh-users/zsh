@@ -807,6 +807,7 @@ op(int what)
 	push(((a.type & MN_FLOAT) ? a.u.d : a.u.l) ? b : c, NULL);
 	break;
     case COLON:
+	zerr("':' without '?'", NULL, 0);
 	break;
     case PREPLUS:
 	if (spval->type & MN_FLOAT)
