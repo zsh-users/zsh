@@ -1332,7 +1332,7 @@ setblock_stdin(void)
 
 /**/
 mod_export int
-read_poll(int fd, int *readchar, int polltty)
+read_poll(int fd, int *readchar, int polltty, zlong microseconds)
 {
     int ret = -1;
     long mode = -1;
@@ -1374,6 +1374,8 @@ read_poll(int fd, int *readchar, int polltty)
 	gettyinfo(&ti);
 	if ((polltty = ti.tio.c_cc[VMIN])) {
 	    ti.tio.c_cc[VMIN] = 0;
+	    /* termios timeout is 10ths of a second */
+	    ti.tio.c_cc[VTIME] = (int) (microseconds / (zlong)100000);
 	    settyinfo(&ti);
 	}
     }
@@ -1381,7 +1383,8 @@ read_poll(int fd, int *readchar, int polltty)
     polltty = 0;
 #endif
 #ifdef HAVE_SELECT
-    expire_tv.tv_sec = expire_tv.tv_usec = 0;
+    expire_tv.tv_sec = (int) (microseconds / (zlong)1000000);
+    expire_tv.tv_usec = microseconds % (zlong)1000000;
     FD_ZERO(&foofd);
     FD_SET(fd, &foofd);
     ret = select(fd+1, (SELECT_ARG_2_T) &foofd, NULL, NULL, &expire_tv);
@@ -1407,6 +1410,7 @@ read_poll(int fd, int *readchar, int polltty)
 #ifdef HAS_TIO
     if (polltty) {
 	ti.tio.c_cc[VMIN] = 1;
+	ti.tio.c_cc[VTIME] = 0;
 	settyinfo(&ti);
     }
 #endif

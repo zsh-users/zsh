@@ -632,7 +632,7 @@ bin_zpty(char *nam, char **args, Options ops, int func)
 	if (p->fin)
 	    return 2;
 	if (OPT_ISSET(ops,'t') && p->read == -1 &&
-	    !read_poll(p->fd, &p->read, 0))
+	    !read_poll(p->fd, &p->read, 0, 0))
 	    return 1;
 
 	return (OPT_ISSET(ops,'r') ?

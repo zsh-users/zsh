@@ -1,3 +1,9 @@
+2003-02-05  Peter Stephenson  <pws@csr.com>
+
+	* 18195: Doc/Zsh/builtins.yo Src/builtin.c Src/utils.c
+	Src/Modules/zpty.c: Timeouts with `read' via optional numeric
+	argument to -t option.
+
 2003-02-04  Peter Stephenson  <pws@csr.com>
 
 	* unposted: 4.1.0-dev-7.

@@ -106,7 +106,7 @@ static struct builtin builtins[] =
     BUILTIN("pushln", BINF_PRINTOPTS, bin_print, 0, -1, BIN_PRINT, NULL, "-nz"),
     BUILTIN("pwd", 0, bin_pwd, 0, 0, 0, "rLP", NULL),
     BUILTIN("r", 0, bin_fc, 0, -1, BIN_R, "nrl", NULL),
-    BUILTIN("read", 0, bin_read, 0, -1, 0, "cek:%lnpqrstzu:AE", NULL),
+    BUILTIN("read", 0, bin_read, 0, -1, 0, "cek:%lnpqrst:%zu:AE", NULL),
     BUILTIN("readonly", BINF_PLUSOPTS | BINF_MAGICEQUALS | BINF_PSPECIAL, bin_typeset, 0, -1, 0, "AE:%F:%HL:%R:%TUZ:%afghi:%lptux", "r"),
     BUILTIN("rehash", 0, bin_hash, 0, 0, 0, "df", "r"),
     BUILTIN("return", BINF_PSPECIAL, bin_break, 0, 1, BIN_RETURN, NULL, NULL),
@@ -4189,16 +4189,30 @@ bin_read(char *name, char **args, Options ops, int func)
     } else
 	readfd = izle = 0;
 
-    if (OPT_ISSET(ops,'t') && 
-	!read_poll(readfd, &readchar, keys && !zleactive)) {
-	if (OPT_ISSET(ops,'k') && !zleactive && !isem)
-	    settyinfo(&shttyinfo);
-	if (haso) {
-	    fclose(shout);
-	    shout = oshout;
-	    SHTTY = -1;
+    if (OPT_ISSET(ops,'t')) {
+	zlong timeout = 0;
+	if (OPT_HASARG(ops,'t')) {
+	    mnumber mn = zero_mnumber;
+	    mn = matheval(OPT_ARG(ops,'t'));
+	    if (errflag)
+		return 1;
+	    if (mn.type == MN_FLOAT) {
+		mn.u.d *= 1e6;
+		timeout = (zlong)mn.u.d;
+	    } else {
+		timeout = (zlong)mn.u.l * (zlong)1000000;
+	    }
 	}
-	return 1;
+	if (!read_poll(readfd, &readchar, keys && !zleactive, timeout)) {
+	    if (OPT_ISSET(ops,'k') && !zleactive && !isem)
+		settyinfo(&shttyinfo);
+	    if (haso) {
+		fclose(shout);
+		shout = oshout;
+		SHTTY = -1;
+	    }
+	    return 1;
+	}
     }
     if (OPT_ISSET(ops,'s') && SHTTY != -1) {
 	struct ttyinfo ti;
