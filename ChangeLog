@@ -1,5 +1,9 @@
 2000-04-14  Clint Adams  <schizo@debian.org>
 
+	* 10764: Radim Kolar: Functions/Misc/run-help: support
+	for reserved words and multiple arguments being passed
+	on to man.
+
 	* 10763: Completion/Builtins/_vars_eq: complete after :
 
 2000-04-14  Sven Wischnowsky <wischnow@informatik.hu-berlin.de>
