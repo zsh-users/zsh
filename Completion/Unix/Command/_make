@@ -22,6 +22,10 @@ expandVars() {
 		close=''
 		var=${(s::)var[1]}
 		;;
+	    (\$*)
+		# avoid parsing second $ in $$
+		tmp=${tmp#\$}
+		continue
 	    (*)
 		continue
 		;;
@@ -38,7 +42,7 @@ expandVars() {
 		;;
 	    esac
 	else
-	    print -- $ret
+	    print -- ${ret//\$\$/\$}
 	    return
 	fi
     done
