@@ -225,7 +225,7 @@ IPDEF9F("@", &pparams, NULL, PM_ARRAY|PM_SPECIAL|PM_DONTIMPORT|PM_READONLY),
 #define IPDEF10(A,B,C) {NULL,A,PM_ARRAY|PM_SPECIAL,BR(NULL),SFN(C),GFN(B),stdunsetfn,10,NULL,NULL,NULL,0}
 
 /* The following parameters are not avaible in sh/ksh compatibility *
- * mode. All of these has sh compatible equivalents.                */
+ * mode. All of these have sh compatible equivalents.                */
 IPDEF1("ARGC", poundgetfn, nullintsetfn, PM_READONLY),
 IPDEF2("HISTCHARS", histcharsgetfn, histcharssetfn, PM_DONTIMPORT),
 IPDEF4("status", &lastval),
@@ -459,7 +459,7 @@ getvaluearr(Value v)
 }
 
 /*
- * Split environment string into (name, vlaue) pair.
+ * Split environment string into (name, value) pair.
  * this is used to avoid in-place editing of environment table
  * that results in core dump on some systems
  */
@@ -520,7 +520,7 @@ createparamtable(void)
 
     /* Add the standard non-special parameters which have to    *
      * be initialized before we copy the environment variables. *
-     * We don't want to override whatever values the users has  *
+     * We don't want to override whatever values the user has   *
      * given them in the environment.                           */
     opts[ALLEXPORT] = 0;
     setiparam("MAILCHECK", 60);
@@ -3153,8 +3153,8 @@ findenv(char *name, int *pos)
     return 0;
 }
 
-/* Given *name = "foo", it searchs the environment for string *
- * "foo=bar", and returns a pointer to the beginning of "bar" */
+/* Given *name = "foo", it searches the environment for string *
+ * "foo=bar", and returns a pointer to the beginning of "bar"  */
 
 /**/
 mod_export char *
@@ -3209,7 +3209,7 @@ addenv(char *name, char *value, int flags)
     /*
      * Under Cygwin we must use putenv() to maintain consistency.
      * Unfortunately, current version (1.1.2) copies argument and may
-     * silently reuse exisiting environment string. This tries to
+     * silently reuse existing environment string. This tries to
      * check for both cases
      */
     if (findenv(name, &pos)) {
@@ -3312,7 +3312,7 @@ convbase(char *s, zlong v, int base)
 /*
  * Convert a floating point value for output.
  * Unlike convbase(), this has its own internal storage and returns
- * a value from the heap;
+ * a value from the heap.
  */
 
 /**/

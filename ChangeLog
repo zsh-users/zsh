@@ -1,5 +1,7 @@
 2002-01-31  Oliver Kiddle  <opk@zsh.org>
 
+	* Derek Peschel: 16493: Src/params.c: correct typos
+
 	* Derek Peschel: 16492: Src/params.c, Src/input.c, Doc/Zsh/params.yo:
 	add RPROMPT2 variable for right prompts in multi-line commands
 
