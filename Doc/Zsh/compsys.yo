@@ -947,6 +947,12 @@ completion data are stored.  Defaults to `tt($ZDOTDIR/.zcompcache)', or
 `tt($HOME/.zcompcache)' if tt($ZDOTDIR) is not defined.  The completion
 layer will not be used unless the tt(use-cache) style is set.
 )
+kindex(cache-policy, completion style)
+item(tt(cache-policy))(
+This style defines the function which will be used to determine whether
+a cache needs rebuilding.  See the section on the tt(_cache_invalid)
+function below.
+)
 kindex(call-command, completion style)
 item(tt(call-command))(
 Currently this is only used by the function completing tt(make)
