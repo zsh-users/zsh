@@ -1782,23 +1782,21 @@ addmatches(Cadata dat, char **argv)
 	} else
 	    lsl = 0;
 	if (dat->aflags & CAF_MATCH) {
-	    int ml, gfl = 0, tildepat = 0;
+	    int ml, gfl = 0;
 	    char *globflag = NULL;
 
 	    if (comppatmatch && *comppatmatch &&
-		lpre[0] == '(' && lpre[1] == '#') {
+		dat->ppre && lpre[0] == '(' && lpre[1] == '#') {
 		char *p;
 
 		for (p = lpre + 2; *p && *p != ')'; p++);
 
-		if (*p == ')' && (dat->ppre || p[1] == '~')) {
+		if (*p == ')') {
 		    char sav = p[1];
 
 		    p[1] = '\0';
 		    globflag = dupstring(lpre);
 		    gfl = p - lpre + 1;
-                    if (!dat->ppre)
-                        tildepat = 1;
 		    p[1] = sav;
 
 		    lpre = p + 1;
@@ -1861,11 +1859,7 @@ addmatches(Cadata dat, char **argv)
 		int is = (*comppatmatch == '*');
 		char *tmp = (char *) zhalloc(2 + llpl + llsl + gfl);
 
-		if (tildepat) {
-                    tmp[0] = '~';
-                    strcpy(tmp + 1, globflag);
-                    strcat(tmp, lpre + 1);
-                } else if (gfl) {
+		if (gfl) {
 		    strcpy(tmp, globflag);
 		    strcat(tmp, lpre);
 		} else

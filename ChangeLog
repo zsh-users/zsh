@@ -1,3 +1,8 @@
+2001-08-20  Sven Wischnowsky  <wischnow@zsh.org>
+
+	* 15669: Completion/Base/Completer/_approximate,
+	Src/Zle/compcore.c: undo most of 15650, do that in shell code
+
 2001-08-18  Bart Schaefer  <schaefer@zsh.org>
 
 	* 15617: Src/exec.c: Fix exit status of zsh -fc '! command'.
