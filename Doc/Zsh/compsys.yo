@@ -1160,6 +1160,36 @@ to tt(menu), then the expansions are only sorted when they are offered
 as single strings (not in the string containing all possible
 expansions).
 )
+item(tt(special-dirs))(
+Normally, the completion code will not produce the directory names
+tt(.) and tt(..) as possible completions. If this style is set to
+`true', it will add both `tt(.)' and `tt(..)' as possible completions,
+if it is set to tt(..), only `tt(..)' will be added.
+)
+item(tt(squeeze-slashes))(
+If set to `true', sequences of slashes (such as tt(foo//bar)) will 
+be rewritten with a single slash (tt(foo/bar)) when completing
+directory names.
+)
+item(tt(stop))(
+If set to `true', the tt(_history_complete_word) bindable
+command will always insert matches as if menucompletion were started
+and it will stop when the last match is inserted. If this style is set
+to tt(verbose) a message will be displayed when the last match is reached.
+)
+item(tt(substitute))(
+If this is unset or set to the empty string, the tt(_expand) completer
+will first try to expand all substitutions in the string (such as
+`tt($LPAR()...RPAR())' and `tt(${...})'). If this is set to an
+non-empty string it should be an expression usable inside a `tt($((...)))'
+arithmetical expression. In this case, expansion of substitutions will
+be done if the expression evaluates to `tt(1)'. For example, with
+
+example(zstyle ':completion:expand' substitute '${NUMERIC:-1} != 1')
+
+substitution will be performed only if given an explicit numeric
+argument other than `tt(1)', as by typing `tt(ESC 2 TAB)'.
+)
 item(tt(tag-order))(
 This provides a mechanism for sorting how the tags available in a
 particular context will be used.
@@ -1195,31 +1225,6 @@ information. See the tt(_sort_tags) function below for a description
 of how such functions can be implemented.
 
 If no style has been defined for a context, all tags will be used.
-)
-item(tt(special-dirs))(
-Normally, the completion code will not produce the directory names
-tt(.) and tt(..) as possible completions. If this style is set to
-`true', it will add both `tt(.)' and `tt(..)' as possible completions,
-if it is set to tt(..), only `tt(..)' will be added.
-)
-item(tt(stop))(
-If set to `true', the tt(_history_complete_word) bindable
-command will always insert matches as if menucompletion were started
-and it will stop when the last match is inserted. If this style is set
-to tt(verbose) a message will be displayed when the last match is reached.
-)
-item(tt(substitute))(
-If this is unset or set to the empty string, the tt(_expand) completer
-will first try to expand all substitutions in the string (such as
-`tt($LPAR()...RPAR())' and `tt(${...})'). If this is set to an
-non-empty string it should be an expression usable inside a `tt($((...)))'
-arithmetical expression. In this case, expansion of substitutions will
-be done if the expression evaluates to `tt(1)'. For example, with
-
-example(zstyle ':completion:expand' substitute '${NUMERIC:-1} != 1')
-
-substitution will be performed only if given an explicit numeric
-argument other than `tt(1)', as by typing `tt(ESC 2 TAB)'.
 )
 item(tt(users))(
 This may be set to a list of names that should be completed whenever 

@@ -18,6 +18,7 @@ styles=(
   cursor		 c:bool
   disable-stat		 c:bool
   expand		 c:
+  file-patterns		 c:
   format		 c:
   glob			 c:
   group-name		 c:
@@ -49,6 +50,7 @@ styles=(
   sort			 c:bool
   tag-order		 c:tag
   special-dirs		 c:sdirs
+  squeeze-slashes	 c:bool
   stop			 c:stop
   substitute		 c:
   users			 c:_users

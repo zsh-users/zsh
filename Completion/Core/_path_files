@@ -157,6 +157,14 @@ if zstyle -s ":completion${curcontext}:files" sort tmp1; then
   fi
 fi
 
+# Squeeze sequences of slashes
+if zstyle -t ":completion${curcontext}:paths" squeeze-slashes
+then
+  PREFIX="${PREFIX//(\\/)#//}"
+  SUFFIX="${SUFFIX//(\\/)#//}"
+  [[ $PREFIX = */ ]] && SUFFIX=${SUFFIX#/}
+fi
+
 # We get the prefix and the suffix from the line and save the whole
 # original string. Then we see if we will do menucompletion.
 
