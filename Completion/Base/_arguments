@@ -14,119 +14,144 @@ local beg optbeg argbeg nargbeg inopt
 typeset -A opts dopts odopts
 typeset -A oneshot
 
-# See if we are using single-letter options.
+# Fill the cache if we were called with different arguments.
 
-if [[ "$1" = -s ]]; then
-  shift
-  single=yes
-fi
+if [[ "$*" != "$_args_cache_descr" ]]; then
+  _args_cache_descr="$*"
 
-# See if we support long options, too.
+  unset _args_cache_{opts,dopts,odopts,oneshot}
+  typeset -gA _args_cache_{opts,dopts,odopts,oneshot}
 
-nth=$argv[(I)--]
-if (( nth )); then
-  long=( "${(@)argv[nth+1,-1]}" )
-  argv=("${(@)argv[1,nth-1]}")
-else
-  long=()
-fi
+  unset _args_cache_{long,single,rest,args,sopts,soptseq,soptseq1}
 
-# Now parse the arguments...
+  # See if we are using single-letter options.
 
-args=()
-nth=1
-while (( $# )); do
-
-  # This describes a one-shot option.
-
-  if [[ "$1" = [-+]* ]]; then
-    if [[ "$1" = *:* ]]; then
-
-      # If the option name ends in a `-', the first argument comes
-      # directly after the option, if it ends in a `+', the first
-      # argument *may* come directly after the option, otherwise it
-      # is in the next word.
-
-      if [[ "$1" = [^:]##-:* ]]; then
-	tmp="${${1%%:*}[1,-2]}"
-        dopts[$tmp]="${1#*:}"
-      elif [[ "$1" = [^:]##+:* ]]; then
-	tmp="${${1%%:*}[1,-2]}"
-        odopts[$tmp]="${1#*:}"
-      else
-        tmp="${1%%:*}"
-        opts[$tmp]="${1#*:}"
-      fi
-    else
-      tmp="$1"
-      opts[$tmp]=''
-    fi
-    oneshot[$tmp]=yes
-  elif [[ "$1" = \*[-+]* ]]; then
-
-    # The same for options that may appear more than once.
-
-    if [[ "$1" = *:* ]]; then
-      if [[ "$1" = [^:]##-:* ]]; then
-        tmp="${${1[2,-1]%%:*}[1,-2]}"
-        dopts[$tmp]="${1#*:}"
-      elif [[ "$1" = [^:]##+:* ]]; then
-        tmp="${${1[2,-1]%%:*}[1,-2]}"
-        odopts[$tmp]="${1#*:}"
-      else
-        tmp="${1[2,-1]%%:*}"
-        opts[$tmp]="${1#*:}"
-      fi
-    else
-      tmp="${1[2,-1]}"
-      opts[$tmp]=''
-    fi
-    unset "oneshot[$tmp]"
-  elif [[ "$1" = \*::* ]]; then
-
-    # This is `*:...', describing `all other arguments', with argument 
-    # range restriction.
-
-    if [[ "$1" = \*:::* ]]; then
-      rest="*${1[3,-1]}"
-    else
-      rest="$1"
-    fi
-  elif [[ "$1" = \*:* ]]; then
-
-    # This is `*:...', describing `all other arguments'.
-
-    rest="${1[3,-1]}"
-  elif [[ "$1" = :* ]]; then
-
-    # This is `:...', describing `the next argument'.
-
-    args[nth++]="${1#*:}"
-  else
-
-    # And this is `n:...', describing the `n'th argument.
-
-    args[${1%%:*}]="${1#*:}"
-    nth=$(( ${1%%:*} + 1 ))
+  if [[ "$1" = -s ]]; then
+    shift
+    _args_cache_single=yes
   fi
-  shift
-done
 
-if [[ -n "$single" ]]; then
-  soptseq="${(@j::)${(@M)${(@k)opts[(R)]}:#[-+]?}#[-+]}"
-  if [[ -n "$soptseq" ]]; then
-    soptseq="[$soptseq]#"
-    soptseq1="$soptseq#"
+  # See if we support long options, too.
+
+  nth=$argv[(I)--]
+  if (( nth )); then
+    _args_cache_long=( "${(@)argv[nth+1,-1]}" )
+    _args_cache_long_nth=$(( nth - 1 ))
   else
-    soptseq=''
-    soptseq1=''
+    _args_cache_long=()
   fi
-  sopts="${(@j::)${(@M)${(@k)opts}:#[-+]?}#[-+]}${(@j::)${(@M)${(@k)dopts}:#[-+]?}#[-+]}${(@j::)${(@M)${(@k)odopts}:#[-+]?}#[-+]}"
-else
-  soptseq=''
-  soptseq1=''
-  sopts=''
+
+  # Now parse the arguments...
+
+  args=()
+  nth=1
+  while (( $# )); do
+
+    # This describes a one-shot option.
+
+    if [[ "$1" = [-+]* ]]; then
+      if [[ "$1" = *:* ]]; then
+
+        # If the option name ends in a `-', the first argument comes
+        # directly after the option, if it ends in a `+', the first
+        # argument *may* come directly after the option, otherwise it
+        # is in the next word.
+
+        if [[ "$1" = [^:]##-:* ]]; then
+  	  tmp="${${1%%:*}[1,-2]}"
+          _args_cache_dopts[$tmp]="${1#*:}"
+        elif [[ "$1" = [^:]##+:* ]]; then
+  	  tmp="${${1%%:*}[1,-2]}"
+          _args_cache_odopts[$tmp]="${1#*:}"
+        else
+          tmp="${1%%:*}"
+          _args_cache_opts[$tmp]="${1#*:}"
+        fi
+      else
+        tmp="$1"
+        _args_cache_opts[$tmp]=''
+      fi
+      _args_cache_oneshot[$tmp]=yes
+    elif [[ "$1" = \*[-+]* ]]; then
+
+      # The same for options that may appear more than once.
+
+      if [[ "$1" = *:* ]]; then
+        if [[ "$1" = [^:]##-:* ]]; then
+          tmp="${${1[2,-1]%%:*}[1,-2]}"
+          _args_cache_dopts[$tmp]="${1#*:}"
+        elif [[ "$1" = [^:]##+:* ]]; then
+          tmp="${${1[2,-1]%%:*}[1,-2]}"
+          _args_cache_odopts[$tmp]="${1#*:}"
+        else
+          tmp="${1[2,-1]%%:*}"
+          _args_cache_opts[$tmp]="${1#*:}"
+        fi
+      else
+        tmp="${1[2,-1]}"
+        _args_cache_opts[$tmp]=''
+      fi
+      unset "_args_cache_oneshot[$tmp]"
+    elif [[ "$1" = \*::* ]]; then
+
+      # This is `*:...', describing `all other arguments', with argument 
+      # range restriction.
+
+      if [[ "$1" = \*:::* ]]; then
+        _args_cache_rest="*${1[3,-1]}"
+      else
+        _args_cache_rest="$1"
+      fi
+    elif [[ "$1" = \*:* ]]; then
+
+      # This is `*:...', describing `all other arguments'.
+
+      _args_cache_rest="${1[3,-1]}"
+    elif [[ "$1" = :* ]]; then
+
+      # This is `:...', describing `the next argument'.
+
+      _args_cache_args[nth++]="${1#*:}"
+    else
+
+      # And this is `n:...', describing the `n'th argument.
+
+      _args_cache_args[${1%%:*}]="${1#*:}"
+      nth=$(( ${1%%:*} + 1 ))
+    fi
+    shift
+  done
+
+  if [[ -n "$_args_cache_single" ]]; then
+    _args_cache_soptseq="${(@j::)${(@M)${(@k)opts[(R)]}:#[-+]?}#[-+]}"
+    if [[ -n "$_args_cache_soptseq" ]]; then
+      _args_cache_soptseq="[$_args_cache_soptseq]#"
+      _args_cache_soptseq1="$_args_cache_soptseq#"
+    else
+      _args_cache_soptseq=''
+      _args_cache_soptseq1=''
+    fi
+    _args_cache_sopts="${(@j::)${(@M)${(@k)opts}:#[-+]?}#[-+]}${(@j::)${(@M)${(@k)dopts}:#[-+]?}#[-+]}${(@j::)${(@M)${(@k)odopts}:#[-+]?}#[-+]}"
+  else
+    _args_cache_soptseq=''
+    _args_cache_soptseq1=''
+    _args_cache_sopts=''
+  fi
 fi
+
+soptseq="$_args_cache_soptseq"
+soptseq1="$_args_cache_soptseq1"
+sopts="$_args_cache_sopts"
+args=( "$_args_cache_args[@]" )
+rest="$_args_cache_rest"
+opts=( "${(@kv)_args_cache_opts}" )
+dopts=( "${(@kv)_args_cache_dopts}" )
+odopts=( "${(@kv)_args_cache_odopts}" )
+oneshot=( "${(@kv)_args_cache_oneshot}" )
+single="$_args_cache_single"
+long=( "$_args_cache_long[@]" )
+
+argv=( "${(@)argv[1,_args_cache_long_nth]}" )
 
 # Parse the command line...
 

@@ -5,7 +5,7 @@ local expl
 # This *has* to be improved some day...
 
 if (( ! $+_font_cache )); then
-  typeset -U _font_cache
+  typeset -gU _font_cache
 
  _font_cache=( "${(@)^${(@f)$(xlsfonts)}%%--*}--" )
 fi

@@ -1,31 +1,59 @@
 #compdef find
 
-local prev="$words[CURRENT-1]" expl
-
-if compset -N '-(ok|exec)' '\;'; then
-  _normal
-elif [[ "$PREFIX" = -* ]]; then
-  _description expl option
-  compadd "$expl[@]" - -daystart -{max,min,}depth -follow -noleaf \
-    -version -xdev -{a,c,}newer -{a,c,m}{min,time} -empty -false \
-    -{fs,x,}type -gid -inum -links -{i,}{l,}name -{no,}{user,group} \
-    -path -perm -regex -size -true -uid -used -exec -{f,}print{f,0,} \
-    -ok -prune -ls
-elif [[ CURRENT -eq 2 ]]; then
-  local ret=1
-
-  _description expl directory
-  compgen "$expl[@]" -g '. ..' && ret=0
-  _files -/ && ret=0
-
-  return ret
-elif [[ "$prev" = -((a|c|)newer|fprint(|0|f)) ]]; then
-  _files
-elif [[ "$prev" = -fstype ]]; then
-  _description expl 'file system type'
-  compadd "$expl[@]" ufs 4.2 4.3 nfs tmp mfs S51K S52K
-elif [[ "$prev" = -group ]]; then
-  _groups
-elif [[ "$prev" = -user ]]; then
-  _users
-fi
+_arguments \
+  '-daystart' \
+  '-depth' \
+  '-follow' \
+  '-help' \
+  '-maxdepth:maximum search depth:' \
+  '-mindepth:minimum search depth:' \
+  '-mount' \
+  '-noleaf' \
+  '-version' \
+  '-xdev' \
+  '-amin:access time (minutes):' \
+  '-cmin:inode change time (minutes):' \
+  '-mmin:modification time (minutes):' \
+  '-atime:access time (days):' \
+  '-ctime:inode change time (days):' \
+  '-mtime:modification time (days):' \
+  '-anewer:file to compare (access time):_files' \
+  '-cnewer:file to compare (inode change time):_files' \
+  '-newer:file to compare (modification time):_files' \
+  '-used:access after inode change (days):' \
+  '-empty' \
+  '-false' \
+  '-fstype:filesystem type:(ufs 4.2 4.3 nfs tmp mfs S51K S52K)' \
+  '-gid:numeric group ID:' \
+  '-group:group:_groups' \
+  '-uid:numeric user ID:' \
+  '-user:user:_users' \
+  '-lname:link pattern to search:' \
+  '-ilname:link pattern to search (case insensitive):' \
+  '-name:name pattern to search:' \
+  '-iname:name pattern to search (case insensitive):' \
+  '-path:path pattern to search:' \
+  '-ipath:path pattern to search (case insensitive):' \
+  '-regex:regular expression to search:' \
+  '-iregex:regular expression to search (case insensitive):' \
+  '-inum:inode number:' \
+  '-links:number of links:' \
+  '-nouser' \
+  '-nogroup' \
+  '-perm:file permission bits:' \
+  '-size:file size:' \
+  '-true' \
+  '-type:file type:(b c d p f l s)' \
+  '-xtype:file type:(b c d p f l s)' \
+  '-exec:program: _command_names -e:*\;::program arguments: _normal' \
+  '-ok:program: _command_names -e:*\;::program arguments: _normal' \
+  '-fls:output file:_files' \
+  '-fprint:output file:_files' \
+  '-fprint0:output file:_files' \
+  '-fprintf:output file:_files:output format:' \
+  '-print' \
+  '-print0' \
+  '-printf:output format:' \
+  '-prune' \
+  '-ls' \
+  '*:directory:_files -/'
