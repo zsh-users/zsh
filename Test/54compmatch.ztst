@@ -471,7 +471,7 @@
 
  test_code 'r:|[A-Z0-9]=** r:|=*' example6_list
  comptest $'tst H\t'
-0:Documentation example using "r:|[A-Z0-9]=* r:|=*", input 2
+0:Documentation example using "r:|[A-Z0-9]=** r:|=*", input H
 >line: {tst H}{}
 >COMPADD:{}
 >INSERT_POSITIONS:{4}
@@ -480,7 +480,7 @@
 
  test_code 'r:|[A-Z0-9]=** r:|=*' example6_list
  comptest $'tst 2\t\t'
-0:Documentation example using "r:|[A-Z0-9]=* r:|=*", input 2
+0:Documentation example using "r:|[A-Z0-9]=** r:|=*", input 2
 >line: {tst 5}{23}
 >COMPADD:{}
 >INSERT_POSITIONS:{5:7}

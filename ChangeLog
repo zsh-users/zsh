@@ -20,6 +20,10 @@
 
 	* unposted: Completion/User/_w3m: complete for w3m.
 
+2001-03-06  Bart Schaefer  <schaefer@zsh.org>
+
+	* 13583: Test/54compmatch.ztst: Tweak doc strings for accuracy.
+
 2001-03-06  Sven Wischnowsky  <wischnow@zsh.org>
 
 	* 13576: Src/lex.c, Src/parse.c: make the parser use real memory
