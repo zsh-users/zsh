@@ -318,6 +318,7 @@ scanpmmapfile(HashTable ht, ScanFunc func, int flags)
 	 * we always read the entire contents of every single file
 	 * in the directory into memory.  Hence just leave it empty.
 	 */
+	pm.nam = dupstring(pm.nam);
 	pm.u.str = "";
 	func((HashNode) &pm, flags);
     }

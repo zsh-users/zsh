@@ -1,3 +1,8 @@
+2001-04-11  Peter Stephenson  <pws@pwstephenson.fsnet.co.uk>
+
+	* 13944: Src/Modules/mapfile.c (from Bart): dupstring the
+	parameter name to avoid static buffer re-use problem.
+
 2001-04-10  Wayne Davison  <wayned@users.sourceforge.net>
 
 	* unposted: Src/hist.c: Slightly enhanced should_ignore_line()
