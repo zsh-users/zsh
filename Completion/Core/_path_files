@@ -247,6 +247,8 @@ for prepath in "$prepaths[@]"; do
   # in the following loop, which walks through the pathname components
   # in the string from the line.
 
+  skipped=
+  cpre=
   tpre="$pre"
   tsuf="$suf"
   testpath="$donepath"
