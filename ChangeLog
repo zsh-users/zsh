@@ -1,3 +1,10 @@
+2001-05-26  Wayne Davison  <wayned@users.sourceforge.net>
+
+	* 14488: Src/Zle/zle_hist.c: fixed accept-and-infer-next-history
+	when called repeatedly.  Also made the infer actions and
+	accept-line-and-down-history not get tripped up by transitory
+	changes to the history data.
+
 2001-05-26  Andrej Borsenkow <bor@zsh.org>
 
 	* 14489: Test/C02cond.ztst: workaround for (probably) find
