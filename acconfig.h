@@ -318,8 +318,5 @@
 /* Define if you have the terminfo strnames symbol.  */
 #undef HAVE_STRNAMES
 
-/* Define if we have curses.h */
-#undef HAVE_CURSES_H
-
 /* Define if term.h chokes without curses.h */
 #undef TERM_H_NEEDS_CURSES_H

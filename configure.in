@@ -562,15 +562,14 @@ esac])dnl
 AC_SEARCH_LIBS(tgetent, [$termcap_curses_order])
 case "$LIBS" in
 *curses*)
-AC_CACHE_CHECK(for curses.h, ac_cv_header_curses_h,
+AC_CHECK_HEADERS(curses.h, [],
+AC_CACHE_CHECK(for Solaris 8 curses.h mistake, ac_cv_header_curses_h,
 AC_TRY_COMPILE([#include <curses.h>], [],
 [ac_cv_header_curses_h=yes
 AC_DEFINE(HAVE_CURSES_H)],
-ac_cv_header_curses_h=no))
-AC_CHECK_HEADERS(term.h)
-if test x$ac_cv_header_term_h = xyes; then
-
-AC_MSG_CHECKING(if term.h needs curses.h)
+ac_cv_header_curses_h=no)))
+AC_CHECK_HEADERS(term.h,
+[AC_MSG_CHECKING(if term.h needs curses.h)
 AC_TRY_COMPILE([#include <term.h>], [char **test = boolcodes;], boolcodes_with_only_term_h=yes,
 boolcodes_with_only_term_h=no)
 AC_TRY_COMPILE([#include <curses.h>
@@ -620,8 +619,7 @@ AC_TRY_LINK([#include <curses.h>
 #include <term.h>], [char **test = strnames; printf(*test);],
 AC_DEFINE(HAVE_STRNAMES) strnames=yes, strnames=no)
 AC_MSG_RESULT($strnames)
-
-fi;;
+]);;
 esac
 
 dnl Some systems (Solaris 2.x, Linux Redhat 5.x) require
