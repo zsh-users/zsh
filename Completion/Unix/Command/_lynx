@@ -11,43 +11,61 @@ _arguments -C \
   '-assume_unrec_charset=:MIMENAME:' \
   '-auth=:ID\:PW:' \
   '-base' \
+  '-bibp=:bibp server:_urls' \
   '-blink' \
   '-book' \
   '-buried_news' \
   '-cache=:number of documents:' \
   '-case' \
+  '-center' \
   '-cfg=:configuration file:_files' \
   '-child' \
+  '-cmd_log=:keystroke log:_files' \
+  '-cmd_script=:keystroke log:_files' \
   '-color' \
+  '-connect_timeout=:seconds:' \
+  '-cookie_file=:cookie file:_files' \
+  '-cookie_save_file=:cookie file:_files' \
   '-cookies' \
   '-core' \
   '-crawl' \
+  '-curses_pads' \
+  '-debug_partial' \
   '-display=:display:_x_display' \
+  '-display_charset=:mimename:' \
+  '-dont_wrap_pre' \
   '-dump' \
   '-editor=:editor:_command_names -e' \
   '-emacskeys' \
   '-enable_scrollback' \
   '-error_file=:error file:_files' \
+  '-exec' \
   '-fileversions' \
+  '-force_empty_hrefless_a' \
   '-force_html' \
   '-force_secure' \
+  '-forms_options' \
   '-from' \
   '-ftp' \
   '-get_data' \
   '-head' \
   '-help' \
+  '-hiddenlinks=:option:(merge listonly ignore)' \
   '-historical' \
   '-homepage=:URL:->html' \
   '-image_links' \
-  '-ismap' \
   '-index=:URL:->html' \
+  '-ismap' \
+  '-justify' \
   '-link=:starting count:' \
   '-localhost' \
   '-locexec' \
+  '-lss=:color-style file:_files' \
   '-mime_header' \
   '-minimal' \
   '-newschunksize=:NUMBER:' \
   '-newsmaxchunk=:NUMBER:' \
+  '-nobold' \
   '-nobrowse' \
   '-nocc' \
   '-nocolor' \
@@ -60,14 +78,19 @@ _arguments -C \
   '-noprint' \
   '-noredir' \
   '-noreferer' \
+  '-noreverse' \
   '-nosocks' \
   '-nostatus' \
+  '-nounderline' \
+  '-number_fields' \
   '-number_links' \
   '-partial' \
+  '-partial_thres=:NUMBER:' \
   '-pauth=:ID\:PW:' \
   '-popup' \
   '-post_data' \
   '-preparsed' \
+  '-prettysrc' \
   '-print' \
   '-pseudo_inlines' \
   '-raw' \
@@ -76,25 +99,35 @@ _arguments -C \
   '-restrictions=:options:->restrictions' \
   '-resubmit_posts' \
   '-rlogin' \
+  '-scrollbar' \
+  '-scrollbar_arrow' \
   '-selective' \
+  '-short_url' \
   '-show_cursor' \
+  '-show_rate' \
   '-soft_dquotes' \
   '-source' \
+  '-stack_dump' \
   '-startfile_ok' \
+  '-stdin' \
   '-tagsoup' \
   '-telnet' \
   '-term=:terminal name:_terminals' \
   '-tlog' \
+  '-tna' \
   '-trace' \
+  '-trace_mask=:trace mask:(0 1 2 3 4 5 6 7)' \
   '-traversal' \
+  '-trim_input_fields' \
   '-underscore' \
-  '-useragent=:NAME:' \
   '-use_mouse' \
+  '-useragent=:NAME:' \
   '-validate' \
   '-verbose' \
   '-version' \
   '-vikeys' \
   '-width=:NUMBER:' \
+  '-with_backspaces' \
   ':url:->html' && return 0
 
 case "$state" in
