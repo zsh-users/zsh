@@ -1,3 +1,11 @@
+2000-05-11  Sven Wischnowsky  <wischnow@zsh.org>
+
+	* 11319: Completion/Core/_main_complete, Doc/Zsh/compsys.yo,
+ 	Doc/Zsh/mod_complist.yo, Src/Zle/compcore.c, Src/Zle/complist.c:
+ 	make ^G in menu-selection restore the old command line; add
+ 	select=long* values for menu style to start menu-selection if list
+ 	is too long for screen
+	
 2000-05-11  Oliver Kiddle  <opk@zsh.org>
 
 	* 11315: Doc/Zsh/builtins.yo, Doc/Zsh/compsys.yo, Doc/Zsh/compwid.yo,

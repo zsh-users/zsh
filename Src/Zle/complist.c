@@ -2135,7 +2135,7 @@ domenuselect(Hookdef dummy, Chdata dat)
 	showinglist = -2;
 	minfo.asked = 0;
     }
-    if (!noselect) {
+    if (!noselect && (!dat || acc)) {
 	showinglist = -2;
 	onlyexpl = oe;
 	if (!smatches)
@@ -2145,7 +2145,7 @@ domenuselect(Hookdef dummy, Chdata dat)
     mlbeg = -1;
     fdat = NULL;
 
-    return (!noselect ^ acc);
+    return (dat ? (acc ? 1 : 2) : (!noselect ^ acc));
 }
 
 /* The widget function. */

@@ -499,12 +499,22 @@ after_complete(Hookdef dummy, Compldat dat)
 {
     if (menucmp && !oldmenucmp) {
 	struct chdata dat;
+	int ret;
 
 	dat.matches = amatches;
 	dat.num = nmatches;
 	dat.cur = NULL;
-	if (runhookdef(MENUSTARTHOOK, (void *) &dat))
+	if ((ret = runhookdef(MENUSTARTHOOK, (void *) &dat))) {
 	    menucmp = menuacc = 0;
+	    if (ret == 2) {
+		cs = 0;
+		foredel(ll);
+		inststr(origline);
+		cs = origcs;
+		clearlist = 1;
+		invalidatelist();
+	    }
+	}
     }
     return 0;
 }

@@ -253,7 +253,8 @@ item(tt(accept-line))(
 accepts the current match and leaves menu selection
 )
 item(tt(send-break))(
-leaves menu selection and continues with normal menu completion
+leaves menu selection and restores the previous contents of the
+command line
 )
 item(tt(redisplay), tt(clear-screen))(
 execute their normal function without leaving menu selection

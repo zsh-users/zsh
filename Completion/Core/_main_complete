@@ -129,11 +129,20 @@ curcontext="${curcontext/:[^:]#:/::}"
 nm=$compstate[nmatches]
 
 if [[ $compstate[old_list] = keep || nm -gt 1 ]]; then
-  [[ _last_nmatches -ge 0 && _last_nmatches -ne $compstate[nmatches] ]] &&
+  [[ _last_nmatches -ge 0 && _last_nmatches -ne nm ]] &&
       _menu_style=( "$_last_menu_style[@]" "$_menu_style[@]" )
 
-  if [[ "$compstate[insert]" = "$_saved_insert" ]]; then
-    if [[ -n "$_menu_style[(r)(yes|true|1|on)]" ||
+  tmp=$(( compstate[list_lines] + BUFFERLINES + 1 ))
+
+  _menu_style=( "$_menu_style[@]" "$_def_menu_style[@]" )
+
+  if [[ -z "$compstate[insert]" ]]; then
+    [[ -n "$_menu_style[(r)select=long-list]" && tmp -gt LINES ]] &&
+        compstate[insert]=menu
+  elif [[ "$compstate[insert]" = "$_saved_insert" ]]; then
+    if [[ -n "$_menu_style[(r)select=long]" && tmp -gt LINES ]]; then
+        compstate[insert]=menu
+    elif [[ -n "$_menu_style[(r)(yes|true|1|on)]" ||
           ( -n "$_menu_style[(r)auto*]" &&
             "$compstate[insert]" = automenu ) ]]; then
       compstate[insert]=menu
@@ -154,11 +163,12 @@ if [[ $compstate[old_list] = keep || nm -gt 1 ]]; then
     fi
   fi
 
-  _menu_style=( "$_menu_style[@]" "$_def_menu_style[@]" )
-
   if [[ "$compstate[insert]" = *menu* ]]; then
     if [[ -n "$_menu_style[(r)no-select*]" ]]; then
       unset MENUSELECT
+    elif [[ -n "$_menu_style[(r)select=long*]" && tmp -gt LINES ]]; then
+      zmodload -i zsh/complist
+      MENUSELECT=0
     else
       sel=( "${(@M)_menu_style:#select*}" )
 

@@ -1498,6 +1498,13 @@ it will be started only if at least that many matches are generated
 smallest one is taken). Starting menuselection can explicitly be
 turned off by defining a value containing the string
 `tt(no-select)'.
+
+There is also support to start menu-selection only when the list of
+matches does not fit on the screen, turned on by using the string
+`tt(select=long)' in the value. However, this will only start
+menu-selection if the widget invoked does completion and not only
+listing (like tt(delete-char-or-list)). To start menu-selection even
+for such widgets one can include the string `tt(select=long-list)'.
 )
 kindex(numbers, completion style)
 item(tt(numbers))(
