@@ -1,0 +1,9 @@
+#autoload
+
+# Usage: _hostport host
+
+local host="$1"
+shift
+
+compadd "$@" - ${${(M)hosts\:#$host\:*}#*\:}
+
