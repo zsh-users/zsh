@@ -1,8 +1,0 @@
-#autoload
-
-local ret=1
-
-_rpm_package && ret=0
-_rpm_pkg_file && ret=0
-
-return ret

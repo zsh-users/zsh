@@ -1,7 +1,0 @@
-DISTFILES_SRC='
-    .distfiles
-    _rpm _rpm_arguments _rpm_build _rpm_capability _rpm_install
-    _rpm_package _rpm_pkg_file _rpm_pkg_or_file _rpm_query _rpm_rebuild
-    _rpm_rebuilddb _rpm_relocate _rpm_resign _rpm_sigcheck _rpm_tags
-    _rpm_uninstall _rpm_upgrade _rpm_verify
-'

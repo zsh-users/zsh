@@ -1,4 +1,0 @@
-#autoload
-
-_rpm_arguments \
-  '*:RPM binary package file:_rpm_pkg_file'

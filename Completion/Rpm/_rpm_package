@@ -1,6 +1,0 @@
-#autoload
-
-local expl
-
-_description expl 'RPM package'
-compadd "$expl[@]" -M 'r:|-=* r:|=*' - $(rpm -qa)
