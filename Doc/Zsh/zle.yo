@@ -712,6 +712,8 @@ mode when it starts up.
 example(zle-line-init() { zle -K vicmd; }
 zle -N zle-line-init)
 
+(The command inside the function sets the keymap directly; it is
+equivalent to tt(zle vi-cmd-mode).)
 )
 enditem()
 

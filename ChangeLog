@@ -1,3 +1,8 @@
+2003-12-15  Peter Stephenson  <pws@csr.com>
+
+	* unposted: Doc/Zsh/zle.yo: add an extra comment to
+	the zle -K vicmd at Bart's suggestion in 19282.
+
 2003-12-12  Peter Stephenson  <pws@pwstephenson.fsnet.co.uk>
 
 	* 19281: Src/Zle/zle_main.c, Src/Zle/zle_thingy.c, Doc/Zsh/zle.yo:
