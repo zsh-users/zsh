@@ -1541,8 +1541,7 @@ mod_export int asklist(void)
 		tcmultout(TCUP, TCMULTUP, nlnct);
 	    } else
 		putc('\n', shout);
-	    if (minfo.cur)
-		minfo.asked = 2;
+	    minfo.asked = 2;
 	    return 1;
 	}
 	if (clearflag) {
@@ -1553,10 +1552,9 @@ mod_export int asklist(void)
 	} else
 	    putc('\n', shout);
 	settyinfo(&shttyinfo);
-	if (minfo.cur)
-	    minfo.asked = 1;
+	minfo.asked = 1;
     }
-    return 0;
+    return (minfo.asked ? minfo.asked - 1 : 0);
 }
 
 /**/

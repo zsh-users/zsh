@@ -782,7 +782,7 @@ complistmatches(Hookdef dummy, Chdata dat)
 
     if (asklist()) {
 	amatches = oamatches;
-	return 1;
+	return (noselect = 1);
     }
     if (mselect >= 0) {
 	int i;
