@@ -3,6 +3,8 @@
 %prep
 
   foo=(a b c d e f g)
+  mkdir array.tmp
+  touch array.tmp/{1..9}
 
 %test
 
@@ -75,3 +77,21 @@
   unsetopt ksh_arrays
 0:Ksh array indexing (iii)
 >.b c d e f g.
+
+  cd array.tmp
+  echo . ?([3,5]) .
+  cd ..
+0:Glob array indexing
+>. 3 4 5 .
+
+  cd array.tmp
+  echo . ?([2,-2]) .
+  cd ..
+0:Glob array indexing (ii)
+>. 2 3 4 5 6 7 8 .
+
+  cd array.tmp
+  echo . ?([-6,-4]) .
+  cd ..
+0:Glob array indexing (iii)
+>. 4 5 6 .
