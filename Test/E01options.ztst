@@ -56,9 +56,9 @@
 #    AUTO_CD
 #
 # Other difficult things I haven't done:
-#    GLOBAL_RCS (uses fixed files outside build ar
+#    GLOBAL_RCS (uses fixed files outside build area)
 #    HASH_CMDS     )
-#    HASH_DIRS     )  fairly seriously internal
+#    HASH_DIRS     )  fairly seriously internal, hard to test at all
 #    HASH_LIST_ALL )
 
 %prep
