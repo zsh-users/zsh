@@ -1,4 +1,5 @@
 DISTFILES_SRC='
 .distfiles
 .cvsignore   README       compaudit    compdump     compinit     compinstall
+bashcompinit
 '
