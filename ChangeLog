@@ -1,3 +1,9 @@
+2002-04-16  Sven Wischnowsky  <wischnow@zsh.org>
+
+	* 16990: Src/Zle/zle_tricky.c: treat backslashed bangs in
+	double quotes specially in get_comp_string(), they are more
+	like $s there
+
 2002-04-12  Clint Adams  <clint@zsh.org>
 
         * 16973: Completion/Debian/Command/_apt: complete package name
