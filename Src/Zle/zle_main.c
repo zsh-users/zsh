@@ -76,7 +76,7 @@ int mark;
 /* last character pressed */
 
 /**/
-int c;
+mod_export int lastchar;
 
 /* the bindings for the previous and for this key */
 
@@ -688,7 +688,7 @@ zlecore(void)
 	selectlocalmap(NULL);
 	bindk = getkeycmd();
 	if (!ll && isfirstln && !(zlereadflags & ZLRF_IGNOREEOF) &&
-	    c == eofchar) {
+	    lastchar == eofchar) {
 	    eofsent = 1;
 	    break;
 	}

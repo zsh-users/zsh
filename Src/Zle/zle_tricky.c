@@ -193,7 +193,7 @@ completeword(char **args)
     usemenu = !!isset(MENUCOMPLETE);
     useglob = isset(GLOBCOMPLETE);
     wouldinstab = 0;
-    if (c == '\t' && usetab())
+    if (lastchar == '\t' && usetab())
 	return selfinsert(args);
     else {
 	int ret;
@@ -215,7 +215,7 @@ menucomplete(char **args)
     usemenu = 1;
     useglob = isset(GLOBCOMPLETE);
     wouldinstab = 0;
-    if (c == '\t' && usetab())
+    if (lastchar == '\t' && usetab())
 	return selfinsert(args);
     else
 	return docomplete(COMP_COMPLETE);
@@ -262,7 +262,7 @@ expandword(char **args)
 {
     usemenu = useglob = 0;
     wouldinstab = 0;
-    if (c == '\t' && usetab())
+    if (lastchar == '\t' && usetab())
 	return selfinsert(args);
     else
 	return docomplete(COMP_EXPAND);
@@ -275,7 +275,7 @@ expandorcomplete(char **args)
     usemenu = !!isset(MENUCOMPLETE);
     useglob = isset(GLOBCOMPLETE);
     wouldinstab = 0;
-    if (c == '\t' && usetab())
+    if (lastchar == '\t' && usetab())
 	return selfinsert(args);
     else {
 	int ret;
@@ -297,7 +297,7 @@ menuexpandorcomplete(char **args)
     usemenu = 1;
     useglob = isset(GLOBCOMPLETE);
     wouldinstab = 0;
-    if (c == '\t' && usetab())
+    if (lastchar == '\t' && usetab())
 	return selfinsert(args);
     else
 	return docomplete(COMP_EXPAND_COMPLETE);
@@ -2294,7 +2294,7 @@ magicspace(char **args)
 {
     char *bangq;
     int ret;
-    c = ' ';
+    lastchar = ' ';
     for (bangq = (char *)line; (bangq = strchr(bangq, bangchar)); bangq += 2)
 	if (bangq[1] == '"' && (bangq == (char *)line || bangq[-1] != '\\'))
 	    break;

@@ -1,5 +1,10 @@
 2004-03-08  Peter Stephenson  <pws@csr.com>
 
+	* 19553: Index: Src/Zle/complist.c, Src/Zle/zle_hist.c,
+	Src/Zle/zle_keymap.c, Src/Zle/zle_main.c, Src/Zle/zle_misc.c,
+	Src/Zle/zle_move.c, Src/Zle/zle_tricky.c, Src/Zle/zle_vi.c:
+	Rename `c' to `lastchar' and mark for export.
+
 	* 19552: Src/params.c: missing mod_export.
 
 2004-03-07  Oliver Kiddle  <opk@zsh.org>

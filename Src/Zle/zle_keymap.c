@@ -1257,11 +1257,11 @@ getkeymapcmd(Keymap km, Thingy *funcp, char **strp)
 {
     Thingy func = t_undefinedkey;
     char *str = NULL;
-    int lastlen = 0, lastc = c;
+    int lastlen = 0, lastc = lastchar;
 
     keybuflen = 0;
     keybuf[0] = 0;
-    while((c = getkeybuf(!!lastlen)) != EOF) {
+    while((lastchar = getkeybuf(!!lastlen)) != EOF) {
 	char *s;
 	Thingy f;
 	int loc = 1;
@@ -1274,7 +1274,7 @@ getkeymapcmd(Keymap km, Thingy *funcp, char **strp)
 	    lastlen = keybuflen;
 	    func = f;
 	    str = s;
-	    lastc = c;
+	    lastc = lastchar;
 	}
 	if(!keyisprefix((loc ? localkeymap : km), keybuf))
 	    break;
@@ -1282,7 +1282,7 @@ getkeymapcmd(Keymap km, Thingy *funcp, char **strp)
     if(!lastlen && keybuflen)
 	lastlen = keybuflen;
     else
-	c = lastc;
+	lastchar = lastc;
     if(lastlen != keybuflen) {
 	unmetafy(keybuf + lastlen, &keybuflen);
 	ungetkeys(keybuf+lastlen, keybuflen);

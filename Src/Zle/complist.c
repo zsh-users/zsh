@@ -1859,7 +1859,7 @@ msearch(Cmatch **ptr, int ins, int back, int rep, int *wrapp)
     msearchpush(ptr, back);
 
     if (ins) {
-        s[0] = c;
+        s[0] = lastchar;
         s[1] = '\0';
 
         msearchstr = dyncat(msearchstr, s);
@@ -2754,9 +2754,9 @@ domenuselect(Hookdef dummy, Chdata dat)
                     }
                 }
                 if (cmd == Th(z_selfinsertunmeta)) {
-                    c &= 0x7f;
-                    if (c == '\r')
-                        c = '\n';
+                    lastchar &= 0x7f;
+                    if (lastchar == '\r')
+                        lastchar = '\n';
                 }
                 wrap = 0;
                 np = msearch(p, ins, (ins ? (mode == MM_BSEARCH) : back),

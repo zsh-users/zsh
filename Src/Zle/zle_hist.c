@@ -949,17 +949,17 @@ doisearch(char **args, int dir)
 		sbuf[sbptr] = '^';
 		zrefresh();
 	    }
-	    if ((c = getkey(0)) == EOF)
+	    if ((lastchar = getkey(0)) == EOF)
 		feep = 1;
 	    else
 		goto ins;
 	} else {
 	    if(cmd == Th(z_selfinsertunmeta)) {
-		c &= 0x7f;
-		if(c == '\r')
-		    c = '\n';
+		lastchar &= 0x7f;
+		if(lastchar == '\r')
+		    lastchar = '\n';
 	    } else if (cmd == Th(z_magicspace))
-		c = ' ';
+		lastchar = ' ';
 	    else if (cmd != Th(z_selfinsert)) {
 		ungetkeycmd();
 		if (cmd == Th(z_sendbreak))
@@ -977,7 +977,7 @@ doisearch(char **args, int dir)
 		sbuf = ibuf + FIRST_SEARCH_CHAR;
 		sibuf *= 2;
 	    }
-	    sbuf[sbptr++] = c;
+	    sbuf[sbptr++] = lastchar;
 	}
 	if (feep)
 	    handlefeep(zlenoargs);
@@ -1091,7 +1091,7 @@ getvisrchstr(void)
 	    break;
 	}
 	if(cmd == Th(z_magicspace)) {
-	    c = ' ';
+	    lastchar = ' ';
 	    cmd = Th(z_selfinsert);
 	}
 	if(cmd == Th(z_redisplay)) {
@@ -1126,15 +1126,15 @@ getvisrchstr(void)
 		sbuf[sptr] = '^';
 		zrefresh();
 	    }
-	    if ((c = getkey(0)) == EOF)
+	    if ((lastchar = getkey(0)) == EOF)
 		feep = 1;
 	    else
 		goto ins;
 	} else if(cmd == Th(z_selfinsertunmeta) || cmd == Th(z_selfinsert)) {
 	    if(cmd == Th(z_selfinsertunmeta)) {
-		c &= 0x7f;
-		if(c == '\r')
-		    c = '\n';
+		lastchar &= 0x7f;
+		if(lastchar == '\r')
+		    lastchar = '\n';
 	    }
 	  ins:
 	    if(sptr == ssbuf - 1) {
@@ -1142,7 +1142,7 @@ getvisrchstr(void)
 		strcpy(newbuf, sbuf);
 		statusline = sbuf = newbuf;
 	    }
-	    sbuf[sptr++] = c;
+	    sbuf[sptr++] = lastchar;
 	} else {
 	    feep = 1;
 	}

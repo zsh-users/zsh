@@ -62,11 +62,11 @@ selfinsert(char **args)
 {
     char s[3], *p = s;
 
-    if(imeta(c)) {
+    if(imeta(lastchar)) {
 	*p++ = Meta;
-	c ^= 32;
+	lastchar ^= 32;
     }
-    *p++ = c;
+    *p++ = lastchar;
     *p = 0;
     doinsert(s);
     return 0;
@@ -76,9 +76,9 @@ selfinsert(char **args)
 int
 selfinsertunmeta(char **args)
 {
-    c &= 0x7f;
-    if (c == '\r')
-	c = '\n';
+    lastchar &= 0x7f;
+    if (lastchar == '\r')
+	lastchar = '\n';
     return selfinsert(args);
 }
 
@@ -489,11 +489,11 @@ quotedinsert(char **args)
     sob.sg_flags = (sob.sg_flags | RAW) & ~ECHO;
     ioctl(SHTTY, TIOCSETN, &sob);
 #endif
-    c = getkey(0);
+    lastchar = getkey(0);
 #ifndef HAS_TIO
     zsetterm();
 #endif
-    if (c < 0)
+    if (lastchar < 0)
 	return 1;
     else
 	return selfinsert(args);
@@ -506,7 +506,7 @@ digitargument(char **args)
     int sign = (zmult < 0) ? -1 : 1;
 
     /* allow metafied as well as ordinary digits */
-    if ((c & 0x7f) < '0' || (c & 0x7f) > '9')
+    if ((lastchar & 0x7f) < '0' || (lastchar & 0x7f) > '9')
 	return 1;
 
     if (!(zmod.flags & MOD_TMULT))
@@ -514,10 +514,10 @@ digitargument(char **args)
     if (zmod.flags & MOD_NEG) {
 	/* If we just had a negative argument, this is the digit, *
 	 * rather than the -1 assumed by negargument()            */
-	zmod.tmult = sign * (c & 0xf);
+	zmod.tmult = sign * (lastchar & 0xf);
 	zmod.flags &= ~MOD_NEG;
     } else
-	zmod.tmult = zmod.tmult * 10 + sign * (c & 0xf);
+	zmod.tmult = zmod.tmult * 10 + sign * (lastchar & 0xf);
     zmod.flags |= MOD_TMULT;
     prefixflag = 1;
     return 0;
@@ -764,16 +764,16 @@ executenamedcommand(char *prmt)
 	} else if(cmd == Th(z_viquotedinsert)) {
 	    *ptr = '^';
 	    zrefresh();
-	    c = getkey(0);
-	    if(c == EOF || !c || len == NAMLEN)
+	    lastchar = getkey(0);
+	    if(lastchar == EOF || !lastchar || len == NAMLEN)
 		feep = 1;
 	    else
-		*ptr++ = c, len++, curlist = 0;
+		*ptr++ = lastchar, len++, curlist = 0;
 	} else if(cmd == Th(z_quotedinsert)) {
-	    if((c = getkey(0)) == EOF || !c || len == NAMLEN)
+	    if((lastchar = getkey(0)) == EOF || !lastchar || len == NAMLEN)
 		feep = 1;
 	    else
-		*ptr++ = c, len++, curlist = 0;
+		*ptr++ = lastchar, len++, curlist = 0;
 	} else if(cmd == Th(z_backwarddeletechar) ||
 	    	cmd == Th(z_vibackwarddeletechar)) {
 	    if (len)
@@ -811,15 +811,15 @@ executenamedcommand(char *prmt)
 		unrefthingy(r);
 	    }
 	    if(cmd == Th(z_selfinsertunmeta)) {
-		c &= 0x7f;
-		if(c == '\r')
-		    c = '\n';
+		lastchar &= 0x7f;
+		if(lastchar == '\r')
+		    lastchar = '\n';
 		cmd = Th(z_selfinsert);
 	    }
 	    if (cmd == Th(z_listchoices) || cmd == Th(z_deletecharorlist) ||
 		cmd == Th(z_expandorcomplete) || cmd == Th(z_completeword) ||
 		cmd == Th(z_expandorcompleteprefix) || cmd == Th(z_vicmdmode) ||
-		cmd == Th(z_acceptline) || c == ' ' || c == '\t') {
+		cmd == Th(z_acceptline) || lastchar == ' ' || lastchar == '\t') {
 		cmdambig = 100;
 
 		cmdll = newlinklist();
@@ -866,10 +866,11 @@ executenamedcommand(char *prmt)
 		    len = cmdambig;
 		}
 	    } else {
-		if (len == NAMLEN || icntrl(c) || cmd != Th(z_selfinsert))
+		if (len == NAMLEN || icntrl(lastchar) ||
+		    cmd != Th(z_selfinsert))
 		    feep = 1;
 		else
-		    *ptr++ = c, len++, curlist = 0;
+		    *ptr++ = lastchar, len++, curlist = 0;
 	    }
 	}
 	if (feep)
