@@ -2775,6 +2775,24 @@ build_cur_dump(char *nam, char *dump, char **names, int match, int map,
 
 static FuncDump dumps;
 
+/**/
+static int
+zwcstat(char *filename, struct stat *buf, FuncDump dumps)
+{
+    FuncDump f;
+    
+    if (stat(filename, buf)) {
+#ifdef HAVE_FSTAT
+	for (f = dumps; f; f = f->next) {
+	    if (!strncmp(filename, f->filename, strlen(f->filename)) &&
+		!fstat(f->fd, buf))
+		return 0;
+	}
+#endif
+	return 1;
+    } else return 0;
+}
+
 /* Load a dump file (i.e. map it). */
 
 static void
@@ -2829,6 +2847,10 @@ load_dump_file(char *dump, struct stat *sbuf, int other, int len)
     d->count = 0;
     d->filename = ztrdup(dump);
 }
+
+#else
+
+#define zwcstat(f, b, d) stat(f, b)
 
 #endif
 

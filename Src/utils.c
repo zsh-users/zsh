@@ -3829,22 +3829,3 @@ mailstat(char *path, struct stat *st)
        return 0;
 }
 #endif
-
-/**/
-mod_export int
-zwcstat(char *filename, struct stat *buf, FuncDump dumps)
-{
-    FuncDump f;
-    
-    if (stat(filename, buf)) {
-#ifdef HAVE_FSTAT
-	for (f = dumps; f; f = f->next) {
-	    if (!strncmp(filename, f->filename, strlen(f->filename)) &&
-		!fstat(f->fd, buf))
-		return 0;
-	}
-#endif
-	return 1;
-    } else return 0;
-    
-}

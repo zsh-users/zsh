@@ -1,5 +1,8 @@
 2001-06-09  Bart Schaefer  <schaefer@zsh.org>
 
+	* 14827: Src/parse.c, Src/utils.c: Move zwcstat() to parse.c
+	where it can be wrapped in #ifdef USE_MMAP.
+
 	* 14824: Test/comptest: Avoid echotc (improvement on 14792).
 
 2001-06-08  Clint Adams  <clint@zsh.org>
