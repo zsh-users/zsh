@@ -451,7 +451,7 @@ AC_CHECK_HEADERS(sys/time.h sys/times.h sys/select.h termcap.h termio.h \
 		 limits.h fcntl.h libc.h sys/utsname.h sys/resource.h \
 		 locale.h errno.h stdlib.h unistd.h sys/capability.h \
 		 utmp.h utmpx.h sys/types.h pwd.h grp.h poll.h sys/mman.h \
-		 linux/tasks.h netinet/in_systm.h stdarg.h varargs.h)
+		 linux/tasks.h netinet/in_systm.h)
 if test $dynamic = yes; then
   AC_CHECK_HEADERS(dlfcn.h)
   AC_CHECK_HEADERS(dl.h)
@@ -860,7 +860,6 @@ AC_CHECK_FUNCS(strftime difftime gettimeofday \
 	       initgroups nis_list \
 	       setuid seteuid setreuid setresuid setsid \
 	       memcpy memmove strstr strerror \
-	       snprintf vsnprintf asprintf \
 	       cap_get_proc \
 	       getrlimit \
 	       setlocale \
