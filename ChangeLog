@@ -1,5 +1,7 @@
 2003-07-23  Oliver Kiddle  <opk@zsh.org>
 
+	* 18890: Completion/Unix/Command/_sablotron: new sabcmd completion
+
 	* 18877: Etc/completion-style-guide: add a few more points
 
 2003-07-23  Peter Stephenson  <pws@csr.com>

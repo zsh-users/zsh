@@ -13,12 +13,12 @@ _cpio         _getconf      _lp           _pbm          _sudo         _zdump
 _cvs          _gnu_generic  _ls           _perl         _tar          _zip
 _dd           _gprof        _lynx         _perldoc      _telnet       _pine
 _dict         _grep         _lzop         _prcs         _tiff         _elm
-_diff         _gs           _make         _psutils      _tin	_apm  _mail
+_diff         _gs           _make         _psutils      _tin	      _mail
 _last         _loadkeys     _ruby         _sysctl       _links        _samba
 _user_admin   _rsync        _arping	  _spamassassin _mtools       _ifconfig
 _fsh          _chkconfig    _cdcd         _irssi        _mysqldiff    _sccs
 _netcat       _larch        _texinfo	  _figlet       _elinks       _tidy
 _global       _global_tags  _ant          _lsof         _mt           _xmlsoft
-_perforce     _python       _antiword     _screen       _renice
-_ecasound     _gpg	    _subversion   _aap
+_perforce     _python       _antiword     _screen       _renice       _apm
+_ecasound     _gpg	    _subversion   _aap          _sablotron
 '
