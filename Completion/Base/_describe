@@ -24,7 +24,7 @@ shift OPTIND-1
 
 if [[ -n "$isopt" ]]; then
 
-  # We take the value to test the number of patches from a non-local
+  # We take the value to test the number of matches from a non-local
   # parameter `nm' if that exists and contains only digits. It's a hack.
 
   if [[ "$nm" = [0-9]## ]]; then
