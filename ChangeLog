@@ -1,5 +1,9 @@
 2001-12-14  Clint Adams  <clint@zsh.org>
 
+	* 16336: Completion/Debian/Type/_deb_packages:
+	use apt-cache --generate pkgnames instead of
+	apt-cache dumpavail.
+
 	* 16335: Completion/Debian/Command/_apt:
 	add -g, --all-names, --recurse, pkgnames, dotty, policy
 	completions for apt-cache.

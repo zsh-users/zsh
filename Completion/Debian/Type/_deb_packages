@@ -7,7 +7,7 @@ _deb_packages_update_avail () {
       _cache_invalid DEBS_avail ) && ! _retrieve_cache DEBS_avail;
   then
     _deb_packages_cache_avail=(
-      ${(f)"$(apt-cache dumpavail | awk '/^Package:/ { print $2 }')"}
+      ${(f)"$(apt-cache --generate pkgnames)"}
     )
 
     _store_cache DEBS_avail _deb_packages_cache_avail
@@ -74,7 +74,5 @@ _deb_packages () {
 	  [[ /var/cache/apt/pkgcache.bin -nt "$1" ||
 	     /var/lib/dpkg/available -nt "$1" ]]
 	  }
-
-
 
 _deb_packages "$@"
