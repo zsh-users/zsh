@@ -1207,12 +1207,15 @@ This style is tested for the tags used when generating matches.  If it
 is set to `true', then none of the words that are already on the line
 will be considered possible completions.  If it is set to
 `tt(current)', the word the cursor is on will not be considered a
-possible completion and if it is set to `tt(other)' all words except
-the current one will not be considered to be a possible completion.
+possible completion.  The same happens if the value is
+`tt(current-shown)', but only if the list of completions is currently
+shown on the screen.  Finally, if it is set to `tt(other)' all words
+except the current one will not be considered to be a possible
+completion.
 
-The value `tt(current)' is a bit like the opposite of the
-tt(accept-exact). It means that only strings with missing characters
-will be completed.
+The values `tt(current)' and `tt(current-shown)' are a bit like the
+opposite of the tt(accept-exact). It means that only strings with
+missing characters will be completed.
 
 Note that you almost certainly don't want to set this to `true' or
 `tt(other)' for a general

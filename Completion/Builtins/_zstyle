@@ -17,31 +17,32 @@ styles=(
   break-keys             c:
   command                c:command
   completer		 c:completer
-  completions		 c:
-  condition		 c:
+  completions		 c:bool
+  condition		 c:bool
   cursor		 c:cursor
   disable-stat		 c:bool
   domains                c:
   expand		 c:
+  fake			 c:fake
   file-patterns		 c:filepat
   file-sort              c:fsort
-  force-list             c
+  force-list             c:
   format		 c:
-  glob			 c:
+  glob			 c:bool
   group-name		 c:
   group-order		 c:tag
   groups		 c:_groups
-  guarded-completer      c:completer
   hidden		 c:bool
   hosts			 c:_hosts
   hosts-ports		 c:host-port
   users-hosts-ports	 c:user-host-port
-  ignore-line            c:bool
+  ignore-line            c:ignline
   ignore-parents         c:ignorepar
   ignored-patterns	 c:
   insert-ids             c:insert-ids
   insert-tab             c:bool
   insert-unambiguous	 c:bool
+  keep-prefix		 c:keep-prefix
   last-prompt		 c:bool
   list			 c:listwhen
   list-colors		 c:
@@ -49,6 +50,8 @@ styles=(
   list-prompt            c:
   list-rows-first	 c:bool
   local			 c:
+  match-original	 c:match-orig
+  matcher		 c:
   matcher-list		 c:
   max-errors		 c:
   menu			 c:boolauto
@@ -62,6 +65,7 @@ styles=(
   prefix-hidden		 c:bool
   prefix-needed		 c:bool
   prompt		 c:
+  remote-access		 c:bool
   remove-all-dups	 c:bool
   select-prompt          c:
   select-scroll          c:
@@ -71,9 +75,12 @@ styles=(
   squeeze-slashes	 c:bool
   stop			 c:stop
   stop-keys		 c:
-  subst-globs-only       c:
-  substitute		 c:
+  subst-globs-only       c:bool
+  substitute		 c:bool
+  suffix		 c:bool
   tag-order		 c:tag
+  try-to-use-pminst	 c:bool
+  use-compctl		 c:urgh
   users			 c:_users
   users-hosts		 c:user-host
   verbose		 c:bool
@@ -254,6 +261,26 @@ while [[ -n $state ]]; do
     insert-ids)
       _wanted values expl 'when to insert process IDs' \
           compadd - menu single longer
+      ;;
+
+    fake)
+      _message 'prefix and names'
+      ;;
+
+    ignline) 
+      _wanted values expl boolean compadd true false current current-shown other
+      ;;
+
+    keep-prefix) 
+      _wanted values expl boolean compadd true false changed
+      ;;
+
+    match-orig) 
+      _wanted values expl boolean compadd only both
+      ;;
+
+    urgh) 
+      _wanted values expl no compadd no false off 0
       ;;
 
     _*)

@@ -1,3 +1,10 @@
+2000-06-19  Sven Wischnowsky  <wischnow@zsh.org>
+
+	* 11973: Completion/Builtins/_zstyle, Completion/Core/_description,
+ 	Completion/Core/_expand, Doc/Zsh/compsys.yo, Src/Zle/zle_tricky.c:
+ 	allow _expand to expand braces; better detection of braces to
+ 	complete inC
+	
 2000-06-19  Peter Stephenson  <pws@cambridgesiliconradio.com>
 
 	* unpost: additions to Completion/Commands/.distfiles and

@@ -38,6 +38,8 @@ if [[ -z "$_comp_no_ignore" ]]; then
     case "$hidden" in
     true|yes|on|1) _comp_ignore=( "$_comp_ignore[@]" "$words[@]" );;
     current)       _comp_ignore=( "$_comp_ignore[@]" "$words[CURRENT]" );;
+    current-shown) [[ "$compstate[old_list]" = *shown* ]] &&
+                       _comp_ignore=( "$_comp_ignore[@]" "$words[CURRENT]" );;
     other)         _comp_ignore=( "$_comp_ignore[@]"
                                   "${(@)words[1,CURRENT-1]}"
 				  "${(@)words[CURRENT+1,-1]}" );;

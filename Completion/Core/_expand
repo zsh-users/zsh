@@ -55,10 +55,12 @@ exp=("$word")
 
 if [[ "$force" = *s* ]] ||
    zstyle -T ":completion:${curcontext}:" substitute; then
-  exp=( "${(e)exp//\\[ 	
-]/ }" )
+  [[ ! -o ignorebraces && "${#${exp}//[^\{]}" = "${#${exp}//[^\}]}" ]] &&
+      eval exp\=\( ${${(q)exp}:gs/\\{/\{/:gs/\\}/\}/} \)
+  exp=( ${(e)exp//\\[ 	
+]/ } )
 else
-  exp=( "${exp:s/\\\$/\$}" )
+  exp=( ${exp:s/\\\$/\$} )
 fi
 
 # If the array is empty, store the original string again.

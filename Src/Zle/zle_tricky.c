@@ -1434,7 +1434,19 @@ get_comp_string(void)
 		    }
 		}
 	    } else if (p < curs) {
+		if (*p == Outbrace) {
+		    cant = 1;
+		    break;
+		}
 		if (*p == Inbrace) {
+		    char *tp = p;
+
+		    if (!skipparens(Inbrace, Outbrace, &tp)) {
+			i += tp - p - 1;
+			dp += tp - p - 1;
+			p = tp - 1;
+			continue;
+		    }
 		    if (bbeg) {
 			Brinfo new;
 			int len = bend - bbeg;
@@ -1470,6 +1482,18 @@ get_comp_string(void)
 		    hascom = 1;
 		}
 	    } else {
+		if (*p == Inbrace) {
+		    char *tp = p;
+
+		    if (!skipparens(Inbrace, Outbrace, &tp)) {
+			i += tp - p - 1;
+			dp += tp - p - 1;
+			p = tp - 1;
+			continue;
+		    }
+		    cant = 1;
+		    break;
+		}
 		if (p == curs) {
 		    if (bbeg) {
 			Brinfo new;
@@ -1501,7 +1525,7 @@ get_comp_string(void)
 		if (*p == Comma) {
 		    if (!bbeg)
 			bbeg = p;
-		    hascom = 1;
+		    hascom = 2;
 		} else if (*p == Outbrace) {
 		    Brinfo new;
 		    int len;
