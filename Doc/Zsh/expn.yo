@@ -1623,6 +1623,8 @@ will be taken  as the var(string); `tt([)', `tt({)', and `tt(<)' match
 matches itself. Note that expansions must be quoted in the var(string)
 to prevent them from being expanded before globbing is done.
 
+vindex(REPLY, use of)
+vindex(reply, use of)
 During the execution of var(string) the filename currently being tested is
 available in the parameter tt(REPLY); the parameter may be altered to
 a string to be inserted into the list instead of the original

@@ -752,11 +752,15 @@ findex(read)
 vindex(IFS, use of)
 item(tt(read) [ tt(-rzpqAclneEt) ] [ tt(-k) [ var(num) ] ] \
 [ tt(-u)var(n) ] [ var(name)[tt(?)var(prompt)] ] [ var(name) ...  ])(
+vindex(REPLY, use of)
+vindex(reply, use of)
 Read one line and break it into fields using the characters
 in tt($IFS) as separators, except as noted below.
 The first field is assigned to the first var(name), the second field
 to the second var(name), etc., with leftover
 fields assigned to the last var(name).
+If var(name) is omitted then
+tt(REPLY) is used for scalars and tt(reply) for arrays.
 
 startitem()
 item(tt(-r))(
@@ -805,8 +809,7 @@ function used for completion (specified with the tt(-K) flag to
 tt(compctl)).  If the tt(-c) flag is given, the words of the
 current command are read. If the tt(-l) flag is given, the whole
 line is assigned as a scalar.  If both flags are present, tt(-l)
-is used and tt(-c) is ignored.  If var(name) is omitted then
-tt(REPLY) is used for scalars and tt(reply) for arrays.
+is used and tt(-c) is ignored.
 )
 item(tt(-n))(
 Together with tt(-c), the number of the word the cursor is on is

@@ -1,3 +1,11 @@
+2000-08-28  Bart Schaefer  <schaefer@brasslantern.com>
+
+	* 12716: Doc/Zsh/builtins.yo, Doc/Zsh/compctl.yo,
+	Doc/Zsh/compsys.yo, Doc/Zsh/expn.yo, Doc/Zsh/grammar.yo,
+	Doc/Zsh/mod_zutil.yo, Doc/Zsh/params.yo: Documentation and index
+	entries for the REPLY and reply parameters, plus index entries for
+	a couple of paramters used by the completion system.
+
 2000-08-28  Sven Wischnowsky  <wischnow@zsh.org>
 
 	* 12710: Src/exec.c: fix for `function' without names

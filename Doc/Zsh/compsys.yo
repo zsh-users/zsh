@@ -2963,6 +2963,9 @@ example(tt(:foo:LPAR()LPAR()a\:bar b\:baz)tt(RPAR()RPAR()))
 The matches will be listed together with their descriptions if the
 tt(description) style for the tt(values) tag is set.
 
+vindex(context, use of)
+vindex(line, use of)
+vindex(opt_args, use of)
 An var(action) of the form `tt(->)var(string)' is used by functions
 that implement a state machine. In this case, the `var(string)'s (with
 all leading and trailing spaces and tabs removed) of all actions that
@@ -2983,6 +2986,7 @@ typeset -A opt_args)
 This will ensure that tt(_arguments) does not create unused global
 parameters.
 
+vindex(expl, use of)
 A string in braces is evaluated to generate the matches and if the
 var(action) does not begin with an opening parentheses or brace, it
 is also split into separate words and executed. If the var(action)
@@ -2991,7 +2995,7 @@ otherwise it will be invoked with some extra strings placed after the
 first word which can be given as arguments to the tt(compadd) builtin
 command and which make sure that the var(message) given
 in the description will be shown above the matches. These arguments
-are taken from the array parameter tt(expl) which will be set up
+are taken from the array parameter `tt(expl)' which will be set up
 before executing the var(action) and hence may be used in it (normally 
 in an expansion like `tt($expl[@])').
 

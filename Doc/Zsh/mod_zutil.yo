@@ -36,6 +36,7 @@ done in the form of calls to tt(zstyle).  Forms with arguments:
 
 startitem()
 item(tt(zstyle) [ tt(-) | tt(-)tt(-) | tt(-e) ] var(pattern) var(style) var(strings) ...)(
+vindex(reply, use of)
 Defines the given var(style) for the var(pattern) with the var(strings) as
 the value.  If the tt(-e) option is given, the var(strings) will be
 concatenated (separated by spaces) and the resulting string will be

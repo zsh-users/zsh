@@ -305,6 +305,7 @@ completions.  The tt(fignore) special parameter is not applied to the
 resulting files.  Note that tt(-g) is faster for filenames.
 )
 item(tt(-K) var(function))(
+vindex(reply, use of)
 Call the given function to get the completions.  Unless the name
 starts with an underscore, the function is
 passed two arguments: the prefix and the suffix of the word on which
@@ -431,6 +432,7 @@ and suffixes, menucompletion is started immediately if tt(AUTO_MENU) is
 set and this flag is used.
 )
 item(tt(-y) var(func-or-var))(
+vindex(reply, use of)
 The list provided by var(func-or-var) is displayed instead of the list
 of completions whenever a listing is required; the actual completions
 to be inserted are not affected.  It can be provided in two
@@ -441,7 +443,7 @@ call to a function using the tt(-K) option.  Otherwise it contains the
 name of a function which will be executed to create the list.  The
 function will be passed as an argument list all matching completions,
 including prefixes and suffixes expanded in full, and should set the
-array var(reply) to the result.  In both cases, the display list will
+array tt(reply) to the result.  In both cases, the display list will
 only be retrieved after a complete list of matches has been created.
 
 Note that the returned list does not have to correspond, even in

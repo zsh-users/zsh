@@ -203,6 +203,7 @@ cindex(user selection)
 cindex(selection, user)
 item(tt(select) var(name) [ tt(in) var(word) ... var(term) ] tt(do) var(list) tt(done))(
 where var(term) is one or more newline or tt(;) to terminate the var(word)s.
+vindex(REPLY, use of)
 Print the set of var(word)s, each preceded by a number.
 If the tt(in) var(word) is omitted, use the positional parameters.
 The tt(PROMPT3) prompt is printed and a line is read from the line editor

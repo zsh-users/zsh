@@ -679,6 +679,21 @@ item(tt(POSTEDIT) <S>)(
 This string is output whenever the line editor exits.
 It usually contains termcap strings to reset the terminal.
 )
+vindex(PROMPT)
+xitem(tt(PROMPT) <S> <Z>)
+vindex(PROMPT2)
+xitem(tt(PROMPT2) <S> <Z>)
+vindex(PROMPT3)
+xitem(tt(PROMPT3) <S> <Z>)
+vindex(PROMPT4)
+item(tt(PROMPT4) <S> <Z>)(
+Same as tt(PS1), tt(PS2), tt(PS3) and tt(PS4),
+respectively.
+)
+vindex(prompt)
+item(tt(prompt) <S> <Z>)(
+Same as tt(PS1).
+)
 vindex(PS1)
 item(tt(PS1) <S>)(
 The primary prompt string, printed before a command is read.
@@ -705,27 +720,12 @@ The execution trace prompt.  Default is `tt(PLUS()%N:%i> )', which displays
 the name of the current shell structure and the line number within it.
 In sh or ksh emulation, the default is `tt(PLUS() )'.
 )
-vindex(PROMPT)
-xitem(tt(PROMPT) <S> <Z>)
-vindex(PROMPT2)
-xitem(tt(PROMPT2) <S> <Z>)
-vindex(PROMPT3)
-xitem(tt(PROMPT3) <S> <Z>)
-vindex(PROMPT4)
-item(tt(PROMPT4) <S> <Z>)(
-Same as tt(PS1), tt(PS2), tt(PS3) and tt(PS4),
-respectively.
-)
 vindex(psvar)
 vindex(PSVAR)
 item(tt(psvar) <S> <Z> (tt(PSVAR) <S>))(
 An array (colon-separated list) whose first nine values can be used in
 tt(PROMPT) strings.  Setting tt(psvar) also sets tt(PSVAR), and
 vice versa.
-)
-vindex(prompt)
-item(tt(prompt) <S> <Z>)(
-Same as tt(PS1).
 )
 vindex(READNULLCMD)
 item(tt(READNULLCMD) <S>)(
@@ -737,6 +737,19 @@ item(tt(REPORTTIME))(
 If nonnegative, commands whose combined user and system execution times
 (measured in seconds) are greater than this value have timing
 statistics printed for them.
+)
+vindex(REPLY)
+item(tt(REPLY))(
+This parameter is reserved by convention to pass string values between
+shell scripts and shell builtins in situations where a function call or
+redirection are impossible or undesirable.  The tt(read) builtin and the
+tt(select) complex command may set tt(REPLY), and filename generation both
+sets and examines its value when evaluating certain expressions.  Some
+modules also employ tt(REPLY) for similar purposes.
+)
+vindex(reply)
+item(tt(reply))(
+As tt(REPLY), but for array values rather than strings.
 )
 vindex(RPROMPT)
 xitem(tt(RPROMPT) <S>)
