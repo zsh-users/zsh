@@ -742,9 +742,9 @@ makequote(ZLE_STRING_T str, size_t *len)
  * cmdstr is the buffer used for execute-named-command converted
  * to a metafied multibyte string.
  */
-static char *cmdstr;
-static LinkList cmdll;
-static int cmdambig;
+static char *namedcmdstr;
+static LinkList namedcmdll;
+static int namedcmdambig;
 
 /**/
 static void
@@ -753,11 +753,11 @@ scancompcmd(HashNode hn, UNUSED(int flags))
     int l;
     Thingy t = (Thingy) hn;
 
-    if(strpfx(cmdstr, t->nam)) {
-	addlinknode(cmdll, t->nam);
-	l = pfxlen(peekfirst(cmdll), t->nam);
-	if (l < cmdambig)
-	    cmdambig = l;
+    if(strpfx(namedcmdstr, t->nam)) {
+	addlinknode(namedcmdll, t->nam);
+	l = pfxlen(peekfirst(namedcmdll), t->nam);
+	if (l < namedcmdambig)
+	    namedcmdambig = l;
     }
 
 }
@@ -808,7 +808,7 @@ executenamedcommand(char *prmt)
 		int zmultsav = zmult;
 
 		zmult = 1;
-		listlist(cmdll);
+		listlist(namedcmdll);
 		showinglist = 0;
 		zmult = zmultsav;
 	    }
@@ -818,7 +818,7 @@ executenamedcommand(char *prmt)
 		int zmultsav = zmult;
 
 		zmult = 1;
-		listlist(cmdll);
+		listlist(namedcmdll);
 		showinglist = 0;
 		zmult = zmultsav;
 	    }
@@ -860,10 +860,10 @@ executenamedcommand(char *prmt)
 		Thingy r;
 		unambiguous:
 		*ptr = 0;
-		cmdstr = zlelineasstring(cmdbuf, len, 0, NULL, NULL, 0);
-		r = rthingy(cmdstr);
-		free(cmdstr);
-		cmdstr = NULL;
+		namedcmdstr = zlelineasstring(cmdbuf, len, 0, NULL, NULL, 0);
+		r = rthingy(namedcmdstr);
+		free(namedcmdstr);
+		namedcmdstr = NULL;
 		if (!(r->flags & DISABLED)) {
 		    unrefthingy(r);
 		    statusline = NULL;
@@ -886,16 +886,16 @@ executenamedcommand(char *prmt)
 		cmd == Th(z_expandorcomplete) || cmd == Th(z_completeword) ||
 		cmd == Th(z_expandorcompleteprefix) || cmd == Th(z_vicmdmode) ||
 		cmd == Th(z_acceptline) || lastchar == ' ' || lastchar == '\t') {
-		cmdambig = 100;
+		namedcmdambig = 100;
 
-		cmdll = newlinklist();
+		namedcmdll = newlinklist();
 
-		cmdstr = zlelineasstring(cmdbuf, len, 0, NULL, NULL, 0);
+		namedcmdstr = zlelineasstring(cmdbuf, len, 0, NULL, NULL, 0);
 		scanhashtable(thingytab, 1, 0, DISABLED, scancompcmd, 0);
-		free(cmdstr);
-		cmdstr = NULL;
+		free(namedcmdstr);
+		namedcmdstr = NULL;
 
-		if (empty(cmdll)) {
+		if (empty(namedcmdll)) {
 		    feep = 1;
 		    if (listed)
 			clearlist = listshown = 1;
@@ -906,12 +906,12 @@ executenamedcommand(char *prmt)
 		    *ptr = ZWC('_');
 		    statusll = l + len + 1;
 		    zmult = 1;
-		    listlist(cmdll);
+		    listlist(namedcmdll);
 		    listed = curlist = 1;
 		    showinglist = 0;
 		    zmult = zmultsav;
-		} else if (!nextnode(firstnode(cmdll))) {
-		    ZLE_STRING_T ztmp = stringaszleline(peekfirst(cmdll),
+		} else if (!nextnode(firstnode(namedcmdll))) {
+		    ZLE_STRING_T ztmp = stringaszleline(peekfirst(namedcmdll),
 							&len, NULL);
 		    ZS_memcpy(ptr = cmdbuf, ztmp, len);
 		    ptr += len;
@@ -920,25 +920,25 @@ executenamedcommand(char *prmt)
 			goto unambiguous;
 		} else {
 		    int ltmp;
-		    ZLE_STRING_T ztmp = stringaszleline(peekfirst(cmdll),
+		    ZLE_STRING_T ztmp = stringaszleline(peekfirst(namedcmdll),
 							&ltmp, NULL);
 		    ZS_memcpy(cmdbuf, ztmp, ltmp);
 		    free(ztmp);
-		    ptr = cmdbuf + cmdambig;
+		    ptr = cmdbuf + namedcmdambig;
 		    *ptr = ZWC('_');
 		    if (isset(AUTOLIST) &&
-			!(isset(LISTAMBIGUOUS) && cmdambig > len)) {
+			!(isset(LISTAMBIGUOUS) && namedcmdambig > len)) {
 			int zmultsav = zmult;
 			if (isset(LISTBEEP))
 			    feep = 1;
-			statusll = l + cmdambig + 1;
+			statusll = l + namedcmdambig + 1;
 			zmult = 1;
-			listlist(cmdll);
+			listlist(namedcmdll);
 			listed = curlist = 1;
 			showinglist = 0;
 			zmult = zmultsav;
 		    }
-		    len = cmdambig;
+		    len = namedcmdambig;
 		}
 	    } else {
 		if (len == NAMLEN || cmd != Th(z_selfinsert))

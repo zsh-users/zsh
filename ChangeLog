@@ -1,3 +1,8 @@
+2005-03-07  Peter Stephenson  <pws@csr.com>
+
+	* 20945: Src/Zle/zle_misc.c: rename static variables to
+	avoid clash with "cmdstr" exported by zle_tricky.c.
+
 2005-03-07  Clint Adams  <clint@zsh.org>
 
 	* 20944: Completion/Debian/Command/_uscan: completion for
