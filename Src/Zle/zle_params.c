@@ -57,6 +57,8 @@ static struct zleparam {
 	zleunsetfn, NULL },
     { "CURSOR",  PM_INTEGER, FN(set_cursor),  FN(get_cursor),
 	zleunsetfn, NULL },
+    { "MARK",  PM_INTEGER, FN(set_mark),  FN(get_mark),
+	zleunsetfn, NULL },
     { "LBUFFER", PM_SCALAR,  FN(set_lbuffer), FN(get_lbuffer),
 	zleunsetfn, NULL },
     { "RBUFFER", PM_SCALAR,  FN(set_rbuffer), FN(get_rbuffer),
@@ -169,6 +171,25 @@ static zlong
 get_cursor(Param pm)
 {
     return cs;
+}
+
+/**/
+static void
+set_mark(Param pm, zlong x)
+{
+    if (x < 0)
+	mark = 0;
+    else if (x > ll)
+	mark = ll;
+    else
+	mark = x;
+}
+
+/**/
+static zlong
+get_mark(Param pm)
+{
+    return mark;
 }
 
 /**/

@@ -434,7 +434,13 @@ bin_zle_refresh(char *name, char **args, char *ops, char func)
 static int
 bin_zle_mesg(char *name, char **args, char *ops, char func)
 {
+    if (!zleactive) {
+	zerrnam(name, "can only be called from widget function", NULL, 0);
+	return 1;
+    }
     showmsg(*args);
+    if (sfcontext != SFC_WIDGET)
+	zrefresh();
     return 0;
 }
 
@@ -442,14 +448,14 @@ bin_zle_mesg(char *name, char **args, char *ops, char func)
 static int
 bin_zle_unget(char *name, char **args, char *ops, char func)
 {
-    char *p = *args;
+    char *b = *args, *p = b + strlen(b);
 
     if (!zleactive) {
 	zerrnam(name, "can only be called from widget function", NULL, 0);
 	return 1;
     }
-    while (*p)
-	ungetkey((int) *p++);
+    while (p > b)
+	ungetkey((int) *--p);
     return 0;
 }
 
@@ -589,18 +595,18 @@ bin_zle_call(char *name, char **args, char *ops, char func)
     int ret, saveflag = 0;
     char *wname = *args++;
 
-    if(!zleactive || incompctlfunc || incompfunc) {
+    if (!wname) {
+	if (saveflag)
+	    zmod = modsave;
+	return (!zleactive || incompctlfunc || incompfunc ||
+		sfcontext != SFC_WIDGET);
+    }
+    if(!zleactive || incompctlfunc || incompfunc || sfcontext != SFC_WIDGET) {
 	zerrnam(name, "widgets can only be called when ZLE is active",
 	    NULL, 0);
 	return 1;
     }
 
-    if (!wname) {
-	zwarnnam(name, "wrong number of arguments", NULL, 0);
-	if (saveflag)
-	    zmod = modsave;
-	return 1;
-    }
     while (*args && **args == '-') {
 	char *num;
 	if (!args[0][1] || args[0][1] == '-') {

@@ -184,7 +184,8 @@ xitem(tt(zle) tt(-C) var(widget) var(completion-widget) var(function))
 xitem(tt(zle) tt(-R) [ tt(-c) ] [ var(display-string) ] [ var(string) ... ])
 xitem(tt(zle) tt(-M) var(string))
 xitem(tt(zle) tt(-U) var(string))
-item(tt(zle) var(widget) tt([ -n) var(num) tt(]) tt([ -N ]) var(args) ...)(
+xitem(tt(zle) var(widget) tt([ -n) var(num) tt(]) tt([ -N ]) var(args) ...)
+item(tt(zle))(
 The tt(zle) builtin performs a number of different actions concerning
 ZLE.  Which operation it performs depends on its options:
 
@@ -289,5 +290,9 @@ tt(zle) command.  Thus if a user defined widget requires an immediate beep,
 it should call the tt(beep) widget directly.
 )
 enditem()
+
+With no options and no arguments, only the returns status will be
+set. It is zero if ZLE is currently active and widgets could be
+invoked using this builtin command and non-zero if ZLE is not active.
 )
 enditem()
