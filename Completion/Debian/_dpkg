@@ -113,9 +113,9 @@ case "$state" in
              \!${^_dpkg_actions%%:*} \
 	   - recur \
              "$_dpkg_options_recursive[@]" \
-	     ':directory:_files -/' \
+	     ':directory:_path_files -/' \
 	   - nonrecur \
-	     ':Debian package:_files -g \*.deb'
+	     ':Debian package:_path_files -g \*.deb'
   ;;
   remove|purge|status|listfiles)
         _funcall ret _dpkg_$state && return ret
