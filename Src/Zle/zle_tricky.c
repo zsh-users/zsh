@@ -8817,14 +8817,14 @@ calclist(void)
     }
     if (isset(LISTPACKED)) {
 	char **pp;
-	int *ws, j, k, cl, ml, mm;
+	int *ws, tlines, tline, tcols, maxlen, nth, width;
 
 	for (g = amatches; g; g = g->next) {
 	    ws = g->widths = (int *) zalloc(columns * sizeof(int));
 	    memset(ws, 0, columns * sizeof(int));
-	    i = g->lins;
-	    mm = g->cols;
-	    cl = 0;
+	    tlines = g->lins;
+	    tcols = g->cols;
+	    width = 0;
 
 	    if ((pp = g->ylist)) {
 		if (!(g->flags & CGF_LINES)) {
@@ -8835,139 +8835,145 @@ calclist(void)
 			ylens[i] = strlen(*pp) + add;
 
 		    if (isset(LISTROWSFIRST)) {
-			int x, l = 0, v;
+			int count, tcol, first, maxlines = 0, llines;
 
-			for (mm = columns / g->shortest; mm > g->cols; mm--) {
-			    for (j = i = ml = cl = l = v = x = 0,
-				     k = g->dcount;
-				 k > 0; k--) {
-				if (ylens[j] > ml)
-				    ml = ylens[j];
-				j += mm;
-				v++;
-				if (j >= g->dcount) {
-				    if ((cl += ml) >= columns)
+			for (tcols = columns / g->shortest; tcols > g->cols;
+			     tcols--) {
+			    for (nth = first = maxlen = width = maxlines =
+				     llines = tcol = 0,
+				     count = g->dcount;
+				 count > 0; count--) {
+				if (ylens[nth] > maxlen)
+				    maxlen = ylens[nth];
+				nth += tcols;
+				tlines++;
+				if (nth >= g->dcount) {
+				    if ((width += maxlen) >= columns)
 					break;
-				    ws[x++] = ml;
-				    ml = 0;
-				    j = ++i;
-				    if (v > l)
-					l = v;
-				    v = 0;
+				    ws[tcol++] = maxlen;
+				    maxlen = 0;
+				    nth = ++first;
+				    if (llines > maxlines)
+					maxlines = llines;
+				    llines = 0;
 				}
 			    }
-			    if (j < yl) {
-				ws[x++] = ml;
-				cl += ml;
+			    if (nth < yl) {
+				ws[tcol++] = maxlen;
+				width += maxlen;
 			    }
-			    if (!k && cl < columns)
+			    if (!count && width < columns)
 				break;
 			}
-			if (mm > g->cols)
-			    i = l;
+			if (tcols > g->cols)
+			    tlines = maxlines;
 		    } else {
-			for (i = ((g->totl + columns) / columns);
-			     i < g->lins; i++) {
-			    for (pp = g->ylist, j = k = cl = ml = mm;
-				 *pp; j++, pp++) {
-				if (ylens[j] > ml)
-				    ml = ylens[j];
-				if (++k == i) {
-				    if ((cl += ml) >= columns)
+			for (tlines = ((g->totl + columns) / columns);
+			     tlines < g->lins; tlines++) {
+			    for (pp = g->ylist, nth = tline = width =
+				     maxlen = tcols = 0;
+				 *pp; nth++, pp++) {
+				if (ylens[nth] > maxlen)
+				    maxlen = ylens[nth];
+				if (++tline == tlines) {
+				    if ((width += maxlen) >= columns)
 					break;
-				    ws[mm++] = ml;
-				    ml = k = 0;
+				    ws[tcols++] = maxlen;
+				    maxlen = tline = 0;
 				}
 			    }
-			    if (k) {
-				ws[mm++] = ml;
-				cl += ml;
+			    if (tline) {
+				ws[tcols++] = maxlen;
+				width += maxlen;
 			    }
-			    if (j == yl && cl < columns)
+			    if (nth == yl && width < columns)
 				break;
 			}
 		    }
 		}
 	    } else if (g->width) {
 		if (isset(LISTROWSFIRST)) {
-		    int x, l = 0, v, al;
-		    Cmatch *q;
+		    int addlen, count, tcol, maxlines = 0, llines, i;
+		    Cmatch *first;
 
-		    for (mm = columns / g->shortest; mm > g->cols; mm--) {
-			p = q = skipnolist(g->matches);
-			for (i = ml = cl = l = v = x = 0,  k = g->dcount;
-			     k > 0; k--) {
+		    for (tcols = columns / g->shortest; tcols > g->cols;
+			 tcols--) {
+			p = first = skipnolist(g->matches);
+			for (maxlen = width = maxlines = llines = tcol = 0,
+				 count = g->dcount;
+			     count > 0; count--) {
 			    m = *p;
-			    al = mlens[m->gnum] + add;
-			    if (al > ml)
-				ml = al;
-			    for (j = mm; j && *p; j--)
+			    addlen = mlens[m->gnum] + add;
+			    if (addlen > maxlen)
+				maxlen = addlen;
+			    for (i = tcols; i && *p; i--)
 				p = skipnolist(p + 1);
 
-			    v++;
+			    llines++;
 			    if (!*p) {
-				if (v > l)
-				    l = v;
-				v = 0;
+				if (llines > maxlines)
+				    maxlines = llines;
+				llines = 0;
 
-				if ((cl += ml) >= columns)
+				if ((width += maxlen) >= columns)
 				    break;
-				ws[x++] = ml;
-				ml = 0;
+				ws[tcol++] = maxlen;
+				maxlen = 0;
 
-				p = q = skipnolist(q + 1);
+				p = first = skipnolist(first + 1);
 			    }
 			}
-			if (v) {
-			    ws[x++] = ml;
-			    cl += ml;
+			if (tlines) {
+			    ws[tcol++] = maxlen;
+			    width += maxlen;
 			}
-			if (!k && cl < columns)
+			if (!count && width < columns)
 			    break;
 		    }
-		    if (mm > g->cols)
-			i = l;
+		    if (tcols > g->cols)
+			tlines = maxlines;
 		} else {
-		    int al;
+		    int addlen;
 
-		    for (i = ((g->totl + columns) / columns);
-			 i < g->lins; i++) {
-			for (p = g->matches, j = k = cl = ml = mm = 0;
-			     (m = *p); p++, j++) {
+		    for (tlines = ((g->totl + columns) / columns);
+			 tlines < g->lins; tlines++) {
+			for (p = g->matches, nth = tline = width =
+				 maxlen = tcols = 0;
+			     (m = *p); p++, nth++) {
 			    if (!(m->flags &
 				  (m->disp ? (CMF_DISPLINE | CMF_HIDE) :
 				   (CMF_NOLIST | CMF_HIDE)))) {
-				al = mlens[m->gnum] + add;
-				if (al > ml)
-				    ml = al;
-				if (++k == i) {
-				    if ((cl += ml) >= columns)
+				addlen = mlens[m->gnum] + add;
+				if (addlen > maxlen)
+				    maxlen = addlen;
+				if (++tline == tlines) {
+				    if ((width += maxlen) >= columns)
 					break;
-				    ws[mm++] = ml;
-				    ml = k = 0;
+				    ws[tcols++] = maxlen;
+				    maxlen = tline = 0;
 				}
 			    }
 			}
-			if (k) {
-			    ws[mm++] = ml;
-			    cl += ml;
+			if (tline) {
+			    ws[tcols++] = maxlen;
+			    width += maxlen;
 			}
-			if (j == g->dcount && cl < columns)
+			if (nth == g->dcount && width < columns)
 			    break;
 		    }
 		}
 	    }
-	    if (i == g->lins) {
+	    if (tlines == g->lins) {
 		zfree(ws, columns * sizeof(int));
 		g->widths = NULL;
 	    } else {
-		nlines += i - g->lins;
-		g->lins = i;
-		g->cols = mm;
-		g->totl = cl;
-		cl -= add;
-		if (cl > max)
-		    max = cl;
+		nlines += tlines - g->lins;
+		g->lins = tlines;
+		g->cols = tcols;
+		g->totl = width;
+		width -= add;
+		if (width > max)
+		    max = width;
 	    }
 	}
 	for (g = amatches; g; g = g->next) {
