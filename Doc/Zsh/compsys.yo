@@ -1899,7 +1899,9 @@ also be separated from the var(message) by two or three colons. With
 two colons the tt(words) special array and the tt(CURRENT) special
 parameter are modified to refer only to the words after the option
 (with two colons) or to the words covered by this description (with
-three colons) during the execution or evaluation of the var(action).
+three colons) during the execution or evaluation of the
+var(action). Note that only one such `tt(:*)'-specification is useful
+and no other argument specification may be given after it.
 
 In the simplest form the var(opt-spec) is just the option name
 beginning with a minus or a plus sign, such as `tt(-foo)'. In this
