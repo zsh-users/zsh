@@ -23,6 +23,12 @@ See ifzman(the section `The ARG2 Module' in zmanref(zshmodules))\
 ifnzman(noderef(The ARG2 Module)).
 )\
 )\
+def(zlecmd)(1)(\
+item(tt(ARG1))(
+See ifzman(the section `Zle Builtins' in zmanref(zshzle))\
+ifnzman(noderef(Zle Builtins)).
+)\
+)\
 startitem()
 prefix(-)
 findex(.)
@@ -119,7 +125,7 @@ item(var(job) ... tt(&))(
 Put each specified var(job) in the background,
 or the current job if none is specified.
 )
-module(bindkey)(zsh/zle)
+zlecmd(bindkey)
 findex(break)
 cindex(exiting loops)
 cindex(loops, exiting)
@@ -655,8 +661,8 @@ tt(-R); all other arguments and options are printed.
 item(tt(-b))(
 Recognize all the escape sequences defined for the tt(bindkey) command,
 see 
-ifzman(zmanref(zshmodules))\
-ifnzman(noderef(The zsh/zle Module))\
+ifzman(zmanref(zshzle))\
+ifnzman(noderef(Zle Builtins))\
 .
 )
 item(tt(-m))(
@@ -1312,7 +1318,7 @@ If the tt(-m) flag is given the arguments are taken as patterns
 (which should be quoted to preserve them from being interpreted as glob
 patterns), and all options with names matching these patterns are unset.
 )
-module(vared)(zsh/zle)
+zlecmd(vared)
 findex(wait)
 cindex(waiting for jobs)
 cindex(jobs, waiting for)
@@ -1496,7 +1502,7 @@ ifzman(enditem())
 )
 module(zformat)(zsh/zutil)
 module(zftp)(zsh/zftp)
-module(zle)(zsh/zle)
+zlecmd(zle)
 findex(zmodload)
 cindex(modules, loading)
 cindex(loading modules)

@@ -20,6 +20,14 @@ cindex(editor ksh style)
 This mode
 is similar to bf(ksh), and uses no termcap sequences.  If tt(TERM) is
 "emacs", the tt(ZLE) option will be unset by default.
+
+startmenu()
+menu(Keymaps)
+menu(Zle Builtins)
+menu(Zle Widgets)
+endmenu()
+
+texinode(Keymaps)(Zle Builtins)()(Zsh Line Editor)
 sect(Keymaps)
 cindex(keymaps)
 cindex(key bindings)
@@ -79,6 +87,7 @@ This input can itself invoke further replacement strings, but in order to
 detect loops the process will be stopped if there are twenty such replacements
 without a real command being read.
 
+texinode(Zle Builtins)(Zle Widgets)(Keymaps)(Zsh Line Editor)
 sect(Zle Builtins)
 cindex(zle, builtin commands)
 The ZLE module contains three related builtin commands. The tt(bindkey)
@@ -442,6 +451,7 @@ invoked using this builtin command and non-zero if ZLE is not active.
 )
 enditem()
 
+texinode(Zle Widgets)()(Zle Builtins)(Zsh Line Editor)
 sect(Widgets)
 cindex(widgets)
 All actions in the editor are performed by `widgets'.  A widget's job is
@@ -583,7 +593,7 @@ menu(Arguments)
 menu(Completion)
 menu(Miscellaneous)
 endmenu()
-texinode(Movement)(History Control)()(Zsh Line Editor)
+texinode(Movement)(History Control)()(Zle Widgets)
 subsect(Movement)
 startitem()
 tindex(vi-backward-blank-word)
@@ -713,7 +723,7 @@ item(tt(vi-rev-repeat-find) (unbound) (,) (unbound))(
 Repeat the last tt(vi-find) command in the opposite direction.
 )
 enditem()
-texinode(History Control)(Modifying Text)(Movement)(Zsh Line Editor)
+texinode(History Control)(Modifying Text)(Movement)(Zle Widgets)
 subsect(History Control)
 startitem()
 tindex(beginning-of-buffer-or-history)
@@ -951,7 +961,7 @@ line up to the cursor.
 This leaves the cursor in its original position.
 )
 enditem()
-texinode(Modifying Text)(Arguments)(History Control)(Zsh Line Editor)
+texinode(Modifying Text)(Arguments)(History Control)(Zle Widgets)
 subsect(Modifying Text)
 startitem()
 tindex(vi-add-eol)
@@ -1235,7 +1245,7 @@ into the kill buffer.
 Arguably, this is what Y should do in vi, but it isn't what it actually does.
 )
 enditem()
-texinode(Arguments)(Completion)(Modifying Text)(Zsh Line Editor)
+texinode(Arguments)(Completion)(Modifying Text)(Zle Widgets)
 subsect(Arguments)
 startitem()
 tindex(digit-argument)
@@ -1266,7 +1276,7 @@ universal-argument) var(num)', the numerical argument will be set to
 var(num); this is equivalent to `tt(NUMERIC=)var(num)'.
 )
 enditem()
-texinode(Completion)(Miscellaneous)(Arguments)(Zsh Line Editor)
+texinode(Completion)(Miscellaneous)(Arguments)(Zle Widgets)
 subsect(Completion)
 startitem()
 tindex(accept-and-menu-complete)
@@ -1341,7 +1351,7 @@ When a previous completion displayed a list below the prompt, this
 widget can be used to move the prompt below the list.
 )
 enditem()
-texinode(Miscellaneous)()(Completion)(Zsh Line Editor)
+texinode(Miscellaneous)()(Completion)(Zle Widgets)
 subsect(Miscellaneous)
 startitem()
 tindex(accept-and-hold)
