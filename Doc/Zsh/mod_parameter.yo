@@ -1,4 +1,4 @@
-texinode(The parameter Module)(The sched Module)(The mapfile Module)(Zsh Modules)
+texinode(The parameter Module)(The sched Module)(The mathfunc Module)(Zsh Modules)
 sect(The parameter Module)
 cindex(parameters, special)
 The tt(parameter) module gives access to some of the internal hash
