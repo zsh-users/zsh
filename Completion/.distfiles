@@ -1,3 +1,4 @@
 DISTFILES_SRC='
-    .cvsignore .distfiles README
+.distfiles
+.cvsignore   README       compaudit    compdump     compinit     compinstall
 '

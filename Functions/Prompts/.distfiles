@@ -1,9 +1,8 @@
 DISTFILES_SRC='
-    .distfiles
-    prompt_elite2_setup prompt_red_setup prompt_adam1_setup
-    prompt_elite_setup prompt_redhat_setup prompt_adam2_setup
-    prompt_fire_setup prompt_suse_setup prompt_blue_setup
-    prompt_green_setup prompt_white_setup prompt_combo_setup
-    prompt_magenta_setup prompt_yellow_setup prompt_cyan_setup
-    prompt_off_setup promptinit
+.distfiles
+prompt_adam1_setup    prompt_elite_setup    prompt_redhat_setup
+prompt_adam2_setup    prompt_fade_setup     prompt_suse_setup
+prompt_bart_setup     prompt_fire_setup     prompt_zefram_setup
+prompt_bigfade_setup  prompt_off_setup      promptinit
+prompt_elite2_setup   prompt_oliver_setup
 '

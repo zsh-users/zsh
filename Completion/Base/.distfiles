@@ -1,8 +1,4 @@
 DISTFILES_SRC='
-    .distfiles 
-    _arg_compile _arguments _brace_parameter _cache_invalid _combination
-    _command_names _condition _default _describe _equal _first _in_vared
-    _jobs _math _parameter _precommand _redirect _regex_arguments
-    _retrieve_cache _store_cache _subscript _tilde _value _values
-    _sub_commands
+.distfiles
+_arguments~     _describe~      _sub_commands~  _tilde~
 '

@@ -1,6 +1,4 @@
 DISTFILES_SRC='
-    .distfiles
-    _rpm
-	_apm
+.distfiles
+_apm
 '
-
