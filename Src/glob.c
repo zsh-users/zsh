@@ -2373,6 +2373,7 @@ tokenize(char *s)
 	case '*':
 	case '?':
 	case '=':
+	case ',':
 	    for (t = ztokens; *t; t++)
 		if (*t == *s) {
 		    if (bslash)

@@ -1,3 +1,7 @@
+2001-05-02  Peter Stephenson  <pws@csr.com>
+
+	* 14140: Src/glob.c:  v='A,B'; print X{$~v}Y  now prints XAY XBY.
+
 2001-05-02  Sven Wischnowsky  <wischnow@zsh.org>
 
 	* 14198: Src/Zle/computil.c: remove quotes when looking at
