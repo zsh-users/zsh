@@ -505,16 +505,12 @@ case "$host_os" in
   *)             termcap_curses_order="termcap curses ncurses" ;;
 esac
 
-for lib in $termcap_curses_order; do
-  AC_CHECK_LIB(${lib}, tgetent, [LIBS="-l$lib $LIBS"; break])
-done
+AC_SEARCH_LIBS(tgetent, [$termcap_curses_order])
 
 dnl Some systems (Solaris 2.x, Linux Redhat 5.x) require
 dnl libnsl (Network Services Library) to find yp_all
-AC_CHECK_FUNCS(yp_all)
-if test $ac_cv_func_yp_all = no; then
-  AC_CHECK_LIB(nsl, yp_all)
-fi
+
+AC_SEARCH_LIBS(yp_all, nsl)
 
 dnl I am told that told that unicos reqire these for nis_list
 if test `echo $host_os | sed 's/^\(unicos\).*/\1/'` = unicos; then

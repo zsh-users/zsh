@@ -1,3 +1,9 @@
+2001-01-19  Andrej Borsenkow <Andrej.Borsenkow@mow.siemens.ru>
+
+	* 13380: configure.in: replace AC_CHECK_LIB(...,tgetent) with
+	AC_SEARCH_LIBS(tgetent,...) to allow user to override default
+	library selection
+
 2001-01-18  Sven Wischnowsky  <wischnow@zsh.org>
 
 	* 13374: Src/Zle/compcore.c, Src/Zle/compctl.c, Src/Zle/complist.c,
