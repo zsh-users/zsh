@@ -630,9 +630,9 @@ hashdir(char **dirp)
     Cmdnam cn;
     DIR *dir;
     char *fn;
-#ifdef _WIN32
+#if defined(_WIN32) || defined(__CYGWIN__)
     char *exe;
-#endif
+#endif /* _WIN32 || _CYGWIN__ */
 
     if (isrelative(*dirp) || !(dir = opendir(unmeta(*dirp))))
 	return;
@@ -644,7 +644,7 @@ hashdir(char **dirp)
 	    cn->u.name = dirp;
 	    cmdnamtab->addnode(cmdnamtab, ztrdup(fn), cn);
 	}
-#ifdef _WIN32
+#if defined(_WIN32) || defined(__CYGWIN__)
 	/* Hash foo.exe as foo, since when no real foo exists, foo.exe
 	   will get executed by DOS automatically.  This quiets
 	   spurious corrections when CORRECT or CORRECT_ALL is set. */
@@ -660,7 +660,7 @@ hashdir(char **dirp)
 		cmdnamtab->addnode(cmdnamtab, ztrdup(fn), cn);
 	    }
 	}
-#endif /* _WIN32 */
+#endif /* _WIN32 || __CYGWIN__ */
     }
     closedir(dir);
 }

@@ -1,3 +1,9 @@
+2001-07-05  Andrej Borsenkow  <bor@zsh.org>
+
+	* 15253 : Src/hashtable.c: make hashdir() hash foo in addition
+	to foo.exe on Cygwin again (lost when Cygwin gcc stopped setting
+	_WIN32 by default).
+
 2001-07-03  Clint Adams  <clint@zsh.org>
 
 	* 15242: Doc/Zsh/mod_pcre.yo,
