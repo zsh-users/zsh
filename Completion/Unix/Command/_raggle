@@ -1,0 +1,27 @@
+#compdef raggle
+
+_arguments \
+  '(-a --add --add-feed)'{-a,--add,--add-feed}"[add a new feed (requires '--url')]" \
+  '--ascii[use ASCII characters instead of ANSI for window borders]' \
+  '(-c --config)'{-c,--config}'[specify an alternate config file]:config file:_files' \
+  '(-d --delete --delete-feed)'{-d,--delete,--delete-feed}'[delete an existing feed]:feed ID:' \
+  '(-e --edit --edit-feed)'{-e,--edit,--edit-feed}'[edit an existing feed]:feed ID:' \
+  '(--import-opml)--export-opml[export feeds to OPML]:OPML file:_files -g "*.opml(-.)"' \
+  "--force[force behavior Raggle won't normally allow]" \
+  '(-)'{-h,--help,--usage}'[display this usage screen]' \
+  '(--export-opml)--import-opml[import feeds from an OPML file]:OPML file:_files -g "*.opml(-.)"' \
+  '(-i --invalidate)'{-i,--invalidate}'[invalidate a feed (force an update)]:feed ID:' \
+  '(-l --list)'{-l,--list}"[list existing feeds (use '--verbose' to show URLs as well)]" \
+  "--lock-title[lock Title attribute of feed (for '--add' and '--edit')]" \
+  "--max-items[set the maximum number of items for a feed (for '--add' and '--edit')]" \
+  '--purge[purge deleted feeds from feed cache]' \
+  '(-r --refresh)'{-r,--refresh}"[refresh attribute of feed (for '--add' and '--edit')]:refresh time (minutes):" \
+  "--save-items[save old items of feed (for '--add' and '--edit')]" \
+  '--server[run Raggle in HTTP server mode]:port:_ports' \
+  '(--sort --sort-feeds)'{--sort,--sort-feeds}'[sort feeds by title (case-insensitive)]' \
+  '(-t --title)'{-t,--title}"[title attribute of feed (for '--add' and '--edit')]:feed title:" \
+  "--unlock-title[unlock Title attribute of feed (for '--add' and '--edit')]" \
+  "--unsave-items[don't save old items of feed (for '--add' and '--edit')]" \
+  '(-u --url)'{-u,--url}"[URL attribute of feed (for '--add' and '--edit')]:url:_urls" \
+  '--verbose[turn on verbose output]' \
+  '(-)'{-v,--version}'[display version information]'
