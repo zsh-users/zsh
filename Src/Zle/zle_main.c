@@ -141,6 +141,17 @@ mod_export char *zlenoargs[1] = { NULL };
 static int delayzsetterm;
 #endif
 
+/*
+ * File descriptors we are watching as well as the terminal fd. 
+ * These are all for reading; we don't watch for writes or exceptions.
+ */
+/**/
+int nwatch;		/* Number of fd's we are watching */
+/**/
+int *watch_fds;		/* The list of fds, not terminated! */
+/**/
+char **watch_funcs;	/* The corresponding functions to call, normal array */
+
 /* set up terminal */
 
 /**/
@@ -324,25 +335,155 @@ breakread(int fd, char *buf, int n)
 # define read    breakread
 #endif
 
+static int
+raw_getkey(int keytmout, char *cptr)
+{
+    long exp100ths;
+    int ret;
+#ifdef HAVE_SELECT
+    fd_set foofd;
+#else
+# ifdef HAS_TIO
+    struct ttyinfo ti;
+# endif
+#endif
+
+    /*
+     * Handle timeouts and watched fd's.  We only do one at once;
+     * key timeouts take precedence.  This saves tricky timing
+     * problems with the key timeout.
+     */
+    if ((nwatch || keytmout)
+#ifdef FIONREAD
+	&& ! delayzsetterm
+#endif
+	) {
+	if (!keytmout || keytimeout <= 0)
+	    exp100ths = 0;
+	else if (keytimeout > 500)
+	    exp100ths = 500;
+	else
+	    exp100ths = keytimeout;
+#ifdef HAVE_SELECT
+	if (!keytmout || exp100ths) {
+	    struct timeval *tvptr = NULL;
+	    struct timeval expire_tv;
+	    int i, fdmax = SHTTY, errtry = 0;
+	    if (exp100ths) {
+		expire_tv.tv_sec = exp100ths / 100;
+		expire_tv.tv_usec = (exp100ths % 100) * 10000L;
+		tvptr = &expire_tv;
+	    }
+	    do {
+		int selret;
+		FD_ZERO(&foofd);
+		FD_SET(SHTTY, &foofd);
+		if (!keytmout && !errtry) {
+		    for (i = 0; i < nwatch; i++) {
+			int fd = watch_fds[i];
+			FD_SET(fd, &foofd);
+			if (fd > fdmax)
+			    fdmax = fd;
+		    }
+		}
+		selret = select(fdmax+1, (SELECT_ARG_2_T) & foofd,
+				NULL, NULL, tvptr);
+		/*
+		 * Make sure a user interrupt gets passed on straight away.
+		 */
+		if (selret < 0 && errflag)
+		    return selret;
+		/*
+		 * Try to avoid errors on our special fd's from
+		 * messing up reads from the terminal.  Try first
+		 * with all fds, then try unsetting the special ones.
+		 */
+		if (selret < 0 && !keytmout && !errtry) {
+		    errtry = 1;
+		    continue;
+		}
+		if (selret == 0) {
+		    /* Special value -2 signals nothing ready */
+		    return -2;
+		} else if (selret < 0)
+		    return selret;
+		if (!keytmout && nwatch) {
+		    /*
+		     * Copy the details of the watch fds in case the
+		     * user decides to delete one from inside the
+		     * handler function.
+		     */
+		    int lnwatch = nwatch;
+		    int *lwatch_fds = zalloc(lnwatch*sizeof(int));
+		    char **lwatch_funcs = zarrdup(watch_funcs);
+		    memcpy(lwatch_fds, watch_fds, lnwatch*sizeof(int));
+		    for (i = 0; i < lnwatch; i++) {
+			if (FD_ISSET(lwatch_fds[i], &foofd)) {
+			    /* Handle the fd. */
+			    LinkList funcargs = znewlinklist();
+			    zaddlinknode(funcargs, ztrdup(lwatch_funcs[i]));
+			    {
+				char buf[BDIGBUFSIZE];
+				convbase(buf, lwatch_fds[i], 10);
+				zaddlinknode(funcargs, ztrdup(buf));
+			    }
+
+			    callhookfunc(lwatch_funcs[i], funcargs);
+			    if (errflag) {
+				/* No sensible way of handling errors here */
+				errflag = 0;
+				/*
+				 * Paranoia: don't run the hooks again this
+				 * time.
+				 */
+				errtry = 1;
+			    }
+			    freelinklist(funcargs, freestr);
+			}
+		    }
+		    /* Function may have invalidated the display. */
+		    if (resetneeded)
+			zrefresh();
+		    zfree(lwatch_fds, lnwatch*sizeof(int));
+		    freearray(lwatch_funcs);
+		}
+	    } while (!FD_ISSET(SHTTY, &foofd));
+	}
+#else
+# ifdef HAS_TIO
+	ti = shttyinfo;
+	ti.tio.c_lflag &= ~ICANON;
+	ti.tio.c_cc[VMIN] = 0;
+	ti.tio.c_cc[VTIME] = exp100ths / 10;
+#  ifdef HAVE_TERMIOS_H
+	tcsetattr(SHTTY, TCSANOW, &ti.tio);
+#  else
+	ioctl(SHTTY, TCSETA, &ti.tio);
+#  endif
+	ret = read(SHTTY, cptr, 1);
+#  ifdef HAVE_TERMIOS_H
+	tcsetattr(SHTTY, TCSANOW, &shttyinfo.tio);
+#  else
+	ioctl(SHTTY, TCSETA, &shttyinfo.tio);
+#  endif
+	return (ret <= 0) ? ret : *cptr;
+# endif
+#endif
+    }
+
+    ret = read(SHTTY, cptr, 1);
+
+    return ret;
+}
+
 /**/
 mod_export int
 getkey(int keytmout)
 {
     char cc;
     unsigned int ret;
-    long exp100ths;
     int die = 0, r, icnt = 0;
     int old_errno = errno, obreaks = breaks;
-
-#ifdef HAVE_SELECT
-    fd_set foofd;
-
-#else
-# ifdef HAS_TIO
-    struct ttyinfo ti;
-
-# endif
-#endif
 
     if (kungetct)
 	ret = STOUC(kungetbuf[--kungetct]);
@@ -355,55 +496,13 @@ getkey(int keytmout)
 		zsetterm();
 	}
 #endif
-	if (keytmout
-#ifdef FIONREAD
-	    && ! delayzsetterm
-#endif
-	    ) {
-	    if (keytimeout > 500)
-		exp100ths = 500;
-	    else if (keytimeout > 0)
-		exp100ths = keytimeout;
-	    else
-		exp100ths = 0;
-#ifdef HAVE_SELECT
-	    if (exp100ths) {
-		struct timeval expire_tv;
-
-		expire_tv.tv_sec = exp100ths / 100;
-		expire_tv.tv_usec = (exp100ths % 100) * 10000L;
-		FD_ZERO(&foofd);
-		FD_SET(SHTTY, &foofd);
-		if (select(SHTTY+1, (SELECT_ARG_2_T) & foofd,
-			   NULL, NULL, &expire_tv) <= 0)
-		    return EOF;
-	    }
-#else
-# ifdef HAS_TIO
-	    ti = shttyinfo;
-	    ti.tio.c_lflag &= ~ICANON;
-	    ti.tio.c_cc[VMIN] = 0;
-	    ti.tio.c_cc[VTIME] = exp100ths / 10;
-#  ifdef HAVE_TERMIOS_H
-	    tcsetattr(SHTTY, TCSANOW, &ti.tio);
-#  else
-	    ioctl(SHTTY, TCSETA, &ti.tio);
-#  endif
-	    r = read(SHTTY, &cc, 1);
-#  ifdef HAVE_TERMIOS_H
-	    tcsetattr(SHTTY, TCSANOW, &shttyinfo.tio);
-#  else
-	    ioctl(SHTTY, TCSETA, &shttyinfo.tio);
-#  endif
-	    return (r <= 0) ? EOF : cc;
-# endif
-#endif
-	}
 	for (;;) {
 	    int q = queue_signal_level();
 	    dont_queue_signals();
-	    r = read(SHTTY, &cc, 1);
+	    r = raw_getkey(keytmout, &cc);
 	    restore_queue_signals(q);
+	    if (r == -2)	/* timeout */
+		return EOF;
 	    if (r == 1)
 		break;
 	    if (r == 0) {
@@ -1101,7 +1200,7 @@ zleaftertrap(Hookdef dummy, void *dat)
 static struct builtin bintab[] = {
     BUILTIN("bindkey", 0, bin_bindkey, 0, -1, 0, "evaMldDANmrsLRp", NULL),
     BUILTIN("vared",   0, bin_vared,   1,  7, 0, NULL,             NULL),
-    BUILTIN("zle",     0, bin_zle,     0, -1, 0, "lDANCLmMgGcRaUKI", NULL),
+    BUILTIN("zle",     0, bin_zle,     0, -1, 0, "aAcCDFgGIKlLmMNRU", NULL),
 };
 
 /* The order of the entries in this table has to match the *HOOK

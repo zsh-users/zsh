@@ -341,6 +341,7 @@ bin_zle(char *name, char **args, char *ops, int func)
 	{ 'U', bin_zle_unget, 1, 1 },
 	{ 'K', bin_zle_keymap, 1, 1 },
 	{ 'I', bin_zle_invalidate, 0, 0 },
+	{ 'F', bin_zle_fd, 0, 2 },
 	{ 0,   bin_zle_call, 0, -1 },
     };
     struct opn const *op, *opp;
@@ -676,6 +677,108 @@ bin_zle_invalidate(char *name, char **args, char *ops, char func)
 	return 0;
     } else
 	return 1;
+}
+
+/**/
+static int
+bin_zle_fd(char *name, char **args, char *ops, char func)
+{
+    int fd = 0, i, found = 0;
+    char *endptr;
+
+    if (*args) {
+	fd = (int)zstrtol(*args, &endptr, 10);
+
+	if (*endptr || fd < 0) {
+	    zwarnnam(name, "Bad file descriptor number for -F: %s", *args, 0);
+	    return 1;
+	}
+    }
+
+    if (ops['L'] || !*args) {
+	/* Listing handlers. */
+	if (args[1]) {
+	    zwarnnam(name, "too many arguments for -FL", NULL, 0);
+	    return 1;
+	}
+	for (i = 0; i < nwatch; i++) {
+	    if (*args && watch_fds[i] != fd)
+		continue;
+	    found = 1;
+	    printf("%s -F %d %s\n", name, watch_fds[i], watch_funcs[i]);
+	}
+	/* only return status 1 if fd given and not found */
+	return *args && !found;
+    }
+
+    if (args[1]) {
+	/* Adding or replacing a handler */
+	char *funcnam = ztrdup(args[1]);
+	if (nwatch) {
+	    for (i = 0; i < nwatch; i++) {
+		if (watch_fds[i] == fd) {
+		    zsfree(watch_funcs[i]);
+		    watch_funcs[i] = funcnam;
+		    found = 1;
+		    break;
+		}
+	    }
+	}
+	if (!found) {
+	    /* zrealloc handles NULL pointers, so OK for first time through */
+	    int newnwatch = nwatch+1;
+	    watch_fds = (int *)zrealloc(watch_fds, 
+					newnwatch * sizeof(int));
+	    watch_funcs = (char **)zrealloc(watch_funcs,
+					    (newnwatch+1) * sizeof(char *));
+	    watch_fds[nwatch] = fd;
+	    watch_funcs[nwatch] = funcnam;
+	    watch_funcs[newnwatch] = NULL;
+	    nwatch = newnwatch;
+	}
+    } else {
+	/* Deleting a handler */
+	for (i = 0; i < nwatch; i++) {
+	    if (watch_fds[i] == fd) {
+		int newnwatch = nwatch-1;
+		int *new_fds;
+		char **new_funcs;
+
+		zsfree(watch_funcs[i]);
+		if (newnwatch) {
+		    new_fds = zalloc(newnwatch*sizeof(int));
+		    new_funcs = zalloc((newnwatch+1)*sizeof(char*));
+		    if (i) {
+			memcpy(new_fds, watch_fds, i*sizeof(int));
+			memcpy(new_funcs, watch_funcs, i*sizeof(char *));
+		    }
+		    if (i < newnwatch) {
+			memcpy(new_fds+i, watch_fds+i+1,
+			       (newnwatch-i)*sizeof(int));
+			memcpy(new_funcs+i, watch_funcs+i+1,
+			       (newnwatch-i)*sizeof(char *));
+		    }
+		    new_funcs[newnwatch] = NULL;
+		} else {
+		    new_fds = NULL;
+		    new_funcs = NULL;
+		}
+		zfree(watch_fds, nwatch*sizeof(int));
+		zfree(watch_funcs, (nwatch+1)*sizeof(char *));
+		watch_fds = new_fds;
+		watch_funcs = new_funcs;
+		nwatch = newnwatch;
+		found = 1;
+		break;
+	    }
+	}
+	if (!found) {
+	    zwarnnam(name, "No handler installed for fd %d", NULL, fd);
+	    return 1;
+	}
+    }
+
+    return 0;
 }
 
 /*******************/

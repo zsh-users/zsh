@@ -624,6 +624,30 @@ time_t lastmailcheck;
 /**/
 time_t lastwatch;
 
+/**/
+mod_export int
+callhookfunc(char *name, LinkList lnklst)
+{
+    Eprog prog;
+
+    if ((prog = getshfunc(name)) != &dummy_eprog) {
+	/*
+	 * Save stopmsg, since user doesn't get a chance to respond
+	 * to a list of jobs generated in a hook.
+	 */
+	int osc = sfcontext, osm = stopmsg;
+
+	sfcontext = SFC_HOOK;
+	doshfunc(name, prog, lnklst, 0, 1);
+	sfcontext = osc;
+	stopmsg = osm;
+
+	return 0;
+    }
+
+    return 1;
+}
+
 /* do pre-prompt stuff */
 
 /**/
@@ -632,7 +656,6 @@ preprompt(void)
 {
     static time_t lastperiodic;
     LinkNode ln;
-    Eprog prog;
     int period = getiparam("PERIOD");
     int mailcheck = getiparam("MAILCHECK");
 
@@ -645,18 +668,7 @@ preprompt(void)
 
     /* If a shell function named "precmd" exists, *
      * then execute it.                           */
-    if ((prog = getshfunc("precmd")) != &dummy_eprog) {
-	/*
-	 * Save stopmsg, since user doesn't get a chance to respond
-	 * to a list of jobs generated in precmd.
-	 */
-	int osc = sfcontext, osm = stopmsg;
-
-	sfcontext = SFC_HOOK;
-	doshfunc("precmd", prog, NULL, 0, 1);
-	sfcontext = osc;
-	stopmsg = osm;
-    }
+    callhookfunc("precmd", NULL);
     if (errflag)
 	return;
 
@@ -664,14 +676,8 @@ preprompt(void)
      * "periodic" exists, 3) it's been greater than PERIOD since we *
      * executed "periodic", then execute it now.                    */
     if (period && (time(NULL) > lastperiodic + period) &&
-	(prog = getshfunc("periodic")) != &dummy_eprog) {
-	int osc = sfcontext;
-
-	sfcontext = SFC_HOOK;
-	doshfunc("periodic", prog, NULL, 0, 1);
-	sfcontext = osc;
+	!callhookfunc("periodic", NULL))
 	lastperiodic = time(NULL);
-    }
     if (errflag)
 	return;
 
