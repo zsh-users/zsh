@@ -1,24 +1,33 @@
 #compdef iconv
 
-local expl curcontext="$curcontext" state line codeset LOCPATH
+local expl curcontext="$curcontext" state line codeset LOCPATH ret=1
 
 if _pick_variant gnu=GNU unix --version; then
 
-  _arguments -C \
-    {'(--from-code --list)-f','(-f --list)--from-code='}'[specify code set of input file]:code set:->codeset' \
-    {'(--to-code --list)-t','(-t --list)--to-code='}'[specify code set for output]:code set:->codeset' \
-    '--list[list all character code sets]' \
-    '--verbose[print progress information]' \
-    {'(--help)-\?','(-\?)--help'}'[display help information]' \
-    '--usage[display a short usage message]' \
-    {'(--version)-V','(-V)--version'}'[print program version]' \
-    '1:file:_files' && return 0
+  local exargs="--list -? --help --usage --version -V"
+  _arguments -C -S -s \
+    "(-f --from-code $exargs)"{-f+,--from-code=}'[specify code set of input file]:code set:->codeset' \
+    "(-t --to-code $exargs)"{-t+,--to-code=}'[specify code set for output]:code set:->codeset' \
+    '(- 1)--list[list all character code sets]' \
+    "($exargs)-c[omit invalid characters from output]" \
+    "(-o --output $exargs)"{-o+,--output=}'[specify output file]:output file:_files' \
+    "(-s --silent --verbose $exargs)"{-s,--silent}'[suppress warnings]' \
+    "(-s --silent $exargs)--verbose[print progress information]" \
+    '(-)'{-\?,--help}'[display help information]' \
+    '(-)--usage[display a short usage message]' \
+    '(-)'{-V,--version}'[print program version]' \
+    '1:input file:_files' && return 0
     
     if [[ $state = codeset ]]; then
-      _wanted codesets expl 'code set' \
-          compadd "$@" ${${(s:,:)$(iconv --list|sed -n '/^$/,$ p')}## #}
+      if compset -P '*/'; then
+        _wanted option expl option compadd "$@" /TRANSLIT && ret=0
+      else
+	_wanted codesets expl 'code set' compadd "$@" -M 'r:|-=* r:|=*' \
+	    ${${${(f)"$(iconv --list|sed -n '/^$/,$ p')"}## #}%//} && ret=0
+      fi
     fi
     
+    return ret
 else
 
   _arguments -C \

@@ -1,9 +1,10 @@
-#compdef -value-,LANG,-default- -P -value-,LC_*,-default-
+#compdef -value-,LANG,-default- -value-,LANGUAGE,-default- -P -value-,LC_*,-default-
 
 local locales
 
 if (( $+commands[locale] )); then
   locales=( $(_call_program locales locale -a) )
+  [[ $OSTYPE = linux-gnu ]] && locales=( ${locales/utf8/UTF-8} )
 else
   locales=( /usr/lib/locale/*(:t) )
 fi

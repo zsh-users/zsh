@@ -1,4 +1,13 @@
-2003-03-12  Peter Stephenson  <pws@csr.com>
+2003-03-12  Oliver Kiddle  <opk@zsh.org>
+
+	* 18346: Completion/Unix/Command/_cdcd, Completion/Unix/Type/_users,
+	Completion/Unix/Command/_iconv, Completion/Unix/Command/_java,
+	Completion/Unix/Command/_sccs, Completion/Unix/Type/_locales:
+	update completions of java encodings for 1.4, GNU iconv to 2.2.5;
+	fix completions of locales on Linux, complete for more commands using
+	existing completions and more improvements to sccs completion
+
+2003-03-12	Peter Stephenson  <pws@csr.com>
 
 	* 18344: Completion/Unix/Command/_perforce: tag-order is now
 	useful after 18299.

@@ -40,7 +40,7 @@ _cdcd_commands ()
     'access:configure cddb access method'
     'help:display a help message'
   )
-  _describe 'cdcd command' commands
+  _describe -t commands 'cdcd command' commands
 }
 
 if (( CURRENT == 2 )); then

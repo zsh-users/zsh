@@ -1,9 +1,9 @@
-#autoload
+#compdef pflags pcred pmap pldd psig pstack pfiles pwdx pstop prun pwait ptree
 
 # If given the `-m <pattern>' option, this tries to complete only pids
 # of processes whose command line match the `<pattern>'.
 
-local out pids list expl match desc listargs args all nm ret=1
+local out pids list expl match desc listargs all nm ret=1
 
 _tags processes || return 1
 
@@ -19,8 +19,6 @@ else
   match="*[[:blank:]]*[[/[:blank:]]$PREFIX*$SUFFIX*"
   nm="$compstate[nmatches]"
 fi
-
-zstyle -s ":completion:${curcontext}:processes" command args
 
 out=( "${(@f)$(_call_program processes ps 2>/dev/null)}" )
 desc="$out[1]"
