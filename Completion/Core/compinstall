@@ -2,6 +2,7 @@ emulate -L zsh
 setopt extendedglob
 
 local key
+local compcontext=-default-
 
 __ci_tidyup() {
   unfunction -m __ci_\* 2>/dev/null
@@ -70,7 +71,7 @@ file where these can be found.  Note that this will only work if they
 are exactly the form in which compinstall inserted them.  If you leave
 the line as it is, or empty, I won't search."
   while true;  do
-    vared -ch -p 'file> ' newifile
+    vared -ch -p 'file> ' newifile || break
     if [[ -n $newifile && $ifile != $newifile ]]; then
       if __ci_test_ifile $newifile; then
         foundold=true
@@ -78,6 +79,8 @@ the line as it is, or empty, I won't search."
       fi
       print "I couldn't find any definitions there.  Edit a new filename, or
 leave the line blank to ignore it."
+    else
+      break
     fi
   done
 fi

@@ -1,3 +1,8 @@
+2000-04-28  Peter Stephenson  <pws@cambridgesiliconradio.com>
+
+	* pws: 11013: Completion/Core/compinstall: more breaks and
+	a completion context.
+
 2000-04-28  Bart Schaefer  <schaefer@zsh.org>
 
 	* 11012: Doc/Zsh/intro.yo, Doc/Zsh/manual.yo: Reorder menus
