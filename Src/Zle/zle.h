@@ -107,6 +107,7 @@ struct change {
     int off;			/* offset of the text changes */
     char *del;			/* characters to delete (metafied) */
     char *ins;			/* characters to insert (metafied) */
+    int old_cs, new_cs;		/* old and new cursor positions */
 };
 
 #define CH_NEXT (1<<0)   /* next structure is also part of this change */

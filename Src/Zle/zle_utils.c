@@ -53,7 +53,7 @@ struct cutbuffer vibuf[35];
 /**/
 char *lastline;
 /**/
-int lastlinesz, lastll;
+int lastlinesz, lastll, lastcs;
 
 /* size of line buffer */
 
@@ -438,6 +438,7 @@ initundo(void)
     curchange->del = curchange->ins = NULL;
     lastline = zalloc(lastlinesz = linesz);
     memcpy(lastline, line, lastll = ll);
+    lastcs = cs;
 }
 
 /**/
@@ -511,6 +512,8 @@ mkundoent(void)
     ch->next = NULL;
     ch->hist = histline;
     ch->off = pre;
+    ch->old_cs = lastcs;
+    ch->new_cs = cs;
     if(suf + pre == lastll)
 	ch->del = NULL;
     else
@@ -541,6 +544,7 @@ setlastline(void)
     if(lastlinesz != linesz)
 	lastline = realloc(lastline, lastlinesz = linesz);
     memcpy(lastline, line, lastll = ll);
+    lastcs = cs;
 }
 
 /* move backwards through the change list */
@@ -578,6 +582,7 @@ unapplychange(struct change *ch)
 	    else
 		line[cs++] = STOUC(*c);
     }
+    cs = ch->old_cs;
 }
 
 /* move forwards through the change list */
@@ -616,6 +621,7 @@ applychange(struct change *ch)
 	    else
 		line[cs++] = STOUC(*c);
     }
+    cs = ch->new_cs;
 }
 
 /* vi undo: toggle between the end of the undo list and the preceding point */

@@ -512,6 +512,9 @@ docomplete(int lst)
     char *s, *ol;
     int olst = lst, chl = 0, ne = noerrs, ocs, ret = 0;
 
+    if (undoing)
+	setlastline();
+
     if (runhookdef(BEFORECOMPLETEHOOK, (void *) &lst))
 	return 0;
 

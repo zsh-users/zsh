@@ -400,8 +400,13 @@ compquote tmp1 tmp4
   done
 
   if [[ -z "$tmp4" ]]; then
-    PREFIX="${opre}${osuf}"
-    SUFFIX=""
+    if [[ "$osuf" = */* ]]; then
+      PREFIX="${opre}${osuf}"
+      SUFFIX=""
+    else
+      PREFIX="${opre}"
+      SUFFIX="${osuf}"
+    fi
     tmp4="$testpath"
     compquote tmp4 tmp1
     compadd -Qf -p "$linepath$tmp4" \
