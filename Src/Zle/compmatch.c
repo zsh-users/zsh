@@ -488,7 +488,7 @@ match_str(char *l, char *w, Brinfo *bpp, int bc, int *rwlp,
 	 */
 
 	bslash = 0;
-	if (test && !sfx &&
+	if (test && !sfx && lw &&
 	    (l[ind] == w[ind] ||
 	     (bslash = (lw > 1 && w[ind] == '\\' &&
 			(ind ? (w[0] == l[0]) : (w[1] == l[0])))))) {
@@ -803,7 +803,7 @@ match_str(char *l, char *w, Brinfo *bpp, int bc, int *rwlp,
 	/* Same code as at the beginning, used in top-level calls. */
 
 	bslash = 0;
-	if ((!test || sfx) &&
+	if ((!test || sfx) && lw &&
 	    (l[ind] == w[ind] ||
 	     (bslash = (lw > 1 && w[ind] == '\\' &&
 			(ind ? (w[0] == l[0]) : (w[1] == l[0])))))) {
