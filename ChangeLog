@@ -1,5 +1,8 @@
 2000-04-28  Sven Wischnowsky  <wischnow@informatik.hu-berlin.de>
 
+	* 11007: Src/Zle/compmatch.c: misplaced cursor with partial-word
+ 	matching
+	
 	* Tanaka: 11001: Completion/User/_enscript, Completion/User/_lp,
 	Completion/User/_printers: printer-detection moved to new
 	_printers; used by _enscript

@@ -1917,14 +1917,8 @@ join_clines(Cline o, Cline n)
 
 		if (tn) {
 		    diff = sub_join(o, n, tn, 0);
-
-		    if (po && po->prefix && cmp_anchors(n, pn, 0)) {
-			po->flags |= CLF_MISS;
-			po->max += diff;
-		    } else {
-			o->flags |= CLF_MISS;
-			o->max += diff;
-		    }
+		    o->flags |= CLF_MISS;
+		    o->max += diff;
 		    n = tn;
 		    po = o;
 		    o = o->next;
