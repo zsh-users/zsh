@@ -2,7 +2,7 @@
 
 # Usage: _urls [-f]
 # Options:
-#  -f : complete files.
+#  -f : complete files first.
 #
 # Configuration keys used:
 #
@@ -38,84 +38,89 @@
 #    e.g. compconf urls_localhttp=www:/usr/local/apache/htdocs:public_html
 
 local ipre scheme host user dirs files ret=1 expl
+local urls_path="${compconfig[urls_path]:-${ZDOTDIR:-$HOME}/.zsh/urls}"
+local localhttp_servername="${${(@s.:.)compconfig[urls_localhttp]}[1]}"
+local localhttp_documentroot="${${(@s.:.)compconfig[urls_localhttp]}[2]}"
+local localhttp_userdir="${${(@s.:.)compconfig[urls_localhttp]}[3]}"
 
 if [[ "$1" = -f ]]; then
   shift
   _files "$@" && return
 fi
 
-if [[ -z "$compconfig[urls_path]" ]]; then
-  compconfig[urls_path]=${ZDOTDIR:-$HOME}/.zsh/urls
-fi
-
 ipre="$IPREFIX"
 
-if [[ -prefix [-+.a-z0-9]#: ]]; then
-  scheme="${PREFIX%%:*}"
-  compset -P "[-+.a-z0-9]#:"
-else
+if ! [[ -prefix [-+.a-z0-9]#: ]]; then
   _description expl 'URL prefix'
-  [[ -d $compconfig[urls_path]/bookmark ]] &&
-      compadd "$@" "$expl[@]" -S '' bookmark: && ret=0
+  [[ -d $urls_path/bookmark ]] &&
+    compadd "$@" "$expl[@]" -S '' bookmark: && ret=0
   compadd "$@" "$expl[@]" -S '' file: ftp:// gopher:// http:// && ret=0
   return $ret
 fi
 
+scheme="${PREFIX%%:*}"
+compset -P "[-+.a-z0-9]#:"
+
 case "$scheme" in
-  http|ftp|gopher) compset -P // || { compadd "$@" -S '' //; return };;
+  http|ftp|gopher)
+    if ! compset -P //; then
+      compadd "$@" -S '' //
+      return
+    fi
+  ;;
   file)
     if ! compset -P //; then
       if [ -prefix / ]; then
 	_files "$@"
-	return
       elif [ ! "$PREFIX" ]; then
 	compadd -S '/' - "${PWD%/}"
-	return
       fi
+      return
     fi
   ;;
   bookmark)
-    if [[ -f "$compconfig[urls_path]/$scheme/$PREFIX$SUFFIX" &&
-        -s "$compconfig[urls_path]/$scheme/$PREFIX$SUFFIX" ]]; then
-      compadd "$@" -QU -- \
-          "$ipre$(<"$compconfig[urls_path]/$scheme/$PREFIX$SUFFIX")"
+    if [[ -f "$urls_path/$scheme/$PREFIX$SUFFIX" &&
+	  -s "$urls_path/$scheme/$PREFIX$SUFFIX" ]]; then
+      compadd "$@" -QU -- "$ipre$(<"$urls_path/$scheme/$PREFIX$SUFFIX")" && ret=0
     else
-      compadd "$@" -Q -S '/' - \
-          $compconfig[urls_path]/$scheme/$PREFIX*$SUFFIX(/:t) && ret=0
-      compadd "$@" -QS '' - \
-          $compconfig[urls_path]/$scheme/$PREFIX*$SUFFIX(.:t) || return $ret
+      _description expl 'bookmark'
+      _path_files -W "$urls_path/$scheme" "$expl[@]" -S '' -g '*(^/)' && ret=0
+      _path_files -W "$urls_path/$scheme" -S/ -r '' -/ && ret=0
     fi
-    return 
+    return $ret
   ;;
 esac
 
-if [[ -prefix */* ]]; then
-
-  # Complete part after hostname
-  host=${PREFIX%%/*}
-  compset -P "$host/"
-  if [[ "$compconfig[urls_localhttp]" = ${host}:* ]]; then
-    if [[ -prefix \~ ]]; then
-      compset -P \~
-      if [[ -prefix */* ]]; then
-        user=${PREFIX%%/*}
-	compset -P $user/
-	_path_files -W ~$user/${${(s.:.)compconfig[urls_localhttp]}[3]}/
-      else
-        _users -S/
-      fi
-    else
-      _path_files -W ${${(s.:.)compconfig[urls_localhttp]}[2]}
-    fi
-  else
-    _path_files -W $compconfig[urls_path]/$scheme/$host/
-  fi
-else
-
-  # Complete hosts
-  dirs=($compconfig[urls_path]/$scheme/$PREFIX*$SUFFIX(/:t))
+# Complete hosts
+if ! [[ -prefix */* ]]; then
+  dirs=($urls_path/$scheme/$PREFIX*$SUFFIX(/:t))
   (( $#dirs )) || _hosts -S/ && ret=0
   [ "$scheme" = "http" ] && 
-      dirs=($dirs ${${(s.:.)compconfig[urls_localhttp]}[1]})
-  compadd "$@" -Q -S '/' - $dirs || return $ret
+    dirs=($dirs $localhttp_servername)
+  compadd "$@" -QS/ - $dirs && ret=0
+  return $ret
 fi
+
+# Complete part after hostname
+host=${PREFIX%%/*}
+compset -P "$host/"
+if [[ "$compconfig[urls_localhttp]" = ${host}:* ]]; then
+  if [[ -prefix \~ ]]; then
+    compset -P \~
+    if [[ -prefix */* ]]; then
+      user=${PREFIX%%/*}
+      compset -P $user/
+      _path_files -W ~$user/$localhttp_userdir -g '*(^/)' && ret=0
+      _path_files -W ~$user/$localhttp_userdir -S/ -r '' -/ && ret=0
+    else
+      _users -S/ && ret=0
+    fi
+  else
+    _path_files -W $localhttp_documentroot -g '*(^/)' && ret=0
+    _path_files -W $localhttp_documentroot -S/ -r '' -/ && ret=0
+  fi
+else
+  _path_files -W $urls_path/$scheme/$host/ -g '*(^/)' && ret=0
+  _path_files -W $urls_path/$scheme/$host/ -S/ -r '' -/ && ret=0
+fi
+return $ret
