@@ -695,6 +695,26 @@ item(tt(WIDGET) (scalar))(
 The name of the widget currently being executed; read-only.
 )
 enditem()
+
+subsect(Special Widget)
+
+There is one user-defined widget which is special to the shell.
+If it does not exist, no special action is taken.  The environment
+provided is identical to that for any other editing widget.
+
+startitem()
+tindex(zle-line-init)
+item(tt(zle-line-init))(
+Executed every time the line editor is started to read a new line
+of input.  The following example puts the line editor into vi command
+mode when it starts up.
+
+example(zle-line-init() { zle -K vicmd; }
+zle -N zle-line-init)
+
+)
+enditem()
+
 sect(Standard Widgets)
 cindex(widgets, standard)
 The following is a list of all the standard widgets,

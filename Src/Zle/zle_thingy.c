@@ -164,6 +164,17 @@ rthingy(char *nam)
     return refthingy(t);
 }
 
+/**/
+Thingy
+rthingy_nocreate(char *nam)
+{
+    Thingy t = (Thingy) thingytab->getnode2(thingytab, nam);
+
+    if(!t)
+	return NULL;
+    return refthingy(t);
+}
+
 /***********/
 /* widgets */
 /***********/

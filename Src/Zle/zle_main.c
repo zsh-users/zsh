@@ -348,7 +348,8 @@ raw_getkey(int keytmout, char *cptr)
 {
     long exp100ths;
     int ret;
-#ifdef HAS_TIO
+#if defined(HAS_TIO) && \
+  (defined(sun) || (!defined(HAVE_POLL) && !defined(HAVE_SELECT)))
     struct ttyinfo ti;
 #endif
 #ifndef HAVE_POLL
@@ -739,6 +740,7 @@ zleread(char *lp, char *rp, int flags)
     unsigned char *s;
     int old_errno = errno;
     int tmout = getiparam("TMOUT");
+    Thingy initthingy;
 
 #if defined(HAVE_POLL) || defined(HAVE_SELECT)
     baud = getiparam("BAUD");
@@ -820,6 +822,14 @@ zleread(char *lp, char *rp, int flags)
     lastcol = -1;
     initmodifier(&zmod);
     prefixflag = 0;
+
+    if ((initthingy = rthingy_nocreate("zle-line-init"))) {
+	char *args[2];
+	args[0] = initthingy->nam;
+	args[1] = NULL;
+	execzlefunc(initthingy, args);
+	unrefthingy(initthingy);
+    }
 
     zlecore();
 

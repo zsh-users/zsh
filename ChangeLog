@@ -1,3 +1,9 @@
+2003-12-12  Peter Stephenson  <pws@pwstephenson.fsnet.co.uk>
+
+	* 19281: Src/Zle/zle_main.c, Src/Zle/zle_thingy.c, Doc/Zsh/zle.yo:
+	zle-line-init, if defined as a widget, is called when zle
+	starts to read a line.
+
 2003-12-05  Oliver Kiddle  <opk@zsh.org>
 
 	* 19276: Completion/Base/Completer/_prefix: fix fallback used to
