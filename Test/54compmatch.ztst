@@ -254,6 +254,18 @@
 >line: {tst ___list_beep__ }{}
 >COMPADD:{}
 
+ test_code 'B:[nN][oO]= M:_= M:{A-Z}={a-z}' example1_list
+ comptest $'tst __no_listbe\t'
+0:Documentation example for options, input "__no_listbe"
+>line: {tst __no_listbeep }{}
+>COMPADD:{}
+
+ test_code 'B:[nN][oO]= M:_= M:{A-Z}={a-z}' example1_list
+ comptest $'tst nonono_listbe\t'
+0:Documentation example for options, input "nonono_listbe"
+>line: {tst nonono_listbeep }{}
+>COMPADD:{}
+
  lower_insensitive_M="M:{a-z}={A-Z}"
  lower_insensitive_m="m:{a-z}={A-Z}"
  example2_list=(ABC Abc abc)

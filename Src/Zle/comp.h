@@ -150,6 +150,7 @@ struct cmatcher {
 #define CMF_LINE  1
 #define CMF_LEFT  2
 #define CMF_RIGHT 4
+#define CMF_INTER 8
 
 struct cpattern {
     Cpattern next;		/* next sub-pattern */

@@ -183,13 +183,13 @@ parse_cmatcher(char *name, char *s)
 {
     Cmatcher ret = NULL, r = NULL, n;
     Cpattern line, word, left, right;
-    int fl, ll, wl, lal, ral, err, both;
+    int fl, fl2, ll, wl, lal, ral, err, both;
 
     if (!*s)
 	return NULL;
 
     while (*s) {
-	lal = ral = both = 0;
+	lal = ral = both = fl2 = 0;
 	left = right = NULL;
 
 	while (*s && inblank(*s)) s++;
@@ -197,10 +197,14 @@ parse_cmatcher(char *name, char *s)
 	if (!*s) break;
 
 	switch (*s) {
+	case 'b': fl2 = CMF_INTER;
 	case 'l': fl = CMF_LEFT; break;
+	case 'e': fl2 = CMF_INTER;
 	case 'r': fl = CMF_RIGHT; break;
 	case 'm': fl = 0; break;
+	case 'B': fl2 = CMF_INTER;
 	case 'L': fl = CMF_LEFT | CMF_LINE; break;
+	case 'E': fl2 = CMF_INTER;
 	case 'R': fl = CMF_RIGHT | CMF_LINE; break;
 	case 'M': fl = CMF_LINE; break;
 	default:
@@ -220,7 +224,7 @@ parse_cmatcher(char *name, char *s)
 		zwarnnam(name, "missing patterns", NULL, 0);
 	    return pcm_err;
 	}
-	if (fl & CMF_LEFT) {
+	if ((fl & CMF_LEFT) && !fl2) {
 	    left = parse_pattern(name, &s, &lal, '|', &err);
 	    if (err)
 		return pcm_err;
@@ -236,7 +240,8 @@ parse_cmatcher(char *name, char *s)
 	} else
 	    left = NULL;
 
-	line = parse_pattern(name, &s, &ll, ((fl & CMF_RIGHT) ? '|' : '='),
+	line = parse_pattern(name, &s, &ll,
+			     (((fl & CMF_RIGHT) && !fl2) ? '|' : '='),
 			     &err);
 	if (err)
 	    return pcm_err;
@@ -246,10 +251,10 @@ parse_cmatcher(char *name, char *s)
 	    line = NULL;
 	    ll = 0;
 	}
-	if ((fl & CMF_RIGHT) && (!*s || !*++s)) {
+	if ((fl & CMF_RIGHT) && !fl2 && (!*s || !*++s)) {
 	    if (name)
 		zwarnnam(name, "missing right anchor", NULL, 0);
-	} else if (!(fl & CMF_RIGHT)) {
+	} else if (!(fl & CMF_RIGHT) || fl2) {
 	    if (!*s) {
 		if (name)
 		    zwarnnam(name, "missing word pattern", NULL, 0);
@@ -257,7 +262,7 @@ parse_cmatcher(char *name, char *s)
 	    }
 	    s++;
 	}
-	if (fl & CMF_RIGHT) {
+	if ((fl & CMF_RIGHT) && !fl2) {
 	    if (*s == '|') {
 		left = line;
 		lal = ll;
@@ -304,7 +309,7 @@ parse_cmatcher(char *name, char *s)
 
 	n = (Cmatcher) hcalloc(sizeof(*ret));
 	n->next = NULL;
-	n->flags = fl;
+	n->flags = fl | fl2;
 	n->line = line;
 	n->llen = ll;
 	n->word = word;

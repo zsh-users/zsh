@@ -815,7 +815,9 @@ corresponding to var(tpat) which matches in the trial completion.
 xitem(tt(l:)var(lanchor)tt(|)var(lpat)tt(=)var(tpat))
 xitem(tt(L:)var(lanchor)tt(|)var(lpat)tt(=)var(tpat))
 xitem(tt(l:)var(lanchor)tt(||)var(ranchor)tt(=)var(tpat))
-item(tt(L:)var(lanchor)tt(||)var(ranchor)tt(=)var(tpat))(
+xitem(tt(L:)var(lanchor)tt(||)var(ranchor)tt(=)var(tpat))
+xitem(tt(b:)var(lpat)tt(=)var(tpat))
+item(tt(B:)var(lpat)tt(=)var(tpat))(
 These letters are for patterns that are anchored by another pattern on
 the left side. Matching for var(lpat) and var(tpat) is as for tt(m) and
 tt(M), but the pattern var(lpat) matched on the command line must be
@@ -828,14 +830,21 @@ If no var(lpat) is given but a var(ranchor) is, this matches the gap
 between substrings matched by var(lanchor) and var(ranchor). Unlike
 var(lanchor), the var(ranchor) only needs to match the trial
 completion string.
+
+The tt(b) and tt(B) forms are similar to tt(l) and tt(L) with an empty 
+anchor, but need to match only the beginning of the trial completion
+or the word on the command line, respectively.
 )
 xitem(tt(r:)var(lpat)tt(|)var(ranchor)tt(=)var(tpat))
 xitem(tt(R:)var(lpat)tt(|)var(ranchor)tt(=)var(tpat))
 xitem(tt(r:)var(lanchor)tt(||)var(ranchor)tt(=)var(tpat))
-item(tt(R:)var(lanchor)tt(||)var(ranchor)tt(=)var(tpat))(
-As tt(l) and tt(L), with the difference that the command line and trial
-completion patterns are anchored on the right side.  Here an empty
-var(ranchor) forces the match to the end of the command line string.
+xitem(tt(R:)var(lanchor)tt(||)var(ranchor)tt(=)var(tpat))
+xitem(tt(e:)var(lpat)tt(=)var(tpat))
+item(tt(E:)var(lpat)tt(=)var(tpat))(
+As tt(l), tt(L), tt(b) and tt(B), with the difference that the command
+line and trial completion patterns are anchored on the right side.
+Here an empty var(ranchor) and the tt(e) and tt(E) forms force the
+match to the end of the trial completion or command line string.
 )
 enditem()
 
@@ -897,6 +906,18 @@ letter in the word. The use of the uppercase forms of the
 specification characters (tt(L) and tt(M)) guarantees that what has
 already been typed on the command line (in particular the prefix
 tt(no)) will not be deleted.
+
+Note that the use of tt(L) in the first part means that it matches
+only when at the beginning of both the command line string and the
+trial completion. I.e., the string `tt(_NO_f)' would not be
+completed to `tt(_NO_foo)', nor would `tt(NONO_f)' be completed to
+`tt(NONO_foo)' because of the leading underscore or the second
+`tt(NO)' on the line which makes the pattern fail even though they are 
+otherwise ignored. To fix this, one would use `tt(B:[nN][oO]=)'
+instead of the first part. As described above, this matches at the
+beginning of the trial completion, independent of other characters or
+substrings at the beginning of the command line word which are ignored
+by the same or other var(spec)s.
 
 The second example makes completion case insensitive.  This is just
 the same as in the option example, except here we wish to retain the

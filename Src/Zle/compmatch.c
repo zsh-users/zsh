@@ -565,7 +565,9 @@ match_str(char *l, char *w, Brinfo *bpp, int bc, int *rwlp,
 					      NULL, NULL)) ||
 			      !match_parts(l + aoff, w + aoff, alen, part))))
 				continue;
-		    } else if (!both || il || iw)
+		    } else if (!both || ((mp->flags & CMF_INTER) ?
+					 ((mp->flags & CMF_LINE) ? iw : il) :
+					 (il || iw)))
 			continue;
 
 		    /* Fine, now we call ourselves recursively to find the
@@ -734,7 +736,9 @@ match_str(char *l, char *w, Brinfo *bpp, int bc, int *rwlp,
 					       tw - mp->lalen - mp->ralen,
 					       NULL, NULL));
 			else
-			    t = (!sfx && !il && !iw);
+			    t = (!sfx && !((mp->flags & CMF_INTER) ?
+					   ((mp->flags & CMF_LINE) ? iw : il) :
+					   (il || iw)));
 		    }
 		    if (mp->flags & CMF_RIGHT) {
 			/* Try to match the right anchor, if any. */
@@ -753,7 +757,9 @@ match_str(char *l, char *w, Brinfo *bpp, int bc, int *rwlp,
 					       mp->ralen - mp->lalen,
 					       NULL, NULL));
 			else
-			    t = (sfx && !il && !iw);
+			    t = (sfx && !((mp->flags & CMF_INTER) ?
+					  ((mp->flags & CMF_LINE) ? iw : il) :
+					  (il || iw)));
 		    }
 		    /* Now try to match the line and word patterns. */
 		    if (!t ||

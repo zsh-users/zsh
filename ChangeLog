@@ -1,5 +1,11 @@
 2000-06-19  Sven Wischnowsky  <wischnow@zsh.org>
 
+	* 11977: Completion/Core/_options, Completion/Core/_set_options,
+ 	Completion/Core/_unset_options, Doc/Zsh/compwid.yo,
+ 	Src/Zle/comp.h, Src/Zle/complete.c, Src/Zle/compmatch.c,
+ 	Test/54compmatch.ztst: new match spec characters bBeE, match only
+ 	word/line not both
+	
 	* 11973: Completion/Builtins/_zstyle, Completion/Core/_description,
  	Completion/Core/_expand, Doc/Zsh/compsys.yo, Src/Zle/zle_tricky.c:
  	allow _expand to expand braces; better detection of braces to

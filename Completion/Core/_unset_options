@@ -7,4 +7,4 @@
 local expl
 
 _wanted zsh-options expl 'unset zsh option' \
-    compadd "$@" -M 'L:|[nN][oO]= M:_= M:{A-Z}={a-z}' -a _unset_options
+    compadd "$@" -M 'B:[nN][oO]= M:_= M:{A-Z}={a-z}' -a _unset_options
