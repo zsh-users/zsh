@@ -1322,7 +1322,7 @@ whenever the var(input) list may be empty.  If there is guaranteed to be
 at least one var(input) and the first var(input) does not begin with a
 `tt(-)', then the first `tt(-)tt(-)' may be omitted.
 
-In the event that the string `tt(-)tt(-)' is or may be an var(INPUT), the
+In the event that the string `tt(-)tt(-)' is or may be an var(input), the
 tt(-e) option may be used to change the end-of-inputs marker.  Note that
 this does em(not) change the end-of-options marker.  For example, to use
 `tt(..)' as the marker:
