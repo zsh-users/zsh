@@ -1,8 +1,8 @@
 #compdef co ci rcs
 
-local nm=$compstate[nmatches] cmd="${words[1]:t}" ret=1
+local cmd="${words[1]:t}" ret=1
 
-if [[ $compstate[nmatches] -eq nm && -d RCS && $cmd != ci ]]; then
+if [[ -d RCS && $cmd != ci ]]; then
   local rep expl
 
   rep=(RCS/*,v(:t:s/\,v//))

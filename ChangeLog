@@ -1,3 +1,8 @@
+2000-11-06  Bart Schaefer  <schaefer@zsh.org>
+
+	* 13127: Completion/User/_rcs: Test of $compstate[nmatches] was a
+	no-op, removed it.
+
 2000-11-05  Bart Schaefer  <schaefer@zsh.org>
 
 	* 13124: Functions/Misc/nslookup: Use "command nslookup" as it's
