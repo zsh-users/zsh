@@ -1,0 +1,58 @@
+#compdef lp lpr lpq lprm
+
+local file expl ret=1 list disp strs shown
+
+if (( ! $+_lp_cache )); then
+   file=( /etc/(printcap|printers.conf)(N) )
+
+  if (( $#file )); then
+    _lp_cache=( "${(@)${(@s:|:)${(@)${(@f)$(< $file[1])}:#[    \#]*}%%:*}%%[ 	]*}" )
+  else
+    # Default value. Could probably be improved
+
+    _lp_cache=( lp0 )
+  fi
+fi
+
+if compset -P -P || [[ "$words[CURRENT-1]" = -P ]]; then
+  _wanted printers expl printer && compadd "$expl" - "$_lp_cache[@]"
+else
+  if [[ "$words[1]" = (lpq|lprm) ]]; then
+    list=( "${(@M)${(f@)$(lpq)}:#[0-9]*}" )
+
+    if (( $#list )); then
+      _tags users jobs
+
+      while _tags; do
+        if _requested users expl user; then
+          strs=( "${(@)${(@)list##[^ 	]##[ 	]##[^ 	]##[ 	]##}%%[ 	]*}" )
+          if [[ -z "$shown" ]] &&
+             zstyle -t ":completion:${curcontext}:users" verbose; then
+            disp=(-ld list)
+  	  shown=yes
+          else
+  	  disp=()
+          fi
+          compadd "$expl[@]" "$disp[@]" - "$strs[@]" || _users && ret=0
+        fi
+        if _requested jobs expl job; then
+          strs=( "${(@)${(@)list##[^ 	]##[ 	]##[^ 	]##[ 	]##[^ 	]##[ 	]##}%%[ 	]*}" )
+          if [[ -z "$shown" ]] &&
+             zstyle -t ":completion:${curcontext}:jobs" verbose; then
+            disp=(-ld list)
+  	  shown=yes
+          else
+  	  disp=()
+          fi
+          compadd "$expl[@]" "$disp[@]" - "$strs[@]" && ret=0
+        fi
+        (( ret )) || return 0
+      done
+    else
+      _message 'no print jobs'
+    fi
+    return 1
+  else
+    _ps
+  fi
+fi

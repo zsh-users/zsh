@@ -1,4 +1,4 @@
-#compdef ps2epsi ps2pdf epsffit extractres fixdlsrps fixfmps fixmacps fixpsditps fixpspps fixscribeps fixtpps fixwfwps fixwpps fixwwps includeres psbook psmerge psnup psresize psselect pstops psmulti pswrap lpr lp
+#compdef ps2epsi ps2pdf epsffit extractres fixdlsrps fixfmps fixmacps fixpsditps fixpspps fixscribeps fixtpps fixwfwps fixwpps fixwwps includeres psbook psmerge psnup psresize psselect pstops psmulti pswrap
 
 local expl
 
