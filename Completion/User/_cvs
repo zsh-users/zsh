@@ -1,135 +1,254 @@
 #compdef cvs
 
-setopt localoptions extendedglob
+_cvs () {
+  setopt localoptions extendedglob
 
-typeset -A commands
-commands=(add "ad new"            admin "adm rcs"         annotate ann
-          checkout "co get"       commit "ci com"         diff "di dif"
-          edit ""                 editors ""              export "exp ex"
-          history "hi his"        import "im imp"         init ""
-          log "lo rlog"           login "logon lgn"       logout ""
-          rdiff patch             release "re rel"        remove "rm delete"
-          status "st stat"        rtag "rt rfreeze"       tag "ta freeze"
-          unedit ""               update "up upd"         watch ""
-          watchers "")
+  typeset -A commands
+  commands=(add "ad new"            admin "adm rcs"         annotate ann
+	    checkout "co get"       commit "ci com"         diff "di dif"
+	    edit ""                 editors ""              export "exp ex"
+	    history "hi his"        import "im imp"         init ""
+	    log "lo rlog"           login "logon lgn"       logout ""
+	    rdiff patch             release "re rel"        remove "rm delete"
+	    status "st stat"        rtag "rt rfreeze"       tag "ta freeze"
+	    unedit ""               update "up upd"         watch ""
+	    watchers "")
 
-local com="${words[(i)(${(j:|:)${(kv)=commands}})]}"
+  local com="${words[(i)(${(j:|:)${(kv)=commands}})]}"
 
-local showlist='compstate[list]=list; compstate[force_list]=yes'
-local showhint="$showlist ; compstate[insert]=''"
-local complete_D="compadd today yesterday week\\ ago month\\ ago"
-local complete_k="compadd kv kvl k o b v"
-local complete_r="_cvsrevisions"
-local complete_m="compadd -UX 'Enter log message' -n ''; $showhint"
+  local showlist='compstate[list]=list; compstate[force_list]=yes'
+  local showhint="$showlist ; compstate[insert]=''"
+  local complete_D="compadd today yesterday week\\ ago month\\ ago"
+  local complete_k="compadd kv kvl k o b v"
+  local complete_r="_cvsrevisions"
+  local complete_m="compadd -UX 'Enter log message' -n ''; $showhint"
 
-if (( com < CURRENT )); then
-  case "$words[$com]" in
-    add|ad|new) # "+k:m:"
-      _complete_opts k: "$complete_k" m: "$complete_m" || _cvsaddp
-      ;;
-    admin|adm|rcs) # "+ib::c:a:A:e:l::u::LUn:N:m:o:s:t::IqxV:k:"
-      _complete_opts i '' b:: '' c: '' a: '' A: '' e: '' l:: '' u:: '' L '' U '' n: '' N: '' m: "$complete_m" o: '' s: '' t:: '' I '' q '' x '' V: '' k: "$complete_k" || _cvstargets
-      ;;
-    annotate|ann) # "+lr:D:fR"
-      _complete_opts l '' r: '' D: '' f '' R '' || _cvstargets
-      ;;
-    checkout|co|get) # "+ANnk:d:flRpQqcsr:D:j:P"
-      _complete_opts A '' N '' n '' k: "$complete_k" d: '' f '' l '' R '' p '' Q '' q '' c '' s '' r: "$complete_r" D: "$complete_D" j: '' P '' || _cvsrepositories
-      ;;
-    commit|ci|com) # "+nlRm:fF:r:"
-      _complete_opts n '' l '' R '' m: "$complete_m" f '' F: '' r: "$complete_r" || _cvstargets_modified
-      ;;
-    diff|di|dif) # "+abcdefhilnpstuw0123456789BHNRC:D:F:I:L:U:V:W:k:r:"
-      _complete_opts a '' b '' c '' d '' e '' f '' h '' i '' l '' n '' p '' s '' t '' u '' w '' 0 '' 1 '' 2 '' 3 '' 4 '' 5 '' 6 '' 7 '' 8 '' 9 '' B '' H '' N '' R '' C: '' D: "$complete_D" F: '' I: '' L: '' U: '' V: '' W: '' k: "$complete_k" r: "$complete_r" || _cvstargets_modified || _cvstargets
-      ;;
-    edit) # "+lRa:"
-      _complete_opts l '' R '' a: '' || _cvstargets
-      ;;
-    editors) # "+lR"
-      _complete_opts l '' R '' || _cvstargets
-      ;;
-    export|exp|ex) # "+ANnk:d:flRpQqcsr:D:j:P"
-      _complete_opts A '' N '' n '' k: "$complete_k" d: '' f '' l '' R '' p '' Q '' q '' c '' s '' r: "$complete_r" D: "$complete_D" j: '' P '' || _cvsrepositories
-      ;;
-    history|hi|his) # "+Tacelow?D:b:f:m:n:p:r:t:u:x:X:z:"
-      _complete_opts T '' a '' c '' e '' l '' o '' w '' \? '' D: "$complete_D" b: '' f: '' m: "$complete_m" n: '' p: '' r: '' t: '' u: '' x: '' X: '' z: '' || _cvstargets
-      ;;
-    import|im|imp) # "+Qqdb:m:I:k:W:"
-      _complete_opts Q '' q '' d '' b: '' m: "$complete_m" I: '' k: "$complete_k" W: '' || case $[CURRENT-com] in
-	1) _cvsrepositories;;
-	2) compadd -UX "Enter vendor tag name" -n '' && eval "$showhint";;
-	3) compadd -UX "Enter release tag name" -n '' && eval "$showhint";;
-	*) compadd -UX "No futher arguments used" -n '' && eval "$showhint";;
-	esac
-      ;;
-    init)
-      break
-      ;;
-    login|logon|lgn|logout)
-      _complete_opts || _files
-      ;;
-    rdiff|patch|pa) # "+V:k:cuftsQqlRD:r:"
-      _complete_opts V: '' k: "$complete_k" c '' u '' f '' t '' s '' Q '' q '' l '' R '' D: "$complete_D" r: "$complete_r" || _cvstargets
-      ;;
-    release|re|rel) # "+Qdq"
-      _complete_opts Q '' d '' q '' || _files -/
-      ;;
-    remove|rm|delete) # "+flR"
-      _complete_opts f '' l '' R '' || _cvsremovep
-      ;;
-    status|st|stat) # "+vlR"
-      _complete_opts v '' l '' R '' || _cvstargets
-      ;;
-    tag|ta|freeze) # "+FQqlRcdr:D:bf"
-      _complete_opts F '' Q '' q '' l '' R '' c '' d '' r: "$complete_r" D: "$complete_D" b '' f '' || _cvstargets
-      ;;
-    unedit) # "+lR"
-      _complete_opts l '' R '' || _cvstargets
-      ;;
-    update|up|upd) # "+ApPflRQqduk:r:D:j:I:W:"
-      _complete_opts A '' p '' P '' f '' l '' R '' Q '' q '' d '' u '' k: "$complete_k" r: "$complete_r" D: "$complete_D" j: '' I: '' W: '' || _cvstargets
-      ;;
-    watch)
-      if (( CURRENT == com + 1 )); then
-        compadd on off add remove
-      else
-        case "$words[com+1]" in
-          on|off) # "+lR"
-            _complete_opts l '' R '' || _cvstargets
-            ;;
-          add|remove) # "+lRa:"
-            _complete_opts l '' R '' a: '' || _cvstargets
-            ;;
-        esac
+  if (( com < CURRENT )); then
+    case "$words[$com]" in
+      add|ad|new) # "+k:m:"
+	_complete_opts k: "$complete_k" m: "$complete_m" || _cvsaddp
+	;;
+      admin|adm|rcs) # "+ib::c:a:A:e:l::u::LUn:N:m:o:s:t::IqxV:k:"
+	_complete_opts i '' b:: '' c: '' a: '' A: '' e: '' l:: '' u:: '' L '' U '' n: '' N: '' m: "$complete_m" o: '' s: '' t:: '' I '' q '' x '' V: '' k: "$complete_k" || _cvstargets
+	;;
+      annotate|ann) # "+lr:D:fR"
+	_complete_opts l '' r: '' D: '' f '' R '' || _cvstargets
+	;;
+      checkout|co|get) # "+ANnk:d:flRpQqcsr:D:j:P"
+	_complete_opts A '' N '' n '' k: "$complete_k" d: '' f '' l '' R '' p '' Q '' q '' c '' s '' r: "$complete_r" D: "$complete_D" j: '' P '' || _cvsrepositories
+	;;
+      commit|ci|com) # "+nlRm:fF:r:"
+	_complete_opts n '' l '' R '' m: "$complete_m" f '' F: '' r: "$complete_r" || _cvstargets_modified
+	;;
+      diff|di|dif) # "+abcdefhilnpstuw0123456789BHNRC:D:F:I:L:U:V:W:k:r:"
+	_complete_opts a '' b '' c '' d '' e '' f '' h '' i '' l '' n '' p '' s '' t '' u '' w '' 0 '' 1 '' 2 '' 3 '' 4 '' 5 '' 6 '' 7 '' 8 '' 9 '' B '' H '' N '' R '' C: '' D: "$complete_D" F: '' I: '' L: '' U: '' V: '' W: '' k: "$complete_k" r: "$complete_r" || _cvstargets_modified || _cvstargets
+	;;
+      edit) # "+lRa:"
+	_complete_opts l '' R '' a: '' || _cvstargets
+	;;
+      editors) # "+lR"
+	_complete_opts l '' R '' || _cvstargets
+	;;
+      export|exp|ex) # "+ANnk:d:flRpQqcsr:D:j:P"
+	_complete_opts A '' N '' n '' k: "$complete_k" d: '' f '' l '' R '' p '' Q '' q '' c '' s '' r: "$complete_r" D: "$complete_D" j: '' P '' || _cvsrepositories
+	;;
+      history|hi|his) # "+Tacelow?D:b:f:m:n:p:r:t:u:x:X:z:"
+	_complete_opts T '' a '' c '' e '' l '' o '' w '' \? '' D: "$complete_D" b: '' f: '' m: "$complete_m" n: '' p: '' r: '' t: '' u: '' x: '' X: '' z: '' || _cvstargets
+	;;
+      import|im|imp) # "+Qqdb:m:I:k:W:"
+	_complete_opts Q '' q '' d '' b: '' m: "$complete_m" I: '' k: "$complete_k" W: '' || case $[CURRENT-com] in
+	  1) _cvsrepositories;;
+	  2) compadd -UX "Enter vendor tag name" -n '' && eval "$showhint";;
+	  3) compadd -UX "Enter release tag name" -n '' && eval "$showhint";;
+	  *) compadd -UX "No futher arguments used" -n '' && eval "$showhint";;
+	  esac
+	;;
+      init)
+	break
+	;;
+      login|logon|lgn|logout)
+	_complete_opts || _files
+	;;
+      rdiff|patch|pa) # "+V:k:cuftsQqlRD:r:"
+	_complete_opts V: '' k: "$complete_k" c '' u '' f '' t '' s '' Q '' q '' l '' R '' D: "$complete_D" r: "$complete_r" || _cvstargets
+	;;
+      release|re|rel) # "+Qdq"
+	_complete_opts Q '' d '' q '' || _files -/
+	;;
+      remove|rm|delete) # "+flR"
+	_complete_opts f '' l '' R '' || _cvsremovep
+	;;
+      status|st|stat) # "+vlR"
+	_complete_opts v '' l '' R '' || _cvstargets
+	;;
+      tag|ta|freeze) # "+FQqlRcdr:D:bf"
+	_complete_opts F '' Q '' q '' l '' R '' c '' d '' r: "$complete_r" D: "$complete_D" b '' f '' || _cvstargets
+	;;
+      unedit) # "+lR"
+	_complete_opts l '' R '' || _cvstargets
+	;;
+      update|up|upd) # "+ApPflRQqduk:r:D:j:I:W:"
+	_complete_opts A '' p '' P '' f '' l '' R '' Q '' q '' d '' u '' k: "$complete_k" r: "$complete_r" D: "$complete_D" j: '' I: '' W: '' || _cvstargets
+	;;
+      watch)
+	if (( CURRENT == com + 1 )); then
+	  compadd on off add remove
+	else
+	  case "$words[com+1]" in
+	    on|off) # "+lR"
+	      _complete_opts l '' R '' || _cvstargets
+	      ;;
+	    add|remove) # "+lRa:"
+	      _complete_opts l '' R '' a: '' || _cvstargets
+	      ;;
+	  esac
+	fi
+	;;
+      watchers) # "+lR"
+	_complete_opts l '' R '' || _cvstargets
+	;;
+      *) _files;;
+    esac
+    return
+  fi
+
+  case ${+cvs_roots} in
+    0)
+      cvs_roots=()
+      if [[ -f ~/.cvspass ]]; then
+	cvs_roots=(
+	  $(cut -d ' ' -f 1 ~/.cvspass)
+	)
       fi
       ;;
-    watchers) # "+lR"
-      _complete_opts l '' R '' || _cvstargets
-      ;;
-    *) _files;;
   esac
-  return
-fi
 
-case ${+cvs_roots} in
-  0)
-    cvs_roots=()
-    if [[ -f ~/.cvspass ]]; then
-      cvs_roots=(
-	$(cut -d ' ' -f 1 ~/.cvspass)
-      )
+  _complete_opts \
+    H '' Q '' q '' r '' w '' l '' n '' t '' v '' f '' a '' \
+    b: "compadd /usr/local/bin" \
+    T: "compadd $TMPPREFIX:h $TMPDIR /tmp" \
+    e: "compadd vi" \
+    d: "compadd $cvs_roots || _files -/" \
+    z: "compadd 9'" \
+    s: "_cvs_user_variable" \
+   || 
+  compadd ${(k)commands} ||
+  compadd ${(kv)=commands}
+}
+
+_cvsprefix () {
+  local f
+  qpref=$PREFIX
+  if [[ $qpref != */ ]]; then
+    if [[ $qpref = */* ]]; then
+      qpref=$qpref:h
+    else
+      qpref=
     fi
-    ;;
-esac
+  fi
+  pref=$~qpref
+  if [[ ! -d "$pref" ]]; then
+    qpref=
+    pref=
+  fi
+  [[ -n "$pref" && "$pref" != */ ]] && qpref=$qpref/ pref=$pref/
+}
 
-_complete_opts \
-  H '' Q '' q '' r '' w '' l '' n '' t '' v '' f '' a '' \
-  b: "compadd /usr/local/bin" \
-  T: "compadd $TMPPREFIX:h $TMPDIR /tmp" \
-  e: "compadd vi" \
-  d: "compadd $cvs_roots || _files -/" \
-  z: "compadd 9'" \
-  s: "_cvs_user_variable" \
- || 
-compadd ${(k)commands} ||
-compadd ${(kv)=commands}
+_cvsentries () {
+  setopt localoptions nullglob unset
+  if [[ -f ${pref}CVS/Entries ]]; then
+      entries=( "${(@)${(@)${(@)${(f@)$(<${pref}CVS/Entries)}:#D}#(D|)/}%%/*}" )
+  fi
+}
+
+_cvsentries_modified () {
+  local LANG=C
+  local OLDTZ="$TZ"; if ! (( $+TZ )); then unset OLDTZ; fi; export TZ=GMT
+
+  local line Entries
+  typeset -A mtime
+
+  if ! zmodload -e stat; then zmodload stat; fi
+  if zmodload -e stat; then
+    if [[ -f "${pref}CVS/Entries" ]]; then
+      Entries="$(<${pref}CVS/Entries)"
+      mtime=( "${(@s:/:)${(j:/:)${(@)${(@)${(@)${(M@)${(f@)Entries}:#/*}#/}%/*/*}/\/*\///}}}" )
+      entries=( "${(@)${(@)${(M@)${(f@)Entries}:#D/*}#D/}%%/*}" )
+      builtin stat -n +mtime -F '%a %b %e %T %Y' "$pref${(@k)^mtime}" |
+      while read line
+      do
+	line=${line#$pref}
+	if [[ x"$mtime[${line%% *}]" == x"${line#* }" ]]; then
+	  #print up-to-date "${line%% *}"
+	else
+	  #print locally-modified "${line%% *}"
+	  entries=($entries "${line%% *}")
+	fi
+      done
+    fi
+  else
+    entries=( "${(@)${(@)${(@)${(f@)Entries}:#D}#(D|)/}%%/*}" )
+  fi
+
+  if (( $+OLDTZ )); then TZ="$OLDTZ"; else unset TZ; fi
+}
+
+_cvstargets () {
+  local qpref pref entries
+  _cvsprefix
+  _cvsentries
+
+  compadd -fP "$qpref" -W "$pref" - $entries
+}
+
+_cvstargets_modified () {
+  local qpref pref entries
+  _cvsprefix
+  _cvsentries_modified
+
+  compadd -fp "$qpref" -W "$pref" - $entries
+}
+
+_cvsrevisions () {
+  compadd - "${(@)${(@)${(@M)${(@f)$(cvs -q status -vl .)}:#	*}##[ 	]##}%%[ 	]*}"
+}
+
+_cvsrepositories () {
+  local root=$CVSROOT
+  [[ -f CVS/Root ]] && root=$(<CVS/Root)
+
+  if [[ $root = :* || ! -d $root ]]; then
+    compadd -UX "Enter repository name" -n '' && { compstate[list]=list; compstate[force_list]=yes; compstate[insert]='' }
+  else
+    compadd - \
+      $root/^CVSROOT(:t) \
+      "${(@)${(@M)${(@f)$(<$root/CVSROOT/modules)}:#[^#]*}%%[ 	]*}"
+  fi
+}
+
+_cvsremovep () {
+  local qpref pref entries
+  _cvsprefix
+  _cvsentries
+  setopt localoptions unset
+  local omit
+  omit=( ${pref}*(D:t) )
+  eval 'compadd -fp "$qpref" -W "$pref" - ${entries:#('${(j:|:)omit}')}' ||
+    compadd -fp "$qpref" -W "$pref" - ${pref}*~${pref}CVS(/:t)
+}
+
+_cvsaddp () {
+  local qpref pref entries
+  _cvsprefix
+  _cvsentries
+  setopt localoptions unset
+  local all omit
+  all=( ${pref}*~${pref}CVS(D:t) )
+  omit=( $entries ${=cvsignore} )
+  [[ -r ~/.cvsignore ]] && omit=( $omit $(<~/.cvsignore) )
+  [[ -r ${pref}.cvsignore ]] && omit=( $omit $(<${pref}.cvsignore) )
+  eval 'compadd -fp "$qpref" -W "$pref" - ${all:#('${(j:|:)omit}')}' ||
+    compadd -fp "$qpref" -W "$pref" - ${pref}*~${pref}CVS(/:t)
+}
+
+_cvs "$@"
