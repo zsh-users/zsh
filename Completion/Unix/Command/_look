@@ -15,7 +15,7 @@ string)
   if [[ -n "$PREFIX" ]]; then
     _wanted values expl 'word prefix' compadd - $(_call_program values $words[1] $PREFIX)
   else
-    _message 'word prefix'
+    _message -e prefixes 'word prefix'
   fi
   ;;
 esac

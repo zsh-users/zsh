@@ -56,7 +56,7 @@ _perl_modules () {
       else
         # If perl isn't there, one wonders why the user's trying to
         # complete Perl modules.  Maybe her $path is wrong?
-        _message "Didn't find perl on \$PATH; guessing @INC ..."
+        _message "didn't find perl on \$PATH; guessing @INC ..."
 
         inc=( /usr/lib/perl5{,/{site_perl/,}<5->.([0-9]##)}(N) 
               ${(s.:.)PERL5LIB} )

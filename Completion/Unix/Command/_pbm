@@ -69,7 +69,7 @@ macptopbm)
 
 pbmclean)
   if [[ "$PREFIX" = -* ]]; then
-    _message 'maximum number of identical neighbours'
+    _message -e neighbours 'maximum number of identical neighbours'
   else
     _pbm
   fi
@@ -344,12 +344,12 @@ pnmflip)
 
 pnmgamma)
   if [[ CURRENT -eq 2 ]]; then
-    _message 'gamma value or red gamma value'
+    _message -e gamma-values 'gamma value or red gamma value'
   elif [[ CURRENT -eq 3 ]]; then
     _pbm && ret=0
-    _message 'green gamma value'
+    _message -e gamma-values 'green gamma value'
   elif [[ CURRENT -eq 4 ]]; then
-    _message 'blue gamma value'
+    _message -e gamma-values 'blue gamma value'
   elif [[ CURRENT -eq 5 ]]; then
     _pbm && ret=0
   fi
@@ -592,7 +592,7 @@ ppmquant)
     else
       _wanted options expl option compadd - -map && ret=0
     fi
-    _message 'number of colors'
+    _message -e numbers 'number of colors'
   
     return ret
   elif [[ CURRENT -eq 3 && "$words[2]" = -map ]]; then

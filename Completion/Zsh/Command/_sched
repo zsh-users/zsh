@@ -14,7 +14,7 @@ if [[ CURRENT -eq 2 ]]; then
                            compadd "$disp[@]" - {1..$#lines}
     return
   else
-    _message 'time specification'
+    _message -e times 'time specification'
     return 1
   fi
 fi

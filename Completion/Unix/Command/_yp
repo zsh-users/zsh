@@ -78,12 +78,12 @@ ypxfr)
     ':map name:->map' && ret=0
   ;;
 domainname)
-  _message 'new domain name'
+  _message -e new-domains 'new domain name'
   return 1
   ;;
 esac
 
-[[ "$state" = keymap ]] && _message 'key'
+[[ "$state" = keymap ]] && _message -e keys 'key'
 
 if [[ "$state" = map* ]]; then
   local expl
@@ -107,7 +107,7 @@ elif [[ "$state" = servers ]]; then
   if compset -P '*,'; then
     _wanted hosts expl server _hosts -qS, && ret=0
   else
-    _message 'domain name'
+    _message -e domains 'domain name'
   fi
 fi
 

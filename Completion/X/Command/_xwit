@@ -70,9 +70,9 @@ _regex_arguments _xwit_parse \
      "/$word/" ':option-iconmove-y:y:' \
   \| "/-id$nul/" "$guard" "/$word/" ':option-id:window id:_x_window' \
   \| "/-(no|)keyrepeat$nul/" "$guard" \
-      \( "/[0-9]##$nul/" ':option-keyrepeat-keycode:keycode:{[[ -prefix [0-9]# ]] && _message keycode}' \
+      \( "/[0-9]##$nul/" ':option-keyrepeat-keycode:keycode:{[[ -prefix [0-9]# ]] && _message -e keycodes keycode}' \
 	\( "/-$nul/" "/[0-9]##$nul/" \
-	   ':option-keyrepeat-last-keycode:last keycode:{[[ -prefix [0-9]# ]] && _message "last keycode"}' \| \) \) \# \
+	   ':option-keyrepeat-last-keycode:last keycode:{[[ -prefix [0-9]# ]] && _message -e keycodes "last keycode"}' \| \) \) \# \
   \| "/-names$nul/" "$guard" \
      "/$word/" ':option-names:window name:_x_window -n' \# \
   \| "/[]/" ':options:option:_xwit_compopts' \

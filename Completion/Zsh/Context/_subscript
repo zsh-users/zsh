@@ -22,7 +22,7 @@ elif compset -P '\('; then
     local f=$match[1] d=$match[2] e=$match[2] v=$match[3]
     [[ $f = s && ${(Pt)${compstate[parameter]}} != scalar* ]] && return 1
     if [[ -z $d ]]; then
-      _message 'delimiter'
+      _message -e delimiters 'delimiter'
       return
     else
       case $d in

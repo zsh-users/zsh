@@ -4,7 +4,7 @@ if compset -N --; then
   if [[ CURRENT -eq 1 ]]; then
     _pspdf
   else
-    _message 'userdict ARGUMENTS'
+    _message -e arguments 'userdict ARGUMENTS'
     return 1
   fi
 else
@@ -23,7 +23,7 @@ else
   case "$state" in
   dname)
     if [[ "$PREFIX" = *\=* ]]; then
-      _message 'systemdict definition value'
+      _message -e definition-values 'systemdict definition value'
     else
       _wanted names expl 'systemdict definition name' \
           compadd -M 'm:{a-z}={A-Z}' - \
@@ -43,7 +43,7 @@ else
         _files "$expl[@]" && ret=0
         ;;
       *)
-        _message 'systemdict value'
+        _message -e values 'systemdict value'
         return 1
       esac
     else

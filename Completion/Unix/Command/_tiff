@@ -185,7 +185,7 @@ if [[ -n "$state" ]]; then
 	'fill[byte-align EOL codes]' && ret=0
       ;;
     jpeg)
-      _message 'compression quality (0-100), or `r'"'"' (output RGB)'
+      _message -e values 'compression quality (0-100), or `r'"'"' (output RGB)'
       ret=0
       ;;
     lzw|zip)

@@ -499,7 +499,7 @@ property)
   if compset -P '*='; then
     _default
   else
-    _message 'property name'
+    _message -e property-names 'property name'
   fi
   ;;
 

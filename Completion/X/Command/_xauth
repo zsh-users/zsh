@@ -37,9 +37,9 @@ while [[ -n "$state" ]]; do
 	  state=protocolname
 	else
 	  case "$words[CURRENT-1]" in
-	  timeout) _message 'timeout(seconds)';;
-	  group) _message 'group-id';;
-	  data) _message 'hexdata';;
+	  timeout) _message -e values 'timeout (seconds)';;
+	  group) _message -e ids 'group-id';;
+	  data) _message -e values 'hexdata';;
 	  *) 
 	    _wanted options expl 'xauth generate options' \
 	      compadd trusted untrusted timeout group data && ret=0

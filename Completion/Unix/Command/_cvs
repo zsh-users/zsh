@@ -115,7 +115,7 @@ _cvs_admin () {
 (( $+functions[_cvs_admin_t] )) ||
 _cvs_admin_t () {
   if compset -P -; then
-    _message 'descriptive text'
+    _message -e descriptions 'descriptive text'
   else
     _files "$@"
   fi
@@ -644,7 +644,7 @@ _cvs_user_variable () {
   if compset -P '*='; then
     _default
   else
-    _message "variable=value"
+    _message -e variables "variable"
   fi
 }
 
@@ -679,7 +679,7 @@ _cvs_k () {
 
 (( $+functions[_cvs_m] )) ||
 _cvs_m () {
-  _message "log message"
+  _message -e messages "log message"
 }
 
 (( $+functions[_cvs_modules] )) ||
@@ -717,7 +717,7 @@ _cvs_top_modules () {
       _wanted modules expl 'module name' \
         compadd -a _cvs_top_modules_cache_mods
     else
-      _message 'module name'
+      _message -e modules 'module name'
     fi
   fi
 }
@@ -741,7 +741,7 @@ _cvs_sub_modules () {
       _wanted modules expl 'module name' \
         compadd -qS/ -a _cvs_sub_modules_cache_mods
     else
-      _message 'module name'
+      _message -e modules 'module name'
     fi
   fi
 }
@@ -793,7 +793,7 @@ _cvs_vendor_branches () {
   if (( $#vendor_branch )); then
     _wanted values expl 'vendor branch' compadd -a vendor_branch
   else
-    _message 'vendor branch'
+    _message -e branches 'vendor branch'
   fi
 }
 
@@ -854,7 +854,7 @@ _cvs_revisions () {
   if (( $#_cvs_revisions_cache )); then
     _wanted values expl revision compadd -a _cvs_revisions_cache
   else
-    _message revision
+    _message -e revisions revision
   fi
 }
 

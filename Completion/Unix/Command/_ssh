@@ -23,7 +23,7 @@ _remote_files () {
       (( ret )) || return 0
     done
   else
-    _message 'remote file'
+    _message -e remote-files 'remote file'
   fi
 }
 
@@ -229,12 +229,12 @@ _ssh () {
     forward)
       if compset -P 1 '*:'; then
         if compset -P '*:'; then
-          _message 'port number'
+          _message -e port-numbers 'port number'
         else
 	  _wanted hosts expl host _ssh_hosts -qS:
         fi
       else
-        _message 'listen-port number'
+        _message -e port-numbers 'listen-port number'
       fi
       return
       ;;

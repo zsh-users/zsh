@@ -1,3 +1,28 @@
+2002-04-16  Sven Wischnowsky  <wischnow@zsh.org>
+
+	* 16988: Completion/Base/Utility/_store_cache,
+	Completion/Debian/Type/_deb_packages,
+	Completion/Redhat/Command/_rpm, Completion/Unix/Command/_cvs,
+	Completion/Unix/Command/_gs, Completion/Unix/Command/_java,
+	Completion/Unix/Command/_look,
+	Completion/Unix/Command/_mysql_utils,
+	Completion/Unix/Command/_nslookup, Completion/Unix/Command/_pbm,
+	Completion/Unix/Command/_perl, Completion/Unix/Command/_rsync,
+	Completion/Unix/Command/_samba, Completion/Unix/Command/_ssh,
+	Completion/Unix/Command/_tiff, Completion/Unix/Command/_whois,
+	Completion/Unix/Command/_yp, Completion/Unix/Type/_perl_modules,
+	Completion/Unix/Type/_urls, Completion/X/Command/_x_utils,
+	Completion/X/Command/_xauth, Completion/X/Command/_xmodmap,
+	Completion/X/Command/_xwit, Completion/X/Type/_x_borderwidth,
+	Completion/X/Type/_x_geometry, Completion/X/Type/_x_locale,
+	Completion/X/Type/_x_name, Completion/X/Type/_x_resource,
+	Completion/X/Type/_x_selection_timeout,
+	Completion/X/Type/_x_title, Completion/X/Type/_xt_session_id,
+	Completion/Zsh/Command/_compdef, Completion/Zsh/Command/_limit,
+	Completion/Zsh/Command/_sched, Completion/Zsh/Command/_zstyle,
+	Completion/Zsh/Context/_subscript: make more calls to _message
+	use the -e option
+
 2002-04-12  Clint Adams  <clint@zsh.org>
 
 	* 16973: Completion/Debian/Command/_apt: complete package name

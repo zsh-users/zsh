@@ -27,7 +27,7 @@ if [[ -n "$state" ]]; then
 	PREFIX=''
 	compadd -S ' ' '=' && ret=0
       else
-        _message 'key code or `any'"'"
+        _message -e keys 'key code or `any'"'"
       fi
       ;;
     keysym*)

@@ -39,7 +39,7 @@ _perl_m_opt () {
   compset -P '-'
 
   if compset -P '*='; then
-    _message 'module arguments, comma separated'
+    _message -e module-arguments 'module arguments, comma separated'
   else
     _perl_modules -S= -q
   fi

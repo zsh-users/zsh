@@ -47,7 +47,7 @@ _deb_packages () {
   fi
 
   [[ "$command" = (installed|uninstalled|avail) ]] || {
-    _message "_deb_packages:unknown command: $command"
+    _message "unknown command: $command"
     return
   }
 

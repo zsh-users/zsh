@@ -137,7 +137,7 @@ _whois_single () {
     if (( $+functions[_whois:$host] )); then
       "_whois:$host" "$expl[@]"
     else
-      _message "identifier"
+      _message -e identifiers "identifier"
     fi
     ;;
   esac
@@ -164,7 +164,7 @@ _whois_multi () {
     if (( $+functions[_whois:$host] )); then
       "_whois:$host" "$expl[@]"
     else
-      _message "identifier"
+      _message -e identifiers "identifier"
     fi
     ;;
   esac
@@ -183,7 +183,7 @@ _whois_fwhois () {
     if (( $+functions[_whois:$host] )); then
       "_whois:$host" "$@"
     else
-      _message "identifier"
+      _message -e identifiers "identifier"
     fi
   fi
 }
@@ -206,7 +206,7 @@ _whois:whois.internic.net () {
 
     _wanted strings expl string compadd HELP DOMAIN HOST
   else
-    _message 'string'
+    _message -e strings 'string'
   fi
 }
 
@@ -217,7 +217,7 @@ _whois:whois.nic.ad.jp () {
 
     _wanted strings expl string compadd HELP DOM NET HOST PERSON CONN COM
   else
-    _message 'string'
+    _message -e strings 'string'
   fi
 }
 

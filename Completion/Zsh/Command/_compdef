@@ -36,7 +36,7 @@ _arguments -C -s -S \
 
 if [[ $state = multi ]]; then
   case $(( CURRENT % 3 )) in
-  0) _message key
+  0) _message -e keys key
      return 1;;
   1) state=cfun;;
   2) state=style;;

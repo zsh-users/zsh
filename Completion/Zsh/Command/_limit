@@ -5,5 +5,5 @@ if ! ((CURRENT % 2)); then
 elif [[ $PREFIX = u* ]]; then
     compadd unlimited
 else
-    _message "number and scaling factor"
+    _message -e values "number and scaling factor"
 fi

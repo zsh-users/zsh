@@ -237,11 +237,11 @@ _rpm () {
             compadd -M 'm:{a-z}={A-Z}' -S '\}' - \
                     "${(@)${(@f)$(_call_program tags rpm --querytags 2> /dev/null)}#RPMTAG_}" && ret=0
       else
-        _message 'RPM format'
+        _message -e formats 'RPM format'
       fi
       ;;
     capability)
-      _message 'RPM capability'
+      _message -e capabilities 'RPM capability'
       ;;
     relocate)
       if compset -P '*='; then

@@ -197,7 +197,7 @@ while (( $#state )); do
       ;;
 
     argument)
-      _message argument
+      _message -e arguments argument
       ;;
     
     bool) 
@@ -290,9 +290,9 @@ while (( $#state )); do
 
     tag-order)
       if compset -P '*:*:'; then
-        _message description
+        _message -e descriptions description
       elif compset -P '*:'; then
-        _message 'tag alias'
+        _message -e aliases 'tag alias'
       else
         suf=()
         compset -S ':*' || suf=( -qS: )
@@ -302,11 +302,11 @@ while (( $#state )); do
 
     filepat)
       if compset -P '*:*:'; then
-        _message description
+        _message -e descriptions description
       elif compset -P '*:'; then
-        _message tag
+        _message -e tags tag
       else
-        _message 'glob patterns'
+        _message -e patterns 'glob patterns'
       fi
       ;;
 
@@ -341,7 +341,7 @@ while (( $#state )); do
       ;;
 
     fake-files)
-      _message 'prefix and names'
+      _message -e fakes 'prefix and names'
       ;;
 
     fake-params)
@@ -375,11 +375,11 @@ while (( $#state )); do
       ;;
 
     preserve-prefix)
-      _message 'pattern matching prefix to keep'
+      _message -e prefixes 'pattern matching prefix to keep'
       ;;
 
     separator)
-      _message 'separator string'
+      _message -e separators 'separator string'
       ;;
 
     urgh) 

@@ -94,7 +94,7 @@ if [[ -n "$compcontext" ]]; then
     return 1
     ;;
   finger)
-    _message 'finger name'
+    _message -e names 'finger name'
     return 1
     ;;
   ls)

@@ -19,8 +19,8 @@ case $service in
 	  profile)
 	    _wanted parameter expl 'parameter' compadd on off flush count
 	  ;;
-	  debug) _message 'debug level' ;;
-	  ping) _message 'number of ping messages' ;;
+	  debug) _message -e levels 'debug level' ;;
+	  ping) _message -e numbers 'number of ping messages' ;;
 	esac
       ;;
       *)

@@ -88,9 +88,9 @@ xhost)
 
       case "$type" in
       inet) _hosts && ret=0;;
-      dnet) _message 'DECnet host';;
-      nis)  _message 'Secure RPC network name';;
-      krb)  _message 'Kerberos V5 principal';;
+      dnet) _message -e decnet-hosts 'DECnet host';;
+      nis)  _message -e network-names 'Secure RPC network name';;
+      krb)  _message -e principals 'Kerberos V5 principal';;
       esac
     else
       _alternative \

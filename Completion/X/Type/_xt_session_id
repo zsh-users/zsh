@@ -1,3 +1,3 @@
 #autoload
 
-_message 'session ID'
+_message -e ids 'session ID'

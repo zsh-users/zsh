@@ -137,7 +137,7 @@ if ! compset -P '(#b)([^:/]#)([:/])'; then
 fi
 host="$match[1]"
 
-[[ $match[2] = ':' ]] && ! compset -P '<->/' && _message 'port number' && return 0
+[[ $match[2] = ':' ]] && ! compset -P '<->/' && _message -e ports 'port number' && return 0
 
 # Complete part after hostname
 

@@ -214,10 +214,10 @@ _mysqladmin_commands () {
         _wanted mysqldbs expl "MySQL databases" _mysql_databases
       ;;
       (kill)
-        _message 'thread ids'
+        _message -e ids 'thread ids'
       ;;
       (password)
-        _message 'new password'
+        _message -e passwords 'new password'
       ;;
     esac
   fi
