@@ -30,13 +30,15 @@
 #include "zsh.mdh"
 #include "utils.pro"
 
-#if defined(HAVE_WCHAR_H) && defined(HAVE_WCTOMB)
-#include <wchar.h>
-#  ifndef __STDC_ISO_10646__
-#    if defined(HAVE_ICONV) || defined(HAVE_LIBICONV)
-#      include <iconv.h>
-#    endif
-#  endif
+#if defined(HAVE_WCHAR_H) && defined(HAVE_WCTOMB) && defined (__STDC_ISO_10646__)
+# include <wchar.h>
+#else
+# ifdef HAVE_LANGINFO_H 			       
+#   include <langinfo.h>			       
+#   if defined(HAVE_ICONV) || defined(HAVE_LIBICONV)   
+#     include <iconv.h> 			       
+#   endif					       
+# endif 					       
 #endif
 
 /* name of script being sourced */
@@ -3271,6 +3273,42 @@ dquotedzputs(char const *s, FILE *stream)
 }
 #endif
 
+# if defined(HAVE_NL_LANGINFO) && defined(CODESET) && !defined(__STDC_ISO_10646__)
+/* Convert a character from UCS4 encoding to UTF-8 */
+
+size_t
+ucs4toutf8(char *dest, unsigned int wval)
+{
+    size_t len;
+
+    if (wval < 0x80)
+      len = 1;
+    else if (wval < 0x800)
+      len = 2;
+    else if (wval < 0x10000)
+      len = 3;
+    else if (wval < 0x200000)
+      len = 4;
+    else if (wval < 0x4000000)
+      len = 5;
+    else
+      len = 6;
+
+    switch (len) { /* falls through except to the last case */
+    case 6: dest[5] = (wval & 0x3f) | 0x80; wval >>= 6;
+    case 5: dest[4] = (wval & 0x3f) | 0x80; wval >>= 6;
+    case 4: dest[3] = (wval & 0x3f) | 0x80; wval >>= 6;
+    case 3: dest[2] = (wval & 0x3f) | 0x80; wval >>= 6;
+    case 2: dest[1] = (wval & 0x3f) | 0x80; wval >>= 6;
+	*dest = wval | (0xfc << (6 - len)) & 0xfc;
+	break;
+    case 1: *dest = wval;
+    }
+
+    return len;
+}
+#endif
+
 /*
  * Decode a key string, turning it into the literal characters.
  * The length is returned in len.
@@ -3299,18 +3337,18 @@ getkeystring(char *s, int *len, int fromwhere, int *misc)
     char svchar = '\0';
     int meta = 0, control = 0;
     int i;
-#if defined(HAVE_WCHAR_H) && defined(HAVE_WCTOMB)
-#  ifdef __STDC_ISO_10646__
+#if defined(HAVE_WCHAR_H) && defined(HAVE_WCTOMB) && defined(__STDC_ISO_10646__)
     wint_t wval;
-#  elif defined(HAVE_ICONV) || defined(HAVE_LIBICONV)
+    size_t count;
+#else
     unsigned int wval;
+# if defined(HAVE_NL_LANGINFO) && defined(CODESET) && (defined(HAVE_ICONV) || defined(HAVE_LIBICONV))
     iconv_t cd;
     char inbuf[4];
-    wchar_t outbuf[1];
     size_t inbytes, outbytes;
-    char *inptr, *outptr;
-#  endif
+    char *inptr;
     size_t count;
+# endif
 #endif
 
     if (fromwhere == 6)
@@ -3387,8 +3425,6 @@ getkeystring(char *s, int *len, int fromwhere, int *misc)
 		    *misc = 1;
 		    break;
 		}
-#if defined(HAVE_WCHAR_H) && defined(HAVE_WCTOMB)
-#if defined(__STDC_ISO_10646__) || defined(HAVE_ICONV) || defined(HAVE_LIBICONV)
 	    case 'u':
 	    case 'U':
 	    	wval = 0;
@@ -3407,33 +3443,8 @@ getkeystring(char *s, int *len, int fromwhere, int *misc)
 		    *misc = wval;
 		    return s+1;
 		}
-#ifdef __STDC_ISO_10646__
+#if defined(HAVE_WCHAR_H) && defined(HAVE_WCTOMB) && defined(__STDC_ISO_10646__)
 		count = wctomb(t, (wchar_t)wval);
-#elif defined(HAVE_ICONV) || defined(HAVE_LIBICONV)
-    	    	inbytes = outbytes = 4;
-    	    	inptr = inbuf;
-    	    	outptr = (char *)outbuf;
-		/* assume big endian convention for UCS-4 */
-		for (i=3;i>=0;i--) {
-		    inbuf[i] = wval & 0xff;
-		    wval >>= 8;
-		}
-    	    	
-    	    	cd = iconv_open("WCHAR_T", "ISO-10646");
-		if (cd == (iconv_t)-1) {
-		    zerr("cannot do charset conversion", NULL, 0);
-		    if (fromwhere == 4) {
-			for (u = t; (*u++ = *++s););
-			return t;
-		    }
-		    *t = '\0';
-		    *len = t - buf;
-		    return buf;
-		}
-                iconv(cd, (const char **)&inptr, &inbytes, &outptr, &outbytes);
-		iconv_close(cd);
-		count = wctomb(t, *outbuf);
-#endif
 		if (count == (size_t)-1) {
 		    zerr("character not in range", NULL, 0);
 		    if (fromwhere == 4) {
@@ -3446,8 +3457,56 @@ getkeystring(char *s, int *len, int fromwhere, int *misc)
 		}
 		t += count;  
 		continue;
-#endif
-#endif
+# else
+#  if defined(HAVE_NL_LANGINFO) && defined(CODESET)
+		if (!strcmp(nl_langinfo(CODESET), "UTF-8")) {
+		    t += ucs4toutf8(t, wval);
+		    continue;
+		} else {
+#   if defined(HAVE_ICONV) || defined(HAVE_LIBICONV)
+    	    	    inbytes = 4;
+		    outbytes = 6;
+    	    	    inptr = inbuf;
+		    /* assume big endian convention for UCS-4 */
+		    for (i=3;i>=0;i--) {
+			inbuf[i] = wval & 0xff;
+			wval >>= 8;
+		    }
+
+    	    	    cd = iconv_open(nl_langinfo(CODESET), "ISO-10646");
+		    if (cd == (iconv_t)-1) {
+			zerr("cannot do charset conversion", NULL, 0);
+			if (fromwhere == 4) {
+			    for (u = t; (*u++ = *++s););
+			    return t;
+			}
+			*t = '\0';
+			*len = t - buf;
+			return buf;
+		    }
+                    count = iconv(cd, (char **)&inptr, &inbytes, &t, &outbytes);
+		    iconv_close(cd);
+		    if (count == (size_t)-1) {
+                        zerr("cannot do charset conversion", NULL, 0);
+		        *t = '\0';
+			*len = t - buf;
+			return buf;
+		    }
+		    continue;
+#   else
+                    zerr("cannot do charset conversion", NULL, 0);
+		    *t = '\0';
+		    *len = t - buf;
+		    return buf;
+#   endif
+		}
+#  else
+                zerr("cannot do charset conversion", NULL, 0);
+		*t = '\0';
+		*len = t - buf;
+		return buf;
+#  endif
+# endif
 	    default:
 	    def:
 		if ((idigit(*s) && *s < '8') || *s == 'x') {
