@@ -1,6 +1,0 @@
-#compdef -P */X11/*
-
-_arguments \
-  '-display:display:_x_display' \
-  '-geometry:geometry:_x_geometry' \
-  "$@"
