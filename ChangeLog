@@ -1,3 +1,10 @@
+2005-02-22  Peter Stephenson  <pws@csr.com>
+
+	* Andrey Borzenkov: 20838 with minor tweaks: Src/system.h,
+	Src/Zle/zle.h, Src/Zle/zle_main.c, Src/Zle/zle_misc.c,
+	Src/Zle/zle_tricky.c, Src/Zle/zle_utils.c: fixes to
+	get ZLE_UNICODE_SUPPORT basically working.
+
 2005-02-21  Peter Stephenson  <pws@csr.com>
 
 	* 20837: Doc/Zsh/contrib.yo: typos.

@@ -159,12 +159,12 @@ int hascompwidgets;
 static int
 usetab(void)
 {
-    unsigned char *s = zleline + zlecs - 1;
+    ZLE_STRING_T s = zleline + zlecs - 1;
 
     if (keybuf[0] != '\t' || keybuf[1])
 	return 0;
-    for (; s >= zleline && *s != '\n'; s--)
-	if (*s != '\t' && *s != ' ')
+    for (; s >= zleline && *s != ZLENL; s--)
+	if (*s != ZLETAB && *s != ZLESPC)
 	    return 0;
     if (compfunc) {
 	wouldinstab = 1;
@@ -866,7 +866,7 @@ addx(char **ptmp)
 	(instring && (zleline[zlecs] == '"' || zleline[zlecs] == '\'')) ||
 	(addspace = (comppref && !iblank(zleline[zlecs])))) {
 	*ptmp = (char *)zleline;
-	zleline = (unsigned char *)zhalloc(strlen((char *)zleline) + 3 +
+	zleline = (ZLE_STRING_T)zhalloc(strlen((char *)zleline) + 3 +
 					   addspace);
 	memcpy(zleline, *ptmp, zlecs);
 	zleline[zlecs] = 'x';

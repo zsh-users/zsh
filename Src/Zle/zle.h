@@ -47,6 +47,7 @@ typedef wint_t   ZLE_INT_T;
 #define ZLENL	L'\n'
 #define ZLENUL	L'\0'
 #define ZLETAB	L'\t'
+#define ZLESPC	L' '
 
 #define DIGIT_1		L'1'
 #define DIGIT_9		L'9'
@@ -75,6 +76,7 @@ typedef int ZLE_INT_T;
 #define ZLENL	'\n'
 #define ZLENUL	'\0'
 #define ZLETAB	'\t'
+#define ZLESPC	' '
 
 #define DIGIT_1		'1'
 #define DIGIT_9		'9'

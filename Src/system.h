@@ -689,6 +689,7 @@ extern short ospeed;
  */
 #if defined(HAVE_WCHAR_H) && defined(HAVE_WCTOMB) && defined (__STDC_ISO_10646__)
 # include <wchar.h>
+# include <wctype.h>
 
 /*
  * More stringent requirements to enable complete Unicode conversion

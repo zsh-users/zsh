@@ -111,22 +111,22 @@ zlelineasstring(ZLE_STRING_T instr, int inll, int incs, int *outll,
 {
 #ifdef ZLE_UNICODE_SUPPORT
     char *s;
-    char *mb_cursor;
     int i, j;
     size_t mb_len = 0;
 
-    mb_cursor = s = zalloc(inll * MB_CUR_MAX);
+    s = zalloc(inll * MB_CUR_MAX + 1);
 
-    for(i=0;i<=inll;i++) {
+    for(i=0; i < inll; i++) {
 	if (outcs != NULL && i == incs)
 	    *outcs = mb_len;
-	j = wctomb(mb_cursor, instr[i]);
+	j = wctomb(s + mb_len, instr[i]);
 	if (j == -1) {
 	    /* invalid char; what to do? */
 	} else {
 	    mb_len += j;
 	}
     }
+    s[mb_len] = '\0';
 
     if (outll != NULL)
 	*outll = mb_len;
@@ -135,7 +135,7 @@ zlelineasstring(ZLE_STRING_T instr, int inll, int incs, int *outll,
 	unsigned char *ret =
 	    (unsigned char *) metafy((char *) s, mb_len, META_HEAPDUP);
 
-	zfree((char *)s, inll * MB_CUR_MAX);
+	zfree((char *)s, inll * MB_CUR_MAX + 1);
 
 	return ret;
     }
@@ -201,11 +201,12 @@ stringaszleline(unsigned char *instr, int *outll, int *outsz)
 #ifdef ZLE_UNICODE_SUPPORT
     if (ll) {
 	/* reset shift state by converting null. */
-	char cnull = '\0';
+	/* char cnull = '\0'; */
 	char *inptr = (char *)instr;
 	wchar_t *outptr = outstr;
 
-	mbrtowc(outstr, &cnull, 1, &ps);
+	/* mbrtowc(outstr, &cnull, 1, &ps); */
+	memset(&ps, \0, sizeof(ps));
 
 	while (ll) {
 	    size_t ret = mbrtowc(outptr, inptr, ll, &ps);

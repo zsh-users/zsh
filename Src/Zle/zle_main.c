@@ -748,10 +748,11 @@ getfullchar(int keytmout)
 mod_export ZLE_INT_T
 getrestchar(int inchar)
 {
-    char cnull = '\0';
+    /* char cnull = '\0'; */
     char buf[MB_CUR_MAX], *ptr;
     wchar_t outchar;
     int ret;
+    mbstate_t ps;
 
     /*
      * We are guaranteed to set a valid wide last character,
@@ -764,7 +765,8 @@ getrestchar(int inchar)
 	return lastchar_wide = WEOF;
 
     /* reset shift state by converting null */
-    mbrtowc(&outchar, &cnull, 1, &ps);
+    /* mbrtowc(&outchar, &cnull, 1, &ps); */
+    memset (&ps, '\0', sizeof (ps));
 
     ptr = buf;
     *ptr++ = inchar;
@@ -785,7 +787,7 @@ getrestchar(int inchar)
 	    return lastchar_wide = WEOF;
 	*ptr++ = inchar;
     }
-    return lastchar_wide = (wint_t)outchar;
+    return lastchar_wide = (ZLE_INT_T)outchar;
 }
 /**/
 #endif

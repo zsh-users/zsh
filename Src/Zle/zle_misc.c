@@ -61,9 +61,13 @@ mod_export int
 selfinsert(UNUSED(char **args))
 {
 #ifdef ZLE_UNICODE_SUPPORT
+    /* wint_t and wchar_t not neccessarily the same size */
+    wchar_t tmp;
+
     if (!lastchar_wide_valid)
 	getrestchar(lastchar);
-    doinsert(&lastchar_wide, 1);
+    tmp = lastchar_wide;
+    doinsert(&tmp, 1);
 #else
     char s = lastchar;
     doinsert(&s, 1);
@@ -921,7 +925,7 @@ executenamedcommand(char *prmt)
 #ifdef ZLE_UNICODE_SUPPORT
 		    if (!lastchar_wide_valid)
 			getrestchar(0);
-		    if (iswcntrl(lastchar))
+		    if (iswcntrl(lastchar_wide))
 #else
 		    if (icntrl(lastchar))
 #endif
