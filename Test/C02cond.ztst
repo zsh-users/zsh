@@ -19,6 +19,7 @@
   chgrp $EGID modish
 
   chmod 7710 modish  # g+xs,u+s,+t
+  chmod g+s modish   # two lines combined work around chmod bugs
 
   touch unmodish
   chmod 000 unmodish

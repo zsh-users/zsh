@@ -1576,7 +1576,7 @@ elif test "$host_os" = cygwin; then
   MOD_IMPORT_VARIABLE="__attribute__((__dllimport__))"
   MOD_IMPORT_FUNCTION=
 elif test "x$dynamic" = xyes; then
-  AC_CACHE_CHECK(if your system use ELF binaries,
+  AC_CACHE_CHECK(if your system uses ELF binaries,
    zsh_cv_sys_elf,
    [AC_TRY_RUN([/* Test for whether ELF binaries are produced */
 #include <fcntl.h>
@@ -1623,6 +1623,10 @@ char *argv[];
 	esac
 	DLLDARG="${LDARG}"
       ;;
+      *darwin*)
+        DLLD="${DLLD=$CC}"
+        DLLDARG=""
+      ;;
       * )
 	DLLD="${DLLD=ld}"
 	DLLDARG=""
@@ -1630,7 +1634,10 @@ char *argv[];
     esac
   fi
   if test -n "$GCC"; then
-    DLCFLAGS="${DLCFLAGS=-fPIC}"
+    case "$host_os" in
+      darwin*) DLCFLAGS="${DLCFLAGS=-fno-common}" ;;
+      *)       DLCFLAGS="${DLCFLAGS=-fPIC}" ;;
+    esac
   else
     case "$host_os" in
       hpux*)                 DLCFLAGS="${DLCFLAGS=+z}" ;;
@@ -1646,6 +1653,7 @@ char *argv[];
     netbsd*)      DLLDFLAGS="${DLLDFLAGS=${DLLDARG}-x -shared --whole-archive}" ;;
     aix*)         DLLDFLAGS="${DLLDFLAGS=-G -bexpall -lc}" ;;
     solaris*|sysv4*|esix*) DLLDFLAGS="${DLLDFLAGS=-G}" ;;
+    darwin*)      DLLDFLAGS="${DLLDFLAGS=-bundle -flat_namespace -undefined suppress}" ;;
     openbsd*)
       if test $zsh_cv_sys_elf = yes; then
 	DLLDFLAGS="${DLLDFLAGS=-shared -fPIC}"

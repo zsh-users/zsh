@@ -18,7 +18,11 @@ Machines
 --------
 
 Apple: MacOS X/Darwin 1.4
-	Should build `out-of-the-box'. Dynamic loading does not work.
+	Should build `out-of-the-box'.
+
+	For dynamic loading to work, you need to use the dlcompat library.
+	It can be downloaded from:
+	    http://sourceforge.net/project/showfiles.php?group_id=17203
 
 Red Hat Inc.: Cygwin
 	Should build `out-of-the-box'.  The compilation directory should
