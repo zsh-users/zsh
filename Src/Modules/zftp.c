@@ -1793,7 +1793,7 @@ zftp_open(char *name, char **args, int flags)
 		tcp_close(zfsess->control);
 		zfsess->control = NULL;
 	    }
-	    freehostent(zhostp);
+	    zfreehostent(zhostp);
 	    zfunsetparam("ZFTP_HOST");
 	    FAILED();
 	    zwarnnam(name, "socket failed: %e", NULL, errno);
@@ -1821,7 +1821,7 @@ zftp_open(char *name, char **args, int flags)
 	}
 
 	if (err) {
-	    freehostent(zhostp);
+	    zfreehostent(zhostp);
 	    zfclose(0);
 	    FAILED();
 	    zwarnnam(name, "connect failed: %e", NULL, errno);
@@ -1842,7 +1842,7 @@ zftp_open(char *name, char **args, int flags)
 	zsh_inet_ntop(af, *addrp, pbuf, sizeof(pbuf));
 	zfsetparam("ZFTP_IP", ztrdup(pbuf), ZFPM_READONLY);
     }
-    freehostent(zhostp);
+    zfreehostent(zhostp);
     /* now we can talk to the control connection */
     zcfinish = 0;
 

@@ -1,5 +1,8 @@
 2001-10-26  Peter Stephenson  <pws@csr.com>
 
+	* 16172: Src/Modules/tcp.c, Src/Modules/zftp.c: rename
+	freehostent() to zfreehostent() to avoid clash with Solaris libnsl.
+
 	* 16171: Doc/Zsh/zftpsys.yo: minor changes of phrasing.
 
 	* 15793: Src/Modules/zftp.c: require zsh/net/tcp explicitly from
