@@ -1,8 +1,11 @@
-#compdef ncftp
+#compdef ncftp lftp
 
-if [[ -f ~/.ncftp/bookmarks ]]; then
-  _wanted bookmarks expl bookmark \
-      compadd - $(awk -F, 'NR > 2 { print $1 }' ~/.ncftp/bookmarks) && return 0
+local bookmarks=$HOME/.$service/bookmarks
+
+if [[ -f $bookmarks ]]; then
+  bookmarks=(${"${(f)$(<$bookmarks)}"%%[[:space:],]*})
+  [[ $service == ncftp ]] && shift 2 bookmarks  
+  _wanted bookmarks expl bookmark compadd -a bookmarks && return 0
 fi
 
 _hosts

@@ -1,3 +1,8 @@
+2001-03-13  Bart Schaefer  <schaefer@zsh.org>
+
+	* 13613, 13620: Completion/User/_ncftp, Completion/User/_lftp:
+	Unify completion for ncftp and lftp in _ncftp (removed _lftp).
+
 2001-03-13  Peter Stephenson  <pws@csr.com>
 
 	* 13611, 13615: Doc/Zsh/zle.yo, Src/init.c, Src/zsh.h, 

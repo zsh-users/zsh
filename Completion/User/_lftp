@@ -1,5 +1,0 @@
-#compdef lftp
-if [[ -f ~/.lftp/bookmarks ]]; then
-  _wanted bookmarks expl bookmark \
-      compadd - $(cut -f1 ~/.lftp/bookmarks) && return 0
-fi
