@@ -33,7 +33,9 @@ else
   word="$IPREFIX$PREFIX$SUFFIX$ISUFFIX"
 fi
 
-[[ "$word" = *\$\{[^\}]# ]] && return 1
+[[ "$word" = *\$(|\{[^\}]#) ||
+   ( "$word" = *\$[a-zA-Z0-9_]## && $+parameters[${word##*\$}] -eq 0 ) ]] &&
+    return 1
 
 zstyle -T ":completion:${curcontext}:" suffix &&
   [[ "$word" = (\~*/|\$(|[=~#^+])[a-zA-Z0-9_\[\]]##[^a-zA-Z0-9_\[\]]|\$\{*\}?)[^\$\{\}\(\)\<\>?^*#~]# ]] &&
@@ -44,8 +46,8 @@ zstyle -t ":completion:${curcontext}:" accept-exact ||
   { [[ "$word" = \~(|[-+]) ||
        ( "$word" = \~[-+][1-9]## && $word[3,-1] -le $#dirstack ) ||
        ( "$word" = \~* && ${#userdirs[(I)${word[2,-1]}*]}+${#nameddirs[(I)${word[2,-1]}*]} -ne 1 ) ||
-       ( "$word" = \$[a-zA-Z0-9_]## && 
-         ${#parameters[(I)${word[2,-1]}*]} -ne 1 ) ]] && return 1 }
+       ( "$word" = *\$[a-zA-Z0-9_]## && 
+         ${#parameters[(I)${word##*\$}*]} -ne 1 ) ]] && return 1 }
 
 # In exp we will collect the expansions.
 

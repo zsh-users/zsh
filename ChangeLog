@@ -1,5 +1,8 @@
 2000-06-29  Sven Wischnowsky  <wischnow@zsh.org>
 
+	* 12118: Completion/Core/_expand: don't expand partially typed
+ 	parameter expansions
+	
 	* 12115: Completion/Core/_expand, Doc/Zsh/compsys.yo: change
  	suffix style to still do expansion if the suffix contains
  	something to expand
