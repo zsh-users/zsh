@@ -2399,7 +2399,7 @@ cv_next(Cvdef d, char **sp, char **ap)
         return r;
 
     } else if (d->hassep) {
-        char *ns = strchr(s, d->sep), *as, *sap, sav;
+        char *ns = strchr(s, d->sep), *as = 0, *sap, sav = 0;
         int skip = 0;
 
         if (d->argsep && (as = strchr(s, d->argsep)) && (!ns || as <= ns)) {
@@ -2425,7 +2425,7 @@ cv_next(Cvdef d, char **sp, char **ap)
 
         return r;
     } else {
-        char *as = strchr(s, d->argsep), *sap, sav;
+        char *as = strchr(s, d->argsep), *sap, sav = 0;
 
         *sp = NULL;
 

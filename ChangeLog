@@ -4,6 +4,10 @@
 	fix for reported problems on AIX 4.x. Still no feedback if it
 	finally works (or even compiles)
 
+2001-06-18  Bart Schaefer  <schaefer@zsh.org>
+
+	* 14965: Src/Zle/computil.c: Silence compiler warnings.
+
 2001-06-18  Sven Wischnowsky  <wischnow@zsh.org>
 
 	* 14962: Completion/Unix/Type/_path_files: make special-dirs
