@@ -1,3 +1,8 @@
+2001-07-20  Peter Stephenson  <pws@csr.com>
+
+	* 15432: Functions/Zle/bash-transpose-words, Doc/Zsh/contrib.yo:
+	new bash-branspose-words widget.
+
 2001-07-20  Sven Wischnowsky  <wischnow@zsh.org>
 
 	* 15433: Src/Zle/computil.c: don't use compsuffix when it might
