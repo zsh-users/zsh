@@ -1,3 +1,9 @@
+2003-08-19  Adam Spiers  <adam@spiers.net>
+
+	* unposted: Functions/Prompts/prompt_adam2_setup: fix colouring
+	and bug introduced since % needed to be quoted inside ${//}
+	substitution.
+
 2003-08-19  Peter Stephenson  <pws@pwstephenson.fsnet.co.uk>
 
 	* 18948: Completion/Unix/Command/_perforce: Pass global
