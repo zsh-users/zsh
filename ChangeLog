@@ -1,3 +1,8 @@
+2000-04-29  Adam Spiers  <adam@spiers.net>
+
+	* 11017: Completion/Linux/_rpm: fixes for --rmsource and
+	--recompile options, and for breakage caused by 10772
+
 2000-04-28  Bart Schaefer  <schaefer@zsh.org>
 
 	* 11015: Src/builtin.c, Src/hashtable.c, Src/signals.c:

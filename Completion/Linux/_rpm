@@ -70,8 +70,9 @@ _arguments -C -s \
   '--erase:*:uninstall:->uninstall' \
   -'b+[build mode (spec file)]:build stage:((p\:execute\ \%prep\ stage l\:do\ a\ list\ check c\:execute\ build\ stage i\:execute\ install\ stage b\:build\ a\ binary\ package a\:build\ binary\ and\ source\ packages)):*:build:->build_b' \
   -'t+[build mode (tar file)]:build stage:((p\:execute\ \%prep\ stage l\:do\ a\ list\ check c\:execute\ build\ stage i\:execute\ install\ stage b\:build\ a\ binary\ package a\:build\ binary\ and\ source\ packages)):*:build:->build_t' \
-  --{rmsource,recompile,resign,addsign}':*:RPM package:->package' \
-  '--rebuild:*:Src RPM files:->package_src' \
+  --{resign,addsign}':*:RPM package:->package' \
+  '--rmsource:*:spec file:->spec_file' \
+  --{rebuild,recompile}':*:Src RPM files:->package_src' \
     '-K+[signature check mode]:*:sigcheck:->sigcheck' \
   '--checksig:*:sigcheck:->sigcheck' \
   '--rebuilddb:*:rebuild:->rebuild' && ret=0
@@ -187,16 +188,20 @@ while [[ -n "$state" ]]; do
       '--dbpath:RPM database path:_files -/' \
       '*:RPM source package file:->package_file' && ret=0
     ;;
-  package_or_file)
-    state=package_file
-    ;&
   target)
     _wanted target expl 'Target platforms' \
         compadd $(_call target rpm --showrc |grep 'compatible archs'|sed 's/.*: //') && ret=0
     ;;
+  package_or_file)
+    state=package_file
+    ;&
   package)
     _wanted packages expl 'RPM package' \
         compadd -M 'r:|-=* r:|=*' - $(_call packages rpm -qa) && ret=0
+    ;;
+  spec_file)
+    _wanted specfiles expl 'spec file' \
+        _files -g \*.spec && ret=0
     ;;
   package_file)
     if compset -P ftp://; then
@@ -204,7 +209,7 @@ while [[ -n "$state" ]]; do
     else
       _alternative \
           'files:RPM package file:_files -g \*.\(\#i\)rpm' \
-	  'prefixes:ftp URL prefix:compadd ftp://' && ret=0
+          'prefixes:ftp URL prefix:compadd ftp://' && ret=0
     fi
     ;;
   package_src)
