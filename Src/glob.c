@@ -2562,7 +2562,7 @@ remnulargs(char *s)
 static int
 qualdev(char *name, struct stat *buf, off_t dv, char *dummy)
 {
-    return buf->st_dev == dv;
+    return (off_t)buf->st_dev == dv;
 }
 
 /* number of hard links to file */
