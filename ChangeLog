@@ -1,3 +1,16 @@
+2000-06-10  Bart Schaefer  <schaefer@zsh.org>
+
+	* 11850: Src/Zle/complist.c: Don't try to menuselect in a listing
+	that isn't there, e.g., because the TERM is too dumb to draw it.
+
+2000-06-09  Peter Stephenson  <pws@cambridgesiliconradio.com>
+
+	* 11842 (repeat of 11838): Doc/Zsh/builtins.yo, Src/builtin.c,
+	Src/params.c, Src/subst.c, Src/zsh.h, Src/Modules/mapfile.c,
+	Src/Modules/parameter.c: add the HIDEVAL parameter attribute and
+	set it by default for parameters created by the mapfile and
+	parameter modules, to restore sanity of `typeset' output.
+
 2000-06-09  Clint Adams  <schizo@debian.org>
 
 	* 11839: Src/signals.c: prevent segmentation fault in

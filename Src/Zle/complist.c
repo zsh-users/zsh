@@ -1627,6 +1627,8 @@ domenuselect(Hookdef dummy, Chdata dat)
     int space, lbeg = 0, step = 1, wrap, pl = nlnct, broken = 0, first = 1;
     char *s;
 
+    if (!mtab)
+	return 0;
     if (fdat || (dummy && (!(s = getsparam("MENUSELECT")) ||
 			   (dat && dat->num < atoi(s))))) {
 	if (fdat) {
