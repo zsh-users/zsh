@@ -2539,7 +2539,7 @@ hashsetfn(Param pm, HashTable x)
 
 /**/
 mod_export void
-nullsethashfn(Param pm, HashTable x)
+nullsethashfn(UNUSED(Param pm), HashTable x)
 {
     deleteparamtable(x);
 }
