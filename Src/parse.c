@@ -2544,7 +2544,8 @@ build_dump(char *nam, char *dump, char **files, int ali, int map, int flags)
     if (!strsfx(FD_EXT, dump))
 	dump = dyncat(dump, FD_EXT);
 
-    if ((dfd = open(dump, O_WRONLY|O_CREAT, 0600)) < 0) {
+    unlink(dump);
+    if ((dfd = open(dump, O_WRONLY|O_CREAT, 0444)) < 0) {
 	zwarnnam(nam, "can't write zwc file: %s", dump, 0);
 	return 1;
     }
@@ -2675,7 +2676,8 @@ build_cur_dump(char *nam, char *dump, char **names, int match, int map,
     if (!strsfx(FD_EXT, dump))
 	dump = dyncat(dump, FD_EXT);
 
-    if ((dfd = open(dump, O_WRONLY|O_CREAT, 0600)) < 0) {
+    unlink(dump);
+    if ((dfd = open(dump, O_WRONLY|O_CREAT, 0444)) < 0) {
 	zwarnnam(nam, "can't write zwc file: %s", dump, 0);
 	return 1;
     }
@@ -2779,10 +2781,10 @@ static FuncDump dumps;
 static int
 zwcstat(char *filename, struct stat *buf, FuncDump dumps)
 {
-    FuncDump f;
-    
     if (stat(filename, buf)) {
 #ifdef HAVE_FSTAT
+        FuncDump f;
+    
 	for (f = dumps; f; f = f->next) {
 	    if (!strncmp(filename, f->filename, strlen(f->filename)) &&
 		!fstat(f->fd, buf))

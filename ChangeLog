@@ -1,5 +1,9 @@
 2001-06-18  Sven Wischnowsky  <wischnow@zsh.org>
 
+	* 14952: Src/parse.c: make zcompile unlink() the zwc file first
+	(in case it is currently mapped we don't want to overwrite it);
+	also, create the file read-only
+
 	* 14951: Src/signals.c, Src/signals.h: rename handler() to
 	zhandler() because it's now exported to modules
 
