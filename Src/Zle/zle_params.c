@@ -391,42 +391,40 @@ unset_cutbuffer(Param pm, int exp)
 static void
 set_killring(Param pm, char **x)
 {
-    int kpos, kcnt;
+    int kcnt;
+    Cutbuffer kptr;
     char **p;
 
-    kcnt = 0;
-    kpos = kringnum;
-
-    if (x) {
-	/*
-	 * Insert the elements into the kill ring, up to a maximum
-	 * of KRINGCT.  We always handle the ring in the order
-	 * a series of yank-pops would show, i.e. starting with
-	 * the most recently cut and going backwards.
-	 */
-	for (p = x; kcnt < KRINGCT && *p; kcnt++, p++) {
-	    Cutbuffer kptr = kring + kpos;
+    if (kring) {
+	for (kptr = kring, kcnt = 0; kcnt < kringsize; kcnt++, kptr++)
 	    if (kptr->buf)
 		free(kptr->buf);
-	    kptr->buf = (char *)zalloc(strlen(*p));
+	zfree(kring, kringsize * sizeof(struct cutbuffer));
+	kring = NULL;
+	kringsize = kringnum = 0;
+    }
+    if (x) {
+	/*
+	 * Insert the elements into the kill ring.
+	 * Regardless of the old order, we number it with the current
+	 * entry first.
+	 */
+	kringsize = arrlen(x);
+	kring = (Cutbuffer)zcalloc(kringsize * sizeof(struct cutbuffer));
+	for (p = x, kptr = kring; *p; p++, kptr++) {
+	    int len = strlen(*p);
+	    kptr->buf = (char *)zalloc(len);
 	    strcpy(kptr->buf, *p);
 	    unmetafy(kptr->buf, &kptr->len);
-	    kptr->flags = 0;
-	    kpos = (kpos + KRINGCT - 1) % KRINGCT;
+	    if (len != kptr->len) {
+		/* Might as well have the lengths consistent. */
+		char *p2 = zalloc(kptr->len);
+		memcpy(p2, kptr->buf, kptr->len);
+		zfree(kptr->buf, len);
+		kptr->buf = p2;
+	    }
 	}
 	freearray(x);
-    }
-    /*
-     * Any values unsupplied are to be unset.
-     */
-    for (; kcnt < KRINGCT; kcnt++) {
-	Cutbuffer kptr = kring + kpos;
-	if (kptr->buf) {
-	    free(kptr->buf);
-	    kptr->buf = NULL;
-	    kptr->flags = kptr->len = 0;
-	}
-	kpos = (kpos + KRINGCT - 1) % KRINGCT;
     }
 }
 
@@ -436,23 +434,28 @@ get_killring(Param pm)
 {
     /*
      * Return the kill ring with the most recently killed first.
-     * Stop as soon as we find something which isn't set, i.e.
-     * don't fill in bogus entries.
+     * Since the kill ring is no longer a fixed length, we return
+     * all entries even if empty.
      */
     int kpos, kcnt;
     char **ret, **p;
 
-    for (kpos = kringnum, kcnt = 0; kcnt < KRINGCT; kcnt++) {
+    /* Supposed to work even if kring is NULL */
+    for (kpos = kringnum, kcnt = 0; kcnt < kringsize; kcnt++) {
 	if (!kring[kpos].buf)
 	    break;
-	kpos = (kpos + KRINGCT - 1) % KRINGCT;
+	kpos = (kpos + kringsize - 1) % kringsize;
     }
 
-    p = ret = (char **)zhalloc((kcnt+1) * sizeof(char *));
+    p = ret = (char **)zhalloc((kringsize+1) * sizeof(char *));
 
-    for (kpos = kringnum; kcnt; kcnt--) {
-	*p++ = metafy((char *)kring[kpos].buf, kring[kpos].len, META_HEAPDUP);
-	kpos = (kpos + KRINGCT - 1) % KRINGCT;
+    for (kpos = kringnum, kcnt = 0; kcnt < kringsize; kcnt++) {
+	Cutbuffer kptr = kring + kpos;
+	if (kptr->buf)
+	    *p++ = metafy((char *)kptr->buf, kptr->len, META_HEAPDUP);
+	else
+	    *p++ = dupstring("");
+	kpos = (kpos + kringsize - 1) % kringsize;
     }
     *p = NULL;
 

@@ -38,9 +38,9 @@ struct cutbuffer cutbuf;
 /* Emacs-style kill buffer ring */
 
 /**/
-struct cutbuffer kring[KRINGCT];
+struct cutbuffer *kring;
 /**/
-int kringnum;
+int kringsize, kringnum;
 
 /* Vi named cut buffers.  0-25 are the named buffers "a to "z, and *
  * 26-34 are the numbered buffer stack "1 to "9.                   */
@@ -167,10 +167,16 @@ cut(int i, int ct, int dir)
 	cutbuf.buf = ztrdup("");
 	cutbuf.len = cutbuf.flags = 0;
     } else if (!(lastcmd & ZLE_KILL)) {
-	kringnum = (kringnum + 1) % KRINGCT;
-	if (kring[kringnum].buf)
-	    free(kring[kringnum].buf);
-	kring[kringnum] = cutbuf;
+	Cutbuffer kptr;
+	if (!kring) {
+	    kringsize = KRINGCTDEF;
+	    kring = (Cutbuffer)zcalloc(kringsize * sizeof(struct cutbuffer));
+	} else
+	    kringnum = (kringnum + 1) % kringsize;
+	kptr = kring + kringnum;
+	if (kptr->buf)
+	    zfree(kptr->buf, kptr->len);
+	*kptr = cutbuf;
 	cutbuf.buf = ztrdup("");
 	cutbuf.len = cutbuf.flags = 0;
     }

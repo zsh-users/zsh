@@ -1,3 +1,11 @@
+2003-01-27  Peter Stephenson  <pws@csr.com>
+
+	* 18139: Doc/Zsh/zle.yo, Src/Zle/zle.h, Src/Zle/zle_main.c,
+	Src/Zle/zle_misc.c, Src/Zle/zle_params.c, Src/Zle/zle_utils.c:
+	Improve $killring interface; can now change length.  Empty
+	strings in $killring are ignored when yank-popping.  Yank-popping
+	is more consistent about looping and using the original cutbuffer.
+
 2003-01-27  Oliver Kiddle  <opk@zsh.org>
 
 	* Doug Kearns: 18141: Completion/Unix/Command/_elinks:

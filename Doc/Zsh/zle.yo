@@ -622,10 +622,14 @@ vindex(killring)
 item(tt(killring) (array))(
 The array of previously killed items, with the most recently killed first.
 This gives the items that would be retrieved by a tt(yank-pop) in the
-same order, up to eight (which is the maximum stored internally).
-Unlike a normal array, only a maximum of eight elements may be written;
-any extra are ignored.  If fewer than eight elements are given, the
-remaining elements of the kill ring will be treated as undefined.
+same order.
+
+The default size for the kill ring is eight, however the length may be
+changed by normal array operations.  Any empty string in the kill ring is
+ignored by the tt(yank-pop) command, hence the size of the array
+effectively sets the maximum length of the kill ring, while the number of
+non-zero strings gives the current length, both as seen by the user at the
+command line.
 )
 
 vindex(LASTSEARCH)

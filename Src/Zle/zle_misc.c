@@ -331,28 +331,35 @@ copyregionaskill(char **args)
     return 0;
 }
 
+/*
+ * kct: index into kill ring, or -1 for original cutbuffer of yank.
+ * yankb, yanke: mark the start and end of last yank in editing buffer.
+ */
 static int kct, yankb, yanke;
+/* The original cutbuffer, either cutbuf or one of the vi buffers. */
+static Cutbuffer kctbuf;
 
 /**/
 int
 yank(char **args)
 {
-    Cutbuffer buf = &cutbuf;
     int n = zmult;
 
     if (n < 0)
 	return 1;
     if (zmod.flags & MOD_VIBUF)
-	buf = &vibuf[zmod.vibuf];
-    if (!buf->buf)
+	kctbuf = &vibuf[zmod.vibuf];
+    else
+	kctbuf = &cutbuf;
+    if (!kctbuf->buf)
 	return 1;
     mark = cs;
     yankb = cs;
     while (n--) {
-	kct = kringnum;
-	spaceinline(buf->len);
-	memcpy((char *)line + cs, buf->buf, buf->len);
-	cs += buf->len;
+	kct = -1;
+	spaceinline(kctbuf->len);
+	memcpy((char *)line + cs, kctbuf->buf, kctbuf->len);
+	cs += kctbuf->len;
 	yanke = cs;
     }
     return 0;
@@ -362,18 +369,56 @@ yank(char **args)
 int
 yankpop(char **args)
 {
-    int cc;
+    int cc, kctstart = kct;
+    Cutbuffer buf;
 
-    if (!(lastcmd & ZLE_YANK) || !kring[kct].buf)
+    if (!(lastcmd & ZLE_YANK))
 	return 1;
+    do {
+	/*
+	 * This is supposed to make the yankpop loop
+	 *   original buffer -> kill ring in order -> original buffer -> ...
+	 * where the original buffer is -1 and the remainder are
+	 * indices into the kill ring, remember that we need to start
+	 * that at kringnum rather than zero.
+	 */
+	if (kct == -1)
+	    kct = kringnum;
+	else {
+	    int kctnew = (kct + kringsize - 1) % kringsize;
+	    if (kctnew == kringnum)
+		kct = -1;
+	    else
+		kct = kctnew;
+	}
+	if (kct == -1)
+	    buf = kctbuf;	/* Use original cutbuffer */
+	else
+	    buf = kring+kct;	/* Use somewhere in the kill ring */
+	/* Careful to prevent infinite looping */
+	if (kct == kctstart)
+	    return 1;
+	/*
+	 * Skip unset buffers instead of stopping as we used to do.
+	 * Also skip zero-length buffers.
+	 * There are two reasons for this:
+	 * 1. We now map the array $killring directly into the
+	 *    killring, instead of via some extra size-checking logic.
+	 *    When $killring has been set, a buffer will always have
+	 *    at least a zero-length string in it.
+	 * 2. The old logic was inconsistent; when the kill ring
+	 *    was full, we could loop round and round it, otherwise
+	 *    we just stopped when we hit the first empty buffer.
+	 */
+    } while (!buf->buf || !*buf->buf);
+
     cs = yankb;
     foredel(yanke - yankb);
-    cc = kring[kct].len;
+    cc = buf->len;
     spaceinline(cc);
-    memcpy((char *)line + cs, kring[kct].buf, cc);
+    memcpy((char *)line + cs, buf->buf, cc);
     cs += cc;
     yanke = cs;
-    kct = (kct + KRINGCT - 1) % KRINGCT;
     return 0;
 }
 

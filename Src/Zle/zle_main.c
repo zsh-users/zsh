@@ -1406,8 +1406,11 @@ finish_(Module m)
     if (rdstrs)
         freelinklist(rdstrs, freestr);
     zfree(cutbuf.buf, cutbuf.len);
-    for(i = KRINGCT; i--; )
-	zfree(kring[i].buf, kring[i].len);
+    if (kring) {
+	for(i = kringsize; i--; )
+	    zfree(kring[i].buf, kring[i].len);
+	zfree(kring, kringsize * sizeof(struct cutbuffer));
+    }
     for(i = 35; i--; )
 	zfree(vibuf[i].buf, vibuf[i].len);
 
