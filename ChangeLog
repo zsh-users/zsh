@@ -1,3 +1,11 @@
+2002-01-04  Oliver Kiddle  <opk@zsh.org>
+
+	* 16398: Completion/Zsh/Command/_zstyle, Doc/Zsh/compsys.yo,
+	Completion/Base/Utility/_regex_arguments, Doc/Zsh/compwid.yo,
+	Completion/Unix/Type/_time_zone, Completion/Unix/Type/_directories,
+	Completion/Unix/Type/_file_systems: updated zstyle completion and
+	related cleanup
+
 2002-01-03  Oliver Kiddle  <opk@zsh.org>
 
 	* 16397: Completion/Base/Widget/_complete_help: use nul as separator

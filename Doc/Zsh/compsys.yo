@@ -356,7 +356,7 @@ the completion system.
 itemiz(\
 The var(function); in many cases this field will be blank, but when
 the completion system is called from other functions, like
-tt(predict-on) or one of the functions in the tt(Command) directory of 
+tt(predict-on) or one of the functions in the tt(Widget) directory of 
 the distribution, this field contains the name of that function, often
 in an abbreviated form.
 )
@@ -633,6 +633,11 @@ kindex(fonts, completion tag)
 item(tt(fonts))(
 used for X font names
 )
+kindex(fstypes, completion tag)
+item(tt(fstypes))(
+used when completing the available file system types (e.g. for the
+tt(mount) command)
+)
 kindex(functions, completion tag)
 item(tt(functions))(
 names of functions, normally shell functions although certain commands may
@@ -663,6 +668,10 @@ kindex(jobs, completion tag)
 item(tt(jobs))(
 used for jobs
 )
+kindex(interfaces, completion tag)
+item(tt(interfaces))(
+for network interfaces
+)
 kindex(keymaps, completion tag)
 item(tt(keymaps))(
 for names of zsh keymaps
@@ -687,6 +696,10 @@ directory when completing for the tt(cd) and related builtin commands
 kindex(manuals, completion tag)
 item(tt(manuals))(
 for names of manual pages
+)
+kindex(mailboxes, completion tag)
+item(tt(mailboxes))(
+for e-mail folders
 )
 kindex(maps, completion tag)
 item(tt(maps))(
@@ -715,6 +728,10 @@ for named directories (you wouldn't have guessed that, would you?)
 kindex(names, completion tag)
 item(tt(names))(
 for all kinds of names
+)
+kindex(newsgroups, completion tag)
+item(tt(newsgroups))(
+for USENET groups
 )
 kindex(nicknames, completion tag)
 item(tt(nicknames))(
@@ -765,7 +782,7 @@ for prefixes (like those of a URL)
 )
 kindex(printers, completion tag)
 item(tt(printers))(
-for printer names
+for print queue names
 )
 kindex(processes, completion tag)
 item(tt(processes))(
@@ -797,6 +814,10 @@ kindex(styles, completion tag)
 item(tt(styles))(
 for styles used by the zstyle builtin command
 )
+kindex(suffixes, completion tag)
+item(tt(suffixes))(
+for filename extensions
+)
 kindex(tags, completion tag)
 item(tt(tags))(
 for tags (e.g. tt(rpm) tags)
@@ -804,6 +825,10 @@ for tags (e.g. tt(rpm) tags)
 kindex(targets, completion tag)
 item(tt(targets))(
 for makefile targets
+)
+kindex(time-zones, completion tag)
+item(tt(time-zones))(
+for time zones (e.g. when setting the tt(TZ) parameter)
 )
 kindex(types, completion tag)
 item(tt(types))(
@@ -826,6 +851,10 @@ kindex(version, completion tag)
 item(tt(version))(
 used by tt(_call_program) to look up the command to run to determine the installed
 version of various other commands (such as tt(diff) and tt(make)).
+)
+kindex(visuals, completion tag)
+item(tt(visuals))(
+for X visuals
 )
 kindex(warnings, completion tag)
 item(tt(warnings))(
@@ -1905,6 +1934,16 @@ expanded but only in command position.  If it is set to `false', regular
 aliases will never be expanded and if it is set to the string
 `tt(always)', regular aliases will be expanded even if not in command
 position.
+)
+kindex(remote-access, completion style)
+item(tt(remote-access))(
+In order to generate matches for some commands such as tt(cvs) it is
+necessary to make connections to remote systems to retrieve the
+pertinent information. If this style is set to `false' such remote
+connections will not be made. Note that in some cases, in particular
+with tt(cvs), this may also prevent connections which are actually
+local because it may not be known if a certain command will make a
+remote connection.
 )
 kindex(remove-all-dups, completion style)
 item(tt(remove-all-dups))(
@@ -3124,7 +3163,7 @@ be generated, the action should consist of only a space. This will make
 the var(message) be displayed but no possible completions listed. Note
 that even in this case the colon at the end of the var(message) is
 needed. The only case where it can be left is when neither a var(message),
-nor a var(action) is given.
+nor an var(action) is given.
 
 Except for the `tt(->)var(string)' form below, the var(action) will be
 executed by calling the tt(_all_labels) function to process all tag labels,

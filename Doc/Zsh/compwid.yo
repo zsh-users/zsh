@@ -15,7 +15,7 @@ writing their own --- see dictionary entry for `hubris') should skip this
 section.  The older system based on the tt(compctl) builtin command is
 described in
 ifzman(zmanref(zshcompctl))\
-ifnzman(the chapter noderef(Completion Using compctl)).
+ifnzman(noderef(Completion Using compctl)).
 
 Completion widgets are defined by the tt(-C) option to the tt(zle)
 builtin command provided by the tt(zsh/zle) module (see

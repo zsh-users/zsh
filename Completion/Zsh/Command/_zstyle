@@ -1,10 +1,25 @@
 #compdef zstyle
 
-local curcontext="$curcontext" state context ostate line expl ctop
-local nm=$compstate[nmatches] mesg
-typeset -A opt_args
+local state context ostate line expl ctop suf
+local nm=$compstate[nmatches] taglist patterns pstyles
+typeset -A opt_args styles
 
-typeset -A styles
+(( $+functions[_completers] )) ||
+_completers() {
+  # option: -p - needs a `_' prefix
+  local us
+  local -a disp list expl
+  
+  list=( complete approximate correct match expand list menu oldlist
+         ignored prefix history )
+  zparseopts -D -K -E 'p=us'
+  [[ -n "$us" ]] && us='_'
+  zstyle -t ":completion:${curcontext}:completers" prefix-hidden &&
+      disp=(-d list)
+  _wanted completers expl 'completer' \
+      compadd "$@" "$disp[@]" - "$us${^list[@]}"
+}
+
 # Assoc array of styles; the values give the possible top-level
 # contexts (currently c for completion, z for zftp or cz for both),
 # followed by a colon, followed by a state to enter, empty if none.
@@ -12,18 +27,17 @@ styles=(
   accept-exact		 c:bool
   add-space		 c:bool
   ambiguous              c:bool
-  assign-list            c:
+  assign-list            c:_parameters
   auto-description	 c:
-  avoid-completer        c:
+  avoid-completer        c:completer
   break-keys             c:
-  cache-path		 'c:_wanted directories expl directory _path_files -/'
+  cache-path		 c:_directories
   cache-policy           c:_functions
   call-command           c:bool
   command                c:command
   commands               c:
   complete               c:bool
   completer		 c:completer
-  completions		 c:bool
   condition		 c:bool
   cursor		 c:cursor
   disable-stat		 c:bool
@@ -44,7 +58,6 @@ styles=(
   hidden		 c:bool
   hosts			 c:_hosts
   hosts-ports		 c:host-port
-  users-hosts-ports	 c:user-host-port
   ignore-line            c:ignline
   ignore-parents         c:ignorepar
   ignored-patterns	 c:
@@ -62,18 +75,21 @@ styles=(
   list-separator	 c:separator
   list-suffixes		 c:bool
   local			 c:
+  mail-directory         c:_directories
   match-original	 c:match-orig
   matcher		 c:
   matcher-list		 c:
   max-errors		 c:
   menu			 c:boolauto
+  muttrc                 c:_files
   numbers		 c:bool
   old-list		 c:bool
   old-matches            c:oldmatches
   old-menu		 c:bool 
   original		 c:bool
   packageset		 c:packageset
-  path			 'c:_wanted directories expl directory _path_files -/'
+  path			 c:_directories
+  pine-directory         c:_directories
   ports			 c:_ports
   prefix-hidden		 c:bool
   prefix-needed		 c:bool
@@ -93,61 +109,80 @@ styles=(
   subst-globs-only       c:bool
   substitute		 c:bool
   suffix		 c:bool
-  tag-order		 c:tag
+  tag-order		 c:tag-order
   try-to-use-pminst	 c:bool
+  urls                   c:_urls
   use-cache		 c:bool
   use-compctl		 c:urgh
   users			 c:_users
   users-hosts		 c:user-host
+  users-hosts-ports	 c:user-host-port
   verbose		 c:bool
   word			 c:bool
 
   chpwd			 z:bool
   progress		 z:progress
-  remote_glob		 z:bool
+  remote-glob		 z:bool
   titlebar		 z:bool
   update		 z:
 )
 
-local taglist
-taglist=(accounts all-files all-expansions arguments arrays
-association-keys bookmarks builtins characters colors commands corrections
-cursors cvs default descriptions devices directories directory-stack
-displays expansions extensions files fonts functions globbed-files groups
-history-words hosts indexes jobs keymaps keysyms local-directories
-libraries limits manuals maps messages modifiers modules my-accounts
-named-directories names nicknames options original other-accounts packages
-parameters path-directories paths pods ports prefixes processes
-processes-names ps regex sequences sessions signals strings tags targets
-types urls users values warnings widgets windows zsh-options)
+taglist=(
+  accounts all-expansions all-files arguments arrays association-keys
+  bookmarks builtins characters colormapids colors commands contexts
+  corrections cursors default descriptions devices directories
+  directory-stack displays expansions extensions files flags fstypes
+  fonts functions globbed-files groups history-words hosts indexes
+  interfaces jobs keymaps keysyms libraries limits local-directories
+  mailboxes manuals maps messages modifiers modules my-accounts
+  named-directories names newsgroups nicknames options original
+  other-accounts packages parameters path-directories paths pods ports
+  prefixes printers processes processes-names ps regex sequences
+  sessions signals strings styles tags targets timezones types urls
+  users values version visuals warnings widgets windows zsh-options
+)
 
-_arguments -C ':context:->contexts' ':style:->styles' '*:argument:->style-arg'
+_arguments -C \
+  '(: -)-L[output in form of zstyle commands]' \
+  '(: -)-d[delete style definitions]:context pattern:->patterns:*:styles:->pstyles' \
+  '(-)-e[value is evaluated when style is looked up]' \
+  ':context:->contexts' ':style:->styles' '*:argument:->style-arg'
 
-while [[ -n $state ]]; do
-  ostate=$state
-  state=
-
-  case "$ostate" in
+while (( $#state )); do
+  case "$state[1]" in
     contexts)
-      if [[ $PREFIX != :*: ]]; then
+      if [[ ! -prefix :*: ]]; then
 	_wanted contexts expl context compadd -P : -S : completion zftp
-      elif [[ $PREFIX = :completion:* ]] && _tags contexts; then
-        mesg=''
-        case "$PREFIX" in
-        :completion:[^:]#) mesg=function ;;
-        :completion:[^:]#:[^:]#) mesg=completer ;;
-        :completion:[^:]#:[^:]#:[^:]#) mesg='command or context' ;;
-        :completion:[^:]#:[^:]#:[^:]#:[^:]#) mesg=argument ;;
-        :completion:[^:]#:[^:]#:[^:]#:[^:]#:[^:]#) mesg=tag ;;
-	esac
-	[[ -n "$mesg" ]] && _message "$mesg"
+      elif compset -P :completion:; then
+        for ostate in functions _completers cmdorcont argument tag; do
+	  compset -P '[^:]#:' || break
+	done
+	suf=()
+	compset -S ':*' || suf=( -qS: )
+	[[ $ostate = tag ]] && suf=()
+	if compset -P '(|\\)\((*\||)'; then  # handle (x|y) patterns
+	  suf=()
+	  compset -S '(|\\)[)|]*' ||
+	      suf=( -S "${${QIPREFIX:+|}:-\|}" -r "${${QIPREFIX:+|}:-\\\\} \t)" )
+	fi
+	state+=( "$ostate" )
       fi
       ;;
 
+    patterns)
+      zstyle -g patterns
+      _wanted contexts expl 'context pattern' compadd -a patterns
+      ;;
+    
+    pstyles)
+      zstyle -g pstyles ${(Q)${(M)opt_args[-d]#*[^\\]:}%:}
+      _wanted styles expl style compadd -a pstyles
+    ;;
+
     styles)
       # Get the top-level context we're completing for, if any.
-      if [[ $words[2] = :(completion|zftp):* ]]; then
-	ctop=${words[2][2]}
+      if [[ $line[1] = :(completion|zftp):* ]]; then
+	ctop=${line[1][2]}
       else
         ctop=cz
       fi
@@ -156,9 +191,13 @@ while [[ -n $state ]]; do
       ;;
       
     style-arg)
-      state="${styles[$words[3]]#*:}"
+      state+=( "${styles[$line[2]]#*:}" )
       ;;
 
+    argument)
+      _message argument
+      ;;
+    
     bool) 
       _wanted values expl boolean compadd true false
       ;;
@@ -167,19 +206,34 @@ while [[ -n $state ]]; do
       _wanted values expl boolean compadd true false auto select
       ;;
 
+    cmdorcont)
+      _alternative -O suf \
+        'commands:command:_command ' \
+        'contexts:context:(-array-value- -brace-parameter- -command- -condition- -math- -parameter- -redirect- -subscript- -value-)'
+     ;;
+
     cursor)
       _wanted values expl 'cursor positioning' compadd complete key default
       ;;
 
     completer)
-      _wanted values expl completer \
-	compadd _complete _approximate _correct _match \
-                _expand _list _menu _oldlist _ignored _prefix _history
+      _wanted values expl completer _completers -p
       ;;
 
     fsort)
       _wanted values expl 'how to sort files' \
 	compadd name size links time date modification access inode change reverse
+      ;;
+
+    function)
+      _wanted control-function expl 'control function' \
+          compadd predict-on all-matches
+      ;;
+
+    functions)
+      _wanted comp-widget expl 'completion widget' \
+          compadd $suf - all-matches complete-tag correct-word expand-word \
+	  expand-alias-word history-words
       ;;
 
     user-host-port)
@@ -229,13 +283,18 @@ while [[ -n $state ]]; do
       ;;
 
     tag)
-      compset -q
+      _wanted tags expl tag compadd $suf -a taglist
+      ;;
+
+    tag-order)
       if compset -P '*:*:'; then
         _message description
       elif compset -P '*:'; then
         _message 'tag alias'
       else
-        _wanted tags expl tag compadd -a taglist
+        suf=()
+        compset -S ':*' || suf=( -qS: )
+        _wanted values expl tag compadd $suf -a taglist
       fi
       ;;
 
@@ -284,7 +343,13 @@ while [[ -n $state ]]; do
       ;;
 
     fake-params)
-      _message 'name and optional type'
+      if compset -P '*:'; then
+	_wanted values expl 'parameter type' compadd scalar array integer
+      else
+        suf=''
+        compset -S ':*' || suf='-qS:'
+      	_wanted values expl 'fake parameter' _parameters $suf
+      fi
       ;;
 
     ignline) 
@@ -320,12 +385,10 @@ while [[ -n $state ]]; do
       ;;
 
     _*)
-      ${=ostate}
-      ;;
-
-    *)
+      ${=state[1]} $suf
       ;;
   esac
+  shift state
 done
 
 [[ $compstate[nmatches] != $nm ]]

@@ -2,13 +2,6 @@
 
 ## usage: _regex_arguments funcname regex
 
-## configuration key used:
-
-# regex_arguments_path
-#  The path to a directory for caching. (default: ~/.zsh/regex_arguments)
-
-##
-
 # _regex_arguments compiles `regex' and emits the result of the state
 # machine into the function `funcname'. `funcname' parses a command line
 # according to `regex' and evaluates appropriate actions in `regex'. Before
