@@ -1946,7 +1946,7 @@ get_cline(char *l, int ll, char *w, int wl, char *o, int ol, int fl)
 {
     Cline r;
 
-    /* Preverably take it from the buffer list (freecl), if there
+    /* Prefer to take it from the buffer list (freecl), if there
      * is none, allocate a new one. */
 
     if ((r = freecl))
@@ -1979,6 +1979,28 @@ free_cline(Cline l)
 	free_cline(l->suffix);
 	l = n;
     }
+}
+
+/* Copy a cline list. */
+
+static Cline
+cp_cline(Cline l)
+{
+    Cline r = NULL, *p = &r, t;
+
+    while (l) {
+	if ((t = freecl))
+	    freecl = t->next;
+	else
+	    t = (Cline) zhalloc(sizeof(*t));
+	memcpy(t, l, sizeof(*t));
+	*p = t;
+	p = &(t->next);
+	l = l->next;
+    }
+    *p = NULL;
+
+    return r;
 }
 
 /* This reverts the order of the elements of the given cline list and
@@ -3365,6 +3387,50 @@ join_mid(Cline o, Cline n)
     n->suffix = NULL;
 }
 
+/* This turns the sequence of anchor cline structs from b to e into a
+ * prefix sequence, puts it before the prefix of e and then tries to
+ * join that with the prefix of a.
+ * This is needed if some matches had a anchor match spec and others
+ * didn't. */
+
+static void
+sub_join(Cline a, Cline b, Cline e, int anew)
+{
+    if (!e->suffix && a->prefix) {
+	Cline op = e->prefix, n = NULL, *p = &n, t, ca;
+
+	for (; b != e; b = b->next) {
+	    if ((*p = t = b->prefix)) {
+		while (t->next)
+		    t = t->next;
+		p = &(t->next);
+	    }
+	    b->suffix = b->prefix = NULL;
+	    b->flags &= ~CLF_SUF;
+	    *p = b;
+	    p = &(b->next);
+	}
+	*p = e->prefix;
+	ca = a->prefix;
+
+	while (n != op) {
+	    e->prefix = cp_cline(n);
+	    a->prefix = cp_cline(ca);
+
+	    if (anew) {
+		join_psfx(e, a, NULL, NULL, 0);
+		if (e->prefix)
+		    break;
+	    } else {
+		join_psfx(e, a, NULL, NULL, 0);
+		if (a->prefix)
+		    break;
+	    }
+	    n = n->next;
+	}
+    }
+}
+
 /* This simplifies the cline list given as the first argument so that
  * it also matches the second list. */
 
@@ -3388,11 +3454,7 @@ join_clines(Cline o, Cline n)
 
 		for (t = o; (tn = t->next) && (tn->flags & CLF_NEW); t = tn);
 		if (tn && cmp_anchors(tn, n, 0)) {
-		    Cline tmp;
-
-		    tmp = o->prefix;
-		    o->prefix = tn->prefix;
-		    tn->prefix = tmp;
+		    sub_join(n, o, tn, 1);
 
 		    if (po)
 			po->next = tn;
@@ -3410,11 +3472,7 @@ join_clines(Cline o, Cline n)
 
 		for (t = n; (tn = t->next) && (tn->flags & CLF_NEW); t = tn);
 		if (tn && cmp_anchors(o, tn, 0)) {
-		    Cline tmp;
-
-		    tmp = n->prefix;
-		    n->prefix = tn->prefix;
-		    tn->prefix = tmp;
+		    sub_join(o, n, tn, 0);
 
 		    n = tn;
 		    o->flags |= CLF_MISS;
@@ -3433,10 +3491,8 @@ join_clines(Cline o, Cline n)
 			 (o->flags  & (CLF_SUF | CLF_MID));
 		     t = tn);
 		if (tn && cmp_anchors(o, tn, 1)) {
-		    Cline t;
+		    sub_join(o, n, tn, 0);
 
-		    t = tn->prefix; tn->prefix = n->prefix; n->prefix = t;
-		    t = tn->suffix; tn->suffix = n->suffix; n->suffix = t;
 		    n = tn;
 		    continue;
 		}
@@ -3446,6 +3502,7 @@ join_clines(Cline o, Cline n)
 			 (n->flags  & (CLF_SUF | CLF_MID));
 		     t = tn);
 		if (tn && cmp_anchors(tn, n, 1)) {
+		    sub_join(n, o, tn, 1);
 		    if (po)
 			po->next = tn;
 		    else
@@ -3474,8 +3531,8 @@ join_clines(Cline o, Cline n)
 		for (t = n; (tn = t->next) && !cmp_anchors(o, tn, 1); t = tn);
 
 		if (tn) {
-		    t = tn->prefix; tn->prefix = n->prefix; n->prefix = t;
-		    t = tn->suffix; tn->suffix = n->suffix; n->suffix = t;
+		    sub_join(o, n, tn, 0);
+
 		    n = tn;
 		    o->flags |= CLF_MISS;
 		    continue;
@@ -3484,8 +3541,8 @@ join_clines(Cline o, Cline n)
 			 t = tn);
 
 		    if (tn) {
-			t = tn->prefix; tn->prefix = o->prefix; o->prefix = t;
-			t = tn->suffix; tn->suffix = o->suffix; o->suffix = t;
+			sub_join(n, o, tn, 1);
+
 			if (po)
 			    po->next = tn;
 			else
