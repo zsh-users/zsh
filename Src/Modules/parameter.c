@@ -181,6 +181,8 @@ scanpmparameters(HashTable ht, ScanFunc func, int flags)
 
     for (i = 0; i < realparamtab->hsize; i++)
 	for (hn = realparamtab->nodes[i]; hn; hn = hn->next) {
+	    if (((Param)hn)->flags & PM_UNSET)
+		continue;
 	    pm.nam = hn->nam;
 	    if (func != scancountparams &&
 		((flags & (SCANPM_WANTVALS|SCANPM_MATCHVAL)) ||

@@ -1,3 +1,8 @@
+2003-07-22  Peter Stephenson  <pws@csr.com>
+
+	* 18880: Src/Modules/parameter.c: Don't return unset variables
+	in whole array value for $parameters.
+
 2003-07-21  Peter Stephenson  <pws@csr.com>
 
 	* 18859: Completion/Base/Core/_description, Doc/Zsh/compsys.yo:
