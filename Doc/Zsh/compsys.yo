@@ -644,15 +644,6 @@ item(tt(paths))(
 used to look up the values of the tt(expand), tt(ambiguous) and
 tt(special-dirs) styles
 )
-kindex(pids, completion tag)
-item(tt(pids))(
-for process identifiers
-)
-kindex(pids-list, completion tag)
-item(tt(pids-list))(
-used to look up the tt(command) style when generating the list to
-display for process identifiers
-)
 kindex(pods, completion tag)
 item(tt(pods))(
 for perl pods
@@ -672,6 +663,16 @@ for printer names
 kindex(processes, completion tag)
 item(tt(processes))(
 for process identifiers
+)
+kindex(processes-list, completion tag)
+item(tt(processes-list))(
+used to look up the tt(command) style when generating the list to
+display for process identifiers
+)
+kindex(processes-names, completion tag)
+item(tt(processes-names))(
+used to look up the tt(command) style when generating the names of
+processes for tt(killall)
 )
 kindex(sequences, completion tag)
 item(tt(sequences))(
@@ -801,9 +802,9 @@ called, but for completion purposes one needs to ensure that the real
 command is called.
 
 For example, the function generating process IDs as matches uses this
-style with the tt(pids) tag to generate the IDs to complete and iwhen
+style with the tt(processes) tag to generate the IDs to complete and iwhen
 the tt(verbose) style is `true', it uses this style with the
-tt(pids-list) tag to generate the strings to display. When using
+tt(processes-list) tag to generate the strings to display. When using
 different values for these two tags one should ensure that the process
 IDs appear in the same order in both lists.
 )

@@ -1,5 +1,8 @@
 2000-04-13  Sven Wischnowsky <wischnow@informatik.hu-berlin.de>
 
+	* 10733: Completion/Builtins/_pids, Completion/User/_killall,
+ 	Doc/Zsh/compsys.yo: remove the `pids' tag, use `processes' instead
+	
 	* 10727: Src/builtin.c: make read -[kq] always print the prompt,
  	if any; after all they make sure they have a terminal anyway
 	

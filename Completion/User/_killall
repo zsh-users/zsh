@@ -1,6 +1,9 @@
 #compdef killall
 
-if compset -P 1 -; then
-  _description expl signal
-  compadd "$expl[@]" $signals[1,-3]
+if [[ "$OSTYPE" = linux* ]]; then
+  _alternative \
+      'signals:: _signals -p' \
+      'processes:process:{ compadd "$expl[@]" ${$(_call processes-names ps ho comm 2> /dev/null):#(ps|COMMAND)} }'
+else
+  _signals -p
 fi

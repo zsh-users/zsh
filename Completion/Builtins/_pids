@@ -12,17 +12,17 @@ if [[ "$1" = -m ]]; then
   shift 2
 fi
 
-zstyle -s ":completion:${curcontext}:pids" command args
+zstyle -s ":completion:${curcontext}:processes" command args
 
-out="$(_call pids ps 2>/dev/null)"
+out="$(_call processes ps 2>/dev/null)"
 
 if zstyle -T ":completion:${curcontext}:processes" verbose; then
-  zstyle -s ":completion:${curcontext}:pids-list" command listargs
+  zstyle -s ":completion:${curcontext}:processes-list" command listargs
   (( $#listargs )) || listargs=( "$args[@]" )
   if [[ "$listargs" = "$args" ]]; then
     list=("${(@Mr:COLUMNS-1:)${(f@)out}[2,-1]:#[ 	]#${PREFIX}[0-9]#${SUFFIX}[ 	]*${~match}}")
   else
-    list=("${(@Mr:COLUMNS-1:)${(f@)$(_call pids-list ps 2>/dev/null)}[2,-1]:#[ 	]#${PREFIX}[0-9]#${SUFFIX}[ 	]*${~match}}")
+    list=("${(@Mr:COLUMNS-1:)${(f@)$(_call processes-list ps 2>/dev/null)}[2,-1]:#[ 	]#${PREFIX}[0-9]#${SUFFIX}[ 	]*${~match}}")
   fi
   desc=(-ld list)
 else
