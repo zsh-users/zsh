@@ -324,8 +324,11 @@ for prepath in "$prepaths[@]"; do
     fi
 
     # Force auto-mounting. There might be a better way...
+    # Commented out in the hope that `pws non-canonical hack'
+    # down below does this for us.  Can be uncommented if it
+    # doesn't.
 
-    : ${^tmp1}/${PREFIX}${SUFFIX}/.(/)
+    # : ${^tmp1}/${PREFIX}${SUFFIX}/.(/)
 
     # Get the matching files by globbing.
 
@@ -342,6 +345,24 @@ for prepath in "$prepaths[@]"; do
 
     if [[ -n "$PREFIX$SUFFIX" ]]; then
       # See which of them match what's on the line.
+
+      # pws non-canonical hack which seems to work so far...
+      # if we didn't match by globbing, check that there is
+      # something to match by explicit name.  This is for
+      # `clever' filing systems where names pop into existence
+      # when referenced.
+      if (( ! $#tmp1 )); then
+	  for tmp3 in "$tmp2[@]"; do
+	      if [[ -n $tmp3 && $tmp3 != */ ]]; then
+		  tmp3+=/
+	      fi
+	      if [[ -e "$tmp3${(Q)PREFIX}${(Q)SUFFIX}" ]] then
+		  ## DEBUG
+		  print "added $tmp3${(Q)PREFIX}${(Q)SUFFIX}" >&2
+		  tmp1+=("$tmp3${(Q)PREFIX}${(Q)SUFFIX}")
+	      fi
+	  done
+      fi
 
       if (( ! $#tmp1 )); then
         tmp2=( ${^tmp2}/$PREFIX$SUFFIX )

@@ -1,3 +1,11 @@
+2003-02-24  Peter Stephenson  <pws@csr.com>
+
+	* 18230: Completion/Unix/Type/_path_files: If globbing failed
+	to match a path entry, test to see if [[ -e <file> ]] worked
+	anyway.  This supports smart filing systems (cygdrive, ClearCase
+	dynamic views) and may work for automounted directories (so
+	commented out the other hack to see).
+
 2003-02-23  Peter Stephenson  <pws@pwstephenson.fsnet.co.uk>
 
 	* 18278: Functions/TCP/tcp_output, Functions/TCP/tcp_spam,
