@@ -979,8 +979,9 @@ if the value contains the string tt(directory), then the tests will
 only be performed if only names of directories are completed.
 
 Note that names of directories ignored because of one of the tests
-will be placed in the alternate set of completions so that they will
-be completed if there are no other possible completions.
+will be ignored in the same way as the matches ignored because of the
+tt(ignored-patterns) style. I.e. by using the tt(_ignored) completer
+it is possible to complete these directories nonetheless.
 )
 item(tt(ignored-patterns))(
 This style is used with the tags used when adding matches and defines a
@@ -1283,26 +1284,6 @@ A style holding the service names of ports to complete. If this is
 not set by the user, the service names from `tt(/etc/services)' will
 be used.
 )
-item(tt(prefer-ignored))(
-This style is tested by the main completion function before calling a
-completer. The context name is formed in the same way as for the
-tt(matcher-list) style, i.e. it contains the name of the completer
-that will be called plus a hyphen and the number of the call to that
-completer.
-
-If the style is set to true and completion did not generate any normal 
-matches yet, but there are matches that were ignored because they
-matched one of the patterns given with the tt(fignore) array or the
-tt(ignored-patterns) style, these ignored matches are used immediatly
-and no other completer will be called.
-
-It is sometimes useful to set this style for the tt(correct) or
-tt(approximate) completer so that ignored matches are prefered over
-corrections.
-
-example(zstyle ':completion:*:complete-2:*' prefer-ignored yes
-zstyle ':completion:*:(correct|approximate)-1:*' prefer-ignored yes)
-)
 item(tt(prefix-hidden))(
 This is used when matches with a common prefix are added (e.g. option
 names). If it is `true', this prefix will not be shown in the list of
@@ -1330,11 +1311,8 @@ matches have no common prefix different from the word on the line or
 if there is such a common prefix, respectively. The sequence `tt(%c)'
 is replaced by the name of the completer function that generated the
 matches (without the leading underscore). Finally, `tt(%n)' is
-replaced by the number of matches generated, `tt(%a)' is replaced by
-an empty string if the matches are in the normal set (i.e. the one
-without file names with one of the suffixes from the
-tt(ignored-suffixes) style) and with `tt( -alt-)' if the matches are
-in the alternate set, and if the tt(list) style is set, `tt(%l)' is
+replaced by the number of matches generated
+and if the tt(list) style is set, `tt(%l)' is
 replaced by `tt(...)' if the list of matches is too long to fit on the
 screen and with an empty string otherwise. If the tt(list) style is
 `false', `tt(%l)' will always be removed.
@@ -1345,12 +1323,9 @@ all duplicate matches should be removed, rather than just consecutive
 duplicates.
 )
 item(tt(single-ignored))(
-Using styles like tt(ignored-patterns) allows one to put some matches
-in the alternate set of matches which is only used if there are no
-`normal' matches. Having only one such normally ignored match is often 
-a special case because one probably doesn't want that match to be
-inserted immediatly. This style allows to configure what to do in such 
-a case. If its value is tt(show), the single match will only be shown, 
+This is used by the tt(_ignored) completer. It allows to specify what
+should be done if it can generate only one match, which is often a
+special case. If its value is tt(show), the single match will only be shown, 
 not inserted. If the value is tt(menu), then the single match and the
 original string are both added as matches and menucompletion is
 started so that one can easily select either of them.
@@ -1836,6 +1811,20 @@ Note that using this completer will only work if the
 tt(COMPLETE_IN_WORD) option is set. Because otherwise the cursor will
 be set after the word before the completion code is called and hence
 there will be no suffix.
+)
+findex(_ignored)
+item(tt(_ignored))(
+Using the tt(ignored-patterns) style it is possible to make some
+matches be ignored. This completer allows to complete these matches as 
+if no tt(ignored-patterns) style were set. Which completers are called 
+for this is determined in the same way as for the tt(_prefix)
+completer.
+
+Finally, tt(_ignored) uses the tt(single-ignored) style if only one
+match could be generated. It can be set to tt(show) to make that match 
+be only displayed, not inserted into the line or it can be set to
+tt(menu) to make the single match and the original string from the
+line be offered in a menucompletion.
 )
 findex(_menu)
 item(tt(_menu))(

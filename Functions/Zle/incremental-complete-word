@@ -17,7 +17,7 @@ incremental-complete-word() {
   unsetopt autolist menucomplete automenu # doesn't work well
 
   local key lbuf="$LBUFFER" rbuf="$RBUFFER" pmpt pstr word
-  local lastl lastr wid twid num alt post toolong
+  local lastl lastr wid twid num post toolong
   local curcontext="${curcontext}" stop brk
 
   [[ -z "$curcontext" ]] && curcontext=:::
@@ -42,10 +42,6 @@ incremental-complete-word() {
   RBUFFER="$rbuf"
   num=$_lastcomp[nmatches]
   if (( ! num )); then
-    num="${_lastcomp[alternate_nmatches]}"
-    alt=' -alt-'
-  fi
-  if (( ! num )); then
     word=''
     state='-no match-'
   elif [[ "${LBUFFER}${RBUFFER}" = *${_lastcomp[unambiguous]}* ]]; then
@@ -55,7 +51,7 @@ incremental-complete-word() {
     word="${_lastcomp[unambiguous]}"
     state=''
   fi
-  zformat -f pstr "$pmpt" "u:${word}" "s:$state" "n:$num" "a:$alt" \
+  zformat -f pstr "$pmpt" "u:${word}" "s:$state" "n:$num" \
                           "l:$toolong" "c:${_lastcomp[completer][2,-1]}"
   zle -R "$pstr"
   read -k key
@@ -88,12 +84,6 @@ incremental-complete-word() {
     RBUFFER="$lastr"
     num=$_lastcomp[nmatches]
     if (( ! num )); then
-      num="${_lastcomp[alternate_nmatches]}"
-      alt=' -alt-'
-    else
-      alt=''
-    fi
-    if (( ! num )); then
       word=''
       state='-no match-'
     elif [[ "${LBUFFER}${RBUFFER}" = *${_lastcomp[unambiguous]}* ]]; then
@@ -103,7 +93,7 @@ incremental-complete-word() {
       word="${_lastcomp[unambiguous]}"
       state=''
     fi
-    zformat -f pstr "$pmpt" "u:${word}" "s:$state" "n:$num" "a:$alt" \
+    zformat -f pstr "$pmpt" "u:${word}" "s:$state" "n:$num" \
                             "l:$toolong" "c:${_lastcomp[completer][2,-1]}"
     zle -R "$pstr"
     read -k key

@@ -19,7 +19,7 @@
 setopt localoptions nullglob rcexpandparam extendedglob
 unsetopt markdirs globsubst shwordsplit nounset ksharrays
 
-local ctxt func funcs ret=1 tmp _compskip format _comp_ignore \
+local func funcs ret=1 tmp _compskip format _comp_ignore \
       _completers _completer _completer_num curtag \
       _matchers _matcher _matcher_num _comp_tags \
       context state line opt_args val_args curcontext="$curcontext" \
@@ -61,7 +61,8 @@ _last_menu_style=()
 
 # Get the names of the completers to use in the positional parameters.
 
-(( $# )) || zstyle -a ":completion:${curcontext}:" completer argv || set _complete
+(( $# )) || zstyle -a ":completion:${curcontext}:" completer argv ||
+    set _complete
 
 # And now just call the completer functions defined.
 
@@ -77,14 +78,8 @@ for func in "$funcs[@]"; do
 done
 
 for _completer; do
-  ctxt=":completion:${curcontext/::/:${_completer[2,-1]}-${(M)#_completers[1,_completer_num]:#$_completer}:}:"
 
-  if zstyle -t "$ctxt" prefer-ignored && (( $compstate[alternate_nmatches] )); then
-    ret=0
-    break;
-  fi
-
-  zstyle -a "$ctxt" matcher-list _matchers ||
+  zstyle -a ":completion:${curcontext/::/:${_completer[2,-1]}-${(M)#_completers[1,_completer_num]:#$_completer}:}:" matcher-list _matchers ||
       _matchers=( '' )
 
   _matcher_num=1
@@ -98,26 +93,9 @@ for _completer; do
   (( _completer_num++ ))
 done
 
-if zstyle -s ":completion:${curcontext}:" single-ignored tmp &&
-   [[ $compstate[old_list] != shown &&
-      $compstate[alternate_nmatches] = 1 ]]; then
-  case "$tmp" in
-  show) compstate[insert]='' compstate[list]='list force' tmp='' ;;
-  menu)
-    local expl
-
-    compstate[insert]='menu'
-    _description original expl original    
-    compadd "$expl[@]" -a -S '' - "$PREFIX$SUFFIX"
-    ;;
-  *) tmp='' ;;
-  esac
-fi
-
 if [[ -n "$tmp" || $compstate[old_list] = keep ||
-      $compstate[nmatches]+$compstate[alternate_nmatches] -gt 1 ]]; then
-  [[ _last_nmatches -ge 0 &&
-     _last_nmatches -ne $compstate[nmatches]+$compstate[alternate_nmatches] ]] &&
+      $compstate[nmatches] -gt 1 ]]; then
+  [[ _last_nmatches -ge 0 && _last_nmatches -ne $compstate[nmatches] ]] &&
       _menu_style=( "$_last_menu_style[@]" "$_menu_style[@]" )
 
   if [[ "$compstate[insert]" = "$_saved_insert" ]]; then
@@ -170,7 +148,7 @@ if [[ -n "$tmp" || $compstate[old_list] = keep ||
       fi
     fi
   fi
-elif [[ $compstate[nmatches]+$compstate[alternate_nmatches] -eq 0 &&
+elif [[ $compstate[nmatches] -eq 0 &&
         $#_lastdescr -ne 0 && $compstate[old_list] != keep ]] &&
      zstyle -s ":completion:${curcontext}:warnings" format format; then
 

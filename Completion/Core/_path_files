@@ -142,8 +142,9 @@ eorig="$orig"
 
 # If given no `-F' option, we may want to use $fignore, turned into patterns.
 
-[[ $#ignore -eq 0 && ( -z $gopt || "$pats" = \ #\*\ # ) && -n $FIGNORE ]] && 
-   ignore=( "?*${^fignore[@]}" )
+[[ -z "$_comp_no_ignore" && $#ignore -eq 0 &&
+   ( -z $gopt || "$pats" = \ #\*\ # ) && -n $FIGNORE ]] && 
+    ignore=( "?*${^fignore[@]}" )
 
 if (( $#ignore )); then
   _comp_ignore=( "$_comp_ignore[@]" "$ignore[@]" )
@@ -350,7 +351,7 @@ for prepath in "$prepaths[@]"; do
       continue 2
     fi
 
-    if [[ "$tpre$tsuf" != */* && $#tmp1 -ne 0 ]] &&
+    if [[ -z "$_comp_no_ignore" && "$tpre$tsuf" != */* && $#tmp1 -ne 0 ]] &&
        zstyle -s ":completion:${curcontext}:files" ignore-parents rem &&
        [[ ( "$rem" != *dir* || "$pats" = '*(-/)' ) &&
 	  ( "$rem" != *..* || "$tmp1" = *../* ) ]]; then

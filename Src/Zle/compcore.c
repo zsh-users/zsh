@@ -307,6 +307,7 @@ do_completion(Hookdef dummy, Compldat dat)
     hasmatched = hasunmatched = 0;
     minmlen = 1000000;
     maxmlen = -1;
+    compignored = 0;
 
     /* Make sure we have the completion list and compctl. */
     if (makecomplist(s, incmd, lst)) {
@@ -1463,7 +1464,7 @@ addmatches(Cadata dat, char **argv)
     int lpl, lsl, pl, sl, bcp = 0, bcs = 0, bpadd = 0, bsadd = 0;
     int ppl = 0, psl = 0;
     int llpl = 0, llsl = 0, nm = mnum, gflags = 0, ohp = haspattern;
-    int oisalt = 0, isalt, isexact, doadd, ois = instring, oib = inbackt;
+    int isexact, doadd, ois = instring, oib = inbackt;
     Cline lc = NULL, pline = NULL, sline = NULL;
     Cmatch cm;
     struct cmlist mst;
@@ -1743,7 +1744,6 @@ addmatches(Cadata dat, char **argv)
 	    } else
 		dat->prpre = dupstring(dat->prpre);
 	    /* Select the set of matches. */
-	    oisalt = (dat->aflags & CAF_ALT);
 
 	    if (dat->remf) {
 		dat->remf = dupstring(dat->remf);
@@ -1761,7 +1761,7 @@ addmatches(Cadata dat, char **argv)
 	/* Walk through the matches given. */
 	obpl = bpl;
 	obsl = bsl;
-	if (!oisalt && (aign || pign)) {
+	if (aign || pign) {
 	    int max = 0;
 	    char **ap = argv;
 
@@ -1780,9 +1780,8 @@ addmatches(Cadata dat, char **argv)
 		    disp = NULL;
 	    }
 	    sl = strlen(s);
-	    isalt = oisalt;
-	    if (!isalt && (aign || pign)) {
-		int il = ppl + sl + psl;
+	    if (aign || pign) {
+		int il = ppl + sl + psl, addit = 1;
 
 		if (ppl)
 		    memcpy(ibuf, dat->ppre, ppl);
@@ -1796,15 +1795,19 @@ addmatches(Cadata dat, char **argv)
 		    char **pt = aign;
 		    int filell;
 
-		    for (isalt = 0; !isalt && *pt; pt++)
-			isalt = ((filell = strlen(*pt)) < il &&
-				 !strcmp(*pt, ibuf + il - filell));
+		    for (; addit && *pt; pt++)
+			addit = !((filell = strlen(*pt)) < il &&
+				  !strcmp(*pt, ibuf + il - filell));
 		}
-		if (!isalt && pign) {
+		if (addit && pign) {
 		    Patprog *pt = pign;
 
-		    for (isalt = 0; !isalt && *pt; pt++)
-			isalt = pattry(*pt, ibuf);
+		    for (; addit && *pt; pt++)
+			addit = !pattry(*pt, ibuf);
+		}
+		if (!addit) {
+		    compignored++;
+		    continue;
 		}
 	    }
 	    if (!(dat->aflags & CAF_MATCH)) {
@@ -1832,7 +1835,7 @@ addmatches(Cadata dat, char **argv)
 		for (bp = obsl; bp; bp = bp->next)
 		    bp->curpos += bsadd;
 
-		if ((cm = add_match_data(isalt, ms, lc, dat->ipre, NULL,
+		if ((cm = add_match_data(0, ms, lc, dat->ipre, NULL,
 					 dat->isuf, dat->pre, dat->prpre,
 					 dat->ppre, pline,
 					 dat->psuf, sline,
@@ -2175,6 +2178,8 @@ add_match_data(int alt, char *str, Cline line,
 
     newmatches = 1;
     mgroup->new = 1;
+    if (alt)
+	compignored++;
 
     if (!complastprompt || !*complastprompt)
 	dolastprompt = 0;
