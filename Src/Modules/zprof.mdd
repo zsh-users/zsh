@@ -1,0 +1,3 @@
+autobins="zprof"
+
+objects="zprof.o"
