@@ -541,309 +541,311 @@ domenuselect(Hookdef dummy, Chdata dat)
     int i = 0, acc = 0, wishcol = 0, setwish = 0;
     char *s;
 
-    if (fdat || (dummy && (!(s = getsparam("SELECTMIN")) ||
-			   (dat && dat->num < atoi(s))))) {
-	if (fdat) {
-	    fdat->matches = dat->matches;
-	    fdat->num = dat->num;
+    HEAPALLOC {
+	if (fdat || (dummy && (!(s = getsparam("SELECTMIN")) ||
+			       (dat && dat->num < atoi(s))))) {
+	    if (fdat) {
+		fdat->matches = dat->matches;
+		fdat->num = dat->num;
+	    }
+	    LASTALLOC_RETURN 0;
 	}
-	return 0;
-    }
-    fdat = dat;
-    selectlocalmap(mskeymap);
-    noselect = 0;
-    mselect = (*(minfo.cur))->gnum;
-    for (;;) {
-	showinglist = -2;
-	zrefresh();
-	inselect = 1;
-	if (noselect)
-	    break;
-	if (!i) {
-	    i = mcols * mlines;
-	    while (i--)
-		if (mtab[i])
+	fdat = dat;
+	selectlocalmap(mskeymap);
+	noselect = 0;
+	mselect = (*(minfo.cur))->gnum;
+	for (;;) {
+	    showinglist = -2;
+	    zrefresh();
+	    inselect = 1;
+	    if (noselect)
+		break;
+	    if (!i) {
+		i = mcols * mlines;
+		while (i--)
+		    if (mtab[i])
+			break;
+		if (!i)
 		    break;
-	    if (!i)
-		break;
-	    i = 1;
-	}
-	p = mmtabp;
-	pg = mgtabp;
-	minfo.cur = *p;
-	minfo.group = *pg;
-	if (setwish)
-	    wishcol = mcol;
-	else if (mcol > wishcol) {
-	    while (mcol > 0 && p[-1] == minfo.cur)
-		mcol--, p--, pg--;
-	} else if (mcol < wishcol) {
-	    while (mcol < mcols - 1 && p[1] == minfo.cur)
-		mcol++, p++, pg++;
-	}
-	setwish = 0;
-
-    getk:
-
-	if (!(cmd = getkeycmd()) || cmd == Th(z_sendbreak))
-	    break;
-	else if (cmd == Th(z_acceptline)) {
-	    acc = 1;
-	    break;
-	} else if (cmd == Th(z_acceptandinfernexthistory)) {
-	    Menustack s = (Menustack) zhalloc(sizeof(*s));
-
-	    s->prev = u;
-	    u = s;
-	    s->line = dupstring((char *) line);
-	    s->cs = cs;
-	    memcpy(&(s->info), &minfo, sizeof(struct menuinfo));
-	    s->amatches = amatches;
-	    s->pmatches = pmatches;
-	    s->lmatches = lmatches;
-	    s->acc = menuacc;
-	    s->brbeg = dupstring(brbeg);
-	    s->brend = dupstring(brend);
-	    menucmp = menuacc = 0;
-	    fixsuffix();
-	    validlist = 0;
-	    pmatches = NULL;
-	    invalidatelist();
-	    menucomplete(zlenoargs);
-	    if (dat->num < 2 || !minfo.cur || !*(minfo.cur)) {
-		noselect = clearlist = listshown = 1;
-		zrefresh();
-		break;
+		i = 1;
 	    }
-	    clearlist = listshown = 1;
-	    mselect = (*(minfo.cur))->gnum;
-	    setwish = 1;
-	    continue;
-	} else if (cmd == Th(z_acceptandhold) ||
-		 cmd == Th(z_acceptandmenucomplete)) {
-	    Menustack s = (Menustack) zhalloc(sizeof(*s));
-
-	    s->prev = u;
-	    u = s;
-	    s->line = dupstring((char *) line);
-	    s->cs = cs;
-	    memcpy(&(s->info), &minfo, sizeof(struct menuinfo));
-	    s->amatches = s->pmatches = s->lmatches = NULL;
-	    s->acc = menuacc;
-	    s->brbeg = dupstring(brbeg);
-	    s->brend = dupstring(brend);
-	    acceptlast();
-	    do_menucmp(0);
-	    mselect = (*(minfo.cur))->gnum;
-	    setwish = 1;
-	    continue;
-	} else if (cmd == Th(z_undo)) {
-	    int l;
-
-	    if (!u)
-		goto getk;
-
-	    cs = 0;
-	    foredel(ll);
-	    spaceinline(l = strlen(u->line));
-	    strncpy((char *) line, u->line, l);
-	    cs = u->cs;
-	    menuacc = u->acc;
-	    memcpy(&minfo, &(u->info), sizeof(struct menuinfo));
-	    p = &(minfo.cur);
-	    if (u->pmatches && pmatches != u->pmatches) {
-		freematches();
-		amatches = u->amatches;
-		pmatches = u->pmatches;
-		lmatches = u->lmatches;
-		hasperm = 1;
+	    p = mmtabp;
+	    pg = mgtabp;
+	    minfo.cur = *p;
+	    minfo.group = *pg;
+	    if (setwish)
+		wishcol = mcol;
+	    else if (mcol > wishcol) {
+		while (mcol > 0 && p[-1] == minfo.cur)
+		    mcol--, p--, pg--;
+	    } else if (mcol < wishcol) {
+		while (mcol < mcols - 1 && p[1] == minfo.cur)
+		    mcol++, p++, pg++;
 	    }
-	    zsfree(brbeg);
-	    zsfree(brend);
-	    brbeg = ztrdup(u->brbeg);
-	    brend = ztrdup(u->brend);
-	    u = u->prev;
-	    clearlist = 1;
-	    setwish = 1;
-	} else if (cmd == Th(z_redisplay)) {
-	    redisplay(zlenoargs);
-	    continue;
-	} else if (cmd == Th(z_clearscreen)) {
-	    clearscreen(zlenoargs);
-	    continue;
-	} else if (cmd == Th(z_downhistory) ||
-		   cmd == Th(z_downlineorhistory) ||
-		   cmd == Th(z_downlineorsearch) ||
-		   cmd == Th(z_vidownlineorhistory)) {
-	    do {
-		if (mline == mlines - 1) {
-		    p -= mline * mcols;
-		    mline = 0;
-		} else {
-		    mline++;
-		    p += mcols;
-		}
-		if (adjust_mcol(wishcol, &p, NULL))
-		    continue;
-	    } while (!*p);
-	} else if (cmd == Th(z_uphistory) ||
-		   cmd == Th(z_uplineorhistory) ||
-		   cmd == Th(z_uplineorsearch) ||
-		   cmd == Th(z_viuplineorhistory)) {
-	    do {
-		if (!mline) {
-		    mline = mlines - 1;
-		    p += mline * mcols;
-		} else {
-		    mline--;
-		    p -= mcols;
-		}
-		if (adjust_mcol(wishcol, &p, NULL))
-		    continue;
-	    } while (!*p);
-	} else if (cmd == Th(z_forwardchar) || cmd == Th(z_viforwardchar)) {
-	    int omcol = mcol;
-	    Cmatch *op = *p;
+	    setwish = 0;
 
-	    do {
-		if (mcol == mcols - 1) {
-		    p -= mcol;
-		    mcol = 0;
-		} else {
+	getk:
+
+	    if (!(cmd = getkeycmd()) || cmd == Th(z_sendbreak))
+		break;
+	    else if (cmd == Th(z_acceptline)) {
+		acc = 1;
+		break;
+	    } else if (cmd == Th(z_acceptandinfernexthistory)) {
+		Menustack s = (Menustack) zhalloc(sizeof(*s));
+
+		s->prev = u;
+		u = s;
+		s->line = dupstring((char *) line);
+		s->cs = cs;
+		memcpy(&(s->info), &minfo, sizeof(struct menuinfo));
+		s->amatches = amatches;
+		s->pmatches = pmatches;
+		s->lmatches = lmatches;
+		s->acc = menuacc;
+		s->brbeg = dupstring(brbeg);
+		s->brend = dupstring(brend);
+		menucmp = menuacc = 0;
+		fixsuffix();
+		validlist = 0;
+		pmatches = NULL;
+		invalidatelist();
+		menucomplete(zlenoargs);
+		if (dat->num < 2 || !minfo.cur || !*(minfo.cur)) {
+		    noselect = clearlist = listshown = 1;
+		    zrefresh();
+		    break;
+		}
+		clearlist = listshown = 1;
+		mselect = (*(minfo.cur))->gnum;
+		setwish = 1;
+		continue;
+	    } else if (cmd == Th(z_acceptandhold) ||
+		       cmd == Th(z_acceptandmenucomplete)) {
+		Menustack s = (Menustack) zhalloc(sizeof(*s));
+
+		s->prev = u;
+		u = s;
+		s->line = dupstring((char *) line);
+		s->cs = cs;
+		memcpy(&(s->info), &minfo, sizeof(struct menuinfo));
+		s->amatches = s->pmatches = s->lmatches = NULL;
+		s->acc = menuacc;
+		s->brbeg = dupstring(brbeg);
+		s->brend = dupstring(brend);
+		acceptlast();
+		do_menucmp(0);
+		mselect = (*(minfo.cur))->gnum;
+		setwish = 1;
+		continue;
+	    } else if (cmd == Th(z_undo)) {
+		int l;
+
+		if (!u)
+		    goto getk;
+
+		cs = 0;
+		foredel(ll);
+		spaceinline(l = strlen(u->line));
+		strncpy((char *) line, u->line, l);
+		cs = u->cs;
+		menuacc = u->acc;
+		memcpy(&minfo, &(u->info), sizeof(struct menuinfo));
+		p = &(minfo.cur);
+		if (u->pmatches && pmatches != u->pmatches) {
+		    freematches();
+		    amatches = u->amatches;
+		    pmatches = u->pmatches;
+		    lmatches = u->lmatches;
+		    hasperm = 1;
+		}
+		zsfree(brbeg);
+		zsfree(brend);
+		brbeg = ztrdup(u->brbeg);
+		brend = ztrdup(u->brend);
+		u = u->prev;
+		clearlist = 1;
+		setwish = 1;
+	    } else if (cmd == Th(z_redisplay)) {
+		redisplay(zlenoargs);
+		continue;
+	    } else if (cmd == Th(z_clearscreen)) {
+		clearscreen(zlenoargs);
+		continue;
+	    } else if (cmd == Th(z_downhistory) ||
+		       cmd == Th(z_downlineorhistory) ||
+		       cmd == Th(z_downlineorsearch) ||
+		       cmd == Th(z_vidownlineorhistory)) {
+		do {
+		    if (mline == mlines - 1) {
+			p -= mline * mcols;
+			mline = 0;
+		    } else {
+			mline++;
+			p += mcols;
+		    }
+		    if (adjust_mcol(wishcol, &p, NULL))
+			continue;
+		} while (!*p);
+	    } else if (cmd == Th(z_uphistory) ||
+		       cmd == Th(z_uplineorhistory) ||
+		       cmd == Th(z_uplineorsearch) ||
+		       cmd == Th(z_viuplineorhistory)) {
+		do {
+		    if (!mline) {
+			mline = mlines - 1;
+			p += mline * mcols;
+		    } else {
+			mline--;
+			p -= mcols;
+		    }
+		    if (adjust_mcol(wishcol, &p, NULL))
+			continue;
+		} while (!*p);
+	    } else if (cmd == Th(z_forwardchar) || cmd == Th(z_viforwardchar)) {
+		int omcol = mcol;
+		Cmatch *op = *p;
+
+		do {
+		    if (mcol == mcols - 1) {
+			p -= mcol;
+			mcol = 0;
+		    } else {
+			mcol++;
+			p++;
+		    }
+		} while (!*p || (mcol != omcol && *p == op));
+		wishcol = mcol;
+	    } else if (cmd == Th(z_backwardchar) || cmd == Th(z_vibackwardchar)) {
+		int omcol = mcol;
+		Cmatch *op = *p;
+
+		do {
+		    if (!mcol) {
+			mcol = mcols - 1;
+			p += mcol;
+		    } else {
+			mcol--;
+			p--;
+		    }
+		} while (!*p || (mcol != omcol && *p == op));
+		wishcol = mcol;
+	    } else if (cmd == Th(z_beginningofbufferorhistory) ||
+		       cmd == Th(z_beginningofline) ||
+		       cmd == Th(z_beginningoflinehist) ||
+		       cmd == Th(z_vibeginningofline)) {
+		p -= mcol;
+		mcol = 0;
+		while (!*p) {
 		    mcol++;
 		    p++;
 		}
-	    } while (!*p || (mcol != omcol && *p == op));
-	    wishcol = mcol;
-	} else if (cmd == Th(z_backwardchar) || cmd == Th(z_vibackwardchar)) {
-	    int omcol = mcol;
-	    Cmatch *op = *p;
-
-	    do {
-		if (!mcol) {
-		    mcol = mcols - 1;
-		    p += mcol;
-		} else {
+		wishcol = 0;
+	    } else if (cmd == Th(z_endofbufferorhistory) ||
+		       cmd == Th(z_endofline) ||
+		       cmd == Th(z_endoflinehist) ||
+		       cmd == Th(z_viendofline)) {
+		p += mcols - mcol - 1;
+		mcol = mcols - 1;
+		while (!*p) {
 		    mcol--;
 		    p--;
 		}
-	    } while (!*p || (mcol != omcol && *p == op));
-	    wishcol = mcol;
-	} else if (cmd == Th(z_beginningofbufferorhistory) ||
-		   cmd == Th(z_beginningofline) ||
-		   cmd == Th(z_beginningoflinehist) ||
-		   cmd == Th(z_vibeginningofline)) {
-	    p -= mcol;
-	    mcol = 0;
-	    while (!*p) {
-		mcol++;
-		p++;
-	    }
-	    wishcol = 0;
-	} else if (cmd == Th(z_endofbufferorhistory) ||
-		   cmd == Th(z_endofline) ||
-		   cmd == Th(z_endoflinehist) ||
-		   cmd == Th(z_viendofline)) {
-	    p += mcols - mcol - 1;
-	    mcol = mcols - 1;
-	    while (!*p) {
-		mcol--;
-		p--;
-	    }
-	    wishcol = mcols - 1;
-	} else if (cmd == Th(z_forwardword) ||
-		   cmd == Th(z_emacsforwardword) ||
-		   cmd == Th(z_viforwardword) ||
-		   cmd == Th(z_viforwardwordend)) {
-	    Cmgroup g = *pg;
-	    int ol = mline;
+		wishcol = mcols - 1;
+	    } else if (cmd == Th(z_forwardword) ||
+		       cmd == Th(z_emacsforwardword) ||
+		       cmd == Th(z_viforwardword) ||
+		       cmd == Th(z_viforwardwordend)) {
+		Cmgroup g = *pg;
+		int ol = mline;
 
-	    do {
-		if (mline == mlines - 1) {
-		    p -= mline * mcols;
-		    pg -= mline * mcols;
-		    mline = 0;
-		} else {
-		    mline++;
-		    p += mcols;
-		    pg += mcols;
-		}
-		if (adjust_mcol(wishcol, &p, &pg))
-		    continue;
-	    } while (ol != mline && (*pg == g || !*pg));
-	} else if (cmd == Th(z_backwardword) ||
-		   cmd == Th(z_emacsbackwardword) ||
-		   cmd == Th(z_vibackwardword)) {
-	    Cmgroup g = *pg;
-	    int ol = mline;
+		do {
+		    if (mline == mlines - 1) {
+			p -= mline * mcols;
+			pg -= mline * mcols;
+			mline = 0;
+		    } else {
+			mline++;
+			p += mcols;
+			pg += mcols;
+		    }
+		    if (adjust_mcol(wishcol, &p, &pg))
+			continue;
+		} while (ol != mline && (*pg == g || !*pg));
+	    } else if (cmd == Th(z_backwardword) ||
+		       cmd == Th(z_emacsbackwardword) ||
+		       cmd == Th(z_vibackwardword)) {
+		Cmgroup g = *pg;
+		int ol = mline;
 
-	    do {
-		if (!mline) {
-		    mline = mlines - 1;
-		    p += mline * mcols;
-		    pg += mline * mcols;
-		} else {
-		    mline--;
-		    p -= mcols;
-		    pg -= mcols;
-		}
-		if (adjust_mcol(wishcol, &p, &pg))
-		    continue;
-	    } while (ol != mline && (*pg == g || !*pg));
-	} else if (cmd == Th(z_completeword) ||
-		   cmd == Th(z_expandorcomplete) ||
-		   cmd == Th(z_expandorcompleteprefix) ||
-		   cmd == Th(z_menucomplete) ||
-		   cmd == Th(z_menuexpandorcomplete) ||
-		   !strcmp(cmd->nam, "menu-select") ||
-		   !strcmp(cmd->nam, "complete-word") ||
-		   !strcmp(cmd->nam, "expand-or-complete") ||
-		   !strcmp(cmd->nam, "expand-or-complete-prefix") ||
-		   !strcmp(cmd->nam, "menu-complete") ||
-		   !strcmp(cmd->nam, "menu-expand-or-complete")) {
-	    do_menucmp(0);
-	    mselect = (*(minfo.cur))->gnum;
-	    setwish = 1;
-	    continue;
-	} else if (cmd == Th(z_reversemenucomplete) ||
-		   !strcmp(cmd->nam, "reverse-menu-complete")) {
-	    reversemenucomplete(zlenoargs);
-	    mselect = (*(minfo.cur))->gnum;
-	    setwish = 1;
-	    continue;
-	} else {
-	    ungetkeycmd();
-	    break;
+		do {
+		    if (!mline) {
+			mline = mlines - 1;
+			p += mline * mcols;
+			pg += mline * mcols;
+		    } else {
+			mline--;
+			p -= mcols;
+			pg -= mcols;
+		    }
+		    if (adjust_mcol(wishcol, &p, &pg))
+			continue;
+		} while (ol != mline && (*pg == g || !*pg));
+	    } else if (cmd == Th(z_completeword) ||
+		       cmd == Th(z_expandorcomplete) ||
+		       cmd == Th(z_expandorcompleteprefix) ||
+		       cmd == Th(z_menucomplete) ||
+		       cmd == Th(z_menuexpandorcomplete) ||
+		       !strcmp(cmd->nam, "menu-select") ||
+		       !strcmp(cmd->nam, "complete-word") ||
+		       !strcmp(cmd->nam, "expand-or-complete") ||
+		       !strcmp(cmd->nam, "expand-or-complete-prefix") ||
+		       !strcmp(cmd->nam, "menu-complete") ||
+		       !strcmp(cmd->nam, "menu-expand-or-complete")) {
+		do_menucmp(0);
+		mselect = (*(minfo.cur))->gnum;
+		setwish = 1;
+		continue;
+	    } else if (cmd == Th(z_reversemenucomplete) ||
+		       !strcmp(cmd->nam, "reverse-menu-complete")) {
+		reversemenucomplete(zlenoargs);
+		mselect = (*(minfo.cur))->gnum;
+		setwish = 1;
+		continue;
+	    } else {
+		ungetkeycmd();
+		break;
+	    }
+	    do_single(**p);
+	    mselect = (**p)->gnum;
 	}
-	do_single(**p);
-	mselect = (**p)->gnum;
-    }
-    if (u) {
-	int hp = hasperm;
-	Cmgroup m = pmatches;
+	if (u) {
+	    int hp = hasperm;
+	    Cmgroup m = pmatches;
 
-	for (; u; u = u->prev) {
-	    if (u->pmatches != m) {
-		pmatches = u->pmatches;
-		freematches();
+	    for (; u; u = u->prev) {
+		if (u->pmatches != m) {
+		    pmatches = u->pmatches;
+		    freematches();
+		}
 	    }
+	    pmatches = m;
+	    hasperm = hp;
 	}
-	pmatches = m;
-	hasperm = hp;
-    }
-    selectlocalmap(NULL);
-    mselect = -1;
-    inselect = 0;
-    if (acc) {
-	menucmp = 0;
-	lastambig = 0;
-	do_single(*(minfo.cur));
-    }
-    if (!noselect) {
-	showinglist = -2;
-	zrefresh();
-    }
-    fdat = NULL;
+	selectlocalmap(NULL);
+	mselect = -1;
+	inselect = 0;
+	if (acc) {
+	    menucmp = 0;
+	    lastambig = 0;
+	    do_single(*(minfo.cur));
+	}
+	if (!noselect) {
+	    showinglist = -2;
+	    zrefresh();
+	}
+	fdat = NULL;
+    } LASTALLOC;
     return (!noselect ^ acc);
 }
 
