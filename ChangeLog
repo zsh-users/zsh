@@ -1,5 +1,7 @@
 2003-02-03  Peter Stephenson  <pws@csr.com>
 
+	* 18175: Completion/Unix/Command/_p4: Completion for Perforce.
+
 	* 18174: Doc/Zsh/contrib.yo, Functions/Zle/read-from-minibuffer,
 	Functions/Zle/replace-string:  New widgets for reading values
 	during editing and for performing string and pattern replacements.
