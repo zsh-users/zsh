@@ -1886,7 +1886,8 @@ printlist(int over, CLPrintFunc printm, int showall)
 			printm(g, NULL, mc, ml, (!i), wid, NULL, NULL);
 			break;
 		    }
-		    if (!m->disp && (m->flags & CMF_FILE)) {
+		    if (!m->disp && (m->flags & CMF_FILE) &&
+			m->str[0] && m->str[strlen(m->str) - 1] != '/') {
 			struct stat buf;
 			char *pb;
 

@@ -1241,7 +1241,8 @@ compprintlist(int showall)
 			    goto end;
 			break;
 		    }
-		    if (!m->disp && (m->flags & CMF_FILE)) {
+		    if (!m->disp && (m->flags & CMF_FILE) &&
+			m->str[0] && m->str[strlen(m->str) - 1] != '/') {
 			struct stat buf;
 			char *pb;
 
@@ -1467,7 +1468,7 @@ clprintm(Cmgroup g, Cmatch *mp, int mc, int ml, int lastc, int width,
 	len = niceztrlen(m->disp ? m->disp : m->str);
 	mlprinted = len / columns;
 
-	 if (isset(LISTTYPES) && buf) {
+	if (isset(LISTTYPES) && buf) {
 	    if (m->gnum != mselect) {
 		zcoff();
 		zcputs(&mcolors, g->name, COL_TC);
