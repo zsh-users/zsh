@@ -763,10 +763,13 @@ load_module(char const *name)
      * chain of aliases.  This makes sure the actual module loaded
      * is the right one.
      */
+    queue_signals();
     if (!(node = find_module(name, 1, &name))) {
 	if (!(linked = module_linked(name)) &&
-	    !(handle = do_load_module(name)))
+	    !(handle = do_load_module(name))) {
+	    unqueue_signals();
 	    return 0;
+	}
 	m = zcalloc(sizeof(*m));
 	m->nam = ztrdup(name);
 	if (handle) {
@@ -782,19 +785,25 @@ load_module(char const *name)
 	    if (!set)
 		finish_module(m);
 	    delete_module(node);
+	    unqueue_signals();
 	    return 0;
 	}
 	m->flags |= MOD_INIT_S | MOD_INIT_B;
 	m->flags &= ~MOD_SETUP;
+	unqueue_signals();
 	return 1;
     } 
     m = (Module) getdata(node);
-    if (m->flags & MOD_SETUP)
+    if (m->flags & MOD_SETUP) {
+	unqueue_signals();
 	return 1;
+    }
     if (m->flags & MOD_UNLOAD)
 	m->flags &= ~MOD_UNLOAD;
-    else if ((m->flags & MOD_LINKED) ? m->u.linked : m->u.handle)
+    else if ((m->flags & MOD_LINKED) ? m->u.linked : m->u.handle) {
+	unqueue_signals();
 	return 1;
+    }
     if (m->flags & MOD_BUSY) {
 	zerr("circular dependencies for module %s", name, 0);
 	return 0;
@@ -804,14 +813,17 @@ load_module(char const *name)
 	for (n = firstnode(m->deps); n; incnode(n))
 	    if (!load_module((char *) getdata(n))) {
 		m->flags &= ~MOD_BUSY;
+		unqueue_signals();
 		return 0;
 	    }
     m->flags &= ~MOD_BUSY;
     if (!m->u.handle) {
 	handle = NULL;
 	if (!(linked = module_linked(name)) &&
-	    !(handle = do_load_module(name)))
+	    !(handle = do_load_module(name))) {
+	    unqueue_signals();
 	    return 0;
+	}
 	if (handle) {
 	    m->u.handle = handle;
 	    m->flags |= MOD_SETUP;
@@ -825,6 +837,7 @@ load_module(char const *name)
 	    else
 		m->u.linked = NULL;
 	    m->flags &= ~MOD_SETUP;
+	    unqueue_signals();
 	    return 0;
 	}
 	m->flags |= MOD_INIT_S;
@@ -837,10 +850,12 @@ load_module(char const *name)
 	else
 	    m->u.handle = NULL;
 	m->flags &= ~MOD_SETUP;
+	unqueue_signals();
 	return 0;
     }
     m->flags |= MOD_INIT_B;
     m->flags &= ~MOD_SETUP;
+    unqueue_signals();
     return 1;
 }
 
@@ -858,19 +873,23 @@ require_module(char *nam, const char *module, int res, int test)
 {
     Module m = NULL;
     LinkNode node;
+    int ret = 1;
 
     /* Resolve aliases and actual loadable module as for load_module */
+    queue_signals();
     node = find_module(module, 1, &module);
     if (node && (m = ((Module) getdata(node)))->u.handle &&
 	!(m->flags & MOD_UNLOAD)) {
 	if (test) {
+	    unqueue_signals();
 	    zwarnnam(nam, "module %s already loaded.", module, 0);
 	    return 0;
 	}
     } else
-	return load_module(module);
+	ret = load_module(module);
+    unqueue_signals();
 
-    return 1;
+    return ret;
 }
 
 /**/
@@ -941,6 +960,8 @@ bin_zmodload(char *nam, char **args, char *ops, int func)
 {
     int ops_bcpf = ops['b'] || ops['c'] || ops['p'] || ops['f'];
     int ops_au = ops['a'] || ops['u'];
+    int ret = 1;
+
     if (ops_bcpf && !ops_au) {
 	zwarnnam(nam, "-b, -c, -f, and -p must be combined with -a or -u",
 		 NULL, 0);
@@ -967,24 +988,26 @@ bin_zmodload(char *nam, char **args, char *ops, int func)
 	zwarnnam(nam, "-e cannot be combined with other options", NULL, 0);
 	return 1;
     }
+    queue_signals();
     if (ops['e'])
-	return bin_zmodload_exist(nam, args, ops);
+	ret = bin_zmodload_exist(nam, args, ops);
     else if (ops['d'])
-	return bin_zmodload_dep(nam, args, ops);
+	ret = bin_zmodload_dep(nam, args, ops);
     else if ((ops['a'] || ops['b']) && !(ops['c'] || ops['p'] || ops['f']))
-	return bin_zmodload_auto(nam, args, ops);
+	ret = bin_zmodload_auto(nam, args, ops);
     else if (ops['c'] && !(ops['b'] || ops['p']))
-	return bin_zmodload_cond(nam, args, ops);
+	ret = bin_zmodload_cond(nam, args, ops);
     else if (ops['f'] && !(ops['b'] || ops['p']))
-	return bin_zmodload_math(nam, args, ops);
+	ret = bin_zmodload_math(nam, args, ops);
     else if (ops['p'] && !(ops['b'] || ops['c']))
-	return bin_zmodload_param(nam, args, ops);
+	ret = bin_zmodload_param(nam, args, ops);
     else if (!(ops['a'] || ops['b'] || ops['c'] || ops['p']))
-	return bin_zmodload_load(nam, args, ops);
+	ret = bin_zmodload_load(nam, args, ops);
     else
 	zwarnnam(nam, "use only one of -b, -c, or -p", NULL, 0);
+    unqueue_signals();
 
-    return 1;
+    return ret;
 }
 
 /**/
@@ -1993,12 +2016,14 @@ add_autoparam(char *nam, char *module)
 {
     Param pm;
 
+    queue_signals();
     if ((pm = (Param) gethashnode2(paramtab, nam)))
 	unsetparam_pm(pm, 0, 1);
 
     pm = setsparam(nam, ztrdup(module));
 
     pm->flags |= PM_AUTOLOAD;
+    unqueue_signals();
 }
 
 /* List of math functions. */

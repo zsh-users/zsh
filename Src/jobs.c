@@ -378,7 +378,7 @@ update_job(Job jn)
 	    zrefresh();
     }
     if (sigtrapped[SIGCHLD] && job != thisjob)
-	dotrap(SIGCHLD, 0);
+	dotrap(SIGCHLD);
 
     /* When MONITOR is set, the foreground process runs in a different *
      * process group from the shell, so the shell will not receive     *
@@ -389,7 +389,7 @@ update_job(Job jn)
 
 	if (sig == SIGINT || sig == SIGQUIT) {
 	    if (sigtrapped[sig]) {
-		dotrap(sig, 0);
+		dotrap(sig);
 		/* We keep the errflag as set or not by dotrap.
 		 * This is to fulfil the promise to carry on
 		 * with the jobs if trap returns zero.
@@ -497,6 +497,7 @@ printtime(struct timeval *real, struct timeinfo *ti, char *desc)
     percent      =  100.0 * (ti->ut + ti->st)
 	/ (clktck * real->tv_sec + clktck * real->tv_usec / 1000000.0);
 
+    queue_signals();
     if (!(s = getsparam("TIMEFMT")))
 	s = DEFAULT_TIMEFMT;
 
@@ -546,6 +547,7 @@ printtime(struct timeval *real, struct timeinfo *ti, char *desc)
 		break;
 	} else
 	    putc(*s, stderr);
+    unqueue_signals();
     putc('\n', stderr);
     fflush(stderr);
 }
@@ -580,10 +582,13 @@ should_report_time(Job j)
     if (j->stat & STAT_TIMED)
 	return 1;
 
+    queue_signals();
     if (!(v = getvalue(&vbuf, &s, 0)) ||
 	(reporttime = getintvalue(v)) < 0) {
+	unqueue_signals();
 	return 0;
     }
+    unqueue_signals();
     /* can this ever happen? */
     if (!j->procs)
 	return 0;
@@ -868,9 +873,10 @@ havefiles(void)
 void
 waitforpid(pid_t pid)
 {
-    int first = 1;
+    int first = 1, q = queue_signal_level();
 
     /* child_block() around this loop in case #ifndef WNOHANG */
+    dont_queue_signals();
     child_block();		/* unblocked in child_suspend() */
     while (!errflag && (kill(pid, 0) >= 0 || errno != ESRCH)) {
 	if (first)
@@ -878,12 +884,11 @@ waitforpid(pid_t pid)
 	else
 	    kill(pid, SIGCONT);
 
-	ALLOWTRAPS {
-	    child_suspend(SIGINT);
-	} DISALLOWTRAPS;
+	child_suspend(SIGINT);
 	child_block();
     }
     child_unblock();
+    restore_queue_signals(q);
 }
 
 /* wait for a job to finish */
@@ -892,8 +897,10 @@ waitforpid(pid_t pid)
 static void
 zwaitjob(int job, int sig)
 {
+    int q = queue_signal_level();
     Job jn = jobtab + job;
 
+    dont_queue_signals();
     child_block();		 /* unblocked during child_suspend() */
     if (jn->procs) {		 /* if any forks were done         */
 	jn->stat |= STAT_LOCKED;
@@ -902,9 +909,7 @@ zwaitjob(int job, int sig)
 	while (!errflag && jn->stat &&
 	       !(jn->stat & STAT_DONE) &&
 	       !(interact && (jn->stat & STAT_STOPPED))) {
-	    ALLOWTRAPS {
-		child_suspend(sig);
-	    } DISALLOWTRAPS;
+	    child_suspend(sig);
 	    /* Commenting this out makes ^C-ing a job started by a function
 	       stop the whole function again.  But I guess it will stop
 	       something else from working properly, we have to find out
@@ -926,6 +931,7 @@ zwaitjob(int job, int sig)
 	numpipestats = 1;
     }
     child_unblock();
+    restore_queue_signals(q);
 }
 
 /* wait for running job to finish */
@@ -1222,11 +1228,13 @@ bin_fg(char *name, char **argv, char *ops, int func)
 	    zwarnnam(name, "-Z requires one argument", NULL, 0);
 	    return 1;
 	}
+	queue_signals();
 	unmetafy(*argv, &len);
 	if(len > hackspace)
 	    len = hackspace;
 	memcpy(hackzero, *argv, len);
 	memset(hackzero + len, 0, hackspace - len);
+	unqueue_signals();
 	return 0;
     }
 
@@ -1292,6 +1300,7 @@ bin_fg(char *name, char **argv, char *ops, int func)
 	    pid_t pid = (long)atoi(*argv);
 	    Job j;
 	    Process p;
+
 	    if (findproc(pid, &j, &p))
 		waitforpid(pid);
 	    else

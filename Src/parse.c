@@ -2312,7 +2312,7 @@ dump_find_func(Wordcode h, char *name)
 int
 bin_zcompile(char *nam, char **args, char *ops, int func)
 {
-    int map, flags;
+    int map, flags, ret;
     char *dump;
 
     if ((ops['k'] && ops['z']) || (ops['R'] && ops['M']) ||
@@ -2359,15 +2359,22 @@ bin_zcompile(char *nam, char **args, char *ops, int func)
     }
     map = (ops['M'] ? 2 : (ops['R'] ? 0 : 1));
 
-    if (!args[1] && !(ops['c'] || ops['a']))
-	return build_dump(nam, dyncat(*args, FD_EXT), args, ops['U'], map, flags);
-
+    if (!args[1] && !(ops['c'] || ops['a'])) {
+	queue_signals();
+	ret = build_dump(nam, dyncat(*args, FD_EXT), args, ops['U'], map, flags);
+	unqueue_signals();
+	return ret;
+    }
     dump = (strsfx(FD_EXT, *args) ? *args : dyncat(*args, FD_EXT));
 
-    return ((ops['c'] || ops['a']) ?
-	    build_cur_dump(nam, dump, args + 1, ops['m'], map,
-			   (ops['c'] ? 1 : 0) | (ops['a'] ? 2 : 0)) :
-	    build_dump(nam, dump, args + 1, ops['U'], map, flags));
+    queue_signals();
+    ret = ((ops['c'] || ops['a']) ?
+	   build_cur_dump(nam, dump, args + 1, ops['m'], map,
+			  (ops['c'] ? 1 : 0) | (ops['a'] ? 2 : 0)) :
+	   build_dump(nam, dump, args + 1, ops['U'], map, flags));
+    unqueue_signals();
+
+    return ret;
 }
 
 /* Load the header of a dump file. Returns NULL if the file isn't a
@@ -2825,9 +2832,12 @@ try_dump_file(char *path, char *name, char *file, int *ksh)
     int rd, rc, rn;
     char *dig, *wc;
 
-    if (strsfx(FD_EXT, path))
-	return check_dump_file(path, NULL, name, ksh);
-
+    if (strsfx(FD_EXT, path)) {
+	queue_signals();
+	prog = check_dump_file(path, NULL, name, ksh);
+	unqueue_signals();
+	return prog;
+    }
     dig = dyncat(path, FD_EXT);
     wc = dyncat(file, FD_EXT);
 
@@ -2839,20 +2849,24 @@ try_dump_file(char *path, char *name, char *file, int *ksh)
      * both the uncompiled function file and its compiled version (or they
      * don't exist) and the digest file contains the definition for the
      * function. */
+    queue_signals();
     if (!rd &&
 	(rc || std.st_mtime > stc.st_mtime) &&
 	(rn || std.st_mtime > stn.st_mtime) &&
-	(prog = check_dump_file(dig, &std, name, ksh)))
+	(prog = check_dump_file(dig, &std, name, ksh))) {
+	unqueue_signals();
 	return prog;
-
+    }
     /* No digest file. Now look for the per-function compiled file. */
     if (!rc &&
 	(rn || stc.st_mtime > stn.st_mtime) &&
-	(prog = check_dump_file(wc, &stc, name, ksh)))
+	(prog = check_dump_file(wc, &stc, name, ksh))) {
+	unqueue_signals();
 	return prog;
-
+    }
     /* No compiled file for the function. The caller (getfpfunc() will
      * check if the directory contains the uncompiled file for it. */
+    unqueue_signals();
     return NULL;
 }
 
@@ -2872,18 +2886,24 @@ try_source_file(char *file)
     else
 	tail = file;
 
-    if (strsfx(FD_EXT, file))
-	return check_dump_file(file, NULL, tail, NULL);
-
+    if (strsfx(FD_EXT, file)) {
+	queue_signals();
+	prog = check_dump_file(file, NULL, tail, NULL);
+	unqueue_signals();
+	return prog;
+    }
     wc = dyncat(file, FD_EXT);
 
     rc = stat(wc, &stc);
     rn = stat(file, &stn);
 
+    queue_signals();
     if (!rc && (rn || stc.st_mtime > stn.st_mtime) &&
-	(prog = check_dump_file(wc, &stc, tail, NULL)))
+	(prog = check_dump_file(wc, &stc, tail, NULL))) {
+	unqueue_signals();
 	return prog;
-
+    }
+    unqueue_signals();
     return NULL;
 }
 

@@ -2606,6 +2606,7 @@ bin_compquote(char *nam, char **args, char *ops, int func)
 
     while ((name = *args++)) {
 	name = dupstring(name);
+	queue_signals();
 	if ((v = getvalue(&vbuf, &name, 0))) {
 	    switch (PM_TYPE(v->pm->flags)) {
 	    case PM_SCALAR:
@@ -2630,6 +2631,7 @@ bin_compquote(char *nam, char **args, char *ops, int func)
 	    }
 	} else
 	    zwarnnam(nam, "unknown parameter: %s", args[-1], 0);
+	unqueue_signals();
     }
     return 0;
 }
@@ -3580,6 +3582,7 @@ bin_compfiles(char *nam, char **args, char *ops, int func)
 		zwarnnam(nam, "too few arguments", NULL, 0);
 		return 1;
 	    }
+	    queue_signals();
 	    if (!(tmp = getaparam(args[1]))) {
 		zwarnnam(nam, "unknown parameter: %s", args[1], 0);
 		return 0;
@@ -3590,6 +3593,7 @@ bin_compfiles(char *nam, char **args, char *ops, int func)
 					    l, getaparam(args[2]), args[3],
 					    args[4], args[5],
 					    getaparam(args[6]), args + 7));
+	    unqueue_signals();
 	    return 0;
 	}
     case 'i':
@@ -3608,16 +3612,19 @@ bin_compfiles(char *nam, char **args, char *ops, int func)
 		zwarnnam(nam, "too many arguments", NULL, 0);
 		return 1;
 	    }
+	    queue_signals();
 	    tmp = getaparam(args[2]);
 	    l = newlinklist();
 	    if (tmp)
 		for (; *tmp; tmp++)
 		    addlinknode(l, *tmp);
 	    if (!(tmp = getaparam(args[1]))) {
+		unqueue_signals();
 		zwarnnam(nam, "unknown parameter: %s", args[1], 0);
 		return 0;
 	    }
 	    cf_ignore(tmp, l, args[3], args[4]);
+	    unqueue_signals();
 	    set_list_array(args[2], l);
 	    return 0;
 	}
@@ -3635,12 +3642,15 @@ bin_compfiles(char *nam, char **args, char *ops, int func)
 		zwarnnam(nam, "too many arguments", NULL, 0);
 		return 1;
 	    }
+	    queue_signals();
 	    if (!(tmp = getaparam(args[1]))) {
+		unqueue_signals();
 		zwarnnam(nam, "unknown parameter: %s", args[1], 0);
 		return 0;
 	    }
 	    if ((l = cf_remove_other(tmp, args[2], &ret)))
 		set_list_array(args[1], l);
+	    unqueue_signals();
 	    return ret;
 	}
     }

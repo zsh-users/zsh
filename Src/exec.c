@@ -759,8 +759,6 @@ execsimple(Estate state)
     } else
 	lv = (execfuncs[code - WC_CURSH])(state, 0);
 
-    RUNTRAPS();
-
     return lastval = lv;
 }
 
@@ -892,19 +890,19 @@ sublist_done:
 	noerrexit = oldnoerrexit;
 
 	if (sigtrapped[SIGDEBUG])
-	    dotrap(SIGDEBUG, 1);
+	    dotrap(SIGDEBUG);
 
 	/* Check whether we are suppressing traps/errexit *
 	 * (typically in init scripts) and if we haven't  *
 	 * already performed them for this sublist.       */
 	if (!noerrexit && !donetrap) {
 	    if (sigtrapped[SIGZERR] && lastval) {
-		dotrap(SIGZERR, 1);
+		dotrap(SIGZERR);
 		donetrap = 1;
 	    }
 	    if (lastval && isset(ERREXIT)) {
 		if (sigtrapped[SIGEXIT])
-		    dotrap(SIGEXIT, 1);
+		    dotrap(SIGEXIT);
 		if (mypid != getpid())
 		    _exit(lastval);
 		else
@@ -951,9 +949,10 @@ execpline(Estate state, wordcode slcode, int how, int last1)
     child_block();
 
     /* get free entry in job table and initialize it */
-    if ((thisjob = newjob = initjob()) == -1)
+    if ((thisjob = newjob = initjob()) == -1) {
+	child_unblock();
 	return 1;
-
+    }
     if (how & Z_TIMED)
 	jobtab[thisjob].stat |= STAT_TIMED;
 
@@ -1186,10 +1185,9 @@ execpline2(Estate state, wordcode pcode,
 	else
 	    list_pipe_text[0] = '\0';
     }
-    if (WC_PIPE_TYPE(pcode) == WC_PIPE_END) {
+    if (WC_PIPE_TYPE(pcode) == WC_PIPE_END)
 	execcmd(state, input, output, how, last1 ? 1 : 2);
-	RUNTRAPS();
-    } else {
+    else {
 	int old_list_pipe = list_pipe;
 	Wordcode next = state->pc + (*state->pc);
 	wordcode code;
@@ -1224,14 +1222,12 @@ execpline2(Estate state, wordcode pcode,
 		entersubsh(how, 2, 0);
 		close(synch[1]);
 		execcmd(state, input, pipes[1], how, 0);
-		RUNTRAPS();
 		_exit(lastval);
 	    }
 	} else {
 	    /* otherwise just do the pipeline normally. */
 	    subsh_close = pipes[0];
 	    execcmd(state, input, pipes[1], how, 0);
-	    RUNTRAPS();
 	}
 	zclose(pipes[1]);
 	state->pc = next;
@@ -1611,7 +1607,7 @@ setunderscore(char *str)
     }
 }
 
-/* These describe the type of espansions that need to be done on the words
+/* These describe the type of expansions that need to be done on the words
  * used in the thing we are about to execute. They are set in execcmd() and
  * used in execsubst() which might be called from one of the functions
  * called from execcmd() (like execfor() and so on). */
@@ -2274,6 +2270,7 @@ execcmd(Estate state, int input, int output, int how, int last1)
 		if (subsh_close >= 0)
 		    zclose(subsh_close);
 		subsh_close = -1;
+
 		execshfunc((Shfunc) hn, args);
 #ifdef PATH_DEV_FD
 		for (i = 10; i <= max_zsh_fd; i++)

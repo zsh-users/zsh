@@ -235,7 +235,7 @@ watchlog2(int inout, WATCH_STRUCT_UTMP *u, char *fmt, int prnt, int fini)
 # endif /* WATCH_UTMP_UT_HOST */
 
     while (*fmt)
-	if (*fmt == '\\')
+	if (*fmt == '\\') {
 	    if (*++fmt) {
 		if (prnt)
 		    putchar(*fmt);
@@ -244,6 +244,7 @@ watchlog2(int inout, WATCH_STRUCT_UTMP *u, char *fmt, int prnt, int fini)
 		return fmt;
 	    else
 		break;
+	}
 	else if (*fmt == fini)
 	    return ++fmt;
 	else if (*fmt != '%') {
@@ -490,8 +491,6 @@ dowatch(void)
     int uct, wct;
 
     s = watch;
-    if (!(fmt = getsparam("WATCHFMT")))
-	fmt = DEFAULT_WATCHFMT;
 
     holdintr();
     if (!wtab) {
@@ -541,6 +540,9 @@ dowatch(void)
 	free(utab);
 	return;
     }
+    queue_signals();
+    if (!(fmt = getsparam("WATCHFMT")))
+	fmt = DEFAULT_WATCHFMT;
     while ((uct || wct) && !errflag)
 	if (!uct || (wct && ucmp(uptr, wptr) > 0))
 	    wct--, watchlog(0, wptr++, s, fmt);
@@ -548,6 +550,7 @@ dowatch(void)
 	    uct--, watchlog(1, uptr++, s, fmt);
 	else
 	    uptr++, wptr++, wct--, uct--;
+    unqueue_signals();
     free(wtab);
     wtab = utab;
     wtabsz = utabsz;

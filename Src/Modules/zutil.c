@@ -219,12 +219,14 @@ evalstyle(Stypat p)
     }
     errflag = ef;
 
+    queue_signals();
     if ((ret = getaparam("reply")))
 	ret = arrdup(ret);
     else if ((str = getsparam("reply"))) {
 	ret = (char **) hcalloc(2 * sizeof(char *));
 	ret[0] = dupstring(str);
     }
+    unqueue_signals();
     unsetparam("reply");
 
     return ret;
@@ -725,12 +727,14 @@ savematch(MatchData *m)
 {
     char **a;
 
+    queue_signals();
     a = getaparam("match");
     m->match = a ? zarrdup(a) : NULL;
     a = getaparam("mbegin");
     m->mbegin = a ? zarrdup(a) : NULL;
     a = getaparam("mend");
     m->mend = a ? zarrdup(a) : NULL;
+    unqueue_signals();
 }
 
 static void
@@ -1078,8 +1082,13 @@ rmatch(RParseResult *sm, char *subj, char *var1, char *var2, int comp)
 	    if (next->pattern && pattry(next->patprog, subj) &&
 		(!next->guard || (execstring(next->guard, 1, 0), !lastval))) {
 		LinkNode aln;
-		char **mend = getaparam("mend");
-		int len = atoi(mend[0]);
+		char **mend;
+		int len;
+
+		queue_signals();
+		mend = getaparam("mend");
+		len = atoi(mend[0]);
+		unqueue_signals();
 
 		for (i = len; i; i--)
 		  if (*subj++ == Meta)

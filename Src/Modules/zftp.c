@@ -801,7 +801,7 @@ zfgetline(char *ln, int lnsize, int tmout)
 		cmdbuf[0] = (char)IAC;
 		cmdbuf[1] = (char)DONT;
 		cmdbuf[2] = ch;
-		ztrapwrite(zfsess->cfd, cmdbuf, 3);
+		write(zfsess->cfd, cmdbuf, 3);
 		continue;
 
 	    case DO:
@@ -811,7 +811,7 @@ zfgetline(char *ln, int lnsize, int tmout)
 		cmdbuf[0] = (char)IAC;
 		cmdbuf[1] = (char)WONT;
 		cmdbuf[2] = ch;
-		ztrapwrite(zfsess->cfd, cmdbuf, 3);
+		write(zfsess->cfd, cmdbuf, 3);
 		continue;
 
 	    case EOF:
@@ -863,8 +863,6 @@ zfgetmsg(void)
 
     if (zfsess->cfd == -1)
 	return 6;
-    if (!(verbose = getsparam("ZFTP_VERBOSE")))
-	verbose = "";
     zsfree(lastmsg);
     lastmsg = NULL;
 
@@ -890,6 +888,9 @@ zfgetmsg(void)
     zfsetparam("ZFTP_CODE", ztrdup(lastcodestr), ZFPM_READONLY);
     stopit = (*ptr++ != '-');
 
+    queue_signals();
+    if (!(verbose = getsparam("ZFTP_VERBOSE")))
+	verbose = "";
     if (strchr(verbose, lastcodestr[0])) {
 	/* print the whole thing verbatim */
 	printing = 1;
@@ -899,6 +900,7 @@ zfgetmsg(void)
 	printing = 2;
 	fputs(ptr, stderr);
     }
+    unqueue_signals();
     if (printing)
 	fputc('\n', stderr);
 
@@ -996,7 +998,7 @@ zfsendcmd(char *cmd)
 	return 6;
     }
     zfalarm(tmout);
-    ret = ztrapwrite(zfsess->cfd, cmd, strlen(cmd));
+    ret = write(zfsess->cfd, cmd, strlen(cmd));
     alarm(0);
 
     if (ret <= 0) {
@@ -1470,7 +1472,7 @@ zfread(int fd, char *bf, off_t sz, int tmout)
     int ret;
 
     if (!tmout)
-	return ztrapread(fd, bf, sz);
+	return read(fd, bf, sz);
 
     if (setjmp(zfalrmbuf)) {
 	alarm(0);
@@ -1479,7 +1481,7 @@ zfread(int fd, char *bf, off_t sz, int tmout)
     }
     zfalarm(tmout);
 
-    ret = ztrapread(fd, bf, sz);
+    ret = read(fd, bf, sz);
 
     /* we don't bother turning off the whole alarm mechanism here */
     alarm(0);
@@ -1495,7 +1497,7 @@ zfwrite(int fd, char *bf, off_t sz, int tmout)
     int ret;
 
     if (!tmout)
-	return ztrapwrite(fd, bf, sz);
+	return write(fd, bf, sz);
 
     if (setjmp(zfalrmbuf)) {
 	alarm(0);
@@ -1504,7 +1506,7 @@ zfwrite(int fd, char *bf, off_t sz, int tmout)
     }
     zfalarm(tmout);
 
-    ret = ztrapwrite(fd, bf, sz);
+    ret = write(fd, bf, sz);
 
     /* we don't bother turning off the whole alarm mechanism here */
     alarm(0);
@@ -1894,10 +1896,12 @@ zftp_open(char *name, char **args, int flags)
     if (setjmp(zfalrmbuf)) {
 	char *hname;
 	alarm(0);
+	queue_signals();
 	if ((hname = getsparam("ZFTP_HOST")) && *hname) 
 	    zwarnnam(name, "timeout connecting to %s", hname, 0);
 	else
 	    zwarnnam(name, "timeout on host name lookup", NULL, 0);
+	unqueue_signals();
 	zfclose(0);
 	return 1;
     }
@@ -2846,7 +2850,7 @@ zfclose(int leaveparams)
 	if (!zfnopen) {
 	    /* Write the final status in case this is a subshell */
 	    lseek(zfstatfd, zfsessno*sizeof(int), 0);
-	    ztrapwrite(zfstatfd, (char *)zfstatusp+zfsessno, sizeof(int));
+	    write(zfstatfd, (char *)zfstatusp+zfsessno, sizeof(int));
 
 	    close(zfstatfd);
 	    zfstatfd = -1;
@@ -2933,10 +2937,12 @@ savesession()
     for (ps = zfparams, pd = zfsess->params; *ps; ps++, pd++) {
 	if (*pd)
 	    zsfree(*pd);
+	queue_signals();
 	if ((val = getsparam(*ps)))
 	    *pd = ztrdup(val);
 	else
 	    *pd = NULL;
+	unqueue_signals();
     }
     *pd = NULL;
 }
@@ -3123,7 +3129,7 @@ bin_zftp(char *name, char **args, char *ops, int func)
 	/* Get the status in case it was set by a forked process */
 	int oldstatus = zfstatusp[zfsessno];
 	lseek(zfstatfd, 0, 0);
-	ztrapread(zfstatfd, (char *)zfstatusp, sizeof(int)*zfsesscnt);
+	read(zfstatfd, (char *)zfstatusp, sizeof(int)*zfsesscnt);
 	if (zfsess->cfd != -1 && (zfstatusp[zfsessno] & ZFST_CLOS)) {
 	    /* got closed in subshell without us knowing */
 	    zcfinish = 2;
@@ -3166,6 +3172,7 @@ bin_zftp(char *name, char **args, char *ops, int func)
 	return 1;
     }
 
+    queue_signals();
     if ((prefs = getsparam("ZFTP_PREFS"))) {
 	zfprefs = 0;
 	for (ptr = prefs; *ptr; ptr++) {
@@ -3196,6 +3203,7 @@ bin_zftp(char *name, char **args, char *ops, int func)
 	    }
 	}
     }
+    unqueue_signals();
 
     ret = (*zptr->fun)(fullname, args, zptr->flags);
 
@@ -3212,7 +3220,7 @@ bin_zftp(char *name, char **args, char *ops, int func)
 	 * but only for the active session.
 	 */
 	lseek(zfstatfd, zfsessno*sizeof(int), 0);
-	ztrapwrite(zfstatfd, (char *)zfstatusp+zfsessno, sizeof(int));
+	write(zfstatfd, (char *)zfstatusp+zfsessno, sizeof(int));
     }
     return ret;
 }

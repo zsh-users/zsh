@@ -407,7 +407,9 @@ bin_enable(char *name, char **argv, char *ops, int func)
      * print nodes NOT containing the DISABLED flag, else scanhashtable will *
      * print nodes containing the DISABLED flag.                             */
     if (!*argv) {
+	queue_signals();
 	scanhashtable(ht, 1, flags1, flags2, ht->printnode, 0);
+	unqueue_signals();
 	return 0;
     }
 
@@ -416,8 +418,11 @@ bin_enable(char *name, char **argv, char *ops, int func)
 	for (; *argv; argv++) {
 	    /* parse pattern */
 	    tokenize(*argv);
-	    if ((pprog = patcompile(*argv, PAT_STATIC, 0)))
+	    if ((pprog = patcompile(*argv, PAT_STATIC, 0))) {
+		queue_signals();
 		match += scanmatchtable(ht, pprog, 0, 0, scanfunc, 0);
+		unqueue_signals();
+	    }
 	    else {
 		untokenize(*argv);
 		zwarnnam(name, "bad pattern : %s", *argv, 0);
@@ -431,6 +436,7 @@ bin_enable(char *name, char **argv, char *ops, int func)
     }
 
     /* Take arguments literally -- do not glob */
+    queue_signals();
     for (; *argv; argv++) {
 	    if ((hn = ht->getnode2(ht, *argv))) {
 		scanfunc(hn, 0);
@@ -439,6 +445,7 @@ bin_enable(char *name, char **argv, char *ops, int func)
 		returnval = 1;
 	    }
 	}
+    unqueue_signals();
     return returnval;
 }
 
@@ -511,6 +518,7 @@ bin_set(char *nam, char **args, char *ops, int func)
     inittyptab();
 
     /* Show the parameters, possibly with values */
+    queue_signals();
     if (!hadopt && !*args)
 	scanhashtable(paramtab, 1, 0, 0, paramtab->printnode,
 	    hadplus ? PRINT_NAMEONLY : 0);
@@ -520,8 +528,10 @@ bin_set(char *nam, char **args, char *ops, int func)
 	scanhashtable(paramtab, 1, PM_ARRAY, 0, paramtab->printnode,
 	    hadplus ? PRINT_NAMEONLY : 0);
     }
-    if (!*args && !hadend)
+    if (!*args && !hadend) {
+	unqueue_signals();
 	return 0;
+    }
     if (array)
 	args++;
     if (sort)
@@ -550,6 +560,7 @@ bin_set(char *nam, char **args, char *ops, int func)
 	freearray(pparams);
 	pparams = zarrdup(args);
     }
+    unqueue_signals();
     return 0;
 }
 
@@ -588,6 +599,7 @@ bin_dirs(char *name, char **argv, char *ops, int func)
 
     /* with the -v option, provide a numbered list of directories, starting at
     zero */
+    queue_signals();
     if (ops['v']) {
 	LinkNode node;
 	int pos = 1;
@@ -599,11 +611,13 @@ bin_dirs(char *name, char **argv, char *ops, int func)
 	    fprintdir(getdata(node), stdout);
 	}
 	putchar('\n');
+	unqueue_signals();
 	return 0;
     }
     /* given no arguments, list the stack normally */
     if (!*argv) {
 	printdirstack();
+	unqueue_signals();
 	return 0;
     }
     /* replace the stack with the specified directories */
@@ -614,6 +628,7 @@ bin_dirs(char *name, char **argv, char *ops, int func)
 	freelinklist(dirstack, freestr);
 	dirstack = l;
     }
+    unqueue_signals();
     return 0;
 }
 
@@ -693,9 +708,11 @@ bin_cd(char *nam, char **argv, char *ops, int func)
     }
   brk:
     chasinglinks = ops['P'] || (isset(CHASELINKS) && !ops['L']);
+    queue_signals();
     zpushnode(dirstack, ztrdup(pwd));
     if (!(dir = cd_get_dest(nam, argv, ops, func))) {
 	zsfree(getlinknode(dirstack));
+	unqueue_signals();
 	return 1;
     }
     cd_new_pwd(func, dir);
@@ -715,6 +732,7 @@ bin_cd(char *nam, char **argv, char *ops, int func)
 	    chdir(unmeta(pwd));
 	}
     }
+    unqueue_signals();
     return 0;
 }
 
@@ -1192,19 +1210,23 @@ bin_fc(char *nam, char **argv, char *ops, int func)
 	    return 1;
 	}
     }
+    queue_signals();
     if (ops['R']) {
 	/* read history from a file */
 	readhistfile(*argv, 1, ops['I'] ? HFILE_SKIPOLD : 0);
+	unqueue_signals();
 	return 0;
     }
     if (ops['W']) {
 	/* write history to a file */
 	savehistfile(*argv, 1, ops['I'] ? HFILE_SKIPOLD : 0);
+	unqueue_signals();
 	return 0;
     }
     if (ops['A']) {
 	/* append history to a file */
 	savehistfile(*argv, 1, HFILE_APPEND | (ops['I'] ? HFILE_SKIPOLD : 0));
+	unqueue_signals();
 	return 0;
     }
     /* put foo=bar type arguments into the substitution list */
@@ -1226,20 +1248,25 @@ bin_fc(char *nam, char **argv, char *ops, int func)
     if (*argv) {
 	minflag = **argv == '-';
 	first = fcgetcomm(*argv);
-	if (first == -1)
+	if (first == -1) {
+	    unqueue_signals();
 	    return 1;
+	}
 	argv++;
     }
     /* interpret and check second history line specifier */
     if (*argv) {
 	last = fcgetcomm(*argv);
-	if (last == -1)
+	if (last == -1) {
+	    unqueue_signals();
 	    return 1;
+	}
 	argv++;
     }
     /* There is a maximum of two history specifiers.  At least, there *
      * will be as long as the history list is one-dimensional.        */
     if (*argv) {
+	unqueue_signals();
 	zwarnnam("fc", "too many arguments", NULL, 0);
 	return 1;
     }
@@ -1256,11 +1283,13 @@ bin_fc(char *nam, char **argv, char *ops, int func)
 	last = (minflag) ? curhist : first;
     else if (last < first)
 	last = first;
-    if (ops['l'])
+    if (ops['l']) {
 	/* list the required part of the history */
 	retval = fclist(stdout, !ops['n'], ops['r'], ops['D'],
 			ops['d'] + ops['f'] * 2 + ops['E'] * 4 + ops['i'] * 8,
 			first, last, asgf, pprog);
+	unqueue_signals();
+    }
     else {
 	/* edit history file, and (if successful) use the result as a new command */
 	int tempfd;
@@ -1272,6 +1301,7 @@ bin_fc(char *nam, char **argv, char *ops, int func)
 	if (((tempfd = open(fil, O_WRONLY | O_CREAT | O_EXCL | O_NOCTTY, 0600))
 	    == -1) ||
 		((out = fdopen(tempfd, "w")) == NULL)) {
+	    unqueue_signals();
 	    zwarnnam("fc", "can't open temp file: %e", NULL, errno);
 	} else {
 	    if (!fclist(out, 0, ops['r'], 0, 0, first, last, asgf, pprog)) {
@@ -1281,6 +1311,7 @@ bin_fc(char *nam, char **argv, char *ops, int func)
 		if (!editor)
 		    editor = DEFAULT_FCEDIT;
 
+		unqueue_signals();
 		if (fcedit(editor, fil)) {
 		    if (stuff(fil))
 			zwarnnam("fc", "%e: %s", s, errno);
@@ -1289,7 +1320,8 @@ bin_fc(char *nam, char **argv, char *ops, int func)
 			retval = lastval;
 		    }
 		}
-	    }
+	    } else
+		unqueue_signals();
 	}
 	unlink(fil);
     }
@@ -1847,6 +1879,8 @@ bin_typeset(char *name, char **argv, char *ops, int func)
 
     on &= ~off;
 
+    queue_signals();
+
     /* Given no arguments, list whatever the options specify. */
     if (!*argv) {
 	if (!(on|roff))
@@ -1854,6 +1888,7 @@ bin_typeset(char *name, char **argv, char *ops, int func)
 	if (roff || ops['+'])
 	    printflags |= PRINT_NAMEONLY;
 	scanhashtable(paramtab, 1, on|roff, 0, paramtab->printnode, printflags);
+	unqueue_signals();
 	return 0;
     }
 
@@ -1868,20 +1903,27 @@ bin_typeset(char *name, char **argv, char *ops, int func)
 
 	if (ops['m']) {
 	    zwarnnam(name, "incompatible options for -T", NULL, 0);
+	    unqueue_signals();
 	    return 1;
 	}
 	on &= ~off;
 	if (!argv[1] || argv[2]) {
 	    zwarnnam(name, "-T requires names of scalar and array", NULL, 0);
+	    unqueue_signals();
 	    return 1;
 	}
 
-	if (!(asg = getasg(argv[0])))
+	if (!(asg = getasg(argv[0]))) {
+	    unqueue_signals();
 	    return 1;
+	}
 	asg0 = *asg;
-	if (!(asg = getasg(argv[1])))
+	if (!(asg = getasg(argv[1]))) {
+	    unqueue_signals();
 	    return 1;
+	}
 	if (!strcmp(asg0.name, asg->name)) {
+	    unqueue_signals();
 	    zerrnam(name, "can't tie a variable to itself", NULL, 0);
 	    return 1;
 	}
@@ -1910,9 +1952,10 @@ bin_typeset(char *name, char **argv, char *ops, int func)
 				 (Param)paramtab->getnode(paramtab,
 							  asg->name),
 				 func, (on | PM_ARRAY) & ~PM_EXPORTED,
-				 off, roff, asg->value, NULL)))
+				 off, roff, asg->value, NULL))) {
+	    unqueue_signals();
 	    return 1;
-
+	}
 	/*
 	 * Create the tied colonarray.  We make it as a normal scalar
 	 * and fix up the oddities later.
@@ -1924,6 +1967,7 @@ bin_typeset(char *name, char **argv, char *ops, int func)
 	    if (oldval)
 		zsfree(oldval);
 	    unsetparam_pm(apm, 1, 1);
+	    unqueue_signals();
 	    return 1;
 	}
 
@@ -1931,6 +1975,7 @@ bin_typeset(char *name, char **argv, char *ops, int func)
 	apm->ename = ztrdup(asg0.name);
 	if (oldval)
 	    setsparam(asg0.name, oldval);
+	unqueue_signals();
 
 	return 0;
     }
@@ -1987,6 +2032,7 @@ bin_typeset(char *name, char **argv, char *ops, int func)
 		    returnval = 1;
 	    }
 	}
+	unqueue_signals();
 	return returnval;
     }
 
@@ -2005,6 +2051,7 @@ bin_typeset(char *name, char **argv, char *ops, int func)
 			    func, on, off, roff, asg->value, NULL))
 	    returnval = 1;
     }
+    unqueue_signals();
     return returnval;
 }
 
@@ -2074,6 +2121,9 @@ bin_functions(char *name, char **argv, char *ops, int func)
      * are given, we will print only functions containing these  *
      * flags, else we'll print them all.                         */
     if (!*argv) {
+	int ret = 0;
+
+	queue_signals();
 	if (ops['X'] == 1) {
 	    if ((shf = (Shfunc) shfunctab->getnode(shfunctab, scriptname))) {
 		DPUTS(!shf->funcdef,
@@ -2083,14 +2133,15 @@ bin_functions(char *name, char **argv, char *ops, int func)
 		shfunctab->addnode(shfunctab, ztrdup(scriptname), shf);
 	    }
 	    shf->flags = on;
-	    return eval_autoload(shf, scriptname, ops, func);
+	    ret = eval_autoload(shf, scriptname, ops, func);
 	} else {
 	    if (ops['U'] && !ops['u'])
 		on &= ~PM_UNDEFINED;
 	    scanhashtable(shfunctab, 1, on|off, DISABLED, shfunctab->printnode,
 			  pflags);
 	}
-	return 0;
+	unqueue_signals();
+	return ret;
     }
 
     /* With the -m option, treat arguments as glob patterns */
@@ -2101,6 +2152,7 @@ bin_functions(char *name, char **argv, char *ops, int func)
 	    tokenize(*argv);
 	    if ((pprog = patcompile(*argv, PAT_STATIC, 0))) {
 		/* with no options, just print all functions matching the glob pattern */
+		queue_signals();
 		if (!(on|off)) {
 		    scanmatchtable(shfunctab, pprog, 0, DISABLED,
 				   shfunctab->printnode, pflags);
@@ -2120,6 +2172,7 @@ bin_functions(char *name, char **argv, char *ops, int func)
 			    }
 		    }
 		}
+		unqueue_signals();
 	    } else {
 		untokenize(*argv);
 		zwarnnam(name, "bad pattern : %s", *argv, 0);
@@ -2130,6 +2183,7 @@ bin_functions(char *name, char **argv, char *ops, int func)
     }
 
     /* Take the arguments literally -- do not glob */
+    queue_signals();
     for (; *argv; argv++) {
 	if (ops['w'])
 	    returnval = dump_autoload(name, *argv, on, ops, func);
@@ -2155,6 +2209,7 @@ bin_functions(char *name, char **argv, char *ops, int func)
 	} else
 	    returnval = 1;
     }
+    unqueue_signals();
     return returnval;
 }
 
@@ -2206,6 +2261,7 @@ bin_unset(char *name, char **argv, char *ops, int func)
 	    tokenize(s);
 	    if ((pprog = patcompile(s, PAT_STATIC, NULL))) {
 		/* Go through the parameter table, and unset any matches */
+		queue_signals();
 		for (i = 0; i < paramtab->hsize; i++) {
 		    for (pm = (Param) paramtab->nodes[i]; pm; pm = next) {
 			/* record pointer to next, since we may free this one */
@@ -2218,6 +2274,7 @@ bin_unset(char *name, char **argv, char *ops, int func)
 			}
 		    }
 		}
+		unqueue_signals();
 	    } else {
 		untokenize(s);
 		zwarnnam(name, "bad pattern : %s", s, 0);
@@ -2231,6 +2288,7 @@ bin_unset(char *name, char **argv, char *ops, int func)
     }
 
     /* do not glob -- unset the given parameter */
+    queue_signals();
     while ((s = *argv++)) {
 	char *ss = strchr(s, '[');
 	char *sse = ss;
@@ -2268,6 +2326,7 @@ bin_unset(char *name, char **argv, char *ops, int func)
 	if (ss)
 	    *ss = '[';
     }
+    unqueue_signals();
     return returnval;
 }
 
@@ -2313,6 +2372,7 @@ bin_whence(char *nam, char **argv, char *ops, int func)
 		returnval = 1;
 		continue;
 	    }
+	    queue_signals();
 	    if (!ops['p']) {
 		/* -p option is for path search only.    *
 		 * We're not using it, so search for ... */
@@ -2339,11 +2399,13 @@ bin_whence(char *nam, char **argv, char *ops, int func)
 	    scanmatchtable(cmdnamtab, pprog, 0, 0,
 			   cmdnamtab->printnode, printflags);
 
+	    unqueue_signals();
 	}
-    return returnval;
+	return returnval;
     }
 
     /* Take arguments literally -- do not glob */
+    queue_signals();
     for (; *argv; argv++) {
 	informed = 0;
 
@@ -2436,6 +2498,7 @@ bin_whence(char *nam, char **argv, char *ops, int func)
 	    returnval = 1;
 	}
     }
+    unqueue_signals();
     return returnval;
 }
 
@@ -2496,10 +2559,13 @@ bin_hash(char *name, char **argv, char *ops, int func)
 
     /* Given no arguments, display current hash table. */
     if (!*argv) {
+	queue_signals();
 	scanhashtable(ht, 1, 0, 0, ht->printnode, printflags);
+	unqueue_signals();
 	return 0;
     }
 
+    queue_signals();
     while (*argv) {
 	void *hn;
 	if (ops['m']) {
@@ -2553,6 +2619,7 @@ bin_hash(char *name, char **argv, char *ops, int func)
 	    ht->printnode(hn, 0);
 	argv++;
     }
+    unqueue_signals();
     return returnval;
 }
 
@@ -2586,6 +2653,7 @@ bin_unhash(char *name, char **argv, char *ops, int func)
 	    tokenize(*argv);
 	    if ((pprog = patcompile(*argv, PAT_STATIC, NULL))) {
 		/* remove all nodes matching glob pattern */
+		queue_signals();
 		for (i = 0; i < ht->hsize; i++) {
 		    for (hn = ht->nodes[i]; hn; hn = nhn) {
 			/* record pointer to next, since we may free this one */
@@ -2596,6 +2664,7 @@ bin_unhash(char *name, char **argv, char *ops, int func)
 			}
 		    }
 		}
+		unqueue_signals();
 	    } else {
 		untokenize(*argv);
 		zwarnnam(name, "bad pattern : %s", *argv, 0);
@@ -2609,6 +2678,7 @@ bin_unhash(char *name, char **argv, char *ops, int func)
     }
 
     /* Take arguments literally -- do not glob */
+    queue_signals();
     for (; *argv; argv++) {
 	if ((hn = ht->removenode(ht, *argv))) {
 	    ht->freenode(hn);
@@ -2617,6 +2687,7 @@ bin_unhash(char *name, char **argv, char *ops, int func)
 	    returnval = 1;
 	}
     }
+    unqueue_signals();
     return returnval;
 }
 
@@ -2656,7 +2727,9 @@ bin_alias(char *name, char **argv, char *ops, int func)
     /* In the absence of arguments, list all aliases.  If a command *
      * line flag is specified, list only those of that type.        */
     if (!*argv) {
+	queue_signals();
 	scanhashtable(aliastab, 1, flags1, flags2, aliastab->printnode, printflags);
+	unqueue_signals();
 	return 0;
     }
 
@@ -2667,8 +2740,10 @@ bin_alias(char *name, char **argv, char *ops, int func)
 	    tokenize(*argv);  /* expand argument */
 	    if ((pprog = patcompile(*argv, PAT_STATIC, NULL))) {
 		/* display the matching aliases */
+		queue_signals();
 		scanmatchtable(aliastab, pprog, flags1, flags2,
 			       aliastab->printnode, printflags);
+		unqueue_signals();
 	    } else {
 		untokenize(*argv);
 		zwarnnam(name, "bad pattern : %s", *argv, 0);
@@ -2679,6 +2754,7 @@ bin_alias(char *name, char **argv, char *ops, int func)
     }
 
     /* Take arguments literally.  Don't glob */
+    queue_signals();
     while ((asg = getasg(*argv++))) {
 	if (asg->value && !ops['L']) {
 	    /* The argument is of the form foo=bar and we are not *
@@ -2694,6 +2770,7 @@ bin_alias(char *name, char **argv, char *ops, int func)
 	} else
 	    returnval = 1;
     }
+    unqueue_signals();
     return returnval;
 }
 
@@ -2774,7 +2851,10 @@ bin_print(char *name, char **args, char *ops, int func)
 	}
 	/* -D option -- interpret as a directory, and use ~ */
 	if(ops['D']) {
-	    Nameddir d = finddir(args[n]);
+	    Nameddir d;
+
+	    queue_signals();
+	    d = finddir(args[n]);
 	    if(d) {
 		char *arg = zhalloc(strlen(args[n]) + 1);
 		sprintf(arg, "~%s%s", d->nam,
@@ -2782,12 +2862,15 @@ bin_print(char *name, char **args, char *ops, int func)
 		args[n] = arg;
 		len[n] = strlen(args[n]);
 	    }
+	    unqueue_signals();
 	}
     }
 
     /* -z option -- push the arguments onto the editing buffer stack */
     if (ops['z']) {
+	queue_signals();
 	zpushnode(bufstack, sepjoin(args, NULL, 0));
+	unqueue_signals();
 	return 0;
     }
     /* -s option -- add the arguments to the history list */
@@ -2795,6 +2878,7 @@ bin_print(char *name, char **args, char *ops, int func)
 	int nwords = 0, nlen, iwords;
 	char **pargs = args;
 
+	queue_signals();
 	ent = prepnexthistent();
 	while (*pargs++)
 	    nwords++;
@@ -2813,6 +2897,7 @@ bin_print(char *name, char **args, char *ops, int func)
 	ent->stim = ent->ftim = time(NULL);
 	ent->flags = 0;
 	addhistnode(histtab, ent->text, ent);
+	unqueue_signals();
 	return 0;
     }
     /* -u and -p -- output to other than standard output */
@@ -2908,10 +2993,12 @@ bin_shift(char *name, char **argv, char *ops, int func)
     char **s;
  
     /* optional argument can be either numeric or an array */
+    queue_signals();
     if (*argv && !getaparam(*argv))
         num = mathevali(*argv++);
  
     if (num < 0) {
+	unqueue_signals();
         zwarnnam(name, "argument to shift must be non-negative", NULL, 0);
         return 1;
     }
@@ -2940,6 +3027,7 @@ bin_shift(char *name, char **argv, char *ops, int func)
 	    pparams = s;
 	}
     }
+    unqueue_signals();
     return ret;
 }
 
@@ -3169,7 +3257,7 @@ zexit(int val, int from_signal)
 	}
     }
     if (sigtrapped[SIGEXIT])
-	dotrap(SIGEXIT, 1);
+	dotrap(SIGEXIT);
     runhookdef(EXITHOOK, NULL);
     if (mypid != getpid())
 	_exit(val);
@@ -3415,7 +3503,7 @@ bin_read(char *name, char **args, char *ops, int func)
 		    *bptr = readchar;
 		    val = 1;
 		    readchar = -1;
-		} else if ((val = ztrapread(readfd, bptr, nchars)) <= 0)
+		} else if ((val = read(readfd, bptr, nchars)) <= 0)
 		    break;
 	    
 		/* decrement number of characters read from number required */
@@ -3429,7 +3517,7 @@ bin_read(char *name, char **args, char *ops, int func)
 	if (!izle && !ops['u'] && !ops['p']) {
 	    /* dispose of result appropriately, etc. */
 	    if (isem)
-		while (val > 0 && ztrapread(SHTTY, &d, 1) == 1 && d != '\n');
+		while (val > 0 && read(SHTTY, &d, 1) == 1 && d != '\n');
 	    else
 		settyinfo(&shttyinfo);
 	    if (haso) {
@@ -3686,7 +3774,7 @@ zread(int izle, int *readchar)
     }
     for (;;) {
 	/* read a character from readfd */
-	ret = ztrapread(readfd, &cc, 1);
+	ret = read(readfd, &cc, 1);
 	switch (ret) {
 	case 1:
 	    /* return the character read */
@@ -3839,6 +3927,7 @@ bin_trap(char *name, char **argv, char *ops, int func)
 
     /* If given no arguments, list all currently-set traps */
     if (!*argv) {
+	queue_signals();
 	for (sig = 0; sig < VSIGCOUNT; sig++) {
 	    if (sigtrapped[sig] & ZSIG_FUNC) {
 		char fname[20];
@@ -3860,6 +3949,7 @@ bin_trap(char *name, char **argv, char *ops, int func)
 		}
 	    }
 	}
+	unqueue_signals();
 	return 0;
     }
 

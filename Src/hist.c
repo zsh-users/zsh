@@ -382,6 +382,7 @@ histsubchar(int c)
 
 	/* get event number */
 
+	queue_signals();
 	if (c == '?') {
 	    for (;;) {
 		c = ingetc();
@@ -397,6 +398,7 @@ histsubchar(int c)
 	    evset = 0;
 	    if (ev == -1) {
 		herrflush();
+		unqueue_signals();
 		zerr("no such event: %s", buf, 0);
 		return -1;
 	    }
@@ -450,6 +452,7 @@ histsubchar(int c)
 		evset = 1;
 	    } else if ((ev = hcomsearch(buf)) == -1) {
 		herrflush();
+		unqueue_signals();
 		zerr("event not found: %s", buf, 0);
 		return -1;
 	    } else
@@ -458,9 +461,10 @@ histsubchar(int c)
 
 	/* get the event */
 
-	if (!(ehist = gethist(defev = ev)))
+	if (!(ehist = gethist(defev = ev))) {
+	    unqueue_signals();
 	    return -1;
-
+	}
 	/* extract the relevant arguments */
 
 	argc = getargc(ehist);
@@ -473,6 +477,7 @@ histsubchar(int c)
 		    argc = getargc(ehist);
 		} else {
 		    herrflush();
+		    unqueue_signals();
 		    zerr("Ambiguous history reference", NULL, 0);
 		    return -1;
 		}
@@ -486,8 +491,10 @@ histsubchar(int c)
 	} else {
 	    inungetc(c);
 	    larg = farg = getargspec(argc, marg, evset);
-	    if (larg == -2)
+	    if (larg == -2) {
+		unqueue_signals();
 		return -1;
+	    }
 	    if (farg != -1)
 		cflag = 0;
 	    c = ingetc();
@@ -497,8 +504,10 @@ histsubchar(int c)
 	    } else if (c == '-') {
 		cflag = 0;
 		larg = getargspec(argc, marg, evset);
-		if (larg == -2)
+		if (larg == -2) {
+		    unqueue_signals();
 		    return -1;
+		}
 		if (larg == -1)
 		    larg = argc - 1;
 	    } else
@@ -508,8 +517,11 @@ histsubchar(int c)
 	    farg = 0;
 	if (larg == -1)
 	    larg = argc;
-	if (!(sline = getargs(ehist, farg, larg)))
+	if (!(sline = getargs(ehist, farg, larg))) {
+	    unqueue_signals();
 	    return -1;
+	}
+	unqueue_signals();
     }
 
     /* do the modifiers */
@@ -1000,10 +1012,12 @@ mod_export int
 hend(Eprog prog)
 {
     int flag, save = 1;
-    char *hf = getsparam("HISTFILE");
+    char *hf;
 
     DPUTS(stophist != 2 && !(inbufflags & INP_ALIAS) && !chline,
 	  "BUG: chline is NULL in hend()");
+    queue_signals();
+    hf = getsparam("HISTFILE");
     if (histdone & HISTFLAG_SETTY)
 	settyinfo(&shttyinfo);
     if (!(histactive & HA_NOINC))
@@ -1013,6 +1027,7 @@ hend(Eprog prog)
 	zfree(chwords, chwordlen*sizeof(short));
 	chline = NULL;
 	histactive = 0;
+	unqueue_signals();
 	return 1;
     }
     if (hist_ignore_all_dups != isset(HISTIGNOREALLDUPS)
@@ -1107,6 +1122,7 @@ hend(Eprog prog)
     if (isset(SHAREHISTORY)? histfileIsLocked() : isset(INCAPPENDHISTORY))
 	savehistfile(hf, 0, HFILE_USE_OPTIONS | HFILE_FAST);
     unlockhistfile(hf); /* It's OK to call this even if we aren't locked */
+    unqueue_signals();
     return !(flag & HISTFLAG_NOEXEC || errflag);
 }
 

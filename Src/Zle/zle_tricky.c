@@ -535,24 +535,33 @@ parambeg(char *s)
 static int
 docomplete(int lst)
 {
+    static int active = 0;
+
     char *s, *ol;
     int olst = lst, chl = 0, ne = noerrs, ocs, ret = 0, dat[2];
 
+    if (active) {
+	zwarn("completion cannot be used recursively (yet)", NULL, 0);
+	return 1;
+    }
+    active = 1;
     if (undoing)
 	setlastline();
 
     if (!module_loaded("zsh/complete"))
 	load_module("zsh/compctl");
 
-    if (runhookdef(BEFORECOMPLETEHOOK, (void *) &lst))
+    if (runhookdef(BEFORECOMPLETEHOOK, (void *) &lst)) {
+	active = 0;
 	return 0;
-
+    }
     /* Expand history references before starting completion.  If anything *
      * changed, do no more.                                               */
 
-    if (doexpandhist())
+    if (doexpandhist()) {
+	active = 0;
 	return 0;
-
+    }
     metafy_line();
 
     ocs = cs;
@@ -608,6 +617,7 @@ docomplete(int lst)
 	    unmetafy_line();
 	    zsfree(s);
 	    zsfree(qword);
+	    active = 0;
 	    return 1;
 	}
 	ocs = cs;
@@ -785,6 +795,7 @@ docomplete(int lst)
     dat[1] = ret;
     runhookdef(AFTERCOMPLETEHOOK, (void *) dat);
 
+    active = 0;
     return dat[1];
 }
 

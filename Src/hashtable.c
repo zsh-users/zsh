@@ -560,11 +560,14 @@ int
 bin_hashinfo(char *nam, char **args, char *ops, int func)
 {
     HashTable ht;
+
     printf("----------------------------------------------------\n");
+    queue_signals();
     for(ht = firstht; ht; ht = ht->next) {
 	ht->printinfo(ht);
 	printf("----------------------------------------------------\n");
     }
+    unqueue_signals();
     return 0;
 }
 

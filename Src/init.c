@@ -170,7 +170,7 @@ loop(int toplevel, int justonce)
 	}
 	if (isset(SINGLECOMMAND) && toplevel) {
 	    if (sigtrapped[SIGEXIT])
-		dotrap(SIGEXIT, 1);
+		dotrap(SIGEXIT);
 	    exit(lastval);
 	}
 	if (justonce)
@@ -1022,6 +1022,7 @@ sourcehome(char *s)
 {
     char *h;
 
+    queue_signals();
     if (emulation == EMULATE_SH || emulation == EMULATE_KSH ||
 	!(h = getsparam("ZDOTDIR")))
 	h = home;
@@ -1030,6 +1031,7 @@ sourcehome(char *s)
 	/* Let source() complain if path is too long */
 	VARARR(char, buf, strlen(h) + strlen(s) + 2);
 	sprintf(buf, "%s/%s", h, s);
+	unqueue_signals();
 	source(buf);
     }
 }

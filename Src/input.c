@@ -141,9 +141,7 @@ shingetline(void)
     for (;;) {
 	do {
 	    errno = 0;
-	    ALLOWTRAPS {
-		c = fgetc(bshin);
-	    } DISALLOWTRAPS;
+	    c = fgetc(bshin);
 	} while (c < 0 && errno == EINTR);
 	if (c < 0 || c == '\n') {
 	    if (c == '\n')

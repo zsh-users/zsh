@@ -1526,14 +1526,15 @@ get_user_var(char *nam)
 	/* Otherwise it should be a parameter name. */
 	char **arr = NULL, *val;
 
+	queue_signals();
 	if ((arr = getaparam(nam)) || (arr = gethparam(nam)))
-	    return (incompfunc ? arrdup(arr) : arr);
-
-	if ((val = getsparam(nam))) {
+	    arr = (incompfunc ? arrdup(arr) : arr);
+	else if ((val = getsparam(nam))) {
 	    arr = (char **) zhalloc(2*sizeof(char *));
 	    arr[0] = (incompfunc ? dupstring(val) : val);
 	    arr[1] = NULL;
 	}
+	unqueue_signals();
 	return arr;
     }
 }
@@ -1542,14 +1543,19 @@ static char **
 get_data_arr(char *name, int keys)
 {
     struct value vbuf;
+    char **ret;
     Value v;
 
+    queue_signals();
     if (!(v = fetchvalue(&vbuf, &name, 1,
 			 (keys ? SCANPM_WANTKEYS : SCANPM_WANTVALS) |
 			 SCANPM_MATCHMANY)))
-	return NULL;
+	ret = NULL;
+    else
+	ret = getarrvalue(v);
+    unqueue_signals();
 
-    return getarrvalue(v);
+    return ret;
 }
 
 /* This is used by compadd to add a couple of matches. The arguments are

@@ -279,14 +279,17 @@ insert(char *s, int checked)
     char *news = s;
     int statted = 0;
 
+    queue_signals();
     inserts = NULL;
 
     if (gf_listtypes || gf_markdirs) {
 	/* Add the type marker to the end of the filename */
 	mode_t mode;
 	checked = statted = 1;
-	if (statfullpath(s, &buf, 1))
+	if (statfullpath(s, &buf, 1)) {
+	    unqueue_signals();
 	    return;
+	}
 	mode = buf.st_mode;
 	if (gf_follow) {
 	    if (!S_ISLNK(mode) || statfullpath(s, &buf2, 0))
@@ -307,9 +310,10 @@ insert(char *s, int checked)
 	/* Go through the qualifiers, rejecting the file if appropriate */
 	struct qual *qo, *qn;
 
-	if (!statted && statfullpath(s, &buf, 1))
+	if (!statted && statfullpath(s, &buf, 1)) {
+	    unqueue_signals();
 	    return;
-
+	}
 	news = dyncat(pathbuf, news);
 
 	statted = 1;
@@ -330,16 +334,20 @@ insert(char *s, int checked)
 	     * vice versa.                                   */
 	    if ((!((qn->func) (news, bp, qn->data, qn->sdata)) ^ qn->sense) & 1) {
 		/* Try next alternative, or return if there are no more */
-		if (!(qo = qo->or))
+		if (!(qo = qo->or)) {
+		    unqueue_signals();
 		    return;
+		}
 		qn = qo;
 		continue;
 	    }
 	    qn = qn->next;
 	}
     } else if (!checked) {
-	if (statfullpath(s, NULL, 1))
+	if (statfullpath(s, NULL, 1)) {
+	    unqueue_signals();
 	    return;
+	}
 	statted = 1;
 	news = dyncat(pathbuf, news);
     } else
@@ -389,6 +397,7 @@ insert(char *s, int checked)
 	if (!inserts)
 	    break;
     }
+    unqueue_signals();
 }
 
 /* Check to see if str is eligible for filename generation. */

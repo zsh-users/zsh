@@ -1,5 +1,16 @@
 2001-01-16  Sven Wischnowsky  <wischnow@zsh.org>
 
+	* 13365: Src/builtin.c, Src/exec.c, Src/glob.c, Src/hashtable.c,
+ 	Src/hist.c, Src/init.c, Src/input.c, Src/jobs.c, Src/math.c,
+ 	Src/mem.c, Src/module.c, Src/params.c, Src/parse.c, Src/prompt.c,
+ 	Src/signals.c, Src/signals.h, Src/subst.c, Src/utils.c,
+ 	Src/watch.c, Src/Modules/zftp.c, Src/Modules/zpty.c,
+ 	Src/Modules/zutil.c, Src/Zle/compcore.c, Src/Zle/complist.c,
+ 	Src/Zle/computil.c, Src/Zle/zle_main.c, Src/Zle/zle_tricky.c:
+ 	remove 13108 (trap queues); replace with signal queueing to ensure
+ 	that user signal handlers are only executed when it is safe to run
+ 	them
+	
 	* 13364: Src/Zle/compctl.c: fix for ol' compctl when completing
  	hash keys
 	

@@ -497,7 +497,7 @@ handler(int sig)
  
     case SIGHUP:
         if (sigtrapped[SIGHUP])
-            dotrap(SIGHUP, 0);
+            dotrap(SIGHUP);
         else {
             stopmsg = 1;
             zexit(SIGHUP, 1);
@@ -506,7 +506,7 @@ handler(int sig)
  
     case SIGINT:
         if (sigtrapped[SIGINT])
-            dotrap(SIGINT, 0);
+            dotrap(SIGINT);
         else {
 	    if ((isset(PRIVILEGED) || isset(RESTRICTED)) &&
 		isset(INTERACTIVE) && noerrexit < 0)
@@ -523,14 +523,14 @@ handler(int sig)
     case SIGWINCH:
         adjustwinsize(1);  /* check window size and adjust */
 	if (sigtrapped[SIGWINCH])
-	    dotrap(SIGWINCH, 0);
+	    dotrap(SIGWINCH);
         break;
 #endif
 
     case SIGALRM:
         if (sigtrapped[SIGALRM]) {
 	    int tmout;
-            dotrap(SIGALRM, 0);
+            dotrap(SIGALRM);
 
 	    if ((tmout = getiparam("TMOUT")))
 		alarm(tmout);           /* reset the alarm */
@@ -549,7 +549,7 @@ handler(int sig)
         break;
  
     default:
-        dotrap(sig, 0);
+        dotrap(sig);
         break;
     }   /* end of switch(sig) */
  
@@ -703,6 +703,7 @@ settrap(int sig, Eprog l)
      * Call unsettrap() unconditionally, to make sure trap is saved
      * if necessary.
      */
+    queue_signals();
     unsettrap(sig);
 
     sigfuncs[sig] = l;
@@ -729,6 +730,7 @@ settrap(int sig, Eprog l)
      * works just the same.
      */
     sigtrapped[sig] |= (locallevel << ZSIG_SHIFT);
+    unqueue_signals();
     return 0;
 }
 
@@ -736,9 +738,13 @@ settrap(int sig, Eprog l)
 void
 unsettrap(int sig)
 {
-    HashNode hn = removetrap(sig);
+    HashNode hn;
+
+    queue_signals();
+    hn = removetrap(sig);
     if (hn)
 	shfunctab->freenode(hn);
+    unqueue_signals();
 }
 
 /**/
@@ -751,6 +757,7 @@ removetrap(int sig)
 	(jobbing && (sig == SIGTTOU || sig == SIGTSTP || sig == SIGTTIN)))
 	return NULL;
 
+    queue_signals();
     trapped = sigtrapped[sig];
     /*
      * Note that we save the trap here even if there isn't an existing
@@ -762,9 +769,10 @@ removetrap(int sig)
 	(!trapped || locallevel > (sigtrapped[sig] >> ZSIG_SHIFT)))
 	dosavetrap(sig, locallevel);
 
-    if (!trapped)
+    if (!trapped) {
+	unqueue_signals();
         return NULL;
-
+    }
     sigtrapped[sig] = 0;
     if (sig == SIGINT && interact) {
 	/* PWS 1995/05/16:  added test for interactive, also noholdintr() *
@@ -790,6 +798,7 @@ removetrap(int sig)
      */
     if (trapped & ZSIG_FUNC) {
 	char func[20];
+	HashNode node;
 
 	sprintf(func, "TRAP%s", sigs[sig]);
 	/*
@@ -797,11 +806,15 @@ removetrap(int sig)
 	 * that calls back into unsettrap();
 	 */
 	sigfuncs[sig] = NULL;
-	return removehashnode(shfunctab, func);
+	node = removehashnode(shfunctab, func);
+	unqueue_signals();
+
+	return node;
     } else if (sigfuncs[sig]) {
 	freeeprog(sigfuncs[sig]);
 	sigfuncs[sig] = NULL;
     }
+    unqueue_signals();
 
     return NULL;
 }
@@ -966,56 +979,15 @@ dotrapargs(int sig, int *sigtr, void *sigfn)
 	*sigtr &= ~ZSIG_IGNORED;
 }
 
-/* != 0 if trap handlers can be called immediately */
-
-/**/
-mod_export int trapsallowed;
-
-/* Queued traps and allocated length of queue. */
-
-static int *trapqueue, trapqlen;
-
-/* Number of used slots in trap queue. */
-
-/**/
-mod_export int trapqused;
-
-/* Standard call to execute a trap for a given signal.  The second
- * argument should be zero if we may need to put the trap on the queue
- * and 1 if it may be called immediately.  It should never be set to
- * anything less than zero, that's used internally. */
+/* Standard call to execute a trap for a given signal. */
 
 /**/
 void
-dotrap(int sig, int now)
+dotrap(int sig)
 {
     /* Copied from dotrapargs(). */
     if ((sigtrapped[sig] & ZSIG_IGNORED) || !sigfuncs[sig] || errflag)
 	return;
 
-    if (now || trapsallowed) {
-	if (now < 0)
-	    RUNTRAPS();
-	dotrapargs(sig, sigtrapped+sig, sigfuncs[sig]);
-    } else {
-	if (trapqlen == trapqused)
-	    trapqueue = (int *) zrealloc(trapqueue, (trapqlen += 32));
-	trapqueue[trapqused++] = sig;
-    }
-}
-
-/**/
-mod_export void
-doqueuedtraps(void)
-{
-    int sig, ota = trapsallowed;
-
-    trapsallowed = 1;
-    while (trapqused) {
-	trapqused--;
-	sig = *trapqueue;
-	memcpy(trapqueue, trapqueue + 1, trapqused * sizeof(int));
-	dotrap(sig, -1);
-    }
-    trapsallowed = ota;
+    dotrapargs(sig, sigtrapped+sig, sigfuncs[sig]);
 }

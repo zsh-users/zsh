@@ -313,17 +313,12 @@ static int
 breakread(int fd, char *buf, int n)
 {
     fd_set f;
-    int ret;
 
     FD_ZERO(&f);
     FD_SET(fd, &f);
 
-    ALLOWTRAPS {
-	ret = (select(fd + 1, (SELECT_ARG_2_T) & f, NULL, NULL, NULL) == -1 ?
-	       EOF : read(fd, buf, n));
-    } DISALLOWTRAPS;
-
-    return ret;
+    return (select(fd + 1, (SELECT_ARG_2_T) & f, NULL, NULL, NULL) == -1 ?
+	    EOF : read(fd, buf, n));
 }
 
 # define read    breakread
@@ -394,7 +389,7 @@ getkey(int keytmout)
 #  else
 	    ioctl(SHTTY, TCSETA, &ti.tio);
 #  endif
-	    r = ztrapread(SHTTY, &cc, 1);
+	    r = read(SHTTY, &cc, 1);
 #  ifdef HAVE_TERMIOS_H
 	    tcsetattr(SHTTY, TCSANOW, &shttyinfo.tio);
 #  else
@@ -405,7 +400,7 @@ getkey(int keytmout)
 #endif
 	}
 	for (;;) {
-	    r = ztrapread(SHTTY, &cc, 1);
+	    r = read(SHTTY, &cc, 1);
 	    if (r == 1)
 		break;
 	    if (r == 0) {
@@ -664,8 +659,11 @@ execzlefunc(Thingy func, char **args)
 		ret = completecall(args);
 		if (atcurhist)
 		    histline = curhist;
-	    } else
+	    } else {
+		queue_signals();
 		ret = w->u.fn(args);
+		unqueue_signals();
+	    }
 	    if (!(wflags & ZLE_NOTCOMMAND))
 		lastcmd = wflags;
 	}
@@ -836,9 +834,11 @@ bin_vared(char *name, char **args, char *ops, int func)
     }
     /* handle non-existent parameter */
     s = args[0];
+    queue_signals();
     v = fetchvalue(&vbuf, &s, (!create || type == PM_SCALAR),
 		   SCANPM_WANTKEYS|SCANPM_WANTVALS|SCANPM_MATCHMANY);
     if (!v && !create) {
+	unqueue_signals();
 	zwarnnam(name, "no such variable: %s", args[0], 0);
 	return 1;
     } else if (v) {
@@ -885,11 +885,13 @@ bin_vared(char *name, char **args, char *ops, int func)
 	} else {
 	    s = ztrdup(getstrvalue(v));
 	}
-	pm = v->pm;
+	unqueue_signals();
     } else if (*s) {
+	unqueue_signals();
 	zwarnnam(name, "invalid parameter name: %s", args[0], 0);
 	return 1;
     } else {
+	unqueue_signals();
 	s = ztrdup(s);
     }
 
@@ -935,14 +937,12 @@ bin_vared(char *name, char **args, char *ops, int func)
     if (t[strlen(t) - 1] == '\n')
 	t[strlen(t) - 1] = '\0';
     /* final assignment of parameter value */
-    if (create && (!pm || (type && PM_TYPE(pm->flags) != type))) {
-	if (pm)
-	    unsetparam(args[0]);
+    if (create) {
+	unsetparam(args[0]);
 	createparam(args[0], type);
-	pm = 0;
     }
-    if (!pm)
-	pm = (Param) paramtab->getnode(paramtab, args[0]);
+    queue_signals();
+    pm = (Param) paramtab->getnode(paramtab, args[0]);
     if (pm && (PM_TYPE(pm->flags) & (PM_ARRAY|PM_HASHED))) {
 	char **a;
 
@@ -957,6 +957,7 @@ bin_vared(char *name, char **args, char *ops, int func)
 	    sethparam(args[0], a);
     } else
 	setsparam(args[0], t);
+    unqueue_signals();
     return 0;
 }
 

@@ -495,10 +495,12 @@ getcvar(char *s)
     mnumber mn;
     mn.type = MN_INTEGER;
 
+    queue_signals();
     if (!(t = getsparam(s)))
 	mn.u.l = 0;
     else
         mn.u.l = STOUC(*t == Meta ? t[1] ^ 32 : *t);
+    unqueue_signals();
     return mn;
 }
 

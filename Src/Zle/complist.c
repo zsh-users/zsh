@@ -340,6 +340,7 @@ getcols(Listcols c)
     int i, l;
 
     max_caplen = lr_caplen = 0;
+    queue_signals();
     if (!(s = getsparam("ZLS_COLORS")) &&
 	!(s = getsparam("ZLS_COLOURS"))) {
 	for (i = 0; i < NUM_COLS; i++)
@@ -356,6 +357,7 @@ getcols(Listcols c)
 	if ((max_caplen = strlen(c->files[COL_MA]->col)) <
 	    (l = strlen(c->files[COL_EC]->col)))
 	    max_caplen = l;
+	unqueue_signals();
 	return;
     }
     /* We have one of the parameters, use it. */
@@ -366,6 +368,7 @@ getcols(Listcols c)
 	    s++;
 	else
 	    s = getcoldef(c, s);
+    unqueue_signals();
 
     /* Use default values for those that aren't set explicitly. */
     for (i = 0; i < NUM_COLS; i++) {
@@ -1528,8 +1531,10 @@ complistmatches(Hookdef dummy, Chdata dat)
     mscroll = 0;
     mlistp = NULL;
 
+    queue_signals();
     if (mselect >= 0 || mlbeg >= 0 ||
-	(mlistp = getsparam("LISTPROMPT"))) {
+	(mlistp = dupstring(getsparam("LISTPROMPT")))) {
+	unqueue_signals();
 	if (mlistp && !*mlistp)
 	    mlistp = "%SAt %p: Hit TAB for more, or the character to insert%s";
 	trashzle();
@@ -1545,6 +1550,7 @@ complistmatches(Hookdef dummy, Chdata dat)
 	    minfo.asked = (listdat.nlines + nlnct <= lines);
 	}
     } else {
+	unqueue_signals();
 	mlistp = NULL;
 	if (asklist()) {
 	    amatches = oamatches;
@@ -1641,6 +1647,7 @@ domenuselect(Hookdef dummy, Chdata dat)
     int nolist = 0;
     char *s;
 
+    queue_signals();
     if (fdat || (dummy && (!(s = getsparam("MENUSELECT")) ||
 			   (dat && dat->num < atoi(s))))) {
 	if (fdat) {
@@ -1648,6 +1655,7 @@ domenuselect(Hookdef dummy, Chdata dat)
 	    fdat->num = dat->num;
 	    fdat->nmesg = dat->nmesg;
 	}
+	unqueue_signals();
 	return 0;
     }
     if ((s = getsparam("MENUSCROLL"))) {
@@ -1659,6 +1667,7 @@ domenuselect(Hookdef dummy, Chdata dat)
     }
     if ((mstatus = dupstring(getsparam("MENUPROMPT"))) && !*mstatus)
 	mstatus = "%SScrolling active: current selection at %p%s";
+    unqueue_signals();
     mhasstat = (mstatus && *mstatus);
     fdat = dat;
     selectlocalmap(mskeymap);

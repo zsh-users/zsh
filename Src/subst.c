@@ -51,6 +51,7 @@ prefork(LinkList list, int flags)
 {
     LinkNode node;
 
+    queue_signals();
     for (node = firstnode(list); node; incnode(node)) {
 	char *str, c;
 
@@ -61,14 +62,18 @@ prefork(LinkList list, int flags)
 		setdata(node, (void *) getproc(str));	/* <(...) or >(...) */
 	    else
 		setdata(node, (void *) getoutputfile(str));	/* =(...) */
-	    if (!getdata(node))
+	    if (!getdata(node)) {
+		unqueue_signals();
 		return;
+	    }
 	} else {
 	    if (isset(SHFILEEXPANSION))
 		filesub((char **)getaddrdata(node),
 			flags & (PF_TYPESET|PF_ASSIGN));
-	    if (!(node = stringsubst(list, node, flags & PF_SINGLE)))
+	    if (!(node = stringsubst(list, node, flags & PF_SINGLE))) {
+		unqueue_signals();
 		return;
+	    }
 	}
     }
     for (node = firstnode(list); node; incnode(node)) {
@@ -82,9 +87,12 @@ prefork(LinkList list, int flags)
 			flags & (PF_TYPESET|PF_ASSIGN));
 	} else if (!(flags & PF_SINGLE))
 	    uremnode(list, node);
-	if (errflag)
+	if (errflag) {
+	    unqueue_signals();
 	    return;
+	}
     }
+    unqueue_signals();
 }
 
 /**/

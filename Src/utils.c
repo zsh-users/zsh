@@ -691,12 +691,16 @@ preprompt(void)
 
 	if (mailpath && *mailpath && **mailpath)
 	    checkmailpath(mailpath);
-	else if ((mailfile = getsparam("MAIL")) && *mailfile) {
-	    char *x[2];
+	else {
+	    queue_signals();
+	    if ((mailfile = getsparam("MAIL")) && *mailfile) {
+		char *x[2];
 
-	    x[0] = mailfile;
-	    x[1] = NULL;
-	    checkmailpath(x);
+		x[0] = mailfile;
+		x[1] = NULL;
+		checkmailpath(x);
+	    }
+	    unqueue_signals();
 	}
 	lastmailcheck = time(NULL);
     }
@@ -1091,17 +1095,21 @@ zclose(int fd)
 mod_export char *
 gettempname(void)
 {
-    char *s;
+    char *s, *ret;
  
+    queue_signals();
     if (!(s = getsparam("TMPPREFIX")))
 	s = DEFAULT_TMPPREFIX;
  
 #ifdef HAVE__MKTEMP
     /* Zsh uses mktemp() safely, so silence the warnings */
-    return ((char *) _mktemp(dyncat(unmeta(s), "XXXXXX")));
+    ret = ((char *) _mktemp(dyncat(unmeta(s), "XXXXXX")));
 #else
-    return ((char *) mktemp(dyncat(unmeta(s), "XXXXXX")));
+    ret = ((char *) mktemp(dyncat(unmeta(s), "XXXXXX")));
 #endif
+    unqueue_signals();
+
+    return ret;
 }
 
 /* Check if a string contains a token */
@@ -1418,38 +1426,12 @@ checkrmall(char *s)
 }
 
 /**/
-mod_export int
-ztrapread(int fd, char *buf, int len)
-{
-    int ret;
-
-    ALLOWTRAPS {
-	ret = read(fd, buf, len);
-    } DISALLOWTRAPS;
-
-    return ret;
-}
-
-/**/
-mod_export int
-ztrapwrite(int fd, char *buf, int len)
-{
-    int ret;
-
-    ALLOWTRAPS {
-	ret = write(fd, buf, len);
-    } DISALLOWTRAPS;
-
-    return ret;
-}
-
-/**/
 int
 read1char(void)
 {
     char c;
 
-    while (ztrapread(SHTTY, &c, 1) != 1) {
+    while (read(SHTTY, &c, 1) != 1) {
 	if (errno != EINTR || errflag || retflag || breaks || contflag)
 	    return -1;
     }
@@ -1467,7 +1449,7 @@ noquery(int purge)
     ioctl(SHTTY, FIONREAD, (char *)&val);
     if (purge) {
 	for (; val; val--)
-	    ztrapread(SHTTY, &c, 1);
+	    read(SHTTY, &c, 1);
     }
 #endif
 
@@ -2122,12 +2104,14 @@ mod_export void
 zbeep(void)
 {
     char *vb;
+    queue_signals();
     if ((vb = getsparam("ZBEEP"))) {
 	int len;
 	vb = getkeystring(vb, &len, 2, NULL);
 	write(SHTTY, vb, len);
     } else if (isset(BEEP))
 	write(SHTTY, "\07", 1);
+    unqueue_signals();
 }
 
 /**/

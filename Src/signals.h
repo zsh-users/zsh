@@ -73,25 +73,33 @@
  * queue signals, it is probably overkill for zsh to do  *
  * this, but it shouldn't hurt anything to do it anyway. */
 
-/* Right now I'm queueing all signals, but maybe we only *
- * need to queue SIGCHLD.  Anybody know?                 */
-
-#define MAX_QUEUE_SIZE 16
+#define MAX_QUEUE_SIZE 128
 
 #define queue_signals()    (queueing_enabled++)
 
-#define unqueue_signals()  do { \
-    DPUTS(!queueing_enabled, "BUG: unqueue_signals called but not queueing"); \
-    if (!--queueing_enabled) { \
-	while (queue_front != queue_rear) {      /* while signals in queue */ \
-	    sigset_t oset; \
-	    queue_front = (queue_front + 1) % MAX_QUEUE_SIZE; \
-	    oset = signal_setmask(signal_mask_queue[queue_front]); \
-	    handler(signal_queue[queue_front]);  /* handle queued signal   */ \
-	    signal_setmask(oset); \
-	} \
+#define run_queued_signals() do { \
+    while (queue_front != queue_rear) {      /* while signals in queue */ \
+	sigset_t oset; \
+	queue_front = (queue_front + 1) % MAX_QUEUE_SIZE; \
+	oset = signal_setmask(signal_mask_queue[queue_front]); \
+	handler(signal_queue[queue_front]);  /* handle queued signal   */ \
+	signal_setmask(oset); \
     } \
 } while (0)
+
+#define unqueue_signals()  do { \
+    DPUTS(!queueing_enabled, "BUG: unqueue_signals called but not queueing"); \
+    if (!--queueing_enabled) run_queued_signals(); \
+} while (0)
+
+#define queue_signal_level() queueing_enabled
+
+#define dont_queue_signals() do { \
+    queueing_enabled = 0; \
+    run_queued_signals(); \
+} while (0)
+
+#define restore_queue_signals(q) (queueing_enabled = (q))
 
 
 /* Make some signal functions faster. */
@@ -117,9 +125,3 @@ extern sigset_t signal_block _((sigset_t));
 #else
 extern sigset_t signal_unblock _((sigset_t));
 #endif   /* POSIX_SIGNALS */
-
-#define RUNTRAPS() do { if (trapqused) doqueuedtraps(); } while (0)
-#define ALLOWTRAPS do { RUNTRAPS(); trapsallowed++; do
-#define DISALLOWTRAPS while (0); RUNTRAPS(); trapsallowed--; } while (0)
-#define ALLOWTRAPS_RETURN(V) \
-    do { RUNTRAPS(); trapsallowed--; return (V); } while (0)

@@ -372,12 +372,15 @@ putpromptchar(int doprint, int endchar)
 		bp += strlen(bp);
 		break;
 	    case 'M':
+		queue_signals();
 		if ((hostnam = getsparam("HOST")))
 		    stradd(hostnam);
+		unqueue_signals();
 		break;
 	    case 'm':
 		if (!arg)
 		    arg++;
+		queue_signals();
 		if (!(hostnam = getsparam("HOST")))
 		    break;
 		if (arg < 0) {
@@ -394,6 +397,7 @@ putpromptchar(int doprint, int endchar)
 		    stradd(hostnam);
 		    *ss = t0;
 		}
+		unqueue_signals();
 		break;
 	    case 'S':
 		txtchangeset(TXTSTANDOUT, TXTNOSTANDOUT);

@@ -1806,6 +1806,7 @@ setsparam(char *s, char *val)
 	errflag = 1;
 	return NULL;
     }
+    queue_signals();
     if ((ss = strchr(s, '['))) {
 	*ss = '\0';
 	if (!(v = getvalue(&vbuf, &s, 1)))
@@ -1823,10 +1824,12 @@ setsparam(char *s, char *val)
 	}
     }
     if (!v && !(v = getvalue(&vbuf, &t, 1))) {
+	unqueue_signals();
 	zsfree(val);
 	return NULL;
     }
     setstrvalue(v, val);
+    unqueue_signals();
     return v->pm;
 }
 
@@ -1845,12 +1848,14 @@ setaparam(char *s, char **val)
 	errflag = 1;
 	return NULL;
     }
+    queue_signals();
     if ((ss = strchr(s, '['))) {
 	*ss = '\0';
 	if (!(v = getvalue(&vbuf, &s, 1)))
 	    createparam(t, PM_ARRAY);
 	*ss = '[';
 	if (v && PM_TYPE(v->pm->flags) == PM_HASHED) {
+	    unqueue_signals();
 	    zerr("attempt to set slice of associative array", NULL, 0);
 	    freearray(val);
 	    errflag = 1;
@@ -1869,9 +1874,12 @@ setaparam(char *s, char **val)
 	}
     }
     if (!v)
-	if (!(v = fetchvalue(&vbuf, &t, 1, SCANPM_ASSIGNING)))
+	if (!(v = fetchvalue(&vbuf, &t, 1, SCANPM_ASSIGNING))) {
+	    unqueue_signals();
 	    return NULL;
+	}
     setarrvalue(v, val);
+    unqueue_signals();
     return v->pm;
 }
 
@@ -1894,20 +1902,23 @@ sethparam(char *s, char **val)
 	zerr("nested associative arrays not yet supported", NULL, 0);
 	errflag = 1;
 	return NULL;
-    } else {
-	if (!(v = fetchvalue(&vbuf, &s, 1, SCANPM_ASSIGNING)))
-	    createparam(t, PM_HASHED);
-	else if (!(PM_TYPE(v->pm->flags) & PM_HASHED) &&
-		 !(v->pm->flags & PM_SPECIAL)) {
-	    unsetparam(t);
-	    createparam(t, PM_HASHED);
-	    v = NULL;
-	}
+    }
+    queue_signals();
+    if (!(v = fetchvalue(&vbuf, &s, 1, SCANPM_ASSIGNING)))
+	createparam(t, PM_HASHED);
+    else if (!(PM_TYPE(v->pm->flags) & PM_HASHED) &&
+	     !(v->pm->flags & PM_SPECIAL)) {
+	unsetparam(t);
+	createparam(t, PM_HASHED);
+	v = NULL;
     }
     if (!v)
-	if (!(v = fetchvalue(&vbuf, &t, 1, SCANPM_ASSIGNING)))
+	if (!(v = fetchvalue(&vbuf, &t, 1, SCANPM_ASSIGNING))) {
+	    unqueue_signals();
 	    return NULL;
+	}
     setarrvalue(v, val);
+    unqueue_signals();
     return v->pm;
 }
 
@@ -1926,6 +1937,7 @@ setiparam(char *s, zlong val)
 	errflag = 1;
 	return NULL;
     }
+    queue_signals();
     if (!(v = getvalue(&vbuf, &s, 1))) {
 	if ((ss = strchr(s, '[')))
 	    *ss = '\0';
@@ -1937,12 +1949,14 @@ setiparam(char *s, zlong val)
 	    DPUTS(!v, "BUG: value not found for new parameter");
 	} else {
 	    pm->u.val = val;
+	    unqueue_signals();
 	    return pm;
 	}
     }
     mnval.type = MN_INTEGER;
     mnval.u.l = val;
     setnumvalue(v, mnval);
+    unqueue_signals();
     return v->pm;
 }
 
@@ -1965,6 +1979,7 @@ setnparam(char *s, mnumber val)
 	errflag = 1;
 	return NULL;
     }
+    queue_signals();
     if (!(v = getvalue(&vbuf, &s, 1))) {
 	if ((ss = strchr(s, '[')))
 	    *ss = '\0';
@@ -1981,10 +1996,12 @@ setnparam(char *s, mnumber val)
 		pm->u.val = val.u.l;
 	    } else
 		pm->u.dval = val.u.d;
+	    unqueue_signals();
 	    return pm;
 	}
     }
     setnumvalue(v, val);
+    unqueue_signals();
     return v->pm;
 }
 
@@ -1996,10 +2013,12 @@ unsetparam(char *s)
 {
     Param pm;
 
+    queue_signals();
     if ((pm = (Param) (paramtab == realparamtab ?
 		       gethashnode2(paramtab, s) :
 		       paramtab->getnode(paramtab, s))))
 	unsetparam_pm(pm, 0, 1);
+    unqueue_signals();
 }
 
 /* Unset a parameter */
@@ -2614,9 +2633,11 @@ setlang(char *x)
     struct localename *ln;
 
     setlocale(LC_ALL, x ? x : "");
+    queue_signals();
     for (ln = lc_names; ln->name; ln++)
 	if ((x = getsparam(ln->name)))
 	    setlocale(ln->category, x);
+    unqueue_signals();
 }
 
 /**/
@@ -2624,8 +2645,11 @@ void
 lc_allsetfn(Param pm, char *x)
 {
     strsetfn(pm, x);
-    if (!x)
+    if (!x) {
+	queue_signals();
 	setlang(getsparam("LANG"));
+	unqueue_signals();
+    }
     else
 	setlocale(LC_ALL, x);
 }
@@ -2647,12 +2671,14 @@ lcsetfn(Param pm, char *x)
     strsetfn(pm, x);
     if (getsparam("LC_ALL"))
 	return;
+    queue_signals();
     if (!x)
 	x = getsparam("LANG");
 
     for (ln = lc_names; ln->name; ln++)
 	if (!strcmp(ln->name, pm->nam))
 	    setlocale(ln->category, x ? x : "");
+    unqueue_signals();
 }
 #endif /* USE_LOCALE */
 
