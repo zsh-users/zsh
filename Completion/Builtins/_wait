@@ -1,13 +1,3 @@
 #compdef wait
 
-local tags ret=1
-  
-_tags job process
-  
-while _tags; do
-  [[ "$tags" = *:job:*     ]] && _jobs && ret=0
-  [[ "$tags" = *:process:* ]] && _pids && ret=0
-  (( ret )) || break
-done
-
-return ret
+_alternative 'job:: _jobs' 'process:: _pids'

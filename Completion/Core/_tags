@@ -1,18 +1,20 @@
 #autoload
 
+local tname="$funcstack[2,-1]"
+
 if (( $# )); then
-  local cmd="$words[1]" func="$funcstack[2]" defs i ttags tag pat style prio
-  local trynow
+  local cmd="$words[1]" defs i ttags tag pat style prio context opt
 
-  while getopts 'c:f:i' i; do
-    case "$i" in
-    c) cmd="$OPTARG"  ;;
-    f) func="$OPTARG" ;;
-    i) trynow=yes     ;;
-    esac
+  while getopts 'c:C:' opt; do
+    if [[ "$opt" = c ]]; then
+      cmd="$OPTARG"
+    else
+      context="$OPTARG"
+    fi
   done
-
   shift OPTIND-1
+
+  [[ -n "$context" ]] && context="/$context"
 
   defs=( "${(@M)argv:#${(kj:|:)~override_tags[(R)(|+*)]}}" )
   (( $#defs )) && set -- "$defs[@]"
@@ -42,8 +44,7 @@ if (( $# )); then
   for i in "$defs[@]"; do
     tag="${i%%:*}"
     for pat in "${(s.:.)i#*:}"; do
-      if [[ ( "$pat" = _* && "$func" = ${~pat%%\=*} ) ||
-            "$cmd" = ${~pat%%\=*} ]]; then
+      if [[ "$cmd$context" = ${~pat%%\=*} ]]; then
         prio="${pat#*\=}"
 	[[ "$prio" = -* ]] && continue 2
 
@@ -65,22 +66,24 @@ if (( $# )); then
   done
 
   prio="_prio_arr$(( _prio_num++ ))"
-  _prio_names[$funcstack]="$prio"
-  eval "${prio}=( \"\${(@)ttags:#}\" )"
+  _prio_names[$tname]="$prio"
+  ttags=( "${(@)ttags:#}" )
+  eval "${prio}=( \"\$ttags[@]\" )"
 
-  [[ -z "$trynow" ]] && return 0
+  return \!$#ttags
 fi
 
-local prios="$_prio_names[$funcstack]"
+local prios="$_prio_names[$tname]"
 
-_failed_tags=( "$_failed_tags[@]" "$_last_tags[@]" )
+_failed_tags=( "$_failed_tags[@]" "$_last_tags" )
 
 (( ${(P)#prios} )) || return 1
 
-tags="${${(@P)prios}[1]}:"
-shift 1 "$prios"
+_cur_tags[$tname]="${(@)${(@P)prios}[1]}:"
 
-_last_tags=( "${(@s.:.)${${tags#:}%:}}" )
+_last_tags=( "${(@)${(@s.:.)${(@P)prios}[1]}:#}" )
 _tried_tags=( "$_tried_tags[@]" "$_last_tags[@]" )
+
+shift 1 "$prios"
 
 return 0

@@ -154,14 +154,14 @@ fi
 if comparguments -i "$compconfig[autodescribe_options]" "$@"; then
   local nm="$compstate[nmatches]" action noargs aret expl local
   local next direct odirect equal single match matched ws tmp1 tmp2
-  local tags opts
+  local opts
 
   if comparguments -D descr action; then
     if comparguments -O next direct odirect equal; then
       opts=yes
-      _tags -f "$funcstack[2]" argument option
+      _tags argument option
     else
-      _tags -f "$funcstack[2]" argument
+      _tags argument
     fi
   else
     if comparguments -a; then
@@ -172,12 +172,12 @@ if comparguments -i "$compconfig[autodescribe_options]" "$@"; then
     comparguments -O next direct odirect equal || return 1
 
     opts=yes
-    _tags -f "$funcstack[2]" option
+    _tags option
   fi
 
   while _tags; do
     while true; do
-      if [[ "$tags" = *:argument* ]]; then
+      if [[ -n "$matched" ]] || _requested argument; then
         _description expl "$descr"
 
         if [[ "$action" = -\>* ]]; then
@@ -207,7 +207,7 @@ if comparguments -i "$compconfig[autodescribe_options]" "$@"; then
 
             eval ws\=\( "${action[3,-3]}" \)
 
-            _describe -c "$cmd" -f "$funcstack[2]" "$descr" ws -M "$match"
+            _describe -c "$cmd" "$descr" ws -M "$match"
 
           elif [[ "$action" = \(*\) ]]; then
 
@@ -234,8 +234,8 @@ if comparguments -i "$compconfig[autodescribe_options]" "$@"; then
           fi
         fi
       fi
-      if [[ "$tags" = *:option* &&
-            ( "$tags" != *\[*prefix*\]* || "$PREFIX" = [-+]* ) ]]; then
+      if [[ -z "$matched" ]] && _requested option &&
+          { ! _style option prefix || [[ "$PREFIX" = [-+]* ]] } ; then
         comparguments -M match
 
         if comparguments -s single; then
@@ -253,20 +253,21 @@ if comparguments -i "$compconfig[autodescribe_options]" "$@"; then
 	    tmp1=( "${(M@)tmp1:#[-+]?(|:*)}" )
 	    tmp2=( "${PREFIX}${(@M)^${(@)${(@)tmp1%%:*}#[-+]}:#?}" )
 
-            _describe -o -c "$cmd" -f "$funcstack[2]" option \
+            _describe -o -c "$cmd" option \
                       tmp1 tmp2 -Q -S ''
           fi
           single=yes
         else
           next=( "$next[@]" "$odirect[@]" )
-          _describe -o -c "$cmd" -f "$funcstack[2]" option \
+          _describe -o -c "$cmd" option \
             next -Q -M "$match" -- \
             direct -QS '' -M "$match" -- \
             equal -QqS= -M "$match"
         fi
       fi
-      if [[ -n "$opts" && -z "$aret$matched" && nm -ne compstate[nmatches] &&
-            "$tags" = *:argument* ]]; then
+      if [[ -n "$opts" && -z "$aret$matched" &&
+            nm -ne compstate[nmatches] ]] &&
+          _requested argument; then
 
         local prefix suffix
 
@@ -282,7 +283,6 @@ if comparguments -i "$compconfig[autodescribe_options]" "$@"; then
 	  IPREFIX="${IPREFIX}${equal[1]%%:*}="
 	  matched=yes
 	  comparguments -L "$equal[1]" descr action
-	  tags=argument
 	  continue
         fi
       fi

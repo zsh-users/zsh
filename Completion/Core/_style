@@ -1,0 +1,45 @@
+#autoload
+
+local tags get i
+
+if [[ "$1" = -g ]]; then
+  get=yes
+  shift
+fi
+
+if (( ${+_cur_tags[${funcstack[2,-1]}]} )); then
+  tags="${_cur_tags[${funcstack[2,-1]}]}"
+else
+  tags="${_cur_tags[${funcstack[3,-1]}]}"
+fi
+
+if [[ "$tags" = *:${1}\[*\]:* ]]; then
+
+  tags="${${tags#*:${1}\[}%%\]*}"
+
+  if [[ $# -eq 2 ]]; then
+    if [[ -n "$get" ]]; then
+      eval "${2}=\"$tags\""
+      return 0
+    fi
+
+    [[ "$tags" = (|*,)${2}(|,*) ]]
+    return
+  fi
+
+  [[ "$tags" = (|*,)${2}(|(\=|,)*) ]] || return 1
+
+  if [[ -n "$get" ]]; then
+    if [[ "$tags" = (|*,)${2}\=* ]]; then
+      eval "${3}=\"${${tags#(|*,)${2}\=}%%,*}\""
+    else
+      eval "${3}=''"
+    fi
+    return 0
+  fi
+
+  [[ "$tags" = (|*,)${2}\=(|[^,]#,)${3}(|,*) ]] 
+  return
+fi
+
+return 1

@@ -2,11 +2,11 @@
 
 if compvalues -i "$@"; then
 
-  local tags noargs args opts descr action expl sep
+  local noargs args opts descr action expl sep
 
   if ! compvalues -D descr action; then
 
-    _tags -i value || return 1
+    _tags value || return 1
 
     compvalues -V noargs args opts
 
@@ -42,7 +42,7 @@ if compvalues -i "$@"; then
         sep=()
       fi
 
-      _describe -f "$funcstack[2]" "$descr" \
+      _describe "$descr" \
         noargs "$sep[@]" -M 'r:|[_-]=* r:|=*' -- \
         args -S= -M 'r:|[_-]=* r:|=*' -- \
         opts -qS= -M 'r:|[_-]=* r:|=*'
@@ -51,7 +51,7 @@ if compvalues -i "$@"; then
     fi
   fi
 
-  _tags -i argument || return 1
+  _tags argument || return 1
 
   _description expl "$descr"
 
@@ -85,7 +85,7 @@ if compvalues -i "$@"; then
 
       eval ws\=\( "${action[3,-3]}" \)
 
-      _describe -f "$funcstack[2]" "$descr" ws -M 'r:|[_-]=* r:|=*'
+      _describe "$descr" ws -M 'r:|[_-]=* r:|=*'
 
     elif [[ "$action" = \(*\) ]]; then
 

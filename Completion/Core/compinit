@@ -446,6 +446,177 @@ comptag() {
   fi
 }
 
+# First suggested function for new configuration interface.
+#
+# Example:
+#
+#   conf1 \
+#     argument = 1 \
+#     value    = 1 with describe \
+#     option   = 2 with describe and hide \
+#     file     = 3 \
+#     path in   '*dvi*' = 1 \
+#          else         = 2 \
+#     glob     = 1 \
+#     job      = never
+
+conf1() {
+  local tag pat prio
+
+  while (( $# )); do
+
+    tag="$1"
+    shift
+
+    while (( $# )); do
+
+      if [[ "$1" = in ]]; then
+        pat="$2"
+	shift 2
+      else
+        pat='*'
+	[[ "$1" = else ]] && shift
+      fi
+
+      style=''
+
+      if [[ "$1" = is ]]; then
+        prio=0
+	style="[${2}]"
+	shift 2
+      elif [[ "$1" = \= ]]; then
+        if [[ "$2" = n(o|ever) ]]; then
+          prio=-1
+	  shift 2
+        else
+          prio="$2"
+	  shift 2
+
+	  if [[ "$1" = with ]]; then
+	    while [[ "$1" = (with|and) ]]; do
+	      style="${style},${2}"
+	      shift 2
+            done
+            style="[${style[2,-1]}]"
+          fi
+        fi
+      else
+        echo "$0: missing priority: $1"
+	return 1
+      fi
+      if [[ -n "$comptags[$tag]" ]]; then
+        comptags[$tag]="${comptags[$tag]}:${pat}=${prio}${style}"
+      else
+        comptags[$tag]="${pat}=${prio}${style}"
+      fi
+
+      [[ "$1" = (in|else|\=) ]] || break
+
+    done
+  done
+
+  return 0
+}
+
+# Second suggested function for new configuration interface.
+#
+# Example:
+#
+#   conf2 \
+#     for '*dvi*' do \
+#       glob and path or \
+#       file \
+#     else do \
+#       glob or \
+#       path or \
+#       file \
+#     for '*p[bgpn]m*' do \
+#       argument and option with describe and with hide \
+#     else do \
+#       argument or \
+#       value with describe or \
+#       option with describe \
+#     for 'kill' do \
+#       no job but \
+#       process \
+#     else do \
+#       process and job
+
+conf2() {
+  local pat prio tag style
+
+  while (( $# )); do
+
+    if [[ "$1" = for ]]; then
+      pat="$2"
+      shift 2
+    elif [[ "$1" = (else|always) ]]; then
+      pat="*"
+      shift
+    else
+      echo "$0: missing context: $1"
+      return 1
+    fi
+
+    shift 1
+
+    prio=1
+
+    while (( $# )); do
+
+      if [[ "$1" = no ]]; then
+        while [[ "$1" != (but|for|else|always) ]]; do
+	  if [[ -n "$comptags[$2]" ]]; then
+	    comptags[$2]="${comptags[$2]}:${pat}=-1"
+          else
+	    comptags[$2]="${pat}=-1"
+	  fi
+
+	  shift 2
+	done
+
+	[[ "$1" != but ]] && break
+
+	shift
+      fi
+
+      while (( $# )); do
+
+        tag="$1"
+	shift
+
+	style=''
+	if [[ "$1" = with ]]; then
+	  shift
+	  while true; do
+	    style="${style},${1}"
+	    [[ "$2" != and || "$3" != with ]] && break
+	    shift 3
+          done
+	  shift
+        fi
+
+	[[ -n "$style" ]] && style="[${style[2,-1]}]"
+
+	if [[ -n "$comptags[$tag]" ]]; then
+	  comptags[$tag]="${comptags[$tag]}:${pat}=${prio}${style}"
+        else
+	  comptags[$tag]="${pat}=${prio}${style}"
+        fi
+
+	[[ "$1" != and ]] && break
+
+	shift
+      done
+
+      [[ "$1" != or ]] && break
+
+      (( prio++ ))
+      shift
+    done
+  done
+}
+
 # Utility function to call a function if it exists.
 #
 # Usage: funcall <return> <name> [ <args> ... ]

@@ -2,19 +2,16 @@
 
 # This can be used to add options or values with descriptions as matches.
 
-local cmd func opt expl tmps tmpd tmpmd tmpms ret=1 showd _nm hide
-local tags type=value
+local cmd opt expl tmps tmpd tmpmd tmpms ret=1 showd _nm hide
+local type=value
 
 cmd="$words[1]"
-func="$funcstack[2]"
 
 # Get the options.
 
-while getopts 'oc:f:' opt; do
+while getopts 'oc:' opt; do
   if [[ "$opt" = o ]]; then
     type=option
-  elif [[ "$opt" = f ]]; then
-    func="$OPTARG"
   else
     cmd="$OPTARG"
   fi
@@ -23,9 +20,9 @@ shift OPTIND-1
 
 # Do the tests. `showd' is set if the descriptions should be shown.
 
-_tags -i -c "$cmd" -f "$func" "$type" || return 1
+_tags -c "$cmd" "$type" || return 1
 
-[[ "$tags" = *:${type}\[*describe*\]* ]] && showd=yes
+_style "$type" describe && showd=yes
 
 _description expl "$1"
 shift
@@ -36,7 +33,7 @@ else
   compdescribe -i "$@"
 fi
 
-[[ "$type" = option && "$tags" = *:option\[*hide*\]* ]] && hide=yes
+[[ "$type" = option ]] && _style option hide && hide=yes
 
 while compdescribe -g args tmpd tmpmd tmps tmpms; do
 

@@ -1,6 +1,6 @@
 #autoload
 
-local opts opt type=file tags
+local opts opt type=file
 
 opts=()
 while getopts "P:S:qr:R:W:F:J:V:X:f/g:M:" opt; do
@@ -13,15 +13,24 @@ while getopts "P:S:qr:R:W:F:J:V:X:f/g:M:" opt; do
 done
 
 case "$type" in
-file) _tags -f "$funcstack[2]" file           ;;
-dir)  _tags -f "$funcstack[2]" path file      ;;
-*)    _tags -f "$funcstack[2]" glob path file ;;
+file) _tags file           ;;
+dir)  _tags path file      ;;
+*)    _tags glob path file ;;
 esac
 
 while _tags; do
-  [[ "$tags" = *:file:* ]] && { _path_files "$opts[@]" -f         ;  return   }
-  [[ "$tags" = *:path:* ]] &&   _path_files "$opts[@]" -/         && return 0
-  [[ "$tags" = *:glob:* ]] &&   _path_files "$opts[@]" -g "$type" && return 0
+  if _requested file; then
+    _path_files "$opts[@]" -f
+    return
+  elif _requested path; then
+    if _requested glob; then
+      _path_files "$opts[@]" -/g "$type" && return 0
+    else
+      _path_files "$opts[@]" -/g "$type" && return 0
+    fi
+  elif _requested glob; then
+    _path_files "$opts[@]" -g "$type" && return 0
+  fi
 done
 
 return 1

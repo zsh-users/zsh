@@ -1,0 +1,70 @@
+#autoload
+
+local tags def expl descr action mesgs nm="$compstack[nmatches]"
+local context
+
+if [[ "$1" = -C?* ]]; then
+  context="${1[3,-1]}"
+  shift
+elif [[ "$1" = -C ]]; then
+  context="$2"
+  shift 2
+fi
+
+mesgs=()
+
+_tags -C "$context" "${(@)argv%%:*}"
+
+while _tags; do
+  for def; do
+    if _requested "${def%%:*}"; then
+      descr="${${def#*:}%%:*}"
+      action="${def#*:*:}"
+
+      _description expl "$descr"
+
+      if [[ "$action" = \ # ]]; then
+
+        # An empty action means that we should just display a message.
+
+        mesgs=( "$mesgs[@]" "$descr")
+      elif [[ "$action" = \(\(*\)\) ]]; then
+        local ws
+
+        # ((...)) contains literal strings with descriptions.
+
+        eval ws\=\( "${action[3,-3]}" \)
+
+        _describe "$descr" ws -M 'r:|[_-]=* r:|=*'
+      elif [[ "$action" = \(*\) ]]; then
+
+        # Anything inside `(...)' is added directly.
+
+        compadd "$expl[@]" - ${=action[2,-2]}
+      elif [[ "$action" = \{*\} ]]; then
+
+        # A string in braces is evaluated.
+
+        eval "$action[2,-2]"
+      elif [[ "$action" = \ * ]]; then
+
+        # If the action starts with a space, we just call it.
+
+        ${(e)=~action}
+      else
+
+        # Otherwise we call it with the description-arguments built above.
+
+        action=( $=action )
+        ${(e)action[1]} "$expl[@]" ${(e)~action[2,-1]}
+      fi
+    fi
+  done
+  [[ nm -ne compstate[nmatches] ]] && return 0
+done
+
+for descr in "$mesgs[@]"; do
+  _message "$descr"
+done
+
+return 1

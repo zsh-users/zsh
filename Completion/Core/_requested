@@ -1,0 +1,9 @@
+#autoload
+
+local tag tname="$funcstack[2,-1]"
+
+for tag; do
+  [[ "${_cur_tags[${tname}]}" = *:${tag}(:|\[*\]:)* ]] && return 0
+done
+
+return 1
