@@ -793,8 +793,7 @@ flag, or with tt(${)...tt(/)...tt(}) (only the var(expr)th match is
 substituted) or tt(${)...tt(//)...tt(}) (all matches from the
 var(expr)th on are substituted).  The var(expr)th match is counted
 such that there is either one or zero matches from each starting
-position in the string when scanning forwards, or to each finishing
-position when scanning backwards, although for global substitution matches
+position in the string, although for global substitution matches
 overlapping previous replacements are ignored.
 )
 item(tt(M))(

@@ -2068,7 +2068,7 @@ set_pat_end(Patprog p, char null_me)
 static int
 igetmatch(char **sp, Patprog p, int fl, int n, char *replstr)
 {
-    char *s = *sp, *t, sav, *furthestend, *longeststart, *lastend;
+    char *s = *sp, *t, sav;
     int i, l = strlen(*sp), ml = ztrlen(*sp), matched = 1;
 
     repllist = NULL;
@@ -2243,17 +2243,19 @@ igetmatch(char **sp, Patprog p, int fl, int n, char *replstr)
 		*sp = get_match_ret(*sp, l, l, fl, replstr);
 		patoffset = 0;
 		return 1;
-	    }
+	    } /* fall through */
+	case (SUB_END|SUB_LONG|SUB_SUBSTR):
+	    /* Longest/shortest at end, matching substrings.       */
 	    patoffset--;
 	    for (t = s + l - 1; t >= s; t--, patoffset--) {
 		if (t > s && t[-1] == Meta)
 		    t--;
 		set_pat_start(p, t-s);
 		if (pattry(p, t) && patinput > t && !--n) {
-		    /* Found a match from this point */
-		    char *mpos = patinput, *ptr;
-		    if (!(p->flags & PAT_PURES)) {
-			/* See if there's a shorter to anywhere */
+		    /* Found the longest match */
+		    char *mpos = patinput;
+		    if (!(fl & SUB_LONG) && !(p->flags & PAT_PURES)) {
+			char *ptr;
 			for (ptr = t; ptr < mpos; METAINC(ptr)) {
 			    sav = *ptr;
 			    set_pat_end(p, sav);
@@ -2275,57 +2277,6 @@ igetmatch(char **sp, Patprog p, int fl, int n, char *replstr)
 	    set_pat_start(p, l);
 	    if ((fl & SUB_LONG) && pattry(p, s + l) && !--n) {
 		*sp = get_match_ret(*sp, l, l, fl, replstr);
-		patoffset = 0;
-		return 1;
-	    }
-	    patoffset = 0;
-	    break;
-
-	case (SUB_END|SUB_LONG|SUB_SUBSTR):
-	    /*
-	     * Longest at end, matching substrings.  Scan up from
-	     * start, remembering the furthest we got.  The
-	     * longest string to reach that point wins.
-	     */
-	    furthestend = longeststart = lastend = NULL;
-	    sav = '\0';
-	    while (n) {
-		int l2 = strlen(s);
-		for (i = 0, t = s; i <= l2; i++, t++, patoffset++) {
-		    set_pat_start(p, t-s);
-		    if (pattry(p, t)) {
-			if (!furthestend || 
-			    patinput - t > furthestend - longeststart) {
-			    furthestend = patinput;
-			    longeststart = t;
-			}
-		    }
-		    if (*t == Meta)
-			t++, i++;
-		}
-		if (furthestend) {
-		    if (lastend) {
-			*lastend = sav;
-			lastend = NULL;
-		    }
-		    if (--n && furthestend > s) {
-			lastend = (furthestend > s+1 && furthestend[-2]
-				   == Meta) ? furthestend-2 : furthestend-1;
-			sav = *lastend;
-			set_pat_end(p, sav);
-			*lastend = '\0';
-			furthestend = NULL;
-			patoffset = 0;
-			continue;
-		    }
-		}
-		break;
-	    }
-	    if (lastend)
-		*lastend = sav;
-	    if (!n) {
-		*sp = get_match_ret(*sp, longeststart-s, furthestend-s, fl,
-				    replstr);
 		patoffset = 0;
 		return 1;
 	    }

@@ -1,3 +1,8 @@
+2001-07-06  Peter Stephenson  <pws@csr.com>
+
+	* Back out 15266: it was right before, I was looking at it
+	back to front.
+
 2001-07-06  Bart Schaefer  <schaefer@zsh.org>
 
 	* 15271: Src/Modules/pcre.mdd: Default to dynamic linkage only, as
