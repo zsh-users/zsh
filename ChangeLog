@@ -1,3 +1,9 @@
+2002-02-07  Sven Wischnowsky  <wischnow@zsh.org>
+
+	* 16582: Src/Zle/computil.c: fix for displaying matches in
+	groups via _describe; go back to displaying one match per line
+	when lines get too long
+
 2002-02-07  Clint Adams  <clint@zsh.org>
 
 	* unposted: Functions/Prompts/.distfiles,

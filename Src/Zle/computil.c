@@ -121,7 +121,7 @@ cd_group()
 {
     Cdset set1, set2;
     Cdstr str1, str2, *strp;
-    int num;
+    int num, len;
 
     for (set1 = cd_state.sets; set1; set1 = set1->next) {
         for (str1 = set1->strs; str1; str1 = str1->next) {
@@ -129,6 +129,7 @@ cd_group()
                 continue;
 
             num = 1;
+            len = str1->len;
             strp = &(str1->other);
 
             for (set2 = set1; set2; set2 = set2->next)
@@ -138,10 +139,18 @@ cd_group()
                         str1->kind = 1;
                         str2->kind = 2;
                         num++;
+                        len += str2->len;
                         *strp = str2;
                         strp = &(str2->other);
                     }
             *strp = NULL;
+            len += num * 2 + cd_state.slen;
+
+            if (len >= columns) {
+                cd_state.groups = 0;
+
+                return;
+            }
             if (num > 1)
                 cd_state.groups++;
             else
