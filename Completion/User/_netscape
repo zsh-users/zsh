@@ -74,13 +74,15 @@ if [[ "$state" = "urls" ]]; then
     _wanted values expl 'about what' \
         compadd "$@" authors blank cache document fonts global hype image-cache \
             license logo memory-cache mozilla plugins && ret=0
+  elif compset -P news: ; then
+    _newsgroups "$@" && ret=0
   else
     _tags prefixes
     while _tags; do
       while _next_label prefixes expl 'URL prefix' "$@"; do
         _urls "$expl[@]" && ret=0
 	compset -S '[^:]*'
-        compadd -S '' "$expl[@]" about: mocha: javascript: && ret=0
+        compadd -S '' "$expl[@]" about: news: mocha: javascript: && ret=0
       done
       (( ret )) || return 0
     done

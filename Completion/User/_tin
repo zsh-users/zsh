@@ -34,7 +34,7 @@ _arguments -C -s \
   "-X[don't save any files on quit]" \
   '-z[start if any unread news]' \
   '-Z[return status to indicate if any unread news]' \
-  '::newsgroup' && return 0
+  '::newsgroup:_newsgroups' && return 0
 
 if [[ "$state" = newshosts ]]; then
   newshosts=( ${${(f)"$(<~/.tin/newsrctable)"}%%\#*} ) 2>/dev/null

@@ -1,5 +1,9 @@
 2001-02-08  Oliver Kiddle  <opk@zsh.org>
 
+	* 13448: Completion/User/.distfiles, Completion/User/_tin,
+	Completion/User/_netscape, Completion/User/_newsgroups:
+	add newsgroup completion
+
 	* 13445: Completion/User/_gzip: fix to work for zcat again
 
 2001-02-07  Bart Schaefer  <schaefer@zsh.org>
