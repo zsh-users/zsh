@@ -1350,28 +1350,45 @@ hcomsearch(char *str)
 int
 remtpath(char **junkptr)
 {
-    char *str = *junkptr, *remcut;
+    char *str = strend(*junkptr);
 
-    if ((remcut = strrchr(str, '/'))) {
-	if (str != remcut)
-	    *remcut = '\0';
-	else
-	    str[1] = '\0';
-	return 1;
+    /* ignore trailing slashes */
+    while (str >= *junkptr && IS_DIRSEP(*str))
+	--str;
+    /* skip filename */
+    while (str >= *junkptr && !IS_DIRSEP(*str))
+	--str;
+    if (str < *junkptr) {
+	*junkptr = dupstring (".");
+	return 0;
     }
-    return 0;
+    /* repeated slashes are considered like a single slash */
+    while (str > *junkptr && IS_DIRSEP(str[-1]))
+	--str;
+    /* never erase the root slash */
+    if (str == *junkptr) {
+	++str;
+	/* Leading doubled slashes (`//') have a special meaning on cygwin
+	   and some old flavor of UNIX, so we do not assimilate them to
+	   a single slash.  However a greater number is ok to squeeze. */
+	if (IS_DIRSEP(*str) && !IS_DIRSEP(str[1]))
+	    ++str;
+    }
+    *str = '\0';
+    return 1;
 }
 
 /**/
 int
 remtext(char **junkptr)
 {
-    char *str = *junkptr, *remcut;
+    char *str;
 
-    if ((remcut = strrchr(str, '.')) && remcut != str) {
-	*remcut = '\0';
-	return 1;
-    }
+    for (str = strend(*junkptr); str >= *junkptr && !IS_DIRSEP(*str); --str)
+	if (*str == '.') {
+	    *str = '\0';
+	    return 1;
+	}
     return 0;
 }
 
@@ -1379,12 +1396,15 @@ remtext(char **junkptr)
 int
 rembutext(char **junkptr)
 {
-    char *str = *junkptr, *remcut;
+    char *str;
 
-    if ((remcut = strrchr(str, '.')) && remcut != str) {
-	*junkptr = dupstring(remcut + 1);	/* .xx or xx? */
-	return 1;
-    }
+    for (str = strend(*junkptr); str >= *junkptr && !IS_DIRSEP(*str); --str)
+	if (*str == '.') {
+	    *junkptr = dupstring(str + 1); /* .xx or xx? */
+	    return 1;
+	}
+    /* no extension */
+    *junkptr = dupstring ("");
     return 0;
 }
 
@@ -1392,13 +1412,20 @@ rembutext(char **junkptr)
 mod_export int
 remlpaths(char **junkptr)
 {
-    char *str = *junkptr, *remcut;
+    char *str = strend(*junkptr);
 
-    if ((remcut = strrchr(str, '/'))) {
-	*remcut = '\0';
-	*junkptr = dupstring(remcut + 1);
-	return 1;
+    if (IS_DIRSEP(*str)) {
+	/* remove trailing slashes */
+	while (str >= *junkptr && IS_DIRSEP(*str))
+	    --str;
+	str[1] = '\0';
     }
+    for (; str >= *junkptr; --str)
+	if (IS_DIRSEP(*str)) {
+	    *str = '\0';
+	    *junkptr = dupstring(str + 1);
+	    return 1;
+	}
     return 0;
 }
 

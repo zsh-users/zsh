@@ -657,3 +657,9 @@ extern short ospeed;
 #ifndef MAILDIR_SUPPORT
 #define mailstat(X,Y) stat(X,Y)
 #endif
+
+#ifdef __CYGWIN__
+# define IS_DIRSEP(c) ((c) == '/' || (c) == '\\')
+#else
+# define IS_DIRSEP(c) ((c) == '/')
+#endif

@@ -202,16 +202,19 @@ noted.
 
 startitem()
 item(tt(h))(
-Remove a trailing pathname component, leaving the head.
+Remove a trailing pathname component, leaving the head.  This works
+like `tt(dirname)'.
 )
 item(tt(r))(
-Remove a trailing suffix of the form `tt(.)var(xxx)', leaving the basename.
+Remove a filename extension of the form `tt(.)var(xxx)', leaving
+the root name.
 )
 item(tt(e))(
-Remove all but the suffix.
+Remove all but the extension.
 )
 item(tt(t))(
-Remove all leading pathname components, leaving the tail.
+Remove all leading pathname components, leaving the tail.  This works
+like `tt(basename)'.
 )
 item(tt(p))(
 Print the new command but do not execute it.  Only works with history

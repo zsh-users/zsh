@@ -79,7 +79,7 @@ zhtricat(char const *s1, char const *s2, char const *s3)
     char *ptr;
     size_t l1 = strlen(s1);
     size_t l2 = strlen(s2);
-    
+
     ptr = (char *)zhalloc(l1 + l2 + strlen(s3) + 1);
     strcpy(ptr, s1);
     strcpy(ptr + l1, s2);
@@ -132,4 +132,16 @@ mod_export char *
 appstr(char *base, char const *append)
 {
     return strcat(realloc(base, strlen(base) + strlen(append) + 1), append);
+}
+
+/* Return a pointer to the last character of a string,
+   unless the string is empty. */
+
+/**/
+mod_export char *
+strend(char *str)
+{
+    if (*str == '\0')
+	return str;
+    return str + strlen (str) - 1;
 }
