@@ -1,3 +1,8 @@
+2002-06-22  Bart Schaefer  <schaefer@zsh.org>
+
+	* users/5073: Completion/compdump: use `typeset +f' instead of
+	`whence -w' to get names of completion functions.
+
 2002-06-14  Peter Stephenson  <pws@csr.com>
 
 	* 17318: Src/hist.c: ${(z)...} appended an extra space when the
