@@ -8,22 +8,24 @@
 srcdir=${srcdir-`echo $0|sed 's%/[^/][^/]*$%%'`}
 test "x$srcdir" = "x$0" && srcdir=.
 test "x$srcdir" = "x"   && srcdir=.
-MODBINS=${MODBINS-modules-bltin}
-XMODCF=${XMODCF-$srcdir/xmods.conf}
+CFMOD=${CFMOD-$srcdir/../config.modules}
 
-bin_mods=" zsh/main "`sed 's/^/ /;s/$/ /' $MODBINS`
-x_mods=`sed 's/^.* //' $XMODCF`
-. ./modules.index
+bin_mods="`grep ' link=static' $CFMOD | sed -e '/^#/d' \
+-e 's/ .*/ /' -e 's/^name=/ /'`"
+
+x_mods="`grep ' load=yes' $CFMOD | sed -e '/^#/d' -e '/ link=no/d' \
+-e 's/ .*/ /' -e 's/^name=/ /'`"
 
 trap "rm -f $1; exit 1" 1 2 15
 
 exec > $1
 
+echo "  if (emulation == EMULATE_ZSH) {"
 for x_mod in $x_mods; do
-    q_x_mod=`echo $x_mod | sed 's,Q,Qq,g;s,_,Qu,g;s,/,Qs,g'`
-    eval "modfile=\$modfile_$q_x_mod"
+    modfile="`grep '^name='$x_mod' ' $CFMOD | sed -e 's/^.* modfile=//' \
+      -e 's/ .*//'`"
     if test "x$modfile" = x; then
-	echo >&2 "WARNING: $XMODCF lists non-existent module \`$x_mod' (ignored)"
+	echo >&2 "WARNING: no name for \`$x_mod' in $CFMOD (ignored)"
 	continue
     fi
     case "$bin_mods" in
@@ -59,17 +61,22 @@ for x_mod in $x_mods; do
     done
     test "x$linked" = xno && echo "#endif"
 done
+echo "  }"
 
 echo
 done_mods=" "
 for bin_mod in $bin_mods; do
     q_bin_mod=`echo $bin_mod | sed 's,Q,Qq,g;s,_,Qu,g;s,/,Qs,g'`
+    modfile="`grep '^name='$bin_mod' ' $CFMOD | sed -e 's/^.* modfile=//' \
+      -e 's/ .*//'`"
     echo "/* linked-in module \`$bin_mod' */"
-    eval "modfile=\$modfile_$q_bin_mod"
     unset moddeps
     . $srcdir/../$modfile
     for dep in $moddeps; do
-	case $done_mods in
+	# This assumes there are no circular dependencies in the builtin
+	# modules.  Better ordering of config.modules would be necessary
+	# to enforce stricter dependency checking.
+	case $bin_mods in
 	    *" $dep "*)
 		echo "    /* depends on \`$dep' */" ;;
 	    *)	echo >&2 "ERROR: linked-in module \`$bin_mod' depends on \`$dep'"

@@ -1,3 +1,8 @@
+2002-06-26  Bart Schaefer  <schaefer@zsh.org>
+
+	* 17357: Src/mkbltnmlst.sh: predefine autoloads for zsh emulation
+	mode only, not sh/ksh/etc. modes.
+
 2002-06-22  Bart Schaefer  <schaefer@zsh.org>
 
 	* users/5073: Completion/compdump: use `typeset +f' instead of
