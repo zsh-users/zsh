@@ -1603,8 +1603,7 @@ addmatches(Cadata dat, char **argv)
 		mst.matcher = dat->match;
 		mstack = &mst;
 
-		if (!mnum)
-		    add_bmatchers(dat->match);
+		add_bmatchers(dat->match);
 
 		addlinknode(matchers, dat->match);
 		dat->match->refc++;
