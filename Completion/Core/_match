@@ -1,53 +1,51 @@
 #autoload
 
 # This is intended to be used as a completer function after the normal
-# completer as in: `compconf completer=_complete:_match'.
+# completer as in: `zstyle ":completion:::::" completer _complete _match'.
 # It temporarily switches on pattern matching, allowing you to try 
 # completion on patterns without having to setopt glob_complete.
 #
 # Note, however, that this is only really useful if you don't use the
 # expand-or-complete function because otherwise the pattern will
 # be expanded using globbing.
-#
-# Configuration key used:
-#
-#  match_original
-#    If this is set to a `only', pattern matching will only be tried
-#    with the string from the line. If it is set to any other non-empty
-#    string, the original pattern will be tried first and if that yields
-#    no completions, matching will be tried again with a `*' inserted
-#    at the cursor position. If this key is not set or set to an empty
-#    string, matching will only be attempted with the `*' inserted.
 
-local tmp opm="$compstate[pattern_match]" ret=0
+[[ _matcher_num -gt 1 ]] && return 1
 
-# Do nothing if we don't have a pattern or there are still global
-# match specifications to try.
+local tmp opm="$compstate[pattern_match]" ret=0 orig ins
+
+# Do nothing if we don't have a pattern.
 
 tmp="${${:-$PREFIX$SUFFIX}#[~=]}"
-[[ "$tmp:q" = "$tmp" ||
-   compstate[matcher] -ne compstate[total_matchers] ]] && return 1
+[[ "$tmp:q" = "$tmp" ]] && return 1
+
+zstyle -s ":completion:${curcontext}:" match-original orig
+zstyle -b ":completion:${curcontext}:" insert-unambiguous ins
 
 # Try completion without inserting a `*'?
 
-if [[ -n "$compconfig[match_original]" ]]; then
-  compstate[matcher]=-1
+if [[ -n "$orig" ]]; then
   compstate[pattern_match]='-'
   _complete && ret=1
   compstate[pattern_match]="$opm"
-  compstate[matcher]="$compstate[total_matchers]"
 
-  (( ret )) && return 0
+  if (( ret )); then
+    [[ "$ins" = yes &&
+       $#compstate[unambiguous] -ge ${#:-${PREFIX}${SUFFIX}} ]] && 
+        compstate[pattern_insert]=unambiguous
+    return 0
+  fi
 fi
 
 # No completion with inserting `*'?
 
-[[ "$compconfig[match_original]" = only ]] && return 1
+[[ "$orig" = only ]] && return 1
 
-compstate[matcher]=-1
 compstate[pattern_match]='*'
 _complete && ret=1
 compstate[pattern_match]="$opm"
-compstate[matcher]="$compstate[total_matchers]"
+
+[[ ret -eq 1 && "$ins" = yes &&
+   $#compstate[unambiguous] -ge ${#:-${PREFIX}${SUFFIX}} ]] && 
+    compstate[pattern_insert]=unambiguous
 
 return 1-ret

@@ -1,0 +1,22 @@
+#compdef zcompile
+
+local context state line expl
+typeset -A opt_args
+
+_arguments -s \
+    '(-c -m -a)-U[don'\''t expand aliases]' \
+    '(-M)-R[mark as read]' \
+    '(-R)-M[mark as mapped]' \
+    '(-c -z -m -a)-k[ksh-style autoloading]' \
+    '(-c -k -m -a)-z[zsh-style autoloading]' \
+    '(-U -z -k)-c[currently defined functions]' \
+    '(-U -z -k)-m[use names as patterns]' \
+    '(-U -z -k)-a[write autoload functions]' \
+    ':zwc file:_files' \
+    '*:function:->function' && return 0
+
+if (( $+opt_args[-c] )); then
+  _wanted functions expl 'function to write' compadd - ${(k)functions}
+else
+  _wanted file expl 'zsh source file' _files
+fi

@@ -1,6 +1,8 @@
-#defcomp enable
+#compdef enable
 
-[[ -mcurrent -1 -*a* ]] && complist -da
-[[ -mcurrent -1 -*f* ]] && complist -dF
-[[ -mcurrent -1 -*r* ]] && complist -dw
-[[ ! -mcurrent -1 -* ]] && complist -dB
+_arguments -C -s \
+  "(-f -r)-a[act on aliases]:*:aliases:(${(k)dis_aliases})" \
+  "(-a -r)-f[act on functions]:*:functions:(${(k)dis_functions})" \
+  "(-a -f)-r[act on reserved words]:*:reserved-words:(${(k)dis_reswords})" \
+  '-m[treat arguments as patterns]' \
+  "*:builtin command:(${(@k)dis_builtins})"

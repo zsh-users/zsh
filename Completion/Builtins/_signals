@@ -20,17 +20,19 @@ done
 
 [[ "$1" = -(|-) ]] && shift
 
-if _wanted signals expl signal &&
-       { [[ -z "$minus" ]] || ! _style signals prefix-needed ||
+if _wanted signals &&
+       { [[ -z "$minus" ]] ||
+         ! zstyle -T ":completion:${curcontext}:signals" prefix-needed ||
          [[ "$PREFIX" = -* ]] } ; then
   local disp tmp
 
-  if _style signals prefix-hidden; then
+  if zstyle -t ":completion:${curcontext}:signals" prefix-hidden; then
     tmp=( "${(@)signals[1,last]}" )
     disp=(-d tmp)
   else
     disp=()
   fi
-  compadd "$@" "$expl[@]" "$disp[@]" -M 'm:{a-z}=${A-Z}' - \
-          "${minus}${(@)^signals[1,last]}"
+  _all_labels signals expl signal \
+      compadd "$@" "$disp[@]" -M 'm:{a-z}={A-Z}' - \
+              "${minus}${(@)^signals[1,last]}"
 fi

@@ -1,65 +1,155 @@
-#autoload
+#compdef curl
 
 # Usage: _urls [-f]
 # Options:
-#  -f : complete files.
-
-# To complete URLs, you must make a URL database locally such as:
+#  -f : complete files first.
 #
-# % cd ~/.zsh/urls
-# % find . -ls
-# ... drwxr-xr-x ... 512 Sep  3 02:46 .
-# ... drwxr-xr-x ... 512 Sep  3 02:48 ./http
-# ... drwxr-xr-x ... 512 Sep  3 02:52 ./http/www.zsh.org
-# ... drwxr-xr-x ... 512 Sep  3 03:01 ./http/www.zsh.org/mla
-# ... drwxr-xr-x ... 512 Sep  3 03:01 ./http/www.zsh.org/mla/workers
-# ... drwxr-xr-x ... 512 Sep  3 03:01 ./http/www.zsh.org/mla/workers/1999
-# ... -rw-r--r-- ...   0 Sep  3 03:01 ./http/www.zsh.org/mla/workers/1999/index.html
-# ... drwxr-xr-x ... 512 Sep  3 02:48 ./http/sunsite.auc.dk
-# ... drwxr-xr-x ... 512 Sep  3 02:48 ./http/sunsite.auc.dk/zsh
-# ... drwxr-xr-x ... 512 Sep  3 02:47 ./bookmark
-# ... drwxr-xr-x ... 512 Sep  3 02:48 ./bookmark/zsh
-# ... -rw-r--r-- ...  27 Sep  3 02:47 ./bookmark/zsh/home
-# ... -rw-r--r-- ...  20 Sep  3 02:48 ./bookmark/zsh/meta
+# Configuration styles used:
+#
+#  path
+#    The path to a directory containing a URL database, such as:
+#
+#      % cd ~/.zsh/urls
+#      % find . -ls
+#      ... drwxr-xr-x ... 512 Sep  3 02:46 .
+#      ... drwxr-xr-x ... 512 Sep  3 02:48 ./http
+#      ... drwxr-xr-x ... 512 Sep  3 02:52 ./http/www.zsh.org
+#      ... drwxr-xr-x ... 512 Sep  3 03:01 ./http/www.zsh.org/mla
+#      ... drwxr-xr-x ... 512 Sep  3 03:01 ./http/www.zsh.org/mla/workers
+#      ... drwxr-xr-x ... 512 Sep  3 03:01 ./http/www.zsh.org/mla/workers/1999
+#      ... -rw-r--r-- ...   0 Sep  3 03:01 ./http/www.zsh.org/mla/workers/1999/index.html
+#      ... drwxr-xr-x ... 512 Sep  3 02:48 ./http/sunsite.auc.dk
+#      ... drwxr-xr-x ... 512 Sep  3 02:48 ./http/sunsite.auc.dk/zsh
+#      ... drwxr-xr-x ... 512 Sep  3 02:47 ./bookmark
+#      ... drwxr-xr-x ... 512 Sep  3 02:48 ./bookmark/zsh
+#      ... -rw-r--r-- ...  27 Sep  3 02:47 ./bookmark/zsh/home
+#      ... -rw-r--r-- ...  20 Sep  3 02:48 ./bookmark/zsh/meta
+#      % cat bookmark/zsh/home 
+#      http://sunsite.auc.dk/zsh/
+#      % cat bookmark/zsh/meta
+#      http://www.zsh.org/
+#
+#  local
+#    Specify a local web server as an array with three elements:
+#      <hostname> <doc root> <user area>
+#    where hostname is the name of the web server, doc root is the path to
+#    the default web pages for the server and user area is the directory
+#    name used by a user placing web pages within their home area.
+#    E.g.:
+#      zstyle ':completion:*:urls' local www /usr/local/apache/htdocs public_html
 
-local ipre scheme dirs files
+local ipre scheme host user uhosts ret=1 expl
+local urls_path localhttp
+zstyle -s ":completion:${curcontext}:urls" path urls_path ||
+    urls_path="${ZDOTDIR:-$HOME}/.zsh/urls"
+zstyle -a ":completion:${curcontext}:urls" local localhttp
+local localhttp_servername="$localhttp[1]"
+local localhttp_documentroot="$localhttp[2]"
+local localhttp_userdir="$localhttp[3]"
 
 if [[ "$1" = -f ]]; then
   shift
-  _files "$@" && return
-fi
-
-if [[ -z "$compconfig[_urls_dir]" ]]; then
-  compconfig[_urls_dir]=${ZDOTDIR:-$HOME}/.zsh/urls
+  _wanted -C -f files && _files "$@" && return
 fi
 
 ipre="$IPREFIX"
 
-if [[ -prefix [-+.a-z0-9]#: ]]; then
-  scheme="${PREFIX%%:*}"
-  compset -P "[-+.a-z0-9]#:"
-else
-  compadd -S '' http:// ftp:// bookmark:
-  return
+if ! compset -P '(#b)([-+.a-z0-9]#):' && _wanted -C argument prefixes; then
+  while _next_label prefixes expl 'URL prefix' "$@"; do
+    [[ -d $urls_path/bookmark ]] &&
+      compadd "$expl[@]" -S '' bookmark: && ret=0
+    compadd "$expl[@]" -S '' file: ftp:// gopher:// http:// && ret=0
+    (( ret )) || return 0
+  done
+  return ret
 fi
+scheme="$match[1]"
 
 case "$scheme" in
-  http) compset -P // || { compadd "$@" -S '' //; return };;
-  ftp) compset -P // || { compadd "$@" -S '' //; return };;
+  http|ftp|gopher)
+    if ! compset -P //; then
+      _wanted -C "$scheme" prefixes expl 'end of prefix' compadd "$@" -S '' //
+      return
+    fi
+  ;;
+  file)
+    if ! compset -P //; then
+      _wanted -C file files || return 1
+
+      while _next_label files expl 'local file' "$@"; do
+        if [[ -prefix / ]]; then
+	  _path_files "$expl[@]" -S '' -g '*(^/)' && ret=0
+	  _path_files "$expl[@]" -S/ -r '/' -/ && ret=0
+        elif [[ -z "$PREFIX" ]]; then
+	  compadd "$expl[@]" -S '/' -r '/' - "${PWD%/}" && ret=0
+        fi
+	(( ret )) || return 0
+      done
+      return ret
+    fi
+  ;;
+  bookmark)
+    if [[ -f "$urls_path/$scheme/${(Q)PREFIX}${(Q)SUFFIX}" &&
+	  -s "$urls_path/$scheme/${(Q)PREFIX}${(Q)SUFFIX}" ]]; then
+      _wanted -C bookmark bookmarks expl bookmarks \
+          compadd "$@" -U - \
+              "$ipre$(<"$urls_path/$scheme/${(Q)PREFIX}${(Q)SUFFIX}")" && ret=0
+    else
+      if _wanted -C bookmark files; then
+        while _next_label files expl 'bookmark'; do
+          _path_files -W "$urls_path/$scheme" "$expl[@]" -S '' -g '*(^/)' && 
+              ret=0
+          _path_files -W "$urls_path/$scheme" -S/ -r '/' -/ && ret=0
+          (( ret )) || return 0
+        done
+      fi
+    fi
+    return ret
+  ;;
 esac
 
-if [[ "$scheme" = bookmark &&
-      -f "$compconfig[_urls_dir]/$scheme/$PREFIX$SUFFIX" &&
-      -s "$compconfig[_urls_dir]/$scheme/$PREFIX$SUFFIX" ]]; then
-  compadd "$@" -QU -- "$ipre$(<"$compconfig[_urls_dir]/$scheme/$PREFIX$SUFFIX")"
-else
-  dirs=($compconfig[_urls_dir]/$scheme/$PREFIX*$SUFFIX(/:t))
-  files=($compconfig[_urls_dir]/$scheme/$PREFIX*$SUFFIX(.:t))
-  compset -P '*/'
-  compadd "$@" -Q -S '/' - $dirs
-  if [[ "$scheme" = bookmark ]]; then
-    compadd "$@" -QS '' - $files
-  else
-    compadd "$@" -Q - $files
-  fi
+# Complete hosts
+if ! compset -P '(#b)([^/]#)/' && _wanted hosts; then
+  uhosts=($urls_path/$scheme/$PREFIX*$SUFFIX(/:t))
+
+  while _next_label hosts expl host "$@"; do
+    (( $#uhosts )) || _hosts -S/ && ret=0
+    [[ "$scheme" = http ]] && uhosts=($uhosts $localhttp_servername)
+    compadd "$expl[@]" -S/ - $uhosts && ret=0
+    (( ret )) || return 0
+  done
+  return ret
 fi
+host="$match[1]"
+
+# Complete part after hostname
+
+_wanted -C local files || return 1
+
+if [[ "$localhttp_servername" = "$host" ]]; then
+  if compset -P \~; then
+    if ! compset -P '(#b)([^/]#)/'; then
+      _users -S/
+      return
+    fi
+    user="$match[1]"
+    while _next_label files expl 'local file'; do
+      _path_files "$expl[@]" -W ~$user/$localhttp_userdir -g '*(^/)' && ret=0
+      _path_files "$expl[@]" -W ~$user/$localhttp_userdir -S/ -r '/' -/ && ret=0
+      (( ret )) || return 0
+    done
+  else
+    while _next_label files expl 'local file'; do
+      _path_files "$expl[@]" -W $localhttp_documentroot -g '*(^/)' && ret=0
+      _path_files "$expl[@]" -W $localhttp_documentroot -S/ -r '/' -/ && ret=0
+      (( ret )) || return 0
+    done
+  fi
+else
+  while _next_label files expl 'local file'; do
+    _path_files "$expl[@]" -W $urls_path/$scheme/$host -g '*(^/)' && ret=0
+    _path_files "$expl[@]" -W $urls_path/$scheme/$host -S/ -r '/' -/ && ret=0
+    (( ret )) || return 0
+  done
+fi
+return $ret

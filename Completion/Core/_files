@@ -1,26 +1,49 @@
 #autoload
 
-# Utility function for completing files of a given type or any file.
-# In many cases you will want to call this one instead of _path_files().
+local opts tmp glob pats expl tag i pat descr minus
 
-local nm=$NMATCHES
+zparseopts -a opts \
+    '/=tmp' 'f=tmp' 'g+:-=tmp' q n 1 2 P: S: r: R: W: X+: M+: F: J+: V+:
 
-_path_files "$@"
+type="${(@j::M)${(@)tmp#-}#?}"
+(( $tmp[(I)-g*] )) && glob="${(j: :)${(M)tmp:#-g*}#-g}"
 
-if [[ $# -ne 0 && -nmatches nm ]]; then
-  local opt opts
-
-  # We didn't get any matches for those types of files described by
-  # the `-g' or `-/' option. Now we try it again accepting all files.
-  # First we get those options that we have to use even if then. If
-  # we find out that the `-f' option was given, we already accepted
-  # all files and give up immediatly.
-
-  opts=()
-  while getopts "P:S:W:F:J:V:X:f/g:" opt; do
-    [[ "$opt" = f ]] && return
-    [[ "$opt" = [PSWFJVX] ]] && opts=("$opts[@]" "-$opt" "$OPTARG")
-  done
-
-  _path_files "$opts[@]"
+if zstyle -a ":completion:${curcontext}:" file-patterns pats; then
+  [[ "$type" = */* ]] && glob="$glob *(-/)"
+  pats=( \ ${(M)^${pats//\\%p/ ${glob:-\*} }:#*[^\\]:*} )
+else
+  if [[ "$type" = *g* ]]; then
+    if [[ "$type" = */* ]]; then
+      pats=( " ${glob//:/\\:} *(-/):globbed-files" '*:all-files' )
+    else
+      pats=( " ${glob//:/\\:}:globbed-files"
+             '*(-/):directories' '*:all-files' )
+    fi
+  elif [[ "$type" = */* ]]; then
+    pats=( '*(-/):directories' '*:all-files' )
+  else
+    pats=( '*:all-files' )
+  fi
 fi
+
+for tag in "${(@)${(@)pats#*[^\\]:}%%:*}"; do
+
+  i="$pats[(I)*[^\\\\]:${tag}(|:*)]"
+  pat="${${pats[i]%%:${tag}*}//\\\\:/:}"
+
+  if [[ i -gt 0 && "$pat" != \ # ]]; then
+    if [[ "$pats[i]" = *:${tag}:* ]]; then
+      descr="${pats[i]#*:${tag}:}"
+      minus=()
+    else
+      descr=file
+      minus=(-)
+    fi
+  fi
+
+  _wanted "$tag" expl "$descr" \
+      _path_files -g "$pat" "$opts[@]" "$minus[@]" && return 0
+
+done
+
+return 1

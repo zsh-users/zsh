@@ -6,61 +6,20 @@
 # This function will allow other completer functions to be called if
 # the expansions done produce no result or do not change the original
 # word from the line.
-#
-# Configuration keys:
-#
-#  expand_substitute
-#    If this is unset or set to the empty string, the code will first
-#    try to expand all substitutions in the string (such as $(...) and
-#    ${...}). If this is set to an non-empty string it should be 
-#    an expression usable inside a $[...] arithmetical expression.
-#    In this case, expansion of substitutions will be done if the
-#    expression evaluates to `1'. For example, with
-#
-#      compconf expand_substitute='NUMERIC != 1'
-#
-#    substitution will be performed only if given an explicit numeric
-#    argument other than `1', as by typing ESC 2 TAB.
-#
-#  expand_glob
-#    If this is unset or set to an empty string, globbing will be
-#    attempted on the word resulting from substitution or the
-#    original string. The values accepted for this key are the same
-#    as for expand_substitute.
-#
-#  expand_menu
-#    If this is unset or set to the empty string, the words resulting
-#    from expansion (if any) will simply be inserted in the ommand line,
-#    replacing the original string. However, if this key is set to an
-#    non-empty string, the user can cycle through the expansion as in
-#    a menucompletion. Unless the value contains the sub-string `only',
-#    the user will still be offered all expansions at once as one of
-#    the strings to insert in the command line. Also, if the value
-#    contains the sub-string `last', the string with all expansion will
-#    be offered first, whereas normally it is offered as the last string
-#    to insert. Finally, if the value contains the sub-string `sort',
-#    the expansions will be sorted alphabetically, normally they are
-#    kept in the order the expansion produced them in.
-#    
-#  expand_original
-#    If this is set to an non-empty string, the original string from the
-#    line will be included in the list of strings the user can cycle
-#    through as in a menucompletion. If the value contains the sub-string
-#    `last', the original string will appear as the last string, with
-#    other values it is inserted as the first one (so that the command
-#    line does not change immediatly).
-#
-#  expand_prompt
-#    This may be set to a string that should be displayed before the
-#    possible expansions. This is given to the -X option and thus may
-#    contain the control sequences `%n', `%B', etc. Also, the sequence
-#    `%o' in this string will be replaced by the original string.
 
-local exp word="$PREFIX$SUFFIX" group=-V
+setopt localoptions nullglob
 
-# Do this only for the first global matcher.
+[[ _matcher_num -gt 1 ]] && return 1
 
-[[ "$compstate[matcher]" -le 1 ]] || return 1
+local exp word="$PREFIX$SUFFIX" sort expr expl subd suf=" "
+
+# First, see if we should insert all *completions*.
+
+if zstyle -s ":completion:${curcontext}:" completions expr &&
+   [[ "${(e):-\$[$expr]}" -eq 1 ]]; then
+  compstate[insert]=all
+  return 1
+fi
 
 # In exp we will collect the expansion.
 
@@ -69,79 +28,68 @@ exp=("$word")
 # First try substitution. That weird thing spanning multiple lines
 # changes quoted spaces, tabs, and newlines into spaces.
 
-[[ -z "$compconfig[expand_substitute]" ||
-   "${(e):-\$[$compconfig[expand_substitute]]}" -eq 1 ]] &&
+zstyle -s ":completion:${curcontext}:" substitute expr &&
+    [[ "${(e):-\$[$expr]}" -eq 1 ]] &&
     exp=( "${(e)exp//\\[ 	
 ]/ }" )
 
 # If the array is empty, store the original string again.
 
-[[ -z "$exp" ]] && exp=("$word")
+(( $#exp )) || exp=("$word")
+
+subd=("$exp[@]")
 
 # Now try globbing.
 
-[[ -z "$compconfig[expand_glob]" ||
-   "${(e):-\$[$compconfig[expand_glob]]}" -eq 1 ]] &&
-    exp=( ${~exp}(N) )
+zstyle -s ":completion:${curcontext}:" glob expr &&
+    [[ "${(e):-\$[$expr]}" -eq 1 ]] &&
+    exp=( ${~exp} )
 
 # If we don't have any expansions or only one and that is the same
 # as the original string, we let other completers run.
 
-[[ $#exp -eq 0 ||
-   ( $#exp -eq 1 && "$exp[1]" = "$word" ) ]] && return 1
+(( $#exp )) || exp=("$subd[@]")
 
-# We have expansions, should we menucomplete them?
+[[ $#exp -eq 1 && "$exp[1]" = "$word"(|\(N\)) ]] && return 1
 
-if [[ -z "$compconfig[expand_menu]" ]]; then
+# With subst-globs-only we bail out if there were no glob expansions,
+# regardless of any substitutions
 
-  # No, so if the user only wants a list, we add the strings
-  # separately. Otherwise we add the whole array as one string,
-  # probably also adding the original string.
+zstyle -s ":completion:${curcontext}:" subst-globs-only expr &&
+    [[ "${(e):-\$[$expr]}" -eq 1 && "$subd" = "$exp"(|\(N\)) ]] && return 1
 
-  if [[ -z "$compstate[insert]" ]]; then
-    compadd -U -V _expand -Q - "$exp[@]"
-  else
-    [[ -n "$compconfig[expand_original]" && 
-       "$compconfig[expand_original]" != *last* ]] &&
-        compadd -UnQ -V _expand_original - "$word"
+# Now add as matches whatever the user requested.
 
-    compadd -UQ -V _expand - "$exp"
+zstyle -s ":completion:${curcontext}:" sort sort
 
-    [[ -n "$compconfig[expand_original]" && 
-       "$compconfig[expand_original]" = *last* ]] &&
-        compadd -UnQ -V _expand_original - "$word"
+[[ "$sort" = (yes|true|1|on) ]] && exp=( "${(@o)exp}" )
 
-    compstate[insert]=menu
-  fi
+# If there is only one expansion, add a suitable suffix
+(($#exp == 1)) && suf='' && [[ -d $exp && "$exp[1]" != */ ]] && suf='/'  
+
+if [[ -z "$compstate[insert]" ]] ;then
+  _description all-expansions expl 'all expansions' "o:$word"
+
+  compadd "$expl[@]" -UQ -qS "$suf" - "$exp"
 else
-  # Sorting? We just use a different group type then.
+  _tags all-expansions expansions original
 
-  [[ "$compconfig[expand_menu]" = *sort* ]] && group=-J
 
-  # Now add the expansion string, probably also adding the original
-  # and/or the string containing all expanded string.
-
-  [[ -n "$compconfig[expand_original]" && 
-     "$compconfig[expand_original]" != *last* ]] &&
-      compadd -UnQ -V _expand_original - "$word"
-
-  [[ "$compconfig[expand_menu]" = *last* &&
-     "$compconfig[expand_menu]" != *only* ]] &&
-      compadd -UnQ -V _expand_all - "$exp"
-
-  if [[ -z "$compconfig[expand_prompt]" ]]; then
-    compadd -UQ $group _expand - "$exp[@]"
-  else
-    compadd -UQ -X "${compconfig[expand_prompt]//\%o/$word}" \
-            $group _expand - "$exp[@]"
+  if _requested all-expansions; then
+    _description all-expansions expl 'all expansions'
+    compadd "$expl[@]" -UQ -qS "$suf" - "$exp"
   fi
-  [[ "$compconfig[expand_menu]" != *last* &&
-     "$compconfig[expand_menu]" != *only* ]] &&
-      compadd -UnQ -V _expand_all - "$exp"
 
-  [[ -n "$compconfig[expand_original]" && 
-     "$compconfig[expand_original]" = *last* ]] &&
-      compadd -UnQ -V _expand_original - "$word"
+  if [[ $#exp -gt 1 ]] && _requested expansions; then
+    if [[ "$sort" = menu ]]; then
+      _description expansions expl expansions "o:$word"
+    else
+      _description -V expansions expl expansions "o:$word"
+    fi
+    compadd "$expl[@]" -UQ - "$exp[@]"
+  fi
+
+  _requested original expl original && compadd "$expl[@]" -UQ - "$word"
 
   compstate[insert]=menu
 fi

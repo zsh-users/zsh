@@ -2,47 +2,206 @@
 
 # The main loop of the completion code. This is what is called when 
 # completion is attempted from the command line.
-# The completion code gives us the special variables and the arguments
-# from the command line are given as positional parameters.
 
-local comp name
 
-setopt localoptions nullglob rcexpandparam globdots
-unsetopt markdirs globsubst shwordsplit nounset
+# If you want to complete only set or unset options for the unsetopt
+# and setopt builtin, un-comment these lines:
+#
+#   local _set_options _unset_options
+#
+#   _set_options=(${(k)options[(R)on]})
+#   _unset_options=(${(k)options[(R)off]})
+#
+# This is needed because completion functions may set options locally
+# which makes the output of setopt and unsetopt reflect a different
+# state than the global one for which you are completing.
 
-# An entry for `-first-' is the replacement for `compctl -T'
-# Completion functions may set `_compskip' to any value to make the 
-# main loops stop calling other completion functions.
+setopt localoptions nullglob rcexpandparam extendedglob
+unsetopt markdirs globsubst shwordsplit nounset ksharrays
 
-comp="$_comps[-first-]"
-if [[ ! -z "$comp" ]]; then
-  "$comp" "$@"
-  if (( $+_compskip )); then
-    unset _compskip
-    return
+local func funcs ret=1 tmp _compskip format _comp_ignore \
+      _completers _completer _completer_num curtag \
+      _matchers _matcher _matcher_num _comp_tags \
+      context state line opt_args val_args curcontext="$curcontext" \
+      _last_nmatches=-1 _last_menu_style _def_menu_style _menu_style sel \
+      _saved_exact="${compstate[exact]}" \
+      _saved_lastprompt="${compstate[last_prompt]}" \
+      _saved_list="${compstate[list]}" \
+      _saved_insert="${compstate[insert]}"
+
+typeset -U _lastdescr
+
+[[ -z "$curcontext" ]] && curcontext=:::
+
+# Special completion contexts after `~' and `='.
+
+if compset -P 1 '='; then
+  compstate[context]=equal
+elif [[ "$PREFIX" != */* && "$PREFIX[1]" = '~' ]]; then
+  compset -p 1
+  compstate[context]=tilde
+fi
+
+# Initial setup.
+
+_setup default
+_def_menu_style=( "$_last_menu_style[@]"
+
+# We can't really do that because the current value of $SELECTMIN
+# may be the one set by this function.
+# There is a similar problem with $ZLS_COLORS in _setup.
+
+#                  ${SELECTMIN+select${SELECTMIN:+\=$SELECTMIN}}
+
+                )
+_last_menu_style=()
+
+# Get the names of the completers to use in the positional parameters.
+
+if (( $# )); then
+  _completers=( "$@" )
+else
+  zstyle -a ":completion:${curcontext}:" completer _completers ||
+      _completers=( _complete )
+fi
+
+# And now just call the completer functions defined.
+
+_completer_num=1
+
+# Call the pre-functions.
+
+funcs=( "$compprefuncs[@]" )
+compprefuncs=()
+for func in "$funcs[@]"; do
+  "$func"
+done
+
+for tmp in "$_completers[@]"; do
+
+  if [[ "$tmp" = *:-* ]]; then
+    _completer="${${tmp%:*}[2,-1]//_/-}${tmp#*:}"
+    tmp="${tmp%:*}"
+  elif [[ $tmp = *:* ]]; then
+    _completer="${tmp#*:}"
+    tmp="${tmp%:*}"
+  else
+    _completer="${tmp[2,-1]//_/-}"
+  fi
+  curcontext="${curcontext/:[^:]#:/:${_completer}:}"
+
+  zstyle -a ":completion:${curcontext}:" matcher-list _matchers ||
+      _matchers=( '' )
+
+  _matcher_num=1
+  for _matcher in "$_matchers[@]"; do
+    if "$tmp"; then
+      ret=0
+      break 2
+    fi
+    (( _matcher_num++ ))
+  done
+  (( _completer_num++ ))
+done
+
+curcontext="${curcontext/:[^:]#:/::}"
+
+if [[ $compstate[old_list] = keep || $compstate[nmatches] -gt 1 ]]; then
+  [[ _last_nmatches -ge 0 && _last_nmatches -ne $compstate[nmatches] ]] &&
+      _menu_style=( "$_last_menu_style[@]" "$_menu_style[@]" )
+
+  if [[ "$compstate[insert]" = "$_saved_insert" ]]; then
+    if [[ -n "$_menu_style[(r)(yes|true|1|on)]" ||
+          ( -n "$_menu_style[(r)auto*]" &&
+            "$compstate[insert]" = automenu ) ]]; then
+      compstate[insert]=menu
+    elif [[ -n "$_menu_style[(r)auto*]" &&
+            "$compstate[insert]" != automenu ]]; then
+      compstate[insert]=automenu-unambiguous
+    elif [[ -n "$_menu_style[(r)(no|false|0|off)]" ]]; then
+      compstate[insert]=unambiguous
+    elif [[ -n "$_def_menu_style[(r)(yes|true|1|on)]" ||
+          ( -n "$_def_menu_style[(r)auto*]" &&
+            "$compstate[insert]" = automenu ) ]]; then
+      compstate[insert]=menu
+    elif [[ -n "$_def_menu_style[(r)auto*]" &&
+            "$compstate[insert]" != automenu ]]; then
+      compstate[insert]=automenu-unambiguous
+    elif [[ -n "$_def_menu_style[(r)(no|false|0|off)]" ]]; then
+      compstate[insert]=unambiguous
+    fi
+  fi
+
+  _menu_style=( "$_menu_style[@]" "$_def_menu_style[@]" )
+
+  if [[ "$compstate[insert]" = *menu* ]]; then
+    if [[ -n "$_menu_style[(r)no-select*]" ]]; then
+      unset SELECTMIN
+    else
+      sel=( "${(@M)_menu_style:#select*}" )
+
+      if (( $# )); then
+        local min=9999999 i num
+
+        for i in "$sel[@]"; do
+          if [[ "$i" = *\=* ]]; then
+  	    num="${i#*\=}"
+  	    [[ num -lt 0 ]] && num=0
+  	  else
+  	    num=0
+  	  fi
+  	  [[ num -lt min ]] && min="$num"
+  
+	  (( min )) || break
+        done
+
+        zmodload -i zsh/complist
+        SELECTMIN="$min"
+      fi
+    fi
+  fi
+elif [[ $compstate[nmatches] -eq 0 &&
+        $#_lastdescr -ne 0 && $compstate[old_list] != keep ]] &&
+     zstyle -s ":completion:${curcontext}:warnings" format format; then
+
+  compstate[list]='list force'
+  compstate[insert]=''
+
+  if [[ "$format" = *%d* ]]; then
+    local str mesg
+
+    _lastdescr=( "\`${(@)^_lastdescr:#}'" )
+
+    case $#_lastdescr in
+    1) str="$_lastdescr[1]";;
+    2) str="$_lastdescr[1] or $_lastdescr[2]";;
+    *) str="${(j:, :)_lastdescr[1,-2]}, or $_lastdescr[-1]";;
+    esac
+
+    zformat -f mesg "$format" "d:$str"
+    compadd -UX "$mesg" -n - ''
+  else
+    _setup warnings
+    compadd -UQX "$format" -V warnings - "${(@)_lastdescr:#}"
   fi
 fi
 
-# For arguments we use the `_normal function.
+# Now call the post-functions.
 
-if [[ $CONTEXT == argument || $CONTEXT == command ]]; then
-  _normal "$@"
-else
-  # Let's see if we have a special completion definition for the other
-  # possible contexts.
+funcs=( "$comppostfuncs[@]" )
+comppostfuncs=()
+for func in "$funcs[@]"; do
+  "$func"
+done
 
-  comp=''
+_lastcomp=( "${(@kv)compstate}" )
+_lastcomp[completer]="$_completer"
+_lastcomp[prefix]="$PREFIX"
+_lastcomp[suffix]="$SUFFIX"
+_lastcomp[iprefix]="$IPREFIX"
+_lastcomp[isuffix]="$ISUFFIX"
+_lastcomp[qiprefix]="$QIPREFIX"
+_lastcomp[qisuffix]="$QISUFFIX"
+_lastcomp[tags]="$_comp_tags"
 
-  case $CONTEXT in
-  redirect)  comp="$_comps[-redirect-]";;
-  math)      comp="$_comps[-math-]";;
-  subscript) comp="$_comps[-subscript-]";;
-  value)     comp="$_comps[-value-]";;
-  condition) comp="$_comps[-condition-]";;
-  esac
-
-  # If not, we use default completion, if any.
-
-  [[ -z "$comp" ]] && comp="$_comps[-default-]"
-  [[ -z "$comp" ]] || "$comp" "$@"
-fi
+return ret

@@ -16,7 +16,7 @@ input/output specifications.
 
 The following may appear anywhere in a simple command
 or may precede or follow a complex command.
-Substitution occurs before var(word) or var(digit)
+Expansion occurs before var(word) or var(digit)
 is used except as noted below.
 If the result of substitution on var(word)
 produces more than one filename,
@@ -57,7 +57,7 @@ exist, even if tt(CLOBBER) is unset.
 item(tt(<<)[tt(-)] var(word))(
 The shell input is read up to a line that is the same as
 var(word), or to an end-of-file.
-No parameter substitution, command substitution or
+No parameter expansion, command substitution or
 filename generation is performed on var(word).
 The resulting document, called a
 em(here-document), becomes the standard input.
@@ -77,10 +77,10 @@ item(tt(<<<) var(word))(
 Perform shell expansion on var(word) and pass the result
 to standard input.  This is known as a em(here-string).
 )
-xitem(tt(<&) var(digit))
-item(tt(>&) var(digit))(
+xitem(tt(<&) var(number))
+item(tt(>&) var(number))(
 The standard input/output is duplicated from file descriptor
-var(digit) (see manref(dup)(2)).
+var(number) (see manref(dup2)(2)).
 )
 xitem(tt(<& -))
 item(tt(>& -))(
@@ -90,11 +90,33 @@ xitem(tt(<& p))
 item(tt(>& p))(
 The input/output from/to the coprocess is moved to the standard input/output.
 )
-item(tt(>&) var(word))(
-Same as `tt(>) var(word) tt(2>&1)'.
+xitem(tt(>&) var(word))
+item(tt(&>) var(word))(
+(Except where `tt(>&) var(word)' matches one of the above syntaxes;
+`tt(&>)' can always be used to avoid this ambiguity.)
+Redirects both standard output and standard error (file descriptor 2)
+in the manner of `tt(>) var(word)'.
+Note that this does em(not) have the same effect as `tt(>) var(word) tt(2>&1)'
+in the presence of multios (see the section below).
 )
-item(tt(>>&) var(word))(
-Same as `tt(>>) var(word) tt(2>&1)'.
+xitem(tt(>&|) var(word))
+xitem(tt(>&!) var(word))
+xitem(tt(&>|) var(word))
+item(tt(&>!) var(word))(
+Redirects both standard output and standard error (file descriptor 2)
+in the manner of `tt(>|) var(word)'.
+)
+xitem(tt(>>&) var(word))
+item(tt(&>>) var(word))(
+Redirects both standard output and standard error (file descriptor 2)
+in the manner of `tt(>>) var(word)'.
+)
+xitem(tt(>>&|) var(word))
+xitem(tt(>>&!) var(word))
+xitem(tt(&>>|) var(word))
+item(tt(&>>!) var(word))(
+Redirects both standard output and standard error (file descriptor 2)
+in the manner of `tt(>>|) var(word)'.
 )
 enditem()
 
@@ -107,7 +129,7 @@ The shell evaluates each redirection in terms of the
 association at the time of evaluation.
 For example:
 
-nofill(... tt(1>)var(fname) tt(2>&1))
+indent(... tt(1>)var(fname) tt(2>&1))
 
 first associates file descriptor 1 with file var(fname).
 It then associates file descriptor 2 with the file associated with file
@@ -123,12 +145,12 @@ the shell opens the file descriptor as a pipe to a process that copies
 its input to all the specified outputs, similar to bf(tee),
 provided the tt(MULTIOS) option is set.  Thus:
 
-nofill(tt(date >foo >bar))
+example(date >foo >bar)
 
 writes the date to two files, named `tt(foo)' and `tt(bar)'.
 Note that a pipe is an implicit redirection; thus
 
-nofill(tt(date >foo | cat))
+example(date >foo | cat)
 
 writes the date to the file `tt(foo)', and also pipes it to cat.
 
@@ -136,14 +158,14 @@ If the tt(MULTIOS)
 option is set, the word after a redirection operator is also subjected
 to filename generation (globbing).  Thus
 
-nofill(tt(: > *))
+example(: > *)
 
 will truncate all files in the current directory,
 assuming there's at least one.  (Without the tt(MULTIOS)
 option, it would create an empty file called `tt(*)'.)
 Similarly, you can do
 
-nofill(tt(echo exit 0 >> *.sh))
+example(echo exit 0 >> *.sh)
 
 If the user tries to open a file descriptor for reading more than once,
 the shell opens the file descriptor as a pipe to a process that copies
@@ -151,17 +173,17 @@ all the specified inputs to its output in the order
 specified, similar to bf(cat),
 provided the tt(MULTIOS) option is set.  Thus
 
-nofill(tt(sort <foo <fubar))
+example(sort <foo <fubar)
 
 or even
 
-nofill(tt(sort <f{oo,ubar}))
+example(sort <f{oo,ubar})
 
 is equivalent to `tt(cat foo fubar | sort)'.
 
 Note that a pipe is an implicit redirection; thus
 
-nofill(tt(cat bar | sort <foo))
+example(cat bar | sort <foo)
 
 is equivalent to `tt(cat bar foo | sort)' (note the order of the inputs).
 
@@ -169,15 +191,35 @@ If the tt(MULTIOS) option is em(un)set,
 each redirection replaces the previous redirection for that file descriptor.
 However, all files redirected to are actually opened, so
 
-nofill(tt(echo foo > bar > baz))
+example(echo foo > bar > baz)
 
 when tt(MULTIOS) is unset will truncate bar, and write `tt(foo)' into baz.
 
-If a simple command consists of one or more redirection operators
-and zero or more parameter assignments, but no command name,
-the command named in the shell variable tt(READNULLCMD) is assumed.
-(If tt(READNULLCMD) is empty or not set, `tt(cat)' is used.)  Thus
+sect(Redirections with no command)
+vindex(NULLCMD, use of)
+vindex(READNULLCMD, use of)
+pindex(CSH_NULLCMD, use of)
+pindex(SH_NULLCMD, use of)
+When a simple command consists of one or more redirection operators
+and zero or more parameter assignments, but no command name, zsh can
+behave in several ways.
 
-nofill(tt(< file))
+If the parameter tt(NULLCMD) is not set or the option tt(CSH_NULLCMD) is
+set, an error is caused.  This is the bf(csh) behavior and tt(CSH_NULLCMD)
+is set by default when emulating bf(csh).
 
-prints the contents of tt(file).
+If the option tt(SH_NULLCMD) is set, the builtin `tt(:)' is inserted as a
+command with the given redirections.  This is the default when emulating
+bf(sh) or bf(ksh).
+
+Otherwise, if the parameter tt(NULLCMD) is set, its value will be used as a
+command with the given redirections.  If both tt(NULLCMD) and
+tt(READNULLCMD) are set, then the value of the latter will be used instead
+of that of the former when the redirection is an input.  The default for
+tt(NULLCMD) is `tt(cat)' and for tt(READNULLCMD) is `tt(more)'. Thus
+
+example(< file)
+
+shows the contents of tt(file) on standard output, with paging if that is a
+terminal.  tt(NULLCMD) and tt(READNULLCMD) may refer to shell functions.
+

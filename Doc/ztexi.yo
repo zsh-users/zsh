@@ -11,7 +11,6 @@ def(CMT)(0)(NOTRANS(@c))
 
 ATEXIT(\
   NL()\
-  NOTRANS(@setchapternewpage odd)NL()\
   NOTRANS(@contents)NL()\
   NOTRANS(@bye)NL()\
 )
@@ -33,7 +32,7 @@ COMMENT(--- emphasised text ---)
 
 def(em)(1)(NOTRANS(@emph{)ARG1NOTRANS(}))
 def(bf)(1)(NOTRANS(@cite{)ARG1NOTRANS(}))
-def(tt)(1)(NOTRANS(@code{)ARG1NOTRANS(}))
+def(tt)(1)(NOTRANS(@t{)ARG1NOTRANS(}))
 def(var)(1)(NOTRANS(@var{)ARG1NOTRANS(}))
 
 COMMENT(--- man page headers ---)
@@ -47,16 +46,26 @@ def(texinfo)(2)(\
   STDPAR()\
   NOTRANS(\input texinfo.tex)NL()\
   NOTRANS(@c %**start of header)NL()\
+  NOTRANS(@iftex)NL()\
+  NOTRANS(@afourpaper)NL()\
+  NOTRANS(@setchapternewpage off)NL()\
+  NOTRANS(@end iftex)NL()\
   NOTRANS(@setfilename )ARG1NL()\
   NOTRANS(@settitle )ARG2NL()\
   NOTRANS(@c %**end of header)NL()\
   NL()\
   NOTRANS(@ifinfo)NL()\
-  NOTRANS(@set dsq @'@')NL()\
+  NOTRANS(@set dsq '@:')NL()\
   NOTRANS(@end ifinfo)NL()\
   NOTRANS(@iftex)NL()\
   NOTRANS(@set dsq '{}')NL()\
   NOTRANS(@end iftex)NL()\
+  NOTRANS(@ifinfo)NL()\
+  NOTRANS(@dircategory Utilities)NL()\
+  NOTRANS(@direntry)NL()\
+  NOTRANS(     * ZSH: (zsh).                     The Z Shell Manual.)NL()\
+  NOTRANS(@end direntry)NL()\
+  NOTRANS(@end ifinfo)NL()\
 )
 
 def(texiifinfo)(1)(\
@@ -171,6 +180,7 @@ def(startlist)(0)(\
   startitem()\
 )
 def(endlist)(0)(\
+  NOTRANS(@item)NL()\
   enditem()\
 )
 def(list)(1)(\
@@ -201,8 +211,16 @@ def(nofill)(1)(\
   USECHARTABLE(standard)\
 )
 
-def(indent)(1)(\
+def(example)(1)(\
+  NOTRANS(@example)NL()\
   ARG1\
+  NL()NOTRANS(@end example)\
+)
+
+def(indent)(1)(\
+  NOTRANS(@quotation)NL()\
+  ARG1\
+  NL()NOTRANS(@end quotation)\
 )
 
 COMMENT(--- hyperlink menus ---)

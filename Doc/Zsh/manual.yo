@@ -28,10 +28,10 @@ menu(Parameters)
 menu(Options)
 menu(Shell Builtin Commands)
 menu(Zsh Line Editor)
-menu(Programmable Completion Using compctl)
+menu(Completion Using compctl)
 menu(Completion Widgets)
-menu(Zsh Modules)
 menu(Completion System)
+menu(Zsh Modules)
 menu(Zftp Function System)
 
  --- Indices ---
@@ -41,7 +41,7 @@ menu(Variables Index)
 menu(Options Index)
 menu(Functions Index)
 menu(Editor Functions Index)
-menu(Keystroke Index)
+menu(Style and Tag Index)
 
  --- The Detailed Node Listing ---
 
@@ -98,7 +98,7 @@ menu(Arguments)
 menu(Completion)
 menu(Miscellaneous)
 
-Programmable Completion Using compctl
+Completion Using compctl
 
 menu(Command Flags)
 menu(Option Flags)
@@ -113,23 +113,18 @@ menu(Builtin Commands)
 menu(Condition Codes)
 menu(Examples)
 
+Completion System
+
+menu(Initialization)
+menu(Completion System Configuration)
+menu(Control Functions)
+menu(Bindable Commands)
+menu(Completion Functions)
+menu(Completion Directories)
+
 Zsh Modules
 
-menu(The cap Module)
-menu(The clone Module)
-menu(The comp1 Module)
-menu(The compctl Module)
-menu(The complist Module)
-menu(The deltochar Module)
-menu(The example Module)
-menu(The files Module)
-menu(The mapfile Module)
-menu(The mathfunc Module)
-menu(The parameter Module)
-menu(The sched Module)
-menu(The stat Module)
-menu(The zftp Module)
-menu(The zle Module)
+includefile(Zsh/manmodmenu.yo)
 endmenu()
 texinode(The Z Shell Manual)(Introduction)(Top)(Top)
 chapter(The Z Shell Manual)

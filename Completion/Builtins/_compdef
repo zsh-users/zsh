@@ -1,22 +1,40 @@
 #compdef compdef
 
-local func base=2
+local state line expl list disp
 
-while [[ $words[base] = -* ]]; do
-  case $words[base] in
-    -d) delete=yes ;;
-    -p) type=pattern ;;
-    -k) type=key ;;
-  esac  
-  (( base++ ))
-done
+_arguments -C -s \
+  '(-d)-a[make function autoloadable]' \
+  '(-d -p -P)-n[leave existing definitions intact]' \
+  '(-a -n -p -P -k -K)-d[delete]:*:completed command:->ccom' \
+  '(-n -d -P -k -K)-p[completion for command matching pattern]:completion function:->cfun:pattern' \
+  '(-n -d -p -k -K)-P[as -p for commands without own completion]:completion function:->cfun:pattern' \
+  '(-d -p -P -K)-k[define widget and key binding]:completion function:->cfun:widget name::style:->style:*:key' \
+  '(-d -p -P -k)-K[define multiple widgets based on function]:completion function:->cfun:widget name::style:->style:*:key' \
+  '1:completion function:->cfun' \
+  '2:commands:_command_names'
+  
 
-if [ "$delete" ]; then
-  compadd ${(k)_comps}
-else
-  if [[ CURRENT -eq base  ]]; then
-    for func in ${^~fpath:/.}/_(|*[^~])(N:t); compadd -P_ - ${func#_}
-  else
-    compgen -c
-  fi
-fi
+case $state in
+  ccom)
+    _wanted commands expl 'completed command' compadd - ${(k)_comps}
+  ;;
+  cfun)
+    if _wanted functions; then
+      list=( ${^fpath:/.}/_(|*[^~])(N:t) )
+      if zstyle -T ":completion:${curcontext}:functions" prefix-hidden; then
+        disp=( ${list[@]#_} )
+        _all_labels functions expl 'completion function' \
+            compadd -d disp - "$list[@]"
+      else
+        _all_labels functions expl 'completion function' compadd - "$list[@]"
+      fi
+    fi
+  ;;
+  style)
+    _wanted widgetstyle expl 'widget style' \
+        compadd -M 'r:|-=* r:|=*' \
+            complete-word delete-char-or-list expand-or-complete \
+            expand-or-complete-prefix list-choices menu-complete \
+            menu-expand-or-complete reverse-menu-complete
+  ;;
+esac

@@ -8,7 +8,7 @@ xdpyinfo)
   ;;
 xwininfo)
   _x_arguments \
-    -{help,int,stats,bits,events,size,wm,shape,frame,all,english,metric} \
+    -{help,int,children,tree,stats,bits,events,size,wm,shape,frame,all,english,metric} \
     '(-id -name)-root' \
     '(-id -root)-name:name: _x_window -n' \
     '(-name -root)-id:id: _x_window'
@@ -46,12 +46,33 @@ xev)
     '-rv'
   ;;
 xhost)
-  local expl type ret=1
+  local expl type ret=1 tmp
 
   if compset -P '-'; then
-    _description expl 'disallow access'
-    compadd "$expl[@]" -M 'm:{a-z}={A-Z} r:|[:.]=* r:|=*' - \
-        "${${(@M)${(@f)$(xhost)}[2,-1]:#LOCAL:*}#INET:}"
+    tmp=(${(f)"$(xhost)"})
+    shift tmp
+    tmp=(${tmp:#LOCAL:|<*>})
+    if [[ "$tmp" = *:* ]]; then
+      if compset -P '(#b)(*):'; then
+	type="$match[1]"
+	_wanted displays &&
+            while _next_label displays expl 'disallow access'; do
+	      { compadd "$expl[@]" -M 'm:{a-z}={A-Z} r:|[:.]=* r:|=*' - \
+		        ${${(M)tmp:#(#i)$type:*}#(#i)$type:} ||
+	            _hosts "$expl[@]" } && return 0
+	    done
+      else
+	_alternative \
+	    'types:name family:compadd -S: ${(L)tmp%%:*}' \
+	    'hosts:host:compadd ${(@)tmp#*:}' && ret=0
+      fi
+    else
+      _wanted displays &&
+          while _next_label displays expl 'disallow access'; do
+	    { compadd "$expl[@]" -M 'm:{a-z}={A-Z} r:|[:.]=* r:|=*' - $tmp ||
+              _hosts "$expl[@]" } && return 0
+          done
+    fi
   else
     compset -P +
 
@@ -66,9 +87,9 @@ xhost)
       krb)  _message 'Kerberos V5 principal';;
       esac
     else
-      _description expl 'name family'
-      compadd -S: - inet dnet nis krb && ret=0
-      _hosts && ret=0
+      _alternative \
+          'types:name family:compadd -S: - inet dnet nis krb' \
+	  'hosts:: _hosts' && ret=0
     fi
     return ret
   fi
@@ -120,7 +141,7 @@ xrdb)
     '(-global -all -screens)-screen' \
     '(-global -all -screen)-screens' \
     '-n[only display on stdout]' \
-    '(-nocpp)-cpp:preprocessor program:_files -g \*\(\*\)' \
+    '(-nocpp)-cpp:preprocessor program:_files -g \*\(-\*\)' \
     '(-cpp)-nocpp' \
     '(-load -override -merge -remove)-query' \
     '(-query -override -merge -remove)-load' \
@@ -131,6 +152,7 @@ xrdb)
     '-backup:backup extension:' \
     '*-D-:symbol to define:' \
     '*-U-:symbol to undefine:' \
-    '*-I-:include directory:_files -/'
+    '*-I-:include directory:_files -/' \
+    '*:defaults file:_files'
   ;;
 esac

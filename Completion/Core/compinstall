@@ -1,72 +1,149 @@
-# This script is to be run by a user to setup the new function based
+# This script is to be run by a user to set up the new function based
 # completion system.  The functions themselves are assumed to be already
 # available in some directory; they should have been installed with the
-# the shell (except we haven't written that yet).
+# the shell.  If they have been, the commands `autoload -U compinit; compinit'
+# in the shell startup file should be enough, although you can run
+# compinstall for more configuration choices.
 #
-# Run it as a script under zsh and answer the questions.
-# You can run it as `zsh compinstall $FPATH' and it will be able to check
-# your function path for the completion functions.
-#
-# Normally, this will alter ~/.zshrc (or wherever ZDOTDIR puts it),
-# but you can make that unwritable and it will leave the lines in a
-# temporary file instead.
-#
-# You can use this script to modify what compinstall previously
-# added to ~/.zshrc.
+# Simply run this script as a function and answer the questions.
+# Normally it will alter ~/.zshrc (or wherever ZDOTDIR puts it), but you
+# can make that unwritable and it will leave the lines in a temporary file
+# instead.  It doesn't matter if .zshrc didn't exist before.  If your
+# .zshrc usually exits before the end, then you should take the code added
+# by compinstall and put it (including the comment lines at the start and
+# end) at the point you want it to be executed.  If you run compinstall
+# again it will find and replace those lines, so you can use this script to
+# modify what compinstall previously added to ~/.zshrc.
 #
 # It is safe to abort with ^C any time you are being prompted for
 # information; your .zshrc will not be altered.
 #
 # To do:
-#  - Maybe this should be sourced, then it can check the user's current
-#    setup better.  But then there is a potentially horrendous option
-#    setting/resetting problem.  (Maybe we need another way of doing that.)
 #  - Should probably offer to set different options for _approximate than
 #    for _complete if both are used.
 #  - Could add code for setting other completers and options.
 #  - Could add keys for context-sensitive help.
-#  - Probably should allow a set of directories to be added to $fpath,
-#    like Core, Base, etc.
 
-# In case a startup script changed options
-emulate zsh
 
-[[ -n $1 ]] && FPATH=$1
+emulate -L zsh
 
-for f in $fpath; do
-  if [[ $f != . && -f $f/compinit && -f $f/compdump ]]; then
-    fdir=$f
-    break
-  fi
-done
+typeset _ci_options _ci_f _ci_fdir _ci_files _ci_dumpfile _ci_lines
+typeset _ci_type _ci_completer _ci_accept _ci_cprompt _ci_startline
+typeset _ci_endline _ci_ifile _ci_tmpf _ci_compstyle _ci_warn
+typeset _ci_dtype _ci_existing _ci_line _ci_end
 
-if [[ -z $fdir ]]; then
-  print "Trying to find where the completion functions are..."
-  if [[ $0 = */* && -f $0:h/compinit && -f $0:h/compdump ]]; then
-    fdir=$0:h
-  else
-    # more guesses?
-    print \
+# Look for the defaults.
+_ci_startline='# The following lines were added by compinstall'
+_ci_endline='# End of lines added by compinstall'
+
+_ci_ifile=${ZDOTDIR:-~}/.zshrc
+_ci_lines=''
+_ci_existing=''
+
+typeset -A _ci_defaults
+
+if [[ -f $_ci_ifile ]]; then
+  # This assumes the lines haven't been altered by the user too much
+  # after they were added.
+  _ci_compstyle=0
+  sed -n "/^$_ci_startline/,/^$_ci_endline/p" $_ci_ifile |
+  while read -rA _ci_line; do
+    if (( $_ci_compstyle )); then
+      # parse a compstyle component as first argument
+      if [[ $_ci_line[-1] != \\ ]]; then
+	_ci_end=-1
+	_ci_compstyle=0
+      else
+	_ci_end=-2
+      fi
+      if [[ $_ci_line[1] = *=* ]]; then
+	_ci_f="${${_ci_line[1,$_ci_end]}#*=}"
+	if [[ $_ci_f = \'*\' ]]; then
+	  # strip quotes
+	  _ci_f=${_ci_f[2,-2]//\'\\\'\'/\'}
+	fi
+	_ci_defaults[${_ci_line[1]%%\=*}]=$_ci_f
+      fi
+      _ci_existing="${_ci_existing}  $_ci_line
+"
+    elif [[ $_ci_line[1] = compinit ]]; then
+      # parse the line running compinit
+      [[ $_ci_line[2] = -f ]]  && _ci_fdir=$_ci_line[3]
+      [[ $_ci_line[-2] = -d ]] && _ci_dumpfile=$_ci_line[-1]
+    elif [[ $_ci_line[1] = _compdir=* ]]; then
+      _ci_fdir=${_ci_line[1]##_compdir=}
+    elif [[ $_ci_line[1] = compstyle ]]; then
+      # parse a compstyle component as second argument (should be completer)
+      [[ $_ci_line[3] = completer ]] &&
+        _ci_completer=${_ci_line[3,-1]}
+      [[ $_ci_line[-1] == \\ ]] && _ci_compstyle=1
+      _ci_existing="${_ci_existing}$_ci_line
+"
+    elif [[ $_ci_line[1] != \#* && $_ci_line[1] != (autoload|\[\[) ]]; then
+      if [[ -z $_ci_warn ]]; then
+	_ci_warn=1
+	print "Warning:  existing lines in compinstall setup not understood:"
+      fi
+      print - $_ci_line
+      _ci_existing="${_ci_existing}$_ci_line
+"
+    fi
+  done
+fi
+
+
+# Find out where the completion functions are kept.
+
+if [[ -z $_ci_fdir || ! -f ${~_ci_fdir}/compinit ||
+  ! -f ${~_ci_fdir}/compdump ]]; then
+  for _ci_f in $fpath; do
+    if [[ $_ci_f != . && -f $_ci_f/compinit && -f $_ci_f/compdump ]]; then
+      _ci_fdir=$_ci_f
+      break
+    elif [[ $_ci_f != . && -f $_ci_f/Core/compinit &&
+      -f $_ci_f/Core/compdump ]]
+    then
+      _ci_fdir=$_ci_f/Core
+      break
+    fi
+  done
+fi
+
+if [[ -z $_ci_fdir || ! -d ${~_ci_fdir} ]]; then
+  print \
 "Please edit the name of the directory where the completion functions are
 installed.  If they are not installed, you will need to find them in the
 Completion/* directories of the zsh distribution and install them yourself,
 or insult your system manager for incompetence."
-    vared -c fdir
-    while [[ ! -d ${~fdir} || ! -f ${~fdir}/compinit || 
-      ! -f ${~fdir}/compdump ]]; do
-      print "I can't find them in that directory.  Try again or abort."
-      vared fdir
-    done
+  vared -c _ci_fdir
+  while [[ ! -d ${~_ci_fdir} || 
+    ((! -f ${~_ci_fdir}/compinit || ! -f ${~_ci_fdir}/compdump) &&
+    (! -f ${~_ci_fdir}/Core/compinit || ! -f ${~_ci_fdir}/Core/compdump)) ]]
+  do
+    print "I can't find them in that directory.  Try again or abort."
+    vared _ci_fdir
+  done
+  if [[ -f ${~_ci_fdir}/Core/compinit && ! -f ${~_ci_fdir}/compinit ]]; then
+    _ci_fdir=$_ci_fdir/Core
   fi
-  eval "fpath=($fdir \$fpath)"
-  fdir=${fdir/#$HOME/\~}
-  lines="fpath=($fdir \$fpath)\n"
 else
-  print "Found completion functions in your fpath, will not alter it."
+  print "Keeping existing completion directiory $_ci_fdir"
 fi
 
-files=( ${^~fpath:/.}/_(|*[^~])(N:t) )
-if [[ $#files -lt 20 ]]; then
+if [[ ${~_ci_fdir} != /* ]]; then
+  _ci_fdir=$(cd $_ci_fdir;builtin pwd)
+fi
+
+# Check if this is in fpath already, else put it there (with ~'s expanded).
+_ci_f=${~_ci_fdir}
+[[ -z ${fpath[(r)$_ci_f]} ]] && fpath=($fpath $_ci_f)
+
+# Contract $HOME to ~ in the parameter to be used for writing.
+_ci_fdir=${_ci_fdir/#$HOME/\~}
+
+# Now check the fpath, ignoring the directory .
+_ci_files=( ${^~fpath:/.}/_(|*[^~])(N:t) )
+if [[ $#_ci_files -lt 20 ]]; then
   print "
 Hmmm, completion functions seem a bit thin on the ground.  There should
 be lots of files with names beginning with an underscore (_).  You should
@@ -75,12 +152,20 @@ look and see what's happened to these.
   read
 fi
 
-if [[ -w ${~fdir} && ( ! -f ${~fdir}/compinit.dump ||
-  -w ${~fdir}/compinit.dump ) ]]
+
+# Set up the dumpfile
+_ci_dtype=existing
+if [[ -z $_ci_dumpfile ]]; then
+  _ci_dumpfile="${ZDOTDIR:-$HOME}/.zcompdump"
+  _ci_dtype=standard
+fi
+
+if [[ -w ${~_ci_dumpfile:h} && ( ! -f ${~_ci_dumpfile} ||
+  -w ${~_ci_dumpfile} ) ]]
 then
   print "
-Using standard dumpfile
-  ${~fdir}/compinit.dump
+Using $_ci_dtype dumpfile
+  ${_ci_dumpfile}
 to speed up initialisation.
 [Hit return to continue]"
   read
@@ -88,23 +173,32 @@ else
   print "
 I will force completion to dump its status, which will speed up the shell's
 start-up considerably.  However, I can't write the file I'd like to, namely
-$fdir/compinit.dump.  Please edit a replacement."
-  dumpfile='~/.compinit.dump'
-  vared dumpfile
-  while ! touch ${~dumpfile} >& /dev/null; do
+${_ci_dumpfile}.  Please edit a replacement."
+  vared _ci_dumpfile
+  while ! touch ${~_ci_dumpfile} >& /dev/null; do
     print "Sorry, I can't write that either.  Try again."
-    vared dumpfile
+    vared _ci_dumpfile
   done
-  [[ -s $dumpfile ]] || rm -f $dumpfile
-  dumpfile=" $dumpfile"
+  [[ -s $_ci_dumpfile ]] || rm -f $_ci_dumpfile
 fi
 
-fdir=${fdir/#$HOME/\~}
-
-lines="${lines}. $fdir/compinit -d$dumpfile\n"
+_ci_lines="${_ci_lines}_compdir=$_ci_fdir
+[[ -z \$fpath[(r)\$_compdir] ]] && fpath=(\$fpath \$_compdir)
+autoload -U compinit
+compinit"
+[[ $_ci_dtype != standard ]] && _ci_lines="${_ci_lines} $_ci_dumpfile"
+_ci_lines="${_ci_lines}
+"
 
 
 print "
+Would you like to set some more advanced options?  Otherwise, you
+can re-run compinstall later to set these. [n]"
+
+# The whole of the next part should be indented, but I can't be bothered.
+if read -q; then
+
+ print "
 In addition to completion, zsh can also perform correction of the
 current word, or approximate completion, i.e. completion where the part of
 the word typed so far can be corrected; or it can try correction, then
@@ -112,105 +206,156 @@ approximate completion if that fails.  Would you like:
   0:  Just ordinary completion
   C:  Correction
   A:  Approximate completion
-  B:  Both?
-Please type one of the keys above:"
-while read -k type; do
-  print
-  case $type in
-    0*) completer=_complete
-	break
-	;;
-    [cC]*) completer=_complete:_correct
-	   break
-	   ;;
-    [aA]*) completer=_complete:_approximate
-	   break;
-	   ;;
-    [bB]*) completer=_complete:_correct:_approximate
-	   break
-	   ;;
-    *) print Try again
-       ;;
-  esac
-done
+  B:  Both"
+  if [[ -n $_ci_completer ]]; then
+    print "  Default: use the current completers:\n$_ci_completer"
+  else
+    print "Please type one of the keys above."
+  fi
+  while read -k _ci_type; do
+    print
+    case $_ci_type in
+      0*) _ci_completer=_complete
+	  break
+	  ;;
+      [cC]*) _ci_completer='_complete _correct'
+	     break
+	     ;;
+      [aA]*) _ci_completer='_complete _approximate'
+	     break;
+	     ;;
+      [bB]*) _ci_completer='_complete _correct _approximate'
+	     break
+	     ;;
+      *) [[ -n $_ci_completer ]] && break
+	 print Try again
+	 ;;
+    esac
+  done
 
-lines="${lines}compconf completer=$completer"
+  _ci_lines="${_ci_lines}zstyle ':completion*' completer $_ci_completer"
 
 
-if [[ $completer = *(correct|approx)* ]]; then
-  print "
-Correction and approximation will normally allow up to two errors,
-and you will be able to use a numeric prefix (e.g. <Esc>4) to allow
-more.  The standard prompt is \`correct to:'. Do you want to change
-any of this? [n]"
-  if read -q; then
-    print "Number of errors to accept normally (0 is OK):"
-    read accept
-    while [[ $accept != <-> ]]; do
-      read accept"?Please enter a number: "
-    done
-    print \
+  if [[ $_ci_completer = *(correct|approx)* ]]; then
+    _ci_accept=${_ci_defaults[correct_accept]}
+    _ci_cprompt=${_ci_defaults[correct_prompt]}
+    print "
+Correction and approximation will allow up to ${${_ci_accept:-2}%%[^0-9]*} \
+errors. "
+    case $_ci_accept in
+      *n*!*|*!*n) print "A numeric prefix, if not 1, will cause correction \
+not to be done."
+		  ;;
+      *n*) print "A numeric prefix gives the maximum number of errors which \
+will be accepted."
+           ;;
+      *) print "The numeric prefix will not be used."
+    esac
+print "The correction prompt is \`${_ci_cprompt:-correct to:}'.
+Do you want to change any of this? [n]"
+    if read -q; then
+      print "Number of errors to accept normally (0 is OK):"
+      _ci_accept=${_ci_accept%%[^0-9]*}
+      vared _ci_accept
+      while [[ $_ci_accept != <-> ]]; do
+	print "Please enter a number:"
+	vared _ci_accept
+      done
+      print \
 "How would you like the numeric prefix to be treated:
   0:  Not used by correction
-  U:  Used to given the number of errors
+  U:  The number gives the largest number of errors which will be
+      accepted when correcting
   I:  If present, and not 1, do not perform correction?
 Please type one of the keys above:"
-    while read -k type; do
-      print
-      case $type in
-	0*) break
-	    ;;
-	[uU]*) accept="${accept}n"
-	       break
-	       ;;
-	[Ii]*) accept="${accept}!n"
-	       break
-	       ;;
-	*) print Try again
-	   ;;
-      esac
-    done
-    lines="$lines \\\\
-  correct_accept='$accept'"
-    print "
+      while read -k _ci_type; do
+	print
+	case $_ci_type in
+	  0*) break
+	      ;;
+	  [uU]*) _ci_accept="${_ci_accept}n"
+		 break
+		 ;;
+	  [Ii]*) _ci_accept="${_ci_accept}!n"
+		 break
+		 ;;
+	  *) print Try again
+	     ;;
+	esac
+      done
+      print "
 Instead of the prompt \`correct to:', you can have no prompt, or a
 prompt of your choosing which can display the number of errors found by
 containing the string \`%e'.  Do you wish to change the correction
 prompt? [n]"
-    if read -q; then
-      cprompt=''
-      print "Edit a new prompt (may be empty):"
-      vared cprompt
-      lines="$lines \\\\
-  correct_prompt='${cprompt//\'/\'\\\'\'}'"
+      if read -q; then
+	print "Edit a new prompt (may be empty):"
+	vared _ci_cprompt
+	[[ -z $_ci_cprompt ]] && _ci_cprompt=':empty:'
+      fi
+    fi
+    if [[ -n $_ci_accept ]]; then
+      _ci_lines="$_ci_lines \\
+  correct_accept='$_ci_accept'"
+      unset '_ci_defaults[correct_accept]'
+    fi
+    if [[ -n $_ci_cprompt ]]; then
+      _ci_cprompt=${_ci_cprompt##:empty:}
+      _ci_lines="$_ci_lines \\
+  correct_prompt='${_ci_cprompt//\'/\'\\\'\'}'"
+      unset '_ci_defaults[correct_prompt]'
     fi
   fi
-fi
 
-lines="$lines\n"
+  _ci_warn=''
+  for _ci_f in ${(k)_ci_defaults}; do
+    if [[ -z $_ci_warn ]]; then
+      print "
+(Keeping other existing configuration settings...)"
+      _ci_warn=1
+    fi
+    _ci_lines="$_ci_lines \\
+  ${_ci_f}='${_ci_defaults[$_ci_f]//\'/\'\\\'\'}'"
+  done
 
+  _ci_lines="$_ci_lines
+"
 
-startline='# The following lines were added by compinstall'
-endline='# End of lines added by compinstall'
-
-ifile=${ZDOTDIR:-~}/.zshrc
-[[ -f $ifile ]] || touch $ifile
-tmpf=${TMPPPREFIX:-/tmp/zsh}compinstall$$
-
-if [[ ! -w $ifile ]]; then
-  print "\nI can't write to $ifile.  I will leave the lines to add in
-\`$tmpf' and you must add them by hand."
-  print "\n$startline\n$lines\n$endline" >$tmpf
-  return 0
-fi
-
-if grep $endline $ifile >& /dev/null; then
-  print -- "$startline\n$lines$endline" >$tmpf
-  sed -e "/^$endline/r $tmpf
-/^$startline/,/^$endline/d" $ifile >${tmpf}2 && mv ${tmpf}2 $ifile &&
-  print "\nSuccesfully modified old compinstall lines in $ifile."
-  rm -f $tmpf ${tmpf}2
 else
-  print "\n$startline\n$lines\n$endline" >>$ifile &&
-  print "\nSuccessfully appended lines to $ifile."
+
+  if [[ -n $_ci_existing ]]; then
+    print -nr "
+I will retain the following lines from the existing completion setup:
+$_ci_existing"
+    _ci_lines="$_ci_lines${_ci_existing}"
+  fi
+
+fi				# End of advanced options
+
+
+[[ -f $_ci_ifile ]] || touch $_ci_ifile
+_ci_tmpf=${TMPPPREFIX:-/tmp/zsh}compinstall$$
+
+if [[ ! -w $_ci_ifile ]]; then
+  print "\nI can't write to $_ci_ifile.  I will leave the lines to add in
+\`$_ci_tmpf' and you must add them by hand."
+  print -r - "$_ci_startline
+$_ci_lines$_ci_endline" >$_ci_tmpf
+elif grep $_ci_endline $_ci_ifile >& /dev/null; then
+  print -r - "$_ci_startline
+$_ci_lines$_ci_endline" >$_ci_tmpf
+  sed -e "/^$_ci_endline/r $_ci_tmpf
+/^$_ci_startline/,/^$_ci_endline/d" $_ci_ifile >${_ci_tmpf}2 && 
+  mv ${_ci_tmpf}2 $_ci_ifile &&
+  print "\nSuccesfully modified old compinstall lines in $_ci_ifile."
+  rm -f $_ci_tmpf ${_ci_tmpf}2
+else
+  print -r - "$_ci_startline
+$_ci_lines$_ci_endline" >>$_ci_ifile &&
+  print "\nSuccessfully appended lines to $_ci_ifile."
 fi
+
+unfunction compinstall
+autoload -U compinstall
+
+return 0

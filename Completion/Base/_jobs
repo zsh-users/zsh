@@ -1,27 +1,85 @@
 #autoload
 
-local expl disp jobs job jids
+local expl disp jobs job jids pfx='%' desc how expls
+
+_wanted jobs || return 1
+
+if [[ "$1" = -t ]]; then
+  zstyle -T ":completion:${curcontext}:jobs" prefix-needed &&
+      [[ "$PREFIX" != %* && compstate[nmatches] -ne 0 ]] && return 1
+  shift
+fi
+zstyle -t ":completion:${curcontext}:jobs" prefix-hidden && pfx=''
+zstyle -T ":completion:${curcontext}:jobs" verbose       && desc=yes
 
 if [[ "$1" = -r ]]; then
   jids=( "${(@k)jobstates[(R)running*]}" )
   shift
-  _description expl 'running job'
+  expls='running job'
 elif [[ "$1" = -s ]]; then
   jids=( "${(@k)jobstates[(R)running*]}" )
   shift
-  _description expl 'suspended job'
+  expls='suspended job'
 else
   [[ "$1" = - ]] && shift
   jids=( "${(@k)jobtexts}" )
-  _description expl job
+  expls=job
 fi
 
-disp=()
-jobs=()
-for job in "$jids[@]"; do
-  disp=( "$disp[@]" "${(l:3:: ::%:)job} -- ${jobtexts[$job]}" )
-  jobs=( "$jobs[@]" "$job" )
-done
+if [[ -n "$desc" ]]; then
+  disp=()
+  for job in "$jids[@]"; do
+    [[ -n "$desc" ]] &&
+        disp=( "$disp[@]" "${pfx}${(r:2:: :)job} -- ${(r:COLUMNS-8:: :)jobtexts[$job]}" )
+  done
+fi
 
-compadd "$@" "$expl[@]" -ld disp - "%$^jobs[@]"
+zstyle -s ":completion:${curcontext}:jobs" numbers how
 
+if [[ "$how" = (yes|true|on|1) ]]; then
+  jobs=( "$jids[@]" )
+else
+  local texts i text str tmp num max=0
+
+  # Find shortest unambiguous strings.
+
+  texts=( "$jobtexts[@]" )
+  jobs=()
+  for i in "$jids[@]"; do
+    text="$jobtexts[$i]"
+    str="${text%% *}"
+    if [[ "$text" = *\ * ]]; then
+      text="${text#* }"
+    else
+      text=""
+    fi
+    tmp=( "${(@M)texts:#${str}*}" )
+    num=1
+    while [[ -n "$text" && $#tmp -ge 2 ]]; do
+      str="${str} ${text%% *}"
+      if [[ "$text" = *\ * ]]; then
+        text="${text#* }"
+      else
+        text=""
+      fi
+      tmp=( "${(@M)texts:#${str}*}" )
+      (( num++ ))
+    done
+
+    [[ num -gt max ]] && max="$num"
+
+    jobs=( "$jobs[@]" "$str" )
+  done
+
+  if [[ "$how" = [0-9]## && max -gt how ]]; then
+    jobs=( "$jids[@]" )
+  else
+    [[ -z "$pfx" && -n "$desc" ]] && disp=( "${(@)disp#%}" )
+  fi
+fi
+
+if [[ -n "$desc" ]]; then
+  _all_labels jobs expl "$expls" compadd "$@" -ld disp - "%$^jobs[@]"
+else
+  _all_labels jobs expl "$expls" compadd "$@" - "%$^jobs[@]"
+fi

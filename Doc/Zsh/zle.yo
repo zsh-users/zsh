@@ -1,12 +1,13 @@
-texinode(Zsh Line Editor)(Programmable Completion)(Shell Builtin Commands)(Top)
+texinode(Zsh Line Editor)(Completion Using compctl)(Shell Builtin Commands)(Top)
 chapter(Zsh Line Editor)
 cindex(line editor)
 cindex(editor, line)
+cindex(ZLE)
 sect(Description)
 pindex(ZLE, use of)
-If the tt(ZLE) option is set (it is by default)
+If the tt(ZLE) option is set (which it is by default in interactive shells)
 and the shell input is attached to the terminal, the user
-is allowed to edit command lines.
+is able to edit command lines.
 
 There are two display modes.  The first, multiline mode, is the
 default.  It only works if the tt(TERM) parameter is set to a valid
@@ -67,7 +68,8 @@ that is bound to some command and is also a prefix of a longer bound string.
 In this case ZLE will wait a certain time to see if more characters
 are typed, and if not (or they don't match any longer string) it will
 execute the binding.  This timeout is defined by the tt(KEYTIMEOUT) parameter;
-its default is 0.4 sec.  No timeout is done if the prefix string is not bound.
+its default is 0.4 sec.  There is no timeout if the prefix string is not
+itself bound to a command.
 
 As well as ZLE commands, key sequences can be bound to other strings, by using
 `tt(bindkey -s)'.
@@ -83,7 +85,7 @@ simply to perform some small action.  The ZLE commands that key sequences
 in keymaps are bound to are in fact widgets.  Widgets can be user-defined
 or built in.
 
-There are 162 standard widgets built in to ZLE (see sectref(Standard Widgets)).
+The standard widgets built in to ZLE are listed in Standard Widgets below.
 Other built-in widgets can be defined by other modules (see
 ifzman(zmanref(zshmodules))\
 ifnzman(noderef(Zsh Modules))\
@@ -102,7 +104,8 @@ cindex(widgets, user-defined)
 User-defined widgets, being implemented as shell functions,
 can execute any normal shell command.  They can also run other widgets
 (whether built-in or user-defined) using the tt(zle) builtin command.
-Finally, they can examine and edit the ZLE buffer being edited by
+They can use tt(read -k) or tt(read -q) to read characters from standard
+input.  Finally, they can examine and edit the ZLE buffer being edited by
 reading and setting the special parameters described below.
 
 cindex(parameters, editor)
@@ -112,6 +115,9 @@ are not in any way special outside ZLE.  If they have some normal value
 outside ZLE, that value is temporarily inaccessible, but will return
 when the widget function exits.  These special parameters in fact have
 local scope, like parameters created in a function using tt(local).
+
+Inside completion widgets and traps called while ZLE is active, these
+parameters are available read-only.
 
 startitem()
 vindex(BUFFER)
@@ -127,6 +133,10 @@ The offset of the cursor, within the edit buffer.  This is in the range
 Attempts to move the cursor outside the buffer will result in the
 cursor being moved to the appropriate end of the buffer.
 )
+vindex(MARK)
+item(tt(MARK) (integer))(
+Like tt(CURSOR), but for the mark.
+)
 vindex(LBUFFER)
 item(tt(LBUFFER) (scalar))(
 The part of the buffer that lies to the left of the cursor position.
@@ -138,6 +148,42 @@ item(tt(RBUFFER) (scalar))(
 The part of the buffer that lies to the right of the cursor position.
 If it is assigned to, only that part of the buffer is replaced, and the
 cursor remains between the old tt($LBUFFER) and the new tt($RBUFFER).
+)
+vindex(BUFFERLINES)
+item(tt(BUFFERLINES))(
+The number of screen lines needed for the edit buffer currently
+displayed on screen (i.e. without any changes to the preceding
+parameters done after the last redisplay).
+)
+vindex(PREBUFFER)
+item(tt(PREBUFFER) (scalar))(
+In a multi-line input at the secondary prompt, this read-only parameter
+contains the contents of the lines before the one the cursor is
+currently in.
+)
+vindex(WIDGET)
+item(tt(WIDGET) (scalar))(
+The name of the widget currently being executed.
+)
+vindex(LASTWIDGET)
+item(tt(LASTWIDGET) (scalar))(
+The name of the last widget that was executed.
+)
+vindex(KEYS)
+item(tt(KEYS) (scalar))(
+The keys typed to invoke this widget, as a literal string.
+)
+vindex(NUMERIC)
+item(tt(NUMERIC) (integer))(
+The numeric argument. If no numeric argument was given, this parameter
+is unset. When this is set inside a widget function, builtin widgets
+called with the tt(zle) builtin command will use the value
+assigned. If it is unset inside a widget function, builtin widgets
+called behave as if no numeric argument was given.
+)
+vindex(HISTNO)
+item(tt(HISTNO) (integer))(
+The current history number.
 )
 enditem()
 sect(Standard Widgets)
@@ -317,6 +363,10 @@ item(tt(down-line-or-search))(
 Move down a line in the buffer, or if already at the bottom line,
 search forward in the history for a line beginning with the first
 word in the buffer.
+
+If called from a function by the tt(zle) command with arguments, the first
+argument is taken as the string for which to search, rather than the
+first word in the buffer.
 )
 tindex(down-history)
 item(tt(down-history) (unbound) (^N) (unbound))(
@@ -385,6 +435,17 @@ search, leaving the last found line in the buffer. Any single character that
 is not bound to one of the above functions, or tt(self-insert) or
 tt(self-insert-unmeta), will have the same effect but the function will be
 executed.
+
+When called from a widget function by the tt(zle) command, the incremental
+search commands can take a string argument.  This will be treated as a
+string of keys, as for arguments to the tt(bindkey) command, and used as
+initial input for the command.  Any characters in the string which are
+unused by the incremental search will be silently ignored.  For example,
+
+example(zle history-incremental-search-backward forceps)
+
+will search backwards for tt(forceps), leaving the minibuffer containing
+the string `tt(forceps)'.
 )
 tindex(history-incremental-search-forward)
 item(tt(history-incremental-search-forward) (^S ^Xs) (unbound) (unbound))(
@@ -398,6 +459,10 @@ tindex(history-search-backward)
 item(tt(history-search-backward) (ESC-P ESC-p) (unbound) (unbound))(
 Search backward in the history for a line beginning with the first
 word in the buffer.
+
+If called from a function by the tt(zle) command with arguments, the first
+argument is taken as the string for which to search, rather than the
+first word in the buffer.
 )
 tindex(vi-history-search-backward)
 item(tt(vi-history-search-backward) (unbound) (/) (unbound))(
@@ -425,18 +490,27 @@ tt(magic-space) is treated as a space.
 Any other character that is not bound to self-insert or
 self-insert-unmeta will beep and be ignored. If the function is called from vi
 command mode, the bindings of the current insert mode will be used.
+
+If called from a function by the tt(zle) command with arguments, the first
+argument is taken as the string for which to search, rather than the
+first word in the buffer.
 )
 tindex(history-search-forward)
 item(tt(history-search-forward) (ESC-N ESC-n) (unbound) (unbound))(
 Search forward in the history for a line beginning with the first
 word in the buffer.
+
+If called from a function by the tt(zle) command with arguments, the first
+argument is taken as the string for which to search, rather than the
+first word in the buffer.
 )
 tindex(vi-history-search-forward)
 item(tt(vi-history-search-forward) (unbound) (?) (unbound))(
 Search forward in the history for a specified string.
 The string may begin with `tt(^)' to anchor the search to the
 beginning of the line. The functions available in the mini-buffer are the same
-as for tt(vi-history-search-backward).
+as for tt(vi-history-search-backward).  Argument handling is also the same
+as for that command.
 )
 tindex(infer-next-history)
 item(tt(infer-next-history) (^X^N) (unbound) (unbound))(
@@ -449,7 +523,10 @@ Insert the last word from the previous history event at the
 cursor position.  If a positive numeric argument is given,
 insert that word from the end of the previous history event.
 If the argument is zero or negative insert that word from the
-left (zero inserts the previous command word).
+left (zero inserts the previous command word).  Repeating this command
+replaces the word just inserted with the last word from the
+history event prior to the one just used; numeric arguments can be used in
+the same way to pick a word from that event.
 )
 tindex(vi-repeat-search)
 item(tt(vi-repeat-search) (unbound) (n) (unbound))(
@@ -474,6 +551,10 @@ tindex(up-line-or-search)
 item(tt(up-line-or-search))(
 Move up a line in the buffer, or if already at the top line,
 search backward in the history for a line beginning with the
+first word in the buffer.
+
+If called from a function by the tt(zle) command with arguments, the first
+argument is taken as the string for which to search, rather than the
 first word in the buffer.
 )
 tindex(up-history)
@@ -771,7 +852,11 @@ startitem()
 tindex(digit-argument)
 item(tt(digit-argument) (ESC-0..ESC-9) (1-9) (unbound))(
 Start a new numeric argument, or add to the current one.
-See also tt(vi-digit-or-beginning-of-line).
+See also tt(vi-digit-or-beginning-of-line).  This only works if bound to a
+key sequence ending in a decimal digit.
+
+Inside a widget function, a call to this function treats the last key of
+the key sequence which called the widget as the digit.
 )
 tindex(neg-argument)
 item(tt(neg-argument) (ESC--) (unbound) (unbound))(
@@ -786,6 +871,10 @@ repeated using this command.  For example, if this command occurs
 twice, followed immediately by tt(forward-char), move forward sixteen
 spaces; if instead it is followed by tt(-2), then tt(forward-char),
 move backward two spaces.
+
+Inside a widget function, if passed an argument, i.e. `tt(zle
+universal-argument) var(num)', the numerical argument will be set to
+var(num); this is equivalent to `tt(NUMERIC=)var(num)'.
 )
 enditem()
 texinode(Completion)(Miscellaneous)(Arguments)(Zsh Line Editor)
@@ -857,6 +946,11 @@ Perform menu completion, like tt(menu-complete), except that if
 a menu completion is already in progress, move to the em(previous)
 completion rather than the next.
 )
+tindex(end-of-list)
+item(tt(end-of-list))(
+When a previous completion displayed a list below the prompt, this
+widget can be used to move the prompt below the list.
+)
 enditem()
 texinode(Miscellaneous)()(Completion)(Zsh Line Editor)
 subsect(Miscellaneous)
@@ -881,6 +975,10 @@ tindex(accept-line-and-down-history)
 item(tt(accept-line-and-down-history) (^O) (unbound) (unbound))(
 Execute the current line, and push the next history
 event on the the buffer stack.
+)
+tindex(beep)
+item(tt(beep))(
+Beep, unless the tt(BEEP) option is unset.
 )
 tindex(vi-cmd-mode)
 item(tt(vi-cmd-mode) (^X^V) (unbound) (^[))(

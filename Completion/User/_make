@@ -1,3 +1,32 @@
-#defcomp make gmake pmake
+#compdef make gmake pmake
 
-complist -s "\$(awk '/^[a-zA-Z0-9][^/ 	]+:/ {print \$1}' FS=: [mM]akefile)"
+local prev="$words[CURRENT-1]" file expl tmp
+
+if [[ "$prev" = -[CI] ]]; then
+  _files -/
+elif [[ "$prev" = -[foW] ]]; then
+  _files
+else
+  file="$words[(I)-f]"
+  if (( file )); then
+    file="$words[file+1]"
+  elif [[ -e Makefile ]]; then
+    file=Makefile
+  elif [[ -e makefile ]]; then
+    file=makefile
+  else
+    file=''
+  fi
+
+  if [[ -n "$file" ]] && _wanted targets; then
+    tmp=(
+          $(awk '/^[a-zA-Z0-9][^\/ \t]+:/ {print $1}
+ 	      /^\.include  *<bsd\.port\.(subdir\.|pre\.)?mk>/ || /^\.include  *".*mk\/bsd\.pkg\.(subdir\.)?mk"/ {
+ 	        print "fetch fetch-list extract patch configure build install reinstall deinstall package describe checkpatch checksum makesum" }' \
+ 	     FS=: $file)
+         )
+    _all_labels targets expl 'make target' compadd "$tmp[@]" && return 0
+  fi
+  compset -P 1 '*='
+  _files
+fi

@@ -16,9 +16,9 @@ printindex(Options Index)(pg)
 texinode(Functions Index)(Editor Functions Index)(Options Index)(Top)
 printindex(Functions Index)(fn)
 
-texinode(Editor Functions Index)(Keystroke Index)(Functions Index)(Top)
+texinode(Editor Functions Index)(Style and Tag Index)(Functions Index)(Top)
 printindex(Editor Functions Index)(tp)
 
-texinode(Keystroke Index)()(Editor Functions Index)(Top)
-printindex(Keystroke Index)(ky)
+texinode(Style and Tag Index)()(Editor Functions Index)(Top)
+printindex(Style and Tag Index)(ky)
 )\

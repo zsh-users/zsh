@@ -1,70 +1,92 @@
 #compdef -k complete-word \C-xn
 
-# Main widget/completer.
+# Main widget.
 
 _next_tags() {
+  local comp
 
-  if [[ $#funcstack -gt 1 ]]; then
-
-    # Called as completer, probably `remove' our helper function. A better
-    # test would be nice, but I think one should still be able to edit the
-    # current word between attempts to complete it.
-
-    [[ $_next_tags_pre != ${LBUFFER%${PREFIX}} ]] && unset _sort_tags
-
-    return 1
+  if [[ -z $compstate[old_list] ]]; then
+    comp=()
   else
-    local comp
+    comp=(_complete)
+  fi
 
-    if [[ -z $compstate[old_list] ]]; then
-      comp=()
-    else
-      comp=(_next_tags _complete)
-    fi
+  (( $+_sort_tags )) || _next_tags_not=
 
-    (( $+_sort_tags )) || _next_tags_not=
+  _sort_tags=_next_tags_sort
+  _next_tags_pre="${LBUFFER%${PREFIX}}"
+  _next_tags_not="$_next_tags_not $_lastcomp[tags]"
 
-    _sort_tags=_next_tags_sort
-    _next_tags_pre="${LBUFFER%${PREFIX}}"
-    _next_tags_not="$_next_tags_not $_lastcomp[tags]"
+  _main_complete "$comp[@]"
 
-    _main_complete "$comp[@]"
+  [[ $compstate[insert] = automenu ]] &&
+     compstate[insert]=automenu-unambiguous
 
-    [[ $compstate[insert] = automenu ]] &&
-       compstate[insert]=automenu-unambiguous
+  compstate[insert]=''
+  compstate[list]='list force'
 
-    compstate[insert]=''
-    compstate[list]='list force'
+  compprefuncs=( "$compprefuncs[@]" _next_tags_pre )
+}
+
+# Pre-completion function.
+
+_next_tags_pre() {
+
+  # Probably `remove' our sort function. A better test would be nice, but
+  # I think one should still be able to edit the current word between
+  # attempts to complete it.
+
+  if [[ $_next_tags_pre != ${LBUFFER%${PREFIX}} ]]; then
+    unset _sort_tags
+  else
+    compprefuncs=( "$compprefuncs[@]" _next_tags_pre )
   fi
 }
 
 # Helper function for sorting tags. Most of this is copied from _tags.
 
 _next_tags_sort() {
-  local order tags tag nodef
+  local order tags tag nodef tmp
 
   zstyle -a ":completion:${curcontext}:" tag-order order ||
-    order=( 'arguments values' options globbed-files directories all-files )
+      order=('arguments values' options)
 
   # But we also remove the tags we've already tried...
 
-  tags=( "${(@)order:#(${(j:|:)~${=_next_tags_not}})}" )
+  tags=( "${(@)order:#(${(j:|:)~${=_next_tags_not}})(|:*)}" )
 
   # ... unless that would remove all offered tags.
 
-  [[ $#tags -ne $#order && "$tags" != *(${(j:|:)~argv})* ]] &&
-    tags=( $order ) _next_tags_not=
-
+  if [[ $funcstack[4] = _files ]]; then
+    if zstyle -a ":completion:${curcontext}:" file-patterns tmp; then
+      [[ "$tags" = *${${tmp[-1]##[^\\]:}%:*}* ]] &&
+          tags=( $order ) _next_tags_not=
+    else
+      [[ "$tags" = *all-files* ]] && tags=( $order ) _next_tags_not=
+    fi
+  else
+     [[ $#tags -ne $#order && "$tags" != *(${(j:|:)~argv})* ]] &&
+        tags=( $order ) _next_tags_not=
+  fi
   for tag in $tags; do
     case $tag in
     -)     nodef=yes;;
     *\(\)) "${${tag%%[ 	]#\(\)}##[ 	]#}" "$@";;
-    \!*)   comptry "${(@)argv:#(${(j:|:)~${=tag[2,-1]}})}";;
-    ?*)    comptry ${=tag};;
+    \!*)   comptry "${(@)argv:#(${(j:|:)~${=~tag[2,-1]}})}";;
+    ?*)    comptry -m "$tag";;
     esac
   done
 
-  [[ -z "$nodef" ]] && comptry "$@"
+  if [[ -z "$nodef" ]]; then
+    if [[ $funcstack[4] = _files ]]; then
+      if zstyle -a ":completion:${curcontext}:" file-patterns tmp; then
+        [[ "$argv" = *${${tmp[-1]##[^\\]:}%:*}* ]] && _next_tags_not=
+      else
+        [[ "$argv" = *all-files* ]] && _next_tags_not=
+      fi
+    fi
+    comptry "${(@)argv:#(${(j:|:)~${=_next_tags_not}})(|:*)}"
+  fi
 }
 
 [[ -o kshautoload ]] || _next_tags "$@"

@@ -1,10 +1,53 @@
-#defcomp -tilde-
+#compdef -tilde-
 
 # We use all named directories and user names here. If this is too slow
 # for you or if there are too many of them, you may want to use
-# `compgen -k friends -qS/' or something like that. To get all user names
-# if there are no matches in the `friends' array, add
-#   `(( compstate[nmatches] )) || compgen -nu -qS/'
-# below that.
+# `compadd -qS/ - "$friends[@]"' or something like that.
 
-compgen -nu -qS/
+local expl suf dirs list lines revlines i ret disp nm="$compstate[nmatches]"
+
+if [[ "$SUFFIX" = */* ]]; then
+  ISUFFIX="/${SUFFIX#*/}$ISUFFIX"
+  SUFFIX="${SUFFIX%%/*}"
+  suf=(-S '')
+else
+  suf=(-qS/)
+fi
+
+_tags users named-directories directory-stack
+
+while _tags; do
+  _requested users && _users "$suf[@]" "$@" && ret=0
+  _requested named-directories expl 'named directory' \
+      compadd "$suf[@]" "$@" - "${(@k)nameddirs}"
+
+  if _requested directory-stack &&
+     { ! zstyle -T ":completion:${curcontext}:directory-stack" prefix-needed ||
+       [[ "$PREFIX" = [-+]* || nm -eq compstate[nmatches] ]] }; then
+    if zstyle -T ":completion:${curcontext}:directory-stack" verbose; then
+      integer i
+
+      lines=("${PWD}" "${dirstack[@]}")
+
+      if [[ ( -prefix - && ! -o pushdminus ) ||
+	    ( -prefix + && -o pushdminus ) ]]; then
+        revlines=( $lines )
+        for (( i = 1; i <= $#lines; i++ )); do
+          lines[$i]="$((i-1)) -- ${revlines[-$i]}"
+        done
+      else
+        for (( i = 1; i <= $#lines; i++ )); do
+          lines[$i]="$((i-1)) -- ${lines[$i]}"
+        done
+      fi
+      list=( ${PREFIX[1]}${^lines%% *} )
+      disp=( -ld lines )
+    else
+      list=( ${PREFIX[1]}{0..${#dirstack}} )
+      disp=()
+    fi
+    _all_labels -V directory-stack expl 'directory stack' \
+        compadd "$suf[@]" "$disp[@]" -Q - "$list[@]" && ret=0
+  fi
+  (( ret )) || return 0
+done

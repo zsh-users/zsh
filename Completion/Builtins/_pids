@@ -3,16 +3,32 @@
 # If given the `-m <pattern>' option, this tries to complete only pids
 # of processes whose command line match the `<pattern>'.
 
-local list expl match
+local out list expl match desc listargs args
+
+_wanted processes || return 1
 
 if [[ "$1" = -m ]]; then
   match="${2}*"
   shift 2
 fi
 
-_description expl 'process ID'
+zstyle -s ":completion:${curcontext}:pids" command args
 
-list=("${(@Mr:COLUMNS-1:)${(f@)$(ps ${=compconfig[ps_listargs]:-$=compconfig[ps_args]} 2>/dev/null)}[2,-1]:#[ 	]#${PREFIX}[0-9]#${SUFFIX}[ 	]*${~match}}")
+out="$(_call pids ps 2>/dev/null)"
 
-compadd "$expl[@]" "$@" -ld list - \
-  ${${${(M)${(f)"$(ps $=compconfig[ps_args] 2>/dev/null)"}[2,-1]:#*${~match}}## #}%% *}
+if zstyle -T ":completion:${curcontext}:processes" verbose; then
+  zstyle -s ":completion:${curcontext}:pids-list" command listargs
+  (( $#listargs )) || listargs=( "$args[@]" )
+  if [[ "$listargs" = "$args" ]]; then
+    list=("${(@Mr:COLUMNS-1:)${(f@)out}[2,-1]:#[ 	]#${PREFIX}[0-9]#${SUFFIX}[ 	]*${~match}}")
+  else
+    list=("${(@Mr:COLUMNS-1:)${(f@)$(_call pids-list ps 2>/dev/null)}[2,-1]:#[ 	]#${PREFIX}[0-9]#${SUFFIX}[ 	]*${~match}}")
+  fi
+  desc=(-ld list)
+else
+  desc=()
+fi
+
+_all_labels processes expl 'process ID' \
+    compadd "$@" "$desc[@]" - \
+        ${${${(M)${(f)"${out}"}[2,-1]:#[ 	]#${PREFIX}[0-9]#${SUFFIX}[ 	]#*${~match}}## #}%% *}

@@ -1,6 +1,10 @@
-#autoload
+#compdef last passwd groups
 
-local expl
+local expl users
 
-_description expl user
-compgen "$@" "$expl[@]" -u
+_wanted users || return 1
+
+zstyle -a ":completion:${curcontext}:" users users &&
+    _all_labels users expl user compadd "$@" - "$users[@]" && return 0
+
+_all_labels users expl user compadd "$@" - "${(@k)userdirs}"

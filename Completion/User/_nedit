@@ -40,10 +40,11 @@ else
     '(-background)-bg[specify background color]:background color:_x_color' \
     '(-fg)-foreground:foreground color:_x_color' \
     '(-foreground)-fg[specify foreground color]:foreground color:_x_color' \
-    '-import[load additional preferences file]:nedit preferences file:_files' \
+    '*-import[load additional preferences file]:nedit preferences file:_files' \
     "$nedit_common[@]"
 fi
 
-[[ $state = lang ]] && _wanted neditlanguages expl 'language mode' &&
-    compadd "$expl[@]" -  ${(f)"$(sed -n \
-      '/^nedit.languageMode/,/^nedit/ s/.*	\([^:]*\).*/\1/p' < ~/.nedit)"}
+[[ $state = lang ]] &&
+    _wanted neditlanguages expl 'language mode' \
+        compadd -  ${(f)"$(sed -n \
+            '/^nedit.languageMode/,/^nedit/ s/.*	\([^:]*\).*/\1/p' < ~/.nedit)"}

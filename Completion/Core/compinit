@@ -1,25 +1,23 @@
 # Initialisation for new style completion. This mainly contains some helper
-# function and aliases. Everything else is split into different files in this
-# directory that will automatically be made autoloaded (see the end of this
-# file).
+# functions and aliases. Everything else is split into different files that
+# will automatically be made autoloaded (see the end of this file).
 # The names of the files that will be considered for autoloading have to
-# start with a underscores (like `_setopt).
+# start with an underscores (like `_setopt').
 # The first line of these files will be read and has to say what should be
 # done with its contents:
 #
-#   `#defcomp <names ...>'
-#     if the first line looks like this, the file is
-#     autoloaded as a function and that function will
-#     be called to generate the matches when completing
-#     for one of the commands whose <name> is given
+#   `#compdef <names ...>'
+#     If the first line looks like this, the file is autoloaded as a
+#     function and that function will be called to generate the matches
+#     when completing for one of the commands whose <names> are given.
 #
-#   `#defpatcomp <pattern>'
-#     this defines a function that should be called to generate
-#     matches for commands whose name matches <pattern>; note
-#     that only one pattern may be given
+#   `#compdef -p <pattern>'
+#     This defines a function that should be called to generate matches
+#     for commands whose name matches <pattern>. Note that only one pattern
+#     may be given.
 #
-#   `#defkeycomp <style> [ <key-sequence> ... ]
-#     this is used to bind special completions to all the given
+#   `#compdef -k <style> [ <key-sequence> ... ]'
+#     This is used to bind special completions to all the given
 #     <key-sequence>(s). The <style> is the name of one of the built-in
 #     completion widgets (complete-word, delete-char-or-list,
 #     expand-or-complete, expand-or-complete-prefix, list-choices,
@@ -29,35 +27,89 @@
 #     rather than by the context.  The widget has the same name as
 #     the autoload file and can be bound using bindkey in the normal way.
 #
-#   `#autoload'
-#     this is for helper functions that are not used to
+#   `#compdef -K <widget-name> <style> <key-sequence> [ ... ]'
+#     This is similar to -k, except it takes any number of sets of
+#     three arguments.  In each set, the widget <widget-name> will
+#     be defined, which will behave as <style>, as with -k, and will
+#     be bound to <key-sequence>, exactly one of which must be defined.
+#     <widget-name> must be different for each:  this must begin with an
+#     underscore, else one will be added, and should not clash with other
+#     completion widgets (names based on the name of the function are the
+#     clearest), but is otherwise arbitrary.  It can be tested in the
+#     function by the parameter $WIDGET.
+#
+#   `#autoload [ <options> ]'
+#     This is for helper functions that are not used to
 #     generate matches, but should automatically be loaded
-#     when they are called
+#     when they are called. The <options> will be given to the
+#     autoload builtin when making the function autoloaded. Note
+#     that this need not include `-U'.
 #
 # Note that no white space is allowed between the `#' and the rest of
 # the string.
 #
-# See the file `compdump' for how to speed up initialiation.
+# Functions that are used to generate matches should return zero if they
+# were able to add matches and non-zero otherwise.
 #
-# If you are using global matching specifications with `compctl -M ...'
-# have a look at the files `_match_test' and `_match_pattern'. To make
-# all the example functions use matching as specified with `-M' these
-# need some editing.
-#
-# If we got the `-d'-flag, we will automatically dump the new state (at
-# the end).
+# See the file `compdump' for how to speed up initialisation.
 
-if [[ "$1" = -d ]]; then
-  _i_autodump=1
-else
-  _i_autodump=0
-fi
+# If we got the `-d'-flag, we will automatically dump the new state (at
+# the end).  This takes the dumpfile as an argument.  -d (with the
+# default dumpfile) is now the default; to turn off dumping use -D.
+
+emulate -L zsh
+setopt extendedglob
+
+typeset _i_dumpfile _i_files _i_line _i_done _i_dir _i_autodump=1
+typeset _i_tag _i_file _i_addfiles
+
+while [[ $# -gt 0 && $1 = -[dDf] ]]; do
+  if [[ "$1" = -d ]]; then
+    _i_autodump=1
+    shift
+    if [[ $# -gt 0 && "$1" != -[df] ]]; then
+      _i_dumpfile="$1"
+      shift
+    fi
+  elif [[ "$1" = -D ]]; then
+    _i_autodump=0
+    shift
+  elif [[ "$1" = -f ]]; then
+    # Not used any more; use _compdir
+    shift
+    shift
+  fi
+done
 
 # The associative array containing the definitions for the commands.
-# Definitions for patterns will be stored in the normal array `_patcomps'.
+# Definitions for patterns will be stored in the associations `_patcomps'
+# and `_postpatcomps'. `_compautos' contains the names and options
+# for autoloaded functions that get options.
 
-typeset -A _comps
-_patcomps=()
+typeset -gA _comps _patcomps _postpatcomps _compautos
+
+# The associative array use to report information about the last
+# cmpletion to the outside.
+
+typeset -gA _lastcomp
+
+# Remember dumpfile.
+if [[ -n $_i_dumpfile ]]; then
+  # Explicitly supplied dumpfile.
+  _comp_dumpfile="$_i_dumpfile"
+else
+  _comp_dumpfile="${ZDOTDIR:-$HOME}/.zcompdump"
+fi
+
+# These can hold names of functions that are to be called before/after all
+# matches have been generated.
+
+compprefuncs=()
+comppostfuncs=()
+
+# Loading it now ensures that the `funcstack' parameter is always correct.
+
+: $funcstack
 
 # This function is used to register or delete completion functions. For
 # registering completion functions, it is invoked with the name of the
@@ -70,6 +122,9 @@ _patcomps=()
 # function will be invoked when completing for a command whose name 
 # matches the pattern given as argument after the function name (in this
 # case only one argument is accepted).
+# The option `-P' is like `-p', but the function will be called after
+# trying to find a function defined for the command on the line if no
+# such function could be found.
 # With the `-k' option a function for a special completion keys is 
 # defined and immediatly bound to those keys. Here, the extra arguments
 # are the name of one of the builtin completion widgets and any number
@@ -78,7 +133,8 @@ _patcomps=()
 # whose name is given as the first argument be autoloaded. When defining
 # a function for command names the `-n' option may be given and keeps
 # the definitions from overriding any previous definitions for the
-# commands.
+# commands; with `-k', the `-n' option prevents compdef from rebinding
+# a key sequence which is already bound.
 # For deleting definitions, the `-d' option must be given. Without the
 # `-p' option, this deletes definitions for functions for the commands
 # whose names are given as arguments. If combined with the `-p' option
@@ -110,11 +166,16 @@ compdef() {
 
   # Get the options.
 
-  while getopts "anpkd" opt; do
+  if [[ $#* -eq 0 ]]; then
+    echo "compdef needs parameters"
+    return 1
+  fi
+  
+  while getopts "anpPkKd" opt; do
     case "$opt" in
     a)    autol=yes;;
     n)    new=yes;;
-    [pk]) if [[ -n "$type" ]]; then
+    [pPkK]) if [[ -n "$type" ]]; then
             # Error if both `-p' and `-k' are given (or one of them
 	    # twice).
             echo "$0: type already set to $type"
@@ -122,6 +183,10 @@ compdef() {
 	  fi
 	  if [[ "$opt" = p ]]; then
 	    type=pattern
+	  elif [[ "$opt" = P ]]; then
+	    type=postpattern
+	  elif [[ "$opt" = K ]]; then
+	    type=widgetkey
 	  else
 	    type=key
 	  fi
@@ -131,12 +196,17 @@ compdef() {
   done
   shift OPTIND-1
 
+  if [[ $#* -eq 0 ]]; then
+    echo "compdef needs parameters"
+    return 1
+  fi
+  
   if [[ -z "$delete" ]]; then
     # Adding definitions, first get the name of the function name
     # and probably do autoloading.
 
     func="$1"
-    [[ -n "$autol" ]] && autoload "$func"
+    [[ -n "$autol" ]] && autoload -U "$func"
     shift
 
     case "$type" in
@@ -145,11 +215,33 @@ compdef() {
         echo "$0: only one pattern allowed"
 	return 1
       fi
-      # Patterns are stored in strings like `c* foo', with a space
-      # between the pattern and the function name.
-
-      _patcomps=("$_patcomps[@]" "$1 $func")
+      _patcomps[$1]="$func"
       ;;
+    postpattern)
+      if [[ $# -gt 1 ]]; then
+        echo "$0: only one pattern allowed"
+	return 1
+      fi
+      _postpatcomps[$1]="$func"
+      ;;
+    widgetkey)
+      while [[ -n $1 ]]; do
+	if [[ $# -lt 3 ]]; then
+	  echo "$0: compdef -K requires <widget> <comp-widget> <key>"
+	  return 1
+	fi
+	[[ $1 = _* ]] || 1="_$1"
+	[[ $2 = .* ]] || 2=".$2"
+	zle -C "$1" "$2" "$func"
+	if [[ -n $new ]]; then
+	  bindkey "$3" | read -A opt
+	  [[ $opt[-1] = undefined-key ]] && bindkey "$3" "$1"
+	else
+	  bindkey "$3" "$1"
+	fi
+	shift 3
+      done
+      ;;	 
     key)
       if [[ $# -lt 2 ]]; then
         echo "$0: missing keys"
@@ -157,30 +249,44 @@ compdef() {
       fi
 
       # Define the widget.
-      zle -C "$func" "$1" "$func"
+      if [[ $1 = .* ]]; then
+	zle -C "$func" "$1" "$func"
+      else
+	zle -C "$func" ".$1" "$func"
+      fi
       shift
 
       # And bind the keys...
       for i; do
+        if [[ -n $new ]]; then
+	   bindkey "$i" | read -A opt
+	   [[ $opt[-1] = undefined-key ]] || continue
+	fi
         bindkey "$i" "$func"
       done
       ;;
     *)
       # For commands store the function name in the `_comps'
       # associative array, command names as keys.
-      for i; do
-        [[ -z "$new" || "${+_comps[$i]}" -eq 0 ]] && _comps[$i]="$func"
-      done
+      if [[ -z "$new" ]]; then
+	for i; do
+	  _comps[$i]="$func"
+	done
+      else
+        for i; do
+          [[ "${+_comps[$i]}" -eq 0 ]] && _comps[$i]="$func"
+        done
+      fi
       ;;
     esac
   else
     # Handle the `-d' option, deleting.
     case "$type" in
     pattern)
-      # Note the space.
-      for i; do
-        _patcomps=("${(@)patcomps:#$i *}")
-      done
+      unset "_patcomps[$^@]"
+      ;;
+    postpattern)
+      unset "_postpatcomps[$^@]"
       ;;
     key)
       # Oops, cannot do that yet.
@@ -189,81 +295,210 @@ compdef() {
       return 1
       ;;
     *)
-      # Deleting definitons for command is even simpler.
-      for i; do
-        unset "_comps[$i]"
-      done
+      unset "_comps[$^@]"
     esac
   fi
 }
 
+# Do *not* use this...
+
+compconf() {
+
+  local style name val i tmp cmt
+
+  if [[ -z "$_compconf_warn" ]]; then
+    _compconf_warn=yep
+
+    print "
+
+Hello
+
+\`compconf' will be removed in the near future, we now use a more
+general (and powerful) mechanism using the \`zstyle' builtin. An
+approximation to your old setup using \`zstyle' should be available
+in the file:
+
+    \`${HOME}/.zsh-styles'
+
+Note that the values for the styles may be partly incorrect. Please
+read the manual to find out how to configure the completion system
+with styles.
+
+Have fun
+
+   Sven
+" 1>&2
+    command rm -f ${HOME}/.zsh-styles
+  fi
+
+  for i; do
+    name="${i%%\=*}"
+    val="${i#*\=}"
+
+    tmp=''
+    cmt=''
+
+    case "$name" in
+    urls_path)
+      tmp="'*:urls' path ${(qq)val}"
+      ;;
+    urls_localhttp)
+      tmp="'*:urls' local ${${(qqs.:.)val}}"
+      ;;
+    describe_options)
+      tmp="'*:options' verbose 'yes'"
+      ;;
+    describe_values)
+      tmp="'*:values' verbose 'yes'"
+      ;;
+    autodescribe_options)
+      tmp="'*:options' auto-description ${(qq)val}"
+      ;;
+    description_format)
+      tmp="'*:descriptions' format ${(qq)val}"
+      ;;
+    message_format)
+      tmp="'*:messages' format ${(qq)val}"
+      ;;
+    warning_format)
+      tmp="'*:warnings' format ${(qq)val}"
+      ;;
+    option_prefix)
+      tmp="'*:options' prefix-needed yes"
+      [[ "$val" = hide* ]] &&
+          tmp="$tmp
+zstyle ':completion:*:options' prefix-hidden yes"
+      ;;    
+    group_matches)
+      tmp="'*' group-name ''"
+      ;;
+    colors_path)
+      tmp="'*:colors' path ${(qq)val}"
+      ;;
+    path_expand)
+      tmp="'*:paths' expand ${(qq)val}"
+      ;;
+    path_cursor)
+      tmp="'*:paths' cursor ${(qq)val}"
+      ;;
+    (approximate|incremental|predict|list|oldlist|match)_*)
+      tmp="'*${name%%_*}:*' ${${name#*_}//_/-} ${(qq)val}"
+      ;;
+    correct_*)
+      cmt="# This one is a bit ugly. You may want to use only \`*:correct'
+# if you also have the \`correctword_*' or \`approximate_*' keys.
+"
+      tmp="'*(correct(|-word)|approximate):*' ${name#*_} ${(qq)val}"
+      ;;
+    correctword_*)
+      tmp="'*:correct-word' ${name#correctword_} ${(qq)val}"
+      ;;
+    expand_*)
+      cmt="# This one is a bit ugly. You may want to use only \`*:expand'
+# if you also have the \`expandword_*' keys.
+"
+      tmp="'*expand(|expand-word):*' ${name#*_} ${(qq)val}"
+      ;;
+    expandword_*)
+      tmp="'expand-word:*' ${name#expandword_} ${(qq)val}"
+      ;;
+    history_*)
+      tmp="'history-words:*' ${name#history_} ${(qq)val}"
+      ;;
+    completer)
+      tmp="'*' completer ${${(qqs.:.)val}}"
+      ;;
+    last_prompt)
+      tmp="'*' last-prompt 'yes'"
+      ;;
+    esac
+    [[ -n "$tmp" ]] && style="${style}${cmt}zstyle :completion:${tmp}
+"
+  done
+
+  eval "${style}"
+
+  print "$style" >>! ${HOME}/.zsh-styles
+}
+
 # Now we automatically make the definition files autoloaded.
 
-# First we get the name of a dump file if this will be used.
-
-: ${COMPDUMP:=$0.dump}
-
-if [[ ! -o extendedglob ]]; then
-  _i_noextglob=yes
-  setopt extendedglob
+typeset -U _i_files
+_i_files=( ${^~fpath:/.}/^([^_]*|*~|*.zwc)(N:t) )
+if [[ $#_i_files -lt 20 || $_compdir = */Core || -d $_compdir/Core ]]; then
+  # Too few files:  we need some more directories,
+  # or we need to check that all directories (not just Core) are present.
+  if [[ -n $_compdir ]]; then
+    _i_addfiles=()
+    if [[ $_compdir = */Core ]]; then
+      # Add all the Completion subdirectories
+      _i_addfiles=(${_compdir:h}/*(/))
+    elif [[ -d $_compdir/Core ]]; then
+      # Likewise
+      _i_addfiles=(${_compdir}/*(/))
+    fi
+    for _i_line in {1..$#i_addfiles}; do
+      _i_file=${_i_addfiles[$_i_line]}
+      [[ -d $_i_file && -z ${fpath[(r)$_i_file]} ]] ||
+        _i_addfiles[$_i_line]=
+    done
+    fpath=($fpath $_i_addfiles)
+    _i_files=( ${^~fpath:/.}/^([^_]*|*~|*.zwc)(N:t) )
+  fi
 fi
 
-typeset -U _i_files
-_i_files=( ${^~fpath}/_*~*~(N:t) )
-_i_initname=$0
+
+# Rebind the standard widgets
+for _i_line in complete-word delete-char-or-list expand-or-complete \
+  expand-or-complete-prefix list-choices menu-complete \
+  menu-expand-or-complete reverse-menu-complete; do
+  zle -C $_i_line .$_i_line _main_complete
+done
+zle -la menu-select && zle -C menu-select .menu-select _main_complete
+
 _i_done=''
+
+# Make sure compdump is available, even if we aren't going to use it.
+autoload -U compdump compinstall
 
 # If we have a dump file, load it.
 
-if [[ -f "$COMPDUMP" ]]; then
-  read -rA _i_line < "$COMPDUMP"
+if [[ -f "$_comp_dumpfile" ]]; then
+  read -rA _i_line < "$_comp_dumpfile"
   if [[ _i_autodump -eq 1 && $_i_line[2] -eq $#_i_files ]]; then
-    builtin . "$COMPDUMP"
+    builtin . "$_comp_dumpfile"
     _i_done=yes
   fi
-  unset _i_line
 fi
 if [[ -z "$_i_done" ]]; then
   for _i_dir in $fpath; do
     [[ $_i_dir = . ]] && continue
-    for _i_file in $_i_dir/_*~*~(N); do
+    for _i_file in $_i_dir/^([^_]*|*~|*.zwc)(N); do
       read -rA _i_line < $_i_file
       _i_tag=$_i_line[1]
       shift _i_line
-      if [[ $_i_tag = '#defcomp' ]]; then
-        compdef -na "${_i_file:t}" "${_i_line[@]}"
-      elif [[ $_i_tag = '#defpatcomp' ]]; then
-        compdef -pa "${_i_file:t}" "${_i_line[@]}"
-      elif [[ $_i_tag = '#defkeycomp' ]]; then
-        compdef -ka "${_i_file:t}" "${_i_line[@]}"
-      elif [[ $_i_tag = '#autoload' ]]; then
-	autoload ${_i_file:t}
-      fi
+      case $_i_tag in
+      (\#compdef)
+	if [[ $_i_line[1] = -[pPkK](n|) ]]; then
+	  compdef ${_i_line[1]}na "${_i_file:t}" "${(@)_i_line[2,-1]}"
+	else
+	  compdef -na "${_i_file:t}" "${_i_line[@]}"
+	fi
+	;;
+      (\#autoload)
+	autoload -U "$_i_line[@]" ${_i_file:t}
+	[[ "$_i_line" != \ # ]] && _compautos[${_i_file:t}]="$_i_line"
+	;;
+      esac
     done
   done
 
-  bindkey |
-    while read -rA _i_line; do
-      if [[ "$_i_line[2]" = complete-word ||
-	"$_i_line[2]" = delete-char-or-list ||
-	"$_i_line[2]" = expand-or-complete ||
-	"$_i_line[2]" = expand-or-complete-prefix ||
-	"$_i_line[2]" = list-choices ||
-	"$_i_line[2]" = menu-complete ||
-	"$_i_line[2]" = menu-expand-or-complete ||
-	"$_i_line[2]" = reverse-menu-complete ]]; then
-	zle -C _complete_$_i_line[2] $_i_line[2] _main_complete
-	bindkey "${_i_line[1][2,-2]}" _complete_$_i_line[2]
-      fi
-    done
-
-  unset _i_dir _i_line _i_file _i_tag
-
   # If autodumping was requested, do it now.
 
-  (( _i_autodump )) && builtin . ${_i_initname:h}/compdump
+  if [[ $_i_autodump = 1 ]]; then
+    compdump
+  fi
 fi
 
-[[ -z "$_i_noextglob" ]] || unsetopt extendedglob
-
-unset _i_files _i_initname _i_done _i_autodump _i_noextglob
+unfunction compinit
+autoload -U compinit

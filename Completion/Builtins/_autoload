@@ -1,3 +1,10 @@
-#defcomp autoload
+#compdef autoload
 
-complist -s '${^fpath}/*(N:t)'
+local expl
+
+if (( $words[(I)[-+]*w*] )); then
+  _description files expl 'zwc file'
+  _files "$expl[@]" -g '*.zwc'
+else
+  _wanted functions expl 'shell function' compadd - ${^fpath}/*(N:t)
+fi

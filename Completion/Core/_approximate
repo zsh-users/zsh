@@ -1,102 +1,30 @@
 #autoload
 
 # This code will try to correct the string on the line based on the
-# strings generated for the context if `compconfig[correct]' is set.
-# These corrected strings will be shown in a list and one can
-# cycle through them as in a menucompletion or get the corrected prefix.
-#
-# Supported configuration keys:
-#
-#  approximate_accept
-#    This should be set to a number, specifying the maximum number
-#    of errors that should be accepted. If the string also contains
-#    a `n' or `N', the code will use the numeric argument as the
-#    maximum number of errors if a numeric argument was given. If no
-#    numeric argument was given, the number from the value of this
-#    key will be used. E.g. with `compconf approximate_accept=2n' two
-#    errors will be accepted, but if the user gives another number
-#    with the numeric argument, this will be prefered. Also, with
-#    `compconf approximate_accept=0n', normally no correction will be
-#    tried, but if a numeric argument is given, automatic correction
-#    will be used. On the other hand, if the string contains an `!'
-#    and a `n' or `N', correction is not attempted if a numeric
-#    argument is given. Once the number of errors to accept is
-#    determined, the code will repeatedly try to generate matches by
-#    allowing one error, two errors, and so on. Independent of the
-#    number of errors the user wants to accept, the code will allow
-#    only fewer errors than there are characters in the string from
-#    the line.
-#
-#  approximate_original
-#    This value is used to determine if the original string should
-#    be included in the list (and thus be presented to the user when
-#    cycling through the corrections). If it is set to any non-empty
-#    value, the original string will be offered. If it contains the
-#    sub-string `last', the original string will appear as the last
-#    string when cycling through the corrections, otherwise it will
-#    appear as the first one (so that the command line does not
-#    change immediately). Also, if the value contains the sub-string
-#    `always', the original string will always be included, whereas
-#    normally it is included only if more than one possible
-#    correction was generated.
-#
-#  approximate_prompt
-#    This can be set to a string that should be printed before the
-#    list of corrected strings when cycling through them. This string
-#    may contain the control sequences `%n', `%B', etc. known from
-#    the `-X' option of `compctl'. Also, the sequence `%e' will be
-#    replaced by the number of errors accepted to generate the
-#    corrected strings.
-#
-#  approximate_insert
-#    If this is set to a string starting with `unambig', the code
-#    will try to insert a usable unambiguous string in the command
-#    line instead of always cycling through the corrected strings.
-#    If such a unambiguous string could be found, the original
-#    string is not used, independent of the setting of
-#    `approximate_original'. If no sensible string could be found,
-#    one can cycle through the corrected strings as usual.
-#
-# If any of these keys is not set, but the the same key with the
-# prefix `correct' instead of `approximate' is set, that value will
-# be used.
+# strings generated for the context. These corrected strings will be
+# shown in a list and one can cycle through them as in a menucompletion
+# or get the corrected prefix.
 
-local _comp_correct _correct_prompt comax
-local cfgacc cfgorig cfgps cfgins
+# We don't try correction if the string is too short or we have tried it
+# already.
 
-# Only if all global matchers hav been tried.
+[[ _matcher_num -gt 1 || "${#:-$PREFIX$SUFFIX}" -le 1 ]] && return 1
 
-[[ compstate[matcher] -ne compstate[total_matchers] ]] && return 1
+local _comp_correct _correct_expl comax cfgacc
+local oldcontext="${curcontext}" opm="$compstate[pattern_match]"
 
-# We don't try correction if the string is too short.
-
-[[ "${#:-$PREFIX$SUFFIX}" -le 1 ]] && return 1
-
-# Get the configuration values, using either the prefix `correct' or
-# `approximate'.
-
-if [[ "$compstate[pattern_match]" = (|\**) ]]; then
-  cfgacc="${compconfig[approximate_accept]:-$compconfig[correct_accept]}"
-  cfgorig="${compconfig[approximate_original]:-$compconfig[correct_original]}"
-  cfgps="${compconfig[approximate_prompt]:-$compconfig[correct_prompt]}"
-  cfgins="${compconfig[approximate_insert]:-$compconfig[correct_insert]}"
-else
-  cfgacc="$compconfig[correct_accept]"
-  cfgorig="$compconfig[correct_original]"
-  cfgps="$compconfig[correct_prompt]"
-  cfgins="$compconfig[correct_insert]"
-fi
+zstyle -s ":completion:${curcontext}:" max-errors cfgacc || cfgacc='2 numeric'
 
 # Get the number of errors to accept.
 
-if [[ "$cfgacc" = *[nN]* && NUMERIC -ne 1 ]]; then
-  # Stop if we also have a `!'.
+if [[ "$cfgacc" = *numeric* && ${NUMERIC:-1} -ne 1 ]]; then
+  # A numeric argument may mean that we should not try correction.
 
-  [[ "$cfgacc" = *\!* ]] && return 1
+  [[ "$cfgacc" = *not-numeric* ]] && return 1
 
   # Prefer the numeric argument if that has a sensible value.
 
-  comax="$NUMERIC"
+  comax="${NUMERIC:-1}"
 else
   comax="${cfgacc//[^0-9]}"
 fi
@@ -105,13 +33,15 @@ fi
 
 [[ "$comax" -lt 1 ]] && return 1
 
-# Otherwise temporarily define functions to use instead of
-# the builtins that add matches. This is used to be able
-# to stick the `(#a...)' into the right place (after an
+_tags corrections original
+
+# Otherwise temporarily define a function to use instead of
+# the builtin that adds matches. This is used to be able
+# to stick the `(#a...)' in the right place (after an
 # ignored prefix).
 
 compadd() {
-  [[ "$*" != *-([a-zA-Z/]#|)U* &&
+  [[ ${argv[(I)-[a-zA-Z]#U[a-zA-Z]#]} -eq 0 &&
      "${#:-$PREFIX$SUFFIX}" -le _comp_correct ]] && return
 
   if [[ "$PREFIX" = \~*/* ]]; then
@@ -119,79 +49,49 @@ compadd() {
   else
     PREFIX="(#a${_comp_correct})$PREFIX"
   fi
-  if [[ -n "$_correct_prompt" ]]; then
-    builtin compadd -X "$_correct_prompt" -J _correct "$@"
-  else
-    builtin compadd -J _correct "$@"
-  fi
+  builtin compadd "$_correct_expl[@]" "$@"
 }
-
-compgen() {
-  [[ "$*" != *-([a-zA-Z/]#|)U* &&
-     "${#:-$PREFIX$SUFFIX}" -le _comp_correct ]] && return
-
-  if [[ "$PREFIX" = \~*/* ]]; then
-    PREFIX="${PREFIX%%/*}/(#a${_comp_correct})${PREFIX#*/}"
-  else
-    PREFIX="(#a${_comp_correct})$PREFIX"
-  fi
-  if [[ -n "$_correct_prompt" ]]; then
-    builtin compgen "$@" -X "$_correct_prompt" -J _correct
-  else
-    builtin compgen "$@" -J _correct
-  fi
-}
-
-# Now initialise our counter. We also set `compstate[matcher]'
-# to `-1'. This allows completion functions to use the simple
-# `[[ compstate[matcher] -gt 1 ]] && return' to avoid being
-# called for multiple global match specs and still be called 
-# again when correction is done. Also, this makes it easy to
-# test if correction is attempted since `compstate[matcher]'
-# will never be set to a negative value by the completion code.
 
 _comp_correct=1
-compstate[matcher]=-1
-
-_correct_prompt="${cfgps//\%e/1}"
-
-# We also need to set `extendedglob' and make the completion
-# code behave as if globcomplete were set.
-
-setopt extendedglob
 
 [[ -z "$compstate[pattern_match]" ]] && compstate[pattern_match]='*'
 
 while [[ _comp_correct -le comax ]]; do
+  curcontext="${oldcontext/(#b)([^:]#:[^:]#:)/${match[1][1,-2]}-${_comp_correct}:}"
+
+  _description corrections _correct_expl corrections \
+               "e:$_comp_correct" "o:$PREFIX$SUFFIX"
+
   if _complete; then
-    if [[ "$cfgins" = unambig* &&
-          "${#compstate[unambiguous]}" -ge "${#:-$PREFIX$SUFFIX}" ]]; then
+    if zstyle -t ":completion:${curcontext}:" insert-unambiguous &&
+       [[ "${#compstate[unambiguous]}" -ge "${#:-$PREFIX$SUFFIX}" ]]; then
       compstate[pattern_insert]=unambiguous
-    elif [[ compstate[nmatches] -gt 1 || "$cfgorig" = *always* ]]; then
-      if [[ "$cfgorig" = *last* ]]; then
-        builtin compadd -U -V _correct_original -nQ - "$PREFIX$SUFFIX"
-      elif [[ -n "$cfgorig" ]]; then
-	builtin compadd -U -nQ - "$PREFIX$SUFFIX"
-      fi
+    elif _requested original &&
+         { [[ compstate[nmatches] -gt 1 ]] ||
+           zstyle -t ":completion:${curcontext}:" original }; then
+      local expl
+
+      _description -V original expl original
+
+      builtin compadd "$expl[@]" -U -Q - "$PREFIX$SUFFIX"
 
       # If you always want to see the list of possible corrections,
-      # set `compstate[list]=list' here.
+      # set `compstate[list]=list force' here.
 
-      compstate[force_list]=list
+      [[ "$compstate[list]" != list* ]] &&
+          compstate[list]="$compstate[list] force"
     fi
-    compstate[matcher]="$compstate[total_matchers]"
-    unfunction compadd compgen
+    unfunction compadd
+    compstate[pattern_match]="$opm"
 
     return 0
   fi
 
   [[ "${#:-$PREFIX$SUFFIX}" -le _comp_correct+1 ]] && break
   (( _comp_correct++ ))
-
-  _correct_prompt="${cfgps//\%e/$_comp_correct}"
 done
 
-compstate[matcher]="$compstate[total_matchers]"
-unfunction compadd compgen
+unfunction compadd
+compstate[pattern_match]="$opm"
 
 return 1

@@ -1,9 +1,12 @@
-texinode(The zutil Module)(The complete Module)(The clone Module)(Zsh Modules)
-sect(The zutil Module)
+COMMENT(!MOD!zsh/zutil
+Some utility builtins, e.g. the one for supporting configuration via 
+styles.
+!MOD!)
 cindex(builtins, utility)
-The tt(zutil) module only adds some builtins:
+The tt(zsh/zutil) module only adds some builtins:
 
 startitem()
+findex(zstyle)
 xitem(tt(zstyle) [ tt(-L) ])
 xitem(tt(zstyle) [ tt(-) | tt(-)tt(-) ] var(pattern) var(style) var(strings) ...)
 xitem(tt(zstyle -d) [ var(pattern) [ var(styles) ... ] ])
@@ -13,6 +16,7 @@ xitem(tt(zstyle -b) var(context) var(style) var(name))
 xitem(tt(zstyle -a) var(context) var(style) var(name))
 xitem(tt(zstyle -h) var(context) var(style) var(name))
 xitem(tt(zstyle -t) var(context) var(style) [ var(strings) ...])
+xitem(tt(zstyle -T) var(context) var(style) [ var(strings) ...])
 item(tt(zstyle -m) var(context) var(style) var(pattern))(
 This builtin command is used to define and lookup styles. Styles are
 pairs of names and values, where the values consist of any number of
@@ -61,17 +65,22 @@ makes it be returned as an associative array (with the first, third,
 etc. string being used as the keys and the other strings being used as 
 the values).
 
-The tt(-t) option can be used to test the value of a style, i.e. it
+The tt(-t) options can be used to test the value of a style, i.e. it
 only sets the return value. Without any var(strings) arguments it is
 zero if the style is defined for at least one matching pattern, has
 only one string in its value and that is equal to one of tt(true),
 tt(yes), tt(on) or tt(1). If any var(strings) are given the return
 zero if and only if at least one of the var(strings) is equal to at
-least one of the strings in the value.
+least one of the strings in the value. If the style is not defined,
+the return value is tt(2).
+
+The tt(-T) option is like tt(-t) but returns zero if the style is not
+set for any matching pattern.
 
 The tt(-m) option can be used to match a value. It returns zero if the 
 var(pattern) matches at least one of the strings in the value.
 )
+findex(zformat)
 xitem(tt(zformat -f) var(param) var(format) var(specs) ...)
 item(tt(zformat -a) var(array) var(sep) var(specs) ...)(
 This builtin provides to different forms of formatting. The first form 
@@ -105,5 +114,53 @@ unchanged and all strings with a empty var(right) string have the
 trailing colon removed. In both cases the lengths of the strings
 are not used to determine how the other strings have to be aligned.
 The resulting strings are stored in the var(array).
+)
+findex(zregexparse)
+item(tt(zregexparse))(
+This implements the internals of the `tt(_regex_arguments)'.
+)
+findex(zparseopts)
+item(tt(zparseopts) [ tt(-D) ] [ tt(-a) var(array) ] [ tt(-A) var(assoc) ] var(specs))(
+This builtin simplifies the parsing of options in the positional
+parameters. Each var(spec) describes one option and should be of the
+form `var(name)[tt(+)][tt(:)[tt(:)][tt(-)]][tt(=)var(array)]'. The var(name)
+is the name of the option (without the leading `tt(-)'). If only that
+is given, the option takes no argument and if it is found in the
+positional parameters it will be placed in the var(array) given with
+the tt(-a) option. If the optional `tt(=)var(array)' is given, it will 
+be put into that array instead. If one or two colons are given, the
+option takes an argument. With one colon, this argument is mandatory
+and with two colons it is optional. The argument will be inserted into 
+the var(array), too. For mandatory arguments it is added as a separate 
+string and for optional arguments it is put into one string together
+with the option name unless the `tt(-)' option is given. In this case
+the argument will be put into the same word even for mandatory
+arguments (note that this makes empty strings as arguments
+indistinguishable). Finally, if the `tt(+)' is given and the option
+appears more than once in the positional parameters, it will be
+inserted more than once in the var(array), too. Without the `tt(+)'
+the option will be inserted only once in the var(array) with arguments 
+of later options overwriting earlier once. If any of the special
+character needs to appear in the option name it must be preceded by a
+backslash.
+
+If the tt(-A) option is given, the options and their values will also
+be put into an associative array with the option names as keys and the 
+arguments (if any) as the values. Note that it is an error to give
+var(specs) without a `tt(=)var(array)' and not use either the tt(-a)
+or tt(-A) option.
+
+If the tt(-D) option is given, all options found are removed from the
+positional parameters leaving only the strings from the first one that 
+was not described by any of the var(specs) to the last (note that this 
+is the usual rule used by tt(zparseopts) to find out when to stop
+processing options).
+
+For example, calling `tt(zparseopts a=foo b:=bar c+:=bar)' with the
+strings `tt(-a)', `tt(-bx)', `tt(-c)', `tt(y)', `tt(-cz)', `tt(baz)'
+and `tt(-cend)' as positional arguments will set the array tt(foo) to
+contain the element `tt(-a)' and the array tt(bar) to the strings
+`tt(-b)', `tt(x)', `tt(-c)', `tt(y)', `tt(-c)', and `tt(z)'. The
+`tt(baz)' and all strings after it will not be used.
 )
 enditem()

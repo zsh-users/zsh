@@ -1,13 +1,61 @@
 #autoload
 
-local colors i
+local val nm="$compstate[nmatches]"
 
-for i; do
-  if _style -a "$i" list-colors colors; then
-    if [[ "$1" = default ]]; then
-      ZLS_COLORS="${(j.:.)${(@)colors:gs/:/\\\:}}"
-    else
-      eval "ZLS_COLORS=\"(${i})\${(j.:(${i}).)\${(@)colors:gs/:/\\\:}}:\${ZLS_COLORS}\""
-    fi
+if zstyle -a ":completion:${curcontext}:$1" list-colors val; then
+  zmodload -i zsh/complist
+  if [[ "$1" = default ]]; then
+    ZLS_COLORS="${(j.:.)${(@)val:gs/:/\\\:}}"
+  else
+    eval "ZLS_COLORS=\"(${1})\${(j.:(${1}).)\${(@)val:gs/:/\\\:}}:\${ZLS_COLORS}\""
   fi
-done
+
+# Here is the problem mentioned in _main_complete.
+
+# elif [[ "$1" = default && -n "$ZLS_COLORS$ZLS_COLOURS" ]]; then
+#   zmodload -i zsh/complist
+#   ZLS_COLORS="$ZLS_COLORS$ZLS_COLOURS"
+
+fi
+
+if zstyle -t ":completion:${curcontext}:$1" list-packed; then
+  compstate[list]="${compstate[list]} packed"
+elif [[ $? -eq 1 ]]; then
+  compstate[list]="${compstate[list]:gs/packed//}"
+else
+  compstate[list]="$_saved_list"
+fi
+
+if zstyle -t ":completion:${curcontext}:$1" list-rows-first; then
+  compstate[list]="${compstate[list]} rows"
+elif [[ $? -eq 1 ]]; then
+  compstate[list]="${compstate[list]:gs/rows//}"
+else
+  compstate[list]="$_saved_list"
+fi
+
+if zstyle -t ":completion:${curcontext}:$1" last-prompt; then
+  compstate[last_prompt]=yes
+elif [[ $? -eq 1 ]]; then
+  compstate[last_prompt]=''
+else
+  compstate[last_prompt]="$_saved_lastprompt"
+fi
+
+if zstyle -t ":completion:${curcontext}:$1" accept-exact; then
+  compstate[exact]=accept
+elif [[ $? -eq 1 ]]; then
+  compstate[exact]=''
+else
+  compstate[exact]="$_saved_exact"
+fi
+
+[[ _last_nmatches -ge 0 && _last_nmatches -ne nm ]] &&
+    _menu_style=( "$_last_menu_style[@]" "$_menu_style[@]" )
+
+if zstyle -a ":completion:${curcontext}:$1" menu val; then
+  _last_nmatches=$nm
+  _last_menu_style=( "$val[@]" )
+else
+  _last_nmatches=-1
+fi

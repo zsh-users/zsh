@@ -4,11 +4,10 @@
 
 (( $compstate[ignored] )) || return 1
 
-local curcontext="${curcontext/:[^:]#:/:ignored-${(M)#_completers[1,_completer_num]:#_ignored}:}"
 local comp i _comp_no_ignore=yes tmp expl
 
 zstyle -a ":completion:${curcontext}:" completer comp ||
-  comp=( "${(@)_completers[1,_completer_num-1][(R)_ignored,-1]}" )
+  comp=( "${(@)_completers[1,_completer_num-1][(R)_ignored(|:*),-1]}" )
 
 for i in "$comp[@]"; do
   if [[ "$i" != _ignored ]] && "$i"; then

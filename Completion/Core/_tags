@@ -1,81 +1,83 @@
 #autoload
 
-if (( $# )); then
-  local cmd="$words[1]" func="$funcstack[2]" defs i tags tag pat style prio
+local prev
 
-  while getopts 'c:f:' i; do
-    if [[ "$i" = c ]]; then
-      cmd="$OPTARG"
-    else
-      func="$OPTARG"
-    fi
-  done
+# A `--' as the first argument says that we should tell comptags to use
+# the preceding function nesting level. This is only documented here because
+# if everythings goes well, users won't have to worry about it and should
+# not mess with it.
 
-  shift OPTIND-1
-
-  defs=( "${(@M)argv:#${(kj:|:)~override_tags[(R)(|+*)]}}" )
-  (( $#defs )) && set -- "$defs[@]"
-
-  _offered_tags=( "$_offered_tags[@]" "$@" )
-  _last_tags=()
-
-  defs=()
-  for i; do
-    if [[ -n ${override_tags[$i]} && ${override_tags[$i]} != (\[|+\[)* ]]; then
-      if [[ ${override_tags[$i]} = *\[* ]]; then
-        prio=( "${i}:*=${override_tags[$i]#+}" )
-      else
-        prio=( "${i}:${(@v)^comptags[(I)(|*:)${i}(|:*)]}" )
-        (( $#prio )) || prio=( "${i}:${comptags[any]}" )
-        prio="${${${prio[(r)(|*:)\*=[^:]#\[*\](|:*)]}##(|*:)\*}%%:*}"
-        prio=( "${i}:*=${override_tags[$i]#+}${(M)prio%%\[*\]}" )
-      fi
-    else
-      prio=( "${i}:${(@v)^comptags[(I)(|*:)${i}(|:*)]}" )
-      (( $#prio )) || prio=( "${i}:${comptags[any]}" )
-    fi
-    defs=( "$defs[@]" "$prio[@]" )
-  done
-
-  tags=()
-  for i in "$defs[@]"; do
-    tag="${i%%:*}"
-    for pat in "${(s.:.)i#*:}"; do
-      if [[ ( "$pat" = _* && "$func" = ${~pat%%\=*} ) ||
-            "$cmd" = ${~pat%%\=*} ]]; then
-        prio="${pat#*\=}"
-	[[ "$prio" = -* ]] && continue 2
-
-	if [[ "$prio" = *\[*\] ]]; then
-	  style="${(M)prio%%\[*}"
-	  prio="${prio%%\[*}"
-        else
-	  style=''
-        fi
-	[[ ${override_tags[$tag]} = (|+)\[* ]] &&
-	    style="${override_tags[$tag]#+}"
-
-	(( prio++ ))
-
-        tags[$prio]="${tags[$prio]}:${tag}${style}"
-        break
-      fi
-    done
-  done
-
-  prios=( "${(@)tags:#}" )
-
-  return 0
+if [[ "$1" = -- ]]; then
+  prev=-
+  shift
 fi
 
-_failed_tags=( "$_failed_tags[@]" "$_last_tags[@]" )
+if (( $# )); then
 
-(( $#prios )) || return 1
+  # We have arguments: the tags supported in this context.
 
-tags="${prios[1]}:"
-shift 1 prios
+  local curcontext="$curcontext" order tag nodef tmp
 
-_last_tags=( "${(@s.:.)${${tags#:}%:}}" )
-_tried_tags=( "$_tried_tags[@]" "$_last_tags[@]" )
+  if [[ "$1" = -C?* ]]; then
+    curcontext="${curcontext%:*}:${1[3,-1]}"
+    shift
+  elif [[ "$1" = -C ]]; then
+    curcontext="${curcontext%:*}:${2}"
+    shift 2
+  else
+    targs=()
+  fi
 
-return 0
+  [[ "$1" = -(|-) ]] && shift
+
+  if zstyle -a ":completion:${curcontext}:" group-order order; then
+    local name
+
+    for name in "$order[@]"; do
+      compadd -J "$name"
+      compadd -V "$name"
+      compadd -J "$name" -1
+      compadd -V "$name" -1
+      compadd -J "$name" -2
+      compadd -V "$name" -2
+    done
+  fi
+
+  # Set and remember offered tags.
+
+  comptags "-i$prev" "$curcontext" "$@"
+
+  # Sort the tags.
+
+  if [[ -n "$_sort_tags" ]]; then
+    "$_sort_tags" "$@"
+  else
+    zstyle -a ":completion:${curcontext}:" tag-order order ||
+        order=('arguments values' options)
+
+    for tag in $order; do
+      case $tag in
+      -)     nodef=yes;;
+      *\(\)) if ! "${${tag%%[ 	]#\(\)}##[ 	]#}" "$@"; then
+               nodef=yes
+               break
+             fi
+             ;;
+      \!*)   comptry "${(@)argv:#(${(j:|:)~${=~tag[2,-1]}})}";;
+      ?*)    comptry -m "$tag";;
+      esac
+    done
+
+    [[ -z "$nodef" ]] && comptry "$@"
+  fi
+
+  # Return non-zero if at least one set of tags should be used.
+
+  comptags "-T$prev"
+
+  return
+fi
+
+# The other mode: switch to the next set of tags.
+
+comptags "-N$prev"

@@ -1,0 +1,24 @@
+#autoload
+
+local gopt=-J descr
+
+if [[ "$1" = -([12]|)[VJ] ]]; then
+  gopt="$1"
+  shift
+fi
+
+if comptags -A "$1" curtag; then
+  if [[ "$curtag" = *:* ]]; then
+    zformat -f descr "${curtag#*:}" "d:$3"
+    _description "$gopt" "${curtag%:*}" "$2" "$descr"
+    curtag="${curtag%:*}"
+    eval "${2}=( \${(P)2} \$argv[4,-1] )"
+  else
+    _description "$gopt" "$curtag" "$2" "$3"
+    eval "${2}=( \$argv[4,-1] \${(P)2} )"
+  fi
+
+  return 0
+fi
+
+return 1

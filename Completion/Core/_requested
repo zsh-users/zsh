@@ -1,9 +1,20 @@
 #autoload
 
-local tag tname="$funcstack[2,-1]"
+local gopt=-J
 
-for tag; do
-  [[ "${_cur_tags[${tname}]}" = *:${tag}(:|\[*\]:)* ]] && return 0
-done
+if [[ "$1" = -([12]|)[VJ] ]]; then
+  gopt="$1"
+  shift
+fi
 
-return 1
+if comptags -R "$1"; then
+  _comp_tags="$_comp_tags $1"
+  if [[ $# -gt 3 ]]; then
+    _all_labels "$gopt" "$@"
+  elif [[ $# -gt 1 ]]; then
+    _description "$gopt" "$@"
+  fi
+  return 0
+else
+  return 1
+fi

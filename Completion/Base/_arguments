@@ -3,386 +3,345 @@
 # Complete the arguments of the current command according to the
 # descriptions given as arguments to this function.
 
-local long args rest ws cur nth def nm expl descr action opt arg tmp
+local long cmd="$words[1]" descr mesg subopts opt usecc autod
+local oldcontext="$curcontext" hasopts
 
-# Associative arrays used to collect information about the options.
+long=$argv[(I)--]
+if (( long )); then
+  local name tmp tmpargv
 
-typeset -A opts mopts dopts dmopts odopts odmopts
+  if [[ long -eq 1 ]]; then
+    tmpargv=()
+  else
+    tmpargv=( "${(@)argv[1,long-1]}" )
+  fi
 
-# See if we support long options, too.
+  name=${~words[1]}
+  [[ "$name" != /* ]] && tmp="$PWD/$name"
 
-nth=$argv[(I)--]
-if (( nth )); then
-  long=( "${(@)argv[nth+1,-1]}" )
-  argv=("${(@)argv[1,nth-1]}")
-else
-  long=()
+  name="_args_cache_${name}"
+  name="${name//[^a-zA-Z0-9_]/_}"
+
+  if (( ! ${(P)+name} )); then
+    local iopts sopts pattern tmpo cur cache
+    typeset -U lopts
+
+    cache=()
+
+    # We have to build a new long-option cache, get the `-i' and
+    # `-s' options.
+
+    set -- "${(@)argv[long+1,-1]}"
+
+    iopts=()
+    sopts=()
+    while [[ "$1" = -[is]* ]]; do
+      if [[ "$1" = -??* ]]; then
+        tmp="${1[3,-1]}"
+        cur=1
+      else
+        tmp="$2"
+	cur=2
+      fi
+      if [[ "$tmp[1]" = '(' ]]; then
+	tmp=( ${=tmp[2,-2]} )
+      else
+	tmp=( "${(@P)tmp}" )
+      fi
+      if [[ "$1" = -i* ]]; then
+        iopts=( "$iopts[@]" "$tmp[@]" )
+      else
+        sopts=( "$sopts[@]" "$tmp[@]" )
+      fi
+      shift cur
+    done
+
+    # Now get the long option names by calling the command with `--help'.
+    # The parameter expansion trickery first gets the lines as separate
+    # array elements. Then we select all lines whose first non-blank
+    # character is a hyphen. Since some commands document more than one
+    # option per line, separated by commas, we convert commas int
+    # newlines and then split the result again at newlines after joining 
+    # the old array elements with newlines between them. Then we select
+    # those elements that start with two hyphens, remove anything up to
+    # those hyphens and anything from the space or comma after the
+    # option up to the end. 
+
+    lopts=("--${(@)^${(@)${(@)${(@M)${(@ps:\n:j:\n:)${(@)${(@M)${(@f)$(_call options ${~words[1]} --help 2>&1)//\[--/
+--}:#[ 	]#-*}//,/
+}}:#[ 	]#--*}#*--}%%[], ]*}:#}")
+    lopts=( "${(@)lopts:#--}" )
+
+    # Now remove all ignored options ...
+
+    while (( $#iopts )); do
+      lopts=( ${lopts:#$~iopts[1]} )
+      shift iopts
+    done
+
+    # ... and add "same" options
+
+    while (( $#sopts )); do
+      lopts=( $lopts ${lopts/$sopts[1]/$sopts[2]} )
+      shift 2 sopts
+    done
+
+    # Then we walk through the descriptions plus a few builtin ones.
+
+    set -- "$@" '*=FILE*:file:_files' \
+           '*=(DIR|PATH)*:directory:_files -/' '*: :'
+
+    while (( $# )); do
+
+      # First, we get the pattern and the action to use and take them
+      # from the positional parameters.
+
+      pattern="${${${(M)1#*[^\\]:}[1,-2]}//\\\\:/:}"
+      descr="${1#${pattern}}"
+      shift
+
+      # We get all options matching the pattern and take them from the
+      # list we have built. If no option matches the pattern, we
+      # continue with the next.
+
+      tmp=("${(@M)lopts:##$~pattern}")
+      lopts=("${(@)lopts:##$~pattern}")
+
+      (( $#tmp )) || continue
+
+      opt=''
+
+      # If there are option strings with a `[=', we take these get an
+      # optional argument.
+
+      tmpo=("${(@M)tmp:#*\[\=*}")
+      if (( $#tmpo )); then
+        tmp=("${(@)tmp:#*\[\=*}")
+        tmpo=("${(@)${(@)tmpo%%\=*}//[^a-z0-9-]}")
+
+        if [[ "$descr" = ::* ]]; then
+	  cache=( "$cache[@]" "${(@)^tmpo}=${descr}" )
+        else
+	  cache=( "$cache[@]" "${(@)^tmpo}=:${descr}" )
+        fi
+      fi
+
+      # Descriptions with `=': mandatory argument.
+
+      tmpo=("${(@M)tmp:#*\=*}")
+      if (( $#tmpo )); then
+        tmp=("${(@)tmp:#*\=*}")
+        tmpo=("${(@)${(@)tmpo%%\=*}//[^a-z0-9-]}")
+
+	cache=( "$cache[@]" "${(@)^tmpo}=${descr}" )
+      fi
+
+      # Everything else is just added as a option without arguments.
+
+      if (( $#tmp )); then
+        tmp=("${(@)tmp//[^a-zA-Z0-9-]}")
+	cache=( "$cache[@]" "$tmp[@]" )
+      fi
+    done
+    eval "${name}=( \"\${(@)cache:# #}\" )"
+  fi
+  set -- "$tmpargv[@]" "${(@P)name}"
 fi
 
-# Now parse the arguments...
-
-args=()
-nth=1
-while (( $# )); do
-
-  # This describes a one-shot option.
-
-  if [[ "$1" = [-+]* ]]; then
-    if [[ "$1" = *:* ]]; then
-
-      # If the option name ends in a `-', the first argument comes
-      # directly after the option, if it ends in a `+', the first
-      # argument *may* come directly after the option, otherwise it
-      # is in the next word.
-
-      if [[ "$1" = [^:]##-:* ]]; then
-        dopts[${${1%%:*}[1,-2]}]="${1#*:}"
-      elif [[ "$1" = [^:]##+:* ]]; then
-        odopts[${${1%%:*}[1,-2]}]="${1#*:}"
-      else
-        opts[${1%%:*}]="${1#*:}"
-      fi
-    else
-      opts[$1]=''
-    fi
-  elif [[ "$1" = \*[-+]* ]]; then
-
-    # The same for options that may appear more than once.
-
-    if [[ "$1" = *:* ]]; then
-      if [[ "$1" = [^:]##-:* ]]; then
-        dmopts[${${1[2,-1]%%:*}[1,-2]}]="${1#*:}"
-      elif [[ "$1" = [^:]##+:* ]]; then
-        odmopts[${${1[2,-1]%%:*}[1,-2]}]="${1#*:}"
-      else
-        mopts[${1[2,-1]%%:*}]="${1#*:}"
-      fi
-    else
-      mopts[${1[2,-1]}]=''
-    fi
-  elif [[ "$1" = \*:* ]]; then
-
-    # This is `*:...', describing `all other arguments'.
-
-    rest="${1[3,-1]}"
-  elif [[ "$1" = :* ]]; then
-
-    # This is `:...', describing `the next argument'.
-
-    args[nth++]="${1#*:}"
-  else
-
-    # And this is `n:...', describing the `n'th argument.
-
-    args[${1%%:*}]="${1#*:}"
-    nth=$(( ${1%%:*} + 1 ))
-  fi
-  shift
+subopts=()
+while [[ "$1" = -(O*|C) ]]; do
+  case "$1" in
+  -C) usecc=yes; shift ;;
+  -O) subopts=( "${(@P)2}" ); shift 2 ;;
+  *)  subopts=( "${(@P)1[3,-1]}" ); shift ;;
+  esac
 done
 
-if [[ $#long -ne 0 && "$PREFIX" = --* ]]; then
+zstyle -s ":completion:${curcontext}:options" auto-description autod
 
-   # If the current words starts with `--' and we should use long
-   # options, just call...
+if (( $# )) && comparguments -i "$autod" "$@"; then
+  local nm="$compstate[nmatches]" action noargs aret expl local
+  local next direct odirect equal single match matched ws tmp1 tmp2 tmp3
+  local opts subc prefix suffix
+  local origpre="$PREFIX" origipre="$IPREFIX"
 
-  _long_options "$long[@]"
-else
+  if comparguments -D descr action; then
+    comparguments -C subc
+    curcontext="${oldcontext%:*}:$subc"
 
-  # Otherwise parse the command line...
-
-  ws=( "${(@)words[2,-1]}" )
-  cur=$(( CURRENT-2 ))
-  nth=1
-
-  # ...until the current word is reached.
-
-  while [[ cur -gt 0 ]]; do
-
-    # `def' holds the description for the option we are currently after.
-    # Check if the next argument for the option is optional.
-
-    if [[ "$def" = :* ]]; then
-      opt=yes
+    if comparguments -O next direct odirect equal; then
+      opts=yes
+      _tags arguments options
     else
-      opt=''
+      _tags arguments
     fi
-    arg=''
-
-    # Remove one description/action pair from `def' if that isn't empty.
-
-    if [[ -n "$def" ]]; then
-      if [[ "$def" = ?*:*:* ]]; then
-        def="${def#?*:*:}"
-      else
-        def=''
-      fi
+  else
+    if comparguments -a; then
+      noargs='no more arguments'
     else
-
-      # If it is empty, and the word starts with `--' and we should
-      # complete long options, just ignore this word, otherwise make sure
-      # we test for options below and handle normal arguments.
-
-      if [[ $#long -eq 0 || "$ws[1]" != --* ]]; then
-        opt=yes
-	arg=yes
-      else
-        def=''
-      fi
+      noargs='no arguments'
     fi
+    comparguments -O next direct odirect equal || return 1
 
-    if [[ -n "$opt" ]]; then
+    opts=yes
+    _tags options
+  fi
 
-      # `opt' was set above if we have to test if the word is an option.
-      # We first test for the simple options -- those without arguments or
-      # those whose arguments have to be given as separate words.
+  while true; do
+    while _tags; do
+      if [[ -n "$matched" ]] || _requested arguments; then
+        _description arguments expl "$descr"
 
-      if (( $+opts[$ws[1]] )); then
-
-        # Options that may only be given once are removed from the
-        # associative array so that we are not offered them again.
-
-        def="$opts[$ws[1]]"
-        unset "opts[$ws[1]]"
-      elif (( $+mopts[$ws[1]] )); then
-        def="$mopts[$ws[1]]"
-      else
-
-        # If the word is none of the simple options, test for those
-        # whose first argument has to or may come directly after the
-        # option. This is done in four loops looking very much alike.
-
-        if (( $#dopts )); then
-
-	  # First we get the option names.
-
-	  tmp=( "${(@k)dopts}" )
-
-	  # Then we loop over them and see if the current word begins
-	  # with one of the option names.
-
-	  while (( $#tmp )); do
-	    [[ "$ws[1]" = ${tmp[1]}* ]] && break
-	    shift 1 tmp
-	  done
-
-	  if (( $#tmp )); then
-
-	    # It does. So use the description for it, but only from
-	    # the second argument on, because we are searching the
-	    # description for the next command line argument.
-
-	    opt=''
-	    def="$dopts[$tmp[1]]"
-	    unset "dopts[$tmp[1]]"
-	    if [[ "$def" = ?*:*:* ]]; then
-              def="${def#?*:*:}"
-            else
-              def=''
-	    fi
+        if [[ "$action" = -\>* ]]; then
+          comparguments -W line opt_args
+          state="${${action[3,-1]##[ 	]#}%%[ 	]#}"
+	  if [[ -n "$usecc" ]]; then
+	    curcontext="${oldcontext%:*}:$subc"
+	  else
+	    context="$subc"
+	  fi
+          compstate[restore]=''
+          aret=yes
+        else
+          if [[ -z "$local" ]]; then
+            local line
+            typeset -A opt_args
+            local=yes
           fi
-        fi
-	if [[ -n "$opt" && $#dmopts -ne 0 ]]; then
-	  tmp=( "${(@k)dmopts}" )
-	  while (( $#tmp )); do
-	    [[ "$ws[1]" = ${tmp[1]}* ]] && break
-	    shift 1 tmp
-	  done
 
-	  if (( $#tmp )); then
-	    opt=''
-	    def="$dmopts[$tmp[1]]"
-	    if [[ "$def" = ?*:*:* ]]; then
-              def="${def#?*:*:}"
-            else
-              def=''
-            fi
+          comparguments -W line opt_args
+
+          if [[ "$action" = \ # ]]; then
+
+            # An empty action means that we should just display a message.
+
+            [[ -n "$matched" ]] && compadd -n -Q -S '' -s "$SUFFIX" - "$PREFIX"
+            mesg="$descr"
+
+          elif [[ "$action" = \(\(*\)\) ]]; then
+
+            # ((...)) contains literal strings with descriptions.
+
+            eval ws\=\( "${action[3,-3]}" \)
+
+            _describe "$descr" ws -M "$match" "$subopts[@]"
+
+          elif [[ "$action" = \(*\) ]]; then
+
+            # Anything inside `(...)' is added directly.
+
+            _all_labels arguments expl "$descr" \
+                compadd "$subopts[@]" - ${=action[2,-2]}
+          elif [[ "$action" = \{*\} ]]; then
+
+            # A string in braces is evaluated.
+
+            while _next_label arguments expl "$descr"; do
+              eval "$action[2,-2]"
+            done
+          elif [[ "$action" = \ * ]]; then
+
+            # If the action starts with a space, we just call it.
+
+	    eval "action=( $action )"
+            while _next_label arguments expl "$descr"; do
+              "$action[@]"
+            done
+          else
+
+            # Otherwise we call it with the description-arguments.
+
+            eval "action=( $action )"
+            _all_labels arguments expl "$descr" \
+                "$action[1]" "$subopts[@]" "${(@)action[2,-1]}"
           fi
-	fi
-        if [[ -n "$opt" && $#odopts -ne 0 ]]; then
-	  tmp=( "${(@k)odopts}" )
-	  while (( $#tmp )); do
-	    [[ "$ws[1]" = ${tmp[1]}* ]] && break
-	    shift 1 tmp
-	  done
-
-	  if (( $#tmp )); then
-	    opt=''
-	    def="$odopts[$tmp[1]]"
-	    unset "odopts[$tmp[1]]"
-
-	    # For options whose first argument *may* come after the
-	    # option, we skip over the first description only if there
-	    # is something after the option name on the line.
-
-	    if [[ "$ws[1]" != "$tmp[1]" ]]; then
-	      if [[ "$def" = ?*:*:* ]]; then
-                def="${def#?*:*:}"
-              else
-                def=''
-              fi
-	    fi
-          fi
-        fi
-	if [[ -n "$opt" && $#odmopts -ne 0 ]]; then
-	  tmp=( "${(@k)odmopts}" )
-	  while (( $#tmp )); do
-	    [[ "$ws[1]" = ${tmp[1]}* ]] && break
-	    shift 1 tmp
-	  done
-
-	  if (( $#tmp )); then
-	    opt=''
-	    def="$odmopts[$tmp[1]]"
-	    if [[ "$ws[1]" != "$tmp[1]" ]]; then
-	      if [[ "$def" = ?*:*:* ]]; then
-                def="${def#?*:*:}"
-              else
-                def=''
-              fi
-            fi
-          fi
-	fi
-
-	# If we didn't find a matching option description and we were
-	# told to use normal argument descriptions, just increase
-	# our counter `nth'.
-
-        if [[ -n "$opt" && -n "$arg" ]]; then
-          def=''
-	  (( nth++ ))
         fi
       fi
-    fi
 
-    shift 1 ws
-    (( cur-- ))
+      if [[ -z "$matched$hasopts" ]] && _requested options &&
+          { ! zstyle -T ":completion:${curcontext}:options" prefix-needed ||
+            [[ "$origpre" = [-+]* ||
+            ( -z "$aret$mesg" && nm -eq compstate[nmatches] ) ]] } ; then
+	local prevpre="$PREFIX" previpre="$IPREFIX"
+
+	hasopts=yes
+
+	PREFIX="$origpre"
+	IPREFIX="$origipre"
+
+        comparguments -M match
+	
+        if comparguments -s single; then
+
+          _description options expl option
+
+          if [[ "$single" = direct ]]; then
+	    compadd "$expl[@]" -QS '' - "${PREFIX}${SUFFIX}"
+          elif [[ "$single" = next ]]; then
+	    compadd "$expl[@]" -Q - "${PREFIX}${SUFFIX}"
+          elif [[ "$single" = equal ]]; then
+	    compadd "$expl[@]" -QqS= - "${PREFIX}${SUFFIX}"
+          else
+	    tmp1=( "$next[@]" "$direct[@]" "$odirect[@]" "$equal[@]" )
+	    tmp3=( "${(M@)tmp1:#[-+]?[^:]*}" )
+	    tmp1=( "${(M@)tmp1:#[-+]?(|:*)}" )
+	    tmp2=( "${PREFIX}${(@M)^${(@)${(@)tmp1%%:*}#[-+]}:#?}" )
+
+            _describe -o option \
+                      tmp1 tmp2 -Q -S '' -- \
+		      tmp3 -Q
+          fi
+          single=yes
+        else
+          next=( "$next[@]" "$odirect[@]" )
+          _describe -o option \
+            next -Q -M "$match" -- \
+            direct -QS '' -M "$match" -- \
+            equal -QqS= -M "$match"
+        fi
+	PREFIX="$prevpre"
+	IPREFIX="$previpre"
+      fi
+    done
+    if [[ -n "$opts" && -z "$aret$matched$mesg" &&
+          nm -eq compstate[nmatches] ]]; then
+
+      PREFIX="$origpre"
+      IPREFIX="$origipre"
+
+      prefix="${PREFIX#*\=}"
+      suffix="$SUFFIX"
+      PREFIX="${PREFIX%%\=*}"
+      SUFFIX=''
+      compadd -M "$match" -D equal - "${(@)equal%%:*}"
+
+      if [[ $#equal -eq 1 ]]; then
+        PREFIX="$prefix"
+	SUFFIX="$suffix"
+	IPREFIX="${IPREFIX}${equal[1]%%:*}="
+	matched=yes
+
+	comparguments -L "${equal[1]%%:*}" descr action subc
+	curcontext="${oldcontext%:*}:$subc"
+
+	_tags arguments
+
+	continue
+      fi
+    fi
+    break
   done
 
-  # Now generate the matches.
+  [[ -z "$aret" || -z "$usecc" ]] && curcontext="$oldcontext"
 
-  nm="$compstate[nmatches]"
+  [[ -n "$aret" ]] && return 300
 
-  if [[ -z "$def" || "$def" = :* ]]; then
-
-    # We either don't have a description for an argument of an option
-    # or we have a description for a optional argument.
-
-    if [[ -z "$def" ]]; then
-
-      # If we have none at all, use the one for this argument position.
-
-      def="$args[nth]"
-      [[ -z "$def" ]] && def="$rest"
-    fi
-
-    # In any case, we have to complete option names here, but we may
-    # be in a string that starts with an option names and continues with
-    # the first argument, test that (again, four loops).
-
-    opt=yes
-    if (( $#dopts )); then
-
-      # Get the option names.
-
-      tmp=( "${(@k)dopts}" )
-      while (( $#tmp )); do
-        if compset -P "$tmp[1]"; then
-
-	  # The current string starts with the option name, so ignore
-	  # that and complete the rest of the string.
-
-	  def="$dopts[$tmp[1]]"
-	  opt=''
-	  break
-        fi
-	shift 1 tmp
-      done
-    fi
-    if [[ -n "$opt" && $#dmopts -ne 0 ]]; then
-      tmp=( "${(@k)dmopts}" )
-      while (( $#tmp )); do
-        if compset -P "$tmp[1]"; then
-	  def="$dmopts[$tmp[1]]"
-	  opt=''
-	  break
-        fi
-	shift 1 tmp
-      done
-    fi
-    if [[ -n "$opt" && $#odopts -ne 0 ]]; then
-      tmp=( "${(@k)odopts}" )
-      while (( $#tmp )); do
-        if compset -P "$tmp[1]"; then
-	  def="$odopts[$tmp[1]]"
-	  opt=''
-	  break
-        fi
-	shift 1 tmp
-      done
-    fi
-    if [[ -n "$opt" && $#odmopts -ne 0 ]]; then
-      tmp=( "${(@k)odmopts}" )
-      while (( $#tmp )); do
-        if compset -P "$tmp[1]"; then
-	  def="$odmopts[$tmp[1]]"
-	  opt=''
-	  break
-        fi
-	shift 1 tmp
-      done
-    fi
-    if [[ -n "$opt" ]]; then
-
-      # We aren't in an argument directly after a option name, so
-      # all option names are possible matches.
-
-      _description expl option
-      compadd "$expl[@]" - "${(@k)opts}" "${(@k)mopts}" \
-                           "${(@k)dopts}" "${(@k)dmopts}" \
-			   "${(@k)odopts}" "${(@k)odmopts}"
-    fi
-  fi
-
-  # Now add the matches from the description, if any.
-
-  if [[ -n "$def" ]]; then
-
-    # Ignore the leading colon describing optional arguments.
-
-    [[ "$def" = :* ]] && def="$def[2,-1]"
-
-    # Get the description and the action.
-
-    descr="${def%%:*}"
-    action="${${def#*:}%%:*}"
-
-    _description expl "$descr"
-
-    if [[ -z "$action" ]]; then
-
-      # An empty action means that we should just display a message.
-      _message "$descr"
-      return 1
-    elif [[ "$action[1]" = \( ]]; then
-
-      # Anything inside `(...)' is added directly.
-
-      compadd "$expl[@]" - ${=action[2,-2]}
-    elif [[ "$action" = \ * ]]; then
-
-      # If the action starts with a space, we just call it.
-
-      $=action
-    else
-
-      # Otherwise we call it with the description-arguments built above.
-
-      action=( $=action )
-      "$action[1]" "$expl[@]" "${(@)action[2,-1]}"
-    fi
-  fi
+  [[ -n "$mesg" ]] && _message "$mesg"
+  [[ -n "$noargs" ]] && _message "$noargs"
 
   # Set the return value.
 
-  [[  nm -ne "$compstate[nmatches]" ]]
+  [[ nm -ne "$compstate[nmatches]" ]]
+else
+  return 1
 fi

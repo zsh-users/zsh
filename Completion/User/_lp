@@ -1,50 +1,98 @@
 #compdef lp lpr lpq lprm
 
-local file expl ret=1 list disp strs shown
+local expl ret=1 printer list disp strs shown
 
 if (( ! $+_lp_cache )); then
+  local file entry names i
+
    file=( /etc/(printcap|printers.conf)(N) )
 
-  if (( $#file )); then
-    _lp_cache=( "${(@)${(@s:|:)${(@)${(@f)$(< $file[1])}:#[    \#]*}%%:*}%%[ 	]*}" )
-  else
-    # Default value. Could probably be improved
+  _lp_cache=()
+  _lp_alias_cache=()
 
-    _lp_cache=( lp0 )
+  if (( $#file )); then
+    while read entry; do
+      if [[ "$entry" = [^[:blank:]\#\*_]*:* ]]; then
+        names=( "${(s:|:)entry%%:*}" )
+        if [[ "$entry" = *:description=* ]]; then
+          disp="${${entry##*:description=}%%:*}"
+        elif [[ $#names -gt 1 && "$names[-1]" = *\ * ]] ;then
+          disp="$names[-1]"
+        else
+          disp=''
+        fi
+        if [[ -n "$disp" ]]; then
+          _lp_cache=( "$_lp_cache[@]" "${names[1]}:${disp}" )
+  	_lp_alias_cache=( "$_lp_alias_cache[@]" "${(@)^names[2,-1]:#*\ *}:${disp}" )
+        else
+          _lp_cache=( "$_lp_cache[@]" "${names[1]}" )
+  	_lp_alias_cache=( "$_lp_alias_cache[@]" "${(@)names[2,-1]:#*\ *}" )
+        fi
+      fi
+    done < $file[1]
   fi
+  (( $#_lp_cache )) || _lp_cache=( 'lp0:Guessed default printer' )
+  (( $#_lp_alias_cache )) || unset _lp_alias_cache
 fi
 
 if compset -P -P || [[ "$words[CURRENT-1]" = -P ]]; then
-  _wanted printers expl printer && compadd "$expl" - "$_lp_cache[@]"
+  if _wanted printers; then
+    if zstyle -T ":completion:${curcontext}:printers" verbose; then
+      zformat -a list ' -- ' "$_lp_cache[@]"
+      disp=(-ld list)
+    else
+      disp=()
+    fi
+    _all_labels printers expl printer \
+        compadd "$disp[@]" - "${(@)_lp_cache%%:*}" && return 0
+
+    (( $+_lp_alias_cache )) || return 1
+
+    if zstyle -T ":completion:${curcontext}:printers" verbose; then
+      zformat -a list ' -- ' "$_lp_alias_cache[@]"
+      disp=(-ld list)
+    else
+      disp=()
+    fi
+    compadd "$expl[@]" "$disp[@]" - "${(@)_lp_alias_cache%%:*}"
+  else
+    return 1
+  fi
 else
   if [[ "$words[1]" = (lpq|lprm) ]]; then
-    list=( "${(@M)${(f@)$(lpq)}:#[0-9]*}" )
+    if [[ "$words" = *-P* ]]; then
+      printer=(-P "${${words##*-P( |)}%% *}")
+    else
+      printer=()
+    fi
+    list=( ${(M)"${(f@)$(_call jobs lpq $printer 2> /dev/null)}":#[0-9]*} )
 
     if (( $#list )); then
       _tags users jobs
 
       while _tags; do
-        if _requested users expl user; then
+        if _requested users; then
           strs=( "${(@)${(@)list##[^ 	]##[ 	]##[^ 	]##[ 	]##}%%[ 	]*}" )
           if [[ -z "$shown" ]] &&
-             zstyle -t ":completion:${curcontext}:users" verbose; then
+             zstyle -T ":completion:${curcontext}:users" verbose; then
             disp=(-ld list)
   	  shown=yes
           else
   	  disp=()
           fi
-          compadd "$expl[@]" "$disp[@]" - "$strs[@]" || _users && ret=0
+	  _all_labels users expl user compadd "$disp[@]" - "$strs[@]" ||
+              _users && ret=0
         fi
-        if _requested jobs expl job; then
+        if _requested jobs; then
           strs=( "${(@)${(@)list##[^ 	]##[ 	]##[^ 	]##[ 	]##[^ 	]##[ 	]##}%%[ 	]*}" )
           if [[ -z "$shown" ]] &&
-             zstyle -t ":completion:${curcontext}:jobs" verbose; then
+             zstyle -T ":completion:${curcontext}:jobs" verbose; then
             disp=(-ld list)
   	  shown=yes
           else
   	  disp=()
           fi
-          compadd "$expl[@]" "$disp[@]" - "$strs[@]" && ret=0
+          _all_labels jobs expl job compadd "$disp[@]" - "$strs[@]" && ret=0
         fi
         (( ret )) || return 0
       done

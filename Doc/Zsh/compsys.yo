@@ -1,87 +1,130 @@
-texinode(Completion System)()(Zsh Modules)(Top)
+texinode(Completion System)(Zsh Modules)(Completion Widgets)(Top)
 chapter(Completion System)
-cindex(completion, system)
+cindex(completion system)
 cindex(completion, programmable)
 cindex(completion, controlling)
 sect(Description)
 
 This describes the shell code for the new completion system.  It consists
-of two scripts and a few other files that define shell functions.
-The shell functions which implement completion behaviour and which may
-be bound to keystrokes, are referred to as `widgets'.  All are contained
-in the following subdirectories of the tt(Completion) directory of the main
-distribution directory.
-
-startitem()
-item(tt(Core))(
-The core scripts and functions.  You will certainly need these, though will
-probably not need to alter them.  The contents of this directory is
-described in more detail below.
-)
-item(tt(Base))(
-Other functions you will almost certainly want if you are going to use
-any of the standard completion functions.  You may want to edit some of
-these files.
-)
-item(tt(Builtins))(
-Functions for completing arguments of shell builtin commands.
-)
-item(tt(User))(
-Functions for completing arguments of external commands and suites of
-commands.  They may need modifying for your system.
-)
-item(tt(Commands))(
-Functions which implement special types of completion to be bound to
-keystrokes rather than called by context.
-)
-enditem()
-
-You should decide which files you will be using and copy them to a
-directory (or multiple directories) of your own which should appear in your
-tt($fpath) variable so that the functions can be autoloaded.
+of various shell functions; those beginning `tt(comp)' are to be called
+directly by the user, while those beginning `tt(_)' are called by the
+completion code.  The shell functions of the second set which implement
+completion behaviour and which may be bound to keystrokes, are referred to
+as `widgets'.
 
 startmenu()
-menu(Initialisation)
+menu(Initialization)
+menu(Completion System Configuration)
 menu(Control Functions)
+menu(Bindable Commands)
 menu(Completion Functions)
+menu(Completion Directories)
 endmenu()
 
-texinode(Initialisation)(Control Functions)()(Completion System)
-sect(Initialisation)
+texinode(Initialization)(Completion System Configuration)()(Completion System)
+sect(Initialization)
+findex(compinstall)
+cindex(completion system, installing)
 
-To initialise the system, the script tt(compinit) should be sourced with
-`tt(source )var(<path>)tt(/compinit)' or
-`tt(. )var(<path>)tt(/compinit)'. This will define a few utility functions,
-arrange for all the necessary shell functions to be autoloaded, and will
-then re-bind all keys that do completion to use the new system.
+The function tt(compinstall) can be run by a user to set up the completion
+system for use, which also provides options for more advanced usage.
+However, if the system was installed completely, it should be enough to
+call the shell function tt(compinit) from your initialization file; see the
+next section.
 
-subsect(Arguments)
+Usually, tt(compinstall) will insert code into tt(.zshrc), although if
+that is not writable it will save it in another file and tell you that
+file's location.  Note that it is up to you to make sure that the lines
+added to tt(.zshrc) are actually run; you may, for example, need to move
+them to an earlier place in the file if tt(.zshrc) usually returns early.
+So long as you keep them all together (including the comment lines at the
+start and finish), you can rerun tt(compinstall) and it will correctly
+locate and modify these lines.  Note, however, that any code you add to
+this section by hand is likely to be lost if you rerun tt(compinstall).
+The new code will take effect next time you start the shell, or run
+tt(.zshrc) by hand.
+
+To run it, you will need to make sure it is in a directory mentioned in your
+tt($fpath) parameter, and that it is autoloaded (`tt(autoload -U
+compinstall)' is recommended).  It will ask you various questions about how
+you would like completion set up.  It is in two parts; the basic part
+locates the completion files and decides where to put your personal
+dumpfile, used to speed up initialization after the first time.  After
+that, you will be asked if you wish to go on to the advanced set-up; if you
+answer tt(n), you can rerun tt(compinstall) later without having to
+re-enter any of the basic settings.
+
+You can abort the installation any time you are being prompted for
+information, and your tt(.zshrc) will not be altered at all.
+
+After initialization all the builtin completion widgets such as
+tt(expand-or-complete) will be redefined to use the new completion system.
+Should you need to, you can still bind keys to the old functions by putting
+a `tt(.)' in front, e.g. `tt(.expand-or-complete)'.
+
+subsect(Use of compinit)
+findex(compinit)
+cindex(completion system, initializing)
+
+This section describes the use of tt(compinit) to initialize completion for
+the current session when run directly by the user; if you have run
+tt(compinstall) it will be called automatically from your tt(.zshrc).
+
+To initialize the system, the function tt(compinit) should be in a
+directory mentioned in the tt($fpath) variable, and should be autoloaded
+(`tt(autoload -U compinit)' is recommended).  When run, it will define a
+few utility functions, arrange for all the necessary shell functions to be
+autoloaded, and will then re-bind all keys that do completion to use the
+new system. Note that this means that the tt(zsh/complist) module has
+to be loaded before the completion system is initialized (i.e. the
+tt(compinit) function is called) to make sure that the tt(menu-select)
+widget defined by it will be redefined, too.
 
 To speed up the running of tt(compinit), it can be made to produce a dumped
-configuration which will be read in on future invocations.  The easiest way
-to do this is by adding the option tt(-d) whenever tt(compinit) is sourced.
-In this case the dumped file will have the same name as the sourced file,
-but with tt(.dump) appended to the end; alternatively, an explicit file
-name can be given following the tt(-d).  On the next call to tt(compinit
--d), the dumped file will be read instead.
+configuration which will be read in on future invocations; this is the
+default, although it can be turned off by calling tt(compinit) with the
+option tt(-D).  The dumped file is tt(.zcompdump) in the same
+directory as the startup files (i.e. tt($ZDOTDIR) or tt($HOME));
+alternatively, an explicit file name can be given by `tt(compinit -d)
+var(dumpfile)'.  On the next call to tt(compinit), the dumped file will be
+read instead of a full initialization.
 
 If the number of completion files changes, tt(compinit) will recognise this
 and produce a new dump file.  However, if the name of a function or the
-arguments in the first line of a tt(#compdef) funcion (as described below)
+arguments in the first line of a tt(#compdef) function (as described below)
 change, it is easiest to delete the dump file by hand so that the next time
 tt(compinit) will re-create it.
 
-The dumping is actually done by another script, tt(compdump), but you will
-only need to source this yourself if you change the configuration
+The dumping is actually done by another function, tt(compdump), but you
+will only need to run this yourself if you change the configuration
 (e.g. using tt(compdef)) and then want to dump the new one.  The name of
-the old dumped file will be remembered for this.
+the old dumped file will be remembered for this purpose.
+
+If the parameter tt(_compdir) is set, tt(compinit) uses it as a directory
+where completion functions can be found; this is only necessary if they are
+not already in the function search path.
 
 subsect(Autoloaded files)
+cindex(completion system, autoloaded functions)
 
 The convention for autoloaded functions used in completion is that they
 start with an underscore; as already mentioned, the tt(fpath/FPATH)
-parameter must contain the directory in which they are stored.  When
-tt(compinit) is sourced, it searches all such files accessible via
+parameter must contain the directory in which they are stored.  If tt(zsh)
+was properly installed on your system, then tt(fpath/FPATH) automatically
+contains the required directories.
+
+For incomplete installations, if tt(compinit) does not find enough files
+beginning with an underscore (fewer than twenty) in the search path, it
+will try to find more by adding the directory tt(_compdir) to the search
+path; if you have run tt(compinstall), this will be set automatically.
+Furthermore, if the directory in question ends in the path segment
+tt(Core), or has a subdirectory named tt(Core), tt(compinit) will add all
+subdirectories of the directory where tt(Core) is to the path: this allows
+the functions to be in the same format as in the tt(zsh) source
+distribution.
+
+cindex(compdef, use of by compinit)
+When tt(compinit) is run, it searches all such files accessible via
 tt(fpath/FPATH) and reads the first line of each of them.  This line should
 contain one of the tags described below. Files whose first line does not
 start with one of these tags are not considered to be part of the
@@ -103,13 +146,23 @@ called when completing for a command whose name matches the given
 var(pattern) (a standard globbing pattern).  Note that only one
 var(pattern) may be given.
 )
+item(tt(#compdef -P) var(pattern))(
+Like the previous one, but the function will be called only if no
+completion function for the command on the line could be found.
+)
 item(tt(#compdef -k) var(style key-sequences...))(
-This can be used bind special completion functions to the
+This can be used to bind special completion functions to the
 var(key-sequences).  It creates a widget behaving like the builtin widget
 var(style), which must be one of those that perform completion, namely
 tt(complete-word), tt(delete-char-or-list), tt(expand-or-complete),
 tt(expand-or-complete-prefix), tt(list-choices), tt(menu-complete),
-tt(menu-expand-or-complete), or tt(reverse-menu-complete).
+tt(menu-expand-or-complete), or tt(reverse-menu-complete). If the
+tt(complist) module is loaded (see
+ifzman(zmanref(zshmodules))\
+ifnzman(noderef(The zsh/complist Module))\
+), the tt(menu-select) widget can be used, too.  Note that the
+bindings will not be used if the key is already bound (that
+is, is bound to something other than tt(undefined-key)).
 
 The widget is then bound to all the var(key-sequences) given, if any: when
 one of the var(key-sequences) is typed, the function in the file will
@@ -117,29 +170,54 @@ be invoked to generate the matches. The widget created has the same
 name as the file and can also be bound to other keys using tt(bindkey) 
 as usual.
 )
-item(tt(#autoload))(
+item(tt(#compdef -K) var(widget-name) var(style) var(key-sequences) ...)(
+This is similar to tt(-k), with the same var(style) and var(key-sequences)
+arguments arguments, preceeded by a string giving the name of a widget.
+In this case only one var(key-sequences) argument may be given, but the
+entire set of three arguments may be repeated with a different set of
+arguments.  In particular, the var(widget-name) must be distinct in each
+set.  It should begin with `tt(_)', else one will be added, and should not
+clash with the name of any existing widget: names based on the name of the
+function are most useful.  For example,
+
+example(#compdef -K _foo_complete complete-word "^X^C" \ 
+  _foo_list list-choices "^X^D")
+
+(all on one line) defines a widget tt(_foo_complete) for completion, bound
+to `tt(^X^C)', and a widget tt(_foo_list) for listing, bound to `tt(^X^D)'.
+)
+item(tt(#autoload) [ var(options) ])(
 This is used for files defining utility function that are not to be
 called directly as completion functions but should be loaded automatically
 when invoked.  Typically they are to be called from within one of the
 completion functions.
+
+The var(options) will be given to the tt(autoload) builtin command
+when making the function autoloaded. Note that the tt(-U) flag is
+always used. Most often, this will be tt(+X) to force the function
+being loaded immediately.
 )
 enditem()
 
 Note that the tt(#) is part of the tag name and no white space is allowed
-after it.  The tt(#compdef) tags use the tt(compdef) function defined
+after it.  The tt(#compdef) tags use the tt(compdef) function described
 below; the main difference is that the name of the function is supplied
 implicitly.
 
 subsect(Functions)
 
-The tt(compinit) file defines the following functions, which may
+The tt(compinit) file defines the following function, which may
 also be called directly by the user.
 
+findex(compdef)
+cindex(completion system, adding definitions)
 startitem()
 xitem(tt(compdef) [ tt(-an) ] var(function names...))
 xitem(tt(compdef -d) var(names...))
 xitem(tt(compdef -p) [ tt(-a) ] var(function pattern))
-item(tt(compdef -k) [ tt(-a) ] var(function style key-sequences...))(
+xitem(tt(compdef -P) [ tt(-a) ] var(function pattern))
+xitem(tt(compdef -k) [ tt(-an) ] var(function style key-sequences...))
+item(tt(compdef -K) [ tt(-an) ] var(function name style key-sequences ...))(
 The first form tells the completion system to call the given
 var(function) when completing for the contexts or commands
 whose var(names) are given:  this is like the tt(#compdef) tag.  If the
@@ -147,78 +225,1588 @@ tt(-n) option is given, any existing completion behaviour for particular
 contexts or commands will not be altered.  These definitions can be deleted
 by giving the tt(-d) option as in the second form.
 
-The third form is similar to the first, but var(function) will be called
-for all commands whose name matches the var(pattern); this is like the
-tt(#compdef -p) function tag.
+The form with tt(-p) is similar to the first, but var(function) will be
+called for all commands whose name matches the var(pattern); this is like
+the tt(#compdef -p) function tag.
 
-The fourth form defines a widget with the same name as the var(function)
+The form with tt(-P) is like the third, but the var(function) will be
+called only if no function for the command itself was found or if one
+was found and it set the tt(_compskip) parameter to a value em(not)
+containing the substring tt(patterns).
+
+The form with tt(-k) defines a widget with the same name as the var(function)
 which will be called for each of the var(key-sequences); this is like the
 tt(#compdef -k) tag.  The function should generate the completions needed
 and will otherwise behave like the builtin widget whose name is given as
 the var(style) argument. The widgets usable for this are:
 tt(complete-word), tt(delete-char-or-list), tt(expand-or-complete),
 tt(expand-or-complete-prefix), tt(list-choices), tt(menu-complete),
-tt(menu-expand-or-complete), and tt(reverse-menu-complete).
+tt(menu-expand-or-complete), and tt(reverse-menu-complete), as well as
+tt(menu-select) if the tt(zsh/complist) module is loaded.  The option tt(-n)
+prevents the key being bound if it is already to bound to something other
+than tt(undefined-key).
+
+The form with tt(-K) is similar and defines multiple widgets based on the
+same var(function), each of which requires the set of three arguments
+var(name), var(style) and var(key-sequences), where the latter two are as
+for tt(-k) and the first must be a unique widget name beginning with an
+underscore.
 
 In each of the forms supporting it the tt(-a) option makes the
 var(function) autoloadable (exactly equivalent to
-tt(autoload )var(function)).
-)
-xitem(tt(compconf) var(definitions...))
-xitem(tt(compconf))
-item(tt(compconf) [ tt(-l) ] var(keys...))(
-Several aspects of the completion system can be configured by the
-user. The configuration values are stored under the keys described
-below in the associative array `tt(compconfig)'.  After sourcing
-tt(compinit), configuration values can either be set directly as in
-`tt(compconfig[completer]=_complete)' or by calling this utility function.
-
-Each var(definition) may be either a simple `var(key)', which sets this
-key in the tt(compconfig) array to an empty string, or of the form
-`var(key=value)' which stores the `var(value)' under key `var(key)'.
-
-Since the completion system also uses the array for internal purposes,
-you should not set all values at once by doing `tt(compconfig=(...))'.
-
-In the second form (without arguments), this function lists all keys
-and their values. If given the tt(-l) option as its first argument, as 
-in the last form, the other arguments are taken as names of keys and
-the values of these keys are printed one per line.
+tt(autoload -U )var(function)).
 )
 enditem()
 
-texinode(Control Functions)(Completion Functions)(Initialisation)(Completion System)
-sect(Control Functions)
+texinode(Completion System Configuration)(Control Functions)(Initialization)(Completion System)
+sect(Completion System Configuration)
+cindex(completion system, configuration)
 
-The initialisation script tt(compinit) re-binds all the keys which perform
-completion to newly created widgets that all call the supplied widget
-function tt(_main_complete). This function acts as a wrapper calling
-the so-called `completer' functions that generate matches. If
-tt(_main_complete) is
-called with arguments, these are taken as the names of completer
-functions to be called in the order given.  If no arguments are given, the
-set of functions to try is taken from the colon-separated list in the
-configuration key tt(completer). For example, to use normal
-completion and correction if that doesn't generate any matches:
+This section gives a short overview of how the completion system works,
+and then more detail on how users can configure how and when matches are
+generated.
 
-indent(
-nofill(tt(compconf completer=_complete:_correct))
+subsect(Overview)
+
+When completion is attempted somewhere on a command line the
+completion system first tries to find out the context where completion 
+was tried.  The context depends on such things as the name of the
+command when completing an argument, and possibily also
+the name of an option when completing an argument to that option.
+
+For the context a name consisting of multiple fields is built. This
+name is then used to look up styles that can be used to configure the
+completion system. Since it is not possible to build the whole context 
+name in advance, completion function may modify some of the fields and 
+hence the context name used for lookup may vary during the same call
+to the completion system.
+
+The context name always consists of the following fields, separated
+by colons:
+
+startitemize()
+itemiz(\
+The literal string tt(completion), saying that this style is used by
+the completion system.
 )
+itemiz(\
+The var(function); in many cases this field will be blank, but when
+the completion system is called from other functions, like
+tt(predict-on) or one of the functions in the tt(Command) directory of 
+the distribution, this field contains the (probably abbreviated) name
+of that function.
+)
+itemiz(\
+The var(completer) currently active, i.e. the name of the completer
+function without the leading underscore. Such a completer is in
+overall control of how completion is to be performed; `tt(complete)'
+is the basic one for ordinary completion, but completers may perform
+various related tasks such as correction, or modify the behaviour of a
+later completer (see
+ifzman(the section `Control Functions' below)\
+ifnzman(noderef(Control Functions)) 
+for more information).  
+)
+itemiz(\
+The var(context) or var(command). This is either one of the special
+context names such as tt(-condition-) as explained for the
+tt(_complete) completer below, or the name of the command we are
+completing arguments for. Completion functions for commands that have
+sub-commands usually modify this field to contain the name of the
+command followed by a minus sign and the sub-command (e.g. the
+completion function for the tt(cvs) command sets this field to strings
+such as tt(cvs-add) when completing for the tt(add) sub-command).
+)
+itemiz(\
+The var(argument), describing which argument we are
+completing. Normally this is either a string of the form
+tt(argument-)var(n), where var(n) is the number of the argument or it
+is a string of the form tt(-)var(opt)tt(-)var(n) when completing the
+var(n)'th argument of the option var(opt).
+)
+itemiz(\
+The var(tag). Tags are used for two purposes:  to describe the types
+of matches a completion function can generate for a certain context
+and to simplify the definition of styles that are tested.
+)
+enditemize()
 
-after sourcing tt(compinit). The default value for this configuration key
-set up in tt(compinit) is `tt(_complete)', i.e. normally only ordinary
-completion is tried. The tt(_main_complete) function uses the return value
-of the completer functions to decide if other completers should be
+As an example, the context name
+
+example(tt(:completion::complete:dvips:-o-1:files))
+
+says that normal completion was attempted on an argument of the tt(dvips)
+command (more precisely: completion was attempted on the first argument
+after the tt(-o) option) and the completion function will generate
+filenames for this context.
+
+In many of the possible contexts the completion system can generate
+matches, often multiple types of matches.  These types are represented as
+simple names called `tags'.  The completion system will decide internally
+what sort of tags are allowed; a list of the standard possibilities is given
+below.  To determine in which order the tags are to be used by the
+completion function, the `tt(tag-order)' style for the appropriate
+context may be set, as described in the list of standard styles below.
+Only those types of matches whose tags were selected by this style
+will be produced, and in the order given.
+
+The tt(_complete_help) bindable command described in 
+ifzman(the section `Bindable Commands' below)\
+ifnzman(noderef(Bindable Commands))
+can be invoked to find out the context and tag names and styles used at a particular
+point in completion.  It shows a list of context names and the 
+tag names used in those contexts and then a list of context names and
+the styles used in those contexts if completion were tried at the
+current cursor position.  Hence one can easily find out all the
+information needed to change the behaviour of the tt(tag-order) style
+for a particular context.
+
+Completion behaviour can be modified by various other
+styles defined with the tt(zstyle) builtin command (\
+ifzman(see zmanref(zshmodules))\
+ifnzman(noderef(The zsh/zutil Module))).
+When looking up styles the completion system uses full context names,
+including the tag.
+
+Styles determine such things as how the matches are generated; some of them
+correspond to shell options (for example, the use of menu completion), but
+styles provide more specific control.  They can have any number of strings as
+their value.  Looking up the value of a style therefore consists of two
+things:  the context, which may be matched as a pattern, and the name of
+the style itself, which must be given exactly.
+
+For example, many completion functions can generate matches in a
+simple and a verbose form and use the tt(verbose) style to decide
+which form should be used. To make all such functions always use the
+verbose form one can simply call
+
+example(zstyle ':completion:*' verbose yes)
+
+in one of the startup files like tt(.zshrc). This definition simply
+means that the tt(verbose) style has tt(yes) as its value in every
+context inside the completion system.  If the pattern were `tt(*)', it
+would mean that the verbose style had this value anywhere the style
+mechanism is used.
+
+As a more specific example, the completion function for the tt(kill)
+builtin command uses the tt(verbose) style to decide if jobs and processes
+are listed only as job numbers and process identifiers or if they are
+listed with the full job texts and the command lines of the processes (the
+latter is achieved by calling the tt(ps) command). To make this builtin
+list the matches only as numbers one could call:
+
+example(zstyle ':completion:*:*:kill:*' verbose no)
+
+Furthermore, if one wanted to see the command lines for processes but not the
+job texts one could use the fact that the context name contains the tag name
+when styles are looked up.  As the function for the tt(kill)
+builtin command uses the tags tt(jobs) and tt(processes), we can use:
+
+example(zstyle ':completion:*:*:kill:*:jobs' verbose no)
+
+Note that the order in which styles are em(defined) does not matter; the
+style mechanism uses the most specific possible match for a particular
+style to determine the set of values.  More precisely, strings are
+preferred over patterns (for example, `tt(:completion:complete:foo)' is
+more specific than `tt(:completion:complete:*')), and longer patterns are
+preferred over shorter patterns.
+
+As for tags, completion functions can use any number of styles, so
+there can't be a complete list. However, the following two sections
+list those tags and styles that are used in many places of the
+completion system.
+
+subsect(Standard Tags)
+cindex(completion system, tags)
+
+Here are the tags currently used by the completion system. Note that
+some of these tags are not actually used while generating matches,
+but are only used by some completion functions when looking up
+styles.
+
+startitem()
+kindex(accounts, completion tag)
+item(tt(accounts))(
+used to look up the tt(users-hosts) style
+)
+kindex(all-files, completion tag)
+item(tt(all-files))(
+for the names of all files
+)
+kindex(all-expansions, completion tag)
+item(tt(all-expansions))(
+used by the tt(_expand) completer when adding the string containing
+all expansions
+)
+kindex(arguments, completion tag)
+item(tt(arguments))(
+when an argument of a command may be completed
+)
+kindex(arrays, completion tag)
+item(tt(arrays))(
+for names of array parameters
+)
+kindex(association-keys, completion tag)
+item(tt(association-keys))(
+for keys of associative arrays (e.g. when completing inside a
+subscript of such a parameter)
+)
+kindex(bookmarks, completion tag)
+item(tt(bookmarks))(
+when completing bookmarks (e.g. for URLs and the tt(zftp) function suite)
+)
+kindex(builtins, completion tag)
+item(tt(builtins))(
+for names of builtin commands
+)
+kindex(characters, completion tag)
+item(tt(characters))(
+used for commands like tt(stty) when completing characters; also used
+when completing character classes after a opening bracket
+)
+kindex(colors, completion tag)
+item(tt(colors))(
+for color names
+)
+kindex(commands, completion tag)
+item(tt(commands))(
+for names of external commands and names of sub-commands (used by some 
+commands like tt(cvs))
+)
+kindex(corrections, completion tag)
+item(tt(corrections))(
+used by the tt(_approximate) and tt(_correct) completers for the possible
+corrections
+)
+kindex(cursors, completion tag)
+item(tt(cursors))(
+for cursor names used by X programs
+)
+kindex(default, completion tag)
+item(tt(default))(
+used to look up default values for various styles that may also be set 
+for tags that are used when generating matches
+)
+kindex(descriptions, completion tag)
+item(tt(descriptions))(
+used when looking up the value of the tt(format) style for
+descriptions
+)
+kindex(devices, completion tag)
+item(tt(devices))(
+for names of device special files
+)
+kindex(directories, completion tag)
+item(tt(directories))(
+for names of directories
+)
+kindex(directory-stack, completion tag)
+item(tt(directory-stack))(
+for entries in the directory stack
+)
+kindex(displays, completion tag)
+item(tt(displays))(
+for X display names
+)
+kindex(domains, completion tag)
+item(tt(domains))(
+for network domains
+)
+kindex(expansions, completion tag)
+item(tt(expansions))(
+used by the tt(_expand) completer for possible expansions
+)
+kindex(extensions, completion tag)
+item(tt(extensions))(
+for X server extensions
+)
+kindex(files, completion tag)
+item(tt(files))(
+used by completion functions that can complete some kind of filenames
+and different types of matches
+)
+kindex(fonts, completion tag)
+item(tt(fonts))(
+used for X font names
+)
+kindex(functions, completion tag)
+item(tt(functions))(
+names of functions (shell functions or other kinds of functions for
+some commands)
+)
+kindex(globbed-files, completion tag)
+item(tt(globbed-files))(
+for names of files matching the glob pattern used by completion
+functions that expect a certain type of file
+)
+kindex(groups, completion tag)
+item(tt(groups))(
+used when completing names of user groups
+)
+kindex(history-words, completion tag)
+item(tt(history-words))(
+for words from the history
+)
+kindex(hosts, completion tag)
+item(tt(hosts))(
+for hostnames
+)
+kindex(indexes, completion tag)
+item(tt(indexes))(
+used for array indexes
+)
+kindex(jobs, completion tag)
+item(tt(jobs))(
+used for jobs
+)
+kindex(keymaps, completion tag)
+item(tt(keymaps))(
+for names of zsh keymaps
+)
+kindex(keysyms, completion tag)
+item(tt(keysyms))(
+for names of X keysyms
+)
+kindex(local-directories, completion tag)
+item(tt(local-directories))(
+for names of directories in the current working directory when
+completing for the tt(cd) builtin command
+)
+kindex(libraries, completion tag)
+item(tt(libraries))(
+for names of system libraries
+)
+kindex(limits, completion tag)
+item(tt(limits))(
+for system limits
+)
+kindex(manuals, completion tag)
+item(tt(manuals))(
+for names of manual pages
+)
+kindex(maps, completion tag)
+item(tt(maps))(
+for map names (e.g. YP maps)
+)
+kindex(messages, completion tag)
+item(tt(messages))(
+used to look up the tt(format) style for messages
+)
+kindex(modifiers, completion tag)
+item(tt(modifiers))(
+for names of X modifiers
+)
+kindex(modules, completion tag)
+item(tt(modules))(
+for modules (e.g. tt(zsh) modules)
+)
+kindex(my-accounts, completion tag)
+item(tt(my-accounts))(
+used to look up the tt(users-hosts) style
+)
+kindex(named-directories, completion tag)
+item(tt(named-directories))(
+for named directories (you wouldn't have guessed that, would you?)
+)
+kindex(names, completion tag)
+item(tt(names))(
+for all kinds of names
+)
+kindex(nicknames, completion tag)
+item(tt(nicknames))(
+for nicknames of YP maps
+)
+kindex(options, completion tag)
+item(tt(options))(
+for command options
+)
+kindex(original, completion tag)
+item(tt(original))(
+used by the tt(_approximate), tt(_correct) and tt(_expand) completers when
+adding the original string
+)
+kindex(other-accounts, completion tag)
+item(tt(other-accounts))(
+used to look up the tt(users-hosts) style
+)
+kindex(packages, completion tag)
+item(tt(packages))(
+for packages (e.g. tt(rpm) or installed tt(Debian) packages)
+)
+kindex(parameters, completion tag)
+item(tt(parameters))(
+for names of parameters
+)
+kindex(path-directories, completion tag)
+item(tt(path-directories))(
+for names of directories in directories from the tt(cdpath) array when
+completing for the tt(cd) builtin command
+)
+kindex(paths, completion tag)
+item(tt(paths))(
+used to look up the values of the tt(expand), tt(cursor) and
+tt(special-dirs) styles
+)
+kindex(pids, completion tag)
+item(tt(pids))(
+for process identifiers
+)
+kindex(pids-list, completion tag)
+item(tt(pids-list))(
+used to look up the tt(command) style when generating the list to
+display for process identifiers
+)
+kindex(pods, completion tag)
+item(tt(pods))(
+for perl pods
+)
+kindex(ports, completion tag)
+item(tt(ports))(
+for communication ports
+)
+kindex(prefixes, completion tag)
+item(tt(prefixes))(
+for prefixes (like those of an URL)
+)
+kindex(printers, completion tag)
+item(tt(printers))(
+for printer names
+)
+kindex(processes, completion tag)
+item(tt(processes))(
+for process identifiers
+)
+kindex(sequences, completion tag)
+item(tt(sequences))(
+for sequences (e.g. tt(mh) sequences)
+)
+kindex(sessions, completion tag)
+item(tt(sessions))(
+for sessions in the tt(zftp) function suite
+)
+kindex(signals, completion tag)
+item(tt(signals))(
+for signal names
+)
+kindex(strings, completion tag)
+item(tt(strings))(
+for strings (e.g. the replacement strings for the tt(cd) builtin
+command)
+)
+kindex(tags, completion tag)
+item(tt(tags))(
+for tags (e.g. tt(rpm) tags)
+)
+kindex(targets, completion tag)
+item(tt(targets))(
+for makefile targets
+)
+kindex(types, completion tag)
+item(tt(types))(
+for types of whatever (e.g. adress types for the tt(xhost) command)
+)
+kindex(urls, completion tag)
+item(tt(urls))(
+used to look up the tt(path) and tt(local) styles when completing URLs
+)
+kindex(users, completion tag)
+item(tt(users))(
+for usernames
+)
+kindex(values, completion tag)
+item(tt(values))(
+when completing a value out of a set of values (or a list of such
+values)
+)
+kindex(warnings, completion tag)
+item(tt(warnings))(
+used to look up the tt(format) style for warnings
+)
+kindex(widgets, completion tag)
+item(tt(widgets))(
+for zsh widget names
+)
+kindex(windows, completion tag)
+item(tt(windows))(
+for IDs of X windows
+)
+kindex(zsh-options, completion tag)
+item(tt(zsh-options))(
+for shell options
+)
+enditem()
+
+subsect(Standard Styles)
+cindex(completion system, styles)
+
+Here are the names of the styles used by the completion system. Note
+that the values of several of these styles represent boolean
+values. In all these cases any of the strings `tt(true)', `tt(on)',
+`tt(yes)', and `tt(1)' can be used for the truth value `true' and
+the strings `tt(false)', `tt(off)', `tt(no)', and `tt(0)' are
+interpreted as `false'.  The behavior for any other value is undefined 
+unless the description for the particular style mentions other
+possible values.
+
+startitem()
+kindex(accept-exact, completion style)
+item(tt(accept-exact))(
+This is tested for the default tag and the tags used when generating
+matches. If it is set to `true' for at least one match which is the
+same as the string on the line, this match will immediately be
+accepted.
+)
+kindex(add-space, completion style)
+item(tt(add-space))(
+This style is used by the tt(_prefix) completer to decide if a space
+should be inserted before the suffix.
+)
+kindex(auto-description, completion style)
+item(tt(auto-description))(
+If set, this style's value will be used as the description for options which
+are not described by the completion functions, but that have exactly
+one argument. The sequence `tt(%d)' in the value will be replaced by
+the description for this argument. Depending on personal preferences,
+it may be useful to set this style to something like `tt(specify: %d)'. 
+Note that this may not work for some commands.
+)
+kindex(break, completion style)
+item(tt(break))(
+This style is used by the tt(incremental-complete-word) widget (found
+in the tt(Functions/Zle) directory of the distribution). Its value
+should be a pattern and all keys matching this pattern will cause the
+widget to stop incremental completion without the key having any
+further effect.
+)
+kindex(command, completion style)
+item(tt(command))(
+This style can be used to override the defaults in several completion
+functions for how commands are called to generate information about
+possible matches. The strings in the value are joined with spaces
+between them to build the command line to execute. If the value starts 
+with a hyphen the string built will be prepended to the default
+supplied by the completion function. This allows one to easily stick a 
+tt(builtin) or tt(command) in front of the default in case one has,
+for example, a shell function with the same name as the command
+called, but for completion purposes one needs to ensure that the real
+command is called.
+
+For example, the function generating process IDs as matches uses this
+style with the tt(pids) tag to generate the IDs to complete and iwhen
+the tt(verbose) style is `true', it uses this style with the
+tt(pids-list) tag to generate the strings to display. When using
+different values for these two tags one should ensure that the process
+IDs appear in the same order in both lists.
+)
+kindex(completer, completion style)
+item(tt(completer))(
+The strings given as the value of this style give the names of the
+completer functions to use. The available completer functions are
+described in
+ifzman(the section `Control Functions' below)\
+ifnzman(noderef(Control Functions))\
+.
+
+Each string may be the name of a completer function or a string of the 
+form `var(function)tt(:)var(name)'. In the first case the
+var(completer) field of the context will contain the name of the
+completer without the leading underscore and with all other
+underscores replaced with hyphens. In the second case the
+var(function) is the name of the completer to call, but the context
+will contain the var(name) in the var(completer) field of the
+context. If the var(name) starts with a hyphen, the string for the
+context will be build from the name of the completer function as in
+the first case with the var(name) will be appended to it. For example: 
+
+example(zstyle ':completion:*' completer _complete _complete:-foo)
+
+Here, completion will call the tt(_complete) completer twice, once
+using `tt(complete)' and once using `tt(complete-foo)' in the
+var(completer) field of the context. Normally, using the same
+completer more than once makes only sense when used with the
+`var(functions)tt(:)var(name)' form, because otherwise the context
+name will be the same in all calls to the completer (possible
+exception to this rule are the tt(_ignored) and tt(_prefix)
+completers).
+
+Note that the widget functions from the distribution that call the
+completion code (namely, the tt(incremental-complete-word) and the
+tt(predict-on) widgets) set up their top-level context name before
+calling completion. This allows one to define different sets of
+completer functions for normal completion and for these widgets. For
+example, to use completion, approximation and correction for normal
+completion, completion and correction for incremental completion and
+only completion for prediction one could use:
+
+example(zstyle ':completion:*' completer _complete _correct _approximate
+zstyle ':completion:incremental:*' completer _complete _correct
+zstyle ':completion:predict:*' completer _complete)
+
+The default value for this style is tt(_complete), i.e. normally only
+completion will be done.
+)
+kindex(completions, completion style)
+item(tt(completions))(
+This style is used by the tt(_expand) completer function.
+
+If this is set to an non-empty string it should be an expression
+usable inside a `tt($((...)))' arithmetical expression. The completer
+function evaluates this expression and if the result is `tt(1)', no
+expansions will be generated, but instead the completions will be
+generated as normal and all of them will be inserted into the command
+line.
+)
+kindex(condition, completion style)
+item(tt(condition))(
+This style is used by the tt(_list) completer function.
+
+If it is not set or set to the empty string, the insertion of
+matches will be delayed unconditionally. If it is set, the value
+should be an expression usable inside a `tt($((...)))'
+arithmetical expression. In this case, delaying will be done if the
+expression evaluates to `tt(1)'. For example, with
+
+example(zstyle ':completion:*:list:::' condition 'NUMERIC != 1')
+
+delaying will be done only if given an explicit numeric argument
+other than `tt(1)'.
+)
+kindex(cursor, completion style)
+item(tt(cursor))(
+This is used together with the tt(paths) tag by the function
+generating filenames as matches to find out if the cursor should be left
+after the first ambiguous pathname component even when menucompletion
+is used.
+
+The tt(predict-on) widget uses this style to decide where to place the 
+cursor after completion has been tried. If it is set to tt(complete),
+the cursor is left at the place where completion left it, but only if
+it is after a character equal to the one just inserted by the user. If 
+it is after another character, the value is treated as if it where the 
+string tt(key). If the value is set to tt(key), the cursor is left
+after the var(n)th occurrence of the character just inserted, where
+var(n) is the number of times that character appeared in the word
+before completion was attempted. In short, this has the effect of
+leaving the cursor after the character just typed even if the
+completion code found out that no other characters need to be inserted 
+at that position. Finally, any other value for this style
+unconditionally leaves the cursor at the position where the completion
+code left it.
+)
+kindex(disable-stat, completion style)
+item(tt(disable-stat))(
+This is used with the an empty tag by the function completing for the
+tt(cvs) command to decide if the tt(zsh/stat) module should be used to
+generate only names of modified files in the appropriate places.
+)
+kindex(domains, completion style)
+item(tt(domains))(
+If set, gives the names of network domains that should be
+completed. If this is not set by the user domain names mentioned in
+tt(/etc/resolv.conf) will be used.
+)
+kindex(expand, completion style)
+item(tt(expand))(
+This style is used when completing strings consisting of multiple
+parts, such as path names. If its
+value contains the string tt(prefix), the partially typed word from
+the line will be expanded as far as possible even if trailing parts
+can not be completed. If it contains the string tt(suffix)
+and normal (non-menu-) completion is used, matching names for
+components after the first ambiguous one will be added, too. This
+means that the resulting string is the longest unambiguous string
+possible, but if menucompletion is started on the list of matches
+generated this way (e.g. due to the option tt(AUTO_MENU) being set),
+this will also cycle through the names of the files in pathname
+components after the first ambiguous one.
+)
+kindex(file-patterns, completion style)
+item(tt(file-patterns))(
+In most places where filenames are completed, the function tt(_files)
+is used which can be configured with this style. If the style is
+unset, tt(_files) offers, one after another, up to three tags:
+tt(globbed-files),
+tt(directories) and tt(all-files), depending on the types of files
+expected by the caller of tt(_files).
+
+If the tt(file-patterns) style is set, the default tags are not
+used. Instead, the value of the style says which tags and which
+patterns are to be offered. The strings in the value are of the form
+`var(patterns)tt(:)var(tag)'. The var(patterns) gives one or more glob 
+patterns separated by spaces that are to be used to generate
+filenames. If it contains the sequence `tt(%p)', that is replaced by
+the pattern(s) given by the calling function.
+Colons in the pattern have to be preceded by a backslash to
+make them distinguishable from the colon before the var(tag). The
+var(tag)s of all strings in the value will be offered by tt(_files)
+(again, one after another) and used when looking up other styles. The
+var(tag) may also be
+followed by an optional second colon and a description. If that is
+given, this description will be used for the `tt(%d)' in the value of
+the tt(format) style (if that is set) instead of the default
+description supplied by the completion function. If the description
+given here contains itself a `tt(%d)', that is replaced with the
+description supplied by the completion function.
+
+For example, to make the tt(rm) command first complete only names of
+object files and the names of all files if no object file matches
+the string on the line, one would do:
+
+example(zstyle ':completion:*:*:rm:*' file-patterns \ 
+    '*.o:object-files' '%p:all-files')
+
+Another interesting example is to change the default behaviour that
+makes completion first offer files matching the patterns given by the
+calling function, then the directories and then all files. Many people 
+prefer to get both the files matching the given patterns and the
+directories in the first try and all files as the second try. To
+achieve this, one could do:
+
+example(zstyle ':completion:*' file-patterns \
+    '%p *(-/):globbed-files' '*:all-files')
+
+Note also that during the execution of completion functions, the
+tt(EXTENDED_GLOB) option is in effect, so the characters `tt(#)',
+`tt(~)' and `tt(^)' have special meanings in the patterns.
+)
+kindex(format, completion style)
+item(tt(format))(
+If this is set for the tt(descriptions) tag, its value is used as a
+string to display above matches in completion lists. The sequence
+`tt(%d)' in this string will be replaced with a short description of
+what these matches are. This string may also contain the sequences to
+specify output attributes, such as `tt(%b)' and `tt(%s)'.
+
+For the same purpose, this style is also tested with the tags used
+when matches are generated before it is tested for the
+tt(descriptions) tag. This gives the possibility to define different
+format strings for different types of matches.
+
+Note also that some completer functions define additional
+`tt(%)'-sequences. These are described for the completer functions that 
+make use of them.
+
+For the tt(messages) tag, this defines a string used by some
+completion functions to display messages. Here, the `tt(%d)' is
+replaced with the message given by the completion function.
+
+Finally, for the tt(warnings) tag, it is printed when no matches could 
+be generated at all. In this case the `tt(%d)' is replaced with the
+descriptions for the matches that were expected. If the value does not 
+contain a `tt(%d)', then those descriptions are added in the same way
+as matches are added, i.e. they appear below the value for the
+tt(format) style laid out in columns. The descriptions are added as if 
+for the tag tt(warnings) so that you can use the tt(list-colors) style 
+for that tag to highlight them.
+
+Here and in all other cases where the completion system uses `tt(%)'
+sequences, the `tt(%)' may be followed by field width specifications as 
+described for the tt(zformat) builtin command from the tt(zutil)
+module, see
+ifzman(zmanref(zshmodules))\
+ifnzman(noderef(The zsh/zutil Module))\
+.
+)
+kindex(glob, completion style)
+item(tt(glob))(
+Like tt(completions), this is used by the tt(_expand) completer.
+
+The value is used like the one for tt(completions) and if it evaluates to 
+`tt(1)', globbing will be attempted on the words resulting from
+substitution (see the tt(substitute) style) or the original string
+from the line.
+)
+kindex(group-name, completion style)
+item(tt(group-name))(
+The completion system can put different types of matches in different
+groups which are then displayed separately in the list of possible
+completions. This style can be use to give the names for these groups
+for particular tags. For example, in command position the completion
+system generates names of builtin and external commands, names of
+aliases and shell functions and reserved words as possible
+completions. To have the external commands and shell functions listed
+separately, one can set:
+
+example(zstyle ':completion:*:*:-command-:*:commands' group-name commands
+zstyle ':completion:*:*:-command-:*:functions' group-name functions)
+
+This also means that if the same name is used for different types of
+matches, then those matches will be displayed together in the same
+group.
+
+If the name given is the empty string, then the name of the tag for
+the matches will be used as the name of the group. So, to have all
+different types of matches displayed separately, one can just set:
+
+example(zstyle ':completion:*' group-name '')
+
+All matches for which no group name is defined will be put in a group
+named tt(-default-).
+)
+kindex(group-order, completion style)
+item(tt(group-order))(
+This style is to be used together with the tt(group-name) style. Once
+different types of matches are put into different groups, this style
+can be used to define in which order these groups should appear in the 
+list. The strings in the value are taken as group names and the named
+groups will be shown in the order in which their names appear in the
+value. All groups whose names are not given in the value of this style 
+will appear in the order defined by the function generating the
+matches.
+
+For example, to have names of builtin commands, shell functions and
+external commands appear in this order when completing in command
+position one would set:
+
+example(zstyle ':completion:*:*:-command-:*' group-order \ 
+       builtins functions commands)
+)
+kindex(groups, completion style)
+item(tt(groups))(
+A style holding the names of the groups that should be completed. If
+this is not set by the user, the group names from the YP database or
+the file `tt(/etc/group)' will be used.
+)
+kindex(hidden, completion style)
+item(tt(hidden))(
+If this is set to one of the `true' values, the matches for the tags
+for which this is set will not appear in the list; only the
+description for the matches as set with the tt(format) style will be
+shown. If this is set to tt(all), not even the description will be
+displayed.
+
+Note that the matches will still be completed, they are just not shown 
+in the list. To avoid having matches considered as possible
+completions at all the tt(tag-order) style can be modified as described
+below.
+)
+kindex(hosts, completion style)
+item(tt(hosts))(
+A style holding the names of hosts that should be completed. If this
+is not set by the user the hostnames in `tt(/etc/hosts)' will be used.
+)
+kindex(hosts-ports, completion style)
+item(tt(hosts-ports))(
+This style is used by commands that need or accept hostnames and
+ports. The strings in the value should be of the form
+`var(host)tt(:)var(port)'. These hostnames and ports are completed
+depending on the information already on the line, so that if, for
+example, the hostname is already typed, only those ports will be
+completed for which pairs with the hostname from the line exist.
+)
+kindex(ignore-parents, completion style)
+item(tt(ignore-parents))(
+When completing files it is possible to make names of directories
+already mentioned on the line or the current working directory be
+ignored. The style is tested for the tt(files) tag and if its value
+contains the string tt(parent), then the name of any directory whose
+path is already contained in the word on the line is ignored. For
+example, when completing after tt(foo/../), the directory tt(foo) will
+not be considered a valid completion.
+
+If the style contains the string tt(pwd), then the name of the current 
+working directory will not be completed, so that, for example,
+completion after tt(../) will not use the name of the current
+directory.
+
+If the style contains the string tt(..) both tests will only be
+performed if the word on the line contains the substring tt(../) and
+if the value contains the string tt(directory), then the tests will
+only be performed if only names of directories are completed.
+
+Note that names of directories ignored because of one of the tests
+will be ignored in the same way as the matches ignored because of the
+tt(ignored-patterns) style. I.e. by using the tt(_ignored) completer
+it is possible to complete these directories nonetheless.
+)
+kindex(ignored-patterns, completion style)
+item(tt(ignored-patterns))(
+This style is used with the tags used when adding matches and defines a
+couple of patterns. All matches that are matched by any of these
+patterns will be ignored as long as there are other matches not
+matched by any of the patterns.  It is a more configurable version
+of the shell parameter tt($fignore).
+
+Note that during the execution of completion functions, the
+tt(EXTENDED_GLOB) option is in effect, so the characters `tt(#)',
+`tt(~)' and `tt(^)' have special meanings in the patterns.
+)
+kindex(insert-unambiguous, completion style)
+item(tt(insert-unambiguous))(
+This is used by the tt(_match) and tt(_approximate) completer
+functions. If it is set to `true', the completer will start menu
+completion only if no unambiguous string could be generated that is at
+least as long as the original string from the line. Note that the
+tt(_approximate) completer uses it after setting the completer field
+in the context name to one of tt(correct-)var(num) or
+tt(approximate-)var(num), where var(num) is the number of errors that
+were accepted.
+)
+kindex(last-prompt, completion style)
+item(tt(last-prompt))(
+This is used to determine if the completion code should try to put the
+cursor back onto the previous command line after showing a completion
+listing (as for the tt(ALWAYS_LAST_PROMPT) option). Like several other 
+styles it is tested for the tt(default) tag and all tags used when
+generating matches. The cursor will be moved back to the previous line 
+if this style is `true' for all types of matches added. Note also that 
+this is independent of the numeric argument -- unlike the
+tt(ALWAYS_LAST_PROMPT) option.
+)
+kindex(list, completion style)
+item(tt(list))(
+This is used by the tt(_history_complete_word) bindable command
+(context `tt(:completion:history-words)') and by the
+tt(incremental-complete-word) widget (context `tt(:completion:incremental)).
+
+The tt(_history_complete_word) bindable command uses this style to
+decide if the available matches should be shown.
+
+When using the tt(incremental-complete-word) widget, this style says
+if the matches should be listed on every key press (if they fit on the 
+screen).
+
+The tt(predict-on) widget uses this style to decide if the completion
+should be shown even if there is only one possible completion. This is 
+done if the value of this style is the string tt(always).
+)
+kindex(list-colors, completion style)
+item(tt(list-colors))(
+If the tt(zsh/complist) module is used, this style can be used to set
+color specifications as with the tt(ZLS_COLORS) and tt(ZLS_COLOURS)
+parameters (see
+ifzman(the section `The zsh/complist Module' in zmanref(zshmodules))\
+ifnzman(noderef(The zsh/complist Module))\
+).
+
+If this style is set for the tt(default) tag, the strings in the value 
+are taken as specifications that are to be used everywhere. If it is
+set for other tags, the specifications are used only for matches of
+the type described by the tag. For this to work, the tt(group-name)
+style has to be set to an empty string. If the tt(group-name) tag
+specifies other names for the groups the matches in these groups can
+be colored by using these names together with the `tt((group)...)'
+syntax described for the tt(ZLS_COLORS) and tt(ZLS_COLOURS) parameters 
+and adding the specifications to the value for this style with the
+tt(default) tag.
+
+To be able to share the same specifications one has set up for the GNU
+version of the tt(ls) command one can use:
+
+example(zstyle ':completion:*:default' list-colors ${(s.:.)LS_COLORS})
+
+And to get the default colors (which are the same as for the GNU
+tt(ls) command) one should set the style to an empty value.
+)
+kindex(list-packed, completion style)
+item(tt(list-packed))(
+Like the tt(list-colors) style, this is tested with the tt(default)
+tag and all tags used when generating matches. If it is set to `true'
+for a tag, the matches added for it will be listed as if the
+tt(LIST_PACKED) option were set for them. If it is set to `false',
+they are listed normally.
+)
+kindex(list-rows-first, completion style)
+item(tt(list-rows-first))(
+This style is tested like the tt(list-packed) style and determines if
+matches are to be listed in a rows-first fashion, as for the
+tt(LIST_ROWS_FIRST) option.
+)
+kindex(local, completion style)
+item(tt(local))(
+This style is used by completion functions which generate URLs as
+possible matches to add suitable matches when a URL points to a
+local web server. Its value should consist of three strings: a
+hostname, the path to the default web pages for the server and the
+directory name used by a user placing web pages within their home
+area.
+)
+kindex(match-original, completion style)
+item(tt(match-original))(
+This is used by the tt(_match) completer.  If it is set to
+tt(only), tt(_match) will try to generate matches without inserting a
+`tt(*)' at the cursor position.  If set to any other non-empty value,
+it will first try to generate matches without inserting the `tt(*)'
+and if that yields no matches, it will try again with the `tt(*)'
+inserted.
+)
+kindex(matcher, completion style)
+item(tt(matcher))(
+This style is tested for tags used when generating matches. Its value
+is used as an additional match specification to use when adding the
+matches as described in
+ifzman(the section `Matching Control' in zmanref(zshcompwid))\
+ifnzman(noderef(Matching Control))\
+.
+)
+kindex(matcher-list, completion style)
+item(tt(matcher-list))(
+This style is used by the main completion function to retrieve match
+specifications that are to be used everywhere. Its value should be a
+list of such specifications. The completion system will try them one
+after another for each completer selected. For example, to first try
+simple completion and, if that generates no matches, case-insensitive
+completion one would do:
+
+example(zstyle ':completion:*' matcher-list '' 'm:{a-zA-Z}={A-Za-z}')
+
+But the style allows even finer control: the style is looked up for
+every completer tried with the name of the completer (without the
+leading underscore) in the context name. For example, if one uses the
+completers tt(_complete) and tt(_prefix) and wants to try
+case-insensitive completion only when using the tt(_complete)
+completer, one would do:
+
+example(zstyle ':completion:*' completer _complete _prefix
+zstyle ':completion:*:complete:*' matcher-list '' 'm:{a-zA-Z}={A-Za-z}')
+
+Note that the tt(completer) style allows to give user-defined names to 
+use in the context instead of the name of the completer.
+This is useful if, for example, one wants to try
+normal completion without a match specification and with
+case-insensitive matching first, correction if that doesn't generate
+any matches and partial-word completion if that doesn't yield any
+matches either. In such a case one can give the tt(_complete)
+completer more than once in the tt(completer) style and define different
+match specifications for them, as in:
+
+example(zstyle ':completion:*' completer _complete _correct _complete:foo
+zstyle ':completion:*:complete:*' matcher-list \ 
+    '' 'm:{a-zA-Z}={A-Za-z}'
+zstyle ':completion:*:foo:*' matcher-list \ 
+    'm:{a-zA-Z}={A-Za-z} r:|[-_./]=* r:|=*')
+
+Note that in any case an unset style makes the completion code use no
+global match specification. Also, some completers (like tt(_correct)
+and tt(_approximate)) do not use the match specifications. But even if 
+such completers are used one can use the simple form to set this style 
+(as in the first example above) because such completers will make sure 
+that they are executed only once even if multiple match specifications 
+have been given.
+)
+kindex(max-errors, completion style)
+item(tt(max-errors))(
+This is used by the tt(_approximate) and tt(_correct) completer functions
+to determine the maximum number of errors to accept. The completer will try
+to generate completions by first allowing one error, then two errors, and
+so on, until either a match was found or the maximum number of errors
+given by this style has been reached.
+
+If the value for this style contains the string tt(numeric), the 
+completer function will take any numeric argument as the
+maximum number of errors allowed. For example, with
+
+example(zstyle ':completion:*:approximate:::' max-errors 2 numeric)
+
+two errors will be allowed if no numeric argument is given. However,
+with a numeric argument of six (as in `tt(ESC-6 TAB)'), up to six
+errors are accepted.  Hence with a value of `tt(0 numeric)', no correcting
+completion will be attempted unless a numeric argument is given.
+
+If the value contains the string tt(not-numeric), the completer
+will em(not) try to generate corrected
+completions when given a numeric argument, so in this case the number given
+should be greater than zero.  For example, `tt(2 not-numeric)' specifies that
+correcting completion with two errors will usually be performed, but if a
+numeric argument is given, correcting completion will not be
+performed.
+
+The default value for this style is `tt(2 numeric)'.
+)
+kindex(menu, completion style)
+item(tt(menu))(
+This style is tested for the tt(default) tag and the tags used when
+adding matches. The value should be one of the `true' values (tt(yes), 
+tt(true), tt(1), or tt(on)) if menu completion should be started when
+matches for the given tag (or always in case of the tt(default) tag)
+are generated. If none of these values is defined for any of the tags
+used, but for at least one of these tags the value is the string
+tt(auto), this says that the same behavior as for the tt(AUTO_MENU)
+option should be used. Finally, if menucompletion is started by some 
+other means (e.g. by setting the tt(MENU_COMPLETE) option) and the
+value for one of the tags used is `false' (i.e. tt(no), tt(false),
+tt(0), or tt(off)), then menucompletion will em(not) be started for
+this completion. Note that the values defined for normal tags
+override the value set for the tt(default) tag.
+
+Either instead of or in addition to one of the values above, the value
+for this style may also contain the string tt(select), optionally
+followed by an equal sign and a number. In this case menuselection
+(as defined by the tt(zsh/computil) module) will be started. Without the
+optional number, it will be started unconditionally and with a number
+it will be started only if at least that many matches are generated
+(if the values for more than one tag define such a number, the
+smallest one is taken). Starting menuselection can explicitly be
+turned off by defining a value containing the string
+tt(no-select).
+)
+kindex(numbers, completion style)
+item(tt(numbers))(
+This is used with the tt(jobs) tag. If it is `true', the completions
+will use the job numbers instead of the shortest unambiguous strings
+of the jobs' command lines. If the value is a number, job numbers will 
+only be used if for at least one of the jobs that many (or more) words 
+from the command line string have to be used to make the strings
+unambiguous. E.g. if it is set to `tt(1)', strings will only be used
+if all jobs differ in the first word on their command lines.
+)
+kindex(old-list, completion style)
+item(tt(old-list))(
+This is used by the tt(_oldlist) completer.  If this is set to tt(always),
+then standard widgets which perform listing will retain the current list of
+matches, however they were generated.  If it is set to tt(never), this will
+not be done (the behaviour without the tt(_oldlist) completer).  If it is
+unset, or any other value, then the existing list of completions will
+be displayed if it is not already; otherwise, the standard completion
+list will be generated:  this is the default behaviour of
+tt(_oldlist).  However, if there is an old list and this style contains
+the name of the completer function that generated the list, then the
+old list will be used even if it was generated by a widget which does
+not do listing.
+
+For example, suppose you type tt(^Xc) to use the tt(_correct_word)
+widget, which generates a list of corrections for the word under the
+cursor.  Usually, typing tt(^D) would generate a standard list of
+completions for the word on the command line, and show that.  With
+tt(_oldlist), it will instead show the list of corrections already
+generated.
+
+As another example consider the tt(_match) completer: with the
+tt(insert-unambiguous) style set to `true' it inserts only an
+unambiguous prefix string if there is any. But since this may remove
+parts of the original pattern, attempting completion again may result
+in more matches than on the first attempt. But by using the
+tt(_oldlist) completer and setting this style to tt(_match), the list of 
+matches generated on the first attempt will be used again.
+)
+kindex(old-menu, completion style)
+item(tt(old-menu))(
+This is used by the tt(_oldlist) completer. Here it controls how menu
+completion behaves when a completion has already been inserted and the
+user types a standard completion key type such as tt(TAB). The default
+behaviour of tt(_oldlist) is that menu completion always continues
+with the existing list of completions.  If this style is set to
+`false', however, a new completion is started if the old list was
+generated by a different completion command (the behaviour without the 
+tt(_oldlist) completer).
+
+For example, suppose you type tt(^Xc) to generate a list of corrections,
+and menu completion is started in one of the usual ways.  Usually, typing
+tt(TAB) at this point would start trying to complete the line as it now
+appears.  With tt(_oldlist), it will instead continue to cycle through the
+list of completions.
+)
+kindex(original, completion style)
+item(tt(original))(
+This is used by the tt(_approximate) and tt(_correct)
+completers to decide if the original string should be added as
+one possible completion. Normally, this is done only if there are
+at least two possible corrections, but if this style is set to `true', it
+will always be added. Note that these completers use this style after
+setting the completer field in the context name to
+tt(correct-)var(num) or tt(approximate-)var(num), where var(num) is
+the number of errors that were accepted.
+)
+kindex(packageset, completion style)
+item(tt(packageset))(
+A style containing an override for the default package set
+for that context.  For example,
+
+example(zstyle ':completion:*:complete:dpkg:--status-1:' packageset avail)
+
+will cause available packages, rather than only installed packages,
+to be completed for `dpkg --status'.
+)
+kindex(path, completion style)
+item(tt(path))(
+This is used together with the the tt(urls) tag by completion
+functions that generate URLs as possible matches. It should be set to
+the path of a directory containing sub-directories named like
+`tt(http)', `tt(ftp)', `tt(bookmark)', and so on. These
+sub-directories should contain files and other sub-directories whose
+pathnames are possible completions after the initial `tt(http://)',
+`tt(ftp://)', etc. See the description in the file tt(_urls) in the
+tt(User) sub-directory of the completion system for more information.
+
+Also, the function that completes color names uses this style with the 
+tt(colors) tag. Here, the value should be the pathname of a file
+containing color names in the format of an X11 tt(rgb.txt) file. That
+file (if it can be found) will be used as the default if the style is
+not set.
+)
+kindex(ports, completion style)
+item(tt(ports))(
+A style holding the service names of ports to complete. If this is
+not set by the user, the service names from `tt(/etc/services)' will
+be used.
+)
+kindex(prefix-hidden, completion style)
+item(tt(prefix-hidden))(
+This is used when matches with a common prefix are added (e.g. option
+names). If it is `true', this prefix will not be shown in the list of
+matches.
+
+The default value for this style is `false'.
+)
+kindex(prefix-needed, completion style)
+item(tt(prefix-needed))(
+This, too, is used for matches with a common prefix. If it is set to
+`true' this common prefix has to be typed by the user to generate the
+matches. E.g. for options this means that the `tt(-)', `tt(+)', or
+`tt(-)tt(-)' has to be on the line to make option names be completed at
+all.
+
+The default style for this style is `true'.
+)
+kindex(prompt, completion style)
+item(tt(prompt))(
+The tt(incremental-complete-word) widget shows the value of this
+style in the status line during incremental completion. The sequence
+`tt(%u)' is replaced by the unambiguous part of all matches if there
+is any and it is different from the word on the line. A `tt(%s)' is
+replaced with `tt(-no match-)', `tt(-no prefix-)', or an empty string
+if there is no completion matching the word on the line, if the
+matches have no common prefix different from the word on the line or
+if there is such a common prefix, respectively. The sequence `tt(%c)'
+is replaced by the name of the completer function that generated the
+matches (without the leading underscore). Finally, `tt(%n)' is
+replaced by the number of matches generated
+and if the tt(list) style is set, `tt(%l)' is
+replaced by `tt(...)' if the list of matches is too long to fit on the
+screen and with an empty string otherwise. If the tt(list) style is
+`false', `tt(%l)' will always be removed.
+)
+kindex(remove-all-dups, completion style)
+item(tt(remove-all-dups))(
+The tt(_history_complete_word) bindable command uses this to decide if 
+all duplicate matches should be removed, rather than just consecutive
+duplicates.
+)
+kindex(single-ignored, completion style)
+item(tt(single-ignored))(
+This is used by the tt(_ignored) completer. It allows to specify what
+should be done if it can generate only one match, which is often a
+special case. If its value is tt(show), the single match will only be shown, 
+not inserted. If the value is tt(menu), then the single match and the
+original string are both added as matches and menucompletion is
+started so that one can easily select either of them.
+)
+kindex(sort, completion style)
+item(tt(sort))(
+If set to `true', completion functions that generate words from the
+history as possible matches sort these words alphabetically instead of
+keeping them in the order in which they appear in the history (from
+youngest to oldest).
+
+The completion function that generates filenames as possible matches
+uses this style with the tt(files) tag to determine in which order the 
+names should be listed and completed when using menucompletion. The
+value may be one of tt(size) to sort them by the size of the file,
+tt(links) to sort them by the number of links to the file,
+tt(modification) (or tt(time) or tt(date)) to sort them by the last
+modification time, tt(access) to sort them by the last access time, or 
+tt(inode) (or tt(change)) to sort them by the last inode change
+time. Any other value (or not setting this style at all) makes them be 
+sorted alphabetically by name. If the value contains the string
+tt(reverse), sorting is done in decreasing order.
+
+This is also used by the tt(_expand) completer. Here, if it is set to
+`true', the expansions generated will always be sorted. If it is set
+to tt(menu), then the expansions are only sorted when they are offered 
+as single strings (not in the string containing all possible
+expansions).
+)
+kindex(special-dirs, completion style)
+item(tt(special-dirs))(
+Normally, the completion code will not produce the directory names
+tt(.) and tt(..) as possible completions. If this style is set to
+`true', it will add both `tt(.)' and `tt(..)' as possible completions,
+if it is set to tt(..), only `tt(..)' will be added.
+)
+kindex(squeeze-slashes, completion style)
+item(tt(squeeze-slashes))(
+If set to `true', sequences of slashes (like in `tt(foo//bar)') will be
+treated as if they were only one slash when completing pathnames.
+)
+kindex(stop, completion style)
+item(tt(stop))(
+If set to `true', the tt(_history_complete_word) bindable
+command will always insert matches as if menucompletion were started
+and it will stop when the last match is inserted. If this style is set
+to tt(verbose) a message will be displayed when the last match is reached.
+
+This style is also used by the tt(incremental-complete-word)
+widget. Here its value is used like the one for the tt(break)
+style. But all keys matching the pattern given as its value will stop
+incremental completion and will then execute their usual function.
+)
+kindex(subst-globs-only, completion style)
+item(tt(subst-globs-only))(
+This is used by the tt(_expand) completer. As for the tt(glob) style,
+the value should be a value usable in a `tt($((...)))' arithmetical
+expression. If it evaluates to `tt(1)', the expansion will only be
+used if they resulted from globbing. If only the expansions described
+for the tt(substitute) style described below resulted in expanded
+strings and globbing did not change the set of expanded strings, the
+tt(_expand) completer will do nothing.
+)
+kindex(substitute, completion style)
+item(tt(substitute))(
+If this is unset or set to the empty string, the tt(_expand) completer
+will first try to expand all substitutions in the string (such as
+`tt($LPAR()...RPAR())' and `tt(${...})'). If this is set to an
+non-empty string it should be an expression usable inside a `tt($((...)))'
+arithmetical expression. In this case, expansion of substitutions will
+be done if the expression evaluates to `tt(1)'. For example, with
+
+example(zstyle ':completion:*:expand:::' substitute '${NUMERIC:-1} != 1')
+
+substitution will be performed only if given an explicit numeric
+argument other than `tt(1)', as by typing `tt(ESC 2 TAB)'.
+)
+kindex(tag-order, completion style)
+kindex(tag-order, completion style)
+item(tt(tag-order))(
+This provides a mechanism for sorting how the tags available in a
+particular context will be used.
+
+The values for the style are sets of space-separated lists of tags.
+The tags in each value will be tried at the same time; if no match is
+found, the next value is used.
+
+For example:
+
+example(zstyle ':completion:*:complete:gunzip:*' tag-order \ 
+    arguments options)
+
+specifies that, many completion functions offer both completions for
+arguments and options immediately instead of offering first arguments
+and then option as usual.
+
+A string starting with an exclamation mark (`tt(!)')
+specifies names of tags that are not to be used -- the effect will be
+the same as if all other possible tags for the context had been
+listed.  If any string in the value consists of only a hyphen
+(`tt(-)'), then only the tags selected by the other strings will be
+generated.  Normally all tags not explicitly selected will be tried at
+the end if the selected tags did not generate any matches.  This means 
+that a value of only one hyphen turns off completion in a particular
+context.
+
+In strings not starting with an exclamation mark, it is also possible
+to specify tag labels instead of only tags. These are of the form
+`var(tag)tt(:)var(label)', where var(tag) is one of the tags offered
+by the completion function for the current context and var(label) is a 
+name. For this, the completion function will generate matches in the
+same way as for the var(tag) but it will use the var(label) in place
+of the tag in the context names used to look up styles. If the
+var(label) starts with a hyphen, the var(tag) is prepended to the
+var(label) to form the name used for lookup. This can be
+used to make the completion system try a certain tag more than once,
+supplying different style settings for each attempt. For example,
+
+example(zstyle ':completion:*:*:-command-:*' tag-order 'functions:-non-comp'
+zstyle ':completion:*:functions-non-comp' ignored-patterns '_*')
+
+Makes completion in command position first try only names of shell
+functions that don't match the pattern `tt(_*)'. If that generates no
+matches, the default of trying all the other things that can be
+completed in command position is used, including the names of all
+shell functions.
+
+The var(label) may optionally be followed by a second colon and a
+description. This description will then be used for the `tt(%d)' in
+the value of the tt(format) style instead of the default description
+supplied by the completion function. Spaces in the description have to 
+be quoted by preceding them with a backslash and a `tt(%d)' appearing
+in the description is replaced with the description given by the
+completion function.
+
+In each of the cases above, the tag may also be a pattern. In this
+case all of the offered tags matching this pattern will be used except 
+for those that are given explicitly in the same string. There are
+probably two main uses of this. One is the case where one wants to try
+one of the tags more than once, setting other styles differently for
+each try, but still wants to use all the other tags without having to
+bother to repeat them all. For example, to make completion of function
+names in command position first ignore all the completion functions
+starting with an underscore one could do:
+
+example(zstyle ':completion:*:*:-command-:*' tag-order \
+    'functions:-non-comp *' functions
+zstyle ':completion:*:functions-non-comp' ignored-patterns '_*')
+
+Here, the completion system will first try all tags offered, but will
+use the tag label tt(functions-non-comp) when looking up styles for
+the function names completed. For this, the tt(ignored-patterns) style 
+is set to make functions starting with an underscore be not considered 
+as possible matches. If none of the generated matches match the string 
+on the line, the completion system will use the second value of the
+tt(tag-order) style and complete functions names again, but this time
+using so name tt(functions) to look up styles, so that the
+tt(ignored-patterns) style will not be used and all function names
+will be considered.
+
+Of course, this can also be used to split the matches for one tag into 
+different groups. For example:
+
+example(zstyle ':completion:*:options' tag-order \
+    'options:-long:long options
+     options:-short:short options
+     options:-single-letter:single letter options'
+
+zstyle ':completion:*:options-long' ignored-patterns '[-+](|-|[^-]*)'
+zstyle ':completion:*:options-short' ignored-patterns '--*' '[-+]?'
+zstyle ':completion:*:options-single-letter' ignored-patterns '???*')
+
+With the tt(group-names) style set, this makes options beginning with
+`tt(-)tt(-)', options beginning with a single `tt(-)' or `tt(+)' but
+containing multiple characters and single-letter options be displayed
+in separate groups with different descriptions.
+
+The second interesting use of patterns is the case where one wants to
+try multiple match specifications one after another. The
+tt(matcher-list) style offers something similar, but it is tested very
+early in the completion system and hence can't be set for single
+commands or even more specific contexts. So, to make completion for
+the arguments of the command tt(foo) and only for this command first
+try normal completion with out any match specification and, if that
+generates no matches, try again with case-insensitive matching, one
+could do:
+
+example(zstyle ':completion:*:*:foo:*' tag-order '*' '*:-case'
+zstyle ':completion:*-case' matcher 'm:{a-z}={A-Z}')
+
+This will make the completion system first try all the tags offered
+when completing after tt(foo) and use the tags to do the lookup. If
+that generates no matches, the second value of tt(tag-order) is
+used. This will make all tags be tried again, but this time using the
+names of the tags with the tt(-case) appended to them for lookup of
+styles. I.e. in this second attempt, the value for the tt(matcher)
+style from the second call to tt(zstyle) in the example will be used
+to make completion case-insensitive.
+
+Strings in the value may also be of the form `var(func)tt(())'. In
+this case the function var(func) will be called which can then define
+in which order tags are to be used based on additional context
+information. See the tt(_sort_tags) function below for a description
+of how such functions can be implemented. The return value of the
+function is used to decide if the following values for the style
+should be used. If it is zero, they are used and if it is non-zero,
+they are not used. For example:
+
+example(non-empty() { [[ -n $PREFIX ]] }
+zstyle ':completion:*:*:-command-:*' tag-order 'non-empty()')
+
+Makes completion in command position happen only if the string on the
+line is not empty (this is tested using the tt(PREFIX)
+parameter which is special in completion widgets, see
+ifzman(zshcompwid)\
+ifnzman(the section noderef(Completion System))\
+)\
+for a description of these special parameters).
+
+If no style has been defined for a context, the strings tt(arguments
+values) and tt(options) plus all tags offered by the completion
+function will be used to provide a sensible default behavior.
+)
+kindex(use-compctl, completion style)
+item(tt(use-compctl))(
+If this style is set to a string not equal to tt(false), tt(0),
+tt(no), and tt(off), the completion system will use any completion
+specifications defined with the tt(compctl) builtin command. If the
+style is unset, this will only be done if the tt(zsh/compctl) module
+is loaded. The string may also contain the substring tt(first) to make
+the definition for tt(compctl -T) be used and the substring
+tt(default) to make the one for tt(compctl -D) be used.
+
+Note that this is only intended to smooth the transition from
+tt(compctl) to the new completion system and may disappear in the
+future.
+
+Note also that the definitions from tt(compctl) will only be used if
+there is no special completion function for the command completion is
+done upon.
+)
+kindex(users, completion style)
+item(tt(users))(
+This may be set to a list of names that should be completed whenever 
+a username is needed. If it is not set or the string on the line
+doesn't match any of the strings in this list, all usernames will be
+completed.
+)
+kindex(users-hosts, completion style)
+item(tt(users-hosts))(
+The values of this style should be of the form
+`var(user)tt(@)var(host)' or `var(user)tt(:)var(host)'. It is used for
+commands that need pairs of
+user- and hostnames. For such commands, only the pairs from this style 
+are used and if, for example, the username is already typed, then only 
+the hostnames for which there is a pair with that username is defined.
+
+If set for the tt(my-accounts) tag, this is used for commands such as
+tt(rlogin) and tt(ssh). I.e. the style should contain the names of the 
+user's own accounts. With the tt(other-accounts) tag this is used for
+commands such as tt(talk) and tt(finger) and should contain other
+people's accounts. Finally, this may also be used by some commands with
+the tt(accounts) tag.
+)
+kindex(users-hosts-ports, completion style)
+item(tt(users-hosts-ports))(
+Like tt(users-hosts) but used for commands like tt(telnet) and
+containing strings of the form `var(user)tt(@)var(host)tt(:)var(port)'.
+)
+kindex(verbose, completion style)
+item(tt(verbose))(
+This is used in several contexts to decide if only a simple or a
+verbose list of matches should be generated. For example some commands 
+show descriptions for option names if this style is `true'.
+
+The default value for this style is `true'.
+)
+kindex(word, completion style)
+item(tt(word))(
+To find out if listing should be performed on its own, the tt(_list)
+completer normally compares the contents of the line with the contents
+the line had at the time of the last invocation. If this style is set to
+`true', comparison is done using only the current word. In this case,
+attempting completion on a word equal to the one when completion was called
+the last time will not delay the generation of matches.
+)
+enditem()
+
+texinode(Control Functions)(Bindable Commands)(Completion System Configuration)(Completion System)
+sect(Control Functions)
+cindex(completion system, choosing completers)
+
+The initialization script tt(compinit) redefines all the widgets
+which perform completion to call the supplied widget function
+tt(_main_complete). This function acts as a wrapper calling the
+so-called `completer' functions that generate matches. If
+tt(_main_complete) is called with arguments, these are taken as the
+names of completer functions to be called in the order given.  If no
+arguments are given, the set of functions to try is taken from the
+tt(completer) style. For example, to use normal completion and
+correction if that doesn't generate any matches:
+
+example(zstyle ':completion:*' completer _complete _correct)
+
+after calling tt(compinit). The default value for this style 
+is `tt(_complete)', i.e. normally only ordinary
+completion is tried. The tt(_main_complete) function uses the return
+value of the completer functions to decide if other completers should be
 called. If the return value is zero, no other completers are tried and the
 tt(_main_complete) function returns.
 
 The following completer functions are contained in the distribution (users
 may write their own):
 
+cindex(completion system, completers)
 startitem()
+findex(_complete)
 item(tt(_complete))(
 This completer generates all possible completions in a context-sensitive
-manner, i.e. using the tt(compdef) function
+manner, i.e. using the settings defined with the tt(compdef) function
 explained above and the current settings of all special parameters.
 
 To complete arguments of commands, tt(_complete) uses the utility function
@@ -228,53 +1816,68 @@ tt(-)var(context)tt(-), as mentioned above for the tt(#compdef) tag, are
 handled specially.  These are:
 
 startitem()
+kindex(-equal-, completion context)
 item(tt(-equal-))(
 for completion after an equal sign, other than one occurring in a
 shell-variable assignment.
 )
+kindex(-tilde-, completion context)
 item(tt(-tilde-))(
 for completion after a tilde (`tt(~)') character, but before a slash.
 )
+kindex(-redirect-, completion context)
 item(tt(-redirect-))(
 for completion after a redirection operator.
 )
+kindex(-math-, completion context)
 item(tt(-math-))(
 for completion inside mathematical contexts, such as
 `tt(LPAR()LPAR())...tt(RPAR()RPAR())'.
 )
+kindex(-subscript-, completion context)
 item(tt(-subscript-))(
 for completion inside subscripts.
 )
+kindex(-value-, completion context)
 item(tt(-value-))(
 for completion on the right hand side of an assignment.
 )
+kindex(-array-value-, completion context)
 item(tt(-array-value-))(
 for completion on the right hand side of an array-assignment
 (`tt(foo=LPAR()...RPAR())').
 )
+kindex(-condition-, completion context)
 item(tt(-condition-))(
 for completion inside conditions (`tt([[...]])').
 )
+kindex(-parameter-, completion context)
 item(tt(-parameter-))(
 for completing the name of a parameter expansion (`tt($...)').
 )
+kindex(-brace-parameter-, completion context)
 item(tt(-brace-parameter-))(
 for completing the name of a parameter expansion within braces
 (`tt(${...})').
 )
+kindex(-first-, completion context)
 item(tt(-first-))(
-for adding completions before any other other completion functions are
-tried (similar to the `tt(-T)' flag of tt(compctl)); if this
-function sets the tt(_compskip) parameter to any value, the completion
-system will not call any other function to generate matches.
+for adding completions before any other completion functions are
+tried; if this
+function sets the tt(_compskip) parameter to tt(all), no other
+completion functions will be called, if it is set to a string
+containing the substring tt(patterns), no pattern completion functions
+will be called, and if it is set to a string containing tt(default)
+the function for the `tt(-default-)' context will not be called, but
+functions defined for commands will.
 )
+kindex(-default-, completion context)
 item(tt(-default-))(
-for generating completions when no special completion function is used 
-(similar to the `tt(-D)' option of tt(compctl)).
+for generating completions when no special completion function is used.
 )
+kindex(-command-, completion context)
 item(tt(-command-))(
-for completing in a command position (as with the `tt(-C)' option of
-tt(compctl)).
+for completing in a command position.
 )
 enditem()
 
@@ -282,7 +1885,13 @@ Default implementations are supplied for each of these
 contexts, in most cases named after the context itself
 (e.g. completion for the `tt(-tilde-)' context is done by the function 
 named `tt(_tilde)').
+
+Before trying to find a function for a specific context, tt(_complete) 
+checks if the parameter `tt(compcontext)' is set to a non-empty
+value. If it is, the value is taken as the name of the context to use
+and the function defined for that context will be called.
 )
+findex(_approximate)
 item(tt(_approximate))(
 This completer function uses the tt(_complete) completer to generate
 a list of strings for the context the cursor is currently in, allowing 
@@ -299,105 +1908,45 @@ counted. The resulting list of corrected and completed strings is then
 presented to the user. The intended use of this completer function is to
 try after the normal tt(_complete) completer by setting:
 
-indent(
-nofill(tt(compconf completer=_complete:_approximate))
-)
+example(zstyle ':completion:*' completer _complete _approximate)
 
 This will give correcting completion if and only if
 normal completion doesn't yield any possible completions. When
 corrected completions are found, the completer will normally start
 menucompletion allowing you to cycle through these strings.
 
-The exact behavior of this completer can be changed by using the
-following configuration keys:
+This completer uses the tags tt(corrections) and tt(original) when
+generating the possible coprrections and the original string. The
+tt(format) style for the former may contain the additional sequences
+`tt(%e)' and `tt(%o)' which will be replaced by the number of errors
+accepted to generate the corrections and the original string,
+respectively.
 
-startitem()
-item(tt(approximate_accept))(
-This should be set to the number of errors the correction code should
-accept. The completer will try to generate completions by first allowing
-one error, then two errors, and so on, until either a match
-was found or the maximum number of errors given by this key has
-been reached.
-
-If the value for this key contains a lower- or upper-case `tt(n)', the 
-completer function will take any numeric argument as the
-maximum number of errors allowed. For example, with
-
-indent(
-nofill(tt(compconf approximate_accept=2n))
+Like all completers tt(_approximate) uses its name without the
+undersccore in the var(completer) field of the context name. Once it
+has started trying to generate matches, it will append a minus sign
+and the number of errors accepted in this attempt to its name. So on the
+first try the field contains `tt(approximate-1)', on the
+second try `tt(approximate-2)', and so on.
 )
-
-two errors will be allowed if no numeric argument is given. However,
-with a numeric argument of six (as in `tt(ESC-6 TAB)'), up to six
-errors are accepted.  Hence with a value of `tt(0n)', no correcting
-completion will be attempted unless a numeric argument is given.
-
-If the value contains `tt(n)' or `tt(N)' and a exclamation mark
-(`tt(!)'), tt(_approximate) will var(not) try to generate corrected
-completions when given a numeric argument, so in this case the number given
-should be greater than zero.  For example, `tt(2n!)' specifies that
-correcting completion with two errors will usually be performed, but if a
-numeric argument is given, correcting completion will not be performed.
-)
-item(tt(approximate_original))(
-This key is used to specify whether the original string on which correcting 
-completion was attempted is to be included in the list of possible
-corrections. If it is set to any non-empty string, the original string 
-will be offered when cycling through the completions. Normally it will 
-appear as the first string, so that the command line does not change
-immediately; consecutive completion attempts will cycle through the
-corrected strings.  If the value for this key contains the substring
-`tt(last)', the original string will be the last one in the list, so
-that it appears just before wrapping around to the first corrected
-string again.  Also, if the value contains the substring `tt(always)',
-the original string will always be included; normally it is
-included only if more than one possible correction was generated.
-)
-item(tt(approximate_prompt))(
-This can be set to a string to be displayed on top of the
-corrected strings generated when cycling through them. This string
-may contain the control sequences `tt(%n)', `tt(%B)', etc. known from
-the `tt(-X)' option of tt(compctl). Also, the sequence `tt(%e)' will
-be replaced by the number of errors accepted to generate the corrected 
-strings.
-)
-item(tt(approximate_insert))(
-If this is set to a string starting with `tt(unambig)', the code will try
-to insert a usable unambiguous string in the command line instead of
-always cycling through the corrected strings. If such a unambiguous
-string could be found, the original string is not used, independent of
-the setting of tt(approximate_original). If no sensible string could be
-found, one can cycle through the corrected strings as usual.
-)
-enditem()
-
-If any of these keys is not set, but the the same key with the prefix
-`tt(correct)' instead of `tt(approximate)' is set, that value will be
-used. The forms beginning with `tt(correct)' are also used by the
-tt(_correct) completer function.
-
-The keys with the `tt(approximate)' prefix have no default values, but 
-tt(compinit) defines default values for tt(correct_accept) (which 
-is set to `tt(2n)'), and tt(correct_prompt).
-)
+findex(_correct)
 item(tt(_correct))(
 Generate corrections (but not completions) for the current word; this is
-similar to spell-checking.  This calls tt(_approximate), but only the
-configuration parameters beginning tt(correct_) are used.
+similar to spell-checking.  This calls tt(_approximate) but uses a
+different var(completer) field in the context name.
 
 For example, with:
 
-indent(tt(
-nofill(compconf completer=_complete:_correct:_approximate)
-nofill(compconf correct_accept='2n!' approximate_accept=3n))
-)
+example(zstyle ':completion:::::' completer _complete _correct _approximate
+zstyle ':completion:*:correct:::' accept 2 not-numeric
+zstyle ':completion:*:approximate:::' accept 3 numeric)
 
 correction will accept up to two errors. If a numeric argument is
-given, correction will not be performed, but correcting completion will be,
-and will accept as many errors as given by the numeric argument.
-Without a numeric argument, first correction and then correcting
-completion will be tried, with the first one accepting two errors 
-and the second one accepting three errors.
+given, correction will not be performed, but correcting completion
+will be, and will accept as many errors as given by the numeric
+argument. Without a numeric argument, first correction and then
+correcting completion will be tried, with the first one accepting two
+errors  and the second one accepting three errors.
 
 This completer function is intended to be used without the
 tt(_approximate) completer or, as in the example, just before
@@ -405,21 +1954,31 @@ it. Using it after the tt(_approximate) completer is useless since
 tt(_approximate) will at least generate the corrected strings
 generated by the tt(_correct) completer -- and probably more.
 )
+findex(_match)
 item(tt(_match))(
 This completer is intended to be used after the tt(_complete)
 completer. It allows one to give patterns on the command line and
-to complete all strings metching these patterns from the set of possible
-completions for the context the cursor is in, without having to set
-the tt(GLOB_COMPLETE) option.
+to complete all strings matching these patterns from the set of
+possible completions for the context the cursor is in, without having
+to set the tt(GLOB_COMPLETE) option.
 
 Normally this will be done by taking the pattern from the line,
 inserting a `tt(*)' at the cursor position and comparing the resulting
 pattern with the possible completions generated. However, if the
-configuration key tt(match_original) has a value of `tt(only)', no
-`tt(*)' will be inserted. If tt(match_original) has any other non-empty
-string as its value, this completer will first try to generate matches
-without, then with a `tt(*)' inserted at the cursor position.
+tt(match-original) style has a value of tt(only), no `tt(*)' will be
+inserted. If tt(match-original) has any other non-empty string as its
+value, this completer will first try to generate matches without, then
+with a `tt(*)' inserted at the cursor position.
+
+The generated matches will be offered in a menucompletion unless the
+tt(insert-unambiguous) style is set to `true'. In
+this case menucompletion will only be started if no unambiguous string
+could be generated that is at least as long as the original string.
+
+Note that the matcher specifications defined globally or used by the
+completion functions will not be used.
 )
+findex(_expand)
 item(tt(_expand))(
 This completer function does not really do completion, but instead
 checks if the word on the command line is eligible for expansion and,
@@ -430,93 +1989,98 @@ will expand the string on the line before the completion widget is
 called. Also, this completer should be called before the tt(_complete) 
 completer function.
 
-Control over how the expanded string will be treated is possible with the 
-following configuration keys:
+The tags used when generating expansions are tt(all-expansions) for
+the string containing all possible expansions, tt(expansions) when
+adding the possible expansions as single matches and tt(original) when 
+adding the original string from the line. In which order these strings 
+are generated and which of these strings are generated at all can be
+controlled by using the tt(group-order) style and by modifying the
+tt(tag-order) style, as usual.
 
-startitem()
-item(tt(expand_substitute))(
-If this is unset or set to the empty string, the code will first try
-to expand all substitutions in the string (such as
-`tt($LPAR()...RPAR())' and `tt(${...})'). If this is set to an
-non-empty string it should be an expression usable inside a `tt($((...)))'
-arithmetical expression. In this case, expansion of substitutions will
-be done if the expression evaluates to `tt(1)'. For example, with
+The format string for tt(all-expansions) and for tt(expansions) may
+contain the sequence `tt(%o)' which will be replaced by the original
+string from the line.
 
-indent(
-nofill(tt(compconf expand_substitute='NUMERIC != 1'))
-)
+Which kind of expansion is tried is controlled by the tt(substitute)
+and tt(glob) styles. Note that neither of these has a default value so 
+that they have to be set to make tt(_expand) generate any expansions
+at all.
 
-substitution will be performed only if given an explicit numeric
-argument other than `tt(1)', as by typing `tt(ESC 2 TAB)'.
+In a different mode selected by the tt(completions) style, all
+em(completions) generated for the string on the line are inserted.
 )
-item(tt(expand_glob))(
-If this is unset or set to an empty string, globbing will be attempted
-on the word resulting from substitution or the original string. The
-values accepted for this key are the same as for tt(expand_substitute).
-)
-item(tt(expand_menu))(
-If this is unset or set to the empty string, the words resulting from
-expansion (if any) will simply be inserted in the command line,
-replacing the original string. However, if this key is set to a
-non-empty string, the user can cycle through the expansion as in
-menucompletion. Unless the value contains the substring `tt(only)',
-the user will still be offered all expansions at once as one of the
-strings to insert in the command line; normally, this possibility is
-offered first, but if the value contains the
-substring `tt(last)', it is offered last. Finally, if the value contains
-the substring `tt(sort)', the expansions will be sorted alphabetically,
-normally they are kept in the order the expansion produced them in.
-)
-item(tt(expand_original))(
-If this is set to an non-empty string, the original string from the
-line will be included in the list of strings the user can cycle
-through as in a menucompletion. If the value contains the substring
-`tt(last)', the original string will appear as the last string, with
-other values it is inserted as the first one (so that the command line
-does not change immediately).
-)
-item(tt(expand_prompt))(
-This may be set to a string that should be displayed before the
-possible expansions. This is passed to the `tt(-X)' option of
-tt(compadd) and thus may contain the control sequences `tt(%n)',
-`tt(%B)', etc. Also, the sequence `tt(%o)' in this string will be
-replaced by the original string.
-)
-enditem()
-
-None of these configuration keys has a default value.
-)
+findex(_list)
 item(tt(_list))(
 This completer allows one to delay the insertion of matches until
 completion is attempted a second time without the word on the line
 being changed. On the first attempt, only the list of matches will be
-shown. Configuration keys understood are:
+shown. Styles used are tt(condition) and tt(word), see
+ifzman(the section `Completion System Configuration' above)\
+ifnzman(noderef(Completion System Configuration)).
+)
+findex(_oldlist)
+item(tt(_oldlist))(
+This completer controls how the standard completion widgets behave
+when there is an existing list of completions which may have been
+generated by a special completion (i.e. a separately-bound completion
+command).  It should appear in the list of completers before any of
+the widgets which generate matches.  It uses two styles: tt(old-list) and
+tt(old-menu), see
+ifzman(the section `Completion System Configuration' above)\
+ifnzman(noderef(Completion System Configuration)).
+)
+findex(_prefix)
+item(tt(_prefix))(
+This completer can be used to try completion with the suffix after the 
+cursor ignored. I.e. the suffix will not be considered to be part of
+the word to complete and hence does not need to be matched. It uses
+the tt(completer) style to decide which other completers to call to
+try to generate matches. If this style is unset, the completers
+currently used by the whole completion are used -- except, of course,
+the tt(_prefix) completer itself. Also, if this completer appears more
+than once in the list of completers only those completers not
+already tried by the last invocation of tt(_prefix) will be
+called.
 
-startitem()
-item(tt(list_condition))(
-If this key is unset or set to the empty string, the insertion of
-matches will be delayed unconditionally. If this value is set, it
-should be set to an expression usable inside a `tt($((...)))'
-arithmetical expression. In this case, delaying will be done if the
-expression evaluates to `tt(1)'. For example, with
+For example, consider this global tt(completer) style:
 
-indent(
-nofill(tt(compconf list_condition='NUMERIC != 1'))
-)
+example(zstyle ':completion:*' completer \
+    _complete _prefix _correct _prefix:foo)
 
-delaying will be done only if given an explicit numeric argument
-other than `tt(1)'.
+This makes the tt(_prefix) completer try normal completion with the
+suffix ignored. If that doesn't generate any matches and neither does
+the call to the tt(_correct) completer after it, then tt(_prefix) will 
+be called a second time and will now only try correction with the
+suffix ignored. If you want to use tt(_prefix) as the last resort and
+want it to try only normal completion, you need to call:
+
+example(zstyle ':completion:*' completer _complete ... _prefix
+zstyle ':completion::prefix:*' completer _complete)
+
+The tt(add-space) style is used, too. If it is set to `true' then
+tt(_prefix) will insert a space between the matches generated (if any) 
+and the suffix.
+
+Note that using this completer will only work if the
+tt(COMPLETE_IN_WORD) option is set. Because otherwise the cursor will
+be set after the word before the completion code is called and hence
+there will be no suffix.
 )
-item(tt(list_word))(
-To find out if listing should be performed on its own, the code normally
-compares the contents of the line with the contents the line had at the
-time of the last invocation. If this key is set to an non-empty string,
-comparison is done using only the current word. So if it is set,
-attempting completion on a word equal to the one when completion was called
-the last time will not delay the generation of matches.
+findex(_ignored)
+item(tt(_ignored))(
+Using the tt(ignored-patterns) style it is possible to make some
+matches be ignored. This completer allows to complete these matches as 
+if no tt(ignored-patterns) style were set. Which completers are called 
+for this is determined in the same way as for the tt(_prefix)
+completer.
+
+Finally, tt(_ignored) uses the tt(single-ignored) style if only one
+match could be generated. It can be set to tt(show) to make that match 
+be only displayed, not inserted into the line or it can be set to
+tt(menu) to make the single match and the original string from the
+line be offered in a menucompletion.
 )
-enditem()
-)
+findex(_menu)
 item(tt(_menu))(
 This completer is a simple example function implemented to show how
 menucompletion can be done in shell code. It should be used as the
@@ -528,8 +2092,128 @@ tt(accept-and-menu-complete).
 )
 enditem()
 
-texinode(Completion Functions)()(Control Functions)(Completion System)
+texinode(Bindable Commands)(Completion Functions)(Control Functions)(Completion System)
+sect(Bindable Commands)
+cindex(completion system, bindable commands)
+
+In addition to the context-dependent completions provided, which are
+expected to work in an intuitively obvious way, there are a few widgets
+implementing special behaviour which can be bound separately to keys.  The
+following is a list of these and their default bindings.
+
+startitem()
+findex(_bash_completions)
+item(tt(_bash_completions))(
+This function is used by two widgets, tt(_bash_complete-word) and
+tt(_bash_list-choices).  It exists to provide compatibility with
+completion bindings in bash.  The last character of the binding determines
+what is completed: `tt(!)', command names; `tt($)', environment variables;
+`tt(@)', host names; `tt(/)', file names; `tt(~)' user names.  In bash, the
+binding preceeded by `tt(\e)' gives completion, and preceeded by `tt(^X)'
+lists options.  As some of these bindings clash with standard zsh
+bindings, only `tt(\e~)' and `tt(^X~)' are bound by default.  To add the
+rest, the following should be added to tt(.zshrc) after tt(compinit) has
+been run:
+
+example(for key in '!' '$' '@' '/' '~'; do
+  bindkey "\e$key" _bash_complete-word
+  bindkey "^X$key" _bash_list-choices
+done)
+
+This includes the bindings for `tt(~)' in case they were already bound to
+something else; the completion code does not override user bindings.
+)
+findex(_correct_filename (^XC))
+item(tt(_correct_filename (^XC)))(
+Correct the filename path at the cursor position.  Allows up to six errors
+in the name.  Can also be called with an argument to correct
+a filename path, independently of zle; the correction is printed on
+standard output.
+)
+findex(_correct_word) (^Xc)
+item(tt(_correct_word) (^Xc))(
+Performs correction of the current argument using the usual contextual
+completions as possible choices. This stores the string
+`tt(correct-word)' in the var(function) field of the context name and
+then calls the tt(_correct) completer.
+)
+findex(_expand_word (^Xe))
+item(tt(_expand_word (^Xe)))(
+Performs expansion on the current word:  equivalent to the standard
+tt(expand-word) command, but using the tt(_expand) completer. Before
+calling it, the var(function) field is set to `tt(expand-word)'.
+)
+findex(_history_complete_word) (\e/)
+item(tt(_history_complete_word) (\e/))(
+Complete words from the shell's command history. This uses the
+tt(list), tt(remove-all-dups), tt(sort), and tt(stop) styles.
+)
+findex(_most_recent_file (^Xm))
+item(tt(_most_recent_file (^Xm)))(
+Complete the name of the most recently modified file matching the pattern
+on the command line (which may be blank).  If given a numeric argument
+var(N), complete the var(N)th most recently modified file.  Note the
+completion, if any, is always unique.
+)
+findex(_next_tags)
+item(tt(_next_tags))(
+This allows to complete types of matches that are not immediately
+offered because of the setting of the tt(tag-order) style. After a
+normal completion was tried, invoking this command makes the matches
+for the next tag (or set of tags) be used. Repeatedly invoking this
+command makes the following tags be used. To be able to complete the
+matches selected by tt(_next_tags), the tt(completer) style should
+contain tt(_next_tags) as its first string. With that, the normal key
+binding (normally tt(TAB)) can be used to complete the matches shown
+after the call to tt(_next_tags).
+
+Normally, this command is not bound to a key. To invoke it with, say
+`tt(^Xn)', one would use:
+
+example(zle -C _next_tags complete-word _next_tags
+bindkey '^Xn' _next_tags)
+)
+findex(_read_comp (^X^R))
+item(tt(_read_comp (^X^R)))(
+Prompt the user for a string, and use that to perform completion on the
+current word.  There are two possibilities for the string.  First, it can
+be a set of words beginning `tt(_)', for example `tt(_files -/)', in which
+case the function with any arguments will be called to generate the
+completions.  Unambiguous parts of the function name will be completed
+automatically (normal completion is not available at this point) until a
+space is typed.
+
+Any other string will be passed as a set of arguments to
+tt(compadd) and should hence be an expression specifying what should
+be completed.
+
+A very restricted set of editing commands is available when reading the
+string:  `tt(DEL)' and `tt(^H)' delete the last character; `tt(^U)' deletes
+the line, and `tt(^C)' and `tt(^G)' abort the function, while `tt(RET)'
+accepts the completion.  Note the string is used verbatim as a command
+line, so arguments must be quoted in accordance with standard shell rules.
+
+Once a string has been read, the next call to tt(_read_comp) will use the
+existing string instead of reading a new one.  To force a new string to be
+read, call tt(_read_comp) with a numeric argument.
+)
+findex(_complete_help (^Xh))
+item(tt(_complete_help (^Xh)))(
+This widget displays information about the context names, 
+the tags, the styles, and the completion functions used 
+when completing at the current cursor position.
+
+Note that, depending on the control flow in the completion functions
+called, the information about the styles may be
+incomplete. I.e. depending on the settings for some styles other
+styles may be used, and, depending on the user's settings, only the
+first sort of styles may be detected by tt(_complete_help).
+)
+enditem()
+
+texinode(Completion Functions)(Completion Directories)(Bindable Commands)(Completion System)
 sect(Utility Functions)
+cindex(completion system, utility functions)
 
 Descriptions follow for utility functions that may be
 useful when writing completion functions.  Most of these reside in the
@@ -539,8 +2223,26 @@ generating matches all follow the convention of returning zero if they
 generated completions and non-zero if no matching completions could be 
 added.
 
+When writing completion functions or other ZLE widgets that call
+completion, it might be interesting to know about two more features
+offered by the tt(_main_complete) function. The arrays
+tt(compprefuncs) and tt(comppostfuncs) may be set to contain names of
+functions that are to be called immediately before or after completion 
+has been tried. The functions will only be called once, unless they
+put themselves into the array again.
+
 startitem()
-item(tt(_compalso))(
+findex(_funcall)
+item(tt(_funcall) var(return) var(name) [ var(args) ... ])(
+If a function var(name) exists, it is called with the arguments
+var(args). Unless it is the empty string or a single hyphen,
+var(return) is taken as the name of a parameter and the return status
+from the called function is stored in it.
+The return value of tt(_funcall) itself is zero if the function
+var(name) exists and was called and non-zero otherwise.
+)
+findex(_compalso)
+item(tt(_compalso) var(names) ...)(
 This function looks up the definitions for the context and command
 names given as arguments and calls the handler functions for them if
 there is a definition (given with the tt(compdef) function). For
@@ -548,6 +2250,20 @@ example, the function completing inside subscripts might use
 `tt(_compalso -math-)' to include the completions generated for
 mathematical environments.
 )
+findex(_call)
+item(tt(_call) var(tag) var(string) ...)(
+This function is used in places where a command is called and the user 
+should have the possibility to override the default for calling this
+command. It looks up the tt(command) style with the supplied
+var(tag). If the style is set, its value is used as the command to
+execute.
+
+In any case, the var(strings) from the call to tt(_call) or from the
+style are concatenated with spaces between them and the resulting
+string is evaluated. The return value is the return value of the
+command called.
+)
+findex(_normal)
 item(tt(_normal))(
 This function is used for normal command completion.  If
 completion is attempted on the first word, command names are
@@ -561,14 +2277,271 @@ the tt(words) array, decrements the tt(CURRENT) parameter, then calls this
 function.
 
 When calling a function defined for a pattern, this function also
-checks if the parameter tt(_compskip) is set. If it was set by the
-function called, no further completion functions are called. With this 
+checks if the parameter tt(_compskip) is set and uses the value in the 
+same way it is used after calling the completion function for the
+tt(-first-) context. With this 
 one can write a pattern completion function that keeps other functions 
 from being tried simply by setting this parameter to any value.
 )
-item(tt(_multi_parts))(
-This functions gets two arguments: a separator character and an
-array.  As usual, the array may be either the
+findex(_description)
+item(tt(_description) [ tt(-12VJ) ] var(tag) var(name) var(descr) [ var(specs) ... ])(
+This function tests some styles for the var(tag) and and stores
+options usable for tt(compadd) in the array with the given var(name)
+which guarantee that the matches are generated as requested by the
+user. The styles tested are: tt(format) (which is first tested for the
+given tag and then for the tt(descriptions) tag if that isn't
+defined), tt(hidden) and tt(group-name) (the last two are tested only
+for the tag given as the first argument). This function also calls the
+tt(_setup) function which tests some more styles.
+
+The format string from the style (if any) will be modified so that the 
+sequence `tt(%d)' is replaced by the var(descr) given as the third
+argument. If tt(_description) is called with more than three
+arguments, these var(specs) should be of the form
+`var(char)tt(:)var(str)' and every appearance of `tt(%)var(char)' in
+the format string will be replaced by var(string).
+
+The options placed in the array will also make sure that the matches
+are placed in a separate group, depending on the value of the
+tt(group-name) style. Normally a sorted group will be used for this
+(with the `tt(-J)' option), but if a option starting with `tt(-V)',
+`tt(-J)', `tt(-1)', or `tt(-2)' is given, that option will be included
+in the array, so that it is possible to make the group unsorted by
+giving the option `tt(-V)', `tt(-1V)', or `tt(-2V)'. 
+
+In most cases, this function will be used like this:
+
+example(local expl
+_description expl files file
+compadd "$expl[@]" - "$files[@]")
+)
+findex(_message)
+item(tt(_message) [ -r ] var(descr))(
+The var(descr) is used like the third
+argument to the tt(_description) function. However, the resulting
+string will always be shown whether or not matches were
+generated. This is useful to display help texts in places where no
+completions can be generated automatically.
+
+This function also uses the tt(format) style for the tt(messages) tag in
+preference to the tt(format) style for the tt(descriptions) tag. The
+latter is used only if the former is unset.
+
+If the tt(-r) option is given, no style is used and the var(descr) is
+used literally as the string to display. This is only used in cases
+where that string is taken from some pre-processed argument list
+containing an expanded description.
+)
+findex(_setup)
+item(tt(_setup) var(tag))(
+This function expects a tag as its argument and sets up the special
+parameters used by the completion system appropriately for the tag,
+using styles such as tt(list-colors) and tt(last-prompt).
+
+Note that this function is called automatically from tt(_description)
+so that one normally doesn't have to call it explicitly.
+)
+findex(_tags)
+item(tt(_tags) [ tt(-C) var(name) [ var(tags) ... ] ])(
+If called with arguments, these are taken as the names of the tags for 
+the types of matches the calling completion function can generate in
+the current context. These tags are stored internally and sorted by
+using the tt(tag-order) style. Following calls to this function
+without arguments from the same function will then select the first,
+second, etc. set of tags requested by the user. To test if a certain
+tag should be tried, the tt(_requested) function has to be called (see 
+below).
+
+The return value is zero if at least one of the tags is requested and
+non-zero otherwise. 
+
+This function also accepts the tt(-C) option followed by a
+var(name). This name is temporarily (i.e. not visible outside
+tt(_tags)) stored in the argument field of the context name in the
+tt(curcontext) parameter. This allows to make tt(_tags) use a more
+specific context name without having to change and reset the
+tt(curcontext) parameter (which would otherwise have the same effect).
+)
+findex(_next_label)
+item(tt(_next_label) [ tt(-12VJ) ] var(tag) var(name) var(descr) [ var(options) ... ])(
+This function should be called repeatedly to generate the tag
+labels. On each call it will check if another tag label is to be used 
+and, if there is at least one, zero is returned. If no more tag
+labels are to be used, a non-zero status is returned.
+
+The tt(-12JV) options and the first three arguments are given to the
+tt(_desciption) function using the tag label instead of the first
+argument is appropriate. The var(options) given after the var(descr)
+should be other options to be used for tt(compadd) or whatever
+function is to be called to add the matches. tt(_next_label) will store these 
+var(options) in the parameter whose var(name) is given as the second
+argument. This is done in such a way that the description given by the 
+user to the tt(tag-order) style is prefered over the one given to
+tt(_next_label).
+
+Note that this function must not be called without a previous call to
+tt(_tags), tt(_wanted) or tt(_requested) because it uses the tag label
+for the current tag found by these functions.
+
+A normal use of this function for the tag labels for the tag tt(foo)
+looks like this:
+
+example(local expl ret=1
+...
+_wanted foo || return 1
+...
+while _next_label foo expl '...'; do
+  compadd "$expl[@]" ... && ret=0
+done
+...
+return ret
+)
+)
+findex(_all_labels)
+item(tt(_all_labels) [ tt(-12VJ) ] var(tag) var(name) var(descr) [ var(command) var(args) ... ])(
+This is a convenient interface to the tt(_next_label) function, implementing
+the loop shown in the example above. The var(command) is the one that
+should be called to generate the matches. The options stored in the
+parameter var(name) will automatically be inserted into the var(args)
+given to the var(command). Normally, they are put directly after the
+var(command), but if one of the var(args) is a single hyphen, they are 
+inserted directly before that. If the hyphen is the last argument,
+that will be removed from the argument list before the var(command) is 
+called. This allows to use tt(_all_labels) in almost all cases where the
+matches can be generated by a single call to the tt(compadd) builtin
+command or by a call to one of the utility functions.
+
+For example:
+
+example(local expl
+...
+_wanted foo || return 1
+...
+_all_labels foo expl '...' compadd ... - $matches)
+
+Will complete the strings from the tt(matches) parameter, using
+tt(compadd) with additional options which will take precedence over
+those generated by tt(_all_labels).
+)
+findex(_requested)
+item(tt(_requested) [ tt(-12VJ) ] var(tag) [ var(name) var(descr) [ var(command) var(args) ... ] ])(
+A function that uses tt(_tags) to register tags and then calls it to
+loop over the requested sets of tags should call this function to
+check if a certain tag is currently requested. This normally has to be 
+done in a loop such as:
+
+example(_tags foo bar baz
+while _tags; do
+  if _requested foo; then
+    ...
+  fi
+  ... # test other tags
+  ... # exit loop if matches were generated
+done)
+
+So, the first argument for tt(_requested) is used as the name of a tag 
+and if that tag is currently requested, the return value is zero (and
+non-zero otherwise).
+
+If the var(name) and the var(descr) are given, tt(_requested) calls the
+tt(_description) function with these arguments, including the options.
+
+If the var(command) is given, the tt(_all_labels) function will be called
+immediatly with the same arguments.
+
+This is often useful to do both the testing of the tag,
+getting the description for the matches and adding the matches at
+once. E.g.:
+
+example(local expl ret=1
+_tags foo bar baz
+while _tags; do
+  _requested foo expl 'description' \ 
+      compadd foobar foobaz && ret=0
+  ...
+  (( ret )) || break
+done)
+)
+findex(_wanted)
+item(tt(_wanted) [ tt(-12VJ) ] var(tag) var(name) var(descr) [ var(specs) ... ])(
+In many contexts only one type of matches can be generated but even
+then it should be tested if the tag representing those matches is
+requested by the user. This function makes that easier.
+
+Like tt(_requested) it gets arguments as for tt(_description).
+With the var(tag) it calls tt(_tags) and if that returns zero 
+(i.e. the var(tag) is requested by the user) it calls tt(_description). So, 
+if you want to offer only one tag and immediatly want to use the
+description built, you can just do:
+
+example(_wanted tag expl 'description' \ 
+    compadd matches...)
+)
+findex(_alternative)
+item(tt(_alternative) [ tt(-C) var(name) ] var(specs) ...)(
+This function is useful if you offer multiple tags and building the
+matches for them is easy enough. It basically implements a loop like
+the one described for the tt(_tags) function above above.
+
+The tags to use and what to do if the tags are requested are described 
+using the var(specs) which are of the form:
+`var(tag)tt(:)var(descr)tt(:)var(action)'. The var(tag)s are offered
+using tt(_tags) and if the tag is requested, the var(action) is
+executed with the given var(descr) (description). The var(action)s
+supported are those used by the tt(_arguments) function (described
+below), without the `tt(->)var(state)' form.
+
+For example, the var(action) may be a simple function call. With that
+one could do:
+
+example(_alternative \ 
+    'users:user:_users' \ 
+    'hosts:host:_hosts')
+
+to offer usernames and hostnames as possible matches (which are
+generated by the tt(_users) and tt(_hosts) functions respectively).
+
+Note that, like tt(_arguments) this will also use tt(_all_labels) to execute 
+the actions, so one doesn't need to call that explicitly unless
+another tag is to be used, for example in a function called from
+tt(_alternative).
+
+Like tt(_tags) this function supports the tt(-C) option to give a
+different name for the argument context field.
+)
+findex(_describe)
+item(tt(_describe) var(descr) var(name1) [ var(name2) ] var(opts) ... tt(-)tt(-) ...)(
+This function can be used to add options or values with descriptions
+as matches. The var(descr) is taken as a string to display above
+the matches if the tt(format) style for the tt(descriptions) tag is set.
+
+After this one or two names of arrays followed by options to give
+to tt(compadd) must be given. The first array contains the possible
+completions with their descriptions (with the description separated
+by a colon from the completion string). If the second array is given,
+it should have the same number of elements as the first one and these
+elements are added as possible completions instead of the strings from 
+the first array. In any case, however, the completion list will show
+the strings from the first array.
+
+Any number of array/option sequences may be given separated by
+`tt(-)tt(-)'. This allows one to display matches together that need
+to be added with different options for tt(compadd).
+
+Before the first argument, the option `tt(-o)' may be given. It says
+that the matches added are option names. This will make tt(_describe)
+use the tt(prefix-hidden), tt(prefix-needed) and tt(verbose) styles
+to find out if the strings should be added at all and if the
+descriptions should be shown. Without the `tt(-o)' option, only the
+tt(verbose) style is used.
+
+tt(_describe) uses the tt(_all_labels) function to generate the matches, so
+that one doesn't need to put it into a loop over the tag labels.
+)
+findex(_multi_parts)
+item(tt(_multi_parts) var(sep) var(array))(
+This function gets two arguments: a separator character and an
+array.  As usual, the var(array) may be either the
 name of an array parameter or a literal array in the form
 `tt(LPAR()foo bar)tt(RPAR())' (i.e. a list of words separated by white 
 space in parentheses). With these arguments, this function will
@@ -579,10 +2552,19 @@ tar file in an array and then calls this function to complete these
 names in the way normal filenames are completed by the
 tt(_path_files) function.
 
+If given the tt(-i) option a single match left will be accepted
+immediatly even if that means that additional parts for which no
+separators were on the line are to be inserted. When completing from a 
+fixed set of possible completions which are really words, this is
+often the expected behaviour. But if tt(_multi_parts) should behave
+like completing pathnames, the tt(-i) option should not be used.
+
 Like other utility functions, this function accepts the `tt(-V)',
-`tt(-J)', and `tt(-X)' options with an argument and passes them to the
-tt(compadd) builtin.
+`tt(-J)', `tt(-1)', `tt(-2)', `tt(-n)', `tt(-f)', `tt(-X)', `tt(-M)', `tt(-P)',
+`tt(-S)', `tt(-r)', `tt(-R)', and `tt(-q)' options and passes them to
+the tt(compadd) builtin.
 )
+findex(_sep_parts)
 item(tt(_sep_parts))(
 This function gets as arguments alternating arrays and separators.
 The arrays specify completions for parts of strings to be separated by the
@@ -592,47 +2574,59 @@ a quoted list of words in parentheses. For example, with the array
 complete the string  `tt(f)' to `tt(foo)' and the string `tt(b@n)' to
 `tt(bar@news)'.
 
-This function passes the `tt(-V)', `tt(-J)', and `tt(-X)' options and
-their arguments to the tt(compadd) builtin used to add the matches.
+This function passes the `tt(-V)', `tt(-J)', `tt(-1)', `tt(-2)',
+`tt(-n)', `tt(-X)', `tt(-M)', `tt(-P)', `tt(-S)', `tt(-r)', `tt(-R)',
+and `tt(-q)' options and their arguments to the tt(compadd) builtin
+used to add the matches.
 )
+findex(_path_files)
+findex(_files)
 item(tt(_path_files) and tt(_files))(
 The function tt(_path_files) is used throughout the shell code
-to complete filenames. The advantage over the builtin
-completion functions is that it allows completion of partial paths. For
+to complete filenames. It allows completion of partial paths. For
 example, the string `tt(/u/i/s/sig)' may be completed to
-`tt(/usr/include/sys/signal.h)'.  The options `tt(-/)', `tt(-f)', `tt(-g)',
-and `tt(-W)' are available as for the tt(compctl)
-and tt(compgen) builtins; tt(-f) is the default. Additionally, the `tt(-F)'
+`tt(/usr/include/sys/signal.h)'.  The option `tt(-/)' specifies that
+only directories should be completed. The option `tt(-g) var(pattern)' 
+says that only files matching the var(pattern) should be completed,
+and the `tt(-f)' option, which is the default, completes all
+filenames. The option `tt(-W) var(paths)' may be used to specify path
+prefixes that are to be prepended to the string from the line to
+generate the filenames but that should not be inserted in the line or
+shown in a completion listing. The var(paths) may be the name of an
+array parameter, a literal list of paths enclosed in parentheses or
+an absolute pathname.
+Additionally, the `tt(-F)'
 option from the tt(compadd) builtin is supported, giving direct control
-over which filenames should be ignored as done by the tt(fignore)
-parameter in normal completion.
+over which filenames should be ignored. If no such option is given,
+the tt(ignored-suffixes) style is used.
 
-The function tt(_files) calls tt(_path_files) with all the arguments
-it was passed and, if that generated no matches, call tt(_path_files) again
-without any tt(-g) or tt(-/) option, thus generating all filenames.
+The function tt(_files) uses the tt(file-patterns) style and calls
+tt(_path_files) with all the arguments it was passed except for tt(-g) 
+and tt(-/). These two options are used depending on the setting of the 
+tt(file-patterns) style.
 
-These functions also accept the `tt(-J)', `tt(-V)', `tt(-X)', `tt(-P)',
-`tt(-S)', `tt(-q)', `tt(-r)', and `tt(-R)' options from the
-tt(compadd) builtin.
+These functions also accept the `tt(-J)', `tt(-V)', `tt(-1)',
+`tt(-2)', `tt(-n)', `tt(-X)', `tt(-M)', `tt(-P)', `tt(-S)', `tt(-q)',
+`tt(-r)', and `tt(-R)' options from the tt(compadd) builtin.
 
-Finally, the tt(_path_files) function supports one configuration key:
-tt(path_expand). If this is set to any non-empty string, the partially
-typed path from the line will be expanded as far as possible even if
-trailing pathname components can not be completed.
+Finally, the tt(_path_files) function  uses the styles tt(expand),
+tt(cursor) and tt(special-dirs) with the tt(paths) tag.
 )
+findex(_parameters)
 item(tt(_parameters))(
-This should be used to complete parameter names if you need some of the
-extra options of tt(compadd). It first tries to complete only non-local
-parameters. All arguments are passed unchanged to the tt(compadd) builtin.
+This should be used to complete parameter names. All arguments are
+passed unchanged to the tt(compadd) builtin.
 )
+findex(_options)
 item(tt(_options))(
-This can be used to complete option names. The difference to the
-`tt(-o)' option of tt(compgen) is that this function uses a matching
+This can be used to complete option names. It uses a matching
 specification that ignores a leading `tt(no)', ignores underscores and 
 allows the user to type upper-case letters, making them match their
 lower-case counterparts. All arguments passed to this function are
-propagated unchanged to the tt(compgen) builtin.
+propagated unchanged to the tt(compadd) builtin.
 )
+findex(_set_options)
+findex(_unset_options)
 item(tt(_set_options) and tt(_unset_options))(
 These functions complete only set or unset options, with the same
 matching specification used in the tt(_options) function.
@@ -642,37 +2636,248 @@ function for these functions to work properly. The lines in question
 are used to store the option settings in effect before the completion
 widget locally sets the options it needs.
 )
-item(tt(_long_options))(
+findex(_arguments)
+item(tt(_arguments) var(specs) ...)(
 This function resides in the tt(Base) subdirectory of the example
 completion system because it is not used by the core system.
 
-This function is used to complete long options for commands that
-support the `tt(--help)' option as, for example, most of the GNU
-commands do. For this it invokes the command from the line with the
-`tt(--help)' option and then parses the output to find possible option
-names. Note that this means that you should be careful to make sure
-that this function is not called for a command that does not support
-this option.
+This function can be used to complete words on the line by simply
+describing the arguments the command on the line gets. The description 
+is given as arguments to this function, with each var(spec) describing
+one option or normal argument of the command. The descriptions
+understood are:
 
-For options that get an argument after a `tt(=)', the function also
-automatically tries to find out what should be completed as the argument.
-The possible completions for option-arguments can be described with
-the arguments to this function. This is done by giving pairs of
-patterns and actions as consecutive arguments. The actions specify
-what should be done to complete arguments of those options whose
-description match the pattern. The action may be a list of words in
-brackets or in parentheses, separated by spaces. A list in square brackets
-denotes possible values for an optional argument, a list in parentheses
-gives words to complete for mandatory arguments. If the action does
-not start with a square bracket or parenthesis, it should be the name of a
-command (probably with arguments) that should be invoked to complete 
-after the equal sign. Example:
-
-indent(
-nofill(tt(_long_options '*\*'     '(yes no)' \))
-nofill(tt(              '*=FILE*' '_files' \))
-nofill(tt(              '*=DIR*'  '_files -/'))
+startitem()
+item(var(n)tt(:)var(message)tt(:)var(action))(
+This describes the var(n)'th normal argument. The var(message) will be 
+printed above the matches generated and the var(action) says what can
+be completed in this position (see below). If there are two colons
+before the var(message), this describes an optional argument.
 )
+item(tt(:)var(message)tt(:)var(action))(
+Like the previous one, but describing the em(next) argument. I.e. if
+you want to describe all arguments a command can get, you can leave
+out the numbers in the description and just use this form to describe
+them one after another in the order they have to appear on the line.
+)
+item(tt(*:)var(message)tt(:)var(action))(
+This describes how arguments are to be completed for which no
+description with one of the first two forms was given. This also means 
+that any number of arguments can be completed.
+
+If there are two colons before the var(message) (as in
+`tt(*::)var(message)tt(:)var(action)') the tt(words) special array and 
+the tt(CURRENT) special parameter will be restricted to only the
+normal arguments when the var(action) is executed or evaluated. With
+three colons before the var(message) they will be restricted to only
+the normal arguments covered by this description.
+)
+item(var(opt-spec)[var(description) ...])(
+This describes an option and (if at least one var(description) is
+given) the arguments that have to come after the option. If no
+var(description) is given, this will only be used to offer the option
+name as a possible completion in the right places. Each
+var(description) has to be of the form
+`tt(:)var(message)tt(:)var(action)' or
+`tt(::)var(message)tt(:)var(action)', where the second form describes
+an optional argument and the first one describes a mandatory argument.
+The last description may also be of the form
+`tt(:*:)var(message)tt(:)var(action)' or
+`tt(:*)var(pattern)tt(:)var(message)tt(:)var(action)'. These describe
+multiple arguments. In the first form all following words on the line
+are to be completed as described by the var(action), in the second
+form all words up to a word matching the given var(pattern) are to be
+completed using the var(action). The `tt(*)' or the var(pattern) may
+also be separated from the var(message) by two or three colons. With
+two colons the tt(words) special array and the tt(CURRENT) special
+parameter are modified to refer only to the words after the option
+(with two colons) or to the words covered by this description (with
+three colons) during the execution or evaluation of the
+var(action). Note that only one such `tt(:*)'-specification is useful
+and no other argument specification may be given after it.
+
+In the simplest form the var(opt-spec) is just the option name
+beginning with a minus or a plus sign, such as `tt(-foo)'. If the
+command accepts the option both with a leading minus and a plus sign,
+one can use either tt(-+foo) or tt(+-foo) to define both options at
+once. In this
+case, the first argument for the option (if any) has to come as a
+separate word directly after the option and the option may appear only 
+once on the line (and if it is already on the line, the option name
+will not be offered as a possible completion again). If the first
+argument for the option has to come directly after the option name
+em(in the same word), a minus sign should be added to the end of the
+var(opt-spec), as in `tt(-foo-)'. If the first argument may be given
+in one string with the option name, but may also be given as a
+separate argument after the option, a plus sign should be used
+instead. If the argument may be given as the next string or in same
+string as the option name but separated from it by an equal sign, a
+`tt(=)' should be used instead of the minus or plus sign.
+
+Note that this and the shortcut syntax with a leading tt(-+) or tt(+-) 
+means that for options like tt(-+) the second character has to be
+quoted with a backslash.
+
+If the option may be given more than once, a star
+(`tt(*)') has to be added in front of the var(opt-spec).
+
+Finally, the var(opt-spec) may contain a explanation string. This is
+given in brackets at the end, as in `tt(-q[query operation])'. The
+tt(verbose) style is used to decide if these
+explanation strings should be printed when options are listed. If no
+explanation string is given but the tt(auto-describe) style is
+set and only one argument is described for this var(opt-spec), the
+option will be described by the value of the style with any appearance
+of the sequence `tt(%d)' in it replaced by the description for the
+first argument.
+)
+enditem()
+
+Every var(spec) may also contain a list of option names and argument
+numbers with which the option or argument described is mutually
+exclusive. Such a list is given in parentheses at the beginning, as in
+`tt((-two -three 1)-one:...)' or `tt((-foo):...)'. In the first
+example, the options `tt(-two)' and `tt(-three)' and the first
+argument will not be offered as possible completions if the option
+`tt(-one)' is on the line. Also, the list may contain a single star as
+one of its elements to specify that the description for the rest
+arguments should not be used and it may contain a colon to specify
+that the descriptions for all normal (non-option-) arguments should
+not be used.
+
+In each of the cases above, the var(action) says how the possible
+completions should be generated. In cases where only one of a fixed
+set of strings can be completed, these strings can directly be given as 
+a list in parentheses, as in `tt(:foo:(foo bar baz))'. Such a list in
+doubled parentheses, as in `tt(:foo:((a\:bar b\:baz)))' should contain 
+strings consisting of the string to complete followed by a colon
+(which needs to be preceded by a backslash) and a description. The
+matches will be listed together with their descriptions if the
+tt(description) style for the tt(values) tag is set.
+
+An var(action) of the form `tt(->)var(string)' is used by functions
+that implement a state machine. In this case, the `var(string)' (with
+all leading and trailing spaces and tabs removed) will be stored in
+the global parameter tt(state) and the function returns with a return
+value of 300 (to make it distinguishable from other return values)
+after setting the global `tt(context)', `tt(line)' and `tt(opt_args)'
+parameters as described below and without resetting any changes made
+to the special parameters such as tt(PREFIX) and tt(words). Note that
+this means that a function calling tt(_arguments) with at least one
+action containing such a `tt(->)var(string)' has to declare
+appropriate local parameters as in:
+
+example(local context state line
+typeset -A opt_args)
+
+This will ensure that tt(_arguments) does not create unused global
+parameters.
+
+A string in
+braces will be evaluated to generate the matches and if the
+var(action) does not begin with an opening parentheses or brace, it
+will be split into separate words and executed. If the var(action)
+starts with a space, this list of words will be invoked unchanged,
+otherwise it will be invoked with some extra strings placed after the
+first word which can be given as arguments to the tt(compadd) builtin
+command and which make sure that the var(message) given
+in the description will be shown above the matches. These arguments
+are taken from the array parameter tt(expl) which will be set up
+before executing the var(action) and hence may be used in it (normally 
+in an expansion like `tt($expl[@])').
+
+Except for the `tt(->)var(string)' form, the var(action) will be
+executed by calling the tt(_all_labels) function to process all tag labels,
+so one doesn't need to call that explicitly unless another tag is to
+be used, for example in a function called in the var(action).
+
+In places where no sensible matches can be generated, the action
+should consist of only a space. This will make the var(message) be
+displayed but no possible completions listed. Note that even in this
+case the colon at the end of the var(message) is needed. The only case 
+where it can be left is when neither a var(message), nor a var(action) 
+is given.
+
+To include a colon in the option name, the var(message) or the
+var(action), it has to be preceded by a backslash.
+
+During the evaluation or execution of the action the array `tt(line)'
+will be set to the command name and normal arguments from the command
+line, i.e. to the words from the command line excluding all options
+and their arguments. These are stored in the associative array
+`tt(opt_args)', using the option names as keys and their arguments as
+the values. For options that have more than one argument these are
+given as one string, separated by colons. All colons in the original
+arguments are preceded with backslashes. The parameter `tt(context)'
+will be set to the automatically created context name. This is either
+a string of the form `var(-opt)tt(-)var(n)' for the var(n)'th argument 
+of the option var(-opt), or a string of the form `tt(argument-)var(n)' 
+for the var(n)'th argument (for rest arguments the var(n) is the
+string `tt(rest)'). For example, when completing the argument of the tt(-o)
+option, the name is `tt(-o-1)' and for the second normal (non-option-)
+argument it is `tt(argument-2)'.
+
+Also, during the evaluation of the var(action), the context name in
+the tt(curcontext) parameter will be changed by appending the same
+string that is stored in the tt(context) parameter.
+
+Normally the option names are taken as multi-character names and a
+word from the line is considered to contain only one option (or
+none). By giving the tt(-s) option to this function (before the first
+description), options are considered to be one-character options and the
+strings from the line may contain more than one such option
+letter. However, strings beginning with two hyphens (like
+`tt(-)tt(-prefix)') are still considered to contain only one option
+name. This allows the use of the `tt(-s)' option to describe
+single-letter options together with such long option names.
+
+Another option supported is `tt(-O) var(name)'. The var(name) will be
+taken as the name of an array and its elements will be given to
+functions called to generate matches when executing the
+var(actions). For example, this allows one to give options for the
+tt(compadd) builtin that should be used for all var(action)s.
+
+Also, the tt(-M) option followed by a string may be given before the
+first description. The string will be used as the match specification
+when completing option names and values instead of the default
+`tt(r:|[_-]=* r:|=*)'. 
+
+Finally, the option tt(-C) can be given to make tt(_arguments) modify
+the tt(curcontext) parameter when a action of the form
+`tt(->)var(state)' is used. This parameter is used to keep track of
+the current context and in this case it (and not the parameter
+tt(context) as explained above) has to be made local to make sure that 
+calling functions don't use the modified value. Also, the local
+version of tt(curcontext) has to be initialised with the old value as
+in:
+
+example(local curcontext="$curcontext")
+
+The function can also be made to automatically complete long options
+for commands that support the `tt(-)tt(-help)' option as, for example,
+most of the GNU commands do. For this, the string `tt(-)tt(-)' must be
+given as one argument and if it is, the command from the line is
+invoked with the `tt(-)tt(-help)' option and its output is parsed to find
+possible option names. Note that this means that you should be careful
+to make sure that this feature is not used for a command that does not
+support this option.
+
+For such automatically found options that get an argument after a
+`tt(=)', the function also tries
+to automatically find out what should be completed as the argument.
+The possible completions for option-arguments can be described with
+the arguments after the `tt(-)tt(-)' (which are not used as described
+above). Each argument contains one description of the form
+`var(pattern)tt(:)var(message)tt(:)var(action)'. The var(message) and
+the var(action) have the same format as for the normal option
+descriptions described above. The var(action) will be executed to
+complete arguments of options whose description in the output of the
+command from the line with the `tt(-)tt(-help)' option matches the
+var(pattern). For example:
+
+example(_arguments -- '*\*:toggle:(yes no)' \ 
+              '*=FILE*:file:_files' \ 
+              '*=DIR*:directory:_files -/')
 
 Here, `tt(yes)' and `tt(no)' will be completed as the argument of
 options whose description ends in a star, file names for options that
@@ -683,9 +2888,374 @@ for option descriptions containing `tt(=FILE)' and paths for option
 descriptions that contain `tt(=DIR)' or `tt(=PATH)'. These builtin
 patterns can be overridden by patterns given as arguments, however.
 
-This function also accepts the `tt(-X)', `tt(-J)', and `tt(-V)'
-options which are passed unchanged to `tt(compadd)'. Finally, it
-accepts the option `tt(-t)'; if this is given, completion is only done
-on words starting with two hyphens.
+Note also that tt(_arguments) tries to find out automatically if the
+argument for an option is optional. If it fails to automatically
+detect this, the colon before the var(message) can be doubled to tell
+it about this as described for the normal option descriptions above.
+
+The option `tt(-i) var(patterns)' (which must be given after the
+`tt(-)tt(-)') can be used to give patterns for options which should not be
+completed. The patterns can be given as the name of an array parameter
+or as a literal list in parentheses. E.g. `tt(-i
+"LPAR()-)tt(-(en|dis)able-FEATURE*RPAR()")' will make the options
+`tt(-)tt(-enable-FEATURE)' and `tt(-)tt(-disable-FEATURE)' be ignored. The
+option `tt(-s) var(pairs)' (again, after the `tt(-)tt(-)') can be used to
+describe option aliases. Each var(pair) consists of a pattern and a
+replacement. E.g. some tt(configure)-scripts describe options only as
+`tt(-)tt(-enable-foo)', but also accept `tt(-)tt(-disable-foo)'. To allow
+completion of the second form, one would use `tt(-s "LPAR()#-)tt(-enable-
+-)tt(-disable-RPAR()")'.
+
+Example:
+
+example(_arguments '-l+:left border:' \ 
+           '-format:paper size:(letter A4)' \ 
+           '*-copy:output file:_files::resolution:(300 600)' \ 
+           ':postscript file:_files -g *.(ps|eps)' \ 
+           '*:page number:')
+
+This describes three options: `tt(-l)', `tt(-format)', and
+`tt(-copy)'. The first one gets one argument described as `var(left
+border)' for which no completion will be offered because of the empty
+action. The argument may come directly after the `tt(-l)' or it may be 
+given as the next word on the line. The `tt(-format)' option gets one
+argument (in the next word) described as `var(paper size)' for which
+only the strings `tt(letter)' and `tt(A4)' will be completed. The
+`tt(-copy)' option differs from the first two in that it may appear
+more than once on the command line and in that it accepts two
+arguments. The first one is mandatory and will be completed as a
+filename. The second one is optional (because of the second colon
+before the description `var(resolution)') and will be completed from
+the strings `tt(300)' and `tt(600)'.
+
+The last two descriptions say what should be completed as
+arguments. The first one describes the first argument as a
+`var(postscript file)' and makes files ending in `tt(ps)' or `tt(eps)' 
+be completed. The last description says that all other arguments are
+`var(page numbers)' but does not give possible completions.
+)
+findex(_values)
+item(tt(_values) var(specs) ...)(
+This is used to complete values (strings) and their arguments or
+lists of such values.
+
+If the first argument is the option `tt(-O) var(name)', this will be
+used in the same way as by the tt(_arguments) function. I.e. the
+elements of the var(name) array will be given to calls to tt(compadd)
+and when executing an action.
+
+Otherwise, if the first argument (or the first argument after the
+`tt(-O) var(name)' option if that is used) is the option `tt(-s)', the
+next argument is used as the character that separates multiple values.
+
+The first argument (after the options and separator character if they
+are given) is used as a string to print as a description before
+listing the values.
+
+All other arguments describe the possible values and their
+arguments in the same format used for the description of options by
+the tt(_arguments) function (see above). The only difference is that
+there is no required minus or plus sign at the beginning and that
+values can have only one argument.
+
+Example:
+
+example(_values -s , 'description' \ 
+        '*foo[bar]' \ 
+        '(two)*one[number]:first count:' \ 
+        'two[another number]::second count:(1 2 3)')
+
+This describes three possible values: `tt(foo)', `tt(one)', and
+`tt(two)'. The first one is described as `tt(bar)', gets no argument 
+and may appear more than once. The second one is described as
+`tt(number)', may appear more than once, and gets one mandatory
+argument described as `tt(first count)' for which no action is
+specified so that it will not be completed automatically. The
+`tt((two))' at the beginning says that if the value `tt(one)' is on
+the line, the value `tt(two)' will not be  considered to be a possible
+completion anymore. Finally, the last value (`tt(two)') is described
+as `tt(another number)' and gets an optional argument decribed as
+`tt(second count)' which will be completed from the strings `tt(1)',
+`tt(2)', and `tt(3)'. The tt(_values) function will complete lists of
+these values separated by commas.
+
+Like tt(_arguments) this function temporarily adds another context
+name component to the current context name while executing the
+var(action). Here this name is just the name of the value for which
+the argument is completed.
+
+To decide if the descriptions for the values (not those for the
+arguments) should be printed, the tt(verbose) is used.
+
+One last difference to tt(_arguments) is that this function uses the
+associative array
+tt(val_args) to report values and their arguments (but otherwise this
+is the same as the tt(opt_args) association used by
+tt(_arguments)). This also means that the function calling tt(_values) 
+should declare the tt(state), tt(line), tt(context) and tt(val_args)
+parameters as in:
+
+example(local context state line
+typeset -A val_args)
+
+when using an action of the form `tt(->)var(string)'. With this
+function the tt(context) parameter will be set to the name of the
+value whose argument is to be completed.
+
+Like tt(_arguments), tt(_values) also supports the tt(-C) option in
+which case you have to make the parameter tt(curcontext) local instead 
+of tt(context) (as described above).
+)
+findex(_regex_arguments)
+item(tt(_regex_arguments) var(name) var(specs) ...)(
+This function is a compiler to generate a completion function.  The
+first argument specifies the name of a generated function while the
+remaining arguments specify a completion as a set of regular
+expressions with actions.  The generated function has the structure of a
+finite-state machine whose state corresponds to the state (i.e. the
+context) of the completion. This state machine uses a command line,
+which comes from concatentating the tt(words) array up to the current
+cursor position using null characters as a separator with no extra
+quotation.  This is analysed and at the end the appropriate action is
+executed.
+
+Specification arguments take one of following forms, in which
+metacharacters such as `tt(LPAR())', `tt(RPAR())', `tt(#)' and `tt(|)'
+should be quoted.
+
+startitem()
+item(tt(/)var(pattern)tt(/) [tt(%)var(lookahead)tt(%)] [tt(-)var(guard)] [tt(:)var(action)])(
+This is a primitive element, corresponding to one
+state of the compiled state machine.  The state is entered if the pattern
+`tt((#b)LPAR()(#B))var(pattern)tt(RPAR()(#B))var(lookahead)tt(*)' matches
+the command line string.  If it is matched, `var(guard)' is evaluated and
+its return status is examined; if this is successful, the state is entered,
+else the test fails and other candidates are tried.  The var(pattern)
+string `tt([])' is guaranteed never to match.
+
+If the test succeeds and the state is entered, the left part of the
+command line string matched as `var(pattern)' is removed and the 
+next state is tried, proceeding from inside to outside and from left to
+right.
+
+If no test succeeds and the remaining command line string contains no null
+character, the completion target is restricted to the remainder of the
+command line string and `var(action)'s for the target are evaluated.
+In this case, nothing is actually removed from the command line string
+so that any previous or neighbouring state may also have `var(actions)'s.
+)
+item(tt(/)var(pattern)tt(/+) [tt(%)var(lookahead)tt(%)] [tt(-)var(guard)] [tt(:)var(action)])(
+This is similar to `tt(/)var(pattern)tt(/) ...' but the left part of
+command line string is also considered as part of the completion target.
+)
+item(tt(/)var(pattern)tt(/-) [tt(%)var(lookahead)tt(%)] [tt(-)var(guard)] [tt(:)var(action)])(
+This is similar to `tt(/)var(pattern)tt(/) ...' but `var(action)'s of the
+current and previous states are ignored even if the following state's
+`var(pattern)' matches the empty string.
+)
+item(tt(LPAR()) var(spec) tt(RPAR()))(
+This groups `var(spec)'.
+)
+item(var(spec) tt(#))(
+This allows any number of repetitions of `var(spec)'.
+)
+item(var(spec) var(spec))(
+This represents the concatenation of two `var(spec)'s.
+)
+item(var(spec) tt(|) var(spec))(
+Either of two `var(spec)'s can be matched.
+)
+enditem()
+)
+findex(_combination)
+item(tt(_combination) [ tt(-s) var(pattern) ] var(tag) var(style) var(specs) ... var(field) var(opts) ...)(
+This function is used to complete combinations of values such as pairs 
+of hostnames and usernames. The possible values will be taken from the 
+var(style) whose name is given as the second argument. The first argument
+is the var(tag) to use to do the lookup.
+
+The style name should consist of multiple parts separated by
+hyphens which are then used as fieldnames. Known values for such
+fields can be given after the second argument in arguments of the form 
+`var(field)tt(=)var(pattern)'. The first argument without a equal sign 
+is taken as the name of the field for which completions should be
+generated.
+
+The matches generated will be taken from the value of the style. These 
+values should contain the possible values for the combinations where
+the values for the different fields are separated by colons or
+characters matching the pattern given after the tt(-s) option to
+tt(_combination) (normally this is used to define character classes
+like the `tt(-s "[:@]")' used for the tt(users-hosts) style).
+
+Only the values for the requested fields for which the patterns given
+in the `var(field)tt(=)var(pattern)' match the respective fields in
+the strings from the style value are generated as possible matches.
+
+If no style with the given name is defined for the given tag but a
+function named with the name of the requested field preceded by an
+underscore is defined, that function will be called to generate the
+matches. This is also done if none of the strings in the value of the
+style match all the patterns given as arguments.
+
+If the same name is used for more than one field, in both the
+`var(field)tt(=)var(pattern)' and the argument that gives the field
+name to complete for, the number of the field (starting with one) may
+be given after the fieldname, separated from it by a colon.
+
+All arguments after the requested fieldname are given to the
+tt(compadd) used (when generating matches from the style value) and to 
+the functions for the fields if they are called.
+)
+findex(_sort_tags)
+item(tt(_sort_tags) var(tag) ...)(
+As described above for the tt(tag-order) style, this is only provided
+to show how functions that sort tags can be implemented.
+
+Inside such functions the name of the current context can
+be accessed using the tt(curcontext) parameter. For example, the
+function generating file names (called tt(_files)) in the completion
+system is often called to generate only filenames matching a given
+glob pattern, in which case it uses the tags tt(globbed-files),
+tt(directories), and tt(all-files).  This means that the function
+offers to generate filenames matching the pattern, names of
+directories or all filenames as possible matches. Example:
+
+example(_sort_tags() {
+  case $curcontext in
+  (*::dvips:*)
+    comptry globbed-files directories
+    comptry all-files
+    ;;
+  (*)
+    comptry globbed-files
+    comptry directories
+    comptry all-files
+    ;;
+  esac
+})
+
+Every call to the tt(comptry) function (actually a builtin
+command defined by the tt(zsh/computil) module) gives a
+set of tags to use; as soon as one of the completion system produces
+some matches for one set,
+subsequent sets have no effect.  Hence in the example
+this means that for the tt(dvips) command on the first attempt the
+names of DVI files and directories will be generated (first call to
+tt(comptry)). If none of those names match the string from the command
+line the completion function will generate all filenames as
+possible matches (second call to tt(comptry)).
+
+For all other context names the second case-pattern matches, so that
+normally the completion functions will only try the filenames matching 
+the glob pattern (if any glob pattern is used). If that doesn't yield
+any matches, names of directories are generated, and if that doesn't
+yield any matching names either, all filenames will be generated.
+
+In every context the function may call tt(comptry) as
+often as it wants. Also, every string may be given as argument, even
+if no tag with such a name was offered by the completion
+function. This allows one to give a preferred ordering for some common 
+tag sets without having to worry about sensible patterns for context
+names. For example, many completion functions can generate both
+arguments and option names for commands. These functions normally use
+the tags tt(arguments) and tt(options). Depending on your preference
+you may write in your sorting function:
+
+example(_sort_tags() {
+  comptry arguments options
+  case $curcontext in
+  ...
+  esac
+})
+
+or
+
+example(_sort_tags() {
+  comptry arguments
+  comptry options
+  case $curcontext in
+  ...
+  esac
+})
+
+The former always adds both the matches for the argument and the
+option names as possible matches. The latter forces matches for the
+arguments to be preferred. In this case option names are only generated
+as matches if the string on the line matches no possible completion
+for the argument, which normally means that you have to type the
+hyphen the option names start with yourself to see the list of option
+names that can be completed.
+
+Since the completion functions are free to choose the tag names they
+use, there can't be a complete list. So to make sure that all types of 
+matches are eventually tried as completions, one should  use a call to 
+tt(comptry) with all arguments at the end of the sorting function. For
+those contexts where one really wants to make sure that certain tags are
+never used one can then use a call to tt(return) to circumvent that
+last tt(comptry). For example:
+
+example(_sort_tags() {
+  ...
+  case $curcontext in
+  (*::kill:*)
+    comptry processes
+    return
+    ;;
+  esac
+  comptry "$@"
+})
+
+The completion function for the tt(kill) builtin command offers the
+tags tt(jobs) and tt(processes) which represent job references
+(e.g. `tt(%1)') and process identifiers respectively. The function
+above makes sure that for this builtin command only process
+identifiers are generated as possible matches by using only the
+tt(processes) tag in a call to tt(comptry). The immediate call to
+tt(return) then makes sure that the default tt(comptry) at the end is
+not executed.
+
+With the tt(-s) option, each tag given to tt(comptry) will be put in a 
+separate set. With the tt(-m) option, the arguments are treated in the 
+same way as the the values for the tt(tag-order) style (except for the 
+`tt(!...)', `tt(-)' and `tt(foo())' forms).
+)
+
+enditem()
+
+texinode(Completion Directories)()(Completion Functions)(Completion System)
+sect(Completion Directories)
+cindex(completion system, directory structure)
+
+In the source distribution, the files are contained in various
+subdirectories of the tt(Completion) directory.  They may have been
+installed in the same structure, or into one single function directory.
+The following is a description of the files found in the original directory
+structure.  If you wish to alter an installed file, you will need to copy
+it to some directory which appears earlier in your tt(fpath) than the
+standard directory where it appears.
+
+startitem()
+item(tt(Core))(
+The core scripts and functions.  You will certainly need these, though will
+probably not need to alter them.  Many of these are documented above.
+)
+item(tt(Base))(
+Other functions you will almost certainly want if you are going to use
+any of the standard completion functions.  You may want to edit some of
+these files.
+)
+item(tt(Builtins))(
+Functions for completing arguments of shell builtin commands and
+utility functions for this (which are also used by functions from the
+tt(User) directory).
+)
+item(tt(User))(
+Functions for completing arguments of external commands and suites of
+commands.  They may need modifying for your system.
+)
+item(tt(Commands))(
+Functions which implement special types of completion to be bound to
+keystrokes rather than called by context.
 )
 enditem()

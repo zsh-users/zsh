@@ -1,7 +1,25 @@
-texinode(Programmable Completion)(Zsh Modules)(Zsh Line Editor)(Top)
-chapter(Programmable Completion)
+texinode(Completion Using compctl)(Completion Widgets)(Zsh Line Editor)(Top)
+chapter(Completion Using compctl)
 cindex(completion, programmable)
 cindex(completion, controlling)
+ifzman(\
+sect(Synopsis)
+This version of zsh has two ways of performing completion of words on the
+command line.  New users of the shell may prefer to use the newer
+and more powerful system based on shell functions; this is described in
+zmanref(zshcompsys), and the basic shell mechanisms which support it are
+described in zmanref(zshcompwid).  This manual entry describes the older
+tt(compctl) command.
+)\
+ifnzman(\
+sect(Types of completion)
+This version of zsh has two ways of performing completion of words on the
+command line.  New users of the shell may prefer to use the newer
+and more powerful system based on shell functions; this is described
+in noderef(Completion System), and the basic shell mechanisms which support
+it are described in noderef(Completion Widgets).  This chapter describes
+the older tt(compctl) command.
+)\
 findex(compctl)
 sect(Description)
 startlist()
@@ -10,7 +28,8 @@ list(tt(compctl) [ tt(-CDT) ] var(options) \
   [ tt(-x) var(pattern) var(options) tt(-) ... tt(--) ] \
   [ tt(PLUS()) var(options) [ tt(-x) ... tt(--) ] ... [tt(PLUS())] ] \
   [ var(command) ... ])
-list(tt(compctl) tt(-L) [ tt(-CDT) ] [ var(command) ... ])
+list(tt(compctl) tt(-M) var(match-specs) ...)
+list(tt(compctl) tt(-L) [ tt(-CDTM) ] [ var(command) ... ])
 list(tt(compctl) tt(PLUS()) var(command) ...)
 endlist()
 
@@ -30,7 +49,8 @@ menu(Alternative Completion)
 menu(Extended Completion)
 menu(Example)
 endmenu()
-texinode(Command Flags)(Option Flags)()(Programmable Completion)
+
+texinode(Command Flags)(Option Flags)()(Completion Using compctl)
 sect(Command Flags)
 Completion of the arguments of a command may be different for each
 command or may use the default.  The behavior when completing the
@@ -44,9 +64,23 @@ item(var(command) ...)(
 controls completion for the named commands, which must be listed last
 on the command line.  If completion is attempted for a command with a
 pathname containing slashes and no completion definition is found, the
-search is retried with the last pathname component.  Note that aliases
+search is retried with the last pathname component. If the command starts
+with a tt(=), completion is tried with the pathname of the command.
+
+Any of the var(command) strings may be patterns of the form normally
+used for filename generation.  These should be be quoted to protect them
+from immediate expansion; for example the command string tt('foo*')
+arranges for completion of the words of any command beginning with
+tt(foo).  When completion is attempted, all pattern completions are
+tried in the reverse order of their definition until one matches.  By
+default, completion then proceeds as normal, i.e. the shell will try to
+generate more matches for the specific command on the command line; this
+can be overridden by including tt(-tn) in the flags for the pattern
+completion.
+
+Note that aliases
 are expanded before the command name is determined unless the
-tt(COMPLETE_ALIASES) option is set.  Commands should not be combined
+tt(COMPLETE_ALIASES) option is set.  Commands may not be combined
 with the tt(-C), tt(-D) or tt(-T) flags.
 )
 item(tt(-C))(
@@ -62,8 +96,8 @@ been issued, filenames are completed.
 )
 item(tt(-T))(
 supplies completion flags to be used before any other processing is
-done, even those given to specific commands with other compctl
-definitions.  This is only useful when combined with extended
+done, even before processing for tt(compctl)s defined for specific
+commands.  This is especially useful when combined with extended
 completion (the tt(-x) flag, see noderef(Extended Completion) below).
 Using this flag you can define default behavior
 which will apply to all commands without exception, or you can alter
@@ -71,41 +105,59 @@ the standard behavior for all commands.  For example, if your access
 to the user database is too slow and/or it contains too many users (so
 that completion after `tt(~)' is too slow to be usable), you can use
 
-nofill(tt(compctl -Tx  'C[0,*/*]' -f - 's[~]' -k friends -S/))
+example(compctl -T -x 's[~] C[0,[^/]#]' -k friends -S/ -tn)
 
 to complete the strings in the array tt(friends) after a `tt(~)'.
-The first argument is necessary so that this form of ~-completion is
+The tt(C[...]) argument is necessary so that this form of ~-completion is
 not tried after the directory name is finished.
 )
 item(tt(-L))(
 lists the existing completion behavior in a manner suitable for
 putting into a start-up script; the existing behavior is not changed.
-Any combination of the above forms may be specified, otherwise all
-defined completions are listed.  Any other flags supplied
-are ignored.
+Any combination of the above forms, or the tt(-M) flag (which must
+follow the tt(-L) flag), may be specified, otherwise all defined
+completions are listed.  Any other flags supplied are ignored.
 )
 item(em(no argument))(
 If no argument is given, tt(compctl) lists all defined completions
 in an abbreviated form;  with a list of var(options), all completions
 with those flags set (not counting extended completion) are listed.
 )
-endlist()
+enditem()
 
 If the tt(PLUS()) flag is alone and followed immediately by the var(command)
 list, the completion behavior for all the commands in the list is reset to
 the default.  In other words, completion will subsequently use the
 options specified by the tt(-D) flag.
-texinode(Option Flags)(Alternative Completion)(Command Flags)(Programmable Completion)
+
+The form with tt(-M) as the first and only option defines global
+matching specifications (see
+ifzman(zshcompwid)\
+ifnzman(noderef(Matching Control))\
+). The match specifications given will be used for every completion
+attempt (only when using tt(compctl), not with the new completion
+system) and are tried in the order in which they are defined until one 
+generates at least one match. E.g.:
+
+example(compctl -M '' 'm:{a-zA-Z}={A-Za-z}')
+
+This will first try completion without any global match specifications 
+(the empty string) and, if that generates no matches, will try case
+insensitive completion.
+
+texinode(Option Flags)(Alternative Completion)(Command Flags)(Completion Using compctl)
 sect(Option Flags)
 startlist()
-list([ tt(-fcFBdeaRGovNAIOPZEnbjrzu/) ])
+list([ tt(-fcFBdeaRGovNAIOPZEnbjrzu/12) ])
 list([ tt(-k) var(array) ] [ tt(-g) var(globstring) ] \
   [ tt(-s) var(subststring) ])
-list([ tt(-K) var(function) ] [ tt(-H) var(num pattern) ])
+list([ tt(-K) var(function) ])
 list([ tt(-Q) ] [ tt(-P) var(prefix) ] [ tt(-S) var(suffix) ])
-list([ tt(-W) var(file-prefix) ])
+list([ tt(-W) var(file-prefix) ] [ tt(-H) var(num pattern) ])
 list([ tt(-q) ] [ tt(-X) var(explanation) ] [ tt(-Y) var(explanation) ])
-list([ tt(-y) var(func-or-var) ] [ tt(-l) var(cmd) ] [ tt(-U) ])
+list([ tt(-y) var(func-or-var) ] [ tt(-l) var(cmd) ] [ tt(-h) var(cmd) ] [ tt(-U) ])
+list([ tt(-t) var(continue) ] [ tt(-J) var(name) ] [ tt(-V) var(name) ])
+list([ tt(-M) var(match-spec) ])
 endlist()
 
 The remaining var(options) specify the type of command arguments
@@ -117,6 +169,7 @@ menu(Simple Flags)
 menu(Flags with Arguments)
 menu(Control Flags)
 endmenu()
+
 texinode(Simple Flags)(Flags with Arguments)()(Option Flags)
 subsect(Simple Flags)
 These produce completion lists made up by the shell itself:
@@ -215,6 +268,7 @@ item(tt(-u))(
 User names.
 )
 enditem()
+
 texinode(Flags with Arguments)(Control Flags)(Simple Flags)(Option Flags)
 subsect(Flags with Arguments)
 These have user supplied arguments to determine how the list of
@@ -229,8 +283,8 @@ of space- or comma-separated values in parentheses, in which any
 delimiter may be escaped with a backslash; in this case the argument
 should be quoted.  For example,
 
-nofill(tt(compctl -k "(cputime filesize datasize stacksize
-    coredumpsize resident descriptors)" limit))
+example(compctl -k "(cputime filesize datasize stacksize
+	       coredumpsize resident descriptors)" limit)
 )
 item(tt(-g) var(globstring))(
 The var(globstring) is expanded using filename globbing; it should be
@@ -251,20 +305,21 @@ completions.  The tt(fignore) special parameter is not applied to the
 resulting files.  Note that tt(-g) is faster for filenames.
 )
 item(tt(-K) var(function))(
-Call the given function to get the completions.  The function is
+Call the given function to get the completions.  Unless the name
+starts with an underscore, the function is
 passed two arguments: the prefix and the suffix of the word on which
 completion is to be attempted, in other words those characters before
 the cursor position, and those from the cursor position onwards.  The
 whole command line can be accessed with the tt(-c) and tt(-l) flags
-of the tt(read) builtin.  The
+of the tt(read) builtin. The
 function should set the variable tt(reply) to an array containing
 the completions (one completion per element); note that tt(reply)
 should not be made local to the function.  From such a function the
 command line can be accessed with the tt(-c) and tt(-l) flags to
 the tt(read) builtin.  For example,
 
-nofill(tt(function whoson { reply=(`users`); }
-compctl -K whoson talk))
+example(function whoson { reply=(`users`); }
+compctl -K whoson talk)
 
 completes only logged-on users after `tt(talk)'.  Note that `tt(whoson)' must
 return an array, so `tt(reply=`users`)' would be incorrect.
@@ -276,12 +331,13 @@ zero or negative the whole history is searched and if var(pattern) is
 the empty string all words are taken (as with `tt(*)').  A typical
 use is
 
-nofill(tt(compctl -D -f PLUS() -H 0 ''))
+example(compctl -D -f PLUS() -H 0 '')
 
 which forces completion to look back in the history list for a word if
 no filename matches.
 )
 enditem()
+
 texinode(Control Flags)()(Flags with Arguments)(Option Flags)
 subsect(Control Flags)
 These do not directly specify types of name to be completed, but
@@ -303,7 +359,7 @@ The var(prefix) is inserted just before the completed string; any
 initial part already typed will be completed and the whole var(prefix)
 ignored for completion purposes.  For example,
 
-nofill(tt(compctl -j -P "%" kill))
+example(compctl -j -P "%" kill)
 
 inserts a `%' after the kill command and then completes job names.
 )
@@ -318,20 +374,25 @@ With directory var(file-prefix):  for command, file, directory and
 globbing completion (options tt(-c), tt(-f), tt(-/), tt(-g)), the file
 prefix is implicitly added in front of the completion.  For example,
 
-nofill(tt(compctl -/ -W ~/Mail maildirs))
+example(compctl -/ -W ~/Mail maildirs)
 
 completes any subdirectories to any depth beneath the directory
 tt(~/Mail), although that prefix does not appear on the command line.
+The var(file-prefix) may also be of the form accepted by the tt(-k)
+flag, i.e. the name of an array or a literal list in parenthesis. In
+this case all the directories in the list will be searched for
+possible completions.
 )
 item(tt(-q))(
 If used with a suffix as specified by the tt(-S) option, this
 causes the suffix to be removed if the next character typed is a blank
-or does not insert anything (the same rule as used for the
-tt(AUTO_REMOVE_SLASH) option).  The option is most useful for list
+or does not insert anything or if the suffix consists of only one character
+and the next character typed is the same character; this the same rule used
+for the tt(AUTO_REMOVE_SLASH) option.  The option is most useful for list
 separators (comma, colon, etc.).
 )
 item(tt(-l) var(cmd))(
-This option cannot be combined with any other.  It restricts the range
+This option restricts the range
 of command line words that are considered to be arguments.  If
 combined with one of the extended completion patterns `tt(p[)...tt(])',
 `tt(r[)...tt(])', or `tt(R[)...tt(])'  (see noderef(Extended Completion)
@@ -342,11 +403,20 @@ option. If the var(cmd) string is empty the first word in the range
 is instead taken as the command name, and command name completion
 performed on the first word in the range.  For example,
 
-nofill(tt(compctl -x 'r[-exec,;]' -l '' -- find))
+example(compctl -x 'r[-exec,;]' -l '' -- find)
 
 completes arguments between `tt(-exec)' and the following `tt(;)' (or the end
 of the command line if there is no such string) as if they were
 a separate command line.
+)
+item(tt(-h) var(cmd))(
+Normally zsh completes quoted strings as a whole. With this option,
+completion can be done separately on different parts of such
+strings. It works like the tt(-l) option but makes the completion code 
+work on the parts of the current word that are separated by
+spaces. These parts are completed as if they were arguments to the
+given var(cmd). If var(cmd) is the empty string, the first part is
+completed as a command name, as with tt(-l).
 )
 item(tt(-U))(
 Use the whole list of possible completions, whether or not they
@@ -355,7 +425,10 @@ will be deleted.  This is most useful with a function (given by the
 tt(-K) option) which can examine the word components passed to it
 (or via the tt(read) builtin's tt(-c) and tt(-l) flags) and
 use its own criteria to decide what matches.  If there is no
-completion, the original word is retained.
+completion, the original word is retained.  Since the produced 
+possible completions seldom have interesting common prefixes
+and suffixes, menucompletion is started immediately if tt(AUTO_MENU) is
+set and this flag is used.
 )
 item(tt(-y) var(func-or-var))(
 The list provided by var(func-or-var) is displayed instead of the list
@@ -379,9 +452,22 @@ printed literally and if they appear output in columns is suppressed.
 )
 item(tt(-X) var(explanation))(
 Print var(explanation) when trying completion on the current set of
-options. A `tt(%n)' in this string is replaced by the number of matches.
+options. A `tt(%n)' in this string is replaced by the number of
+matches that were added for this explanation string.
 The explanation only appears if completion was tried and there was
-no unique match, or when listing completions.
+no unique match, or when listing completions. Explanation strings 
+will be listed together with the matches of the group specified
+together with the tt(-X) option (using the tt(-J) or tt(-V)
+option). If the same explanation string is given to multiple tt(-X)
+options, the string appears only once (for each group) and the number
+of matches shown for the `tt(%n)' is the total number of all matches
+for each of these uses. In any case, the explanation string will only
+be shown if there was at least one match added for the explanation
+string.
+
+The sequences tt(%B), tt(%b), tt(%S), tt(%s), tt(%U), and tt(%u) specify
+output attributes (bold, standout, and underline) and tt(%{...%}) can
+be used to include literal escape sequences as in prompts.
 )
 item(tt(-Y) var(explanation))(
 Identical to tt(-X), except that the var(explanation) first undergoes
@@ -389,8 +475,72 @@ expansion following the usual rules for strings in double quotes.
 The expansion will be carried out after any functions are called for
 the tt(-K) or tt(-y) options, allowing them to set variables.
 )
+item(tt(-t) var(continue))(
+The var(continue)-string contains a character that specifies which set
+of completion flags should be used next.  It is useful:
+
+(i) With tt(-T), or when trying a list of pattern completions, when
+tt(compctl) would usually continue with ordinary processing after
+finding matches; this can be suppressed with `tt(-tn)'.
+
+(ii) With a list of alternatives separated by tt(+), when tt(compctl)
+would normally stop when one of the alternatives generates matches.  It
+can be forced to consider the next set of completions by adding `tt(-t+)'
+to the flags of the alternative before the `tt(+)'.
+
+(iii) In an extended completion list (see below), when tt(compctl) would
+normally continue until a set of conditions succeeded, then use only
+the immediately following flags.  With `tt(-t-)', tt(compctl) will
+continue trying extended completions after the next `tt(-)'; with
+`tt(-tx)' it will attempt completion with the default flags, in other
+words those before the `tt(-x)'.
+)
+item(tt(-J) var(name))(
+This gives the name of the group the matches should be placed in. Groups
+are listed and sorted separately; likewise, menucompletion will offer
+the matches in the groups in the order in which the groups were
+defined. If no group name is explicitly given, the matches are stored in
+a group named var(default). The first time a group name is encountered,
+a group with that name is created. After that all matches with the same
+group name are stored in that group.
+
+This can be useful with non-exclusive alternative completions.  For
+example, in
+
+example(compctl -f -J files -t+ + -v -J variables foo)
+
+both files and variables are possible completions, as the tt(-t+) forces
+both sets of alternatives before and after the tt(+) to be considered at
+once.  Because of the tt(-J) options, however, all files are listed
+before all variables.
+)
+item(tt(-V) var(name))(
+Like tt(-J), but matches within the group will not be sorted in listings
+nor in menucompletion. These unsorted groups are in a different name
+space from the sorted ones, so groups defined as tt(-J files) and tt(-V
+files) are distinct.
+)
+item(tt(-1))(
+If given together with the tt(-V) option, makes
+only consecutive duplicates in the group be removed. Note that groups
+with and without this flag are in different name spaces.
+)
+item(tt(-2))(
+If given together with the tt(-J) or tt(-V) option, makes all
+duplicates be kept. Again, groups with and without this flag are in
+different name spaces.
+)
+item(tt(-M) var(match-spec))(
+This defines additional matching control specifications that should be used
+only when testing words for the list of flags this flag appears in. The format
+of the var(match-spec) string is described in 
+ifzman(zshcompwid)\
+ifnzman(noderef(Matching Control))\
+.
+)
 enditem()
-texinode(Alternative Completion)(Extended Completion)(Option Flags)(Programmable Completion)
+
+texinode(Alternative Completion)(Extended Completion)(Option Flags)(Completion Using compctl)
 sect(Alternative Completion)
 startlist()
 list(tt(compctl) [ tt(-CDT) ] var(options) tt(PLUS()) var(options) [ tt(PLUS()) ... ] \
@@ -402,16 +552,19 @@ tried with the options before the first `tt(PLUS())'. If this produces no
 matches completion is tried with the flags after the `tt(PLUS())' and so on. If
 there are no flags after the last `tt(PLUS())' and a match has not been found
 up to that point, default completion is tried.
-texinode(Extended Completion)(Example)(Alternative Completion)(Programmable Completion)
+If the list of flags contains a tt(-t) with a tt(PLUS()) character, the next
+list of flags is used even if the current list produced matches.
+
+texinode(Extended Completion)(Example)(Alternative Completion)(Completion Using compctl)
 sect(Extended Completion)
 startlist()
-list(tt(compctl) [ tt(-CDT) ] var(options) \
-tt(-x) var(pattern) var(options) tt(-) ... tt(--) \
-[ var(command) ... ])
-list(tt(compctl) [ tt(-CDT) ] var(options) \
-[ tt(-x) var(pattern) var(options) tt(-) ... tt(--) ] \
-[ tt(PLUS()) var(options) [ tt(-x) ... tt(--) ] ... [tt(PLUS())] ] \
-[ var(command) ... ])
+list(nofill(tt(compctl) [ tt(-CDT) ] var(options) \
+tt(-x) var(pattern) var(options) tt(-) ... tt(--)
+  [ var(command) ... ]))
+list(nofill(tt(compctl) [ tt(-CDT) ] var(options) \
+[ tt(-x) var(pattern) var(options) tt(-) ... tt(--) ]
+  [ tt(PLUS()) var(options) [ tt(-x) ... tt(--) ] ... [tt(PLUS())] ] \
+[ var(command) ... ]))
 endlist()
 
 The form with `tt(-x)' specifies extended completion for the
@@ -478,7 +631,7 @@ considered part of the completion, but the rest will.  var(index) may
 be negative to count from the end: in most cases, var(index) will be
 1 or -1.  For example,
 
-nofill(tt(compctl -s '`users`' -x 'n[1,@]' -k hosts -- talk))
+example(compctl -s '`users`' -x 'n[1,@]' -k hosts -- talk)
 
 will usually complete usernames, but if you insert an tt(@) after the
 name, names from the array var(hosts) (assumed to contain hostnames,
@@ -497,17 +650,27 @@ var(max) inclusive.
 )
 item(tt(r[)var(str1)tt(,)var(str2)tt(])...)(
 Matches if the cursor is after a word with prefix var(str1).  If there
-is also a word with prefix var(str2) on the command line it matches
-only if the cursor is before this word.
+is also a word with prefix var(str2) on the command line after the one 
+matched by var(str1) it matches
+only if the cursor is before this word. If the comma and var(str2) are
+omitted, it matches if the cursor is after a word with prefix var(str1).
 )
 item(tt(R[)var(str1)tt(,)var(str2)tt(])...)(
 Like tt(r) but using pattern matching instead.
 )
+item(tt(q[)var(str)tt(])...)(
+Matches the word currently being completed is in single quotes and the 
+var(str) begins with the letter `s', or if completion is done in
+double quotes and var(str) starts with the letter `d', or if
+completion is done in backticks and var(str) starts with a `b'.
+)
 enditem()
-texinode(Example)()(Extended Completion)(Programmable Completion)
+
+texinode(Example)()(Extended Completion)(Completion Using compctl)
 sect(Example)
-nofill(tt(compctl -u -x 's[tt(PLUS())] c[-1,-f],s[-f+PLUS()]' -g '~/Mail/*(:t)' \ 
-    - 's[-f],c[-1,-f]' -f -- mail))
+
+example(compctl -u -x 's[tt(PLUS())] c[-1,-f],s[-f+PLUS()]' \ 
+  -g '~/Mail/*(:t)' - 's[-f],c[-1,-f]' -f -- mail)
 
 This is to be interpreted as follows:
 

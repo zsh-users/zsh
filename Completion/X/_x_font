@@ -1,3 +1,16 @@
 #autoload
 
-_message 'font'
+local expl
+
+_wanted fonts || return 1
+
+# This *has* to be improved some day...
+
+if (( ! $+_font_cache )); then
+  typeset -gU _font_cache
+
+ _font_cache=( "${(@)^${(@f)$(_call fonts xlsfonts)}%%--*}--" )
+fi
+
+_all_labels fonts expl font \
+    compadd -M 'r:|-=* r:|=*' "$@" -S '' - "$_font_cache[@]"

@@ -2,6 +2,8 @@
 
 local expl
 
+_wanted keysyms || return 1
+
 if (( ! $+_keysym_cache )); then
   local file
 
@@ -16,5 +18,5 @@ if (( ! $+_keysym_cache )); then
   fi
 fi
 
-_description expl 'key symbol'
-compadd "$@" "$expl[@]" -M 'm:{a-z}={A-Z} r:|-=* r:|=*' - $_keysym_cache
+_all_labels keysyms expl 'key symbol' \
+    compadd "$@" -M 'm:{a-z}={A-Z} r:|-=* r:|=*' - $_keysym_cache
