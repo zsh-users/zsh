@@ -74,7 +74,7 @@ to be loaded before the completion system is initialized (i.e. the
 tt(compinit) function is called) to make sure that the tt(menu-select)
 widget defined by it will be redefined, too.
 
-Should you need to use the original copmpletion commands, you can still
+Should you need to use the original completion commands, you can still
 bind keys to the old functions by putting a `tt(.)' in front of the
 command name, e.g. `tt(.expand-or-complete)'.
 
@@ -761,8 +761,12 @@ accepted.
 )
 kindex(add-space, completion style)
 item(tt(add-space))(
-This style is used by the tt(_prefix) completer to decide if a space
-should be inserted before the suffix.
+This style is used by the tt(_expand) completer. If it `true' (the
+default), a space will be inserted after all words resulting forom the 
+expansion (except for directory names which get a slash).
+
+It is also used by tt(_prefix) completers to decide if a space should
+be inserted before the suffix.
 )
 kindex(ambiguous, completion style)
 item(tt(ambiguous))(
@@ -2263,6 +2267,10 @@ item(tt(_expand_word (^Xe)))(
 Performs expansion on the current word:  equivalent to the standard
 tt(expand-word) command, but using the tt(_expand) completer. Before
 calling it, the var(function) field is set to `tt(expand-word)'.
+
+Different from tt(_expand), this uses a `tt(1)' (one) as default
+value for the tt(substitute) and tt(glob) styles, i.e. both types of
+expansion will normally be performed.
 )
 findex(_history_complete_word) (\e/)
 item(tt(_history_complete_word) (\e/))(

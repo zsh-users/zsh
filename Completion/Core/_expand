@@ -28,7 +28,8 @@ exp=("$word")
 # First try substitution. That weird thing spanning multiple lines
 # changes quoted spaces, tabs, and newlines into spaces.
 
-zstyle -s ":completion:${curcontext}:" substitute expr &&
+{ zstyle -s ":completion:${curcontext}:" substitute expr ||
+  [[ "$curcontext" = expand-word:* ]] && expr=1 } &&
     [[ "${(e):-\$[$expr]}" -eq 1 ]] &&
     exp=( "${(e)exp//\\[ 	
 ]/ }" )
@@ -41,7 +42,8 @@ subd=("$exp[@]")
 
 # Now try globbing.
 
-zstyle -s ":completion:${curcontext}:" glob expr &&
+{ zstyle -s ":completion:${curcontext}:" glob expr ||
+  [[ "$curcontext" = expand-word:* ]] && expr=1 } &&
     [[ "${(e):-\$[$expr]}" -eq 1 ]] &&
     exp=( ${~exp} )
 
@@ -65,15 +67,25 @@ zstyle -s ":completion:${curcontext}:" sort sort
 [[ "$sort" = (yes|true|1|on) ]] && exp=( "${(@o)exp}" )
 
 # If there is only one expansion, add a suitable suffix
-(($#exp == 1)) && suf='' && [[ -d $exp && "$exp[1]" != */ ]] && suf='/'  
+
+if (( $#exp == 1 )); then
+  if [[ -d $exp && "$exp[1]" != */ ]]; then
+    suf=/
+  elif zstyle -T ":completion:${curcontext}:" add-space; then
+    suf=
+  fi
+fi
 
 if [[ -z "$compstate[insert]" ]] ;then
-  _description all-expansions expl 'all expansions' "o:$word"
+  if [[ "$sort" = menu ]]; then
+    _description expansions expl expansions "o:$word"
+  else
+    _description -V expansions expl expansions "o:$word"
+  fi
 
-  compadd "$expl[@]" -UQ -qS "$suf" - "$exp"
+  compadd "$expl[@]" -UQ -qS "$suf" - "$exp[@]"
 else
   _tags all-expansions expansions original
-
 
   if _requested all-expansions; then
     _description all-expansions expl 'all expansions'
@@ -81,12 +93,30 @@ else
   fi
 
   if [[ $#exp -gt 1 ]] && _requested expansions; then
+    local i normal dir
+
     if [[ "$sort" = menu ]]; then
       _description expansions expl expansions "o:$word"
     else
       _description -V expansions expl expansions "o:$word"
     fi
-    compadd "$expl[@]" -UQ - "$exp[@]"
+    if zstyle -T ":completion:${curcontext}:" add-space; then
+      suf=' '
+    else
+      suf=
+    fi
+    normal=()
+    dir=()
+
+    for i in "$exp[@]"; do
+      if [[ -d "$i" && "$i" != */ ]]; then
+        dir=( "$dir[@]" "$i" )
+      else
+	normal=( "$dir[@]" "$i" )
+      fi
+    done
+    (( $#dir ))    && compadd "$expl[@]" -UQ -qS/ - "$dir[@]"
+    (( $#normal )) && compadd "$expl[@]" -UQ -qS "$suf" - "$normal[@]"
   fi
 
   _requested original expl original && compadd "$expl[@]" -UQ - "$word"

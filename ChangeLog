@@ -1,3 +1,9 @@
+2000-04-20  Sven Wischnowsky  <wischnow@informatik.hu-berlin.de>
+
+	* 10854: Completion/Commands/_expand_word, Completion/Core/_expand,
+ 	Doc/Zsh/compsys.yo: default values for styles in _expand_word,
+ 	listing expansions with ^Xd, _expand uses add-space style
+	
 2000-04-20  Oliver Kiddle  <opk@zsh.org>
 
 	* 10848: Completion/Builtins/_print, Completion/Core/.distfiles,
