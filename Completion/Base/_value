@@ -1,11 +1,32 @@
-#compdef -value-
+#compdef -value- -array-value-
 
 _value () {
-  #_view_completion_parameters
+  # You can customize completion for different parameters by writing a
+  # function `_value:<name>'.
+
   if (( $+functions[_value:$compstate[parameter]] )); then
     "_value:$compstate[parameter]" "$@"
+  elif [[ "$compstate[parameter]" != *-* &&
+          "${(Pt)${compstate[parameter]}}" = assoc* ]]; then
+    if (( CURRENT & 1 )); then
+      _wanted association-keys expl 'association key' \
+          compadd - "${(@kP)${compstate[parameter]}}"
+    else
+      compstate[parameter]="${compstate[parameter]}-${words[CURRENT-1]}"
+      _value "$@"
+    fi
   else
-    _default
+    local pats
+
+    if { zstyle -a ":completion:${curcontext}:" assign-list pats &&
+         [[ "$compstate[parameter]" = (${(j:|:)~pats}) ]] } ||
+       [[ "$PREFIX$SUFFIX" = *:* ]]; then
+      compset -P '*:'
+      compset -S ':*'
+      _default -qS: "$@"
+    else
+      _default "$@"
+    fi
   fi
 }
 
@@ -24,8 +45,11 @@ _value:LDFLAGS () {
     _files -/ "$@"
   elif compset -P '-R'; then
     compset -P '*:'
+    compset -S ':*'
     _files -/ -S/ -r ' :' "$@"
   else
     _default "$@"
   fi
 }
+
+_value "$@"

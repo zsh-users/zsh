@@ -771,6 +771,18 @@ generating filenames as matches to find out if the cursor should be left
 after the first ambiguous pathname component even when menucompletion
 is used.
 )
+kindex(assign-list, completion style)
+item(tt(assign-list))(
+When completing after an equal sign, the completion system normally
+completes only one filename.  But when completing the value for some
+parameters or after other strings separated by an equal sign from a
+value, a colon-separated list of filenames is needed. This style
+can be set to a list of patterns matching the names of parameters for
+which such a colon-separated list of filenames should be completed.
+
+The default is to complete lists when the word on the line already
+contains a colon.
+)
 kindex(auto-description, completion style)
 item(tt(auto-description))(
 If set, this style's value will be used as the description for options which

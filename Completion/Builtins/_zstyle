@@ -12,9 +12,10 @@ styles=(
   accept-exact		 c:bool
   add-space		 c:bool
   ambiguous              c:bool
-  arguments		 c:
+  assign-list            c:
   auto-description	 c:
   break-keys             c:
+  command                c:command
   completer		 c:completer
   completions		 c:
   condition		 c:
@@ -38,7 +39,6 @@ styles=(
   insert-unambiguous	 c:bool
   last-prompt		 c:bool
   list			 c:listwhen
-  list-arguments	 c:
   list-colors		 c:
   list-packed		 c:bool
   list-rows-first	 c:bool
@@ -233,6 +233,12 @@ while [[ -n $state ]]; do
     single-ignored)
       _wanted values expl 'how to handle a single ignored match' \
           compadd - show menu
+      ;;
+
+    command)
+      shift 3 words
+      (( CURRENT -= 3 ))
+      _normal
       ;;
 
     _*)

@@ -1,9 +1,9 @@
 #compdef declare export integer local readonly typeset
 
-if compset -P '*=*:'; then
-  _default
-elif compset -P '*='; then
-  _default
+if [[ "$PREFIX" = *\=* ]]; then
+  compstate[parameter]="${PREFIX%%\=*}"
+  compset -P 1 '*='
+  _value
 else
   _parameters -q -S '='
 fi

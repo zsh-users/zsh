@@ -12,10 +12,16 @@ if { zstyle -s ":completion:${curcontext}:" use-compctl ctl ||
   compcall "$opt[@]" || return 0
 fi
 
-_files && return 0
+_files "$@" && return 0
 
 # magicequalsubst allows arguments like <any-old-stuff>=~/foo to do
 # file name expansion after the =.  In that case, it's natural to
 # allow completion to handle file names after any equals sign.
 
-[[ -o magicequalsubst ]] && compset -P 1 '*=' && _files
+if [[ -o magicequalsubst && "$PREFIX" = *\=* ]]; then
+  compstate[parameter]="${words[1]:t}-${PREFIX%%\=*}"
+  compset -P 1 '*='
+  _value "$@"
+else
+  return 1
+fi
