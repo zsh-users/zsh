@@ -66,14 +66,14 @@ have already run make, then after adding or removing the modules run:
 Controlling what is compiled into the main zsh binary
 -----------------------------------------------------
 
-By default the comp1, compctl, zle, complist, sched and rlimits modules are
-compiled into non-dynamic zsh and no modules are compiled into the main
-binary if dynamic loading is available.  This can be overridden by creating
-the file mymods.conf in the compilation directory (Src, unless you have
-told configure to use another directory) with the list of modules which are
-to be compiled into the main binary, one module name per line with no
-punctuation and no suffix.  See the zshmodules manual page for the list of
-available modules.
+By default the complete, compctl, zle, computil, complist, sched, parameter,
+zleparameter and rlimits modules are compiled into non-dynamic zsh and no
+modules are compiled into the main binary if dynamic loading is available.
+This can be overridden by creating the file mymods.conf in the compilation
+directory (Src, unless you have told configure to use another directory)
+with the list of modules which are to be compiled into the main binary, one
+module name per line with no punctuation and no suffix.  See the zshmodules
+manual page for the list of available modules.
 
 On systems which do not allow symbols in one dynamically loaded library to
 be visible from another, comp1 will be compiled in to the base executable
