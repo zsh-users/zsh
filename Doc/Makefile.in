@@ -199,10 +199,6 @@ install.info: zsh.texi
 	    exit 1; \
 	fi
 
-install.html: zsh_toc.html
-	$(sdir_top)/mkinstalldirs $(DESTDIR)$(htmldir)
-	$(INSTALL_DATA) *.html $(DESTDIR)$(htmldir)
-
 # uninstall man pages
 uninstall.man:
 	for file in $(MAN); do \

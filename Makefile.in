@@ -88,10 +88,6 @@ install.info uninstall.info:
 install.html uninstall.html:
 	@cd Doc && $(MAKE) $(MAKEDEFS) $@
 
-# install/uninstall just the html pages
-install.html uninstall.html
-	@cd Doc && $(MAKE) $(MAKEDEFS) $@
-
 # ========== DEPENDENCIES FOR TESTING ==========
 check test:
 	cd Test ; $(MAKE) check
