@@ -172,7 +172,7 @@ produce a nicely formatted printed manual.
 item(The HTML manual)(
 An HTML version of this manual is available at the Zsh web site via:
 
-tt(http://sunsite.dk/zsh/Doc/).
+tt(http://zsh.sunsite.dk/Doc/).
 
 (The HTML version is produced with bf(texi2html), which may be obtained
 from tt(http://www.mathematik.uni-kl.de/~obachman/Texi2html/). The command is

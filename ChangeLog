@@ -1,3 +1,8 @@
+2001-09-12  Oliver Kiddle  <opk@zsh.org>
+
+	* 15792: Doc/Zsh/manual.yo, Doc/Zsh/metafaq.yo: update url
+	references to http://zsh.sunsite.dk/
+
 2001-09-11  Oliver Kiddle  <opk@zsh.org>
 
 	* 15781: Completion/Unix/Command/.distfiles,
