@@ -1,3 +1,8 @@
+2005-04-01  Peter Stephenson  <pws@csr.com>
+
+	* 21078: Src/init.c, Test/A01grammar.ztst: parse errors didn't
+	cause non-zero exit status.
+
 2005-03-31  Oliver Kiddle  <opk@zsh.org>
 
 	* 21076: Completion/Unix/Command/_subversion: use _files with

@@ -131,6 +131,8 @@ loop(int toplevel, int justonce)
 		(tok == LEXERR && (!isset(SHINSTDIN) || !toplevel)) ||
 		justonce)
 		break;
+	    if (tok == LEXERR && !lastval)
+		lastval = 1;
 	    continue;
 	}
 	if (hend(prog)) {
@@ -1282,6 +1284,9 @@ zsh_main(UNUSED(int argc), char **argv)
 	    loop(1,0);
 	while (tok != ENDINPUT && (tok != LEXERR || isset(SHINSTDIN)));
 	if (tok == LEXERR) {
+	    /* Make sure a parse error exits with non-zero status */
+	    if (!lastval)
+		lastval = 1;
 	    stopmsg = 1;
 	    zexit(lastval, 0);
 	}

@@ -7,6 +7,7 @@
   mkdir basic.tmp && cd basic.tmp
 
   touch foo bar
+  echo "'" >unmatched_quote.txt
 
 %test
 #
@@ -439,3 +440,11 @@
   done || print no
 0:Handling of &&'s and ||'s with a for loop in between
 >no
+
+  $ZTST_testdir/../Src/zsh -f unmatched_quote.txt
+1:Parse error with file causes non-zero exit status
+?unmatched_quote.txt:2: unmatched '
+
+  $ZTST_testdir/../Src/zsh -f <unmatched_quote.txt
+1:Parse error on standard input causes non-zero exit status
+?zsh: unmatched '
