@@ -292,7 +292,7 @@ do_completion(Hookdef dummy, Compldat dat)
 	compqstack[0] = '\'';
 
     hasunqu = 0;
-    useline = (lst != COMP_LIST_COMPLETE);
+    useline = (wouldinstab ? -1 : (lst != COMP_LIST_COMPLETE));
     useexact = isset(RECEXACT);
     zsfree(compexactstr);
     compexactstr = ztrdup("");
@@ -334,6 +334,8 @@ do_completion(Hookdef dummy, Compldat dat)
 	clearlist = 1;
 	ret = 1;
 	minfo.cur = NULL;
+	if (useline < 0)
+	    selfinsert(zlenoargs);
 	goto compend;
     }
     zsfree(lastprebr);
@@ -342,7 +344,9 @@ do_completion(Hookdef dummy, Compldat dat)
 
     if (comppatmatch && *comppatmatch && comppatmatch != opm)
 	haspattern = 1;
-    if (!useline && uselist) {
+    if (useline < 0)
+	selfinsert(zlenoargs);
+    else if (!useline && uselist) {
 	/* All this and the guy only wants to see the list, sigh. */
 	cs = 0;
 	foredel(ll);
@@ -430,7 +434,7 @@ do_completion(Hookdef dummy, Compldat dat)
     /* Print the explanation strings if needed. */
     if (!showinglist && validlist && usemenu != 2 && 
 	(nmatches != 1 || diffmatches) &&
-	useline != 2 && (!oldlist || !listshown)) {
+	useline >= 0 && useline != 2 && (!oldlist || !listshown)) {
 	onlyexpl = 1;
 	showinglist = -2;
     }
@@ -706,7 +710,8 @@ callcompfunc(char *s, char *fn)
 	    compinsert = "";
 	    kset &= ~CP_INSERT;
 	}
-	compinsert = ztrdup(compinsert);
+	compinsert = (useline < 0 ? tricat("tab ", "", compinsert) :
+		      ztrdup(compinsert));
 	if (useexact)
 	    compexact = ztrdup("accept");
 	else {
@@ -780,6 +785,8 @@ callcompfunc(char *s, char *fn)
 
 	if (!compinsert)
 	    useline = 0;
+	else if (strstr(compinsert, "tab"))
+	    useline = -1;
 	else if (!strcmp(compinsert, "unambig") ||
 		 !strcmp(compinsert, "unambiguous") ||
 		 !strcmp(compinsert, "automenu-unambiguous"))

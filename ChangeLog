@@ -1,5 +1,10 @@
 2000-05-09  Sven Wischnowsky  <wischnow@zsh.org>
 
+	* 11274: Completion/Builtins/_zstyle, Completion/Core/_main_complete,
+ 	Doc/Zsh/compsys.yo, Doc/Zsh/compwid.yo, Src/Zle/compcore.c,
+ 	Src/Zle/zle_tricky.c: give control over insertion of tab when no
+ 	non-blank character before cursor; add insert-tab style
+	
 	* 11273: Completion/Base/_argument_sets,
  	Completion/Base/_arguments: option name clash in _arguments
 	

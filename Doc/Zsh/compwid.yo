@@ -275,7 +275,10 @@ common prefix is to be inserted and the next invocation of the
 completion code may start menucompletion (due to the tt(AUTO_MENU)
 option being set); if set to tt(menu) or tt(automenu) menucompletion
 will be started for the matches currently generated (in the
-latter case this will happen because the tt(AUTO_MENU) is set).
+latter case this will happen because the tt(AUTO_MENU) is set). The
+value may also contain the string `tt(tab)' when the completion code
+woul normally not really do completion, but only insert the TAB
+character.
 
 On exit it may be set to any of the values above (where setting it to
 the empty string is the same as unsetting it), or to a number, in which
@@ -290,6 +293,10 @@ i.e. without automatically appending a space.
 Both tt(menu) and tt(automenu) may also specify the the number of the
 match to insert, given after a colon.  For example, `tt(menu:2)' says
 to start menucompletion, beginning with the second match.
+
+Note that a value containing the substring `tt(tab)' makes the
+matches generated be ignored and only the character that was used to
+call the completion widget be inserted.
 
 Finally, it may also be set to tt(all), which makes all matches
 generated be inserted into the line.

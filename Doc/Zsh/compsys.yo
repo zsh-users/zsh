@@ -1253,6 +1253,15 @@ is any other string, menucompletion will be entered when the string on
 the line is longer than the prefix of the IDs of all matching
 processes.
 )
+kindex(insert-tab, completion style)
+item(tt(insert-tab))(
+If this has one of the `true' values, the completion system will only
+insert the TAB character if the completion code would normally do that 
+(i.e. when there is no non-blank character to the left of the cursor
+yet). If set to `false', completion will be done even there.
+
+The default value of this style is `true'.
+)
 kindex(insert-unambiguous, completion style)
 item(tt(insert-unambiguous))(
 This is used by the tt(_match) and tt(_approximate) completer

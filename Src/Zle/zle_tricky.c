@@ -77,6 +77,11 @@ mod_export int offs;
 /**/
 mod_export int usemenu, useglob;
 
+/* != 0 if we would insert a TAB if we weren't calling a completion widget. */
+
+/**/
+mod_export int wouldinstab;
+
 /* != 0 if we are in the middle of a menu completion. May be == 2 to force *
  * menu completion even if using different widgets.                        */
 
@@ -153,9 +158,15 @@ usetab(void)
 {
     unsigned char *s = line + cs - 1;
 
+    wouldinstab = 0;
     for (; s >= line && *s != '\n'; s--)
 	if (*s != '\t' && *s != ' ')
 	    return 0;
+    if (compfunc) {
+	wouldinstab = 1;
+
+	return 0;
+    }
     return 1;
 }
 

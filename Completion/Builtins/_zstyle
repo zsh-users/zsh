@@ -40,6 +40,7 @@ styles=(
   ignore-parents         c:ignorepar
   ignored-patterns	 c:
   insert-ids             c:insert-ids
+  insert-tab             c:bool
   insert-unambiguous	 c:bool
   last-prompt		 c:bool
   list			 c:listwhen
