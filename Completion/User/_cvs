@@ -584,7 +584,7 @@ _cvs_root () {
   fi
 
   _tags files && {
-    compadd -M 'r:|[:@./]=* r:|=*' "$@" $_cvs_roots || _files "$@" -/
+    compadd -M 'r:|[:@./]=** r:|=**' "$@" $_cvs_roots || _files "$@" -/
   }
 }
 

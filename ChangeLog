@@ -1,3 +1,7 @@
+2000-05-16  Tanaka Akira  <akr@zsh.org>
+
+	* 11415: Completion/User/_cvs: follow the new matcher-list behaviour.
+
 2000-05-16  Peter Stephenson  <pws@cambridgesiliconradio.com>
 
 	* 11410: Src/glob.c: tokenize `=' in tokenize(), so that `=cmd'
