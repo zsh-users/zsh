@@ -1,5 +1,9 @@
 2003-03-26  Oliver Kiddle  <opk@zsh.org>
 
+	* 18391: Test/.distfiles, Test/B03print.ztst, Test/B04read.ztst,
+	Test/C01arith.ztst, Test/D02glob.ztst: add tests for read builtin
+	a few glob qualifiers, 17678 and 18015
+
 	* 18390: Completion/Unix/Command/_prcs,
 	Completion/Unix/Command/_xmlsoft: tidy up _prcs and update
 	_xmlsoft for latest version of xsltproc

@@ -199,3 +199,7 @@
 0:argument specified for precision only
 >2
 >000
+
+ printf -- '%s\n' str
+0:initial `--' ignored to satisfy POSIX
+>str

@@ -265,3 +265,28 @@
 0:exclusions regression test
 >
 >glob.tmp/a glob.tmp/b glob.tmp/c glob.tmp/dir1 glob.tmp/dir1/a glob.tmp/dir1/b glob.tmp/dir1/c glob.tmp/dir2 glob.tmp/dir2/a glob.tmp/dir2/b glob.tmp/dir2/c
+
+ print glob.tmp/*(/)
+0:Just directories
+>glob.tmp/dir1 glob.tmp/dir2
+
+ print glob.tmp/*(.)
+0:Just files
+>glob.tmp/a glob.tmp/b glob.tmp/c
+
+ print glob.tmp/*(.e^'reply=( glob.tmp/*/${REPLY:t} )'^:t)
+0:Globbing used recursively (inside e glob qualifier)
+>a a b b c c
+
+ print glob.tmp/**/(:h) 
+0:Head modifier
+>. glob.tmp glob.tmp
+
+ print glob.tmp(:r)
+0:Remove extension modifier
+>glob
+
+ print glob.tmp/*(:s/./_/)
+0:Substitute modifier
+>glob_tmp/a glob_tmp/b glob_tmp/c glob_tmp/dir1 glob_tmp/dir2
+

@@ -98,3 +98,7 @@
   print $x
 0:assigning to scalar which contains non-math string
 >32
+
+  print $(( ))
+0:empty math parse e.g. $(( )) acts like a zero
+>0
