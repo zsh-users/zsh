@@ -1,7 +1,0 @@
-#compdef prompt
-
-_arguments -s \
-  '-l[list themes]:*:' \
-  "-h[help]::prompt theme:($prompt_themes):*:" \
-  "-p[preview theme(s)]:*:prompt theme:($prompt_themes):*:" \
-  {-s'[set and save theme]','*'}":prompt themes:($prompt_themes):*:"
