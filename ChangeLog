@@ -1,3 +1,8 @@
+2001-06-01  Oliver Kiddle  <opk@zsh.org>
+
+	* 14658: Base/Utility/_arguments, Base/Utility/_values: correctly
+	handle argument to -O option
+
 2001-06-01  Peter Stephenson  <pws@csr.com>
 
 	* 14651: Doc/Zsh/builtins.yo: add fix for 14597 in one other place.
