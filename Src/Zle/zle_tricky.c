@@ -3983,7 +3983,7 @@ addmatches(Cadata dat, char **argv)
     char **aign = NULL, **dparr = NULL, oaq = autoq, *oppre = dat->ppre;
     char *oqp = qipre, *oqs = qisuf, qc, **disp = NULL;
     int lpl, lsl, pl, sl, bpl, bsl, bppl = -1, bssl = -1;
-    int llpl = 0, llsl = 0, nm = mnum, gflags;
+    int llpl = 0, llsl = 0, nm = mnum, gflags = 0;
     int oisalt = 0, isalt, isexact, doadd, ois = instring, oib = inbackt;
     Cline lc = NULL;
     Cmatch cm;
@@ -5779,7 +5779,7 @@ makecomplistctl(int flags)
 static int
 makecomplistglobal(char *os, int incmd, int lst, int flags)
 {
-    Compctl cc;
+    Compctl cc = NULL;
     char *s;
 
     ccont = CC_CCCONT;
@@ -5787,38 +5787,46 @@ makecomplistglobal(char *os, int incmd, int lst, int flags)
 
     if (linwhat == IN_ENV) {
         /* Default completion for parameter values. */
-        cc = &cc_default;
-	keypm = NULL;
-    } else if (linwhat == IN_MATH) {
-	if (insubscr >= 2) {
-	    /* Inside subscript of assoc array, complete keys. */
-	    cc_dummy.mask = 0;
-	    cc_dummy.suffix = (insubscr == 2 ? "]" : "");
-	} else {
-	    /* Other math environment, complete paramete names. */
+	if (!(flags & CFN_DEFAULT)) {
+	    cc = &cc_default;
 	    keypm = NULL;
-	    cc_dummy.mask = CC_PARAMS;
 	}
-	cc = &cc_dummy;
-	cc_dummy.refc = 10000;
+    } else if (linwhat == IN_MATH) {
+	if (!(flags & CFN_DEFAULT)) {
+	    if (insubscr >= 2) {
+		/* Inside subscript of assoc array, complete keys. */
+		cc_dummy.mask = 0;
+		cc_dummy.suffix = (insubscr == 2 ? "]" : "");
+	    } else {
+		/* Other math environment, complete paramete names. */
+		keypm = NULL;
+		cc_dummy.mask = CC_PARAMS;
+	    }
+	    cc = &cc_dummy;
+	    cc_dummy.refc = 10000;
+	}
     } else if (linwhat == IN_COND) {
 	/* We try to be clever here: in conditions we complete option   *
 	 * names after a `-o', file names after `-nt', `-ot', and `-ef' *
 	 * and file names and parameter names elsewhere.                */
-	s = clwpos ? clwords[clwpos - 1] : "";
-	cc_dummy.mask = !strcmp("-o", s) ? CC_OPTIONS :
-	    ((*s == '-' && s[1] && !s[2]) ||
-	     !strcmp("-nt", s) ||
-	     !strcmp("-ot", s) ||
-	     !strcmp("-ef", s)) ? CC_FILES :
-	    (CC_FILES | CC_PARAMS);
-	cc = &cc_dummy;
-	cc_dummy.refc = 10000;
-	keypm = NULL;
+	if (!(flags & CFN_DEFAULT)) {
+	    s = clwpos ? clwords[clwpos - 1] : "";
+	    cc_dummy.mask = !strcmp("-o", s) ? CC_OPTIONS :
+		((*s == '-' && s[1] && !s[2]) ||
+		 !strcmp("-nt", s) ||
+		 !strcmp("-ot", s) ||
+		 !strcmp("-ef", s)) ? CC_FILES :
+		(CC_FILES | CC_PARAMS);
+	    cc = &cc_dummy;
+	    cc_dummy.refc = 10000;
+	    keypm = NULL;
+	}
     } else if (linredir) {
-	/* In redirections use default completion. */
-	cc = &cc_default;
-	keypm = NULL;
+	if (!(flags & CFN_DEFAULT)) {
+	    /* In redirections use default completion. */
+	    cc = &cc_default;
+	    keypm = NULL;
+	}
     } else {
 	/* Otherwise get the matches for the command. */
 	keypm = NULL;
@@ -6980,7 +6988,7 @@ makecomplistflags(Compctl cc, char *s, int incmd, int compadd)
     if (!errflag && cc->ylist) {
 	/* generate the user-defined display list: if anything fails, *
 	 * we silently allow the normal completion list to be used.   */
-	char **yaptr, *uv = NULL;
+	char **yaptr = NULL, *uv = NULL;
 	List list;
 
 	if (cc->ylist[0] == '$' || cc->ylist[0] == '(') {
@@ -8955,7 +8963,7 @@ calclist(void)
 	}
 	for (g = amatches; g; g = g->next) {
 	    if (g->widths) {
-		int *p, a = (max - g->totl - add) / g->cols;
+		int *p, a = (max - g->totl + add) / g->cols;
 
 		for (i = g->cols, p = g->widths; i; i--, p++)
 		    *p += a;
@@ -9024,7 +9032,7 @@ printlist(int over, CLPrintFunc printm)
     Cmatch *p, m;
     Cexpl *e;
     int pnl = 0, cl = (over ? listdat.nlines : -1);
-    int mc, ml = 0, printed = 0;
+    int mc = 0, ml = 0, printed = 0;
 
     if (cl < 2) {
 	cl = -1;
@@ -9135,7 +9143,7 @@ printlist(int over, CLPrintFunc printm)
 			    }
 			}
 			printed++;
-			printm(g, p, mc, ml, 1, 0, NULL, NULL);
+			printm(g, p, 0, ml, 1, 0, NULL, NULL);
 			pnl = 1;
 		    }
 	    }
@@ -9183,7 +9191,7 @@ printlist(int over, CLPrintFunc printm)
 		    mc++;
 		}
 		while (i-- > 0)
-		    printm(g, NULL, mc, ml, (!i),
+		    printm(g, NULL, mc++, ml, (!i),
 			   (g->widths ? g->widths[mc] : g->width), NULL, NULL);
 
 		if (n) {
