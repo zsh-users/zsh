@@ -1,0 +1,15 @@
+#compdef debchange dch=debchange
+
+_arguments \
+    '(--help)-h[help]' \
+    '(-h)--help' \
+    '--version' \
+    '(--append -a --newversion -v --increment)-i[increment]' \
+    '(--append -a --newversion -v -i)--increment' \
+    '(--increment -i --newversion -v --append)-a[append]' \
+    '(--increment -i --newversion -v -a)--append' \
+    '(--append -a --increment -i --newversion)-v[newversion]:version:' \
+    '(--append -a --increment -i -v)--newversion:version:' \
+    '(--preserve)-p[preserve]' \
+    '(-p)--preserve' \
+    ':text:'
