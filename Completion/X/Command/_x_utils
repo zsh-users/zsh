@@ -1,0 +1,165 @@
+#compdef xdpyinfo xwininfo xkill xfontsel xfd xev xhost xon xsetroot xwd xwud xrdb
+
+case "$service" in
+xdpyinfo)
+  _x_arguments \
+    -queryExtensions \
+    '-ext:extension: _x_extension -a'
+  ;;
+xwininfo)
+  _x_arguments \
+    -{help,int,children,tree,stats,bits,events,size,wm,shape,frame,all,english,metric} \
+    '(-id -name)-root' \
+    '(-id -root)-name:name: _x_window -n' \
+    '(-name -root)-id:id: _x_window'
+  ;;
+xkill)
+  _x_arguments \
+    -frame \
+    '(-id)-all' \
+    '(-all)-id:window: _x_window' \
+    '-button:selection button:(any 1 2 3 4 5)'
+  ;;
+xfontsel)
+  _xt_arguments \
+    -{print,noscaled} \
+    '-pattern:font pattern:_x_font' \
+    '-sample:sample text:' \
+    '-sample16:16-bit sample text:'
+  ;;
+xfd)
+  _xt_arguments \
+    '-fn:font: _x_font' \
+    -{box,center} \
+    '-start:first character number:' \
+    '-bc:box border color:_x_color' \
+    '-rows:number of rows:' \
+    '-columns:number of columns:'
+  ;;
+xev)
+  _x_arguments \
+    '-bw:border width:' \
+    '-bs:type of backing store:(NotUseful WhenMapped Always)' \
+    '-id:id:_x_window' \
+    '-s[use save-under]' \
+    '-name:window name:' \
+    '-rv'
+  ;;
+xhost)
+  local expl type ret=1 tmp match
+
+  if compset -P '-'; then
+    tmp=(${(f)"$(xhost)"})
+    shift tmp
+    tmp=(${tmp:#LOCAL:|<*>})
+    if [[ "$tmp" = *:* ]]; then
+      if compset -P '(#b)(*):'; then
+	type="$match[1]"
+	_tags displays
+	while _tags; do
+          while _next_label displays expl 'disallow access'; do
+	      { compadd "$expl[@]" -M 'm:{a-z}={A-Z} r:|[:.]=* r:|=*' - \
+		        ${${(M)tmp:#(#i)$type:*}#(#i)$type:} ||
+	            _hosts "$expl[@]" } && ret=0
+	  done
+	  (( ret )) || return 0
+        done
+      else
+	_alternative \
+	    'types:name family:compadd -S: ${(L)tmp%%:*}' \
+	    'hosts:host:compadd ${(@)tmp#*:}' && ret=0
+      fi
+    else
+      _tags displays
+      while _tags; do
+        while _next_label displays expl 'disallow access'; do
+	  { compadd "$expl[@]" -M 'm:{a-z}={A-Z} r:|[:.]=* r:|=*' -a tmp ||
+            _hosts "$expl[@]" } && ret=0
+        done
+	(( ret )) || return 0
+      done
+    fi
+  else
+    compset -P +
+
+    if [[ "$PREFIX" = *:* ]]; then
+      type="${(L)PREFIX%%:*}"
+      compset -P '*:'
+
+      case "$type" in
+      inet) _hosts && ret=0;;
+      dnet) _message 'DECnet host';;
+      nis)  _message 'Secure RPC network name';;
+      krb)  _message 'Kerberos V5 principal';;
+      esac
+    else
+      _alternative \
+          'types:name family:compadd -S: - inet dnet nis krb' \
+	  'hosts:: _hosts' && ret=0
+    fi
+    return ret
+  fi
+  ;;
+xon)
+  _arguments \
+    -{access,debug,nols} \
+    '-name:window name:' \
+    '-screen:screen number:' \
+    '-user:remote user name:_users' \
+    ':remote host:_hosts' \
+    '(-):command: _command_names -e' \
+    '*:command: _normal'
+  ;;
+xsetroot)
+  _x_arguments \
+    -{help,def,gray,grey,rv} \
+    '-cursor:cursor file:_files -g \*.\(\#i\)\(xbm\|curs\(\|or\)\):mask file:_files -g \*.\(\#i\)\(xbm\|curs\(\|or\)\|mask\)' \
+    '-cursor_name:cursor name:_x_cursor' \
+    '-bitmap:bitmap file:_files -g \*.\(\#i\)xbm' \
+    '-mod:x grid distance (1-16): :y grid distance (1-16):' \
+    '-fg:foreground color:_x_color' \
+    '-bg:background color:_x_color' \
+    '-solid:screen solid color:_x_color' \
+    '-name:root window name:'
+  ;;
+xwd)
+  _x_arguments \
+    -{debug,help,nobdrs,xy,frame,root,icmap,screen,silent} \
+    '-out:output file:_files' \
+    '-add:pixel change value:' \
+    '-id:id: _x_window' \
+    '-name:name: _x_window -n'
+  ;;
+xwud)
+  _x_arguments \
+    -{help,new,noclick,raw,rv,scale} \
+    '-bg:background color:_x_color' \
+    '-fg:foreground color:_x_color' \
+    '-in:input file:_files -g \*.\(\#i\)xwd' \
+    '-plane:image plane to display:' \
+    '-std:standard colormap:(best default gray red blue green)' \
+    '-vis:visual class:(StaticGray GrayScale StaticColor PseudoColor DirectColor TrueColor)'
+  ;;
+xrdb)
+  _x_arguments \
+    -{help,quiet,symbols,retain} \
+    '(-all -screen -screens)-global' \
+    '(-global -screen -screens)-all' \
+    '(-global -all -screens)-screen' \
+    '(-global -all -screen)-screens' \
+    '-n[only display on stdout]' \
+    '(-nocpp)-cpp:preprocessor program:_files -g \*\(-\*\)' \
+    '(-cpp)-nocpp' \
+    '(-load -override -merge -remove)-query' \
+    '(-query -override -merge -remove)-load' \
+    '(-query -load -merge -remove)-override' \
+    '(-query -load -override -remove)-merge' \
+    '(-query -load -override -merge)-remove' \
+    '-edit:output file:_files' \
+    '-backup:backup extension:' \
+    '*-D-:symbol to define:' \
+    '*-U-:symbol to undefine:' \
+    '*-I-:include directory:_files -/' \
+    '*:defaults file:_files'
+  ;;
+esac
