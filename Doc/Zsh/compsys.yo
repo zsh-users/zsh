@@ -2756,6 +2756,45 @@ Also, during the evaluation of the var(action), the context name in
 the tt(curcontext) parameter will be changed by appending the same
 string that is stored in the tt(context) parameter.
 
+The aruments also allows to specify multiple sets of options and
+arguments separated by single hyphens. The specifications before
+the first hyphen are shared by all sets given after the first
+hyphen. The first word in every other set gives the name of the
+set. This name may appear in exclusion lists in the specifications,
+either alone or before one of the possible values described above
+(with a `tt(-)' between the name and the rest).
+
+For example:
+
+example(_argument_sets \ 
+    -a \ 
+  - set1 \ 
+    -c \ 
+  - set2 \ 
+    -d \ 
+    ':arg:(x2 y2)')
+
+This defines two sets. When the command line contains the option
+`tt(-c)', the `tt(-d)' option and the argument will not be considered
+possible completions. When it contains `tt(-d)' or an argument, the
+option `tt(-c)' will not be completed any more, but if `tt(-a)' is
+given, both sets will still be considered valid, because it appears
+before the first hyphen, so both sets contain this option.
+
+If the name-string is of the form `tt(LPAR())var(name)tt(RPAR())' then 
+all specifications in the set have an implicit exclusion list
+containing the name of the set, i.e. all specifications are mutual
+exclusive with all other specifications in the same set. This is
+useful for defining multiple sets of options which are mutually
+exclusive and in which the options are aliases for each other. E.g.:
+
+example(_argument_sets \ 
+    -a -b \ 
+  - '(compress)' \ 
+    {-c,--compress}'[compress]' \ 
+  - '(uncompress)' \ 
+    {-d,--decompress}'[decompress]')
+
 Normally the option names are taken as multi-character names and a
 word from the line is considered to contain only one option (or
 none). By giving the tt(-s) option to this function (before the first
@@ -2834,6 +2873,11 @@ argument for an option is optional. If it fails to automatically
 detect this, the colon before the var(message) can be doubled to tell
 it about this as described for the normal option descriptions above.
 
+If the var(pattern) ends in `tt((-))', this will removed from the
+pattern and the var(action) will be used only directly after the
+`tt(=)', not in the next word. I.e., this is like a normal
+specification as descrobed above using `tt(=-)'.
+
 The option `tt(-i) var(patterns)' (which must be given after the
 `tt(-)tt(-)') can be used to give patterns for options which should not be
 completed. The patterns can be given as the name of an array parameter
@@ -2874,55 +2918,6 @@ arguments. The first one describes the first argument as a
 `var(postscript file)' and makes files ending in `tt(ps)' or `tt(eps)' 
 be completed. The last description says that all other arguments are
 `var(page numbers)' but does not give possible completions.
-)
-findex(_argument_sets)
-item(tt(_argument_sets) var(sets) ...)(
-This is like tt(_arguments) but allows to specify multiple sets of
-options and arguments. The arguments are sets of specifications for
-tt(_arguments) separated by single hyphens. The specifications before
-the first hyphen are shared by all sets given after the first
-hyphen. The first word in every other set gives the name of the
-set. This name may appear in exclusion lists in the specifications,
-either alone or before one of the possible values described for
-tt(_arguments) above (with a `tt(-)' between the name and the rest).
-
-For example:
-
-example(_argument_sets \ 
-    -a \ 
-  - set1 \ 
-    -c \ 
-  - set2 \ 
-    -d \ 
-    ':arg:(x2 y2)')
-
-This defines two sets. When the command line contains the option
-`tt(-c)', the `tt(-d)' option and the argument will not be considered
-possible completions. When it contains `tt(-d)' or an argument, the
-option `tt(-c)' will not be completed any more, but if `tt(-a)' is
-given, both sets will still be considered valid, because it appears
-before the first hyphen, so both sets contain this option.
-
-If the name-string is of the form `tt(LPAR())var(name)tt(RPAR())' then 
-all specifications in the set have an implicit exclusion list
-containing the name of the set, i.e. all specifications are mutual
-exclusive with all other specifications in the same set. This is
-useful for defining multiple sets of options which are mutual
-exclusive and in which the options are aliases for each other. E.g.:
-
-example(_argument_sets \ 
-    -a -b \ 
-  - '(compress)' \
-    {-c,--compress}'[compress]' \ 
-  - '(uncompress)' \ 
-    {-d,--decompress}'[decompress]')
-
-Don't expect too much with complicated options that get their
-arguments in the same string and `tt(->)var(state)' actions or with
-the tt(-C) option that is given to tt(_arguments), otherwise most
-things should work. Note that the contexts reported in the tt(context) 
-array and the options in the tt(opt_args) association are prefixed
-with the set names and a hyphen.
 )
 findex(_call)
 item(tt(_call) var(tag) var(string) ...)(

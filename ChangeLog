@@ -1,5 +1,10 @@
 2000-05-22  Sven Wischnowsky  <wischnow@zsh.org>
 
+	* 11489: Completion/Base/_arguments, Doc/Zsh/compsys.yo,
+ 	Src/Zle/computil.c: pat(-) in long-option patterns to say that
+ 	argument should be completed only after the `='; merge _arguments
+ 	and _argument_sets; slightly better test when not to complete options
+	
 	* 11487: Completion/Core/_expand, Src/Zle/complist.c: fix for
  	a-a-m-c in menu selection; scroll explanations onto screen again
  	when cursor comes near them

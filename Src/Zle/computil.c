@@ -293,6 +293,7 @@ typedef struct caarg *Caarg;
 
 struct cadef {
     Cadef next;			/* next in cache */
+    Cadef snext;		/* next set */
     Caopt opts;			/* the options */
     int nopts, ndopts, nodopts;	/* number of options/direct/optional direct */
     Caarg args;			/* the normal arguments */
@@ -304,7 +305,8 @@ struct cadef {
     char *match;		/* -M spec to use */
     int argsactive;		/* if arguments are still allowed */
 				/* used while parsing a command line */
-    char *set;			/* set name, shared */
+    char *set;			/* set name prefix (<name>-), shared */
+    char *sname;		/* set name */
     int flags;			/* see CDF_* below */
 };
 
@@ -399,11 +401,14 @@ freecaargs(Caarg a)
 static void
 freecadef(Cadef d)
 {
-    if (d) {
-	Caopt p, n;
+    Cadef s;
+    Caopt p, n;
 
+    while (d) {
+	s = d->snext;
 	zsfree(d->match);
 	zsfree(d->set);
+	zsfree(d->sname);
 	if (d->defs)
 	    freearray(d->defs);
 
@@ -421,6 +426,7 @@ freecadef(Cadef d)
 	if (d->single)
 	    zfree(d->single, 256 * sizeof(Caopt));
 	zfree(d, sizeof(*d));
+	d = s;
     }
 }
 
@@ -510,25 +516,63 @@ parse_caarg(int mult, int type, int num, int opt, char *oname, char **def,
     return ret;
 }
 
+static Cadef
+alloc_cadef(char **args, int single, char *match, int flags)
+{
+    Cadef ret;
+
+    ret = (Cadef) zalloc(sizeof(*ret));
+    ret->next = ret->snext = NULL;
+    ret->opts = NULL;
+    ret->args = ret->rest = NULL;
+    if (args) {
+	ret->defs = zarrdup(args);
+	ret->ndefs = arrlen(args);
+    } else {
+	ret->defs = NULL;
+	ret->ndefs = 0;
+    }
+    ret->lastt = time(0);
+    ret->set = ret->sname = NULL;
+    if (single) {
+	ret->single = (Caopt *) zalloc(256 * sizeof(Caopt));
+	memset(ret->single, 0, 256 * sizeof(Caopt));
+    } else
+	ret->single = NULL;
+    ret->match = ztrdup(match);
+    ret->flags = flags;
+
+    return ret;
+}
+
+static void
+set_cadef_opts(Cadef def)
+{
+    Caarg argp;
+    int xnum;
+
+    for (argp = def->args, xnum = 0; argp; argp = argp->next) {
+	if (!argp->direct)
+	    argp->min = argp->num - xnum;
+	if (argp->type == CAA_OPT)
+	    xnum++;
+    }
+}
+
 /* Parse an array of definitions. */
 
 static Cadef
-parse_cadef(char *nam, char **args, int multi)
+parse_cadef(char *nam, char **args)
 {
-    Cadef ret;
+    Cadef all, ret;
     Caopt *optp;
-    Caarg argp;
-    char **oargs = args, *p, *q, *match = "r:|[_-]=* r:|=*", **xor;
-    char *adpre, *adsuf, *set = NULL, *doset = NULL;
+    char **oargs = args, *p, *q, *match = "r:|[_-]=* r:|=*", **xor, **sargs;
+    char *adpre, *adsuf, *axor = NULL, *doset = NULL, **setp = NULL;
     int single = 0, anum = 1, xnum, nopts, ndopts, nodopts, flags = 0;
+    int state = 0;
 
     nopts = ndopts = nodopts = 0;
 
-    if (multi) {
-	if (!args[1])
-	    return NULL;
-	set = tricat(*args++, "-", "");
-    }
     /* First string is the auto-description definition. */
 
     for (p = args[0]; *p && (p[0] != '%' || p[1] != 'd'); p++);
@@ -582,27 +626,47 @@ parse_cadef(char *nam, char **args, int multi)
 
     /* Looks good. Optimistically allocate the cadef structure. */
 
-    ret = (Cadef) zalloc(sizeof(*ret));
-    ret->next = NULL;
-    ret->opts = NULL;
-    ret->args = ret->rest = NULL;
-    ret->defs = zarrdup(oargs);
-    ret->ndefs = arrlen(oargs);
-    ret->lastt = time(0);
-    ret->set = set;
-    if (single) {
-	ret->single = (Caopt *) zalloc(256 * sizeof(Caopt));
-	memset(ret->single, 0, 256 * sizeof(Caopt));
-    } else
-	ret->single = NULL;
-    ret->match = ztrdup(match);
-    ret->flags = flags;
+    all = ret = alloc_cadef(oargs, single, match, flags);
+    optp = &(ret->opts);
+    single = flags = 0;
+    anum = 1;
+
+    sargs = args;
 
     /* Get the definitions. */
 
-    for (optp = &(ret->opts); *args; args++) {
-        if (args[0][0] == '-' && !args[0][1]) {
-	    doset = set;
+    for (; *args; args++) {
+        if (args[0][0] == '-' && !args[0][1] && args[1]) {
+	    if (!state) {
+		char *p;
+		int l;
+
+		if (setp)
+		    args = setp;
+		p = *++args;
+		l = strlen(p) - 1;
+		if (*p == '(' && p[l] == ')') {
+		    axor = p = dupstring(p + 1);
+		    p[l - 1] = '\0';
+		} else
+		    axor = NULL;
+		ret->set = doset = tricat(p, "-", "");
+		ret->sname = ztrdup(p);
+		state = 1;
+	    } else {
+		setp = args;
+		state = 0;
+		args = sargs - 1;
+		doset = NULL;
+		ret->nopts = nopts;
+		ret->ndopts = ndopts;
+		ret->nodopts = nodopts;
+		set_cadef_opts(ret);
+		ret = ret->snext = alloc_cadef(NULL, single, NULL, flags);
+		optp = &(ret->opts);
+		single = flags = nopts = ndopts = nodopts = 0;
+		anum = 1;
+	    }
 	    continue;
 	}
 	p = dupstring(*args);
@@ -632,16 +696,25 @@ parse_cadef(char *nam, char **args, int multi)
 	    }
 	    /* Oops, end-of-string. */
 	    if (*p != ')') {
-		freecadef(ret);
+		freecadef(all);
 		zwarnnam(nam, "invalid argument: %s", *args, 0);
 		return NULL;
 	    }
+	    if (doset && axor)
+		xnum++;
 	    xor = (char **) zalloc((xnum + 2) * sizeof(char *));
 	    for (node = firstnode(list), xp = xor; node; incnode(node), xp++)
 		*xp = ztrdup((char *) getdata(node));
+	    if (doset && axor)
+		*xp++ = ztrdup(axor);
 	    xp[0] = xp[1] = NULL;
 
 	    p++;
+	} else if (doset && axor) {
+	    xnum = 1;
+	    xor = (char **) zalloc(3 * sizeof(char *));
+	    xor[0] = ztrdup(axor);
+	    xor[1] = xor[2] = NULL;
 	} else
 	    xor = NULL;
 
@@ -676,7 +749,7 @@ parse_cadef(char *nam, char **args, int multi)
 		    p++;
 	    }
 	    if (!p[1]) {
-		freecadef(ret);
+		freecadef(all);
 		zwarnnam(nam, "invalid argument: %s", *args, 0);
 		return NULL;
 	    }
@@ -713,7 +786,7 @@ parse_cadef(char *nam, char **args, int multi)
 			p++;
 
 		if (!*p) {
-		    freecadef(ret);
+		    freecadef(all);
 		    zwarnnam(nam, "invalid option definition: %s", *args, 0);
 		    return NULL;
 		}
@@ -723,7 +796,7 @@ parse_cadef(char *nam, char **args, int multi)
 		descr = NULL;
 
 	    if (c && c != ':') {
-		freecadef(ret);
+		freecadef(all);
 		zwarnnam(nam, "invalid option definition: %s", *args, 0);
 		return NULL;
 	    }
@@ -766,7 +839,7 @@ parse_cadef(char *nam, char **args, int multi)
 			    *p = sav;
 			}
 			if (*p != ':') {
-			    freecadef(ret);
+			    freecadef(all);
 			    freecaargs(oargs);
 			    zwarnnam(nam, "invalid option definition: %s",
 				    *args, 0);
@@ -848,12 +921,12 @@ parse_cadef(char *nam, char **args, int multi)
 	    int type = CAA_REST;
 
 	    if (*++p != ':') {
-		freecadef(ret);
+		freecadef(all);
 		zwarnnam(nam, "invalid rest argument definition: %s", *args, 0);
 		return NULL;
 	    }
 	    if (ret->rest) {
-		freecadef(ret);
+		freecadef(all);
 		zwarnnam(nam, "doubled rest argument definition: %s", *args, 0);
 		return NULL;
 	    }
@@ -885,7 +958,7 @@ parse_cadef(char *nam, char **args, int multi)
 		anum++;
 
 	    if (*p != ':') {
-		freecadef(ret);
+		freecadef(all);
 		zwarnnam(nam, "invalid argument: %s", *args, 0);
 		return NULL;
 	    }
@@ -905,7 +978,7 @@ parse_cadef(char *nam, char **args, int multi)
 		 pre = tmp, tmp = tmp->next);
 
 	    if (tmp && tmp->num == anum - 1) {
-		freecadef(ret);
+		freecadef(all);
 		freecaargs(arg);
 		zwarnnam(nam, "doubled argument definition: %s", *args, 0);
 		return NULL;
@@ -920,21 +993,16 @@ parse_cadef(char *nam, char **args, int multi)
     ret->nopts = nopts;
     ret->ndopts = ndopts;
     ret->nodopts = nodopts;
+    set_cadef_opts(ret);
 
-    for (argp = ret->args, xnum = 0; argp; argp = argp->next) {
-	if (!argp->direct)
-	    argp->min = argp->num - xnum;
-	if (argp->type == CAA_OPT)
-	    xnum++;
-    }
-    return ret;
+    return all;
 }
 
 /* Given an array of definitions, return the cadef for it. From the cache
  * are newly built. */
 
 static Cadef
-get_cadef(char *nam, char **args, int multi)
+get_cadef(char *nam, char **args)
 {
     Cadef *p, *min, new;
     int i, na = arrlen(args);
@@ -948,7 +1016,7 @@ get_cadef(char *nam, char **args, int multi)
 	    min = p;
     if (i)
 	min = p;
-    if ((new = parse_cadef(nam, args, multi))) {
+    if ((new = parse_cadef(nam, args))) {
 	freecadef(*min);
 	*min = new;
     }
@@ -1120,7 +1188,10 @@ ca_inactive(Cadef d, char **xor, int cur, int opts)
 
 /* State when parsing a command line. */
 
+typedef struct castate *Castate;
+
 struct castate {
+    Castate snext;
     Cadef d;
     int nopts;
     Caarg def, ddef;
@@ -1134,10 +1205,23 @@ struct castate {
 static struct castate ca_laststate;
 static int ca_parsed = 0, ca_alloced = 0;
 
+static void
+freecastate(Castate s)
+{
+    int i;
+    LinkList *p;
+
+    freelinklist(s->args, freestr);
+    for (i = s->nopts, p = s->oargs; i--; p++)
+	if (*p)
+	    freelinklist(*p, freestr);
+    zfree(s->oargs, s->d->nopts * sizeof(LinkList));
+}
+
 /* Parse a command line. */
 
 static int
-ca_parse_line(Cadef d, int multi)
+ca_parse_line(Cadef d, int multi, int first)
 {
     Caarg adef, ddef;
     Caopt ptr, wasopt, dopt;
@@ -1148,16 +1232,17 @@ ca_parse_line(Cadef d, int multi)
 
     /* Free old state. */
 
-    if (ca_alloced) {
-	int i = ca_laststate.nopts;
-	LinkList *p = ca_laststate.oargs;
+    if (first && ca_alloced) {
+	Castate s = &ca_laststate, ss;
+	int f = 1;
 
-	freelinklist(ca_laststate.args, freestr);
-	while (i--)
-	    if (*p++)
-		freelinklist(p[-1], freestr);
-
-	zfree(ca_laststate.oargs, ca_laststate.d->nopts * sizeof(LinkList));
+	while (s) {
+	    ss = s->snext;
+	    freecastate(s);
+	    if (!f)
+		zfree(s, sizeof(*s));
+	    s = ss;
+	}
     }
     /* Mark everything as active. */
 
@@ -1171,6 +1256,7 @@ ca_parse_line(Cadef d, int multi)
 
     /* Default values for the state. */
 
+    state.snext = NULL;
     state.d = d;
     state.nopts = d->nopts;
     state.def = state.ddef = NULL;
@@ -1482,15 +1568,12 @@ ca_colonlist(LinkList l)
 }
 
 static void
-ca_set_data(char *opt, Caarg arg, char **args, int single)
+ca_set_data(LinkList descr, LinkList act, LinkList subc,
+	    char *opt, Caarg arg, int single)
 {
-    LinkList descr, act, subc;
+    LinkNode dnode, anode;
     char nbuf[40], *buf;
     int restr = 0, onum, miss = 0, rest, oopt = 1, lopt = 0, addopt;
-
-    descr = newlinklist();
-    act = newlinklist();
-    subc = newlinklist();
 
  rec:
 
@@ -1503,33 +1586,40 @@ ca_set_data(char *opt, Caarg arg, char **args, int single)
 	if (!opt && !lopt && oopt > 0)
 	    oopt = 0;
 
-	addlinknode(descr, arg->descr);
-	addlinknode(act, arg->action);
+	for (dnode = firstnode(descr), anode = firstnode(act);
+	     dnode; incnode(dnode), incnode(anode))
+	    if (!strcmp((char *) getdata(dnode), arg->descr) &&
+		!strcmp((char *) getdata(anode), arg->action))
+		break;
 
-	if (!restr) {
-	    if ((restr = (arg->type == CAA_RARGS)))
-		restrict_range(ca_laststate.optbeg, ca_laststate.argend);
-	    else if ((restr = (arg->type == CAA_RREST)))
-		restrict_range(ca_laststate.argbeg, ca_laststate.argend);
+	if (!dnode) {
+	    addlinknode(descr, arg->descr);
+	    addlinknode(act, arg->action);
+
+	    if (!restr) {
+		if ((restr = (arg->type == CAA_RARGS)))
+		    restrict_range(ca_laststate.optbeg, ca_laststate.argend);
+		else if ((restr = (arg->type == CAA_RREST)))
+		    restrict_range(ca_laststate.argbeg, ca_laststate.argend);
+	    }
+	    if (arg->opt) {
+		buf = (char *) zhalloc((arg->set ? strlen(arg->set) : 0) +
+				       strlen(arg->opt) + 40);
+		if (arg->num > 0 && arg->type < CAA_REST)
+		    sprintf(buf, "%soption%s-%d",
+			    (arg->set ? arg->set : ""), arg->opt, arg->num);
+		else
+		    sprintf(buf, "%soption%s-rest",
+			    (arg->set ? arg->set : ""), arg->opt);
+	    } else if (arg->num > 0) {
+		sprintf(nbuf, "argument-%d", arg->num);
+		buf = (arg->set ? dyncat(arg->set, nbuf) : dupstring(nbuf));
+	    } else
+		buf = (arg->set ? dyncat(arg->set, "argument-rest") :
+		       dupstring("argument-rest"));
+
+	    addlinknode(subc, buf);
 	}
-	if (arg->opt) {
-	    buf = (char *) zhalloc((arg->set ? strlen(arg->set) : 0) +
-				   strlen(arg->opt) + 40);
-	    if (arg->num > 0 && arg->type < CAA_REST)
-		sprintf(buf, "%soption%s-%d",
-			(arg->set ? arg->set : ""), arg->opt, arg->num);
-	    else
-		sprintf(buf, "%soption%s-rest",
-			(arg->set ? arg->set : ""), arg->opt);
-	} else if (arg->num > 0) {
-	    sprintf(nbuf, "argument-%d", arg->num);
-	    buf = (arg->set ? dyncat(arg->set, nbuf) : dupstring(nbuf));
-	} else
-	    buf = (arg->set ? dyncat(arg->set, "argument-rest") :
-		   dupstring("argument-rest"));
-
-	addlinknode(subc, buf);
-
 	if (single)
 	    break;
 
@@ -1565,15 +1655,13 @@ ca_set_data(char *opt, Caarg arg, char **args, int single)
 
 	goto rec;
     }
-    set_list_array(args[0], descr);
-    set_list_array(args[1], act);
-    set_list_array(args[2], subc);
 }
 
 static int
 bin_comparguments(char *nam, char **args, char *ops, int func)
 {
     int min, max, n;
+    Castate lstate = &ca_laststate;
 
     if (incompfunc != 1) {
 	zwarnnam(nam, "can only be called from completion function", NULL, 0);
@@ -1588,8 +1676,7 @@ bin_comparguments(char *nam, char **args, char *ops, int func)
 	return 1;
     }
     switch (args[0][1]) {
-    case 'i':
-    case 'I': min = 2; max = -1; break;
+    case 'i': min = 2; max = -1; break;
     case 'D': min = 3; max =  3; break;
     case 'O': min = 4; max =  4; break;
     case 'L': min = 3; max =  4; break;
@@ -1611,171 +1698,235 @@ bin_comparguments(char *nam, char **args, char *ops, int func)
     }
     switch (args[0][1]) {
     case 'i':
-    case 'I':
 	if (compcurrent > 1 && compwords[0]) {
 	    Cadef def;
-	    int cap = ca_parsed;
-	    LinkList cax = ca_xor;
+	    int cap = ca_parsed, multi, first = 1, use, ret = 0;
+	    LinkList cax = ca_xor, nx;
+	    LinkNode node;
+	    Castate states = NULL, sp;
+	    char *xor[2];
 
 	    ca_parsed = 0;
+	    xor[1] = NULL;
 
-	    if (args[0][1] == 'I') {
-		char **xor;
+	    if (!(def = get_cadef(nam, args + 1)))
+		return 1;
 
-		if (!(def = get_cadef(nam, args + 2, 1)))
-		    return 1;
+	    multi = !!def->snext;
+	    ca_parsed = cap;
+	    ca_xor = (multi ? newlinklist() : NULL);
 
-		ca_parsed = cap;
-		ca_xor = newlinklist();
-		if ((xor = getaparam(args[1]))) {
-		    if (arrcontains(xor, args[2], 0) ||
-			ca_inactive(def, xor, compcurrent, 0)) {
-			ca_xor = cax;
-			return 1;
+	    while (def) {
+		use = !ca_parse_line(def, multi, first);
+		nx = ca_xor;
+		ca_xor = NULL;
+		while ((def = def->snext)) {
+		    if (nx) {
+			for (node = firstnode(nx); node; incnode(node)) {
+			    xor[0] = (char *) getdata(node);
+			    if (!strcmp(xor[0], def->sname) ||
+				ca_inactive(def, xor, compcurrent, 0))
+				break;
+			}
+			if (!node)
+			    break;
 		    }
 		}
-		if (ca_parse_line(def, 1)) {
-		    ca_xor = cax;
-		    return 1;
+		ca_xor = nx;
+		if (use && def) {
+		    sp = (Castate) zalloc(sizeof(*sp));
+		    memcpy(sp, &ca_laststate, sizeof(*sp));
+		    sp->snext = states;
+		    states = sp;
+		} else if (!use && !def) {
+		    if (states) {
+			freecastate(&ca_laststate);
+			memcpy(&ca_laststate, states, sizeof(*sp));
+			sp = states->snext;
+			zfree(states, sizeof(*states));
+			states = sp;
+		    } else
+			ret = 1;
 		}
-		set_list_array(args[1], ca_xor);
-	    } else {
-		if (!(def = get_cadef(nam, args + 1, 0)))
-		    return 1;
-
-		ca_parsed = cap;
-		ca_xor = NULL;
-		ca_parse_line(def, 0);
+		first = 0;
 	    }
 	    ca_xor = cax;
 	    ca_parsed = 1;
+	    ca_laststate.snext = states;
 
-	    return 0;
+	    return ret;
 	}
 	return 1;
 
     case 'D':
 	{
-	    Caarg arg = ca_laststate.def;
+	    LinkList descr, act, subc;
+	    Caarg arg;
+	    int ign = 0, ret = 1;
 
-	    if (arg) {
-		if (ca_laststate.doff > 0)
-		    ignore_prefix(ca_laststate.doff);
+	    descr = newlinklist();
+	    act = newlinklist();
+	    subc = newlinklist();
 
-		ca_set_data(arg->opt, arg, args + 1, (ca_laststate.doff > 0));
+	    while (lstate) {
+		arg = lstate->def;
 
-		return 0;
+		if (arg) {
+		    ret = 0;
+		    if (!ign && lstate->doff > 0) {
+			ign = 1;
+			ignore_prefix(lstate->doff);
+		    }
+		    ca_set_data(descr, act, subc, arg->opt, arg,
+				(lstate->doff > 0));
+		}
+		lstate = lstate->snext;
 	    }
-	    return 1;
+	    if (!ret) {
+		set_list_array(args[1], descr);
+		set_list_array(args[2], act);
+		set_list_array(args[3], subc);
+	    }
+	    return ret;
 	}
     case 'O':
-	if (ca_laststate.actopts &&
-	    (ca_laststate.opt || (ca_laststate.doff && ca_laststate.def) ||
-	     (ca_laststate.def &&
-	      (ca_laststate.def->type == CAA_OPT ||
-	       (ca_laststate.def->type >= CAA_RARGS &&
-		ca_laststate.def->num < 0)))) &&
-	    (!ca_laststate.def || ca_laststate.def->type < CAA_RARGS ||
-	     (ca_laststate.def->type == CAA_RARGS ?
-	      (ca_laststate.curpos == ca_laststate.argbeg + 1) :
-	      (compcurrent == 1)))) {
+	{
 	    LinkList next = newlinklist();
 	    LinkList direct = newlinklist();
 	    LinkList odirect = newlinklist();
 	    LinkList equal = newlinklist(), l;
 	    Caopt p;
 	    char *str;
+	    int ret = 1;
 
-	    for (p = ca_laststate.d->opts; p; p = p->next) {
-		if (p->active) {
-		    switch (p->type) {
-		    case CAO_NEXT:    l = next;    break;
-		    case CAO_DIRECT:  l = direct;  break;
-		    case CAO_ODIRECT: l = odirect; break;
-		    default:          l = equal;   break;
+	    for (; lstate; lstate = lstate->snext) {
+		if (lstate->actopts &&
+		    (lstate->opt || (lstate->doff && lstate->def) ||
+		     (lstate->def &&
+		      (lstate->def->type == CAA_OPT ||
+		       (lstate->def->type >= CAA_RARGS &&
+			lstate->def->num < 0)))) &&
+		    (!lstate->def || lstate->def->type < CAA_RARGS ||
+		     (lstate->def->type == CAA_RARGS ?
+		      (lstate->curpos == lstate->argbeg + 1) :
+		      (compcurrent == 1)))) {
+		    ret = 0;
+		    for (p = lstate->d->opts; p; p = p->next) {
+			if (p->active) {
+			    switch (p->type) {
+			    case CAO_NEXT:    l = next;    break;
+			    case CAO_DIRECT:  l = direct;  break;
+			    case CAO_ODIRECT: l = odirect; break;
+			    default:          l = equal;   break;
+			    }
+			    if (p->descr) {
+				char *n = bslashcolon(p->name);
+				int len = strlen(n) + strlen(p->descr) + 2;
+
+				str = (char *) zhalloc(len);
+				strcpy(str, n);
+				strcat(str, ":");
+				strcat(str, p->descr);
+			    } else
+				str = bslashcolon(p->name);
+			    addlinknode(l, str);
+			}
 		    }
-		    if (p->descr) {
-			char *n = bslashcolon(p->name);
-			int len = strlen(n) + strlen(p->descr) + 2;
-
-			str = (char *) zhalloc(len);
-			strcpy(str, n);
-			strcat(str, ":");
-			strcat(str, p->descr);
-		    } else
-			str = bslashcolon(p->name);
-		    addlinknode(l, str);
 		}
 	    }
-	    set_list_array(args[1], next);
-	    set_list_array(args[2], direct);
-	    set_list_array(args[3], odirect);
-	    set_list_array(args[4], equal);
-
-	    return 0;
-	}
-	return (ca_laststate.singles ? 2 : 1);
-    case 'L':
-	{
-	    Caopt opt = ca_get_opt(ca_laststate.d, args[1], 1, NULL);
-
-	    if (opt && opt->args) {
-		ca_set_data(opt->name, opt->args, args + 2, 1);
+	    if (!ret) {
+		set_list_array(args[1], next);
+		set_list_array(args[2], direct);
+		set_list_array(args[3], odirect);
+		set_list_array(args[4], equal);
 
 		return 0;
 	    }
-	    return 1;
+	    return (ca_laststate.singles ? 2 : 1);
+	}
+    case 'L':
+	{
+	    LinkList descr, act, subc;
+	    Caopt opt;
+	    int ret = 1;
+
+	    descr = newlinklist();
+	    act = newlinklist();
+	    subc = newlinklist();
+
+	    while (lstate) {
+		opt = ca_get_opt(lstate->d, args[1], 1, NULL);
+
+		if (opt && opt->args) {
+		    ret = 0;
+		    ca_set_data(descr, act, subc, opt->name, opt->args, 1);
+		}
+		lstate = lstate->snext;
+	    }
+	    if (!ret) {
+		set_list_array(args[2], descr);
+		set_list_array(args[3], act);
+		set_list_array(args[4], subc);
+	    }
+	    return ret;
 	}
     case 's':
-	if (ca_laststate.d->single && ca_laststate.singles &&
-	    ca_laststate.actopts && ca_laststate.opt) {
-	    setsparam(args[1],
-		      ztrdup((ca_laststate.ddef && ca_laststate.dopt) ?
-			     (ca_laststate.dopt->type == CAO_DIRECT ?
-			      "direct" :
-			      ((ca_laststate.dopt->type == CAO_OEQUAL ||
-				ca_laststate.dopt->type == CAO_EQUAL) ?
-			       "equal" : "next")) : ""));
-	    return 0;
-	}
+	for (; lstate; lstate = lstate->snext)
+	    if (lstate->d->single && lstate->singles &&
+		lstate->actopts && lstate->opt) {
+		setsparam(args[1],
+			  ztrdup((lstate->ddef && lstate->dopt) ?
+				 (lstate->dopt->type == CAO_DIRECT ?
+				  "direct" :
+				  ((lstate->dopt->type == CAO_OEQUAL ||
+				    lstate->dopt->type == CAO_EQUAL) ?
+				   "equal" : "next")) : ""));
+		return 0;
+	    }
 	return 1;
     case 'M':
 	setsparam(args[1], ztrdup(ca_laststate.d->match));
 	return 0;
     case 'a':
-	return !(ca_laststate.d->args || ca_laststate.d->rest);
+	for (; lstate; lstate = lstate->snext)
+	    if (lstate->d->args || lstate->d->rest)
+		return 0;
+	return 1;
     case 'W':
 	{
+	    Castate s;
 	    char **ret, **p;
 	    LinkNode n;
 	    LinkList *a;
 	    Caopt o;
 	    int num;
 
-	    ret = p = zalloc((countlinknodes(ca_laststate.args) + 1) *
-			     sizeof(char *));
+	    for (num = 0, s = lstate; s; s = s->snext)
+		num += countlinknodes(s->args);
 
-	    for (n = firstnode(ca_laststate.args); n; incnode(n))
-		*p++ = ztrdup((char *) getdata(n));
+	    ret = p = zalloc((num + 1) * sizeof(char *));
+
+	    for (s = lstate; s; s = s->snext)
+		for (n = firstnode(s->args); n; incnode(n))
+		    *p++ = ztrdup((char *) getdata(n));
 	    *p = NULL;
 
 	    setaparam(args[1], ret);
 
-	    for (num = 0, o = ca_laststate.d->opts, a = ca_laststate.oargs; o;
-		 o = o->next, a++)
-		if (*a)
-		    num += 2;
+	    for (num = 0, s = lstate; s; s = s->snext)
+		for (o = s->d->opts, a = s->oargs; o; o = o->next, a++)
+		    if (*a)
+			num += 2;
 
 	    ret = p = zalloc((num + 1) * sizeof(char *));
 
-	    for (o = ca_laststate.d->opts, a = ca_laststate.oargs; o;
-		 o = o->next, a++) {
-		if (*a) {
-		    *p++ = (o->set ? tricat(o->set, o->name, "") :
-			    ztrdup(o->name));
-		    *p++ = ca_colonlist(*a);
-		}
-	    }
+	    for (s = lstate; s; s = s->snext)
+		for (o = s->d->opts, a = s->oargs; o; o = o->next, a++)
+		    if (*a) {
+			*p++ = (o->set ? tricat(o->set, o->name, "") :
+				ztrdup(o->name));
+			*p++ = ca_colonlist(*a);
+		    }
 	    *p = NULL;
 
 	    sethparam(args[2], ret);
