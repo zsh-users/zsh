@@ -1,3 +1,7 @@
+2002-03-17  Bart Schaefer  <schaefer@zsh.org>
+
+	* 16849: Completion/Base/Core/_dispatch: shift off `-s' argument.
+
 2002-03-17  Clint Adams  <clint@zsh.org>
 
 	* 16847: Completion/Unix/Command/_cvs: complete multiple -j's after

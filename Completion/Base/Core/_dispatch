@@ -7,6 +7,7 @@ local curcontext="$curcontext" service str noskip
 
 if [[ "$1" = -s ]]; then
   noskip=yes
+  shift
 fi
 
 [[ -z "$noskip" ]] && _compskip=
