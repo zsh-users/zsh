@@ -476,7 +476,7 @@ scanner(Complist q)
 
 	    if (!errflag && !(q->closure && !strcmp(str, "."))) {
 		addpath(str);
-		if (!closure || statfullpath("", NULL, 1))
+		if (!closure || !statfullpath("", NULL, 1))
 		    scanner((q->closure) ? q : q->next);
 		pathbuf[pathpos = oppos] = '\0';
 	    }
