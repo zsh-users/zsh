@@ -97,7 +97,7 @@ static int h_m[1025], h_push, h_pop, h_free;
 #endif
 
 #define H_ISIZE  sizeof(zlong)
-#define HEAPSIZE (8192 - H_ISIZE)
+#define HEAPSIZE (16384 - H_ISIZE)
 #define HEAP_ARENA_SIZE (HEAPSIZE - sizeof(struct heap))
 #define HEAPFREE (16384 - H_ISIZE)
 
@@ -133,6 +133,10 @@ global_permalloc(void)
 
 static Heap heaps;
 
+/* first heap with free space, not always correct */
+
+static Heap fheap;
+
 /* Use new heaps from now on. This returns the old heap-list. */
 
 /**/
@@ -141,7 +145,7 @@ new_heaps(void)
 {
     Heap h = heaps;
 
-    heaps = NULL;
+    fheap = heaps = NULL;
 
     return h;
 }
@@ -160,6 +164,7 @@ old_heaps(Heap old)
 	zfree(h, sizeof(*h));
     }
     heaps = old;
+    fheap = NULL;
 }
 
 /* Temporarily switch to other heaps (or back again). */
@@ -171,6 +176,7 @@ switch_heaps(Heap new)
     Heap h = heaps;
 
     heaps = new;
+    fheap = NULL;
 
     return h;
 }
@@ -208,6 +214,8 @@ freeheap(void)
 #if defined(ZSH_MEM) && defined(ZSH_MEM_DEBUG)
     h_free++;
 #endif
+
+    fheap = NULL;
     for (h = heaps; h; h = hn) {
 	hn = h->next;
 	if (h->sp) {
@@ -215,6 +223,8 @@ freeheap(void)
 	    memset(arena(h) + h->sp->used, 0xff, h->used - h->sp->used);
 #endif
 	    h->used = h->sp->used;
+	    if (!fheap && h->used < HEAP_ARENA_SIZE)
+		fheap = h;
 	    hl = h;
 	} else
 	    zfree(h, HEAPSIZE);
@@ -238,6 +248,7 @@ popheap(void)
     h_pop++;
 #endif
 
+    fheap = NULL;
     for (h = heaps; h; h = hn) {
 	hn = h->next;
 	if ((hs = h->sp)) {
@@ -246,6 +257,8 @@ popheap(void)
 	    memset(arena(h) + hs->used, 0xff, h->used - hs->used);
 #endif
 	    h->used = hs->used;
+	    if (!fheap && h->used < HEAP_ARENA_SIZE)
+		fheap = h;
 	    zfree(hs, sizeof(*hs));
 
 	    hl = h;
@@ -275,13 +288,12 @@ zhalloc(size_t size)
 
     /* find a heap with enough free space */
 
-    for (h = heaps; h; h = h->next) {
+    for (h = (fheap ? fheap : heaps); h; h = h->next) {
 	if (HEAP_ARENA_SIZE >= (n = size + h->used)) {
 	    h->used = n;
 	    return arena(h) + n - size;
 	}
     }
-
     {
 	Heap hp;
         /* not found, allocate new heap */
@@ -311,6 +323,7 @@ zhalloc(size_t size)
 	    hp->next = h;
 	else
 	    heaps = h;
+	fheap = NULL;
 
 	unqueue_signals();
 	return arena(h);
@@ -361,6 +374,7 @@ hrealloc(char *p, size_t old, size_t new)
 		ph->next = h->next;
 	    else
 		heaps = h->next;
+	    fheap = NULL;
 	    zfree(h, HEAPSIZE);
 	    return NULL;
 	}
@@ -593,6 +607,16 @@ struct m_hdr {
 #define M_ISIZE (sizeof(zlong))
 #define M_MIN   (2 * M_ISIZE)
 
+/* M_FREE  is the number of bytes that have to be free before memory is
+ *         given back to the system
+ * M_KEEP  is the number of bytes that will be kept when memory is given
+ *         back; note that this has to be less than M_FREE
+ * M_ALLOC is the number of extra bytes to request from the system */
+
+#define M_FREE  65536
+#define M_KEEP  32768
+#define M_ALLOC M_KEEP
+
 /* a pointer to the last free block, a pointer to the free list (the blocks
    on this list are kept in order - lowest address first) */
 
@@ -623,13 +647,13 @@ static char *m_high, *m_low;
 
 
 #define M_SIDX(S)  ((S) / M_ISIZE)
-#define M_SNUM     50
+#define M_SNUM     128
 #define M_SLEN(M)  ((M)->len / M_SNUM)
 #define M_SBLEN(S) ((S) * M_SNUM + sizeof(struct m_shdr *) +  \
 		    sizeof(zlong) + sizeof(struct m_hdr *))
 #define M_BSLEN(S) (((S) - sizeof(struct m_shdr *) -  \
 		     sizeof(zlong) - sizeof(struct m_hdr *)) / M_SNUM)
-#define M_NSMALL 8
+#define M_NSMALL   13
 
 static struct m_hdr *m_small[M_NSMALL];
 
@@ -691,9 +715,9 @@ malloc(MALLOC_ARG_T size)
 	    m->used++;
 
 	    /* if all small blocks in this block are allocated, the block is 
-	       put at the end of the list blocks wth small blocks of this
+	       put at the end of the list blocks with small blocks of this
 	       size (i.e., we try to keep blocks with free blocks at the
-	       beginning of the list, to make the search faster */
+	       beginning of the list, to make the search faster) */
 
 	    if (m->used == M_SNUM && m->next) {
 		for (mt = m; mt->next; mt = mt->next);
@@ -753,14 +777,23 @@ malloc(MALLOC_ARG_T size)
 	for (mp = NULL, m = m_free; m && m->len < size; mp = m, m = m->next);
     }
     if (!m) {
+	long nal;
 	/* no matching free block was found, we have to request new
 	   memory from the system */
-	n = (size + M_HSIZE + m_pgsz - 1) & ~(m_pgsz - 1);
+	n = (size + M_HSIZE + M_ALLOC + m_pgsz - 1) & ~(m_pgsz - 1);
 
 	if (((char *)(m = (struct m_hdr *)sbrk(n))) == ((char *)-1)) {
 	    DPUTS(1, "MEM: allocation error at sbrk.");
 	    unqueue_signals();
 	    return NULL;
+	}
+	if ((nal = ((long)(char *)m) & (M_ALIGN-1))) {
+	    if ((char *)sbrk(M_ALIGN - nal) == (char *)-1) {
+		DPUTS(1, "MEM: allocation error at sbrk.");
+		unqueue_signals();
+		return NULL;
+	    }
+	    m = (struct m_hdr *) ((char *)m + (M_ALIGN - nal));
 	}
 	/* set m_low, for the check in free() */
 	if (!m_low)
@@ -1034,8 +1067,8 @@ zfree(void *p, int sz)
        and now there is more than one page size of memory, we can give
        it back to the system (and we do it ;-) */
     if ((((char *)m_lfree) + M_ISIZE + m_lfree->len) == m_high &&
-	m_lfree->len >= m_pgsz + M_MIN) {
-	long n = (m_lfree->len - M_MIN) & ~(m_pgsz - 1);
+	m_lfree->len >= m_pgsz + M_MIN + M_FREE) {
+	long n = (m_lfree->len - M_MIN - M_KEEP) & ~(m_pgsz - 1);
 
 	m_lfree->len -= n;
 	if (brk(m_high -= n) == -1) {

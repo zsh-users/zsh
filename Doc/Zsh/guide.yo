@@ -28,7 +28,7 @@ menu(Parameters)
 menu(Options)
 menu(Shell Builtin Commands)
 menu(Zsh Line Editor)
-menu(Programmable Completion)
+menu(Programmable Completion Using compctl)
 menu(Completion Widgets)
 menu(Zsh Modules)
 menu(Completion System)
@@ -98,7 +98,7 @@ menu(Arguments)
 menu(Completion)
 menu(Miscellaneous)
 
-Programmable Completion
+Programmable Completion Using compctl
 
 menu(Command Flags)
 menu(Option Flags)

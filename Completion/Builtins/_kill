@@ -9,7 +9,8 @@ else
 
   compgen -P '%' -j && ret=0
   list=("$(ps 2>/dev/null)")
-  compgen -y '$list' -s '`ps 2>/dev/null | tail +2 | cut -c1-5`' && ret=0
+  compgen -y '$list' -s '${${${(f)"$(ps 2>/dev/null)"}[2,-1]## #}%% *}' && 
+    ret=0
 
   return ret
 fi

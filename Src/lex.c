@@ -179,6 +179,12 @@ struct lexstack {
     int hwgetword;
     int lexstop;
     struct heredocs *hdocs;
+    int (*hgetc) _((void));
+    void (*hungetc) _((int));
+    void (*hwaddc) _((int));
+    void (*hwbegin) _((int));
+    void (*hwend) _((void));
+    void (*addtoline) _((int));
 
     unsigned char *cstack;
     int csp;
@@ -226,6 +232,12 @@ lexsave(void)
     ls->hwgetword = hwgetword;
     ls->lexstop = lexstop;
     ls->hdocs = hdocs;
+    ls->hgetc = hgetc;
+    ls->hungetc = hungetc;
+    ls->hwaddc = hwaddc;
+    ls->hwbegin = hwbegin;
+    ls->hwend = hwend;
+    ls->addtoline = addtoline;
     cmdsp = 0;
     inredir = 0;
     hdocs = NULL;
@@ -271,6 +283,12 @@ lexrestore(void)
     hwgetword = lstack->hwgetword;
     lexstop = lstack->lexstop;
     hdocs = lstack->hdocs;
+    hgetc = lstack->hgetc;
+    hungetc = lstack->hungetc;
+    hwaddc = lstack->hwaddc;
+    hwbegin = lstack->hwbegin;
+    hwend = lstack->hwend;
+    addtoline = lstack->addtoline;
     hlinesz = lstack->hlinesz;
     errflag = 0;
 
@@ -783,7 +801,7 @@ gettok(void)
 static int
 gettokstr(int c, int sub)
 {
-    int bct = 0, pct = 0, brct = 0;
+    int bct = 0, pct = 0, brct = 0, fdpar = 0;
     int intpos = 1, in_brace_param = 0;
     int peek, inquote;
 #ifdef DEBUG
@@ -798,8 +816,12 @@ gettokstr(int c, int sub)
     for (;;) {
 	int act;
 	int e;
+	int inbl = inblank(c);
+	
+	if (fdpar && !inbl && c != ')')
+	    fdpar = 0;
 
-	if (inblank(c) && !in_brace_param && !pct)
+	if (inbl && !in_brace_param && !pct)
 	    act = LX2_BREAK;
 	else {
 	    act = lexact2[STOUC(c)];
@@ -822,6 +844,12 @@ gettokstr(int c, int sub)
 	    add(Meta);
 	    break;
 	case LX2_OUTPAR:
+	    if (fdpar) {
+		/* this is a single word `(   )', treat as INOUTPAR */
+		add(c);
+		*bptr = '\0';
+		return INOUTPAR;
+	    }
 	    if ((sub || in_brace_param) && isset(SHGLOB))
 		break;
 	    if (!in_brace_param && !pct--) {
@@ -898,11 +926,40 @@ gettokstr(int c, int sub)
 		    e = hgetc();
 		    hungetc(e);
 		    lexstop = 0;
-		    if (e == ')' ||
-			(incmdpos && !brct && peek != ENVSTRING))
+		    /* For command words, parentheses are only
+		     * special at the start.  But now we're tokenising
+		     * the remaining string.  So I don't see what
+		     * the old incmdpos test here is for.
+		     *   pws 1999/6/8
+		     *
+		     * Oh, no.
+		     *  func1(   )
+		     * is a valid function definition in [k]sh.  The best
+		     * thing we can do, without really nasty lookahead tricks,
+		     * is break if we find a blank after a parenthesis.  At
+		     * least this can't happen inside braces or brackets.  We
+		     * only allow this with SHGLOB (set for both sh and ksh).
+		     *
+		     * Things like `print @( |foo)' should still
+		     * work, because [k]sh don't allow multiple words
+		     * in a function definition, so we only do this
+		     * in command position.
+		     *   pws 1999/6/14
+		     */
+		    if (e == ')' || (isset(SHGLOB) && inblank(e) && !bct &&
+				     !brct && !intpos && incmdpos))
 			goto brk;
 		}
-		pct++;
+		/*
+		 * This also handles the [k]sh `foo( )' function definition.
+		 * Maintain a variable fdpar, set as long as a single set of
+		 * parentheses contains only space.  Then if we get to the
+		 * closing parenthesis and it is still set, we can assume we
+		 * have a function definition.  Only do this at the start of
+		 * the word, since the (...) must be a separate token.
+		 */
+		if (!pct++ && isset(SHGLOB) && intpos && !bct && !brct)
+		    fdpar = 1;
 	    }
 	    c = Inpar;
 	    break;
@@ -1294,8 +1351,7 @@ parsestr(char *s)
 	lexsave();
 	untokenize(s);
 	inpush(dupstring(s), 0, NULL);
-	strinbeg();
-	stophist = 2;
+	strinbeg(0);
 	len = 0;
 	bptr = tokstr = s;
 	bsiz = l + 1;
@@ -1331,8 +1387,7 @@ parse_subst_string(char *s)
     lexsave();
     untokenize(s);
     inpush(dupstring(s), 0, NULL);
-    strinbeg();
-    stophist = 2;
+    strinbeg(0);
     len = 0;
     bptr = tokstr = s;
     bsiz = l + 1;
@@ -1377,8 +1432,7 @@ exalias(void)
 
     if (!tokstr) {
 	yytext = tokstrings[tok];
-	if (yytext)
-	    yytext = dupstring(yytext);
+
 	return 0;
     }
 

@@ -1,5 +1,5 @@
-texinode(Programmable Completion)(Completion Widgets)(Zsh Line Editor)(Top)
-chapter(Programmable Completion)
+texinode(Programmable Completion Using compctl)(Completion Widgets)(Zsh Line Editor)(Top)
+chapter(Programmable Completion Using compctl)
 cindex(completion, programmable)
 cindex(completion, controlling)
 findex(compctl)
@@ -33,7 +33,7 @@ menu(Matching Control)
 menu(Example)
 endmenu()
 
-texinode(Command Flags)(Option Flags)()(Programmable Completion)
+texinode(Command Flags)(Option Flags)()(Programmable Completion Using compctl)
 sect(Command Flags)
 Completion of the arguments of a command may be different for each
 command or may use the default.  The behavior when completing the
@@ -56,7 +56,7 @@ from immediate expansion; for example the command string tt('foo*')
 arranges for completion of the words of any command beginning with
 tt(foo).  When completion is attempted, all pattern completions are
 tried in the reverse order of their definition until one matches.  By
-default, completion then procedes as normal, i.e. the shell will try to
+default, completion then proceeds as normal, i.e. the shell will try to
 generate more matches for the specific command on the command line; this
 can be overridden by including tt(-tn) in the flags for the pattern
 completion.
@@ -88,9 +88,7 @@ the standard behavior for all commands.  For example, if your access
 to the user database is too slow and/or it contains too many users (so
 that completion after `tt(~)' is too slow to be usable), you can use
 
-indent(
-tt(compctl -T -x 's[~] C[0,[^/]#]' -k friends -S/ -tn)
-)
+example(compctl -T -x 's[~] C[0,[^/]#]' -k friends -S/ -tn)
 
 to complete the strings in the array tt(friends) after a `tt(~)'.
 The tt(C[...]) argument is necessary so that this form of ~-completion is
@@ -118,7 +116,7 @@ options specified by the tt(-D) flag.
 The form with tt(-M) as the first and only option defines global
 matching specifications, as described below in noderef(Matching Control).
 
-texinode(Option Flags)(Alternative Completion)(Command Flags)(Programmable Completion)
+texinode(Option Flags)(Alternative Completion)(Command Flags)(Programmable Completion Using compctl)
 sect(Option Flags)
 startlist()
 list([ tt(-fcFBdeaRGovNAIOPZEnbjrzu/) ])
@@ -256,10 +254,8 @@ of space- or comma-separated values in parentheses, in which any
 delimiter may be escaped with a backslash; in this case the argument
 should be quoted.  For example,
 
-indent(
-nofill(tt(compctl -k "(cputime filesize datasize stacksize
-	       coredumpsize resident descriptors)" limit))
-)
+example(compctl -k "(cputime filesize datasize stacksize
+	       coredumpsize resident descriptors)" limit)
 )
 item(tt(-g) var(globstring))(
 The var(globstring) is expanded using filename globbing; it should be
@@ -281,7 +277,7 @@ resulting files.  Note that tt(-g) is faster for filenames.
 )
 item(tt(-K) var(function))(
 Call the given function to get the completions.  Unless the name
-starts with an underscode, the function is
+starts with an underscore, the function is
 passed two arguments: the prefix and the suffix of the word on which
 completion is to be attempted, in other words those characters before
 the cursor position, and those from the cursor position onwards.  The
@@ -293,10 +289,8 @@ should not be made local to the function.  From such a function the
 command line can be accessed with the tt(-c) and tt(-l) flags to
 the tt(read) builtin.  For example,
 
-indent(
-nofill(tt(function whoson { reply=(`users`); }
-compctl -K whoson talk))
-)
+example(function whoson { reply=(`users`); }
+compctl -K whoson talk)
 
 completes only logged-on users after `tt(talk)'.  Note that `tt(whoson)' must
 return an array, so `tt(reply=`users`)' would be incorrect.
@@ -315,9 +309,7 @@ zero or negative the whole history is searched and if var(pattern) is
 the empty string all words are taken (as with `tt(*)').  A typical
 use is
 
-indent(
-tt(compctl -D -f PLUS() -H 0 '')
-)
+example(compctl -D -f PLUS() -H 0 '')
 
 which forces completion to look back in the history list for a word if
 no filename matches.
@@ -345,9 +337,7 @@ The var(prefix) is inserted just before the completed string; any
 initial part already typed will be completed and the whole var(prefix)
 ignored for completion purposes.  For example,
 
-indent(
-tt(compctl -j -P "%" kill)
-)
+example(compctl -j -P "%" kill)
 
 inserts a `%' after the kill command and then completes job names.
 )
@@ -362,9 +352,7 @@ With directory var(file-prefix):  for command, file, directory and
 globbing completion (options tt(-c), tt(-f), tt(-/), tt(-g)), the file
 prefix is implicitly added in front of the completion.  For example,
 
-indent(
-tt(compctl -/ -W ~/Mail maildirs)
-)
+example(compctl -/ -W ~/Mail maildirs)
 
 completes any subdirectories to any depth beneath the directory
 tt(~/Mail), although that prefix does not appear on the command line.
@@ -393,9 +381,7 @@ option. If the var(cmd) string is empty the first word in the range
 is instead taken as the command name, and command name completion
 performed on the first word in the range.  For example,
 
-indent(
-tt(compctl -x 'r[-exec,;]' -l '' -- find)
-)
+example(compctl -x 'r[-exec,;]' -l '' -- find)
 
 completes arguments between `tt(-exec)' and the following `tt(;)' (or the end
 of the command line if there is no such string) as if they were
@@ -419,7 +405,7 @@ tt(-K) option) which can examine the word components passed to it
 use its own criteria to decide what matches.  If there is no
 completion, the original word is retained.  Since the produced 
 possible completions seldom seldom have interesting common prefixes
-and suffixes, menucompletion is started immediatly if tt(AUTO_MENU) is
+and suffixes, menucompletion is started immediately if tt(AUTO_MENU) is
 set and this flag is used.
 )
 item(tt(-y) var(func-or-var))(
@@ -499,9 +485,7 @@ group name are stored in that group.
 This can be useful with non-exclusive alternative completions.  For
 example, in
 
-indent(
-tt(compctl -f -J files -t+ + -v -J variables foo)
-)
+example(compctl -f -J files -t+ + -v -J variables foo)
 
 both files and variables are possible completions, as the tt(-t+) forces
 both sets of alternatives before and after the tt(+) to be considered at
@@ -521,7 +505,7 @@ of the var(match-spec) string is described below in noderef(Matching Control).
 )
 enditem()
 
-texinode(Alternative Completion)(Extended Completion)(Option Flags)(Programmable Completion)
+texinode(Alternative Completion)(Extended Completion)(Option Flags)(Programmable Completion Using compctl)
 sect(Alternative Completion)
 startlist()
 list(tt(compctl) [ tt(-CDT) ] var(options) tt(PLUS()) var(options) [ tt(PLUS()) ... ] \
@@ -536,7 +520,7 @@ up to that point, default completion is tried.
 If the list of flags contains a tt(-t) with a tt(PLUS()) character, the next
 list of flags is used even if the current list produced matches.
 
-texinode(Extended Completion)(Matching Control)(Alternative Completion)(Programmable Completion)
+texinode(Extended Completion)(Matching Control)(Alternative Completion)(Programmable Completion Using compctl)
 sect(Extended Completion)
 startlist()
 list(nofill(tt(compctl) [ tt(-CDT) ] var(options) \
@@ -612,9 +596,7 @@ considered part of the completion, but the rest will.  var(index) may
 be negative to count from the end: in most cases, var(index) will be
 1 or -1.  For example,
 
-indent(
-tt(compctl -s '`users`' -x 'n[1,@]' -k hosts -- talk)
-)
+example(compctl -s '`users`' -x 'n[1,@]' -k hosts -- talk)
 
 will usually complete usernames, but if you insert an tt(@) after the
 name, names from the array var(hosts) (assumed to contain hostnames,
@@ -648,7 +630,7 @@ completion is done in backticks and var(str) starts with a `b'.
 )
 enditem()
 
-texinode(Matching Control)(Example)(Extended Completion)(Programmable Completion)
+texinode(Matching Control)(Example)(Extended Completion)(Programmable Completion Using compctl)
 sect(Matching Control)
 
 It is possible by use of the tt(-M) var(spec) flag to specify how the
@@ -732,10 +714,10 @@ following alters the matching rules so that the prefix tt(no) and any
 underscore are ignored when trying to match the trial completions
 generated and uppercase letters on the line match the corresponding
 lowercase letters in the words:
-indent(
-nofill(tt(compctl -M 'L:|[nN][oO]= M:_= M:{A-Z}={a-z}' \ 
-  -o setopt unsetopt))
-)
+
+example(compctl -M 'L:|[nN][oO]= M:_= M:{A-Z}={a-z}' \ 
+  -o setopt unsetopt)
+
 The first part says that the pattern `tt([nN][oO])' at the beginning
 (the empty anchor before the pipe symbol) of the string on the
 line matches the empty string in the list of words generated by
@@ -752,14 +734,13 @@ The second example makes completion case insensitive.  By using
 tt(compctl) with the tt(-M) option alone this applies to every
 completion.  This is just the same as in the tt(setopt) example, except
 here we wish to retain the characters in the list of completions:
-indent(
-tt(compctl -M 'm:{a-z}={A-Z}')
-)
+
+example(compctl -M 'm:{a-z}={A-Z}')
+
 This makes lowercase letters match their uppercase counterparts.
 To make uppercase letters match the lowercase forms as well:
-indent(
-tt(compctl -M 'm:{a-zA-Z}={A-Za-z}')
-)
+
+example(compctl -M 'm:{a-zA-Z}={A-Za-z}')
 
 A nice example for the use of tt(*) patterns is partial word
 completion. Sometimes you would like to make strings like tt(c.s.u)
@@ -770,10 +751,10 @@ however, that the case where each part of the word, i.e. tt(comp),
 tt(source) and tt(unix) in this example, is to be completed separately
 is a different problem to be solved by extended completion.  The
 example can be handled by:
-indent(
-nofill(tt(compctl -M 'r:|.=* r:|=*' \ 
-  -k '(comp.sources.unix comp.sources.misc ...)' ngroups))
-)
+
+example(compctl -M 'r:|.=* r:|=*' \ 
+  -k '(comp.sources.unix comp.sources.misc ...)' ngroups)
+
 The first specification says that tt(lpat) is the empty string, while
 tt(anchor) is a dot; tt(tpat) is tt(*), so this can match anything
 except for the `tt(.)' from the anchor in
@@ -795,9 +776,9 @@ empty string at the end of the string on the line matches any characters
 at the end of the trial completion.
 
 More generally, the specification
-indent(
-tt(compctl -M 'r:|[.,_-]=* r:|=*')
-)
+
+example(compctl -M 'r:|[.,_-]=* r:|=*')
+
 allows one to complete words with abbreviations before any of the
 characters in the square brackets in any completion.  For example, to
 complete tt(veryverylongfile.c) rather than tt(veryverylongheader.h)
@@ -817,9 +798,9 @@ the string on the command line as a substring, not just at the
 beginning.  Since this might produce more matches than we want,
 we arrange for it to be tried only if the matchers described above don't
 produce any matches:
-indent(
-tt(compctl -M 'r:|[.,_-]=* r:|=*' 'l:|=* r:|=*')
-)
+
+example(compctl -M 'r:|[.,_-]=* r:|=*' 'l:|=* r:|=*')
+
 Here, if the string on the command line is tt(foo.bar), tt(compctl)
 first tries matching tt(foo)var(anything)tt(.bar)var(anything), as
 with the previous example.  If that fails, the two descriptions in the
@@ -828,13 +809,12 @@ and end of the string on the command line can match any set of
 characters at the beginning or end of the trial completion, so it will
 look for var(anything)tt(foo.bar)var(anything).
 
-texinode(Example)()(Matching Control)(Programmable Completion)
+texinode(Example)()(Matching Control)(Programmable Completion Using compctl)
 sect(Example)
-indent(
-nofill(
-tt(compctl -u -x 's[tt(PLUS())] c[-1,-f],s[-f+PLUS()]' \ 
-  -g '~/Mail/*(:t)' - 's[-f],c[-1,-f]' -f -- mail))
-)
+
+example(compctl -u -x 's[tt(PLUS())] c[-1,-f],s[-f+PLUS()]' \ 
+  -g '~/Mail/*(:t)' - 's[-f],c[-1,-f]' -f -- mail)
+
 This is to be interpreted as follows:
 
 If the current command is tt(mail), then

@@ -220,11 +220,12 @@ turn off both installation of functions and the setting of a default value
 for $fpath/$FPATH.
 
 You can control the functions which get installed by setting
-FUNCTIONS_INSTALL, either when running configure or when running `make
-install' or `make install.fns'.  It includes a list of files relative to
-either the Completion or Functions subdirectories.  By default, all the
-functions for the Completion system will be installed (see the zshcompsys
-manual page), i.e.
+FUNCTIONS_INSTALL, either when running configure (e.g.
+`FUNCTIONS_INSTALL="..." configure ...') or when running `make install' or
+`make install.fns'.  It includes a list of files relative to either the
+Completion or Functions subdirectories.  By default, all the functions for
+the Completion system will be installed (see the zshcompsys manual page),
+i.e.
   FUNCTIONS_INSTALL='Core/* Base/* Builtins/* User/* Commands/*'
 and if the --enable-dynamic option was given, the functions in
 Functions/Zftp, which require the zftp module to be available (see the
@@ -232,6 +233,11 @@ zshzftpsys manual page), will be included as well.  There are also some
 miscellaneous functions with documentation in comments; the complete set
 of functions can be installed with
   FUNCTIONS_INSTALL='Core/* Base/* Builtins/* User/* Commands/* Misc/* Zftp/*'
+
+You can also set --enable-function-subdirs to allow shell
+functions to be installed into subdirectories of the function directory,
+i.e. `Core/*' files will be installed into `FNDIR/Core', and so on.
+This also initialises $fpath/$FPATH appropriately.
 
 Support for large files and integers
 ------------------------------------
@@ -256,6 +262,11 @@ formulae.  This depends only on the shell finding a suitable 64-bit integer
 type; it does not require that support for large files is actually
 enabled.  Hence you might consider using --enable-lfs on any 32-bit system
 with a suitable compiler such as gcc.
+
+Also note that if `configure' finds out that either of the types off_t or
+ino_t are 64-bit quantities, but that long integers are only 32 bits, all
+the above will be enabled automatically.  This is necessary to ensure
+correct handling of these types.
 
 None of this is relevant for 64-bit systems; zsh should compile and run
 without problems if (sizeof(long) == 8).
@@ -300,6 +311,7 @@ Features:
      zlogin=pathname     # the full pathname of the global zlogin script
      zprofile=pathname   # the full pathname of the global zprofile script
      zlogout=pathname    # the full pathname of the global zlogout script
-     fns=directory       # the directory where shell functions will go
+     fndir=directory     # the directory where shell functions will go
+     function-subdirs    # if functions will be installed into subdirectories
      dynamic             # allow dynamically loaded binary modules
      lfs                 # allow configure check for large files

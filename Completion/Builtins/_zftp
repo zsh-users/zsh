@@ -43,6 +43,19 @@ case $subcom in
   compgen -k hosts
   ;;
 
+  *(goto|mark))
+  # complete bookmarks.  First decide if ncftp mode is go.
+  if [[ $words[2] = -*n* ]]; then
+    if [[ -f ~/.ncftp/bookmarks ]]; then
+      compadd - $(awk -F, 'NR > 2 { print $1 }' ~/.ncftp/bookmarks)
+    fi
+  else
+    if [[ -f ${ZFTP_BMFILE:=${ZDOTDIR:-$HOME}/.zfbkmarks} ]]; then
+      compadd - $(awk '{print $1}' $ZFTP_BMFILE)
+    fi
+  fi
+  ;;
+
   *)
   # dunno... try ordinary completion after all.
   unset _compskip

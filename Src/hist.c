@@ -30,6 +30,27 @@
 #include "zsh.mdh"
 #include "hist.pro"
 
+/* Functions to call for getting/ungetting a character and for history
+ * word control. */
+
+/**/
+int (*hgetc) _((void));
+
+/**/
+void (*hungetc) _((int));
+
+/**/
+void (*hwaddc) _((int));
+
+/**/
+void (*hwbegin) _((int));
+
+/**/
+void (*hwend) _((void));
+
+/**/
+void (*addtoline) _((int));
+
 /* != 0 means history substitution is turned off */
  
 /**/
@@ -159,12 +180,11 @@ int hlinesz;
 /* default event (usually curhist-1, that is, "!!") */
  
 static int defev;
- 
+
 /* add a character to the current history word */
 
-/**/
-void
-hwaddc(int c)
+static void
+ihwaddc(int c)
 {
     /* Only if history line exists and lexing has not finished. */
     if (chline && !(errflag || lexstop)) {
@@ -182,7 +202,7 @@ hwaddc(int c)
 	if (hptr - chline >= hlinesz) {
 	    int oldsiz = hlinesz;
 
-	    chline = realloc(chline, hlinesz = oldsiz + 16);
+	    chline = realloc(chline, hlinesz = oldsiz + 64);
 	    hptr = chline + oldsiz;
 	}
     }
@@ -192,12 +212,12 @@ hwaddc(int c)
  * zsh expands history (see doexpandhist() in zle_tricky.c). It also     *
  * calculates the new cursor position after the expansion. It is called  *
  * from hgetc() and from gettok() in lex.c for characters in comments.   */
- 
+
 /**/
 void
-addtoline(int c)
+iaddtoline(int c)
 {
-    if (! expanding || lexstop)
+    if (!expanding || lexstop)
 	return;
     if (qbang && c == bangchar && stophist < 2) {
 	exlast--;
@@ -216,9 +236,8 @@ addtoline(int c)
     line[cs++] = itok(c) ? ztokens[c - Pound] : c;
 }
 
-/**/
-int
-hgetc(void)
+static int
+ihgetc(void)
 {
     int c = ingetc();
 
@@ -234,7 +253,7 @@ hgetc(void)
     }
     if ((inbufflags & INP_HIST) && !stophist) {
 	/* the current character c came from a history expansion          *
-	 * (inbufflags && INP_HIST) and history is not disabled           *
+	 * (inbufflags & INP_HIST) and history is not disabled            *
 	 * (e.g. we are not inside single quotes). In that case, \!       *
 	 * should be treated as ! (since this \! came from a previous     *
 	 * history line where \ was used to escape the bang). So if       *
@@ -606,9 +625,8 @@ histsubchar(int c)
 /* unget a char and remove it from chline. It can only be used *
  * to unget a character returned by hgetc.                     */
 
-/**/
-void
-hungetc(int c)
+static void
+ihungetc(int c)
 {
     int doit = 1;
 
@@ -641,10 +659,10 @@ hungetc(int c)
 
 /**/
 void
-strinbeg(void)
+strinbeg(int dohist)
 {
     strin++;
-    hbegin();
+    hbegin(dohist);
     lexinit();
 }
 
@@ -661,17 +679,49 @@ strinend(void)
     histdone = 0;
 }
 
+/* dummy functions to use instead of hwaddc(), hwbegin(), and hwend() when
+ * they aren't needed */
+
+static void
+nohw(int c)
+{
+}
+
+static void
+nohwe(void)
+{
+}
+
 /* initialize the history mechanism */
 
 /**/
 void
-hbegin(void)
+hbegin(int dohist)
 {
     isfirstln = isfirstch = 1;
     errflag = histdone = spaceflag = 0;
-    stophist = (!interact || unset(BANGHIST) || unset(SHINSTDIN)) << 1;
-    chline = hptr = zcalloc(hlinesz = 16);
-    chwords = zalloc((chwordlen = 16)*sizeof(short));
+    stophist = (dohist ? ((!interact || unset(SHINSTDIN)) << 1) : 2);
+    if (stophist == 2 || (inbufflags & INP_ALIAS)) {
+	chline = hptr = NULL;
+	hlinesz = 0;
+	chwords = NULL;
+	chwordlen = 0;
+	hgetc = ingetc;
+	hungetc = inungetc;
+	hwaddc = nohw;
+	hwbegin = nohw;
+	hwend = nohwe;
+	addtoline = nohw;
+    } else {
+	chline = hptr = zcalloc(hlinesz = 64);
+	chwords = zalloc((chwordlen = 64) * sizeof(short));
+	hgetc = ihgetc;
+	hungetc = ihungetc;
+	hwaddc = ihwaddc;
+	hwbegin = ihwbegin;
+	hwend = ihwend;
+	addtoline = iaddtoline;
+    }
     chwordpos = 0;
 
     if (histactive & HA_JUNKED)
@@ -864,7 +914,8 @@ hend(void)
     int flag, save = 1;
     char *hf = getsparam("HISTFILE");
 
-    DPUTS(!chline, "BUG: chline is NULL in hend()");
+    DPUTS(stophist != 2 && !(inbufflags & INP_ALIAS) && !chline,
+	  "BUG: chline is NULL in hend()");
     if (histdone & HISTFLAG_SETTY)
 	settyinfo(&shttyinfo);
     if (!(histactive & HA_NOINC)) {
@@ -1005,8 +1056,10 @@ int hwgetword = -1;
 
 /**/
 void
-hwbegin(int offset)
+ihwbegin(int offset)
 {
+    if (stophist == 2 || strin)
+	return;
     if (chwordpos%2)
 	chwordpos--;	/* make sure we're on a word start, not end */
     /* If we're expanding an alias, we should overwrite the expansion
@@ -1023,15 +1076,18 @@ hwbegin(int offset)
 
 /**/
 void
-hwend(void)
+ihwend(void)
 {
+    if (stophist == 2 || strin)
+	return;
     if (chwordpos%2 && chline) {
 	/* end of word reached and we've already begun a word */
 	if (hptr > chline + chwords[chwordpos-1]) {
 	    chwords[chwordpos++] = hptr - chline;
 	    if (chwordpos >= chwordlen) {
 		chwords = (short *) realloc(chwords,
-					    (chwordlen += 16)*sizeof(short));
+					    (chwordlen += 32) * 
+					    sizeof(short));
 	    }
 	    if (hwgetword > -1) {
 		/* We want to reuse the current word position */
@@ -1606,7 +1662,7 @@ readhistfile(char *fn, int err, int readflags)
     else if (!lockhistfile(fn, 1))
 	return;
     if ((in = fopen(unmeta(fn), "r"))) {
-	nwordlist = 16;
+	nwordlist = 64;
 	wordlist = (short *)zalloc(nwordlist*sizeof(short));
 	bufsiz = 1024;
 	buf = zalloc(bufsiz);
@@ -1717,7 +1773,7 @@ readhistfile(char *fn, int err, int readflags)
 		if (*pt) {
 		    if (nwordpos >= nwordlist)
 			wordlist = (short *) realloc(wordlist,
-					(nwordlist += 16)*sizeof(short));
+					(nwordlist += 64)*sizeof(short));
 		    wordlist[nwordpos++] = pt - start;
 		    while (*pt && !inblank(*pt))
 			pt++;

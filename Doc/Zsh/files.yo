@@ -26,7 +26,7 @@ tt($ZDOTDIR/.zlogin) are read.
 
 When a login shell exits, the files tt($ZDOTDIR/.zlogout) and then
 tt(/etc/zlogout) are read.  This happens with either an explicit exit
-via the tt(exit) or tt(logout) commands, or an implict exit by reading
+via the tt(exit) or tt(logout) commands, or an implicit exit by reading
 end-of-file from the terminal.  However, if the shell terminates due
 to tt(exec)'ing another process, the logout files are not read.
 These are also affected by the tt(RCS) and tt(GLOBAL_RCS) options.

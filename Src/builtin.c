@@ -43,7 +43,7 @@ static struct builtin builtins[] =
     BUILTIN(".", BINF_PSPECIAL, bin_dot, 1, -1, 0, NULL, NULL),
     BUILTIN(":", BINF_PSPECIAL, bin_true, 0, -1, 0, NULL, NULL),
     BUILTIN("alias", BINF_MAGICEQUALS, bin_alias, 0, -1, 0, "Lgmr", NULL),
-    BUILTIN("autoload", BINF_TYPEOPTS, bin_functions, 0, -1, 0, "t", "u"),
+    BUILTIN("autoload", BINF_TYPEOPTS, bin_functions, 0, -1, 0, "tU", "u"),
     BUILTIN("bg", 0, bin_fg, 0, -1, BIN_BG, NULL, NULL),
     BUILTIN("break", BINF_PSPECIAL, bin_break, 0, 1, BIN_BREAK, NULL, NULL),
     BUILTIN("bye", 0, bin_break, 0, 1, BIN_EXIT, NULL, NULL),
@@ -64,7 +64,7 @@ static struct builtin builtins[] =
     BUILTIN("false", 0, bin_false, 0, -1, 0, NULL, NULL),
     BUILTIN("fc", BINF_FCOPTS, bin_fc, 0, -1, BIN_FC, "nlreIRWAdDfEim", NULL),
     BUILTIN("fg", 0, bin_fg, 0, -1, BIN_FG, NULL, NULL),
-    BUILTIN("functions", BINF_TYPEOPTS, bin_functions, 0, -1, 0, "mtu", NULL),
+    BUILTIN("functions", BINF_TYPEOPTS, bin_functions, 0, -1, 0, "mtuU", NULL),
     BUILTIN("getln", 0, bin_read, 0, -1, 0, "ecnAlE", "zr"),
     BUILTIN("getopts", 0, bin_getopts, 2, -1, 0, NULL, NULL),
     BUILTIN("hash", BINF_MAGICEQUALS, bin_hash, 0, -1, 0, "dfmrv", NULL),
@@ -209,7 +209,7 @@ execbuiltin(LinkList args, Builtin bn)
     LinkNode n;
     char ops[MAX_OPS], *arg, *pp, *name, **argv, **oargv, *optstr;
     char *oxarg, *xarg = NULL;
-    int flags, sense, argc = 0, execop;
+    int flags, sense, argc = 0, execop, xtr = isset(XTRACE), lxarg = 0;
 
     /* initialise some static variables */
     auxdata = NULL;
@@ -250,12 +250,21 @@ execbuiltin(LinkList args, Builtin bn)
 		    break;
 	    }
 	    /* save the options in xarg, for execution tracing */
-	    if (xarg) {
-		oxarg = tricat(xarg, " ", arg);
-		zsfree(xarg);
-		xarg = oxarg;
-	    } else
-		xarg = ztrdup(arg);
+	    if (xtr) {
+		if (xarg) {
+		    int l = strlen(arg) + lxarg + 1;
+
+		    oxarg = zhalloc(l + 1);
+		    strcpy(oxarg, xarg);
+		    oxarg[lxarg] = ' ';
+		    strcpy(oxarg + lxarg + 1, arg);
+		    xarg = oxarg;
+		    lxarg = l + 1;
+		} else {
+		    xarg = dupstring(arg);
+		    lxarg = strlen(xarg);
+		}
+	    }
 	    /* handle -- or - (ops['-']), and + (ops['-'] and ops['+']) */
 	    if (arg[1] == '-')
 		arg++;
@@ -283,7 +292,6 @@ execbuiltin(LinkList args, Builtin bn)
 		if(*arg == Meta)
 		    *++arg ^= 32;
 		zerr("bad option: -%c", NULL, *arg);
-		zsfree(xarg);
 		return 1;
 	    }
 	    arg = (char *) ugetnode(args);
@@ -330,7 +338,6 @@ execbuiltin(LinkList args, Builtin bn)
 	while ((*argv++ = (char *)ugetnode(args)));
     argv = oargv;
     if (errflag) {
-	zsfree(xarg);
 	errflag = 0;
 	return 1;
     }
@@ -339,12 +346,11 @@ execbuiltin(LinkList args, Builtin bn)
     if (argc < bn->minargs || (argc > bn->maxargs && bn->maxargs != -1)) {
 	zwarnnam(name, (argc < bn->minargs)
 		? "not enough arguments" : "too many arguments", NULL, 0);
-	zsfree(xarg);
 	return 1;
     }
 
     /* display execution trace information, if required */
-    if (isset(XTRACE)) {
+    if (xtr) {
 	fprintf(stderr, "%s%s", (prompt4) ? prompt4 : "", name);
 	if (xarg)
 	    fprintf(stderr, " %s", xarg);
@@ -353,7 +359,6 @@ execbuiltin(LinkList args, Builtin bn)
 	fputc('\n', stderr);
 	fflush(stderr);
     }
-    zsfree(xarg);
     /* call the handler function, and return its return value */
     return (*(bn->handlerfunc)) (name, argv, ops, bn->funcid);
 }
@@ -1824,17 +1829,18 @@ bin_functions(char *name, char **argv, char *ops, int func)
     int on = 0, off = 0;
 
     /* Do we have any flags defined? */
-    if (ops['u'] || ops['t']) {
-	if (ops['u'] == 1)
-	    on |= PM_UNDEFINED;
-	else if (ops['u'] == 2)
-	    off |= PM_UNDEFINED;
-
-	if (ops['t'] == 1)
-	    on |= PM_TAGGED;
-	else if (ops['t'] == 2)
-	    off |= PM_TAGGED;
-    }
+    if (ops['u'] == 1)
+	on |= PM_UNDEFINED;
+    else if (ops['u'] == 2)
+	off |= PM_UNDEFINED;
+    if (ops['U'] == 1)
+	on |= PM_UNALIASED|PM_UNDEFINED;
+    else if (ops['U'] == 2)
+	off |= PM_UNALIASED;
+    if (ops['t'] == 1)
+	on |= PM_TAGGED;
+    else if (ops['t'] == 2)
+	off |= PM_TAGGED;
 
     if (off & PM_UNDEFINED) {
 	zwarnnam(name, "invalid option(s)", NULL, 0);
@@ -1845,6 +1851,8 @@ bin_functions(char *name, char **argv, char *ops, int func)
      * are given, we will print only functions containing these  *
      * flags, else we'll print them all.                         */
     if (!*argv) {
+	if (ops['U'] && !ops['u'])
+	    on &= ~PM_UNDEFINED;
 	scanhashtable(shfunctab, 1, on|off, DISABLED, shfunctab->printnode, 0);
 	return 0;
     }
@@ -3078,8 +3086,7 @@ bin_eval(char *nam, char **argv, char *ops, int func)
     List list;
 
     inpush(zjoin(argv, ' '), 0, NULL);
-    strinbeg();
-    stophist = 2;
+    strinbeg(0);
     list = parse_list();
     strinend();
     inpop();
@@ -3584,7 +3591,7 @@ bin_trap(char *name, char **argv, char *ops, int func)
 		if (!sigfuncs[sig])
 		    printf("trap -- '' %s\n", sigs[sig]);
 		else {
-		    s = getpermtext((void *) dupstruct((void *) sigfuncs[sig]));
+		    s = getpermtext((void *) sigfuncs[sig]);
 		    printf("trap -- ");
 		    quotedzputs(s, stdout);
 		    printf(" %s\n", sigs[sig]);

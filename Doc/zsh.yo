@@ -17,7 +17,7 @@ def(ifzshall)(1)()\
 )\
 ifztexi(\
 texinfo(zsh.info)(zsh)
-NOTRANS(@setchapternewpage odd
+NOTRANS(@setchapternewpage off
 @iftex
 @finalout
 @afourpaper

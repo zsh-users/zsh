@@ -203,6 +203,11 @@ Normally, only one var(word) is provided; multiple var(word)s
 are usually only useful for setting traps.
 The body of the function is the var(list) between
 the tt({) and tt(}).  See noderef(Functions).
+
+If the option tt(SH_GLOB) is set for compatibility with other shells, then
+whitespace may appear between between the left and right parentheses when
+there is a single var(word);  otherwise, the parentheses will be treated as
+forming a globbing pattern in that case.
 )
 cindex(timing)
 item(tt(time) [ var(pipeline) ])(

@@ -37,6 +37,14 @@
 /**/
 int noexitct = 0;
 
+/* buffer for $_ and its length */
+
+/**/
+char *underscore;
+
+/**/
+int underscorelen;
+
 /* what level of sourcing we are at */
  
 /**/
@@ -94,7 +102,7 @@ loop(int toplevel, int justonce)
 	    if (interact)
 		preprompt();
 	}
-	hbegin();		/* init history mech        */
+	hbegin(1);		/* init history mech        */
 	intr();			/* interrupts on            */
 	lexinit();              /* initialize lexical state */
 	if (!(list = parse_event())) {	/* if we couldn't parse a list */
@@ -128,6 +136,8 @@ loop(int toplevel, int justonce)
 	    if (stopmsg)	/* unset 'you have stopped jobs' flag */
 		stopmsg--;
 	    execlist(list, 0, 0);
+	    if (toplevel)
+		freestructs();
 	    tok = toksav;
 	    if (toplevel)
 		noexitct = 0;
@@ -550,8 +560,20 @@ setupvals(void)
     cdpath   = mkarray(NULL);
     manpath  = mkarray(NULL);
     fignore  = mkarray(NULL);
-#ifdef FUNCTION_DIR
-    fpath    = mkarray(ztrdup(FUNCTION_DIR));
+#ifdef FPATH_DIR
+# ifdef FPATH_SUBDIRS
+    {
+	char *fpath_subdirs[] = FPATH_SUBDIRS;
+	int len = sizeof(fpath_subdirs)/sizeof(char *), j;
+
+	fpath = zalloc((len+1)*sizeof(char *));
+	for (j = 0; j < len; j++)
+	    fpath[j] = tricat(FPATH_DIR, "/", fpath_subdirs[j]);
+	fpath[len] = NULL;
+    }
+# else
+    fpath    = mkarray(ztrdup(FPATH_DIR));
+# endif
 #else
     fpath    = mkarray(NULL);
 #endif
@@ -582,7 +604,8 @@ setupvals(void)
     ifs         = ztrdup(DEFAULT_IFS);
     wordchars   = ztrdup(DEFAULT_WORDCHARS);
     postedit    = ztrdup("");
-    underscore  = ztrdup("");
+    underscore  = (char *) zalloc(underscorelen = 32);
+    *underscore = '\0';
 
     zoptarg = ztrdup("");
     zoptind = 1;

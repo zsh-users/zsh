@@ -68,6 +68,7 @@ INSTALL_DATA    = @INSTALL_DATA@
 
 # variables used in determining what to install
 FUNCTIONS_INSTALL = @FUNCTIONS_INSTALL@
+FUNCTIONS_SUBDIRS = @FUNCTIONS_SUBDIRS@
 
 # flags passed to recursive makes in subdirectories
 MAKEDEFS = \

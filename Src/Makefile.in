@@ -205,8 +205,12 @@ clean: clean-modules
 distclean: distclean-modules
 realclean: realclean-modules
 
-mostlyclean-modules clean-modules distclean-modules realclean-modules: Makemod
-	@$(MAKE) -f Makemod $(MAKEDEFS) `echo $@ | sed 's/-modules//'`
+# Don't remake Makemod just to delete things, even if it doesn't exist.
+mostlyclean-modules clean-modules distclean-modules realclean-modules:
+	if test -f Makemod; then \
+	  @$(MAKE) -f Makemod $(MAKEDEFS) `echo $@ | sed 's/-modules//'`; \
+	fi; \
+	exit 0
 
 @CLEAN_MK@
 

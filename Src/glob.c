@@ -744,7 +744,7 @@ parsecomp(int gflag)
 		pptr++;
 	}
 
-	if (*pptr == Inpar && pptr[1] == Pound) {
+	if (*pptr == Inpar && pptr[1] == Pound && isset(EXTENDEDGLOB)) {
 	    /* Found some globbing flags */
 	    char *eptr = pptr;
 	    if (kshfunc != KF_NONE)
@@ -3432,17 +3432,17 @@ tokenize(char *s)
 void
 remnulargs(char *s)
 {
-    int nl = *s;
-    char *t = s;
+    if (*s) {
+	char *t = s, *p = s, c;
 
-    while (*s)
-	if (INULL(*s))
-	    chuck(s);
-	else
-	    s++;
-    if (!*t && nl) {
-	t[0] = Nularg;
-	t[1] = '\0';
+	while ((c = *s++))
+	    if (!INULL(c))
+		*p++ = c;
+	*p = '\0';
+	if (!*t) {
+	    t[0] = Nularg;
+	    t[1] = '\0';
+	}
     }
 }
 

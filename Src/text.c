@@ -169,7 +169,6 @@ gettext2(struct node *n)
 	    if (_List(n)->type & Z_DISOWN)
 		taddstr("|");
 	}
-	simplifyright(_List(n));
 	if (_List(n)->right) {
 	    if (tnewlins)
 		taddnl();
@@ -460,22 +459,23 @@ getsimptext(Cmd cmd)
 {
     LinkNode n;
 
-    for (n = firstnode(cmd->vars); n; incnode(n)) {
-	struct varasg *v = (struct varasg *)getdata(n);
+    if (cmd->vars)
+	for (n = firstnode(cmd->vars); n; incnode(n)) {
+	    struct varasg *v = (struct varasg *)getdata(n);
 
-	taddstr(v->name);
-	taddchr('=');
-	if (PM_TYPE(v->type) == PM_ARRAY) {
-	    taddchr('(');
-	    taddlist(v->arr);
-	    taddstr(") ");
-	} else if (PM_TYPE(v->type) == PM_HASHED) {
-	    /* XXX */
-	} else {
-	    taddstr(v->str);
-	    taddchr(' ');
+	    taddstr(v->name);
+	    taddchr('=');
+	    if (PM_TYPE(v->type) == PM_ARRAY) {
+		taddchr('(');
+		taddlist(v->arr);
+		taddstr(") ");
+	    } else if (PM_TYPE(v->type) == PM_HASHED) {
+		/* XXX */
+	    } else {
+		taddstr(v->str);
+		taddchr(' ');
+	    }
 	}
-    }
     taddlist(cmd->args);
 }
 
@@ -490,6 +490,8 @@ getredirs(Cmd cmd)
 	"<<", "<<-", "<<<", "<&", ">&", NULL /* >&- */, "<", ">"
     };
 
+    if (!cmd->redir)
+	return;
     taddchr(' ');
     for (n = firstnode(cmd->redir); n; incnode(n)) {
 	struct redir *f = (struct redir *)getdata(n);
@@ -537,7 +539,7 @@ taddlist(LinkList l)
 {
     LinkNode n;
 
-    if (!(n = firstnode(l)))
+    if (!l || !(n = firstnode(l)))
 	return;
     for (; n; incnode(n)) {
 	taddstr(getdata(n));

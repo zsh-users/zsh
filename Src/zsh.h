@@ -47,7 +47,11 @@
  */
 #ifdef ZSH_64_BIT_TYPE
 typedef ZSH_64_BIT_TYPE zlong;
-typedef unsigned ZSH_64_BIT_TYPE zulong;
+#ifdef ZSH_64_BIT_UTYPE
+typedef ZSH_64_BIT_UTYPE zulong;
+#else
+typedef unsigned zlong zulong;
+#endif
 #else
 typedef long zlong;
 typedef unsigned long zulong;
@@ -352,7 +356,6 @@ struct node {
 #define NT_N(T, N) (((T) >> (8 + (N) * 4)) & 0xf)
 #define NT_SET(T0, T1, T2, T3, T4) \
     ((T0) | ((T1) << 8) | ((T2) << 12) | ((T3) << 16) | ((T4) << 20))
-#define NT_HEAP   (1 << 30)
 
 /* tree element for lists */
 
@@ -605,7 +608,7 @@ struct job {
     pid_t gleader;		/* process group leader of this job  */
     pid_t other;		/* subjob id or subshell pid         */
     int stat;                   /* see STATs below                   */
-    char *pwd;			/* current working dir of shell when *
+    char pwd[PATH_MAX + 1];	/* current working dir of shell when *
 				 * this job was spawned              */
     struct process *procs;	/* list of processes                 */
     LinkList filelist;		/* list of files to delete when done */
@@ -948,7 +951,12 @@ struct param {
 #define PM_READONLY	(1<<8)	/* readonly                                   */
 #define PM_TAGGED	(1<<9)	/* tagged                                     */
 #define PM_EXPORTED	(1<<10)	/* exported                                   */
+
+/* The following are the same since they *
+ * both represent -U option to typeset   */
 #define PM_UNIQUE	(1<<11)	/* remove duplicates                          */
+#define PM_UNALIASED	(1<<11)	/* do not expand aliases when autoloading     */
+
 #define PM_TIED 	(1<<12)	/* array tied to colon-path or v.v. */
 #define PM_SPECIAL	(1<<13) /* special builtin parameter                  */
 #define PM_DONTIMPORT	(1<<14)	/* do not import this variable                */

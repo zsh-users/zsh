@@ -1,4 +1,4 @@
-texinode(Completion Widgets)(Zsh Modules)(Programmable Completion)(Top)
+texinode(Completion Widgets)(Zsh Modules)(Programmable Completion Using compctl)(Top)
 chapter(Completion Widgets)
 cindex(completion, widgets)
 cindex(completion, programmable)
@@ -10,9 +10,7 @@ ifzman(zmanref(zshzle))\
 ifnzman(noderef(The zle Module))\
 ). For example,
 
-indent(
-nofill(tt(zle -C complete expand-or-complete completer))
-)
+example(zle -C complete expand-or-complete completer)
 
 defines a widget named tt(complete). When this widget is bound to a key
 using the tt(bindkey) builtin command defined in the tt(zle) module
@@ -73,10 +71,8 @@ not considered part of the list of matches.  Typically, a string is
 transferred from the beginning of tt(PREFIX) to the end of tt(IPREFIX), for
 example:
 
-tt(indent(
-nofill(IPREFIX=${PREFIX%%\=*}=)
-nofill(PREFIX=${PREFIX#*=})
-))
+example(IPREFIX=${PREFIX%%\=*}=
+PREFIX=${PREFIX#*=})
 
 causes the part of the prefix up to and including the first equal sign not
 to be treated as part of a matched string.
@@ -182,9 +178,7 @@ item(tt(matcher))(
 When completion is performed with a global match specification as defined
 by
 
-indent(
-nofill(tt(compctl -M) var(spec1 ... specN ...))
-)
+indent(tt(compctl -M) var(spec1 ... specN ...))
 
 this gives the number of the specification string currently in use.
 In this case, matching is performed with each specification in turn.
@@ -229,7 +223,7 @@ the tt(ALWAYS_LAST_PROMPT) option.
 )
 item(tt(insert))(
 This controls the manner in which a match is inserted into the command
-line.  On entry to the widget fuction, if it is unset the command line is
+line.  On entry to the widget function, if it is unset the command line is
 not to be changed; if set to tt(unambiguous), any prefix common to all
 matches is to be inserted; if set to tt(menu) or tt(automenu) the usual
 behaviour of the tt(MENU_COMPLETE) or tt(AUTO_MENU) options, respectively,
@@ -262,7 +256,7 @@ item(tt(old_list))(
 This is set to tt(yes) if there is still a valid list of completions
 from a previous completion at the time the widget is invoked.  This will
 usually be the case if and only if the previous editing operation was a
-completion widget or one of the builtin completion fuctions.  If there is a
+completion widget or one of the builtin completion functions.  If there is a
 valid list and it is also currently shown on the screen, the value of this
 key is tt(shown).
 
@@ -330,7 +324,7 @@ Generate matches according to the given var(flags).  These can be any of
 the normal option flags (not those for extended completion) supported by
 the tt(compctl) builtin command (see
 ifzman(zmanref(zshcompctl))\
-ifnzman(noderef(Programmable Completion))\
+ifnzman(noderef(Programmable Completion Using compctl))\
 ) except for the tt(-t) and tt(-l) flags.  However, when using the tt(-K)
 flag, the function given as argument to it cannot access the command
 line with the tt(read) builtin command.
@@ -339,7 +333,7 @@ The matches will be generated in the same way as if the completion code
 generated them directly from a tt(compctl)-definition with the same
 flags. The completion code will consider only those matches as
 possible completions that match the prefix and suffix from the special 
-parameters desribed above. These strings will be compared with the
+parameters described above. These strings will be compared with the
 generated matches using the normal matching rules and any matching
 specifications given with the tt(-M) flag to tt(compgen) and the
 global matching specifications given via the tt(compctl -M )var(spec1 ...)
@@ -366,9 +360,7 @@ non-zero if no matches were added.
 The completion code breaks the string to complete into seven fields in
 the order: 
 
-indent(
-var(<ipre><apre><hpre><word><hsuf><asuf><isuf>)
-)
+indent(var(<ipre><apre><hpre><word><hsuf><asuf><isuf>))
 
 The first field
 is an ignored prefix taken from the command line, the contents of the
@@ -620,20 +612,18 @@ testing and modification is performed as if it were not given.
 )
 item(tt(-q))(
 If the cursor is currently inside single or double quotes, the word
-currenly being completed is split in separate words at the spaces. The 
+currently being completed is split in separate words at the spaces. The 
 resulting words are stored in the tt(words) array, and tt(PREFIX),
 tt(SUFFIX), tt(QIPREFIX), and tt(QISUFFIX) are modified to reflect the 
 word part that is completed.
 )
 enditem()
 
-In all the above cases the return value is zero if the test succeded
+In all the above cases the return value is zero if the test succeeded
 and the parameters were modified and non-zero otherwise. This allows
 one to use this builtin in tests such as:
 
-indent(
-tt(if compset -P '*\='; then ...)
-)
+example(if compset -P '*\='; then ...)
 
 This forces anything up to and including the last equal sign to be
 ignored by the completion code.
@@ -685,21 +675,18 @@ sect(Examples)
 
 The first step is to define the widget:
 
-indent(nofill(
-tt(zle -C complete complete-word complete-history)))
+example(zle -C complete complete-word complete-history)
 
 Then the widget can be bound to a key using the tt(bindkey) builtin
 command:
 
-indent(nofill(
-tt(bindkey '^X\t' complete)))
+example(bindkey '^X\t' complete)
 
 After that the shell function tt(complete-history) will be invoked
 after typing control-X and TAB. The function should then generate the
 matches, e.g.:
 
-indent(nofill(
-tt(complete-history LPAR()RPAR() { compgen -H 0 '' })))
+example(complete-history LPAR()RPAR() { compgen -H 0 '' })
 
 This function will complete words from the history matching the 
 current word.

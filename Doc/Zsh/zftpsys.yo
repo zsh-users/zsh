@@ -8,7 +8,7 @@ distribution as an interface to the tt(zftp) builtin command, allowing you
 to perform FTP operations from the shell command line or within functions
 or scripts.  The interface is similar to a traditional FTP client (e.g. the
 tt(ftp) command itself, see manref(ftp)(1)), but as it is entirely done
-within the shell all the familar completion, editing and globbing features,
+within the shell all the familiar completion, editing and globbing features,
 and so on, are present, and macros are particularly simple to write as they
 are just ordinary shell functions.
 
@@ -45,21 +45,22 @@ You should make sure all the functions from the tt(Functions/Zftp)
 directory of the source distribution are available; they all begin with the
 two letters `tt(zf)'.  They may already have been installed on your system;
 otherwise, you will need to find them and copy them.  The directory should
-appear as one of the elements of the tt($fpath) array, and the functions
-should be autoloaded.  Finally, to initialise the use of the system you
-need to call the tt(zfinit) function.  The following code in your
-tt(.zshrc) will arrange for this; assume the functions are stored in the
-directory tt(~/myfns):
+appear as one of the elements of the tt($fpath) array (this should already
+be the case if they were installed), and at least the function tt(zfinit)
+should be autoloaded; it will autoload the rest.  Finally, to initialise
+the use of the system you need to call the tt(zfinit) function.  The
+following code in your tt(.zshrc) will arrange for this; assume the
+functions are stored in the directory tt(~/myfns):
 
-tt(indent(
-nofill(fpath=(~/myfns $fpath))
-nofill(autoload ~/myfns/zf*(:t))
-nofill(zfinit)
-))
+example(fpath=(~/myfns $fpath)
+autoload zfinit
+zfinit)
 
 Note that tt(zfinit) assumes you are using the tt(zmodload) method to
 load the tt(zftp) command.  If it is already built into the shell, change
-tt(zfinit) to tt(zfinit -n).
+tt(zfinit) to tt(zfinit -n).  It is helpful (though not essential) if the
+call to tt(zfinit) appears after any code to initialise the new completion
+system, else unnecessary tt(compctl) commands will be given.
 
 texinode(Zftp Functions)(Miscellaneous Features)(Installation)(Zftp Function System)
 sect(Functions)
@@ -115,7 +116,7 @@ have many of the features of the shell builtin tt(cd).
 
 In the first form with var(dir) present, change to the directory var(dir).
 The command `tt(zfcd ..)' is treated specially, so is guaranteed to work on
-non-UNIX servers (note this is handled internall by tt(zftp)).  If var(dir)
+non-UNIX servers (note this is handled internally by tt(zftp)).  If var(dir)
 is omitted, has the effect of `tt(zfcd ~)'.
 
 The second form changes to the directory previously current.
@@ -274,10 +275,45 @@ then tt(zfpcp) will retry using the second form.
 )
 enditem()
 
-subsect(Closing the connectino)
+subsect(Closing the connection)
 startitem()
 item(tt(zfclose))(
 Close the connection.
+)
+enditem()
+
+subsect(Bookmarks)
+The two functions tt(zfmark) and tt(zfgoto) allow you to `bookmark' the
+present location (host, user and directory) of the current FTP connection
+for later use.  The file to be used for storing and retrieving bookmarks is
+given by the parameter tt($ZFTP_BMFILE); if not set when one of the two
+functions is called, it will be set to the file tt(.zfbfmarks) in the
+directory where your zsh startup files live (usually tt(~)).
+
+startitem()
+item(tt(zfmark [ )var(bookmark)tt( ]))(
+If given an argument, mark the current host, user and directory under the
+name var(bookmark) for later use by tt(zfgoto).  If there is no connection
+open, use the values for the last connection immediately before it was
+closed; it is an error if there is none.  Any existing bookmark
+under the same name will be silently replaced.
+
+If not given an argument, list the existing bookmarks and the points to
+which they refer in the form var(user)tt(@)var(host)tt(:)var(directory).
+)
+item(tt(zfgoto [ -n ] )var(bookmark))(
+Return to the location given by var(bookmark), as previously set by
+tt(zfmark).  If the location has user `tt(ftp)' or `tt(anonymous)', open
+the connection with tt(zfanon), so that no password is required.  If the
+user and host parameters match those currently stored, those will be used,
+and again no password is required.  Otherwise a password will be prompted
+for.
+
+With the option tt(-n), the bookmark is taken to be a nickname stored by
+the tt(ncftp) program in its bookmark file, which is assumed to be
+tt(~/.ncftp/bookmarks).  The function works identically in other ways.
+Note that there is no mechanism for adding or modifying tt(ncftp) bookmarks
+from the zftp functions.
 )
 enditem()
 
@@ -288,7 +324,7 @@ alter tt(zftp_chpwd) and tt(zftp_progress), in particular.
 
 startitem()
 item(tt(zfinit [ -n ]))(
-As decribed above, this is used to initialise the zftp function system.
+As described above, this is used to initialise the zftp function system.
 The tt(-n) option should be used if the zftp command is already built into
 the shell.
 )
@@ -320,7 +356,7 @@ var(prefix) and var(suffix) set appropriately.
 item(tt(zfrglob var(varname)))(
 Perform remote globbing, as describes in more detail below.  var(varname)
 is the name of a variable containing the pattern to be expanded; if there
-were any matches, the same variable will be set to the exanded set of
+were any matches, the same variable will be set to the expanded set of
 filenames on return.
 )
 item(tt(zfrtime var(lfile) var(rfile) [ var(time) ]))(
@@ -339,15 +375,13 @@ tt(xterm) or tt(sun-cmd) terminal emulator to reflect the local and remote
 hostnames and current directories.  It works best when combined with the
 function tt(chpwd).  In particular, a function of the form
 
-tt(indent(
-nofill(chpwd() {)
-nofill(  if [[ -n $ZFTP_USER ]]; then)
-nofill(    zftp_chpwd)
-nofill(  else)
-nofill(    # usual chpwd e.g put host:directory in title bar)
-nofill(  fi)
-nofill(})
-))
+example(chpwd() {
+  if [[ -n $ZFTP_USER ]]; then
+    zftp_chpwd
+  else
+    # usual chpwd e.g put host:directory in title bar
+  fi
+})
 
 fits in well.
 )
@@ -378,7 +412,7 @@ remote server does not support the UNIX directory semantics, directory
 handling is problematic and it is recommended that globbing only be used
 within the current directory.  The list of files in the current directory,
 if retrieved, will be cached, so that subsequent globs in the same
-directory without an interventing tt(zfcd) are fast.
+directory without an intervening tt(zfcd) are fast.
 
 If the variable tt($zfrglob) is set to a non-zero length, globbing is
 instead performed on the remote host:  the server is asked for a list of
@@ -415,10 +449,8 @@ never close the connection automatically.
 Information about the previous connection is given by the tt(zfstat)
 function.  So, for example, if that reports:
 
-tt(indent(
-nofill(Not connected.)
-nofill(Last session:   ftp.bar.com:/pub/textfiles)
-))
+example(Not connected.
+Last session:   ftp.bar.com:/pub/textfiles)
 
 then the command tt(zfget file.txt) will attempt to reopen a connection to
 tt(ftp.bar.com), retrieve the file tt(/pub/textfiles/file.txt), and
@@ -427,9 +459,9 @@ will open the connection in the directory tt(/pub) and leave it open.
 
 subsect(Completion)
 
-Completion of remote files and directories is supported.  The older,
-tt(compctl)-style completion is defined when tt(zfinit) is called; support
-for the new widget-based completion system is provided in the function
-tt(Completion/Builtins/_zftp), which should be installed with the other
-functions of the completion system and hence should automatically be
+Completion of remote files, directories and bookmarks is supported.  The
+older, tt(compctl)-style completion is defined when tt(zfinit) is called;
+support for the new widget-based completion system is provided in the
+function tt(Completion/Builtins/_zftp), which should be installed with the
+other functions of the completion system and hence should automatically be
 available.

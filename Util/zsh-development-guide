@@ -504,3 +504,21 @@ Documentation
   ocurring in the main text, "plugh" is a normal word that is being quoted
   (it's the user that says `plugh', not the documentation), and "xyzzy"
   is some text to be typed literally that is being quoted.
+
+* For multiple-line pieces of text that should not be filled, there are
+  various models.
+  - If the text is pure example, i.e. with no metasyntactic variables etc.,
+    it should be included within `example(...)'.  The text will be
+    indented, will not be filled and will be put into a fixed width font.
+  - If the text includes mixed fonts, it should be included within
+    `indent(...)'.  As with `example()', the text is not filled, but now
+    explicit font-changing commands are required inside.
+  - If the text appears inside some other format, such as for example the
+    `item()' list structure, then the instruction `nofill(...)', which
+    simply turns off filling should be used; as with `indent(...)',
+    explicit font changing commands are required.  This is also an
+    alternative to `indent()' when no identation is required, e.g. if the
+    accumulated indentation would otherwise be too long.
+  All the above should appear on their own, separated by newlines from the
+  surrounding text.  No extra newlines after the opening or before the
+  closing parenthesis are required.

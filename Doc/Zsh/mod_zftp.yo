@@ -80,7 +80,7 @@ will be deleted if the tt(zftp) module is unloaded.
 
 For example,
 
-nofill(tt(zftp params ftp.elsewhere.xx juser '?'))
+example(zftp params ftp.elsewhere.xx juser '?')
 
 will store the host tt(ftp.elsewhere.xx) and the user tt(juser) and
 then prompt the user for the corresponding password.
@@ -89,8 +89,8 @@ This command may also be used to set up a transfer which then takes
 place completely in the background, freeing tt(zftp) for concurrent
 foreground use.  For example,
 
-nofill(tt(zftp params ftp.soreeyes.ca bubble squeak))
-nofill(tt(LPAR()zftp open; zftp get foo >bar; zftp close)tt(RPAR() &))
+example(zftp params ftp.soreeyes.ca bubble squeak
+(zftp open; zftp get foo >bar; zftp close) &)
 
 --- here, the connection is restricted to a background subshell and
 you are free to open a simultaneous connection in the foreground.
@@ -110,7 +110,7 @@ supported on this system) is printed instead.
 
 It is useful to put the code
 
-nofill(tt([[ -n $ZFTP_HOST ]] && zftp test))
+example([[ -n $ZFTP_HOST ]] && zftp test)
 
 into the shell function tt(precmd) for testing the connection before
 every prompt.  However, tt(zftp) will call tt(test) at the start of any
@@ -209,7 +209,7 @@ item(tt(mkdir) var(directory))(
 Create a new directory var(directory) on the server.
 )
 item(tt(rmdir) var(directory))(
-Delete the diretory var(directory)  on the server.
+Delete the directory var(directory)  on the server.
 )
 item(tt(rename) var(old-name) var(new-name))(
 Rename file var(old-name) to var(new-name) on the server.
@@ -221,7 +221,7 @@ only need this if instructed by the server to use it.
 item(tt(quote) var(args...))(
 Send the raw FTP command sequence to the server.  You should be
 familiar with the FTP command set as defined in RFC959 before doing
-this.  Useful comands may include tt(STAT) and tt(HELP).  Note also
+this.  Useful commands may include tt(STAT) and tt(HELP).  Note also
 the mechanism for returning messages as described for the variable
 tt(ZFTP_VERBOSE) below, in particular that all messages from the
 control connection are sent to standard error.
@@ -335,7 +335,7 @@ digit reply code is defined by RFC959 to correspond to:
 
 startitem()
 item(1.)(
-A positive prelimnary reply.
+A positive preliminary reply.
 )
 item(2.)(
 A positive completion reply.
@@ -442,7 +442,7 @@ until the next call to tt(zftp).  Other status changes in subshells
 will not be reflected by changes to the variables (but should
 be otherwise harmless).
 
-On some operatings systems, the control connection is not valid after a
+On some operating systems, the control connection is not valid after a
 fork(), so that operations in subshells or on the left hand side of a
 pipeline are not possible.
 

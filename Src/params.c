@@ -52,7 +52,6 @@ char **pparams,		/* $argv        */
  
 /**/
 char *argzero,		/* $0           */
-     *underscore,	/* $_           */
      *home,		/* $HOME        */
      *hostnam,		/* $HOST        */
      *ifs,		/* $IFS         */
@@ -231,11 +230,6 @@ IPDEF9("mailpath", &mailpath, "MAILPATH"),
 IPDEF9("manpath", &manpath, "MANPATH"),
 IPDEF9("psvar", &psvar, "PSVAR"),
 IPDEF9("watch", &watch, "WATCH"),
-
-/*TEST BEGIN*/
-#define IPDEF10(A) {NULL,A,PM_HASHED|PM_SPECIAL|PM_DONTIMPORT,BR((void *)0),SFN(hashsetfn),GFN(hashgetfn),stdunsetfn,0,NULL,NULL,NULL,0}
-IPDEF10("testhash"),
-/*TEST END*/
 
 #ifdef DYNAMIC
 IPDEF9F("module_path", &module_path, "MODULE_PATH", PM_RESTRICTED),
@@ -723,16 +717,13 @@ isident(char *s)
 #endif
 }
 
-static char **garr;
-
 /**/
 static zlong
 getarg(char **str, int *inv, Value v, int a2, zlong *w)
 {
-    int num = 1, word = 0, rev = 0, ind = 0, down = 0, l, i, ishash;
-    int beg = 0, hasbeg = 0;
+    int hasbeg = 0, word = 0, rev = 0, ind = 0, down = 0, l, i, ishash;
     char *s = *str, *sep = NULL, *t, sav, *d, **ta, **p, *tt;
-    zlong r = 0;
+    zlong num = 1, beg = 0, r = 0;
     Comp c;
 
     ishash = (v->pm && PM_TYPE(v->pm->flags) == PM_HASHED);
@@ -1147,7 +1138,6 @@ fetchvalue(char **pptr, int bracks, int flags)
     int ppar = 0;
 
     s = t = *pptr;
-    garr = NULL;
 
     if (idigit(*s)) {
 	if (bracks >= 0)
@@ -1638,7 +1628,7 @@ setaparam(char *s, char **val)
 	if (!(v = getvalue(&s, 1)))
 	    createparam(t, PM_ARRAY);
 	*ss = '[';
-	if (PM_TYPE(v->pm->flags) == PM_HASHED) {
+	if (v && PM_TYPE(v->pm->flags) == PM_HASHED) {
 	    zerr("attempt to set slice of associative array", NULL, 0);
 	    freearray(val);
 	    errflag = 1;
@@ -2466,7 +2456,10 @@ wordcharssetfn(Param pm, char *x)
 char *
 underscoregetfn(Param pm)
 {
-    return underscore;
+    char *u = dupstring(underscore);
+
+    untokenize(u);
+    return u;
 }
 
 /* Function to get value for special parameter `TERM' */

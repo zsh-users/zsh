@@ -277,7 +277,8 @@ If tt(<) is used, then the file passed as an argument will
 be a named pipe connected to the output of the var(list) process.
 For example,
 
-nofill(tt(paste <LPAR()cut -f1) var(file1)tt(RPAR() <LPAR()cut -f3) var(file2)tt(RPAR() | tee >LPAR())var(process1)tt(RPAR() >LPAR())var(process2)tt(RPAR() >/dev/null))
+nofill(tt(paste <LPAR()cut -f1) var(file1)tt(RPAR() <LPAR()cut -f3) var(file2)tt(RPAR() |
+tee >LPAR())var(process1)tt(RPAR() >LPAR())var(process2)tt(RPAR() >/dev/null))
 
 cuts fields 1 and 3 from the files var(file1) and var(file2) respectively,
 pastes the results together, and sends it to the processes
@@ -427,9 +428,9 @@ the flags tt(M), tt(R), tt(B), tt(E) and tt(N) are not useful.
 
 For example,
 
-nofill(tt(foo="twinkle twinkle little star" sub="t*e" rep="spy")
-tt(print ${foo//${~sub}/$rep})
-tt(print ${(S)foo//${~sub}/$rep}))
+example(foo="twinkle twinkle little star" sub="t*e" rep="spy"
+print ${foo//${~sub}/$rep}
+print ${(S)foo//${~sub}/$rep})
 
 Here, the `tt(~)' ensures that the text of tt($sub) is treated as a
 pattern rather than a plain string.  In the first case, the longest
@@ -728,7 +729,7 @@ account of whether the current value is a scalar or an array, whether the
 whole substitution is in double quotes, and what flags are supplied to the
 current level of substitution, just as if the nested substitution were the
 outermost.  The flags are not propagated up to enclosing
-substitutions; the nested subsitution will return either a scalar or an
+substitutions; the nested substitution will return either a scalar or an
 array as determined by the flags, possibly adjusted for quoting.  All the
 following steps take place where applicable at all levels of substitution.
 Note that, unless the `tt((P))' flag is present, the flags and any subscripts
@@ -1221,11 +1222,11 @@ matching the pattern var(foo).
 As a shorthand, `tt(**/)' is equivalent to `tt((*/)#)'.
 Thus:
 
-nofill(tt(ls (*/)#bar))
+example(ls (*/)#bar)
 
 or
 
-nofill(tt(ls **/bar))
+example(ls **/bar)
 
 does a recursive directory search for files named `tt(bar)', not following
 symbolic links.  To follow links, use `tt(***/)'.
@@ -1468,26 +1469,26 @@ name of any existing file can be followed by a modifier of the form
 `tt((:..))' even if no actual filename generation is performed.
 Thus:
 
-nofill(tt(ls *(-/)))
+example(ls *(-/))
 
 lists all directories and symbolic links that point to directories,
 and
 
-nofill(tt(ls *(%W)))
+example(ls *(%W))
 
 lists all world-writable device files in the current directory, and
 
-nofill(tt(ls *(W,X)))
+example(ls *(W,X))
 
 lists all files in the current directory that are
 world-writable or world-executable, and
 
-nofill(tt(echo /tmp/foo*(u0^@:t)))
+example(echo /tmp/foo*(u0^@:t))
 
 outputs the basename of all root-owned files beginning with the string
 `tt(foo)' in tt(/tmp), ignoring symlinks, and
 
-nofill(tt(ls *.*~(lex|parse).[ch](^D^l1)))
+example(ls *.*~(lex|parse).[ch](^D^l1))
 
 lists all files having a link count of one whose names contain a dot
 (but not those starting with a dot, since tt(GLOB_DOTS) is explicitly

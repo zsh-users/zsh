@@ -20,7 +20,7 @@ elif [[ "$command" == */* ]]; then
   cmd2="${command:t}"
 else
   cmd1="$command"
-  eval cmd2=$(whence -p $command)
+  cmd2=$(whence -p $command)
 fi
 
 # See if there are any matching pattern completions.

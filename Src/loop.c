@@ -44,21 +44,18 @@ int contflag;
  
 /**/
 int breaks;
- 
+
 /**/
 int
-execfor(Cmd cmd)
+execfor(Cmd cmd, LinkList args, int flags)
 {
-    List list;
     Forcmd node;
     char *str;
-    int val = 0;
-    LinkList args;
+    zlong val = 0;
 
     node = cmd->u.forcmd;
-    args = cmd->args;
     if (node->condition) {
-	str = node->name;
+	str = dupstring(node->name);
 	singsub(&str);
 	if (!errflag)
 	    matheval(str);
@@ -69,7 +66,7 @@ execfor(Cmd cmd)
 
 	args = newlinklist();
 	for (x = pparams; *x; x++)
-	    addlinknode(args, ztrdup(*x));
+	    addlinknode(args, dupstring(*x));
     }
     lastval = 0;
     loops++;
@@ -95,13 +92,12 @@ execfor(Cmd cmd)
 	    if (!val)
 		break;
 	} else {
-	    str = (char *) ugetnode(args);
-	    if (!str)
+	    if (!args || !(str = (char *) ugetnode(args)))
 		break;
 	    setsparam(node->name, ztrdup(str));
 	}
-	list = (List) dupstruct(node->list);
-	execlist(list, 1, (cmd->flags & CFLAG_EXEC) && empty(args));
+	execlist(node->list, 1,
+		 (flags & CFLAG_EXEC) && args && empty(args));
 	if (breaks) {
 	    breaks--;
 	    if (breaks || !contflag)
@@ -129,27 +125,24 @@ execfor(Cmd cmd)
 
 /**/
 int
-execselect(Cmd cmd)
+execselect(Cmd cmd, LinkList args, int flags)
 {
-    List list;
     Forcmd node;
     char *str, *s;
-    LinkList args;
     LinkNode n;
     int i;
     FILE *inp;
     size_t more;
 
     node = cmd->u.forcmd;
-    args = cmd->args;
     if (!node->inflag) {
 	char **x;
 
 	args = newlinklist();
 	for (x = pparams; *x; x++)
-	    addlinknode(args, ztrdup(*x));
+	    addlinknode(args, dupstring(*x));
     }
-    if (empty(args))
+    if (!args || empty(args))
 	return 1;
     loops++;
     lastval = 0;
@@ -196,8 +189,7 @@ execselect(Cmd cmd)
 		str = "";
 	}
 	setsparam(node->name, ztrdup(str));
-	list = (List) dupstruct(node->list);
-	execlist(list, 1, 0);
+	execlist(node->list, 1, 0);
 	freeheap();
 	if (breaks) {
 	    breaks--;
@@ -278,9 +270,8 @@ selectlist(LinkList l, size_t start)
 
 /**/
 int
-execwhile(Cmd cmd)
+execwhile(Cmd cmd, LinkList args, int flags)
 {
-    List list;
     struct whilecmd *node;
     int olderrexit, oldval;
 
@@ -290,9 +281,8 @@ execwhile(Cmd cmd)
     pushheap();
     loops++;
     for (;;) {
-	list = (List) dupstruct(node->cont);
 	noerrexit = 1;
-	execlist(list, 1, 0);
+	execlist(node->cont, 1, 0);
 	noerrexit = olderrexit;
 	if (!((lastval == 0) ^ node->cond)) {
 	    if (breaks)
@@ -300,8 +290,7 @@ execwhile(Cmd cmd)
 	    lastval = oldval;
 	    break;
 	}
-	list = (List) dupstruct(node->loop);
-	execlist(list, 1, 0);
+	execlist(node->loop, 1, 0);
 	if (breaks) {
 	    breaks--;
 	    if (breaks || !contflag)
@@ -322,22 +311,20 @@ execwhile(Cmd cmd)
 
 /**/
 int
-execrepeat(Cmd cmd)
+execrepeat(Cmd cmd, LinkList args, int flags)
 {
-    List list;
     int count;
 
     lastval = 0;
-    if (empty(cmd->args) || nextnode(firstnode(cmd->args))) {
+    if (!args || empty(args) || nextnode(firstnode(args))) {
 	zerr("bad argument for repeat", NULL, 0);
 	return 1;
     }
-    count = atoi(peekfirst(cmd->args));
+    count = atoi(peekfirst(args));
     pushheap();
     loops++;
     while (count--) {
-	list = (List) dupstruct(cmd->u.list);
-	execlist(list, 1, 0);
+	execlist(cmd->u.list, 1, 0);
 	freeheap();
 	if (breaks) {
 	    breaks--;
@@ -357,7 +344,7 @@ execrepeat(Cmd cmd)
 
 /**/
 int
-execif(Cmd cmd)
+execif(Cmd cmd, LinkList args, int flags)
 {
     struct ifcmd *node;
     int olderrexit;
@@ -380,7 +367,7 @@ execif(Cmd cmd)
     noerrexit = olderrexit;
 
     if (*t)
-	execlist(*t, 1, cmd->flags & CFLAG_EXEC);
+	execlist(*t, 1, flags & CFLAG_EXEC);
     else
 	lastval = 0;
 
@@ -389,7 +376,7 @@ execif(Cmd cmd)
 
 /**/
 int
-execcase(Cmd cmd)
+execcase(Cmd cmd, LinkList args, int flags)
 {
     struct casecmd *node;
     char *word;
@@ -400,18 +387,18 @@ execcase(Cmd cmd)
     l = node->lists;
     p = node->pats;
 
-    word = *p++;
+    word = dupstring(*p++);
     singsub(&word);
     untokenize(word);
     lastval = 0;
 
     if (node) {
 	while (*p) {
-	    char *pat = *p + 1;
+	    char *pat = dupstring(*p + 1);
 	    singsub(&pat);
 	    if (matchpat(word, pat)) {
 		do {
-		    execlist(*l++, 1, **p == ';' && (cmd->flags & CFLAG_EXEC));
+		    execlist(*l++, 1, **p == ';' && (flags & CFLAG_EXEC));
 		} while(**p++ == '&' && *p);
 		break;
 	    }
@@ -421,4 +408,3 @@ execcase(Cmd cmd)
     }
     return lastval;
 }
-

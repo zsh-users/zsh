@@ -41,11 +41,13 @@ for ac_shellvar in $ac_shellvars; do
   CPPFLAGS) ac_lfsvar=LFS_CFLAGS ;;
   *) ac_lfsvar=LFS_$ac_shellvar ;;
   esac
-  eval test '"${'$ac_shellvar'+set}"' = set && ac_set=$ac_shellvar
   (getconf $ac_lfsvar) >/dev/null 2>&1 || { ac_result=no; break; }
   ac_getconf=`getconf $ac_lfsvar`
-  ac_getconfs=$ac_getconfs$ac_getconf
-  eval ac_test_$ac_shellvar="\$ac_getconf"
+  if test -n "$ac_getconf"; then
+    eval test '"${'$ac_shellvar'+set}"' = set && ac_set=$ac_shellvar
+    ac_getconfs=$ac_getconfs$ac_getconf
+    eval ac_test_$ac_shellvar="\$ac_getconf"
+  fi
 done
 case "$ac_result$ac_getconfs" in
 yes) ac_result=no ;;
@@ -74,12 +76,12 @@ esac
 dnl
 dnl zsh_64_BIT_TYPE
 dnl   Check whether the first argument works as a 64-bit type.
-dnl   If there is a non-zero second argument, we just assume it works
+dnl   If there is a non-zero third argument, we just assume it works
 dnl   when we're cross compiling.  This is to allow a type to be
 dnl   specified directly as --enable-lfs="long long".
-dnl   Sets zsh_cv_64_bit_type to the first argument if the test worked,
-dnl   `no' otherwise.  Be careful testing this, as it may produce
-dnl   two words `long long' on an unquoted substitution.
+dnl   Sets the variable given in the second argument to the first argument
+dnl   if the test worked, `no' otherwise.  Be careful testing this, as it
+dnl   may produce two words `long long' on an unquoted substitution.
 dnl   This macro does not produce messages as it may be run several times
 dnl   before finding the right type.
 dnl
@@ -95,11 +97,11 @@ main()
   $1 foo = 0; 
   return sizeof($1) != 8;
 }
-], zsh_cv_64_bit_type="$1", zsh_cv_64_bit_type=no,
-  [if test x$2 != x ; then
-    zsh_cv_64_bit_type="$1"
+], $2="$1", $2=no,
+  [if test x$3 != x ; then
+    $2="$1"
   else
-    zsh_cv_64_bit_type=no
+    $2=no
   fi])
 ])
 

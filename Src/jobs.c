@@ -65,10 +65,6 @@ struct tms shtms;
 /**/
 int ttyfrozen;
  
-/* empty job structure for quick clearing of jobtab entries */
-
-static struct job zero;		/* static variables are initialized to zero */
-
 static struct timeval dtimeval, now;
 
 /* Diff two timevals for elapsed-time computations */
@@ -244,8 +240,11 @@ update_job(Job jn)
 		adjustwinsize(0);
 	    }
 	}
+    } else if (list_pipe && (val & 0200) && inforeground == 1) {
+	breaks = loops;
+	errflag = 1;
+	inerrflush();
     }
-
     if (somestopped && jn->stat & STAT_SUPERJOB)
 	return;
     jn->stat |= (somestopped) ? STAT_CHANGED | STAT_STOPPED :
@@ -663,14 +662,16 @@ deletejob(Job jn)
 	nx = pn->next;
 	zfree(pn, sizeof(struct process));
     }
-    zsfree(jn->pwd);
-
     deletefilelist(jn->filelist);
 
     if (jn->ty)
 	zfree(jn->ty, sizeof(struct ttyinfo));
 
-    *jn = zero;
+    jn->gleader = jn->other = 0;
+    jn->stat = jn->stty_in_env = 0;
+    jn->procs = NULL;
+    jn->filelist = NULL;
+    jn->ty = NULL;
 }
 
 /* add a process to the current job */
@@ -831,7 +832,12 @@ waitjob(int job, int sig)
 void
 waitjobs(void)
 {
-    waitjob(thisjob, 0);
+    Job jn = jobtab + thisjob;
+
+    if (jn->procs)
+	waitjob(thisjob, 0);
+    else
+	deletejob(jn);
     thisjob = -1;
 }
 
@@ -843,12 +849,9 @@ clearjobtab(void)
 {
     int i;
 
-    for (i = 1; i < MAXJOB; i++) {
-	if (jobtab[i].pwd)
-	    zsfree(jobtab[i].pwd);
+    for (i = 1; i < MAXJOB; i++)
 	if (jobtab[i].ty)
 	    zfree(jobtab[i].ty, sizeof(struct ttyinfo));
-    }
 
     memset(jobtab, 0, sizeof(jobtab)); /* zero out table */
 }
@@ -864,7 +867,11 @@ initjob(void)
     for (i = 1; i < MAXJOB; i++)
 	if (!jobtab[i].stat) {
 	    jobtab[i].stat = STAT_INUSE;
-	    jobtab[i].pwd = ztrdup(pwd);
+	    if (strlen(pwd) >= PATH_MAX) {
+		memcpy(jobtab[i].pwd, pwd, PATH_MAX);
+		jobtab[i].pwd[PATH_MAX] = '\0';
+	    } else
+		strcpy(jobtab[i].pwd, pwd);
 	    jobtab[i].gleader = 0;
 	    return i;
 	}

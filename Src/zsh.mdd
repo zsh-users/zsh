@@ -31,7 +31,16 @@ version.h: $(sdir_top)/Config/version.mk
 zshpaths.h: FORCE Makemod
 	@echo '#define MODULE_DIR "'$(MODDIR)'"' > zshpaths.h.tmp
 	@if test x$(fndir) != xno; then \
-	  echo '#define FUNCTION_DIR "'$(fndir)'"' >> zshpaths.h.tmp; \
+	  echo '#define FPATH_DIR "'$(fndir)'"' >> zshpaths.h.tmp; \
+	  if test x$(FUNCTIONS_SUBDIRS) != x -a \
+	  x$(FUNCTIONS_SUBDIRS) != xno; then \
+	    fpath_tmp="`for f in $$FUNCTIONS_INSTALL; do \
+	      echo $$f | sed s%/.*%%; \
+	    done | sort | uniq`"; \
+	    fpath_tmp="`echo $$fpath_tmp | sed 's/ /\", \"/g'`"; \
+	    echo "#define FPATH_SUBDIRS { \"$$fpath_tmp\" }" \
+	    >>zshpaths.h.tmp; \
+	  fi; \
 	fi
 	@if cmp -s zshpaths.h zshpaths.h.tmp; then \
 	    rm -f zshpaths.h.tmp; \

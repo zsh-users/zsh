@@ -75,6 +75,7 @@ findcmd
 firsthist
 freearray
 freeheap
+freelinklist
 freestruct
 getaparam
 gethashnode
@@ -113,6 +114,7 @@ hist_skip_flags
 holdintr
 hptr
 hrealloc
+ifs
 inbufct
 incmdpos
 incond
@@ -179,7 +181,6 @@ path
 pathchecked
 popheap
 postedit
-pparams
 ppid
 prefork
 prepromptfns

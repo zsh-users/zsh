@@ -222,8 +222,21 @@ printulimit(int lim, int hard, int head)
     /* display the limit */
     if (limit == RLIM_INFINITY)
 	printf("unlimited\n");
-    else
-	printf("%ld\n", (long)limit);
+    else {
+# ifdef RLIM_T_IS_QUAD_T
+	printf("%qd\n", limit);
+# else
+#  ifdef RLIM_T_IS_LONG_LONG
+	printf("%lld\n", limit);
+#  else
+#   ifdef RLIM_T_IS_UNSIGNED
+	printf("%lu\n", limit);
+#   else
+	printf("%ld\n", limit);
+#   endif /* RLIM_T_IS_UNSIGNED */
+#  endif /* RLIM_T_IS_LONG_LONG */
+# endif /* RLIM_T_IS_QUAD_T */
+    }
 }
 
 /* limit: set or show resource limits.  The variable hard indicates *

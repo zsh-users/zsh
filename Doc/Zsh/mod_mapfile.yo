@@ -34,11 +34,13 @@ handled, zsh's internal memory management may be arbitrarily baroque.  Thus
 it should not automatically be assumed that use of tt(mapfile) represents a
 gain in efficiency over use of other mechanisms.  Note in particular that
 the whole contents of the file will always reside physically in memory when
-accessed (possibly multiple times, due to standard parameter subsitution
-operations).
+accessed (possibly multiple times, due to standard parameter substitution
+operations).  In particular, this means handling of sufficiently long files
+(greater than the machine's swap space, or than the range of the pointer
+type) will be incorrect.
 
 No errors are printed or flagged for non-existent, unreadable, or
-unwriteable files, as the parameter mechanism is too low in the shell
+unwritable files, as the parameter mechanism is too low in the shell
 execution hierarchy to make this convenient.
 
 It is unfortunate that the mechanism for loading modules does not yet allow

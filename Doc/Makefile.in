@@ -57,7 +57,7 @@ Zsh/filelist.yo Zsh/files.yo Zsh/func.yo Zsh/grammar.yo Zsh/guide.yo \
 Zsh/index.yo Zsh/intro.yo Zsh/invoke.yo Zsh/jobs.yo Zsh/metafaq.yo \
 Zsh/modules.yo Zsh/mod_cap.yo Zsh/compwid.yo Zsh/compsys.yo \
 Zsh/mod_clone.yo Zsh/mod_comp1.yo Zsh/mod_compctl.yo Zsh/mod_deltochar.yo \
-Zsh/mod_example.yo Zsh/mod_files.yo Zsh/mod_stat.yo \
+Zsh/mod_example.yo Zsh/mod_files.yo Zsh/mod_mapfile.yo Zsh/mod_stat.yo \
 Zsh/mod_zle.yo Zsh/options.yo \
 Zsh/params.yo Zsh/prompt.yo Zsh/redirect.yo Zsh/restricted.yo \
 Zsh/seealso.yo Zsh/zftpsys.yo Zsh/zle.yo
@@ -132,8 +132,8 @@ zshmisc.1: Zsh/grammar.yo Zsh/redirect.yo Zsh/exec.yo Zsh/func.yo \
 
 zshmodules.1: Zsh/modules.yo Zsh/mod_cap.yo Zsh/mod_clone.yo \
               Zsh/mod_comp1.yo Zsh/mod_compctl.yo Zsh/mod_deltochar.yo \
-              Zsh/mod_example.yo Zsh/mod_files.yo Zsh/mod_sched.yo \
-              Zsh/mod_stat.yo Zsh/mod_zftp.yo Zsh/mod_zle.yo
+              Zsh/mod_example.yo Zsh/mod_files.yo Zsh/mod_mapfile.yo \
+              Zsh/mod_sched.yo Zsh/mod_stat.yo Zsh/mod_zftp.yo Zsh/mod_zle.yo
 
 zshoptions.1: Zsh/options.yo
 

@@ -719,7 +719,7 @@ dotrapargs(int sig, int *sigtr, void *sigfn)
 	freelinklist(args, (FreeFunc) NULL);
 	zsfree(name);
     } else HEAPALLOC {
-	execlist(dupstruct(sigfn), 1, 0);
+	execlist(sigfn, 1, 0);
     } LASTALLOC;
     if (trapreturn > 0)
 	trapret = trapreturn;

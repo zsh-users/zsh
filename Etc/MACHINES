@@ -38,6 +38,10 @@ DEC: OSF/1 1.2, 1.3, 2.0, 3.*, DEC Unix 4.* (Alpha)
 	This problem is not related to zsh.  If you have such problems,
 	remove the bogus strip and use /bin/strip instead.
 
+        On Digital UNIX 4.0, compilation with gcc and with --enable-dynamic
+        apparently needs configuring with explicit flags:
+          DLLD=gcc LDFLAGS='-g -rpath <path-to-.so-files>' ./configure ...
+
 FreeBSD: FreeBSD 2.2.7 [3.1.4]
 	Should build `out-of-the-box'.
 
@@ -102,5 +106,7 @@ Sun: Solaris 2.*
 	to /usr/ucblib in your LD_LIBRARY_PATH.  You can easily do this
 	by just unsetting LD_LIBRARY_PATH before building zsh.
 
-	Under Solaris 2.7, dynamically loaded library support with
-	--enable-dynamic currently does not work.
+	Under Solaris 2.7, problems have been reported with dynamically
+        loaded library support using --enable-dynamic.  However, other
+        users have been successful with the standard Sun compiler.
+        More details of any problems would be appreciated.

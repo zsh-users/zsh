@@ -248,8 +248,11 @@
 /* Define to 1 if long is 64 bits */
 #undef LONG_IS_64_BIT
 
-/* Define to a 64 bit type if there is one, but long is shorter */
+/* Define to a 64 bit integer type if there is one, but long is shorter */
 #undef ZSH_64_BIT_TYPE
+
+/* Define to an unsigned variant of ZSH_64_BIT_TYPE if that is defined */
+#undef ZSH_64_BIT_UTYPE
 
 /* Define to 1 if off_t is 64 bit (for large file support) */
 #undef OFF_T_IS_64_BIT

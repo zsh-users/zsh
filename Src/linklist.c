@@ -38,7 +38,7 @@ newlinklist(void)
 {
     LinkList list;
 
-    list = (LinkList) alloc(sizeof *list);
+    list = (LinkList) ncalloc(sizeof *list);
     list->first = NULL;
     list->last = (LinkNode) list;
     return list;
@@ -53,7 +53,7 @@ insertlinknode(LinkList list, LinkNode node, void *dat)
     LinkNode tmp, new;
 
     tmp = node->next;
-    node->next = new = (LinkNode) alloc(sizeof *tmp);
+    node->next = new = (LinkNode) ncalloc(sizeof *tmp);
     new->last = node;
     new->dat = dat;
     new->next = tmp;

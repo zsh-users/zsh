@@ -230,7 +230,7 @@ static char *lastmsg, lastcodestr[4];
 static int lastcode;
 
 /* flag for remote system is UNIX --- useful to know as things are simpler */
-static int zfis_unix, zfpassive_conn;
+static int zfpassive_conn;
 
 /* remote system has size, mdtm commands */
 enum {
@@ -1786,7 +1786,6 @@ zftp_open(char *name, char **args, int flags)
 	return 1;
     }
 
-    zfis_unix = 0;
     zfhas_size = zfhas_mdtm = ZFCP_UNKN;
     zdfd = -1;
     /* initial status: open, ASCII data, stream mode 'n' stuff */
@@ -2039,14 +2038,12 @@ zftp_login(char *name, char **args, int flags)
 		/*
 		 * Use binary for transfers.  This simple test saves much
 		 * hassle for all concerned, particularly me.
+		 *
+		 * We could set this based just on the UNIX part,
+		 * but I don't really know the consequences of that.
 		 */
 		zfstatus |= ZFST_IMAG;
-		zfis_unix = 1;
 	    }
-	    /*
-	     * we could set zfis_unix based just on the UNIX part,
-	     * but I don't really know the consequences of that.
-	     */
 	    zfsetparam("ZFTP_SYSTEM", systype, ZFPM_READONLY);
 	}
 	zfstatus |= ZFST_SYST;

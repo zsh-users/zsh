@@ -55,7 +55,14 @@ install.fns:
 	  $(sdir_top)/mkinstalldirs $(fndir) || exit 1; \
 	  for file in $(FUNCTIONS_INSTALL); do \
 	    if test -f $$file; then \
-	      $(INSTALL_DATA) $$file $(fndir) || exit 1; \
+	      if test x$(FUNCTIONS_SUBDIRS) != x -a \
+	      x$(FUNCTIONS_SUBDIRS) != xno; then \
+	        subdir="`echo $$file | sed -e 's%/.*%%'`"; \
+	        $(sdir_top)/mkinstalldirs $(fndir)/$$subdir || exit 1; \
+	        $(INSTALL_DATA) $$file $(fndir)/$$subdir || exit 1; \
+	      else \
+	        $(INSTALL_DATA) $$file $(fndir) || exit 1; \
+	      fi; \
 	    fi; \
 	  done; \
 	fi; \
@@ -65,7 +72,12 @@ uninstall.fns:
 	if test x$(fndir) != x && test x$(fndir) != xno; then \
 	  for file in $(FUNCTIONS_INSTALL); do \
 	    if test -f $$file; then \
-	      rm -f "$(fndir)/`echo $$file | sed -e 's%^.*/%%'`"; \
+	      if test x$(FUNCTIONS_SUBDIRS) != x -a \
+              x$(FUNCTIONS_SUBDIRS) != xno; then \
+	        rm -f $(fndir)/$$file; \
+	      else \
+	        rm -f "$(fndir)/`echo $$file | sed -e 's%^.*/%%'`"; \
+	      fi; \
 	    fi; \
 	  done; \
 	fi; \

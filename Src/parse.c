@@ -298,6 +298,8 @@ par_pline(void)
 	rdr->type = MERGEOUT;
 	rdr->fd1 = 2;
 	rdr->name = dupstring("1");
+	if (!c->redir)
+	    c->redir = newlinklist();
 	addlinknode(c->redir, rdr);
 
 	cmdpush(CS_ERRPIPE);
@@ -330,11 +332,14 @@ par_cmd(void)
 
     c = (Cmd) make_cmd();
     c->lineno = lineno;
-    c->args = newlinklist();
-    c->redir = newlinklist();
-    c->vars = newlinklist();
-    while (IS_REDIROP(tok))
-	par_redir(c->redir);
+    c->args = NULL;
+    c->vars = NULL;
+    if (IS_REDIROP(tok)) {
+	c->redir = newlinklist();
+	while (IS_REDIROP(tok))
+	    par_redir(c->redir);
+    } else
+	c->redir = NULL;
     switch (tok) {
     case FOR:
 	cmdpush(CS_FOR);
@@ -399,6 +404,8 @@ par_cmd(void)
 	break;
     case DINPAR:
 	c->type = CARITH;
+	if (!c->args)
+	    c->args = newlinklist();
 	addlinknode(c->args, tokstr);
 	yylex();
 	break;
@@ -407,8 +414,12 @@ par_cmd(void)
 	    return NULL;
 	break;
     }
-    while (IS_REDIROP(tok))
-	par_redir(c->redir);
+    if (IS_REDIROP(tok)) {
+	if (!c->redir)
+	    c->redir = newlinklist();
+	while (IS_REDIROP(tok))
+	    par_redir(c->redir);
+    }
     incmdpos = 1;
     incasepat = 0;
     incond = 0;
@@ -460,6 +471,8 @@ par_for(Cmd c)
 	    f->inflag = 1;
 	    incmdpos = 0;
 	    yylex();
+	    if (!c->args)
+		c->args = newlinklist();
 	    c->args = par_wordlist();
 	    if (tok != SEPER)
 		YYERRORV;
@@ -467,6 +480,8 @@ par_for(Cmd c)
 	    f->inflag = 1;
 	    incmdpos = 0;
 	    yylex();
+	    if (!c->args)
+		c->args = newlinklist();
 	    c->args = par_nl_wordlist();
 	    if (tok != OUTPAR)
 		YYERRORV;
@@ -819,6 +834,8 @@ par_repeat(Cmd c)
     yylex();
     if (tok != STRING)
 	YYERRORV;
+    if (!c->args)
+	c->args = newlinklist();
     addlinknode(c->args, tokstr);
     incmdpos = 1;
     yylex();
@@ -966,6 +983,8 @@ par_simple(Cmd c)
 		v->str = p + 1;
 	    } else
 		equalsplit(tokstr, &v->str);
+	    if (!c->vars)
+		c->vars = newlinklist();
 	    addlinknode(c->vars, v);
 	    isnull = 0;
 	} else if (tok == ENVARRAY) {
@@ -982,6 +1001,8 @@ par_simple(Cmd c)
 	    if (tok != OUTPAR)
 		YYERROR;
 	    incmdpos = oldcmdpos;
+	    if (!c->vars)
+		c->vars = newlinklist();
 	    addlinknode(c->vars, v);
 	    isnull = 0;
 	} else
@@ -993,9 +1014,13 @@ par_simple(Cmd c)
     for (;;) {
 	if (tok == STRING) {
 	    incmdpos = 0;
+	    if (!c->args)
+		c->args = newlinklist();
 	    addlinknode(c->args, tokstr);
 	    yylex();
 	} else if (IS_REDIROP(tok)) {
+	    if (!c->redir)
+		c->redir = newlinklist();
 	    par_redir(c->redir);
 	} else if (tok == INOUTPAR) {
 	    incmdpos = 1;
@@ -1011,15 +1036,26 @@ par_simple(Cmd c)
 		    YYERROR;
 		}
 		yylex();
-	    } else
-		c->u.list = (List) expandstruct((struct node *) par_cmd(), N_LIST);
+	    } else {
+		List l;
+		Sublist sl;
+		Pline pl;
+
+		l = (List) allocnode(N_LIST);
+		l->type = Z_SYNC;
+		l->left = sl = (Sublist) allocnode(N_SUBLIST);
+		sl->type = END;
+		sl->left = pl = (Pline) allocnode(N_PLINE);
+		pl->type = END;
+		pl->left = par_cmd();
+	    }
 	    cmdpop();
 	    c->type = FUNCDEF;
 	} else
 	    break;
 	isnull = 0;
     }
-    if (isnull && empty(c->redir))
+    if (isnull && (!c->redir || empty(c->redir)))
 	return NULL;
     incmdpos = 1;
     return c;

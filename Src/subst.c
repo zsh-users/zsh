@@ -53,9 +53,9 @@ prefork(LinkList list, int flags)
 
     MUSTUSEHEAP("prefork");
     for (node = firstnode(list); node; incnode(node)) {
-	char *str, *str3;
+	char *str;
 
-	str = str3 = (char *)getdata(node);
+	str = (char *)getdata(node);
 	if ((*str == Inang || *str == Outang || *str == Equals) &&
 	    str[1] == Inpar) {
 	    if (*str == Inang || *str == Outang)

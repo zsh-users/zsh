@@ -733,9 +733,9 @@ mathevall(char *s, int prek, char **ep)
     char *xptr;
     zlong xyyval;
     LV xyylval;
-    char **xlvals = 0;
+    char **xlvals = 0, *nlvals[LVCOUNT];
     int xsp;
-    struct mathvalue *xstack = 0;
+    struct mathvalue *xstack = 0, nstack[STACKSZ];
     zlong ret;
 
     xlastbase = xnoeval = xunary = xlvc = xyyval = xyylval = xsp = 0;
@@ -753,9 +753,10 @@ mathevall(char *s, int prek, char **ep)
 	xsp = sp;
 	xstack = stack;
     }
-    stack = (struct mathvalue *)zalloc(STACKSZ*sizeof(struct mathvalue));
+    stack = nstack;
     lastbase = -1;
-    lvals = (char **)zcalloc(LVCOUNT*sizeof(char *));
+    memset(nlvals, 0, LVCOUNT*sizeof(char *));
+    lvals = nlvals;
     lvc = 0;
     ptr = s;
     sp = -1;
@@ -769,8 +770,6 @@ mathevall(char *s, int prek, char **ep)
 
     ret = stack[0].val;
 
-    zfree(lvals, LVCOUNT*sizeof(char *));
-    zfree(stack, STACKSZ*sizeof(struct mathvalue));
     if (--mlevel) {
 	lastbase = xlastbase;
 	noeval = xnoeval;
@@ -827,7 +826,8 @@ mathevalarg(char *s, char **ss)
 static void
 mathparse(int pc)
 {
-    int q, otok, onoeval;
+    zlong q;
+    int otok, onoeval;
 
     if (errflag)
 	return;

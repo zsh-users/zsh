@@ -981,12 +981,13 @@ shown.
 )
 item(tt(-f))(
 The names refer to functions rather than parameters.  No assignments
-can be made, and the only other valid flags are tt(-t)
-and tt(-u).  The flag tt(-t) turns on execution tracing for this
-function.  The flag tt(-u) causes this function to be marked
-for autoloading.  The tt(fpath) parameter will be searched to find the
-function definition when the function is first referenced; see
-noderef(Functions).
+can be made, and the only other valid flags are tt(-t), tt(-u) and
+tt(-U).  The flag tt(-t) turns on execution tracing for this
+function.  The tt(-u) and tt(-U) flags cause the function to be
+marked for autoloading; tt(-U) also causes alias expansion to be
+suppressed when the function is loaded.  The tt(fpath) parameter
+will be searched to find the function definition when the function
+is first referenced; see noderef(Functions).
 )
 item(tt(-i))(
 Use an internal integer representation.  If var(n) is nonzero it

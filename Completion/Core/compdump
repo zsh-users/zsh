@@ -74,7 +74,7 @@ done))
 # print them out:  about five to a line looks neat
 
 while (( $#_d_als )); do
-  print -n autoload
+  print -n autoload -U
   for (( _i = 0; _i < 5; _i++ )); do
     if (( $#_d_als )); then
       print -n " $_d_als[1]"

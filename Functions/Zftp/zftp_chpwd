@@ -24,6 +24,7 @@ if [[ -z $ZFTP_USER ]]; then
 else
   [[ -n $ZFTP_PWD ]] && zflastdir=$ZFTP_PWD
   zflastsession="$ZFTP_HOST:$ZFTP_PWD"
+  zflastuser="$ZFTP_USER"
   local args
   if [[ -t 1 && -t 2 ]]; then
     local str=$zflastsession

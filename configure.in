@@ -97,8 +97,7 @@ AC_ARG_ENABLE(zsh-hash-debug,
   AC_DEFINE(ZSH_HASH_DEBUG)
 fi])
 
-dnl Do you want large file support, if available (mostly Solaris)?
-dnl Currently this is only partially implemented.
+dnl Do you want large file support, if available?
 undefine([lfs])dnl
 AC_ARG_ENABLE(lfs,
 [  --enable-lfs               turn on support for large files])
@@ -203,18 +202,35 @@ AC_DEFINE(RESTRICTED_R)
 
 undefine([fndir])dnl
 AC_ARG_ENABLE(fndir,
-[  --enable-fndir=DIR        where functions go (default DATADIR/zsh-fns)],
-[fndir="$enableval"], [fndir=${datadir}/zsh/functions])
+[  --enable-fndir=DIR        where functions go (default DATADIR/zsh/functions)],
+[if test $enableval = yes; then
+  fndir=${datadir}/zsh/functions
+else
+  fndir="$enableval"
+fi], [fndir=${datadir}/zsh/functions])
 
-if test x${FUNCTIONS_INSTALL+set} != xset; then
+undefine([function_subdirs])
+AC_ARG_ENABLE(function-subdirs,
+[  --enable-function-subdirs  install functions in subdirectories])
+
+if test "x${FUNCTIONS_INSTALL+set}" != xset; then
   FUNCTIONS_INSTALL="Core/* Base/* Builtins/* User/* Commands/*"
   if test $dynamic != no; then
     FUNCTIONS_INSTALL="${FUNCTIONS_INSTALL} Zftp/*"
   fi
 fi
 
+if test "x${enable_function_subdirs}" != x -a \
+  "x${enable_function_subdirs}" != xno -a \
+  "x$FUNCTIONS_INSTALL" != x; then
+  FUNCTIONS_SUBDIRS=yes
+else
+  FUNCTIONS_SUBDIRS=no
+fi
+
 AC_SUBST(fndir)dnl
 AC_SUBST(FUNCTIONS_INSTALL)dnl
+AC_SUBST(FUNCTIONS_SUBDIRS)dnl
 
 dnl ------------------
 dnl CHECK THE COMPILER
@@ -225,7 +241,7 @@ test -z "${LDFLAGS+set}" && LDFLAGS= auto_ldflags=1
 
 AC_PROG_CC
 
-dnl Check for large file support (Solaris).
+dnl Check for large file support.
 dnl This needs to be done early to get the stuff into the flags.
 if test "x$enable_lfs" != x; then
 zsh_LARGE_FILE_SUPPORT
@@ -552,44 +568,69 @@ zsh_cv_long_is_64_bit=no)])
 
 if test $zsh_cv_long_is_64_bit = yes; then
   AC_DEFINE(LONG_IS_64_BIT)
-elif test "x$enable_lfs" != x; then
-  AC_CACHE_CHECK(if compiler has a 64 bit type, zsh_cv_64_bit_type,
-  [if test "x$enable_lfs" != xyes; then
-     zsh_64_BIT_TYPE(${enable_lfs})
-   else
-     zsh_64_BIT_TYPE(long long)
-     if test "$zsh_cv_64_bit_type" = no; then
-       zsh_64_BIT_TYPE(quad_t)
-     fi
-   fi
-])
-  if test "$zsh_cv_64_bit_type" != no; then
-    AC_DEFINE_UNQUOTED(ZSH_64_BIT_TYPE, $zsh_cv_64_bit_type)
-
-    AC_CACHE_CHECK(if off_t is 64 bit, zsh_cv_off_t_is_64_bit,
-    [AC_TRY_RUN([
+else
+  AC_CACHE_CHECK(if off_t is 64 bit, zsh_cv_off_t_is_64_bit,
+  [AC_TRY_RUN([
 #include <sys/types.h>
 
 main() { return sizeof(off_t) < 8; }
 ],
-    zsh_cv_off_t_is_64_bit=yes,
-    zsh_cv_off_t_is_64_bit=no,
-    zsh_cv_off_t_is_64_bit=no)])
-    if test $zsh_cv_off_t_is_64_bit = yes; then
-      AC_DEFINE(OFF_T_IS_64_BIT)
-    fi
+  zsh_cv_off_t_is_64_bit=yes,
+  zsh_cv_off_t_is_64_bit=no,
+  zsh_cv_off_t_is_64_bit=no)])
+  if test $zsh_cv_off_t_is_64_bit = yes; then
+    AC_DEFINE(OFF_T_IS_64_BIT)
+  fi
 
-    AC_CACHE_CHECK(if ino_t is 64 bit, zsh_cv_ino_t_is_64_bit,
-    [AC_TRY_RUN([
+  AC_CACHE_CHECK(if ino_t is 64 bit, zsh_cv_ino_t_is_64_bit,
+  [AC_TRY_RUN([
 #include <sys/types.h>
 
 main() { return sizeof(ino_t) < 8; }
 ],
-    zsh_cv_ino_t_is_64_bit=yes,
-    zsh_cv_ino_t_is_64_bit=no,
-    zsh_cv_ino_t_is_64_bit=no)])
-    if test $zsh_cv_ino_t_is_64_bit = yes; then
-      AC_DEFINE(INO_T_IS_64_BIT)
+  zsh_cv_ino_t_is_64_bit=yes,
+  zsh_cv_ino_t_is_64_bit=no,
+  zsh_cv_ino_t_is_64_bit=no)])
+  if test $zsh_cv_ino_t_is_64_bit = yes; then
+    AC_DEFINE(INO_T_IS_64_BIT)
+  fi
+
+  if test "x$enable_lfs" != xno -o $zsh_cv_off_t_is_64_bit = yes \
+  -o $zsh_cv_ino_t_is_64_bit = yes; then
+    AC_CACHE_CHECK(if compiler has a 64 bit type, zsh_cv_64_bit_type,
+    [if test "x$enable_lfs" != xyes -a "x$enable_lfs" != xno; then
+      zsh_64_BIT_TYPE(${enable_lfs}, zsh_cv_64_bit_type, force)
+     else
+       zsh_64_BIT_TYPE(long long, zsh_cv_64_bit_type)
+       if test "$zsh_cv_64_bit_type" = no; then
+         zsh_64_BIT_TYPE(quad_t, zsh_cv_64_bit_type)
+       fi
+       if test "$zsh_cv_64_bit_type" = no; then
+         zsh_64_BIT_TYPE(__int64_t, zsh_cv_64_bit_type)
+       fi
+       dnl As a last resort, if we know off_t has 64 bits, use that as
+       dnl the 64-bit integer type.  I don't dare try ino_t since there's
+       dnl probably nothing to stop that being unsigned.
+       if test "$zsh_cv_64_bit_type" = no -a \
+       "$zsh_cv_off_t_is_64_bit" = yes; then
+         zsh_64_BIT_TYPE(off_t, zsh_cv_64_bit_type)
+       fi
+     fi])
+    if test "$zsh_cv_64_bit_type" != no; then
+      AC_DEFINE_UNQUOTED(ZSH_64_BIT_TYPE, $zsh_cv_64_bit_type)
+
+      dnl Handle cases where unsigned type cannot be simply
+      dnl `unsigned ZSH_64_BIT_TYPE'.  More tests may be required.
+      AC_CACHE_CHECK(for a corresponding unsigned 64 bit type,
+      zsh_cv_64_bit_utype,
+      [zsh_64_BIT_TYPE(unsigned $zsh_cv_64_bit_type, zsh_cv_64_bit_utype,
+       force)
+       if test "$zsh_cv_64_bit_utype" = no; then
+         zsh_64_BIT_TYPE(__uint64_t, zsh_cv_64_bit_utype)
+       fi])
+      if test "$zsh_cv_64_bit_utype" != no; then
+        AC_DEFINE_UNQUOTED(ZSH_64_BIT_UTYPE, $zsh_cv_64_bit_utype)
+      fi
     fi
   fi
 fi
@@ -1326,6 +1367,7 @@ eval "zshbin1=${bindir}"
 eval "zshbin2=${zshbin1}"
 eval "zshman=${mandir}"
 eval "zshinfo=${infodir}"
+eval "zshfndir=${fndir}"
 
 echo "
 zsh configuration
@@ -1350,5 +1392,9 @@ echo "\
 library flags             : ${LIBS}
 binary install path       : ${zshbin2}
 man page install path     : ${zshman}
-info install path         : ${zshinfo}
+info install path         : ${zshinfo}"
+if test "$zshfndir" != no; then
+echo "functions install path    : ${zshfndir}
+installed functions       : ${FUNCTIONS_INSTALL}
 "
+fi

@@ -16,7 +16,7 @@ To assign an array value, use `tt(set -A) var(name) var(value) ...'.
 findex(set, use of)
 The value of a parameter may also be assigned by writing:
 
-nofill(var(name)tt(=)var(value))
+indent(var(name)tt(=)var(value))
 
 If the integer attribute, tt(-i), is set for var(name), the var(value)
 is subject to arithmetic evaluation.  See noderef(Array Parameters)
@@ -38,19 +38,19 @@ texinode(Array Parameters)(Positional Parameters)()(Parameters)
 sect(Array Parameters)
 The value of an array parameter may be assigned by writing:
 
-nofill(var(name)tt(=LPAR())var(value) ...tt(RPAR()))
+indent(var(name)tt(=LPAR())var(value) ...tt(RPAR()))
 
 If no parameter var(name) exists, an ordinary array parameter is created.
 Associative arrays must be declared first, by `tt(typeset -A) var(name)'.
 When var(name) refers to an associative array, the parenthesized list is
 interpreted as alternating keys and values:
 
-nofill(var(name)tt(=LPAR())var(key) var(value) ...tt(RPAR()))
+indent(var(name)tt(=LPAR())var(key) var(value) ...tt(RPAR()))
 
 Every var(key) must have a var(value) in this case.  To create an empty
 array or associative array, use:
 
-nofill(var(name)tt(=LPAR()RPAR()))
+indent(var(name)tt(=LPAR()RPAR()))
 
 Individual elements of an array may be selected using a
 subscript.  A subscript of the form `tt([)var(exp)tt(])'
@@ -59,6 +59,7 @@ an arithmetic expression which will be subject to arithmetic
 expansion as if it were surrounded by `tt($LPAR()LPAR())...tt(RPAR()RPAR())'.
 The elements are numbered beginning with 1 unless the
 tt(KSH_ARRAYS) option is set when they are numbered from zero.
+cindex(subscripts)
 pindex(KSH_ARRAYS, use of)
 
 The same subscripting syntax is used for associative arrays,
@@ -72,9 +73,8 @@ except when they appear within double quotes.
 
 A subscript of the form `tt([)var(exp1)tt(,)var(exp2)tt(])'
 selects all elements in the range var(exp1) to var(exp2),
-inclusive.
-(Associative arrays are unordered, and so do not support ranges.)
-If one of the subscripts evaluates to a negative number,
+inclusive. (Associative arrays are unordered, and so do not support
+ranges.) If one of the subscripts evaluates to a negative number,
 say tt(-)var(n), then the var(n)th element from the end
 of the array is used.  Thus `tt($foo[-3])' is the third element
 from the end of the array tt(foo), and
@@ -95,7 +95,7 @@ element or range is replaced by the expression on the right side.  An
 array (but not an associative array) may be created by assignment to a
 range or element.  Arrays do not nest, so assigning a parenthesized list
 of values to an element or range changes the number of elements in the
-array, shifting the other elements to accomodate the new values.  (This
+array, shifting the other elements to accommodate the new values.  (This
 is not supported for associative arrays.)
 
 To delete an element of an ordinary array, assign `tt(LPAR()RPAR())' to
@@ -180,7 +180,7 @@ values) any of the positions from 1 to var(n) that do not already have
 values.  Note that, because the positional parameters form an array, an
 array assignment of the form `var(n)tt(=LPAR())var(value) ...tt(RPAR())' is
 allowed, and has the effect of shifting all the values at positions greater
-than var(n) by as many positions as necessary to accomodate the new values.
+than var(n) by as many positions as necessary to accommodate the new values.
 
 texinode(Local Parameters)(Parameters Set By The Shell)(Positional Parameters)(Parameters)
 sect(Local Parameters)

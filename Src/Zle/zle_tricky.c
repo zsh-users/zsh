@@ -681,12 +681,11 @@ cmphaswilds(char *str)
 /* Check if we have to complete a parameter name. */
 
 static char *
-check_param(char *s, int set, char **ep)
+check_param(char *s, int set, int test)
 {
     char *p;
-    int bq = 0, eq = 0, i;
 
-    if (!ep)
+    if (!test)
 	ispar = parq = eparq = 0;
     /* Try to find a `$'. */
     for (p = s + offs; p > s && *p != String && *p != Qstring; p--);
@@ -726,9 +725,9 @@ check_param(char *s, int set, char **ep)
 
 	e = b;
 	if (br) {
-	    while (*e == (ep ? Dnull : '"'))
-		e++, parq++, bq++;
-	    if (!ep)
+	    while (*e == (test ? Dnull : '"'))
+		e++, parq++;
+	    if (!test)
 		b = e;
 	}
 	/* Find the end of the name. */
@@ -749,14 +748,12 @@ check_param(char *s, int set, char **ep)
 	if (offs <= e - s && offs >= b - s && n <= 0) {
 	    if (br) {
 		p = e;
-		while (*p == (ep ? Dnull : '"'))
-		    p++, parq--, eparq++, eq++;
+		while (*p == (test ? Dnull : '"'))
+		    p++, parq--, eparq++;
 	    }
 	    /* It is. */
-	    if (ep) {
-		*ep = e;
+	    if (test)
 		return b;
-	    }
 	    /* If we were called from makecomplistflags(), we have to set the
 	     * global variables. */
 
@@ -765,21 +762,12 @@ check_param(char *s, int set, char **ep)
 		    mflags |= CMF_PARBR;
 
 		/* Get the prefix (anything up to the character before the name). */
-		for (i = eq, p = e; i; i--, p++)
-		    *p = '.';
-		isuf = quotename(e, NULL);
-		for (i = eq, p = isuf; i; i--, p++)
-		    *p = '"';
+		isuf = dupstring(e);
+		untokenize(isuf);
 		*e = '\0';
 		ripre = dupstring(s);
 		ripre[b - s] = '\0';
-		for (i = bq, p = ripre + (b - s) - 1; i; i--, p--)
-		    *p = '.';
-		ipre = quotename(ripre, NULL);
-		for (i = bq, p = ripre + strlen(ripre) - 1; i; i--, p--)
-		    *p = '"';
-		for (i = bq, p = ipre + strlen(ipre) - 1; i; i--, p--)
-		    *p = '"';
+		ipre = dupstring(ripre);
 		untokenize(ipre);
 	    }
 	    else
@@ -1231,8 +1219,7 @@ get_comp_string(void)
 	clwpos = -1;
 	lexsave();
 	inpush(dupstrspace((char *) linptr), 0, NULL);
-	strinbeg();
-	stophist = 2;
+	strinbeg(0);
 	i = tt0 = cp = rd = ins = oins = linarr = parct = ia = 0;
 
 	/* This loop is possibly the wrong way to do this.  It goes through *
@@ -1535,11 +1522,12 @@ get_comp_string(void)
 	/* This variable will hold the current word in quoted form. */
 	qword = ztrdup(s);
 	offs = cs - wb;
-	if ((p = check_param(s, 0, &tt))) {
-	    for (; *p == Dnull; p++)
-		*p = '"';
-	    for (; *tt == Dnull; tt++)
-		*tt = '"';
+	if ((p = check_param(s, 0, 1))) {
+	    for (p = s; *p; p++)
+		if (*p == Dnull)
+		    *p = '"';
+		else if (*p == Snull)
+		    *p = '\'';
 	}
 	if (*s == Snull || *s == Dnull) {
 	    char *q = (*s == Snull ? "'" : "\""), *n = tricat(qipre, q, "");
@@ -3427,7 +3415,7 @@ add_match_data(int alt, char *str, Cline line,
     Aminfo ai = (alt ? fainfo : ainfo);
     int palen, salen, qipl, ipl, pl, ppl, qisl, isl, psl;
 
-    palen = salen = qipl = ipl = pl = ppl = isl = psl = 0;
+    palen = salen = qipl = ipl = pl = ppl = qisl = isl = psl = 0;
 
     DPUTS(!line, "BUG: add_match_data() without cline");
 
@@ -4369,10 +4357,10 @@ docompletion(char *s, int lst, int incmd)
 	    invalidatelist();
 
 	/* Print the explanation strings if needed. */
-	if (!showinglist && validlist && nmatches != 1) {
+	if (!showinglist && validlist && usemenu != 2 && nmatches != 1) {
 	    Cmgroup g = amatches;
 	    Cexpl *e;
-	    int up = 0, tr = 1;
+	    int up = 0, tr = 1, nn = 0;
 
 	    if (!nmatches)
 		feep();
@@ -4385,7 +4373,12 @@ docompletion(char *s, int lst, int incmd)
 				trashzle();
 				tr = 0;
 			    }
+			    if (nn) {
+				up++;
+				putc('\n', shout);
+			    }
 			    up += printfmt((*e)->str, (*e)->count, 1);
+			    nn = 1;
 			}
 			e++;
 		    }
@@ -4915,6 +4908,9 @@ sep_comp_string(char *ss, char *s, int noffs, int rec)
     int ois = instring, oib = inbackt;
     char *tmp, *p, *ns, *ol = (char *) line, sav, oaq = autoq, *qp, *qs;
 
+    swb = swe = soffs = 0;
+    ns = NULL;
+
     /* Put the string in the lexer buffer and call the lexer to *
      * get the words we have to expand.                        */
     zleparse = 1;
@@ -4930,8 +4926,7 @@ sep_comp_string(char *ss, char *s, int noffs, int rec)
     inpush(dupstrspace(tmp), 0, NULL);
     line = (unsigned char *) tmp;
     ll = tl - 1;
-    strinbeg();
-    stophist = 2;
+    strinbeg(0);
     noaliases = 1;
     do {
 	ctxtlex();
@@ -4979,11 +4974,21 @@ sep_comp_string(char *ss, char *s, int noffs, int rec)
     ll = oll;
     if (cur < 0 || i < 1)
 	return 1;
+    owb = offs;
+    offs = soffs;
+    if ((p = check_param(ns, 0, 1))) {
+	for (p = ns; *p; p++)
+	    if (*p == Dnull)
+		*p = '"';
+	    else if (*p == Snull)
+		*p = '\'';
+    }
+    offs = owb;
     if (*ns == Snull || *ns == Dnull) {
 	instring = (*ns == Snull ? 1 : 2);
 	inbackt = 0;
 	swb++;
-	if (ns[strlen(ns) - 1] == *ns)
+	if (ns[strlen(ns) - 1] == *ns && ns[1])
 	    swe--;
 	autoq = (*ns == Snull ? '\'' : '"');
     } else {
@@ -5028,7 +5033,8 @@ sep_comp_string(char *ss, char *s, int noffs, int rec)
 	char **ow = clwords, *os = cmdstr, *oqp = qipre, *oqs = qisuf;
 	int olws = clwsize, olwn = clwnum, olwp = clwpos;
 	int obr = brange, oer = erange, oof = offs;
-	
+	unsigned long occ = ccont;
+
 	clwsize = clwnum = countlinknodes(foo);
 	clwords = (char **) zalloc((clwnum + 1) * sizeof(char *));
 	for (n = firstnode(foo), i = 0; n; incnode(n), i++) {
@@ -5043,7 +5049,9 @@ sep_comp_string(char *ss, char *s, int noffs, int rec)
 	qipre = qp;
 	qisuf = qs;
 	offs = soffs;
+	ccont = CC_CCCONT;
 	makecomplistcmd(ns, !clwpos, CFN_FIRST);
+	ccont = occ;
 	offs = oof;
 	zsfree(cmdstr);
 	cmdstr = os;
@@ -6341,7 +6349,7 @@ makecomplistflags(Compctl cc, char *s, int incmd, int compadd)
 	tmpbuf = (char *)zhalloc(strlen(cc->str) + 5);
 	sprintf(tmpbuf, "foo %s", cc->str); /* KLUDGE! */
 	inpush(tmpbuf, 0, NULL);
-	strinbeg();
+	strinbeg(0);
 	noaliases = 1;
 	do {
 	    ctxtlex();
@@ -6502,7 +6510,7 @@ makecomplistflags(Compctl cc, char *s, int incmd, int compadd)
 	int oldn = clwnum, oldp = clwpos;
 	unsigned long occ = ccont;
 	
-	ccont = 0;
+	ccont = CC_CCCONT;
 	
 	/* So we restrict the words-array. */
 	if (brange >= clwnum)
@@ -8099,14 +8107,13 @@ doexpandhist(void)
 	lexsave();
 	/* We push ol as it will remain unchanged */
 	inpush((char *) ol, 0, NULL);
-	strinbeg();
+	strinbeg(1);
 	noaliases = 1;
 	noerrs = 1;
 	exlast = inbufct;
 	do {
 	    ctxtlex();
 	} while (tok != ENDINPUT && tok != LEXERR);
-	stophist = 2;
 	while (!lexstop)
 	    hgetc();
 	/* We have to save errflags because it's reset in lexrestore. Since  *
@@ -8178,7 +8185,7 @@ getcurcmd(void)
 	metafy_line();
 	inpush(dupstrspace((char *) line), 0, NULL);
 	unmetafy_line();
-	strinbeg();
+	strinbeg(1);
 	pushheap();
 	do {
 	    curlincmd = incmdpos;

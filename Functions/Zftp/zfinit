@@ -1,3 +1,5 @@
+emulate -L zsh
+
 [[ $1 = -n ]] || zmodload -ia zftp
 
 alias zfcd='noglob zfcd'
@@ -5,6 +7,11 @@ alias zfget='noglob zfget'
 alias zfls='noglob zfls'
 alias zfdir='noglob zfdir'
 alias zfuget='noglob zfuget'
+
+autoload -U zfanon zfautocheck zfcd zfcd_match zfcget zfclose zfcput
+autoload -U zfdir zfgcp zfget zfget_match zfgoto zfhere zfinit zfls
+autoload -U zfmark zfopen zfparams zfpcp zfput zfrglob zfrtime zfstat
+autoload -U zftp_chpwd zftp_progress zftype zfuget zfuput
 
 # only way of getting that noglob out of the way: this is unnecessary with
 # widget-based completion and can be commented out.
@@ -14,7 +21,7 @@ setopt completealiases
 # zftp completions: only use these if new-style completion is not
 # active.
 #
-if [[ ${#patcomps} -eq 0 || ${patcomps[(i)zf*]} -gt ${#patcomps} ]]; then
+if [[ ${#_patcomps} -eq 0 || ${_patcomps[(i)zf*]} -gt ${#_patcomps} ]]; then
   compctl -f -x 'p[1]' \
     -k '(open params user login type ascii binary mode put putat
     get getat append appendat ls dir local remote mkdir rmdir delete
@@ -25,4 +32,9 @@ if [[ ${#patcomps} -eq 0 || ${patcomps[(i)zf*]} -gt ${#patcomps} ]]; then
   compctl -K zfcd_match -S/ -q zfcd zfdir zfls
   compctl -K zfget_match zfget zfgcp zfuget zfcget
   compctl -k hosts zfanon zfopen zfparams
+  compctl -s \
+    '$(awk '\''{print $1}'\'' ${ZFTP_BMFILE:-${ZDOTDIR:-$HOME}/.zfbkmarks})' \
+    -x 'W[1,-*n*]' \
+    -s '$(awk -F, '\''NR > 2 { print $1 }'\'' ~/.ncftp/bookmarks)' -- \
+    zfgoto zfmark
 fi

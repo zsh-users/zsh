@@ -1,4 +1,4 @@
-texinode(Zsh Line Editor)(Programmable Completion)(Shell Builtin Commands)(Top)
+texinode(Zsh Line Editor)(Programmable Completion Using compctl)(Shell Builtin Commands)(Top)
 chapter(Zsh Line Editor)
 cindex(line editor)
 cindex(editor, line)
@@ -83,7 +83,7 @@ simply to perform some small action.  The ZLE commands that key sequences
 in keymaps are bound to are in fact widgets.  Widgets can be user-defined
 or built in.
 
-There are 162 standard widgets built in to ZLE (see sectref(Standard Widgets)).
+There are 162 standard widgets built in to ZLE (see Standard Widgets below).
 Other built-in widgets can be defined by other modules (see
 ifzman(zmanref(zshmodules))\
 ifnzman(noderef(Zsh Modules))\
@@ -157,7 +157,7 @@ vindex(keys)
 item(tt(keys) (array))(
 The keys typed to invoke this widget, one element per
 key. Control-keys are reported with a leading `tt(^)', as in `tt(^A)',
-and meta-keys are repoted with a leading `tt(M-)', as in `tt(M-a)' and 
+and meta-keys are reported with a leading `tt(M-)', as in `tt(M-a)' and 
 `tt(M-^A)'.
 )
 vindex(NUMERIC)

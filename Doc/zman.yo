@@ -162,6 +162,12 @@ def(itemiz)(1)(\
 
 COMMENT(--- special effects ---)
 
+def(example)(1)(\
+  NOTRANS(.RS)NL()NOTRANS(.nf)NL()\
+  NOTRANS(\fB)ARG1NOTRANS(\fP)\
+  NL()NOTRANS(.fi)NL()NOTRANS(.RE)\
+)
+
 def(nofill)(1)(\
   NOTRANS(.nf)NL()\
   ARG1\
@@ -169,9 +175,9 @@ def(nofill)(1)(\
 )
 
 def(indent)(1)(\
-  NOTRANS(.RS)\
+  NOTRANS(.RS)NL()NOTRANS(.nf)NL()\
   ARG1\
-  NOTRANS(.RE)\
+  NL()NOTRANS(.fi)NL()NOTRANS(.RE)\
 )
 
 COMMENT(--- hyperlink menus ---)

@@ -3,7 +3,7 @@ sect(The compctl Module)
 The tt(compctl) module makes available several builtin commands. tt(compctl),
 is the standard way to control completions for ZLE.  See
 ifzman(zmanref(zshcompctl))\
-ifnzman(noderef(Programmable Completion))\
+ifnzman(noderef(Programmable Completion Using compctl))\
 .
 The other builtin commands can be used in user-defined completion widgets,
 see

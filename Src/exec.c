@@ -139,8 +139,7 @@ parse_string(char *s)
 
     lexsave();
     inpush(s, 0, NULL);
-    strinbeg();
-    stophist = 2;
+    strinbeg(0);
     l = parse_list();
     strinend();
     inpop();
@@ -298,12 +297,12 @@ static char list_pipe_text[JOBTEXTSIZE];
 
 /**/
 static int
-execcursh(Cmd cmd)
+execcursh(Cmd cmd, LinkList args, int flags)
 {
     if (!list_pipe)
 	deletejob(jobtab + thisjob);
-    execlist(cmd->u.list, 1, cmd->flags & CFLAG_EXEC);
-    cmd->u.list = NULL;
+    execlist(cmd->u.list, 1, flags & CFLAG_EXEC);
+
     return lastval;
 }
 
@@ -718,7 +717,6 @@ execlist(List list, int dont_change_job, int exiting)
 	/* Reset donetrap:  this ensures that a trap is only *
 	 * called once for each sublist that fails.          */
 	donetrap = 0;
-	simplifyright(list);
 	slist = list->left;
 
 	/* Loop through code followed by &&, ||, or end of sublist. */
@@ -1009,11 +1007,13 @@ execpline2(Pline pline, int how, int input, int output, int last1)
     lineno = pline->left->lineno;
 
     if (pline_level == 1)
-	strcpy(list_pipe_text, getjobtext((void *) pline->left));
-    if (pline->type == END) {
+	if (!sfcontext)
+	    strcpy(list_pipe_text, getjobtext((void *) pline->left));
+	else
+	    list_pipe_text[0] = '\0';
+    if (pline->type == END)
 	execcmd(pline->left, input, output, how, last1 ? 1 : 2);
-	pline->left = NULL;
-    } else {
+    else {
 	int old_list_pipe = list_pipe;
 
 	mpipe(pipes);
@@ -1046,11 +1046,10 @@ execpline2(Pline pline, int how, int input, int output, int last1)
 		_exit(lastval);
 	    }
 	} else {
-	/* otherwise just do the pipeline normally. */
+	    /* otherwise just do the pipeline normally. */
 	    subsh_close = pipes[0];
 	    execcmd(pline->left, input, pipes[1], how, 0);
 	}
-	pline->left = NULL;
 	zclose(pipes[1]);
 	if (pline->right) {
 	    /* if another execpline() is invoked because the command is *
@@ -1102,13 +1101,17 @@ makecline(LinkList list)
 void
 untokenize(char *s)
 {
-    for (; *s; s++)
-	if (itok(*s)) {
-	    if (*s == Nularg)
-		chuck(s--);
-	    else
-		*s = ztokens[*s - Pound];
-	}
+    if (*s) {
+	char *p = s, c;
+
+	while ((c = *s++))
+	    if (itok(c)) {
+		if (c != Nularg)
+		    *p++ = ztokens[c - Pound];
+	    } else
+		*p++ = c;
+	*p = '\0';
+    }
 }
 
 /* Open a file for writing redicection */
@@ -1152,34 +1155,34 @@ clobber_open(struct redir *f)
 static void
 closemn(struct multio **mfds, int fd)
 {
-    struct multio *mn = mfds[fd];
-    char buf[TCBUFSIZE];
-    int len, i;
+    if (fd >= 0 && mfds[fd] && mfds[fd]->ct >= 2) {
+	struct multio *mn = mfds[fd];
+	char buf[TCBUFSIZE];
+	int len, i;
 
-    if (fd < 0 || !mfds[fd] || mfds[fd]->ct < 2)
-	return;
-    if (zfork()) {
-	for (i = 0; i < mn->ct; i++)
-	    zclose(mn->fds[i]);
-	zclose(mn->pipe);
-	mn->ct = 1;
-	mn->fds[0] = fd;
-	return;
-    }
-    /* pid == 0 */
-    closeallelse(mn);
-    if (mn->rflag) {
-	/* tee process */
-	while ((len = read(mn->pipe, buf, TCBUFSIZE)) > 0)
+	if (zfork()) {
 	    for (i = 0; i < mn->ct; i++)
-		write(mn->fds[i], buf, len);
-    } else {
-	/* cat process */
-	for (i = 0; i < mn->ct; i++)
-	    while ((len = read(mn->fds[i], buf, TCBUFSIZE)) > 0)
-		write(mn->pipe, buf, len);
+		zclose(mn->fds[i]);
+	    zclose(mn->pipe);
+	    mn->ct = 1;
+	    mn->fds[0] = fd;
+	    return;
+	}
+	/* pid == 0 */
+	closeallelse(mn);
+	if (mn->rflag) {
+	    /* tee process */
+	    while ((len = read(mn->pipe, buf, TCBUFSIZE)) > 0)
+		for (i = 0; i < mn->ct; i++)
+		    write(mn->fds[i], buf, len);
+	} else {
+	    /* cat process */
+	    for (i = 0; i < mn->ct; i++)
+		while ((len = read(mn->fds[i], buf, TCBUFSIZE)) > 0)
+		    write(mn->pipe, buf, len);
+	}
+	_exit(0);
     }
-    _exit(0);
 }
 
 /* close all the mnodes (failure) */
@@ -1273,9 +1276,10 @@ static void
 addvars(LinkList l, int export)
 {
     Varasg v;
+    LinkNode n;
     LinkList vl;
     int xtr;
-    char **arr, **ptr;
+    char **arr, **ptr, *name;
 
     xtr = isset(XTRACE);
     if (xtr && nonempty(l)) {
@@ -1283,26 +1287,30 @@ addvars(LinkList l, int export)
 	doneps4 = 1;
     }
 
-    while (nonempty(l)) {
-	v = (Varasg) ugetnode(l);
-	singsub(&v->name);
+    for (n = firstnode(l); n; incnode(n)) {
+	v = (Varasg) getdata(n);
+	name = dupstring(v->name);
+	singsub(&name);
 	if (errflag)
 	    return;
-	untokenize(v->name);
+	untokenize(name);
 	if (xtr)
-	    fprintf(stderr, "%s=", v->name);
+	    fprintf(stderr, "%s=", name);
 	if (v->type == PM_SCALAR) {
 	    vl = newlinklist();
-	    addlinknode(vl, v->str);
+	    addlinknode(vl, dupstring(v->str));
 	} else
-	    vl = v->arr;
-	prefork(vl, v->type == PM_SCALAR ? (PF_SINGLE|PF_ASSIGN) : PF_ASSIGN);
-	if (errflag)
-	    return;
-	if (isset(GLOBASSIGN) || v->type != PM_SCALAR)
-	    globlist(vl);
-	if (errflag)
-	    return;
+	    vl = listdup(v->arr);
+	if (vl) {
+	    prefork(vl, v->type == PM_SCALAR ? (PF_SINGLE|PF_ASSIGN) :
+		                               PF_ASSIGN);
+	    if (errflag)
+		return;
+	    if (isset(GLOBASSIGN) || v->type != PM_SCALAR)
+		globlist(vl);
+	    if (errflag)
+		return;
+	}
 	if (v->type == PM_SCALAR && (empty(vl) || !nextnode(firstnode(vl)))) {
 	    Param pm;
 	    char *val;
@@ -1319,7 +1327,7 @@ addvars(LinkList l, int export)
 	    if (export) {
 		if (export < 0) {
 		    /* We are going to fork so do not bother freeing this */
-		    pm = (Param) paramtab->removenode(paramtab, v->name);
+		    pm = (Param) paramtab->removenode(paramtab, name);
 		    if (isset(RESTRICTED) && (pm->flags & PM_RESTRICTED)) {
 			zerr("%s: restricted", pm->nam, 0);
 			zsfree(val);
@@ -1328,18 +1336,22 @@ addvars(LinkList l, int export)
 		}
 		allexp = opts[ALLEXPORT];
 		opts[ALLEXPORT] = 1;
-		pm = setsparam(v->name, val);
+		pm = setsparam(name, val);
 		opts[ALLEXPORT] = allexp;
 	    } else
-		pm = setsparam(v->name, val);
+		pm = setsparam(name, val);
 	    if (errflag)
 		return;
 	    continue;
 	}
-	ptr = arr = (char **) zalloc(sizeof(char **) * (countlinknodes(vl) + 1));
+	if (vl) {
+	    ptr = arr = (char **) zalloc(sizeof(char **) *
+					 (countlinknodes(vl) + 1));
 
-	while (nonempty(vl))
-	    *ptr++ = ztrdup((char *) ugetnode(vl));
+	    while (nonempty(vl))
+		*ptr++ = ztrdup((char *) ugetnode(vl));
+	} else
+	    ptr = arr = (char **) zalloc(sizeof(char **));
 
 	*ptr = NULL;
 	if (xtr) {
@@ -1348,7 +1360,7 @@ addvars(LinkList l, int export)
 		fprintf(stderr, "%s ", *ptr);
 	    fprintf(stderr, ") ");
 	}
-	setaparam(v->name, arr);
+	setaparam(name, arr);
 	if (errflag)
 	    return;
     }
@@ -1364,15 +1376,19 @@ execcmd(Cmd cmd, int input, int output, int how, int last1)
     struct multio *mfds[10];
     char *text;
     int save[10];
-    int fil, dfil, is_cursh, type, i;
+    int fil, dfil, is_cursh, type, flags, i;
     int nullexec = 0, assign = 0, forked = 0;
     int is_shfunc = 0, is_builtin = 0, is_exec = 0;
     /* Various flags to the command. */
     int cflags = 0, checked = 0;
+    LinkList vars, redir;
 
     doneps4 = 0;
-    args = cmd->args;
+    args = listdup(cmd->args);
     type = cmd->type;
+    flags = cmd->flags;
+    redir = dupheaplist(cmd->redir);
+    vars = cmd->vars;
 
     for (i = 0; i < 10; i++) {
 	save[i] = -2;
@@ -1381,7 +1397,7 @@ execcmd(Cmd cmd, int input, int output, int how, int last1)
 
     /* If the command begins with `%', then assume it is a *
      * reference to a job in the job table.                */
-    if (type == SIMPLE && nonempty(args) &&
+    if (type == SIMPLE && args && nonempty(args) &&
 	*(char *)peekfirst(args) == '%') {
 	pushnode(args, dupstring((how & Z_DISOWN)
 				 ? "disown" : (how & Z_ASYNC) ? "bg" : "fg"));
@@ -1393,7 +1409,8 @@ execcmd(Cmd cmd, int input, int output, int how, int last1)
      * job currently in the job table.  If it does, then we treat it *
      * as a command to resume this job.                              */
     if (isset(AUTORESUME) && type == SIMPLE && (how & Z_SYNC) &&
-	nonempty(args) && empty(cmd->redir) && !input &&
+	args && nonempty(args) &&
+	(!cmd->redir || empty(cmd->redir)) && !input &&
 	!nextnode(firstnode(args))) {
 	if (unset(NOTIFY))
 	    scanjobs();
@@ -1407,7 +1424,7 @@ execcmd(Cmd cmd, int input, int output, int how, int last1)
      * only works in simple cases.  has_token() is called to make sure   *
      * this really is a simple case.                                     */
     if (type == SIMPLE) {
-	while (nonempty(args)) {
+	while (args && nonempty(args)) {
 	    char *cmdarg = (char *) peekfirst(args);
 	    checked = !has_token(cmdarg);
 	    if (!checked)
@@ -1444,7 +1461,8 @@ execcmd(Cmd cmd, int input, int output, int how, int last1)
     }
 
     /* Do prefork substitutions */
-    prefork(args, (assign || isset(MAGICEQUALSUBST)) ? PF_TYPESET : 0);
+    if (args)
+	prefork(args, (assign || isset(MAGICEQUALSUBST)) ? PF_TYPESET : 0);
 
     if (type == SIMPLE) {
 	int unglobbed = 0;
@@ -1453,7 +1471,7 @@ execcmd(Cmd cmd, int input, int output, int how, int last1)
 	    char *cmdarg;
 
 	    if (!(cflags & BINF_NOGLOB))
-		while (!checked && !errflag && nonempty(args) &&
+		while (!checked && !errflag && args && nonempty(args) &&
 		       has_token((char *) peekfirst(args)))
 		    glob(args, firstnode(args));
 	    else if (!unglobbed) {
@@ -1465,12 +1483,12 @@ execcmd(Cmd cmd, int input, int output, int how, int last1)
 	    /* Current shell should not fork unless the *
 	     * exec occurs at the end of a pipeline.    */
 	    if ((cflags & BINF_EXEC) && last1 == 2)
-		cmd->flags |= CFLAG_EXEC;
+		flags |= CFLAG_EXEC;
 
 	    /* Empty command */
-	    if (empty(args)) {
-		if (nonempty(cmd->redir)) {
-		    if (cmd->flags & CFLAG_EXEC) {
+	    if (!args || empty(args)) {
+		if (redir && nonempty(redir)) {
+		    if (flags & CFLAG_EXEC) {
 			/* Was this "exec < foobar"? */
 			nullexec = 1;
 			break;
@@ -1480,17 +1498,23 @@ execcmd(Cmd cmd, int input, int output, int how, int last1)
 			errflag = lastval = 1;
 			return;
 		    } else if (readnullcmd && *readnullcmd &&
-			       ((Redir) peekfirst(cmd->redir))->type == READ &&
-			       !nextnode(firstnode(cmd->redir))) {
+			       ((Redir) peekfirst(redir))->type == READ &&
+			       !nextnode(firstnode(redir))) {
+			if (!args)
+			    args = newlinklist();
 			addlinknode(args, dupstring(readnullcmd));
-		    } else
+		    } else {
+			if (!args)
+			    args = newlinklist();
 			addlinknode(args, dupstring(nullcmd));
+		    }
 		} else if ((cflags & BINF_PREFIX) && (cflags & BINF_COMMAND)) {
 		    lastval = 0;
 		    return;
 		} else {
 		    cmdoutval = 0;
-		    addvars(cmd->vars, 0);
+		    if (vars)
+			addvars(vars, 0);
 		    if (errflag)
 			lastval = errflag;
 		    else
@@ -1502,7 +1526,7 @@ execcmd(Cmd cmd, int input, int output, int how, int last1)
 		    return;
 		}
 	    } else if (isset(RESTRICTED) && (cflags & BINF_EXEC) &&
-		       (cmd->flags & CFLAG_EXEC)) {
+		       (flags & CFLAG_EXEC)) {
 		zerrnam("exec", "%s: restricted", (char *) getdata(firstnode(args)), 0);
 		lastval = 1;
 		return;
@@ -1548,22 +1572,32 @@ execcmd(Cmd cmd, int input, int output, int how, int last1)
     }
 
     /* Get the text associated with this command. */
-    if (jobbing || (how & Z_TIMED))
+    if (!sfcontext && (jobbing || (how & Z_TIMED)))
 	text = getjobtext((void *) cmd);
     else
 	text = NULL;
 
     /* Set up special parameter $_ */
-    zsfree(underscore);
-    if (nonempty(args)
-	&& (underscore = ztrdup((char *) getdata(lastnode(args)))))
-	untokenize(underscore); 
-    else
-  	underscore = ztrdup("");
+    if (args && nonempty(args)) {
+	char *u = (char *) getdata(lastnode(args));
+
+	if (u) {
+	    int ul = strlen(u);
+
+	    if (ul >= underscorelen) {
+		zfree(underscore, underscorelen);
+		underscore = (char *) zalloc(underscorelen = ul + 32);
+	    }
+	    strcpy(underscore, u);
+	} else
+	    *underscore = '\0';
+    } else
+	*underscore = '\0';
 
     /* Warn about "rm *" */
     if (type == SIMPLE && interact && unset(RMSTARSILENT)
-	&& isset(SHINSTDIN) && nonempty(args) && nextnode(firstnode(args))
+	&& isset(SHINSTDIN) && args && nonempty(args)
+	&& nextnode(firstnode(args))
 	&& !strcmp(peekfirst(args), "rm")) {
 	LinkNode node, next;
 
@@ -1596,11 +1630,11 @@ execcmd(Cmd cmd, int input, int output, int how, int last1)
     if (type == SIMPLE && !nullexec) {
 	char *s;
 	char trycd = (isset(AUTOCD) && isset(SHINSTDIN)
-		      && empty(cmd->redir) && !empty(args)
+		      && (!redir || empty(redir)) && args && !empty(args)
 		      && !nextnode(firstnode(args))
 		      && *(char *)peekfirst(args));
 
-	DPUTS(empty(args), "BUG: empty(args) in exec.c");
+	DPUTS((!args || empty(args)), "BUG: empty(args) in exec.c");
 	if (!hn) {
 	    /* Resolve external commands */
 	    char *cmdarg = (char *) peekfirst(args);
@@ -1652,7 +1686,7 @@ execcmd(Cmd cmd, int input, int output, int how, int last1)
      * current shell.                                                         *
      **************************************************************************/
 
-    if ((how & Z_ASYNC) || (!(cmd->flags & CFLAG_EXEC) &&
+    if ((how & Z_ASYNC) || (!(flags & CFLAG_EXEC) &&
        (((is_builtin || is_shfunc) && output) ||
        (!is_cursh && (last1 != 1 || sigtrapped[SIGZERR] ||
         sigtrapped[SIGEXIT] || havefiles()))))) {
@@ -1677,10 +1711,13 @@ execcmd(Cmd cmd, int input, int output, int how, int last1)
 #endif
 	    if (how & Z_ASYNC) {
 		lastpid = (zlong) pid;
-	    } else if (!jobtab[thisjob].stty_in_env && nonempty(cmd->vars)) {
+	    } else if (!jobtab[thisjob].stty_in_env &&
+		       vars && nonempty(vars)) {
 		/* search for STTY=... */
-		while (nonempty(cmd->vars))
-		    if (!strcmp(((Varasg) ugetnode(cmd->vars))->name, "STTY")) {
+		LinkNode n;
+
+		for (n = firstnode(vars); n; incnode(n))
+		    if (!strcmp(((Varasg) getdata(n))->name, "STTY")) {
 			jobtab[thisjob].stty_in_env = 1;
 			break;
 		    }
@@ -1713,7 +1750,7 @@ execcmd(Cmd cmd, int input, int output, int how, int last1)
 	is_exec = 1;
     }
 
-    if (!(cflags & BINF_NOGLOB))
+    if (args && !(cflags & BINF_NOGLOB))
 	globlist(args);
     if (errflag) {
 	lastval = 1;
@@ -1727,11 +1764,12 @@ execcmd(Cmd cmd, int input, int output, int how, int last1)
 	addfd(forked, save, mfds, 1, output, 1);
 
     /* Do process substitutions */
-    spawnpipes(cmd->redir);
+    if (redir)
+	spawnpipes(redir);
 
     /* Do io redirections */
-    while (nonempty(cmd->redir)) {
-	fn = (Redir) ugetnode(cmd->redir);
+    while (redir && nonempty(redir)) {
+	fn = (Redir) ugetnode(redir);
 	DPUTS(fn->type == HEREDOC || fn->type == HEREDOCDASH,
 	      "BUG: unexpanded here document");
 	if (fn->type == INPIPE) {
@@ -1749,7 +1787,7 @@ execcmd(Cmd cmd, int input, int output, int how, int last1)
 	    }
 	    addfd(forked, save, mfds, fn->fd1, fn->fd2, 1);
 	} else {
-	    if (fn->type != HERESTR && xpandredir(fn, cmd->redir))
+	    if (fn->type != HERESTR && xpandredir(fn, redir))
 		continue;
 	    if (errflag) {
 		closemnodes(mfds);
@@ -1870,15 +1908,15 @@ execcmd(Cmd cmd, int input, int output, int how, int last1)
 	if (is_exec)
 	    entersubsh(how, type != SUBSH ? 2 : 1, 1);
 	if (type >= CURSH) {
-	    static int (*func[]) _((Cmd)) = {
+	    static int (*func[]) _((Cmd, LinkList, int)) = {
 		execcursh, exectime, execfuncdef, execfor, execwhile,
 		execrepeat, execif, execcase, execselect, execcond,
 		execarith, execautofn
 	    };
 
 	    if (last1 == 1)
-		cmd->flags |= CFLAG_EXEC;
-	    lastval = (func[type - CURSH]) (cmd);
+		flags |= CFLAG_EXEC;
+	    lastval = (func[type - CURSH]) (cmd, args, flags);
 	} else if (is_builtin || is_shfunc) {
 	    LinkList restorelist = 0, removelist = 0;
 	    /* builtin or shell function */
@@ -1889,11 +1927,11 @@ execcmd(Cmd cmd, int input, int output, int how, int last1)
 			     !(hn->flags & BINF_PSPECIAL))))
 		save_params(cmd, &restorelist, &removelist);
 
-	    if (cmd->vars) {
+	    if (vars) {
 		/* Export this if the command is a shell function,
 		 * but not if it's a builtin.
 		 */
-		addvars(cmd->vars, is_shfunc);
+		addvars(vars, is_shfunc);
 		if (errflag) {
 		    restore_params(restorelist, removelist);
 		    lastval = 1;
@@ -1904,6 +1942,7 @@ execcmd(Cmd cmd, int input, int output, int how, int last1)
 
 	    if (is_shfunc) {
 		/* It's a shell function */
+
 #ifdef PATH_DEV_FD
 		int i;
 
@@ -1914,7 +1953,7 @@ execcmd(Cmd cmd, int input, int output, int how, int last1)
 		if (subsh_close >= 0)
 		    zclose(subsh_close);
 		subsh_close = -1;
-		execshfunc(cmd, (Shfunc) hn);
+		execshfunc(cmd, (Shfunc) hn, args);
 #ifdef PATH_DEV_FD
 		for (i = 10; i <= max_zsh_fd; i++)
 		    if (fdtable[i] > 1)
@@ -1943,7 +1982,7 @@ execcmd(Cmd cmd, int input, int output, int how, int last1)
 		    clearerr(stdout);
 	    }
 
-	    if (cmd->flags & CFLAG_EXEC) {
+	    if (flags & CFLAG_EXEC) {
 		if (subsh)
 		    _exit(lastval);
 
@@ -1957,7 +1996,7 @@ execcmd(Cmd cmd, int input, int output, int how, int last1)
 	    restore_params(restorelist, removelist);
 
 	} else {
-	    if (cmd->flags & CFLAG_EXEC) {
+	    if (flags & CFLAG_EXEC) {
 		setiparam("SHLVL", --shlvl);
 		/* If we are exec'ing a command, and we are not *
 		 * in a subshell, then save the history file.   */
@@ -1965,8 +2004,8 @@ execcmd(Cmd cmd, int input, int output, int how, int last1)
 		    savehistfile(NULL, 1, HFILE_USE_OPTIONS);
 	    }
 	    if (type == SIMPLE) {
-		if (cmd->vars) {
-		    addvars(cmd->vars, -1);
+		if (vars) {
+		    addvars(vars, -1);
 		    if (errflag)
 			_exit(1);
 		}
@@ -1981,7 +2020,7 @@ execcmd(Cmd cmd, int input, int output, int how, int last1)
 #endif
 		execute((Cmdnam) hn, cflags & BINF_DASH);
 	    } else {		/* ( ... ) */
-		DPUTS(cmd->vars && nonempty(cmd->vars),
+		DPUTS(vars && nonempty(vars),
 		      "BUG: assigment before complex command");
 		list_pipe = 0;
 		if (subsh_close >= 0)
@@ -2011,7 +2050,11 @@ save_params(Cmd cmd, LinkList *restore_p, LinkList *remove_p)
     char *s;
 
     MUSTUSEHEAP("save_params()");
-
+    
+    if (!cmd->vars) {
+	*restore_p = *remove_p = NULL;
+	return;
+    }
     *restore_p = newlinklist();
     *remove_p = newlinklist();
 
@@ -2283,8 +2326,9 @@ getoutput(char *cmd, int qt)
 	return NULL;
     if (list != &dummy_list && !list->right && !list->left->flags &&
 	list->left->type == END && list->left->left->type == END &&
-	(c = list->left->left->left)->type == SIMPLE && empty(c->args) &&
-	empty(c->vars) && nonempty(c->redir) &&
+	(c = list->left->left->left)->type == SIMPLE && 
+	(!c->args || empty(c->args)) &&
+	(!c->vars || empty(c->vars)) && c->redir && nonempty(c->redir) &&
 	!nextnode(firstnode(c->redir)) &&
 	(r = (Redir) getdata(firstnode(c->redir)))->fd1 == 0 &&
 	r->type == READ) {
@@ -2613,7 +2657,7 @@ extern int tracingcond;
 
 /**/
 static int
-execcond(Cmd cmd)
+execcond(Cmd cmd, LinkList args, int flags)
 {
     int stat;
     if (isset(XTRACE)) {
@@ -2633,18 +2677,19 @@ execcond(Cmd cmd)
 
 /**/
 static int
-execarith(Cmd cmd)
+execarith(Cmd cmd, LinkList args, int flags)
 {
     char *e;
     zlong val = 0;
 
     if (isset(XTRACE))
 	fprintf(stderr, "%s((", prompt4 ? prompt4 : "");
-    while ((e = (char *) ugetnode(cmd->args))) {
-	if (isset(XTRACE))
-	    fprintf(stderr, " %s", e);
-	val = matheval(e);
-    }
+    if (args)
+	while ((e = (char *) ugetnode(args))) {
+	    if (isset(XTRACE))
+		fprintf(stderr, " %s", e);
+	    val = matheval(e);
+	}
     if (isset(XTRACE)) {
 	fprintf(stderr, " ))\n");
 	fflush(stderr);
@@ -2657,7 +2702,7 @@ execarith(Cmd cmd)
 
 /**/
 static int
-exectime(Cmd cmd)
+exectime(Cmd cmd, LinkList args, int flags)
 {
     int jb;
 
@@ -2675,30 +2720,33 @@ exectime(Cmd cmd)
 
 /**/
 static int
-execfuncdef(Cmd cmd)
+execfuncdef(Cmd cmd, LinkList args, int flags)
 {
     Shfunc shf;
     char *s;
     int signum;
 
-    PERMALLOC {
-	while ((s = (char *) ugetnode(cmd->args))) {
-	    shf = (Shfunc) zalloc(sizeof *shf);
-	    shf->funcdef = (List) dupstruct(cmd->u.list);
-	    shf->flags = 0;
+    if (args) {
+	PERMALLOC {
+	    while ((s = (char *) ugetnode(args))) {
+		shf = (Shfunc) zalloc(sizeof *shf);
+		shf->funcdef = (List) dupstruct(cmd->u.list);
+		shf->flags = 0;
 
-	    /* is this shell function a signal trap? */
-	    if (!strncmp(s, "TRAP", 4) && (signum = getsignum(s + 4)) != -1) {
-		if (settrap(signum, shf->funcdef)) {
-		    freestruct(shf->funcdef);
-		    zfree(shf, sizeof *shf);
-		    LASTALLOC_RETURN 1;
-		}
-		sigtrapped[signum] |= ZSIG_FUNC;
-	    }
-	    shfunctab->addnode(shfunctab, ztrdup(s), shf);
-	}
-    } LASTALLOC;
+		/* is this shell function a signal trap? */
+		if (!strncmp(s, "TRAP", 4) &&
+		    (signum = getsignum(s + 4)) != -1) {
+		    if (settrap(signum, shf->funcdef)) {
+			freestruct(shf->funcdef);
+			zfree(shf, sizeof *shf);
+			LASTALLOC_RETURN 1;
+		    }
+		    sigtrapped[signum] |= ZSIG_FUNC;
+  		}
+		shfunctab->addnode(shfunctab, ztrdup(s), shf);
+  	    }
+	} LASTALLOC;
+    }
     if(isset(HISTNOFUNCTIONS))
 	remhist();
     return 0;
@@ -2708,7 +2756,7 @@ execfuncdef(Cmd cmd)
 
 /**/
 static void
-execshfunc(Cmd cmd, Shfunc shf)
+execshfunc(Cmd cmd, Shfunc shf, LinkList args)
 {
     LinkList last_file_list = NULL;
 
@@ -2726,16 +2774,17 @@ execshfunc(Cmd cmd, Shfunc shf)
     if (isset(XTRACE)) {
 	LinkNode lptr;
 	fprintf(stderr, "%s", prompt4 ? prompt4 : prompt4);
-	for (lptr = firstnode(cmd->args); lptr; incnode(lptr)) {
-	    if (lptr != firstnode(cmd->args))
-		fputc(' ', stderr);
-	    fprintf(stderr, "%s", (char *)getdata(lptr));
-	}
+	if (args)
+	    for (lptr = firstnode(args); lptr; incnode(lptr)) {
+		if (lptr != firstnode(args))
+		    fputc(' ', stderr);
+		fprintf(stderr, "%s", (char *)getdata(lptr));
+	    }
 	fputc('\n', stderr);
 	fflush(stderr);
     }
 
-    doshfunc(shf->nam, shf->funcdef, cmd->args, shf->flags, 0);
+    doshfunc(shf->nam, shf->funcdef, args, shf->flags, 0);
 
     if (!list_pipe)
 	deletefilelist(last_file_list);
@@ -2749,10 +2798,16 @@ execshfunc(Cmd cmd, Shfunc shf)
 
 /**/
 static int
-execautofn(Cmd cmd)
+execautofn(Cmd cmd, LinkList args, int flags)
 {
     Shfunc shf = cmd->u.autofn->shf;
-    List l = getfpfunc(shf->nam);
+    int noalias = noaliases;
+    List l;
+
+    noaliases = (shf->flags & PM_UNALIASED);
+    l = getfpfunc(shf->nam);
+    noaliases = noalias;
+
     if(l == &dummy_list) {
 	zerr("%s: function definition file not found", shf->nam, 0);
 	return 1;
@@ -2773,9 +2828,7 @@ execautofn(Cmd cmd)
 	} LASTALLOC;
 	shf->flags &= ~PM_UNDEFINED;
     }
-    HEAPALLOC {
-	execlist(dupstruct(shf->funcdef), 1, 0);
-    } LASTALLOC;
+    execlist(shf->funcdef, 1, 0);
     return lastval;
 }
 
@@ -2822,7 +2875,8 @@ doshfunc(char *name, List list, LinkList doshargs, int flags, int noreturnval)
 	    LinkNode node;
 
 	    node = doshargs->first;
-	    pparams = x = (char **) zcalloc(((sizeof *x) * (1 + countlinknodes(doshargs))));
+	    pparams = x = (char **) zcalloc(((sizeof *x) *
+					     (1 + countlinknodes(doshargs))));
 	    if (isset(FUNCTIONARGZERO)) {
 		oargv0 = argzero;
 		argzero = ztrdup((char *) node->dat);
@@ -2901,7 +2955,7 @@ void
 runshfunc(List list, FuncWrap wrap, char *name)
 {
     int cont;
-    char *ou;
+    VARARR(char, ou, underscorelen);
 
     while (wrap) {
 	wrap->module->wrapper++;
@@ -2917,11 +2971,9 @@ runshfunc(List list, FuncWrap wrap, char *name)
 	wrap = wrap->next;
     }
     startparamscope();
-    ou = underscore;
-    underscore = ztrdup(underscore);
-    execlist(dupstruct(list), 1, 0);
-    zsfree(underscore);
-    underscore = ou;
+    strcpy(ou, underscore);
+    execlist(list, 1, 0);
+    strcpy(underscore, ou);
     endparamscope();
 }
 
@@ -2949,20 +3001,18 @@ getfpfunc(char *s)
 	unmetafy(buf, NULL);
 	if (!access(buf, R_OK) && (fd = open(buf, O_RDONLY | O_NOCTTY)) != -1) {
 	    if ((len = lseek(fd, 0, 2)) != -1) {
+		d = (char *) zalloc(len + 1);
 		lseek(fd, 0, 0);
-		d = (char *) zcalloc(len + 1);
 		if (read(fd, d, len) == len) {
 		    close(fd);
+		    d[len] = '\0';
 		    d = metafy(d, len, META_REALLOC);
 		    HEAPALLOC {
 			r = parse_string(d);
 		    } LASTALLOC;
-		    zfree(d, len + 1);
 		    return r;
-		} else {
-		    zfree(d, len + 1);
+		} else
 		    close(fd);
-		}
 	    } else {
 		close(fd);
 	    }
@@ -2995,9 +3045,10 @@ stripkshdef(List l, char *name)
     if(p->right)
 	return l;
     c = p->left;
-    if(c->type != FUNCDEF || c->flags ||
-	nonempty(c->redir) || nonempty(c->vars) ||
-	empty(c->args) || lastnode(c->args) != firstnode(c->args) ||
+    if (c->type != FUNCDEF || c->flags ||
+	(c->redir && nonempty(c->redir)) || (c->vars && nonempty(c->vars)) ||
+	!c->args || empty(c->args) ||
+	lastnode(c->args) != firstnode(c->args) ||
 	strcmp(name, peekfirst(c->args)))
 	return l;
     return c->u.list;
@@ -3076,8 +3127,7 @@ execsave(void)
     es->trapreturn = trapreturn;
     es->noerrs = noerrs;
     es->subsh_close = subsh_close;
-    es->underscore = underscore;
-    underscore = ztrdup(underscore);
+    es->underscore = ztrdup(underscore);
     es->next = exstack;
     exstack = es;
     noerrs = cmdoutpid = 0;
@@ -3105,8 +3155,8 @@ execrestore(void)
     trapreturn = exstack->trapreturn;
     noerrs = exstack->noerrs;
     subsh_close = exstack->subsh_close;
-    zsfree(underscore);
-    underscore = exstack->underscore;
+    strcpy(underscore, exstack->underscore);
+    zsfree(exstack->underscore);
     en = exstack->next;
     free(exstack);
     exstack = en;

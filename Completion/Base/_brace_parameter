@@ -16,4 +16,6 @@ ls="$RBUFFER[${#SUFFIX}+1,-1]"
 n=${(M)#ls##\"#}
 q=${(M)lp%%\"#}
 
+[[ n -gt 0 ]] && suf=''
+
 _parameters -s "${q[1,-n-1]}" -S "$suf" -r '-:?#%+=[/'

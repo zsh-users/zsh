@@ -1,4 +1,181 @@
+1999-06-15  Peter Stephenson  <pws@ibmth.difi.unipi.it>
+
+	* Oliver: 6636: Completion/Builtins/_limits: wasn't working
+
+	* Bart: 6617 + minor changes: Src/utils.c: Be more careful keeping
+	  $COLUMNS and $LINES correct, particularly if exported.
+
+	* Sven: zsh-users/2388: Src/jobs.c:  while loops etc. in shells
+	  running without MONITOR were hard to kill.
+
+	* Bart: 6628: Src/params.c: setting slices of unset array
+	  caused a crash.
+
+1999-06-14  Peter Stephenson  <pws@ibmth.difi.unipi.it>
+
+	* pws: 6626: Src/mem.c: in zsh's malloc, try to make sure when
+	  sbrk'ing that it's sufficiently well aligned.
+
+	* Oliver: 6624: Completion/Builtins/_kill,
+	  Completion/Builtins/_wait: more widely functioning process
+	  handling
+
+	* pws: 6623: Completion/Makefile.in, Config/defs.mk.in,
+	  Functions/Makefile.in, INSTALL, Src/init.c, Src/zsh.mdd,
+	  configure.in: --enable-function-subdirs allows installation
+	  into subdirectories of the function directory and sets the
+	  initial $fpath appropriately.
+
+	* Oliver: 6620: Completion/Builtins/_jobs: handle disown, too.
+
+	* pws: 6618: Doc/Zsh/func.yo, Doc/Zsh/grammar.yo, Src/lex.c:
+	  with SH_GLOB set, function definition parentheses after the
+	  first word on the line allow spaces inside.
+
+	* Sven: 6614: Src/Zle/zle_tricky.c, Completion/Brace/_brace_parameter:
+	  completion after quotes in parameters
+	
+	* pws: 6610: Src/glob.c: globbing flags shouldn't be active
+	  without extendedglob.
+
+	* Bart: 6608: Doc/Zsh files compctl.yo, compsys.yo, compwid.yo,
+	  expn.yo, files.yo, mod_mapfile.yo, mod_zftp.yo, params.yo,
+	  zftpsys.yo, zle.yo: spelling corrections
+
+1999-06-12  Peter Stephenson  <pws@ibmth.difi.unipi.it>
+
+	* pws: 6601: Src/Makefile.in: don't remake Makemod just
+	  to clean up files
+
+	* pws: 6600: Doc/Zsh/arith.yo, Doc/Zsh/compctl.yo,
+	  Doc/Zsh/compsys.yo, Doc/Zsh/compwid.yo, Doc/Zsh/expn.yo,
+	  Doc/Zsh/guide.yo, Doc/Zsh/jobs.yo, Doc/Zsh/metafaq.yo,
+	  Doc/Zsh/mod_compctl.yo, Doc/Zsh/mod_zftp.yo, Doc/Zsh/params.yo,
+	  Doc/Zsh/redirect.yo, Doc/Zsh/zftpsys.yo, Doc/Zsh/zle.yo,
+	  Doc/zman.yo, Doc/ztexi.yo, Util/zsh-development-guide:
+	  Formatting of unfilled text now handled by three distinct
+	  macros example(), indent(), nofill(); compctl description node
+	  is now called `Programmable Completion Using compctl' to
+	  distinguish it from widget completion; don't put chapters on
+	  separate pages because many are too short.
+
+	* Wayne: 6599: Src/Zle/zle_tricky.c: unitialised variable warnings
+	  from gcc
+
+1999-06-11  Peter Stephenson  <pws@ibmth.difi.unipi.it>
+
+	* pws: 6598: Doc/Zsh/zftpsys.yo, Functions/Zftp/zfinit,
+	  Functions/Zftp/zfgoto, Functions/Zftp/zfmark,
+	  Functions/Zftp/zftp_chpwd, Completion/Builtins/_zftp:
+	  add zfmark and zfgoto implementing bookmarks (including use
+	  ncftp bookmarks) for zftp function suite; autoload functions
+	  from zfinit; patcomps -> _patcomps.
+
+	* pws: 6596: Doc/Zsh/arith.yo: update on size of integers and
+	  increase in clarity of presentation
+
+	* Sven: 6589: Completion/Core/_path_files: use :h and :t instead
+	  of pattern matching
+
+	* Sven: 6587, 6588: Src/Zle/zle_misc.c, Doc/Zsh/options.yo: < and
+	  > shouldn't remove a suffix, but | does
+
+	* Sven: 6586: Src/exec.c, Src/lex.c, Src/loop.c: don't modify
+	  struct cmd to insert cmd args and flags, always pass those
+	  separately
+
+1999-06-10  Peter Stephenson  <pws@ibmth.difi.unipi.it>
+
+	* Andrej: 6581: Doc/Makefile: dependencies for manuals
+
+	* Sven: 6579: Src/exec.c: old hack of storing shell function
+	  args in struct cmd doesn't work any more
+
+	* Sven: 6577: Src/exec.c, Src/text.c, Src/utils.c: expunge
+	  simplifyright(), which appears no longer to have an effect
+	
+	* pws: 6575: Doc/Zsh/mod_mapfile.yo: avoid mapping long files
+
+	* pws: 6571: Src/Builtins/rlimits.c: use appropriate printf()
+	  routine in printulimit() instead of just casting to long
+
+	* pws: 6570: configure.in, INSTALL: some systems have
+	  sizeof(off_t) or sizeof(ino_t) == 8 and sizeof(long) == 4 even
+	  without explicit enabling, so check and if so use the
+	  --enable-lfs code.
+
+	* pws/Sven: 6567, 6568: Completion/Base/_vars: complete assoc
+	  array keys
+
+	* pws: 6566: Src/params.c: junk testhash assoc array
+
+	* pws: 6563: sporadic: minor changes affecting casts, sizes
+	  of integers, unused variables; add index for subscripts in
+	  manual
+
+	* Bart: email: Src/zsh.h: alternative definition for zulong
+
+	* Bart: 6558: Src/builtins.c: printing functions with the
+	  UNALIASED flag
+
+	* Sven: 6557: Doc/zsh/compsys.yo: a few typos
+
+1999-06-09  Peter Stephenson  <pws@ibmth.difi.unipi.it>
+
+	* Andrej: 6556: aczsh.m4: don't disable setting variables
+	  for --enable-lfs just because some other variables were set
+
+	* Sven: 6554: Src/Zle/zle_tricky.c: display bugs with compadd -X:
+	  newline missing and display unnecessarily altered
+
+	* pws: 6552: configure.in, aczsh.m4, acconfig.h, Src/zsh.h:
+	  define separate unsigned 64-bit integer; try __int64_t and
+	  __uint64_t.
+
+	* Sven: 6548: Src/Zle/zle_tricky.c: fix `compctl -l'
+
+	* Andrej: 6544: configure displays info on function installation
+
+	* Sven: 6542: Src/builtin.c, Src/exec.c, Src/hist.c, Src/init.c,
+	  Src/lex.c: when not using interactive history, don't allocate
+	  history at all
+
+	* Andrej: 6541: configure.in: add missing `test'
+
+	* Sven: 6535: Completion/core/_normal: an eval was unnecessary
+
+	* Bart: 6534: Completion/Core/compdump, Completion/Core/compinit,
+	  Doc/Zsh/builtins.yo, Src/builtin.c, Src/exec.c, Src/zsh.h:
+	  autoload -U defines functions which don't use expand aliases
+	  during loading; used in new completion code to protect
+	  functions.
+
+	* Sven: 6527: Src/builtin.c, Src/cond.c, Src/exec.c, Src/glob.c,
+	  Src/hashtable.c, Src/init.c, Src/jobs.c, Src/lex.c,
+	  Src/linklist.c, Src/loop.c, Src/math.c, Src/mem.c, Src/params.c,
+	  Src/parse.c, Src/signals.c, Src/text.c, Src/utils.c, Src/zsh.h:
+	  various sets of patches:
+	  - make zhalloc() use a pointer to the first free heap
+	  - make zsh-mem allocators keep some memory back when freeing
+	  - reduce the amount of allocation work done in the exec.c
+	    execution hierarchy
+	  - don't duplicate execution trees any more than necessary, e.g.
+	    execute functions from stored tree
+	
+	* pws: Etc/MACHINES: Danek Duvall reports --enable-dynamic OK
+	  on Solaris 2.7, despite previous reports; Sven says on Digital
+	  UNIX 4.0, you need special DLLD and LDFLAGS.
+
 1999-06-08  Peter Stephenson  <pws@ibmth.difi.unipi.it>
+
+	* pws: 6525: Src/lex.c (gettokstr): allow parentheses after
+	  first character in command word
+
+	* Tanaka Akira: 6522: configure.in: help string for --enable-fndir
+	  had wrong default directory
+
+	* pws: 6520: configure.in: --enable-fndir might be yes,
+	  so turn it into ${datadir}/zsh/functions
 
 	* 3.1.5-pws-21 made available
 
@@ -38,7 +215,7 @@
 	  `compctl -h' takes a command line from inside a quoted string;
 	  the compctl tests q[s], q[d], q[b] are true if we are in single,
 	  double, back quotes; compset -q tests quotes and splits the word,
-	  affecting $PREFIX, $SUFFX and setting $IQPREFIX, $IQSUFFIX for
+	  affecting $PREFIX, $SUFFIX and setting $IQPREFIX, $IQSUFFIX for
 	  the bits which will now be ignored.
 
 	* pws: 6490: Completion/Core/compinit: nounset workaround

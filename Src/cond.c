@@ -42,6 +42,7 @@ int
 evalcond(Cond c)
 {
     struct stat *st;
+    char *left, *right = NULL;
 
     switch (c->type) {
     case COND_NOT:
@@ -103,107 +104,109 @@ evalcond(Cond c)
 	    return 0;
 	}
     }
-    singsub((char **)&c->left);
-    untokenize(c->left);
+    left = dupstring((char *) c->left);
+    singsub(&left);
+    untokenize(left);
     if (c->right) {
-	singsub((char **)&c->right);
+	right = dupstring((char *) c->right);
+	singsub(&right);
 	if (c->type != COND_STREQ && c->type != COND_STRNEQ)
-	    untokenize(c->right);
+	    untokenize(right);
     }
 
     if (tracingcond) {
 	if (c->type < COND_MOD) {
-	    char *rt = (char *)c->right;
+	    char *rt = (char *)right;
 	    if (c->type == COND_STREQ || c->type == COND_STRNEQ) {
 		rt = dupstring(rt);
 		untokenize(rt);
 	    }
-	    fprintf(stderr, " %s %s %s", (char *)c->left, condstr[c->type],
+	    fprintf(stderr, " %s %s %s", (char *)left, condstr[c->type],
 		    rt);
 	} else
-	    fprintf(stderr, " -%c %s", c->type, (char *)c->left);
+	    fprintf(stderr, " -%c %s", c->type, (char *)left);
     }
 
     switch (c->type) {
     case COND_STREQ:
-	return matchpat(c->left, c->right);
+	return matchpat(left, right);
     case COND_STRNEQ:
-	return !matchpat(c->left, c->right);
+	return !matchpat(left, right);
     case COND_STRLT:
-	return strcmp(c->left, c->right) < 0;
+	return strcmp(left, right) < 0;
     case COND_STRGTR:
-	return strcmp(c->left, c->right) > 0;
+	return strcmp(left, right) > 0;
     case 'e':
     case 'a':
-	return (doaccess(c->left, F_OK));
+	return (doaccess(left, F_OK));
     case 'b':
-	return (S_ISBLK(dostat(c->left)));
+	return (S_ISBLK(dostat(left)));
     case 'c':
-	return (S_ISCHR(dostat(c->left)));
+	return (S_ISCHR(dostat(left)));
     case 'd':
-	return (S_ISDIR(dostat(c->left)));
+	return (S_ISDIR(dostat(left)));
     case 'f':
-	return (S_ISREG(dostat(c->left)));
+	return (S_ISREG(dostat(left)));
     case 'g':
-	return (!!(dostat(c->left) & S_ISGID));
+	return (!!(dostat(left) & S_ISGID));
     case 'k':
-	return (!!(dostat(c->left) & S_ISVTX));
+	return (!!(dostat(left) & S_ISVTX));
     case 'n':
-	return (!!strlen(c->left));
+	return (!!strlen(left));
     case 'o':
-	return (optison(c->left));
+	return (optison(left));
     case 'p':
-	return (S_ISFIFO(dostat(c->left)));
+	return (S_ISFIFO(dostat(left)));
     case 'r':
-	return (doaccess(c->left, R_OK));
+	return (doaccess(left, R_OK));
     case 's':
-	return ((st = getstat(c->left)) && !!(st->st_size));
+	return ((st = getstat(left)) && !!(st->st_size));
     case 'S':
-	return (S_ISSOCK(dostat(c->left)));
+	return (S_ISSOCK(dostat(left)));
     case 'u':
-	return (!!(dostat(c->left) & S_ISUID));
+	return (!!(dostat(left) & S_ISUID));
     case 'w':
-	return (doaccess(c->left, W_OK));
+	return (doaccess(left, W_OK));
     case 'x':
 	if (privasserted()) {
-	    mode_t mode = dostat(c->left);
+	    mode_t mode = dostat(left);
 	    return (mode & S_IXUGO) || S_ISDIR(mode);
 	}
-	return doaccess(c->left, X_OK);
+	return doaccess(left, X_OK);
     case 'z':
-	return (!strlen(c->left));
+	return (!strlen(left));
     case 'h':
     case 'L':
-	return (S_ISLNK(dolstat(c->left)));
+	return (S_ISLNK(dolstat(left)));
     case 'O':
-	return ((st = getstat(c->left)) && st->st_uid == geteuid());
+	return ((st = getstat(left)) && st->st_uid == geteuid());
     case 'G':
-	return ((st = getstat(c->left)) && st->st_gid == getegid());
+	return ((st = getstat(left)) && st->st_gid == getegid());
     case 'N':
-	return ((st = getstat(c->left)) && st->st_atime <= st->st_mtime);
+	return ((st = getstat(left)) && st->st_atime <= st->st_mtime);
     case 't':
-	return isatty(matheval(c->left));
+	return isatty(matheval(left));
     case COND_EQ:
-	return matheval(c->left) == matheval(c->right);
+	return matheval(left) == matheval(right);
     case COND_NE:
-	return matheval(c->left) != matheval(c->right);
+	return matheval(left) != matheval(right);
     case COND_LT:
-	return matheval(c->left) < matheval(c->right);
+	return matheval(left) < matheval(right);
     case COND_GT:
-	return matheval(c->left) > matheval(c->right);
+	return matheval(left) > matheval(right);
     case COND_LE:
-	return matheval(c->left) <= matheval(c->right);
+	return matheval(left) <= matheval(right);
     case COND_GE:
-	return matheval(c->left) >= matheval(c->right);
+	return matheval(left) >= matheval(right);
     case COND_NT:
     case COND_OT:
 	{
 	    time_t a;
 
-	    if (!(st = getstat(c->left)))
+	    if (!(st = getstat(left)))
 		return 0;
 	    a = st->st_mtime;
-	    if (!(st = getstat(c->right)))
+	    if (!(st = getstat(right)))
 		return 0;
 	    return (c->type == COND_NT) ? a > st->st_mtime : a < st->st_mtime;
 	}
@@ -212,11 +215,11 @@ evalcond(Cond c)
 	    dev_t d;
 	    ino_t i;
 
-	    if (!(st = getstat(c->left)))
+	    if (!(st = getstat(left)))
 		return 0;
 	    d = st->st_dev;
 	    i = st->st_ino;
-	    if (!(st = getstat(c->right)))
+	    if (!(st = getstat(right)))
 		return 0;
 	    return d == st->st_dev && i == st->st_ino;
 	}

@@ -194,7 +194,7 @@ compdef() {
     # and probably do autoloading.
 
     func="$1"
-    [[ -n "$autol" ]] && autoload "$func"
+    [[ -n "$autol" ]] && autoload -U "$func"
     shift
 
     case "$type" in
@@ -363,7 +363,7 @@ if [[ -z "$_i_done" ]]; then
 	fi
 	;;
       (\#autoload)
-	autoload ${_i_file:t}
+	autoload -U ${_i_file:t}
 	;;
       esac
     done

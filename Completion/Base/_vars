@@ -1,3 +1,20 @@
 #compdef getopts read unset vared
 
-compgen -v
+# This will handle completion of keys of associative arrays, e.g. at
+# `vared compconfig[<TAB>'.  However, in this version the [ must be
+# added by hand.
+
+if [[ $PREFIX = *\[* ]]; then
+  local var=${PREFIX%%\[*}
+  local elt="${PREFIX#*\]}${SUFFIX%\]}"
+  local addclose
+  compset -p $(( ${#var} + 1 ))
+  if ! compset -S \]; then
+    addclose=(-S ']')
+  fi
+  if [[ ${(tP)var} = assoc* ]]; then
+    compadd $addclose - ${(kP)var}
+  fi
+else
+  compgen -v
+fi

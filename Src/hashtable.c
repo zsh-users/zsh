@@ -880,7 +880,7 @@ printshfuncnode(HashNode hn, int printflags)
 	return;
     }
  
-    t = getpermtext((void *) dupstruct((void *) f->funcdef));
+    t = getpermtext((void *) f->funcdef);
     quotedzputs(f->nam, stdout);
     printf(" () {\n\t");
     zputs(t, stdout);
@@ -1327,7 +1327,7 @@ addhistnode(HashTable ht, char *nam, void *nodeptr)
 {
     HashNode oldnode = addhashnode2(ht, nam, nodeptr);
     Histent he = (Histent)nodeptr;
-    if (oldnode && oldnode != nodeptr) {
+    if (oldnode && oldnode != (HashNode)nodeptr) {
 	if (he->flags & HIST_MAKEUNIQUE
 	 || (he->flags & HIST_FOREIGN && (Histent)oldnode == he->up)) {
 	    he->flags |= HIST_DUP;

@@ -107,7 +107,7 @@ The shell evaluates each redirection in terms of the
 association at the time of evaluation.
 For example:
 
-nofill(... tt(1>)var(fname) tt(2>&1))
+indent(... tt(1>)var(fname) tt(2>&1))
 
 first associates file descriptor 1 with file var(fname).
 It then associates file descriptor 2 with the file associated with file
@@ -123,12 +123,12 @@ the shell opens the file descriptor as a pipe to a process that copies
 its input to all the specified outputs, similar to bf(tee),
 provided the tt(MULTIOS) option is set.  Thus:
 
-nofill(tt(date >foo >bar))
+example(date >foo >bar)
 
 writes the date to two files, named `tt(foo)' and `tt(bar)'.
 Note that a pipe is an implicit redirection; thus
 
-nofill(tt(date >foo | cat))
+example(date >foo | cat)
 
 writes the date to the file `tt(foo)', and also pipes it to cat.
 
@@ -136,14 +136,14 @@ If the tt(MULTIOS)
 option is set, the word after a redirection operator is also subjected
 to filename generation (globbing).  Thus
 
-nofill(tt(: > *))
+example(: > *)
 
 will truncate all files in the current directory,
 assuming there's at least one.  (Without the tt(MULTIOS)
 option, it would create an empty file called `tt(*)'.)
 Similarly, you can do
 
-nofill(tt(echo exit 0 >> *.sh))
+example(echo exit 0 >> *.sh)
 
 If the user tries to open a file descriptor for reading more than once,
 the shell opens the file descriptor as a pipe to a process that copies
@@ -151,17 +151,17 @@ all the specified inputs to its output in the order
 specified, similar to bf(cat),
 provided the tt(MULTIOS) option is set.  Thus
 
-nofill(tt(sort <foo <fubar))
+example(sort <foo <fubar)
 
 or even
 
-nofill(tt(sort <f{oo,ubar}))
+example(sort <f{oo,ubar})
 
 is equivalent to `tt(cat foo fubar | sort)'.
 
 Note that a pipe is an implicit redirection; thus
 
-nofill(tt(cat bar | sort <foo))
+example(cat bar | sort <foo)
 
 is equivalent to `tt(cat bar foo | sort)' (note the order of the inputs).
 
@@ -169,7 +169,7 @@ If the tt(MULTIOS) option is em(un)set,
 each redirection replaces the previous redirection for that file descriptor.
 However, all files redirected to are actually opened, so
 
-nofill(tt(echo foo > bar > baz))
+example(echo foo > bar > baz)
 
 when tt(MULTIOS) is unset will truncate bar, and write `tt(foo)' into baz.
 
@@ -178,6 +178,6 @@ and zero or more parameter assignments, but no command name,
 the command named in the shell variable tt(READNULLCMD) is assumed.
 (If tt(READNULLCMD) is empty or not set, `tt(cat)' is used.)  Thus
 
-nofill(tt(< file))
+example(< file)
 
 copies the contents of tt(file) to the standard output.

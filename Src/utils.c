@@ -853,61 +853,131 @@ int resetneeded;
 int winchanged;
 #endif
 
-/* check the size of the window and adjust if necessary. *
- * The value of from:					 *
- *   0: called from update_job or setupvals		 *
- *   1: called from the SIGWINCH handler		 *
- *   2: the user have just changed LINES manually	 *
- *   3: the user have just changed COLUMNS manually      */
-
-/**/
-void
-adjustwinsize(int from)
+static int
+adjustlines(int signalled)
 {
-    int oldcols = columns, oldrows = lines;
+    int oldlines = lines;
 
 #ifdef TIOCGWINSZ
-    static int userlines, usercols;
-
-    if (SHTTY == -1)
-	return;
-
-    if (from == 2)
-	userlines = lines > 0;
-    if (from == 3)
-	usercols = columns > 0;
-
-    if (!ioctl(SHTTY, TIOCGWINSZ, (char *)&shttyinfo.winsize)) {
-	if (!userlines || from == 1)
-	    lines = shttyinfo.winsize.ws_row;
-	if (!usercols || from == 1)
-	    columns = shttyinfo.winsize.ws_col;
-    }
-#endif   /* TIOCGWINSZ */
-
-    if (lines <= 0)
+    if (signalled || lines <= 0)
+	lines = shttyinfo.winsize.ws_row;
+    else
+	shttyinfo.winsize.ws_row = lines;
+#endif /* TIOCGWINSZ */
+    if (lines <= 0) {
+	DPUTS(signalled, "BUG: Impossible TIOCGWINSZ rows");
 	lines = tclines > 0 ? tclines : 24;
-    if (columns <= 0)
-	columns = tccolumns > 0 ? tccolumns : 80;
+    }
+
     if (lines > 2)
 	termflags &= ~TERM_SHORT;
     else
 	termflags |= TERM_SHORT;
+
+    return (lines != oldlines);
+}
+
+static int
+adjustcolumns(int signalled)
+{
+    int oldcolumns = columns;
+
+#ifdef TIOCGWINSZ
+    if (signalled || columns <= 0)
+	columns = shttyinfo.winsize.ws_col;
+    else
+	shttyinfo.winsize.ws_col = columns;
+#endif /* TIOCGWINSZ */
+    if (columns <= 0) {
+	DPUTS(signalled, "BUG: Impossible TIOCGWINSZ cols");
+	columns = tccolumns > 0 ? tccolumns : 80;
+    }
+
     if (columns > 2)
 	termflags &= ~TERM_NARROW;
     else
 	termflags |= TERM_NARROW;
 
+    return (columns != oldcolumns);
+}
+
+/* check the size of the window and adjust if necessary. *
+ * The value of from:					 *
+ *   0: called from update_job or setupvals		 *
+ *   1: called from the SIGWINCH handler		 *
+ *   2: called from the LINES parameter callback	 *
+ *   3: called from the COLUMNS parameter callback	 */
+
+/**/
+void
+adjustwinsize(int from)
+{
+    static int getwinsz = 1;
+    int ttyrows = shttyinfo.winsize.ws_row;
+    int ttycols = shttyinfo.winsize.ws_col;
+    int resetzle = 0;
+
+    if (getwinsz || from == 1) {
 #ifdef TIOCGWINSZ
-    if (interact && from >= 2) {
-	shttyinfo.winsize.ws_row = lines;
-	shttyinfo.winsize.ws_col = columns;
+	if (SHTTY == -1)
+	    return;
+	if (ioctl(SHTTY, TIOCGWINSZ, (char *)&shttyinfo.winsize) == 0) {
+	    resetzle = (ttyrows != shttyinfo.winsize.ws_row ||
+			ttycols != shttyinfo.winsize.ws_col);
+	    if (from == 0 && resetzle && ttyrows && ttycols)
+		from = 1; /* Signal missed while a job owned the tty? */
+	    ttyrows = shttyinfo.winsize.ws_row;
+	    ttycols = shttyinfo.winsize.ws_col;
+	} else {
+	    /* Set to unknown on failure */
+	    shttyinfo.winsize.ws_row = 0;
+	    shttyinfo.winsize.ws_col = 0;
+	    resetzle = 1;
+	}
+#else
+	resetzle = from == 1;
+#endif /* TIOCGWINSZ */
+    } /* else
+	 return; */
+
+    switch (from) {
+    case 0:
+    case 1:
+	getwinsz = 0;
+	/* Calling setiparam() here calls this function recursively, but  *
+	 * because we've already called adjustlines() and adjustcolumns() *
+	 * here, recursive calls are no-ops unless a signal intervenes.   *
+	 * The commented "else return;" above might be a safe shortcut,   *
+	 * but I'm concerned about what happens on race conditions; e.g., *
+	 * suppose the user resizes his xterm during `eval $(resize)'?    */
+	if (adjustlines(from) && zgetenv("LINES"))
+	    setiparam("LINES", lines);
+	if (adjustcolumns(from) && zgetenv("COLUMNS"))
+	    setiparam("COLUMNS", columns);
+	getwinsz = 1;
+	break;
+    case 2:
+	resetzle = adjustlines(0);
+	break;
+    case 3:
+	resetzle = adjustcolumns(0);
+	break;
+    }
+
+#ifdef TIOCGWINSZ
+    if (interact && from >= 2 &&
+	(shttyinfo.winsize.ws_row != ttyrows ||
+	 shttyinfo.winsize.ws_col != ttycols)) {
+	/* shttyinfo.winsize is already set up correctly */
 	ioctl(SHTTY, TIOCSWINSZ, (char *)&shttyinfo.winsize);
     }
-#endif
+#endif /* TIOCGWINSZ */
 
-    if (zleactive && (from >= 2 || oldcols != columns || oldrows != lines)) {
-	resetneeded = winchanged = 1;
+    if (zleactive && resetzle) {
+#ifdef TIOCGWINSZ
+	winchanged =
+#endif /* TIOCGWINSZ */
+	    resetneeded = 1;
 	zrefresh();
     }
 }
@@ -1733,13 +1803,12 @@ char *
 sepjoin(char **s, char *sep)
 {
     char *r, *p, **t;
-    int l, sl, elide = 0;
+    int l, sl;
     char sepbuf[3];
 
     if (!*s)
 	return "";
     if (!sep) {
-	elide = 1;
 	sep = sepbuf;
 	sepbuf[0] = *ifs;
 	sepbuf[1] = *ifs == Meta ? ifs[1] ^ 32 : '\0';
@@ -1853,329 +1922,21 @@ allocnode(int type)
 {
     struct node *n;
 
-    n = (struct node *) alloc(sizetab[type]);
+    n = (struct node *) ncalloc(sizetab[type]);
     memset((void *) n, 0, sizetab[type]);
     n->ntype = flagtab[type];
-    if (useheap)
-	n->ntype |= NT_HEAP;
 
     return (void *) n;
 }
+ 
+/* duplicate a syntax tree */
 
 /**/
 void *
 dupstruct(void *a)
 {
-    struct node *n, *r;
-
-    n = (struct node *) a;
-    if (!a || ((List) a) == &dummy_list)
-	return (void *) a;
-
-    if ((n->ntype & NT_HEAP) && !useheap) {
-	HEAPALLOC {
-	    n = (struct node *) dupstruct2((void *) n);
-	} LASTALLOC;
-	n = simplifystruct(n);
-    }
-    r = (struct node *)dupstruct2((void *) n);
-
-    if (!(n->ntype & NT_HEAP) && useheap)
-	r = expandstruct(r, N_LIST);
-
-    return (void *) r;
-}
-
-/**/
-static struct node *
-simplifystruct(struct node *n)
-{
-    if (!n || ((List) n) == &dummy_list)
-	return n;
-
-    switch (NT_TYPE(n->ntype)) {
-    case N_LIST:
-	{
-	    List l = (List) n;
-
-	    l->left = (Sublist) simplifystruct((struct node *)l->left);
-	    if ((l->type & Z_SYNC) && !l->right)
-		return (struct node *)l->left;
-	}
-	break;
-    case N_SUBLIST:
-	{
-	    Sublist sl = (Sublist) n;
-
-	    sl->left = (Pline) simplifystruct((struct node *)sl->left);
-	    if (sl->type == END && !sl->flags && !sl->right)
-		return (struct node *)sl->left;
-	}
-	break;
-    case N_PLINE:
-	{
-	    Pline pl = (Pline) n;
-
-	    pl->left = (Cmd) simplifystruct((struct node *)pl->left);
-	    if (pl->type == END && !pl->right)
-		return (struct node *)pl->left;
-	}
-	break;
-    case N_CMD:
-	{
-	    Cmd c = (Cmd) n;
-	    int i = 0;
-
-	    if (empty(c->args))
-		c->args = NULL, i++;
-	    if (empty(c->redir))
-		c->redir = NULL, i++;
-	    if (empty(c->vars))
-		c->vars = NULL, i++;
-
-	    c->u.list = (List) simplifystruct((struct node *)c->u.list);
-	    if (i == 3 && !c->flags &&
-		(c->type == CWHILE || c->type == CIF ||
-		 c->type == COND))
-		return (struct node *)c->u.list;
-	}
-	break;
-    case N_FOR:
-	{
-	    Forcmd f = (Forcmd) n;
-
-	    f->list = (List) simplifystruct((struct node *)f->list);
-	}
-	break;
-    case N_CASE:
-	{
-	    struct casecmd *c = (struct casecmd *)n;
-	    List *l;
-
-	    for (l = c->lists; *l; l++)
-		*l = (List) simplifystruct((struct node *)*l);
-	}
-	break;
-    case N_IF:
-	{
-	    struct ifcmd *i = (struct ifcmd *)n;
-	    List *l;
-
-	    for (l = i->ifls; *l; l++)
-		*l = (List) simplifystruct((struct node *)*l);
-	    for (l = i->thenls; *l; l++)
-		*l = (List) simplifystruct((struct node *)*l);
-	}
-	break;
-    case N_WHILE:
-	{
-	    struct whilecmd *w = (struct whilecmd *)n;
-
-	    w->cont = (List) simplifystruct((struct node *)w->cont);
-	    w->loop = (List) simplifystruct((struct node *)w->loop);
-	}
-    }
-
-    return n;
-}
-
-/**/
-struct node *
-expandstruct(struct node *n, int exp)
-{
-    struct node *m;
-
-    if (!n || ((List) n) == &dummy_list)
-	return n;
-
-    if (exp != N_COUNT && exp != NT_TYPE(n->ntype)) {
-	switch (exp) {
-	case N_LIST:
-	    {
-		List l;
-
-		m = (struct node *) allocnode(N_LIST);
-		l = (List) m;
-		l->type = Z_SYNC;
-		l->left = (Sublist) expandstruct(n, N_SUBLIST);
-
-		return (struct node *)l;
-	    }
-	case N_SUBLIST:
-	    {
-		Sublist sl;
-
-		m = (struct node *) allocnode(N_SUBLIST);
-		sl = (Sublist) m;
-		sl->type = END;
-		sl->left = (Pline) expandstruct(n, N_PLINE);
-
-		return (struct node *)sl;
-	    }
-	case N_PLINE:
-	    {
-		Pline pl;
-
-		m = (struct node *) allocnode(N_PLINE);
-		pl = (Pline) m;
-		pl->type = END;
-		pl->left = (Cmd) expandstruct(n, N_CMD);
-
-		return (struct node *)pl;
-	    }
-	case N_CMD:
-	    {
-		Cmd c;
-
-		m = (struct node *) allocnode(N_CMD);
-		c = (Cmd) m;
-		switch (NT_TYPE(n->ntype)) {
-		case N_WHILE:
-		    c->type = CWHILE;
-		    break;
-		case N_IF:
-		    c->type = CIF;
-		    break;
-		case N_COND:
-		    c->type = COND;
-		}
-		c->u.list = (List) expandstruct(n, NT_TYPE(n->ntype));
-		c->args = newlinklist();
-		c->vars = newlinklist();
-		c->redir = newlinklist();
-
-		return (struct node *)c;
-	    }
-	}
-    } else
-	switch (NT_TYPE(n->ntype)) {
-	case N_LIST:
-	    {
-		List l = (List) n;
-
-		l->left = (Sublist) expandstruct((struct node *)l->left,
-						 N_SUBLIST);
-		l->right = (List) expandstruct((struct node *)l->right,
-					       N_LIST);
-	    }
-	    break;
-	case N_SUBLIST:
-	    {
-		Sublist sl = (Sublist) n;
-
-		sl->left = (Pline) expandstruct((struct node *)sl->left,
-						N_PLINE);
-		sl->right = (Sublist) expandstruct((struct node *)sl->right,
-						   N_SUBLIST);
-	    }
-	    break;
-	case N_PLINE:
-	    {
-		Pline pl = (Pline) n;
-
-		pl->left = (Cmd) expandstruct((struct node *)pl->left,
-					      N_CMD);
-		pl->right = (Pline) expandstruct((struct node *)pl->right,
-						 N_PLINE);
-	    }
-	    break;
-	case N_CMD:
-	    {
-		Cmd c = (Cmd) n;
-
-		if (!c->args)
-		    c->args = newlinklist();
-		if (!c->vars)
-		    c->vars = newlinklist();
-		if (!c->redir)
-		    c->redir = newlinklist();
-
-		switch (c->type) {
-		case CFOR:
-		case CSELECT:
-		    c->u.list = (List) expandstruct((struct node *)c->u.list,
-						    N_FOR);
-		    break;
-		case CWHILE:
-		    c->u.list = (List) expandstruct((struct node *)c->u.list,
-						    N_WHILE);
-		    break;
-		case CIF:
-		    c->u.list = (List) expandstruct((struct node *)c->u.list,
-						    N_IF);
-		    break;
-		case CCASE:
-		    c->u.list = (List) expandstruct((struct node *)c->u.list,
-						    N_CASE);
-		    break;
-		case COND:
-		    c->u.list = (List) expandstruct((struct node *)c->u.list,
-						    N_COND);
-		    break;
-		case ZCTIME:
-		    c->u.list = (List) expandstruct((struct node *)c->u.list,
-						    N_SUBLIST);
-		    break;
-		case AUTOFN:
-		    c->u.list = (List) expandstruct((struct node *)c->u.list,
-						    N_AUTOFN);
-		    break;
-		default:
-		    c->u.list = (List) expandstruct((struct node *)c->u.list,
-						    N_LIST);
-		}
-	    }
-	    break;
-	case N_FOR:
-	    {
-		Forcmd f = (Forcmd) n;
-
-		f->list = (List) expandstruct((struct node *)f->list,
-					      N_LIST);
-	    }
-	    break;
-	case N_CASE:
-	    {
-		struct casecmd *c = (struct casecmd *)n;
-		List *l;
-
-		for (l = c->lists; *l; l++)
-		    *l = (List) expandstruct((struct node *)*l, N_LIST);
-	    }
-	    break;
-	case N_IF:
-	    {
-		struct ifcmd *i = (struct ifcmd *)n;
-		List *l;
-
-		for (l = i->ifls; *l; l++)
-		    *l = (List) expandstruct((struct node *)*l, N_LIST);
-		for (l = i->thenls; *l; l++)
-		    *l = (List) expandstruct((struct node *)*l, N_LIST);
-	    }
-	    break;
-	case N_WHILE:
-	    {
-		struct whilecmd *w = (struct whilecmd *)n;
-
-		w->cont = (List) expandstruct((struct node *)w->cont,
-					      N_LIST);
-		w->loop = (List) expandstruct((struct node *)w->loop,
-					      N_LIST);
-	    }
-	}
-
-    return n;
-}
-
-/* duplicate a syntax tree */
-
-/**/
-static void *
-dupstruct2(void *a)
-{
     void **onodes, **nnodes, *ret, *n, *on;
-    int type, heap;
+    int type;
     size_t nodeoffs;
 
     if (!a || ((List) a) == &dummy_list)
@@ -2183,53 +1944,33 @@ dupstruct2(void *a)
     type = *(int *)a;
     ret = alloc(sizetab[NT_TYPE(type)]);
     memcpy(ret, a, nodeoffs = offstab[NT_TYPE(type)]);
-    *(int*)ret = (type & ~NT_HEAP) | (useheap ? NT_HEAP : 0);
     onodes = (void **) ((char *)a + nodeoffs);
     nnodes = (void **) ((char *)ret + nodeoffs);
-    heap = type & NT_HEAP;
     for (type = (type & 0xffff00) >> 4; (type >>= 4); *nnodes++ = n) {
 	if (!(on = *onodes++))
 	    n = NULL;
 	else {
 	    switch (type & 0xf) {
 	    case NT_NODE:
-		n = dupstruct2(on);
+		n = dupstruct(on);
 		break;
 	    case NT_STR:
 		n = dupstring(on);
 		break;
 	    case NT_LIST | NT_NODE:
-		if (heap) {
-		    if (useheap)
-			n =  duplist(on, (VFunc) dupstruct2);
-		    else
-			n = list2arr(on, (VFunc) dupstruct2);
-		}
-		else if (useheap)
-		    n = arr2list(on, (VFunc) dupstruct2);
-		else
-		    n = duparray(on, (VFunc) dupstruct2);
+		n = duplist(on, (VFunc) dupstruct);
 		break;
 	    case NT_LIST | NT_STR:
-		if (heap) {
-		    if (useheap)
-			n = duplist(on, (VFunc) dupstring);
-		    else
-			n = list2arr(on, (VFunc) ztrdup);
-		}
-		else if (useheap)
-		    n = arr2list(on, (VFunc) dupstring);
-		else
-		    n = duparray(on, (VFunc) ztrdup);
+		n = duplist(on, (VFunc) (useheap ? dupstring : ztrdup));
 		break;
 	    case NT_NODE | NT_ARR:
-		n = duparray(on, (VFunc) dupstruct2);
+		n = duparray(on, (VFunc) dupstruct);
 		break;
 	    case NT_STR | NT_ARR:
 		n = duparray(on, (VFunc) (useheap ? dupstring : ztrdup));
 		break;
 	    default:
-		DPUTS(1, "BUG: bad node type in dupstruct2()");
+		DPUTS(1, "BUG: bad node type in dupstruct()");
 		abort();
 	    }
 	}
@@ -2237,19 +1978,46 @@ dupstruct2(void *a)
     return ret;
 }
 
-/* free a syntax tree */
+/* Free a syntax tree. Now, freestruct() only registers everything that
+ * has to be freed. Later, freestructs() will be called to do the real
+ * work. This is to avoid having functions that are currently executed
+ * free themselves by re-defining themselves. */
+
+static LinkList freeslist = NULL;
 
 /**/
 void
 freestruct(void *a)
 {
-    void **nodes, *n;
-    int type, size;
-
     if (!a || ((List) a) == &dummy_list)
 	return;
 
-    type = * (int *) a;
+    PERMALLOC {
+	if (!freeslist)
+	    freeslist = newlinklist();
+	addlinknode(freeslist, a);
+    } LASTALLOC;
+}
+
+/**/
+void
+freestructs(void)
+{
+    void *a;
+
+    if (freeslist)
+	while ((a = getlinknode(freeslist)))
+	    ifreestruct(a);
+}
+
+/**/
+static void
+ifreestruct(void *a)
+{
+    void **nodes, *n;
+    int type, size;
+
+    type = *(int *) a;
     nodes = (void **) ((char *)a + offstab[NT_TYPE(type)]);
     size = sizetab[NT_TYPE(type)];
     for (type = (type & 0xffff00) >> 4; (type >>= 4);) {
@@ -2262,6 +2030,8 @@ freestruct(void *a)
 		zsfree((char *) n);
 		break;
 	    case NT_LIST | NT_NODE:
+		freelinklist((LinkList) n, (FreeFunc) freestruct);
+		break;
 	    case NT_NODE | NT_ARR:
 	    {
 		void **p = (void **) n;
@@ -2272,6 +2042,8 @@ freestruct(void *a)
 		break;
 	    }
 	    case NT_LIST | NT_STR:
+		freelinklist((LinkList) n, (FreeFunc) zsfree);
+		break;
 	    case NT_STR | NT_ARR:
 		freearray((char **) n);
 		break;
@@ -2287,58 +2059,46 @@ freestruct(void *a)
 }
 
 /**/
+LinkList
+dupheaplist(LinkList l)
+{
+    if (!l)
+	return NULL;
+
+    return duplist(l, (VFunc) dupstruct);
+}
+
+/**/
 static LinkList
 duplist(LinkList l, VFunc func)
 {
-    LinkList ret;
-    LinkNode node;
+    if (l && nonempty(l)) {
+	LinkList ret;
+	LinkNode node;
 
-    ret = newlinklist();
-    for (node = firstnode(l); node; incnode(node))
-	addlinknode(ret, func(getdata(node)));
-    return ret;
+	ret = newlinklist();
+	for (node = firstnode(l); node; incnode(node))
+	    addlinknode(ret, func(getdata(node)));
+	return ret;
+    }
+    return NULL;
 }
 
 /**/
 char **
 duparray(char **arr, VFunc func)
 {
-    char **ret, **rr;
+    if (arr && *arr) {
+	char **ret, **rr, *p;
 
-    ret = (char **) alloc((arrlen(arr) + 1) * sizeof(char *));
-    for (rr = ret; *arr;)
-	*rr++ = (char *)func(*arr++);
-    *rr = NULL;
+	ret = (char **) alloc((arrlen(arr) + 1) * sizeof(char *));
+	for (rr = ret; (p = *arr++);)
+	    *rr++ = (char *)func(p);
+	*rr = NULL;
 
-    return ret;
-}
-
-/**/
-static char **
-list2arr(LinkList l, VFunc func)
-{
-    char **arr, **r;
-    LinkNode n;
-
-    arr = r = (char **) alloc((countlinknodes(l) + 1) * sizeof(char *));
-
-    for (n = firstnode(l); n; incnode(n))
-	*r++ = (char *)func(getdata(n));
-    *r = NULL;
-
-    return arr;
-}
-
-/**/
-static LinkList
-arr2list(char **arr, VFunc func)
-{
-    LinkList l = newlinklist();
-
-    while (*arr)
-	addlinknode(l, func(*arr++));
-
-    return l;
+	return ret;
+    }
+    return NULL;
 }
 
 /**/
@@ -2382,28 +2142,6 @@ equalsplit(char *s, char **t)
 	return 1;
     }
     return 0;
-}
-
-/* see if the right side of a list is trivial */
-
-/**/
-void
-simplifyright(List l)
-{
-    Cmd c;
-
-    if (l == &dummy_list || !l->right)
-	return;
-    if (l->right->right || l->right->left->right ||
-	l->right->left->flags || l->right->left->left->right ||
-	l->left->flags)
-	return;
-    c = l->left->left->left;
-    if (c->type != SIMPLE || nonempty(c->args) || nonempty(c->redir)
-	|| nonempty(c->vars))
-	return;
-    l->right = NULL;
-    return;
 }
 
 /* the ztypes table */
@@ -2468,6 +2206,25 @@ arrdup(char **s)
 
     while ((*x++ = dupstring(*s++)));
     return y;
+}
+
+/* Duplicate a list of strings. */
+
+/**/
+LinkList
+listdup(LinkList l)
+{
+    if (!l)
+	return NULL;
+    else {
+	LinkList r = newlinklist();
+	LinkNode n;
+
+	for (n = firstnode(l); n; incnode(n))
+	    addlinknode(r, dupstring((char *) getdata(n)));
+
+	return r;
+    }
 }
 
 /**/

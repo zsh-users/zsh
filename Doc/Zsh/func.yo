@@ -5,7 +5,8 @@ sect(Functions)
 )\
 cindex(functions)
 findex(function)
-The tt(function) reserved word is used to define shell functions.
+Shell functions are defined with the tt(function) reserved word or the
+special syntax `var(funcname) tt(())'.
 Shell functions are read in and stored internally.
 Alias names are resolved when the function is read.
 Functions are executed like commands with the arguments
