@@ -111,7 +111,7 @@ modifiers (see noderef(Modifiers)) may follow the final `tt(^)'.
 If the shell encounters the character sequence `tt(!")'
 in the input, the history mechanism is temporarily disabled until
 the current list (see
-ifzman(manref(zshmisc)(1))\
+ifzman(zmanref(zshmisc))\
 ifnzman(noderef(Shell Grammar))\
 ) is fully parsed.  The `tt(!")' is removed from the input, and any
 subsequent `tt(!)' characters have no special significance.

@@ -1,6 +1,6 @@
 2000-05-10  Tanaka Akira  <akr@zsh.org>
 
-	* 11309: Doc/Zsh/expn.yo: fix missing section.
+	* 11309, 11310: Doc/Zsh/expn.yo: fix missing section.
 
 2000-05-10  Bart Schaefer  <schaefer@zsh.org>
 
