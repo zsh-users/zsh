@@ -1304,9 +1304,10 @@ noderef(Functions)
 for a description of how autoloaded functions are searched).
 
 If there is at least one var(function) argument, the wordcode for all
-these functions will be put in the created wordcode var(file). Such
-files containing the code for multiple functions are intended to be
-used as elements of the tt(FPATH)/tt(fpath) special array.
+these functions will be put in the created wordcode var(file) (if that 
+name does not end in tt(.zwc), this extension is automatically
+appended). Such files containing the code for multiple functions are
+intended to be used as elements of the tt(FPATH)/tt(fpath) special array.
 
 If the tt(-U) option is given, aliases in the var(function)s will not
 be expanded. If the tt(-r) option is given, the function(s) in the

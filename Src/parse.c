@@ -2361,8 +2361,11 @@ build_dump(char *nam, char *dump, char **files, int ali, int map)
     LinkNode node;
     struct fdhead head;
     wordcode pre[FD_PRELEN];
-    char *file, **ofiles = files, **oofiles = files, *name, *tail;
+    char *file, **ofiles = files, **oofiles = files, *tail;
     Eprog prog;
+
+    if (!strsfx(FD_EXT, dump))
+	dump = dyncat(dump, FD_EXT);
 
     if ((dfd = open(dump, O_WRONLY|O_CREAT, 0600)) < 0) {
 	zerrnam(nam, "can't write dump file: %s", dump, 0);
@@ -2436,9 +2439,10 @@ build_dump(char *nam, char *dump, char **files, int ali, int map)
 	    head.strs = prog->strs - ((char *) prog->prog);
 	    head.hlen = (sizeof(struct fdhead) / sizeof(wordcode)) +
 		(strlen(*ofiles) + sizeof(wordcode)) / sizeof(wordcode);
-	    for (name = tail = *ofiles; *name; name++)
-		if (*name == '/')
-		    tail = name + 1;
+	    if ((tail = strrchr(*ofiles, '/')))
+		tail++;
+	    else
+		tail= *ofiles;
 	    head.tail = tail - *ofiles;
 	    if (other)
 		fdswap((Wordcode) &head, sizeof(head) / sizeof(wordcode));
@@ -2539,20 +2543,23 @@ load_dump_file(char *dump, int other, int len)
 Eprog
 try_dump_file(char *dump, char *name, char *func)
 {
+    char *file;
     int isrec = 0;
     Wordcode d;
     FDHead h;
     FuncDump f;
 
+    file = (strsfx(FD_EXT, dump) ? dump : dyncat(dump, FD_EXT));
+
  rec:
 
     d = NULL;
     for (f = dumps; f; f = f->next)
-	if (!strcmp(dump, f->name)) {
+	if (!strcmp(file, f->name)) {
 	    d = f->map;
 	    break;
 	}
-    if (!f && (isrec || !(d = load_dump_header(dump)))) {
+    if (!f && (isrec || !(d = load_dump_header(file)))) {
 	if (!isrec) {
 	    struct stat stc, stn;
 	    char *p = (char *) zhalloc(strlen(dump) + strlen(name) +
@@ -2561,10 +2568,10 @@ try_dump_file(char *dump, char *name, char *func)
 	    sprintf(p, "%s/%s%s", dump, name, FD_EXT);
 
 	    /* Ignore the dump file if it is older than the normal one. */
-	    if (stat(p, &stc) || stat(func, &stn) || stn.st_mtime > stc.st_mtime)
+	    if (stat(p, &stc) || (!stat(func, &stn) && stn.st_mtime > stc.st_mtime))
 		return NULL;
 
-	    if (!(d = load_dump_header(dump = p)))
+	    if (!(d = load_dump_header(file = p)))
 		return NULL;
 
 	} else
@@ -2594,7 +2601,7 @@ try_dump_file(char *dump, char *name, char *func)
 
 	    return prog;
 	} else if (fdflags(d) & FDF_MAP) {
-	    load_dump_file(dump, (fdflags(d) & FDF_OTHER), fdother(d));
+	    load_dump_file(file, (fdflags(d) & FDF_OTHER), fdother(d));
 	    isrec = 1;
 	    goto rec;
 	} else {
@@ -2602,7 +2609,7 @@ try_dump_file(char *dump, char *name, char *func)
 	    Patprog *pp;
 	    int np, fd, po = h->npats * sizeof(Patprog);
 
-	    if ((fd = open(dump, O_RDONLY)) < 0 ||
+	    if ((fd = open(file, O_RDONLY)) < 0 ||
 		lseek(fd, ((h->start * sizeof(wordcode)) +
 			   ((fdflags(d) & FDF_OTHER) ? fdother(d) : 0)), 0) < 0) {
 		if (fd >= 0)

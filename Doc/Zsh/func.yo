@@ -52,7 +52,9 @@ example(fpath=(~/myfuncs $fpath)
 autoload myfunc1 myfunc2 ...)
 
 The elements of the tt(fpath) array may also name wordcode files
-directly. This is mostly useful for wordcode files containing multiple 
+directly. The names of these files must have the tt(.zwc) extension
+but in tt(fpath) the names may be given with or without it. This is
+mostly useful for wordcode files containing multiple 
 functions, in which case the file is treated like a directory
 containing files for functions and will be searched for the definition 
 of the function.
