@@ -1,3 +1,7 @@
+2003-05-06  Peter Stephenson  <pws@csr.com>
+
+	* unposted: Config/version.mk: version 4.1.1-test-2.
+
 2003-05-05  Andrey Borzenkov  <bor@zsh.org>
 
 	* unposted: .cvsignore, Completion/.cvsignore, Config/.cvsignore,
