@@ -452,7 +452,7 @@ for prepath in "$prepaths[@]"; do
 
     if (( $#tmp4 )) ||
        [[ -n "$compstate[pattern_match]" &&
-          "$PREFIX$SUFFIX" != "${(q)PREFIX}${(q)SUFFIX}" ]]; then
+          "${PREFIX:s/$//}${SUFFIX:s/$//}" != "${(q)PREFIX:s/$//}${(q)SUFFIX:s/$//}" ]]; then
 
       # It is. For menucompletion we now add the possible completions
       # for this component with the unambigous prefix we have built
