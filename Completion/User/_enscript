@@ -18,9 +18,9 @@ _arguments -s \
   '(-c)--truncate-lines' \
   '(--line-numbers)-C-:start line:' \
   '(-C)--line-numbers=-:start line:' \
-  '(--printer -d   )-P+:printer name:' \
-  '(--printer    -P)-d+:printer name:' \
-  '(          -d -P)--printer=:printer name:' \
+  '(--printer -d   )-P+:printer name: _printers' \
+  '(--printer    -P)-d+:printer name: _printers' \
+  '(          -d -P)--printer=:printer name: _printers' \
   '*-D+:key\:value:' \
   '*--setpagedevice=:key\:value:' \
   '(--escapes)-e-:escape character:' \
