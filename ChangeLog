@@ -1,3 +1,8 @@
+2002-02-28  Bart Schaefer  <schaefer@zsh.org>
+
+	* 16748: Completion/Zsh/Command/_zle: Fix infinite loop
+	introduced by 16464.
+
 2002-02-25  Sven Wischnowsky  <wischnow@zsh.org>
 
 	* 16711: Src/loop.c: allow nterruption of empty while-loops
