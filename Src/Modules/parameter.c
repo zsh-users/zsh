@@ -332,13 +332,12 @@ setfunction(char *name, char *val, int dis)
 
     if (!strncmp(name, "TRAP", 4) &&
 	(sn = getsignum(name + 4)) != -1) {
-	if (settrap(sn, shf->funcdef)) {
+	if (settrap(sn, NULL, ZSIG_FUNC)) {
 	    freeeprog(shf->funcdef);
 	    zfree(shf, sizeof(*shf));
 	    zsfree(val);
 	    return;
 	}
-	sigtrapped[sn] |= ZSIG_FUNC;
     }
     shfunctab->addnode(shfunctab, ztrdup(name), shf);
     zsfree(val);

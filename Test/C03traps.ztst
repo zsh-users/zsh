@@ -183,17 +183,21 @@
   }
   testunset
   f
-1: more sophisticated error trapping
+  print status $?
+  unfunction TRAPZERR
+0: more sophisticated error trapping
 >f
 >ERR-or!
 >f
 >t
+>f
 >t
 >f
 >ERR-or!
 >testunset
 >f
 >ERR-or!
+>status 1
 
   f() {
     setopt localtraps
@@ -216,6 +220,32 @@
   fn
 1: ksh-style EXIT traps preserve return value
 
-  inner() { trap 'return 3' EXIT; return 2: }
+  inner() { trap 'return 3' EXIT; return 2; }
   outer() { inner; return 1; }
+  outer
 3: ksh-style EXIT traps can force return status of enclosing function
+
+# Autoloaded traps are horrid, but unfortunately people expect
+# them to work if we support them.
+  echo "print Running exit trap" >TRAPEXIT
+  $ZTST_testdir/../Src/zsh -fc '
+    fpath=(. $fpath)
+    autoload TRAPEXIT
+    print "Exiting, attempt 1"
+    exit
+    print "What?"
+  '
+  $ZTST_testdir/../Src/zsh -fc '
+    fpath=(. $fpath)
+    autoload TRAPEXIT;
+    fn() { print Some function }
+    fn
+    print "Exiting, attempt 2"
+    exit
+  '
+0: autoloaded TRAPEXIT (exit status > 128 indicates an old bug is back)
+>Exiting, attempt 1
+>Running exit trap
+>Some function
+>Exiting, attempt 2
+>Running exit trap

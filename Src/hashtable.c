@@ -819,7 +819,6 @@ disableshfuncnode(HashNode hn, UNUSED(int flags))
     if (!strncmp(hn->nam, "TRAP", 4)) {
 	int signum = getsignum(hn->nam + 4);
 	sigtrapped[signum] &= ~ZSIG_FUNC;
-	sigfuncs[signum] = NULL;
 	unsettrap(signum);
     }
 }
@@ -838,8 +837,7 @@ enableshfuncnode(HashNode hn, UNUSED(int flags))
     if (!strncmp(shf->nam, "TRAP", 4)) {
 	int signum = getsignum(shf->nam + 4);
 	if (signum != -1) {
-	    settrap(signum, shf->funcdef);
-	    sigtrapped[signum] |= ZSIG_FUNC;
+	    settrap(signum, NULL, ZSIG_FUNC);
 	}
     }
 }

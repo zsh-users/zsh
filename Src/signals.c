@@ -36,10 +36,19 @@
 /**/
 mod_export int sigtrapped[VSIGCOUNT];
 
-/* trap functions for each signal */
+/*
+ * Trap programme lists for each signal.
+ *
+ * If (sigtrapped[sig] & ZSIG_FUNC) is set, this isn't used.
+ * The corresponding shell function is used instead.
+ *
+ * Otherwise, if sigtrapped[sig] is not zero, this is NULL when a signal
+ * is to be ignored, and if not NULL contains the programme list to be
+ * eval'd.
+ */
 
 /**/
-mod_export Eprog sigfuncs[VSIGCOUNT];
+mod_export Eprog siglists[VSIGCOUNT];
 
 /* Total count of trapped signals */
 
@@ -682,7 +691,7 @@ static int dontsavetrap;
 
 /*
  * Save the current trap by copying it.  This does nothing to
- * the existing value of sigtrapped or sigfuncs.
+ * the existing value of sigtrapped or siglists.
  */
 
 static void
@@ -704,15 +713,18 @@ dosavetrap(int sig, int level)
 	    newshf->nam = ztrdup(shf->nam);
 	    newshf->flags = shf->flags;
 	    newshf->funcdef = dupeprog(shf->funcdef, 0);
+	    if (shf->flags & PM_UNDEFINED)
+		newshf->funcdef->shf = newshf;
 	}
 #ifdef DEBUG
 	else dputs("BUG: no function present with function trap flag set.");
 #endif
+	DPUTS(siglists[sig], "BUG: function signal has eval list, too.");
 	st->list = newshf;
     } else if (sigtrapped[sig]) {
-	st->list = sigfuncs[sig] ? dupeprog(sigfuncs[sig], 0) : NULL;
+	st->list = siglists[sig] ? dupeprog(siglists[sig], 0) : NULL;
     } else {
-	DPUTS(sigfuncs[sig], "BUG: sigfuncs not null for untrapped signal");
+	DPUTS(siglists[sig], "BUG: siglists not null for untrapped signal");
 	st->list = NULL;
     }
     if (!savetraps)
@@ -723,9 +735,24 @@ dosavetrap(int sig, int level)
     zinsertlinknode(savetraps, (LinkNode)savetraps, st);
 }
 
+
+/*
+ * Set a trap:  note this does not handle manipulation of
+ * the function table for TRAPNAL functions.
+ *
+ * sig is the signal number.
+ *
+ * l is the list to be eval'd for a trap defined with the "trap"
+ * builtin and should be NULL for a function trap.
+ *
+ * flags includes any additional flags to be or'd into sigtrapped[sig],
+ * in particular ZSIG_FUNC; the basic flags will be assigned within
+ * settrap.
+ */
+
 /**/
 mod_export int
-settrap(int sig, Eprog l)
+settrap(int sig, Eprog l, int flags)
 {
     if (sig == -1)
         return 1;
@@ -741,8 +768,10 @@ settrap(int sig, Eprog l)
     queue_signals();
     unsettrap(sig);
 
-    sigfuncs[sig] = l;
-    if (empty_eprog(l)) {
+    DPUTS((flags & ZSIG_FUNC) && l,
+	  "BUG: trap function has passed eval list, too");
+    siglists[sig] = l;
+    if (!(flags & ZSIG_FUNC) && empty_eprog(l)) {
 	sigtrapped[sig] = ZSIG_IGNORED;
         if (sig && sig <= SIGCOUNT &&
 #ifdef SIGWINCH
@@ -765,7 +794,7 @@ settrap(int sig, Eprog l)
      * sigtrapped[sig] is zero or not, i.e. a test without a mask
      * works just the same.
      */
-    sigtrapped[sig] |= (locallevel << ZSIG_SHIFT);
+    sigtrapped[sig] |= (locallevel << ZSIG_SHIFT) | flags;
     unqueue_signals();
     return 0;
 }
@@ -829,7 +858,7 @@ removetrap(int sig)
     /*
      * At this point we free the appropriate structs.  If we don't
      * want that to happen then either the function should already have been
-     * removed from shfunctab, or the entry in sigfuncs should have been set
+     * removed from shfunctab, or the entry in siglists should have been set
      * to NULL.  This is no longer necessary for saving traps as that
      * copies the structures, so here we are remove the originals.
      * That causes a little inefficiency, but a good deal more reliability.
@@ -841,15 +870,14 @@ removetrap(int sig)
 	 * As in dosavetrap(), don't call removeshfuncnode() because
 	 * that calls back into unsettrap();
 	 */
-	sigfuncs[sig] = NULL;
 	if (node)
 	    removehashnode(shfunctab, node->nam);
 	unqueue_signals();
 
 	return node;
-    } else if (sigfuncs[sig]) {
-	freeeprog(sigfuncs[sig]);
-	sigfuncs[sig] = NULL;
+    } else if (siglists[sig]) {
+	freeeprog(siglists[sig]);
+	siglists[sig] = NULL;
     }
     unqueue_signals();
 
@@ -894,9 +922,9 @@ endtrapscope(void)
 	if (exittr & ZSIG_FUNC) {
 	    exitfn = removehashnode(shfunctab, "TRAPEXIT");
 	} else {
-	    exitfn = sigfuncs[SIGEXIT];
+	    exitfn = siglists[SIGEXIT];
+	    siglists[SIGEXIT] = NULL;
 	}
-	sigfuncs[SIGEXIT] = NULL;
 	if (sigtrapped[SIGEXIT] & ZSIG_TRAPPED)
 	    nsigtrapped--;
 	sigtrapped[SIGEXIT] = 0;
@@ -911,11 +939,12 @@ endtrapscope(void)
 	    remnode(savetraps, ln);
 
 	    if (st->flags && (st->list != NULL)) {
-		Eprog prog = (st->flags & ZSIG_FUNC) ?
-		    ((Shfunc) st->list)->funcdef : (Eprog) st->list;
 		/* prevent settrap from saving this */
 		dontsavetrap++;
-		settrap(sig, prog);
+		if (st->flags & ZSIG_FUNC)
+		    settrap(sig, NULL, ZSIG_FUNC);
+		else
+		    settrap(sig, (Eprog) st->list, 0);
 		dontsavetrap--;
 		/*
 		 * counting of nsigtrapped should presumably be handled
@@ -946,7 +975,7 @@ endtrapscope(void)
 }
 
 /* Execute a trap function for a given signal, possibly
- * with non-standard sigtrapped & sigfuncs values
+ * with non-standard sigtrapped & siglists values
  */
 
 /* Are we already executing a trap? */
@@ -1097,9 +1126,24 @@ dotrapargs(int sig, int *sigtr, void *sigfn)
 void
 dotrap(int sig)
 {
+    Eprog funcprog;
+
+    if (sigtrapped[sig] & ZSIG_FUNC) {
+	HashNode hn = gettrapnode(sig, 0);
+	if (hn)
+	    funcprog = ((Shfunc)hn)->funcdef;
+	else {
+#ifdef DEBUG
+	    dputs("BUG: running function trap which has escaped.");
+#endif
+	    funcprog = NULL;
+	}
+    } else
+	funcprog = siglists[sig];
+
     /* Copied from dotrapargs(). */
-    if ((sigtrapped[sig] & ZSIG_IGNORED) || !sigfuncs[sig] || errflag)
+    if ((sigtrapped[sig] & ZSIG_IGNORED) || !funcprog || errflag)
 	return;
 
-    dotrapargs(sig, sigtrapped+sig, sigfuncs[sig]);
+    dotrapargs(sig, sigtrapped+sig, funcprog);
 }

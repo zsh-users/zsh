@@ -2105,6 +2105,16 @@ yyerror(int noerr)
 	errflag = 1;
 }
 
+/*
+ * Duplicate a programme list, on the heap if heap is 1, else
+ * in permanent storage.
+ *
+ * Be careful in case p is the Eprog for a function which will
+ * later be autoloaded.  The shf element of the returned Eprog
+ * must be set appropriately by the caller.  (Normally we create
+ * the Eprog in this case by using mkautofn.)
+ */
+
 /**/
 mod_export Eprog
 dupeprog(Eprog p, int heap)

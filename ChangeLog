@@ -1,3 +1,12 @@
+2005-02-06  Peter Stephenson  <pws@pwstephenson.fsnet.co.uk>
+
+	* (cheated and guessed) 20793: Src/builtin.c, Src/exec.c,
+	Src/hashtable.c, Src/Modules/parameter.c, Src/Module/zftp.c,
+	Src/parse.c, Src/signals.c, Test/C03traps.ztst: Fix bug that
+	autoloaded TRAPEXIT wasn't restored properly after running an
+	intermediate function; only use sigfuncs (renamed to siglists) for
+	eval-style traps; augment and fix trap tests.
+
 2005-02-04  Peter Stephenson  <pws@csr.com>
 
 	* 20787: configure.ac, Config/defs.mk.in, Doc/.distfiles,

@@ -2617,14 +2617,12 @@ bin_functions(char *name, char **argv, Options ops, int func)
 	    shfunctab->addnode(shfunctab, ztrdup(*argv), shf);
 
 	    if (signum != -1) {
-		if (settrap(signum, shf->funcdef)) {
+		if (settrap(signum, NULL, ZSIG_FUNC)) {
 		    shfunctab->removenode(shfunctab, *argv);
 		    shfunctab->freenode((HashNode)shf);
 		    returnval = 1;
 		    ok = 0;
 		}
-		else
-		    sigtrapped[signum] |= ZSIG_FUNC;
 	    }
 
 	    if (ok && OPT_ISSET(ops,'X') &&
@@ -4967,10 +4965,10 @@ bin_trap(char *name, char **argv, UNUSED(Options ops), UNUSED(int func))
 		    shfunctab->printnode(hn, 0);
 		DPUTS(!hn, "BUG: I did not find any trap functions!");
 	    } else if (sigtrapped[sig]) {
-		if (!sigfuncs[sig])
+		if (!siglists[sig])
 		    printf("trap -- '' %s\n", sigs[sig]);
 		else {
-		    s = getpermtext(sigfuncs[sig], NULL);
+		    s = getpermtext(siglists[sig], NULL);
 		    printf("trap -- ");
 		    quotedzputs(s, stdout);
 		    printf(" %s\n", sigs[sig]);
@@ -5013,7 +5011,7 @@ bin_trap(char *name, char **argv, UNUSED(Options ops), UNUSED(int func))
 	    break;
 	}
 	t = dupeprog(prog, 0);
-	if (settrap(sig, t))
+	if (settrap(sig, t, 0))
 	    freeeprog(t);
     }
     return *argv != NULL;

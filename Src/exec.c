@@ -2650,8 +2650,8 @@ entersubsh(int how, int cl, int fake, int revertpgrp)
 		unsettrap(sig);
     if (!(monitor = isset(MONITOR))) {
 	if (how & Z_ASYNC) {
-	    settrap(SIGINT, NULL);
-	    settrap(SIGQUIT, NULL);
+	    settrap(SIGINT, NULL, 0);
+	    settrap(SIGQUIT, NULL, 0);
 	    if (isatty(0)) {
 		close(0);
 		if (open("/dev/null", O_RDWR | O_NOCTTY)) {
@@ -3340,13 +3340,12 @@ execfuncdef(Estate state, UNUSED(int do_exec))
 	/* is this shell function a signal trap? */
 	if (!strncmp(s, "TRAP", 4) &&
 	    (signum = getsignum(s + 4)) != -1) {
-	    if (settrap(signum, shf->funcdef)) {
+	    if (settrap(signum, NULL, ZSIG_FUNC)) {
 		freeeprog(shf->funcdef);
 		zfree(shf, sizeof(*shf));
 		state->pc = end;
 		return 1;
 	    }
-	    sigtrapped[signum] |= ZSIG_FUNC;
 
 	    /*
 	     * Remove the old node explicitly in case it has

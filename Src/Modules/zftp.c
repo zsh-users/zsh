@@ -436,7 +436,8 @@ zfunalarm(void)
     } else
 	alarm(0);
     if (sigtrapped[SIGALRM] || interact) {
-	if (sigfuncs[SIGALRM] || !sigtrapped[SIGALRM])
+	if (siglists[SIGALRM] || !sigtrapped[SIGALRM] ||
+	    (sigtrapped[SIGALRM] & ZSIG_FUNC))
 	    install_handler(SIGALRM);
 	else
 	    signal_ignore(SIGALRM);
@@ -452,7 +453,7 @@ static void
 zfunpipe()
 {
     if (sigtrapped[SIGPIPE]) {
-	if (sigfuncs[SIGPIPE])
+	if (siglists[SIGPIPE] || (sigtrapped[SIGPIPE] & ZSIG_FUNC))
 	    install_handler(SIGPIPE);
 	else
 	    signal_ignore(SIGPIPE);
