@@ -1,5 +1,9 @@
 2002-04-16  Sven Wischnowsky  <wischnow@zsh.org>
 
+	* users/4836: Completion/Unix/Type/_path_files: make
+	_path_files use match specs from the matcher style when calling
+	compfiles
+
 	* 16991: Completion/Base/Utility/_values: make _values not use
 	-Q
 
