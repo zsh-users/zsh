@@ -1,4 +1,10 @@
-2002-08-22  Oliver Kiddle  <opk@zsh.org>
+2002-08-24  Oliver Kiddle  <opk@zsh.org>
+
+	* 17577: Completion/Unix/Command/_ant, Completion/Unix/Command/_zip,
+	Completion/Unix/Command/_java, Completion/Unix/Type/_java_class:
+	pass classpath as an option to _java_class
+
+2002-08-23  Oliver Kiddle  <opk@zsh.org>
 
 	* 17573: Completion/Zsh/Command/_read: complete -s option to
 	read added in 17544

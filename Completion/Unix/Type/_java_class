@@ -1,16 +1,24 @@
 #autoload
-local classpath
-#Should probably add some sort of cache.
-#First use -classpath/-cp, then CLASSPATH, then assume .
-classpath=${opt_args[-classpath]:-${opt_args[-cp]:-${CLASSPATH:-.}}}
-local c i
-#Should we call _multipart insteads of compadd
-for i in ${(z)classpath//:/ }; do
-	if [ -f $i ] && [[ "$i" == *.(jar|zip|war|ear) ]]; then
-		c=(${${${(M)$(_call_program jar_classes jar -tf $i)##*.class}%%.class}:gs#/#.#})
-		compadd -M 'r:|.=* r:|=*' -- $c
-	elif [ -d $i ]; then
-		c=(**/*.class(.:r:s/.class//:gs#/#.#))
-		compadd -M 'r:|.=* r:|=*' -- $c
-	fi
+
+# Should probably add some sort of cache.
+# Should we call _multi_parts insteads of compadd?
+
+local classpath i expl
+local -a c
+local method type
+
+zparseopts -D -E -a classpath t:=type m:=method cp: classpath:
+: "$classpath[@]"
+classpath="${${classpath[2]:-${CLASSPATH:-.}}//\\:/:}"
+: "$classpath[@]"
+
+for i in "${(s.:.)classpath}"; do
+  if [ -f $i ] && [[ "$i" == *.(jar|zip|war|ear) ]]; then
+    c+=( ${${${(M)$(_call_program jar_classes jar -tf $i)##*.class}%%.class}:gs#/#.#} )
+  elif [ -d $i ]; then
+    c+=( $i/**/*.class(.:r:s/.class//:s#$i/##:gs#/#.#) )
+  fi
 done
+
+_wanted classes expl 'java class' compadd "$@" -M 'r:|.=* r:|=*' -a c
+

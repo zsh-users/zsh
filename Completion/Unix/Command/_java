@@ -34,8 +34,7 @@ jdb)
 java)
   _arguments -C \
     "$jdb_args[@]" \
-    '(-cp)-classpath[specify path for user class files]:class path:->classpath' \
-    '(-classpath)-cp[specify path for user class files]:class path:->classpath' \
+    '(-cp -classpath)'{-cp,-classpath}'[specify path for user class files]:class path:->classpath' \
     '-D-[specify a property]:property:->property' \
     '(-verbose:class)-verbose[print class information]' \
     '(-verbose)-verbose\:class[print class information]' \
@@ -44,7 +43,7 @@ java)
     '-version[print version]' \
     '-help[print help message]' \
     '(- 1)-jar[specify a program capsulated as jar]:jar:_files -g \*.jar' \
-    '(-):class:_java_class -m main' \
+    '(-):class:_java_class -m main ${(kv)opt_args[(i)(-classpath|-cp)]}' \
     '*::args: _normal' \
      && return 0
   ;;
@@ -57,7 +56,7 @@ javadoc)
     '-package[display packages, public/protected classes and members only]' \
     '-private[display all classes and members]' \
     '-help[print help message]' \
-    '-doclet[specify a doclet]:doclet:_java_class -t doclet' \
+    '-doclet[specify a doclet]:doclet:_java_class -t doclet ${(kv)opt_args[(i)-classpath]}' \
     '-docletpath[specify a path to search doclet]:doclet path:->docletpath' \
     '-1.1[Javadoc 1.1 compatible output]' \
     '-sourcepath[specify path for source files]:source path:->sourcepath' \
@@ -118,7 +117,7 @@ jar)
     jar_cmd="${words[2]#-}"
     tmpassoc=(
       m ':manifest file:_files'
-      f ':archive file:_files -g \*.\(jar\|zip\)'
+      f ':archive file:_files -g \*.\([ejw]ar\|zip\)'
     )
     _arguments -C \
       "${jar_cmd/[^-]*/:dummy:}" \
@@ -140,7 +139,7 @@ javah|javah_g)
     '-bootclasspath[specify path for bootstrap class files]:bootstrap class path:->bootstrapclasspath' \
     '-old[generate old JDK1.0-style header files]' \
     '-force[force output]' \
-    '*:fully qualified classname:_java_class -m main' && return 0
+    '*:fully qualified classname:_java_class -m main ${(kv)opt_args[(i)-classpath]}' && return 0
   ;;
 
 javap)
@@ -159,7 +158,7 @@ javap)
     '-classpath[specify path for user class files]:class path:->classpath' \
     '-bootclasspath[specify path for bootstrap class files]:bootstrap class path:->bootstrapclasspath' \
     '-extdirs[specify directories for extensions]:extensions directories:->extdirs' \
-    '*:class:_java_class' && return 0
+    '*:class:_java_class ${(kv)opt_args[(i)-classpath]}' && return 0
   ;;
 
 extcheck)
@@ -182,7 +181,7 @@ rmic)
     '-verbose[print verbose messages]' \
     '-v1.1[JDK 1.1 stub protocol]' \
     '-v1.2[JDK 1.2 stub protocol]' \
-    '*:package qualified class name:_java_class' && return 0
+    '*:package qualified class name:_java_class  ${(kv)opt_args[(i)-classpath]}' && return 0
   ;;
 
 rmiregistry)

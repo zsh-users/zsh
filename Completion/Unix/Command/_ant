@@ -2,8 +2,9 @@
 
 typeset -A opt_args
 local buildfile tmp state line curcontext="$curcontext"
-local target='*:target:->target'
-#local CLASSPATH="$ANT_HOME/lib/*.jar"
+local c target='*:target:->target'
+
+c=( $ANT_HOME/lib/*.jar )
 
 if [[ $service = *ANT_ARGS* ]]; then
   compset -q
@@ -22,12 +23,12 @@ _arguments -C \
   '-debug[print debugging information]' \
   '-emacs[produce logging information without adornments]' \
   '(-l -logfile)'{-l,-logfile}'[use specified file for log]:logfile:_files' \
-  '-logger[the class which is to perform logging]:classname:_java_class' \
-  '*-listener[add an instance of class as a project listener]:classname:_java_class' \
+  '-logger[the class which is to perform logging]:classname:_java_class -cp ${(j.:.)c}' \
+  '*-listener[add an instance of class as a project listener]:classname:_java_class -cp ${(j.:.)c}' \
   '(-f -file -buildfile -find)'{-f,-file,-buildfile}'[use specified build file]:build file:_files' \
   '*-D[specify property with value to use]:property:->property' \
   '-propertyfile[load properties from specfied file]:property file:_files' \
-  '-inputhandler[specify class which will handle input requests]:class:_java_class' \
+  '-inputhandler[specify class which will handle input requests]:class:_java_class -cp ${(j.\:.)c}' \
   '(-f -file -buildfile)-find[search for build file towards the root of filesystem]:build file:(build.xml)' \
   $target && return
 
