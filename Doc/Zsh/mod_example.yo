@@ -1,5 +1,6 @@
-texinode(The example Module)(The files Module)(The deltochar Module)(Zsh Modules)
-sect(The example Module)
+COMMENT(!MOD!
+An example of how to write a module.
+!MOD!)
 The tt(example) module makes available one builtin command:
 
 startitem()

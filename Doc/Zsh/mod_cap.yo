@@ -1,5 +1,6 @@
-texinode(The cap Module)(The clone Module)()(Zsh Modules)
-sect(The cap Module)
+COMMENT(!MOD!
+Builtins for manipulating POSIX.1e (POSIX.6) capability (privilege) sets.
+!MOD!)
 The tt(cap) module is used for manipulating POSIX.1e (POSIX.6) capability
 sets.  If the operating system does not support this interface, the
 builtins defined by this module will do nothing.

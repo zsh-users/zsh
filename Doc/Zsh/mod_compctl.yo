@@ -1,5 +1,7 @@
-texinode(The compctl Module)(The complist Module)(The complete Module)(Zsh Modules)
-sect(The compctl Module)
+COMMENT(!MOD!
+The tt(compctl) builtin for controlling completion and the builtins for
+completion widgets.
+!MOD!)
 The tt(compctl) module makes available two builtin commands. tt(compctl),
 is the old, deprecated way to control completions for ZLE.  See
 ifzman(zmanref(zshcompctl))\

@@ -1,5 +1,7 @@
-texinode(The computil Module)(The deltochar Module)(The complist Module)(Zsh Modules)
-sect(The computil Module)
+COMMENT(!MOD!
+A module with utility builtins needed for the shell function based
+completion system.
+!MOD!)
 cindex(completion, utility)
 The tt(computil) module adds several builtin commands that are used by
 some of the completion functions in the shell function based

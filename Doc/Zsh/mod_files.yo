@@ -1,5 +1,6 @@
-texinode(The files Module)(The mapfile Module)(The example Module)(Zsh Modules)
-sect(The files Module)
+COMMENT(!MOD!
+Some basic file manipulation commands as builtins.
+!MOD!)
 cindex(files, manipulating)
 The tt(files) module makes some standard commands available as builtins:
 

@@ -1,5 +1,6 @@
-texinode(The clone Module)(The zutil Module)(The cap Module)(Zsh Modules)
-sect(The clone Module)
+COMMENT(!MOD!
+A builtin that can clone a running shell onto another terminal.
+!MOD!)
 The tt(clone) module makes available one builtin command:
 
 startitem()

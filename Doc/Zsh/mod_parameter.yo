@@ -1,5 +1,6 @@
-texinode(The parameter Module)(The sched Module)(The mathfunc Module)(Zsh Modules)
-sect(The parameter Module)
+COMMENT(!MOD!
+Access to internal hash tables via special associative arrays.
+!MOD!)
 cindex(parameters, special)
 The tt(parameter) module gives access to some of the internal hash
 tables used by the shell by defining some special parameters.

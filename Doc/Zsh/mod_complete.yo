@@ -1,5 +1,6 @@
-texinode(The complete Module)(The compctl Module)(The zutil Module)(Zsh Modules)
-sect(The complete Module)
+COMMENT(!MOD!
+The basic completion code.
+!MOD!)
 The tt(complete) module makes available several builtin commands which
 can be used in user-defined completion widgets, see
 ifzman(zmanref(zshcompwid))\

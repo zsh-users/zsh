@@ -50,17 +50,24 @@ zshexpn.1 zshmisc.1 zshmodules.1 \
 zshoptions.1 zshparam.1 zshzftpsys.1 zshzle.1 zshall.1
 
 # yodl documentation
+
 YODLDOC = $(MAN) zsh.texi
+
+MODDOCSRC = \
+Zsh/mod_cap.yo Zsh/mod_clone.yo \
+Zsh/mod_compctl.yo Zsh/mod_complete.yo Zsh/mod_complist.yo \
+Zsh/mod_computil.yo \
+Zsh/mod_deltochar.yo Zsh/mod_example.yo Zsh/mod_files.yo \
+Zsh/mod_mapfile.yo Zsh/mod_mathfunc.yo Zsh/mod_parameter.yo Zsh/mod_sched.yo \
+Zsh/mod_stat.yo Zsh/mod_zftp.yo Zsh/mod_zle.yo Zsh/mod_zleparameter.yo \
+Zsh/mod_zutil.yo
+
 YODLSRC = zmacros.yo zman.yo ztexi.yo Zsh/arith.yo Zsh/builtins.yo \
 Zsh/compat.yo Zsh/compctl.yo Zsh/compsys.yo Zsh/compwid.yo Zsh/cond.yo \
 Zsh/exec.yo Zsh/expn.yo \
 Zsh/filelist.yo Zsh/files.yo Zsh/func.yo Zsh/grammar.yo Zsh/manual.yo \
 Zsh/index.yo Zsh/intro.yo Zsh/invoke.yo Zsh/jobs.yo Zsh/metafaq.yo \
-Zsh/modules.yo Zsh/mod_cap.yo \
-Zsh/mod_clone.yo Zsh/mod_complete.yo Zsh/mod_compctl.yo Zsh/mod_complist.yo \
-Zsh/mod_deltochar.yo Zsh/mod_example.yo Zsh/mod_files.yo \
-Zsh/mod_mapfile.yo Zsh/mod_mathfunc.yo Zsh/mod_parameter.yo Zsh/mod_sched.yo \
-Zsh/mod_stat.yo Zsh/mod_zftp.yo Zsh/mod_zle.yo Zsh/mod_zleparameter.yo \
+Zsh/modules.yo Zsh/modlist.yo Zsh/modmenu.yo $(MODDOCSRC) \
 Zsh/options.yo Zsh/params.yo Zsh/prompt.yo Zsh/redirect.yo Zsh/restricted.yo \
 Zsh/seealso.yo Zsh/zftpsys.yo Zsh/zle.yo
 
@@ -142,11 +149,7 @@ zshmisc.1: Zsh/grammar.yo Zsh/redirect.yo Zsh/exec.yo Zsh/func.yo \
            Zsh/jobs.yo Zsh/arith.yo Zsh/cond.yo Zsh/compat.yo \
            Zsh/prompt.yo Zsh/restricted.yo
 
-zshmodules.1: Zsh/modules.yo Zsh/mod_cap.yo Zsh/mod_clone.yo \
-              Zsh/mod_complete.yo Zsh/mod_complist.yo Zsh/mod_compctl.yo \
-              Zsh/mod_deltochar.yo Zsh/mod_example.yo Zsh/mod_files.yo \
-              Zsh/mod_mapfile.yo Zsh/mod_mathfunc.yo Zsh/mod_sched.yo \
-              Zsh/mod_stat.yo Zsh/mod_zftp.yo Zsh/mod_zle.yo
+zshmodules.1: Zsh/modules.yo Zsh/modlist.yo Zsh/modmenu.yo $(MODDOCSRC)
 
 zshoptions.1: Zsh/options.yo
 
@@ -163,6 +166,36 @@ version.yo: $(sdir_top)/Config/version.mk
 	  echo 'def(date)(0)('$(VERSION_DATE)')'; \
 	  echo 'ENDDEF()#' | tr '#' '\\'; \
 	) > $(sdir)/version.yo
+
+Zsh/modlist.yo: $(MODDOCSRC)
+	( \
+	    modules=`echo '' $(MODDOCSRC) '' | sed 's| Zsh/mod_| |g;s|\.yo | |g'`; \
+	    echo "startitem()"; \
+	    for mod in $$modules; do \
+		echo "item(tt($$mod))("; \
+		sed -n '1d;/^!MOD!)$$/q;p' < $(sdir)/Zsh/mod_$${mod}.yo; \
+		echo ")"; \
+	    done; \
+	    echo "enditem()"; \
+	    echo "startmenu()"; \
+	    echo "includefile(Zsh/modmenu.yo)"; \
+	    echo "endmenu()"; \
+	    set '' $$modules; \
+	    while test ".$$2" != .; do \
+		echo "texinode(The $$2 Module)($${3+The $$3 Module})($${1:+The $$1 Module})(Zsh Modules)"; \
+		echo "sect(The $$2 Module)"; \
+		echo "includefile(Zsh/mod_$${2}.yo)"; \
+		shift; \
+	    done \
+	) > $(sdir)/Zsh/modlist.yo
+
+Zsh/modmenu.yo: $(MODDOCSRC)
+	( \
+	    modules=`echo '' $(MODDOCSRC) '' | sed 's| Zsh/mod_| |g;s|\.yo | |g'`; \
+	    for mod in $$modules; do \
+		echo "menu(The $$mod Module)"; \
+	    done \
+	) > $(sdir)/Zsh/modmenu.yo
 
 # ========== DEPENDENCIES FOR INSTALLING ==========
 
@@ -233,6 +266,7 @@ distclean-here: clean-here
 	rm -f Makefile
 
 realclean-here: distclean-here
+	cd $(sdir) && rm -f Zsh/modlist.yo Zsh/modmenu.yo
 	cd $(sdir) && rm -f version.yo ../META-FAQ zsh.texi $(MAN)
 
 @CLEAN_MK@

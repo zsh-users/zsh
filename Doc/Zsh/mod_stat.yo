@@ -1,5 +1,6 @@
-texinode(The stat Module)(The zftp Module)(The sched Module)(Zsh Modules)
-sect(The stat Module)
+COMMENT(!MOD!
+A builtin command interface to the tt(stat) system call.
+!MOD!)
 The tt(stat) module makes available one builtin command:
 
 startitem()

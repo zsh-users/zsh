@@ -1,12 +1,13 @@
 DISTFILES_SRC='
-    .distfiles
+    .cvsignore .distfiles
     arith.yo builtins.yo compat.yo compctl.yo compsys.yo compwid.yo
     cond.yo exec.yo expn.yo filelist.yo files.yo func.yo grammar.yo
     index.yo intro.yo invoke.yo jobs.yo manual.yo metafaq.yo mod_cap.yo
     mod_clone.yo mod_compctl.yo mod_complete.yo mod_complist.yo
     mod_computil.yo mod_deltochar.yo mod_example.yo mod_files.yo
     mod_mapfile.yo mod_mathfunc.yo mod_parameter.yo mod_sched.yo
-    mod_stat.yo mod_zftp.yo mod_zle.yo mod_zleparameter.yo modules.yo
+    mod_stat.yo mod_zftp.yo mod_zle.yo mod_zleparameter.yo mod_zutil.yo
+    modules.yo modlist.yo modmenu.yo
     options.yo params.yo prompt.yo redirect.yo restricted.yo seealso.yo
     zftpsys.yo zle.yo
 '

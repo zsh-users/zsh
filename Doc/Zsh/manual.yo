@@ -115,22 +115,7 @@ menu(Examples)
 
 Zsh Modules
 
-menu(The cap Module)
-menu(The clone Module)
-menu(The complete Module)
-menu(The compctl Module)
-menu(The complist Module)
-menu(The deltochar Module)
-menu(The example Module)
-menu(The files Module)
-menu(The mapfile Module)
-menu(The mathfunc Module)
-menu(The parameter Module)
-menu(The sched Module)
-menu(The stat Module)
-menu(The zftp Module)
-menu(The zle Module)
-menu(The zleparameter Module)
+includefile(Zsh/modmenu.yo)
 endmenu()
 texinode(The Z Shell Manual)(Introduction)(Top)(Top)
 chapter(The Z Shell Manual)

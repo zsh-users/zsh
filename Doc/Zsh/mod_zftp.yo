@@ -1,5 +1,6 @@
-texinode(The zftp Module)(The zle Module)(The stat Module)(Zsh Modules)
-sect(The zftp Module)
+COMMENT(!MOD!
+A builtin FTP client.
+!MOD!)
 The tt(zftp) module makes available one builtin command:
 
 startitem()

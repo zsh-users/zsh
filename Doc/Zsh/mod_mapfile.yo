@@ -1,5 +1,6 @@
-texinode(The mapfile Module)(The mathfunc Module)(The files Module)(Zsh Modules)
-sect(The mapfile Module)
+COMMENT(!MOD!
+Access to external files via a special associative array.
+!MOD!)
 cindex(parameter, file access via)
 The tt(mapfile) module provides one special associative array parameter of
 the same name.

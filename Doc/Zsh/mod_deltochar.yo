@@ -1,5 +1,6 @@
-texinode(The deltochar Module)(The example Module)(The computil Module)(Zsh Modules)
-sect(The deltochar Module)
+COMMENT(!MOD!
+A ZLE function duplicating EMACS' tt(zap-to-char).
+!MOD!)
 The tt(deltochar) module makes available two ZLE functions:
 
 startitem()

@@ -1,5 +1,6 @@
-texinode(The zleparameter Module)()(The zle Module)(Zsh Modules)
-sect(The zleparameter Module)
+COMMENT(!MOD!
+Access to internals of the Zsh Line Editor via parameters.
+!MOD!)
 cindex(parameters, special)
 The tt(zleparameter) module defines two special parameters that can be 
 used to access internal information of the Zsh Line Editor (see

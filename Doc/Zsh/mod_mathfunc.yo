@@ -1,5 +1,6 @@
-texinode(The mathfunc Module)(The parameter Module)(The mapfile Module)(Zsh Modules)
-sect(The mathfunc Module)
+COMMENT(!MOD!
+Standard scientific functions for use in mathematical evaluations.
+!MOD!)
 cindex(functions, mathematical)
 cindex(mathematical functions)
 The tt(mathfunc) module provides standard mathematical functions for use when
