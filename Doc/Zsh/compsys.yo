@@ -681,6 +681,10 @@ matches. If it is set to `true' for at least one match which is the
 same as the string on the line, this match will immediately be
 accepted.
 )
+item(tt(add-space))(
+This style is used by the tt(_prefix) completer to decide if a space
+should be inserted before the suffix.
+)
 item(tt(arguments))(
 The value of this style is given to the tt(ps) command by functions
 that call it when generating process identifiers as matches.
@@ -1583,16 +1587,6 @@ shown. Styles used are tt(condition) and tt(word), see
 ifzman(the section `Completion System Configuration' above)\
 ifnzman(noderef(Completion System Configuration)).
 )
-findex(_menu)
-item(tt(_menu))(
-This completer is a simple example function implemented to show how
-menucompletion can be done in shell code. It should be used as the
-first completer and has the effect of making the code perform
-menucompletion. Note that this is independent of the setting of the
-tt(MENU_COMPLETE) option and does not work with the other
-menucompletion widgets such as tt(reverse-menu-complete), or
-tt(accept-and-menu-complete).
-)
 findex(_oldlist)
 item(tt(_oldlist))(
 This completer controls how the standard completion widgets behave
@@ -1603,6 +1597,46 @@ the widgets which generate matches.  It uses two styles: tt(list) and
 tt(menu), see
 ifzman(the section `Completion System Configuration' above)\
 ifnzman(noderef(Completion System Configuration)).
+)
+findex(_prefix)
+item(tt(_prefix))(
+This completer can be used to try completion with the suffix after the 
+cursor ignored. I.e. the suffix will not be considered to be part of
+the word to complete and hence does not need to be matched. It uses
+the tt(completer) style to decide which other completers to call to
+try to generate matches. If this style is unset, the completers
+currently used by the whole completion are used -- except, of course,
+the tt(_prefix) completer itself. Also, if this completer appears more
+than once in the list of completers to use only those completers not
+already tried by the last invocation of tt(_prefix) will be called.
+
+For example, consider this global tt(completer) style:
+
+example(zstyle ':completion:::::' completer _complete _prefix _correct _prefix)
+
+This makes the tt(_prefix) completer try normal completion with the
+suffix ignored. If that doesn't generate any matches and neither does
+the call to the tt(_correct) completer after it, then tt(_prefix) will 
+be called a second time and will now only try correction with the
+suffix ignored. If you want to use tt(_prefix) as the last resort and
+want it to try only normal completion, you need to do:
+
+example(zstyle ':completion:::::' completer _complete ... _prefix
+zstyle ':completion::prefix:::' completer _complete)
+
+The tt(add-space) style is used, too. If it is set to `true' then
+tt(_prefix) will insert a space between the matches generated (if any) 
+and the suffix.
+)
+findex(_menu)
+item(tt(_menu))(
+This completer is a simple example function implemented to show how
+menucompletion can be done in shell code. It should be used as the
+first completer and has the effect of making the code perform
+menucompletion. Note that this is independent of the setting of the
+tt(MENU_COMPLETE) option and does not work with the other
+menucompletion widgets such as tt(reverse-menu-complete), or
+tt(accept-and-menu-complete).
 )
 enditem()
 

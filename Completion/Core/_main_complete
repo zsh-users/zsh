@@ -20,6 +20,7 @@ setopt localoptions nullglob rcexpandparam extendedglob
 unsetopt markdirs globsubst shwordsplit nounset ksharrays
 
 local comp post ret=1 _compskip _prio_num=1 format _comp_ignore \
+      _completers _completers_left \
       context state line opt_args val_args curcontext="$curcontext" \
       _last_nmatches=-1 _last_menu_style _def_menu_style _menu_style sel \
       _saved_exact="${compstate[exact]}" \
@@ -63,11 +64,15 @@ fi
 
 # And now just call the completer functions defined.
 
+_completers=( "$@" )
+_completers_left=( "$@" )
+
 for comp; do
   if "$comp"; then
     ret=0
     break;
   fi
+  shift 1 _completers_left
 done
 
 if (( $compstate[nmatches] )); then

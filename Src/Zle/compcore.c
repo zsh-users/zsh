@@ -1974,21 +1974,12 @@ add_match_data(int alt, char *str, Cline line,
 	salen += (qisl = strlen(qisuf));
 
     if (salen) {
-	char *asuf = (char *) zhalloc(salen);
 	Cline pp, p, s, sl = NULL;
-	
-
-	if (psl)
-	    memcpy(asuf, psuf, psl);
-	if (isl)
-	    memcpy(asuf + psl, isuf, isl);
-	if (qisl)
-	    memcpy(asuf + psl + isl, qisuf, qisl);
 
 	for (pp = NULL, p = line; p->next; pp = p, p = p->next);
 
-	if (salen > qisl) {
-	    s = bld_parts(asuf, salen - qisl, salen - qisl, &sl);
+	if (psl) {
+	    s = bld_parts(psuf, psl, psl, &sl);
 
 	    if (sline) {
 		Cline sp;
@@ -1998,6 +1989,7 @@ add_match_data(int alt, char *str, Cline line,
 		for (sp = sline; sp->next; sp = sp->next);
 		sp->next = s;
 		s = sline;
+		sline = NULL;
 	    }
 	    if (!(p->flags & (CLF_SUF | CLF_MID)) &&
 		!p->llen && !p->wlen && !p->olen) {
@@ -2009,7 +2001,7 @@ add_match_data(int alt, char *str, Cline line,
 		    s->prefix = p->prefix;
 		    p->prefix = NULL;
 		}
-		s->flags |= (p->flags & CLF_MATCHED);
+		s->flags |= (p->flags & CLF_MATCHED) | CLF_MID;
 		free_cline(p);
 		if (pp)
 		    pp->next = s;
@@ -2018,8 +2010,29 @@ add_match_data(int alt, char *str, Cline line,
 	    } else
 		p->next = s;
 	}
+	if (isl) {
+	    Cline tsl;
+
+	    s = bld_parts(isuf, isl, isl, &tsl);
+
+	    if (sl)
+		sl->next = s;
+	    else if (sline) {
+		Cline sp;
+
+		sline = cp_cline(sline, 1);
+
+		for (sp = sline; sp->next; sp = sp->next);
+		sp->next = s;
+		p->next = sline;
+		sline = NULL;
+	    } else
+		p->next = s;
+
+	    sl = tsl;
+	}
 	if (qisl) {
-	    Cline qsl = bld_parts(asuf + psl + isl, qisl, qisl, NULL);
+	    Cline qsl = bld_parts(qisuf, qisl, qisl, NULL);
 
 	    qsl->flags |= CLF_SUF;
 	    qsl->suffix = qsl->prefix;
@@ -2129,7 +2142,7 @@ add_match_data(int alt, char *str, Cline line,
 	} else
 	    for (p = lp = cp_cline(pline, 1); lp->next; lp = lp->next);
 
-	if (lp->prefix && !(line->flags & (CLF_SUF | CLF_MID)) &&
+	if (lp->prefix && !(line->flags & CLF_SUF) &&
 	    !lp->llen && !lp->wlen && !lp->olen) {
 	    Cline lpp;
 
