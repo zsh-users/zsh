@@ -1,5 +1,8 @@
 2000-05-16  Bart Schaefer  <schaefer@zsh.org>
 
+	* 11419: Test/Makefile.in: Interpolate TESTNUM variable in the
+	glob that specifies which tests are run.
+	
 	* Felix Rosencrantz: 11398: Completion/User/_lzop,
 	Completion/Bsd/_bsd_pkg: Fix typos in option descriptions.
 

@@ -40,10 +40,15 @@ INSTALL         = @INSTALL@
 
 # ========== DEPENDENCIES FOR TESTING ==========
 
-tests:
-	for f in *.ztst; do \
-	  ../Src/zsh ztst.zsh $$f; \
+check test:
+	if test -n "$(DLLD)"; then \
+	  cd $(dir_top) && \
+	  $(MAKE) MODDIR=`pwd`/$(subdir)/Modules install.modules > /dev/null; \
+	fi
+	for f in $(sdir)/$(TESTNUM)*.ztst; do \
+	  $(dir_top)/Src/zsh -f $(sdir)/ztst.zsh $$f; \
 	done
+	rm -rf Modules
 
 # ========== DEPENDENCIES FOR CLEANUP ==========
 
