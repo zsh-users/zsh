@@ -1,0 +1,68 @@
+#compdef pkg_add pkg_delete pkg_info
+
+(( $+functions[_bsd_pkg_packages] )) ||
+_bsd_pkg_packages() {
+  local ret=1 paths
+
+  paths=( "${(@)${(@s.:.)PKG_PATH}:#}" )
+  _files "$@" -g \*.tgz && ret=0
+  (( $#path )) && _files "$@" -W paths -g \*.tgz && ret=0
+  compadd "$@" - /usr/ports/packages/All/*.tgz && ret=0
+
+  return ret
+}
+
+_bsd_pkg() {
+  case "$service" in
+  pkg_add)
+    _arguments -s \
+        '-v[be verbose]' \
+	'-I[don'\''t execute installation scripts]' \
+	'-n[don'\''t really install packages]' \
+	'-R[don'\''t record]' \
+	'-r[use remote fetching]' \
+	'-f[force installation]' \
+	'-M[run in master mode]' \
+	'-S[run in slave mode]' \
+        '-t:mktemp template:_files -/' \
+        '-p:prefix directory:_files -/' \
+        '*:package to install:_bsd_pkg_packages'
+    ;;
+
+  pkg_delete)
+    _arguments -s \
+        '-v[be verbose]' \
+	'-D[don'\''t execute deinstallation scripts]' \
+	'-n[don'\''t really deinstall packages]' \
+	'-d[remove empty directories]' \
+	'-f[force deinstallation]' \
+        '-p:prefix directory:_files -/' \
+        '*:package to deinstall:compadd - /var/db/pkg/*(\:t)'
+    ;;
+
+  pkg_info)
+    _arguments -s \
+        '(:)-a[show all installed packages]' \
+	'-v[be verbose]' \
+	'-p[show installation prefixes]' \
+	'-q[be quiet]' \
+	'-c[show comment fields]' \
+	'-d[show long descriptions]' \
+	'-D[show install-message files]' \
+        '-f[show packing list instructions]' \
+	'-i[show install scripts]' \
+	'-I[show index lines]' \
+	'-k[show deinstall scripts]' \
+	'-r[show requirements scripts]' \
+	'-R[show list list of installed requiring packages]' \
+	'-m[show mtree files]' \
+	'-L[show full pathnames of files]' \
+        '-e[test if package is installed]:package name:compadd - /var/db/pkg/*(\:t)' \
+        '-l:prefix directory:_files -/' \
+        '-t:mktemp template:_files -/' \
+        '(-a)*:package name:compadd - /var/db/pkg/*(\:t)'
+    ;;
+  esac
+}
+
+_bsd_pkg "$@"
