@@ -92,12 +92,20 @@ _next_tags_sort() {
   if [[ -z "$nodef" ]]; then
     if [[ $funcstack[4] = _files ]]; then
       if zstyle -a ":completion:${curcontext}:" file-patterns tmp; then
-        [[ "$argv" = *${${tmp[-1]##[^\\]:}%:*}* ]] && _next_tags_reset=yes
+        [[ "$argv" = *${${tmp[-1]#*[^\\]:}%:*}* ]] && _next_tags_reset=yes
       else
         [[ "$argv" = *all-files* ]] && _next_tags_reset=yes
       fi
     fi
-    comptry "${(@)argv:#(${(j:|:)~${=_next_tags_not}})(|:*)}"
+    tmp=( "${(@)argv:#(${(j:|:)~${=_next_tags_not}})(|:*)}" )
+
+    # $prev is set in _tags!
+
+    if [[ -n "$prev" && ( $#tmp -ne 0 || $funcstack[4] = _files ) ]]; then
+      comptry "$tmp[@]"
+    else
+      comptry "$argv[@]"
+    fi
   fi
 }
 

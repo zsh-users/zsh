@@ -1,3 +1,8 @@
+2000-04-05  Sven Wischnowsky <wischnow@informatik.hu-berlin.de>
+
+	* 10498: Completion/Commands/_next_tags: fix for handling
+	file-patterns.
+
 2000-04-04  Peter Stephenson  <pws@pwstephenson.fsnet.co.uk>
 
 	* Clint: 10477: Functions/Zftp/zfcd_match: some awks don't like
