@@ -1,3 +1,8 @@
+2002-01-13  Andrej Borsenkow  <bor@zsh.org>
+
+	* 16437: Completion/Mandrake/Command/_urpmi: adapt
+	to new urpmi version in cooker
+
 2002-01-10  Sven Wischnowsky  <wischnow@zsh.org>
 
 	* 16426: Completion/Unix/Command/_man,
