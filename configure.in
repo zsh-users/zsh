@@ -859,7 +859,6 @@ AC_CHECK_FUNCS(strftime difftime gettimeofday \
 	       initgroups nis_list \
 	       setuid seteuid setreuid setresuid setsid \
 	       memcpy memmove strstr strerror \
-	       mmap munmap msync \
 	       cap_get_proc \
 	       getrlimit \
 	       setlocale \
@@ -869,6 +868,11 @@ AC_CHECK_FUNCS(strftime difftime gettimeofday \
 	       brk sbrk \
 	       pathconf sysconf)
 AC_FUNC_STRCOLL
+
+AC_FUNC_MMAP
+if test $ac_cv_func_mmap = yes; then
+  AC_CHECK_FUNCS(munmap msync)
+fi
 
 if test $ac_cv_func_setpgrp = yes; then
   AC_FUNC_GETPGRP
