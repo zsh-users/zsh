@@ -848,8 +848,15 @@ execlist(Estate state, int dont_change_job, int exiting)
 			 * for this sublist.                                   */
 			donetrap = 1;
 			goto sublist_done;
-		    } else if (WC_SUBLIST_TYPE(code) == WC_SUBLIST_END)
+		    } else if (WC_SUBLIST_TYPE(code) == WC_SUBLIST_END) {
 			donetrap = 1;
+			/*
+			 * Treat this in the same way as if we reached
+			 * the end of the sublist normally.
+			 */
+			state->pc = next;
+			goto sublist_done;
+		    }
 		}
 		cmdpush(CS_CMDAND);
 		break;
@@ -874,8 +881,15 @@ execlist(Estate state, int dont_change_job, int exiting)
 			 * for this sublist.                                   */
 			donetrap = 1;
 			goto sublist_done;
-		    } else if (WC_SUBLIST_TYPE(code) == WC_SUBLIST_END)
+		    } else if (WC_SUBLIST_TYPE(code) == WC_SUBLIST_END) {
 			donetrap = 1;
+			/*
+			 * Treat this in the same way as if we reached
+			 * the end of the sublist normally.
+			 */
+			state->pc = next;
+			goto sublist_done;
+		    }
 		}
 		cmdpush(CS_CMDOR);
 		break;
