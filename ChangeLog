@@ -1,3 +1,10 @@
+2001-07-13  Sven Wischnowsky  <wischnow@zsh.org>
+
+	* 15389: Completion/Unix/Type/_files,
+	Completion/Unix/Type/_path_files: make _files not use its own
+	description if there is one from a calling function; improve
+	-P-prefix handling in _path_files
+
 2001-07-11  Bart Schaefer  <schaefer@zsh.org>
 
 	* 15375: Doc/Zsh/options.yo: Explain the effect of CORRECT on

@@ -65,7 +65,11 @@ for def in "$pats[@]"; do
     if [[ "$sdef" = *:${tag}:* ]]; then
       descr="${(Q)sdef#*:${tag}:}"
     else
-      descr=file
+      if (( $opts[(I)-X] )); then
+        descr=
+      else
+        descr=file
+      fi
       end=yes
     fi
 
