@@ -886,11 +886,18 @@ execlist(Estate state, int dont_change_job, int exiting)
 	state->pc--;
 sublist_done:
 
-	cmdsp = csp;
 	noerrexit = oldnoerrexit;
 
-	if (sigtrapped[SIGDEBUG])
+	if (sigtrapped[SIGDEBUG]) {
+	    exiting = donetrap;
+	    ret = lastval;
 	    dotrap(SIGDEBUG);
+	    lastval = ret;
+	    donetrap = exiting;
+	    noerrexit = oldnoerrexit;
+	}
+
+	cmdsp = csp;
 
 	/* Check whether we are suppressing traps/errexit *
 	 * (typically in init scripts) and if we haven't  *
