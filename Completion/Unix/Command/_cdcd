@@ -1,0 +1,101 @@
+#compdef cdcd
+
+typeset -A opt_args
+
+_cdcd_tracks ()
+{
+    cdcd info | sed -e 1,2d -e 4d -e "s,Total tracks: *\([0-9]\+\).*,\1,"
+}
+
+_cdcd_track_list ()
+{
+    seq 1 $(_cdcd_tracks)
+}
+
+_cdcd_track_list_verbose ()
+{
+    cdcd tracks | grep "^[ 0-9]\+:" | sed -e 's,^ *\([0-9]\+\):[ >]*. *[^ ]* *\(.*\) \+,\1\\\:\"\2\",'
+}
+
+_cdcd_commands ()
+{
+    _arguments \
+	':cdcd command:((
+	play\:"play a track"
+	stop\:"stop plating"
+	open\:"eject the CD-ROM tray"
+	eject\:"eject the CD-ROM tray"
+	close\:"close the CD-ROM tray"
+	pause\:"pause playing"
+	resume\:"resume playing"
+	ff\:"fast forward"
+	rew\:"rewind"
+	next\:"advance one track"
+	prev\:"return to previous track"
+	getvol\:"get current volume settings"
+	setvol\:"set volume settings"
+	status\:"get numerical data regarding the CD status"
+	info\:"short information about the CD"
+	tracks\:"list all tracks on the CD"
+	rndplay\:"play a random track"
+	list\:"list all CDs in a CD-ROM changer"
+	slot\:"changes the current CD in the CD-ROM changer"
+	edit\:"edit information about the disc"
+	ext\:"Extended information about the disc"
+	refresh\:"refresh the information about the CD from a CDDB server"
+	device\:"change the CD-ROM device cdcd will use"
+	verbose\:"toggle verbosity"
+	sites\:"edit the server list"
+	access\:"configure cddb access method"
+	help\:"display a help message"
+	))'
+}
+
+if (( CURRENT == 2 )); then
+    _cdcd_commands
+else
+    shift words
+    (( --CURRENT ))
+    case "$words[1]" in
+	# sub-commands with no args
+	stop|open|eject|close|pause|resume|next|prev|getvol)
+	    ;;
+	status|info|tracks|rndplay|list|slot|refresh)
+	    ;;
+	# sub-commands with args that cannot be completed
+	ff|rew|setvol)
+	    ;;
+	# sub-commands that do not work as expected
+	access|edit|sites)
+	    ;;
+	# completeable sub-commands
+	verbose)
+	    _arguments \
+		':verbose subcommand:((
+		on\:"turn verbosity on"
+		off\:"turn verbosity off"))'
+	    ;;
+	ext)
+	    _arguments \
+		":ext subcommand:((
+		disc\:\"extra information about the disc\"
+		$(_cdcd_track_list)))"
+	    ;;
+	device)
+	    compadd "$expl[@]" /dev/cd* /dev/cd*/*
+	    ;;
+	play)
+	    if (( CURRENT == 2 )); then
+		_arguments ":play subcommand:((
+		$(_cdcd_track_list_verbose)))"
+	    else
+		shift words
+		(( --CURRENT ))
+		_arguments ":play subcommand2:((
+		$(_cdcd_track_list_verbose)))"
+	    fi
+	    ;;
+	help)
+	    _cdcd_commands;;
+    esac
+fi

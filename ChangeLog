@@ -1,3 +1,8 @@
+2002-02-14  Clint Adams  <clint@zsh.org>
+
+	* Gergely Nagy, 16644: Completion/Unix/Command/.distfiles,
+	Completion/Unix/Command/_cdcd: completion for cdcd.
+
 2002-02-14  Geoff Wing  <gcw@zsh.org>
 
 	* unposted: Doc/Zsh/metafaq.yo: update distribution sites - remove four
