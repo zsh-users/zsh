@@ -1,5 +1,8 @@
 2001-03-29  Sven Wischnowsky  <wischnow@zsh.org>
 
+	* 13833: Completion/Core/_expand: fix comparison of expansions
+	with expanded prefix (missing quoting)
+
 	* 13830: Completion/Core/_multi_parts: next try to get rid of
 	empty strings being added as possible completion by
 	_multi_parts

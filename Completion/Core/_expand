@@ -93,7 +93,7 @@ if [[ "$word" = [\~\$]*/* && "$tmp" = (yes|true|on|1|changed) ]]; then
   eval 'epre=( ${(e)~${word%%/*}} )' 2>/dev/null
   if [[ -n "$epre" && $#epre -eq 1 ]]; then
     opre="${word%%/*}"
-    pre="$epre[1]"
+    pre="${(q)epre[1]}"
     [[ "$tmp" != changed || $#exp -gt 1 ||
        "${opre}${exp[1]#${pre}}" != "$word" ]] && exp=( ${opre}${^exp#${pre}} )
   fi
