@@ -843,6 +843,9 @@ match_str(char *l, char *w, Brinfo *bpp, int bc, int *rwlp,
 	    he = 0;
 	} else {
 
+	    if (!lw)
+		break;
+
 	    if (exact) {
 		/* If we just accepted some characters directly (at the
 		 * beginning of the loop) and now can't match any further,
@@ -858,9 +861,6 @@ match_str(char *l, char *w, Brinfo *bpp, int bc, int *rwlp,
 
 		goto retry;
 	    }
-
-	    if (!lw)
-		break;
 	    /* No matcher and different characters: l does not match w. */
 	    if (test)
 		return 0;
