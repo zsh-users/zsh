@@ -457,19 +457,40 @@ init_io(void)
 	opts[USEZLE] = 0;
 
 #ifdef JOB_CONTROL
-    /* If interactive, make the shell the foreground process */
+    /* If interactive, make sure the shell is in the foreground and is the
+     * process group leader.
+     */
+    mypid = (zlong)getpid();
     if (opts[MONITOR] && interact && (SHTTY != -1)) {
 	if ((mypgrp = GETPGRP()) > 0) {
+	    sigset_t blockset, oldset;
+	    sigemptyset(&blockset);
+	    sigaddset(&blockset, SIGTTIN);
+	    sigaddset(&blockset, SIGTTOU);
+	    sigaddset(&blockset, SIGTSTP);
+	    oldset = signal_block(blockset);
 	    while ((ttpgrp = gettygrp()) != -1 && ttpgrp != mypgrp) {
-		sleep(1);	/* give parent time to change pgrp */
 		mypgrp = GETPGRP();
-		if (mypgrp == mypid)
-		    attachtty(mypgrp);
+		if (mypgrp == mypid) {
+		    signal_setmask(oldset);
+		    attachtty(mypgrp); /* Might generate SIGT* */
+		    signal_block(blockset);
+		}
 		if (mypgrp == gettygrp())
 		    break;
-		killpg(mypgrp, SIGTTIN);
+		signal_setmask(oldset);
+		read(0, NULL, 0); /* Might generate SIGT* */
+		signal_block(blockset);
 		mypgrp = GETPGRP();
 	    }
+	    if (mypgrp != mypid) {
+	        if (setpgrp(0, 0) == 0) {
+		    mypgrp = mypid;
+		    attachtty(mypgrp);
+                } else
+		    opts[MONITOR] = 0;
+	    }
+	    signal_setmask(oldset);
 	} else
 	    opts[MONITOR] = 0;
     } else

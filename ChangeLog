@@ -1,3 +1,10 @@
+2002-11-04  Peter Stephenson  <pws@csr.com>
+
+	* 17859: Philippe Troin <phil@fifi.org>: Src/init.c: Better
+	handling of becoming process group leader in an interactive
+	process.  We could end up with two shells reading from the
+	terminal at once.
+
 2002-10-31  Wayne Davison  <wayned@users.sourceforge.net>
 
 	* 17881: Src/builtin.c, Src/params.c: made the elapsed time in the
