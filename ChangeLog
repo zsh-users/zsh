@@ -1,5 +1,9 @@
 2002-06-05  Peter Stephenson  <pws@csr.com>
 
+	* 17265: Src/exec.c, Src/jobs.c, Src/Modules/clone.c: Make the
+	`jobs' command work in a subshell of a shell with job control by
+	saving the valid bits of the job table.
+
 	* 17285: David Wolfe <dwolfe@gforcetech.com>:
 	Src/Builtins/rlimits.c: finally fix 16145 to eliminate duplicate
 	case statement also in ulimit.

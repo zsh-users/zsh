@@ -2507,13 +2507,13 @@ forklevel;
 static void
 entersubsh(int how, int cl, int fake)
 {
-    int sig;
+    int sig, monitor;
 
     if (cl != 2)
 	for (sig = 0; sig < VSIGCOUNT; sig++)
 	    if (!(sigtrapped[sig] & ZSIG_FUNC))
 		unsettrap(sig);
-    if (unset(MONITOR)) {
+    if (!(monitor = isset(MONITOR))) {
 	if (how & Z_ASYNC) {
 	    settrap(SIGINT, NULL);
 	    settrap(SIGQUIT, NULL);
@@ -2569,7 +2569,7 @@ entersubsh(int how, int cl, int fake)
     opts[MONITOR] = opts[USEZLE] = 0;
     zleactive = 0;
     if (cl)
-	clearjobtab();
+	clearjobtab(monitor);
     times(&shtms);
     forklevel = locallevel;
 }

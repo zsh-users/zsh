@@ -55,6 +55,12 @@ mod_export int prevjob;
 /**/
 mod_export struct job jobtab[MAXJOB];
 
+/* If we have entered a subshell, the original shell's job table. */
+static struct job *oldjobtab;
+
+/* The size of that. */
+static int oldmaxjob;
+
 /* shell timings */
  
 /**/
@@ -612,12 +618,17 @@ void
 printjob(Job jn, int lng, int synch)
 {
     Process pn;
-    int job = jn - jobtab, len = 9, sig, sflag = 0, llen;
+    int job, len = 9, sig, sflag = 0, llen;
     int conted = 0, lineleng = columns, skip = 0, doputnl = 0;
     FILE *fout = (synch == 2) ? stdout : shout;
 
     if (jn->stat & STAT_NOPRINT)
 	return;
+
+    if (jn < jobtab || jn >= jobtab + MAXJOB)
+	job = jn - oldjobtab;
+    else
+	job = jn - jobtab;
 
     if (lng < 0) {
 	conted = 1;
@@ -655,11 +666,14 @@ printjob(Job jn, int lng, int synch)
 	}
     }
 
-/* print if necessary */
+/* print if necessary: ignore option state on explicit call to `jobs'. */
 
-    if (interact && jobbing && ((jn->stat & STAT_STOPPED) || sflag ||
-				job != thisjob)) {
+    if (synch == 2 || 
+	(interact && jobbing &&
+	 ((jn->stat & STAT_STOPPED) || sflag || job != thisjob))) {
 	int len2, fline = 1;
+	/* use special format for current job, except in `jobs' */
+	int thisfmt = job == thisjob && synch != 2;
 	Process qn;
 
 	if (!synch)
@@ -667,7 +681,7 @@ printjob(Job jn, int lng, int synch)
 	if (doputnl && !synch)
 	    putc('\n', fout);
 	for (pn = jn->procs; pn;) {
-	    len2 = ((job == thisjob) ? 5 : 10) + len;	/* 2 spaces */
+	    len2 = (thisfmt ? 5 : 10) + len;	/* 2 spaces */
 	    if (lng & 3)
 		qn = pn->next;
 	    else
@@ -678,10 +692,10 @@ printjob(Job jn, int lng, int synch)
 			break;
 		    len2 += strlen(qn->text) + 2;
 		}
-	    if (job != thisjob) {
+	    if (!thisfmt) {
 		if (fline)
 		    fprintf(fout, "[%ld]  %c ",
-			    (long)(jn - jobtab),
+			    (long)job,
 			    (job == curjob) ? '+'
 			    : (job == prevjob) ? '-' : ' ');
 		else
@@ -956,13 +970,32 @@ waitjobs(void)
 
 /**/
 mod_export void
-clearjobtab(void)
+clearjobtab(int monitor)
 {
     int i;
 
-    for (i = 1; i < MAXJOB; i++)
-	if (jobtab[i].ty)
+    for (i = 1; i < MAXJOB; i++) {
+	if (jobtab[i].ty) {
 	    zfree(jobtab[i].ty, sizeof(struct ttyinfo));
+	    jobtab[i].ty = NULL;
+	}
+	if (monitor) {
+	    /*
+	     * See if there is a jobtable worth saving.
+	     * We never free the saved version; it only happens
+	     * once for each subshell of a shell with job control,
+	     * so doesn't create a leak.
+	     */
+	    if (jobtab[i].stat)
+		oldmaxjob = i+1;
+	}
+    }
+
+    if (monitor && oldmaxjob) {
+	int sz = oldmaxjob * sizeof(struct job);
+	oldjobtab = (struct job *)zalloc(sz);
+	memcpy(oldjobtab, jobtab, sz);
+    }
 
     memset(jobtab, 0, sizeof(jobtab)); /* zero out table */
 }
@@ -1253,7 +1286,8 @@ bin_fg(char *name, char **argv, char *ops, int func)
     if (unset(NOTIFY))
 	scanjobs();
 
-    setcurjob();
+    if (func != BIN_JOBS || isset(MONITOR) || !oldmaxjob)
+	setcurjob();
 
     if (func == BIN_JOBS)
         /* If you immediately type "exit" after "jobs", this      *
@@ -1274,13 +1308,24 @@ bin_fg(char *name, char **argv, char *ops, int func)
 	    firstjob = curjob;
 	} else if (func == BIN_JOBS) {
 	    /* List jobs. */
-	    for (job = 0; job != MAXJOB; job++)
-		if (job != thisjob && jobtab[job].stat) {
+	    struct job *jobptr;
+	    int maxjob, ignorejob;
+	    if (unset(MONITOR) && oldmaxjob) {
+		jobptr = oldjobtab;
+		maxjob = oldmaxjob;
+		ignorejob = 0;
+	    } else {
+		jobptr = jobtab;
+		maxjob = MAXJOB;
+		ignorejob = thisjob;
+	    }
+	    for (job = 0; job != maxjob; job++, jobptr++)
+		if (job != ignorejob && jobptr->stat) {
 		    if ((!ops['r'] && !ops['s']) ||
 			(ops['r'] && ops['s']) ||
-			(ops['r'] && !(jobtab[job].stat & STAT_STOPPED)) ||
-			(ops['s'] && jobtab[job].stat & STAT_STOPPED))
-			printjob(job + jobtab, lng, 2);
+			(ops['r'] && !(jobptr->stat & STAT_STOPPED)) ||
+			(ops['s'] && jobptr->stat & STAT_STOPPED))
+			printjob(jobptr, lng, 2);
 		}
 	    unqueue_signals();
 	    return 0;

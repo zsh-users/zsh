@@ -53,7 +53,7 @@ bin_clone(char *nam, char **args, char *ops, int func)
     }
     pid = fork();
     if (!pid) {
-	clearjobtab();
+	clearjobtab(0);
 	ppid = getppid();
 	mypid = getpid();
 #ifdef HAVE_SETSID
@@ -61,7 +61,7 @@ bin_clone(char *nam, char **args, char *ops, int func)
 	    zwarnnam(nam, "failed to create new session: %e", NULL, errno);
 #endif
 #ifdef TIOCNOTTY
-	    if (ioctl(SHTTY, TIOCNOTTY))
+	    if (ioctl(SHTTY, TIOCNOTTY, 0))
 		zwarnnam(nam, "%e", NULL, errno);
 	    setpgrp(0L, mypid);
 #endif
@@ -98,18 +98,29 @@ static struct builtin bintab[] = {
 
 /**/
 int
-boot_clone(Module m)
+setup_(Module m)
+{
+    return 0;
+}
+
+/**/
+int
+boot_(Module m)
 {
     return !addbuiltins(m->nam, bintab, sizeof(bintab)/sizeof(*bintab));
 }
 
-#ifdef MODULE
-
 /**/
 int
-cleanup_clone(Module m)
+cleanup_(Module m)
 {
     deletebuiltins(m->nam, bintab, sizeof(bintab)/sizeof(*bintab));
     return 0;
 }
-#endif
+
+/**/
+int
+finish_(Module m)
+{
+    return 0;
+}
