@@ -1,3 +1,8 @@
+2003-11-21  Oliver Kiddle  <opk@zsh.org>
+
+	* Stephen Rüger: 19255: Completion/Debian/Command/_apt: update
+	to work with APT 0.5.14
+
 2003-11-17  Doug Kearns  <djkea2@mugca.its.monash.edu.au>
 
 	* unposted: Completion/Unix/Command/_wget: --dns-cache option takes a
