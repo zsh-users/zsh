@@ -1,3 +1,7 @@
+2002-02-20  Wayne Davison  <wayned@users.sourceforge.net>
+
+	* 16678: Src/hist.c: Yet another fix for prepnexthistent().
+
 2002-02-20  Oliver Kiddle  <opk@zsh.org>
 
 	* 16619, 16676: Src/builtin.c, Doc/Zsh/builtins.yo,
