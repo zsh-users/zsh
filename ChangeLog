@@ -1,3 +1,8 @@
+2002-02-04  Bart Schaefer  <schaefer@zsh.org>
+
+	* 16556: Src/builtin.c: Error messages added in 16503 should not
+	change the behavior of >&- redirections.
+
 2002-02-04  Clint Adams  <clint@zsh.org>
 
 	* 16553, 16555: Completion/Unix/Command/_ssh: differentiate

@@ -3074,10 +3074,12 @@ bin_print(char *name, char **args, char *ops, int func)
 	    } while (*ap);
 	    fputc(ops['N'] ? '\0' : '\n', fout);
 	}
-	if (((fout != stdout) ? fclose(fout) : fflush(fout)) != 0) {
+	/* Testing EBADF special-cases >&- redirections */
+	if ((fout != stdout) ? (fclose(fout) != 0) :
+	    (fflush(fout) != 0 && errno != EBADF)) {
             zwarnnam(name, "write error: %e", NULL, errno);
             ret = 1;
-        }
+	}
 	return ret;
     }
     
@@ -3090,11 +3092,12 @@ bin_print(char *name, char **args, char *ops, int func)
 	}
 	if (!(ops['n'] || nnl))
 	    fputc(ops['N'] ? '\0' : '\n', fout);
-	if (((fout != stdout) ? fclose(fout) : fflush(fout)) != 0) {
+	/* Testing EBADF special-cases >&- redirections */
+	if ((fout != stdout) ? (fclose(fout) != 0) :
+	    (fflush(fout) != 0 && errno != EBADF)) {
             zwarnnam(name, "write error: %e", NULL, errno);
             ret = 1;
 	}
-	
 	return ret;
     }
     
@@ -3279,9 +3282,11 @@ bin_print(char *name, char **args, char *ops, int func)
 		}
 		zwarnnam(name, "%s: invalid directive", start, 0);
 		if (*c) c[1] = save;
-		if (((fout != stdout) ? fclose(fout) : fflush(fout)) != 0) {
-	            zwarnnam(name, "write error: %e", NULL, errno);
-	        }
+		/* Testing EBADF special-cases >&- redirections */
+		if ((fout != stdout) ? (fclose(fout) != 0) :
+		    (fflush(fout) != 0 && errno != EBADF)) {
+		    zwarnnam(name, "write error: %e", NULL, errno);
+		}
 		return 1;
 	    }
 
@@ -3345,9 +3350,11 @@ bin_print(char *name, char **args, char *ops, int func)
 	/* if there are remaining args, reuse format string */
     } while (*args && args != first && !ops['r']);
 
-    if (((fout != stdout) ? fclose(fout) : fflush(fout)) != 0) {
-        zwarnnam(name, "write error: %e", NULL, errno);
-        ret = 1;
+    /* Testing EBADF special-cases >&- redirections */
+    if ((fout != stdout) ? (fclose(fout) != 0) :
+	(fflush(fout) != 0 && errno != EBADF)) {
+	zwarnnam(name, "write error: %e", NULL, errno);
+	ret = 1;
     }
     return ret;
 }
