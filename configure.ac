@@ -562,8 +562,17 @@ if test $zsh_cv_header_termios_h_tiocgwinsz = no; then
 fi
  
 AH_TEMPLATE([WINSIZE_IN_PTEM],
-[Define if your system defines `struct winsize' in sys/ptem.h.])
-AC_CHECK_HEADER([sys/ptem.h], AC_DEFINE(WINSIZE_IN_PTEM))
+[Define if your should include sys/stream.h and sys/ptem.h.])
+AC_CACHE_CHECK(for streams headers including struct winsize,
+ac_cv_winsize_in_ptem,
+[AC_TRY_COMPILE([#include <sys/stream.h>
+#include <sys/ptem.h>],
+[struct winsize wsz],
+ac_cv_winsize_in_ptem=yes,
+ac_cv_winsize_in_ptem=no)])
+if test $ac_cv_winsize_in_ptem = yes; then
+  AC_DEFINE(WINSIZE_IN_PTEM)
+fi
 
 dnl -------------------
 dnl CHECK FOR LIBRARIES

@@ -1,5 +1,8 @@
 2004-02-17  Peter Stephenson  <pws@csr.com>
 
+	* 19428: configure.ac: fix test for #include'ing STREAMS
+	headers.
+
 	* 19427: Src/jobs.c: last job in table wasn't reported with `jobs'.
 
 2004-02-16  Oliver Kiddle  <opk@zsh.org>
