@@ -12,4 +12,4 @@ _arguments \
     '-d[remove SpamAssassin markup]' \
     '-c[config]:config file:_files' \
     '-p[score preferences]:preference file:_files' \
-    '-D[diagnostic output'
+    '-D[diagnostic output]'
