@@ -1,3 +1,9 @@
+2005-03-02  Clint Adams  <clint@zsh.org>
+
+	* 20906: Completion/Unix/Command/_make: patch from
+	Mike "Stew" O'Connor to limit recursion depth in make
+	completion variable expansion.
+
 2005-03-02  Wayne Davison  <wayned@users.sourceforge.net>
 
 	* unposted: Completion/Unix/Command/_make: Don't try to expand
