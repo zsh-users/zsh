@@ -1,23 +1,19 @@
 #compdef mysql mysqlshow mysqldump mysqladmin
-#
-# zsh completion functions for mysql client programs
-# Adam Spiers <adam@spiers.net>
-#
 
-##
-## Auxiliary functions
-##
+# Adam Spiers <adam@spiers.net>
+
+# Auxiliary functions
 
 _mysql_get_identity () {
-  _mysql_user=${opt_args[-u]-$opt_args[--user]}
-  _mysql_port=${opt_args[-P]-$opt_args[--port]}
-  _mysql_host=${opt_args[-h]-$opt_args[--host]}
+  _mysql_user=${(v)opt_args[(i)-u|--user]}
+  _mysql_port=${(v)opt_args[(i)-P|--port]}
+  _mysql_host=${(v)opt_args[(i)-h|--host]}
 
   _mysql_params=(
-                 ${_mysql_user:+"--user=$_mysql_user"}
-                 ${_mysql_host:+"--host=$_mysql_host"}
-                 ${_mysql_port:+"--port=$_mysql_port"}
-                )
+    ${_mysql_user:+"--user=$_mysql_user"}
+    ${_mysql_host:+"--host=$_mysql_host"}
+    ${_mysql_port:+"--port=$_mysql_port"}
+  )
 }
 
 _mysql_hosts () {
@@ -57,29 +53,16 @@ _mysql_databases () {
   local _mysql_user _mysql_port _mysql_host _mysql_params
   _mysql_get_identity
 
-  local _mysql_databases
-  _mysql_databases=(
-                    ${(f)~~"$( echo "show databases" |
-                               mysql "$_mysql_params[@]" )"}
-                   )
-  shift _mysql_databases
-
-  compadd "$expl[@]" -a _mysql_databases
+  compadd "$@" - ${${(f)~~"$(_call_program databases \
+      mysql "$_mysql_params[@]" <<<'show databases' 2>/dev/null)"}[2,-1]}
 }
 
 _mysql_tables () {
   local _mysql_user _mysql_port _mysql_host _mysql_params
   _mysql_get_identity
 
-  local _mysql_tables
-  _mysql_tables=(
-                 ${(f)~~"$( echo "show tables" |
-                              mysql "$_mysql_params[@]" $1 )"}
-                )
-  # remove header
-  shift _mysql_tables
-
-  compadd "$expl[@]" -a _mysql_tables
+  compadd "$@" - ${${(f)~~"$(_call_program tables \
+      mysql "$_mysql_params[@]" $1 <<< 'show tables' 2>/dev/null)"}[2,-1]}
 }
 
 _mysql_variables () {
@@ -89,27 +72,12 @@ _mysql_variables () {
 }
 
 
-##
-## The actual completion code for the commands
-##
-
-_mysql_common_opts=(
-    {-\?,--help}'[display help]'
-    {-S+,--socket=}':server socket file:_files'
-    {-h+,--host=}':server hostname:_mysql_hosts'
-    {-P+,--port=}':server port:_mysql_ports'
-    {-u+,--user=}':server username:_mysql_users'
-    {-p+,--password=}':server password: '
-    {-C,--compress}'[use compression in server/client protocol]'
-)
+# The actual completion code for the commands
 
 _mysql () {
-  local curcontext="$curcontext" state line expl
-  typeset -A opt_args
-
-  _arguments -C -s \
+  _arguments -s \
     "$_mysql_common_opts[@]" \
-    {-V,--version}'[display client version]' \
+    '(- :)'{-V,--version}'[display client version]' \
     {-A,--no-auto-rehash}'[no automatic rehashing]' \
     '(-t --table)'{-B,--batch}'[batch mode (no pretty ASCII)]' \
     {-T,--debug-info}'[print debug info on exit]' \
@@ -129,14 +97,11 @@ _mysql () {
     {-v,--verbose}'[verbose mode]' \
     {-E,--vertical}'[print query output vertically]' \
     {-w,--wait}'[wait and retry server connection if necessary]' \
-    ':MySQL database to use:_mysql_databases'
+    ':MySQL database:_mysql_databases'
 }
 
 _mysqlshow () {
-  local curcontext="$curcontext" state line expl
-  typeset -A opt_args
-
-  _arguments -C -s \
+  _arguments -s \
     "$_mysql_common_opts[@]" \
     {-V,--version}'[display version]' \
     {-\#+,--debug=}':debug file: ' \
@@ -146,10 +111,7 @@ _mysqlshow () {
 }
 
 _mysqldump () {
-  local curcontext="$curcontext" state line expl
-  typeset -A opt_args
-
-  _arguments -C -s \
+  _arguments -s \
     "$_mysql_common_opts[@]" \
     {-V,--version}'[display version]' \
     {-a,--all}'[include all create options]' \
@@ -179,51 +141,59 @@ _mysqldump () {
 }
 
 _mysqladmin () {
-  local curcontext="$curcontext" state line expl
+  local curcontext="$curcontext" state line expl ret=1
   typeset -A opt_args
 
   _arguments -C -s \
     "$_mysql_common_opts[@]" \
-    {-v,--version}'[display version]' \
-    {-\#+,--debug=}':debug file: ' \
-    {-f,--force}'[continue through errors]' \
-    {-i+,--sleep=}'[repeat commands periodically]:number of seconds between executions: ' \
-    {-s,--silent}"[silently exit if can't connect to server]" \
-    {-t+,--timeout=}'[timeout for connection]' \
-    {-w+,--wait=}'[wait and retry server connection if necessary]:number of retries: ' \
-    '*::admin command:_mysqladmin_commands'
-}
+    '(- *)'{-v,--version}'[display version]' \
+    '(-\# --debug)'{-\#+,--debug=}'[output debug log]:debug file' \
+    '(-f --force)'{-f,--force}'[continue through errors]' \
+    '(-i --sleep)'{-i+,--sleep=}'[repeat commands periodically]:number of seconds between executions: ' \
+    '(-s --silent)'{-s,--silent}"[silently exit if can't connect to server]" \
+    '(-t --timeout)'{-t+,--timeout=}'[specify timeout for connection]:time (seconds)' \
+    '(-w --wait)'{-w+,--wait=}'[wait and retry server connection if necessary]:number of retries' \
+    '*::mysqladmin command:->mysqladmin-commands' && ret=0
 
-_mysqladmin_commands () {
-  local cmds expl
-  cmds=(
-        create drop extended-status
-        flush-{hosts,logs,status,tables,privileges}
-        kill password ping processlist
-        reload refresh shutdown
-        status variables version
-       )
-
-  if (( CURRENT == 1 )); then
-    _wanted commands expl command compadd "$@" -a cmds
-  else
-    local curcontext="$curcontext"
-
-    case "${words[1]:t}" in
-      (create|drop)
-        _wanted mysqldbs expl "MySQL databases" _mysql_databases
-      ;;
-      (kill)
-        _message -e ids 'thread ids'
-      ;;
-      (password)
-        _message -e passwords 'new password'
-      ;;
-    esac
+  if [[ -n "$state" ]]; then
+    if (( CURRENT == 1 )); then
+      _wanted commands expl 'mysqladmin command' compadd - \
+	  create drop extended-status \
+	  flush-{hosts,logs,status,tables,privileges} \
+	  kill password ping processlist \
+	  reload refresh shutdown \
+	  status variables version && ret=0
+    else
+      case "${words[1]:t}" in
+	create|drop)
+	  _wanted databases expl "MySQL databases" _mysql_databases && ret=0
+	;;
+	kill)
+	  _message -e ids 'thread ids'
+	;;
+	password)
+	  _message -e passwords 'new password'
+	;;
+      esac
+    fi
   fi
+
+  return ret
 }
 
 _mysql_utils () {
+  local _mysql_common_opts
+
+  _mysql_common_opts=(
+    '(-)'{-\?,--help}'[display help]'
+    '(-S --socket)'{-S+,--socket=}'[specify socket file to use for connection]:server socket file:_files'
+    '(-h --host)'{-h+,--host=}'[specify server hostname]:hostname:_mysql_hosts'
+    '(-P,--port)'{-P+,--port=}'[specify port number for connection]:server port:_mysql_ports'
+    '(-u --user)'{-u+,--user=}'[specify username for login]:server username:_mysql_users'
+    '(-p --password)'{-p+,--password=}'[specify password to use for connection]:server password'
+    '(-C --compress)'{-C,--compress}'[use compression in server/client protocol]'
+  )
+
   case "$service" in
     mysql)
       _mysql "$@"

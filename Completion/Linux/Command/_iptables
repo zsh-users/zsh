@@ -12,8 +12,8 @@ case $service in
   ;;
   iptables-restore)
     _arguments -s \
-      '{-c,--counters}'[restore the values of all packet and byte counters]' \
-      '{-n,--noflush}"[don't flush the previous contents of the table]"
+      {-c,--counters}'[restore the values of all packet and byte counters]' \
+      {-n,--noflush}"[don't flush the previous contents of the table]"
     return
   ;;
 esac

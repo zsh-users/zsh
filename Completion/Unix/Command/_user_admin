@@ -7,7 +7,7 @@ redhat=$?
 
 if [[ $service = user* ]]; then
   if [[ -r /etc/shells ]]; then
-    shells=( $(</etc/shells) )
+    shells=( ${${(f)"$(</etc/shells)"}:#\#*} )
   else
     shells=( ${(M)commands:#*/(|[abckz]|tc|ba)sh} )
   fi
@@ -24,7 +24,7 @@ if [[ $service = user* ]]; then
     '(-D)-u[uid]:uid'
     '(-D)-o[allow non unique uid]'
   )
-  [[ $OSTYPE = linux* ]] && args=( $args[@] 
+  [[ $OSTYPE = linux* ]] && args=( $args[@]
       '(-D -U -L)-p+[specify encrypted password]:encrypted password' )
 
   if [[ $service = useradd ]]; then
@@ -58,7 +58,7 @@ else
       '-f[force]'
     )
   else
-    args=( $args[@] 
+    args=( $args[@]
       '-n[specify new group name]:new group name'
       ':group name:_groups'
     )

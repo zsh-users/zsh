@@ -30,6 +30,5 @@ if (( ! $+_color_cache )); then
   (( $#_color_cache )) || _color_cache=(white black gray red blue green)
 fi
 
-_wanted colors expl 'color specification' \
-    compadd "$@" -M 'm:{a-z}={A-Z} m:-=\  r:[^ A-Z0-9]||[ A-Z0-9]=* r:|=*' -a \
-            _color_cache
+_wanted colors expl 'color specification' compadd "$@" -M \
+    'm:{a-z}={A-Z} m:-=\  r:[^ A-Z0-9]||[ A-Z0-9]=* r:|=*' -a - _color_cache

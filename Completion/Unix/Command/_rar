@@ -1,137 +1,88 @@
 #compdef rar unrar
 
+local common
 
-_rar(){
-    case $service in
-        rar)
-        _arguments -s \
-        '*::rar command:_rar_command' 
-        ;;
-    unrar)
-        _arguments -s \
-        '*::unrar command:_unrar_command'
-        ;;
-    esac
-}
+common=(
+  '-ad[append archive name to destination path]'
+  '-ap[set path inside archive]'
+  '-av\-[disable authenticity verification check]'
+  '-c\-[disable comments show]'
+  '-cfg\-[disable read configuration]'
+  '-cl\-[convert names to lower case]'
+  '-cu[convert names to upper case]'
+  '-dh[open shared files]'
+  '-ep[exclude paths from name]'
+  '-f[freshen files]'
+  '-idp[disable percentage display]'
+  '-ierr[send all messages to stderr]'
+  '-inul[disable all messages]'
+  '-kb[keep broken extracted files]'
+  '-o\+[overwrite existing files]'
+  '-o\-[do not overwrite existing files]'
+  '-ow[save or restore file owner and group]'
+  '-p\-[do not query password]'
+  '-r[recurse subdirectorie]'
+  '-ta[process files modified after <date> in YYYYMMDDHHMMSS format]'
+  '-tb[process files modified before <date> in YYYYMMDDHHMMSS format]'
+  '-tn[process files newer than <time>]'
+  '-to[process files older than <time>]'
+  '-u[update files]'
+  '-v[create volumes with size autodetection or list all volumes]'
+  '-ver[file version control]'
+  '-vp[pause before each volume]'
+  '-x[exclude specified file]'
+  '-y[assume yes answer to all queries]'
+)
 
-_compression_level() {
-    compression_level=
-    _tags compression_level && { compadd "$@" -k compression_level || compadd "$@" ${(kv)=compression_level} }
-}
-
-_dico_size() {
-    dico_size=(64 128 256 512 1024 2048 4096 a b c d e f g)
-    _tags dico_size && { compadd "$@" -k dico_size || compadd "$@" ${(kv)=dico_size} }
-}
-
-_unrar_command () {
-    cmd=(e l lt p t v vt x)
-    if (( CURRENT == 1 ));then
-        _tags cmd && { compadd "$@" -k cmd || compadd "$@" ${(kv)=cmd} }
+case $service in
+  unrar)
+    if (( CURRENT == 2 )); then
+      _wanted commands expl 'rar command' compadd e l lt p t v vt x && return
     else
-        _arguments -C  \
-            '-ad[Append archive name to destination path]'\
-            '-ap[Set path inside archive]'\
-            '-av\-[Disable authenticity verification check]'\
-            '-c\-[Disable comments show]'\
-            '-cfg\-[Disable read configuration]'\
-            '-cl\-[Convert names to lower case]'\
-            '-cu[Convert names to upper case]'\
-            '-dh[Open shared files]'\
-            '-ep[Exclude paths from name]'\
-            '-f[Freshen files]'\
-            '-idp[Disable percentage display]'\
-            '-ierr[Send all messages to stderr]'\
-            '-inul[Disable all messages]'\
-            '-kb[Keep broken extracted files]'\
-            '-o\+[Overwrite existing files]'\
-            '-o\-[Do not overwrite existing files]'\
-            '-ow[Save or restore file owner and group]'\
-            '-p\-[Do not query password]'\
-            '-r[Recurse subdirectorie]'\
-            '-ta[Process files modified after <date> in YYYYMMDDHHMMSS format]'\
-            '-tb[Process files modified before <date> in YYYYMMDDHHMMSS format]'\
-            '-tn[Process files newer than <time>]'\
-            '-to[Process files older than <time>]'\
-            '-u[Update files]'\
-            '-v[Create volumes with size autodetection or list all volumes]'\
-            '-ver[File version control]'\
-            '-vp[Pause before each volume]'\
-            '-x[Exclude specified file]'\
-            '-y[Assume Yes on all queries]'\
-            '*:RAR files:_files -g \*.rar' && return 0
+      _arguments "$common[@]" '*:RAR files:_files -g \*.rar' && return
     fi
-}
-
-_rar_command () {
-    cmd=(a c cf cw d e f i k l lt m mf p r rc rr rv s t u v vt x)
-    if (( CURRENT == 1 ));then
-        _tags cmd && { compadd "$@" -k cmd || compadd "$@" ${(kv)=cmd} }
+  ;;
+  rar)
+    if (( CURRENT == 2 )); then
+      _wanted commands expl 'rar command' compadd \
+	  a c cf cw d e f i k l lt m mf p r rc rr rv s t u v vt x && return
     else
-        _arguments -s \
-            '-ad[Append archive name to destination path]'\
-            '-ag[Generate archive name using the current date]'\
-            '-ap[Set path inside archive]'\
-            '-as[Synchronize archive contents]'\
-            '-av[Put authenticity verification (registered versions only)]'\
-            '-av\-[Disable authenticity verification check]'\
-            '-c\-[Disable comments show]'\
-            '-cfg\-[Disable read configuration]'\
-            '-cl\-[Convert names to lower case]'\
-            '-cu[Convert names to upper case]'\
-            '-df[Delete files after archiving]'\
-            '-dh[Open shared files]'\
-            '-ds[Disable name sort for solid archive]'\
-            '-e[Set file exclude attributes]'\
-            '-ed[Do not add empty directories]'\
-            '-en[Do not put end of archive block]'\
-            '-ep[Exclude paths from name]'\
-            '-ep1[Exclude base directory from names]'\
-            '-ep2[Expand paths to full]'\
-            '-f[Freshen files]'\
-            '-hp[Encrypt both file data and headers]'\
-            '-idp[Disable percentage display]'\
-            '-ierr[Send all messages to stderr]'\
-            '-ilog[Log errors to file (registered versions only)]'\
-            '-inul[Disable all messages]'\
-            '-isnd[Enable sound]'\
-            '-k[Lock archive]'\
-            '-kb[Keep broken extracted files]'\
-            '-m+[Set compression level (0-store...3-default...5-maximal)]:compression level:(( 0\:store 1\:fastest 2\:fast 3\:normal 4\:good 5\:maximal ))'\
-            '-md+[Dictionary size in KB]:dictionaty size in KB:_dico_size' \
-            '-ms[Specify file types to store]'\
-            '-o\+[Overwrite existing files]'\
-            '-o\-[Do not overwrite existing files]'\
-            '-ol[Save symbolic links as the link instead of the file]'\
-            '-ow[Save or restore file owner and group]'\
-            '-p[Set password]'\
-            '-p\-[Do not query password]'\
-            '-r[Recurse subdirectorie]'\
-            '-r0[Recurse subdirectories for wildcard names only]'\
-            '-rr[Add data recovery record]'\
-            '-rv[Create recovery volumes]'\
-            '-s[Create solid archive]'\
-            '-se[Create solid archive using extension]'\
-            '-sv[Create solid archive using volumes]'\
-            '-s\-[Disable solid archiving]'\
-            '-sfx[Create SFX archive]'\
-            '-t[Test files after archiving]'\
-            '-ta[Process files modified after <date> in YYYYMMDDHHMMSS format]'\
-            '-tb[Process files modified before <date> in YYYYMMDDHHMMSS format]'\
-            '-tk[Keep original archive time]'\
-            '-tl[Set archive time to latest file]'\
-            '-tn[Process files newer than <time>]'\
-            '-to[Process files older than <time>]'\
-            '-u[Update files]'\
-            '-v[Create volumes with size autodetection or list all volumes]'\
-            '-ver[File version control]'\
-            '-vn[Use the old style volume naming scheme]'\
-            '-vp[Pause before each volume]'\
-            '-w+[Assign work directory]:work directory:_files -/'\
-            '-x[Exclude specified file]'\
-            '-y[Assume Yes on all queries]'\
-            '-z+[Read archive comment from file]:comment file:_files' \
-            '*:files:_files'
+      _arguments -s \
+	'-ag[generate archive name using the current date]' \
+	'-as[synchronize archive contents]' \
+	'-av[put authenticity verification (registered versions only)]' \
+	'-df[delete files after archiving]' \
+	'-ds[disable name sort for solid archive]' \
+	'-e[set file exclude attributes]' \
+	'-ed[do not add empty directories]' \
+	'-en[do not put end of archive block]' \
+	'-ep1[exclude base directory from names]' \
+	'-ep2[expand paths to full]' \
+	'-hp[encrypt both file data and headers]' \
+	'-ilog[log errors to file (registered versions only)]' \
+	'-isnd[enable sound]' \
+	'-k[lock archive]' \
+	'-m+[set compression level]:compression level:(( 0\:store 1\:fastest 2\:fast 3\:normal 4\:good 5\:maximal ))' \
+	'-md+[dictionary size]:dictionary size (KB):( 64 128 256 512 1024 2048 4096 a b c d e f g )' \
+	'-ms[specify file types to store]' \
+	'-ol[save symbolic links as the link instead of the file]' \
+	'-p[set password]' \
+	'-r0[recurse subdirectories for wildcard names only]' \
+	'-rr[add data recovery record]' \
+	'-rv[create recovery volumes]' \
+	'-s[create solid archive]' \
+	'-se[create solid archive using extension]' \
+	'-sv[create solid archive using volumes]' \
+	'-s\-[disable solid archiving]' \
+	'-sfx[create SFX archive]' \
+	'-t[test files after archiving]' \
+	'-tk[keep original archive time]' \
+	'-tl[set archive time to latest file]' \
+	'-vn[use the old style volume naming scheme]' \
+	'-w+[assign work directory]:work directory:_files -/' \
+	"$common[@]" \
+	'-z+[read archive comment from file]:comment file:_files' \
+	'*:files:_files' && return
     fi
-}
-_rar "$@"
+  ;;
+esac
