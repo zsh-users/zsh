@@ -1,4 +1,4 @@
-name=zsh/tcp
+name=zsh/net/tcp
 link=dynamic
 load=no
 

@@ -5,6 +5,6 @@ functions='Functions/Zftp/*'
 
 autobins="zftp"
 
-moddeps="zsh/tcp"
+moddeps="zsh/net/tcp"
 
 objects="zftp.o"

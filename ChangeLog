@@ -1,5 +1,8 @@
 2001-06-06  Clint Adams  <clint@zsh.org>
 
+	* 14778: Src/Modules/tcp.mdd, Src/Modules/zftp.mdd:
+	rename zsh/tcp to zsh/net/tcp.
+
 	* 14770: Src/Modules/tcp.c, Src/Modules/tcp.h,
 	Src/Modules/tcp.mdd, Src/Modules/zftp.c,
 	Src/Modules/zftp.mdd: move some functionality
