@@ -538,6 +538,8 @@ bin_ztcp(char *nam, char **args, char *ops, int func)
 	}
 
 	if(test) {
+#if defined(HAVE_POLL) || defined(HAVE_SELECT)
+# ifdef HAVE_POLL
 	    struct pollfd pfd;
 	    int ret;
 
@@ -549,7 +551,29 @@ bin_ztcp(char *nam, char **args, char *ops, int func)
 		zwarnnam(nam, "poll error: %e", NULL, errno);
 		return 1;
 	    }
-
+# else
+	    fd_set rfds;
+	    struct timeval tv;
+	    int ret;
+	    
+	    FD_ZERO(&rfds);
+	    FD_SET(lfd, &rfds);
+	    tv.tv_sec = 0;
+	    tv.tv_usec = 0;
+	    
+	    if(ret = select(lfd+1, &rfds, NULL, NULL, &tv)) return 1;
+	    else if (ret == -1)
+	    {
+		zwarnnam(nam, "select error: %e", NULL, errno);
+		return 1;
+	    }
+	    
+# endif
+	    
+#else
+	    zwarnnam(nam, "not currently supported", NULL, 0);
+	    return 1;
+#endif
 	}
 	sess = zts_alloc(ZTCP_INBOUND);
 
@@ -572,7 +596,6 @@ bin_ztcp(char *nam, char **args, char *ops, int func)
 
 	if(verbose)
 	    fprintf(shout, "%d is on fd %d\n", ntohs(sess->peer.in.sin_port), sess->fd);
-
     }
     else
     {

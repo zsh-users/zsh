@@ -1,3 +1,9 @@
+2001-09-27  Clint Adams  <clint@zsh.org>
+
+	* 15886: Src/Modules/tcp.c: use select if poll
+	is not available, or complain if neither are
+	available.
+
 2001-09-27  Peter Stephenson  <pws@csr.com>
 
 	* Config/version.mk, Completion/Unix/Command/.distfiles,
