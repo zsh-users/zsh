@@ -124,7 +124,7 @@ Chapter 4:  The mysteries of completion
 4.3. How does zsh deal with ambiguous completions?
 4.4. How do I complete in the middle of words / just what's before the cursor?
 4.5. How do I get started with programmable completion?
-4.6. And if programmable completion isn't good enough?
+4.6. Suppose I want to complete all files during a special completion?
 
 Chapter 5:  The future of zsh
 5.1. What bugs are currently known and unfixed? (Plus recent important changes)
@@ -184,15 +184,10 @@ email(mail-server@rtfm.mit.edu)
   The latest version of this FAQ is also available directly from any
   of the zsh archive sites listed in question link(1.6)(16).
 
-  I have been putting together a user guide to complement the manual by
+  I have put together a user guide to complement the manual by
   explaining the most useful features of zsh in a more easy to read way.
-  This will be a long project, but a partial version describing how to
-  write startup files and how to use the new, more powerful, form for
-  completion which first appeared in 3.1.6 (and is not described in this
-  FAQ) can be seen by looking at
-    url(http://www.pwstephenson.fsnet.co.uk/computing/)
-(http://www.pwstephenson.fsnet.co.uk/computing/)
-  where it exists in various formats.
+  This can be found at the zsh web site:
+    url(http://zsh.sunsite.dk/Guide/)(http://zsh.sunsite.dk/Guide/)
 
   (As a method of reading the following in Emacs, you can type tt(\M-2
   \C-x $) to make all the indented text vanish, then tt(\M-0 \C-x $)
@@ -1777,22 +1772,6 @@ sect(Why is my output duplicated with `tt(foo 2>&1 >foo.out | bar)'?)
 
 chapter(The mysteries of completion)
 
-Programmable completion using the `compctl' command is one of the most
-powerful, and also potentially confusing, features of zsh; here I give
-a short introduction.  There is a set of example completions supplied
-with the source in Misc/compctl-examples; completion definitions for
-many of the most obvious commands can be found there.
-
-If this confuses you, you may like to know that there is a new, more
-elegant completion system which appeared in version 3.1.6.  This is based
-on functions called automatically for completion in particular contexts
-(for example, there is a function called tt(_cd) to handle completion for
-the tt(cd) command) and is installed automatically with the shell, so all
-you need to do, in principal, is to arrange for this to be loaded.  Putting
-`tt(autoload -U compinit; compinit)' in your tt(.zshrc) should be enough if
-the system is installed properly.  The rest of this section talks about the
-old completion system.
-
 
 sect(What is completion?)
 
@@ -1814,6 +1793,15 @@ sect(What is completion?)
   fairly intuitive and not under user control; for the rest of the
   chapter I will discuss completion only.
 
+  An elegant completion system appeared in version 4, replacing the old
+  tt(compctl) command.  This is based on functions called automatically for
+  completion in particular contexts (for example, there is a function
+  called tt(_cd) to handle completion for the tt(cd) command) and is
+  installed automatically with the shell, so all you need to do, in
+  principal, is to arrange for this to be loaded.  Putting `tt(autoload -U
+  compinit; compinit)' in your tt(.zshrc) should be enough if the system is
+  installed properly.
+
 
 sect(What sorts of things can be completed?)
 label(42)
@@ -1822,7 +1810,7 @@ label(42)
   you have made special arrangements, as described below, then after
   you type a command name, anything else you type is assumed by the
   completion system to be a filename.  If you type part of a word and
-  hit TAB, zsh will see if it matches the first part a file name and
+  hit TAB, zsh will see if it matches the first part a filename and
   if it does it will automatically insert the rest.
 
   The other simple type is command completion, which applies
@@ -1831,56 +1819,12 @@ label(42)
   (or something else you can execute, like a builtin command, a
   function or an alias) and tries to complete that.
 
-  Other forms of completion have to be set up by special arrangement.
-  See the manual entry for compctl for a list of all the flags:  you
-  can make commands complete variable names, user names, job names,
-  etc., etc.
-
-  For example, one common use is that you have an array variable,
-  tt($hosts), which contains names of other machines you use frequently on
-  the network:
-  verb(
-    hosts=(fred.ph.ku.ac.uk snuggles.floppy-bunnies.com here.there.edu)
-  )
-  then you can tell zsh that when you use telnet (or ftp, or ...), the
-  argument will be one of those names:
-  verb(
-    compctl -k hosts telnet ftp ...
-  )
-  so that if you type mytt(telnet fr) and hit TAB, the rest of the name
-  will appear by itself.
-
-  An even more powerful option to tt(compctl) (tt(-g)) is to tell zsh that
-  only certain sorts of filename are allowed.  The argument to tt(-g) is
-  exactly like a glob pattern, with the usual wildcards mytt(*), mytt(?), etc.
-  In the compctl statement it needs to be quoted to avoid it being
-  turned into filenames straight away.  For example,
-  verb(
-    compctl -g '*.(ps|eps)' ghostview
-  )
-  tells zsh that if you type TAB on an argument after a ghostview
-  command, only files ending in mytt(.ps) or mytt(.eps) should be considered
-  for completion.
-
-  A useful addition for zsh from version 3.1 is directory completion:
-  verb(
-    compctl -/ cd
-  )
-  Before, you had to use tt(-g), but this is neater: it takes care of
-  things like ignoring directories beginning with a dot unless you've
-  typed the dot yourself, and whole directory paths are understood.
-
-  Note that flags may be combined; if you have more than one, all the
-  possible completions for all of them are put into the same list, all
-  of them being possible completions.  So
-  verb(
-    compctl -k hosts -f rcp
-  )
-  tells zsh that rcp can have a hostname or a filename after it.  (You
-  really need to be able to handle host:file, which is where
-  programmable completion comes in, see link(4.5)(45).)  Also, from
-  version 3.1 you can always handle directories at the same time as
-  other files just by adding tt(-/) to the list.
+  However, the new completion system is highly sensitive to context
+  and comes with completions for many UNIX commands.  These are
+  automatically loaded when you run tt(compinit) as described above.
+  So the real answer to the question `what can be completed?' is
+  `anything where an automated guess is possible'.  Just hit TAB
+  and see if the shell manages to guess correctly.
 
 
 sect(How does zsh deal with ambiguous completions?)
@@ -1923,10 +1867,10 @@ sect(How does zsh deal with ambiguous completions?)
 
 sect(How do I complete in the middle of words / just what's before the cursor?)
 
-  Sometimes you have a word on the command-line (let's stick to file
-  names) which is incomplete in the middle.  Normally if you hit tab
-  in zsh, it will simply go to the end of the word and try to complete
-  there.  However, there are two ways of changing this.
+  Sometimes you have a word on the command-line which is incomplete in the
+  middle.  Normally if you hit tab in zsh, it will simply go to the end of
+  the word and try to complete there.  However, there are two ways of
+  changing this.
 
   First, there is the option COMPLETE_IN_WORD.  This tries to fill in
   the word at the point of the cursor.  For example, if the current
@@ -1934,163 +1878,55 @@ sect(How do I complete in the middle of words / just what's before the cursor?)
   complete mytt(fbar) to mytt(foobar) by moving the cursor to the
   mytt(b) and hitting tab.
 
-  That's not the full story, however.  Sometimes you just want the
-  part of the word before the cursor completed.  For example, the word
-  is mytt(/usr/loc/b), which you want to complete to mytt(/usr/local/bin).
-  Normally, zsh won't do this in one go because there are two bits
-  missing (but see below!), so you need to complete the mytt(/usr/loc)
-  on its own first.  For this you need the function
-  tt(expand-or-complete-prefix): it works mostly like the usual
-  function bound to tab, but it ignores anything on the right of the
-  cursor.  If you always want this behaviour (some other shells do
-  this), bind it to tab; otherwise put another binding, e.g. mytt(^X
-  TAB) in tt(~/.zshrc):
+  To complete just what's before the cursor, ignoring anything after, you
+  need the function tt(expand-or-complete-prefix): it works mostly like the
+  usual function bound to tab, but it ignores anything on the right of the
+  cursor.  If you always want this behaviour (some other shells do this),
+  bind it to tab; otherwise put another binding, e.g. mytt(^X TAB) in
+  tt(~/.zshrc):
   verb(
     bindkey "^X^I" expand-or-complete-prefix
   )
-  then in the example you can move to just after mytt(/usr/loc), hit
-  whatever key you've just bound, move to the end, and hit tab.
-  (Note that tt(AUTO_REMOVE_SLASH) behaviour applies here, see the manual.)
 
-  Even that doesn't exhaust the possibilities.  Included with the
-  source distribution is the file tt(Functions/multicomp), a function
-  which you can bind as an alternative form of default completion (see
-  below for a description of alternative completion), e.g.
-  verb(
-    compctl -D -f + -U -Q -K multicomp
-  )
-  and whole sequences of directories, like mytt(/usr/loc/b) or even
-  mytt(/u/l/b) can be completed in one go.  It works best with
-  menucompletion if the result is ambiguous.
+  The completion system's handling of filenames allows you to complete
+  multiple segments of a path in one go, so for example tt(/u/l/b)
+  can expand to tt(/usr/local/bin) or anything else that matches.  This
+  saves you having to expand the middle part of the path separately.
 
 
 sect(How do I get started with programmable completion?)
 label(45)
 
-  Finally, the hairiest part of completion.  It is possible to get zsh
-  to consider different completions not only for different commands,
-  but for different words of the same command, or even to look at
-  other words on the command line (for example, if the last word was a
-  particular flag) and decide then.
+  The main resource is the tt(zshcompsys) manual page.  It's complicated,
+  I'm afraid, far too much to go into here.  See also the user guide
+  referred to above, or copy one of the very many existing functions.  For
+  a professionally produced guide, see the book `From Bash to Z Shell:
+  Conquering the Command Line' by Oliver Kiddle, Jerry Peek and Peter
+  Stephenson (me), published by Apress, ISBN 1-59059-376-6.  Chapter 10
+  tells you how to configure the completion system and chapter 15 how
+  to write your own completion functions.
 
-  There are really two sorts of things to worry about.  The simpler is
-  alternative completion:  that just means zsh will try one
-  alternative, and only if there are no possible completions try the
-  next.  For example
+
+sect(Suppose I want to complete all files during a special completion?)
+
+  If you're using the completion system the shell will decide what
+  to complete when you hit TAB.  That's usually the right thing for
+  the context, but sometimes you just want to complete files, like
+  TAB used to do in the old days.  You can set up this up as follows:
   verb(
-    compctl -g '*.ps' + -f lpr
+    zle -C complete-file complete-word _generic
+    zstyle ':completion:complete-file::::' completer _files
+    bindkey '^xF' complete-file
   )
-  says that after lpr you'd prefer to find only mytt(.ps) files, so if
-  there are any, only those are used, but if there aren't any, any
-  old file is a possibility.  You can also have a tt(+) with no flags
-  after it, which tells zsh that it's to treat the command like any
-  other if nothing was found.  That's only really useful if your
-  default completion is fancy, i.e. you have done something with
-  mytt(compctl -D) to tell zsh how commands which aren't specially handled
-  are to have their arguments completed.
+  This turns the key tt(\C-x F) into a command tt(complete-file) which
+  goes straight to the completion system's file completion command,
+  ignoring the normal context.  Change the binding how you like.
 
-  The second sort is the hard one.  Following a mytt(-x), zsh expects that
-  the next thing will be some completion code, which is a single
-  letter followed by an argument in square brackets.  For example
-  mytt(p[1]): mytt(p) is for position, and the argument tells it to look at
-  position 1; that says that this completion only applies to the word
-  immediately after the command.  You can also say mytt(p[1,3]) which says
-  the completion only applies to the word if it's between the first
-  and third words, inclusive, after the command, and so on.  See the
-  list in the `compctl' manual entry for a list of these conditions:
-  some conditions take one argument in the square brackets, some two.
-  Usually, negative numeric arguments count backwards from the end
-  (for example, mytt(p[-1]) applies to the last word on the line).
-
-  (Note the difference in the ways mytt(+) and mytt(-x) work.  A mytt(+)
-  completion will always try and find completions for what's before
-  the mytt(+) first; it will only produce a list for what's after if
-  the first list was empty.  On the other hand, if a condition for a
-  mytt(-x) matches, the appropriate set of completions is always used,
-  even if the list of completions produced is empty.)
-
-  The condition is then followed by the flags as usual (as in link(4.2)(42)),
-  and possibly other condition/flag sets following a single -; the
-  whole lot ends with a double -- before the command name.  In other
-  words, each extended completion section looks like this:
-  verb(
-    -x <pattern> <flags>... [ - <pattern> <flags>... ...] --
-  )
-
-  Let's look at rcp again: this assumes you've set up tt($hosts) as above.
-  This uses the mytt(n[<n>,<string>]) flag, which tells zsh to look for
-  the tt(<n>)'th occurrence of <string> in the word, ignoring anything up
-  to and including that.  We'll use it for completing the bits of
-  rcp's mytt(user@host:file) combination.  (Of course, the file name is on
-  the local machine, not mytt(host), but let's ignore that; it may still
-  be useful.)
-  COMMENT(-- note space after backslash --)
-  verb(
-    compctl -k hosts -S ':' + -f -x 'n[1,:]' -f - \ 
-          'n[1,@]' -k hosts -S ':' -- rcp
-  )
-  This means: (1) try and complete a hostname (the bit before the
-  mytt(+)), if successful add a mytt(:) (tt(-S) for suffix); (2) if that fails
-  move on to try the code after the mytt(+):  look and see if there is a
-  mytt(:) in a word (the mytt(n[1,:])); if there is, complete filenames
-  (tt(-f)) after the first of them; (3) otherwise look for an mytt(@) and
-  complete hostnames after the first of them (the mytt(n[1,@])), adding a
-  mytt(:) if successful; (4) if all else fails use the mytt(-f) before the
-  mytt(-x) and try to complete files.
-
-  So the rules for order are (1) try anything before a mytt(+) before
-  anything after it (2) try the conditions after a tt(-x) in order until
-  one succeeds (3) use the default flags before the tt(-x) if none of the
-  conditions was true.
-
-  Different conditions can also be combined.  There are three levels
-  of this (in decreasing order of precedence):
-  enumerate(
-   myeit() multiple square brackets after a single condition give
-      alternatives:  for example, mytt(s[foo][bar]) says apply the
-      completion if the word begins with mytt(foo) or mytt(bar),
-   myeit() spaces between conditions mean both must match:  for example,
-      mytt(p[1] s[-]) says this completion only applies for the first word
-      after the command and only if it begins with a mytt(-),
-   myeit() commas between conditions mean either can match:  for example,
-      mytt(c[-1,-f], s[-f]) means either the previous word (-1 relative to
-      the current one) is tt(-f), or the current word begins with tt(-f) ---
-      useful to use the same completion whether or not the tt(-f) has a
-      space after it.
-  )
-  You must be careful to put the whole expression inside quotation
-  marks, so that it appears as a single argument to tt(compctl).
-
-  Here's a useless example just to show a general mytt(-x) completion.
-  verb(
-    compctl -f -x 'c[-1,-u][-1,-U] p[2], s[-u]' -u - \ 
-      'c[-1,-j]' -P % -j -- foobar
-  )
-  The way to read this is:  for command mytt(foobar), look and see if (((the
-  word before the current one is tt(-u)) or (the word before the current
-  one is tt(-U))) and (the current word is 2)) or (the current word begins
-  with tt(-u)); if so, try to complete user names.  If the word before
-  the current one is tt(-j), insert the prefix mytt(%) before the current word
-  if it's not there already and complete job names.  Otherwise, just
-  complete file names.
-
-
-sect(And if programmable completion isn't good enough?)
-
-  ...then your last resort is to write a shell function to do it for
-  you.  By combining the mytt(-U) and mytt(-K func) flags you can get
-  almost unlimited power.  The mytt(-U) tells zsh that whatever the
-  completion produces is to be used, even if it doesn't fit what's
-  there already (so that gets deleted when the completion is
-  inserted).  The mytt(-K func) tells zsh a function name.  The
-  function is passed the part of the word already typed, and can read
-  the rest of the line with mytt(read -c).  It can return a set of
-  completions via the mytt(reply) array, and this becomes the set of
-  possible completions.  The best way to understand this is to look at
-  mytt(multicomp) and other functions supplied with the zsh
-  distribution.  Almost certainly, however, you are better off using
-  the new completion system for anything complicated.  No further
-  upgrades are planned for the old system.
+  Note the way the form of completion to use is specified by picking a
+  `completer' called `tt(_files)'.  You can define any completion
+  to be bound to a keystroke by putting the appropriate completion
+  function at that point.  Then change all occurrences of
+  `tt(complete-file)' to a name of your own.
 
 
 chapter(The future of zsh)
@@ -2099,133 +1935,15 @@ sect(What bugs are currently known and unfixed? (Plus recent \
 important changes))
 label(51)
 
-  Here are some of the more well-known ones, very roughly in
-  decreasing order of significance.  Many of these can also be counted
-  against differences from ksh in question link(2.1)(21); note that \
-this applies
-  to the latest beta version and that simple bugs are often fixed
-  quite quickly.  There is a file Etc/BUGS in the source distribution
-  with more detail.
+  Bugs tend to be tracked on the zsh-workers mailing list; see the
+  next section.  Check the mailing list to see if a bug has been
+  reported.  (There is a bug tracker at the zsh development site
+  at Sourceforge, but it's not in active use.)
 
-  itemize(
-  it() Parameter expansions using the tt(${param+word}) and tt(${param-word})
-    forms may fail to behave in Bourne-shell-compatible fashion when the
-    tt(SH_WORD_SPLIT) option is set and the word contains spaces.
-  it() mytt(time) is ignored with builtins and can't be used with mytt({...}).
-  it() mytt(set -x) (mytt(setopt xtrace)) still has a few glitches; these
-     are mostly fixed in 3.1.6.
-  it() Zsh's notion of the current line number (via tt($LINENO)) is
-     sometimes not well handled, particularly when using functions and traps.
-     This should also work reliably from 3.0.6 and 3.1.6.
-  it() In vi mode, mytt(u) can go past the original modification point.
-  it() The singlelinezle option has problems with prompts containing escapes.
-  it() The mytt(r) command does not work inside mytt($(...)) or mytt(`...`)
-     expansions.   This is fixed in 3.1.
-  it() mytt(typeset) handling is non-optimal, particularly with regard to
-     flags, and is ksh-incompatible in unpredictable ways.  3.1.6 has
-     been overhauled, but remaining glitches are to be expected.
-  it() Nested closures in extended globbing and pattern matching, such as
-  verb(
-      [[ fofo = (fo#)# ]]
-  )
-     were once not correctly handled, and there were problems with
-     complicated exclusions using mytt(^) or mytt(~).  These are fixed
-     since version 3.1.3.
-  )
-  it() Handling of the mytt(:q) and mytt(:x) with parameter subsitutions is
-    erratic: neither work in any 3.0 release, and tt(:x) doesn't work in
-    any release so far.
-
-  Note that a few recent changes introduce incompatibilities (these
-  are not bugs):
-
-  Changes after zsh 3.0:
-  itemize(
-  it() The options tt(ALWAYS_LAST_PROMPT) (return to the line you were
-     editing after displaying completion lists) and tt(LIST_AMBIGUOUS)
-     (don't do tt(AUTO_LIST) if there was an unambiguous prefix that could be
-     inserted, i.e. only list if it is ambiguous what to insert next) are
-     now set by default.  This is in response to complaints that too many
-     zsh features are never noticed by many users.  To turn them off,
-     just put mytt(unsetopt alwayslastprompt listambiguous) in your
-     tt(.zshrc) file.
-  it() In 3.1.5, tt(history-search-{forward,backward}) only find previous
-     lines where the first word is the same as the current one.  For
-     example, 
-    verb(
-      comp<ESC>p
-    )
-     will find lines in the history like mytt(comp -edit emacs), but not
-     mytt(compress file) any more.  For this reason, mytt(\M-n) and
-     mytt(\M-p) use tt(history-beginning-search-{forward,backward}) which
-     search for a line with the same prefix up to the cursor position.
-     From 3.1.6, there is a different implementation which makes this
-     closer (though not identical) to the old behaviour, and the
-     traditional bindings have been restored.. The story for the 
-     tt({up,down}-line-or-search) commands is similar.
-  it() In vi insert mode, the cursor keys no longer work.  The following
-     will bind them:
-      COMMENT(-- note space after backslash --)
-      verb(
-       bindkey -M viins '^[[D' vi-backward-char '^[[C' vi-forward-char \ 
-                      '^[[A' up-line-or-history '^[[B' down-line-or-history
-      )
-     (unless your terminal requires mytt(^[O) instead of mytt(^[[)).  The
-     rationale is that the insert mode and command mode keymaps for
-     keys with prefixes are now separate.
-  )
-
-  Changes since zsh 2.5:
-  itemize(
-  it() The left hand of an assignment is no longer substituted.  Thus,
-     mytt($1=$2) will not work.  You can use something like mytt(eval
-     "$1=\$2"), which should have the identical effect.
-  it() Signal traps established with the `trap' builtin are now called with
-     the environment of the caller, as in ksh, instead of as a new
-     function level.  Traps established as functions (e.g. mytt(TRAPINT()
-     {...})) work as before.
-  it() The tt(NO_CLOBBER) option is now -C and tt(PRINT_EXIT_VALUE) -1; they
-     used to be the other way around.  (Use of names rather than letters is
-     generally recommended.)
-  it() mytt([[) is a reserved word, hence must be separated from
-     other characters by whitespace; mytt({) and mytt(}) are also reserved
-     words if the tt(IGNORE_BRACES) option is set.
-  it() The option tt(CSH_JUNKIE_PAREN) has been removed:  csh-like code now
-     always does what it looks like it does, so mytt(if ( ... ) ...)
-     executes the code in parentheses in a subshell.  To make this
-     useful, the syntax expected after an mytt(if), etc., is less strict
-     than in other shells.
-  it() mytt(foo=*) does not perform globbing immediately on the right
-     hand side of the assignment; the old behaviour now requires the
-     option tt(GLOB_ASSIGN).  (mytt(foo=(*)) is and has always been the
-     consistent way of doing this.)
-  it() tt(<>) performs redirection of input and output to the specified file.
-     For numeric globs, you now need tt(<->).
-  it() The command line qualifiers tt(exec), tt(noglob), tt(command), \
-     tt(-) are now
-     treated more like builtin commands:  previously they were
-     syntactically special.  This should make it easier to perform
-     tricks with them (disabling, hiding in parameters, etc.).
-  it() The pushd builtin has been rewritten for compatibility with other
-     shells.  The old behavour can be achieved with a shell function.
-  it() The current version now uses tt(~)'s for directory stack substitution
-     instead of tt(=)'s.  This is for consistency:  all other directory
-     substitution (tt(~user), tt(~name), tt(~+), ...) used a tilde, while
-     tt(=<number>) caused problems with tt(=program) substitution.
-  it() The tt(HISTLIT) option was broken in various ways and has been removed:
-     the rewritten history mechanism doesn't alter history lines, making
-     the option unnecessary.
-  it() History expansion is disabled in single-quoted strings, like other
-     forms of expansion -- hence exclamation marks there should not be
-     backslashed.
-  it() The mytt($HISTCHARS) variable is now mytt($histchars).  Currently both
-     are tied together for compatibility.
-  it() The tt(PROMPT_SUBST) option now performs backquote expansion -- hence
-     you should quote these in prompts.  (SPROMPT has changed as a result.)
-  it() Quoting in prompts has changed: close parentheses inside ternary
-     expressions should be quoted with a tt(%); history is now tt(%!), not
-     tt(!).  Backslashes are no longer special.
-  )
+  To see how recent versions of the shell have changed, look at
+  the README file in the source distribution.  This indicates the
+  most important changes, and in particular draws attention to
+  incompatibilities you might notice.
 
 
 sect(Where do I report bugs, get more info / who's working on zsh?)
@@ -2293,56 +2011,23 @@ label(52)
 
 sect(What's on the wish-list?)
 
-  With version 3, the code is much cleaner than before, but still
-  bears the marks of the ages and many things could be done much
+  The code bears the marks of the ages and many things could be done much
   better with a rewrite.  A more efficient set of code for
   lexing/parsing/execution might also be an advantage.  Volunteers are
   particularly welcome for these tasks.
 
-  Here are the latest changes, which appeared in zsh 3.1.6.
+  Some future possibilities which have been suggested:
   itemize(
-  it() Even more powerful new completion system, based on shell functions,
-     allowing much more detailed control both over generation of matches
-     for completion and how they are inserted and displayed.  A set of
-     functions which work `out of the box' will be available, including
-     many functions for external commands:  files in tar archives can
-     be listed for extraction as if they were real files; GNU commands
-     which accept the mytt(--help) option can generate completion lists for
-     themselves on the fly, etc., etc.
-     You can have old-style tt(compctl)-based completions for some commands,
-     and new-style ones for others; you can bind particular completion
-     commands of your own definition to key-strokes.
-  it() Other completion enhancements:  matching control, allowing
-     case-insensitive matching and wild card anchors, e.g. mytt(z_t<TAB>)
-     can allow a wildcard before the mytt(_) so that this will expand
-     to mytt(zle_tricky.c) --- all under user control; completions can
-     be grouped; a new completion command, menu-select, allows real menu
-     selection --- you can move the cursor around to choose a completion.
-  it() Case-insensitive and approximate matching in the globbing code:
-     for example, mytt((#ia2)readme) matches the string mytt(readme)
-     case-insensitively with up to two errors, such as tt(README),
-     tt(READ.ME), tt(_README_), tt(Read!Me!).  The new completion system
-     knows about these, allowing correcting completion, e.g.
-     mytt(mkaef<TAB>) can be made to complete to mytt(Makefile).
-  it() Associative arrays, declared with mytt(typeset -A aname); syntax
-     for creating, accessing and deleting elements of these.
-  it() Users can create their own tt(foopath)/tt(FOOPATH) array/path
-     combinations, just like tt(path) and tt(PATH).
-  it() A dynamically loadable library for FTP, complete with a suite of
-     functions to make it easy to use.  This allows you to use the shell's
-     capabilities for scripting, line editing, completion, I/O redirection,
-     directory management etc. within an FTP session.
-  )
-
-  Other future possibilities which have been suggested:
-  itemize(
+  it() The shell, in particular the line editor, should support Unicode
+     characters.  Initial support for this should appear in version 4.3,
+     but this is a large job.
   it() The parameter code could do with tidying up, maybe with more of the
      features made available in ksh93.
   it() Configuration files to enable zsh startup files to be created
      with the Dotfile Generator.
   it() Further improvements in integrating the line editor with shell
      functions.
-  it() Ksh compatibility could be improved.
+  it() POSIX compatibility could be improved.
   it() Option for glob qualifiers to follow perl syntax (a traditional item).
   )
 
