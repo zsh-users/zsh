@@ -1,5 +1,8 @@
 2002-03-17  Clint Adams  <clint@zsh.org>
 
+        * 16850: Completion/Unix/Command/_rsync: remote file completion via
+	rsync and ssh, plus all options valid in rsync 2.5.2.
+
         * 16846: Completion/X/Command/_xdvi: complete .dvi.gz and .dvi.bz2
         too.
 
