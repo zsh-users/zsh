@@ -1,6 +1,9 @@
 Makefile
 Makemod.in Makemod
-*.pro
+*.export
+[_a-zA-Z0-9]*.pro
+*.epro
+*.syms
 *.o
 *.o.c
 *.so
@@ -19,7 +22,9 @@ zsh
 libzsh.so*
 sigcount.h
 signames.c
+version.h
 zshpaths.h
 zshxmods.h
 bltinmods.list
 tags TAGS
+cscope.out

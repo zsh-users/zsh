@@ -1,3 +1,7 @@
+2000-08-16  Peter Stephenson  <pws@csr.com>
+
+	* Andrej: 12658: .cvsignore, Src/.cvsignore: cscope ignorance.
+
 2000-08-16  Sven Wischnowsky  <wischnow@zsh.org>
 
 	* 12654: Doc/Zsh/mod_parameter.yo, Src/Modules/parameter.c: make
