@@ -1,0 +1,3 @@
+#compdef disown fg jobs
+
+_jobs
