@@ -21,19 +21,6 @@
 	* 14408: Test/C02cond.ztst: do chmod +w to work around rm -f
 	problem in Cygwin.
 
-
-	* unposted: Completion/Unix/Type/_diff_options: quote $@
-	in calls to _arguments.
-
-2001-05-21  Oliver Kiddle  <opk@zsh.org>
-
-	* 14409: Completion/Zsh/Command/_set: make use of _arguments in _set
-
-2001-05-21  Peter Stephenson  <pws@csr.com>
-
-	* 14408: Test/C02cond.ztst: do chmod +w to work around rm -f
-	problem in Cygwin.
-
 	* unposted: Test/.distfiles: add Test/E01options.ztst.
 
 2001-05-20  Peter Stephenson  <pws@pwstephenson.fsnet.co.uk>
