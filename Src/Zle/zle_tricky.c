@@ -2297,7 +2297,9 @@ match_str(char *l, char *w, int *bp, int *rwlp, int sfx, int test)
 	    for (mp = ms->matcher; mp; mp = mp->next) {
 		t = 1;
 		if ((lm && lm == mp) ||
-		    ((oll == ll || olw == lw) && test && mp->wlen < 0))
+		    ((oll == ll || olw == lw) &&
+		     (test == 1 || (!mp->left && !mp->right)) &&
+		     mp->wlen < 0))
 		    /* If we were called recursively, don't use `*' patterns
 		     * at the beginning (avoiding infinite recursion). */
 		    continue;
@@ -2359,7 +2361,7 @@ match_str(char *l, char *w, int *bp, int *rwlp, int sfx, int test)
 				savw = tp[-zoff];
 				tp[-zoff] = '\0';
 				t = match_str(l - ll, w - lw,
-					      NULL, NULL, 1, 1);
+					      NULL, NULL, 1, 2);
 				tp[-zoff] = savw;
 			    } else
 				t = match_str(l + llen + moff, tp + moff,
@@ -2410,6 +2412,12 @@ match_str(char *l, char *w, int *bp, int *rwlp, int sfx, int test)
 			    add_match_sub(NULL, NULL, ol, op, ol);
 			    add_match_sub(NULL, NULL, llen + alen,
 					  lp, llen + alen);
+			} else if (sfx) {
+			    add_match_str(NULL, NULL,
+					  map, ct + ol + alen, sfx);
+			    add_match_part(mp, l + aoff, wap, alen,
+					   l + loff, llen, op, ol, ol, sfx);
+			    add_match_sub(NULL, NULL, 0, wmp, ct);
 			} else {
 			    add_match_str(NULL, NULL,
 					  map, ct + ol + alen, sfx);
@@ -2590,10 +2598,10 @@ match_str(char *l, char *w, int *bp, int *rwlp, int sfx, int test)
 	}
 	for (t = matchparts; (tn = t->next); t = tn) {
 	    s = (tn->prefix ? tn->prefix : tn->suffix);
-	    if (t->prefix)
-		t->prefix = s;
-	    else
+	    if (t->suffix)
 		t->suffix = s;
+	    else
+		t->prefix = s;
 	}
 	t->prefix = t->suffix = NULL;
     }
@@ -4924,13 +4932,15 @@ makecomplist(char *s, int incmd, int lst)
 	int n;
 
 	for (n = 0; m; m = m->next, n++) {
-	    *mp = (Cmlist) zhalloc(sizeof(struct cmlist));
-	    (*mp)->matcher = m->matcher;
-	    (*mp)->next = NULL;
-	    (*mp)->str = dupstring(m->str);
-	    mp = &((*mp)->next);
-	    addlinknode(matchers, m->matcher);
-	    m->matcher->refc++;
+	    if (m->matcher) {
+		*mp = (Cmlist) zhalloc(sizeof(struct cmlist));
+		(*mp)->matcher = m->matcher;
+		(*mp)->next = NULL;
+		(*mp)->str = dupstring(m->str);
+		mp = &((*mp)->next);
+		addlinknode(matchers, m->matcher);
+		m->matcher->refc++;
+	    }
 	}
 	m = mm;
 	compmatcher = 1;

@@ -20,8 +20,8 @@ _xt_arguments \
   '-cu' '+cu' \
   '-dc' '+dc' \
   '-e:program: _command_names -e:*::program arguments: _normal' \
-  '-fb:bold font:' \
-  '-fi:icon font:' \
+  '-fb:bold font:_x_font' \
+  '-fi:icon font:_x_font' \
   '-hc:background color for highlighted text:_colors' \
   '-hf' '+hf' \
   '-ie' '+ie' \

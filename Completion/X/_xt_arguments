@@ -24,7 +24,6 @@ _arguments \
   '+rv' '-rv' '-reverse' \
   '+synchronous' '-synchronous' \
   '-background:background color:_colors' \
-  '-background:background color:_colors' \
   '-bd:border color:_colors' \
   '-bg:background color:_colors' \
   '-bordercolor:border color:_colors' \
