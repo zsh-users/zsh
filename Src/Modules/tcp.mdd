@@ -1,0 +1,5 @@
+name=zsh/tcp
+link=dynamic
+load=no
+
+objects="tcp.o"
