@@ -36,7 +36,7 @@ _cvs () {
 
 (( $+functions[_cvs_command] )) ||
 _cvs_command () {
-  local cmd
+  local cmd cvsroot="${opt_args[-d]:Q}"
   typeset -A cmds
   cmds=(add " ad new "          admin " adm rcs "       annotate " ann "
 	checkout " co get "     commit " ci com "       diff " di dif "
@@ -432,7 +432,16 @@ _cvs_remove () {
     '-f[force to remove]' \
     '(-R)-l[don'\''t recursive]' \
     '(-l)-R[recursive]' \
-    '*:file:_cvs_files_removed'
+    '*:file:_cvs_remove_arg'
+}
+
+(( $+functions[_cvs_remove_arg] )) ||
+_cvs_remove_arg () {
+  if (( $+opt_args[-f] )); then
+    _cvs_files
+  else
+    _cvs_files_removed
+  fi
 }
 
 (( $+functions[_cvs_rtag] )) ||
@@ -548,11 +557,12 @@ _cvs_watchers () {
 
 (( $+functions[_cvs_loadstat] )) ||
 _cvs_loadstat () {
-  zstyle -t ":completion:${curcontext}:" disable-stat && return
-  (( $+_cvs_loadstat_tried )) && return
-  _cvs_loadstat_tried=yes
+  zstyle -t ":completion:${curcontext}:" disable-stat && return 1
+  (( $+_cvs_loadstat_status )) && return $_cvs_loadstat_status
 
   zmodload -i zsh/stat 2>/dev/null
+  (( _cvs_loadstat_status = ! $+builtins[stat] ))
+  return $_cvs_loadstat_status
 }
 
 (( $+functions[_cvs_root] )) ||
@@ -562,8 +572,7 @@ _cvs_root () {
   typeset -gU _cvs_roots
 
   if [[ -f "${cvspassfile::=${CVS_PASSFILE:-$HOME/.cvspass}}" ]]; then
-    _cvs_loadstat
-    if (( $+builtins[stat] )); then
+    if _cvs_loadstat; then
       id="$(LC_ALL=C builtin stat -g +mtime -F '%Y/%m/%d-%T' "$cvspassfile")"
     else
       id="$(LC_ALL=C ls -l "$cvspassfile")"
@@ -629,14 +638,26 @@ _cvs_m () {
 
 (( $+functions[_cvs_modules] )) ||
 _cvs_modules () {
-  local root=$CVSROOT expl
-
+  local root="$CVSROOT" expl
   [[ -f CVS/Root ]] && root=$(<CVS/Root)
+  [[ -n "$cvsroot" ]] && root="$cvsroot"
 
   if [[ $root = :* || ! -d $root ]]; then
-    _message "module name"
+    if [[ $_cvs_modules_root != $root ]]; then
+      _cvs_modules_root="$root"
+      if zstyle -T ":completion:${curcontext}:" remote-access; then
+	_cvs_modules_cache=(${(M)${${(f)"$(CVS_IGNORE_REMOTE_ROOT= cvs -d "$root" co -c)"}%%[ 	]*}:#?*})
+      else
+	_cvs_modules_cache=()
+      fi
+    fi
+    if (( $#_cvs_modules_cache )); then
+      _wanted modules expl 'module name' compadd - $_cvs_modules_cache
+    else
+      _message 'module name'
+    fi
   else
-    _wanted modules expl module \
+    _wanted modules expl 'module name' \
         compadd - $root/^CVSROOT(:t) \
             ${${(M)${(f)"$(<$root/CVSROOT/modules)"}:#[^#]*}%%[ 	]*}
   fi
@@ -644,159 +665,95 @@ _cvs_modules () {
 
 (( $+functions[_cvs_revisions] )) ||
 _cvs_revisions () {
-  local expl
+  local root="$CVSROOT" expl
+  [[ -f CVS/Root ]] && root=$(<CVS/Root)
+  [[ -n "$cvsroot" ]] && root="$cvsroot"
 
-  _wanted values expl revision \
-      compadd - ${${${(M)${(f)"$(cvs -q status -vl .)"}:#	*}##[ 	]##(No Tags Exist)#}%%[ 	]*}
+  if [[ $_cvs_revisions_key != $root:$PWD ]]; then
+    _cvs_revisions_key="$root:$PWD"
+    if zstyle -T ":completion:${curcontext}:" remote-access; then
+      _cvs_revisions_cache=(
+	$(CVS_IGNORE_REMOTE_ROOT= cvs -d "$root" -q status -vl .|
+	  sed -n -e '/No Tags Exist/d' -e 's/^	\([A-Za-z][-_0-9A-Za-z]*\).*/\1/p'|
+	  sort|uniq)
+      )
+    else
+      _cvs_revisions_cache=()
+    fi
+  fi
+
+  if (( $#_cvs_revisions_cache )); then
+    _wanted values expl revision compadd - $_cvs_revisions_cache
+  else
+    _message revision
+  fi
 }
 
 # define completion functions for files maintained by cvs.
 
-(( $+functions[_cvs_setup_prefix] )) ||
-_cvs_setup_prefix () {
-  if [[ -prefix */ ]]; then
-    qpref="${PREFIX%/*}/"
-    pref=$~qpref
-  else
-    qpref=
-    pref=./
-  fi
-}
-
-(( $+functions[_cvs_extract_directory_entries] )) ||
-_cvs_extract_directory_entries () {
-  entries=($entries ${${${(M)rawentries:#D/*}#D/}%%/*})
-}
-
-(( $+functions[_cvs_extract_file_entries] )) ||
-_cvs_extract_file_entries () {
-  entries=($entries ${${${(M)rawentries:#/*}#/}%%/*})
-}
-
-(( $+functions[_cvs_extract_modifiedfile_entries] )) ||
-_cvs_extract_modifiedfile_entries () {
-  _cvs_loadstat
-  if (( ! $+builtins[stat] )); then
-    _cvs_extract_file_entries
-    return
-  fi
-
-  local ents pats
-  ents=(${${${${(M)rawentries:#/*}#/}/\\/[^\\/]#\\///}%/[^/]#/[^/]#})
-  pats=(${${${(f)"$(LC_ALL=C builtin stat -gn +mtime -F '%a %b %e %T %Y' ${pref}*(D))"}##*/}/ //})
-  eval 'ents=(${ents:#('${(j:|:)${(@)pats:q}}')})'
-  entries=($entries ${ents%%/*})
-}
-
-(( $+functions[_cvs_setup_allentries] )) ||
-_cvs_setup_allentries () {
-  entries=()
-  if [[ -f ${pref}CVS/Entries ]]; then
-    local rawentries
-    rawentries=(${(f)"$(<${pref}CVS/Entries)"})
-    _cvs_extract_file_entries
-    _cvs_extract_directory_entries
-  fi
-}
-
-(( $+functions[_cvs_setup_direntries] )) ||
-_cvs_setup_direntries () {
-  entries=()
-  if [[ -f ${pref}CVS/Entries ]]; then
-    local rawentries
-    rawentries=(${(f)"$(<${pref}CVS/Entries)"})
-    _cvs_extract_directory_entries
-  fi
-}
-
-(( $+functions[_cvs_setup_modentries] )) ||
-_cvs_setup_modentries () {
-  entries=()
-  if [[ -f ${pref}CVS/Entries ]]; then
-    local rawentries
-    rawentries=(${(f)"$(<${pref}CVS/Entries)"})
-    _cvs_extract_modifiedfile_entries
-    _cvs_extract_directory_entries
-  fi
-}
-
-(( $+functions[_cvs_directories] )) ||
-_cvs_directories () {
-  if [[ -d ${pref}CVS ]]; then
-    _cvs_setup_direntries
-    (( $#entries )) && _path_files "$@" -g "${(j:|:)${(@)entries:q}}" ||
-      _path_files -g '*~(*/|)CVS(/)'
-  else
-    _files "$@"
-  fi
-}
-
 (( $+functions[_cvs_files] )) ||
 _cvs_files () {
-  local qpref pref entries
-  _cvs_setup_prefix
-  if [[ -d ${pref}CVS ]]; then
-    _cvs_setup_allentries
-    (( $#entries )) && _files "$@" -g "${(j:|:)${(@)entries:q}}"
-  else
-    _files "$@"
-  fi
+  _alternative \
+    'directories:directory:_cvs_existing_directories' \
+    'existing-files:file:_cvs_existing_entries' \
+    'removed-files:removed file:_cvs_nonexisting_entries'
 }
 
 (( $+functions[_cvs_files_modified] )) ||
 _cvs_files_modified () {
-  local qpref pref entries
-  _cvs_setup_prefix
-  if [[ -d ${pref}CVS ]]; then
-    _cvs_setup_modentries
-    setopt localoptions unset
-    local omit
-    omit=($line)
-    eval 'entries=(${entries:#('${(j:|:)${(@)omit:q}}')})'
-    (( $#entries )) && _files "$@" -g "${(j:|:)${(@)entries:q}}"
-  else
-    _files "$@"
-  fi
+  _alternative \
+    'directories:directory:_cvs_existing_directories' \
+    'existing-files:file:_cvs_modified_entries' \
+    'removed-files:removed file:_cvs_nonexisting_entries'
 }
 
 (( $+functions[_cvs_files_removed] )) ||
 _cvs_files_removed () {
-  local qpref pref entries
-  _cvs_setup_prefix
-  if [[ -d ${pref}CVS ]]; then
-    _cvs_setup_allentries
-    setopt localoptions unset
-    local omit
-    omit=(${pref}*(D:t) $line)
-    eval 'entries=(${entries:#('${(j:|:)${(@)omit:q}}')})'
-    _tags directories && compadd "$@" -P "$qpref" - ${entries:q} ||
-        _cvs_directories "$@"
-  else
-    _files "$@"
-  fi
+  _alternative \
+    'directories:directory:_cvs_existing_directories' \
+    'removed-files:removed file:_cvs_nonexisting_entries'
 }
 
 (( $+functions[_cvs_files_unmaintained] )) ||
 _cvs_files_unmaintained () {
-  local qpref pref entries
-  _cvs_setup_prefix
-  if [[ -d ${pref}CVS ]]; then
-    _cvs_setup_allentries
-    setopt localoptions unset
-    local omit
-    omit=($_cvs_ignore_default ${entries:q} ${=cvsignore} $line)
-    [[ -r ~/.cvsignore ]] && omit=($omit $(<~/.cvsignore))
-    [[ -r ${pref}.cvsignore ]] && omit=($omit $(<${pref}.cvsignore))
-    entries=($entries CVS)
-    _path_files "$@" -g '*~(*/|)('${(j:|:)omit}')(D)' ||
-      _path_files "$@" -g '*~(*/|)('${(j:|:)${(@)entries:q}}')(D)' ||
-        _cvs_directories "$@"
-  else
-    _files "$@"
-  fi
+  _cvs_nonentried_files ||
+  _cvs_existing_directories ||
+  _cvs_strict_nonentried_files
 }
 
-# define configuration variables.
+(( $+functions[_cvs_existing_directories] )) ||
+_cvs_existing_directories () {
+  local expl
+  _wanted files expl file _path_files -g "*~(*/|)CVS(/)"
+}
+
+(( $+functions[_cvs_existing_entries] )) ||
+_cvs_existing_entries () {
+  local expl match linedir realdir pat
+  match=()
+  : ${PREFIX:#(#b)(*/)(*)}
+  linedir="$match[1]"
+  realdir=${(e)~linedir}
+  [[ -f "$realdir"CVS/Entries ]] &&
+  [[ -n ${pat::="${(@j:|:)${(@)${(@)${(@)${(@M)${(@f)"$(<"$realdir"CVS/Entries)"}:#/*}#/}%%/*}//(#m)[][*?()<|^~#\\]/\\$MATCH}}"} ]] &&
+  _wanted files expl file _path_files -g "$pat"
+}
+
+(( $+functions[_cvs_modified_entries] )) ||
+_cvs_modified_entries () {
+  if _cvs_loadstat; then
+    local expl match linedir realdir pat
+    match=()
+    : ${PREFIX:#(#b)(*/)(*)}
+    linedir="$match[1]"
+    realdir=${(e)~linedir}
+    [[ -f "$realdir"CVS/Entries ]] &&
+    [[ -n ${pat::="${(@j:|:)${(@)${(@)${(@)${(@)${(@)${(@M)${(@f)"$(<"$realdir"CVS/Entries)"}:#/*}#/}/\\/[^\\/]#\\///}%/[^/]#/[^/]#}:#${(j:|:)~${${${${(f)"$(LC_ALL=C builtin stat -gn +mtime -F '%a %b %e %T %Y' ${realdir}*(D))"}##*/}/ //}//(#m)[][*?()<|^~#\\]/\\$MATCH}}}%%/*}//(#m)[][*?()<|^~#\\]/\\$MATCH}"} ]] &&
+    _wanted files expl file _path_files -g "$pat"
+  else
+    _cvs_existing_entries
+  fi
+}
 
 (( $+_cvs_ignore_default )) ||
 _cvs_ignore_default=(
@@ -806,6 +763,58 @@ _cvs_ignore_default=(
   core
 )
 
-# call real _cvs.
+(( $+functions[_cvs_strict_nonentried_files] )) ||
+_cvs_strict_nonentried_files () {
+  local expl match linedir realdir omitpats
+
+  match=()
+  : ${PREFIX:#(#b)(*/)(*)}
+  linedir="$match[1]"
+  realdir=${(e)~linedir}
+  [[ -f "$realdir"CVS/Entries ]] && {
+    omitpats=(
+      ${${${${(M)${(f)"$(<"$realdir"CVS/Entries)"}:#/*}#/}%%/*}//(#m)[][*?()<|^~#\\]/\\$MATCH}
+    )
+    _path_files -g "*~(*/|)(${(j:|:)~omitpats})(D.)"
+  }
+}
+
+(( $+functions[_cvs_nonentried_files] )) ||
+_cvs_nonentried_files () {
+  local expl match linedir realdir omitpats
+
+  match=()
+  : ${PREFIX:#(#b)(*/)(*)}
+  linedir="$match[1]"
+  realdir=${(e)~linedir}
+  [[ -f "$realdir"CVS/Entries ]] && {
+    omitpats=(
+      ${${${${(M)${(f)"$(<"$realdir"CVS/Entries)"}:#(D|)/*}#(D|)/}%%/*}//(#m)[][*?()<|^~#\\]/\\$MATCH}
+      $_cvs_ignore_default
+      ${=cvsignore}
+    )
+    [[ -r ~/.cvsignore ]] && omitpats=($omitpats $(<~/.cvsignore))
+    [[ -r ${realdir}.cvsignore ]] && omitpats=($omitpats $(<${realdir}.cvsignore))
+
+    _path_files -g "*~(*/|)(${(j:|:)~omitpats})(D.)"
+  }
+}
+
+(( $+functions[_cvs_nonexisting_entries] )) ||
+_cvs_nonexisting_entries () {
+  local expl match linedir realdir files
+  match=()
+  : ${PREFIX:#(#b)(*/)(*)}
+  linedir="$match[1]"
+  realdir=${(e)~linedir}
+  files=(${realdir}*(D:t))
+  [[ -f "$realdir"CVS/Entries ]] && {
+    files=(
+      ${${${${(M)${(f)"$(<"$realdir"CVS/Entries)"}:#(D|)/*}#(D|)/}%%/*}:#${(j:|:)~${files//(#m)[][*?()<|^~#\\]/\\$MATCH}}}
+    )
+    compquote files
+    _wanted files expl file compadd -Qp "$linedir" $files
+  }
+}
 
 [[ -o kshautoload ]] || _cvs "$@"
