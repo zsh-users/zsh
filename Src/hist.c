@@ -2093,7 +2093,8 @@ savehistfile(char *fn, int err, int writeflags)
 	}
 	fclose(out);
 
-	if ((writeflags & (HFILE_SKIPOLD | HFILE_FAST)) == HFILE_SKIPOLD) {
+	if (writeflags & HFILE_SKIPOLD
+	 && !(writeflags & (HFILE_FAST | HFILE_NO_REWRITE))) {
 	    int remember_histactive = histactive;
 
 	    /* Zeroing histactive avoids unnecessary munging of curline. */
@@ -2445,7 +2446,7 @@ pophiststack(void)
 
 /**/
 int
-saveandpophiststack(int pop_through)
+saveandpophiststack(int pop_through, int writeflags)
 {
     if (pop_through <= 0) {
 	pop_through += histsave_stack_pos + 1;
@@ -2459,7 +2460,7 @@ saveandpophiststack(int pop_through)
 	return 0;
     do {
 	if (!nohistsave)
-	    savehistfile(NULL, 1, HFILE_USE_OPTIONS);
+	    savehistfile(NULL, 1, writeflags);
 	pophiststack();
     } while (histsave_stack_pos >= pop_through);
     return 1;
