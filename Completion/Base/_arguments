@@ -234,9 +234,8 @@ if (( $# )) && comparguments "$multi[@]" "$autod" "$@"; then
 
               # An empty action means that we should just display a message.
 
-              [[ -n "$matched" ]] &&
-                  compadd -n -Q -S '' -s "$SUFFIX" - "$PREFIX"
-              mesg="$descr"
+	      _message "$descr"
+	      mesg=yes
 
             elif [[ "$action" = \(\(*\)\) ]]; then
 
@@ -361,7 +360,6 @@ if (( $# )) && comparguments "$multi[@]" "$autod" "$@"; then
 
   [[ -n "$aret" ]] && return 300
 
-  [[ -n "$mesg" ]] && _message "$mesg"
   if [[ -n "$noargs" ]]; then
     [[ -z "$ismulti" && nm -eq "$compstate[nmatches]" ]] && _message "$noargs"
   else

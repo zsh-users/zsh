@@ -1,5 +1,8 @@
 2000-05-08  Sven Wischnowsky  <wischnow@zsh.org>
 
+	* 11253: Completion/Base/_arguments, Src/Zle/computil.c: more
+ 	problems with optional arguments in _arguments
+	
 	* 11248: Src/Zle/compmatch.c: better cursor positioning in words
  	with multiple ambiguous word parts
 	

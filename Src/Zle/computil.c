@@ -1072,7 +1072,7 @@ struct castate {
     Caarg def, ddef;
     Caopt curopt;
     int opt, arg, argbeg, optbeg, nargbeg, restbeg, curpos;
-    int inopt, inrest, inarg, nth, doff, singles, oopt;
+    int inopt, inrest, inarg, nth, doff, singles, oopt, actopts;
     LinkList args;
     LinkList *oargs;
 };
@@ -1121,7 +1121,7 @@ ca_parse_line(Cadef d, int multi)
     state.nopts = d->nopts;
     state.def = state.ddef = NULL;
     state.curopt = NULL;
-    state.argbeg = state.optbeg = state.nargbeg = state.restbeg =
+    state.argbeg = state.optbeg = state.nargbeg = state.restbeg = state.actopts =
 	state.nth = state.inopt = state.inarg = state.opt = state.arg = 1;
     state.inrest = state.doff = state.singles = state.doff = state.oopt = 0;
     state.curpos = compcurrent;
@@ -1136,7 +1136,7 @@ ca_parse_line(Cadef d, int multi)
     if (!compwords[1]) {
 	ca_laststate.opt = ca_laststate.arg = 0;
 
-	return 0;
+	goto end;
     }
     /* Loop over the words from the line. */
 
@@ -1349,6 +1349,13 @@ ca_parse_line(Cadef d, int multi)
 	    }
 	}
     }
+ end:
+
+    ca_laststate.actopts = 0;
+    for (ptr = d->opts; ptr; ptr = ptr->next)
+	if (ptr->active)
+	    ca_laststate.actopts++;
+
     return 0;
 }
 
@@ -1574,7 +1581,8 @@ bin_comparguments(char *nam, char **args, char *ops, int func)
 	    return 1;
 	}
     case 'O':
-	if ((ca_laststate.opt || (ca_laststate.doff && ca_laststate.def) ||
+	if (ca_laststate.actopts &&
+	    (ca_laststate.opt || (ca_laststate.doff && ca_laststate.def) ||
 	     (ca_laststate.def &&
 	      (ca_laststate.def->type == CAA_OPT ||
 	       (ca_laststate.def->type >= CAA_RARGS &&
@@ -1632,7 +1640,7 @@ bin_comparguments(char *nam, char **args, char *ops, int func)
 	}
     case 's':
 	if (ca_laststate.d->single && ca_laststate.singles &&
-	    ca_laststate.opt) {
+	    ca_laststate.actopts > 1 && ca_laststate.opt) {
 	    setsparam(args[1],
 		      ztrdup(ca_laststate.ddef ?
 			     (ca_laststate.ddef->type == CAO_DIRECT ?
