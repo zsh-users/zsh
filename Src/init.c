@@ -399,10 +399,8 @@ init_io(void)
 #ifdef JOB_CONTROL
     /* If interactive, make the shell the foreground process */
     if (opts[MONITOR] && interact && (SHTTY != -1)) {
-	attachtty(GETPGRP());
 	if ((mypgrp = GETPGRP()) > 0) {
 	    while ((ttpgrp = gettygrp()) != -1 && ttpgrp != mypgrp) {
-		sleep(1);
 		mypgrp = GETPGRP();
 		if (mypgrp == gettygrp())
 		    break;
@@ -413,6 +411,7 @@ init_io(void)
 	    opts[MONITOR] = 0;
     } else
 	opts[MONITOR] = 0;
+    attachtty(GETPGRP());
 #else
     opts[MONITOR] = 0;
 #endif
