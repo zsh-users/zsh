@@ -54,7 +54,3 @@ Ksh automatically searches FPATH for any command not found in PATH, and
 autoloads the file if found.  The "autoload" command is only required if
 you want FPATH to be searched before PATH, e.g. because the function has
 the same name as a command in PATH.
-
-Autoloading should work more like "source" when kshautoload is active.
-In particular, aliases defined in the autoloaded file should be expanded
-when referenced later in the same file (even when using "autoload -U").
