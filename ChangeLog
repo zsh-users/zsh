@@ -1,7 +1,7 @@
 2001-03-18  Clint Adams  <schizo@debian.org>
 
 	* 13664: Completion/User/_init_d: handle rcS.d, force-restart,
-	force-reload.
+	force-reload.  Also, remove Completion/SysV.
 
 2001-03-18  Peter Stephenson  <pws@pwstephenson.fsnet.co.uk>
 
