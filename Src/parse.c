@@ -2196,6 +2196,9 @@ init_eprog(void)
  * file should be mapped or read and if this header is the `other' one),
  * the version string in a field of 40 characters and the descriptions
  * for the functions in the dump file.
+ *
+ * NOTE: this layout has to be kept; everything after it may be changed.
+ *
  * Each description consists of a struct fdhead followed by the name,
  * aligned to sizeof(wordcode) (i.e. 4 bytes).
  */
@@ -2302,11 +2305,10 @@ bin_zcompile(char *nam, char **args, char *ops, int func)
 	    zwarnnam(nam, "too few arguments", NULL, 0);
 	    return 1;
 	}
-	if (!(f = load_dump_header(*args)) &&
-	    !(f = load_dump_header(dyncat(*args, FD_EXT)))) {
-	    zwarnnam(nam, "invalid dump file: %s", *args, 0);
-	    return 1;
-	}
+	if (!(f = load_dump_header(nam, (strsfx(FD_EXT, *args) ? *args :
+					 dyncat(*args, FD_EXT)), 1)))
+		return 1;
+
 	if (args[1]) {
 	    for (args++; *args; args++)
 		if (!dump_find_func(f, *args))
@@ -2315,7 +2317,7 @@ bin_zcompile(char *nam, char **args, char *ops, int func)
 	} else {
 	    FDHead h, e = (FDHead) (f + fdheaderlen(f));
 
-	    printf("function dump file (%s) for zsh-%s\n",
+	    printf("zwc file (%s) for zsh-%s\n",
 		   ((fdflags(f) & FDF_MAP) ? "mapped" : "read"), fdversion(f));
 	    for (h = firstfdhead(f); h < e; h = nextfdhead(h))
 		printf("%s\n", fdname(h));
@@ -2344,18 +2346,23 @@ bin_zcompile(char *nam, char **args, char *ops, int func)
 
 /**/
 static Wordcode
-load_dump_header(char *name)
+load_dump_header(char *nam, char *name, int err)
 {
-    int fd;
+    int fd, v = 0;
     wordcode buf[FD_PRELEN + 1];
 
-    if ((fd = open(name, O_RDONLY)) < 0)
+    if ((fd = open(name, O_RDONLY)) < 0) {
+	if (err)
+	    zwarnnam(nam, "can't open zwc file: %s", name, 0);
 	return NULL;
-
+    }
     if (read(fd, buf, (FD_PRELEN + 1) * sizeof(wordcode)) !=
 	((FD_PRELEN + 1) * sizeof(wordcode)) ||
 	(fdmagic(buf) != FD_MAGIC && fdmagic(buf) != FD_OMAGIC) ||
-	strcmp(ZSH_VERSION, fdversion(buf))) {
+	(v = strcmp(ZSH_VERSION, fdversion(buf)))) {
+	if (err)
+	    zwarnnam(nam, (v ? "invalid zwc file, wrong version: %s" :
+			   "invalid zwc file: %s") , name, 0);
 	close(fd);
 	return NULL;
     } else {
@@ -2372,6 +2379,7 @@ load_dump_header(char *name)
 	    if (lseek(fd, o, 0) == -1 ||
 		read(fd, buf, (FD_PRELEN + 1) * sizeof(wordcode)) !=
 		((FD_PRELEN + 1) * sizeof(wordcode))) {
+		zwarnnam(nam, "invalid zwc file: %s" , name, 0);
 		close(fd);
 		return NULL;
 	    }
@@ -2384,6 +2392,7 @@ load_dump_header(char *name)
 		 len - ((FD_PRELEN + 1) * sizeof(wordcode))) !=
 	    len - ((FD_PRELEN + 1) * sizeof(wordcode))) {
 	    close(fd);
+	    zwarnnam(nam, "invalid zwc file: %s" , name, 0);
 	    return NULL;
 	}
 	close(fd);
@@ -2483,7 +2492,7 @@ build_dump(char *nam, char *dump, char **files, int ali, int map, int flags)
 	dump = dyncat(dump, FD_EXT);
 
     if ((dfd = open(dump, O_WRONLY|O_CREAT, 0600)) < 0) {
-	zwarnnam(nam, "can't write dump file: %s", dump, 0);
+	zwarnnam(nam, "can't write zwc file: %s", dump, 0);
 	return 1;
     }
     progs = newlinklist();
@@ -2614,7 +2623,7 @@ build_cur_dump(char *nam, char *dump, char **names, int match, int map,
 	dump = dyncat(dump, FD_EXT);
 
     if ((dfd = open(dump, O_WRONLY|O_CREAT, 0600)) < 0) {
-	zwarnnam(nam, "can't write dump file: %s", dump, 0);
+	zwarnnam(nam, "can't write zwc file: %s", dump, 0);
 	return 1;
     }
     progs = newlinklist();
@@ -2876,7 +2885,7 @@ check_dump_file(char *file, char *name, int *ksh)
 
 #endif
 
-    if (!f && (isrec || !(d = load_dump_header(file))))
+    if (!f && (isrec || !(d = load_dump_header(NULL, file, 0))))
 	return NULL;
 
     if ((h = dump_find_func(d, name))) {
@@ -3014,7 +3023,7 @@ decrdumpcount(FuncDump f)
 
 /**/
 int
-dump_autoload(char *file, int on, char *ops, int func)
+dump_autoload(char *nam, char *file, int on, char *ops, int func)
 {
     Wordcode h;
     FDHead n, e;
@@ -3024,7 +3033,7 @@ dump_autoload(char *file, int on, char *ops, int func)
     if (!strsfx(FD_EXT, file))
 	file = dyncat(file, FD_EXT);
 
-    if (!(h = load_dump_header(file)))
+    if (!(h = load_dump_header(nam, file, 1)))
 	return 1;
 
     for (n = firstfdhead(h), e = (FDHead) (h + fdheaderlen(h)); n < e;

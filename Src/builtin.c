@@ -2118,12 +2118,9 @@ bin_functions(char *name, char **argv, char *ops, int func)
 
     /* Take the arguments literally -- do not glob */
     for (; *argv; argv++) {
-	if (ops['w']) {
-	    if (dump_autoload(*argv, on, ops, func)) {
-		zwarnnam(name, "invalid wordcode file: %s", *argv, 0);
-		returnval = 1;
-	    }
-	} else if ((shf = (Shfunc) shfunctab->getnode(shfunctab, *argv))) {
+	if (ops['w'])
+	    returnval = dump_autoload(name, *argv, on, ops, func);
+	else if ((shf = (Shfunc) shfunctab->getnode(shfunctab, *argv))) {
 	    /* if any flag was given */
 	    if (on|off) {
 		/* turn on/off the given flags */

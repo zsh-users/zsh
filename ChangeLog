@@ -1,5 +1,8 @@
 2000-04-03  Sven Wischnowsky <wischnow@informatik.hu-berlin.de>
 
+	* 10467: Src/builtin.c, Src/parse.c: better error handling for
+	zwc files
+
 	* 10465: Src/Zle/computil.c: fix for completion of options
 	after option with rest-arguments
 
