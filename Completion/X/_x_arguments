@@ -1,4 +1,4 @@
-#autoload
+#compdef -P */X11(|R[456])/*
 
 local ret long xargs
 
@@ -7,7 +7,7 @@ xargs=(
   '-geometry:geometry:_x_geometry'
 )
 
-(( $# )) || xargs=( "$xargs[@]" '*:files: _files' )
+(( $# )) || xargs=( "$xargs[@]" '*:default: _default' )
 
 long=$argv[(I)--]
 if (( long )); then
