@@ -292,11 +292,16 @@ of that function.
 )
 item()(
 The var(completer) currently active, i.e. the name of the completer
-function without the leading underscore. Such a completer is in
-overall control of how completion is to be performed; `tt(complete)'
-is the basic one for ordinary completion, but completers may perform
-various related tasks such as correction, or modify the behaviour of a
-later completer (see
+function without the leading underscore, followed by a minus sign and a
+number.  The number is 1 on the first call to a completer, 2 on the second
+call to the em(same) completer, etc.; this is used to provide fine control
+of when a completion style is used (see `Standard Styles' in
+ifzman(the section `Completion System Configuration' below)\
+ifnzman(noderef(Completion System Configuration)) 
+for examples).  Such a completer is in overall control of how completion
+is to be performed; `tt(complete)' is the basic one for ordinary
+completion, but completers may perform various related tasks such as
+correction, or modify the behaviour of a later completer (see
 ifzman(the section `Control Functions' below)\
 ifnzman(noderef(Control Functions)) 
 for more information).  
@@ -1294,6 +1299,9 @@ and no other completer will be called.
 It is sometimes useful to set this style for the tt(correct) or
 tt(approximate) completer so that ignored matches are prefered over
 corrections.
+
+example(zstyle ':completion:*:complete-2:*' prefer-ignored yes
+zstyle ':completion:*:(correct|approximate)-1:*' prefer-ignored yes)
 )
 item(tt(prefix-hidden))(
 This is used when matches with a common prefix are added (e.g. option

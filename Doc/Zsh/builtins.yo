@@ -1310,7 +1310,7 @@ the section `Autoloading Functions' in zmanref(zshfunc)
 )\
 ifnzman(\
 noderef(Functions)
-)
+)\
 for a description of how autoloaded functions are searched).
 
 If there is at least one var(name) argument, the wordcode for all
