@@ -1,0 +1,5 @@
+moddeps="zle"
+
+autoparams="zlewidgets zlekeymaps"
+
+objects="zleparameter.o"
