@@ -428,7 +428,7 @@ before_complete(Hookdef dummy, int *lst)
     /* If we are doing a menu-completion... */
 
     if (menucmp && *lst != COMP_LIST_EXPAND && 
-	(!compwidget || compwidget == lastcompwidget)) {
+	(menucmp != 1 || !compwidget || compwidget == lastcompwidget)) {
 	do_menucmp(*lst);
 	return 1;
     }

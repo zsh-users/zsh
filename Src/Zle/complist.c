@@ -545,7 +545,7 @@ domenuselect(Hookdef dummy, Chdata dat)
     Cmgroup *pg;
     Thingy cmd;
     Menustack u = NULL;
-    int i = 0, acc = 0, wishcol = 0, setwish = 0, oe = onlyexpl;
+    int i = 0, acc = 0, wishcol = 0, setwish = 0, oe = onlyexpl, wasnext = 0;
     char *s;
 
     HEAPALLOC {
@@ -591,7 +591,7 @@ domenuselect(Hookdef dummy, Chdata dat)
 		while (mcol < mcols - 1 && p[1] == minfo.cur)
 		    mcol++, p++, pg++;
 	    }
-	    setwish = 0;
+	    setwish = wasnext = 0;
 
 	getk:
 
@@ -634,7 +634,7 @@ domenuselect(Hookdef dummy, Chdata dat)
 		}
 		clearlist = listshown = 1;
 		mselect = (*(minfo.cur))->gnum;
-		setwish = 1;
+		setwish = wasnext = 1;
 		continue;
 	    } else if (cmd == Th(z_acceptandhold) ||
 		       cmd == Th(z_acceptandmenucomplete)) {
@@ -858,6 +858,11 @@ domenuselect(Hookdef dummy, Chdata dat)
 	if (acc) {
 	    menucmp = lastambig = hasoldlist = 0;
 	    do_single(*(minfo.cur));
+	}
+	if (wasnext) {
+	    menucmp = 2;
+	    showinglist = -2;
+	    minfo.asked = 0;
 	}
 	if (!noselect) {
 	    showinglist = -2;

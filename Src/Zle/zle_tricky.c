@@ -77,7 +77,8 @@ int offs;
 /**/
 int usemenu, useglob;
 
-/* != 0 if we are in the middle of a menu completion. */
+/* != 0 if we are in the middle of a menu completion. May be == 2 to force *
+ * menu completion even if using different widgets.                        */
 
 /**/
 int menucmp;
