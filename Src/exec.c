@@ -2519,6 +2519,10 @@ save_params(Estate state, Wordcode pc, LinkList *restore_p, LinkList *remove_p)
     while (wc_code(ac = *pc) == WC_ASSIGN) {
 	s = ecrawstr(state->prog, pc + 1, NULL);
 	if ((pm = (Param) paramtab->getnode(paramtab, s))) {
+	    if (pm->env) {
+		delenv(pm->env);
+		pm->env = NULL;
+	    }
 	    if (!(pm->flags & PM_SPECIAL)) {
 		paramtab->removenode(paramtab, s);
 	    } else if (!(pm->flags & PM_READONLY) &&

@@ -2039,6 +2039,19 @@ add_autoparam(char *nam, char *module)
 MathFunc mathfuncs;
 
 /**/
+static void removemathfunc(MathFunc previous, MathFunc current)
+{
+    if (previous)
+	previous->next = current->next;
+    else
+	mathfuncs = current->next;
+
+    zsfree(current->name);
+    zsfree(current->module);
+    zfree(current, sizeof(*current));
+}
+
+/**/
 MathFunc
 getmathfunc(char *name, int autol)
 {
@@ -2049,13 +2062,7 @@ getmathfunc(char *name, int autol)
 	    if (autol && p->module) {
 		char *n = dupstring(p->module);
 
-		if (q)
-		    q->next = p->next;
-		else
-		    mathfuncs = p->next;
-
-		zsfree(p->module);
-		zfree(p, sizeof(*p));
+		removemathfunc(q, p);
 
 		load_module(n);
 
@@ -2071,14 +2078,22 @@ getmathfunc(char *name, int autol)
 mod_export int
 addmathfunc(MathFunc f)
 {
-    MathFunc p;
+    MathFunc p, q = NULL;
 
     if (f->flags & MFF_ADDED)
 	return 1;
 
-    for (p = mathfuncs; p; p = p->next)
-	if (!strcmp(f->name, p->name))
+    for (p = mathfuncs; p; q = p, p = p->next)
+	if (!strcmp(f->name, p->name)) {
+	    if (p->module) {
+		/*
+		 * Autoloadable, replace.
+		 */
+		removemathfunc(q, p);
+		break;
+	    }
 	    return 1;
+	}
 
     f->flags |= MFF_ADDED;
     f->next = mathfuncs;

@@ -2673,6 +2673,7 @@ tiedarrunsetfn(Param pm, int exp)
     zfree(pm->u.data, sizeof(struct tieddata));
     /* paranoia -- shouldn't need these, but in case we reuse the struct... */
     pm->u.data = NULL;
+    zsfree(pm->ename);
     pm->flags &= ~PM_TIED;
 }
 

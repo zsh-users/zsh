@@ -1,3 +1,17 @@
+2004-03-18  Peter Stephenson  <pws@csr.com>
+
+	* 19657: Src/modules.c: Leak when an autoloadable math function
+	was read in.  Also, it was impossible to autoload multiple math
+	functions from the same library.
+
+	* 19656: Src/exec.c Leak saving and restoring parameters around
+	builtins and functions when set temporarily for that command if
+	the parameter was previously exported.
+
+	* 19655: Src/params.c: the reverse pointer from a tied array
+	to a tied scalar wasn't delete if the array was unset by unsetting
+	the scalar (or probably vice versa).
+
 2004-03-17  Peter Stephenson  <pws@csr.com>
 
 	* unposted: Etc/MACHINES: dlcompat apparently not needed
