@@ -21,7 +21,7 @@ NOTRANS(@iftex
 @finalout
 @end iftex)
 texititlepage()
-texititle(The Z Shell Guide)
+texititle(The Z Shell Manual)
 texisubtitle(Version version())
 texisubtitle(Updated date())
 texiauthor(Original documentation by Paul Falstad)
@@ -42,7 +42,7 @@ Permission is granted to copy and distribute translations of this manual
 into another language, under the above conditions for modified versions.
 texiendtitlepage()
 )\
-ifnzman(includefile(Zsh/guide.yo))
+ifnzman(includefile(Zsh/manual.yo))
 includefile(Zsh/intro.yo)
 includefile(Zsh/invoke.yo)
 includefile(Zsh/files.yo)

@@ -54,7 +54,7 @@ YODLDOC = $(MAN) zsh.texi
 YODLSRC = zmacros.yo zman.yo ztexi.yo Zsh/arith.yo Zsh/builtins.yo \
 Zsh/compat.yo Zsh/compctl.yo Zsh/compsys.yo Zsh/compwid.yo Zsh/cond.yo \
 Zsh/exec.yo Zsh/expn.yo \
-Zsh/filelist.yo Zsh/files.yo Zsh/func.yo Zsh/grammar.yo Zsh/guide.yo \
+Zsh/filelist.yo Zsh/files.yo Zsh/func.yo Zsh/grammar.yo Zsh/manual.yo \
 Zsh/index.yo Zsh/intro.yo Zsh/invoke.yo Zsh/jobs.yo Zsh/metafaq.yo \
 Zsh/modules.yo Zsh/mod_cap.yo \
 Zsh/mod_clone.yo Zsh/mod_comp1.yo Zsh/mod_compctl.yo Zsh/mod_complist.yo \

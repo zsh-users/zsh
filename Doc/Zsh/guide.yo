@@ -1,6 +1,6 @@
 texiifinfo(\
-texinode(Top)(The Z Shell Guide)((dir))((dir))
-texitop(The Z Shell Guide)
+texinode(Top)(The Z Shell Manual)((dir))((dir))
+texitop(The Z Shell Manual)
 This Info file documents Zsh, a freely available UNIX command interpreter
 (shell), which of the standard shells most closely resembles the Korn shell
 (ksh), although it is not completely compatible.
@@ -9,7 +9,7 @@ Version version(), last updated date().
 )\
 
 startmenu()
-menu(The Z Shell Guide)
+menu(The Z Shell Manual)
 menu(Introduction)
 menu(Invocation)
 menu(Files)
@@ -131,26 +131,26 @@ menu(The stat Module)
 menu(The zftp Module)
 menu(The zle Module)
 endmenu()
-texinode(The Z Shell Guide)(Introduction)(Top)(Top)
-chapter(The Z Shell Guide)
+texinode(The Z Shell Manual)(Introduction)(Top)(Top)
+chapter(The Z Shell Manual)
 This document has been produced from the texinfo file tt(zsh.texi),
 included in the tt(Doc) sub-directory of the Zsh distribution.
 sect(Producing documentation from zsh.texi)
 The texinfo source may be converted into several formats:
 
 startitem()
-item(The Info guide)(
+item(The Info manual)(
 The Info format allows searching for topics, commands, functions, etc.
 from the many Indices. The command `tt(makeinfo zsh.texi)' is used to
 produce the Info documentation.
 )
-item(The printed guide)(
+item(The printed manual)(
 The command `tt(texi2dvi zsh.texi)' will output tt(zsh.dvi) which can
 then be processed with bf(dvips) and optionally bf(gs) (Ghostscript) to
-produce a nicely formatted printed guide.
+produce a nicely formatted printed manual.
 )
-item(The HTML guide)(
-An HTML version of this guide is available at the Zsh web site via:
+item(The HTML manual)(
+An HTML version of this manual is available at the Zsh web site via:
 
 tt(http://sunsite.auc.dk/zsh/Doc/index.html).
 
