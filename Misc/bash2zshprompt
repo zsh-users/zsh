@@ -10,7 +10,7 @@ use strict;
 my @colours = qw/grey red green yellow blue magenta cyan white/;
 
 my @codes = ();
-my %bold;
+my %boldp;
 my $out = '';
 
 print "# Converted to zsh prompt theme by bash2zshprompt, written by <adam\@spiers.net>\n";
@@ -80,21 +80,22 @@ sub color {
               ($p[1] eq '4') ? 'bg' :
               '???');
 
-  $bold{$fgbg} ||= '';
+  $boldp{$fgbg} ||= '';
 
   if ($p[0] =~ /^0?0$/) {
-    $bold{$fgbg} = '';
+    $boldp{$fgbg} = '';
     return '$reset_color';
   }
   
   if ($p[0] =~ /^0?1$/) {
-    $bold{$fgbg} = 'bold_';
+    $boldp{$fgbg} = 'bold_';
     return '$bold_color';
   }
 
   return '$' .
-         "${fgbg}_$bold{$fgbg}" .
-         $colours[$p[2]];
+         "${fgbg}$boldp{$fgbg}\[" .
+         $colours[$p[2]] .
+         ']';
 }
 
 sub split_codes {
