@@ -1241,7 +1241,7 @@ dnl -----------
 dnl if found tcsetpgrp, test to see if it actually works
 dnl for instance, BeOS R4.51 does not support it yet
 dnl -----------
-if test $ac_cv_func_tcsetpgrp=yes; then
+if test -t 0 -a $ac_cv_func_tcsetpgrp=yes; then
     AC_CACHE_CHECK(if tcsetpgrp() actually works,
     zsh_cv_sys_tcsetpgrp,
     [AC_TRY_RUN([
