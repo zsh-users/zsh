@@ -450,7 +450,8 @@ item(tt(-J) var(name))(
 Gives the name of the group of matches the words should be stored in.
 )
 item(tt(-V) var(name))(
-Like tt(-J) but naming a unsorted group.
+Like tt(-J) but naming a unsorted group. These are in a different name 
+space than groups created with the tt(-J) flag.
 )
 item(tt(-1))(
 If given together with the tt(-V) option, makes
