@@ -1,0 +1,4 @@
+DISTFILES_SRC='
+    .distfiles
+    _sysv_initscripts
+'

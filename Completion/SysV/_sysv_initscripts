@@ -1,0 +1,17 @@
+#compdef -p /etc/(init|rc[0-9S]).d/*
+
+local stdargs nonstdargs expl
+
+if [[ -f $words[1] ]]
+then
+nonstdargs=(${${(s: :)${${${${(M)${(f)"$(<$words[1])"}:#[	 a-z-|]##\)*}%\)*}##\ #}:gs/|/ /}:s/	//}:#(start|stop|restart|force-reload|reload)})
+stdargs=(${(M)${(s: :)${${${${(M)${(f)"$(<$words[1])"}:#[	 a-z-|]##\)*}%\)*}##\ #}:gs/|/ /}:s/	//}:#(start|stop|restart|force-reload|reload)})
+else
+nonstdargs=()
+stdargs=(start stop restart force-reload)
+fi
+
+_tags nonstdargs stdargs
+
+_wanted -V stdargs expl "standard arguments" compadd -a stdargs
+_wanted nonstdargs expl "non-standard arguments" compadd -a nonstdargs
