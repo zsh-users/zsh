@@ -168,7 +168,7 @@ bin_zprof(char *nam, char **args, char *ops, int func)
 
 	printf("num  calls                time                       self            name\n-----------------------------------------------------------------------------------\n");
 	for (fp = fs, i = 1; *fp; fp++, i++) {
-	    printf("%2ld) %4ld       %8.2f %8.2f  %5.2f%%  %8.2f %8.2f  %5.2f%%  %s\n",
+	    printf("%2ld) %4ld       %8.2f %8.2f  %6.2f%%  %8.2f %8.2f  %6.2f%%  %s\n",
 		   ((*fp)->num = i),
 		   (*fp)->calls,
 		   (*fp)->time, (*fp)->time / ((double) (*fp)->calls),
@@ -184,14 +184,14 @@ bin_zprof(char *nam, char **args, char *ops, int func)
 	    printf("\n-----------------------------------------------------------------------------------\n\n");
 	    for (ap = as; *ap; ap++)
 		if ((*ap)->to == *fp) {
-		    printf("    %4ld/%-4ld  %8.2f %8.2f  %5.2f%%  %8.2f %8.2f             %s [%ld]\n",
+		    printf("    %4ld/%-4ld  %8.2f %8.2f  %6.2f%%  %8.2f %8.2f             %s [%ld]\n",
 			   (*ap)->calls, (*fp)->calls,
 			   (*ap)->time, (*ap)->time / ((double) (*ap)->calls),
 			   ((*ap)->time / total) * 100.0,
 			   (*ap)->self, (*ap)->self / ((double) (*ap)->calls),
 			   (*ap)->from->name, (*ap)->from->num);
 		}
-	    printf("%2ld) %4ld       %8.2f %8.2f  %5.2f%%  %8.2f %8.2f  %5.2f%%  %s\n",
+	    printf("%2ld) %4ld       %8.2f %8.2f  %6.2f%%  %8.2f %8.2f  %6.2f%%  %s\n",
 		   (*fp)->num, (*fp)->calls,
 		   (*fp)->time, (*fp)->time / ((double) (*fp)->calls),
 		   ((*fp)->time / total) * 100.0,
@@ -200,7 +200,7 @@ bin_zprof(char *nam, char **args, char *ops, int func)
 		   (*fp)->name);
 	    for (ap = as + narcs - 1; ap >= as; ap--)
 		if ((*ap)->from == *fp) {
-		    printf("    %4ld/%-4ld  %8.2f %8.2f  %5.2f%%  %8.2f %8.2f             %s [%ld]\n",
+		    printf("    %4ld/%-4ld  %8.2f %8.2f  %6.2f%%  %8.2f %8.2f             %s [%ld]\n",
 			   (*ap)->calls, (*ap)->to->calls,
 			   (*ap)->time, (*ap)->time / ((double) (*ap)->calls),
 			   ((*ap)->time / total) * 100.0,
@@ -214,7 +214,7 @@ bin_zprof(char *nam, char **args, char *ops, int func)
 
 /**/
 static int
-zprof_wrapper(List list, FuncWrap w, char *name)
+zprof_wrapper(Eprog prog, FuncWrap w, char *name)
 {
     struct sfunc sf, *sp;
     Pfunc f;
@@ -224,28 +224,24 @@ zprof_wrapper(List list, FuncWrap w, char *name)
     double prev, now;
 
     if (!(f = findpfunc(name))) {
-	PERMALLOC {
-	    f = (Pfunc) zalloc(sizeof(*f));
-	    f->name = ztrdup(name);
-	    f->calls = 0;
-	    f->time = f->self = 0.0;
-	    f->next = calls;
-	    calls = f;
-	    ncalls++;
-	} LASTALLOC;
+	f = (Pfunc) zalloc(sizeof(*f));
+	f->name = ztrdup(name);
+	f->calls = 0;
+	f->time = f->self = 0.0;
+	f->next = calls;
+	calls = f;
+	ncalls++;
     }
     if (stack) {
 	if (!(a = findparc(stack->p, f))) {
-	    PERMALLOC {
-		a = (Parc) zalloc(sizeof(*a));
-		a->from = stack->p;
-		a->to = f;
-		a->calls = 0;
-		a->time = a->self = 0.0;
-		a->next = arcs;
-		arcs = a;
-		narcs++;
-	    } LASTALLOC;
+	    a = (Parc) zalloc(sizeof(*a));
+	    a->from = stack->p;
+	    a->to = f;
+	    a->calls = 0;
+	    a->time = a->self = 0.0;
+	    a->next = arcs;
+	    arcs = a;
+	    narcs++;
 	}
     }
     sf.prev = stack;
@@ -257,7 +253,7 @@ zprof_wrapper(List list, FuncWrap w, char *name)
     gettimeofday(&tv, &dummy);
     sf.beg = prev = ((((double) tv.tv_sec) * 1000.0) +
 		     (((double) tv.tv_usec) / 1000.0));
-    runshfunc(list, w, name);
+    runshfunc(prog, w, name);
     tv.tv_sec = tv.tv_usec = 0;
     gettimeofday(&tv, &dummy);
 
@@ -291,14 +287,14 @@ static struct funcwrap wrapper[] = {
 
 /**/
 int
-setup_zprof(Module m)
+setup_(Module m)
 {
     return 0;
 }
 
 /**/
 int
-boot_zprof(Module m)
+boot_(Module m)
 {
     calls = NULL;
     ncalls = 0;
@@ -311,7 +307,7 @@ boot_zprof(Module m)
 
 /**/
 int
-cleanup_zprof(Module m)
+cleanup_(Module m)
 {
     freepfuncs(calls);
     freeparcs(arcs);
@@ -322,7 +318,7 @@ cleanup_zprof(Module m)
 
 /**/
 int
-finish_zprof(Module m)
+finish_(Module m)
 {
     return 0;
 }
