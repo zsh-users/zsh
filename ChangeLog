@@ -37,6 +37,10 @@
 	changes.  Avoid [[ ! -r ... ]] test when running as root, as it
 	always fails in that case.  Test `typeset -ft' (function trace).
 
+	* Adam Spiers: unposted: Doc/Zsh/expn.yo: mention the word
+	`greedy' in the docs for the S flag, to make it easier to find for
+	those used to Perl-speak.
+
 	* 15488: Doc/Zsh/expn.yo: More index entry cleanup.  Reorder the
 	description section to look less as if it has two menus in info
 	and to add some cross-references.
