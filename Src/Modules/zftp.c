@@ -50,15 +50,36 @@ union zftp_sockaddr;
 struct zftp_session;
 typedef struct zftp_session *Zftp_session;
 
-#include "zftp.mdh"
-#include "zftp.pro"
+/*
+ * We need to include the zsh headers later to avoid clashes with
+ * the definitions on some systems, however we need the configuration
+ * file to decide whether we can include netinet/in_systm.h, which
+ * doesn't exist on cygwin.
+ */
+#include "../../config.h"
 
+#include <sys/types.h>
 #include <sys/socket.h>
 #include <netdb.h>
-#include <netinet/in_systm.h>
+/*
+ * For some reason, configure doesn't always detect netinet/in_systm.h.
+ * On some systems, including linux, this seems to be because gcc is
+ * throwing up a warning message about the redefinition of
+ * __USE_LARGEFILE.  This means the problem is somewhere in the
+ * header files where we can't get at it.  For now, revert to
+ * not including this file only on systems where we know it's missing.
+ * Currently this is just cygwin.
+ */
+#ifndef __CYGWIN__
+# include <netinet/in_systm.h>
+#endif
 #include <netinet/in.h>
 #include <netinet/ip.h>
 #include <arpa/inet.h>
+
+#include "zftp.mdh"
+#include "zftp.pro"
+
 /* it's a TELNET based protocol, but don't think I like doing this */
 #include <arpa/telnet.h>
 
@@ -90,6 +111,10 @@ union zftp_sockaddr {
 #endif
 };
 
+#ifdef USE_LOCAL_H_ERRNO
+int h_errno;
+#endif
+
 /* We use the RFC 2553 interfaces.  If the functions don't exist in the library,
    simulate them. */
 
@@ -101,12 +126,12 @@ union zftp_sockaddr {
 # define INET6_ADDRSTRLEN 46
 #endif
 
-/**/  
+/**/
 #ifndef HAVE_INET_NTOP
 
-/**/    
+/**/
 static char const *
-inet_ntop(int af, void const *cp, char *buf, size_t len)
+zsh_inet_ntop(int af, void const *cp, char *buf, size_t len)
 {       
         if(af != AF_INET) {
                 errno = EAFNOSUPPORT;
@@ -120,7 +145,11 @@ inet_ntop(int af, void const *cp, char *buf, size_t len)
         return buf;
 }
 
-/**/  
+#else /* !HAVE_INET_NTOP */
+
+# define zsh_inet_ntop inet_ntop
+
+/**/
 #endif /* !HAVE_INET_NTOP */
 
 /**/
@@ -134,24 +163,32 @@ inet_ntop(int af, void const *cp, char *buf, size_t len)
 #  endif
 
 /**/
-static int inet_aton(char const *src, struct in_addr *dst)
+static int zsh_inet_aton(char const *src, struct in_addr *dst)
 {
     return (dst->s_addr = inet_addr(src)) != INADDR_NONE;
 }
+
+#else /* !HAVE_INET_ATON */
+
+# define zsh_inet_aton inet_aton
 
 /**/
 # endif /* !HAVE_INET_ATON */
 
 /**/
 static int
-inet_pton(int af, char const *src, void *dst)
+zsh_inet_pton(int af, char const *src, void *dst)
 {
         if(af != AF_INET) {
                 errno = EAFNOSUPPORT;
                 return -1;
         }
-        return !!inet_aton(src, dst);
+        return !!zsh_inet_aton(src, dst);
 }
+
+#else /* !HAVE_INET_PTON */
+
+# define zsh_inet_pton inet_pton
 
 /**/
 #endif /* !HAVE_INET_PTON */
@@ -159,13 +196,35 @@ inet_pton(int af, char const *src, void *dst)
 /**/
 #ifndef HAVE_GETIPNODEBYNAME
 
+/**/
+# ifndef HAVE_GETHOSTBYNAME2
+
+/**/
+static struct hostent *
+zsh_gethostbyname2(char const *name, int af)
+{
+	if(af != AF_INET) {
+		h_errno = NO_RECOVERY;
+		return NULL;
+	}
+	return gethostbyname(name);
+}
+
+#else /* !HAVE_GETHOSTBYNAME2 */
+
+# define zsh_gethostbyname2 gethostbyname2
+
+/**/
+# endif /* !HAVE_GETHOSTBYNAME2 */
+
+
 /* note: this is not a complete implementation.  If ignores the flags,
    and does not provide the memory allocation of the standard interface.
    Each returned structure will overwrite the previous one. */
 
 /**/
 static struct hostent *
-getipnodebyname(char const *name, int af, int flags, int *errorp)
+zsh_getipnodebyname(char const *name, int af, int flags, int *errorp)
 {
 	static struct hostent ahe;
 	static char nbuf[16];
@@ -176,8 +235,8 @@ getipnodebyname(char const *name, int af, int flags, int *errorp)
 	static char pbuf[INET_ADDRSTRLEN];
 # endif
 	struct hostent *he;
-	if(inet_pton(af, name, nbuf) == 1) {
-		inet_ntop(af, nbuf, pbuf, sizeof(pbuf));
+	if(zsh_inet_pton(af, name, nbuf) == 1) {
+		zsh_inet_ntop(af, nbuf, pbuf, sizeof(pbuf));
 		ahe.h_name = pbuf;
 		ahe.h_aliases = addrlist+1;
 		ahe.h_addrtype = af;
@@ -185,34 +244,20 @@ getipnodebyname(char const *name, int af, int flags, int *errorp)
 		ahe.h_addr_list = addrlist;
 		return &ahe;
 	}
-	he = gethostbyname2(name, af);
+	he = zsh_gethostbyname2(name, af);
 	if(!he)
 		*errorp = h_errno;
 	return he;
 }
-
-/**/
-# ifndef HAVE_GETHOSTBYNAME2
-
-/**/
-static struct hostent *
-gethostbyname2(char const *name, int af)
-{
-	if(af != AF_INET) {
-		h_errno = NO_RECOVERY;
-		return NULL;
-	}
-	return gethostbyname(name);
-}
-
-/**/
-# endif /* !HAVE_GETHOSTBYNAME2 */
-
 /**/
 static void
 freehostent(struct hostent *ptr)
 {
 }
+
+#else /* !HAVE_GETIPNODEBYNAME */
+
+# define zsh_getipnodebyname getipnodebyname
 
 /**/
 #endif /* !HAVE_GETIPNODEBYNAME */
@@ -838,8 +883,6 @@ zfgetmsg(void)
 
     if (zfsess->cfd == -1)
 	return 6;
-    if (!(verbose = getsparam("ZFTP_VERBOSE")))
-	verbose = "";
     zsfree(lastmsg);
     lastmsg = NULL;
 
@@ -865,6 +908,9 @@ zfgetmsg(void)
     zfsetparam("ZFTP_CODE", ztrdup(lastcodestr), ZFPM_READONLY);
     stopit = (*ptr++ != '-');
 
+    queue_signals();
+    if (!(verbose = getsparam("ZFTP_VERBOSE")))
+	verbose = "";
     if (strchr(verbose, lastcodestr[0])) {
 	/* print the whole thing verbatim */
 	printing = 1;
@@ -874,6 +920,7 @@ zfgetmsg(void)
 	printing = 2;
 	fputs(ptr, stderr);
     }
+    unqueue_signals();
     if (printing)
 	fputc('\n', stderr);
 
@@ -1144,7 +1191,7 @@ zfopendata(char *name, union zftp_sockaddr *zdsockp, int *is_passivep)
 	if(zdsockp->a.sa_family == AF_INET6) {
 	    /* see RFC 2428 for explanation */
 	    strcpy(portcmd, "EPRT |2|");
-	    inet_ntop(AF_INET6, &zdsockp->in6.sin6_addr,
+	    zsh_inet_ntop(AF_INET6, &zdsockp->in6.sin6_addr,
 		portcmd+8, INET6_ADDRSTRLEN);
 	    sprintf(strchr(portcmd, 0), "|%u|\r\n",
 		(unsigned)ntohs(zdsockp->in6.sin6_port));
@@ -1195,7 +1242,8 @@ zfclosedata(void)
 static int
 zfgetdata(char *name, char *rest, char *cmd, int getsize)
 {
-    int len, newfd, is_passive;
+    SOCKLEN_T len;
+    int newfd, is_passive;
     union zftp_sockaddr zdsock;
 
     if (zfopendata(name, &zdsock, &is_passive))
@@ -1301,8 +1349,7 @@ zfgetdata(char *name, char *rest, char *cmd, int getsize)
 #endif
 #if defined(F_SETFD) && defined(FD_CLOEXEC)
 	/* If the shell execs a program, we don't want this fd left open. */
-	len = FD_CLOEXEC;
-	fcntl(zfsess->dfd, F_SETFD, &len);
+	fcntl(zfsess->dfd, F_SETFD, FD_CLOEXEC);
 #endif
 
     return 0;
@@ -1830,7 +1877,8 @@ zftp_open(char *name, char **args, int flags)
     struct servent *zservp;
     struct hostent *zhostp = NULL;
     char **addrp, *fname;
-    int err, len, tmout;
+    int err, tmout;
+    SOCKLEN_T len;
     int herrno, af, salen;
 
     if (!*args) {
@@ -1870,10 +1918,12 @@ zftp_open(char *name, char **args, int flags)
     if (setjmp(zfalrmbuf)) {
 	char *hname;
 	alarm(0);
+	queue_signals();
 	if ((hname = getsparam("ZFTP_HOST")) && *hname) 
 	    zwarnnam(name, "timeout connecting to %s", hname, 0);
 	else
 	    zwarnnam(name, "timeout on host name lookup", NULL, 0);
+	unqueue_signals();
 	zfclose(0);
 	return 1;
     }
@@ -1889,7 +1939,7 @@ zftp_open(char *name, char **args, int flags)
 # define FAILED() do { } while(0)
 #endif
     {
-    	zhostp = getipnodebyname(args[0], af, 0, &herrno);
+    	zhostp = zsh_getipnodebyname(args[0], af, 0, &herrno);
 	if (!zhostp || errflag) {
 	    /* should use herror() here if available, but maybe
 	     * needs configure test. on AIX it's present but not
@@ -1971,7 +2021,7 @@ zftp_open(char *name, char **args, int flags)
 	char pbuf[INET_ADDRSTRLEN];
 #endif
 	addrp--;
-	inet_ntop(af, *addrp, pbuf, sizeof(pbuf));
+	zsh_inet_ntop(af, *addrp, pbuf, sizeof(pbuf));
 	zfsetparam("ZFTP_IP", ztrdup(pbuf), ZFPM_READONLY);
     }
     freehostent(zhostp);
@@ -1986,8 +2036,7 @@ zftp_open(char *name, char **args, int flags)
 
 #if defined(F_SETFD) && defined(FD_CLOEXEC)
     /* If the shell execs a program, we don't want this fd left open. */
-    len = FD_CLOEXEC;
-    fcntl(zfsess->cfd, F_SETFD, &len);
+    fcntl(zfsess->cfd, F_SETFD, FD_CLOEXEC);
 #endif
 
     len = sizeof(zfsess->sock);
@@ -2055,8 +2104,7 @@ zftp_open(char *name, char **args, int flags)
 	DPUTS(zfstatfd == -1, "zfstatfd not created");
 #if defined(F_SETFD) && defined(FD_CLOEXEC)
 	/* If the shell execs a program, we don't want this fd left open. */
-	len = FD_CLOEXEC;
-	fcntl(zfstatfd, F_SETFD, &len);
+	fcntl(zfstatfd, F_SETFD, FD_CLOEXEC);
 #endif
 	unlink(fname);
     }
@@ -2824,7 +2872,7 @@ zfclose(int leaveparams)
 	if (!zfnopen) {
 	    /* Write the final status in case this is a subshell */
 	    lseek(zfstatfd, zfsessno*sizeof(int), 0);
-	    write(zfstatfd, zfstatusp+zfsessno, sizeof(int));
+	    write(zfstatfd, (char *)zfstatusp+zfsessno, sizeof(int));
 
 	    close(zfstatfd);
 	    zfstatfd = -1;
@@ -2911,10 +2959,12 @@ savesession()
     for (ps = zfparams, pd = zfsess->params; *ps; ps++, pd++) {
 	if (*pd)
 	    zsfree(*pd);
+	queue_signals();
 	if ((val = getsparam(*ps)))
 	    *pd = ztrdup(val);
 	else
 	    *pd = NULL;
+	unqueue_signals();
     }
     *pd = NULL;
 }
@@ -3101,7 +3151,7 @@ bin_zftp(char *name, char **args, char *ops, int func)
 	/* Get the status in case it was set by a forked process */
 	int oldstatus = zfstatusp[zfsessno];
 	lseek(zfstatfd, 0, 0);
-	read(zfstatfd, zfstatusp, sizeof(int)*zfsesscnt);
+	read(zfstatfd, (char *)zfstatusp, sizeof(int)*zfsesscnt);
 	if (zfsess->cfd != -1 && (zfstatusp[zfsessno] & ZFST_CLOS)) {
 	    /* got closed in subshell without us knowing */
 	    zcfinish = 2;
@@ -3144,6 +3194,7 @@ bin_zftp(char *name, char **args, char *ops, int func)
 	return 1;
     }
 
+    queue_signals();
     if ((prefs = getsparam("ZFTP_PREFS"))) {
 	zfprefs = 0;
 	for (ptr = prefs; *ptr; ptr++) {
@@ -3174,6 +3225,7 @@ bin_zftp(char *name, char **args, char *ops, int func)
 	    }
 	}
     }
+    unqueue_signals();
 
     ret = (*zptr->fun)(fullname, args, zptr->flags);
 
@@ -3190,45 +3242,13 @@ bin_zftp(char *name, char **args, char *ops, int func)
 	 * but only for the active session.
 	 */
 	lseek(zfstatfd, zfsessno*sizeof(int), 0);
-	write(zfstatfd, zfstatusp+zfsessno, sizeof(int));
+	write(zfstatfd, (char *)zfstatusp+zfsessno, sizeof(int));
     }
     return ret;
 }
 
-/* The load/unload routines required by the zsh library interface */
-
-/**/
-int
-setup_(Module m)
-{
-    return 0;
-}
-
-/**/
-int
-boot_(Module m)
-{
-    int ret;
-    if ((ret = addbuiltins(m->nam, bintab,
-			   sizeof(bintab)/sizeof(*bintab))) == 1) {
-	/* if successful, set some default parameters */
-	off_t tmout_def = 60;
-	zfsetparam("ZFTP_VERBOSE", ztrdup("450"), ZFPM_IFUNSET);
-	zfsetparam("ZFTP_TMOUT", &tmout_def, ZFPM_IFUNSET|ZFPM_INTEGER);
-	zfsetparam("ZFTP_PREFS", ztrdup("PS"), ZFPM_IFUNSET);
-	/* default preferences if user deletes variable */
-	zfprefs = ZFPF_SNDP|ZFPF_PASV;
-    
-	zfsessions = znewlinklist();
-	newsession("default");
-    }
-
-    return !ret;
-}
-
-/**/
-int
-cleanup_(Module m)
+static void
+zftp_cleanup(void)
 {
     /*
      * There are various parameters hanging around, but they're
@@ -3250,7 +3270,55 @@ cleanup_(Module m)
     zfunsetparam("ZFTP_SESSION");
     freelinklist(zfsessions, (FreeFunc) freesession);
     zfree(zfstatusp, sizeof(int)*zfsesscnt);
-    deletebuiltins(m->nam, bintab, sizeof(bintab)/sizeof(*bintab));
+    deletebuiltins("zftp", bintab, sizeof(bintab)/sizeof(*bintab));
+}
+
+static int
+zftpexithook(Hookdef d, void *dummy)
+{
+    zftp_cleanup();
+    return 0;
+}
+
+/* The load/unload routines required by the zsh library interface */
+
+/**/
+int
+setup_(Module m)
+{
+    return 0;
+}
+
+/**/
+int
+boot_(Module m)
+{
+    int ret;
+    if ((ret = addbuiltins("zftp", bintab,
+			   sizeof(bintab)/sizeof(*bintab))) == 1) {
+	/* if successful, set some default parameters */
+	off_t tmout_def = 60;
+	zfsetparam("ZFTP_VERBOSE", ztrdup("450"), ZFPM_IFUNSET);
+	zfsetparam("ZFTP_TMOUT", &tmout_def, ZFPM_IFUNSET|ZFPM_INTEGER);
+	zfsetparam("ZFTP_PREFS", ztrdup("PS"), ZFPM_IFUNSET);
+	/* default preferences if user deletes variable */
+	zfprefs = ZFPF_SNDP|ZFPF_PASV;
+    
+	zfsessions = znewlinklist();
+	newsession("default");
+
+	addhookfunc("exit", zftpexithook);
+    }
+
+    return !ret;
+}
+
+/**/
+int
+cleanup_(Module m)
+{
+    deletehookfunc("exit", zftpexithook);
+    zftp_cleanup();
     return 0;
 }
 

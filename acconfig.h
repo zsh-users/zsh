@@ -139,6 +139,10 @@
 /* Define to be a string corresponding the vendor of the machine */
 #undef VENDOR
 
+/* Define to limit job table size */
+#undef MAXJOB
+#undef NEED_LINUX_TASKS_H
+
 /* Define if your system defines `struct winsize' in sys/ptem.h.  */
 #undef WINSIZE_IN_PTEM
 
@@ -168,6 +172,9 @@
 
 /* Define for Maildir support */
 #undef MAILDIR_SUPPORT
+
+/* Define for function depth limits */
+#undef MAX_FUNCTION_DEPTH
 
 /* Define if you want locale features.  By default this is defined. */
 #undef CONFIG_LOCALE
@@ -289,3 +296,30 @@
 
 /* Define to 1 if ino_t is 64 bit (for large file support) */
 #undef INO_T_IS_64_BIT
+
+/* Define to 1 if h_errno is not defined by the system */
+#undef USE_LOCAL_H_ERRNO
+
+/* Define if you have the termcap boolcodes symbol.  */
+#undef HAVE_BOOLCODES
+
+/* Define if you have the termcap numcodes symbol.  */
+#undef HAVE_NUMCODES
+
+/* Define if you have the termcap strcodes symbol.  */
+#undef HAVE_STRCODES
+
+/* Define if you have the terminfo boolnames symbol.  */
+#undef HAVE_BOOLNAMES
+
+/* Define if you have the terminfo numnames symbol.  */
+#undef HAVE_NUMNAMES
+
+/* Define if you have the terminfo strnames symbol.  */
+#undef HAVE_STRNAMES
+
+/* Define if term.h chokes without curses.h */
+#undef TERM_H_NEEDS_CURSES_H
+
+/* Define to the base type of the third argument of accept */
+#undef SOCKLEN_T

@@ -39,6 +39,16 @@
 	* 14988 with mod suggested in 14989: Src/exec.c: avoid names of
 	saved special parameters being trashed.
 
+2001-06-19  Bart Schaefer  <schaefer@zsh.org>
+
+	* 14976: aczsh.m4: Add socklen_t to possible SOCKLEN_T types.
+
+2001-06-19  Andrej Borsenkow  <bor@zsh.org>
+
+	* 14973: acconfig.h, aczsh.m4, zshconfig.ac, Src/Modules/zftp.c:
+	fix for reported problems on AIX 4.x. Still no feedback if it
+	finally works (or even compiles)
+
 2001-06-18  Bart Schaefer  <schaefer@zsh.org>
 
 	* 14965: Src/Zle/computil.c: Silence compiler warnings.

@@ -1485,6 +1485,12 @@ fi
 
 
 dnl ---------------
+dnl check for the type of third argument of accept
+dnl ---------------
+
+zsh_CHECK_SOCKLEN_T
+
+dnl ---------------
 dnl dynamic loading
 dnl ---------------
 L=N
@@ -1496,28 +1502,29 @@ MOD_IMPORT_VARIABLE=
 MOD_IMPORT_FUNCTION=
 aixdynamic=no
 hpuxdynamic=no
-if test "$ac_cv_func_dlopen"  != yes ||
-   test "$ac_cv_func_dlsym"   != yes ||
-   test "$ac_cv_func_dlerror" != yes; then
-  if test "$ac_cv_func_load"      != yes ||
-     test "$ac_cv_func_unload"    != yes ||
-     test "$ac_cv_func_loadbind"  != yes ||
-     test "$ac_cv_func_loadquery" != yes; then
-    if test "$ac_cv_func_shl_load" != yes ||
-       test "$ac_cv_func_shl_unload" != yes ||
-       test "$ac_cv_func_shl_findsym" != yes; then
-      dynamic=no
-    elif test "x$dynamic" = xyes; then
-      hpuxdynamic=yes
-      DL_EXT="${DL_EXT=sl}"
-      dnl autoheader won't allow us to define anything which isn't
-      dnl going into a header, and we can't undefine anything, so
-      dnl just define this anyway and rely on the later tests to
-      dnl define DYNAMIC or not.
-      AC_DEFINE(HPUXDYNAMIC)dnl
-    fi
-  elif test "x$dynamic" = xyes; then
+if test "$ac_cv_func_load"      = yes &&
+   test "$ac_cv_func_unload"    = yes &&
+   test "$ac_cv_func_loadbind"  = yes &&
+   test "$ac_cv_func_loadquery" = yes; then
+  dnl Force AIXDYNAMIC even on newer versions that have dl family
+  if test "x$dynamic" = xyes; then
     aixdynamic=yes
+  fi
+elif test "$ac_cv_func_dlopen"  != yes ||
+     test "$ac_cv_func_dlsym"   != yes ||
+     test "$ac_cv_func_dlerror" != yes; then
+  if test "$ac_cv_func_shl_load" != yes ||
+     test "$ac_cv_func_shl_unload" != yes ||
+     test "$ac_cv_func_shl_findsym" != yes; then
+    dynamic=no
+  elif test "x$dynamic" = xyes; then
+    hpuxdynamic=yes
+    DL_EXT="${DL_EXT=sl}"
+    dnl autoheader won't allow us to define anything which isn't
+    dnl going into a header, and we can't undefine anything, so
+    dnl just define this anyway and rely on the later tests to
+    dnl define DYNAMIC or not.
+    AC_DEFINE(HPUXDYNAMIC)dnl
   fi
 fi
 
