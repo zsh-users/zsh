@@ -1,3 +1,7 @@
+2003-09-25  Peter Stephenson  <pws@csr.com>
+
+	* 19139: Test/B02typeset.ztst: add extra tests for typeset -T.
+
 2003-09-25  Wayne Davison  <wayned@users.sourceforge.net>
 
 	* unposted: Src/builtin.c: fixed old-style typeset -T (without

@@ -195,6 +195,18 @@
 >i:n:n:e:r
 >outer
 
+ typeset -TU MORESTUFF=here-we-go-go-again morestuff '-'
+ print -l $morestuff
+0:Tied arrays with separator specified
+>here
+>we
+>go
+>again
+
+ typeset -T THIS will not work
+1:Tied array syntax
+?(eval):typeset:1: -T requires names of scalar and array
+
  local array[2]=x
 1:Illegal local array element assignment
 ?(eval):local:1: array[2]: can't create local array elements
