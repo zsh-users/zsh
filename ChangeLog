@@ -1,3 +1,8 @@
+2004-07-29  Peter Stephenson  <pws@csr.com>
+
+	* 20208: Src/prompt.c, Doc/Zsh/prompt.yo: ternary code character C
+	etc. treat / as path with zero elements.
+
 2004-07-28  Peter Stephenson  <pws@csr.com>
 
 	* 20214: Src/parse.c: fix debugging test that didn't work

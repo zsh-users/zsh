@@ -217,11 +217,13 @@ sitem(tt(#))(True if the effective uid of the current process is var(n).)
 sitem(tt(?))(True if the exit status of the last command was var(n).)
 sitem(tt(_))(True if at least var(n) shell constructs were started.)
 sxitem(tt(C))
-sitem(tt(/))(True if the current absolute path has at least var(n) elements.)
+sitem(tt(/))(True if the current absolute path has at least var(n) elements
+relative to the root directory, hence tt(/) is counted as 0 elements.)
 sxitem(tt(c))
 sxitem(tt(.))
 sitem(tt(~))(True if the current path, with prefix replacement, has at
-least var(n) elements.)
+least var(n) elements relative to the root directory, hence tt(/) is
+counted as 0 elements.)
 sitem(tt(D))(True if the month is equal to var(n) (January = 0).)
 sitem(tt(d))(True if the day of the month is equal to var(n).)
 sitem(tt(g))(True if the effective gid of the current process is var(n).)

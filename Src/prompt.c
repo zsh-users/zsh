@@ -244,9 +244,12 @@ putpromptchar(int doprint, int endchar)
 		    if ((nd = finddir(ss))) {
 			arg--;
 			ss += strlen(nd->dir);
-		    }
+		    } /*FALLTHROUGH*/
 		case '/':
 		case 'C':
+		    /* `/' gives 0, `/any' gives 1, etc. */
+		    if (*ss++ == '/' && *ss)
+			arg--;
 		    for (; *ss; ss++)
 			if (*ss == '/')
 			    arg--;
