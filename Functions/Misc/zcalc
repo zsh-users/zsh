@@ -141,7 +141,11 @@ while vared -cehp "${(%)ZCALCPROMPT}" line; do
     eval "latest=\$(( $line ))"
     argv[num++]=$latest
     psvar[1]=$num
-    print -- $(( $base $latest ))
+    if [[ -z $base ]]; then
+      print -- $latest
+    else
+      print -- $(( $base $latest ))
+    fi
   fi
   line=
 done
