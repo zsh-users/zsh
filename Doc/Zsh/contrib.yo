@@ -90,14 +90,14 @@ startitem()
 findex(zrecompile)
 xitem(tt(zrecompile) [ tt(-qt) ] [ var(name) ... ])
 item(tt(zrecompile) [ tt(-qt) ] tt(-p) var(args) [ tt(-)tt(-) var(args) ... ])(
-This tries to find wordcode files and automatically re-compile them if at
-least one of the original files is newer than the wordcode file.  This
-works only if the names stored in the wordcode files are full paths or are
-relative to the directory that contains the wordcode file.
+This tries to find tt(*.zwc) files and automatically re-compile them if at
+least one of the original files is newer than the compiled file.  This
+works only if the names stored in the compiled files are full paths or are
+relative to the directory that contains the tt(.zwc) file.
 
-In the first form, each var(name) is the name of a wordcode file or a
-directory containing wordcode files that should be checked. If no
-arguments are given, the directories and wordcode files in $fpath are
+In the first form, each var(name) is the name of a compiled file or a
+directory containing tt(*.zwc) files that should be checked.  If no
+arguments are given, the directories and tt(*.zwc) files in tt(fpath) are
 used.
 
 When tt(-t) is given, no compilation is performed, but a return status of
@@ -105,9 +105,9 @@ zero (true) is set if there are files that need to be re-compiled and
 non-zero (false) otherwise.  The tt(-q) option quiets the chatty output
 that describes what tt(zrecompile) is doing.
 
-Without the tt(-t) option, the return status is zero if all wordcode files
-that needed re-compilation could be compiled and non-zero if compilation
-for at least one of the files failed.
+Without the tt(-t) option, the return status is zero if all files that
+needed re-compilation could be compiled and non-zero if compilation for at
+least one of the files failed.
 
 If the tt(-p) option is given, the var(args) are interepted as one
 or more sets of arguments for tt(zcompile), separated by `tt(-)tt(-)'.
