@@ -1,0 +1,86 @@
+#
+# Makefile for Completion subdirectory
+#
+# Copyright (c) 1999 Peter Stephensons
+# All rights reserved.
+#
+# Permission is hereby granted, without written agreement and without
+# license or royalty fees, to use, copy, modify, and distribute this
+# software and to distribute modified versions of this software for any
+# purpose, provided that the above copyright notice and the following
+# two paragraphs appear in all copies of this software.
+#
+# In no event shall Peter Stephenson or the Zsh Development Group be liable
+# to any party for direct, indirect, special, incidental, or consequential
+# damages arising out of the use of this software and its documentation,
+# even if Peter Stephenson and the Zsh Development Group have been advised of
+# the possibility of such damage.
+#
+# Peter Stephenson and the Zsh Development Group specifically disclaim any
+# warranties, including, but not limited to, the implied warranties of
+# merchantability and fitness for a particular purpose.  The software
+# provided hereunder is on an "as is" basis, and Peter Stephenson and the
+# Zsh Development Group have no obligation to provide maintenance,
+# support, updates, enhancements, or modifications.
+#
+
+subdir = Completion
+dir_top = ..
+SUBDIRS =
+
+@VERSION_MK@
+
+# source/build directories
+VPATH           = @srcdir@
+sdir            = @srcdir@
+sdir_top        = @top_srcdir@
+INSTALL         = @INSTALL@
+
+@DEFS_MK@
+
+# ========== DEPENDENCIES FOR BUILDING ==========
+
+all:
+
+# ========== DEPENDENCIES FOR INSTALLING ==========
+
+install: install.fns
+
+uninstall: uninstall.fns
+
+# install functions, including those in subdirectories, creating
+# install directory if necessary
+install.fns:
+	if test x$(fndir) != x && test x$(fndir) != xno; then \
+	  $(sdir_top)/mkinstalldirs $(fndir) || exit 1; \
+	  for file in $(FUNCTIONS_INSTALL); do \
+	    if test -f $$file; then \
+	      $(INSTALL_DATA) $$file $(fndir) || exit 1; \
+	    fi; \
+	  done; \
+	fi; \
+	exit 0
+
+uninstall.fns:
+	if test x$(fndir) != x && test x$(fndir) != xno; then \
+	  for file in $(FUNCTIONS_INSTALL); do \
+	    if test -f $$file; then \
+	      rm -f "$(fndir)/`echo $$file | sed -e 's%^.*/%%'`"; \
+	    fi; \
+	  done; \
+	fi; \
+	exit 0
+
+# ========== DEPENDENCIES FOR CLEANUP ==========
+
+@CLEAN_MK@
+
+mostlyclean-here:
+
+distclean-here:
+
+realclean-here:
+
+# ========== DEPENDENCIES FOR MAINTENANCE ==========
+
+@CONFIG_MK@
