@@ -1,12 +1,204 @@
-1999-07-03  Peter Stephenson  <pws@ibmth.difi.unipi.it>
+1999-07-12  Peter Stephenson  <pws@ibmth.df.unipi.it>
 
+	* pws: version 3.1.6-test-1
+
+	* Sven: 7099: Completion/Core/_main_complete, Doc/Zsh/compsys.yo:
+	  config key last_prompt means don't turn off alwayslastprompt on
+	  prefix.
+
+	* Sven: 7097: Completion/Core/_oldlist: keeps old command line.
+
+1999-07-09  Peter Stephenson  <pws@ibmth.df.unipi.it>
+
+	* pws: 7091: configure.in, INSTALL: change defaults for
+	  dynamic and large file support to be enabled.
+
+	* Sven: 7083: Src/Zle/compctl.c, Src/Zle/zle_tricky.c,
+	  Doc/Zsh/compwid.yo: compset -q unconditionally splits
+	  the current word.
+
+	* Sven: 7082: Completion/Base/_parameter: use _parameters
+
+	* pws: 7076: Completion/Base/_command_names,
+	  Completion/Base/_first, Completion/User/_su: %resume should be
+	  in _command_names; _su should check $SHELL.
+
+	* pws: 7075, 7080, 7092: Completion/Core/compinit,
+	  Config/funcinst.mk, Config/installfns.sh,
+	  Config/uninstallfns.sh, INSTALL: Yet another attempt to install
+	  shell functions in a sensible way; compinit adds to the end of
+	  $fpath; fixed typo that it didn't check existing fpath properly.
+
+	* Oliver: 7067: Completion/Base/_first, Completion/User/_su,
+	  Completion/User/_sh: check for %resume on command line;
+	  new completions for _su and _sh.
+
+	* pws: 7066: configure.in: function install makefile in
+	  source, not build, hierarchy.
+
+	* Sven: 7062: Src/Zle/complist.c, Src/Zle/zle_tricky.c,
+	  Doc/Zsh/compsys.yo, Doc/Zsh/mod_complist.yo: undo works
+	  inside menu-selection for items completed by
+	  accept-and-infer-next-history; display is more reliable.
+
+	* Sven: 7058: Src/Zle/zle_params.c: turn off menu completion
+	  if the command line gets altered by a zle function.
+
+1999-07-08  Peter Stephenson  <pws@ibmth.df.unipi.it>
+	  
+	* pws: 7049: Src/builtin.c: eval didn't save/restore lexical
+	  state.
+	
+	* pws: 7046: Src/loop.c: xtrace for case and for statements.
+	
+	* Sven: 7043: Completion/Core/_oldlist:  Extra sophistication
+	  when using _oldlist with a particular completer.
+	
+	* pws: 7042: Etc/BUGS, Etc/CONTRIBUTORS, Etc/NEWS,
+	  Doc/Zsh/builtins.yo, Doc/Zsh/expn.yo, Doc/Zsh/mod_complist.yo,
+	  Doc/Zsh/params.yo:  Changes to admin files for 3.1.6; some minor
+	  documentation changes.
+	
+	* Sven: 7039: Completion/Commands/_read_comp: trapping SIGINT
+	  no longer necessary after 7038.
+	
+	* pws: 7038: Src/Zle/zle_main.c: restore breaks whenever errflag
+	  is restored as SIGINT handler sets both.
+	  
+	* Sven: 7036: Src/Zle/complist.c: make sure old list is thrown
+	  away when doing accept-and-infer-next-history in menu-completion.
+	
+	* Sven: 7028: Src/Zle/zle_tricky.c,
+	  Functions/Zle/incremental-complete-word: problems when BUFFER
+	  changes, %u in i-c-w prompt, config key for showing list.
+
+	* Sven: 7026: Completion/Core/_main_complete,
+	  Completion/Core/_match, Completion/Core/_oldlist,
+	  Completion/Core/compinit: More information stored in assoc array
+	  _lastcomp about the previous completion.
+
+	* Sven: 7025: Src/Zle/complist.c: remove list when accepting
+	  and retrying completion when unambiguous.
+
+1999-07-07  Peter Stephenson  <pws@ibmth.df.unipi.it>
+
+	* pws: 7021: Src/utils.c: error message in findsep() was
+	  erroneous.
+
+	* pws: 7020: Src/params.c: error message for whole assoc array
+	  assignment.
+
+	* Oliver: 7005: Src/builtin.c, Doc/Zsh/builtins.yo: alias
+	  takes +g and + flags.
+
+	* Sven: 7004: Src/Zle/zle_refresh.c: reset showinglist on
+	  clearlist.
+
+	* pws: 7002: Completion/Commands/_read_comp: does completion
+	  lists; handle errors better.
+
+	* pws: 7001: Src/hist.c: line numbers were wrong in some error
+	  messages (e.g. conditions) when reading from a string
+	  (e.g. autoloaded functions).
+
+	* pws: 6998: Src/Zle/zle_bindings.c: restore history-search
+	  bindings \M-n, \M-p.
+
+	* Sven: 6996: Src/Zle/complist.c, Src/Zle/zle_tricky.c,
+	  Doc/Zsh/mod_complist.yo: accept-and-infer-next-history
+	  in menu-select accepts a match, then restarts menu selection.
+
+	* Sven: 6995, 7000: Src/math.c, Src/utils.c, Doc/Zsh/arith.yo:
+	  allow bindkey strings in after #\ in math mode.  Also
+	  incremental-complete-word and insert-files, added by hand
+	  to directory Functions/Zle, with appropriate changes to
+	  configure.in and INSTALL.
+
+	* Sven: 6992: Src/Zle/zle_main.c, Src/Zle/zle_misc.c,
+	  Src/Zle/zle_thingy.c, Src/Zle/zle_tricky.c, Doc/Zsh/mod_zle.yo:
+	  zle -R can take list arguments; zle -cR clears the list;
+	  zle -U puts keys in the unget queue.
+
+	* Geoff: 6991: configure.in: NetBSD can use both ELF and a.out.
+
+1999-07-06  Peter Stephenson  <pws@ibmth.df.unipi.it>
+
+	* Andrej: 6990: Completion/Builtins/_cd,
+	  Completion/Core/_path_files: some local variable fixes.
+
+	* pws: 6987: Src/builtin.c: `typeset +f' and `functions +'
+	  should just print the function name.
+
+	* pws: 6986: Doc/Zsh/builtins.yo, Doc/Zsh/params.yo,
+	  Src/builtin.c, Src/params.c, Src/zsh.h: special parameters
+	  can become local, remaining special; be more careful that
+	  only the most global parameter can appear in the environment.
+
+	* pws: 6984: Doc/Zsh/compsys.yo: typo in 6973 docs
+
+1999-07-05  Peter Stephenson  <pws@ibmth.df.unipi.it>
+
+	* pws: 6982: Src/exec.c: variable assignment with redirection is
+	  interpreted as variable assignment with redirection, not
+	  nullcmd.
+
+	* pws: 6981: Completion/Commands/_read_comp: -n should be -z.
+
+	* Sven: 6979: Completion/Core/_path_files: compconfig[path_expand]
+	  fix.
+
+	* Sven: 6977: Completion/Core/_match: cosmetic `if' change.
+
+	* Sven: 6975: Src/Zle/zle_tricky.c: fix quoting of tildes at
+	  the start of file names.
+
+	* Sven: 6974: Src/exec.c: mark superjob as locked as soon
+	  as started.
+
+	* pws: 6973: Completion/Commands/_read_comp, Doc/Zsh/compsys.yo:
+	  _read_comp allows function arguments and ^U but won't add
+	  non-printables; document Completion/Commands widgets.
+
+	* Sven: 6971: Src/exec.c, Src/jobs.c: backgrounding jobs forked
+	  from current shell works again; job table not filled up by
+	  current shell subjobs; current/previous job not lost.
+
+1999-07-04  Peter Stephenson  <pws@ibmth.df.unipi.it>
+
+	* pws: 6970: Completion/Base/_default, Completion/Builtins/_cd,
+	  Completion/Commands/_read_comp: handle magicequalsubst and
+	  cdablevars optios; _read_comp can read and execute a completion
+	  function (_*) or compgen argument (-*) on the fly.
+
+	* pws: 6969: Doc/Zsh/builtins.yo, Src/builtin.c: print -b
+	  uses full bindkey string possibilities.
+
+	* Tanaka Akira: 6968: Completion/Core/compinit: compinit -D
+	  didn't actually work.
+
+	* pws: 6967: Completion/Core/_path_files: final return status
+	  inverted.
+
+	* pws: 6966: Completion/Makefile.in, Functions/Makefile.in,
+	  Config/funcinst.mk, configure.in, INSTALL:  prevent overwriting
+	  of changed shell functions on installation; move function
+	  installation code to funcinst.mk; clear up INSTALL a bit.
+
+1999-07-03  Peter Stephenson  <pws@ibmth.df.unipi.it>
+
+	* pws: 6962: Doc/Zsh/prompt.yo, Src/prompt.c:  %/ and %~ take
+	  numbers for trailing path segments like %c and %C, %N can too;
+	  function promptpath() to implement this.
+
+	* pws: 6957: 3.1.5-pws-25 made available
+	
 	* pws: 6955, 6956: Completion/Core/compinit,
 	  Completion/Core/compinstall, Doc/Zsh/compsys.yo: better handling
 	  of subdirectory structure for completion functions; -d is default
 	  for compinit, -D turns it off; documentation updated for installed
 	  files; bugfix for compinstall re-using compconf arguments.
 
-1999-07-02  Peter Stephenson  <pws@ibmth.difi.unipi.it>
+1999-07-02  Peter Stephenson  <pws@ibmth.df.unipi.it>
 
 	* Tanaka Akira: 6953: Completion/Builtins/_cd: use pushd code for cd
 
@@ -22,7 +214,7 @@
 	  send-break to exit menu selection and return to normal menu
 	  completion.
 
-1999-07-01  Peter Stephenson  <pws@ibmth.difi.unipi.it>
+1999-07-01  Peter Stephenson  <pws@ibmth.df.unipi.it>
 
 	* Sven: 6936: Src/jobs.c: time builtin was broken.
 
@@ -30,7 +222,7 @@
 	  control fixes:  running external command after loop in function;
 	  function on left hand side of pipeline with loop on right.
 
-1999-06-29  Peter Stephenson  <pws@ibmth.difi.unipi.it>
+1999-06-29  Peter Stephenson  <pws@ibmth.df.unipi.it>
 
 	* Sven: 6908, 6926: Src/exec.c, Src/jobs.c, Src/zsh.h: more job
 	  control fixes:  functions with programs that send strange
@@ -50,7 +242,7 @@
 	  some (but not all) recent job handling patches to avoid more
 	  serious problems with recalcitrant programs.
 
-1999-06-28  Peter Stephenson  <pws@ibmth.difi.unipi.it>
+1999-06-28  Peter Stephenson  <pws@ibmth.df.unipi.it>
 
 	* pws: 6899: Doc/Zsh/params.yo, Doc/Zsh/prompt.yo, Src/init.c:
 	  default PS4 is now "+%N:%i> ", except in [k]sh emulation.
@@ -67,7 +259,7 @@
 	* Geoff: 6884: Src/Zle/zle_refresh.c: bug when redisplaying line
 	  one shorter than terminal width
 
-1999-06-27  Peter Stephenson  <pws@ibmth.difi.unipi.it>
+1999-06-27  Peter Stephenson  <pws@ibmth.df.unipi.it>
 
         * pws: 6881: Doc/Zsh/mod_zle.yo: explain keymap linking
 
@@ -83,11 +275,11 @@
 	* pws: 6866: Src/exec.c, Src/init.c: signed/unsigned character
 	  problems; one was causing SunOS 4.1.3_U1 with gcc 2.7.0 to hang.
 
-1999-06-26  Peter Stephenson  <pws@ibmth.difi.unipi.it>
+1999-06-26  Peter Stephenson  <pws@ibmth.df.unipi.it>
 
 	* 3.1.5-pws-24 made available
 
-1999-06-25  Peter Stephenson  <pws@ibmth.difi.unipi.it>
+1999-06-25  Peter Stephenson  <pws@ibmth.df.unipi.it>
 
 	* pws: 6857: Completion/Core/compinit,
 	  Completion/Core/compinstall, Doc/Zsh/compsys.yo: compinit and
@@ -110,7 +302,7 @@
 
 	* Sven: 6841: Src/loop.c: %_ in else branches for PS4
 
-1999-06-24  Peter Stephenson  <pws@ibmth.difi.unipi.it>
+1999-06-24  Peter Stephenson  <pws@ibmth.df.unipi.it>
 
 	* pws: 6834: Src/glob.c, Src/hashtable.c: dyncat() changed always
 	  to use heap memory (as it erroneously claimed); hashtable element
@@ -142,7 +334,7 @@
 	  don't automatically switch on select widget until there are
 	  $SELECTMIN choices.
 
-1999-06-23  Peter Stephenson  <pws@ibmth.difi.unipi.it>
+1999-06-23  Peter Stephenson  <pws@ibmth.df.unipi.it>
 
 	* pws: 6816: Doc/Zsh/params.yo, Src/utils.c:  ZBEEP parameter
 	  gives string to output instead of beeping.
@@ -185,7 +377,7 @@
 	  Src/Zle/zle_main.c, Doc/Zsh/mod_complist.yo: Local keymaps can be
 	  defined, currently only used with menu-select.
 
-1999-06-22  Peter Stephenson  <pws@ibmth.difi.unipi.it>
+1999-06-22  Peter Stephenson  <pws@ibmth.df.unipi.it>
 
 	* Sven: 6786: Src/Zle/zle_tricky.c, Doc/Zsh/compctl.yo: only use
 	  a range when you are after the first pattern in it.
@@ -212,7 +404,7 @@
 	* Oliver: 6772: Src/Zle/zle_tricky.c: use the whole
 	  command text for job completion.
 
-1999-06-21  Peter Stephenson  <pws@ibmth.difi.unipi.it>
+1999-06-21  Peter Stephenson  <pws@ibmth.df.unipi.it>
 
 	* Sven: 6760: Src/Zle/zle_tricky.c: menucompletion displaying new
 	  list of matches sometimes got confused.
@@ -243,7 +435,7 @@
 
 	* Bart: 6731: Doc/Zsh/compctl.yo: spelling correction
 
-1999-06-20  Peter Stephenson  <pws@ibmth.difi.unipi.it>
+1999-06-20  Peter Stephenson  <pws@ibmth.df.unipi.it>
 
 	* zsh-3.1.5-pws-23 made available
 	
@@ -258,7 +450,7 @@
 	  to list to restore when outside a function, but do if the function
 	  simply unsets a trap which was set outside.
 
-1999-06-18  Peter Stephenson  <pws@ibmth.difi.unipi.it>
+1999-06-18  Peter Stephenson  <pws@ibmth.df.unipi.it>
 
 	* pws: 6718: Completion/Core/compinit, Completion/Core/compdump,
 	  Doc/Zsh/compsys.yo: rebind existing completion widgets for new
@@ -281,7 +473,7 @@
 	  of stopping a command in such a structure where the command
 	  handles interruptions in such a way that zsh doesn't see them.
 
-1999-06-17  Peter Stephenson  <pws@ibmth.difi.unipi.it>
+1999-06-17  Peter Stephenson  <pws@ibmth.df.unipi.it>
 
 	* pws: 6705: Doc/Zsh/builtins.yo, Src/builtin.c, Src/exec.c,
 	  Src/init.c, Src/input.c, Src/parse.c: some more LINENO
@@ -328,7 +520,7 @@
 	* Wayne: 6681: Src/builtin.c: start-of-loop check for history -r
 	  was wrong.
 
-1999-06-16  Peter Stephenson  <pws@ibmth.difi.unipi.it>
+1999-06-16  Peter Stephenson  <pws@ibmth.df.unipi.it>
 
 	* pws: 6679: Src/Zle/zle_thingy.c, Doc/Zsh/compwid.yo:  always
 	  use .complete-word etc. as widget type in zle -C.
@@ -365,7 +557,7 @@
 	* Bart: 6646: Src/lex.c: extra braces to enhance beauty of code
 	  which appeared in 3.0.5.
 
-1999-06-15  Peter Stephenson  <pws@ibmth.difi.unipi.it>
+1999-06-15  Peter Stephenson  <pws@ibmth.df.unipi.it>
 
 	* Tanaka Akira: 6642: Completion/Base/_tilde: complete directory
 	  stack elements after ~+ or ~-.
@@ -388,7 +580,7 @@
 	* Bart: 6628: Src/params.c: setting slices of unset array
 	  caused a crash.
 
-1999-06-14  Peter Stephenson  <pws@ibmth.difi.unipi.it>
+1999-06-14  Peter Stephenson  <pws@ibmth.df.unipi.it>
 
 	* pws: 6626: Src/mem.c: in zsh's malloc, try to make sure when
 	  sbrk'ing that it's sufficiently well aligned.
@@ -419,7 +611,7 @@
 	  expn.yo, files.yo, mod_mapfile.yo, mod_zftp.yo, params.yo,
 	  zftpsys.yo, zle.yo: spelling corrections
 
-1999-06-12  Peter Stephenson  <pws@ibmth.difi.unipi.it>
+1999-06-12  Peter Stephenson  <pws@ibmth.df.unipi.it>
 
 	* pws: 6601: Src/Makefile.in: don't remake Makemod just
 	  to clean up files
@@ -439,7 +631,7 @@
 	* Wayne: 6599: Src/Zle/zle_tricky.c: unitialised variable warnings
 	  from gcc
 
-1999-06-11  Peter Stephenson  <pws@ibmth.difi.unipi.it>
+1999-06-11  Peter Stephenson  <pws@ibmth.df.unipi.it>
 
 	* pws: 6598: Doc/Zsh/zftpsys.yo, Functions/Zftp/zfinit,
 	  Functions/Zftp/zfgoto, Functions/Zftp/zfmark,
@@ -461,7 +653,7 @@
 	  struct cmd to insert cmd args and flags, always pass those
 	  separately
 
-1999-06-10  Peter Stephenson  <pws@ibmth.difi.unipi.it>
+1999-06-10  Peter Stephenson  <pws@ibmth.df.unipi.it>
 
 	* Andrej: 6581: Doc/Makefile: dependencies for manuals
 
@@ -497,7 +689,7 @@
 
 	* Sven: 6557: Doc/zsh/compsys.yo: a few typos
 
-1999-06-09  Peter Stephenson  <pws@ibmth.difi.unipi.it>
+1999-06-09  Peter Stephenson  <pws@ibmth.df.unipi.it>
 
 	* Andrej: 6556: aczsh.m4: don't disable setting variables
 	  for --enable-lfs just because some other variables were set
@@ -543,7 +735,7 @@
 	  on Solaris 2.7, despite previous reports; Sven says on Digital
 	  UNIX 4.0, you need special DLLD and LDFLAGS.
 
-1999-06-08  Peter Stephenson  <pws@ibmth.difi.unipi.it>
+1999-06-08  Peter Stephenson  <pws@ibmth.df.unipi.it>
 
 	* pws: 6525: Src/lex.c (gettokstr): allow parentheses after
 	  first character in command word
@@ -560,7 +752,7 @@
 
 	* Wayne: 6510: Completion/Core/compinit: another nounset problem
 
-1999-06-07  Peter Stephenson  <pws@ibmth.difi.unipi.it>
+1999-06-07  Peter Stephenson  <pws@ibmth.df.unipi.it>
 
 	* pws: configure.in, Config/defs.mk.in, Functions/Makefile.in,
 	  Completion/Makefile.in, rearrangement of Functions
@@ -613,12 +805,12 @@
 	* Tanaka Akira: 6478: Completion/User/_make: complete files
 	  as fallback (but use _files instead of compgen -f)
 
-1999-06-06  Peter Stephenson  <pws@ibmth.difi.unipi.it>
+1999-06-06  Peter Stephenson  <pws@ibmth.df.unipi.it>
 
 	* Naoki Wakamatsu <naoki-w@ht-net21.ne.jp>: 6477: configure.in:
 	  undefine etcdir, not zshenv
 
-1999-06-05  Peter Stephenson  <pws@ibmth.difi.unipi.it>
+1999-06-05  Peter Stephenson  <pws@ibmth.df.unipi.it>
 
 	* Merge ChangeLog entry from patchlist.txt in 3.1.5-pws-20
 	  These are briefer than normal ChangeLog entries, but upgrading

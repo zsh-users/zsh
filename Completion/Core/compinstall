@@ -136,7 +136,7 @@ fi
 
 # Check if this is in fpath already, else put it there (with ~'s expanded).
 _ci_f=${~_ci_fdir}
-[[ -z ${fpath[(r)$_ci_f]} ]] && fpath=($_ci_f $fpath)
+[[ -z ${fpath[(r)$_ci_f]} ]] && fpath=($fpath $_ci_f)
 
 # Contract $HOME to ~ in the parameter to be used for writing.
 _ci_fdir=${_ci_fdir/#$HOME/\~}
@@ -183,7 +183,7 @@ ${_ci_dumpfile}.  Please edit a replacement."
 fi
 
 _ci_lines="${_ci_lines}_compdir=$_ci_fdir
-[[ -z \$fpath[(r)\$_compdir] ]] && fpath=(\$_compdir \$fpath)
+[[ -z \$fpath[(r)\$_compdir] ]] && fpath=(\$fpath \$_compdir)
 autoload -U compinit
 compinit"
 [[ $_ci_dtype != standard ]] && _ci_lines="${_ci_lines} $_ci_dumpfile"

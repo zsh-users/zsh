@@ -57,6 +57,13 @@ execfor(Cmd cmd, LinkList args, int flags)
     if (node->condition) {
 	str = dupstring(node->name);
 	singsub(&str);
+	if (isset(XTRACE)) {
+	    char *str2 = dupstring(str);
+	    untokenize(str2);
+	    printprompt4();
+	    fprintf(stderr, "%s\n", str2);
+	    fflush(stderr);
+	}
 	if (!errflag)
 	    matheval(str);
 	if (errflag)
@@ -79,9 +86,14 @@ execfor(Cmd cmd, LinkList args, int flags)
 	    if (!errflag) {
 		while (iblank(*str))
 		    str++;
-		if (*str)
+		if (*str) {
+		    if (isset(XTRACE)) {
+			printprompt4();
+			fprintf(stderr, "%s\n", str);
+			fflush(stderr);
+		    }
 		    val = matheval(str);
-		else
+		} else
 		    val = 1;
 	    }
 	    if (errflag) {
@@ -95,6 +107,11 @@ execfor(Cmd cmd, LinkList args, int flags)
 	} else {
 	    if (!args || !(str = (char *) ugetnode(args)))
 		break;
+	    if (isset(XTRACE)) {
+		printprompt4();
+		fprintf(stderr, "%s=%s\n", node->name, str);
+		fflush(stderr);
+	    }
 	    setsparam(node->name, ztrdup(str));
 	}
 	execlist(node->list, 1,
@@ -107,6 +124,11 @@ execfor(Cmd cmd, LinkList args, int flags)
 	}
 	if (node->condition && !errflag) {
 	    str = dupstring(node->advance);
+	    if (isset(XTRACE)) {
+		printprompt4();
+		fprintf(stderr, "%s\n", str);
+		fflush(stderr);
+	    }
 	    singsub(&str);
 	    if (!errflag)
 		matheval(str);
@@ -410,6 +432,13 @@ execcase(Cmd cmd, LinkList args, int flags)
 	while (*p) {
 	    char *pat = dupstring(*p + 1);
 	    singsub(&pat);
+	    if (isset(XTRACE)) {
+		char *pat2 = dupstring(pat);
+		untokenize(pat2);
+		printprompt4();
+		fprintf(stderr, "case %s (%s)\n", word, pat2);
+		fflush(stderr);
+	    }
 	    if (matchpat(word, pat)) {
 		do {
 		    execlist(*l++, 1, **p == ';' && (flags & CFLAG_EXEC));

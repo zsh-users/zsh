@@ -1,3 +1,3 @@
 #compdef -parameter-
 
-compgen -v
+_parameters -S ' ' -r '['

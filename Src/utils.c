@@ -1735,10 +1735,11 @@ findsep(char **s, char *sep)
 	if (!*t)
 	    return i;
 	if (*(*s)++ == Meta) {
-	    (*s)++;
 #ifdef DEBUG
-	    if (! **s)
+	    if (! *(*s)++)
 		fprintf(stderr, "BUG: unexpected end of string in findsep()\n");
+#else
+	    (*s)++;
 #endif
 	}
     }
@@ -3187,24 +3188,28 @@ dquotedzputs(char const *s, FILE *stream)
  *   4:  Do $'...' quoting.  Overwrites the existing string instead of
  *       zhalloc'ing 
  *   5:  As 2, but \- is special.  Expects misc to be defined.
+ *   6:  As 2, but parses only one character and returns end-pointer
+ *       and parsed character in *misc
  */
 
 /**/
 char *
 getkeystring(char *s, int *len, int fromwhere, int *misc)
 {
-    char *buf;
+    char *buf, tmp[1];
     char *t, *u = NULL;
     char svchar = '\0';
     int meta = 0, control = 0;
 
-    if (fromwhere != 4)
-	buf = zhalloc(strlen(s) + 1);
+    if (fromwhere == 6)
+	t = tmp;
+    else if (fromwhere != 4)
+	t = buf = zhalloc(strlen(s) + 1);
     else {
-	buf = s;
+	t = buf = s;
 	s += 2;
     }
-    for (t = buf; *s; s++) {
+    for (; *s; s++) {
 	if (*s == '\\' && s[1]) {
 	    switch (*++s) {
 	    case 'a':
@@ -3303,7 +3308,8 @@ getkeystring(char *s, int *len, int fromwhere, int *misc)
 	} else if (fromwhere == 4 && *s == Snull) {
 	    for (u = t; (*u++ = *s++););
 	    return t + 1;
-	} else if (*s == '^' && (fromwhere == 2 || fromwhere == 5)) {
+	} else if (*s == '^' &&
+		   (fromwhere == 2 || fromwhere == 5 || fromwhere == 6)) {
 	    control = 1;
 	    continue;
 	} else if (*s == Meta)
@@ -3329,6 +3335,10 @@ getkeystring(char *s, int *len, int fromwhere, int *misc)
 	    *t = t[-1] ^ 32;
 	    t[-1] = Meta;
 	    t++;
+	}
+	if (fromwhere == 6 && t != tmp) {
+	    *misc = (int) tmp[0];
+	    return s + 1;
 	}
     }
     DPUTS(fromwhere == 4, "BUG: unterminated $' substitution");

@@ -44,7 +44,7 @@ This command only expands parameters.  A zero exit code is returned.
 findex(alias)
 cindex(aliases, defining)
 cindex(aliases, listing)
-item(tt(alias) [ tt(-gmrL) ] [ var(name)[tt(=)var(value)] ... ])(
+item(tt(alias) [ {tt(PLUS()|tt(-))}tt(gmrL) ] [ var(name)[tt(=)var(value)] ... ])(
 For each var(name) with a corresponding var(value), define an alias
 with that value.  A trailing space in var(value) causes the next word
 to be checked for alias expansion.  If the tt(-g) flag is present,
@@ -58,7 +58,9 @@ are taken as patterns (they should be quoted to preserve them from being
 interpreted as glob patterns), and the aliases matching these patterns
 are printed.  When printing aliases and the tt(-g) or tt(-r) flags
 are present, then restrict the printing to global or regular
-aliases, respectively.
+aliases, respectively.  Using `tt(PLUS())' instead of `tt(-)', or ending
+the option list with a single `tt(PLUS())', prevents the values of the
+aliases from being printed.
 
 If the tt(-L) flag is present, then print each
 alias in a manner suitable for putting in a startup script.  The exit
@@ -550,7 +552,7 @@ If the tt(PUSHD_MINUS) option is set, the meanings of `tt(PLUS())' and
 `tt(-)' in this context are swapped.
 )
 findex(print)
-item(tt(print) [ tt(-nrslzpNDPoOicm) ] [ tt(-u)var(n) ] [ tt(-R) [ tt(-en) ]] [ var(arg) ... ])(
+item(tt(print) [ tt(-bnrslzpNDPoOicm) ] [ tt(-u)var(n) ] [ tt(-R) [ tt(-en) ]] [ var(arg) ... ])(
 With no flags or with flag `tt(-)', the arguments are printed on
 the standard output as described by tt(echo), with the following differences:
 the escape sequence `tt(\M-)var(x)' metafies the character
@@ -569,6 +571,13 @@ Emulate the BSD tt(echo) command, which does not process escape sequences
 unless the tt(-e) flag is given.  The tt(-n) flag suppresses the trailing
 newline.  Only the tt(-e) and tt(-n) flags are recognized after
 tt(-R); all other arguments and options are printed.
+)
+item(tt(-b))(
+Recognize all the escape sequences defined for the tt(bindkey) command,
+see 
+ifzman(zmanref(zshmodules))\
+ifnzman(noderef(The zle Module))\
+.
 )
 item(tt(-m))(
 Take the first argument as a pattern (should be quoted), and remove
@@ -917,15 +926,18 @@ ifzman(`Local Parameters' in zmanref(zshparam))\
 ifnzman(noderef(Local Parameters))\
 .  Local parameters are not exported unless tt(ALL_EXPORT) is set, in
 which case the parameter is exported em(only) when var(name) does not
-already appear in the environment.
+already exist.  The same rules apply to special shell parameters, which
+retain their special attributes when made local.
 
 For each var(name)tt(=)var(value) assignment, the parameter
 var(name) set to var(value).  Note that arrays currently cannot be
 assigned in tt(typeset) expressions; scalars and integers only.
 
-For each remaining var(name) that refers to a parameter that is set,
-the name and value of the parameter are printed in the form of an
-assignment.  Nothing is printed for newly-created parameters.
+For each remaining var(name) that refers to a parameter that is set, the
+name and value of the parameter are printed in the form of an assignment.
+Nothing is printed for newly-created parameters, or if any attribute flags
+listed below are given.  Using `tt(PLUS())' instead of minus to introduce
+an attribute turns it off.
 
 If the tt(-T) option is given, exactly two (or zero) var(name)
 arguments must be present.  They represent a scalar and an array (in
@@ -951,13 +963,16 @@ has no effect when listing existing parameters, nor does the flag tt(+g)
 have any effect.
 
 If no var(name) is present, the names and values of all parameters are
-printed.  In this case the attribute flags restrict the display to
-only those parameters that have the specified attributes.  Using
-`tt(PLUS())' rather than `tt(-)' to introduce the flag causes the
-attribute to be turned off, and suppresses printing of the names and
-values.  If only the tt(-m) flag is given the arguments are taken as
-patterns (should be quoted) and all parameters (or functions with the
-tt(-f) flag) with matching names are printed.
+printed.  In this case the attribute flags restrict the display to only
+those parameters that have the specified attributes, and using `tt(PLUS())'
+rather than `tt(-)' to introduce the flag suppresses printing of the values
+of parameters when there is no parameter name.  Also, if the option list
+ends with `tt(PLUS())', values will not be printed.  If only the tt(-m)
+flag is given the arguments are taken as patterns (should be quoted) and
+all parameters (or functions with the tt(-f) flag) with matching names are
+printed.  If no attribute flags and no tt(-m) flag is present, the
+parameter names will be preceded by a list of any attributes (tt(array),
+tt(association), tt(exported), tt(integer), tt(readonly)).
 
 The following attribute flags may be specified:
 

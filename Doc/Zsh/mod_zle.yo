@@ -177,7 +177,8 @@ xitem(tt(zle) tt(-D) var(widget) ...)
 xitem(tt(zle) tt(-A) var(old-widget) var(new-widget))
 xitem(tt(zle) tt(-N) var(widget) [ var(function) ])
 xitem(tt(zle) tt(-C) var(widget) var(completion-widget) var(function))
-xitem(tt(zle) tt(-R) [ var(display-string) ])
+xitem(tt(zle) tt(-R) [ tt(-c) ] [ var(display-string) ] [ var(string) ... ])
+xitem(tt(zle) tt(-U) var(string))
 item(tt(zle) var(widget) tt([ -n) var(num) tt(]) tt([ -N ]) var(args) ...)(
 The tt(zle) builtin performs a number of different actions concerning
 ZLE.  Which operation it performs depends on its options:
@@ -227,11 +228,21 @@ ifzman(zmanref(zshcompwid))\
 ifnzman(noderef(Completion Widgets))\
 .
 )
-item(tt(-R) [ var(display-string) ])(
+item(tt(-R) [ tt(-c) ] [ var(display-string) ] [ var(string) ... ])(
 Redisplay the command line; this is to be called from within a user-defined
 widget to allow changes to become visible.  If a var(display-string) is
-given, this is shown in the status line (immediately below the line being
-edited).
+given and not empty, this is shown in the status line (immediately
+below the line being edited).
+
+If the optional var(string)s are given they are listed below the
+prompt in the same way as completion lists are printed. If no
+var(string)s are given but the tt(-c) option is used such a list is
+cleared.
+)
+item(tt(-U) var(string))(
+This puts the characters in the var(string) in the input queue of
+ZLE. After the widget currently executed finishes ZLE will behave as
+if the characters in the var(string) were typed by the user.
 )
 item(var(widget) tt([ -n) var(num) tt(]) tt([ -N ]) var(args) ...)(
 Invoke the specified widget.  This can only be done when ZLE is

@@ -75,6 +75,7 @@ if [[ "$PREFIX" = --* ]]; then
   _long_options '--owner*'          "_tilde" \
                 '*=(PROG|COMMAND)*' "_command_names" \
 		'*=ARCHIVE*'        "_tar_archive" \
+		'*=NAME*'           "_files" \
 		'*=CONTROL*'        "[t numbered nil existing never simple]"
 
 elif [[ ( CURRENT -gt 2 && "$words[CURRENT-1]" = -*f* &&

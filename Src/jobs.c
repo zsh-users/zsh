@@ -125,6 +125,86 @@ findproc(pid_t pid, Job *jptr, Process *pptr)
     return 0;
 }
 
+/* Find the super-job of a sub-job. */
+
+/**/
+static int
+super_job(int sub)
+{
+    int i;
+
+    for (i = 1; i < MAXJOB; i++)
+	if ((jobtab[i].stat & STAT_SUPERJOB) &&
+	    jobtab[i].other == sub &&
+	    jobtab[i].gleader)
+	    return i;
+    return 0;
+}
+
+/**/
+static int
+handle_sub(int job, int fg)
+{
+    Job jn = jobtab + job, sj = jobtab + jn->other;
+
+    if ((sj->stat & STAT_DONE) || !sj->procs) {
+	struct process *p;
+		    
+	for (p = sj->procs; p; p = p->next)
+	    if (WIFSIGNALED(p->status)) {
+		if (jn->gleader != mypgrp && jn->procs->next)
+		    killpg(jn->gleader, WTERMSIG(p->status));
+		else
+		    kill(jn->procs->pid, WTERMSIG(p->status));
+		kill(sj->other, SIGCONT);
+		kill(sj->other, WTERMSIG(p->status));
+		break;
+	    }
+	if (!p) {
+	    int cp;
+
+	    jn->stat &= ~STAT_SUPERJOB;
+	    jn->stat |= STAT_WASSUPER;
+
+	    if ((cp = ((WIFEXITED(jn->procs->status) ||
+			WIFSIGNALED(jn->procs->status)) &&
+		       killpg(jn->gleader, 0) == -1))) {
+		Process p;
+		for (p = jn->procs; p->next; p = p->next);
+		jn->gleader = p->pid;
+	    }
+	    /* This deleted the job too early if the parent
+	       shell waited for a command in a list that will
+	       be executed by the sub-shell (e.g.: if we have
+	       `ls|if true;then sleep 20;cat;fi' and ^Z the
+	       sleep, the rest will be executed by a sub-shell,
+	       but the parent shell gets notified for the
+	       sleep.
+	       deletejob(sj); */
+	    /* If this super-job contains only the sub-shell,
+	       we have to attach the tty to its process group
+	       now. */
+	    if ((fg || thisjob == job) &&
+		(!jn->procs->next || cp || jn->procs->pid != jn->gleader))
+		attachtty(jn->gleader);
+	    kill(sj->other, SIGCONT);
+	}
+	curjob = jn - jobtab;
+    } else if (sj->stat & STAT_STOPPED) {
+	struct process *p;
+
+	jn->stat |= STAT_STOPPED;
+	for (p = jn->procs; p; p = p->next)
+	    if (p->status == SP_RUNNING ||
+		(!WIFEXITED(p->status) && !WIFSIGNALED(p->status)))
+		p->status = sj->procs->status;
+	curjob = jn - jobtab;
+	printjob(jn, !!isset(LONGLISTJOBS), 1);
+	return 1;
+    }
+    return 0;
+}
+
 /* Update status of process that we have just WAIT'ed for */
 
 /**/
@@ -183,13 +263,8 @@ update_job(Job jn)
 		 * or to exit. So we have to send it a SIGTSTP. */
 		int i;
 
-		for (i = 1; i < MAXJOB; i++)
-		    if ((jobtab[i].stat & STAT_SUPERJOB) &&
-			jobtab[i].other == job &&
-			jobtab[i].gleader) {
-			killpg(jobtab[i].gleader, SIGTSTP);
-			break;
-		    }
+		if ((i = super_job(job)))
+		    killpg(jobtab[i].gleader, SIGTSTP);
 	    }
 	    return;
 	}
@@ -254,6 +329,13 @@ update_job(Job jn)
 	return;
     jn->stat |= (somestopped) ? STAT_CHANGED | STAT_STOPPED :
 	STAT_CHANGED | STAT_DONE;
+    if (!inforeground &&
+	(jn->stat & (STAT_SUBJOB | STAT_DONE)) == (STAT_SUBJOB | STAT_DONE)) {
+	int su;
+
+	if ((su = super_job(jn - jobtab)))
+	    handle_sub(su, 0);
+    }
     if ((jn->stat & (STAT_DONE | STAT_STOPPED)) == STAT_STOPPED) {
 	prevjob = curjob;
 	curjob = job;
@@ -303,13 +385,14 @@ setprevjob(void)
 
     for (i = MAXJOB - 1; i; i--)
 	if ((jobtab[i].stat & STAT_INUSE) && (jobtab[i].stat & STAT_STOPPED) &&
-	    i != curjob && i != thisjob) {
+	    !(jobtab[i].stat & STAT_SUBJOB) && i != curjob && i != thisjob) {
 	    prevjob = i;
 	    return;
 	}
 
     for (i = MAXJOB - 1; i; i--)
-	if ((jobtab[i].stat & STAT_INUSE) && i != curjob && i != thisjob) {
+	if ((jobtab[i].stat & STAT_INUSE) && !(jobtab[i].stat & STAT_SUBJOB) &&
+	    i != curjob && i != thisjob) {
 	    prevjob = i;
 	    return;
 	}
@@ -791,64 +874,9 @@ waitjob(int job, int sig)
 		killjb(jn, SIGCONT);
 		jn->stat &= ~STAT_STOPPED;
 	    }
-	    if (jn->stat & STAT_SUPERJOB) {
-		Job sj = jobtab + jn->other;
-		if ((sj->stat & STAT_DONE) || !sj->procs) {
-		    struct process *p;
-		    
-		    for (p = sj->procs; p; p = p->next)
-			if (WIFSIGNALED(p->status)) {
-			    if (jn->gleader != mypgrp && jn->procs->next)
-				killpg(jn->gleader, WTERMSIG(p->status));
-			    else
-				kill(jn->procs->pid, WTERMSIG(p->status));
-			    kill(sj->other, SIGCONT);
-			    kill(sj->other, WTERMSIG(p->status));
-			    break;
-			}
-		    if (!p) {
-			int cp;
-
-			jn->stat &= ~STAT_SUPERJOB;
-			jn->stat |= STAT_WASSUPER;
-
-			if ((cp = ((WIFEXITED(jn->procs->status) ||
-				    WIFSIGNALED(jn->procs->status)) &&
-				   killpg(jn->gleader, 0) == -1))) {
-			    Process p;
-			    for (p = jn->procs; p->next; p = p->next);
-			    jn->gleader = p->pid;
-			}
-			/* This deleted the job too early if the parent
-			   shell waited for a command in a list that will
-			   be executed by the sub-shell (e.g.: if we have
-			   `ls|if true;then sleep 20;cat;fi' and ^Z the
-			   sleep, the rest will be executed by a sub-shell,
-			   but the parent shell gets notified for the
-			   sleep.
-			   deletejob(sj); */
-			/* If this super-job contains only the sub-shell,
-			   we have to attach the tty to our process group
-			   (which is shared by the sub-shell) now. */
-			if (!jn->procs->next || cp || jn->procs->pid != jn->gleader)
-			    attachtty(jn->gleader);
-			kill(sj->other, SIGCONT);
-		    }
-		    curjob = jn - jobtab;
-		}
-		else if (sj->stat & STAT_STOPPED) {
-		    struct process *p;
-
-		    jn->stat |= STAT_STOPPED;
-		    for (p = jn->procs; p; p = p->next)
-			if (p->status == SP_RUNNING ||
-			    (!WIFEXITED(p->status) && !WIFSIGNALED(p->status)))
-			    p->status = sj->procs->status;
-		    curjob = jn - jobtab;
-		    printjob(jn, !!isset(LONGLISTJOBS), 1);
+	    if (jn->stat & STAT_SUPERJOB)
+		if (handle_sub(jn - jobtab, 1))
 		    break;
-		}
-	    }
 	    child_block();
 	}
     } else

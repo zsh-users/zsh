@@ -4,8 +4,8 @@ ZSH CONTRIBUTORS
 
 Zsh was originally written by Paul Falstad <pf@zsh.org>.  Zsh is
 now maintained by the members of the zsh-workers mailing list
-<zsh-workers@math.gatech.edu>.  The development is currently coordinated
-by Andrew Main (Zefram) <zefram@zsh.org>.
+<zsh-workers@sunsite.auc.dk>.  The development is currently coordinated
+by Peter Stephenson <pws@zsh.org>.
 
 This file credits only the major contributors to the current release.
 See the ChangeLog files for a complete list of people who have submitted
@@ -14,6 +14,40 @@ are included for disambiguation purposes only, and are not guaranteed
 to be currently accurate.  If you feel that you or someone else have
 been unfairly omitted from this list please mail the current maintainer
 at <coordinator@zsh.org>.
+
+Version 3.1.6
+-------------
+
+* Sven Wishnowsky <wischnow@informatik.hu-berlin.de>: completion code,
+  major rewrite and enhancements, including matching control, completion
+  widgets and function system, complist module; zle code additions; job
+  control code changes; parameters code changes; parameter module;
+  additional autoloading code; general code changes for extra efficiency;
+  subscripting and ordering of globbing lists.
+  
+* Peter Stephenson <pws@ibmth.df.unipi.it>: zftp and mapfile modules and
+  zf* functions; local parameters and typeset changes; changes in autoconf
+  system; case-independent and approximate pattern matching; various
+  options; a few completion modules; some zle changes; FAQ.
+
+* Bart Schaefer <schaefer@candle.brasslantern.com>: associative array
+  implementation; other parameter changes; keeping track of missing
+  patches; function autoloading changes.
+  
+* Wayne Davison <wayne@clari.net>:  History code novelties and improvements
+  with new options.
+  
+* Geoff Wing <mason@primenet.com.au>:  Zle display code fixes, mailing
+  list and patch archive.
+
+* Zoltán Hidvégi <hzoli@cs.elte.hu>: AIX dynamic loading code.
+
+* Matt Armstrong: cygwin configuration changes.
+
+Other improvements, bug fixes and design suggestions from all the above
+plus Andrej Borsenkow, Oliver Kiddle, Tanaka Akira, Naoki Wakamatsu, Tatuso
+Furukawa, Ville Herva, Will Day, Lehti Rahmi, Larry P. Schrof, Helmut
+Jarausch, Phil Pennock, Wilfredo Sanchez, Bruce Stephens.
 
 Version 3.0
 -----------

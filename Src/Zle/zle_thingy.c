@@ -340,7 +340,8 @@ bin_zle(char *name, char **args, char *ops, int func)
 	{ 'A', bin_zle_link, 2,  2 },
 	{ 'N', bin_zle_new,  1,  2 },
 	{ 'C', bin_zle_complete, 3, 3 },
-	{ 'R', bin_zle_refresh, 0, 1 },
+	{ 'R', bin_zle_refresh, 0, -1 },
+	{ 'U', bin_zle_unget, 1, 1 },
 	{ 0,   bin_zle_call, 0, -1 },
     };
     struct opn const *op, *opp;
@@ -396,19 +397,46 @@ static int
 bin_zle_refresh(char *name, char **args, char *ops, char func)
 {
     char *s = statusline;
-    int sl = statusll;
+    int sl = statusll, ocl = clearlist;
 
+    statusline = NULL;
+    statusll = 0;
     if (*args) {
-	statusline = *args;
-	statusll = strlen(statusline);
-    } else {
-	statusline = NULL;
-	statusll = 0;
-    }
+	if (**args) {
+	    statusline = *args;
+	    statusll = strlen(statusline);
+	}
+	if (*++args) {
+	    LinkList l = newlinklist();
+	    int zmultsav = zmult;
+
+	    for (; *args; args++)
+		addlinknode(l, *args);
+
+	    zmult = 1;
+	    listlist(l);
+	    showinglist = clearlist = 0;
+	    zmult = zmultsav;
+	} else if (ops['c'])
+	    clearlist = 1;
+    } else if (ops['c'])
+	clearlist = 1;
     zrefresh();
 
+    clearlist = ocl;
     statusline = s;
     statusll = sl;
+    return 0;
+}
+
+/**/
+static int
+bin_zle_unget(char *name, char **args, char *ops, char func)
+{
+    char *p = *args;
+
+    while (*p)
+	ungetkey((int) *p++);
     return 0;
 }
 

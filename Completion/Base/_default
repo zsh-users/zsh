@@ -11,4 +11,11 @@
 
 compcall || return 0
 
-_files
+_files && return
+
+# magicequalsubst allows arguments like <any-old-stuff>=~/foo to do
+# file name expansion after the =.  In that case, it's natural to
+# allow completion to handle file names after any equals sign.
+if [[ -o magicequalsubst ]] && compset -P 1 '*='; then
+  _files
+fi

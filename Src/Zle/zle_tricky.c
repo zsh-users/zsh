@@ -133,7 +133,8 @@ static LinkList matches, fmatches;
 /* This holds the list of matches-groups. lmatches is a pointer to the  *
  * last element in this list. */
 
-static Cmgroup pmatches, amatches, lmatches;
+/**/
+Cmgroup pmatches, amatches, lmatches;
 
 /* Non-zero if we have permanently allocated matches. */
 
@@ -150,7 +151,8 @@ static int nmatches, smatches;
 
 /* !=0 if we have a valid completion list. */
 
-static int validlist;
+/**/
+int validlist;
 
 /* This flag is non-zero if we are completing a pattern (with globcomplete) */
 
@@ -818,7 +820,8 @@ docomplete(int lst)
      * string inserted by the last completion. */
 
     if (fromcomp & FC_INWORD)
-	cs = lastend;
+	if ((cs = lastend) > ll)
+	    cs = ll;
 
     /* Check if we have to start a menu-completion (via automenu). */
 
@@ -1773,6 +1776,7 @@ doexpansion(char *s, int lst, int olst, int explincmd)
 	if (lst == COMP_LIST_EXPAND) {
 	    /* Only the list of expansions was requested. */
 	    listlist(vl);
+	    showinglist = 0;
 	    goto end;
 	}
 	/* Remove the current word and put the expansions there. */
@@ -2577,7 +2581,8 @@ comp_match(char *pfx, char *sfx, char *w, Comp cp,
 	    return NULL;
     
 	r = (qu ? quotename(r, NULL) : dupstring(r));
-
+	if (qu == 2 && r[0] == '\\' && r[1] == '~')
+	    chuck(r);
 	/* We still break it into parts here, trying to build a sensible
 	 * cline list for these matches, too. */
 	wl = strlen(w);
@@ -2590,6 +2595,8 @@ comp_match(char *pfx, char *sfx, char *w, Comp cp,
 	int mpl, rpl, wl;
 
 	w = (qu ? quotename(w, NULL) : dupstring(w));
+	if (qu == 2 && w[0] == '\\' && w[1] == '~')
+	    chuck(w);
 
 	wl = strlen(w);
 
@@ -3814,15 +3821,20 @@ addmatches(Cadata dat, char **argv)
 		    dat->rems = dupstring(dat->rems);
 
 		/* Probably quote the prefix and suffix for testing. */
-		if (!cp && (dat->aflags & CAF_MATCH) &&
-		    !(dat->aflags & CAF_QUOTE)) {
-		    lpre = quotename(lpre, NULL);
-		    lsuf = quotename(lsuf, NULL);
+		if (!(dat->aflags & CAF_QUOTE)) {
+		    if (!cp && (dat->aflags & CAF_MATCH)) {
+			lpre = quotename(lpre, NULL);
+			lsuf = quotename(lsuf, NULL);
+		    }
+		    if (dat->ppre) {
+			dat->ppre = quotename(dat->ppre, NULL);
+			if ((dat->flags & CMF_FILE) &&
+			    dat->ppre[0] == '\\' && dat->ppre[1] == '~')
+			    chuck(dat->ppre);
+		    }
+		    if (dat->psuf)
+			dat->psuf = quotename(dat->psuf, NULL);
 		}
-		if (dat->ppre)
-		    dat->ppre = quotename(dat->ppre, NULL);
-		if (dat->psuf)
-		    dat->psuf = quotename(dat->psuf, NULL);
 	    }
 	    /* Walk through the matches given. */
 	    for (; (s = *argv); argv++) {
@@ -3855,7 +3867,9 @@ addmatches(Cadata dat, char **argv)
 		    lc = bld_parts(ms, sl, -1, NULL);
 		    isexact = 0;
 		} else if (!(ms = comp_match(lpre, lsuf, s, cp, &lc,
-					     !(dat->aflags & CAF_QUOTE),
+					     (!(dat->aflags & CAF_QUOTE) ?
+					      ((dat->ppre && dat->ppre) ||
+					       !(dat->flags & CMF_FILE) ? 1 : 2) : 0),
 					     &bpl, &bsl, &isexact))) {
 		    if (dparr && !*++dparr)
 			dparr = NULL;
@@ -3962,7 +3976,7 @@ addmatch(char *s, char *t)
 	}
 	ms = ((addwhat == CC_FILES || addwhat == -6 ||
 	       addwhat == -5 || addwhat == -8) ? 
-	      comp_match(qfpre, qfsuf, s, filecomp, &lc, 1,
+	      comp_match(qfpre, qfsuf, s, filecomp, &lc, (ppre && *ppre ? 1 : 2),
 			 &bpl, &bsl, &isexact) :
 	      comp_match(fpre, fsuf, s, filecomp, &lc, 0,
 			 &bpl, &bsl, &isexact));
@@ -4361,6 +4375,7 @@ docompletion(char *s, int lst, int incmd)
 	    cs = origcs;
 	    clearlist = 1;
 	    ret = 1;
+	    minfo.cur = NULL;
 	    goto compend;
 	}
 	if (comppatmatch && *comppatmatch && comppatmatch != opm)
@@ -5156,10 +5171,16 @@ sep_comp_string(char *ss, char *s, int noffs, int rec)
 	zsfree(compisuffix);
 	compisuffix = ztrdup("");
 	zsfree(compqiprefix);
-	compqiprefix = qp;
 	zsfree(compqisuffix);
-	compqisuffix = qs;
-
+	if (instring) {
+	    compqiprefix = qp;
+	    compqisuffix = qs;
+	} else {
+	    compqiprefix = ztrdup(quotename(qp, NULL));
+	    zsfree(qp);
+	    compqisuffix = ztrdup(quotename(qs, NULL));
+	    zsfree(qs);
+	}
 	freearray(compwords);
 	i = countlinknodes(foo);
 	compwords = (char **) zalloc((i + 1) * sizeof(char *));
@@ -7028,7 +7049,7 @@ freematch(Cmatch m)
 /* This frees the groups of matches. */
 
 /**/
-static void
+void
 freematches(void)
 {
     Cmgroup g = pmatches, n;

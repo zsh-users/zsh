@@ -2,6 +2,13 @@
 
 local nm=$compstate[nmatches] ret=1
 
+
+# Complete jobs in implicit fg and bg
+if [[ "$PREFIX[1]" = "%" ]]; then
+  compgen -j -P '%'
+  [[ nm -ne compstate[nmatches] ]] && return
+fi
+
 compgen -c && ret=0
 
 if [[ nm -eq compstate[nmatches] ]]; then

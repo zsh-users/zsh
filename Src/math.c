@@ -357,9 +357,11 @@ zzlex(void)
 	    }
 	    if (*ptr == '#') {
 		if (*++ptr == '\\') {
+		    int v;
+
 		    ptr++;
-		    yyval = *ptr == Meta ? *++ptr ^ 32 : *ptr;
-		    ptr++;
+		    ptr = getkeystring(ptr, NULL, 6, &v);
+		    yyval = v;
 		    unary = 0;
 		    return NUM;
 		}

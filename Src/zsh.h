@@ -951,40 +951,41 @@ struct param {
 /* flags for parameters */
 
 /* parameter types */
-#define PM_SCALAR	0	/* scalar                                     */
-#define PM_ARRAY	(1<<0)	/* array                                      */
-#define PM_INTEGER	(1<<1)	/* integer                                    */
-#define PM_HASHED	(1<<2)	/* association                                */
+#define PM_SCALAR	0	/* scalar                                   */
+#define PM_ARRAY	(1<<0)	/* array                                    */
+#define PM_INTEGER	(1<<1)	/* integer                                  */
+#define PM_HASHED	(1<<2)	/* association                              */
 
 #define PM_TYPE(X) (X & (PM_SCALAR|PM_INTEGER|PM_ARRAY|PM_HASHED))
 
-#define PM_LEFT		(1<<3)	/* left justify and remove leading blanks     */
-#define PM_RIGHT_B	(1<<4)	/* right justify and fill with leading blanks */
-#define PM_RIGHT_Z	(1<<5)	/* right justify and fill with leading zeros  */
-#define PM_LOWER	(1<<6)	/* all lower case                             */
+#define PM_LEFT		(1<<3)	/* left justify, remove leading blanks      */
+#define PM_RIGHT_B	(1<<4)	/* right justify, fill with leading blanks  */
+#define PM_RIGHT_Z	(1<<5)	/* right justify, fill with leading zeros   */
+#define PM_LOWER	(1<<6)	/* all lower case                           */
 
 /* The following are the same since they *
  * both represent -u option to typeset   */
-#define PM_UPPER	(1<<7)	/* all upper case                             */
-#define PM_UNDEFINED	(1<<7)	/* undefined (autoloaded) shell function      */
+#define PM_UPPER	(1<<7)	/* all upper case                           */
+#define PM_UNDEFINED	(1<<7)	/* undefined (autoloaded) shell function    */
 
-#define PM_READONLY	(1<<8)	/* readonly                                   */
-#define PM_TAGGED	(1<<9)	/* tagged                                     */
-#define PM_EXPORTED	(1<<10)	/* exported                                   */
+#define PM_READONLY	(1<<8)	/* readonly                                 */
+#define PM_TAGGED	(1<<9)	/* tagged                                   */
+#define PM_EXPORTED	(1<<10)	/* exported                                 */
 
 /* The following are the same since they *
  * both represent -U option to typeset   */
-#define PM_UNIQUE	(1<<11)	/* remove duplicates                          */
-#define PM_UNALIASED	(1<<11)	/* do not expand aliases when autoloading     */
+#define PM_UNIQUE	(1<<11)	/* remove duplicates                        */
+#define PM_UNALIASED	(1<<11)	/* do not expand aliases when autoloading   */
 
-#define PM_TIED 	(1<<12)	/* array tied to colon-path or v.v. */
-#define PM_LOCAL	(1<<13) /* this parameter will be made local */
-#define PM_SPECIAL	(1<<14) /* special builtin parameter                  */
-#define PM_DONTIMPORT	(1<<15)	/* do not import this variable                */
-#define PM_RESTRICTED	(1<<16) /* cannot be changed in restricted mode       */
-#define PM_UNSET	(1<<17)	/* has null value                             */
-#define PM_REMOVABLE	(1<<18)	/* special can be removed from paramtab */
-#define PM_AUTOLOAD     (1<<19) /* autoloaded from module */
+#define PM_TIED 	(1<<12)	/* array tied to colon-path or v.v.         */
+#define PM_LOCAL	(1<<13) /* this parameter will be made local        */
+#define PM_SPECIAL	(1<<14) /* special builtin parameter                */
+#define PM_DONTIMPORT	(1<<15)	/* do not import this variable              */
+#define PM_RESTRICTED	(1<<16) /* cannot be changed in restricted mode     */
+#define PM_UNSET	(1<<17)	/* has null value                           */
+#define PM_REMOVABLE	(1<<18)	/* special can be removed from paramtab     */
+#define PM_AUTOLOAD	(1<<19) /* autoloaded from module                   */
+#define PM_NORESTORE	(1<<20)	/* do not restore value of local special    */
 
 /* Flags for extracting elements of arrays and associative arrays */
 #define SCANPM_WANTVALS   (1<<0)

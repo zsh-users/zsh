@@ -42,21 +42,14 @@ A `tt(RPAR())'.
 )
 xitem(tt(%d))
 item(tt(%/))(
-Present working directory (tt($PWD)).
+Present working directory (tt($PWD)).  If an integer follows the `tt(%)',
+it specifies a number of trailing components of tt($PWD) to show; zero
+means the whole path.
 )
 item(tt(%~))(
-tt($PWD).
-If it has a named directory as its prefix, that part is replaced
-by a `tt(~)' followed by the name of the directory.
-If it starts with tt($HOME), that part is
-replaced by a `tt(~)'.
-)
-xitem(tt(%c))
-xitem(tt(%.))
-item(tt(%C))(
-Trailing component of tt($PWD).
-An integer may follow the `tt(%)' to get more than one component.
-Unless `tt(%C)' is used, tilde contraction is performed first.
+As tt(%d) and tt(%/), but if tt($PWD) has a named directory as its prefix,
+that part is replaced by a `tt(~)' followed by the name of the directory.
+If it starts with tt($HOME), that part is replaced by a `tt(~)'.
 )
 xitem(tt(%h))
 item(tt(%!))(
@@ -98,7 +91,9 @@ tt($USERNAME).
 item(tt(%N))(
 The name of the script, sourced file, or shell function that zsh is
 currently executing, whichever was started most recently.  If there is
-none, this is equivalent to the parameter tt($0).
+none, this is equivalent to the parameter tt($0).  An integer may follow
+the `tt(%)' to specify a number of trailing path components to show; zero
+means the full path.
 )
 item(tt(%i))(
 The line number currently being executed in the script, sourced file, or
@@ -234,5 +229,15 @@ prompt '%10<...<%~%<<%# ' will print a truncated representation of the
 current directory, followed by a `tt(%)' or `tt(#)', followed by a
 space.  Without the `tt(%<<)', those two characters would be included
 in the string to be truncated.
+)
+xitem(tt(%c))
+xitem(tt(%.))
+item(tt(%C))(
+Trailing component of tt($PWD).
+An integer may follow the `tt(%)' to get more than one component.
+Unless `tt(%C)' is used, tilde contraction is performed first.  These are
+deprecated as tt(%c) and tt(%C) are equivalent to tt(%1~) and tt(%1/),
+respectively, while explicit positive integers have the same effect as for
+the latter two sequences.
 )
 enditem()

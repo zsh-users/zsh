@@ -1905,7 +1905,7 @@ arrhashsetfn(Param pm, char **val)
 
     if (alen % 2) {
 	freearray(val);
-	zerr("bad set of key/value pairs for associative array\n",
+	zerr("bad set of key/value pairs for associative array",
 	     NULL, 0);
 	return;
     }
@@ -2500,11 +2500,17 @@ arrfixenv(char *s, char **t)
     Param pm;
 
     MUSTUSEHEAP("arrfixenv");
+    pm = (Param) paramtab->getnode(paramtab, s);
+    /*
+     * Only one level of a parameter can be exported.  Unless
+     * ALLEXPORT is set, this must be global.
+     */
     if (t == path)
 	cmdnamtab->emptytable(cmdnamtab);
+    if (isset(ALLEXPORT) ? !!pm->old : pm->level)
+	return;
     u = t ? zjoin(t, ':') : "";
     len_s = strlen(s);
-    pm = (Param) paramtab->getnode(paramtab, s);
     for (ep = environ; *ep; ep++)
 	if (!strncmp(*ep, s, len_s) && (*ep)[len_s] == '=') {
 	    pm->env = replenv(*ep, u);
@@ -2685,8 +2691,46 @@ static void
 scanendscope(HashNode hn, int flags)
 {
     Param pm = (Param)hn;
-    if(pm->level > locallevel)
-	unsetparam_pm(pm, 0, 0);
+    if (pm->level > locallevel) {
+	if ((pm->flags & (PM_SPECIAL|PM_REMOVABLE)) == PM_SPECIAL) {
+	    /*
+	     * Removable specials are normal in that they can be removed
+	     * to reveal an ordinary parameter beneath.  Here we handle
+	     * non-removable specials, which were made local by stealth
+	     * (see newspecial code in typeset_single()).  In fact the
+	     * visible pm is always the same struct; the pm->old is
+	     * just a place holder for old data and flags.
+	     */
+	    Param tpm = pm->old;
+
+	    DPUTS(!tpm || PM_TYPE(pm->flags) != PM_TYPE(tpm->flags) ||
+		  !(tpm->flags & PM_SPECIAL),
+		  "BUG: in restoring scope of special parameter");
+	    pm->old = tpm->old;
+	    pm->flags = (tpm->flags & ~PM_NORESTORE);
+	    pm->level = tpm->level;
+	    pm->ct = tpm->ct;
+	    pm->env = tpm->env;
+
+	    if (!(tpm->flags & PM_NORESTORE))
+		switch (PM_TYPE(pm->flags)) {
+		case PM_SCALAR:
+		    pm->sets.cfn(pm, tpm->u.str);
+		    break;
+		case PM_INTEGER:
+		    pm->sets.ifn(pm, tpm->u.val);
+		    break;
+		case PM_ARRAY:
+		    pm->sets.afn(pm, tpm->u.arr);
+		    break;
+		case PM_HASHED:
+		    pm->sets.hfn(pm, tpm->u.hash);
+		    break;
+		}
+	    zfree(tpm, sizeof(*tpm));
+	} else
+	    unsetparam_pm(pm, 0, 0);
+    }
 }
 
 

@@ -5,6 +5,12 @@ The tt(complist) module offers two extensions to completion listings:
 the ability to highlight matches in such a list and a different
 style of menu-completion.
 
+Whenever one of the parameters tt(ZLS_COLORS) or tt(ZLS_COLOURS) is set 
+and the tt(complist) module is loaded or linked into the shell,
+completion lists will be colored.  Note, however, that tt(complist) will
+not automatically be loaded if it is not linked in:  on systems with
+dynamic loading, `tt(zmodload complist)' is required.
+
 subsect(Parameters)
 For both extensions one of the parameters tt(ZLS_COLORS) or tt(ZLS_COLOURS)
 must be set, even if the value is empty (which uses all the default values
@@ -12,12 +18,12 @@ given below). These describe how matches are highlighted. The format of the
 value of these parameters is the same as used by the GNU version of the
 tt(ls) command: a colon-separated list of specifications of the form
 `var(name)=var(value)'. The var(name) may be one of the following strings,
-most of which specify file-types for which the var(value) will be used. The
+most of which specify file types for which the var(value) will be used. The
 strings and their default values are:
 
 startitem()
 item(tt(no 0))(
-for normal text (not the string displayed for a match)
+for normal text (i.e. when displaying something other than a matched file)
 )
 item(tt(fi 0))(
 for regular files
@@ -44,7 +50,7 @@ item(tt(ex 35))(
 for executable files
 )
 item(tt(mi) var(none))(
-for names not naming a file (default is the value defined for tt(fi))
+for non-existent file (default is the value defined for tt(fi))
 )
 item(tt(lc \e[))(
 for the left code (see below)
@@ -71,46 +77,51 @@ The default values are ISO 6429 (ANSI) compliant and can be used on
 vt100 compatible terminals such as tt(xterm)s. On monochrome terminals
 the default values will have no visual effect.
 
-Whenever one of the parameters tt(ZLS_COLORS) or tt(ZLS_COLOURS) is set 
-and the tt(complist) module is loaded or linked into the shell,
-completion lists will be colored.
-
 subsect(Menu selection)
-The tt(complist) module also offers a different style of selecting
-matches from a list called menu-selection. It can be invoked directly by
+The tt(complist) module also offers an alternative style of selecting
+matches from a list, called menu-selection. It can be invoked directly by
 the widget tt(menu-select) defined by the module.  Alternatively,
-the parameter tt(SELECTMIN) can be set to an integer giving the minimum
-number of matches which must be present before menu selection is
+the parameter tt(SELECTMIN) can be set to an integer, which give the
+minimum number of matches that must be present before menu selection is
 automatically turned on.  This second method requires that menu completion
 be started, either directly from a widget such as tt(menu-complete), or due
 to one of the options tt(MENU_COMPLETE) or tt(AUTO_MENU) being set.  If
 tt(SELECTMIN) is set, but is 0, 1 or empty, menu selection will always be
-started during menu completion if the completion is ambiguous.
+started during an ambiguous menu completion.
 
 After menu-selection is started, the matches will be listed. The
 matches to insert into the command line can be selected from this
 list. In the list one match is highlighted using the value for tt(ma)
 from the tt(ZLS_COLORS) or tt(ZLS_COLOURS) parameter. The default
 value for this it `tt(7)' which forces the selected match to be
-highlighted using standout mode on a vt100 compatible terminal. If
+highlighted using standout mode on a vt100-compatible terminal. If
 neither tt(ZLS_COLORS) nor tt(ZLS_COLOURS) is set, the same terminal
-control sequence is used as for the `tt(%S)' escape in prompts.
+control sequence as for the `tt(%S)' escape in prompts is used.
 
 Selecting matches is done by moving the mark around using the zle movement
 functions. The zle functions tt(send-break) and tt(accept-line) can be used
 to leave menu-selection, leaving the match currently inserted into the line
-in place. In the case of tt(accept-line), the match currently inserted
-will be accepted and the immediatly trying completion again will
-complete after it. Using tt(send-break) leaves menu-selection and
-continues with normal menu-completion. The functions tt(accept-and-hold) and
+in place.  In the case of tt(accept-line), the match currently inserted
+will be accepted and a new completion may be attempted.
+Using tt(send-break) leaves menu-selection and continues with normal
+menu-completion.  The functions tt(accept-and-hold) and
 tt(accept-and-menu-complete) can be used to accept the match currently
-inserted and continue inserting matches after that. Matches inserted this
-way can be removed by invoking the tt(undo) function. Keys bound to one of
+inserted and continue inserting matches from the same list. The
+function tt(accept-and-infer-next-history) accepts the current match and
+then tries completion with menu-selection again.  In the case of
+files this allows one to select a directory and immediately attempt to
+complete files in it.  Matches inserted in one of these ways can be removed
+by invoking the tt(undo) function.  Keys bound to one of
 the completion functions will cycle to the next (or, in case of
 tt(reverse-menu-complete), the previous) match, and the tt(redisplay) and
 tt(clear-screen) functions work as usual without leaving
-menu-selection. Any other zle function leaves menu-selection and executes
-that function.
+menu-selection.
+
+Any other zle function leaves menu-selection and executes that function.
+It is possible to make widgets in the above list do the same by using the
+form of the widget with a `tt(.)' in front.  For example, the widget
+`tt(.accept-line)' has the effect of leaving menu selection and accepting
+the entire command line.
 
 During this selection the widget uses the keymap tt(menuselect). Any
 key that is not defined in this keymap or that is bound to
@@ -124,6 +135,6 @@ ifnzman(noderef(The zle Module))\
 ). For example, to make the return key leave menu-selection and
 continue with normal menu-completion one can call
 
-indent(tt(bindkey -M menuselect '^J' send-break))
+indent(tt(bindkey -M menuselect '^M' send-break))
 
 after loading the tt(complist) module.

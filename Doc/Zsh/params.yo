@@ -108,14 +108,15 @@ be a list of flags. The flags currently understood are:
 
 startitem()
 item(tt(e))(
-this option has no effect and retained for backward compatibility only.
+This option has no effect and retained for backward compatibility only.
 )
 item(tt(w))(
-if the parameter subscripted is a scalar than this flag makes
-subscription work on a per-word basis instead of characters.
+If the parameter subscripted is a scalar than this flag makes
+subscripting work on words instead of characters.  The default word
+separator is whitespace.
 )
 item(tt(s:)var(string)tt(:))(
-this gives the var(string) that separates words (for use with the
+This gives the var(string) that separates words (for use with the
 tt(w) flag).
 )
 item(tt(p))(
@@ -123,21 +124,22 @@ Recognize the same escape sequences as the tt(print) builtin in
 the string argument of a subsequent `tt(s)' flag.
 )
 item(tt(f))(
-if the parameter subscripted is a scalar than this flag makes
-subscription work on a per-line basis instead of characters.
-This is a shorthand for `tt(pws:\n:)'.
+If the parameter subscripted is a scalar than this flag makes
+subscripting work on lines instead of characters, i.e. with elements
+separated by newlines.  This is a shorthand for `tt(pws:\n:)'.
 )
 item(tt(r))(
-if this flag is given the var(exp) is taken as a pattern and the
-result is the first matching array element, substring or word (if the
-parameter is an array, if it is a scalar, or if it is a scalar and the
-`tt(w)' flag is given, respectively); note that this is like giving a
-number: `tt($foo[(r))var(??)tt(,3])' and `tt($foo[(r))var(??)tt(,(r)f*])' work.
-If the parameter is an associative array, only the value part of each pair
-is compared to the pattern.
+Reverse subscripting:  if this flag is given, the var(exp) is taken as a
+pattern and the  result is the first matching array element, substring or
+word (if the parameter is an array, if it is a scalar, or if it is a scalar
+and the `tt(w)' flag is given, respectively).  The subscript used is the
+number of the matching element, so that pairs of subscripts such as
+`tt($foo[(r))var(??)tt(,3])' and `tt($foo[(r))var(??)tt(,(r)f*])'
+are possible.  If the parameter is an associative array, only the value part
+of each pair is compared to the pattern.
 )
 item(tt(R))(
-like `tt(r)', but gives the last match.  For associative arrays, gives
+Like `tt(r)', but gives the last match.  For associative arrays, gives
 all possible matches.
 )
 item(tt(i))(
@@ -188,8 +190,7 @@ Shell function executions delimit scopes for shell parameters.
 (Parameters are dynamically scoped.)  The tt(typeset) builtin, and its
 alternative forms tt(declare), tt(integer), tt(local) and tt(readonly)
 (but not tt(export)), can be used to declare a parameter as being local
-to the innermost scope.  Note that em(special) parameters cannot be made
-local.
+to the innermost scope.
 
 When a parameter is read or assigned to, the
 innermost existing parameter of that name is used.  (That is, the
@@ -200,6 +201,23 @@ causes it to be created in the em(outer)most scope.
 Local parameters disappear when their scope ends.
 tt(unset) can be used to delete a parameter while it is still in scope;
 any outer parameter of the same name remains hidden.
+
+Special parameters may also be made local; they retain their special
+attributes.  This may have unexpected effects.  Firstly, there is no
+default value, so if there is no assigment at the point the variable is
+made local, it will be set to an empty value (or zero in the case of
+integers).  Secondly, special parameters which are made local will not be
+exported (as with other parameters), so that the global value of the
+parameter remains present in the environment if it is already there.  This
+should be particularly noted in the case of tt(PATH): the shell will use
+the local version of tt(PATH) for finding programmes, but programmes using
+the shell's environment will inherit the global version.  The following:
+
+example(typeset PATH=/new/directory:$PATH)
+
+is valid for temporarily allowing the shell to find the programs in
+tt(/new/directory) inside a function.
+
 texinode(Parameters Set By The Shell)(Parameters Used By The Shell)(Local Parameters)(Parameters)
 sect(Parameters Set By The Shell)
 The following parameters are automatically set by the shell:
@@ -715,12 +733,12 @@ set up the terminal before executing the command. The modes apply only to the
 command, and are reset when it finishes or is suspended. If the command is
 suspended and continued later with the tt(fg) or tt(wait) builtins it will
 see the modes specified by tt(STTY), as if it were not suspended.  This
-(intentionally) does not apply if the command is continued via `tt(kill -CONT)'.
-tt(STTY) is ignored if the command is run in the background, or if it is in the
-environment of the shell but not explicitly assigned to in the input line. This
-avoids running stty at every external command by accidentally exporting it.
-Also note that tt(STTY) should not be used for window size specifications; these
-will not be local to the command.
+(intentionally) does not apply if the command is continued via `tt(kill
+-CONT)'.  tt(STTY) is ignored if the command is run in the background, or
+if it is in the environment of the shell but not explicitly assigned to in
+the input line. This avoids running stty at every external command by
+accidentally exporting it. Also note that tt(STTY) should not be used for
+window size specifications; these will not be local to the command.
 )
 vindex(TERM)
 item(tt(TERM) <S>)(

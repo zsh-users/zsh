@@ -2096,9 +2096,7 @@ bin_compset(char *name, char **argv, char *ops, int func)
     case 'P': test = CVT_PREPAT; break;
     case 's': test = CVT_SUFNUM; break;
     case 'S': test = CVT_SUFPAT; break;
-    case 'q': return !(compquote && *compquote &&
-		       (*compquote == '\'' || *compquote == '"') &&
-		       !set_comp_sepptr());
+    case 'q': return set_comp_sepptr();
     default:
 	zerrnam(name, "bad option -%c", NULL, argv[0][1]);
 	return 1;

@@ -15,9 +15,13 @@
 #    any matches, correction is tried and if that doesn't yield
 #    anything either, correcting completion is attempted.
 #
-# These completer functions are only used when this function is called
-# without arguments. If arguments are given, they should be names of
-# completer functions which will then be called.
+#    These completer functions are only used when this function is called
+#    without arguments. If arguments are given, they should be names of
+#    completer functions which will then be called.
+#
+#  last_prompt
+#    If this is set to `always' the cursor is moved up to the last prompt
+#    after printing a list even if a numeric argument was given.
 
 
 # If you want to complete only set or unset options for the unsetopt
@@ -33,7 +37,7 @@
 # state than the global one for which you are completing.
 
 
-local comp
+local comp ret=1
 
 setopt localoptions nullglob rcexpandparam
 unsetopt markdirs globsubst shwordsplit nounset ksharrays
@@ -54,5 +58,21 @@ fi
 # And now just call the completer functions defined.
 
 for comp; do
-  "$comp" && return
+  if "$comp"; then
+    ret=0
+    break;
+  fi
 done
+
+[[ "$compconfig[last_prompt]" = always ]] && compstate[last_prompt]=yes
+
+_lastcomp=( "${(@kv)compstate}" )
+_lastcomp[completer]="$comp"
+_lastcomp[prefix]="$PREFIX"
+_lastcomp[suffix]="$SUFFIX"
+_lastcomp[iprefix]="$IPREFIX"
+_lastcomp[isuffix]="$ISUFFIX"
+_lastcomp[qiprefix]="$QIPREFIX"
+_lastcomp[qisuffix]="$QISUFFIX"
+
+return ret

@@ -137,6 +137,8 @@ set_buffer(Param pm, char *x)
 	    cs = ll;
     } else
 	cs = ll = 0;
+    fixsuffix();
+    menucmp = 0;
 }
 
 /**/
@@ -156,6 +158,8 @@ set_cursor(Param pm, zlong x)
 	cs = ll;
     else
 	cs = x;
+    fixsuffix();
+    menucmp = 0;
 }
 
 /**/
@@ -182,6 +186,8 @@ set_lbuffer(Param pm, char *x)
     ll = ll - cs + len;
     cs = len;
     zsfree(x);
+    fixsuffix();
+    menucmp = 0;
 }
 
 /**/
@@ -205,6 +211,8 @@ set_rbuffer(Param pm, char *x)
     sizeline(ll = cs + len);
     memcpy(line + cs, y, len);
     zsfree(x);
+    fixsuffix();
+    menucmp = 0;
 }
 
 /**/

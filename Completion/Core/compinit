@@ -49,7 +49,7 @@ emulate -L zsh
 typeset _i_dumpfile _i_files _i_line _i_done _i_dir _i_autodump=1
 typeset _i_tag _i_file _i_addfiles
 
-while [[ $# -gt 0 && $1 = -[df] ]]; do
+while [[ $# -gt 0 && $1 = -[dDf] ]]; do
   if [[ "$1" = -d ]]; then
     _i_autodump=1
     shift
@@ -59,6 +59,7 @@ while [[ $# -gt 0 && $1 = -[df] ]]; do
     fi
   elif [[ "$1" = -D ]]; then
     _i_autodump=0
+    shift
   elif [[ "$1" = -f ]]; then
     # Not used any more; use _compdir
     shift
@@ -71,6 +72,11 @@ done
 
 typeset -gA _comps
 _patcomps=()
+
+# The associative array use to report information about the last
+# cmpletion to the outside.
+
+typeset -gA _lastcomp
 
 # This is the associative array used for configuration.
 
@@ -308,10 +314,10 @@ if [[ $#_i_files -lt 20 || $_compdir = */Core || -d $_compdir/Core ]]; then
     fi
     for _i_line in {1..$#i_addfiles}; do
       _i_file=${_i_addfiles[$_i_line]}
-      [[ -d $_i_file && -z ${fpath[(r)$_i_$file]} ]] ||
+      [[ -d $_i_file && -z ${fpath[(r)$_i_file]} ]] ||
         _i_addfiles[$_i_line]=
     done
-    fpath=($_i_addfiles $fpath)
+    fpath=($fpath $_i_addfiles)
     _i_files=( ${^~fpath:/.}/_(|*[^~])(N:t) )
   fi
 fi

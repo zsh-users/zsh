@@ -307,7 +307,7 @@ getkey(int keytmout)
     unsigned int ret;
     long exp100ths;
     int die = 0, r, icnt = 0;
-    int old_errno = errno;
+    int old_errno = errno, obreaks = breaks;
 
 #ifdef HAVE_SELECT
     fd_set foofd;
@@ -397,6 +397,7 @@ getkey(int keytmout)
 		if (!errflag && !retflag && !breaks)
 		    continue;
 		errflag = 0;
+		breaks = obreaks;
 		errno = old_errno;
 		return EOF;
 	    } else if (errno == EWOULDBLOCK) {
@@ -717,7 +718,7 @@ bin_vared(char *name, char **args, char *ops, int func)
     Value v;
     Param pm = 0;
     int create = 0;
-    int type = PM_SCALAR;
+    int type = PM_SCALAR, obreaks = breaks;
     char *p1 = NULL, *p2 = NULL;
 
     if (zleactive) {
@@ -809,6 +810,7 @@ bin_vared(char *name, char **args, char *ops, int func)
     if (!t || errflag) {
 	/* error in editing */
 	errflag = 0;
+	breaks = obreaks;
 	return 1;
     }
     /* strip off trailing newline, if any */
@@ -948,7 +950,7 @@ trashzle(void)
 static struct builtin bintab[] = {
     BUILTIN("bindkey", 0, bin_bindkey, 0, -1, 0, "evaMldDANmrsLR", NULL),
     BUILTIN("vared",   0, bin_vared,   1,  7, 0, NULL,             NULL),
-    BUILTIN("zle",     0, bin_zle,     0, -1, 0, "lDANCLmMgGcRa",  NULL),
+    BUILTIN("zle",     0, bin_zle,     0, -1, 0, "lDANCLmMgGcRaU", NULL),
 };
 
 /* The order of the entries in this table has to match the *HOOK

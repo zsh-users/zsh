@@ -100,7 +100,8 @@ fi])
 dnl Do you want large file support, if available?
 undefine([lfs])dnl
 AC_ARG_ENABLE(lfs,
-[  --enable-lfs               turn on support for large files])
+[  --enable-lfs               turn on support for large files],
+[lfs="$enableval"], [lfs=yes])
 
 dnl Pathnames for global zsh scripts
 undefine([etcdir])dnl
@@ -183,7 +184,7 @@ dnl Do you want dynamically loaded binary modules.
 undefine([dynamic])dnl
 AC_ARG_ENABLE(dynamic,
 [  --enable-dynamic           allow dynamically loaded binary modules],
-[dynamic="$enableval"], [dynamic=no])
+[dynamic="$enableval"], [dynamic=yes])
 
 dnl Do you want to compile as K&R C.
 AC_ARG_ENABLE(ansi2knr,
@@ -214,7 +215,7 @@ AC_ARG_ENABLE(function-subdirs,
 [  --enable-function-subdirs  install functions in subdirectories])
 
 if test "x${FUNCTIONS_INSTALL+set}" != xset; then
-  FUNCTIONS_INSTALL="Core/* Base/* Builtins/* User/* Commands/*"
+  FUNCTIONS_INSTALL="Core/* Base/* Builtins/* User/* Commands/* Zle/*"
   if test $dynamic != no; then
     FUNCTIONS_INSTALL="${FUNCTIONS_INSTALL} Zftp/*"
   fi
@@ -243,7 +244,7 @@ AC_PROG_CC
 
 dnl Check for large file support.
 dnl This needs to be done early to get the stuff into the flags.
-if test "x$enable_lfs" != x; then
+if test $lfs != no; then
 zsh_LARGE_FILE_SUPPORT
 fi
 
@@ -595,12 +596,11 @@ main() { return sizeof(ino_t) < 8; }
     AC_DEFINE(INO_T_IS_64_BIT)
   fi
 
-  if test "x$enable_lfs" != xno -o $zsh_cv_off_t_is_64_bit = yes \
+  if test $lfs != no -o $zsh_cv_off_t_is_64_bit = yes \
   -o $zsh_cv_ino_t_is_64_bit = yes; then
     AC_CACHE_CHECK(if compiler has a 64 bit type, zsh_cv_64_bit_type,
-    [if test "x$enable_lfs" != x -a "x$enable_lfs" != xyes \
-     -a "x$enable_lfs" != xno; then
-      zsh_64_BIT_TYPE(${enable_lfs}, zsh_cv_64_bit_type, force)
+    [if test $lfs != xyes -a $lfs != xno; then
+      zsh_64_BIT_TYPE(${lfs}, zsh_cv_64_bit_type, force)
      else
        zsh_64_BIT_TYPE(long long, zsh_cv_64_bit_type)
        if test "$zsh_cv_64_bit_type" = no; then
@@ -1171,8 +1171,10 @@ char *argv[];
   DL_EXT="${DL_EXT=so}"
   if test $zsh_cv_sys_elf = yes; then
     DLLD="${DLLD=$CC}"
+    DLLDARG="${LDARG}"
   else
     DLLD="${DLLD=ld}"
+    DLLDARG=""
   fi
   if test -n "$GCC"; then
     DLCFLAGS="${DLCFLAGS=-fpic}"
@@ -1188,7 +1190,7 @@ char *argv[];
     linux*|irix*|osf*) DLLDFLAGS="${DLLDFLAGS=-shared}" ;;
     sunos*)       DLLDFLAGS="${DLLDFLAGS=-assert nodefinitions}" ;;
     sysv4*|esix*) DLLDFLAGS="${DLLDFLAGS=-G $ldflags}" ;;
-    netbsd*)      DLLDFLAGS="${DLLDFLAGS=-x -shared --whole-archive}" ;;
+    netbsd*)      DLLDFLAGS="${DLLDFLAGS=${DLLDARG}-x -shared --whole-archive}" ;;
     aix*)         DLLDFLAGS="${DLLDFLAGS=-G -bexpall -lc}" ;;
     solaris*|sysv4*|esix*) DLLDFLAGS="${DLLDFLAGS=-G}" ;;
   esac
@@ -1340,11 +1342,13 @@ CLEAN_MK="${srcdir}/Config/clean.mk"
 CONFIG_MK="${srcdir}/Config/config.mk"
 dnl defs.mk is in the build tree, not the source tree
 DEFS_MK="Config/defs.mk"
+FUNCINST_MK="${srcdir}/Config/funcinst.mk"
 VERSION_MK="${srcdir}/Config/version.mk"
 
 AC_SUBST_FILE(CLEAN_MK)dnl
 AC_SUBST_FILE(CONFIG_MK)dnl
 AC_SUBST_FILE(DEFS_MK)dnl
+AC_SUBST_FILE(FUNCINST_MK)dnl
 AC_SUBST_FILE(VERSION_MK)dnl
 
 real_no_create=$no_create

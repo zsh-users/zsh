@@ -291,7 +291,7 @@ safeinungetc(int c)
 void
 herrflush(void)
 {
-    while (!lexstop && inbufct)
+    while (!lexstop && inbufct && !strin)
 	hwaddc(ingetc());
 }
 

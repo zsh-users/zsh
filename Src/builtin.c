@@ -42,7 +42,7 @@ static struct builtin builtins[] =
     BUILTIN("[", 0, bin_test, 0, -1, BIN_BRACKET, NULL, NULL),
     BUILTIN(".", BINF_PSPECIAL, bin_dot, 1, -1, 0, NULL, NULL),
     BUILTIN(":", BINF_PSPECIAL, bin_true, 0, -1, 0, NULL, NULL),
-    BUILTIN("alias", BINF_MAGICEQUALS, bin_alias, 0, -1, 0, "Lgmr", NULL),
+    BUILTIN("alias", BINF_MAGICEQUALS | BINF_PLUSOPTS, bin_alias, 0, -1, 0, "Lgmr", NULL),
     BUILTIN("autoload", BINF_TYPEOPTS, bin_functions, 0, -1, 0, "tU", "u"),
     BUILTIN("bg", 0, bin_fg, 0, -1, BIN_BG, NULL, NULL),
     BUILTIN("break", BINF_PSPECIAL, bin_break, 0, 1, BIN_BREAK, NULL, NULL),
@@ -87,7 +87,7 @@ static struct builtin builtins[] =
 #endif
 
     BUILTIN("popd", 0, bin_cd, 0, 2, BIN_POPD, NULL, NULL),
-    BUILTIN("print", BINF_PRINTOPTS, bin_print, 0, -1, BIN_PRINT, "RDPnrslzNu0123456789pioOcm-", NULL),
+    BUILTIN("print", BINF_PRINTOPTS, bin_print, 0, -1, BIN_PRINT, "RDPbnrslzNu0123456789pioOcm-", NULL),
     BUILTIN("pushd", 0, bin_cd, 0, 2, BIN_PUSHD, NULL, NULL),
     BUILTIN("pushln", BINF_PRINTOPTS, bin_print, 0, -1, BIN_PRINT, NULL, "-nz"),
     BUILTIN("pwd", 0, bin_pwd, 0, 0, 0, "rLP", NULL),
@@ -645,12 +645,14 @@ set_pwd_env(void)
     setsparam("OLDPWD", ztrdup(oldpwd));
 
     pm = (Param) paramtab->getnode(paramtab, "PWD");
-    if (!(pm->flags & PM_EXPORTED)) {
+    if (!(pm->flags & PM_EXPORTED) &&
+	(!pm->level || (isset(ALLEXPORT) && !pm->old))) {
 	pm->flags |= PM_EXPORTED;
 	pm->env = addenv("PWD", pwd);
     }
     pm = (Param) paramtab->getnode(paramtab, "OLDPWD");
-    if (!(pm->flags & PM_EXPORTED)) {
+    if (!(pm->flags & PM_EXPORTED) &&
+	(!pm->level || (isset(ALLEXPORT) && !pm->old))) {
 	pm->flags |= PM_EXPORTED;
 	pm->env = addenv("OLDPWD", oldpwd);
     }
@@ -1492,7 +1494,7 @@ Param
 typeset_single(char *cname, char *pname, Param pm, int func,
 	       int on, int off, int roff, char *value, Param altpm)
 {
-    int usepm, tc, keeplocal = 0;
+    int usepm, tc, keeplocal = 0, newspecial = 0;
 
     /*
      * Do we use the existing pm?  Note that this isn't the end of the
@@ -1503,22 +1505,31 @@ typeset_single(char *cname, char *pname, Param pm, int func,
      */
     usepm = pm && !(pm->flags & PM_UNSET);
 
-    /* Always use an existing pm if special at current locallevel */
-    if (pm && (pm->flags & PM_SPECIAL) && pm->level == locallevel)
+    /*
+     * We need to compare types with an existing pm if special,
+     * even if that's unset
+     */
+    if (pm && (pm->flags & PM_SPECIAL))
 	usepm = 1;
 
     /*
-     * Don't use a non-special existing param if
+     * Don't use an existing param if
      *   - the local level has changed, and
      *   - we are really locallizing the parameter
      */
-    if (usepm && !(pm->flags & PM_SPECIAL) &&
-	locallevel != pm->level && (on & PM_LOCAL))
+    if (usepm && locallevel != pm->level && (on & PM_LOCAL)) {
+	/*
+	 * If the original parameter was special and we're creating
+	 * a new one, we need to keep it special.
+	 */
+	newspecial = (pm->flags & PM_SPECIAL);
 	usepm = 0;
+    }
 
     /* attempting a type conversion, or making a tied colonarray? */
-    if ((tc = usepm && (((off & pm->flags) | (on & ~pm->flags)) &
-			(PM_INTEGER|PM_HASHED|PM_ARRAY|PM_TIED|PM_AUTOLOAD))))
+    if ((tc = (usepm || newspecial)
+	 && (((off & pm->flags) | (on & ~pm->flags)) &
+	     (PM_INTEGER|PM_HASHED|PM_ARRAY|PM_TIED|PM_AUTOLOAD))))
 	usepm = 0;
     if (tc && (pm->flags & PM_SPECIAL)) {
 	zerrnam(cname, "%s: can't change type of a special parameter",
@@ -1526,13 +1537,27 @@ typeset_single(char *cname, char *pname, Param pm, int func,
 	return NULL;
     }
 
+    /*
+     * According to the manual, local parameters don't get exported.
+     * A parameter will be local if
+     * 1. we are re-using an existing local parameter
+     *    or
+     * 2. we are not using an existing parameter, but
+     *   i. there is already a parameter, which will be hidden
+     *     or
+     *   ii. we are creating a new local parameter
+     */
+    if ((usepm && pm->level) ||
+	(!usepm && (pm || (locallevel && (on & PM_LOCAL)))))
+	on &= ~PM_EXPORTED;
+
     if (usepm) {
 	on &= ~PM_LOCAL;
 	if (!on && !roff && !value) {
 	    paramtab->printnode((HashNode)pm, 0);
 	    return pm;
 	}
-	if ((pm->flags & PM_RESTRICTED && isset(RESTRICTED))) {
+	if ((pm->flags & PM_RESTRICTED) && isset(RESTRICTED)) {
 	    zerrnam(cname, "%s: restricted", pname, 0);
 	    return pm;
 	}
@@ -1553,7 +1578,8 @@ typeset_single(char *cname, char *pname, Param pm, int func,
 	    if (pm->flags & PM_EXPORTED) {
 		if (!(pm->flags & PM_UNSET) && !pm->env && !value)
 		    pm->env = addenv(pname, getsparam(pname));
-	    } else if (pm->env) {
+	    } else if (pm->env &&
+		       (!pm->level || (isset(ALLEXPORT) && !pm->old))) {
 		delenv(pm->env);
 		zsfree(pm->env);
 		pm->env = NULL;
@@ -1593,13 +1619,68 @@ typeset_single(char *cname, char *pname, Param pm, int func,
 	pname = dupstring(pname);
 	unsetparam_pm(pm, 0, 1);
     }
-    /*
-     * Create a new node for a parameter with the flags in `on' minus the
-     * readonly flag
-     */
-    pm = createparam(pname, on & ~PM_READONLY);
-    DPUTS(!pm, "BUG: parameter not created");
-    pm->ct = auxlen;
+
+    if (newspecial) {
+	Param tpm, pm2;
+	if ((pm->flags & PM_RESTRICTED) && isset(RESTRICTED)) {
+	    zerrnam(cname, "%s: restricted", pname, 0);
+	    return pm;
+	}
+	/*
+	 * For specials, we keep the same struct but zero everything.
+	 * Maybe it would be easier to create a new struct but copy
+	 * the get/set methods.
+	 */
+	tpm = (Param) zalloc(sizeof *tpm);
+
+	tpm->nam = pm->nam;
+	if (pm->ename &&
+	    (pm2 = (Param) paramtab->getnode(paramtab, pm->ename)) &&
+	    pm2->level == locallevel) {
+	    /* This is getting silly, but anyway:  if one of a path/PATH
+	     * pair has already been made local at the current level, we
+	     * have to make sure that the other one does not have its value
+	     * saved:  since that comes from an internal variable it will
+	     * already reflect the local value, so restoring it on exit
+	     * would be wrong.
+	     *
+	     * This problem is also why we make sure we have a copy
+	     * of the environment entry in tpm->env, rather than relying
+	     * on the restored value to provide it.
+	     */
+	    tpm->flags = pm->flags | PM_NORESTORE;
+	} else {
+	    copyparam(tpm, pm, 1);
+	}
+	tpm->old = pm->old;
+	tpm->level = pm->level;
+	tpm->ct = pm->ct;
+	tpm->env = pm->env;
+
+	pm->old = tpm;
+	/*
+	 * The remaining on/off flags should be harmless to use,
+	 * because we've checked for unpleasant surprises above.
+	 */
+	pm->flags = (PM_TYPE(pm->flags) | on | PM_SPECIAL) & ~off;
+	/*
+	 * Final tweak: if we've turned on one of the flags with
+	 * numbers, we should use the appropriate integer.
+	 */
+	if (on & (PM_LEFT|PM_RIGHT_B|PM_RIGHT_Z|PM_INTEGER))
+	    pm->ct = auxlen;
+	else
+	    pm->ct = 0;
+	pm->env = NULL;
+    } else {
+	/*
+	 * Create a new node for a parameter with the flags in `on' minus the
+	 * readonly flag
+	 */
+	pm = createparam(pname, on & ~PM_READONLY);
+	DPUTS(!pm, "BUG: parameter not created");
+	pm->ct = auxlen;
+    }
 
     if (altpm && PM_TYPE(pm->flags) == PM_SCALAR) {
 	/*
@@ -1618,6 +1699,28 @@ typeset_single(char *cname, char *pname, Param pm, int func,
 	pm->level = locallevel;
     if (value && !(pm->flags & (PM_ARRAY|PM_HASHED)))
 	setsparam(pname, ztrdup(value));
+    else if (newspecial && !(pm->old->flags & PM_NORESTORE)) {
+	/*
+	 * We need to use the special setting function to re-initialise
+	 * the special parameter to empty.
+	 */
+	HEAPALLOC {
+	    switch (PM_TYPE(pm->flags)) {
+	    case PM_SCALAR:
+		pm->sets.cfn(pm, ztrdup(""));
+		break;
+	    case PM_INTEGER:
+		pm->sets.ifn(pm, 0);
+		break;
+	    case PM_ARRAY:
+		pm->sets.afn(pm, mkarray(NULL));
+		break;
+	    case PM_HASHED:
+		pm->sets.hfn(pm, newparamtable(17, pm->nam));
+		break;
+	    }
+	} LASTALLOC;
+    }
     pm->flags |= (on & PM_READONLY);
     if (value && (pm->flags & (PM_ARRAY|PM_HASHED))) {
 	zerrnam(cname, "%s: can't assign initial value for array", pname, 0);
@@ -1839,7 +1942,7 @@ bin_functions(char *name, char **argv, char *ops, int func)
     Comp com;
     Shfunc shf;
     int i, returnval = 0;
-    int on = 0, off = 0;
+    int on = 0, off = 0, pflags = 0;
 
     /* Do we have any flags defined? */
     if (ops['u'] == 1)
@@ -1860,13 +1963,17 @@ bin_functions(char *name, char **argv, char *ops, int func)
 	return 1;
     }
 
+    if (ops['f'] == 2 || ops['+'])
+	pflags |= PRINT_NAMEONLY;
+
     /* If no arguments given, we will print functions.  If flags *
      * are given, we will print only functions containing these  *
      * flags, else we'll print them all.                         */
     if (!*argv) {
 	if (ops['U'] && !ops['u'])
 	    on &= ~PM_UNDEFINED;
-	scanhashtable(shfunctab, 1, on|off, DISABLED, shfunctab->printnode, 0);
+	scanhashtable(shfunctab, 1, on|off, DISABLED, shfunctab->printnode,
+		      pflags);
 	return 0;
     }
 
@@ -1879,7 +1986,8 @@ bin_functions(char *name, char **argv, char *ops, int func)
 	    if ((com = parsereg(*argv))) {
 		/* with no options, just print all functions matching the glob pattern */
 		if (!(on|off)) {
-		    scanmatchtable(shfunctab, com, 0, DISABLED, shfunctab->printnode, 0);
+		    scanmatchtable(shfunctab, com, 0, DISABLED,
+				   shfunctab->printnode, pflags);
 		} else {
 		/* apply the options to all functions matching the glob pattern */
 		    for (i = 0; i < shfunctab->hsize; i++) {
@@ -1906,7 +2014,7 @@ bin_functions(char *name, char **argv, char *ops, int func)
 		shf->flags = (shf->flags | (on & ~PM_UNDEFINED)) & ~off;
 	    else
 		/* no flags, so just print */
-		shfunctab->printnode((HashNode) shf, 0);
+		shfunctab->printnode((HashNode) shf, pflags);
 	} else if (on & PM_UNDEFINED) {
 	    /* Add a new undefined (autoloaded) function to the *
 	     * hash table with the corresponding flags set.     */
@@ -2407,6 +2515,8 @@ bin_alias(char *name, char **argv, char *ops, int func)
 
     if (ops['L'])
 	printflags |= PRINT_LIST;
+    else if (ops['r'] == 2 || ops['g'] == 2 || ops['m'] == 2 || ops['+'])
+	printflags |= PRINT_NAMEONLY;
 
     /* In the absence of arguments, list all aliases.  If a command *
      * line flag is specified, list only those of that type.        */
@@ -2512,8 +2622,8 @@ bin_print(char *name, char **args, char *ops, int func)
 	if (!ops['e'] && (ops['R'] || ops['r'] || ops['E']))
 	    unmetafy(args[n], &len[n]);
 	else
-	    args[n] = getkeystring(args[n], &len[n],
-				    func != BIN_ECHO && !ops['e'], &nnl);
+	    args[n] = getkeystring(args[n], &len[n], ops['b'] ? 2 :
+				    (func != BIN_ECHO && !ops['e']), &nnl);
 	/* -P option -- interpret as a prompt sequence */
 	if(ops['P']) {
 	    /*
@@ -3098,11 +3208,7 @@ bin_eval(char *nam, char **argv, char *ops, int func)
 {
     List list;
 
-    inpush(zjoin(argv, ' '), 0, NULL);
-    strinbeg(0);
-    list = parse_list();
-    strinend();
-    inpop();
+    list = parse_string(zjoin(argv, ' '), 0);
     if (!list) {
 	errflag = 0;
 	return 1;

@@ -60,10 +60,8 @@ _complete && ret=1
 compstate[pattern_match]="$opm"
 compstate[matcher]="$compstate[total_matchers]"
 
-if (( ! ret )); then
-  [[ "$compconfig[match_insert]" = unambig* &&
-     $#compstate[unambiguous] -ge ${#:-${PREFIX}${SUFFIX}} ]] && 
-      compstate[pattern_insert]=unambiguous
-fi
+[[ ret -eq 1 && "$compconfig[match_insert]" = unambig* &&
+   $#compstate[unambiguous] -ge ${#:-${PREFIX}${SUFFIX}} ]] && 
+    compstate[pattern_insert]=unambiguous
 
 return 1-ret

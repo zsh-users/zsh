@@ -87,6 +87,9 @@ SGI: IRIX 5.1.1.1, 5.2, 5.3, 6.2, 6.3, 6.5
         full optimization (cc -O3 -OPT:Olimit=0) causes problems.
 
 Sun: SunOS 4.1.*
+	Dynamic loading does not work under SunOS 4.1.  Sometimes,
+	you may need to turn it off explicitly with --disable-dynamic.
+
 	Under 4.1.3 if yellow pages is used, username completion may cause
 	segmentation violation.  This is a bug in the shared library not
 	in zsh.  Some libc.so.1.9.* has this bug (it fails in yp_all).

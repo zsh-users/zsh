@@ -2,6 +2,92 @@
 CHANGES FROM PREVIOUS VERSIONS OF ZSH
 -------------------------------------
 
+New features in zsh version 3.1.6 (beta version)
+------------------------------------------------
+
+New completion system via shell functions; massive degree of
+programmability and configurability:
+ - ready-made function suite to use, see zshcompsys(1)
+ - approximate completion and spelling correction via completion
+ - control over matching for case-independence, partial word completion, etc.
+ - menu selection:  choose a completion by moving the cursor
+ - coloured completion lists
+
+Other editing changes:
+  - enhancements to function/editing interface:  new parameters, numeric
+    arguments, string argument passing, reading keys from widgets.
+  - the old history-search-{back,for}ward behaviour and bindings have
+    returned (up to minor details).
+  - BASH_AUTO_LIST option to show completion list only on second key press.
+  - the ZBEEP parameter gives a string to output instead of beeping,
+    allowing you to have a visual bell.
+
+History changes: new options HIST_NO_FUNCTIONS, HIST_EXPIRE_DUPS_FIRST,
+HIST_FIND_NO_DUPS, HIST_IGNORE_ALL_DUPS, INC_APPEND_HISTORY,
+HIST_SAVE_NO_DUPS, SHARE_HISTORY, allow better control of when history is
+read and written and how duplicates are handled.
+
+Associative arrays plus enhanced parameter substitutions to retrieve keys
+and values.
+
+Globbing changes:
+  - Case-insensitive and approximate globbing.
+  - Ordering and indexing of globbing matches, e.g. *(om[1]) picks
+    most recently modified file.
+
+New loadable modules:
+  - zftp, plus associated function suite, for turning your zsh session
+    into an FTP session too
+  - parameter, for examining and altering shell hash tables via an
+    associative array interface.
+  - mapfile, for reading and writing external files via an associative
+    array interface.
+
+Debugging and prompt enhancements:
+  - LINENO is now very much more useful in scripts and functions and has
+    corresponding prompt escape %i
+  - $PS4 can contain %i as well as %N for script or function names
+    (default PS4 changed), also %_ for current shell structure executing; 
+  - Prompt truncation %<...< is now more flexible: it applies to a
+    whole section of the prompt, not just one escape.  You need to put
+    %<< after the truncated escape to get the old behaviour.
+  - %20(l.yes.no) in prompts prints yes if at least 20 characters have
+    been output, else no (e.g. for outputting extra newlines).
+
+Parameter and expansion changes
+  - typeset -t MYPATH mypath creates tied path/PATH-like variables
+  - typeset -g allows operations on parameters without making them local
+  - New expansions
+    - ${(t)param} prints type information for $param
+    - ${(P)param} treats value of $param as the name of a param to
+      substitute
+    - ${foo:q} can quote replaced parameter text from expansion
+    - ${foo/old/new} substitution, like bash; also (S) flag for shortest
+      match
+    - $foo[(b.2.i)bar] starts searching $foo for bar starting at 2nd match
+    - more logical behaviour of nested parameters, now properly documented
+    - quote only nested expansion, e.g. ${(f)"$(<file)"} reads complete
+      `file', then splits lines into array.
+
+Builtin and function changes
+  - stat module: `stat -H hash foo' gives you e.g. $hash[mtime]
+  - autoload -U autoloads functions without alias expansion.
+
+Other new options:
+  - LOCAL_TRAPS allows signal traps to be local to functions (as in ksh).
+  - NO_RCS can now be turned on at any point in initialization files.
+  - NO_GLOBAL_RCS can force /etc/z* files after /etc/zshenv to be skipped.
+    (Please don't use this as an excuse to stuff more into /etc/zshenv!)
+  - existing MAGIC_EQUAL_SUBST option is more useful; any argument containing
+    ...=~...:~... will perform filename expansion on the ~.
+
+Configuration changes:
+  - Large file and 64-bit integers on 32-bit machines supported where
+    provided by OS.
+  - generation of signal names should be more reliable
+  - Customizable installation of shell functions from distribution.
+
+
 New features in zsh version 3.1 (beta version)
 ----------------------------------------------
 

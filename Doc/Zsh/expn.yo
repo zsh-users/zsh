@@ -248,6 +248,9 @@ reference on the command line, then they refer to the previous command.
 
 The character sequence `tt(^)var(foo)tt(^)var(bar)'
 repeats the last command, replacing the string var(foo) with var(bar).
+More precisely, the sequence `tt(^)var(foo)tt(^)var(bar)tt(^)' is
+synonymous with `tt(!!:s)tt(^)var(foo)tt(^)var(bar)tt(^)', hence other
+modifiers may follow the final `tt(^)'.
 
 If the shell encounters the character sequence `tt(!")'
 in the input, the history mechanism is temporarily disabled until
@@ -855,10 +858,10 @@ texinode(Command Substitution)(Arithmetic Expansion)(Parameter Expansion)(Expans
 sect(Command Substitution)
 cindex(command substitution)
 cindex(substitution, command)
-A command enclosed in parentheses
-preceded by a dollar sign, like `tt($LPAR())...tt(RPAR())', or quoted with grave
-accents, like `tt(`)...tt(`)', is replaced with its standard output, with any
-trailing newlines deleted.
+A command enclosed in parentheses preceded by a dollar sign, like
+`tt($LPAR())...tt(RPAR())', or quoted with grave 
+accents, like `tt(`)...tt(`)', is replaced with its standard output, with
+any trailing newlines deleted.
 If the substitution is not enclosed in double quotes, the
 output is broken into words using the tt(IFS) parameter.
 vindex(IFS, use of)

@@ -1,0 +1,89 @@
+# incremental-complete-word() {
+
+# Autoload this function, run `zle -N <func-name>' and bind <func-name>
+# to a key.
+
+# This allows incremental completion of a word.  After starting this
+# command, a list of completion choices is shown after every character you
+# type, which you can delete with ^h or DEL.  RET will accept the
+# completion so far.  You can hit TAB to do normal completion and ^g to
+# abort back to the state when you started.
+#
+# Completion keys:
+#   incremental_prompt   Prompt to show in status line during icompletion;
+#                        the sequence `%u' is replaced by the unambiguous
+#                        part of all matches if there is any and it is
+#                        different from the word on the line
+# incremental_stop       Pattern matching keys which will cause icompletion
+#                         to stop and the key to be re-executed
+# incremental_break      Pattern matching keys which will cause icompletion
+#                         to stop and the key to be discarded
+# incremental_completer  Set of completers, like the `completer' key
+#   incremental_list     If set to a non-empty string, the matches will be
+#                        listed on every key-press
+
+emulate -L zsh
+unsetopt autolist menucomplete automenu # doesn't work well
+
+local key lbuf="$LBUFFER" rbuf="$RBUFFER" pmpt word lastl lastr wid twid
+
+[[ -n "$compconfig[incremental_completer]" ]] &&
+set ${(s.:.)compconfig[incremental_completer]}
+pmpt="${compconfig[incremental_prompt]-incremental completion...}"
+
+if [[ -n "$compconfig[incremental_list]" ]]; then
+  wid=list-choices
+else
+  wid=complete-word
+fi
+
+zle $wid "$@"
+LBUFFER="$lbuf"
+RBUFFER="$rbuf"
+if [[ "${LBUFFER}${RBUFFER}" = *${_lastcomp[unambiguous]}* ]]; then
+  word=''
+else
+  word="${_lastcomp[unambiguous]}"
+fi
+zle -R "${pmpt//\\%u/$word}"
+read -k key
+
+while [[ '#key' -ne '#\\r' && '#key' -ne '#\\n' &&
+         '#key' -ne '#\\C-g' ]]; do
+  twid=$wid
+  if [[ "$key" = ${~compconfig[incremental_stop]} ]]; then
+    zle -U "$key"
+    return
+  elif [[ "$key" = ${~compconfig[incremental_break]} ]]; then
+    return
+  elif [[ '#key' -eq '#\\C-h' || '#key' -eq '#\\C-?' ]]; then
+    [[ $#LBUFFER -gt $#l ]] && LBUFFER="$LBUFFER[1,-2]"
+  elif [[ '#key' -eq '#\\t' ]]; then
+    zle complete-word "$@"
+    lbuf="$LBUFFER"
+    rbuf="$RBUFFER"
+  elif [[ '#key' -eq '#\\C-d' ]]; then
+    twid=list-choices
+  else
+    LBUFFER="$LBUFFER$key"
+  fi
+  lastl="$LBUFFER"
+  lastr="$RBUFFER"
+  zle $twid "$@"
+  LBUFFER="$lastl"
+  RBUFFER="$lastr"
+  if [[ "${LBUFFER}${RBUFFER}" = *${_lastcomp[unambiguous]}* ]]; then
+    word=''
+  else
+    word="${_lastcomp[unambiguous]}"
+  fi
+  zle -R "${pmpt//\\%u/$word}"
+  read -k key
+done
+
+if [[ '#key' -eq '#\\C-g' ]]; then
+  LBUFFER="$lbuf"
+  RBUFFER="$rbuf"
+fi
+zle -Rc
+# }

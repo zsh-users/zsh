@@ -97,6 +97,38 @@ static int dontcount;
 
 static char *rstring, *Rstring;
 
+/*
+ * Expand path p; maximum is npath segments where 0 means the whole path.
+ * If tilde is 1, try and find a named directory to use.
+ */
+
+static void
+promptpath(char *p, int npath, int tilde)
+{
+    char *modp = p;
+    Nameddir nd;
+
+    if (tilde && ((nd = finddir(p))))
+	modp = tricat("~", nd->nam, p + strlen(nd->dir));
+
+    if (npath) {
+	char *sptr;
+	for (sptr = modp + strlen(modp); sptr > modp; sptr--) {
+	    if (*sptr == '/' && !--npath) {
+		sptr++;
+		break;
+	    }
+	}
+	if (*sptr == '/' && sptr[1] && sptr != modp)
+	    sptr++;
+	stradd(sptr);
+    } else
+	stradd(modp);
+
+    if (p != modp)
+	zsfree(modp);
+}
+
 /* Perform prompt expansion on a string, putting the result in a *
  * permanently-allocated string.  If ns is non-zero, this string *
  * may have embedded Inpar and Outpar, which indicate a toggling *
@@ -293,49 +325,21 @@ putpromptchar(int doprint, int endchar)
 		}
 	    switch (*fm) {
 	    case '~':
-		if ((nd = finddir(pwd))) {
-		    char *t = tricat("~", nd->nam, pwd + strlen(nd->dir));
-		    stradd(t);
-		    zsfree(t);
-		    break;
-		}
+		promptpath(pwd, arg, 1);
+		break;
 	    case 'd':
 	    case '/':
-		stradd(pwd);
+		promptpath(pwd, arg, 0);
 		break;
 	    case 'c':
 	    case '.':
-	        {
-		    char *t;
-
-		    if ((nd = finddir(pwd)))
-			t = tricat("~", nd->nam, pwd + strlen(nd->dir));
-		    else
-			t = ztrdup(pwd);
-		    if (!arg)
-			arg++;
-		    for (ss = t + strlen(t); ss > t; ss--)
-			if (*ss == '/' && !--arg) {
-			    ss++;
-			    break;
-			}
-		    if(*ss == '/' && ss[1] && ss != t)
-			ss++;
-		    stradd(ss);
-		    zsfree(t);
-		    break;
-		}
+		promptpath(pwd, arg ? arg : 1, 1);
+		break;
 	    case 'C':
-		if (!arg)
-		    arg++;
-		for (ss = pwd + strlen(pwd); ss > pwd; ss--)
-		    if (*ss == '/' && !--arg) {
-			ss++;
-			break;
-		    }
-		if (*ss == '/' && ss[1] && (ss != pwd))
-		    ss++;
-		stradd(ss);
+		promptpath(pwd, arg ? arg : 1, 0);
+		break;
+	    case 'N':
+		promptpath(scriptname ? scriptname : argzero, arg, 0);
 		break;
 	    case 'h':
 	    case '!':
@@ -535,9 +539,6 @@ putpromptchar(int doprint, int endchar)
 		addbufspc(DIGBUFSIZE);
 		sprintf(bp, "%ld", (long)lineno);
 		bp += strlen(bp);
-		break;
-	    case 'N':
-		stradd(scriptname ? scriptname : argzero);
 		break;
 	    case '\0':
 		return 0;

@@ -11,11 +11,8 @@
 #    it's not a lot of use.  If you don't type the + or - it will
 #    complete directories as normal.
 
-local pushdminus
-[[ -o pushdminus ]] && pushdminus=1
-
-emulate -LR zsh
-setopt extendedglob
+emulate -L zsh
+setopt extendedglob nonomatch
 
 if [[ CURRENT -eq 3 ]]; then
   # cd old new: look for old in $PWD and see what can replace it
@@ -40,8 +37,8 @@ elif [[ $PREFIX = [-+]* ]]; then
   lines="$(dirs -v)"
   # turn the lines into an array, removing the current directory
   list=(${${(f)lines}##0*})
-  if [[ ( $IPREFIX = - && -z $pushdminus ) ||
-        ( $IPREFIX = + && -n $pushdminus ) ]]; then
+  if [[ ( $IPREFIX = - && ! -o pushdminus ) ||
+        ( $IPREFIX = + && -o pushdminus ) ]]; then
     # reverse the numbering: it counts the last one as -0, which
     # is a little strange.
     integer tot i
@@ -59,7 +56,19 @@ elif [[ $PREFIX = [-+]* ]]; then
 
   return ret
 elif [[ $PREFIX != (\~|/|./|../)* && $#cdpath -ne 0 ]]; then
-  _path_files -W "(. $cdpath)" -/
+  local tdir tdir2
+  # With cdablevars, we can convert foo/bar/... to ~foo/bar/... if
+  # there is no directory foo.  In that case we could also complete
+  # variable names, but it hardly seems worth it.
+  # Note we need a tilde because cdablevars also allows user home
+  # directories, hence we also need nonomatch to suppress error messages.
+  if [[ -o cdablevars && ! -d ${tdir::=${PREFIX%%/*}} &&
+    -d ${~tdir2::="~$tdir"} ]]; then
+      PREFIX="~$PREFIX"
+      _path_files -/
+  else
+    _path_files -W "(. $cdpath)" -/
+  fi
 else
   _path_files -/
 fi

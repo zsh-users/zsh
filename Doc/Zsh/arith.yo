@@ -74,11 +74,12 @@ is evaluated.  Note the precedence of the bitwise AND, OR,
 and XOR operators.
 
 An expression of the form `tt(#\)var(x)' where var(x) is any character
-gives the ascii value of this character and an expression of the form
-`tt(#)var(foo)' gives the ascii value of the first character of the value
-of the parameter var(foo).  Note that this is different from the expression
-`tt($#)var(foo)', a standard parameter substitution which gives the length
-of the parameter var(foo).
+sequence such as `tt(a)', `tt(^A)', or `tt(\M-\C-x)' gives the ascii
+value of this character and an expression of the form `tt(#)var(foo)'
+gives the ascii value of the first character of the value of the
+parameter var(foo).  Note that this is different from the expression
+`tt($#)var(foo)', a standard parameter substitution which gives the
+length of the parameter var(foo).
 
 Named parameters and subscripted arrays can be referenced by name within an
 arithmetic expression without using the parameter expansion syntax.  For

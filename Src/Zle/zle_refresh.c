@@ -281,7 +281,9 @@ zrefresh(void)
 	    clearflag = 0;
 	    resetneeded = 1;
 	}
-	listshown = showinglist = 0;
+	listshown = 0;
+	if (showinglist != -2)
+	    showinglist = 0;
     }
     clearlist = 0;
 

@@ -1,4 +1,5 @@
 DISTFILES_SRC='
     .distfiles
-    c2z compctl-examples globtests globtests.ksh lete2ctl
+    c2z compctl-examples globtests globtests.ksh
+    job-control-tests lete2ctl
 '

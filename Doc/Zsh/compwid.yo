@@ -620,7 +620,7 @@ array. If tt(words) contains no word matching var(end-pat), the
 testing and modification is performed as if it were not given.
 )
 item(tt(-q))(
-If the cursor is currently inside single or double quotes, the word
+The word
 currently being completed is split in separate words at the spaces. The 
 resulting words are stored in the tt(words) array, and tt(PREFIX),
 tt(SUFFIX), tt(QIPREFIX), and tt(QISUFFIX) are modified to reflect the 

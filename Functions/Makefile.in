@@ -48,40 +48,7 @@ install: install.fns
 
 uninstall: uninstall.fns
 
-# install functions, including those in subdirectories, creating
-# install directory if necessary
-install.fns:
-	if test x$(fndir) != x && test x$(fndir) != xno; then \
-	  $(sdir_top)/mkinstalldirs $(fndir) || exit 1; \
-	  for file in $(FUNCTIONS_INSTALL); do \
-	    if test -f $$file; then \
-	      if test x$(FUNCTIONS_SUBDIRS) != x -a \
-	      x$(FUNCTIONS_SUBDIRS) != xno; then \
-	        subdir="`echo $$file | sed -e 's%/.*%%'`"; \
-	        $(sdir_top)/mkinstalldirs $(fndir)/$$subdir || exit 1; \
-	        $(INSTALL_DATA) $$file $(fndir)/$$subdir || exit 1; \
-	      else \
-	        $(INSTALL_DATA) $$file $(fndir) || exit 1; \
-	      fi; \
-	    fi; \
-	  done; \
-	fi; \
-	exit 0
-
-uninstall.fns:
-	if test x$(fndir) != x && test x$(fndir) != xno; then \
-	  for file in $(FUNCTIONS_INSTALL); do \
-	    if test -f $$file; then \
-	      if test x$(FUNCTIONS_SUBDIRS) != x -a \
-	      x$(FUNCTIONS_SUBDIRS) != xno; then \
-	        rm -f $(fndir)/$$file; \
-	      else \
-	        rm -f "$(fndir)/`echo $$file | sed -e 's%^.*/%%'`"; \
-	      fi; \
-	    fi; \
-	  done; \
-	fi; \
-	exit 0
+@FUNCINST_MK@
 
 # ========== DEPENDENCIES FOR CLEANUP ==========
 

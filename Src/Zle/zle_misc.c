@@ -736,6 +736,7 @@ executenamedcommand(char *prmt)
 		    statusll = l + len + 1;
 		    zmult = 1;
 		    listlist(cmdll);
+		    showinglist = 0;
 		    zmult = zmultsav;
 		} else if (!nextnode(firstnode(cmdll))) {
 		    strcpy(ptr = cmdbuf, peekfirst(cmdll));
@@ -754,6 +755,7 @@ executenamedcommand(char *prmt)
 			statusll = l + cmdambig + 1;
 			zmult = 1;
 			listlist(cmdll);
+			showinglist = 0;
 			zmult = zmultsav;
 		    }
 		    len = cmdambig;

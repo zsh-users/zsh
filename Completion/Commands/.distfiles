@@ -1,3 +1,4 @@
 DISTFILES_SRC='
-    .distfiles _correct_filename _correct_word _expand_word _most_recent_file 
+    .distfiles _correct_filename _correct_word _expand_word 
+    _history_complete_word _read_comp _most_recent_file 
 '

@@ -1,7 +1,7 @@
 #
-# Makefile for Completion subdirectory
+# Makefile definitions for installing shell functions
 #
-# Copyright (c) 1999 Peter Stephensons
+# Copyright (c) 1999 Peter Stephenson
 # All rights reserved.
 #
 # Permission is hereby granted, without written agreement and without
@@ -24,42 +24,24 @@
 # support, updates, enhancements, or modifications.
 #
 
-subdir = Completion
-dir_top = ..
-SUBDIRS =
+# install functions, including those in subdirectories, creating
+# install directory if necessary
 
-@VERSION_MK@
+install.fns:
+	if test x$(fndir) != x && test x$(fndir) != xno; then \
+	  sdir_top="$(sdir_top)" fndir="$(fndir)" sdir="$(sdir)" \
+	  FUNCTIONS_INSTALL="$(FUNCTIONS_INSTALL)" \
+	  FUNCTIONS_SUBDIRS="$(FUNCTIONS_SUBDIRS)" \
+	  INSTALL_DATA="$(INSTALL_DATA)" \
+	  $(SHELL) $(sdir_top)/Config/installfns.sh || exit 1; \
+	fi; \
+	exit 0
 
-# source/build directories
-VPATH           = @srcdir@
-sdir            = @srcdir@
-sdir_top        = @top_srcdir@
-INSTALL         = @INSTALL@
-
-@DEFS_MK@
-
-# ========== DEPENDENCIES FOR BUILDING ==========
-
-all:
-
-# ========== DEPENDENCIES FOR INSTALLING ==========
-
-install: install.fns
-
-uninstall: uninstall.fns
-
-@FUNCINST_MK@
-
-# ========== DEPENDENCIES FOR CLEANUP ==========
-
-@CLEAN_MK@
-
-mostlyclean-here:
-
-distclean-here:
-
-realclean-here:
-
-# ========== DEPENDENCIES FOR MAINTENANCE ==========
-
-@CONFIG_MK@
+uninstall.fns:
+	if test x$(fndir) != x && test x$(fndir) != xno; then \
+	  fndir="$(fndir)" sdir="$(sdir)" \
+	  FUNCTIONS_INSTALL="$(FUNCTIONS_INSTALL)" \
+	  FUNCTIONS_SUBDIRS="$(FUNCTIONS_SUBDIRS)" \
+	  $(SHELL) $(sdir_top)/Config/uninstallfns.sh || exit 1; \
+	fi; \
+	exit 0

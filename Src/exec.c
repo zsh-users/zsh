@@ -916,7 +916,7 @@ execpline(Sublist l, int how, int last1)
 		    }
 
 		    jn->stat &= ~(STAT_DONE | STAT_NOPRINT);
-		    jn->stat |= STAT_STOPPED | STAT_CHANGED;
+		    jn->stat |= STAT_STOPPED | STAT_CHANGED | STAT_LOCKED;
 		    printjob(jn, !!isset(LONGLISTJOBS), 1);
 		}
 		else if (newjob != list_pipe_job)
@@ -1012,7 +1012,9 @@ execpline(Sublist l, int how, int last1)
 		jn = jobtab + pj;
 		killjb(jn, lastval & ~0200);
 	    }
-	    if (list_pipe_child || (list_pipe && (jn->stat & STAT_DONE)))
+	    if (list_pipe_child ||
+		((jn->stat & STAT_DONE) &&
+		 (list_pipe || (pline_level && !(jn->stat & STAT_SUBJOB)))))
 		deletejob(jn);
 	    thisjob = pj;
 
@@ -1530,6 +1532,9 @@ execcmd(Cmd cmd, int input, int output, int how, int last1)
 			/* Was this "exec < foobar"? */
 			nullexec = 1;
 			break;
+		    } else if (vars && nonempty(vars)) {
+			nullexec = 2;
+			break;
 		    } else if (!nullcmd || !*nullcmd ||
 			       (cflags & BINF_PREFIX)) {
 			zerr("redirection with no command", NULL, 0);
@@ -1869,7 +1874,8 @@ execcmd(Cmd cmd, int input, int output, int how, int last1)
 		addfd(forked, save, mfds, fn->fd1, fil, 0);
 		/* If this is 'exec < file', read from stdin, *
 		 * not terminal, unless `file' is a terminal. */
-		if (nullexec && fn->fd1 == 0 && isset(SHINSTDIN) && interact)
+		if (nullexec == 1 && fn->fd1 == 0 &&
+		    isset(SHINSTDIN) && interact)
 		    init_io();
 		break;
 	    case CLOSE:
@@ -1929,17 +1935,28 @@ execcmd(Cmd cmd, int input, int output, int how, int last1)
 	closemn(mfds, i);
 
     if (nullexec) {
-	for (i = 0; i < 10; i++)
-	    if (save[i] != -2)
-		zclose(save[i]);
+	if (nullexec == 1) {
+	    /*
+	     * If nullexec is 1 we specifically *don't* restore the original
+	     * fd's before returning.
+	     */
+	    for (i = 0; i < 10; i++)
+		if (save[i] != -2)
+		    zclose(save[i]);
+	    return;
+	}
 	/*
-	 * Here we specifically *don't* restore the original fd's
-	 * before returning.
+	 * If nullexec is 2, we have variables to add with the redirections
+	 * in place.
 	 */
-	return;
-    }
-
-    if (isset(EXECOPT) && !errflag) {
+	if (vars)
+	    addvars(vars, 0);
+	lastval = errflag ? errflag : cmdoutval;
+	if (isset(XTRACE)) {
+	    fputc('\n', stderr);
+	    fflush(stderr);
+	}
+    } else if (isset(EXECOPT) && !errflag) {
 	/*
 	 * We delay the entersubsh() to here when we are exec'ing
 	 * the current shell (including a fake exec to run a builtin then
