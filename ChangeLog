@@ -13,6 +13,12 @@
 	
 	* 13530: Src/hist.c: properly restore noaliases in bufferwords()
 	
+2001-02-22  Peter Stephenson  <pws@csr.com>
+
+	* 13520: Completion/Builtin/_vars_eq: use $service to decide
+	on service; shorten description to avoid dreaded 80-character
+	redisplay bug.
+
 2001-02-20  Sven Wischnowsky  <wischnow@zsh.org>
 
 	* 13509: Src/jobs.c: more (|un)queue_signals(), this time for the
