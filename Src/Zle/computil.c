@@ -1019,7 +1019,7 @@ static void
 ca_parse_line(Cadef d)
 {
     Caarg adef, ddef;
-    Caopt ptr;
+    Caopt ptr, wasopt;
     struct castate state;
     char *line, *pe;
     int cur, doff;
@@ -1107,6 +1107,8 @@ ca_parse_line(Cadef d)
 
 	pe = NULL;
 
+	wasopt = NULL;
+
 	/* See if it's an option. */
 
 	if (state.opt == 2 && (state.curopt = ca_get_opt(d, line, 0, &pe)) &&
@@ -1141,8 +1143,11 @@ ca_parse_line(Cadef d)
 	    }
 	    if (state.def)
 		state.opt = 0;
-	    else
+	    else {
+		if (!d->single || (state.curopt->name[1] && state.curopt->name[2]))
+		    wasopt = state.curopt;
 		state.curopt = NULL;
+	    }
 	} else if (state.opt == 2 && d->single &&
 		   (state.curopt = ca_get_sopt(d, line, 0, &pe))) {
 	    /* Or maybe it's a single-letter option? */
@@ -1262,6 +1267,8 @@ ca_parse_line(Cadef d)
 		ca_laststate.optbeg = state.nargbeg;
 		ca_laststate.argbeg = state.restbeg;
 		ca_laststate.singles = state.singles;
+		if (wasopt)
+		    wasopt->active = 1;
 	    }
 	}
     }
