@@ -1,6 +1,12 @@
+2000-07-17  Wayne Davison  <wayned@users.sourceforge.net>
+
+	* 12265: Src/hist.c: Fixed gethistent().  Fixed a race condition
+	in the SHARE_HISTORY code that could fail to import some shared
+	history lines from other shells.
+
 2000-07-16  Wayne Davison  <wayned@users.sourceforge.net>
 
-	* 12260: Src/hist.c:  Added unmeta() calls, fixed lockhistfile().
+	* 12260: Src/hist.c: Added unmeta() calls.  Fixed lockhistfile().
 
 2000-07-13  Peter Stephenson  <pws@cambridgesiliconradio.com>
 
