@@ -116,8 +116,8 @@ zlelineasstring(ZLE_STRING_T instr, int inll, int incs, int *outll,
 
     s = zalloc(inll * MB_CUR_MAX + 1);
 
-    for(i=0; i < inll; i++) {
-	if (outcs != NULL && i == incs)
+    for(i=0; i < inll; i++, incs--) {
+	if (outcs != NULL && incs == 0)
 	    *outcs = mb_len;
 	j = wctomb(s + mb_len, instr[i]);
 	if (j == -1) {
@@ -206,7 +206,7 @@ stringaszleline(unsigned char *instr, int *outll, int *outsz)
 	wchar_t *outptr = outstr;
 
 	/* mbrtowc(outstr, &cnull, 1, &ps); */
-	memset(&ps, \0, sizeof(ps));
+	memset(&ps, '\0', sizeof(ps));
 
 	while (ll) {
 	    size_t ret = mbrtowc(outptr, inptr, ll, &ps);

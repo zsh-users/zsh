@@ -1,3 +1,9 @@
+2005-02-23  Andrey Borzenkov  <bor@zsh.org>
+
+	* 20845: Src/Zle/zle_main.c, Src/Zle/zle_utils.c: fix
+	multibyte input in getrestchar; fix cursor position in
+	zlelineasstring when cs == ll.
+
 2005-02-22  Peter Stephenson  <pws@csr.com>
 
 	* 20843: Doc/Zsh/expn.yo, Src/utils.c: named directories always

@@ -749,10 +749,10 @@ mod_export ZLE_INT_T
 getrestchar(int inchar)
 {
     /* char cnull = '\0'; */
-    char buf[MB_CUR_MAX], *ptr;
+    char c = inchar;
     wchar_t outchar;
     int ret;
-    mbstate_t ps;
+    static mbstate_t ps;
 
     /*
      * We are guaranteed to set a valid wide last character,
@@ -764,28 +764,23 @@ getrestchar(int inchar)
     if (inchar == EOF)
 	return lastchar_wide = WEOF;
 
-    /* reset shift state by converting null */
-    /* mbrtowc(&outchar, &cnull, 1, &ps); */
-    memset (&ps, '\0', sizeof (ps));
-
-    ptr = buf;
-    *ptr++ = inchar;
     /*
      * Return may be zero if we have a NULL; handle this like
      * any other character.
      */
-    while ((ret = mbrtowc(&outchar, buf, ptr - buf, &ps)) < 0) {
+    while ((ret = mbrtowc(&outchar, &c, 1, &ps)) < 0) {
 	if (ret == -1) {
 	    /*
 	     * Invalid input.  Hmm, what's the right thing to do here?
 	     */
 	    return lastchar_wide = WEOF;
 	}
+
 	/* No timeout here as we really need the character. */
 	inchar = getbyte(0);
 	if (inchar == EOF)
 	    return lastchar_wide = WEOF;
-	*ptr++ = inchar;
+	c = inchar;
     }
     return lastchar_wide = (ZLE_INT_T)outchar;
 }
