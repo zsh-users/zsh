@@ -34,7 +34,7 @@ else
        tmp=( $(_call_program targets "$words[1]" -nsp --no-print-directory -f "$file" .PHONY 2> /dev/null | $cmdargs) )
     elif [[ -n $useperl ]]; then
       tmp=(
-      $(perl -ne '@matches = /^(?:([a-zA-Z0-9]+[^\/\t=\s]+)\s*)+:([^=]|$)/  and
+      $(perl -ne '@matches = /^(?:([a-zA-Z0-9]+[^\/\t=\s]+)\s*)+:(?:[^=]|$)/  and
 	print join(" ", @matches), "\n";
 if (/^\.include\s+\<bsd\.port\.(subdir\.|pre\.)?mk>/ ||
     /^\.include\s+\".*mk\/bsd\.pkg\.(subdir\.)?mk\"/) {
