@@ -1,3 +1,8 @@
+2003-04-30  Oliver Kiddle  <opk@zsh.org>
+
+	* 18486: Completion/Base/Utility/_describe: back-out 18458
+	because it causes problems when completing only options
+
 2003-04-28  Peter Stephenson  <pws@csr.com>
 
 	* 17820 (tweaked): Andrej: Src/Modules/tcp.h: unconfirmed but
