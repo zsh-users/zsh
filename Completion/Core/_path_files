@@ -43,6 +43,8 @@ while getopts "P:S:qr:R:W:F:J:V:X:f/g:M:12n" opt; do
   W)     tmp1="$OPTARG"
          if [[ "$tmp1[1]" = '(' ]]; then
            prepaths=( ${^=tmp1[2,-2]%/}/ )
+	 elif [[ "$tmp1[1]" = '/' ]]; then
+           prepaths=( "$tmp1/" )
          else
 	   # In this case the variable should be an array, so
 	   # don't use an extra ${=...}.

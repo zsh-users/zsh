@@ -1844,7 +1844,8 @@ filenames. The option `tt(-W) var(paths)' may be used to specify path
 prefixes that are to be prepended to the string from the line to
 generate the filenames but that should not be inserted in the line or
 shown in a completion listing. The var(paths) may be the name of an
-array parameter or a literal list of paths enclosed in parentheses.
+array parameter, a literal list of paths enclosed in parentheses or
+an absolute pathname.
 Additionally, the `tt(-F)'
 option from the tt(compadd) builtin is supported, giving direct control
 over which filenames should be ignored. If no such option is given,
