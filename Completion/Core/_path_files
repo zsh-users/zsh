@@ -255,7 +255,7 @@ for prepath in "$prepaths[@]"; do
 
     if [[ "$tpre$tsuf" = */* ]]; then
       if [[ ! -o globdots && "$PREFIX" = .* ]]; then
-        tmp1=( ${^tmp1}${skipped}*(-/) ${^tmp1}${slash}.*(-/) )
+        tmp1=( ${^tmp1}${skipped}*(-/) ${^tmp1}${skipped}.*(-/) )
       else
         tmp1=( ${^tmp1}${skipped}*(-/) )
       fi
@@ -269,7 +269,7 @@ for prepath in "$prepaths[@]"; do
       fi
     else
       if [[ ! -o globdots && "$PREFIX" = .* ]]; then
-        tmp1=( ${^tmp1}${skipped}${^~pats} ${^tmp1}${slash}.${^~pats} )
+        tmp1=( ${^tmp1}${skipped}${^~pats} ${^tmp1}${skipped}.${^~pats} )
       else
         tmp1=( ${^tmp1}${skipped}${^~pats} )
       fi
