@@ -1,5 +1,8 @@
 2002-05-08  Peter Stephenson  <pws@csr.com>
 
+	* 17102: Src/Modules/tcp.c: looking up TCP sessions by fd returned
+	the wrong pointer.
+
 	* 17097: Src/Modules/tcp.c: closing all TCP sessions referenced
 	freed memory.
 

@@ -271,7 +271,7 @@ zts_byfd(int fd)
     
     for (node = firstnode(ztcp_sessions); node; incnode(node))
 	if (((Tcp_session)getdata(node))->fd == fd)
-	    return (Tcp_session)node;
+	    return (Tcp_session)getdata(node);
     
     return NULL;
 }
