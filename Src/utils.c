@@ -525,6 +525,7 @@ mod_export void
 adduserdir(char *s, char *t, int flags, int always)
 {
     Nameddir nd;
+    char *eptr;
 
     /* We don't maintain a hash table in non-interactive shells. */
     if (!interact)
@@ -558,7 +559,18 @@ adduserdir(char *s, char *t, int flags, int always)
     /* add the name */
     nd = (Nameddir) zshcalloc(sizeof *nd);
     nd->flags = flags;
-    nd->dir = ztrdup(t);
+    eptr = t + strlen(t);
+    while (eptr > t && eptr[-1] == '/')
+	eptr--;
+    if (eptr == t) {
+	/*
+	 * Don't abbreviate multiple slashes at the start of a
+	 * named directory, since these are sometimes used for
+	 * special purposes.
+	 */
+	nd->dir = ztrdup(t);
+    } else
+	nd->dir = ztrduppfx(t, eptr - t);
     /* The variables PWD and OLDPWD are not to be displayed as ~PWD etc. */
     if (!strcmp(s, "PWD") || !strcmp(s, "OLDPWD"))
 	nd->flags |= ND_NOABBREV;

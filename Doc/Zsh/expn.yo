@@ -1138,6 +1138,8 @@ named directory, and replaced by the value of that named directory if found.
 Named directories are typically home directories for users on the system.
 They may also be defined if the text after the `tt(~)' is the name
 of a string shell parameter whose value begins with a `tt(/)'.
+Note that trailing slashes will be removed from the path to the directory
+(though the original parameter is not modified).
 It is also possible to define directory names using the tt(-d) option to the
 tt(hash) builtin.
 
