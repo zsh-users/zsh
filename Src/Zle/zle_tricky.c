@@ -7801,7 +7801,7 @@ inststrlen(char *str, int move, int len)
 static Cline
 cut_cline(Cline l)
 {
-    Cline p, e = NULL, maxp = NULL;
+    Cline q, p, e = NULL, maxp = NULL;
     int sum = 0, max = 0, tmp, ls = 0;
 
     /* If no match was added with matching, we don't really know
@@ -7819,10 +7819,17 @@ cut_cline(Cline l)
     /* First, search the last struct for which we have something on
      * the line. Anything before that is kept. */
 
-    for (p = l; p; p = p->next)
+    for (q = NULL, p = l; p; p = p->next) {
 	if (p->orig || p->olen || !(p->flags & CLF_NEW))
 	    e = p->next;
-
+	if (!p->suffix && (p->wlen || p->llen || p->prefix))
+	    q = p;
+    }
+    if (!e && q && !q->orig && !q->olen && (q->flags & CLF_MISS) &&
+	(q->word ? q->wlen : q->llen) < 3) {
+	q->word = q->line = NULL;
+	q->wlen = q->llen = 0;
+    }
     /* Then keep all structs without missing characters. */
 
     while (e && !(e->flags & CLF_MISS))
