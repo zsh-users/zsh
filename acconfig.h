@@ -317,9 +317,3 @@
 
 /* Define if you have the terminfo strnames symbol.  */
 #undef HAVE_STRNAMES
-
-/* Define if you have the cap library.  */
-#undef HAVE_LIBCAP
-
-/* Define if you have the socket library.  */
-#undef HAVE_LIBSOCKET

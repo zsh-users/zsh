@@ -1,3 +1,11 @@
+2001-04-23  Andrej Borsenkow <bor@zsh.org>
+
+	* 14077 : acconfig.h, aczsh.m4, configure.in, Config/defs.mk.in,
+	Src/Makefile.in, Src/mkmakemod.sh, Src/zsh.mdd, Src/Modules/cap.mdd,
+	Src/Modules/termcap.mdd, Src/Modules/terminfo.mdd,
+	Src/Modules/zftp.mdd: revert Clint's build patches. They break
+	build on ReliantUNIX and need some more consideration.
+
 2001-04-23  Bart Schaefer  <schaefer@zsh.org>
 
 	* 14070: Src/lex.c, Src/params.c, Test/D06subscript.ztst: Fix

@@ -6,5 +6,3 @@ functions='Functions/Zftp/*'
 autobins="zftp"
 
 objects="zftp.o"
-
-extralibs="socket"

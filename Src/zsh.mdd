@@ -17,8 +17,6 @@ signames.o string.o subst.o text.o utils.o watch.o"
 headers="../config.h system.h zsh.h sigcount.h signals.h \
 prototypes.h hashtable.h ztype.h"
 
-#extralibs="m termcap yp"
-
 :<<\Make
 @CONFIG_MK@
 

@@ -82,11 +82,11 @@ EXTRAZSHOBJS = @EXTRAZSHOBJS@
 
 zsh$(EXEEXT): $(@L@IBZSH) $(@L@STMP) $(MAIN_OBJS) zsh.export $(EXTRAZSHOBJS)
 	rm -f $@
-	$(@L@DRUNPATH) $(LINK) $(MAIN_OBJS) $(EXTRAZSHOBJS) $(@L@LIST) $(ZSH_@E@XPORT) $(@L@IBZSH) $(MAINLIBS)
+	$(@L@DRUNPATH) $(LINK) $(MAIN_OBJS) $(EXTRAZSHOBJS) $(@L@LIST) $(ZSH_@E@XPORT) $(@L@IBZSH) $(LIBS)
 
 $(LIBZSH): $(LIBOBJS) $(NSTMP)
 	rm -f $@
-	$(DLLINK) $(LIBOBJS) $(NLIST) $(MAINLIBS)
+	$(DLLINK) $(LIBOBJS) $(NLIST) $(LIBS)
 
 zsh.res.o: $(sdir)/zsh.rc $(sdir)/zsh.ico
 	windres -O coff --include-dir $(sdir) -i $(sdir)/zsh.rc -o zsh.res.o

@@ -27,7 +27,6 @@
 #   autoprefixconds like autoinfixconds, but for prefix condition codes
 #   autoparams      parameters defined by the module, for autoloading
 #   automathfuncs   math functions defined by the module, for autoloading
-#   extralibs       libraries specific to this module (default none)
 #   objects         .o files making up this module (*must* be defined)
 #   proto           .syms files for this module (default generated from $objects)
 #   headers         extra headers for this module (default none)
@@ -191,8 +190,7 @@ if $first_stage; then
 
 	unset name moddeps nozshdep alwayslink hasexport
 	unset autobins autoinfixconds autoprefixconds autoparams automathfuncs
-	unset extralibs objects proto headers hdrdeps otherincs
-	unset EXTRALIBS
+	unset objects proto headers hdrdeps otherincs
 	. $top_srcdir/$the_subdir/${mddname}.mdd
 	q_name=`echo $name | sed 's,Q,Qq,g;s,_,Qu,g;s,/,Qs,g'`
 	test -n "${moddeps+set}" || moddeps=
@@ -201,24 +199,6 @@ if $first_stage; then
 	    proto=`echo $objects '' | sed 's,\.o ,.syms ,g'`
 
 	dobjects=`echo $objects '' | sed 's,\.o ,..o ,g'`
-
-	for lib in $extralibs; do
-	case $lib in
-	m) EXTRALIBS="$EXTRALIBS \$(LIBS_M)"
-	;;
-	cap) EXTRALIBS="$EXTRALIBS \$(LIBS_CAP)"
-	;;
-	socket) EXTRALIBS="$EXTRALIBS \$(LIBS_SOCKET)"
-	;;
-	termcap) EXTRALIBS="$EXTRALIBS \$(LIBS_TERMCAP)"
-	;;
-	terminfo) EXTRALIBS="$EXTRALIBS \$(LIBS_TERMINFO)"
-	;;
-	yp) EXTRALIBS="$EXTRALIBS \$(LIBS_YP)"
-	;;
-	esac
-	done
-
 	modhdeps=
 	mododeps=
 	exportdeps=
@@ -322,7 +302,6 @@ if $first_stage; then
 	echo "NXPIMP_${mddname} ="
 	echo "LINKMODS_${mddname} = $mododeps"
 	echo "NOLINKMODS_${mddname} = "
-	echo "EXTRALIBS_${mddname} = $EXTRALIBS"
 	echo
 	echo "proto.${mddname}: \$(EPRO_${mddname})"
 	echo "\$(SYMS_${mddname}): \$(PROTODEPS)"
@@ -349,7 +328,7 @@ if $first_stage; then
 	    echo
 	    echo "${mddname}.\$(DL_EXT): \$(MODDOBJS_${mddname}) ${mddname}.export $exportdeps \$(@LINKMODS@_${mddname})"
 	    echo '	rm -f $@'
-	    echo "	\$(DLLINK) \$(@E@XPIMP_$mddname) \$(@E@NTRYOPT) \$(MODDOBJS_${mddname}) \$(@LINKMODS@_${mddname}) $EXTRALIBS \$(LIBS)"
+	    echo "	\$(DLLINK) \$(@E@XPIMP_$mddname) \$(@E@NTRYOPT) \$(MODDOBJS_${mddname}) \$(@LINKMODS@_${mddname}) \$(LIBS) "
 	    echo
 	fi
 	echo "${mddname}.mdhi: ${mddname}.mdhs \$(INCS_${mddname})"
