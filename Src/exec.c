@@ -1265,16 +1265,25 @@ mod_export void
 untokenize(char *s)
 {
     if (*s) {
-	char *p = s;
 	int c;
 
 	while ((c = *s++))
 	    if (itok(c)) {
+		char *p = s - 1;
+
 		if (c != Nularg)
 		    *p++ = ztokens[c - Pound];
-	    } else
-		*p++ = c;
-	*p = '\0';
+
+		while ((c = *s++)) {
+		    if (itok(c)) {
+			if (c != Nularg)
+			    *p++ = ztokens[c - Pound];
+		    } else
+			*p++ = c;
+		}
+		*p = '\0';
+		break;
+	    }
     }
 }
 
@@ -3010,7 +3019,7 @@ execfuncdef(Estate state, int do_exec)
 {
     Shfunc shf;
     char *s;
-    int signum, nprg, npats, len, plen, i, htok = 0;
+    int signum, nprg, sbeg, nstrs, npats, len, plen, i, htok = 0;
     Wordcode beg = state->pc, end;
     Eprog prog;
     Patprog *pp;
@@ -3018,26 +3027,40 @@ execfuncdef(Estate state, int do_exec)
 
     end = beg + WC_FUNCDEF_SKIP(state->pc[-1]);
     names = ecgetlist(state, *state->pc++, EC_DUPTOK, &htok);
-    nprg = *state->pc++ - 4;
+    nprg = end - beg;
+    sbeg = *state->pc++;
+    nstrs = *state->pc++;
     npats = *state->pc++;
 
-    plen = (end - state->pc) * sizeof(wordcode);
-    len = plen + (npats * sizeof(Patprog));
+    nprg = (end - state->pc);
+    plen = nprg * sizeof(wordcode);
+    len = plen + (npats * sizeof(Patprog)) + nstrs;
 
     if (htok)
 	execsubst(names);
 
     while ((s = (char *) ugetnode(names))) {
 	prog = (Eprog) zalloc(sizeof(*prog));
-	prog->heap = 0;
-	prog->len = len;
 	prog->npats = npats;
-	prog->pats = pp = (Patprog *) zalloc(len);
-	prog->prog = (Wordcode) (prog->pats + npats);
+	prog->len = len;
+	if (state->prog->dump) {
+	    prog->alloc = EA_MAP;
+	    incrdumpcount(state->prog->dump);
+	    prog->pats = pp = (Patprog *) zalloc(npats * sizeof(Patprog));
+	    prog->prog = state->pc;
+	    prog->strs = state->strs + sbeg;
+	    prog->dump = state->prog->dump;
+	} else {
+	    prog->alloc = EA_REAL;
+	    prog->pats = pp = (Patprog *) zalloc(len);
+	    prog->prog = (Wordcode) (prog->pats + npats);
+	    prog->strs = (char *) (prog->prog + nprg);
+	    prog->dump = NULL;
+	    memcpy(prog->prog, state->pc, plen);
+	    memcpy(prog->strs, state->strs + sbeg, nstrs);
+	}
 	for (i = npats; i--; pp++)
 	    *pp = dummy_patprog1;
-	memcpy(prog->prog, state->pc, plen);
-	prog->strs = (char *) (prog->prog + nprg);
 	prog->shf = NULL;
 
 	shf = (Shfunc) zalloc(sizeof(*shf));
@@ -3150,7 +3173,10 @@ execautofn(Estate state, int do_exec)
 	}
     } else {
 	freeeprog(shf->funcdef);
-	shf->funcdef = zdupeprog(stripkshdef(prog, shf->nam));
+	if (prog->alloc == EA_MAP)
+	    shf->funcdef = stripkshdef(prog, shf->nam);
+	else
+	    shf->funcdef = zdupeprog(stripkshdef(prog, shf->nam));
 	shf->flags &= ~PM_UNDEFINED;
     }
     popheap();
@@ -3180,7 +3206,10 @@ loadautofn(Shfunc shf)
     }
     if (!prog)
 	prog = &dummy_eprog;
-    shf->funcdef = zdupeprog(stripkshdef(prog, shf->nam));
+    if (prog->alloc == EA_MAP)
+	shf->funcdef = stripkshdef(prog, shf->nam);
+    else
+	shf->funcdef = zdupeprog(stripkshdef(prog, shf->nam));
     shf->flags &= ~PM_UNDEFINED;
 
     popheap();
@@ -3339,6 +3368,8 @@ getfpfunc(char *s)
 	    sprintf(buf, "%s/%s", *pp, s);
 	else
 	    strcpy(buf, s);
+	if ((r = try_dump_file(*pp, s, buf)))
+	    return r;
 	unmetafy(buf, NULL);
 	if (!access(buf, R_OK) && (fd = open(buf, O_RDONLY | O_NOCTTY)) != -1) {
 	    if ((len = lseek(fd, 0, 2)) != -1) {
@@ -3372,7 +3403,7 @@ getfpfunc(char *s)
  * contents of that definition.  Otherwise, use the entire file.           */
 
 /**/
-static Eprog
+Eprog
 stripkshdef(Eprog prog, char *name)
 {
     Wordcode pc = prog->prog;
@@ -3399,25 +3430,34 @@ stripkshdef(Eprog prog, char *name)
     {
 	Eprog ret;
 	Wordcode end = pc + WC_FUNCDEF_SKIP(code);
-	int nprg = pc[2] - 4;
-	int npats = pc[3];
-	int plen, len, i;
+	int sbeg = pc[2], nstrs = pc[3], nprg, npats = pc[4], plen, len, i;
 	Patprog *pp;
 
-	pc += 4;
+	pc += 5;
 
-	plen = (end - pc) * sizeof(wordcode);
-	len = plen + (npats * sizeof(Patprog));
+	nprg = end - pc;
+	plen = nprg * sizeof(wordcode);
+	len = plen + (npats * sizeof(Patprog)) + nstrs;
 
-	ret = (Eprog) zhalloc(sizeof(*ret));
-	ret->heap = 1;
+	if (prog->alloc == EA_MAP) {
+	    ret = prog;
+	    free(prog->pats);
+	    ret->pats = pp = (Patprog *) zalloc(npats * sizeof(Patprog));
+	    ret->prog = pc;
+	    ret->strs = prog->strs + sbeg;
+	} else {
+	    ret = (Eprog) zhalloc(sizeof(*ret));
+	    ret->alloc = EA_HEAP;
+	    ret->pats = pp = (Patprog *) zhalloc(len);
+	    ret->prog = (Wordcode) (ret->pats + npats);
+	    memcpy(ret->prog, pc, plen);
+	    memcpy(ret->strs, prog->strs + sbeg, nstrs);
+	    ret->dump = NULL;
+	}
 	ret->len = len;
 	ret->npats = npats;
-	ret->pats = pp = (Patprog *) zhalloc(len);
-	ret->prog = (Wordcode) (ret->pats + npats);
 	for (i = npats; i--; pp++)
 	    *pp = dummy_patprog1;
-	memcpy(ret->prog, pc, plen);
 	ret->strs = (char *) (ret->prog + nprg);
 	ret->shf = NULL;
 

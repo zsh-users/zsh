@@ -524,7 +524,7 @@ execcase(Estate state, int do_exec)
 
 	    opat = pat = ecgetstr(state, EC_DUP, NULL);
 	    singsub(&pat);
-	    save = (!state->prog->heap &&
+	    save = (state->prog->alloc != EA_HEAP &&
 		    !strcmp(pat, opat) && *spprog != dummy_patprog2);
 
 	    pat2 = dupstring(pat);
@@ -548,7 +548,7 @@ execcase(Estate state, int do_exec)
 						state->pc - 2, &htok));
 		if (htok)
 		    singsub(&pat);
-		save = (!state->prog->heap &&
+		save = (state->prog->alloc != EA_HEAP &&
 			!strcmp(pat, opat) && *spprog != dummy_patprog2);
 	    }
 	    if (!(pprog = patcompile(pat, (save ? PAT_ZDUP : PAT_STATIC),

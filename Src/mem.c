@@ -1272,7 +1272,7 @@ bin_mem(char *name, char **argv, char *ops, int func)
 	printf("blocks is shown. For otherwise used blocks the first few\n");
 	printf("bytes are shown as an ASCII dump.\n");
     }
-    printf("\nblock list:\nnum\ttnum\taddr\tlen\tstate\tcum\n");
+    printf("\nblock list:\nnum\ttnum\taddr\t\tlen\tstate\tcum\n");
     for (m = m_l, mf = m_free, ii = fi = ui = 1; ((char *)m) < m_high;
 	 m = (struct m_hdr *)(((char *)m) + M_ISIZE + m->len), ii++) {
 	for (j = 0, ms = NULL; j < M_NSMALL && !ms; j++)

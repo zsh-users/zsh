@@ -206,7 +206,7 @@ evalcond(Estate state)
 						  &htok));
 		if (htok)
 		    singsub(&right);
-		save = (!state->prog->heap &&
+		save = (state->prog->alloc != EA_HEAP &&
 			!strcmp(opat, right) && pprog != dummy_patprog2);
 
 		if (!(pprog = patcompile(right, (save ? PAT_ZDUP : PAT_STATIC),

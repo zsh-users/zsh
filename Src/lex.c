@@ -194,7 +194,7 @@ struct lexstack {
     int eclen, ecused, ecfree, ecnpats;
     Wordcode ecbuf;
     Eccstr ecstrs;
-    int ecsoffs;
+    int ecsoffs, ecssub, ecnfunc;
 
     unsigned char *cstack;
     int csp;
@@ -255,6 +255,8 @@ lexsave(void)
     ls->ecbuf = ecbuf;
     ls->ecstrs = ecstrs;
     ls->ecsoffs = ecsoffs;
+    ls->ecssub = ecssub;
+    ls->ecnfunc = ecnfunc;
     cmdsp = 0;
     inredir = 0;
     hdocs = NULL;
@@ -314,6 +316,8 @@ lexrestore(void)
     ecbuf = lstack->ecbuf;
     ecstrs = lstack->ecstrs;
     ecsoffs = lstack->ecsoffs;
+    ecssub = lstack->ecssub;
+    ecnfunc = lstack->ecnfunc;
     hlinesz = lstack->hlinesz;
     errflag = 0;
 

@@ -396,7 +396,7 @@ zzlex(void)
 	    }
 	    if (iident(*ptr)) {
 		int func = 0;
-		char *p, q;
+		char *p;
 
 		p = ptr;
 		while (iident(*++ptr));
@@ -413,10 +413,7 @@ zzlex(void)
 			    ptr++;
 		    }
 		}
-		q = *ptr;
-		*ptr = '\0';
-		yylval = dupstring(p);
-		*ptr = q;
+		yylval = dupstrpfx(p, ptr - p);
 		return (func ? FUNC : (cct ? CID : ID));
 	    }
 	    else if (cct) {

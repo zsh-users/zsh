@@ -124,6 +124,7 @@ static struct builtin builtins[] =
     BUILTIN("where", 0, bin_whence, 0, -1, 0, "pmsw", "ca"),
     BUILTIN("which", 0, bin_whence, 0, -1, 0, "ampsw", "c"),
     BUILTIN("zmodload", 0, bin_zmodload, 0, -1, 0, "ILabcfdipue", NULL),
+    BUILTIN("zcompile", 0, bin_zcompile, 0, -1, 0, "tUmr", NULL),
 };
 
 /****************************************/
@@ -2151,7 +2152,8 @@ mkautofn(Shfunc shf)
     p->shf = shf;
     p->npats = 0;
     p->pats = NULL;
-    p->heap = 0;
+    p->alloc = EA_REAL;
+    p->dump = NULL;
 
     p->prog[0] = WCB_LIST((Z_SYNC | Z_END), 0);
     p->prog[1] = WCB_SUBLIST(WC_SUBLIST_END, 0, 3);

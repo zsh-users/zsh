@@ -2327,16 +2327,22 @@ mod_export void
 remnulargs(char *s)
 {
     if (*s) {
-	char *t = s, *p = s, c;
+	char *o = s, c;
 
 	while ((c = *s++))
-	    if (!INULL(c))
-		*p++ = c;
-	*p = '\0';
-	if (!*t) {
-	    t[0] = Nularg;
-	    t[1] = '\0';
-	}
+	    if (INULL(c)) {
+		char *t = s - 1;
+
+		while ((c = *s++))
+		    if (!INULL(c))
+			*t++ = c;
+		*t = '\0';
+		if (!*o) {
+		    o[0] = Nularg;
+		    o[1] = '\0';
+		}
+		break;
+	    }
     }
 }
 

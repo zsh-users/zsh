@@ -476,23 +476,39 @@ struct value {
 #define MAX_ARRLEN    262144
 
 /********************************************/
-/* Defintions for byte code                 */
+/* Defintions for word code                 */
 /********************************************/
 
 typedef unsigned int wordcode;
 typedef wordcode *Wordcode;
 
+typedef struct funcdump *FuncDump;
 typedef struct eprog *Eprog;
 
+struct funcdump {
+    FuncDump next;		/* next in list */
+    char *name;			/* path name */
+    int fd;			/* file descriptor */
+    Wordcode map;		/* pointer to header */
+    Wordcode addr;		/* mapped region */
+    int len;			/* length */
+    int count;			/* reference count */
+};
+
 struct eprog {
-    int heap;			/* != 0 if in heap memory */
+    int alloc;			/* EA_* below */
     int len;			/* total block length */
     int npats;			/* Patprog cache size */
     Patprog *pats;		/* the memory block, the patterns */
     Wordcode prog;		/* memory block ctd, the code */
     char *strs;			/* memory block ctd, the strings */
     Shfunc shf;			/* shell function for autoload */
+    FuncDump dump;		/* dump file this is in */
 };
+
+#define EA_REAL 0
+#define EA_HEAP 1
+#define EA_MAP  2
 
 typedef struct estate *Estate;
 
@@ -508,6 +524,7 @@ struct eccstr {
     Eccstr next;
     char *str;
     wordcode offs;
+    int nfunc;
 };
 
 #define EC_NODUP  0

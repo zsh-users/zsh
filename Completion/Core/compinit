@@ -56,6 +56,7 @@
 # default dumpfile) is now the default; to turn off dumping use -D.
 
 emulate -L zsh
+setopt extendedglob
 
 typeset _i_dumpfile _i_files _i_line _i_done _i_dir _i_autodump=1
 typeset _i_tag _i_file _i_addfiles
@@ -419,7 +420,7 @@ zstyle ':completion:*:options' prefix-hidden yes"
 # Now we automatically make the definition files autoloaded.
 
 typeset -U _i_files
-_i_files=( ${^~fpath:/.}/_(|*[^~])(N:t) )
+_i_files=( ${^~fpath:/.}/^([^_]*|*~|*.zwc)(N:t) )
 if [[ $#_i_files -lt 20 || $_compdir = */Core || -d $_compdir/Core ]]; then
   # Too few files:  we need some more directories,
   # or we need to check that all directories (not just Core) are present.
@@ -438,7 +439,7 @@ if [[ $#_i_files -lt 20 || $_compdir = */Core || -d $_compdir/Core ]]; then
         _i_addfiles[$_i_line]=
     done
     fpath=($fpath $_i_addfiles)
-    _i_files=( ${^~fpath:/.}/_(|*[^~])(N:t) )
+    _i_files=( ${^~fpath:/.}/^([^_]*|*~|*.zwc)(N:t) )
   fi
 fi
 
@@ -468,7 +469,7 @@ fi
 if [[ -z "$_i_done" ]]; then
   for _i_dir in $fpath; do
     [[ $_i_dir = . ]] && continue
-    for _i_file in $_i_dir/_(|*[^~])(N); do
+    for _i_file in $_i_dir/^([^_]*|*~|*.zwc)(N); do
       read -rA _i_line < $_i_file
       _i_tag=$_i_line[1]
       shift _i_line

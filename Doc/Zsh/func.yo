@@ -33,16 +33,29 @@ cindex(autoloading functions)
 cindex(functions, autoloading)
 A function can be marked as em(undefined) using the tt(autoload) builtin
 (or `tt(functions -u)' or `tt(typeset -fu)').  Such a function has no
-body.  When the function is first executed, the tt(fpath)
-variable will be searched for a file with the same name as the
-function.  The usual alias expansion during reading will be suppressed if
-the tt(autoload) builtin or its equivalent is given the option tt(-U);
+body.  When the function is first executed, each element of the tt(fpath)
+variable will first be searched for a file with the same name as the
+function plus the extension tt(.zwc) and then with the name of the
+function.  The first file will only be used if it was created with the 
+tt(zcompile) builtin command, if it contains the wordcode for the
+function and it is either older than the file with the name of the
+function in the same directory or if such a file does not exist.  The
+usual alias expansion during reading will be suppressed
+if the tt(autoload) builtin or its equivalent is given the option
+tt(-U), for wordcode files this has to be decided when creating the
+file with the tt(-U) option of the tt(zcompile) builtin command;
 this is recommended for the use of functions supplied with the zsh
 distribution.  Thus to define functions for autoloading, a typical sequence
 is:
 
 example(fpath=(~/myfuncs $fpath)
 autoload myfunc1 myfunc2 ...)
+
+The elements of the tt(fpath) array may also name wordcode files
+directly. This is mostly useful for wordcode files containing multiple 
+functions, in which case the file is treated like a directory
+containing files for functions and will be searched for the definition 
+of the function.
 
 pindex(KSH_AUTOLOAD, use of)
 If the tt(KSH_AUTOLOAD) option is set, or the file contains only a simple

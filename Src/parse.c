@@ -131,10 +131,11 @@ struct heredocs *hdocs;
  *     - if (type == PIPE), followed by pipe
  *
  *   WC_FUNCDEF
- *     - data contains offset to after body-strings
+ *     - data contains offset to after body
  *     - followed by number of names
  *     - followed by names
- *     - followed by number of codes for body
+ *     - followed by offset to first string
+ *     - followed by length of string table
  *     - followed by number of patterns for body
  *     - follwoed by codes for body
  *     - followed by strings for body
@@ -230,28 +231,7 @@ Wordcode ecbuf;
 /**/
 Eccstr ecstrs;
 /**/
-int ecsoffs;
-
-/* Make at least n bytes free (aligned to sizeof(wordcode)). */
-
-static int
-ecspace(int n)
-{
-    n = (n + sizeof(wordcode) - 1) / sizeof(wordcode);
-
-    if (ecfree < n) {
-	int a = (n > 256 ? n : 256);
-
-	ecbuf = (Wordcode) hrealloc((char *) ecbuf, eclen * sizeof(wordcode),
-				    (eclen + a) * sizeof(wordcode));
-	eclen += a;
-	ecfree += a;
-    }
-    ecused += n;
-    ecfree -= n;
-
-    return ecused - 1;
-}
+int ecsoffs, ecssub, ecnfunc;
 
 /* Insert n free code-slots at position p. */
 
@@ -323,7 +303,7 @@ ecstrcode(char *s)
 	Eccstr p, q = NULL;
 
 	for (p = ecstrs; p; q = p, p = p->next)
-	    if (!strcmp(s, p->str))
+	    if (p->nfunc == ecnfunc && !strcmp(s, p->str))
 		return p->offs;
 
 	p = (Eccstr) zhalloc(sizeof(*p));
@@ -332,8 +312,9 @@ ecstrcode(char *s)
 	    q->next = p;
 	else
 	    ecstrs = p;
-	p->offs = (ecsoffs << 2) | (t ? 1 : 0);
+	p->offs = ((ecsoffs - ecssub) << 2) | (t ? 1 : 0);
 	p->str = s;
+	p->nfunc = ecnfunc;
 	ecsoffs += l;
 
 	return p->offs;
@@ -370,6 +351,8 @@ init_parse(void)
     ecused = 0;
     ecstrs = NULL;
     ecsoffs = ecnpats = 0;
+    ecssub = 0;
+    ecnfunc = 0;
 }
 
 /* Build eprog. */
@@ -393,7 +376,8 @@ bld_eprog(void)
     ret->prog = (Wordcode) (ret->pats + ecnpats);
     ret->strs = (char *) (ret->prog + ecused);
     ret->shf = NULL;
-    ret->heap = 1;
+    ret->alloc = EA_HEAP;
+    ret->dump = NULL;
     for (l = 0; l < ecnpats; l++)
 	ret->pats[l] = dummy_patprog1;
     memcpy(ret->prog, ecbuf, ecused * sizeof(wordcode));
@@ -1288,8 +1272,8 @@ par_subsh(int *complex)
 static void
 par_funcdef(void)
 {
-    int oecused = ecused, oldlineno = lineno, num = 0, sbeg, onp, p, c = 0;
-    Eccstr ostrs;
+    int oecused = ecused, oldlineno = lineno, num = 0, onp, p, c = 0;
+    int so, oecssub = ecssub;
 
     lineno = 0;
     nocorrect = 1;
@@ -1311,6 +1295,7 @@ par_funcdef(void)
     }
     ecadd(0);
     ecadd(0);
+    ecadd(0);
 
     nocorrect = 0;
     if (tok == INOUTPAR)
@@ -1318,10 +1303,8 @@ par_funcdef(void)
     while (tok == SEPER)
 	yylex();
 
-    sbeg = ecsoffs;
-    ecsoffs = 0;
-    ostrs = ecstrs;
-    ecstrs = NULL;
+    ecnfunc++;
+    ecssub = so = ecsoffs;
     onp = ecnpats;
     ecnpats = 0;
 
@@ -1330,43 +1313,28 @@ par_funcdef(void)
 	par_list(&c);
 	if (tok != OUTBRACE) {
 	    lineno += oldlineno;
-	    ecsoffs = sbeg;
-	    ecstrs = ostrs;
 	    ecnpats = onp;
+	    ecssub = oecssub;
 	    YYERRORV(oecused);
 	}
 	yylex();
     } else if (unset(SHORTLOOPS)) {
 	lineno += oldlineno;
-	ecsoffs = sbeg;
-	ecstrs = ostrs;
 	ecnpats = onp;
+	ecssub = oecssub;
 	YYERRORV(oecused);
     } else
 	par_list1(&c);
 
     ecadd(WCB_END());
-    ecbuf[p + num + 2] = ecused - num - p;
-    ecbuf[p + num + 3] = ecnpats;
+    ecbuf[p + num + 2] = so - oecssub;
+    ecbuf[p + num + 3] = ecsoffs - so;
+    ecbuf[p + num + 4] = ecnpats;
     ecbuf[p + 1] = num;
 
-    if (ecsoffs) {
-	int beg = ecused, l;
-	Eccstr sp;
-	char *sq;
-
-	ecspace(ecsoffs);
-
-	for (sp = ecstrs, sq = (char *) (ecbuf + beg); sp;
-	     sp = sp->next, sq += l) {
-	    l = strlen(sp->str) + 1;
-	    memcpy(sq, sp->str, l);
-	}
-    }
     lineno += oldlineno;
-    ecsoffs = sbeg;
-    ecstrs = ostrs;
     ecnpats = onp;
+    ecssub = oecssub;
 
     ecbuf[p] = WCB_FUNCDEF(ecused - 1 - p);
 }
@@ -1481,8 +1449,7 @@ par_simple(int *complex, int nr)
 	    p += 3;		/* 3 codes per redirection */
 	    sr++;
 	} else if (tok == INOUTPAR) {
-	    int oldlineno = lineno, sbeg, onp;
-	    Eccstr ostrs;
+	    int oldlineno = lineno, onp, so, oecssub = ecssub;
 
 	    *complex = c;
 	    lineno = 0;
@@ -1496,11 +1463,10 @@ par_simple(int *complex, int nr)
 	    ecbuf[p + 1] = argc;
 	    ecadd(0);
 	    ecadd(0);
+	    ecadd(0);
 
-	    sbeg = ecsoffs;
-	    ecsoffs = 0;
-	    ostrs = ecstrs;
-	    ecstrs = NULL;
+	    ecnfunc++;
+	    ecssub = so = ecsoffs;
 	    onp = ecnpats;
 	    ecnpats = 0;
 
@@ -1512,9 +1478,8 @@ par_simple(int *complex, int nr)
 		if (tok != OUTBRACE) {
 		    cmdpop();
 		    lineno += oldlineno;
-		    ecsoffs = sbeg;
-		    ecstrs = ostrs;
 		    ecnpats = onp;
+		    ecssub = oecssub;
 		    YYERROR(oecused);
 		}
 		yylex();
@@ -1532,26 +1497,13 @@ par_simple(int *complex, int nr)
 	    cmdpop();
 
 	    ecadd(WCB_END());
-	    ecbuf[p + argc + 2] = ecused - argc - p;
-	    ecbuf[p + argc + 3] = ecnpats;
+	    ecbuf[p + argc + 2] = so - oecssub;
+	    ecbuf[p + argc + 3] = ecsoffs - so;
+	    ecbuf[p + argc + 4] = ecnpats;
 
-	    if (ecsoffs) {
-		int beg = ecused, l;
-		Eccstr sp;
-		char *sq;
-
-		ecspace(ecsoffs);
-
-		for (sp = ecstrs, sq = (char *) (ecbuf + beg); sp;
-		     sp = sp->next, sq += l) {
-		    l = strlen(sp->str) + 1;
-		    memcpy(sq, sp->str, l);
-		}
-	    }
 	    lineno += oldlineno;
-	    ecsoffs = sbeg;
-	    ecstrs = ostrs;
 	    ecnpats = onp;
+	    ecssub = oecssub;
 
 	    ecbuf[p] = WCB_FUNCDEF(ecused - 1 - p);
 
@@ -2020,7 +1972,8 @@ zdupeprog(Eprog p)
 	return p;
 
     r = (Eprog) zalloc(sizeof(*r));
-    r->heap = 0;
+    r->alloc = EA_REAL;
+    r->dump = NULL;
     r->len = p->len;
     r->npats = p->npats;
     pp = r->pats = (Patprog *) zcalloc(r->len);
@@ -2056,7 +2009,11 @@ freeeprogs(void)
     while ((p = (Eprog) getlinknode(eprog_free))) {
 	for (i = p->npats, pp = p->pats; i--; pp++)
 	    freepatprog(*pp);
-	zfree(p->pats, p->len);
+	if (p->dump) {
+	    decrdumpcount(p->dump);
+	    zfree(p->pats, p->npats * sizeof(Patprog));
+	} else
+	    zfree(p->pats, p->len);
 	zfree(p, sizeof(*p));
     }
 }
@@ -2083,6 +2040,17 @@ ecgetstr(Estate s, int dup, int *tok)
     }
     if (tok)
 	*tok = (c & 1);
+
+    /*** Since function dump files are mapped read-only, avoiding to
+     *   to duplicate strings when they don't contain tokens may fail
+     *   when one of the many utility functions happens to write to
+     *   one of the strings (without really modifying it).
+     *   If that happens to you and you don't feel like debugging it,
+     *   just change the line below to:
+     *
+     *     return (dup ? dupstring(r) : r);
+     */
+
     return ((dup == EC_DUP || (dup && (c & 1)))  ? dupstring(r) : r);
 }
 
@@ -2193,3 +2161,530 @@ init_eprog(void)
 
     eprog_free = znewlinklist();
 }
+
+/* Code for function dump files.
+ *
+ * Dump files consist of a header and the function bodies (the wordcode
+ * plus the string table) and that twice: once for the byte-order of the
+ * host the file was created on and once for the other byte-order. The
+ * header describes where the beginning of the `other' version is and it
+ * is up to the shell reading the file to decide which version it needs.
+ * This is done by checking if the first word is FD_MAGIC (then the 
+ * shell reading the file has the same byte order as the one that created
+ * the file) or if it is FD_OMAGIC, then the `other' version has to be
+ * read.
+ * The header is the magic number, a word containing the flags (if the
+ * file should be mapped or read and if this header is the `other' one),
+ * the version string in a field of 40 characters and the descriptions
+ * for the functions in the dump file.
+ * Each description consists of a struct fdhead followed by the name,
+ * aligned to sizeof(wordcode) (i.e. 4 bytes).
+ */
+
+#include "version.h"
+
+#define FD_EXT ".zwc"
+#define FD_MINMAP 4096
+
+#define FD_PRELEN 12
+#define FD_MAGIC  0x01020304
+#define FD_OMAGIC 0x04030201
+
+#define FDF_MAP   1
+#define FDF_OTHER 2
+
+typedef struct fdhead *FDHead;
+
+struct fdhead {
+    wordcode start;		/* offset to function definition */
+    wordcode len;		/* length of wordcode/strings */
+    wordcode npats;		/* number of patterns needed */
+    wordcode strs;		/* offset to strings */
+    wordcode hlen;		/* header length (incl. name) */
+    wordcode tail;		/* offset to name tail */
+};
+
+#define fdheaderlen(f) (((Wordcode) (f))[FD_PRELEN])
+
+#define fdmagic(f)       (((Wordcode) (f))[0])
+#define fdbyte(f, i)     ((wordcode) (((unsigned char *) (((Wordcode) (f)) + 1))[i]))
+#define fdflags(f)       fdbyte(f, 0)
+#define fdother(f)       (fdbyte(f, 1) + (fdbyte(f, 2) << 8) + (fdbyte(f, 3) << 16))
+#define fdsetother(f, o) \
+    do { \
+        fdbyte(f, 1) = (o & 0xff); \
+        fdbyte(f, 2) = (o >> 8) & 0xff; \
+        fdbyte(f, 3) = (o >> 16) & 0xff; \
+    } while (0)
+#define fdversion(f)     ((char *) ((f) + 2))
+
+#define firstfdhead(f) ((FDHead) (((Wordcode) (f)) + FD_PRELEN))
+#define nextfdhead(f)  ((FDHead) (((Wordcode) (f)) + (f)->hlen))
+
+#define fdname(f)      ((char *) (((FDHead) (f)) + 1))
+
+/* Try to find the description for the given function name. */
+
+static FDHead
+dump_find_func(Wordcode h, char *name)
+{
+    FDHead n, e = (FDHead) (h + fdheaderlen(h));
+
+    for (n = firstfdhead(h); n < e; n = nextfdhead(n))
+	if (!strcmp(name, fdname(n) + n->tail))
+	    return n;
+
+    return NULL;
+}
+
+/**/
+int
+bin_zcompile(char *nam, char **args, char *ops, int func)
+{
+    int map;
+
+    if (ops['t']) {
+	Wordcode f;
+
+	if (!*args) {
+	    zerrnam(nam, "too few arguments", NULL, 0);
+	    return 1;
+	}
+	if (!(f = load_dump_header(*args))) {
+	    zerrnam(nam, "invalid dump file: %s", *args, 0);
+	    return 1;
+	}
+	if (args[1]) {
+	    for (args++; *args; args++)
+		if (!dump_find_func(f, *args))
+		    return 1;
+	    return 0;
+	} else {
+	    FDHead h, e = (FDHead) (f + fdheaderlen(f));
+
+	    printf("function dump file (%s) for zsh-%s\n",
+		   ((fdflags(f) & FDF_MAP) ? "mapped" : "read"), fdversion(f));
+	    for (h = firstfdhead(f); h < e; h = nextfdhead(h))
+		printf("%s\n", fdname(h));
+	    return 0;
+	}
+    }
+    if (!*args) {
+	zerrnam(nam, "too few arguments", NULL, 0);
+	return 1;
+    }
+    map = (ops['m'] ? 2 : (ops['r'] ? 0 : 1));
+
+    if (!args[1])
+	return build_dump(nam, dyncat(*args, FD_EXT), args, ops['U'], map);
+
+    return build_dump(nam, *args, args + 1, ops['U'], map);
+}
+
+/* Load the header of a dump file. Returns NULL if the file isn't a
+ * valid dump file. */
+
+/**/
+static Wordcode
+load_dump_header(char *name)
+{
+    int fd;
+    wordcode buf[FD_PRELEN + 1];
+
+    if ((fd = open(name, O_RDONLY)) < 0)
+	return NULL;
+
+    if (read(fd, buf, (FD_PRELEN + 1) * sizeof(wordcode)) !=
+	((FD_PRELEN + 1) * sizeof(wordcode)) ||
+	strcmp(ZSH_VERSION, fdversion(buf))) {
+	close(fd);
+	return NULL;
+    } else {
+	int len;
+	Wordcode head;
+
+	if (fdmagic(buf) == FD_MAGIC) {
+	    len = fdheaderlen(buf) * sizeof(wordcode);
+	    head = (Wordcode) zhalloc(len);
+	}
+	else {
+	    int o = fdother(buf);
+
+	    if (lseek(fd, o, 0) == -1 ||
+		read(fd, buf, (FD_PRELEN + 1) * sizeof(wordcode)) !=
+		((FD_PRELEN + 1) * sizeof(wordcode))) {
+		close(fd);
+		return NULL;
+	    }
+	    len = fdheaderlen(buf) * sizeof(wordcode);
+	    head = (Wordcode) zhalloc(len);
+	}
+	memcpy(head, buf, (FD_PRELEN + 1) * sizeof(wordcode));
+
+	if (read(fd, head + (FD_PRELEN + 1),
+		 len - ((FD_PRELEN + 1) * sizeof(wordcode))) !=
+	    len - ((FD_PRELEN + 1) * sizeof(wordcode))) {
+	    close(fd);
+	    return NULL;
+	}
+	close(fd);
+	return head;
+    }
+}
+
+/* Swap the bytes in a wordcode. */
+
+static void
+fdswap(Wordcode p, int n)
+{
+    wordcode c;
+
+    for (; n--; p++) {
+	c = *p;
+	*p = (((c & 0xff) << 24) |
+	      ((c & 0xff00) << 8) |
+	      ((c & 0xff0000) >> 8) |
+	      ((c & 0xff000000) >> 24));
+    }
+}
+
+/* Write a dump file. */
+
+/**/
+static int
+build_dump(char *nam, char *dump, char **files, int ali, int map)
+{
+    int dfd, fd, hlen, tlen, flen, tmp, ona = noaliases, other = 0, ohlen;
+    LinkList progs;
+    LinkNode node;
+    struct fdhead head;
+    wordcode pre[FD_PRELEN];
+    char *file, **ofiles = files, **oofiles = files, *name, *tail;
+    Eprog prog;
+
+    if ((dfd = open(dump, O_WRONLY|O_CREAT, 0600)) < 0) {
+	zerrnam(nam, "can't write dump file: %s", dump, 0);
+	return 1;
+    }
+    progs = newlinklist();
+    noaliases = ali;
+
+    for (hlen = FD_PRELEN, tlen = 0; *files; files++) {
+	if ((fd = open(*files, O_RDONLY)) < 0 ||
+	    (flen = lseek(fd, 0, 2)) == -1) {
+	    if (fd >= 0)
+		close(fd);
+	    close(dfd);
+	    zerrnam(nam, "can't open file: %s", *files, 0);
+	    noaliases = ona;
+	    return 1;
+	}
+	file = (char *) zalloc(flen + 1);
+	file[flen] = '\0';
+	lseek(fd, 0, 0);
+	if (read(fd, file, flen) != flen) {
+	    close(fd);
+	    close(dfd);
+	    zfree(file, flen);
+	    zerrnam(nam, "can't read file: %s", *files, 0);
+	    noaliases = ona;
+	    return 1;
+	}
+	close(fd);
+	file = metafy(file, flen, META_REALLOC);
+
+	if (!(prog = parse_string(file, 1)) || errflag) {
+	    close(dfd);
+	    zfree(file, flen);
+	    zerrnam(nam, "can't read file: %s", *files, 0);
+	    noaliases = ona;
+	    return 1;
+	}
+	zfree(file, flen);
+
+	addlinknode(progs, prog);
+
+	flen = (strlen(*files) + sizeof(wordcode)) / sizeof(wordcode);
+	hlen += (sizeof(head) / sizeof(wordcode)) + flen;
+
+	tlen += (prog->len - (prog->npats * sizeof(Patprog)) +
+		 sizeof(wordcode) - 1) / sizeof(wordcode);
+    }
+    noaliases = ona;
+
+    tlen = (tlen + hlen) * sizeof(wordcode);
+    if (map == 1)
+	map = (tlen >= FD_MINMAP);
+
+    for (ohlen = hlen; ; hlen = ohlen) {
+	fdmagic(pre) = (other ? FD_OMAGIC : FD_MAGIC);
+	fdflags(pre) = (map ? FDF_MAP : 0) | other;
+	fdsetother(pre, tlen);
+	strcpy(fdversion(pre), ZSH_VERSION);
+	write(dfd, pre, FD_PRELEN * sizeof(wordcode));
+
+	for (node = firstnode(progs), ofiles = oofiles; node;
+	     ofiles++, incnode(node)) {
+	    prog = (Eprog) getdata(node);
+	    head.start = hlen;
+	    hlen += (prog->len - (prog->npats * sizeof(Patprog)) +
+		     sizeof(wordcode) - 1) / sizeof(wordcode);
+	    head.len = prog->len - (prog->npats * sizeof(Patprog));
+	    head.npats = prog->npats;
+	    head.strs = prog->strs - ((char *) prog->prog);
+	    head.hlen = (sizeof(struct fdhead) / sizeof(wordcode)) +
+		(strlen(*ofiles) + sizeof(wordcode)) / sizeof(wordcode);
+	    for (name = tail = *ofiles; *name; name++)
+		if (*name == '/')
+		    tail = name + 1;
+	    head.tail = tail - *ofiles;
+	    if (other)
+		fdswap((Wordcode) &head, sizeof(head) / sizeof(wordcode));
+	    write(dfd, &head, sizeof(head));
+	    tmp = strlen(*ofiles) + 1;
+	    write(dfd, *ofiles, tmp);
+	    if ((tmp &= (sizeof(wordcode) - 1)))
+		write(dfd, &head, sizeof(wordcode) - tmp);
+	}
+	for (node = firstnode(progs); node; incnode(node)) {
+	    prog = (Eprog) getdata(node);
+	    tmp = (prog->len - (prog->npats * sizeof(Patprog)) +
+		   sizeof(wordcode) - 1) / sizeof(wordcode);
+	    if (other)
+		fdswap(prog->prog, (((Wordcode) prog->strs) - prog->prog));
+	    write(dfd, prog->prog, tmp * sizeof(wordcode));
+	}
+	if (other)
+	    break;
+	other = FDF_OTHER;
+    }
+    close(dfd);
+    return 0;
+}
+
+#if defined(HAVE_SYS_MMAN_H) && defined(HAVE_MMAP) && defined(HAVE_MUNMAP)
+
+#include <sys/mman.h>
+
+#if defined(MAP_SHARED) && defined(PROT_READ)
+
+#define USE_MMAP 1
+
+#endif
+#endif
+
+#ifdef USE_MMAP
+
+/* List of dump files mapped. */
+
+static FuncDump dumps;
+
+/* Load a dump file (i.e. map it). */
+
+static void
+load_dump_file(char *dump, int other, int len)
+{
+    FuncDump d;
+    Wordcode addr;
+    int fd, off;
+
+    if (other) {
+	static size_t pgsz = 0;
+
+	if (!pgsz) {
+
+#ifdef _SC_PAGESIZE
+	    pgsz = sysconf(_SC_PAGESIZE);     /* SVR4 */
+#else
+# ifdef _SC_PAGE_SIZE
+	    pgsz = sysconf(_SC_PAGE_SIZE);    /* HPUX */
+# else
+	    pgsz = getpagesize();
+# endif
+#endif
+
+	    pgsz--;
+	}
+	off = len & ~pgsz;
+    } else
+	off = 0;
+
+    if ((fd = open(dump, O_RDONLY)) < 0)
+	return;
+
+    fd = movefd(fd);
+
+    if ((addr = (Wordcode) mmap(NULL, len, PROT_READ, MAP_SHARED, fd, off)) ==
+	((Wordcode) -1)) {
+	close(fd);
+	return;
+    }
+    d = (FuncDump) zalloc(sizeof(*d));
+    d->next = dumps;
+    dumps = d;
+    d->name = ztrdup(dump);
+    d->fd = fd;
+    d->map = addr + (other ? (len - off) / sizeof(wordcode) : 0);
+    d->addr = addr;
+    d->len = len;
+    d->count = 0;
+}
+
+/* See if `dump' is the name of a dump file and it has the definition
+ * for the function `name'. If so, return an eprog for it. */
+
+/**/
+Eprog
+try_dump_file(char *dump, char *name, char *func)
+{
+    int isrec = 0;
+    Wordcode d;
+    FDHead h;
+    FuncDump f;
+
+ rec:
+
+    d = NULL;
+    for (f = dumps; f; f = f->next)
+	if (!strcmp(dump, f->name)) {
+	    d = f->map;
+	    break;
+	}
+    if (!f && (isrec || !(d = load_dump_header(dump)))) {
+	if (!isrec) {
+	    struct stat stc, stn;
+	    char *p = (char *) zhalloc(strlen(dump) + strlen(name) +
+				       strlen(FD_EXT) + 2);
+
+	    sprintf(p, "%s/%s%s", dump, name, FD_EXT);
+
+	    /* Ignore the dump file if it is older than the normal one. */
+	    if (stat(p, &stc) || stat(func, &stn) || stn.st_mtime > stc.st_mtime)
+		return NULL;
+
+	    if (!(d = load_dump_header(dump = p)))
+		return NULL;
+
+	} else
+	    return NULL;
+    }
+    if ((h = dump_find_func(d, name))) {
+	/* Found the name. If the file is already mapped, return the eprog,
+	 * otherwise map it and just go up. */
+	if (f) {
+	    Eprog prog = (Eprog) zalloc(sizeof(*prog));
+	    Patprog *pp;
+	    int np;
+
+	    prog->alloc = EA_MAP;
+	    prog->len = h->len;
+	    prog->npats = np = h->npats;
+	    prog->pats = pp = (Patprog *) zalloc(np * sizeof(Patprog));
+	    prog->prog = f->map + h->start;
+	    prog->strs = ((char *) prog->prog) + h->strs;
+	    prog->shf = NULL;
+	    prog->dump = f;
+
+	    incrdumpcount(f);
+
+	    while (np--)
+		*pp++ = dummy_patprog1;
+
+	    return prog;
+	} else if (fdflags(d) & FDF_MAP) {
+	    load_dump_file(dump, (fdflags(d) & FDF_OTHER), fdother(d));
+	    isrec = 1;
+	    goto rec;
+	} else {
+	    Eprog prog;
+	    Patprog *pp;
+	    int np, fd, po = h->npats * sizeof(Patprog);
+
+	    if ((fd = open(dump, O_RDONLY)) < 0 ||
+		lseek(fd, ((h->start * sizeof(wordcode)) +
+			   ((fdflags(d) & FDF_OTHER) ? fdother(d) : 0)), 0) < 0) {
+		if (fd >= 0)
+		    close(fd);
+		return NULL;
+	    }
+	    d = (Wordcode) zalloc(h->len + po);
+
+	    if (read(fd, ((char *) d) + po, h->len) != h->len) {
+		close(fd);
+		zfree(d, h->len);
+
+		return NULL;
+	    }
+	    close(fd);
+
+	    prog = (Eprog) zalloc(sizeof(*prog));
+
+	    prog->alloc = EA_MAP;
+	    prog->len = h->len + po;
+	    prog->npats = np = h->npats;
+	    prog->pats = pp = (Patprog *) d;
+	    prog->prog = (Wordcode) (((char *) d) + po);
+	    prog->strs = ((char *) prog->prog) + h->strs;
+	    prog->shf = NULL;
+	    prog->dump = f;
+
+	    while (np--)
+		*pp++ = dummy_patprog1;
+
+	    return prog;
+	}
+    }
+    return NULL;
+}
+
+/* Increment the reference counter for a dump file. */
+
+/**/
+void
+incrdumpcount(FuncDump f)
+{
+    f->count++;
+}
+
+/* Decrement the reference counter for a dump file. If zero, unmap the file. */
+
+/**/
+void
+decrdumpcount(FuncDump f)
+{
+    f->count--;
+    if (!f->count) {
+	FuncDump p, q;
+
+	for (q = NULL, p = dumps; p && p != f; q = p, p = p->next);
+	if (p) {
+	    if (q)
+		q->next = p->next;
+	    else
+		dumps = p->next;
+	    munmap((void *) f->addr, f->len);
+	    zclose(f->fd);
+	    zfree(f, sizeof(*f));
+	}
+    }
+}
+
+#else
+
+Eprog
+try_dump_file(char *dump, char *name, char *func)
+{
+    return NULL;
+}
+
+void
+incrdumpcount(FuncDump f)
+{
+}
+
+void
+decrdumpcount(FuncDump f)
+{
+}
+
+#endif

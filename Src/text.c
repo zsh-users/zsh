@@ -378,8 +378,8 @@ gettext2(Estate state)
 		    n = tpush(code, 1);
 		    n->u._funcdef.strs = state->strs;
 		    n->u._funcdef.end = end;
-		    state->strs = (char *) (p + (*state->pc));
-		    state->pc += 2;
+		    state->strs += *state->pc;
+		    state->pc += 3;
 		}
 	    } else {
 		state->strs = s->u._funcdef.strs;

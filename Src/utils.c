@@ -1704,7 +1704,7 @@ spacesplit(char *s, int allownull, int heap)
 {
     char *t, **ret, **ptr;
     int l = sizeof(*ret) * (wordcount(s, NULL, -!allownull) + 1);
-    char *(*dup)(char *) = (heap ? dupstring : ztrdup);
+    char *(*dup)(const char *) = (heap ? dupstring : ztrdup);
 
     ptr = ret = (heap ? (char **) hcalloc(l) : (char **) zcalloc(l));
 
