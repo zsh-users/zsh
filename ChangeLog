@@ -1,3 +1,8 @@
+2001-06-30  Bart Schaefer  <schaefer@zsh.org>
+
+	* 15191: Src/init.c: Don't infinite loop if there's an error in
+	the user's precmd -- reset errflag after preprompt().
+
 2001-06-29  Andrej Borsenkow  <bor@zsh.org>
 
 	* 15183: zshconfig.ac: fix DLLD in non-ELF case

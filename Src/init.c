@@ -107,7 +107,6 @@ loop(int toplevel, int justonce)
     pushheap();
     for (;;) {
 	freeheap();
-	errflag = 0;
 	hbegin(1);		/* init history mech        */
 	if (isset(SHINSTDIN)) {
 	    setblock_stdin();
@@ -116,6 +115,7 @@ loop(int toplevel, int justonce)
 		stophist = 3;
 		preprompt();
 		stophist = hstop;
+		errflag = 0;
 	    }
 	}
 	intr();			/* interrupts on            */
