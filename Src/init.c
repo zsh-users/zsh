@@ -34,6 +34,8 @@
 
 #include "init.pro"
 
+#include "version.h"
+
 /**/
 int noexitct = 0;
 
@@ -105,7 +107,6 @@ loop(int toplevel, int justonce)
     pushheap();
     for (;;) {
 	freeheap();
-	errflag = 0;
 	hbegin(1);		/* init history mech        */
 	if (isset(SHINSTDIN)) {
 	    setblock_stdin();
@@ -114,34 +115,43 @@ loop(int toplevel, int justonce)
 		stophist = 3;
 		preprompt();
 		stophist = hstop;
+		errflag = 0;
 	    }
 	}
 	intr();			/* interrupts on            */
 	lexinit();              /* initialize lexical state */
 	if (!(prog = parse_event())) {	/* if we couldn't parse a list */
-	    hend();
+	    hend(NULL);
 	    if ((tok == ENDINPUT && !errflag) ||
 		(tok == LEXERR && (!isset(SHINSTDIN) || !toplevel)) ||
 		justonce)
 		break;
 	    continue;
 	}
-	if (hend()) {
+	if (hend(prog)) {
 	    int toksav = tok;
 	    Eprog preprog;
 
 	    if (toplevel && (preprog = getshfunc("preexec")) != &dummy_eprog) {
 		LinkList args;
 		int osc = sfcontext;
+		char *cmdstr;
 
 		args = znewlinklist();
 		zaddlinknode(args, "preexec");
-		if (hist_ring)
+		/* If curline got dumped from the history, we don't know
+		 * what the user typed. */
+		if (hist_ring && curline.histnum == curhist)
 		    zaddlinknode(args, hist_ring->text);
+		else
+		    zaddlinknode(args, "");
+		zaddlinknode(args, getjobtext(prog, NULL));
+		zaddlinknode(args, cmdstr = getpermtext(prog, NULL));
 
 		sfcontext = SFC_HOOK;
 		doshfunc("preexec", preprog, args, 0, 1);
 		sfcontext = osc;
+		zsfree(cmdstr);
 		freelinklist(args, (FreeFunc) NULL);
 		errflag = 0;
 	    }
@@ -184,10 +194,10 @@ static int restricted;
 void
 parseargs(char **argv)
 {
+    int optionbreak = 0;
     char **x;
     int action, optno;
     LinkList paramlist;
-    int bourne = (emulation == EMULATE_KSH || emulation == EMULATE_SH);
 
     argzero = *argv++;
     SHIN = 0;
@@ -204,24 +214,47 @@ parseargs(char **argv)
     opts[SINGLECOMMAND] = 0;
 
     /* loop through command line options (begins with "-" or "+") */
-    while (*argv && (**argv == '-' || **argv == '+')) {
+    while (!optionbreak && *argv && (**argv == '-' || **argv == '+')) {
 	char *args = *argv;
 	action = (**argv == '-');
-	if(!argv[0][1])
+	if (!argv[0][1])
 	    *argv = "--";
 	while (*++*argv) {
-	    /* The pseudo-option `--' signifies the end of options. *
-	     * `-b' does too, csh-style, unless we're emulating a   *
-	     * Bourne style shell.                                  */
-	    if (**argv == '-' || (!bourne && **argv == 'b')) {
-		argv++;
-		goto doneoptions;
+	    if (**argv == '-') {
+		if(!argv[0][1]) {
+		    /* The pseudo-option `--' signifies the end of options. */
+		    argv++;
+		    goto doneoptions;
+		}
+		if(*argv != args+1 || **argv != '-')
+		    goto badoptionstring;
+		/* GNU-style long options */
+		++*argv;
+		if (!strcmp(*argv, "version")) {
+		    printf("zsh %s (%s-%s-%s)\n",
+			    ZSH_VERSION, MACHTYPE, VENDOR, OSTYPE);
+		    exit(0);
+		}
+		if (!strcmp(*argv, "help")) {
+		    printhelp();
+		    exit(0);
+		}
+		/* `-' characters are allowed in long options */
+		for(args = *argv; *args; args++)
+		    if(*args == '-')
+			*args = '_';
+		goto longoptions;
 	    }
 
-	    if (**argv == 'c') {         /* -c command */
+	    if (unset(SHOPTIONLETTERS) && **argv == 'b') {
+		/* -b ends options at the end of this argument */
+		optionbreak = 1;
+	    } else if (**argv == 'c') {
+		/* -c command */
 		cmd = *argv;
 		opts[INTERACTIVE] &= 1;
 		opts[SHINSTDIN] = 0;
+		scriptname = ztrdup("zsh");
 	    } else if (**argv == 'o') {
 		if (!*++*argv)
 		    argv++;
@@ -229,9 +262,11 @@ parseargs(char **argv)
 		    zerr("string expected after -o", NULL, 0);
 		    exit(1);
 		}
-		if(!(optno = optlookup(*argv)))
+	    longoptions:
+		if (!(optno = optlookup(*argv))) {
 		    zerr("no such option: %s", *argv, 0);
-		else if (optno == RESTRICTED)
+		    exit(1);
+		} else if (optno == RESTRICTED)
 		    restricted = action;
 		else
 		    dosetopt(optno, action, 1);
@@ -240,6 +275,7 @@ parseargs(char **argv)
 		/* zsh's typtab not yet set, have to use ctype */
 		while (*++*argv)
 		    if (!isspace(STOUC(**argv))) {
+		    badoptionstring:
 			zerr("bad option string: `%s'", args, 0);
 			exit(1);
 		    }
@@ -291,6 +327,25 @@ parseargs(char **argv)
     argzero = ztrdup(argzero);
 }
 
+/**/
+static void
+printhelp(void)
+{
+    printf("Usage: %s [<options>] [<argument> ...]\n", argzero);
+    printf("\nSpecial options:\n");
+    printf("  --help     show this message, then exit\n");
+    printf("  --version  show zsh version number, then exit\n");
+    if(unset(SHOPTIONLETTERS))
+	printf("  -b         end option processing, like --\n");
+    printf("  -c         take first argument as a command to execute\n");
+    printf("  -o OPTION  set an option by name (see below)\n");
+    printf("\nNormal options are named.  An option may be turned on by\n");
+    printf("`-o OPTION', `--OPTION', `+o no_OPTION' or `+-no-OPTION'.  An\n");
+    printf("option may be turned off by `-o no_OPTION', `--no-OPTION',\n");
+    printf("`+o OPTION' or `+-OPTION'.  Options are listed below only in\n");
+    printf("`--OPTION' or `--no-OPTION' form.\n");
+    printoptionlist();
+}
 
 /**/
 mod_export void
@@ -450,7 +505,8 @@ init_shout(void)
 static char *tccapnams[TC_COUNT] = {
     "cl", "le", "LE", "nd", "RI", "up", "UP", "do",
     "DO", "dc", "DC", "ic", "IC", "cd", "ce", "al", "dl", "ta",
-    "md", "so", "us", "me", "se", "ue", "ch"
+    "md", "so", "us", "me", "se", "ue", "ch",
+    "ku", "kd", "kl", "kr"
 };
 
 /* Initialise termcap */
@@ -593,9 +649,6 @@ setupvals(void)
     curjob = prevjob = coprocin = coprocout = -1;
     gettimeofday(&shtimer, &dummy_tz);	/* init $SECONDS */
     srand((unsigned int)(shtimer.tv_sec + shtimer.tv_usec)); /* seed $RANDOM */
-
-    hostnam     = (char *) zalloc(256);
-    gethostname(hostnam, 256);
 
     /* Set default path */
     path    = (char **) zalloc(sizeof(*path) * 5);
@@ -904,7 +957,7 @@ source(char *s)
     int oldshst, osubsh, oloops;
     FILE *obshin;
     char *old_scriptname = scriptname, *us;
-    char *ocs;
+    unsigned char *ocs;
     int ocsp;
 
     if (!s || 
@@ -943,7 +996,7 @@ source(char *s)
 	execode(prog, 1, 0);
 	popheap();
     } else
-	loop(0, 0);		     /* loop through the file to be sourced        */
+	loop(0, 0);		     /* loop through the file to be sourced  */
     sourcelevel--;
 
     /* restore the current shell state */
@@ -976,18 +1029,20 @@ source(char *s)
 void
 sourcehome(char *s)
 {
-    char buf[PATH_MAX];
     char *h;
 
+    queue_signals();
     if (emulation == EMULATE_SH || emulation == EMULATE_KSH ||
 	!(h = getsparam("ZDOTDIR")))
 	h = home;
-    if (strlen(h) + strlen(s) + 1 >= PATH_MAX) {
-	zerr("path too long: %s", s, 0);
-	return;
+
+    {
+	/* Let source() complain if path is too long */
+	VARARR(char, buf, strlen(h) + strlen(s) + 2);
+	sprintf(buf, "%s/%s", h, s);
+	unqueue_signals();
+	source(buf);
     }
-    sprintf(buf, "%s/%s", h, s);
-    source(buf);
 }
 
 /**/
@@ -1024,8 +1079,6 @@ noop_function_int(int nothing)
 /**/
 mod_export ZleVoidFn trashzleptr = noop_function;
 /**/
-mod_export ZleVoidFn gotwordptr = noop_function;
-/**/
 mod_export ZleVoidFn refreshptr = noop_function;
 /**/
 mod_export ZleVoidIntFn spaceinlineptr = noop_function_int;
@@ -1035,7 +1088,6 @@ mod_export ZleReadFn zlereadptr = autoload_zleread;
 #else /* !LINKED_XMOD_zshQszle */
 
 mod_export ZleVoidFn trashzleptr = noop_function;
-mod_export ZleVoidFn gotwordptr = noop_function;
 mod_export ZleVoidFn refreshptr = noop_function;
 mod_export ZleVoidIntFn spaceinlineptr = noop_function_int;
 # ifdef UNLINKED_XMOD_zshQszle
@@ -1066,6 +1118,7 @@ fallback_zleread(char *lp, char *rp, int ha)
     pptbuf = unmetafy(promptexpand(lp, 0, NULL, NULL), &pptlen);
     write(2, (WRITE_ARG_2_T)pptbuf, pptlen);
     free(pptbuf);
+
     return (unsigned char *)shingetline();
 }
 
@@ -1081,4 +1134,98 @@ fallback_compctlread(char *name, char **args, char *ops, char *reply)
     zwarnnam(name, "option valid only in functions called from completion",
 	    NULL, 0);
     return 1;
+}
+
+/*
+ * This is real main entry point. This has to be mod_export'ed
+ * so zsh.exe can found it on Cygwin
+ */
+
+/**/
+mod_export int
+zsh_main(int argc, char **argv)
+{
+    char **t;
+    int t0;
+#ifdef USE_LOCALE
+    setlocale(LC_ALL, "");
+#endif
+
+    init_hackzero(argv, environ);
+
+    /*
+     * Provisionally set up the type table to allow metafication.
+     * This will be done properly when we have decided if we are
+     * interactive
+     */
+    typtab['\0'] |= IMETA;
+    typtab[STOUC(Meta)  ] |= IMETA;
+    typtab[STOUC(Marker)] |= IMETA;
+    for (t0 = (int)STOUC(Pound); t0 <= (int)STOUC(Nularg); t0++)
+	typtab[t0] |= ITOK | IMETA;
+
+    for (t = argv; *t; *t = metafy(*t, -1, META_ALLOC), t++);
+
+    zsh_name = argv[0];
+    do {
+      char *arg0 = zsh_name;
+      if (!(zsh_name = strrchr(arg0, '/')))
+	  zsh_name = arg0;
+      else
+	  zsh_name++;
+      if (*zsh_name == '-')
+	  zsh_name++;
+      if (strcmp(zsh_name, "su") == 0) {
+	  char *sh = zgetenv("SHELL");
+	  if (sh && *sh && arg0 != sh)
+	      zsh_name = sh;
+	  else
+	      break;
+      } else
+	  break;
+    } while (zsh_name);
+
+    fdtable_size = zopenmax();
+    fdtable = zcalloc(fdtable_size);
+
+    createoptiontable();
+    emulate(zsh_name, 1);   /* initialises most options */
+    opts[LOGINSHELL] = (**argv == '-');
+    opts[MONITOR] = 1;   /* may be unset in init_io() */
+    opts[PRIVILEGED] = (getuid() != geteuid() || getgid() != getegid());
+    opts[USEZLE] = 1;   /* may be unset in init_io() */
+    parseargs(argv);   /* sets INTERACTIVE, SHINSTDIN and SINGLECOMMAND */
+
+    SHTTY = -1;
+    init_io();
+    setupvals();
+    init_signals();
+    init_bltinmods();
+    run_init_scripts();
+    init_misc();
+
+    for (;;) {
+	do
+	    loop(1,0);
+	while (tok != ENDINPUT && (tok != LEXERR || isset(SHINSTDIN)));
+	if (tok == LEXERR) {
+	    stopmsg = 1;
+	    zexit(lastval, 0);
+	}
+	if (!(isset(IGNOREEOF) && interact)) {
+#if 0
+	    if (interact)
+		fputs(islogin ? "logout\n" : "exit\n", shout);
+#endif
+	    zexit(lastval, 0);
+	    continue;
+	}
+	noexitct++;
+	if (noexitct >= 10) {
+	    stopmsg = 1;
+	    zexit(lastval, 0);
+	}
+	zerrnam("zsh", (!islogin) ? "use 'exit' to exit."
+		: "use 'logout' to logout.", NULL, 0);
+    }
 }
