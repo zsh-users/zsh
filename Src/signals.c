@@ -400,7 +400,7 @@ signal_suspend(int sig, int sig2)
 /* the signal handler */
  
 /**/
-RETSIGTYPE
+mod_export RETSIGTYPE
 handler(int sig)
 {
     sigset_t newmask, oldmask;

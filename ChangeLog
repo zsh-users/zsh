@@ -1,3 +1,9 @@
+2001-06-13  Peter Stephenson  <pws@csr.com>
+
+	* 14893: Src/signals.c: make handler mod_export because it's
+	needed for signal queueing in various modules.  Probably
+	sensible to change handler to zhandler too --- not done yet.
+
 2001-06-13  Sven Wischnowsky  <wischnow@zsh.org>
 
 	* 14897 (and Oliver Kiddle: 14862): Completion/Base/Utility/_values,
