@@ -2,7 +2,7 @@
 
 	* 145??: Src/Zle/zle_hist.c: fix thinko
 
-	* 145??: Src/Zle/zle_hist.c: repeat last vi history search
+	* 14552: Src/Zle/zle_hist.c: repeat last vi history search
 	if search string is empty.
 
 2001-05-29  Oliver Kiddle  <opk@zsh.org>
