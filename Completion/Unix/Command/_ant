@@ -1,15 +1,8 @@
-#compdef ant -value-,ANT_ARGS,-default-
+#compdef ant
 
 typeset -A opt_args
 local state line curcontext="$curcontext"
 local target='*:target:->target'
-
-if [[ $service = *ANT_ARGS* ]]; then
-  compset -q
-  words=( fake "$words[@]" )
-  (( CURRENT++ ))
-  unset target
-fi
 
 _arguments -C \
   '-help[display usage information]' \
@@ -25,7 +18,7 @@ _arguments -C \
   '-listener[add an instance of class as a project listener]:classname:_java_class' \
   '(-f -file -buildfile)'{-f,-file,-buildfile}'[use specified build file]:build file:_files' \
   '*-D[specify property with value to use]:property' \
-  '-propertyfile[load properties from specfied file]:property file:_files' \
+  '-propertyfile[load properties from specified file]:property file:_files' \
   '-inputhandler[specify class which will handle input requests]:class:_java_class' \
   '-find[search for buildfile]:file:_files' \
   $target && return
