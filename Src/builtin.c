@@ -1247,10 +1247,12 @@ bin_fc(char *nam, char **argv, char *ops, int func)
 	return 1;
     }
     /* default values of first and last, and range checking */
-    if (first == -1)
-	first = ops['l']? addhistnum(curhist,-16,0) : addhistnum(curhist,-1,0);
+    if (first == -1) {
+	first = ops['l']? addhistnum(curline.histnum,-16,0)
+			: addhistnum(curline.histnum,-1,0);
+    }
     if (last == -1)
-	last = ops['l']? addhistnum(curhist,-1,0) : first;
+	last = ops['l']? addhistnum(curline.histnum,-1,0) : first;
     if (first < firsthist())
 	first = firsthist();
     if (last == -1)
@@ -1315,8 +1317,8 @@ fcgetcomm(char *s)
      * numbers indicate reversed numbering.           */
     if ((cmd = atoi(s))) {
 	if (cmd < 0)
-	    cmd = addhistnum(curhist,cmd,HIST_FOREIGN);
-	if (cmd >= curhist) {
+	    cmd = addhistnum(curline.histnum,cmd,HIST_FOREIGN);
+	if (cmd >= curline.histnum) {
 	    zwarnnam("fc", "bad history number: %d", 0, cmd);
 	    return -1;
 	}
