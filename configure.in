@@ -498,27 +498,6 @@ fi
  
 AC_CHECK_HEADER([sys/ptem.h], AC_DEFINE(WINSIZE_IN_PTEM))
 
-dnl Try to get a sane value for MAXJOB
-linux_tasks_defines_mtpu=no
-AC_MSG_CHECKING(what to set MAXJOB to)
-if test $ac_cv_header_linux_tasks_h = yes; then
-AC_EGREP_CPP(yes,
-[#include <linux/tasks.h>
- #ifdef MAX_TASKS_PER_USER
- yes
- #endif
-], linux_tasks_defines_mtpu=yes)
-fi
-
-if test $linux_tasks_defines_mtpu = yes; then
-AC_DEFINE(MAXJOB, MAX_TASKS_PER_USER)
-AC_DEFINE(NEED_LINUX_TASKS_H)
-AC_MSG_RESULT(${msg}MAX_TASKS_PER_USER)
-else
-AC_DEFINE(MAXJOB, 50)
-AC_MSG_RESULT(${msg}50)
-fi
-
 dnl -------------------
 dnl CHECK FOR LIBRARIES
 dnl -------------------
@@ -1371,6 +1350,46 @@ main() {
       AC_DEFINE(GETPWNAM_FAKED)
     fi
 fi
+
+AC_MSG_CHECKING(what to set MAXJOB to)
+dnl Do you want to alter the maximum job table size?
+undefine([max_jobtable_size])dnl
+AC_ARG_ENABLE(max-jobtable-size,
+[  --enable-max-jobtable-size=MAX   Limit job table size to MAX],
+
+[if test x$enableval = xyes; then
+
+  if test $ac_cv_header_linux_tasks_h = yes; then
+   AC_EGREP_CPP(yes,
+   [#include <linux/tasks.h>
+    #ifdef MAX_TASKS_PER_USER
+    yes
+    #endif
+   ],
+   maxj=max)
+
+   if test x$maxj = xmax; then
+    AC_DEFINE(MAXJOB, MAX_TASKS_PER_USER)
+    AC_DEFINE(NEED_LINUX_TASKS_H)
+    AC_MSG_RESULT(${msg}MAX_TASKS_PER_USER)
+   else
+    AC_DEFINE(MAXJOB, 256)
+    AC_MSG_RESULT(${msg}256)
+   fi
+  fi
+
+ elif test x$enableval = xno; then
+ AC_DEFINE(MAXJOB,512)
+ AC_MSG_RESULT(${msg}512)
+ else
+ AC_DEFINE_UNQUOTED(MAXJOB,$enableval)
+ AC_MSG_RESULT(${msg}${enableval}) 
+fi],
+[
+AC_DEFINE(MAXJOB, 50)
+ AC_MSG_RESULT(${msg}50) 
+])
+
 
 dnl ---------------
 dnl dynamic loading
