@@ -1,5 +1,8 @@
 2002-09-03  Oliver Kiddle  <opk@zsh.org>
 
+	* Thomas Köhler: 176xx: Completion/Unix/Command/_ssh: also pass
+	through -F option
+
 	* 17607: Completion/Unix/Command/_ssh: pass through options such as
 	the port number to ssh when getting remote files for scp
 
