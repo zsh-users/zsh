@@ -3,6 +3,8 @@
 # The main loop of the completion code. This is what is called when 
 # completion is attempted from the command line.
 
+# In case non-standard separators are in use.
+local IFS=$' \t\n\0'
 
 # If you want to complete only set or unset options for the unsetopt
 # and setopt builtin, un-comment these lines:

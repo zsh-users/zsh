@@ -1,5 +1,11 @@
 2003-08-01  Peter Stephenson  <pws@csr.com>
 
+	* 18920: Src/utils.c, Completion/Core/Base/_main_complete: update
+	18916 to use space to join if unset, as per POSIX; set IFS locally
+	in completion just in case.
+
+2003-08-01  Peter Stephenson  <pws@csr.com>
+
 	* 18916: Src/utils.c: Unsetting IFS could cause segmentation
 	fault (any time IFS was used to join an array).
 
