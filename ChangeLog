@@ -1,5 +1,11 @@
 2001-06-27  Sven Wischnowsky  <wischnow@zsh.org>
 
+	* 15123: Src/Zle/compmatch.c: (only the patch to compmatch.c
+	from the mail); improve merging cline lists coming from
+	different IPREFIX/PREFIX combinations and such by avoiding to
+	generate cline structs for empty parts after a match spec
+	anchor cline struct
+
 	* 15115: Doc/Zsh/builtins.yo, Doc/Zsh/options.yo, Src/exec.c,
 	Src/jobs.c, Src/options.c, Src/zsh.h: add autocontinue option
 	to automatically make stopped jos running when they are being

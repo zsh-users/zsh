@@ -1178,14 +1178,18 @@ bld_parts(char *str, int len, int plen, Cline *lp)
     }
     /* This is the cline struct for the remaining string at the end. */
 
-    *q = n = get_cline(NULL, 0, NULL, 0, NULL, 0, (plen <= 0 ? CLF_NEW : 0));
     if (p != str) {
 	int olen = str - p, llen = (op < 0 ? 0 : op);
+
+        *q = n = get_cline(NULL, 0, NULL, 0, NULL, 0, (plen <= 0 ? CLF_NEW : 0));
 
 	if (llen > olen)
 	    llen = olen;
 	n->prefix = get_cline(NULL, llen, p, olen, NULL, 0, 0);
     }
+    else if (!ret)
+        *q = n = get_cline(NULL, 0, NULL, 0, NULL, 0, (plen <= 0 ? CLF_NEW : 0));
+
     n->next = NULL;
 
     if (lp)
