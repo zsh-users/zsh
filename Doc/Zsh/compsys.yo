@@ -938,7 +938,9 @@ which the option described is mutually exclusive. Such a list is given
 in parentheses at the beginning, as in `tt((-two -three)-one:...)'. In 
 this example, the options `tt(-two)' and `tt(-three)' will not be
 offered as possible completions if the option `tt(-one)' is on the
-line.
+line. Also, the list may contain a single colon as one of its elements 
+to specify that the descriptions for normal (non-option-) arguments
+should not be used if the option described is on the line.
 
 Finally, the var(opt-spec) may contain a explanation string. This is
 given in brackets at the end, as in `tt(-q[query operation])'. The
@@ -976,6 +978,10 @@ otherwise it will be invoked with some extra string placed after the
 first word which can be given as arguments to the tt(compadd) and
 tt(compgen) builtins and which make sure that the var(message) given
 in the description will be shown above the matches.
+
+In places where no sensible matches can be generated, the action
+should consist of only a space. This will make the var(message) be
+displayed but no possible completions listed.
 
 To include a colon in the var(message) or the var(action), it has to
 be preceded by a backslash.

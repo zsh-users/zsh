@@ -417,6 +417,10 @@ while [[ cur -gt 0 ]]; do
       argbeg="$beg"
       inopt=yes
       if [[ -n "$xors[$ws[1]]" ]]; then
+	if [[ "$xors[$ws[1]]" = (*\ |):(\ *|) ]]; then
+          args=()
+	  rest=''
+        fi
         odescr=( "${(@)odescr:#(${(j:|:)~${=xors[$ws[1]]}}):*}" )
         unset {{,d,od}opts,xors}\[${^=xors[$ws[1]]}\]
       fi
@@ -475,6 +479,10 @@ while [[ cur -gt 0 ]]; do
 	  argbeg="$beg"
 	  inopt=yes
 	  if [[ -n "$xors[$tmp[1]]" ]]; then
+	    if [[ "$xors[$ws[1]]" = (*\ |):(\ *|) ]]; then
+              args=()
+	      rest=''
+            fi
             odescr=( "${(@)odescr:#(${(j:|:)~${=xors[$tmp[1]]}}):*}" )
             unset {{,d,od}opts,xors}\[${^=xors[$tmp[1]]}\]
           fi
@@ -521,6 +529,10 @@ while [[ cur -gt 0 ]]; do
 	  argbeg="$beg"
 	  inopt=yes
 	  if [[ -n "$xors[$tmp[1]]" ]]; then
+	    if [[ "$xors[$ws[1]]" = (*\ |):(\ *|) ]]; then
+              args=()
+	      rest=''
+            fi
             odescr=( "${(@)odescr:#(${(j:|:)~${=xors[$tmp[1]]}}):*}" )
             unset {{,d,od}opts,xors}\[${^=xors[$tmp[1]]}\]
           fi
