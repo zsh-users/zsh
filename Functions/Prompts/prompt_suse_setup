@@ -6,7 +6,8 @@ prompt_suse_setup () {
   PS1="%n@%m:%~/ > "
   PS2="> "
 
-  precmd () { setopt promptsubst }
+  prompt_opts=( cr percent )
+  precmd () { }
   preexec () { }
 }
 

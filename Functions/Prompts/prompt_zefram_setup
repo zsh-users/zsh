@@ -10,7 +10,8 @@ function prompt_zefram_setup {
   PS1='[%(2L.%L/.)'$ZSH_VERSION']%(?..%B{%v}%b)%n%(2v.%B@%b.@)%m:%B%~%b%(!.#.>) '
   PS2='%(4_:... :)%3_> '
 
-  precmd () { prompt_zefram_precmd; setopt promptsubst }
+  prompt_opts=( cr subst percent )
+  precmd () { prompt_zefram_precmd }
   preexec () { }
 }
 

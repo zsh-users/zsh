@@ -8,12 +8,12 @@
 
 prompt_themes=()
 typeset -gU prompt_themes
-typeset -g prompt_theme
+typeset -g prompt_theme >/dev/null
 
 promptinit () {
   emulate -L zsh
   setopt extendedglob
-  local ppath='' name
+  local ppath='' name theme
 
   # Autoload all prompt_*_setup functions in fpath
   for theme in $^fpath/prompt_*_setup(N); do
@@ -170,6 +170,8 @@ prompt () {
  
   (( $#prompt_opts )) &&
       setopt noprompt{bang,cr,percent,subst} prompt${^prompt_opts[@]}
+
+  true
 }
 
 prompt_preview_theme () {

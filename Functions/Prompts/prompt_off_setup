@@ -4,7 +4,8 @@ prompt_off_setup () {
   PS1="%# "
   PS2="> "
 
-  precmd () { setopt promptsubst }
+  prompt_opts=( cr percent )
+  precmd () { }
   preexec () { }
 }
 

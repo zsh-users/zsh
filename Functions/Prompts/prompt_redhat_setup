@@ -6,7 +6,8 @@ prompt_redhat_setup () {
   PS1="[%n@%m %1~]\\$ "
   PS2="> "
 
-  precmd () { setopt promptsubst }
+  prompt_opts=( cr percent )
+  precmd () { }
   preexec () { }
 }
 
