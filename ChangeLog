@@ -1,3 +1,8 @@
+2000-08-04  Sven Wischnowsky  <wischnow@zsh.org>
+
+	* 12525: Src/module.c: remove (wrong) test for linked-in modules
+ 	in require_module()
+	
 2000-08-04  Bart Schaefer  <schaefer@zsh.org>
 
 	* 12516: Src/compat.c, Src/system.h, Src/Modules/files.c,

@@ -778,11 +778,6 @@ require_module(char *nam, char *module, int res, int test)
     Module m = NULL;
     LinkNode node;
 
-    /* First see if the module is linked in. */
-    for (node = firstnode(linkedmodules); node; incnode(node)) {
-	if (!strcmp((char *) getdata(node), nam))
-	    return 1;
-    }
     node = find_module(module);
     if (node && (m = ((Module) getdata(node)))->u.handle &&
 	!(m->flags & MOD_UNLOAD)) {
