@@ -1,6 +1,6 @@
 #compdef lsdev
 
-local state line expl
+local curcontext="${curcontext}" state line expl
 
 _arguments -C \
   '(-P)-C[list info about device in customized devices object class]' \
