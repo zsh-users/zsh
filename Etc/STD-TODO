@@ -54,3 +54,7 @@ Ksh automatically searches FPATH for any command not found in PATH, and
 autoloads the file if found.  The "autoload" command is only required if
 you want FPATH to be searched before PATH, e.g. because the function has
 the same name as a command in PATH.
+
+All parameters in ksh are indexed arrays.  That's why $array has to mean
+${array[0]}, and why subscripts can't be used to extract substrings from
+scalars.
