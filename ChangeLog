@@ -1,3 +1,9 @@
+2005-03-02  Wayne Davison  <wayned@users.sourceforge.net>
+
+	* unposted: Completion/Unix/Command/_make: Don't try to expand
+	a single-character Makefile variable if it is a digit.  Avoids
+	an infinite recursion from a Makefile referencing $1.
+
 2005-02-21  Peter Stephenson  <pws@csr.com>
 
 	* 20837: Doc/Zsh/contrib.yo: typos.
