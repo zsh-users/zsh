@@ -1,5 +1,8 @@
 2004-01-11  Clint Adams  <clint@zsh.org>
 
+	* unposted: config.guess, config.sub: update to 2004-11-12 and
+	2004-11-30, respectively.
+
 	* 20689: Etc/FAQ.yo: fix missing-word typo.
 
 	* 20657: Src/Zle/zle_tricky.c: sort completions partially based on
