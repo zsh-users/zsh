@@ -40,13 +40,17 @@
 # With the --max-procs option, zargs may not correctly capture the exit
 # status of the backgrounded jobs, because of limitations of the "wait"
 # builtin.  If the zsh/parameter module is not available, the status is
-# NEVER correctly returned.
+# NEVER correctly returned, otherwise the status of the longest-running
+# job in each batch is captured.
+#
+# Also because of "wait" limitations, --max-procs spawns max-procs jobs,
+# then waits for all of those, then spawns another batch, etc.
 #
 
 emulate -L zsh || return 1
 local -a opts eof n s l P i
 
-local ZARGS_VERSION="1.0"
+local ZARGS_VERSION="1.3"
 
 if zparseopts -a opts -D -- \
 	-eof::=eof e::=eof \
@@ -153,31 +157,16 @@ else command=( print -r -- )
 fi
 
 local wait bg
-if (( P != 1 ))
-then
-    setopt nonotify nomonitor
-    bg='&'
-fi
-if (( P > 1 ))
-then
-    if zmodload -i zsh/parameter 2>/dev/null
-    then
-	integer j=$#jobtexts
-	wait='(( $#jobtexts - j < P )) || wait %${(k)^jobtexts} 2>/dev/null;'
-    else
-	wait='{ (( P )) && (( P-- )) } || wait;'
-    fi
-fi
-
-local last='return $ret' execute='
+local execute='
     if (( $opts[(I)-(-interactive|p)] ))
-    then read -q "?$call?..." || eval "$last"
+    then read -q "?$call?..." || continue
     elif (( $opts[(I)-(-verbose|t)] ))
     then print -u2 -r -- "$call"
     fi
     eval "{
 	\$call
-    } $bg $wait"
+    } $bg"'
+local ret=0 analyze='
     case $? in
     (0) ;;
     (<1-125>|128)  ret=123;;
@@ -186,21 +175,21 @@ local last='return $ret' execute='
     (126)       return 126;;
     (127)       return 127;;
     (*)         return 1;;
-    esac
-    eval "$last"'
+    esac'
 
 if (( ARGC == 0 ))
 then
     if (( $opts[(I)-(-no-run-if-empty|r)] ))
     then return 0
-    else call=($command); eval "$execute"
+    else
+	call=($command)
+	# Use "repeat" here so "continue" won't complain.
+	repeat 1 eval "$execute ; $analyze"
+	return $ret
     fi
 fi
 
 n=${${n##-(n|-max-args(=|))}:-$[ARGC+c]}
-s=${${s##-(s|-max-chars(=|))}:-20480}
-l=${${l##-(l|-max-lines(=|))}:-${${l[1]:+1}:-$ARGC}}
-P=${${P##-(P|-max-procs(=|))}:-1}
 
 if (( n > c ))
 then (( n -= c ))
@@ -209,27 +198,62 @@ else
     return 1
 fi
 
-last='shift $((end > ARGC ? ARGC : end)); continue'
+P=${${P##-(P|-max-procs(=|))}:-1}
+
+if (( P != 1 && ARGC > 1 ))
+then
+    # These setopts are necessary for "wait" on multiple jobs to work.
+    setopt nonotify nomonitor
+    bg='&'
+    if zmodload -i zsh/parameter 2>/dev/null
+    then
+	wait='wait %${(k)^jobstates[(R)running:*]}'
+    else
+	wait='wait'
+    fi
+fi
+
+s=${${s##-(s|-max-chars(=|))}:-20480}
+l=${${l##-(l|-max-lines(=|))}:-${${l[1]:+1}:-$ARGC}}
+
+# Everything has to be in a subshell just in case of backgrounding jobs,
+# so that we don't unintentionally "wait" for jobs of the parent shell.
+(
+
 while ((ARGC))
 do
-    for (( end=l; end && ${(c)#argv[1,end]} > s; end/=2 )) :
-    (( end > n && ( end = n ) ))
-    args=( $argv[1,end] )
-    if (( $#i ))
-    then call=( ${command/$i/$args} )
-    else call=( $command $args )
+    if (( P == 0 || P > ARGC ))
+    then (( P = ARGC ))
     fi
-    if (( ${(c)#call} > s ))
-    then
-	print -u2 zargs: cannot fit single argument within size limit
-	# GNU xargs exits here whether or not -x,
-	# but that just makes the option useless.
-	(( $opts[(I)-(-exit|x)] )) && return 1
-	eval "$last"
-    else
-	eval "$execute"
-    fi
+
+    repeat $P
+    do
+	((ARGC)) || break
+	for (( end=l; end && ${(c)#argv[1,end]} > s; end/=2 )) :
+	(( end > n && ( end = n ) ))
+	args=( $argv[1,end] )
+	shift $((end > ARGC ? ARGC : end))
+	if (( $#i ))
+	then call=( ${command/$i/$args} )
+	else call=( $command $args )
+	fi
+	if (( ${(c)#call} > s ))
+	then
+	    print -u2 zargs: cannot fit single argument within size limit
+	    # GNU xargs exits here whether or not -x,
+	    # but that just makes the option useless.
+	    (( $opts[(I)-(-exit|x)] )) && return 1
+	    continue
+	else
+	    eval "$execute"
+	fi
+    done
+
+    eval "$wait
+	$analyze"
 done
 return $ret
+
+)
 
 # }
