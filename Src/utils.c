@@ -2985,10 +2985,10 @@ bslashquote(const char *s, char **e, int instring)
 	if (e && *e == u)
 	    *e = v, sf = 1;
 	if (ispecial(*u) &&
-	    (!instring || (isset(BANGHIST) &&
-			   *u == (char)bangchar) ||
+	    (!instring ||
+	     (isset(BANGHIST) && *u == (char)bangchar) ||
 	     (instring == 2 &&
-	      (*u == '$' || *u == '`' || *u == '\"')) ||
+	      (*u == '$' || *u == '`' || *u == '\"' || *u == '\\')) ||
 	     (instring == 1 && *u == '\''))) {
 	    if (*u == '\n' || (instring == 1 && *u == '\'')) {
 		if (unset(RCQUOTES)) {
