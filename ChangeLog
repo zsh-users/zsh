@@ -1,3 +1,8 @@
+2001-09-24  Bart Schaefer  <schaefer@zsh.org>
+
+	* users/4269: Src/hist.c: Detect and reject corrupted history
+	files ('\0' bytes) rather than consuming all available memory.
+
 2001-09-24  Peter Stephenson  <pws@csr.com>
 
 	* Src/builtin.c, Src/exec.c: Unwind function calls before exiting

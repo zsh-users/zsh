@@ -1766,6 +1766,33 @@ static struct {
 
 static int histfile_linect;
 
+static int readhistline(int start, char **bufp, int *bufsiz, FILE *in)
+{
+    char *buf = *bufp;
+    if (fgets(buf + start, *bufsiz - start, in)) {
+	int l = strlen(buf);
+
+	if (start >= l)
+	    return -1;
+
+	if (l) {
+	    if (buf[l - 1] != '\n' && !feof(in)) {
+		*bufp = zrealloc(buf, 2 * (*bufsiz));
+		*bufsiz = 2 * (*bufsiz);
+		return readhistline(l, bufp, bufsiz, in);
+	    }
+	    buf[l - 1] = '\0';
+	    if (l > 1 && buf[l - 2] == '\\') {
+		buf[--l - 1] = '\n';
+		if (!feof(in))
+		    return readhistline(l, bufp, bufsiz, in);
+	    }
+	}
+	return l;
+    } else
+	return 0;
+}
+
 /**/
 void
 readhistfile(char *fn, int err, int readflags)
@@ -1778,7 +1805,7 @@ readhistfile(char *fn, int err, int readflags)
     short *wordlist;
     struct stat sb;
     int nwordpos, nwordlist, bufsiz;
-    int searching, newflags;
+    int searching, newflags, l;
 
     if (!fn && !(fn = getsparam("HISTFILE")))
 	return;
@@ -1816,30 +1843,13 @@ readhistfile(char *fn, int err, int readflags)
 	if (readflags & HFILE_SKIPOLD
 	 || (hist_ignore_all_dups && newflags & hist_skip_flags))
 	    newflags |= HIST_MAKEUNIQUE;
-	while (fpos = ftell(in), fgets(buf, bufsiz, in)) {
-	    int l = strlen(buf);
-	    char *pt;
+	while (fpos = ftell(in), (l = readhistline(0, &buf, &bufsiz, in))) {
+	    char *pt = buf;
 
-	    while (l) {
-		while (buf[l - 1] != '\n') {
-		    buf = zrealloc(buf, 2 * bufsiz);
-		    bufsiz = 2 * bufsiz;
-		    if (!fgets(buf + l, bufsiz - l, in)) {
-			l++;
-			break;
-		    }
-		    l += strlen(buf+l);
-		}
-		buf[l - 1] = '\0';
-		if (l > 1 && buf[l - 2] == '\\') {
-		    buf[--l - 1] = '\n';
-		    fgets(buf + l, bufsiz - l, in);
-		    l += strlen(buf+l);
-		} else
-		    break;
+	    if (l < 0) {
+		zerr("corrupt history file %s", fn, 0);
+		break;
 	    }
-
-	    pt = buf;
 	    if (*pt == ':') {
 		pt++;
 		stim = zstrtol(pt, NULL, 0);
@@ -1933,7 +1943,7 @@ readhistfile(char *fn, int err, int readflags)
 
 	fclose(in);
     } else if (err)
-	zerr("can't read history file", fn, 0);
+	zerr("can't read history file %s", fn, 0);
 
     unlockhistfile(fn);
 }
