@@ -1,5 +1,7 @@
 2003-08-01  Oliver Kiddle  <opk@zsh.org>
 
+	* 189xx: Src/glob.c: fix minor bug with f glob qualifier
+
 	* 18xxx: Completion/Unix/Command/_chmod: new chmod completion
 
 2003-08-01  Peter Stephenson  <pws@csr.com>
