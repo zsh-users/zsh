@@ -2846,7 +2846,7 @@ zfclose(int leaveparams)
 	if (!zfnopen) {
 	    /* Write the final status in case this is a subshell */
 	    lseek(zfstatfd, zfsessno*sizeof(int), 0);
-	    ztrapwrite(zfstatfd, zfstatusp+zfsessno, sizeof(int));
+	    ztrapwrite(zfstatfd, (char *)zfstatusp+zfsessno, sizeof(int));
 
 	    close(zfstatfd);
 	    zfstatfd = -1;
@@ -3123,7 +3123,7 @@ bin_zftp(char *name, char **args, char *ops, int func)
 	/* Get the status in case it was set by a forked process */
 	int oldstatus = zfstatusp[zfsessno];
 	lseek(zfstatfd, 0, 0);
-	ztrapread(zfstatfd, zfstatusp, sizeof(int)*zfsesscnt);
+	ztrapread(zfstatfd, (char *)zfstatusp, sizeof(int)*zfsesscnt);
 	if (zfsess->cfd != -1 && (zfstatusp[zfsessno] & ZFST_CLOS)) {
 	    /* got closed in subshell without us knowing */
 	    zcfinish = 2;
@@ -3212,7 +3212,7 @@ bin_zftp(char *name, char **args, char *ops, int func)
 	 * but only for the active session.
 	 */
 	lseek(zfstatfd, zfsessno*sizeof(int), 0);
-	ztrapwrite(zfstatfd, zfstatusp+zfsessno, sizeof(int));
+	ztrapwrite(zfstatfd, (char *)zfstatusp+zfsessno, sizeof(int));
     }
     return ret;
 }

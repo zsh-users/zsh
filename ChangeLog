@@ -1,5 +1,8 @@
 2000-12-17  Clint Adams  <schizo@debian.org>
 
+	* 13288: Src/Modules/zftp.c: cast pointers when calling
+	ztrapread and ztrapwrite.
+
 	* 13287: Completion/Debian/_dpkg: complete multiple
 	arguments for -i.
 
