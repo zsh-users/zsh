@@ -4212,7 +4212,8 @@ bin_read(char *name, char **args, Options ops, int func)
 		timeout = (zlong)mn.u.l * (zlong)1000000;
 	    }
 	}
-	if (!read_poll(readfd, &readchar, keys && !zleactive, timeout)) {
+	if (readfd == -1 ||
+	    !read_poll(readfd, &readchar, keys && !zleactive, timeout)) {
 	    if (OPT_ISSET(ops,'k') && !zleactive && !isem)
 		settyinfo(&shttyinfo);
 	    if (haso) {

@@ -1,3 +1,8 @@
+2003-03-26  Peter Stephenson  <pws@csr.com>
+
+	* 18392: Src/builtin.c: read with -p and -t options crashed
+	if no coprocess owing to bad file descriptor.
+
 2003-03-26  Oliver Kiddle  <opk@zsh.org>
 
 	* 18391: Test/.distfiles, Test/B03print.ztst, Test/B04read.ztst,
