@@ -1,3 +1,7 @@
+2000-07-17  Wayne Davison  <wayned@users.sourceforge.net>
+
+	* 12323: Src/hist.c: support "builtin" in HIST_NO_STORE check.
+
 2000-07-19  Chmouel Boudjnah  <chmouel@mandrakesoft.com>
 
 	* 12319: Completion/User/_perl_builtin_funcs: Get also /usr/share/man.
