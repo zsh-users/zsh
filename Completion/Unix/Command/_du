@@ -1,0 +1,44 @@
+#compdef du
+
+if _pick_variant gnu=Free\ Soft unix --version; then
+  _arguments -s \
+    '(-a --all -s --summarize)'{-a,--all}'[write counts for all files]' \
+    '--apparent-size[print apparent sizes rather than disc usage]' \
+    '(-B --block-size -k)'{-B,--block-size=}'[specify block size]:size (bytes)' \
+    '(-B --block-size -k --apparent-size -b --bytes)'{-b,--bytes}'[equivalent to --apparent-size --block-size=1]' \
+    '(-c --total)'{-c,--total}'[produce a grand total]' \
+    '(-D --dereference-args -L --dereference)'{-D,--dereference-args}'[dereference arguments that are symlinks]' \
+    '(-h --human-readable -H --si)'{-h,--human-readable}'[print sizes in human readable format]' \
+    '(-H --si -h --human-readable)'{-H,--si}'[human readable form using powers of 1000]' \
+    '(-B --block-size)-k[use block size of 1k]' \
+    '(-l --count-links)'{-l,--count-links}'[count sizes many times if hard linked]' \
+    '(-L --dereference -D --dereference-args)'{-L,--dereference}'[dereference all symlinks]' \
+    '(-S --separate-dirs)'{-S,--seperate-dirs}'[do not include size of subdirectories]' \
+    '(-s --summarize --max-depth -a --all)'{-s,--summarize}'[only display total for each argument]' \
+    '(-x --one-file-system)'{-x,--one-file-system}'[skip directories on different filesystems]' \
+    \*{-X+,--exclude-from=}'[exclude files matching any pattern in file]:file:_files' \
+    '*--exclude=[exclude files matching pattern]:pattern' \
+    '(-s --summarize)--max-depth=[maximum levels to recurse]:levels' \
+    '(* -)--help[display help information]' \
+    '(* -)--version[display version information]' \
+    '*:file:_files'
+  return
+else
+  # based on $OSTYPE = solaris2.8
+  local xdev='[skip directories on different filesystems]'
+  if [[ ${commands[$words[1]]:-$words[1]} = *xpg4* ]]; then
+    args=( -x$xdev )
+  else
+    args=( -d$xdev
+      '-L[dereference symlinks]'
+      "(-a)-o[do not add child directories' usage to parent's total]"
+    )
+  fi
+  _arguments -s "$args[@]" \
+    '(-s -o)-a[write counts for all files]' \
+    '-k[use block size of 1k]' \
+    '-r[notify about unreadable files/directories]' \
+    '(-a)-s[only display total for each argument]' \
+    '*:file:_files'
+  return
+fi

@@ -5,7 +5,10 @@
 
 2003-08-20  Oliver Kiddle  <opk@zsh.org>
 
-	* 18947: Completion/Unix/Command/_chown: also complete options using
+	* 18949: Completion/Unix/Command/_du,
+	Completion/Unix/Type/_directories: new completion for du
+
+ 	* 18947: Completion/Unix/Command/_chown: also complete options using
 	_arguments
 
 2003-08-19  Adam Spiers  <adam@spiers.net>

@@ -21,5 +21,5 @@ _netcat       _larch        _texinfo	  _figlet       _elinks       _tidy
 _global                     _ant          _lsof         _mt           _xmlsoft
 _perforce     _python       _antiword     _screen       _renice       _apm
 _ecasound     _gpg	    _subversion   _aap          _sablotron    _nmap
-_chmod
+_chmod        _du
 '
