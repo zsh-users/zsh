@@ -3,8 +3,17 @@
 # redefine _cvs.
 
 _cvs () {
+  local extra
+
   # "+Qqrwtnlvb:T:e:d:Hfz:s:xa"
+  case $OSTYPE in
+  freebsd*|openbsd*)
+    extra='-R[read only access]'
+    ;;
+  esac
+
   _arguments -s \
+    $extra \
     '-a[authenticate]' \
     '-f[disable .cvsrc]' \
     '(-n)-l[disable logging]' \
