@@ -25,7 +25,7 @@ styles=(
   disable-stat		 c:bool
   domains                c:
   expand		 c:
-  fake			 c:fake
+  fake-files		 c:fake-files
   fake-parameters	 c:fake-params
   file-patterns		 c:filepat
   file-sort              c:fsort
@@ -268,7 +268,7 @@ while [[ -n $state ]]; do
           compadd - menu single longer
       ;;
 
-    fake)
+    fake-files)
       _message 'prefix and names'
       ;;
 

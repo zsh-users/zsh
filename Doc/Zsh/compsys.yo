@@ -1012,8 +1012,8 @@ generated this way (e.g. due to the option tt(AUTO_MENU) being set),
 this will also cycle through the names of the files in pathname
 components after the first ambiguous one.
 )
-kindex(fake, completion style)
-item(tt(fake))(
+kindex(fake-files, completion style)
+item(tt(fake-files))(
 Currently, this style is only used when completing files and looked up 
 with the tag tt(files).  Its values are of the form
 `var(dir)tt(:)var(names...)'.  This will add the var(names) (strings

@@ -1,3 +1,9 @@
+2000-10-12  Sven Wischnowsky  <wischnow@zsh.org>
+
+	* 12954, 12973: Completion/Builtins/_zstyle,
+	Completion/Core/_path_files, Doc/Zsh/compsys.yo: rename fake style
+	to fake-files
+	
 2000-10-11  Andrej Borsenkow <Andrej.Borsenkow@mow.siemens.ru>
 
 	* 12958: Cosmo <cosmo@informix.com>: aczsh.m4: fix for NCR compiler

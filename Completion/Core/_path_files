@@ -142,7 +142,7 @@ zstyle -s ":completion:${curcontext}:paths" special-dirs sdirs
     sopt=$sopt/
 
 zstyle -a ":completion:${curcontext}:files" accept-exact accex
-zstyle -a ":completion:${curcontext}:files" fake fake
+zstyle -a ":completion:${curcontext}:files" fake-files fake
 
 zstyle -s ":completion:${curcontext}:files" ignore-parents ignpar
 
