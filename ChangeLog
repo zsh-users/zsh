@@ -1,5 +1,7 @@
 2004-03-01  Oliver Kiddle  <opk@zsh.org>
 
+	* unposted: Completion/Debian/Command/_aptitude: correct return status
+
 	* 19507: Completion/Unix/Command/_attr,
 	Completion/Unix/Command/_less, Completion/Unix/Command/_rcs,
 	Completion/Unix/Command/_wiggle: new completions for less,

@@ -32,13 +32,13 @@ case $state in
         _message -e patterns pattern
       ;;
       download)
-        _deb_packages avail
+        _deb_packages avail && ret=0
       ;;
       remove|purge|hold)
-        _deb_packages installed
+        _deb_packages installed && ret=0
       ;;
       install|markauto|unmarkauto)
-        _deb_packages uninstalled
+        _deb_packages uninstalled && ret=0
       ;;
       *)
         (( ret )) && _message 'no more arguments'
