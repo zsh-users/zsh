@@ -1,3 +1,8 @@
+2004-01-20  Peter Stephenson  <pws@csr.com>
+
+	* Bob Schmertz: 19385: Src/compmatch.c: protect against calling
+	add_match_part with NULL pointers.
+
 2004-01-19  Peter Stephenson  <pws@csr.com>
 
 	* Vincent Stemen <zsh@hightek.org>: users/7011:

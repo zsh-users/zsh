@@ -341,7 +341,7 @@ add_match_part(Cmatcher m, char *l, char *w, int wl,
 
     /* If the anchors are equal, we keep only one. */
 
-    if (!strncmp(l, w, wl))
+    if (l && !strncmp(l, w, wl))
 	l = NULL;
 
     /* Split the new part into parts and turn the last one into a
