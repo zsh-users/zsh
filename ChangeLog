@@ -1,5 +1,10 @@
 2001-11-15  Peter Stephenson  <pws@csr.com>
 
+	* unposted: Config/version.mk, Etc/.distfiles, Util/.distfiles,
+	Completion/Mandrake/.distfiles,
+	Completion/Mandrake/Command/.distfiles: version 4.1.0-dev-3 plus
+	associated tidying of distribution.
+
 	* 16255: Function/Misc/zcalc: allow -#base or -## base to
 	specify default output base.
 
