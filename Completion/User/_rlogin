@@ -1,19 +1,51 @@
-#compdef rlogin rsh
+#compdef rlogin rsh remsh rcp
 
-local expl
+case "$words[1]" in
+rlogin)
+  _arguments -s \
+    '-8[allow 8-Bit data]' \
+    '-e-[specify escape character]:escape character:' \
+    '-l[specify login user name]:login as:_users' \
+    ':remote host name:_hosts'
+  ;;
+rsh|remsh)
+  local state line ret=1
+  typeset -A options
 
-_description expl user
+  _arguments -s \
+    '-n[ignore stdin]' \
+    '-l[specify login user name]:login as:_users' \
+    ':remote host name:_hosts' \
+    ':command: _command_names -e' \
+    '*::command:->command' && ret=0
 
-if [[ CURRENT -eq 2 ]];
-  if compset -P 1 '*@'; then
-   _hosts
-  else
-    local nm=${compstate[nmatches]}
-    _hosts
-    [[ nm -eq compstate[nmatches] ]] && compgen "$expl[@]" -S @ -u
+  if [[ -n "$state" ]]; then
+    shift 1 words
+    (( CURRENT-- ))
+    _normal && ret=0
   fi
-elif [[ CURRENT -eq 3 ]]; then
-  compadd - -l
-else
-  _users -S @
-fi
+  return ret
+  ;;
+rcp)
+  local state line ret=1
+  typeset -A options
+
+  _arguments -s \
+    '-p[preserve modification times]' \
+    '-r[recursively copy directories]' \
+    '*:files:->files' && ret=0
+
+  if [[ -n "$state" ]]; then
+    if compset -P '*:'; then
+      _files && ret=0
+    elif compset -P '*@'; then
+      _hosts -S: && ret=0
+    else
+      _files && ret=0
+      _hosts -S: && ret=0
+      _users -S@ && ret=0
+    fi
+  fi
+  return ret
+  ;;    
+esac
