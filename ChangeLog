@@ -44,10 +44,17 @@
 	* 18866: Etc/completion-style-guide: document conventions used
 	in completion functions
 
+	* unposted: Completion/Unix/Command/_aap: adjust return code
+	in the same way as was done for old completions in 18631
+
 2003-07-17  Peter Stephenson  <pws@csr.com>
 
 	* 18864: Src/lex.c: unnecessary spaces with empty substitutions
 	when using ${(Q)...} flag.
+
+2003-07-17  Doug Kearns  <djkea2@mugca.its.monash.edu.au>
+
+	* 18863: Completion/Unix/Command/_aap: new completion for aap
 
 2003-07-09  Oliver Kiddle  <opk@zsh.org>
 
