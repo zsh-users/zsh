@@ -1,5 +1,10 @@
 2003-07-03  Peter Stephenson  <pws@csr.com>
 
+	* 19696: Completion/Unix/Command/_cvs: quoting of characters
+	when completing existing CVS-managed files (in particular
+	spaces) was flakey.  The same problem probably exists for
+	completing modified files, but the code is indecipherable.
+
 	* 18769: Src/exec.c: parse error in autoloading file causes
 	return value zero and empty function definition.  Presumed
 	to be error introduced with wordcode.
