@@ -200,29 +200,26 @@ vindex(NULLCMD, use of)
 vindex(READNULLCMD, use of)
 pindex(IGNORE_NULLCMD, use of)
 pindex(SH_NULLCMD, use of)
-If a simple command consists of one or more redirection operators
-and zero or more parameter assignments, but no command name, and the
-parameter tt(NULLCMD) is not set, an error is caused.  If the parameter
-tt(NULLCMD) is set, its value will be inserted as a command with the
-given redirections.  If both tt(NULLCMD) and tt(READNULLCMD) are set, then
-the value of the latter will be used instead of that of the former when the
-redirection is an input.  The default for tt(NULLCMD) is `tt(cat)' and for
-tt(READNULLCMD) is `tt(more)'. Thus
+When a simple command consists of one or more redirection operators
+and zero or more parameter assignments, but no command name, zsh can
+behave in several ways.
+
+If the parameter tt(NULLCMD) is not set or the option tt(CSH_NULLCMD) is
+set, an error is caused.  This is the bf(csh) behavior and tt(CSH_NULLCMD)
+is set by default when emulating bf(csh).
+
+If the option (SH_NULLCMD) is set, the builtin tt(`:') is inserted as a
+command with the given redirections.  This is the default when emulating
+bf(sh) or bf(ksh).
+
+Otherwise, if the parameter tt(NULLCMD) is set, its value will be used as a
+command with the given redirections.  If both tt(NULLCMD) and
+tt(READNULLCMD) are set, then the value of the latter will be used instead
+of that of the former when the redirection is an input.  The default for
+tt(NULLCMD) is `tt(cat)' and for tt(READNULLCMD) is `tt(more)'. Thus
 
 example(< file)
 
 shows the contents of tt(file) on standard output, with paging if that is a
 terminal.  tt(NULLCMD) and tt(READNULLCMD) may refer to shell functions.
 
-The above default behaviour can be affected by the options
-tt(IGNORE_NULLCMD) and tt(SH_NULLCMD).  tt(SH_NULLCMD) forces the Bourne
-shell behaviour when the parameter tt(NULLCMD) is not set (i.e. the
-implicit command used with the redirections is `tt(:)'), while
-tt(IGNORE_NULLCMD) is used to obtain the same behaviour as if tt(NULLCMD)
-was unset.
-
-The standard Bourne shell behaviour is obtained by setting the options
-tt(IGNORE_NULLCMD) and tt(SH_NULLCMD).  This is the default when zsh is
-emulating bf(sh) or bf(ksh).  The tt(csh) behaviour can be obtained by
-setting only tt(IGNORE_NULLCMD), which is the default when emulating
-bf(csh).
