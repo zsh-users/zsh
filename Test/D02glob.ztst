@@ -312,3 +312,8 @@
  [[ "" = "" ]] && echo OK
 0:Empty strings
 >OK
+
+ foo="this string has a : colon in it"
+ print ${foo%% #:*}
+0:Must-match arguments in complex patterns
+>this string has a

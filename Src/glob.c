@@ -2206,8 +2206,20 @@ igetmatch(char **sp, Patprog p, int fl, int n, char *replstr)
     repllist = NULL;
 
     /* perform must-match test for complex closures */
-    if (p->mustoff && !strstr((char *)s, (char *)p + p->mustoff))
-	matched = 0;
+    if (p->mustoff)
+    {
+	/*
+	 * Yuk.  Probably we should rewrite this whole function to
+	 * use an unmetafied test string.
+	 *
+	 * Use META_HEAPDUP because we need a terminating NULL.
+	 */
+	char *muststr = metafy((char *)p + p->mustoff,
+			       p->patmlen, META_HEAPDUP);
+
+	if (!strstr(s, muststr))
+	    matched = 0;
+    }
 
     /* in case we used the prog before... */
     p->flags &= ~(PAT_NOTSTART|PAT_NOTEND);

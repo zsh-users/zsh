@@ -1,3 +1,8 @@
+2004-10-26  Peter Stephenson  <pws@csr.com>
+
+	* 20522: Src/glob.c, Test/D02glob.ztst: must-match optimisation
+	was broken for pattern substitutions in parameters.
+
 2004-10-22  Wayne Davison  <wayned@users.sourceforge.net>
 
 	* 20510: Borzenkov Andrey: Src/jobs.c: Fixed the arg to a call
