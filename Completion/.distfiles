@@ -1,3 +1,5 @@
 DISTFILES_SRC='
-    .cvsignore .distfiles README Makefile.in
+.distfiles
+.cvsignore   README       compaudit    compdump     compinit     compinstall
+bashcompinit
 '

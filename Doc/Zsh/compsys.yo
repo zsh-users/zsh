@@ -2646,6 +2646,14 @@ tt(COMPLETE_IN_WORD) option is set; otherwise, the cursor will
 be moved to the end of the current word before the completion code is
 called and hence there will be no suffix.
 )
+findex(bashcompinit)
+item(tt(bashcompinit))(
+This function provides compatibility with bash's programmable completion
+system. When run it will define the functions, tt(compgen) and
+tt(complete) which correspond to the bash builtins with the same names. It
+will then be possible to use completion specifications and functions
+written for bash.
+)
 enditem()
 
 texinode(Bindable Commands)(Completion Functions)(Control Functions)(Completion System)
