@@ -1,3 +1,11 @@
+2002-08-05  Peter Stephenson  <pws@csr.com>
+
+	* 17502 (with some additional comments): Test/B01cd.ztst,
+	Test/C02cond.ztst, Test/E02xtrace.ztst, Test/README,
+	Test/zstst.zsh: Test changes consequent on 17492; introduce
+	code for text which should be printed in the event of an error
+	and use it for the NFS `-N' problem.
+
 2002-08-05  Oliver Kiddle  <opk@zsh.org>
 
 	* 17503: Doc/Zsh/builtins.yo, Doc/Zsh/compsys.yo, Doc/Zsh/contrib.yo,
