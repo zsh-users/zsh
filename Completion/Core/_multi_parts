@@ -80,7 +80,11 @@ while true; do
   # use the stuff from the line. This avoids having `foo' complete to
   # both `foo' and `foobar'.
 
-  tmp1=( "${(@M)matches:#${PREFIX}${SUFFIX}${sep}*}" )
+  if [[ -n "$PREFIX$SUFFIX" || "$pre" = ${sep}* ]]; then
+    tmp1=( "${(@M)matches:#${PREFIX}${SUFFIX}${sep}*}" )
+  else
+    tmp1=
+  fi
 
   if (( $#tmp1 )); then
     npref="${PREFIX}${SUFFIX}${sep}"
