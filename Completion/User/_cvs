@@ -748,7 +748,7 @@ _cvs_modified_entries () {
     linedir="$match[1]"
     realdir=${(e)~linedir}
     [[ -f "$realdir"CVS/Entries ]] &&
-    [[ -n ${pat::="${(@j:|:)${(@)${(@)${(@)${(@)${(@)${(@M)${(@f)"$(<"$realdir"CVS/Entries)"}:#/*}#/}/\\/[^\\/]#\\///}%/[^/]#/[^/]#}:#${(j:|:)~${${${${(f)"$(LC_ALL=C builtin stat -gn +mtime -F '%a %b %e %T %Y' ${realdir}*(D))"}##*/}/ //}//(#m)[][*?()<|^~#\\]/\\$MATCH}}}%%/*}//(#m)[][*?()<|^~#\\]/\\$MATCH}"} ]] &&
+    [[ -n ${pat::="${(@j:|:)${(@)${(@)${(@)${(@)${(@)${(@M)${(@f)"$(<"$realdir"CVS/Entries)"}:#/*}#/}/\\/[^\\/]#\\///}%/[^/]#/[^/]#}:#${(j:|:)~${${${${(f)"$(LC_ALL=C builtin stat -gn +mtime -F '%a %b %e %T %Y' ${realdir}*(D) 2>/dev/null)"}##*/}/ //}//(#m)[][*?()<|^~#\\]/\\$MATCH}}}%%/*}//(#m)[][*?()<|^~#\\]/\\$MATCH}"} ]] &&
     _wanted files expl file _path_files -g "$pat"
   else
     _cvs_existing_entries

@@ -1,3 +1,7 @@
+2000-07-20  Bart Schaefer  <schaefer@zsh.org>
+
+	* 12326: Completion/User/_cvs: Discard stderr of a command subst.
+
 2000-07-17  Wayne Davison  <wayned@users.sourceforge.net>
 
 	* 12323: Src/hist.c: support "builtin" in HIST_NO_STORE check.
@@ -141,7 +145,7 @@
 	* 12201: Completion/User/_java: fix completion for jar. complete
 	package qualified class names. fix typos.
 
-2000-07-07  Bart Schaefer  <schaefer@brasslantern.com>
+2000-07-07  Bart Schaefer  <schaefer@zsh.org>
 
 	* 12193: configure.in, Src/Builtins/rlimits.mdd: Fix unnecessary
 	rebuilds of rlimits.o on platforms where getrlimit() is not found.
@@ -295,7 +299,7 @@
  	make a-a-i-n-h in menu selection work with one match; better undo
  	behaviour for menu selection
 	
-2000-06-27  Bart Schaefer  <schaefer@brasslantern.com>
+2000-06-27  Bart Schaefer  <schaefer@zsh.org>
 
 	* 12086: Doc/Zsh/compsys.yo: Move _use_lo doc into alphabetical
 	order; separate _files and _path_files for same reason.
