@@ -1,3 +1,9 @@
+2001-04-18  Bart Schaefer  <schaefer@zsh.org>
+
+	* 14004 (plus typo fix per Sven 14009): Improve completion in the
+	tail of paths with a leading tilde-component, particularly with
+	respect to nameddirs.
+
 2001-04-17  Sven Wischnowsky  <wischnow@zsh.org>
 
 	* 13999: Src/Zle/computil.c: only use the exclusion lists of

@@ -190,7 +190,7 @@ eorig="$orig"
 
 # Now let's have a closer look at the string to complete.
 
-if [[ "$pre" = *\$*/* && "$compstate[quote]" != \" ]]; then
+if [[ "$pre" = *(\`[^\`]#\`|\$)*/* && "$compstate[quote]" != \' ]]; then
 
   # If there is a parameter expansion in the word from the line, we try
   # to complete the beast by expanding the prefix and completing anything
@@ -207,6 +207,7 @@ if [[ "$pre" = *\$*/* && "$compstate[quote]" != \" ]]; then
   donepath=
   prepaths=( '' )
 elif [[ "$pre[1]" = \~ && -z "$compstate[quote]" ]]; then
+
   # It begins with `~', so remember anything before the first slash to be able
   # to report it to the completion code. Also get an expanded version of it
   # (in `realpath'), so that we can generate the matches. Then remove that
@@ -217,10 +218,6 @@ elif [[ "$pre[1]" = \~ && -z "$compstate[quote]" ]]; then
   linepath="${pre[2,-1]%%/*}"
   if [[ -z "$linepath" ]]; then
     realpath="${HOME%/}/"
-  elif (( $+userdirs[$linepath] )); then
-    realpath="${userdirs[$linepath]%/}/"
-  elif (( $+nameddirs[$linepath] )); then
-    realpath="${nameddirs[$linepath]%/}/"
   elif [[ "$linepath" = ([-+]|)[0-9]## ]]; then
     if [[ "$linepath" != [-+]* ]]; then
       if [[ -o pushdminus ]]; then
@@ -248,8 +245,11 @@ elif [[ "$pre[1]" = \~ && -z "$compstate[quote]" ]]; then
   elif [[ "$linepath" = [-+] ]]; then
     realpath=${~:-\~$linepath}/
   else
-    _message "unknown user \`$linepath'"
-    return 1
+    eval "realpath=~${linepath}/" 2>/dev/null
+    if [[ -z "$realpath" ]]; then
+      _message "unknown user \`$linepath'"
+      return 1
+    fi
   fi
   linepath="~${linepath}/"
   [[ "$realpath" = "$linepath" ]] && return 1
