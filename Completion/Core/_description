@@ -18,8 +18,8 @@ name="$2"
 zstyle -s ":completion:${curcontext}:$1" format format ||
     zstyle -s ":completion:${curcontext}:descriptions" format format
 
-zstyle -s ":completion:${curcontext}:$1" hidden hidden
-if [[ "$hidden" = (all|yes|true|1|on) ]]; then
+if zstyle -s ":completion:${curcontext}:$1" hidden hidden &&
+   [[ "$hidden" = (all|yes|true|1|on) ]]; then
   [[ "$hidden" = all ]] && format=''
   opts=(-n)
 fi

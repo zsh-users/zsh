@@ -2425,42 +2425,64 @@ bin_comptry(char *nam, char **args, char *ops, int func)
 			s++;
 		    *p = '\0';
 		    if (*q) {
-			char *qq = dupstring(q);
+			char *qq, *qqq;
+
 			if (c)
 			    *c = '\0';
 
+			qqq = qq = dupstring(q);
+			while (*qqq) {
+			    if (qqq == qq || qqq[-1] != '\\') {
+				if (*qqq == '{')
+				    *qqq = Inbrace;
+				else if (*qqq == '}')
+				    *qqq = Outbrace;
+				else if (*qqq == ',')
+				    *qqq = Comma;
+			    }
+			    qqq++;
+			}
 			tokenize(qq);
-			if (haswilds(qq)) {
+			if (haswilds(qq) || hasbraces(qq)) {
 			    Patprog prog;
-			    LinkNode node;
+			    LinkNode bnode, node;
+			    LinkList blist = newlinklist();
 
-			    if ((prog = patcompile(qq, PAT_STATIC, NULL))) {
-				char **a, *n;
-				int l = (c ? strlen(c + 1) + 2 : 1), al;
+			    addlinknode(blist, qq);
+			    for (bnode = firstnode(blist); bnode; incnode(bnode))
+				while (hasbraces(getdata(bnode)))
+				    xpandbraces(blist, &bnode);
 
-				for (a = all; *a; a++) {
-				    for (node = firstnode(list); node;
-					 incnode(node)) {
-					char *as, *ls;
+			    for (bnode = firstnode(blist); bnode; incnode(bnode)) {
+				qq = (char *) getdata(bnode);
+				if ((prog = patcompile(qq, PAT_STATIC, NULL))) {
+				    char **a, *n;
+				    int l = (c ? strlen(c + 1) + 2 : 1), al;
 
-					for (as = *a, ls = (char *) getdata(node);
-					     *as && *ls && *ls != ':'; as++, ls++)
-					    if (*as != *ls)
+				    for (a = all; *a; a++) {
+					for (node = firstnode(list); node;
+					     incnode(node)) {
+					    char *as, *ls;
+
+					    for (as = *a, ls = (char *) getdata(node);
+						 *as && *ls && *ls != ':'; as++, ls++)
+						if (*as != *ls)
+						    break;
+					    if (!*as && (!*ls || *ls == ':'))
 						break;
-					if (!*as && (!*ls || *ls == ':'))
-					    break;
-				    }
-				    if (node)
-					continue;
-				    if (pattry(prog, *a)) {
-					n = (char *) zhalloc((al = strlen(*a)) + l);
-					strcpy(n, *a);
-					if (c) {
-					    n[al] = ':';
-					    strcpy(n + al + 1, c + 1);
 					}
-					addlinknode(list, n);
-					num++;
+					if (node)
+					    continue;
+					if (pattry(prog, *a)) {
+					    n = (char *) zhalloc((al = strlen(*a)) + l);
+					    strcpy(n, *a);
+					    if (c) {
+						n[al] = ':';
+						strcpy(n + al + 1, c + 1);
+					    }
+					    addlinknode(list, n);
+					    num++;
+					}
 				    }
 				}
 			    }

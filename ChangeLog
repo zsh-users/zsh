@@ -1,5 +1,9 @@
 2000-04-17  Sven Wischnowsky <wischnow@informatik.hu-berlin.de>
 
+	* 10775: Completion/Core/_description, Completion/Core/_path_files,
+ 	Completion/Core/_tags, Src/Zle/computil.c: make _tags use C-code
+ 	for braces in tag-order values; and misc. stuff
+	
 	* 10774: Src/Zle/compmatch.c: fix for partial word completion with
  	empty parts and common suffix
 	
