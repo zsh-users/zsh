@@ -11,7 +11,7 @@ xitem(tt(zstyle) [ tt(-L) ])
 xitem(tt(zstyle) [ tt(-) | tt(-)tt(-) ] var(pattern) var(style) var(strings) ...)
 xitem(tt(zstyle -d) [ var(pattern) [ var(styles) ... ] ])
 xitem(tt(zstyle -g) var(name) [ var(pattern) [ var(style) ] ])
-xitem(tt(zstyle -abhs) var(context) var(style) var(name) [ var(sep) ])
+xitem(tt(zstyle -abs) var(context) var(style) var(name) [ var(sep) ])
 xitem(tt(zstyle -Tt) var(context) var(style) [ var(strings) ...])
 item(tt(zstyle -m) var(context) var(style) var(pattern))(
 This builtin command is used to define and lookup styles.  Styles are
@@ -67,11 +67,10 @@ The value is stored in var(name) as a boolean, i.e. as the string
 of `tt(yes)', `tt(true)', `tt(on)', or `tt(1)'. If the value is any other
 string or has more than one string, the parameter is set to `tt(no)'.
 )
-xitem(tt(zstyle -a) var(context) var(style) var(name))
-item(tt(zstyle -h) var(context) var(style) var(name))(
-With the tt(-a) option the value is stored in var(name) as an array and
-with tt(-h) as an associative array (with the first, third, etc. string
-being used as the keys and the other strings being used as the values).
+item(tt(zstyle -a) var(context) var(style) var(name))(
+The value is stored in var(name) as an array. If var(name) is declared 
+as an associative array,  the first, third, etc. stringare used as the
+keys and the other strings are used as the values.
 )
 xitem(tt(zstyle -t) var(context) var(style) [ var(strings) ...])
 item(tt(zstyle -T) var(context) var(style) [ var(strings) ...])(

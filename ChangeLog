@@ -1,5 +1,8 @@
 2000-05-22  Sven Wischnowsky  <wischnow@zsh.org>
 
+	* 11490: Doc/Zsh/mod_zutil.yo, Src/Modules/zutil.c: remove -h
+ 	option from zstyle
+	
 	* 11489: Completion/Base/_arguments, Doc/Zsh/compsys.yo,
  	Src/Zle/computil.c: pat(-) in long-option patterns to say that
  	argument should be completed only after the `='; merge _arguments

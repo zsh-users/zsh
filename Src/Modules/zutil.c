@@ -279,7 +279,6 @@ bin_zstyle(char *nam, char **args, char *ops, int func)
     case 's': min = 3; max =  4; break;
     case 'b': min = 3; max =  3; break;
     case 'a': min = 3; max =  3; break;
-    case 'h': min = 3; max =  3; break;
     case 't': min = 2; max = -1; break;
     case 'T': min = 2; max = -1; break;
     case 'm': min = 3; max =  3; break;
@@ -384,7 +383,6 @@ bin_zstyle(char *nam, char **args, char *ops, int func)
 	}
 	break;
     case 'a':
-    case 'h':
 	{
 	    Stypat s;
 	    char **ret;
@@ -399,10 +397,7 @@ bin_zstyle(char *nam, char **args, char *ops, int func)
 		ret = zarrdup(&dummy);
 		val = 1;
 	    }
-	    if (args[0][1] == 'a')
-		setaparam(args[3], ret);
-	    else
-		sethparam(args[3], ret);
+	    setaparam(args[3], ret);
 
 	    return val;
 	}
