@@ -1,5 +1,9 @@
 2002-01-31  Oliver Kiddle  <opk@zsh.org>
 
+	* Derek Peschel: 16494: Src/prompt.c: extract outermost words with
+	negative arguments to %_ prompt expansion and add %^ for a reverse
+	ordered status list
+
 	* Derek Peschel: 16493: Src/params.c: correct typos
 
 	* Derek Peschel: 16492: Src/params.c, Src/input.c, Doc/Zsh/params.yo:

@@ -574,15 +574,54 @@ putpromptchar(int doprint, int endchar)
 	    case 'E':
                 tsetcap(TCCLEAREOL, 1);
 		break;
+	    case '^':
+		if (cmdsp) {
+		    if (arg >= 0) {
+			if (arg > cmdsp || arg == 0)
+			    arg = cmdsp;
+			for (t0 = cmdsp - 1; arg--; t0--) {
+			    stradd(cmdnames[cmdstack[t0]]);
+			    if (arg) {
+				addbufspc(1);
+				*bp++=' ';
+			    }
+			}
+		    } else {
+			arg = -arg;
+			if (arg > cmdsp)
+			    arg = cmdsp;
+			for (t0 = arg - 1; arg--; t0--) {
+			    stradd(cmdnames[cmdstack[t0]]);
+			    if (arg) {
+				addbufspc(1);
+				*bp++=' ';
+			    }
+			}
+		    }
+		}
+		break;
 	    case '_':
 		if (cmdsp) {
-		    if (arg > cmdsp || arg <= 0)
-			arg = cmdsp;
-		    for (t0 = cmdsp - arg; arg--; t0++) {
-			stradd(cmdnames[cmdstack[t0]]);
-			if (arg) {
-			    addbufspc(1);
-			    *bp++=' ';
+		    if (arg >= 0) {
+			if (arg > cmdsp || arg == 0)
+			    arg = cmdsp;
+			for (t0 = cmdsp - arg; arg--; t0++) {
+			    stradd(cmdnames[cmdstack[t0]]);
+			    if (arg) {
+				addbufspc(1);
+				*bp++=' ';
+			    }
+			}
+		    } else {
+			arg = -arg;
+			if (arg > cmdsp)
+			    arg = cmdsp;
+			for (t0 = 0; arg--; t0++) {
+			    stradd(cmdnames[cmdstack[t0]]);
+			    if (arg) {
+				addbufspc(1);
+				*bp++=' ';
+			    }
 			}
 		    }
 		}
