@@ -12,7 +12,7 @@ MODBINS=${MODBINS-modules-bltin}
 XMODCF=${XMODCF-$srcdir/xmods.conf}
 
 bin_mods=" zsh/main "`sed 's/^/ /;s/$/ /' $MODBINS`
-x_mods=`cat $XMODCF`
+x_mods=`sed 's/^.* //' $XMODCF`
 . ./modules.index
 
 trap "rm -f $1; exit 1" 1 2 15

@@ -124,7 +124,7 @@ modules-bltin: Makefile
 	if test -f mymods.conf; then \
 	    cat mymods.conf > $@; \
 	elif test @D@ = N; then \
-	    cat $(sdir)/xmods.conf > $@; \
+	    sed -n '/L.* /{s/^.* //;p;}' < $(sdir)/xmods.conf > $@; \
 	else \
 	    echo > $@; \
 	fi

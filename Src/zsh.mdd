@@ -62,7 +62,7 @@ zshxmods.h: modules-bltin xmods.conf
 	@echo "Creating \`$@'."
 	@( \
 	    binmods=`sed 's/^/ /;s/$$/ /' modules-bltin`; \
-	    for mod in `cat $(sdir_src)/xmods.conf`; do \
+	    for mod in `sed 's/^.* //' $(sdir_src)/xmods.conf`; do \
 		q_mod=`echo $$mod | sed 's,Q,Qq,g;s,_,Qu,g;s,/,Qs,g'`; \
 		case $$binmods in \
 		    *" $$mod "*) \
