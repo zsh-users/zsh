@@ -337,6 +337,7 @@ bin_zle(char *name, char **args, char *ops, int func)
 	{ 'N', bin_zle_new,  1,  2 },
 	{ 'C', bin_zle_complete, 3, 3 },
 	{ 'R', bin_zle_refresh, 0, -1 },
+	{ 'M', bin_zle_mesg, 1, 1 },
 	{ 'U', bin_zle_unget, 1, 1 },
 	{ 0,   bin_zle_call, 0, -1 },
     };
@@ -426,6 +427,14 @@ bin_zle_refresh(char *name, char **args, char *ops, char func)
     clearlist = ocl;
     statusline = s;
     statusll = sl;
+    return 0;
+}
+
+/**/
+static int
+bin_zle_mesg(char *name, char **args, char *ops, char func)
+{
+    showmsg(*args);
     return 0;
 }
 
