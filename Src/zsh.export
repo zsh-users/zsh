@@ -44,6 +44,7 @@ deletebuiltins
 deleteconddefs
 deletehashtable
 deleteparamdefs
+deleteparamtable
 deletewrapper
 domatch
 dosetopt
@@ -191,6 +192,7 @@ pwd
 quietgetevent
 quietgethist
 quotedzputs
+readoutput
 realparamtab
 refreshptr
 remlpaths

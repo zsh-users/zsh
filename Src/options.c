@@ -109,7 +109,7 @@ static struct optname optns[] = {
 {NULL, "flowcontrol",	      OPT_ALL,			 FLOWCONTROL},
 {NULL, "functionargzero",     OPT_EMULATE|OPT_NONBOURNE, FUNCTIONARGZERO},
 {NULL, "glob",		      OPT_ALL,			 GLOBOPT},
-{NULL, "globalrcsfirst",      0,			 GLOBALRCSFIRST},
+{NULL, "globalrcs",           OPT_ALL,			 GLOBALRCS},
 {NULL, "globassign",	      OPT_EMULATE|OPT_CSH,	 GLOBASSIGN},
 {NULL, "globcomplete",	      0,			 GLOBCOMPLETE},
 {NULL, "globdots",	      0,			 GLOBDOTS},
@@ -265,7 +265,7 @@ static short zshletters[LAST_OPT - FIRST_OPT + 1] = {
     /* a */  ALLEXPORT,
     /* b */  0,			/* in non-Bourne shells, end of options */
     /* c */  0,			/* command follows */
-    /* d */  GLOBALRCSFIRST,
+    /* d */ -GLOBALRCS,
     /* e */  ERREXIT,
     /* f */ -RCS,
     /* g */  HISTIGNORESPACE,

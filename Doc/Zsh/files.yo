@@ -6,12 +6,17 @@ cindex(startup files)
 cindex(files, shutdown)
 cindex(shutdown files)
 pindex(NO_RCS, use of)
-Commands are first read from tt(/etc/zshenv).
-If the tt(RCS) option is unset
-within tt(/etc/zshenv), all other
-initialization files are skipped.
-Otherwise, commands are read
-from tt($ZDOTDIR/.zshenv).
+pindex(NO_GLOBAL_RCS, use of)
+Commands are first read from tt(/etc/zshenv); this cannot be overridden.
+If the tt(RCS) option is unset, no further files are read; changing this
+option after this point has no effect on initialization files, but may
+affect behaviour on logout.  Subsequent behaviour is also modified by the
+option tt(GLOBAL_RCS).  If it is unset at any point during initialisation,
+later files in the tt(/etc) directory will not be read.  It is also
+possible for a file in tt($ZDOTDIR) to re-enable tt(GLOBAL_RCS). Both
+tt(RCS) and tt(GLOBAL_RCS) are set by default.
+
+Commands are then read from tt($ZDOTDIR/.zshenv).
 pindex(LOGIN, use of)
 If the shell is a login shell, commands
 are read from tt(/etc/zprofile) and then tt($ZDOTDIR/.zprofile).
@@ -20,20 +25,15 @@ commands are read from tt(/etc/zshrc) and then tt($ZDOTDIR/.zshrc).
 Finally, if the shell is a login shell, tt(/etc/zlogin) and
 tt($ZDOTDIR/.zlogin) are read.
 
-If the option tt(GLOBAL_RCS_FIRST) is set when the shell is invoked or in
-the file tt(/etc/zshenv), then all the applicable global startup files are
-read before all the users', so that the order becomes tt(/etc/zshenv)
-... tt(/etc/zlogin), tt($ZDOTDIR/.zshenv) ... tt($ZDOTDIR/.zlogin).
-After tt(/etc/zshenv) has been read, changing the option has no further
-effect.
-
 When a login shell exits, the files tt($ZDOTDIR/.zlogout) and then
 tt(/etc/zlogout) are read.  This happens with either an explicit exit
 via the tt(exit) or tt(logout) commands, or an implict exit by reading
 end-of-file from the terminal.  However, if the shell terminates due
 to tt(exec)'ing another process, the logout files are not read.
+These are also affected by the tt(RCS) and tt(GLOBAL_RCS) options.
 
 If tt(ZDOTDIR) is unset, tt(HOME) is used instead.
 Those files listed above as being in tt(/etc) may be in another
 directory, depending on the installation.
 ifnzman(includefile(Zsh/filelist.yo))
+

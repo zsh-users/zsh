@@ -43,15 +43,26 @@ whenlatex(report(ARG1)(ARG2)(ARG3))\
 whenman(report(ARG1)(ARG2)(ARG3))\
 whenms(report(ARG1)(ARG2)(ARG3))\
 whensgml(report(ARG1)(ARG2)(ARG3)))
-myreport(Z-Shell Frequently-Asked Questions)(Peter Stephenson)(1999/04/23)
+myreport(Z-Shell Frequently-Asked Questions)(Peter Stephenson)(1999/05/24)
 COMMENT(-- the following are for Usenet and must appear first)\
 description(
 mydit(Archive-Name:) unix-faq/shell/zsh
-mydit(Last-Modified:) 1999/04/23
+mydit(Last-Modified:) 1999/05/24
 mydit(Submitted-By:) email(pws@ibmth.df.unipi.it (Peter Stephenson))
-mydit(Version:) $Id: FAQ.yo,v 1.1.1.3 1999/04/25 15:43:54 akr Exp $
+mydit(Version:) $Id: FAQ.yo,v 1.1.1.4 1999/05/31 17:10:29 akr Exp $
 mydit(Posting-Frequency:) Monthly
 mydit(Copyright:) (C) P.W. Stephenson, 1995--1999 (see end of document)
+)
+
+bf(Changes since issue posted April 1999:)
+description(
+mydit(*.*)  Orthography for option names standardised.
+mydit(1.4)  don't change config.h.in, change acconfig.h
+mydit(1.6)  email zefram@zsh.org
+mydit(2.4)  new widget version of tcsh run-fg-editor
+mydit(3.7)  should have mentioned tt(PRINT_EIGHT_BIT) is new in 3.1
+mydit(3.23) new: describe tt(PROMPT_CR) option.
+mydit(5.1)  Description of tt(LIST_AMBIGUOUS) corrected.
 )
 
 This document contains a list of frequently-asked (or otherwise
@@ -113,6 +124,7 @@ Chapter 3:  How to get various things to work
 3.20. How does the alternative loop syntax, e.g. mytt(while {...} {...}) work?
 3.21. Why is my history not being saved?
 3.22. How do I get a variable's value to be evaluated as another variable?
+3.23. How do I prevent the prompt overwriting output when there is no newline?
 
 Chapter 4:  The mysteries of completion
 4.1. What is completion?
@@ -271,7 +283,7 @@ sect(On what machines will it run?)
 
   If you need to change something to support a new machine, it would be
   appreciated if you could add any necessary preprocessor code and
-  alter configure.in and config.h.in to configure zsh automatically,
+  alter configure.in and acconfig.h to configure zsh automatically,
   then send the required context diffs to the list (see question
   link(5.2)(52)).  Changes based on version 2.5 are very unlikely to
   be useful.
@@ -314,7 +326,7 @@ sect(What's the latest version?)
 sect(Where do I get it?)
 label(16)
 
-  The archive is now run by email(Andrew Main <zefram@tao.co.uk>).
+  The archive is now run by email(Andrew Main <zefram@zsh.org>).
   The following are known mirrors (kept frequently up to date); the
   first is the official archive site, currently in Australia.  All are
   available by anonymous FTP.  The major sites keep test versions in
@@ -516,18 +528,21 @@ label(21)
   The classic difference is word splitting, discussed in link(3.1)(31); this
   catches out very many beginning zsh users.  As explained there, this
   is actually a bug in every other shell.  The answer is to set
-  SH_WORD_SPLIT for backward compatibility.  The next most classic
+  tt(SH_WORD_SPLIT) for backward compatibility.  The next most classic
   difference is that unmatched glob patterns cause the command to
-  abort; set NO_NOMATCH for those.
+  abort; set tt(NO_NOMATCH) for those.
 
   Here is a list of various options which will increase ksh
   compatibility, though maybe decrease zsh's abilities: see the manual
-  entries for GLOB_SUBST, IGNORE_BRACES (though brace expansion occurs
-  in some versions of ksh), KSH_ARRAYS, KSH_GLOB, KSH_OPTION_PRINT,
-  LOCAL_OPTIONS, NO_BAD_PATTERN, NO_BANG_HIST, NO_EQUALS, NO_HUP,
-  NO_NOMATCH, NO_RCS, NO_SHORT_LOOPS, PROMPT_SUBST, RM_STAR_SILENT,
-  POSIX_BUILTINS, SH_FILE_EXPANSION, SH_GLOB, SH_OPTION_LETTERS,
-  SH_WORD_SPLIT (see question link(3.1)(31)) and SINGLE_LINE_ZLE.
+  entries for tt(GLOB_SUBST), tt(IGNORE_BRACES) (though brace expansion occurs
+  in some versions of ksh), tt(KSH_ARRAYS), tt(KSH_GLOB), tt(KSH_OPTION_PRINT),
+  tt(LOCAL_OPTIONS), tt(NO_BAD_PATTERN), tt(NO_BANG_HIST), tt(NO_EQUALS), \
+tt(NO_HUP,)
+  tt(NO_NOMATCH), tt(NO_RCS), tt(NO_SHORT_LOOPS), tt(PROMPT_SUBST), \
+tt(RM_STAR_SILENT),
+  tt(POSIX_BUILTINS), tt(SH_FILE_EXPANSION), tt(SH_GLOB), \
+tt(SH_OPTION_LETTERS),
+  tt(SH_WORD_SPLIT) (see question link(3.1)(31)) and tt(SINGLE_LINE_ZLE).
   Note that you can also disable any built-in commands which get in
   your way.  If invoked as `ksh', the shell will try and set suitable
   options.
@@ -548,7 +563,7 @@ label(21)
         subscripts start at 1, not 0; tt(array[0]) refers to tt(array[1]);
         mytt($array) refers to the whole array, not tt($array[0]);
         braces are unnecessary: tt($a[1] == ${a[1]}), etc.
-        The KSH_ARRAYS option is now available.
+        The tt(KSH_ARRAYS) option is now available.
     it()  Coprocesses are established by mytt(coproc); mytt(|&) behaves like
         csh.  Handling of coprocess file descriptors is also different.
     it()  In mytt(cmd1 && cmd2 &), only mytt(cmd2) instead of the whole
@@ -558,10 +573,10 @@ label(21)
   it() Command line substitutions, globbing etc.:
   itemize(
     it()* Failure to match a globbing pattern causes an error (use
-        NO_NOMATCH).
+        tt(NO_NOMATCH)).
     it()* The results of parameter substitutions are treated as plain text:
-        mytt(foo="*"; print $foo) prints all files in ksh but mytt(*) in zsh.
-        (GLOB_SUBST has been added to fix this.)
+        mytt(foo="*"; print $foo) prints all files in ksh but mytt(*) in zsh
+        (uset tt(GLOB_SUBST)).
     it()  The backslash in tt($(echo '\$x')) is treated differently:  in \
 ksh, it
         is not stripped, in zsh it is.  (The tt(`...`) form gives the same in
@@ -583,9 +598,9 @@ PROMPT_SUBST).
 ----------------------------------------------------------------------
       )
       The mytt(^), mytt(~) and mytt(#) (but not mytt(|))forms require \
-EXTENDED_GLOB.
+tt(EXTENDED_GLOB).
       From version 3.1.3, the ksh forms are fully supported when the
-      option KSH_GLOB is in effect; for previous versions you
+      option tt(KSH_GLOB) is in effect; for previous versions you
       must use the table above.
 
       [1] Note that mytt(~) is the only globbing operator to have a lower
@@ -681,7 +696,7 @@ sect(Similarities with csh)
   it()  tt(*rc) file for interactive shells.
   it()  Directory stacks.
   it()  tt(cshjunkie*), tt(ignoreeof) options.
-  it()  The CSH_NULL_GLOB option.
+  it()  The tt(CSH_NULL_GLOB) option.
   it()  tt(>&), tt(|&) etc. redirection.
       (Note that mytt(>file 2>&1) is the standard Bourne shell command for
       csh's mytt(>&file).)
@@ -765,7 +780,7 @@ label(23)
      heavy csh alias junkies:
 
   myeit() Mapping from csh alias "parameter referencing" into zsh function
-     (assuming shwordsplit and ksharrays are NOT set in zsh):
+     (assuming tt(SH_WORD_SPLIT) and tt(KSH_ARRAYS) are NOT set in zsh):
        verb(
       csh             zsh
      =====         ==========
@@ -848,7 +863,17 @@ sect(Similarities with tcsh)
   verb(
     bindkey '\eq' push-input
   )
-  to save the entire buffer.
+  to save the entire buffer.  In recent versions of zsh 3.1, you have
+  the following more sophisticated option,
+  verb(
+    run-fg-editor() {
+      zle push-input
+      BUFFER="fg %$EDITOR:t"
+      zle accept-line
+    }
+    zle -N run-fg-editor
+  )
+  and can now bind tt(run-fg-editor) just like any other editor function.
 
 
 sect(Similarities with bash)
@@ -872,7 +897,7 @@ sect(Shouldn't zsh be more/less like ksh/(t)csh?)
   would have features familiar to csh users.  For a long time, csh was
   the preferred interactive shell and there is a strong resistance to
   changing to something unfamiliar, hence the additional syntax and
-  CSH_JUNKIE options.  This argument still holds.  On the other hand,
+  tt(CSH_JUNKIE) options.  This argument still holds.  On the other hand,
   the arguments for having what is close to a plug-in replacement for ksh
   are, if anything, even more powerful:  the deficiencies of csh as a
   programming language are well known (look in any Usenet FAQ archive, e.g.
@@ -900,8 +925,8 @@ label(31)
   )
   are split into words when passed to a command or used in a mytt(for foo in
   $var) loop.  By default, zsh does not have that behaviour: the
-  variable remains intact.  (This is not a bug!  See below.)  An option
-  (SHWORDSPLIT) exists to provide compatibility.
+  variable remains intact.  (This is not a bug!  See below.)  The option
+  tt(SH_WORD_SPLIT) exists to provide compatibility.
 
   For example, defining the function args to show the number of its
   arguments:
@@ -935,7 +960,7 @@ label(31)
   verb(
     args $array
   )
-  produces the output `4', regardless of the setting of SHWORDSPLIT.
+  produces the output `4', regardless of the setting of tt(SH_WORD_SPLIT).
   Arrays are also much more versatile than single strings.  Probably
   if this mechanism had always been available there would never have
   been automatic word splitting in scalars, which is a sort of
@@ -954,22 +979,22 @@ label(31)
   after which $words is an array with the words of $sentence (note
   characters special to the shell, such as the mytt(') in this example,
   must already be quoted), or, less standard but more reliable,
-  turning on SHWORDSPLIT for one variable only:
+  turning on tt(SH_WORD_SPLIT) for one variable only:
   verb(
     args ${=sentence}
   )
   always returns 8 with the above definition of mytt(args).  (In older
-  versions of zsh, tt(${=foo}) toggled SHWORDSPLIT; now it forces it on.)
+  versions of zsh, tt(${=foo}) toggled tt(SH_WORD_SPLIT); now it forces it on.)
 
   Note also the tt("$@") method of word splitting is always available in zsh
   functions and scripts (though strictly this does array splitting, not
   word splitting).  This is more portable than the tt($*), since it
-  will work regardless of the SHWORDSPLIT setting; the other
+  will work regardless of the tt(SH_WORD_SPLIT) setting; the other
   difference is that tt($*) removes empty arguments from the array.
   You can fix the first half of that objection by using tt(${==*}),
-  which turns off SHWORDSPLIT for the duration of the expansion.
+  which turns off tt(SH_WORD_SPLIT) for the duration of the expansion.
 
-  SHWORDSPLIT is set when zsh is invoked with the names `ksh' or `sh',
+  tt(SH_WORD_SPLIT) is set when zsh is invoked with the names `ksh' or `sh',
   or (entirely equivalent) when mytt(emulate ksh) or mytt(emulate sh) is in
   effect.
 
@@ -1004,7 +1029,7 @@ sect(In which startup file do I put...?)
   you use the tt(-f) option) is tt(.zshenv), so this is a good place to \
   put
   things you want even if the shell is non-interactive: options for
-  changing the the syntax, like EXTENDED_GLOB, any changes to set with
+  changing the the syntax, like tt(EXTENDED_GLOB), any changes to set with
   mytt(limit), any more variables you want to make sure are set as for
   example tt($fpath) to find functions.  You almost certainly do not
   want tt(.zshenv) to produce any output.  Some people prefer not to
@@ -1025,7 +1050,7 @@ sect(In which startup file do I put...?)
   to save your history.
 
 
-sect(What is the difference between `export' and the ALL_EXPORT option?)
+sect(What is the difference between `export' and the tt(ALL_EXPORT) option?)
 
   Normally, you would put a variable into the environment by using
   mytt(export var).  The command mytt(setopt allexport) causes all
@@ -1045,7 +1070,7 @@ sect(What is the difference between `export' and the ALL_EXPORT option?)
      meaning to a command.  Since all shell variables are visible to
      commands, there is no protection against this.
   )
-  For these reasons it is usually best to avoid ALL_EXPORT unless you
+  For these reasons it is usually best to avoid tt(ALL_EXPORT) unless you
   have a specific use for it.  One safe use is to set it before
   creating a list of variables in an initialisation file, then unset
   it immediately afterwards.  Only those variables will be automatically
@@ -1130,12 +1155,15 @@ sect(How do I automatically display the directory in my xterm title bar?)
 
 sect(How do I make the completion list use eight bit characters?)
 
-  If you are sure your terminal handles this, the easiest way is to
-  set the option PRINT_EIGHT_BIT.  In principle, this will work
-  automatically if your computer uses the `locale' system and your
-  locale variables are set properly, as zsh understands this.
-  However, it is quite complicated, so if it isn't already set up,
-  trying the option is a lot easier.
+  If you are sure your terminal handles this, the easiest way from version
+  3.1 of the shell is to set the option tt(PRINT_EIGHT_BIT).  In principle,
+  this will work automatically if your computer uses the `locale' system
+  and your locale variables are set properly, as zsh understands this.
+  However, it is quite complicated, so if it isn't already set up, trying
+  the option is a lot easier.  For 3.0, you are stuck with trying to
+  understand locales, see the tt(setlocale(3)) and tt(zshparam(1)) manual
+  pages:  the simplest possibility may be to set tt(LC_ALL=en_US).  For older
+  versions of the shell, there is no easy way out.
 
 
 sect(Why do the cursor (arrow) keys not work?)
@@ -1267,7 +1295,7 @@ sect(Why do my autoloaded functions not autoload [the first time]?)
   incompatible with the old zsh behaviour which allowed you to
   redefine the function when you called it.
 
-  From version 3.1, there is an option KSHAUTOLOAD to allow full ksh
+  From version 3.1, there is an option tt(KSH_AUTOLOAD) to allow full ksh
   compatiblity, i.e. the function myem(must) be in the second form
   above.  If that is not set, zsh tries to guess which form you are
   using:  if the file contains only a complete definition of the
@@ -1323,6 +1351,7 @@ sect(How does base arithmetic work?)
 
 
 sect(How do I get a newline in my prompt?)
+label(313)
 
   You can place a literal newline in quotes, i.e.
   verb(
@@ -1359,7 +1388,7 @@ sect(Why can't I bind tt(\C-s) and tt(\C-q) any more?)
   settings.)  In other words, tt(\C-s) stops all output to the terminal,
   while tt(\C-q) resumes it.
 
-  There is an option NO_FLOW_CONTROL to stop zsh from allowing flow
+  There is an option tt(NO_FLOW_CONTROL) to stop zsh from allowing flow
   control and hence restoring the use of the keys: put mytt(setopt
   noflowcontrol) in your tt(.zshrc) file.
 
@@ -1381,7 +1410,7 @@ sect(Why do history substitutions with single bangs do something funny?)
   If you have a command like "tt(echo !-2:$ !$)", the first history
   substitution then sets a default to which later history substitutions
   with single unqualified bangs refer, so that !$ becomes equivalent to
-  tt(!-2:$).  The option CSH_JUNKIE_HISTORY makes all single bangs refer
+  tt(!-2:$).  The option tt(CSH_JUNKIE_HISTORY) makes all single bangs refer
   to the last command.
 
 
@@ -1522,6 +1551,24 @@ sect(How do I get a variable's value to be evaluated as another variable?)
   actually does nothing.
 
 
+sect(How do I prevent the prompt overwriting output when there is no newline?)
+
+  The problem is, for example,
+  verb(
+    % echo -n foo
+    % 
+  )
+  and the tt(foo) has been overwritten by the prompt tt(%).  The answer is
+  simple:  put tt(unsetopt promptcr) in your tt(.zshrc).  The option \
+  tt(PROMPT_CR),
+  to print a carriage return before a new prompt, is set by default because
+  a prompt at the right hand side (mytt($RPROMPT), mytt($RPS1)) will not appear
+  in the right place, and multi-line editing will be confused about the line
+  position, unless the line starts in the left hand column.  Apart from
+  tt(PROMPT_CR), you can force this to happen by putting a newline in the
+  prompt (see question link(3.13)(313) for that).
+
+
 chapter(The mysteries of completion)
 
 Programmable completion using the `compctl' command is one of the most
@@ -1630,25 +1677,26 @@ sect(How does zsh deal with ambiguous completions?)
   delete the next character and you have to use tt(ESC-\C-D).)  This can be
   changed by the following options, among others:
   itemize(
-   it() with nobeep set, that annoying beep goes away
-   it() with nolistbeep, beeping is only turned off for ambiguous completions
-   it() with autolist set, when the completion is ambiguous you get a
+   it() with tt(NO_BEEP) set, that annoying beep goes away
+   it() with tt(NO_LIST_BEEP), beeping is only turned off for ambiguous
+      completions
+   it() with tt(AUTO_LIST) set, when the completion is ambiguous you get a
       list without having to type tt(\C-D)
-   it() with listambigous, this is modified so that nothing is listed if
+   it() with tt(LIST_AMBIGOUS), this is modified so that nothing is listed if
       there is an unambiguous prefix or suffix to be inserted
-   it() with menucomplete set, one completion is always inserted
+   it() with tt(MENU_COMPLETE) set, one completion is always inserted
       completely, then when you hit TAB it changes to the next, and so
       on until you get back to where you started
-   it() with automenu, you only get the menu behaviour when you hit TAB
+   it() with tt(AUTO_MENU), you only get the menu behaviour when you hit TAB
       again on the ambiguous completion.
    it() Finally, although it affects all completion lists, including
-      those explicitly requested, note also alwayslastprompt, which
+      those explicitly requested, note also tt(ALWAYS_LAST_PROMPT), which
       causes the cursor to return to the line you were editing after
       printing the list, provided that is short enough.
   )
-  Combinations of these are possible; for example, autolist and
-  automenu together give an intuitive combination.  Note that
-  from version 3.1 listambiguous is set by default; if you use
+  Combinations of these are possible; for example, tt(AUTO_LIST) and
+  tt(AUTO_MENU) together give an intuitive combination.  Note that
+  from version 3.1 tt(LIST_AMBIGUOUS) is set by default; if you use
   autolist, you may well want to `unsetopt listambiguous'.
 
 
@@ -1681,7 +1729,7 @@ sect(How do I complete in the middle of words / just what's before the cursor?)
   )
   then in the example you can move to just after mytt(/usr/loc), hit
   whatever key you've just bound, move to the end, and hit tab.
-  (Note that AUTO_REMOVE_SLASH behaviour applies here, see the manual.)
+  (Note that tt(AUTO_REMOVE_SLASH) behaviour applies here, see the manual.)
 
   Even that doesn't exhaust the possibilities.  Included with the
   source distribution is the file tt(Functions/multicomp), a function
@@ -1862,11 +1910,12 @@ this applies
 
   Changes after zsh 3.0 (3.1.x is still currently in beta):
   itemize(
-  it() The options ALWAYS_LAST_PROMPT (return to the line you were
-     editing after displaying completion lists) and LIST_AMBIGUOUS
-     (show matching files when there are several) are now set by
-     default.  This is in response to complaints that too many zsh
-     features are never noticed by many users.  To turn them off,
+  it() The options tt(ALWAYS_LAST_PROMPT) (return to the line you were
+     editing after displaying completion lists) and tt(LIST_AMBIGUOUS)
+     (don't do tt(AUTO_LIST) if there was an unambiguous prefix that could be
+     inserted, i.e. only list if it is ambiguous what to insert next) are
+     now set by default.  This is in response to complaints that too many
+     zsh features are never noticed by many users.  To turn them off,
      just put mytt(unsetopt alwayslastprompt listambiguous) in your
      tt(.zshrc) file.
   it() tt(history-search-{forward,backward}) now only find previous
@@ -1903,20 +1952,20 @@ this applies
      the environment of the caller, as in ksh, instead of as a new
      function level.  Traps established as functions (e.g. mytt(TRAPINT()
      {...})) work as before.
-  it() The NO_CLOBBER option is now -C and PRINT_EXIT_VALUE -1; they used
-     to be the other way around.  (Use of names rather than letters is
+  it() The tt(NO_CLOBBER) option is now -C and tt(PRINT_EXIT_VALUE) -1; they
+     used to be the other way around.  (Use of names rather than letters is
      generally recommended.)
   it() mytt([[) is a reserved word, hence must be separated from
      other characters by whitespace; mytt({) and mytt(}) are also reserved
-     words if the IGNORE_BRACES option is set.
-  it() The option CSH_JUNKIE_PAREN has been removed:  csh-like code now
+     words if the tt(IGNORE_BRACES) option is set.
+  it() The option tt(CSH_JUNKIE_PAREN) has been removed:  csh-like code now
      always does what it looks like it does, so mytt(if ( ... ) ...)
      executes the code in parentheses in a subshell.  To make this
      useful, the syntax expected after an mytt(if), etc., is less strict
      than in other shells.
   it() mytt(foo=*) does not perform globbing immediately on the right
      hand side of the assignment; the old behaviour now requires the
-     option GLOB_ASSIGN.  (mytt(foo=(*)) is and has always been the
+     option tt(GLOB_ASSIGN).  (mytt(foo=(*)) is and has always been the
      consistent way of doing this.)
   it() tt(<>) performs redirection of input and output to the specified file.
      For numeric globs, you now need tt(<->).
@@ -1931,7 +1980,7 @@ this applies
      instead of tt(=)'s.  This is for consistency:  all other directory
      substitution (tt(~user), tt(~name), tt(~+), ...) used a tilde, while
      tt(=<number>) caused problems with tt(=program) substitution.
-  it() The `HISTLIT' option was broken in various ways and has been removed:
+  it() The tt(HISTLIT) option was broken in various ways and has been removed:
      the rewritten history mechanism doesn't alter history lines, making
      the option unnecessary.
   it() History expansion is disabled in single-quoted strings, like other
@@ -1939,7 +1988,7 @@ this applies
      backslashed.
   it() The mytt($HISTCHARS) variable is now mytt($histchars).  Currently both
      are tied together for compatibility.
-  it() The PROMPT_SUBST option now performs backquote expansion -- hence
+  it() The tt(PROMPT_SUBST) option now performs backquote expansion -- hence
      you should quote these in prompts.  (SPROMPT has changed as a result.)
   it() Quoting in prompts has changed: close parentheses inside ternary
      expressions should be quoted with a tt(%); history is now tt(%!), not

@@ -28,8 +28,15 @@ subdir = .
 dir_top = .
 SUBDIRS = Doc Etc Src
 
-@@version.mk@@
-@@defs.mk@@
+@VERSION_MK@
+
+# source/build directories
+VPATH           = @srcdir@
+sdir            = @srcdir@
+sdir_top        = @top_srcdir@
+INSTALL         = @INSTALL@
+
+@DEFS_MK@
 
 # ========== DEPENDENCIES FOR BUILDING ==========
 
@@ -81,7 +88,7 @@ install.html uninstall.html:
 
 # ========== DEPENDENCIES FOR CLEANUP ==========
 
-@@clean.mk@@
+@CLEAN_MK@
 
 distclean-here:
 	rm -f Makefile config.h config.status config.log config.cache stamp-h
@@ -91,7 +98,7 @@ realclean-here:
 
 # ========== DEPENDENCIES FOR MAINTENANCE ==========
 
-@@config.mk@@
+@CONFIG_MK@
 
 config: config.h
 

@@ -30,8 +30,15 @@
 # dir_top is done by mkmakemod.sh
 # SUBDIRS is done by mkmakemod.sh
 
-@@version.mk@@
-@@defs.mk@@
+@VERSION_MK@
+
+# source/build directories
+VPATH           = @srcdir@
+sdir            = @srcdir@
+sdir_top        = @top_srcdir@
+INSTALL         = @INSTALL@
+
+@DEFS_MK@
 
 sdir_src      = $(sdir_top)/Src
 dir_src       = $(dir_top)/Src
@@ -134,7 +141,7 @@ uninstall.modules-here:
 
 # ========== DEPENDENCIES FOR CLEANUP ==========
 
-@@clean.mk@@
+@CLEAN_MK@
 
 mostlyclean-here:
 	rm -f *.o *.$(DL_EXT)

@@ -27,8 +27,15 @@
 subdir = Doc
 dir_top = ..
 
-@@version.mk@@
-@@defs.mk@@
+@VERSION_MK@
+
+# source/build directories
+VPATH           = @srcdir@
+sdir            = @srcdir@
+sdir_top        = @top_srcdir@
+INSTALL         = @INSTALL@
+
+@DEFS_MK@
 
 MAKEINFO = makeinfo
 TEXI2DVI = texi2dvi
@@ -195,7 +202,7 @@ uninstall.info:
 
 # ========== DEPENDENCIES FOR CLEANUP ==========
 
-@@clean.mk@@
+@CLEAN_MK@
 
 clean-here:
 	rm -f *.html *.info* *.dvi *.ps
@@ -210,4 +217,4 @@ realclean-here:
 
 # ========== DEPENDENCIES FOR MAINTENANCE ==========
 
-@@config.mk@@
+@CONFIG_MK@

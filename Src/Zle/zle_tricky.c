@@ -751,6 +751,7 @@ check_param(char *s, int set)
 	    wb = cs - offs;
 	    we = wb + e - b;
 	    ispar = (br >= 2 ? 2 : 1);
+	    b[we-wb] = '\0';
 	    return b;
 	}
     }
@@ -2327,7 +2328,7 @@ match_str(char *l, char *w, int *bp, int *rwlp, int sfx, int test)
 		    }
 		    ow = w;
 
-		    if (!ict)
+		    if (!llen && !alen)
 			lm = mp;
 		    else
 			lm = NULL;
@@ -3596,15 +3597,22 @@ addmatches(Cadata dat, char **argv)
 	    /* Get the contents of the completion variables if we have
 	     * to perform matching. */
 	    if (dat->aflags & CAF_MATCH) {
-		lipre = dupstring(compiprefix);
-		lisuf = dupstring(compisuffix);
+		if (dat->aflags & CAF_QUOTE) {
+		    lipre = dupstring(compiprefix);
+		    lisuf = dupstring(compisuffix);
+		} else {
+		    lipre = quotename(compiprefix, NULL);
+		    lisuf = quotename(compisuffix, NULL);
+		}
 		lpre = dupstring(compprefix);
 		lsuf = dupstring(compsuffix);
 		llpl = strlen(lpre);
 		llsl = strlen(lsuf);
 		/* Test if there is an existing -P prefix. */
 		if (dat->pre && *dat->pre) {
-		    pl = pfxlen(dat->pre, lpre);
+		    char *dp = rembslash(dat->pre);
+
+		    pl = pfxlen(dp, lpre);
 		    llpl -= pl;
 		    lpre += pl;
 		}
@@ -5324,10 +5332,11 @@ makecomplistflags(Compctl cc, char *s, int incmd, int compadd)
 	int pl = 0;
 
 	if (*s) {
+	    char *dp = rembslash(cc->prefix);
 	    /* First find out how much of the prefix is already on the line. */
 	    sd = dupstring(s);
 	    untokenize(sd);
-	    pl = pfxlen(cc->prefix, sd);
+	    pl = pfxlen(dp, sd);
 	    s += pl;
 	    sd += pl;
 	    offs -= pl;
@@ -5335,7 +5344,7 @@ makecomplistflags(Compctl cc, char *s, int incmd, int compadd)
     }
     /* Does this compctl have a suffix (compctl -S)? */
     if (cc->suffix) {
-	char *sdup = dupstring(cc->suffix);
+	char *sdup = rembslash(cc->suffix);
 	int sl = strlen(sdup), suffixll;
 
 	/* Ignore trailing spaces. */
@@ -7112,9 +7121,13 @@ do_single(Cmatch m)
 		menuinsc++;
 		if (menuwe)
 		    menuend++;
-		if ((!menucmp || menuwe) && isset(AUTOREMOVESLASH)) {
-		    makesuffix(1);
-		    suffixlen['/'] = 1;
+		if (!menucmp || menuwe) {
+		    if (m->remf || m->rems)
+			makesuffixstr(m->remf, m->rems, 1);
+		    else if (isset(AUTOREMOVESLASH)) {
+			makesuffix(1);
+			suffixlen['/'] = 1;
+		    }
 		}
 	    }
 	}

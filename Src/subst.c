@@ -279,7 +279,7 @@ multsub(char **s, char ***a, int *isarr, char *sep)
 	*p = NULL;
 	if (a && mult_isarr) {
 	    *a = r;
-	    *isarr = 1;
+	    *isarr = SCANPM_MATCHMANY;
 	    mult_isarr = omi;
 	    return 0;
 	}
@@ -976,7 +976,9 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int ssub)
 		zerr("bad substitution", NULL, 0);
 		return NULL;
 	    }
-	} else
+	} else if (INULL(*s))
+	    s++;
+	else
 	    break;
     }
     globsubst = globsubst && !qt;
@@ -999,6 +1001,8 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int ssub)
 	    idbeg = val;
 	copied = 1;
 	*s = sav;
+	while (INULL(*s))
+	    s++;
 	v = (Value) NULL;
     } else if (aspar) {
 	if ((v = getvalue(&s, 1))) {

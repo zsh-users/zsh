@@ -184,7 +184,7 @@ setpmcommand(Param pm, char *value)
 	Cmdnam cn = zcalloc(sizeof(*cn));
 
 	cn->flags = HASHED;
-	cn->u.cmd = ztrdup(value);
+	cn->u.cmd = value;
 
 	cmdnamtab->addnode(cmdnamtab, ztrdup(pm->nam), (HashNode) cn);
     }
@@ -207,6 +207,9 @@ setpmcommands(Param pm, HashTable ht)
     int i;
     HashNode hn;
 
+    if (!ht)
+	return;
+
     for (i = 0; i < ht->hsize; i++)
 	for (hn = ht->nodes[i]; hn; hn = hn->next) {
 	    Cmdnam cn = zcalloc(sizeof(*cn));
@@ -222,6 +225,7 @@ setpmcommands(Param pm, HashTable ht)
 
 	    cmdnamtab->addnode(cmdnamtab, ztrdup(hn->nam), (HashNode) cn);
 	}
+    deleteparamtable(ht);
 }
 
 /**/
@@ -312,14 +316,13 @@ scanpmcommands(HashTable ht, ScanFunc func, int flags)
 
 /**/
 static void
-setfunction(char *name, char *value)
+setfunction(char *name, char *val)
 {
-    char *val;
+    char *value = dupstring(val);
     Shfunc shf;
     List list;
     int sn;
 
-    val = ztrdup(value);
     val = metafy(val, strlen(val), META_REALLOC);
 
     HEAPALLOC {
@@ -327,7 +330,7 @@ setfunction(char *name, char *value)
     } LASTALLOC;
 
     if (!list || list == &dummy_list) {
-	zwarnnam(NULL, "invalid function definition", val, 0);
+	zwarnnam(NULL, "invalid function definition", value, 0);
 	zsfree(val);
 	return;
     }
@@ -348,7 +351,6 @@ setfunction(char *name, char *value)
 	}
 	shfunctab->addnode(shfunctab, ztrdup(name), shf);
     } LASTALLOC;
-
     zsfree(val);
 }
 
@@ -376,6 +378,9 @@ setpmfunctions(Param pm, HashTable ht)
     int i;
     HashNode hn;
 
+    if (!ht)
+	return;
+
     for (i = 0; i < ht->hsize; i++)
 	for (hn = ht->nodes[i]; hn; hn = hn->next) {
 	    struct value v;
@@ -385,8 +390,9 @@ setpmfunctions(Param pm, HashTable ht)
 	    v.arr = NULL;
 	    v.pm = (Param) hn;
 
-	    setfunction(hn->nam, getstrvalue(&v));
+	    setfunction(hn->nam, ztrdup(getstrvalue(&v)));
 	}
+    deleteparamtable(ht);
 }
 
 /**/
@@ -483,6 +489,7 @@ setpmoption(Param pm, char *value)
 	zwarnnam(NULL, "no such option: %s", pm->nam, 0);
     else if (dosetopt(n, (value && strcmp(value, "off")), 0))
 	zwarnnam(NULL, "can't change option: %s", pm->nam, 0);
+    zsfree(value);
 }
 
 /**/
@@ -504,6 +511,9 @@ setpmoptions(Param pm, HashTable ht)
     int i;
     HashNode hn;
 
+    if (!ht)
+	return;
+
     for (i = 0; i < ht->hsize; i++)
 	for (hn = ht->nodes[i]; hn; hn = hn->next) {
 	    struct value v;
@@ -521,6 +531,7 @@ setpmoptions(Param pm, HashTable ht)
 			      (val && strcmp(val, "off")), 0))
 		zwarnnam(NULL, "can't change option: %s", hn->nam, 0);
 	}
+    deleteparamtable(ht);
 }
 
 /**/

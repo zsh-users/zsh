@@ -2279,6 +2279,7 @@ set_compstate(Param pm, HashTable ht)
 
 		    break;
 		}
+    deleteparamtable(ht);
 }
 
 /**/

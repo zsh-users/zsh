@@ -331,6 +331,24 @@ copyparamtable(HashTable ht, char *name)
     return nht;
 }
 
+/* Flag to freeparamnode to unset the struct */
+
+static int delunset;
+
+/* Function to delete a parameter table. */
+
+/**/
+void
+deleteparamtable(HashTable t)
+{
+    /* The parameters in the hash table need to be unset *
+     * before being deleted.                             */
+    int odelunset = delunset;
+    delunset = 1;
+    deletehashtable(t);
+    delunset = odelunset;
+}
+
 static unsigned numparamvals;
 
 /**/
@@ -426,7 +444,7 @@ createparamtable(void)
     Param ip, pm;
     char **new_environ, **envp, **envp2, **sigptr, **t;
     char buf[50], *str, *iname;
-    int num_env;
+    int num_env, oae = opts[ALLEXPORT];
 
     paramtab = realparamtab = newparamtable(151, "paramtab");
 
@@ -446,6 +464,7 @@ createparamtable(void)
 	 * be initialized before we copy the environment variables. *
 	 * We don't want to override whatever values the users has  *
 	 * given them in the environment.                           */
+	opts[ALLEXPORT] = 0;
 	setiparam("MAILCHECK", 60);
 	setiparam("LOGCHECK", 60);
 	setiparam("KEYTIMEOUT", 40);
@@ -491,6 +510,7 @@ createparamtable(void)
 	    }
 	}
 	environ = new_environ;
+	opts[ALLEXPORT] = oae;
 
 	pm = (Param) paramtab->getnode(paramtab, "HOME");
 	if (!(pm->flags & PM_EXPORTED)) {
@@ -1867,24 +1887,14 @@ hashgetfn(Param pm)
     return pm->u.hash;
 }
 
-/* Flag to freeparamnode to unset the struct */
-
-static int delunset;
-
 /* Function to set value of an association parameter */
 
 /**/
 void
 hashsetfn(Param pm, HashTable x)
 {
-    if (pm->u.hash && pm->u.hash != x) {
-	/* The parameters in the hash table need to be unset *
-	 * before being deleted.                             */
-	int odelunset = delunset;
-	delunset = 1;
-	deletehashtable(pm->u.hash);
-	delunset = odelunset;
-    }
+    if (pm->u.hash && pm->u.hash != x)
+	deleteparamtable(pm->u.hash);
     pm->u.hash = x;
 }
 

@@ -2342,7 +2342,7 @@ getoutput(char *cmd, int qt)
 /* read output of command substitution */
 
 /**/
-static LinkList
+LinkList
 readoutput(int in, int qt)
 {
     LinkList ret;

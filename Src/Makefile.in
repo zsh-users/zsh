@@ -28,8 +28,15 @@ subdir = Src
 dir_top = ..
 SUBDIRS =
 
-@@version.mk@@
-@@defs.mk@@
+@VERSION_MK@
+
+# source/build directories
+VPATH           = @srcdir@
+sdir            = @srcdir@
+sdir_top        = @top_srcdir@
+INSTALL         = @INSTALL@
+
+@DEFS_MK@
 
 sdir_src      = $(sdir)
 dir_src       = .
@@ -85,7 +92,7 @@ modobjs: headers rm-modobjs-tmp
 rm-modobjs-tmp:
 	rm -f stamp-modobjs.tmp
 
-@@config.mk@@
+@CONFIG_MK@
 
 Makemod modules.index prep: modules-bltin $(CONFIG_INCS)
 	( cd $(sdir_top) && $(SHELL) $(subdir)/mkmodindex.sh $(subdir) ) \
@@ -201,7 +208,7 @@ realclean: realclean-modules
 mostlyclean-modules clean-modules distclean-modules realclean-modules: Makemod
 	@$(MAKE) -f Makemod $(MAKEDEFS) `echo $@ | sed 's/-modules//'`
 
-@@clean.mk@@
+@CLEAN_MK@
 
 # ========== RECURSIVE MAKES ==========
 

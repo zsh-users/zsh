@@ -141,6 +141,9 @@ or insult your system manager for incompetence."
 else
   print "Keeping existing completion directiory $_ci_fdir"
 fi
+if [[ ${~_ci_fdir} != /* ]]; then
+  _ci_fdir=$(cd $_ci_fdir;builtin pwd)
+fi
 
 # Check if this is in fpath already, else put it there (with ~'s expanded).
 _ci_f=${~_ci_fdir}

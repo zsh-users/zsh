@@ -362,7 +362,7 @@ AC_CHECK_HEADERS(sys/time.h sys/times.h sys/select.h termcap.h termio.h \
 		 termios.h sys/param.h sys/filio.h string.h memory.h \
 		 limits.h fcntl.h libc.h sys/utsname.h sys/resource.h \
 		 locale.h errno.h stdlib.h unistd.h sys/capability.h \
-		 utmp.h utmpx.h sys/types.h pwd.h grp.h poll.h)
+		 utmp.h utmpx.h sys/types.h pwd.h grp.h poll.h sys/mman.h)
 if test $dynamic = yes; then
   AC_CHECK_HEADERS(dlfcn.h)
   AC_CHECK_HEADERS(dl.h)
@@ -706,7 +706,7 @@ AC_CHECK_FUNCS(memcpy memmove \
               sigprocmask setuid seteuid setreuid setresuid setsid strerror \
               nis_list initgroups fchdir cap_get_proc readlink nice \
 	      getgrgid getgrnam getpwent getpwnam getpwuid setpgrp \
-	      fseeko ftello)
+	      fseeko ftello mmap munmap msync ftruncate)
 
 dnl ---------------
 dnl CHECK FUNCTIONS
@@ -1279,30 +1279,30 @@ AC_SUBST(IMPOPT)dnl
 AC_SUBST(L)dnl
 AC_SUBST(RTLD_GLOBAL_OK)dnl
 
+CLEAN_MK="${srcdir}/Config/clean.mk"
+CONFIG_MK="${srcdir}/Config/config.mk"
+dnl defs.mk is in the build tree, not the source tree
+DEFS_MK="Config/defs.mk"
+VERSION_MK="${srcdir}/Config/version.mk"
+
+AC_SUBST_FILE(CLEAN_MK)dnl
+AC_SUBST_FILE(CONFIG_MK)dnl
+AC_SUBST_FILE(DEFS_MK)dnl
+AC_SUBST_FILE(VERSION_MK)dnl
+
 real_no_create=$no_create
 no_create=yes
-AC_OUTPUT(Makefile Doc/Makefile Etc/Makefile Src/Makefile, \
+
+AC_OUTPUT(Config/defs.mk Makefile Doc/Makefile Etc/Makefile Src/Makefile, \
 [test -z "$CONFIG_HEADERS" || echo > stamp-h])
 
 dnl The standard config.status is missing some essential features.
 dnl So add them now.
-[(
-  echo '1,$s@^#( *ac_file_inputs=#).*$@#1`echo $ac_file_in | sed -e "s%^%:%" -e "s%:##([^!]##)% $ac_given_srcdir/##1%g" -e "s%:!% %"`@'
-  echo '/ac_sed_cmds=cat/+a'
-  echo ''
-  echo 'ac_sed_inc_cmds="'
-  quote_sed='s,\.,#.,g'
-  for name in `echo '' ${srcdir}/Config/*.mk | sed "s, ${srcdir}/Config/, ,g"`; do
-    echo '/^@@'`echo $name | sed -e "$quote_sed"`'@@#$/{r $ac_given_srcdir/Config/'$name
-    echo 'd;}'
-  done
-  echo '"'
-  echo '.'
-  echo '1,$s@^#( *#)#(sed -e "#$ac_comsub *#)$@#1sed -e "$ac_sed_inc_cmds" $ac_file_inputs | #2@'
-  echo '1,$s@^#( *"#)  *$ac_file_inputs |@#1 |@'
-  echo 'w'
-  echo 'q'
-) | tr '#' '\\' | ed $CONFIG_STATUS >/dev/null 2>/dev/null]
+[rm -f $CONFIG_STATUS.old
+cp $CONFIG_STATUS $CONFIG_STATUS.old
+sed '1,$s@^\( *ac_file_inputs=\).*$@\1`echo $ac_file_in | sed -e "s%^%:%" -e "s%:\\([^!]\\)% $ac_given_srcdir/\\1%g" -e "s%:!% %"`@' \
+ $CONFIG_STATUS.old >$CONFIG_STATUS
+ rm -f $CONFIG_STATUS.old]
 
 test "$real_no_create" = yes || ${CONFIG_SHELL-/bin/sh} $CONFIG_STATUS || exit 1
 

@@ -2962,7 +2962,8 @@ zexit(int val, int from_signal)
 	    if (islogin && !subsh) {
 		sourcehome(".zlogout");
 #ifdef GLOBAL_ZLOGOUT
-		source(GLOBAL_ZLOGOUT);
+		if (isset(RCS) && isset(GLOBALRCS))
+		    source(GLOBAL_ZLOGOUT);
 #endif
 	    }
 	}

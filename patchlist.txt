@@ -1085,6 +1085,8 @@ pws: 6259: second version of compinstall
 
 pws: 6263: incrementalappendhistory -> incappendhistory
 
+Sven: 6268: parameter module for access to internal tables
+
 pws: 6284, should have been in 6269: changes to large file support
 
 pws: 6271: make sure -D_LARGEFILE_SOURCE is defined any time there are
@@ -1129,3 +1131,40 @@ pws: 6314: in something like `{ false; } || true', errexit shouldn't be
 used at all on the left of the ||
 
 pws: unposted: updated some .distfiles
+
+  pws-20
+
+Sven: 6318: memory fixes for parameter module (and compctl).
+
+Sven: 6322: reverse indexing of nested arrays
+
+Sven: 6326: compadd -r and -R work on automatically added suffixes, too
+
+pws: 6330: rewrite configuration system to use AC_SUBST_FILE instead
+of including files by ed trickery (ed is now no longer required).
+
+pws: 6331: protect against null hash tables in parameter module
+
+pws: 6332: mapfile module
+
+pws: 6335: now you can do ${(f)"$(...)"} to get arrays
+
+pws: 6340: INSTALL didn't work if it was install-sh after 6330
+
+Sven: 6343: test length of anchor in partial word matching
+
+pws: 6345: Config/defs.mk is now in build tree, not source tree
+
+pws: 6346: msync() missing from mapfile.c, somehow
+
+Sven: 6352, 6354: more quoting in completion
+
+Sven: 6355: ALL_EXPORT crashed the shell if set on command line
+
+Bart: 6368: don't use cp -f, use rm -f in configure.in
+
+Bart: 6369: fix use of relative paths in compinstall
+
+Sven: 6374: autoremove behaviour on -r and -R, documentation
+
+Sven: 6388: completion in braces removes later arguments

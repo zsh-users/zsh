@@ -424,7 +424,8 @@ is the same character.
 )
 item(tt(-r) var(remove-chars))(
 This is a more versatile form of the tt(-q) option.
-The suffix given with tt(-S) will be automatically removed if
+The suffix given with tt(-S) or the slash automatically added after
+completing directories will be automatically removed if
 the next character typed inserts one of the characters given in the
 var(remove-chars).  This string is parsed as a characters class and
 understands the backslash sequences used by the tt(print) command.  For
@@ -436,8 +437,8 @@ all characters that insert nothing. Thus `tt(-S "=" -q)' is the same
 as `tt(-S "=" -r "= \t\n\-")'.
 )
 item(tt(-R) var(remove-func))(
-This is another form of the tt(-r) option. When a suffix given with the
-tt(-S) option has been inserted and the completion accepted, the function
+This is another form of the tt(-r) option. When a suffix 
+has been inserted and the completion accepted, the function
 var(remove-func) will be called after the next character typed.  It is
 passed the length of the suffix as an argument and can use the special
 parameters available in ordinary (non-completion) zle widgets (see

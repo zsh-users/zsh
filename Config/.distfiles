@@ -1,4 +1,4 @@
 DISTFILES_SRC='
     .distfiles
-    clean.mk config.mk defs.mk version.mk
+    clean.mk config.mk defs.mk.in version.mk
 '
