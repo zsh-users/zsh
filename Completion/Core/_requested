@@ -8,7 +8,7 @@ else
   tag="$1"
 fi
 
-comptags -R "$tag" &&
+comptags -R "$tag" && _comp_tags="$_comp_tags $tag" &&
     if [[ $# -gt 1 ]]; then
       _description "$@"
       return 0

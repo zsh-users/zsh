@@ -1861,6 +1861,18 @@ on the command line (which may be blank).  If given a numeric argument
 var(N), complete the var(N)th most recently modified file.  Note the
 completion, if any, is always unique.
 )
+findex(_next_tags (^Xn))
+item(tt(_next_tags (^Xn)))(
+This allows to complete types of matches that are not immediately
+offered because of the setting of the tt(tag-order) style. After a
+normal completion was tried, invoking this command makes the matches
+for the next tag (or set of tags) be used. Repeatedly invoking this
+command makes the following tags be used. To be able to complete the
+matches selected by tt(_next_tags), the tt(completer) style should
+contain tt(_next_tags) as its first string. With that, the normal key
+binding (normally tt(TAB)) can be used to complete the matches shown
+after the call to tt(_next_tags).
+)
 findex(_read_comp (^X^R))
 item(tt(_read_comp (^X^R)))(
 Prompt the user for a string, and use that to perform completion on the

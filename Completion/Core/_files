@@ -33,7 +33,7 @@ if zstyle -s ":completion:${curcontext}:directories" file-patterns tmp &&
     type="${type}/"
   fi
 else
-  dopts=()
+  dopts=(-/)
 fi
 if zstyle -s ":completion:${curcontext}:globbed-files" file-patterns tmp &&
    [[ -n "$tmp" ]]; then

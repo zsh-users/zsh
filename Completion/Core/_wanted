@@ -19,7 +19,8 @@ else
 fi
 
 if [[ $# -gt 1 ]]; then
-  _tags "$targs[@]" "$tag" && _description "$@"
+  _tags "$targs[@]" "$tag" && _comp_tags="$_comp_tags $tag" &&
+    _description "$@"
 else
-  _tags "$targs[@]" "$tag"
+  _tags "$targs[@]" "$tag" && _comp_tags="$_comp_tags $tag"
 fi
