@@ -1,3 +1,7 @@
+2000-07-04  Peter Stephenson  <pws@cambridgesiliconradio.com>
+
+	* 12158: Src/Modules/parameter.c: cast pid_t to int for printing.
+
 2000-07-03  Peter Stephenson  <pws@cambridgesiliconradio.com>
 
 	* 12149: acconfig.h, configure.in, Src/Modules/zftp.c:

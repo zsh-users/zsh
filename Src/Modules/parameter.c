@@ -1246,7 +1246,7 @@ pmjobstate(int job)
 	else
 	    state = sigmsg(WTERMSIG(pn->status));
 
-	sprintf(buf, ":%d=%s", pn->pid, state);
+	sprintf(buf, ":%d=%s", (int)pn->pid, state);
 
 	ret = dyncat(ret, buf);
     }
