@@ -541,7 +541,7 @@ init_term(void)
 #endif
 
 	if (isset(INTERACTIVE))
-	    zerr("can't find termcap info for %s", term, 0);
+	    zerr("can't find terminal definition for %s", term, 0);
 	errflag = 0;
 	termflags |= TERM_BAD;
 	return 0;
