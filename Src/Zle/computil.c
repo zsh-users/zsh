@@ -690,8 +690,8 @@ cd_get(char **params)
                     strcpy(dbuf, cd_state.sep);
                     memcpy(dbuf + cd_state.slen,
                            str->desc,
-                           (strlen(str->desc) >= dlen ? dlen - 1 :
-                            strlen(str->desc)));
+                           ((int)strlen(str->desc) >= dlen ? dlen - 1 :
+                            (int)strlen(str->desc)));
                     *dp++ = ztrdup(dbuf);
                 }
                 mats[0] = *dp = NULL;
@@ -1640,7 +1640,7 @@ ca_inactive(Cadef d, char **xor, int cur, int opts, char *optname)
     if ((xor || opts) && cur <= compcurrent) {
 	Caopt opt;
 	char *x;
-	int sl = (d->set ? strlen(d->set) : -1), set = 0;
+	int sl = (d->set ? (int)strlen(d->set) : -1), set = 0;
 
 	for (; (x = (opts ? "-" : *xor)); xor++) {
             if (optname && optname[0] == x[0] && strcmp(optname, x))
