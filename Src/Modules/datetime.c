@@ -63,8 +63,19 @@ bin_strftime(char *nam, char **argv, Options ops, int func)
     return 0;
 }
 
+static zlong
+getcurrentsecs()
+{
+    return (zlong) time(NULL);
+}
+
 static struct builtin bintab[] = {
     BUILTIN("strftime",    0, bin_strftime,    2,   2, 0, NULL, NULL),
+};
+
+static struct paramdef patab[] = {
+    PARAMDEF("SECS", PM_INTEGER|PM_SPECIAL|PM_READONLY,
+		    NULL, NULL, &getcurrentsecs, NULL),
 };
 
 /**/
@@ -78,7 +89,9 @@ setup_(Module m)
 int
 boot_(Module m)
 {
-    return !addbuiltins(m->nam, bintab, sizeof(bintab)/sizeof(*bintab));
+    return !(addbuiltins(m->nam, bintab, sizeof(bintab)/sizeof(*bintab)) |
+	     addparamdefs(m->nam, patab, sizeof(patab)/sizeof(*patab))
+	    );
 }
 
 /**/

@@ -1,3 +1,8 @@
+2003-09-28  Clint Adams  <clint@zsh.org>
+
+	* 19151: Src/Modules/datetime.c: add $SECS parameter for
+	seconds since epoch.
+
 2003-09-25  Peter Stephenson  <pws@csr.com>
 
 	* unposted: Completion/Unix/Command/_perforce: suggested by
