@@ -1,3 +1,14 @@
+2000-08-14  Bart Schaefer  <schaefer@zsh.org>
+
+	* 12617: configure.in: Use AC_FUNC_MMAP rather than just test for
+	existence of mmap.
+
+	* Andrej: 12614: Test/53completion.ztst, Test/54compmatch.ztst,
+	Test/55arguments.ztst: Add %clean sections to unload zpty module.
+
+	* Andrej: 12614: Completion/Builtins/_zmodload: Add DLL to suffix
+	list, for benefit of cygwin.
+
 2000-08-14  Sven Wischnowsky  <wischnow@zsh.org>
 
 	* Andrej: 12613: Src/lex.c: missing mod_export
