@@ -20,8 +20,8 @@ done
 local savelbuffer=$LBUFFER saverbuffer=$RBUFFER
 local savepredisplay=$PREDISPLAY savepostdisplay=$POSTDISPLAY
 
-LBUFFER=
-RBUFFER=
+LBUFFER="$2"
+RBUFFER="$3"
 PREDISPLAY="$PREDISPLAY$savelbuffer$saverbuffer$POSTDISPLAY
 ${1:-? }"
 POSTDISPLAY=

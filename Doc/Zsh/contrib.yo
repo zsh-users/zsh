@@ -742,12 +742,20 @@ when executing, for example, tt(execute-named-cmd)).  The value is then
 returned to the calling function in the parameter tt($REPLY) and the
 editing buffer restored to its previous state.  If the read was aborted
 by a keyboard break (typically tt(^G)), the function returns status 1
-and tt($REPLY) is not set.  If an argument is supplied to the function
-it is taken as a prompt, otherwise `tt(? )' is used.
+and tt($REPLY) is not set.
+
+If one argument is supplied to the function it is taken as a prompt,
+otherwise `tt(? )' is used.  If two arguments are supplied, they are the
+prompt and the initial value of tt($LBUFFER), and if a third argument is
+given it is the initial value of tt($RBUFFER).  This provides a default
+value and starting cursor placement.  Upon return the entire buffer is the
+value of tt($REPLY).
 
 One option is available: `tt(-k) var(num)' specifies that var(num)
 characters are to be read instead of a whole line.  The line editor is not
-invoked recursively in this case.  Note that unlike the tt(read) builtin
+invoked recursively in this case, so depending on the terminal settings
+the input may not be visible, and only the input keys are placed in
+tt($REPLY), not the entire buffer.  Note that unlike the tt(read) builtin
 var(num) must be given; there is no default.
 
 The name is a slight misnomer, as in fact the shell's own minibuffer is

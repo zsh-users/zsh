@@ -8,6 +8,12 @@
 	prompt variable is always reread; fixes bug that if PS1
 	was altered the prompt string was invalid.
 
+2004-07-10  Bart Schaefer  <schaefer@zsh.org>
+
+	* 20145: Doc/Zsh/contrib.yo, Functions/Zle/read-from-minibuffer:
+	second and third arguments of read-from-minibuffer now specify the
+	initial values of LBUFFER and RBUFFER.
+
 2004-07-07  Peter Stephenson  <pws@csr.com>
 
 	* 20142: Test/A06assign.ztst: add test for bug fixed in
