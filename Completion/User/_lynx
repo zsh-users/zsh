@@ -37,10 +37,10 @@ _arguments -C \
   '-head' \
   '-help' \
   '-historical' \
-  '-homepage=:URL: _urls -f' \
+  '-homepage=:URL:->html' \
   '-image_links' \
   '-ismap' \
-  '-index=:URL: _urls -f' \
+  '-index=:URL:->html' \
   '-link=:NUMBER:' \
   '-localhost' \
   '-locexec' \
@@ -95,7 +95,7 @@ _arguments -C \
   '-version' \
   '-vikeys' \
   '-width=:NUMBER:' \
-  ':url: _urls -f'
+  ':url:->html'
 
 case "$state" in
 restrictions)
@@ -105,5 +105,8 @@ restrictions)
     goto inside_ftp inside_news inside_rlogin inside_telnet jump mail \
     multibook news_post options_save outside_ftp outside_news outside_rlogin \
     outside_telnet print shell suspend telnet_port useragent
+  ;;
+html)
+  _files -g '*.html' || _urls
   ;;
 esac

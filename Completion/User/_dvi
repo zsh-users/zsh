@@ -22,7 +22,7 @@ dvips)
     '(-X -Y)-D[set resolution]:resolution in dots per inch:' \
     '-e[set maximum character offset]:maximum character offset:' \
     '-E[generate EPSF file]' \
-    '(: -o)-f[read from stdin, write to stdout]' \
+    '(-o)-f[write to stdout]' \
     '-F[append control-D]' \
     '-h[specify additional header file]:postscript header file:_files -g \*.\(\#i\)\(ps\|eps\)' \
     '-i[one file per section]' \

@@ -8,7 +8,7 @@ xdpyinfo)
   ;;
 xwininfo)
   _x_arguments \
-    -{help,int,stats,bits,events,size,wm,shape,frame,all,english,metric} \
+    -{help,int,children,tree,stats,bits,events,size,wm,shape,frame,all,english,metric} \
     '(-id -name)-root' \
     '(-id -root)-name:name: _x_window -n' \
     '(-name -root)-id:id: _x_window'
