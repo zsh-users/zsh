@@ -1,5 +1,9 @@
 2000-06-29  Sven Wischnowsky  <wischnow@zsh.org>
 
+	* 12114: Completion/Core/_main_complete, Doc/Zsh/compsys.yo: even
+ 	more fun with the menu style (no=num, yes=long-list, reverse
+ 	meaning of yes=num)
+	
 	* 12113: Completion/Core/_expand, Src/Zle/zle_tricky.c: quote
  	brace-strings
 	

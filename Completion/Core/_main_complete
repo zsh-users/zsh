@@ -170,8 +170,9 @@ if [[ $compstate[old_list] = keep || nm -gt 1 ]]; then
 
   _menu_style=( "$_menu_style[@]" "$_def_menu_style[@]" )
 
-  if [[ "$compstate[list]" = *list &&
-        -n "$_menu_style[(r)select=long-list]" && tmp -gt LINES ]]; then
+  if [[ "$compstate[list]" = *list && tmp -gt LINES &&
+        ( -n "$_menu_style[(r)select=long-list]" ||
+          -n "$_menu_style[(r)(yes|true|on|1)=long-list]" ) ]]; then
     compstate[insert]=menu
   elif [[ "$compstate[insert]" = "$_saved_insert" ]]; then
     if [[ -n "$_menu_style[(r)select=long]" && tmp -gt LINES ]]; then
@@ -180,28 +181,46 @@ if [[ $compstate[old_list] = keep || nm -gt 1 ]]; then
       sel=( "${(@M)_menu_style:#(yes|true|1|on)*}" )
 
       if (( $#sel )); then
-	min=9999999
+	min=0
         for i in "$sel[@]"; do
           if [[ "$i" = *\=* ]]; then
   	    num="${i#*\=}"
   	    [[ num -lt 0 ]] && num=0
   	  else
-  	    num=0
+  	    num=$nm
   	  fi
-  	  [[ num -lt min ]] && min="$num"
+  	  [[ num -gt min ]] && min="$num"
   
-	  (( min )) || break
+	  [[ min -ge nm ]] && break
         done
       fi
-      if [[ ( -n "$min" && nm -ge min ) ||
+      if [[ ( -n "$min" && nm -le min ) ||
             ( -n "$_menu_style[(r)auto*]" &&
               "$compstate[insert]" = automenu ) ]]; then
         compstate[insert]=menu
       elif [[ -n "$_menu_style[(r)auto*]" &&
               "$compstate[insert]" != automenu ]]; then
         compstate[insert]=automenu-unambiguous
-      elif [[ -n "$_menu_style[(r)(no|false|0|off)]" ]]; then
-        compstate[insert]=unambiguous
+      else
+        sel=( "${(@M)_menu_style:#(no|false|0|off)*}" )
+
+        if (( $#sel )); then
+	  min=9999999
+          for i in "$sel[@]"; do
+            if [[ "$i" = *\=* ]]; then
+  	      num="${i#*\=}"
+  	      [[ num -lt 0 ]] && num=0
+  	    else
+  	      num=0
+  	    fi
+  	    [[ num -lt min ]] && min="$num"
+  
+	    (( min )) || break
+          done
+        else
+          min=
+        fi
+        [[ -n "$min" && nm -ge min ]] && compstate[insert]=unambiguous
       fi
     fi
   fi
