@@ -44,11 +44,11 @@ mod_export Eprog sigfuncs[VSIGCOUNT];
 /* Variables used by signal queueing */
 
 /**/
-int queueing_enabled, queue_front, queue_rear;
+mod_export int queueing_enabled, queue_front, queue_rear;
 /**/
-int signal_queue[MAX_QUEUE_SIZE];
+mod_export int signal_queue[MAX_QUEUE_SIZE];
 /**/
-sigset_t signal_mask_queue[MAX_QUEUE_SIZE];
+mod_export sigset_t signal_mask_queue[MAX_QUEUE_SIZE];
 
 /* This is only used on machines that don't understand signal sets.  *
  * On SYSV machines this will represent the signals that are blocked *
