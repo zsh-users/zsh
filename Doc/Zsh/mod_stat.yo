@@ -1,12 +1,14 @@
-texinode(The stat Module)(The zle Module)(The sched Module)(Zsh Modules)
-sect(The stat Module)
-The tt(stat) module makes available one builtin command:
+COMMENT(!MOD!zsh/stat
+A builtin command interface to the tt(stat) system call.
+!MOD!)
+The tt(zsh/stat) module makes available one builtin command:
 
 startitem()
 findex(stat)
 cindex(files, listing)
 cindex(files, examining)
-item(tt(stat) [ tt(-gnNlLtTrs) ] [ tt(-f) var(fd) ] [ tt(-A) var(array) ] \
+item(tt(stat) [ tt(-gnNolLtTrs) ] [ tt(-f) var(fd) ] \
+    [ tt(-H) var(hash) ] [ tt(-A) var(array) ] \
     [ tt(-F) var(fmt) ] [ tt(PLUS())var(element) ] [ var(file) ... ])(
 The command acts as a front end to the tt(stat) system call (see
 manref(stat)(2)).
@@ -84,12 +86,17 @@ item(tt(-A) var(array))(
 Instead of displaying the results on standard
 output, assign them to an var(array), one tt(struct stat) element per array
 element for each file in order.  In this case neither the name
-of the element nor the name of the files is provided unless the
-tt(-t) or tt(-n) options are provided, respectively.  In the
-former case the element name appears as a prefix to the
-appropriate array element and in the latter case the file name
+of the element nor the name of the files appears in var(array) unless the
+tt(-t) or tt(-n) options were given, respectively.  If tt(-t) is given,
+the element name appears as a prefix to the
+appropriate array element; if tt(-n) is given, the file name
 appears as a separate array element preceding all the others.
 Other formatting options are respected.
+)
+item(tt(-H) var(hash))(
+Similar to tt(-A), but instead assign the values to var(hash).  The keys
+are the elements listed above.  If the tt(-n) option is provided then the
+name of the file is included in the hash with key tt(name).
 )
 item(tt(-f) var(fd))(
 Use the file on file descriptor var(fd) instead of
@@ -121,6 +128,13 @@ than one file in the list.
 )
 item(tt(-N))(
 Never show the names of files.
+)
+item(tt(-o))(
+If a raw file mode is printed, show it in octal, which is more useful for
+human consumption than the default of decimal.  A leading zero will be
+printed in this case.  Note that this does not affect whether a raw or
+formatted file mode is shown, which is controlled by the tt(-r) and tt(-s)
+options, nor whether a mode is shown at all.
 )
 item(tt(-r))(
 Print raw data (the default format) alongside string

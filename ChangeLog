@@ -1,3 +1,8 @@
+2000-04-07  Peter Stephenson  <pws@pwstephenson.fsnet.co.uk>
+
+	* 10584: Doc/Zsh/mod_stat.yo, Src/Modules/stat.c: -o shows
+	numeric file modes in octal.
+
 2000-04-07  Bart Schaefer <schaefer@zsh.org>
 
 	* 10582: Src/exec.c: Apply STTY only to process group leaders.
