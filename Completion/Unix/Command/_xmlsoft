@@ -28,7 +28,7 @@ case $service in
       ':file:_files -g \*.xml' && return
   ;;
   xmllint)
-    local curcontext="$curcontext" state line encoding
+    local -a encoding
 
     encoding=(
       UTF-8
