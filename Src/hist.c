@@ -924,14 +924,15 @@ putoldhistentryontop(short keep_going)
 	if (!keep_going)
 	    max_unique_ct = getiparam("SAVEHIST");
 	do {
-	    if (max_unique_ct-- <= 0) {
+	    if (max_unique_ct-- <= 0 || he == hist_ring) {
 		max_unique_ct = 0;
 		he = hist_ring->down;
+		next = hist_ring;
 		break;
 	    }
 	    he = next;
 	    next = he->down;
-	} while (he != hist_ring->down && !(he->flags & HIST_DUP));
+	} while (!(he->flags & HIST_DUP));
     }
     if (he != hist_ring->down) {
 	he->up->down = he->down;
