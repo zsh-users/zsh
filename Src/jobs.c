@@ -890,7 +890,7 @@ waitforpid(pid_t pid)
 
 /**/
 static void
-waitjob(int job, int sig)
+zwaitjob(int job, int sig)
 {
     Job jn = jobtab + job;
 
@@ -937,7 +937,7 @@ waitjobs(void)
     Job jn = jobtab + thisjob;
 
     if (jn->procs)
-	waitjob(thisjob, 0);
+	zwaitjob(thisjob, 0);
     else {
 	deletejob(jn);
 	pipestats[0] = lastval;
@@ -1276,7 +1276,7 @@ bin_fg(char *name, char **argv, char *ops, int func)
 	} else {   /* Must be BIN_WAIT, so wait for all jobs */
 	    for (job = 0; job != MAXJOB; job++)
 		if (job != thisjob && jobtab[job].stat)
-		    waitjob(job, SIGINT);
+		    zwaitjob(job, SIGINT);
 	    return 0;
 	}
     }
@@ -1367,7 +1367,7 @@ bin_fg(char *name, char **argv, char *ops, int func)
 		killjb(jobtab + job, SIGCONT);
 	    }
 	    if (func == BIN_WAIT)
-		waitjob(job, SIGINT);
+		zwaitjob(job, SIGINT);
 	    if (func != BIN_BG) {
 		waitjobs();
 		retval = lastval2;

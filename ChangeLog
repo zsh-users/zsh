@@ -1,3 +1,8 @@
+2000-12-06  Peter Stephenson  <pws@csr.com>
+
+	* unposted: Src/jobs.c: rename waitjob() to zwaitjob() to avoid
+	clash with IRIX system function.
+
 2000-12-06  Andrej Borsenkow <Andrej.Borsenkow@mow.siemens.ru>
 
 	* 13243: Makefile.in: we do not use Makefile in Completion and
