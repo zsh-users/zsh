@@ -479,11 +479,26 @@ scanner(Complist q)
 	    /* Not the last path section. Just add it to the path. */
 	    int oppos = pathpos;
 
-	    if (!errflag && !(q->closure && !strcmp(str, "."))) {
-		addpath(str);
-		if (!closure || !statfullpath("", NULL, 1))
-		    scanner((q->closure) ? q : q->next);
-		pathbuf[pathpos = oppos] = '\0';
+	    if (!errflag) {
+		int add = 1;
+
+		if (q->closure && *pathbuf) {
+		    if (!strcmp(str, "."))
+			add = 0;
+		    else if (!strcmp(str, "..")) {
+			struct stat sc, sr;
+
+			add = (stat("/", &sr) || stat(pathbuf, &sc) ||
+			       sr.st_ino != sc.st_ino ||
+			       sr.st_dev != sc.st_dev);
+		    }
+		}
+		if (add) {
+		    addpath(str);
+		    if (!closure || !statfullpath("", NULL, 1))
+			scanner((q->closure) ? q : q->next);
+		    pathbuf[pathpos = oppos] = '\0';
+		}
 	    }
 	} else
 	    insert(str, 0);
