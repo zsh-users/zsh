@@ -1537,7 +1537,7 @@ zglob(LinkList list, LinkNode np, int nountok)
 		newquals->next = quals;
 		quals = qn;
 	    }
-	} else
+	} else if (newquals)
 	    quals = newquals;
     }
     q = parsepat(str);

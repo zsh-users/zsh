@@ -1,5 +1,8 @@
 2002-01-22  Peter Stephenson  <pws@csr.com>
 
+	* 16487: Src/glob.c: bug in 16486 when a qualifier in a set
+	consisted only of flags which were handled globally.
+
 	* 16486: Doc/Zsh/expn.yo, Src/glob.c, Src/pattern.c:  support
 	(#q...) EXTENDED_GLOB syntax for qualifiers.  May be chained,
 	ignored by pattern matching code.
