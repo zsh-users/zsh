@@ -1,0 +1,11 @@
+# Wait for given number of seconds, reading any data from
+# all TCP connections while doing so.
+
+typeset -F SECONDS to end
+
+(( to = $1, end = SECONDS + to ))
+while (( SECONDS < end )); do
+  tcp_read -a -T $to
+  (( to = end - SECONDS ))
+done
+return

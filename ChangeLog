@@ -1,5 +1,13 @@
 2003-02-06  Peter Stephenson  <pws@csr.com>
 
+	* 18202: Functions/TCP/*, Doc/Makefile.in, Doc/zsh.yo,
+	Doc/zshtcpsys.yo, Doc/Zsh/manual.yo, Doc/Zsh/modules.yo,
+	Doc/zsh/tcpsys.yo, Doc/Zsh/zftpsys.yo, Src/Modules/tcp.c,
+	Src/Modules/tcp.mdd:  New set of TCP functions tcp_* which
+	run on top of ztcp, documented in zshtcpsys manual.  Also
+	sneaked in more informative error message in zsh/net/tcp
+	for failure to bind to a port.
+
 	* Greg Klanderman <gak@klanderman.net>: 18191:
 	Src/Zle/compresult.c: `compctl -y' didn't obey the listpacked
 	and listrowsfirst options.

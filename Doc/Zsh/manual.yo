@@ -33,6 +33,7 @@ menu(Completion Widgets)
 menu(Completion System)
 menu(Completion Using compctl)
 menu(Zsh Modules)
+menu(TCP Function System)
 menu(Zftp Function System)
 menu(User Contributions)
 
@@ -136,6 +137,13 @@ menu(Example)
 Zsh Modules
 
 includefile(Zsh/manmodmenu.yo)
+
+TCP Function System
+
+menu(TCP Functions)
+menu(TCP Parameters)
+menu(TCP Examples)
+menu(TCP Bugs)
 
 Zftp Function System
 

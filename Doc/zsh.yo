@@ -63,6 +63,7 @@ ifnzman(includefile(Zsh/compwid.yo))
 ifnzman(includefile(Zsh/compsys.yo))
 ifnzman(includefile(Zsh/compctl.yo))
 ifnzman(includefile(Zsh/modules.yo))
+ifnzman(includefile(Zsh/tcpsys.yo))
 ifnzman(includefile(Zsh/zftpsys.yo))
 ifnzman(includefile(Zsh/contrib.yo))
 ifzshall(\
@@ -78,6 +79,7 @@ source(zshcompwid)
 source(zshcompsys)
 source(zshcompctl)
 source(zshmodules)
+source(zshtcpsys)
 source(zshzftpsys)
 source(zshcontrib)
 manpage(ZSHALL)(1)(date())(zsh version())

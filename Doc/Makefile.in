@@ -47,7 +47,7 @@ TEXI2HTML = texi2html -expand info -split chapter
 # man pages to install
 MAN = zsh.1 zshbuiltins.1 zshcompctl.1 zshcompwid.1 zshcompsys.1 \
 zshcontrib.1 zshexpn.1 zshmisc.1 zshmodules.1 \
-zshoptions.1 zshparam.1 zshzftpsys.1 zshzle.1 zshall.1
+zshoptions.1 zshparam.1 zshtcpsys.1 zshzftpsys.1 zshzle.1 zshall.1
 
 # yodl documentation
 
@@ -72,7 +72,7 @@ Zsh/filelist.yo Zsh/files.yo Zsh/func.yo Zsh/grammar.yo Zsh/manual.yo \
 Zsh/index.yo Zsh/intro.yo Zsh/invoke.yo Zsh/jobs.yo Zsh/metafaq.yo \
 Zsh/modules.yo Zsh/modlist.yo Zsh/modmenu.yo Zsh/manmodmenu.yo $(MODDOCSRC) \
 Zsh/options.yo Zsh/params.yo Zsh/prompt.yo Zsh/redirect.yo Zsh/restricted.yo \
-Zsh/seealso.yo Zsh/zftpsys.yo Zsh/zle.yo
+Zsh/seealso.yo Zsh/tcpsys.yo Zsh/zftpsys.yo Zsh/zle.yo
 
 # ========== DEPENDENCIES FOR BUILDING ==========
 
@@ -181,6 +181,8 @@ zshmodules.1: Zsh/modules.yo Zsh/modlist.yo Zsh/modmenu.yo $(MODDOCSRC)
 zshoptions.1: Zsh/options.yo
 
 zshparam.1: Zsh/params.yo
+
+zshtcpsys.1: Zsh/tcpsys.yo
 
 zshzftpsys.1: Zsh/zftpsys.yo
 

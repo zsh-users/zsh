@@ -1,0 +1,35 @@
+local line name=${tcp_by_fd[$1]}
+if [[ -n $name ]]
+then
+  local TCP_INVALIDATE_ZLE
+  if (( $# > 2 )); then
+    zle -I
+    ## debugging only
+    # print "Flags on the play:" ${argv[3,-1]}
+  else
+    TCP_INVALIDATE_ZLE=1
+  fi
+  if ! tcp_read -d -u $1; then
+    [[ -n $TCP_INVALIDATE_ZLE ]] && zle -I
+    print "[TCP fd $1 (session $name) gone awol; removing from poll list]" >& 2
+    zle -F $1
+    return 1
+  fi
+  return 0
+else
+  zle -I
+  # Handle fds not in the TCP set similarly.
+  # This does the drain thing, to try and get as much data out as possible.
+  if ! read line <&$1; then
+    print "[Reading on $1 failed; removing from poll list]" >& 2
+    zle -F $1
+    return 1
+  fi
+  line="fd$1:$line"
+  local newline
+  while read -t newline <&$1; do
+    line="${line}
+fd$1:$newline"
+  done
+fi
+print -r - $line
