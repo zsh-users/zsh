@@ -1105,9 +1105,9 @@ histwgetfn(Param pm)
     int i = addhistnum(curhist, -1, HIST_FOREIGN), iw;
     Histent he = gethistent(i, GETHIST_UPWARD);
 
-    ll = bufferwords(NULL, NULL, NULL);
-    for (n = firstnode(ll); n; incnode(n))
-	pushnode(l, getdata(n));
+    if ((ll = bufferwords(NULL, NULL, NULL)))
+        for (n = firstnode(ll); n; incnode(n))
+            pushnode(l, getdata(n));
 
     while (he) {
 	for (iw = he->nwords - 1; iw >= 0; iw--) {

@@ -1833,7 +1833,7 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int ssub)
 	} else
 	    list = bufferwords(NULL, val, NULL);
 
-	if (!firstnode(list))
+	if (!list || !firstnode(list))
 	    val = dupstring("");
 	else if (!nextnode(firstnode(list)))
 	    val = getdata(firstnode(list));

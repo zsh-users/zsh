@@ -549,13 +549,13 @@ copyprevshellword(char **args)
     int i;
     char *p = NULL;
 
-    l = bufferwords(NULL, NULL, &i);
+    if ((l = bufferwords(NULL, NULL, &i)))
+        for (n = firstnode(l); n; incnode(n))
+            if (!i--) {
+                p = getdata(n);
+                break;
+            }
 
-    for (n = firstnode(l); n; incnode(n))
-	if (!i--) {
-	    p = getdata(n);
-	    break;
-	}
     if (p) {
 	int len = strlen(p);
 
