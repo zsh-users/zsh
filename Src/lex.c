@@ -993,8 +993,12 @@ gettokstr(int c, int sub)
 	    c = Outbrack;
 	    break;
 	case LX2_INPAR:
-	    if ((sub || in_brace_param) && isset(SHGLOB))
-		break;
+	    if (isset(SHGLOB)) {
+		if (sub || in_brace_param)
+		    break;
+		if (incasepat && !len)
+		    return INPAR;
+	    }
 	    if (!in_brace_param) {
 		if (!sub) {
 		    e = hgetc();
