@@ -46,7 +46,7 @@ top level Makefile.
 Dynamic loading
 ---------------
 
-Zsh-3.1 has support for dynamically loadable modules.  This is now enabled
+Zsh has support for dynamically loadable modules.  This is now enabled
 by default; to disable it, run configure with the --disable-dynamic option.
 Note that dynamic loading does not work on all systems.  On these systems
 this option will have no effect.  When dynamic loading is enabled, major
