@@ -18,7 +18,6 @@ if (( $# )); then
 
   [[ "$1" = -(|-) ]] && shift
 
-
   if _style -a '' group-order order; then
     local name
 

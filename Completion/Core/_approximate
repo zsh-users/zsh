@@ -5,8 +5,7 @@
 # shown in a list and one can cycle through them as in a menucompletion
 # or get the corrected prefix.
 
-local _comp_correct _correct_prompt comax
-local cfgacc cfgorig cfgps cfgins
+local _comp_correct _correct_expl comax cfgacc
 local curcontext="${curcontext}" oldcontext
 
 # Only if all global matchers have been tried.
@@ -22,9 +21,6 @@ local curcontext="${curcontext}" oldcontext
 oldcontext="$curcontext"
 
 _style -s '' max-errors cfgacc
-_style -s '' original cfgorig
-_style -s '' prompt cfgps
-_style -s '' insert cfgins
 
 # Get the number of errors to accept.
 
@@ -44,6 +40,8 @@ fi
 
 [[ "$comax" -lt 1 ]] && return 1
 
+_tags corrections original
+
 # Otherwise temporarily define functions to use instead of
 # the builtins that add matches. This is used to be able
 # to stick the `(#a...)' into the right place (after an
@@ -58,11 +56,7 @@ compadd() {
   else
     PREFIX="(#a${_comp_correct})$PREFIX"
   fi
-  if [[ -n "$_correct_prompt" ]]; then
-    builtin compadd -X "$_correct_prompt" -J corrections "$@"
-  else
-    builtin compadd -J corrections "$@"
-  fi
+  builtin compadd "$_correct_expl[@]" "$@"
 }
 
 # Now initialise our counter. We also set `compstate[matcher]'
@@ -76,39 +70,28 @@ compadd() {
 _comp_correct=1
 compstate[matcher]=-1
 
-_correct_prompt="${cfgps//\\%e/1}"
-
-_setup corrections
-
-[[ "$cfgorig" != *last* ]] && builtin compadd -V original
-builtin compadd -J corrections
-
 [[ -z "$compstate[pattern_match]" ]] && compstate[pattern_match]='*'
 
 while [[ _comp_correct -le comax ]]; do
   curcontext="${oldcontext}:$_comp_correct"
 
-  if _complete; then
-    if [[ "$cfgins" = unambig* &&
-          "${#compstate[unambiguous]}" -ge "${#:-$PREFIX$SUFFIX}" ]]; then
-      compstate[pattern_insert]=unambiguous
-    elif [[ compstate[nmatches] -gt 1 || "$cfgorig" = *always* ]]; then
-      local expl format
+  _description corrections _correct_expl corrections \
+               "e:$_comp_correct" "o:$PREFIX$SUFFIX"
 
-      if [[ "$cfgorig" = *show* ]]; then
-        if _style -s descriptions format format; then
-	  expl=(-X "${format//\\%d/original}")
-        else
-	  expl=()
-        fi
-      else
-        expl=(-n)
-      fi
-      _setup original
-      builtin compadd "$expl[@]" -U -V original -Q - "$PREFIX$SUFFIX"
+  if _complete; then
+    if _style '' insert-unambiguous &&
+       [[ "${#compstate[unambiguous]}" -ge "${#:-$PREFIX$SUFFIX}" ]]; then
+      compstate[pattern_insert]=unambiguous
+    elif _requested original &&
+         ( [[ compstate[nmatches] -gt 1 ]] || _style '' original ); then
+      local expl
+
+      _description -V original expl original
+
+      builtin compadd "$expl[@]" -U -Q - "$PREFIX$SUFFIX"
 
       # If you always want to see the list of possible corrections,
-      # set `compstate[list]=list' here.
+      # set `compstate[list]=list force' here.
 
       [[ "$compstate[list]" != list* ]] &&
           compstate[list]="$compstate[list] force"
@@ -121,8 +104,6 @@ while [[ _comp_correct -le comax ]]; do
 
   [[ "${#:-$PREFIX$SUFFIX}" -le _comp_correct+1 ]] && break
   (( _comp_correct++ ))
-
-  _correct_prompt="${cfgps//\\%e/$_comp_correct}"
 done
 
 compstate[matcher]="$compstate[total_matchers]"

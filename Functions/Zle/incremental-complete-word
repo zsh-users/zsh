@@ -16,7 +16,7 @@ incremental-complete-word() {
   #emulate -L zsh
   unsetopt autolist menucomplete automenu # doesn't work well
 
-  local key lbuf="$LBUFFER" rbuf="$RBUFFER" pmpt word
+  local key lbuf="$LBUFFER" rbuf="$RBUFFER" pmpt pstr word
   local lastl lastr wid twid num alt post toolong
   local curcontext="${curcontext}:incremental" stop brk
 
@@ -51,7 +51,9 @@ incremental-complete-word() {
     word="${_lastcomp[unambiguous]}"
     state=''
   fi
-  zle -R "${${${${${${pmpt//\\%u/$word}//\\%s/$state}//\\%c/${_lastcomp[completer][2,-1]}}//\\%n/$num}//\\%a/$alt}//\\%l/$toolong}"
+  compfmt pstr "$pmpt" "u:${word}" "s:$state" "n:$num" "a:$alt" \
+                       "l:$toolong" "c:${_lastcomp[completer][2,-1]}"
+  zle -R "$pstr"
   read -k key
 
   while [[ '#key' -ne '#\\r' && '#key' -ne '#\\n' &&
@@ -97,7 +99,9 @@ incremental-complete-word() {
       word="${_lastcomp[unambiguous]}"
       state=''
     fi
-    zle -R "${${${${${${pmpt//\\%u/$word}//\\%s/$state}//\\%c/${_lastcomp[completer][2,-1]}}//\\%n/$num}//\\%a/$alt}//\\%l/$toolong}"
+    compfmt pstr "$pmpt" "u:${word}" "s:$state" "n:$num" "a:$alt" \
+                       "l:$toolong" "c:${_lastcomp[completer][2,-1]}"
+    zle -R "$pstr"
     read -k key
   done
 

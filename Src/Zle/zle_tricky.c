@@ -1815,7 +1815,7 @@ printfmt(char *fmt, int n, int dopr, int doesc)
 			tcout(TCUNDERLINEEND);
 		    break;
 		case '{':
-		    for (p++; *p && (*p != '%' || p[1] != '}'); p++, cc++)
+		    for (p++; *p && (*p != '%' || p[1] != '}'); p++)
 			if (dopr)
 			    putc(*p, shout);
 		    if (*p)

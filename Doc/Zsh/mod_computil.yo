@@ -24,6 +24,13 @@ innermost quoting level.
 
 The return value is non-zero in case of an error and zero otherwise.
 )
+item(tt(compfmt) var(name) var(string) var(defs) ...)(
+The var(defs) ar of the form `var(char)tt(;)var(string)' and
+tt(compfmt) will replace every occurance of the sequence
+`tt(%)var(char)' for each of the var(char)s with the corresponding
+var(string). The resulting string will be placed in the parameter
+var(name).
+)
 item(tt(compdisplay) var(name) var(string) var(defs) ...)(
 The var(defs) are strings which should be of the form
 `var(str)tt(:)var(descr)' (the intended use is that the var(descr)

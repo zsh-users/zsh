@@ -844,6 +844,15 @@ string to display above matches in completion lists. The sequence
 what these matches are. This string may also contain the sequences to
 specify output attributes, such as `tt(%b)' and `tt(%s)'.
 
+For the same purpose, this style is also tested with the tags used
+when matches are generated em(before it is tested for the
+tt(descriptions) tag). This gives the possibility to define different
+format strings for different types of matches.
+
+Not also that some completer functions define additional
+`tt(%)'-sequences. These are described for the completer function that 
+make use of them.
+
 For the tt(messages) tag, this defines a string used by some
 completion functions to display messages. Here, the `tt(%d)' is
 replaced with the message given by the completion function.
@@ -907,6 +916,18 @@ A style holding the names of the groups that should be completed. If
 this is not set by the user, the group names from the YP database or
 the file `tt(/etc/group)' will be used.
 )
+item(tt(hidden))(
+If this is set to one of the `true' values, the matches for the tags
+for which this is set will not appear in the list, only the
+description for the matches as set with the tt(format) style will be
+shown. If this is set to tt(all), not even the description will be
+displayed.
+
+Note that the matches will still be completed, they are just not shown 
+in the list. To avoid having some matches to considered possible
+completions one can modify the tt(_sort_tags) function as described
+above.
+)
 item(tt(hosts))(
 A style holding the names of hosts that should be completed. If this
 is not set by the user the hostnames in `tt(/etc/hosts)' will be used.
@@ -929,8 +950,8 @@ filenames to ignore. The matches ignored will only be completed when
 there are no other matches.
 )
 item(tt(insert-unambiguous))(
-This is used by the tt(_match) completer function. If it is set to
-`true', the tt(_completer) will start menu
+This is used by the tt(_match) and tt(_approximate) completer
+functions. If it is set to `true', the completer will start menu
 completion only if no unambiguous string could be generated that is at
 least as long as the original string from the line.
 )
@@ -969,7 +990,7 @@ tt(_oldlist), it will instead show the list of corrections already
 generated.
 
 As another example consider the tt(_match) completer: with the
-tt(insert) style set to tt(unambig) it inserts only an
+tt(insert-unambiguous) style set to `true' it inserts only an
 unambiguous prefix string if there is any. But since this may remove
 parts of the original pattern, attempting completion again may result
 in more matches than on the first attempt. But by using the
@@ -1054,22 +1075,7 @@ correcting completion with two errors will usually be performed, but if a
 numeric argument is given, correcting completion will not be performed.
 )
 item(tt(menu))(
-This is used by the tt(_expand) completer. If it is unset or set to
-an empty value, the words resulting from expansion (if any) will
-simply be inserted in the command line, replacing the original
-string. However, if this style is set to a non-empty value, the user
-can cycle through the expansions as in menucompletion. Unless the value
-contains the string `tt(only)', the user will still be offered all
-expansions at once as one of the strings to insert in the command
-line; normally, this possibility is offered first, but if the value
-contains the string `tt(last)', it is offered last. Also, if the
-value contains the string `tt(sort)', the expansions will be sorted
-alphabetically, normally they are kept in the order the expansion
-produced them in. And finally, if the value contains the string
-`tt(show-all)', the string of all words will be shown in the list of
-expansions.
-
-The tt(_oldlist) completer uses this, too. Here it controls how menu
+This is used by the tt(_oldlist) completer. It controls how menu
 completion behaves when a completion has already been inserted and the
 user types a standard completion key type such as tt(TAB). The default
 behaviour of tt(_oldlist) is that menu completion always continues
@@ -1085,32 +1091,13 @@ appears.  With tt(_oldlist), it will instead continue to cycle through the
 list of completions.
 )
 item(tt(original))(
-In the tt(_approximate) completer this style is used to specify
-whether the original string on which correcting completion was
-attempted is to be included in the list of possible corrections. If it
-is set to any non-empty value, the original string will be offered
-when cycling through the completions. Normally it will appear as the
-first string, so that the command line does not change immediately;
-consecutive completion attempts will cycle through the corrected
-strings.  If the value for this style contains the string `tt(last)',
-the original string will be the last one in the list, so that it
-appears just before wrapping around to the first corrected string
-again.  Also, if the value contains the string `tt(always)', the
-original string will always be included; normally it is included only
-if more than one possible correction was generated. And finally, if
-the value contains the string `tt(show)', the original string will
-be shown in the list of corrections.
+This is used by the tt(_approximate) and tt(_match) completers. The
+first one uses it to decide if the original string should be added as
+one possible completion. Normally, this is done only if there at least 
+two possible corrections, but if this style is set to `true', it will
+always be added.
 
-For the tt(_expand) completer function, if this is set to an non-empty
-string, the original string from the line will be included in the list
-of strings the user can cycle through as in a menucompletion. If the
-value contains the string `tt(last)', the original string will
-appear as the last string, with other values it is inserted as the
-first one (so that the command line does not change
-immediately). Also, if the value contains the string `tt(show)',
-the original string will be shown in the list of expansions.
-
-Finally, for the tt(_match) completer, if this style is set to
+For the tt(_match) completer, if this style is set to
 `tt(only)', it will try to generate matches without inserting a
 `tt(*)' at the cursor position. If set to any other non-empty value,
 it will first try to generate matches without inserting the `tt(*)'
@@ -1149,18 +1136,7 @@ matches. E.g. for options this means that the `tt(-)', `tt(+)', or
 all.
 )
 item(tt(prompt))(
-The tt(approximate) completer uses the value of this style as a string
-to be displayed on top of the corrected strings generated when cycling
-through them. This string may contain the control sequences `tt(%n)',
-`tt(%B)', etc. known from the `tt(-X)' option of tt(compadd). Also,
-the sequence `tt(%e)' will be replaced by the number of errors
-accepted to generate the corrected  strings.
-
-The tt(_expand) completer uses it for the same purpose, but here the
-sequence `tt(%o)' will be replaced by the original string from the
-line.
-
-Also, the tt(incremental-complete-word) widget shows the value of this
+The tt(incremental-complete-word) widget shows the value of this
 style in the status line during incremental completion. The sequence
 `tt(%u)' is replaced by the unambiguous part of all matches if there
 is any and it is different from the word on the line. A `tt(%s)' is
@@ -1189,6 +1165,12 @@ If set to `true', completion functions that generate words from the
 history as possible matches sort these words alphabetically instead of
 keeping them in the order in which they appear in the history (from
 youngest to oldest).
+
+This is also used by the tt(_expand) completer. Here, if it is set to
+`true', the expansions generated will always be sorted. If it is set
+to tt(menu), then the expansions are only sorted when they are offered 
+as single strings (not in the string containing all possible
+expansions).
 )
 item(tt(stop))(
 If set to a non-empty string, the tt(_history_complete_word) bindable
@@ -1398,10 +1380,12 @@ normal completion doesn't yield any possible completions. When
 corrected completions are found, the completer will normally start
 menucompletion allowing you to cycle through these strings.
 
-The exact behavior of this completer can be changed by using the
-styles tt(max-errors), tt(original), tt(prompt), and tt(insert), see
-ifzman(the section `Completion System Configuration' above)\
-ifnzman(noderef(Completion System Configuration)).
+This completer uses the tags tt(corrections) and tt(original) when
+generating the possible coprrections and the original string. The
+tt(format) style for the former may contain the additional seuqences
+`tt(%e)' and `tt(%o)' which will be replaced by the number of errors
+accepted to generate the corrections and the original string,
+respectively.
 
 Like all completers tt(_approximate) uses its name without the
 undersccore as the top-level context name. Once it has started trying
@@ -1450,7 +1434,7 @@ value, this completer will first try to generate matches without, then
 with a `tt(*)' inserted at the cursor position.
 
 The generated matches will be offered in a menucompletion unless the
-tt(insert) style is set to a string starting with `tt(unambig)'. In
+tt(insert-unambiguous) style is set to `true'. In
 this case menucompletion will only be started if no unambiguous string
 could be generated that is at least as long as the original string.
 
@@ -1467,11 +1451,17 @@ will expand the string on the line before the completion widget is
 called. Also, this completer should be called before the tt(_complete) 
 completer function.
 
-Control over how the expanded string will be treated is possible with the 
-tt(substitute), tt(glob), tt(menu), tt(original), and tt(prompt)
-styles, see
-ifzman(the section `Completion System Configuration' above)\
-ifnzman(noderef(Completion System Configuration)).
+The tags used when generating expansions are tt(all-expansions) for
+the string containing all possible expansions, tt(expansions) when
+adding the possible expansions as single matches and tt(original) when 
+adding the original string from the line. In which order these strings 
+are generated and which of these strings are generated at all can be
+controlled by using the tt(group-order) style and by modifying the
+tt(_sort_tags) function, as usual.
+
+The format string for tt(all-expansions) and for tt(expansions) may
+contain the sequence `tt(%o)' which will be replaced by the original
+string from the line.
 
 In a different mode selected by the tt(completions) style, all
 em(completions) generated for the string on the line are inserted.
@@ -1639,27 +1629,35 @@ one can write a pattern completion function that keeps other functions
 from being tried simply by setting this parameter to any value.
 )
 item(tt(_description))(
-This function gets two or three arguments: a group name,
-the name of an array and a
-string. It tests if the style tt(format) for the tt(descriptions) tag is
-set and if it is, it stores some options in the array that can then be 
-given to the tt(compadd) builtin command to make the
-value of the tt(format) style for the tt(descriptions) tag (with the
-sequence `tt(%d)' replaced by the string given as the last argument)
-be displayed above the matches added. These options also will make
-sure that the matches are placed in a separate group if the style
-tt(group) for the tt(matches) tag is set to `true'. The first argument 
-will be used as the name of the group and should in most cases be the
-name of a tag. Normally a sorted
-group will be used for this (with the `tt(-J)' option), but if a
-option starting with `tt(-V)' or `tt(-J)' is given, that option will
-be included in the array, so that it is possible to make the group
-unsorted by giving the option `tt(-V)', `tt(-V1)', or `tt(-V2)'.
+The first three arguments to this function are: a group name,
+the name of an array and a string. It tests if some styles for the tag 
+and stores options usable for tt(compadd) in the array which guarantee 
+that the matches are generated as requested by the user. The styles
+tested are: tt(format) (which is first tested for the given tag and
+then for the tt(descriptions) tag if that isn't defined), tt(hidden)
+and tt(group-name) (the last two are tested only for the tag given as
+the first argument). This function also calls the tt(_setup) function
+which tests some more styles.
+
+The format string from the style (if any) will be modified so that the 
+sequence `tt(%d)' is replaced by the string given as the third
+argument. If tt(_description) is called with more than three
+arguments, these extra arguments should be of the form
+`var(char)tt(:)var(str)' and every appearance of `tt(%)var(char)' in
+the format string will be replaced by var(string).
+
+These options placed in the array will also make sure that the matches
+are placed in a separate group, depending on the value of the
+tt(group-name) style. Normally a sorted group will be used for this
+(with the `tt(-J)' option), but if a option starting with `tt(-V)' or
+`tt(-J)' is given, that option will be included in the array, so that
+it is possible to make the group unsorted by giving the option
+`tt(-V)', `tt(-V1)', or `tt(-V2)'. 
 
 In most cases, this function will be used like this:
 
 example(local expl
-_description expl file  # same as `files expl file'
+_description expl files file
 compadd "$expl[@]" - "$files[@]")
 )
 item(tt(_message))(

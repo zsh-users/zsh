@@ -2810,6 +2810,50 @@ bin_comptry(char *nam, char **args, char *ops, int func)
     return 0;
 }
 
+static char *
+fmtstr(char *str, char c, char *repl)
+{
+    int len, num, rlen;
+    char *s, *ret, *rp;
+
+    len = strlen(str);
+    rlen = strlen(repl);
+
+    for (num = 0, s = str; *s; s++)
+	if (*s == '%' && s[1] == c)
+	    num++, s++;
+
+    ret = (char *) zhalloc((num * (rlen - 2)) + len + 1);
+
+    for (s = str, rp = ret; *s; s++) {
+	if (*s == '%' && s[1] == c) {
+	    strcpy(rp, repl);
+	    rp += rlen;
+	    s++;
+	} else
+	    *rp++ = *s;
+    }
+    *rp = '\0';
+
+    return ret;
+}
+
+static int
+bin_compfmt(char *nam, char **args, char *ops, int func)
+{
+    char *param = args[0], *str = args[1];
+
+    for (args += 2; *args; args++) {
+	if (args[0][1] != ':') {
+	    zerrnam(nam, "invalid argument `%s'", args[0], 0);
+	    return 1;
+	}
+	str = fmtstr(str, **args, *args + 2);
+    }
+    setsparam(param, ztrdup(str));
+    return 0;
+}
+
 static struct builtin bintab[] = {
     BUILTIN("compdisplay", 0, bin_compdisplay, 2, -1, 0, NULL, NULL),
     BUILTIN("compdescribe", 0, bin_compdescribe, 3, -1, 0, NULL, NULL),
@@ -2819,6 +2863,7 @@ static struct builtin bintab[] = {
     BUILTIN("compstyles", 0, bin_compstyles, 1, -1, 0, NULL, NULL),
     BUILTIN("comptags", 0, bin_comptags, 1, -1, 0, NULL, NULL),
     BUILTIN("comptry", 0, bin_comptry, 0, -1, 0, NULL, NULL),
+    BUILTIN("compfmt", 0, bin_compfmt, 2, -1, 0, NULL, NULL),
 };
 
 

@@ -7,10 +7,9 @@
 # the expansions done produce no result or do not change the original
 # word from the line.
 
-local exp word="$PREFIX$SUFFIX" group=-V expl expl2 disp orig menu prompt
-local curcontext="${curcontext}" expr descr
+local exp word="$PREFIX$SUFFIX" sort expr expl curcontext="${curcontext}"
 
-[[ "$curcontext" != :correct* ]] && curcontext="${curcontext}:correct"
+[[ "$curcontext" != :expand* ]] && curcontext="${curcontext}:expand"
 
 # First, see if we should insert all *completions*.
 
@@ -49,97 +48,34 @@ _style -s '' glob expr && [[ "${(e):-\$[$expr]}" -eq 1 ]] &&
 [[ $#exp -eq 0 ||
    ( $#exp -eq 1 && "$exp[1]" = "$word"(|\(N\)) ) ]] && return 1
 
-# Get the options for adding the original string and `all'-string.
+# Now add as matches whatever the user requested.
 
-_style -s '' original orig
-_style -s '' menu menu
-_style -s '' prompt prompt
-_style -s descriptions format descr
+_style -s '' sort sort
 
-if [[ "$orig" = *show* ]]; then
-  if [[ -n "$descr" ]]; then
-    expl=(-X "${descr//\\%d/original}")
-  else
-    expl=()
-  fi
+[[ "$sort" = (yes|true|1|on) ]] && exp=( "${(@o)exp}" )
+
+if [[ -z "$compstate[insert]" ]] ;then
+  _description all-expansions expl 'all expansions' "o:$word"
+
+  compadd "$expl[@]" -UQ - "$exp"
 else
-  expl=(-n)
-fi
+  _tags all-expansions expansions original
 
-if [[ -n "$menu" && "$menu" != *only* && "$menu" = *show-all* ]]; then
-  if [[ -n "$descr" ]]; then
-    expl2=(-ld disp -X "${descr//\\%d/all words}")
-  else
-    expl2=(-ld disp )
-  fi
-  disp=( "$exp" )
-  if [[ ${#disp[1]} -gt COLUMNS-5 ]]; then
-    disp=( "${disp[1][1,COLUMNS-5]}..." )
-  fi
-else
-  expl2=(-n)
-fi
 
-# Quote the results and remove unnecessary quotes before `='s.
+  _requested all-expansions expl 'all expansions' "o:$word" &&
+      compadd "$expl[@]" -UQ "$exp"
 
-exp=( "${(@)${(@)${(@q)exp}//\\\\=/=}/#=/\\=}" )
-
-# We have expansions, should we menucomplete them?
-
-if [[ -z "$menu" ]]; then
-
-  # No, so if the user only wants a list, we add the strings
-  # separately. Otherwise we add the whole array as one string,
-  # probably also adding the original string.
-
-  if [[ -z "$compstate[insert]" ]]; then
-    _setup all-expansions
-    compadd -U -V all-expansions -Q - "$exp[@]"
-  else
-    if [[ -n "$orig" && "$orig" != *last* ]]; then
-      _setup original
-      compadd "$expl[@]" -UQ -V original - "$word"
+  if _requested expansions; then
+    if [[ "$sort" = menu ]]; then
+      _description expansions expl expansions "o:$word"
+    else
+      _description -V expansions expl expansions "o:$word"
     fi
-    _setup expansions
-    compadd -UQ -V expansions - "$exp"
+    compadd "$expl[@]" -UQ - "$exp[@]"
+  fi
 
-    if [[ -n "$orig" && "$orig" = *last* ]]; then
-      _setup original
-      compadd "$expl[@]" -UQ -V original - "$word"
-    fi
-    compstate[insert]=menu
-  fi
-else
-  # Sorting? We just use a different group type then.
+  _requested original expl original && compadd "$expl[@]" -UQ - "$word"
 
-  [[ "$menu" = *sort* ]] && group=-J
-
-  # Now add the expansion string, probably also adding the original
-  # and/or the string containing all expanded string.
-
-  if [[ -n "$orig" && "$orig" != *last* ]]; then
-    _setup original
-    compadd "$expl[@]" -UQ -V original - "$word"
-  fi
-  if [[ $#exp -ne 1 && "$menu" = *last* && "$menu" != *only* ]]; then
-    _setup all-expansions
-    compadd "$expl2[@]" -UQ -V all-expansions - "$exp"
-  fi
-  _setup expansions
-  if [[ -z "$prompt" ]]; then
-    compadd -UQ $group expansions - "$exp[@]"
-  else
-    compadd -UQ -X "${prompt//\\%o/$word}" \
-            $group expansions - "$exp[@]"
-  fi
-  if [[ $#exp -ne 1 && "$menu" != *last* && "$menu" != *only* ]]; then
-    _setup all-expansions
-    compadd "$expl2[@]" -UQ -V all-expansions - "$exp"
-  fi
-  if [[ -n "$orig" && "$orig" = *last* ]]; then
-    _setup original
-    compadd "$expl[@]" -UQ -V original - "$word"
-  fi
   compstate[insert]=menu
 fi
 

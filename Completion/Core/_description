@@ -1,8 +1,9 @@
 #autoload
 
-local gropt format gname
+local name gropt format gname hidden hide
 
 gropt=(-J)
+hide=()
 
 if [[ "$1" = -[VJ] ]]; then
   gropt=("$1")
@@ -16,20 +17,30 @@ _lastdescr=( "$_lastdescr[@]" "$3" )
 
 _setup "$1"
 
-_style -s descriptions format format
+name="$2"
+
+_style -s "$1" format format || _style -s descriptions format format
+_style -s "$1" hidden hidden
+if [[ "$hidden" = (all|yes|true|1|on) ]]; then
+  [[ "$hidden" = all ]] && format=''
+  hide=(-n)
+fi
 _style -s "$1" group-name gname && [[ -z "$gname" ]] && gname="$1"
+
+shift 2
+[[ -n "$format" ]] && compfmt format "$format" "d:$1" "${(@)argv[2,-1]}"
 
 if [[ -n "$gname" ]]; then
   if [[ -n "$format" ]]; then
-    eval "$2=($gropt ${(q)gname} -X ${(q)format//\\%d/$3})"
+    eval "${name}=($hide $gropt ${(q)gname} -X \"${format}\")"
   else
-    eval "$2=($gropt ${(q)gname})"
+    eval "${name}=($hide $gropt ${(q)gname})"
   fi
 else
   if [[ -n "$format" ]]; then
-    eval "$2=(-J -default- -X ${(q)format//\\%d/$3})"
+    eval "${name}=($hide -J -default- -X \"${format}\")"
   else
-    eval "$2=(-J -default-)"
+    eval "${name}=($hide -J -default-)"
   fi
 fi
 
