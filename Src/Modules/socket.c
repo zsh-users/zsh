@@ -63,7 +63,7 @@ bin_zsocket(char *nam, char **args, char *ops, int func)
     int err=1, verbose=0, test=0, targetfd=0;
     SOCKLEN_T len;
     char **dargs;
-    struct sockaddr_un sun;
+    struct sockaddr_un soun;
     int sfd;
 
     if (ops['v'])
@@ -101,12 +101,12 @@ bin_zsocket(char *nam, char **args, char *ops, int func)
 	    return 1;
 	}
 
-	sun.sun_family = AF_UNIX;
-	strncpy(sun.sun_path, localfn, UNIX_PATH_MAX);
+	soun.sun_family = AF_UNIX;
+	strncpy(soun.sun_path, localfn, UNIX_PATH_MAX);
 
-	if (bind(sfd, (struct sockaddr *)&sun, sizeof(struct sockaddr_un)))
+	if (bind(sfd, (struct sockaddr *)&soun, sizeof(struct sockaddr_un)))
 	{
-	    zwarnnam(nam, "could not bind to %s: %e", sun.sun_path, errno);
+	    zwarnnam(nam, "could not bind to %s: %e", soun.sun_path, errno);
 	    close(sfd);
 	    return 1;
 	}
@@ -130,7 +130,7 @@ bin_zsocket(char *nam, char **args, char *ops, int func)
 	setiparam("REPLY", sfd);
 
 	if (verbose)
-	    printf("%s listener is on fd %d\n", sun.sun_path, sfd);
+	    printf("%s listener is on fd %d\n", soun.sun_path, sfd);
 
 	return 0;
 
@@ -190,7 +190,8 @@ bin_zsocket(char *nam, char **args, char *ops, int func)
 #endif
 	}
 
-	if ((rfd = accept(lfd, (struct sockaddr *)&sun, &len)) == -1)
+	len = sizeof(soun);
+	if ((rfd = accept(lfd, (struct sockaddr *)&soun, &len)) == -1)
 	{
 	    zwarnnam(nam, "could not accept connection: %e", NULL, errno);
 	    return 1;
@@ -207,7 +208,7 @@ bin_zsocket(char *nam, char **args, char *ops, int func)
 	setiparam("REPLY", sfd);
 
 	if (verbose)
-	    printf("new connection from %s is on fd %d\n", sun.sun_path, sfd);
+	    printf("new connection from %s is on fd %d\n", soun.sun_path, sfd);
     }
     else
     {
@@ -223,10 +224,10 @@ bin_zsocket(char *nam, char **args, char *ops, int func)
 	    return 1;
 	}
 
-	sun.sun_family = AF_UNIX;
-	strncpy(sun.sun_path, dargs[0], UNIX_PATH_MAX);
+	soun.sun_family = AF_UNIX;
+	strncpy(soun.sun_path, dargs[0], UNIX_PATH_MAX);
 	
-	if ((err = connect(sfd, (struct sockaddr *)&sun, sizeof(struct sockaddr_un)))) {
+	if ((err = connect(sfd, (struct sockaddr *)&soun, sizeof(struct sockaddr_un)))) {
 	    zwarnnam(nam, "connection failed: %e", NULL, errno);
 	    close(sfd);
 	    return 1;
@@ -241,7 +242,7 @@ bin_zsocket(char *nam, char **args, char *ops, int func)
 	    setiparam("REPLY", sfd);
 
 	    if (verbose)
-		printf("%s is now on fd %d\n", sun.sun_path, sfd);
+		printf("%s is now on fd %d\n", soun.sun_path, sfd);
 	}
 	
     }
