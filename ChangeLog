@@ -1,5 +1,25 @@
 2004-10-01  Wayne Davison  <wayned@users.sourceforge.net>
 
+	* 20438: Src/builtin.c, Src/hist.c, Src/params.c, Src/zsh.h:
+	If the shell is exiting because it received a signal, we now
+	skip rewriting the history file after appending any new lines.
+	Has no affect unless APPEND_HISTORY, INC_APPEND_HISTORY, or
+	SHARE_HISTORY are set.  This should avoid a history truncation
+	glitch when too many shells are all trying to update the history
+	file at the same time before being killed by a follow-up signal.
+
+2004-10-01  Wayne Davison  <wayned@users.sourceforge.net>
+
+	* unposted: Src/params.c: silenced two compiler warnings about
+	unused parameters.
+
+2004-10-01  Wayne Davison  <wayned@users.sourceforge.net>
+
+	* unposted: Src/builtin.c, Src/Modules/parameter.c: use convbase
+	instead of a "%d" format to convert a zlong.
+
+2004-10-01  Wayne Davison  <wayned@users.sourceforge.net>
+
 	* 20277 (modified): Completion/Unix/Command/_make: completer now
 	follows include files and expands variables (and does it all in
 	zsh code instead of using awk or perl).
