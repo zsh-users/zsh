@@ -8,7 +8,6 @@ comptestinit () {
   zmodload -i zsh/zpty
 
   comptest_zsh=${ZSH:-zsh}
-  termcap_ce="$(echotc ce 2>/dev/null)"
 
   while getopts z: opt; do
     case $opt in
@@ -105,7 +104,7 @@ comptest () {
       log="${log[$mend[1]+1,-1]}"
       if (( 0 <= $mbegin[2] )); then
 	if [[ $match[2] != TC && $match[3] != \ # ]]; then
-	  print -lr "$match[2]:{${match[3]%$termcap_ce}}"
+	  print -lr "$match[2]:{${match[3]%${(%):-%E}}}"
 	fi
       elif (( 0 <= $mbegin[4] )); then
 	print -lr "DESCRIPTION:{$match[4]}"

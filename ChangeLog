@@ -1,3 +1,7 @@
+2001-06-09  Bart Schaefer  <schaefer@brasslantern.com>
+
+	* 14824: Test/comptest: Avoid echotc (improvement on 14792).
+
 2001-06-08  Clint Adams  <clint@zsh.org>
 
 	* 14815: Src/utils.c: actually check the filename of
