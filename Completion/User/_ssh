@@ -3,7 +3,7 @@
 _remote_files () {
   # This is extremely simple-minded; could parse "ls -F" output to do
   # colorings and LIST_TYPES and so on, but I'm just not that ambitious.
-  compadd $(ssh ${words[CURRENT]%:*} echo ${words[CURRENT]#*:}\*)
+  compadd $(ssh -a -x ${words[CURRENT]%:*} echo ${words[CURRENT]#*:}\*)
 }
 
 _ssh () {
