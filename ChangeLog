@@ -1,3 +1,8 @@
+2000-11-14  Sven Wischnowsky  <wischnow@zsh.org>
+
+	* 13163: Src/Modules/zpty.c: don't be sure that read-ahead doesn't
+ 	contains nuls
+	
 2000-11-13  Peter Stephenson  <pws@csr.com>
 
 	* unposted: config.sub, config.status: updated from GNU sources,

@@ -49,6 +49,7 @@ struct ptycmd {
     int fin;
     int read;
     char *old;
+    int olen;
 };
 
 static Ptycmd ptycmds;
@@ -375,6 +376,7 @@ newptycmd(char *nam, char *pname, char **args, int echo, int nblock)
     p->fin = 0;
     p->read = -1;
     p->old = NULL;
+    p->olen = 0;
 
     p->next = ptycmds;
     ptycmds = p;
@@ -462,11 +464,12 @@ ptyread(char *nam, Ptycmd cmd, char **args)
 	fflush(stdout);
 
     if (cmd->old) {
-	used = strlen(cmd->old);
+	used = cmd->olen;
 	buf = (char *) zhalloc((blen = 256 + used) + 1);
-	strcpy(buf, cmd->old);
-	zsfree(cmd->old);
+	memcpy(buf, cmd->old, cmd->olen);
+	zfree(cmd->old, cmd->olen);
 	cmd->old = NULL;
+	cmd->olen = 0;
     } else {
 	used = 0;
 	buf = (char *) zhalloc((blen = 256) + 1);
@@ -516,8 +519,8 @@ ptyread(char *nam, Ptycmd cmd, char **args)
 #endif
 #endif
 	) {
-	cmd->old = ztrdup(buf);
-	used = 0;
+	cmd->old = (char *) zalloc(cmd->olen = used);
+	memcpy(cmd->old, buf, cmd->olen);
 
 	return 1;
     }
