@@ -1,3 +1,8 @@
+2003-03-26  Peter Stephenson  <pws@csr.com>
+
+	* 18389: Test/A01grammar.ztst: `select' test, test for
+	multi-parameter `for' syntax.
+
 2003-03-25  Wayne Davison  <wayned@users.sourceforge.net>
 
 	* 18383: Src/utils.c: Fixed zjoin() when it returns an empty

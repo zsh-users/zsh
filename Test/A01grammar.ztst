@@ -136,6 +136,29 @@
 >1
 >2
 
+  for keyvar valvar in key1 val1 key2 val2; do
+     print key=$keyvar val=$valvar
+  done
+0:enhanced `for' syntax with two loop variables
+>key=key1 val=val1
+>key=key2 val=val2
+
+  for keyvar valvar stuffvar in keyA valA stuffA keyB valB stuffB; do
+     print key=$keyvar val=$valvar stuff=$stuffvar
+  done
+0:enhanced `for' syntax with three loop variables
+>key=keyA val=valA stuff=stuffA
+>key=keyB val=valB stuff=stuffB
+
+  for in in in in in stop; do
+    print in=$in
+  done
+0:compatibility of enhanced `for' syntax with standard syntax
+>in=in
+>in=in
+>in=in
+>in=stop
+
   name=0
   while (( name < 3 )); do
     print $name
@@ -208,18 +231,17 @@
 >2
 >3
 
-## This doesn't work, because zsh tries to read from the terminal
-## even in a non-interactive shell.  The manual implies it always reads
-## from stdin, even in an interactive shell.
-#  PS3="input> "
-#  select name in one two three; do
-#    print $name
-#  done
-#0:`select' loop
-#<2
-#>1) one     2) two     3) three   
-#>input> 
-#>two
+## Select now reads from stdin if the shell is not interactive.
+## Its own output goes to stderr.
+  PS3="input> "
+  select name in one two three; do
+    print $name
+  done
+0:`select' loop
+<2
+?1) one     2) two     3) three   
+?input> input> 
+>two
 
   function name1 name2 () { print This is $0; }
   name2
