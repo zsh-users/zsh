@@ -295,10 +295,10 @@ do_completion(Hookdef dummy, Compldat dat)
 	haspattern = 0;
 	complistmax = getiparam("LISTMAX");
 	zsfree(complastprompt);
-	complastprompt = ztrdup((dolastprompt =
-				 ((isset(ALWAYSLASTPROMPT) && zmult == 1) ||
-				  (unset(ALWAYSLASTPROMPT) && zmult != 1))) ?
+	complastprompt = ztrdup(((isset(ALWAYSLASTPROMPT) && zmult == 1) ||
+				 (unset(ALWAYSLASTPROMPT) && zmult != 1)) ?
 				"yes" : "");
+	dolastprompt = 1;
 	zsfree(complist);
 	complist = ztrdup(isset(LISTROWSFIRST) ?
 			  (isset(LISTPACKED) ? "packed rows" : "rows") :

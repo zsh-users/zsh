@@ -8,7 +8,7 @@
 local curcontext="$curcontext"
 
 if [[ -z "$curcontext" ]]; then
-  curcontext="correct-word:::"
+  curcontext="expand-word:::"
 else
   curcontext="expand-word:${curcontext#*:}"
 fi

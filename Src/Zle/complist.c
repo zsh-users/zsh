@@ -780,7 +780,7 @@ complistmatches(Hookdef dummy, Chdata dat)
     if (inselect)
 	clearflag = 0;
 
-    if (asklist()) {
+    if (asklist() || !clearflag) {
 	amatches = oamatches;
 	return (noselect = 1);
     }
