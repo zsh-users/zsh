@@ -1428,7 +1428,7 @@ files compiled into it are listed.  The first line of output shows
 the version of the shell which compiled the file and how the file
 will be used (i.e. by reading it directly or by mapping it into memory).
 With arguments, nothing is output and the return value is set to zero if
-definitions for em(all) var(name)s name files were found in the wordcode
+definitions for em(all) var(name)s name files were found in the compiled
 file, and non-zero if the definition for at least one var(name) was not
 found.
 

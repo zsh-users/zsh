@@ -1,6 +1,7 @@
 2000-09-06  Bart Schaefer  <schaefer@zsh.org>
 
-	* 12765: Doc/Zsh/contrib.yo: Eliminate use of "wordcode".
+	* 12765,12766: Doc/Zsh/builtins.yo, Doc/Zsh/contrib.yo: Eliminate
+	use of "wordcode".
 
 2000-09-06  Peter Stephenson  <pws@csr.com>
 
