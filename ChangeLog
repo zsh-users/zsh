@@ -1,3 +1,7 @@
+2001-10-05  Peter Stephenson  <pws@csr.com>
+
+	* 15949: Completion/compinstall: add handling for expand style.
+
 2001-10-05  Oliver Kiddle  <opk@zsh.org>
 
 	* 15851, 15948: Src/builtin.c, Doc/Zsh/builtins.yo: add printf
