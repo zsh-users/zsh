@@ -1117,8 +1117,9 @@ zclose(int fd)
 	    coprocin = -1;
 	if (fd == coprocout)
 	    coprocout = -1;
+	return close(fd);
     }
-    return close(fd);
+    return -1;
 }
 
 /* Get a file name relative to $TMPPREFIX which *
