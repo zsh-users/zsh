@@ -213,7 +213,13 @@ statprint(struct stat *sbuf, char *outbuf, char *fname, int iwhich, int flags)
 	break;
 
     case ST_INO:
+#ifdef INO_T_IS_64_BIT
+	convbase(optr, sbuf->st_ino, 0);
+#else
+	DPUTS(sizeof(sbuf->st_ino) > 4,
+	      "Shell compiled with wrong ino_t size");
 	statulprint((unsigned long)sbuf->st_ino, optr);
+#endif
 	break;
 
     case ST_MODE:
@@ -237,7 +243,13 @@ statprint(struct stat *sbuf, char *outbuf, char *fname, int iwhich, int flags)
 	break;
 
     case ST_SIZE:
+#ifdef OFF_T_IS_64_BIT
+	convbase(optr, sbuf->st_size, 0);
+#else
+	DPUTS(sizeof(sbuf->st_size) > 4,
+	      "Shell compiled with wrong off_t size");
 	statulprint((unsigned long)sbuf->st_size, optr);
+#endif
 	break;
 
     case ST_ATIM:

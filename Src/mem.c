@@ -96,7 +96,7 @@ static int h_m[1025], h_push, h_pop, h_free;
 
 #endif
 
-#define H_ISIZE  sizeof(long)
+#define H_ISIZE  sizeof(zlong)
 #define HEAPSIZE (8192 - H_ISIZE)
 #define HEAP_ARENA_SIZE (HEAPSIZE - sizeof(struct heap))
 #define HEAPFREE (16384 - H_ISIZE)
@@ -500,8 +500,9 @@ ztrdup(const char *s)
 /*
    Below is a simple segment oriented memory allocator for systems on
    which it is better than the system's one. Memory is given in blocks
-   aligned to an integer multiple of sizeof(long) (4 bytes on most machines,
-   but 8 bytes on e.g. a dec alpha). Each block is preceded by a header
+   aligned to an integer multiple of sizeof(zlong) (4 bytes on most machines,
+   but 8 bytes on e.g. a dec alpha; it will be 8 bytes if we are using
+   long long's or equivalent). Each block is preceded by a header
    which contains the length of the data part (in bytes). In allocated
    blocks only this field of the structure m_hdr is senseful. In free
    blocks the second field (next) is a pointer to the next free segment
@@ -561,22 +562,26 @@ ztrdup(const char *s)
 
 struct m_shdr {
     struct m_shdr *next;	/* next one on free list */
+#ifdef ZSH_64_BIT_TYPE
+    /* dummy to make this 64-bit aligned */
+    struct m_shdr *dummy;
+#endif
 };
 
 struct m_hdr {
-    long len;			/* length of memory block */
+    zlong len;			/* length of memory block */
     struct m_hdr *next;		/* if free: next on free list
 				   if block of small blocks: next one with
 				                 small blocks of same size*/
     struct m_shdr *free;	/* if block of small blocks: free list */
-    long used;			/* if block of small blocks: number of used
+    zlong used;			/* if block of small blocks: number of used
 				                                     blocks */
 };
 
 
 /* alignment for memory blocks */
 
-#define M_ALIGN (sizeof(long))
+#define M_ALIGN (sizeof(zlong))
 
 /* length of memory header, length of first field of memory header and
    minimal size of a block left free (if we allocate memory and take a
@@ -585,7 +590,7 @@ struct m_hdr {
    the free list) */
 
 #define M_HSIZE (sizeof(struct m_hdr))
-#define M_ISIZE (sizeof(long))
+#define M_ISIZE (sizeof(zlong))
 #define M_MIN   (2 * M_ISIZE)
 
 /* a pointer to the last free block, a pointer to the free list (the blocks
@@ -621,9 +626,9 @@ static char *m_high, *m_low;
 #define M_SNUM     50
 #define M_SLEN(M)  ((M)->len / M_SNUM)
 #define M_SBLEN(S) ((S) * M_SNUM + sizeof(struct m_shdr *) +  \
-		    sizeof(long) + sizeof(struct m_hdr *))
+		    sizeof(zlong) + sizeof(struct m_hdr *))
 #define M_BSLEN(S) (((S) - sizeof(struct m_shdr *) -  \
-		     sizeof(long) - sizeof(struct m_hdr *)) / M_SNUM)
+		     sizeof(zlong) - sizeof(struct m_hdr *)) / M_SNUM)
 #define M_NSMALL 8
 
 static struct m_hdr *m_small[M_NSMALL];
@@ -1198,8 +1203,9 @@ bin_mem(char *name, char **argv, char *ops, int func)
 	if (m == mf)
 	    buf[0] = '\0';
 	else if (m == ms)
-	    sprintf(buf, "%ld %ld %ld", M_SNUM - ms->used, ms->used,
-		    (m->len - sizeof(struct m_hdr)) / M_SNUM + 1);
+	    sprintf(buf, "%ld %ld %ld", (long)(M_SNUM - ms->used),
+		    (long)ms->used,
+		    (long)(m->len - sizeof(struct m_hdr)) / M_SNUM + 1);
 
 	else {
 	    for (i = 0, b = buf, c = (char *)&m->next; i < 20 && i < m->len;
@@ -1210,7 +1216,7 @@ bin_mem(char *name, char **argv, char *ops, int func)
 
 	printf("%d\t%d\t%ld\t%ld\t%s\t%ld\t%s\n", ii,
 	       (m == mf) ? fi++ : ui++,
-	       (long)m, m->len,
+	       (long)m, (long)m->len,
 	       (m == mf) ? "free" : ((m == ms) ? "small" : "used"),
 	       (m == mf) ? (f += m->len) : (u += m->len),
 	       buf);
@@ -1231,7 +1237,8 @@ bin_mem(char *name, char **argv, char *ops, int func)
 	    printf("%ld\t", (long)i * M_ISIZE);
 
 	    for (ii = 0, m = m_small[i]; m; m = m->next) {
-		printf("(%ld/%ld) ", M_SNUM - m->used, m->used);
+		printf("(%ld/%ld) ", (long)(M_SNUM - m->used),
+		       (long)m->used);
 		if (!((++ii) & 7))
 		    printf("\n\t");
 	    }

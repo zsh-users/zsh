@@ -304,3 +304,21 @@ zchdir(char *dir)
     return currdir == -2 ? -1 : -2;
 #endif
 }
+
+/*
+ * How to print out a 64 bit integer.  This isn't needed (1) if longs
+ * are 64 bit, since ordinary %ld will work (2) if we couldn't find a
+ * 64 bit type anyway.
+ */
+/**/
+#ifdef ZSH_64_BIT_TYPE
+/**/
+char *
+output64(zlong val)
+{
+    static char llbuf[DIGBUFSIZE];
+    convbase(llbuf, val, 0);
+    return llbuf;
+}
+/**/
+#endif /* ZSH_64_BIT_TYPE */

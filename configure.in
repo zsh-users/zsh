@@ -97,6 +97,12 @@ AC_ARG_ENABLE(zsh-hash-debug,
   AC_DEFINE(ZSH_HASH_DEBUG)
 fi])
 
+dnl Do you want large file support, if available (mostly Solaris)?
+dnl Currently this is only partially implemented.
+undefine([lfs])dnl
+AC_ARG_ENABLE(lfs,
+[  --enable-lfs               turn on support for large files])
+
 dnl Pathnames for global zsh scripts
 undefine([zshenv])dnl
 AC_ARG_ENABLE(etcdir,
@@ -206,7 +212,9 @@ AC_PROG_CC
 
 dnl Check for large file support (Solaris).
 dnl This needs to be done early to get the stuff into the flags.
+if test "x$enable_lfs" != x; then
 zsh_LARGE_FILE_SUPPORT
+fi
 
 dnl if the user hasn't specified CFLAGS, then
 dnl   if compiler is gcc, then use -O2 and some warning flags
@@ -325,7 +333,7 @@ if test $zsh_cv_c_broken_signed_to_unsigned_casting = yes; then
 fi
 
 dnl Checking if the compiler supports variable-length arrays
-AC_CACHE_CHECK(if the compiler supports variable-lenth arrays,
+AC_CACHE_CHECK(if the compiler supports variable-length arrays,
 zsh_cv_c_variable_length_arrays,
 [AC_TRY_COMPILE([int foo();], [int i[foo()];],
   zsh_cv_c_variable_length_arrays=yes,
@@ -511,9 +519,65 @@ dnl --------------
 AC_TYPE_SIGNAL
 AC_TYPE_PID_T
 AC_TYPE_OFF_T
+AC_CHECK_TYPE(ino_t, unsigned long)
 AC_TYPE_MODE_T
 AC_TYPE_UID_T
 AC_TYPE_SIZE_T
+
+dnl ------------------------------------------------
+dnl Check size of long and try to find a 64-bit type
+dnl ------------------------------------------------
+dnl AC_CHECK_SIZEOF is no good, because we need the result here,
+dnl and that doesn't seem to define a shell parameter.
+AC_CACHE_CHECK(if long is 64 bits, zsh_cv_long_is_64_bit,
+[AC_TRY_RUN([int main() { return sizeof(long) < 8; }],
+zsh_cv_long_is_64_bit=yes,
+zsh_cv_long_is_64_bit=no,
+zsh_cv_long_is_64_bit=no)])
+
+if test $zsh_cv_long_is_64_bit = yes; then
+  AC_DEFINE(LONG_IS_64_BIT)
+elif test "x$enable_lfs" != x; then
+  AC_CACHE_CHECK(if compiler has a 64 bit type, zsh_cv_64_bit_type,
+  [if test "x$enable_lfs" != xyes; then
+     zsh_64_BIT_TYPE(${enable_lfs})
+   else
+     zsh_64_BIT_TYPE(long long)
+     if test "$zsh_cv_64_bit_type" = no; then
+       zsh_64_BIT_TYPE(quad_t)
+     fi
+   fi
+])
+  if test "$zsh_cv_64_bit_type" != no; then
+    AC_DEFINE_UNQUOTED(ZSH_64_BIT_TYPE, $zsh_cv_64_bit_type)
+
+    AC_CACHE_CHECK(if off_t is 64 bit, zsh_cv_off_t_is_64_bit,
+    [AC_TRY_RUN([
+#include <sys/types.h>
+
+main() { return sizeof(off_t) < 8; }
+],
+    zsh_cv_off_t_is_64_bit=yes,
+    zsh_cv_off_t_is_64_bit=no,
+    zsh_cv_off_t_is_64_bit=no)])
+    if test $zsh_cv_off_t_is_64_bit = yes; then
+      AC_DEFINE(OFF_T_IS_64_BIT)
+    fi
+
+    AC_CACHE_CHECK(if ino_t is 64 bit, zsh_cv_ino_t_is_64_bit,
+    [AC_TRY_RUN([
+#include <sys/types.h>
+
+main() { return sizeof(ino_t) < 8; }
+],
+    zsh_cv_ino_t_is_64_bit=yes,
+    zsh_cv_ino_t_is_64_bit=no,
+    zsh_cv_ino_t_is_64_bit=no)])
+    if test $zsh_cv_ino_t_is_64_bit = yes; then
+      AC_DEFINE(INO_T_IS_64_BIT)
+    fi
+  fi
+fi
 
 dnl Check for sigset_t.  Currently I'm looking in
 dnl <sys/types.h> and <signal.h>.  Others might need
@@ -641,7 +705,8 @@ AC_CHECK_FUNCS(memcpy memmove \
               sigblock sigsetmask sigrelse sighold killpg sigaction getrlimit \
               sigprocmask setuid seteuid setreuid setresuid setsid strerror \
               nis_list initgroups fchdir cap_get_proc readlink nice \
-	      getgrgid getgrnam getpwent getpwnam getpwuid setpgrp)
+	      getgrgid getgrnam getpwent getpwnam getpwuid setpgrp \
+	      fseeko ftello)
 
 dnl ---------------
 dnl CHECK FUNCTIONS
@@ -1253,6 +1318,7 @@ zsh version               : ${VERSION}
 host operating system     : ${host_cpu}-${host_vendor}-${host_os}
 source code location      : ${srcdir}
 compiler                  : ${CC}
+preprocessor flags        : ${CPPFLAGS}
 executable compiler flags : ${CFLAGS}"
 if test "$dynamic" = yes; then
   echo "\

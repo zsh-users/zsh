@@ -112,6 +112,7 @@ newhashtable(int size, char const *name, PrintTableStats printinfo)
     ht->hsize = size;
     ht->ct = 0;
     ht->scan = NULL;
+    ht->scantab = NULL;
     return ht;
 }
 
@@ -361,6 +362,10 @@ scanhashtable(HashTable ht, int sorted, int flags1, int flags2, ScanFunc scanfun
 {
     struct scanstatus st;
 
+    if (ht->scantab) {
+	ht->scantab(ht, scanfunc, scanflags);
+	return;
+    }
     if (sorted) {
 	int i, ct = ht->ct;
 	VARARR(HashNode, hnsorttab, ct);

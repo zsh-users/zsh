@@ -233,3 +233,26 @@
 
 /* Define to 1 if you want to use dynamically loaded modules on HPUX 10 */
 #undef HPUXDYNAMIC
+
+/* Define to `unsigned long' if <sys/types.h> doesn't define. */
+#undef ino_t
+
+/*
+ * Definitions used when a long is less than eight byte, to try to
+ * provide some support for eight byte operations.
+ *
+ * Note that ZSH_64_BIT_TYPE, OFF_T_IS_64_BIT, INO_T_IS_64_BIT do *not* get
+ * defined if long is already 64 bits, since in that case no special handling
+ * is required.
+ */
+/* Define to 1 if long is 64 bits */
+#undef LONG_IS_64_BIT
+
+/* Define to a 64 bit type if there is one, but long is shorter */
+#undef ZSH_64_BIT_TYPE
+
+/* Define to 1 if off_t is 64 bit (for large file support) */
+#undef OFF_T_IS_64_BIT
+
+/* Define to 1 if ino_t is 64 bit (for large file support) */
+#undef INO_T_IS_64_BIT

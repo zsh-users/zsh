@@ -1080,3 +1080,52 @@ pws: 6257: rewrite 6240 for any old builtin structure after the pipeline
 pws: 6258: yet another attempt at the same problem
 
 pws: 6259: second version of compinstall
+
+  pws-19
+
+pws: 6263: incrementalappendhistory -> incappendhistory
+
+pws: 6284, should have been in 6269: changes to large file support
+
+pws: 6271: make sure -D_LARGEFILE_SOURCE is defined any time there are
+other -D's for large file support
+
+pws: 6272: correct even more mistakes some bozo (guess who) made with
+rlim_t: put back RLIM_T_IS_UNSIGNED code.
+
+Tatsuo Furukawa: 6273: don't need to defined _POSIX* flags specially on HPUX
+
+Tatsuo Furukawa: 6274: updated form of zle_refresh patch
+
+Sven: 6278: fix ${$(foo)...} to produce an array
+
+Sven: 6283: compadd -U didn't quote characters properly
+
+Sven: 6285: tty/job handling when executing some command in current shell
+code within RHS of pipeline
+
+pws: 6290: parameter module uses global scope, $parameters gets
+unreadonlied, gcc warning
+
+pws: 6291: zftp only checks for system type after login.
+
+pws: 6294: typeset -U MANPATH performs uniqueness test straight away
+
+Sven: 6298: (mult_isarr) ${*:-word} didn't use the default word
+
+pws: 6299: if called as su* or -su*, zsh doesn't do sh emulation
+
+Sven: 6301: expanded ignored prefix ignored for testing
+
+Sven: 6302: more list_pipe intricacies
+
+Tanaka Akira: 6303: _path_files: find files after symbolic link
+
+pws: 6307, 6312: wider support for 64-bit integers on 32-bit architectures
+
+pws: 6313: fix 6299 to use $SHELL to decide emulation
+
+pws: 6314: in something like `{ false; } || true', errexit shouldn't be
+used at all on the left of the ||
+
+pws: unposted: updated some .distfiles

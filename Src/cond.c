@@ -311,7 +311,7 @@ cond_str(char **args, int num)
 }
 
 /**/
-long
+zlong
 cond_val(char **args, int num)
 {
     char *s = args[num];

@@ -30,18 +30,24 @@
 #include "zsh.mdh"
 #include "glob.pro"
 
+#if defined(OFF_T_IS_64_BIT) && defined(__GNUC__)
+# define ALIGN64 __attribute__((aligned(8)))
+#else
+# define ALIGN64
+#endif
+
 /* flag for CSHNULLGLOB */
 
 typedef struct gmatch *Gmatch; 
 
 struct gmatch {
     char *name;
-    long size;
+    off_t size ALIGN64;
     long atime;
     long mtime;
     long ctime;
     long links;
-    long _size;
+    off_t _size ALIGN64;
     long _atime;
     long _mtime;
     long _ctime;
@@ -97,13 +103,13 @@ typedef struct stat *Statptr;	 /* This makes the Ultrix compiler happy.  Go figu
 #define TT_KILOBYTES 2
 #define TT_MEGABYTES 3
 
-typedef int (*TestMatchFunc) _((struct stat *, long));
+typedef int (*TestMatchFunc) _((struct stat *, off_t));
 
 struct qual {
     struct qual *next;		/* Next qualifier, must match                */
     struct qual *or;		/* Alternative set of qualifiers to match    */
     TestMatchFunc func;		/* Function to call to test match            */
-    long data;			/* Argument passed to function               */
+    off_t data ALIGN64;		/* Argument passed to function               */
     int sense;			/* Whether asserting or negating             */
     int amc;			/* Flag for which time to test (a, m, c)     */
     int range;			/* Whether to test <, > or = (as per signum) */
@@ -244,7 +250,7 @@ insert(char *s, int checked)
 	if (gf_follow) {
 	    if (!S_ISLNK(mode) || statfullpath(s, &buf2, 0))
 		memcpy(&buf2, &buf, sizeof(buf));
-	    statted = 2;
+	    statted |= 2;
 	    mode = buf2.st_mode;
 	}
 	if (gf_listtypes || S_ISDIR(mode)) {
@@ -268,11 +274,11 @@ insert(char *s, int checked)
 	    range = qn->range;
 	    amc = qn->amc;
 	    units = qn->units;
-	    if ((qn->sense & 2) && statted != 2) {
+	    if ((qn->sense & 2) && !(statted & 2)) {
 		/* If (sense & 2), we're following links */
 		if (!S_ISLNK(buf.st_mode) || statfullpath(s, &buf2, 0))
 		    memcpy(&buf2, &buf, sizeof(buf));
-		statted = 2;
+		statted |= 2;
 	    }
 	    bp = (qn->sense & 2) ? &buf2 : &buf;
 	    /* Reject the file if the function returned zero *
@@ -302,24 +308,29 @@ insert(char *s, int checked)
 	statfullpath(s, &buf, 1);
 	statted = 1;
     }
-    if (statted != 2 && (gf_sorts & GS_LINKED)) {
+    if (!(statted & 2) && (gf_sorts & GS_LINKED)) {
 	if (statted) {
 	    if (!S_ISLNK(buf.st_mode) || statfullpath(s, &buf2, 0))
 		memcpy(&buf2, &buf, sizeof(buf));
 	} else if (statfullpath(s, &buf2, 0))
 	    statfullpath(s, &buf2, 1);
+	statted |= 2;
     }
     matchptr->name = news;
-    matchptr->size = buf.st_size;
-    matchptr->atime = buf.st_atime;
-    matchptr->mtime = buf.st_mtime;
-    matchptr->ctime = buf.st_ctime;
-    matchptr->links = buf.st_nlink;
-    matchptr->_size = buf2.st_size;
-    matchptr->_atime = buf2.st_atime;
-    matchptr->_mtime = buf2.st_mtime;
-    matchptr->_ctime = buf2.st_ctime;
-    matchptr->_links = buf2.st_nlink;
+    if (statted & 1) {
+	matchptr->size = buf.st_size;
+	matchptr->atime = buf.st_atime;
+	matchptr->mtime = buf.st_mtime;
+	matchptr->ctime = buf.st_ctime;
+	matchptr->links = buf.st_nlink;
+    }
+    if (statted & 2) {
+	matchptr->_size = buf2.st_size;
+	matchptr->_atime = buf2.st_atime;
+	matchptr->_mtime = buf2.st_mtime;
+	matchptr->_ctime = buf2.st_ctime;
+	matchptr->_links = buf2.st_nlink;
+    }
     matchptr++;
 
     if (++matchct == matchsz) {
@@ -1102,10 +1113,10 @@ parsepat(char *str)
 /* get number after qualifier */
 
 /**/
-static long
+static off_t
 qgetnum(char **s)
 {
-    long v = 0;
+    off_t v = 0;
 
     if (!idigit(**s)) {
 	zerr("number expected", NULL, 0);
@@ -1119,10 +1130,10 @@ qgetnum(char **s)
 /* get mode spec after qualifier */
 
 /**/
-static long
+static zlong
 qgetmodespec(char **s)
 {
-    long yes = 0, no = 0, val, mask, t;
+    zlong yes = 0, no = 0, val, mask, t;
     char *p = *s, c, how, end;
 
     if ((c = *p) == '=' || c == Equals || c == '+' || c == '-' ||
@@ -1163,7 +1174,7 @@ qgetmodespec(char **s)
 		case 't': val |= 01000; break;
 		case '0': case '1': case '2': case '3':
 		case '4': case '5': case '6': case '7':
-		    t = ((long) c - '0');
+		    t = ((zlong) c - '0');
 		    val |= t | (t << 3) | (t << 6);
 		    break;
 		default:
@@ -1186,7 +1197,7 @@ qgetmodespec(char **s)
 		    val <<= 3;
 		} else {
 		    t <<= 3;
-		    val = (val << 3) | ((long) c - '0');
+		    val = (val << 3) | ((zlong) c - '0');
 		}
 		p++;
 	    }
@@ -1212,7 +1223,7 @@ static int
 gmatchcmp(Gmatch a, Gmatch b)
 {
     int i, *s;
-    long r = 0L;
+    off_t r = 0L;
 
     for (i = gf_nsorts, s = gf_sortlist; i; i--, s++) {
 	switch (*s & ~GS_DESC) {
@@ -1306,13 +1317,13 @@ glob(LinkList list, LinkNode np)
 	    /* Real qualifiers found. */
 	    int sense = 0;	/* bit 0 for match (0)/don't match (1)   */
 				/* bit 1 for follow links (2), don't (0) */
-	    long data = 0;	/* Any numerical argument required       */
-	    int (*func) _((Statptr, long));
+	    off_t data = 0;	/* Any numerical argument required       */
+	    int (*func) _((Statptr, off_t));
 
 	    str[sl-1] = 0;
 	    *s++ = 0;
 	    while (*s && !colonmod) {
-		func = (int (*) _((Statptr, long)))0;
+		func = (int (*) _((Statptr, off_t)))0;
 		if (idigit(*s)) {
 		    /* Store numeric argument for qualifier */
 		    func = qualflags;
@@ -3142,7 +3153,14 @@ matchonce(Comp c)
 	}
 	if (*pat == Inang) {
 	    /* Numeric globbing. */
+#ifdef ZSH_64_BIT_TYPE
+/* zstrtol returns zlong anyway */
+# define RANGE_CAST()
+	    zlong t1, t2, t3;
+#else
+# define RANGE_CAST() (unsigned long)
 	    unsigned long t1, t2, t3;
+#endif
 	    char *ptr, *saves = pptr, *savep = pat;
 
 	    if (!idigit(*pptr))
@@ -3161,18 +3179,18 @@ matchonce(Comp c)
 		 * t1 = number supplied:  must be positive, so use
 		 * unsigned arithmetic.
 		 */
-		t1 = (unsigned long)zstrtol(pptr, &ptr, 10);
+		t1 = RANGE_CAST() zstrtol(pptr, &ptr, 10);
 		pptr = ptr;
 		/* t2 = lower limit */
 		if (idigit(*pat))
-		    t2 = (unsigned long)zstrtol(pat, &ptr, 10);
+		    t2 = RANGE_CAST() zstrtol(pat, &ptr, 10);
 		else
 		    t2 = 0, ptr = pat;
 		if (*ptr != '-' || (not3 = (ptr[1] == Outang)))
 				/* exact match or no upper limit */
 		    t3 = t2, pat = ptr + not3;
 		else		/* t3 = upper limit */
-		    t3 = (unsigned long)zstrtol(ptr + 1, &pat, 10);
+		    t3 = RANGE_CAST() zstrtol(ptr + 1, &pat, 10);
 		DPUTS(*pat != Outang, "BUG: wrong internal range pattern");
 		pat++;
 		/*
@@ -3191,6 +3209,7 @@ matchonce(Comp c)
 		}
 	    }
 	    continue;
+#undef RANGE_CAST
 	}
 	/* itok(Meta) is zero */
 	DPUTS(itok(*pat), "BUG: matching tokenized character");
@@ -3430,7 +3449,7 @@ remnulargs(char *s)
 
 /**/
 static int
-qualdev(struct stat *buf, long dv)
+qualdev(struct stat *buf, off_t dv)
 {
     return buf->st_dev == dv;
 }
@@ -3439,7 +3458,7 @@ qualdev(struct stat *buf, long dv)
 
 /**/
 static int
-qualnlink(struct stat *buf, long ct)
+qualnlink(struct stat *buf, off_t ct)
 {
     return (range < 0 ? buf->st_nlink < ct :
 	    range > 0 ? buf->st_nlink > ct :
@@ -3450,7 +3469,7 @@ qualnlink(struct stat *buf, long ct)
 
 /**/
 static int
-qualuid(struct stat *buf, long uid)
+qualuid(struct stat *buf, off_t uid)
 {
     return buf->st_uid == uid;
 }
@@ -3459,7 +3478,7 @@ qualuid(struct stat *buf, long uid)
 
 /**/
 static int
-qualgid(struct stat *buf, long gid)
+qualgid(struct stat *buf, off_t gid)
 {
     return buf->st_gid == gid;
 }
@@ -3468,7 +3487,7 @@ qualgid(struct stat *buf, long gid)
 
 /**/
 static int
-qualisdev(struct stat *buf, long junk)
+qualisdev(struct stat *buf, off_t junk)
 {
     return S_ISBLK(buf->st_mode) || S_ISCHR(buf->st_mode);
 }
@@ -3477,7 +3496,7 @@ qualisdev(struct stat *buf, long junk)
 
 /**/
 static int
-qualisblk(struct stat *buf, long junk)
+qualisblk(struct stat *buf, off_t junk)
 {
     return S_ISBLK(buf->st_mode);
 }
@@ -3486,7 +3505,7 @@ qualisblk(struct stat *buf, long junk)
 
 /**/
 static int
-qualischr(struct stat *buf, long junk)
+qualischr(struct stat *buf, off_t junk)
 {
     return S_ISCHR(buf->st_mode);
 }
@@ -3495,7 +3514,7 @@ qualischr(struct stat *buf, long junk)
 
 /**/
 static int
-qualisdir(struct stat *buf, long junk)
+qualisdir(struct stat *buf, off_t junk)
 {
     return S_ISDIR(buf->st_mode);
 }
@@ -3504,7 +3523,7 @@ qualisdir(struct stat *buf, long junk)
 
 /**/
 static int
-qualisfifo(struct stat *buf, long junk)
+qualisfifo(struct stat *buf, off_t junk)
 {
     return S_ISFIFO(buf->st_mode);
 }
@@ -3513,7 +3532,7 @@ qualisfifo(struct stat *buf, long junk)
 
 /**/
 static int
-qualislnk(struct stat *buf, long junk)
+qualislnk(struct stat *buf, off_t junk)
 {
     return S_ISLNK(buf->st_mode);
 }
@@ -3522,7 +3541,7 @@ qualislnk(struct stat *buf, long junk)
 
 /**/
 static int
-qualisreg(struct stat *buf, long junk)
+qualisreg(struct stat *buf, off_t junk)
 {
     return S_ISREG(buf->st_mode);
 }
@@ -3531,7 +3550,7 @@ qualisreg(struct stat *buf, long junk)
 
 /**/
 static int
-qualissock(struct stat *buf, long junk)
+qualissock(struct stat *buf, off_t junk)
 {
     return S_ISSOCK(buf->st_mode);
 }
@@ -3540,7 +3559,7 @@ qualissock(struct stat *buf, long junk)
 
 /**/
 static int
-qualflags(struct stat *buf, long mod)
+qualflags(struct stat *buf, off_t mod)
 {
     return mode_to_octal(buf->st_mode) & mod;
 }
@@ -3549,7 +3568,7 @@ qualflags(struct stat *buf, long mod)
 
 /**/
 static int
-qualmodeflags(struct stat *buf, long mod)
+qualmodeflags(struct stat *buf, off_t mod)
 {
     long v = mode_to_octal(buf->st_mode), y = mod & 07777, n = mod >> 12;
 
@@ -3560,7 +3579,7 @@ qualmodeflags(struct stat *buf, long mod)
 
 /**/
 static int
-qualiscom(struct stat *buf, long mod)
+qualiscom(struct stat *buf, off_t mod)
 {
     return S_ISREG(buf->st_mode) && (buf->st_mode & S_IXUGO);
 }
@@ -3569,9 +3588,15 @@ qualiscom(struct stat *buf, long mod)
 
 /**/
 static int
-qualsize(struct stat *buf, long size)
+qualsize(struct stat *buf, off_t size)
 {
-    unsigned long scaled = buf->st_size;
+#if defined(LONG_IS_64_BIT) || defined(OFF_T_IS_64_BIT)
+# define QS_CAST_SIZE()
+    off_t scaled = buf->st_size;
+#else
+# define QS_CAST_SIZE() (unsigned long)
+    unsigned long scaled = (unsigned long)buf->st_size;
+#endif
 
     switch (units) {
     case TT_POSIX_BLOCKS:
@@ -3588,16 +3613,17 @@ qualsize(struct stat *buf, long size)
 	break;
     }
 
-    return (range < 0 ? scaled < (unsigned long) size :
-	    range > 0 ? scaled > (unsigned long) size :
-	    scaled == (unsigned long) size);
+    return (range < 0 ? scaled < QS_CAST_SIZE() size :
+	    range > 0 ? scaled > QS_CAST_SIZE() size :
+	    scaled == QS_CAST_SIZE() size);
+#undef QS_CAST_SIZE
 }
 
 /* time in required range? */
 
 /**/
 static int
-qualtime(struct stat *buf, long days)
+qualtime(struct stat *buf, off_t days)
 {
     time_t now, diff;
 

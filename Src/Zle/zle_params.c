@@ -101,8 +101,8 @@ makezleparams(int ro)
 		pm->gets.afn = (char **(*) _((Param))) zp->getfn;
 		break;
 	    case PM_INTEGER:
-		pm->sets.ifn = (void (*) _((Param, long))) zp->setfn;
-		pm->gets.ifn = (long (*) _((Param))) zp->getfn;
+		pm->sets.ifn = (void (*) _((Param, zlong))) zp->setfn;
+		pm->gets.ifn = (zlong (*) _((Param))) zp->getfn;
 		pm->ct = 10;
 		break;
 	}
@@ -146,7 +146,7 @@ get_buffer(Param pm)
 
 /**/
 static void
-set_cursor(Param pm, long x)
+set_cursor(Param pm, zlong x)
 {
     if(x < 0)
 	cs = 0;
@@ -157,7 +157,7 @@ set_cursor(Param pm, long x)
 }
 
 /**/
-static long
+static zlong
 get_cursor(Param pm)
 {
     return cs;
@@ -264,20 +264,20 @@ get_keys(Param pm)
 
 /**/
 static void
-set_numeric(Param pm, long x)
+set_numeric(Param pm, zlong x)
 {
     zmult = x;
 }
 
 /**/
-static long
+static zlong
 get_numeric(Param pm)
 {
     return zmult;
 }
 
 /**/
-static long
+static zlong
 get_histno(Param pm)
 {
     return histline;

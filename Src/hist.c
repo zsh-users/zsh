@@ -972,7 +972,7 @@ hend(void)
     zfree(chwords, chwordlen*sizeof(short));
     chline = NULL;
     histactive = 0;
-    if (isset(SHAREHISTORY) || isset(INCREMENTALAPPENDHISTORY))
+    if (isset(SHAREHISTORY) || isset(INCAPPENDHISTORY))
 	savehistfile(hf, 1, HFILE_USE_OPTIONS | HFILE_FAST);
     unlockhistfile(hf); /* It's OK to call this even if we aren't locked */
     return !(flag & HISTFLAG_NOEXEC || errflag);
@@ -1778,7 +1778,7 @@ savehistfile(char *fn, int err, int writeflags)
 	he = hist_ring->down;
     }
     if (writeflags & HFILE_USE_OPTIONS) {
-	if (isset(APPENDHISTORY) || isset(INCREMENTALAPPENDHISTORY)
+	if (isset(APPENDHISTORY) || isset(INCAPPENDHISTORY)
 	 || isset(SHAREHISTORY))
 	    writeflags |= HFILE_APPEND | HFILE_SKIPOLD;
 	else
@@ -1883,7 +1883,7 @@ lockhistfile(char *fn, int keep_trying)
 	char *tmpfile, *lockfile;
 
 	tmpfile = zalloc(len + 10 + 1);
-	sprintf(tmpfile, "%s.%ld", fn, mypid);
+	sprintf(tmpfile, "%s.%ld", fn, (long)mypid);
 	if ((fd = open(tmpfile, O_RDWR|O_CREAT|O_EXCL, 0644)) >= 0) {
 	    write(fd, "0\n", 2);
 	    close(fd);

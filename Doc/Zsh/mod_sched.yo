@@ -1,4 +1,4 @@
-texinode(The sched Module)(The stat Module)(The files Module)(Zsh Modules)
+texinode(The sched Module)(The stat Module)(The parameter Module)(Zsh Modules)
 sect(The sched Module)
 The tt(sched) module makes available one builtin command:
 

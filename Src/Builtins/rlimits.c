@@ -112,9 +112,15 @@ showlimits(int hard, int lim)
             else
 		printf("%lldkB\n", val / 1024L);
 #  else
+#   ifdef RLIM_T_IS_UNSIGNED
+		printf("%luMB\n", val / (1024L * 1024L));
+            else
+		printf("%lukB\n", val / 1024L);
+#   else
 		printf("%ldMB\n", val / (1024L * 1024L));
             else
 		printf("%ldkB\n", val / 1024L);
+#   endif /* RLIM_T_IS_UNSIGNED */
 #  endif /* RLIM_T_IS_LONG_LONG */
 # endif /* RLIM_T_IS_QUAD_T */
 	}

@@ -42,7 +42,7 @@ int lastbase;
  
 static char *ptr;
 
-static long yyval;
+static zlong yyval;
 static LV yylval;
 
 static int mlevel = 0;
@@ -409,14 +409,14 @@ static int sp = -1;			/* stack pointer */
 
 struct mathvalue {
     LV lval;
-    long val;
+    zlong val;
 };
 
 static struct mathvalue *stack;
 
 /**/
 static void
-push(long val, LV lval)
+push(zlong val, LV lval)
 {
     if (sp == STACKSZ - 1)
 	zerr("stack overflow", NULL, 0);
@@ -428,7 +428,7 @@ push(long val, LV lval)
 
 
 /**/
-static long
+static zlong
 getcvar(LV s)
 {
     char *t;
@@ -440,8 +440,8 @@ getcvar(LV s)
 
 
 /**/
-static long
-setvar(LV s, long v)
+static zlong
+setvar(LV s, zlong v)
 {
     if (s == -1 || s >= lvc) {
 	zerr("lvalue required", NULL, 0);
@@ -456,7 +456,7 @@ setvar(LV s, long v)
 
 /**/
 static int
-notzero(long a)
+notzero(zlong a)
 {
     if (a == 0) {
 	zerr("division by zero", NULL, 0);
@@ -496,7 +496,7 @@ notzero(long a)
 void
 op(int what)
 {
-    long a, b, c;
+    zlong a, b, c;
     LV lv;
 
     if (sp < 0) {
@@ -569,39 +569,39 @@ op(int what)
 	break;
     case LES:
 	pop2();
-	pushv((long)(a < b));
+	pushv((zlong)(a < b));
 	break;
     case LEQ:
 	pop2();
-	pushv((long)(a <= b));
+	pushv((zlong)(a <= b));
 	break;
     case GRE:
 	pop2();
-	pushv((long)(a > b));
+	pushv((zlong)(a > b));
 	break;
     case GEQ:
 	pop2();
-	pushv((long)(a >= b));
+	pushv((zlong)(a >= b));
 	break;
     case DEQ:
 	pop2();
-	pushv((long)(a == b));
+	pushv((zlong)(a == b));
 	break;
     case NEQ:
 	pop2();
-	pushv((long)(a != b));
+	pushv((zlong)(a != b));
 	break;
     case DAND:
 	pop2();
-	pushv((long)(a && b));
+	pushv((zlong)(a && b));
 	break;
     case DOR:
 	pop2();
-	pushv((long)(a || b));
+	pushv((zlong)(a || b));
 	break;
     case DXOR:
 	pop2();
-	pushv((long)((a && !b) || (!a && b)));
+	pushv((zlong)((a && !b) || (!a && b)));
 	break;
     case QUEST:
 	pop3();
@@ -658,15 +658,15 @@ op(int what)
 	break;
     case DANDEQ:
 	pop2lv();
-	set((long)(a && b));
+	set((zlong)(a && b));
 	break;
     case DOREQ:
 	pop2lv();
-	set((long)(a || b));
+	set((zlong)(a || b));
 	break;
     case DXOREQ:
 	pop2lv();
-	set((long)((a && !b) || (!a && b)));
+	set((zlong)((a && !b) || (!a && b)));
 	break;
     case COMMA:
 	pop2();
@@ -725,18 +725,18 @@ bop(int tk)
 
 
 /**/
-static long
+static zlong
 mathevall(char *s, int prek, char **ep)
 {
     int t0;
     int xlastbase, xnoeval, xunary, xlvc;
     char *xptr;
-    long xyyval;
+    zlong xyyval;
     LV xyylval;
     char **xlvals = 0;
     int xsp;
     struct mathvalue *xstack = 0;
-    long ret;
+    zlong ret;
 
     xlastbase = xnoeval = xunary = xlvc = xyyval = xyylval = xsp = 0;
     xptr = NULL;
@@ -789,11 +789,11 @@ mathevall(char *s, int prek, char **ep)
 
 
 /**/
-long
+zlong
 matheval(char *s)
 {
     char *junk;
-    long x;
+    zlong x;
     int xmtok = mtok;
 
     if (!*s)
@@ -807,10 +807,10 @@ matheval(char *s)
 
 
 /**/
-long
+zlong
 mathevalarg(char *s, char **ss)
 {
-    long x;
+    zlong x;
     int xmtok = mtok;
 
     x = mathevall(s, ARGPREC, ss);

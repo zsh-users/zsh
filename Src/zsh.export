@@ -31,6 +31,7 @@ compctlreadptr
 cond_match
 cond_str
 cond_val
+convbase
 coprocin
 coprocout
 countlinknodes
@@ -45,6 +46,7 @@ deletehashtable
 deleteparamdefs
 deletewrapper
 domatch
+dosetopt
 doshfunc
 down_histent
 dputs
@@ -52,6 +54,7 @@ dquotedztrdup
 dummy_list
 dupstring
 dupstrpfx
+dupstruct
 dyncat
 emptyhashtable
 endparamscope
@@ -71,6 +74,7 @@ findcmd
 firsthist
 freearray
 freeheap
+freestruct
 getaparam
 gethashnode
 gethashnode2
@@ -79,7 +83,9 @@ getintvalue
 getiparam
 getkeystring
 getlinknode
+getpermtext
 getshfunc
+getsignum
 getsparam
 getstrvalue
 gettempname
@@ -92,6 +98,8 @@ gotwordptr
 hasam
 hashcmd
 hasher
+hashgetfn
+hashsetfn
 hasspecial
 haswilds
 hcalloc
@@ -156,10 +164,13 @@ noop_function
 noop_function_int
 old_heaps
 optiontab
+optlookup
 opts
+output64
 paramtab
 parbegin
 parend
+parse_string
 parsereg
 parsestr
 path
@@ -171,6 +182,7 @@ ppid
 prefork
 prepromptfns
 printif
+printparamnode
 printqt
 promptexpand
 pushheap
@@ -179,6 +191,7 @@ pwd
 quietgetevent
 quietgethist
 quotedzputs
+realparamtab
 refreshptr
 remlpaths
 remnulargs
@@ -189,11 +202,13 @@ restoredir
 reswdtab
 retflag
 runshfunc
+scancountparams
 scanhashtable
 setaparam
 sethparam
 setlimits
 setsparam
+settrap
 settyinfo
 sfcontext
 shfunctab
@@ -211,6 +226,7 @@ startparamscope
 stdunsetfn
 stophist
 stopmsg
+strgetfn
 strinbeg
 strinend
 strpfx

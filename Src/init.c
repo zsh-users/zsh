@@ -414,7 +414,7 @@ init_shout(void)
 static char *tccapnams[TC_COUNT] = {
     "cl", "le", "LE", "nd", "RI", "up", "UP", "do",
     "DO", "dc", "DC", "ic", "IC", "cd", "ce", "al", "dl", "ta",
-    "md", "so", "us", "me", "se", "ue"
+    "md", "so", "us", "me", "se", "ue", "ch"
 };
 
 /* Initialise termcap */
@@ -583,8 +583,8 @@ setupvals(void)
     zoptarg = ztrdup("");
     zoptind = 1;
 
-    ppid  = (long) getppid();
-    mypid = (long) getpid();
+    ppid  = (zlong) getppid();
+    mypid = (zlong) getpid();
     term  = ztrdup("");
 
     /* The following variable assignments cause zsh to behave more *

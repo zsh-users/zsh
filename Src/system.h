@@ -27,12 +27,6 @@
  *
  */
 
-#ifdef __hpux
-# define _INCLUDE_POSIX_SOURCE 1
-# define _INCLUDE_XOPEN_SOURCE 1
-# define _INCLUDE_HPUX_SOURCE 1
-#endif
-
 #ifdef sinix
 # define _XPG_IV 1
 #endif
@@ -401,9 +395,10 @@ struct timezone {
 #endif
 
 /* DIGBUFSIZ is the length of a buffer which can hold the -LONG_MAX-1 *
+ * (or with ZSH_64_BIT_TYPE maybe -LONG_LONG_MAX-1)                   *
  * converted to printable decimal form including the sign and the     *
  * terminating null character. Below 0.30103 > lg 2.                  */
-#define DIGBUFSIZE ((int)(((sizeof(long) * 8) - 1) * 0.30103) + 3)
+#define DIGBUFSIZE ((int)(((sizeof(zlong) * 8) - 1) * 0.30103) + 3)
 
 /* If your stat macros are broken, we will *
  * just undefine them.                     */
@@ -608,4 +603,13 @@ extern short ospeed;
 
 #ifndef O_NOCTTY
 # define O_NOCTTY 0
+#endif
+
+#ifdef _LARGEFILE_SOURCE
+#ifdef HAVE_FSEEKO
+#define fseek fseeko
+#endif
+#ifdef HAVE_FTELLO
+#define ftell ftello
+#endif
 #endif

@@ -222,7 +222,7 @@ for prepath in "$prepaths[@]"; do
     # Get the matching files by globbing.
 
     if [[ "$tpre$tsuf" = */* ]]; then
-      tmp1=( ${^tmp1}*(D/) )
+      tmp1=( ${^tmp1}*(-D/) )
     else
       tmp1=( ${^tmp1}${^~pats} )
     fi

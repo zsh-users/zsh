@@ -479,9 +479,9 @@ of tt(exit) or tt(logout) instead.
 However, ten consecutive EOFs will cause the shell to exit anyway,
 to avoid the shell hanging if its tty goes away.
 )
-pindex(INCREMENTAL_APPEND_HISTORY)
+pindex(INC_APPEND_HISTORY)
 cindex(history, incremental appending to a file)
-item(tt(INCREMENTAL_APPEND_HISTORY))(
+item(tt(INC_APPEND_HISTORY))(
 This options works like APPEND_HISTORY except that new history lines
 are added to the tt($HISTFILE) when they finish running, rather than
 waiting until the shell is killed. The file is periodically trimmed

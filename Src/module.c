@@ -1224,8 +1224,8 @@ addparamdef(Paramdef d)
 
     pm->level = 0;
     pm->u.data = d->var;
-    pm->sets.ifn = (void (*)(Param, long)) d->set;
-    pm->gets.ifn = (long (*)(Param)) d->get;
+    pm->sets.ifn = (void (*)(Param, zlong)) d->set;
+    pm->gets.ifn = (zlong (*)(Param)) d->get;
     pm->unsetfn = (void (*)(Param, int)) d->unset;
 
     return 0;

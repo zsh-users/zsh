@@ -134,7 +134,7 @@ zerrnam(const char *cmd, const char *fmt, const char *str, int num)
 	    fmt++;
 	}
     if (unset(SHINSTDIN) && lineno)
-	fprintf(stderr, " [%ld]\n", lineno);
+	fprintf(stderr, " [%ld]\n", (long)lineno);
     else
 	putc('\n', stderr);
     fflush(stderr);
@@ -1096,15 +1096,15 @@ skipparens(char inpar, char outpar, char **s)
    return level;
 }
 
-/* Convert string to long.  This function (without the z) *
- * is contained in the ANSI standard C library, but a lot *
- * of them seem to be broken.                             */
+/* Convert string to zlong (see zsh.h).  This function (without the z) *
+ * is contained in the ANSI standard C library, but a lot of them seem *
+ * to be broken.                                                       */
 
 /**/
-long
+zlong
 zstrtol(const char *s, char **t, int base)
 {
-    long ret = 0;
+    zlong ret = 0;
     int neg;
 
     while (inblank(*s))

@@ -1,0 +1,49 @@
+texinode(The parameter Module)(The sched Module)(The files Module)(Zsh Modules)
+sect(The parameter Module)
+cindex(parameters, special)
+The tt(parameter) module gives access to some of the internal hash
+tables used by the shell, by defining four special associative arrays.
+
+startitem()
+vindex(options)
+item(tt(options))(
+The keys for this associative array are the names of the options that
+can be set and unset using the tt(setopt) and tt(unsetopt)
+builtins. The value of each key is either the string tt(on) if the
+option is currently set, or the string tt(off) if the option is unset.
+Setting a key to one of these strings is like setting or unsetting
+the option, respectively. Unsetting a key in this array is like
+setting it to the value tt(off).
+)
+vindex(commands)
+item(tt(command))(
+This array gives access to the command hash table. The keys are the
+names of external commands, the values are the pathnames of the files
+that would be executed when the command would be invoked. Setting a
+key in this array defines a new entry in this table in the same way as
+with the tt(hash) builtin. Unsetting a key as in `tt(unset
+"commands[foo]")' removes the entry for the given key from the command 
+hash table.
+)
+vindex(functions)
+item(tt(functions))(
+This association maps function names to their definitions. Setting a
+key in it is like defining a function with the name given by the key
+and the body given by the value. Unsetting a key removes the
+definition for the function named by the key.
+)
+vindex(parameters)
+item(tt(parameters))(
+The keys in this associative array are the names of the parameters
+currently defined. The values are strings describing the type of the
+parameter, in the same format used by the tt(t) parameter flag, see
+ifzman(\
+zmanref(zshexpn)
+)\
+ifnzman(\
+noderef(Parameter Expansion)
+)\
+.
+Setting or unsetting keys in this array is not possible.
+)
+enditem()

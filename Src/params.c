@@ -74,7 +74,7 @@ char *argzero,		/* $0           */
      *zsh_name;		/* $ZSH_NAME    */
 
 /**/
-long lastval,		/* $?           */
+zlong lastval,		/* $?           */
      mypid,		/* $$           */
      lastpid,		/* $!           */
      columns,		/* $COLUMNS     */
@@ -334,7 +334,7 @@ copyparamtable(HashTable ht, char *name)
 static unsigned numparamvals;
 
 /**/
-static void
+void
 scancountparams(HashNode hn, int flags)
 {
     ++numparamvals;
@@ -346,7 +346,7 @@ static Comp scancomp;
 static char **paramvals;
 
 /**/
-static void
+void
 scanparamvals(HashNode hn, int flags)
 {
     struct value v;
@@ -572,6 +572,8 @@ createparam(char *name, int flags)
 			 gethashnode2(paramtab, name) :
 			 paramtab->getnode(paramtab, name));
 
+	DPUTS(oldpm && oldpm->level > locallevel,
+	      "BUG:  old local parameter not deleteed");
 	if (oldpm && oldpm->level == locallevel) {
 	    if (!(oldpm->flags & PM_UNSET) || (oldpm->flags & PM_SPECIAL)) {
 		oldpm->flags &= ~PM_UNSET;
@@ -704,13 +706,13 @@ isident(char *s)
 static char **garr;
 
 /**/
-static long
-getarg(char **str, int *inv, Value v, int a2, long *w)
+static zlong
+getarg(char **str, int *inv, Value v, int a2, zlong *w)
 {
     int num = 1, word = 0, rev = 0, ind = 0, down = 0, l, i, ishash;
     int beg = 0, hasbeg = 0;
     char *s = *str, *sep = NULL, *t, sav, *d, **ta, **p, *tt;
-    long r = 0;
+    zlong r = 0;
     Comp c;
 
     ishash = (v->pm && PM_TYPE(v->pm->flags) == PM_HASHED);
@@ -872,7 +874,7 @@ getarg(char **str, int *inv, Value v, int a2, long *w)
 		return 0;
 
 	    if (!a2 && *tt != ',')
-		*w = (long)(s - t) - 1;
+		*w = (zlong)(s - t) - 1;
 
 	    return (a2 ? s : d + 1) - t;
 	} else if (!v->isarr && !word) {
@@ -973,7 +975,7 @@ getarg(char **str, int *inv, Value v, int a2, long *w)
 		    r++;
 		for (i = 0; (t = findword(&d, sep)) && *t; i++)
 		    if (!--r) {
-			r = (long)(t - s + (a2 ? -1 : 1));
+			r = (zlong)(t - s + (a2 ? -1 : 1));
 			if (!a2 && *tt != ',')
 			    *w = r + strlen(ta[i]) - 2;
 			return r;
@@ -1051,7 +1053,7 @@ getindex(char **pptr, Value v)
 	v->b = -1;
 	s += 2;
     } else {
-	long we = 0, dummy;
+	zlong we = 0, dummy;
 
 	a = getarg(&s, &inv, v, 0, &we);
 
@@ -1216,7 +1218,7 @@ char *
 getstrvalue(Value v)
 {
     char *s, **ss;
-    static char buf[(sizeof(long) * 8) + 4];
+    static char buf[(sizeof(zlong) * 8) + 4];
 
     if (!v)
 	return hcalloc(1);
@@ -1314,7 +1316,7 @@ getarrvalue(Value v)
 }
 
 /**/
-long
+zlong
 getintvalue(Value v)
 {
     if (!v || v->isarr)
@@ -1330,7 +1332,7 @@ getintvalue(Value v)
 static void
 setstrvalue(Value v, char *val)
 {
-    char buf[(sizeof(long) * 8) + 4];
+    char buf[(sizeof(zlong) * 8) + 4];
 
     if (v->pm->flags & PM_READONLY) {
 	zerr("read-only variable: %s", v->pm->nam, 0);
@@ -1414,7 +1416,7 @@ setstrvalue(Value v, char *val)
 
 /**/
 static void
-setintvalue(Value v, long val)
+setintvalue(Value v, zlong val)
 {
     char buf[DIGBUFSIZE];
 
@@ -1429,7 +1431,7 @@ setintvalue(Value v, long val)
     switch (PM_TYPE(v->pm->flags)) {
     case PM_SCALAR:
     case PM_ARRAY:
-	sprintf(buf, "%ld", val);
+	convbase(buf, val, 0);
 	setstrvalue(v, ztrdup(buf));
 	break;
     case PM_INTEGER:
@@ -1508,7 +1510,7 @@ setarrvalue(Value v, char **val)
 /* Retrieve an integer parameter */
 
 /**/
-long
+zlong
 getiparam(char *s)
 {
     Value v;
@@ -1681,7 +1683,7 @@ sethparam(char *s, char **val)
 
 /**/
 Param
-setiparam(char *s, long val)
+setiparam(char *s, zlong val)
 {
     Value v;
     char *t = s;
@@ -1794,7 +1796,7 @@ stdunsetfn(Param pm, int exp)
 /* Function to get value of an integer parameter */
 
 /**/
-static long
+static zlong
 intgetfn(Param pm)
 {
     return pm->u.val;
@@ -1804,7 +1806,7 @@ intgetfn(Param pm)
 
 /**/
 static void
-intsetfn(Param pm, long x)
+intsetfn(Param pm, zlong x)
 {
     pm->u.val = x;
 }
@@ -1859,7 +1861,7 @@ arrsetfn(Param pm, char **x)
 /* Function to get value of an association parameter */
 
 /**/
-static HashTable
+HashTable
 hashgetfn(Param pm)
 {
     return pm->u.hash;
@@ -1872,7 +1874,7 @@ static int delunset;
 /* Function to set value of an association parameter */
 
 /**/
-static void
+void
 hashsetfn(Param pm, HashTable x)
 {
     if (pm->u.hash && pm->u.hash != x) {
@@ -1941,10 +1943,10 @@ nullsetfn(Param pm, char *x)
  * containing the integer value.                    */
 
 /**/
-long
+zlong
 intvargetfn(Param pm)
 {
-    return *((long *)pm->u.data);
+    return *((zlong *)pm->u.data);
 }
 
 /* Function to set value of generic special integer *
@@ -1953,9 +1955,9 @@ intvargetfn(Param pm)
 
 /**/
 void
-intvarsetfn(Param pm, long x)
+intvarsetfn(Param pm, zlong x)
 {
-    *((long *)pm->u.data) = x;
+    *((zlong *)pm->u.data) = x;
 }
 
 /* Function to set value of any ZLE-related integer *
@@ -1964,9 +1966,9 @@ intvarsetfn(Param pm, long x)
 
 /**/
 void
-zlevarsetfn(Param pm, long x)
+zlevarsetfn(Param pm, zlong x)
 {
-    long *p = (long *)pm->u.data;
+    zlong *p = (zlong *)pm->u.data;
 
     *p = x;
     if (p == &lines || p == &columns)
@@ -2086,7 +2088,7 @@ uniqarray(char **x)
 /* Function to get value of special parameter `#' and `ARGC' */
 
 /**/
-long
+zlong
 poundgetfn(Param pm)
 {
     return arrlen(pparams);
@@ -2095,7 +2097,7 @@ poundgetfn(Param pm)
 /* Function to get value for special parameter `RANDOM' */
 
 /**/
-long
+zlong
 randomgetfn(Param pm)
 {
     return rand() & 0x7fff;
@@ -2105,7 +2107,7 @@ randomgetfn(Param pm)
 
 /**/
 void
-randomsetfn(Param pm, long v)
+randomsetfn(Param pm, zlong v)
 {
     srand((unsigned int)v);
 }
@@ -2113,7 +2115,7 @@ randomsetfn(Param pm, long v)
 /* Function to get value for special parameter `SECONDS' */
 
 /**/
-long
+zlong
 secondsgetfn(Param pm)
 {
     return time(NULL) - shtimer.tv_sec;
@@ -2123,7 +2125,7 @@ secondsgetfn(Param pm)
 
 /**/
 void
-secondssetfn(Param pm, long x)
+secondssetfn(Param pm, zlong x)
 {
     shtimer.tv_sec = time(NULL) - x;
     shtimer.tv_usec = 0;
@@ -2163,7 +2165,7 @@ usernamesetfn(Param pm, char *x)
 /* Function to get value for special parameter `UID' */
 
 /**/
-long
+zlong
 uidgetfn(Param pm)
 {
     return getuid();
@@ -2183,7 +2185,7 @@ uidsetfn(Param pm, uid_t x)
 /* Function to get value for special parameter `EUID' */
 
 /**/
-long
+zlong
 euidgetfn(Param pm)
 {
     return geteuid();
@@ -2203,7 +2205,7 @@ euidsetfn(Param pm, uid_t x)
 /* Function to get value for special parameter `GID' */
 
 /**/
-long
+zlong
 gidgetfn(Param pm)
 {
     return getgid();
@@ -2223,7 +2225,7 @@ gidsetfn(Param pm, gid_t x)
 /* Function to get value for special parameter `EGID' */
 
 /**/
-long
+zlong
 egidgetfn(Param pm)
 {
     return getegid();
@@ -2241,7 +2243,7 @@ egidsetfn(Param pm, gid_t x)
 }
 
 /**/
-long
+zlong
 ttyidlegetfn(Param pm)
 {
     struct stat ttystat;
@@ -2345,7 +2347,7 @@ lcsetfn(Param pm, char *x)
 /* Function to get value for special parameter `HISTSIZE' */
 
 /**/
-long
+zlong
 histsizegetfn(Param pm)
 {
     return histsiz;
@@ -2355,7 +2357,7 @@ histsizegetfn(Param pm)
 
 /**/
 void
-histsizesetfn(Param pm, long v)
+histsizesetfn(Param pm, zlong v)
 {
     if ((histsiz = v) <= 2)
 	histsiz = 2;
@@ -2365,7 +2367,7 @@ histsizesetfn(Param pm, long v)
 /* Function to get value for special parameter `ERRNO' */
 
 /**/
-long
+zlong
 errnogetfn(Param pm)
 {
     return errno;
@@ -2626,11 +2628,11 @@ delenv(char *x)
 }
 
 /**/
-static void
-convbase(char *s, long v, int base)
+void
+convbase(char *s, zlong v, int base)
 {
     int digs = 0;
-    unsigned long x;
+    zulong x;
 
     if (v < 0)
 	*s++ = '-', v = -v;
@@ -2774,7 +2776,11 @@ printparamnode(HashNode hn, int printflags)
 	break;
     case PM_INTEGER:
 	/* integer */
+#ifdef ZSH_64_BIT_TYPE
+	fputs(output64(p->gets.ifn(p)), stdout);
+#else
 	printf("%ld", p->gets.ifn(p));
+#endif
 	break;
     case PM_ARRAY:
 	/* array */

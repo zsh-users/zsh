@@ -1,4 +1,4 @@
-texinode(The files Module)(The sched Module)(The example Module)(Zsh Modules)
+texinode(The files Module)(The parameter Module)(The example Module)(Zsh Modules)
 sect(The files Module)
 cindex(files, manipulating)
 The tt(files) module makes some standard commands available as builtins:

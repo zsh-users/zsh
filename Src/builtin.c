@@ -1521,9 +1521,14 @@ typeset_single(char *cname, char *pname, Param pm, int func,
 	    zerrnam(cname, "%s: restricted", pname, 0);
 	    return pm;
 	}
-	if (PM_TYPE(pm->flags) == PM_ARRAY && (on & PM_UNIQUE) &&
-	    !(pm->flags & PM_READONLY & ~off))
-	    uniqarray((*pm->gets.afn) (pm));
+	if ((on & PM_UNIQUE) && !(pm->flags & PM_READONLY & ~off)) {
+	    Param apm;
+	    if (PM_TYPE(pm->flags) == PM_ARRAY)
+		uniqarray((*pm->gets.afn) (pm));
+	    else if (PM_TYPE(pm->flags) == PM_SCALAR && pm->ename &&
+		     (apm = (Param) paramtab->getnode(paramtab, pm->ename)))
+		uniqarray((*apm->gets.afn) (apm));
+	}
 	pm->flags = (pm->flags | on) & ~off;
 	/* This auxlen/pm->ct stuff is a nasty hack. */
 	if ((on & (PM_LEFT | PM_RIGHT_B | PM_RIGHT_Z | PM_INTEGER)) &&
@@ -3647,7 +3652,7 @@ bin_ttyctl(char *name, char **argv, char *ops, int func)
 int
 bin_let(char *name, char **argv, char *ops, int func)
 {
-    long val = 0;
+    zlong val = 0;
 
     while (*argv)
 	val = matheval(*argv++);

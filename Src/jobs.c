@@ -175,8 +175,23 @@ update_job(Job jn)
 	    jn->ty = (struct ttyinfo *) zalloc(sizeof(struct ttyinfo));
 	    gettyinfo(jn->ty);
 	}
-	if (jn->stat & STAT_STOPPED)
+	if (jn->stat & STAT_STOPPED) {
+	    if (jn->stat & STAT_SUBJOB) {
+		/* If we have `cat foo|while read a; grep $a bar;done'
+		 * and have hit ^Z, the sub-job is stopped, but the
+		 * super-job may still be running, waiting to be stopped
+		 * or to exit. So we have to send it a SIGSTOP. */
+		int i;
+
+		for (i = 1; i < MAXJOB; i++)
+		    if ((jobtab[i].stat & STAT_SUPERJOB) &&
+			jobtab[i].other == job) {
+			killpg(jobtab[i].gleader, SIGSTOP);
+			break;
+		    }
+	    }
 	    return;
+	}
     } else {                   /* job is done, so remember return value */
 	lastval2 = val;
 	/* If last process was run in the current shell, keep old status
@@ -202,14 +217,27 @@ update_job(Job jn)
 	if (mypgrp != pgrp && inforeground &&
 	    (jn->gleader == pgrp || (pgrp > 1 && kill(-pgrp, 0) == -1))) {
 	    if (list_pipe) {
-		/*
-		 * Oh, dear, we're right in the middle of some confusion
-		 * of shell jobs on the righthand side of a pipeline, so
-		 * it's death to call attachtty() just yet.  Mark the
-		 * fact in the job, so that the attachtty() will be called
-		 * when the job is finally deleted.
-		 */
-		jn->stat |= STAT_ATTACH;
+		if (pgrp > 1 && kill(-pgrp, 0) == -1) {
+		    attachtty(mypgrp);
+		    /* check window size and adjust if necessary */
+		    adjustwinsize(0);
+		} else {
+		    /*
+		     * Oh, dear, we're right in the middle of some confusion
+		     * of shell jobs on the righthand side of a pipeline, so
+		     * it's death to call attachtty() just yet.  Mark the
+		     * fact in the job, so that the attachtty() will be called
+		     * when the job is finally deleted.
+		     */
+		    jn->stat |= STAT_ATTACH;
+		}
+		/* If we have `foo|while true; (( x++ )); done', and hit
+		 * ^C, we have to stop the loop, too. */
+		if ((val & 0200) && inforeground == 1) {
+		    breaks = loops;
+		    errflag = 1;
+		    inerrflush();
+		}
 	    } else {
 		attachtty(mypgrp);
 		/* check window size and adjust if necessary */
@@ -765,8 +793,17 @@ waitjob(int job, int sig)
 			}
 		    if (!p) {
 			jn->stat &= ~STAT_SUPERJOB;
+			if (WIFEXITED(jn->procs->status))
+			    jn->gleader = mypgrp;
+			/* This deleted the job too early if the parent
+			   shell waited for a command in a list that will
+			   be executed by the sub-shell (e.g.: if we have
+			   `ls|if true;then sleep 20;cat;fi' and ^Z the
+			   sleep, the rest will be executed by a sub-shell,
+			   but the parent shell gets notified for the
+			   sleep.
+			   deletejob(sj); */
 			kill(sj->other, SIGCONT);
-			deletejob(sj);
 		    }
 		    curjob = jn - jobtab;
 		}

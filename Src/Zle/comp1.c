@@ -100,11 +100,11 @@ int incompfunc;
 /* global variables for shell parameters in new style completion */
 
 /**/
-long compcurrent,
-     compnmatches,
-     compmatcher,
-     compmatchertot,
-     complistmax;
+zlong compcurrent,
+      compnmatches,
+      compmatcher,
+      compmatchertot,
+      complistmax;
 
 /**/
 char **compwords,

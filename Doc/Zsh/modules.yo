@@ -31,6 +31,9 @@ An example of how to write a module.
 item(tt(files))(
 Some basic file manipulation commands as builtins.
 )
+item(tt(parameter))(
+Access to internal hash tables via special associative arrays.
+)
 item(tt(sched))(
 A builtin that provides a timed execution facility within the shell.
 )
@@ -52,6 +55,7 @@ menu(The compctl Module)
 menu(The deltochar Module)
 menu(The example Module)
 menu(The files Module)
+menu(The parameter Module)
 menu(The sched Module)
 menu(The stat Module)
 menu(The zftp Module)
@@ -64,6 +68,7 @@ includefile(Zsh/mod_compctl.yo)
 includefile(Zsh/mod_deltochar.yo)
 includefile(Zsh/mod_example.yo)
 includefile(Zsh/mod_files.yo)
+includefile(Zsh/mod_parameter.yo)
 includefile(Zsh/mod_sched.yo)
 includefile(Zsh/mod_stat.yo)
 includefile(Zsh/mod_zftp.yo)

@@ -99,6 +99,8 @@ stringsubst(LinkList list, LinkNode node, int ssub)
     while (!errflag && *str) {
 	if ((qt = *str == Qstring) || *str == String) {
 	    if (str[1] == Inpar) {
+		if (!qt)
+		    mult_isarr = 1;
 		str++;
 		goto comsub;
 	    } else if (str[1] == Inbrack) {
@@ -249,6 +251,7 @@ singsub(char **s)
  * The mult_isarr variable is used by paramsubst() to tell if it yields *
  * an array.                                                            */
 
+/**/
 static int mult_isarr;
 
 /**/
@@ -282,6 +285,8 @@ multsub(char **s, char ***a, int *isarr, char *sep)
 	}
 	*s = sepjoin(r, NULL);
 	mult_isarr = omi;
+	if (isarr)
+	    *isarr = 0;
 	return 0;
     }
     if (l)
@@ -666,7 +671,7 @@ get_intarg(char **s)
 {
     char *t = get_strarg(*s + 1);
     char *p, sav;
-    long ret;
+    zlong ret;
 
     if (!*t)
 	return -1;
@@ -719,7 +724,7 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int ssub)
     char *sep = NULL, *spsep = NULL;
     char *premul = NULL, *postmul = NULL, *preone = NULL, *postone = NULL;
     char *replstr = NULL;	/* replacement string for /orig/repl */
-    long prenum = 0, postnum = 0;
+    zlong prenum = 0, postnum = 0;
     int copied = 0;
     int arrasg = 0;
     int eval = 0;
@@ -751,7 +756,7 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int ssub)
 	} else if (*s == '(' || *s == Inpar) {
 	    char *t, sav;
 	    int tt = 0;
-	    long num;
+	    zlong num;
 	    int escapes = 0;
 	    int klen;
 #define UNTOK(C)  (itok(C) ? ztokens[(C) - Pound] : (C))
@@ -1678,13 +1683,13 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int ssub)
 static char *
 arithsubst(char *a, char **bptr, char *rest)
 {
-    char *s = *bptr, *t, buf[DIGBUFSIZE];
-    char *b = buf;
-    long v;
+    char *s = *bptr, *t;
+    char buf[DIGBUFSIZE], *b = buf;
+    zlong v;
 
     singsub(&a);
     v = matheval(a);
-    sprintf(buf, "%ld", v);
+    convbase(buf, v, 0);
     t = *bptr = (char *)ncalloc(strlen(*bptr) + strlen(buf) + strlen(rest) + 1);
     t--;
     while ((*++t = *s++));

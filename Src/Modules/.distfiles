@@ -4,6 +4,7 @@ DISTFILES_SRC='
     clone.mdd clone.c
     example.mdd example.c
     files.mdd files.c
+    parameter.mdd parameter.c
     stat.mdd stat.c
     zftp.mdd zftp.c
 '

@@ -7,7 +7,19 @@ cindex(compatibility)
 cindex(sh, compatibility)
 cindex(ksh, compatibility)
 Zsh tries to emulate bf(sh) or bf(ksh) when it is invoked as
-tt(sh) or tt(ksh) respectively.  In this mode the following
+tt(sh) or tt(ksh) respectively.  More precisely, it looks at the first
+letter of the name passed to it, which may not necessarily be the
+name of the executable file, ignoring any initial `tt(-)' as well as
+`tt(r)' (for restricted); an `tt(s)' or `tt(b)' will force
+bf(sh) compatibility, while `tt(k)' will force bf(ksh) compatibility.  An
+exception is if the name excluding any `tt(-)' is tt(su), in which case
+the environment variable tt(SHELL) will be used to test the emulation;
+this is to workaround a problem under some operating systems where the
+tt(su) command does not change the name when executing a user shell.  Note
+that, from within zsh itself, this mechanism can be invoked by `tt(ARGV0=sh
+zsh ...)'.
+
+In this emulation mode, the following
 parameters are not special and not initialized by the shell:
 tt(ARGC),
 tt(argv),

@@ -3723,7 +3723,8 @@ addmatches(Cadata dat, char **argv)
 		    }
 		}
 		if (!(dat->aflags & CAF_MATCH)) {
-		    ms = dupstring(s);
+		    ms = ((dat->aflags & CAF_QUOTE) ? dupstring(s) :
+			  quotename(s, NULL));
 		    lc = bld_parts(ms, sl, -1, NULL);
 		    isexact = 0;
 		} else if (!(ms = comp_match(lpre, lsuf, s, cp, &lc,
@@ -3734,7 +3735,7 @@ addmatches(Cadata dat, char **argv)
 		    continue;
 		}
 		if (doadd) {
-		    cm = add_match_data(isalt, ms, lc, dat->ipre, dat->ipre,
+		    cm = add_match_data(isalt, ms, lc, dat->ipre, NULL,
 					dat->isuf, dat->pre, dat->prpre,
 					dat->ppre, dat->psuf, dat->suf,
 					bpl, bsl, dat->flags, isexact);

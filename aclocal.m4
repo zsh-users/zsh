@@ -27,9 +27,12 @@ ac_save_CFLAGS="$CFLAGS"
 # breaks some systems' header files.
 # AIX			-qlanglvl=ansi
 # Ultrix and OSF/1	-std1
-# HP-UX			-Aa -D_HPUX_SOURCE
+# HP-UX			-Ae  or  -Aa -D_HPUX_SOURCE
 # SVR4			-Xc
-for ac_arg in "" -qlanglvl=ansi -std1 "-Aa -D_HPUX_SOURCE" -Xc
+#  For HP-UX, we try -Ae first; this turns on ANSI but also extensions,
+#  as well as defining _HPUX_SOURCE, and we can then use long long.
+#  We keep the old version for backward compatibility.
+for ac_arg in "" -qlanglvl=ansi -std1 -Ae "-Aa -D_HPUX_SOURCE" -Xc
 do
   CFLAGS="$ac_save_CFLAGS $ac_arg"
   AC_TRY_COMPILE(

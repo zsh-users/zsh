@@ -202,6 +202,32 @@ Any startup/shutdown script can be disabled by giving the
 --disable-scriptname option to "configure".  The --disable-etcdir option
 disables all startup/shutdown files which are not explicitely enabled.
 
+Support for large files and integers
+------------------------------------
+
+Some 32-bit systems allow special compilation modes to get around the 2GB
+file size barrier; the zsh support for this is still experimental, and
+feedback is particularly appreciated.  The option --enable-lfs turns on the
+configure check for support for large files.  Not all systems recognize the
+test used by zsh (via the getconf command), so flags may need to be set by
+hand, but --enable-lfs should be used in any case to compile in the code
+for using 64 bit integers.  On HP-UX 10.20, zsh has been successfully
+compiled with large file support by configuring with
+  CC="cc -Ae" CPPFLAGS="-D_LARGEFILE_SOURCE -D_FILE64" configure \
+  --enable-lfs ...
+You can also give a value to --enable-lfs, which will be interpreted as the
+name of a 64-bit integer type, for example --enable-lfs="long long"
+(although this type is checked for anyway).
+
+Furthermore, use of --enable-lfs will also enable 64-bit arithmetic for
+shell parameters, and anywhere they are used such as in mathematical
+formulae.  This depends only on the shell finding a suitable 64-bit integer
+type; it does not require that support for large files is actually
+enabled.  Hence you might consider using --enable-lfs on any 32-bit system
+with a suitable compiler such as gcc.
+
+None of this is relevant for 64-bit systems; zsh should compile and run
+without problems if (sizeof(long) == 8).
 
 Options For Configure
 ---------------------
@@ -244,3 +270,4 @@ Features:
      zprofile=pathname   # the full pathname of the global zprofile script
      zlogout=pathname    # the full pathname of the global zlogout script
      dynamic             # allow dynamically loaded binary modules
+     lfs                 # allow configure check for large files

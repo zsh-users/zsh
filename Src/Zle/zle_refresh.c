@@ -881,20 +881,8 @@ moveto(int ln, int cl)
 	}
     }
 
-    if (cl == vcs)
-	return;
-
-/* choose cheapest movements for ttys without multiple movement capabilities -
-   do this now because it's easier (to code) */
-    if (cl <= vcs / 2) {
-	zputc('\r', shout);
-	vcs = 0;
-    }
-    if (vcs < cl)
-	tc_rightcurs(cl);
-    else if (vcs > cl)
-	tc_leftcurs(vcs - cl);
-    vcs = cl;
+    if (cl != vcs)
+        singmoveto(cl);
 }
 
 /**/
@@ -912,16 +900,17 @@ tcmultout(int cap, int multcap, int ct)
     return 0;
 }
 
+/* ct: number of characters to move across */
 /**/
 static void
-tc_rightcurs(int cl)
+tc_rightcurs(int ct)
 {
-    int ct,			/* number of characters to move across	    */
+    int cl,			/* ``desired'' absolute horizontal position */
 	i = vcs,		/* cursor position after initial movements  */
 	j;
     char *t;
 
-    ct = cl - vcs;
+    cl = ct + vcs;
 
 /* do a multright if we can - it's the most reliable */
     if (tccan(TCMULTRIGHT)) {
@@ -929,6 +918,13 @@ tc_rightcurs(int cl)
 	return;
     }
 
+/* do an absolute horizontal position if we can */
+    if (tccan(TCHORIZPOS)) {
+	tcoutarg(TCHORIZPOS, cl);
+	return;
+    }
+
+/* XXX: should really check "it" in termcap and use / and % */
 /* try tabs if tabs are non destructive and multright is not possible */
     if (!oxtabs && tccan(TCNEXTTAB) && ((vcs | 7) < cl)) {
 	i = (vcs | 7) + 1;
@@ -1137,21 +1133,19 @@ singmoveto(int pos)
 {
     if (pos == vcs)
 	return;
-    if (pos <= vcs / 2) {
+
+/* choose cheapest movements for ttys without multiple movement capabilities -
+   do this now because it's easier (to code) */
+
+    if ((!tccan(TCMULTLEFT) || pos == 0) && (pos <= vcs / 2)) {
 	zputc('\r', shout);
 	vcs = 0;
     }
-    if (pos < vcs) {
+
+    if (pos < vcs)
 	tc_leftcurs(vcs - pos);
-	vcs = pos;
-    }
-    if (pos > vcs) {
-	if (tcmultout(TCRIGHT, TCMULTRIGHT, pos - vcs))
-	    vcs = pos;
-	else
-	    while (pos > vcs) {
-		zputc(nbuf[0][vcs], shout);
-		vcs++;
-	    }
-    }
+    else if (pos > vcs)
+	tc_rightcurs(pos - vcs);
+
+    vcs = pos;
 }

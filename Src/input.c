@@ -406,7 +406,7 @@ stuff(char *fn)
 {
     FILE *in;
     char *buf;
-    int len;
+    off_t len;
 
     if (!(in = fopen(unmeta(fn), "r"))) {
 	zerr("can't open %s", fn, 0);

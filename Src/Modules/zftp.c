@@ -117,7 +117,7 @@ enum {
     ZFHD_EORB = 128		/* block is end of file */
 };
 
-typedef int (*readwrite_t)(int, char *, size_t, int);
+typedef int (*readwrite_t)(int, char *, off_t, int);
 
 struct zftpcmd {
     const char *nam;
@@ -195,7 +195,7 @@ static char *zfparams[] = {
 enum {
     ZFPM_READONLY = 0x01,	/* make parameter readonly */
     ZFPM_IFUNSET  = 0x02,	/* only set if not already set */
-    ZFPM_INTEGER  = 0x04	/* passed pointer to long */
+    ZFPM_INTEGER  = 0x04	/* passed pointer to off_t */
 };
 
 /*
@@ -250,25 +250,26 @@ static int zfhas_size, zfhas_mdtm;
  * --- we don't try to track it because it's too complicated.
  */
 enum {
-    ZFST_ASCI = 0x00,		/* type for next transfer is ASCII */
-    ZFST_IMAG = 0x01,		/* type for next transfer is image */
+    ZFST_ASCI = 0x0000,		/* type for next transfer is ASCII */
+    ZFST_IMAG = 0x0001,		/* type for next transfer is image */
 
-    ZFST_TMSK = 0x01,		/* mask for type flags */
-    ZFST_TBIT = 0x01,		/* number of bits in type flags */
+    ZFST_TMSK = 0x0001,		/* mask for type flags */
+    ZFST_TBIT = 0x0001,		/* number of bits in type flags */
 
-    ZFST_CASC = 0x00,		/* current type is ASCII - default */
-    ZFST_CIMA = 0x02,		/* current type is image */
+    ZFST_CASC = 0x0000,		/* current type is ASCII - default */
+    ZFST_CIMA = 0x0002,		/* current type is image */
 
-    ZFST_STRE = 0x00,		/* stream mode - default */
-    ZFST_BLOC = 0x04,		/* block mode */
+    ZFST_STRE = 0x0000,		/* stream mode - default */
+    ZFST_BLOC = 0x0004,		/* block mode */
 
-    ZFST_MMSK = 0x04,		/* mask for mode flags */
+    ZFST_MMSK = 0x0004,		/* mask for mode flags */
 
-    ZFST_LOGI = 0x08,		/* user logged in */
-    ZFST_NOPS = 0x10,		/* server doesn't understand PASV */
-    ZFST_NOSZ = 0x20,		/* server doesn't send `(XXXX bytes)' reply */
-    ZFST_TRSZ = 0x40,		/* tried getting 'size' from reply */
-    ZFST_CLOS = 0x80		/* connection closed */
+    ZFST_LOGI = 0x0008,		/* user logged in */
+    ZFST_SYST = 0x0010,		/* done system type check */
+    ZFST_NOPS = 0x0020,		/* server doesn't understand PASV */
+    ZFST_NOSZ = 0x0040,		/* server doesn't send `(XXXX bytes)' reply */
+    ZFST_TRSZ = 0x0080,		/* tried getting 'size' from reply */
+    ZFST_CLOS = 0x0100		/* connection closed */
 };
 #define ZFST_TYPE(x) (x & ZFST_TMSK)
 /*
@@ -461,7 +462,7 @@ zfmovefd(int fd)
  * set a non-special parameter.
  * if ZFPM_IFUNSET, don't set if it already exists.
  * if ZFPM_READONLY, make it readonly, but only when creating it.
- * if ZFPM_INTEGER, val pointer is to long (NB not int), don't free.
+ * if ZFPM_INTEGER, val pointer is to off_t (NB not int), don't free.
  */
 /**/
 static void
@@ -488,7 +489,7 @@ zfsetparam(char *name, void *val, int flags)
 	return;
     }
     if (type == PM_INTEGER)
-	pm->sets.ifn(pm, *(long *)val);
+	pm->sets.ifn(pm, *(off_t *)val);
     else
 	pm->sets.cfn(pm, (char *)val);
 }
@@ -1009,7 +1010,7 @@ zfgetdata(char *name, char *rest, char *cmd, int getsize)
 	    if (isdigit(STOUC(*ptr))) {
 		zfstatus &= ~ZFST_NOSZ;
 		if (getsize) {
-		    long sz = zstrtol(ptr, NULL, 10);
+		    off_t sz = zstrtol(ptr, NULL, 10);
 		    zfsetparam("ZFTP_SIZE", &sz, ZFPM_READONLY|ZFPM_INTEGER);
 		}
 	    }
@@ -1090,9 +1091,9 @@ zfgetdata(char *name, char *rest, char *cmd, int getsize)
 
 /**/
 static int
-zfstats(char *fnam, int remote, long *retsize, char **retmdtm, int fd)
+zfstats(char *fnam, int remote, off_t *retsize, char **retmdtm, int fd)
 {
-    long sz = -1;
+    off_t sz = -1;
     char *mt = NULL;
     int ret;
 
@@ -1151,7 +1152,7 @@ zfstats(char *fnam, int remote, long *retsize, char **retmdtm, int fd)
 
 	if ((fd == -1 ? stat(fnam, &statbuf) : fstat(fd, &statbuf)) < 0)
 	    return 1;
-	/* make sure it's long, since this has to be a pointer */
+	/* make sure it's off_t, since this has to be a pointer */
 	sz = statbuf.st_size;
 
 	if (retmdtm) {
@@ -1179,9 +1180,9 @@ zfstats(char *fnam, int remote, long *retsize, char **retmdtm, int fd)
 
 /**/
 static void
-zfstarttrans(char *nam, int recv, long sz)
+zfstarttrans(char *nam, int recv, off_t sz)
 {
-    long cnt = 0;
+    off_t cnt = 0;
     /*
      * sz = -1 signifies error getting size.  don't set ZFTP_SIZE if sz is
      * zero, either: it probably came from an fstat() on a pipe, so it
@@ -1210,7 +1211,7 @@ zfendtrans()
 
 /**/
 static int
-zfread(int fd, char *bf, size_t sz, int tmout)
+zfread(int fd, char *bf, off_t sz, int tmout)
 {
     int ret;
 
@@ -1235,7 +1236,7 @@ zfread(int fd, char *bf, size_t sz, int tmout)
 
 /**/
 static int
-zfwrite(int fd, char *bf, size_t sz, int tmout)
+zfwrite(int fd, char *bf, off_t sz, int tmout)
 {
     int ret;
 
@@ -1262,11 +1263,11 @@ static int zfread_eof;
 
 /**/
 static int
-zfread_block(int fd, char *bf, size_t sz, int tmout)
+zfread_block(int fd, char *bf, off_t sz, int tmout)
 {
     int n;
     struct zfheader hdr;
-    size_t blksz, cnt;
+    off_t blksz, cnt;
     char *bfptr;
     do {
 	/* we need the header */
@@ -1314,11 +1315,11 @@ zfread_block(int fd, char *bf, size_t sz, int tmout)
 
 /**/
 static int
-zfwrite_block(int fd, char *bf, size_t sz, int tmout)
+zfwrite_block(int fd, char *bf, off_t sz, int tmout)
 {
     int n;
     struct zfheader hdr;
-    size_t cnt;
+    off_t cnt;
     char *bfptr;
     /* we need the header */
     do {
@@ -1359,7 +1360,7 @@ zfwrite_block(int fd, char *bf, size_t sz, int tmout)
 
 /**/
 static int
-zfsenddata(char *name, int recv, int progress, long startat)
+zfsenddata(char *name, int recv, int progress, off_t startat)
 {
 #define ZF_BUFSIZE 32768
 #define ZF_ASCSIZE (ZF_BUFSIZE/2)
@@ -1367,7 +1368,7 @@ zfsenddata(char *name, int recv, int progress, long startat)
     int n, ret = 0, gotack = 0, fdin, fdout, fromasc = 0, toasc = 0;
     int rtmout = 0, wtmout = 0;
     char lsbuf[ZF_BUFSIZE], *ascbuf = NULL, *optr;
-    long sofar = 0, last_sofar = 0;
+    off_t sofar = 0, last_sofar = 0;
     readwrite_t read_ptr = zfread, write_ptr = zfwrite;
     List l;
 
@@ -1598,7 +1599,7 @@ zftp_open(char *name, char **args, int flags)
     struct protoent *zprotop;
     struct servent *zservp;
     struct hostent *zhostp = NULL;
-    char **addrp, tbuf[2] = "X", *fname;
+    char **addrp, *fname;
     int err, len, tmout;
 
     if (!*args) {
@@ -1802,32 +1803,11 @@ zftp_open(char *name, char **args, int flags)
 #endif
     unlink(fname);
 
-    /* now find out what system we're connected to */
-    if (!(zfprefs & ZFPF_DUMB) && zfsendcmd("SYST\r\n") == 2) {
-	char *ptr = lastmsg, *eptr, *systype;
-	for (eptr = ptr; *eptr; eptr++)
-	    ;
-	systype = ztrduppfx(ptr, eptr-ptr);
-	if (!strncmp(systype, "UNIX Type: L8", 13)) {
-	    /*
-	     * Use binary for transfers.  This simple test saves much
-	     * hassle for all concerned, particularly me.
-	     */
-	    zfstatus |= ZFST_IMAG;
-	    zfis_unix = 1;
-	}
-	/*
-	 * we could set zfis_unix based just on the UNIX part,
-	 * but I don't really know the consequences of that.
-	 */
-	zfsetparam("ZFTP_SYSTEM", systype, ZFPM_READONLY);
-    } else if (zcfd == -1) {
+    if (zcfd == -1) {
 	/* final paranoid check */
 	return 1;
     }
 	
-    tbuf[0] = (ZFST_TYPE(zfstatus) == ZFST_ASCI) ? 'A' : 'I';
-    zfsetparam("ZFTP_TYPE", ztrdup(tbuf), ZFPM_READONLY);
     zfsetparam("ZFTP_MODE", ztrdup("S"), ZFPM_READONLY);
     /* if remaining arguments, use them to log in. */
     if (zcfd > -1 && *++args)
@@ -1964,7 +1944,7 @@ static int
 zftp_login(char *name, char **args, int flags)
 {
     char *ucmd, *passwd = NULL, *acct = NULL;
-    char *user;
+    char *user, tbuf[2] = "X";
     int stopit;
 
     if ((zfstatus & ZFST_LOGI) && zfsendcmd("REIN\r\n") >= 4)
@@ -2043,6 +2023,36 @@ zftp_login(char *name, char **args, int flags)
     zfsetparam("ZFTP_USER", ztrdup(user), ZFPM_READONLY);
     if (acct)
 	zfsetparam("ZFTP_ACCOUNT", ztrdup(acct), ZFPM_READONLY);
+
+    /*
+     * Now find out what system we're connected to. Some systems
+     * won't let us do this until we're logged in; it's fairly safe
+     * to delay it here for all systems.
+     */
+    if (!(zfprefs & ZFPF_DUMB) && !(zfstatus & ZFST_SYST)) {
+	if (zfsendcmd("SYST\r\n") == 2) {
+	    char *ptr = lastmsg, *eptr, *systype;
+	    for (eptr = ptr; *eptr; eptr++)
+		;
+	    systype = ztrduppfx(ptr, eptr-ptr);
+	    if (!strncmp(systype, "UNIX Type: L8", 13)) {
+		/*
+		 * Use binary for transfers.  This simple test saves much
+		 * hassle for all concerned, particularly me.
+		 */
+		zfstatus |= ZFST_IMAG;
+		zfis_unix = 1;
+	    }
+	    /*
+	     * we could set zfis_unix based just on the UNIX part,
+	     * but I don't really know the consequences of that.
+	     */
+	    zfsetparam("ZFTP_SYSTEM", systype, ZFPM_READONLY);
+	}
+	zfstatus |= ZFST_SYST;
+    }
+    tbuf[0] = (ZFST_TYPE(zfstatus) == ZFST_ASCI) ? 'A' : 'I';
+    zfsetparam("ZFTP_TYPE", ztrdup(tbuf), ZFPM_READONLY);
 
     /*
      * Get the directory.  This is possibly an unnecessary overhead, of
@@ -2307,7 +2317,7 @@ zftp_local(char *name, char **args, int flags)
 {
     int more = !!args[1], ret = 0, dofd = !*args;
     while (*args || dofd) {
-	long sz;
+	off_t sz;
 	char *mt;
 	int newret = zfstats(*args, !(flags & ZFTP_HERE), &sz, &mt,
 			     dofd ? 0 : -1);
@@ -2324,7 +2334,12 @@ zftp_local(char *name, char **args, int flags)
 	    fputs(*args, stdout);
 	    fputc(' ', stdout);
 	}
+#ifdef OFF_T_IS_64_BIT
+	printf("%s %s\n", output64(sz), mt);
+#else
+	DPUTS(sizeof(sz) > 4, "Shell compiled with wrong off_t size");
 	printf("%ld %s\n", sz, mt);
+#endif
 	zsfree(mt);
 	if (dofd)
 	    break;
@@ -2371,9 +2386,9 @@ zftp_getput(char *name, char **args, int flags)
 	fflush(stdout);		/* since we may be using fd 1 */
     for (; *args; args++) {
 	char *ln, *rest = NULL;
-	long startat = 0;
+	off_t startat = 0;
 	if (progress && (l = getshfunc("zftp_progress")) != &dummy_list) {
-	    long sz;
+	    off_t sz;
 	    /*
 	     * This calls the SIZE command to get the size for remote
 	     * files.  Some servers send the size with the reply to
@@ -2701,7 +2716,7 @@ boot_zftp(Module m)
     if ((ret = addbuiltins(m->nam, bintab,
 			   sizeof(bintab)/sizeof(*bintab))) == 1) {
 	/* if successful, set some default parameters */
-	long tmout_def = 60;
+	off_t tmout_def = 60;
 	zfsetparam("ZFTP_VERBOSE", ztrdup("450"), ZFPM_IFUNSET);
 	zfsetparam("ZFTP_TMOUT", &tmout_def, ZFPM_IFUNSET|ZFPM_INTEGER);
 	zfsetparam("ZFTP_PREFS", ztrdup("PS"), ZFPM_IFUNSET);

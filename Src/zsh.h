@@ -38,6 +38,21 @@
 /* A few typical macros */
 #define minimum(a,b)  ((a) < (b) ? (a) : (b))
 
+/*
+ * Our longest integer type:  will be a 64 bit either if long already is,
+ * or if we found some alternative such as long long.
+ * Currently we only define this to be longer than a long if --enable-lfs
+ * was given.  That enables internal use of 64-bit types even if
+ * no actual large file support is present.
+ */
+#ifdef ZSH_64_BIT_TYPE
+typedef ZSH_64_BIT_TYPE zlong;
+typedef unsigned ZSH_64_BIT_TYPE zulong;
+#else
+typedef long zlong;
+typedef unsigned long zulong;
+#endif
+
 /* math.c */
 typedef int LV;
 
@@ -228,6 +243,7 @@ typedef struct linklist  *LinkList;
 typedef struct hashnode  *HashNode;
 typedef struct hashtable *HashTable;
 
+typedef struct optname   *Optname;
 typedef struct reswd     *Reswd;
 typedef struct alias     *Alias;
 typedef struct param     *Param;
@@ -685,6 +701,7 @@ typedef int      (*CompareFunc)    _((const char *, const char *));
 /* type of function that is passed to *
  * scanhashtable or scanmatchtable    */
 typedef void     (*ScanFunc)       _((HashNode, int));
+typedef void     (*ScanTabFunc)    _((HashTable, ScanFunc, int));
 
 typedef void (*PrintTableStats) _((HashTable));
 
@@ -710,6 +727,7 @@ struct hashtable {
     ScanFunc enablenode;	/* pointer to function to enable a node       */
     FreeNodeFunc freenode;	/* pointer to function to free a node         */
     ScanFunc printnode;		/* pointer to function to print a node        */
+    ScanTabFunc scantab;	/* pointer to function to scan table          */
 
 #ifdef HASHTABLE_INTERNAL_MEMBERS
     HASHTABLE_INTERNAL_MEMBERS	/* internal use in hashtable.c                */
@@ -728,6 +746,15 @@ struct hashnode {
  * you can disable builtins, shell functions, aliases and *
  * reserved words.                                        */
 #define DISABLED	(1<<0)
+
+/* node in shell option table */
+
+struct optname {
+    HashNode next;		/* next in hash chain */
+    char *nam;			/* hash data */
+    int flags;
+    int optno;			/* option number */
+};
 
 /* node in shell reserved word hash table (reswdtab) */
 
@@ -868,14 +895,14 @@ struct param {
 	void *data;		/* used by special parameter functions    */
 	char **arr;		/* value if declared array   (PM_ARRAY)   */
 	char *str;		/* value if declared string  (PM_SCALAR)  */
-	long val;		/* value if declared integer (PM_INTEGER) */
+	zlong val;		/* value if declared integer (PM_INTEGER) */
         HashTable hash;		/* value if declared assoc   (PM_HASHED)  */
     } u;
 
     /* pointer to function to set value of this parameter */
     union {
 	void (*cfn) _((Param, char *));
-	void (*ifn) _((Param, long));
+	void (*ifn) _((Param, zlong));
 	void (*afn) _((Param, char **));
         void (*hfn) _((Param, HashTable));
     } sets;
@@ -883,7 +910,7 @@ struct param {
     /* pointer to function to get value of this parameter */
     union {
 	char *(*cfn) _((Param));
-	long (*ifn) _((Param));
+	zlong (*ifn) _((Param));
 	char **(*afn) _((Param));
         HashTable (*hfn) _((Param));
     } gets;
@@ -1155,7 +1182,7 @@ enum {
     HUP,
     IGNOREBRACES,
     IGNOREEOF,
-    INCREMENTALAPPENDHISTORY,
+    INCAPPENDHISTORY,
     INTERACTIVE,
     INTERACTIVECOMMENTS,
     KSHARRAYS,
@@ -1298,7 +1325,8 @@ struct ttyinfo {
 #define TCALLATTRSOFF  21
 #define TCSTANDOUTEND  22
 #define TCUNDERLINEEND 23
-#define TC_COUNT       24
+#define TCHORIZPOS     24
+#define TC_COUNT       25
 
 #define tccan(X) (tclen[X])
 
@@ -1381,6 +1409,9 @@ struct heap {
     struct heap *next;		/* next one                                  */
     size_t used;		/* bytes used from the heap                  */
     struct heapstack *sp;	/* used by pushheap() to save the value used */
+#ifdef ZSH_64_BIT_TYPE
+    size_t dummy;		/* Make sure sizeof(heap) is a multiple of 8 */
+#endif
 #define arena(X)	((char *) (X) + sizeof(struct heap))
 };
 

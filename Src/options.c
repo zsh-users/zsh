@@ -45,15 +45,6 @@ char opts[OPT_SIZE];
 /**/
 HashTable optiontab;
  
-typedef struct optname *Optname;
-
-struct optname {
-    HashNode next;		/* next in hash chain */
-    char *nam;			/* hash data */
-    int flags;
-    int optno;			/* option number */
-};
-
 /* The canonical option name table */
 
 #define OPT_CSH		EMULATE_CSH
@@ -73,6 +64,10 @@ struct optname {
 
 #define defset(X) (!!((X)->flags & emulation))
 
+/*
+ * Note that option names should usually be fewer than 20 characters long
+ * to avoid formatting problems.
+ */
 static struct optname optns[] = {
 {NULL, "allexport",	      0,			 ALLEXPORT},
 {NULL, "alwayslastprompt",    OPT_ALL,			 ALWAYSLASTPROMPT},
@@ -137,7 +132,7 @@ static struct optname optns[] = {
 {NULL, "hup",		      OPT_EMULATE|OPT_ZSH,	 HUP},
 {NULL, "ignorebraces",	      OPT_EMULATE|OPT_SH,	 IGNOREBRACES},
 {NULL, "ignoreeof",	      0,			 IGNOREEOF},
-{NULL, "incrementalappendhistory",0,			 INCREMENTALAPPENDHISTORY},
+{NULL, "incappendhistory",    0,			 INCAPPENDHISTORY},
 {NULL, "interactive",	      OPT_SPECIAL,		 INTERACTIVE},
 {NULL, "interactivecomments", OPT_EMULATE|OPT_BOURNE,	 INTERACTIVECOMMENTS},
 {NULL, "ksharrays",	      OPT_EMULATE|OPT_BOURNE,	 KSHARRAYS},
@@ -443,6 +438,17 @@ emulate(const char *zsh_name, int fully)
 {
     char ch = *zsh_name;
 
+    if (!strcmp("su", zsh_name)) {
+	/* We haven't set up the paramtable yet, so just use zgetenv */
+	char *ptr = zgetenv("SHELL");
+	if (ptr && *ptr) {
+	    zsh_name = ptr;
+	    if ((ptr = strrchr(zsh_name, '/')))
+		zsh_name = ptr+1;
+	    ch = *zsh_name;
+	} else
+	    ch = 'z';
+    }
     if (ch == 'r')
 	ch = zsh_name[1];
 

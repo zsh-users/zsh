@@ -51,7 +51,7 @@ extern int tputs _((char *cp, int affcnt, int (*outc) (int)));
 # define WRITE_ARG_2_T char *
 #endif
 
-#if defined(__hpux) && defined(_HPUX_SOURCE)
+#if defined(__hpux) && defined(_HPUX_SOURCE) && !defined(_XPG4_EXTENDED)
 # define SELECT_ARG_2_T int *
 #else
 # define SELECT_ARG_2_T fd_set *

@@ -2270,7 +2270,7 @@ set_compstate(Param pm, HashTable ht)
 		    v.arr = NULL;
 		    v.pm = (Param) hn;
 		    if (cp->type == PM_INTEGER)
-			*((long *) cp->var) = getintvalue(&v);
+			*((zlong *) cp->var) = getintvalue(&v);
 		    else if ((str = getstrvalue(&v))) {
 			zsfree(*((char **) cp->var));
 			*((char **) cp->var) = ztrdup(str);
@@ -2289,7 +2289,7 @@ get_unambig(Param pm)
 }
 
 /**/
-static long
+static zlong
 get_unambig_curs(Param pm)
 {
     int c;
@@ -2342,7 +2342,7 @@ comp_wrapper(List list, FuncWrap w, char *name)
 	return 1;
     else {
 	char *orest, *opre, *osuf, *oipre, *oisuf, **owords;
-	long ocur;
+	zlong ocur;
 	unsigned int unset = 0, m, sm;
 	Param *pp;
 
