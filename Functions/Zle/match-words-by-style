@@ -69,13 +69,13 @@ setopt extendedglob
 
 local wordstyle spacepat wordpat1 wordpat2 opt charskip wordchars wordclass
 local match mbegin mend pat1 pat2 word1 word2 ws1 ws2 ws3 skip
-local MATCH MBEGIN MEND
+local nwords MATCH MBEGIN MEND
 
 if [[ -z $curcontext ]]; then
     local curcontext=:zle:match-words-by-style
 fi
 
-while getopts "w:s:c:C:" opt; do
+while getopts "w:s:c:C:tT" opt; do
   case $opt in
     (w)
     wordstyle=$OPTARG
@@ -107,6 +107,7 @@ case $wordstyle in
   (shell) local bufwords
 	  # This splits the line into words as the shell understands them.
 	  bufwords=(${(z)LBUFFER})
+	  nwords=${#bufwords}
 	  # Work around bug: if stripping quotes failed, a bogus
 	  # space is appended.  Not a good test, since this may
 	  # be a quoted space, but it's hard to get right.
@@ -129,6 +130,23 @@ case $wordstyle in
 	    wordpat2="${(q)wordpat2}"
 	  fi
 	  spacepat='[[:space:]]#'
+
+	  # Assume the words are at the top level, i.e. if we are inside
+	  # 'something with spaces' then we need to ignore the embedded
+	  # spaces and consider the whole word.
+	  bufwords=(${(z)BUFFER})
+	  if (( ${#bufwords[$nwords]} > ${#wordpat1} )); then
+	    # Yes, we're in the middle of a shell word.
+	    # Find out what's in front.
+	    eval pat1='${LBUFFER%%(#b)('${wordpat1}')('${spacepat}')}'
+	    # Now everything from ${#pat1}+1 is wordy
+	    wordpat1=${(q)LBUFFER[${#pat1}+1,-1]}
+
+	    # Likewise at the end...
+	    eval pat2='${RBUFFER##(#b)('${charskip}${spacepat}')('\
+${wordpat2}')('${spacepat}')}'
+	    wordpat2=${(q)RBUFFER[1,-1-${#pat2}]}
+	  fi
 	  ;;
   (*space) spacepat='[[:space:]]#'
            wordpat1='[^[:space:]]##'
