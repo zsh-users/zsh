@@ -1867,8 +1867,8 @@ on the command line (which may be blank).  If given a numeric argument
 var(N), complete the var(N)th most recently modified file.  Note the
 completion, if any, is always unique.
 )
-findex(_next_tags (^Xn))
-item(tt(_next_tags (^Xn)))(
+findex(_next_tags)
+item(tt(_next_tags))(
 This allows to complete types of matches that are not immediately
 offered because of the setting of the tt(tag-order) style. After a
 normal completion was tried, invoking this command makes the matches
@@ -1878,6 +1878,12 @@ matches selected by tt(_next_tags), the tt(completer) style should
 contain tt(_next_tags) as its first string. With that, the normal key
 binding (normally tt(TAB)) can be used to complete the matches shown
 after the call to tt(_next_tags).
+
+Normally, this command is not bound to a key. To invoke it with, say
+`tt(^Xn)', one would use:
+
+example(zle -C _next_tags complete-word _next_tags
+bindkey '^Xn' _next_tags)
 )
 findex(_read_comp (^X^R))
 item(tt(_read_comp (^X^R)))(

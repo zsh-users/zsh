@@ -1,4 +1,13 @@
-#compdef -k complete-word \C-xn
+#autoload
+
+# To use this, put _next_tags at the beginning of the completer style,
+# define it as a completion widget and bind it to a key, e.g.:
+#
+#  zle -C _next_tags complete-word _next_tags
+#  bindkey '^Xn' _next_tags
+#
+# Makes it be bound to ^Xn.
+
 
 # Main widget/completer.
 
