@@ -40,7 +40,7 @@ static Cline
 cut_cline(Cline l)
 {
     Cline q, p, e = NULL, maxp = NULL;
-    int sum = 0, max = 0, tmp, ls = 0;
+    int sum = 0, max = 0, tmp, ls = 0, miss = 0;
 
     /* If no match was added with matching, we don't really know
      * which parts of the unambiguous string are worth keeping,
@@ -108,12 +108,39 @@ cut_cline(Cline l)
 		    len += p->max;
 
 		if (len > ((minmlen << 1) / 3))
-		    return l;
+		    goto end;
 	    }
 	    e->line = e->word = NULL;
 	    e->llen = e->wlen = e->olen = 0;
 	    e->next = NULL;
 	}
+    }
+ end:
+
+    /* Sanity check. If there are no parts with missing characters but
+     * parts with joined substrings, remove those. */
+
+    for (p = l, e = 0, tmp = 0; p; p = p->next) {
+	if (p->flags & (CLF_MISS|CLF_DIFF))
+	    miss = 1;
+	for (q = p->prefix; q; q = q->next)
+	    if (q->flags & CLF_JOIN) {
+		e = p;
+		tmp = 0;
+		break;
+	    }
+	for (q = p->suffix; q; q = q->next)
+	    if (q->flags & CLF_JOIN) {
+		e = p;
+		tmp = 1;
+		break;
+	    }
+    }
+    if (e && (!miss || cline_sublen(e) == e->min)) {
+	for (p = (tmp ? e->suffix : e->prefix);
+	     p && p->next && !(p->next->flags & CLF_JOIN); p = p->next);
+	if (p)
+	    p->next = NULL;
     }
     if (!ls)
 	cline_setlens(l, 0);

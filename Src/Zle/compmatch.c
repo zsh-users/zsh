@@ -466,7 +466,9 @@ match_str(char *l, char *w, Brinfo *bpp, int bc, int *rwlp,
 	bp->curpos = bc;
 	bp = bp->next;
     }
-    while (ll && lw) {
+    /*** This once was: `while (ll && lw)', but then ignored characters at
+     *   the end or not, well, ignored. */
+    while (ll) {
 
 	/* Hm, we unconditionally first tried the matchers for the cases
 	 * where the beginnings of the line and word patterns match the
@@ -576,7 +578,12 @@ match_str(char *l, char *w, Brinfo *bpp, int bc, int *rwlp,
 			     pattern_match(ap, tp - moff, NULL, NULL) &&
 			     (!aol || pattern_match(aop, tp - moff - aol,
 						    NULL, NULL)) &&
-			     match_parts(l + aoff , tp - moff, alen, part))) {
+			     (mp->wlen == -1 ||
+			      match_parts(l + aoff , tp - moff,
+						      alen, part)))) {
+			    if (!both && mp->wlen == -1 &&
+				!match_parts(l + aoff , tp - moff, alen, part))
+				break;
 			    if (sfx) {
 				savw = tp[-zoff];
 				tp[-zoff] = '\0';
@@ -1819,13 +1826,19 @@ join_clines(Cline o, Cline n)
 		    free_cline(o);
 		    x = o;
 		    o = tn;
+#if 0
+		    /*** These should be handled different from the ones
+			 that compare anchors. */
 		    if (po && po->prefix && cmp_anchors(x, po, 0)) {
 			po->flags |= CLF_MISS;
 			po->max += diff;
 		    } else {
+#endif
 			o->flags |= CLF_MISS;
 			o->max += diff;
+#if 0
 		    }
+#endif
 		    continue;
 		}
 	    }
@@ -1836,13 +1849,19 @@ join_clines(Cline o, Cline n)
 		if (tn && cmp_anchors(o, tn, 0)) {
 		    diff = sub_join(o, n, tn, 0);
 
+#if 0
+		    /*** These should be handled different from the ones
+			 that compare anchors. */
 		    if (po && po->prefix && cmp_anchors(n, pn, 0)) {
 			po->flags |= CLF_MISS;
 			po->max += diff;
 		    } else {
+#endif
 			o->flags |= CLF_MISS;
 			o->max += diff;
+#if 0
 		    }
+#endif
 		    n = tn;
 		    continue;
 		}

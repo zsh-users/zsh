@@ -1,5 +1,8 @@
 2000-05-12  Sven Wischnowsky  <wischnow@zsh.org>
 
+	* 11346: Src/Zle/compmatch.c, Src/Zle/compresult.c: fixes for
+ 	completion matching
+	
 	* 11335: Src/Zle/compcore.c: fix for compadd -x when there are no
  	matches
 	
