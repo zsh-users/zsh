@@ -1,5 +1,9 @@
 2001-01-25  Sven Wischnowsky  <wischnow@zsh.org>
 
+	* 13388: Src/Zle/compmatch.c: fix for mergin two CLF_MID entries
+ 	in cline lists (with two equal prefixes it thought there were
+ 	characters missing)
+	
 	* 13384: Src/signals.c: make signal queueing variables be exported
  	to modules
 	

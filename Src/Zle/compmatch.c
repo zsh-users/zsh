@@ -1627,7 +1627,7 @@ join_psfx(Cline ot, Cline nt, Cline *orest, Cline *nrest, int sfx)
 	    *orest = NULL;
 	if (nrest)
 	    *nrest = n;
-	if (n)
+	if (n && n->wlen)
 	    ot->flags |= CLF_MISS;
 
 	return;
