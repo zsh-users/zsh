@@ -157,7 +157,7 @@ _cvsprefix () {
 _cvsentries () {
   setopt localoptions nullglob unset
   if [[ -f ${pref}CVS/Entries ]]; then
-      entries=( "${(@)${(@)${(@)${(f@)$(<${pref}CVS/Entries)}:#D}#(D|)/}%%/*}" )
+      entries=( ${${${${(f)"$(<${pref}CVS/Entries)"}:#D}#(D|)/}%%/*} )
   fi
 }
 
@@ -168,26 +168,27 @@ _cvsentries_modified () {
   local line Entries
   typeset -A mtime
 
+  if [[ -f "${pref}CVS/Entries" ]]; then
+    Entries="$(<${pref}CVS/Entries)"
+  fi
+
   if ! zmodload -e stat; then zmodload stat; fi
   if zmodload -e stat; then
-    if [[ -f "${pref}CVS/Entries" ]]; then
-      Entries="$(<${pref}CVS/Entries)"
-      mtime=( "${(@s:/:)${(j:/:)${(@)${(@)${(@)${(M@)${(f@)Entries}:#/*}#/}%/*/*}/\/*\///}}}" )
-      entries=( "${(@)${(@)${(M@)${(f@)Entries}:#D/*}#D/}%%/*}" )
-      builtin stat -n +mtime -F '%a %b %e %T %Y' "$pref${(@k)^mtime}" |
-      while read line
-      do
-	line=${line#$pref}
-	if [[ x"$mtime[${line%% *}]" == x"${line#* }" ]]; then
-	  #print up-to-date "${line%% *}"
-	else
-	  #print locally-modified "${line%% *}"
-	  entries=($entries "${line%% *}")
-	fi
-      done
-    fi
+    mtime=( ${(s:/:)${(j:/:)${${${${(M)${(f)Entries}:#/*}#/}%/*/*}/\\/*\\///}}} )
+    entries=( ${${${(M)${(f)Entries}:#D/*}#D/}%%/*} )
+    builtin stat -n +mtime -F '%a %b %e %T %Y' "$pref${(@k)^mtime}" |
+    while read line
+    do
+      line=${line#$pref}
+      if [[ x"$mtime[${line%% *}]" == x"${line#* }" ]]; then
+        #print up-to-date "${line%% *}"
+      else
+        #print locally-modified "${line%% *}"
+        entries=($entries "${line%% *}")
+      fi
+    done
   else
-    entries=( "${(@)${(@)${(@)${(f@)Entries}:#D}#(D|)/}%%/*}" )
+    entries=( ${${${${(f)Entries}:#D}#(D|)/}%%/*} )
   fi
 
   if (( $+OLDTZ )); then TZ="$OLDTZ"; else unset TZ; fi
@@ -210,7 +211,7 @@ _cvstargets_modified () {
 }
 
 _cvsrevisions () {
-  compadd - "${(@)${(@)${(@M)${(@f)$(cvs -q status -vl .)}:#	*}##[ 	]##}%%[ 	]*}"
+  compadd - ${${${(M)${(f)"$(cvs -q status -vl .)"}:#	*}##[ 	]##}%%[ 	]*}
 }
 
 _cvsrepositories () {
@@ -222,7 +223,7 @@ _cvsrepositories () {
   else
     compadd - \
       $root/^CVSROOT(:t) \
-      "${(@)${(@M)${(@f)$(<$root/CVSROOT/modules)}:#[^#]*}%%[ 	]*}"
+      ${${(M)${(f)"$(<$root/CVSROOT/modules)"}:#[^#]*}%%[ 	]*}
   fi
 }
 
