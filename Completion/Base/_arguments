@@ -43,10 +43,9 @@ if [[ "$*" != "$_args_cache_descr" ]]; then
       tmpargv=( "${(@)argv[1,nth-1]}" )
     fi
 
-    if [[ "$words[1]" = /* ]]; then
-      tmp="$words[1]"
-    else
-      tmp="$PWD/$words[1]"
+    tmp=${~words[1]}
+    if [[ "$tmp" != /* ]]; then
+      tmp="$PWD/$tmp"
     fi
 
     if [[ "$tmp" != "$_args_cache_longcmd" ]]; then
@@ -92,7 +91,7 @@ if [[ "$*" != "$_args_cache_descr" ]]; then
       # those hyphens and anything from the space or comma after the
       # option up to the end. 
 
-      lopts=("--${(@)^${(@)${(@)${(@M)${(@ps:\n:j:\n:)${(@)${(@M)${(@f)$("$words[1]" --help 2>&1)//\[--/
+      lopts=("--${(@)^${(@)${(@)${(@M)${(@ps:\n:j:\n:)${(@)${(@M)${(@f)$(${~words[1]} --help 2>&1)//\[--/
 --}:#[ 	]#-*}//,/
 }}:#[ 	]#--*}#*--}%%[, ]*}:#}")
 
