@@ -17,11 +17,8 @@ else
 fi
   
 if [[ $# -ne 0 || $+_in_pbm -ne 0 ]]; then
-  if (( ! $# )); then
-    _description files expl 'picture file'
-    set -- "$expl[@]"
-  fi
-  _path_files "$@" -g "$pat" || _files "$@" -g '*.(#i)p[bgp]m'
+  _wanted files expl 'picture file' _path_files "$@" -g "$pat" - ||
+      _files "$@" "$expl[@]" -g '*.(#i)p[bgp]m'
   return
 fi
 
@@ -772,6 +769,6 @@ zeisstopnm)
   ;;
 
 *)
-  _description files expl 'picture file'
-  _path_files "$expl[@]" -g "$pat" || _files "$expl[@]" -g '*.(#i)p[bgp]m'
+  _wanted files expl 'picture file' _path_files -g "$pat" ||
+      _files "$expl[@]" -g '*.(#i)p[bgp]m'
 esac

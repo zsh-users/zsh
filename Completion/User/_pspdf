@@ -6,7 +6,6 @@ local ret=1 expl
 #  gs gsbj gsdj gsdj500 gslj gslp gsnd ps2ascii
 
 _ps && ret=0
-_description files expl 'PDF file'
-_path_files "$expl[@]" -g '*.(#i)pdf'
+_wanted files expl 'PDF file' _path_files -g '*.(#i)pdf'
 
 return ret

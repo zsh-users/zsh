@@ -47,7 +47,7 @@ styles=(
   numbers		 c:bool
   original		 c:bool
   packageset		 c:packageset
-  path			 'c:_path_files -/'
+  path			 'c:_wanted directories expl directory _path_files -/'
   ports			 c:_ports
   prefer-ignored         c:bool
   prefix-hidden		 c:bool

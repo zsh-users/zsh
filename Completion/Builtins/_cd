@@ -34,7 +34,7 @@ elif _popd || [[ $PREFIX != (\~|/|./|../)* && $#cdpath -ne 0 ]]; then
   if [[ -o cdablevars && -n "$PREFIX" && ! -d ${tdir::=${PREFIX%%/*}} &&
         -d ${~tdir2::="~$tdir"} ]]; then
       PREFIX="~$PREFIX"
-      _path_files -/
+      _wanted directories expl directory _path_files -/
   else
     local tmpcdpath
     tmpcdpath=(${${(@)cdpath:#.}:#$PWD})
@@ -43,5 +43,5 @@ elif _popd || [[ $PREFIX != (\~|/|./|../)* && $#cdpath -ne 0 ]]; then
 	"path-directories:directories in cdpath:_path_files -W tmpcdpath -/"
   fi
 else
-  _path_files -/
+  _wanted directories expl directory _path_files -/
 fi

@@ -13,7 +13,8 @@ if [[ $# -ne 0 || $+_in_tiff -ne 0 ]]; then
     _description files expl 'picture file'
     set -- "$expl[@]"
   fi
-  _path_files "$@" -g "$pat" || _files "$@" -g '*.(#i)tiff'
+  _wanted files expl 'picture file' _path_files "$@" -g "$pat" - ||
+      _files "$@" "$expl[@]" -g '*.(#i)tiff'
   return
 fi
 
