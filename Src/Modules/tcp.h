@@ -27,10 +27,33 @@
  *
  */
 
+/*
+ * We need to include the zsh headers later to avoid clashes with
+ * the definitions on some systems, however we need the configuration
+ * file to decide whether we can include netinet/in_systm.h, which
+ * doesn't exist on cygwin.
+ */
 #include "../../config.h"
+
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <netdb.h>
+
+/*
+ * For some reason, configure doesn't always detect netinet/in_systm.h.
+ * On some systems, including linux, this seems to be because gcc is
+ * throwing up a warning message about the redefinition of
+ * __USE_LARGEFILE.  This means the problem is somewhere in the
+ * header files where we can't get at it.  For now, revert to
+ * not including this file only on systems where we know it's missing.
+ * Currently this is just cygwin.
+ */
+#ifndef __CYGWIN__
+# include <netinet/in_systm.h>
+#endif
+#include <netinet/in.h>
+#include <netinet/ip.h>
+#include <arpa/inet.h>
 
 /* Is IPv6 supported by the library? */
 
