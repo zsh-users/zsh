@@ -1,3 +1,8 @@
+2001-02-28  Oliver Kiddle  <opk@zsh.org>
+
+	* 13555: Completion/Core/_main_complete: handle ksh_arrays on the
+	setopt line to fix problem from users/3648
+
 2001-02-28  Sven Wischnowsky  <wischnow@zsh.org>
 
 	* 13554: Completion/Core/compinit, Doc/Zsh/options.yo, Src/lex.c,
