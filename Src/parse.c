@@ -225,7 +225,7 @@ struct heredocs *hdocs;
  */
 
 /**/
-int eclen, ecused, ecfree, ecnpats;
+int eclen, ecused, ecnpats;
 /**/
 Wordcode ecbuf;
 /**/
@@ -240,13 +240,12 @@ ecispace(int p, int n)
 {
     int m;
 
-    if (ecfree < n) {
+    if ((eclen - ecused) < n) {
 	int a = (n > 256 ? n : 256);
 
 	ecbuf = (Wordcode) hrealloc((char *) ecbuf, eclen * sizeof(wordcode),
 				    (eclen + a) * sizeof(wordcode));
 	eclen += a;
-	ecfree += a;
     }
     if ((m = ecused - p) > 0)
 	memmove(ecbuf + p + n, ecbuf + p, m * sizeof(wordcode));
@@ -258,15 +257,13 @@ ecispace(int p, int n)
 static int
 ecadd(wordcode c)
 {
-    if (ecfree < 1) {
+    if ((eclen - ecused) < 1) {
 	ecbuf = (Wordcode) hrealloc((char *) ecbuf, eclen * sizeof(wordcode),
 				    (eclen + 256) * sizeof(wordcode));
 	eclen += 256;
-	ecfree += 256;
     }
     ecbuf[ecused] = c;
     ecused++;
-    ecfree--;
 
     return ecused - 1;
 }
@@ -347,7 +344,7 @@ ecstr(char *s)
 static void
 init_parse(void)
 {
-    ecbuf = (Wordcode) zhalloc((eclen = ecfree = 256) * sizeof(wordcode));
+    ecbuf = (Wordcode) zhalloc((eclen = 256) * sizeof(wordcode));
     ecused = 0;
     ecstrs = NULL;
     ecsoffs = ecnpats = 0;
@@ -2209,14 +2206,17 @@ struct fdhead {
 #define fdheaderlen(f) (((Wordcode) (f))[FD_PRELEN])
 
 #define fdmagic(f)       (((Wordcode) (f))[0])
-#define fdbyte(f, i)     ((wordcode) (((unsigned char *) (((Wordcode) (f)) + 1))[i]))
+#define fdsetbyte(f,i,v) \
+    ((((unsigned char *) (((Wordcode) (f)) + 1))[i]) = ((unsigned char) (v)))
+#define fdbyte(f,i)      ((wordcode) (((unsigned char *) (((Wordcode) (f)) + 1))[i]))
 #define fdflags(f)       fdbyte(f, 0)
+#define fdsetflags(f,v)  fdsetbyte(f, 0, v)
 #define fdother(f)       (fdbyte(f, 1) + (fdbyte(f, 2) << 8) + (fdbyte(f, 3) << 16))
 #define fdsetother(f, o) \
     do { \
-        fdbyte(f, 1) = (o & 0xff); \
-        fdbyte(f, 2) = (o >> 8) & 0xff; \
-        fdbyte(f, 3) = (o >> 16) & 0xff; \
+        fdsetbyte(f, 1, ((o) & 0xff)); \
+        fdsetbyte(f, 2, (((o) >> 8) & 0xff)); \
+        fdsetbyte(f, 3, (((o) >> 16) & 0xff)); \
     } while (0)
 #define fdversion(f)     ((char *) ((f) + 2))
 
@@ -2423,7 +2423,7 @@ build_dump(char *nam, char *dump, char **files, int ali, int map)
 
     for (ohlen = hlen; ; hlen = ohlen) {
 	fdmagic(pre) = (other ? FD_OMAGIC : FD_MAGIC);
-	fdflags(pre) = (map ? FDF_MAP : 0) | other;
+	fdsetflags(pre, ((map ? FDF_MAP : 0) | other));
 	fdsetother(pre, tlen);
 	strcpy(fdversion(pre), ZSH_VERSION);
 	write(dfd, pre, FD_PRELEN * sizeof(wordcode));
@@ -2536,6 +2536,8 @@ load_dump_file(char *dump, int other, int len)
     d->count = 0;
 }
 
+#endif
+
 /* See if `dump' is the name of a dump file and it has the definition
  * for the function `name'. If so, return an eprog for it. */
 
@@ -2551,14 +2553,28 @@ try_dump_file(char *dump, char *name, char *func)
 
     file = (strsfx(FD_EXT, dump) ? dump : dyncat(dump, FD_EXT));
 
+#ifdef USE_MMAP
+
  rec:
 
+#endif
+
     d = NULL;
+
+#ifdef USE_MMAP
+
     for (f = dumps; f; f = f->next)
 	if (!strcmp(file, f->name)) {
 	    d = f->map;
 	    break;
 	}
+
+#else
+
+    f = NULL;
+
+#endif
+
     if (!f && (isrec || !(d = load_dump_header(file)))) {
 	if (!isrec) {
 	    struct stat stc, stn;
@@ -2580,6 +2596,9 @@ try_dump_file(char *dump, char *name, char *func)
     if ((h = dump_find_func(d, name))) {
 	/* Found the name. If the file is already mapped, return the eprog,
 	 * otherwise map it and just go up. */
+
+#ifdef USE_MMAP
+
 	if (f) {
 	    Eprog prog = (Eprog) zalloc(sizeof(*prog));
 	    Patprog *pp;
@@ -2604,7 +2623,11 @@ try_dump_file(char *dump, char *name, char *func)
 	    load_dump_file(file, (fdflags(d) & FDF_OTHER), fdother(d));
 	    isrec = 1;
 	    goto rec;
-	} else {
+	} else
+
+#endif
+
+	    {
 	    Eprog prog;
 	    Patprog *pp;
 	    int np, fd, po = h->npats * sizeof(Patprog);
@@ -2646,6 +2669,8 @@ try_dump_file(char *dump, char *name, char *func)
     return NULL;
 }
 
+#ifdef USE_MMAP
+
 /* Increment the reference counter for a dump file. */
 
 /**/
@@ -2679,12 +2704,6 @@ decrdumpcount(FuncDump f)
 }
 
 #else
-
-Eprog
-try_dump_file(char *dump, char *name, char *func)
-{
-    return NULL;
-}
 
 void
 incrdumpcount(FuncDump f)

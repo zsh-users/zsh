@@ -191,7 +191,7 @@ struct lexstack {
     void (*hwend) _((void));
     void (*addtoline) _((int));
 
-    int eclen, ecused, ecfree, ecnpats;
+    int eclen, ecused, ecnpats;
     Wordcode ecbuf;
     Eccstr ecstrs;
     int ecsoffs, ecssub, ecnfunc;
@@ -250,7 +250,6 @@ lexsave(void)
     ls->addtoline = addtoline;
     ls->eclen = eclen;
     ls->ecused = ecused;
-    ls->ecfree = ecfree;
     ls->ecnpats = ecnpats;
     ls->ecbuf = ecbuf;
     ls->ecstrs = ecstrs;
@@ -311,7 +310,6 @@ lexrestore(void)
     addtoline = lstack->addtoline;
     eclen = lstack->eclen;
     ecused = lstack->ecused;
-    ecfree = lstack->ecfree;
     ecnpats = lstack->ecnpats;
     ecbuf = lstack->ecbuf;
     ecstrs = lstack->ecstrs;

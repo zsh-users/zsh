@@ -1317,7 +1317,10 @@ will be mapped into the shell's memory. This is done in such a way
 that multiple instances of the shell running on the same host will
 share this mapped function. If neither tt(-r) nor tt(-m) are given,
 the tt(zcompile) builtin decides which style is used based on the size 
-of the resulting wordcode file.
+of the resulting wordcode file. On some systems it is impossible to
+map wordcode files into memory. On such systems, the functions will
+only be read from the files, independent on the mode selected when the 
+file was created.
 
 In every case, the created file contains two versions of the wordcode, 
 one for big-endian machines and one for small-endian machines. The
