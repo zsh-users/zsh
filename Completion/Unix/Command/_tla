@@ -1,63 +1,37 @@
 #compdef tla
 
-local arg_call opts_std opt_archive \
-  opt_silent opt_quiet opt_report opt_verbose opt_debug opts_verbosity \
-  opt_cache opt_dir opt_delete opt_errname opts_tag_method opt_readme \
-  opt_reverse opt_summary opt_creator opt_date opt_full opt_dest opt_forward \
-  opt_sparse opt_non_sparse opt_link opt_library
-opts_std=(
-  '--version[print version info]'
-  '--help[display help]'
-)
-opt_archive=(
-  '--archive[specify the default archive name]:archive:_tla_archives'
-)
-opt_library_archive=(
-  '--archive[specify the default archive name]:archive:_tla_archives --library'
-)
-opt_silent=('(--quiet --report --verbose --debug)--silent[suppress messages]')
-opt_quiet=('(--silent --report --verbose --debug)--quiet[brief output]')
-opt_report=('(--silent --quiet --verbose --debug)--report[default output]')
-opt_verbose=('(--silent --quiet --report --debug)--verbose[maximal output]')
-opt_debug=('(--silent --quiet --report --verbose)--debug[debugging output]')
-opts_verbosity=($opt_silent $opt_quiet $opt_report $opt_verbose $opt_debug)
-opt_cache=(
-  '--cache[specify directory for locally cached revisions]:directory: _files -/'
-)
-opt_dir=('--dir[operate on project tree in DIR]:DIR:_files -/')
-opt_delete=('--delete[unspecify]')
-opt_errname=('--errname[specify program name for errors]:program:_files')
-opts_tag_method=(
-  '--explicit[use explicit file tags]'
-  '--implicit[use implicit file tags]'
-  '--tagline[use tagline file tags]'
-  '--names[use name-based file tags]'
-)
-opt_readme=('--readme[save FILE as the README for this archive]:file:_files')
-opt_reverse=('--reverse[print in reverse order]')
-opt_summary=('--summary[print a summary of each patch]')
-opt_creator=('--creator[print the creator id of each patch]')
-opt_date=('--date[print the date of each patch]')
-opt_full=('--full[print full names of patch levels]')
-opt_dest=(
-  '--dest[create/modify DEST instead of the project tree]:DEST:_files -/'
-)
-opt_forward=('--forward[pass the --forward option to `patch'\'']')
-opt_sparse=('(--non-sparse)--sparse[don'\''t fill in gaps in the library]')
-opt_non_sparse=('(--sparse)--non-sparse[fill in gaps in the library]')
-opt_link=('--link[hardlink files to revision library instead of copying]')
-opt_library=('--library[ensure the revision is in a revision library]')
+autoload is-at-least
+local TLA=$words[1]
+local tla_version
+local hide_short
+
+# ask the user which version of tla this is
+if ! zstyle -s ":completion:${curcontext}" tla-version tla_version; then
+  # ask tla instead
+  tla_version="${${$($TLA --version)#tla tla-}%% from regexps.com*}"
+  [[ $tla_version == *[a-zA-Z]* ]] && tla_version=1.3 # tla doesn't know
+fi
+
+# test whether to hide short options from completion
+if zstyle -s ":completion:${curcontext}" hide-shortopts hide_short; then
+  case $hide_short in
+    true|yes|on|1) hide_short='!' ;;
+    *) hide_short='' ;;
+  esac
+fi
+
+# completion functions
 
 (( $+functions[_tla_archives] )) ||
 _tla_archives () {
   local expl completions library name_arg='-n'
-  if [[ -n $argv[(k)--library] ]]; then
+  if [[ -n $argv[(r)--library] ]]; then
     library='library-'
-    # remove parameter from $@ before calling compadd 
-    argv[(k)--library]=()
+    # remove parameter from $@ before calling compadd
+    argv[(r)--library]=()
     name_arg=
   fi
-  completions=($(_call_program tla tla ${library:-}archives $name_arg))
+  completions=($(_call_program tla $TLA ${library:-}archives $name_arg))
   _description -V archives expl "${library:-}archives"
   compadd "$@" "$expl[@]" -- "$completions[@]"
 }
@@ -76,11 +50,11 @@ _tla_revisions () { _tla_namespace 4 "$argv[@]" }
 
 (( $+functions[_tla_local_revisions] )) ||
 _tla_local_revisions () {
-  local expl1 expl2 tree_version=`tla tree-version`
+  local expl1 expl2 tree_version=`$TLA tree-version`
   _description -V applied-patches expl1 "patches from this version"
   _description -V other-patches expl2 "patches from other versions"
-  compadd "$expl1[@]" `tla logs`
-  compadd "$expl2[@]" `tla logs --full $(tla log-versions | grep -v $tree_version)`
+  compadd "$expl1[@]" `$TLA logs`
+  compadd "$expl2[@]" `$TLA logs --full $($TLA log-versions | grep -v $tree_version)`
   # This is incredibly slow.
   # Should complete based on -A, -R, -d
 }
@@ -92,13 +66,13 @@ _tla_namespace () { #double as arch_namespace_categories
 # 2: branch
 # 3: version
 # 4: revision
-  local suffix expl archive=`tla my-default-archive`
+  local suffix expl archive=`$TLA my-default-archive 2> /dev/null`
   local trailing_dashes=0
-  [[ -n $argv[(k)--trailing-dashes] ]] && trailing_dashes=1
+  [[ -n $argv[(r)--trailing-dashes] ]] && trailing_dashes=1
   local library
-  [[ -n $argv[(k)--library] ]] && library='library-';
+  [[ -n $argv[(r)--library] ]] && library='library-';
   local exclude_library_revisions=0
-  [[ -n $argv[(k)--exclude-library-revisions] ]] && exclude_library_revisions=1
+  [[ -n $argv[(r)--exclude-library-revisions] ]] && exclude_library_revisions=1
 
   if [ $1 -gt 1 ] || (( trailing_dashes )); then
     suffix=(-q -S --)
@@ -107,20 +81,21 @@ _tla_namespace () { #double as arch_namespace_categories
     compset -P '*/'
     archive=${IPREFIX%/*}
     _description -V categories expl "${library:-}categories in $archive"
-    compadd $suffix "$expl[@]" `tla ${library:-}categories -A $archive`
+    compadd $suffix "$expl[@]" `$TLA ${library:-}categories -A $archive`
   elif [ -z $IPREFIX ]; then
-    for (( i = 2 ; i < CURRENT ; i++ )); do
-      if [ $words[$i] = -A ] || [ $words[$i] = --archive ]; then
-        archive=$words[(($i + 1))]
-        break
-      fi
-    done
+    local index=$(( words[(i)-A] + 1 ))
+    (( index < CURRENT )) || index=$(( words[(i)--archive] + 1 ))
+    (( index < CURRENT )) && archive=$words[$index]
 
-    _description -V categories expl "${library:-}categories in $archive"
-    compadd "$expl[@]" $suffix `tla ${library:-}categories -A $archive`
+    if [ $archive ]; then
+      _description -V categories expl "${library:-}categories in $archive"
+      compadd "$expl[@]" $suffix `$TLA ${library:-}categories -A $archive`
+    fi
+
     _tla_archives -S / ${library:+--library}
   fi
-  if [ $1 -gt 1 ] && [[ $PREFIX != *@* ]] && [[ $PREFIX = *--* ]]; then
+  if [ $archive ] && [ $1 -gt 1 ] && [[ $PREFIX != *@* ]] \
+     && [[ $PREFIX = *--* ]]; then
   #this match could be better
     _tla_namespace_branches $(($1 - 1))
   fi
@@ -137,7 +112,7 @@ _tla_namespace_branches () {
     local category=${IPREFIX%--}
     _description -V branches expl "${library:-}branches"
     compadd $suffix "$expl[@]" \
-      `tla ${library:-}branches -A $archive $category | sed 's/^.*--//'`
+      ${${(@)$($TLA ${library:-}branches -A $archive $category)}##*--}
   fi
   if [ $1 -gt 1 ] && [[ $IPREFIX = *-- ]] && [[ $PREFIX = *--* ]]; then
     _tla_namespace_versions $(($1 - 1))
@@ -155,7 +130,7 @@ _tla_namespace_versions () {
     local branch=${IPREFIX%--}
     _description -V versions expl "${library:-}versions"
     compadd $suffix "$expl[@]" \
-      `tla ${library:-}versions -A $archive $branch | sed 's/^.*--//'`
+      ${${(@)$($TLA ${library:-}versions -A $archive $branch)}##*--}
   fi
   if [ $1 -gt 1 ] && [[ $IPREFIX = *--*-- ]] && ([[ $IPREFIX = */*--*-- ]] \
     || [[ $PREFIX != */* ]]) && [[ $PREFIX = *--* ]]; then
@@ -171,36 +146,38 @@ _tla_namespace_revisions () {
     local version=${IPREFIX%--}
     _description -V revisions expl "${library:-}revisions"
     local completions c
-    completions=(`tla ${library:-}revisions -A $archive $version | sed 's/^.*--//'`)
+    completions=(
+      ${${(@)$($TLA ${library:-}revisions -A $archive $version)}##*--}
+    )
     (( exclude_library_revisions )) && \
-        foreach c ($(tla library-revisions -A $archive $version)); do completions[(k)$c]=(); done
+        foreach c ($($TLA library-revisions -A $archive $version)); do completions[(r)$c]=(); done
     compadd "$expl[@]" -a completions
   fi
 }
 
 (( $+functions[_tla_config] )) ||
-_tla_config () { 
+_tla_config () {
 
   # zsh 4.1.1+ is recommended; 4.0.6 gives the error below when doing
   # tla build-config e<TAB>
   # _path_files:322: no matches found: configs//e/.(/)
   # whereas 4.1.1 completes correctly
-  
+
   local configdir root ret=1 n expl
-  
+
   n=$opt_args[(i)(-d|--dir)]
   [[ -n "$n" ]] && configdir=$opt_args[$n]
-  root="$(_call_program tla tla tree-root ${configdir} 2>&1)"
+  root="$(_call_program tla $TLA tree-root ${configdir} 2>&1)"
   if (( $? )); then
     _message -e messages "Error: $root"
     return $ret
   fi
-  
-  if [[ -d "$root/configs" ]]; then   
+
+  if [[ -d "$root/configs" ]]; then
     configdir=("$root/configs")
-    _description files expl '%Bconfig file%b' 
+    _description files expl '%Bconfig file%b'
     _files -W configdir "$expl[@]" && ret=0
-  else 
+  else
     _message -e messages "No configs/ directory in tree whose root is $root"
   fi
   return $ret
@@ -208,25 +185,18 @@ _tla_config () {
 
 (( $+functions[_tla_limit] )) ||
 _tla_limit () { #presently only does push-mirror style limits
-  [[ $words[$CURRENT] = *@* ]] && return 1
+  [[ $words[$CURRENT] == *@* ]] && return 1
 
-  local expl archive=`tla my-default-archive`
+  local expl archive
+  archive=${words[(r)*@*]:-$($TLA my-default-archive 2> /dev/null)}
+  if [ $archive ]; then
 
-  for (( i = 2 ; i < CURRENT ; i++ )); do
-    if [[ $words[$i] = *@* ]]; then
-      archive=$words[$i]
-      if tla archives -n | grep "$archive-SOURCE" > /dev/null; then
-        archive=$archive-SOURCE
-      fi
-      break
+    if [[ $PREFIX != *--* ]]; then
+      _description -V categories expl "categories in $archive"
+      compadd -q -S -- "$expl[@]" `$TLA categories -A $archive`
+    else
+      _tla_namespace_branches 3
     fi
-  done
-
-  _description -V categories expl "categories in $archive"
-  if [[ $PREFIX != *--* ]]; then
-    compadd -q -S -- "$expl[@]" `tla categories -A $archive`
-  else
-    _tla_namespace_branches 3
   fi
 }
 
@@ -235,736 +205,518 @@ _tla_tree_or_rev () {
   _alternative 'trees:tree:_files -/' 'revisions:revision:_tla_revisions'
 }
 
-local _arg_call
-_arg_call=(_arguments -S -A "-*" $opts_std)
-
-(( $+functions[_tla_cmd_help] )) ||
-_tla_cmd_help () { $_arg_call }
-
-(( $+functions[_tla_cmd_my-id] )) ||
-_tla_cmd_my-id () {
-  $_arg_call $opt_errname \
-    '--uid[print only the UID portion of the id]' \
-    '::id-string:'
-}
-
-(( $+functions[_tla_cmd_my-default-archive] )) ||
-_tla_cmd_my-default-archive () {
-  $_arg_call $opt_archive $opt_errname $opt_silent $opt_delete \
-    '::archive:_tla_archives'
-}
-
-(( $+functions[_tla_cmd_register-archive] )) ||
-_tla_cmd_register-archive () {
-  $_arg_call $opt_delete '--force[overwrite existing location]' \
-    '::archive:_tla_archives' ':location:_files -/'
-}
-
-(( $+functions[_tla_cmd_whereis-archive] )) ||
-_tla_cmd_whereis-archive () {
-  $_arg_call ':archive:_tla_archives'
-}
-
-(( $+functions[_tla_cmd_archives] )) ||
-_tla_cmd_archives () {
-  $_arg_call '--names[print archive names only]' \
-    '--exclude-remote[exclude MIRROR and SOURCE archives]' \
-    '::regex:'
-}
-
-(( $+functions[_tla_cmd_init-tree] )) ||
-_tla_cmd_init-tree () {
-  $_arg_call $opt_archive $opt_dir \
-    '--nested[init a nested project tree]' \
-    '::version:_tla_versions'
-}
-
-(( $+functions[_tla_cmd_tree-root] )) ||
-_tla_cmd_tree-root () {
-  $_arg_call $opt_silent '--accurate[error for mid-txn trees]' \
-    '::directory:_files -/'
-}
-
-(( $+functions[_tla_cmd_tree-version] )) ||
-_tla_cmd_tree-version () { $_arg_call '::directory:_files -/' }
-
-(( $+functions[_tla_cmd_set-tree-version] )) ||
-_tla_cmd_set-tree-version () {
-  $_arg_call $opt_archive $opt_dir ':version:_tla_versions'
-}
-
-(( $+functions[_tla_cmd_build-config] )) ||
-_tla_cmd_build-config () {
-  $_arg_call $opt_dir $opt_sparse $opt_link $opt_library \
-    '--no-pristines[don'\''t create pristine copies]' \
-    '--release-id[overwrite ./=RELEASE-ID for this config]' \
-    ':config:_tla_config'
-}
-
-(( $+functions[_tla_cmd_cat-config] )) ||
-_tla_cmd_cat-config () {
-  $_arg_call $opt_dir \
-    '--output[write the output as config CFG]:CFG:_tla_config' \
-    '--force[overwrite an exiting config (with --output)]' \
-    '--snap[show current patch levels of subtree packages]' \
-    ':config:_tla_config'
-}
-
-(( $+functions[_tla_cmd_undo] )) ||
-_tla_cmd_undo () {
-  $_arg_call $opt_archive $opt_quiet $opt_dir $opt_forward \
-    '(--no-output)--output[save changeset in DIR]:DIR:_files -/' \
-    '(--output)--no-output[do not save the changeset]' \
-    '::revision:_tla_revisions'
-}
-
-(( $+functions[_tla_cmd_redo] )) ||
-_tla_cmd_redo() {
-  $_arg_call $opt_quiet $opt_dir $opt_forward \
-    '--keep[do not delete the patch]' \
-    '::changeset:_files -/'
-}
-
-(( $+functions[_tla_cmd_changes] )) ||
-_tla_cmd_changes () {
-  $_arg_call $opt_archive $opt_verbose $opt_quiet $opt_dir \
-    '--output[save changeset in DIR]:DIR:_files -/' \
-    '--diffs[include diffs in the output]' \
-    '(--output)--keep[don'\''t remove the output directory]' \
-    '::revision:_tla_revisions'
-  #  ':separator:(--)' '*::limit:_files'
-  #don't understand the limit usage
-}
-
-(( $+functions[_tla_cmd_file-diffs] )) ||
-_tla_cmd_file-diffs () {
-  $_arg_call $opt_archive '--new-file[treat missing file as empty]' \
-    ':file:_files' '::revision:_tla_revisions'
-}
-
-(( $+functions[_tla_cmd_file-find] )) ||
-_tla_cmd_file-find () {
-  $_arg_call $opt_archive \
-    '--new-file[print missing file as `/dev/null'\'']' \
-    ':file:_files' '::revision:_tla_revisions'
-}
-
-(( $+functions[_tla_cmd_inventory] )) ||
-_tla_cmd_inventory () {
-  $_arg_call $opts_tag_method '--source[list source files]' \
-    '--precious[list precious files]' \
-    '--backups[list backup files]' \
-    '--junk[list junk files]' \
-    '--unrecognized[list unrecognized files]' \
-    '--trees[list roots of nested trees]' \
-    '(--files --both)--directories[list only directories]' \
-    '(--directories --both)--files[list only non-directories]' \
-    '(--directories --files)--both[list both dirs and files]' \
-    '--kind[indicate file kinds]' \
-    '--all[show arch control files]' \
-    '--nested[include nested trees]' \
-    '--ids[list with ids (source files only)]' \
-    '--untagged[include untagged files]' \
-    '::separator:(--)' '*::directory:_files -/'
-}
-
-(( $+functions[_tla_cmd_tree-lint] )) ||
-_tla_cmd_tree-lint () {
-  $_arg_call '--broken-symlinks[just list broken symlinks]' \
-    '--unrecognized-files[just list files violating naming conventions]' \
-    '--untagged-files[just list files lacking inventory tags]' \
-    '--missing-files[just list inventory tags lacking corresponding files]' \
-    '--duplicate-tags[just list duplicated tags]' \
-    '--strict[exit with non-0 status on _any_ oddity]' \
-    '::directory:_files -/'
-}
-
-(( $+functions[_tla_cmd_id] )) ||
-_tla_cmd_id () { $_arg_call $opts_tag_method $opt_silent '*:file:_files' }
-
-(( $+functions[_tla_cmd_id-tagging-method] )) ||
-_tla_cmd_id-tagging-method () {
-  local methods
-  methods=(
-    'names:use naming conventions only'
-    'implicit:use naming conventions but permit for inventory tags'
-    'tagline:use naming conventions but permit for inventory tags'
-    'explicit:require explicit designation of source'
-  )
-  $_arg_call $opt_dir '--strict[exit with error if method not set]' \
-    '::tagging method:(($methods))'
-}
-
-(( $+functions[_tla_cmd_add-id] )) ||
-_tla_cmd_add-id () {
-  $_arg_call '--tag[specify TAG instead of auto-generating]:TAG:' \
-    '*:files to add:_files'
-}
-
-(( $+functions[_tla_cmd_add] )) ||
-_tla_cmd_add () { _tla_cmd_add-id "$@" }
-
-(( $+functions[_tla_cmd_delete-id] )) ||
-_tla_cmd_delete-id () {
-  $_arg_call '*:files to delete:_files'
-  #may want to check validity when expanding
-}
-
-(( $+functions[_tla_cmd_delete] )) ||
-_tla_cmd_delete () { _tla_cmd_delete-id "$@" }
-
-(( $+functions[_tla_cmd_move-id] )) ||
-_tla_cmd_move-id () {
-  $_arg_call ':old name:_files' ':new name:_files'
-  #would be nice not to offer dirs for newname if oldname is a file, and
-  #vice versa
-}
-
-(( $+functions[_tla_cmd_move] )) ||
-_tla_cmd_move () { _tla_cmd_move-id "$@" }
-
-(( $+functions[_tla_cmd_mv] )) ||
-_tla_cmd_mv () {
-  $_arg_call '*:file:_files'
-  # this isn't quite right, but I can't get zsh to dtrt
-}
-
-(( $+functions[_tla_cmd_default-id] )) ||
-_tla_cmd_default-id () {
-  $_arg_call $opt_dir '--delete[remove the default]' \
-    '--strong[use the strong default]' \
-    '--weak[set a weak default]' \
-    '--dont-care[use the dont-care default]' \
-    '::TAG-PREFIX:'
-}
-
-(( $+functions[_tla_cmd_explicit-default] )) ||
-_tla_cmd_explicit-default () { _tla_cmd_default-id "$@" }
-
-(( $+functions[_tla_cmd_id-tagging-defaults] )) ||
-_tla_cmd_id-tagging-defaults () { $_arg_call }
-
-(( $+functions[_tla_cmd_changeset] )) ||
-_tla_cmd_changeset () {
-  $_arg_call \
-    '--file-list[record only diffs of files listed in FILE]:file:_files' \
-    ':ORIG:_files -/' ':MOD:_files -/' ':DEST:_files -/' '*::files:_files'
-  #should command-line file list be allowed if --file-list is given?
-}
-
-(( $+functions[_tla_cmd_mkpatch] )) ||
-_tla_cmd_mkpatch () { _tla_cmd_changeset "$@" }
-
-(( $+functions[_tla_cmd_apply-changeset] )) ||
-_tla_cmd_apply-changeset () {
-  $_arg_call $opt_forward '--reverse[apply the changeset in reverse]' \
-    ':changeset:_files -/' \
-    ':target:_files -/'
-}
-
-(( $+functions[_tla_cmd_dopatch] )) ||
-_tla_cmd_dopatch () { _tla_cmd_apply-changeset "$@" }
-
-(( $+functions[_tla_cmd_show-changeset] )) ||
-_tla_cmd_show-changeset () {
-  $_arg_call '--diffs[include diff output]' '::changeset:_files -/'
-}
-
-(( $+functions[_tla_cmd_make-archive] )) ||
-_tla_cmd_make-archive () {
-  $_arg_call '--listing[keep .listing files up-to-date]' \
-    '(--mirror-from)--mirror[create mirror of MASTER]:MASTER:_tla_archives' \
-    '(--mirror)--mirror-from[create pull-based mirror of MASTER]:MASTER:_tla_archives' \
-    '::name:' ':location:_files -/'
-}
-
-(( $+functions[_tla_cmd_archive-setup] )) ||
-_tla_cmd_archive-setup () {
-  $_arg_call $opt_archive \
-    '--file[read the list of desired versions from FILE]:FILE:_files' \
-    '--branches[make base-0 tags]' \
-    '--cache[archive cache when creating base-0 tags]' \
-    '*::versions:_tla_branches --trailing-dashes'
-  #This doesn't take care of the subtleties at all
-}
-
-(( $+functions[_tla_cmd_make-category] )) ||
-_tla_cmd_make-category () {
-  $_arg_call $opt_archive ':category:_tla_archives -S /'
-}
-
-(( $+functions[_tla_cmd_make-branch] )) ||
-_tla_cmd_make-branch () {
-  $_arg_call $opt_archive ':branch:_tla_categories --trailing-dashes'
-}
-
-(( $+functions[_tla_cmd_make-version] )) ||
-_tla_cmd_make-version () {
-  $_arg_call $opt_archive ':version:_tla_branches --trailing-dashes'
-}
-
-(( $+functions[_tla_cmd_import] )) ||
-_tla_cmd_import () {
-  $_arg_call $opt_archive $opt_dir \
-    '--log[commit with log file FILE]:FILE:_files' \
-    '--summary[log with summary TEXT plus log-for-merge output]:TEXT:' \
-    '--log-message[log with TEXT]:TEXT:' \
-    '--setup[use `make-archive'\'' if necessary]' \
-    '::version:_tla_versions'
-}
-
-(( $+functions[_tla_cmd_commit] )) ||
-_tla_cmd_commit () {
-  $_arg_call $opt_archive $opt_dir \
-    '--log[commit with log file FILE]:FILE:_files' \
-    '--summary[log with summary TEXT plus log-for-merge output]:TEXT:' \
-    '--log-message[log with TEXT plus log-for-merge output]:TEXT:' \
-    '--strict[strict tree-lint]' \
-    '--seal[create a version-0 revision]' \
-    '--fix[create a versionfix revision]' \
-    '--out-of-date-ok[commit even if out of date]' \
-    '--file-list[commit only mods to files listed in FILE]:FILE:_files' \
-    '::version:_tla_versions' ':separator:(--)' '*:files:_files'
-}
-
-(( $+functions[_tla_cmd_get] )) ||
-_tla_cmd_get () {
-  $_arg_call $opt_archive $opt_silent $opt_sparse $opt_non_sparse $opt_link \
-    $opt_library \
-    '--cache[specify cache root for trees with pristines]:DIR:_files -/' \
-    '--no-pristine[don'\''t save a pristine copy]' \
-    ':revision:_tla_revisions' \
-    '::directory:_files -/'
-}
-
-(( $+functions[_tla_cmd_get-changeset] )) ||
-_tla_cmd_get-changeset () {
-  $_arg_call $opt_archive ':revision:_tla_revisions' '::dir:_files -/'
-}
-
-(( $+functions[_tla_cmd_lock-revision] )) ||
-_tla_cmd_lock-revision () {
-  $_arg_call $opt_archive '--unlock[release a lock owned by you]' \
-    '--break[break any existing lock]' \
-    ':revision:_tla_revisions'
-}
-
-(( $+functions[_tla_cmd_archive-mirror] )) ||
-_tla_cmd_archive-mirror () {
-  $_arg_call \
-    '(--cached-tags)--no-cached[don'\''t copy cached revisions]' \
-    '(--no-cached)--cached-tags[copy only cachedrevs for tags to other archives]' \
-    '::FROM or MINE:_tla_archives' '::TO:_tla_archives' '::LIMIT:_tla_limit'
-  #TO should only be offered if FROM is given.
-  #tla currently fails if limit is given without also passing an archive.
-  #That should be fixed soon.
-}
-
-(( $+functions[_tla_cmd_categories] )) ||
-_tla_cmd_categories () {
-  $_arg_call $opt_archive '::archive:_tla_archives'
-}
-
-(( $+functions[_tla_cmd_branches] )) ||
-_tla_cmd_branches () {
-  $_arg_call $opt_archive '::category:_tla_categories'
-}
-
-(( $+functions[_tla_cmd_versions] )) ||
-_tla_cmd_versions () {
-  $_arg_call $opt_archive $opt_reverse \
-    '::branch:_tla_branches'
-}
-
-(( $+functions[_tla_cmd_revisions] )) ||
-_tla_cmd_revisions () {
-  $_arg_call $opt_archive $opt_reverse $opt_summary $opt_creator \
-    $opt_date $opt_full \
-    '::version:_tla_versions'
-    # Should complete revisions associated with the current tree too
-}
-
-(( $+functions[_tla_cmd_ancestry] )) ||
-_tla_cmd_ancestry () {
-  $_arg_call $opt_archive $opt_dir $opt_reverse $opt_summary $opt_creator \
-    $opt_date \
-    '--merges[show merges into this development line]' \
-    '::revision:_tla_revisions'
-}
-
-(( $+functions[_tla_cmd_ancestry-graph] )) ||
-_tla_cmd_ancestry-graph () {
-  $_arg_call $opt_archive $opt_dir $opt_reverse \
-    '--merges[show merges into this development line]' \
-    '--immediate[show only the immediate ancestor]' \
-    '--previous[show the (namespace) previous revision]' \
-    '::revision:_tla_revisions'
-}
-
-(( $+functions[_tla_cmd_cat-archive-log] )) ||
-_tla_cmd_cat-archive-log () {
-  $_arg_call $opt_archive '--headers[show only log headers]' \
-    ':revision:_tla_revisions'
-}
-
-(( $+functions[_tla_cmd_cacherev] )) ||
-_tla_cmd_cacherev () {
-  $_arg_call $opt_archive $opt_cache ':revision:_tla_revisions'
-  #should only complete non-cached revisions
-}
-
-(( $+functions[_tla_cmd_cachedrevs] )) ||
-_tla_cmd_cachedrevs () {
-  $_arg_call $opt_archive ':version:_tla_versions'
-}
-
-(( $+functions[_tla_cmd_uncacherev] )) ||
-_tla_cmd_uncacherev () {
-  $_arg_call $opt_archive ':revision:_tla_revisions' '::dir:_files -/'
-  #should only complete cached revisions
-}
-
-(( $+functions[_tla_cmd_archive-meta-info] )) ||
-_tla_cmd_archive-meta-info () {
-  $_arg_call $opt_archive ':item-name:(name mirror)'
-  #What else is there to complete?
-}
-
-(( $+functions[_tla_cmd_archive-snapshot] )) ||
-_tla_cmd_archive-snapshot () {
-  $_arg_call $opt_archive ':dir:_files -/' '::limit:_tla_revisions'
-}
-
-(( $+functions[_tla_cmd_archive-version] )) ||
-_tla_cmd_archive-version () { $_arg_call $opt_archive }
-
-(( $+functions[_tla_cmd_archive-fixup] )) ||
-_tla_cmd_archive-fixup () { $_arg_call $opt_archive }
-
-(( $+functions[_tla_cmd_make-log] )) ||
-_tla_cmd_make-log () {
-  $_arg_call $opt_archive $opt_dir '::version:_tla_versions'
-}
-
-(( $+functions[_tla_cmd_log-versions] )) ||
-_tla_cmd_log-versions () {
-  $_arg_call $opt_reverse $opt_dir \
-    '--archive[list only logs for ARCHIVE]:_tla_archives' \
-    '--category[list only logs for CATEGORY:_tla_categories' \
-    '--branch[list only logs for BRANCH]:_tla_branches' \
-    '--vsn[list only logs for VERSION-NUMBER]:_tla_versions'
-  # This should only complete items that are in the tree
-}
-
-(( $+functions[_tla_cmd_add-log-version] )) ||
-_tla_cmd_add-log-version () {
-  $_arg_call $opt_archive $opt_dir ':version:_tla_versions'
-}
-
-(( $+functions[_tla_cmd_remove-log-version] )) ||
-_tla_cmd_remove-log-version () {
-  $_arg_call $opt_archive $opt_dir \
-    ':version:('"$(tla log-versions)"')'
-}
-
-(( $+functions[_tla_cmd_logs] )) ||
-_tla_cmd_logs () {
-  $_arg_call $opt_archive $opt_dir $opt_reverse $opt_summary \
-    $opt_creator $opt_date $opt_full \
-    '--local-merges[list merges from the same archive]' \
-    '--foreign-merges[list merges from other archives]' \
-    '--merges[list all merges]' \
-    '*::version:('"$(tla log-versions)"')'
-}
-
-(( $+functions[_tla_cmd_abrowse] )) ||
-_tla_cmd_abrowse () {
-  $_arg_call $opt_archive $opt_reverse $opt_summary $opt_creator $opt_date \
-    '--kind[show each revision kind (import, changeset or tag)]' \
-    '--desc[implies -s -c -D -k]' \
-    '--local-merges[list merges from the same archive]' \
-    '--foreign-merges[list merges from other archives]' \
-    '--merges[list all merges]' \
-    '--categories[show category names only]' \
-    '--branches[show branch names only]' \
-    '--versions[show version names only]' \
-    '--omit-empty[omit empty or unchanged-since items]' \
-    '--since[show revisions after those listed in SNAP-FILE]:SNAP-FILE:_files' \
-    '--since-limits[limit output to items in the since file]' \
-    '--snap[record the highest revisions shown in SNAP-FILE]:SNAP-FILE:_files' \
-    '--force[overwrite an existing snap-file]' \
-    '::LIMIT:_tla_revisions'
-}
-
-(( $+functions[_tla_cmd_cat-log] )) ||
-_tla_cmd_cat-log () {
-  $_arg_call $opt_archive $opt_dir ':revision-spec:_tla_local_revisions'
-}
-
-(( $+functions[_tla_cmd_changelog] )) ||
-_tla_cmd_changelog () {
-  $_arg_call $opt_archive $opt_dir \
-    '--no-files[exclude file lists from ChangeLog]' \
-    '--untagged[don'\''t implicitly tag the output file]' \
-    '--new-entry[make FILE the first (top) entry for patch level PATCH]:' \
-    '::version:_tla_versions'
-  #--new-entry could use a completion
-}
-
-(( $+functions[_tla_cmd_log-for-merge] )) ||
-_tla_cmd_log-for-merge () {
-  $_arg_call $opt_archive $opt_dir $opt_reverse \
-    '::version:_tla_versions'
-}
-
-(( $+functions[_tla_cmd_merges] )) ||
-_tla_cmd_merges () {
-  $_arg_call $opt_archive $opt_dir $opt_reverse $opt_full \
-    ':INTO:_tla_revisions' '::FROM:_tla_revisions'
-}
-
-(( $+functions[_tla_cmd_new-merges] )) ||
-_tla_cmd_new-merges () {
-  $_arg_call $opt_archive $opt_dir $opt_reverse '::version:_tla_versions'
-}
-
-(( $+functions[_tla_cmd_tag] )) ||
-_tla_cmd_tag () {
-  $_arg_call $opt_archive '--log[commit with log file FILE]:FILE:_files' \
-    '--seal[create a version-0 revision]' \
-    '--fix[create a versionfix revision]' \
-    ':SOURCE-REVISION:_tla_revisions' ':TAG_VERSION:_tla_versions'
-}
-
-(( $+functions[_tla_cmd_update] )) ||
-_tla_cmd_update () {
-  $_arg_call $opt_archive $opt_dir $opt_dest $opt_forward \
-    '::revision:_tla_revisions'
-}
-
-(( $+functions[_tla_cmd_join-branch] )) ||
-_tla_cmd_join-branch () {
-  $_arg_call $opt_archive $opt_dir $opt_dest ':revision:_tla_revisions'
-  #should only complete continuation revisions
-}
-
-(( $+functions[_tla_cmd_replay] )) ||
-_tla_cmd_replay () {
-  $_arg_call $opt_archive $opt_dir $opt_dest $opt_forward \
-    '--list[read a list of patches to apply from FILE]:FILE:_files' \
-    '--new[replay only new patches]' \
-    '--reverse[reverse the named patch]' \
-    '--skip-present[skip patches that contain 1 or more patch logs already in this tree]' \
-    '*::revision:_tla_revisions'
-}
-
-(( $+functions[_tla_cmd_star-merge] )) ||
-_tla_cmd_star-merge () {
-  $_arg_call $opt_archive $opt_dir $opt_forward \
-    '--changes[save changeset in OUTPUT, but don'\''t apply]:OUTPUT:_files -/' \
-    '--reference[set reference version]:VERSION:_tla_versions' \
-    '--three-way[Perform a 3-way (diff3-style) merge]' \
-    ':FROM:_tla_revisions'
-}
-
-(( $+functions[_tla_cmd_apply-delta] )) ||
-_tla_cmd_apply-delta () {
-  $_arg_call $opt_archive $opt_cache $opt_dir $opt_dest $opt_forward \
-    ':FROM:_tla_tree_or_rev' \
-    ':TO:_tla_tree_or_rev'
-}
-
-(( $+functions[_tla_cmd_missing] )) ||
-_tla_cmd_missing () {
-  $_arg_call $opt_archive $opt_dir $opt_reverse $opt_summary $opt_creator \
-    $opt_date $opt_full '--merges[print a merge list for each missing patch]' \
-    '--skip-present[skip patches that contain 1 or more patch logs already in this tree]' \
-    '::revision:_tla_revisions'
-}
-
-(( $+functions[_tla_cmd_sync-tree] )) ||
-_tla_cmd_sync-tree () {
-  $_arg_call $opt_archive $opt_dir $opt_dest ':revision:_tla_revisions'
-}
-
-(( $+functions[_tla_cmd_delta] )) ||
-_tla_cmd_delta () {
-  $_arg_call $opt_archive $opt_cache \
-    '--report[output a changeset report]' \
-    '--no-changeset[don'\''t save the delta]' \
-    ':FROM:_tla_tree_or_rev' \
-    ':TO:_tla_tree_or_rev' \
-    '::DEST:_files -/'
-}
-
-(( $+functions[_tla_cmd_pristines] )) ||
-_tla_cmd_pristines () {
-  $_arg_call $opt_dir $opt_reverse \
-    '--unlocked[return only unlocked pristines]' \
-    '--locked[return only locked pristines]' \
-    '::limit:_tla_revisions'
-  #limit apparently needs at least a branch?
-}
-
-(( $+functions[_tla_cmd_lock-pristine] )) ||
-_tla_cmd_lock-pristine () {
-  $_arg_call $opt_archive $opt_dir \
-    '--unlock[unlock, rather than lock]' \
-    ':revision:_tla_revisions'
-}
-
-(( $+functions[_tla_cmd_add-pristine] )) ||
-_tla_cmd_add-pristine () {
-  $_arg_call $opt_archive $opt_dir ':revision:_tla_revisions'
-  #should it only complete revisions that match the project tree?
-}
-
-(( $+functions[_tla_cmd_find-pristine] )) ||
-_tla_cmd_find-pristine () {
-  $_arg_call $opt_archive $opt_dir $opt_silent \
-    '--unlocked[return only an unlocked pristine]' \
-    '--locked[return only a locked pristine]' \
-    '--tree-only[search this tree only, not siblings]' \
-    ':revision:_tla_revisions'
-}
-
-(( $+functions[_tla_cmd_my-revision-library] )) ||
-_tla_cmd_my-revision-library () {
-  $_arg_call $opt_errname $opt_delete $opt_silent \
-    '--search[use the full search path]' \
-    '--add[use the full add path]' \
-    '--search-only[use the search-only path]' \
-    '--add-only[use the add-only path]' \
-    '--first[prepend to the path if setting (default appends)]' \
-    '::dir:_files -/'
-}
-
-(( $+functions[_tla_cmd_library-find] )) ||
-_tla_cmd_library-find () {
-  $_arg_call $opt_library_archive $opt_errname $opt_silent \
-  ':revision:_tla_revisions --library'
-}
-
-(( $+functions[_tla_cmd_library-add] )) ||
-_tla_cmd_library-add () {
-  $_arg_call $opt_archive $opt_sparse $opt_non_sparse \
-    '--library[specify which library to add to]:LIB:_files -/' \
-    '--for-links[require a lib on the same device as PATH]:PATH:_files -/' \
-    ':revision:_tla_revisions --exclude-library-revisions'
-  #ought to have a _tla_libraries function to comlete libraries
-}
-
-(( $+functions[_tla_cmd_library-remove] )) ||
-_tla_cmd_library-remove () {
-  $_arg_call $opt_library_archive ':revision:_tla_revisions --library'
-}
-
-(( $+functions[_tla_cmd_library-archives] )) ||
-_tla_cmd_library-archives () {
-  $_arg_call
-}
-
-(( $+functions[_tla_cmd_library-categories] )) ||
-_tla_cmd_library-categories () {
-  $_arg_call $opt_library_archive '::archive:_tla_archives --library'
-}
-
-(( $+functions[_tla_cmd_library-branches] )) ||
-_tla_cmd_library-branches () {
-  $_arg_call $opt_library_archive '::category:_tla_categories --library'
-}
-
-(( $+functions[_tla_cmd_library-versions] )) ||
-_tla_cmd_library-versions () {
-  $_arg_call $opt_library_archive $opt_reverse \
-    '::branch:_tla_branches --library'
-}
-
-(( $+functions[_tla_cmd_library-revisions] )) ||
-_tla_cmd_library-revisions () {
-  $_arg_call $opt_library_archive $opt_reverse $opt_full $opt_summary \
-    $opt_creator $opt_date '::version:_tla_versions --library'
-}
-
-(( $+functions[_tla_cmd_library-log] )) ||
-_tla_cmd_library-log () {
-  $_arg_call $opt_silent $opt_library_archive ':revision:_tla_revisions --library'
-}
-
-(( $+functions[_tla_cmd_library-file] )) ||
-_tla_cmd_library-file () {
-  $_arg_call $opt_library_archive '--tag[interpret file as an inventory tag]' \
-           '--this[interpret file as a file within a project tree]' \
-           ':file:_files' ':revision:_tla_revisions --library'
-}
-
-(( $+functions[_tla_cmd_grab] )) ||
-_tla_cmd_grab () {
-  $_arg_call ':location:_files'
-}
-
-(( $+functions[_tla_cmd_parse-package-name] )) ||
-_tla_cmd_parse-package-name () {
-  $_arg_call $opt_archive \
-    '--arch[print the archive name]' \
-    '--non-arch[print the non-archive part of the name]' \
-    '--category[print the category name]' \
-    '--branch[print the branch name]' \
-    '--package[print the package name]' \
-    '--vsn[print the version id]' \
-    '--package-version[print the category--branch--version]' \
-    '--lvl[print the patch level]' \
-    ':name:'
-}
-
-(( $+functions[_tla_cmd_valid-package-name] )) ||
-_tla_cmd_valid-package-name () {
-  $_arg_call $opt_errname \
-    '--archive[require an explicit archive]' \
-    '--no-archive[prohibit an explicit archive]' \
-    '--category[require a category]' \
-    '--package[require category, permit branch]' \
-    '--vsn[require a version number]' \
-    '--lvl[require a patch level]' \
-    '--tolerant[tolerate more specific names]' \
-    ':name:'
-}
-
-(( $+functions[_tla_cmd_library-config] )) ||
-_tla_cmd_library-config () {
-  $_arg_call $opt_sparse $opt_non_sparse \
-  '(--non-greedy)--greedy[make the library greedy]' \
-    '(--greedy)--non-greedy[make the library non-greedy]' \
-    ':library-dir:_files -/'
-}
-
-(( $+functions[_tla_cmd_rbrowse] )) ||
-_tla_cmd_rbrowse () {
-  $_arg_call '(--archive)--search-all[search all archives]' \
-    '(--search-all)--archive[use ARCHIVE instead of default]:ARCHIVE:_tla_archives' \
-    '::regular expression:'
-}
-
-_tla_main () {
-  typeset -A opt_args
-  if (( CURRENT > 2 )); then
-    local cmd=${words[2]}
-    curcontext="${curcontext%:*:*}:tla-$cmd:"
-    (( CURRENT-- ))
-    shift words
-    if typeset -f _tla_cmd_$cmd &>/dev/null; then
-      _tla_cmd_$cmd
-    else
-      _arguments '*:: :_files'
-    fi
+(( $+functions[_tla_libraries] )) ||
+_tla_libraries () {
+  local libraries expl
+  libraries=($(_call_program tla $TLA my-revision-library))
+  _description -V libraries expl "revision libraries"
+  compadd "$expl[@]" -a libraries
+}
+
+(( $+functions[_tla_my_revision_library] )) ||
+_tla_my_revision_library () {
+  if [[ -n $words[(r)-d] ]] || [[ -n $words[(r)--delete] ]]; then
+    _tla_libraries
   else
-    _arguments $opts_std ':commands:(($cmds))'
+    _files -/
   fi
 }
 
-local -U cmds
-local help
-help=(${(f)"$(tla help)"})
-cmds=(${${${${(M)help:#* :*}/ #: #/:}%% ##}## #})
+(( $+functions[_tla_log_versions] )) ||
+_tla_log_versions () {
+  local logs expl
+  if is-at-least 1.1 $tla_version; then
+    logs=($(_call_program tla $TLA log-versions))
+  else
+    logs=($(_call_program tla $TLA logs))
+  fi
+  _description -V versions expl "log versions"
+  compadd "$expl[@]" -a logs
+}
+
+# command argument definitions
+# commands with different versions
+
+local cmd_register_archive cmd_archives cmd_ls_archives cmd_redo
+local cmd_redo_changes cmd_changes cmd_what_changed cmd_categories
+local cmd_branches cmd_versions cmd_cacherev cmd_logs cmd_log_versions
+local cmd_log_ls cmd_update cmd_join_branch cmd_replay cmd_deltapatch
+local cmd_delta_patch cmd_apply_delta cmd_sync_tree cmd_make_sync_tree
+local cmd_delta cmd_revdelta cmd_library_categories cmd_library_branches
+local cmd_library_versions cmd_library_revisions
+
+cmd_log_ls=('*:version:_tla_log_versions')
+cmd_log_versions=()
+# the options should only complete items that are in the tree
+
+if is-at-least 1.1 $tla_version; then
+  cmd_register_archive=('::archive:_tla_archives' ':location:_files -/')
+  cmd_archives=('::regex:')
+  cmd_redo=('::changeset:_files -/')
+  cmd_changes=('::revision:_tla_revisions'
+    #  ':separator:(--)' '*::limit:_files'
+    #don't understand the limit usage
+  )
+  cmd_categories=('::archive:_tla_archives')
+  cmd_branches=('::category:_tla_categories')
+  cmd_versions=('::branch:_tla_branches')
+  cmd_cacherev=('::revision:_tla_revisions')
+  #should only complete non-cached revisions
+
+  cmd_logs=($cmd_log_ls)
+  cmd_update=('::revision:_tla_revisions')
+  cmd_join_branch=(':revision:_tla_revisions')
+  #should only complete continuation revisions
+
+  cmd_replay=('*::revision:_tla_revisions')
+  cmd_deltapatch=(':FROM:_tla_tree_or_rev' ':TO:_tla_tree_or_rev')
+  cmd_sync_tree=(':revision:_tla_revisions')
+  cmd_delta=(':FROM:_tla_tree_or_rev' ':TO:_tla_tree_or_rev' '::DEST:_files -/')
+  cmd_library_categories=('::archive:_tla_archives --library')
+  cmd_library_branches=('::category:_tla_categories --library')
+  cmd_library_versions=('::branch:_tla_branches --library')
+  cmd_library_revisions=('::version:_tla_versions --library')
+else
+  cmd_register_archive=(':archive:_tla_archives' ':location:_files -/')
+  cmd_archives=()
+  cmd_redo=()
+  cmd_changes=('::revision:_tla_revisions')
+  cmd_categories=()
+  cmd_branches=(':category:_tla_categories')
+  cmd_versions=(':branch:_tla_branches')
+  cmd_cacherev=(':revision:_tla_revisions' '::dir:_files -/')
+  cmd_logs=($cmd_log_versions)
+  cmd_update=(':dir:_files -/' '::newdir:_files -/'
+    '::revision:_tla_revisions')
+  cmd_join_branch=(':dir:_files -/' '::newdir:_files -/'
+    ':revision:_tla_revisions')
+  cmd_replay=(':dir:_files -/' '::newdir:_files -/' '::revision:_tla_revisions')
+  cmd_deltapatch=(':FROM:_tla_tree_or_rev' ':TO:_tla_tree_or_rev'
+    ':UPON:_tla_tree_or_rev' '::DEST:_files -/')
+  cmd_sync_tree=(':dir:_files -/' '::newdir:_files -/'
+    ':revision:_tla_revisions')
+  cmd_delta=(':FROM:_tla_tree_or_rev' ':TO:_tla_tree_or_rev')
+  cmd_library_categories=()
+  cmd_library_branches=(':category:_tla_categories --library')
+  cmd_library_versions=(':branch:_tla_branches --library')
+  cmd_library_revisions=(':version:_tla_versions --library')
+fi
+
+cmd_ls_archives=($cmd_archives)
+cmd_redo_changes=($cmd_redo)
+cmd_what_changed=($cmd_changes)
+cmd_delta_patch=($cmd_deltapatch)
+cmd_apply_delta=($cmd_deltapatch)
+cmd_make_sync_tree=($cmd_sync_tree)
+cmd_revdelta=($cmd_delta)
+
+# commands the same in all versions
+
+local cmd_help
+cmd_help=()
+
+local cmd_my_id
+cmd_my_id=('::id-string:')
+
+local cmd_my_default_archive
+cmd_my_default_archive=('::archive:_tla_archives')
+
+local cmd_whereis_archive
+cmd_whereis_archive=(':archive:_tla_archives')
+
+local cmd_init_tree
+cmd_init_tree=('::version:_tla_versions')
+
+local cmd_tree_root
+cmd_tree_root=('::directory:_files -/')
+
+local cmd_tree_version
+cmd_tree_version=('::directory:_files -/')
+
+local cmd_set_tree_version
+cmd_set_tree_version=(':version:_tla_versions')
+
+local cmd_build_config cmd_buildcfg
+cmd_build_config=(':config:_tla_config')
+cmd_buildcfg=($cmd_build_config)
+
+local cmd_cat_config cmd_catcfg cmd_cfgcat
+cmd_cat_config=(':config:_tla_config')
+cmd_catcfg=($cmd_cat_config)
+cmd_cfgcat=($cmd_cat_config)
+
+local cmd_undo cmd_undo_changes
+cmd_undo=('::revision:_tla_revisions')
+cmd_undo_changes=($cmd_undo)
+
+local cmd_file_diffs
+cmd_file_diffs=(':file:_files' '::revision:_tla_revisions')
+
+local cmd_file_find
+cmd_file_find=(':file:_files' '::revision:_tla_revisions')
+
+local cmd_inventory cmd_srcfind
+cmd_inventory=('::separator:(--)' '*:directory:_files -/')
+cmd_srcfind=($cmd_inventory)
+
+local cmd_tree_lint
+cmd_tree_lint=('::directory:_files -/')
+
+local cmd_id cmd_invtag
+cmd_id=('*:file:_files')
+cmd_invtag=($cmd_id)
+
+local cmd_id_tagging_method cmd_tagging_method methods
+cmd_id_tagging_method=('::tagging method:(($methods))')
+methods=(
+  'names:use naming conventions only'
+  'implicit:use naming conventions but permit for inventory tags'
+  'tagline:use naming conventions but permit for inventory tags'
+  'explicit:require explicit designation of source'
+)
+cmd_tagging_method=($cmd_id_tagging_method)
+
+local cmd_add cmd_add_id cmd_add_tag
+cmd_add=('*:files to add:_files')
+cmd_add_id=($cmd_add)
+cmd_add_tag=($cmd_add)
+
+local cmd_delete cmd_delete_id cmd_delete_tag
+cmd_delete=('*:files to delete:_files')
+cmd_delete_id=($cmd_delete)
+cmd_delete_tag=($cmd_delete)
+
+local cmd_move cmd_move_id cmd_move_tag
+cmd_move_id=(':old name:_files' ':new name:_files')
+cmd_move_id=($cmd_move)
+cmd_move_tag=($cmd_move)
+#would be nice not to offer dirs for newname if oldname is a file, and
+#vice versa
+
+local cmd_mv
+cmd_mv=('*:file:_files')
+# not really right, but close enough
+
+local cmd_default_id cmd_explicit_default cmd_default_tag
+cmd_default_id=('::TAG-PREFIX:')
+cmd_explicit_default=($cmd_default_id)
+cmd_default_tag=($cmd_default_id)
+
+local cmd_tagging_defaults cmd_id_tagging_defaults
+cmd_tagging_defaults=()
+cmd_id_tagging_defaults=($cmd_tagging_defaults)
+
+local cmd_changeset cmd_mkpatch
+cmd_changeset=(
+  ':ORIG:_files -/'
+  ':MOD:_files -/'
+  ':DEST:_files -/'
+  '*:files:_files'
+)
+cmd_mkpatch=("$cmd_changeset[@]")
+
+local cmd_dopatch cmd_do_changeset cmd_apply_changeset
+cmd_dopatch=(':changeset:_files -/' ':target:_files -/')
+cmd_do_changeset=($cmd_dopatch)
+cmd_apply_changeset=($cmd_dopatch)
+
+local cmd_show_changeset
+cmd_show_changeset=('::changeset:_files -/')
+
+local cmd_make_archive
+cmd_make_archive=('::name:' ':location:_files -/')
+
+local cmd_archive_setup
+cmd_archive_setup=('*:versions:_tla_branches --trailing-dashes')
+
+local cmd_make_category
+cmd_make_category=(':category:_tla_archives -S /')
+
+local cmd_make_branch
+cmd_make_branch=(':branch:_tla_categories --trailing-dashes')
+
+local cmd_make_version
+cmd_make_version=(':version:_tla_branches --trailing-dashes')
+
+local cmd_import cmd_imprev
+cmd_import=('::version:_tla_versions')
+cmd_imprev=($cmd_import)
+
+local cmd_commit cmd_cmtrev
+cmd_commit=('::version:_tla_versions' ':separator:(--)' '*:files:_files')
+cmd_cmtrev=($cmd_commit)
+
+local cmd_get cmd_getrev
+cmd_get=(':revision:_tla_revisions' '::directory:_files -/')
+cmd_getrev=($cmd_get)
+
+local cmd_get_patch cmd_get_changeset
+cmd_get_patch=(':revision:_tla_revisions' '::dir:_files -/')
+cmd_get_changeset=($cmd_get_patch)
+
+local cmd_lock_revision
+cmd_lock_revision=(':revision:_tla_revisions')
+
+local cmd_push_mirror cmd_archive_mirror
+cmd_push_mirror=(
+  '::FROM or MINE:_tla_archives'
+  '::TO:_tla_archives'
+  '::LIMIT:_tla_limit'
+)
+cmd_archive_mirror=($cmd_push_mirror)
+
+local cmd_revisions
+cmd_revisions=('::version:_tla_versions')
+
+local cmd_ancestry
+cmd_ancestry=('::revision:_tla_revisions')
+
+local cmd_ancestry_graph
+cmd_ancestry_graph=('::revision:_tla_revisions')
+
+local cmd_cat_archive_log
+cmd_cat_archive_log=(':revision:_tla_revisions')
+
+local cmd_cachedrevs
+cmd_cachedrevs=(':version:_tla_versions')
+
+local cmd_uncacherev
+cmd_uncacherev=(':revision:_tla_revisions' '::dir:_files -/')
+
+local cmd_archive_meta_info
+cmd_archive_meta_info=(':item-name:((name\:foo mirror\:bar))')
+
+local cmd_archive_snapshot
+cmd_archive_snapshot=(':dir:_files -/' '::limit:_tla_revisions')
+
+local cmd_archive_version
+cmd_archive_version=()
+
+local cmd_archive_fixup
+cmd_archive_fixup=()
+
+local cmd_make_log
+cmd_make_log=('::version:_tla_versions')
+
+local cmd_add_log cmd_add_log_version
+cmd_add_log=(':version:_tla_versions')
+cmd_add_log_version=($cmd_add_log)
+
+local cmd_remove_log cmd_remove_log_version
+cmd_remove_log=(':version:_tla_log_versions')
+cmd_remove_log_version=($cmd_remove_log)
+
+local cmd_abrowse
+cmd_abrowse=('::LIMIT:_tla_revisions')
+
+local cmd_cat_log
+cmd_cat_log=(':revision-spec:_tla_local_revisions')
+
+local cmd_changelog
+cmd_changelog=('::version:_tla_versions')
+
+local cmd_log_for_merge
+cmd_log_for_merge=('::version:_tla_versions')
+
+local cmd_merges
+cmd_merges=(':INTO:_tla_revisions' '::FROM:_tla_revisions')
+
+local cmd_new_merges
+cmd_new_merges=('::version:_tla_versions')
+
+local cmd_tag cmd_tagrev
+cmd_tag=(':SOURCE-REVISION:_tla_revisions' ':TAG-VERSION:_tla_versions')
+cmd_tagrev=($cmd_tag)
+
+local cmd_star_merge
+cmd_star_merge=(':FROM:_tla_revisions')
+
+local cmd_missing cmd_whats_missing
+cmd_missing=('::revision:_tla_revisions')
+cmd_whats_missing=($cmd_missing)
+
+local cmd_pristines cmd_ls_pristines
+cmd_pristines=('::limit:_tla_revisions')
+cmd_ls_pristines=($cmd_pristines)
+
+local cmd_lock_pristine
+cmd_lock_pristine=(':revision:_tla_revisions')
+
+local cmd_add_pristine
+cmd_add_pristine=(':revision:_tla_revisions')
+
+local cmd_find_pristine
+cmd_find_pristine=(':revision:_tla_revisions')
+
+local cmd_my_revision_library
+cmd_my_revision_library=(':library:_tla_my_revision_library')
+
+local cmd_library_find
+cmd_library_find=(':revision:_tla_revisions --library')
+
+local cmd_library_add
+cmd_library_add=(':revision:_tla_revisions --exclude-library-revisions')
+
+local cmd_library_remove
+cmd_library_remove=(':revision:_tla_revisions --library')
+
+local cmd_library_archives
+cmd_library_archives=()
+
+local cmd_library_log
+cmd_library_log=(':revision:_tla_revisions --library')
+
+local cmd_library_file
+cmd_library_file=(':file:_files' ':revision:_tla_revisions --library')
+
+local cmd_grab
+cmd_grab=(':location:_files')
+
+local cmd_parse_package_name
+cmd_parse_package_name=(':name:')
+
+local cmd_valid_package_name
+cmd_valid_package_name=(':name:')
+
+local cmd_library_config
+cmd_library_config=(':library:_tla_libraries')
+
+local cmd_rbrowse
+cmd_rbrowse=('::regular expression:')
+
+local cmd_rm
+cmd_rm=('*:file:_files')
+
+local cmd_escape
+cmd_escape=(':string:')
+
+#mutually exclusive options
+
+local -A excludes
+excludes=(
+# This first line means that if --output was given, don't complete
+# --no-output or --keep. The converse is not true.
+--output '--no-output --keep'
+--no-output --output
+
+--silent  '         --quiet --report --verbose --debug'
+--quiet   '--silent         --report --verbose --debug'
+--report  '--silent --quiet          --verbose --debug'
+--verbose '--silent --quiet --report           --debug'
+--debug   '--silent --quiet --report --verbose        '
+
+--sparse --non-sparse
+--non-sparse --sparse
+
+--files       '        --directories --both'
+--directories '--files               --both'
+--both        '--files --directories       '
+
+--mirror --mirror-from
+--mirror-from --mirror
+
+--no-cached --cached-tags
+--cached-tags --no-cached
+
+--non-greedy --greedy
+--greedy --non-greedy
+)
+
+_tla_main () {
+  typeset -A opt_args
+  local arguments
+  if (( CURRENT > 2 )); then
+    local cmd=${words[2]}
+    local var_cmd=cmd_${cmd//-/_}
+    curcontext="${curcontext%:*:*}:tla-$cmd:"
+    (( CURRENT-- ))
+    shift words
+
+    arguments=()
+    local input
+    input=(${${(f)"$($TLA $cmd -h)"}#  })
+    shift 6 input
+
+    local i j=1
+    local short long arg desc action
+    short=()
+    long=()
+    arg=()
+    desc=()
+    action=()
+    for (( i=1 ; i <= ${#input} ; i++ )); do
+      [[ "$input[i]" != *[^\ ]* ]] && continue # stupid blank lines
+      short[j]="${${${input[i]}[1,2]}#--}"
+      long[j]="${${input[i]#-?, }%% *}"
+
+      arg[j]="${${${input[i]%%  *}##* }##-*}"
+      [[ $long[j] == --archive ]] && arg[j]=ARCHIVE # tla doesn't mention this
+
+      desc[j]="${input[i]##*  }"
+      if [[ "$input[i+1]" == \ *[^\ ]* ]]; then # description continues
+        (( i++ ))
+        desc[j]="$desc[j] ${input[i]##*  }"
+      fi
+      desc[j]="${${desc[j]//\[/\\[}//\]/\\]}" # escape brackets
+
+      case $arg[j] in
+      DIR|PATCH-DIR|DEST|OUTPUT|PATH)
+        action[j]='_files -/' ;;
+      FILES|FILE|SNAP-FILE)
+        action[j]='_files' ;;
+      MASTER|MASTER-SOURCE|ARCHIVE)
+        action[j]='_tla_archives' ;;
+      CATEGORY)
+        action[j]='_tla_categories' ;;
+      BRANCH)
+        action[j]='_tla_branches' ;;
+      VERSION)
+        action[j]='_tla_versions' ;;
+      CFG)
+        action[j]='_tla_configs' ;;
+      LIB)
+        action[j]='_tla_libraries' ;;
+#      PATCH,FILE) # not sure how to complete this
+#        action[j]='_tla_patch_file' ;;
+      *)
+        action[j]='' ;;
+      esac
+
+      (( j++ ))
+
+    done
+
+    local excluded k
+    for (( i = 1 ; i < j ; i++ )); do
+      excluded=($short[i] $long[i])
+      foreach opt (${=excludes[$long[i]]})
+        k=$long[(i)$opt]
+        excluded=($excluded $short[k] $long[k])
+        #excludes matching short options too :-)
+      end
+
+
+      # generate arguments to _arguments ;-)
+      # make long and short options mutually exclusive
+      [ $short[i] ] && arguments=("$arguments[@]"
+        "${hide_short}(${excluded})${short[i]}[${desc[i]}]${arg[i]:+:$arg[i]:$action[i]}")
+      [ $long[i] ] && arguments=("$arguments[@]"
+        "(${excluded})${long[i]}[${desc[i]}]${arg[i]:+:$arg[i]:$action[i]}")
+    done
+
+    arguments=("$arguments[@]" "${(@P)var_cmd-*:FILE:_files}")
+  else
+    local help
+    local -U cmds
+    help=(${(f)"$($TLA help)"})
+    cmds=(${${${${(M)help:#* :*}/ #: #/:}%% ##}## #})
+    arguments=(':commands:(($cmds))')
+  fi
+  _arguments -S -A '-*' \
+    {"${hide_short}(: -)-V",'(: -)--version'}'[display version]' \
+    {"${hide_short}(: -)-h",'(: -)--help'}'[display help]' \
+    '(: -)-H[display verbose help]' \
+    "$arguments[@]"
+}
 
 _tla_main "$@"

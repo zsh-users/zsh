@@ -1,3 +1,8 @@
+2004-06-15  Clint Adams  <clint@zsh.org>
+
+	* 20055: Completion/Unix/Command/_tla: additions and fixes
+	from Jason McCarty.
+
 2004-06-09  Peter Stephenson  <pws@csr.com>
 
 	* c.f. 20034: Test/V03mathfunc.ztst: tests for the zsh/mathfunc
