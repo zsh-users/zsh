@@ -1173,7 +1173,7 @@ zsh_main(int argc, char **argv)
 	  break;
     } while (zsh_name);
 
-    fdtable_size = OPEN_MAX;
+    fdtable_size = zopenmax();
     fdtable = zcalloc(fdtable_size);
 
     createoptiontable();

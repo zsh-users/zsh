@@ -220,6 +220,9 @@ struct timezone {
 #  define OPEN_MAX 64
 # endif
 #endif
+#ifndef HAVE_SYSCONF
+# define zopenmax() (long) OPEN_MAX
+#endif
 
 #ifdef HAVE_FCNTL_H
 # include <fcntl.h>

@@ -1,3 +1,9 @@
+2000-08-08  Clint Adams  <schizo@debian.org>
+
+	* 12568: configure.in, Src/compat.c, Src/exec.c, Src/init.c,
+	Src/system.h: check sysconf(_SC_OPEN_MAX) if available instead
+	of OPEN_MAX/NOFILES.
+
 2000-08-08  Sven Wischnowsky  <wischnow@zsh.org>
 
 	* 12567: Completion/Linux/_rpm, Src/Zle/computil.c: handle the

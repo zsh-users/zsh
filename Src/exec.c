@@ -1404,8 +1404,11 @@ static void
 closeallelse(struct multio *mn)
 {
     int i, j;
+    long openmax;
 
-    for (i = 0; i < OPEN_MAX; i++)
+    openmax = zopenmax();
+
+    for (i = 0; i < openmax; i++)
 	if (mn->pipe != i) {
 	    for (j = 0; j < mn->ct; j++)
 		if (mn->fds[j] == i)

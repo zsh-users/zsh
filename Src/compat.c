@@ -171,6 +171,27 @@ zpathmax(char *dir)
 }
 #endif
 
+#ifdef HAVE_SYSCONF
+/* This is replaced by a macro from system.h if not HAVE_PATHCONF.   *
+ * 0 is returned if _SC_OPEN_MAX is unavailable                      *
+ * -1 is returned on error                                           *
+ *                                                                   *
+ * Neither of these should happen, but resort to OPEN_MAX rather     *
+ * than return 0 or -1 just in case.                                 */
+
+/**/
+mod_export long
+zopenmax(void)
+{
+    long openmax;
+    
+    openmax = sysconf(_SC_OPEN_MAX);
+    if(openmax < 1)
+	return OPEN_MAX;
+    else
+	return openmax;
+}
+#endif
 
 /**/
 mod_export char *

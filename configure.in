@@ -864,7 +864,7 @@ AC_CHECK_FUNCS(strftime difftime gettimeofday \
 	       signgam \
 	       putenv getenv \
 	       brk sbrk \
-	       pathconf)
+	       pathconf sysconf)
 AC_FUNC_STRCOLL
 
 if test $ac_cv_func_setpgrp = yes; then
