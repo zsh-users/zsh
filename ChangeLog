@@ -1,3 +1,8 @@
+2001-03-28  Peter Stephenson  <pws@csr.com>
+
+	* unposted: Doc/Zsh/zle.yo, Doc/Zsh/mod_zle.yo: move ZLE builtin
+	documentation from mod_zle.yo to zle.yo.
+
 2001-03-28  Sven Wischnowsky  <wischnow@zsh.org>
 
 	* Completion/Commands/_history_complete_word,
