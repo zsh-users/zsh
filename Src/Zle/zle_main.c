@@ -748,7 +748,7 @@ bin_vared(char *name, char **args, char *ops, int func)
     struct value vbuf;
     Value v;
     Param pm = 0;
-    int create = 0, ifl;
+    int create = 0, ifl, ieof;
     int type = PM_SCALAR, obreaks = breaks, haso = 0;
     char *p1 = NULL, *p2 = NULL;
     FILE *oshout = NULL;
@@ -900,11 +900,13 @@ bin_vared(char *name, char **args, char *ops, int func)
 
     varedarg = *args;
     ifl = isfirstln;
-    if (ops['e'])
-	isfirstln = 1;
     if (ops['h'])
 	hbegin(2);
+    isfirstln = ops['e'];
+    ieof = opts[IGNOREEOF];
+    opts[IGNOREEOF] = 0;
     t = (char *) zleread(p1, p2, ops['h'] ? ZLRF_HISTORY : 0);
+    opts[IGNOREEOF] = ieof;
     if (ops['h'])
 	hend(NULL);
     isfirstln = ifl;

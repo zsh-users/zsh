@@ -1,3 +1,9 @@
+2000-10-21  Bart Schaefer  <schaefer@zsh.org>
+
+	* 13057: Src/Zle/zle_main.c: `vared -h' should not imply `vared -e';
+	use of -e should override the setting of the IGNOREEOF option.
+	(The -e flag was added by zsh-workers/9396, for 3.1.6-dev-16.)
+
 2000-10-20  Bart Schaefer  <schaefer@zsh.org>
 
 	* 13055: Src/hist.c, Src/Zle/zle_main.c: Fix `vared -h' for non-
