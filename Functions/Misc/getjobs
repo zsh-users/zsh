@@ -1,6 +1,6 @@
 # Call this from the preexec function like so:
 #   preexec() {
-#	  getjobs "${(z)1}"
+#	  getjobs "${(z)2}"  # Use "${(z)1}" prior to zsh-4.0.1
 #   }
 setopt localoptions noshwordsplit noksharrays
 local texts
