@@ -1,5 +1,8 @@
 2001-05-29  Clint Adams  <clint@zsh.org>
 
+	* 14536: Completion/Debian/Command/_update-alternatives:
+	loop for multiple --slaves thanks to Sven.
+
 	* 14533: Completion/Debian/Command/_dpkg,
 	Completion/Debian/Command/_update-alternatives:
 	use "= ->" for states expecting positional

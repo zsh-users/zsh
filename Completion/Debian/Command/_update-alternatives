@@ -16,26 +16,39 @@ _arguments -C '--verbose' \
     '--display:name:_files -W /var/lib/dpkg/alternatives' \
     '--config:name:_files -W /var/lib/dpkg/alternatives' && return 0
 
-_call_function ret _update_alternatives_$state && return ret
+while true; do
 case "$state" in
 	islave)
+        _call_function ret _update_alternatives_$state && return ret
+	state=
 	_arguments -C '1:link:_files' \
                    '2:name:_files -W /var/lib/dpkg/alternatives' \
                    '3:path:_files' \
-                   '--slave:*::slave:->islave'
+                   '--slave:*::more:= ->islave' && return 0
+        [[ -z $state ]] && return 1
 	;;
+
 	install)
+        _call_function ret _update_alternatives_$state && return ret
 	_arguments -C '1:link:_files' \
                    '2:name:_files -W /var/lib/dpkg/alternatives' \
                    '3:path:_files' \
                    '4:priority:' \
-                   '--slave:*::slave:->islave' \
+                   '--slave:*::slave:= ->islave' && return 0
+        [[ -z $state ]] && return 1
 	;;
 
 	remove)
+        _call_function ret _update_alternatives_$state && return ret
 	_arguments \
                    '1:name:_files -W /var/lib/dpkg/alternatives' \
-                   '2:path:_files'
+                   '2:path:_files' && return 0
+        return 1
+	;;
+
+	*)
+	return 1
 	;;
 
 esac
+done
