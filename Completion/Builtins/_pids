@@ -3,7 +3,7 @@
 # If given the `-m <pattern>' option, this tries to complete only pids
 # of processes whose command line match the `<pattern>'.
 
-local list expl match desc listargs args
+local out list expl match desc listargs args
 
 _wanted processes expl 'process ID' || return 1
 
@@ -12,12 +12,18 @@ if [[ "$1" = -m ]]; then
   shift 2
 fi
 
-zstyle -a ":completion${curcontext}:ps" list-arguments listargs
 zstyle -a ":completion${curcontext}:ps" arguments args
-(( $#listargs )) || listargs=( "$args[@]" )
+
+out="$(command ps $args 2>/dev/null)"
 
 if zstyle -t ":completion${curcontext}:processes" verbose; then
-  list=("${(@Mr:COLUMNS-1:)${(f@)$(command ps $listargs 2>/dev/null)}[2,-1]:#[ 	]#${PREFIX}[0-9]#${SUFFIX}[ 	]*${~match}}")
+  zstyle -a ":completion${curcontext}:ps" list-arguments listargs
+  (( $#listargs )) || listargs=( "$args[@]" )
+  if [[ "$listargs" = "$args" ]]; then
+    list=("${(@Mr:COLUMNS-1:)${(f@)out}[2,-1]:#[ 	]#${PREFIX}[0-9]#${SUFFIX}[ 	]*${~match}}")
+  else
+    list=("${(@Mr:COLUMNS-1:)${(f@)$(command ps $listargs 2>/dev/null)}[2,-1]:#[ 	]#${PREFIX}[0-9]#${SUFFIX}[ 	]*${~match}}")
+  fi
   desc=(-ld list)
 else
   desc=()

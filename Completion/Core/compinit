@@ -485,13 +485,13 @@ compstyle() {
 
 # Default styles. This should be executed conditionally somehow.
 
-compstyle '*'         verbose       'yes'
-compstyle '*'         prefix-needed 'yes'
-compstyle '*'         prefix-hidden 'no'
-compstyle ':correct'  accept        '2n'
-compstyle ':correct'  prompt        'correct to:'
-compstyle '*'         completer     '_complete'
-compstyle '*:default' list-colors   no=0 fi=0 di=0 ln=0 pi=0 so=0 bd=0 cd=0 ex=0
+zstyle ':completion:*'        verbose       'yes'
+zstyle ':completion:*'        prefix-needed 'yes'
+zstyle ':completion:*'        prefix-hidden 'no'
+zstyle ':completion:correct'  accept        '2n'
+zstyle ':completion:correct'  prompt        'correct to:'
+zstyle ':completion:*'        completer     '_complete'
+zstyle ':completion*:default' list-colors   no=0 fi=0 di=0 ln=0 pi=0 so=0 bd=0 cd=0 ex=0
 
 # Now we automatically make the definition files autoloaded.
 

@@ -578,7 +578,7 @@ _cvs_files_removed () {
     omit=(${pref}*(D:t))
     eval 'entries=(${entries:#('${(j:|:)${(@)omit:q}}')})'
     _tags directories && compadd "$@" -P "$qpref" - ${entries:q} ||
-    _cvs_directories "$@"
+        _cvs_directories "$@"
   else
     _files "$@"
   fi
@@ -595,9 +595,9 @@ _cvs_files_unmaintained () {
     omit=($_cvs_ignore_default ${entries:q} ${=cvsignore})
     [[ -r ~/.cvsignore ]] && omit=($omit $(<~/.cvsignore))
     [[ -r ${pref}.cvsignore ]] && omit=($omit $(<${pref}.cvsignore))
-    _files "$@" -g '*~(*/|)('${(j:|:)omit}')(D)' ||
-    _files "$@" -g '*~(*/|)('${(j:|:)${(@)entries:q}}')(D)' ||
-    _cvs_directories "$@"
+    _path_files "$@" -g '*~(*/|)('${(j:|:)omit}')(D)' ||
+        _path_files "$@" -g '*~(*/|)('${(j:|:)${(@)entries:q}}')(D)' ||
+        _cvs_directories "$@"
   else
     _files "$@"
   fi

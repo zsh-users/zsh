@@ -6,7 +6,7 @@
 local linepath realpath donepath prepath testpath exppath
 local tmp1 tmp2 tmp3 tmp4 i orig pre suf tpre tsuf opre osuf cpre
 local pats haspats=no ignore group expl addpfx addsfx remsfx
-local nm=$compstate[nmatches] menu match matcher mopts
+local nm=$compstate[nmatches] menu match matcher mopts atmp
 
 typeset -U prepaths exppaths
 
@@ -366,12 +366,12 @@ for prepath in "$prepaths[@]"; do
 	fi
       else
         if [[ "$tmp3" = */* ]]; then
+	  atmp=( -Qf "$mopts[@]" -p "$linepath$tmp4"
+	         -W "$prepath$realpath$testpath" "$ignore[@]"
+	         "$addpfx[@]" "$addsfx[@]" "$remsfx[@]"
+                 -M "r:|/=* r:|=* $match" "$group[@]" "$expl[@]" )
           for i in "$tmp1[@]"; do
-	    compadd -Qf "$mopts[@]" -p "$linepath$tmp4" -s "/${i#*/}" \
-		    -W "$prepath$realpath$testpath" "$ignore[@]" \
-		    "$addpfx[@]" "$addsfx[@]" "$remsfx[@]" \
-                    -M "r:|/=* r:|=* $match" "$group[@]" "$expl[@]" \
-		    - "${i%%/*}"
+	    compadd "$atmp[@]" -s "/${i#*/}" - "${i%%/*}"
 	  done
         else
 	  compadd -Qf "$mopts[@]" -p "$linepath$tmp4" \
