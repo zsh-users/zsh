@@ -1,5 +1,8 @@
 2000-05-05  Sven Wischnowsky  <wischnow@informatik.hu-berlin.de>
 
+	* 11177: Functions/Misc/nslookup: make nslookup page it's output
+ 	if too long for screen
+	
 	* Wayne: 11171: Src/builtin.c, Src/hist.c: fix for print -s when
 	called from widget; added lines are not immediately available,
 	though
