@@ -1493,6 +1493,8 @@ complistmatches(Hookdef dummy, Chdata dat)
 
     amatches = dat->matches;
 
+    noselect = 0;
+
     if ((minfo.asked == 2 && mselect < 0) || nlnct >= lines) {
 	showinglist = 0;
 	amatches = oamatches;
@@ -1629,8 +1631,6 @@ domenuselect(Hookdef dummy, Chdata dat)
     int space, lbeg = 0, step = 1, wrap, pl = nlnct, broken = 0, first = 1;
     char *s;
 
-    if (!mtab)
-	return 0;
     if (fdat || (dummy && (!(s = getsparam("MENUSELECT")) ||
 			   (dat && dat->num < atoi(s))))) {
 	if (fdat) {
@@ -1651,7 +1651,7 @@ domenuselect(Hookdef dummy, Chdata dat)
     mhasstat = (mstatus && *mstatus);
     fdat = dat;
     selectlocalmap(mskeymap);
-    noselect = 0;
+    noselect = 1;
     while ((menuacc &&
 	    !hasbrpsfx(*(minfo.cur), minfo.prebr, minfo.postbr)) ||
 	   (((*minfo.cur)->flags & (CMF_NOLIST | CMF_MULT)) &&
