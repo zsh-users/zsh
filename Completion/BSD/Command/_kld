@@ -21,6 +21,8 @@ _kld_unload_id() {
 }
 
 _kld() {
+  unset _cache_sysctlvars
+
   case "$service" in
   kldload)
     _arguments -s \

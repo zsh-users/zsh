@@ -1,3 +1,9 @@
+2001-07-06  Oliver Kiddle  <opk@zsh.org>
+
+	* 15252 (and Akinori Musha: 15245): Completion/BSD/Command/_kld,
+	Completion/Unix/Command/_sysctl: Add exclusion lists and use
+	_multi_parts for BSD completion of sysctl.
+
 2001-07-06  Sven Wischnowsky  <wischnow@zsh.org>
 
 	* 15283: Completion/Unix/Type/_path_files: when looking for
@@ -52,8 +58,6 @@
 	* 15228: zshconfig.ac, Src/Modules/pcre.c: switch AC_CHECK_LIB to
 	AC_SEARCH_LIBS for pcre.  Have pcre_match set positional
 	parameters with the contents of capture buffers.
-
-2001-07-03  Clint Adams  <clint@zsh.org>
 
 	* unposted: Doc/Makefile.in: add mod_pcre.yo to makefile.
 
