@@ -1,0 +1,23 @@
+#autoload
+
+local i fds expl list link
+
+for i in {0..9}; [[ -e /dev/fd/$i ]] && fds=( ${fds[@]} $i )
+
+if zstyle -T ":completion:${curcontext}" verbose && [[ -e /proc/$$/fd ]]; then
+  if zmodload -e zsh/stat; then
+    for i in "${fds[@]}"; do
+      stat +link -A link /proc/$$/fd/$i
+      list=( ${list[@]} "$i -- ${link[1]}" )
+    done
+  elif (( $+commands[readlink] )); then
+    for i in "${fds[@]}"; list=( ${list[@]} "$i -- $(readlink /proc/$$/fd/$i)" )
+  else
+    for i in "${fds[@]}"; do
+      list=( ${list[@]} "$i -- $(ls -l /proc/$$/fd/$i|sed 's/.*-> //' )" )
+    done
+  fi
+  _wanted file-descriptors expl 'file descriptors' compadd "$@" -d list -a fds
+else
+  _wanted file-descriptors expl 'file descriptors' compadd "$@" -a fds
+fi
