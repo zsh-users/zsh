@@ -79,10 +79,10 @@ all: $(MAN) zsh.texi ../META-FAQ
 everything: all zsh.dvi zsh_us.ps zsh_a4.ps zsh_toc.html
 .PHONY: everything
 
-zsh.dvi: zsh.texi
+zsh.dvi: $(sdir)/zsh.texi
 	$(TEXI2DVI) $(sdir)/zsh.texi
 
-zsh.texi:
+zsh.texi $(sdir)/zsh.texi:
 	case $@ in \
 	  */*) target=$@ ;; \
 	  *) target=$(sdir)/$@ ;; \
@@ -90,7 +90,7 @@ zsh.texi:
 	$(YODL) -o $$target -I$(sdir) -w ztexi.yo version.yo zsh.yo; \
 	test -f $$target
 
-zsh.info: zsh.texi
+zsh.info: $(sdir)/zsh.texi
 	$(MAKEINFO) $(sdir)/zsh.texi
 
 .yo.1:
@@ -109,7 +109,7 @@ zsh_us.ps: zsh.dvi
 zsh_a4.ps: zsh.dvi
 	$(DVIPS) -t a4 -o $@ zsh.dvi
 
-zsh_toc.html: zsh.texi
+zsh_toc.html: $(sdir)/zsh.texi
 	$(TEXI2HTML) $(sdir)/zsh.texi
 
 zshall.1: zsh.yo
