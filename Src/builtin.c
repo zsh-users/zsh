@@ -1042,11 +1042,13 @@ cd_new_pwd(int func, LinkNode dir)
     pwd = new_pwd;
     set_pwd_env();
 
-    if (unset(PUSHDSILENT) && func != BIN_CD && isset(INTERACTIVE))
-	printdirstack();
-    else if (doprintdir) {
-	fprintdir(pwd, stdout);
-        putchar('\n');
+    if (isset(INTERACTIVE)) {
+	if (unset(PUSHDSILENT) && func != BIN_CD)
+	    printdirstack();
+	else if (doprintdir) {
+	    fprintdir(pwd, stdout);
+	    putchar('\n');
+	}
     }
 
     /* execute the chpwd function */
