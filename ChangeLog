@@ -1,3 +1,9 @@
+2003-07-03  Peter Stephenson  <pws@csr.com>
+
+	* 18769: Src/exec.c: parse error in autoloading file causes
+	return value zero and empty function definition.  Presumed
+	to be error introduced with wordcode.
+
 2003-06-25  Oliver Kiddle  <opk@zsh.org>
 
 	* 18634: Tomi Vainio: Src/system.h: work around problem with
