@@ -838,8 +838,8 @@ this is automatically handled; note that only availability of the first
 character is tested, so that e.g. `tt(read -t -k 2)' can still block on the
 second character.
 )
-enditem()
-
+ifnzman(enditem()
+)
 If the first argument contains a `tt(?)', the remainder of this
 word is used as a var(prompt) on standard error when the shell
 is interactive.
@@ -855,6 +855,7 @@ tt(-p) cancels tt(-u), tt(-k) cancels tt(-z), and otherwise tt(-z)
 cancels both tt(-p) and tt(-u).
 
 The tt(-c) or tt(-l) flags cancel any and all of tt(-kpquz).
+ifzman(enditem())
 )
 cindex(parameters, marking readonly)
 alias(readonly)(typeset -r)
@@ -1478,13 +1479,14 @@ These options may also appear as many times as necessary between the listed
 var(name)s to specify the loading style of all following functions, up to
 the next tt(-k) or tt(-z).
 )
-enditem()
-
+ifnzman(enditem()
+)
 The created file always contains two versions of the compiled
 format, one for big-endian machines and one for small-endian
 machines.  The upshot of this is that the compiled file is machine
 independent and if it is read or mapped, only one half of the file
 is actually used (and mapped).
+ifzman(enditem())
 )
 module(zformat)(zsh/zutil)
 module(zftp)(zsh/zftp)
