@@ -1,5 +1,8 @@
 2004-01-07  Clint Adams  <clint@zsh.org>
 
+	* 20650: Completion/Unix/Command/_mencal:
+	completion for mencal.
+
 	* 20649: Completion/Unix/Command/_cal:
 	completion for cal and ncal.
 
