@@ -1,3 +1,9 @@
+2002-03-30  Wayne Davison  <wayned@users.sourceforge.net>
+
+	* 16927: zsh/Functions/Misc/zmv: Added -W to auto-convert wildcards in
+	both the find and replace strings.  Fixed the usage message to output
+	the '$' args and '\' characters (they were getting eaten).
+
 2002-03-27  Bart Schaefer  <schaefer@zsh.org>
 
 	* 16895: Doc/Zsh/redirect.yo: cross-references to the `|&' and
