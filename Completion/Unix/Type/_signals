@@ -1,0 +1,37 @@
+#autoload
+
+# Options (only in separate words):
+#
+# -a  use all signals (even the pseudo-signals)
+# -p  needs a `-' prefix
+#
+# A `-' or `--' as the first argument is ignored.
+
+local expl last=-3 minus
+
+while [[ "$1" = -[ap] ]]; do
+  if [[ "$1" = -a ]]; then
+    last=-1
+  else
+    minus=-
+  fi
+  shift
+done
+
+[[ "$1" = -(|-) ]] && shift
+
+if [[ -z "$minus" ]] ||
+   ! zstyle -T ":completion:${curcontext}:signals" prefix-needed ||
+   [[ "$PREFIX" = -* ]]; then
+  local disp tmp
+
+  if zstyle -t ":completion:${curcontext}:signals" prefix-hidden; then
+    tmp=( "${(@)signals[1,last]}" )
+    disp=(-d tmp)
+  else
+    disp=()
+  fi
+  _wanted signals expl signal \
+      compadd "$@" "$disp[@]" -M 'm:{a-z}={A-Z}' - \
+              "${minus}${(@)^signals[1,last]}"
+fi
