@@ -131,6 +131,7 @@ xrdb)
     '-backup:backup extension:' \
     '*-D-:symbol to define:' \
     '*-U-:symbol to undefine:' \
-    '*-I-:include directory:_files -/'
+    '*-I-:include directory:_files -/' \
+    '*:defaults file:_files'
   ;;
 esac
