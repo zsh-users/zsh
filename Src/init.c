@@ -119,14 +119,14 @@ loop(int toplevel, int justonce)
 	intr();			/* interrupts on            */
 	lexinit();              /* initialize lexical state */
 	if (!(prog = parse_event())) {	/* if we couldn't parse a list */
-	    hend();
+	    hend(NULL);
 	    if ((tok == ENDINPUT && !errflag) ||
 		(tok == LEXERR && (!isset(SHINSTDIN) || !toplevel)) ||
 		justonce)
 		break;
 	    continue;
 	}
-	if (hend()) {
+	if (hend(prog)) {
 	    int toksav = tok;
 	    Eprog preprog;
 
