@@ -1215,6 +1215,8 @@ get_comp_string(void)
 	zsfree(varname);
 	varname = ztrdup(tt);
 	*s = sav;
+        if (*s == '+')
+            s++;
 	if (skipparens(Inbrack, Outbrack, &s) > 0 || s > tt + cs - wb) {
 	    s = NULL;
 	    inwhat = IN_MATH;

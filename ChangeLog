@@ -1,5 +1,8 @@
 2002-01-08  Sven Wischnowsky  <wischnow@zsh.org>
 
+	* 16418: Src/lex.c, Src/Zle/zle_tricky.c: fix completion after
+	var+= to use value context
+
 	* 16417: Src/Zle/computil.c: don't report _arguments-specs more
 	than once (not even shared options with multiple sets)
 
