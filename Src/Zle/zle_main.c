@@ -672,7 +672,8 @@ execzlefunc(Thingy func, char **args)
 	}
 	r = 1;
     } else {
-	Eprog prog = getshfunc(w->u.fnnam);
+	Shfunc shf = (Shfunc) shfunctab->getnode(shfunctab, w->u.fnnam);
+	Eprog prog = (shf ? shf->funcdef : &dummy_eprog);
 
 	if(prog == &dummy_eprog) {
 	    /* the shell function doesn't exist */
@@ -685,6 +686,7 @@ execzlefunc(Thingy func, char **args)
 	    ret = 1;
 	} else {
 	    int osc = sfcontext, osi = movefd(0), olv = lastval;
+	    int oxt = isset(XTRACE);
 	    LinkList largs = NULL;
 
 	    if (*args) {
@@ -696,7 +698,9 @@ execzlefunc(Thingy func, char **args)
 	    startparamscope();
 	    makezleparams(0);
 	    sfcontext = SFC_WIDGET;
-	    doshfunc(w->u.fnnam, prog, largs, 0, 0);
+	    opts[XTRACE] = 0;
+	    doshfunc(w->u.fnnam, prog, largs, shf->flags, 0);
+	    opts[XTRACE] = oxt;
 	    ret = lastval;
 	    lastval = olv;
 	    sfcontext = osc;
