@@ -627,10 +627,9 @@ do_ambiguous(void)
 	cline_str(ainfo->line, 1, NULL);
 
 	/* Sometimes the different match specs used may result in a cline
-	 * that is shorter than the original string. If that happened, we
-	 * re-insert the old string. Unless there were matches added with
-	 * -U, that is. */
-	if (lastend - wb < we - wb && !hasunmatched) {
+	 * that gives an empty string. If that happened, we re-insert the
+         * old string. Unless there were matches added with -U, that is. */
+	if (!(lastend - wb) && !hasunmatched) {
 	    cs = wb;
 	    foredel(lastend - wb);
 	    inststrlen(old, 0, we - wb);

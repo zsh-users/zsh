@@ -11,10 +11,10 @@ if compset -P 1 'conv='; then
               ascii ebcdic ibm block unblock lcase ucase swab noerror sync
 elif compset -P 1 'if='; then
   _description files expl 'input file'
-  _files "$expl[@]"
+  _tilde_files "$expl[@]"
 elif compset -P 1 'of='; then
   _description files expl 'output file'
-  _files "$expl[@]"
+  _tilde_files "$expl[@]"
 else
   _wanted values expl option &&
       compadd "$expl[@]" -S '=' if of ibs obs bs cbs skip files seek count conv

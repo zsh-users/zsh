@@ -36,7 +36,7 @@ if (( $#prepaths )); then
   if [[ "$tmp1[1]" = '(' ]]; then
     prepaths=( ${^=tmp1[2,-2]%/}/ )
   elif [[ "$tmp1[1]" = '/' ]]; then
-    prepaths=( "$tmp1/" )
+    prepaths=( "${tmp1%/}/" )
   else
     prepaths=( ${(P)^tmp1%/}/ )
     (( ! $#prepaths )) && prepaths=( ${tmp1%/}/ )
