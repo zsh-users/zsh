@@ -1,3 +1,8 @@
+2000-07-26  Sven Wischnowsky  <wischnow@zsh.org>
+
+	* users/3337: Completion/Base/_value: allow _value:<assoc> functions to
+ 	override completion for all keys of an assoc
+	
 2000-07-24  Oliver Kiddle  <opk@zsh.org>
 
 	* 12356: Completion/User/_mh: use mhpath and mhparam instead of

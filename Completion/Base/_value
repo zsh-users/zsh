@@ -2,10 +2,16 @@
 
 _value () {
   # You can customize completion for different parameters by writing a
-  # function `_value:<name>'.
+  # function `_value:<name>', where <name> is the name of the parameter.
+  # When completing values of elements of associative arrays, we first
+  # search for a function `_value:<assoc>-<key>' and then for 
+  # `_value:<assoc>', so it's simple to define different functions
+  # for different keys or one function for a whole association.
 
   if (( $+functions[_value:$compstate[parameter]] )); then
     "_value:$compstate[parameter]" "$@"
+  elif (( $+functions[_value:${compstate[parameter]%%-*}] )); then
+    "_value:${compstate[parameter]%%-*}" "$@"
   elif [[ "$compstate[parameter]" != *-* &&
           "${(Pt)${compstate[parameter]}}" = assoc* ]]; then
     if (( CURRENT & 1 )); then
