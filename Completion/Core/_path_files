@@ -172,7 +172,7 @@ orig="${PREFIX}${SUFFIX}"
 eorig="$orig"
 
 [[ $compstate[insert] = (*menu|[0-9]*) || -n "$_comp_correct" ||
-   ( $#compstate[pattern_match] -ne 0 &&
+   ( -n "$compstate[pattern_match]" &&
      "${orig#\~}" != "${${orig#\~}:q}" ) ]] && menu=yes
 
 # If given no `-F' option, we may want to use $fignore, turned into patterns.
@@ -442,7 +442,17 @@ for prepath in "$prepaths[@]"; do
       tmp4=( "${(@)tmp1:#${tmp1[1]}}" )
     fi
 
-    if (( $#tmp4 )); then
+    if [[ "$tpre" = */* ]]; then
+      PREFIX="${donepath}${linepath}${cpre}${tpre%%/*}"
+      SUFFIX="/${tsuf#*/}"
+    else
+      PREFIX="${donepath}${linepath}${cpre}${tpre}"
+      SUFFIX="${tsuf}"
+    fi
+
+    if (( $#tmp4 )) ||
+       [[ -n "$compstate[pattern_match]" &&
+          "$PREFIX$SUFFIX" != "${(q)PREFIX}${(q)SUFFIX}" ]]; then
 
       # It is. For menucompletion we now add the possible completions
       # for this component with the unambigous prefix we have built
@@ -451,29 +461,21 @@ for prepath in "$prepaths[@]"; do
       # collected as the suffixes to make the completion code expand
       # it as far as possible.
 
-      if [[ "$tpre" = */* ]]; then
-        PREFIX="${donepath}${linepath}${cpre}${tpre%%/*}"
-	SUFFIX="/${tsuf#*/}"
-      else
-        PREFIX="${donepath}${linepath}${cpre}${tpre}"
-	SUFFIX="${tsuf}"
-      fi
-
-      tmp4="$testpath"
-      compquote tmp1 tmp4
+      tmp2="$testpath"
+      compquote tmp1 tmp2
 
       if [[ -n $menu ]] ||
          ! zstyle -t ":completion${curcontext}:paths" expand suffix; then
-        zstyle -t ":completion${curcontext}:paths" cursor &&
+        (( $#tmp4 )) && zstyle -t ":completion${curcontext}:paths" cursor &&
             compstate[to_end]=''
         if [[ "$tmp3" = */* ]]; then
-	  compadd -Qf "$mopts[@]" -p "$linepath$tmp4" -s "/${tmp3#*/}" \
+	  compadd -Qf "$mopts[@]" -p "$linepath$tmp2" -s "/${tmp3#*/}" \
 	          -W "$prepath$realpath$testpath" \
 		  "$addpfx[@]" "$addsfx[@]" "$remsfx[@]" \
                   -M "r:|/=* r:|=* $mspec" "$group[@]" "$expl[@]" \
 		  - "${(@)tmp1%%/*}"
 	else
-	  compadd -Qf "$mopts[@]" -p "$linepath$tmp4" \
+	  compadd -Qf "$mopts[@]" -p "$linepath$tmp2" \
 	          -W "$prepath$realpath$testpath" \
 		   "$addpfx[@]" "$addsfx[@]" "$remsfx[@]" \
                    -M "r:|/=* r:|=* $mspec" "$group[@]" "$expl[@]" \
@@ -481,7 +483,7 @@ for prepath in "$prepaths[@]"; do
 	fi
       else
         if [[ "$tmp3" = */* ]]; then
-	  atmp=( -Qf "$mopts[@]" -p "$linepath$tmp4"
+	  atmp=( -Qf "$mopts[@]" -p "$linepath$tmp2"
 	         -W "$prepath$realpath$testpath"
 	         "$addpfx[@]" "$addsfx[@]" "$remsfx[@]"
                  -M "r:|/=* r:|=* $mspec" "$group[@]" "$expl[@]" )
@@ -489,7 +491,7 @@ for prepath in "$prepaths[@]"; do
 	    compadd "$atmp[@]" -s "/${i#*/}" - "${i%%/*}"
 	  done
         else
-	  compadd -Qf "$mopts[@]" -p "$linepath$tmp4" \
+	  compadd -Qf "$mopts[@]" -p "$linepath$tmp2" \
 		  -W "$prepath$realpath$testpath" \
 		  "$addpfx[@]" "$addsfx[@]" "$remsfx[@]" \
                   -M "r:|/=* r:|=* $mspec" "$group[@]" "$expl[@]" \
