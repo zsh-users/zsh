@@ -1,5 +1,10 @@
 2003-02-26  Oliver Kiddle  <opk@zsh.org>
 
+	* 18299: Completion/Base/Core/_main_complete,
+	Completion/Base/Core/_all_labels, Completion/Base/Core/_next_label,
+	Completion/Base/Widget/_next_tags: allow _next_tags to work with
+	nested tag loops
+
 	* 18300: Completion/Unix/Command/_tar,
 	Completion/Unix/Type/_tar_archive: handle tar's -C option better
 
