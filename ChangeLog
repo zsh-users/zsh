@@ -1,5 +1,10 @@
 2000-04-28  Sven Wischnowsky  <wischnow@informatik.hu-berlin.de>
 
+	* 11008: Doc/zsh.yo, Doc/Zsh/compctl.yo, Doc/Zsh/compsys.yo,
+ 	Doc/Zsh/compwid.yo, Doc/Zsh/modules.yo, Doc/Zsh/seealso.yo,
+ 	Doc/Zsh/zle.yo: move compctl docs behind compsys, mention
+ 	`zcompile -z' in compsys
+	
 	* 11007: Src/Zle/compmatch.c: misplaced cursor with partial-word
  	matching
 	

@@ -1,4 +1,4 @@
-texinode(Completion Using compctl)(Completion Widgets)(Zsh Line Editor)(Top)
+texinode(Completion Using compctl)(Zsh Modules)(Completion System)(Top)
 chapter(Completion Using compctl)
 cindex(completion, programmable)
 cindex(completion, controlling)

@@ -1,4 +1,4 @@
-texinode(Completion System)(Zsh Modules)(Completion Widgets)(Top)
+texinode(Completion System)(Completion Using compctl)(Completion Widgets)(Top)
 chapter(Completion System)
 cindex(completion system)
 cindex(completion, programmable)
@@ -201,6 +201,18 @@ Note that the tt(#) is part of the tag name and no white space is allowed
 after it.  The tt(#compdef) tags use the tt(compdef) function described
 below; the main difference is that the name of the function is supplied
 implicitly.
+
+Note also that the functions for the completion system assume that the
+tt(KSH_AUTOLOAD) option is not set, they can't be loaded when it is
+set. But when you can't or don't want to unset tt(KSH_AUTOLOAD) and
+still want to use the completion system, you can simply use one or
+more tt(zwc) file(s) created with the tt(zcompile) builtin command
+with the tt(-z) option to load the functions for the completion system 
+from (see
+ifzman(zmanref(zshbuiltins))\
+ifnzman(noderef(Shell Builtin Commands))\
+). This forces the functions to be autoloaded the way zsh normally
+loads functions.
 
 subsect(Functions)
 

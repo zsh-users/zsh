@@ -9,6 +9,8 @@ manref(ksh)(1)\
 ifzshone(\
 ,
 zmanref(zshbuiltins),
+zmanref(zshcompwid),
+zmanref(zshcompsys),
 zmanref(zshcompctl),
 zmanref(zshexpn),
 zmanref(zshmisc),
