@@ -1,11 +1,42 @@
-#defcomp man
+#compdef man apropos whatis
+
 setopt localoptions rcexpandparam
 
-local rep
-if [[ $2 = (<->*|ln) ]]; then
-  rep=( $manpath/(man|cat)$2/$PREFIX*$SUFFIX.<->*(N:t:r) )
-else
-  rep=( $manpath/(man|cat)*/$PREFIX*$SUFFIX.<->*(N:t:r) )
+local rep expl star approx mrd
+
+if [[ $compstate[pattern_match] != [^*] ]]; then
+  # If a string other than *, we just want correction, so no `*'.
+  star='*'
 fi
 
-(( $#rep )) && compadd -m $rep
+if [[ -n $_comp_correct ]]; then
+  # If this is set, we are correcting with this many approximations.
+  approx="(#a${_comp_correct})"
+fi
+
+if (( ! $#manpath )); then
+  local mp
+  mp=($(manpath 2>/dev/null))
+  [[ "$mp" == *:* ]] && mp=( ${(s.:.)mp} )
+  manpath=( $mp )
+fi
+
+(( $#manpath )) || manpath=( ${(s.:.)$(manpath 2>/dev/null)} ) ||
+    manpath=( /usr/man(-/N) /(opt|usr)/(dt|share|X11R6|local)/(cat|)man(-/N) )
+
+# `sman' is the SGML manual directory for Solaris 7.
+# 1M is system administrator commands on SVR4
+
+mrd=(${^manpath/\\%L/${LANG:-En_US.ASCII}}/mandb(N))
+if [[ $words[2] = (<->*|1M|l|n) ]]; then
+  rep=(
+  $manpath/(sman|man|cat)${words[2]}/${~approx}$PREFIX${~star}$SUFFIX.<->*(N:t) )
+  (($#mrd)) && rep[$#rep+1]=($(awk "\$2 == $words[2] {print \$1}" $mrd))
+else
+  rep=( $manpath/(sman|man|cat)*/${~approx}$PREFIX${~star}$SUFFIX.<->*(N:t) )
+  (($#mrd)) && rep[$#rep+1]=($(awk '{print $1}' $mrd))
+fi
+
+
+(( $#rep )) && _wanted manuals expl 'manual page' \
+    compadd - ${rep%%.[^.]##(.gz|.bz2|)}
