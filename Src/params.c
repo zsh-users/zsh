@@ -509,7 +509,7 @@ createparamtable(void)
      * memory, so we can do mallocs and frees on it.               */
     envsize = sizeof(char *)*(1 + arrlen(environ));
     new_environ = (char **) zalloc(envsize);
-    memcpy (new_environ, environ, envsize);
+    memcpy(new_environ, environ, envsize);
     environ = new_environ;
 #endif
 
@@ -2849,18 +2849,20 @@ arrfixenv(char *s, char **t)
 	pm->env = addenv(s, u, pm->flags);
 }
 
-#ifndef HAVE_PUTENV
 
 static int
-putenv(char *str)
+zputenv(char *str)
 {
+#ifdef HAVE_PUTENV
+    return putenv(str);
+#else
     char **ep;
     int num_env;
 
 
     /* First check if there is already an environment *
      * variable matching string `name'.               */
-    if (findenv (str, &num_env)) {
+    if (findenv(str, &num_env)) {
 	environ[num_env] = str;
     } else {
     /* Else we have to make room and add it */
@@ -2873,35 +2875,19 @@ putenv(char *str)
 	*(ep + 1) = NULL;
     }
     return 0;
-}
 #endif
-
-#ifndef HAVE_GETENV
-
-static char *
-getenv(char *name)
-{
-    char **ep, *s, *t;
- 
-    for (ep = environ; *ep; ep++) {
-	for (s = *ep, t = name; *s && *s == *t; s++, t++);
-	if (*s == '=' && !*t)
-	    return s + 1;
-    }
-    return NULL;
 }
-#endif
 
 /**/
 static int
-findenv (char *name, int *pos)
+findenv(char *name, int *pos)
 {
     char **ep, *eq;
     int  nlen;
 
 
-    eq = strchr (name, '=');
-    nlen = eq ? eq - name : strlen (name);
+    eq = strchr(name, '=');
+    nlen = eq ? eq - name : strlen(name);
     for (ep = environ; *ep; ep++) 
 	if (!strncmp (*ep, name, nlen) && *((*ep)+nlen) == '=') {
 	    if (pos)
@@ -2919,7 +2905,18 @@ findenv (char *name, int *pos)
 mod_export char *
 zgetenv(char *name)
 {
+#ifdef HAVE_GETENV
     return getenv(name);
+#else
+    char **ep, *s, *t;
+ 
+    for (ep = environ; *ep; ep++) {
+       for (s = *ep, t = name; *s && *s == *t; s++, t++);
+       if (*s == '=' && !*t)
+           return s + 1;
+    }
+    return NULL;
+#endif
 }
 
 /**/
@@ -2945,14 +2942,14 @@ addenv_internal(char *name, char *value, int flags, int add)
     /* First check if there is already an environment *
      * variable matching string `name'. If not, and   *
      * we are not requested to add new, return        */
-    if (findenv (name, &pos))
+    if (findenv(name, &pos))
 	oldenv = environ[pos];
     else if (!add)
 	return NULL;
 
-    newenv = mkenvstr (name, value, flags);
-    if (putenv (newenv)) {
-	zsfree (newenv);
+     newenv = mkenvstr(name, value, flags);
+     if (zputenv(newenv)) {
+        zsfree(newenv);
 	return NULL;
     }
     /*
@@ -2961,12 +2958,12 @@ addenv_internal(char *name, char *value, int flags, int add)
      * silently reuse exisiting environment string. This tries to
      * check for both cases
      */
-    if (findenv (name, &pos)) {
+    if (findenv(name, &pos)) {
 	env = environ[pos];
 	if (env != oldenv)
-	    zsfree (oldenv);
+	    zsfree(oldenv);
 	if (env != newenv)
-	    zsfree (newenv);
+	    zsfree(newenv);
 	return env;
     }
 
@@ -2980,7 +2977,7 @@ char *
 replenv(char *name, char *value, int flags)
 {
 
-    return addenv_internal (name, value, flags, 0);
+    return addenv_internal(name, value, flags, 0);
 }
 
 /* Given strings *name = "foo", *value = "bar", *
@@ -3013,7 +3010,7 @@ mkenvstr(char *name, char *value, int flags)
 char *
 addenv(char *name, char *value, int flags)
 {
-    return addenv_internal (name, value, flags, 1);
+    return addenv_internal(name, value, flags, 1);
 }
 
 /* Delete a pointer from the list of pointers to environment *

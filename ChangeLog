@@ -1,3 +1,8 @@
+2000-08-03  Peter Stephenson  <pws@csr.com>
+
+	* Andrej: 12501: Src/params.c: getenv etc. become zgetenv etc.
+	and call getenv where necessary.
+
 2000-08-03  Sven Wischnowsky  <wischnow@zsh.org>
 
 	* 12497: Doc/Zsh/builtins.yo: small fix for `read -r' doc
