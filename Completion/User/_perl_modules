@@ -67,13 +67,12 @@ _perl_modules () {
 
       for libdir in $inc; do
         # Ignore cwd - could be too expensive e.g. if we're near /
-        if [[ $libdir == '.' ]]; then break; fi
+        if [[ $libdir == '.' ]]; then continue; fi
 
         # Find all modules
         if [[ -d $libdir && -x $libdir ]]; then
-        builtin cd $libdir
-        new_pms=( {[A-Z]*/***/,}*.pm~*blib* )
-        builtin cd $OLDPWD
+          new_pms=( $libdir/{[A-Z]*/***/,}*.pm~*blib* )
+          new_pms=( "${(@)new_pms##$libdir/##}" )
         fi
 
         # Convert to Perl nomenclature

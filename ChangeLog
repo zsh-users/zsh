@@ -1,3 +1,7 @@
+2000-11-15  Bart Schaefer  <schaefer@zsh.org>
+
+	* 13167: Completion/User/_perl_modules: Avoid cd entirely.
+
 2000-11-14  Bart Schaefer  <schaefer@zsh.org>
 
 	* 13165 plus unposted: Completion/User/_perl_modules: `builtin cd'
