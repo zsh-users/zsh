@@ -33,18 +33,26 @@
 # that needed re-compilation could be compiled and non-zero if compilation
 # for at least one of the files failed.
 
-setopt localoptions extendedglob
+setopt localoptions extendedglob noshwordsplit noksharrays
 
 local opt check quiet zwc files re file pre ret map tmp mesg pats
 
-while getopts "tqp" opt; do
+tmp=()
+while getopts ":tqp" opt; do
   case $opt in
   t) check=yes ;;
   q) quiet=yes ;;
   p) pats=yes  ;;
+  *)
+    if [[ -n $pats ]]; then
+      tmp=( $tmp $OPTARG )
+    else
+      print -u2 zrecompile: bad option: -$OPTARG
+      return 1
+    fi
   esac
 done
-shift OPTIND-1
+shift OPTIND-${#tmp:-1}
 
 if [[ -n $check ]]; then
   ret=1
@@ -66,12 +74,16 @@ if [[ -n $pats ]]; then
       argv=()
     fi
 
-    if [[ $files[1] = -[RM] ]]; then
-      map=( $files[1] )
-      shift 1 files
-    else
-      map=()
-    fi
+    tmp=()
+    map=()
+    OPTIND=1
+    while getopts :MR opt $files; do
+      case $opt in
+      [MR]) map=( -$opt ) ;;
+      *) tmp=( $tmp $files[OPTIND] );;
+      esac
+    done
+    shift OPTIND-1 files
     (( $#files )) || continue
 
     files=( $files[1] ${files[2,-1]:#*(.zwc|~)} )
@@ -117,7 +129,7 @@ if [[ -n $pats ]]; then
 	# old file by renaming it.
 
 	if { [[ ! -f $zwc ]] || mv $zwc ${zwc}.old } &&
-             zcompile "$map[@]" $zwc $files 2> /dev/null; then
+             zcompile $map $tmp $zwc $files 2> /dev/null; then
           [[ -z $quiet ]] && print succeeded
         else
           [[ -z $quiet ]] && print failed

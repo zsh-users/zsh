@@ -3,6 +3,11 @@
 	* 12728: Completion/User/_man: complete _files instead of
 	manpages if -l or --local-file is present on the commandline.
 
+2000-09-03  Bart Schaefer  <schaefer@zsh.org>
+
+	* 12726,12727: Functions/Misc/zrecompile: Handle pass-through of
+	all zcompile options.
+
 2000-09-02  Bart Schaefer  <schaefer@zsh.org>
 
 	* 12725: Util/helpfiles: Recognize more end-of-page patterns, and
