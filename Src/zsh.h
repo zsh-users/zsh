@@ -57,7 +57,26 @@ typedef long zlong;
 typedef unsigned long zulong;
 #endif
 
+/*
+ * Double float support requires 64-bit alignment, so if longs and
+ * pointers are less we need to pad out.
+ */
+#ifndef LONG_IS_64_BIT
+# define PAD_64_BIT 1
+#endif
+
 /* math.c */
+typedef struct {
+    union {
+	zlong l;
+	double d;
+    } u;
+    int type;
+} mnumber;
+
+#define MN_INTEGER 1		/* mnumber is integer */
+#define MN_FLOAT   2		/* mnumber is floating point */
+
 typedef int LV;
 
 /* Character tokens are sometimes casted to (unsigned char)'s.         * 
@@ -953,6 +972,8 @@ struct param {
 	char **arr;		/* value if declared array   (PM_ARRAY)   */
 	char *str;		/* value if declared string  (PM_SCALAR)  */
 	zlong val;		/* value if declared integer (PM_INTEGER) */
+	double dval;		/* value if declared float
+				                    (PM_EFLOAT|PM_FFLOAT) */
         HashTable hash;		/* value if declared assoc   (PM_HASHED)  */
     } u;
 
@@ -960,6 +981,7 @@ struct param {
     union {
 	void (*cfn) _((Param, char *));
 	void (*ifn) _((Param, zlong));
+	void (*ffn) _((Param, double));
 	void (*afn) _((Param, char **));
         void (*hfn) _((Param, HashTable));
     } sets;
@@ -968,6 +990,7 @@ struct param {
     union {
 	char *(*cfn) _((Param));
 	zlong (*ifn) _((Param));
+	double (*ffn) _((Param));
 	char **(*afn) _((Param));
         HashTable (*hfn) _((Param));
     } gets;
@@ -988,41 +1011,50 @@ struct param {
 #define PM_SCALAR	0	/* scalar                                   */
 #define PM_ARRAY	(1<<0)	/* array                                    */
 #define PM_INTEGER	(1<<1)	/* integer                                  */
-#define PM_HASHED	(1<<2)	/* association                              */
+#define PM_EFLOAT	(1<<2)	/* double with %e output		    */
+#define PM_FFLOAT	(1<<3)	/* double with %f output		    */
+#define PM_HASHED	(1<<4)	/* association                              */
 
-#define PM_TYPE(X) (X & (PM_SCALAR|PM_INTEGER|PM_ARRAY|PM_HASHED))
+#define PM_TYPE(X) \
+  (X & (PM_SCALAR|PM_INTEGER|PM_EFLOAT|PM_FFLOAT|PM_ARRAY|PM_HASHED))
 
-#define PM_LEFT		(1<<3)	/* left justify, remove leading blanks      */
-#define PM_RIGHT_B	(1<<4)	/* right justify, fill with leading blanks  */
-#define PM_RIGHT_Z	(1<<5)	/* right justify, fill with leading zeros   */
-#define PM_LOWER	(1<<6)	/* all lower case                           */
+#define PM_LEFT		(1<<5)	/* left justify, remove leading blanks      */
+#define PM_RIGHT_B	(1<<6)	/* right justify, fill with leading blanks  */
+#define PM_RIGHT_Z	(1<<7)	/* right justify, fill with leading zeros   */
+#define PM_LOWER	(1<<8)	/* all lower case                           */
 
 /* The following are the same since they *
  * both represent -u option to typeset   */
-#define PM_UPPER	(1<<7)	/* all upper case                           */
-#define PM_UNDEFINED	(1<<7)	/* undefined (autoloaded) shell function    */
+#define PM_UPPER	(1<<9)	/* all upper case                           */
+#define PM_UNDEFINED	(1<<9)	/* undefined (autoloaded) shell function    */
 
-#define PM_READONLY	(1<<8)	/* readonly                                 */
-#define PM_TAGGED	(1<<9)	/* tagged                                   */
-#define PM_EXPORTED	(1<<10)	/* exported                                 */
+#define PM_READONLY	(1<<10)	/* readonly                                 */
+#define PM_TAGGED	(1<<11)	/* tagged                                   */
+#define PM_EXPORTED	(1<<12)	/* exported                                 */
 
 /* The following are the same since they *
  * both represent -U option to typeset   */
-#define PM_UNIQUE	(1<<11)	/* remove duplicates                        */
-#define PM_UNALIASED	(1<<11)	/* do not expand aliases when autoloading   */
+#define PM_UNIQUE	(1<<13)	/* remove duplicates                        */
+#define PM_UNALIASED	(1<<13)	/* do not expand aliases when autoloading   */
 
-#define PM_HIDE		(1<<12)	/* Special behaviour hidden by local        */
-#define PM_TIED 	(1<<13)	/* array tied to colon-path or v.v.         */
+#define PM_HIDE		(1<<14)	/* Special behaviour hidden by local        */
+#define PM_TIED 	(1<<15)	/* array tied to colon-path or v.v.         */
 
 /* Remaining flags do not correspond directly to command line arguments */
-#define PM_LOCAL	(1<<14) /* this parameter will be made local        */
-#define PM_SPECIAL	(1<<15) /* special builtin parameter                */
-#define PM_DONTIMPORT	(1<<16)	/* do not import this variable              */
-#define PM_RESTRICTED	(1<<17) /* cannot be changed in restricted mode     */
-#define PM_UNSET	(1<<18)	/* has null value                           */
-#define PM_REMOVABLE	(1<<19)	/* special can be removed from paramtab     */
-#define PM_AUTOLOAD	(1<<20) /* autoloaded from module                   */
-#define PM_NORESTORE	(1<<21)	/* do not restore value of local special    */
+#define PM_LOCAL	(1<<16) /* this parameter will be made local        */
+#define PM_SPECIAL	(1<<17) /* special builtin parameter                */
+#define PM_DONTIMPORT	(1<<18)	/* do not import this variable              */
+#define PM_RESTRICTED	(1<<19) /* cannot be changed in restricted mode     */
+#define PM_UNSET	(1<<20)	/* has null value                           */
+#define PM_REMOVABLE	(1<<21)	/* special can be removed from paramtab     */
+#define PM_AUTOLOAD	(1<<22) /* autoloaded from module                   */
+#define PM_NORESTORE	(1<<23)	/* do not restore value of local special    */
+
+/* The option string corresponds to the first of the variables above */
+#define TYPESET_OPTSTR "aiEFALRZlurtxUhT"
+
+/* These typeset options take an optional numeric argument */
+#define TYPESET_OPTNUM "LRZiEF"
 
 /* Flags for extracting elements of arrays and associative arrays */
 #define SCANPM_WANTVALS   (1<<0)
@@ -1481,7 +1513,7 @@ struct heap {
     struct heap *next;		/* next one                                  */
     size_t used;		/* bytes used from the heap                  */
     struct heapstack *sp;	/* used by pushheap() to save the value used */
-#ifdef ZSH_64_BIT_TYPE
+#ifdef PAD_64_BIT
     size_t dummy;		/* Make sure sizeof(heap) is a multiple of 8 */
 #endif
 #define arena(X)	((char *) (X) + sizeof(struct heap))

@@ -557,6 +557,11 @@ assigngetset(Param pm)
 	pm->sets.ifn = intsetfn;
 	pm->gets.ifn = intgetfn;
 	break;
+    case PM_EFLOAT:
+    case PM_FFLOAT:
+	pm->sets.ffn = floatsetfn;
+	pm->gets.ffn = floatgetfn;
+	break;
     case PM_ARRAY:
 	pm->sets.afn = arrsetfn;
 	pm->gets.afn = arrgetfn;
@@ -650,6 +655,10 @@ copyparam(Param tpm, Param pm, int toplevel)
 	    break;
 	case PM_INTEGER:
 	    tpm->u.val = pm->gets.ifn(pm);
+	    break;
+	case PM_EFLOAT:
+	case PM_FFLOAT:
+	    tpm->u.dval = pm->gets.ffn(pm);
 	    break;
 	case PM_ARRAY:
 	    tpm->u.arr = arrdup(pm->gets.afn(pm));
@@ -1242,7 +1251,7 @@ char *
 getstrvalue(Value v)
 {
     char *s, **ss;
-    static char buf[(sizeof(zlong) * 8) + 4];
+    char buf[(sizeof(zlong) * 8) + 4];
 
     if (!v)
 	return hcalloc(1);
@@ -1275,6 +1284,11 @@ getstrvalue(Value v)
 	case PM_INTEGER:
 	    convbase(buf, v->pm->gets.ifn(v->pm), v->pm->ct);
 	    s = dupstring(buf);
+	    break;
+	case PM_EFLOAT:
+	case PM_FFLOAT:
+	    s = convfloat(v->pm->gets.ffn(v->pm), v->pm->ct,
+			  v->pm->flags, NULL);
 	    break;
 	case PM_SCALAR:
 	    s = v->pm->gets.cfn(v->pm);
@@ -1349,7 +1363,30 @@ getintvalue(Value v)
 	return v->a;
     if (PM_TYPE(v->pm->flags) == PM_INTEGER)
 	return v->pm->gets.ifn(v->pm);
-    return matheval(getstrvalue(v));
+    if (v->pm->flags & (PM_EFLOAT|PM_FFLOAT))
+	return (zlong)v->pm->gets.ffn(v->pm);
+    return mathevali(getstrvalue(v));
+}
+
+/**/
+mnumber
+getnumvalue(Value v)
+{
+    mnumber mn;
+    mn.type = MN_INTEGER;
+
+    if (!v || v->isarr) {
+	mn.u.l = 0;
+    } else if (v->inv) {
+	mn.u.l = v->a;
+    } else if (PM_TYPE(v->pm->flags) == PM_INTEGER) {
+	mn.u.l = v->pm->gets.ifn(v->pm);
+    } else if (v->pm->flags & (PM_EFLOAT|PM_FFLOAT)) {
+	mn.type = MN_FLOAT;
+	mn.u.d = v->pm->gets.ffn(v->pm);
+    } else
+	return matheval(getstrvalue(v));
+    return mn;
 }
 
 /**/
@@ -1405,11 +1442,20 @@ setstrvalue(Value v, char *val)
 	break;
     case PM_INTEGER:
 	if (val) {
-	    (v->pm->sets.ifn) (v->pm, matheval(val));
+	    (v->pm->sets.ifn) (v->pm, mathevali(val));
 	    zsfree(val);
 	}
 	if (!v->pm->ct && lastbase != -1)
 	    v->pm->ct = lastbase;
+	break;
+    case PM_EFLOAT:
+    case PM_FFLOAT:
+	if (val) {
+	    mnumber mn = matheval(val);
+	    (v->pm->sets.ffn) (v->pm, (mn.type & MN_FLOAT) ? mn.u.d :
+			       (double)mn.u.l);
+	    zsfree(val);
+	}
 	break;
     case PM_ARRAY:
 	MUSTUSEHEAP("setstrvalue");
@@ -1428,6 +1474,9 @@ setstrvalue(Value v, char *val)
 	return;
     if (PM_TYPE(v->pm->flags) == PM_INTEGER)
 	convbase(val = buf, v->pm->gets.ifn(v->pm), v->pm->ct);
+    else if (v->pm->flags & (PM_EFLOAT|PM_FFLOAT))
+	val = convfloat(v->pm->gets.ffn(v->pm), v->pm->ct,
+			v->pm->flags, NULL);
     else
 	val = v->pm->gets.cfn(v->pm);
     if (v->pm->env)
@@ -1440,9 +1489,9 @@ setstrvalue(Value v, char *val)
 
 /**/
 static void
-setintvalue(Value v, zlong val)
+setnumvalue(Value v, mnumber val)
 {
-    char buf[DIGBUFSIZE];
+    char buf[DIGBUFSIZE], *p;
 
     if (v->pm->flags & PM_READONLY) {
 	zerr("read-only variable: %s", v->pm->nam, 0);
@@ -1455,11 +1504,21 @@ setintvalue(Value v, zlong val)
     switch (PM_TYPE(v->pm->flags)) {
     case PM_SCALAR:
     case PM_ARRAY:
-	convbase(buf, val, 0);
-	setstrvalue(v, ztrdup(buf));
+	if (val.type & MN_INTEGER)
+	    convbase(p = buf, val.u.l, 0);
+	else
+	    p = convfloat(val.u.d, 0, 0, NULL);
+	setstrvalue(v, ztrdup(p));
 	break;
     case PM_INTEGER:
-	(v->pm->sets.ifn) (v->pm, val);
+	(v->pm->sets.ifn) (v->pm, (val.type & MN_INTEGER) ? val.u.l :
+			   (zlong) val.u.d);
+	setstrvalue(v, NULL);
+	break;
+    case PM_EFLOAT:
+    case PM_FFLOAT:
+	(v->pm->sets.ffn) (v->pm, (val.type & MN_INTEGER) ?
+			   (double)val.u.l : val.u.d);
 	setstrvalue(v, NULL);
 	break;
     }
@@ -1542,6 +1601,22 @@ getiparam(char *s)
     if (!(v = getvalue(&s, 1)))
 	return 0;
     return getintvalue(v);
+}
+
+/* Retrieve a numerical parameter, either integer or floating */
+
+/**/
+mnumber
+getnparam(char *s)
+{
+    Value v;
+    if (!(v = getvalue(&s, 1))) {
+	mnumber mn;
+	mn.type = MN_INTEGER;
+	mn.u.l = 0;
+	return mn;
+    }
+    return getnumvalue(v);
 }
 
 /* Retrieve a scalar (string) parameter */
@@ -1709,6 +1784,7 @@ setiparam(char *s, zlong val)
     Value v;
     char *t = s;
     Param pm;
+    mnumber mnval;
 
     if (!isident(s)) {
 	zerr("not an identifier: %s", s, 0);
@@ -1721,7 +1797,41 @@ setiparam(char *s, zlong val)
 	pm->u.val = val;
 	return pm;
     }
-    setintvalue(v, val);
+    mnval.type = MN_INTEGER;
+    mnval.u.l = val;
+    setnumvalue(v, mnval);
+    return v->pm;
+}
+
+/*
+ * Like setiparam(), but can take an mnumber which can be integer or
+ * floating.
+ */
+
+/**/
+Param
+setnparam(char *s, mnumber val)
+{
+    Value v;
+    char *t = s;
+    Param pm;
+
+    if (!isident(s)) {
+	zerr("not an identifier: %s", s, 0);
+	errflag = 1;
+	return NULL;
+    }
+    if (!(v = getvalue(&s, 1))) {
+	pm = createparam(t, (val.type & MN_INTEGER) ? PM_INTEGER
+			 : PM_FFLOAT);
+	DPUTS(!pm, "BUG: parameter not created");
+	if (val.type & MN_INTEGER)
+	    pm->u.val = val.u.l;
+	else
+	    pm->u.dval = val.u.d;
+	return pm;
+    }
+    setnumvalue(v, val);
     return v->pm;
 }
 
@@ -1832,6 +1942,24 @@ static void
 intsetfn(Param pm, zlong x)
 {
     pm->u.val = x;
+}
+
+/* Function to get value of a floating point parameter */
+
+/**/
+static double
+floatgetfn(Param pm)
+{
+    return pm->u.dval;
+}
+
+/* Function to set value of an integer parameter */
+
+/**/
+static void
+floatsetfn(Param pm, double x)
+{
+    pm->u.dval = x;
 }
 
 /* Function to get value of a scalar (string) parameter */
@@ -2680,6 +2808,62 @@ convbase(char *s, zlong v, int base)
     }
 }
 
+/*
+ * Convert a floating point value for output.
+ * Unlike convbase(), this has its own internal storage and returns
+ * a value from the heap;
+ */
+
+/**/
+char *
+convfloat(double dval, int digits, int flags, FILE *fout)
+{
+    char fmt[] = "%.*e";
+
+    MUSTUSEHEAP("convfloat");
+    /*
+     * The difficulty with the buffer size is that a %f conversion
+     * prints all digits before the decimal point: with 64 bit doubles,
+     * that's around 310.  We can't check without doing some quite
+     * serious floating point operations we'd like to avoid.
+     * Then we are liable to get all the digits
+     * we asked for after the decimal point, or we should at least
+     * bargain for it.  So we just allocate 512 + digits.  This
+     * should work until somebody decides on 128-bit doubles.
+     */
+    if (!(flags & (PM_EFLOAT|PM_FFLOAT))) {
+	/*
+	 * Conversion from a floating point expression without using
+	 * a variable.  The best bet in this case just seems to be
+	 * to use the general %g format with something like the maximum
+	 * double precision.
+	 */
+	fmt[3] = 'g';
+	if (!digits)
+	    digits = 17;
+    } else {
+	if (flags & PM_FFLOAT)
+	    fmt[3] = 'f';
+	if (digits <= 0)
+	    digits = 10;
+	if (flags & PM_EFLOAT) {
+	    /*
+	     * Here, we are given the number of significant figures, but
+	     * %e wants the number of decimal places (unlike %g)
+	     */
+	    digits--;
+	}
+    }
+    if (fout) {
+	fprintf(fout, fmt, digits, dval);
+	return NULL;
+    } else {
+	VARARR(char, buf, 512 + digits);
+	sprintf(buf, fmt, digits, dval);
+	return dupstring(buf);
+    }
+}
+
 /* Start a parameter scope */
 
 /**/
@@ -2732,6 +2916,10 @@ scanendscope(HashNode hn, int flags)
 		    break;
 		case PM_INTEGER:
 		    pm->sets.ifn(pm, tpm->u.val);
+		    break;
+		case PM_EFLOAT:
+		case PM_FFLOAT:
+		    pm->sets.ffn(pm, tpm->u.dval);
 		    break;
 		case PM_ARRAY:
 		    pm->sets.afn(pm, tpm->u.arr);
@@ -2786,6 +2974,8 @@ printparamnode(HashNode hn, int printflags)
 	    printf("undefined ");
 	if (p->flags & PM_INTEGER)
 	    printf("integer ");
+	if (p->flags & (PM_EFLOAT|PM_FFLOAT))
+	    printf("float ");
 	else if (p->flags & PM_ARRAY)
 	    printf("array ");
 	else if (p->flags & PM_HASHED)
@@ -2842,6 +3032,11 @@ printparamnode(HashNode hn, int printflags)
 #else
 	printf("%ld", p->gets.ifn(p));
 #endif
+	break;
+    case PM_EFLOAT:
+    case PM_FFLOAT:
+	/* float */
+	convfloat(p->gets.ffn(p), p->ct, p->flags, stdout);
 	break;
     case PM_ARRAY:
 	/* array */

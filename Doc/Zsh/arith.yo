@@ -6,12 +6,13 @@ sect(Arithmetic Evaluation)
 cindex(arithmetic evaluation)
 cindex(evaluation, arithmetic)
 findex(let, use of)
-The shell can perform integer arithmetic, either using the builtin tt(let),
-or via a substitution of the form tt($((...))).  The shell is usually
-compiled to use 8-byte precision where this is available, otherwise
-precision is 4 bytes.  This can be tested, for example, by giving the
-command `tt(print - $(( 12345678901 )))'; if the number appears unchanged,
-the precision is at least 8 bytes.
+The shell can perform integer and floating point arithmetic, either using
+the builtin tt(let), or via a substitution of the form tt($((...))).  For
+integers, the shell is usually compiled to use 8-byte precision where this
+is available, otherwise precision is 4 bytes.  This can be tested, for
+example, by giving the command `tt(print - $(( 12345678901 )))'; if the
+number appears unchanged, the precision is at least 8 bytes.  Floating
+point arithmetic is always double precision.
 
 The tt(let) builtin command takes arithmetic expressions as arguments; each
 is evaluated separately.  Since many of the arithmetic operators, as well
@@ -32,15 +33,20 @@ both assigning the value 3 to the shell variable tt(foo) and returning a
 zero status.
 
 cindex(bases, in arithmetic)
-Numbers can be in bases other than 10.
+Integers can be in bases other than 10.
 A leading `tt(0x)' or `tt(0X)' denotes hexadecimal.
-Numbers may also be of the form `var(base)tt(#)var(n)',
+Integers may also be of the form `var(base)tt(#)var(n)',
 where var(base) is a decimal number between two and thirty-six
 representing the arithmetic base and var(n)
 is a number in that base (for example, `tt(16#ff)' is 255 in hexadecimal).
 The var(base)tt(#) may also be omitted, in which case
 base 10 is used.  For backwards compatibility the form
 `tt([)var(base)tt(])var(n)' is also accepted.
+
+Floating point constants are recognized by the presence of a decimal point
+or an exponent.  The decimal point may be the first character of the
+constant, but the exponent character tt(e) or tt(E) may not, as it will be
+taken for a parameter name.
 
 cindex(arithmetic operators)
 cindex(operators, arithmetic)
@@ -67,9 +73,9 @@ sitem(tt(= PLUS()= -= *= /= %= &= ^= |= <<= >>= &&= ||= ^^= **=))(assignment)
 sitem(tt(,))(comma operator)
 endsitem()
 
-The operators `tt(&&)', `tt(||)', `tt(&&=)', and `tt(||=)' are short-circuiting,
-and only one of the latter two expressions in a ternary operator
-is evaluated.  Note the precedence of the bitwise AND, OR,
+The operators `tt(&&)', `tt(||)', `tt(&&=)', and `tt(||=)' are
+short-circuiting, and only one of the latter two expressions in a ternary
+operator is evaluated.  Note the precedence of the bitwise AND, OR,
 and XOR operators.
 
 An expression of the form `tt(#\)var(x)' where var(x) is any character
@@ -95,4 +101,41 @@ cindex(integer parameters)
 findex(integer, use of)
 Arithmetic evaluation is performed on the value of each
 assignment to a named parameter declared integer
-in this manner.
+in this manner.  Assigning a floating point number to an integer results in
+rounding down to the next integer.
+
+cindex(parameters, floating point)
+cindex(floating point parameters)
+findex(float, use of)
+Likewise, floating point numbers can be declared with the tt(float)
+builtin; there are two types, differing only in their output format, as
+described for the tt(typeset) builtin.  The output format can be bypassed
+by using arithmetic substitution instead of the parameter substitution,
+i.e. `tt(${)var(float)tt(})' uses the defined format, but
+`tt($LPAR()LPAR())var(float)tt(RPAR()RPAR())' uses a generic floating point
+format.
+
+Promotion of integer to floating point values is performed where
+necessary.  In addition, if any operator which requires an integer
+(`tt(~)', `tt(&)', `tt(|)', `tt(^)', `tt(%)', `tt(<<)', `tt(>>)' and their
+equivalents with assignment) is given a floating point argument, it will be
+silently rounded down to the next integer.
+
+Scalar variables can hold integer or floating point values at different
+times; there is no memory of the numeric type in this case.
+
+If a variable is first assigned in a numeric context without previously
+being declared, it will be implicitly typed as tt(integer) or tt(float) and
+retain that type either until the type is explicitly changed or until the
+end of the scope.  This can have unforeseen consequences.  For example, in
+the loop
+
+example(for (( f = 0; f < 1; f += 0.1 )); do;
+# use $f
+done)
+
+if tt(f) has not already been declared, the first assignment will cause it
+to be created as an integer, and consequently the operation `tt(f += 0.1)'
+will always cause the result to be truncated to zero, so that the loop will
+fail.  A simple fix would be to turn the initialization into `tt(f = 0.0)'.
+It is therefore best to declare numeric variables with explicit types.

@@ -127,6 +127,45 @@ evalcond(Cond c)
 	    fprintf(stderr, " -%c %s", c->type, (char *)left);
     }
 
+    if (c->type >= COND_EQ && c->type <= COND_GE) {
+	mnumber mn1, mn2;
+	mn1 = matheval(left);
+	mn2 = matheval(right);
+
+	if (((mn1.type|mn2.type) & (MN_INTEGER|MN_FLOAT)) ==
+	    (MN_INTEGER|MN_FLOAT)) {
+	    /* promote to float */
+	    if (mn1.type & MN_INTEGER) {
+		mn1.type = MN_FLOAT;
+		mn1.u.d = (double)mn1.u.l;
+	    }
+	    if (mn2.type & MN_INTEGER) {
+		mn2.type = MN_FLOAT;
+		mn2.u.d = (double)mn2.u.l;
+	    }
+	}
+	switch(c->type) {
+	case COND_EQ:
+	    return (mn1.type & MN_FLOAT) ? (mn1.u.d == mn2.u.d) :
+		(mn1.u.l == mn2.u.l);
+	case COND_NE:
+	    return (mn1.type & MN_FLOAT) ? (mn1.u.d != mn2.u.d) :
+		(mn1.u.l != mn2.u.l);
+	case COND_LT:
+	    return (mn1.type & MN_FLOAT) ? (mn1.u.d < mn2.u.d) :
+		(mn1.u.l < mn2.u.l);
+	case COND_GT:
+	    return (mn1.type & MN_FLOAT) ? (mn1.u.d > mn2.u.d) :
+		(mn1.u.l > mn2.u.l);
+	case COND_LE:
+	    return (mn1.type & MN_FLOAT) ? (mn1.u.d <= mn2.u.d) :
+		(mn1.u.l <= mn2.u.l);
+	case COND_GE:
+	    return (mn1.type & MN_FLOAT) ? (mn1.u.d >= mn2.u.d) :
+		(mn1.u.l >= mn2.u.l);
+	}
+    }
+
     switch (c->type) {
     case COND_STREQ:
 	return matchpat(left, right);
@@ -185,19 +224,7 @@ evalcond(Cond c)
     case 'N':
 	return ((st = getstat(left)) && st->st_atime <= st->st_mtime);
     case 't':
-	return isatty(matheval(left));
-    case COND_EQ:
-	return matheval(left) == matheval(right);
-    case COND_NE:
-	return matheval(left) != matheval(right);
-    case COND_LT:
-	return matheval(left) < matheval(right);
-    case COND_GT:
-	return matheval(left) > matheval(right);
-    case COND_LE:
-	return matheval(left) <= matheval(right);
-    case COND_GE:
-	return matheval(left) >= matheval(right);
+	return isatty(mathevali(left));
     case COND_NT:
     case COND_OT:
 	{
@@ -323,7 +350,7 @@ cond_val(char **args, int num)
     singsub(&s);
     untokenize(s);
 
-    return matheval(s);
+    return mathevali(s);
 }
 
 /**/

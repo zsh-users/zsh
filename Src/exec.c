@@ -2182,6 +2182,10 @@ restore_params(LinkList restorelist, LinkList removelist)
 		case PM_INTEGER:
 		    tpm->sets.ifn(tpm, pm->u.val);
 		    break;
+		case PM_EFLOAT:
+		case PM_FFLOAT:
+		    tpm->sets.ffn(tpm, pm->u.dval);
+		    break;
 		case PM_ARRAY:
 		    tpm->sets.afn(tpm, pm->u.arr);
 		    break;
@@ -2757,7 +2761,7 @@ execarith(Cmd cmd, LinkList args, int flags)
 	while ((e = (char *) ugetnode(args))) {
 	    if (isset(XTRACE))
 		fprintf(stderr, " %s", e);
-	    val = matheval(e);
+	    val = mathevali(e);
 	}
     if (isset(XTRACE)) {
 	fprintf(stderr, " ))\n");

@@ -90,6 +90,8 @@ paramtypestr(Param pm)
 	case PM_SCALAR:  val = "scalar"; break;
 	case PM_ARRAY:   val = "array"; break;
 	case PM_INTEGER: val = "integer"; break;
+	case PM_EFLOAT:
+	case PM_FFLOAT:  val = "float"; break;
 	case PM_HASHED:  val = "association"; break;
 	}
 	DPUTS(!val, "BUG: type not handled in parameter");

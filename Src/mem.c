@@ -96,7 +96,13 @@ static int h_m[1025], h_push, h_pop, h_free;
 
 #endif
 
-#define H_ISIZE  sizeof(zlong)
+/* Make sure we align to the longest fundamental type. */
+union mem_align {
+    zlong l;
+    double d;
+};
+
+#define H_ISIZE  sizeof(union mem_align)
 #define HEAPSIZE (16384 - H_ISIZE)
 #define HEAP_ARENA_SIZE (HEAPSIZE - sizeof(struct heap))
 #define HEAPFREE (16384 - H_ISIZE)
@@ -514,13 +520,12 @@ ztrdup(const char *s)
 /*
    Below is a simple segment oriented memory allocator for systems on
    which it is better than the system's one. Memory is given in blocks
-   aligned to an integer multiple of sizeof(zlong) (4 bytes on most machines,
-   but 8 bytes on e.g. a dec alpha; it will be 8 bytes if we are using
-   long long's or equivalent). Each block is preceded by a header
-   which contains the length of the data part (in bytes). In allocated
-   blocks only this field of the structure m_hdr is senseful. In free
-   blocks the second field (next) is a pointer to the next free segment
-   on the free list.
+   aligned to an integer multiple of sizeof(union mem_align), which will
+   probably be 64-bit as it is the longer of zlong or double. Each block is
+   preceded by a header which contains the length of the data part (in
+   bytes). In allocated blocks only this field of the structure m_hdr is
+   senseful. In free blocks the second field (next) is a pointer to the next
+   free segment on the free list.
 
    On top of this simple allocator there is a second allocator for small
    chunks of data. It should be both faster and less space-consuming than
@@ -576,7 +581,7 @@ ztrdup(const char *s)
 
 struct m_shdr {
     struct m_shdr *next;	/* next one on free list */
-#ifdef ZSH_64_BIT_TYPE
+#ifdef PAD_64_BIT
     /* dummy to make this 64-bit aligned */
     struct m_shdr *dummy;
 #endif
@@ -584,18 +589,25 @@ struct m_shdr {
 
 struct m_hdr {
     zlong len;			/* length of memory block */
+#if defined(PAD_64_BIT) && !defined(ZSH_64_BIT_TYPE)
+    /* either 1 or 2 zlong's, whichever makes up 64 bits. */
+    zlong dummy1;
+#endif
     struct m_hdr *next;		/* if free: next on free list
 				   if block of small blocks: next one with
 				                 small blocks of same size*/
     struct m_shdr *free;	/* if block of small blocks: free list */
     zlong used;			/* if block of small blocks: number of used
 				                                     blocks */
+#if defined(PAD_64_BIT) && !defined(ZSH_64_BIT_TYPE)
+    zlong dummy2;
+#endif
 };
 
 
 /* alignment for memory blocks */
 
-#define M_ALIGN (sizeof(zlong))
+#define M_ALIGN (sizeof(union mem_align))
 
 /* length of memory header, length of first field of memory header and
    minimal size of a block left free (if we allocate memory and take a
@@ -604,7 +616,11 @@ struct m_hdr {
    the free list) */
 
 #define M_HSIZE (sizeof(struct m_hdr))
-#define M_ISIZE (sizeof(zlong))
+#if defined(PAD_64_BIT) && !defined(ZSH_64_BIT_TYPE)
+# define M_ISIZE (2*sizeof(zlong))
+#else
+# define M_ISIZE (sizeof(zlong))
+#endif
 #define M_MIN   (2 * M_ISIZE)
 
 /* M_FREE  is the number of bytes that have to be free before memory is
@@ -649,10 +665,18 @@ static char *m_high, *m_low;
 #define M_SIDX(S)  ((S) / M_ISIZE)
 #define M_SNUM     128
 #define M_SLEN(M)  ((M)->len / M_SNUM)
+#if defined(PAD_64_BIT) && !defined(ZSH_64_BIT_TYPE)
+/* Include the dummy in the alignment */
+#define M_SBLEN(S) ((S) * M_SNUM + sizeof(struct m_shdr *) +  \
+		    2*sizeof(zlong) + sizeof(struct m_hdr *))
+#define M_BSLEN(S) (((S) - sizeof(struct m_shdr *) -  \
+		     2*sizeof(zlong) - sizeof(struct m_hdr *)) / M_SNUM)
+#else
 #define M_SBLEN(S) ((S) * M_SNUM + sizeof(struct m_shdr *) +  \
 		    sizeof(zlong) + sizeof(struct m_hdr *))
 #define M_BSLEN(S) (((S) - sizeof(struct m_shdr *) -  \
 		     sizeof(zlong) - sizeof(struct m_hdr *)) / M_SNUM)
+#endif
 #define M_NSMALL   13
 
 static struct m_hdr *m_small[M_NSMALL];

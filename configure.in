@@ -458,6 +458,8 @@ dnl in case they require objects that exist only in the static version
 dnl and might not be compiled into the zsh executable.
 AC_CHECK_LIB(c, printf)
 
+AC_CHECK_LIB(m, pow)
+
 dnl Prefer BSD termcap library to SysV curses library, except on certain
 dnl versions of AIX and HP-UX.
 case "$host_os" in

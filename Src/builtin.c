@@ -50,7 +50,7 @@ static struct builtin builtins[] =
     BUILTIN("cd", 0, bin_cd, 0, 2, BIN_CD, NULL, NULL),
     BUILTIN("chdir", 0, bin_cd, 0, 2, BIN_CD, NULL, NULL),
     BUILTIN("continue", BINF_PSPECIAL, bin_break, 0, 1, BIN_CONTINUE, NULL, NULL),
-    BUILTIN("declare", BINF_TYPEOPTS | BINF_MAGICEQUALS | BINF_PSPECIAL, bin_typeset, 0, -1, 0, "ALRTUZafghilrtux", NULL),
+    BUILTIN("declare", BINF_TYPEOPTS | BINF_MAGICEQUALS | BINF_PSPECIAL, bin_typeset, 0, -1, 0, "AEFLRTUZafghilrtux", NULL),
     BUILTIN("dirs", 0, bin_dirs, 0, -1, 0, "v", NULL),
     BUILTIN("disable", 0, bin_enable, 0, -1, BIN_DISABLE, "afmr", NULL),
     BUILTIN("disown", 0, bin_fg, 0, -1, BIN_DISOWN, NULL, NULL),
@@ -60,10 +60,11 @@ static struct builtin builtins[] =
     BUILTIN("enable", 0, bin_enable, 0, -1, BIN_ENABLE, "afmr", NULL),
     BUILTIN("eval", BINF_PSPECIAL, bin_eval, 0, -1, BIN_EVAL, NULL, NULL),
     BUILTIN("exit", BINF_PSPECIAL, bin_break, 0, 1, BIN_EXIT, NULL, NULL),
-    BUILTIN("export", BINF_TYPEOPTS | BINF_MAGICEQUALS | BINF_PSPECIAL, bin_typeset, 0, -1, BIN_EXPORT, "LRTUZafhilrtu", "xg"),
+    BUILTIN("export", BINF_TYPEOPTS | BINF_MAGICEQUALS | BINF_PSPECIAL, bin_typeset, 0, -1, BIN_EXPORT, "EFLRTUZafhilrtu", "xg"),
     BUILTIN("false", 0, bin_false, 0, -1, 0, NULL, NULL),
     BUILTIN("fc", BINF_FCOPTS, bin_fc, 0, -1, BIN_FC, "nlreIRWAdDfEim", NULL),
     BUILTIN("fg", 0, bin_fg, 0, -1, BIN_FG, NULL, NULL),
+    BUILTIN("float", BINF_TYPEOPTS | BINF_MAGICEQUALS | BINF_PSPECIAL, bin_typeset, 0, -1, 0, "EFghlrtux", "E"),
     BUILTIN("functions", BINF_TYPEOPTS, bin_functions, 0, -1, 0, "mtuU", NULL),
     BUILTIN("getln", 0, bin_read, 0, -1, 0, "ecnAlE", "zr"),
     BUILTIN("getopts", 0, bin_getopts, 2, -1, 0, NULL, NULL),
@@ -78,7 +79,7 @@ static struct builtin builtins[] =
     BUILTIN("jobs", 0, bin_fg, 0, -1, BIN_JOBS, "dlpZrs", NULL),
     BUILTIN("kill", 0, bin_kill, 0, -1, 0, NULL, NULL),
     BUILTIN("let", 0, bin_let, 1, -1, 0, NULL, NULL),
-    BUILTIN("local", BINF_TYPEOPTS | BINF_MAGICEQUALS | BINF_PSPECIAL, bin_typeset, 0, -1, 0, "ALRTUZahilrtu", NULL),
+    BUILTIN("local", BINF_TYPEOPTS | BINF_MAGICEQUALS | BINF_PSPECIAL, bin_typeset, 0, -1, 0, "AEFLRTUZahilrtu", NULL),
     BUILTIN("log", 0, bin_log, 0, 0, 0, NULL, NULL),
     BUILTIN("logout", 0, bin_break, 0, 1, BIN_LOGOUT, NULL, NULL),
 
@@ -97,7 +98,7 @@ static struct builtin builtins[] =
     BUILTIN("pwd", 0, bin_pwd, 0, 0, 0, "rLP", NULL),
     BUILTIN("r", BINF_R, bin_fc, 0, -1, BIN_FC, "nrl", NULL),
     BUILTIN("read", 0, bin_read, 0, -1, 0, "rzu0123456789pkqecnAlE", NULL),
-    BUILTIN("readonly", BINF_TYPEOPTS | BINF_MAGICEQUALS | BINF_PSPECIAL, bin_typeset, 0, -1, 0, "ALRTUZafghiltux", "r"),
+    BUILTIN("readonly", BINF_TYPEOPTS | BINF_MAGICEQUALS | BINF_PSPECIAL, bin_typeset, 0, -1, 0, "AEFLRTUZafghiltux", "r"),
     BUILTIN("rehash", 0, bin_hash, 0, 0, 0, "dfv", "r"),
     BUILTIN("return", BINF_PSPECIAL, bin_break, 0, 1, BIN_RETURN, NULL, NULL),
     BUILTIN("set", BINF_PSPECIAL, bin_set, 0, -1, 0, NULL, NULL),
@@ -111,7 +112,7 @@ static struct builtin builtins[] =
     BUILTIN("trap", BINF_PSPECIAL, bin_trap, 0, -1, 0, NULL, NULL),
     BUILTIN("true", 0, bin_true, 0, -1, 0, NULL, NULL),
     BUILTIN("type", 0, bin_whence, 0, -1, 0, "ampfsw", "v"),
-    BUILTIN("typeset", BINF_TYPEOPTS | BINF_MAGICEQUALS | BINF_PSPECIAL, bin_typeset, 0, -1, 0, "ALRTUZafghilrtuxm", NULL),
+    BUILTIN("typeset", BINF_TYPEOPTS | BINF_MAGICEQUALS | BINF_PSPECIAL, bin_typeset, 0, -1, 0, "AEFLRTUZafghilrtuxm", NULL),
     BUILTIN("umask", 0, bin_umask, 0, 1, 0, "S", NULL),
     BUILTIN("unalias", 0, bin_unhash, 1, -1, 0, "m", "a"),
     BUILTIN("unfunction", 0, bin_unhash, 1, -1, 0, "m", "f"),
@@ -215,6 +216,7 @@ execbuiltin(LinkList args, Builtin bn)
     LinkNode n;
     char ops[MAX_OPS], *arg, *pp, *name, **argv, **oargv, *optstr;
     char *oxarg, *xarg = NULL;
+    char typenumstr[] = TYPESET_OPTNUM;
     int flags, sense, argc = 0, execop, xtr = isset(XTRACE), lxarg = 0;
 
     /* initialise some static variables */
@@ -289,8 +291,7 @@ execbuiltin(LinkList args, Builtin bn)
 	    /* "typeset" may take a numeric argument *
 	     * at the tail of the options            */
 	    if (idigit(*arg) && (flags & BINF_TYPEOPT) &&
-		(arg[-1] == 'L' || arg[-1] == 'R' ||
-		 arg[-1] == 'Z' || arg[-1] == 'i'))
+		strchr(typenumstr, arg[-1]))
 		auxlen = (int)zstrtol(arg, &arg, 10);
 	    /* The above loop may have exited on an invalid option.  (We  *
 	     * assume that any option requiring metafication is invalid.) */
@@ -315,9 +316,9 @@ execbuiltin(LinkList args, Builtin bn)
 		auxdata = arg;
 		arg = (char *) ugetnode(args);
 	    }
-	    /* for "typeset", -L, -R, -Z and -i take a numeric extra argument */
-	    if ((flags & BINF_TYPEOPT) && (execop == 'L' || execop == 'R' ||
-		execop == 'Z' || execop == 'i') && arg && idigit(*arg)) {
+	    /* some "typeset" options take a numeric extra argument */
+	    if ((flags & BINF_TYPEOPT) && strchr(typenumstr, execop) &&
+		arg && idigit(*arg)) {
 		auxlen = atoi(arg);
 		arg = (char *) ugetnode(args);
 	    }
@@ -1571,10 +1572,15 @@ typeset_single(char *cname, char *pname, Param pm, int func,
     }
 
     /* attempting a type conversion, or making a tied colonarray? */
-    if ((tc = (usepm || newspecial)
-	 && (((off & pm->flags) | (on & ~pm->flags)) &
-	     (PM_INTEGER|PM_HASHED|PM_ARRAY|PM_TIED|PM_AUTOLOAD))))
-	usepm = 0;
+    tc = 0;
+    if (usepm || newspecial) {
+	int chflags = ((off & pm->flags) | (on & ~pm->flags)) &
+	     (PM_INTEGER|PM_EFLOAT|PM_FFLOAT|PM_HASHED|
+	      PM_ARRAY|PM_TIED|PM_AUTOLOAD);
+	/* keep the parameter if just switching between floating types */
+	if ((tc = chflags && chflags != (PM_EFLOAT|PM_FFLOAT)))
+	    usepm = 0;
+    }
     if (tc && (pm->flags & PM_SPECIAL)) {
 	zerrnam(cname, "%s: can't change type of a special parameter",
 		pname, 0);
@@ -1615,7 +1621,8 @@ typeset_single(char *cname, char *pname, Param pm, int func,
 	}
 	pm->flags = (pm->flags | on) & ~off;
 	/* This auxlen/pm->ct stuff is a nasty hack. */
-	if ((on & (PM_LEFT | PM_RIGHT_B | PM_RIGHT_Z | PM_INTEGER)) &&
+	if ((on & (PM_LEFT | PM_RIGHT_B | PM_RIGHT_Z | PM_INTEGER |
+		   PM_EFLOAT | PM_FFLOAT)) &&
 	    auxlen)
 	    pm->ct = auxlen;
 	if (!(pm->flags & (PM_ARRAY|PM_HASHED))) {
@@ -1711,7 +1718,8 @@ typeset_single(char *cname, char *pname, Param pm, int func,
 	 * Final tweak: if we've turned on one of the flags with
 	 * numbers, we should use the appropriate integer.
 	 */
-	if (on & (PM_LEFT|PM_RIGHT_B|PM_RIGHT_Z|PM_INTEGER))
+	if (on & (PM_LEFT|PM_RIGHT_B|PM_RIGHT_Z|PM_INTEGER|
+		  PM_EFLOAT|PM_FFLOAT))
 	    pm->ct = auxlen;
 	else
 	    pm->ct = 0;
@@ -1756,6 +1764,10 @@ typeset_single(char *cname, char *pname, Param pm, int func,
 	    case PM_INTEGER:
 		pm->sets.ifn(pm, 0);
 		break;
+	    case PM_EFLOAT:
+	    case PM_FFLOAT:
+		pm->sets.ffn(pm, 0.0);
+		break;
 	    case PM_ARRAY:
 		pm->sets.afn(pm, mkarray(NULL));
 		break;
@@ -1785,7 +1797,7 @@ bin_typeset(char *name, char **argv, char *ops, int func)
     Param pm;
     Asgment asg;
     Patprog pprog;
-    char *optstr = "aiALRZlurtxUhT";
+    char *optstr = TYPESET_OPTSTR;
     int on = 0, off = 0, roff, bit = PM_ARRAY;
     int i;
     int returnval = 0, printflags = 0;
@@ -1805,14 +1817,24 @@ bin_typeset(char *name, char **argv, char *ops, int func)
     roff = off;
 
     /* Sanity checks on the options.  Remove conficting options. */
+    if (on & PM_FFLOAT) {
+	off |= PM_RIGHT_B | PM_LEFT | PM_RIGHT_Z | PM_UPPER | PM_ARRAY
+	    | PM_INTEGER | PM_EFLOAT;
+	/* Allow `float -F' to work even though float sets -E by default */
+	on &= ~PM_EFLOAT;
+    }
+    if (on & PM_EFLOAT)
+	off |= PM_RIGHT_B | PM_LEFT | PM_RIGHT_Z | PM_UPPER | PM_ARRAY
+	    | PM_INTEGER | PM_FFLOAT;
     if (on & PM_INTEGER)
-	off |= PM_RIGHT_B | PM_LEFT | PM_RIGHT_Z | PM_UPPER | PM_ARRAY;
+	off |= PM_RIGHT_B | PM_LEFT | PM_RIGHT_Z | PM_UPPER | PM_ARRAY |
+	    PM_EFLOAT | PM_FFLOAT;
     if (on & PM_LEFT)
-	off |= PM_RIGHT_B | PM_INTEGER;
+	off |= PM_RIGHT_B | PM_INTEGER | PM_EFLOAT | PM_FFLOAT;
     if (on & PM_RIGHT_B)
-	off |= PM_LEFT | PM_INTEGER;
+	off |= PM_LEFT | PM_INTEGER | PM_EFLOAT | PM_FFLOAT;
     if (on & PM_RIGHT_Z)
-	off |= PM_INTEGER;
+	off |= PM_INTEGER | PM_EFLOAT | PM_FFLOAT;
     if (on & PM_UPPER)
 	off |= PM_LOWER;
     if (on & PM_LOWER)
@@ -1820,7 +1842,7 @@ bin_typeset(char *name, char **argv, char *ops, int func)
     if (on & PM_HASHED)
 	off |= PM_ARRAY;
     if (on & PM_TIED)
-	off |= PM_INTEGER | PM_ARRAY | PM_HASHED;
+	off |= PM_INTEGER | PM_EFLOAT | PM_FFLOAT | PM_ARRAY | PM_HASHED;
 
     on &= ~off;
 
@@ -2900,7 +2922,7 @@ bin_shift(char *name, char **argv, char *ops, int func)
  
     /* optional argument can be either numeric or an array */
     if (*argv && !getaparam(*argv))
-        num = matheval(*argv++);
+        num = mathevali(*argv++);
  
     if (num < 0) {
         zwarnnam(name, "argument to shift must be non-negative", NULL, 0);
@@ -3042,7 +3064,7 @@ bin_break(char *name, char **argv, char *ops, int func)
 
     /* handle one optional numeric argument */
     if (*argv) {
-	num = matheval(*argv++);
+	num = mathevali(*argv++);
 	nump = 1;
     }
 
@@ -3857,7 +3879,7 @@ bin_let(char *name, char **argv, char *ops, int func)
     zlong val = 0;
 
     while (*argv)
-	val = matheval(*argv++);
+	val = mathevali(*argv++);
     /* Errors in math evaluation in let are non-fatal. */
     errflag = 0;
     return !val;

@@ -685,7 +685,7 @@ get_intarg(char **s)
     singsub(&p);
     if (errflag)
 	return -1;
-    ret = matheval(p);
+    ret = mathevali(p);
     if (errflag)
 	return -1;
     if (ret < 0)
@@ -1045,6 +1045,8 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int ssub)
 		case PM_SCALAR:  val = "scalar"; break;
 		case PM_ARRAY:   val = "array"; break;
 		case PM_INTEGER: val = "integer"; break;
+		case PM_EFLOAT:
+		case PM_FFLOAT:  val = "float"; break;
 		case PM_HASHED:  val = "association"; break;
 		}
 		val = dupstring(val);
@@ -1823,12 +1825,16 @@ arithsubst(char *a, char **bptr, char *rest)
 {
     char *s = *bptr, *t;
     char buf[DIGBUFSIZE], *b = buf;
-    zlong v;
+    mnumber v;
 
     singsub(&a);
     v = matheval(a);
-    convbase(buf, v, 0);
-    t = *bptr = (char *)ncalloc(strlen(*bptr) + strlen(buf) + strlen(rest) + 1);
+    if (v.type & MN_FLOAT)
+	b = convfloat(v.u.d, 0, 0, NULL);
+    else
+	convbase(buf, v.u.l, 0);
+    t = *bptr = (char *)ncalloc(strlen(*bptr) + strlen(b) + 
+				strlen(rest) + 1);
     t--;
     while ((*++t = *s++));
     t--;
