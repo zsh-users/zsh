@@ -6,7 +6,7 @@
 setopt localoptions extendedglob
 
 local long args rest ws cur nth def nm expl descr action opt arg tmp
-local single uns ret=1
+local single uns ret=1 soptseq soptseq1 sopts
 
 # Associative arrays used to collect information about the options.
 
@@ -90,6 +90,22 @@ while (( $# )); do
   shift
 done
 
+if [[ -n "$single" ]]; then
+  soptseq="${(@j::)${(@M)${(@k)opts[(R)]}:#[-+]?}#[-+]}${(@j::)${(@M)${(@k)mopts[(R)]}:#[-+]?}#[-+]}"
+  if [[ -n "$soptseq" ]]; then
+    soptseq="[$soptseq]#"
+    soptseq1="$soptseq#"
+  else
+    soptseq=''
+    soptseq1=''
+  fi
+  sopts="${(@j::)${(@M)${(@k)opts}:#[-+]?}#[-+]}${(@j::)${(@M)${(@k)mopts}:#[-+]?}#[-+]}${(@j::)${(@M)${(@k)dopts}:#[-+]?}#[-+]}${(@j::)${(@M)${(@k)dmopts}:#[-+]?}#[-+]}${(@j::)${(@M)${(@k)odopts}:#[-+]?}#[-+]}${(@j::)${(@M)${(@k)odmopts}:#[-+]?}#[-+]}"
+else
+  soptseq=''
+  soptseq1=''
+  sopts=''
+fi
+
 if [[ $#long -ne 0 && "$PREFIX" = --* ]]; then
 
    # If the current words starts with `--' and we should use long
@@ -157,19 +173,17 @@ else
         def="$mopts[$ws[1]]"
       else
         uns=''
-        if [[ -n "$single" && "$ws[1]" = [-+]* ]]; then
-          if [[ ${#${(kj::)opts[(R)?*]#?}} -ne 0 &&
-                "$ws[1]" = ${ws[1][1]}*[${(kj::)opts[(R)?*]#?}] ]]; then
+        if [[ -n "$sopts" && "$ws[1]" = [-+]${~soptseq}[$sopts] ]]; then
+	  if (( $+opts[${ws[1][1]}${ws[1][-1]}] )); then
 	    def="$opts[${ws[1][1]}${ws[1][-1]}]"
 	    uns="${ws[1][2,-1]}"
 	    opt=''
-	  elif [[ ${#${(kj::)mopts[(R)?*]#?}} -ne 0 &&
-                  "$ws[1]" = ${ws[1][1]}*[${(kj::)mopts[(R)?*]#?}] ]]; then
+	  elif (( $+mopts[${ws[1][1]}${ws[1][-1]}] )); then
 	    def="$mopts[${ws[1][1]}${ws[1][-1]}]"
 	    uns="${ws[1][2,-1]}"
 	    opt=''
 	  fi
-         fi
+        fi
 
         # If the word is none of the simple options, test for those
         # whose first argument has to or may come directly after the
@@ -185,8 +199,8 @@ else
 	  # with one of the option names.
 
 	  while (( $#tmp )); do
-            if [[ -n "$single" ]]; then
-	      if [[ "$ws[1]" = ${tmp[1][1]}*${tmp[1][2]}* ]]; then
+            if [[ -n "$sopts" && $tmp[1] = [-+]? ]]; then
+	      if [[ "$ws[1]" = ${tmp[1][1]}${~soptseq}${tmp[1][2]}* ]]; then
 	        uns="${ws[1][2,-1]%%${tmp[1][2]}*}${tmp[1][2]}"
 		break;
 	      fi
@@ -204,7 +218,7 @@ else
 
 	    opt=''
 	    def="$dopts[$tmp[1]]"
-	    [[ -z "$single" ]] && unset "dopts[$tmp[1]]"
+	    unset "dopts[$tmp[1]]"
 	    if [[ "$def" = ?*:*:* ]]; then
               def="${def#?*:*:}"
             else
@@ -215,8 +229,8 @@ else
 	if [[ -n "$opt" && $#dmopts -ne 0 ]]; then
 	  tmp=( "${(@k)dmopts}" )
 	  while (( $#tmp )); do
-            if [[ -n "$single" ]]; then
-	      if [[ "$ws[1]" = ${tmp[1][1]}*${tmp[1][2]}* ]]; then
+            if [[ -n "$sopts" && $tmp[1] = [-+]? ]]; then
+	      if [[ "$ws[1]" = ${tmp[1][1]}${~soptseq}${tmp[1][2]}* ]]; then
 	        uns="${ws[1][2,-1]%%${tmp[1][2]}*}${tmp[1][2]}"
 		break;
 	      fi
@@ -239,8 +253,8 @@ else
         if [[ -n "$opt" && $#odopts -ne 0 ]]; then
 	  tmp=( "${(@k)odopts}" )
 	  while (( $#tmp )); do
-            if [[ -n "$single" ]]; then
-	      if [[ "$ws[1]" = ${tmp[1][1]}*${tmp[1][2]}* ]]; then
+            if [[ -n "$sopts" && $tmp[1] = [-+]? ]]; then
+	      if [[ "$ws[1]" = ${tmp[1][1]}${~soptseq}${tmp[1][2]}* ]]; then
 	        uns="${ws[1][2,-1]%%${tmp[1][2]}*}${tmp[1][2]}"
 		break;
 	      fi
@@ -253,14 +267,14 @@ else
 	  if (( $#tmp )); then
 	    opt=''
 	    def="$odopts[$tmp[1]]"
-	    [[ -z "$single" ]] && unset "odopts[$tmp[1]]"
+	    unset "odopts[$tmp[1]]"
 
 	    # For options whose first argument *may* come after the
 	    # option, we skip over the first description only if there
 	    # is something after the option name on the line.
 
-	    if [[ ( -z "$single" && "$ws[1]" != "$tmp[1]" ) ||
-                  ( -n "$single" && "$ws[1]" != *${tmp[1][2]} ) ]]; then
+	    if [[ ( -z "$sopts" && "$ws[1]" != "$tmp[1]" ) ||
+                  ( -n "$sopts" && $tmp[1] = [-+]? && "$ws[1]" != ${tmp[1][1]}${~soptseq}${tmp[1][2]} ) ]]; then
 	      if [[ "$def" = ?*:*:* ]]; then
                 def="${def#?*:*:}"
               else
@@ -272,8 +286,8 @@ else
 	if [[ -n "$opt" && $#odmopts -ne 0 ]]; then
 	  tmp=( "${(@k)odmopts}" )
 	  while (( $#tmp )); do
-            if [[ -n "$single" ]]; then
-	      if [[ "$ws[1]" = ${tmp[1][1]}*${tmp[1][2]}* ]]; then
+            if [[ -n "$sopts" && $tmp[1] = [-+]? ]]; then
+	      if [[ "$ws[1]" = ${tmp[1][1]}${~soptseq}${tmp[1][2]}* ]]; then
 	        uns="${ws[1][2,-1]%%${tmp[1][2]}*}${tmp[1][2]}"
 		break;
 	      fi
@@ -286,8 +300,8 @@ else
 	  if (( $#tmp )); then
 	    opt=''
 	    def="$odmopts[$tmp[1]]"
-	    if [[ ( -z "$single" && "$ws[1]" != "$tmp[1]" ) ||
-                  ( -n "$single" && "$ws[1]" != *${tmp[1][2]} ) ]]; then
+	    if [[ ( -z "$sopts" && "$ws[1]" != "$tmp[1]" ) ||
+                  ( -n "$sopts" && $tmp[1] = [-+]? && "$ws[1]" != ${tmp[1][1]}${~soptseq}${tmp[1][2]} ) ]]; then
 	      if [[ "$def" = ?*:*:* ]]; then
                 def="${def#?*:*:}"
               else
@@ -297,7 +311,7 @@ else
           fi
 	fi
 
-        [[ -n "$single" && -n "$opt" && "$ws[1]" = [-+]* ]] && \
+        [[ -n "$sopts" && -n "$opt" && "$ws[1]" = [-+]${~soptseq} ]] && \
             uns="${ws[1][2,-1]}"
 
         [[ -n "$uns" ]] &&
@@ -351,7 +365,7 @@ else
 
       tmp=( "${(@k)dopts}" )
       while (( $#tmp )); do
-        if [[ -n "$single" ]] && compset -P "${tmp[1][1]}*${tmp[1][2]}"; then
+        if [[ -n "$sopts" && $tmp[1] = [-+]? ]] && compset -P "${tmp[1][1]}${~soptseq}${tmp[1][2]}"; then
           def="$dopts[$tmp[1]]"
 	  opt=''
 	  uns="${PREFIX[2,-1]%%${tmp[1][2]}*}${tmp[1][2]}"
@@ -371,7 +385,7 @@ else
     if [[ -n "$opt" && $#dmopts -ne 0 ]]; then
       tmp=( "${(@k)dmopts}" )
       while (( $#tmp )); do
-        if [[ -n "$single" ]] && compset -P "${tmp[1][1]}*${tmp[1][2]}"; then
+        if [[ -n "$sopts" && $tmp[1] = [-+]? ]] && compset -P "${tmp[1][1]}${~soptseq}${tmp[1][2]}"; then
           def="$dmopts[$tmp[1]]"
 	  opt=''
 	  uns="${PREFIX[2,-1]%%${tmp[1][2]}*}${tmp[1][2]}"
@@ -387,7 +401,7 @@ else
     if [[ -n "$opt" && $#odopts -ne 0 ]]; then
       tmp=( "${(@k)odopts}" )
       while (( $#tmp )); do
-        if [[ -n "$single" ]] && compset -P "${tmp[1][1]}*${tmp[1][2]}"; then
+        if [[ -n "$sopts" && $tmp[1] = [-+]? ]] && compset -P "${tmp[1][1]}${~soptseq}${tmp[1][2]}"; then
           def="$odopts[$tmp[1]]"
 	  opt=''
 	  uns="${PREFIX[2,-1]%%${tmp[1][2]}*}${tmp[1][2]}"
@@ -403,7 +417,7 @@ else
     if [[ -n "$opt" && $#odmopts -ne 0 ]]; then
       tmp=( "${(@k)odmopts}" )
       while (( $#tmp )); do
-        if [[ -n "$single" ]] && compset -P "${tmp[1][1]}*${tmp[1][2]}"; then
+        if [[ -n "$sopts" &&  $tmp[1] = [-+]? ]] && compset -P "${tmp[1][1]}${~soptseq}${tmp[1][2]}"; then
           def="$odmopts[$tmp[1]]"
 	  opt=''
 	  uns="${PREFIX[2,-1]%%${tmp[1][2]}*}${tmp[1][2]}"
@@ -417,7 +431,7 @@ else
       done
     fi
 
-    [[ -n "$single" && -n "$opt" && "$PREFIX" = [-+]* ]] && \
+    [[ -n "$sopts" && -n "$opt" && "$PREFIX" = [-+]* ]] && \
         uns="${PREFIX[2,-1]}"
 
     [[ -n "$uns" ]] &&
@@ -433,25 +447,12 @@ else
       if [[ "$compconfig[option_prefix]" != *(short|all)* ||
             "$PREFIX" = [-+]* ]]; then
         _description expl option
-	if [[ -n "$single" ]]; then
-          if [[ -z "$PREFIX" || "$PREFIX" = ? ]]; then
-	    compadd "$expl[@]" - "${(@k)opts}" "${(@k)mopts}" \
-			         "${(@k)dopts}" "${(@k)dmopts}" \
-			         "${(@k)odopts}" "${(@k)odmopts}" &&
-                ret=0
-	  else
-	    compadd "$expl[@]" - "${PREFIX}${(@k)^opts[(I)${PREFIX[1]}*]#?}" \
-			         "${PREFIX}${(@k)^mopts[(I)${PREFIX[1]}*]#?}" \
-			         "${PREFIX}${(@k)^dopts[(I)${PREFIX[1]}*]#?}" \
-			         "${PREFIX}${(@k)^dmopts[(I)${PREFIX[1]}*]#?}" \
-			         "${PREFIX}${(@k)^odopts[(I)${PREFIX[1]}*]#?}" \
-			         "${PREFIX}${(@k)^odmopts[(I)${PREFIX[1]}*]#?}" &&
-                ret=0
-          fi
+	if [[ -n "$sopts" && -n "$PREFIX" && -n "$soptseq" && "$PREFIX" = [-+]${~soptseq1} ]]; then
+	  compadd "$expl[@]" -Q - "$PREFIX" && ret=0
 	else
-          compadd "$expl[@]" - "${(@k)opts}" "${(@k)mopts}" \
-                               "${(@k)dopts}" "${(@k)dmopts}" \
-			       "${(@k)odopts}" "${(@k)odmopts}" && ret=0
+          compadd "$expl[@]" -Q - "${(@k)opts}" "${(@k)mopts}" \
+				  "${(@k)odopts}" "${(@k)odmopts}" && ret=0
+	  compadd "$expl[@]" -QS '' - "${(@k)dopts}" "${(@k)dmopts}" && ret=0
         fi
       fi
       [[ $#long -ne 0 &&

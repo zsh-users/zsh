@@ -12,7 +12,7 @@ _arguments -s \
   '-b' \
   '-V+:version control style:(simple numbered existing)' \
   '-B+:backup path prefix:' \
-  '-Y+:basename basename prefix:_files' \
+  '-Y+:backup basename prefix:_files' \
   '-z+:backup file suffix:(.bak)' \
   '-g+:NUM:' \
   '-t' '-f' '-s' \
