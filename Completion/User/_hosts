@@ -1,4 +1,4 @@
-#compdef ftp ncftp ping rwho rup xping traceroute nslookup telnet
+#compdef ftp ncftp ping rwho rup xping traceroute telnet
 
 local expl
 

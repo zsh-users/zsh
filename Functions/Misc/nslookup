@@ -32,3 +32,37 @@ done
 
 print -p exit
 wait $pid
+# Simple wrapper function for `nslookup'. With completion if you are using
+# the function based completion system.
+
+setopt localoptions completealiases
+
+local char line compcontext=nslookup pid
+
+trap 'print -p exit;return' INT
+
+coproc command nslookup
+pid=$!
+
+while read -pk1 char; do
+  line="$line$char"
+  [[ "$line" = *'
+> ' ]] && break
+done
+print -nr - "$line"
+
+line=''
+while vared -p '> ' line; do
+  print -p "$line"
+  line=''
+  while read -pk1 char; do
+    line="$line$char"
+    [[ "$line" = *'
+> ' ]] && break
+  done
+  print -nr - "$line"
+  line=''
+done
+
+print -p exit
+wait $pid
