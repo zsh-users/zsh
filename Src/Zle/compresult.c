@@ -785,19 +785,40 @@ do_single(Cmatch m)
 	    else {
 		/* Build the path name. */
 		if (partest && !*psuf && !(m->flags & CMF_PARNEST)) {
-		    int ne = noerrs;
+		    int ne = noerrs, tryit = 1;
 
 		    p = (char *) zhalloc(strlen((m->flags & CMF_ISPAR) ?
 						parpre : m->ripre) +
 					 strlen(str) + 2);
 		    sprintf(p, "%s%s%c",
 			    ((m->flags & CMF_ISPAR) ? parpre : m->ripre), str,
-			    ((m->flags & CMF_PARBR) ? Outbrace : '\0'));
-		    noerrs = 1;
-		    parsestr(p);
-		    singsub(&p);
-		    errflag = 0;
-		    noerrs = ne;
+			    ((m->flags & CMF_PARBR) ? '}' : '\0'));
+		    if (*p == '$') {
+			char *n;
+			Param pm;
+
+			if (p[1] == '{') {
+			    char *e;
+
+			    n = dupstring(p + 2);
+			    e = n + strlen(n) - 1;
+
+			    if (*e == '}')
+				*e = '\0';
+			} else
+			    n = p + 1;
+
+			if ((pm = (Param) paramtab->getnode(paramtab, n)) &&
+			    PM_TYPE(pm->flags) != PM_SCALAR)
+			    tryit = 0;
+		    }
+		    if (tryit) {
+			noerrs = 1;
+			parsestr(p);
+			singsub(&p);
+			errflag = 0;
+			noerrs = ne;
+		    }
 		} else {
 		    p = (char *) zhalloc(strlen(prpre) + strlen(str) +
 				 strlen(psuf) + 3);
