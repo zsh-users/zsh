@@ -259,6 +259,15 @@ the values of these keys are printed one per line. In either case, if the
 tt(-L) option is given, the keys and values are printed as calls to this
 function, usable to be put in a setup script.
 )
+findex(funcall)
+item(tt(funcall) var(return) var(name) [ var(args) ... ])(
+If a function var(name) exists, it is called with the arguments
+var(args). Unless it is the empty string or a single hyphen,
+var(return) is taken as the name of a parameter and the return status
+from the called function is stored in it.
+The return value of tt(funcall) itself is zero if the function
+var(name) exists and was called and non-zero otherwise.
+)
 enditem()
 
 texinode(Control Functions)(Completion Functions)(Initialization)(Completion System)
@@ -735,6 +744,36 @@ This function also uses the configuration key tt(message_format) in
 preference to tt(description_format). The latter is used only if the
 former is unset or set to the empty string.
 )
+item(tt(_display))(
+This function generates a display list usable for the `tt(-y)' option
+of tt(compadd) and tt(compgen). For this it takes its second argument
+as an array of possible matches with descriptions. The array may
+either be given as the name of an array parameter or directly as a
+list of words in parentheses.
+
+Each element of the array should contain a match, optionally followed
+by a colon and the description for this match. With this
+tt(_display) builds a string with one match and its description per
+line. Matches witout descriptions are appended at the end and aligned
+in multiple columns. After that, the first argument is taken as a
+parameter name and the string built is stored in it.
+
+Before the building the list, however, this function first uses
+tt(compadd) to remove all strings from the array that don't match the
+string on the line (so that they don't appear in the list). This means 
+that the special parameters tt(PREFIX) and tt(SUFFIX) have to be set
+up correctly before this function is called. This call to tt(compadd)
+also uses the other arguments given to tt(_display), by directly
+giving them to tt(compadd).
+
+Finally, if the array is given as the name of a parameter, this
+paramete will be changed to include only those strings that match the
+string on the line.
+
+The return value of tt(_display) is zero if there was at least one
+matching string and the display string could be built and non-zero
+otherwise.
+)
 item(tt(_multi_parts))(
 This function gets two arguments: a separator character and an
 array.  As usual, the array may be either the
@@ -820,17 +859,6 @@ function for these functions to work properly. The lines in question
 are used to store the option settings in effect before the completion
 widget locally sets the options it needs.
 )
-item(tt(_long_options))(
-
-This function is used to complete long options for commands that
-support the `tt(--help)' option as, for example, most of the GNU
-commands do. For this it invokes the command from the line with the
-`tt(--help)' option and then parses the output to find possible option
-names. Note that this means that you should be careful to make sure
-that this function is not called for a command that does not support
-this option.
-
-)
 item(tt(_arguments))(
 This function resides in the tt(Base) subdirectory of the example
 completion system because it is not used by the core system.
@@ -899,8 +927,26 @@ separate argument after the option, a plus sign should be used
 instead. If the argument may be given as the next string or in same
 string as the option name but separated by it from an equal sign, a
 `tt(=)' should be used instead of the minus or plus sign.
-Finally, if the option may be given more than once, a star
-(`tt(*)') should be added in front of the var(opt-spec).
+
+If the option may be given more than once, a star
+(`tt(*)') has to be added in front of the var(opt-spec) because
+otherwise it is not offered as a possible completion again if it is
+already on the line.
+
+An var(opt-spec) may also contain a list of other option names with
+which the option described is mutually exclusive. Such a list is given 
+in parentheses at the beginning, as in `tt((-two -three)-one:...)'. In 
+this example, the options `tt(-two)' and `tt(-three)' will not be
+offered as possible completions if the option `tt(-one)' is on the
+line.
+
+Finally, the var(opt-spec) may contain a explanation string. This is
+given in brackets at the end, as in `tt(-q[query operation])'. The
+configuration key tt(describe_options) is used to decide if these
+explanation strings should be printed when options are listed. If it
+is set to a non-empty string and it doesn't contain the substring
+`tt(!)var(command)', where `var(command)' is the name of the command
+that is completed for, the descriptions will be shown.
 )
 enditem()
 
@@ -911,7 +957,17 @@ a list in parentheses, as in `tt(:foo:(foo bar baz))'. Such a list in
 doubled parentheses, as in `tt(:foo:((a\:bar b\:baz)))' should contain 
 strings consisting of the string to complete followed by a colon
 (which needs to be preceded by a backslash) and a description. The
-matches will be listed together with their descriptions. A string in
+matches will be listed together with their descriptions.
+
+A var(action) of the form `tt(->)var(string)' is used by functions
+that implement a state machine. In this case, the `var(string)' (with
+all leading and trailing spaces and tabs removed) will be stored in
+the global parameter tt(state) and the function returns with a return
+value of one after setting the global `tt(line)' and `tt(options)'
+parameters as described below and without resetting any changes made
+to the special parameters such as tt(PREFIX) and tt(words).
+
+A string in
 braces will be evaluated to generate the matches and if the
 var(action) does not begin with an opening parentheses or brace, it
 will be split into separate words and executed. If the var(action)
@@ -919,20 +975,25 @@ starts with a space, this list of words will be invoked unchanged,
 otherwise it will be invoked with some extra string placed after the
 first word which can be given as arguments to the tt(compadd) and
 tt(compgen) builtins and which make sure that the var(message) given
-in the description will be shown above the matches. During the
-evaluation or execution of the action the array `tt(line)' will be set 
-to the command name and normal arguments from the command line,
-i.e. to the words from the command line excluding all options and their 
-arguments.
+in the description will be shown above the matches.
 
 To include a colon in the var(message) or the var(action), it has to
 be preceded by a backslash.
+
+During the evaluation or execution of the action the array `tt(line)'
+will be set to the command name and normal arguments from the command
+line, i.e. to the words from the command line excluding all options
+and their arguments. These are stored in the associative array
+`tt(options)', using the option names as keys and their arguments as
+the values. For options that have more than one argument these are
+given as one string, separated by colons. All colons in the original
+arguments are preceded with backslashes.
 
 Normally the option names are taken as multi-character names and a
 word from the line is considered to contain only one option (or
 none). By giving the tt(-s) option to this function (as the first
 argument), options are considered to be one-character options and the
-string from the line may contain more than one such option letter.
+strings from the line may contain more than one such option letter.
 
 The function can also be made to automatically complete long options
 for commands that support the `tt(--help)' option as, for example,
@@ -986,13 +1047,14 @@ replacement. E.g. some tt(configure)-scripts describe options only as
 completion of the second form, one would use `tt(-s "(#--enable-
 --disable-)")'.
 
-Finally, this function uses one configuration key: tt(option_prefix). If
-this is set to a string containing `tt(short)' or `tt(all)' as a
-substring, option names beginning with a single minus sign are added
-as possible matches only if the word on the line begins with a minus
-sign. If the value contains one of the substrings `tt(long)' or
-`tt(all)', option names beginning with two minus signs will be
-added as matches only if the two minus signs are given on the line.
+Finally, this function uses the configuration key tt(option_prefix). If
+it is set to a non-empty string, option names are added as possible
+matches only if the word on the line begins with the prefix character
+of them (i.e. a minus or a plus sign). If the value contains
+`tt(!)var(command)' as a substring, where `var(command)' is the name
+of the command that is completed for, the options are added as
+possible matches even if their prefix character is not given on the
+line.
 
 Example:
 

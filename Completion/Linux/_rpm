@@ -1,0 +1,215 @@
+#compdef rpm
+
+# This uses `_arguments' in a state-machine kind of way. These states
+# have names and before executing the default action for such a state
+# we try to call a function with the name `_rpm_<state>'. If such a
+# function exists, we return with it's return status immediatly. This
+# allows users to override the default completions by simply defining
+# these functions.
+# The states (and possible values for the `<state>' above) are:
+#
+#  query
+#    complete for `rpm -q' query
+#  verify
+#    complete for `rpm --verify'
+#  install
+#    complete for `rpm -i' or `rpm --install'
+#  upgrade
+#    complete for `rpm -U' or `rpm --upgrade'
+#  uninstall
+#    complete for `rpm -e' or `rpm --erase'
+#  build_b
+#    complete for `rpm -bx' (the stage `x' is already completed)
+#  build_t
+#    complete for `rpm -tx' (the stage `x' is already completed)
+#  sigcheck
+#    complete for `rpm --sigcheck'
+#  rebuild
+#    complete for `rpm --rebuild'
+#  package
+#    complete a RPM package name
+#  package_file
+#    complete a RPM package file name
+#  package_or_file
+#    the previous two together
+#  tags
+#    complete a tag name
+#  capability
+#    complete a capability
+#  relocate
+#    complete a `old=new' pair of paths
+
+local ret=1 tmp expl
+
+# Used by `_arguments', made local here.
+
+local state lstate line
+tyeset -A options
+
+state=''
+
+# Do simple completions or get the first state.
+
+_arguments \
+  '--rcfile:resource file:_files' \
+  '--ftpproxy:FTP proxy server:_hosts' \
+  '--ftpport:FTP port number:' \
+  '-q:*:query:->query' \
+  -{V,v,vv,y,-{setperms,setugids,querytags,initdb,showrc}} \
+  '-pipe:*:pipe command:_command_names -e' \
+  '--verify:*:verify:->verify' \
+  -{i,-install}':*:install:->install' \
+  -{U,-upgrade}':*:upgrade:->upgrade' \
+  -{e,-erase}':*:uninstall:->uninstall' \
+  -'b+:build stage:((p\:execute\ \%prep\ stage l\:do\ a\ list\ check c\:execute\ build\ stage i\:execute\ install\ stage b\:build\ a\ binary\ package a\:build\ binary\ and\ source\ packages)):*:build:->build_b' \
+  -'t+:build stage:((p\:execute\ \%prep\ stage l\:do\ a\ list\ check c\:execute\ build\ stage i\:execute\ install\ stage b\:build\ a\ binary\ package a\:build\ binary\ and\ source\ packages)):*:build:->build_t' \
+  --{rebuild,rmsource,recompile,resign,addsign}':*:RPM package:->package' \
+  -{K,-checksig}':*:sigcheck:->sigcheck' \
+  '--rebuilddb:*:rebuild:->rebuild' && ret=0
+
+# As long as we have a state name...
+
+while [[ -n "$state" ]]; do
+
+  # First try to call a user-defined function.
+
+  funcall ret _rpm_$state && return ret
+
+  # Copy the state and reset `state', to simplify the test above.
+
+  lstate="$state"
+  state=''
+  tmp=()
+
+  # Dispatch...
+
+  case "$lstate" in
+  query)
+    _arguments \
+      -{v,vv} \
+      '--rcfile:resource file:_files' \
+      '--ftpproxy:FTP proxy server:_hosts' \
+      '--ftpport:FTP port number:' \
+      '--root:RPM root directory:_files -/' \
+      '--dbpath:RPM database path:_files -/' \
+      '--queryformat:RPM query format:->tags' \
+      '-f:file:_files' \
+      '-p:RPM package file:->package_file' \
+      '--triggeredby:RPM package:->package' \
+      '--whatprovides:RPM capability:->capability' \
+      '--whatrequires:RPM capability:->capability' \
+      '*:RPM package:->package_or_file' && ret=0
+    ;;
+  verify)
+    _arguments \
+      -{v,vv} \
+      '--rcfile:resource file:_files' \
+      '--ftpproxy:FTP proxy server:_hosts' \
+      '--ftpport:FTP port number:' \
+      --no{deps,md5,files} \
+      '--root:RPM root directory:_files -/' \
+      '--dbpath:RPM database path:_files -/' \
+      '*:RPM package:->package' && ret=0
+    ;;
+  upgrade)
+    tmp=( --oldpackage )
+    ;&
+  install)
+    _arguments "$tmp[@]" \
+      -{v,vv} \
+      '--rcfile:resource file:_files' \
+      '--ftpproxy:FTP proxy server:_hosts' \
+      '--ftpport:FTP port number:' \
+      -{-{badreloc,excludedocs,force,hash,allfiles,ignorearch,ignoreos,includedocs,justdb,nodeps,noorder,noscripts,notriggers,percent,replacefiles,replacepkgs,test},h} \
+      '--relocate:relocate:->relocate' \
+      '--prefix:package prefix directory:_files -/' \
+      '--root:RPM root directory:_files -/' \
+      '--dbpath:RPM database path:_files -/' \
+      '*:pkg file:->package_file' && ret=0
+    ;;
+  uninstall)
+    _arguments \
+      -{v,vv} \
+      '--rcfile:resource file:_files' \
+      '--ftpproxy:FTP proxy server:_hosts' \
+      '--ftpport:FTP port number:' \
+      --{allmatches,justdb,nodeps,noorder,noscripts,notriggers} \
+      '--root:RPM root directory:_files -/' \
+      '--dbpath:RPM database path:_files -/' \
+      '*:RPM package:->package' && ret=0
+    ;;
+  build_b)
+    tmp=( '*:RPM package:->package' )
+    ;&
+  build_t)
+    (( $#tmp )) || tmp=( '*:tar file:_files -g \*.\(\#i\)tar\(.\*\|\)' )
+
+    _arguments \
+      -{v,vv} \
+      '--rcfile:resource file:_files' \
+      '--ftpproxy:FTP proxy server:_hosts' \
+      '--ftpport:FTP port number:' \
+      --{short-circuit,clean,rmsource,sign,test} \
+      '--buildroot:build root directory:_files -/' \
+      '--buildarch:architecture for which to build:' \
+      '--buildos:ositecture for which to build:' \
+      '--timecheck:time check (seconds):' "$tmp[1]" && ret=0
+    ;;
+  sigcheck)
+    _arguments \
+      -{v,vv} \
+      '--rcfile:resource file:_files' \
+      '--ftpproxy:FTP proxy server:_hosts' \
+      '--ftpport:FTP port number:' \
+      --no{pgp,md5} \
+      '*:RPM package file:->package_or_file' && ret=0
+    ;;
+  rebuild)
+    _arguments \
+      -{v,vv} \
+      '--rcfile:resource file:_files' \
+      '--ftpproxy:FTP proxy server:_hosts' \
+      '--ftpport:FTP port number:' \
+      '--root:RPM root directory:_files -/' \
+      '--dbpath:RPM database path:_files -/' \
+      '*:RPM source package file:->package_file' && ret=0
+    ;;
+  package_or_file)
+    state=package_file
+    ;&
+  package)
+    _description expl 'RPM package'
+    compadd "$expl[@]" -M 'r:|-=* r:|=*' - $(rpm -qa) && ret=0
+    ;;
+  package_file)
+    if compset -P ftp:; then
+      _hosts -S/ && ret=0
+    else
+      _files -g '*.(#i)rpm' && ret=0
+    fi
+    ;;
+  tags)
+    if compset -P '*\{'; then
+      _description expl 'RPM tag'
+      compadd "$expl[@]" -M 'm:{a-z}={A-Z}' -S '}' - \
+              "${(@)${(@f)$(rpm --querytags)}#RPMTAG_}" && ret=0
+    else
+      _message 'RPM format'
+    fi
+    ;;
+  capability)
+    _message 'RPM capability'
+    ;;
+  relocate)
+    if compset -P '*\='; then
+      _description expl 'new path'
+    else
+      _description expl 'old path'
+    fi
+
+    _files "$expl[@]" -/ && ret=0
+    ;;
+  esac
+done
+
+return ret

@@ -15,11 +15,11 @@ For now this is just a list of things one should or shouldn't do.
     with multiple calls to `compadd' or `compgen', supplying different
     descriptions.
 6)  Use helper functions that do option completion for you (like
-    `_arguments' and `_long_options') -- it will make your life much
+    `_arguments' and `_values') -- it will make your life much
     easier.
 7)  Use helper functions like `_users' and `_groups' instead of direct
     calls to `compgen -u' or some ad hoc mechanisms to generate such
-    information. This ensures that user can change the way these things 
+    information. This ensures that users can change the way these things 
     will be completed everywhere by just using their own implementations 
     for these functions.
 8)  Make sure that the return value of your functions is correct: zero
@@ -28,7 +28,7 @@ For now this is just a list of things one should or shouldn't do.
     for this. This should always be done by first saving the old value
     (`local nm="$compstate[nmatches]"') and later comparing this with
     the current value after all matches have been added (e.g. by
-    writing `[[ nmm -ne compstate[nmatches] ]]' at the end of your
+    writing `[[ nm -ne compstate[nmatches] ]]' at the end of your
     function). This guarantees that your functions will be re-usable
     because calling functions may rely on the correct return value.
 9)  In places where different behaviors may be useful, add a
@@ -42,3 +42,36 @@ For now this is just a list of things one should or shouldn't do.
 10) When writing helper functions that generate matches, the arguments
     of these should be given unchanged to `compadd' or `compgen' (if
     they are not used by the helper function itself).
+11) When option names are generated as possible matches, add them *with*
+    the `-', `+', or `--' at the beginning. This is the style used 
+    throughout the completion system from the distribution and makes it
+    easier to distinguish options from other matches in completion lists.
+    Also, when adding options as matches, put them in a sorted group
+    named `option'. The best way to do this is by using the `_description'
+    helper function as in:
+
+      local expl
+      _description expl option
+      compadd "$expl[@]" - <option-names ...>
+
+    Also, before adding options as possible matches, test the
+    `option_prefix' configuration key. If it set and it doesn't contain
+    the sub-string `!cmd' (where `cmd' is the name of the command that
+    is completed for) options should only be added if the prefix character
+    (`-' or `+') is on the line or if no other useful matches could be 
+    generated. This can be achieved by first generating these other matches
+    (if any) and then using a test like:
+
+      if [[ nm -eq "$compstate[nmatches]" ||
+            -z "$compconfig[option_prefix]" ||
+            "$compconfig[option_prefix]" = *\!${words[1]}* ||
+            "$PREFIX" = [-+]* ]]; then
+        # Add options...
+      fi
+
+    Finally, it is good style to display descriptions for options that
+    aren't self-explanatory. See the `_display' function and it's use
+    in `_arguments'.
+
+    All this should make it look like a really good idea to just use the
+    supplied `_arguments' function to complete options.

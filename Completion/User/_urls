@@ -6,7 +6,7 @@
 #
 # Configuration key used:
 #
-#  urls_dir
+#  urls_path
 #    The path to a directory containing a URL database, such as:
 #
 #      % cd ~/.zsh/urls
@@ -32,8 +32,8 @@ if [[ "$1" = -f ]]; then
   _files "$@" && return
 fi
 
-if [[ -z "$compconfig[urls_dir]" ]]; then
-  compconfig[urls_dir]=${ZDOTDIR:-$HOME}/.zsh/urls
+if [[ -z "$compconfig[urls_path]" ]]; then
+  compconfig[urls_path]=${ZDOTDIR:-$HOME}/.zsh/urls
 fi
 
 ipre="$IPREFIX"
@@ -52,12 +52,12 @@ case "$scheme" in
 esac
 
 if [[ "$scheme" = bookmark &&
-      -f "$compconfig[urls_dir]/$scheme/$PREFIX$SUFFIX" &&
-      -s "$compconfig[urls_dir]/$scheme/$PREFIX$SUFFIX" ]]; then
-  compadd "$@" -QU -- "$ipre$(<"$compconfig[urls_dir]/$scheme/$PREFIX$SUFFIX")"
+      -f "$compconfig[urls_path]/$scheme/$PREFIX$SUFFIX" &&
+      -s "$compconfig[urls_path]/$scheme/$PREFIX$SUFFIX" ]]; then
+  compadd "$@" -QU -- "$ipre$(<"$compconfig[urls_path]/$scheme/$PREFIX$SUFFIX")"
 else
-  dirs=($compconfig[urls_dir]/$scheme/$PREFIX*$SUFFIX(/:t))
-  files=($compconfig[urls_dir]/$scheme/$PREFIX*$SUFFIX(.:t))
+  dirs=($compconfig[urls_path]/$scheme/$PREFIX*$SUFFIX(/:t))
+  files=($compconfig[urls_path]/$scheme/$PREFIX*$SUFFIX(.:t))
   compset -P '*/'
   compadd "$@" -Q -S '/' - $dirs
   if [[ "$scheme" = bookmark ]]; then
