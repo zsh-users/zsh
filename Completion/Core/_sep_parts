@@ -57,7 +57,7 @@ while [[ $# -gt 1 ]]; do
 
   # Get the matching array elements.
 
-  PREFIX="${str%%${sep}*}"
+  PREFIX="${str%%(|\\)${sep}*}"
   builtin compadd -O testarr - "${(@P)arr}"
   [[ $#testarr -eq 0 && -n "$_comp_correct" ]] &&
     compadd -O testarr - "${(@P)arr}"
@@ -129,7 +129,7 @@ while [[ $# -gt 0 && "$str" == *${1}* ]]; do
   [[ $#tmparr -eq 0 && -n "$_comp_correct" ]] &&
     compadd -O tmparr - "${(@P)arr}"
 
-  suffixes=("${(@)^suffixes[@]}${1}${(@)^tmparr}")
+  suffixes=("${(@)^suffixes[@]}${(q)1}${(@)^tmparr}")
 
   # We want the completion code to generate the most specific suffix
   # for us, so we collect matching specifications that allow partial
@@ -142,7 +142,7 @@ done
 # If we were given at least one more separator we make the completion
 # code offer it by appending it as a autoremovable suffix.
 
-(( $# )) && autosuffix=(-qS "$1")
+(( $# )) && autosuffix=(-qS "${(q)1}")
 
 # If we have collected matching specifications, we build an array
 # from it that can be used as arguments to `compadd'.
