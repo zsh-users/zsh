@@ -1,0 +1,140 @@
+#compdef -k complete-word \C-xn
+
+# Main widget.
+
+_next_tags() {
+  setopt localoptions ${_comp_options[@]}
+
+  local ins ops="$PREFIX$SUFFIX"
+
+  unfunction _all_labels _next_label
+
+  _all_labels() {
+    local gopt=-J len tmp pre suf ret=1 descr spec
+
+    if [[ "$1" = -([12]|)[VJ] ]]; then
+      gopt="$1"
+      shift
+    fi
+
+    tmp=${argv[(ib:4:)-]}
+    len=$#
+    if [[ tmp -lt len ]]; then
+      pre=$(( tmp-1 ))
+      suf=$tmp
+    elif [[ tmp -eq $# ]]; then
+      pre=-2
+      suf=$(( len+1 ))
+    else
+      pre=4
+      suf=5
+    fi
+
+    while comptags -A "$1" curtag spec; do
+      [[ "$_next_tags_not" = *\ ${spec}\ * ]] && continue
+      _comp_tags="$_comp_tags $spec "
+      if [[ "$curtag" = *:* ]]; then
+        zformat -f descr "${curtag#*:}" "d:$3"
+        _description "$gopt" "${curtag%:*}" "$2" "$descr"
+        curtag="${curtag%:*}"
+
+        "$4" "${(P@)2}" "${(@)argv[5,-1]}"
+      else
+        _description "$gopt" "$curtag" "$2" "$3"
+
+        "${(@)argv[4,pre]}" "${(P@)2}" "${(@)argv[suf,-1]}" && ret=0
+      fi
+    done
+
+    return ret
+  }
+
+  _next_label() {
+    local gopt=-J descr spec
+
+    if [[ "$1" = -([12]|)[VJ] ]]; then
+      gopt="$1"
+      shift
+    fi
+
+    if comptags -A "$1" curtag spec; then
+      [[ "$_next_tags_not" = *\ ${spec}\ * ]] && continue
+      _comp_tags="$_comp_tags $spec "
+      if [[ "$curtag" = *:* ]]; then
+        zformat -f descr "${curtag#*:}" "d:$3"
+        _description "$gopt" "${curtag%:*}" "$2" "$descr"
+        curtag="${curtag%:*}"
+	set -A "$2" "${(P@)2}" "${(@)argv[4,-1]}"
+      else
+        _description "$gopt" "$curtag" "$2" "$3"
+	set -A "$2" "${(@)argv[4,-1]}" "${(P@)2}"
+      fi
+
+      return 0
+    fi
+
+    return 1
+  }
+
+  if [[ "${LBUFFER%${PREFIX}}" = "$_next_tags_pre" ]]; then
+    PREFIX="$_next_tags_pfx"
+    SUFFIX="$_next_tags_sfx"
+  else
+    _next_tags_pre="${LBUFFER%${PREFIX}}"
+    if [[ "$LASTWIDGET" = (_next_tags|list-*|*complete*) ]]; then
+      PREFIX="$_lastcomp[prefix]"
+      SUFFIX="$_lastcomp[suffix]"
+    fi
+  fi
+
+  _next_tags_not="$_next_tags_not $_lastcomp[tags]"
+  _next_tags_pfx="$PREFIX"
+  _next_tags_sfx="$SUFFIX"
+
+  if [[ -n "$compstate[old_insert]" ]]; then
+    ins=1
+  else
+    ins=unambiguous
+  fi
+
+  _main_complete _complete _next_tags_completer
+
+  [[ $compstate[insert] = automenu ]] && compstate[insert]=automenu-unambiguous
+  [[ $compstate[insert] = *unambiguous && -n "$ops" &&
+     -z "$_lastcomp[unambiguous]" ]] && compadd -Uns "$SUFFIX" - "$PREFIX"
+
+  compstate[insert]="$ins"
+  compstate[list]='list force'
+
+  compprefuncs=( "$compprefuncs[@]" _next_tags_pre )
+}
+
+# Completer, for wrap-around.
+
+_next_tags_completer() {
+  _next_tags_not=
+
+  _complete
+}
+
+# Pre-completion function.
+
+_next_tags_pre() {
+
+  # Probably `remove' our label functions. A better test would be nice, but
+  # I think one should still be able to edit the current word between
+  # attempts to complete it.
+
+  if [[ -n $compstate[old_insert] && $WIDGET != _next_tags ]]; then
+    compstate[old_list]=keep
+    compstate[insert]=menu:2
+    return 0
+  elif [[ ${LBUFFER%${PREFIX}} != ${_next_tags_pre}* ]]; then
+    unfunction _all_labels _next_label
+    autoload -U _all_labels _next_label
+  else
+    compprefuncs=( "$compprefuncs[@]" _next_tags_pre )
+  fi
+}
+
+_next_tags "$@"
