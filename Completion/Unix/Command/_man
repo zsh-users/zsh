@@ -40,8 +40,28 @@ _man() {
     dirs=( $^manpath/(sman|man|cat)*/ )
     awk='{print $1}'
   fi
+  if zstyle -t ":completion:${curcontext}:manuals" separate-sections; then
+    typeset -U sects
+    local ret=1
 
-  _wanted manuals expl 'manual page' _man_pages
+    sects=( ${(o)${dirs##*(man|cat)}%/} )
+
+    (( $#sects )) || return 1
+
+    _tags manuals.${^sects}
+    while _tags; do
+      for sect in $sects; do
+        _requested manuals.$sect expl "manual page, section $sect" _man_pages &&
+            ret=0
+      done
+      (( ret )) || return 0
+    done
+
+    return 1
+  else
+    sect=
+    _wanted manuals expl 'manual page' _man_pages
+  fi
 }
 
 _man_pages() {
@@ -56,7 +76,7 @@ _man_pages() {
     matcher=
   fi
 
-  pages=( $dirs )
+  pages=( ${(M)dirs:#*$sect/} )
   compfiles -p pages '' '' "$matcher" '' dummy '*'
   pages=( ${^~pages}(N:t:r) )
 

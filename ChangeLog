@@ -1,3 +1,10 @@
+2002-01-10  Sven Wischnowsky  <wischnow@zsh.org>
+
+	* 16426: Completion/Unix/Command/_man,
+	Completion/Zsh/Command/_zstyle, Doc/Zsh/compsys.yo: allow
+	manual pages to be shown separated by section with new
+	separate-sections style
+
 2002-01-10  Peter Stephenson  <pws@csr.com>
 
 	* 16423: Src/params.c: Don't let convfloat output a number
