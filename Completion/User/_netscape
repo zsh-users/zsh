@@ -1,0 +1,75 @@
+#compdef netscape
+
+local state
+
+_x_arguments \
+  '-xrm:resource:_x_resource' \
+  '-help[show usage message]' \
+  '-version[show the version number and build date]' \
+  '-visual[use a specific server visual]:id-or-number:' \
+  '-install[install a private colormap]' \
+  '-no-install[use the default colormap]' \
+  '-ncols[max no. of colors to allocate for images]:n:' \
+  '-mono[force 1-bit-deep image display]' \
+  '-iconic[start up iconified]' \
+  '-remote[execute a command in an existing Netscape]:remote command:->remote' \
+  '-id[id of X window to send remote commands to]:window-id:' \
+  '-raise[raise window following remote command]' \
+  "-noraise[don't raise window following remote command]" \
+  '-nethelp[show nethelp]' \
+  -{dont-force-window-stacking,no-about-splash} \
+  -{,no-}{,irix-}session-management \
+  -{done-save,ignore}-geometry-prefs \
+  -{component-bar,composer,edit,messenger,mail,discussions,news} \
+  '*:location:->urls'
+
+[ "$state" = "urls" ] && _files "$@" && return
+
+# Handle netscape remote commands
+if [ "$state" = "remote" ]; then  
+  local -a remote_commands
+  remote_commands=(openURL openFile saveAs mailto addBookmark)
+
+  [[ $compstate[quoting] = (double|single) ]] && compset -q
+  compset -P '*\('
+  case $IPREFIX in
+    openURL*|addBookmark* ) state=urls;;
+    openFile* ) _files -W ~;;
+    saveAs* ) 
+      if compset -P "*,"; then
+        compadd -s")" -M 'm:{a-zA-Z}={A-Za-z}' HTML Text PostScript
+      else
+        _path_files -W ~
+      fi
+    ;;
+    mailto* )
+      compset -P "*,"
+      if compset -P '*@'; then
+        _description expl 'remote host name'
+        _hosts "$expl[@]" -q -S,
+      else
+        _description expl 'login name'
+        _users "$expl[@]" -q -S@
+      fi
+    ;;
+    * )
+      if [ "$QIPREFIX" ]; then
+        compadd -q -S '(' -M 'm:{a-zA-Z}={A-Za-z}' $remote_commands
+      else
+	compadd -s'(' -S '' -M 'm:{a-zA-Z}={A-Za-z}' $remote_commands
+      fi
+    ;;
+  esac
+fi
+
+if [ "$state" = "urls" ]; then
+  # Complete netscape urls
+  if [[ -prefix about: ]]; then
+    compset -P about:
+    compadd authors blank cache document fonts global hype image-cache \
+        license logo memory-cache mozilla plugins
+  else
+    compadd -S '' about: mocha: javascript:
+    _urls "$@"
+  fi
+fi

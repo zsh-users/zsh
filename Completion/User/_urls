@@ -4,7 +4,7 @@
 # Options:
 #  -f : complete files.
 #
-# Configuration key used:
+# Configuration keys used:
 #
 #  urls_path
 #    The path to a directory containing a URL database, such as:
@@ -28,8 +28,16 @@
 #      http://sunsite.auc.dk/zsh/
 #      % cat bookmark/zsh/meta
 #      http://www.zsh.org/
+#
+#  urls_localhttp
+#    Specify a local web server in the form:
+#      hostname:doc root:user area
+#    where hostname is the name of the web server, doc root is the path to
+#    the default web pages for the server and user area is the directory
+#    name used by a user placing web pages within their home area.
+#    e.g. compconf urls_localhttp=www:/usr/local/apache/htdocs:public_html
 
-local ipre scheme dirs files
+local ipre scheme host user dirs files ret=1
 
 if [[ "$1" = -f ]]; then
   shift
@@ -46,37 +54,67 @@ if [[ -prefix [-+.a-z0-9]#: ]]; then
   scheme="${PREFIX%%:*}"
   compset -P "[-+.a-z0-9]#:"
 else
-  compadd "$@" -S '' http:// ftp:// bookmark: file:
-  return
+  [ -d $compconfig[urls_path]/bookmark ] &&
+      compadd "$@" -S '' bookmark: && ret=0
+  compadd "$@" -S '' file: ftp:// gopher:// http:// && ret=0
+  return $ret
 fi
 
 case "$scheme" in
-  http|ftp) compset -P // || { compadd "$@" -S '' //; return };;
+  http|ftp|gopher) compset -P // || { compadd "$@" -S '' //; return };;
   file)
-    if [[ -prefix // ]]; then
-      compset -P //
-    elif [ -prefix / ]; then
-      _files "$@"
-      return
-    elif [ ! "$PREFIX" ]; then
-      compadd -S '/' ~+
-      return
+    if ! compset -P //; then
+      if [ -prefix / ]; then
+	_files "$@"
+	return
+      elif [ ! "$PREFIX" ]; then
+	compadd -S '/' - "${PWD%/}"
+	return
+      fi
     fi
+  ;;
+  bookmark)
+    if [[ -f "$compconfig[urls_path]/$scheme/$PREFIX$SUFFIX" &&
+        -s "$compconfig[urls_path]/$scheme/$PREFIX$SUFFIX" ]]; then
+      compadd "$@" -QU -- \
+          "$ipre$(<"$compconfig[urls_path]/$scheme/$PREFIX$SUFFIX")"
+    else
+      compadd "$@" -Q -S '/' - \
+          $compconfig[urls_path]/$scheme/$PREFIX*$SUFFIX(/:t) && ret=0
+      compadd "$@" -QS '' - \
+          $compconfig[urls_path]/$scheme/$PREFIX*$SUFFIX(.:t) || return $ret
+    fi
+    return 
   ;;
 esac
 
-if [[ "$scheme" = bookmark &&
-      -f "$compconfig[urls_path]/$scheme/$PREFIX$SUFFIX" &&
-      -s "$compconfig[urls_path]/$scheme/$PREFIX$SUFFIX" ]]; then
-  compadd "$@" -QU -- "$ipre$(<"$compconfig[urls_path]/$scheme/$PREFIX$SUFFIX")"
-else
-  dirs=($compconfig[urls_path]/$scheme/$PREFIX*$SUFFIX(/:t))
-  files=($compconfig[urls_path]/$scheme/$PREFIX*$SUFFIX(.:t))
-  compset -P '*/'
-  compadd "$@" -Q -S '/' - $dirs
-  if [[ "$scheme" = bookmark ]]; then
-    compadd "$@" -QS '' - $files
+if [[ -prefix */* ]]; then
+
+  # Complete part after hostname
+  host=${PREFIX%%/*}
+  compset -P "$host/"
+  if [[ "$compconfig[urls_localhttp]" = ${host}:* ]]; then
+    if [[ -prefix \~ ]]; then
+      compset -P \~
+      if [[ -prefix */* ]]; then
+        user=${PREFIX%%/*}
+	compset -P $user/
+	_path_files -W ~$user/${${(s.:.)compconfig[urls_localhttp]}[3]}/
+      else
+        _users -S/
+      fi
+    else
+      _path_files -W ${${(s.:.)compconfig[urls_localhttp]}[2]}
+    fi
   else
-    compadd "$@" -Q - $files
+    _path_files -W $compconfig[urls_path]/$scheme/$host/
   fi
+else
+
+  # Complete hosts
+  dirs=($compconfig[urls_path]/$scheme/$PREFIX*$SUFFIX(/:t))
+  (( $#dirs )) || _hosts -S/ && ret=0
+  [ "$scheme" = "http" ] && 
+      dirs=($dirs ${${(s.:.)compconfig[urls_localhttp]}[1]})
+  compadd "$@" -Q -S '/' - $dirs || return $ret
 fi

@@ -1658,6 +1658,15 @@ generate process IDs as matches. These functions will display the
 output of tt(ps) called with the value of this key as its argument
 when showing completion lists.
 )
+item(tt(urls_localhttp))(
+This key is used by completion functions which generate URLs as
+possible matches to add suitable matches when a URL points to a
+local web server. Its value should be of the form
+`tt(hostname:doc root:user area)' where hostname is the name of the web
+server, doc root is the path to the default web pages for the server
+and user area is the directory name used by a user placing web pages
+within their home area
+)
 item(tt(urls_path))(
 This key is used by completion functions that generate URLs as
 possible matches. It should be set to the path of a directory
