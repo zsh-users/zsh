@@ -835,6 +835,7 @@ zleread(char *lp, char *rp, int flags, int context)
 	args[1] = NULL;
 	execzlefunc(initthingy, args);
 	unrefthingy(initthingy);
+	errflag = retflag = 0;
     }
 
     zlecore();
