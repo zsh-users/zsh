@@ -517,16 +517,14 @@ space from the sorted ones, so groups defined as tt(-J files) and tt(-V
 files) are distinct.
 )
 item(tt(-1))(
-If given together with the tt(-J) option, makes duplicate matches in
-the group be kept. If given together with the tt(-V) option, makes
+If given together with the tt(-V) option, makes
 only consecutive duplicates in the group be removed. Note that groups
 with and without this flag are in different name spaces.
 )
 item(tt(-2))(
-If given together with the tt(-J) option, behaves the same as
-tt(-J). If given together with the tt(-V) option, keep all duplicate
-matches. Again, groups with and without this flag are in different
-name spaces.
+If given together with the tt(-J) or tt(-V) option, makes all
+duplicates be kept. Again, groups with and without this flag are in
+different name spaces.
 )
 item(tt(-M) var(match-spec))(
 This defines additional matching control specifications that should be used

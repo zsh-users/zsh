@@ -315,8 +315,8 @@ putcolstr(Listcols c, char *n, mode_t m)
 /* Information about the list shown. */
 
 static int noselect, mselect, inselect, mcol, mline, mcols, mlines;
-static Cmatch *mmatch, **mtab;
-static Cmgroup mgroup, *mgtab;
+static Cmatch **mtab, **mmtabp;
+static Cmgroup *mgtab, *mgtabp;
 static struct listcols mcolors;
 
 
@@ -346,11 +346,11 @@ clprintm(Cmgroup g, Cmatch *mp, int mc, int ml, int lastc, int width,
 
 	    mtab[mm] = mp;
 	    mgtab[mm] = g;
+	    mmtabp = mtab + mm;
+	    mgtabp = mgtab + mm;
 	}
 	if (m->gnum == mselect) {
 	    mline = ml;
-	    mmatch = mp;
-	    mgroup = g;
 	    cc = COL_MA;
 	} else
 	    cc = COL_NO;
@@ -377,12 +377,12 @@ clprintm(Cmgroup g, Cmatch *mp, int mc, int ml, int lastc, int width,
 
 	    mtab[mx + mm] = mp;
 	    mgtab[mx + mm] = g;
+	    mmtabp = mtab + mx + mm;
+	    mgtabp = mgtab + mx + mm;
 	}
 	if (m->gnum == mselect) {
 	    mcol = mx;
 	    mline = ml;
-	    mmatch = mp;
-	    mgroup = g;
 	    zcputs(&mcolors, COL_MA);
 	} else if (buf)
 	    putcolstr(&mcolors, path, buf->st_mode);
@@ -557,10 +557,8 @@ domenuselect(Hookdef dummy, Chdata dat)
 		break;
 	    i = 1;
 	}
-	p = mtab + mcol + (mline * mcols);
-	pg = mgtab + mcol + (mline * mcols);
-	minfo.cur = *p;
-	minfo.group = *pg;
+	p = mmtabp;
+	pg = mgtabp;
 
     getk:
 

@@ -7192,8 +7192,19 @@ static int
 matchcmp(Cmatch *a, Cmatch *b)
 {
     if ((*a)->disp) {
-	if ((*b)->disp)
-	    return strcmp((*a)->disp, (*b)->disp);
+	if ((*b)->disp) {
+	    if ((*a)->flags & CMF_DISPLINE) {
+		if ((*b)->flags & CMF_DISPLINE)
+		    return strcmp((*a)->disp, (*b)->disp);
+		else
+		    return -1;
+	    } else {
+		if ((*b)->flags & CMF_DISPLINE)
+		    return 1;
+		else
+		    return strcmp((*a)->disp, (*b)->disp);
+	    }
+	}
 	return -1;
     }
     if ((*b)->disp)
@@ -7264,7 +7275,7 @@ makearray(LinkList l, int type, int flags, int *np, int *nlp, int *llp)
 	    qsort((void *) rp, n, sizeof(Cmatch),
 		  (int (*) _((const void *, const void *)))matchcmp);
 
-	    if (!(flags & (CGF_UNIQALL | CGF_UNIQCON))) {
+	    if (!(flags & CGF_UNIQCON)) {
 		/* And delete the ones that occur more than once. */
 		for (ap = cp = rp; *ap; ap++) {
 		    *cp++ = *ap;
