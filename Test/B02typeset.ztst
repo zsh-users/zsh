@@ -223,9 +223,9 @@
 >scalar a r y
 
  # The first declare works around the "not an identifier" bug with -h
- declare \! \# \$ * - ? @
- typeset -h +g -m *
- unset -m *
+ declare \! \# \$ \* - \? @
+ typeset -h +g -m \*
+ unset -m \*
  integer i=9
  float -H f=9
  declare -t scalar

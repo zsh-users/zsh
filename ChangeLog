@@ -1,3 +1,9 @@
+2002-11-26  Peter Stephenson  <pws@csr.com>
+
+	* 17967: Test/B02typeset.ztst: globbable arguments to
+	typeset-style commands should be quoted.  N.B.: test currently
+	still fails.
+
 2002-11-25  Oliver Kiddle  <opk@zsh.org>
 
 	* 17961: Armin Wolfermann: Completion/Unix/Command/_sysctl:
