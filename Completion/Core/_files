@@ -6,7 +6,7 @@ zparseopts -a opts \
     '/=tmp' 'f=tmp' 'g+:-=tmp' q n 1 2 P: S: r: R: W: X+: M+: F: J+: V+:
 
 type="${(@j::M)${(@)tmp#-}#?}"
-(( $tmp[(I)-g*] )) && glob="${(j: :)${(M)tmp:#-g*}#-g}"
+(( $tmp[(I)-g*] )) && glob="${(j: :)${(@M)tmp:#-g*}#-g}"
 ign=$opts[(I)-F]
 if (( ign )); then
   ign=( $=opts[ign+1] )

@@ -140,7 +140,7 @@ if [[ $compstate[old_list] = keep || $compstate[nmatches] -gt 1 ]]; then
     else
       sel=( "${(@M)_menu_style:#select*}" )
 
-      if (( $# )); then
+      if (( $#sel )); then
         local min=9999999 i num
 
         for i in "$sel[@]"; do
