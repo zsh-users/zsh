@@ -1,3 +1,9 @@
+2002-01-30  Sven Wischnowsky  <wischnow@zsh.org>
+
+	* 16515: Completion/Zsh/Command/_cd: fixlet to avoid an empty
+	string in an array; cause completion after cd without any
+	matches to not report that there were no matches
+
 2002-01-29  Clint Adams  <clint@zsh.org>
 
 	* 16514: Completion/Unix/Command/_init_d: do not attempt

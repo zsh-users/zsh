@@ -34,6 +34,8 @@ else
   if [[ $PREFIX != (\~|/|./|../)* ]]; then
     local tmpcdpath alt
 
+    alt=()
+
     tmpcdpath=(${${(@)cdpath:#.}:#$PWD})
 
     (( $#tmpcdpath )) &&
