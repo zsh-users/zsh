@@ -697,7 +697,7 @@ bin_zle_fd(char *name, char **args, char *ops, char func)
 
     if (ops['L'] || !*args) {
 	/* Listing handlers. */
-	if (args[1]) {
+	if (*args && args[1]) {
 	    zwarnnam(name, "too many arguments for -FL", NULL, 0);
 	    return 1;
 	}

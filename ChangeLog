@@ -1,5 +1,8 @@
 2002-06-05  Peter Stephenson  <pws@pwstephenson.fsnet.co.uk>
 
+	* 17295: Src/Zle/zle_thingy.c: `zle -F' could fail because
+	it examined non-existent arguments.
+
 	* 17294: Src/Modules/tcp.c: remove session even if closing fd
 	failed; remove builtin from hash table when unloading module.
 
