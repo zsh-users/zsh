@@ -9,7 +9,7 @@ fi
 
 if comptags -R "$1"; then
   if [[ $# -gt 3 ]]; then
-    _all_labels - "$gopt" "$@"
+    _all_labels - "$gopt" "$@" || return 1
   elif [[ $# -gt 1 ]]; then
     _description "$gopt" "$@"
   fi

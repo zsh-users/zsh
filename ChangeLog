@@ -1,3 +1,7 @@
+2000-05-04  Tanaka Akira  <akr@zsh.org>
+
+	* 11157: Completion/Core/_requested: fail if _all_labels is failed.
+
 2000-05-04  Peter Stephenson  <pws@cambridgesiliconradio.com>
 
 	* 11147: Test/08traps.ztst: test for trap bugs fixed in
