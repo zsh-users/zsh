@@ -165,8 +165,9 @@ get_pty(int master, int *retfd)
 {
     static char *name;
     static int mfd, sfd;
-
+#if defined(I_FIND) && defined(I_PUSH) && defined(__SVR4)
     int ret;
+#endif
 
     if (master) {
 	if ((mfd = open("/dev/ptmx", O_RDWR|O_NOCTTY)) < 0)
