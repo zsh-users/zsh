@@ -1219,18 +1219,18 @@ comp_wrapper(Eprog prog, FuncWrap w, char *name)
 	orest = comprestore;
 	comprestore = ztrdup("auto");
 	ocur = compcurrent;
-	opre = dupstring(compprefix);
-	osuf = dupstring(compsuffix);
-	oipre = dupstring(compiprefix);
-	oisuf = dupstring(compisuffix);
-	oqipre = dupstring(compqiprefix);
-	oqisuf = dupstring(compqisuffix);
-	oq = dupstring(compquote);
-	oqi = dupstring(compquoting);
-	oqs = dupstring(compqstack);
-	oaq = dupstring(autoq);
+	opre = ztrdup(compprefix);
+	osuf = ztrdup(compsuffix);
+	oipre = ztrdup(compiprefix);
+	oisuf = ztrdup(compisuffix);
+	oqipre = ztrdup(compqiprefix);
+	oqisuf = ztrdup(compqisuffix);
+	oq = ztrdup(compquote);
+	oqi = ztrdup(compquoting);
+	oqs = ztrdup(compqstack);
+	oaq = ztrdup(autoq);
 
-	HEAPALLOC {
+	PERMALLOC {
 	    owords = arrdup(compwords);
 	} LASTALLOC;
 
@@ -1239,38 +1239,48 @@ comp_wrapper(Eprog prog, FuncWrap w, char *name)
 	if (comprestore && !strcmp(comprestore, "auto")) {
 	    compcurrent = ocur;
 	    zsfree(compprefix);
-	    compprefix = ztrdup(opre);
+	    compprefix = opre;
 	    zsfree(compsuffix);
-	    compsuffix = ztrdup(osuf);
+	    compsuffix = osuf;
 	    zsfree(compiprefix);
-	    compiprefix = ztrdup(oipre);
+	    compiprefix = oipre;
 	    zsfree(compisuffix);
-	    compisuffix = ztrdup(oisuf);
+	    compisuffix = oisuf;
 	    zsfree(compqiprefix);
-	    compqiprefix = ztrdup(oqipre);
+	    compqiprefix = oqipre;
 	    zsfree(compqisuffix);
-	    compqisuffix = ztrdup(oqisuf);
+	    compqisuffix = oqisuf;
 	    zsfree(compquote);
-	    compquote = ztrdup(oq);
+	    compquote = oq;
 	    zsfree(compquoting);
-	    compquoting = ztrdup(oqi);
+	    compquoting = oqi;
 	    zsfree(compqstack);
-	    compqstack = ztrdup(oqs);
+	    compqstack = oqs;
 	    zsfree(autoq);
-	    autoq = ztrdup(oaq);
+	    autoq = oaq;
 	    freearray(compwords);
-	    PERMALLOC {
-		compwords = arrdup(owords);
-	    } LASTALLOC;
+	    compwords = owords;
 	    comp_setunset(CP_COMPSTATE |
 			  (~runset & (CP_WORDS | CP_CURRENT | CP_PREFIX |
 				     CP_SUFFIX | CP_IPREFIX | CP_ISUFFIX |
 				     CP_QIPREFIX | CP_QISUFFIX)),
 			  (runset & CP_ALLREALS),
 			  (~kunset & CP_RESTORE), (kunset & CP_ALLKEYS));
-	} else
+	} else {
 	    comp_setunset(CP_COMPSTATE, 0, (~kunset & CP_RESTORE),
 			  (kunset & CP_RESTORE));
+	    zsfree(opre);
+	    zsfree(osuf);
+	    zsfree(oipre);
+	    zsfree(oisuf);
+	    zsfree(oqipre);
+	    zsfree(oqisuf);
+	    zsfree(oq);
+	    zsfree(oqi);
+	    zsfree(oqs);
+	    zsfree(oaq);
+	    freearray(owords);
+	}
 	zsfree(comprestore);
 	comprestore = orest;
 
