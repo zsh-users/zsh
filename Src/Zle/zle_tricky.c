@@ -2617,6 +2617,7 @@ comp_match(char *pfx, char *sfx, char *w, Comp cp,
 	    chuck(r);
 	/* We still break it into parts here, trying to build a sensible
 	 * cline list for these matches, too. */
+	w = dupstring(w);
 	wl = strlen(w);
 	*clp = bld_parts(w, wl, wl, NULL);
 	*exact = 0;
