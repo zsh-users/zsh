@@ -1,3 +1,7 @@
+2001-03-06  Oliver Kiddle  <opk@zsh.org>
+
+	* unposted: Completion/User/.distfiles: include _w3m
+
 2001-03-06  Clint Adams  <schizo@debian.org>
 
 	* unposted: Completion/User/_w3m: complete for w3m.

@@ -14,6 +14,6 @@ DISTFILES_SRC='
     _sh _slrn _socket _ssh _strip _stty _su _sudo
     _tar _tar_archive _telnet _tex _texi _tiff _tilde_files _tin
     _urls _use_lo _user_at_host _users _users_on
-    _webbrowser _wget _whereis _whois _xargs _yodl _yp
+    _w3m _webbrowser _wget _whereis _whois _xargs _yodl _yp
     _zcat _zdump
 '
