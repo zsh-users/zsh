@@ -80,7 +80,7 @@ _baz_namespace () { #double as arch_namespace_categories
     compset -P '*/'
     archive=${IPREFIX%/*}
     _description -V categories expl "${library:-}categories in $archive"
-    compadd $suffix "$expl[@]" `$BAZ ${library:-}categories -A $archive`
+    compadd $suffix "$expl[@]" `$BAZ ${library:-}categories $archive`
   elif [ -z $IPREFIX ]; then
     local index=$(( words[(i)-A] + 1 ))
     (( index < CURRENT )) || index=$(( words[(i)--archive] + 1 ))
@@ -88,7 +88,7 @@ _baz_namespace () { #double as arch_namespace_categories
 
     if [ $archive ]; then
       _description -V categories expl "${library:-}categories in $archive"
-      compadd "$expl[@]" $suffix `$BAZ ${library:-}categories -A $archive`
+      compadd "$expl[@]" $suffix `$BAZ ${library:-}categories $archive`
     fi
 
     _baz_archives -S / ${library:+--library}
@@ -111,7 +111,7 @@ _baz_namespace_branches () {
     local category=${IPREFIX%--}
     _description -V branches expl "${library:-}branches"
     compadd $suffix "$expl[@]" \
-      ${${(@)$($BAZ ${library:-}branches -A $archive $category)}##*--}
+      ${${(@)$($BAZ ${library:-}branches $archive/$category)}##*--}
   fi
   if [ $1 -gt 1 ] && [[ $IPREFIX = *-- ]] && [[ $PREFIX = *--* ]]; then
     _baz_namespace_versions $(($1 - 1))
@@ -129,7 +129,7 @@ _baz_namespace_versions () {
     local branch=${IPREFIX%--}
     _description -V versions expl "${library:-}versions"
     compadd $suffix "$expl[@]" \
-      ${${(@)$($BAZ ${library:-}versions -A $archive $branch)}##*--}
+      ${${(@)$($BAZ ${library:-}versions $archive/$branch)}##*--}
   fi
   if [ $1 -gt 1 ] && [[ $IPREFIX = *--*-- ]] && ([[ $IPREFIX = */*--*-- ]] \
     || [[ $PREFIX != */* ]]) && [[ $PREFIX = *--* ]]; then
@@ -146,22 +146,16 @@ _baz_namespace_revisions () {
     _description -V revisions expl "${library:-}revisions"
     local completions c
     completions=(
-      ${${(@)$($BAZ ${library:-}revisions -A $archive $version)}##*--}
+      ${${(@)$($BAZ ${library:-}revisions $archive/$version)}##*--}
     )
     (( exclude_library_revisions )) && \
-        foreach c ($($BAZ library-revisions -A $archive $version)); do completions[(r)$c]=(); done
+        foreach c ($($BAZ library-revisions $archive/$version)); do completions[(r)$c]=(); done
     compadd "$expl[@]" -a completions
   fi
 }
 
 (( $+functions[_baz_config] )) ||
 _baz_config () {
-
-  # zsh 4.1.1+ is recommended; 4.0.6 gives the error below when doing
-  # baz build-config e<TAB>
-  # _path_files:322: no matches found: configs//e/.(/)
-  # whereas 4.1.1 completes correctly
-
   local configdir root ret=1 n expl
 
   n=$opt_args[(i)(-d|--dir)]
@@ -192,7 +186,7 @@ _baz_limit () { #presently only does push-mirror style limits
 
     if [[ $PREFIX != *--* ]]; then
       _description -V categories expl "categories in $archive"
-      compadd -q -S -- "$expl[@]" `$BAZ categories -A $archive`
+      compadd -q -S -- "$expl[@]" `$BAZ categories $archive`
     else
       _baz_namespace_branches 3
     fi
