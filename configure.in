@@ -562,7 +562,12 @@ esac])dnl
 AC_SEARCH_LIBS(tgetent, [$termcap_curses_order])
 case "$LIBS" in
 *curses*)
-AC_CHECK_HEADERS(curses.h term.h)
+AC_CACHE_CHECK(for curses.h, ac_cv_header_curses_h,
+AC_TRY_COMPILE([#include <curses.h>], [],
+[ac_cv_header_curses_h=yes
+AC_DEFINE(HAVE_CURSES_H)],
+ac_cv_header_curses_h=no))
+AC_CHECK_HEADERS(term.h)
 if test x$ac_cv_header_term_h = xyes; then
 
 AC_MSG_CHECKING(if term.h needs curses.h)
