@@ -1252,6 +1252,7 @@ struct histent {
 #define HIST_READ	0x00000004	/* Command was read back from disk*/
 #define HIST_DUP	0x00000008	/* Command duplicates a later line */
 #define HIST_FOREIGN	0x00000010	/* Command came from another shell */
+#define HIST_TMPSTORE	0x00000020	/* Kill when user enters another cmd */
 
 #define GETHIST_UPWARD  (-1)
 #define GETHIST_DOWNWARD  1
