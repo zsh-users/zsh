@@ -310,14 +310,6 @@ struct timezone {
 # endif  /* HAVE_TERMIO_H  */
 #endif   /* HAVE_TERMIOS_H */
 
-#ifdef HAVE_TERMCAP_H
-# include <termcap.h>
-#else
-# ifdef HAVE_TERM_H
-#  include <term.h>
-# endif
-#endif
-
 #if defined(GWINSZ_IN_SYS_IOCTL) || defined(CLOBBERS_TYPEAHEAD)
 # include <sys/ioctl.h>
 #endif

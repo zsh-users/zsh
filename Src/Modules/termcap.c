@@ -27,12 +27,16 @@
  *
  */
 
+#define USES_TERMCAP_H 1
 #include "termcap.mdh"
 #include "termcap.pro"
 
 /* echotc: output a termcap */
 
 #ifdef HAVE_TGETENT
+# ifdef HAVE_TERMCAP_H
+#  include <termcap.h>
+# endif
 
 /**/
 static int

@@ -27,6 +27,7 @@
  *
  */
 
+#define USES_TERM_H 1
 #include "terminfo.mdh"
 #include "terminfo.pro"
 
@@ -34,8 +35,20 @@ static char terminfo_nam[] = "terminfo";
 
 /**/
 #ifdef HAVE_TIGETSTR
+
+/* The following two undefs are needed for Solaris 2.6 */
+# ifdef VINTR
+#  undef VINTR
+# endif
+# ifdef offsetof
+#  undef offsetof
+# endif
+
 # ifdef HAVE_CURSES_H
 #  include <curses.h>
+# endif
+# ifdef HAVE_TERM_H
+#  include <term.h>
 # endif
 
 static Param terminfo_pm;

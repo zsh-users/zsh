@@ -33,7 +33,7 @@ char *realloc _((void *, size_t));
 char *calloc _((size_t, size_t));
 #endif
 
-#if !(defined(HAVE_TERMCAP_H) || defined(HAVE_TERM_H))
+#if !(defined(USES_TERMCAP_H) || defined(USES_TERM_H))
 extern int tgetent _((char *bp, char *name));
 extern int tgetnum _((char *id));
 extern int tgetflag _((char *id));
