@@ -1,3 +1,9 @@
+2005-02-14  Peter Stephenson  <pws@csr.com>
+
+	* 20811: configure.ac: Copy the trick for finding the
+	file with signal names to make finding the file with resource
+	names more reliable.
+
 2005-02-10  Wayne Davison  <wayned@users.sourceforge.net>
 
 	* unposted: Completion/Unix/Command/_yodl:  Added missing

@@ -1275,13 +1275,26 @@ dnl Look for the file containing the RLIMIT_* definitions
 dnl -----------------------------------------------------
 dnl CALL FOR MORE (FEWER?) LOCATIONS:  I've just copied the signal checking.
 AC_CACHE_CHECK(where the RLIMIT macros are located,zsh_cv_path_rlimit_h,
-[for RESOURCE_H in /usr/include/bsd/sys/resource.h   dnl
-                   /usr/include/asm/resource.h	     dnl
-                   /usr/include/linux/resource.h     dnl
-                   /usr/include/sys/resource.h       dnl
-                   /usr/include/bits/resource.h      dnl
-                   /usr/include/resourcebits.h       dnl
-                   /dev/null;
+[dnl Look at the output from the preprocessor.
+dnl Copied from the search for the signal names above.
+echo "#include <sys/resource.h>" >restmp.c
+resourcefile_list="`$CPP restmp.c |
+sed -n -e 's/^#line[ 	].*\"\(.*\)\"/\1/p' \
+       -e 's/^#[ 	].*\"\(.*\)\"/\1/p' |
+sed 's/\\\\\\\\/\//g' |
+$AWK '{ if (\$1 ~ \"resource\") files[[\$1]] = \$1 }
+  END { for (var in files) print var }'`"
+rm -f restmp.c
+if test -z "$resourcefile_list"; then
+  dnl No list: look at standard places.
+  resourcefile_list="/usr/include/bsd/sys/resource.h
+/usr/include/asm/resource.h
+/usr/include/linux/resource.h
+/usr/include/sys/resource.h
+/usr/include/bits/resource.h
+/usr/include/resourcebits.h"
+fi
+for RESOURCE_H in $resourcefile_list /dev/null;
 do
   test -f $RESOURCE_H && \
   grep '#[ 	]*define[ 	][ 	]*RLIMIT_[A-Z]*[ 	]*[0-9A-Z][0-9]*' $RESOURCE_H > /dev/null && \
