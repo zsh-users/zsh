@@ -1318,7 +1318,7 @@ noquery(int purge)
 #ifdef FIONREAD
     ioctl(SHTTY, FIONREAD, (char *)&val);
     if (purge) {
-	while(val--)
+	for (; val; val--)
 	    read(SHTTY, &c, 1);
     }
 #endif
