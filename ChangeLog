@@ -1,5 +1,7 @@
 2000-05-20  Bart Schaefer  <schaefer@zsh.org>
 
+	* 11477: Doc/Zsh/compsys.yo: Alphabetize itemized lists.
+
 	* 11473: Src/utils.c: Turn off xtrace while printing PS4.
 
 2000-05-19  Oliver Kiddle  <opk@zsh.org>
