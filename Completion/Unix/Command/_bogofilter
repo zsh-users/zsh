@@ -1,4 +1,4 @@
-#compdef bogoutil
+#compdef bogoutil bogotune bogofilter
 
 local ret bogotokens
 
@@ -11,8 +11,8 @@ _bogoutil_caching_policy () {
   return 1
 }
 
-_bogofilter() {
-  _arguments -C \
+_bogoutil() {
+  _arguments \
   	'-v[verbose]' \
   	'-n[replace non-ASCII characters]' \
   	'-D[redirect debug output to stdout]' \
@@ -27,14 +27,16 @@ _bogofilter() {
   	'-m[perform maintenance functions]' \
   	'-w[display token information]:database file or directory:_files' \
   	'-p[display token probability information]:database file or directory:_files' \
-	'-C[verify database]:database:_files -/' \
   	'-H[print histogram]' \
-  	'(-f -F -P -R)-r[recalculate ROBX]:database:_files -/' \
-  	'(-f -F -P -r)-R[recalculate and save ROBX]:database:_files -/' \
-	'(-F -P -r -R)-f[run regular recovery]:database:_files -/' \
-	'(-f -P -r -R)-F[run catastrophic recovery]:database:_files -/' \
-	'(-f -F -r -R)-P[checkpoint database]:database:_files -/' \
-	'(-f -F -r -R -P)--remove-environment:database:_files -/' \
+	'(--db_recover --db_recover-harder --db_prune -R -r --db_remove-environment)--db_verify[verify database]:database:_files -/' \
+  	'(--db_recover --db_recover-harder --db_prune -R --db_remove-environment)-r[recalculate ROBX]:database:_files -/' \
+  	'(--db_recover --db_recover-harder --db_prune -r --db_remove-environment)-R[recalculate and save ROBX]:database:_files -/' \
+	'(--db_recover-harder --db_prune -r -R --db_remove-environment)--db_recover[run regular recovery]:database:_files -/' \
+	'(--db_recover --db_prune -r -R --db_remove-environment)--db_recover-harder[run catastrophic recovery]:database:_files -/' \
+	'(--db_recover --db_recover-harder -r -R --db_remove-environment)--db_prune[checkpoint database]:database:_files -/' \
+	'(--db_recover --db_recover-harder -r -R --db_prune)--db_remove-environment:database:_files -/' \
+	'--db_lk_max_locks[set max lock count]' \
+	'--db_lk_max_objects[set max object count]' \
   	'-h[help]' \
   	'-V[version]' \
   	'*:tokens:->tokens' && ret=0
@@ -59,4 +61,60 @@ _bogofilter() {
   esac
 }
 
-_bogofilter "$@"
+case $service in
+	(bogoutil)
+	_bogoutil "$@"
+	;;
+	(bogotune)
+	_arguments \
+	'-h[help]' \
+	'-C[do not read standard configs]' \
+	'-c[config file]:config file:_files' \
+	'-D[do not a wordlist file]' \
+	'-d[wordlist dir]:directory:_files -/' \
+	'-E[disable ESF tuning]' \
+	'-M[output input file in message count format]' \
+	'-r[specify robx value]:robx value:' \
+	'-T[specify fp target value]:fp target value:' \
+	'-s[spam files]:spam files:_files' \
+	'-n[non-spam files]:non-spam files:_files' \
+	'-v[verbose]' \
+	'-q[quiet]'
+	;;
+	(bogofilter)
+	_arguments -s -w \
+	'(--help)-h[help]' \
+	'(--version)-V[version]' \
+	'(--query)-Q[query]' \
+	'-QQ[display extended config info]' \
+	'(--passthrough)-p[passthrough]' \
+	'(--ham-true)-e[ham-true]' \
+	'(--update-as-scored)-u[update-as-scored]' \
+	'(--classify-mbox)-M[classify-mbox]' \
+	'(--classify-stdin)-b[classify-stdin]' \
+	'(--classify-files)-B[classify-files]:file list:_files' \
+	'(--dataframe)-R[print R dataframe]' \
+	'(--register-spam)-s[register as spam]' \
+	'(--register-ham)-n[register as non-spam]' \
+	'(--unregister-spam)-S[unregister as spam]' \
+	'(--unregister-ham)-N[unregister as non-spam]' \
+	'(--config-file)-c[config file]:config file:_files' \
+	'(--no-config-file)-C[do not read standard config files]' \
+	'(--bogofilter_dir)-d[wordlist directory]' \
+	'(--no-header-tags)-H[disable header line tagging]' \
+	'(--db_cachesize)-k[set Berkeley DB cache size]:megabytes:' \
+	'(--use-syslog)-l[log via syslog]' \
+	'(--syslog-tag)-L[specify tag value for log messages]:tag:' \
+	'(--input-file)-I[specify input file instead of stdin]:input file:_files' \
+	'(--output-file)-O[specify output file instead of stdout]:output file:_files' \
+	'(--min_dev --robs --robx)-m[user-defined min_dev, robs, and robx]:values:' \
+	'(--spam_cutoff --ham_cutoff)-o[user-defined spam and ham cutoffs]:values:' \
+	'(--terse)-t[terse output mode]' \
+	'(--fixed-terse-format)-T[invariant terse output mode]' \
+	'(--report-unsure)-U[print statistics if spamicity is unsure]' \
+	'(--verbosity)-v[set debug verbosity level]' \
+	'(--timestamp-date)-y[set date for token timestamps]' \
+	'(--debug-to-stdout)-D[direct debug output to stdout]' \
+	'(--debug-flags)-x[debug flags]:debug flags:'
+	;;
+esac

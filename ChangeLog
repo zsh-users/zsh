@@ -1,4 +1,12 @@
+2004-12-25  Clint Adams  <clint@zsh.org>
+
+	* 20636: Completion/Unix/Command/_bogofilter: add
+	completion for 'bogofilter' and 'bogotune' commands.
+
 2004-12-24  Clint Adams  <clint@zsh.org>
+
+	* 20635: Completion/Unix/Command/_bogofilter: update
+	bogoutil completion for 0.93.3.
 
 	* 20634: Completion/Unix/Command/_postfix: completion
 	for postsuper.
