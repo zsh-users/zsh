@@ -588,7 +588,7 @@ createparam(char *name, int flags)
 
 	DPUTS(oldpm && oldpm->level > locallevel,
 	      "BUG:  old local parameter not deleteed");
-	if (oldpm && (oldpm->level == locallevel || !(flags & PM_LOCAL))) {
+	if (oldpm && oldpm->level == locallevel) {
 	    if (!(oldpm->flags & PM_UNSET) || (oldpm->flags & PM_SPECIAL)) {
 		oldpm->flags &= ~PM_UNSET;
 		return NULL;
@@ -616,7 +616,7 @@ createparam(char *name, int flags)
 	pm = (Param) alloc(sizeof *pm);
 	pm->nam = nulstring;
     }
-    pm->flags = flags & ~PM_LOCAL;
+    pm->flags = flags;
 
     if(!(pm->flags & PM_SPECIAL))
 	assigngetset(pm);
@@ -1898,7 +1898,7 @@ arrhashsetfn(Param pm, char **val)
      * since that could cause trouble for special hashes.  This way, *
      * it's up to pm->sets.hfn() what to do.                         */
     int alen = arrlen(val);
-    HashTable opmtab = paramtab, ht = 0;
+    HashTable opmtab = paramtab, ht;
     char **aptr = val;
     Value v = (Value) hcalloc(sizeof *v);
     v->b = -1;
@@ -1909,8 +1909,7 @@ arrhashsetfn(Param pm, char **val)
 	     NULL, 0);
 	return;
     }
-    if (alen)
-	ht = paramtab = newparamtable(17, pm->nam);
+    ht = paramtab = newparamtable(17, pm->nam);
     while (*aptr) {
 	/* The parameter name is ztrdup'd... */
 	v->pm = createparam(*aptr, PM_SCALAR|PM_UNSET);

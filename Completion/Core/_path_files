@@ -377,9 +377,9 @@ done
 exppaths=( "${(@)exppaths:#$orig}" )
 
 if [[ -n "$compconfig[path_expand]" &&
-      $#exppaths -eq 0 && nm -eq compstate[nmatches] ]]; then
-  compadd -QU -S '' "$group[@]" "$expl[@]" -i "$IPREFIX" -I "$ISUFFIX" \
-          -M 'r:|/=* r:|=*' -p "$linepath" - "${(@)exppaths}"
+      $#exppaths -ne 0 && nm -eq compstate[nmatches] ]]; then
+  compadd -U -S '' "$group[@]" "$expl[@]" -i "$IPREFIX" -I "$ISUFFIX" \
+          -p "$linepath" - "${(@)exppaths}"
 fi
 
 [[ nm -eq compstate[nmatches] ]]

@@ -133,7 +133,6 @@ deletehashtable(HashTable ht)
 	ht->last->next = ht->next;
     else
 	firstht = ht->next;
-    zsfree(ht->tablename);
 #endif /* ZSH_HASH_DEBUG */
     zfree(ht->nodes, ht->hsize * sizeof(HashNode));
     zfree(ht, sizeof(*ht));

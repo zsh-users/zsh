@@ -98,7 +98,7 @@ struct bindstate {
 /* currently selected keymap, and its name */
 
 /**/
-Keymap curkeymap, localkeymap;
+Keymap curkeymap;
 /**/
 char *curkeymapname;
 
@@ -216,7 +216,7 @@ freekeynode(HashNode hn)
 static HashTable copyto;
 
 /**/
-Keymap
+static Keymap
 newkeymap(Keymap tocopy, char *kmname)
 {
     Keymap km = zcalloc(sizeof(*km));
@@ -250,7 +250,7 @@ scancopykeys(HashNode hn, int flags)
 }
 
 /**/
-void
+static void
 deletekeymap(Keymap km)
 {
     int i;
@@ -322,21 +322,21 @@ openkeymap(char *name)
 }
 
 /**/
-int
-unlinkkeymap(char *name, int ignm)
+static int
+unlinkkeymap(char *name)
 {
     KeymapName n = (KeymapName) keymapnamtab->getnode(keymapnamtab, name);
     if(!n)
 	return 2;
-    if(!ignm && (n->flags & KMN_IMMORTAL))
+    if(n->flags & KMN_IMMORTAL)
 	return 1;
     keymapnamtab->freenode(keymapnamtab->removenode(keymapnamtab, name));
     return 0;
 }
 
 /**/
-int
-linkkeymap(Keymap km, char *name, int imm)
+static int
+linkkeymap(Keymap km, char *name)
 {
     KeymapName n = (KeymapName) keymapnamtab->getnode(keymapnamtab, name);
     if(n) {
@@ -347,12 +347,9 @@ linkkeymap(Keymap km, char *name, int imm)
 	if(!--n->keymap->rc)
 	    deletekeymap(n->keymap);
 	n->keymap = km;
-    } else {
-	n = makekeymapnamnode(km);
-	if (imm)
-	    n->flags |= KMN_IMMORTAL;
-	keymapnamtab->addnode(keymapnamtab, ztrdup(name), n);
-    }
+    } else
+	keymapnamtab->addnode(keymapnamtab, ztrdup(name),
+	    makekeymapnamnode(km));
     km->rc++;
     return 0;
 }
@@ -380,15 +377,6 @@ selectkeymap(char *name, int fb)
     curkeymapname = name;
     curkeymap = km;
     return 0;
-}
-
-/* Select a local key map. */
-
-/**/
-void
-selectlocalmap(Keymap m)
-{
-    localkeymap = m;
 }
 
 /* Reopen the currently selected keymap, in case it got deleted.  This *
@@ -654,7 +642,7 @@ bin_bindkey(char *name, char **argv, char *ops, int func)
 	    return 1;
 	}
 	if(ops['e'] || ops['v'])
-	    linkkeymap(km, "main", 0);
+	    linkkeymap(km, "main");
     } else {
 	kmname = NULL;
 	km = NULL;
@@ -727,7 +715,7 @@ bin_bindkey_del(char *name, char *kmname, Keymap km, char **argv, char *ops, cha
     int ret = 0;
 
     do {
-	int r = unlinkkeymap(*argv, 0);
+	int r = unlinkkeymap(*argv);
 	if(r == 1)
 	    zwarnnam(name, "keymap name `%s' is protected", *argv, 0);
 	else if(r == 2)
@@ -747,7 +735,7 @@ bin_bindkey_link(char *name, char *kmname, Keymap km, char **argv, char *ops, ch
     if(!km) {
 	zwarnnam(name, "no such keymap `%s'", argv[0], 0);
 	return 1;
-    } else if(linkkeymap(km, argv[1], 0)) {
+    } else if(linkkeymap(km, argv[1])) {
 	zwarnnam(name, "keymap name `%s' is protected", argv[1], 0);
 	return 1;
     }
@@ -774,7 +762,7 @@ bin_bindkey_new(char *name, char *kmname, Keymap km, char **argv, char *ops, cha
 	}
     } else
 	km = NULL;
-    linkkeymap(newkeymap(km, argv[0]), argv[0], 0);
+    linkkeymap(newkeymap(km, argv[0]), argv[0]);
     return 0;
 }
 
@@ -1120,18 +1108,20 @@ default_bindings(void)
      * will be linked to the "emacs" keymap, except that if VISUAL *
      * or EDITOR contain the string "vi" then it will be linked to *
      * the "viins" keymap.                                         */
-    linkkeymap(vmap, "viins", 0);
-    linkkeymap(emap, "emacs", 0);
-    linkkeymap(amap, "vicmd", 0);
-    linkkeymap(smap, ".safe", 1);
+    linkkeymap(vmap, "viins");
+    linkkeymap(emap, "emacs");
+    linkkeymap(amap, "vicmd");
+    linkkeymap(smap, ".safe");
     if (((ed = zgetenv("VISUAL")) && strstr(ed, "vi")) ||
 	((ed = zgetenv("EDITOR")) && strstr(ed, "vi")))
-	linkkeymap(vmap, "main", 0);
+	linkkeymap(vmap, "main");
     else
-	linkkeymap(emap, "main", 0);
+	linkkeymap(emap, "main");
 
     /* the .safe map cannot be modified or deleted */
     smap->flags |= KM_IMMUTABLE;
+    ((KeymapName) keymapnamtab->getnode(keymapnamtab, ".safe"))->flags
+	|= KMN_IMMORTAL;
 }
 
 /*************************/
@@ -1152,12 +1142,7 @@ getkeymapcmd(Keymap km, Thingy *funcp, char **strp)
     keybuf[0] = 0;
     while((c = getkeybuf(!!lastlen)) != EOF) {
 	char *s;
-	Thingy f;
-	int loc = 1;
-
-	if (!localkeymap ||
-	    (f = keybind(localkeymap, keybuf, &s)) == t_undefinedkey)
-	    loc = 0, f = keybind(km, keybuf, &s);
+	Thingy f = keybind(km, keybuf, &s);
 
 	if(f != t_undefinedkey) {
 	    lastlen = keybuflen;
@@ -1165,7 +1150,7 @@ getkeymapcmd(Keymap km, Thingy *funcp, char **strp)
 	    str = s;
 	    lastc = c;
 	}
-	if(!keyisprefix((loc ? localkeymap : km), keybuf))
+	if(!keyisprefix(km, keybuf))
 	    break;
     }
     if(!lastlen && keybuflen)

@@ -390,16 +390,7 @@ init_io(void)
 #ifdef JOB_CONTROL
     /* If interactive, make the shell the foreground process */
     if (opts[MONITOR] && interact && (SHTTY != -1)) {
-      /* Since we now sometimes execute programs in the process group
-       * of the parent shell even when using job-control, we have to
-       * make sure that we run in our own process group. Otherwise if
-       * we are called from a program that doesn't put us in our own
-       * group a SIGTSTP that we ignore might stop our parent process.
-       * Instead of the two calls below we once had:
-       *   attachtty(GETPGRP());
-       */
-	attachtty(getpid());
-	setpgrp(0L, 0L);
+	attachtty(GETPGRP());
 	if ((mypgrp = GETPGRP()) > 0) {
 	    while ((ttpgrp = gettygrp()) != -1 && ttpgrp != mypgrp) {
 		sleep(1);

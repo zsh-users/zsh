@@ -103,7 +103,8 @@ User-defined widgets, being implemented as shell functions,
 can execute any normal shell command.  They can also run other widgets
 (whether built-in or user-defined) using the tt(zle) builtin command.
 They can use tt(read -k) or tt(read -q) to read characters from standard
-input.  Finally, they can examine and edit the ZLE buffer being edited by
+input, which will use the appropriate tt(zle) key input mechanism.
+Finally, they can examine and edit the ZLE buffer being edited by
 reading and setting the special parameters described below.
 
 cindex(parameters, editor)
@@ -955,10 +956,6 @@ tindex(accept-line-and-down-history)
 item(tt(accept-line-and-down-history) (^O) (unbound) (unbound))(
 Execute the current line, and push the next history
 event on the the buffer stack.
-)
-tindex(beep)
-item(tt(beep))(
-Beep, unless the tt(BEEP) option is unset.
 )
 tindex(vi-cmd-mode)
 item(tt(vi-cmd-mode) (^X^V) (unbound) (^[))(

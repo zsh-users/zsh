@@ -1993,7 +1993,7 @@ dyncat(char *s1, char *s2)
     char *ptr;
     int l1 = strlen(s1);
 
-    ptr = (char *)zhalloc(l1 + strlen(s2) + 1);
+    ptr = (char *)ncalloc(l1 + strlen(s2) + 1);
     strcpy(ptr, s1);
     strcpy(ptr + l1, s2);
     return ptr;

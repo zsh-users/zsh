@@ -3,7 +3,7 @@
 # available in some directory; they should have been installed with the
 # the shell (except we haven't written that yet).
 #
-# Run this script as a function and answer the questions.
+# Source this script (e.g. `. /path/compinstall') and answer the questions.
 #
 # Normally, this will alter ~/.zshrc (or wherever ZDOTDIR puts it), but you
 # can make that unwritable and it will leave the lines in a temporary file
@@ -23,13 +23,33 @@
 #  - Could add code for setting other completers and options.
 #  - Could add keys for context-sensitive help.
 
+# Save the options.  We will need to trap ^C to make sure they get
+# restored properly.
+typeset -A _ci_options
+_ci_options=($(setopt kshoptionprint;setopt))
+[[ -o kshoptionprint ]] || _ci_options[kshoptionprint]=off
+[[ -o monitor ]] && _ci_options[monitor]=on
+[[ -o zle ]] && _ci_options[zle]=on
 
-emulate -L zsh
+emulate zsh
 
-typeset _ci_options _ci_f _ci_fdir _ci_files _ci_dumpfile _ci_lines
-typeset _ci_type _ci_completer _ci_accept _ci_cprompt _ci_startline
-typeset _ci_endline _ci_ifile _ci_tmpf _ci_compconf _ci_warn
-typeset _ci_dtype _ci_existing _ci_line
+TRAPINT() { 
+  unsetopt ${(k)_ci_options[(R)off]}
+  setopt ${(k)_ci_options[(R)on]}
+
+  unset _ci_options _ci_f _ci_fdir _ci_files _ci_dumpfile _ci_lines
+  unset _ci_type _ci_completer _ci_accept _ci_cprompt _ci_startline
+  unset _ci_endline _ci_ifile _ci_tmpf _ci_defaults _ci_compconf _ci_warn
+  unset _ci_dtype _ci_existing _ci_line
+
+  if (( $1 )); then
+    print Aborted.
+    unfunction TRAPINT
+    return 1
+  fi
+  return 0
+}
+
 
 # Look for the defaults.
 _ci_startline='# The following lines were added by compinstall'
@@ -40,7 +60,6 @@ _ci_lines=''
 _ci_existing=''
 
 typeset -A _ci_defaults
-
 if [[ -f $_ci_ifile ]]; then
   # This assumes the lines haven't been altered by the user too much
   # after they were added.
@@ -64,12 +83,10 @@ if [[ -f $_ci_ifile ]]; then
       fi
       _ci_existing="${_ci_existing}  $_ci_line
 "
-    elif [[ $_ci_line[1] = compinit ]]; then
-      # parse the line running compinit
-      [[ $_ci_line[2] = -f ]]  && _ci_fdir=$_ci_line[3]
+    elif [[ $_ci_line[1] = . && $_ci_line[2] = */compinit ]]; then
+      # parse the line sourcing compinit
+      [[ $_ci_line[3] = -f ]]  && _ci_fdir=$_ci_line[4]
       [[ $_ci_line[-2] = -d ]] && _ci_dumpfile=$_ci_line[-1]
-    elif [[ $_ci_line[1] = _compdir=* ]]; then
-      _ci_fdir=${_ci_line[1]##_compdir=}
     elif [[ $_ci_line[1] = compconf ]]; then
       # parse a compconf component as second argument (should be completer)
       [[ $_ci_line[2] = completer=* ]] &&
@@ -77,7 +94,7 @@ if [[ -f $_ci_ifile ]]; then
       [[ $_ci_line[-1] == \\ ]] && _ci_compconf=1
       _ci_existing="${_ci_existing}$_ci_line
 "
-    elif [[ $_ci_line[1] != \#* && $_ci_line[1] != (autoload|\[\[) ]]; then
+    elif [[ $_ci_line[1] != \#* ]]; then
       if [[ -z $_ci_warn ]]; then
 	_ci_warn=1
 	print "Warning:  existing lines in compinstall setup not understood:"
@@ -149,7 +166,7 @@ fi
 # Set up the dumpfile
 _ci_dtype=existing
 if [[ -z $_ci_dumpfile ]]; then
-  _ci_dumpfile="${ZDOTDIR:-$HOME}/.zcompdump"
+  _ci_dumpfile="${_ci_fdir}/compinit.dump"
   _ci_dtype=standard
 fi
 
@@ -167,6 +184,7 @@ else
 I will force completion to dump its status, which will speed up the shell's
 start-up considerably.  However, I can't write the file I'd like to, namely
 ${_ci_dumpfile}.  Please edit a replacement."
+  _ci_dumpfile='~/.compinit.dump'
   vared _ci_dumpfile
   while ! touch ${~_ci_dumpfile} >& /dev/null; do
     print "Sorry, I can't write that either.  Try again."
@@ -175,10 +193,7 @@ ${_ci_dumpfile}.  Please edit a replacement."
   [[ -s $_ci_dumpfile ]] || rm -f $_ci_dumpfile
 fi
 
-_ci_lines="${_ci_lines}_compdir=$_ci_fdir
-[[ -z \$fpath[(r)\$_compdir] ]] && fpath=(\$_compdir \$fpath)
-autoload -U compinit
-compinit -d"
+_ci_lines="${_ci_lines}. $_ci_fdir/compinit -f $_ci_fdir -d"
 [[ $_ci_dtype != standard ]] && _ci_lines="${_ci_lines} $_ci_dumpfile"
 _ci_lines="${_ci_lines}
 "
@@ -348,7 +363,6 @@ $_ci_lines$_ci_endline" >>$_ci_ifile &&
   print "\nSuccessfully appended lines to $_ci_ifile."
 fi
 
-unfunction compinstall
-autoload -U compinstall
+TRAPINT 0
 
 return 0

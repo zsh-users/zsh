@@ -19,7 +19,6 @@
 "backward-kill-line", backwardkillline, ZLE_KILL | ZLE_KEEPSUFFIX
 "backward-kill-word", backwardkillword, ZLE_KILL | ZLE_KEEPSUFFIX
 "backward-word", backwardword, 0
-"beep", handlefeep, 0
 "beginning-of-buffer-or-history", beginningofbufferorhistory, 0
 "beginning-of-history", beginningofhistory, 0
 "beginning-of-line", beginningofline, 0

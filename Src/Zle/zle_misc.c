@@ -98,6 +98,7 @@ deletechar(char **args)
 	backdel(zmult);
 	return 0;
     }
+    feep();
     return 1;
 }
 
@@ -181,6 +182,7 @@ gosmacstransposechars(char **args)
 	if (cs == ll || line[cs] == '\n' ||
 	    ((cs + 1 == ll || line[cs + 1] == '\n') &&
 	     (!cs || line[cs - 1] == '\n'))) {
+	    feep();
 	    return 1;
 	}
 	cs += (cs == 0 || line[cs - 1] == '\n') ? 2 : 1;
@@ -203,8 +205,10 @@ transposechars(char **args)
 	n = -n;
     while (n--) {
 	if (!(ct = cs) || line[cs - 1] == '\n') {
-	    if (ll == cs || line[cs] == '\n')
+	    if (ll == cs || line[cs] == '\n') {
+		feep();
 		return 1;
+	    }
 	    if (!neg)
 		cs++;
 	    ct++;
@@ -221,8 +225,10 @@ transposechars(char **args)
 	}
 	if (ct == ll || line[ct] == '\n')
 	    ct--;
-	if (ct < 1 || line[ct - 1] == '\n')
+	if (ct < 1 || line[ct - 1] == '\n') {
+	    feep();
 	    return 1;
+	}
 	cc = line[ct - 1];
 	line[ct - 1] = line[ct];
 	line[ct] = cc;
@@ -344,8 +350,10 @@ yank(char **args)
 	return 1;
     if (zmod.flags & MOD_VIBUF)
 	buf = &vibuf[zmod.vibuf];
-    if (!buf->buf)
+    if (!buf->buf) {
+	feep();
 	return 1;
+    }
     mark = cs;
     yankb = cs;
     while (n--) {
@@ -364,8 +372,10 @@ yankpop(char **args)
 {
     int cc;
 
-    if (!(lastcmd & ZLE_YANK) || !kring[kct].buf)
+    if (!(lastcmd & ZLE_YANK) || !kring[kct].buf) {
+	feep();
 	return 1;
+    }
     cs = yankb;
     foredel(yanke - yankb);
     cc = kring[kct].len;
@@ -428,6 +438,7 @@ whatcursorposition(char **args)
 int
 undefinedkey(char **args)
 {
+    feep();
     return 1;
 }
 
@@ -446,9 +457,10 @@ quotedinsert(char **args)
 #ifndef HAS_TIO
     zsetterm();
 #endif
-    if (c < 0)
+    if (c < 0) {
+	feep();
 	return 1;
-    else
+    } else
 	return selfinsert(args);
 }
 
@@ -458,8 +470,10 @@ digitargument(char **args)
 {
     int sign = (zmult < 0) ? -1 : 1;
 
-    if (c < '0' || c > '9')
+    if (c < '0' || c > '9') {
+	feep();
 	return 1;
+    }
 
     if (!(zmod.flags & MOD_TMULT))
 	zmod.tmult = 0;
@@ -479,8 +493,10 @@ digitargument(char **args)
 int
 negargument(char **args)
 {
-    if (zmod.flags & MOD_TMULT)
+    if (zmod.flags & MOD_TMULT) {
+	feep();
 	return 1;
+    }
     zmod.tmult = -1;
     zmod.flags |= MOD_TMULT|MOD_NEG;
     prefixflag = 1;
@@ -639,7 +655,7 @@ Thingy
 executenamedcommand(char *prmt)
 {
     Thingy cmd;
-    int len, l = strlen(prmt), ols = listshown, feep = 0;
+    int len, l = strlen(prmt), ols = listshown;
     char *ptr;
     char *okeymap = curkeymapname;
 
@@ -672,12 +688,12 @@ executenamedcommand(char *prmt)
 	    zrefresh();
 	    c = getkey(0);
 	    if(c == EOF || !c || len == NAMLEN)
-		feep = 1;
+		feep();
 	    else
 		*ptr++ = c, len++;
 	} else if(cmd == Th(z_quotedinsert)) {
 	    if((c = getkey(0)) == EOF || !c || len == NAMLEN)
-		feep = 1;
+		feep();
 	    else
 		*ptr++ = c, len++;
 	} else if(cmd == Th(z_backwarddeletechar) ||
@@ -728,7 +744,7 @@ executenamedcommand(char *prmt)
 		    scanhashtable(thingytab, 1, 0, DISABLED, scancompcmd, 0);
 		} LASTALLOC;
 		if (empty(cmdll))
-		    feep = 1;
+		    feep();
 		else if (cmd == Th(z_listchoices) ||
 		    cmd == Th(z_deletecharorlist)) {
 		    int zmultsav = zmult;
@@ -750,7 +766,7 @@ executenamedcommand(char *prmt)
 			!(isset(LISTAMBIGUOUS) && cmdambig > len)) {
 			int zmultsav = zmult;
 			if (isset(LISTBEEP))
-			    feep = 1;
+			    feep();
 			statusll = l + cmdambig + 1;
 			zmult = 1;
 			listlist(cmdll);
@@ -760,14 +776,12 @@ executenamedcommand(char *prmt)
 		}
 	    } else {
 		if (len == NAMLEN || icntrl(c) || cmd != Th(z_selfinsert))
-		    feep = 1;
+		    feep();
 		else
 		    *ptr++ = c, len++;
 	    }
 	}
-	if (feep)
-	    handlefeep(zlenoargs);
-	feep = 0;
+	handlefeep();
     }
 }
 

@@ -2221,8 +2221,7 @@ static void
 addcompparams(struct compparam *cp, Param *pp)
 {
     for (; cp->name; cp++, pp++) {
-	Param pm = createparam(cp->name,
-			       cp->type |PM_SPECIAL|PM_REMOVABLE|PM_LOCAL);
+	Param pm = createparam(cp->name, cp->type | PM_SPECIAL | PM_REMOVABLE);
 	if (!pm)
 	    pm = (Param) paramtab->getnode(paramtab, cp->name);
 	DPUTS(!pm, "param not set in addcompparams");
@@ -2262,8 +2261,7 @@ makecompparams(void)
 
     addcompparams(comprparams, comprpms);
 
-    if (!(cpm = createparam(COMPSTATENAME,
-			    PM_SPECIAL|PM_REMOVABLE|PM_LOCAL|PM_HASHED)))
+    if (!(cpm = createparam(COMPSTATENAME, PM_SPECIAL|PM_REMOVABLE|PM_HASHED)))
 	cpm = (Param) paramtab->getnode(paramtab, COMPSTATENAME);
     DPUTS(!cpm, "param not set in makecompparams");
 

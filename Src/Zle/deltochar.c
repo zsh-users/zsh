@@ -67,6 +67,8 @@ deltochar(char **args)
 	    }
 	}
     }
+    if (!ok)
+	feep();
     return !ok;
 }
 

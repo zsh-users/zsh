@@ -300,8 +300,10 @@ vibackwardkillword(char **args)
     int x = cs, lim = (viinsbegin > findbol()) ? viinsbegin : findbol();
     int n = zmult;
 
-    if (n < 0)
+    if (n < 0) {
+	feep();
 	return 1;
+    }
 /* this taken from "vibackwardword" */
     while (n--) {
 	while ((x > lim) && iblank(line[x - 1]))
@@ -477,16 +479,22 @@ transposewords(char **args)
 	    x = cs;
 	    while (x && line[x - 1] != '\n' && !iword(line[x]))
 		x--;
-	    if (!x || line[x - 1] == '\n')
+	    if (!x || line[x - 1] == '\n') {
+		feep();
 		return 1;
+	    }
 	}
 	for (p4 = x; p4 != ll && iword(line[p4]); p4++);
 	for (p3 = p4; p3 && iword(line[p3 - 1]); p3--);
-	if (!p3)
+	if (!p3) {
+	    feep();
 	    return 1;
+	}
 	for (p2 = p3; p2 && !iword(line[p2 - 1]); p2--);
-	if (!p2)
+	if (!p2) {
+	    feep();
 	    return 1;
+	}
 	for (p1 = p2; p1 && iword(line[p1 - 1]); p1--);
 	pp = temp = (char *)zhalloc(p4 - p1 + 1);
 	struncpy(&pp, (char *) line + p3, p4 - p3);

@@ -858,19 +858,6 @@ item(tt(WORDCHARS) <S>)(
 A list of non-alphanumeric characters considered part of a word
 by the line editor.
 )
-vindex(ZBEEP)
-item(tt(ZBEEP))(
-If set, this gives a string of characters, which can use all the same codes
-as the tt(bindkey) command as described in
-ifzman(zmanref(zshzle))\
-ifnzman(noderef(Zsh Line Editor))\
-, that will be output to the terminal
-instead of beeping.  This may have a visible instead of an audible effect;
-for example, the string `tt(\e[?5h\e[?5l)' on a vt100 or xterm will have
-the effect of flashing reverse video on and off (if you usually use reverse
-video, you should use the string `tt(\e[?5l\e[?5h)' instead).  This takes
-precedence over the tt(NOBEEP) option.
-)
 vindex(ZDOTDIR)
 item(tt(ZDOTDIR))(
 The directory to search for shell startup files (.zshrc, etc),

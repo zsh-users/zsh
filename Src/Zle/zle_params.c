@@ -84,7 +84,7 @@ makezleparams(int ro)
 
     for(zp = zleparams; zp->name; zp++) {
 	Param pm = createparam(zp->name, (zp->type |PM_SPECIAL|PM_REMOVABLE|
-					  PM_LOCAL|(ro ? PM_READONLY : 0)));
+					  (ro ? PM_READONLY : 0)));
 	if (!pm)
 	    pm = (Param) paramtab->getnode(paramtab, zp->name);
 	DPUTS(!pm, "param not set in makezleparams");

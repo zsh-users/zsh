@@ -13,7 +13,7 @@ tt(compctl) command.
 )\
 ifnzman(\
 sect(Types of completion)
-This version of zsh has two ways of performing completion of words on the
+This version of zsh has two ways of performing completino of words on the
 command line.  New users of the shell may prefer to use the newer
 and more powerful system based on shell functions; this is described
 in noderef(Completion System), and the basic shell mechanisms which support
@@ -633,8 +633,7 @@ var(max) inclusive.
 )
 item(tt(r[)var(str1)tt(,)var(str2)tt(])...)(
 Matches if the cursor is after a word with prefix var(str1).  If there
-is also a word with prefix var(str2) on the command line after the one 
-matched by var(str1) it matches
+is also a word with prefix var(str2) on the command line it matches
 only if the cursor is before this word. If the comma and var(str2) are
 omitted, it matches if the cursor is after a word with prefix var(str1).
 )

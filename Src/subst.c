@@ -1328,15 +1328,10 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int ssub)
 			else
 			    t = aval;
 		    } else if (!isarr) {
-			if (!*val && arrasg > 1) {
-			    arr[0] = NULL;
-			    l = 0;
-			} else {
-			    arr[0] = val;
-			    arr[1] = NULL;
-			    l = 1;
-			}
+			arr[0] = val;
+			arr[1] = NULL;
 			t = aval = arr;
+			l = 1;
 		    } else
 			l = arrlen(aval), t = aval;
 		    p = a = zalloc(sizeof(char *) * (l + 1));

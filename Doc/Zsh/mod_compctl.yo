@@ -1,4 +1,4 @@
-texinode(The compctl Module)(The complist Module)(The comp1 Module)(Zsh Modules)
+texinode(The compctl Module)(The deltochar Module)(The comp1 Module)(Zsh Modules)
 sect(The compctl Module)
 The tt(compctl) module makes available several builtin commands. tt(compctl),
 is the standard way to control completions for ZLE.  See

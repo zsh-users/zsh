@@ -278,9 +278,8 @@ typedef struct heapstack *Heapstack;
 typedef struct histent   *Histent;
 typedef struct forcmd    *Forcmd;
 typedef struct autofn    *AutoFn;
-typedef struct hookdef   *Hookdef;
 
-typedef struct asgment   *Asgment;
+typedef struct asgment  *Asgment;
 
 
 /********************************/
@@ -888,22 +887,6 @@ struct module {
 #define MOD_UNLOAD  (1<<1)
 #define MOD_SETUP   (1<<2)
 
-/* C-function hooks */
-
-typedef int (*Hookfn) _((Hookdef, void *));
-
-struct hookdef {
-    Hookdef next;
-    char *name;
-    Hookfn def;
-    int flags;
-    LinkList funcs;
-};
-
-#define HOOKF_ALL 1
-
-#define HOOKDEF(name, func, flags) { NULL, name, (Hookfn) func, flags, NULL }
-
 /* node used in parameter hash table (paramtab) */
 
 struct param {
@@ -976,13 +959,12 @@ struct param {
 #define PM_UNALIASED	(1<<11)	/* do not expand aliases when autoloading     */
 
 #define PM_TIED 	(1<<12)	/* array tied to colon-path or v.v. */
-#define PM_LOCAL	(1<<13) /* this parameter will be made local */
-#define PM_SPECIAL	(1<<14) /* special builtin parameter                  */
-#define PM_DONTIMPORT	(1<<15)	/* do not import this variable                */
-#define PM_RESTRICTED	(1<<16) /* cannot be changed in restricted mode       */
-#define PM_UNSET	(1<<17)	/* has null value                             */
-#define PM_REMOVABLE	(1<<18)	/* special can be removed from paramtab */
-#define PM_AUTOLOAD     (1<<19) /* autoloaded from module */
+#define PM_SPECIAL	(1<<13) /* special builtin parameter                  */
+#define PM_DONTIMPORT	(1<<14)	/* do not import this variable                */
+#define PM_RESTRICTED	(1<<15) /* cannot be changed in restricted mode       */
+#define PM_UNSET	(1<<16)	/* has null value                             */
+#define PM_REMOVABLE	(1<<17)	/* special can be removed from paramtab */
+#define PM_AUTOLOAD     (1<<18) /* autoloaded from module */
 
 /* Flags for extracting elements of arrays and associative arrays */
 #define SCANPM_WANTVALS   (1<<0)

@@ -13,15 +13,15 @@ elif [[ ${(Pt)${compstate[parameter]}} = array* ]]; then
   list=()
   for i in "$ind[@]"; do
     [[ "$i" = ${PREFIX}*${SUFFIX} ]] &&
-        list=( "$list[@]" 
-	  "${(r:4:: ::):)i} $(print -D ${(P)${compstate[parameter]}[$i]})" )
+        list=( "$list[@]" "${(r:4:: ::):)i} ${(P)${compstate[parameter]}[$i]}
+)
   done
 
-  if [[ "$RBUFFER" = \]* ]]; then
-    compadd -S '' -V default -y list - "$ind[@]"
-  else
-    compadd -S ']' -V default -y list - "$ind[@]"
-  fi
+ if [[ "$RBUFFER" = \]* ]]; then
+   compadd -S '' -y list - "$ind[@]"
+ else
+   compadd -S ']' -y list - "$ind[@]"
+ fi
 else
   _compalso -math-
 fi

@@ -901,9 +901,6 @@ execpline(Sublist l, int how, int last1)
 		    DPUTS(!list_pipe_pid, "invalid list_pipe_pid");
 		    addproc(list_pipe_pid, list_pipe_text);
 
-		    if (!jn->procs->next)
-			jn->gleader = mypgrp;
-
 		    for (pn = jobtab[jn->other].procs; pn; pn = pn->next)
 			if (WIFSTOPPED(pn->status))
 			    break;
@@ -917,10 +914,8 @@ execpline(Sublist l, int how, int last1)
 		    jn->stat |= STAT_STOPPED | STAT_CHANGED;
 		    printjob(jn, !!isset(LONGLISTJOBS), 1);
 		}
-		else if (newjob != list_pipe_job)
-		    deletejob(jn);
 		else
-		    lastwj = -1;
+		    deletejob(jn);
 	    }
 
 	    for (; !nowait;) {
@@ -936,10 +931,7 @@ execpline(Sublist l, int how, int last1)
 		    lastval2 & 0200)
 		    killpg(mypgrp, lastval2 & ~0200);
 		if ((list_pipe || last1 || pline_level) &&
-		    !list_pipe_child && 
-		    ((jn->stat & STAT_STOPPED) ||
-		     (list_pipe_job && pline_level &&
-		      (jobtab[list_pipe_job].stat & STAT_STOPPED)))) {
+		    !list_pipe_child && jn->stat & STAT_STOPPED) {
 		    pid_t pid;
 		    int synch[2];
 
@@ -965,28 +957,22 @@ execpline(Sublist l, int how, int last1)
 			close(synch[1]);
 			read(synch[0], &dummy, 1);
 			close(synch[0]);
-			/* If this job has finished, we leave it as a
-			 * normal (non-super-) job. */
-			if (!(jn->stat & STAT_DONE)) {
-			    jobtab[list_pipe_job].other = newjob;
-			    jobtab[list_pipe_job].stat |= STAT_SUPERJOB;
-			    jn->stat |= STAT_SUBJOB | STAT_NOPRINT;
-			    jn->other = pid;
-			}
-			if ((list_pipe || last1) && jobtab[list_pipe_job].procs)
+			jobtab[list_pipe_job].other = newjob;
+			jobtab[list_pipe_job].stat |= STAT_SUPERJOB;
+			jn->stat |= STAT_SUBJOB | STAT_NOPRINT;
+			jn->other = pid;
+			if (list_pipe || last1)
 			    killpg(jobtab[list_pipe_job].gleader, SIGSTOP);
 			break;
 		    }
 		    else {
 			close(synch[0]);
 			entersubsh(Z_ASYNC, 0, 0);
-			if (jobtab[list_pipe_job].procs)
-			    setpgrp(0L, mypgrp = jobtab[list_pipe_job].gleader);
+			setpgrp(0L, mypgrp = jobtab[list_pipe_job].gleader);
 			close(synch[1]);
 			kill(getpid(), SIGSTOP);
 			list_pipe = 0;
 			list_pipe_child = 1;
-			opts[INTERACTIVE] = 0;
 			break;
 		    }
 		}
@@ -2208,9 +2194,8 @@ entersubsh(int how, int cl, int fake)
 		    attachtty(jobtab[thisjob].gleader);
 	    }
 	}
-	else if (!(list_pipe || list_pipe_child || pline_level > 1) &&
-		 (!jobtab[thisjob].gleader ||
-		  setpgrp(0L, jobtab[thisjob].gleader) == -1)) {
+	else if (!jobtab[thisjob].gleader ||
+		 (setpgrp(0L, jobtab[thisjob].gleader) == -1)) {
 	    jobtab[thisjob].gleader = getpid();
 	    if (list_pipe_job != thisjob &&
 		!jobtab[list_pipe_job].gleader)
@@ -2798,13 +2783,14 @@ execshfunc(Cmd cmd, Shfunc shf, LinkList args)
     if (errflag)
 	return;
 
-    if (!list_pipe && thisjob != list_pipe_job) {
+    if (!list_pipe) {
 	/* Without this deletejob the process table *
 	 * would be filled by a recursive function. */
 	last_file_list = jobtab[thisjob].filelist;
 	jobtab[thisjob].filelist = NULL;
 	deletejob(jobtab + thisjob);
     }
+
     if (isset(XTRACE)) {
 	LinkNode lptr;
 	printprompt4();
@@ -2883,7 +2869,7 @@ doshfunc(char *name, List list, LinkList doshargs, int flags, int noreturnval)
 {
     char **tab, **x, *oargv0 = NULL;
     int oldzoptind, oldlastval;
-    char saveopts[OPT_SIZE], *oldscriptname;
+    char saveopts[OPT_SIZE];
     int obreaks = breaks;
 
     HEAPALLOC {
@@ -2895,8 +2881,6 @@ doshfunc(char *name, List list, LinkList doshargs, int flags, int noreturnval)
 	starttrapscope();
 
 	tab = pparams;
-	oldscriptname = scriptname;
-	scriptname = name;
 	oldzoptind = zoptind;
 	zoptind = 1;
 
@@ -2939,7 +2923,6 @@ doshfunc(char *name, List list, LinkList doshargs, int flags, int noreturnval)
 	    argzero = oargv0;
 	}
 	zoptind = oldzoptind;
-	scriptname = oldscriptname;
 	pparams = tab;
 
 	if (isset(LOCALOPTIONS)) {

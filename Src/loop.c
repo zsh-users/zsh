@@ -378,7 +378,7 @@ execif(Cmd cmd, LinkList args, int flags)
     noerrexit = olderrexit;
 
     if (*t) {
-	cmdpush(*i ? (s ? CS_ELIFTHEN : CS_IFTHEN) : CS_ELSE);
+	cmdpush(s ? CS_ELIFTHEN : CS_IFTHEN);
 	execlist(*t, 1, flags & CFLAG_EXEC);
 	cmdpop();
     } else

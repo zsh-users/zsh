@@ -77,8 +77,10 @@ int
 uphistory(char **args)
 {
     int nodups = isset(HISTIGNOREDUPS);
-    if (!zle_goto_hist(histline, -zmult, nodups) && isset(HISTBEEP))
+    if (!zle_goto_hist(histline, -zmult, nodups) && isset(HISTBEEP)) {
+	feep();
 	return 1;
+    }
     return 0;
 }
 
@@ -126,8 +128,10 @@ uplineorhistory(char **args)
 	int m = zmult, ret;
 
 	cs = ocs;
-	if (virangeflag || !histallowed)
+	if (virangeflag || !histallowed) {
+	    feep();
 	    return 1;
+	}
 	zmult = n;
 	ret = uphistory(args);
 	zmult = m;
@@ -156,8 +160,10 @@ uplineorsearch(char **args)
 	int m = zmult, ret;
 
 	cs = ocs;
-	if (virangeflag || !histallowed)
+	if (virangeflag || !histallowed) {
+	    feep();
 	    return 1;
+	}
 	zmult = n;
 	ret = historysearchbackward(args);
 	zmult = m;
@@ -210,8 +216,10 @@ downlineorhistory(char **args)
 	int m = zmult, ret;
 
 	cs = ocs;
-	if (virangeflag || !histallowed)
+	if (virangeflag || !histallowed) {
+	    feep();
 	    return 1;
+	}
 	zmult = n;
 	ret = downhistory(args);
 	zmult = m;
@@ -240,8 +248,10 @@ downlineorsearch(char **args)
 	int m = zmult, ret;
 
 	cs = ocs;
-	if (virangeflag || !histallowed)
+	if (virangeflag || !histallowed) {
+	    feep();
 	    return 1;
+	}
 	zmult = n;
 	ret = historysearchforward(args);
 	zmult = m;
@@ -256,8 +266,10 @@ acceptlineanddownhistory(char **args)
 {
     Histent he;
 
-    if (!(he = movehistent(quietgethist(histline), 1, HIST_FOREIGN)))
+    if (!(he = movehistent(quietgethist(histline), 1, HIST_FOREIGN))) {
+	feep();
 	return 1;
+    }
     pushnode(bufstack, ztrdup(ZLETEXT(he)));
     done = 1;
     stackhist = he->histnum;
@@ -269,8 +281,10 @@ int
 downhistory(char **args)
 {
     int nodups = isset(HISTIGNOREDUPS);
-    if (!zle_goto_hist(histline, zmult, nodups) && isset(HISTBEEP))
+    if (!zle_goto_hist(histline, zmult, nodups) && isset(HISTBEEP)) {
+	feep();
 	return 1;
+    }
     return 0;
 }
 
@@ -322,6 +336,7 @@ historysearchbackward(char **args)
 	    }
 	}
     }
+    feep();
     return 1;
 }
 
@@ -370,6 +385,7 @@ historysearchforward(char **args)
 	    }
 	}
     }
+    feep();
     return 1;
 }
 
@@ -388,8 +404,10 @@ beginningofbufferorhistory(char **args)
 int
 beginningofhistory(char **args)
 {
-    if (!zle_goto_hist(firsthist(), 0, 0) && isset(HISTBEEP))
+    if (!zle_goto_hist(firsthist(), 0, 0) && isset(HISTBEEP)) {
+	feep();
 	return 1;
+    }
     return 0;
 }
 
@@ -439,15 +457,19 @@ insertlastword(char **args)
 	zsfree(lastinsert);
 	lastinsert = NULL;
     }
-    if (!(he = quietgethist(evhist)) || !he->nwords)
+    if (!(he = quietgethist(evhist)) || !he->nwords) {
+	feep();
 	return 1;
+    }
     if (zmult > 0) {
 	n = he->nwords - (zmult - 1);
     } else {
 	n = 1 - zmult;
     }
-    if (n < 1 || n > he->nwords)
+    if (n < 1 || n > he->nwords) {
+	feep();
 	return 1;
+    }
     s = he->text + he->words[2*n-2];
     t = he->text + he->words[2*n-1];
     save = *t;
@@ -569,6 +591,7 @@ getline(char **args)
     char *s = (char *)getlinknode(bufstack);
 
     if (!s) {
+	feep();
 	return 1;
     } else {
 	int cc;
@@ -670,7 +693,7 @@ doisearch(char **args, int dir)
     int sbptr = 0, top_spot = 0, pos, sibuf = 80;
     int nomatch = 0, skip_line = 0, skip_pos = 0;
     int odir = dir, sens = zmult == 1 ? 3 : 1;
-    int hl = histline, savekeys = -1, feep = 0;
+    int hl = histline, savekeys = -1;
     Thingy cmd;
     char *okeymap = curkeymapname;
     static char *previous_search = NULL;
@@ -739,7 +762,7 @@ doisearch(char **args, int dir)
 		    get_isrch_spot(top_spot, &hl, &pos, &cs, &sbptr,
 				   &dir, &nomatch);
 		    if (!nomatch) {
-			feep = 1;
+			feep();
 			nomatch = 1;
 		    }
 		    he = quietgethist(hl);
@@ -780,7 +803,7 @@ doisearch(char **args, int dir)
 	    goto ref;
 	} else if(cmd == Th(z_vicmdmode)) {
 	    if(selectkeymap(invicmdmode() ? "main" : "vicmd", 0))
-		feep = 1;
+		feep();
 	    goto ref;
 	} else if(cmd == Th(z_vibackwarddeletechar) ||
 	    	cmd == Th(z_backwarddeletechar)) {
@@ -788,7 +811,7 @@ doisearch(char **args, int dir)
 		get_isrch_spot(--top_spot, &hl, &pos, &cs, &sbptr,
 			       &dir, &nomatch);
 	    else
-		feep = 1;
+		feep();
 	    if (nomatch) {
 		statusline = ibuf;
 		skip_pos = 1;
@@ -855,7 +878,7 @@ doisearch(char **args, int dir)
 		zrefresh();
 	    }
 	    if ((c = getkey(0)) == EOF)
-		feep = 1;
+		feep();
 	    else
 		goto ins;
 	} else {
@@ -873,7 +896,7 @@ doisearch(char **args, int dir)
 	    }
 	ins:
 	    if (sbptr == PATH_MAX) {
-		feep = 1;
+		feep();
 		continue;
 	    }
 	    set_isrch_spot(top_spot++, hl, pos, cs, sbptr, dir, nomatch);
@@ -884,9 +907,7 @@ doisearch(char **args, int dir)
 	    }
 	    sbuf[sbptr++] = c;
 	}
-	if (feep)
-	    handlefeep(zlenoargs);
-	feep = 0;
+	handlefeep();
     }
     if (sbptr) {
 	zfree(previous_search, previous_search_len);
@@ -936,6 +957,7 @@ infernexthistory(char **args)
 	    return 0;
 	}
     }
+    feep();
     return 1;
 }
 
@@ -954,6 +976,7 @@ vifetchhistory(char **args)
     }
     if (!zle_goto_hist((zmod.flags & MOD_MULT) ? zmult : curhist, 0, 0) &&
 	isset(HISTBEEP)) {
+	feep();
 	return 1;
     }
     return 0;
@@ -969,7 +992,7 @@ static int
 getvisrchstr(void)
 {
     char *sbuf = zhalloc(80);
-    int sptr = 1, ret = 0, ssbuf = 80, feep = 0;
+    int sptr = 1, ret = 0, ssbuf = 80;
     Thingy cmd;
     char *okeymap = curkeymapname;
 
@@ -1022,7 +1045,7 @@ getvisrchstr(void)
 		zrefresh();
 	    }
 	    if ((c = getkey(0)) == EOF)
-		feep = 1;
+		feep();
 	    else
 		goto ins;
 	} else if(cmd == Th(z_selfinsertunmeta) || cmd == Th(z_selfinsert)) {
@@ -1039,11 +1062,9 @@ getvisrchstr(void)
 	    }
 	    sbuf[sptr++] = c;
 	} else {
-	    feep = 1;
+	    feep();
 	}
-	if (feep)
-	    handlefeep(zlenoargs);
-	feep = 0;
+	handlefeep();
     }
     statusline = NULL;
     selectkeymap(okeymap, 1);
@@ -1101,8 +1122,10 @@ virepeatsearch(char **args)
     int n = zmult;
     char *s;
 
-    if (!visrchstr)
+    if (!visrchstr) {
+	feep();
 	return 1;
+    }
     if (zmult < 0) {
 	n = -n;
 	visrchsense = -visrchsense;
@@ -1122,6 +1145,7 @@ virepeatsearch(char **args)
 	    }
 	}
     }
+    feep();
     return 1;
 }
 
@@ -1170,6 +1194,7 @@ historybeginningsearchbackward(char **args)
 	    }
 	}
     }
+    feep();
     return 1;
 }
 
@@ -1206,5 +1231,6 @@ historybeginningsearchforward(char **args)
 	    }
 	}
     }
+    feep();
     return 1;
 }

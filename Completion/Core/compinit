@@ -41,13 +41,15 @@
 # See the file `compdump' for how to speed up initialisation.
 
 # If we got the `-d'-flag, we will automatically dump the new state (at
-# the end).  This takes the dumpfile as an argument.
+# the end).
+# `-f dir' is used to pass down the directory where this file was
+#   found.  This is necessary if functionargzero is not set.
+# If we were given an argument, this will be taken as the name of the
+# file in which to store the dump.
 
-emulate -L zsh
-
-typeset _i_dumpfile _i_files _i_line _i_done _i_dir _i_autodump=0
-typeset _i_tag _i_file
-
+_i_fdir=''
+_i_dumpfile=''
+_i_autodump=0
 while [[ $# -gt 0 && $1 = -[df] ]]; do
   if [[ "$1" = -d ]]; then
     _i_autodump=1
@@ -57,27 +59,56 @@ while [[ $# -gt 0 && $1 = -[df] ]]; do
       shift
     fi
   elif [[ "$1" = -f ]]; then
-    # Not used any more; use _compdir
+    # Used by compinstall to pass down directory where compinit was found
     shift
+    _i_fdir="$1"
     shift
   fi
 done
+# Get the directory if we don't have it already and we can
+if [[ -z "$_i_fdir" && -o functionargzero && $0 = */* ]]; then
+  _i_fdir=${0:h}
+fi
 
 # The associative array containing the definitions for the commands.
 # Definitions for patterns will be stored in the normal array `_patcomps'.
 
-typeset -gA _comps
+typeset -A _comps
 _patcomps=()
 
 # This is the associative array used for configuration.
 
-typeset -gA compconfig
+typeset -A compconfig
 
 # Standard initialisation for `compconfig'.
 if [[ -n $_i_dumpfile ]]; then
   # Explicitly supplied dumpfile.
   compconfig[dumpfile]="$_i_dumpfile"
+elif [[ -o functionargzero ]]; then
+  # We can deduce it from the name of this script
+  compconfig[dumpfile]="$0.dump"
+elif [[ -n $_i_fdir ]]; then
+  # We were told what directory to use.
+  compconfig[dumpfile]="$_i_fdir/compinit.dump"
 else
+  compconfig[dumpfile]=''
+fi
+
+if [[ -n $compconfig[dumpfile] ]]; then
+  # Check the file is writeable.  If it doesn't exist, the
+  # only safe way is to try and create it.
+  if [[ -f $compconfig[dumpfile] ]]; then
+    [[ -w $compconfig[dumpfile] ]] || compconfig[dumpfile]=''
+  elif touch $compconfig[dumpfile] >& /dev/null; then
+    rm -f $compconfig[dumpfile]
+  else
+    compconfig[dumpfile]=''
+  fi
+fi
+
+if [[ -z $compconfig[dumpfile] ]]; then
+  # If no dumpfile given, or it was not writeable, then use
+  # user's ZDOTDIR.
   compconfig[dumpfile]="${ZDOTDIR:-$HOME}/.zcompdump"
 fi
 
@@ -294,13 +325,15 @@ _i_files=( ${^~fpath:/.}/_(|*[^~])(N:t) )
 if [[ $#_i_files -lt 20 ]]; then
   # Too few files:  we need some more directories
   # Assume that we need to add the compinit directory to fpath.
-  if [[ -n $_compdir ]]; then
-    if [[ $_compdir = */Core ]]; then
+  if [[ -n $_i_fdir ]]; then
+    if [[ $_i_fdir = */Core ]]; then
       # Add all the Completion subdirectories
-      fpath=(${_compdir:h}/*(/) $fpath)
-    elif [[ -d $_compdir/Core ]]; then
+      fpath=(${_i_fdir:h}/*(/) $fpath)
+    elif [[ -d $_i_fdir/Core ]]; then
       # Likewise
-      fpath=(${_compdir}/*(/) $fpath)
+      fpath=(${_i_fdir}/*(/) $fpath)
+    else
+      fpath=($_i_fdir $fpath)
     fi
     _i_files=( ${^~fpath:/.}/_(|*[^~])(N:t) )
   fi
@@ -313,12 +346,8 @@ for _i_line in complete-word delete-char-or-list expand-or-complete \
   menu-expand-or-complete reverse-menu-complete; do
   zle -C $_i_line .$_i_line _main_complete
 done
-zle -la menu-select && zle -C menu-select .menu-select _main_complete
 
 _i_done=''
-
-# Make sure compdump is available, even if we aren't going to use it.
-autoload -U compdump compinstall
 
 # If we have a dump file, load it.
 
@@ -328,6 +357,7 @@ if [[ -f "$compconfig[dumpfile]" ]]; then
     builtin . "$compconfig[dumpfile]"
     _i_done=yes
   fi
+  unset _i_line
 fi
 if [[ -z "$_i_done" ]]; then
   for _i_dir in $fpath; do
@@ -351,12 +381,13 @@ if [[ -z "$_i_done" ]]; then
     done
   done
 
+  unset _i_dir _i_line _i_file _i_tag
+
   # If autodumping was requested, do it now.
 
-  if [[ $_i_autodump = 1 ]]; then
-    compdump
+  if [[ -n ${_i_fdir} && $_i_autodump = 1 ]]; then
+    builtin . ${_i_fdir}/compdump
   fi
 fi
 
-unfunction compinit
-autoload -U compinit
+unset _i_files _i_initname _i_done _i_autodump _i_fdir _i_dumpfile
