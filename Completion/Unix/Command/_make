@@ -1,6 +1,6 @@
 #compdef make gmake pmake dmake
 
-local prev="$words[CURRENT-1]" file expl tmp is_gnu cmdargs dir incl
+local prev="$words[CURRENT-1]" file expl tmp is_gnu dir incl
 
 expandVars() {
     local open close var val tmp=$1 ret=$1
