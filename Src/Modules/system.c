@@ -391,6 +391,8 @@ boot_(Module m)
 			       PM_HIDE|PM_HIDEVAL|PM_REMOVABLE)))
 	return 1;
     pm_nos->gets.afn = errnosgetfn;
+    pm_nos->sets.afn = arrsetfn;
+    pm_nos->unsetfn = stdunsetfn;
 
     if (!addbuiltins(m->nam, bintab, sizeof(bintab)/sizeof(*bintab))) {
 	tidyparam(pm_nos);

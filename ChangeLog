@@ -1,3 +1,9 @@
+2003-09-17  Peter Stephenson  <pws@csr.com>
+
+	* 19096: Src/Modules/system.c: Unloading zsh/system could crash
+	the shell because the set and unset elements for the errnos
+	array weren't installed.
+
 2003-09-15  Vin Shelton  <acs@alumni.princeton.edu>
 
 	* Doc/Zsh/contrib.yo: Fix capitalization to make makeinfo happy.
