@@ -946,7 +946,7 @@ static struct reswd reswds[] = {
     {NULL, "time", 0, TIME},
     {NULL, "until", 0, UNTIL},
     {NULL, "while", 0, WHILE},
-    {NULL, NULL}
+    {NULL, NULL, 0, 0}
 };
 
 /* hash table containing the reserved words */
