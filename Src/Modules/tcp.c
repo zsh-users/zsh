@@ -355,7 +355,8 @@ tcp_connect(Tcp_session sess, char *addrp, struct hostent *zhost, int d_port)
 static int
 bin_ztcp(char *nam, char **args, char *ops, int func)
 {
-    int herrno, err=1, destport, force=0, verbose=0, test=0, targetfd=0, len;
+    int herrno, err=1, destport, force=0, verbose=0, test=0, targetfd=0;
+    SOCKLEN_T  len;
     char **addrp, *desthost, *localname, *remotename, **dargs;
     struct hostent *zthost = NULL, *ztpeer = NULL;
     struct servent *srv;

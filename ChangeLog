@@ -1,3 +1,7 @@
+2001-10-08  Andrej Borsenkow  <bor@zsh.org>
+
+	* 15964: Src/Modules/tcp.c: use SOCKLEN_T
+
 2001-10-06  Clint Adams  <clint@zsh.org>
 
 	* Norbert Koch: 15954: Doc/Zsh/arith.yo:
