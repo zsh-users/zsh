@@ -1,4 +1,4 @@
-2000-05-03  Tanaka Akira  <akr@m17n.org>
+2000-05-03  Tanaka Akira  <akr@zsh.org>
 
 	* 11137: Test/07cond.ztst: detect block device file using find.
 
@@ -32,7 +32,7 @@
  	backslashes before `$' in _expand when `substitute' is unset; fix
  	for clearing end-of-list lines in menu-selection
 	
-2000-05-03  Tanaka Akira  <akr@m17n.org>
+2000-05-03  Tanaka Akira  <akr@zsh.org>
 
 	* 11109: Completion/X/_xauth: new completion for xauth.
 
@@ -68,7 +68,7 @@
 
 	* 11078: README: update download location for yodl
 
-2000-05-02  Tanaka Akira  <akr@m17n.org>
+2000-05-02  Tanaka Akira  <akr@zsh.org>
 
 	* 11075: configure.in: install completion functions for AIX and BSD.
 
