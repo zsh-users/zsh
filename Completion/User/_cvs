@@ -327,6 +327,7 @@ _cvs_tag () {
     -{F,Q,q,l,R,c,d,b,f} \
     '-r+:tag:_cvs_revisions' \
     '-D+:date:_cvs_D' \
+    ':tag:' \
     '*:file:_cvs_files'
 }
 
