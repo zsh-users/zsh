@@ -81,7 +81,7 @@ $(sdir)/zsh.texi.in: $(sdir)/zsh.yo
 zsh.texi: $(sdir)/zsh.texi.in
 	@test -f $< -a -s $<
 	tzsh=`echo zsh | sed '$(transform); s/,/\\\\,/g'`; \
-	sed "/@setfilename/{; s/@setfilename //; s,zsh,$$tzsh, ; s/^/@setfilename /;}" < $< > zsh.texi
+	sed "/@setfilename/{s/@setfilename //; s,zsh,$$tzsh, ; s/^/@setfilename /;}" < $< > zsh.texi
 
 .yo.1:
 	case $@ in \
