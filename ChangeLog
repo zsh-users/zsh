@@ -1,3 +1,10 @@
+2002-05-29  Sven Wischnowsky  <wischnow@zsh.org>
+
+	* 17252: Completion/Unix/Type/_path_files: fix for use of (z)
+	parameter modifier; the first word in the parameter is parsed
+	like the first word on a command line, treating parens
+	specially
+
 2002-05-29  Peter Stephenson  <pws@csr.com>
 
 	* 17250: Src/signals.c: don't execsave()/execrestore() around
