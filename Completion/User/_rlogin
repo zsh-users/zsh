@@ -17,7 +17,7 @@ _rlogin () {
       '-n[ignore stdin]' \
       '-l[specify login user name]:login as:_rlogin_users' \
       ':remote host name:_rlogin_hosts' \
-      ':command: _command_names -e' \
+      '(-):command: _command_names -e' \
       '*::command:->command' && ret=0
 
     if [[ -n "$state" ]]; then

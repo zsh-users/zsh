@@ -18,7 +18,7 @@ _ssh () {
   ssh|slogin)
     args=(
       ':remote host name:->userhost'
-      ':command: _command_names -e'
+      '(-):command: _command_names -e'
       '*::args:->command'
     )
     ;&

@@ -1,5 +1,11 @@
 2000-05-03  Sven Wischnowsky  <wischnow@informatik.hu-berlin.de>
 
+	* 11121: Completion/User/_fakeroot, Completion/User/_rlogin,
+ 	Completion/User/_ssh, Completion/User/_sudo,
+ 	Completion/User/_xargs, Completion/X/_xutils, Doc/Zsh/compsys.yo,
+ 	Src/Zle/computil.c: allow `-' in exclusion lists for _arguments,
+ 	to avoid completing all options
+	
 	* 11117: Doc/Zsh/expn.yo, Src/hist.c: fix for the (z) flag: report
  	partial word (like `"foo', without a closing quote); mention in
  	manual that (z) is handled lately

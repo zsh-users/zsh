@@ -1040,7 +1040,12 @@ ca_inactive(Cadef d, char **xor, int cur)
 	    }
 	    if (x[0] == ':' && !x[1])
 		d->argsactive = 0;
-	    else if (x[0] == '*' && !x[1]) {
+	    else if (x[0] == '-' && !x[1]) {
+		Caopt p;
+
+		for (p = d->opts; p; p = p->next)
+		    p->active = 0;
+	    } else if (x[0] == '*' && !x[1]) {
 		if (d->rest)
 		    d->rest->active = 0;
 	    } else if (x[0] >= '0' && x[0] <= '9') {

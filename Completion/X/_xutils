@@ -107,7 +107,8 @@ xon)
     '-screen:screen number:' \
     '-user:remote user name:_users' \
     ':remote host:_hosts' \
-    '*:command::command:_normal'
+    '(-):command: _command_names -e' \
+    '*:command: _normal'
   ;;
 xsetroot)
   _x_arguments \

@@ -3,9 +3,11 @@
 _arguments \
   -{p,t,x} \
   -{e-,E}':end-of-file string:' \
-  -{i-,I}':replacement string for lines:' \
-  -{l-,L}':number of input lines:' \
-  '-n:maximum number of arguments:' \
+  '(-x -I)-i-:replacement string for lines:' \
+  '(-x -i)-I:replacement string for lines:' \
+  '(-n -L -x)-l-:number of input lines:' \
+  '(-n -l)-L:number of input lines:' \
+  '(-l -L)-n:maximum number of arguments:' \
   '-s:maximum command line length:' \
-  ':command: _command_names -e' \
-  '*::args:_normal'
+  '(-):command: _command_names -e' \
+  '*::args: _normal'
