@@ -5,7 +5,8 @@
 # way round if pushdminus is set). Note that this function is also called
 # from _cd for cd and pushd.
 
-setopt localoptions nonomatch
+emulate -L zsh
+setopt extendedglob nonomatch
 
 [[ $PREFIX = [-+]* ]] || return 1
 
@@ -16,17 +17,17 @@ PREFIX=$PREFIX[2,-1]
 
 # get the list of directories with their canonical number
 # and turn the lines into an array, removing the current directory
-lines=( "$dirstack[@]" )
+lines=( ${${(f)"$(dirs -v)"}##0*} )
 if [[ ( $IPREFIX = - && ! -o pushdminus ) ||
       ( $IPREFIX = + && -o pushdminus ) ]]; then
   integer i
   revlines=( $lines )
   for (( i = 1; i <= $#lines; i++ )); do
-    lines[$i]="$((i-1)) -- ${revlines[-$i]}"
+    lines[$i]="$((i-1)) -- ${revlines[-$i]##[0-9]#[	 ]#}"
   done
 else
   for (( i = 1; i <= $#lines; i++ )); do
-    lines[$i]="$i -- ${lines[$i]}"
+    lines[$i]="$i -- ${lines[$i]##[0-9]#[	 ]#}"
   done
 fi
 # get the array of numbers only

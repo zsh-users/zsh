@@ -59,7 +59,8 @@ insert-and-predict () {
 	  zle complete-word ${(s.:.)compconfig[predict_completer]}
 	  # Decide where to leave the cursor. The dummy loop is used to
 	  # get out of that `case'.
-	  while true; do
+	  repeat 1
+	  do
 	    case $compconfig[predict_cursor] in
 	    (complete)
 	      # At the place where the completion left it, if it is after
@@ -69,7 +70,8 @@ insert-and-predict () {
 	    (key)
 	      # Or maybe at the n'th occurrence of the character typed.
 	      pos=${BUFFER[(in:nchar:)${KEYS[-1]}]}
-	      if [[ pos -gt curs ]]; then
+	      if [[ pos -gt curs ]]
+	      then
 	        CURSOR=$pos
 	        break
 	      fi
@@ -78,7 +80,6 @@ insert-and-predict () {
 	      # Or else at the previous position.
 	      CURSOR=$curs
 	    esac
-	    break
 	  done
 	fi
       fi

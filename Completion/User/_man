@@ -21,7 +21,7 @@ if (( ! $#manpath )); then
   manpath=( $mp )
 fi
 
-(( $#manpath )) ||
+(( $#manpath )) || manpath=( ${(s.:.)$(manpath 2>/dev/null)} ) ||
   manpath=( /usr/man(-/N) /(opt|usr)/(dt|share|X11R6|local)/(cat|)man(-/N) )
 
 # `sman' is the SGML manual directory for Solaris 7.

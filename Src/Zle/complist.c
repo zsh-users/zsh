@@ -409,7 +409,7 @@ clprintm(Cmgroup g, Cmatch *mp, int mc, int ml, int lastc, int width,
 	nicezputs((m->disp ? m->disp : m->str), shout);
 	len = niceztrlen(m->disp ? m->disp : m->str);
 
-        if (isset(LISTTYPES) && buf) {
+	 if (isset(LISTTYPES) && buf) {
 	    if (m->gnum != mselect) {
 		zcoff();
 		zcputs(&mcolors, COL_TC);

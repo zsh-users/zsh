@@ -1,3 +1,392 @@
+1999-11-03  Bart Schaefer  <schaefer@zsh.org>
+
+	* Config/version.mk: Set version string to 3.1.6-bart-8.
+
+	* Doc/Zsh/Makefile.in, Src/Zle/zle.mdd: The comp1 module is obsolete.
+
+1999-11-02  Bart Schaefer  <schaefer@zsh.org>
+
+	* Src/Zle/comp1.c, Src/Zle/comp1.export, Src/Zle/comp1.mdd: Sven:
+	8424: These files are obsolete now.
+
+	* Src/Zle/compcore.c: Sven: 8495: The wrong cline struct was being
+	tested, causing improper auto-suffix-removal behavior.
+
+	* Completion/Core/_path_files: Sven: 8494: Fix up prefix/suffix
+	manipulations.
+
+	* Completion/Base/_value: Tanaka: 8491: Call _value after
+	redefining it.
+
+	* Src/Zle/compcore.c, Src/Zle/compresult.c, Src/Zle/computil.c:
+	Sven: 8490: Fix display bugs and a fencepost error.
+
+	* Src/Modules/parameter.c: Sven: 8490: Use the correct scan for
+	disabled aliases.
+
+	* Completion/User/_urls: Sven: 8490: Don't use "hosts" as a local
+	paramter name, _hosts wants to see the global when it gets called
+	later.
+
+	* Src/exec.c: Sven: 8488: Pass a copy of the function name to
+	module wrappers in case the function undefines/redefines itself.
+
+	* Completion/Base/_value: Tanaka: 8487: Completions after
+	parameter assignments.
+
+	* Completion/User/_make: Tanaka: 8486: Some BSD-variant special cases.
+
+	* Completion/Debian/_apt, Completion/User/_archie: Tanaka: 8485:
+	Fix typos and minor omissions.
+
+	* Completion/User/_cvs, Completion/User/_whois,
+	Completion/Core/compinit, Completion/Base/_combination: Sven:
+	8484: Use parameter module for testing function existence; fix a
+	couple of small bugs.
+
+	* Src/Modules/parameter.c: Sven: 8482: Make sure special AA param
+	keys are set when needed.
+
+	* Src/Zle/compcore.c, Src/Zle/compmatch.c: Sven: 8481: An empty
+	string in compmatchers means try global match specs.
+
+	* Doc/Zsh/mod_parameter.yo, Src/Modules/parameter.c,
+	Src/Modules/parameter.mdd, Completion/Core/compinit: Sven: 8480:
+	Add funcstack parameter.
+
+	* Completion/Core/_path_files: Sven: 8479: Use globdots throughout.
+
+	* Completion/Base/_first: Sven: 8479: Fix example code (in comment).
+
+	* Doc/Zsh/expn.yo, Src/glob.c: Sven: zsh-users/2713: Qualifier (n)
+	sets numeric-glob-sort for current glob.
+
+	* Src/Zle/zle_thingy.c, Src/Zle/zle_tricky.c, Doc/Zsh/compctl.yo,
+	Doc/Zsh/compsys.yo, Doc/Zsh/compwid.yo, Doc/Zsh/intro.yo,
+	Doc/Zsh/manual.yo, Doc/Zsh/mod_complete.yo, Doc/Zsh/modules.yo,
+	Doc/Zsh/zle.yo, Src/Zle/comp.h, Src/Zle/compcore.c,
+	Src/Zle/complete.c, Src/Zle/complete.mdd, Src/Zle/complist.c,
+	Src/Zle/compmatch.c, Src/Zle/compresult.c, Src/Zle/zle.h,
+	Src/Zle/zle_main.c, Src/Zle/zle_misc.c, Doc/zsh.yo: Sven: 8478 (as
+	described in 8475 and 8476): Continue the re-modularization of the
+	new completion system, moving some doc into new sections and
+	moving most of the completion code from zle_tricky.c into three
+	new files.
+
+	* Completion/Core/compinit: Sven: 8475: Call zmodload on parameter
+	and zleparameter.  This may not be necessary, as it wasn't
+	included in the correction in 8478.
+
+	* Src/Modules/parameter.c: Sven: 8474: Fix computation from
+	previous patch for whether values are needed.
+
+	* Src/hashtable.c: Sven: 8474: Fall back on getpwent() if NIS
+	and/or NIS+ don't find anything.
+
+	* Src/signals.c: Sven: 8473: Reset sigtrapped[] during dosavetrap().
+
+	* Src/Modules/parameter.c, Src/Zle/zleparameter.c: Sven: 8472:
+	Don't calculate values for special parameters unless needed.
+
+	* Functions/Zle/predict-on: Use a "repeat 1" instead of "while
+	true" for a dummy loop.  (Unposted.)
+
+	* Completion/Builtins/_functions, Completion/Builtins/_unhash,
+	Completion/Builtins/_which, Completion/Builtins/_zle,
+	Completion/Builtins/_zmodload, Doc/Zsh/mod_parameter.yo,
+	Doc/Zsh/mod_zleparameter.yo, Src/Modules/parameter.c,
+	Src/Modules/parameter.mdd, Src/Zle/zleparameter.c,
+	Src/Zle/zleparameter.mdd, Completion/Base/_command_names,
+	Completion/Base/_equal, Completion/Builtins/_aliases,
+	Completion/Builtins/_bindkey, Completion/Builtins/_builtin,
+	Completion/Builtins/_disable, Completion/Builtins/_enable: Sven:
+	8471: Split some paramters into enabled and disabled variants.
+
+	* Functions/Zle/predict-on: Sven: 8470: Test list_max of 0 as a
+	special case.
+
+	* configure.in: Zefram: 8459: More places to hunt for signals and
+	resources.
+
+	* Completion/Core/compinit, Doc/Zsh/compsys.yo, Src/xmods.conf:
+	Sven: 8440: Auto-autoload the parameter modules, because
+	completion won't work without them.
+
+	* Src/Zle/zle_tricky.c: Sven: 8439: Completion lists respect
+	NUMERIC_GLOB_SORT.
+
+	* Src/Zle/zle_tricky.c: Sven: 8438: Force recompute of completion
+	list in listlist().
+
+	* Src/Zle/complist.c, Src/Zle/zle_tricky.c: Sven: 8437: Fix crash
+	in menu-select and remove old ref to ZLS_SELECT param.
+
+	* Src/Zle/compctl.mdd, Src/Zle/complete.c, Src/Zle/complete.mdd,
+	Src/Zle/complist.c, Src/Zle/complist.mdd, Src/Zle/computil.mdd,
+	Src/Zle/zle.h, Src/Zle/zle_keymap.c, Src/Zle/zle_main.c,
+	Src/Zle/zle_thingy.c, Src/Zle/zle_tricky.c,
+	Src/Zle/zleparameter.c, Src/Zle/zleparameter.mdd,
+	Doc/Zsh/compwid.yo, Doc/Zsh/expn.yo, Doc/Zsh/manual.yo,
+	Doc/Zsh/mod_clone.yo, Doc/Zsh/mod_compctl.yo,
+	Doc/Zsh/mod_complete.yo, Doc/Zsh/mod_computil.yo,
+	Doc/Zsh/mod_parameter.yo, Doc/Zsh/mod_zle.yo,
+	Doc/Zsh/mod_zleparameter.yo, Doc/Zsh/modules.yo,
+	Src/Modules/parameter.c, Src/Modules/parameter.mdd,
+	Src/Zle/comp.h, Src/Zle/compctl.h, Src/hashtable.c, Src/module.c,
+	Src/params.c, Src/subst.c, Src/xmods.conf, Completion/User/_cvs,
+	Completion/User/_gdb, Completion/User/_man, Completion/User/_mh,
+	Completion/User/_nslookup, Completion/User/_tar,
+	Completion/User/_urls, Completion/User/_users,
+	Completion/User/_whereis, Completion/User/_whois,
+	Completion/X/_x_font, Completion/X/_x_window,
+	Completion/X/_xmodmap, Doc/Makefile.in, Doc/Zsh/compctl.yo,
+	Doc/Zsh/compsys.yo, Completion/Debian/_apt,
+	Completion/Core/_approximate, Completion/Core/_main_complete,
+	Completion/Core/_normal, Completion/Core/_options,
+	Completion/Core/_parameters, Completion/Core/_path_files,
+	Completion/Core/compinit, Completion/Commands/_bash_completions,
+	Completion/Commands/_history_complete_word,
+	Completion/Commands/_read_comp, Completion/Builtins/_aliases,
+	Completion/Builtins/_arrays, Completion/Builtins/_bg_jobs,
+	Completion/Builtins/_bindkey, Completion/Builtins/_builtin,
+	Completion/Builtins/_cd, Completion/Builtins/_command,
+	Completion/Builtins/_compdef, Completion/Builtins/_disable,
+	Completion/Builtins/_enable, Completion/Builtins/_fc,
+	Completion/Builtins/_functions, Completion/Builtins/_hash,
+	Completion/Builtins/_jobs, Completion/Builtins/_kill,
+	Completion/Builtins/_set, Completion/Builtins/_stat,
+	Completion/Builtins/_trap, Completion/Builtins/_unhash,
+	Completion/Builtins/_wait, Completion/Builtins/_which,
+	Completion/Builtins/_zle, Completion/Builtins/_zmodload,
+	Completion/Base/_arguments, Completion/Base/_brace_parameter,
+	Completion/Base/_command_names, Completion/Base/_describe,
+	Completion/Base/_equal, Completion/Base/_first,
+	Completion/Base/_job, Completion/Base/_regex_arguments,
+	Completion/Base/_tilde, Completion/Base/_values: Sven: 8424:
+	Rearrange completion code to make the new function-based system
+	the default and begin separating zle_tricky, the old compctl
+	stuff, and the new system into better-segregated modules.
+
+	* Src/Zle/compctl.c: Port from zle_tricky.c my local stubbornness
+	patch to use short job names, not whole job listings, in job
+	completions.
+
+	* Src/Zle/compctl.c: Sven: 8424: Rearrange completion code to make
+	the new function-based system the default and begin separating
+	zle_tricky, the old compctl stuff, and the new system into
+	better-segregated modules.
+
+1999-10-27  Bart Schaefer  <schaefer@zsh.org>
+
+	* Functions/Zle/predict-on: Better handling of automenu, and don't
+	generate a listing if nmatches is so big that it would generate a
+	"do you wish ...?" prompt.
+
+	* Functions/Zle/predict-on, Doc/Zsh/compsys.yo: Sven: 8442: "Pour
+	some compconfig over" predict-on.
+
+1999-10-26  Bart Schaefer  <schaefer@zsh.org>
+
+	* Functions/Zle/predict-on: As per Sven's suggestion, use a
+	comppostfuncs function to suppress the "do you wish to see all
+	possibilities?" message on long listings.
+
+1999-10-25  Bart Schaefer  <schaefer@zsh.org>
+
+	* Src/Zle/complist.c: Alexandre Duret-Lutz: 8413: Tweak 8412 to
+	extend the menu-selection highlight to the full width of the
+	column.
+
+	* Src/Zle/complist.c, Doc/Zsh/mod_complist.yo: Sven: 8412: Add
+	separate colorings for the file-type-marker and for background
+	spaces, to be able to more closely copy GNU color-ls.
+
+	* Src/Modules/parameter.c: Bart: 8404: Implement "autoload -X" and
+	change the value of "$functions" to fit.  Also fix a crash-bug
+	when unloading this module.
+
+	* Src/builtin.c, Src/exec.c, Src/hashtable.c, Doc/Zsh/builtins.yo,
+	Doc/Zsh/func.yo: Bart: 8404: Implement "autoload -X" and change the
+	output of "functions" to fit.
+
+	* Doc/Zsh/zle.yo: Sven: 8400: BLINES -> BUFFERLINES
+
+1999-10-24  Bart Schaefer  <schaefer@zsh.org>
+
+	* Src/zsh.mdd: Don't forcibly rebuild zshpaths.h; instead make it
+	depend on the usual configuration-related makefile fragments.
+
+	* Src/parse.c: Fix function-body parsing bug introduced by earlier
+	optimizations.
+
+1999-10-22  Bart Schaefer  <schaefer@zsh.org>
+
+	* Src/Modules/stat.c: Alexandre Duret-Lutz: 8371: Make "stat -g"
+	correspond to the doc for it.
+
+	* Src/hist.c: Alexandre Duret-Lutz: 8376: !# history expansion now
+	works during completion, as it has in 3.0 since June 1, 1997.
+
+	* Src/main.c, Src/params.c, Src/system.h, INSTALL, acconfig.h,
+	configure.in: Zefram: 8372: Configure option to disable
+	setlocale() support, and also do a linkage test for it rather than
+	simply test for the LC_ALL constant.
+
+	* Functions/Zle/predict-on: Back out Sven's suggested compmatchers
+	for now; turn off prediction when a delete-char-or-list is
+	performed.
+
+1999-10-21  Bart Schaefer  <schaefer@zsh.org>
+
+	* Functions/Zle/predict-on: Refine, and improve commentary.
+
+	* Completion/Builtins/_cd, Completion/Builtins/_popd: Oliver:
+	8361: Factor out handling of +/- dirstack offsets from _cd to make
+	completer for _popd; fix _cd handling of directory names that
+	actually do begin with a + or -.
+
+	* Src/Zle/computil.c: Sven: 8360: Still more parsing fixes.
+
+	* Completion/User/_bison: Sven: 8360: Improved option recognition.
+
+	* Completion/Base/_arguments, Completion/Base/_values: Sven: 8360:
+	More computil-related tweaking.
+
+	* Completion/Builtins/_sched: Oliver: 8359: Complete scheduled
+	jobs for removal.
+
+	* Src/Zle/computil.c: Sven: 8357: More options-parsing tweaks.
+
+	* Functions/Prompts/promptinit,
+	Functions/Prompts/prompt_oliver_setup: Oliver: 8353: Simplified
+	handling of prompt_opts.
+
+	* Src/Zle/computil.c: Sven: 8352: Fix parsing bugs.
+
+	* Completion/User/_bison: Sven: 8352: Complete .y files as well.
+
+	* Completion/Base/_arguments: Sven: 8352: Delay calling _message
+	so it won't confuse compstate[insert].
+
+	* Src/Zle/zle_tricky.c: Sven: 8350: Fixes to cline handling of
+	position of braces and of cursor following completion in nested
+	braces.
+
+	* Functions/Zle/predict-on: If history-beginning-search-backward
+	fails, attempt complete-word.
+
+	* Completion/Core/_path_files: Sven: 8350: Fix prefix/suffix settings.
+
+	* configure.in: Clint Adams: 8346: Fix typos.
+
+	* Src/Zle/computil.c: Sven: 8340: Fix memory management bugs and
+	confusion about word ranges when restricting compwords.
+
+	* Completion/Core/_path_files: Sven: 8340: Fix completion on empty
+	string.
+
+1999-10-20  Bart Schaefer  <schaefer@zsh.org>
+
+	* Functions/Prompts/promptinit: Oliver: 8335: Provide the
+	prompt_opts assoc. array to specify what options are needed by a
+	given prompt theme, and arrange to set them by putting the
+	localoptions-affected guts of the prompt function into set_prompt
+	and then calling setopt after it finishes.  (Tweaked to avoid
+	reindentation.)
+
+1999-10-19  Bart Schaefer  <schaefer@zsh.org>
+
+	* Src/Zle/comp.h, Src/Zle/complist.c, Src/Zle/zle_tricky.c: Sven:
+	8333: Handle completion in nested brace-expressions.
+
+	* Src/Builtins/rlimits.c: Display the sockbufsize and maxpthreads
+	limits in "ulimit -a" output.
+
+	* Src/Builtins/rlimits.awk, Doc/Zsh/builtins.yo: Add the
+	"maxpthreads" limit as reported by Albert Chin.
+
+	* Src/Zle/comp1.export, Src/Zle/compctl.export,
+	Src/Zle/zle.export: Oliver: 8323: Declarations needed to build
+	shared objects on AIX.
+
+	* Src/Zle/zle_tricky.c: Sven: 8322: Fix overeager slash-addition
+	and suffix-elimination.
+
+	* Completion/Core/_path_files: Sven: 8322: Complete directories up
+	to a trailing slash even if there are no further subdirectories,
+	but continue to make any subdirectories candidates for further
+	completion when a trailing slash is present.
+
+	* Src/Builtins/rlimits.awk, Doc/Zsh/builtins.yo: Rename
+	"sktbuffersize" as "sockbufsize".
+
+	* Src/cond.c: Sven: 8321: Fix bug in new cmpile-once "case" handling.
+
+1999-10-18  Bart Schaefer  <schaefer@zsh.org>
+
+	* Src/Builtins/rlimits.awk, Src/Builtins/rlimits.c,
+	Src/Builtins/rlimits.mdd: Zefram: 8320: Sort the resource list for
+	"limit", rename "sbsize" to "sktbuffersize", fix problems handling
+	memory type limits vs pure numeric vs time spans.
+
+	* Doc/Zsh/builtins.yo: Zefram: 8320: Sort the resource list for
+	"limit", rename "sbsize" to "sktbuffersize".
+
+	* Src/cond.c, Src/loop.c, Src/parse.c, Src/pattern.c, Src/utils.c,
+	Src/zsh.h: Sven: 8319: Compile patterns in "case" statements on
+	demand, then keep them in the parse tree so they only have to be
+	compiled once.
+
+	* Src/Zle/zle_tricky.c: Sven: 8317: Reset state so that a leading
+	"~" isn't assumed to be part of an extendedglob pattern.
+
+	* Completion/Base/_tilde: Sven: 8317: Use _users.
+
+	* Src/Zle/computil.c: Sven: 8316: Report when arguments are not
+	allowed at a position.
+
+	* Completion/Base/_arguments: Sven: 8316: Extraneous "break".
+
+	* Src/Zle/computil.c: Sven: 8315: Save and restore parser state
+	around "restricting rest-argument-definitions".
+
+	* Src/Zle/zle_tricky.c: Sven: 8313: Try harder to use match specs
+	correctly, even when `globcomplete'.
+
+	* Doc/Zsh/compsys.yo, Completion/Core/_path_files: Sven: 8313:
+	conconfig[path_expand] now has "prefix" and "suffix" choices.
+
+	* Completion/Core/compinit: Sven: 8313: Minor cleanup of "funcall".
+
+	* Completion/Core/_main_complete: Sven: 8313: A warning message
+	should be printed only when the last global match spec was tried.
+
+	* Completion/Core/_main_complete: Sven: 8312: Missing "local" decl.
+
+	* Doc/Zsh/builtins.yo: Document the `sbsize' limit.
+
+	* Src/Builtins/rlimits.awk: Jos Backus: 8309: FreeBSD has an
+	SBSIZE limit.
+
+1999-10-17  Bart Schaefer  <schaefer@zsh.org>
+
+	* Completion/User/_man: Oliver: 8139: Use the "manpath" command if
+	available, splitting at colons.
+
+	* Src/Modules/mathfunc.c: Oliver: 8138: Remove excess comma that
+	causes picky compilers to choke.
+
+	* Src/builtin.c, Src/options.c, Src/zsh.h, Doc/Zsh/options.yo:
+	Bart: 8308: The `CHECK_JOBS' option, based on Clint Adams' 8109,
+	with sense reversed as suggested by Zefram in 8111, and adapted
+	doc from PWS in 8110.
+
+	* Doc/Zsh/compsys.yo, Completion/Commands/_history_complete_word:
+	Adam: 8028,8063,8070; and PWS: 8098: Revised history completion.
+
+	* Src/.cvsignore: Ignore .pro files only if they begin with
+	alphanumerics, to keep .indent.pro.
+
 1999-10-16  Bart Schaefer  <schaefer@zsh.org>
 
 	* Config/version.mk: Set version string to 3.1.6-bart-7.

@@ -106,21 +106,12 @@ Options:
 }
 
 prompt () {
-  local -A prompt_opts
-  local opt
-
+  local prompt_opts
+  
   set_prompt "$@"
-
-  # Set prompt options
-  for opt in ${(k)prompt_opts}; do
-    if [[ $prompt_opts[$opt] != (|un)set ]]; then
-      echo "${0##*/}: value of prompt option must be 'set' or 'unset'" >&2
-      return 1
-    else
-      $prompt_opts[$opt]opt prompt$opt
-    fi
-  done
+ 
+  (( $#prompt_opts )) &&
+      setopt noprompt{bang,cr,percent,subst} prompt${^prompt_opts[@]}
 }
 
 promptinit "$@"
-
