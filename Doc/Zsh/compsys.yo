@@ -3276,7 +3276,7 @@ metacharacters such as `tt(LPAR())', `tt(RPAR())', `tt(#)' and `tt(|)'
 should be quoted.
 
 startitem()
-item(tt(/)var(pattern)tt(/) [tt(%)var(lookahead)tt(%)] [tt(-)var(guard)] [tt(:)var(action)])(
+item(tt(/)var(pattern)tt(/) [tt(%)var(lookahead)tt(%)] [tt(-)var(guard)] [tt(:)var(tag)tt(:)var(descr)tt(:)var(action)])(
 This is a primitive element, corresponding to one
 state of the compiled state machine.  The state is entered if
 `tt((#b)LPAR()(#B))var(pattern)tt(RPAR()(#B))var(lookahead)tt(*)' matches
@@ -3295,12 +3295,15 @@ character, the completion target is restricted to the remainder of the
 command line string and var(action)s for the target are evaluated.
 In this case, nothing is actually removed from the command line string
 so that any previous or neighbouring state may also have var(actions)s.
+var(actions)s evaluation are ordered by the tt(tag-order) style and
+specified var(tag).  var(descr) is used for set up the array parameter
+tt(expl).
 )
-item(tt(/)var(pattern)tt(/+) [tt(%)var(lookahead)tt(%)] [tt(-)var(guard)] [tt(:)var(action)])(
+item(tt(/)var(pattern)tt(/+) [tt(%)var(lookahead)tt(%)] [tt(-)var(guard)] [tt(:)var(tag)tt(:)var(descr)tt(:)var(action)])(
 This is similar to `tt(/)var(pattern)tt(/) ...' but the left part of
 command line string is also considered as part of the completion target.
 )
-item(tt(/)var(pattern)tt(/-) [tt(%)var(lookahead)tt(%)] [tt(-)var(guard)] [tt(:)var(action)])(
+item(tt(/)var(pattern)tt(/-) [tt(%)var(lookahead)tt(%)] [tt(-)var(guard)] [tt(:)var(tag)tt(:)var(descr)tt(:)var(action)])(
 This is similar to `tt(/)var(pattern)tt(/) ...' but the var(action)s of the
 current and previous states are ignored even if the following state's
 `var(pattern)' matches the empty string.

@@ -15,34 +15,53 @@ _xwit_guard () {
 }
 
 _xwit_compopts () {
-  local expl
-  _wanted options expl option compadd - ${(k)no[(R)*~0]} ||
-      _wanted options expl option compadd - ${(k)no}
+  compadd "$expl[@]" - ${(k)no[(R)*~0]} ||
+    compadd "$expl[@]" - ${(k)no}
 }
 
 _regex_arguments _xwit_parse \
   "/$word/" \
   \( \
     "/-/+" \
-    \( "/display$nul/" "$guard" "/$word/" ":_x_display" \
+    \( "/display$nul/" "$guard" "/$word/" ':option-display:display:_x_display' \
     \| "/(sync|pop|open|iconify|unmap|root|current|select|(no|)(save|backingstore|saveunder))$nul/" "$guard" \
-    \| "/resize$nul/" "$guard" "/$word/" ":_message width" "/$word/" ":_message height" \
-    \| "/rows$nul/" "$guard" "/$word/" ":_message rows" \
-    \| "/columns$nul/" "$guard" "/$word/" ":_message columns" \
-    \| "/(r|)move$nul/" "$guard" "/$word/" ":_message x" "/$word/" ":_message y" \
-    \| "/(r|)warp$nul/" "$guard" "/$word/" ":_message x" "/$word/" ":_message y" \
-    \| "/colormap$nul/" "$guard" "/$word/" ":_x_colormapid" \
-    \| "/(name|label)$nul/" "$guard" "/$word/" ":_x_name" \
-    \| "/iconname$nul/" "$guard" "/$word/" ":_x_name" \
-    \| "/bitmap$nul/" "$guard" "/$word/" ":_files -g \\*.xbm" \
-    \| "/mask$nul/" "$guard" "/$word/" ":_files -g \\*.xbm" \
-    \| "/iconmove$nul/" "$guard" "/$word/" ":_message x" "/$word/" ":_message y" \
-    \| "/id$nul/" "$guard" "/$word/" ":_x_window" \
+    \| "/resize$nul/" "$guard" \
+       "/$word/" ':option-resize-width:width:_message width' \
+       "/$word/" ':option-resize-height:height:_message height' \
+    \| "/rows$nul/" "$guard" "/$word/" ':option-rows:rows:_message rows' \
+    \| "/columns$nul/" "$guard" "/$word/" ':option-columns:columns:_message columns' \
+    \| "/move$nul/" "$guard" \
+       "/$word/" ':option-move-x:x:_message x' \
+       "/$word/" ':option-move-y:y:_message y' \
+    \| "/rmove$nul/" "$guard" \
+       "/$word/" ':option-rmove-x:x:_message x' \
+       "/$word/" ':option-rmove-y:y:_message y' \
+    \| "/warp$nul/" "$guard" \
+       "/$word/" ':option-warp-x:x:_message x' \
+       "/$word/" ':option-warp-y:y:_message y' \
+    \| "/rwarp$nul/" "$guard" \
+       "/$word/" ':option-rwarp-x:x:_message x' \
+       "/$word/" ':option-rwarp-y:y:_message y' \
+    \| "/colormap$nul/" "$guard" \
+       "/$word/" ':option-colormap:colormapid:_x_colormapid' \
+    \| "/(name|label)$nul/" "$guard" \
+       "/$word/" ':option-name:name:_x_name "$expl[@]"' \
+    \| "/iconname$nul/" "$guard" \
+       "/$word/" ':option-name:iconname:_x_name "$expl[@]"' \
+    \| "/bitmap$nul/" "$guard" \
+       "/$word/" ':option-bitmap:bitmap file:_files "$expl[@]" -g \*.xbm' \
+    \| "/mask$nul/" "$guard" \
+       "/$word/" ':option-mask:mask file:_files "$expl[@]" -g \*.xbm' \
+    \| "/iconmove$nul/" "$guard" \
+       "/$word/" ':option-iconmove-x:x:_message x' \
+       "/$word/" ':option-iconmove-y:y:_message y' \
+    \| "/id$nul/" "$guard" "/$word/" ':option-id:window id:_x_window' \
     \| "/(no|)keyrepeat$nul/" "$guard" \
-        \( "/[0-9]##$nul/" ":[[ -prefix [0-9]# ]] && _message keycode" \
-	  \( "/-$nul/" "/[0-9]##$nul/" ":[[ -prefix [0-9]# ]] && _message 'last keycode'" \| \) \) \# \
-    \| "/names$nul/" "$guard" "/$word/" ":_x_window -n" \# \
-    \| "/[]/" ':_xwit_compopts' \
+        \( "/[0-9]##$nul/" ':option-keyrepeat-keycode:keycode:[[ -prefix [0-9]# ]] && _message keycode' \
+	  \( "/-$nul/" "/[0-9]##$nul/" ':option-keyrepeat-last-keycode:last keycode:[[ -prefix [0-9]# ]] && _message "last keycode"' \| \) \) \# \
+    \| "/names$nul/" "$guard" \
+       "/$word/" ':option-names:window name:_x_window -n' \# \
+    \| "/[]/" ':options:option:_xwit_compopts' \
     \) \
   \) \#
 

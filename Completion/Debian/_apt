@@ -75,9 +75,9 @@ _apt_arguments () {
   nul=$'\0'
   qnul="\$'\\0'"
 
-  comp_bool='_wanted values expl_bool "boolean value" compadd "$expl_bool[@]" '"$bool"
+  comp_bool='compadd "$expl[@]" '"$bool"
   comp_intlevel= #"_message 'intlevel'"
-  comp_configfile='_files "$expl_configfile[@]"'
+  comp_configfile='_files "$expl[@]"'
   comp_arbitem= #"_message 'Foo::Bar=bar'"
 
   comp_short=\
@@ -116,15 +116,15 @@ _describe -o option tmp2 -- tmp3 -S='
     regex_short=("$regex_short[@]"
       /"$short_seq(${(j:|:)short_hasarg})(=|)"/
 	-'_apt_consume_short ${match[1]%=}; current_option=${canonicalize[-${${match[1]%=}[-1]}]}'
-	\( /"$word1"/ :"$comp_hasarg" \| /"$nul"/ /"$word"/ :"$comp_hasarg" \) \|
+	\( /"$word1"/ ":options:option:$comp_hasarg" \| /"$nul"/ /"$word"/ ":options:option:$comp_hasarg" \) \|
     )
     regex_long_prefix=("$regex_long_prefix[@]"
       /"(${(j:|:)short_hasarg})$nul"/
 	-'_apt_consume_short ${match[1][-2]}; current_option=${canonicalize[-${${match[1]%'$qnul'}[-1]}]}'
-	/"$word"/ :"$comp_hasarg" \|
+	/"$word"/ ":options:option:$comp_hasarg" \|
       /"(${(j:|:)short_hasarg})="/
 	-'_apt_consume_short ${match[1][-2]}; current_option=${canonicalize[-${${match[1]%=}[-1]}]}'
-	\( /"$word1"/ :"$comp_hasarg" \| /"$nul"/ /"$word"/ :"$comp_hasarg" \) \|
+	\( /"$word1"/ ":options:option:$comp_hasarg" \| /"$nul"/ /"$word"/ ":options:option:$comp_hasarg" \) \|
     )
   fi
 
@@ -134,15 +134,15 @@ _describe -o option tmp2 -- tmp3 -S='
 	-'_apt_consume_short ${match[1]%%('$qnul'('${(j:|:)bool}')|('${(j:|:)bool}')|)'$qnul'}' \|
       /"$short_seq(${(j:|:)short_bool})="/
 	-'_apt_consume_short ${match[1]%=}'
-	\( /"$word1"/ :"$comp_bool" \| /"$nul"/ /"$word"/ :"$comp_bool" \) \|
+	\( /"$word1"/ ":names:boolean value:$comp_bool" \| /"$nul"/ /"$word"/ ":names:boolean value:$comp_bool" \) \|
     )
     regex_long_prefix=("$regex_long_prefix[@]"
       /"(${(j:|:)short_bool})="/
 	-'_apt_consume_short ${match[1][-2]}'
-	\( /"$word1"/ :"$comp_bool" \| /"$nul"/ /"$word"/ :"$comp_bool" \) \|
+	\( /"$word1"/ ":names:boolean value:$comp_bool" \| /"$nul"/ /"$word"/ ":names:boolean value:$comp_bool" \) \|
       /"(${(j:|:)short_bool})$nul"/
 	-'_apt_consume_short ${match[1][-2]}'
-	/"((${(j:|:)bool})$nul|)"/ :"$comp_bool" \|
+	/"((${(j:|:)bool})$nul|)"/ ":names:boolean value:$comp_bool" \|
     )
   fi
 
@@ -152,15 +152,15 @@ _describe -o option tmp2 -- tmp3 -S='
 	-'_apt_consume_short ${match[1]%%'"($qnul$intlevel|$intlevel|)$qnul"'}' \|
       /"$short_seq(${(j:|:)short_intlevel})="/
 	-'_apt_consume_short ${match[1]%=}'
-	\( /"$word1"/ :"$comp_intlevel" \| /"$nul"/ /"$word"/ :"$comp_intlevel" \) \|
+	\( /"$word1"/ ":options:option:$comp_intlevel" \| /"$nul"/ /"$word"/ ":options:option:$comp_intlevel" \) \|
     )
     regex_long_prefix=("$regex_long_prefix[@]"
       /"(${(j:|:)short_intlevel})="/
 	-'_apt_consume_short ${match[1][-2]}'
-	\( /"$word1"/ :"$comp_intlevel" \| /"$nul"/ /"$word"/ :"$comp_intlevel" \) \|
+	\( /"$word1"/ ":options:option:$comp_intlevel" \| /"$nul"/ /"$word"/ ":options:option:$comp_intlevel" \) \|
       /"(${(j:|:)short_intlevel})$nul"/
 	-'_apt_consume_short ${match[1][-2]}'
-	/"($intlevel$nul|)"/ :"$comp_intlevel" \|
+	/"($intlevel$nul|)"/ ":options:option:$comp_intlevel" \|
     )
   fi
 
@@ -168,15 +168,15 @@ _describe -o option tmp2 -- tmp3 -S='
     regex_short=("$regex_short[@]"
       /"$short_seq(${(j:|:)short_configfile})(=|)"/
 	-'_apt_consume_short ${match[1]%=}'
-	\( /"$word1"/ :"$comp_configfile" \| /"$nul"/ /"$word"/ :"$comp_configfile" \) \|
+	\( /"$word1"/ ":files:config file:$comp_configfile" \| /"$nul"/ /"$word"/ ":files:config file:$comp_configfile" \) \|
     )
     regex_long_prefix=("$regex_long_prefix[@]"
       /"(${(j:|:)short_configfile})$nul"/
 	-'_apt_consume_short ${match[1][-2]}'
-	/"$word"/ :"$comp_configfile" \|
+	/"$word"/ ":files:config file:$comp_configfile" \|
       /"(${(j:|:)short_configfile})="/
 	-'_apt_consume_short ${match[1][-2]}'
-	\( /"$word1"/ :"$comp_configfile" \| /"$nul"/ /"$word"/ :"$comp_configfile" \) \|
+	\( /"$word1"/ ":files:config file:$comp_configfile" \| /"$nul"/ /"$word"/ ":files:config file:$comp_configfile" \) \|
     )
   fi
 
@@ -184,15 +184,15 @@ _describe -o option tmp2 -- tmp3 -S='
     regex_short=("$regex_short[@]"
       /"$short_seq(${(j:|:)short_arbitem})(=|)"/
 	-'_apt_consume_short ${match[1]%=}'
-	\( /"$word1"/ :"$comp_arbitem" \| /"$nul"/ /"$word"/ :"$comp_arbitem" \) \|
+	\( /"$word1"/ ":options:option:$comp_arbitem" \| /"$nul"/ /"$word"/ ":options:option:$comp_arbitem" \) \|
     )
     regex_long_prefix=("$regex_long_prefix[@]"
       /"(${(j:|:)short_arbitem})$nul"/
 	-'_apt_consume_short ${match[1][-2]}'
-	/"$word"/ :"$comp_arbitem" \|
+	/"$word"/ ":options:option:$comp_arbitem" \|
       /"(${(j:|:)short_arbitem})="/
 	-'_apt_consume_short ${match[1][-2]}'
-	\( /"$word1"/ :"$comp_arbitem" \| /"$nul"/ /"$word"/ :"$comp_arbitem" \) \|
+	\( /"$word1"/ ":options:option:$comp_arbitem" \| /"$nul"/ /"$word"/ ":options:option:$comp_arbitem" \) \|
     )
   fi
 
@@ -200,18 +200,18 @@ _describe -o option tmp2 -- tmp3 -S='
     regex_long=("$regex_long[@]"
       /"(${(j:|:)long_hasarg})$nul"/
 	-'_apt_consume_long ${match[1]%'$qnul'}; current_option=${canonicalize[--${match[1]%'$qnul'}]}'
-	/"$word"/ :"$comp_hasarg" \|
+	/"$word"/ ":options:option:$comp_hasarg" \|
       /"(${(j:|:)long_hasarg})="/
 	-'_apt_consume_long ${match[1]%=}; current_option=${canonicalize[--${match[1]%=}]}'
-	\( /"$word1"/ :"$comp_hasarg" \| /"$nul"/ /"$word"/ :"$comp_hasarg" \) \|
+	\( /"$word1"/ ":options:option:$comp_hasarg" \| /"$nul"/ /"$word"/ ":options:option:$comp_hasarg" \) \|
     )
     regex_long_prefix=("$regex_long_prefix[@]"
       /"(${(j:|:)long_hasarg})$nul"/
 	-'_apt_consume_long ${match[1]%'$qnul'}; current_option=${canonicalize[--${match[1]%'$qnul'}]}'
-	/"$word"/ :"$comp_hasarg" \|
+	/"$word"/ ":options:option:$comp_hasarg" \|
       /"(${(j:|:)long_hasarg})="/
 	-'_apt_consume_long ${match[1]%=}; current_option=${canonicalize[--${match[1]%=}]}'
-	\( /"$word1"/ :"$comp_hasarg" \| /"$nul"/ /"$word"/ :"$comp_hasarg" \) \|
+	\( /"$word1"/ ":options:option:$comp_hasarg" \| /"$nul"/ /"$word"/ ":options:option:$comp_hasarg" \) \|
     )
   fi
 
@@ -219,18 +219,18 @@ _describe -o option tmp2 -- tmp3 -S='
     regex_long=("$regex_long[@]"
       /"(${(j:|:)long_bool})="/
 	-'_apt_consume_long ${match[1]%=}'
-	\( /"$word1"/ :"$comp_bool" \| /"$nul"/ /"$word"/ :"$comp_bool" \) \|
+	\( /"$word1"/ ":names:boolean value:$comp_bool" \| /"$nul"/ /"$word"/ ":names:boolean value:$comp_bool" \) \|
       /"(${(j:|:)long_bool})$nul"/
 	-'_apt_consume_long ${match[1]%'$qnul'}'
-	/"((${(j:|:)bool})$nul|)"/ :"$comp_bool" \|
+	/"((${(j:|:)bool})$nul|)"/ ":names:boolean value:$comp_bool" \|
     )
     regex_long_prefix=("$regex_long_prefix[@]"
       /"(${(j:|:)long_bool})="/
 	-'_apt_consume_long ${match[1]%=}'
-	\( /"$word1"/ :"$comp_bool" \| /"$nul"/ /"$word"/ :"$comp_bool" \) \|
+	\( /"$word1"/ ":names:boolean value:$comp_bool" \| /"$nul"/ /"$word"/ ":names:boolean value:$comp_bool" \) \|
       /"(${(j:|:)long_bool})$nul"/
 	-'_apt_consume_long ${match[1]%'$qnul'}'
-	/"((${(j:|:)bool})$nul|)"/ :"$comp_bool" \|
+	/"((${(j:|:)bool})$nul|)"/ ":names:boolean value:$comp_bool" \|
     )
   fi
 
@@ -238,18 +238,18 @@ _describe -o option tmp2 -- tmp3 -S='
     regex_long=("$regex_long[@]"
       /"(${(j:|:)long_intlevel})="/
 	-'_apt_consume_long ${match[1]%=}'
-	\( /"$word1"/ :"$comp_intlevel" \| /"$nul"/ /"$word"/ :"$comp_intlevel" \) \|
+	\( /"$word1"/ ":options:option:$comp_intlevel" \| /"$nul"/ /"$word"/ ":options:option:$comp_intlevel" \) \|
       /"(${(j:|:)long_intlevel})$nul"/
 	-'_apt_consume_long ${match[1]%'$qnul'}'
-	/"($intlevel$nul|)"/ :"$comp_intlevel" \|
+	/"($intlevel$nul|)"/ ":options:option:$comp_intlevel" \|
     )
     regex_long_prefix=("$regex_long_prefix[@]"
       /"(${(j:|:)long_intlevel})="/
 	-'_apt_consume_long ${match[1]%=}'
-	\( /"$word1"/ :"$comp_intlevel" \| /"$nul"/ /"$word"/ :"$comp_intlevel" \) \|
+	\( /"$word1"/ ":options:option:$comp_intlevel" \| /"$nul"/ /"$word"/ ":options:option:$comp_intlevel" \) \|
       /"(${(j:|:)long_intlevel})$nul"/
 	-'_apt_consume_long ${match[1]%'$qnul'}'
-	/"($intlevel$nul|)"/ :"$comp_intlevel" \|
+	/"($intlevel$nul|)"/ ":options:option:$comp_intlevel" \|
     )
   fi
 
@@ -257,18 +257,18 @@ _describe -o option tmp2 -- tmp3 -S='
     regex_long=("$regex_long[@]"
       /"(${(j:|:)long_configfile})$nul"/
 	-'_apt_consume_long ${match[1]%'$qnul'}'
-	/"$word"/ :"$comp_configfile" \|
+	/"$word"/ ":files:config file:$comp_configfile" \|
       /"(${(j:|:)long_configfile})="/
 	-'_apt_consume_long ${match[1]%=}'
-	\( /"$word1"/ :"$comp_configfile" \| /"$nul"/ /"$word"/ :"$comp_configfile" \) \|
+	\( /"$word1"/ ":files:config file:$comp_configfile" \| /"$nul"/ /"$word"/ ":files:config file:$comp_configfile" \) \|
     )
     regex_long_prefix=("$regex_long_prefix[@]"
       /"(${(j:|:)long_configfile})$nul"/
 	-'_apt_consume_long ${match[1]%'$qnul'}'
-	/"$word"/ :"$comp_configfile" \|
+	/"$word"/ ":files:config file:$comp_configfile" \|
       /"(${(j:|:)long_configfile})="/
 	-'_apt_consume_long ${match[1]%=}'
-	\( /"$word1"/ :"$comp_configfile" \| /"$nul"/ /"$word"/ :"$comp_configfile" \) \|
+	\( /"$word1"/ ":files:config file:$comp_configfile" \| /"$nul"/ /"$word"/ ":files:config file:$comp_configfile" \) \|
     )
   fi
 
@@ -276,18 +276,18 @@ _describe -o option tmp2 -- tmp3 -S='
     regex_long=("$regex_long[@]"
       /"(${(j:|:)long_arbitem})$nul"/
 	-'_apt_consume_long ${match[1]%'$qnul'}'
-	/"$word"/ :"$comp_arbitem" \|
+	/"$word"/ ":options:option:$comp_arbitem" \|
       /"(${(j:|:)long_arbitem})="/
 	-'_apt_consume_long ${match[1]%=}'
-	\( /"$word1"/ :"$comp_arbitem" \| /"$nul"/ /"$word"/ :"$comp_arbitem" \) \|
+	\( /"$word1"/ ":options:option:$comp_arbitem" \| /"$nul"/ /"$word"/ ":options:option:$comp_arbitem" \) \|
     )
     regex_long_prefix=("$regex_long_prefix[@]"
       /"(${(j:|:)long_arbitem})$nul"/
 	-'_apt_consume_long ${match[1]%'$qnul'}'
-	/"$word"/ :"$comp_arbitem" \|
+	/"$word"/ ":options:option:$comp_arbitem" \|
       /"(${(j:|:)long_arbitem})="/
 	-'_apt_consume_long ${match[1]%=}'
-	\( /"$word1"/ :"$comp_arbitem" \| /"$nul"/ /"$word"/ :"$comp_arbitem" \) \|
+	\( /"$word1"/ ":options:option:$comp_arbitem" \| /"$nul"/ /"$word"/ ":options:option:$comp_arbitem" \) \|
     )
   fi
 
@@ -296,9 +296,9 @@ _describe -o option tmp2 -- tmp3 -S='
     \( /--/+ \( "$regex_long[@]"
 		/"(${(j:|:)bool})-"/+
 		  \( "$regex_long_prefix[@]"
-		     /"[]"/ :"$comp_long_prefix" \) \) \|
+		     /"[]"/ ":options:option:$comp_long_prefix" \) \) \|
        /-/+ \( "$regex_short[@]" /"[]"/ \) \|
-       /"[]"/ :"$comp_opt" \) \#
+       /"[]"/ ":options:option:$comp_opt" \) \#
     "$regex_all[@]"
   )
 
@@ -323,11 +323,6 @@ _describe -o option tmp2 -- tmp3 -S='
     long_configfile=($long_configfile)
     long_arbitem=($long_arbitem)
     bool_prefix=($bool_prefix)
-
-    local expl_opt expl_bool expl_configfile
-    _description options expl_opt option
-    _description values expl_bool 'boolean value'
-    _description files expl_configfile 'config file'
 
     local current_option tmp1 tmp2 tmp3
 
@@ -375,16 +370,16 @@ _apt-get () {
     -- \
     /$'update\0'/ \| \
     /$'upgrade\0'/ \| \
-    /$'install\0'/ /$'[^\0]#\0'/ :'_deb_packages "$expl_packages[@]" uninstalled || _deb_packages "$expl_packages[@]" installed' \# \| \
-    /$'remove\0'/ /$'[^\0]#\0'/ :'_deb_packages "$expl_packages[@]" installed' \# \| \
+    /$'install\0'/ /$'[^\0]#\0'/ ':packages::_deb_packages "$expl_packages[@]" uninstalled || _deb_packages "$expl_packages[@]" installed' \# \| \
+    /$'remove\0'/ /$'[^\0]#\0'/ ':packages::_deb_packages "$expl_packages[@]" installed' \# \| \
     /$'dist-upgrade\0'/ \| \
     /$'dselect-upgrade\0'/ \| \
     /$'clean\0'/ \| \
     /$'autoclean\0'/ \| \
     /$'check\0'/ \| \
-    /$'source\0'/ /$'[^\0]#\0'/ :'_deb_packages "$expl_packages[@]" avail' \# \| \
+    /$'source\0'/ /$'[^\0]#\0'/ ':packages::_deb_packages "$expl_packages[@]" avail' \# \| \
     /$'help\0/' \| \
-    /"[]"/	:'_wanted actions expl_action action compadd update upgrade install remove dist-upgrade dselect-upgrade clean autoclean check source help'
+    /"[]"/	':argument-1::compadd "$expl_action[@]" update upgrade install remove dist-upgrade dselect-upgrade clean autoclean check source help'
 
   _apt-get () {
     local expl_action expl_packages
@@ -411,18 +406,18 @@ _apt-cache () {
     -o,--option:arbitem \
     -- \
     /$'help\0'/ \| \
-    /$'add\0'/ /$'[^\0]#\0'/ :'_files' \# \| \
+    /$'add\0'/ /$'[^\0]#\0'/ ':files:index files:_files "$expl[@]"' \# \| \
     /$'gencaches\0'/ \| \
-    /$'showpkg\0'/ /$'[^\0]#\0'/ :'_deb_packages "$expl_packages[@]" avail' \# \| \
+    /$'showpkg\0'/ /$'[^\0]#\0'/ ':packages::_deb_packages "$expl_packages[@]" avail' \# \| \
     /$'stats\0'=$status[4]/ \| \
     /$'dump\0'/ \| \
     /$'dumpavail\0'/ \| \
     /$'unmet\0'/ \| \
     /$'check\0'/ \| \
-    /$'search\0'/ /$'[^\0]#\0'/ :'_message "pattern"' \| \
-    /$'show\0'/ /$'[^\0]#\0'/ :'_deb_packages "$expl_packages[@]" avail' \# \| \
+    /$'search\0'/ /$'[^\0]#\0'/ ':strings::_message "pattern"' \| \
+    /$'show\0'/ /$'[^\0]#\0'/ ':packages::_deb_packages "$expl_packages[@]" avail' \# \| \
     /$'depends\0'/ \| \
-    /"[]"/ :'_wanted actions expl_action action compadd help add gencaches showpkg stats dump dumpavail unmet check search show depends'
+    /"[]"/ ':argument-1::compadd "$expl_action[@]" help add gencaches showpkg stats dump dumpavail unmet check search show depends'
 
   _apt-cache () {
     local expl_action expl_packages expl_pkg_cache expl_src_cache
@@ -451,7 +446,7 @@ _apt-cdrom () {
     -o,--option:arbitem \
     -- \
     /$'add\0'/ \| \
-    /"[]"/	:'_wanted actions expl_action action compadd add'
+    /"[]"/	':argument-1::compadd "$expl_action[@]" add'
 
   _apt-cdrom () {
     local expl_action expl_mount_point
@@ -465,7 +460,7 @@ _apt-cdrom () {
 }
 
 _apt-config () {
-  _apt_arguments _apt-config_sm \
+  _apt_arguments _apt-config \
     -h,--help:bool \
     -v,--version:bool \
     -c,--config-file:configfile \
@@ -473,20 +468,11 @@ _apt-config () {
     -- \
     /$'shell\0'/ \
       \( \
-	/$'[^\0]#\0'/ :'_wanted parameters expl_shell_var "shell variable to assign" compadd - "${(@k)parameters}"' \
-	/$'[^\0]#\0'/ :'_wanted configuration-keys expl_config_key "configuration key" compadd - ${${(f)"$(apt-config dump 2>&1)"}% *}' \
+	/$'[^\0]#\0'/ ':parameters:shell variable to assign:compadd "$expl[@]" - "${(@k)parameters}"' \
+	/$'[^\0]#\0'/ ':values:configuration key:compadd "$expl[@]" - ${${(f)"$(apt-config dump 2>&1)"}% *}' \
       \) \# \| \
     /$'dump\0'/ \| \
-    /"[]"/	:'_wanted actions expl_action action compadd shell dump'
-
-  _apt-config () {
-    local expl_action expl_shell_var expl_config_key
-    _description actions expl_action 'action'
-    _description parameters expl_shell_var 'shell variable to assign'
-    _description configuration-keys expl_config_key 'configuration key'
-
-    _apt-config_sm
-  }
+    /"[]"/	':argument-1:action:compadd "$expl[@]" shell dump'
 
   _apt-config "$@"
 }

@@ -32,11 +32,11 @@ _xset_compopts () {
 }
 
 _xset_compfpadd () {
-  _wanted directories expl directory _files -/
+  _files "$expl[@]" -/
 }
 
 _xset_compfpdel () {
-  _wanted directories expl directory compadd - ${(s:,:)${"$(xset q)"##*
+  compadd "$expl[@]" - ${(s:,:)${"$(xset q)"##*
 Font Path:
  #}%%
 *}
@@ -44,69 +44,70 @@ Font Path:
 
 _regex_arguments _xset_parse \
   "/$word/" \
-  \( "/-d(isplay|)$nul/" "$guard" "/$word/" ":_x_display" \
+  \( "/-d(isplay|)$nul/" "$guard" "/$word/" ':option-display:display:_x_display "$expl[@]"' \
   \| "/-c$nul/" "$guard" \
   \| "/c$nul/" "$guard" \
-    \( "/(on|off)$nul/" ':_wanted values expl click compadd on off' \
-    \| "/[0-9]##$nul/" ':_message volume' \
+    \( "/(on|off)$nul/" ':option-c-bool:click:compadd "$expl[@]" on off' \
+    \| "/[0-9]##$nul/" ':option-c-volume:volume:_message volume' \
     \| \) \
   \| "/-b$nul/" "$guard" \
   \| "/b$nul/" "$guard" \
-    \( "/(on|off)$nul/" ':_wanted values expl bell compadd on off' \
-    \| "/[0-9]##$nul/" ':_message volume' \
-      \( "/[0-9]##$nul/" ':_message pitch' \
-	\( "/[0-9]##$nul/" ':_message duration' \
+    \( "/(on|off)$nul/" ':option-b-bool:bell:compadd "$expl[@]" on off' \
+    \| "/[0-9]##$nul/" ':option-b-volume:bell volume:_message volume' \
+      \( "/[0-9]##$nul/" ':option-b-pitch:bell pitch:_message pitch' \
+	\( "/[0-9]##$nul/" ':option-b-duration:bell duration:_message duration' \
 	\| \) \
       \| \) \
     \| \) \
   \| "/bc$nul/" "$guard" \
   \| "/-bc$nul/" "$guard" \
-  \| "/fp$nul/" "$guard" "/$word/" ':_wanted values expl "font path" compadd default rehash' \
-  \| "/(fp[+=]|[+]fp)$nul/" "$guard" "/$word/" ':compset -P "*,"; _xset_compfpadd' \
-  \| "/(fp-|-fp)$nul/" "$guard" "/$word/" ':compset -P "*,"; _xset_compfpdel' \
+  \| "/fp$nul/" "$guard" "/$word/" ':option-fp:font path:compadd "$expl[@]" default rehash' \
+  \| "/(fp[+=]|[+]fp)$nul/" "$guard" "/$word/" ':option-fp-add:font path:compset -P "*,"; _xset_compfpadd' \
+  \| "/(fp-|-fp)$nul/" "$guard" "/$word/" ':option-fp-del:font path:compset -P "*,"; _xset_compfpdel' \
   \| "/-led$nul/" "$guard" \
-    \( "/[0-9]##$nul/" ':_message integer' \
+    \( "/[0-9]##$nul/" ':option-led-number:led number:_message "led number"' \
     \| \) \
   \| "/led$nul/" "$guard" \
-    \( "/(on|off)$nul/" ':_wanted values expl led compadd on off' \
-    \| "/[0-9]##$nul/" ':_message integer' \
+    \( "/(on|off)$nul/" ':option-led-bool:led:compadd "$expl[@]" on off' \
+    \| "/[0-9]##$nul/" ':option-led-number:led number:_message "led number"' \
     \| \) \
   \| "/m(ouse|)$nul/" "$guard" \
-    \( "/default$nul/" ':_wanted values expl "mouse parameter" compadd default' \
-    \| "/[0-9]##(/[0-9]##|)$nul/" ':_message accel_mult/accel_div' \
-      \( "/[0-9]##$nul/" ':_message threshold' \
+    \( "/default$nul/" ':option-mouse-default:mouse parameter:compadd "$expl[@]" default' \
+    \| "/[0-9]##(/[0-9]##|)$nul/" ':option-mouse-mult-div:accel_mult/accel_div:_message accel_mult/accel_div' \
+      \( "/[0-9]##$nul/" ':option-mouse-threshold:threshold:_message threshold' \
       \| \) \
     \| \) \
   \| "/[-+]dpms$nul/" "$guard" \
   \| "/dpms$nul/" "$guard" \
-    \( "/[0-9]##$nul/" ':_message "standby timeout"' \
-      \( "/[0-9]##$nul/" ':_message "suspend timeout"' \
-	\( "/[0-9]##$nul/" ':_message "off timeout"' \
+    \( "/[0-9]##$nul/" ':option-dpms-standby:standby timeout:_message "standby timeout"' \
+      \( "/[0-9]##$nul/" ':option-dpms-suspend:suspend timeout:_message "suspend timeout"' \
+	\( "/[0-9]##$nul/" ':option-dpms-off:off timeout:_message "off timeout"' \
 	\| \) \
       \| \) \
-    \| "/(on|standby|suspend|off)$nul/" ':_wanted values expl DPMS compadd on standby suspend off' \
+    \| "/force/" ':option-dpms-force:force DPMS state:compadd "$expl[@]" force' \
+       "/(on|standby|suspend|off)$nul/" ':option-dpms-state:DPMS state:compadd "$expl[@]" on standby suspend off' \
     \) \
   \| "/s$nul/" "$guard" \
     \( "/(blank|noblank|expose|noexpose|default|on|activate|reset)$nul/" \
-       ':_wanted values expl "screen saver" compadd blank noblank expose noexpose default on activate reset off' \
-    \| "/off$nul/" \( "/off$nul/" ':compadd off' \| \) \
-    \| "/[0-9]##$nul/" ':_message length' \
-      \( "/[0-9]##$nul/" ':_message period' \
+       ':option-s:screen saver:compadd "$expl[@]" blank noblank expose noexpose default on activate reset off' \
+    \| "/off$nul/" \( "/off$nul/" ':option-s-off-period:period off:compadd "$expl[@]" off' \| \) \
+    \| "/[0-9]##$nul/" ':option-s-timeout:length:_message length' \
+      \( "/[0-9]##$nul/" ':option-s-period:period:_message period' \
       \| \) \
     \| \) \
   \| "/-r$nul/" "$guard" \
-    \( "/[0-9]##$nul/" ':_message keycode' \
+    \( "/[0-9]##$nul/" ':option-r-keycode:keycode:_message keycode' \
     \| \) \
   \| "/r$nul/" "$guard" \
-    \( "/(on|off)$nul/" ':_wanted values expl autorepeat compadd on off' \
-    \| "/[0-9]##$nul/" ':_message keycode' \
+    \( "/(on|off)$nul/" ':option-r-autorepeat:autorepeat:compadd "$expl[@]" on off' \
+    \| "/[0-9]##$nul/" ':option-r-keycode:keycode:_message keycode' \
     \| \) \
   \| "/p$nul/" "$guard" \
-    "/[0-9]##$nul/" ':_message pixel' \
-    "/$word/" ':_x_color' \
+    "/[0-9]##$nul/" ':option-p-pixel:pixel:_message pixel' \
+    "/$word/" ':option-p-color:color:_x_color "$expl[@]"' \
   \| "/(-|)k$nul/" "$guard" \
   \| "/(-|)q$nul/" "$guard" \
-  \| "/[]/" ':_xset_compopts' \
+  \| "/[]/" ':options:options:_xset_compopts' \
   \) \#
 
 _xset () {
