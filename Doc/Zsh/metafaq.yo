@@ -149,7 +149,6 @@ sect(The Zsh Web Page)
 Zsh has a web page which is located at tt(http://www.zsh.org/).  This is
 maintained by Karsten Thygesen tt(<karthy@zsh.org>), of SunSITE Denmark.
 The contact address for web-related matters is tt(<webmaster@zsh.org>).
-
 texinode(The Zsh Userguide)(See Also)(The Zsh Web Page)(Introduction)
 sect(The Zsh Userguide)
 A userguide is currently in preparation.  It is intended to complement the
