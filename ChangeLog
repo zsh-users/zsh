@@ -1,3 +1,17 @@
+2002-04-17  Wayne Davison  <wayned@users.sourceforge.net>
+
+	* unposted: Src/params.c: HISTSIZE can now get set to 1 line
+	instead of bottoming-out at 2.
+
+	* users/4678: Src/hist.c: When rewriting the history file, make
+	sure that we didn't get an error on the read.
+
+	* 16890: Src/hist.c, Src/params.c: Fixed a history-file-truncation
+	problem by making SAVEHIST a special param.
+
+	* 16703-B: Src/builtin.c: Made the "history" builtin's parameter-
+	checking work better (so we complain less often).
+
 2002-04-17  Sven Wischnowsky  <wischnow@zsh.org>
 
 	* 16998: Src/Zle/computil.c: make compvalues unquote the string
