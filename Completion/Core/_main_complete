@@ -56,8 +56,9 @@ _def_menu_style=( "$_last_menu_style[@]"
                 )
 _last_menu_style=()
 
-if zstyle -s ":completion:${curcontext}:default" list-prompt LISTPROMPT &&
-   [[ -n "$LISTPROMPT" ]]; then
+zstyle -s ":completion:${curcontext}:default" list-prompt LISTPROMPT ||
+    LISTPROMPT='Current position at %P    Continue? '
+if [[ -n "$LISTPROMPT" ]]; then
   zmodload -i zsh/complist
   compstate[list_max]=scroll
 fi

@@ -1,3 +1,10 @@
+2000-04-19  Sven Wischnowsky  <wischnow@informatik.hu-berlin.de>
+
+	* 10816: Completion/Core/_main_complete, Doc/Zsh/compsys.yo,
+ 	Doc/Zsh/mod_complist.yo, Src/Zle/complist.c: default for
+ 	list-prompt style, %[MLP] use fixed-width strings, %[mlp] use
+ 	variable-width strings
+	
 2000-04-18  Sven Wischnowsky  <wischnow@informatik.hu-berlin.de>
 
 	* 10812: Completion/Core/_path_files: fix completion after ~<num>

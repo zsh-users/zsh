@@ -383,7 +383,7 @@ getcols(Listcols c)
 
 static int noselect, mselect, inselect, mcol, mline, mcols, mlines, mmlen;
 static int selected, mlbeg = -1, mlend = 9999999, mscroll, mrestlines;
-static int mnew, mlastcols, mlastlines, mhasstat;
+static int mnew, mlastcols, mlastlines, mhasstat, mfirstl, mlastm;
 static char *mstatus;
 static Cmatch **mtab, **mmtabp;
 static Cmgroup *mgtab, *mgtabp;
@@ -656,7 +656,7 @@ asklistscroll(int ml)
     Thingy cmd;
     int i, ret = 0;
 
-    compprintfmt(NULL, -1, 1, 1, ml, NULL);
+    compprintfmt(NULL, 1, 1, 1, ml, NULL);
 
     fflush(shout);
     zsetterm();
@@ -791,13 +791,27 @@ compprintfmt(char *fmt, int n, int dopr, int doesc, int ml, int *stop)
 			p--;
 		    break;
 		case 'm':
-		    if (stat && n >= 0) {
-			sprintf(nbuf, "%d/%d", mselect, listdat.nlist);
+		    if (stat) {
+			sprintf(nc, "%d/%d", (n ? mlastm : mselect),
+				listdat.nlist);
+			m = 2;
+		    }
+		    break;
+		case 'M':
+		    if (stat) {
+			sprintf(nbuf, "%d/%d", (n ? mlastm : mselect),
+				listdat.nlist);
 			sprintf(nc, "%-9s", nbuf);
 			m = 2;
 		    }
 		    break;
 		case 'l':
+		    if (stat) {
+			sprintf(nc, "%d/%d", ml + 1, listdat.nlines);
+			m = 2;
+		    }
+		    break;
+		case 'L':
 		    if (stat) {
 			sprintf(nbuf, "%d/%d", ml + 1, listdat.nlines);
 			sprintf(nc, "%-9s", nbuf);
@@ -805,14 +819,26 @@ compprintfmt(char *fmt, int n, int dopr, int doesc, int ml, int *stop)
 		    }
 		    break;
 		case 'p':
-		    if (stat && n >= 0) {
+		    if (stat) {
 			if (ml == listdat.nlines - 1)
 			    strcpy(nc, "Bottom");
-			else if (mlbeg || ml != n)
+			else if (n ? mfirstl : (mlbeg > 0 || ml != mfirstl))
 			    sprintf(nc, "%d%%",
 				    ((ml + 1) * 100) / listdat.nlines);
 			else
 			    strcpy(nc, "Top");
+			m = 2;
+		    }
+		    break;
+		case 'P':
+		    if (stat) {
+			if (ml == listdat.nlines - 1)
+			    strcpy(nc, "Bottom");
+			else if (n ? mfirstl : (mlbeg > 0 || ml != mfirstl))
+			    sprintf(nc, "%2d%%   ",
+				    ((ml + 1) * 100) / listdat.nlines);
+			else
+			    strcpy(nc, "Top   ");
 			m = 2;
 		    }
 		    break;
@@ -853,6 +879,8 @@ compprintfmt(char *fmt, int n, int dopr, int doesc, int ml, int *stop)
 		    ml++;
 		if (mscroll && beg && !--mrestlines && (ask = asklistscroll(ml))) {
 		    *stop = 1;
+		    if (stat && n)
+			mfirstl = -1;
 		    return l + (cc / columns);
 		}
 	    }
@@ -860,6 +888,9 @@ compprintfmt(char *fmt, int n, int dopr, int doesc, int ml, int *stop)
     }
     if (dopr && mlbeg >= 0 && tccan(TCCLEAREOL))
 	tcout(TCCLEAREOL);
+
+    if (stat && n)
+	mfirstl = -1;
 
     return l + (cc / columns);
 }
@@ -944,8 +975,9 @@ compprintlist(int showall)
     Cmatch *p, m;
     Cexpl *e;
     int pnl = 0, cl, mc = 0, ml = 0, printed = 0, stop = 0, asked = 1;
-    int lastused = 0, fl = -1;
+    int lastused = 0;
 
+    mfirstl = -1;
     if (mnew || lastbeg != mlbeg || mlbeg < 0) {
 	lasttype = 0;
 	lastg = NULL;
@@ -988,6 +1020,8 @@ compprintlist(int showall)
 				tcout(TCCLEAREOD);
 			}
 		    }
+		    if (mlbeg < 0 && mfirstl < 0)
+			mfirstl = ml;
 		    l = compprintfmt((*e)->str, (*e)->count, dolist(ml), 1,
 				     ml, &stop);
 		    if (stop)
@@ -1026,6 +1060,8 @@ compprintlist(int showall)
 			tcout(TCCLEAREOD);
 		}
 	    }
+	    if (mlbeg < 0 && mfirstl < 0)
+		mfirstl = ml;
 	    if (g->flags & CGF_LINES) {
 		while (*pp) {
 		    if (compzputs(*pp, ml))
@@ -1112,8 +1148,8 @@ compprintlist(int showall)
 				    tcout(TCCLEAREOD);
 			    }
 			}
-			if (fl < 0)
-			    fl = ml;
+			if (mfirstl < 0)
+			    mfirstl = ml;
 			if (dolist(ml))
 			    printed++;
 			if (clprintm(g, p, 0, ml, 1, 0, NULL, NULL))
@@ -1183,8 +1219,8 @@ compprintlist(int showall)
 
 		    if (dolist(ml))
 			printed++;
-		    if (fl < 0)
-			fl = ml;
+		    if (mfirstl < 0)
+			mfirstl = ml;
 
 		    if (--n)
 			for (j = ((g->flags & CGF_ROWS) ? 1 : nc);
@@ -1233,7 +1269,7 @@ compprintlist(int showall)
 	    if ((ml = listdat.nlines + nlnct) >= lines) {
 		if (mhasstat) {
 		    putc('\n', shout);
-		    compprintfmt(NULL, fl, 1, 1, mline, NULL);
+		    compprintfmt(NULL, 0, 1, 1, mline, NULL);
 		}
 		ml = lines - 1;
 	    } else
@@ -1287,6 +1323,7 @@ clprintm(Cmgroup g, Cmatch *mp, int mc, int ml, int lastc, int width,
 	return 0;
     }
     m = *mp;
+    mlastm = m->gnum;
     if (m->disp && (m->flags & CMF_DISPLINE)) {
 	if (mselect >= 0) {
 	    int mm = (mcols * ml), i;

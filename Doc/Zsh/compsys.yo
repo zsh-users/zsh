@@ -1274,11 +1274,21 @@ completion lists that don't fit on the screen can be scrolled (see
 ifzman(the description of the tt(zsh/complist) module in zmanref(zshmodules))\
 ifnzman(noderef(The zsh/complist Module))\
 ). The value will be displayed after every screenful, prompting for a
-key and may contain the escape `tt(%l)' which will be replaced by the
-number of the last line displayed and the total number of lines. As
+key press. It may contain the escape `tt(%l)' or `tt(%L)' which will be
+replaced by the number of the last line displayed and the total number
+of lines. A `tt(%m)' or `tt(%M)' will be replaced by the number of the 
+last match shown and the total number of matches and `tt(%p)' and
+`tt(%P)' will be replaced by `tt(Top)' when at the beginning of the
+list, `tt(Bottom)' when at the end and the position shown in percent
+of the total length. In each of these cases the form with the
+uppercase letter is replaced by a string of fixed width, padded to the 
+right with spaces. As
 usual, the `tt(%S)', `tt(%s)', `tt(%B)', `tt(%b)', `tt(%U)', `tt(%u)',
 and `tt(%{)...tt(%})' escapes for the terminal display modes are
 understood, too.
+
+Note that this style has a default value. If you don't want to use
+scrolling, set this style to an empty string.
 )
 kindex(list-rows-first, completion style)
 item(tt(list-rows-first))(
@@ -1578,11 +1588,7 @@ If this is set to a non-empty string for the tt(default) tag, its
 value will be displayed during menu-selection (see the tt(menu) style
 above) when the completion list does not fit on the screen as a
 whole. The same escapes as for the tt(list-prompt) style are
-understood, plus `tt(%m)' which is replaced by the number of the
-currently selected match and the total number of matches and `tt(%p)'
-which is replaced by `tt(Top)' when the mark is on the first line,
-`tt(Bottom)' when it is on the last line and the relative position of
-the mark in the list given as a percentage.
+understood, but give the number of the match or line the mark is on.
 )
 kindex(select-scroll, completion style)
 item(tt(select-scroll))(

@@ -159,10 +159,16 @@ currently selected.
 If the parameter tt(LISTPROMPT) is set, its value will be used as the
 prompt.  The value may contain escapes of the form `tt(%x)'. It
 supports the escapes `tt(%B)', `tt(%b)', `tt(%S)', `tt(%s)', `tt(%U)',
-`tt(%u)' and `tt(%{...%})' known from the shell prompts and the
-additional sequence `tt(%l)' which is replaced by the number of the
-last line shown and the total number of lines in the form
-`var(number)tt(/)var(total)'.
+`tt(%u)' and `tt(%{...%})' known from the shell prompts and three
+pairs of additional sequences. A `tt(%l)' or `tt(%L)' is replaced by
+the number of the last line shown and the total number of lines in the form
+`var(number)tt(/)var(total)'. A `tt(%m)' or `tt(%M)' is replaced with
+the number of the last match shown and the total number of matches and 
+`tt(%p)' or `tt(%P)' is replaced with `tt(Top)', `tt(Bottom)' or the
+position of the first line shown in percent of the total number of
+lines, respectively. In each of these cases the one with the uppercase 
+letter will be replaced with a string of fixed width, padded to the
+right with spaces.
 
 As for the tt(ZLS_COLORS) and tt(ZLS_COLOURS) parameters,
 tt(LISTPROMPT) should not be set directly when using the shell
@@ -207,13 +213,9 @@ control sequence as for the `tt(%S)' escape in prompts is used.
 
 If there are more matches than fit on the screen and the parameter
 tt(SELECTPROMPT) is set, its value will be shown below the
-matches. Next to the escape sequences understood for the
-tt(LISTPROMPT) parameter, a `tt(%m)' will be replaced by a string
-containing the number of the match the mark is on and the total number 
-of matches in the form `var(number)tt(/)var(total)' and the sequence
-`tt(%p)' will be replaced with `tt(Top)', `tt(Bottom)' or the position
-in percent of the total size when the mark is in the first line, in
-the last line or somewhere in between, respectively.
+matches. It supports the sames escape sequences as tt(LISTPROMPT), but 
+the number of the match or line shown will be that of the one where
+the mark is placed.
 
 The tt(SELECTSCROLL) parameter can be used to specify how the list is
 scrolled. If the parameter is unset, this is done line by line, if it
