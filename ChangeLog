@@ -1,3 +1,8 @@
+2003-10-24  Clint Adams  <clint@zsh.org>
+
+	* 19201: Completion/Unix/Command/_screen: patch from
+	Yasuhiro Hayase to complete normal commands after screen.
+
 2003-10-13  Peter Stephenson  <pws@csr.com>
 
 	* 19185: Functions/Zle/delete-whole-word-match: Bart spotted

@@ -69,7 +69,8 @@ _arguments \
   '(-)-v[print screen version]' \
   '(-)-wipe[do nothing, clean up SockDir]' \
   '-x[attach to a not detached screen. (Multi display mode).]' \
-  '-X[execute <cmd> as a screen command in the specified session.]:screencmd:(${scr_cmds[@]})'
+  '-X[execute <cmd> as a screen command in the specified session.]:screencmd:(${scr_cmds[@]})' \
+  '*::arguments: _normal'
 
 case $state in
   sessionname)
