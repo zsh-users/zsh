@@ -420,6 +420,18 @@ empty_eprog(Eprog p)
     return (!p || !p->prog || *p->prog == WCB_END());
 }
 
+static void
+clear_hdocs()
+{
+    struct heredocs *p, *n;
+
+    for (p = hdocs; p; p = n) {
+        n = p->next;
+        zfree(p, sizeof(struct heredocs));
+    }
+    hdocs = NULL;
+}
+
 /*
  * event	: ENDINPUT
  *			| SEPER
@@ -435,7 +447,12 @@ parse_event(void)
     aliasspaceflag = 0;
     yylex();
     init_parse();
-    return ((par_event()) ? bld_eprog() : NULL);
+
+    if (!par_event()) {
+        clear_hdocs();
+        return NULL;
+    }
+    return bld_eprog();
 }
 
 /**/
@@ -509,6 +526,7 @@ parse_list(void)
     init_parse();
     par_list(&c);
     if (tok != ENDINPUT) {
+        clear_hdocs();
 	tok = LEXERR;
 	yyerror(0);
 	return NULL;
@@ -522,9 +540,10 @@ parse_cond(void)
 {
     init_parse();
 
-    if (!par_cond())
+    if (!par_cond()) {
+        clear_hdocs();
 	return NULL;
-
+    }
     return bld_eprog();
 }
 
