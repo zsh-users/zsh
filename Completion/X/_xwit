@@ -39,8 +39,8 @@ _regex_arguments _xwit_parse \
     \| "/iconmove$nul/" "$guard" "/$word/" ":_message x" "/$word/" ":_message y" \
     \| "/id$nul/" "$guard" "/$word/" ":_x_window" \
     \| "/(no|)keyrepeat$nul/" "$guard" \
-        \( "/[0-9]##$nul/" ":_message keycode" \
-	  \( "/-$nul/" "/[0-9]##$nul/" ":_message 'last keycode'" \| \) \) \# \
+        \( "/[0-9]##$nul/" ":[[ -prefix [0-9]## ]] && _message keycode" \
+	  \( "/-$nul/" "/[0-9]##$nul/" ":[[ -prefix [0-9]## ]] && _message 'last keycode'" \| \) \) \# \
     \| "/names$nul/" "$guard" "/$word/" ":_x_window -n" \# \
     \| "/[]/" ':_xwit_compopts' \
     \) \
