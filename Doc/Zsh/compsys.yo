@@ -1624,4 +1624,40 @@ If tt(regex_arguments_path) is an existing writable directory,
 tt(_regex_arguments) sotores a compiled function definition into the
 directory.
 )
+item(tt(incremental_prompt))(
+The keys with the prefix tt(incremental_) are used by the
+tt(incremental-complete-word) widget found in the tt(Functions/Zle)
+directory of the tt(zsh) source distribution.
+
+This key defines the Prompt to show in the status line during
+incremental completion. The sequence `tt(%u)' is replaced by the
+unambiguous part of all matches if there is any and it is different
+from the word on the line. A `tt(%s)' is replaced with `tt(-no
+match-)', `tt(-no prefix-)', or an empty string if there is no
+completion matching the word on the line, if the matches have no
+common prefix different from the word on the line or if there is such
+a common prefix, respectively. The sequence `tt(%c)' is replaced by
+the name of the completer function that generated the matches (without
+the leading underscore). Finally, `tt(%n)' is replaced by the number
+of matches generated and `tt(%a)' is replaced by an empty string if
+the matches are in the normal set (i.e. the one without file names
+with one of the suffixes from the tt(fignore) array) and with `tt(
+-alt-)' if the matches are in the alternate set.
+)
+item(tt(incremental_stop))(
+This gives a pattern matching (keyboard-) keys which will cause
+incremental completion to stop and the key to be re-executed.
+)
+item(tt(incremental_break))(
+This gives a pattern matching (keyboard-) keys which will cause
+incremental completion to stop and the key to be discarded.
+)
+item(tt(incremental_completer))(
+Colon-separated list of completers, like the tt(completer) key for
+normal completion.
+)
+item(tt(incremental_list))(
+If set to a non-empty string, the matches will be listed on every
+key-press.
+)
 enditem()
