@@ -226,7 +226,11 @@ while [[ cur -gt 0 ]]; do
       def="$opts[$ws[1]]"
       optbeg="$beg"
       argbeg="$beg"
-      inopt=yes
+      if [[ -n "$def" ]]; then
+        inopt=yes
+      else
+        inopt=''
+      fi
       [[ -n "$oneshot[$ws[1]]" ]] && unset "opts[$ws[1]]"
     else
       uns=''
@@ -236,7 +240,11 @@ while [[ cur -gt 0 ]]; do
 	  def="$opts[$tmp]"
 	  optbeg="$beg"
 	  argbeg="$beg"
-          inopt=yes
+	  if [[ -n "$def" ]]; then
+            inopt=yes
+	  else
+            inopt=''
+	  fi
 	  uns="${ws[1][2,-1]}"
 	  opt=''
 	fi
@@ -283,6 +291,7 @@ while [[ cur -gt 0 ]]; do
             inopt=yes
           else
             def=''
+	    inopt=''
 	  fi
         fi
       fi
@@ -318,10 +327,14 @@ while [[ cur -gt 0 ]]; do
               def="${def#?*[^\\]:*[^\\]:}"
 	      optbeg="$beg"
 	      argbeg="$beg"
-              inopt=yes
             else
               def=''
             fi
+	  fi
+          if [[ -n "$def" ]]; then
+	    inopt=yes
+          else
+	    inopt=''
 	  fi
         fi
       fi
@@ -453,7 +466,7 @@ else
       (( $#tmp )) && unset "$tmp[@]"
     fi
 
-    if [[ -n "$opt" ]]; then
+    if [[ -n "$opt" && "$def" != \** ]]; then
 
       # We aren't in an argument directly after a option name, so
       # all option names are possible matches.

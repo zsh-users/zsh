@@ -1,18 +1,18 @@
 #autoload
 
-typeset -A commands
-commands=(add "ad new"            admin "adm rcs"         annotate ann
-	  checkout "co get"       commit "ci com"         diff "di dif"
-	  edit ""                 editors ""              export "exp ex"
-	  history "hi his"        import "im imp"         init ""
-	  log "lo rlog"           login "logon lgn"       logout ""
-	  rdiff patch             release "re rel"        remove "rm delete"
-	  status "st stat"        rtag "rt rfreeze"       tag "ta freeze"
-	  unedit ""               update "up upd"         watch ""
-	  watchers "")
+typeset -A cmds
+cmds=(add "ad new"            admin "adm rcs"         annotate ann
+      checkout "co get"       commit "ci com"         diff "di dif"
+      edit ""                 editors ""              export "exp ex"
+      history "hi his"        import "im imp"         init ""
+      log "lo rlog"           login "logon lgn"       logout ""
+      rdiff patch             release "re rel"        remove "rm delete"
+      status "st stat"        rtag "rt rfreeze"       tag "ta freeze"
+      unedit ""               update "up upd"         watch ""
+      watchers "")
 
 if (( CURRENT == 1 )); then
-  compadd ${(k)commands} || compadd ${(kv)=commands}
+  compadd ${(k)cmds} || compadd ${(kv)=cmds}
 else
   case "$words[1]" in
     add|ad|new) _cvs_add;;
