@@ -1299,16 +1299,20 @@ dquote_parse(char endchar, int sub)
 		intick = 1, ALLOWHIST
 	    break;
 	case '(':
-	    pct++;
+	    if (!math || !bct)
+		pct++;
 	    break;
 	case ')':
-	    err = (!pct-- && math);
+	    if (!math || !bct)
+		err = (!pct-- && math);
 	    break;
 	case '[':
-	    brct++;
+	    if (!math || !bct)
+		brct++;
 	    break;
 	case ']':
-	    err = (!brct-- && math);
+	    if (!math || !bct)
+		err = (!brct-- && math);
 	    break;
 	case '"':
 	    if (intick || (!endchar && !bct))
