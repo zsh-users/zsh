@@ -35,9 +35,17 @@ static int
 bin_strftime(char *nam, char **argv, Options ops, int func)
 {
     int bufsize, x;
-    char *endptr = NULL, *buffer;
+    char *endptr = NULL, *scalar = NULL, *buffer;
     time_t secs;
     struct tm *t;
+
+    if (OPT_ISSET(ops,'s')) {
+	scalar = OPT_ARG(ops, 's');
+	if (!isident(scalar)) {
+	    zwarnnam(nam, "not an identifier: %s", scalar, 0);
+	    return 1;
+	}
+    }
 
     secs = (time_t)strtoul(argv[1], &endptr, 10);
     if (secs == ULONG_MAX) {
@@ -58,7 +66,11 @@ bin_strftime(char *nam, char **argv, Options ops, int func)
 	buffer = zrealloc(buffer, bufsize *= 2);
     }
 
-    printf("%s\n", buffer);
+    if (scalar) {
+	setsparam(scalar, ztrdup(buffer));
+    } else {
+	printf("%s\n", buffer);
+    }
     zfree(buffer, bufsize);
 
     return 0;
@@ -71,12 +83,12 @@ getcurrentsecs()
 }
 
 static struct builtin bintab[] = {
-    BUILTIN("strftime",    0, bin_strftime,    2,   2, 0, NULL, NULL),
+    BUILTIN("strftime",    0, bin_strftime,    2,   2, 0, "s:", NULL),
 };
 
 static struct paramdef patab[] = {
     PARAMDEF("EPOCHSECONDS", PM_INTEGER|PM_SPECIAL|PM_READONLY,
-		    NULL, NULL, &getcurrentsecs, NULL),
+		    NULL, NULL, &getcurrentsecs, stdunsetfn),
 };
 
 /**/
@@ -99,7 +111,14 @@ boot_(Module m)
 int
 cleanup_(Module m)
 {
+    Param pm;
+
     deletebuiltins(m->nam, bintab, sizeof(bintab)/sizeof(*bintab));
+    pm = (Param) paramtab->getnode(paramtab, "EPOCHSECONDS");
+    if (pm && (pm->flags & PM_SPECIAL)) {
+	pm->flags &= ~PM_READONLY;
+	unsetparam_pm(pm, 0, 1);
+    }
     return 0;
 }
 

@@ -1,3 +1,10 @@
+2004-01-22  Peter Stephenson  <pws@csr.com>
+
+	* 19389 plus added stdunsetfn to EPOCHSECONDS:
+	Src/Modules/datetime.c, Doc/Zsh/mod_datetime.yo: add -s scalar
+	option to strftime, remove EPOCHSECONDS cleanly when module
+	unloaded.
+
 2004-01-21  Oliver Kiddle  <opk@zsh.org>
 
 	* 19387: Completion/...: add (-.) glob qualifiers to many globs
