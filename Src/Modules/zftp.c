@@ -49,14 +49,15 @@ union zftp_sockaddr;
 struct zftp_session;
 typedef struct zftp_session *Zftp_session;
 
-#include "zftp.mdh"
-#include "zftp.pro"
-
 #include <sys/socket.h>
 #include <netdb.h>
 #include <netinet/in_systm.h>
 #include <netinet/in.h>
 #include <netinet/ip.h>
+
+#include "zftp.mdh"
+#include "zftp.pro"
+
 #include <arpa/inet.h>
 /* it's a TELNET based protocol, but don't think I like doing this */
 #include <arpa/telnet.h>
