@@ -1,5 +1,8 @@
 2004-07-07  Peter Stephenson  <pws@csr.com>
 
+	* 20142: Test/A06assign.ztst: add test for bug fixed in
+	20141.
+
 	* 20141: Src/builtin.c, Src/exec.c, Src/params.c:  Crash
 	after restoring exported special parameters.  The
 	answer was `pm = tpm' at exec.c:2590.
