@@ -1,3 +1,9 @@
+2001-10-05  Sven Wischnowsky  <wischnow@zsh.org>
+
+	* 15944: Completion/Unix/Type/_path_files, Doc/Zsh/compsys.yo:
+	make expand style (file completion) work again; no more special
+	behaviour with menu completion; try to make docs clearer
+
 2001-10-05  Geoff Wing  <gcw@zsh.org>
 
 	* unposted: Doc/Zsh/options.yo: typo
