@@ -2,7 +2,7 @@ texinode(Introduction)(Invocation)(The Z Shell Manual)(Top)
 chapter(Introduction)
 cindex(introduction)
 ifzman(\
-sect(Synopsis)
+sect(Overview)
 Because zsh contains many features, the zsh manual has been split into
 a number of section+CHAR(s)\
 ifzshall(\

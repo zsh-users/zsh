@@ -3,7 +3,8 @@ chapter(Completion Using compctl)
 cindex(completion, programmable)
 cindex(completion, controlling)
 ifzman(\
-sect(Synopsis)
+sect(Description)
+findex(compctl)
 This version of zsh has two ways of performing completion of words on the
 command line.  New users of the shell may prefer to use the newer
 and more powerful system based on shell functions; this is described in
@@ -19,9 +20,9 @@ and more powerful system based on shell functions; this is described
 in noderef(Completion System), and the basic shell mechanisms which support
 it are described in noderef(Completion Widgets).  This chapter describes
 the older tt(compctl) command.
-)\
-findex(compctl)
 sect(Description)
+findex(compctl)
+)\
 startlist()
 list(tt(compctl) [ tt(-CDT) ] var(options) [ var(command) ... ])
 list(tt(compctl) [ tt(-CDT) ] var(options) \
