@@ -294,7 +294,7 @@ newptycmd(char *nam, char *pname, char **args, int echo, int nblock)
 	/* This code copied from the clone module, except for getting *
 	 * the descriptor from get_pty() and duplicating it to 0/1/2. */
 
-	clearjobtab();
+	clearjobtab(0);
 	ppid = getppid();
 	mypid = getpid();
 #ifdef HAVE_SETSID
