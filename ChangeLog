@@ -1,5 +1,8 @@
 2001-12-11  Oliver Kiddle  <opk@zsh.org>
 
+	* 16322: Completion/Unix/Command/_mtools,
+	Completion/Unix/Command/.distfiles: new mtools completion
+
 	* 16320: Completion/Unix/Type/_file_systems,
 	Completion/Unix/Type/.distfiles, Completion/Unix/Command/_find,
 	Completion/Unix/Command/_mount: factor out file system completion 
