@@ -27,7 +27,6 @@
 
 2001-05-31  Sven Wischnowsky  <wischnow@zsh.org>
 
->>>>>>> 1.1182
 	* 14605: Src/params.c, Src/Modules/parameter.c,
 	Src/Zle/complete.c, Src/Zle/computil.c, Src/Zle/zleparameter.c:
 	fix two memory leaks (at least I hope they are fixed) and some
