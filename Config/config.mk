@@ -35,8 +35,8 @@ $(dir_top)/Config/defs.mk $(dir_top)/Config/version.mk
 
 Makefile: Makefile.in $(dir_top)/config.status $(CONFIG_INCS)
 	cd $(dir_top) && \
-	  CONFIG_FILES=$(subdir)/$@ CONFIG_HEADERS= $(SHELL) ./config.status
+	  $(SHELL) ./config.status `echo $(subdir)/$@ | sed 's%^./%%'`
 
 $(dir_top)/Config/defs.mk: $(sdir_top)/Config/defs.mk.in $(dir_top)/config.status
 	cd $(dir_top) && \
-	  CONFIG_FILES=Config/defs.mk CONFIG_HEADERS= $(SHELL) ./config.status
+	  $(SHELL) ./config.status Config/defs.mk

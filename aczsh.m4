@@ -594,8 +594,11 @@ AC_DEFUN(zsh_PATH_UTMP,
   zsh_cv_path_$1=no
 done
 ])
+AH_TEMPLATE([PATH_]translit($1, [a-z], [A-Z])[_FILE],
+[Define to be location of ]$1[ file.])
 if test $zsh_cv_path_$1 != no; then
-  AC_DEFINE_UNQUOTED(PATH_[]translit($1, [a-z], [A-Z])[]_FILE, "$zsh_cv_path_$1")
+  AC_DEFINE_UNQUOTED([PATH_]translit($1, [a-z], [A-Z])[_FILE],
+  "$zsh_cv_path_$1")
 fi
 ])
 
@@ -610,8 +613,10 @@ AC_DEFUN(zsh_TYPE_EXISTS,
 [zsh_cv_type_exists_[]translit($2, [ ], [_])=yes],
 [zsh_cv_type_exists_[]translit($2, [ ], [_])=no])
 ])
+AH_TEMPLATE([HAVE_]translit($2, [ a-z], [_A-Z]),
+[Define to 1 if ]$2[ is defined by a system header])
 if test $zsh_cv_type_exists_[]translit($2, [ ], [_]) = yes; then
-  AC_DEFINE(HAVE_[]translit($2, [ a-z], [_A-Z]))
+  AC_DEFINE([HAVE_]translit($2, [ a-z], [_A-Z]))
 fi
 ])
 
@@ -627,8 +632,10 @@ AC_DEFUN(zsh_STRUCT_MEMBER,
 [zsh_cv_struct_member_[]translit($2, [ ], [_])_$3=yes],
 [zsh_cv_struct_member_[]translit($2, [ ], [_])_$3=no])
 ])
+AH_TEMPLATE([HAVE_]translit($2_$3, [ a-z], [_A-Z]),
+[Define if your system's ]$2[ has a member named ]$3[.])
 if test $zsh_cv_struct_member_[]translit($2, [ ], [_])_$3 = yes; then
-  AC_DEFINE(HAVE_[]translit($2_$3, [ a-z], [_A-Z]))
+  AC_DEFINE([HAVE_]translit($2_$3, [ a-z], [_A-Z]))
 fi
 ])
 
@@ -707,12 +714,15 @@ AC_DEFUN([zsh_CHECK_SOCKLEN_T],[
       zsh_cv_type_socklen_t=int
     fi]
   )
-  AC_DEFINE_UNQUOTED([SOCKLEN_T], [$zsh_cv_type_socklen_t])]
+  AC_DEFINE_UNQUOTED([SOCKLEN_T], [$zsh_cv_type_socklen_t],
+  [Define to the base type of the third argument of accept])]
 )
 
 dnl Check for limit $1 e.g. RLIMIT_RSS.
 AC_DEFUN(zsh_LIMIT_PRESENT,
-[AC_CACHE_CHECK([for limit $1],
+[AH_TEMPLATE([HAVE_]$1,
+[Define to 1 if ]$1[ is present (whether or not as a macro).])
+AC_CACHE_CHECK([for limit $1],
 zsh_cv_have_$1,
 [AC_TRY_COMPILE([
 #include <sys/types.h>

@@ -466,21 +466,11 @@ if $first_stage; then
 fi
 
 if $second_stage ; then
-    if grep 'Hack for autoconf-2.13' ./config.status > /dev/null 2>&1 ; then
-        bang=\!
-    else
-	bang=
-    fi
-
     trap "rm -f $the_subdir/${the_makefile}" 1 2 15
 
-    # The standard config.status requires the pathname for the .in file to
-    # be relative to the top of the source tree.  As we have it in the build
-    # tree, this is a problem.  zsh's configure script edits config.status,
-    # adding the feature that an input filename starting with "!" has the
-    # "!" removed and is not mangled further.
-    CONFIG_FILES=$the_subdir/${the_makefile}:$bang$the_subdir/${the_makefile}.in CONFIG_HEADERS= ${CONFIG_SHELL-/bin/sh} ./config.status
-
+    ${CONFIG_SHELL-/bin/sh} ./config.status \
+	--file=$the_subdir/${the_makefile}:$the_subdir/${the_makefile}.in ||
+    return 1
 fi
 
 exit 0

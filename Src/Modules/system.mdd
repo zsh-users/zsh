@@ -23,5 +23,9 @@ errnames.c: errnames1.awk errnames2.awk $(dir_top)/config.h @ERRNO_H@
 
 errcount.h: errnames.c
 	grep 'define.*ERRCOUNT' errnames.c > $@
+
+clean-here: clean.system
+clean.system:
+	rm -f errcount.h errnames.c
 Make
 

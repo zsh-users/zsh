@@ -1,3 +1,8 @@
+2004-02-14  Peter Stephenson  <pws@pwstephenson.fsnet.co.uk>
+
+	* 19420: acconfig.h, aczsh.m4, configure.ac, Makefile.in,
+	Config/config.mk, Src/mkmakemod.sh, Src/Modules/system.mdd
+
 2004-02-13  Oliver Kiddle  <opk@zsh.org>
 
 	* 19418: Completion/Linux/Command/_modutils,
