@@ -1,3 +1,9 @@
+2003-09-11  Oliver Kiddle  <opk@zsh.org>
+
+	* 19059: acconfig.h, zshconfig.ac, Src/builtin.c, Src/exec.c,
+	Src/hashtable.h, Doc/Zsh/builtins.yo: add -v, -V and -p flags
+	required by POSIX to the command builtin
+
 2003-09-10  Wayne Davison  <wayned@users.sourceforge.net>
 
 	* users/6529 + unposted: StartupFiles/zshenv: updated the comments

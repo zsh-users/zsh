@@ -52,6 +52,9 @@
  * anything                                                          */
 #undef GLOBAL_ZLOGOUT
 
+/* The default path; used when running commands with command -p */
+#undef DEFAULT_PATH
+
 /* Define to 1 if compiler could initialise a union */
 #undef HAVE_UNION_INIT
 

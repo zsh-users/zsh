@@ -1323,6 +1323,20 @@ if test $zsh_cv_rlimit_vmem_is_as = yes; then
 fi
 
 
+dnl --------------------------------------------
+dnl CHECK FOR DEFAULT PATH (used for command -p)
+dnl --------------------------------------------
+AC_CACHE_VAL(zsh_cv_cs_path,
+[if getconf _CS_PATH >/dev/null 2>&1; then
+  zsh_cv_cs_path=`getconf _CS_PATH`
+elif getconf CS_PATH >/dev/null 2>&1; then
+  zsh_cv_cs_path=`getconf CS_PATH`
+else
+  zsh_cv_cs_path="/bin:/usr/bin"
+fi])
+AC_DEFINE_UNQUOTED(DEFAULT_PATH, "$zsh_cv_cs_path")
+
+
 dnl ----------------------------
 dnl CHECK FOR /dev/fd FILESYSTEM
 dnl ----------------------------

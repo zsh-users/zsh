@@ -2593,7 +2593,7 @@ bin_unset(char *name, char **argv, Options ops, int func)
     return returnval;
 }
 
-/* type, whence, which */
+/* type, whence, which, command */
 
 /**/
 int
@@ -2603,6 +2603,7 @@ bin_whence(char *nam, char **argv, Options ops, int func)
     Patprog pprog;
     int returnval = 0;
     int printflags = 0;
+    int aliasflags;
     int csh, all, v, wd;
     int informed;
     char *cnam;
@@ -2623,6 +2624,18 @@ bin_whence(char *nam, char **argv, Options ops, int func)
 	printflags |= PRINT_WHENCE_SIMPLE;
     if (OPT_ISSET(ops,'f'))
 	printflags |= PRINT_WHENCE_FUNCDEF;
+
+    if (func == BIN_COMMAND)
+	if (OPT_ISSET(ops,'V')) {
+	    printflags = aliasflags = PRINT_WHENCE_VERBOSE;
+	    v = 1;
+	} else {
+	    aliasflags = PRINT_LIST;
+	    printflags = PRINT_WHENCE_SIMPLE;
+	    v = 0;
+	}
+    else
+	aliasflags = printflags;
 
     /* With -m option -- treat arguments as a glob patterns */
     if (OPT_ISSET(ops,'m')) {
@@ -2677,7 +2690,7 @@ bin_whence(char *nam, char **argv, Options ops, int func)
 
 	    /* Look for alias */
 	    if ((hn = aliastab->getnode(aliastab, *argv))) {
-		aliastab->printnode(hn, printflags);
+		aliastab->printnode(hn, aliasflags);
 		if (!all)
 		    continue;
 		informed = 1;

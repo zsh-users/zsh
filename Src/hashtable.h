@@ -58,6 +58,7 @@
 #define BIN_DISABLE  24
 #define BIN_ENABLE   25
 #define BIN_PRINTF   26
+#define BIN_COMMAND  27
 
 /* These currently depend on being 0 and 1. */
 #define BIN_SETOPT    0

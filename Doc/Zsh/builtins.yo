@@ -194,7 +194,18 @@ followed regardless of the state of the tt(CHASE_LINKS) option.
 )
 alias(chdir)(cd)
 module(clone)(zsh/clone)
-prefix(command)
+findex(command)
+item(tt(command) [ tt(-pvV) ] var(simple command))(
+The simple command argument is taken as an external command instead of
+a function or builtin and is executed. If the tt(POSIX_BUILTINS) option
+is set, builtins will also be executed but certain special properties
+of them are suppressed. The tt(-p) flag causes a default path to be
+searched instead of that in tt($path). With the tt(-v) flag, tt(command)
+is similar to tt(whence) and with tt(-V), it is equivalent to tt(whence
+-v).
+
+See also noderef(Precommand Modifiers).
+)
 module(comparguments)(zsh/computil)
 module(compcall)(zsh/compctl)
 module(compctl)(zsh/compctl)

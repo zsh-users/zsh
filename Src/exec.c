@@ -143,6 +143,10 @@ static int (*execfuncs[]) _((Estate, int)) = {
     execarith, execautofn
 };
 
+/* structure for command builtin for when it is used with -v or -V */
+static struct builtin commandbn =
+    BUILTIN(0, 0, bin_whence, 0, -1, BIN_COMMAND, "vV", NULL);
+
 /* parse string into a list */
 
 /**/
@@ -243,7 +247,7 @@ zfork(void)
  * In zsh this traditionally executes the loop in the current shell, which
  * is nice to have if the loop does something to change the shell, like
  * setting parameters or calling builtins.
- * Putting the loop in a sub-shell makes live easy, because the shell only
+ * Putting the loop in a sub-shell makes life easy, because the shell only
  * has to put it into the job-structure and then treats it as a normal
  * process. Suspending and interrupting is no problem then.
  * Some years ago, zsh either couldn't suspend such things at all, or
@@ -257,7 +261,7 @@ zfork(void)
  *  execlist->execpline->execcmd->execwhile->execlist->execpline
  *
  * (when waiting for the grep, ignoring execpline2 for now). At this time,
- * zsh has build two job-table entries for it: one for the cat and one for
+ * zsh has built two job-table entries for it: one for the cat and one for
  * the grep. If the user hits ^Z at this point (and jobbing is used), the 
  * shell is notified that the grep was suspended. The list_pipe flag is
  * used to tell the execpline where it was waiting that it was in a pipeline
@@ -442,7 +446,7 @@ isgooderr(int e, char *dir)
 
 /**/
 void
-execute(Cmdnam not_used_yet, int dash)
+execute(Cmdnam not_used_yet, int dash, int defpath)
 {
     Cmdnam cn;
     char buf[MAXCMDLEN], buf2[MAXCMDLEN];
@@ -451,7 +455,7 @@ execute(Cmdnam not_used_yet, int dash)
     int eno = 0, ee;
 
     arg0 = (char *) peekfirst(args);
-    if (isset(RESTRICTED) && strchr(arg0, '/')) {
+    if (isset(RESTRICTED) && (strchr(arg0, '/') || defpath)) {
 	zerr("%s: restricted", arg0, 0);
 	_exit(1);
     }
@@ -473,8 +477,6 @@ execute(Cmdnam not_used_yet, int dash)
 	STTYval = 0;
 	zsfree(s);
     }
-
-    cn = (Cmdnam) cmdnamtab->getnode(cmdnamtab, arg0);
 
     /* If ARGV0 is in the commands environment, we use *
      * that as argv[0] for this external command       */
@@ -507,51 +509,89 @@ execute(Cmdnam not_used_yet, int dash)
 	    break;
 	}
 
-    if (cn) {
-	char nn[PATH_MAX], *dptr;
+    /* for command -p, search the default path */ 
+    if (defpath) {
+	char *s, pbuf[PATH_MAX];
+	char *dptr, *pe, *ps = DEFAULT_PATH;
 
-	if (cn->flags & HASHED)
-	    strcpy(nn, cn->u.cmd);
-	else {
-	    for (pp = path; pp < cn->u.name; pp++)
-		if (!**pp || (**pp == '.' && (*pp)[1] == '\0')) {
-		    ee = zexecve(arg0, argv);
-		    if (isgooderr(ee, *pp))
-			eno = ee;
-		} else if (**pp != '/') {
-		    z = buf;
-		    strucpy(&z, *pp);
-		    *z++ = '/';
-		    strcpy(z, arg0);
-		    ee = zexecve(buf, argv);
-		    if (isgooderr(ee, *pp))
-			eno = ee;
-		}
-	    strcpy(nn, cn->u.name ? *(cn->u.name) : "");
-	    strcat(nn, "/");
-	    strcat(nn, cn->nam);
+	for(;ps;ps = pe ? pe+1 : NULL) {
+	    pe = strchr(ps, ':');
+	    if (*ps == '/') {
+		s = pbuf;
+		if (pe)
+		    struncpy(&s, ps, pe-ps);
+		else
+		    strucpy(&s, ps);
+		*s++ = '/';
+		if ((s - pbuf) + strlen(arg0) >= PATH_MAX)
+		    continue;
+		strucpy(&s, arg0);
+		if (iscom(pbuf))
+		    break;
+	    }
 	}
-	ee = zexecve(nn, argv);
 
-	if ((dptr = strrchr(nn, '/')))
+	if (!ps) {
+	    zerr("command not found: %s", arg0, 0);
+	    _exit(127);
+	}
+
+	ee = zexecve(pbuf, argv);
+
+	if ((dptr = strrchr(pbuf, '/')))
 	    *dptr = '\0';
-	if (isgooderr(ee, *nn ? nn : "/"))
+	if (isgooderr(ee, *pbuf ? pbuf : "/"))
 	    eno = ee;
-    }
-    for (pp = path; *pp; pp++)
-	if (!(*pp)[0] || ((*pp)[0] == '.' && !(*pp)[1])) {
-	    ee = zexecve(arg0, argv);
-	    if (isgooderr(ee, *pp))
-		eno = ee;
-	} else {
-	    z = buf;
-	    strucpy(&z, *pp);
-	    *z++ = '/';
-	    strcpy(z, arg0);
-	    ee = zexecve(buf, argv);
-	    if (isgooderr(ee, *pp))
+
+    } else {
+   
+	if ((cn = (Cmdnam) cmdnamtab->getnode(cmdnamtab, arg0))) {
+	    char nn[PATH_MAX], *dptr;
+
+	    if (cn->flags & HASHED)
+		strcpy(nn, cn->u.cmd);
+	    else {
+		for (pp = path; pp < cn->u.name; pp++)
+		    if (!**pp || (**pp == '.' && (*pp)[1] == '\0')) {
+			ee = zexecve(arg0, argv);
+			if (isgooderr(ee, *pp))
+			    eno = ee;
+		    } else if (**pp != '/') {
+			z = buf;
+			strucpy(&z, *pp);
+			*z++ = '/';
+			strcpy(z, arg0);
+			ee = zexecve(buf, argv);
+			if (isgooderr(ee, *pp))
+			    eno = ee;
+		    }
+		strcpy(nn, cn->u.name ? *(cn->u.name) : "");
+		strcat(nn, "/");
+		strcat(nn, cn->nam);
+	    }
+	    ee = zexecve(nn, argv);
+
+	    if ((dptr = strrchr(nn, '/')))
+		*dptr = '\0';
+	    if (isgooderr(ee, *nn ? nn : "/"))
 		eno = ee;
 	}
+	for (pp = path; *pp; pp++)
+	    if (!(*pp)[0] || ((*pp)[0] == '.' && !(*pp)[1])) {
+		ee = zexecve(arg0, argv);
+		if (isgooderr(ee, *pp))
+		    eno = ee;
+	    } else {
+		z = buf;
+		strucpy(&z, *pp);
+		*z++ = '/';
+		strcpy(z, arg0);
+		ee = zexecve(buf, argv);
+		if (isgooderr(ee, *pp))
+		    eno = ee;
+	    }
+    }
+
     if (eno)
 	zerr("%e: %s", arg0, eno);
     else
@@ -1692,7 +1732,7 @@ execcmd(Estate state, int input, int output, int how, int last1)
     int save[10];
     int fil, dfil, is_cursh, type, do_exec = 0, i, htok = 0;
     int nullexec = 0, assign = 0, forked = 0;
-    int is_shfunc = 0, is_builtin = 0, is_exec = 0;
+    int is_shfunc = 0, is_builtin = 0, is_exec = 0, use_defpath = 0;
     /* Various flags to the command. */
     int cflags = 0, checked = 0, oautocont = opts[AUTOCONTINUE];
     LinkList redir;
@@ -1782,9 +1822,30 @@ execcmd(Estate state, int input, int output, int how, int last1)
 	    }
 	    cflags &= ~BINF_BUILTIN & ~BINF_COMMAND;
 	    cflags |= hn->flags;
+	    checked = 0;
+	    if (cflags & BINF_COMMAND && nextnode(firstnode(args))) {
+		// check for options to command builtin
+		char *next = (char *) getdata(nextnode(firstnode(args)));
+		char *cmdopt;
+		if (next && *next == '-' && strlen(next) == 2 &&
+		        (cmdopt = strchr("pvV", next[1])))
+		{
+		    if (*cmdopt == 'p') {
+			uremnode(args, firstnode(args));
+			use_defpath = 1;
+			if (nextnode(firstnode(args)))
+			    next = (char *) getdata(nextnode(firstnode(args)));
+		    } else {
+			hn = (HashNode)&commandbn;
+			is_builtin = 1;
+			break;
+		    }
+		}
+		if (!strcmp(next, "--"))
+		     uremnode(args, firstnode(args));   
+	    }
 	    uremnode(args, firstnode(args));
 	    hn = NULL;
-	    checked = 0;
 	    if ((cflags & BINF_COMMAND) && unset(POSIXBUILTINS))
 		break;
 	}
@@ -2401,7 +2462,7 @@ execcmd(Estate state, int input, int output, int how, int last1)
 		    zsfree(STTYval);
 		    STTYval = 0;
 		}
-		execute((Cmdnam) hn, cflags & BINF_DASH);
+		execute((Cmdnam) hn, cflags & BINF_DASH, use_defpath);
 	    } else {		/* ( ... ) */
 		DPUTS(varspc,
 		      "BUG: assignment before complex command");
