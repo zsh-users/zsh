@@ -920,7 +920,7 @@ gmatchcmp(Gmatch a, Gmatch b)
 
 /**/
 void
-glob(LinkList list, LinkNode np, int nountok)
+zglob(LinkList list, LinkNode np, int nountok)
 {
     struct qual *qo, *qn, *ql;
     LinkNode node = prevnode(np);
