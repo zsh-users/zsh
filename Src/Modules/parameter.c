@@ -617,23 +617,28 @@ boot_parameter(Module m)
      * As an example for autoloaded parameters, this is probably a bad
      * example, because we the zsh core doesn't support creation of
      * special hashes, yet. */
+    Param pm;
 
-    unsetparam(PAR_NAM);
+    if ((pm = (Param) gethashnode2(paramtab, PAR_NAM)))
+	unsetparam_pm(pm, 0, 1);
     if (!(parpm = createspecialhash(PAR_NAM, getpmparameter,
 				    scanpmparameters)))
 	return 1;
     parpm->flags |= PM_READONLY;
-    unsetparam(CMD_NAM);
+    if ((pm = (Param) gethashnode2(paramtab, CMD_NAM)))
+	unsetparam_pm(pm, 0, 1);
     if (!(cmdpm = createspecialhash(CMD_NAM, getpmcommand,
 				    scanpmcommands)))
 	return 1;
     cmdpm->sets.hfn = setpmcommands;
-    unsetparam(FUN_NAM);
+    if ((pm = (Param) gethashnode2(paramtab, FUN_NAM)))
+	unsetparam_pm(pm, 0, 1);
     if (!(funpm = createspecialhash(FUN_NAM, getpmfunction,
 				    scanpmfunctions)))
 	return 1;
     funpm->sets.hfn = setpmfunctions;
-    unsetparam(OPT_NAM);
+    if ((pm = (Param) gethashnode2(paramtab, OPT_NAM)))
+	unsetparam_pm(pm, 0, 1);
     if (!(optpm = createspecialhash(OPT_NAM, getpmoption,
 				    scanpmoptions)))
 	return 1;
