@@ -1,5 +1,7 @@
 2003-08-30  Peter Stephenson  <pws@pwstephenson.fsnet.co.uk>
 
+	* 18982: Src/subst.c:  Comments/rant for paramsubst().
+
 	* 18981: Doc/Zsh/tcpsys.yo: General tidy up.
 
 2003-08-22  Peter Stephenson  <pws@csr.com>

@@ -137,7 +137,7 @@ static initparam special_params[] ={
 #define GFN(X) BR(((char *(*)_((Param)))(X)))
 #define IPDEF1(A,B,C,D) {NULL,A,PM_INTEGER|PM_SPECIAL|D,BR(NULL),SFN(C),GFN(B),stdunsetfn,10,NULL,NULL,NULL,0}
 IPDEF1("#", poundgetfn, nullintsetfn, PM_READONLY),
-IPDEF1("ERRNO", errnogetfn, nullintsetfn, PM_READONLY),
+IPDEF1("ERRNO", errnogetfn, errnosetfn, 0),
 IPDEF1("GID", gidgetfn, gidsetfn, PM_DONTIMPORT | PM_RESTRICTED),
 IPDEF1("EGID", egidgetfn, egidsetfn, PM_DONTIMPORT | PM_RESTRICTED),
 IPDEF1("HISTSIZE", histsizegetfn, histsizesetfn, PM_RESTRICTED),
@@ -3012,6 +3012,15 @@ savehistsizesetfn(Param pm, zlong v)
 {
     if ((savehistsiz = v) < 0)
 	savehistsiz = 0;
+}
+
+/* Function to set value for special parameter `ERRNO' */
+
+/**/
+void
+errnosetfn(Param pm, zlong x)
+{
+    errno = (int)x;
 }
 
 /* Function to get value for special parameter `ERRNO' */
