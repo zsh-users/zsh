@@ -24,9 +24,6 @@ _x_arguments -C \
   -{component-bar,composer,edit,messenger,mail,discussions,news} \
   '*:location:->urls' && ret=0
 
-[[ "$state" = "urls" ]] &&
-  _files "$@" && return 0
-
 # Handle netscape remote commands
 if [[ "$state" = "remote" ]]; then  
   local -a remote_commands
@@ -69,24 +66,31 @@ if [[ "$state" = "remote" ]]; then
 fi
 
 if [[ "$state" = "urls" ]]; then
-  # Complete netscape urls
-  if compset -P about: ; then
-    _wanted values expl 'about what' \
-        compadd "$@" authors blank cache document fonts global hype image-cache \
-            license logo memory-cache mozilla plugins && ret=0
-  elif compset -P news: ; then
-    _newsgroups "$@" && ret=0
-  else
-    _tags prefixes
-    while _tags; do
-      while _next_label prefixes expl 'URL prefix' "$@"; do
-        _urls "$expl[@]" && ret=0
-	compset -S '[^:]*'
-        compadd -S '' "$expl[@]" about: news: mocha: javascript: && ret=0
-      done
-      (( ret )) || return 0
-    done
-  fi
+  _tags files urls
+  while _tags; do
+    _requested files expl 'file' _files "$@" && ret=0
+    if _requested urls; then
+      # Complete netscape urls
+      if compset -P about: ; then
+	_wanted values expl 'about what' \
+            compadd "$@" authors blank cache document fonts global hype \
+	    	image-cache license logo memory-cache mozilla plugins && ret=0
+      elif compset -P news: ; then
+	_newsgroups "$@" && ret=0
+      else
+	_tags prefixes
+	while _tags; do
+	  while _next_label prefixes expl 'URL prefix' "$@"; do
+            _urls "$expl[@]" && ret=0
+	    compset -S '[^:]*'
+            compadd -S '' "$expl[@]" about: news: mocha: javascript: && ret=0
+	  done
+	  (( ret )) || return 0
+	done
+      fi
+    fi
+    (( ret )) || return 0
+  done
 fi
 
 return ret

@@ -24,8 +24,6 @@ _arguments -C \
        '-help' \
        ':url:->html' && return 0
 
-case "$state" in
-html)
-  _files -g '*.html' || _urls
-  ;;
-esac
+if [[ "$state" = html ]]; then
+  _alternative 'files:file:_files "*.html"' 'urls:url:_urls'
+fi

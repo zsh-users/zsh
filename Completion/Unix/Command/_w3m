@@ -42,7 +42,7 @@ case $state in
 	   compadd $_w3mhistory
 	fi
 
-	_urls || _files -g '*.html'
+	_alternative 'files:file:_files "*.html"' 'urls:url:_urls'
 	;;
 
 esac

@@ -107,6 +107,6 @@ restrictions)
     outside_telnet print shell suspend telnet_port useragent
   ;;
 html)
-  _files -g '*.html' || _urls
+  _alternative 'files:file:_files "*.html"' 'urls:url:_urls'
   ;;
 esac
