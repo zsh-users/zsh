@@ -1,3 +1,8 @@
+2001-06-23  Bart Schaefer  <schaefer@zsh.org>
+
+	* 15050, 15054: Src/exec.c: Change exit status of external
+	commands that could not be executed, to comply with POSIX.
+
 2001-06-22  Andrej Borsenkow  <bor@zsh.org>
 
 	* 15021: Src/prompt.c, Doc/Zsh/prompt.yo: revert to old %l

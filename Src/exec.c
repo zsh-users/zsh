@@ -502,7 +502,7 @@ execute(Cmdnam not_used_yet, int dash)
 		(arg0[0] == '.' && (arg0 + 1 == s ||
 				    (arg0[1] == '.' && arg0 + 2 == s)))) {
 		zerr("%e: %s", arg0, errno);
-		_exit(1);
+		_exit((errno == EACCES || errno == ENOEXEC) ? 126 : 127);
 	    }
 	    break;
 	}
@@ -556,7 +556,7 @@ execute(Cmdnam not_used_yet, int dash)
 	zerr("%e: %s", arg0, eno);
     else
 	zerr("command not found: %s", arg0, 0);
-    _exit(1);
+    _exit((eno == EACCES || eno == ENOEXEC) ? 126 : 127);
 }
 
 #define RET_IF_COM(X) { if (iscom(X)) return docopy ? dupstring(X) : arg0; }
