@@ -1,3 +1,7 @@
+2000-07-12  Sven Wischnowsky  <wischnow@zsh.org>
+
+	* 12225: Completion/Linux/_rpm: check if options were completed
+	
 2000-07-11  Peter Stephenson  <pws@cambridgesiliconradio.com>
 
 	* Src/exec.c: 12220: print error message for unfound autoload

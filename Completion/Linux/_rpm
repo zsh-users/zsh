@@ -41,7 +41,7 @@
 
 # Used by `_arguments', made local here.
 
-local curcontext="$curcontext" state lstate line
+local curcontext="$curcontext" state lstate line nm="$compstate[nmatches]"
 typeset -A opt_args
 
 state=''
@@ -246,6 +246,8 @@ while [[ -n "$state" ]]; do
     _files "$expl[@]" -/ && ret=0
     ;;
   esac
+
+  [[ ret -eq 0 || $nm -ne $compstate[nmatches] ]] && return 0
 done
 
 return ret
