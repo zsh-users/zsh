@@ -26,7 +26,7 @@
 
  print -f
 1:print -f needs a format specified
-?(eval):print:1: -f: format argument expected
+?(eval):print:1: argument expected: -f
 
  print -Of '%s\n' foo bar baz
 0:reverse argument sorting
