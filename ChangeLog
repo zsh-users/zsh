@@ -1,3 +1,9 @@
+2002-05-13  Sven Wischnowsky  <wischnow@zsh.org>
+
+	* 17135: Src/Zle/compcore.c, Src/Zle/zle_tricky.c: fix for
+	unquoting with `compset -q' with singly and doubly quoted
+	strings
+
 2002-05-12  Peter Stephenson  <pws@pwstephenson.fsnet.co.uk>
 
 	* c.f. 17128: Doc/Makefile.in: back out changes accidentally

@@ -985,7 +985,7 @@ static char *
 get_comp_string(void)
 {
     int t0, tt0, i, j, k, cp, rd, sl, ocs, ins, oins, ia, parct, varq = 0;
-    int ona = noaliases;
+    int ona = noaliases, qsub;
     char *s = NULL, *linptr, *tmp, *p, *tt = NULL, rdop[20];
 
     freebrinfo(brbeg);
@@ -1051,6 +1051,8 @@ get_comp_string(void)
     * and whatnot. */
 
     do {
+        qsub = 0;
+
 	lincmd = ((incmdpos && !ins && !incond) || (oins == 2 && i == 2) ||
 		  (ins == 3 && i == 1));
 	linredir = (inredir && !ins);
@@ -1126,9 +1128,16 @@ get_comp_string(void)
 	if (!zleparse && !tt0) {
 	    /* This is done when the lexer reached the word the cursor is on. */
 	    tt = tokstr ? dupstring(tokstr) : NULL;
+
+            if (isset(RCQUOTES) && *tt == Snull) {
+                char *p, *e = tt + cs - wb;
+                for (p = tt; *p && p < e; p++)
+                    if (*p == '\'')
+                        qsub++;
+            }
 	    /* If we added a `x', remove it. */
 	    if (addedx && tt)
-		chuck(tt + cs - wb);
+		chuck(tt + cs - wb - qsub);
 	    tt0 = tok;
 	    /* Store the number of this word. */
 	    clwpos = i;
@@ -1176,8 +1185,8 @@ get_comp_string(void)
 	/* If this is the word the cursor is in and we added a `x', *
 	 * remove it.                                               */
 	if (clwpos == i++ && addedx)
-	    chuck(&clwords[i - 1][((cs - wb) >= sl) ?
-				 (sl - 1) : (cs - wb)]);
+	    chuck(&clwords[i - 1][((cs - wb - qsub) >= sl) ?
+				 (sl - 1) : (cs - wb - qsub)]);
     } while (tok != LEXERR && tok != ENDINPUT &&
 	     (tok != SEPER || (zleparse && !tt0)));
     /* Calculate the number of words stored in the clwords array. */

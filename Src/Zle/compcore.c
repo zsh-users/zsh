@@ -1175,6 +1175,30 @@ rembslash(char *s)
     return t;
 }
 
+/* Remove one of every pair of single quotes, without copying. Return
+ * the number of removed quotes. */
+
+/**/
+mod_export int
+remsquote(char *s)
+{
+    int ret = 0, qa = (isset(RCQUOTES) ? 1 : 3);
+    char *t = s;
+
+    while (*s)
+	if (qa == 1 ?
+            (s[0] == '\'' && s[1] == '\'') :
+            (s[0] == '\'' && s[1] == '\\' && s[2] == '\'' && s[3] == '\'')) {
+            ret += qa;
+            *t++ = '\'';
+            s += qa + 1;
+	} else
+	    *t++ = *s++;
+    *t = '\0';
+
+    return ret;
+}
+
 /* This should probably be moved into tokenize(). */
 
 /**/
@@ -1244,7 +1268,8 @@ set_comp_sep(void)
     LinkList foo = newlinklist();
     LinkNode n;
     int owe = we, owb = wb, ocs = cs, swb, swe, scs, soffs, ne = noerrs;
-    int tl, got = 0, i = 0, cur = -1, oll = ll, sl, remq;
+    int tl, got = 0, i = 0, j, cur = -1, oll = ll, sl;
+    int remq = 0, dq = 0, odq, sq = 0, osq, issq = 0, sqq = 0, lsq = 0, qa = 0;
     int ois = instring, oib = inbackt, noffs = lp, ona = noaliases;
     char *tmp, *p, *ns, *ol = (char *) line, sav, *qp, *qs, *ts, qc = '\0';
 
@@ -1266,8 +1291,33 @@ set_comp_sep(void)
     memcpy(tmp + 1, s, noffs);
     tmp[(scs = cs = 1 + noffs)] = 'x';
     strcpy(tmp + 2 + noffs, s + noffs);
-    if ((remq = (*compqstack == '\\')))
+
+    switch (*compqstack) {
+    case '\\':
+        remq = 1;
 	tmp = rembslash(tmp);
+        break;
+    case '\'':
+        issq = 1;
+        if (isset(RCQUOTES))
+            qa = 1;
+        else
+            qa = 3;
+
+        sq = remsquote(tmp);
+
+        break;
+    case '"':
+        for (j = 0, p = tmp; *p; p++, j++)
+            if (*p == '\\' && p[1] == '\\') {
+                dq++;
+                chuck(p);
+                if (!*p)
+                    break;
+            }
+    }
+    odq = dq;
+    osq = sq;
     inpush(dupstrspace(tmp), 0, NULL);
     line = (unsigned char *) tmp;
     ll = tl - 1;
@@ -1280,9 +1330,10 @@ set_comp_sep(void)
 
 	    if (!tokstr)
 		break;
-	    for (j = 0, p = tokstr; *p; p++)
+	    for (j = 0, p = tokstr; *p; p++) {
 		if (*p == Snull || *p == Dnull)
 		    j++;
+            }
 	    if (j & 1) {
 		tok = STRING;
 		if (p > tokstr && p[-1] == ' ')
@@ -1291,16 +1342,33 @@ set_comp_sep(void)
 	}
 	if (tok == ENDINPUT || tok == LEXERR)
 	    break;
-	if (tokstr && *tokstr)
+	if (tokstr && *tokstr) {
+            for (p = tokstr; dq && *p; p++)
+                if (*p == Bnull)
+                    dq--;
+            if (issq) {
+                for (p = tokstr, lsq = 0; *p; p++) {
+                    if (sq && *p == Snull)
+                        sq -= qa;
+                    if (*p == '\'') {
+                        sq -= qa;
+                        lsq += qa;
+                    }
+                }
+            }
+            else
+                lsq = 0;
 	    addlinknode(foo, (p = ztrdup(tokstr)));
+        }
 	else
 	    p = NULL;
 	if (!got && !zleparse) {
 	    DPUTS(!p, "no current word in substr");
 	    got = 1;
 	    cur = i;
-	    swb = wb - 1;
-	    swe = we - 1;
+	    swb = wb - 1 - dq - sq;
+	    swe = we - 1 - dq - sq;
+            sqq = lsq;
 	    soffs = cs - swb;
 	    chuck(p + soffs);
 	    ns = dupstring(p);
@@ -1352,8 +1420,12 @@ set_comp_sep(void)
     for (p = ns, i = swb; *p; p++, i++) {
 	if (INULL(*p)) {
 	    if (i < scs) {
-		if (remq && *p == Bnull && p[1])
-		    swb -= 2;
+		if (*p == Bnull && p[1]) {
+                    if (remq)
+                        swb -= 2;
+                    if (odq)
+                        swb--;
+                }
 	    }
 	    if (p[1] || *p != Bnull) {
 		if (*p == Bnull) {
@@ -1378,9 +1450,9 @@ set_comp_sep(void)
 	if (ql > rl)
 	    swb -= ql - rl;
     }
-    sav = s[(i = swb - 1)];
+    sav = s[(i = swb - 1 - sqq)];
     s[i] = '\0';
-    qp = rembslash(s);
+    qp = (issq ? dupstring(s) : rembslash(s));
     s[i] = sav;
     if (swe < swb)
 	swe = swb;
@@ -1391,11 +1463,14 @@ set_comp_sep(void)
 	if (strlen(ns) > swe - swb + 1)
 	    ns[swe - swb + 1] = '\0';
     }
-    qs = rembslash(s + swe);
+    qs = (issq ? dupstring(s + swe) : rembslash(s + swe));
     sl = strlen(ns);
     if (soffs > sl)
 	soffs = sl;
-
+    if (issq) {
+        remsquote(qp);
+        remsquote(qs);
+    }
     {
 	int set = CP_QUOTE | CP_QUOTING, unset = 0;
 
