@@ -1101,6 +1101,18 @@ history as possible matches sort these words alphabetically instead of
 keeping them in the order in which they appear in the history (from
 youngest to oldest).
 
+The completion function that generates filenames as possible matches
+uses this style with the tt(files) tag to determine in which order the 
+names should be listed and completed when using menucompletion. The
+value may be one of tt(size) to sort them by the size of the file,
+tt(links) to sort them by the number of links to the file,
+tt(modification) (or tt(time) or tt(date)) to sort them by the last
+modification time, tt(access) to sort them by the last access time, or 
+tt(inode) (or tt(change)) to sort them by the last inode change
+time. Any other value (or not setting this style at all) makes them be 
+sorted alphabetically by name. If the value contains the string
+tt(reverse), sorting is done in decreasing order.
+
 This is also used by the tt(_expand) completer. Here, if it is set to
 `true', the expansions generated will always be sorted. If it is set
 to tt(menu), then the expansions are only sorted when they are offered 

@@ -6,7 +6,7 @@
 local linepath realpath donepath prepath testpath exppath
 local tmp1 tmp2 tmp3 tmp4 i orig eorig pre suf tpre tsuf opre osuf cpre
 local pats haspats=no ignore group expl addpfx addsfx remsfx
-local nm=$compstate[nmatches] menu match matcher mopts atmp
+local nm=$compstate[nmatches] menu match matcher mopts atmp sort
 
 typeset -U prepaths exppaths
 
@@ -108,6 +108,37 @@ if [[ "$sopt" = - ]]; then
     pats=('*')
   else
     unset sopt
+  fi
+fi
+
+if zstyle -s ":completion${curcontext}:files" sort tmp1; then
+  case "$tmp1" in
+  *size*)             sort=oL;;
+  *links*)            sort=ol;;
+  *(time|date|modi)*) sort=om;;
+  *access*)           sort=oa;;
+  *(inode|change)*)   sort=oc;;
+  *)                  sort=on;;
+  esac
+  [[ "$tmp1" = *rev* ]] && sort[1]=O
+
+  if [[ "$sort" = on ]]; then
+    sort=''
+  else
+    group=( "${(@)group/#-J/-V}" )
+    expl=( "${(@)expl/#-J/-V}" )
+
+    tmp2=()
+    for tmp1 in "$pats[@]"; do
+      if [[ "$tmp1" = ?*\(\([^\|~]##\)\) ]]; then
+        tmp2=( "$tmp2[@]" "${tmp1[1,-3]}${sort}))" )
+      elif [[ "$tmp1" = ?*\([^\|~]##\) ]]; then
+        tmp2=( "$tmp2[@]" "${tmp1[1,-2]}${sort})" )
+      else
+        tmp2=( "$tmp2[@]" "${tmp1}(${sort})" )
+      fi
+    done
+    pats=( "$tmp2[@]" )
   fi
 fi
 
