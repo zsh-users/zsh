@@ -1,3 +1,8 @@
+2000-10-19  Wayne Davison  <wayned@users.sourceforge.net>
+
+	* 13034: Src/hist.c: Don't call histreduceblanks() if the line
+	didn't parse right.
+
 2000-10-17  Bart Schaefer  <schaefer@zsh.org>
 
 	* unposted: Functions/Misc/zmv: Small typo in example in comment.
