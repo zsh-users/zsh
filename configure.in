@@ -398,7 +398,7 @@ AC_PROG_MAKE_SET            dnl Does make define $MAKE
 AC_PROG_INSTALL             dnl Check for BSD compatible `install'
 AC_PROG_AWK                 dnl Check for mawk,gawk,nawk, then awk.
 AC_PROG_LN                  dnl Check for working ln, for "make install"
-AC_CHECK_PROGS([YODL], [yodl], [:])
+AC_CHECK_PROGS([YODL], [yodl], [exit 0; yodl])
 
 dnl ------------------
 dnl CHECK HEADER FILES
@@ -1273,12 +1273,13 @@ if test $ac_cv_func_getpwnam=yes; then
 #include <pwd.h>
 main() {
     struct passwd *pw1, *pw2;
-    char buf[1024];
+    char buf[1024], name[1024];
     sprintf(buf, "%d:%d", getpid(), rand());
     pw1=getpwnam(buf);
+    if (pw1) strcpy(name, pw1->pw_name);
     sprintf(buf, "%d:%d", rand(), getpid());
     pw2=getpwnam(buf);
-    exit(pw1!=0 && pw2!=0 && !strcmp(pw1->pw_name, pw2->pw_name));
+    exit(pw1!=0 && pw2!=0 && !strcmp(name, pw2->pw_name));
 }
 ],
       zsh_cv_sys_getpwnam_faked=no,

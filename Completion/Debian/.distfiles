@@ -1,5 +1,4 @@
 DISTFILES_SRC='
     .distfiles
-    _apt _deb_packages
+    _apt _deb_packages _dpkg _dpkg-source
 '
-
