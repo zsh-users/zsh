@@ -58,7 +58,7 @@ BEGIN {limidx = 0}
 /^[\t ]*RLIM_NLIMITS[\t ]*=[\t ]*RLIMIT_NLIMITS/ {
     if(!nlimits) { nlimits = limidx }
 }
-/^[\t ]*RLIMIT_NLIMITS[\t ]*=[\t ]*[0-9][0-9]*/ {
+/^[\t ]*RLIM(IT)?_NLIMITS[\t ]*=[\t ]*[0-9][0-9]*/ {
     limindex = index($0, "=")
     limtail = substr($0, limindex, 80)
     split(limtail, tmp)
