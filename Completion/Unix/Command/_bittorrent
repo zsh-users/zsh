@@ -1,0 +1,97 @@
+#compdef btdownloadcurses btdownloadheadless btdownloadgui btlaunchmany btlaunchmanycurses bttrack btshowmetainfo btreannounce btmakemetafile btrename
+
+# Bittorrent completion commands. Originally written by Jussi
+# Pakkanen, 2004. Most of the command descriptions are from the Debian
+# project's man pages.
+
+case $service in
+
+# Start with the clients.
+
+ btdownloadcurses)
+   ;&
+ btdownloadheadless)
+   ;&
+ btdownloadgui)
+   ;&
+ btlaunchmany)
+   ;&
+ btlaunchmanycurses)
+  _arguments -s -S \
+      '(--responsefile)--responsefile+[response file]:file for server response:_files -g "*"'\
+      "--url+[from URL]:URL of torrent file:"\
+      '(-i --ip)'{-i+,--ip+}'[ip address]:report argument as your ip address'\
+      "--bind+[ip]:bind to ip instead of default:"\
+      "--minport+[port]:minimum port to listen to (default 6881):"\
+      "--maxport+[port]:maximum port to listen to (default 6889):"\
+      "--saveas+[filename]:save to specified filename:_files -/"\
+      "--max_uploads+[num]:maximum amount of uploads (default 4):"\
+      "--max_upload_rate+[kbytes]:maximum rate to upload in kbytes (default no limit):"\
+      "--keepalive_interval+[secs]:pause between keepalives (default 120.0):"\
+      "--download_slice_size+[bytes]:query for bytes bytes per request (default 32768):"\
+      "--request_backlog+[num]:keep num requests in a single pipe at once (default 5):"\
+      "--max_message_length+[bytes]:max length prefix encoding you'll accept over the wire (default 8388608):"\
+      "--timeout+[secs]:wait secs before closing sockets which nothing has been recieved on (default 300.0):"\
+      "--timeout_check_interval+[secs]:check whether connections have timed out  every secs seconds (default 60.0):"\
+      "--max_slice_length+[bytes]:requests from peers larger than bytes bytes are ignored (default 131072):"\
+      "--max_rate_recalculate_interval+[secs]:connections that  pause  longer  than  secs  seconds  are  given reduced rate (default 15.0):"\
+      "--max_rate_period+[secs]:set secs to the maximum amount of time to guess the current rate estimate represents (default 20.0):"\
+      "--upload_rate_fudge+[secs]:set the time equivalent of writing to kernel-level TCP buffer to secs (default 5.0):"\
+      "--display_interval+[secs]:update displayed information every secs seconds (default 0.1):"\
+      "--rerequest_interval+[secs]:request more peers every secs seconds (default 300)"\
+      "--min_peers+[num]:do not rerequest if we have num peers already (default 20):"\
+      "--http_timeout+[secs]:wait secs seconds before assuming a http connection has timed out (default 60):"\
+      "--snub_time+[secs]:wait secs seconds for data to come in over a connection  before assuming it's semi-permanently choked (default 30.0):"\
+      "--spew+[1 | 0]:whether to display diagnostic info to stdout. (default  0):(0 1)"\
+      "--check_hashes+[1 | 0]:whether to check hashes on disk (defaults to 1):(0 1)"\
+      "--max_initiate+[num]:stop initiating new connections when we have num peers (default 40):"\
+      "--report_hash_failures+[1 | 0]:whether to report to the user that hash failuers occur (non-fatal, common error) (default 0):(0 1)"\
+      "--rarest_first_priority_cutoff+[num]:the number of peers which need to have a piece before other partials take priority over rarest first (default 3):"\
+      ':torrent file:_files -g "*.torrent"' \
+      && return 0
+  ;;
+
+# Next up are the torrent file manipulation programs.
+
+  btshowmetainfo)
+   _files -g "*.torrent" && return 0
+   ;;
+
+  btrename)
+   _files -g '*.torrent' && return 0
+  ;;
+
+  btmakemetafile)
+    _arguments -s -S \
+      '--piece_size_pow2+[arg]:which power of 2 to set the piece size to (default: 18)' \
+      "--comment+[arg]:optional human-readable comment to put in .torrent (defaults to '')"\
+      "--target+[arg]:optional target file for the torrent (defaults to '')"\
+      ':file:_files -g "*"' \
+      && return 0;
+  ;;
+
+  btreannounce)
+   _files -g '*.torrent' && return 0
+  ;;
+
+# Lastly the tracker.
+
+  bttrack)
+    _arguments -s -S \
+      "--port+[portnum]:listen on port portnum (default 80):" \
+      "--dfile+[filename]:store recent downloader info in filename:_files -/" \
+      "--bind+[ip]:bind to ip instead of the default:" \
+      "--socket_timeout+[secs]:timeout for closing connections (default 15):"\
+      "--save_dfile_interval+[secs]:seconds between saving dfile (default 300):"\
+      "--timeout_downloaders_interval+[secs]:seconds between expiring downloaders (default 2700):" \
+      "--reannounce_interval+[secs]:seconds downloaders should wait between reannouncements (default 1800):" \
+      "--response_size+[num]:number of peers to send in an info message (default 50):" \
+      "--timeout_check_interval+[secs]:time to wait between checking if any connections have timed out (default 5):"\
+      "--nat_check=[ 1 | 0 ]:whether to check back and ban downloaders behind NAT (default 1):(0 1)" \
+      "--min_time_between_log_flushes+[secs]:minimum time it must have been since the last flush to do another one (default 3.0):" \
+      "--allowed_dir+[path]:only  allow  downloads  for .torrents in this directory (default ''):_files -/" \
+      "--parse_allowed_interval+[mins]:minutes between reloading of allowed_dir (default 15):" \
+      "--show_names+[ 1 | 0 ]:whether to display names from allowed dir (default 1):(0 1)"\
+      && return 0
+    ;;
+esac

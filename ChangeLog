@@ -1,3 +1,8 @@
+2004-11-09  Peter Stephenson  <pws@csr.com>
+
+	* Jussi Pakkanen <jpakkane@yahoo.com>: users/8189:
+	Completion/Unix/Command/_bittorrent: new completion.
+
 2004-11-05  Bart Schaefer  <schaefer@zsh.org>
 
 	* 20546: Src/Zle/compcore.c: fix "compadd -k assoc1 assoc2".
