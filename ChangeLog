@@ -1,5 +1,9 @@
 2004-08-01  Clint Adams  <clint@zsh.org>
 
+	* 20230: Completion/Debian/Command/_apt: dumb down apt-get
+	install completion and always complete from all available
+	packages.
+
 	* 20225: Doc/Zsh/mod_clone.yo: add Philippe Troin's explanations
 	of clone usage.
 

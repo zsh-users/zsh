@@ -423,7 +423,7 @@ _apt-get () {
     /$'update\0'/ \| \
     /$'upgrade\0'/ \| \
     \( \
-    /$'install\0'/ /$'[^\0]#\0'/ ':packages::{ _deb_packages "$expl_packages[@]" uninstalled || _deb_packages "$expl_packages[@]" installed }' \# \
+    /$'install\0'/ /$'[^\0]#\0'/ ':packages::_deb_packages "$expl_packages[@]" avail' \# \
     /$'[^\0/]#/'/ /$'[^\0/]#\0'/ ':release name::_apt_releases' \) \| \
     /$'remove\0'/ /$'[^\0]#\0'/ ':packages::_deb_packages "$expl_packages[@]" installed' \# \| \
     /$'dist-upgrade\0'/ \| \
