@@ -473,7 +473,7 @@ _apt-config () {
     -- \
     /$'shell\0'/ \
       \( \
-	/$'[^\0]#\0'/ :'compadd "$expl_shell_var[@]" - "${(@k)parameters}' \
+	/$'[^\0]#\0'/ :'compadd "$expl_shell_var[@]" - "${(@k)parameters}"' \
 	/$'[^\0]#\0'/ :'compadd "$expl_config_key[@]" - ${${(f)"$(apt-config dump 2>&1)"}% *}' \
       \) \# \| \
     /$'dump\0'/ \| \
