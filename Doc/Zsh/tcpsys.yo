@@ -11,9 +11,9 @@ zmanref(zshmodules)
 )\
 ifnzman(\
 noderef(Zsh Modules)
-).  This manual page describes a function suite based on the module.  The
-functions will usually be installed at the same time as the module if that
-is present on your system, in which case they will be available for
+).  This manual page describes a function suite based on the module.  
+If the module is installed, the functions are usually installed at the
+same time, in which case they will be available for
 autoloading in the default function search path.  In addition to the
 tt(zsh/net/tcp) module, the tt(zsh/zselect) module is used to implement
 timeouts on read operations.  For troubleshooting tips, consult the
@@ -100,21 +100,21 @@ If the option tt(-q) is given with any of the three forms, tt(tcp_open)
 will not print informational messages, although it will in any case exit
 with an appropriate status.
 
-If the line editor (zle) is in use, which it usually is if and only if the
+If the line editor (zle) is in use, which is typically the case if the
 shell is interactive, tt(tcp_open) installs a handler inside tt(zle) which
 will check for new data at the same time as it checks for keyboard input.
 This is convenient as the shell consumes no CPU time while waiting; the
-test is performed by the operating systems.  However, if incoming data
-is only to be read explicitly, the option tt(-z) to any of the forms of
-tt(tcp_open) prevents the handler from being installed.   Note this is not
+test is performed by the operating system.  Giving the option tt(-z) to
+any of the forms of tt(tcp_open) prevents the handler from being
+installed, so data must be read explicitly.  Note, however, this is not
 necessary for executing complete sets of send and read commands from a
 function, as zle is not active at this point.  Generally speaking, the
 handler is only active when the shell is waiting for input at a command
 prompt or in the tt(vared) builtin.  The option has no effect if zle is not
 active; `tt([[ -o zle]])' will test for this.
 
-The first session to be opened becomes the current session; subsequent
-calls to tt(tcp_open) will not change this.  The current session is stored
+The first session to be opened becomes the current session and subsequent
+calls to tt(tcp_open) do not change it.  The current session is stored
 in the parameter tt($TCP_SESS); see below for more detail about the
 parameters used by the system.
 )
@@ -140,13 +140,13 @@ If the option tt(-q) is given, no informational messages will be printed.
 findex(tcp_read)
 xitem(tt(tcp_read [-bdq] [ -t) var(TO) tt(] [ -T) var(TO) tt(]))
 item(    tt([ -a | -u) var(fd) tt(... | -l) var(sess)tt(,... | -s) var(sess) tt(...]))(
-Perform a read operation on the current session, or on a list of sessions
-if any are given (the first form), or all open sessions (the second form).
-Any of the tt(-u), tt(-l) or tt(-s) options may be repeated or mixed
-together.  The tt(-u) option specifies a file descriptor directly (only
-those managed by this system are useful), the other two specify sessions as
-described for tt(tcp_open) above.  If tt(-a) is given, all sessions ares
-examined for new data.
+Perform a read operation on the current session, or on a list of
+sessions if any are given with tt(-u), tt(-l) or tt(-s), or all open
+sessions if the option tt(-a) is given.  Any of the tt(-u), tt(-l) or
+tt(-s) options may be repeated or mixed together.  The tt(-u) option
+specifies a file descriptor directly (only those managed by this system
+are useful), the other two specify sessions as described for
+tt(tcp_open) above.
 
 The function checks for new data available on all the sessions listed.
 Unless the tt(-b) option is given, it will not block waiting for new data.
@@ -437,7 +437,7 @@ sect(TCP User-defined Functions)
 Certain functions, if defined by the user, will be called by the function
 system in certain contexts.  This facility depends on the module
 tt(zsh/parameter), which is usually available in interactive shells as the
-completion system depends on it.  None of the functions need by defined;
+completion system depends on it.  None of the functions need be defined;
 they simply provide convenient hooks when necessary.
 
 Typically, these are called after the requested action has been taken, so
@@ -545,8 +545,8 @@ sect(TCP User Parameters)
 
 Parameters follow the usual convention that uppercase is used for scalars
 and integers, while lowercase is used for normal and associative array.
-It is always safe for user code to read these parameters; some parameters
-may also be set, which are noted explicitly.  Other are included in this
+It is always safe for user code to read these parameters.  Some parameters
+may also be set; these are noted explicitly.  Others are included in this
 group as they are set by the function system for the user's benefit,
 i.e. setting them is typically not useful but is benign.
 
@@ -554,7 +554,9 @@ It is often also useful to make settable parameters local to a function.
 For example, `tt(local TCP_SILENT=1)' specifies that data read during the
 function call will not be printed to standard output, regardless of the
 setting outside the function.  Likewise, `tt(local TCP_SESS=)var(sess)'
-sets a session for the duration of a function.
+sets a session for the duration of a function, and `tt(local
+TCP_PROMPT=)' specifies that no prompt is used for input during the
+function.
 
 startitem()
 vindex(tcp_expect_lines)
@@ -598,17 +600,17 @@ will be sent; the full filename is tt(${TCP_LOG_SESS}.)var(sess).
 Output to each file is raw; no prompt is added.  If it is not an absolute
 path name, it will follow the user's current directory.
 )
-vindex(tcp_nospam_list)
-item(tt(tcp_nospam_list))(
+vindex(tcp_no_spam_list)
+item(tt(tcp_no_spam_list))(
 Array.  May be set directly.  See tt(tcp_spam) for how this is used.
 )
 vindex(TCP_OUTPUT)
 item(tt(TCP_OUTPUT))(
 May be set directly.  If a non-empty string, any data sent to a session by
-tt(tcp_send) will be logged.  The prompt has the same format as
-tt(TCP_PROMPT) and the same rules for its use apply:  it is used in a file
-specified by tt($TCP_LOG), but not in a file generated from
-tt($TCP_LOG_SESS).
+tt(tcp_send) will be logged.  This parameter gives the prompt to be used
+in a file specified by tt($TCP_LOG) but not in a file generated from
+tt($TCP_LOG_SESS).  The prompt string has the same format as
+tt(TCP_PROMPT) and the same rules for its use apply.
 )
 vindex(TCP_PROMPT)
 item(tt(TCP_PROMPT))(
