@@ -882,21 +882,19 @@ gethistent(int ev, int nearmatch)
 
     if (ev - hist_ring->down->histnum < hist_ring->histnum - ev) {
 	for (he = hist_ring->down; he->histnum < ev; he = he->down) ;
-	if (nearmatch == 0) {
-	    if (he->histnum != ev)
+	if (he->histnum != ev) {
+	    if (nearmatch == 0
+	     || (nearmatch < 0 && (he = up_histent(he)) == NULL))
 		return NULL;
 	}
-	else if (nearmatch < 0 && (he = up_histent(he)) == NULL)
-	    return NULL;
     }
     else {
 	for (he = hist_ring; he->histnum > ev; he = he->up) ;
-	if (nearmatch == 0) {
-	    if (he->histnum != ev)
+	if (he->histnum != ev) {
+	    if (nearmatch == 0
+	     || (nearmatch > 0 && (he = down_histent(he)) == NULL))
 		return NULL;
 	}
-	else if (nearmatch > 0 && (he = down_histent(he)) == NULL)
-	    return NULL;
     }
 
     checkcurline(he);
@@ -1060,7 +1058,7 @@ hend(void)
     zfree(chwords, chwordlen*sizeof(short));
     chline = NULL;
     histactive = 0;
-    if (isset(SHAREHISTORY) || isset(INCAPPENDHISTORY))
+    if (isset(SHAREHISTORY)? histfileIsLocked() : isset(INCAPPENDHISTORY))
 	savehistfile(hf, 0, HFILE_USE_OPTIONS | HFILE_FAST);
     unlockhistfile(hf); /* It's OK to call this even if we aren't locked */
     return !(flag & HISTFLAG_NOEXEC || errflag);
@@ -2065,6 +2063,13 @@ unlockhistfile(char *fn)
 	unlink(lockfile);
 	free(lockfile);
     }
+}
+
+/**/
+int
+histfileIsLocked(void)
+{
+    return lockhistct > 0;
 }
 
 /* Get the words in the current buffer. Using the lexer. */
