@@ -1,5 +1,12 @@
 2000-04-26  Sven Wischnowsky  <wischnow@informatik.hu-berlin.de>
 
+	* Tanaka Akira: 10890: Completion/User/_gunzip,
+	Completion/User/_gzip, Completion/User/_zcat: new completion for
+	GNU zip commands
+
+	* Tanaka Akira: 10885: Completion/X/_xset: new completion function
+	for xset
+
 	* 10926: Completion/X/_x_color, Doc/Zsh/compwid.yo, Src/Zle/complete.c,
  	Src/Zle/compmatch.c: allow to anchor on gaps between strings in
  	matching control specs
