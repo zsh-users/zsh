@@ -593,15 +593,15 @@ killjb(Job jn, int sig)
                 for (pn = jobtab[jn->other].procs; pn; pn = pn->next)
                     if (killpg(pn->pid, sig) == -1)
 			if (kill(pn->pid, sig) == -1 && errno != ESRCH)
-			    err |= -1;
+			    err = -1;
  
                 for (pn = jn->procs; pn->next; pn = pn->next)
                     if (kill(pn->pid, sig) == -1 && errno != ESRCH)
-			err |= -1;
+			err = -1;
 
 		if (!jobtab[jn->other].procs && pn)
 		    if (kill(pn->pid, sig) == -1 && errno != ESRCH)
-			err |= -1;
+			err = -1;
 
                 return err;
             }
@@ -609,7 +609,7 @@ killjb(Job jn, int sig)
 		err = -1;
 		
 	    if (killpg(jn->gleader, sig) == -1 && errno != ESRCH)
-		err |= -1;
+		err = -1;
 
 	    return err;
         }
