@@ -4,7 +4,7 @@ setopt localoptions nullglob rcexpandparam extendedglob
 unsetopt markdirs globsubst shwordsplit nounset ksharrays
 
 (( $+_debug_count )) || integer -g _debug_count
-local tmp=${TMPPREFIX}${$}${words[1]}$[++_debug_count]
+local tmp=${TMPPREFIX}${$}${words[1]:t}$[++_debug_count]
 local w="${(qqq)words}"
 
 [[ -t 2 ]] && exec 3>&2 2>| $tmp

@@ -1,3 +1,8 @@
+2000-05-02  Oliver Kiddle  <opk@zsh.org>
+
+	* 11065: Completion/Commands/_complete_debug: small fix to avoid
+	using slashes in temporary file name
+
 2000-05-02  Sven Wischnowsky  <wischnow@informatik.hu-berlin.de>
 
 	* 11061: Functions/Misc/zrecompile: make zrecompile detect deleted
