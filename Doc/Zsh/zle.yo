@@ -189,8 +189,9 @@ The current history number.
 )
 vindex(PENDING)
 item(tt(PENDING) (integer))(
-The number of bytes pending for input. On systems where the shell is
-not able to get this information, this parameter will always have a
+The number of bytes pending for input, i.e. the number of bytes which have
+already been typed and can immediately be read. On systems where the shell
+is not able to get this information, this parameter will always have a
 value of zero.
 )
 enditem()

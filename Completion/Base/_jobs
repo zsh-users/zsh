@@ -15,7 +15,7 @@ if [[ "$1" = -r ]]; then
   shift
   expls='running job'
 elif [[ "$1" = -s ]]; then
-  jids=( "${(@k)jobstates[(R)running*]}" )
+  jids=( "${(@k)jobstates[(R)suspended*]}" )
   shift
   expls='suspended job'
 else

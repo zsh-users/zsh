@@ -1,3 +1,11 @@
+2000-05-14  Peter Stephenson  <pws@pwstephenson.fsnet.co.uk>
+
+	* Src/builtin.c: make integer builtin understand `-i base'.
+
+	* Completion/Base/_jobs: typo in suspended jobs.
+
+	* Doc/Zsh/*: various changes of phrasing.
+
 2000-05-12  Sven Wischnowsky  <wischnow@zsh.org>
 
 	* 11349: Completion/Base/_arguments, Completion/Core/_message,

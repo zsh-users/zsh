@@ -387,5 +387,5 @@ outputs nothing apart from a newline if tt(RC_QUOTES) is not set, but one
 single quote if it is set.
 
 Inside double quotes (tt("")), parameter and
-command substitution occurs, and `tt(\)' quotes the characters
+command substitution occur, and `tt(\)' quotes the characters
 `tt(\)', `tt(`)', `tt(")', and `tt($)'.

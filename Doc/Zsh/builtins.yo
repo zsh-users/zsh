@@ -497,7 +497,7 @@ added by explicit specification.  If has no effect if used with tt(-f).
 )
 alias(history)(fc -l)
 findex(integer)
-item(tt(integer) [ {tt(PLUS())|tt(-)}tt(ghlrtux) ] [ var(name)[tt(=)var(value)] ... ])(
+item(tt(integer) [ {tt(PLUS())|tt(-)}tt(ghilrtux) ] [ var(name)[tt(=)var(value)] ... ])(
 Equivalent to tt(typeset -i), except that options irrelevant to
 integers are not permitted.
 )
@@ -850,10 +850,10 @@ the effect is different for zero and non-zero return status.  With zero
 status (or after an implicit return at the end of the trap), the shell
 will return to whatever it was previously processing; with a non-zero
 status, the shell will behave as interrupted except that the return
-status of the trap is retained.  Note that the signal which caused the
-trap is passed as the first argument, so the statement `tt(return
-$((128PLUS()$1)))' will return the same status as if the signal had not
-been trapped.
+status of the trap is retained.  Note that the numeric value of the signal
+which caused the trap is passed as the first argument, so the statement
+`tt(return $((128PLUS()$1)))' will return the same status as if the signal
+had not been trapped.
 )
 module(sched)(zsh/sched)
 findex(set)
@@ -1330,32 +1330,32 @@ cindex(compilation)
 xitem(tt(zcompile) [ tt(-U) ] [ tt(-z) | tt(-k) ] [ tt(-R) | tt(-M) ] var(file) [ var(name) ... ])
 xitem(tt(zcompile) tt(-ca) [ tt(-m) ] [ tt(-R) | tt(-M) ] var(file) [ var(name) ... ])
 item(tt(zcompile -t) var(file) [ var(name) ... ])(
-This builtin command can be used to compile functions or scripts and
-store the compiled form in a file, and to examine files containing
+This builtin command can be used to compile functions or scripts,
+storing the compiled form in a file, and to examine files containing
 the compiled form.  This allows faster autoloading of functions and
 execution of scripts by avoiding parsing of the text when the files
 are read.
 
 The first form (without the tt(-c), tt(-a) or tt(-t) options) creates a
-compiled file.  If only the var(file) argument is provided, the
+compiled file.  If only the var(file) argument is given, the
 output file has the name `var(file)tt(.zwc)' and will be placed in
-the same directory as the var(file).  This will make the compiled
-file be loaded instead of the normal function file when the function
-is autoloaded (see
+the same directory as the var(file).  The shell will load the compiled
+file instead of the normal function file when the function
+is autoloaded; see
 ifzman(\
 the section `Autoloading Functions' in zmanref(zshfunc)
 )\
 ifnzman(\
 noderef(Functions)
 )\
-for a description of how autoloaded functions are searched).  The
-extension tt(.zwc) stands for `zsh word codes'.
+for a description of how autoloaded functions are searched.  The
+extension tt(.zwc) stands for `zsh word code'.
 
-If there is at least one var(name) argument, all those named files
-are compiled into one output var(file).  If var(file) does not end
-in tt(.zwc), this extension is automatically appended.  Files
-containing multiple compiled functions are called `digest' files,
-and are intended to be used as elements of the tt(FPATH)/tt(fpath)
+If there is at least one var(name) argument, all the named files
+are compiled into the output var(file) given as the first argument.  If
+var(file) does not end in tt(.zwc), this extension is automatically
+appended.  Files containing multiple compiled functions are called `digest'
+files, and are intended to be used as elements of the tt(FPATH)/tt(fpath)
 special array.
 
 The second form, with the tt(-c) or tt(-a) options, writes the compiled
@@ -1386,12 +1386,13 @@ autoloaded will be written.
 
 The third form, with the tt(-t) option, examines an existing
 compiled file.  Without further arguments, the names of the original
-files compiled into it are listed.  The first line of output tells
+files compiled into it are listed.  The first line of output shows
 the version of the shell which compiled the file and how the file
-will be used (mapping or reading the file).  With arguments, nothing
-is output and the return value is set to zero if em(all) var(name)s
-name files contained in the wordcode file, and non-zero if at least
-one var(name) is not contained in it.
+will be used (i.e. by reading it directly or by mapping it into memory).
+With arguments, nothing is output and the return value is set to zero if
+definitions for em(all) var(name)s name files were found in the wordcode
+file, and non-zero if the definition for at least one var(name) was not
+found.
 
 Other options:
 
@@ -1405,9 +1406,9 @@ shell's memory, rather than memory-mapped (see tt(-M)).  This
 happens automatically on systems that do not support memory mapping.
 
 When compiling scripts instead of autoloadable functions, it is
-often desirable to use this option. Otherwise the whole file will
-remain mapped if the script has defined one or more functions, even
-if the rest of the file will not be used again.
+often desirable to use this option; otherwise the whole file, including the
+code to define functions which have already been defined, will
+remain mapped, consequently wasting memory.
 )
 item(tt(-M))(
 The compiled file is mapped into the shell's memory when read. This
@@ -1418,24 +1419,24 @@ on the size of the compiled file.
 )
 xitem(tt(-k))
 item(tt(-z))(
-These options are used when the compiled file contains functions and
-those functions are to be autoloaded. If tt(-z) is given, the
+These options are used when the compiled file contains functions which
+are to be autoloaded. If tt(-z) is given, the
 function will be autoloaded as if the tt(KSH_AUTOLOAD) option is
 em(not) set, even if it is set at the time the compiled file is
-read. The tt(-k) makes the function be loaded as if tt(KSH_AUTOLOAD)
-em(is) set.  If neither of these options is given, the function will
-be loaded as determined by the setting of the tt(KSH_AUTOLOAD) option
-at the time the compiled file is read.
+read, while if the tt(-k) is given, the function will be loaded as if
+tt(KSH_AUTOLOAD) em(is) set.  If neither of these options is given, the
+function will be loaded as determined by the setting of the
+tt(KSH_AUTOLOAD) option at the time the compiled file is read.
 
-These options may also be repeated among the listed var(name)s to
-specify the loading style of all following functions, up to the next
-tt(-k) or tt(-z).
+These options may also appear as many times as necessary between the listed
+var(name)s to specify the loading style of all following functions, up to
+the next tt(-k) or tt(-z).
 )
 enditem()
 
 The created file always contains two versions of the compiled
 format, one for big-endian machines and one for small-endian
-machines. The upshot of this is that the compiled file is machine
+machines.  The upshot of this is that the compiled file is machine
 independent and if it is read or mapped, only one half of the file
 is actually used (and mapped).
 )
@@ -1450,8 +1451,11 @@ xitem(tt(zmodload -e) [ ... ])
 xitem(tt(zmodload) [ tt(-a) [ tt(-bcpf) [ tt(-I) ] ] ] [ tt(-iL) ] ...)
 item(tt(zmodload) tt(-u) [ tt(-abcdpf) [ tt(-I) ] ] [ tt(-iL) ] ...)(
 Performs operations relating to zsh's loadable modules.
-This feature is not available on all operating systems,
-or on all installations on a particular operating system.
+Loading of modules while the shell is running (`dynamical loading') is not
+available on all operating systems, or on all installations on a particular
+operating system, although the tt(zmodload) command itself is always
+available and can be used to manipulate modules built into versions of the
+shell executable without dynamical loading.
 
 Without arguments the names of all currently loaded binary modules are
 printed.  The tt(-L) option causes this list to be in the form of a
@@ -1462,7 +1466,7 @@ xitem(tt(zmodload) [ tt(-i) ] var(name) ... )
 item(tt(zmodload) tt(-u) [ tt(-i) ] var(name) ...)(
 In the simplest case, tt(zmodload) loads a binary module.  The module must
 be in a file with a name consisting of the specified var(name) followed by
-a standard suffix, usually `tt(.so)'.
+a standard suffix, usually `tt(.so)' (`tt(.sl)' on HPUX).
 If the module to be loaded is
 already loaded and the tt(-i) option is given, the duplicate module is
 ignored.  Otherwise tt(zmodload) prints an error message.

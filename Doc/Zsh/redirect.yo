@@ -143,7 +143,7 @@ pindex(MULTIOS, use of)
 If the user tries to open a file descriptor for writing more than once,
 the shell opens the file descriptor as a pipe to a process that copies
 its input to all the specified outputs, similar to bf(tee),
-provided the tt(MULTIOS) option is set.  Thus:
+provided the tt(MULTIOS) option is set, as it is by default.  Thus:
 
 example(date >foo >bar)
 
