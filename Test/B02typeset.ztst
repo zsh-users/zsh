@@ -183,6 +183,21 @@
 >l o c a l
 >l:o:c:a l o c a
 
+ typeset -T SCALAR=$'l\x83o\x83c\x83a\x83l' array $'\x83'
+ print $array
+ typeset -U SCALAR
+ print $SCALAR $array
+0:Tied parameters and uniquified arrays with meta-character as separator
+>l o c a l
+>lƒoƒcƒa l o c a
+
+ typeset -T SCALAR=$'l\000o\000c\000a\000l' array $'\000'
+ typeset -U SCALAR
+ print $array
+ [[ $SCALAR == $'l\000o\000c\000a' ]]
+0:Tied parameters and uniquified arrays with NUL-character as separator
+>l o c a
+
  typeset -T SCALAR array
  typeset +T SCALAR
 1:Untying is prohibited

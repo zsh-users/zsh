@@ -1912,16 +1912,14 @@ zjoin(char **arr, int delim, int heap)
     ptr = ret = (heap ? (char *) hcalloc(len) : (char *) zshcalloc(len));
     for (s = arr; *s; s++) {
 	strucpy(&ptr, *s);
-	if (delim) {
 	    if (imeta(delim)) {
 		*ptr++ = Meta;
 		*ptr++ = delim ^ 32;
 	    }
 	    else
 		*ptr++ = delim;
-	}
     }
-    ptr[-1] = '\0';
+    ptr[-1 - (imeta(delim) ? 1 : 0)] = '\0';
     return ret;
 }
 

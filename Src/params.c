@@ -2643,7 +2643,7 @@ tiedarrsetfn(Param pm, char *x)
 	if (imeta(dptr->joinchar))
 	{
 	    sepbuf[0] = Meta;
-	    sepbuf[1] = dptr->joinchar;
+	    sepbuf[1] = dptr->joinchar ^ 32;
 	    sepbuf[2] = '\0';
 	}
 	else

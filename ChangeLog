@@ -1,3 +1,9 @@
+2004-09-17  Peter Stephenson  <pws@csr.com>
+
+	* 20378: Matthias B <msb@winterdrache.de>: Src/params.c,
+	Src/utils.c, B02typeset.ztst: Fix bugs with metafied characters
+	in tied arrays.
+
 2004-09-16  Peter Stephenson  <pws@csr.com>
 
 	* 20364: Functions/Completer/_oldlist: use $WIDGETSTYLE.
