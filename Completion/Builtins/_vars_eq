@@ -6,8 +6,8 @@ local -a args
 
 allargs=( \
   A '(-E -F -L -R -T -U -Z -a -f -i -m)-A[specify that arguments refer to associative arrays]' \
-  E '(-A -F -L -R -T -U -Z -a -f -i -m)-E[represent internally as floating point, use engineering notation on output]' \
-  F '(-A -E -L -R -T -U -Z -a -f -i -m)-F[represent internally as floating point, use fixed point decimal on output]' \
+  E '(-A -F -L -R -T -U -Z -a -f -i -m)-E[floating point, use engineering notation on output]' \
+  F '(-A -E -L -R -T -U -Z -a -f -i -m)-F[floating point, use fixed point decimal on output]' \
   L '(-A -E -F -f -i)-L+[left justify and remove leading blanks from value]:width' \
   R '(-A -E -F -f -i)-R+[right justify and fill with leading blanks]:width' \
   T '(-A -E -F -a -f -g -h -i -l -m -t)-T[tie scalar to array]' \
@@ -33,7 +33,7 @@ allargs=( \
 
 use="AEFLRTUZafghilmrtux"
 
-case ${words[1]} in
+case ${service} in
   float) use="EFghlrtux";;
   functions)
     use="Umtu"
