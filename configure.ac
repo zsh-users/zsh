@@ -505,7 +505,8 @@ AC_CHECK_HEADERS(sys/time.h sys/times.h sys/select.h termcap.h termio.h \
 		 limits.h fcntl.h libc.h sys/utsname.h sys/resource.h \
 		 locale.h errno.h stdio.h stdlib.h unistd.h sys/capability.h \
 		 utmp.h utmpx.h sys/types.h pwd.h grp.h poll.h sys/mman.h \
-		 netinet/in_systm.h pcre.h langinfo.h wchar.h stddef.h)
+		 netinet/in_systm.h pcre.h langinfo.h wchar.h stddef.h \
+		 sys/stropts.h)
 if test $dynamic = yes; then
   AC_CHECK_HEADERS(dlfcn.h)
   AC_CHECK_HEADERS(dl.h)
@@ -1029,7 +1030,8 @@ AC_CHECK_FUNCS(strftime difftime gettimeofday \
 	       pcre_compile pcre_study pcre_exec \
 	       nl_langinfo \
 	       erand48 open_memstream \
-	       wctomb iconv)
+	       wctomb iconv \
+	       grantpt unlockpt ptsname)
 AC_FUNC_STRCOLL
 
 dnl  Check if tgetent accepts NULL (and will allocate its own termcap buffer)
@@ -1794,6 +1796,24 @@ dnl check for the type of third argument of accept
 dnl ---------------
 
 zsh_CHECK_SOCKLEN_T
+
+dnl ---------------
+dnl Check for pty multiplexer for use in pty module.
+dnl We need to open it read/write, so make sure it is writeable.
+dnl Yet another test which won't work when cross-compiling.
+dnl ---------------
+AH_TEMPLATE([HAVE_DEV_PTMX],
+[Define to 1 if your system can use /dev/ptmx for creating ptys.])
+AC_CACHE_CHECK(if your system has /dev/ptmx,
+ac_cv_have_dev_ptmx,
+[if test -w /dev/ptmx; then
+  ac_cv_have_dev_ptmx=yes
+else
+  ac_cv_have_dev_ptmx=no
+fi])
+if test $ac_cv_have_dev_ptmx = yes; then
+  AC_DEFINE(HAVE_DEV_PTMX)
+fi
 
 dnl ---------------
 dnl dynamic loading

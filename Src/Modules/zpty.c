@@ -154,12 +154,10 @@ getptycmd(char *name)
     return NULL;
 }
 
-/**** maybe we should use configure here */
-/**** and we certainly need more/better #if tests */
+#if defined(HAVE_DEV_PTMX) && defined(HAVE_GRANTPT) && \
+    defined(HAVE_PTSNAME) && defined(HAVE_UNLOCKPT)
 
-#if defined(__SVR4) || defined(sinix) || defined(__CYGWIN__)
-
-#if !defined(__CYGWIN__)
+#ifdef HAVE_SYS_STROPTS_H
 #include <sys/stropts.h>
 #endif
 
@@ -192,7 +190,11 @@ get_pty(int master, int *retfd)
 	close(mfd);
 	return 1;
     }
-#if !defined(__CYGWIN__)
+#if defined(I_FIND) && defined(I_PUSH)
+    /*
+     * Use if STREAMS is available.  The test is probably OK,
+     * but we could use e.g. the sys/stropts.h test.
+     */
     if ((ret = ioctl(sfd, I_FIND, "ptem")) != 1)
        if (ret == -1 || ioctl(sfd, I_PUSH, "ptem") == -1) {
 	   close(mfd);
@@ -211,14 +213,14 @@ get_pty(int master, int *retfd)
 	   close(sfd);
 	   return 1;
        }
-#endif /* !defined(__CYGWIN__) */
+#endif
 
     *retfd = sfd;
 
     return 0;
 }
 
-#else /* ! (defined(__SVR4) || defined(sinix) || defined(__CYGWIN__)) */
+#else /* No /dev/ptmx or no pt functions */
 
 static int
 get_pty(int master, int *retfd)
@@ -267,7 +269,7 @@ get_pty(int master, int *retfd)
     return 1;
 }
 
-#endif /* __SVR4 */
+#endif /* /dev/ptmx or alternatives */
 
 static int
 newptycmd(char *nam, char *pname, char **args, int echo, int nblock)

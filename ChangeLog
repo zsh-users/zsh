@@ -1,5 +1,8 @@
 2004-02-17  Peter Stephenson  <pws@csr.com>
 
+	* 19428: configure.ac, Src/Modules/pty.c: use configure to
+	test if we can create pty pairs using /dev/ptmx.
+
 	* 19428: configure.ac: fix test for #include'ing STREAMS
 	headers.
 
