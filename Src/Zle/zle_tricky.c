@@ -801,9 +801,9 @@ check_param(char *s, int set, int test)
 		isuf = dupstring(e);
 		untokenize(isuf);
 		*e = '\0';
-		ripre = dupstring(s);
+		ripre = dyncat((ripre ? ripre : ""), s);
+		ipre = dyncat((ipre ? ipre : ""), s);
 		ripre[b - s] = '\0';
-		ipre = dupstring(ripre);
 		untokenize(ipre);
 	    }
 	    else
