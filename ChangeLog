@@ -1,3 +1,20 @@
+2003-01-27  Bart Schaefer  <schaefer@zsh.org>
+
+	* 18144: Src/init.c: no SIGHUP handler if parent was ignoring
+	(originally posted in 17989).
+
+	* 18144: Src/prompt.c: allow %{ %} to put bounds around a prompt
+	truncation in the intuitive way (originally discussed in 17755).
+
+	* 18144: zshconfig.ac: fix inconsequential typos.
+
+	* 18143: Doc/Zsh/compsys.yo, Doc/Zsh/contrib.yo,
+	Functions/Zle/copy-earlier-word, Functions/Zle/predict-on,
+	Functions/Zle/smart-insert-last-word: improve cooperation
+	between copy-earlier-word and smart-insert-last-word; fix
+	some problems with "toggle" style for predict-on; fix doc
+	typo in compsys example.
+
 2003-01-27  Peter Stephenson  <pws@csr.com>
 
 	* 18139: Doc/Zsh/zle.yo, Src/Zle/zle.h, Src/Zle/zle_main.c,
