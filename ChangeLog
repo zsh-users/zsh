@@ -1,4 +1,4 @@
-2002-03-14  Oliver Kidddle  <opk@zsh.org>
+2002-03-14  Oliver Kiddle  <opk@zsh.org>
 
 	* 16823: Completion/Unix/Command/_gzip,
 	Completion/Unix/Type/_dir_list, Completion/Unix/Type/_directories:
