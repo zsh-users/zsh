@@ -397,6 +397,8 @@ findex(fc)
 cindex(history, editing)
 cindex(editing history)
 xitem(tt(fc) [ tt(-e) var(ename) ] [ tt(-nlrdDfEim) ] [ var(old)tt(=)var(new) ... ] [ var(first) [ var(last) ] ])
+xitem(tt(fc) tt(-p) [ var(filename) [ var(histsize) [ var(savehistsize) ] ] ])
+xitem(tt(fc) tt(-P))
 item(tt(fc) tt(-ARWI) [ var(filename) ])(
 Select a range of commands from var(first) to var(last) from the
 history list.
@@ -432,6 +434,23 @@ instead of the default `var(mm)tt(/)var(dd)tt(/)var(yyyy)'.
 Adding the tt(-i) flag causes the dates to be printed in ISO8601
 `var(yyyy)tt(-)var(mm)tt(-)var(dd)' format.
 With the tt(-D) flag, tt(fc) prints elapsed times.
+
+cindex(history, stack)
+cindex(stack, history)
+
+`tt(fc -p)' pushes the current history list onto a stack and switches to a
+new history list.  If no arguments are specified, the history list is
+empty, tt($HISTFILE) is unset, and tt($HISTSIZE) & tt($SAVEHIST) are set to
+their default values.  If one argument is given, tt($HISTFILE) is set to
+the filename, tt($HISTSIZE) & tt($SAVEHIST) are left unchanged, and the
+history file is read in (if it exists) to initialize the new history list.
+If a second argument is specified, tt($HISTSIZE) & tt($SAVEHIST) are
+instead set to the specified numeric value.  Finally, if a third argument
+is specified, tt($SAVEHIST) is set to a separate value from tt($HISTSIZE).
+
+`tt(fc -P)' pops the history list back to an older list saved by `tt(fc -p)'.
+The current list is saved to its tt($HISTFILE) before it is destroyed (as long
+as tt($HISTFILE) and tt($SAVEHIST) are set appropriately, of course).
 
 cindex(history, file)
 cindex(file, history)
