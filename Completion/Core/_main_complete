@@ -97,7 +97,8 @@ if zstyle -s ":completion:${curcontext}:" single-ignored tmp &&
   esac
 fi
 
-if [[ -n "$tmp" || $compstate[nmatches]+$compstate[alternate_nmatches] -gt 1 ]]; then
+if [[ -n "$tmp" || $compstate[old_list] = keep ||
+      $compstate[nmatches]+$compstate[alternate_nmatches] -gt 1 ]]; then
   [[ _last_nmatches -ge 0 && _last_nmatches -ne compstate[nmatches] ]] &&
       _menu_style=( "$_last_menu_style[@]" "$_menu_style[@]" )
 
@@ -152,7 +153,7 @@ if [[ -n "$tmp" || $compstate[nmatches]+$compstate[alternate_nmatches] -gt 1 ]];
     fi
   fi
 elif [[ $compstate[nmatches]+$compstate[alternate_nmatches] -eq 0 &&
-        $#_lastdescr -ne 0 ]] &&
+        $#_lastdescr -ne 0 && $compstate[old_list] != keep ]] &&
      zstyle -s ":completion:${curcontext}:warnings" format format; then
 
   compstate[list]='list force'
