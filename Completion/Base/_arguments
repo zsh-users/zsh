@@ -166,7 +166,7 @@ _style -s options auto-description autod
 if comparguments -i "$autod" "$@"; then
   local nm="$compstate[nmatches]" action noargs aret expl local
   local next direct odirect equal single match matched ws tmp1 tmp2
-  local opts subc
+  local opts subc prefix suffix
 
   if comparguments -D descr action; then
     comparguments -C subc
@@ -288,8 +288,6 @@ if comparguments -i "$autod" "$@"; then
       fi
       if [[ -n "$opts" && -z "$aret$matched" &&
             nm -eq compstate[nmatches] ]]; then
-
-        local prefix suffix
 
         prefix="${PREFIX#*\=}"
         suffix="$SUFFIX"
