@@ -1,3 +1,8 @@
+2003-03-25  Clint Adams  <clint@zsh.org>
+
+	* users/5986, 18380: Src/Modules/terminfo.c,
+	Doc/Zsh/mod_terminfo.yo: arg support for echoti builtin.
+
 2003-03-24  Peter Stephenson  <pws@csr.com>
 
 	* 18378: Src/Zle/params.c: memory management for $killring

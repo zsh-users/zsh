@@ -59,8 +59,8 @@ static Param terminfo_pm;
 static int
 bin_echoti(char *name, char **argv, Options ops, int func)
 {
-    char *s, *t;
-    int num;
+    char *s, *t, *u;
+    int num, argct;
 
     s = *argv++;
     /* This depends on the termcap stuff in init.c */
@@ -92,9 +92,28 @@ bin_echoti(char *name, char **argv, Options ops, int func)
 	zwarnnam(name, "no such terminfo capability: %s", s, 0);
 	return 1;
     }
-
-    tputs(t, 1, putchar);
+    /* count the number of arguments required */
+    for (argct = 0, u = t; *u; u++)
+        if (*u == '%') {
+            if (u++, (*u == 'd' || *u == '2' || *u == '3' || *u == '.' ||
+                      *u == '+'))
+                argct++;
+        }
+    /* check that the number of arguments provided is correct */
+    if (arrlen(argv) != argct) {
+        zwarnnam(name, (arrlen(argv) < argct) ? "not enough arguments" :
+                 "too many arguments", NULL, 0);
+        return 1;
+    }
+    /* output string, through the proper termcap functions */
+    if (!argct)
+        tputs(t, 1, putraw);
+    else {
+        num = (argv[1]) ? atoi(argv[1]) : atoi(*argv);
+        tputs(tparm(t, atoi(*argv)), num, putraw);
+    }
     return 0;
+
 }
 
 /**/
