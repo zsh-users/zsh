@@ -27,6 +27,9 @@
  *
  */
 
+/* this is defined so we get the prototype for open_memstream */
+#define _GNU_SOURCE 1
+
 #include "zsh.mdh"
 #include "builtin.pro"
 
@@ -2909,10 +2912,11 @@ bin_print(char *name, char **args, char *ops, int func)
     int flen, width, prec, type, argc, n, narg;
     int nnl = 0, ret = 0, maxarg = 0;
     int flags[5], *len;
-    char *start, *endptr, *c, *d, *flag, spec[11], *fmt = NULL;
+    char *start, *endptr, *c, *d, *flag, *buf, *tmpf, spec[11], *fmt = NULL;
     char **first, *curarg, *flagch = "0+- #", save = '\0', nullstr = '\0';
-    zlong count;
+    size_t rcount, mcount, count = 0;
     FILE *fout = stdout;
+    Histent ent;
     
     mnumber mnumval;
     double doubleval;
@@ -2984,61 +2988,6 @@ bin_print(char *name, char **args, char *ops, int func)
 	}
     }
     
-    /* -o and -O -- sort the arguments */
-    if (ops['o']) {
-	if (fmt && !*args) return 0;
-	if (ops['i'])
-	    qsort(args, arrlen(args), sizeof(char *), cstrpcmp);
-	else
-	    qsort(args, arrlen(args), sizeof(char *), strpcmp);
-    } else if (ops['O']) {
-	if (fmt && !*args) return 0;
-	if (ops['i'])
-	    qsort(args, arrlen(args), sizeof(char *), invcstrpcmp);
-	else
-	    qsort(args, arrlen(args), sizeof(char *), invstrpcmp);
-    }
-    /* after sorting arguments, recalculate lengths */
-    if(ops['o'] || ops['O'])
-	for(n = 0; n < argc; n++)
-	    len[n] = strlen(args[n]);
-
-    /* -z option -- push the arguments onto the editing buffer stack */
-    if (ops['z']) {
-	queue_signals();
-	zpushnode(bufstack, sepjoin(args, NULL, 0));
-	unqueue_signals();
-	return 0;
-    }
-    /* -s option -- add the arguments to the history list */
-    if (ops['s']) {
-	int nwords = 0, nlen, iwords;
-	char **pargs = args;
-	Histent ent;
-
-	queue_signals();
-	ent = prepnexthistent();
-	while (*pargs++)
-	    nwords++;
-	if ((ent->nwords = nwords)) {
-	    ent->words = (short *)zalloc(nwords*2*sizeof(short));
-	    nlen = iwords = 0;
-	    for (pargs = args; *pargs; pargs++) {
-		ent->words[iwords++] = nlen;
-		nlen += strlen(*pargs);
-		ent->words[iwords++] = nlen;
-		nlen++;
-	    }
-	} else
-	    ent->words = (short *)NULL;
-	ent->text = zjoin(args, ' ', 0);
-	ent->stim = ent->ftim = time(NULL);
-	ent->flags = 0;
-	addhistnode(histtab, ent->text, ent);
-	unqueue_signals();
-	return 0;
-    }
-
     /* -u and -p -- output to other than standard output */
     if (ops['u'] || ops['p']) {
 	int fd;
@@ -3060,6 +3009,25 @@ bin_print(char *name, char **args, char *ops, int func)
 	    return 1;
 	}
     }
+
+    /* -o and -O -- sort the arguments */
+    if (ops['o']) {
+	if (fmt && !*args) return 0;
+	if (ops['i'])
+	    qsort(args, arrlen(args), sizeof(char *), cstrpcmp);
+	else
+	    qsort(args, arrlen(args), sizeof(char *), strpcmp);
+    } else if (ops['O']) {
+	if (fmt && !*args) return 0;
+	if (ops['i'])
+	    qsort(args, arrlen(args), sizeof(char *), invcstrpcmp);
+	else
+	    qsort(args, arrlen(args), sizeof(char *), invstrpcmp);
+    }
+    /* after sorting arguments, recalculate lengths */
+    if(ops['o'] || ops['O'])
+	for(n = 0; n < argc; n++)
+	    len[n] = strlen(args[n]);
 
     /* -c -- output in columns */
     if (ops['c']) {
@@ -3099,6 +3067,41 @@ bin_print(char *name, char **args, char *ops, int func)
     
     /* normal output */
     if (!fmt) {
+	/* -z option -- push the arguments onto the editing buffer stack */
+	if (ops['z']) {
+	    queue_signals();
+	    zpushnode(bufstack, sepjoin(args, NULL, 0));
+	    unqueue_signals();
+	    return 0;
+	}
+	/* -s option -- add the arguments to the history list */
+	if (ops['s']) {
+	    int nwords = 0, nlen, iwords;
+	    char **pargs = args;
+
+	    queue_signals();
+	    ent = prepnexthistent();
+	    while (*pargs++)
+		nwords++;
+	    if ((ent->nwords = nwords)) {
+		ent->words = (short *)zalloc(nwords*2*sizeof(short));
+		nlen = iwords = 0;
+		for (pargs = args; *pargs; pargs++) {
+		    ent->words[iwords++] = nlen;
+		    nlen += strlen(*pargs);
+		    ent->words[iwords++] = nlen;
+		    nlen++;
+		}
+	    } else
+		ent->words = (short *)NULL;
+	    ent->text = zjoin(args, ' ', 0);
+	    ent->stim = ent->ftim = time(NULL);
+	    ent->flags = 0;
+	    addhistnode(histtab, ent->text, ent);
+	    unqueue_signals();
+	    return 0;
+	}
+
 	for (; *args; args++, len++) {
 	    fwrite(*args, *len, 1, fout);
 	    if (args[1])
@@ -3115,10 +3118,22 @@ bin_print(char *name, char **args, char *ops, int func)
 	return ret;
     }
     
+    if (ops['z'] || ops['s']) {
+#ifdef HAVE_OPEN_MEMSTREAM
+    	if ((fout = open_memstream(&buf, &mcount)) == NULL)
+	    zwarnnam(name, "open_memstream failed", NULL, 0);
+#else
+	tmpf = gettempname();
+    	if ((fout = fopen(tmpf, "w+")) == NULL)
+	    zwarnnam(name, "can't open temp file: %e", NULL, errno);
+	unlink(tmpf);
+#endif
+    } 
+    
     /* printf style output */
     *spec='%';
     do {
-    	count = 0;
+    	rcount = count;
     	if (maxarg) {
 	    first += maxarg;
 	    argc -= maxarg;
@@ -3287,7 +3302,7 @@ bin_print(char *name, char **args, char *ops, int func)
 		type=3;
 		break;
 	    case 'n':
-		if (curarg) setiparam(curarg, count);
+		if (curarg) setiparam(curarg, count - rcount);
 		break;
 	    default:
 	        if (*c) {
@@ -3363,6 +3378,31 @@ bin_print(char *name, char **args, char *ops, int func)
     	if (maxarg) args = first + maxarg;
 	/* if there are remaining args, reuse format string */
     } while (*args && args != first && !ops['r']);
+
+    if (ops['z'] || ops['s']) {
+#ifdef HAVE_OPEN_MEMSTREAM
+	putc(0, fout);
+	fflush(fout);
+	count = mcount;
+#else
+	rewind(fout);
+	buf = (char *)zalloc(count + 1);
+	fread(buf, count, 1, fout);
+	buf[count] = '\0';
+#endif
+	queue_signals();
+	if (ops['z']) {
+	    zpushnode(bufstack, buf);
+	} else {
+	    ent = prepnexthistent();
+	    ent->text = buf;
+	    ent->stim = ent->ftim = time(NULL);
+	    ent->flags = 0;
+	    ent->words = (short *)NULL;
+	    addhistnode(histtab, ent->text, ent);
+	}
+	unqueue_signals();
+    }
 
     /* Testing EBADF special-cases >&- redirections */
     if ((fout != stdout) ? (fclose(fout) != 0) :

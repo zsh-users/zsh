@@ -951,7 +951,7 @@ AC_CHECK_FUNCS(strftime difftime gettimeofday \
 	       tgetent tigetflag tigetnum tigetstr setupterm \
 	       pcre_compile pcre_study pcre_exec \
 	       nl_langinfo \
-	       erand48)
+	       erand48 open_memstream)
 AC_FUNC_STRCOLL
 
 dnl  Check if tgetent accepts NULL (and will allocate its own termcap buffer)

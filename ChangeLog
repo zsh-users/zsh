@@ -1,3 +1,8 @@
+2002-03-19  Oliver Kiddle  <opk@zsh.org>
+
+	* 16862: zshconfig.ac, Src/builtin.c: allow print's -s and -z
+	options to be used with -f
+
 2002-03-17  Clint Adams  <clint@zsh.org>
 
 	* 16850: Completion/Unix/Command/_rsync: remote file completion via
