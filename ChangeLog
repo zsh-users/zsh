@@ -1,3 +1,8 @@
+2001-05-29  Chmouel Boudjnah  <chmouel@mandrakesoft.com>
+
+	* 14539: Completion/Debian/Command/_update-alternatives:
+	Add support for rpm update-alternatives.
+
 2001-05-29  Clint Adams  <clint@zsh.org>
 
 	* 14541: %# with capabilities should prompt-expand to #

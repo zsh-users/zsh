@@ -1,7 +1,13 @@
 #compdef update-alternatives
 
-local curcontext="$curcontext" context state line expl ret
+local curcontext="$curcontext" context state line expl ret alterdir
 typeset -A opt_args
+
+if [[ -d /var/lib/dpkg/alternatives ]];then
+    alterdir=/var/lib/dpkg/alternatives
+elif [[ -d /var/lib/rpm/alternatives/ ]];then
+    alterdir=/var/lib/rpm/alternatives
+fi
 
 _arguments -C '--verbose' \
            '--quiet' \
@@ -12,9 +18,9 @@ _arguments -C '--verbose' \
            '--admindir:admindir:_files -/' \
     '--install:*::alt:= ->install' \
     '--remove:*::alt:= ->remove' \
-    '--auto:name:_files -W /var/lib/dpkg/alternatives' \
-    '--display:name:_files -W /var/lib/dpkg/alternatives' \
-    '--config:name:_files -W /var/lib/dpkg/alternatives' && return 0
+    '--auto:name:_files -W $alterdir' \
+    '--display:name:_files -W $alterdir' \
+    '--config:name:_files -W $alterdir' && return 0
 
 while true; do
 case "$state" in
@@ -22,7 +28,7 @@ case "$state" in
         _call_function ret _update_alternatives_$state && return ret
 	state=
 	_arguments -C '1:link:_files' \
-                   '2:name:_files -W /var/lib/dpkg/alternatives' \
+                   '2:name:_files -W $alterdir' \
                    '3:path:_files' \
                    '--slave:*::more:= ->islave' && return 0
         [[ -z $state ]] && return 1
@@ -31,7 +37,7 @@ case "$state" in
 	install)
         _call_function ret _update_alternatives_$state && return ret
 	_arguments -C '1:link:_files' \
-                   '2:name:_files -W /var/lib/dpkg/alternatives' \
+                   '2:name:_files -W $alterdir' \
                    '3:path:_files' \
                    '4:priority:' \
                    '--slave:*::slave:= ->islave' && return 0
@@ -41,7 +47,7 @@ case "$state" in
 	remove)
         _call_function ret _update_alternatives_$state && return ret
 	_arguments \
-                   '1:name:_files -W /var/lib/dpkg/alternatives' \
+                   '1:name:_files -W $alterdir' \
                    '2:path:_files' && return 0
         return 1
 	;;
