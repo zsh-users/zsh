@@ -59,6 +59,7 @@ styles=(
   list-packed		 c:bool
   list-prompt            c:
   list-rows-first	 c:bool
+  list-separator	 c:separator
   list-suffixes		 c:bool
   local			 c:
   match-original	 c:match-orig
@@ -308,6 +309,10 @@ while [[ -n $state ]]; do
 
     preserve-prefix)
       _message 'pattern matching prefix to keep'
+      ;;
+
+    separator)
+      _message 'separator string'
       ;;
 
     urgh) 

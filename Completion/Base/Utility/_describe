@@ -23,12 +23,13 @@ fi
 
 zstyle -T ":completion:${curcontext}:$_type" verbose && _showd=yes
 
+zstyle -s ":completion:${curcontext}:$_type" list-separator _sep || _sep=--
+
 if zstyle -T ":completion:${curcontext}:$_type" list-grouped; then
   local _argv _new _strs _mats _opts _i=2
 
   _argv=( "$@" )
   _grp=(-g)
-  _sep='-- '
   _new=( "$1" )
   shift
 
@@ -68,7 +69,6 @@ if zstyle -T ":completion:${curcontext}:$_type" list-grouped; then
   set - "$_argv[@]"
 else
   _grp=()
-  _sep=' -- '
 fi
 
 _descr="$1"
@@ -83,7 +83,7 @@ while _tags; do
   while _next_label "$_type" _expl "$_descr"; do
 
     if [[ -n "$_showd" ]]; then
-      compdescribe -I "$_hide" "$_sep" _expl "$_grp[@]" "$@"
+      compdescribe -I "$_hide" "$_sep " _expl "$_grp[@]" "$@"
     else
       compdescribe -i "$_hide" "$@"
     fi

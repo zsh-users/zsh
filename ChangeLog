@@ -1,5 +1,13 @@
 2001-07-25  Sven Wischnowsky  <wischnow@zsh.org>
 
+	* 15484: Completion/AIX/Command/_lscfg,
+	Completion/AIX/Type/_logical_volumes,
+	Completion/Base/Utility/_describe,
+	Completion/Unix/Type/_printers, Completion/Zsh/Command/_zstyle,
+	Completion/Zsh/Context/_subscript, Doc/Zsh/compsys.yo,
+	Src/Zle/computil.c: another fix for 15477 (separator strings);
+	add list-separator style
+
 	* 15482: Doc/Zsh/compwid.yo, Src/Zle/compcore.c,
 	Src/Zle/computil.c: fixlet for 15477, don't let it remove
 	consecutive dummy matches

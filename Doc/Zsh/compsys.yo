@@ -1563,6 +1563,12 @@ typed pathname components and this style is set to `true', all
 components starting with the first one for which more than one match
 could be generated will be shown.
 )
+kindex(list-separator, completion style)
+item(tt(list-separator))(
+The value of this style is used in completion listing to separate the
+string to complete from a description when possible (e.g. when
+completing options).  It defaults to `tt(-)tt(-)' (two hyphens).
+)
 kindex(local, completion style)
 item(tt(local))(
 This style is used by completion functions which generate URLs as

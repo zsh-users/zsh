@@ -1,6 +1,6 @@
 #compdef -subscript-
 
-local expl ind osuf=']' flags
+local expl ind osuf=']' flags sep
 
 if [[ "$1" = -q ]]; then
   osuf='] '
@@ -91,7 +91,8 @@ elif [[ ${(Pt)${compstate[parameter]}} = array* ]]; then
 	      list=( "$list[@]" '' )
 	  fi
         done
-        zformat -a list ' -- ' "$list[@]"
+        zstyle -s ":completion:${curcontext}:indexes" list-separator sep || sep=--
+        zformat -a list " $sep " "$list[@]"
 	disp=( -d list)
       else
         disp=()

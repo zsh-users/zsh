@@ -504,11 +504,12 @@ cd_get(char **params)
         case CRT_DESC:
             {
                 VARARR(char, buf,
-                       cd_state.pre + cd_state.suf + cd_state.slen + 1);
+                       cd_state.pre + cd_state.suf + cd_state.slen + 3);
                 char *sufp = NULL;
 
-                memcpy(buf + cd_state.pre, cd_state.sep, cd_state.slen);
-                sufp = buf + cd_state.pre + cd_state.slen;
+                memcpy(buf + cd_state.pre + 2, cd_state.sep, cd_state.slen);
+                buf[cd_state.pre] = buf[cd_state.pre + 1] = ' ';
+                sufp = buf + cd_state.pre + cd_state.slen + 2;
 
                 mats = mp = (char **) zalloc((run->count + 1) * sizeof(char *));
                 dpys = dp = (char **) zalloc((run->count + 1) * sizeof(char *));
