@@ -5,4 +5,4 @@ local expl
 : ${(A)hosts:=${(s: :)${(ps:\t:)${${(f)"$(</etc/hosts)"}%%\#*}##[:blank:]#[^[:blank:]]#}}}
 
 _description expl host
-compadd -M 'm:{a-zA-Z}={A-Za-z} r:|.=* r:|=*' "$@" "$expl[@]" - "${hosts[@]%:*}"
+compadd -M 'm:{a-zA-Z}={A-Za-z} r:|.=* r:|=*' "$@" "$expl[@]" - "$hosts[@]"

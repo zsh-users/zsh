@@ -1,5 +1,12 @@
 #compdef socket
 
+# Parameter used:
+#
+#  socket_ports
+#    The associative array that maps a host name to a space-separated list of 
+#    ports.
+
+
 local state line expl
 typeset -A options
 
@@ -18,17 +25,21 @@ command)
 
 arg1)
   if (( $+options[-s] )); then
-    _message 'port'
+    _message 'port to listen'
   else
     _description expl 'host'
-    _hosts "$expl[@]"
+    compadd "$expl[@]" - ${(k)socket_ports} || _hosts "$expl[@]"
   fi
   ;;
 
 arg2)
   if (( ! $+options[-s] )); then
-    _description expl 'port'
-    _hostports $line[2] "$expl[@]"
+    _description expl 'port to connect'
+    if (( $+socket_ports )); then
+      compadd "$expl[@]" - ${=socket_ports[$line[2]]};
+    else
+      _message 'port to connect';
+    fi
   fi
   ;;
 esac

@@ -1,5 +1,11 @@
 #compdef telnet
 
+# Parameter used:
+#
+#  telnet_ports
+#    The associative array that maps a host name to a space-separated list of
+#    ports.
+
 _arguments -s \
   -{F,f,x} \
   '-8[allow 8-Bit data]' \
@@ -16,6 +22,6 @@ _arguments -s \
   '-l+[specify user]:user:' \
   '-n+[specify tracefile]:tracefile:_files' \
   '-r[rlogin like user interface]' \
-  ':host:_hosts' \
-  ':port:{ _hostports $line[2] "$expl[@]" }'
+  ':host:{ compadd "$expl[@]" - ${(k)telnet_ports} || _hosts "$expl[@]" }' \
+  ':port:{ if (( $+telnet_ports )); then compadd "$expl[@]" - ${=telnet_ports[$line[2]]}; else _message "port"; fi }'
 
