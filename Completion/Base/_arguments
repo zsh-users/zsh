@@ -126,7 +126,7 @@ if [[ "$*" != "$_args_cache_descr" ]]; then
       # Then we walk through the descriptions plus a few builtin ones.
 
       set -- "$@" '*=FILE*:file:_files' \
-             '*=(DIR|PATH)*:directory:_files -/' '*:unknown:'
+             '*=(DIR|PATH)*:directory:_files -/' '*: :'
 
       while (( $# )); do
 
@@ -219,8 +219,8 @@ if [[ "$*" != "$_args_cache_descr" ]]; then
       1="${1/\[$descr\]}"
     elif [[ -n "$compconfig[autodescribe_options]" &&
             "$1" = [-+][^:]##:[^:]#[^\\]:[^:]# ]]; then
-      descr="${${(M)${1#*:}#*[^\\]:}[1,-2]}"
-      descr="${compconfig[autodescribe_options]//\\%d/$descr}"
+      descr="${${${${(M)${1#*:}#*[^\\]:}[1,-2]}## #}%% #}"
+      [[ -n "$descr" ]] && descr="${compconfig[autodescribe_options]//\\%d/$descr}"
     fi
 
     # Description for both the `-foo' and `+foo' form?
