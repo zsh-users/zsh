@@ -1,3 +1,8 @@
+2001-10-09  Peter Stephenson  <pws@csr.com>
+
+	* 15994: Completion/compinstall: handle list-suffixes; make
+	prompts at end of function more transparent.
+
 2001-10-09  Sven Wischnowsky  <wischnow@zsh.org>
 
 	* 15991: Src/Zle/compcore.c: hide all but one match with the

@@ -1529,13 +1529,14 @@ completions?
 #       squeeze-slashes,
 __ci_do_file_styles() {
   local key files cursor expand speciald ignorep squeezes select
-  local prefon suffon
+  local prefon suffon lssuffixes
 
   __ci_get_this_style file-sort files
   __ci_get_this_style ignore-parents ignorep
   __ci_get_this_style special-dirs speciald
   __ci_get_this_style squeeze-slashes squeezes
   __ci_get_this_style expand expand
+  __ci_get_this_style list-suffixes lssuffixes
 
   while true; do
     clear
@@ -1550,7 +1551,8 @@ __ci_do_file_styles() {
 
 4.  When expanding paths, \`foo//bar' is treated as \`foo/bar'.
 
-5.  Configure how multiple paths are expanded, e.g. /f/b -> /foo/bar
+5.  Configure how multiple paths are expanded and displayed, 
+    e.g. /f/b -> /foo/bar
 
 q.  Return without saving.
 0.  Done setting options for filename completion.
@@ -1692,7 +1694,7 @@ as far as the part that is unambiguous; for example, if /foo/bar and
 and not attempt to expand the rest of the match.  However, you can force
 it to add all possible completions for you to resolve conflicts in the
 normal way.  Currently this feature is ${${suffon:+on}:-off}.
-Do you want it on ([y]es, [n]o, [k]eep current settign)?
+Do you want it on ([y]es, [n]o, [k]eep current setting)?
 "
 	  while true; do
 	    read -k key'?--- Hit selection --- '
@@ -1704,6 +1706,28 @@ Do you want it on ([y]es, [n]o, [k]eep current settign)?
 	    ([nN]) suffon=suffix;;
 	  esac
 	  expand=${prefon:+$prefon${suffon:+ }}${suffon}
+
+	  if [[ $lssuffixes = (1|[tT]|[yY]|[oO])* ]]; then
+	     lssuffixes=true
+	  else
+	     lssuffixes=
+	  fi
+	  print "
+When listing expansions of /f/b such as /foo/bar, /foo/bad, /failed/bag,
+the shell will usually only show the first part of the path if it is
+ambiguous, hence /foo will appear twice.  It is possible to show the
+full path in this case.  Currently this feature is ${${lssuffixes:+on}:-off}.
+Do you want this behaviour ([y]es, [n]o, [k]eep current setting)?
+"
+	  while true; do
+	    read -k key'?--- Hit selection --- '
+	    [[ $key = [yYnNkK] ]] && break
+	    print "Type one of y, n or k."
+	  done
+	  case $key in
+	    ([yY]) lssuffixes=true;;
+	    ([nN]) lssuffixes=;;
+	  esac
 	  ;;
       (q) return 1
 	 ;;
@@ -1716,6 +1740,7 @@ Do you want it on ([y]es, [n]o, [k]eep current settign)?
   __ci_set_this_style special-dirs speciald
   __ci_set_this_style squeeze-slashes squeezes
   __ci_set_this_style expand expand
+  __ci_set_this_style list-suffixes lssuffixes
 
   return 0
 }
@@ -1816,7 +1841,7 @@ zstyle ${(qq)stylevals[1]} $style $stylevals[2]"
 fi
 
 if [[ -z $ifile || -d $ifile ]] ||
-  ! read -q key"?Save new settings to $ifile? "; then
+  ! read -q key"?Save new settings to $ifile ([y]es, [n]o)? "; then
    print "Enter file to save in (~ will be expanded), or return to abort:"
    ifile=
    vared -ch -p 'file> ' ifile
@@ -1874,12 +1899,12 @@ future use."
     print "\nFailure adding lines to $ifile.  Lines left in \`$tmpout'"
   fi
   rm -f ${tmpout}2
-elif read -q key'?Print them to stdout instead? '; then
+elif read -q key'?Print them to stdout instead ([y]es, [n]o)? '; then
   cat $tmpout
   rm -f $tmpout
 fi
 
-if read -q key'?Set new styles for immediate use? '; then
+if read -q key'?Set new styles for immediate use ([y]es, [n]o)? '; then
   eval $output
   print "The new settings are now in effect.  Note this will not remove old
 styles you have deleted until you restart the shell."
