@@ -34,7 +34,6 @@ for x_mod in $x_mods; do
     eval "modfile=\$modfile_$q_x_mod"
     unset moddeps autobins autoinfixconds autoprefixconds autoparams
     unset automathfuncs
-    if [ -f $srcdir/../$modfile ]; then
     . $srcdir/../$modfile
     for bin in $autobins; do
 	echo "    add_autobin(\"$bin\", \"$x_mod\");"
@@ -54,7 +53,6 @@ for x_mod in $x_mods; do
     for dep in $moddeps; do
 	echo "    add_dep(\"$x_mod\", \"$dep\");"
     done
-    fi
     test "x$linked" = xno && echo "#endif"
 done
 
