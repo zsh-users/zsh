@@ -326,6 +326,8 @@ for prepath in "$prepaths[@]"; do
 	    [[ "$i" -ef "$PWD" ]] && _comp_ignore=( "$_comp_ignore[@]" "${(q)i}" )
 	  done
         fi
+       (( $#_comp_ignore )) && (( $expl[(I)-F] )) ||
+           expl=( "$expl[@]" -F _comp_ignore )
       fi
       if [[ "$sopt" = *[/f]* && ( -o globdots || "$PREFIX" = .* ) ]] &&
 	  zstyle -s ":completion${curcontext}:paths" special-dirs atmp; then
