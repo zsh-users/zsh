@@ -1,5 +1,7 @@
 2001-03-26  Sven Wischnowsky  <wischnow@zsh.org>
 
+	* 13770: Src/Zle/computil.c: handle colons in xor lists
+
 	* 13768: Completion/Core/_main_complete,
 	Completion/Core/_setup: unset ZLS_COLORS if list-colors not
 	set

@@ -821,7 +821,7 @@ parse_cadef(char *nam, char **args)
 		    xor = (char **) zalloc(2 * sizeof(char *));
 		    xor[1] = NULL;
 		}
-		xor[xnum] = ztrdup(name);
+		xor[xnum] = ztrdup(rembslashcolon(name));
 	    }
 	    if (c == ':') {
 		/* There's at least one argument. */
