@@ -1,4 +1,6 @@
-2000-04-09  Bart Schaefer  <schaefer@brasslantern.com>
+2000-04-09  Bart Schaefer  <schaefer@zsh.org>
+
+	* 10606: Fix thinko in 10598.
 
 	* 10602: Completion/Core/compinstall: Fix typo.
 

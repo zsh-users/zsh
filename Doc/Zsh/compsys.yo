@@ -1122,7 +1122,7 @@ kindex(ignore-parents, completion style)
 item(tt(ignore-parents))(
 The style is tested for the tt(files) tag to determine whether to ignore
 the names of directories already mentioned in the current word, or the
-name of the current working directory.  The value may include one or more
+name of the current working directory.  The value must include one or both
 of the following strings:
 
 startitem()
@@ -1136,13 +1136,18 @@ The name of the current working directory will not be completed, so that,
 for example, completion after tt(../) will not use the name of the current
 directory.
 )
+enditem()
+
+In addition, the value may include one or both of:
+
+startitem()
 item(tt(..))(
-Both of the above tests are performed, but only if the word on the line
-contains the substring `tt(../)'.
+Ignore the specified directories only when the word on the line contains
+the substring `tt(../)'.
 )
 item(tt(directory))(
-The tests are performed only when names of directories are completed,
-not when completing names of files.
+Ignore only when names of directories are completed, not when completing
+names of files.
 )
 enditem()
 
