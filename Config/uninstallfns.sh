@@ -24,7 +24,7 @@ case $fndir in
      for file in $allfuncs; do
        if test -f $sdir_top/$file; then
 	 if test x$FUNCTIONS_SUBDIRS != x -a x$FUNCTIONS_SUBDIRS != xno; then
-	   file=`echo $file | sed -e 's%%^Completion/%' -e 's%%^Functions%'`
+	   file=`echo $file | sed -e 's%%^Functions/%'`
 	   rm -f $fndir/$file;
 	 else
 	   bfile="`echo $file | sed -e 's%^.*/%%'`"

@@ -1744,7 +1744,7 @@ for modfile in `cd ${srcdir}; echo */*.mdd */*/*.mdd`; do
                 grep "^name=$name " ${CONFIG_MODULES}.old
 		;;
     *) case "$link" in
-	  *\ *) eval 'link=`'$link'`'
+	  *\ *) eval "link=\`$link\`"
 	       ;;
        esac
        case "${load}" in

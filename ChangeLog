@@ -1,5 +1,10 @@
 2000-12-04  Peter Stephenson  <pws@csr.com>
 
+	* 13226: configure.in, Config/defs.mk, Config/installfns.sh,
+	Config/uninstallfns.sh, Src/zsh.mdd: fix --enable-function-subdirs
+	for config.modules system; make Completion get its own functions
+	subdirectory; tidy up other related bits.	
+
 	* 13220: Doc/Zsh/params.yo: mention problems with $# e.g. `$#-'
 	in arithmetic.
 
