@@ -442,7 +442,9 @@ _i_done=''
 if [[ -f "$_comp_dumpfile" ]]; then
   if [[ -n "$_i_check" ]]; then
     read -rA _i_line < "$_comp_dumpfile"
-    if [[ _i_autodump -eq 1 && $_i_line[2] -eq $#_i_files ]]; then
+    if [[ _i_autodump -eq 1 && $_i_line[2] -eq $#_i_files &&
+        $ZSH_VERSION = $_i_line[4] ]]
+    then
       builtin . "$_comp_dumpfile"
       _i_done=yes
     fi

@@ -1,3 +1,8 @@
+2004-06-16  Oliver Kiddle  <opk@zsh.org>
+
+	* users/7553: Completion/compdump, Completion/compinit:
+	include zsh version in dump file to avoid problems with upgrades
+
 2004-06-15  Clint Adams  <clint@zsh.org>
 
 	* 20055: Completion/Unix/Command/_tla: additions and fixes

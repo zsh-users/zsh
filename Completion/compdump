@@ -33,7 +33,7 @@ if [[ -n "$_comp_secure" ]]; then
   (( $#_d_wdirs ))  && _d_files=( "${(@)_d_files:#(${(j:|:)_d_wdirs})/*}" )
 fi
 
-print "#files: $#_d_files" > $_d_file
+print "#files: $#_d_files\tversion: $ZSH_VERSION" > $_d_file
 
 # Dump the arrays _comps, _services and _patcomps.  The quoting
 # hieroglyphics ensure that a single quote inside a variable is itself
