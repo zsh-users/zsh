@@ -2,8 +2,8 @@
 CHANGES FROM PREVIOUS VERSIONS OF ZSH
 -------------------------------------
 
-New features between zsh versions 4.0 and 4.1.1
------------------------------------------------
+New features between zsh versions 4.0 and 4.2
+---------------------------------------------
 
 Configuration:
 - upgraded to use autoconf post-2.50
@@ -16,9 +16,16 @@ Syntax and builtins:
   pairs) associative arrays.
 - enhanced multiple parameter `for' loops:
     for key value in key1 value1 key2 value2 ...
-  maintaining full compatibility with POSIX syntax
+  maintaining full compatibility with POSIX syntax.
+- Suffix aliases allow the shell to run a command on a file by suffix,
+  e.g `alias -s ps=gv' makes `foo.ps' execute `gv foo.ps'.  Supplied
+  function zsh-mime-setup uses existing mailcap and mime.types files
+  to set up suitable aliases.  Supplied function pick-web-browser is
+  suitable for finding a browser to show .html etc. files by suffix alias.
 
 Add-on modules and functions:
+- zsh/datetime modules makes date formatting and seconds since EPOCH
+  available inside the shell.
 - zsh/net/tcp module provides builtin interface to TCP through ztcp
   builtin.  Function suite for interactive and script use with expect-style
   pattern matching.
@@ -40,6 +47,7 @@ Completion system:
   releases):  valgrind, tidy, texinfo, infocmp, Java classes, larch, limit,
   locale parameters, netcat, mysqldiff, mt, lsof, elinks, ant, debchange
   (dch), email addresses, file system types, Perforce, xsltproc.
+  Plus many others.
 
 Line editor:
 - special parameters $PREDISPLAY, $POSTDISPLAY available in function
@@ -55,19 +63,24 @@ Line editor:
 - better handling of keymaps in zle and widgets
 - better support for output from user-defined widgets while zle is active
 - tetris game which runs entirely in zle
+- several other contributed widgets
 
 Local internal improvements:
 - disowned jobs are automatically restarted
 - \u and \U print escapes for Unicode
+- read -d <delimiter> allows a custom line ending.
+- read -t <timeout>.
 - line numbers in error messages and $PS4 output are more consistent
 - `=prog' expands only paths, no longer aliases for consistency
 - job display in prompts; `jobs' command output can be piped
 - prompts: new $RPROMPT2, %^, %j, %y, enhanced %{, %}, %_.
-- rand48() function for better randomness in arithmetic
+- rand48() function in zsh/mathfunc for better randomness in arithmetic
   (if the corresponding math library function is present)
 - $SECONDS parameter can be made floating point via `typeset -F SECONDS'
   for better timing accuracy
 - improvements to command line history mechanism
+- job table is dynamically sized, preventing overflow (typically seen
+  previously in complex completions).
 - many bugfixes
 
 

@@ -1,3 +1,9 @@
+2004-02-26  Peter Stephenson  <pws@csr.com>
+
+	* unposted: .cvsignore, .distfiles, README, Config/version.mk,
+	Etc/CONTRIBUTORS, Etc/MACHINES, Etc/NEWS,
+	Functions/Zle/.distfiles: zsh 4.2.0-pre-1.
+
 2004-02-26  Doug Kearns  <djkea2@mugca.its.monash.edu.au>
 
 	* unposted: Completion/Unix/Command/_raggle: reword --help

@@ -12,4 +12,5 @@ backward-kill-word-match backward-word-match capitalize-word-match
 down-case-word-match forward-word-match kill-word-match
 match-words-by-style select-word-style transpose-words-match
 up-case-word-match
+delete-whole-word-match quote-and-complete-word url-quote-magic
 '
