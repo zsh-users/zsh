@@ -3297,25 +3297,25 @@ bin_dot(char *name, char **argv, char *ops, int func)
 		break;
 	    }
 	if (!*s || (ret && isset(PATHDIRS) && diddot < 2 && dotdot == 0)) {
+	    pushheap();
 	    /* search path for script */
 	    for (t = path; *t; t++) {
 		if (!(*t)[0] || ((*t)[0] == '.' && !(*t)[1])) {
 		    if (diddot)
 			continue;
 		    diddot = 1;
-		    buf = ztrdup(arg0);
+		    buf = dupstring(arg0);
 		} else
-		    buf = tricat(*t, "/", arg0);
+		    buf = zhtricat(*t, "/", arg0);
 
 		s = unmeta(buf);
 		if (access(s, F_OK) == 0 && stat(s, &st) >= 0
 		    && !S_ISDIR(st.st_mode)) {
 		    ret = source(enam = buf);
-		    zsfree(buf);
 		    break;
 		}
-		zsfree(buf);
 	    }
+	    popheap();
 	}
     }
     /* clean up and return */

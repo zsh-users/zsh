@@ -1,5 +1,8 @@
 2000-09-17  Clint Adams  <schizo@debian.org>
 
+	* 12823: Src/builtin.c, Src/utils.c: use zsh heap instead of
+	permanent heap.
+
 	* 12821: Src/builtin.c: bin_dot is now independent of PATH_MAX.
 
 2000-09-16  Bart Schaefer  <schaefer@zsh.org>

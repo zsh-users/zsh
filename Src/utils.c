@@ -3473,6 +3473,20 @@ appstr(char *base, char const *append)
 }
 
 /**/
+mod_export char *
+zhtricat(char const *s1, char const *s2, char const *s3)
+{
+    char *ptr;
+    
+    ptr = (char *)zhalloc(strlen(s1) + strlen(s2) + strlen(s3) + 1);
+    strcpy(ptr, s1);
+    strcat(ptr, s2);
+    strcat(ptr, s3);
+    return ptr;
+}
+
+
+/**/
 static int
 upchdir(int n)
 {
