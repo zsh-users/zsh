@@ -1418,6 +1418,9 @@ setpmnameddirs(Param pm, HashTable ht)
     int i;
     HashNode hn, next, hd;
 
+    if (!ht)
+	return;
+
     for (i = 0; i < nameddirtab->hsize; i++)
 	for (hn = nameddirtab->nodes[i]; hn; hn = next) {
 	    next = hn->next;
@@ -1425,9 +1428,6 @@ setpmnameddirs(Param pm, HashTable ht)
 		(hd = nameddirtab->removenode(nameddirtab, hn->nam)))
 		nameddirtab->freenode(hd);
 	}
-
-    if (!ht)
-	return;
 
     for (i = 0; i < ht->hsize; i++)
 	for (hn = ht->nodes[i]; hn; hn = hn->next) {
@@ -1649,6 +1649,9 @@ setaliases(Param pm, HashTable ht, int global, int dis)
     int i;
     HashNode hn, next, hd;
 
+    if (!ht)
+	return;
+
     for (i = 0; i < aliastab->hsize; i++)
 	for (hn = aliastab->nodes[i]; hn; hn = next) {
 	    next = hn->next;
@@ -1657,9 +1660,6 @@ setaliases(Param pm, HashTable ht, int global, int dis)
 		(hd = aliastab->removenode(aliastab, hn->nam)))
 		aliastab->freenode(hd);
 	}
-
-    if (!ht)
-	return;
 
     for (i = 0; i < ht->hsize; i++)
 	for (hn = ht->nodes[i]; hn; hn = hn->next) {
