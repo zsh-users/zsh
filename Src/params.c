@@ -2305,7 +2305,7 @@ uniqarray(char **x)
     char **t, **p = x;
 
     if (!x || !*x)
-	return 0;
+	return;
     while (*++p)
 	for (t = x; t < p; t++)
 	    if (!strcmp(*p, *t)) {
