@@ -1,24 +1,24 @@
 #compdef make-kpkg
 
 _arguments \
-       '--help' \
-       '--revision:number:' \
-       '--append-to-version:suffix:' \
-       '--flavour:flavour:' \
-       '--added-modules:module list:' \
-       '--added-patches:patches list' \
-       '--arch:architecture:' \
-       '--cross-compile:target:' \
-       '--subarch:subarchitecture:' \
-       '--arch-in-name' \
-       '--pgpsign:name:' \
-       '--config:target:(oldconfig config menuconfig xconfig old menu x)' \
-       '--targets' \
-       '--noexec' \
-       '--initrd' \
-       '--zimage[make zImage instead of bzImage]' \
-       '--bzimage[make bzImage instead of zImage]' \
-       '--rootcmd:root command:(sudo fakeroot)' \
-       '--us[unsigned source]' \
-       '--uc[unsigned changelog]' \
-       '*:target:(clean buildpackage binary kernel-source kernel-headers kernel-doc kernel-image build modules modules_config modules_image modules_clean configure debian libc-kheaders)'
+   '--help[display help message]' \
+   '--revision[change Debian revision number]:number:' \
+   '--append-to-version:suffix:' \
+   '--flavour[specify additional kernel sub-version]:flavour:' \
+   '--added-modules:module list:' \
+   '--added-patches:patches list' \
+   '--arch[specify architecture for cross-compilation]:architecture' \
+   '--cross-compile[specify target string]:target' \
+   '--subarch[specify subarchitecture]:subarchitecture:' \
+   '--arch-in-name[include architecture in kernel image name]' \
+   '--pgpsign[sign changes file]:name' \
+   '--config[specify configuration target]:target:(oldconfig config menuconfig xconfig old menu x)' \
+   '--targets[list known targets]' \
+   '--noexec[pass -n option to make]' \
+   '--initrd[create image suitable for initrd]' \
+   '(--bzimage)--zimage[make zImage instead of bzImage]' \
+   '(--zimage)--bzimage[make bzImage instead of zImage]' \
+   '--rootcmd[specify command for gaining root access]:root command:(sudo fakeroot)' \
+   '--us[unsigned source]' \
+   '--uc[unsigned changelog]' \
+   '*:target:(clean buildpackage binary kernel-source kernel-headers kernel-doc kernel-image build modules modules_config modules_image modules_clean configure debian libc-kheaders)'

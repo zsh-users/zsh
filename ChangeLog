@@ -1,3 +1,11 @@
+2002-05-28  Clint Adams  <clint@zsh.org>
+
+        * 17244: Completion/Debian/Command/_dpkg:
+        don't complete udebs for --unpack or -i.
+
+        * Oliver: 16803: Completion/Debian/Command/_make-kpkg,
+        Completion/Debian/Command/_dpkg: option descriptions
+
 2002-05-26  Clint Adams  <clint@zsh.org>
 
         * 17234: Completion/Unix/Command/_cvs:
