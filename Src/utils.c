@@ -2999,7 +2999,7 @@ bslashquote(const char *s, char **e, int instring)
 
     if (e && *e == u)
 	*e = v, sf = 1;
-    DPUTS(!e || sf, "BUG: Wild pointer *e in bslashquote()");
+    DPUTS(e && !sf, "BUG: Wild pointer *e in bslashquote()");
 
     return buf;
 }
