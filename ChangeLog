@@ -1,3 +1,8 @@
+2005-02-10  Wayne Davison  <wayned@users.sourceforge.net>
+
+	* unposted: Completion/Unix/Command/_yodl:  Added missing
+	closing double-quote.
+
 2005-02-09  Bart Schaefer  <schaefer@zsh.org>
 
 	* Kris Shannon: 20801: Completion/Unix/Command/_init_d: fix
