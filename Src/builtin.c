@@ -92,6 +92,7 @@ static struct builtin builtins[] =
 
     BUILTIN("popd", 0, bin_cd, 0, 2, BIN_POPD, NULL, NULL),
     BUILTIN("print", BINF_PRINTOPTS, bin_print, 0, -1, BIN_PRINT, "RDPbnrslzNu0123456789pioOcm-", NULL),
+    BUILTIN("printf", 0, bin_printf, 1, -1, 0, NULL, NULL),
     BUILTIN("pushd", 0, bin_cd, 0, 2, BIN_PUSHD, NULL, NULL),
     BUILTIN("pushln", BINF_PRINTOPTS, bin_print, 0, -1, BIN_PRINT, NULL, "-nz"),
     BUILTIN("pwd", 0, bin_pwd, 0, 0, 0, "rLP", NULL),
@@ -3051,6 +3052,179 @@ bin_print(char *name, char **args, char *ops, int func)
     if (fout != stdout)
 	fclose(fout);
     return 0;
+}
+
+/* printf */
+
+#define print_val(VAL) \
+  if (width >= 0) { \
+      if (prec >= 0) \
+	  printf(start, width, prec, VAL); \
+      else \
+	  printf(start, width, VAL); \
+  } else { \
+      if (prec >= 0) \
+	  printf(start, prec, VAL); \
+      else \
+	  printf(start, VAL); \
+  }
+
+/**/
+int
+bin_printf(char *name, char **args, char *ops, int func)
+{
+    int len, nnl, width, prec, type, ret = 0;
+    char *start, *endptr, *c, *fmt = getkeystring(*args, &len, 0, &nnl);
+    char **first = ++args, nullstr = '\0', save = '\0';
+
+    double doubleval;
+    int intval;
+    unsigned int uintval;
+    char *stringval;
+
+    do {
+
+	for (c = fmt;c-fmt < len;c++) {
+	    type = prec = width = -1;
+
+	    if (*c != '%') {
+		putchar(*c);
+		continue;
+	    }
+
+	    start = c++;
+	    if (*c == '%') {
+		putchar('%');
+		continue;
+	    }
+
+	    if (strchr("+- #", *c)) c++;
+
+	    if (*c == '*') {
+		width = (*args) ? strtoul(*args++, NULL, 0) : 0;
+		c++;
+	    } else {
+		while (idigit(*c)) c++;
+	    }
+
+	    if (*c == '.') {
+		c++;
+		if (*c == '*') {
+		    prec = (*args) ? strtoul(*args++, NULL, 0) : 0;
+		    c++;
+		} else {
+		    while (idigit(*c)) c++;
+		}
+	    }
+
+	    if (*c == 'l' || *c == 'L' || *c == 'h') c++;
+
+	    if (*c) {
+		save = c[1];
+		c[1] = '\0';
+	    }
+	    switch (*c) {
+	    case 'c':
+		if (*args) {
+		    if (**args == Meta)
+			intval = (*args)[1] ^ 32;
+		    else
+			intval = **args;
+		    args++;
+		} else
+		    intval = 0;
+		print_val(intval);
+		break;
+	    case 's':
+		if (*args)
+		    stringval = unmetafy(*args++, NULL);
+		else
+		    stringval = &nullstr;
+		print_val(stringval);
+		break;
+	    case 'b':
+		if (*args) {
+		    int l;
+		    char *b = getkeystring(*args++, &l, 0, &nnl);
+		    fwrite(b, l, 1, stdout);
+		}
+		continue;
+	    case 'q':
+		if (*args)
+		    stringval = bslashquote(unmetafy(*args++, NULL), NULL, 0);
+		else
+		    stringval = &nullstr;
+		*c = 's';
+		print_val(stringval);
+		break;
+	    case 'd':
+	    case 'i':
+		type=1;
+		break;
+	    case 'e':
+	    case 'E':
+	    case 'f':
+	    case 'g':
+	    case 'G':
+		type=2;
+		break;
+	    case 'o':
+	    case 'u':
+	    case 'x':
+	    case 'X':
+		type=3;
+		break;
+	    default:
+		zerrnam(name, "%s: invalid directive", start, 0);
+		ret = 1;
+	    }
+
+	    if (type > 0) {
+		if (*args && (**args == '\'' || **args == '"' )) {
+		    if (type == 2) {
+			doubleval = (*args)[1];
+			print_val(doubleval);
+		    } else {
+		    	intval = (*args)[1];
+			print_val(intval);
+		    }
+		    args++;
+		} else {
+	    	    switch (type) {
+		    case 1:
+			intval = (*args) ? strtol(*args, &endptr, 0) : 0;
+			print_val(intval);
+			break;
+		    case 2:
+			doubleval = (*args) ? strtod(*args, &endptr) : 0;
+			print_val(doubleval);
+			break;
+		    case 3:
+			uintval = (*args) ? strtoul(*args, &endptr, 0) : 0;
+			print_val(uintval);
+		    }
+		    if (*args) {
+			if (errno == ERANGE) {
+			    zerrnam(name, "`%s' arithmetic overflow", *args, 0);
+			    ret = 1;
+			} else if (**args && endptr == *args) {
+			    zerrnam(name, "`%s' expected numeric value", endptr, 0);
+			    ret = 1;
+			} else if (*endptr) {
+			    zerrnam(name, "`%s' not completely converted", *args, 0);
+			    ret = 1;
+			}
+			args++;
+		    }
+		}
+	    }
+	    if (*c) c[1] = save;
+	}
+
+    /* if there are remaining args, reuse format string */
+    } while (*args && args != first);
+
+    return ret;
 }
 
 /* shift builtin */

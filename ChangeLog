@@ -1,3 +1,8 @@
+2001-10-05  Oliver Kiddle  <opk@zsh.org>
+
+	* 15851, 15948: Src/builtin.c, Doc/Zsh/builtins.yo: add printf
+	builtin	with basic POSIX functionality
+
 2001-10-05  Sven Wischnowsky  <wischnow@zsh.org>
 
 	* 15946: Src/Zle/compresult.c: fix calculation of number of
