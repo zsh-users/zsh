@@ -1,4 +1,9 @@
 2000-05-15  Clint Adams  <schizo@debian.org>
+
+	* 11387: Doc/Zsh/options.yo, Src/math.c, Src/options.c,
+	Src/zsh.h: new option OCTAL_ZEROES to enable parsing
+	in 11385, on by default in 'sh' emulation.
+
 	* 11385: Src/math.c: interpret integer constants beginning
 	with '0' as octal to conform to IEEE Std 1003.2-1992
 	(ISO 9945-2:1993).

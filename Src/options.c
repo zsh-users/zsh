@@ -162,6 +162,7 @@ static struct optname optns[] = {
 {NULL, "notify",	      OPT_ZSH,			 NOTIFY},
 {NULL, "nullglob",	      OPT_EMULATE,		 NULLGLOB},
 {NULL, "numericglobsort",     OPT_EMULATE,		 NUMERICGLOBSORT},
+{NULL, "octalzeroes",         OPT_EMULATE|OPT_SH,	 OCTALZEROES},
 {NULL, "overstrike",	      0,			 OVERSTRIKE},
 {NULL, "pathdirs",	      OPT_EMULATE,		 PATHDIRS},
 {NULL, "posixbuiltins",	      OPT_EMULATE|OPT_BOURNE,	 POSIXBUILTINS},

@@ -357,7 +357,8 @@ zzlex(void)
 		yyval.u.l = zstrtol(++ptr, &ptr, lastbase = 16);
 		return NUM;
 	    }
-	    else if (idigit(*ptr) && (memchr(ptr, '.', strlen(ptr)) == NULL)) {
+	    else if (isset(OCTALZEROES) &&
+		    (memchr(ptr, '.', strlen(ptr)) == NULL)) {
 	        yyval.u.l = zstrtol(ptr, &ptr, lastbase = 8);
 	        return NUM;
 	    }
