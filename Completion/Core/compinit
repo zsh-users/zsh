@@ -272,6 +272,11 @@ compconf() {
 
 typeset -U _i_files
 _i_files=( ${^~fpath}/_(|*[^~])(N:t) )
+if [[ $#_i_files -lt 20 && $0 = */* ]]; then
+  # Assume that we need to add the compinit directory to fpath.
+  fpath=(${0:h} $fpath)
+  _i_files=( ${^~fpath}/_(|*[^~])(N:t) )
+fi
 _i_initname=$0
 _i_done=''
 
