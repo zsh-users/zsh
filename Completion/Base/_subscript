@@ -24,9 +24,12 @@ elif [[ ${(Pt)${compstate[parameter]}} = array* ]]; then
       if zstyle -T ":completion:${curcontext}:indexes" verbose; then
         list=()
         for i in "$ind[@]"; do
-          [[ "$i" = ${PREFIX}*${SUFFIX} ]] &&
+          if [[ "$i" = ${PREFIX}*${SUFFIX} ]]; then
               list=( "$list[@]" 
 	             "${i}:$(print -D ${(P)${compstate[parameter]}[$i]})" )
+	  else
+	      list=( "$list[@]" '' )
+	  fi
         done
         zformat -a list ' -- ' "$list[@]"
 	disp=( -d list)
