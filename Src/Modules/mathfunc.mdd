@@ -1,0 +1,3 @@
+autobins="mathfunc"
+
+objects="mathfunc.o"
