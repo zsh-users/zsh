@@ -733,6 +733,7 @@ callcompfunc(char *s, char *fn)
 	}
 	compinsert = (useline < 0 ? tricat("tab ", "", compinsert) :
 		      ztrdup(compinsert));
+	zsfree(compexact);
 	if (useexact)
 	    compexact = ztrdup("accept");
 	else {

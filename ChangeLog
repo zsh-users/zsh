@@ -1,6 +1,9 @@
-2000-06-03  Bart Schaefer  <schaefer@brasslantern.com>
+2000-06-03  Bart Schaefer  <schaefer@zsh.org>
 
 	* 11736: Src/signals.c: Fix special scoping of TRAPEXIT.
+
+	* Felix: 11734: Src/Zle/compcore.c, Doc/Zsh/mod_complist.yo: Fix
+	one more memory leak and a doc mistake.
 
 2000-06-02  Peter Stephenson  <pws@cambridgesiliconradio.com>
 
