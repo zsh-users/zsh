@@ -1,3 +1,9 @@
+2004-09-24  Wayne Davison  <wayned@users.sourceforge.net>
+
+	* 20409: Completion/Unix/Command/_darcs: Completion for the darcs
+	revision control system.  Derived from the zsh-completion example
+	that comes with darcs.
+
 2004-09-21  Peter Stephenson  <pws@csr.com>
 
 	* unposted: Completion/Unix/Command/_perforce: updated for
