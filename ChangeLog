@@ -13,6 +13,12 @@
 	* 20959 (variant of 20958): Src/params.c, Src/Module/parameter.c,
 	Test/V01zmodload.ztst: fix crash unloading zsh/parameter and test.
 
+2005-03-09  Clint Adams  <clint@zsh.org>
+	* 20961: Completion/Unix/Command/_baz: fix completion of status and
+	diff subcommands.
+	* 20951: Completion/Unix/Command/_baz: fix version detection and baz
+	merge completion.
+
 2005-03-03  Oliver Kiddle  <opk@zsh.org>
 
 	* 20921, 20924: Src/utils.c, Completion/Unix/Command/_iconv:
