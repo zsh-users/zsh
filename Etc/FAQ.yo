@@ -49,7 +49,7 @@ description(\
 mydit(Archive-Name:) unix-faq/shell/zsh
 mydit(Last-Modified:) 1999/07/24
 mydit(Submitted-By:) email(pws@ibmth.df.unipi.it (Peter Stephenson))
-mydit(Version:) $Id: FAQ.yo,v 1.1.1.8.2.1 1999/07/29 20:48:06 akr Exp $
+mydit(Version:) $Id: FAQ.yo,v 1.1.1.8.2.2 1999/07/30 03:35:30 akr Exp $
 mydit(Posting-Frequency:) Monthly
 mydit(Copyright:) (C) P.W. Stephenson, 1995--1999 (see end of document)
 )
@@ -366,7 +366,7 @@ url(http://www.math.technion.ac.il/mirror/ftp.zsh.org/pub/zsh/)
 (http://www.math.technion.ac.il/mirror/ftp.zsh.org/pub/zsh/)
     mydit(Italy)     url(ftp://ftp.unina.it/pub/Unix/pkgs/shell/zsh/)
 (ftp://ftp.unina.it/pub/Unix/pkgs/shell/zsh/)
-    mydit()          url(ftp://ftp.nisiq.net/pub/shells/zsh/)
+    mydit(Japan)     url(ftp://ftp.nisiq.net/pub/shells/zsh/)
 (ftp://ftp.nis.co.jp/pub/shells/zsh/)
     mydit()          url(ftp://ftp.win.ne.jp/pub/shell/zsh/)
 (ftp://ftp.win.ne.jp/pub/shell/zsh/)
