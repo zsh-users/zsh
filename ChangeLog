@@ -1,5 +1,7 @@
 2000-12-23  Clint Adams  <schizo@debian.org>
 
+	* unposted: configure.in: thinko in jobtable size determination.
+
 	* Chip Salzenberg: 13310: Completion/Debian/_apt:
 	correct typo for apt-cache completion.
 

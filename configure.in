@@ -1386,6 +1386,7 @@ AC_ARG_ENABLE(max-jobtable-size,
     #endif
    ],
    maxj=max)
+  fi
 
    if test x$maxj = xmax; then
     AC_DEFINE(MAXJOB, MAX_TASKS_PER_USER)
@@ -1395,7 +1396,6 @@ AC_ARG_ENABLE(max-jobtable-size,
     AC_DEFINE(MAXJOB, 256)
     AC_MSG_RESULT(${msg}256)
    fi
-  fi
 
  elif test x$enableval = xno; then
  AC_DEFINE(MAXJOB,512)
