@@ -1123,3 +1123,97 @@ fallback_compctlread(char *name, char **args, char *ops, char *reply)
 	    NULL, 0);
     return 1;
 }
+
+/*
+ * This is real main entry point. This has to be mod_export'ed
+ * so zsh.exe can found it on Cygwin
+ */
+
+/**/
+mod_export int
+zsh_main(int argc, char **argv)
+{
+    char **t;
+    int t0;
+#ifdef USE_LOCALE
+    setlocale(LC_ALL, "");
+#endif
+
+    init_hackzero(argv, environ);
+
+    /*
+     * Provisionally set up the type table to allow metafication.
+     * This will be done properly when we have decided if we are
+     * interactive
+     */
+    typtab['\0'] |= IMETA;
+    typtab[STOUC(Meta)  ] |= IMETA;
+    typtab[STOUC(Marker)] |= IMETA;
+    for (t0 = (int)STOUC(Pound); t0 <= (int)STOUC(Nularg); t0++)
+	typtab[t0] |= ITOK | IMETA;
+
+    for (t = argv; *t; *t = metafy(*t, -1, META_ALLOC), t++);
+
+    zsh_name = argv[0];
+    do {
+      char *arg0 = zsh_name;
+      if (!(zsh_name = strrchr(arg0, '/')))
+	  zsh_name = arg0;
+      else
+	  zsh_name++;
+      if (*zsh_name == '-')
+	  zsh_name++;
+      if (strcmp(zsh_name, "su") == 0) {
+	  char *sh = zgetenv("SHELL");
+	  if (sh && *sh && arg0 != sh)
+	      zsh_name = sh;
+	  else
+	      break;
+      } else
+	  break;
+    } while (zsh_name);
+
+    fdtable_size = OPEN_MAX;
+    fdtable = zcalloc(fdtable_size);
+
+    createoptiontable();
+    emulate(zsh_name, 1);   /* initialises most options */
+    opts[LOGINSHELL] = (**argv == '-');
+    opts[MONITOR] = 1;   /* may be unset in init_io() */
+    opts[PRIVILEGED] = (getuid() != geteuid() || getgid() != getegid());
+    opts[USEZLE] = 1;   /* may be unset in init_io() */
+    parseargs(argv);   /* sets INTERACTIVE, SHINSTDIN and SINGLECOMMAND */
+
+    SHTTY = -1;
+    init_io();
+    setupvals();
+    init_signals();
+    init_bltinmods();
+    run_init_scripts();
+    init_misc();
+
+    for (;;) {
+	do
+	    loop(1,0);
+	while (tok != ENDINPUT && (tok != LEXERR || isset(SHINSTDIN)));
+	if (tok == LEXERR) {
+	    stopmsg = 1;
+	    zexit(lastval, 0);
+	}
+	if (!(isset(IGNOREEOF) && interact)) {
+#if 0
+	    if (interact)
+		fputs(islogin ? "logout\n" : "exit\n", shout);
+#endif
+	    zexit(lastval, 0);
+	    continue;
+	}
+	noexitct++;
+	if (noexitct >= 10) {
+	    stopmsg = 1;
+	    zexit(lastval, 0);
+	}
+	zerrnam("zsh", (!islogin) ? "use 'exit' to exit."
+		: "use 'logout' to logout.", NULL, 0);
+    }
+}

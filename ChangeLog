@@ -1,3 +1,10 @@
+2000-08-02  Peter Stephenson  <pws@csr.com>
+
+	* Andrej: 12487: configure.in, Etc/MACHINES, Src/Makefile.in,
+	Src/init.c, Src/main.c, Src/makepro.awk, Src/mkmakemod.sh,
+	Src/parse.c, Src/zsh.h, Src/Zle/zle_utils.c: Dynamic loading
+	on cygwin.
+
 2000-08-02  Clint Adams  <schizo@debian.org>
 
         * 12489: Src/Modules/files.c, Src/Modules/parameter.c: check

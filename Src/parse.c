@@ -3070,7 +3070,8 @@ decrdumpcount(FuncDump f)
 {
 }
 
-void
+/**/
+mod_export void
 closedumps(void)
 {
 }

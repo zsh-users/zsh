@@ -18,13 +18,9 @@ BEGIN {
     gsub(/\//, "_", name)
     ARGC--
 
-    # `locals' is a list of local declarations, built up while global
-    # declarations are output.
-    locals = ""
-
-    printf "#ifndef have_%s_globals\n", name
-    printf "#define have_%s_globals\n", name
-    printf "\n"
+    printf "E#ifndef have_%s_globals\n", name
+    printf "E#define have_%s_globals\n", name
+    printf "E\n"
 }
 
 # all relevant declarations are preceded by "/**/" on a line by itself
@@ -39,6 +35,13 @@ BEGIN {
 	if(getline <= 0) {
 	    aborting = 1
 	    exit 1
+	}
+	if (line == "" && $0 ~ /^[ \t]*#/) {
+            # Directly after the /**/ was a preprocessor line.
+            # Spit it out and re-start the outer loop.
+	    printf "E%s\n", $0
+	    printf "L%s\n", $0
+	    next
 	}
 	gsub(/\t/, " ")
 	line = line " " $0
@@ -74,13 +77,16 @@ BEGIN {
 	    break
     }
     sub(/^ */, "", line)
-    match(line, /^((const|enum|static|struct|union) +)*([_0-9A-Za-z]+ +|((char|double|float|int|long|short|unsigned|void) +)+)((const|static) +)*/)
+    match(line, /^((const|enum|mod_export|static|struct|union) +)*([_0-9A-Za-z]+ +|((char|double|float|int|long|short|unsigned|void) +)+)((const|static) +)*/)
     dtype = substr(line, 1, RLENGTH)
     sub(/ *$/, "", dtype)
-    islocal = " " dtype " " ~ / static /
+    if(" " dtype " " ~ / static /)
+	locality = "L"
+    else
+	locality = "E"
+    exported = " " dtype " " ~ / mod_export /
     line = substr(line, RLENGTH+1) ","
     # Handle each declarator.
-    output = ""
     while(match(line, /^[^,]*,/)) {
 	# Separate out the name from the declarator.  Use "@+" and "@-"
 	# to bracket the name within the declarator.  Strip off any
@@ -103,44 +109,29 @@ BEGIN {
 	gsub(/@>/, ")", dcltor)
 	gsub(/@!/, ",", dcltor)
 
-	# If this is a module boot/cleanup function, conditionally rename it.
-	if(" " dtype " " ~ / int / && dcltor ~ / *@\+(boot|cleanup)_[_0-9A-Za-z]+@- *_\(\( *Module +[_0-9A-Za-z]+ *\)\) */) {
-	    modtype = dnam
-	    sub(/_.*$/, "", modtype)
-	    output = output "# if defined(DYNAMIC_NAME_CLASH_OK) && defined(MODULE)\n"
-	    output = output "#  define " dnam " " modtype "_\n"
-	    output = output "# endif\n"
-	}
+	# If this is exported, add it to the exported symbol list.
+	if(exported)
+	    printf "X%s\n", dnam
 
 	# Format the declaration for output
 	dcl = dtype " " dcltor ";"
-	if(!islocal)
+	if(locality ~ /E/)
 	    dcl = "extern " dcl
+	if(isfunc)
+	    gsub(/ mod_export /, " mod_import_function ", dcl)
+	else
+	    gsub(/ mod_export /, " mod_import_variable ", dcl)
 	gsub(/@[+-]/, "", dcl)
 	gsub(/ +/, " ", dcl)
 	while(match(dcl, /[^_0-9A-Za-z] ./) || match(dcl, /. [^_0-9A-Za-z]/))
 	    dcl = substr(dcl, 1, RSTART) substr(dcl, RSTART+2)
-	output = output dcl "\n"
+	printf "%s%s\n", locality, dcl
     }
-
-    # Output global declarations now, but save up locals until the end.
-    if(islocal)
-	locals = locals output
-    else
-	printf "%s", output
 }
 
 END {
     if(aborting)
 	exit 1
-    printf "\n"
-    printf "#endif /* !have_%s_globals */\n", name
-    if(locals != "") {
-	printf "\n"
-	printf "#ifndef GLOBAL_PROTOTYPES\n"
-	printf "\n"
-	printf locals
-	printf "\n"
-	printf "#endif /* !GLOBAL_PROTOTYPES */\n"
-    }
+    printf "E\n"
+    printf "E#endif /* !have_%s_globals */\n", name
 }

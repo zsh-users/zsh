@@ -1467,6 +1467,18 @@ if test "x$aixdynamic" = xyes; then
   zsh_cv_sys_dynamic_strip_exe="${zsh_cv_sys_dynamic_strip_exe=yes}"
   zsh_cv_sys_dynamic_strip_lib="${zsh_cv_sys_dynamic_strip_lib=yes}"
   zsh_cv_sys_dynamic_broken="${zsh_cv_sys_dynamic_broken=no}"
+elif test "x$ac_cv_cygwin" = xyes; then
+  DL_EXT="${DL_EXT=dll}"
+  DLLD="${DLLD=dllwrap}"
+  zsh_cv_func_dlsym_needs_underscore=no
+  DLLDFLAGS=${DLLDFLAGS=}
+  EXTRA_LDFLAGS=${EXTRA_LDFLAGS=}
+  zsh_cv_sys_dynamic_clash_ok="${zsh_cv_sys_dynamic_clash_ok=no}"
+  zsh_cv_sys_dynamic_rtld_global="${zsh_cv_sys_dynamic_rtld_global=yes}"
+  zsh_cv_sys_dynamic_execsyms="${zsh_cv_sys_dynamic_execsyms=no}"
+  zsh_cv_sys_dynamic_strip_exe="${zsh_cv_sys_dynamic_strip_exe=yes}"
+  zsh_cv_sys_dynamic_strip_lib="${zsh_cv_sys_dynamic_strip_lib=yes}"
+  zsh_cv_sys_dynamic_broken="${zsh_cv_sys_dynamic_broken=no}"
 elif test "x$dynamic" = xyes; then
   AC_CACHE_CHECK(if your system use ELF binaries,
    zsh_cv_sys_elf,
@@ -1653,6 +1665,16 @@ else
   SHORTBOOTNAMES=no
 fi
 AC_SUBST(SHORTBOOTNAMES)
+
+if test "x$ac_cv_cygwin" = xyes; then
+  INSTLIB="install.cygwin-lib"
+  UNINSTLIB="uninstall.cygwin-lib"
+else
+  INSTLIB="install.bin-\$(L)"
+  UNINSTLIB="uninstall.bin-\$(L)"
+fi
+AC_SUBST(INSTLIB)dnl
+AC_SUBST(UNINSTLIB)dnl
 
 AC_DEFINE_UNQUOTED(DL_EXT, "$DL_EXT")dnl
 AC_SUBST(D)dnl

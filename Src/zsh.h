@@ -1681,7 +1681,15 @@ typedef unsigned char * (*ZleReadFn) _((char *, char *, int));
 /* Pseudo-keyword to mark exportedness */
 /***************************************/
 
+#ifdef __CYGWIN__
+#define mod_export __attribute__((__dllexport__))
+#define mod_import_variable __attribute__((__dllimport__))
+#define mod_import_function
+#else
 #define mod_export
+#define mod_import_variable
+#define mod_import_function
+#endif
 
 /***************************************/
 /* Hooks in core.                      */

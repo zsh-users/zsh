@@ -58,6 +58,8 @@ modules: headers
 
 MAIN_OBJS = main.o
 
+L = @L@
+
 LSTMP =
 LLIST =
 NSTMP = stamp-modobjs
@@ -65,6 +67,8 @@ NLIST = `cat stamp-modobjs`
 
 LIBZSH = libzsh-$(VERSION).$(DL_EXT)
 NIBZSH =
+INSTLIB = @INSTLIB@
+UNINSTLIB = @UNINSTLIB@
 
 ZSH_EXPORT = $(EXPOPT)zsh.export
 ZSH_NXPORT =
@@ -80,7 +84,7 @@ zsh$(EXEEXT): $(@L@IBZSH) $(@L@STMP) $(MAIN_OBJS) zsh.export
 
 $(LIBZSH): $(LIBOBJS) $(NSTMP)
 	rm -f $@
-	$(DLLINK) $(LIBOBJS) $(NLIST)
+	$(DLLINK) $(LIBOBJS) $(NLIST) $(LIBS)
 
 stamp-modobjs: modobjs
 	@if cmp -s stamp-modobjs.tmp stamp-modobjs; then \
@@ -176,7 +180,7 @@ uninstall.bin: uninstall.bin-here
 .PHONY: install.bin uninstall.bin
 
 # install binary, creating install directory if necessary
-install.bin-here: zsh$(EXEEXT) install.bin-@L@
+install.bin-here: zsh$(EXEEXT) $(INSTLIB)
 	$(sdir_top)/mkinstalldirs $(DESTDIR)$(bindir)
 	$(INSTALL_PROGRAM) $(STRIPFLAGS) zsh$(EXEEXT) $(DESTDIR)$(bindir)/$(tzsh)-$(VERSION)$(EXEEXT)
 	if test -f $(DESTDIR)$(bindir)/$(tzsh)$(EXEEXT); then \
@@ -192,17 +196,21 @@ install.bin-N:
 install.bin-L: $(LIBZSH)
 	$(sdir_top)/mkinstalldirs $(DESTDIR)$(libdir)/$(tzsh)
 	$(INSTALL_PROGRAM) $(LIBZSH) $(DESTDIR)$(libdir)/$(tzsh)/$(LIBZSH)
-.PHONY: install.bin-N install.bin-L
+install.cygwin-lib: $(LIBZSH)
+	$(INSTALL_PROGRAM) $(LIBZSH) $(DESTDIR)$(bindir)/$(LIBZSH)
+.PHONY: install.bin-N install.bin-L install.cygwin-lib
 
 # uninstall binary
-uninstall.bin-here: uninstall.bin-@L@
+uninstall.bin-here: $(UNINSTLIB)
 	rm -f $(DESTDIR)$(bindir)/$(tzsh)-$(VERSION) $(DESTDIR)$(bindir)/$(tzsh)$(EXEEXT)
 .PHONY: uninstall.bin-here uninstall.bin-@L@
 
 uninstall.bin-N:
 uninstall.bin-L:
 	rm -f $(DESTDIR)$(libdir)/$(tzsh)/$(LIBZSH)
-.PHONY: uninstall.bin-N uninstall.bin-L
+uninstall.cygwin-lib:
+	rm -f $(DESTDIR)$(bindir)/$(LIBZSH)
+.PHONY: uninstall.bin-N uninstall.bin-L uninstall.cygwin-lib
 
 # ========== DEPENDENCIES FOR CLEANUP ==========
 

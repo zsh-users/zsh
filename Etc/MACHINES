@@ -30,13 +30,18 @@ Cygnus Solutions: Cygwin on Intel
 	be on a file system mounted as binary (the mount command shows
 	`binmode').
 
-	Dynamic loading does not work (this is automatically detected),
-	though libraries not compiled by default will work (see the file
-	INSTALL for how to add these to the base executable).  In
+	Dynamic loading works as of cygwin-1.1.3 and binutils-20000722-1.
+	It was not tested for earlier versions. This does not imply
+	that every module will work. New completion and in
 	particular zsh/zftp and zsh/mathfunc are known to work.
 
 	Some of the tests in the Test subdirectory are known to fail:
 	this is because the UNIX environment is not completely implemented.
+
+	Cygwin allows mount without existing mount point (e.g.
+	"mount //server/path /usr/src" where /usr/src does not exist).
+	Path completion will fail inside these mounts; make sure that
+	every mount point really exists.
 
 Data General: DG/UX 5.4R3.10 MU01 (various AViiONs)
 	Should build `out-of-the-box'.
