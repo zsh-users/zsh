@@ -27,7 +27,7 @@ _arguments -C \
   '*-listener[add an instance of class as a project listener]:classname:_java_class -cp ${(j.:.)c}' \
   '(-f -file -buildfile -find)'{-f,-file,-buildfile}'[use specified build file]:build file:_files' \
   '*-D[specify property with value to use]:property:->property' \
-  '-propertyfile[load properties from specfied file]:property file:_files' \
+  '-propertyfile[load properties from specified file]:property file:_files' \
   '-inputhandler[specify class which will handle input requests]:class:_java_class -cp ${(j.\:.)c}' \
   '(-f -file -buildfile)-find[search for build file towards the root of filesystem]:build file:(build.xml)' \
   $target && return
