@@ -698,6 +698,8 @@ parsecomplist(char *instr)
 static Complist
 parsepat(char *str)
 {
+    long assert;
+
     patcompstart();
     /*
      * Check for initial globbing flags, so that they don't form
@@ -707,7 +709,7 @@ parsepat(char *str)
 	(isset(KSHGLOB) && *str == '@' && str[1] == Inpar &&
 	 str[2] == Pound)) {
 	str += (*str == Inpar) ? 2 : 3;
-	if (!patgetglobflags(&str))
+	if (!patgetglobflags(&str, &assert))
 	    return NULL;
     }
 

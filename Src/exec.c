@@ -3251,6 +3251,9 @@ doshfunc(char *name, Eprog prog, LinkList doshargs, int flags, int noreturnval)
     char saveopts[OPT_SIZE], *oldscriptname = NULL, *fname = dupstring(name);
     int obreaks;
     struct funcstack fstack;
+#ifdef MAX_FUNCTION_DEPTH
+    static int funcdepth;
+#endif
 
     pushheap();
 
@@ -3300,6 +3303,13 @@ doshfunc(char *name, Eprog prog, LinkList doshargs, int flags, int noreturnval)
 	    argzero = ztrdup(argzero);
 	}
     }
+#ifdef MAX_FUNCTION_DEPTH
+    if(++funcdepth > MAX_FUNCTION_DEPTH)
+    {
+        zerr("maximum nested function level reached", NULL, 0);
+	return;
+    }
+#endif
     fstack.name = dupstring(name);
     fstack.prev = funcstack;
     funcstack = &fstack;
@@ -3323,6 +3333,9 @@ doshfunc(char *name, Eprog prog, LinkList doshargs, int flags, int noreturnval)
     }
     runshfunc(prog, wrappers, fstack.name);
     funcstack = fstack.prev;
+#ifdef MAX_FUNCTION_DEPTH
+    --funcdepth;
+#endif
     if (retflag) {
 	retflag = 0;
 	breaks = obreaks;

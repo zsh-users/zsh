@@ -1,3 +1,11 @@
+2000-04-06  Clint Adams  <schizo@debian.org>
+	* Felix Rosencrantz: 10564: Completion/X/_x_display:
+	typo in _wanted.
+	* 10565: acconfig.h, configure.in, Src/exec.c:
+	add configure option for function depth limit.
+	* 10566: Src/glob.c: change invocation of patgetglobflags
+	to use two arguments.
+
 2000-04-06  Peter Stephenson  <pws@pwstephenson.fsnet.co.uk>
 
 	* 10547: Doc/Zsh/expn.yo, Misc/globtests, Src/pattern.c,

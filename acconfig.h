@@ -73,6 +73,9 @@
 /* Define to 1 if you have RFS superroot directory. */
 #undef HAVE_SUPERROOT
 
+/* Define to 1 if you need to use the native getcwd */
+#undef USE_GETCWD
+
 /* Define to the path of the /dev/fd filesystem */
 #undef PATH_DEV_FD
 
@@ -130,6 +133,9 @@
 /* Define if your system's struct direct has a member named d_stat.  */
 #undef HAVE_STRUCT_DIRECT_D_STAT
 
+/* Define if your system's struct sockaddr_in6 has a member named sin6_scope_id.  */
+#undef HAVE_STRUCT_SOCKADDR_IN6_SIN6_SCOPE_ID
+
 /* Define to be a string corresponding the vendor of the machine */
 #undef VENDOR
 
@@ -154,6 +160,20 @@
 /* Define to 1 if you want to get debugging information on internal *
  * hash tables.  This turns on the `hashinfo' builtin.              */
 #undef ZSH_HASH_DEBUG
+
+/* Undefine this if you don't want to get a restricted shell *
+ * when zsh is exec'd with basename that starts with r.      *
+ * By default this is defined.                               */
+#undef RESTRICTED_R
+
+/* Define for Maildir support */
+#undef MAILDIR_SUPPORT
+
+/* Define for function depth limits */
+#undef MAX_FUNCTION_DEPTH
+
+/* Define if you want locale features.  By default this is defined. */
+#undef CONFIG_LOCALE
 
 /* Define to 1 if your termcap library has the ospeed variable */
 #undef HAVE_OSPEED
@@ -181,9 +201,6 @@
 /* Define to 1 if struct timezone is defined by a system header */
 #undef HAVE_STRUCT_TIMEZONE
 
-/* Define if your system's typeahead disappears from the shell editor. */
-#undef CLOBBERS_TYPEAHEAD
-
 /* Define to 1 if there is a prototype defined for brk() on your system */
 #undef HAVE_BRK_PROTO
 
@@ -193,13 +210,22 @@
 /* Define to 1 if there is a prototype defined for ioctl() on your system */
 #undef HAVE_IOCTL_PROTO
 
+/* Define to 1 if there is a prototype defined for mknod() on your system */
+#undef HAVE_MKNOD_PROTO
+
+/* Define to 1 if select() is defined in <sys/socket.h>, ie BeOS R4.51*/
+#undef SELECT_IN_SYS_SOCKET_H
+
 /* Define to 1 if system has working FIFO's */
 #undef HAVE_FIFOS
 
-/* Define to 1 if struct rlimit use quad_t */
+/* Define to 1 if struct rlimit uses quad_t */
 #undef RLIM_T_IS_QUAD_T
 
-/* Define to 1 if rlimit use unsigned */
+/* Define to 1 if struct rlimit uses long long */
+#undef RLIM_T_IS_LONG_LONG
+
+/* Define to 1 if rlimit uses unsigned */
 #undef RLIM_T_IS_UNSIGNED
 
 /* Define to the type used in struct rlimit */
@@ -207,6 +233,21 @@
 
 /* Define to 1 if /bin/sh does not interpret \ escape sequences */
 #undef SH_USE_BSD_ECHO
+
+/* Define to 1 if system has working link() */
+#undef HAVE_LINK
+
+/* Define to 1 if kill(pid, 0) doesn't return ESRCH, ie BeOS R4.51 */
+#undef BROKEN_KILL_ESRCH
+
+/* Define to 1 if sigsuspend() is broken, ie BeOS R4.51 */
+#undef BROKEN_POSIX_SIGSUSPEND
+
+/* Define to 1 if getpwnam() is faked, ie BeOS R4.51 */
+#undef GETPWNAM_FAKED
+
+/* Define to 1 if tcsetpgrp() doesn't work, ie BeOS R4.51 */
+#undef BROKEN_TCSETPGRP
 
 /* Define to 1 if an underscore has to be prepended to dlsym() argument */
 #undef DLSYM_NEEDS_UNDERSCORE
@@ -219,3 +260,35 @@
 
 /* Define to 1 if you want to use dynamically loaded modules */
 #undef DYNAMIC
+
+/* Define to 1 if you want to use dynamically loaded modules on AIX */
+#undef AIXDYNAMIC
+
+/* Define to 1 if you want to use dynamically loaded modules on HPUX 10 */
+#undef HPUXDYNAMIC
+
+/* Define to `unsigned long' if <sys/types.h> doesn't define. */
+#undef ino_t
+
+/*
+ * Definitions used when a long is less than eight byte, to try to
+ * provide some support for eight byte operations.
+ *
+ * Note that ZSH_64_BIT_TYPE, OFF_T_IS_64_BIT, INO_T_IS_64_BIT do *not* get
+ * defined if long is already 64 bits, since in that case no special handling
+ * is required.
+ */
+/* Define to 1 if long is 64 bits */
+#undef LONG_IS_64_BIT
+
+/* Define to a 64 bit integer type if there is one, but long is shorter */
+#undef ZSH_64_BIT_TYPE
+
+/* Define to an unsigned variant of ZSH_64_BIT_TYPE if that is defined */
+#undef ZSH_64_BIT_UTYPE
+
+/* Define to 1 if off_t is 64 bit (for large file support) */
+#undef OFF_T_IS_64_BIT
+
+/* Define to 1 if ino_t is 64 bit (for large file support) */
+#undef INO_T_IS_64_BIT
