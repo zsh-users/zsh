@@ -208,9 +208,10 @@ ZTST_execchunk() {
   options=($ZTST_testopts)
   eval "$ZTST_code"
   ZTST_status=$?
+  # careful... ksh_arrays may be in effect.
+  ZTST_testopts=(${(kv)options[*]})
+  options=(${ZTST_mainopts[*]})
   ZTST_verbose 2 "ZTST_execchunk: status $ZTST_status"
-  ZTST_testopts=(${(kv)options})
-  options=($ZTST_mainopts)
   return $ZTST_status
 }
 
