@@ -127,6 +127,7 @@ variables:
   - autoinfixconds  infix condition codes defined by the module, for
                     autoloading (without the leading `-')
   - autoprefixconds like autoinfixconds, but for prefix condition codes
+  - autoparams      parameters defined by the module, for autoloading
   - objects         .o files making up this module (*must* be defined)
   - proto           .pro files for this module (default generated from $objects)
   - headers         extra headers for this module (default none)
@@ -137,7 +138,7 @@ Be sure to put the values in quotes. For further enlightenment have a
 look at the `mkmakemod.sh' script in the Src directory of the
 distribution.
 
-Modules have to define four functions which will automatically called
+Modules have to define four functions which will be called automatically
 by the zsh core. The first one, named `setup_foo' for a module named
 `foo', should set up any data needed in the module, at least any data
 other modules may be interested in. The second one, named `boot_foo',
@@ -322,6 +323,78 @@ almost exactly the same as for builtins, using the functions
 
 Arguments and return values are the same as for the functions for
 builtins.
+
+For defining parameters, a module can call `createparam()' directly or 
+use a table to describe them, e.g.:
+
+  static struct paramdef patab[] = {
+    PARAMDEF("foo", PM_INTEGER, NULL, get_foo, set_foo, unset_foo),
+    INTPARAMDEF("exint", &intparam),
+    STRPARAMDEF("exstr", &strparam),
+    ARRPARAMDEF("exarr", &arrparam),
+  };
+
+There are four macros used:
+
+  - PARAMDEF() gets as arguments:
+    - the name of the parameter
+    - the parameter flags to set for it (from the PM_* flags defined
+      in zsh.h)
+    - optionally a pointer to a variable holding the value of the
+      parameter
+    - three functions that will be used to get the value of the
+      parameter, store a value in the parameter, and unset the
+      parameter
+  - the other macros provide simple ways to define the most common
+    types of parameters; they get the name of the parameter and a
+    pointer to a variable holding the value as arguments; they are
+    used to define integer-, scalar-, and array-parameters, so the
+    variables whose addresses are given should be of type `long',
+    `char *', and `char **', respectively
+
+For a description of how to write functions for getting or setting the 
+value of parameters, or how to write a function to unset a parameter,
+see the description of the following functions in the `params.c' file:
+
+  - `intvargetfn()' and `intvarsetfn()' for integer parameters
+  - `strvargetfn()' and `strvarsetfn()' for scalar parameters
+  - `arrvargetfn()' and `arrvarsetfn()' for array parameters
+  - `stdunsetfn()' for unsetting parameters
+
+Note that if one defines parameters using the last two macros (for
+scalars and arrays), the variable holding the value should be
+initialized to either `NULL' or to a a piece of memory created with
+`zalloc()'. But this memory should *not* be freed in the
+finish-function of the module because that will be taken care of by
+the `deleteparamdefs()' function described below.
+
+To register the parameters in the zsh core, the function
+`addparamdefs()' is called as in:
+
+  /**/
+  int
+  boot_example(Module m)
+  {
+    int ret;
+
+    ret = addparamdefs(m->nam, patab, sizeof(patab)/sizeof(*patab))
+    ...
+  }
+
+The arguments and the return value are as for the functions used to
+add builtins and condition codes and like these, it should be called
+in the boot-function of the module. To remove the parameters defined,
+the function `deleteparamdefs()' should be called, again with the same 
+arguments and the same return value as for the functions to remove
+builtins and condition codes:
+
+  /**/
+  int
+  cleanup_example(Module m)
+  {
+    deleteparamdefs(m->nam, patab, sizeof(patab)/sizeof(*patab));
+    ...
+  }
 
 Finally, modules can define wrapper functions. These functions are
 called whenever a shell function is to be executed.
