@@ -53,7 +53,7 @@ else
 fi
 
 if [[ -n $pats ]]; then
-  local end
+  local end num
 
   while (( $# )); do
     end=$argv[(i)--]
@@ -84,13 +84,18 @@ if [[ -n $pats ]]; then
     (( $#files )) || files=( ${zwc%.zwc} )
 
     if [[ -f $zwc ]]; then
-      re=
-      for file in $files; do
-        if [[ $file -nt $zwc ]]; then
-          re=yes
-	  break
-        fi
-      done
+      num=$(zcompile -t $zwc | wc -l)
+      if [[ num-1 -ne $#files ]]; then
+        re=yes
+      else
+        re=
+        for file in $files; do
+          if [[ $file -nt $zwc ]]; then
+            re=yes
+	    break
+          fi
+        done
+      fi
     else
       re=yes
     fi

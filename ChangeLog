@@ -1,5 +1,8 @@
 2000-05-02  Sven Wischnowsky  <wischnow@informatik.hu-berlin.de>
 
+	* 11061: Functions/Misc/zrecompile: make zrecompile detect deleted
+ 	and new files
+	
 	* 11060: Doc/Zsh/compsys.yo: two more doc fixes
 	
 2000-05-02  Peter Stephenson  <pws@cambridgesiliconradio.com>
