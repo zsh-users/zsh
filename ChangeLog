@@ -1,3 +1,8 @@
+2001-11-29  Clint Adams  <clint@zsh.org>
+
+        * 16292: Completion/Unix/Command/.distfiles,
+        Completion/Unix/Command/_rsync: completion for rsync.
+
 2001-11-26  Clint Adams  <clint@zsh.org>
 
         * Gergely Nagy: 16291: Completion/Debian/Command/_dupload:
