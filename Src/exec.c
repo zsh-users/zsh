@@ -981,13 +981,11 @@ execpline(Estate state, wordcode slcode, int how, int last1)
 		    makerunning(jn);
 		}
 		if (!(jn->stat & STAT_LOCKED))
-		    waitjobs();
-
-		if (list_pipe_job && jobtab[list_pipe_job].procs &&
-		    !(jobtab[list_pipe_job].stat & STAT_STOPPED)) {
-		    child_unblock();
-		    child_block();
-		}
+		    waitjobs();      /* Implicit child_unblock() */
+		else if (list_pipe_job && jobtab[list_pipe_job].procs &&
+		    !(jobtab[list_pipe_job].stat & STAT_STOPPED))
+		    child_unblock(); /* Permit job table update */
+		child_block();       /* Freeze job table again */
 		if (list_pipe_child &&
 		    jn->stat & STAT_DONE &&
 		    lastval2 & 0200)
