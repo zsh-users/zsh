@@ -709,9 +709,15 @@ parse_cadef(char *nam, char **args)
 			p++;
 		    } else if (*p == '*') {
 			if (*++p != ':') {
-			    for (end = ++p; *p && *p != ':'; p++)
+			    char sav;
+
+			    for (end = p++; *p && *p != ':'; p++)
 				if (*p == '\\' && p[1])
 				    p++;
+			    sav = *p;
+			    *p = '\0';
+			    end = dupstring(end);
+			    *p = sav;
 			}
 			if (*p != ':') {
 			    freecadef(ret);
@@ -735,6 +741,8 @@ parse_cadef(char *nam, char **args)
 		    /* And the definition. */
 
 		    *oargp = parse_caarg(!rest, atype, oanum++, name, &p);
+		    if (end)
+			(*oargp)->end = ztrdup(end);
 		    oargp = &((*oargp)->next);
 		    if (rest)
 			break;
@@ -1081,6 +1089,7 @@ ca_parse_line(Cadef d)
 		if (state.def->end && pattry(endpat, line)) {
 		    state.def = NULL;
 		    state.curopt = NULL;
+		    state.opt = state.arg = 1;
 		    continue;
 		}
 	    } else if ((state.def = state.def->next))
@@ -1218,12 +1227,15 @@ ca_parse_line(Cadef d)
 		    for (; line; line = compwords[cur++])
 			addlinknode(l, ztrdup(line));
 		} LASTALLOC;
-		memcpy(&ca_laststate, &state, sizeof(state));
+		if (cur < compcurrent)
+		    memcpy(&ca_laststate, &state, sizeof(state));
 		ca_laststate.ddef = NULL;
 		ca_laststate.doff = 0;
 		break;
 	    }
-	}
+	} else if (state.def && state.def->end)
+	    endpat = patcompile(state.def->end, 0, NULL);
+
 	/* Copy the state into the global one. */
 
 	if (cur + 1 == compcurrent) {
