@@ -1,3 +1,8 @@
+2001-05-02  Sven Wischnowsky  <wischnow@zsh.org>
+
+	* 14197: Completion/Base/Completer/_expand: missing star in
+	suffix-style test pattern
+
 2001-05-01  Peter Stephenson  <pws@csr.com>
 
 	* 14181: Src/params.c: follow-up to 14151: use BDIGBUFSIZE in
