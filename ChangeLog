@@ -1,3 +1,8 @@
+2004-03-11  Clint Adams  <clint@zsh.org>
+
+	* 19604: Completion/Unix/Command/_vux: completion for vux
+	and vuxctl.
+
 2004-03-11  Peter Stephenson  <pws@csr.com>
 
 	* 19603: Test/Y01completion.ztst, Test/Y02compmatch.ztst,
