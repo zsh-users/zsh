@@ -1,5 +1,8 @@
 2001-08-07  Peter Stephenson  <pws@csr.com>
 
+	* 15586: Src/subst.c, Doc/Zsh/expn.yo: remove =alias expansion,
+	so `=' only expands pathnames.  Hooray!
+
 	* 15585: Doc/Zsh/contrib.yo, Functions/Zle/bash-down-case-word,
 	Functions/Zle/bash-up-case-word: two new Zle functions with
 	bash-style word boundaries.

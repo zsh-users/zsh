@@ -414,15 +414,9 @@ filesubstr(char **namptr, int assign)
 	sav = *pp;
 	*pp = 0;
 	if (!(cnam = findcmd(str + 1, 1))) {
-	    Alias a = (Alias) aliastab->getnode(aliastab, str + 1);
-	    
-	    if (a)
-		cnam = a->text;
-	    else {
-		if (isset(NOMATCH))
-		    zerr("%s not found", str + 1, 0);
-		return 0;
-	    }
+	    if (isset(NOMATCH))
+		zerr("%s not found", str + 1, 0);
+	    return 0;
 	}
 	*namptr = dupstring(cnam);
 	if (sav) {

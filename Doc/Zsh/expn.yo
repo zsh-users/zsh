@@ -1092,11 +1092,9 @@ tt($OLDPWD) are never abbreviated in this fashion.
 If a word begins with an unquoted `tt(=)'
 and the tt(EQUALS) option is set,
 the remainder of the word is taken as the
-name of a command or alias.  If a command
+name of a command.  If a command
 exists by that name, the word is replaced
 by the full pathname of the command.
-If an alias exists by that name, the word
-is replaced with the text of the alias.
 
 Filename expansion is performed on the right hand side of a parameter
 assignment, including those appearing after commands of the
