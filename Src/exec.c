@@ -932,6 +932,7 @@ execpline(Estate state, wordcode slcode, int how, int last1)
     } else {
 	if (newjob != lastwj) {
 	    Job jn = jobtab + newjob;
+	    int updated;
 
 	    if (newjob == list_pipe_job && list_pipe_child)
 		_exit(0);
@@ -980,12 +981,18 @@ execpline(Estate state, wordcode slcode, int how, int last1)
 		    jn->stat |= STAT_NOPRINT;
 		    makerunning(jn);
 		}
-		if (!(jn->stat & STAT_LOCKED))
-		    waitjobs();      /* Implicit child_unblock() */
-		else if (list_pipe_job && jobtab[list_pipe_job].procs &&
-		    !(jobtab[list_pipe_job].stat & STAT_STOPPED))
-		    child_unblock(); /* Permit job table update */
-		child_block();       /* Freeze job table again */
+		if (!(jn->stat & STAT_LOCKED)) {
+		    updated = !!jobtab[thisjob].procs;
+		    waitjobs();
+		    child_block();
+		} else
+		    updated = 0;
+		if (!updated &&
+		    list_pipe_job && jobtab[list_pipe_job].procs &&
+		    !(jobtab[list_pipe_job].stat & STAT_STOPPED)) {
+		    child_unblock();
+		    child_block();
+		}
 		if (list_pipe_child &&
 		    jn->stat & STAT_DONE &&
 		    lastval2 & 0200)
