@@ -486,7 +486,7 @@ is set to tt(LPAR())var(a b c)tt(RPAR()), are substituted with
 Internally, each such expansion is converted into the
 equivalent list for brace expansion.  E.g., tt(${^var}) becomes
 tt({$var[1],$var[2],)...tt(}), and is processed as described in
-noderef(Brace Expansion) above.
+noderef(Brace Expansion) below.
 If word splitting is also in effect the
 tt($var[)var(N)tt(]) may themselves be split into different list
 elements.
@@ -948,6 +948,14 @@ In that case, it is expanded to a sorted list of the individual
 characters between the braces, in the manner of a search set.
 `tt(-)' is treated specially as in a search set, but `tt(^)' or `tt(!)' as
 the first character is treated normally.
+
+Note that brace expansion is not part of filename generation (globbing); an
+expression such as tt(*/{foo,bar}) is split into two separate words
+tt(*/foo) and tt(*/bar) before filename generation takes place.  In
+particular, note that this is liable to produce a `no match' error if
+em(either) of the two expressions does not match; this is to be contrasted
+with tt(*/(foo|bar)), which is treated as a single pattern but otherwise
+has similar effects.
 texinode(Filename Expansion)(Filename Generation)(Brace Expansion)(Expansion)
 sect(Filename Expansion)
 cindex(filename expansion)
@@ -1099,9 +1107,9 @@ If the tt(KSH_GLOB) option is set, then a
 the `tt(LPAR())' is treated specially, as detailed below. The option
 tt(SH_GLOB) prevents bare parentheses from being used in this way, though
 the tt(KSH_GLOB) option is still available.
-Note that grouping cannot currently extend over multiple directories:
-a `tt(/)' separating a directory terminates processing of the current
-group; processing resumes after the end of the group.
+Note that grouping cannot extend over multiple directories: it is an error
+to have a `tt(/)' within a group (this only applies for patterns which
+match filenames).
 )
 item(var(x)tt(|)var(y))(
 Matches either var(x) or var(y).
@@ -1290,7 +1298,10 @@ subsect(Recursive Globbing)
 A pathname component of the form `tt(LPAR())var(foo)tt(/RPAR()#)'
 matches a path consisting of zero or more directories
 matching the pattern var(foo).
-As a shorthand, `tt(**/)' is equivalent to `tt((*/)#)'.
+
+As a shorthand, `tt(**/)' is equivalent to `tt((*/)#)'; note that this
+therefore matches files in the current directory as well as
+subdirectories.
 Thus:
 
 example(ls (*/)#bar)
@@ -1299,8 +1310,11 @@ or
 
 example(ls **/bar)
 
-does a recursive directory search for files named `tt(bar)', not following
-symbolic links.  To follow links, use `tt(***/)'.
+does a recursive directory search for files named `tt(bar)' (potentially
+including the file `tt(bar)' in the current directory), not following
+symbolic links.  To follow links, use `tt(***/)'.  Neither of these can be
+combined with other forms of globbing within the same filename segment; in
+that case, the `tt(*)' operators revert to their usual effect.
 subsect(Glob Qualifiers)
 cindex(globbing, qualifiers)
 cindex(qualifiers, globbing)
