@@ -48,7 +48,7 @@ bin_cap(char *nam, char **argv, char *ops, int func)
 	    ret = 1;
 	}
     } else {
-	char *result;
+	char *result = NULL;
 	ssize_t length;
 	caps = cap_get_proc();
 	if(caps)
@@ -59,7 +59,7 @@ bin_cap(char *nam, char **argv, char *ops, int func)
 	} else
 	    puts(result);
     }
-    cap_free(&caps);
+    cap_free(caps);
     return ret;
 }
 
@@ -69,7 +69,7 @@ bin_getcap(char *nam, char **argv, char *ops, int func)
     int ret = 0;
 
     do {
-	char *result;
+	char *result = NULL;
 	ssize_t length;
 	cap_t caps = cap_get_file(*argv);
 	if(caps)
@@ -79,7 +79,7 @@ bin_getcap(char *nam, char **argv, char *ops, int func)
 	    ret = 1;
 	} else
 	    printf("%s %s\n", *argv, result);
-	cap_free(&caps);
+	cap_free(caps);
     } while(*++argv);
     return ret;
 }
@@ -102,7 +102,7 @@ bin_setcap(char *nam, char **argv, char *ops, int func)
 	    ret = 1;
 	}
     } while(*++argv);
-    cap_free(&caps);
+    cap_free(caps);
     return ret;
 }
 
