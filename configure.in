@@ -826,7 +826,8 @@ AC_CHECK_FUNCS(strftime difftime gettimeofday \
 	       mmap munmap msync \
 	       cap_get_proc \
 	       getrlimit \
-	       setlocale)
+	       setlocale \
+	       uname)
 AC_FUNC_STRCOLL
 
 if test $ac_cv_func_setpgrp = yes; then

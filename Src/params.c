@@ -453,6 +453,10 @@ createparamtable(void)
     char **new_environ, **envp, **envp2, **sigptr, **t;
     char buf[50], *str, *iname;
     int num_env, oae = opts[ALLEXPORT];
+#ifdef HAVE_UNAME
+    struct utsname unamebuf;
+    char *machinebuf;
+#endif
 
     paramtab = realparamtab = newparamtable(151, "paramtab");
 
@@ -538,7 +542,17 @@ createparamtable(void)
 
     /* Add the standard non-special parameters */
     set_pwd_env();
+#ifdef HAVE_UNAME
+    if(uname(&unamebuf)) setsparam("MACHTYPE", ztrdup(MACHTYPE));
+    else
+    {
+       machinebuf = ztrdup(unamebuf.machine);
+       setsparam("MACHTYPE", machinebuf);
+    }
+	
+#else
     setsparam("MACHTYPE", ztrdup(MACHTYPE));
+#endif
     setsparam("OSTYPE", ztrdup(OSTYPE));
     setsparam("TTY", ztrdup(ttystrname));
     setsparam("VENDOR", ztrdup(VENDOR));
