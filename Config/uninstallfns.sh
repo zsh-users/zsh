@@ -11,18 +11,20 @@ for file in $FUNCTIONS_INSTALL; do
   fi
 done
 
+fndir=$DESTDIR$fndir
+
 for file in $install; do
   if test -f $sdir/$file; then
     if test x$FUNCTIONS_SUBDIRS != x -a x$FUNCTIONS_SUBDIRS != xno; then
-      rm -f $DESTDIR$fndir/$file;
-      if test -f $DESTDIR$fndir.old/$file; then
-	mv $DESTDIR$fndir.old/$file $DESTDIR$fndir/$file
+      rm -f $fndir/$file;
+      if test -f $fndir.old/$file; then
+	mv $fndir.old/$file $fndir/$file
       fi
     else
       bfile="`echo $file | sed -e 's%^.*/%%'`"
-      rm -f "$DESTDIR$fndir/$bfile"; \
-      if test -f $DESTDIR$fndir.old/$bfile; then
-        mv $DESTDIR$fndir.old/$bfile $DESTDIR$fndir/$bfile
+      rm -f "$fndir/$bfile"; \
+      if test -f $fndir.old/$bfile; then
+        mv $fndir.old/$bfile $fndir/$bfile
       fi
     fi
   fi

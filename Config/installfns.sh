@@ -1,10 +1,12 @@
 #!/bin/sh
 
-if test -d $DESTDIR$fndir.old; then
+fndir=$DESTDIR$fndir
+
+if test -d $fndir.old; then
   add_old=1
 fi
 
-$sdir_top/mkinstalldirs $DESTDIR$fndir || exit 1;
+$sdir_top/mkinstalldirs $fndir || exit 1;
 
 # If the source directory is somewhere else, we need to force
 # the shell to expand it in that directory, then strip it off.
@@ -22,17 +24,17 @@ for file in $install; do
     if test x$FUNCTIONS_SUBDIRS != x -a x$FUNCTIONS_SUBDIRS != xno; then
       subfile="$file"
       subdir="`echo $file | sed -e 's%/[^/]*$%%'`"
-      olddir="$DESTDIR$fndir.old/$subdir"
-      instdir="$DESTDIR$fndir/$subdir"
+      olddir="$fndir.old/$subdir"
+      instdir="$fndir/$subdir"
     else
       subfile="`echo $file | sed -e 's%^.*/%%'`"
-      olddir="$DESTDIR$fndir.old"
-      instdir="$DESTDIR$fndir"
+      olddir="$fndir.old"
+      instdir="$fndir"
     fi
-    if test -f $DESTDIR$fndir/$subfile; then
-      if cmp $DESTDIR$fndir/$subfile $sdir/$file >/dev/null; then :; else
+    if test -f $fndir/$subfile; then
+      if cmp $fndir/$subfile $sdir/$file >/dev/null; then :; else
 	$sdir_top/mkinstalldirs $olddir
-        mv $DESTDIR$fndir/$subfile $olddir
+        mv $fndir/$subfile $olddir
         : ${add_old:=1}
       fi
     fi
@@ -42,7 +44,7 @@ for file in $install; do
 done
 
 if test x$add_old != x1; then
-  rm -rf $DESTDIR$fndir.old
+  rm -rf $fndir.old
 fi
 
 exit 0
