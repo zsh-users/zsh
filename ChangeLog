@@ -1,3 +1,8 @@
+2001-08-07  Wayne Davison  <wayned@users.sourceforge.net>
+
+	* users/4092: Src/hist.c: Don't lose the last history line
+	when a signal causes us to rewrite the history file.
+
 2001-08-07  Oliver Kiddle  <opk@zsh.org>
 
 	* 15594: Completion/Zsh/Context/_value,
