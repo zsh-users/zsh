@@ -74,10 +74,10 @@ _mailbox_cache () {
     _mutt_cache=( ${=${(M)${(f)"$(<${~muttrc})"}:#mailboxes *}#mailboxes *} )
 
 
-  _mbox_cache=( ${~maildirectory}/*(^/) )
-  _pine_cache=( ${~pinedirectory}/**/*(.) )
+  _mbox_cache=( ${~maildirectory}/*(N^/) )
+  _pine_cache=( ${~pinedirectory}/**/*(N.) )
 
-  dirboxes=( ${~maildirectory}/*(/) )
+  dirboxes=( ${~maildirectory}/*(N/) )
 
   while (( $#dirboxes )); do
     i=${dirboxes[1]}
@@ -87,7 +87,7 @@ _mailbox_cache () {
     elif j=( "$i"/<1-> ) && [[ -n "$j" ]]; then
       _mh_cache=( "${_mh_cache[@]}" "$i" )
     else
-      _mbox_cache=( "${_mbox_cache[@]}" "$i"/*(.) )
+      _mbox_cache=( "${_mbox_cache[@]}" "$i"/*(N.) )
       dirboxes=( $dirboxes "$i"/*(/) )
     fi
   done

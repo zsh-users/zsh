@@ -1,7 +1,7 @@
 #compdef gcc
 
-local state line ret=1 expl args
-typeset -A options
+local curcontext="$curcontext" state line ret=1 expl args
+typeset -A opt_args
 
 args=()
 case $MACHTYPE in
@@ -163,7 +163,7 @@ h8/300)
 esac
 
 
-_arguments -M 'L:|-{fW}no-=-{fW} r:|[_-]=* r:|=*' \
+_arguments -C -M 'L:|-{fW}no-=-{fW} r:|[_-]=* r:|=*' \
   "$args[@]" \
   -c -S -E -v -a -w -C -H -P -s '(-pg)-p' '(-p)-pg' \
   '-o:output file:_files' \
@@ -273,8 +273,8 @@ dump)
     'p[annotate assembler output]' && ret=0
   ;;
 library)
-  _description expl library
-  compadd "$expl[@]" - ${^=LD_LIBRARY_PATH:-/usr/lib /usr/local/lib}/lib*.(a|so*)(:t:fr:s/lib//) && ret=0
+  _wanted libraries expl library \
+      compadd - ${^=LD_LIBRARY_PATH:-/usr/lib /usr/local/lib}/lib*.(a|so*)(N:t:fr:s/lib//) && ret=0
   ;;
 esac
 

@@ -1,3 +1,10 @@
+2000-09-07  Sven Wischnowsky  <wischnow@zsh.org>
+
+	* 12768: as suggested by Andrej (12767): Completion/Bsd/_bsd_pkg,
+	Completion/Bsd/_kld, Completion/User/_gcc, Completion/User/_gdb,
+ 	Completion/User/_mailboxes, Completion/User/_zdump: stick some
+ 	`N's into glob patterns
+	
 2000-09-06  Bart Schaefer  <schaefer@zsh.org>
 
 	* 12765,12766: Doc/Zsh/builtins.yo, Doc/Zsh/contrib.yo: Eliminate
