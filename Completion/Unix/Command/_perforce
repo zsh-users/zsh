@@ -237,20 +237,6 @@ _perforce() {
 	return
     fi
 
-    if (( ! ${#_perforce_cmd_list} )); then
-	(( ${+_perforce_cmd_list} )) || typeset -ga _perforce_cmd_list
-	local hline
-	# Output looks like <tab>command-name<space>description in words...
-	# Ignore blank lines and the heading line beginning `Perforce...'
-	# Just gets run once, then cached, so don't bother optimising
-	# this to a grossly unreadable parameter substitution.
-	_call_program help-commands p4 help commands | while read -A hline; do
-	    (( ${#hline} < 2 )) && continue
-	    [[ $hline[1] = (#i)perforce ]] && continue
-	    _perforce_cmd_list+=("${hline[1]}:${hline[2,-1]}")
-	done
-    fi
-
     # If we are given a service of the form p4-cmd, treat this
     # as if it was after `p4 cmd'.  This provides an easy way in
     # for scripts and functions that emulate the behaviour of
@@ -277,6 +263,14 @@ _perforce() {
 	    break
 	fi
     done
+
+    # If we are at or after the command word, remember the
+    # global arguments to p4 as we will need to pass these down
+    # when generating completion lists.
+    local -a _perforce_global_options
+    if (( i <= CURRENT && i > 2 )); then
+	_perforce_global_options=(${words[2,i-1]})
+    fi
 
     if (( i >= CURRENT )); then
 	_arguments -s : \
@@ -305,8 +299,37 @@ _perforce() {
 # Command and argument dispatchers
 #
 
+# Front end to _call_program to add in the global arguments
+# passed to p4.
+(( $+functions[_perforce_call_p4] )) ||
+_perforce_call_p4() {
+    local cp_tag=$1
+    shift
+    _call_program $cp_tag p4 "${_perforce_global_options[@]}" "$@"
+}
+
+
+# The list of commands is cached in _perforce_cmd_list, but we
+# only generate it via this function when we need it.
+(( $+functions[_perforce_gen_cmd_list] )) ||
+_perforce_gen_cmd_list() {
+    (( ${+_perforce_cmd_list} )) || typeset -ga _perforce_cmd_list
+    local hline
+    # Output looks like <tab>command-name<space>description in words...
+    # Ignore blank lines and the heading line beginning `Perforce...'
+    # Just gets run once, then cached, so don't bother optimising
+    # this to a grossly unreadable parameter substitution.
+    _perforce_call_p4 help-commands help commands | while read -A hline; do
+	(( ${#hline} < 2 )) && continue
+	[[ $hline[1] = (#i)perforce ]] && continue
+	_perforce_cmd_list+=("${hline[1]}:${hline[2,-1]}")
+    done
+}
+
+
 (( $+functions[_perforce_commands] )) ||
 _perforce_commands() {
+    (( ${#_perforce_cmd_list} )) || _perforce_gen_cmd_list
     _describe -t p4-commands 'Perforce command' _perforce_cmd_list
 }
 
@@ -331,7 +354,7 @@ _perforce_command_args() {
 _perforce_branches() {
     local bline match mbegin mend
     local -a bl
-    bl=(${${${(f)"$(_call_program branches p4 branches 2>/dev/null)"}##Branch }/ /:})
+    bl=(${${${(f)"$(_perforce_call_p4 branches branches 2>/dev/null)"}##Branch }/ /:})
     [[ $#bl -eq 1 && $bl[1] = '' ]] && bl=()
     (( $#bl )) && _describe -t branches 'Perforce branch' bl
 }
@@ -351,7 +374,7 @@ _perforce_changes() {
 	 [[ $PREFIX = (|*[^[:digit:]])(#b)(<->) ]] && num+=$match[1]
 	 [[ $SUFFIX = (#b)(<->)* ]] && num+=$match[1]
 	 if [[ -n $num ]]; then
-	     _message -r "$(_call_program describe p4 describe $num)"
+	     _message -r "$(_perforce_call_p4 describe describe $num)"
 	     return 0
 	 fi
     elif [[ ${NUMERIC:-0} -gt 0 ]]; then
@@ -385,7 +408,7 @@ _perforce_changes() {
     # Limit to the 20 most recent changes by default to avoid huge
     # output.
     cl=(
-${${${${(f)"$(_call_program changes p4 changes -m ${max:-20} $cstatus \$file)"}##Change\ }//\ on\ /:}/\ by\ /\ }
+${${${${(f)"$(_perforce_call_p4 changes changes -m ${max:-20} $cstatus \$file)"}##Change\ }//\ on\ /:}/\ by\ /\ }
 "default:change not yet numbered")
     [[ $#cl -eq 1 && $cl[1] = '' ]] && cl=()
     _describe -t changes "${ctype}change" cl $comma
@@ -410,7 +433,7 @@ _perforce_clients() {
 	compset -P '//' && slash=(-S/ -q)
     fi
 
-    cl=(${${${(f)"$(_call_program clients p4 clients)"}##Client\ }/\ /:})
+    cl=(${${${(f)"$(_perforce_call_p4 clients clients)"}##Client\ }/\ /:})
     [[ $#cl -eq 1 && $cl[1] = '' ]] && cl=()
     _describe -t clients 'Perforce client' cl $slash
 }
@@ -421,7 +444,7 @@ _perforce_counters() {
     local cline match mbegin mend
     local -a cl
 
-    cl=(${${${(f)"$(_call_program counters p4 counters)"}/\ /:}/\=/current value})
+    cl=(${${${(f)"$(_perforce_call_p4 counters counters)"}/\ /:}/\=/current value})
     [[ $#cl -eq 1 && $cl[1] = '' ]] && cl=()
     _describe -t counters 'Perforce counter' cl
 }
@@ -430,7 +453,7 @@ _perforce_counters() {
 (( $+functions[_perforce_counter_values] )) ||
 _perforce_counter_values() {
     if [[ -n $words[CURRENT-1] ]]; then
-	 local value="$(_call_program counter p4 counter $words[CURRENT-1] 2>/dev/null)"
+	 local value="$(_perforce_call_p4 counter counter $words[CURRENT-1] 2>/dev/null)"
 	 if [[ -n $value ]]; then
 	     # No space.  This allows stuff like incarg and decarg.
 	     compstate[insert]=1
@@ -485,7 +508,7 @@ _perforce_depots() {
     local dline match mbegin mend max
     local -a dl
 
-    dl=(${${${(f)"$(_call_program depots p4 depots)"}##Depot\ }/\ /:})
+    dl=(${${${(f)"$(_perforce_call_p4 depots depots)"}##Depot\ }/\ /:})
     [[ $#dl -eq 1 && $dl[1] = '' ]] && dl=()
     _describe -t depots 'depot name' dl
 }
@@ -533,7 +556,7 @@ _perforce_integrated_files() {
     local -a files
 
     compset -P '*/'
-    files=(${${${(f)"$(_call_program integrated p4 integrated \"\$pfx\*\$\{\(Q\)SUFFIX\}\" 2>/dev/null)"}%\#*}##*/})
+    files=(${${${(f)"$(_perforce_call_p4 integrated integrated \"\$pfx\*\$\{\(Q\)SUFFIX\}\" 2>/dev/null)"}%\#*}##*/})
     [[ $#files -eq 1 && $files[1] = '' ]] && files=()
     compadd "$@" -a files
 }
@@ -545,7 +568,7 @@ _perforce_opened_files() {
     local -a files
 
     compset -P '*/'
-    files=(${${${(f)"$(_call_program opened p4 opened \"\$pfx\*\$\{\(Q\)SUFFIX\}\" 2>/dev/null)"}%\#*}##*/})
+    files=(${${${(f)"$(_perforce_call_p4 opened opened \"\$pfx\*\$\{\(Q\)SUFFIX\}\" 2>/dev/null)"}%\#*}##*/})
     [[ $#files -eq 1 && $files[1] = '' ]] && files=()
     compadd "$@" -a files
 }
@@ -557,7 +580,7 @@ _perforce_resolved_files() {
     local -a files
 
     compset -P '*/'
-    files=(${${${(f)"$(_call_program resolved p4 resolved \"\$pfx\*\$\{\(Q\)SUFFIX\}\" 2>/dev/null)"}%\#*}##*/})
+    files=(${${${(f)"$(_perfroce_call_p4 resolved resolved \"\$pfx\*\$\{\(Q\)SUFFIX\}\" 2>/dev/null)"}%\#*}##*/})
     [[ $#files -eq 1 && $files[1] = '' ]] && files=()
     compadd "$@" -a files
 }
@@ -578,7 +601,7 @@ _perforce_depot_dirs() {
     local -a files
 
     compset -P '*/'
-    files=(${"${(f)$(_call_program dirs p4 dirs \"\$pfx\*\$\{\(Q\)SUFFIX\}\" 2>/dev/null)}"##*/})
+    files=(${"${(f)$(_perforce_call_p4 dirs dirs \"\$pfx\*\$\{\(Q\)SUFFIX\}\" 2>/dev/null)}"##*/})
     [[ $#files -eq 1 && $files[1] = '' ]] && files=()
     compadd "$@" -S / -q -a files
 }
@@ -590,7 +613,7 @@ _perforce_depot_files() {
     local -a files
 
     compset -P '*/'
-    files=(${${${(f)"$(_call_program files p4 files \"\$pfx\*\$\{\(Q\)SUFFIX\}\" 2>/dev/null)"}%\#*}##*/})
+    files=(${${${(f)"$(_perforce_call_p4 files files \"\$pfx\*\$\{\(Q\)SUFFIX\}\" 2>/dev/null)"}%\#*}##*/})
     [[ $#files -eq 1 && $files[1] = '' ]] && files=()
     compadd "$@" -R _perforce_file_suffix -a files
 }
@@ -619,7 +642,7 @@ _perforce_client_dirs() {
 	typeset -gA _perforce_client_list
 	local -a tmplist
 	local tmpelt
-	tmplist=(${${${(f)"$(_call_program clients p4 clients)"}##Client\ }%%\ *})
+	tmplist=(${${${(f)"$(_perforce_call_p4 clients clients)"}##Client\ }%%\ *})
 	[[ $#tmplist -eq 1 && $tmplist[1] = '' ]] && tmplist=()
 	for tmpelt in $tmplist; do
 	    _perforce_client_list[$tmpelt]=1
@@ -641,7 +664,7 @@ _perforce_client_dirs() {
     else
 	# We need to look at the View stanza of the client record
 	# to see what directories exist in the client view.
-	_call_program client "p4 client -o $client" 2>/dev/null | while read line; do
+	_perforce_call_p4 client "client -o $client" 2>/dev/null | while read line; do
 	    case $line in
 		([[:blank:]]##) type=
 			        ;;
@@ -785,7 +808,7 @@ _perforce_files() {
 	pfx="$match[1]"
 	pfx=${(e)~pfx}
 	omitpats=(
-	    ${${${${(f)"$(_call_program files p4 files \"\$pfx\*\$\{\(Q\)SUFFIX\}\" 2>/dev/null)"}%\#*}##*/}//(#m)[][*?()<|^~#\\]/\\$MATCH}
+	    ${${${${(f)"$(_perforce_call_p4 files files \"\$pfx\*\$\{\(Q\)SUFFIX\}\" 2>/dev/null)"}%\#*}##*/}//(#m)[][*?()<|^~#\\]/\\$MATCH}
 	)
 
 	[[ $#omitpats -eq 1 && $omitpats[1] = '' ]] && omitpats=()
@@ -859,7 +882,7 @@ _perforce_filetypes() {
 
 (( $+functions[_perforce_groups] )) ||
 _perforce_groups() {
-    _describe -t groups 'Perforce group' $(_call_program groups p4 groups)
+    _describe -t groups 'Perforce group' $(_perforce_call_p4 groups groups)
 }
 
 
@@ -884,13 +907,13 @@ _perforce_jobs() {
 	# prefix argument.  Instead of listing possible completions,
 	# show the full description for the job which is on the line at
 	# the moment.
-	_message -r "$(_call_program jobs p4 jobs -e \"Job=\$PREFIX\$SUFFIX\" -l 2>/dev/null)"
+	_message -r "$(_perforce_call_p4 jobs jobs -e \"Job=\$PREFIX\$SUFFIX\" -l 2>/dev/null)"
 	return 0
     elif [[ ${NUMERIC:-0} -gt 0 ]]; then
 	max=$NUMERIC
     fi
 
-    _call_program jobs p4 jobs -m ${max:-20} | while read jline; do
+    _perforce_call_p4 jobs jobs -m ${max:-20} | while read jline; do
 	if [[ $jline = (#b)([^[:blank:]]##)' '[^[:blank:]]##' '(*) ]]; then
 	    jl+=("${match[1]}:${match[2]}")
 	fi
@@ -921,7 +944,7 @@ _perforce_jobviews() {
 
     # According to the manual, `p4 jobspec' requires admin privileges.
     # If this is true even of `p4 jobspec -o', we are a bit screwed.
-    _call_program jobspec p4 jobspec -o 2>/dev/null | while read line; do
+    _perforce_call_p4 jobspec jobspec -o 2>/dev/null | while read line; do
 	case $line in
 	    ([[:blank:]]##) type=
 			    ;;
@@ -985,7 +1008,7 @@ _perforce_labels() {
     # May be completing after `@'.
     compset -P '*@'
 
-    _call_program labels p4 labels | while read lline; do
+    _perforce_call_p4 labels labels | while read lline; do
 	if [[ $lline = (#b)'Label '([^[:blank:]]##)' '(*) ]]; then
 	    ll+=("${match[1]}:${match[2]}")
 	fi
@@ -1016,7 +1039,7 @@ _perforce_revisions() {
     if [[ -z $PREFIX || $PREFIX = <-> ]]; then
 	# always allowed (same as none)
 	rl+=(0)
-	_call_program filelog 'p4 filelog $pfx' 2>/dev/null | while read rline; do
+	_perforce_call_p4 filelog 'filelog $pfx' 2>/dev/null | while read rline; do
 	    if [[ $rline = (#b)'... #'(<->)' change '(*) ]]; then
 		rl+=("${match[1]}:${match[2]}")
 	    fi
@@ -1038,7 +1061,7 @@ _perforce_statuses() {
     local jline match mbegin mend
     local -a statuses
 
-    _call_program jobspec p4 jobspec -o | while read jline; do
+    _perforce_call_p4 jobspec jobspec -o | while read jline; do
 	if [[ $jline = (#b)Status[[:blank:]]##(*/*) ]]; then
 	    statuses=(${(s./.)match[1]})
 	    break
@@ -1058,7 +1081,7 @@ _perforce_variables() {
     local line match mbegin mend expl
     local -a vars
 
-    _call_program help-environment p4 help environment | while IFS= read line; do
+    _perforce_call_p4 help-environment help environment | while IFS= read line; do
 	if [[ $line = $'\t'(#b)([A-Z][A-Z0-9_]##)* ]]; then
 	   vars+=($match[1])
 	fi
@@ -1361,8 +1384,9 @@ _perforce_cmd_help() {
     if (( ! ${#_perforce_help_list} )); then
 	(( ${+_perforce_help_list} )) || typeset -ga _perforce_help_list
 	# All commands have help.
+	(( ${#_perforce_cmd_list} )) || _perforce_gen_cmd_list
 	_perforce_help_list=($_perforce_cmd_list)
-	_call_program help p4 help | while read -A hline; do
+	_perforce_call_p4 help help | while read -A hline; do
 	    if [[ $hline[1] = p4 && $hline[2] = help ]]; then
 		_perforce_help_list+=("$hline[3]:${hline[4,-1]}")
 	    fi

@@ -1,3 +1,9 @@
+2003-08-19  Peter Stephenson  <pws@pwstephenson.fsnet.co.uk>
+
+	* 18948: Completion/Unix/Command/_perforce: Pass global
+	options via _call_command interface to commands that generate
+	completion lists.
+
 2003-08-16  Doug Kearns  <djkea2@mugca.its.monash.edu.au>
 
 	* 18944: Completion/Unix/Command/_ruby: update ruby completion for
