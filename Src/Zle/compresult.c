@@ -1114,7 +1114,7 @@ do_single(Cmatch m)
 	    inststrlen(" ", 1, 1);
 	    minfo.insc++;
 	    if (minfo.we)
-		makesuffix(1);
+		makesuffixstr(m->remf, m->rems, 1);
 	}
     }
     if (minfo.we && partest && isset(AUTOPARAMKEYS))

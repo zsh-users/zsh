@@ -575,6 +575,10 @@ suffix if the next character typed inserts anything but a digit. One extra
 backslash sequence is understood in this string: `tt(\-)' stands for
 all characters that insert nothing. Thus `tt(-S "=" -q)' is the same
 as `tt(-S "=" -r "= \t\n\-")'.
+
+This option may also be used without the tt(-S) option; then any
+automatically added space will be removed when one of the characters in the
+list is typed.
 )
 item(tt(-R) var(remove-func))(
 This is another form of the tt(-r) option. When a suffix 
