@@ -1400,11 +1400,13 @@ setpmnameddir(Param pm, char *value)
 #ifdef HAVE_PATHCONF
     int pathmax = 0;
 
+    errno = 0;
     pathmax = pathconf(value, _PC_PATH_MAX);
-    if (pathmax == -1) {
+    if ((pathmax == -1) && errno) {
       zwarn("%s: %e", value, errno);
     }
-    else if (!value || *value != '/' || strlen(value) >= pathmax)
+    else if (!value || *value != '/' || ((strlen(value) >= pathmax) &&
+            pathmax != -1))
 #else
     if (!value || *value != '/' || strlen(value) >= PATH_MAX)
 #endif
@@ -1456,7 +1458,8 @@ setpmnameddirs(Param pm, HashTable ht)
 	    v.pm = (Param) hn;
 
 #ifdef HAVE_PATHCONF
-            if((pathmax = pathconf(val, _PC_PATH_MAX)) == -1)
+	    errno = 0;
+            if((((pathmax = pathconf(val, _PC_PATH_MAX)) == -1)) && errno)
                 zwarn("%s: %e", val, errno);
             else
 #endif
@@ -1464,7 +1467,7 @@ setpmnameddirs(Param pm, HashTable ht)
 #ifdef HAVE_PATHCONF
 		strlen(val) >= PATH_MAX)
 #else
-                strlen(val) >= pathmax)
+                ((strlen(val) >= pathmax)) && pathmax != -1)
 #endif
 		zwarn("invalid value: %s", val, 0);
 	    else

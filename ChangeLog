@@ -1,5 +1,8 @@
 2000-08-02  Clint Adams  <schizo@debian.org>
 
+        * 12489: Src/Modules/files.c, Src/Modules/parameter.c: check
+	errno change from pathconf() in case of unlimited path length.
+
         * 12472: configure.in, Src/Modules/files.c,
 	Src/Modules/parameter.c: use pathconf() instead
 	of PATH_MAX if possible.
