@@ -7,6 +7,7 @@ a description of various additional configuration options.  You should
 have a look at the items in the second part before following the
 instructions in the first.
 
+
 =====================
 MAKING AND INSTALLING
 =====================
@@ -39,9 +40,10 @@ Configure accepts several options (explained below).  To display
 currently available options, do the command:
     ./configure --help
 
-Most of the interesting configuration options can be added after running
+Many of the interesting configuration options can be added after running
 configure by editing the user configuration section of config.h and the
-top level Makefile.
+top level Makefile.  However, see the end of this file for a list of
+features configurable on the command line.
 
 Dynamic loading
 ---------------
@@ -74,9 +76,17 @@ the top-level build directory which retains the existing configuration as
 much as possible.
 
 The key to the module system is the file config.modules, created in the
-configuration process.  Each module has a line in the file.  It may be
-edited to change the following values for each module; be careful to retain
-the (strict) format for the file:
+configuration process.  In the normal case that dynamic loading is
+available, all modules relevant to your configuration will be compiled and
+installed as separate files, so unless you want the modules to be loaded by
+default you don't need to do anything.  For a non-dynamic zsh, the default
+is to compile the complete, compctl, zle, computil, complist, sched,
+parameter, zleparameter and rlimits modules into the shell, and you will
+need to edit config.modules to make any other modules available.
+
+If you wish to change the configuration, here is how config.modules works.
+Each module has a line in the file.  Be careful to retain the (strict)
+format for lines in the file:
 link - `dynamic', if the module is to be dynamically linked -- meaningless
            if this is not available on your system.
        `static' if the module is to be linked directly into the executable.
@@ -90,13 +100,9 @@ load - `yes' if the module is to be visible to the user.  This will make
 	   statically and dynamically linked modules.
 auto - `yes' if the entry is to be regenerated whenever configure is run.
        `no' if you wish to retain your hand-edited version.
-Do not edit the entry for the pseudo-module zsh/main, which is the main
-shell.  After you have edited this file, run `make prep' in the Src
-subdirectory.
-
-By default the complete, compctl, zle, computil, complist, sched, parameter,
-zleparameter and rlimits modules are compiled into non-dynamic zsh and no
-modules are compiled into the main binary if dynamic loading is available.
+Do not edit the entry for the pseudo-module zsh/main (apart from the
+`functions=' part) as this is the main shell.  After you have edited this
+file, run `make prep' in the Src subdirectory.
 
 Note that the modules depending on zle or complete (e.g.: complist and
 deltochar) cannot be loaded dynamically on systems which do not allow symbols
@@ -114,21 +120,21 @@ the "configure" script does not know about, by either editing the user
 configuration section of the top level Makefile (after running configure)
 or giving "configure" initial values for these variables by setting them
 in the environment.  Using a Bourne-compatible shell (such as sh,ksh,zsh),
-
 you can do that on the command line like this:
+    CC=c89 ./configure --enable-cflags=-O2 --enable-libs=-lposix
+This is almost equivalent to
     CC=c89 CFLAGS=-O2 LIBS=-lposix ./configure
+but has the advantage that the CFLAGS and LIBS variables are remembered if
+the configuration is recreated by means of `config.status --recheck' (this
+happens automatically if certain configuration files change).  You can
+set the make variables CFLAGS, CPPFLAGS, LDFLAGS and LIBS in this way,
+however CC must appear as shown.  If you are configuring from a csh-derived
+shell, you may need to use the "env" program:
+    env CC=c89 ./configure --enable-cflags=-O2 --enable-libs=-lposix.
 
-Or on systems that have the "env" program, you can do it like this:
-    env CPPFLAGS=-I/usr/local/include LDFLAGS=-s ./configure
-
-The flags CFLAGS, CPPFLAGS, LDFLAGS and LIBS can also be set as flags to
-configure, where the name appears in lower case:
-    configure --enable-cflags=-O2 --enable-libs=-lposix
-
-The advantage of this form is that `config.status --recheck' will remember
-the flags you originally specified.  You can still override the flags when
-running `make' (although these will not be passed down via `config.status
---recheck').
+You can override the variables directly when running `make':
+    make CFLAGS=-g
+However, these will not be passed down via `config.status --recheck'.
 
 Check Generated Files
 ---------------------
@@ -142,14 +148,14 @@ the corresponding default shell parameters.  Since these shell parameters
 are only for informational purposes, you can change them to whatever
 you feel is appropriate.
 
-Also configure will create a Makefile in the top level directory as well
+Also, configure will create a Makefile in the top level directory as well
 as in the various subdirectories.  You should check the user configuration
 section of the top level Makefile.
 
 Compiling Zsh
 -------------
 
-After configuring, to build zsh, do the command:
+After configuring, to build zsh, execute the command:
     make
 
 It's then a good idea to check that your build is working properly:
@@ -167,29 +173,30 @@ See Test/README for a list of test categories.
 Installing Zsh
 --------------
 
-If no make/compilation errors occur, then to install the zsh binary, do
-the command:
-    make install.bin
+If no make/compilation errors occur, then execute the command
+    make install
+to install all the necessary files except for the info files.
 
+Alternatively, you can install the various parts in separate stages.  To
+install the zsh binary, execute the command:
+    make install.bin
 Any previous copy of zsh will be renamed "zsh.old"
                    
-To install the dynamically-loadable modules, do the command:
+To install the dynamically-loadable modules, execute the command:
     make install.modules
+Note that this is required for the shell to operate properly if dynamic
+loading is enabled.
 
-To install the zsh man page, do the command:
+To install the zsh man page, execute the command:
     make install.man
 
-To install all the shell functions which come with the distribution, do the
-command:
+To install all the shell functions which come with the distribution,
+execute the command:
     make install.fns
 
-Or alternatively, you can install all the above with the command:
-    make install
-
-To install the zsh info files (this must be done separately), do the
+To install the zsh info files (this must be done separately), execute the
 command:
     make install.info
-
 If the programme install-info is available, "make install.info" will
 insert an entry in the file "dir" in the same directory as the info
 files.  Otherwise you will have to edit the topmost node of the info
@@ -219,6 +226,9 @@ source code in the directory that "configure" is in.  For example,
     cd /usr/local/SunOS/zsh
     /usr/local/src/zsh-3.0/configure
     make
+
+Note that this is mutually exclusive with using the source directories
+as make can become confused by build files created in the source directories.
 
 
 =====================
@@ -272,7 +282,7 @@ can be overriden using one of the options below when invoking "configure".
  --enable-zlogout=pathname    # the full pathname of the global zlogout script
 
 Any startup/shutdown script can be disabled by giving the
---disable-scriptname option to "configure".  The --disable-etcdir option
+--disable-SCRIPTNAME option to "configure".  The --disable-etcdir option
 disables all startup/shutdown files which are not explicitly enabled.
 
 Shell functions
@@ -283,9 +293,9 @@ By default, the shell functions which are installed with `make install' or
 unless you have specified --datadir is the same as
 ${prefix}/share/zsh/$ZSH_VERSION/functions ($prefix itself defaults to
 /usr/local, as described below).  This directory will also be compiled into
-the shell as the default directory for the variable $fpath/$FPATH. You can
-override it with --enable-fndir=directory; --disable-fndir or
---enable-fndir=no will turn off both installation of functions and the
+the shell as the default directory for the parameters $fpath and
+$FPATH. You can override it with --enable-fndir=directory; --disable-fndir
+or --enable-fndir=no will turn off both installation of functions and the
 setting of a default value for $fpath/$FPATH.  Note the presence of
 $ZSH_VERSION (e.g. `3.1.7') to avoid clashes between versions of zsh.
 If you only run one version of zsh at once, installing into a common
@@ -297,7 +307,7 @@ appear at the end of the line after `functions=': note that the rest of the
 line is taken verbatim as shell command line text, i.e. no quoting is used
 around the value as a whole and unquoted wildcards will be expanded.  To
 prevent any functions from being installed, either remove the `functions='
-entry or delete the reset of the line after it.
+entry or delete the rest of the line after it.
 
 Functions not specific to a particular module are listed on the zsh/main
 line.  None of these are crucial to shell operation, so you may choose not
@@ -305,7 +315,7 @@ to install them.  For other modules, the functions will be installed if and
 only if the module itself is installed.  This will usually be what you
 want; in particular, the zsh/complete and zsh/zftp modules are of much less
 use without the associated functions.  The functions listed with zsh/zle
-are optional, however.
+are not used by the editor unless you explicitly load them, however.
 
 You can also use the configure option --enable-function-subdirs to allow
 shell functions to be installed into subdirectories of the function
@@ -324,23 +334,21 @@ Support for large files and integers
 ------------------------------------
 
 Some 32-bit systems allow special compilation modes to get around the 2GB
-file size barrier.  The option --enable-lfs turns on the configure check
-for support for large files.  This is now enabled by default; use
---disable-lfs to turn it off.  Not all systems recognize the test used by
-zsh (via the getconf command), so flags may need to be set by hand.  On
-HP-UX 10.20, zsh has been successfully compiled with large file support by
-configuring with
+file size barrier.  This is enabled by default; use --disable-lfs to turn
+it off.  Not all systems recognize the test used by zsh (via the getconf
+command), so flags may need to be set by hand.  On HP-UX 10.20, zsh has
+been successfully compiled with large file support by configuring with
   CC="cc -Ae" CPPFLAGS="-D_LARGEFILE_SOURCE -D_FILE64" configure \
   --enable-lfs ...
-You can also give a value to --enable-lfs, which will be interpreted as the
-name of a 64-bit integer type, for example --enable-lfs="long long"
-(although this type is checked for anyway).
+You can also specify --enable-lfs together with a value, which will be
+interpreted as the name of a 64-bit integer type, for example
+--enable-lfs="long long" (although this type is checked for anyway).
 
 Furthermore, use of --enable-lfs will also enable 64-bit arithmetic for
 shell parameters, and anywhere they are used such as in mathematical
 formulae.  This depends only on the shell finding a suitable 64-bit integer
 type; it does not require that support for large files is actually
-enabled.  Hence you might consider using --enable-lfs on any 32-bit system
+enabled.  Hence --enable-lfs is useful on many 32-bit systems
 with a suitable compiler such as gcc.
 
 Also note that if `configure' finds out that either of the types off_t or
@@ -360,41 +368,48 @@ or relevant to zsh.  To get the complete list of configure options, run
 options of interest for configuring zsh.
 
 Configuration:
-  --cache-file=FILE      # cache test results in FILE
-  --help                 # print a help message
-  --version              # print the version of autoconf that create configure
-  --quiet, --silent      # do not print `checking...' messages
-  --no-create            # do not create output files
+  --cache-file=FILE     # cache test results in FILE
+  --help                # print a help message
+  --version             # print the version of autoconf that create configure
+  --quiet, --silent     # do not print `checking...' messages
+  --no-create           # do not create output files
 
 Directories:
-  --prefix=PREFIX        # install host independent files in PREFIX [/usr/local]
-  --exec-prefix=EPREFIX  # install host dependent files in EPREFIX [same as prefix]
-  --bindir=DIR           # install user executables in DIR [EPREFIX/bin]
-  --infodir=DIR          # install info documentation in DIR [PREFIX/info]
-  --mandir=DIR           # install man documentation in DIR [PREFIX/man]
-  --srcdir=DIR           # find the sources in DIR [configure dir or ..]
+  --prefix=PREFIX       # install host independent files in PREFIX [/usr/local]
+  --exec-prefix=EPREFIX # install host dependent files in EPREFIX [PREFIX]
+  --bindir=DIR          # install user executables in DIR [EPREFIX/bin]
+  --infodir=DIR         # install info documentation in DIR [PREFIX/info]
+  --mandir=DIR          # install man documentation in DIR [PREFIX/man]
+  --srcdir=DIR          # find the sources in DIR [configure dir or ..]
+  --datadir=DATADIR     # install shared files in DATADIR [PREFIX/share]
 
 Features:
-  --enable-FEATURE       # enable use of this feature
-  --disable-FEATURE      # disable use of this feature
+  --enable-FEATURE      # enable use of this feature
+  --disable-FEATURE     # disable use of this feature
 
-     The FEATURES currently supported are:
-     zsh-debug           # use it if you want to debug zsh
-     zsh-mem             # use zsh's memory allocators
-     zsh-mem-debug       # debug zsh's memory allocators
-     zsh-mem-warning     # turn on warnings of memory allocation errors
-     zsh-secure-free     # turn on memory checking of free()
-     zsh-hash-debug      # turn on debugging of internal hash tables
-     etcdir=directory    # default directory for global zsh scripts
-     zshenv=pathname     # the full pathname of the global zshenv script
-     zshrc=pathname      # the full pathname of the global zshrc script
-     zlogin=pathname     # the full pathname of the global zlogin script
-     zprofile=pathname   # the full pathname of the global zprofile script
-     zlogout=pathname    # the full pathname of the global zlogout script
-     fndir=directory     # the directory where shell functions will go
-     site-fndir=directory# the directory where site-specific functions can go
-     function-subdirs    # if functions will be installed into subdirectories
-     omit-modules=mod1,..# don't compile nor install the modules named mod1,...
-     dynamic             # allow dynamically loaded binary modules
-     lfs                 # allow configure check for large files
-     locale              # allow use of locale library
+Here is the list of FEATURES currently supported.  Defaults are shown in
+brackets, though a value shown as `yes' (equivalent to --enable-FEATURE)
+will be ignored if your OS doesn't support that feature.
+
+zsh-debug            # compile debugging features into zsh [no]
+zsh-mem              # use zsh's memory allocators [no]
+zsh-mem-debug        # debug zsh's memory allocators [no]
+zsh-mem-warning      # turn on warnings of memory allocation errors [no]
+zsh-secure-free      # turn on memory checking of free() [no]
+zsh-hash-debug       # turn on debugging of internal hash tables [no]
+etcdir=directory     # default directory for global zsh scripts [/etc]
+zshenv=pathname      # the path to the global zshenv script [/etc/zshenv]
+zshrc=pathname       # the path to the global zshrc script [/etc/zshrc]
+zlogin=pathname      # the path to the global zlogin script [/etc/zlogin]
+zprofile=pathname    # the path to the global zprofile script [/etc/zprofile]
+zlogout=pathname     # the path to the global zlogout script [/etc/zlogout]
+fndir=directory      # the directory where shell functions will go
+                     # [DATADIR/zsh/VERSION/functions]
+site-fndir=directory # the directory where site-specific functions can go
+                     # [DATADIR/zsh/site-functions]
+function-subdirs     # if functions will be installed into subdirectories [no]
+omit-modules=mod1,.. # don't compile or install the modules named mod1,...
+dynamic              # allow dynamically loaded binary modules [yes]
+lfs                  # allow configure check for large files [yes]
+locale               # allow use of locale library [yes]
+

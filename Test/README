@@ -11,3 +11,17 @@ scripts names:
  X: line editing
  Y: completion
  Z: separate systems and user contributions
+
+You will need to run these by using `make test' in the Test subdirectory of
+the build area for your system (which may or may not be the same as the
+Test subdirectory of the source tree), or the directory above.  You can get
+more information about the tests being performed with
+  ZTST_verbose=1 make check
+(`test' is equivalent to `check') or change 1 to 2 for even more detail.
+
+Individual or groups of tests can be performed with
+  make TESTNUM=C02 check
+or
+  make TESTNUM=C check
+to perform just the test beginning C02, or all tests beginning C,
+respectively.

@@ -749,8 +749,8 @@ contain symbolic links.
 alias(r)(fc -e -)
 findex(read)
 vindex(IFS, use of)
-item(tt(read) [ tt(-rzpqAclneEt) ] [ tt(-k) [ var(num) ] ] \
-[ tt(-u)var(n) ] [ var(name)[tt(?)var(prompt)] ] [ var(name) ...  ])(
+xitem(tt(read) [ tt(-rzpqAclneEt) ] [ tt(-k) [ var(num) ] ])
+item([ tt(-u)var(n) ] [ var(name)[tt(?)var(prompt)] ] [ var(name) ...  ])(
 vindex(REPLY, use of)
 vindex(reply, use of)
 Read one line and break it into fields using the characters

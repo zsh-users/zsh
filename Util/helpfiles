@@ -21,12 +21,12 @@
 # previous line (so you see what we're up against).
 
 # Example usage:
-#    cd ~/zsh-3.0.0				# or wherever
+#    cd ~/zsh-4.0.1				# or wherever
 #    mkdir Help
 #    cd Help
-#    man zsh | colcrt - | helpfiles
+#    man zshbuiltins | colcrt - | helpfiles
 #    run-help() {
-#      typeset zhelp=~/zsh-3.0.0/Help		# or wherever
+#      typeset zhelp=~/zsh-4.0.1/Help		# or wherever
 #      [[ $1 = . ]] && 1=dot
 #      [[ $1 = : ]] && 1=colon
 #      if [[ $1 = compctl ]]; then

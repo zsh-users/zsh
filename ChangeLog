@@ -1,3 +1,9 @@
+2001-05-30  Peter Stephenson  <pws@csr.com>
+
+	* 14573: INSTALL, README, Doc/Zsh/builtins.yo, Test/README,
+	Util/helpfiles:  documentation changes for 4.0.1 for clarity,
+	plus avoid buggy nroff wrap in read builtin.
+
 2001-05-30  Bart Schaefer  <schaefer@zsh.org>
 
 	* 14516: Use the same ncurses compilation test in gettermcap() as
