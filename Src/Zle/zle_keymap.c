@@ -1000,8 +1000,6 @@ init_keymaps(void)
     lastnamed = refthingy(t_undefinedkey);
 }
 
-#ifdef MODULE
-
 /* cleanup entry point (for unloading the zle module) */
 
 /**/
@@ -1012,8 +1010,6 @@ cleanup_keymaps(void)
     deletehashtable(keymapnamtab);
     zfree(keybuf, keybufsz);
 }
-
-#endif /* MODULE */
 
 /* Create the default keymaps.  For efficiency reasons, this function   *
  * assigns directly to the km->first array.  It knows that there are no *

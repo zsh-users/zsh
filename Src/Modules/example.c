@@ -212,8 +212,6 @@ boot_example(Module m)
 	     !addwrapper(m, wrapper));
 }
 
-#ifdef MODULE
-
 /**/
 int
 cleanup_example(Module m)
@@ -234,5 +232,3 @@ finish_example(Module m)
     fflush(stdout);
     return 0;
 }
-
-#endif

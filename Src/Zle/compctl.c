@@ -3764,8 +3764,6 @@ boot_compctl(Module m)
     return (addbuiltins(m->nam, bintab, sizeof(bintab)/sizeof(*bintab)) != 1);
 }
 
-#ifdef MODULE
-
 /**/
 int
 cleanup_compctl(Module m)
@@ -3789,5 +3787,3 @@ finish_compctl(Module m)
     compctlreadptr = fallback_compctlread;
     return 0;
 }
-
-#endif

@@ -1389,8 +1389,6 @@ boot_complete(Module m)
     return 0;
 }
 
-#ifdef MODULE
-
 /**/
 int
 cleanup_complete(Module m)
@@ -1414,7 +1412,8 @@ cleanup_complete(Module m)
 int
 finish_complete(Module m)
 {
-    freearray(compwords);
+    if (compwords)
+	freearray(compwords);
     zsfree(compprefix);
     zsfree(compsuffix);
     zsfree(compiprefix);
@@ -1446,5 +1445,3 @@ finish_complete(Module m)
 
     return 0;
 }
-
-#endif

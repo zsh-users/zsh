@@ -1390,20 +1390,20 @@ item(tt(zmodload) tt(-ua) [ tt(-i) ] var(builtin) ...)(
 Equivalent to tt(-ab) and tt(-ub).
 )
 item(tt(zmodload -e) [ var(string) ... ])(
-The tt(-e) option without arguments lists all modules loaded or linked 
-into the shell. With arguments only the return status is set to zero
-if all var(string)s given as arguments are names of modules loaded or
-linked in and to one if at least on var(string) is not the name of a
-module loaded or linked. This can be used to test for the availability 
+The tt(-e) option without arguments lists all loaded modules loaded.
+With arguments only the return status is set to zero
+if all var(string)s given as arguments are names of loaded modules
+and to one if at least on var(string) is not the name of a
+loaded module. This can be used to test for the availability 
 of things implemented by modules.
 )
 enditem()
 
-In a shell without dynamic loading only the tt(-e) option is
-supported and the tt(-i) option is ignored. In such a shell the return
-status of tt(zmodload) without arguments or options is one whereas in
-a shell with dynamic loading the return status without arguments or
-options is always zero. This can be used to test if the shell supports
-dynamic loading of modules or not.
+Note that tt(zsh) makes no difference between modules that were linked 
+into the shell and modules that are loaded dynamically. In both cases
+this builtin command has to be used to make available the builtins and
+other things defined by modules (unless the module is autoloaded on
+these definitions). This is even true for systems that don't support
+dynamic loading of modules.
 )
 enditem()

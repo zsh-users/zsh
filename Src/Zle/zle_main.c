@@ -1043,8 +1043,6 @@ boot_zle(Module m)
     return 0;
 }
 
-#ifdef MODULE
-
 /**/
 int
 cleanup_zle(Module m)
@@ -1093,5 +1091,3 @@ finish_zle(Module m)
 
     return 0;
 }
-
-#endif /* MODULE */

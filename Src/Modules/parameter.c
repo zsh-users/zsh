@@ -901,18 +901,12 @@ getpmmodule(HashTable ht, char *name)
 	pm->old = NULL;
 	pm->level = 0;
 
-	for (node = firstnode(bltinmodules); node; incnode(node))
-	    if (!strcmp(name, (char *) getdata(node))) {
-		type = "builtin";
-		break;
-	    }
-#ifdef DYNAMIC
 	if (!type) {
 	    Module m;
 
 	    for (node = firstnode(modules); node; incnode(node)) {
 		m = (Module) getdata(node);
-		if (m->handle && !(m->flags & MOD_UNLOAD) &&
+		if (m->u.handle && !(m->flags & MOD_UNLOAD) &&
 		    !strcmp(name, m->nam)) {
 		    type = "loaded";
 		    break;
@@ -937,7 +931,6 @@ getpmmodule(HashTable ht, char *name)
 	    if (modpmfound)
 		type = "autoloaded";
 	}
-#endif
 	if (type)
 	    pm->u.str = dupstring(type);
 	else {
@@ -972,16 +965,10 @@ scanpmmodules(HashTable ht, ScanFunc func, int flags)
     pm.level = 0;
 
     pm.u.str = dupstring("builtin");
-    for (node = firstnode(bltinmodules); node; incnode(node)) {
-	pm.nam = (char *) getdata(node);
-	addlinknode(done, pm.nam);
-	func((HashNode) &pm, flags);
-    }
-#ifdef DYNAMIC
     pm.u.str = dupstring("loaded");
     for (node = firstnode(modules); node; incnode(node)) {
 	m = (Module) getdata(node);
-	if (m->handle && !(m->flags & MOD_UNLOAD)) {
+	if (m->u.handle && !(m->flags & MOD_UNLOAD)) {
 	    pm.nam = m->nam;
 	    addlinknode(done, pm.nam);
 	    func((HashNode) &pm, flags);
@@ -1012,7 +999,6 @@ scanpmmodules(HashTable ht, ScanFunc func, int flags)
 		func((HashNode) &pm, flags);
 	    }
 	}
-#endif
 }
 
 /* Functions for the dirstack special parameter. */
@@ -1919,8 +1905,6 @@ boot_parameter(Module m)
     return 0;
 }
 
-#ifdef MODULE
-
 /**/
 int
 cleanup_parameter(Module m)
@@ -1949,5 +1933,3 @@ finish_parameter(Module m)
 {
     return 0;
 }
-
-#endif

@@ -602,8 +602,6 @@ boot_stat(Module m)
     return !addbuiltins(m->nam, bintab, sizeof(bintab)/sizeof(*bintab));
 }
 
-#ifdef MODULE
-
 /**/
 int
 cleanup_stat(Module m)
@@ -618,5 +616,3 @@ finish_stat(Module m)
 {
     return 0;
 }
-
-#endif

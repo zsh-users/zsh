@@ -599,11 +599,9 @@ setupvals(void)
     mailpath = mkarray(NULL);
     watch    = mkarray(NULL);
     psvar    = mkarray(NULL);
-#ifdef DYNAMIC
     module_path = mkarray(ztrdup(MODULE_DIR));
     modules = newlinklist();
-#endif
-    bltinmodules = newlinklist();
+    linkedmodules = newlinklist();
 
     /* Set default prompts */
     if(unset(INTERACTIVE)) {
@@ -940,9 +938,10 @@ sourcehome(char *s)
 void
 init_bltinmods(void)
 {
-    static struct module mod = { NULL, 0, NULL, NULL };
+
 #include "bltinmods.list"
-    mod.nam = NULL;
+
+    load_module("zsh");
 }
 
 /**/
@@ -969,13 +968,13 @@ noop_function_int(int nothing)
 /**/
 ZleVoidFn trashzleptr = noop_function;
 /**/
-ZleVoidFn gotwordptr;
+ZleVoidFn gotwordptr = noop_function;
 /**/
-ZleVoidFn refreshptr;
+ZleVoidFn refreshptr = noop_function;
 /**/
-ZleVoidIntFn spaceinlineptr;
+ZleVoidIntFn spaceinlineptr = noop_function_int;
 /**/
-ZleReadFn zlereadptr;
+ZleReadFn zlereadptr = autoload_zleread;
 
 #else /* !LINKED_XMOD_zle */
 
@@ -989,20 +988,16 @@ ZleReadFn zlereadptr = autoload_zleread;
 ZleReadFn zlereadptr = fallback_zleread;
 # endif /* !UNLINKED_XMOD_zle */
 
-/**/
-# ifdef UNLINKED_XMOD_zle
+#endif /* !LINKED_XMOD_zle */
 
 /**/
-static unsigned char *
+unsigned char *
 autoload_zleread(char *lp, char *rp, int ha)
 {
     zlereadptr = fallback_zleread;
     load_module("zle");
     return zleread(lp, rp, ha);
 }
-
-/**/
-# endif /* UNLINKED_XMOD_zle */
 
 /**/
 unsigned char *
@@ -1016,8 +1011,6 @@ fallback_zleread(char *lp, char *rp, int ha)
     free(pptbuf);
     return (unsigned char *)shingetline();
 }
-
-#endif /* !LINKED_XMOD_zle */
 
 /* compctl entry point pointers.  Similar to the ZLE ones. */
 

@@ -30,10 +30,10 @@
 #include "zsh.mdh"
 #include "module.pro"
 
-/* List of builtin modules. */
+/* List of linked-in modules. */
 
 /**/
-LinkList bltinmodules;
+LinkList linkedmodules;
 
 
 /* The `zsh' module contains all the base code that can't actually be built *
@@ -54,30 +54,55 @@ boot_zsh(Module m)
     return 0;
 }
 
+/**/
+int
+cleanup_zsh(Module m)
+{
+    return 0;
+}
+
+/**/
+int
+finish_zsh(Module m)
+{
+    return 0;
+}
+
 /* This registers a builtin module.                                   */
 
 /**/
 void
-register_module(char *n)
+register_module(char *n, Module_func setup, Module_func boot,
+		Module_func cleanup, Module_func finish)
 {
+    Linkedmod m;
+
     PERMALLOC {
-	addlinknode(bltinmodules, n);
+	m = (Linkedmod) zalloc(sizeof(*m));
+
+	m->name = ztrdup(n);
+	m->setup = setup;
+	m->boot = boot;
+	m->cleanup = cleanup;
+	m->finish = finish;
+
+	addlinknode(linkedmodules, m);
     } LASTALLOC;
 }
 
 /* Check if a module is linked in. */
 
 /**/
-int
-module_linked(char *name)
+Linkedmod
+module_linked(char const *name)
 {
     LinkNode node;
 
-    for (node = firstnode(bltinmodules); node; incnode(node))
-	if (!strcmp((char *) getdata(node), name))
-	    return 1;
+    for (node = firstnode(linkedmodules); node; incnode(node))
+	if (!strcmp(((Linkedmod) getdata(node))->name, name))
+	    return (Linkedmod) getdata(node);
 
-    return 0;
+    return NULL;
 }
 
 /* addbuiltin() can be used to add a new builtin.  It returns zero on *
@@ -156,9 +181,6 @@ addwrapper(Module m, FuncWrap w)
 
     return 0;
 }
-
-/**/
-#ifdef DYNAMIC
 
 /* $module_path ($MODULE_PATH) */
 
@@ -255,6 +277,9 @@ deletewrapper(Module m, FuncWrap w)
 }
 
 /**/
+#ifdef DYNAMIC
+
+/**/
 #ifdef AIXDYNAMIC
 
 #include <sys/ldr.h>
@@ -271,8 +296,8 @@ load_and_bind(const char *fn)
 	int err = loadbind(0, (void *) addbuiltin, ret);
 	for (node = firstnode(modules); !err && node; incnode(node)) {
 	    Module m = (Module) getdata(node);
-	    if (m->handle)
-		err |= loadbind(0, m->handle, ret);
+	    if (m->u.handle)
+		err |= loadbind(0, m->u.handle, ret);
 	}
 
 	if (err) {
@@ -361,8 +386,6 @@ hpux_dlsym(void *handle, char *name)
 # define RTLD_GLOBAL 0
 #endif
 
-typedef int (*Module_func) _((Module));
-
 /**/
 static void *
 try_load_module(char const *name)
@@ -415,6 +438,19 @@ do_load_module(char const *name)
 }
 
 /**/
+#else /* !DYNAMIC */
+
+/**/
+static void *
+do_load_module(char const *name)
+{
+    return NULL;
+}
+
+/**/
+#endif /* !DYNAMIC */
+
+/**/
 static LinkNode
 find_module(const char *name)
 {
@@ -430,34 +466,37 @@ find_module(const char *name)
 }
 
 /**/
+#ifdef DYNAMIC
+
+/**/
 #ifdef AIXDYNAMIC
 
 /**/
 static int
-setup_module(Module m)
+dyn_setup_module(Module m)
 {
-    return ((int (*)_((int,Module))) m->handle)(0, m);
+    return ((int (*)_((int,Module))) m->u.handle)(0, m);
 }
 
 /**/
 static int
-init_module(Module m)
+dyn_boot_module(Module m)
 {
-    return ((int (*)_((int,Module))) m->handle)(1, m);
+    return ((int (*)_((int,Module))) m->u.handle)(1, m);
 }
 
 /**/
 static int
-cleanup_module(Module m)
+dyn_cleanup_module(Module m)
 {
-    return ((int (*)_((int,Module))) m->handle)(2, m);
+    return ((int (*)_((int,Module))) m->u.handle)(2, m);
 }
 
 /**/
 static int
-finish_module(Module m)
+dyn_finish_module(Module m)
 {
-    return ((int (*)_((int,Module))) m->handle)(3, m);
+    return ((int (*)_((int,Module))) m->u.handle)(3, m);
 }
 
 /**/
@@ -480,19 +519,19 @@ module_func(Module m, char *name, char *name_s)
     if ((t = strrchr(s, '.')))
 	*t = '\0';
 #ifdef DYNAMIC_NAME_CLASH_OK
-    fn = (Module_func) dlsym(m->handle, name);
+    fn = (Module_func) dlsym(m->u.handle, name);
 #else /* !DYNAMIC_NAME_CLASH_OK */
     if (strlen(s) + 6 > PATH_MAX)
 	return NULL;
     sprintf(buf, name_s, s);
-    fn = (Module_func) dlsym(m->handle, buf);
+    fn = (Module_func) dlsym(m->u.handle, buf);
 #endif /* !DYNAMIC_NAME_CLASH_OK */
     return fn;
 }
 
 /**/
 static int
-setup_module(Module m)
+dyn_setup_module(Module m)
 {
     Module_func fn = module_func(m, STR_SETUP, STR_SETUP_S);
 
@@ -504,7 +543,7 @@ setup_module(Module m)
 
 /**/
 static int
-init_module(Module m)
+dyn_boot_module(Module m)
 {
     Module_func fn = module_func(m, STR_BOOT, STR_BOOT_S);
 
@@ -516,7 +555,7 @@ init_module(Module m)
 
 /**/
 static int
-cleanup_module(Module m)
+dyn_cleanup_module(Module m)
 {
     Module_func fn = module_func(m, STR_CLEANUP, STR_CLEANUP_S);
 
@@ -531,7 +570,7 @@ cleanup_module(Module m)
 
 /**/
 static int
-finish_module(Module m)
+dyn_finish_module(Module m)
 {
     Module_func fn = module_func(m, STR_FINISH, STR_FINISH_S);
     int r;
@@ -542,7 +581,7 @@ finish_module(Module m)
 	zwarnnam(m->nam, "no finish function", NULL, 0);
 	r = 1;
     }
-    dlclose(m->handle);
+    dlclose(m->u.handle);
     return r;
 }
 
@@ -550,34 +589,107 @@ finish_module(Module m)
 #endif /* !AIXDYNAMIC */
 
 /**/
+static int
+setup_module(Module m)
+{
+    return ((m->flags & MOD_LINKED) ?
+	    (m->u.linked->setup)(m) : dyn_setup_module(m));
+}
+
+/**/
+static int
+boot_module(Module m)
+{
+    return ((m->flags & MOD_LINKED) ?
+	    (m->u.linked->boot)(m) : dyn_boot_module(m));
+}
+
+/**/
+static int
+cleanup_module(Module m)
+{
+    return ((m->flags & MOD_LINKED) ?
+	    (m->u.linked->cleanup)(m) : dyn_cleanup_module(m));
+}
+
+/**/
+static int
+finish_module(Module m)
+{
+    return ((m->flags & MOD_LINKED) ?
+	    (m->u.linked->finish)(m) : dyn_finish_module(m));
+}
+
+/**/
+#else /* !DYNAMIC */
+
+/**/
+static int
+setup_module(Module m)
+{
+    return ((m->flags & MOD_LINKED) ? (m->u.linked->setup)(m) : 1);
+}
+
+/**/
+static int
+boot_module(Module m)
+{
+    return ((m->flags & MOD_LINKED) ? (m->u.linked->boot)(m) : 1);
+}
+
+/**/
+static int
+cleanup_module(Module m)
+{
+    return ((m->flags & MOD_LINKED) ? (m->u.linked->cleanup)(m) : 1);
+}
+
+/**/
+static int
+finish_module(Module m)
+{
+    return ((m->flags & MOD_LINKED) ? (m->u.linked->finish)(m) : 1);
+}
+
+/**/
+#endif /* !DYNAMIC */
+
+/**/
 int
 load_module(char const *name)
 {
     Module m;
-    void *handle;
+    void *handle = NULL;
+    Linkedmod linked;
     LinkNode node, n;
-
-    if (module_linked(name))
-	return 1;
+    int set;
 
     if (!(node = find_module(name))) {
-	if (!(handle = do_load_module(name)))
-	    return NULL;
+	if (!(linked = module_linked(name)) &&
+	    !(handle = do_load_module(name)))
+	    return 0;
 	m = zcalloc(sizeof(*m));
 	m->nam = ztrdup(name);
-	m->handle = handle;
-	m->flags |= MOD_SETUP;
+	if (handle) {
+	    m->u.handle = handle;
+	    m->flags |= MOD_SETUP;
+	} else {
+	    m->u.linked = linked;
+	    m->flags |= MOD_SETUP | MOD_LINKED;
+	}
 	PERMALLOC {
 	    node = addlinknode(modules, m);
 	} LASTALLOC;
-	if (setup_module(m) || init_module(m)) {
-	    finish_module(m);
+	if ((set = setup_module(m)) || boot_module(m)) {
+	    if (!set)
+		finish_module(m);
 	    remnode(modules, node);
 	    zsfree(m->nam);
 	    zfree(m, sizeof(*m));
 	    m->flags &= ~MOD_SETUP;
-	    return NULL;
+	    return 0;
 	}
+	m->flags |= MOD_INIT_S | MOD_INIT_B;
 	m->flags &= ~MOD_SETUP;
 	return 1;
     } 
@@ -586,7 +698,7 @@ load_module(char const *name)
 	return 1;
     if (m->flags & MOD_UNLOAD)
 	m->flags &= ~MOD_UNLOAD;
-    else if (m->handle)
+    else if ((m->flags & MOD_LINKED) ? m->u.linked : m->u.handle)
 	return 1;
     if (m->flags & MOD_BUSY) {
 	zerr("circular dependencies for module %s", name, 0);
@@ -600,24 +712,39 @@ load_module(char const *name)
 		return 0;
 	    }
     m->flags &= ~MOD_BUSY;
-    if (!m->handle) {
-	if (!(m->handle = do_load_module(name)))
+    if (!m->u.handle) {
+	handle = NULL;
+	if (!(linked = module_linked(name)) &&
+	    !(handle = do_load_module(name)))
 	    return 0;
-	m->flags |= MOD_SETUP;
+	if (handle) {
+	    m->u.handle = handle;
+	    m->flags |= MOD_SETUP;
+	} else {
+	    m->u.linked = linked;
+	    m->flags |= MOD_SETUP | MOD_LINKED;
+	}
 	if (setup_module(m)) {
-	    finish_module(m->handle);
-	    m->handle = NULL;
+	    if (handle)
+		m->u.handle = NULL;
+	    else
+		m->u.linked = NULL;
 	    m->flags &= ~MOD_SETUP;
 	    return 0;
 	}
+	m->flags |= MOD_INIT_S;
     }
     m->flags |= MOD_SETUP;
-    if (init_module(m)) {
-	finish_module(m->handle);
-	m->handle = NULL;
+    if (boot_module(m)) {
+	finish_module(m);
+	if (m->flags & MOD_LINKED)
+	    m->u.linked = NULL;
+	else
+	    m->u.handle = NULL;
 	m->flags &= ~MOD_SETUP;
 	return 0;
     }
+    m->flags |= MOD_INIT_B;
     m->flags &= ~MOD_SETUP;
     return 1;
 }
@@ -638,12 +765,12 @@ require_module(char *nam, char *module, int res, int test)
     LinkNode node;
 
     /* First see if the module is linked in. */
-    for (node = firstnode(bltinmodules); node; incnode(node)) {
+    for (node = firstnode(linkedmodules); node; incnode(node)) {
 	if (!strcmp((char *) getdata(node), nam))
 	    return 1;
     }
     node = find_module(module);
-    if (node && (m = ((Module) getdata(node)))->handle &&
+    if (node && (m = ((Module) getdata(node)))->u.handle &&
 	!(m->flags & MOD_UNLOAD)) {
 	if (test) {
 	    zwarnnam(nam, "module %s already loaded.", module, 0);
@@ -710,6 +837,47 @@ autoloadscan(HashNode hn, int printflags)
     putchar('\n');
 }
 
+/* Cleanup and finish all modules. */
+
+/**/
+void
+exit_modules(void)
+{
+    Module m;
+    char *name;
+    LinkNode node, next, mn, dn;
+    int del, used;
+
+    while (nonempty(modules)) {
+	for (node = firstnode(modules); (next = node); node = next) {
+	    incnode(next);
+	    del = used = 0;
+	    name = ((Module) getdata(node))->nam;
+	    for (mn = firstnode(modules); !used && mn; incnode(mn)) {
+		m = (Module) getdata(mn);
+		if (m->deps && m->u.handle)
+		    for (dn = firstnode(m->deps); dn; incnode(dn))
+			if (!strcmp((char *) getdata(dn), name)) {
+			    if (m->flags & MOD_UNLOAD)
+				del = 1;
+			    else {
+				used = 1;
+				break;
+			    }
+			}
+	    }
+	    if (!used) {
+		m = (Module) getdata(node);
+		if (del)
+		    m->wrapper++;
+		unload_module(m, NULL, 1);
+		if (del)
+		    m->wrapper--;
+	    }
+	}
+    }
+}
+
 /**/
 int
 bin_zmodload(char *nam, char **args, char *ops, int func)
@@ -761,13 +929,9 @@ bin_zmodload_exist(char *nam, char **args, char *ops)
     Module m;
 
     if (!*args) {
-	for (node = firstnode(bltinmodules); node; incnode(node)) {
-	    nicezputs((char *) getdata(node), stdout);
-	    putchar('\n');
-	}
 	for (node = firstnode(modules); node; incnode(node)) {
 	    m = (Module) getdata(node);
-	    if (m->handle && !(m->flags & MOD_UNLOAD)) {
+	    if (m->u.handle && !(m->flags & MOD_UNLOAD)) {
 		nicezputs(m->nam, stdout);
 		putchar('\n');
 	    }
@@ -778,13 +942,10 @@ bin_zmodload_exist(char *nam, char **args, char *ops)
 
 	for (; !ret && *args; args++) {
 	    f = 0;
-	    for (node = firstnode(bltinmodules);
-		 !f && node; incnode(node))
-		f = !strcmp(*args, (char *) getdata(node));
 	    for (node = firstnode(modules);
 		 !f && node; incnode(node)) {
 		m = (Module) getdata(node);
-		if (m->handle && !(m->flags & MOD_UNLOAD))
+		if (m->u.handle && !(m->flags & MOD_UNLOAD))
 		    f = !strcmp(*args, m->nam);
 	    }
 	    ret = !f;
@@ -825,7 +986,7 @@ bin_zmodload_dep(char *nam, char **args, char *ops)
 		m->deps = NULL;
 	    }
 	}
-	if (!m->deps && !m->handle) {
+	if (!m->deps && !m->u.handle) {
 	    remnode(modules, node);
 	    zsfree(m->nam);
 	    zfree(m, sizeof(*m));
@@ -1111,9 +1272,13 @@ bin_zmodload_param(char *nam, char **args, char *ops)
 
 /**/
 int
-unload_module(Module m, LinkNode node)
+unload_module(Module m, LinkNode node, int force)
 {
-    if (m->handle && !(m->flags & MOD_UNLOAD) && cleanup_module(m))
+    if ((m->flags & MOD_INIT_S) &&
+	!(m->flags & MOD_UNLOAD) &&
+	((m->flags & MOD_LINKED) ?
+	 (m->u.linked && m->u.linked->cleanup(m)) :
+	 (m->u.handle && cleanup_module(m))))
 	return 1;
     else {
 	int del = (m->flags & MOD_UNLOAD);
@@ -1123,9 +1288,19 @@ unload_module(Module m, LinkNode node)
 	    return 0;
 	}
 	m->flags &= ~MOD_UNLOAD;
-	if (m->handle)
-	    finish_module(m);
-	m->handle = NULL;
+	if (m->flags & MOD_INIT_B) {
+	    if (m->flags & MOD_LINKED) {
+		if (m->u.linked) {
+		    m->u.linked->finish(m);
+		    m->u.linked = NULL;
+		}
+	    } else {
+		if (m->u.handle) {
+		    finish_module(m);
+		    m->u.handle = NULL;
+		}
+	    }
+	}
 	if (del && m->deps) {
 	    /* The module was unloaded delayed, unload all modules *
 	     * on which it depended. */
@@ -1145,7 +1320,9 @@ unload_module(Module m, LinkNode node)
 
 		    for (an = firstnode(modules); du && an; incnode(an)) {
 			am = (Module) getdata(an);
-			if (am != m && am->handle && am->deps) {
+			if (am != m && am->deps &&
+			    ((am->flags & MOD_LINKED) ?
+			     am->u.linked : am->u.handle)) {
 			    LinkNode sn;
 
 			    for (sn = firstnode(am->deps); du && sn;
@@ -1156,11 +1333,11 @@ unload_module(Module m, LinkNode node)
 			}
 		    }
 		    if (du)
-			unload_module(dm, NULL);
+			unload_module(dm, NULL, 0);
 		}
 	    }
 	}
-	if(!m->deps) {
+	if(!m->deps || force) {
 	    if (!node) {
 		for (node = firstnode(modules); node; incnode(node))
 		    if (m == (Module) getdata(node))
@@ -1193,7 +1370,7 @@ bin_zmodload_load(char *nam, char **args, char *ops)
 
 		for (mn = firstnode(modules); mn; incnode(mn)) {
 		    m = (Module) getdata(mn);
-		    if (m->deps && m->handle)
+		    if (m->deps && m->u.handle)
 			for (dn = firstnode(m->deps); dn; incnode(dn))
 			    if (!strcmp((char *) getdata(dn), *args)) {
 				if (m->flags & MOD_UNLOAD)
@@ -1208,7 +1385,7 @@ bin_zmodload_load(char *nam, char **args, char *ops)
 		m = (Module) getdata(node);
 		if (del)
 		    m->wrapper++;
-		if (unload_module(m, node))
+		if (unload_module(m, node, 0))
 		    ret = 1;
 		if (del)
 		    m->wrapper--;
@@ -1223,7 +1400,7 @@ bin_zmodload_load(char *nam, char **args, char *ops)
 	/* list modules */
 	for (node = firstnode(modules); node; incnode(node)) {
 	    m = (Module) getdata(node);
-	    if (m->handle && !(m->flags & MOD_UNLOAD)) {
+	    if (m->u.handle && !(m->flags & MOD_UNLOAD)) {
 		if(ops['L']) {
 		    printf("zmodload ");
 		    if(m->nam[0] == '-')
@@ -1245,46 +1422,6 @@ bin_zmodload_load(char *nam, char **args, char *ops)
     }
 }
 
-/**/
-#else /* DYNAMIC */
-
-/* This is the version for shells without dynamic linking. */
-
-/**/
-int
-bin_zmodload(char *nam, char **args, char *ops, int func)
-{
-    /* We understand only the -e option (and ignore -i). */
-
-    if (ops['e'] || *args) {
-	LinkNode node;
-
-	if (!*args) {
-	    for (node = firstnode(bltinmodules); node; incnode(node)) {
-		nicezputs((char *) getdata(node), stdout);
-		putchar('\n');
-	    }
-	} else {
-	    for (; *args; args++) {
-		for (node = firstnode(bltinmodules); node; incnode(node))
-		    if (!strcmp(*args, (char *) getdata(node)))
-			break;
-		if (!node) {
-		    if (!ops['e'])
-			zerrnam(nam, "cannot load module: `%s'", *args, 0);
-		    return 1;
-		}
-	    }
-	}
-	return 0;
-    }
-    /* Otherwise we return 1 -- different from the dynamic version. */
-    return 1;
-}
-
-/**/
-#endif /* DYNAMIC */
-
 /* The list of module-defined conditions. */
 
 /**/
@@ -1299,9 +1436,7 @@ Conddef
 getconddef(int inf, char *name, int autol)
 {
     Conddef p;
-#ifdef DYNAMIC
     int f = 1;
-#endif
 
     do {
 	for (p = condtab; p; p = p->next) {
@@ -1309,7 +1444,6 @@ getconddef(int inf, char *name, int autol)
 		!strcmp(name, p->name))
 		break;
 	}
-#ifdef DYNAMIC
 	if (autol && p && p->module) {
 	    /* This is a definition for an autoloaded condition, load the *
 	     * module if we haven't tried that already. */
@@ -1322,7 +1456,6 @@ getconddef(int inf, char *name, int autol)
 		return NULL;
 	    }
 	} else
-#endif
 	    break;
     } while (!p);
     return p;
@@ -1341,11 +1474,9 @@ addconddef(Conddef c)
     if (p) {
 	if (!p->module || (p->flags & CONDF_ADDED))
 	    return 1;
-#ifdef DYNAMIC
 	/* There is an autoload definition. */
 
 	deleteconddef(p);
-#endif
     }
     c->next = condtab;
     condtab = c;
@@ -1616,9 +1747,6 @@ deleteparamdefs(char const *nam, Paramdef d, int size)
     return 1;
 }
 
-/**/
-#ifdef DYNAMIC
-
 /* This adds a definition for autoloading a module for a condition. */
 
 /**/
@@ -1709,9 +1837,6 @@ add_autoparam(char *nam, char *module)
     pm->flags |= PM_AUTOLOAD;
 }
 
-/**/
-#endif
-
 /* List of math functions. */
 
 /**/
@@ -1725,7 +1850,6 @@ getmathfunc(char *name, int autol)
 
     for (p = mathfuncs; p; q = p, p = p->next)
 	if (!strcmp(name, p->name)) {
-#ifdef DYNAMIC
 	    if (autol && p->module) {
 		char *n = dupstring(p->module);
 
@@ -1741,7 +1865,6 @@ getmathfunc(char *name, int autol)
 
 		return getmathfunc(name, 0);
 	    }
-#endif
 	    return p;
 	}
 
@@ -1789,8 +1912,6 @@ addmathfuncs(char const *nam, MathFunc f, int size)
     }
     return hadf ? hads : 1;
 }
-
-#ifdef DYNAMIC
 
 /**/
 int
@@ -1859,5 +1980,3 @@ deletemathfuncs(char const *nam, MathFunc f, int size)
     }
     return hadf ? hads : 1;
 }
-
-#endif /* DYNAMIC */

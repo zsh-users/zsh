@@ -4,6 +4,7 @@
 #
 # Written by Andrew Main
 #
+
 srcdir=${srcdir-`echo $0|sed 's%/[^/][^/]*$%%'`}
 test "x$srcdir" = "x$0" && srcdir=.
 test "x$srcdir" = "x"   && srcdir=.
@@ -18,40 +19,32 @@ trap "rm -f $1; exit 1" 1 2 15
 
 exec > $1
 
-echo "#ifdef DYNAMIC"
 for x_mod in $x_mods; do
-    case $bin_mods in
-	*" $x_mod "*) ;;
-	*)  echo "/* non-linked-in known module \`$x_mod' */"
-	    eval "loc=\$loc_$x_mod"
-	    unset moddeps autobins autoinfixconds autoprefixconds autoparams
-	    unset automathfuncs
-	    . $srcdir/../$loc/${x_mod}.mdd
-	    for bin in $autobins; do
-		echo "    add_autobin(\"$bin\", \"$x_mod\");"
-	    done
-	    for cond in $autoinfixconds; do
-		echo "    add_autocond(\"$cond\", 1, \"$x_mod\");"
-	    done
-	    for cond in $autoprefixconds; do
-		echo "    add_autocond(\"$cond\", 0, \"$x_mod\");"
-	    done
-	    for param in $autoparams; do
-		echo "    add_autoparam(\"$param\", \"$x_mod\");"
-	    done
-	    for mfunc in $automathfuncs; do
-		echo "    add_automath(\"$mfunc\", \"$x_mod\");"
-	    done
-	    for dep in $moddeps; do
-		case $bin_mods in
-		    *" $dep "*)
-			echo "    /* depends on \`$dep' */" ;;
-		    *)	echo "    add_dep(\"$x_mod\", \"$dep\");" ;;
-		esac
-	    done ;;
-    esac
+    echo "/* non-linked-in known module \`$x_mod' */"
+    eval "loc=\$loc_$x_mod"
+    unset moddeps autobins autoinfixconds autoprefixconds autoparams
+    unset automathfuncs
+    . $srcdir/../$loc/${x_mod}.mdd
+    for bin in $autobins; do
+	echo "    add_autobin(\"$bin\", \"$x_mod\");"
+    done
+    for cond in $autoinfixconds; do
+	echo "    add_autocond(\"$cond\", 1, \"$x_mod\");"
+    done
+    for cond in $autoprefixconds; do
+	echo "    add_autocond(\"$cond\", 0, \"$x_mod\");"
+    done
+    for param in $autoparams; do
+	echo "    add_autoparam(\"$param\", \"$x_mod\");"
+    done
+    for mfunc in $automathfuncs; do
+	echo "    add_automath(\"$mfunc\", \"$x_mod\");"
+    done
+    for dep in $moddeps; do
+	echo "    add_dep(\"$x_mod\", \"$dep\");"
+    done
 done
-echo "#endif /* DYNAMIC */"
+
 echo
 done_mods=" "
 for bin_mod in $bin_mods; do
@@ -68,6 +61,15 @@ for bin_mod in $bin_mods; do
 		exit 1 ;;
 	esac
     done
-    echo "    register_module(mod.nam = \"$bin_mod\"); setup_$bin_mod(&mod); boot_$bin_mod(&mod);"
+    echo "    {"
+    echo "        extern int setup_${bin_mod} _((Module));"
+    echo "        extern int boot_${bin_mod} _((Module));"
+    echo "        extern int cleanup_${bin_mod} _((Module));"
+    echo "        extern int finish_${bin_mod} _((Module));"
+    echo
+    echo "        register_module(\"$bin_mod\","
+    echo "                        setup_${bin_mod}, boot_${bin_mod},"
+    echo "                        cleanup_${bin_mod}, finish_${bin_mod});"
+    echo "    }"
     done_mods="$done_mods$bin_mod "
 done

@@ -3213,8 +3213,6 @@ boot_zftp(Module m)
     return !ret;
 }
 
-#ifdef MODULE
-
 /**/
 int
 cleanup_zftp(Module m)
@@ -3249,5 +3247,3 @@ finish_zftp(Module m)
 {
     return 0;
 }
-
-#endif

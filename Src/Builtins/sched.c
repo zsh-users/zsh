@@ -200,8 +200,6 @@ boot_sched(Module m)
     return 0;
 }
 
-#ifdef MODULE
-
 /**/
 int
 cleanup_sched(Module m)
@@ -224,5 +222,3 @@ finish_sched(Module m)
 {
     return 0;
 }
-
-#endif

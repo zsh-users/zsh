@@ -2837,8 +2837,6 @@ boot_computil(Module m)
     return !addbuiltins(m->nam, bintab, sizeof(bintab)/sizeof(*bintab));
 }
 
-#ifdef MODULE
-
 /**/
 int
 cleanup_computil(Module m)
@@ -2865,5 +2863,3 @@ finish_computil(Module m)
 
     return 0;
 }
-
-#endif

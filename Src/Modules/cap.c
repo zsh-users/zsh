@@ -136,8 +136,6 @@ boot_cap(Module m)
     return !addbuiltins(m->nam, bintab, sizeof(bintab)/sizeof(*bintab));
 }
 
-#ifdef MODULE
-
 /**/
 int
 cleanup_cap(Module m)
@@ -152,5 +150,3 @@ finish_cap(Module m)
 {
     return 0;
 }
-
-#endif

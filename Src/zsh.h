@@ -300,6 +300,7 @@ typedef struct funcwrap  *FuncWrap;
 typedef struct builtin   *Builtin;
 typedef struct nameddir  *Nameddir;
 typedef struct module    *Module;
+typedef struct linkedmod *Linkedmod;
 
 typedef struct patprog   *Patprog;
 typedef struct process   *Process;
@@ -917,7 +918,10 @@ struct builtin {
 struct module {
     char *nam;
     int flags;
-    void *handle;
+    union {
+	void *handle;
+	Linkedmod linked;
+    } u;
     LinkList deps;
     int wrapper;
 };
@@ -925,6 +929,19 @@ struct module {
 #define MOD_BUSY    (1<<0)
 #define MOD_UNLOAD  (1<<1)
 #define MOD_SETUP   (1<<2)
+#define MOD_LINKED  (1<<3)
+#define MOD_INIT_S  (1<<4)
+#define MOD_INIT_B  (1<<5)
+
+typedef int (*Module_func) _((Module));
+
+struct linkedmod {
+    char *name;
+    Module_func setup;
+    Module_func boot;
+    Module_func cleanup;
+    Module_func finish;
+};
 
 /* C-function hooks */
 

@@ -110,8 +110,6 @@ boot_clone(Module m)
     return !addbuiltins(m->nam, bintab, sizeof(bintab)/sizeof(*bintab));
 }
 
-#ifdef MODULE
-
 /**/
 int
 cleanup_clone(Module m)
@@ -126,5 +124,3 @@ finish_clone(Module m)
 {
     return 0;
 }
-
-#endif

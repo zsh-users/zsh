@@ -151,9 +151,7 @@ The third one, named `cleanup_foo' for module `foo' is called when the
 user tries to unload a module and should de-register the builtins
 etc. The last function, `finish_foo' is called when the module is
 actually unloaded and should finalize all the data initialized in the 
-`setup'-function. Since the last two functions are only executed when
-the module is used as an dynamically loaded module you can surround
-it with `#ifdef MODULE' and `#endif'.
+`setup'-function.
 In short, the `cleanup'-function should undo what the `boot'-function
 did, and the `finish'-function should undo what the `setup'-function
 did.

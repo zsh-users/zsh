@@ -346,8 +346,6 @@ boot_mapfile(Module m)
     return 0;
 }
 
-#ifdef MODULE
-
 /**/
 int
 cleanup_mapfile(Module m)
@@ -370,5 +368,3 @@ finish_mapfile(Module m)
 {
     return 0;
 }
-
-#endif

@@ -637,8 +637,6 @@ boot_rlimits(Module m)
     return !addbuiltins(m->nam, bintab, sizeof(bintab)/sizeof(*bintab));
 }
 
-#ifdef MODULE
-
 /**/
 int
 cleanup_rlimits(Module m)
@@ -653,5 +651,3 @@ finish_rlimits(Module m)
 {
     return 0;
 }
-
-#endif

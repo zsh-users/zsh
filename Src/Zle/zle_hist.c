@@ -612,17 +612,11 @@ static struct isrch_spot {
 static int max_spot = 0;
 
 /**/
-#ifdef MODULE
-
-/**/
 void
 free_isrch_spots(void)
 {
     zfree(isrch_spots, max_spot * sizeof(*isrch_spots));
 }
-
-/**/
-#endif /* MODULE */
 
 /**/
 static void

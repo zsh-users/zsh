@@ -286,8 +286,6 @@ addzlefunction(char *name, ZleIntFunc ifunc, int flags)
     return w;
 }
 
-#ifdef DYNAMIC
-
 /* Delete an internal widget provided by a module.  Don't try to delete *
  * a widget from the fixed table -- it would be bad.  (Thanks, Egon.)   */
 
@@ -308,8 +306,6 @@ deletezlefunction(Widget w)
 	p = n;
     }
 }
-
-#endif /* DYNAMIC */
 
 /***************/
 /* zle builtin */
@@ -550,18 +546,10 @@ bin_zle_complete(char *name, char **args, char *ops, char func)
     Thingy t;
     Widget w, cw;
 
-#ifdef DYNAMIC
     if (!require_module(name, "complete", 0, 0)) {
 	zerrnam(name, "can't load complete module", NULL, 0);
 	return 1;
     }
-#else
-    if (!module_linked("complete")) {
-	zerrnam(name, "complete module not available", NULL, 0);
-	return 1;
-    }
-#endif
-    
     t = rthingy((args[1][0] == '.') ? args[1] : dyncat(".", args[1]));
     cw = t->widget;
     unrefthingy(t);

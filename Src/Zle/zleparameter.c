@@ -230,8 +230,6 @@ boot_zleparameter(Module m)
     return 0;
 }
 
-#ifdef MODULE
-
 /**/
 int
 cleanup_zleparameter(Module m)
@@ -255,5 +253,3 @@ finish_zleparameter(Module m)
 {
     return 0;
 }
-
-#endif

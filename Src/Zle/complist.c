@@ -935,8 +935,6 @@ boot_complist(Module m)
     return 0;
 }
 
-#ifdef MODULE
-
 /**/
 int
 cleanup_complist(Module m)
@@ -957,5 +955,3 @@ finish_complist(Module m)
 {
     return 0;
 }
-
-#endif

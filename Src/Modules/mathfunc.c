@@ -462,8 +462,6 @@ boot_mathfunc(Module m)
     return !addmathfuncs(m->nam, mftab, sizeof(mftab)/sizeof(*mftab));
 }
 
-#ifdef MODULE
-
 /**/
 int
 cleanup_mathfunc(Module m)
@@ -478,5 +476,3 @@ finish_mathfunc(Module m)
 {
     return 0;
 }
-
-#endif

@@ -1504,13 +1504,12 @@ execcmd(Cmd cmd, int input, int output, int how, int last1)
 	    }
 	    if (!(hn->flags & BINF_PREFIX)) {
 		is_builtin = 1;
-#ifdef DYNAMIC
+
 		/* autoload the builtin if necessary */
 		if (!((Builtin) hn)->handlerfunc) {
 		    load_module(((Builtin) hn)->optstr);
 		    hn = builtintab->getnode(builtintab, cmdarg);
 		}
-#endif
 		assign = (hn->flags & BINF_MAGICEQUALS);
 		break;
 	    }
@@ -1619,13 +1618,12 @@ execcmd(Cmd cmd, int input, int output, int how, int last1)
 	    }
 	    if (!(hn->flags & BINF_PREFIX)) {
 		is_builtin = 1;
-#ifdef DYNAMIC
+
 		/* autoload the builtin if necessary */
 		if (!((Builtin) hn)->handlerfunc) {
 		    load_module(((Builtin) hn)->optstr);
 		    hn = builtintab->getnode(builtintab, cmdarg);
 		}
-#endif
 		break;
 	    }
 	    cflags &= ~BINF_BUILTIN & ~BINF_COMMAND;
@@ -3072,11 +3070,11 @@ runshfunc(List list, FuncWrap wrap, char *name)
 	wrap->module->wrapper++;
 	cont = wrap->handler(list, wrap->next, name);
 	wrap->module->wrapper--;
-#ifdef DYNAMIC
+
 	if (!wrap->module->wrapper &&
 	    (wrap->module->flags & MOD_UNLOAD))
-	    unload_module(wrap->module, NULL);
-#endif
+	    unload_module(wrap->module, NULL, 0);
+
 	if (!cont)
 	    return;
 	wrap = wrap->next;

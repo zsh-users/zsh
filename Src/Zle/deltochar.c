@@ -98,8 +98,6 @@ boot_deltochar(Module m)
     return -1;
 }
 
-#ifdef MODULE
-
 /**/
 int
 cleanup_deltochar(Module m)
@@ -115,5 +113,3 @@ finish_deltochar(Module m)
 {
     return 0;
 }
-
-#endif

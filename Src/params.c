@@ -203,10 +203,8 @@ IPDEF8("WATCH", &watch, "watch", 0),
 IPDEF8("PATH", &path, "path", PM_RESTRICTED),
 IPDEF8("PSVAR", &psvar, "psvar", 0),
 
-#ifdef DYNAMIC
 /* MODULE_PATH is not imported for security reasons */
 IPDEF8("MODULE_PATH", &module_path, "module_path", PM_DONTIMPORT|PM_RESTRICTED),
-#endif
 
 #define IPDEF9F(A,B,C,D) {NULL,A,D|PM_ARRAY|PM_SPECIAL|PM_DONTIMPORT,BR((void *)B),SFN(arrvarsetfn),GFN(arrvargetfn),stdunsetfn,0,NULL,C,NULL,0}
 #define IPDEF9(A,B,C) IPDEF9F(A,B,C,0)
@@ -234,9 +232,7 @@ IPDEF9("manpath", &manpath, "MANPATH"),
 IPDEF9("psvar", &psvar, "PSVAR"),
 IPDEF9("watch", &watch, "WATCH"),
 
-#ifdef DYNAMIC
 IPDEF9F("module_path", &module_path, "MODULE_PATH", PM_RESTRICTED),
-#endif
 IPDEF9F("path", &path, "PATH", PM_RESTRICTED),
 
 {NULL, NULL}
@@ -253,10 +249,6 @@ static Param argvparam;
  
 /**/
 HashTable paramtab, realparamtab;
-
-#ifndef DYNAMIC
-#define getparamnode gethashnode2
-#endif /* DYNAMIC */
 
 /**/
 HashTable
@@ -281,8 +273,6 @@ newparamtable(int size, char const *name)
 }
 
 /**/
-#ifdef DYNAMIC
-/**/
 static HashNode
 getparamnode(HashTable ht, char *nam)
 {
@@ -302,8 +292,6 @@ getparamnode(HashTable ht, char *nam)
     }
     return hn;
 }
-/**/
-#endif /* DYNAMIC */
 
 /* Copy a parameter hash table */
 

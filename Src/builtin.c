@@ -123,12 +123,7 @@ static struct builtin builtins[] =
     BUILTIN("whence", 0, bin_whence, 0, -1, 0, "acmpvfsw", NULL),
     BUILTIN("where", 0, bin_whence, 0, -1, 0, "pmsw", "ca"),
     BUILTIN("which", 0, bin_whence, 0, -1, 0, "ampsw", "c"),
-
-#ifdef DYNAMIC
     BUILTIN("zmodload", 0, bin_zmodload, 0, -1, 0, "ILabcfdipue", NULL),
-#else
-    BUILTIN("zmodload", 0, bin_zmodload, 0, -1, 0, "ei", NULL),
-#endif
 };
 
 /****************************************/
@@ -229,14 +224,11 @@ execbuiltin(LinkList args, Builtin bn)
 
     arg = (char *) ugetnode(args);
 
-#ifdef DYNAMIC
     if (!bn->handlerfunc) {
 	zwarnnam(name, "autoload failed", NULL, 0);
 	deletebuiltin(bn->nam);
 	return 1;
     }
-#endif
-
     /* get some information about the command */
     flags = bn->flags;
     optstr = bn->optstr;
@@ -3209,6 +3201,8 @@ zexit(int val, int from_signal)
 	if (in_exit++ && from_signal) {
 	    LASTALLOC_RETURN;
 	}
+	exit_modules();
+
 	if (isset(MONITOR)) {
 	    /* send SIGHUP to any jobs left running  */
 	    killrunjobs(from_signal);
