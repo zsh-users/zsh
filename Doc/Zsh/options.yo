@@ -1161,6 +1161,15 @@ item(tt(TRANSIENT_RPROMPT))(
 Remove any right prompt from display when accepting a command
 line.  This may be useful with terminals with other cut/paste methods.
 )
+pindex(TYPESET_SILENT)
+item(tt(TYPESET_SILENT))(
+If this is unset, executing any of the `tt(typeset)' family of
+commands with no options and a list of parameters that have no values
+to be assigned but already exist will display the value of the parameter.
+If the option is set, they will only be shown when parameters are selected
+with the `tt(-m)' option.  The option `tt(-p)' is available whether or not
+the option is set.
+)
 pindex(UNSET)
 cindex(parameters, substituting unset)
 cindex(unset parameters, substituting)

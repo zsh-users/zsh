@@ -424,7 +424,7 @@ Bring each specified var(job) in turn to the foreground.
 If no var(job) is specified, resume the current job.
 )
 findex(float)
-item(tt(float) [ {tt(PLUS())|tt(-)}tt(EFghlrtux) ] [ var(name)[tt(=)var(value)] ... ])(
+item(tt(float) [ {tt(PLUS())|tt(-)}tt(EFghlprtux) ] [ var(name)[tt(=)var(value)] ... ])(
 Equivalent to tt(typeset -E), except that options irrelevant to floating
 point numbers are not permitted.
 )
@@ -525,7 +525,7 @@ the form of a call to hash.
 )
 alias(history)(fc -l)
 findex(integer)
-item(tt(integer) [ {tt(PLUS())|tt(-)}tt(ghilrtux) ] [ var(name)[tt(=)var(value)] ... ])(
+item(tt(integer) [ {tt(PLUS())|tt(-)}tt(ghilprtux) ] [ var(name)[tt(=)var(value)] ... ])(
 Equivalent to tt(typeset -i), except that options irrelevant to
 integers are not permitted.
 )
@@ -624,7 +624,7 @@ sitem([var(mm)tt(:)]var(ss))(minutes and seconds)
 endsitem()
 )
 findex(local)
-item(tt(local) [ {tt(PLUS())|tt(-)}tt(AEFLRUZahilrtux) [var(n)]] [ var(name)[tt(=)var(value)] ] ...)(
+item(tt(local) [ {tt(PLUS())|tt(-)}tt(AEFLRUZahilprtux) [var(n)]] [ var(name)[tt(=)var(value)] ] ...)(
 Same as tt(typeset), except that the options tt(-g), and
 tt(-f) are not permitted.  In this case the tt(-x) option does not force
 the use of tt(-g), i.e. exported variables will be local to functions.
@@ -1076,7 +1076,7 @@ Equivalent to tt(whence -v).
 findex(typeset)
 cindex(parameters, setting)
 cindex(parameters, declaring)
-xitem(tt(typeset) [ {tt(PLUS())|tt(-)}tt(AEFLRUZafghilrtuxm) [var(n)]] [ \
+xitem(tt(typeset) [ {tt(PLUS())|tt(-)}tt(AEFLRUZafghilprtuxm) [var(n)]] [ \
 var(name)[tt(=)var(value)] ... ])
 item(tt(typeset) -T [ {tt(PLUS()|tt(-))}tt(LRUZrux) ] \
   var(SCALAR)[tt(=)var(value)] var(array))(
@@ -1095,11 +1095,18 @@ For each var(name)tt(=)var(value) assignment, the parameter
 var(name) is set to var(value).  Note that arrays currently cannot be
 assigned in tt(typeset) expressions, only scalars and integers.
 
-For each remaining var(name) that refers to a parameter that is set, the
-name and value of the parameter are printed in the form of an assignment.
-Nothing is printed for newly-created parameters, or when any attribute
-flags listed below are given along with the var(name).  Using `tt(PLUS())'
-instead of minus to introduce an attribute turns it off.
+If the shell option tt(TYPESET_SILENT) is not set, for each remaining
+var(name) that refers to a parameter that is set, the name and value of the
+parameter are printed in the form of an assignment.  Nothing is printed for
+newly-created parameters, or when any attribute flags listed below are
+given along with the var(name).  Using `tt(PLUS())' instead of minus to
+introduce an attribute turns it off.
+
+If the tt(-p) option is given, parameters and values are printed in the
+form of a typeset comand and an assignment (which will be printed
+separately for arrays and associative arrays), regardless of other flags
+and options.  Note that the tt(-h) flag on parameters is respected; no
+value will be shown for these parameters.
 
 If the tt(-T) option is given, exactly two (or zero) var(name)
 arguments must be present.  They represent a scalar and an array (in
@@ -1133,10 +1140,11 @@ is the word `tt(PLUS())', then names are printed but values are not.
 
 If the tt(-m) flag is given the var(name) arguments are taken as patterns
 (which should be quoted).  With no attribute flags, all parameters (or
-functions with the tt(-f) flag) with matching names are printed.  Note that
-tt(-m) is ignored if no patterns are given.  If the tt(+g) flag is combined
-with tt(-m), a new local parameter is created for every matching parameter
-that is not already local.  Otherwise tt(-m) applies all other flags or
+functions with the tt(-f) flag) with matching names are printed (the shell
+option tt(TYPESET_SILENT) is not used in this case).  Note that tt(-m) is
+ignored if no patterns are given.  If the tt(+g) flag is combined with
+tt(-m), a new local parameter is created for every matching parameter that
+is not already local.  Otherwise tt(-m) applies all other flags or
 assignments to the existing parameters.  Except when assignments are made
 with var(name)tt(=)var(value), using tt(+m) forces the matching parameters
 to be printed, even inside a function.

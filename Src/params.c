@@ -3486,6 +3486,36 @@ freeparamnode(HashNode hn)
 
 /* Print a parameter */
 
+enum paramtypes_flags {
+    PMTF_USE_CT		= (1<<0),
+    PMTF_TEST_LEVEL	= (1<<1)
+};
+
+struct paramtypes {
+    int binflag;	/* The relevant PM_FLAG(S) */
+    const char *string;	/* String for verbose output */
+    int typeflag;	/* Flag for typeset -? */
+    int flags;		/* The enum above */
+};
+
+static const struct paramtypes pmtypes[] = {
+    { PM_AUTOLOAD, "undefined", 0, 0},
+    { PM_INTEGER, "integer", 'i', PMTF_USE_CT},
+    { PM_EFLOAT, "float", 'E', 0},
+    { PM_FFLOAT, "float", 'F', 0},
+    { PM_ARRAY, "array", 'a', 0},
+    { PM_HASHED, "association", 'A', 0},
+    { 0, "local", 0, PMTF_TEST_LEVEL},
+    { PM_LEFT, "left justified", 'L', PMTF_USE_CT},
+    { PM_RIGHT_B, "right justified", 'R', PMTF_USE_CT},
+    { PM_RIGHT_Z, "zero filled", 'Z', PMTF_USE_CT},
+    { PM_LOWER, "lowercase", 'l', 0},
+    { PM_UPPER, "uppercase", 'u', 0},
+    { PM_READONLY, "readonly", 'r', 0},
+    { PM_TAGGED, "tagged", 't', 0},
+    { PM_EXPORTED, "exported", 'x', 0}
+};
+
 /**/
 mod_export void
 printparamnode(HashNode hn, int printflags)
@@ -3496,36 +3526,43 @@ printparamnode(HashNode hn, int printflags)
     if (p->flags & PM_UNSET)
 	return;
 
+    if (printflags & PRINT_TYPESET)
+	printf("typeset ");
+
     /* Print the attributes of the parameter */
-    if (printflags & PRINT_TYPE) {
-	if (p->flags & PM_AUTOLOAD)
-	    printf("undefined ");
-	if (p->flags & PM_INTEGER)
-	    printf("integer ");
-	if (p->flags & (PM_EFLOAT|PM_FFLOAT))
-	    printf("float ");
-	else if (p->flags & PM_ARRAY)
-	    printf("array ");
-	else if (p->flags & PM_HASHED)
-	    printf("association ");
-	if (p->level)
-	    printf("local ");
-	if (p->flags & PM_LEFT)
-	    printf("left justified %d ", p->ct);
-	if (p->flags & PM_RIGHT_B)
-	    printf("right justified %d ", p->ct);
-	if (p->flags & PM_RIGHT_Z)
-	    printf("zero filled %d ", p->ct);
-	if (p->flags & PM_LOWER)
-	    printf("lowercase ");
-	if (p->flags & PM_UPPER)
-	    printf("uppercase ");
-	if (p->flags & PM_READONLY)
-	    printf("readonly ");
-	if (p->flags & PM_TAGGED)
-	    printf("tagged ");
-	if (p->flags & PM_EXPORTED)
-	    printf("exported ");
+    if (printflags & (PRINT_TYPE|PRINT_TYPESET)) {
+	int doneminus = 0, i;
+	const struct paramtypes *pmptr;
+
+	for (pmptr = pmtypes, i = 0; i < sizeof(pmtypes)/sizeof(*pmptr);
+	     i++, pmptr++) {
+	    int doprint = 0;
+	    if (pmptr->flags & PMTF_TEST_LEVEL) {
+		if (p->level)
+		    doprint = 1;
+	    } else if (p->flags & pmptr->binflag)
+		doprint = 1;
+
+	    if (doprint) {
+		if (printflags & PRINT_TYPESET) {
+		    if (pmptr->typeflag) {
+			if (!doneminus) {
+			    putchar('-');
+			    doneminus = 1;
+			}
+			putchar(pmptr->typeflag);
+		    }
+		} else {
+		    printf("%s ", pmptr->string);
+		}
+		if ((pmptr->flags & PMTF_USE_CT) && p->ct) {
+		    printf("%d ", p->ct);
+		    doneminus = 0;
+		}
+	    }
+	}
+	if (doneminus)
+	    putchar(' ');
     }
 
     if ((printflags & PRINT_NAMEONLY) ||
@@ -3543,6 +3580,9 @@ printparamnode(HashNode hn, int printflags)
     }
     if (printflags & PRINT_KV_PAIR)
 	putchar(' ');
+    else if ((printflags & PRINT_TYPESET) &&
+	     (PM_TYPE(p->flags) == PM_ARRAY || PM_TYPE(p->flags) == PM_HASHED))
+	printf("\n%s=", p->nam);
     else
 	putchar('=');
 

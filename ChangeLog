@@ -1,3 +1,9 @@
+2002-06-20  Peter Stephenson  <pws@csr.com>
+
+	* 17334: Src/builtin.c, Src/options.c, Src/params.c, Src/zsh.h,
+	Doc/Zsh/builtins.yo, Doc/Zsh/options.yo: add TYPESET_SILENT
+	shell option and `typeset -p' option.
+
 2002-06-17  Peter Stephenson  <pws@csr.com>
 
 	* unposted: Config/version.mk, Completion/Unix/Command/.distfile,

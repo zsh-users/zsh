@@ -53,7 +53,7 @@ static struct builtin builtins[] =
     BUILTIN("cd", 0, bin_cd, 0, 2, BIN_CD, NULL, NULL),
     BUILTIN("chdir", 0, bin_cd, 0, 2, BIN_CD, NULL, NULL),
     BUILTIN("continue", BINF_PSPECIAL, bin_break, 0, 1, BIN_CONTINUE, NULL, NULL),
-    BUILTIN("declare", BINF_TYPEOPTS | BINF_MAGICEQUALS | BINF_PSPECIAL, bin_typeset, 0, -1, 0, "AEFHLRTUZafghilrtux", NULL),
+    BUILTIN("declare", BINF_TYPEOPTS | BINF_MAGICEQUALS | BINF_PSPECIAL, bin_typeset, 0, -1, 0, "AEFHLRTUZafghilprtux", NULL),
     BUILTIN("dirs", 0, bin_dirs, 0, -1, 0, "clpv", NULL),
     BUILTIN("disable", 0, bin_enable, 0, -1, BIN_DISABLE, "afmr", NULL),
     BUILTIN("disown", 0, bin_fg, 0, -1, BIN_DISOWN, NULL, NULL),
@@ -62,11 +62,11 @@ static struct builtin builtins[] =
     BUILTIN("enable", 0, bin_enable, 0, -1, BIN_ENABLE, "afmr", NULL),
     BUILTIN("eval", BINF_PSPECIAL, bin_eval, 0, -1, BIN_EVAL, NULL, NULL),
     BUILTIN("exit", BINF_PSPECIAL, bin_break, 0, 1, BIN_EXIT, NULL, NULL),
-    BUILTIN("export", BINF_TYPEOPTS | BINF_MAGICEQUALS | BINF_PSPECIAL, bin_typeset, 0, -1, BIN_EXPORT, "EFHLRTUZafhilrtu", "xg"),
+    BUILTIN("export", BINF_TYPEOPTS | BINF_MAGICEQUALS | BINF_PSPECIAL, bin_typeset, 0, -1, BIN_EXPORT, "EFHLRTUZafhilprtu", "xg"),
     BUILTIN("false", 0, bin_false, 0, -1, 0, NULL, NULL),
     BUILTIN("fc", BINF_FCOPTS, bin_fc, 0, -1, BIN_FC, "nlreIRWAdDfEim", NULL),
     BUILTIN("fg", 0, bin_fg, 0, -1, BIN_FG, NULL, NULL),
-    BUILTIN("float", BINF_TYPEOPTS | BINF_MAGICEQUALS | BINF_PSPECIAL, bin_typeset, 0, -1, 0, "EFHghlrtux", "E"),
+    BUILTIN("float", BINF_TYPEOPTS | BINF_MAGICEQUALS | BINF_PSPECIAL, bin_typeset, 0, -1, 0, "EFHghlprtux", "E"),
     BUILTIN("functions", BINF_TYPEOPTS, bin_functions, 0, -1, 0, "mtuU", NULL),
     BUILTIN("getln", 0, bin_read, 0, -1, 0, "ecnAlE", "zr"),
     BUILTIN("getopts", 0, bin_getopts, 2, -1, 0, NULL, NULL),
@@ -77,11 +77,11 @@ static struct builtin builtins[] =
 #endif
 
     BUILTIN("history", 0, bin_fc, 0, -1, BIN_FC, "nrdDfEim", "l"),
-    BUILTIN("integer", BINF_TYPEOPTS | BINF_MAGICEQUALS | BINF_PSPECIAL, bin_typeset, 0, -1, 0, "Hghilrtux", "i"),
+    BUILTIN("integer", BINF_TYPEOPTS | BINF_MAGICEQUALS | BINF_PSPECIAL, bin_typeset, 0, -1, 0, "Hghilprtux", "i"),
     BUILTIN("jobs", 0, bin_fg, 0, -1, BIN_JOBS, "dlpZrs", NULL),
     BUILTIN("kill", 0, bin_kill, 0, -1, 0, NULL, NULL),
     BUILTIN("let", 0, bin_let, 1, -1, 0, NULL, NULL),
-    BUILTIN("local", BINF_TYPEOPTS | BINF_MAGICEQUALS | BINF_PSPECIAL, bin_typeset, 0, -1, 0, "AEFHLRTUZahilrtux", NULL),
+    BUILTIN("local", BINF_TYPEOPTS | BINF_MAGICEQUALS | BINF_PSPECIAL, bin_typeset, 0, -1, 0, "AEFHLRTUZahilprtux", NULL),
     BUILTIN("log", 0, bin_log, 0, 0, 0, NULL, NULL),
     BUILTIN("logout", 0, bin_break, 0, 1, BIN_LOGOUT, NULL, NULL),
 
@@ -101,7 +101,7 @@ static struct builtin builtins[] =
     BUILTIN("pwd", 0, bin_pwd, 0, 0, 0, "rLP", NULL),
     BUILTIN("r", BINF_R, bin_fc, 0, -1, BIN_FC, "nrl", NULL),
     BUILTIN("read", 0, bin_read, 0, -1, 0, "ceklnpqrtzuAE0123456789", NULL),
-    BUILTIN("readonly", BINF_TYPEOPTS | BINF_MAGICEQUALS | BINF_PSPECIAL, bin_typeset, 0, -1, 0, "AEFHLRTUZafghiltux", "r"),
+    BUILTIN("readonly", BINF_TYPEOPTS | BINF_MAGICEQUALS | BINF_PSPECIAL, bin_typeset, 0, -1, 0, "AEFHLRTUZafghilptux", "r"),
     BUILTIN("rehash", 0, bin_hash, 0, 0, 0, "df", "r"),
     BUILTIN("return", BINF_PSPECIAL, bin_break, 0, 1, BIN_RETURN, NULL, NULL),
     BUILTIN("set", BINF_PSPECIAL, bin_set, 0, -1, 0, NULL, NULL),
@@ -115,7 +115,7 @@ static struct builtin builtins[] =
     BUILTIN("trap", BINF_PSPECIAL, bin_trap, 0, -1, 0, NULL, NULL),
     BUILTIN("true", 0, bin_true, 0, -1, 0, NULL, NULL),
     BUILTIN("type", 0, bin_whence, 0, -1, 0, "ampfsw", "v"),
-    BUILTIN("typeset", BINF_TYPEOPTS | BINF_MAGICEQUALS | BINF_PSPECIAL, bin_typeset, 0, -1, 0, "AEFHLRTUZafghilrtuxm", NULL),
+    BUILTIN("typeset", BINF_TYPEOPTS | BINF_MAGICEQUALS | BINF_PSPECIAL, bin_typeset, 0, -1, 0, "AEFHLRTUZafghilprtuxm", NULL),
     BUILTIN("umask", 0, bin_umask, 0, 1, 0, "S", NULL),
     BUILTIN("unalias", 0, bin_unhash, 1, -1, 0, "m", "a"),
     BUILTIN("unfunction", 0, bin_unhash, 1, -1, 0, "m", "f"),
@@ -1607,7 +1607,8 @@ getasg(char *s)
 /**/
 Param
 typeset_single(char *cname, char *pname, Param pm, int func,
-	       int on, int off, int roff, char *value, Param altpm)
+	       int on, int off, int roff, char *value, Param altpm,
+	       char *ops)
 {
     int usepm, tc, keeplocal = 0, newspecial = 0;
     char *subscript;
@@ -1688,7 +1689,10 @@ typeset_single(char *cname, char *pname, Param pm, int func,
     if (usepm) {
 	on &= ~PM_LOCAL;
 	if (!on && !roff && !value) {
-	    paramtab->printnode((HashNode)pm, PRINT_INCLUDEVALUE);
+	    if (ops['p'])
+		paramtab->printnode((HashNode)pm, PRINT_TYPESET);
+	    else if (unset(TYPESETSILENT) && !ops['m'])
+		paramtab->printnode((HashNode)pm, PRINT_INCLUDEVALUE);
 	    return pm;
 	}
 	if ((pm->flags & PM_RESTRICTED) && isset(RESTRICTED)) {
@@ -1733,6 +1737,8 @@ typeset_single(char *cname, char *pname, Param pm, int func,
 	    return NULL;
 	}
 	pm->flags |= (on & PM_READONLY);
+	if (ops['p'])
+	    paramtab->printnode((HashNode)pm, PRINT_TYPESET);
 	return pm;
     }
 
@@ -1921,6 +1927,9 @@ typeset_single(char *cname, char *pname, Param pm, int func,
 	return NULL;
     }
 
+    if (ops['p'])
+	paramtab->printnode((HashNode)pm, PRINT_TYPESET);
+
     return pm;
 }
 
@@ -1985,11 +1994,15 @@ bin_typeset(char *name, char **argv, char *ops, int func)
     queue_signals();
 
     /* Given no arguments, list whatever the options specify. */
+    if (ops['p'])
+	printflags |= PRINT_TYPESET;
     if (!*argv) {
-	if (!(on|roff))
-	    printflags |= PRINT_TYPE;
-	if (roff || ops['+'])
-	    printflags |= PRINT_NAMEONLY;
+	if (!ops['p']) {
+	    if (!(on|roff))
+		printflags |= PRINT_TYPE;
+	    if (roff || ops['+'])
+		printflags |= PRINT_NAMEONLY;
+	}
 	scanhashtable(paramtab, 1, on|roff, 0, paramtab->printnode, printflags);
 	unqueue_signals();
 	return 0;
@@ -2055,7 +2068,7 @@ bin_typeset(char *name, char **argv, char *ops, int func)
 				 (Param)paramtab->getnode(paramtab,
 							  asg->name),
 				 func, (on | PM_ARRAY) & ~PM_EXPORTED,
-				 off, roff, asg->value, NULL))) {
+				 off, roff, asg->value, NULL, ops))) {
 	    unqueue_signals();
 	    return 1;
 	}
@@ -2066,7 +2079,8 @@ bin_typeset(char *name, char **argv, char *ops, int func)
 	if (!(pm=typeset_single(name, asg0.name,
 				(Param)paramtab->getnode(paramtab,
 							 asg0.name),
-				func, on, off, roff, asg0.value, apm))) {
+				func, on, off, roff, asg0.value, apm,
+				ops))) {
 	    if (oldval)
 		zsfree(oldval);
 	    unsetparam_pm(apm, 1, 1);
@@ -2089,10 +2103,12 @@ bin_typeset(char *name, char **argv, char *ops, int func)
 
     /* With the -m option, treat arguments as glob patterns */
     if (ops['m']) {
-	if (!(on|roff))
-	    printflags |= PRINT_TYPE;
-	if (!on)
-	    printflags |= PRINT_NAMEONLY;
+	if (!ops['p']) {
+	    if (!(on|roff))
+		printflags |= PRINT_TYPE;
+	    if (!on)
+		printflags |= PRINT_NAMEONLY;
+	}
 
 	while ((asg = getasg(*argv++))) {
 	    LinkList pmlist = newlinklist();
@@ -2131,7 +2147,7 @@ bin_typeset(char *name, char **argv, char *ops, int func)
 	    for (pmnode = firstnode(pmlist); pmnode; incnode(pmnode)) {
 		pm = (Param) getdata(pmnode);
 		if (!typeset_single(name, pm->nam, pm, func, on, off, roff,
-				    asg->value, NULL))
+				    asg->value, NULL, ops))
 		    returnval = 1;
 	    }
 	}
@@ -2145,7 +2161,8 @@ bin_typeset(char *name, char **argv, char *ops, int func)
 			    (Param) (paramtab == realparamtab ?
 				     gethashnode2(paramtab, asg->name) :
 				     paramtab->getnode(paramtab, asg->name)),
-			    func, on, off, roff, asg->value, NULL))
+			    func, on, off, roff, asg->value, NULL,
+			    ops))
 	    returnval = 1;
     }
     unqueue_signals();

@@ -1244,6 +1244,7 @@ struct nameddir {
 #define PRINT_LIST		(1<<2)
 #define PRINT_KV_PAIR		(1<<3)
 #define PRINT_INCLUDEVALUE	(1<<4)
+#define PRINT_TYPESET		(1<<5)
 
 /* flags for printing for the whence builtin */
 #define PRINT_WHENCE_CSH	(1<<5)
@@ -1465,6 +1466,7 @@ enum {
     SINGLELINEZLE,
     SUNKEYBOARDHACK,
     TRANSIENTRPROMPT,
+    TYPESETSILENT,
     UNSET,
     VERBOSE,
     XTRACE,
