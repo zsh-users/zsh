@@ -35,7 +35,7 @@ else
 fi
 
 zstyle -t ":completion:${curcontext}:" suffix &&
-  [[ "$word" = (\~*/*|\$[a-zA-Z0-9_]##[^a-zA-Z0-9_]*|\$\{*\}?*) ]] &&
+  [[ "$word" = (\~*/*|\$[a-zA-Z0-9_\[\]]##[^a-zA-Z0-9_\[\]]*|\$\{*\}?*) ]] &&
   return 1
 
 zstyle -t ":completion:${curcontext}:" accept-exact ||
