@@ -1,0 +1,16 @@
+#compdef loadkeys
+
+_arguments \
+	'(--clearcompose)-c[clearcompose]' \
+	'(-c)--clearcompose' \
+	'(--default)-d[default]' \
+	'(-d)--default' \
+	'(--help)-h[help]' \
+	'(-h)--help' \
+	'(--mktable)-m[mktable]' \
+	'(-m)--mktable' \
+	'(--clearstrings)-s[clearstrings]' \
+	'(-s)--clearstrings' \
+	'(--verbose)-v[verbose]' \
+	'(-v)--verbose' \
+	':keymap:_files -W /usr/share/keymaps'
