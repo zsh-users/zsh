@@ -139,6 +139,17 @@ item(tt(R))(
 Like `tt(r)', but gives the last match.  For associative arrays, gives
 all possible matches.
 )
+item(tt(k))(
+If used in a subscript on a parameter that is not an associative
+array, this behaves like `tt(r)', but if used on an association, it
+makes the keys be interpreted as patterns and returns the first value
+whose key matches the var(exp).
+)
+item(tt(K))(
+On an associtation this is like `tt(k)' but returns all values whose
+keys match the var(exp). On other types of parameters this has the
+same effect as `tt(R)'.
+)
 item(tt(i))(
 like `tt(r)', but gives the index of the match instead; this may not
 be combined with a second argument.  For associative arrays, the key

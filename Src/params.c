@@ -359,6 +359,7 @@ scancountparams(HashNode hn, int flags)
 }
 
 static Patprog scanprog;
+static char *scanstr;
 static char **paramvals;
 
 /**/
@@ -366,12 +367,20 @@ void
 scanparamvals(HashNode hn, int flags)
 {
     struct value v;
-    if (numparamvals && (flags & (SCANPM_MATCHVAL|SCANPM_MATCHKEY)) &&
-	!(flags & SCANPM_MATCHMANY))
+    Patprog prog;
+
+    if (numparamvals && !(flags & SCANPM_MATCHMANY) &&
+	(flags & (SCANPM_MATCHVAL|SCANPM_MATCHKEY|SCANPM_KEYMATCH)))
 	return;
     v.pm = (Param)hn;
-    if ((flags & SCANPM_MATCHKEY) &&
-	!pattry(scanprog, v.pm->nam)) {
+    if ((flags & SCANPM_KEYMATCH)) {
+	char *tmp = dupstring(v.pm->nam);
+
+	tokenize(tmp);
+
+	if (!(prog = patcompile(tmp, 0, NULL)) || !pattry(prog, scanstr))
+	    return;
+    } else if ((flags & SCANPM_MATCHKEY) && !pattry(scanprog, v.pm->nam)) {
 	return;
     }
     if (flags & SCANPM_WANTKEYS) {
@@ -736,9 +745,10 @@ static zlong
 getarg(char **str, int *inv, Value v, int a2, zlong *w)
 {
     int hasbeg = 0, word = 0, rev = 0, ind = 0, down = 0, l, i, ishash;
+    int keymatch = 0;
     char *s = *str, *sep = NULL, *t, sav, *d, **ta, **p, *tt;
     zlong num = 1, beg = 0, r = 0;
-    Patprog pprog;
+    Patprog pprog = NULL;
 
     ishash = (v->pm && PM_TYPE(v->pm->flags) == PM_HASHED);
 
@@ -750,18 +760,29 @@ getarg(char **str, int *inv, Value v, int a2, zlong *w)
 	    switch (*s) {
 	    case 'r':
 		rev = 1;
-		down = ind = 0;
+		keymatch = down = ind = 0;
 		break;
 	    case 'R':
+		rev = down = 1;
+		keymatch = ind = 0;
+		break;
+	    case 'k':
+		keymatch = ishash;
+		rev = 1;
+		down = ind = 0;
+		break;
+	    case 'K':
+		keymatch = ishash;
 		rev = down = 1;
 		ind = 0;
 		break;
 	    case 'i':
 		rev = ind = 1;
-		down = 0;
+		down = keymatch = 0;
 		break;
 	    case 'I':
 		rev = ind = down = 1;
+		keymatch = 0;
 		break;
 	    case 'w':
 		/* If the parameter is a scalar, then make subscription *
@@ -818,7 +839,7 @@ getarg(char **str, int *inv, Value v, int a2, zlong *w)
 	    default:
 	      flagerr:
 		num = 1;
-		word = rev = ind = down = 0;
+		word = rev = ind = down = keymatch = 0;
 		sep = NULL;
 		s = *str - 1;
 	    }
@@ -841,7 +862,7 @@ getarg(char **str, int *inv, Value v, int a2, zlong *w)
 		v->isarr &= ~SCANPM_WANTVALS;
 	    } else if (rev)
 		v->isarr |= SCANPM_WANTVALS;
-	    if (!down && ishash)
+	    if (!down && !keymatch && ishash)
 		v->isarr &= ~SCANPM_MATCHMANY;
 	}
 	*inv = ind;
@@ -938,13 +959,16 @@ getarg(char **str, int *inv, Value v, int a2, zlong *w)
 	}
 	tokenize(s);
 
-	if ((pprog = patcompile(s, 0, NULL))) {
+	if (keymatch || (pprog = patcompile(s, 0, NULL))) {
 	    int len;
 
 	    if (v->isarr) {
 		if (ishash) {
 		    scanprog = pprog;
-		    if (ind)
+		    scanstr = s;
+		    if (keymatch)
+			v->isarr |= SCANPM_KEYMATCH;
+		    else if (ind)
 			v->isarr |= SCANPM_MATCHKEY;
 		    else
 			v->isarr |= SCANPM_MATCHVAL;
@@ -952,7 +976,8 @@ getarg(char **str, int *inv, Value v, int a2, zlong *w)
 			v->isarr |= SCANPM_MATCHMANY;
 		    if ((ta = getvaluearr(v)) &&
 			(*ta || ((v->isarr & SCANPM_MATCHMANY) &&
-				 (v->isarr & (SCANPM_MATCHKEY | SCANPM_MATCHVAL))))) {
+				 (v->isarr & (SCANPM_MATCHKEY | SCANPM_MATCHVAL |
+					      SCANPM_KEYMATCH))))) {
 			*inv = v->inv;
 			*w = v->b;
 			return 1;
@@ -1131,7 +1156,8 @@ getindex(char **pptr, Value v)
 		s++;
 		if (v->isarr && a == b && 
 		    (!(v->isarr & SCANPM_MATCHMANY) ||
-		     !(v->isarr & (SCANPM_MATCHKEY | SCANPM_MATCHVAL))))
+		     !(v->isarr & (SCANPM_MATCHKEY | SCANPM_MATCHVAL |
+				   SCANPM_KEYMATCH))))
 		    v->isarr = 0;
 		v->a = a;
 		v->b = b;
