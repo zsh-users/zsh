@@ -2,6 +2,10 @@
 
 	* unposted: Config/version.mk: create 4.0.3.
 
+	* unposted: Completion/BSD/Command/.distfiles,
+	Completion/UNIX/Command/.distfiles, Functions/Zle.distfiles,
+	Test/.distfiles: usual fixes for missing distfiles entries.
+
 	* 16135: Doc/.distfiles: pack up more of the .distfiles produced
 	by texi2html, see 16130.
 

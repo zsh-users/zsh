@@ -1,0 +1,4 @@
+DISTFILES_SRC='
+.distfiles
+_bsd_pkg  _cvsup    _kld  _chflags
+'
