@@ -1,13 +1,18 @@
 # Like up-line-or-search, but uses the whole line prefix up to the
 # cursor position for searching backwards.
 
-if [[ $LASTWIDGET != $WIDGET ]]
+if [[ $LBUFFER == *$'\n'* ]]; then
+  zle .up-line-or-history
+  __searching=''
+elif [[ -n $PREBUFFER ]] && 
+    zstyle -t ':zle:up-line-or-beginning-search' edit-buffer
 then
-    if [[ $LBUFFER == *$'\n'* ]]
-    then
-        __last_up_line=up-line-or-history
-    else
-        __last_up_line=history-beginning-search-backward
-    fi
+  zle .push-line-or-edit
+else
+  [[ $LASTWIDGET = $__searching ]] && CURSOR=$__savecursor
+  __savecursor=$CURSOR
+  __searching=$WIDGET
+  zle .history-beginning-search-backward
+  zstyle -T ':zle:up-line-or-beginning-search' leave-cursor &&
+      zle .end-of-line
 fi
-zle .${__last_up_line:-beep}

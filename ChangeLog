@@ -1,5 +1,10 @@
 2002-04-04  Oliver Kiddle  <opk@zsh.org>
 
+	* 16933; based on 16011 (Martin Ebourne) and 16906 (Bart):
+	Functions/Zle/up-line-or-beginning-search,
+	Functions/Zle/down-line-or-beginning-search:
+	more sophisticated versions of these functions
+
 	* 16923: Completion/Base/Completer/_all_matches, Doc/Zsh/compsys.yo:
 	add insert style to insert all matches instead of adding as a match
 

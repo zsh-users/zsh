@@ -1,13 +1,19 @@
 # Like down-line-or-search, but uses the whole line prefix up to the
 # cursor position for searching forwards.
 
-if [[ $LASTWIDGET != $WIDGET ]]
+if [[ ${+NUMERIC} -eq 0 &&
+    ( $LASTWIDGET = $__searching || $RBUFFER != *$'\n'* ) ]]
 then
-    if [[ $LBUFFER == *$'\n'* ]]
-    then
-        __last_down_line=down-line-or-history
-    else
-        __last_down_line=history-beginning-search-forward
-    fi
+  [[ $LASTWIDGET = $__searching ]] && CURSOR=$__savecursor
+  __searching=$WIDGET
+  __savecursor=$CURSOR
+  if zle .history-beginning-search-forward; then
+    [[ $RBUFFER = *$'\n'* ]] || 
+	zstyle -T ':zle:down-line-or-beginning-search' leave-cursor &&
+	zle .end-of-line
+    return
+  fi
+  [[ $RBUFFER = *$'\n'* ]] || return
 fi
-zle .${__last_down_line:-beep}
+__searching=''
+zle .down-line-or-history
