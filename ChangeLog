@@ -1,3 +1,12 @@
+2004-09-08  Bart Schaefer  <schaefer@zanshin.com>
+
+	* 20325: Src/exec.c, Test/E01options.ztst: fix crash when using
+	the "command" builtin (as opposed to the "command" precommand
+	modifier) when POSIX_BUILTINS is set; (unposted) add test for that
+	and also for EVAL_LINENO.
+
+	* 20320: Src/builtin.c: rewrite 20318 for simplicity and clarity.
+
 2004-09-04  Bart Schaefer  <schaefer@zsh.org>
 
 	* 20318: Src/builtin.c: fix subtle xtrace output bug introduced
