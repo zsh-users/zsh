@@ -2963,7 +2963,8 @@ char *
 bslashquote(const char *s, char **e, int instring)
 {
     const char *u, *tt;
-    char *v, buf[PATH_MAX * 2];
+    char *v;
+    VARARR(char, buf, 2 * strlen(s) + 1);
     int sf = 0;
 
     tt = v = buf;
