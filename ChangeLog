@@ -1,3 +1,9 @@
+2001-10-24  Bart Schaefer  <schaefer@zsh.org>
+
+	* Sven: 16041, Bart: 16038, 16124: Src/cond.c, Src/loop.c: for
+	caching of compiled patterns: remember that singsub() might modify
+	the string it gets, compare with unmodified string
+
 2001-10-24  Peter Stephenson  <pws@csr.com>
 
 	* 16130: Doc/.cvsignore, Doc/Makefile.in, Doc/Zsh/manual.yo:

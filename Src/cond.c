@@ -202,11 +202,11 @@ evalcond(Estate state)
 		char *opat;
 		int save;
 
-		right = opat = dupstring(ecrawstr(state->prog, state->pc,
+		right = dupstring(opat = ecrawstr(state->prog, state->pc,
 						  &htok));
 		if (htok)
 		    singsub(&right);
-		save = (state->prog->alloc != EA_HEAP &&
+		save = (!(state->prog->flags & EF_HEAP) &&
 			!strcmp(opat, right) && pprog != dummy_patprog2);
 
 		if (!(pprog = patcompile(right, (save ? PAT_ZDUP : PAT_STATIC),

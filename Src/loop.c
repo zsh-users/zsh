@@ -38,7 +38,7 @@ int loops;
 /* # of continue levels */
  
 /**/
-int contflag;
+mod_export int contflag;
  
 /* # of break levels */
  
@@ -524,9 +524,9 @@ execcase(Estate state, int do_exec)
 	if (isset(XTRACE)) {
 	    char *pat2, *opat;
 
-	    opat = pat = ecgetstr(state, EC_DUP, NULL);
+	    pat = dupstring(opat = ecrawstr(state->prog, state->pc, NULL));
 	    singsub(&pat);
-	    save = (state->prog->alloc != EA_HEAP &&
+	    save = (!(state->prog->flags & EF_HEAP) &&
 		    !strcmp(pat, opat) && *spprog != dummy_patprog2);
 
 	    pat2 = dupstring(pat);
@@ -534,9 +534,8 @@ execcase(Estate state, int do_exec)
 	    printprompt4();
 	    fprintf(xtrerr, "case %s (%s)\n", word, pat2);
 	    fflush(xtrerr);
-	    state->pc++;
-	} else
-	    state->pc += 2;
+	}
+	state->pc += 2;
 
 	if (*spprog != dummy_patprog1 && *spprog != dummy_patprog2)
 	    pprog = *spprog;
@@ -546,11 +545,11 @@ execcase(Estate state, int do_exec)
 		char *opat;
 		int htok = 0;
 
-		opat = pat = dupstring(ecrawstr(state->prog,
+		pat = dupstring(opat = ecrawstr(state->prog,
 						state->pc - 2, &htok));
 		if (htok)
 		    singsub(&pat);
-		save = (state->prog->alloc != EA_HEAP &&
+		save = (!(state->prog->flags & EF_HEAP) &&
 			!strcmp(pat, opat) && *spprog != dummy_patprog2);
 	    }
 	    if (!(pprog = patcompile(pat, (save ? PAT_ZDUP : PAT_STATIC),
@@ -567,7 +566,7 @@ execcase(Estate state, int do_exec)
 		state->pc = next;
 		code = *state->pc;
 		state->pc += 3;
-		next = state->pc + WC_CASE_SKIP(code) - 1;
+		next = state->pc + WC_CASE_SKIP(code) - 2;
 		execlist(state, 1, ((WC_CASE_TYPE(code) == WC_CASE_OR) &&
 				    do_exec));
 	    }
