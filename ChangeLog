@@ -1,3 +1,8 @@
+2003-04-22  Felix Rosencrantz <f_rosencrantz@yahoo.com>
+
+	* 18459: Completion/Unix/Command/_screen: fix up suggestions from
+        Oliver.
+
 2003-04-22  Oliver Kiddle  <opk@zsh.org>
 
 	* unposted: Completion/Unix/Command/_imagemagick: correct return codes
