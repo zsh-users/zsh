@@ -1378,23 +1378,24 @@ the owner and the other members of the group have at least write
 permission, and for which other users don't have read or execute
 permission.
 )
-item(tt(F)var(name)[var(args)...])(
-The shell function var(name) will be called with the generated
-filename as its first argument and the return value determines if the
+item(tt(e)var(string))(
+The var(string) will be executed and the return value determines if the
 filename should be included in the list (if it is zero) or not (if it
-is non-zero). The first character after the `tt(F)' will be used as a
+is non-zero). The first character after the `tt(e)' will be used as a
 separator and anything up to the next matching separator will be taken 
-as the name of the function (`tt([)', `tt({)', and `tt(<)' match
-`tt(])', `tt(})', and `tt(>)' respectively, any other character
-matches itself). Arguments may be given inside consecutive pairs of
-the same separator(s). These strings will be given literally to the
-shell function as the second to last argument.
+as the var(string) (`tt([)', `tt({)', and `tt(<)' match `tt(])',
+`tt(})', and `tt(>)' respectively, any other character matches
+itself). Before the string is executed, expansion is performed on it
+with the parameter tt($_) being set to the filename currently being
+tested. Note that parameter expansions in the var(string) have to be
+quoted to prevent them from being expanded before globbing is done.
 
-If the function sets the parameter tt(reply) to an array or to a
-string or if it sets the parameter tt(REPLY) to a string, then these
-strings will be inserted into the generated list instead of the
-original string. For security reasons, these parameters will be unset
-by the shell before the function is called.
+If during the execution of var(string) the parameter tt(reply) is set
+to an array or to a string or if the parameter tt(REPLY) is set to a
+string, then these strings will be inserted into the generated list
+instead of the original filename. For security reasons, these
+parameters will be unset by the shell before the var(string) is
+executed.
 )
 item(tt(d)var(dev))(
 files on the device var(dev)
