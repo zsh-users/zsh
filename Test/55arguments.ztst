@@ -90,6 +90,8 @@
 0:argument beginning with minus
 >line: {tst -}{}
 >MESSAGE:{arg}
+>DESCRIPTION:{option}
+>NO:{-x}
 
  tst_arguments '-o::optarg:(oa)' ':arg1:(a1)'
  comptest $'tst -o\t\t'

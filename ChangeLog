@@ -1,5 +1,8 @@
 2000-07-27  Sven Wischnowsky  <wischnow@zsh.org>
 
+	* 12408: Test/55arguments.ztst: fix completion test (55*) because
+ 	of 12394
+	
 	* 12405: Completion/Core/_main_complete, Doc/Zsh/compsys.yo: fix a
  	bug that started menu selection too often; fix bug for `yes=long'
  	and documentit
