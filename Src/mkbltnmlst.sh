@@ -20,6 +20,7 @@ trap "rm -f $1; exit 1" 1 2 15
 
 exec > $1
 
+echo "  if (emulation == EMULATE_ZSH) {"
 for x_mod in $x_mods; do
     modfile="`grep '^name='$x_mod' ' $CFMOD | sed -e 's/^.* modfile=//' \
       -e 's/ .*//'`"
@@ -60,6 +61,7 @@ for x_mod in $x_mods; do
     done
     test "x$linked" = xno && echo "#endif"
 done
+echo "  }"
 
 echo
 done_mods=" "

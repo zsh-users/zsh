@@ -1,3 +1,8 @@
+2002-06-26  Bart Schaefer  <schaefer@zsh.org>
+
+	* 17357: Src/mkbltnmlst.sh: predefine autoloads for zsh emulation
+	mode only, not sh/ksh/etc. modes.
+
 2002-06-26  Sven Wischnowsky  <wischnow@zsh.org>
 
 	* 17366: Completion/Base/Core/_main_complete,
