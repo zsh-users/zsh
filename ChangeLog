@@ -1,3 +1,9 @@
+2002-01-14  Peter Stephenson  <pws@csr.com>
+
+	* 16448: Src/math.c: 15291, 15292 introduced bug that assignment
+	could be made in math eval even if a parameter retrieval gave
+	an error.
+
 2002-01-14  Andrej Borsenkow  <bor@zsh.org>
 
 	* 16443: Completion/Mandrake/Command/_urpmi: fix

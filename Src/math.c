@@ -497,7 +497,7 @@ pop(int noget)
     if (mv->val.type == MN_UNSET && !noget)
 	mv->val = getnparam(mv->lval);
     sp--;
-    return mv->val;
+    return errflag ? zero_mnumber : mv->val;
 }
 
 /**/
@@ -630,6 +630,8 @@ op(int what)
 	DPUTS(sp < 1, "BUG: math: not enough wallabies in outback.");
 	b = pop(0);
 	a = pop(what == EQ);
+	if (errflag)
+	    return;
 
 	if (tp & (OP_A2IO|OP_E2IO)) {
 	    /* coerce to integers */
@@ -856,6 +858,8 @@ op(int what)
 	c = pop(0);
 	b = pop(0);
 	a = pop(0);
+	if (errflag)
+	    return;
 	/* b and c can stay different types in this case. */
 	push(((a.type & MN_FLOAT) ? a.u.d : a.u.l) ? b : c, NULL, 0);
 	break;
