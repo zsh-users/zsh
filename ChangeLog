@@ -1,3 +1,8 @@
+2004-02-16  Oliver Kiddle  <opk@zsh.org>
+
+	* Frank v Waveren: 19423: Completion/X/Command/_mplayer: correct
+	typo in one of the options
+
 2004-02-15  Oliver Kiddle  <opk@zsh.org>
 
 	* 19422: Src/Zle/compctl.c: fix crash if given a long option

@@ -102,7 +102,7 @@ _x_arguments -C -s \
   '-vop[specify video output filters]:video output filters:->video-output-plugins' \
   -vobsub:vobsub\ file -vobsubid:id -vsync \
   '-x[scale image to x width if driver supports]:width' \
-  -xineramascreeen:screen -xvidopts:option \
+  -xineramascreen:screen -xvidopts:option \
   '-xy[scale image by factor if driver supports]:factor' \
   '-y[scale image to y height if driver supports]:height' \
   '-z[specify compression level for png output]:compression-level:((0\:no\ compression 1 2 3 4 5 6\:default\ compression 7 8 9\:max\ compression))' \
