@@ -1,3 +1,9 @@
+2001-06-28  Sven Wischnowsky  <wischnow@zsh.org>
+
+	* Bart: 15106, small changes in 15152: Completion/Zsh/Command/_cd,
+	Completion/Zsh/Context/_tilde: Improve completion for `cd' with
+	cdablevars set; cleanup in _cd and _tilde
+
 2001-06-27  Peter Stephenson  <pws@pwstephenson.fsnet.co.uk>
 
 	* 15151: zshconfig.ac: enable-sitefndir should have been

@@ -6,7 +6,7 @@
 
 [[ -n "$compstate[quote]" ]] && return 1
 
-local expl suf dirs list lines revlines i ret disp nm="$compstate[nmatches]"
+local expl suf ret
 
 if [[ "$SUFFIX" = */* ]]; then
   ISUFFIX="/${SUFFIX#*/}$ISUFFIX"
