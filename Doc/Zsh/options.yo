@@ -53,6 +53,11 @@ tt(KSH_OPTION_PRINT) is set), `tt(setopt)' shows all options whose settings
 are changed from the default.
 
 startitem()
+pindex(ALIASES)
+cindex(aliases, expansion)
+item(tt(ALIASES) <D>)(
+Expand aliases.
+)
 pindex(ALL_EXPORT)
 cindex(export, automatic)
 item(tt(ALL_EXPORT) (tt(-a), ksh: tt(-a)))(
@@ -206,6 +211,19 @@ Make the tt(echo) builtin compatible with the BSD manref(echo)(1) command.
 This disables backslashed escape sequences in echo strings unless the
 tt(-e) option is specified.
 )
+pindex(C_BASES)
+cindex(bases, output in C format)
+cindex(hexadecimal, output in C format)
+cindex(octal, output in C format)
+item(tt(C_BASES))(
+Output hexadecimal numbers in the standard C format, for example `tt(0xFF)'
+instead of the usual `tt(16#FF)'.  If the option tt(OCTAL_ZEROES) is also
+set (it is not by default), octal numbers will be treated similarly and
+hence appear as `tt(077)' instead of `tt(8#77)'.  This option has no effect
+on the choice of the output base, nor on the output of bases other than
+hexadecimal and octal.  Note that these formats will be understood on input
+irrespective of the setting of tt(C_BASES).
+)
 pindex(CDABLE_VARS)
 cindex(cd, to parameter)
 item(tt(CDABLE_VARS) (tt(-T)))(
@@ -218,7 +236,7 @@ pindex(CHASE_DOTS)
 cindex(cd, with .. in argument)
 item(tt(CHASE_DOTS))(
 When changing to a directory containing a path segment `tt(..)' which would
-otherwise be treated as cancelling the previous segment in the path (in
+otherwise be treated as canceling the previous segment in the path (in
 other words, `tt(foo/..)' would be removed from the path, or if `tt(..)' is
 the first part of the path, the last part of tt($PWD) would be deleted),
 instead resolve the path to the physical directory.  This option is
@@ -236,7 +254,7 @@ cindex(symbolic links)
 item(tt(CHASE_LINKS) (tt(-w)))(
 Resolve symbolic links to their true values when changing directory.
 This also has the effect of tt(CHASE_DOTS), i.e. a `tt(..)' path segment
-will be treated as referring to the physical parent, even if the preceeding
+will be treated as referring to the physical parent, even if the preceding
 path segment is a symbolic link.
 )
 pindex(CHECK_JOBS)
@@ -244,8 +262,14 @@ cindex(exiting, checking jobs when)
 cindex(logging out, checking jobs when)
 item(tt(CHECK_JOBS) <Z>)(
 Report the status of background and suspended jobs before exiting a shell
-with job control.  tt(NO_CHECK_JOBS) is best used only in combination with
-tt(NO_HUP), else such jobs will be killed automatically.
+with job control; a second attempt to exit the shell will succeed.
+tt(NO_CHECK_JOBS) is best used only in combination with tt(NO_HUP), else
+such jobs will be killed automatically.
+
+The check is omitted if the commands run from the previous command line
+included a `tt(jobs)' command, since it is assumed the user is aware that
+there are background or suspended jobs.  A `tt(jobs)' command run from the
+tt(precmd) function is not counted for this purpose.
 )
 pindex(CLOBBER)
 cindex(clobbering, of files)
@@ -324,7 +348,13 @@ If a pattern for filename generation has no matches,
 delete the pattern from the argument list;
 do not report an error unless all the patterns
 in a command have no matches.
-Overrides tt(NULL_GLOB).
+Overrides tt(NOMATCH).
+)
+pindex(DVORAK)
+item(tt(DVORAK))(
+Use the Dvorak keyboard instead of the standard qwerty keyboard as a basis
+for examining spelling mistakes for the tt(CORRECT) and tt(CORRECT_ALL)
+options and the tt(spell-word) editor command.
 )
 pindex(EQUALS)
 cindex(filename expansion, =)
@@ -344,6 +374,8 @@ cindex(command execution, enabling)
 item(tt(EXEC) (tt(PLUS()n), ksh: tt(PLUS()n)) <D>)(
 Do execute commands.  Without this option, commands are
 read and checked for syntax errors, but not executed.
+This option cannot be turned off in an interactive shell,
+except when `tt(-n)' is supplied to the shell at startup.
 )
 pindex(EXTENDED_GLOB)
 cindex(globbing, extended)
@@ -381,6 +413,24 @@ item(tt(GLOB) (tt(PLUS()F), ksh: tt(PLUS()f)) <D>)(
 Perform filename generation (globbing).
 (See noderef(Filename Generation).)
 )
+pindex(GLOBAL_EXPORT)
+cindex(environment, and local parameters)
+item(tt(GLOBAL_EXPORT) (tt(<Z>)))(
+If this option is set, passing the tt(-x) flag to the builtins tt(declare),
+tt(float), tt(integer), tt(readonly) and tt(typeset) (but not tt(local))
+will also set the tt(-g) flag;  hence parameters exported to
+the environment will not be made local to the enclosing function, unless
+they were already or the flag tt(+g) is given explicitly.  If the option is
+unset, exported parameters will be made local in just the same way as any
+other parameter.
+
+This option is set by default for backward compatibility; it is not
+recommended that its behaviour be relied upon.  Note that the builtin
+tt(export) always sets both the tt(-x) and tt(-g) flags, and hence its
+effect extends beyond the scope of the enclosing function; this is the
+most portable way to achieve this behaviour.
+)
+cindex(exporting, and local parameters)
 pindex(GLOBAL_RCS)
 cindex(startup files, global, inhibiting)
 cindex(files, global startup, inhibiting)
@@ -423,7 +473,8 @@ item(tt(GLOB_SUBST) <C> <K> <S>)(
 Treat any characters resulting from parameter expansion as being
 eligible for file expansion and filename generation, and any
 characters resulting from command substitution as being eligible for
-filename generation.
+filename generation.  Braces (and commas in between) do not become eligible
+for expansion.
 )
 pindex(HASH_CMDS)
 cindex(hashing, of commands)
@@ -493,17 +544,28 @@ if they are duplicates of the previous event.
 pindex(HIST_IGNORE_SPACE)
 cindex(history, ignoring spaces)
 item(tt(HIST_IGNORE_SPACE) (tt(-g)))(
-Do not enter command lines into the history list
-if any command on the line begins with a blank.
+Remove command lines from the history list when the first character on
+the line is a space, or when one of the expanded aliases contains a
+leading space.
+Note that the command lingers in the internal history until the next
+command is entered before it vanishes, allowing you to briefly reuse
+or edit the line.  If you want to make it vanish right away without
+entering another command, type a space and press return.
 )
 pindex(HIST_NO_FUNCTIONS)
 item(tt(HIST_NO_FUNCTIONS))(
-Do not store function definitions in the history list.
+Remove function definitions from the history list.
+Note that the function lingers in the internal history until the next
+command is entered before it vanishes, allowing you to briefly reuse
+or edit the definition.
 )
 pindex(HIST_NO_STORE)
 item(tt(HIST_NO_STORE))(
-Remove the tt(history) (tt(fc -l)) command from
-the history when invoked.
+Remove the tt(history) (tt(fc -l)) command from the history list
+when invoked.
+Note that the command lingers in the internal history until the next
+command is entered before it vanishes, allowing you to briefly reuse
+or edit the line.
 )
 pindex(HIST_REDUCE_BLANKS)
 item(tt(HIST_REDUCE_BLANKS))(
@@ -542,6 +604,11 @@ Do not exit on end-of-file.  Require the use
 of tt(exit) or tt(logout) instead.
 However, ten consecutive EOFs will cause the shell to exit anyway,
 to avoid the shell hanging if its tty goes away.
+
+Also, if this option is set and the Zsh Line Editor is used, widgets
+implemented by shell functions can be bound to EOF (normally
+Control-D) without printing the normal warning message.  This works
+only for normal widgets, not for completion widgets.
 )
 pindex(INC_APPEND_HISTORY)
 cindex(history, incremental appending to a file)
@@ -753,6 +820,14 @@ item(tt(NUMERIC_GLOB_SORT))(
 If numeric filenames are matched by a filename generation pattern,
 sort the filenames numerically rather than lexicographically.
 )
+pindex(OCTAL_ZEROES)
+cindex(octal, arithmetic expressions)
+item(tt(OCTAL_ZEROES) <S>)(
+Interpret any integer constant beginning with a 0 as octal, per IEEE Std
+1003.2-1992 (ISO 9945-2:1993).  This is not enabled by default as it
+causes problems with parsing of, for example, date and time strings with
+leading zeroes.
+)
 pindex(OVERSTRIKE)
 cindex(editor, overstrike mode)
 cindex(overstrike mode, of editor)
@@ -763,12 +838,17 @@ pindex(PATH_DIRS)
 cindex(path search, extended)
 item(tt(PATH_DIRS) (tt(-Q)))(
 Perform a path search even on command names with slashes in them.
-Thus if `tt(/usr/local/bin)' is in the user's path, and he types
+Thus if `tt(/usr/local/bin)' is in the user's path, and he or she types
 `tt(X11/xinit)', the command `tt(/usr/local/bin/X11/xinit)' will be executed
 (assuming it exists).
 Commands explicitly beginning with `tt(/)', `tt(./)' or `tt(../)'
 are not subject to the path search.
 This also applies to the tt(.) builtin.
+
+Note that subdirectories of the current directory are always searched for
+executables specified in this form.  This takes place before any search
+indicated by this option, and regardless of whether `tt(.)' or the current
+directory appear in the command search path.
 )
 pindex(POSIX_BUILTINS)
 item(tt(POSIX_BUILTINS) <K> <S>)(
@@ -885,7 +965,9 @@ cindex(rc, quoting style)
 cindex(quoting style, rc)
 item(tt(RC_QUOTES))(
 Allow the character sequence `tt('')' to signify a single quote
-within singly quoted strings.
+within singly quoted strings.  Note this does not apply in quoted strings
+using the format tt($')var(...)tt('), where a backslashed single quote can
+be used.
 )
 pindex(RCS)
 cindex(startup files, sourcing)

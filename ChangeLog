@@ -1,3 +1,8 @@
+2001-06-11  Peter Stephenson  <pws@csr.com>
+
+	* 14840: Doc/Zsh/options.yo: document search behaviour with
+	PATH_DIRS option.
+
 2001-06-10  Clint Adams <clint@zsh.org>
 
 	* 14830: config.guess, config.sub:
