@@ -51,9 +51,10 @@ int vilinerange;
 int vichgbufsz, vichgbufptr, vichgflag;
 
 /*
- * TODO: need consistent handling of vichgbuf: ZLE_STRING_T or
- * char *?  Consequently, use of lastchar in this file needs fixing
- * too.
+ * Examination of the code suggests vichgbuf is consistently tied
+ * to raw byte input, so it is left as a character array rather
+ * than turned into wide characters.  In particular, when we replay
+ * it we use ungetbytes().
  */
 /**/
 char *vichgbuf;
@@ -117,11 +118,6 @@ vigetkey(void)
     else
 	cmd = t_undefinedkey;
 
-    /*
-     * TODO: if this was bound to self-insert, we may
-     * be on the first character of a multibyte string
-     * and need to acquire the rest.
-     */
     if (!cmd || cmd == Th(z_sendbreak)) {
 	return ZLEEOF;
     } else if (cmd == Th(z_quotedinsert)) {
@@ -575,9 +571,9 @@ vioperswapcase(UNUSED(char **args))
 	/* swap the case of all letters within range */
 	while (zlecs < c2) {
 	    if (islower(zleline[zlecs]))
-		zleline[zlecs] = tuupper(zleline[zlecs]);
+		zleline[zlecs] = ZS_toupper(zleline[zlecs]);
 	    else if (isupper(zleline[zlecs]))
-		zleline[zlecs] = tulower(zleline[zlecs]);
+		zleline[zlecs] = ZS_tolower(zleline[zlecs]);
 	    zlecs++;
 	}
 	/* go back to the first line of the range */
@@ -815,9 +811,9 @@ viswapcase(UNUSED(char **args))
     eol = findeol();
     while (zlecs < eol && n--) {
 	if (islower(zleline[zlecs]))
-	    zleline[zlecs] = tuupper(zleline[zlecs]);
+	    zleline[zlecs] = ZS_toupper(zleline[zlecs]);
 	else if (isupper(zleline[zlecs]))
-	    zleline[zlecs] = tulower(zleline[zlecs]);
+	    zleline[zlecs] = ZS_tolower(zleline[zlecs]);
 	zlecs++;
     }
     if (zlecs && zlecs == eol)
@@ -862,8 +858,11 @@ visetbuffer(UNUSED(char **args))
 	zmod.flags |= MOD_VIAPP;
     else
 	zmod.flags &= ~MOD_VIAPP;
-    /* TODO tulower, idigit doen't handle wint_t */
-    zmod.vibuf = tulower(ch) + (idigit(ch) ? - ZWC('1') + 26 : -ZWC('a'));
+    zmod.vibuf = ZS_tolower(ch);
+    if (ch >= ZWC('1') && ch <= ZWC('9'))
+	zmod.vibuf += - (int)ZWC('1') + 26;
+    else
+	zmod.vibuf += - (int)ZWC('a');
     zmod.flags |= MOD_VIBUF;
     prefixflag = 1;
     return 0;

@@ -30,6 +30,11 @@
 #include "zle.mdh"
 #include "zle_word.pro"
 
+/*
+ * TODO: use of iword needs completely rethinking for Unicode
+ * since we can't base it on a table lookup.
+ */
+
 /**/
 int
 forwardword(char **args)
@@ -354,7 +359,7 @@ upcaseword(UNUSED(char **args))
 	while (zlecs != zlell && !iword(zleline[zlecs]))
 	    zlecs++;
 	while (zlecs != zlell && iword(zleline[zlecs])) {
-	    zleline[zlecs] = tuupper(zleline[zlecs]);
+	    zleline[zlecs] = ZS_toupper(zleline[zlecs]);
 	    zlecs++;
 	}
     }
@@ -376,7 +381,7 @@ downcaseword(UNUSED(char **args))
 	while (zlecs != zlell && !iword(zleline[zlecs]))
 	    zlecs++;
 	while (zlecs != zlell && iword(zleline[zlecs])) {
-	    zleline[zlecs] = tulower(zleline[zlecs]);
+	    zleline[zlecs] = ZS_tolower(zleline[zlecs]);
 	    zlecs++;
 	}
     }
@@ -401,7 +406,8 @@ capitalizeword(UNUSED(char **args))
 	while (zlecs != zlell && iword(zleline[zlecs]) && !isalpha(zleline[zlecs]))
 	    zlecs++;
 	while (zlecs != zlell && iword(zleline[zlecs])) {
-	    zleline[zlecs] = (first) ? tuupper(zleline[zlecs]) : tulower(zleline[zlecs]);
+	    zleline[zlecs] = (first) ? ZS_toupper(zleline[zlecs]) :
+		ZS_tolower(zleline[zlecs]);
 	    first = 0;
 	    zlecs++;
 	}

@@ -105,7 +105,8 @@ int cost;
 # define zwrite(a, b)		zwcwrite(a, b)
 #endif
 
-static int
+/**/
+int
 zwcputc(ZLE_CHAR_T c)
 {
 #ifdef ZLE_UNICODE_SUPPORT

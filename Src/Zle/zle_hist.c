@@ -865,10 +865,6 @@ get_isrch_spot(int num, int *hlp, int *posp, int *csp, int *lenp, int *dirp, int
 #define NORM_PROMPT_POS		8
 #define FIRST_SEARCH_CHAR	(NORM_PROMPT_POS + 14)
 
-/*
- * TODO: use of isearch buffer and strings need fixing for Unicode.
- */
-
 /**/
 static void
 doisearch(char **args, int dir)

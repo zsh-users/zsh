@@ -578,14 +578,14 @@ getzlequery(int yesno)
     if (yesno) {
 	if (c == ZWC('\t'))
 	    c = ZWC('y');
-	else if (icntrl(c) || c == ZLEEOF) /* TODO iswcntrl */
+	else if (ZS_icntrl(c) || c == ZLEEOF)
 	    c = ZWC('n');
 	else
-	    c = tulower(c);	/* TODO tulower doesn't handle wint_t */
+	    c = ZS_tolower(c);
     }
     /* echo response and return */
     if (c != ZWC('\n'))
-	putc(c, shout);		/* TODO: convert to multibyte */
+	zwcputc(c);
     return c;
 }
 

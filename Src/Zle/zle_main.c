@@ -702,8 +702,8 @@ getbyte(int keytmout)
 	ret = STOUC(cc);
     }
     /*
-     * TODO: if vichgbuf is to be characters instead of a multibyte
-     * string the following needs moving to getfullchar().
+     * vichgbuf is raw bytes, not wide characters, so is dealt
+     * with here.
      */
     if (vichgflag) {
 	if (vichgbufptr == vichgbufsz)
