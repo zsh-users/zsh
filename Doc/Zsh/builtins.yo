@@ -702,7 +702,10 @@ Treat the arguments as directory names, replacing prefixes with tt(~)
 expressions, as appropriate.
 )
 item(tt(-P))(
-Perform prompt expansion (see noderef(Prompt Expansion)).
+Perform prompt expansion (see
+ifzman(zmanref(zshmisc))\
+ifnzman(noderef(Prompt Expansion))\
+).
 )
 enditem()
 )

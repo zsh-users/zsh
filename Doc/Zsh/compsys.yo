@@ -901,14 +901,6 @@ the description for this argument.  Depending on personal preferences,
 it may be useful to set this style to something like `tt(specify: %d)'. 
 Note that this may not work for some commands.
 )
-kindex(break-keys, completion style)
-item(tt(break-keys))(
-This style is used by the tt(incremental-complete-word) widget (found
-in the tt(Functions/Zle) directory of the distribution). Its value
-should be a pattern and all keys matching this pattern will cause the
-widget to stop incremental completion without the key having any
-further effect.
-)
 kindex(cache-path, completion style)
 item(tt(cache-path))(
 This style defines the path where any cache files containing dumped
@@ -969,19 +961,6 @@ name will be the same in all calls to the completer; possible
 exceptions to this rule are the tt(_ignored) and tt(_prefix)
 completers.
 
-Note that the widget functions from the distribution that call the
-completion code (namely, the tt(incremental-complete-word) and the
-tt(predict-on) widgets) set up their top-level context name before
-calling completion.  This allows one to define different sets of
-completer functions for normal completion and for these widgets.  For
-example, to use completion, approximation and correction for normal
-completion, completion and correction for incremental completion and
-only completion for prediction one could use:
-
-example(zstyle ':completion:*' completer _complete _correct _approximate
-zstyle ':completion:incremental:*' completer _complete _correct
-zstyle ':completion:predict:*' completer _complete)
-
 The default value for this style is tt(_complete _ignored),
 i.e. normally only completion will be done, first using the
 tt(ignored-patterns) style and the tt($fignore) array and then without 
@@ -999,31 +978,6 @@ item(tt(condition))(
 This style is used by the tt(_list) completer function to decide if
 insertion of matches should be delayed unconditionally. The default is 
 `true'.
-)
-kindex(cursor, completion style)
-item(tt(cursor))(
-The tt(predict-on) widget uses this style to decide where to place the 
-cursor after completion has been tried.  Values are:
-
-startitem()
-item(tt(complete))(
-The cursor is left where it was when completion finished, but only if
-it is after a character equal to the one just inserted by the user.  If 
-it is after another character, this value is the same as `tt(key)'.
-)
-item(tt(key))(
-The cursor is left
-after the var(n)th occurrence of the character just inserted, where
-var(n) is the number of times that character appeared in the word
-before completion was attempted.  In short, this has the effect of
-leaving the cursor after the character just typed even if the
-completion code found out that no other characters need to be inserted 
-at that position.
-)
-enditem()
-
-Any other value for this style unconditionally leaves the cursor at the
-position where the completion code left it.
 )
 kindex(disable-stat, completion style)
 item(tt(disable-stat))(
@@ -1426,21 +1380,9 @@ tt(ALWAYS_LAST_PROMPT) option.
 )
 kindex(list, completion style)
 item(tt(list))(
-This style is used by the tt(_history_complete_word) bindable command
-(using the context prefix `tt(:completion:history-words)') and by the
-tt(incremental-complete-word) widget (using the context prefix
-`tt(:completion:incremental)).
-
-The tt(_history_complete_word) bindable command uses this style to
-decide if the available matches should be shown.
-
-When using the tt(incremental-complete-word) widget, this style says
-if the matches should be listed on every key press (if they fit on the 
-screen).
-
-The tt(predict-on) widget uses this style to decide if the completion
-should be shown even if there is only one possible completion. This is 
-done if the value of this style is the string tt(always).
+This style is used by the tt(_history_complete_word) bindable command to
+decide if the available matches should be shown.  Use the context prefix
+`tt(:completion:history-words)'.
 )
 kindex(list-colors, completion style)
 item(tt(list-colors))(
@@ -1780,39 +1722,6 @@ all.
 
 The default style for this style is `true'.
 )
-kindex(prompt, completion style)
-item(tt(prompt))(
-The tt(incremental-complete-word) widget shows the value of this
-style in the status line during incremental completion.  The string
-value may contain any of the following substrings in the manner of
-the tt(PS1) and other prompt parameters:
-
-startitem()
-item(tt(%c))(
-Replaced by the name of the completer function that generated the
-matches (without the leading underscore).
-)
-item(tt(%l))(
-When the tt(list) style is set,
-replaced by `tt(...)' if the list of matches is too long to fit on the
-screen and with an empty string otherwise.  If the tt(list) style is
-`false' or not set, `tt(%l)' is always removed.
-)
-item(tt(%n))(
-Replaced by the number of matches generated.
-)
-item(tt(%s))(
-Replaced by `tt(-no match-)', `tt(-no prefix-)', or an empty string
-if there is no completion matching the word on the line, if the
-matches have no common prefix different from the word on the line, or
-if there is such a common prefix, respectively.
-)
-item(tt(%u))(
-Replaced by the unambiguous part of all matches, if there
-is any, and if it is different from the word on the line.
-)
-enditem()
-)
 kindex(range, completion style)
 item(tt(range))(
 This is used by the tt(_history) completer and the
@@ -1896,14 +1805,6 @@ command will always insert matches as if menu completion were started
 and will stop when the last match is inserted.  If this style is set
 to `tt(verbose)' a message will be displayed when the last match is
 reached.
-)
-kindex(stop-keys, completion style)
-item(tt(stop-keys))(
-This style is used by the tt(incremental-complete-word)
-widget.  Its value is treated similarly to the one for the tt(break-keys)
-style.  However, in this case all keys matching the pattern given as its
-value will stop incremental completion and will then execute their usual
-function.
 )
 kindex(subst-globs-only, completion style)
 item(tt(subst-globs-only))(

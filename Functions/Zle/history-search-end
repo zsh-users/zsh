@@ -8,13 +8,13 @@
 #   bindkey '...' history-beginning-search-backward-end
 #   bindkey '...' history-beginning-search-forward-end
 
-integer ocursor=$CURSOR
+integer cursor=$CURSOR mark=$MARK
 
 if [[ $LASTWIDGET = history-beginning-search-*-end ]]; then
-  # Last widget called set $hbs_pos.
-  CURSOR=$hbs_pos
+  # Last widget called set $MARK.
+  CURSOR=$MARK
 else
-  hbs_pos=$CURSOR
+  MARK=$CURSOR
 fi
 
 if zle .${WIDGET%-end}; then
@@ -22,7 +22,8 @@ if zle .${WIDGET%-end}; then
   zle .end-of-line
 else
   # failure, restore position
-  CURSOR=$ocursor
+  CURSOR=$cursor
+  MARK=$mark
   return 1
 fi
 # }

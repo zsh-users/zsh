@@ -1115,7 +1115,7 @@ tindex(run-help)
 item(tt(run-help) (ESC-H ESC-h) (unbound) (unbound))(
 Push the buffer onto the buffer stack, and execute the
 command `tt(run-help) var(cmd)', where var(cmd) is the current
-command.  tt(run-help) is normally aliased to var(man).
+command.  tt(run-help) is normally aliased to tt(man).
 )
 tindex(vi-set-buffer)
 item(tt(vi-set-buffer) (unbound) (") (unbound))(

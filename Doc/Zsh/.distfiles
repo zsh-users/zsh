@@ -10,5 +10,5 @@ DISTFILES_SRC='
     mod_zprof.yo mod_zpty.yo
     modules.yo modlist.yo modmenu.yo manmodmenu.yo
     options.yo params.yo prompt.yo redirect.yo restricted.yo seealso.yo
-    zftpsys.yo zle.yo
+    zftpsys.yo zle.yo contrib.yo
 '

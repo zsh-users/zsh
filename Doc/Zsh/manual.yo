@@ -31,6 +31,7 @@ menu(Completion System)
 menu(Completion Using compctl)
 menu(Zsh Modules)
 menu(Zftp Function System)
+menu(User Contributions)
 
  --- Indices ---
 
@@ -138,6 +139,14 @@ Zftp Function System
 menu(Installation)
 menu(Zftp Functions)
 menu(Miscellaneous Features)
+
+User Contributions
+
+menu(Utilities)
+menu(Prompt Themes)
+menu(ZLE Functions)
+menu(Other Functions)
+
 endmenu()
 texinode(The Z Shell Manual)(Introduction)(Top)(Top)
 chapter(The Z Shell Manual)

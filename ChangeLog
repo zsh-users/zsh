@@ -1,3 +1,16 @@
+2000-09-04  Bart Schaefer  <schaefer@zsh.org>
+
+	* 12742: Doc/.distfiles, Doc/Makefile.in, Doc/Zsh/.distfiles,
+	Doc/Zsh/builtins.yo, Doc/Zsh/compsys.yo, Doc/Zsh/contrib.yo,
+	Doc/Zsh/manual.yo, Doc/Zsh/zftpsys.yo, Doc/Zsh/zle.yo,
+	Doc/zsh.yo, Doc/zshcontrib.yo, Functions/Prompts/promptinit,
+	Functions/Zle/history-search-end, Functions/Zle/predict-on:
+	Create new "User Contributions" chapter in the manual; move
+	some items there from existing chapters; fix a few typos.
+	Minor improvements to promptinit and history-search-end.
+	Larger improvements to predict-on, including removing the
+	`:comletion' prefix from most of its style contexts.
+
 2000-09-04  Peter Stephenson  <pws@csr.com>
 
 	* 12741: Src/math.c: problem with nested matheval unexpectedly

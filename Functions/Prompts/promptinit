@@ -76,7 +76,7 @@ Options:
 
 Use prompt -h <theme> for help on specific themes.'
 
-  getopts "chlps" opt
+  getopts "chlps:" opt
   case "$opt" in
     (h|p)
       setopt localtraps
@@ -136,7 +136,8 @@ Use prompt -h <theme> for help on specific themes.'
        print "  autoload -U promptinit"
        print "  promptinit"
        print "  prompt $*[2,-1]"
-       ;;
+       shift
+       ;&
     *) if [[ "$1" == 'random' ]]; then
          local random_themes
          if (( $#* == 1 )); then

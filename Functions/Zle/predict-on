@@ -29,20 +29,27 @@ predict-on() {
   zle -N magic-space insert-and-predict
   zle -N backward-delete-char delete-backward-and-predict
   zle -N delete-char-or-list delete-no-predict
+  zstyle -t :predict verbose && zle -M predict-on
+  return 0
 }
 predict-off() {
   zle -A .self-insert self-insert
   zle -A .magic-space magic-space
   zle -A .backward-delete-char backward-delete-char
+  zstyle -t :predict verbose && zle -M predict-off
+  return 0
 }
 insert-and-predict () {
   setopt localoptions noshwordsplit noksharrays
-  if [[ $LBUFFER = *$'\012'* ]]
+
+  if [[ $LBUFFER == *$'\012'* ]] || (( PENDING ))
   then
-    # Editing a multiline buffer, it's unlikely prediction is wanted
+    # Editing a multiline buffer or pasting in a chunk of text;
+    # it's unlikely prediction is wanted
+    zstyle -t ":predict" toggle && predict-off
     zle .$WIDGET "$@"
     return
-  elif [[ ${RBUFFER[1]} = ${KEYS[-1]} ]]
+  elif [[ ${RBUFFER[1]} == ${KEYS[-1]} ]]
   then
     # Same as what's typed, just move on
     ((++CURSOR))
@@ -58,10 +65,7 @@ insert-and-predict () {
 	  unsetopt automenu recexact
 	  integer curs=$CURSOR pos nchar=${#LBUFFER//[^${KEYS[-1]}]}
 	  local -a +h comppostfuncs
-	  local crs curcontext="${curcontext}"
-
-          [[ -z "$curcontext" ]] && curcontext=:::
-          curcontext="predict:${curcontext#*:}"
+	  local crs curcontext="predict:${${curcontext:-:::}#*:}"
 
 	  comppostfuncs=( predict-limit-list )
 	  zle complete-word
@@ -69,7 +73,7 @@ insert-and-predict () {
 	  # get out of that `case'.
 	  repeat 1
 	  do
-	    zstyle -s ":completion:${curcontext}:" cursor crs
+	    zstyle -s ":predict" cursor crs
 	    case $crs in
 	    (complete)
 	      # At the place where the completion left it, if it is after
@@ -92,27 +96,28 @@ insert-and-predict () {
 	  done
 	fi
       fi
+    else
+      zstyle -t ":predict" toggle && predict-off
     fi
   fi
   return 0
 }
 delete-backward-and-predict() {
-  if [[ -n "$LBUFFER" ]]
+  if (( $#LBUFFER > 1 ))
   then
     setopt localoptions noshwordsplit noksharrays
-    if [[ $LBUFFER = *$'\012'* ]] then
-      # Editing a multiline buffer, it's unlikely prediction is wanted
-      zle .$WIDGET "$@"
-    # If the last widget was e.g. a motion, then probably the intent is
+    # When editing a multiline buffer, it's unlikely prediction is wanted;
+    # or if the last widget was e.g. a motion, then probably the intent is
     # to actually edit the line, not change the search prefix.
-    elif [[ $LASTWIDGET == (self-insert|magic-space|backward-delete-char) ]]
+    if [[ $LBUFFER = *$'\012'* ||
+	  $LASTWIDGET != (self-insert|magic-space|backward-delete-char) ]]
     then
+      zstyle -t ":predict" toggle && predict-off
+      LBUFFER="$LBUFFER[1,-2]"
+    else
       ((--CURSOR))
       zle .history-beginning-search-forward || RBUFFER=""
       return 0
-    else
-      # Depending on preference, you might call "predict-off" here.
-      LBUFFER="$LBUFFER[1,-2]"
     fi
   fi
 }
@@ -130,7 +135,7 @@ predict-limit-list() {
 	    compstate[nmatches] > compstate[list_max] ) ))
   then
     compstate[list]=''
-  elif zstyle -t ":completion:predict::::" list always
+  elif zstyle -t ":predict" list always
   then
     compstate[list]='force list'
   fi
