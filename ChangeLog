@@ -1,3 +1,8 @@
+2004-01-15  Peter Stephenson  <pws@csr.com>
+
+	* 19374: Src/params.c: typo in 19361 caused crashes when
+	unsetting special parameters tied internally to arrays.
+
 2004-01-14  Peter Stephenson  <pws@csr.com>
 
 	* 19364: Completion/Unix/Command/.distfiles,

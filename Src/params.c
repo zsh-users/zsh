@@ -2585,7 +2585,7 @@ arrvarsetfn(Param pm, char **x)
      * ways which need to be set to NULL.  We can't do this
      * with user tied variables since we can leak memory.
      */
-    if ((pm->flags & PM_SPECIAL) & !x)
+    if ((pm->flags & PM_SPECIAL) && !x)
 	*dptr = mkarray(NULL);
     else
 	*dptr = x;
