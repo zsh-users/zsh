@@ -1587,10 +1587,15 @@ mod_export int asklist(void)
 	((complistmax > 0 && listdat.nlist >= complistmax) ||
 	 (complistmax < 0 && listdat.nlines <= -complistmax) ||
 	 (!complistmax && listdat.nlines >= lines))) {
-	int qup;
+	int qup, l;
+
 	zsetterm();
-	qup = printfmt("zsh: do you wish to see all %n lines? ",
-		       listdat.nlines, 1, 1);
+	l = (listdat.nlist > 0 ?
+	     fprintf(shout, "zsh: do you wish to see all %d possibilities (%d lines)? ",
+		     listdat.nlist, listdat.nlines) :
+	     fprintf(shout, "zsh: do you wish to see all %d lines? ",
+		     listdat.nlines));
+	qup = ((l + columns - 1) / columns) - 1;
 	fflush(shout);
 	if (getzlequery() != 'y') {
 	    if (clearflag) {

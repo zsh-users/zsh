@@ -1988,11 +1988,14 @@ listlist(LinkList l)
 
     max = getiparam("LISTMAX");
     if ((max && num > max) || (!max && nlines > lines)) {
-	int qup;
+	int qup, l;
 
 	zsetterm();
-	qup = printfmt("zsh: do you wish to see all %n lines? ",
-		       nlines, 1, 1);
+	l = (num > 0 ?
+	     fprintf(shout, "zsh: do you wish to see all %d possibilities (%d lines)? ",
+		     num, nlines) :
+	     fprintf(shout, "zsh: do you wish to see all %d lines? ", nlines));
+	qup = ((l + columns - 1) / columns) - 1;
 	fflush(shout);
 	if (getzlequery() != 'y') {
 	    if (clearflag) {
