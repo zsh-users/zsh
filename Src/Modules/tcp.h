@@ -63,20 +63,24 @@
 #endif
 
 union tcp_sockaddr {
-	struct sockaddr a;
-	struct sockaddr_in in;
+    struct sockaddr a;
+    struct sockaddr_in in;
 #ifdef SUPPORT_IPV6
-	struct sockaddr_in6 in6;
+    struct sockaddr_in6 in6;
 #endif
 };
 
-struct tcp_session {
-	int fd;				/* file descriptor */
-	union tcp_sockaddr sock;  	/* local address   */
-	union tcp_sockaddr peer;  	/* remote address  */
-};
-
 typedef struct tcp_session *Tcp_session;
+
+#define ZTCP_ZFTP 16
+
+struct tcp_session {
+    int fd;				/* file descriptor */
+    union tcp_sockaddr sock;  	/* local address   */
+    union tcp_sockaddr peer;  	/* remote address  */
+    Tcp_session next;
+    int flags;
+};
 
 #include "tcp.mdh"
 #include "tcp.pro"

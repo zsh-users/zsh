@@ -1,5 +1,5 @@
 /*
- * tcp.c - builtin FTP client
+ * tcp.c - TCP module
  *
  * This file is part of zsh, the Z shell.
  *
@@ -89,16 +89,16 @@ int h_errno;
 mod_export char const *
 zsh_inet_ntop(int af, void const *cp, char *buf, size_t len)
 {       
-        if(af != AF_INET) {
-                errno = EAFNOSUPPORT;
-                return NULL;
-        } 
-        if(len < INET_ADDRSTRLEN) {
-                errno = ENOSPC;
-                return NULL;
-        }
-        strcpy(buf, inet_ntoa(*(struct in_addr *)cp));
-        return buf;
+    if(af != AF_INET) {
+	errno = EAFNOSUPPORT;
+	return NULL;
+    } 
+    if(len < INET_ADDRSTRLEN) {
+	errno = ENOSPC;
+	return NULL;
+    }
+    strcpy(buf, inet_ntoa(*(struct in_addr *)cp));
+    return buf;
 }
 
 /**/
@@ -139,11 +139,11 @@ mod_export int zsh_inet_aton(char const *src, struct in_addr *dst)
 mod_export int
 zsh_inet_pton(int af, char const *src, void *dst)
 {
-        if(af != AF_INET) {
-                errno = EAFNOSUPPORT;
-                return -1;
-        }
-        return !!zsh_inet_aton(src, dst);
+    if(af != AF_INET) {
+	errno = EAFNOSUPPORT;
+	return -1;
+    }
+    return !!zsh_inet_aton(src, dst);
 }
 
 #else /* !HAVE_INET_PTON */
@@ -163,11 +163,11 @@ zsh_inet_pton(int af, char const *src, void *dst)
 mod_export struct hostent *
 zsh_gethostbyname2(char const *name, int af)
 {
-	if(af != AF_INET) {
-		h_errno = NO_RECOVERY;
-		return NULL;
-	}
-	return gethostbyname(name);
+    if(af != AF_INET) {
+	h_errno = NO_RECOVERY;
+	return NULL;
+    }
+    return gethostbyname(name);
 }
 
 /**/
@@ -187,28 +187,28 @@ zsh_gethostbyname2(char const *name, int af)
 mod_export struct hostent *
 zsh_getipnodebyname(char const *name, int af, int flags, int *errorp)
 {
-	static struct hostent ahe;
-	static char nbuf[16];
-	static char *addrlist[] = { nbuf, NULL };
+    static struct hostent ahe;
+    static char nbuf[16];
+    static char *addrlist[] = { nbuf, NULL };
 # ifdef SUPPORT_IPV6
-	static char pbuf[INET6_ADDRSTRLEN];
+    static char pbuf[INET6_ADDRSTRLEN];
 # else
-	static char pbuf[INET_ADDRSTRLEN];
+    static char pbuf[INET_ADDRSTRLEN];
 # endif
-	struct hostent *he;
-	if(zsh_inet_pton(af, name, nbuf) == 1) {
-		zsh_inet_ntop(af, nbuf, pbuf, sizeof(pbuf));
-		ahe.h_name = pbuf;
-		ahe.h_aliases = addrlist+1;
-		ahe.h_addrtype = af;
-		ahe.h_length = (af == AF_INET) ? 4 : 16;
-		ahe.h_addr_list = addrlist;
-		return &ahe;
-	}
-	he = zsh_gethostbyname2(name, af);
-	if(!he)
-		*errorp = h_errno;
-	return he;
+    struct hostent *he;
+    if(zsh_inet_pton(af, name, nbuf) == 1) {
+	zsh_inet_ntop(af, nbuf, pbuf, sizeof(pbuf));
+	ahe.h_name = pbuf;
+	ahe.h_aliases = addrlist+1;
+	ahe.h_addrtype = af;
+	ahe.h_length = (af == AF_INET) ? 4 : 16;
+	ahe.h_addr_list = addrlist;
+	return &ahe;
+    }
+    he = zsh_gethostbyname2(name, af);
+    if(!he)
+	*errorp = h_errno;
+    return he;
 }
 
 /**/
@@ -226,29 +226,130 @@ freehostent(struct hostent *ptr)
 /**/
 #endif /* !HAVE_GETIPNODEBYNAME */
 
-/**/
-mod_export int
-tcp_socket(int domain, int type, int protocol, Tcp_session sess)
+Tcp_session ztcp_head = NULL, ztcp_tail = NULL;
+
+static Tcp_session
+zts_head(void)
 {
+    return ztcp_head;
+}
+
+static Tcp_session
+zts_next(Tcp_session cur)
+{
+    return cur ? cur->next : NULL;
+}
+
+/* "allocate" a tcp_session */
+static Tcp_session
+zts_alloc(int ztflags)
+{
+    Tcp_session sess;
+
+    sess = (Tcp_session)zcalloc(sizeof(struct tcp_session));
+    if(!sess) return NULL;
+    sess->fd=-1;
+    sess->next=NULL;
+    sess->flags=ztflags;
+
+    if(!zts_head()) {
+	ztcp_head = ztcp_tail = sess;
+    }
+    else {
+	ztcp_tail->next = sess;
+    }
+    return sess;
+}
+
+/**/
+mod_export Tcp_session
+tcp_socket(int domain, int type, int protocol, int ztflags)
+{
+    Tcp_session sess;
+
+    sess = zts_alloc(ztflags);
+    if(!sess) return NULL;
+
     sess->fd = socket(domain, type, protocol);
-    return sess->fd;
+    return sess;
+}
+
+static int
+zts_delete(Tcp_session sess)
+{
+    Tcp_session tsess;
+
+    tsess = zts_head();
+
+    if(tsess == sess)
+    {
+	ztcp_head = sess->next;
+	free(sess);
+	return 0;
+    }
+
+    while((tsess->next != sess) && (tsess->next))
+    {
+	tsess = zts_next(tsess);
+    }
+
+    if(!tsess->next) return 1;
+
+    tsess->next = tsess->next->next;
+    free(tsess->next);
+    return 0;
+
+}
+
+static Tcp_session
+zts_byfd(int fd)
+{
+    Tcp_session tsess;
+
+    tsess = zts_head();
+
+    do {
+	if(tsess->fd == fd)
+	    return tsess;
+
+	tsess = zts_next(tsess);
+    }
+    while(tsess != NULL);
+
+    return NULL;
 }
 
 static void
 tcp_cleanup(void)
 {
+    Tcp_session sess, prev;
+    
+    for(sess = zts_head(); sess != NULL; sess = zts_next(prev))
+    {
+	prev = sess;
+	tcp_close(sess);
+	zts_delete(sess);
+    }
 }
 
 /**/
 mod_export int
 tcp_close(Tcp_session sess)
 {
-    if(!close(sess->fd))
-    {
-	sess->fd = -1;
+    int err;
+    
+    if(sess->fd != -1)
+    {  
+	err = close(sess->fd);
+	if(err)
+	{
+	    zwarn("connection close failed: %e", NULL, errno);
+	    return -1;
+	}
 	return 0;
     }
-       else return -1;
+
+    return -1;
 }
 
 /**/
@@ -270,11 +371,121 @@ tcp_connect(Tcp_session sess, char *addrp, struct hostent *zhost, int d_port)
     {
 	memcpy(&(sess->peer.in.sin_addr), addrp, zhost->h_length);
 	sess->peer.in.sin_port = d_port;
+	sess->peer.a.sa_family = zhost->h_addrtype;
 	salen = sizeof(struct sockaddr_in);
     }
 
     return connect(sess->fd, (struct sockaddr *)&(sess->peer), salen);
 }
+
+static int
+bin_ztcp(char *nam, char **args, char *ops, int func)
+{
+    int herrno, err=1, destport, force=0, len;
+    char **addrp, *desthost;
+    struct hostent *zthost = NULL;
+    Tcp_session sess;
+
+    if (ops['f'])
+	force=1;
+    
+    if (ops['c']) {
+	if (!args[0]) {
+	    tcp_cleanup();
+	}
+	else {
+	    int targetfd = atoi(args[0]);
+	    sess = zts_byfd(targetfd);
+
+	    if(sess)
+	    {
+		if((sess->flags & ZTCP_ZFTP) && !force)
+		{
+		    zwarnnam(nam, "use -f to force closure of a zftp control connection", NULL, 0);
+		    return 1;
+		}
+		tcp_close(sess);
+		zts_delete(sess);
+		return 0;
+	    }
+	    else
+	    {
+		zwarnnam(nam, "fd not found in tcp table", NULL, 0);
+		return 1;
+	    }
+	}
+    }
+    else {
+	
+	if (!args[0]) {
+	    for(sess = zts_head(); sess != NULL; sess = zts_next(sess))
+	    {
+		if(sess->fd != -1)
+		{
+		    zthost = gethostbyaddr(&(sess->peer.in.sin_addr), sizeof(struct sockaddr_in), AF_INET);
+		    if(zthost) fprintf(shout, "%s:%d is on fd %d%s\n", zthost->h_name, ntohs(sess->peer.in.sin_port), sess->fd, (sess->flags & ZTCP_ZFTP) ? " ZFTP" : "");
+		    else fprintf(shout, "%s:%d is on fd %d%s\n", "UNKNOWN", sess->peer.in.sin_port, sess->fd, (sess->flags & ZTCP_ZFTP) ? " ZFTP" : "");
+		}
+	    }
+	    return 0;
+	}
+	else if (!args[1]) {
+	    destport = 23;
+	}
+	else {
+	    destport = atoi(args[1]);
+	}
+	
+	desthost = ztrdup(args[0]);
+	
+	zthost = zsh_getipnodebyname(desthost, AF_INET, 0, &herrno);
+	if (!zthost || errflag) {
+	    zwarnnam(nam, "host resolution failure: %s", desthost, 0);
+	    return 1;
+	}
+	
+	sess = tcp_socket(PF_INET, SOCK_STREAM, 0, 0);
+#ifdef SO_OOBINLINE
+	len = 1;
+	setsockopt(sess->fd, SOL_SOCKET, SO_OOBINLINE, (char *)&len, sizeof(len));
+#endif
+
+	if(!sess) {
+	    zwarnnam(nam, "unable to allocate a TCP session slot", NULL, 0);
+	    return 1;
+	}
+	if (sess->fd < 0) {
+	    zwarnnam(nam, "socket creation failed: %e", NULL, errno);
+	    zsfree(desthost);
+	    zts_delete(sess);
+	    return 1;
+	}
+	
+	for (addrp = zthost->h_addr_list; err && *addrp; addrp++) {
+	    if(zthost->h_length != 4)
+		zwarnnam(nam, "address length mismatch", NULL, 0);
+	    do {
+		err = tcp_connect(sess, *addrp, zthost, htons(destport));
+	    } while (err && errno == EINTR && !errflag);
+	}
+	
+	if(err)
+	    zwarnnam(nam, "connection failed: %e", NULL, errno);
+	else
+	{
+	    fprintf(shout, "%s:%d is now on fd %d\n", desthost, destport, sess->fd);
+	}
+	
+	zsfree(desthost);
+    }
+
+    return 0;
+    
+}
+
+static struct builtin bintab[] = {
+    BUILTIN("ztcp", 0, bin_ztcp, 0, 2, 0, "c", NULL),
+};
 
 /* The load/unload routines required by the zsh library interface */
 
@@ -289,8 +500,9 @@ setup_(Module m)
 int
 boot_(Module m)
 {
-    return 0;
+    return !addbuiltins(m->nam, bintab, sizeof(bintab)/sizeof(*bintab));
 }
+
 
 /**/
 int

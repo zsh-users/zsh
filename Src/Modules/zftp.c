@@ -75,10 +75,10 @@ int h_errno;
 #endif
 
 union zftp_sockaddr {
-	struct sockaddr a;
-	struct sockaddr_in in;
+    struct sockaddr a;
+    struct sockaddr_in in;
 #ifdef SUPPORT_IPV6
-	struct sockaddr_in6 in6;
+    struct sockaddr_in6 in6;
 #endif
 };
 
@@ -301,7 +301,7 @@ struct zftp_session {
     char **params;		/* parameters ordered as in zfparams */
     char **userparams;		/* user parameters set by zftp_params */
     FILE *cin;			/* control input file */
-    struct tcp_session control;	/* the control connection */
+    Tcp_session control;	/* the control connection */
     int dfd;			/* data connection */
     int has_size;		/* understands SIZE? */
     int has_mdtm;		/* understands MDTM? */
@@ -643,7 +643,7 @@ zfgetline(char *ln, int lnsize, int tmout)
 		cmdbuf[0] = (char)IAC;
 		cmdbuf[1] = (char)DONT;
 		cmdbuf[2] = ch;
-		write(zfsess->control.fd, cmdbuf, 3);
+		write(zfsess->control->fd, cmdbuf, 3);
 		continue;
 
 	    case DO:
@@ -653,7 +653,7 @@ zfgetline(char *ln, int lnsize, int tmout)
 		cmdbuf[0] = (char)IAC;
 		cmdbuf[1] = (char)WONT;
 		cmdbuf[2] = ch;
-		write(zfsess->control.fd, cmdbuf, 3);
+		write(zfsess->control->fd, cmdbuf, 3);
 		continue;
 
 	    case EOF:
@@ -703,7 +703,7 @@ zfgetmsg(void)
     char line[256], *ptr, *verbose;
     int stopit, printing = 0, tmout;
 
-    if (zfsess->control.fd == -1)
+    if ((zfsess->control && zfsess->control->fd == -1))
 	return 6;
     zsfree(lastmsg);
     lastmsg = NULL;
@@ -831,7 +831,7 @@ zfsendcmd(char *cmd)
      */
     int ret, tmout;
 
-    if (zfsess->control.fd == -1)
+    if ((zfsess->control && zfsess->control->fd == -1))
 	return 6;
     tmout = getiparam("ZFTP_TMOUT");
     if (setjmp(zfalrmbuf)) {
@@ -840,7 +840,7 @@ zfsendcmd(char *cmd)
 	return 6;
     }
     zfalarm(tmout);
-    ret = write(zfsess->control.fd, cmd, strlen(cmd));
+    ret = write(zfsess->control->fd, cmd, strlen(cmd));
     alarm(0);
 
     if (ret <= 0) {
@@ -874,7 +874,7 @@ zfopendata(char *name, union tcp_sockaddr *zdsockp, int *is_passivep)
 	int err, salen;
 
 #ifdef SUPPORT_IPV6
-	if(zfsess->control.peer.a.sa_family == AF_INET6)
+	if(zfsess->control->peer.a.sa_family == AF_INET6)
 	    psv_cmd = "EPSV\r\n";
 	else
 #endif /* SUPPORT_IPV6 */
@@ -890,9 +890,9 @@ zfopendata(char *name, union tcp_sockaddr *zdsockp, int *is_passivep)
 	    zfclosedata();
 	    return zfopendata(name, zdsockp, is_passivep);
 	}
-	zdsockp->a.sa_family = zfsess->control.peer.a.sa_family;
+	zdsockp->a.sa_family = zfsess->control->peer.a.sa_family;
 #ifdef SUPPORT_IPV6
-	if(zfsess->control.peer.a.sa_family == AF_INET6) {
+	if(zfsess->control->peer.a.sa_family == AF_INET6) {
 	    /* see RFC 2428 for explanation */
 	    char const *ptr, *end;
 	    char delim, portbuf[6], *pbp;
@@ -920,7 +920,7 @@ zfopendata(char *name, union tcp_sockaddr *zdsockp, int *is_passivep)
 	    portnum = strtoul(portbuf, &pbp, 10);
 	    if(*pbp || portnum > 65535UL)
 		goto bad_epsv;
-	    *zdsockp = zfsess->control.peer;
+	    *zdsockp = zfsess->control->peer;
 	    zdsockp->in6.sin6_port = htons((unsigned)portnum);
 	    salen = sizeof(struct sockaddr_in6);
 	} else
@@ -980,7 +980,7 @@ zfopendata(char *name, union tcp_sockaddr *zdsockp, int *is_passivep)
 	    return 1;
 	}
 
-	*zdsockp = zfsess->control.sock;
+	*zdsockp = zfsess->control->sock;
 #ifdef SUPPORT_IPV6
 	if(zdsockp->a.sa_family == AF_INET6) {
 	    zdsockp->in6.sin6_port = 0;	/* to be set by bind() */
@@ -1015,9 +1015,9 @@ zfopendata(char *name, union tcp_sockaddr *zdsockp, int *is_passivep)
 	    /* see RFC 2428 for explanation */
 	    strcpy(portcmd, "EPRT |2|");
 	    zsh_inet_ntop(AF_INET6, &zdsockp->in6.sin6_addr,
-		portcmd+8, INET6_ADDRSTRLEN);
+			  portcmd+8, INET6_ADDRSTRLEN);
 	    sprintf(strchr(portcmd, 0), "|%u|\r\n",
-		(unsigned)ntohs(zdsockp->in6.sin6_port));
+		    (unsigned)ntohs(zdsockp->in6.sin6_port));
 	} else
 #endif /* SUPPORT_IPV6 */
 	{
@@ -1171,8 +1171,8 @@ zfgetdata(char *name, char *rest, char *cmd, int getsize)
     }
 #endif
 #if defined(F_SETFD) && defined(FD_CLOEXEC)
-	/* If the shell execs a program, we don't want this fd left open. */
-	fcntl(zfsess->dfd, F_SETFD, FD_CLOEXEC);
+    /* If the shell execs a program, we don't want this fd left open. */
+    fcntl(zfsess->dfd, F_SETFD, FD_CLOEXEC);
 #endif
 
     return 0;
@@ -1655,8 +1655,8 @@ zfsenddata(char *name, int recv, int progress, off_t startat)
 
 	/* the following is black magic, as far as I'm concerned. */
 	/* what are we going to do if it fails?  not a lot, actually. */
-	send(zfsess->control.fd, (char *)msg, 3, 0);
-	send(zfsess->control.fd, (char *)msg+3, 1, MSG_OOB);
+	send(zfsess->control->fd, (char *)msg, 3, 0);
+	send(zfsess->control->fd, (char *)msg+3, 1, MSG_OOB);
 
 	zfsendcmd("ABOR\r\n");
 	if (lastcode == 226) {
@@ -1718,7 +1718,7 @@ zftp_open(char *name, char **args, int flags)
      * Probably this is the safest thing to do.  It's possible
      * a `QUIT' will hang, though.
      */
-    if (zfsess->control.fd != -1)
+    if ((zfsess->control && zfsess->control->fd != -1))
 	zfclose(0);
 
     /* this is going to give 0.  why bother? */
@@ -1757,12 +1757,12 @@ zftp_open(char *name, char **args, int flags)
 # define SUCCEEDED() break
 # define FAILED() if(af == AF_INET) { } else continue
 #else
-    af = AF_INET;
+	af = AF_INET;
 # define SUCCEEDED() do { } while(0)
 # define FAILED() do { } while(0)
 #endif
     {
-    	zhostp = zsh_getipnodebyname(args[0], af, 0, &herrno);
+	zhostp = zsh_getipnodebyname(args[0], af, 0, &herrno);
 	if (!zhostp || errflag) {
 	    /* should use herror() here if available, but maybe
 	     * needs configure test. on AIX it's present but not
@@ -1777,7 +1777,6 @@ zftp_open(char *name, char **args, int flags)
 	}
 	zfsetparam("ZFTP_HOST", ztrdup(zhostp->h_name), ZFPM_READONLY);
 
-	zfsess->control.peer.a.sa_family = af;
 #ifdef SUPPORT_IPV6
 	if(af == AF_INET6) {
 	    hlen = 16;
@@ -1787,8 +1786,9 @@ zftp_open(char *name, char **args, int flags)
 	    hlen = 4;
 	}
 
-	tcp_socket(af, SOCK_STREAM, 0, &(zfsess->control));
-	if (zfsess->control.fd < 0) {
+	zfsess->control = tcp_socket(af, SOCK_STREAM, 0, ZTCP_ZFTP);
+
+	if (!(zfsess->control) || (zfsess->control->fd < 0)) {
 	    freehostent(zhostp);
 	    zfunsetparam("ZFTP_HOST");
 	    FAILED();
@@ -1811,7 +1811,7 @@ zftp_open(char *name, char **args, int flags)
 	    if(hlen != zhostp->h_length)
 		zwarnnam(name, "address length mismatch", NULL, 0);
 	    do {
-		err = tcp_connect(&(zfsess->control), *addrp, zhostp, zservp->s_port);
+		err = tcp_connect(zfsess->control, *addrp, zhostp, zservp->s_port);
 	    } while (err && errno == EINTR && !errflag);
 	    /* you can check whether it's worth retrying here */
 	}
@@ -1846,15 +1846,15 @@ zftp_open(char *name, char **args, int flags)
      * Move the fd out of the user-visible range.  We need to do
      * this after the connect() on some systems.
      */
-    zfsess->control.fd = zfmovefd(zfsess->control.fd);
+    zfsess->control->fd = zfmovefd(zfsess->control->fd);
 
 #if defined(F_SETFD) && defined(FD_CLOEXEC)
     /* If the shell execs a program, we don't want this fd left open. */
-    fcntl(zfsess->control.fd, F_SETFD, FD_CLOEXEC);
+    fcntl(zfsess->control->fd, F_SETFD, FD_CLOEXEC);
 #endif
 
-    len = sizeof(zfsess->control.sock);
-    if (getsockname(zfsess->control.fd, (struct sockaddr *)&zfsess->control.sock, &len) < 0) {
+    len = sizeof(zfsess->control->sock);
+    if (getsockname(zfsess->control->fd, (struct sockaddr *)&zfsess->control->sock, &len) < 0) {
 	zwarnnam(name, "getsockname failed: %e", NULL, errno);
 	zfclose(0);
 	return 1;
@@ -1866,20 +1866,20 @@ zftp_open(char *name, char **args, int flags)
      * do clever things with SIGURG.
      */
     len = 1;
-    setsockopt(zfsess->control.fd, SOL_SOCKET, SO_OOBINLINE,
+    setsockopt(zfsess->control->fd, SOL_SOCKET, SO_OOBINLINE,
 	       (char *)&len, sizeof(len));
 #endif
 #if defined(IP_TOS) && defined(IPTOS_LOWDELAY)
     /* for control connection we want low delay.  please don't laugh. */
     len = IPTOS_LOWDELAY;
-    setsockopt(zfsess->control.fd, IPPROTO_IP, IP_TOS, (char *)&len, sizeof(len));
+    setsockopt(zfsess->control->fd, IPPROTO_IP, IP_TOS, (char *)&len, sizeof(len));
 #endif
 
     /*
      * We use stdio with line buffering for convenience on input.
      * On output, we can just dump a complete message to the fd via write().
      */
-    zfsess->cin = fdopen(zfsess->control.fd, "r");
+    zfsess->cin = fdopen(zfsess->control->fd, "r");
 
     if (!zfsess->cin) {
 	zwarnnam(name, "file handling error", NULL, 0);
@@ -1923,17 +1923,17 @@ zftp_open(char *name, char **args, int flags)
 	unlink(fname);
     }
 
-    if (zfsess->control.fd == -1) {
+    if (zfsess->control->fd == -1) {
 	/* final paranoid check */
 	return 1;
     }
 	
     zfsetparam("ZFTP_MODE", ztrdup("S"), ZFPM_READONLY);
     /* if remaining arguments, use them to log in. */
-    if (zfsess->control.fd > -1 && *++args)
+    if (zfsess->control->fd > -1 && *++args)
 	return zftp_login(name, args, flags);
     /* if something wayward happened, connection was already closed */
-    return zfsess->control.fd == -1;
+    return zfsess->control->fd == -1;
 }
 
 /*
@@ -1995,7 +1995,7 @@ zfgetinfo(char *prompt, int noecho)
 	/* '\n' didn't get echoed */
 	fputc('\n', stdout);
 	fflush(stdout);
-    	settyinfo(&shttyinfo);
+	settyinfo(&shttyinfo);
     }
 
     return strret;
@@ -2127,7 +2127,7 @@ zftp_login(char *name, char **args, int flags)
     }
 
     zsfree(ucmd);
-    if (zfsess->control.fd == -1)
+    if (zfsess->control->fd == -1)
 	return 1;
     if (stopit == 2 || (lastcode != 230 && lastcode != 202)) {
 	zwarnnam(name, "login failed", NULL, 0);
@@ -2206,7 +2206,7 @@ zftp_test(char *name, char **args, int flags)
     struct timeval tv;
 # endif /* HAVE_POLL */
 
-    if (zfsess->control.fd == -1)
+    if (zfsess->control->fd == -1)
 	return 1;
 
 # ifdef HAVE_POLL
@@ -2214,7 +2214,7 @@ zftp_test(char *name, char **args, int flags)
     /* safety first, though I think POLLIN is more common */
 #   define POLLIN POLLNORM
 #  endif /* HAVE_POLL */
-    pfd.fd = zfsess->control.fd;
+    pfd.fd = zfsess->control->fd;
     pfd.events = POLLIN;
     if ((ret = poll(&pfd, 1, 0)) < 0 && errno != EINTR && errno != EAGAIN)
 	zfclose(0);
@@ -2224,10 +2224,10 @@ zftp_test(char *name, char **args, int flags)
     }
 # else
     FD_ZERO(&f);
-    FD_SET(zfsess->control.fd, &f);
+    FD_SET(zfsess->control->fd, &f);
     tv.tv_sec = 0;
     tv.tv_usec = 0;
-    if ((ret = select(zfsess->control.fd +1, (SELECT_ARG_2_T) &f,
+    if ((ret = select(zfsess->control->fd +1, (SELECT_ARG_2_T) &f,
 		      NULL, NULL, &tv)) < 0
 	&& errno != EINTR)
 	zfclose(0);
@@ -2236,8 +2236,8 @@ zftp_test(char *name, char **args, int flags)
 	zfgetmsg();
     }
 # endif /* HAVE_POLL */
-    /* if we now have zfsess->control.fd == -1, then we've just been dumped out. */
-    return (zfsess->control.fd == -1) ? 2 : 0;
+    /* if we now have zfsess->control->fd == -1, then we've just been dumped out. */
+    return (zfsess->control->fd == -1) ? 2 : 0;
 #else
     zfwarnnam(name, "not supported on this system.", NULL, 0);
     return 3;
@@ -2659,7 +2659,7 @@ zfclose(int leaveparams)
     char **aptr;
     Eprog prog;
 
-    if (zfsess->control.fd == -1)
+    if (zfsess->control->fd == -1)
 	return;
 
     zfclosing = 1;
@@ -2675,9 +2675,9 @@ zfclose(int leaveparams)
 	fclose(zfsess->cin);
 	zfsess->cin = NULL;
     }
-    if (zfsess->control.fd != -1) {
+    if (zfsess->control->fd != -1) {
 	zfnopen--;
-	tcp_close(&(zfsess->control));
+	tcp_close(zfsess->control);
     }
 
     if (zfstatfd != -1) {
@@ -2750,7 +2750,7 @@ newsession(char *nm)
     if (!nptr) {
 	zfsess = (Zftp_session) zcalloc(sizeof(struct zftp_session));
 	zfsess->name = ztrdup(nm);
-	zfsess->control.fd = zfsess->dfd = -1;
+	zfsess->dfd = -1;
 	zfsess->params = (char **) zcalloc(sizeof(zfparams));
 	zaddlinknode(zfsessions, zfsess);
 
@@ -2965,7 +2965,7 @@ bin_zftp(char *name, char **args, char *ops, int func)
 	int oldstatus = zfstatusp[zfsessno];
 	lseek(zfstatfd, 0, 0);
 	read(zfstatfd, (char *)zfstatusp, sizeof(int)*zfsesscnt);
-	if (zfsess->control.fd != -1 && (zfstatusp[zfsessno] & ZFST_CLOS)) {
+	if ((zfsess->control && zfsess->control->fd != -1) && (zfstatusp[zfsessno] & ZFST_CLOS)) {
 	    /* got closed in subshell without us knowing */
 	    zcfinish = 2;
 	    zfclose(0);
@@ -2986,7 +2986,7 @@ bin_zftp(char *name, char **args, char *ops, int func)
 	}
     }
 #if defined(HAVE_SELECT) || defined (HAVE_POLL)
-    if (zfsess->control.fd != -1 && !(zptr->flags & (ZFTP_TEST|ZFTP_SESS))) {
+    if ((zfsess->control && zfsess->control->fd != -1) && !(zptr->flags & (ZFTP_TEST|ZFTP_SESS))) {
 	/*
 	 * Test the connection for a bad fd or incoming message, but
 	 * only if the connection was last heard of open, and
@@ -2996,7 +2996,7 @@ bin_zftp(char *name, char **args, char *ops, int func)
 	ret = zftp_test("zftp test", NULL, 0);
     }
 #endif
-    if ((zptr->flags & ZFTP_CONN) && zfsess->control.fd == -1) {
+    if ((zptr->flags & ZFTP_CONN) && (zfsess->control && zfsess->control->fd == -1)) {
 	if (ret != 2) {
 	    /*
 	     * with ret == 2, we just got dumped out in the test,

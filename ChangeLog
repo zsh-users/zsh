@@ -1,3 +1,9 @@
+2001-09-08  Clint Adams  <clint@zsh.org>
+
+	* 15762: Src/Modules/tcp.c, Src/Modules/tcp.h,
+	Src/Modules/tcp.mdd, Src/Modules/zftp.c:
+	introduce ztcp builtin.
+
 2001-09-06  Clint Adams  <clint@zsh.org>
 
 	* 15740: Completion/compaudit: don't whine about

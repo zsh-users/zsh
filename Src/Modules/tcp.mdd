@@ -3,3 +3,4 @@ link=dynamic
 load=no
 
 objects="tcp.o"
+autobins="ztcp"
