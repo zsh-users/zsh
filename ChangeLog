@@ -1,3 +1,11 @@
+2003-03-11  Oliver Kiddle  <opk@zsh.org>
+
+	* 18338: Completion/Base/Widget/_next_tags: list a single
+	unambiguous match instead of inserting it
+
+	* 18337: Src/params.c: use C locale when converting floats to scalars
+	to avoid problems in locales where `,' is the decimal separator
+
 2003-03-10  Oliver Kiddle  <opk@zsh.org>
 
 	* 18330: Src/math.c: save output of setlocale as the pointer it
