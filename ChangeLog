@@ -1,5 +1,8 @@
 2003-08-30  Peter Stephenson  <pws@pwstephenson.fsnet.co.uk>
 
+	* c.f. somewhat terse reference in zsh-users/6493:
+	use tinfo library for curses if not found elsewhere.
+
 	* 18980: zshconfig.ac, Doc/.cvsignore, Doc/Makefile.in,
 	Doc/Zsh/mod_system.yo, Doc/Zsh/params.yo, Src/params.c,
 	Src/Modules/.cvsignore, Src/Modules/errnames1.awk,

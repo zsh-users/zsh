@@ -567,15 +567,15 @@ dnl On HPUX, Hcurses is reported to work better than curses.
 AC_ARG_WITH(curses-terminfo,
 [  --with-curses-terminfo     use terminfo support from curses library],
 [if test x$withval = xyes; then
-  termcap_curses_order="curses ncurses termcap"
+  termcap_curses_order="tinfo curses ncurses termcap"
   AC_SEARCH_LIBS(tigetstr, [$termcap_curses_order])
 else
-  termcap_curses_order="termcap curses ncurses"
+  termcap_curses_order="tinfo termcap curses ncurses"
 fi],
 [case "$host_os" in
   hpux10.*|hpux11.*|solaris*)
       termcap_curses_order="Hcurses curses ncurses termcap" ;;
-  *)             termcap_curses_order="termcap curses ncurses" ;;
+  *)             termcap_curses_order="tinfo termcap curses ncurses" ;;
 esac])dnl
 
 AC_SEARCH_LIBS(tgetent, [$termcap_curses_order])
