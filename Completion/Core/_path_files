@@ -346,9 +346,13 @@ for prepath in "$prepaths[@]"; do
       # if none of the patterns match.
 
       if [[ -z "$tpre$tsuf" && -n "$pre$suf" ]]; then
-        tmp1=( "$tmp2[@]" )
 	pfxsfx=(-S '' "$pfxsfx[@]")
-	break
+	### Don't remember what the break was good for. We explicitly
+	### execute this only when there are no matches in the directory,
+	### so why continue?
+	###
+        ### tmp1=( "$tmp2[@]" )
+	### break
       elif [[ "$haspats" = no && -z "$tpre$tsuf" &&
 	"$pre" = */ && -z "$suf" ]]; then
 	PREFIX="${opre}"
