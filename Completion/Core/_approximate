@@ -23,7 +23,7 @@ zstyle -s ":completion:${curcontext}:" max-errors cfgacc || cfgacc='2 numeric'
 # Get the number of errors to accept.
 
 if [[ "$cfgacc" = *numeric* && ${NUMERIC:-1} -ne 1 ]]; then
-  # Stop if we also have a `!'.
+  # A numeric argument may mean that we should not try correction.
 
   [[ "$cfgacc" = *not-numeric* ]] && return 1
 
@@ -40,9 +40,9 @@ fi
 
 _tags corrections original
 
-# Otherwise temporarily define functions to use instead of
-# the builtins that add matches. This is used to be able
-# to stick the `(#a...)' into the right place (after an
+# Otherwise temporarily define a function to use instead of
+# the builtin that adds matches. This is used to be able
+# to stick the `(#a...)' in the right place (after an
 # ignored prefix).
 
 compadd() {
@@ -72,8 +72,8 @@ while [[ _comp_correct -le comax ]]; do
        [[ "${#compstate[unambiguous]}" -ge "${#:-$PREFIX$SUFFIX}" ]]; then
       compstate[pattern_insert]=unambiguous
     elif _requested original &&
-         ( [[ compstate[nmatches] -gt 1 ]] ||
-           zstyle -t ":completion:${curcontext}:" original ); then
+         { [[ compstate[nmatches] -gt 1 ]] ||
+           zstyle -t ":completion:${curcontext}:" original }; then
       local expl
 
       _description -V original expl original

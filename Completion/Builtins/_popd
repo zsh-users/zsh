@@ -9,10 +9,10 @@ setopt extendedglob nonomatch
 
 local expl list lines revlines disp
 
-_wanted -V directory-stack expl 'directory stack' || return 1
-
 ! zstyle -T ":completion:${curcontext}:directory-stack" prefix-needed ||
     [[ $PREFIX = [-+]* ]] || return 1
+
+_wanted -V directory-stack expl 'directory stack' || return 1
 
 if zstyle -T ":completion:${curcontext}:directory-stack" verbose; then
   # get the list of directories with their canonical number
