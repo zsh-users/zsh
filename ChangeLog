@@ -1,3 +1,11 @@
+2002-10-06  Bart Schaefer  <schaefer@zsh.org>
+
+	* 17760: Src/lex.c Src/parse.c: Fix case-pattern parsing bug in sh
+	emulation.
+
+	* 17714: Src/mkbltnmlst.sh: Fix to 17357, add module dependencies
+	even if not adding module autoloads.
+
 2002-10-05  Clint Adams  <clint@zsh.org>
 
 	* 17765: Completion/Debian/Command/_apt: add some missing apt-get
