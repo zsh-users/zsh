@@ -1,5 +1,7 @@
 2003-11-21  Oliver Kiddle  <opk@zsh.org>
 
+	* unposted: Completion/Unix/Command/_screen: tidy up descriptions
+
 	* Stephen Rüger: 19255: Completion/Debian/Command/_apt: update
 	to work with APT 0.5.14
 
