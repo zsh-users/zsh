@@ -1,0 +1,22 @@
+#compdef su
+
+local shell comp name usr base
+
+[[ $words[2] != - ]]
+(( base=$?+2 ))
+
+if [[ CURRENT -eq base ]]; then
+  _users && return
+  usr=root
+elif [[ CURRENT -ge base+1 ]]; then
+  usr=$words[base]
+else
+  return
+fi
+
+shell="${${(M@)${(@f)$(</etc/passwd)}:#$usr*}##*:}"
+compset -n $base
+for name in $shell $shell:t -default-; do
+  comp="$_comps[$name]"
+  [[ -n "$comp" ]] && "$comp" && return
+done  
