@@ -39,10 +39,10 @@ case $state in
     else
       if compset -S '[.:]*'; then
         suf=()
-      elif [[ $OSTYPE = (solaris*|hpux*|*bsd*|linux*) ]]; then
-	suf=( -qS ':' )
-      else
+      elif [[ $OSTYPE = irix* ]]; then
 	suf=( -qS '.' )
+      else
+	suf=( -qS ':' )
       fi
       _users "$suf[@]" && ret=0
     fi
