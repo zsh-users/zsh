@@ -5,4 +5,4 @@ _arguments -C -s -A "-*" -S \
   "(-a -r)-f[act on functions]:*:functions:(${(k)dis_functions})" \
   "(-a -f)-r[act on reserved words]:*:reserved-words:(${(k)dis_reswords})" \
   '-m[treat arguments as patterns]' \
-  "*:builtin command:(${(@k)dis_builtins})"
+  "*:builtin command:(${(k)dis_builtins})"

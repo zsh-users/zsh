@@ -58,4 +58,6 @@ _value:LDFLAGS () {
   fi
 }
 
+_value:DISPLAY() { _x_display "$@" }
+
 _value "$@"
