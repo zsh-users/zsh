@@ -27,6 +27,5 @@ elif [[ "$prev" = -fstype ]]; then
 elif [[ "$prev" = -group ]]; then
   _groups
 elif [[ "$prev" = -user ]]; then
-  _description expl user
-  compgen "$expl[@]" -u
+  _users
 fi

@@ -1,0 +1,49 @@
+#autoload
+
+# This should be called from `_arguments' or otherwise the calling
+# function has to set up an array named `line' that contains the
+# name of the executable as its seconf element or it has to supply
+# that name as an argument.
+# One option is recognized: `-p' means that we are completing a pair
+# of names separated by a slash.
+
+local cmd pair expl
+
+if [[ "$1" = -p ]]; then
+  pair=yes
+  shift
+fi
+
+if (( $# )); then
+  cmd="$1"
+elif [[ $#line -gt 1 ]]; then
+  cmd="$line[2]"
+else
+  return 1
+fi
+
+if [[ -n "$cmd" ]]; then
+  if [[ "$cmd" = /* ]]; then
+    tmp="$cmd"
+  else
+    tmp="$PWD/$cmd"
+  fi
+
+  if [[ "$tmp" != "$_es_command" ]]; then
+    _es_command="$tmp"
+    _es_funcs=( "${(@)${(@M)${(@f)$(nm $cmd)}:#[^ ]# [tT] ([^_]|_[^_])*}##* }" )
+  fi
+  
+  if [[ -n "$pair" ]]; then
+    if compset -P '*/'; then
+      _description expl 'call arc to function'
+    else
+      _description expl 'call arc from function'
+    fi
+  else
+    _description expl function
+  fi
+  compadd -M 'r:|_=* r:|=*' - "$_es_funcs[@]"
+else
+  return 1
+fi

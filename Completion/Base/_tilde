@@ -41,7 +41,7 @@ else
   if (( $# )); then
     d=( "$@" )
   else
-    _description d user
+    _description d 'user or named directory'
   fi
 fi
 

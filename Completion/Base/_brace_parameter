@@ -2,16 +2,17 @@
 
 setopt localoptions extendedglob
 
-local lp ls n q suf=''
+local lp ls n q
 
 if [[ "$SUFFIX" = *\}* ]]; then
   ISUFFIX="${SUFFIX#*\}}$ISUFFIX"
   SUFFIX="${SUFFIX%%\}*}"
+  suf=()
 elif [[ "$LBUFFER" = *\$\{[^}]#\$\{[^}]#$PREFIX ||
         "$compstate[insert]" = *menu* ]]; then
-  suf='}'
+  suf=(-b '')
 else
-  suf='} '
+  suf=(-b ' ')
 fi
 
 lp="$LBUFFER[1,-${#PREFIX}-1]"
@@ -21,4 +22,4 @@ q=${(M)lp%%\"#}
 
 [[ n -gt 0 ]] && suf=''
 
-_parameters -Qs "${q[1,-n-1]}" -S "$suf" -r '-:?#%+=[/}'
+_parameters "$suf[@]" -Qs "${q[1,-n-1]}" -r '-:?#%+=[/}'

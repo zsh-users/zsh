@@ -1,4 +1,4 @@
-#compdef -kn complete-word \e/
+#compdef -k complete-word \e/
 
 local expl
 

@@ -1,13 +1,12 @@
 #compdef su
 
-local shell comp name usr base expl
+local shell comp name usr base
 
 [[ $words[2] != - ]]
 (( base=$?+2 ))
 
 if [[ CURRENT -eq base ]]; then
-  _description expl user
-  compgen "$expl[@]" -u && return
+  _users && return
   usr=root
 elif [[ CURRENT -ge base+1 ]]; then
   usr=$words[base]

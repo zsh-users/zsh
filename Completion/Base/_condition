@@ -7,11 +7,10 @@ if [[ "$prev" = -o ]]; then
 elif [[ "$prev" = -([no]t|ef) ]]; then
   _files
 else
-  local ret=1 expl
+  local ret=1
 
   _files && ret=0
-  _description expl parameter
-  compgen "$expl[@]" -v && ret=0
+  _parameters && ret=0
 
   return ret
 fi

@@ -72,7 +72,7 @@ if [[ "$PREFIX" = --* ]]; then
 
   # ...long options after `--'.
 
-  _long_options '--owner*:user:_tilde' \
+  _long_options '--owner*:user:_users' \
                 '*=(PROG|COMMAND)*:program:_command_names' \
 		'*=ARCHIVE*:archive: _tar_archive' \
 		'*=NAME*:file:_files' \

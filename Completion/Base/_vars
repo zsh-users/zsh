@@ -20,6 +20,5 @@ if [[ $PREFIX = *\[* ]]; then
     compadd "$expl[@]" $addclose - ${(kP)var}
   fi
 else
-  _description expl parameter
-  compgen "$expl[@]" -v
+  _parameter
 fi

@@ -1,4 +1,4 @@
-#compdef -kn complete-word \C-xe
+#compdef -k complete-word \C-xe
 
 # Simple completion front-end implementing expansion.
 #

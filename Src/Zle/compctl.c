@@ -1850,8 +1850,9 @@ bin_compadd(char *name, char **argv, char *ops, int func)
 			*sp = p + 1;
 		    p = "" - 1;
 		} else if (argv[1]) {
+		    argv++;
 		    if (!*sp)
-			*sp = *++argv;
+			*sp = *argv;
 		    p = "" - 1;
 		} else {
 		    zerrnam(name, e, NULL, *p);

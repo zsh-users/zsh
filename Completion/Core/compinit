@@ -379,7 +379,7 @@ if [[ -z "$_i_done" ]]; then
       case $_i_tag in
       (\#compdef)
 	if [[ $_i_line[1] = -[pPk](n|) ]]; then
-	  compdef ${_i_line[1]}a "${_i_file:t}" "${(@)_i_line[2,-1]}"
+	  compdef ${_i_line[1]}na "${_i_file:t}" "${(@)_i_line[2,-1]}"
 	else
 	  compdef -na "${_i_file:t}" "${_i_line[@]}"
 	fi

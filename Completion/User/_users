@@ -1,0 +1,6 @@
+#autoload
+
+local expl
+
+_description expl user
+compgen "$@" "$expl[@]" -u

@@ -1,4 +1,4 @@
-#compdef -kn complete-word \C-xc
+#compdef -k complete-word \C-xc
 
 # Simple completion front-end implementing spelling correction.
 # The maximum number of errors is set quite high, and

@@ -23,47 +23,46 @@ fi
 
 case $subcom in
   *(cd|ls|dir))
-   # complete remote directories; we could be smarter about hiding prefixes
-   zfcd_match $PREFIX $SUFFIX
-   _description expl 'remote directory'
-   (( $#reply )) && compadd "$expl[@]" -S/ -q - $reply
-   ;;
+    # complete remote directories; we could be smarter about hiding prefixes
+    zfcd_match $PREFIX $SUFFIX
+    _description expl 'remote directory'
+    (( $#reply )) && compadd "$expl[@]" -S/ -q - $reply
+    ;;
 
   *(get(|at)|gcp|delete|remote))
-   # complete remote files
-   zfget_match $PREFIX $SUFFIX
-   _description expl 'remote file'
-   (( $#reply )) && compadd "$expl[@]" -F fignore - $reply
-   ;;
+    # complete remote files
+    zfget_match $PREFIX $SUFFIX
+    _description expl 'remote file'
+    (( $#reply )) && compadd "$expl[@]" -F fignore - $reply
+    ;;
 
   *(put(|at)|pcp))
-   # complete local files
-   _files
-   ;;
+    # complete local files
+    _files
+    ;;
 
   *(open|anon|params))
-  # complete hosts:  should do cleverer stuff with user names
-  _description expl host
-  compgen "$expl[@]" -k hosts
-  ;;
+    # complete hosts:  should do cleverer stuff with user names
+    _hosts
+    ;;
 
   *(goto|mark))
-  # complete bookmarks.  First decide if ncftp mode is go.
-  _description expl bookmark
-  if [[ $words[2] = -*n* ]]; then
-    if [[ -f ~/.ncftp/bookmarks ]]; then
-      compadd "$expl[@]" - $(awk -F, 'NR > 2 { print $1 }' ~/.ncftp/bookmarks)
+    # complete bookmarks.  First decide if ncftp mode is go.
+    _description expl bookmark
+    if [[ $words[2] = -*n* ]]; then
+      if [[ -f ~/.ncftp/bookmarks ]]; then
+        compadd "$expl[@]" - $(awk -F, 'NR > 2 { print $1 }' ~/.ncftp/bookmarks)
+      fi
+    else
+      if [[ -f ${ZFTP_BMFILE:=${ZDOTDIR:-$HOME}/.zfbkmarks} ]]; then
+        compadd "$expl[@]" - $(awk '{print $1}' $ZFTP_BMFILE)
+      fi
     fi
-  else
-    if [[ -f ${ZFTP_BMFILE:=${ZDOTDIR:-$HOME}/.zfbkmarks} ]]; then
-      compadd "$expl[@]" - $(awk '{print $1}' $ZFTP_BMFILE)
-    fi
-  fi
-  ;;
+    ;;
 
   *)
-  # dunno... try ordinary completion after all.
-  unset _compskip
-  return 1
-  ;;
+    # dunno... try ordinary completion after all.
+    unset _compskip
+    return 1
+    ;;
 esac

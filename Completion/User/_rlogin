@@ -15,5 +15,5 @@ if [[ CURRENT -eq 2 ]];
 elif [[ CURRENT -eq 3 ]]; then
   compadd - -l
 else
-  compgen "$expl[@]" -S @ -u
+  _users -S @
 fi

@@ -112,8 +112,9 @@ if [[ "$tmp" != $_lo_cache_cmd ]]; then
   # those hyphens and anything from the space or comma after the
   # option up to the end. 
 
-  opts=("--${(@)^${(@)${(@M)${(@ps:\n:j:\n:)${(@)${(@M)${(@f)$("$words[1]" --help)}:#[ 	]#-*}//,/
-}}:#[ 	]#--*}#*--}%%[, ]*}")
+  opts=("--${(@)^${(@)${(@)${(@M)${(@ps:\n:j:\n:)${(@)${(@M)${(@f)$("$words[1]" --help 2>&1)//\[--/
+--}:#[ 	]#-*}//,/
+}}:#[ 	]#--*}#*--}%%[, ]*}:#}")
 
   # Now remove all ignored options ...
 
@@ -256,15 +257,15 @@ if [[ "$str" = *\=* ]]; then
 
       _description expl "$descr"
 
-      if [[ "$action[1]" = (\[|\() ]]; then
+      if [[ "$action[1]" = (\[*\]|\(*\)) ]]; then
         compadd "$expl[@]" - ${=action[2,-2]}
-      elif (( $#action )); then
-        if [[ "$action" = \ * ]]; then
-          ${(e)=~action}
-        else
-	  action=($=action)
-	  ${(e)action[1]} "$expl[@]" ${(e)~action[2,-1]}
-        fi
+      elif [[ "$action" = \{*\} ]]; then
+        eval "$action[2,-2]"
+      elif [[ "$action" = \ * ]]; then
+        ${(e)=~action}
+      elif [[ -n "$action" ]]; then
+	action=($=action)
+	${(e)action[1]} "$expl[@]" ${(e)~action[2,-1]}
       else
         _message "$descr"
       fi
@@ -308,15 +309,15 @@ if [[ "$str" = *\=* ]]; then
 
     _description expl "$partd"
 
-    if (( $#parta )); then
-      if [[ "$parta[1]" = (\[|\() ]]; then
-        compadd "$expl[@]" - ${=parta[2,-2]}
-      elif [[ "$parta" = \ * ]]; then
-        ${(e)=~parta}
-      else
-	action=($=parta)
-	${(e)~parta[1]} "$expl[@]" ${(e)~action[2,-1]}
-      fi
+    if [[ "$parta[1]" = (\[*\]|\(*\)) ]]; then
+      compadd "$expl[@]" - ${=parta[2,-2]}
+    elif [[ "$parta" = \{*\} ]]; then
+      eval "$parta[2,-2]"
+    elif [[ "$parta" = \ * ]]; then
+      ${(e)=~parta}
+    elif [[ -n "$parta" ]]; then
+      action=($=parta)
+      ${(e)~action[1]} "$expl[@]" ${(e)~action[2,-1]}
     else
       compadd -S '' - "$PREFIX"
     fi
@@ -346,8 +347,6 @@ fi
 
 anum=1
 for name in "$_lo_cache_names[@]"; do
-  action="$_lo_cache_actions[anum]"
-
   _description expl option
 
   if [[ "$name" = *_optarg_* ]]; then

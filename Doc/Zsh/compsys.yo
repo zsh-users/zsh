@@ -846,7 +846,7 @@ possible values for an optional argument, a list in parentheses
 gives words to complete for mandatory arguments. If the action does
 not start with a bracket or parentheses, it should be the name of a
 command (probably with arguments) that should be invoked to complete 
-after the equal sign. E.g.:
+after the equal sign or a string in braces that will be evaluated. E.g.:
 
 example(_long_options '*\*'     '(yes no)' \ 
               '*=FILE*' '_files' \ 
@@ -930,14 +930,19 @@ enditem()
 In each of the cases above, the var(action) says how the possible
 completions should be generated. In cases where only one of a fixed
 set of strings can be completed, these string can directly be given as 
-a list in parentheses, as in `tt(:foo:(foo bar baz))'. If the
-var(action) does not begin with an opening parentheses, it will be
-split into separate words and executed. If the var(action) starts with 
-a space, this list of words will be invoked unchanged, otherwise it
-will be invoked with some extra string placed after the first word
-which can be given as arguments to the tt(compadd) and tt(compgen)
-builtins and which make sure that the var(message) given in the
-description will be shown above the matches.
+a list in parentheses, as in `tt(:foo:(foo bar baz))'. A string in
+braces will be evaluated to generate the matches and if the
+var(action) does not begin with an opening parentheses or brace, it
+will be split into separate words and executed. If the var(action)
+starts with a space, this list of words will be invoked unchanged,
+otherwise it will be invoked with some extra string placed after the
+first word which can be given as arguments to the tt(compadd) and
+tt(compgen) builtins and which make sure that the var(message) given
+in the description will be shown above the matches. During the
+evaluation or execution of the action the array `tt(line)' will be set 
+to the command name and normal arguments from the command line,
+i.e. to the words from the command line xcluding all options and their 
+arguments.
 
 Normally the option names are taken as multi-character names and a
 word from the line is considered to contain only one option (or
