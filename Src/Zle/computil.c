@@ -910,7 +910,7 @@ parse_cadef(char *nam, char **args)
 		    opt->descr = NULL;
 	    } else
 		opt->descr = NULL;
-	    opt->xor = (again == 1 ? zarrdup(xor) : xor);
+	    opt->xor = (again == 1 && xor ? zarrdup(xor) : xor);
 	    opt->type = otype;
 	    opt->args = oargs;
 	    opt->num = nopts++;

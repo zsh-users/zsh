@@ -1,5 +1,8 @@
 2003-04-23  Peter Stephenson  <pws@pwstephenson.fsnet.co.uk>
 
+	* 18477: Src/Zle/computil.c: null pointer dereferenced with
+	_arguments '*-+bar'.
+
 	* IKEGAMI Tsutomu: SourceForge bug 722366: initialisation of pwd
 	from PWD in environment didn't metafy.
 
