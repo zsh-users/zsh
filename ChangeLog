@@ -1,3 +1,9 @@
+2005-02-07  Peter Stephenson  <pws@csr.com>
+
+	* 20794: Config/version.mk, Src/init.c: change dev version
+	to 4.3.0-dev-1 and (unrelated) don't compile in static function
+	unless needed.
+
 2005-02-06  Peter Stephenson  <pws@pwstephenson.fsnet.co.uk>
 
 	* (cheated and guessed) 20793: Src/builtin.c, Src/exec.c,
