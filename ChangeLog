@@ -1,5 +1,7 @@
 2001-05-11  Peter Stephenson  <pws@csr.com>
 
+	* 14314: Src/Modules/stat.c: writing const variable under cygwin.
+
 	* 14313: Test/E01options.ztst, Test/ztst.zsh: new options tests.
 
 2001-05-10  Wayne Davison  <wayned@users.sourceforge.net>

@@ -54,15 +54,15 @@ statmodeprint(mode_t mode, char *outbuf, int flags)
     }
     if (flags & STF_STRING) {
 	static const char *modes = "?rwxrwxrwx";
-	static const mode_t mflags[9] = {
 #ifdef __CYGWIN__
-	    0
+	static mode_t mflags[9] = { 0 };
 #else
+	static const mode_t mflags[9] = {
 	    S_IRUSR, S_IWUSR, S_IXUSR,
 	    S_IRGRP, S_IWGRP, S_IXGRP,
 	    S_IROTH, S_IWOTH, S_IXOTH
-#endif
 	};
+#endif
 	const mode_t *mfp = mflags;
 	char pm[11];
 	int i;
