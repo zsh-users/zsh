@@ -800,15 +800,14 @@ makecomplist(char *s, int incmd, int lst)
 	int n;
 
 	for (n = 0; m; m = m->next, n++) {
-	    if (m->matcher) {
-		*mp = (Cmlist) zhalloc(sizeof(struct cmlist));
-		(*mp)->matcher = m->matcher;
-		(*mp)->next = NULL;
-		(*mp)->str = dupstring(m->str);
-		mp = &((*mp)->next);
-		addlinknode(matchers, m->matcher);
+	    *mp = (Cmlist) zhalloc(sizeof(struct cmlist));
+	    (*mp)->matcher = m->matcher;
+	    (*mp)->next = NULL;
+	    (*mp)->str = dupstring(m->str);
+	    mp = &((*mp)->next);
+	    addlinknode(matchers, m->matcher);
+	    if (m->matcher)
 		m->matcher->refc++;
-	    }
 	}
 	m = mm;
 	compmatcher = 1;

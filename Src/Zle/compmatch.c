@@ -1016,7 +1016,7 @@ bld_parts(char *str, int len, int plen, Cline *lp)
     while (len) {
 	for (t = 0, ms = bmatchers; ms && !t; ms = ms->next) {
 	    mp = ms->matcher;
-	    if (mp->flags == CMF_RIGHT && mp->wlen == -1 &&
+	    if (mp && mp->flags == CMF_RIGHT && mp->wlen == -1 &&
 		!mp->llen && len >= mp->ralen && mp->ralen &&
 		pattern_match(mp->right, str, NULL, NULL)) {
 		int olen = str - p, llen;
@@ -1136,7 +1136,7 @@ bld_line(Cpattern pat, char *line, char *lp,
 		t = 0;
 		for (ms = bmatchers; ms && !t; ms = ms->next) {
 		    mp = ms->matcher;
-		    if (!mp->flags && mp->wlen <= wlen && mp->llen <= l &&
+		    if (mp && !mp->flags && mp->wlen <= wlen && mp->llen <= l &&
 			pattern_match(mp->line, (sfx ? line - mp->llen : line),
 				      NULL, ea) &&
 			pattern_match(mp->word, (sfx ? word - mp->wlen : word),
@@ -1186,7 +1186,7 @@ join_strs(int la, char *sa, int lb, char *sb)
 	    /* Different characters, try the matchers. */
 	    for (t = 0, ms = bmatchers; ms && !t; ms = ms->next) {
 		mp = ms->matcher;
-		if (!mp->flags && mp->wlen > 0 && mp->llen > 0 &&
+		if (mp && !mp->flags && mp->wlen > 0 && mp->llen > 0 &&
 		    mp->wlen <= la && mp->wlen <= lb) {
 		    /* The pattern has no anchors and the word
 		     * pattern fits, try it. */
@@ -1373,7 +1373,7 @@ join_sub(Cmdata md, char *str, int len, int *mlen, int sfx, int join)
 	    /* We use only those patterns that match a non-empty
 	     * string in both the line and the word and that have
 	     * no anchors. */
-	    if (!mp->flags && mp->wlen > 0 && mp->llen > 0) {
+	    if (mp && !mp->flags && mp->wlen > 0 && mp->llen > 0) {
 		/* We first test, if the old string matches already the
 		 * new one. */
 		if (mp->llen <= ol && mp->wlen <= nl &&
