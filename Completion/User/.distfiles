@@ -1,8 +1,9 @@
 DISTFILES_SRC='
     .distfiles
     _a2ps _archie _bison _bunzip2 _bzip2 _chown _compress _configure _cvs
-    _dd _dir_list _dirs _domains _dvi _find _flex _gcc _gdb _gprof _groups _gs
-    _gunzip _gv _gzip _hosts _ispell _killall _lp _lynx _mailboxes _make _man
+    _dd _dir_list _dirs _domains _dvi _find _finger _flex
+    _gcc _gdb _gprof _groups _gs _gunzip _gv _gzip
+    _hosts _ispell _killall _lp _lynx _mailboxes _make _man
     _mh _mount _mutt _my_accounts _netscape _nslookup _other_accounts
     _pack _patch _pbm _pdf _perl_basepods _perl_builtin_funcs
     _perl_modules _perldoc _ports _prcs _prompt _ps _pspdf _rcs _rlogin _sh
