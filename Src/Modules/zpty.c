@@ -34,7 +34,6 @@
  * upper bound on the number of bytes we read (even if we are give a
  * pattern). */
 
-#define READ_LEN 1024
 #define READ_MAX (1024 * 1024)
 
 typedef struct ptycmd *Ptycmd;
@@ -46,9 +45,10 @@ struct ptycmd {
     int fd;
     int pid;
     int echo;
-    int block;
+    int nblock;
     int fin;
     int read;
+    char *old;
 };
 
 static Ptycmd ptycmds;
@@ -264,7 +264,7 @@ get_pty(int master, int *retfd)
 #endif /* __SVR4 */
 
 static int
-newptycmd(char *nam, char *pname, char **args, int echo, int block)
+newptycmd(char *nam, char *pname, char **args, int echo, int nblock)
 {
     Ptycmd p;
     int master, slave, pid;
@@ -380,14 +380,15 @@ newptycmd(char *nam, char *pname, char **args, int echo, int block)
     p->fd = master;
     p->pid = pid;
     p->echo = echo;
-    p->block = block;
+    p->nblock = nblock;
     p->fin = 0;
     p->read = -1;
+    p->old = NULL;
 
     p->next = ptycmds;
     ptycmds = p;
 
-    if (!block)
+    if (nblock)
 	ptynonblock(master);
 
     return 0;
@@ -411,11 +412,11 @@ deleteptycmd(Ptycmd cmd)
     zsfree(p->name);
     freearray(p->args);
 
+    zclose(cmd->fd);
+
     /* We kill the process group the command put itself in. */
 
     kill(-(p->pid), SIGHUP);
-
-    zclose(cmd->fd);
 
     zfree(p, sizeof(*p));
 }
@@ -438,7 +439,7 @@ checkptycmd(Ptycmd cmd)
 {
     if (cmd->read != -1)
 	return;
-    if (!read_poll(cmd->fd, &cmd->read, !cmd->block) &&
+    if (!read_poll(cmd->fd, &cmd->read, 0) &&
 	kill(cmd->pid, 0) < 0) {
 	cmd->fin = 1;
 	zclose(cmd->fd);
@@ -448,8 +449,8 @@ checkptycmd(Ptycmd cmd)
 static int
 ptyread(char *nam, Ptycmd cmd, char **args)
 {
-    int blen = 256, used = 0, seen = 0, ret = 1;
-    char *buf = (char *) zhalloc((blen = 256) + 1);
+    int blen, used, seen = 0, ret = 0;
+    char *buf;
     Patprog prog = NULL;
 
     if (*args && args[1]) {
@@ -469,10 +470,20 @@ ptyread(char *nam, Ptycmd cmd, char **args)
     } else
 	fflush(stdout);
 
+    if (cmd->old) {
+	used = strlen(cmd->old);
+	buf = (char *) zhalloc((blen = 256 + used) + 1);
+	strcpy(buf, cmd->old);
+	zsfree(cmd->old);
+	cmd->old = NULL;
+    } else {
+	used = 0;
+	buf = (char *) zhalloc((blen = 256) + 1);
+    }
     if (cmd->read != -1) {
-	buf[0] = (char) cmd->read;
-	buf[1] = '\0';
-	used = 1;
+	buf[used] = (char) cmd->read;
+	buf[used + 1] = '\0';
+	seen = used = 1;
 	cmd->read = -1;
     }
     do {
@@ -495,36 +506,60 @@ ptyread(char *nam, Ptycmd cmd, char **args)
 	}
 	buf[used] = '\0';
 
-	if (!prog && ret <= 0)
+	if (!prog && (ret <= 0 || (*args && buf[used - 1] == '\n')))
 	    break;
-    } while (!errflag && !breaks && !retflag && !contflag &&
-	     (prog ? (used < READ_MAX && (!ret || !pattry(prog, buf))) :
-	      (used < READ_LEN)));
+    } while (!(errflag || breaks || retflag || contflag) &&
+	     used < READ_MAX && !(prog && ret && pattry(prog, buf)));
 
+    if (prog && ret < 0 &&
+#ifdef EWOULDBLOCK
+	errno == EWOULDBLOCK
+#else
+#ifdef EAGAIN
+	errno == EAGAIN
+#endif
+#endif
+	) {
+	cmd->old = ztrdup(buf);
+	used = 0;
+
+	return 1;
+    }
     if (*args)
 	setsparam(*args, ztrdup(metafy(buf, used, META_HREALLOC)));
-    else
+    else if (used)
 	write(1, buf, used);
 
-    return !seen;
+    return (seen ? 0 : cmd->fin + 1);
 }
 
 static int
 ptywritestr(Ptycmd cmd, char *s, int len)
 {
-    int written;
+    int written, all = 0;
 
-    for (; len; len -= written, s += written) {
-	if ((written = write(cmd->fd, s, len)) < 0)
-	    return 1;
+    for (; !errflag && !breaks && !retflag && !contflag && len;
+	 len -= written, s += written) {
+	if ((written = write(cmd->fd, s, len)) < 0 && cmd->nblock &&
+#ifdef EWOULDBLOCK
+	    errno == EWOULDBLOCK
+#else
+#ifdef EAGAIN
+	    errno == EAGAIN
+#endif
+#endif
+	    )
+	    return !all;
 	if (written < 0) {
 	    checkptycmd(cmd);
 	    if (cmd->fin)
 		break;
 	    written = 0;
 	}
+	if (written > 0)
+	    all += written;
     }
-    return 0;
+    return (all ? 0 : cmd->fin + 1);
 }
 
 static int
@@ -559,8 +594,9 @@ static int
 bin_zpty(char *nam, char **args, char *ops, int func)
 {
     if ((ops['r'] && ops['w']) ||
-	((ops['r'] || ops['w']) && (ops['d'] || ops['e'] || ops['t'] ||
+	((ops['r'] || ops['w']) && (ops['d'] || ops['e'] ||
 				    ops['b'] || ops['L'])) ||
+	(ops['w'] && ops['t']) ||
 	(ops['n'] && (ops['b'] || ops['e'] || ops['r'] || ops['t'] ||
 		      ops['d'] || ops['L'])) ||
 	(ops['d'] && (ops['b'] || ops['e'] || ops['L'] || ops['t'])) ||
@@ -579,7 +615,10 @@ bin_zpty(char *nam, char **args, char *ops, int func)
 	    return 1;
 	}
 	if (p->fin)
+	    return 2;
+	if (ops['t'] && p->read == -1 && !read_poll(p->fd, &p->read, 0))
 	    return 1;
+
 	return (ops['r'] ?
 		ptyread(nam, p, args + 1) :
 		ptywrite(p, args + 1, ops['n']));
@@ -629,7 +668,7 @@ bin_zpty(char *nam, char **args, char *ops, int func)
 	    checkptycmd(p);
 	    if (ops['L'])
 		printf("%s %s%s%s ", nam, (p->echo ? "-e " : ""),
-		       (p->block ? "-b " : ""), p->name);
+		       (p->nblock ? "-b " : ""), p->name);
 	    else if (p->fin)
 		printf("(finished) %s: ", p->name);
 	    else

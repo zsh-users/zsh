@@ -1315,7 +1315,7 @@ setblock_stdin(void)
 mod_export int
 read_poll(int fd, int *readchar, int polltty)
 {
-    int ret = 0;
+    int ret = -1;
     long mode = -1;
     char c;
 #ifdef HAVE_SELECT
@@ -1353,38 +1353,32 @@ read_poll(int fd, int *readchar, int polltty)
      */
     if (polltty) {
 	gettyinfo(&ti);
-	ti.tio.c_cc[VMIN] = 0;
-	settyinfo(&ti);
+	if ((polltty = ti.tio.c_cc[VMIN])) {
+	    ti.tio.c_cc[VMIN] = 0;
+	    settyinfo(&ti);
+	}
     }
 #else
     polltty = 0;
 #endif
 #ifdef HAVE_SELECT
-    if (!ret) {
-	expire_tv.tv_sec = expire_tv.tv_usec = 0;
-	FD_ZERO(&foofd);
-	FD_SET(fd, &foofd);
-	if (select(fd+1, (SELECT_ARG_2_T) &foofd, NULL, NULL, &expire_tv)
-	    > 1)
-	    ret = 1;
-    }
+    expire_tv.tv_sec = expire_tv.tv_usec = 0;
+    FD_ZERO(&foofd);
+    FD_SET(fd, &foofd);
+    ret = select(fd+1, (SELECT_ARG_2_T) &foofd, NULL, NULL, &expire_tv);
 #else
 #ifdef FIONREAD
-    if (!ret) {
-	ioctl(fd, FIONREAD, (char *)&val);
-	if (val)
-	    ret = 1;
-    }
+    if (ioctl(fd, FIONREAD, (char *) &val) == 0)
+	ret = (val > 0);
 #endif
 #endif
 
-    if (!ret) {
+    if (ret <= 0) {
 	/*
 	 * Final attempt: set non-blocking read and try to read a character.
 	 * Praise Bill, this works under Cygwin (nothing else seems to).
 	 */
-	if ((polltty || setblock_fd(0, fd, &mode))
-	    && read(fd, &c, 1) > 0) {
+	if ((polltty || setblock_fd(0, fd, &mode)) && read(fd, &c, 1) > 0) {
 	    *readchar = STOUC(c);
 	    ret = 1;
 	}
@@ -1397,7 +1391,7 @@ read_poll(int fd, int *readchar, int polltty)
 	settyinfo(&ti);
     }
 #endif
-    return ret;
+    return (ret > 0);
 }
 
 /**/

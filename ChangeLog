@@ -1,3 +1,12 @@
+2000-11-05  Bart Schaefer  <schaefer@zsh.org>
+
+	* 13120: Doc/Zsh/mod_zpty.yo, Functions/Misc/nslookup,
+	Src/utils.c, Src/Modules/zpty.c: Merge Sven's uncommitted patch
+	from 13061 with 13116.  WARNING: This reverses the meaning of
+	`zpty -b'; the default is now blocking, -b selects non-blocking.
+	Fix nslookup accordingly.  Clean up read_poll() somewhat.
+	Document that `zpty -w' and `zpty -r' can stream to/from the pty.
+
 2000-11-04  Bart Schaefer  <schaefer@zsh.org>
 
 	* 13118: Completion/Core/compinit: Add `bareglobqual' to the
