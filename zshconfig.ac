@@ -1537,7 +1537,7 @@ if test "x$aixdynamic" = xyes; then
   zsh_cv_sys_dynamic_execsyms="${zsh_cv_sys_dynamic_execsyms=yes}"
   zsh_cv_sys_dynamic_strip_exe="${zsh_cv_sys_dynamic_strip_exe=yes}"
   zsh_cv_sys_dynamic_strip_lib="${zsh_cv_sys_dynamic_strip_lib=yes}"
-  zsh_cv_sys_dynamic_broken="${zsh_cv_sys_dynamic_broken=no}"
+  zsh_cv_shared_environ="${zsh_cv_shared_environ=yes}"
 elif test "$host_os" = cygwin; then
   DL_EXT="${DL_EXT=dll}"
   DLLD="${DLLD=dllwrap}"
@@ -1723,7 +1723,6 @@ fi
 if test "x$dynamic" = xyes; then
   zsh_SHARED_VARIABLE([environ], [char **])
   test "$zsh_cv_shared_environ" = yes || dynamic=no
-dnl  test "$zsh_cv_sys_dynamic_broken" = no || dynamic=no
   if test "$ac_cv_func_tgetent" = yes; then
     zsh_SHARED_FUNCTION([tgetent])
   fi

@@ -1,3 +1,8 @@
+2001-06-18  Andrej Borsenkow <bor@zsh.org>
+
+	* unposted: zshconfig.ac:  forgot to change
+	zsh_cv_sys_dynamic_broken -> zsh_cv_shared_environ in one place
+
 2001-06-18  Sven Wischnowsky  <wischnow@zsh.org>
 
 	* 14951: Src/signals.c, Src/signals.h: rename handler() to
