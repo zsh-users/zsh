@@ -57,23 +57,45 @@ static struct zleparam {
 	zleunsetfn, NULL },
     { "CURSOR",  PM_INTEGER, FN(set_cursor),  FN(get_cursor),
 	zleunsetfn, NULL },
+    { "MARK",  PM_INTEGER, FN(set_mark),  FN(get_mark),
+	zleunsetfn, NULL },
     { "LBUFFER", PM_SCALAR,  FN(set_lbuffer), FN(get_lbuffer),
 	zleunsetfn, NULL },
     { "RBUFFER", PM_SCALAR,  FN(set_rbuffer), FN(get_rbuffer),
 	zleunsetfn, NULL },
+    { "PREBUFFER",  PM_SCALAR | PM_READONLY,  NULL,  FN(get_prebuffer),
+	zleunsetfn, NULL },
+    { "WIDGET", PM_SCALAR | PM_READONLY, NULL, FN(get_widget),
+        zleunsetfn, NULL },
+    { "LASTWIDGET", PM_SCALAR | PM_READONLY, NULL, FN(get_lwidget),
+        zleunsetfn, NULL },
+    { "KEYS", PM_SCALAR | PM_READONLY, NULL, FN(get_keys),
+        zleunsetfn, NULL },
+    { "NUMERIC", PM_INTEGER | PM_UNSET, FN(set_numeric), FN(get_numeric),
+        unset_numeric, NULL },
+    { "HISTNO", PM_INTEGER | PM_READONLY, NULL, FN(get_histno),
+        zleunsetfn, NULL },
+    { "BUFFERLINES", PM_INTEGER | PM_READONLY, NULL, FN(get_bufferlines),
+        zleunsetfn, NULL },
+    { "PENDING", PM_INTEGER | PM_READONLY, NULL, FN(get_pending),
+        zleunsetfn, NULL },
     { NULL, 0, NULL, NULL, NULL, NULL }
 };
 
 /**/
-void
-makezleparams(void)
+mod_export void
+makezleparams(int ro)
 {
     struct zleparam *zp;
 
     for(zp = zleparams; zp->name; zp++) {
-	Param pm = createparam(zp->name, zp->type | PM_SPECIAL);
+	Param pm = createparam(zp->name, (zp->type |PM_SPECIAL|PM_REMOVABLE|
+					  PM_LOCAL|(ro ? PM_READONLY : 0)));
+	if (!pm)
+	    pm = (Param) paramtab->getnode(paramtab, zp->name);
+	DPUTS(!pm, "param not set in makezleparams");
 
-	pm->level = locallevel;
+	pm->level = locallevel + 1;
 	pm->u.data = zp->data;
 	switch(PM_TYPE(zp->type)) {
 	    case PM_SCALAR:
@@ -85,11 +107,14 @@ makezleparams(void)
 		pm->gets.afn = (char **(*) _((Param))) zp->getfn;
 		break;
 	    case PM_INTEGER:
-		pm->sets.ifn = (void (*) _((Param, long))) zp->setfn;
-		pm->gets.ifn = (long (*) _((Param))) zp->getfn;
+		pm->sets.ifn = (void (*) _((Param, zlong))) zp->setfn;
+		pm->gets.ifn = (zlong (*) _((Param))) zp->getfn;
+		pm->ct = 10;
 		break;
 	}
 	pm->unsetfn = zp->unsetfn;
+	if ((zp->type & PM_UNSET) && (zmod.flags & MOD_MULT))
+	    pm->flags &= ~PM_UNSET;
     }
 }
 
@@ -118,6 +143,8 @@ set_buffer(Param pm, char *x)
 	    cs = ll;
     } else
 	cs = ll = 0;
+    fixsuffix();
+    menucmp = 0;
 }
 
 /**/
@@ -129,7 +156,7 @@ get_buffer(Param pm)
 
 /**/
 static void
-set_cursor(Param pm, long x)
+set_cursor(Param pm, zlong x)
 {
     if(x < 0)
 	cs = 0;
@@ -137,13 +164,34 @@ set_cursor(Param pm, long x)
 	cs = ll;
     else
 	cs = x;
+    fixsuffix();
+    menucmp = 0;
 }
 
 /**/
-static long
+static zlong
 get_cursor(Param pm)
 {
     return cs;
+}
+
+/**/
+static void
+set_mark(Param pm, zlong x)
+{
+    if (x < 0)
+	mark = 0;
+    else if (x > ll)
+	mark = ll;
+    else
+	mark = x;
+}
+
+/**/
+static zlong
+get_mark(Param pm)
+{
+    return mark;
 }
 
 /**/
@@ -163,6 +211,8 @@ set_lbuffer(Param pm, char *x)
     ll = ll - cs + len;
     cs = len;
     zsfree(x);
+    fixsuffix();
+    menucmp = 0;
 }
 
 /**/
@@ -186,6 +236,8 @@ set_rbuffer(Param pm, char *x)
     sizeline(ll = cs + len);
     memcpy(line + cs, y, len);
     zsfree(x);
+    fixsuffix();
+    menucmp = 0;
 }
 
 /**/
@@ -193,4 +245,82 @@ static char *
 get_rbuffer(Param pm)
 {
     return metafy((char *)line + cs, ll - cs, META_HEAPDUP);
+}
+
+/**/
+static char *
+get_prebuffer(Param pm)
+{
+    if (chline)
+	return dupstrpfx(chline, hptr - chline);
+    else
+	return dupstring("");
+}
+
+/**/
+static char *
+get_widget(Param pm)
+{
+    return bindk->nam;
+}
+
+/**/
+static char *
+get_lwidget(Param pm)
+{
+    return (lbindk ? lbindk->nam : "");
+}
+
+/**/
+static char *
+get_keys(Param pm)
+{
+    return keybuf;
+}
+
+/**/
+static void
+set_numeric(Param pm, zlong x)
+{
+    zmult = x;
+    zmod.flags = MOD_MULT;
+}
+
+/**/
+static zlong
+get_numeric(Param pm)
+{
+    return zmult;
+}
+
+/**/
+static void
+unset_numeric(Param pm, int exp)
+{
+    if (exp) {
+	stdunsetfn(pm, exp);
+	zmod.flags = 0;
+	zmult = 1;
+    }
+}
+
+/**/
+static zlong
+get_histno(Param pm)
+{
+    return histline;
+}
+
+/**/
+static zlong
+get_bufferlines(Param pm)
+{
+    return nlnct;
+}
+
+/**/
+static zlong
+get_pending(Param pm)
+{
+    return noquery(0);
 }

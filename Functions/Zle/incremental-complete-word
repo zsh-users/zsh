@@ -75,27 +75,31 @@ incremental-complete-word() {
     else
       LBUFFER="$LBUFFER$key"
     fi
-    lastl="$LBUFFER"
-    lastr="$RBUFFER"
-    [[ "$twid" = "$wid" ]] && comppostfuncs=( "$post[@]" )
-    toolong=''
-    zle $twid "$@"
-    LBUFFER="$lastl"
-    RBUFFER="$lastr"
-    num=$_lastcomp[nmatches]
-    if (( ! num )); then
-      word=''
-      state='-no match-'
-    elif [[ "${LBUFFER}${RBUFFER}" = *${_lastcomp[unambiguous]}* ]]; then
-      word=''
-      state='-no prefix-'
+    if (( ! PENDING )); then
+      lastl="$LBUFFER"
+      lastr="$RBUFFER"
+      [[ "$twid" = "$wid" ]] && comppostfuncs=( "$post[@]" )
+      toolong=''
+      zle $twid "$@"
+      LBUFFER="$lastl"
+      RBUFFER="$lastr"
+      num=$_lastcomp[nmatches]
+      if (( ! num )); then
+        word=''
+        state='-no match-'
+      elif [[ "${LBUFFER}${RBUFFER}" = *${_lastcomp[unambiguous]}* ]]; then
+        word=''
+        state='-no prefix-'
+      else
+        word="${_lastcomp[unambiguous]}"
+        state=''
+      fi
+      zformat -f pstr "$pmpt" "u:${word}" "s:$state" "n:$num" \
+                              "l:$toolong" "c:${_lastcomp[completer][2,-1]}"
+      zle -R "$pstr"
     else
-      word="${_lastcomp[unambiguous]}"
-      state=''
+      zle -R
     fi
-    zformat -f pstr "$pmpt" "u:${word}" "s:$state" "n:$num" \
-                            "l:$toolong" "c:${_lastcomp[completer][2,-1]}"
-    zle -R "$pstr"
     read -k key
   done
 

@@ -185,6 +185,12 @@ vindex(HISTNO)
 item(tt(HISTNO) (integer))(
 The current history number.
 )
+vindex(PENDING)
+item(tt(PENDING) (integer))(
+The number of bytes pending for input. On systems where the shell is
+not able to get this information, this parameter will always have a
+value of zero.
+)
 enditem()
 sect(Standard Widgets)
 cindex(widgets, standard)

@@ -1,5 +1,9 @@
 2000-04-05  Sven Wischnowsky <wischnow@informatik.hu-berlin.de>
 
+	* 10500: Doc/Zsh/zle.yo, Functions/Zle/incremental-complete-word,
+	Src/utils.c, Src/Zle/zle_params.c: add zle special parameter
+	$PENDING, giving the number of un-read bytes.
+
 	* 10498: Completion/Commands/_next_tags: fix for handling
 	file-patterns.
 
