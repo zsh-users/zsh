@@ -277,6 +277,20 @@ tt(autoload -U )var(function)).
 )
 enditem()
 
+The tt(compdef) function is the place to turn to when one wants to
+define what the completion system should complete for a certain
+command.  The function named can of course be one of the functions
+supplied or one written by the user.  For example, if one has a
+command tt(foo) that gets process identifiers as arguments, one could
+do:
+
+example(compdef _pids foo)
+
+using the tt(_pids) function from the distribution to generate the
+process identifiers.  Not also the tt(_use_lo) function described
+below, which can be used to complete options for commands that
+understand the `tt(-)tt(-help)' option.
+
 texinode(Completion System Configuration)(Control Functions)(Initialization)(Completion System)
 sect(Completion System Configuration)
 cindex(completion system, configuration)
@@ -2672,6 +2686,25 @@ tt(_alternative).
 
 Like tt(_tags) this function supports the tt(-C) option to give a
 different name for the argument context field.
+)
+findex(_use_lo)
+item(tt(_use_lo))(
+This function is a simple wrapper around the tt(_arguments) function
+described below.  It can be used to automatically complete long
+options for commands that understand the `tt(-)tt(-help)' option
+(`tt(_use_lo)' is for `use long options').  It is not intended to be
+used from completion functions but as a top-level completion function
+in its own right.  For example, to enable option completion for the
+commands tt(foo) and tt(bar), one would call:
+
+example(compdef _use_lo foo bar)
+
+in one of the initialization files after the call to tt(compinit).
+
+The default installation uses this function only to generate
+completions for some GNU-commands because to complete the options, the 
+command has to be called and hence it shouldn't be used if one can't
+be sure that the command understands the `tt(-)tt(-help)' option.
 )
 findex(_arguments)
 item(tt(_arguments) var(spec) ...)(

@@ -1,3 +1,7 @@
+2000-06-27  Sven Wischnowsky  <wischnow@zsh.org>
+
+	* 12082: Doc/Zsh/compsys.yo: document _use_lo
+	
 2000-06-27  Peter Stephenson  <pws@cambridgesiliconradio.com>
 
 	* Andrej: 12081: Src/Modules/zpty.c: compiles under Cygwin, but
