@@ -123,7 +123,7 @@ if [[ "$*" != "$_args_cache_descr" ]]; then
   done
 
   if [[ -n "$_args_cache_single" ]]; then
-    _args_cache_soptseq="${(@j::)${(@M)${(@k)opts[(R)]}:#[-+]?}#[-+]}"
+    _args_cache_soptseq="${(@j::)${(@M)${(@k)_args_cache_opts[(R)]}:#[-+]?}#[-+]}"
     if [[ -n "$_args_cache_soptseq" ]]; then
       _args_cache_soptseq="[$_args_cache_soptseq]#"
       _args_cache_soptseq1="$_args_cache_soptseq#"
@@ -131,7 +131,7 @@ if [[ "$*" != "$_args_cache_descr" ]]; then
       _args_cache_soptseq=''
       _args_cache_soptseq1=''
     fi
-    _args_cache_sopts="${(@j::)${(@M)${(@k)opts}:#[-+]?}#[-+]}${(@j::)${(@M)${(@k)dopts}:#[-+]?}#[-+]}${(@j::)${(@M)${(@k)odopts}:#[-+]?}#[-+]}"
+    _args_cache_sopts="${(@j::)${(@M)${(@k)_args_cache_opts}:#[-+]?}#[-+]}${(@j::)${(@M)${(@k)_args_cache_dopts}:#[-+]?}#[-+]}${(@j::)${(@M)${(@k)_args_cache_odopts}:#[-+]?}#[-+]}"
   else
     _args_cache_soptseq=''
     _args_cache_soptseq1=''

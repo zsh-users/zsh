@@ -10,5 +10,5 @@ _arguments -s \
   '-d+:cvsroot:_cvs_root' \
   '-e+:editor:_cvs_editor' \
   '-s+:user variable:_cvs_user_variable' \
-  '-z:gzip level:_cvs_gzip_level' \
+  '-z+:gzip level:_cvs_gzip_level' \
   '*::cvs command:_cvs_command'
