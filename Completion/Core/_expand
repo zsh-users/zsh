@@ -34,9 +34,9 @@ zstyle -s ":completion:${curcontext}:" substitute expr &&
 
 # If the array is empty, store the original string again.
 
-[[ -z "$exp" ]] && exp=("$word")
+(( $#exp )) || exp=("$word")
 
-subd="$exp"
+subd=("$exp[@]")
 
 # Now try globbing.
 
@@ -47,14 +47,15 @@ zstyle -s ":completion:${curcontext}:" glob expr &&
 # If we don't have any expansions or only one and that is the same
 # as the original string, we let other completers run.
 
-[[ $#exp -eq 0 ||
-   ( $#exp -eq 1 && "$exp[1]" = "$word"(|\(N\)) ) ]] && return 1
+(( $#exp )) || exp=("$subd[@]")
+
+[[ $#exp -eq 1 && "$exp[1]" = "$word"(|\(N\)) ]] && return 1
 
 # With subst-globs-only we bail out if there were no glob expansions,
 # regardless of any substitutions
+
 zstyle -s ":completion:${curcontext}:" subst-globs-only expr &&
-    [[ "${(e):-\$[$expr]}" -eq 1 ]] &&
-    [[ "$subd" = "$exp"(|\(N\)) ]] && return 1
+    [[ "${(e):-\$[$expr]}" -eq 1 && "$subd" = "$exp"(|\(N\)) ]] && return 1
 
 # Now add as matches whatever the user requested.
 
@@ -76,7 +77,7 @@ else
   _requested all-expansions expl 'all expansions' "o:$word" &&
       compadd "$expl[@]" -UQ -qS "$suf" - "$exp"
 
-  if _requested expansions; then
+  if [[ $#exp -gt 1 ]] && _requested expansions; then
     if [[ "$sort" = menu ]]; then
       _description expansions expl expansions "o:$word"
     else

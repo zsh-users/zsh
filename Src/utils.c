@@ -2819,6 +2819,39 @@ bslashquote(const char *s, char **e, int instring)
 	  }
 	  continue;
 	}
+	else if (*u == Tick || *u == Qtick) {
+	    char c = *u++;
+
+	    *v++ = c;
+	    while (*u && *u != c)
+		*v++ = *u++;
+	    *v++ = c;
+	    if (!*u)
+		u--;
+	    continue;
+	}
+	else if ((*u == String || *u == Qstring) &&
+		 (u[1] == Inpar || u[1] == Inbrack || u[1] == Inbrace)) {
+	    char c = (u[1] == Inpar ? Outpar : (u[1] == Inbrace ?
+						Outbrace : Outbrack));
+	    char beg = *u;
+	    int level = 0;
+
+	    *v++ = *u++;
+	    *v++ = *u++;
+	    while (*u && (*u != c || level)) {
+		if (*u == beg)
+		    level++;
+		else if (*u == c)
+		    level--;
+		*v++ = *u++;
+	    }
+	    if (*u)
+		*v++ = *u;
+	    else
+		u--;
+	    continue;
+	}
 	else if (ispecial(*u) &&
 		 ((*u != '=' && *u != '~') ||
 		  u == s ||
