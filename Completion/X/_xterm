@@ -7,13 +7,13 @@ _xt_arguments \
   '-bcf:time text cursor is off when blinking (milliseconds):' \
   '-bcn:time text cursor is on when blinking (milliseconds):' \
   '-cc:character class:' \
-  '-cr:text cursor color:_colors' \
+  '-cr:text cursor color:_x_color' \
   '-e:program: _command_names -e:*::program arguments: _normal' \
   '-fb:bold font:_x_font' \
   '-fi:icon font:_x_font' \
-  '-hc:background color for highlighted text:_colors' \
+  '-hc:background color for highlighted text:_x_color' \
   '-mc:multi-click threshold (milliseconds):' \
-  '-ms:pointer cursor color:_colors' \
+  '-ms:pointer cursor color:_x_color' \
   '-nb:margin bell number:' \
   '-sl:save lines:' \
   '-ti:terminal ID:(vt52 vt100 vt101 vt102 vt220)' \
@@ -22,75 +22,3 @@ _xt_arguments \
   '-ziconbeep:iconbeep (percent):' \
   '-C' \
   '-S-:pseudo-terminal and file descriptor:'
-#compdef xterm
-
-_arguments \
-  '-version' \
-  '-help' \
-  '-132' \
-  '-ah' '+ah' \
-  '-ai' '+ai' \
-  '-aw' '+aw' \
-  '-b:inner border size:' \
-  '-bc' '+bc' \
-  '-bcf:time text cursor is off when blinking (milliseconds):' \
-  '-bcn:time text cursor is on when blinking (milliseconds):' \
-  '-bdc' '+bdc' \
-  '-cb' '+cb' \
-  '-cc:character class:' \
-  '-cm' '+cm' \
-  '-cn' '+cn' \
-  '-cr:text cursor color:_color' \
-  '-cu' '+cu' \
-  '-dc' '+dc' \
-  '-e:*::program: _normal' \
-  '-fb:bold font:' \
-  '-fi:icon font:' \
-  '-hc:background color for highlighted text:_color' \
-  '-hf' '+hf' \
-  '-ie' '+ie' \
-  '-im' '+im' \
-  '-j' '+j' \
-  '-leftbar' \
-  '-ls' '+ls' \
-  '-mb' '+mb' \
-  '-mc:multi-click threshold (milliseconds):' \
-  '-ms:pointer cursor color:_color' \
-  '-nb:margin bell number:' \
-  '-nul' '+nul' \
-  '-pc' '+pc' \
-  '-rightbar' \
-  '-rw' '+rw' \
-  '-s' '+s' \
-  '-samename' '+samename' \
-  '-sb' '+sb' \
-  '-sf' '+sf' \
-  '-si' '+si' \
-  '-sk' '+sk' \
-  '-sl:save lines:' \
-  '-sp' '+sp' \
-  '-t' '+t' \
-  '-ti:terminal ID:(vt52 vt100 vt101 vt102 vt220)' \
-  '-tm:terminal setting:' \
-  '-tn:terminal type:' \
-  '-u8' '+u8' \
-  '-ulc' '+ulc' \
-  '-ut' '+ut' \
-  '-vb' '+vb' \
-  '-wc' '+wc' \
-  '-wf' '+wf' \
-  '-ziconbeep:iconbeep (percent):' \
-  '-C' \
-  '-S-:pseudo-terminal and file descriptor:' \
-  '-bd:border color:_color' \
-  '-bg:background color:_color' \
-  '-bw:border width:' \
-  '-display:display:' \
-  '-fg:foreground color:_color' \
-  '-fn:font:' \
-  '-geometry:geometry:' \
-  '-iconic' \
-  '-name:name:' \
-  '-rv' \
-  '-title:title:' \
-  '-xrm:resource:'

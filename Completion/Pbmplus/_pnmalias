@@ -1,6 +1,6 @@
 #compdef pnmalias
 
-_arguments '-bgcolor:background color:_colors' \
-           '-fgcolor:foreground color:_colors' \
+_arguments '-bgcolor:background color:_x_color' \
+           '-fgcolor:foreground color:_x_color' \
 	   '-bonly' '-fonly' '-balias' '-falias' \
 	   '-weight:central aliasing weight:' ':file: _pbm_file'

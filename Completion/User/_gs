@@ -8,7 +8,7 @@ if compset -N --; then
     return 1
   fi
 else
-  _x_options \
+  _x_arguments \
     -q \
     '-g-:device size (<width>x<height>):' \
     '-r-:resolution (<val> or <x>x<y>):' \

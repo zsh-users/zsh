@@ -1,4 +1,4 @@
 #compdef ppmtoacad
 
-_arguments '-dxb' '-poly' '-background:background color:_colors' \
+_arguments '-dxb' '-poly' '-background:background color:_x_color' \
            '-white' '-aspect:pixel aspect ratio:' '-8' ':file: _pbm_file'

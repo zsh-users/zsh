@@ -1,4 +1,4 @@
 #compdef pnmmargin
 
-_arguments '-white' '-black' '-color:color: _colors' \
+_arguments '-white' '-black' '-color:color: _x_color' \
            ':border width:' ':file: _pbm_file'

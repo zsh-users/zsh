@@ -1,12 +1,12 @@
 #compdef xfig
 
-_x_options \
+_x_arguments \
   -{help,Landscape,Portrait,debug,dontswitchcmap,flushleft,inches,inverse,latexfonts,left,metric,monochrome,multiple,noscalablefonts,notrack,right,scalablefonts,showallbuttons,single,specialtext,tablet,track} \
   '-bold:bold font:_x_font' \
   '-button:button font:_x_font' \
   '-but_per_row:number of buttons:' \
-  '-cbg:canvas background color:_colors' \
-  '-cfg:canvas foreground color:_colors' \
+  '-cbg:canvas background color:_x_color' \
+  '-cfg:canvas foreground color:_x_color' \
   '-depth:visual depth:_x_visdepth' \
   '-exportlanguage:export language:(box latex epic eepic eepicemu pictex ibmgl eps ps pstex textyl tpic pic mf acad pcx png gif jpeg tiff ppm xbm xpm)' \
   '-iconGeometry:icon geometry:_x_geometry' \

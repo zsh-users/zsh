@@ -1,12 +1,12 @@
 #compdef xsetroot
 
-_x_options \
+_x_arguments \
   -{help,def,gray,grey,rv} \
   '-cursor:cursor file:_files -g \*.\(\#i\)\(xbm\|curs\(\|or\)\):mask file:_files -g \*.\(\#i\)\(xbm\|curs\(\|or\)\|mask\)' \
-  '-cursor_name:cursor name:_cursors' \
+  '-cursor_name:cursor name:_x_cursor' \
   '-bitmap:bitmap file:_files -g \*.\(\#i\)xbm' \
   '-mod:x grid distance (1-16): :y grid distance (1-16):' \
-  '-fg:foreground color:_colors' \
-  '-bg:background color:_colors' \
-  '-solid:screen solid color:_colors' \
+  '-fg:foreground color:_x_color' \
+  '-bg:background color:_x_color' \
+  '-solid:screen solid color:_x_color' \
   '-name:root window name:'

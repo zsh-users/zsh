@@ -10,6 +10,6 @@ else
   _description expl 'old color'
 fi
 
-_colors "$expl[@]" && ret=0
+_x_color "$expl[@]" && ret=0
 
 return ret

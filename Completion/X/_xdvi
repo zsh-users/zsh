@@ -6,13 +6,13 @@ _xt_arguments \
   '-altfont:default font:' \
   '-base:base URL:' \
   '-browser:WWW browser:_command_names -e' \
-  '-cr:cursor color:_colors' \
+  '-cr:cursor color:_x_color' \
   '-debug:debugging bitmask:((1\:bitmaps 2\:dvi\ translation 4\:pk\ reading 8\:batch\ operation 16\:events 32\:file\ opening 64\:PostScript\ communication 128\:Kpathsea\ statistics 256\:Kpathsea\ hash\ table\ lookups 512\:Kpathsea\ path\ definitions 1024\:Kpathsea\ path\ expansion 2048\:Kpathsea\ searches))' \
   '-density:font shrink density:' \
   '-gamma:anti-aliasing factor (default 1.0):' \
-  -grid{1,2,3}':grid color:_colors' \
+  -grid{1,2,3}':grid color:_x_color' \
   '-gspalette:Ghostscript palette:(Color Greyscale Monochrome)' \
-  '-hl:page highlight color:_colors' \
+  '-hl:page highlight color:_x_color' \
   '-icongeometry:icon geometry:_x_geometry' \
   '-interpreter:Ghostscript program:_command_names -e' \
   '-margin:margin size:' \
