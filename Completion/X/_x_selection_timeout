@@ -1,3 +1,7 @@
 #autoload
 
-_message 'selection timeout'
+if (( $# )); then
+  _message "$2"
+else
+  _message 'selection timeout'
+fi

@@ -21,9 +21,10 @@ elif compset -P '-(symbols|core|command)='; then
   _files
 elif [[ "$PREFIX" = -* ]]; then
   _description expl option
-  compadd "$expl[@]" -QS '' - symbols\= exec\= se\= core\= command\= \
-                              directory\= cd\= tty\=
-  compadd "$expl[@]" - help h s e c x d nx n quiet q batch fullname f b
+  compadd "$expl[@]" -QS '' - -symbols\= -exec\= -se\= -core\= -command\= \
+                              -directory\= -cd\= -tty\=
+  compadd "$expl[@]" - -help -h -s -e -c -x -d -nx -n -quiet -q -batch \
+                       -fullname -f -b
 else
   prev="$words[CURRENT-1]"
 

@@ -1,3 +1,7 @@
 #autoload
 
-_message 'title'
+if (( $# )); then
+  _message "$2"
+else
+  _message 'title'
+fi

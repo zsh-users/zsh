@@ -7,4 +7,4 @@ _arguments '-forceplain' '-help' '-landscape' '-portrait' '-nocrop' \
 	   '-xborder:x border fraction:' '-yborder:y border fraction:' \
 	   '-xmax:maximum width:' '-ymax:maximum height' \
 	   '-xsize:width:' '-ysize:height:' \
-	   ':postscript file:_files -g *.(#i)(ps|eps)'
+	   ':postscript file:_files -g \*.\(\#i\)\(ps\|eps\)'

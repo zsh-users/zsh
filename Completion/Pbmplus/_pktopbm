@@ -1,4 +1,4 @@
 #compdef pktopbm
 
-_arguments ':pk file:_files -g *.(#i)pk' '-c:character number:' \
+_arguments ':pk file:_files -g \*.\(\#i\)pk' '-c:character number:' \
            '*:file: _pbm_file'

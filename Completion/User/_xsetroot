@@ -1,22 +1,16 @@
 #compdef xsetroot
 
-local expl
-
-case "$words[CURRENT-1]" in
--cursor_name) _cursors; return;;
--([fb]g|solid)) _colors; return;;
--cursor) _description expl 'cursor file'
-         _files "$expl[@]" -/g '*.(#i)(xbm|curs(|or))'; return;;
--bitmap) _description expl 'bitmap file'
-         _files "$expl[@]" -/g '*.(#i)xbm'; return;;
-esac
-
-if [[ CURRENT -gt 2 && "$words[CURRENT-2]" = -cursor ]]; then
-  _description expl 'cursor mask file'
-  _files "$expl[@]" -/g '*.(#i)(xbm|curs(|or)|mask)'
-else
-  _description expl option
-  compadd "$expl[@]" -M 'm:-=_ r:|_=*' - \
-          -help -def -cursor -cursor_name -bitmap -mod -gray -grey \
-          -fg -bg -rv -solid -name
-fi
+_x_options \
+  '-help' \
+  '-def' \
+  '-cursor:cursor file:_files -g \*.\(\#i\)\(xbm\|curs\(\|or\)\):mask file:_files -g \*.\(\#i\)\(xbm\|curs\(\|or\)\|mask\)' \
+  '-cursor_name:cursor name:_cursors' \
+  '-bitmap:bitmap file:_files -g \*.\(\#i\)xbm' \
+  '-mod:x grid distance (1-16): :y grid distance (1-16):' \
+  '-gray' \
+  '-grey' \
+  '-fg:foreground color:_colors' \
+  '-bg:background color:_colors' \
+  '-rv' \
+  '-solid:screen solid color:_colors' \
+  '-name:root window name:'

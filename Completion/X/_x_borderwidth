@@ -1,3 +1,7 @@
 #autoload
 
-_message 'border width'
+if (( $# )); then
+  _message "$2"
+else
+  _message 'border width'
+fi

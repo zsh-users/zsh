@@ -5,8 +5,8 @@ _arguments -s -{a,b,c,D,h,i,l,L,s,T,v,w,x,y,z} \
 	   '-I:directory:_dir_list' \
 	   '-d-:debug level:' '-k:function names: _exec_funcs -p' \
 	   '-m:minimum execution count:' \
-	   ':executable:_files -g *(*)' \
-	   ':profile file:_files -g gmon.*' \
+	   ':executable:_files -g \*\(\*\)' \
+	   ':profile file:_files -g gmon.\*' \
 	   -- -s '(#--[no-] --)' \
            '*=name*:function name: _exec_funcs' \
 	   '*=dirs*:directory:_dir_list'

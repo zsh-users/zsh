@@ -1,12 +1,6 @@
 #compdef -P */X11/*
 
-local expl
-
-# A simple pattern completion, just as an example.
-
-if [ "$words[CURRENT-1]" = "-display" ]; then
-  _x_display
-else
-  _description expl option  
-  compadd "$expl[@]" - -display -name -xrm
-fi
+_arguments \
+  '-display:display:_x_display' \
+  '-geometry:geometry:_x_geometry' \
+  "$@"

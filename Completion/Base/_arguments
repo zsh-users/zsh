@@ -465,18 +465,19 @@ else
         _description expl option
 	if [[ -n "$sopts" && -n "$PREFIX" && "$PREFIX" = [-+]${~soptseq}[$sopts] ]]; then
 	  if [[ "$PREFIX" = [-+]${~soptseq1} ]]; then
-	    compadd "$expl[@]" -Q \
+	    compadd "$expl[@]" -Q -M 'r:|_=* r:|=*' \
                     -y "( ${(j: :)${(@M)${(@k)opts}:#[-+]?}} ${(j: :)${(@M)${(@k)dopts}:#[-+]?}} ${(j: :)${(@M)${(@k)odopts}:#[-+]?}} )" - \
                     "${PREFIX}${(@k)^opts[(I)${PREFIX[1]}?]#?}" \
 		    "${PREFIX}${(@k)^dopts[(I)${PREFIX[1]}?]#?}" \
 		    "${PREFIX}${(@k)^odopts[(I)${PREFIX[1]}?]#?}" && ret=0
 	  else
-	    # The last option takes an argument in next word.
-	    compadd "$expl[@]" -Q - "${PREFIX}" && ret=0
+	    # The last option takes an argument in the next word.
+	    compadd "$expl[@]" -Q  -M 'r:|_=* r:|=*' - "${PREFIX}" && ret=0
 	  fi
 	else
-          compadd "$expl[@]" -Q - "${(@k)opts}" "${(@k)odopts}" && ret=0
-	  compadd "$expl[@]" -QS '' - "${(@k)dopts}" && ret=0
+          compadd "$expl[@]" -Q -M 'r:|_=* r:|=*' - \
+                  "${(@k)opts}" "${(@k)odopts}" && ret=0
+	  compadd "$expl[@]" -QS '' -M 'r:|_=* r:|=*' - "${(@k)dopts}" && ret=0
         fi
       fi
       [[ $#long -ne 0 &&
@@ -530,7 +531,7 @@ else
 
     _description expl "$descr"
 
-    if [[ -z "$action" ]]; then
+    if [[ "$action" = \ # ]]; then
 
       # An empty action means that we should just display a message.
 
