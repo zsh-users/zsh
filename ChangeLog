@@ -8,9 +8,14 @@
 	* 20978: Src/zle_main.c: don't propagate EOFs from recursive
 	edit.
 
+2005-03-11  Wayne Davison  <wayned@users.sourceforge.net>
+
+	* unposted: Completion/Unix/Command/_rsync:  A few more tweaks
+	to the various --*-dest options.
+
 2005-02-28  Philippe Troin  <phil@fifi.org>
 
-       * 20886: configure.ac: Use TTOU with trap rather than SIGTTOU.
+	* 20886: configure.ac: Use TTOU with trap rather than SIGTTOU.
 
 2005-03-13  Bart Schaefer  <schaefer@zsh.org>
 
@@ -140,8 +145,8 @@
 
 2005-03-02  Wayne Davison  <wayned@users.sourceforge.net>
 
-	* unposted: Completion/Unix/Command/_make: Don't try to expand
-	a single-character Makefile variable if it is a digit.  Avoids
+	* 20917: Completion/Unix/Command/_make: Don't try to expand a
+	single-character Makefile variable if it is a digit.  Avoids
 	an infinite recursion from a Makefile referencing $1.
 
 2005-03-02  Clint Adams  <clint@zsh.org>
