@@ -350,6 +350,10 @@ scanhashtable(HashTable ht, int sorted, int flags1, int flags2, ScanFunc scanfun
 {
     struct scanstatus st;
 
+    if (ht->scanfunc) {
+	ht->scanfunc(ht, scanfunc, scanflags);
+	return;
+    }
     if (sorted) {
 	int i, ct = ht->ct;
 	VARARR(HashNode, hnsorttab, ct);

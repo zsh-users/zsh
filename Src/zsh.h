@@ -228,6 +228,7 @@ typedef struct linklist  *LinkList;
 typedef struct hashnode  *HashNode;
 typedef struct hashtable *HashTable;
 
+typedef struct optname   *Optname;
 typedef struct reswd     *Reswd;
 typedef struct alias     *Alias;
 typedef struct param     *Param;
@@ -684,6 +685,8 @@ typedef void     (*FreeNodeFunc)   _((HashNode));
  * scanhashtable or scanmatchtable    */
 typedef void     (*ScanFunc)       _((HashNode, int));
 
+typedef void     (*ScanTabFunc)    _((HashTable, ScanFunc, int));
+
 typedef void (*PrintTableStats) _((HashTable));
 
 /* hash table for standard open hashing */
@@ -707,6 +710,7 @@ struct hashtable {
     ScanFunc enablenode;	/* pointer to function to enable a node       */
     FreeNodeFunc freenode;	/* pointer to function to free a node         */
     ScanFunc printnode;		/* pointer to function to print a node        */
+    ScanTabFunc scanfunc;	/* pointer to function to scan table          */
 
 #ifdef HASHTABLE_INTERNAL_MEMBERS
     HASHTABLE_INTERNAL_MEMBERS	/* internal use in hashtable.c                */
@@ -725,6 +729,15 @@ struct hashnode {
  * you can disable builtins, shell functions, aliases and *
  * reserved words.                                        */
 #define DISABLED	(1<<0)
+
+/* node in shell option table */
+
+struct optname {
+    HashNode next;		/* next in hash chain */
+    char *nam;			/* hash data */
+    int flags;
+    int optno;			/* option number */
+};
 
 /* node in shell reserved word hash table (reswdtab) */
 

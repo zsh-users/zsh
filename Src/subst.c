@@ -1008,33 +1008,7 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int ssub)
 
 	if (wantt) {
 	    if (v && v->pm && !(v->pm->flags & PM_UNSET)) {
-		int f = v->pm->flags;
-
-		switch (PM_TYPE(f)) {
-		case PM_SCALAR:  val = "scalar"; break;
-		case PM_ARRAY:   val = "array"; break;
-		case PM_INTEGER: val = "integer"; break;
-		case PM_HASHED:  val = "association"; break;
-		}
-		val = dupstring(val);
-		if (f & PM_LEFT)
-		    val = dyncat(val, "-left");
-		if (f & PM_RIGHT_B)
-		    val = dyncat(val, "-right_blanks");
-		if (f & PM_RIGHT_Z)
-		    val = dyncat(val, "-right_zeros");
-		if (f & PM_LOWER)
-		    val = dyncat(val, "-lower");
-		if (f & PM_UPPER)
-		    val = dyncat(val, "-upper");
-		if (f & PM_READONLY)
-		    val = dyncat(val, "-readonly");
-		if (f & PM_TAGGED)
-		    val = dyncat(val, "-tag");
-		if (f & PM_EXPORTED)
-		    val = dyncat(val, "-export");
-		if (f & PM_UNIQUE)
-		    val = dyncat(val, "-unique");
+		val = paramtypestr(v->pm);
 		vunset = 0;
 	    } else
 		val = dupstring("");

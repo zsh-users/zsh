@@ -255,7 +255,11 @@ static Param argvparam;
 /* hash table containing the parameters */
  
 /**/
-HashTable paramtab;
+HashTable paramtab, realparamtab;
+
+#ifndef DYNAMIC
+#define getparamnode gethashnode2
+#endif /* DYNAMIC */
 
 /**/
 HashTable
@@ -278,6 +282,7 @@ newparamtable(int size, char const *name)
     return ht;
 }
 
+#ifdef DYNAMIC
 /**/
 static HashNode
 getparamnode(HashTable ht, char *nam)
@@ -294,6 +299,7 @@ getparamnode(HashTable ht, char *nam)
     }
     return hn;
 }
+#endif /* DYNAMIC */
 
 /* Copy a parameter hash table */
 
@@ -406,6 +412,495 @@ getvaluearr(Value v)
 	return NULL;
 }
 
+/* empty dummy function for special hash parameters */
+
+static void
+shempty()
+{
+}
+
+/* Create a simple special hash parameter. */
+
+/**/
+Param
+createspecialhash(char *name, GetNodeFunc get, ScanTabFunc scan)
+{
+    Param pm;
+    HashTable ht;
+
+    if (!(pm = createparam(name, PM_SPECIAL|PM_REMOVABLE|PM_HASHED)))
+	return NULL;
+
+    pm->level = locallevel;
+    pm->gets.hfn = hashgetfn;
+    pm->sets.hfn = hashsetfn;
+    pm->unsetfn = stdunsetfn;
+    pm->u.hash = ht = newhashtable(7, name, NULL);
+
+    ht->hash        = hasher;
+    ht->emptytable  = (TableFunc) shempty;
+    ht->filltable   = NULL;
+    ht->addnode     = (AddNodeFunc) shempty;
+    ht->getnode     = ht->getnode2 = get;
+    ht->removenode  = (RemoveNodeFunc) shempty;
+    ht->disablenode = NULL;
+    ht->enablenode  = NULL;
+    ht->freenode    = (FreeNodeFunc) shempty;
+    ht->printnode   = NULL;
+    ht->scanfunc    = scan;
+
+    return pm;
+}
+
+/* Functions for the parameters special parameter. */
+
+static HashNode
+getpmparameter(HashTable ht, char *name)
+{
+    Param rpm, pm = NULL;
+
+    HEAPALLOC {
+	pm = (Param) zhalloc(sizeof(struct param));
+	pm->nam = dupstring(name);
+	pm->flags = PM_SCALAR | PM_READONLY;
+	pm->sets.cfn = NULL;
+	pm->gets.cfn = strgetfn;
+	pm->unsetfn = NULL;
+	pm->ct = 0;
+	pm->env = NULL;
+	pm->ename = NULL;
+	pm->old = NULL;
+	pm->level = 0;
+	if ((rpm = (Param) realparamtab->getnode(realparamtab, name)) &&
+	    !(rpm->flags & PM_UNSET))
+	    pm->u.str = paramtypestr(rpm);
+	else {
+	    pm->u.str = "";
+	    pm->flags |= PM_UNSET;
+	}
+    } LASTALLOC;
+
+    return (HashNode) pm;
+}
+
+static void
+scanpmparameters(HashTable ht, ScanFunc func, int flags)
+{
+    struct param pm;
+    int i;
+    HashNode hn;
+
+    pm.flags = PM_SCALAR | PM_READONLY;
+    pm.sets.cfn = NULL;
+    pm.gets.cfn = strgetfn;
+    pm.unsetfn = NULL;
+    pm.ct = 0;
+    pm.env = NULL;
+    pm.ename = NULL;
+    pm.old = NULL;
+    pm.level = 0;
+
+    for (i = 0; i < realparamtab->hsize; i++)
+	for (hn = realparamtab->nodes[i]; hn; hn = hn->next) {
+	    pm.nam = hn->nam;
+	    if (func != scancountparams)
+		pm.u.str = paramtypestr((Param) hn);
+	    func((HashNode) &pm, flags);
+	}
+}
+
+/* Functions for the commands special parameter. */
+
+static void
+setpmcommand(Param pm, char *value)
+{
+    if (isset(RESTRICTED))
+	zwarnnam(NULL, "restricted: %s", value, 0);
+    else {
+	Cmdnam cn = zcalloc(sizeof(*cn));
+
+	cn->flags = HASHED;
+	cn->u.cmd = ztrdup(value);
+
+	cmdnamtab->addnode(cmdnamtab, ztrdup(pm->nam), (HashNode) cn);
+    }
+}
+
+static void
+unsetpmcommand(Param pm, int exp)
+{
+    HashNode hn = cmdnamtab->removenode(cmdnamtab, pm->nam);
+
+    if (hn)
+	cmdnamtab->freenode(hn);
+}
+
+static void
+setpmcommands(Param pm, HashTable ht)
+{
+    int i;
+    HashNode hn;
+
+    for (i = 0; i < ht->hsize; i++)
+	for (hn = ht->nodes[i]; hn; hn = hn->next) {
+	    Cmdnam cn = zcalloc(sizeof(*cn));
+	    struct value v;
+
+	    v.isarr = v.inv = v.a = 0;
+	    v.b = -1;
+	    v.arr = NULL;
+	    v.pm = (Param) hn;
+
+	    cn->flags = HASHED;
+	    cn->u.cmd = ztrdup(getstrvalue(&v));
+
+	    cmdnamtab->addnode(cmdnamtab, ztrdup(hn->nam), (HashNode) cn);
+	}
+}
+
+static HashNode
+getpmcommand(HashTable ht, char *name)
+{
+    Cmdnam cmd;
+    Param pm = NULL;
+
+    if (!(cmd = (Cmdnam) cmdnamtab->getnode(cmdnamtab, name)) &&
+	isset(HASHLISTALL)) {
+	cmdnamtab->filltable(cmdnamtab);
+	cmd = (Cmdnam) cmdnamtab->getnode(cmdnamtab, name);
+    }
+    HEAPALLOC {
+	pm = (Param) zhalloc(sizeof(struct param));
+	pm->nam = dupstring(name);
+	pm->flags = PM_SCALAR;
+	pm->sets.cfn = setpmcommand;
+	pm->gets.cfn = strgetfn;
+	pm->unsetfn = unsetpmcommand;
+	pm->ct = 0;
+	pm->env = NULL;
+	pm->ename = NULL;
+	pm->old = NULL;
+	pm->level = 0;
+	if (cmd) {
+	    if (cmd->flags & HASHED)
+		pm->u.str = cmd->u.cmd;
+	    else {
+		pm->u.str = zhalloc(strlen(*(cmd->u.name)) +
+				    strlen(name) + 2);
+		strcpy(pm->u.str, *(cmd->u.name));
+		strcat(pm->u.str, "/");
+		strcat(pm->u.str, name);
+	    }
+	} else {
+	    pm->u.str = "";
+	    pm->flags |= PM_UNSET;
+	}
+    } LASTALLOC;
+
+    return (HashNode) pm;
+}
+
+static void
+scanpmcommands(HashTable ht, ScanFunc func, int flags)
+{
+    struct param pm;
+    int i;
+    HashNode hn;
+    Cmdnam cmd;
+
+    if (isset(HASHLISTALL))
+	cmdnamtab->filltable(cmdnamtab);
+
+    pm.flags = PM_SCALAR;
+    pm.sets.cfn = setpmcommand;
+    pm.gets.cfn = strgetfn;
+    pm.unsetfn = unsetpmcommand;
+    pm.ct = 0;
+    pm.env = NULL;
+    pm.ename = NULL;
+    pm.old = NULL;
+    pm.level = 0;
+
+    for (i = 0; i < cmdnamtab->hsize; i++)
+	for (hn = cmdnamtab->nodes[i]; hn; hn = hn->next) {
+	    pm.nam = hn->nam;
+	    cmd = (Cmdnam) hn;
+	    if (func != scancountparams) {
+		if (cmd->flags & HASHED)
+		    pm.u.str = cmd->u.cmd;
+		else {
+		    pm.u.str = zhalloc(strlen(*(cmd->u.name)) +
+				       strlen(cmd->nam) + 2);
+		    strcpy(pm.u.str, *(cmd->u.name));
+		    strcat(pm.u.str, "/");
+		    strcat(pm.u.str, cmd->nam);
+		}
+	    }
+	    func((HashNode) &pm, flags);
+	}
+}
+
+/* Functions for the functions special parameter. */
+
+static void
+setfunction(char *name, char *value)
+{
+    char *val;
+    Shfunc shf;
+    List list;
+    int sn;
+
+    val = ztrdup(value);
+    val = metafy(val, strlen(val), META_REALLOC);
+
+    HEAPALLOC {
+	list = parse_string(val);
+    } LASTALLOC;
+
+    if (!list || list == &dummy_list) {
+	zwarnnam(NULL, "invalid function definition", val, 0);
+	zsfree(val);
+	return;
+    }
+    PERMALLOC {
+	shf = (Shfunc) zalloc(sizeof(*shf));
+	shf->funcdef = (List) dupstruct(list);
+	shf->flags = 0;
+
+	if (!strncmp(name, "TRAP", 4) &&
+	    (sn = getsignum(name + 4)) != -1) {
+	    if (settrap(sn, shf->funcdef)) {
+		freestruct(shf->funcdef);
+		zfree(shf, sizeof(*shf));
+		zsfree(val);
+		LASTALLOC_RETURN;
+	    }
+	    sigtrapped[sn] |= ZSIG_FUNC;
+	}
+	shfunctab->addnode(shfunctab, ztrdup(name), shf);
+    } LASTALLOC;
+
+    zsfree(val);
+}
+
+static void
+setpmfunction(Param pm, char *value)
+{
+    setfunction(pm->nam, value);
+}
+
+static void
+unsetpmfunction(Param pm, int exp)
+{
+    HashNode hn = shfunctab->removenode(shfunctab, pm->nam);
+
+    if (hn)
+	shfunctab->freenode(hn);
+}
+
+static void
+setpmfunctions(Param pm, HashTable ht)
+{
+    int i;
+    HashNode hn;
+
+    for (i = 0; i < ht->hsize; i++)
+	for (hn = ht->nodes[i]; hn; hn = hn->next) {
+	    struct value v;
+
+	    v.isarr = v.inv = v.a = 0;
+	    v.b = -1;
+	    v.arr = NULL;
+	    v.pm = (Param) hn;
+
+	    setfunction(hn->nam, getstrvalue(&v));
+	}
+}
+
+static HashNode
+getpmfunction(HashTable ht, char *name)
+{
+    Shfunc shf;
+    Param pm = NULL;
+
+    HEAPALLOC {
+	pm = (Param) zhalloc(sizeof(struct param));
+	pm->nam = dupstring(name);
+	pm->flags = PM_SCALAR;
+	pm->sets.cfn = setpmfunction;
+	pm->gets.cfn = strgetfn;
+	pm->unsetfn = unsetpmfunction;
+	pm->ct = 0;
+	pm->env = NULL;
+	pm->ename = NULL;
+	pm->old = NULL;
+	pm->level = 0;
+
+	if ((shf = (Shfunc) shfunctab->getnode(shfunctab, name))) {
+	    if (shf->flags & PM_UNDEFINED)
+		pm->u.str = "undefined";
+	    else {
+		char *t = getpermtext((void *) dupstruct((void *)
+							 shf->funcdef)), *h;
+
+		h = dupstring(t);
+		zsfree(t);
+		unmetafy(h, NULL);
+
+		pm->u.str = h;
+	    }
+	} else {
+	    pm->u.str = "";
+	    pm->flags |= PM_UNSET;
+	}
+    } LASTALLOC;
+
+    return (HashNode) pm;
+}
+
+static void
+scanpmfunctions(HashTable ht, ScanFunc func, int flags)
+{
+    struct param pm;
+    int i;
+    HashNode hn;
+
+    pm.flags = PM_SCALAR;
+    pm.sets.cfn = setpmcommand;
+    pm.gets.cfn = strgetfn;
+    pm.unsetfn = unsetpmcommand;
+    pm.ct = 0;
+    pm.env = NULL;
+    pm.ename = NULL;
+    pm.old = NULL;
+    pm.level = 0;
+
+    for (i = 0; i < shfunctab->hsize; i++)
+	for (hn = shfunctab->nodes[i]; hn; hn = hn->next) {
+	    if (!(hn->flags & DISABLED)) {
+		pm.nam = hn->nam;
+		if (func != scancountparams) {
+		    if (((Shfunc) hn)->flags & PM_UNDEFINED)
+			pm.u.str = "undefined";
+		    else {
+			char *t = getpermtext((void *)
+					      dupstruct((void *) ((Shfunc) hn)->funcdef));
+
+			unmetafy((pm.u.str = dupstring(t)), NULL);
+			zsfree(t);
+		    }
+		}
+		func((HashNode) &pm, flags);
+	    }
+	}
+}
+
+/* Functions for the options special parameter. */
+
+static void
+setpmoption(Param pm, char *value)
+{
+    int n;
+
+    if (!value || (strcmp(value, "on") && strcmp(value, "off")))
+	zwarnnam(NULL, "invalid value: %s", value, 0);
+    else if (!(n = optlookup(pm->nam)))
+	zwarnnam(NULL, "no such option: %s", pm->nam, 0);
+    else if (dosetopt(n, (value && strcmp(value, "off")), 0))
+	zwarnnam(NULL, "can't change option: %s", pm->nam, 0);
+}
+
+static void
+unsetpmoption(Param pm, int exp)
+{
+    int n;
+
+    if (!(n = optlookup(pm->nam)))
+	zwarnnam(NULL, "no such option: %s", pm->nam, 0);
+    else if (dosetopt(n, 0, 0))
+	zwarnnam(NULL, "can't change option: %s", pm->nam, 0);
+}
+
+static void
+setpmoptions(Param pm, HashTable ht)
+{
+    int i;
+    HashNode hn;
+
+    for (i = 0; i < ht->hsize; i++)
+	for (hn = ht->nodes[i]; hn; hn = hn->next) {
+	    struct value v;
+	    char *val;
+
+	    v.isarr = v.inv = v.a = 0;
+	    v.b = -1;
+	    v.arr = NULL;
+	    v.pm = (Param) hn;
+
+	    val = getstrvalue(&v);
+	    if (!val || (strcmp(val, "on") && strcmp(val, "off")))
+		zwarnnam(NULL, "invalid value: %s", val, 0);
+	    else if (dosetopt(optlookup(hn->nam),
+			      (val && strcmp(val, "off")), 0))
+		zwarnnam(NULL, "can't change option: %s", hn->nam, 0);
+	}
+}
+
+static HashNode
+getpmoption(HashTable ht, char *name)
+{
+    Param pm = NULL;
+    int n;
+
+    HEAPALLOC {
+	pm = (Param) zhalloc(sizeof(struct param));
+	pm->nam = dupstring(name);
+	pm->flags = PM_SCALAR;
+	pm->sets.cfn = setpmoption;
+	pm->gets.cfn = strgetfn;
+	pm->unsetfn = unsetpmoption;
+	pm->ct = 0;
+	pm->env = NULL;
+	pm->ename = NULL;
+	pm->old = NULL;
+	pm->level = 0;
+
+	if ((n = optlookup(name)))
+	    pm->u.str = dupstring(opts[n] ? "on" : "off");
+	else {
+	    pm->u.str = "";
+	    pm->flags |= PM_UNSET;
+	}
+    } LASTALLOC;
+
+    return (HashNode) pm;
+}
+
+static void
+scanpmoptions(HashTable ht, ScanFunc func, int flags)
+{
+    struct param pm;
+    int i;
+    HashNode hn;
+
+    pm.flags = PM_SCALAR;
+    pm.sets.cfn = setpmoption;
+    pm.gets.cfn = strgetfn;
+    pm.unsetfn = unsetpmoption;
+    pm.ct = 0;
+    pm.env = NULL;
+    pm.ename = NULL;
+    pm.old = NULL;
+    pm.level = 0;
+
+    for (i = 0; i < optiontab->hsize; i++)
+	for (hn = optiontab->nodes[i]; hn; hn = hn->next) {
+	    pm.nam = hn->nam;
+	    pm.u.str = opts[((Optname) hn)->optno] ? "on" : "off";
+	    func((HashNode) &pm, flags);
+	}
+}
+
 /* Set up parameter hash table.  This will add predefined  *
  * parameter entries as well as setting up parameter table *
  * entries for environment variables we inherit.           */
@@ -419,7 +914,7 @@ createparamtable(void)
     char buf[50], *str, *iname;
     int num_env;
 
-    paramtab = newparamtable(151, "paramtab");
+    paramtab = realparamtab = newparamtable(151, "paramtab");
 
     /* Add the special parameters to the hash table */
     for (ip = special_params; ip->nam; ip++)
@@ -509,6 +1004,15 @@ createparamtable(void)
 	setsparam("ZSH_VERSION", ztrdup(ZSH_VERSION));
 	setaparam("signals", sigptr = zalloc((SIGCOUNT+4) * sizeof(char *)));
 	for (t = sigs; (*sigptr++ = ztrdup(*t++)); );
+
+	pm = createspecialhash("parameters", getpmparameter, scanpmparameters);
+	pm->flags |= PM_READONLY;
+	pm = createspecialhash("commands", getpmcommand, scanpmcommands);
+	pm->sets.hfn = setpmcommands;
+	pm = createspecialhash("functions", getpmfunction, scanpmfunctions);
+	pm->sets.hfn = setpmfunctions;
+	pm = createspecialhash("options", getpmoption, scanpmoptions);
+	pm->sets.hfn = setpmoptions;
     } LASTALLOC;
 
     noerrs = 0;
@@ -559,7 +1063,9 @@ createparam(char *name, int flags)
     Param pm, oldpm;
 
     if (name != nulstring) {
-	oldpm = (Param) gethashnode2(paramtab, name);
+	oldpm = (Param) (paramtab == realparamtab ?
+			 gethashnode2(paramtab, name) :
+			 paramtab->getnode(paramtab, name));
 
 	if (oldpm && oldpm->level == locallevel) {
 	    if (!(oldpm->flags & PM_UNSET) || (oldpm->flags & PM_SPECIAL)) {
@@ -842,8 +1348,7 @@ getarg(char **str, int *inv, Value v, int a2, long *w)
 	    *inv = 0;	/* We've already obtained the "index" (key) */
 	    *w = v->b = -1;
 	    r = isset(KSHARRAYS) ? 1 : 0;
-	} else
-	if (!(r = mathevalarg(s, &s)) || (isset(KSHARRAYS) && r >= 0))
+	} else if (!(r = mathevalarg(s, &s)) || (isset(KSHARRAYS) && r >= 0))
 	    r++;
 	if (word && !v->isarr) {
 	    s = t = getstrvalue(v);
@@ -2706,6 +3211,47 @@ freeparamnode(HashNode hn)
     zfree(pm, sizeof(struct param));
 }
 
+/* Return a string describing the type of a parameter. */
+
+/**/
+char *
+paramtypestr(Param pm)
+{
+    char *val;
+    int f = pm->flags;
+
+    if (!(f & PM_UNSET)) {
+	switch (PM_TYPE(f)) {
+	case PM_SCALAR:  val = "scalar"; break;
+	case PM_ARRAY:   val = "array"; break;
+	case PM_INTEGER: val = "integer"; break;
+	case PM_HASHED:  val = "association"; break;
+	}
+	val = dupstring(val);
+	if (f & PM_LEFT)
+	    val = dyncat(val, "-left");
+	if (f & PM_RIGHT_B)
+	    val = dyncat(val, "-right_blanks");
+	if (f & PM_RIGHT_Z)
+	    val = dyncat(val, "-right_zeros");
+	if (f & PM_LOWER)
+	    val = dyncat(val, "-lower");
+	if (f & PM_UPPER)
+	    val = dyncat(val, "-upper");
+	if (f & PM_READONLY)
+	    val = dyncat(val, "-readonly");
+	if (f & PM_TAGGED)
+	    val = dyncat(val, "-tag");
+	if (f & PM_EXPORTED)
+	    val = dyncat(val, "-export");
+	if (f & PM_UNIQUE)
+	    val = dyncat(val, "-unique");
+    } else
+	val = dupstring("");
+
+    return val;
+}
+
 /* Print a parameter */
 
 /**/
@@ -2715,11 +3261,13 @@ printparamnode(HashNode hn, int printflags)
     Param p = (Param) hn;
     char *t, **u;
 
-    if (p->flags & (PM_UNSET | PM_AUTOLOAD))
+    if (p->flags & PM_UNSET)
 	return;
 
     /* Print the attributes of the parameter */
     if (printflags & PRINT_TYPE) {
+	if (p->flags & PM_AUTOLOAD)
+	    printf("undefined ");
 	if (p->flags & PM_INTEGER)
 	    printf("integer ");
 	else if (p->flags & PM_ARRAY)
@@ -2753,6 +3301,11 @@ printparamnode(HashNode hn, int printflags)
     }
 
     quotedzputs(p->nam, stdout);
+
+    if (p->flags & PM_AUTOLOAD) {
+	putchar('\n');
+	return;
+    }
     if (printflags & PRINT_KV_PAIR)
 	putchar(' ');
     else

@@ -45,15 +45,6 @@ char opts[OPT_SIZE];
 /**/
 HashTable optiontab;
  
-typedef struct optname *Optname;
-
-struct optname {
-    HashNode next;		/* next in hash chain */
-    char *nam;			/* hash data */
-    int flags;
-    int optno;			/* option number */
-};
-
 /* The canonical option name table */
 
 #define OPT_CSH		EMULATE_CSH
