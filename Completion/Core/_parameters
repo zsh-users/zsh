@@ -3,6 +3,13 @@
 # This should be used to complete parameter names if you need some of the
 # extra options of compadd. It completes only non-local parameters.
 
-local expl
+# If you specify a -g option with a pattern, the pattern will be used to
+# restrict the type of parameters matched.
 
-_wanted parameters expl parameter compadd "$@" -k 'parameters[(R)^*local*]'
+local expl pattern
+
+pattern=(-g \*)
+zparseopts -D -K -E g:=pattern
+
+_wanted parameters expl parameter compadd "$@" \
+    -k "parameters[(R)${pattern[2]}~*local*]"

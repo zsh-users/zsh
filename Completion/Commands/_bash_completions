@@ -34,7 +34,7 @@ case $key in
   '!') _main_complete _command_names
        ;;
   '$') _main_complete - parameters _wanted parameters expl 'exported parameters' \
-                                       compadd -k 'parameters[(R)*export*]'
+                                       _parameters -g '*export*'
        ;;
   '@') _main_complete _hosts
        ;;

@@ -3470,8 +3470,12 @@ completion functions are called even if there are no matches so far.
 )
 findex(_parameters)
 item(tt(_parameters))(
-This should be used to complete parameter names.  All arguments are
-passed unchanged to the tt(compadd) builtin.
+This should be used to complete parameter names.  tt(_parameters) can
+take a tt(-g var(pattern)) option which specifies that only parameters
+whose type matches the var(pattern) should be completed.  Strings of
+the same form as those returned by the tt(t) parameter expansion flag
+are used here when matching the type.  All other arguments are passed
+unchanged to the tt(compadd) builtin.
 )
 findex(_path_files)
 item(tt(_path_files))(
