@@ -1,3 +1,9 @@
+2002-12-11  Peter Stephenson  <pws@csr.com>
+
+	* 17996: Src/builtin.c: Improve formatting with `print -C' by
+	ignoring the length of the final column when calculating the
+	separation.
+
 2002-12-10  Peter Stephenson  <pws@csr.com>
 
 	* 17994: Src/pattern.c: A set of globbing flags with no effect

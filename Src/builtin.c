@@ -3214,20 +3214,6 @@ bin_print(char *name, char **args, Options ops, int func)
 	int l, nc, nr, sc, n, t, i;
 	char **ap;
 
-	/*
-	 * n: loop counter
-	 * ap: array iterator
-	 * l: maximum length seen
-	 */
-	for (n = l = 0, ap = args; *ap; ap++, n++)
-	    if (l < (t = strlen(*ap)))
-		l = t;
-
-	/*
-	 * sc: column width
-	 * nc: number of columns (at least one)
-	 */
-	sc = l + 2;
 	if (OPT_ISSET(ops,'C')) {
 	    char *eptr, *argptr = OPT_ARG(ops,'C');
 	    nc = (int)zstrtol(argptr, &eptr, 10);
@@ -3239,14 +3225,56 @@ bin_print(char *name, char **args, Options ops, int func)
 		zwarnnam(name, "invalid number of columns: %s", argptr, 0);
 		return 1;
 	    }
+	    /*
+	     * n: number of elements
+	     * nc: number of columns
+	     * nr: number of rows
+	     */
+	    n = arrlen(args);
+	    nr = (n + nc - 1) / nc;
+
+	    /*
+	     * i: loop counter
+	     * ap: array iterator
+	     * l: maximum length seen
+	     *
+	     * Ignore lengths in last column since they don't affect
+	     * the separation.
+	     */
+	    for (i = l = 0, ap = args; *ap; ap++, i++) {
+		if (OPT_ISSET(ops, 'a')) {
+		    if ((i % nc) == nc - 1)
+			continue;
+		} else {
+		    if (i >= nr * (nc - 1))
+			break;
+		}
+		if (l < (t = strlen(*ap)))
+		    l = t;
+	    }
+	    sc = l + 2;
 	}
 	else
 	{
+	    /*
+	     * n: loop counter
+	     * ap: array iterator
+	     * l: maximum length seen
+	     */
+	    for (n = l = 0, ap = args; *ap; ap++, n++)
+		if (l < (t = strlen(*ap)))
+		    l = t;
+
+	    /*
+	     * sc: column width
+	     * nc: number of columns (at least one)
+	     */
+	    sc = l + 2;
 	    nc = (columns + 1) / sc;
 	    if (!nc)
 		nc = 1;
+	    nr = (n + nc - 1) / nc;
 	}
-	nr = (n + nc - 1) / nc;
 
 	if (OPT_ISSET(ops,'a'))	/* print across, i.e. columns first */
 	    ap = args;
