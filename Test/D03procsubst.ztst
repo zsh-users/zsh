@@ -1,10 +1,16 @@
 # Tests for process substitution: <(...), >(...) and =(...).
 
 %prep
-  mkdir procsubst.tmp
-  cd procsubst.tmp
-  print 'First\tSecond\tThird\tFourth' >FILE1
-  print 'Erste\tZweite\tDritte\tVierte' >FILE2
+  if grep '#define PATH_DEV_FD' $ZTST_testdir/../config.h > /dev/null 2>&1 ||
+     grep '#define HAVE_FIFOS' $ZTST_testdir/../config.h > /dev/null 2>&1; then
+    mkdir procsubst.tmp
+    cd procsubst.tmp
+    print 'First\tSecond\tThird\tFourth' >FILE1
+    print 'Erste\tZweite\tDritte\tVierte' >FILE2
+  else
+    ZTST_unimplemented="process substitution is not supported"
+    true
+  fi
 
 %test
   paste <(cut -f1 FILE1) <(cut -f3 FILE2)

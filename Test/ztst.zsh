@@ -232,9 +232,11 @@ ZTST_execchunk() {
 ZTST_prepclean() {
   # Execute indented code chunks.
   while ZTST_getchunk; do
-    ZTST_execchunk >/dev/null || [[ -n $1 ]] ||
-    ZTST_testfailed "non-zero status from preparation code:
-$ZTST_code"
+    ZTST_execchunk >/dev/null || [[ -n $1 ]] || {
+      [[ -n "$ZTST_unimplemented" ]] ||
+      ZTST_testfailed "non-zero status from preparation code:
+$ZTST_code" && return 0
+    }
   done
 }
 
@@ -363,8 +365,11 @@ ZTST_sects=(prep 0 test 0 clean 0)
 print "$ZTST_testname: starting."
 
 # Now go through all the different sections until the end.
+# prep section may set ZTST_unimplemented, in this case the actual
+# tests will be skipped
 ZTST_skipok=
-while ZTST_getsect $ZTST_skipok; do
+ZTST_unimplemented=
+while [[ -z "$ZTST_unimplemented" ]] && ZTST_getsect $ZTST_skipok; do
   case $ZTST_cursect in
     prep) if (( ${ZTST_sects[prep]} + ${ZTST_sects[test]} + \
 	        ${ZTST_sects[clean]} )); then
@@ -399,6 +404,10 @@ while ZTST_getsect $ZTST_skipok; do
   esac
 done
 
-(( $ZTST_testfailed )) || print "$ZTST_testname: all tests successful."
+if [[ -n "$ZTST_unimplemented" ]]; then
+  print "$ZTST_testname: skipped ($ZTST_unimplemented)"
+elif (( ! $ZTST_testfailed )); then
+  print "$ZTST_testname: all tests successful."
+fi
 ZTST_cleanup
 exit $(( ZTST_testfailed ))

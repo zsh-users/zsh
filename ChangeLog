@@ -1,3 +1,8 @@
+2001-06-26  Andrej Borsenkow  <bor@zsh.org>
+
+	* 15099: Test/D03procsubst.ztst, Test/ztst.zsh: add some support
+	for skipping unimplemented features
+
 2001-06-26  Clint Adams  <clint@zsh.org>
 
 	* 15094: Functions/Prompts/prompt_clint_setup:
