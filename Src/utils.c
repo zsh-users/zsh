@@ -1313,31 +1313,39 @@ read1char(void)
 
 /**/
 int
+noquery(int purge)
+{
+    int c, val = 0;
+
+#ifdef FIONREAD
+    ioctl(SHTTY, FIONREAD, (char *)&val);
+    if (purge) {
+	while(val--)
+	    read(SHTTY, &c, 1);
+    }
+#endif
+
+    return val;
+}
+
+/**/
+int
 getquery(char *valid_chars, int purge)
 {
     int c, d;
     int isem = !strcmp(term, "emacs");
 
-#ifdef FIONREAD
-    int val = 0;
-#endif
-
     attachtty(mypgrp);
     if (!isem)
 	setcbreak();
 
-#ifdef FIONREAD
-    ioctl(SHTTY, FIONREAD, (char *)&val);
-    if(purge) {
-	while(val--)
-	    read(SHTTY, &c, 1);
-    } else if (val) {
+    if (noquery(purge)) {
 	if (!isem)
 	    settyinfo(&shttyinfo);
 	write(SHTTY, "n\n", 2);
 	return 'n';
     }
-#endif
+
     while ((c = read1char()) >= 0) {
 	if (c == 'Y' || c == '\t')
 	    c = 'y';
@@ -1494,13 +1502,17 @@ spckword(char **s, int hist, int cmd, int ask)
 	    *guess = *best = ztokens[ic - Pound];
 	}
 	if (ask) {
-	    char *pptbuf;
-	    pptbuf = promptexpand(sprompt, 0, best, guess);
-	    zputs(pptbuf, shout);
-	    free(pptbuf);
-	    fflush(shout);
-	    zbeep();
-	    x = getquery("nyae ", 0);
+	    if (noquery(0)) {
+		x = 'n';
+	    } else {
+		char *pptbuf;
+		pptbuf = promptexpand(sprompt, 0, best, guess);
+		zputs(pptbuf, shout);
+		free(pptbuf);
+		fflush(shout);
+		zbeep();
+		x = getquery("nyae ", 0);
+	    }
 	} else
 	    x = 'y';
 	if (x == 'y' || x == ' ') {
