@@ -1,3 +1,8 @@
+2000-07-03  Peter Stephenson  <pws@cambridgesiliconradio.com>
+
+	* 12121: Src/utils.c, Doc/Zsh/options.yo: save and restore stopmsg
+	for precmd, fix #ifdef's for variable declaration in read_poll().
+
 2000-07-03  Sven Wischnowsky  <wischnow@zsh.org>
 
 	* 12134: Completion/Core/_main_complete, Doc/Zsh/compsys.yo,

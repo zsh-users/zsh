@@ -644,11 +644,16 @@ preprompt(void)
     /* If a shell function named "precmd" exists, *
      * then execute it.                           */
     if ((prog = getshfunc("precmd")) != &dummy_eprog) {
-	int osc = sfcontext;
+	/*
+	 * Save stopmsg, since user doesn't get a chance to respond
+	 * to a list of jobs generated in precmd.
+	 */
+	int osc = sfcontext, osm = stopmsg;
 
 	sfcontext = SFC_HOOK;
 	doshfunc("precmd", prog, NULL, 0, 1);
 	sfcontext = osc;
+	stopmsg = osm;
     }
     if (errflag)
 	return;
@@ -1316,12 +1321,13 @@ read_poll(int fd, int *readchar, int polltty)
     int ret = 0;
     long mode = -1;
     char c;
-#ifdef FIONREAD
-    int val;
-#endif
 #ifdef HAVE_SELECT
     fd_set foofd;
     struct timeval expire_tv;
+#else
+#ifdef FIONREAD
+    int val;
+#endif
 #endif
 #ifdef HAS_TIO
     struct ttyinfo ti;

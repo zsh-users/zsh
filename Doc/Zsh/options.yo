@@ -244,8 +244,14 @@ cindex(exiting, checking jobs when)
 cindex(logging out, checking jobs when)
 item(tt(CHECK_JOBS) <Z>)(
 Report the status of background and suspended jobs before exiting a shell
-with job control.  tt(NO_CHECK_JOBS) is best used only in combination with
-tt(NO_HUP), else such jobs will be killed automatically.
+with job control; a second attempt to exit the shell will succeed.
+tt(NO_CHECK_JOBS) is best used only in combination with tt(NO_HUP), else
+such jobs will be killed automatically.
+
+The check is omitted if the commands run from the previous command line
+included a `tt(jobs)' command, since it is assumed the user is aware that
+there are background or suspended jobs.  A `tt(jobs)' command run from the
+tt(precmd) function is not counted for this purpose.
 )
 pindex(CLOBBER)
 cindex(clobbering, of files)
