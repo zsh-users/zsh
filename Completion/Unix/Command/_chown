@@ -1,8 +1,12 @@
 #compdef chown chgrp
 
-local suf usr grp req expl
+local suf usr grp req expl line
 
-if [[ CURRENT -eq 2 || CURRENT -eq 3 && $words[CURRENT-1] = -* ]]; then
+line=( "${(@)words[2,CURRENT-1]:#-*}" )
+
+if [[ -prefix - ]]; then
+  _message option
+elif [[ $#line -eq 0 ]]; then
   if [[ $service = chgrp ]] || compset -P '*[:.]'; then
     if (( EGID && $+commands[groups] )); then  # except for root
       _wanted groups expl 'group' compadd $(groups) && return 0
@@ -19,16 +23,16 @@ if [[ CURRENT -eq 2 || CURRENT -eq 3 && $words[CURRENT-1] = -* ]]; then
   fi
 else
   if [[ $service = chgrp ]]; then
-    grp=${words[CURRENT-1]}
+    grp=${line[1]}
   else
-    usr=${words[CURRENT-1]%%[.:]*}
+    usr=${line[1]%%[.:]*}
     usr=${${(M)usr:#[0-9]#}:-${userdirs[$usr]:+.$usr.}}
-    grp=${${(M)words[CURRENT-1]%%[.:]*}#?}
+    grp=${${(M)line[1]%%[.:]*}#?}
   fi
   [[ -n $grp ]] && grp="${${(M)grp:#[0-9]#}:-.$grp.}"
   req=( ${usr:+\^u$usr} ${grp:+\^g$grp} )
   (( EUID )) && req=( u$EUID$^req )
   req=( -$^req )
 
-  _files -g "*(${(j:,:)req})" && return 0
+  _wanted files expl file _files -g "*(${(j:,:)req})" && return 0
 fi
