@@ -232,7 +232,7 @@ putpromptchar(int doprint, int endchar)
 		    break;
 		case 'l':
 		    *bp = '\0';
-		    countprompt(bufline, &t0, 0);
+		    countprompt(bufline, &t0, 0, 0);
 		    if (t0 >= arg)
 			test = 1;
 		    break;
@@ -678,11 +678,15 @@ putstr(int d)
 
 /**/
 void
-countprompt(char *str, int *wp, int *hp)
+countprompt(char *str, int *wp, int *hp, int overf)
 {
     int w = 0, h = 1;
     int s = 1;
     for(; *str; str++) {
+	if(w >= columns) {
+	    w = 0;
+	    h++;
+	}
 	if(*str == Meta)
 	    str++;
 	if(*str == Inpar)
@@ -694,12 +698,15 @@ countprompt(char *str, int *wp, int *hp)
 	else if(s) {
 	    if(*str == '\t')
 		w = (w | 7) + 1;
-	    else if(*str == '\n')
-		w = columns;
-	    else
+	    else if(*str == '\n') {
+		w = 0;
+		h++;
+	    } else
 		w++;
 	}
-	if(w >= columns) {
+    }
+    if(w >= columns) {
+	if (!overf || w > columns) {
 	    w = 0;
 	    h++;
 	}

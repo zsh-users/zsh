@@ -96,6 +96,7 @@ static int more_start,		/* more text before start of screen?	    */
     olnct,			/* previous number of lines		    */
     ovln,			/* previous video cursor position line	    */
     lpromptw, rpromptw,		/* prompt widths on screen                  */
+    lpromptwof,			/* left prompt width with real end position */
     lprompth,			/* lines taken up by the prompt		    */
     rprompth,			/* right prompt height                      */
     vcs, vln,			/* video cursor position column & line	    */
@@ -141,8 +142,14 @@ resetvideo(void)
 	    *obuf[ln] = '\0';
     }
 
-    countprompt(lpromptbuf, &lpromptw, &lprompth);
-    countprompt(rpromptbuf, &rpromptw, &rprompth);
+    countprompt(lpromptbuf, &lpromptwof, &lprompth, 1);
+    countprompt(rpromptbuf, &rpromptw, &rprompth, 0);
+    if (lpromptwof != winw)
+	lpromptw = lpromptwof;
+    else {
+	lpromptw = 0;
+	lprompth++;
+    }
 
     if (lpromptw) {
     	memset(nbuf[0], ' ', lpromptw);
@@ -327,7 +334,7 @@ zrefresh(void)
             vcs = 0;
         else if (!clearflag && lpromptbuf[0]) {
             zputs(lpromptbuf, shout);
-	    if (lpromptw == 0 && lprompth == 1)
+	    if (lpromptwof == winw)
 		zputs("\n", shout);	/* works with both hasam and !hasam */
 	}
 	if (clearflag) {
@@ -947,7 +954,7 @@ tc_rightcurs(int cl)
 		zputc('\r', shout);
 	    tc_upcurs(lprompth - 1);
 	    zputs(lpromptbuf, shout);
-	    if (lpromptw == 0 && lprompth == 1)
+	    if (lpromptwof == winw)
 		zputs("\n", shout);	/* works with both hasam and !hasam */
 	}
 	i = lpromptw;
