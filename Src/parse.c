@@ -878,7 +878,7 @@ static void
 par_for(int *complex)
 {
     int oecused = ecused, csh = (tok == FOREACH), p, sel = (tok == SELECT);
-    int type, ona = noaliases;
+    int type;
 
     p = ecadd(0);
 
@@ -903,27 +903,29 @@ par_for(int *complex)
 	yylex();
 	type = WC_FOR_COND;
     } else {
-	int np, n, posix_in;
+	int np, n, posix_in, ona = noaliases, onc = nocorrect;
 	infor = 0;
 	if (tok != STRING || !isident(tokstr))
 	    YYERRORV(oecused);
 	np = ecadd(0);
 	n = 0;
 	incmdpos = 1;
-	noaliases = 1;
+	noaliases = nocorrect = 1;
 	for (;;) {
 	    n++;
 	    ecstr(tokstr);
 	    yylex();	
 	    if (tok != STRING || !strcmp(tokstr, "in") || sel)
 		break;
-	    if (!isident(tokstr))
+	    if (!isident(tokstr) || errflag)
 	    {
 		noaliases = ona;
+		nocorrect = onc;
 		YYERRORV(oecused);
 	    }
 	}
 	noaliases = ona;
+	nocorrect = onc;
 	ecbuf[np] = n;
 	posix_in = isnewlin;
 	while (isnewlin)

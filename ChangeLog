@@ -18,6 +18,8 @@
 	and ${(SI:...:)...%...} indices count matches finishing
 	progressively earlier in the string.
 
+	* 15265: Src/parse.c: correction problems with new `for' syntax.
+	
 2001-07-05  Peter Stephenson  <pws@csr.com>
 
 	* 15264: Doc/Zsh/grammar.yo: improve description of use of
