@@ -1,6 +1,7 @@
 #compdef iconv
 
-local expl curcontext="$curcontext" state line codeset LOCPATH ret=1
+local expl curcontext="$curcontext" state line codeset ret=1
+local LOCPATH="${LOCPATH:-/usr/lib/nls/loc}"
 
 if _pick_variant gnu=GNU unix --version; then
 
@@ -17,17 +18,18 @@ if _pick_variant gnu=GNU unix --version; then
     '(-)--usage[display a short usage message]' \
     '(-)'{-V,--version}'[print program version]' \
     '1:input file:_files' && return 0
-    
-    if [[ $state = codeset ]]; then
-      if compset -P '*/'; then
-        _wanted option expl option compadd "$@" /TRANSLIT && ret=0
-      else
-	_wanted codesets expl 'code set' compadd "$@" -M 'r:|-=* r:|=*' \
-	    ${${${(f)"$(iconv --list|sed -n '/^$/,$ p')"}## #}%//} && ret=0
-      fi
+
+  if [[ $state = codeset ]]; then
+    if compset -P '*/'; then
+      _wanted option expl option compadd "$@" /TRANSLIT && ret=0
+    else
+      _wanted codesets expl 'code set' compadd "$@" \
+	  -M 'm:{a-zA-Z}={A-Za-z} r:|-=* r:|=*' \
+	  ${${${(f)"$(_call_program codesets iconv --list|sed -n '/^$/,$ p')"}## #}%//} && ret=0
     fi
-    
-    return ret
+  fi
+
+  return ret
 else
 
   _arguments -C \
@@ -35,19 +37,17 @@ else
     '-t[specify code set for output]:code set:->codeset' \
     '1:file:_files' && return 0
 
-    if [[ $state = codeset ]]; then
-      if [[ -f /usr/lib/iconv/iconv_data ]]; then  # IRIX & Solaris
-	codeset=( ${${(f)"$(</usr/lib/iconv/iconv_data)"}%%[[:blank:]]*} )
-      elif [[ -d ${LOCPATH:=/usr/lib/nls/loc}/iconv ]]; then  # OSF
-	codeset=( $LOCPATH/iconv/*(N:t) )
-	codeset=( ${(j:_:s:_:)codeset} )
-      else
-	return 1
-      fi
-	
-      _wanted codesets expl 'code set' compadd "$@" -a codeset
+  if [[ $state = codeset ]]; then
+    if [[ -f /usr/lib/iconv/iconv_data ]]; then  # IRIX & Solaris
+      codeset=( ${${(f)"$(</usr/lib/iconv/iconv_data)"}%%[[:blank:]]*} )
+    elif [[ -d $LOCPATH/iconv ]]; then  # OSF
+      codeset=( $LOCPATH/iconv/*(N:t) )
+      codeset=( ${(j:_:s:_:)codeset} )
+    else
+      return 1
     fi
 
-fi    
-    
-    
+    _wanted codesets expl 'code set' compadd "$@" -a codeset
+  fi
+
+fi
