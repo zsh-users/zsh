@@ -115,7 +115,7 @@
 #   non-positional parameters may not start with a number, although
 #   paranoiacs like the author will probably put them there anyway.
 
-emulate -L zsh
+emulate -RL zsh
 setopt extendedglob
 
 local f g args match mbegin mend files action myname tmpf opt exec

@@ -1,3 +1,8 @@
+2000-06-20  Peter Stephenson  <pws@cambridgesiliconradio.com>
+
+	* 12000: Functions/Misc/zmv: emulate zsh doesn't unset MARKDIRS,
+	so use emulate -R.
+
 2000-06-20  Sven Wischnowsky  <wischnow@zsh.org>
 
 	* 11998: ChangeLog, Completion/Builtins/_pids, Completion/Core/compdump,
