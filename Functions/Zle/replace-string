@@ -4,14 +4,21 @@ setopt extendedglob
 autoload read-from-minibuffer
 
 local p1="Replace: " p2="   with: "
-local src rep REPLY MATCH MBEGIN MEND curwidget=$WIDGET
+local REPLY MATCH MBEGIN MEND curwidget=$WIDGET previous
 local -a match mbegin mend
 
-read-from-minibuffer $p1 || return 1
-src=$REPLY
+if (( ${+NUMERIC} )); then
+  (( $NUMERIC > 0 )) && previous=1
+else
+  zstyle -t ":zle:$WIDGET" edit-previous && previous=1
+fi
 
-read-from-minibuffer "$p1$src$p2" || return 1
-rep=$REPLY
+read-from-minibuffer $p1 ${previous:+$_replace_string_src} || return 1
+_replace_string_src=$REPLY
+
+read-from-minibuffer "$p1$_replace_string_src$p2" \
+  ${previous:+$_replace_string_rep} || return 1
+_replace_string_rep=$REPLY
 
 if [[ $curwidget = *pattern* ]]; then
     local rep2
@@ -20,6 +27,7 @@ if [[ $curwidget = *pattern* ]]; then
     # while preceded by an odd number of backslashes is inactive,
     # with one backslash being stripped.  A similar logic applies
     # to \digit.
+    local rep=$_replace_string_rep
     while [[ $rep = (#b)([^\\]#)(\\\\)#(\\|)(\&|\\<->|\\\{<->\})(*) ]]; do
 	if [[ -n $match[3] ]]; then
 	    # Expression is quoted, strip quotes
@@ -37,9 +45,9 @@ if [[ $curwidget = *pattern* ]]; then
 	rep=${match[5]}
     done
     rep2+=$rep
-    LBUFFER=${LBUFFER//(#bm)$~src/${(e)rep2}}
-    RBUFFER=${RBUFFER//(#bm)$~src/${(e)rep2}}
+    LBUFFER=${LBUFFER//(#bm)$~_replace_string_src/${(e)rep2}}
+    RBUFFER=${RBUFFER//(#bm)$~_replace_string_src/${(e)rep2}}
 else
-    LBUFFER=${LBUFFER//$src/$rep}
-    RBUFFER=${RBUFFER//$src/$rep}
+    LBUFFER=${LBUFFER//$_replace_string_src/$_replace_string_rep}
+    RBUFFER=${RBUFFER//$_replace_string_src/$_replace_string_rep}
 fi

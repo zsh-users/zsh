@@ -1,5 +1,8 @@
 2005-01-13  Peter Stephenson  <pws@csr.com>
 
+	* 20708: Doc/Zsh/contrib.yo, Functions/Zle/replace-string:
+	replace-string can offer previous values for editing.
+
 	* unposted: README, Config/version.mk, Etc/FAQ.yo:
 	release 4.2.3.
 

@@ -814,6 +814,13 @@ replaced by the var(N)th parenthesised expression matched.  The form
 `tt(\{)var(N)tt(})' may be used to protect the digit from following
 digits.
 
+By default the previous source or replacement string will not be offered
+for editing.  However, this feature can be activated by setting the style
+tt(edit-previous) in the context tt(:zle:)var(widget) (for example,
+tt(:zle:replace-string)) to tt(true).  In addition, a positive
+numeric argument forces the previous values to be offered, a negative or
+zero argument forces them not to be.
+
 For example, starting from the line:
 
 example(print This line contains fan and fond)
