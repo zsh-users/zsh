@@ -4378,7 +4378,7 @@ callcompfunc(char *s, char *fn)
 
 	    PERMALLOC {
 		q = compwords = (char **)
-		    zalloc((clwnum - aadd + 1) * sizeof(char *));
+		    zalloc((clwnum + 1) * sizeof(char *));
 		for (p = clwords + aadd; *p; p++, q++) {
 		    tmp = dupstring(*p);
 		    untokenize(tmp);
