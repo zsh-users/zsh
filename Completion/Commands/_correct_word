@@ -7,8 +7,8 @@
 # If configurations keys with the prefix `correctword_' are
 # given they override those starting with `correct_'.
 
-setopt localoptions nullglob rcexpandparam extendedglob noshglob
-unsetopt markdirs globsubst shwordsplit nounset ksharrays
+setopt localoptions nullglob rcexpandparam extendedglob unset
+unsetopt markdirs globsubst shwordsplit shglob ksharrays cshnullglob
 
 local curcontext="$curcontext"
 

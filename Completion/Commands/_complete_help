@@ -1,8 +1,8 @@
 #compdef -k complete-word \C-xh
 
 _complete_help() {
-  setopt localoptions nullglob rcexpandparam extendedglob noshglob
-  unsetopt markdirs globsubst shwordsplit nounset ksharrays
+  setopt localoptions nullglob rcexpandparam extendedglob unset
+  unsetopt markdirs globsubst shwordsplit shglob ksharrays cshnullglob
   exec </dev/null	# ZLE closes stdin, which can cause errors
 
   local _sort_tags=_help_sort_tags text i j k

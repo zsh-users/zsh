@@ -1,3 +1,14 @@
+2000-10-05  Bart Schaefer  <schaefer@zsh.org>
+
+	* 12912: Completion/Commands/_bash_completions,
+	Completion/Commands/_complete_debug,
+	Completion/Commands/_complete_help,
+	Completion/Commands/_correct_word,
+	Completion/Commands/_expand_word,
+	Completion/Commands/_history_complete_word,
+	Completion/Commands/_next_tags, Completion/Core/_main_complete:
+	Other places where `unsetopt cshnullglob' is needed.
+
 2000-10-05  Sven Wischnowsky  <wischnow@zsh.org>
 
 	* 12901: Doc/Zsh/compwid.yo, Doc/Zsh/manual.yo: cleanup for 12896
