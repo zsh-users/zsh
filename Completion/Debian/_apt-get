@@ -1,116 +1,43 @@
 #compdef apt-get
 
-local short_bool short_intlevel short_configfile short_arbitem
-local long_bool long_intlevel long_configfile long_arbitem
-local action
-
-short_bool=(h v d b s y f u m)
-short_intlevel=(q)
-short_configfile=(c)
-short_arbitem=(o)
-
-long_bool=(help version download-only compile build simulate just-print recon
-  no-act yes assume-yes fix-broken show-upgraded ignore-missing no-download
-  fix-missing ignore-hold no-upgrade force-yes print-uris)
-long_intlevel=(quiet silent)
-long_configfile=(config-file)
-long_arbitem=(option)
-
-action=(update upgrade install remove dist-upgrade dselect-upgrade clean
-  autoclean check source help)
-
-comp_action='compadd "$expl_action[@]" '"$action"
-
-regex_action=(
- \(
-    /$'update\0' \|
-    /$'upgrade\0' \|
-    /$'install\0' /$'[^\0]#\0' !'_deb_packages uninstalled "$expl_packages[@]" || _deb_packages installed "$expl_packages[@]" ' \# \|
-    /$'remove\0' /$'[^\0]#\0' !'_deb_packages installed "$expl_packages[@]"' \# \|
-    /$'dist-upgrade\0' \|
-    /$'dselect-upgrade\0' \|
-    /$'clean\0' \|
-    /$'autoclean\0' \|
-    /$'check\0' \|
-    /$'source\0' /$'[^\0]#\0' !'_deb_packages avail "$expl_packages[@]"' \# \|
-    /$'help\0' \|
-    /"[]"	!"$comp_action"
+_apt_arguments _apt-get_sm \
+  -h,--help:bool \
+  -v,--version:bool \
+  -q,--quiet,--silent:intlevel \
+  -d,--download-only:bool \
+  -b,--compile,--build:bool \
+  -s,--simulate,--just-print,--recon,--no-act:bool \
+  -y,--yes,--assume-yes:bool \
+  -f,--fix-broken:bool \
+  -u,--show-upgraded:bool \
+  -m,--ignore-missing,--fix-missing:bool \
+  --no-download:bool \
+  --ignore-hold:bool \
+  --no-upgrade:bool \
+  --force-yes:bool \
+  --print-uris:bool \
+  -c,--config-file:configfile \
+  -o,--option:arbitem \
+  -- \
+  \( \
+    /$'update\0' \| \
+    /$'upgrade\0' \| \
+    /$'install\0' /$'[^\0]#\0' !'_deb_packages uninstalled "$expl_packages[@]" || _deb_packages installed "$expl_packages[@]" ' \# \| \
+    /$'remove\0' /$'[^\0]#\0' !'_deb_packages installed "$expl_packages[@]"' \# \| \
+    /$'dist-upgrade\0' \| \
+    /$'dselect-upgrade\0' \| \
+    /$'clean\0' \| \
+    /$'autoclean\0' \| \
+    /$'check\0' \| \
+    /$'source\0' /$'[^\0]#\0' !'_deb_packages avail "$expl_packages[@]"' \# \| \
+    /$'help\0' \| \
+    /"[]"	!'compadd "$expl_action[@]" update upgrade install remove dist-upgrade dselect-upgrade clean autoclean check source help' \
   \)
-)
-
-_apt_arguments _apt-get_sm "$regex_action[@]"
 
 _apt-get () {
-  local tmp1 tmp2
-  local expl_action expl_opt expl_bool expl_configfile expl_packages
+  local expl_action expl_packages
   _description expl_action action
-  _description expl_opt option
-  _description expl_bool 'bool value'
-  _description expl_configfile 'config file'
   _description expl_packages 'package'
-
-  typeset -A options short_to_option long_to_option
-
-  options=(
-    help		1
-    version		1
-    quiet		-1
-    download-only	1
-    compile		1
-    simulate		1
-    assume-yes		1
-    fix-broken		1
-    show-upgraded	1
-    no-download		1
-    fix-missing		1
-    ignore-hold		1
-    no-upgrade		1
-    force-yes		1
-    print-uris		1
-    config-file		1
-    option		-1
-  )
-
-  short_to_option=(
-    h help
-    v version
-    q quiet
-    d download-only
-    b compile
-    s simulate
-    y assume-yes
-    f fix-broken
-    u show-upgraded
-    m fix-missing
-    c config-file
-    o option
-  )
-
-  long_to_option=(
-    help		help
-    version		version
-    quiet		quiet
-    silent		quiet
-    download-only	download-only
-    compile		compile
-    build		compile
-    simulate		simulate
-    just-print		simulate
-    recon		simulate
-    no-act		simulate
-    yes			assume-yes
-    assume-yes		assume-yes
-    fix-broken		fix-broken
-    show-upgraded	show-upgraded
-    ignore-missing	fix-missing
-    no-download		no-download
-    ignore-hold		ignore-hold
-    no-upgrade		no-upgrade
-    force-yes		force-yes
-    print-uris		print-uris
-    config-file		config-file
-    option		option
-  )
 
   _apt-get_sm
 }
