@@ -4168,7 +4168,7 @@ findex(_retrieve_cache)
 item(tt(_retrieve_cache) var(cache_identifier))(
 This function retrieves completion information from the file given by
 var(cache_identifier), stored in a directory specified by the
-tt(cache-path) style which defaults to tt(~/.zsh/cache).  The return value
+tt(cache-path) style which defaults to tt(~/.zcompcache).  The return value
 is zero if retrieval was successful.  It will only attempt retrieval
 if the tt(use-cache) style is set, so you can call this function
 without worrying about whether the user wanted to use the caching
@@ -4218,7 +4218,7 @@ even in different instances of the shell.
 
 The var(cache_identifier) specifies the file which the data should be
 dumped to.  The file is stored in a directory specified by the
-tt(cache-path) style which defaults to tt(~/.zsh/cache).  The remaining
+tt(cache-path) style which defaults to tt(~/.zcompcache).  The remaining
 var(params) arguments are the parameters to dump to the file.
 
 The return value is zero if storage was successful.  The function will
