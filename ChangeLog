@@ -1,5 +1,7 @@
 2000-04-18  Peter Stephenson  <pws@cambridgesiliconradio.com>
 
+	* 10808: Completion/Core/compinstall: handle list-prompt.
+
 	* 10802: Doc/Zsh/mod_complist.yo: typo
 
 2000-04-18  Sven Wischnowsky <wischnow@informatik.hu-berlin.de>

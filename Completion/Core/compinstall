@@ -943,11 +943,13 @@ The expression will automatically be quoted.
 }
 
 __ci_do_list_format() {
-  local key format groupn verbose autod
+  local key format groupn verbose listp autod
   __ci_get_this_style format format
   [[ -n $format ]] && format=${(Q)format}
   __ci_get_this_style group-name groupn
   __ci_get_this_style verbose verbose
+  __ci_get_this_style list-prompt listp
+  [[ -n $listp ]] && listp=${(Q)listp}
   __ci_get_this_style auto-description autod
   [[ -n $autod ]] && autod=${(Q)autod}
 
@@ -965,7 +967,9 @@ listings.
 
 3.  Make completion verbose, using option descriptions etc. (on by default).
 
-4.  Make single-valued options prompt use the value's description as
+4.  Allow scrolling of long completion lists and set the prompt.
+
+5.  Make single-valued options display the value's description as
     part of the option's description.
 
 q.  Return without saving.
@@ -1036,6 +1040,19 @@ you want?
           esac
 	 ;;
       4) print "\
+Normally, the display of completions which don't fit on the screen is
+controlled by the LISTMAX parameter (currently ${LISTMAX:-unset}), which
+specifies the maximum number to show without asking.  Instead, you can make
+completion lists scroll when they don't fit on the screen.  To do this,
+edit a prompt to show when scrolling is active; an empty string turns
+this feature off.  It can contain \`%l' to show the number of matches
+as \`current_number/total_number', as well as font-control sequences such
+as %B, %U, %S.  Quotes will be added automatically.  Hit return to keep the
+current value.
+"
+	 vared -eh -p 'prompt> ' -c listp
+	 ;;
+      5) print "\
 Many commands have options which take a single argument.  In some cases,
 completion is not set up to describe the option even though it has a
 description for the argument.  You can enter a string containing \`%d',
@@ -1063,6 +1080,8 @@ Quotation will be added automatically.
   __ci_set_this_style format format
   __ci_set_this_style group-name groupn
   __ci_set_this_style verbose verbose
+  [[ -n $listp ]] && listp=${(qq)listp}
+  __ci_set_this_style list-prompt listp
   [[ -n $autod ]] && autod=${(qq)autod}
   __ci_set_this_style auto-description autod
 }
@@ -1268,7 +1287,8 @@ __ci_do_display() {
          *** compinstall: display and insertion options ***
 
 1.  Change appearance of completion lists:  allows descriptions of
-    completions to appear, and sorting of different types of completions.
+    completions to appear, sorting of different types of completions,
+    and scrolling of completion lists.
 
 2.  Change how completions are inserted: includes options for sorting,
     and keeping the original or an unambiguous prefix with correction etc.
