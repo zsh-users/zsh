@@ -8,6 +8,16 @@
 	* 20959 (variant of 20958): Src/params.c, Src/Module/parameter.c,
 	Test/V01zmodload.ztst: fix crash unloading zsh/parameter and test.
 
+2005-03-03  Oliver Kiddle  <opk@zsh.org>
+
+	* 20921, 20924: Src/utils.c, Completion/Unix/Command/_iconv:
+	using UCS-4BE instead of ISO-10646 to identify character
+	encoding is more portable; make error message more specific;
+	find more encodings in iconv completion on Solaris
+
+	* Henryk Konsek: 20918 (modified): Completion/Unix/Command/_unace:
+	new completion for unace
+
 2005-03-02  Clint Adams  <clint@zsh.org>
 
 	* 20906: Completion/Unix/Command/_make: patch from
@@ -19,6 +29,19 @@
 	* unposted: Completion/Unix/Command/_make: Don't try to expand
 	a single-character Makefile variable if it is a digit.  Avoids
 	an infinite recursion from a Makefile referencing $1.
+
+2005-02-25  Oliver Kiddle  <opk@zsh.org>
+
+	* 20867: Completion/Unix/Command/_ant: handle imported files
+	that are specified using a relative path
+
+2005-02-24  Oliver Kiddle  <opk@zsh.org>
+
+	* Konstantin Sobolev: 20832 (modified):
+	Completion/Unix/Command/_ant: gather targets from imported files
+
+	* 20862: configure.ac, Src/system.h, Src/utils.c: attempt to
+	fix configure scripts to detect iconv properly
 
 2005-02-21  Peter Stephenson  <pws@csr.com>
 
@@ -93,6 +116,17 @@
 	with non-existent files (or any failed state) were recorded
 	as errors, causing initialisation scripts, functions, etc., etc.
 	to exit.
+
+2005-01-21  Oliver Kiddle  <opk@zsh.org>
+
+	* unposted: remove Completion/Unix/Command/_larch: larch has
+	been superceded by tla and is no longer available
+
+	* 20734: Completion/Linux/Command/_valgrind: rewrite to handle
+	version 2.2.0 of valgrind
+
+	* 20730 (modified): Completion/Base/Completer/_expand: fix 
+	suffix style to regard quoted special characters as not special
 
 2005-01-19  Peter Stephenson  <pws@csr.com>
 

@@ -3455,6 +3455,7 @@ dquotedzputs(char const *s, FILE *stream)
 # if defined(HAVE_NL_LANGINFO) && defined(CODESET) && !defined(__STDC_ISO_10646__)
 /* Convert a character from UCS4 encoding to UTF-8 */
 
+/**/
 size_t
 ucs4toutf8(char *dest, unsigned int wval)
 {
@@ -3479,7 +3480,7 @@ ucs4toutf8(char *dest, unsigned int wval)
     case 4: dest[3] = (wval & 0x3f) | 0x80; wval >>= 6;
     case 3: dest[2] = (wval & 0x3f) | 0x80; wval >>= 6;
     case 2: dest[1] = (wval & 0x3f) | 0x80; wval >>= 6;
-	*dest = wval | (0xfc << (6 - len)) & 0xfc;
+	*dest = wval | ((0xfc << (6 - len)) & 0xfc);
 	break;
     case 1: *dest = wval;
     }
@@ -3521,11 +3522,10 @@ getkeystring(char *s, int *len, int fromwhere, int *misc)
     size_t count;
 #else
     unsigned int wval;
-# if defined(HAVE_NL_LANGINFO) && defined(CODESET) && (defined(HAVE_ICONV_H) || defined(HAVE_ICONV) || defined(HAVE_LIBICONV))
+# if defined(HAVE_NL_LANGINFO) && defined(CODESET) && defined(HAVE_ICONV)
     iconv_t cd;
     char inbuf[4];
     size_t inbytes, outbytes;
-    char *inptr;
     size_t count;
 # endif
 #endif
@@ -3642,17 +3642,17 @@ getkeystring(char *s, int *len, int fromwhere, int *misc)
 		    t += ucs4toutf8(t, wval);
 		    continue;
 		} else {
-#   if defined(HAVE_ICONV_H) || defined(HAVE_ICONV) || defined(HAVE_LIBICONV)
+#   ifdef HAVE_ICONV
+		    ICONV_CONST char *inptr = inbuf;
     	    	    inbytes = 4;
 		    outbytes = 6;
-    	    	    inptr = inbuf;
-		    /* assume big endian convention for UCS-4 */
+		    /* store value in big endian form */
 		    for (i=3;i>=0;i--) {
 			inbuf[i] = wval & 0xff;
 			wval >>= 8;
 		    }
 
-    	    	    cd = iconv_open(nl_langinfo(CODESET), "ISO-10646");
+    	    	    cd = iconv_open(nl_langinfo(CODESET), "UCS-4BE");
 		    if (cd == (iconv_t)-1) {
 			zerr("cannot do charset conversion", NULL, 0);
 			if (fromwhere == 4) {
@@ -3663,10 +3663,10 @@ getkeystring(char *s, int *len, int fromwhere, int *misc)
 			*len = t - buf;
 			return buf;
 		    }
-                    count = iconv(cd, (char **)&inptr, &inbytes, &t, &outbytes);
+                    count = iconv(cd, &inptr, &inbytes, &t, &outbytes);
 		    iconv_close(cd);
 		    if (count == (size_t)-1) {
-                        zerr("cannot do charset conversion", NULL, 0);
+                        zerr("character not in range", NULL, 0);
 		        *t = '\0';
 			*len = t - buf;
 			return buf;

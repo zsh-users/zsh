@@ -1,0 +1,96 @@
+#compdef valgrind -value-,VALGRIND_OPTS,-default-
+
+local curcontext="$curcontext" state line common cmd
+local -a args args_{memcheck,addrcheck,cachegrind,helgrind,massif}
+
+cmd=(
+  '1:command name:_command_names -e'
+  '*::args :_normal'
+)
+
+if [[ $service = *_OPTS* ]]; then
+  compset -q
+  words=( fake "$words[@]" )
+  (( CURRENT++ ))
+  cmd=()
+fi
+
+common=(
+  '--sloppy-malloc=-[round malloc sizes to multiple of 4]:enable:(yes no)'
+  '--alignment=-[set minimum alignment of allocations]:number'
+)
+
+args_addrcheck=(
+  $common
+  '--partial-loads-ok=-:enable:(yes no)'
+  '--freelist-vol=-[volume of freed blocks queue]:blocks'
+  '--leak-check=-[search for memory leaks at exit]:enable:(yes no)'
+  '--leak-resolution=-[how much bt merging in leak check]:(low med high)'
+  '--show-reachable=-[show reachable blocks in leak check]:enable:(yes no)'
+  '--workaround-gcc296-bugs=-:enable:(yes no)'
+)
+
+args_memcheck=(
+  $args_addrcheck
+  '--avoid-strlen-errors=-[suppress errs from inlined strlen]:enable:(yes no)'
+)
+
+args_cachegrind=(
+  '--I1=-[set I1 cache manually]:size,assoc,line_size'
+  '--D1=-[set D1 cache manually]:size,assoc,line_size'
+  '--L2=-[set L2 cache manually]:size,assoc,line_size'
+)
+
+args_helgrind=(
+  $common
+  '--private-stacks=-[assume thread stacks are used privately]:enable:(yes no)'
+  '--show-last-access=-[show location of last word access on error]:locations:(no some all)'
+)
+
+args_massif=(
+  $common
+  '--heap=-[profile heap blocks]:enable:(yes no)'
+  '--heap-admin=-[specify average admin bytes per heap block]:bytes'
+  '--stacks=-[enable profile stacks]:enable:(yes no)'
+  '--depth=-[depth of contexts]:depth'
+  '--alloc-fn=-[specify alloc function]:function'
+  '--format=-[specify format of textual output]:format:(text html)'
+)
+
+args="args_${${words[(r)--(skin|tool)=*]#*=}:-memcheck}"
+
+_arguments -C ${(P)args} $cmd \
+  '(--tool --skin)'{--tool,--skin}'=-[specify valgrind tool]:valgrind tool:->tools' \
+  '(-h --help)'{-h,--help}'[show help information]' \
+  '--help-debug[show help info including debugging options]' \
+  '--version[show version]' \
+  '(-q --quiet)'{-q,--quiet}'[run silently; only print error msgs]' \
+  '(-v --verbose)'{-v,--verbose}'[be more verbose]' \
+  '--trace-children=-[valgrind-ise child processes]:enable:(yes no)' \
+  '--track-fds=-[track open file descriptors]:enable:(yes no)' \
+  '--time-stamp=-[add timestamps to log messages]:enable:(yes no)' \
+  '--run-libc-freeres=-[free up glibc memory at exit]:enable:(yes no)' \
+  '--weird-hacks=-[enable hack]:hack:(lax-ioctls)' \
+  '--signal-polltime=-[signal poll period (ms)]:period' \
+  '--lowlat-signals=-[improve thread signal wake-up latency]:enable:(yes no)' \
+  '--lowlat-syscalls=-[improve thread syscall wake-up latency]:enable:(yes no)' \
+  '--pointercheck=-[enforce client address space limits]:enable:(yes no)' \
+  '--log-fd=-[log messages to specified file descriptor]:file descriptor:_file_descriptors' \
+  '--log-file=-[log messages to specified file]:file:_files' \
+  '--log-socket=-[log messages to socket]:ipaddr\:port' \
+  '--demangle=-[automatically demangle C++ names]:enable:(yes no)' \
+  '--num-callers=-[specify no of callers to show in stack traces]:number' \
+  '--error-limit=-[stop showing new errors if too many]:enable:(yes no)' \
+  '--show-below-main=-[continue stack traces below main()]:enable:(yes no)' \
+  '--suppressions=-[suppress errors described in specified file]:file:_files' \
+  '--gen-suppressions=-[print suppressions for errors detected]:enable:(yes no)' \
+  '--db-attach=-[start debugger when errors detected]:enable:(yes no)' \
+  '--db-command=-[specify command to start debugger]:command:_command_names -e' \
+  '--input-fd=-[specify file descriptor for input]:file descriptor:_file_descriptors' && return
+
+if [[ -n "$state" ]]; then
+  _wanted tools exl 'valgrind tool' compadd ${=${${(f)"$(_call_program \
+      tools valgrind --tool= 2>&1)"}[(r)Available*,-1]}[2,-1]} && return
+fi
+
+return 1
