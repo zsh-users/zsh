@@ -1434,10 +1434,6 @@ get_comp_string(void)
 		    }
 		}
 	    } else if (p < curs) {
-		if (*p == Outbrace) {
-		    cant = 1;
-		    break;
-		}
 		if (*p == Inbrace) {
 		    if (bbeg) {
 			Brinfo new;
@@ -1474,10 +1470,6 @@ get_comp_string(void)
 		    hascom = 1;
 		}
 	    } else {
-		if (*p == Inbrace) {
-		    cant = 1;
-		    break;
-		}
 		if (p == curs) {
 		    if (bbeg) {
 			Brinfo new;

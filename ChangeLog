@@ -1,5 +1,9 @@
 2000-06-16  Sven Wischnowsky  <wischnow@zsh.org>
 
+	* 11939: Src/Zle/compmatch.c, Src/Zle/compresult.c, Src/Zle/zle_tricky.c:
+ 	allow completion after `a{{b,c},'; fix for closing brace
+ 	re-insertion when completing from both ends (CLF_MID)
+	
 	* 11938: Completion/Core/_description, Doc/Zsh/compsys.yo: enhance
  	ignore-line to ignore all/current/other word(s)
 	

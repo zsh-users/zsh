@@ -1608,6 +1608,7 @@ join_psfx(Cline ot, Cline nt, Cline *orest, Cline *nrest, int sfx)
 
 		continue;
 	    }
+	    o->llen = o->llen - ot->slen;
 	    join = 1; line = 0; slen = &(o->wlen); sstr = &(o->word);
 	}
 	if (join) {

@@ -406,8 +406,8 @@ cline_str(Cline l, int ins, int *csp)
      * with missing characters, we take this, otherwise if we have a
      * prefix with missing characters, we take that, the same for a
      * suffix, and finally a place where the matches differ. */
-    ncs = (cbr >= 0 ? cbr :
-	   (mid >= 0 ? mid :
+    ncs = (mid >= 0 ? mid :
+	   (cbr >= 0 ? cbr :
 	    (pm >= 0 ? pm : (sm >= 0 ? sm : (d >= 0 ? d : cs)))));
 
     if (!ins) {
