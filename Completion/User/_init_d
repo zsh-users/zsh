@@ -1,0 +1,5 @@
+#compdef -P */(init|rc[0-9]#).d/*
+
+# This should probably be system specific...
+
+_sub_commands start stop

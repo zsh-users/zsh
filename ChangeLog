@@ -1,5 +1,10 @@
 2001-02-26  Sven Wischnowsky  <wischnow@zsh.org>
 
+	* 13536: Completion/Base/_sub_commands, Completion/Core/_normal,
+ 	Completion/User/_apachectl, Completion/User/_init_d: some small
+ 	functions for completing sub-commands (generic function, init
+ 	scripts, apachectl)
+	
 	* 13534: Completion/Builtins/_fc, Completion/Builtins/_hash,
  	Completion/Builtins/_source, Completion/Builtins/_which,
  	Completion/Builtins/_zftp, Completion/User/_man,

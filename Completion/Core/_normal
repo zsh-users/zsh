@@ -30,6 +30,10 @@ else
     eval cmd1\=$command
     cmd2="$command[2,-1]"
     curcontext="${curcontext%:*:*}:${cmd2}:"
+  elif [[ "$command" = ..#/* ]]; then
+    cmd1="${PWD}/$command"
+    cmd2="${command:t}"
+    curcontext="${curcontext%:*:*}:${cmd2}:"
   elif [[ "$command" = */* ]]; then
     cmd1="$command"
     cmd2="${command:t}"
