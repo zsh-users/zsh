@@ -982,15 +982,11 @@ initjob(void)
 void
 setjobpwd(void)
 {
-    int i, l;
+    int i;
 
     for (i = 1; i < MAXJOB; i++)
-	if (jobtab[i].stat && !jobtab[i].pwd) {
-	    if ((l = strlen(pwd)) >= PATH_MAX)
-		jobtab[i].pwd = ztrdup(pwd + l - PATH_MAX);
-	    else
-		jobtab[i].pwd = ztrdup(pwd);
-	}
+	if (jobtab[i].stat && !jobtab[i].pwd)
+	    jobtab[i].pwd = ztrdup(pwd);
 }
 
 /* print pids for & */

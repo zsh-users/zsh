@@ -1,5 +1,8 @@
 2000-09-22  Clint Adams  <schizo@debian.org>
 
+	* 12860: Src/jobs.c: don't check length against PATH_MAX or
+	truncate.
+
 	* 12859: Src/string.c, Src/Zle/compresult.c:
 	dynamically allocate buffer in ztat, remove
 	duplication loop to ztrdupstrip().
