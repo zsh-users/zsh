@@ -1,3 +1,8 @@
+2000-09-05  Bart Schaefer  <schaefer@zsh.org>
+
+	* 12745: Doc/Zsh/contrib.yo: Add a cross-reference; include some
+	comments about using completers with predict-on.
+
 2000-09-05  Sven Wischnowsky  <wischnow@zsh.org>
 
 	* 12744: Doc/Zsh/contrib.yo, Doc/Zsh/mod_complist.yo,

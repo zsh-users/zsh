@@ -451,6 +451,14 @@ zstyle ':completion:incremental:*' completer \
         _complete _correct
 zstyle ':completion:predict:*' completer \ 
         _complete)
+
+It is a good idea to restrict the completers used in prediction, because
+they may be automatically invoked as you type.  The tt(_list) and
+tt(_menu) completers should never be used with prediction.  The
+tt(_approximate), tt(_correct), tt(_expand), and tt(_match) completers may
+be used, but be aware that they may change characters anywhere in the word
+behind the cursor, so you need to watch carefully that the result is what
+you intended.
 )
 kindex(cursor, completion style)
 item(tt(cursor))(
@@ -640,7 +648,10 @@ is-at-least 2.6-17 || print "You can't use is-at-least here.")
 findex(nslookup)
 item(tt(nslookup) [ var(arg) ... ])(
 This wrapper function for the tt(nslookup) command requires the
-tt(zsh/zpty) module.  It behaves exactly like the standard tt(nslookup)
+tt(zsh/zpty) module (see
+ifzman(zmanref(zshmodules))\
+ifnzman(noderef(The zsh/zpty Module))\
+).  It behaves exactly like the standard tt(nslookup)
 except that it provides customizable prompts (including a right-side
 prompt) and completion of nslookup commands, host names, etc. (if you use
 the function-based completion system).  Completion styles may be set with
