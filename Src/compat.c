@@ -387,10 +387,14 @@ zchdir(char *dir)
     int currdir = -2;
 
     for (;;) {
-	if (!*dir)
+	if (!*dir || !chdir(dir))
+	{
+#ifdef HAVE_FCHDIR
+           if (currdir >= 0)
+               close(currdir);
+#endif
 	    return 0;
-	if (!chdir(dir))
-	    return 0;
+	}
 	if ((errno != ENAMETOOLONG && errno != ENOMEM) ||
 	    strlen(dir) < PATH_MAX)
 	    break;

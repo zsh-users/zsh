@@ -1,5 +1,8 @@
 2004-11-29  Peter Stephenson  <pws@csr.com>
 
+	* 20591: Stephane Chazelas <Stephane_Chazelas@yahoo.fr>:
+	use of fchdir to change directory leaked filed descriptors.
+
 	* 20592: Src/math.c: $((##)) caused mayhem by passing null
 	string to getkeystring().  Report error instead.
 
