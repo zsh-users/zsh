@@ -1,3 +1,7 @@
+2004-06-26  Peter Stephenson  <pws@pwstephenson.fsnet.co.uk>
+
+	* unposted: Functions/Zle/.distfiles: add zed-set-file-name.
+
 2004-06-24  Bart Schaefer  <schaefer@zsh.org>
 
 	* unposted (see 20092): Completion/Zsh/Context/_condition: fix
