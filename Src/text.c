@@ -274,8 +274,9 @@ gettext2(Estate state)
 	    break;
 	case WC_SUBLIST:
 	    if (!s) {
-                if (wc_code(*state->pc) != WC_PIPE)
-                    stack = 1;
+                if (!(WC_SUBLIST_FLAGS(code) & WC_SUBLIST_SIMPLE) &&
+                    wc_code(*state->pc) != WC_PIPE)
+                    stack = -1;
 		if (WC_SUBLIST_FLAGS(code) & WC_SUBLIST_NOT)
 		    taddstr(stack ? "!" : "! ");
 		if (WC_SUBLIST_FLAGS(code) & WC_SUBLIST_COPROC)
@@ -293,7 +294,7 @@ gettext2(Estate state)
 			taddstr("coproc ");
 		}
 	    }
-	    if (!stack && (WC_SUBLIST_FLAGS(s->code) & WC_SUBLIST_SIMPLE))
+	    if (stack < 1 && (WC_SUBLIST_FLAGS(s->code) & WC_SUBLIST_SIMPLE))
 		state->pc++;
 	    break;
 	case WC_PIPE:
