@@ -1,3 +1,8 @@
+2003-06-20  Peter Stephenson  <pws@csr.com>
+
+	* 18618: Etc/changelog2html.pl: Script to turn ChangeLog into
+	HTML for display on the website.
+
 2003-06-19  Peter Stephenson  <pws@csr.com>
 
 	* 18616: Src/Modules/zutil.c, Doc/Zsh/mod_zutil.yo: Add
