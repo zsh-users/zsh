@@ -12,6 +12,7 @@
 # is-at-least 3.1.6-15 && setopt NO_GLOBAL_RCS
 # is-at-least 3.1.0 && setopt HIST_REDUCE_BLANKS
 # is-at-least 586 $MACHTYPE && echo 'You could be running Mandrake!'
+# is-at-least $ZSH_VERSION || print 'Something fishy here.'
 
 function is-at-least()
 {
@@ -19,14 +20,17 @@ function is-at-least()
     local IFS=".-" min_cnt=0 ver_cnt=0 part min_ver version
     min_ver=(${=1})
     version=(${=2:-$ZSH_VERSION} 0)
-    while (( $min_cnt <= ${#min_ver} )) {
-	while [[ "$part" != <-> ]] {
-	    [[ $[++ver_cnt] > ${#version} ]] && return 0
+    while (( $min_cnt <= ${#min_ver} )); do
+	while [[ "$part" != <-> ]]; do
+	    (( ++ver_cnt > ${#version} )) && return 0
 	    part=${version[ver_cnt]##*[^0-9]}
-	}
-	[[ $[++min_cnt] > ${#min_ver} ]] && return 0
+	done
+	while true; do
+	  (( ++min_cnt > ${#min_ver} )) && return 0
+	  [[ ${min_ver[min_cnt]} = <-> ]] && break
+	done
 	(( part > min_ver[min_cnt] )) && return 0
 	(( part < min_ver[min_cnt] )) && return 1
 	part=''
-    }
+    done
 }
