@@ -1466,7 +1466,7 @@ complistmatches(Hookdef dummy, Chdata dat)
 
     if (mselect >= 0 || mlbeg >= 0 ||
 	(mlistp = getsparam("LISTPROMPT"))) {
-	if (!*mlistp)
+	if (mlistp && !*mlistp)
 	    mlistp = "%SAt %p: Hit TAB for more, or the character to insert%s";
 	trashzle();
 	showinglist = listshown = 0;
