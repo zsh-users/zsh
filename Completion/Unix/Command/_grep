@@ -11,7 +11,7 @@ if [[ $service = *GREP_OPT* ]]; then
 else
   arguments=(
     '(-e --regexp -f --file)1: :_guard "^--*" pattern'
-    '*:files:->files'
+    '*:files:_files'
   )
   command="$words[1]"
 fi
