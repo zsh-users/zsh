@@ -1692,19 +1692,23 @@ execcmd(Cmd cmd, int input, int output, int how, int last1)
 	if (!hn) {
 	    /* Resolve external commands */
 	    char *cmdarg = (char *) peekfirst(args);
+	    char **checkpath = pathchecked;
 	    int dohashcmd = isset(HASHCMDS);
 
 	    hn = cmdnamtab->getnode(cmdnamtab, cmdarg);
 	    if (hn && trycd && !isreallycom((Cmdnam)hn)) {
+		if (!(((Cmdnam)hn)->flags & HASHED)) {
+		    checkpath = path;
+		    dohashcmd = 1;
+		}
 		cmdnamtab->removenode(cmdnamtab, cmdarg);
 		cmdnamtab->freenode(hn);
 		hn = NULL;
-		dohashcmd = 1;
 	    }
 	    if (!hn && dohashcmd && strcmp(cmdarg, "..")) {
 		for (s = cmdarg; *s && *s != '/'; s++);
 		if (!*s)
-		    hn = (HashNode) hashcmd(cmdarg, pathchecked);
+		    hn = (HashNode) hashcmd(cmdarg, checkpath);
 	    }
 	}
 
