@@ -1,3 +1,9 @@
+2001-04-03  Oliver Kiddle  <opk@zsh.org>
+
+	* 13898, Bart: 13827: Completion/Zsh/Command/_ttyctl,
+	Completion/Zsh/Command/_ulimit,	Completion/Zsh/Command/_vared:
+	new completion functions
+	
 2001-04-03  Sven Wischnowsky  <wischnow@zsh.org>
 
 	* 13892: Src/Zle/compmatch.c, Test/comptest, Test/ztst.zsh:
@@ -40,7 +46,7 @@
 
 2001-04-01  Oliver Kiddle  <opk@zsh.org>
 
-	* Completion/Builtins/_bindkey, Completion/Builtins/_compdef,
+	* 13863: Completion/Builtins/_bindkey, Completion/Builtins/_compdef,
 	Completion/Builtins/_disable, Completion/Builtins/_emulate,
 	Completion/Builtins/_enable, Completion/Builtins/_fc,
 	Completion/Builtins/_hash, Completion/Builtins/_print,
@@ -111,8 +117,8 @@
 
 2001-03-28  Sven Wischnowsky  <wischnow@zsh.org>
 
-	* Completion/Commands/_history_complete_word,
-	13815: Doc/Zsh/compsys.yo: more cleanup; simplify the stop
+	* 13815: Completion/Commands/_history_complete_word,
+	Doc/Zsh/compsys.yo: more cleanup; simplify the stop
 	and liststyles; try to make it obey whatever _main_complete
 	says should be done (menu-wise)
 
