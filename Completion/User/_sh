@@ -1,0 +1,8 @@
+#compdef sh ksh bash zsh csh tcsh rc
+
+if (( CURRENT == ${words[(i)-c]} + 1 )); then
+  compset -q
+  _normal
+else
+  _default
+fi
