@@ -1,4 +1,4 @@
-#compdef javac java javadoc appletviewer jar jdb javah javap extcheck rmic rmiregistry rmid serialvar native2ascii keytool jarsigner policytool
+#compdef javac java javadoc appletviewer jar jdb javah javap extcheck rmic rmiregistry rmid serialver native2ascii keytool jarsigner policytool
 
 local expl tmp jdb_args jar_cmd match basedir ret=1
 local curcontext="$curcontext" state line jf
@@ -10,17 +10,18 @@ case "$service" in
 javac)
   _arguments -C \
     '-g-[generate debugging information]:debug:->debug' \
-    '-O[optimize]' \
-    '-nowarn[suppress warnings]' \
-    '-verbose[print verbose messages]' \
-    '-deprecation[print uses of deprecated APIs]' \
-    '-classpath[specify path for user class files]:class path:->classpath' \
-    '-sourcepath[specify path for source files]:source path:->sourcepath' \
-    '-bootclasspath[specify path for bootstrap class files]:bootstrap class path:->bootstrapclasspath' \
-    '-extdirs[specify directories for extensions]:extensions directories:->extdirs' \
-    '-d[specify destination directory]:directory:_files -/' \
-    '-encoding[specify character encoding for source files]:encoding:->encoding' \
+    '-nowarn[generate no warnings]' \
+    '-verbose[output messages about what the compiler is doing]' \
+    '-deprecation[output source locations where deprecated APIs are used]' \
+    '-classpath[specify where to find user class files]:class path:->classpath' \
+    '-sourcepath[specify where to find input source files]:source path:->sourcepath' \
+    '-bootclasspath[override location of bootstrap class files]:bootstrap class path:->bootstrapclasspath' \
+    '-extdirs[override location of installed extensions]:extensions directories:->extdirs' \
+    '-d[specify where to place generated class files]:directory:_files -/' \
+    '-encoding[specify character encoding used by source files]:encoding:->encoding' \
+    '-source[provide source compatibility with specified release]:release:(1.3 1.4)' \
     '-target[specify VM version]:release:(1.{1..4})' \
+    '-help[print a synopsis of standard options]' \
     '*:java source file:_files -g \*.java' && return 0
   ;;
 
@@ -201,9 +202,11 @@ rmid)
     '-stop[stop rmid]:' && return 0
   ;;
        
-serialvar)
+serialver)
   _arguments \
-    '-show[display user interface]' && return 0
+    '-classpath[specify where to find user class files]:class path:->classpath' \
+    '(*)-show[display user interface]' \
+    '(-show)*:class:_java_class ${(kv)opt_args[(i)-classpath]}' && return 0
   ;;
 
 native2ascii)

@@ -39,6 +39,11 @@
 
 	* 18877: Etc/completion-style-guide: add a few more points
 
+2003-07-21  Doug Kearns  <djkea2@mugca.its.monash.edu.au>
+
+	* 18872: Completion/Unix/Command/_java: update javac completion for
+	SDK 1.4.x and rename serialvar to serialver
+
 2003-07-17  Oliver Kiddle  <opk@zsh.org>
 
 	* 18866: Etc/completion-style-guide: document conventions used
