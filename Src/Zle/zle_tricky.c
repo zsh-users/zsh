@@ -87,6 +87,10 @@ static int usemenu, useglob, useexact, useline, uselist;
 
 static int oldlist, oldins;
 
+/* Non-zero if we have to redisplay the list of matches. */
+
+static int showagain = 0;
+
 /* The match and group number to insert when starting menucompletion.   */
 
 static int insmnum, insgnum, insgroup;
@@ -758,6 +762,10 @@ docomplete(int lst)
     char *s, *ol;
     int olst = lst, chl = 0, ne = noerrs, ocs;
 
+    if (showagain && validlist)
+	showinglist = -2;
+    showagain = 0;
+
     /* If we are doing a menu-completion... */
 
     if (menucmp && lst != COMP_LIST_EXPAND && 
@@ -872,7 +880,7 @@ docomplete(int lst)
 	    }
 	    if (lst == COMP_EXPAND_COMPLETE)
 		do {
-		    /* check if there is a parameter expresiion. */
+		    /* Check if there is a parameter expression. */
 		    for (; *q && *q != String; q++);
 		    if (*q == String && q[1] != Inpar && q[1] != Inbrack) {
 			if (*++q == Inbrace) {
@@ -1519,9 +1527,11 @@ get_comp_string(void)
 		 * but this may fail sometimes. sorry.
 		 */
 		if (*p == String || *p == Qstring) {
-		    if (p[1] == Inbrace) {
+		    if (p[1] == Inbrace || p[1] == Inpar || p[1] == Inbrack) {
 			char *tp = p + 1;
-			if (skipparens(Inbrace, Outbrace, &tp)) {
+			if (skipparens(*tp, (*tp == Inbrace ? Outbrace :
+					     (*tp == Inpar ? Outpar : Outbrack)),
+				       &tp)) {
 			    tt = NULL;
 			    break;
 			}
@@ -1530,6 +1540,11 @@ get_comp_string(void)
 		    } else {
 			char *tp = p + 1;
 
+			for (; *tp == '^' || *tp == Hat ||
+				 *tp == '=' || *tp == Equals ||
+				 *tp == '~' || *tp == Tilde ||
+				 *tp == '#' || *tp == Pound || *tp == '+';
+			     tp++);
 			if (*tp == Quest || *tp == Star || *tp == String ||
 			    *tp == Qstring || *tp == '?' || *tp == '*' ||
 			    *tp == '$' || *tp == '-' || *tp == '!' ||
@@ -4175,6 +4190,7 @@ docompletion(char *s, int lst, int incmd)
 				(unset(ALWAYSLASTPROMPT) && zmult != 1)) ?
 				"yes" : "");
 	movetoend = ((cs == we || isset(ALWAYSTOEND)) ? 2 : 1);
+	showinglist = 0;
 
 	/* Make sure we have the completion list and compctl. */
 	if (makecomplist(s, incmd, lst)) {
@@ -7546,6 +7562,9 @@ listlist(LinkList l)
     struct cmgroup dg;
     Cmgroup am = amatches;
     int vl = validlist, sm = smatches;
+
+    if (listshown)
+	showagain = 1;
 
     smatches = 1;
     validlist = 1;
