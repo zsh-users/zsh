@@ -1,3 +1,7 @@
+2000-06-01  Wayne Davison  <wayned@users.sourceforge.net>
+
+	* 11716: Src/params.c: Made $array[0,0] work like $array[0].
+
 2000-06-01  Bart Schaefer  <schaefer@zsh.org>
 
 	* 11713: Test/53completion.ztst: Revert the change made in 11647
