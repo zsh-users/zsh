@@ -67,7 +67,7 @@ void
 sizeline(int sz)
 {
     while (sz > linesz)
-	zleline = (unsigned char *)realloc(zleline, (linesz *= 4) + 2);
+	zleline = (ZLE_STRING_T)realloc(zleline, (linesz *= 4) + 2);
 }
 
 /*
@@ -84,11 +84,6 @@ zleaddtoline(int chr)
     spaceinline(1);
     zleline[zlecs++] = chr;
 }
-
-/*
-    return zleline;
-    return zleline;
- */
 
 /**/
 mod_export unsigned char *
