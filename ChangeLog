@@ -187,7 +187,7 @@
 	* 15781: Completion/Unix/Command/.distfiles,
 	Completion/Unix/Command/_samba: new completion for samba tools
 
-2001-09-09  Bart Schaefer  <schaefer@brasslantern.com>
+2001-09-09  Bart Schaefer  <schaefer@zsh.org>
 
 	* David Lebel: 15742: zshconfig.ac: Shared object linkage on
 	OpenBSD.
