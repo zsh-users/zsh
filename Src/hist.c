@@ -1807,6 +1807,7 @@ static struct histsave {
     int histlinect;
     int histsiz;
     int savehistsiz;
+    int locallevel;
 } *histsave_stack;
 static int histsave_stack_size = 0;
 static int histsave_stack_pos = 0;
@@ -2096,7 +2097,7 @@ savehistfile(char *fn, int err, int writeflags)
 	    /* Zeroing histactive avoids unnecessary munging of curline. */
 	    histactive = 0;
 	    /* The NULL leaves HISTFILE alone, preserving fn's value. */
-	    pushhiststack(NULL, savehistsiz, savehistsiz);
+	    pushhiststack(NULL, savehistsiz, savehistsiz, -1);
 
 	    hist_ignore_all_dups |= isset(HISTSAVENODUPS);
 	    readhistfile(fn, err, 0);
@@ -2344,7 +2345,7 @@ bufferwords(LinkList list, char *buf, int *index)
 
 /**/
 int
-pushhiststack(char *hf, int hs, int shs)
+pushhiststack(char *hf, int hs, int shs, int level)
 {
     struct histsave *h;
     int curline_in_ring = (histactive & HA_ACTIVE) && hist_ring == &curline;
@@ -2374,6 +2375,7 @@ pushhiststack(char *hf, int hs, int shs)
     h->histlinect = histlinect;
     h->histsiz = histsiz;
     h->savehistsiz = savehistsiz;
+    h->locallevel = level;
 
     memset(&lasthist, 0, sizeof lasthist);
     if (hf) {
@@ -2433,20 +2435,30 @@ pophiststack(void)
     return histsave_stack_pos + 1;
 }
 
+/* If pop_through > 0, pop all array items >= the 1-relative index value.
+ * If pop_through <= 0, pop (-1)*pop_through levels off the stack.
+ * If the (new) top of stack is from a higher locallevel, auto-pop until
+ * it is not.
+ */
+
 /**/
 int
-saveandpophiststack(int down_through)
+saveandpophiststack(int pop_through)
 {
-    if (down_through < 0)
-	down_through += histsave_stack_pos + 1;
-    if (down_through <= 0)
-	down_through = 1;
-    if (histsave_stack_pos < down_through)
+    if (pop_through <= 0) {
+	pop_through += histsave_stack_pos + 1;
+	if (pop_through <= 0)
+	    pop_through = 1;
+    }
+    while (pop_through > 1
+     && histsave_stack[pop_through-2].locallevel > locallevel)
+	pop_through--;
+    if (histsave_stack_pos < pop_through)
 	return 0;
     do {
 	if (!nohistsave)
 	    savehistfile(NULL, 1, HFILE_USE_OPTIONS);
 	pophiststack();
-    } while (histsave_stack_pos >= down_through);
+    } while (histsave_stack_pos >= pop_through);
     return 1;
 }
