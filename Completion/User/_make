@@ -32,7 +32,7 @@ else
   fi
 
   if [[ -n "$file" ]] && _tags targets; then
-    if [[ -n "$_is_gnu[$1]" ]]; then
+    if [[ -n "$_is_gnu[$words[1]]" ]]; then
       tmp=( $(make -nsp --no-print-directory -f "$file" .PHONY | awk '/^[a-zA-Z0-9][^\/\t=]+:/ {print $1}' FS=:) )
     else
       tmp=(

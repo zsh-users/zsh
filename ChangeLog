@@ -694,7 +694,7 @@
 
 	* Sven: 10265: Completion/Builtins/_zstyle,
 	Completion/Core/_approximate, Doc/Zsh/compsys.yo: tag-order and
-	file-patterns completions; subst-glob-only and _approximate
+	file-patterns completions; subst-globs-only and _approximate
 	improvements.
 
 	* Sven: 10264: Completion/Core/_call, Completion/Core/compdump,
