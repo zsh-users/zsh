@@ -343,28 +343,28 @@ Have fun
 
     case "$name" in
     urls_path)
-      tmp="'*:urls' path '$val'"
+      tmp="'*:urls' path ${(qq)val}"
       ;;
     urls_localhttp)
-      tmp="'*:urls' local '${val//:/ }'"
+      tmp="'*:urls' local ${${(qqs.:.)val}}"
       ;;
     describe_options)
-      tmp="'*:options' description '$val'"
+      tmp="'*:options' description ${(qq)val}"
       ;;
     describe_values)
-      tmp="'*:values' description '$val'"
+      tmp="'*:values' description ${(qq)val}"
       ;;
     autodescribe_options)
-      tmp="'*:options' auto-description '$val'"
+      tmp="'*:options' auto-description ${(qq)val}"
       ;;
     description_format)
-      tmp="'*:descriptions' format '$val'"
+      tmp="'*:descriptions' format ${(qq)val}"
       ;;
     message_format)
-      tmp="'*:messages' format '$val'"
+      tmp="'*:messages' format ${(qq)val}"
       ;;
     warning_format)
-      tmp="'*:warnings' format '$val'"
+      tmp="'*:warnings' format ${(qq)val}"
       ;;
     option_prefix)
       tmp="'*:options' prefix-needed yes"
@@ -376,43 +376,43 @@ compstyle '*:options' prefix-hidden yes"
       tmp="'*:matches' group 'yes'"
       ;;
     colors_path)
-      tmp="'*:colors' path '$val'"
+      tmp="'*:colors' path ${(qq)val}"
       ;;
     path_expand)
-      tmp="'*:paths' expand '$val'"
+      tmp="'*:paths' expand ${(qq)val}"
       ;;
     path_cursor)
-      tmp="'*:paths' cursor '$val'"
+      tmp="'*:paths' cursor ${(qq)val}"
       ;;
     (approximate|incremental|predict|list|oldlist|match)_*)
-      tmp="':${name%%_*}' ${${name#*_}//_/-} '$val'"
+      tmp="':${name%%_*}' ${${name#*_}//_/-} ${(qq)val}"
       ;;
     correct_*)
       cmt="# This one is a bit ugly. You may want to use only \`*:correct'
 # if you also have the \`correctword_*' or \`approximate_*' keys.
 "
-      tmp="':(correct(|-word)|approximate)' ${name#*_} '$val'"
+      tmp="':(correct(|-word)|approximate)' ${name#*_} ${(qq)val}"
       ;;
     correctword_*)
-      tmp="':correct-word' ${name#correctword_} '$val'"
+      tmp="':correct-word' ${name#correctword_} ${(qq)val}"
       ;;
     expand_*)
       cmt="# This one is a bit ugly. You may want to use only \`*:expand'
 # if you also have the \`expandword_*' keys.
 "
-      tmp="':expand(|expand-word)' ${name#*_} '$val'"
+      tmp="':expand(|expand-word)' ${name#*_} ${(qq)val}"
       ;;
     expandword_*)
-      tmp="':expand-word' ${name#expandword_} '$val'"
+      tmp="':expand-word' ${name#expandword_} ${(qq)val}"
       ;;
     history_*)
-      tmp="'*:history-entries' ${name#history_} '$val'"
+      tmp="'*:history-entries' ${name#history_} ${(qq)val}"
       ;;
     completer)
-      tmp="'*' completer ${val//:/ }"
+      tmp="'*' completer ${${(qqs.:.)val}}"
       ;;
     last_prompt)
-      tmp="'*' last-prompt '$val'"
+      tmp="'*' last-prompt ${(qq)val}"
       ;;
     esac
     [[ -n "$tmp" ]] && style="${style}${cmt}compstyle ${tmp}
@@ -433,17 +433,30 @@ compstyle '*:options' prefix-hidden yes"
 # This will be improved if needed. Promised.
 
 compstyle() {
+  local long
+
+  if [[ "$1" = -L ]]; then
+    long=yes
+    shift
+  fi
+
   if (( ! $# )); then
-    local pats styles vals pat style
+    local pats styles vals pat style pre eq
 
     compstyles -G pats
 
     for pat in "$pats[@]"; do
-      print "$pat"
+      if [[ -n "$long" ]]; then
+        pre="compstyle ${(qq)pat} "
+      else
+        print "$pat"
+	pre='    '
+	eq=' ='
+      fi
       compstyles -G styles "$pat"
       for style in "$styles[@]"; do
         compstyles -G vals "$pat" "$style"
-        print "    $style = $vals"
+        print "${pre}${style}${eq}" "${(@qq)vals}"
       done
     done
 

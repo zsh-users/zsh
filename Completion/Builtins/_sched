@@ -4,7 +4,7 @@ local expl lines disp
 
 if [[ CURRENT -eq 2 ]]; then
   if compset -P -; then
-    _wanted -C - entries expl 'scheduled jobs' || return 1
+    _wanted -C - jobs expl 'scheduled jobs' || return 1
 
     lines=(${(f)"$(sched)"})
     if _style entries description; then

@@ -204,7 +204,7 @@ _whois:whois.internic.net () {
   if (( CURRENT == 1 )); then
     local expl
 
-    _wanted string expl string && compadd "$expl[@]" HELP DOMAIN HOST
+    _wanted strings expl string && compadd "$expl[@]" HELP DOMAIN HOST
   else
     _message 'string'
   fi
@@ -215,7 +215,7 @@ _whois:whois.nic.ad.jp () {
   if (( CURRENT == 1 )); then
     local expl
 
-    _wanted string expl string && compadd HELP DOM NET HOST PERSON CONN COM
+    _wanted strings expl string && compadd HELP DOM NET HOST PERSON CONN COM
   else
     _message 'string'
   fi

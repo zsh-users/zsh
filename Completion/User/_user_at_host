@@ -5,9 +5,9 @@ if [[ -prefix 1 *@ ]]; then
 
   compset -P 1 '*@'
 
-  _wanted -C user-at hosts expl "hostnames for $user" &&
+  _wanted -C user-at hosts expl "host for $user" &&
       _combination accounts_users_hosts users="$user" hosts "$expl[@]" "$@"
 else
-  _wanted users expl "usernames" &&
+  _wanted users expl "user" &&
       _combination accounts_users_hosts users -S@ -q "$expl[@]" "$@"
 fi

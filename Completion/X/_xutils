@@ -67,7 +67,7 @@ xhost)
       esac
     else
       _alternative \
-          'families:name family:compadd -S: - inet dnet nis krb' \
+          'types:name family:compadd -S: - inet dnet nis krb' \
 	  'hosts:: _hosts' && ret=0
     fi
     return ret

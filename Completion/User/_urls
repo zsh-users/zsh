@@ -54,7 +54,7 @@ fi
 ipre="$IPREFIX"
 
 if ! compset -P '(#b)([-+.a-z0-9]#):' &&
-   _wanted argument prefixes expl 'URL prefix'; then
+   _wanted -C argument prefixes expl 'URL prefix'; then
   [[ -d $urls_path/bookmark ]] &&
     compadd "$@" "$expl[@]" -S '' bookmark: && ret=0
   compadd "$@" "$expl[@]" -S '' file: ftp:// gopher:// http:// && ret=0
@@ -65,7 +65,7 @@ scheme="$match[1]"
 case "$scheme" in
   http|ftp|gopher)
     if ! compset -P //; then
-      _wanted -C "$scheme" slashes expl 'end of prefix' &&
+      _wanted -C "$scheme" prefixes expl 'end of prefix' &&
           compadd "$expl[@]" "$@" -S '' //
       return
     fi
@@ -86,11 +86,11 @@ case "$scheme" in
   bookmark)
     if [[ -f "$urls_path/$scheme/$PREFIX$SUFFIX" &&
 	  -s "$urls_path/$scheme/$PREFIX$SUFFIX" ]]; then
-      _wanted -C bookmark caches expl biikmarks &&
+      _wanted -C bookmark bookmarks expl bookmarks &&
           compadd "$expl[@]" "$@" -QU - \
               "$ipre$(<"$urls_path/$scheme/$PREFIX$SUFFIX")" && ret=0
     else
-      if _wanted -C bookmark files 'bookmark'; then
+      if _wanted -C bookmark files expl 'bookmark'; then
         _path_files -W "$urls_path/$scheme" "$expl[@]" -S '' -g '*(^/)' && 
             ret=0
         _path_files -W "$urls_path/$scheme" -S/ -r '/' -/ && ret=0

@@ -5,10 +5,10 @@ local expl
 if [[ "$words[CURRENT-1]" = -[AH] ]]; then
   _arrays
 else
-  _tags elements files || return 1
+  _tags options files || return 1
 
   while _tags; do
-    _requested elements expl 'inode element' &&
+    _requested options expl 'inode element' &&
         { ! _style elements prefix-needed || [[ "$PREFIX[1]" = + ]] } &&
         compadd "$expl[@]" - +device +inode +mode +nlink +uid +gid +rdev \
                              +size +atime +mtime +ctime +blksize +block +link

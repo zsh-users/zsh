@@ -575,7 +575,7 @@ _cvs_files_removed () {
     local omit
     omit=(${pref}*(D:t))
     eval 'entries=(${entries:#('${(j:|:)${(@)omit:q}}')})'
-    _tags direcories && compadd "$@" -P "$qpref" - ${entries:q} ||
+    _tags directories && compadd "$@" -P "$qpref" - ${entries:q} ||
     _cvs_directories "$@"
   else
     _files "$@"
