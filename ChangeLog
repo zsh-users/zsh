@@ -1,3 +1,8 @@
+2003-02-26  Oliver Kiddle  <opk@zsh.org>
+
+	* 18300: Completion/Unix/Command/_tar,
+	Completion/Unix/Type/_tar_archive: handle tar's -C option better
+
 2003-02-26  Peter Stephenson  <pws@csr.com>
 
 	* unposted: whoops, left some debugging code in 18230.

@@ -1,4 +1,4 @@
-#compdef tar
+#compdef tar gtar star
 
 # Tar completion.  Features:
 #  - Tries to collect tar commands from second position, single letter
@@ -13,7 +13,7 @@
 #    tar itself (GNU tar)
 #  - Things like --directory=... are also completed correctly.
 
-local _tar_cmd tf tmp tmpb del
+local _tar_cmd tf tmp tmpb del index
 
 # First we collect in `_tar_cmd' single letter options describing what
 # should be done with the archive and if it is compressed. This
@@ -95,24 +95,23 @@ if [[ "$PREFIX" = --* ]]; then
 		 '*=DIR*:directory:_files -/' \
 		 '*=CONTROL*::version control:(t numbered nil existing never simple)'
 
-elif [[ ( CURRENT -gt 2 && "$words[CURRENT-1]" = -*f* &&
-          "$words[CURRENT-1]" != --* && "$words[CURRENT-1]" != -*Cf* ) ||
-        ( CURRENT -eq 3 && "$words[2]" = *f* && "$words[2]" != -* &&
-          "$words[2]" != *Cf* ) ||
-        ( CURRENT -gt 2 && "$words[CURRENT-2]" = -*Cf* &&
+elif [[ ( CURRENT -gt 2 && "$words[CURRENT-1]" = -[^C]#f* &&
+          "$words[CURRENT-1]" != --* ) ||
+        ( CURRENT -eq 3 && "$words[2]" = [^C]#f* && "$words[2]" != -* ) ||
+        ( CURRENT -gt 2 && "$words[CURRENT-2]" = -*C*f* &&
           "$words[CURRENT-2]" != --* && "$words[CURRENT-1]" != --* ) ||
-        ( CURRENT -eq 4 && "$words[2]" = *Cf* && "$words[2]" != -* ) ]]; then
+        ( CURRENT -eq 4 && "$words[2]" = *C*f* && "$words[2]" != -* ) ]]; then
 
   # ...archive files if we think they are wanted here.
 
   _tar_archive
 
-elif [[ ( CURRENT -gt 2 && "$words[CURRENT-1]" = -*Cf*) ||
-        ( CURRENT -eq 3 && "$words[2]" = *Cf* ) ]]; then
+elif [[ ( CURRENT -gt 2 && "$words[CURRENT-1]" = -[^f]#C*) ||
+        ( CURRENT -eq 3 && "$words[2]" = [^f]#C* ) ]]; then
 
   # a directory for -C
 
-  _files -/
+  _directories
 
 elif [[ ( "$_tar_cmd" = *[xt]* || -n $del ) && -n "$tf" ]]; then
 
@@ -145,6 +144,28 @@ elif [[ ( "$_tar_cmd" = *[xt]* || -n $del ) && -n "$tf" ]]; then
   fi
 
   _wanted files expl 'file from archive' _multi_parts / _tar_cache_list
+elif (( CURRENT == 2 )); then
+  _values -s '' 'tar function' \
+    '(c t u x)A[append to and archive]' \
+    '(A t u x)c[create a new archive]' \
+    '(A c u x)t[list archive contents]' \
+    '(A c t x)u[update archive]' \
+    '(A c t u)x[extract files from an archive]' \
+    'v[verbose output]' \
+    'f[specify archive file or device]'
 else
+  if ! (( index=$words[(I)-*C*] )); then
+    if [[ $words[2] = [^f]#C* ]]; then
+      index=1
+    elif [[ $words[2] = *f*C* ]]; then
+      index=2
+    fi
+  fi
+  if (( index )); then
+    index="$~words[index+1]"
+    [[ $index = (.|..|)/* ]] || index=~+/$index
+    _files -W $index
+  else
     _files
+  fi
 fi
