@@ -23,10 +23,6 @@ ifzman(the section `Matching Control' in zmanref(zshcompctl))\
 ifnzman(noderef(Matching Control))
 for further details.
 
-Also note that this completion system requires the tt(parameter) and
-tt(zleparameter) modules to be linked into the shell or to be
-dynamically loadable.
-
 startmenu()
 menu(Initialization)
 menu(Control Functions)

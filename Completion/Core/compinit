@@ -78,10 +78,6 @@ while [[ $# -gt 0 && $1 = -[dDf] ]]; do
   fi
 done
 
-# We need the parameter modules.
-
-zmodload -i parameter zleparameter
-
 # The associative array containing the definitions for the commands.
 # Definitions for patterns will be stored in the normal arrays `_patcomps'
 # and `_postpatcomps'.
