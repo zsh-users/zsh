@@ -1764,7 +1764,14 @@ findsep(char **s, char *sep)
 	return i;
     }
     if (!sep[0]) {
-	return **s ? ++*s, 1 : -1;
+	if (**s) {
+	    if (**s == Meta)
+		*s += 2;
+	    else
+		++*s;
+	    return 1;
+	}
+	return -1;
     }
     for (i = 0; **s; i++) {
 	for (t = sep, tt = *s; *t && *tt && *t == *tt; t++, tt++);
