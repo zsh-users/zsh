@@ -1116,6 +1116,8 @@ If var(sig) is tt(0) or tt(EXIT)
 and the tt(trap) statement is not executed inside the body of a function,
 then the command var(arg) is executed when the shell terminates.
 
+tt(ZERR), tt(DEBUG) and tt(EXIT) traps are not executed inside other traps.
+
 The tt(trap) command with no arguments prints a list of commands
 associated with each signal.
 

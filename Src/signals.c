@@ -932,7 +932,10 @@ dotrapargs(int sig, int *sigtr, void *sigfn)
     int trapret = 0;
     int obreaks = breaks;
     int isfunc;
- 
+
+    /* Are we already executing a trap? */
+    static int intrap;
+
     /* if signal is being ignored or the trap function		      *
      * is NULL, then return					      *
      *								      *
@@ -946,6 +949,24 @@ dotrapargs(int sig, int *sigtr, void *sigfn)
     if ((*sigtr & ZSIG_IGNORED) || !sigfn || errflag)
         return;
 
+    /*
+     * Never execute special (synchronous) traps inside other traps.
+     * This can cause unexpected code execution when more than one
+     * of these is set.
+     *
+     * The down side is that it's harder to debug traps.  I don't think
+     * that's a big issue.
+     */
+    if (intrap) {
+	switch (sig) {
+	case SIGEXIT:
+	case SIGDEBUG:
+	case SIGZERR:
+	    return;
+	}
+    }
+
+    intrap++;
     *sigtr |= ZSIG_IGNORED;
 
     lexsave();
@@ -1023,6 +1044,7 @@ dotrapargs(int sig, int *sigtr, void *sigfn)
 
     if (*sigtr != ZSIG_IGNORED)
 	*sigtr &= ~ZSIG_IGNORED;
+    intrap--;
 }
 
 /* Standard call to execute a trap for a given signal. */

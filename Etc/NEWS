@@ -5,14 +5,19 @@ CHANGES FROM PREVIOUS VERSIONS OF ZSH
 Changes since zsh version 4.2.0
 -------------------------------
 
-The zftp module supports ports following the hostname in the normal suffix
-notation, `host:port'.  This requires IPv6 colon-style addresses to be
-specified in suitably quoted square brackets, for example:
+- The zftp module supports ports following the hostname in the normal suffix
+  notation, `host:port'.  This requires IPv6 colon-style addresses to be
+  specified in suitably quoted square brackets, for example:
 
   zftp open '[f000::baaa]'
   zftp open '[f000::baaa]:ftp'
 
-(the two are equivalent).
+  (the two are equivalent).
+
+- Special traps, those that don't correspond to signals, i.e. ZERR, DEBUG
+  and EXIT are no longer executed inside other traps.  This caused
+  unnecessary confusion if, for example, both DEBUG and EXIT traps
+  were set.  The new behaviour is more compatible with other shells.
 
 
 New features between zsh versions 4.0 and 4.2
