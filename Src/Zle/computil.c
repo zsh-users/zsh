@@ -1442,7 +1442,7 @@ bin_comparguments(char *nam, char **args, char *ops, int func)
 		setsparam(args[3], ztrdup(opt->args->action));
 
 		if (args[4])
-		    setsparam(args[4], tricat(opt->name, "-1", NULL));
+		    setsparam(args[4], tricat(opt->name, "-1", ""));
 
 		return 0;
 	    }
