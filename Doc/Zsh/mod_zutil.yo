@@ -19,8 +19,10 @@ pairs of names and values, where the values consist of any number of
 strings.  They are stored together with patterns and lookup is done by
 giving a string, called the `context', which is compared to the
 patterns.  The definition stored for the first matching pattern will be 
-returned.  For this, the patterns are ordered from most specific to
-less specific and patterns that are equally specific keep the order in 
+returned.
+
+For ordering of comparisons, patterns are searched from most specific to
+least specific, and patterns that are equally specific keep the order in 
 which they were defined.  A pattern is considered to be more specific
 than another if it contains more components (substrings separated by
 colons) or if the patterns for the components are more specific, where 
@@ -33,16 +35,16 @@ tt(zstyle) will test them. If the tt(-L) option is given, listing is
 done in the form of calls to tt(zstyle).  Forms with arguments:
 
 startitem()
-item(tt(zstyle) [ tt(-e) | tt(-) | tt(-)tt(-) ] var(pattern) var(style) var(strings) ...)(
+item(tt(zstyle) [ tt(-) | tt(-)tt(-) | tt(-e) ] var(pattern) var(style) var(strings) ...)(
 Defines the given var(style) for the var(pattern) with the var(strings) as
 the value.  If the tt(-e) option is given, the var(strings) will be
 concatenated (separated by spaces) and the resulting string will be
-evaluated (in the same way as it is dome by the tt(eval) builtin
+evaluated (in the same way as it is done by the tt(eval) builtin
 command) when the style is looked up.  In this case the parameter
-tt(reply) will be used to get the strings to return after the
-evaluation.  Before evaluating the value, tt(reply) will be unset and
-if it is still unset after the evaluation, this will be handled as if
-the style were not set.
+`tt(reply)' must be assigned to set the strings returned after the
+evaluation.  Before evaluating the value, tt(reply) is unset, and
+if it is still unset after the evaluation, the style is treated as if
+it were not set.
 )
 item(tt(zstyle -d) [ var(pattern) [ var(styles) ... ] ])(
 Delete style definitions. Without arguments all definitions are deleted,
@@ -76,7 +78,7 @@ string or has more than one string, the parameter is set to `tt(no)'.
 )
 item(tt(zstyle -a) var(context) var(style) var(name))(
 The value is stored in var(name) as an array. If var(name) is declared 
-as an associative array,  the first, third, etc. stringare used as the
+as an associative array,  the first, third, etc. strings are used as the
 keys and the other strings are used as the values.
 )
 xitem(tt(zstyle -t) var(context) var(style) [ var(strings) ...])
@@ -89,8 +91,9 @@ its value, and that is equal to one of `tt(true)', `tt(yes)', `tt(on)' or
 at least one of the var(strings) is equal to at least one of the strings
 in the value. If the style is not defined, the status is tt(2).
 
-The tt(-T) option is like tt(-t) but returns zero if the style is not
-set for any matching pattern.
+The tt(-T) option tests the values of the style like tt(-t), but it
+returns zero (rather than tt(2)) if the style is not defined for any
+matching pattern.
 )
 item(tt(zstyle -m) var(context) var(style) var(pattern))(
 Match a value. Returns status zero if the 
@@ -135,64 +138,85 @@ The resulting strings are stored in the var(array).
 )
 findex(zregexparse)
 item(tt(zregexparse))(
-This implements the internals of the `tt(_regex_arguments)'.
+This implements some internals of the tt(_regex_arguments) function.
 )
 findex(zparseopts)
 item(tt(zparseopts) [ tt(-D) ] [ tt(-K) ] [ tt(-E) ] [ tt(-a) var(array) ] [ tt(-A) var(assoc) ] var(specs))(
-This builtin simplifies the parsing of options in positional
-parameters, i.e. the set of arguments given by tt($*).  Each var(spec)
-describes one option and should be of the form
-`var(name)[tt(+)][tt(:)[tt(:)][tt(-)]][tt(=)var(array)]'.  The var(name) is
-the name of the option (without the leading `tt(-)').  If only the option
-name is given, the option takes no argument and if it is found in the
-positional parameters it will be placed in the var(array) specified with
-the tt(-a) option; if the optional `tt(=)var(array)' is given, it will
-instead be put into that array.  If one or two colons are given, the
-option takes an argument; with one colon, the argument is mandatory
-and with two colons it is optional.  The argument will also be inserted into 
-the var(array).  A mandatory arguments is added as a separate 
-string and an optional argument is put into a single string together
-with the option name, unless a `tt(-)' appears after the colon, in
-which case the argument will be put into the same word even for mandatory
-arguments (note that this makes empty strings as arguments
-indistinguishable).  Finally, if a `tt(+)' appears after var(name) the
-option may appears more than once in the positional parameters and will
-hence be inserted more than once in the var(array); without the `tt(+)'
-the option will be inserted only once in the var(array) with arguments 
-of later options overwriting earlier once.  Any of the special
-characters can appear in the option name provided it is preceded by a
-backslash.
+This builtin simplifies the parsing of options in positional parameters,
+i.e. the set of arguments given by tt($*).  Each var(spec) describes one
+option and must be of the form `var(opt)[tt(=)var(array)]'.  If an option
+described by var(opt) is found in the positional parameters it is copied
+into the var(array) specified with the tt(-a) option; if the optional
+`tt(=)var(array)' is given, it is instead copied into that array.
+
+Note that it is an error to give any var(spec) without an
+`tt(=)var(array)' unless one of the tt(-a) or tt(-A) options is used.
 
 Unless the tt(-E) option is given, parsing stops at the first string
-that isn't described by one of the var(specs) And even with tt(-E),
+that isn't described by one of the var(specs).  Even with tt(-E),
 parsing always stops at a positional parameter equal to `tt(-)' or
 `tt(-)tt(-)'.
 
-The other
+The var(opt) description must be one of the following.  Any of the special
+characters can appear in the option name provided it is preceded by a
+backslash.
+
+startitem()
+xitem(var(name))
+item(var(name)tt(+))(
+The var(name) is the name of the option without the leading `tt(-)'.  To
+specify a GNU-style long option, one of the usual two leading `tt(-)' must
+be included in var(name); for example, a `tt(--file)' option is
+represented by a var(name) of `tt(-file)'.
+
+If a `tt(+)' appears after var(name), the option is appended to var(array)
+each time it is found in the positional parameters; without the `tt(+)'
+only the em(last) occurrence of the option is preserved.
+
+If one of these forms is used, the option takes no argument, so parsing
+stops if the next positional parameter does not also begin with `tt(-)'
+(unless the tt(-E) option is used).
+)
+xitem(var(name)tt(:))
+xitem(var(name)tt(:-))
+item(var(name)tt(::))(
+If one or two colons are given, the option takes an argument; with one
+colon, the argument is mandatory and with two colons it is optional.  The
+argument is appended to the var(array) after the option itself.
+
+An optional argument is put into the same array element as the option name
+(note that this makes empty strings as arguments indistinguishable).  A
+mandatory argument is added as a separate element unless the `tt(:-)' form
+is used, in which case the argument is put into the same element.
+
+A `tt(+)' as described above may appear between the var(name) and the
+first colon.
+)
+enditem()
+
+The options of tt(zparseopts) itself are:
 
 startitem()
 item(tt(-a) var(array))(
-As described above, this specifies the default array to store the
-recognised options in.
+As described above, this names the default array in which to store the
+recognised options.
 )
 item(tt(-A) var(assoc))(
-If this is given, the options and their values will also
-be put into an associative array with the option names as keys and the 
-arguments (if any) as the values.  Note that it is an error to give
-var(specs) without a `tt(=)var(array)' and not use either the tt(-a)
-or tt(-A) option.
+If this is given, the options and their values are also put into an
+associative array with the option names as keys and the arguments (if any)
+as the values.
 )
 item(tt(-D))(
-If this option is given, all options found are removed from the
-positional parameters, up to but not including any not described by the
-var(specs).  This means that any options processed by tt(zparseopts) are
-removed from the positional parameters.
+If this option is given, all options found are removed from the positional
+parameters of the calling shell or shell function, up to but not including
+any not described by the var(specs).  This is similar to using the tt(shift)
+builtin.
 )
 item(tt(-K))(
 With this option, the arrays specified with the tt(-a) and tt(-A)
-options and with the `tt(=)var(array)' forms will be left unchanged
-when none of the var(specs) for them is used.  This allows to assign
-default values to them before calling tt(zparseopts).
+options and with the `tt(=)var(array)' forms are kept unchanged when none
+of the var(specs) for them is used.  This allows assignment of default
+values to them before calling tt(zparseopts).
 )
 item(tt(-E))(
 This changes the parsing rules to em(not) stop at the first string

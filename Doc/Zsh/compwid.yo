@@ -787,7 +787,7 @@ enditem()
 texinode(Matching Control)(Examples)(Condition Codes)(Completion Widgets)
 sect(Matching Control)
 
-It is possible by use of the 
+It is possible by use of the
 tt(-M) option of the tt(compadd) builtin command to specify how the
 characters in the string to be completed (referred to here as the
 command line) map onto the characters in the list of matches produced by
@@ -796,14 +796,16 @@ that this is not used if the command line contains a glob pattern and
 the tt(GLOB_COMPLETE) option is set or the tt(pattern_match) of the
 tt(compstate) special association is set to a non-empty string.
 
-The var(spec) given as argument to the tt(-m) option consists of one
-or more matching descriptions separated by
+The var(match-spec) given as argument to the tt(-M) option (see
+ifzman(`Builtin Commands' above)\
+ifnzman(noderef(Builtin Commands))\
+) consists of one or more matching descriptions separated by
 whitespace.  Each description consists of a letter followed by a colon
 and then the patterns describing which character sequences on the line match
 which character sequences in the trial completion.  Any sequence of
 characters not handled in this fashion must match exactly, as usual.
 
-The forms of var(spec) understood are as follows. In each case, the
+The forms of var(match-spec) understood are as follows. In each case, the
 form with an uppercase initial character retains the string already
 typed on the command line as the final result of completion, while with
 a lowercase initial character the string on the command line is changed
@@ -920,7 +922,7 @@ otherwise ignored. To fix this, one would use `tt(B:[nN][oO]=)'
 instead of the first part. As described above, this matches at the
 beginning of the trial completion, independent of other characters or
 substrings at the beginning of the command line word which are ignored
-by the same or other var(spec)s.
+by the same or other var(match-spec)s.
 
 The second example makes completion case insensitive.  This is just
 the same as in the option example, except here we wish to retain the

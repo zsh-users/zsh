@@ -13,18 +13,14 @@ specialised and thus not very interesting when writing your own
 completion functions.  In summary, these builtin commands are:
 
 startitem()
-item(tt(compquote) var(names) ...)(
-There may be reasons to write completion functions that have to add
-the matches using the tt(-Q) option to tt(compadd) and perform quoting
-themselves.  Instead of interpreting the first character of the
-tt(all_quotes) key of the tt(compstate) special association and using
-the tt(q) flag for parameter expansions, one can use this builtin
-command.  The arguments are the names of scalar or array parameters
-and the values of these parameters are quoted as needed for the
-innermost quoting level.
-
-The return value is non-zero in case of an error and zero otherwise.
+findex(comparguments)
+item(tt(comparguments))(
+This is used by the tt(_arguments) function to do the argument and
+command line parsing.  Like tt(compdescribe) it has an option tt(-i) to 
+do the parsing and initialize some internal state and various options
+to access the state information to decide what should be completed.
 )
+findex(compdescribe)
 item(tt(compdescribe))(
 This is used by the tt(_describe) function to build the displays for
 the matches and to get the strings to add as matches with their
@@ -44,16 +40,41 @@ the third, the strings without descriptions in the fourth, and the
 matches for them in the fifth array.  These are then directly given to
 tt(compadd) to register the matches with the completion code.
 )
-item(tt(comparguments))(
-This is used by the tt(_arguments) function to do the argument and
-command line parsing.  Like tt(compdescribe) it has an option tt(-i) to 
-do the parsing and initialize some internal state and various options
-to access the state information to decide what should be completed.
+findex(compfiles)
+item(tt(compfiles))(
+Used by the tt(_path_files) function to optimize complex recursive
+filename generation (globbing).
 )
+findex(compfmt)
+item(tt(compfmt))(
+An obsolete form of `tt(zformat -f)'.  Do not use this.
+)
+findex(compgroups)
+item(tt(compgroups))(
+Used by the tt(_tags) function to implement the internals of the
+tt(group-order) style.
+)
+findex(compquote)
+item(tt(compquote) var(names) ...)(
+There may be reasons to write completion functions that have to add
+the matches using the tt(-Q) option to tt(compadd) and perform quoting
+themselves.  Instead of interpreting the first character of the
+tt(all_quotes) key of the tt(compstate) special association and using
+the tt(q) flag for parameter expansions, one can use this builtin
+command.  The arguments are the names of scalar or array parameters
+and the values of these parameters are quoted as needed for the
+innermost quoting level.
+
+The return value is non-zero in case of an error and zero otherwise.
+)
+findex(comptags)
+findex(comptry)
+xitem(tt(comptags))
+item(tt(comptry))(
+These implements the internals of the tags mechanism.
+)
+findex(compvalues)
 item(tt(compvalues))(
 Like tt(comparguments), but for the tt(_values) function.
-)
-item(tt(comptags), tt(comptry))(
-This implements the internals of the tags mechanism.
 )
 enditem()
