@@ -1,6 +1,6 @@
 #autoload
 
-local name gropt nopt xopt format gname hidden hide match opts tag
+local name gropt nopt xopt format gname hidden hide match opts tag sort
 
 opts=()
 
@@ -30,6 +30,18 @@ fi
 zstyle -s ":completion:${curcontext}:$1" matcher match &&
     opts=($opts -M "$match")
 [[ -n "$_matcher" ]] && opts=($opts -M "$_matcher")
+
+# Use sort style, but ignore `menu' value to help _expand.
+# Also don't override explicit use of -V.
+if { zstyle -s ":completion:${curcontext}:$1" sort sort ||
+     zstyle -s ":completion:${curcontext}:" sort sort; } &&
+    [[ "$gropt" = -J && $sort != menu ]]; then
+    if [[ "$sort" = (yes|true|1|on) ]]; then
+	gropt=(-J)
+    else
+	gropt=(-V)
+    fi
+fi
 
 if [[ -z "$_comp_no_ignore" ]]; then
   zstyle -a ":completion:${curcontext}:$1" ignored-patterns _comp_ignore ||
