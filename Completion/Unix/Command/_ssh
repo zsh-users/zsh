@@ -107,12 +107,12 @@ _ssh () {
   ssh-keygen)
     _arguments \
       '(-p -c -u -P)-b[specify number of bits in key]:bits in key:' \
-      '(-p -c)-f[key file]:key file:_files' \
+      '(-c)-f[key file]:key file:_files' \
       '(-c -u)-N[specify new passphrase]:new passphrase:' \
       '(-b -u -f)-P[specify old passphrase]:old passphrase:' \
       '(-p -u)-C[specify new comment]:new comment:' \
-      '(-b -f -C -u -c)-p[change passphrase of private key file]' \
-      '(-b -f -N -p -u)-c[change comment in private and public key files]' \
+      '(-b -C -u -c)-p[change passphrase of private key file]' \
+      '(-b -N -p -u)-c[change comment in private and public key files]' \
       '-l[show fingerprint of specified private or public key file]' \
       '-q[silence ssh-keygen]' \
       '-R[exit 0 or 1 if RSA support is functional]' \
