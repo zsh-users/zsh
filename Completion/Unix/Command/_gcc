@@ -7,7 +7,7 @@ if [[ "$comptype" = values ]]; then
   compset -q
   words=( fake "$words[@]" )
   (( CURRENT++ ))
-  if ("$service" = LDFLAGS ]]; then
+  if [[ "$service" = LDFLAGS ]]; then
     args2=( '-R:runtime path:->rundir' )
   else
     args2=()
