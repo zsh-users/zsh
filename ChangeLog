@@ -285,7 +285,7 @@
 
 2004-06-03  Felix Rosencrantz <f_rosencrantz@yahoo.com>
 
-        * 20002: Src/Zle/compmatch.c: Fix a problem with an inconsistent
+	* 20002: Src/Zle/compmatch.c: Fix a problem with an inconsistent
 	struct change in cmp_anchors().
 
 2004-06-03  Peter Stephenson  <pws@csr.com>
