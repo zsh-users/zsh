@@ -21,6 +21,9 @@
 
   touch unmodish
   chmod 000 unmodish
+
+  print 'MZ' > cmd.exe
+  chmod +x cmd.exe
 %test
 
   [[ -a zerolength && ! -a nonexistent ]]
@@ -92,7 +95,7 @@
   [[ -u modish && ! -u zerolength ]]
 0:-u cond
 
-  [[ -x $ZTST_srcdir/ztst.zsh && ! -x zerolength ]]
+  [[ -x cmd.exe && ! -x zerolength ]]
 0:-x cond
 
   [[ -z $bar && -z '' && ! -z $foo ]]
@@ -113,7 +116,12 @@
   sleep 1
   cat unmodified
   touch newnewnew
-  [[ -N newnewnew && ! -N unmodified ]]
+  if [[ $OSTYPE == "cygwin" ]]; then
+    print -u8 "Warning: not testing [[ -N file ]] (not supported on Cygwin)"
+    true
+  else
+    [[ -N newnewnew && ! -N unmodified ]]
+  fi
 0:-N cond
 
   [[ newnewnew -nt zerolength && ! (unmodified -nt zerolength) ]]
@@ -146,11 +154,21 @@
   [[ 1 -lt 2 || 2 -lt 2 && 3 -gt 4 ]]
 0:|| and && in conds
 
-  [[ -e /dev/fd/0 ]]
-0:/dev/fd support in conds handled by access
+  if ! grep '#define PATH_DEV_FD' $ZTST_testdir/../config.h; then
+    print -u8 "Warning: not testing [[ -e /dev/fd/0 ]] (/dev/fd not supported)"
+    true
+  else
+    [[ -e /dev/fd/0 ]]
+  fi
+0dD:/dev/fd support in conds handled by access
 
-  [[ -O /dev/fd/0 ]]
-0:/dev/fd support in conds handled by stat
+  if ! grep '#define PATH_DEV_FD' $ZTST_testdir/../config.h; then
+    print -u8 "Warning: not testing [[ -O /dev/fd/0 ]] (/dev/fd not supported)"
+    true
+  else
+    [[ -O /dev/fd/0 ]]
+  fi
+0dD:/dev/fd support in conds handled by stat
 
   [[ ( -z foo && -z foo ) || -z foo ]]
 1:complex conds with skipping

@@ -1,5 +1,8 @@
 2001-05-30  Andrej Borsenkow  <bor@zsh.org>
 
+	* 14566: Test/C02cond.ztst: more testing for unimplemented
+	features.
+
 	* 14557: INSTALL: remove 3.1 version number
 
 2001-05-30  Sven Wischnowsky  <wischnow@zsh.org>
