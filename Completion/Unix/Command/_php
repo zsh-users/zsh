@@ -1,0 +1,37 @@
+#compdef php
+
+# PHP 4.3.6RC2 (cli) (built: Apr  9 2004 00:14:04)
+
+local curcontext="$curcontext" line state
+typeset -A opt_args
+
+_arguments -S \
+  {-a,--interactive}'[run interactively]' \
+  {-c,--php-ini}'[look for php.ini file in the specified directory]:directory:_files -/' \
+  {-n,--no-php-ini}'[no php.ini file will be used]' \
+  {-d,--define}"[define INI entry]:configuration directive:->ini" \
+  {-e,--profile-info}'[generate extended information for debugger/profiler]' \
+  '(- *)'{-h,--help}'[display help information]' \
+  '(- *)'{-i,--info}'[PHP information]' \
+  '(-)'{-l,--syntax-check}'[syntax check only (lint)]' \
+  '(- *)'{-m,--modules}'[show compiled in modules]' \
+  '(1 -l --syntax-check -s --syntax-highlight -w --strip)'{-r,--run}'[run the specified PHP code without using script tags <?..?>]:PHP code:'\
+  '(-)'{-s,--syntax-highlight}'[display colour syntax highlighted source]' \
+  '(- *)'{-v,--version}'[display version information]' \
+  '(-)'{-w,--strip}'[display source with stripped comments and whitespace]' \
+  {-z,--zend-extension}'[load specified Zend extension]:extension file:_files' \
+  '(-)1:PHP file:_files -g "*.php(-.)"' \
+  '*:script argument:_files' && return
+
+case $state in
+  ini)
+    if compset -P '*='; then
+      _default
+    else
+      _message -e configuration-directives 'configuration directive'
+    fi
+    ;;
+esac
+
+return 1
+

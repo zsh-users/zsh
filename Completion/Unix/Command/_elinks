@@ -2,7 +2,7 @@
 
 # ELinks 0.9.0 - Text WWW browser
 
-local curcontext="$curcontext" state line
+local curcontext="$curcontext" state line ret=1
 typeset -A opt_args
 
 _arguments -C -A '-*' \

@@ -1,3 +1,9 @@
+2004-04-17  Doug Kearns  <djkea2@mugca.its.monash.edu.au>
+
+	* 19775: Completion/Unix/Command/_php: new completion for php
+	* unposted: Completion/Unix/Commmand/_elinks: declare and initialise
+	return value parameter
+
 2004-04-15  Peter Stephenson  <pws@csr.com>
 
 	* see 19778 etc.: Doc/Makefile.in: remove change from 19735.
