@@ -1,5 +1,8 @@
 2003-04-18  Oliver Kiddle  <opk@zsh.org>
 
+	* unposted: Completion/Zsh/Context/_tilde: fix bug where 0 was
+	not returned when adding a named directory as a match
+
 	* users/6013: GoTaR <gotar@poczta.onet.pl>: Completion/Unix/Type/_ps,
 	Completion/Unix/Type/_pdf, Completion/X/Command/_gqview:
 	new gqview completion and complete .ps/.pdf files for more commands
