@@ -92,7 +92,7 @@ _arguments -C -s \
   '(-e)--erase:*:uninstall:->uninstall' \
   '-b+[build mode (spec file)]:build stage:((p\:execute\ \%prep\ stage l\:do\ a\ list\ check c\:execute\ build\ stage i\:execute\ install\ stage b\:build\ a\ binary\ package a\:build\ binary\ and\ source\ packages)):*:build:->build_b' \
   '(-b)-t+[build mode (tar file)]:build stage:((p\:execute\ \%prep\ stage l\:do\ a\ list\ check c\:execute\ build\ stage i\:execute\ install\ stage b\:build\ a\ binary\ package a\:build\ binary\ and\ source\ packages)):*:build:->build_t' \
-  --{resign,addsign}':*:RPM package:->package' \
+  --{resign,addsign}':*:RPM package:->package_file' \
   '--rmsource:*:spec file:->spec_file' \
   --{rebuild,recompile}':*:Src RPM files:->package_src' \
   '(--checksig)-K+[signature check mode]:*:sigcheck:->sigcheck' \
