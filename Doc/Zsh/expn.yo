@@ -559,7 +559,7 @@ further parameter name, whose value will be used where appropriate. If used
 with a nested parameter or command substitution, the result of that will be
 taken as a parameter name in the same way.  For example, if you have
 `tt(foo=bar)' and `tt(bar=baz)', the strings tt(${(P)foo}),
-tt(${(P)${foo}}), and tt${(P)$(echo bar)} will be expanded to `tt(baz)'.
+tt(${(P)${foo}}), and tt(${(P)$(echo bar)}) will be expanded to `tt(baz)'.
 )
 item(tt(o))(
 Sort the resulting words in ascending order.
