@@ -1389,9 +1389,13 @@ par_time(void)
 
     p = ecadd(0);
     ecadd(0);
-    f = par_sublist2(&c);
-    ecbuf[p] = WCB_TIMED((p + 1 == ecused) ? WC_TIMED_EMPTY : WC_TIMED_PIPE);
-    set_sublist_code(p + 1, WC_SUBLIST_END, f, ecused - 2 - p, c);
+    if ((f = par_sublist2(&c)) < 0) {
+	ecused--;
+	ecbuf[p] = WCB_TIMED(WC_TIMED_EMPTY);
+    } else {
+	ecbuf[p] = WCB_TIMED(WC_TIMED_PIPE);
+	set_sublist_code(p + 1, WC_SUBLIST_END, f, ecused - 2 - p, c);
+    }
 }
 
 /*

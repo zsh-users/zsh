@@ -1,3 +1,7 @@
+2000-07-21  Sven Wischnowsky  <wischnow@zsh.org>
+
+	* 12337: Src/parse.c: fix parsing of `time' without a command
+	
 2000-07-20  Wayne Davison  <wayned@users.sourceforge.net>
 
 	* unposted: tweaked a function name in hist.c for Sven.
