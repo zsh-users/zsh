@@ -1,7 +1,12 @@
+2002-08-01  Oliver Kiddle  <opk@zsh.org>
+
+	* 17496: Completion/Unix/Type/_diff_options: update for new options
+	in GNU diff 2.8.1
+
 2002-07-30  Sven Wischnowsky  <wischnow@zsh.org>
 
 	* 17489: Src/Zle/compresult.c: make sure invalidatelist() isn't
-	called hwen we are inside menu selection and there's only one
+	called when we are inside menu selection and there's only one
 	match left
 
 2002-07-29  Peter Stephenson  <pws@csr.com>
