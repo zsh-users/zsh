@@ -1105,7 +1105,7 @@ struct castate {
     int nopts;
     Caarg def, ddef;
     Caopt curopt;
-    int opt, arg, argbeg, optbeg, nargbeg, restbeg, curpos;
+    int opt, arg, argbeg, optbeg, nargbeg, restbeg, curpos, argend;
     int inopt, inrest, inarg, nth, doff, singles, oopt, actopts;
     LinkList args;
     LinkList *oargs;
@@ -1123,7 +1123,7 @@ ca_parse_line(Cadef d, int multi)
     Caopt ptr, wasopt;
     struct castate state;
     char *line, *pe, **argxor = NULL;
-    int cur, doff;
+    int cur, doff, argend;
     Patprog endpat = NULL;
 
     /* Free old state. */
@@ -1157,6 +1157,7 @@ ca_parse_line(Cadef d, int multi)
     state.curopt = NULL;
     state.argbeg = state.optbeg = state.nargbeg = state.restbeg = state.actopts =
 	state.nth = state.inopt = state.inarg = state.opt = state.arg = 1;
+    state.argend = argend = arrlen(compwords) - 1;
     state.inrest = state.doff = state.singles = state.doff = state.oopt = 0;
     state.curpos = compcurrent;
     state.args = znewlinklist();
@@ -1197,15 +1198,19 @@ ca_parse_line(Cadef d, int multi)
 
 	    if (state.def->type == CAA_REST || state.def->type == CAA_RARGS ||
 		state.def->type == CAA_RREST) {
+		if (state.curopt)
+		    state.oopt++;
 		if (state.def->end && pattry(endpat, line)) {
 		    state.def = NULL;
 		    state.curopt = NULL;
 		    state.opt = state.arg = 1;
+		    state.argend = ca_laststate.argend = cur - 1;
 		    continue;
 		}
-	    } else if ((state.def = state.def->next))
+	    } else if ((state.def = state.def->next)) {
 		state.argbeg = cur;
-	    else {
+		state.argend = argend;
+	    } else {
 		state.curopt = NULL;
 		state.opt = 1;
 	    }
@@ -1233,10 +1238,12 @@ ca_parse_line(Cadef d, int multi)
 				state.curopt->args : NULL);
 	    doff = pe - line;
 	    state.optbeg = state.argbeg = state.inopt = cur;
+	    state.argend = argend;
 	    state.singles = (d->single && (!pe || !*pe) &&
 			     state.curopt->name[1] && !state.curopt->name[2]);
 
-	    state.oargs[state.curopt->num] = znewlinklist();
+	    if (!state.oargs[state.curopt->num])
+		state.oargs[state.curopt->num] = znewlinklist();
 
 	    if (ca_inactive(d, state.curopt->xor, cur, 0))
 		return 1;
@@ -1273,11 +1280,13 @@ ca_parse_line(Cadef d, int multi)
 	    ddef = state.def = state.curopt->args;
 	    doff = pe - line;
 	    state.optbeg = state.argbeg = state.inopt = cur;
+	    state.argend = argend;
 	    state.singles = (!pe || !*pe);
 
 	    for (p = line + 1; p < pe; p++) {
 		if ((tmpopt = d->single[STOUC(*p)])) {
-		    state.oargs[tmpopt->num] = znewlinklist();
+		    if (!state.oargs[tmpopt->num])
+			state.oargs[tmpopt->num] = znewlinklist();
 
 		    if (ca_inactive(d, tmpopt->xor, cur, 0))
 			return 1;
@@ -1310,6 +1319,7 @@ ca_parse_line(Cadef d, int multi)
 	    if (state.inopt) {
 		state.inopt = 0;
 		state.nargbeg = cur - 1;
+		state.argend = argend;
 	    }
 	    if (!d->args && !d->rest)
 		return 1;
@@ -1320,6 +1330,7 @@ ca_parse_line(Cadef d, int multi)
 		state.opt = (cur == state.nargbeg + 1);
 		state.optbeg = state.nargbeg;
 		state.argbeg = cur - 1;
+		state.argend = argend;
 
 		for (; line; line = compwords[cur++])
 		    zaddlinknode(state.args, ztrdup(line));
@@ -1389,7 +1400,9 @@ ca_parse_line(Cadef d, int multi)
 		ca_laststate.ddef = NULL;
 		ca_laststate.optbeg = state.nargbeg;
 		ca_laststate.argbeg = state.restbeg;
+		ca_laststate.argend = state.argend;
 		ca_laststate.singles = state.singles;
+		ca_laststate.oopt = state.oopt;
 		if (wasopt)
 		    wasopt->active = 1;
 	    }
@@ -1466,14 +1479,14 @@ ca_set_data(char *opt, Caarg arg, char **args, int single)
 
 	if (!restr) {
 	    if ((restr = (arg->type == CAA_RARGS)))
-		restrict_range(ca_laststate.optbeg, arrlen(compwords) - 1);
+		restrict_range(ca_laststate.optbeg, ca_laststate.argend);
 	    else if ((restr = (arg->type == CAA_RREST)))
-		restrict_range(ca_laststate.argbeg, arrlen(compwords) - 1);
+		restrict_range(ca_laststate.argbeg, ca_laststate.argend);
 	}
 	if (arg->opt) {
 	    buf = (char *) zhalloc((arg->set ? strlen(arg->set) : 0) +
 				   strlen(arg->opt) + 40);
-	    if (arg->num > 0)
+	    if (arg->num > 0 && arg->type < CAA_REST)
 		sprintf(buf, "%soption%s-%d",
 			(arg->set ? arg->set : ""), arg->opt, arg->num);
 	    else
