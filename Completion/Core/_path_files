@@ -170,6 +170,23 @@ if [[ "$pre[1]" = \~ ]]; then
     realpath="${userdirs[$linepath]%/}/"
   elif (( $+nameddirs[$linepath] )); then
     realpath="${nameddirs[$linepath]%/}/"
+  elif [[ "$linepath" = [-+][0-9]## ]]; then
+    if [[ "$linepath" = -* ]]; then
+      tmp=$(( $#dirstack $linepath ))
+    else
+      tmp=$linepath[2,-1]
+    fi
+    [[ -o pushdminus ]] && tmp=$(( $#dirstack - $tmp ))
+    if (( ! tmp )); then
+      realpath=$PWD/
+    elif [[ tmp -le $#dirstack ]]; then
+      realpath=$dirstack[tmp]/
+    else
+      _message 'not directory stack entries'
+      return 1
+    fi
+  elif [[ "$linepath" = [-+] ]]; then
+    realpath=${~:-\~$linepath}/
   else
     _message "unknown user \`$linepath'"
     return 1
