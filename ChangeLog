@@ -1,5 +1,8 @@
 2000-04-07  Sven Wischnowsky <wischnow@informatik.hu-berlin.de>
 
+	* 10575: Completion/User/_make: complete make targets of the form
+ 	`foo bar:'
+	
 	* 10573: Src/Zle/compmatch.c: cursor placed on wrong word part
  	with ** match spec
 	
