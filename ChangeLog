@@ -1,3 +1,8 @@
+2005-03-10  Peter Stephenson  <pws@csr.com>
+
+	* 20959 (variant of 20958): Src/params.c, Src/Module/parameter.c,
+	Test/V01zmodload.ztst: fix crash unloading zsh/parameter and test.
+
 2005-03-09  Peter Stephenson  <pws@csr.com>
 
 	* 20955: README, Src/builtin.c: "unset foo" should return

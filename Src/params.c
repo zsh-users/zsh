@@ -147,7 +147,7 @@ mod_export const struct gsu_hash stdhash_gsu =
 { hashgetfn, hashsetfn, stdunsetfn };
 /**/
 mod_export const struct gsu_hash nullsethash_gsu =
-{ hashgetfn, nullsethashfn, NULL };
+{ hashgetfn, nullsethashfn, nullunsetfn };
 
 
 /* Non standard methods (not exported) */
@@ -2602,6 +2602,11 @@ nullstrsetfn(UNUSED(Param pm), char *x)
 /**/
 void
 nullintsetfn(UNUSED(Param pm), UNUSED(zlong x))
+{}
+
+/**/
+mod_export void
+nullunsetfn(UNUSED(Param pm), UNUSED(int exp))
 {}
 
 

@@ -151,11 +151,12 @@
  zmodload -e example
 1:Delete the module alias again
 
-# Don't unload the two modules that are required by the test system!
+# Don't unload the main module.
+# Do unload zsh/parameter, but reload it as it is needed.
 
  mods[(r)zsh/main]=()
- mods[(r)zsh/parameter]=()
  zmodunload $mods
+ zmodload zsh/parameter
 0d:Unload the modules loaded by this test suite
 
 %clean

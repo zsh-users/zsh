@@ -1817,7 +1817,7 @@ struct pardef {
  * in a compile-time initialiser, so we use this instead.
  */
 static const struct gsu_hash pmnullsethash_gsu =
-{ hashgetfn, nullsethashfn, NULL };
+{ hashgetfn, nullsethashfn, nullunsetfn };
 static const struct gsu_hash pmcommands_gsu =
 { hashgetfn, setpmcommands, stdunsetfn };
 static const struct gsu_hash pmfunctions_gsu =
