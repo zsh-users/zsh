@@ -923,34 +923,40 @@ makecomplist(char *s, int incmd, int lst)
 char *
 multiquote(char *s, int ign)
 {
-    char *os = s, *p = compqstack;
+    if (s) {
+	char *os = s, *p = compqstack;
 
-    if (p && *p && (ign < 1 || p[ign])) {
-	if (ign > 0)
-	    p += ign;
-	while (*p) {
-	    if (ign >= 0 || p[1])
-		s = bslashquote(s, NULL,
-				(*p == '\'' ? 1 : (*p == '"' ? 2 : 0)));
-	    p++;
+	if (p && *p && (ign < 1 || p[ign])) {
+	    if (ign > 0)
+		p += ign;
+	    while (*p) {
+		if (ign >= 0 || p[1])
+		    s = bslashquote(s, NULL,
+				    (*p == '\'' ? 1 : (*p == '"' ? 2 : 0)));
+		p++;
+	    }
 	}
+	return (s == os ? dupstring(s) : s);
     }
-    return (s == os ? dupstring(s) : s);
+    return NULL;
 }
 
 /**/
 char *
 tildequote(char *s, int ign)
 {
-    int tilde;
+    if (s) {
+	int tilde;
 
-    if ((tilde = (*s == '~')))
-	*s = 'x';
-    s = multiquote(s, ign);
-    if (tilde)
-	*s = '~';
+	if ((tilde = (*s == '~')))
+	    *s = 'x';
+	s = multiquote(s, ign);
+	if (tilde)
+	    *s = '~';
 
-    return s;
+	return s;
+    }
+    return NULL;
 }
 
 /* Check if we have to complete a parameter name. */
@@ -1708,10 +1714,12 @@ addmatches(Cadata dat, char **argv)
 		} else if (dat->rems)
 		    dat->rems = dupstring(dat->rems);
 
-		lpre = ((!(dat->aflags & CAF_QUOTE) &&
-			 (!dat->ppre && (dat->flags & CMF_FILE))) ?
-			tildequote(lpre, 1) : multiquote(lpre, 1));
-		lsuf = multiquote(lsuf, 1);
+		if (lpre)
+		    lpre = ((!(dat->aflags & CAF_QUOTE) &&
+			     (!dat->ppre && (dat->flags & CMF_FILE))) ?
+			    tildequote(lpre, 1) : multiquote(lpre, 1));
+		if (lsuf)
+		    lsuf = multiquote(lsuf, 1);
 	    }
 	    /* Walk through the matches given. */
 	    obpl = bpl;
