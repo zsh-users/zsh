@@ -7,6 +7,8 @@ xargs=(
   '-geometry:geometry:_x_geometry'
 )
 
+(( $# )) || xargs=( "$xargs[@]" '*:files: _files' )
+
 long=$argv[(I)--]
 if (( long )); then
   argv[long]=( "$xargs[@]" -- )
