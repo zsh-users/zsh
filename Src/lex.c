@@ -642,7 +642,18 @@ gettok(void)
 	return DOUTPAR;
     } else if (idigit(c)) {	/* handle 1< foo */
 	d = hgetc();
-	if (d == '>' || d == '<') {
+	if(d == '&') {
+	    d = hgetc();
+	    if(d == '>') {
+		peekfd = c - '0';
+		hungetc('>');
+		c = '&';
+	    } else {
+		hungetc(d);
+		lexstop = 0;
+		hungetc('&');
+	    }
+	} else if (d == '>' || d == '<') {
 	    peekfd = c - '0';
 	    c = d;
 	} else {
@@ -702,6 +713,7 @@ gettok(void)
 	else if (d == '!' || d == '|')
 	    return AMPERBANG;
 	else if (d == '>') {
+	    tokfd = peekfd;
 	    d = hgetc();
 	    if (d == '!' || d == '|')
 		return OUTANGAMPBANG;
@@ -715,7 +727,6 @@ gettok(void)
 	    }
 	    hungetc(d);
 	    lexstop = 0;
-	    tokfd = -1;
 	    return AMPOUTANG;
 	}
 	hungetc(d);

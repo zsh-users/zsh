@@ -1,5 +1,9 @@
 2000-04-06  Andrew Main  <zefram@zsh.org>
 
+	* zefram2: Src/lex.c: Support "3&> foo" etc.
+
+2000-04-06  Andrew Main  <zefram@zsh.org>
+
 	* zefram1: configure.in, Etc/zsh-development-guide: List of tools
 	required for development work, and a little more conspicuous
 	explanation of the config.status hack.
