@@ -1098,6 +1098,10 @@ zclose(int fd)
 /* Get a file name relative to $TMPPREFIX which *
  * is unique, for use as a temporary file.      */
  
+#ifdef HAVE__MKTEMP
+extern char *_mktemp(char *);
+#endif
+
 /**/
 mod_export char *
 gettempname(void)
