@@ -1,3 +1,8 @@
+2005-02-01  Clint Adams  <clint@zsh.org>
+
+	* 20773: Completion/Unix/Command/_getconf: additional variables
+	from confstr().
+
 2005-02-01  Peter Stephenson  <pws@csr.com>
 
 	* Peter A. Castro: 20759 updated as 20760 and 20765: configure.ac,

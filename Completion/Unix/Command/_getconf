@@ -3,7 +3,7 @@
 local expl ret=1
 
 if [[ CURRENT -eq 2 ]]; then
-  _tags syswideconfig pathconfig standardsconfig
+  _tags syswideconfig pathconfig standardsconfig confstring
 
   while _tags; do
     _requested -V syswideconfig expl 'systemwide configuration variables' \
@@ -22,6 +22,13 @@ if [[ CURRENT -eq 2 ]]; then
 	  POSIX2_LINE_MAX POSIX2_RE_DUP_MAX POSIX2_VERSION POSIX2_C_BIND \
 	  POSIX2_C_DEV POSIX2_FORT_DEV POSIX2_FORT_RUN POSIX2_LOCALEDEF \
 	  POSIX2_SW_DEV _XOPEN_VERSION && ret=0
+
+    _requested -V confstring \
+        expl 'configuration-dependent string variables' \
+      compadd -S '' PATH GNU_LIBC_VERSION GNU_LIBPTHREAD_VERSION \
+          LFS_CFLAGS LFS_LDFLAGS LFS_LIBS LFS_LINTFLAGS \
+	  LFS64_CFLAGS LFS64_LDFLAGS LFS64_LIBS LFS64_LINTFLAGS \
+	  && ret=0
 
     _requested pathconfig &&
         while _next_label -V pathconfig expl 'system path configuration variables'; do
