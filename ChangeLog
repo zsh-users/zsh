@@ -1,3 +1,8 @@
+2000-08-04  Clint Adams  <schizo@debian.org>
+
+	* 12533: Src/Modules/files.c: drop the tail of the path
+	passed to mkdir in the call to pathconf().
+
 2000-08-04  Sven Wischnowsky  <wischnow@zsh.org>
 
 	* 12525: Src/module.c: remove (wrong) test for linked-in modules
