@@ -1,7 +1,7 @@
 #compdef nedit nc
 
-local state line expl nedit_common curcontext="$curcontext"
-typeset -A opt_args ret=1
+local state line expl nedit_common curcontext="$curcontext" ret=1
+typeset -A opt_args
 
 nedit_common=( \
   '-read[open file read only]' \
