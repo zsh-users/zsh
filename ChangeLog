@@ -1,5 +1,8 @@
 2004-08-07  Oliver Kiddle  <opk@zsh.org>
 
+	* 20236: Completion/Base/Completer/_expand: fix problem with
+	keep-prefix style where a modifier changes or removes the prefix
+
 	* 20235: Completion/Unix/Command/_rsync: synched remote file
 	completion with that in _ssh. quoting needed quoting.
 

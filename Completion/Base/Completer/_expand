@@ -133,8 +133,9 @@ if [[ "$word" = (\~*/*|*\$*/*) && "$tmp" = (yes|true|on|1|changed) ]]; then
 
   if [[ -n "$epre" && $#epre -eq 1 ]]; then
     pre="${(q)epre[1]}"
-    [[ "$tmp" != changed || $#exp -gt 1 ||
-       "${opre}${exp[1]#${pre}}" != "$word" ]] && exp=( ${opre}${^exp#${pre}} )
+    [[ ( "$tmp" != changed || $#exp -gt 1 ||
+       "${opre}${exp[1]#${pre}}" != "$word" ) && "${exp[1]}" = $pre* ]] &&
+       exp=( ${opre}${^exp#${pre}} )
   fi
   [[ $#exp -eq 1 && "$exp[1]" = "$word" ]] && return 1
 fi
