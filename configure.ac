@@ -2341,7 +2341,7 @@ AC_SUBST_FILE(VERSION_MK)dnl
 
 AC_CONFIG_FILES(Config/defs.mk Makefile Doc/Makefile Etc/Makefile \
 Src/Makefile Test/Makefile)
-AC_CONFIG_COMMANDS([config.modules], [. config.modules.sh])
+AC_CONFIG_COMMANDS([config.modules], [. ./config.modules.sh])
 
 AC_OUTPUT
 

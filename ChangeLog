@@ -1,5 +1,8 @@
 2004-02-18  Oliver Kiddle  <opk@zsh.org>
 
+	* 19437: configure.ac: don't rely on path search to find
+	config.modules.sh
+
 	* 19436: Completion/Unix/Type/_groups, Completion/Unix/Type/_hosts,
 	Completion/Unix/Type/_printers: complete more things from nis
 
