@@ -1,3 +1,7 @@
+2001-03-30  Clint Adams  <schizo@debian.org>
+
+	* 13860: Completion/Debian/_deb_packages: caching layer support.
+
 2001-03-30  Peter Stephenson  <pws@csr.com>
 
 	* 13851: Src/signals.c, Src/exec.c: don't exec final command in
