@@ -2307,11 +2307,11 @@ completers are only used when completion is attempted a second time on
 the same string, e.g.:
 
 example(zstyle ':completion:*' completer '
-  if [[ $_last_try = "$HISTNO$BUFFER$CURSOR" ]]; then
+  if [[ $_last_try != "$HISTNO$BUFFER$CURSOR" ]]; then
+    _last_try="$HISTNO$BUFFER$CURSOR"
     reply=(_complete _match _prefix)
   else
-    _last_try="$HISTNO$BUFFER$CURSOR"
-    reply=( _ignored _correct _approximate)
+    reply=(_ignored _correct _approximate)
   fi')
 
 This uses the tt(HISTNO) parameter and the tt(BUFFER) and tt(CURSOR)
