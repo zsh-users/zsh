@@ -54,6 +54,12 @@
 2003-07-31  Oliver Kiddle  <opk@zsh.org>
 
 	* 18914: Completion/Base/Utility/_nothing,
+	Completion/Cygwin/Command/_cygpath,
+	Completion/Cygwin/Command/_cygrunsrv,
+	Completion/Cygwin/Command/_getclip,
+	Completion/Cygwin/Command/_getfacl,
+	Completion/Cygwin/Command/_mkshortcut,
+	Completion/Cygwin/Command/_pscp, Completion/Cygwin/Command/_putclip,
 	Completion/Debian/Command/_auto-apt, Completion/Debian/Command/_bug,
 	Completion/Debian/Command/_debchange,
 	Completion/Debian/Command/_debfoster,
@@ -119,6 +125,14 @@
 2003-07-17  Doug Kearns  <djkea2@mugca.its.monash.edu.au>
 
 	* 18863: Completion/Unix/Command/_aap: new completion for aap
+
+2003-07-16  Doug Kearns  <djkea2@mugca.its.monash.edu.au>
+
+	* unposted: Completion/Debian/Command/_bug,
+	Completion/Debian/Command/_debsign, Completion/Linux/Command/_pkgtool,
+	Completion/Unix/Command/_cvs, Completion/Unix/Command/_ecasound,
+	Completion/Unix/Command/_mysql_utils, Completion/Unix/Command/_screen:
+	remove initial capitalisation from option descriptions
 
 2003-07-09  Oliver Kiddle  <opk@zsh.org>
 
@@ -282,11 +296,21 @@
 	* 18462: Completion/Unix/Command/_sh: complete files in addition
 	to commands
 
+2003-04-22  Felix Rosencrantz <f_rosencrantz@yahoo.com>
+
+	* 18459: Completion/Unix/Command/_screen: fix up suggestions from
+	Oliver.
+
 2003-04-22  Oliver Kiddle  <opk@zsh.org>
 
 	* unposted: Completion/Unix/Command/_imagemagick: correct return codes
 	
 	* 18458: Completion/Unix/Command/_renice: new completion for renice
+
+2003-04-19  Felix Rosencrantz <f_rosencrantz@yahoo.com>
+
+	* 18455: Completion/Unix/Command/_screen,
+	Completion/Unix/Command/.distfiles: Completion function for screen.
 
 2003-04-18  Oliver Kiddle  <opk@zsh.org>
 
@@ -300,6 +324,24 @@
 2003-04-15  Oliver Kiddle  <opk@zsh.org>
 
 	* 18443: Completion/X/Command/_dcop: new completion for dcop
+
+2003-04-08  Felix Rosencrantz <f_rosencrantz@yahoo.com>
+
+	* 18440: Src/Zle/complete.mdd: Add the cygwin completion functions
+	to the completion module.
+
+2003-04-07  Felix Rosencrantz <f_rosencrantz@yahoo.com>
+
+	* 18439: Completion/Cygwin/.distfiles,
+	Completion/Cygwin/Command/_cygcheck,
+	Completion/Cygwin/Command/_cygpath,
+	Completion/Cygwin/Command/_cygrunsrv,
+	Completion/Cygwin/Command/_cygserver,
+	Completion/Cygwin/Command/_cygstart, Completion/Cygwin/Command/_dumper,
+	Completion/Cygwin/Command/_getclip, Completion/Cygwin/Command/_getfacl,
+	Completion/Cygwin/Command/_mkshortcut, Completion/Cygwin/Command/_mkzsh,
+	Completion/Cygwin/Command/_pscp, Completion/Cygwin/Command/_putclip:
+	cygwin completion functions.
 
 2003-03-28  Wayne Davison  <wayned@users.sourceforge.net>
 

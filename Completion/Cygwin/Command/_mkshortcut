@@ -1,0 +1,15 @@
+#compdef mkshortcut mkshortcut.exe
+
+_arguments  \
+  '(--arguments -a)'{-a,--arguments=-}'[use specified arguments]:arguments' \
+  '(--icon -i)'{-i,--icon=-}'[specify icon file for link to use]:icon file:_files' \
+  '(--iconoffset -j)'{-j,--iconoffset=-}'[specify offset of icon in icon file]:offset' \
+  '(--name -n)'{-n,--name=-}'[specify name for link]:file:_files' \
+  '(--allusers -A)'{-A,--allusers}"[use 'All Users' instead of current user for -D,-P]" \
+  '(--desktop -D)'{-D,--desktop}"[create link relative to 'Desktop' directory]" \
+  '(--smprograms -P)'{-P,--smprograms}"[create link relative to Start Menu 'Programs' directory]" \
+  '(- 1)'{-h,--help}'[show help information]' \
+  '(- 1)--usage[display brief usage message]' \
+  '(- 1)'{-v,--version}'[show version information]' \
+  '(- 1)--license[display licensing information]' \
+  '1:target:_files'

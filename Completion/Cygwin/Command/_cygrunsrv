@@ -1,0 +1,25 @@
+#compdef cygrunsrv cygrunsrv.exe
+
+_arguments  \
+  '(-I --install)'{-I,--install}'[install a new service]:service' \
+  '(-R --remove)'{-R,--remove}'[remove specified service]:service' \
+  '(-S --start)'{-S,--start}'[start specified service]:service' \
+  '(-E --stop)'{-E,--stop}'[stop specified service]:service' \
+  '(-p --path)'{-p,--path}'[specify application path which is run as a service]:application path' \
+  '(-a --args)'{-a,--args}'[specify options to give service on startup]:args' \
+  '(-c --chdir)'{-c,--chdir}'[specify working directory for the application]:directory:_directories' \
+  '(-e --env)'{-e,--env}'[specify environment strings exported to service]:var=value' \
+  '(-d --disp)'{-d,--disp}'[specify display name for service]:display name' \
+  '(-f --desc)'{-f,--desc}'[specify service description]:description' \
+  '(-t --type)'{-t,--type}'[specify service start type]:start type:(auto manual)' \
+  '(-u --user)'{-u,--user}'[specify user to start service under]:user:_users' \
+  '(-w --passwd)'{-w,--passwd}'[specify password for user]:password' \
+  '(-s --termsig)'{-s,--termsig}'[specify signal to use to stop service]:signal:_signals' \
+  '(-y --dep)'{-y,--dep}'[specify name of service that must be started]:service' \
+  '(-0 --stdin)'{-0,--stdin}'[specify file for stdin redirection]:file:_files' \
+  '(-1 --stdout)'{-1,--stdout}'[specify file for stdout redirection]:file:_files' \
+  '(-2 --stderr)'{-2,--stderr}'[specify file for stderr redirection]:file:_files' \
+  '(-o --shutdown)'{-o,--shutdown}'[stop service application during system shutdown]' \
+  '(- *)'{-h,--help}'[print help information]' \
+  '(- *)'{-v,--version}'[print version information]' \
+  '*: :_files'
