@@ -13,7 +13,7 @@ startmenu()
 menu(Utilities)
 menu(Prompt Themes)
 menu(ZLE Functions)
-menu(MIME functions)
+menu(MIME Functions)
 menu(Other Functions)
 endmenu()
 
