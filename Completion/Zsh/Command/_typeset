@@ -1,0 +1,70 @@
+#compdef declare export integer float local readonly typeset
+
+local expl state line func i use curcontext="$curcontext"
+local -A allargs
+local -a args
+
+allargs=( \
+  A '(-E -F -L -R -T -U -Z -a -f -i -m)-A[specify that arguments refer to associative arrays]' \
+  E '(-A -F -L -R -T -U -Z -a -f -i -m)-E[floating point, use engineering notation on output]' \
+  F '(-A -E -L -R -T -U -Z -a -f -i -m)-F[floating point, use fixed point decimal on output]' \
+  L '(-A -E -F -f -i)-L+[left justify and remove leading blanks from value]:width' \
+  R '(-A -E -F -f -i)-R+[right justify and fill with leading blanks]:width' \
+  T '(-A -E -F -a -f -g -h -i -l -m -t)-T[tie scalar to array]' \
+  U '(-A -E -F -i)-U[keep array values unique and suppress alias expansion for functions]' \
+  Uf '(-E -F -i)-U[suppress alias expansion for functions]' \
+  Up '(-E -F -i)-U[keep array values unique]' \
+  Z '(-A -E -F -f -i)-Z+[right justify and fill with leading zeros]:width' \
+  a '(-A -E -F -T -f -i)-a[specify that arguments refer to arrays]' \
+  f '(-A -E -F -L -R -T -Z -a -g -h -i -l -r -x)-f[specify that arguments refer to functions]' \
+  g '(-T -f)-+g[do not restrict parameter to local scope]' \
+  h '(-T -f)-+h[hide parameter]' \
+  i '(-A -E -F -T -f)-+i[represent internally as an integer]' \
+  l '(-T -f)-l[convert the value to lowercase]' \
+  m '(-A -E -F -T -i)-m[treat arguments as patterns]' \
+  r '(-f)-+r[mark parameters as readonly]' \
+  t '(-T)-+t[tag parameters and turn on execution tracing for functions]' \
+  tf '(-T)-+t[turn on execution tracing for functions]' \
+  tp '(-T)-+t[tag parameters]' \
+  u '-u[convert the value to uppercase or mark function for autoloading]' \
+  uf '-u[mark function for autoloadling]' \
+  up '-u[convert the value to uppercase]' \
+  x '(-f)-+x[export parameter]' )
+
+use="AEFLRTUZafghilmrtux"
+
+case ${service} in
+  float) use="EFghlrtux";;
+  functions)
+    use="Umtu"
+    func=f
+  ;;
+  integer) use="ghilrtux" ;;
+  readonly) use="${use/r/}" ;;
+  local) use="${use/f/}" ;&
+  export) use="${${use/g/}/x/}" ;;
+esac
+
+[[ -z "${words[(r)-*f*]}" ]] || func=f
+[[ -z "${words[(r)-*[aA]*]}" ]] || func=p
+   
+for ((i=1;i<=$#use;++i)); do
+  args=( "${args[@]}" \
+      ${allargs[${use[$i]}${${(s::)use[$i]}[(r)[Uut]]:+$func}]} )
+done
+
+_arguments -C -s -A "-*" -S "${args[@]}" '*:vars:->vars_eq'
+
+if [[ "$state" = vars_eq ]]; then
+  if [[ $func = f ]]; then
+    _functions
+  elif [[ "$PREFIX" = *\=* ]]; then
+    compstate[parameter]="${PREFIX%%\=*}"
+    compset -P 1 '*='
+    _value
+  elif (( $+opt_args[-a] || $+opt_args[-A] )); then
+    _parameters -q
+  else
+    _parameters -q -S '='
+  fi
+fi
