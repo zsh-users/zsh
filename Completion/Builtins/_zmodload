@@ -44,3 +44,5 @@ while _tags; do
   _requested aliases expl 'module alias' \
     compadd "$suf[@]" -k 'modules[(R)alias*]' && ret=0
 done
+
+return ret

@@ -1,3 +1,7 @@
+2000-08-21  Sven Wischnowsky  <wischnow@zsh.org>
+
+	* 12682: Completion/Builtins/_zmodload: use return value
+	
 2000-08-18  Oliver Kiddle  <opk@zsh.org>
 
 	* 12677: Completion/Builtins/_zmodload: use _arguments in _zmodload
