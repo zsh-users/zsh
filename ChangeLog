@@ -1,3 +1,9 @@
+2003-03-24  Peter Stephenson  <pws@csr.com>
+
+	* 18376: zshconfig.ac, Src/system.h, Src/utils.c: use of
+	wide characters needs some more header munging; also silence
+	a couple of related gcc warnings.
+
 2003-03-20  Doug Kearns  <djkea2@mugca.its.monash.edu.au>
 
 	* 18369: Completion/Unix/Command/_tidy: update HTML Tidy completion

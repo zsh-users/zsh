@@ -3395,8 +3395,8 @@ getkeystring(char *s, int *len, int fromwhere, int *misc)
 		for (i=(*s == 'u' ? 4 : 8); i>0; i--) {
 		    if (*++s && idigit(*s))
 		        wval = wval * 16 + (*s - '0');
-		    else if (*s && (*s >= 'a' && *s <= 'f') ||
-		            (*s >= 'A' && *s <= 'F'))
+		    else if (*s && ((*s >= 'a' && *s <= 'f') ||
+				    (*s >= 'A' && *s <= 'F')))
 		        wval = wval * 16 + (*s & 0x1f) + 9;
 		    else {
 		    	s--;
@@ -3430,7 +3430,7 @@ getkeystring(char *s, int *len, int fromwhere, int *misc)
 		    *len = t - buf;
 		    return buf;
 		}
-                iconv(cd, &inptr, &inbytes, &outptr, &outbytes);
+                iconv(cd, (const char **)&inptr, &inbytes, &outptr, &outbytes);
 		iconv_close(cd);
 		count = wctomb(t, *outbuf);
 #endif

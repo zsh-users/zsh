@@ -89,6 +89,16 @@ char *alloca _((size_t));
 # include <unistd.h>
 #endif
 
+#ifdef HAVE_STDDEF_H
+/*
+ * Seen on Solaris 8 with gcc: stddef defines offsetof, which clashes
+ * with system.h's definition of the symbol unless we include this
+ * first.  Otherwise, this will be hooked in by wchar.h, too late
+ * for comfort.
+ */
+#include <stddef.h>
+#endif
+
 #include <stdio.h>
 #include <ctype.h>
 #include <sys/stat.h>
