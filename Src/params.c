@@ -2910,8 +2910,8 @@ histsizegetfn(Param pm)
 void
 histsizesetfn(Param pm, zlong v)
 {
-    if ((histsiz = v) <= 2)
-	histsiz = 2;
+    if ((histsiz = v) < 1)
+	histsiz = 1;
     resizehistents();
 }
 
