@@ -30,7 +30,7 @@ else
   if zmodload -e parameter; then
     cmd2="$commands[$command]"
   else
-    cmd2=$(whence -p $command)
+    cmd2=$(whence -p - $command)
   fi
 fi
 
