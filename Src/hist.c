@@ -1779,6 +1779,8 @@ void
 resizehistents(void)
 {
     if (histlinect > histsiz) {
+	/* The reason we don't just call freehistnode(hist_ring->down) is
+	 * so that we can honor the HISTEXPIREDUPSFIRST setting. */
 	putoldhistentryontop(0);
 	freehistnode((HashNode)hist_ring);
 	while (histlinect > histsiz) {
