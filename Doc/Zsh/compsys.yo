@@ -939,12 +939,18 @@ which can be given as arguments to the tt(compadd) and tt(compgen)
 builtins and which make sure that the var(message) given in the
 description will be shown above the matches.
 
-Finally, this function can be made to automatically call the
+Normally the option names are taken as multi-character names and a
+word from the line is considered to contain only one option (or
+none). By giving the tt(-s) option to this function (as the first
+argument), options are considered to be one-character options and the
+string from the line may contain more than one such option letter.
+
+This function can also be made to automatically call the
 tt(_long_options) function where appropriate by giving it the string
 `tt(--)' as an argument. All arguments after this will be given
 unchanged to the tt(_long_options) function.
 
-This function also uses one configuration key: tt(option_prefix). If
+Finally, this function uses one configuration key: tt(option_prefix). If
 this is set to a string containing `tt(short)' or `tt(all)' as a
 substring, option names beginning with a single minus sign are added
 as possible matches only if the word on the line begins with a minus
