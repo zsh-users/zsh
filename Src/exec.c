@@ -133,28 +133,33 @@ mod_export Funcstack funcstack;
 
 static LinkList args;
 static int doneps4;
+static char *STTYval;
 
 /* Execution functions. */
 
-static int (*execfuncs[]) _((Estate, int)) = {
+static int (*execfuncs[WC_COUNT-WC_CURSH]) _((Estate, int)) = {
     execcursh, exectime, execfuncdef, execfor, execselect,
     execwhile, execrepeat, execcase, execif, execcond,
-    execarith, execautofn
+    execarith, execautofn, exectry
 };
+
+/* structure for command builtin for when it is used with -v or -V */
+static struct builtin commandbn =
+    BUILTIN(0, 0, bin_whence, 0, -1, BIN_COMMAND, "vV", NULL);
 
 /* parse string into a list */
 
 /**/
 mod_export Eprog
-parse_string(char *s, int ln)
+parse_string(char *s)
 {
     Eprog p;
     int oldlineno = lineno;
 
     lexsave();
-    inpush(s, (ln ? INP_LINENO : 0), NULL);
+    inpush(s, INP_LINENO, NULL);
     strinbeg(0);
-    lineno = ln ? 1 : -1;
+    lineno = 1;
     p = parse_list();
     lineno = oldlineno;
     strinend();
@@ -207,14 +212,20 @@ setlimits(char *nam)
 
 /**/
 static pid_t
-zfork(void)
+zfork(struct timeval *tv)
 {
     pid_t pid;
+    struct timezone dummy_tz;
 
-    if (thisjob >= MAXJOB - 1) {
+    /*
+     * Is anybody willing to explain this test?
+     */
+    if (thisjob != -1 && thisjob >= jobtabsize - 1 && !expandjobtab()) {
 	zerr("job table full", NULL, 0);
 	return -1;
     }
+    if (tv)
+	gettimeofday(tv, &dummy_tz);
     pid = fork();
     if (pid == -1) {
 	zerr("fork failed: %e", NULL, errno);
@@ -242,7 +253,7 @@ zfork(void)
  * In zsh this traditionally executes the loop in the current shell, which
  * is nice to have if the loop does something to change the shell, like
  * setting parameters or calling builtins.
- * Putting the loop in a sub-shell makes live easy, because the shell only
+ * Putting the loop in a sub-shell makes life easy, because the shell only
  * has to put it into the job-structure and then treats it as a normal
  * process. Suspending and interrupting is no problem then.
  * Some years ago, zsh either couldn't suspend such things at all, or
@@ -256,7 +267,7 @@ zfork(void)
  *  execlist->execpline->execcmd->execwhile->execlist->execpline
  *
  * (when waiting for the grep, ignoring execpline2 for now). At this time,
- * zsh has build two job-table entries for it: one for the cat and one for
+ * zsh has built two job-table entries for it: one for the cat and one for
  * the grep. If the user hits ^Z at this point (and jobbing is used), the 
  * shell is notified that the grep was suspended. The list_pipe flag is
  * used to tell the execpline where it was waiting that it was in a pipeline
@@ -305,6 +316,7 @@ zfork(void)
 int list_pipe = 0, simple_pline = 0;
 
 static pid_t list_pipe_pid;
+static struct timeval list_pipe_start;
 static int nowait, pline_level = 0;
 static int list_pipe_child = 0, list_pipe_job;
 static char list_pipe_text[JOBTEXTSIZE];
@@ -317,7 +329,10 @@ execcursh(Estate state, int do_exec)
 {
     Wordcode end = state->pc + WC_CURSH_SKIP(state->pc[-1]);
 
-    if (!list_pipe && thisjob != list_pipe_job)
+    /* Skip word only used for try/always */
+    state->pc++;
+
+    if (!list_pipe && thisjob != list_pipe_job && !hasprocs(thisjob))
 	deletejob(jobtab + thisjob);
     cmdpush(CS_CURSH);
     execlist(state, 1, do_exec);
@@ -344,18 +359,14 @@ zexecve(char *pth, char **argv)
     for (eep = argv; *eep; eep++)
 	if (*eep != pth)
 	    unmetafy(*eep, NULL);
-    for (eep = environ; *eep; eep++)
-	if (**eep == '_' && (*eep)[1] == '=')
-	    break;
     buf[0] = '_';
     buf[1] = '=';
     if (*pth == '/')
 	strcpy(buf + 2, pth);
     else
 	sprintf(buf + 2, "%s/%s", pwd, pth);
-    if (!*eep)
-	eep[1] = NULL;
-    *eep = buf;
+    zputenv(buf);
+    closedumps();
     execve(pth, argv, environ);
 
     /* If the execve returns (which in general shouldn't happen),   *
@@ -440,17 +451,16 @@ isgooderr(int e, char *dir)
 
 /**/
 void
-execute(Cmdnam not_used_yet, int dash)
+execute(UNUSED(Cmdnam cmdname), int dash, int defpath)
 {
     Cmdnam cn;
-    static LinkList exargs;
     char buf[MAXCMDLEN], buf2[MAXCMDLEN];
     char *s, *z, *arg0;
     char **argv, **pp;
     int eno = 0, ee;
 
     arg0 = (char *) peekfirst(args);
-    if (isset(RESTRICTED) && strchr(arg0, '/')) {
+    if (isset(RESTRICTED) && (strchr(arg0, '/') || defpath)) {
 	zerr("%s: restricted", arg0, 0);
 	_exit(1);
     }
@@ -458,25 +468,26 @@ execute(Cmdnam not_used_yet, int dash)
     /* If the parameter STTY is set in the command's environment, *
      * we first run the stty command with the value of this       *
      * parameter as it arguments.                                 */
-    if (!exargs && (s = zgetenv("STTY")) && isatty(0)) {
-	char *t;
+    if ((s = STTYval) && isatty(0) && (GETPGRP() == getpid())) {
+	LinkList exargs = args;
+	char *t = tricat("stty", " ", s);
 
-	exargs = args;	/* this prevents infinite recursion */
+	STTYval = 0;	/* this prevents infinite recursion */
+	zsfree(s);
 	args = NULL;
-	t = tricat("stty", " ", s);
 	execstring(t, 1, 0);
 	zsfree(t);
 	args = exargs;
-	exargs = NULL;
+    } else if (s) {
+	STTYval = 0;
+	zsfree(s);
     }
-
-    cn = (Cmdnam) cmdnamtab->getnode(cmdnamtab, arg0);
 
     /* If ARGV0 is in the commands environment, we use *
      * that as argv[0] for this external command       */
     if (unset(RESTRICTED) && (z = zgetenv("ARGV0"))) {
 	setdata(firstnode(args), (void *) ztrdup(z));
-	delenv(z - 6);
+	delenvvalue(z - 6);
     } else if (dash) {
     /* Else if the pre-command `-' was given, we add `-' *
      * to the front of argv[0] for this command.         */
@@ -498,61 +509,99 @@ execute(Cmdnam not_used_yet, int dash)
 		(arg0[0] == '.' && (arg0 + 1 == s ||
 				    (arg0[1] == '.' && arg0 + 2 == s)))) {
 		zerr("%e: %s", arg0, errno);
-		_exit(1);
+		_exit((errno == EACCES || errno == ENOEXEC) ? 126 : 127);
 	    }
 	    break;
 	}
 
-    if (cn) {
-	char nn[PATH_MAX], *dptr;
+    /* for command -p, search the default path */ 
+    if (defpath) {
+	char *s, pbuf[PATH_MAX];
+	char *dptr, *pe, *ps = DEFAULT_PATH;
 
-	if (cn->flags & HASHED)
-	    strcpy(nn, cn->u.cmd);
-	else {
-	    for (pp = path; pp < cn->u.name; pp++)
-		if (!**pp || (**pp == '.' && (*pp)[1] == '\0')) {
-		    ee = zexecve(arg0, argv);
-		    if (isgooderr(ee, *pp))
-			eno = ee;
-		} else if (**pp != '/') {
-		    z = buf;
-		    strucpy(&z, *pp);
-		    *z++ = '/';
-		    strcpy(z, arg0);
-		    ee = zexecve(buf, argv);
-		    if (isgooderr(ee, *pp))
-			eno = ee;
-		}
-	    strcpy(nn, cn->u.name ? *(cn->u.name) : "");
-	    strcat(nn, "/");
-	    strcat(nn, cn->nam);
+	for(;ps;ps = pe ? pe+1 : NULL) {
+	    pe = strchr(ps, ':');
+	    if (*ps == '/') {
+		s = pbuf;
+		if (pe)
+		    struncpy(&s, ps, pe-ps);
+		else
+		    strucpy(&s, ps);
+		*s++ = '/';
+		if ((s - pbuf) + strlen(arg0) >= PATH_MAX)
+		    continue;
+		strucpy(&s, arg0);
+		if (iscom(pbuf))
+		    break;
+	    }
 	}
-	ee = zexecve(nn, argv);
 
-	if ((dptr = strrchr(nn, '/')))
+	if (!ps) {
+	    zerr("command not found: %s", arg0, 0);
+	    _exit(127);
+	}
+
+	ee = zexecve(pbuf, argv);
+
+	if ((dptr = strrchr(pbuf, '/')))
 	    *dptr = '\0';
-	if (isgooderr(ee, *nn ? nn : "/"))
+	if (isgooderr(ee, *pbuf ? pbuf : "/"))
 	    eno = ee;
-    }
-    for (pp = path; *pp; pp++)
-	if (!(*pp)[0] || ((*pp)[0] == '.' && !(*pp)[1])) {
-	    ee = zexecve(arg0, argv);
-	    if (isgooderr(ee, *pp))
-		eno = ee;
-	} else {
-	    z = buf;
-	    strucpy(&z, *pp);
-	    *z++ = '/';
-	    strcpy(z, arg0);
-	    ee = zexecve(buf, argv);
-	    if (isgooderr(ee, *pp))
+
+    } else {
+   
+	if ((cn = (Cmdnam) cmdnamtab->getnode(cmdnamtab, arg0))) {
+	    char nn[PATH_MAX], *dptr;
+
+	    if (cn->flags & HASHED)
+		strcpy(nn, cn->u.cmd);
+	    else {
+		for (pp = path; pp < cn->u.name; pp++)
+		    if (!**pp || (**pp == '.' && (*pp)[1] == '\0')) {
+			ee = zexecve(arg0, argv);
+			if (isgooderr(ee, *pp))
+			    eno = ee;
+		    } else if (**pp != '/') {
+			z = buf;
+			strucpy(&z, *pp);
+			*z++ = '/';
+			strcpy(z, arg0);
+			ee = zexecve(buf, argv);
+			if (isgooderr(ee, *pp))
+			    eno = ee;
+		    }
+		strcpy(nn, cn->u.name ? *(cn->u.name) : "");
+		strcat(nn, "/");
+		strcat(nn, cn->nam);
+	    }
+	    ee = zexecve(nn, argv);
+
+	    if ((dptr = strrchr(nn, '/')))
+		*dptr = '\0';
+	    if (isgooderr(ee, *nn ? nn : "/"))
 		eno = ee;
 	}
+	for (pp = path; *pp; pp++)
+	    if (!(*pp)[0] || ((*pp)[0] == '.' && !(*pp)[1])) {
+		ee = zexecve(arg0, argv);
+		if (isgooderr(ee, *pp))
+		    eno = ee;
+	    } else {
+		z = buf;
+		strucpy(&z, *pp);
+		*z++ = '/';
+		strcpy(z, arg0);
+		ee = zexecve(buf, argv);
+		if (isgooderr(ee, *pp))
+		    eno = ee;
+	    }
+    }
+
     if (eno)
 	zerr("%e: %s", arg0, eno);
     else
 	zerr("command not found: %s", arg0, 0);
-    _exit(1);
+    _exit((eno == EACCES || eno == ENOEXEC) ? 126 : 127);
 }
 
 #define RET_IF_COM(X) { if (iscom(X)) return docopy ? dupstring(X) : arg0; }
@@ -684,7 +733,7 @@ hashcmd(char *arg0, char **pp)
     if (!*pp)
 	return NULL;
 
-    cn = (Cmdnam) zcalloc(sizeof *cn);
+    cn = (Cmdnam) zshcalloc(sizeof *cn);
     cn->flags = 0;
     cn->u.name = pp;
     cmdnamtab->addnode(cmdnamtab, ztrdup(arg0), cn);
@@ -707,13 +756,13 @@ execstring(char *s, int dont_change_job, int exiting)
     Eprog prog;
 
     pushheap();
-    if ((prog = parse_string(s, 0)))
+    if ((prog = parse_string(s)))
 	execode(prog, dont_change_job, exiting);
     popheap();
 }
 
 /**/
-void
+mod_export void
 execode(Eprog p, int dont_change_job, int exiting)
 {
     struct estate s;
@@ -721,8 +770,11 @@ execode(Eprog p, int dont_change_job, int exiting)
     s.prog = p;
     s.pc = p->prog;
     s.strs = p->strs;
+    useeprog(p);		/* Mark as in use */
 
     execlist(&s, dont_change_job, exiting);
+
+    freeeprog(p);		/* Free if now unused */
 }
 
 /* Execute a simplified command. This is used to execute things that
@@ -734,11 +786,13 @@ static int
 execsimple(Estate state)
 {
     wordcode code = *state->pc++;
+    int lv;
 
     if (errflag)
 	return (lastval = 1);
 
-    if (code)
+    /* In evaluated traps, don't modify the line number. */
+    if ((!intrap || trapisfunc) && !ineval && code)
 	lineno = code - 1;
 
     code = wc_code(*state->pc++);
@@ -750,9 +804,11 @@ execsimple(Estate state)
 	    fputc('\n', xtrerr);
 	    fflush(xtrerr);
 	}
-	return (lastval = (errflag ? errflag : cmdoutval));
+	lv = (errflag ? errflag : cmdoutval);
     } else
-	return (lastval = (execfuncs[code - WC_CURSH])(state, 0));
+	lv = (execfuncs[code - WC_CURSH])(state, 0);
+
+    return lastval = lv;
 }
 
 /* Main routine for executing a list.                                *
@@ -841,6 +897,14 @@ execlist(Estate state, int dont_change_job, int exiting)
 			 * for this sublist.                                   */
 			donetrap = 1;
 			goto sublist_done;
+		    } else if (WC_SUBLIST_TYPE(code) == WC_SUBLIST_END) {
+			donetrap = 1;
+			/*
+			 * Treat this in the same way as if we reached
+			 * the end of the sublist normally.
+			 */
+			state->pc = next;
+			goto sublist_done;
 		    }
 		}
 		cmdpush(CS_CMDAND);
@@ -866,6 +930,14 @@ execlist(Estate state, int dont_change_job, int exiting)
 			 * for this sublist.                                   */
 			donetrap = 1;
 			goto sublist_done;
+		    } else if (WC_SUBLIST_TYPE(code) == WC_SUBLIST_END) {
+			donetrap = 1;
+			/*
+			 * Treat this in the same way as if we reached
+			 * the end of the sublist normally.
+			 */
+			state->pc = next;
+			goto sublist_done;
 		    }
 		}
 		cmdpush(CS_CMDOR);
@@ -877,11 +949,18 @@ execlist(Estate state, int dont_change_job, int exiting)
 	state->pc--;
 sublist_done:
 
-	cmdsp = csp;
 	noerrexit = oldnoerrexit;
 
-	if (sigtrapped[SIGDEBUG])
+	if (sigtrapped[SIGDEBUG]) {
+	    exiting = donetrap;
+	    ret = lastval;
 	    dotrap(SIGDEBUG);
+	    lastval = ret;
+	    donetrap = exiting;
+	    noerrexit = oldnoerrexit;
+	}
+
+	cmdsp = csp;
 
 	/* Check whether we are suppressing traps/errexit *
 	 * (typically in init scripts) and if we haven't  *
@@ -891,13 +970,23 @@ sublist_done:
 		dotrap(SIGZERR);
 		donetrap = 1;
 	    }
-	    if (lastval && isset(ERREXIT)) {
-		if (sigtrapped[SIGEXIT])
-		    dotrap(SIGEXIT);
-		if (mypid != getpid())
-		    _exit(lastval);
-		else
-		    exit(lastval);
+	    if (lastval) {
+		int errreturn = isset(ERRRETURN) && 
+		    (isset(INTERACTIVE) || locallevel || sourcelevel);
+		int errexit = isset(ERREXIT) || 
+		    (isset(ERRRETURN) && !errreturn);
+		if (errexit) {
+		    if (sigtrapped[SIGEXIT])
+			dotrap(SIGEXIT);
+		    if (mypid != getpid())
+			_exit(lastval);
+		    else
+			exit(lastval);
+		}
+		if (errreturn) {
+		    retflag = 1;
+		    breaks = loops;
+		}
 	    }
 	}
 	if (ltype & Z_END)
@@ -934,15 +1023,23 @@ execpline(Estate state, wordcode slcode, int how, int last1)
 
     if (wc_code(code) != WC_PIPE)
 	return lastval = (slflags & WC_SUBLIST_NOT) != 0;
+    else if (slflags & WC_SUBLIST_NOT)
+	last1 = 0;
 
     pj = thisjob;
     ipipe[0] = ipipe[1] = opipe[0] = opipe[1] = 0;
     child_block();
 
-    /* get free entry in job table and initialize it */
-    if ((thisjob = newjob = initjob()) == -1)
+    /*
+     * Get free entry in job table and initialize it.
+     * This is currently the only call to initjob(), so this
+     * is also the only place where we can expand the job table
+     * under us.
+     */
+    if ((thisjob = newjob = initjob()) == -1) {
+	child_unblock();
 	return 1;
-
+    }
     if (how & Z_TIMED)
 	jobtab[thisjob].stat |= STAT_TIMED;
 
@@ -963,16 +1060,19 @@ execpline(Estate state, wordcode slcode, int how, int last1)
      * stopped, the top-level execpline() didn't get the pid for the
      * sub-shell because it was overwritten. */
     if (!pline_level++) {
-	list_pipe_job = newjob;
         list_pipe_pid = 0;
 	nowait = 0;
 	simple_pline = (WC_PIPE_TYPE(code) == WC_PIPE_END);
+	list_pipe_job = newjob;
     }
     lastwj = lpforked = 0;
     execpline2(state, code, how, opipe[0], ipipe[1], last1);
     pline_level--;
     if (how & Z_ASYNC) {
 	lastwj = newjob;
+
+        if (thisjob == list_pipe_job)
+            list_pipe_job = 0;
 	jobtab[thisjob].stat |= STAT_NOSTTY;
 	if (slflags & WC_SUBLIST_COPROC) {
 	    zclose(ipipe[1]);
@@ -1005,7 +1105,8 @@ execpline(Estate state, wordcode slcode, int how, int last1)
 
 		    curjob = newjob;
 		    DPUTS(!list_pipe_pid, "invalid list_pipe_pid");
-		    addproc(list_pipe_pid, list_pipe_text);
+		    addproc(list_pipe_pid, list_pipe_text, 0,
+			    &list_pipe_start);
 
 		    /* If the super-job contains only the sub-shell, the
 		       sub-shell is the group leader. */
@@ -1039,13 +1140,13 @@ execpline(Estate state, wordcode slcode, int how, int last1)
 		    makerunning(jn);
 		}
 		if (!(jn->stat & STAT_LOCKED)) {
-		    updated = !!jobtab[thisjob].procs;
+		    updated = hasprocs(thisjob);
 		    waitjobs();
 		    child_block();
 		} else
 		    updated = 0;
 		if (!updated &&
-		    list_pipe_job && jobtab[list_pipe_job].procs &&
+		    list_pipe_job && hasprocs(list_pipe_job) &&
 		    !(jobtab[list_pipe_job].stat & STAT_STOPPED)) {
 		    child_unblock();
 		    child_block();
@@ -1061,14 +1162,14 @@ execpline(Estate state, wordcode slcode, int how, int last1)
 		      (jobtab[list_pipe_job].stat & STAT_STOPPED)))) {
 		    pid_t pid;
 		    int synch[2];
+		    struct timeval bgtime;
 
 		    pipe(synch);
 
-		    if ((pid = fork()) == -1) {
+		    if ((pid = zfork(&bgtime)) == -1) {
 			trashzle();
 			close(synch[0]);
 			close(synch[1]);
-			putc('\n', stderr);
 			fprintf(stderr, "zsh: job can't be suspended\n");
 			fflush(stderr);
 			makerunning(jn);
@@ -1081,6 +1182,7 @@ execpline(Estate state, wordcode slcode, int how, int last1)
 			lpforked = 
 			    (killpg(jobtab[list_pipe_job].gleader, 0) == -1 ? 2 : 1);
 			list_pipe_pid = pid;
+			list_pipe_start = bgtime;
 			nowait = errflag = 1;
 			breaks = loops;
 			close(synch[1]);
@@ -1094,13 +1196,13 @@ execpline(Estate state, wordcode slcode, int how, int last1)
 			    jn->stat |= STAT_SUBJOB | STAT_NOPRINT;
 			    jn->other = pid;
 			}
-			if ((list_pipe || last1) && jobtab[list_pipe_job].procs)
+			if ((list_pipe || last1) && hasprocs(list_pipe_job))
 			    killpg(jobtab[list_pipe_job].gleader, SIGSTOP);
 			break;
 		    }
 		    else {
 			close(synch[0]);
-			entersubsh(Z_ASYNC, 0, 0);
+			entersubsh(Z_ASYNC, 0, 0, 0);
 			if (jobtab[list_pipe_job].procs) {
 			    if (setpgrp(0L, mypgrp = jobtab[list_pipe_job].gleader)
 				== -1) {
@@ -1131,7 +1233,8 @@ execpline(Estate state, wordcode slcode, int how, int last1)
 		(!(jn->stat & STAT_INUSE) || (jn->stat & STAT_DONE))) {
 		deletejob(jn);
 		jn = jobtab + pj;
-		killjb(jn, lastval & ~0200);
+		if (jn->gleader)
+		    killjb(jn, lastval & ~0200);
 	    }
 	    if (list_pipe_child ||
 		((jn->stat & STAT_DONE) &&
@@ -1163,7 +1266,8 @@ execpline2(Estate state, wordcode pcode,
     if (breaks || retflag)
 	return;
 
-    if (WC_PIPE_LINENO(pcode))
+    /* In evaluated traps, don't modify the line number. */
+    if ((!intrap || trapisfunc) && !ineval && WC_PIPE_LINENO(pcode))
 	lineno = WC_PIPE_LINENO(pcode) - 1;
 
     if (pline_level == 1) {
@@ -1179,11 +1283,11 @@ execpline2(Estate state, wordcode pcode,
 	execcmd(state, input, output, how, last1 ? 1 : 2);
     else {
 	int old_list_pipe = list_pipe;
-	Wordcode next = state->pc + (*state->pc);
+	Wordcode next = state->pc + (*state->pc), pc;
 	wordcode code;
 
 	state->pc++;
-	code = *state->pc;
+	for (pc = state->pc; wc_code(code = *pc) == WC_REDIR; pc += 3);
 
 	mpipe(pipes);
 
@@ -1192,24 +1296,24 @@ execpline2(Estate state, wordcode pcode,
 	 * rest of the pipeline in the current shell.         */
 	if (wc_code(code) >= WC_CURSH && (how & Z_SYNC)) {
 	    int synch[2];
+	    struct timeval bgtime;
 
 	    pipe(synch);
-	    if ((pid = fork()) == -1) {
+	    if ((pid = zfork(&bgtime)) == -1) {
 		close(synch[0]);
 		close(synch[1]);
-		zerr("fork failed: %e", NULL, errno);
 	    } else if (pid) {
 		char dummy, *text;
 
 		text = getjobtext(state->prog, state->pc);
-		addproc(pid, text);
+		addproc(pid, text, 0, &bgtime);
 		close(synch[1]);
 		read(synch[0], &dummy, 1);
 		close(synch[0]);
 	    } else {
 		zclose(pipes[0]);
 		close(synch[0]);
-		entersubsh(how, 2, 0);
+		entersubsh(how, 2, 0, 0);
 		close(synch[1]);
 		execcmd(state, input, pipes[1], how, 0);
 		_exit(lastval);
@@ -1253,7 +1357,7 @@ makecline(LinkList list)
 
 	for (node = firstnode(list); node; incnode(node)) {
 	    *ptr++ = (char *)getdata(node);
-	    zputs(getdata(node), xtrerr);
+	    quotedzputs(getdata(node), xtrerr);
 	    if (nextnode(node))
 		fputc(' ', xtrerr);
 	}
@@ -1339,30 +1443,52 @@ closemn(struct multio **mfds, int fd)
 	struct multio *mn = mfds[fd];
 	char buf[TCBUFSIZE];
 	int len, i;
+	pid_t pid;
+	struct timeval bgtime;
 
-	if (zfork()) {
+	if ((pid = zfork(&bgtime))) {
 	    for (i = 0; i < mn->ct; i++)
 		zclose(mn->fds[i]);
 	    zclose(mn->pipe);
+	    if (pid == -1) { 
+		mfds[fd] = NULL;
+		return;
+	    }
 	    mn->ct = 1;
 	    mn->fds[0] = fd;
+	    addproc(pid, NULL, 1, &bgtime);
 	    return;
 	}
 	/* pid == 0 */
 	closeallelse(mn);
 	if (mn->rflag) {
 	    /* tee process */
-	    while ((len = read(mn->pipe, buf, TCBUFSIZE)) > 0)
+	    while ((len = read(mn->pipe, buf, TCBUFSIZE)) != 0) {
+		if (len < 0) {
+		    if (errno == EINTR)
+			continue;
+		    else
+			break;
+		}
 		for (i = 0; i < mn->ct; i++)
 		    write(mn->fds[i], buf, len);
+	    }
 	} else {
 	    /* cat process */
 	    for (i = 0; i < mn->ct; i++)
-		while ((len = read(mn->fds[i], buf, TCBUFSIZE)) > 0)
+		while ((len = read(mn->fds[i], buf, TCBUFSIZE)) != 0) {
+		    if (len < 0) {
+			if (errno == EINTR)
+			    continue;
+			else
+			    break;
+		    }
 		    write(mn->pipe, buf, len);
+		}
 	}
 	_exit(0);
-    }
+    } else if (fd >= 0)
+	mfds[fd] = NULL;
 }
 
 /* close all the mnodes (failure) */
@@ -1386,8 +1512,11 @@ static void
 closeallelse(struct multio *mn)
 {
     int i, j;
+    long openmax;
 
-    for (i = 0; i < OPEN_MAX; i++)
+    openmax = zopenmax();
+
+    for (i = 0; i < openmax; i++)
 	if (mn->pipe != i) {
 	    for (j = 0; j < mn->ct; j++)
 		if (mn->fds[j] == i)
@@ -1473,7 +1602,8 @@ addvars(Estate state, Wordcode pc, int export)
 	if (htok)
 	    untokenize(name);
 	if (xtr)
-	    fprintf(xtrerr, "%s=", name);
+	    fprintf(xtrerr,
+	    	WC_ASSIGN_TYPE2(ac) == WC_ASSIGN_INC ? "%s+=" : "%s=", name);
 	if ((isstr = (WC_ASSIGN_TYPE(ac) == WC_ASSIGN_SCALAR))) {
 	    init_list1(svl, ecgetstr(state, EC_DUPTOK, &htok));
 	    vl = &svl;
@@ -1505,8 +1635,10 @@ addvars(Estate state, Wordcode pc, int export)
 		untokenize(peekfirst(vl));
 		val = ztrdup(ugetnode(vl));
 	    }
-	    if (xtr)
-		fprintf(xtrerr, "%s ", val);
+	    if (xtr) {
+		quotedzputs(val, xtrerr);
+		fputc(' ', xtrerr);
+	    }
 	    if (export && !strchr(name, '[')) {
 		if (export < 0 && isset(RESTRICTED) &&
 		    (pm = (Param) paramtab->removenode(paramtab, name)) &&
@@ -1516,12 +1648,18 @@ addvars(Estate state, Wordcode pc, int export)
 		    state->pc = opc;
 		    return;
 		}
+		if (strcmp(name, "STTY") == 0) {
+		    zsfree(STTYval);
+		    STTYval = ztrdup(val);
+		}
 		allexp = opts[ALLEXPORT];
 		opts[ALLEXPORT] = 1;
-		pm = setsparam(name, val);
+	    	pm = assignsparam(name, val,
+		    WC_ASSIGN_TYPE2(ac) == WC_ASSIGN_INC);
 		opts[ALLEXPORT] = allexp;
 	    } else
-		pm = setsparam(name, val);
+	    	pm = assignsparam(name, val,
+		    WC_ASSIGN_TYPE2(ac) == WC_ASSIGN_INC);
 	    if (errflag) {
 		state->pc = opc;
 		return;
@@ -1540,11 +1678,13 @@ addvars(Estate state, Wordcode pc, int export)
 	*ptr = NULL;
 	if (xtr) {
 	    fprintf(xtrerr, "( ");
-	    for (ptr = arr; *ptr; ptr++)
-		fprintf(xtrerr, "%s ", *ptr);
+	    for (ptr = arr; *ptr; ptr++) {
+		quotedzputs(*ptr, xtrerr);
+		fputc(' ', xtrerr);
+	    }
 	    fprintf(xtrerr, ") ");
 	}
-	setaparam(name, arr);
+	assignaparam(name, arr, WC_ASSIGN_TYPE2(ac) == WC_ASSIGN_INC);
 	if (errflag) {
 	    state->pc = opc;
 	    return;
@@ -1576,7 +1716,7 @@ setunderscore(char *str)
     }
 }
 
-/* These describe the type of espansions that need to be done on the words
+/* These describe the type of expansions that need to be done on the words
  * used in the thing we are about to execute. They are set in execcmd() and
  * used in execsubst() which might be called from one of the functions
  * called from execcmd() (like execfor() and so on). */
@@ -1609,9 +1749,9 @@ execcmd(Estate state, int input, int output, int how, int last1)
     int save[10];
     int fil, dfil, is_cursh, type, do_exec = 0, i, htok = 0;
     int nullexec = 0, assign = 0, forked = 0;
-    int is_shfunc = 0, is_builtin = 0, is_exec = 0;
+    int is_shfunc = 0, is_builtin = 0, is_exec = 0, use_defpath = 0;
     /* Various flags to the command. */
-    int cflags = 0, checked = 0;
+    int cflags = 0, checked = 0, oautocont = opts[AUTOCONTINUE];
     LinkList redir;
     wordcode code;
     Wordcode beg = state->pc, varspc;
@@ -1646,6 +1786,8 @@ execcmd(Estate state, int input, int output, int how, int last1)
      * reference to a job in the job table.                */
     if (type == WC_SIMPLE && args && nonempty(args) &&
 	*(char *)peekfirst(args) == '%') {
+        if (how & Z_DISOWN)
+            opts[AUTOCONTINUE] = 1;
 	pushnode(args, dupstring((how & Z_DISOWN)
 				 ? "disown" : (how & Z_ASYNC) ? "bg" : "fg"));
 	how = Z_SYNC;
@@ -1692,14 +1834,35 @@ execcmd(Estate state, int input, int output, int how, int last1)
 		    load_module(((Builtin) hn)->optstr);
 		    hn = builtintab->getnode(builtintab, cmdarg);
 		}
-		assign = (hn->flags & BINF_MAGICEQUALS);
+		assign = (hn && (hn->flags & BINF_MAGICEQUALS));
 		break;
 	    }
 	    cflags &= ~BINF_BUILTIN & ~BINF_COMMAND;
 	    cflags |= hn->flags;
+	    checked = 0;
+	    if (cflags & BINF_COMMAND && nextnode(firstnode(args))) {
+		/* check for options to command builtin */
+		char *next = (char *) getdata(nextnode(firstnode(args)));
+		char *cmdopt;
+		if (next && *next == '-' && strlen(next) == 2 &&
+		        (cmdopt = strchr("pvV", next[1])))
+		{
+		    if (*cmdopt == 'p') {
+			uremnode(args, firstnode(args));
+			use_defpath = 1;
+			if (nextnode(firstnode(args)))
+			    next = (char *) getdata(nextnode(firstnode(args)));
+		    } else {
+			hn = (HashNode)&commandbn;
+			is_builtin = 1;
+			break;
+		    }
+		}
+		if (!strcmp(next, "--"))
+		     uremnode(args, firstnode(args));   
+	    }
 	    uremnode(args, firstnode(args));
 	    hn = NULL;
-	    checked = 0;
 	    if ((cflags & BINF_COMMAND) && unset(POSIXBUILTINS))
 		break;
 	}
@@ -1719,7 +1882,7 @@ execcmd(Estate state, int input, int output, int how, int last1)
 	    if (!(cflags & BINF_NOGLOB))
 		while (!checked && !errflag && args && nonempty(args) &&
 		       has_token((char *) peekfirst(args)))
-		    glob(args, firstnode(args), 0);
+		    zglob(args, firstnode(args), 0);
 	    else if (!unglobbed) {
 		for (node = firstnode(args); node; incnode(node))
 		    untokenize((char *) getdata(node));
@@ -1751,7 +1914,7 @@ execcmd(Estate state, int input, int output, int how, int last1)
 			    args = newlinklist();
 			addlinknode(args, dupstring(":"));
 		    } else if (readnullcmd && *readnullcmd &&
-			       ((Redir) peekfirst(redir))->type == READ &&
+			       ((Redir) peekfirst(redir))->type == REDIR_READ &&
 			       !nextnode(firstnode(redir))) {
 			if (!args)
 			    args = newlinklist();
@@ -1785,7 +1948,18 @@ execcmd(Estate state, int input, int output, int how, int last1)
 		return;
 	    }
 
-	    if (errflag || checked ||
+	    /*
+	     * Quit looking for a command if:
+	     * - there was an error; or
+	     * - we checked the simple cases needing MAGIC_EQUAL_SUBST; or
+	     * - we know we already found a builtin (because either:
+	     *   - we loaded a builtin from a module, or
+	     *   - we have determined there are options which would
+	     *     require us to use the "command" builtin); or
+	     * - we aren't using POSIX and so BINF_COMMAND indicates a zsh
+	     *   precommand modifier is being used in place of the builtin
+	     */
+	    if (errflag || checked || is_builtin ||
 		(unset(POSIXBUILTINS) && (cflags & BINF_COMMAND)))
 		break;
 
@@ -1797,8 +1971,9 @@ execcmd(Estate state, int input, int output, int how, int last1)
 	    }
 	    if (!(hn = builtintab->getnode(builtintab, cmdarg))) {
 		if (cflags & BINF_BUILTIN) {
-		    zerr("no such builtin: %s", cmdarg, 0);
-		    errflag = lastval = 1;
+		    zwarn("no such builtin: %s", cmdarg, 0);
+		    lastval = 1;
+                    opts[AUTOCONTINUE] = oautocont;
 		    return;
 		}
 		break;
@@ -1822,6 +1997,7 @@ execcmd(Estate state, int input, int output, int how, int last1)
 
     if (errflag) {
 	lastval = 1;
+        opts[AUTOCONTINUE] = oautocont;
 	return;
     }
 
@@ -1865,6 +2041,7 @@ execcmd(Estate state, int input, int output, int how, int last1)
 
     if (errflag) {
 	lastval = 1;
+        opts[AUTOCONTINUE] = oautocont;
 	return;
     }
 
@@ -1923,7 +2100,7 @@ execcmd(Estate state, int input, int output, int how, int last1)
      *    be needed after the current command.  This is typically the case    *
      *    when when the command is the last stage in a subshell, or is the    *
      *    last command after the option `-c'.                                 *
-     * 2) We are not trapping EXIT or ZERR.                                   *
+     * 2) We don't have any traps set.                                        *
      * 3) We don't have any files to delete.                                  *
      *                                                                        *
      * The condition above for a `fake exec' will also work for a current     *
@@ -1935,19 +2112,20 @@ execcmd(Estate state, int input, int output, int how, int last1)
     if ((how & Z_ASYNC) ||
 	(!do_exec &&
 	 (((is_builtin || is_shfunc) && output) ||
-	  (!is_cursh && (last1 != 1 || sigtrapped[SIGZERR] ||
-			 sigtrapped[SIGEXIT] || havefiles()))))) {
+	  (!is_cursh && (last1 != 1 || nsigtrapped || havefiles()))))) {
 
 	pid_t pid;
 	int synch[2];
 	char dummy;
+	struct timeval bgtime;
 
 	child_block();
 	pipe(synch);
 
-	if ((pid = zfork()) == -1) {
+	if ((pid = zfork(&bgtime)) == -1) {
 	    close(synch[0]);
 	    close(synch[1]);
+            opts[AUTOCONTINUE] = oautocont;
 	    return;
 	} if (pid) {
 	    close(synch[1]);
@@ -1972,12 +2150,13 @@ execcmd(Estate state, int input, int output, int how, int last1)
 			  3 : WC_ASSIGN_NUM(ac) + 2);
 		}
 	    }
-	    addproc(pid, text);
+	    addproc(pid, text, 0, &bgtime);
+            opts[AUTOCONTINUE] = oautocont;
 	    return;
 	}
 	/* pid == 0 */
 	close(synch[0]);
-	entersubsh(how, (type != WC_SUBSH) && !(how & Z_ASYNC) ? 2 : 1, 0);
+	entersubsh(how, (type != WC_SUBSH) && !(how & Z_ASYNC) ? 2 : 1, 0, 0);
 	close(synch[1]);
 	forked = 1;
 	if (sigtrapped[SIGINT] & ZSIG_IGNORED)
@@ -2028,21 +2207,21 @@ execcmd(Estate state, int input, int output, int how, int last1)
 
     /* Do process substitutions */
     if (redir)
-	spawnpipes(redir);
+	spawnpipes(redir, nullexec);
 
     /* Do io redirections */
     while (redir && nonempty(redir)) {
 	fn = (Redir) ugetnode(redir);
-	DPUTS(fn->type == HEREDOC || fn->type == HEREDOCDASH,
+	DPUTS(fn->type == REDIR_HEREDOC || fn->type == REDIR_HEREDOCDASH,
 	      "BUG: unexpanded here document");
-	if (fn->type == INPIPE) {
+	if (fn->type == REDIR_INPIPE) {
 	    if (fn->fd2 == -1) {
 		closemnodes(mfds);
 		fixfds(save);
 		execerr();
 	    }
 	    addfd(forked, save, mfds, fn->fd1, fn->fd2, 0);
-	} else if (fn->type == OUTPIPE) {
+	} else if (fn->type == REDIR_OUTPIPE) {
 	    if (fn->fd2 == -1) {
 		closemnodes(mfds);
 		fixfds(save);
@@ -2050,7 +2229,7 @@ execcmd(Estate state, int input, int output, int how, int last1)
 	    }
 	    addfd(forked, save, mfds, fn->fd1, fn->fd2, 1);
 	} else {
-	    if (fn->type != HERESTR && xpandredir(fn, redir))
+	    if (fn->type != REDIR_HERESTR && xpandredir(fn, redir))
 		continue;
 	    if (errflag) {
 		closemnodes(mfds);
@@ -2058,26 +2237,26 @@ execcmd(Estate state, int input, int output, int how, int last1)
 		execerr();
 	    }
 	    if (isset(RESTRICTED) && IS_WRITE_FILE(fn->type)) {
-		zerr("writing redirection not allowed in restricted mode", NULL, 0);
+		zwarn("writing redirection not allowed in restricted mode", NULL, 0);
 		execerr();
 	    }
 	    if (unset(EXECOPT))
 		continue;
 	    switch(fn->type) {
-	    case HERESTR:
+	    case REDIR_HERESTR:
 		fil = getherestr(fn);
 		if (fil == -1) {
 		    closemnodes(mfds);
 		    fixfds(save);
 		    if (errno != EINTR)
-			zerr("%e", NULL, errno);
+			zwarn("%e", NULL, errno);
 		    execerr();
 		}
 		addfd(forked, save, mfds, fn->fd1, fil, 0);
 		break;
-	    case READ:
-	    case READWRITE:
-		if (fn->type == READ)
+	    case REDIR_READ:
+	    case REDIR_READWRITE:
+		if (fn->type == REDIR_READ)
 		    fil = open(unmeta(fn->name), O_RDONLY | O_NOCTTY);
 		else
 		    fil = open(unmeta(fn->name),
@@ -2086,24 +2265,24 @@ execcmd(Estate state, int input, int output, int how, int last1)
 		    closemnodes(mfds);
 		    fixfds(save);
 		    if (errno != EINTR)
-			zerr("%e: %s", fn->name, errno);
+			zwarn("%e: %s", fn->name, errno);
 		    execerr();
 		}
 		addfd(forked, save, mfds, fn->fd1, fil, 0);
 		/* If this is 'exec < file', read from stdin, *
 		 * not terminal, unless `file' is a terminal. */
 		if (nullexec == 1 && fn->fd1 == 0 &&
-		    isset(SHINSTDIN) && interact)
+		    isset(SHINSTDIN) && interact && !zleactive)
 		    init_io();
 		break;
-	    case CLOSE:
+	    case REDIR_CLOSE:
 		if (!forked && fn->fd1 < 10 && save[fn->fd1] == -2)
 		    save[fn->fd1] = movefd(fn->fd1);
 		closemn(mfds, fn->fd1);
 		zclose(fn->fd1);
 		break;
-	    case MERGEIN:
-	    case MERGEOUT:
+	    case REDIR_MERGEIN:
+	    case REDIR_MERGEOUT:
 		if (fn->fd2 < 10)
 		    closemn(mfds, fn->fd2);
 		if (fn->fd2 > 9 &&
@@ -2115,7 +2294,7 @@ execcmd(Estate state, int input, int output, int how, int last1)
 		} else {
 		    int fd = fn->fd2;
 		    if(fd == -2)
-			fd = (fn->type == MERGEOUT) ? coprocout : coprocin;
+			fd = (fn->type == REDIR_MERGEOUT) ? coprocout : coprocin;
 		    fil = dup(fd);
 		}
 		if (fil == -1) {
@@ -2125,10 +2304,10 @@ execcmd(Estate state, int input, int output, int how, int last1)
 		    fixfds(save);
 		    if (fn->fd2 != -2)
 		    	sprintf(fdstr, "%d", fn->fd2);
-		    zerr("%s: %e", fn->fd2 == -2 ? "coprocess" : fdstr, errno);
+		    zwarn("%s: %e", fn->fd2 == -2 ? "coprocess" : fdstr, errno);
 		    execerr();
 		}
-		addfd(forked, save, mfds, fn->fd1, fil, fn->type == MERGEOUT);
+		addfd(forked, save, mfds, fn->fd1, fil, fn->type == REDIR_MERGEOUT);
 		break;
 	    default:
 		if (IS_APPEND_REDIR(fn->type))
@@ -2148,7 +2327,7 @@ execcmd(Estate state, int input, int output, int how, int last1)
 		    closemnodes(mfds);
 		    fixfds(save);
 		    if (errno != EINTR)
-			zerr("%e: %s", fn->name, errno);
+			zwarn("%e: %s", fn->name, errno);
 		    execerr();
 		}
 		addfd(forked, save, mfds, fn->fd1, fil, 1);
@@ -2194,7 +2373,9 @@ execcmd(Estate state, int input, int output, int how, int last1)
 	 * exit) in case there is an error return.
 	 */
 	if (is_exec)
-	    entersubsh(how, (type != WC_SUBSH) ? 2 : 1, 1);
+	    entersubsh(how, (type != WC_SUBSH) ? 2 : 1, 1,
+		       (do_exec || (type >= WC_CURSH && last1 == 1)) 
+		       && !forked);
 	if (type >= WC_CURSH) {
 	    if (last1 == 1)
 		do_exec = 1;
@@ -2239,6 +2420,7 @@ execcmd(Estate state, int input, int output, int how, int last1)
 		if (subsh_close >= 0)
 		    zclose(subsh_close);
 		subsh_close = -1;
+
 		execshfunc((Shfunc) hn, args);
 #ifdef PATH_DEV_FD
 		for (i = 10; i <= max_zsh_fd; i++)
@@ -2254,18 +2436,18 @@ execcmd(Estate state, int input, int output, int how, int last1)
 #ifdef PATH_DEV_FD
 		closem(2);
 #endif
-		if (isset(PRINTEXITVALUE) && isset(SHINSTDIN) && lastval && !subsh) {
-		    fprintf(stderr, "zsh: exit %ld\n", (long)lastval);
-		}
 		fflush(stdout);
 		if (save[1] == -2) {
 		    if (ferror(stdout)) {
-			zerr("write error: %e", NULL, errno);
+			zwarn("write error: %e", NULL, errno);
 			clearerr(stdout);
-			errflag = 0;
 		    }
 		} else
 		    clearerr(stdout);
+	    }
+	    if (isset(PRINTEXITVALUE) && isset(SHINSTDIN) &&
+		lastval && !subsh) {
+		fprintf(stderr, "zsh: exit %ld\n", (long)lastval);
 	    }
 
 	    if (do_exec) {
@@ -2305,16 +2487,23 @@ execcmd(Estate state, int input, int output, int how, int last1)
 		if (!forked)
 		    setlimits(NULL);
 #endif
-		execute((Cmdnam) hn, cflags & BINF_DASH);
+		if (how & Z_ASYNC) {
+		    zsfree(STTYval);
+		    STTYval = 0;
+		}
+		execute((Cmdnam) hn, cflags & BINF_DASH, use_defpath);
 	    } else {		/* ( ... ) */
 		DPUTS(varspc,
-		      "BUG: assigment before complex command");
+		      "BUG: assignment before complex command");
 		list_pipe = 0;
 		if (subsh_close >= 0)
 		    zclose(subsh_close);
                 subsh_close = -1;
 		/* If we're forked (and we should be), no need to return */
 		DPUTS(last1 != 1 && !forked, "BUG: not exiting?");
+		DPUTS(type != WC_SUBSH, "Not sure what we're doing.");
+		/* Skip word only used for try/always blocks */
+		state->pc++;
 		execlist(state, 0, 1);
 	    }
 	}
@@ -2332,6 +2521,10 @@ execcmd(Estate state, int input, int output, int how, int last1)
 	xtrerr = oxtrerr;
 	zclose(fil);
     }
+
+    zsfree(STTYval);
+    STTYval = 0;
+    opts[AUTOCONTINUE] = oautocont;
 }
 
 /* Arrange to have variables restored. */
@@ -2350,19 +2543,21 @@ save_params(Estate state, Wordcode pc, LinkList *restore_p, LinkList *remove_p)
     while (wc_code(ac = *pc) == WC_ASSIGN) {
 	s = ecrawstr(state->prog, pc + 1, NULL);
 	if ((pm = (Param) paramtab->getnode(paramtab, s))) {
+	    if (pm->env)
+		delenv(pm);
 	    if (!(pm->flags & PM_SPECIAL)) {
 		paramtab->removenode(paramtab, s);
 	    } else if (!(pm->flags & PM_READONLY) &&
 		       (unset(RESTRICTED) || !(pm->flags & PM_RESTRICTED))) {
-		Param tpm = (Param) zhalloc(sizeof *tpm);
-		tpm->nam = s;
+		Param tpm = (Param) hcalloc(sizeof *tpm);
+		tpm->nam = pm->nam;
 		copyparam(tpm, pm, 1);
 		pm = tpm;
 	    }
-	    addlinknode(*remove_p, s);
+	    addlinknode(*remove_p, dupstring(s));
 	    addlinknode(*restore_p, pm);
 	} else
-	    addlinknode(*remove_p, s);
+	    addlinknode(*remove_p, dupstring(s));
 
 	pc += (WC_ASSIGN_TYPE(ac) == WC_ASSIGN_SCALAR ?
 	       3 : WC_ASSIGN_NUM(ac) + 2);
@@ -2399,26 +2594,27 @@ restore_params(LinkList restorelist, LinkList removelist)
 		tpm->flags = pm->flags;
 		switch (PM_TYPE(pm->flags)) {
 		case PM_SCALAR:
-		    tpm->sets.cfn(tpm, pm->u.str);
+		    tpm->gsu.s->setfn(tpm, pm->u.str);
 		    break;
 		case PM_INTEGER:
-		    tpm->sets.ifn(tpm, pm->u.val);
+		    tpm->gsu.i->setfn(tpm, pm->u.val);
 		    break;
 		case PM_EFLOAT:
 		case PM_FFLOAT:
-		    tpm->sets.ffn(tpm, pm->u.dval);
+		    tpm->gsu.f->setfn(tpm, pm->u.dval);
 		    break;
 		case PM_ARRAY:
-		    tpm->sets.afn(tpm, pm->u.arr);
+		    tpm->gsu.a->setfn(tpm, pm->u.arr);
 		    break;
 		case PM_HASHED:
-		    tpm->sets.hfn(tpm, pm->u.hash);
+		    tpm->gsu.h->setfn(tpm, pm->u.hash);
 		    break;
 		}
+		pm = tpm;
 	    } else
 		paramtab->addnode(paramtab, pm->nam, pm);
 	    if ((pm->flags & PM_EXPORTED) && ((s = getsparam(pm->nam))))
-		pm->env = addenv(pm->nam, s, pm->flags);
+		addenv(pm, s);
 	}
     }
 }
@@ -2439,16 +2635,20 @@ fixfds(int *save)
 }
 
 /**/
+int
+forklevel;
+
+/**/
 static void
-entersubsh(int how, int cl, int fake)
+entersubsh(int how, int cl, int fake, int revertpgrp)
 {
-    int sig;
+    int sig, monitor;
 
     if (cl != 2)
 	for (sig = 0; sig < VSIGCOUNT; sig++)
 	    if (!(sigtrapped[sig] & ZSIG_FUNC))
 		unsettrap(sig);
-    if (unset(MONITOR)) {
+    if (!(monitor = isset(MONITOR))) {
 	if (how & Z_ASYNC) {
 	    settrap(SIGINT, NULL);
 	    settrap(SIGQUIT, NULL);
@@ -2462,8 +2662,8 @@ entersubsh(int how, int cl, int fake)
 	}
     } else if (thisjob != -1 && cl) {
 	if (jobtab[list_pipe_job].gleader && (list_pipe || list_pipe_child)) {
-	    if (killpg(jobtab[list_pipe_job].gleader, 0) == -1 ||
-		setpgrp(0L, jobtab[list_pipe_job].gleader) == -1) {
+	    if (setpgrp(0L, jobtab[list_pipe_job].gleader) == -1 ||
+		killpg(jobtab[list_pipe_job].gleader, 0) == -1) {
 		jobtab[list_pipe_job].gleader =
 		    jobtab[thisjob].gleader = (list_pipe_child ? mypgrp : getpid());
 		setpgrp(0L, jobtab[list_pipe_job].gleader);
@@ -2484,7 +2684,10 @@ entersubsh(int how, int cl, int fake)
     }
     if (!fake)
 	subsh = 1;
+    if (revertpgrp && getpid() == mypgrp)
+	release_pgrp();
     if (SHTTY != -1) {
+	shout = NULL;
 	zclose(SHTTY);
 	SHTTY = -1;
     }
@@ -2503,8 +2706,9 @@ entersubsh(int how, int cl, int fake)
     opts[MONITOR] = opts[USEZLE] = 0;
     zleactive = 0;
     if (cl)
-	clearjobtab();
-    times(&shtms);
+	clearjobtab(monitor);
+    get_usage();
+    forklevel = locallevel;
 }
 
 /* close internal shell fds */
@@ -2532,11 +2736,12 @@ gethere(char *str, int typ)
 
     for (s = str; *s; s++)
 	if (INULL(*s)) {
-	    *s = Nularg;
 	    qt = 1;
+	    break;
 	}
+    quotesubst(str);
     untokenize(str);
-    if (typ == HEREDOCDASH) {
+    if (typ == REDIR_HEREDOCDASH) {
 	strip = 1;
 	while (*str == '\t')
 	    str++;
@@ -2598,8 +2803,7 @@ getherestr(struct redir *fn)
     untokenize(t);
     unmetafy(t, &len);
     t[len++] = '\n';
-    s = gettempname();
-    if (!s || (fd = open(s, O_CREAT|O_WRONLY|O_EXCL|O_NOCTTY, 0600)) == -1)
+    if ((fd = gettempfile(NULL, 1, &s)) < 0)
 	return -1;
     write(fd, t, len);
     close(fd);
@@ -2619,7 +2823,7 @@ getoutput(char *cmd, int qt)
     pid_t pid;
     Wordcode pc;
 
-    if (!(prog = parse_string(cmd, 0)))
+    if (!(prog = parse_string(cmd)))
 	return NULL;
 
     pc = prog->prog;
@@ -2628,7 +2832,7 @@ getoutput(char *cmd, int qt)
 	wc_code(pc[1]) == WC_SUBLIST && !WC_SUBLIST_FLAGS(pc[1]) &&
 	WC_SUBLIST_TYPE(pc[1]) == WC_SUBLIST_END &&
 	wc_code(pc[2]) == WC_PIPE && WC_PIPE_TYPE(pc[2]) == WC_PIPE_END &&
-	wc_code(pc[3]) == WC_REDIR && WC_REDIR_TYPE(pc[3]) == READ && 
+	wc_code(pc[3]) == WC_REDIR && WC_REDIR_TYPE(pc[3]) == REDIR_READ && 
 	!pc[4] &&
 	wc_code(pc[6]) == WC_SIMPLE && !WC_SIMPLE_ARGC(pc[6])) {
 	/* $(< word) */
@@ -2648,7 +2852,7 @@ getoutput(char *cmd, int qt)
     mpipe(pipes);
     child_block();
     cmdoutval = 0;
-    if ((cmdoutpid = pid = zfork()) == -1) {
+    if ((cmdoutpid = pid = zfork(NULL)) == -1) {
 	/* fork error */
 	zclose(pipes[0]);
 	zclose(pipes[1]);
@@ -2671,7 +2875,7 @@ getoutput(char *cmd, int qt)
     zclose(pipes[0]);
     redup(pipes[1], 1);
     opts[MONITOR] = 0;
-    entersubsh(Z_SYNC, 1, 0);
+    entersubsh(Z_SYNC, 1, 0, 0);
     cmdpush(CS_CMDSUBST);
     execode(prog, 0, 1);
     cmdpop();
@@ -2726,11 +2930,11 @@ readoutput(int in, int qt)
 	}
 	addlinknode(ret, buf);
     } else {
-	char **words = spacesplit(buf, 0, 1);
+	char **words = spacesplit(buf, 0, 1, 0);
 
 	while (*words) {
 	    if (isset(GLOBSUBST))
-		tokenize(*words);
+		shtokenize(*words);
 	    addlinknode(ret, *words++);
 	}
     }
@@ -2750,7 +2954,7 @@ parsecmd(char *cmd)
 	return NULL;
     }
     *str = '\0';
-    if (str[1] || !(prog = parse_string(cmd + 2, 0))) {
+    if (str[1] || !(prog = parse_string(cmd + 2))) {
 	zerr("parse error in process substitution", NULL, 0);
 	return NULL;
     }
@@ -2772,10 +2976,8 @@ getoutputfile(char *cmd)
 	return NULL;
     if (!(prog = parsecmd(cmd)))
 	return NULL;
-    if (!(nam = gettempname()))
+    if (!(nam = gettempname(NULL, 0)))
 	return NULL;
-
-    nam = ztrdup(nam);
 
     if (!jobtab[thisjob].filelist)
 	jobtab[thisjob].filelist = znewlinklist();
@@ -2784,7 +2986,7 @@ getoutputfile(char *cmd)
     child_block();
     fd = open(nam, O_WRONLY | O_CREAT | O_EXCL | O_NOCTTY, 0600);
 
-    if (fd < 0 || (cmdoutpid = pid = zfork()) == -1) {
+    if (fd < 0 || (cmdoutpid = pid = zfork(NULL)) == -1) {
 	/* fork or open error */
 	child_unblock();
 	return nam;
@@ -2802,7 +3004,7 @@ getoutputfile(char *cmd)
     /* pid == 0 */
     redup(fd, 1);
     opts[MONITOR] = 0;
-    entersubsh(Z_SYNC, 1, 0);
+    entersubsh(Z_SYNC, 1, 0, 0);
     cmdpush(CS_CMDSUBST);
     execode(prog, 0, 1);
     cmdpop();
@@ -2819,7 +3021,7 @@ getoutputfile(char *cmd)
 static char *
 namedpipe(void)
 {
-    char *tnam = gettempname();
+    char *tnam = gettempname(NULL, 1);
 
 # ifdef HAVE_MKFIFO
     if (mkfifo(tnam, 0600) < 0)
@@ -2844,51 +3046,66 @@ getproc(char *cmd)
     Eprog prog;
     int out = *cmd == Inang;
     char *pnam;
+    pid_t pid;
+    struct timeval bgtime;
+
 #ifndef PATH_DEV_FD
     int fd;
-#else
-    int pipes[2];
-#endif
 
     if (thisjob == -1)
 	return NULL;
-#ifndef PATH_DEV_FD
     if (!(pnam = namedpipe()))
 	return NULL;
-#else
-    pnam = hcalloc(strlen(PATH_DEV_FD) + 6);
-#endif
     if (!(prog = parsecmd(cmd)))
 	return NULL;
-#ifndef PATH_DEV_FD
     if (!jobtab[thisjob].filelist)
 	jobtab[thisjob].filelist = znewlinklist();
     zaddlinknode(jobtab[thisjob].filelist, ztrdup(pnam));
 
-    if (zfork()) {
-#else
-    mpipe(pipes);
-    if (zfork()) {
-	sprintf(pnam, "%s/%d", PATH_DEV_FD, pipes[!out]);
-	zclose(pipes[out]);
-	fdtable[pipes[!out]] = 2;
-#endif
+    if ((pid = zfork(&bgtime))) {
+	if (pid == -1)
+	    return NULL;
+	if (!out)
+	    addproc(pid, NULL, 1, &bgtime);
 	return pnam;
     }
-#ifndef PATH_DEV_FD
     closem(0);
     fd = open(pnam, out ? O_WRONLY | O_NOCTTY : O_RDONLY | O_NOCTTY);
     if (fd == -1) {
 	zerr("can't open %s: %e", pnam, errno);
 	_exit(1);
     }
-    entersubsh(Z_ASYNC, 1, 0);
+    entersubsh(Z_ASYNC, 1, 0, 0);
     redup(fd, out);
-#else
-    entersubsh(Z_ASYNC, 1, 0);
+#else /* PATH_DEV_FD */
+    int pipes[2];
+
+    if (thisjob == -1)
+	return NULL;
+    pnam = hcalloc(strlen(PATH_DEV_FD) + 6);
+    if (!(prog = parsecmd(cmd)))
+	return NULL;
+    mpipe(pipes);
+    if ((pid = zfork(&bgtime))) {
+	sprintf(pnam, "%s/%d", PATH_DEV_FD, pipes[!out]);
+	zclose(pipes[out]);
+	if (pid == -1)
+	{
+	    zclose(pipes[!out]);
+	    return NULL;
+	}
+	fdtable[pipes[!out]] = 2;
+	if (!out)
+	{
+	    addproc(pid, NULL, 1, &bgtime);
+	}
+	return pnam;
+    }
+    entersubsh(Z_ASYNC, 1, 0, 0);
     redup(pipes[out], out);
     closem(0);   /* this closes pipes[!out] as well */
-#endif
+#endif /* PATH_DEV_FD */
+
     cmdpush(CS_CMDSUBST);
     execode(prog, 0, 1);
     cmdpop();
@@ -2898,23 +3115,37 @@ getproc(char *cmd)
 #endif   /* HAVE_FIFOS and PATH_DEV_FD not defined */
 }
 
-/* > >(...) or < <(...) (does not use named pipes) */
+/*
+ * > >(...) or < <(...) (does not use named pipes)
+ *
+ * If the second argument is 1, this is part of
+ * an "exec < <(...)" or "exec > >(...)" and we shouldn't
+ * wait for the job to finish before continuing.
+ */
 
 /**/
 static int
-getpipe(char *cmd)
+getpipe(char *cmd, int nullexec)
 {
     Eprog prog;
     int pipes[2], out = *cmd == Inang;
+    pid_t pid;
+    struct timeval bgtime;
 
     if (!(prog = parsecmd(cmd)))
 	return -1;
     mpipe(pipes);
-    if (zfork()) {
+    if ((pid = zfork(&bgtime))) {
 	zclose(pipes[out]);
+	if (pid == -1) {
+	    zclose(pipes[!out]);
+	    return -1;
+	}
+	if (!nullexec)
+	    addproc(pid, NULL, 1, &bgtime);
 	return pipes[!out];
     }
-    entersubsh(Z_ASYNC, 1, 0);
+    entersubsh(Z_ASYNC, 1, 0, 0);
     redup(pipes[out], out);
     closem(0);	/* this closes pipes[!out] as well */
     cmdpush(CS_CMDSUBST);
@@ -2935,11 +3166,17 @@ mpipe(int *pp)
     pp[1] = movefd(pp[1]);
 }
 
-/* Do process substitution with redirection */
+/*
+ * Do process substitution with redirection
+ *
+ * If the second argument is 1, this is part of
+ * an "exec < <(...)" or "exec > >(...)" and we shouldn't
+ * wait for the job to finish before continuing.
+ */
 
 /**/
 static void
-spawnpipes(LinkList l)
+spawnpipes(LinkList l, int nullexec)
 {
     LinkNode n;
     Redir f;
@@ -2948,9 +3185,9 @@ spawnpipes(LinkList l)
     n = firstnode(l);
     for (; n; incnode(n)) {
 	f = (Redir) getdata(n);
-	if (f->type == OUTPIPE || f->type == INPIPE) {
+	if (f->type == REDIR_OUTPIPE || f->type == REDIR_INPIPE) {
 	    str = f->name;
-	    f->fd2 = getpipe(str);
+	    f->fd2 = getpipe(str, nullexec);
 	}
     }
 }
@@ -2961,7 +3198,7 @@ extern int tracingcond;
 
 /**/
 static int
-execcond(Estate state, int do_exec)
+execcond(Estate state, UNUSED(int do_exec))
 {
     int stat;
 
@@ -2972,7 +3209,13 @@ execcond(Estate state, int do_exec)
 	tracingcond++;
     }
     cmdpush(CS_COND);
-    stat = !evalcond(state);
+    stat = evalcond(state, NULL);
+    /*
+     * 2 indicates a syntax error.  For compatibility, turn this
+     * into a shell error.
+     */
+    if (stat == 2)
+	errflag = 1;
     cmdpop();
     if (isset(XTRACE)) {
 	fprintf(xtrerr, " ]]\n");
@@ -2986,10 +3229,10 @@ execcond(Estate state, int do_exec)
 
 /**/
 static int
-execarith(Estate state, int do_exec)
+execarith(Estate state, UNUSED(int do_exec))
 {
     char *e;
-    zlong val = 0;
+    mnumber val = zero_mnumber;
     int htok = 0;
 
     if (isset(XTRACE)) {
@@ -3003,7 +3246,7 @@ execarith(Estate state, int do_exec)
     if (isset(XTRACE))
 	fprintf(xtrerr, " %s", e);
 
-    val = mathevali(e);
+    val = matheval(e);
 
     cmdpop();
 
@@ -3012,14 +3255,15 @@ execarith(Estate state, int do_exec)
 	fflush(xtrerr);
     }
     errflag = 0;
-    return !val;
+    /* should test for fabs(val.u.d) < epsilon? */
+    return (val.type == MN_INTEGER) ? val.u.l == 0 : val.u.d == 0.0;
 }
 
 /* perform time ... command */
 
 /**/
 static int
-exectime(Estate state, int do_exec)
+exectime(Estate state, UNUSED(int do_exec))
 {
     int jb;
 
@@ -3037,7 +3281,7 @@ exectime(Estate state, int do_exec)
 
 /**/
 static int
-execfuncdef(Estate state, int do_exec)
+execfuncdef(Estate state, UNUSED(int do_exec))
 {
     Shfunc shf;
     char *s;
@@ -3048,7 +3292,10 @@ execfuncdef(Estate state, int do_exec)
     LinkList names;
 
     end = beg + WC_FUNCDEF_SKIP(state->pc[-1]);
-    names = ecgetlist(state, *state->pc++, EC_DUPTOK, &htok);
+    if (!(names = ecgetlist(state, *state->pc++, EC_DUPTOK, &htok))) {
+	state->pc = end;
+	return 0;
+    }
     nprg = end - beg;
     sbeg = *state->pc++;
     nstrs = *state->pc++;
@@ -3064,16 +3311,17 @@ execfuncdef(Estate state, int do_exec)
     while ((s = (char *) ugetnode(names))) {
 	prog = (Eprog) zalloc(sizeof(*prog));
 	prog->npats = npats;
+	prog->nref = 1; /* allocated from permanent storage */
 	prog->len = len;
 	if (state->prog->dump) {
-	    prog->alloc = EA_MAP;
+	    prog->flags = EF_MAP;
 	    incrdumpcount(state->prog->dump);
 	    prog->pats = pp = (Patprog *) zalloc(npats * sizeof(Patprog));
 	    prog->prog = state->pc;
 	    prog->strs = state->strs + sbeg;
 	    prog->dump = state->prog->dump;
 	} else {
-	    prog->alloc = EA_REAL;
+	    prog->flags = EF_REAL;
 	    prog->pats = pp = (Patprog *) zalloc(len);
 	    prog->prog = (Wordcode) (prog->pats + npats);
 	    prog->strs = (char *) (prog->prog + nprg);
@@ -3099,11 +3347,15 @@ execfuncdef(Estate state, int do_exec)
 		return 1;
 	    }
 	    sigtrapped[signum] |= ZSIG_FUNC;
+
+	    /*
+	     * Remove the old node explicitly in case it has
+	     * an alternative name
+	     */
+	    removetrapnode(signum);
 	}
 	shfunctab->addnode(shfunctab, ztrdup(s), shf);
     }
-    if (isset(HISTNOFUNCTIONS))
-	remhist();
     state->pc = end;
     return 0;
 }
@@ -3121,13 +3373,14 @@ execshfunc(Shfunc shf, LinkList args)
     if (errflag)
 	return;
 
-    if (!list_pipe && thisjob != list_pipe_job) {
+    if (!list_pipe && thisjob != list_pipe_job && !hasprocs(thisjob)) {
 	/* Without this deletejob the process table *
 	 * would be filled by a recursive function. */
 	last_file_list = jobtab[thisjob].filelist;
 	jobtab[thisjob].filelist = NULL;
 	deletejob(jobtab + thisjob);
     }
+
     if (isset(XTRACE)) {
 	LinkNode lptr;
 	printprompt4();
@@ -3135,7 +3388,7 @@ execshfunc(Shfunc shf, LinkList args)
 	    for (lptr = firstnode(args); lptr; incnode(lptr)) {
 		if (lptr != firstnode(args))
 		    fputc(' ', xtrerr);
-		fprintf(xtrerr, "%s", (char *)getdata(lptr));
+		quotedzputs((char *)getdata(lptr), xtrerr);
 	    }
 	fputc('\n', xtrerr);
 	fflush(xtrerr);
@@ -3164,9 +3417,26 @@ execshfunc(Shfunc shf, LinkList args)
 
 /**/
 static int
-execautofn(Estate state, int do_exec)
+execautofn(Estate state, UNUSED(int do_exec))
 {
-    Shfunc shf = state->prog->shf;
+    Shfunc shf;
+    char *oldscriptname;
+
+    if (!(shf = loadautofn(state->prog->shf, 1, 0)))
+	return 1;
+
+    oldscriptname = scriptname;
+    scriptname = dupstring(shf->nam);
+    execode(shf->funcdef, 1, 0);
+    scriptname = oldscriptname;
+
+    return lastval;
+}
+
+/**/
+Shfunc
+loadautofn(Shfunc shf, int fksh, int autol)
+{
     int noalias = noaliases, ksh = 1;
     Eprog prog;
 
@@ -3176,26 +3446,50 @@ execautofn(Estate state, int do_exec)
     prog = getfpfunc(shf->nam, &ksh);
     noaliases = noalias;
 
+    if (ksh == 1) {
+	ksh = fksh;
+	if (ksh == 1)
+	    ksh = (shf->flags & PM_KSHSTORED) ? 2 :
+		  (shf->flags & PM_ZSHSTORED) ? 0 : 1;
+    }
+
     if (prog == &dummy_eprog) {
-	zerr("%s: function definition file not found", shf->nam, 0);
+	/* We're not actually in the function; decrement locallevel */
+	locallevel--;
+	zwarn("%s: function definition file not found", shf->nam, 0);
+	locallevel++;
 	popheap();
-	return 1;
+	return NULL;
     }
     if (!prog)
-	prog = &dummy_eprog;
+	return NULL;
     if (ksh == 2 || (ksh == 1 && isset(KSHAUTOLOAD))) {
-	VARARR(char, n, strlen(shf->nam) + 1);
-	strcpy(n, shf->nam);
-	execode(prog, 1, 0);
-	shf = (Shfunc) shfunctab->getnode(shfunctab, n);
-	if(!shf || (shf->flags & PM_UNDEFINED)) {
-	    zerr("%s: function not defined by file", n, 0);
-	    popheap();
-	    return 1;
+	if (autol) {
+	    prog->flags |= EF_RUN;
+
+	    freeeprog(shf->funcdef);
+	    if (prog->flags & EF_MAP)
+		shf->funcdef = prog;
+	    else
+		shf->funcdef = dupeprog(prog, 0);
+	    shf->flags &= ~PM_UNDEFINED;
+	} else {
+	    VARARR(char, n, strlen(shf->nam) + 1);
+	    strcpy(n, shf->nam);
+	    execode(prog, 1, 0);
+	    shf = (Shfunc) shfunctab->getnode(shfunctab, n);
+	    if (!shf || (shf->flags & PM_UNDEFINED)) {
+		/* We're not actually in the function; decrement locallevel */
+		locallevel--;
+		zwarn("%s: function not defined by file", n, 0);
+		locallevel++;
+		popheap();
+		return NULL;
+	    }
 	}
     } else {
 	freeeprog(shf->funcdef);
-	if (prog->alloc == EA_MAP)
+	if (prog->flags & EF_MAP)
 	    shf->funcdef = stripkshdef(prog, shf->nam);
 	else
 	    shf->funcdef = dupeprog(stripkshdef(prog, shf->nam), 0);
@@ -3203,68 +3497,57 @@ execautofn(Estate state, int do_exec)
     }
     popheap();
 
-    execode(shf->funcdef, 1, 0);
-    return lastval;
+    return shf;
 }
 
-/**/
-int
-loadautofn(Shfunc shf)
-{
-    /* Copied from execautofn() -- should consolidate someday */
-
-    int noalias = noaliases;
-    Eprog prog;
-
-    pushheap();
-
-    noaliases = (shf->flags & PM_UNALIASED);
-    prog = getfpfunc(shf->nam, NULL);
-    noaliases = noalias;
-
-    if (prog == &dummy_eprog) {
-	zerr("%s: function definition file not found", shf->nam, 0);
-	shf->funcdef = prog;
-	return 1;
-    }
-    if (!prog)
-	prog = &dummy_eprog;
-    if (prog->alloc == EA_MAP)
-	shf->funcdef = stripkshdef(prog, shf->nam);
-    else
-	shf->funcdef = dupeprog(stripkshdef(prog, shf->nam), 0);
-    shf->flags &= ~PM_UNDEFINED;
-
-    popheap();
-
-    return 0;
-}
-
-/* execute a shell function */
+/*
+ * execute a shell function
+ *
+ * If noreturnval is nonzero, then reset the current return
+ * value (lastval) to its value before the shell function
+ * was executed.  However, in any case return the status value
+ * from the function (i.e. if noreturnval is not set, this
+ * will be the same as lastval).
+ */
 
 /**/
-mod_export void
+mod_export int
 doshfunc(char *name, Eprog prog, LinkList doshargs, int flags, int noreturnval)
-/* If noreturnval is nonzero, then reset the current return *
- * value (lastval) to its value before the shell function   *
- * was executed.                                            */
 {
-    char **tab, **x, *oargv0 = NULL;
-    int oldzoptind, oldlastval, oldoptcind;
-    char saveopts[OPT_SIZE], *oldscriptname;
-    int obreaks = breaks;
+    char **tab, **x, *oargv0;
+    int oldzoptind, oldlastval, oldoptcind, oldnumpipestats, ret;
+    int *oldpipestats = NULL;
+    char saveopts[OPT_SIZE], *oldscriptname = scriptname, *fname = dupstring(name);
+    int obreaks;
     struct funcstack fstack;
+#ifdef MAX_FUNCTION_DEPTH
+    static int funcdepth;
+#endif
 
     pushheap();
+
+    oargv0 = NULL;
+    obreaks = breaks;;
     if (trapreturn < 0)
 	trapreturn--;
     oldlastval = lastval;
+    oldnumpipestats = numpipestats;
+    if (noreturnval) {
+	/*
+	 * Easiest to use the heap here since we're bracketed
+	 * immediately by a pushheap/popheap pair.
+	 */
+	size_t bytes = sizeof(int)*numpipestats;
+	oldpipestats = (int *)zhalloc(bytes);
+	memcpy(oldpipestats, pipestats, bytes);
+    }
 
-    starttrapscope();
+    if (!intrap)
+	starttrapscope();
 
     tab = pparams;
-    oldscriptname = scriptname;
-    scriptname = dupstring(name);
+    if (!(flags & PM_UNDEFINED))
+	scriptname = dupstring(name);
     oldzoptind = zoptind;
     zoptind = 1;
     oldoptcind = optcind;
@@ -3282,7 +3565,7 @@ doshfunc(char *name, Eprog prog, LinkList doshargs, int flags, int noreturnval)
 	LinkNode node;
 
 	node = doshargs->first;
-	pparams = x = (char **) zcalloc(((sizeof *x) *
+	pparams = x = (char **) zshcalloc(((sizeof *x) *
 					 (1 + countlinknodes(doshargs))));
 	if (isset(FUNCTIONARGZERO)) {
 	    oargv0 = argzero;
@@ -3292,17 +3575,48 @@ doshfunc(char *name, Eprog prog, LinkList doshargs, int flags, int noreturnval)
 	for (; node; node = node->next, x++)
 	    *x = ztrdup((char *) node->dat);
     } else {
-	pparams = (char **) zcalloc(sizeof *pparams);
+	pparams = (char **) zshcalloc(sizeof *pparams);
 	if (isset(FUNCTIONARGZERO)) {
 	    oargv0 = argzero;
 	    argzero = ztrdup(argzero);
 	}
     }
+#ifdef MAX_FUNCTION_DEPTH
+    if(++funcdepth > MAX_FUNCTION_DEPTH)
+    {
+        zerr("maximum nested function level reached", NULL, 0);
+	goto undoshfunc;
+    }
+#endif
     fstack.name = dupstring(name);
     fstack.prev = funcstack;
     funcstack = &fstack;
+
+    if (prog->flags & EF_RUN) {
+	Shfunc shf;
+
+	prog->flags &= ~EF_RUN;
+
+	runshfunc(prog, NULL, fstack.name);
+
+	if (!(shf = (Shfunc) shfunctab->getnode(shfunctab,
+						(name = fname)))) {
+	    zwarn("%s: function not defined by file", name, 0);
+	    if (noreturnval)
+		errflag = 1;
+	    else
+		lastval = 1;
+	    goto doneshfunc;
+	}
+	prog = shf->funcdef;
+    }
     runshfunc(prog, wrappers, fstack.name);
+ doneshfunc:
     funcstack = fstack.prev;
+#ifdef MAX_FUNCTION_DEPTH
+ undoshfunc:
+    --funcdepth;
+#endif
     if (retflag) {
 	retflag = 0;
 	breaks = obreaks;
@@ -3312,10 +3626,10 @@ doshfunc(char *name, Eprog prog, LinkList doshargs, int flags, int noreturnval)
 	zsfree(argzero);
 	argzero = oargv0;
     }
+    pparams = tab;
     optcind = oldoptcind;
     zoptind = oldzoptind;
     scriptname = oldscriptname;
-    pparams = tab;
 
     if (isset(LOCALOPTIONS)) {
 	/* restore all shell options except PRIVILEGED and RESTRICTED */
@@ -3329,13 +3643,36 @@ doshfunc(char *name, Eprog prog, LinkList doshargs, int flags, int noreturnval)
 	opts[LOCALOPTIONS] = saveopts[LOCALOPTIONS];
     }
 
-    endtrapscope();
+    if (!intrap)
+	endtrapscope();
 
     if (trapreturn < -1)
 	trapreturn++;
-    if (noreturnval)
+    ret = lastval;
+    if (noreturnval) {
 	lastval = oldlastval;
+	numpipestats = oldnumpipestats;
+	memcpy(pipestats, oldpipestats, sizeof(int)*numpipestats);
+    }
     popheap();
+
+    if (exit_pending) {
+	if (locallevel) {
+	    /* Still functions to return: force them to do so. */
+	    retflag = 1;
+	    breaks = loops;
+	} else {
+	    /*
+	     * All functions finished: time to exit the shell.
+	     * We already did the `stopmsg' test when the
+	     * exit command was handled.
+	     */
+	    stopmsg = 1;
+	    zexit(exit_pending >> 1, 0);
+	}
+    }
+
+    return ret;
 }
 
 /* This finally executes a shell function and any function wrappers     *
@@ -3379,6 +3716,7 @@ getfpfunc(char *s, int *ksh)
 {
     char **pp, buf[PATH_MAX];
     off_t len;
+    off_t rlen;
     char *d;
     Eprog r;
     int fd;
@@ -3398,12 +3736,16 @@ getfpfunc(char *s, int *ksh)
 	    if ((len = lseek(fd, 0, 2)) != -1) {
 		d = (char *) zalloc(len + 1);
 		lseek(fd, 0, 0);
-		if (read(fd, d, len) == len) {
-		    close(fd);
-		    d[len] = '\0';
-		    d = metafy(d, len, META_REALLOC);
+		if ((rlen = read(fd, d, len)) >= 0) {
+		    char *oldscriptname = scriptname;
 
-		    r = parse_string(d, 1);
+		    close(fd);
+		    d[rlen] = '\0';
+		    d = metafy(d, rlen, META_REALLOC);
+
+		    scriptname = dupstring(s);
+		    r = parse_string(d);
+		    scriptname = oldscriptname;
 
 		    zfree(d, len + 1);
 
@@ -3456,7 +3798,7 @@ stripkshdef(Eprog prog, char *name)
 	plen = nprg * sizeof(wordcode);
 	len = plen + (npats * sizeof(Patprog)) + nstrs;
 
-	if (prog->alloc == EA_MAP) {
+	if (prog->flags & EF_MAP) {
 	    ret = prog;
 	    free(prog->pats);
 	    ret->pats = pp = (Patprog *) zalloc(npats * sizeof(Patprog));
@@ -3464,7 +3806,7 @@ stripkshdef(Eprog prog, char *name)
 	    ret->strs = prog->strs + sbeg;
 	} else {
 	    ret = (Eprog) zhalloc(sizeof(*ret));
-	    ret->alloc = EA_HEAP;
+	    ret->flags = EF_HEAP;
 	    ret->pats = pp = (Patprog *) zhalloc(len);
 	    ret->prog = (Wordcode) (ret->pats + npats);
 	    ret->strs = (char *) (ret->prog + nprg);
