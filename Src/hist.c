@@ -1695,7 +1695,7 @@ readhistfile(char *fn, int err, int readflags)
     if (!fn && !(fn = getsparam("HISTFILE")))
 	return;
     if (readflags & HFILE_FAST) {
-	if (stat(fn, &sb) < 0
+	if (stat(unmeta(fn), &sb) < 0
 	 || (lasthist.fsiz == sb.st_size && lasthist.mtim == sb.st_mtime)
 	 || !lockhistfile(fn, 0))
 	    return;
@@ -1980,17 +1980,23 @@ lockhistfile(char *fn, int keep_trying)
 	return 0;
     if (!lockhistct++) {
 	struct stat sb;
-	int fd, len = strlen(fn);
-	char *tmpfile, *lockfile;
+	int fd, len;
+	char *lockfile;
+#ifdef HAVE_LINK
+	char *tmpfile;
+#endif
 
+	fn = unmeta(fn);
+	len = strlen(fn);
+	lockfile = zalloc(len + 5 + 1);
+	sprintf(lockfile, "%s.LOCK", fn);
 #ifdef HAVE_LINK
 	tmpfile = zalloc(len + 10 + 1);
 	sprintf(tmpfile, "%s.%ld", fn, (long)mypid);
-	if ((fd = open(tmpfile, O_RDWR|O_CREAT|O_EXCL, 0644)) >= 0) {
-	    write(fd, "0\n", 2);
+	unlink(tmpfile); /* NFS's O_EXCL is often broken... */
+	if ((fd = open(tmpfile, O_WRONLY|O_CREAT|O_EXCL, 0644)) >= 0) {
+	    write(fd, tmpfile+len+1, strlen(tmpfile+len+1));
 	    close(fd);
-	    lockfile = zalloc(len + 5 + 1);
-	    sprintf(lockfile, "%s.LOCK", fn);
 	    while (link(tmpfile, lockfile) < 0) {
 		if (stat(lockfile, &sb) < 0) {
 		    if (errno == ENOENT)
@@ -2006,25 +2012,33 @@ lockhistfile(char *fn, int keep_trying)
 		lockhistct--;
 		break;
 	    }
-	    free(lockfile);
+	    unlink(tmpfile);
 	}
-	unlink(tmpfile);
 	free(tmpfile);
 #else /* not HAVE_LINK */
-	lockfile = zalloc(len + 5 + 1);
-	sprintf(lockfile, "%s.LOCK", fn);
-	while ((fd = open(lockfile, O_CREAT|O_EXCL, 0644)) < 0) {
-		if (errno == EEXIST) continue;
-		else if (keep_trying) {
-		    if (time(NULL) - sb.st_mtime < 10)
-			sleep(1);
-		    continue;
-		}
-		lockhistct--;
+	while ((fd = open(lockfile, O_WRONLY|O_CREAT|O_EXCL, 0644)) < 0) {
+	    if (errno != EEXIST || !keep_trying)
 		break;
+	    if (stat(lockfile, &sb) < 0) {
+		if (errno == ENOENT)
+		    continue;
+		break;
+	    }
+	    if (time(NULL) - sb.st_mtime < 10)
+		sleep(1);
+	    else
+		unlink(lockfile);
 	}
+	if (fd < 0)
+	    lockhistct--;
+	else {
+	    char buf[16];
+	    sprintf(buf, "%ld", (long)mypid);
+	    write(fd, buf, strlen(buf));
+	    close(fd);
+	}
+#endif /* not HAVE_LINK */
 	free(lockfile);
-#endif /* HAVE_LINK */
     }
     return ct != lockhistct;
 }
@@ -2044,7 +2058,9 @@ unlockhistfile(char *fn)
 	    lockhistct = 0;
     }
     else {
-	char *lockfile = zalloc(strlen(fn) + 5 + 1);
+	char *lockfile;
+	fn = unmeta(fn);
+	lockfile = zalloc(strlen(fn) + 5 + 1);
 	sprintf(lockfile, "%s.LOCK", fn);
 	unlink(lockfile);
 	free(lockfile);
