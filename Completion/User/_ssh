@@ -1,208 +1,237 @@
 #compdef ssh slogin scp ssh-add ssh-agent ssh-keygen
 
-local state lstate line ret=1 expl args
-typeset -A options
+_ssh () {
+  local state lstate line ret=1 expl args
+  typeset -A options
 
-args=()
+  local accounts_users_hosts
 
-# ssh-opt is a pseudo-command used to complete ssh options for `scp -o'.
+  local varname="$words[1]_accounts"
 
-case "$words[1]" in
-ssh|slogin)
-  args=(
-    ':remote host name:->userhost'
-    ':command: _command_names -e'
-    '*::args:->command'
-  )
-  ;&
-ssh-opt)
-  _arguments -s \
-    '-a[disable forwarding of authentication agent connection]' \
-    '-c[select encryption cipher]:encryption cipher:(idea des 3des blowfish arcfour tss none)' \
-    '-e[set escape character]:escape character (or `none'"'"'):' \
-    '(-n)-f[go to background]' \
-    '-i[select identity file]:SSH identity file:_files' \
-    '-k[disable forwarding of kerberos tickets]' \
-    '-l[specify login name]:login name:_users' \
-    '-n[redirect stdin from /dev/null]' \
-    '*-o[specify extra options]:option string:->option' \
-    '-p[specify port on remote host]:port number on remote host:' \
-    '-q[quiet operation]' \
-    '-P[use non priviledged port]' \
-    '-t[force pseudo-tty allocation]' \
-    '-v[verbose mode]' \
-    '-V[show version number]' \
-    '-x[disable X11 forwarding]' \
-    '-C[compress all data]' \
-    '-L[specify local port forwarding]:local port forwarding:->forward' \
-    '-R[specify remote port forwarding]:remote port forwarding:->forward' \
-    "$args[@]" && ret=0
-
-  while [[ -n "$state" ]]; do
-    lstate="$state"
-    state=''
-
-    case "$lstate" in
-    option)
-      if compset -P '*[= ]'; then
-        case "$IPREFIX" in
-        *(#i)(batchmode|compression|fallbacktorsh|forward(agent|x11)|keepalive|passwordauthentication|rhosts(|rsa)authentication|rsaauthentication|usersh|kerberos(authetication|tgtparsing)|usepriviledgedport)*)
-          compadd yes no && ret=0
-  	;;
-        *(#i)cipher*)
-          _description expl 'encryption cipher'
-          compadd "$expl[@]" idea des 3des blowfish arcfour tss none && ret=0
-          ;;
-        *(#i)globalknownhostsfile*)
-          _description expl 'global file with known hosts'
-          _files "$expl[@]" && ret=0
-          ;;
-        *(#i)hostname*)
-          _description expl 'real host name to log into'
-          _hosts "$expl[@]" && ret=0
-          ;;
-        *(#i)identityfile*)
-          _description expl 'SSH identity file'
-          _files "$expl[@]" && ret=0
-          ;;
-        *(#i)(local|remote)forward*)
-          state=forward
-          ;;
-        *(#i)proxycommand*)
-          compset -q
-  	  shift 1 words
-	  (( CURRENT-- ))
-          _normal && ret=0
-          ;;
-        *(#i)stricthostkeychecking*)
-          compadd yes no ask
-          ;;
-        *(#i)userknownhostsfile*)
-          _description expl 'user file with known hosts'
-          _files "$expl[@]" && ret=0
-          ;;
-        *(#i)user*)
-          _description expl 'user to log in as'
-          _users "$expl[@]" && ret=0
-          ;;
-        *(#i)xauthlocation*)
-          _description expl 'xauth program'
-          _files "$expl[@]" -g '*(*)' && ret=0
-          ;;
-        esac
-      else
-        _description expl 'configure file option'
-        compadd "$expl[@]" -M 'm:{a-z}={A-Z}' -S '=' - \
-                BatchMode ClearAllForwardings Cipher Compression CompressionLevel \
-	        Host ConnectionAttempts EscapeChar FallBackToRsh ForwardAgent \
-	        ForwardX11 GlobalKnownHostsFile HostName IdentityFile KeepAlive \
-	        KerberosAuthentication KerberosTgtPassing LocalForward \
-	        NumberOfPasswordPrompts PasswordAuthentication Port ProxyCommand \
-	        RemoteForward RhostsAuthentication RhostsRSAAuthentication \
-	        RSAAuthentication StrictHostKeyChecking TISAuthentication \
-	        UsePriviledgedPort User UserKnownHostsFile UseRsh \
-                XAuthLocation && ret=0
-      fi
-      ;;
-    forward)
-      if compset -P 1 '*:'; then
-        if compset -P '*:'; then
-          _message 'port number'
-        else
-          _hosts -S:
-        fi
-      else
-        _message 'listen-port number'
-      fi
-      return
-      ;;
-    command)
-      shift 1 words
-      (( CURRENT-- ))
-      _normal
-      return
-      ;;
-    userhost)
-      if compset -P '*@'; then
-        _description expl 'remote host name'
-        _hosts "$expl[@]"
-	return
-      else
-        _description expl 'remote host name'
-        _hosts "$expl[@]" && ret=0
-	if (( ! $+options[-l] )); then
-	  _description expl 'login name'
-	  _users "$expl[@]" -S@ && ret=0
-        fi
-      fi
-      ;;
-    esac
-
-    break;
-  done
-
-  return ret
-  ;;
-scp)
-  _arguments -s \
-    '-c[select encryption cipher]:encryption cipher:(idea des 3des blowfish arcfour tss none)' \
-    '-P[specify port on remote host]:port number on remote host:' \
-    '-i[select identity file]:SSH identity file:_files' \
-    '-S[specify path to ssh]:path to ssh:_files -g \*\(\*\)' \
-    '-o[give SSH options]:options:->options' \
-    '-p[preserve modification times]' \
-    '-r[recursively copy directories]' \
-    '-v[verbose mode]' \
-    '-B[batch mode]' \
-    '-C[compress data]' \
-    '*:file:->file' && ret=0
-
-  if [[ "$state" = options ]]; then
-    compset -q
-    words=(ssh-opt "$words[@]" )
-    (( CURRENT++ ))
-    _ssh
-    return
-  elif [[ -n "$state" ]]; then
-    if compset -P '*:'; then
-      _files && ret=0
-    elif compset -P '*@'; then
-      _hosts -S: && ret=0
-    else
-      _files && ret=0
-      _hosts -S: && ret=0
-      _users -S@ && ret=0
-    fi
+  if (( ${(P)+varname} )); then
+    accounts_users_hosts=( ${(P)varname} )
+  else
+    accounts_users_hosts=( $my_accounts )
   fi
-  return ret
-  ;;
-ssh-add)
-  _arguments -s \
-    '-p[read passphrase from stdin]' \
-    '-l[list all identities]' \
-    '-d[remove identity]' \
-    '-D[delete all identities]' \
-    '*:SSH identity file:_files'
-  return
-  ;;
-ssh-agent)
-  _arguments -s \
-    '(:)-k[kill agent automatically]' \
-    '(:)-s[force sh-style shell]' \
-    '(:)-c[force csh-style shell]' \
-    '*::command: _normal'
-  return
-  ;;
-ssh-keygen)
-  _arguments \
-    '(-p -c -u -P)-b[specify number of bits in key]:bits in key:' \
-    '(-p -c)-f[key file]:key file:_files' \
-    '(-c -u)-N[specify new passphrase]:new passphrase:' \
-    '(-b -u -f)-P[specify old passphrase]:old passphrase:' \
-    '(-p -u)-C[specify new comment]:new comment:' \
-    '(-b -f -C -u -c)-p[change passphrase of private key file]' \
-    '(-b -f -N -p -u)-c[change comment in private and public key files]' \
-    '(-b -N -C -p -c)-u[change key cipher to default]'
-  return
-  ;;
-esac
+
+  args=()
+
+  # ssh-opt is a pseudo-command used to complete ssh options for `scp -o'.
+
+  case "$words[1]" in
+  ssh|slogin)
+    args=(
+      ':remote host name:->userhost'
+      ':command: _command_names -e'
+      '*::args:->command'
+    )
+    ;&
+  ssh-opt)
+    _arguments -s \
+      '-a[disable forwarding of authentication agent connection]' \
+      '-c[select encryption cipher]:encryption cipher:(idea des 3des blowfish arcfour tss none)' \
+      '-e[set escape character]:escape character (or `none'"'"'):' \
+      '(-n)-f[go to background]' \
+      '-i[select identity file]:SSH identity file:_files' \
+      '-k[disable forwarding of kerberos tickets]' \
+      '-l[specify login name]:login name:_ssh_users' \
+      '-n[redirect stdin from /dev/null]' \
+      '*-o[specify extra options]:option string:->option' \
+      '-p[specify port on remote host]:port number on remote host:' \
+      '-q[quiet operation]' \
+      '-P[use non priviledged port]' \
+      '-t[force pseudo-tty allocation]' \
+      '-v[verbose mode]' \
+      '-V[show version number]' \
+      '-x[disable X11 forwarding]' \
+      '-C[compress all data]' \
+      '-L[specify local port forwarding]:local port forwarding:->forward' \
+      '-R[specify remote port forwarding]:remote port forwarding:->forward' \
+      "$args[@]" && ret=0
+
+    while [[ -n "$state" ]]; do
+      lstate="$state"
+      state=''
+
+      case "$lstate" in
+      option)
+        if compset -P '*[= ]'; then
+          case "$IPREFIX" in
+          *(#i)(batchmode|compression|fallbacktorsh|forward(agent|x11)|keepalive|passwordauthentication|rhosts(|rsa)authentication|rsaauthentication|usersh|kerberos(authetication|tgtparsing)|usepriviledgedport)*)
+            compadd yes no && ret=0
+            ;;
+          *(#i)cipher*)
+            _description expl 'encryption cipher'
+            compadd "$expl[@]" idea des 3des blowfish arcfour tss none && ret=0
+            ;;
+          *(#i)globalknownhostsfile*)
+            _description expl 'global file with known hosts'
+            _files "$expl[@]" && ret=0
+            ;;
+          *(#i)hostname*)
+            _description expl 'real host name to log into'
+            _ssh_hosts "$expl[@]" && ret=0
+            ;;
+          *(#i)identityfile*)
+            _description expl 'SSH identity file'
+            _files "$expl[@]" && ret=0
+            ;;
+          *(#i)(local|remote)forward*)
+            state=forward
+            ;;
+          *(#i)proxycommand*)
+            compset -q
+            shift 1 words
+            (( CURRENT-- ))
+            _normal && ret=0
+            ;;
+          *(#i)stricthostkeychecking*)
+            compadd yes no ask
+            ;;
+          *(#i)userknownhostsfile*)
+            _description expl 'user file with known hosts'
+            _files "$expl[@]" && ret=0
+            ;;
+          *(#i)user*)
+            _description expl 'user to log in as'
+            _ssh_users "$expl[@]" && ret=0
+            ;;
+          *(#i)xauthlocation*)
+            _description expl 'xauth program'
+            _files "$expl[@]" -g '*(*)' && ret=0
+            ;;
+          esac
+        else
+          _description expl 'configure file option'
+          compadd "$expl[@]" -M 'm:{a-z}={A-Z}' -S '=' - \
+              BatchMode ClearAllForwardings Cipher Compression \
+              CompressionLevel Host ConnectionAttempts EscapeChar \
+              FallBackToRsh ForwardAgent ForwardX11 \
+              GlobalKnownHostsFile HostName IdentityFile KeepAlive \
+              KerberosAuthentication KerberosTgtPassing LocalForward \
+              NumberOfPasswordPrompts PasswordAuthentication Port \
+              ProxyCommand RemoteForward RhostsAuthentication \
+              RhostsRSAAuthentication RSAAuthentication \
+              StrictHostKeyChecking TISAuthentication \
+              UsePriviledgedPort User UserKnownHostsFile UseRsh \
+              XAuthLocation \
+            && ret=0
+        fi
+        ;;
+      forward)
+        if compset -P 1 '*:'; then
+          if compset -P '*:'; then
+            _message 'port number'
+          else
+            _ssh_hosts -S: -q
+          fi
+        else
+          _message 'listen-port number'
+        fi
+        return
+        ;;
+      command)
+        shift 1 words
+        (( CURRENT-- ))
+        _normal
+        return
+        ;;
+      userhost)
+        if compset -P '*@'; then
+          _description expl 'remote host name'
+          _ssh_hosts "$expl[@]" && ret=0
+        else
+          _description expl 'remote host name'
+          _ssh_hosts "$expl[@]" && ret=0
+          if (( ! $+options[-l] )); then
+            _description expl 'login name'
+            _ssh_users "$expl[@]" -S@ -q && ret=0
+          fi
+        fi
+        ;;
+      esac
+
+      break;
+    done
+
+    return ret
+    ;;
+  scp)
+    _arguments -s \
+      '-c[select encryption cipher]:encryption cipher:(idea des 3des blowfish arcfour tss none)' \
+      '-P[specify port on remote host]:port number on remote host:' \
+      '-i[select identity file]:SSH identity file:_files' \
+      '-S[specify path to ssh]:path to ssh:_files -g \*\(\*\)' \
+      '-o[give SSH options]:options:->options' \
+      '-p[preserve modification times]' \
+      '-r[recursively copy directories]' \
+      '-v[verbose mode]' \
+      '-B[batch mode]' \
+      '-C[compress data]' \
+      '*:file:->file' && ret=0
+
+    if [[ "$state" = options ]]; then
+      compset -q
+      words=(ssh-opt "$words[@]" )
+      (( CURRENT++ ))
+      _ssh
+      return
+    elif [[ -n "$state" ]]; then
+      if compset -P '*:'; then
+        _files && ret=0
+      elif compset -P '*@'; then
+        _ssh_hosts -S: && ret=0
+      else
+        _files && ret=0
+        _ssh_hosts -S: && ret=0
+        _ssh_users -S@ && ret=0
+      fi
+    fi
+    return ret
+    ;;
+  ssh-add)
+    _arguments -s \
+      '-p[read passphrase from stdin]' \
+      '-l[list all identities]' \
+      '-d[remove identity]' \
+      '-D[delete all identities]' \
+      '*:SSH identity file:_files'
+    return
+    ;;
+  ssh-agent)
+    _arguments -s \
+      '(:)-k[kill agent automatically]' \
+      '(:)-s[force sh-style shell]' \
+      '(:)-c[force csh-style shell]' \
+      '*::command: _normal'
+    return
+    ;;
+  ssh-keygen)
+    _arguments \
+      '(-p -c -u -P)-b[specify number of bits in key]:bits in key:' \
+      '(-p -c)-f[key file]:key file:_files' \
+      '(-c -u)-N[specify new passphrase]:new passphrase:' \
+      '(-b -u -f)-P[specify old passphrase]:old passphrase:' \
+      '(-p -u)-C[specify new comment]:new comment:' \
+      '(-b -f -C -u -c)-p[change passphrase of private key file]' \
+      '(-b -f -N -p -u)-c[change comment in private and public key files]' \
+      '(-b -N -C -p -c)-u[change key cipher to default]'
+    return
+    ;;
+  esac
+}
+
+_ssh_users () {
+  _combination accounts_users_hosts users "$@"
+}
+
+_ssh_hosts () {
+  if [[ "$IPREFIX" == *@ ]]; then
+    _combination accounts_users_hosts "users=${IPREFIX/@}" hosts "$@"
+  else
+    _combination accounts_users_hosts \
+      ${options[-l]:+"users=${options[-l]:q}"} hosts "$@"
+  fi
+}
+
+_ssh "$@"
