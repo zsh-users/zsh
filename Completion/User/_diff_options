@@ -61,10 +61,10 @@ if [[ -n "$_is_gnu[$cmd]" ]]; then
     '(--ignore-matching-lines)-I+[ignore lines that match regex]:line exclusion regex:' \
     '(-a)--text[treat all files as text]' \
     '(--text)-a[treat all files as text]' \
-    "($of $oss)--context=[context diff]::number of lines of copied context:" \
+    "($of $oss)--context=-[context diff]:number of lines of copied context:" \
     "($of $oss)-C+[output a context diff]:number of lines of copied context:" \
     "($of $oss)-c[output a context diff]" \
-    "($of $oss)--unified=[output a unified diff]::number of lines of unified context:" \
+    "($of $oss)--unified=-[output a unified diff]:number of lines of unified context:" \
     "($of $oss)-U+[output a unified diff]:number of lines of unified context:" \
     "($of $oss)-u[output a unified diff]" \
     "($ofwuc $oss -L)--label=[set label to use instead of file name]:label:" \

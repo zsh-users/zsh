@@ -1,5 +1,7 @@
 2000-05-15  Tanaka Akira  <akr@zsh.org>
 
+	* 11393: Completion/User/_diff_options: use `=-'.
+
 	* 11392: Completion/Core/_description: ignore-line fix.
 
 2000-05-15  Clint Adams  <schizo@debian.org>
