@@ -156,6 +156,11 @@ of later options overwriting earlier once.  Any of the special
 characters can appear in the option name provided it is preceded by a
 backslash.
 
+Unless the tt(-E) option is given, parsing stops at the first string
+that isn't described by one of the var(specs) And even with tt(-E),
+parsing always stops at a positional parameter equal to `tt(-)' or
+`tt(-)tt(-)'.
+
 If the tt(-A) option is given, the options and their values will also
 be put into an associative array with the option names as keys and the 
 arguments (if any) as the values.  Note that it is an error to give
@@ -167,8 +172,10 @@ positional parameters, up to but not including any not described by the
 var(specs).  This means that any options processed by tt(zparseopts) are
 removed from the positional parameters.
 
-The tt(-E) option allows to extract the options described by the
-var(specs) from the positional parameters, ignoring all other strings.
+Since tt(-E) changes the parsing rules, it can be used to test for or
+(if used together with tt(-D)) extract options and their arguments,
+ignoring all other options and arguments that may be in the positional 
+parameters.
 
 For example,
 
@@ -181,5 +188,18 @@ example(foo=(-a)
 bar=(-b x -c y -c z))
 
 The arguments from `tt(baz)' on will not be used.
+
+As an example for the tt(-E) option, consider:
+
+example(set -- -a x -b y -c z arg1 arg2
+zparseopts -E -D b:=bar)
+
+will have the effect of
+
+example(bar=(-b y)
+set -- -a x -c z arg1 arg2)
+
+I.e., the option tt(-b) and its arguments are taken from the
+positional parameters and put into the array tt(bar).
 )
 enditem()

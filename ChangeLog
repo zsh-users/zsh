@@ -1,5 +1,7 @@
 2000-05-23  Sven Wischnowsky  <wischnow@zsh.org>
 
+	* 11536: Doc/Zsh/mod_zutil.yo: doc clarifications for zparseopts
+	
 	* 11533: Doc/Zsh/compwid.yo, Src/params.c, Src/Zle/comp.h,
  	Src/Zle/compcore.c, Src/Zle/complete.c: add -[ak] options to
  	compadd
