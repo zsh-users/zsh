@@ -1,3 +1,12 @@
+2003-01-29  Oliver Kiddle  <opk@zsh.org>
+
+	* 18156: Completion/Unix/Type/_email_addresses, Doc/Zsh/compsys.yo:
+	use more conventional reply array for plugins, document new styles
+	used in _email_addresses and document bashcompinit
+
+	* 18149, 18153: Completion/bashcompinit: new function for
+	emulating bash's programmable completion system
+
 2003-01-27  Bart Schaefer  <schaefer@zsh.org>
 
 	* 18144: Src/init.c: no SIGHUP handler if parent was ignoring

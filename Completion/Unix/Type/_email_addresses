@@ -7,14 +7,14 @@
 #
 # Plugins are written as separate functions with names starting `_email-'.
 # They should either do their own completion or return the addresses in the
-# ali array in the form 'alias:address' and return 300. The -c option is
+# reply array in the form 'alias:address' and return 300. The -c option is
 # passed on to plugins (and -n could be if needed ever). New plugins will be
 # picked up and run automatically.
 
 # plugins
 (( $+functions[_email-mail] )) ||
 _email-mail() {
-  ali=( ${${${(M)${(f)"$(<$files[$plugin])"}:#alias*}##alias[[:blank:]]##}/[[:blank:]]##/:} )
+  reply=( ${${${(M)${(f)"$(<$files[$plugin])"}:#alias*}##alias[[:blank:]]##}/[[:blank:]]##/:} )
   return 300
 }
 (( $+functions[_email-mutt] )) || _email-mutt() { _email-mail }
@@ -22,13 +22,13 @@ _email-mail() {
 
 (( $+functions[_email-MH] )) ||
 _email-MH() {
-  ali=( ${${(f)"$(_call_program aliases ali)"}/: /:} )
+  reply=( ${${(f)"$(_call_program aliases ali)"}/: /:} )
   return 300
 }
 
 (( $+functions[_email-pine] )) ||
 _email-pine() {
-  ali=( ${${${${${(f)"$(<~/.addressbook)"}:#*DELETED*}:#\ *}/	[^	]#	/:}%%	*} )
+  reply=( ${${${${${(f)"$(<~/.addressbook)"}:#*DELETED*}:#\ *}/	[^	]#	/:}%%	*} )
   return 300
 }
 
@@ -77,7 +77,7 @@ _email-local() {
 }
 
 _email_addresses() {
-  local -a plugins ali list args
+  local -a plugins reply list args
   local -A opts files
   local plugin rcfile expl ret fret
 
@@ -147,17 +147,17 @@ _email_addresses() {
 
 	  if (( fret == 300 )); then
 	    if (( ! $+opts[-c] )) && [[ $opts[-n] = $plugin ]]; then
-	      zformat -a list ' -- ' "${ali[@]}"
+	      zformat -a list ' -- ' "${reply[@]}"
 	      _wanted mail-aliases expl 'alias' compadd "$@" \
-		  -d list - ${ali%%:*} && ret=0
+		  -d list - ${reply%%:*} && ret=0
 	    else
 	      if (( $#args )); then
-		ali=( ${(SM)${ali#*:}##$~__addrspec} )
+		reply=( ${(SM)${reply#*:}##$~__addrspec} )
 	      else
 		# remove lines not containing `@' as they probably aren't addresses
-		ali=( "${(@)${(M@)ali:#*@*}#*:}" )
+		reply=( "${(@)${(M@)reply:#*@*}#*:}" )
 	      fi
-	      compadd -a "$@" "$expl[@]" ali && ret=0
+	      compadd -a "$@" "$expl[@]" reply && ret=0
 	    fi
 	  fi
 	done

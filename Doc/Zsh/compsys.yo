@@ -1244,6 +1244,15 @@ time.  If the style is set to any other value, or is unset, files will be
 sorted alphabetically by name.  If the value contains the string
 `tt(reverse)', sorting is done in decreasing order.
 )
+kindex(filter, completion style)
+item(tt(filter))(
+This is used by the LDAP plugin for e-mail address completion to specify
+the attributes to match against when filtering entries. So for example, if
+the style is set to `tt(sn)', matching is done against surnames. Standard
+LDAP filtering is used so normal completion matching is bypassed. If this
+style is not set, the LDAP plugin is skipped. You may also need to set the
+tt(command) style before it can connect to your LDAP server though.
+)
 kindex(force-list, completion style)
 item(tt(force-list))(
 This forces a list of completions to be shown at any point where listing is
@@ -2091,6 +2100,13 @@ the opposite end of the history.  If this style is set to `false' (the
 default), tt(_history_complete_word) will loop immediately as in a
 menu completion.
 )
+kindex(strip-comments, completion style)
+item(tt(strip-comments))(
+If set to `true', this style causes non-essential comment text to be
+removed from the completion matches. Currently it is only used when
+completing e-mail addresses where it removes any display name from the
+addresses, cutting them down to plain var(user@host) form.
+)
 kindex(subst-globs-only, completion style)
 item(tt(subst-globs-only))(
 This is used by the tt(_expand) completer.  If it is set to `true',
@@ -2855,6 +2871,14 @@ Note that this completer is only useful if the
 tt(COMPLETE_IN_WORD) option is set; otherwise, the cursor will
 be moved to the end of the current word before the completion code is
 called and hence there will be no suffix.
+)
+findex(bashcompinit)
+item(tt(bashcompinit))(
+This function provides compatibility with bash's programmable completion
+system. When run it will define the functions, tt(compgen) and
+tt(complete) which correspond to the bash builtins with the same names. It
+will then be possible to use completion specifications and functions
+written for bash.
 )
 enditem()
 
