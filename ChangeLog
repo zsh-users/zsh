@@ -1,6 +1,10 @@
+2001-05-05  Bart Schaefer  <schaefer@zsh.org>
+
+	* 14230: Completion/Zsh/Context/_subscript: Fix flag descriptions.
+
 2001-05-04  Oliver Kiddle  <opk@zsh.org>
 
-	* 14227: Completion/Zsh/Context/_subscript, complete subscript flags
+	* 14227: Completion/Zsh/Context/_subscript: Complete subscript flags.
 
 2001-05-04  Bart Schaefer  <schaefer@zsh.org>
 

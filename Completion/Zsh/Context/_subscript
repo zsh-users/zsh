@@ -19,12 +19,12 @@ elif compset -P '\('; then
 
   case ${(Pt)${compstate[parameter]}} in
     assoc*) flags=(
-      '(R k K i I)r[return first matching value]'
-      '(r k K i I)R[return value of first matching key]'
-      '(r R K i I)k[return all values with matching keys]'
-      '(r R k i I)K[return value of first matching key]'
-      '(r R k K I)i[return first matching key]'
-      '(r R k K i)I[return all matching keys]'
+      '(R k K i I)r[any one value matched by subscript as pattern]'
+      '(r k K i I)R[all values matched by subscript as pattern]'
+      '(r R K i I)k[any one value where subscript matched by key as pattern]'
+      '(r R k i I)K[all values where subscript matched by key as pattern]'
+      '(r R k K I)i[any one key matched by subscript as pattern]'
+      '(r R k K i)I[all keys matched by subscript as pattern]'
     );;
     (|scalar*)) flags=(
       'w[make subscripting work on words of scalar]'
@@ -32,11 +32,12 @@ elif compset -P '\('; then
       'p[recognise escape sequences in subsequent s flag]'
     );&
     array*) flags=($flags
-      'n[specify match to return]'
+      'n[Nth lowest/highest index with i/I/r/R flag]'
       'b[begin with specified element]'
-      '(r R k K i)I[reverse subscript giving index of last match]'
-      '(r k K i I)R[reverse subscripting giving last match]'
-      '(R k K i I)r[reverse subscripting giving first match]'
+      '(r R k K i)I[highest index of value matched by subscript]'
+      '(r R k K I)i[lowest index of value matched by subscript]'
+      '(r k K i I)R[value matched by subscript at highest index]'
+      '(R k K i I)r[value matched by subscript at lowest index]'
     );;
   esac
 
