@@ -1,5 +1,0 @@
-#defcomp - nohup nice eval time rusage noglob nocorrect exec
-
-[[ -position 1 -1 ]]
-
-_normal "$@"
