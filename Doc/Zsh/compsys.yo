@@ -819,7 +819,10 @@ starts with a space, this list of words will be invoked unchanged,
 otherwise it will be invoked with some extra string placed after the
 first word which can be given as arguments to the tt(compadd) and
 tt(compgen) builtins and which make sure that the var(message) given
-in the description will be shown above the matches.
+in the description will be shown above the matches. These arguments
+are taken from the array parameter tt(expl) which will be set up
+before executing the var(action) and hence may be used in it (normally 
+in an expansion like `tt($expl[@])').
 
 In places where no sensible matches can be generated, the action
 should consist of only a space. This will make the var(message) be

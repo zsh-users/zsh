@@ -8,7 +8,7 @@ setopt localoptions extendedglob
 local args rest ws cur nth def nm expl descr action opt arg tmp xor
 local single uns ret=1 aret soptseq soptseq1 sopts prefix _line odescr
 local beg optbeg argbeg nargbeg inopt inrest fromrest cmd="$words[1]"
-local matched curopt noargs
+local matched curopt noargs i
 
 # Associative arrays used to collect information about the options.
 
@@ -433,7 +433,9 @@ while [[ cur -gt 0 ]]; do
 	if (( $+opts[$tmp] )); then
 	  def="$opts[$tmp]"
           curopt="$tmp"
-          _options[$curopt]=''
+	  for i in ${(s::)ws[1][2,-1]}; do
+            _options[${ws[1][1]}$i]=''
+	  done
 	  optbeg="$beg"
 	  argbeg="$beg"
           inopt=yes
@@ -646,6 +648,9 @@ if [[ -z "$def" || "$def" = :* ]]; then
         def="$dopts[$tmp[1]]"
 	opt=''
 	uns="${prefix[2,-1]%%${tmp[1][2]}*}${tmp[1][2]}"
+	for i in ${(s::)prefix[2,-1]%%${tmp[1][2]}*} ${tmp[1][2]}; do
+	  _options[${prefix[1]}$i]=''
+	done
 	break
       elif compset -P "$tmp[1]"; then
 
@@ -667,6 +672,9 @@ if [[ -z "$def" || "$def" = :* ]]; then
         def="$odopts[$tmp[1]]"
 	opt=''
 	uns="${prefix[2,-1]%%${tmp[1][2]}*}${tmp[1][2]}"
+	for i in ${(s::)prefix[2,-1]%%${tmp[1][2]}*} ${tmp[1][2]}; do
+	  _options[${prefix[1]}$i]=''
+	done
 	break
       elif compset -P "$tmp[1]"; then
 	def="$odopts[$tmp[1]]"
