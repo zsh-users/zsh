@@ -90,7 +90,7 @@ if [[ -n $state ]]; then
   case $state in
     device)
       devices=( ${(f)"$(_call_program device cdrecord -scanbus 2>/dev/null \
-          |grep '^  '|cut -c2-6,23-|sed 's/ /:/')"} )
+          |grep '^	'|cut -c2-6,23-|sed 's/ /:/')"} )
       _describe -t devices device devices && return
     ;;
     blank)
