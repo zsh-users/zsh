@@ -4,7 +4,7 @@
 	actions that have to be tried (but only once), execute actions
 	if we aren't after an option already (in the same word)
 
-001-06-06  Andrej Borsenkow  <bor@zsh.org>
+2001-06-06  Andrej Borsenkow  <bor@zsh.org>
 
 	* unposted; based on 14679 (me) and 14693 (Bart): configure.ac,
 	zshconfig.ac, .distfiles, Makefile.in, configure.in, Src/mkmakemod.sh:
