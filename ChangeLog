@@ -1,5 +1,7 @@
 2004-10-05  Peter Stephenson  <pws@csr.com>
 
+	* unposted: Update README to indicate 20412.
+
 	* 20435: Src/pattern.c: fix crash in negative matching.  Could do
 	with being streamlined but that might be a big change.
 

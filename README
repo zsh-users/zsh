@@ -5,7 +5,7 @@ THE Z SHELL (ZSH)
 Version
 -------
 
-This is zsh version 4.2.1.  This is a stable release.
+This is development code based on zsh version 4.2.1.
 
 Installing Zsh
 --------------
@@ -26,6 +26,18 @@ Possible incompatibilities
 
 Currently the only known incompatibilities between 4.2.0 and later
 versions are minor:
+
+
+Since 4.2.1:
+
+The "test" and "[" builtins now behave more like relevant Unix standards
+suggest they should.  Previously they were a simple front-end to the same
+tests used by zsh's "[[" syntax.  (The documentation was previously cagey
+about what "test" and "[" actually did.)  "[[" has always been the
+recommended way of implementing tests within zsh.
+
+
+From 4.2.0 to 4.2.1:
 
 IPv6 addresses must be specified in square brackets in the zftp module and
 the function system built on top of the zftp module.
