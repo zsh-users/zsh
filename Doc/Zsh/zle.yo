@@ -732,15 +732,21 @@ vindex(WIDGET)
 item(tt(WIDGET) (scalar))(
 The name of the widget currently being executed; read-only.
 )
+vindex(WIDGETFUNC)
+item(tt(WIDGETFUNC) (scalar))(
+The name of the shell function that implements a widget defined with
+either tt(zle -N) or tt(zle -C).  In the former case, this is the second
+argument to the tt(zle -N) command that defined the widget, or
+the first argument if there was no second argument.  In the latter case
+this is the the third argument to the tt(zle -C) command that defined the
+widget.  Read-only.
+)
 vindex(WIDGETSTYLE)
-item(tt(WIDGET) (scalar))(
-Describes the implementation behind the widget currently being executed;
-the second argument that followed tt(zle -C) or tt(zle -N) when the widget
-was defined, if any.  If the widget was defined with tt(zle -N) and there was
-no second argument this is the same as the first argument.  Hence for
-tt(zle -N) this gives the name of the function that implements the widget,
-and for tt(zle -C) this gives the internal completion widget that defines
-the type of completion.  Read-only.
+item(tt(WIDGETSTYLE) (scalar))(
+Describes the implementation behind the completion widget currently being
+executed; the second argument that followed tt(zle -C) when the widget was
+defined.  This is the name of a builtin completion widget.  For widgets
+defined with tt(zle -N) this is set to the empty string.  Read-only.
 )
 enditem()
 

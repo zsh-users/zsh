@@ -93,6 +93,8 @@ static struct zleparam {
 	zleunsetfn, NULL },
     { "WIDGET", PM_SCALAR | PM_READONLY, NULL, FN(get_widget),
         zleunsetfn, NULL },
+    { "WIDGETFUNC", PM_SCALAR | PM_READONLY, NULL, FN(get_widgetfunc),
+        zleunsetfn, NULL },
     { "WIDGETSTYLE", PM_SCALAR | PM_READONLY, NULL, FN(get_widgetstyle),
 	zleunsetfn, NULL },
     { NULL, 0, NULL, NULL, NULL, NULL }
@@ -282,6 +284,21 @@ get_widget(UNUSED(Param pm))
 
 /**/
 static char *
+get_widgetfunc(UNUSED(Param pm))
+{
+    Widget widget = bindk->widget;
+    int flags = widget->flags;
+
+    if (flags & WIDGET_INT)
+	return ".internal";	/* Don't see how this can ever be returned... */
+    else if (flags & WIDGET_NCOMP)
+	return widget->u.comp.func;
+    else
+	return widget->u.fnnam;
+}
+
+/**/
+static char *
 get_widgetstyle(UNUSED(Param pm))
 {
     Widget widget = bindk->widget;
@@ -292,7 +309,7 @@ get_widgetstyle(UNUSED(Param pm))
     else if (flags & WIDGET_NCOMP)
 	return widget->u.comp.wid;
     else
-	return widget->u.fnnam;
+	return "";
 }
 
 /**/
