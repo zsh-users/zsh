@@ -50,36 +50,51 @@ _history_complete_word () {
     slice=$max
   fi
 
-  if [[ -n "$compstate[old_list]" &&
-        ( -n "$stop" || "$compstate[insert]" = menu ) ]] ; then
-    # array of matches is newest -> oldest (reverse of history order)
-    if [[ "$direction" == 'older' ]]; then
-      if [[ compstate[old_insert] -eq $_hist_menu_length ||
-            "$_hist_stop" == 'oldest' ]]; then
-        _hist_stop='oldest'
-        [[ "$stop" = verbose ]] &&
-          _message 'beginning of history reached'
-      elif [[ "$_hist_stop" == 'newest' ]]; then
-        zle -Rc
+  if [[ ( -n "$compstate[old_list]" ||
+          ( $LASTWIDGET = _history-complete-* && -n $_hist_stop ) ) &&
+        ( -n "$stop" || "$compstate[insert]" = menu ) ]]; then
+    if [[ "$direction" == older ]]; then
+      if [[ $_hist_stop = new ]]; then
+        PREFIX=$_hist_old_prefix
         _history_complete_word_gen_matches
-      else
+        compstate[insert]=2
+        _hist_stop=
+      elif [[ $_hist_stop = old ]]; then
+        PREFIX=$_hist_old_prefix
+        _history_complete_word_gen_matches
+        compstate[insert]=1
+        _hist_stop=
+      elif [[ compstate[old_insert] -lt _hist_menu_length ]]; then
         compstate[old_list]=keep
         (( compstate[insert] = compstate[old_insert] + 1 ))
+      else
+        _hist_stop=old
+        _message 'beginning of history reached'
+        return 1
       fi
     elif [[ "$direction" == 'newer' ]]; then
-      if [[ compstate[old_insert] -eq 1 || "$_hist_stop" == 'newest' ]]; then
-        _hist_stop='newest'
-        [[ "$stop" = verbose ]] && _message 'end of history reached'
-      elif [[ "$_hist_stop" == 'oldest' ]]; then
-        zle -Rc
+      if [[ $_hist_stop = old ]]; then
+        PREFIX=$_hist_old_prefix
         _history_complete_word_gen_matches
-      else
+        compstate[insert]=$(( $compstate[nmatches] - 1 ))
+        _hist_stop=
+      elif [[ $_hist_stop = new ]]; then
+        PREFIX=$_hist_old_prefix
+        _history_complete_word_gen_matches
+        compstate[insert]=$compstate[nmatches]
+        _hist_stop=
+      elif [[ compstate[old_insert] -gt 1 ]]; then
         compstate[old_list]=keep
         (( compstate[insert] = compstate[old_insert] - 1 ))
+      else
+        _hist_stop=new
+        _message 'end of history reached'
+        return 1
       fi
     fi
+    return 0
   else
-    _hist_stop=''
+    _hist_stop=
     _hist_old_prefix="$PREFIX"
     _history_complete_word_gen_matches
   fi

@@ -822,7 +822,7 @@ do_ambiguous(void)
 
     /* At this point, we might want a completion listing.  Show the listing *
      * if it is needed.                                                     */
-    if (isset(LISTBEEP))
+    if (isset(LISTBEEP) && !oldlist)
 	ret = 1;
 
     if (uselist && (usemenu != 2 || (!listshown && !oldlist)) &&

@@ -1,3 +1,10 @@
+2001-03-27  Sven Wischnowsky  <wischnow@zsh.org>
+
+	* 3752: Completion/Commands/_history_complete_word,
+	Src/Zle/compresult.c: try to make _h_c_w smarter at the
+	beginning and end of the list; avoid list-beeping if the old
+	completion list is re-used
+
 2001-03-26  Clint Adams  <schizo@debian.org>
 
 	* 13783 from Michal Politowski: Completion/Builtins/_pids:
