@@ -1,4 +1,4 @@
 DISTFILES_SRC='
 .distfiles
-_mondo
+_losetup _modutils _mondo _valgrind
 '

@@ -1,0 +1,14 @@
+#compdef losetup
+
+local cyphers
+cyphers=( /proc/crypto/cipher/*(N:t) )
+cyphers="${cyphers[@]%-*}"
+
+_arguments -S \
+  '(- 2)'{--delete,--detach,-d}'[detach from specified loop device]' \
+  '(-d --delete --detach -e --encryption)'{-e,--encryption}"+[enable encryption]:cypher:( $cyphers )" \
+  '(-d --delete --detach -o --offset)'{-o,--offset}'+[specify data start is offset]:offset (bytes)' \
+  '(-d --delete --detach -p --pass-fd)'{-p,--pass-fd}'+[read passphrase from specified file descriptor]:file descriptor:_file_descriptors' \
+  '(-d --delete --detach -k --keybits)'{-k,--keybits}'+[set the number of bits to use in key]:key size:(64 128 160 192 256)' \
+  '1:device:_files -g loop\*' \
+  '(-d --delete --detach)2:file:_files'
