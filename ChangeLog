@@ -1,3 +1,7 @@
+2004-03-08  Peter Stephenson  <pws@csr.com>
+
+	* 19552: Src/params.c: missing mod_export.
+
 2004-03-07  Oliver Kiddle  <opk@zsh.org>
 
 	* unposted: Etc/MACHINES: builds `out-of-the-box' on OpenBSD 3.4
