@@ -3,6 +3,11 @@
 	* 18325: Src/Modules/parameter.c: options on by default weren't
 	handled correctly.
 
+2003-02-27  Doug Kearns  <djkea2@mugca.its.monash.edu.au>
+
+	* 18305: Completion/Unix/Command/_python: new completion for
+	python.
+
 2003-02-26  Clint Adams  <clint@zsh.org>
 
         * 18303: zshconfig.ac: fix some always-true test evaluations.
