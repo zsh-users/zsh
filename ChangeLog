@@ -1,5 +1,8 @@
 2000-05-09  Sven Wischnowsky  <wischnow@zsh.org>
 
+	* 11273: Completion/Base/_argument_sets,
+ 	Completion/Base/_arguments: option name clash in _arguments
+	
 	* 11272: Completion/Base/_arguments: fix for _arguments without
  	options and no more arguments to complete
 	

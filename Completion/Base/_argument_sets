@@ -20,7 +20,7 @@ ocontext=()
 while true; do
   end=$argv[(i)-]
 
-  _arguments -M xor "$1" "$all[@]" "${(@)argv[2,end-1]}"
+  _arguments -m xor "$1" "$all[@]" "${(@)argv[2,end-1]}"
   r=$?
 
   oopt_args=( "$oopt_args[@]" "${(kv)opt_args}" )

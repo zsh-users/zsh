@@ -150,13 +150,13 @@ fi
 
 multi=(-i)
 subopts=()
-while [[ "$1" = -(O*|C|M*) ]]; do
+while [[ "$1" = -(O*|C|m*) ]]; do
   case "$1" in
   -C) usecc=yes; shift ;;
   -O) subopts=( "${(@P)2}" ); shift 2 ;;
   -O*)  subopts=( "${(@P)1[3,-1]}" ); shift ;;
-  -M) ismulti=yes multi=(-I "$2" "$3"); shift 3 ;;
-  -M*) ismulti=yes multi=(-I "${1[3,-1]}" "$2"); shift 2 ;;
+  -m) ismulti=yes multi=(-I "$2" "$3"); shift 3 ;;
+  -m*) ismulti=yes multi=(-I "${1[3,-1]}" "$2"); shift 2 ;;
   esac
 done
 
