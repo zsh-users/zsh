@@ -1,10 +1,21 @@
-#compdef ssh ssh-add ssh-agent ssh-keygen
+#compdef ssh slogin scp ssh-add ssh-agent ssh-keygen
 
-local state lstate line ret=1 expl
+local state lstate line ret=1 expl args
 typeset -A options
 
+args=()
+
+# ssh-opt is a pseudo-command used to complete ssh options for `scp -o'.
+
 case "$words[1]" in
-ssh)
+ssh|slogin)
+  args=(
+    ':remote host name:->userhost'
+    ':command: _command_names -e'
+    '*::args:->command'
+  )
+  ;&
+ssh-opt)
   _arguments -s \
     '-a[disable forwarding of authentication agent connection]' \
     '-c[select encryption cipher]:encryption cipher:(idea des 3des blowfish arcfour tss none)' \
@@ -25,9 +36,7 @@ ssh)
     '-C[compress all data]' \
     '-L[specify local port forwarding]:local port forwarding:->forward' \
     '-R[specify remote port forwarding]:remote port forwarding:->forward' \
-    ':remote host name:_hosts' \
-    ':command: _command_names -e' \
-    '*::args:->command' && ret=0
+    "$args[@]" && ret=0
 
   while [[ -n "$state" ]]; do
     lstate="$state"
@@ -113,11 +122,58 @@ ssh)
       _normal
       return
       ;;
+    userhost)
+      if compset -P '*@'; then
+        _description expl 'remote host name'
+        _hosts "$expl[@]"
+	return
+      else
+        _description expl 'remote host name'
+        _hosts "$expl[@]" && ret=0
+	if (( ! $+options[-l] )); then
+	  _description expl 'login name'
+	  _users "$expl[@]" -S@ && ret=0
+        fi
+      fi
+      ;;
     esac
 
     break;
   done
 
+  return ret
+  ;;
+scp)
+  _arguments -s \
+    '-c[select encryption cipher]:encryption cipher:(idea des 3des blowfish arcfour tss none)' \
+    '-P[specify port on remote host]:port number on remote host:' \
+    '-i[select identity file]:SSH identity file:_files' \
+    '-S[specify path to ssh]:path to ssh:_files -g \*\(\*\)' \
+    '-o[give SSH options]:options:->options' \
+    '-p[preserve modification times]' \
+    '-r[recursively copy directories]' \
+    '-v[verbose mode]' \
+    '-B[batch mode]' \
+    '-C[compress data]' \
+    '*:file:->file' && ret=0
+
+  if [[ "$state" = options ]]; then
+    compset -q
+    words=(ssh-opt "$words[@]" )
+    (( CURRENT++ ))
+    _ssh
+    return
+  elif [[ -n "$state" ]]; then
+    if compset -P '*:'; then
+      _files && ret=0
+    elif compset -P '*@'; then
+      _hosts -S: && ret=0
+    else
+      _files && ret=0
+      _hosts -S: && ret=0
+      _users -S@ && ret=0
+    fi
+  fi
   return ret
   ;;
 ssh-add)

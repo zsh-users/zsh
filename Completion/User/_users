@@ -1,6 +1,13 @@
 #autoload
 
+# If a parameter `users' exists and it is an array, we first try to
+# complete only to its elements.
+
 local expl
 
 _description expl user
+
+[[ "${(t)users}" = *array* ]] &&
+    compadd "$expl[@]" "$@" - "$users[@]" && return 0
+
 compgen "$@" "$expl[@]" -u
