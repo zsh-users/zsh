@@ -28,10 +28,10 @@ else
     '-jsconsole[start with JavaScript Console]' \
     '-venkman[start with JavaScript debugger]' \
     '-terminal[start with command line terminal]' \
-    '-edit[start with editor]:url:_urls' \
-    '-chrome[load the specified chrome]:url:_urls' \
+    '-edit[start with editor]:URL:_urls' \
+    '-chrome[load the specified chrome]:URL:_urls' \
     '-mail[start with mail]' \
-    '-compose[start with messenger compose]:url:_urls' \
+    '-compose[start with messenger compose]:URL:_urls' \
     '*:location:->urls' && ret=0
 fi
 

@@ -78,7 +78,7 @@ _svn_subcommand () {
     ;;
     log)
       _svn_subcmds+=(
-        '1: : _alternative "files:file:_files -g \*\(e:_svn_controlled:\)" "urls:url:_svn_urls"'
+        '1: : _alternative "files:file:_files -g \*\(e:_svn_controlled:\)" "urls:URL:_svn_urls"'
 	'*:file:_files -g "*(e:_svn_controlled:)"'
       )
     ;;
@@ -86,10 +86,10 @@ _svn_subcommand () {
       case $_svn_subcmd_usage in
         *(TARGET|URL*PATH)*)
           _svn_subcmds+=( 
-	    '*: : _alternative "files:file:_files" "urls:url:_svn_urls"'
+	    '*: : _alternative "files:file:_files" "urls:URL:_svn_urls"'
 	  )
 	;;
-        *URL*) _svn_subcmds+=( ':url:_svn_urls' ) ;;
+        *URL*) _svn_subcmds+=( ':URL:_svn_urls' ) ;;
         *PATH*) _svn_subcmds+=( '*:file:_files' ) ;;
       esac
     ;;

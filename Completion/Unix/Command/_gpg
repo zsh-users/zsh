@@ -100,7 +100,7 @@ _arguments -C -s -S -A "-*" \
   '(-N --notation-data)'{-N,--notation-data}'[put parameter in signature]:name=value' \
   '(--no-show-notation)--show-notation[show key signature notations]' \
   "(--show-notation)--no-show-notation[don't show key signature notations]" \
-  '--set-policy-url:policy url' \
+  '--set-policy-url:policy URL' \
   '(--no-show-policy-url)--show-policy-url' \
   "(--show-policy-url)--no-show-policy-url" \
   '--set-filename[specify file which is stored in messages]:file:_files' \

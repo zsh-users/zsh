@@ -31,7 +31,7 @@ _arguments -s \
   "($opts $idx -url)-attach[go directly into composer with given file]:file:_files" \
   "($opts $idx -url)-attachlist[go to composer with given files]:file:_files" \
   "($opts $idx -url)-attach_and_delete[go to composer, attach file, delete when finished]:file:_files" \
-  "($opts $idx $send)-url[open the given URL]:url:_email_addresses -c -P mailto\:" \
+  "($opts $idx $send)-url[open the given URL]:URL:_email_addresses -c -P mailto\:" \
   "($opts $send)-f+[specify mailbox to load]:mailbox: _mailboxes" \
   "($opts $send)-c+[specify context to apply to -f arg]: :_guard '[0-9]#' number" \
   "($opts $send)-sort[specify sort order of folder]:sort order:(${(j: :)sortorder})" \

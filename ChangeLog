@@ -1,3 +1,15 @@
+2004-02-26  Doug Kearns  <djkea2@mugca.its.monash.edu.au>
+
+	* 19468: Completion/Unix/Command/_elinks,
+	Completion/Unix/Command/_gpg, Completion/Unix/Command/_imagemagick,
+	Completion/Unix/Command/_java, Completion/Unix/Command/_links,
+	Completion/Unix/Command/_lynx, Completion/Unix/Command/_pine,
+	Completion/Unix/Command/_subversion, Completion/Unix/Command/_w3m,
+	Completion/Unix/Command/_webbrowser, Completion/Unix/Command/_wget,
+	Completion/Unix/Type/_urls, Completion/X/Command/_mozilla,
+	Completion/X/Command/_mplayer: capitalize URL abbreviation in
+	completion descriptions 
+
 2004-02-26  Peter Stephenson  <pws@csr.com>
 
 	* 19460: configure.ac, Src/Modules/terminfo.c,

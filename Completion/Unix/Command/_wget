@@ -48,7 +48,7 @@ _arguments -C -s \
   '--header=:string:' \
   '--proxy-user=:user:' \
   '--proxy-passwd=:password:' \
-  '--referer=:url:_urls' \
+  '--referer=:URL:_urls' \
   '(--save-headers -s)'{--save-headers,-s}'[save http headers]' \
   '(--user-agent -U)'{--user-agent=,-U+}'[specify user agent to identify as]:user-agent' \
   '--retr-symlinks' \
@@ -97,7 +97,7 @@ _arguments -C -s \
   '--sslcerttype=[specify client cert type]:certificate type:((0\:PEM 1\:ASN1))' \
   '--sslcheckcert=[check the server cert against given CA]: :(0 1)' \
   '--sslprotocol=[choose SSL protocol]:protocol version:((0\:automatic 1\:SSLv2 2\:SSLv3 3\:TLSv1))' \
-  '*:url:_urls' && return 0
+  '*:URL:_urls' && return 0
 
 case "$state" in
   gauge)

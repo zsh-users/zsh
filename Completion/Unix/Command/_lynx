@@ -128,7 +128,7 @@ _arguments -C \
   '-vikeys' \
   '-width=:NUMBER:' \
   '-with_backspaces' \
-  ':url:->html' && ret=0
+  ':URL:->html' && ret=0
 
 case "$state" in
 restrictions)
@@ -140,7 +140,7 @@ restrictions)
     outside_telnet print shell suspend telnet_port useragent && return
   ;;
 html)
-  _alternative 'files:file:_files -g "*.x#html(-.)"' 'urls:url:_urls' && return
+  _alternative 'files:file:_files -g "*.x#html(-.)"' 'urls:URL:_urls' && return
   ;;
 esac
 

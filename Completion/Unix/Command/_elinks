@@ -29,7 +29,7 @@ _arguments -C -A '-*' \
   '*-no-numbering[do not number links in dump output]::boolean:(0 1)' \
   '*-touch-files[touch files in ~/.elinks when running with -no-connect/-session-ring]::boolean:(0 1)' \
   '(- 1)-version[print version information and exit]' \
-  '1:url:->url' && ret=0
+  '1:URL:->url' && ret=0
 
 if [[ "$state" = url ]]; then
   local elinks_bookmarks
@@ -41,7 +41,7 @@ if [[ "$state" = url ]]; then
   _alternative \
     'files:file:_files' \
     'bookmarks:bookmark:compadd -a elinks_bookmarks' \
-    'urls:url:_urls' && return
+    'urls:URL:_urls' && return
 fi
 
 return ret

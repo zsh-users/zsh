@@ -517,7 +517,7 @@ case "$service" in
       '-retrieve[retrieve matching files]' \
       '-timeout:maximum timeout' \
       '-type:remote system type:(UNIX VMS other)' \
-      ':url: _urls' && return
+      ':URL: _urls' && return
   ;;
 
   identify)

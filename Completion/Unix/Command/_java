@@ -98,7 +98,7 @@ appletviewer)
     '-debug[run applet on jdb]' \
     '-encoding[specify character encoding for source files]:encoding:->encoding' \
     '-J-[specify java option]:java option:' \
-    '*:url:_urls' && return 0
+    '*:URL:_urls' && return 0
   ;;
 
 jar)
@@ -331,7 +331,7 @@ keytool)
 
 jarsigner)
   _arguments \
-    '-keystore[specify url for keystore location]:url for keystore location:' \
+    '-keystore[specify URL for keystore location]:URL for keystore location:' \
     '-storetype[specify keystore type]:store type:' \
     '-storepass[specify password for keystore]:password:' \
     '-keypass[specify password for private key]:password:' \
