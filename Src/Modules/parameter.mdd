@@ -1,0 +1,3 @@
+autoparams="parameters commands functions options"
+
+objects="parameter.o"
