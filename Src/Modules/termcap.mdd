@@ -16,4 +16,4 @@ autobins="echotc"
 
 objects="termcap.o"
 
-extralibs="termcap"
+#extralibs="termcap"

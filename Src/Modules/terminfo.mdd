@@ -17,4 +17,4 @@ autoparams="terminfo"
 
 objects="terminfo.o"
 
-extralibs="terminfo"
+#extralibs="terminfo"

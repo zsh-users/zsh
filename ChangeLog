@@ -1,5 +1,10 @@
 2001-04-19  Clint Adams  <schizo@debian.org>
 
+	* 14039: configure.in, Config/defs.mk.in, Src/zsh.mdd,
+	Src/Modules/cap.mdd, Src/Modules/termcap.mdd,
+	Src/Modules/terminfo.mdd, Src/Modules/zftp.mdd:
+	simulate old linking behavior.
+
 	* 14033: acconfig.h, aczsh.m4, configure.in, Config/defs.mk.in,
 	Src/Makefile.in, Src/mkmakemod.sh, Src/zsh.mdd,
 	Src/Modules/cap.mdd, Src/Modules/termcap.mdd,

@@ -898,7 +898,7 @@ if test $zsh_cv_func_tgetent_accepts_null = yes; then
   AC_DEFINE(TGETENT_ACCEPTS_NULL)
 fi
 
-LIBS=$SAVELIBS
+LIBS="$LIBS_CAP $LIBS_SOCKET $LIBS_M $LIBS_TERMCAP $LIBS_TERMINFO $LIBS_YP $SAVELIBS"
 
 AC_FUNC_MMAP
 if test x$ac_cv_func_mmap_fixed_mapped = xyes; then
@@ -1688,16 +1688,16 @@ if test "x$dynamic" = xyes; then
   test "$zsh_cv_shared_environ" = yes || dynamic=no
 dnl  test "$zsh_cv_sys_dynamic_broken" = no || dynamic=no
   if test "$ac_cv_func_tgetent" = yes; then
-    SAVELIBS=$LIBS
-    LIBS="$LIBS_TERMCAP $LIBS"
+#    SAVELIBS=$LIBS
+#    LIBS="$LIBS_TERMCAP $LIBS"
     zsh_SHARED_FUNCTION([tgetent])
-    LIBS=$SAVELIBS
+#    LIBS=$SAVELIBS
   fi
   if test "$ac_cv_func_tigetstr" = yes; then
-    SAVELIBS=$LIBS
-    LIBS="$LIBS_TERMINFO $LIBS"
+#    SAVELIBS=$LIBS
+#    LIBS="$LIBS_TERMINFO $LIBS"
     zsh_SHARED_FUNCTION([tigetstr])
-    LIBS=$SAVELIBS
+#    LIBS=$SAVELIBS
   fi
 fi
 
