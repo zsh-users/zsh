@@ -1,3 +1,8 @@
+2000-04-31  Oliver Kiddle  <opk@zsh.org>
+
+	* 11037: Etc/MACHINES, Etc/NEWS, Etc/completion-style-guide,
+	Etc/zsh-development-guide: spelling corrections
+
 2000-04-30  Peter Stephenson  <pws@pwstephenson.fsnet.co.uk>
 
 	* 11033: Completion/Commands/.distfiles,

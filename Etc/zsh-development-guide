@@ -73,8 +73,7 @@ Testing
   tests for basic syntactic features, builtins, options etc. which you
   know to be flakey or to have had difficulties in the past.  Better
   support for testing job control and interactive features is expected
-  to follow eventually (this may require additional external software
-  e.g. `expect').
+  to follow eventually.
 
 * The directory is not part of the usual process of building and
   installation.  To run the tests, go to Test and `make check'.  Please
@@ -146,7 +145,7 @@ C coding style
   The declaration itself should be all on one line (except for multi-line
   initialisers).
 
-* Preprocessor directives thst affect the function/variable declarations must
+* Preprocessor directives that affect the function/variable declarations must
   also be preceded by a "/**/" line, so that they get copied into the
   prototype lists.
 
@@ -178,12 +177,13 @@ used; the naming hierarchy is strictly for organisational convenience.
 
 Each module is described by a file with a name ending in `.mdd' somewhere
 under the Src directory.  This file is actually a shell script that will
-sourced when zsh is build. To describe the module it can/should set the
+sourced when zsh is built. To describe the module it can/should set the
 following shell variables:
 
   - name            name of the module
   - moddeps         modules on which this module depends (default none)
-  - nozshdep        non-empty indicates no dependence on the `zsh/main' pseudo-module
+  - nozshdep        non-empty indicates no dependence on the `zsh/main'
+                    pseudo-module
   - alwayslink      if non-empty, always link the module into the executable
   - autobins        builtins defined by the module, for autoloading
   - autoinfixconds  infix condition codes defined by the module, for
@@ -361,7 +361,7 @@ tokenized. There are three helper functions available:
     function is non-zero if the the num'th string from the array taken 
     as a glob pattern matches the given string.
 
-Registering and de-resgitering condition codes with the shell is
+Registering and de-registering condition codes with the shell is
 almost exactly the same as for builtins, using the functions
 `addconddefs()' and `deleteconddefs()' instead:
 
@@ -504,7 +504,7 @@ last argument from the macro-call. Functions defined with
 `STRMATHFUNC' get the name of the function, the string between the
 parentheses at the call, and the last argument from the macro-call.
 
-Both types of functions return an mnumber which is a descriminated
+Both types of functions return an mnumber which is a discriminated
 union looking like:
 
   typedef struct {
@@ -737,7 +737,7 @@ finished:
   }
 
 Inside these wrapper functions the global variable `sfcontext' will be 
-set to a vlue indicating the circumstances under which the shell
+set to a clue indicating the circumstances under which the shell
 function was called. It can have any of the following values:
 
   - SFC_DIRECT:   the function was invoked directly by the user
@@ -758,13 +758,13 @@ defined wrappers from a shell function. In this case the module can't
 be unloaded immediately since the wrapper function is still on the
 call stack. The zsh code delays unloading modules until all wrappers
 from them have finished. To hide this from the user, the module's
-cleanup function is run immediatly so that all builtins, condition
+cleanup function is run immediately so that all builtins, condition
 codes, and wrapper function defined by the module are
 de-registered. But if there is some module-global state that has to be 
 finalized (e.g. some memory that has to be freed) and that is used by
 the wrapper functions finalizing this data in the cleanup function
 won't work.
-This is why ther are two functions each for the initialization and
+This is why there are two functions each for the initialization and
 finalization of modules. The `boot'- and `cleanup'-functions are run
 whenever the user calls `zmodload' or `zmodload -u' and should only
 register or de-register the module's interface that is visible to the
@@ -810,7 +810,7 @@ Documentation
     `item()' list structure, then the instruction `nofill(...)', which
     simply turns off filling should be used; as with `indent(...)',
     explicit font changing commands are required.  This can be used
-    without `indent()' when no identation is required, e.g. if the
+    without `indent()' when no indentation is required, e.g. if the
     accumulated indentation would otherwise be too long.
   All the above should appear on their own, separated by newlines from the
   surrounding text.  No extra newlines after the opening or before the

@@ -64,7 +64,7 @@ IBM: AIX 3.2, 4.1
 	Should build `out-of-the-box', but --enable-zsh-mem will not work.
 
 	On 3.2, for 64-bit integer support you need to compile with gcc, as
-	the native compiler does not support ANSI simulataneously with
+	the native compiler does not support ANSI simultaneously with
 	`long long'.  On 4.1, there appear to be problems using
 	--enable-dynamic (the default) with gcc (version was 2.7.2.3) in
 	4.1, though native cc works. More information about this problem
@@ -107,16 +107,16 @@ SIEMENS: Reliant UNIX
        and CDS/CDS++ compiler.
 
 SIEMENS: SINIX
-       MX (Intel) plattform: SINIX-L/M 5.41
+       MX (Intel) platform: SINIX-L/M 5.41
        Builds out-of-the-box with EGCS. Neither dynamic loading nor
-       64-bit integers are suported. Native compiler was not tried
+       64-bit integers are supported. Native compiler was not tried
        mostly because GCC/EGCS builds out-of-the-box as well. If you 
        succeed with native compiler, send a patch for this file
        to zsh-workers.
 
-       RM (MIPS) plattform: SINIX-N/Y 5.42
+       RM (MIPS) platform: SINIX-N/Y 5.42
        Should build out-of-the-box but it was not tested. Neither
-       dynamic loading nor 64-bit integers are suported.
+       dynamic loading nor 64-bit integers are supported.
        Note, that this version is obsolete and users are expected to 
        update to Reliant UNIX.
 

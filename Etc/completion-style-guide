@@ -2,7 +2,7 @@ Contexts, tags and all that
 ---------------------------
 
 The completion system keeps track of the current context in the
-parameter `curcontext'. It's content is the hierarchical name for the
+parameter `curcontext'. Its content is the hierarchical name for the
 current context sans the `:completion:' and the last colon and the tag
 currently tried. The tags represent different types of matches. So,
 whenever you are about to add matches, you should use a tag for them
@@ -98,13 +98,13 @@ then calling `_all_labels' with the same arguments.
 
 The `_all_labels' function implements the loop over the tag aliases and
 handles the user-defined description, using (in the example) the
-parameter `expl' to store options to give to the command. These option 
+parameter `expl' to store options to give to the command. These options
 are inserted into the command line either directly before a single
 hyphen if there is such an argument or after the first word if there
-is no single hyphen. Since using `_all_labels' is so much more conveient
+is no single hyphen. Since using `_all_labels' is so much more convenient
 than writing the loop with the `_next_label' function (see below), but
-some function called to generate matches don't accept a single hyphen
-as argument anywhere but want the options built as their last arguments,
+some functions called to generate matches don't accept a single hyphen
+as an argument anywhere but want the options built as their last arguments,
 `_all_labels' will *replace* the hyphen with the options if the hyphen is
 the last argument. A good example for such a function is
 `_combination' which can be called like:
@@ -157,7 +157,7 @@ for this uses `_tags' and `_requested':
   _tags friends users hosts
 
   while _tags; do
-    _requested friends expl friend compad alice bob && ret=0
+    _requested friends expl friend compadd alice bob && ret=0
     _requested users && _users && ret=0
     _requested hosts && _hosts && ret=0
 
@@ -207,7 +207,7 @@ used by the corresponding call to `_tags' automatically.
 For the names of the tags: choose simple (short, if at all possible)
 names in plural. Also, first have a look at the tag names already used 
 by other functions and if any of these names seem sensible for the
-type of matches you are about to add, the use those names. This will
+type of matches you are about to add, then use those names. This will
 allow users to define styles for certain types of matches independent
 of the place where they are added.
 
@@ -233,7 +233,7 @@ Styles
 Users can associate patterns for hierarchical context names with
 certain styles using the `zstyle' builtin. The completion code
 should then use these styles to decide how matches should be added and 
-to get user-configured values. This, too,  is done using the builtin
+to get user-configured values. This, too, is done using the builtin
 `zstyle'.
 
 Basically styles map names to a bunch of strings (the `value'). In
@@ -327,7 +327,7 @@ throughout the completion system) and do:
   _description tag expl <descr>
   compadd "$expl@]" - <matches ...>
 
-Note that this function also accepts `-V' und `-J', optionally (in the 
+Note that this function also accepts `-V' and `-J', optionally (in the 
 same word) preceded by `1' or `2' to describe the type of group you
 want to use. For example:
 
@@ -373,7 +373,7 @@ Misc. remarks
     change the way these things will be completed everywhere by just using
     their own implementations for these functions.
 4)  Make sure that the return value of your functions is correct: zero
-    if matches where added and non-zero if no matches were found.
+    if matches were added and non-zero if no matches were found.
     In some cases you'll need to test the value of `$compstate[nmatches]'
     for this. This should always be done by first saving the old value
     (`local nm="$compstate[nmatches]"') and later comparing this with
@@ -397,7 +397,7 @@ Misc. remarks
     documentation for `_arguments' and `_values' for two functions
     that may help you with this.
 8)  If a completion function generates completely different types of
-    completions (for example, because the comamnd has several
+    completions (for example, because the command has several
     completely different modes), it should allow users to define
     functions that separately override the behavior for these
     different types. This can easily be achieved by using the

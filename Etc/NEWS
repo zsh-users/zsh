@@ -5,14 +5,14 @@ CHANGES FROM PREVIOUS VERSIONS OF ZSH
 New features in zsh version 3.1.7
 ---------------------------------
 Further enhancements to new completion system:
- - Comprehensive context-sensitive configuration vai `styles', which
-   can be set by the menu-driven front end in compinstall.
+ - Comprehensive context-sensitive configuration via `styles', which
+   can be set by the menu-driven front end in compinstall
  - General mechanism for setting patterns to be ignored in a completion;
    overriding  of patterns to be matched for functions
  - New completers: _prefix to complete word before cursor, _ignored
    to complete using words so far ignored (like $fignore but more
    powerful), _history to complete words from shell history
- - Multiple use of completers with different options, similalry splitting
+ - Multiple use of completers with different options, similarly splitting
    of different types of completion (`tags') so they are considered with
    different styles
  - Many more supplied completions for standard commands which work out of
@@ -68,7 +68,7 @@ Globbing and pattern matching:
    matches, e.g.
      [[ $foo = (#b)(*/)[^/]* ]]
    stores the part of $foo up to the last / in $match[1] and the indexes of
-   the match in $mbegin[1], $mend[1].  (#m) is also availabel to set $MATCH
+   the match in $mbegin[1], $mend[1].  (#m) is also available to set $MATCH
    to the entire match and corresponding $MBEGIN, $MEND:  useful in
    parameter substitutions like ${.../.../...}.
  - (#s) and (#e) match start and end of pattern like ^ and $ in regular
@@ -88,7 +88,7 @@ Modules:
    zsh subdirectory, so zle becomes zsh/zle etc.; aliases supplied for
    compatibility for existing code, but the new format should be used in
    future.
- - zmodload is more consistent between dynamicall and statically linked
+ - zmodload is more consistent between dynamically and statically linked
    shells
  - zsh/zftp and its function suite support multiple sessions (zfsession
    command); zftransfer allows transfer of files between two ftp sessions
@@ -286,7 +286,7 @@ New features in zsh version 3.0
 -------------------------------
 
 Trailing "/" in a glob pattern now works like in other shell thus it
-can no longer be used as a sorthand for "(/)".
+can no longer be used as a shorthand for "(/)".
 
 Much improved sh/ksh emulation.  When zsh is invoked as sh it mostly
 conforms to POSIX 1003.2.
