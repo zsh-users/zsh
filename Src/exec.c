@@ -1786,7 +1786,7 @@ execcmd(Estate state, int input, int output, int how, int last1)
 			    args = newlinklist();
 			addlinknode(args, dupstring(":"));
 		    } else if (readnullcmd && *readnullcmd &&
-			       ((Redir) peekfirst(redir))->type == READ &&
+			       ((Redir) peekfirst(redir))->type == REDIR_READ &&
 			       !nextnode(firstnode(redir))) {
 			if (!args)
 			    args = newlinklist();
@@ -2068,16 +2068,16 @@ execcmd(Estate state, int input, int output, int how, int last1)
     /* Do io redirections */
     while (redir && nonempty(redir)) {
 	fn = (Redir) ugetnode(redir);
-	DPUTS(fn->type == HEREDOC || fn->type == HEREDOCDASH,
+	DPUTS(fn->type == REDIR_HEREDOC || fn->type == REDIR_HEREDOCDASH,
 	      "BUG: unexpanded here document");
-	if (fn->type == INPIPE) {
+	if (fn->type == REDIR_INPIPE) {
 	    if (fn->fd2 == -1) {
 		closemnodes(mfds);
 		fixfds(save);
 		execerr();
 	    }
 	    addfd(forked, save, mfds, fn->fd1, fn->fd2, 0);
-	} else if (fn->type == OUTPIPE) {
+	} else if (fn->type == REDIR_OUTPIPE) {
 	    if (fn->fd2 == -1) {
 		closemnodes(mfds);
 		fixfds(save);
@@ -2085,7 +2085,7 @@ execcmd(Estate state, int input, int output, int how, int last1)
 	    }
 	    addfd(forked, save, mfds, fn->fd1, fn->fd2, 1);
 	} else {
-	    if (fn->type != HERESTR && xpandredir(fn, redir))
+	    if (fn->type != REDIR_HERESTR && xpandredir(fn, redir))
 		continue;
 	    if (errflag) {
 		closemnodes(mfds);
@@ -2099,7 +2099,7 @@ execcmd(Estate state, int input, int output, int how, int last1)
 	    if (unset(EXECOPT))
 		continue;
 	    switch(fn->type) {
-	    case HERESTR:
+	    case REDIR_HERESTR:
 		fil = getherestr(fn);
 		if (fil == -1) {
 		    closemnodes(mfds);
@@ -2110,9 +2110,9 @@ execcmd(Estate state, int input, int output, int how, int last1)
 		}
 		addfd(forked, save, mfds, fn->fd1, fil, 0);
 		break;
-	    case READ:
-	    case READWRITE:
-		if (fn->type == READ)
+	    case REDIR_READ:
+	    case REDIR_READWRITE:
+		if (fn->type == REDIR_READ)
 		    fil = open(unmeta(fn->name), O_RDONLY | O_NOCTTY);
 		else
 		    fil = open(unmeta(fn->name),
@@ -2131,14 +2131,14 @@ execcmd(Estate state, int input, int output, int how, int last1)
 		    isset(SHINSTDIN) && interact && !zleactive)
 		    init_io();
 		break;
-	    case CLOSE:
+	    case REDIR_CLOSE:
 		if (!forked && fn->fd1 < 10 && save[fn->fd1] == -2)
 		    save[fn->fd1] = movefd(fn->fd1);
 		closemn(mfds, fn->fd1);
 		zclose(fn->fd1);
 		break;
-	    case MERGEIN:
-	    case MERGEOUT:
+	    case REDIR_MERGEIN:
+	    case REDIR_MERGEOUT:
 		if (fn->fd2 < 10)
 		    closemn(mfds, fn->fd2);
 		if (fn->fd2 > 9 &&
@@ -2150,7 +2150,7 @@ execcmd(Estate state, int input, int output, int how, int last1)
 		} else {
 		    int fd = fn->fd2;
 		    if(fd == -2)
-			fd = (fn->type == MERGEOUT) ? coprocout : coprocin;
+			fd = (fn->type == REDIR_MERGEOUT) ? coprocout : coprocin;
 		    fil = dup(fd);
 		}
 		if (fil == -1) {
@@ -2163,7 +2163,7 @@ execcmd(Estate state, int input, int output, int how, int last1)
 		    zwarn("%s: %e", fn->fd2 == -2 ? "coprocess" : fdstr, errno);
 		    execerr();
 		}
-		addfd(forked, save, mfds, fn->fd1, fil, fn->type == MERGEOUT);
+		addfd(forked, save, mfds, fn->fd1, fil, fn->type == REDIR_MERGEOUT);
 		break;
 	    default:
 		if (IS_APPEND_REDIR(fn->type))
@@ -2578,7 +2578,7 @@ gethere(char *str, int typ)
 	    qt = 1;
 	}
     untokenize(str);
-    if (typ == HEREDOCDASH) {
+    if (typ == REDIR_HEREDOCDASH) {
 	strip = 1;
 	while (*str == '\t')
 	    str++;
@@ -2670,7 +2670,7 @@ getoutput(char *cmd, int qt)
 	wc_code(pc[1]) == WC_SUBLIST && !WC_SUBLIST_FLAGS(pc[1]) &&
 	WC_SUBLIST_TYPE(pc[1]) == WC_SUBLIST_END &&
 	wc_code(pc[2]) == WC_PIPE && WC_PIPE_TYPE(pc[2]) == WC_PIPE_END &&
-	wc_code(pc[3]) == WC_REDIR && WC_REDIR_TYPE(pc[3]) == READ && 
+	wc_code(pc[3]) == WC_REDIR && WC_REDIR_TYPE(pc[3]) == REDIR_READ && 
 	!pc[4] &&
 	wc_code(pc[6]) == WC_SIMPLE && !WC_SIMPLE_ARGC(pc[6])) {
 	/* $(< word) */
@@ -2990,7 +2990,7 @@ spawnpipes(LinkList l)
     n = firstnode(l);
     for (; n; incnode(n)) {
 	f = (Redir) getdata(n);
-	if (f->type == OUTPIPE || f->type == INPIPE) {
+	if (f->type == REDIR_OUTPIPE || f->type == REDIR_INPIPE) {
 	    str = f->name;
 	    f->fd2 = getpipe(str);
 	}

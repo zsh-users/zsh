@@ -1,3 +1,9 @@
+2000-12-05  Peter Stephenson  <pws@csr.com>
+
+	* Joel Smith <jsmith@caldera.com>: 13230: Src/exec.c, Src/glob.c,
+	Src/lex.c, Src/parse.c, Src/text.c, Src/zsh.h: avoid name clashes
+	with Linux kernel.
+
 2000-12-04  Bart Schaefer  <schaefer@zsh.org>
 
 	* 13229: Doc/Makefile.in: Include mod_term*.yo in MODDOCSRC.

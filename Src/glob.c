@@ -1626,9 +1626,9 @@ xpandredir(struct redir *fn, LinkList tab)
 	char *s = peekfirst(&fake);
 	fn->name = s;
 	untokenize(s);
-	if (fn->type == MERGEIN || fn->type == MERGEOUT) {
+	if (fn->type == REDIR_MERGEIN || fn->type == REDIR_MERGEOUT) {
 	    if (s[0] == '-' && !s[1])
-		fn->type = CLOSE;
+		fn->type = REDIR_CLOSE;
 	    else if (s[0] == 'p' && !s[1]) 
 		fn->fd2 = -2;
 	    else {
@@ -1636,17 +1636,17 @@ xpandredir(struct redir *fn, LinkList tab)
 		    s++;
 		if (!*s && s > fn->name)
 		    fn->fd2 = zstrtol(fn->name, NULL, 10);
-		else if (fn->type == MERGEIN)
+		else if (fn->type == REDIR_MERGEIN)
 		    zerr("file number expected", NULL, 0);
 		else
-		    fn->type = ERRWRITE;
+		    fn->type = REDIR_ERRWRITE;
 	    }
 	}
-    } else if (fn->type == MERGEIN)
+    } else if (fn->type == REDIR_MERGEIN)
 	zerr("file number expected", NULL, 0);
     else {
-	if (fn->type == MERGEOUT)
-	    fn->type = ERRWRITE;
+	if (fn->type == REDIR_MERGEOUT)
+	    fn->type = REDIR_ERRWRITE;
 	while ((nam = (char *)ugetnode(&fake))) {
 	    /* Loop over matches, duplicating the *
 	     * redirection for each file found.   */

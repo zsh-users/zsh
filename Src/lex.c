@@ -349,13 +349,13 @@ yylex(void)
 	    char *name;
 
 	    hwbegin(0);
-	    cmdpush(hdocs->type == HEREDOC ? CS_HEREDOC : CS_HEREDOCD);
+	    cmdpush(hdocs->type == REDIR_HEREDOC ? CS_HEREDOC : CS_HEREDOCD);
 	    STOPHIST
 	    name = gethere(hdocs->str, hdocs->type);
 	    ALLOWHIST
 	    cmdpop();
 	    hwend();
-	    setheredoc(hdocs->pc, HERESTR, name);
+	    setheredoc(hdocs->pc, REDIR_HERESTR, name);
 	    zfree(hdocs, sizeof(struct heredocs));
 	    hdocs = next;
 	}

@@ -707,7 +707,7 @@ par_pline(int *complex)
 	for (r = p + 1; wc_code(ecbuf[r]) == WC_REDIR; r += 3);
 
 	ecispace(r, 3);
-	ecbuf[r] = WCB_REDIR(MERGEOUT);
+	ecbuf[r] = WCB_REDIR(REDIR_MERGEOUT);
 	ecbuf[r + 1] = 2;
 	ecbuf[r + 2] = ecstrcode("1");
 
@@ -1572,21 +1572,21 @@ par_simple(int *complex, int nr)
  */
 
 static int redirtab[TRINANG - OUTANG + 1] = {
-    WRITE,
-    WRITENOW,
-    APP,
-    APPNOW,
-    READ,
-    READWRITE,
-    HEREDOC,
-    HEREDOCDASH,
-    MERGEIN,
-    MERGEOUT,
-    ERRWRITE,
-    ERRWRITENOW,
-    ERRAPP,
-    ERRAPPNOW,
-    HERESTR,
+    REDIR_WRITE,
+    REDIR_WRITENOW,
+    REDIR_APP,
+    REDIR_APPNOW,
+    REDIR_READ,
+    REDIR_READWRITE,
+    REDIR_HEREDOC,
+    REDIR_HEREDOCDASH,
+    REDIR_MERGEIN,
+    REDIR_MERGEOUT,
+    REDIR_ERRWRITE,
+    REDIR_ERRWRITENOW,
+    REDIR_ERRAPP,
+    REDIR_ERRAPPNOW,
+    REDIR_HERESTR,
 };
 
 /**/
@@ -1616,8 +1616,8 @@ par_redir(int *rp)
     name = tokstr;
 
     switch (type) {
-    case HEREDOC:
-    case HEREDOCDASH: {
+    case REDIR_HEREDOC:
+    case REDIR_HEREDOCDASH: {
 	/* <<[-] name */
 	struct heredocs **hd;
 
@@ -1638,24 +1638,24 @@ par_redir(int *rp)
 	yylex();
 	return;
     }
-    case WRITE:
-    case WRITENOW:
+    case REDIR_WRITE:
+    case REDIR_WRITENOW:
 	if (tokstr[0] == Outang && tokstr[1] == Inpar)
 	    /* > >(...) */
-	    type = OUTPIPE;
+	    type = REDIR_OUTPIPE;
 	else if (tokstr[0] == Inang && tokstr[1] == Inpar)
 	    YYERRORV(ecused);
 	break;
-    case READ:
+    case REDIR_READ:
 	if (tokstr[0] == Inang && tokstr[1] == Inpar)
 	    /* < <(...) */
-	    type = INPIPE;
+	    type = REDIR_INPIPE;
 	else if (tokstr[0] == Outang && tokstr[1] == Inpar)
 	    YYERRORV(ecused);
 	break;
-    case READWRITE:
+    case REDIR_READWRITE:
 	if ((tokstr[0] == Inang || tokstr[0] == Outang) && tokstr[1] == Inpar)
-	    type = tokstr[0] == Inang ? INPIPE : OUTPIPE;
+	    type = tokstr[0] == Inang ? REDIR_INPIPE : REDIR_OUTPIPE;
 	break;
     }
     yylex();

@@ -233,31 +233,31 @@ enum {
  * below.                                                              */
 
 enum {
-    WRITE,		/* > */
-    WRITENOW,		/* >| */
-    APP,		/* >> */
-    APPNOW,		/* >>| */
-    ERRWRITE,		/* &>, >& */
-    ERRWRITENOW,	/* >&| */
-    ERRAPP,		/* >>& */
-    ERRAPPNOW,		/* >>&| */
-    READWRITE,		/* <> */
-    READ,		/* < */
-    HEREDOC,		/* << */
-    HEREDOCDASH,	/* <<- */
-    HERESTR,		/* <<< */
-    MERGEIN,		/* <&n */
-    MERGEOUT,		/* >&n */
-    CLOSE,		/* >&-, <&- */
-    INPIPE,		/* < <(...) */
-    OUTPIPE		/* > >(...) */
+    REDIR_WRITE,		/* > */
+    REDIR_WRITENOW,		/* >| */
+    REDIR_APP,		/* >> */
+    REDIR_APPNOW,		/* >>| */
+    REDIR_ERRWRITE,		/* &>, >& */
+    REDIR_ERRWRITENOW,	/* >&| */
+    REDIR_ERRAPP,		/* >>& */
+    REDIR_ERRAPPNOW,		/* >>&| */
+    REDIR_READWRITE,		/* <> */
+    REDIR_READ,		/* < */
+    REDIR_HEREDOC,		/* << */
+    REDIR_HEREDOCDASH,	/* <<- */
+    REDIR_HERESTR,		/* <<< */
+    REDIR_MERGEIN,		/* <&n */
+    REDIR_MERGEOUT,		/* >&n */
+    REDIR_CLOSE,		/* >&-, <&- */
+    REDIR_INPIPE,		/* < <(...) */
+    REDIR_OUTPIPE		/* > >(...) */
 };
 
-#define IS_WRITE_FILE(X)      ((X)>=WRITE && (X)<=READWRITE)
+#define IS_WRITE_FILE(X)      ((X)>=REDIR_WRITE && (X)<=REDIR_READWRITE)
 #define IS_APPEND_REDIR(X)    (IS_WRITE_FILE(X) && ((X) & 2))
 #define IS_CLOBBER_REDIR(X)   (IS_WRITE_FILE(X) && ((X) & 1))
-#define IS_ERROR_REDIR(X)     ((X)>=ERRWRITE && (X)<=ERRAPPNOW)
-#define IS_READFD(X)          (((X)>=READWRITE && (X)<=MERGEIN) || (X)==INPIPE)
+#define IS_ERROR_REDIR(X)     ((X)>=REDIR_ERRWRITE && (X)<=REDIR_ERRAPPNOW)
+#define IS_READFD(X)          (((X)>=REDIR_READWRITE && (X)<=REDIR_MERGEIN) || (X)==REDIR_INPIPE)
 #define IS_REDIROP(X)         ((X)>=OUTANG && (X)<=TRINANG)
 
 /* Flags for input stack */
