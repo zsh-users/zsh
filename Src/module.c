@@ -444,6 +444,8 @@ do_load_module(char const *name)
 static void *
 do_load_module(char const *name)
 {
+    zerr("failed to load module: %s", name, 0);
+
     return NULL;
 }
 

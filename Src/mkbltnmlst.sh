@@ -20,7 +20,16 @@ trap "rm -f $1; exit 1" 1 2 15
 exec > $1
 
 for x_mod in $x_mods; do
-    echo "/* non-linked-in known module \`$x_mod' */"
+    case "$bin_mods" in
+    *" $x_mod "*)
+        echo "/* linked-in known module \`$x_mod' */"
+	linked=yes
+	;;
+    *)
+        echo "#ifdef DYNAMIC"
+        echo "/* non-linked-in known module \`$x_mod' */"
+	linked=no
+    esac
     eval "loc=\$loc_$x_mod"
     unset moddeps autobins autoinfixconds autoprefixconds autoparams
     unset automathfuncs
@@ -43,6 +52,7 @@ for x_mod in $x_mods; do
     for dep in $moddeps; do
 	echo "    add_dep(\"$x_mod\", \"$dep\");"
     done
+    test "x$linked" = xno && echo "#endif"
 done
 
 echo
