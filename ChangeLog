@@ -1,3 +1,8 @@
+2004-11-24  Clint Adams  <clint@zsh.org>
+
+	* 20583: Completion/Unix/Command/_ssh: complete "modern" options
+	such as GSSAPIAuthentication.
+
 2004-11-27  Doug Kearns  <djkea2@gus.gscit.monash.edu.au>
 
 	* 20584: Completion/Unix/Command/_screen: offer multiuser screen

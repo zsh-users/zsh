@@ -213,22 +213,29 @@ _ssh () {
       else
         _wanted values expl 'configure file option' \
             compadd -M 'm:{a-z}={A-Z}' -S '=' - \
-                AFSTokenPassing BatchMode BindAddress CheckHostIP \
+	    	AddressFamily \
+                AFSTokenPassing BatchMode BindAddress \
+		ChallengeResponseAuthentication CheckHostIP \
 		Cipher Ciphers ClearAllForwardings Compression \
-                CompressionLevel ConnectionAttempts DynamicForward \
+                CompressionLevel ConnectionAttempts ConnectTimeout \
+		DynamicForward EnableSSHKeysign \
 		EscapeChar FallBackToRsh ForwardAgent ForwardX11 \
-                GatewayPorts GlobalKnownHostsFile HostbasedAuthentication \
+		ForwardX11Trusted \
+                GatewayPorts GlobalKnownHostsFile GSSAPIAuthentication \
+		GSSAPIDelegateCredentials HostbasedAuthentication \
 		HostKeyAlgorithms HostKeyAlias HostName IdentityFile \
+		IdentitiesOnly \
 		KeepAlive KerberosAuthentication KerberosTgtPassing \
 		LocalForward LogLevel MACs NoHostAuthenticationForLocalhost \
 		NumberOfPasswordPrompts PreferredAuthentications \
 		PasswordAuthentication Port Protocol ProtocolKeepAlives \
                 ProxyCommand PubkeyAuthentication RemoteForward \
 		RhostsAuthentication RhostsRSAAuthentication \
-		RSAAuthentication ChallengeResponseAuthentication \
+		RSAAuthentication ServerAliveInterval ServerAliveCountMax \
 		SetupTimeOut SmartcardDevice StrictHostKeyChecking \
+		TCPKeepAlive \
                 UsePrivilegedPort User UserKnownHostsFile UseRsh \
-                XAuthLocation && ret=0
+                VerifyHostKeyDNS XAuthLocation && ret=0
       fi
       ;;
     forward)
