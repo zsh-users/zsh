@@ -1,3 +1,7 @@
+2005-01-10  Oliver Kiddle  <opk@zsh.org>
+
+	* 20662: Completion/X/Command/_nedit: update for nedit 5.5
+
 2004-01-09  Clint Adams  <clint@zsh.org>
 
 	* 20655: Completion/Debian/Type/_deb_packages:
