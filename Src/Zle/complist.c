@@ -251,6 +251,7 @@ getcols(Listcols c)
 /* Information about the list shown. */
 
 static int noselect, mselect, inselect, mcol, mline, mcols, mlines, mmlen;
+static int selected;
 static Cmatch **mtab, **mmtabp;
 static Cmgroup *mgtab, *mgtabp;
 static struct listcols mcolors;
@@ -567,6 +568,7 @@ domenuselect(Hookdef dummy, Chdata dat)
 	    inselect = 1;
 	    if (noselect)
 		break;
+	    selected = 1;
 	    if (!i) {
 		i = mcols * mlines;
 		while (i--)
@@ -876,8 +878,9 @@ menuselect(char **args)
     int d = 0;
 
     if (!minfo.cur) {
+	selected = 0;
 	menucomplete(args);
-	if ((minfo.cur && minfo.asked == 2) || getsparam("ZLS_SELECT"))
+	if ((minfo.cur && minfo.asked == 2) || selected)
 	    return 0;
 	d = 1;
     }

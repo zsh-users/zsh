@@ -5915,6 +5915,7 @@ permmatches(int last)
     hasperm = 1;
     permmnum = mn - 1;
     permgnum = gn - 1;
+    listdat.valid = 0;
 
     return fi;
 }
