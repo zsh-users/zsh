@@ -983,6 +983,7 @@ execpline(Estate state, wordcode slcode, int how, int last1)
 		if (!(jn->stat & STAT_LOCKED)) {
 		    child_unblock();
 		    waitjobs();
+		    child_block();
 		}
 		if (list_pipe_child &&
 		    jn->stat & STAT_DONE &&
