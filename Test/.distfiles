@@ -8,5 +8,6 @@ A03quoting.ztst      C04funcdef.ztst      Makefile.in          ztst.zsh
 A04redirect.ztst     D01prompt.ztst       V02zregexparse.ztst
 A05execution.ztst    D02glob.ztst         Y01completion.ztst
 D06subscript.ztst    V01zmodload.ztst     E01options.ztst
+B02typeset.ztst
 README
 '
