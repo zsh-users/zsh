@@ -752,6 +752,7 @@ zleread(char *lp, char *rp, int flags)
     pmpt_attr = txtchange;
     rpromptbuf = promptexpand(rp, 1, NULL, NULL);
     rpmpt_attr = txtchange;
+    free_prepostdisplay();
 
     zlereadflags = flags;
     histline = curhist;

@@ -666,17 +666,15 @@ vindex(PREDISPLAY)
 item(tt(PREDISPLAY) (scalar))(
 Text to be displayed before the start of the editable text buffer.  This
 does not have to be a complete line; to display a complete line, a newline
-must be appended explicitly.  Note that the text survives between calls to zle
-and hence must be removed explicitly by assigning an empty value to the
-parameter.
+must be appended explicitly.    The text is reset on each new invocation
+(but not recursive invocation) of zle.
 )
 vindex(POSTDISPLAY)
 item(tt(POSTDISPLAY) (scalar))(
 Text to be displayed after the end of the editable text buffer.  This
 does not have to be a complete line; to display a complete line, a newline
-must be prepended explicitly.  Note that the text survives between calls to
-zle and hence must be removed explicitly by assigning an empty value to the
-parameter.
+must be prepended explicitly.  The text is reset on each new invocation
+(but not recursive invocation) of zle.
 )
 vindex(RBUFFER)
 item(tt(RBUFFER) (scalar))(

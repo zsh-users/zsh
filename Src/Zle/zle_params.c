@@ -516,3 +516,13 @@ get_postdisplay(Param pm)
 {
     return get_prepost(postdisplay, postdisplaylen);
 }
+
+/**/
+void
+free_prepostdisplay(void)
+{
+    if (predisplaylen)
+	set_prepost(&predisplay, &predisplaylen, NULL);
+    if (postdisplaylen)
+	set_prepost(&postdisplay, &postdisplaylen, NULL);
+}
