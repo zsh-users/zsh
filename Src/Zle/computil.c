@@ -1039,7 +1039,7 @@ ca_parse_line(Cadef d)
 
 	zfree(ca_laststate.oargs, ca_laststate.d->nopts * sizeof(LinkList));
     }
-    /* MArk everything as active. */
+    /* Mark everything as active. */
 
     for (ptr = d->opts; ptr; ptr = ptr->next)
 	ptr->active = 1;
@@ -1406,8 +1406,10 @@ bin_comparguments(char *nam, char **args, char *ops, int func)
 	    return 1;
 	}
     case 'O':
-	if (ca_laststate.opt || (ca_laststate.doff && ca_laststate.def) ||
-	    (ca_laststate.def && ca_laststate.def->type == CAA_OPT)) {
+	if ((ca_laststate.opt || (ca_laststate.doff && ca_laststate.def) ||
+	     (ca_laststate.def && ca_laststate.def->type == CAA_OPT)) &&
+	    (!ca_laststate.def || ca_laststate.def->type < CAA_RARGS ||
+	     compcurrent == 1)) {
 	    LinkList next = newlinklist();
 	    LinkList direct = newlinklist();
 	    LinkList odirect = newlinklist();
