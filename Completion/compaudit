@@ -15,7 +15,13 @@ compaudit() {                           # Define and then call
 emulate -L zsh
 setopt extendedglob
 
-[[ -x /usr/bin/getent ]] || getent() { cat /etc/$1 }
+[[ -x /usr/bin/getent ]] || getent() {
+  if [[ $2 = <-> ]]; then
+    grep ":$2:[^:]*$" /etc/$1
+  else
+    grep "^$2:" /etc/$1
+  fi
+}
 
 # The positional parameters are the directories to check, else fpath.
 if (( $# )); then

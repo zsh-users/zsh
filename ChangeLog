@@ -1,5 +1,8 @@
 2004-03-30  Oliver Kiddle  <opk@zsh.org>
 
+	* 19708: Completion/compaudit: change getent() function to
+	handle two arguments
+
 	* 19707: Src/params.c, Test/D05array.ztst: fix bug where a
 	nagative index into an array returned a one element array
 	instead of a scalar
