@@ -1,5 +1,9 @@
 2001-05-28  Clint Adams  <schizo@debian.org>
 
+	* 14513: Completion/Debian/Command/.distfiles,
+	Completion/Debian/Command/_update_alternatives:
+	completion for update-alternatives
+
 	* 14512: Completion/Debian/Command/_dpkg: tweak --compare-versions
 	behavior.
 

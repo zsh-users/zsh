@@ -1,4 +1,5 @@
 DISTFILES_SRC='
 .distfiles
 _apt          _bug          _dpkg         _dpkg_source  _dupload
+_update_alternatives
 '

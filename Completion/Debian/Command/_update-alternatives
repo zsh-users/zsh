@@ -1,0 +1,41 @@
+#compdef update-alternatives
+
+local curcontext="$curcontext" context state line expl ret
+typeset -A opt_args
+
+_arguments -C '--verbose' \
+           '--quiet' \
+           '--test' \
+           '--help' \
+           '--version' \
+           '--altdir:altdir:_files -/' \
+           '--admindir:admindir:_files -/' \
+    '--install:*::alt:->install' \
+    '--remove:*::alt:->remove' \
+    '--auto:altname:_files -W /var/lib/dpkg/alternatives' \
+    '--display:altname:_files -W /var/lib/dpkg/alternatives' \
+    '--config:altname:_files -W /var/lib/dpkg/alternatives' && return 0
+
+_call_function ret _update_alternatives_$state && return ret
+case "$state" in
+	islave)
+	_arguments -C '1:link:_files' \
+                   '2:name:_files -W /var/lib/dpkg/alternatives' \
+                   '3:path:_files' \
+                   '--slave:*::slave:->islave'
+	;;
+	install)
+	_arguments -C '1:link:_files' \
+                   '2:name:_files -W /var/lib/dpkg/alternatives' \
+                   '3:path:_files' \
+                   '4:priority:' \
+                   '--slave:*::slave:->islave' \
+	;;
+
+	remove)
+	_arguments \
+                   '1:altname:_files -W /var/lib/dpkg/alternatives' \
+                   '2:path:_files'
+	;;
+
+esac
