@@ -1,5 +1,8 @@
 2003-09-21  Oliver Kiddle  <opk@zsh.org>
 
+	* users/6606: Completion/Base/Utility/_sep_parts: handle any
+	matching control options passed down
+
 	* 19106: Doc/Zsh/compsys.yo: document use for _menu
 
 2003-09-17  Vin Shelton  <acs@alumni.princeton.edu>

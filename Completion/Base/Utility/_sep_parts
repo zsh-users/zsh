@@ -17,19 +17,13 @@
 # This function understands the `-J group', `-V group', and
 # `-X explanation' options.
 
-local str arr sep test testarr tmparr prefix suffixes matchers autosuffix
+local str arr sep test testarr tmparr prefix suffixes autosuffix
 local matchflags opt group expl nm=$compstate[nmatches] opre osuf opts matcher
 
 # Get the options.
 
 zparseopts -D -a opts \
     'J+:=group' 'V+:=group' P: F: S: r: R: q 1 2 n 'X+:=expl' 'M+:=matcher'
-
-if (( $#matcher )); then
-  matcher="${matcher[2]}"
-else
-  matcher=''
-fi
 
 # Get the string from the line.
 
@@ -58,9 +52,9 @@ while [[ $# -gt 1 ]]; do
   # Get the matching array elements.
 
   PREFIX="${str%%(|\\)${sep}*}"
-  builtin compadd -O testarr -a "$arr"
+  builtin compadd -O testarr "$matcher[@]" -a "$arr"
   [[ $#testarr -eq 0 && -n "$_comp_correct" ]] &&
-    compadd -O testarr -a "$arr"
+    compadd -O testarr "$matcher[@]" -a "$arr"
 
   # If there are no matches we give up. If there is more than one
   # match, this is the part we will complete.
@@ -88,9 +82,9 @@ if [[ $# -le 1 || "$str" != *${2}* ]]; then
   # No more separators, build the matches.
 
   PREFIX="$str"
-  builtin compadd -O testarr -a "$arr"
+  builtin compadd -O testarr "$matcher[@]" -a "$arr"
   [[ $#testarr -eq 0 && -n "$_comp_correct" ]] &&
-    compadd -O testarr -a "$arr"
+    compadd -O testarr "$matcher[@]" -a "$arr"
 fi
 
 [[ $#testarr -eq 0 || ${#testarr[1]} -eq 0 ]] && return 1
@@ -98,7 +92,6 @@ fi
 # Now we build the suffixes to give to the completion code.
 
 shift
-matchers=()
 suffixes=("")
 autosuffix=()
 
@@ -125,17 +118,12 @@ while [[ $# -gt 0 && "$str" == *${1}* ]]; do
     arr=tmparr
   fi
 
-  builtin compadd -O tmparr -a "$arr"
+  builtin compadd -O tmparr "$matcher[@]" -a "$arr"
   [[ $#tmparr -eq 0 && -n "$_comp_correct" ]] &&
-    compadd -O tmparr - "$arr"
+    compadd -O tmparr "$matcher[@]" - "$arr"
 
   suffixes=("${(@)^suffixes[@]}${(q)1}${(@)^tmparr}")
 
-  # We want the completion code to generate the most specific suffix
-  # for us, so we collect matching specifications that allow partial
-  # word matching before the separators on the fly.
-
-  matchers=("$matchers[@]" "r:|${1:q}=*")
   shift 2
 done
 
@@ -144,17 +132,12 @@ done
 
 (( $# )) && autosuffix=(-qS "${(q)1}")
 
-# If we have collected matching specifications, we build an array
-# from it that can be used as arguments to `compadd'.
-
-[[ $#matchers+$#matcher -gt 0 ]] && matchers=(-M "$matchers $matcher")
-
 # Add the matches for each of the suffixes.
 
 PREFIX="$pre"
 SUFFIX="$suf"
 for i in "$suffixes[@]"; do
-  compadd -U "$group[@]" "$expl[@]" "$matchers[@]" "$autosuffix[@]" "$opts[@]" \
+  compadd -U "$group[@]" "$expl[@]" "$autosuffix[@]" "$opts[@]" \
           -i "$IPREFIX" -I "$ISUFFIX" -p "$prefix" -s "$i" -a testarr
 done
 
