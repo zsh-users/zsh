@@ -2587,6 +2587,10 @@ bin_compquote(char *nam, char **args, char *ops, int func)
     struct value vbuf;
     Value v;
 
+    if (incompfunc != 1) {
+	zwarnnam(nam, "can only be called from completion function", NULL, 0);
+	return 1;
+    }
     /* Anything to do? */
 
     if (!compqstack || !*compqstack)
@@ -3547,6 +3551,10 @@ cf_remove_other(char **names, char *pre, int *amb)
 static int
 bin_compfiles(char *nam, char **args, char *ops, int func)
 {
+    if (incompfunc != 1) {
+	zwarnnam(nam, "can only be called from completion function", NULL, 0);
+	return 1;
+    }
     if (**args != '-') {
 	zwarnnam(nam, "missing option: %s", *args, 0);
 	return 1;
@@ -3640,6 +3648,10 @@ bin_compgroups(char *nam, char **args, char *ops, int func)
     Heap oldheap;
     char *n;
 
+    if (incompfunc != 1) {
+	zwarnnam(nam, "can only be called from completion function", NULL, 0);
+	return 1;
+    }
     SWITCHHEAPS(oldheap, compheap) {
 	while ((n = *args++)) {
 	    endcmgroup(NULL);
