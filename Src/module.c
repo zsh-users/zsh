@@ -1142,23 +1142,24 @@ bin_zmodload_dep(char *nam, char **args, char *ops)
 {
     LinkNode node;
     Module m;
-    if(ops['u']) {
+    if (ops['u']) {
 	/* remove dependencies, which can't pertain to aliases */
 	const char *tnam = *args++;
 	node = find_module(tnam, 1, &tnam);
 	if (!node)
 	    return 0;
 	m = (Module) getdata(node);
-	if(*args && m->deps) {
+	if (*args && m->deps) {
 	    do {
-		for(node = firstnode(m->deps); node; incnode(node))
-		    if(!strcmp(*args, getdata(node))) {
-			zsfree(getdata(node));
-			remnode(m->deps, node);
+		LinkNode dnode;
+		for (dnode = firstnode(m->deps); dnode; incnode(dnode))
+		    if (!strcmp(*args, getdata(dnode))) {
+			zsfree(getdata(dnode));
+			remnode(m->deps, dnode);
 			break;
 		    }
 	    } while(*++args);
-	    if(empty(m->deps)) {
+	    if (empty(m->deps)) {
 		freelinklist(m->deps, freestr);
 		m->deps = NULL;
 	    }
@@ -1171,13 +1172,13 @@ bin_zmodload_dep(char *nam, char **args, char *ops)
 	if (!m->deps && !m->u.handle)
 	    delete_module(node);
 	return 0;
-    } else if(!args[0] || !args[1]) {
+    } else if (!args[0] || !args[1]) {
 	/* list dependencies */
 	for (node = firstnode(modules); node; incnode(node)) {
 	    m = (Module) getdata(node);
 	    if (m->deps && (!args[0] || !strcmp(args[0], m->nam))) {
 		LinkNode n;
-		if(ops['L']) {
+		if (ops['L']) {
 		    printf("zmodload -d ");
 		    if(m->nam[0] == '-')
 			fputs("-- ", stdout);
@@ -1202,7 +1203,7 @@ bin_zmodload_dep(char *nam, char **args, char *ops)
 	int ret = 0;
 	char *tnam = *args++;
 
-	for(; *args; args++)
+	for (; *args; args++)
 	    add_dep(tnam, *args);
 	return ret;
     }
