@@ -824,8 +824,8 @@ contain symbolic links.
 alias(r)(fc -e -)
 findex(read)
 vindex(IFS, use of)
-ifzman(xitem(tt(read) [ tt(-rszpqAclneE) ] [ tt(-t) [ var(num) ] ] [ tt(-k) [ var(num) ] ]))
-item(ifnzman(tt(read) [ tt(-rszpqAclneE) ] [ tt(-t) [ var(num) ] ] [ tt(-k) [ var(num) ] ]) [ tt(-u)var(n) ] [ var(name)[tt(?)var(prompt)] ] [ var(name) ...  ])(
+ifzman(xitem(tt(read) [ tt(-rszpqAclneE) ] [ tt(-t) [ var(num) ] ] [ tt(-k) [ var(num) ] ] [ tt(-d) var(delim) ]))
+item(ifnzman(tt(read) [ tt(-rszpqAclneE) ] [ tt(-t) [ var(num) ] ] [ tt(-k) [ var(num) ] ] [ tt(-d) var(delim) ]) [ tt(-u)var(n) ] [ var(name)[tt(?)var(prompt)] ] [ var(name) ...  ])(
 vindex(REPLY, use of)
 vindex(reply, use of)
 Read one line and break it into fields using the characters
@@ -898,6 +898,10 @@ Input is read from file descriptor var(n).
 )
 item(tt(-p))(
 Input is read from the coprocess.
+)
+item(tt(-d) var(delim))(
+Input is terminated by the first character of var(delim) instead of
+by newline.
 )
 item(tt(-t) [ var(num) ])(
 Test if input is available before attempting to read.  If var(num)

@@ -106,7 +106,7 @@ static struct builtin builtins[] =
     BUILTIN("pushln", BINF_PRINTOPTS, bin_print, 0, -1, BIN_PRINT, NULL, "-nz"),
     BUILTIN("pwd", 0, bin_pwd, 0, 0, 0, "rLP", NULL),
     BUILTIN("r", 0, bin_fc, 0, -1, BIN_R, "nrl", NULL),
-    BUILTIN("read", 0, bin_read, 0, -1, 0, "cek:%lnpqrst:%zu:AE", NULL),
+    BUILTIN("read", 0, bin_read, 0, -1, 0, "cd:ek:%lnpqrst:%zu:AE", NULL),
     BUILTIN("readonly", BINF_PLUSOPTS | BINF_MAGICEQUALS | BINF_PSPECIAL, bin_typeset, 0, -1, 0, "AE:%F:%HL:%R:%TUZ:%afghi:%lptux", "r"),
     BUILTIN("rehash", 0, bin_hash, 0, 0, 0, "df", "r"),
     BUILTIN("return", BINF_PSPECIAL, bin_break, 0, 1, BIN_RETURN, NULL, NULL),
@@ -4120,9 +4120,9 @@ bin_read(char *name, char **args, Options ops, int func)
     int readchar = -1, val, resettty = 0;
     struct ttyinfo saveti;
     char d;
+    char delim = '\n';
 
-
-    if ((OPT_HASARG(ops,c='k') || OPT_HASARG(ops,c='b'))) {
+    if (OPT_HASARG(ops,c='k')) {
 	char *eptr, *optarg = OPT_ARG(ops,c);
 	nchars = (int)zstrtol(optarg, &eptr, 10);
 	if (*eptr) {
@@ -4223,17 +4223,36 @@ bin_read(char *name, char **args, Options ops, int func)
 	    return 1;
 	}
     }
+    if (OPT_ISSET(ops,'d')) {
+        delim = *OPT_ARG(ops,'d');
+	if (SHTTY != -1) {
+	    struct ttyinfo ti;
+	    gettyinfo(&ti);
+	    saveti = ti;
+	    resettty = 1;
+#ifdef HAS_TIO
+	    ti.tio.c_lflag &= ~ICANON;
+	    ti.tio.c_cc[VMIN] = 1;
+	    ti.tio.c_cc[VTIME] = 0;
+#else
+	    ti.sgttyb.sg_flags |= CBREAK;
+#endif
+	    settyinfo(&ti);
+	}
+    }
     if (OPT_ISSET(ops,'s') && SHTTY != -1) {
 	struct ttyinfo ti;
 	gettyinfo(&ti);
-	saveti = ti;
+	if (! resettty) {
+	    saveti = ti;
+	    resettty = 1;
+	}
 #ifdef HAS_TIO
 	ti.tio.c_lflag &= ~ECHO;
 #else
 	ti.sgttyb.sg_flags &= ~ECHO;
 #endif
 	settyinfo(&ti);
-	resettty = 1;
     }
 
     /* handle prompt */
@@ -4352,11 +4371,11 @@ bin_read(char *name, char **args, Options ops, int func)
 	    c = zread(izle, &readchar);
 	    /* \ at the end of a line indicates a continuation *
 	     * line, except in raw mode (-r option)            */
-	    if (bslash && c == '\n') {
+	    if (bslash && c == delim) {
 		bslash = 0;
 		continue;
 	    }
-	    if (c == EOF || c == '\n')
+	    if (c == EOF || c == delim)
 		break;
 	    /*
 	     * `first' is non-zero if any separator we encounter is a
@@ -4393,7 +4412,7 @@ bin_read(char *name, char **args, Options ops, int func)
 	    }
 	}
 	signal_setmask(s);
-	if (c == '\n' || c == EOF)
+	if (c == delim || c == EOF)
 	    gotnl = 1;
 	*bptr = '\0';
 	/* dispose of word appropriately */
@@ -4455,11 +4474,11 @@ bin_read(char *name, char **args, Options ops, int func)
 	    c = zread(izle, &readchar);
 	    /* \ at the end of a line introduces a continuation line, except in
 	       raw mode (-r option) */
-	    if (bslash && c == '\n') {
+	    if (bslash && c == delim) {
 		bslash = 0;
 		continue;
 	    }
-	    if (c == EOF || (c == '\n' && !zbuf))
+	    if (c == EOF || (c == delim && !zbuf))
 		break;
 	    if (!bslash && isep(c) && bptr == buf) {
 		if (iwsep(c))

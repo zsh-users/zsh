@@ -1,3 +1,9 @@
+2003-02-17  Oliver Kiddle  <opk@zsh.org>
+
+	* 18242: Src/builtin.c, Completion/Zsh/Command/_read,
+	Doc/Zsh/builtins.yo: add -d option to read for specifying
+	delimiter to terminate input instead of newline
+
 2003-02-14  Peter Stephenson  <pws@csr.com>
 
 	* 18243: Src/Zle/zle_main.c: On Solaris, poll the tty for
