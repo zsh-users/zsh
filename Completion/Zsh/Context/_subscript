@@ -8,14 +8,38 @@ if [[ "$1" = -q ]]; then
   shift
 fi
 
-compset -P '\([^\)]##\)' # remove subscript flags
+compset -P '\(([^\(\)]|*\(*\)*)##\)' # remove subscript flags
 
 if [[ "$PREFIX" = :* ]]; then
   _wanted characters expl 'character class' \
       compadd -p: -S ':]' alnum alpha blank cntrl digit graph \
                           lower print punct space upper xdigit
 elif compset -P '\('; then
+  local match
   compset -S '\)*'
+
+  if [[ $PREFIX = (#b)*([bns])(?|)(*) ]]; then
+    local f=$match[1] d=$match[2] e=$match[2] v=$match[3]
+    [[ $f = s && ${(Pt)${compstate[parameter]}} != scalar ]] && return 1
+    if [[ -z $d ]]; then
+      _message 'delimiter'
+      return
+    else
+      case $d in
+      (\() e=\);;
+      (\[) e=\];;
+      (\{) e=\};;
+      esac
+      if [[ $v != *$e* ]]; then
+	case $f in
+	(s) _message 'separator string';;
+	(b|n) [[ $v = <-># ]] && _message 'number' || return 1;;
+	esac
+	[[ -n $v && $SUFFIX$ISUFFIX != *$e* ]] && _message 'delimiter'
+	return 0
+      fi
+    fi
+  fi
 
   case ${(Pt)${compstate[parameter]}} in
     assoc*) flags=(
