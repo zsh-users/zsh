@@ -62,7 +62,7 @@ if (( $# )); then
   _completers=( "$@" )
 else
   zstyle -a ":completion:${curcontext}:" completer _completers ||
-      _completers=( _complete )
+      _completers=( _complete _ignored )
 fi
 
 # And now just call the completer functions defined.

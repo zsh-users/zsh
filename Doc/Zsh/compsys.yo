@@ -841,8 +841,10 @@ example(zstyle ':completion:*' completer _complete _correct _approximate
 zstyle ':completion:incremental:*' completer _complete _correct
 zstyle ':completion:predict:*' completer _complete)
 
-The default value for this style is tt(_complete), i.e. normally only
-completion will be done.
+The default value for this style is tt(_complete _ignored),
+i.e. normally only completion will be done, first using the
+tt(ignored-patterns) style and the tt($fignore) array and then without 
+ignoring matches because of these.
 )
 kindex(completions, completion style)
 item(tt(completions))(
