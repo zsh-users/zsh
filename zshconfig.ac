@@ -494,7 +494,7 @@ AC_CHECK_HEADERS(sys/time.h sys/times.h sys/select.h termcap.h termio.h \
 		 limits.h fcntl.h libc.h sys/utsname.h sys/resource.h \
 		 locale.h errno.h stdio.h stdlib.h unistd.h sys/capability.h \
 		 utmp.h utmpx.h sys/types.h pwd.h grp.h poll.h sys/mman.h \
-		 netinet/in_systm.h pcre.h langinfo.h)
+		 netinet/in_systm.h pcre.h langinfo.h wchar.h)
 if test $dynamic = yes; then
   AC_CHECK_HEADERS(dlfcn.h)
   AC_CHECK_HEADERS(dl.h)
@@ -662,6 +662,8 @@ fi
 AC_CHECK_LIB(cap, cap_get_proc)
 
 AC_CHECK_LIB(socket, socket)
+
+AC_CHECK_LIB(iconv, iconv)
 
 dnl pcre-config should probably be employed here
 AC_SEARCH_LIBS(pcre_compile, pcre)
@@ -959,7 +961,8 @@ AC_CHECK_FUNCS(strftime difftime gettimeofday \
 	       tgetent tigetflag tigetnum tigetstr setupterm \
 	       pcre_compile pcre_study pcre_exec \
 	       nl_langinfo \
-	       erand48 open_memstream)
+	       erand48 open_memstream \
+	       wctomb iconv)
 AC_FUNC_STRCOLL
 
 dnl  Check if tgetent accepts NULL (and will allocate its own termcap buffer)

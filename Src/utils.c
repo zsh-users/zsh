@@ -30,6 +30,15 @@
 #include "zsh.mdh"
 #include "utils.pro"
 
+#if defined(HAVE_WCHAR_H) && defined(HAVE_WCTOMB)
+#include <wchar.h>
+#  ifndef __STDC_ISO_10646__
+#    if defined(HAVE_ICONV) || defined(HAVE_LIBICONV)
+#      include <iconv.h>
+#    endif
+#  endif
+#endif
+
 /* name of script being sourced */
 
 /**/
@@ -3274,7 +3283,8 @@ dquotedzputs(char const *s, FILE *stream)
  *       for no newlines.
  *   3:  As 1, but don't handle \c.
  *   4:  Do $'...' quoting.  Overwrites the existing string instead of
- *       zhalloc'ing 
+ *       zhalloc'ing. If \uNNNN ever generates multi-byte chars longer
+ *       than 6 bytes, will need to adjust this to re-allocate memory.
  *   5:  As 2, but \- is special.  Expects misc to be defined.
  *   6:  As 2, but parses only one character and returns end-pointer
  *       and parsed character in *misc
@@ -3288,11 +3298,28 @@ getkeystring(char *s, int *len, int fromwhere, int *misc)
     char *t, *u = NULL;
     char svchar = '\0';
     int meta = 0, control = 0;
+    int i;
+#if defined(HAVE_WCHAR_H) && defined(HAVE_WCTOMB)
+#  ifdef __STDC_ISO_10646__
+    wint_t wval;
+#  elif defined(HAVE_ICONV) || defined(HAVE_LIBICONV)
+    unsigned int wval;
+    iconv_t cd;
+    char inbuf[4];
+    wchar_t outbuf[1];
+    size_t inbytes, outbytes;
+    char *inptr, *outptr;
+#  endif
+    size_t count;
+    size_t buflen = MB_LEN_MAX * (strlen(s) / 6) + (strlen(s) % 6) + 1;
+#else
+    size_t buflen = strlen(s) + 1;
+#endif
 
     if (fromwhere == 6)
 	t = buf = tmp;
     else if (fromwhere != 4)
-	t = buf = zhalloc(strlen(s) + 1);
+	t = buf = zhalloc(buflen);
     else {
 	t = buf = s;
 	s += 2;
@@ -3363,6 +3390,67 @@ getkeystring(char *s, int *len, int fromwhere, int *misc)
 		    *misc = 1;
 		    break;
 		}
+#if defined(HAVE_WCHAR_H) && defined(HAVE_WCTOMB)
+#if defined(__STDC_ISO_10646__) || defined(HAVE_ICONV) || defined(HAVE_LIBICONV)
+	    case 'u':
+	    case 'U':
+	    	wval = 0;
+		for (i=(*s == 'u' ? 4 : 8); i>0; i--) {
+		    if (*++s && idigit(*s))
+		        wval = wval * 16 + (*s - '0');
+		    else if (*s && (*s >= 'a' && *s <= 'f') ||
+		            (*s >= 'A' && *s <= 'F'))
+		        wval = wval * 16 + (*s & 0x1f) + 9;
+		    else {
+		    	s--;
+		        break;
+		    }
+		}
+    	    	if (fromwhere == 6) {
+		    *misc = wval;
+		    return s+1;
+		}
+#ifdef __STDC_ISO_10646__
+		count = wctomb(t, (wchar_t)wval);
+#elif defined(HAVE_ICONV) || defined(HAVE_LIBICONV)
+    	    	inbytes = outbytes = 4;
+    	    	inptr = inbuf;
+    	    	outptr = (char *)outbuf;
+		/* assume big endian convention for UCS-4 */
+		for (i=3;i>=0;i--) {
+		    inbuf[i] = wval & 0xff;
+		    wval >>= 8;
+		}
+    	    	
+    	    	cd = iconv_open("WCHAR_T", "ISO-10646");
+		if (cd == (iconv_t)-1) {
+		    zerr("cannot do charset conversion", NULL, 0);
+		    if (fromwhere == 4) {
+			for (u = t; (*u++ = *++s););
+			return t;
+		    }
+		    *t = '\0';
+		    *len = t - buf;
+		    return buf;
+		}
+                iconv(cd, &inptr, &inbytes, &outptr, &outbytes);
+		iconv_close(cd);
+		count = wctomb(t, *outbuf);
+#endif
+		if (count == (size_t)-1) {
+		    zerr("character not in range", NULL, 0);
+		    if (fromwhere == 4) {
+			for (u = t; (*u++ = *++s););
+			return t;
+		    }
+		    *t = '\0';
+		    *len = t - buf;
+		    return buf;
+		}
+		t += count;  
+		continue;
+#endif
+#endif
 	    default:
 	    def:
 		if ((idigit(*s) && *s < '8') || *s == 'x') {

@@ -1,3 +1,8 @@
+2003-03-14  Oliver Kiddle  <opk@zsh.org>
+
+	* 18343, 18348: zshconfig.ac, Doc/Zsh/builtins.yo, Src/utils.c:
+	handle \u and \U escapes for specifying unicode characters
+
 2003-03-15  Doug Kearns  <djkea2@mugca.its.monash.edu.au>
 
 	* 18351: Completion/Unix/Command/_antiword: new completion for

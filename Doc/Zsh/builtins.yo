@@ -278,6 +278,8 @@ sitem(tt(\v))(vertical tab)
 sitem(tt(\\))(backslash)
 sitem(tt(\0)var(NNN))(character code in octal)
 sitem(tt(\x)var(NN))(character code in hexadecimal)
+sitem(tt(\u)var(NNNN))(unicode character code in hexadecimal)
+sitem(tt(\U)var(NNNNNNNN))(unicode character code in hexadecimal)
 endsitem()
 
 pindex(BSD_ECHO, use of)
