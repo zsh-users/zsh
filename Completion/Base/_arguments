@@ -561,7 +561,7 @@ while [[ cur -gt 0 ]]; do
           uns="${ws[1][2,-1]}"
 
       if [[ -n "$uns" ]]; then
-        uns="${(@j::)${(v)=xors[(I)${ws[1][1]}[$uns]]}#[-+]}"
+        uns="${(@j::)${(M@)${(v)=xors[(I)${ws[1][1]}[$uns]]}:#??}#[-+]}"
 	if  [[ -n "$uns" ]]; then
 	  tmp=(
 	    "opts[${(@)^opts[(I)${ws[1][1]}[$uns]]}]"
@@ -677,11 +677,11 @@ if [[ -z "$def" || "$def" = :* ]]; then
     done
   fi
 
-  [[ -n "$sopts" && -n "$opt" && "$PREFIX" = [-+]${~soptseq}[$sopts] ]] && \
+  [[ -n "$sopts" && -n "$opt" && "$PREFIX" = [-+]${~soptseq}[$sopts] ]] &&
       uns="${PREFIX[2,-1]}"
 
   if [[ -n "$uns" ]]; then
-    uns="${(@j::)${(v)=xors[(I)${ws[1][1]}[$uns]]}#[-+]}"
+    uns="${(@j::)${(M@)${(v)=xors[(I)${ws[1][1]}[$uns]]}:#??}#[-+]}"
     if [[ -n "$uns" ]]; then
       tmp=(
         "opts[${(@)^opts[(I)${pre[1]}[$uns]]}]"
