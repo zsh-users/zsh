@@ -1,3 +1,8 @@
+2004-05-28  Clint Adams  <clint@zsh.org>
+
+	* 19991: Completion/Unix/Command/_lynx: complete .htm files
+	too.
+
 2004-05-25  Peter Stephenson  <pws@csr.com>
 
 	* 19976: Src/exec.c, Src/jobs.c: `job table full' messages
