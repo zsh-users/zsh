@@ -800,10 +800,12 @@ check_param(char *s, int set, int test)
 		/* Get the prefix (anything up to the character before the name). */
 		isuf = dupstring(e);
 		untokenize(isuf);
-		*e = '\0';
+		sav = *b;
+		*b = *e = '\0';
 		ripre = dyncat((ripre ? ripre : ""), s);
 		ipre = dyncat((ipre ? ipre : ""), s);
-		ripre[b - s] = '\0';
+		*b = sav;
+
 		untokenize(ipre);
 	    }
 	    else
