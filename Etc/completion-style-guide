@@ -75,3 +75,24 @@ For now this is just a list of things one should or shouldn't do.
 
     All this should make it look like a really good idea to just use the
     supplied `_arguments' function to complete options.
+12) If at all possible, completion code for a command or a suite of
+    commands should go into only one file. If a command has sub-commands,
+    implementing aa state-machine might be a good idea. See the `_rpm' 
+    and `_pbm' files for examples of different styles. Also see the
+    documentation for `_arguments' and `_values' for two functions
+    that may help you with this.
+13) If a completion function generates completely different types of
+    completions (for example, because the comamnd has several
+    completely different modes), it should allow users to define
+    functions that separately override the behavior for these
+    different types. This can easily be achieved by using the
+    `funcall' utility function, as in:
+
+      funcall ret _command_$subcommand && return ret
+
+    This will try to call the function `_command_$subcommand' and if
+    it exists, it will be called and the completion function exits
+    with its exit status. After this call to `funcall' the completion
+    function would contain the code for the default way to generate
+    the matches.
+    See the `_rpm' and `_nslookup' files for examples.
