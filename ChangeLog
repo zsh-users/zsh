@@ -1,5 +1,7 @@
 2001-12-16  Clint Adams  <clint@zsh.org>
 
+	* 16346: Doc/Zsh/expn.yo: documentation for 16345.
+
 	* 16345: Src/params.c, Src/subst.c:
 	(n) flag to remove duplicate array values during
 	expansion.

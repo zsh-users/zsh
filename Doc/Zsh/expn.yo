@@ -761,6 +761,9 @@ access single words in the result, one has to use nested expansions as
 in `tt(${${(z)foo}[2]})'. Likewise, to remove the quotes in the
 resulting words one would do: `tt(${(Q)${(z)foo}})'.
 )
+item(tt(n))(
+Expand only the first occurrence of each unique word.
+)
 enditem()
 
 The following flags (except tt(p)) are followed by one or more arguments
