@@ -1472,7 +1472,7 @@ read, while if the tt(-k) is given, the function will be loaded as if
 tt(KSH_AUTOLOAD) em(is) set.  If neither of these options is given, the
 function will be loaded as determined by the setting of the
 tt(KSH_AUTOLOAD) option at the time the compiled file is read.
-
+ifzman( )
 These options may also appear as many times as necessary between the listed
 var(name)s to specify the loading style of all following functions, up to
 the next tt(-k) or tt(-z).

@@ -1,5 +1,7 @@
 2001-06-01  Peter Stephenson  <pws@csr.com>
 
+	* 14651: Doc/Zsh/builtins.yo: add fix for 14597 in one other place.
+
 	* 14646: LICENCE, Etc/FEATURES, Etc/MACHINES: `final' tweaks for
 	4.0.1.
 
