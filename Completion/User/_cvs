@@ -365,14 +365,14 @@ _cvs_watch () {
 	_arguments -s \
 	    -{l,R} \
 	    ':watch command:' \
-	    ':*:file:_cvs_files'
+	    '*:file:_cvs_files'
 	;;
       add|remove) # "+lRa:"
 	_arguments -s \
 	    -{l,R} \
 	    '*-a+:action:(edit unedit commit all none)' \
 	    ':watch command:' \
-	    ':*:file:_cvs_files'
+	    '*:file:_cvs_files'
 	;;
     esac
   fi
@@ -383,7 +383,7 @@ _cvs_watchers () {
   # "+lR"
   _arguments -s \
       -{l,R} \
-      ':*:file:_cvs_files'
+      '*:file:_cvs_files'
 }
 
 (( $+functions[_cvs_root] )) ||
