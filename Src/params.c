@@ -1651,7 +1651,7 @@ setstrvalue(Value v, char *val)
 void
 setnumvalue(Value v, mnumber val)
 {
-    char buf[DIGBUFSIZE], *p;
+    char buf[BDIGBUFSIZE], *p;
 
     if (v->pm->flags & PM_READONLY) {
 	zerr("read-only variable: %s", v->pm->nam, 0);

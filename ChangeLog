@@ -1,3 +1,8 @@
+2001-04-28  Bart Schaefer  <schaefer@zsh.org>
+
+	* 14151: Src/params.c, Src/subst.c, Src/system.h: BDIGBUFSIZE is
+	the space needed to print a number converted to binary.
+
 2001-04-27  Sven Wischnowsky  <wischnow@zsh.org>
 
 	* 14133: Completion/Base/Completer/_expand,

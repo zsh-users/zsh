@@ -406,8 +406,10 @@ struct timezone {
 /* DIGBUFSIZ is the length of a buffer which can hold the -LONG_MAX-1 *
  * (or with ZSH_64_BIT_TYPE maybe -LONG_LONG_MAX-1)                   *
  * converted to printable decimal form including the sign and the     *
- * terminating null character. Below 0.30103 > lg 2.                  */
+ * terminating null character. Below 0.30103 > lg 2.                  *
+ * BDIGBUFSIZE is for a number converted to printable binary form.    */
 #define DIGBUFSIZE ((int)(((sizeof(zlong) * 8) - 1) * 0.30103) + 3)
+#define BDIGBUFSIZE ((int)((sizeof(zlong) * 8) + 4))
 
 /* If your stat macros are broken, we will *
  * just undefine them.                     */

@@ -1994,7 +1994,7 @@ static char *
 arithsubst(char *a, char **bptr, char *rest)
 {
     char *s = *bptr, *t;
-    char buf[DIGBUFSIZE], *b = buf;
+    char buf[BDIGBUFSIZE], *b = buf;
     mnumber v;
 
     singsub(&a);
