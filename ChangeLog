@@ -1,3 +1,14 @@
+2001-03-11  Bart Schaefer  <schaefer@zsh.org>
+
+	* 13599: Completion/User/_sh: Use _normal completion following
+	the name of a shell script.
+
+	* 13598: Completion/Core/_expand: Handle quoted whitespace in
+	glob expansions.
+
+	* 13562: Functions/Zle/edit-command-line: Better handling of
+	multi-line buffers, at the expense of an extra feep.
+
 2001-03-08  Peter Stephenson  <pws@csr.com>
 
 	* unposted: Config/version.mk: 4.0.1-pre-2.
