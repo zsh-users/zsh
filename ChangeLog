@@ -14,7 +14,7 @@
  	Doc/Zsh/func.yo, Doc/Zsh/mod_complist.yo: cleanup
 	
 	* 12892: Completion/Core/_files, Completion/Core/_path_files,
- 	Doc/Zsh/compsys.yo, Doc/Zsh/expn.yo: complete after autoloaded
+ 	Doc/Zsh/compsys.yo, Doc/Zsh/expn.yo: complete after automounted
  	directories (a rather ugly hack); remove old code in _files (comma
  	separated patterns); improve docs for fake style and for comma
  	separated qualifier lists
