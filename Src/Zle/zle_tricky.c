@@ -577,8 +577,17 @@ acceptlast(void)
 	zsfree(minfo.postbr);
 	minfo.postbr = ztrdup(lastpostbr);
 
-	if (listshown)
-	    showinglist = -2;
+	if (listshown && (lastprebr || lastpostbr)) {
+	    Cmgroup g;
+	    Cmatch *m;
+
+	    for (g = amatches, m = NULL; g && (!m || !*m); g = g->next)
+		for (m = g->matches; *m; m++)
+		    if (!hasbrpsfx(*m, minfo.prebr, minfo.postbr)) {
+			showinglist = -2;
+			break;
+		    }
+	}
     }
     menuacc++;
 
