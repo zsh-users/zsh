@@ -17,7 +17,7 @@ if (( long )); then
   fi
 
   name=${~words[1]}
-  [[ "$name" != /* ]] && tmp="$PWD/$name"
+  [[ "$name" = [^/]*/* ]] && name="$PWD/$name"
 
   name="_args_cache_${name}"
   name="${name//[^a-zA-Z0-9_]/_}"

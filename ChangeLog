@@ -1,3 +1,8 @@
+2000-04-27  Sven Wischnowsky  <wischnow@informatik.hu-berlin.de>
+
+	* 10974: Completion/Base/_arguments: ensure $PWD is prepended to
+ 	cache-names for long options in _arguments
+	
 2000-04-27  Peter Stephenson  <pws@cambridgesiliconradio.com>
 
 	* 10971: Src/pattern.c: noglobdots didn't work with the PAT_ANY
