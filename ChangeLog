@@ -2,6 +2,8 @@
 
 	* pws: Config/version.mk: 3.1.8 released.
 
+	* unposted: 14array.ztst missing from Test/.distfiles.
+
 2000-06-05  Sven Wischnowsky  <wischnow@zsh.org>
 
 	* 11745: Src/builtin.c, Src/Modules/parameter.c, Src/Zle/compresult.c:
