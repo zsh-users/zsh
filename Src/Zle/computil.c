@@ -329,11 +329,13 @@ struct caopt {
 struct caarg {
     Caarg next;
     char *descr;		/* description */
+    char **xor;			/* if this, then not ... */
     char *action;		/* what to do for it */
     int type;			/* CAA_* below */
     char *end;			/* end-pattern for ::<pat>:... */
     char *opt;			/* option name if for an option */
     int num;			/* it's the num'th argument */
+    int active;			/* still allowed on command line */
 };
 
 #define CAA_NORMAL 1
@@ -375,6 +377,8 @@ freecaargs(Caarg a)
     for (; a; a = n) {
 	n = a->next;
 	zsfree(a->descr);
+	if (a->xor)
+	    freearray(a->xor);
 	zsfree(a->action);
 	zsfree(a->end);
 	zsfree(a->opt);
@@ -457,6 +461,7 @@ parse_caarg(int mult, int type, int num, char *oname, char **def)
 
     ret->next = NULL;
     ret->descr = ret->action = ret->end = NULL;
+    ret->xor = NULL;
     ret->num = num;
     ret->type = type;
     ret->opt = ztrdup(oname);
@@ -806,6 +811,7 @@ parse_cadef(char *nam, char **args)
 		    type = CAA_RARGS;
 	    }
 	    ret->rest = parse_caarg(0, type, -1, NULL, &p);
+	    ret->rest->xor = xor;
 	} else {
 	    /* It's a normal argument definition. */
 
@@ -835,6 +841,7 @@ parse_cadef(char *nam, char **args)
 		p++;
 	    }
 	    arg = parse_caarg(0, type, anum - 1, NULL, &p);
+	    arg->xor = xor;
 
 	    /* Sort the new definition into the existing list. */
 
@@ -970,10 +977,10 @@ ca_get_arg(Cadef d, int n)
 	while (a && a->num < n)
 	    a = a->next;
 
-	if (a && a->num == n)
+	if (a && a->num == n && a->active)
 	    return a;
 
-	return d->rest;
+	return (d->rest && d->rest->active ? d->rest : NULL);
     }
     return NULL;
 }
@@ -989,7 +996,19 @@ ca_inactive(Cadef d, char **xor)
 	for (; *xor; xor++) {
 	    if (xor[0][0] == ':' && !xor[0][1])
 		d->argsactive = 0;
-	    else if ((opt = ca_get_opt(d, *xor, 1, NULL)))
+	    else if (xor[0][0] == '*' && !xor[0][1]) {
+		if (d->rest)
+		    d->rest->active = 0;
+	    } else if (xor[0][0] >= '0' && xor[0][0] <= '9') {
+		int n = atoi(xor[0]);
+		Caarg a = d->args;
+
+		while (a && a->num < n)
+		    a = a->next;
+
+		if (a && a->num == n)
+		    a->active = 0;
+	    } else if ((opt = ca_get_opt(d, *xor, 1, NULL)))
 		opt->active = 0;
 	}
     }
@@ -1019,7 +1038,7 @@ ca_parse_line(Cadef d)
     Caarg adef, ddef;
     Caopt ptr, wasopt;
     struct castate state;
-    char *line, *pe;
+    char *line, *pe, **argxor = NULL;
     int cur, doff;
     Patprog endpat = NULL;
 
@@ -1041,6 +1060,10 @@ ca_parse_line(Cadef d)
     for (ptr = d->opts; ptr; ptr = ptr->next)
 	ptr->active = 1;
     d->argsactive = 1;
+    if (d->rest)
+	d->rest->active = 1;
+    for (adef = d->args; adef; adef = adef->next)
+	adef->active = 1;
 
     /* Default values for the state. */
 
@@ -1071,6 +1094,8 @@ ca_parse_line(Cadef d)
 	 line; line = compwords[cur++]) {
 	ddef = adef = NULL;
 	doff = state.singles = 0;
+
+	ca_inactive(d, argxor);
 
 	/* We've a definition for an argument, skip to the next. */
 
@@ -1201,6 +1226,9 @@ ca_parse_line(Cadef d)
 		break;
 	    }
 	    zaddlinknode(state.args, ztrdup(line));
+
+	    if (state.def)
+		argxor = state.def->xor;
 
 	    if (state.def && state.def->type != CAA_NORMAL &&
 		state.def->type != CAA_OPT && state.inarg) {
