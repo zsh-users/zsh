@@ -1,3 +1,9 @@
+2000-07-31  Sven Wischnowsky  <wischnow@zsh.org>
+
+	* 12438: Doc/Zsh/compsys.yo: clarify manual for menu style;
+ 	select= and yes= may be given both a number and one of the long*
+ 	values at the same time
+	
 2000-07-30  Andrew Main <zefram@zsh.org>
 
 	* 12436: Doc/Zsh/invoke.yo, Src/init.c: Make -b behave like

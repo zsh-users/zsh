@@ -1649,6 +1649,11 @@ matches does not fit on the screen by using the value
 invoked does completion, not simply listing as done by
 tt(delete-char-or-list); to start menu-selection even here, use the value
 `tt(select=long-list)'.
+
+To turn on menu completion or menu selection when a certain number of
+matches is generated em(or) the list of matches does not fit onto the
+screen, both of `tt(yes=)' and `tt(select=)' can be given twice, once
+with a number and once with `tt(long)' or `tt(long-list)'.
 )
 kindex(numbers, completion style)
 item(tt(numbers))(
