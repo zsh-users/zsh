@@ -48,8 +48,11 @@ fi
 # if we want to keep it.
 local lastdir=$ZFTP_PWD
 
-zftp cd "$@" && [[ $lastdir != $ZFTP_PWD ]] &&
-zfconfig[lastdir_$ZFTP_SESSION]=$lastdir
+if zftp cd "$@" && [[ $lastdir != $ZFTP_PWD ]]; then
+  # Invalidate current directory listing.
+  rm -f $zfconfig[curdir_$ZFTP_SESSION]
+  zfconfig[lastdir_$ZFTP_SESSION]=$lastdir
+fi
 
 print $zfconfig[lastloc_$ZFTP_SESSION]
 # }

@@ -1,5 +1,8 @@
 2004-08-06  Peter Stephenson  <pws@csr.com>
 
+	* 20232 with typo corrected: Functions/Zftp/zfcd: remove
+	cached directory listing when changing directory.
+
 	* unposted: Config/version.mk: version 4.2.1-test-A.
 
 2004-08-01  Clint Adams  <clint@zsh.org>
