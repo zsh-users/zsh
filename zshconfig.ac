@@ -292,13 +292,13 @@ dnl   else use -O
 if test -n "$auto_cflags" && test ."$ansi2knr" != .yes; then
   if test "${enable_zsh_debug}" = yes; then
     if test -n "$GCC"; then
-      CFLAGS="$CFLAGS -Wall -Wno-implicit -Wmissing-prototypes -ggdb"
+      CFLAGS="$CFLAGS -Wall -Wmissing-prototypes -ggdb"
     else
       CFLAGS="$CFLAGS -g"
     fi
   else
     if test -n "$GCC"; then
-      CFLAGS="$CFLAGS -Wall -Wno-implicit -Wmissing-prototypes -O2"
+      CFLAGS="$CFLAGS -Wall -Wmissing-prototypes -O2"
     else
       CFLAGS="$CFLAGS -O"
     fi

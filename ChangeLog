@@ -1,3 +1,8 @@
+2002-05-31  Clint Adams  <clint@zsh.org>
+
+        * unposted: zshconfig.ac: get rid of evil -Wno-implicit
+        in CFLAGS.
+
 2002-05-28  Clint Adams  <clint@zsh.org>
 
         * 17244: Completion/Debian/Command/_dpkg:
