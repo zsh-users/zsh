@@ -1,6 +1,6 @@
 DISTFILES_SRC='
     .cvsignore .distfiles .exrc
-    comp.h complete.mdd complete.c
+    comp.h complete.mdd complete.c complete.export
     compcore.c compmatch.c compresult.c
     compctl.mdd compctl.c compctl.h compctl.export
     complist.mdd complist.c
