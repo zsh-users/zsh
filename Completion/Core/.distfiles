@@ -7,5 +7,5 @@ DISTFILES_SRC='
     _parameters _path_files _prefix _requested _sep_parts
     _set_options _setup _sort_tags _tags
     _unset_options _wanted
-    compdump compinit compinstall
+    compaudit compdump compinit compinstall
 '

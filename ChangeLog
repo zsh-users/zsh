@@ -1,3 +1,9 @@
+2000-07-31  Peter Stephenson  <pws@csr.com>
+
+	* Config/version.mk: 3.1.9-dev-4.
+
+	* unposted: Completion/Core/.distfiles: add compaudit
+
 2000-07-31  Sven Wischnowsky  <wischnow@zsh.org>
 
 	* 12439: Src/hist.c: isalpha() -> ialpha(); avoid a compiler
