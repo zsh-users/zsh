@@ -1,6 +1,7 @@
 DISTFILES_SRC='
 .distfiles
-_a2ps         _dvi          _gzip         _man          _rcs          _w3m
+_a2ps         _bittorrent   _darcs        _larch
+_dvi          _gzip         _man          _rcs          _w3m
 _apachectl    _enscript     _iconv        _mh           _rlogin       _webbrowser
 _cdrecord     _fakeroot     _imagemagick  _mount        _sh           _wget
 _arp          _fetchmail    _init_d       _mutt         _slrn         _whereis

@@ -3,6 +3,8 @@
 	* unposted: Config/version.mk, README, Etc/FAQ.yo: release
 	zsh version 4.2.2.
 
+	* unposted: Fix .distfiles and .cvsignore for distribution.
+
 	* unposted: Completion/Unix/Command/_perforce: minor comment
 	change.
 

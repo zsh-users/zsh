@@ -21,7 +21,7 @@ ansi2knr
 zsh
 libzsh.so*
 sigcount.h
-signames.c
+signames.c signames2.c
 version.h
 zshpaths.h
 zshxmods.h
