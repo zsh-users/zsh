@@ -599,7 +599,9 @@ bin_compadd(char *name, char **argv, char *ops, int func)
 	}
     }
  ca_args:
-    if (!*argv)
+
+    if (!*argv && !dat.group &&
+	!(dat.aflags & (CAF_NOSORT|CAF_UNIQALL|CAF_UNIQCON)))
 	return 1;
 
     dat.match = match = cpcmatcher(match);

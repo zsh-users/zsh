@@ -1686,6 +1686,17 @@ addmatches(Cadata dat, char **argv)
 		    }
 		}
 	    }
+	    /* Select the group in which to store the matches. */
+	    gflags = (((dat->aflags & CAF_NOSORT ) ? CGF_NOSORT  : 0) |
+		      ((dat->aflags & CAF_UNIQALL) ? CGF_UNIQALL : 0) |
+		      ((dat->aflags & CAF_UNIQCON) ? CGF_UNIQCON : 0));
+	    if (dat->group) {
+		endcmgroup(NULL);
+		begcmgroup(dat->group, gflags);
+	    } else {
+		endcmgroup(NULL);
+		begcmgroup("default", 0);
+	    }
 	    if (*argv) {
 		if (dat->pre)
 		    dat->pre = dupstring(dat->pre);
@@ -1696,17 +1707,6 @@ addmatches(Cadata dat, char **argv)
 		    untokenize(dat->prpre);
 		} else
 		    dat->prpre = dupstring(dat->prpre);
-		/* Select the group in which to store the matches. */
-		gflags = (((dat->aflags & CAF_NOSORT ) ? CGF_NOSORT  : 0) |
-			  ((dat->aflags & CAF_UNIQALL) ? CGF_UNIQALL : 0) |
-			  ((dat->aflags & CAF_UNIQCON) ? CGF_UNIQCON : 0));
-		if (dat->group) {
-		    endcmgroup(NULL);
-		    begcmgroup(dat->group, gflags);
-		} else {
-		    endcmgroup(NULL);
-		    begcmgroup("default", 0);
-		}
 		/* Select the set of matches. */
 		oisalt = (dat->aflags & CAF_ALT);
 
