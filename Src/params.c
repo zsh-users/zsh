@@ -1898,7 +1898,7 @@ setiparam(char *s, zlong val)
 {
     struct value vbuf;
     Value v;
-    char *t = s;
+    char *t = s, *ss;
     Param pm;
     mnumber mnval;
 
@@ -1908,10 +1908,18 @@ setiparam(char *s, zlong val)
 	return NULL;
     }
     if (!(v = getvalue(&vbuf, &s, 1))) {
-	pm = createparam(t, PM_INTEGER);
+	if ((ss = strchr(s, '[')))
+	    *ss = '\0';
+	pm = createparam(t, ss ? PM_ARRAY : PM_INTEGER);
 	DPUTS(!pm, "BUG: parameter not created");
-	pm->u.val = val;
-	return pm;
+	if (ss) {
+	    *ss = '[';
+	    v = getvalue(&vbuf, &t, 1);
+	    DPUTS(!v, "BUG: value not found for new parameter");
+	} else {
+	    pm->u.val = val;
+	    return pm;
+	}
     }
     mnval.type = MN_INTEGER;
     mnval.u.l = val;
@@ -1930,7 +1938,7 @@ setnparam(char *s, mnumber val)
 {
     struct value vbuf;
     Value v;
-    char *t = s;
+    char *t = s, *ss = NULL;
     Param pm;
 
     if (!isident(s)) {
@@ -1939,15 +1947,23 @@ setnparam(char *s, mnumber val)
 	return NULL;
     }
     if (!(v = getvalue(&vbuf, &s, 1))) {
-	pm = createparam(t, (val.type & MN_INTEGER) ? PM_INTEGER
-			 : PM_FFLOAT);
+	if ((ss = strchr(s, '[')))
+	    *ss = '\0';
+	pm = createparam(t, ss ? PM_ARRAY :
+			 (val.type & MN_INTEGER) ? PM_INTEGER : PM_FFLOAT);
 	DPUTS(!pm, "BUG: parameter not created");
-	if (val.type & MN_INTEGER) {
-	    pm->ct = outputradix;
-	    pm->u.val = val.u.l;
-	} else
-	    pm->u.dval = val.u.d;
-	return pm;
+	if (ss) {
+	    *ss = '[';
+	    v = getvalue(&vbuf, &t, 1);
+	    DPUTS(!v, "BUG: value not found for new parameter");
+	} else {
+	    if (val.type & MN_INTEGER) {
+		pm->ct = outputradix;
+		pm->u.val = val.u.l;
+	    } else
+		pm->u.dval = val.u.d;
+	    return pm;
+	}
     }
     setnumvalue(v, val);
     return v->pm;

@@ -1,5 +1,8 @@
 2000-07-03  Peter Stephenson  <pws@cambridgesiliconradio.com>
 
+	* 12138: Src/params.c, Test/06arith.ztst: setting of array
+	elements in math context didn't work (ever). 
+
 	* 12121: Src/utils.c, Doc/Zsh/options.yo: save and restore stopmsg
 	for precmd, fix #ifdef's for variable declaration in read_poll().
 

@@ -82,3 +82,9 @@
 0:use of scalars to store integers and floats
 >3.5
 >4
+
+  (( newarray[unsetvar]++ ))
+  (( newarray[unsetvar]++ ))
+  print ${(t)newarray} ${#newarray} ${newarray[1]}
+0:setting array elements in math context
+>array 1 2
