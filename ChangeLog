@@ -1,3 +1,8 @@
+2001-08-15  Adam Spiers  <adam@spiers.net>
+
+	* 15630: Completion/Redhat/Command/_rpm: update caching policy
+	for newer versions of rpm.
+
 2001-08-14  Clint Adams  <clint@zsh.org>
 
 	* 15629: Completion/Unix/Command/_zip: unzip -Z
