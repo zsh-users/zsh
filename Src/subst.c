@@ -1149,6 +1149,7 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int ssub)
 		isarr = 0;
 	    }
 	    pm = createparam(nulstring, isarr ? PM_ARRAY : PM_SCALAR);
+	    DPUTS(!pm, "BUG: parameter not created");
 	    if (isarr)
 		pm->u.arr = aval;
 	    else

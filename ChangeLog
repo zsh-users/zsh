@@ -1,5 +1,8 @@
 2001-05-18  Bart Schaefer  <schaefer@zsh.org>
 
+	* 14388: Src/params.c, Src/subst.c: Correctly handle re-set of
+	of integer-typed special parameters such as SHLVL, after unset.
+
 	* 14385: Test/V01zmodload.ztst, Test/ztst.zsh: Fix typo in a
 	comment; print a warning when unable to test zsh/example; make
 	sure the file descriptor for that warning (and others in other

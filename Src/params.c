@@ -1998,17 +1998,16 @@ setiparam(char *s, zlong val)
     if (!(v = getvalue(&vbuf, &s, 1))) {
 	if ((ss = strchr(s, '[')))
 	    *ss = '\0';
-	pm = createparam(t, ss ? PM_ARRAY : PM_INTEGER);
+	if (!(pm = createparam(t, ss ? PM_ARRAY : PM_INTEGER)))
+	    pm = (Param) paramtab->getnode(paramtab, t);
 	DPUTS(!pm, "BUG: parameter not created");
 	if (ss) {
 	    *ss = '[';
-	    v = getvalue(&vbuf, &t, 1);
-	    DPUTS(!v, "BUG: value not found for new parameter");
 	} else {
-	    pm->u.val = val;
-	    unqueue_signals();
-	    return pm;
+	    pm->ct = outputradix;
 	}
+	v = getvalue(&vbuf, &t, 1);
+	DPUTS(!v, "BUG: value not found for new parameter");
     }
     mnval.type = MN_INTEGER;
     mnval.u.l = val;
@@ -2042,20 +2041,16 @@ setnparam(char *s, mnumber val)
 	    *ss = '\0';
 	pm = createparam(t, ss ? PM_ARRAY :
 			 (val.type & MN_INTEGER) ? PM_INTEGER : PM_FFLOAT);
+	if (!pm)
+	    pm = (Param) paramtab->getnode(paramtab, t);
 	DPUTS(!pm, "BUG: parameter not created");
 	if (ss) {
 	    *ss = '[';
-	    v = getvalue(&vbuf, &t, 1);
-	    DPUTS(!v, "BUG: value not found for new parameter");
-	} else {
-	    if (val.type & MN_INTEGER) {
-		pm->ct = outputradix;
-		pm->u.val = val.u.l;
-	    } else
-		pm->u.dval = val.u.d;
-	    unqueue_signals();
-	    return pm;
+	} else if (val.type & MN_INTEGER) {
+	    pm->ct = outputradix;
 	}
+	v = getvalue(&vbuf, &t, 1);
+	DPUTS(!v, "BUG: value not found for new parameter");
     }
     setnumvalue(v, val);
     unqueue_signals();
