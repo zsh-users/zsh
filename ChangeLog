@@ -1,4 +1,5 @@
 2000-04-11  Clint Adams  <schizo@debian.org>
+
 	* 10680: Completion/User/_diff_options: spelling corrections.
 
 2000-04-11  Peter Stephenson  <pws@pwstephenson.fsnet.co.uk>
@@ -8,7 +9,10 @@
 
 2000-04-11  Bart Schaefer  <schaefer@zsh.org>
 
-	* 10657: One change missed in 10635.
+	* 10681: Completion/Commands/_complete_help: Setopts the same
+	as _main_complete.
+
+	* 10657: Completion/User/_make: One change missed in 10635.
 
 	* Functions/Prompts/prompt_bart_setup: No-op cleanup.
 
