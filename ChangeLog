@@ -1,5 +1,8 @@
 2000-04-25  Sven Wischnowsky  <wischnow@informatik.hu-berlin.de>
 
+	* 10915: Src/Zle/computil.c: forgotten fix for _arguments using
+ 	multiple actions
+	
 	* 10912: Src/Zle/compresult.c: don't always ignore backslashes in
  	paths when testing file type
 	
