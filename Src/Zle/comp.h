@@ -120,6 +120,8 @@ struct cmatch {
 #define CMF_NOSPACE  (1<< 8)	/* don't add a space */
 #define CMF_PACKED   (1<< 9)	/* prefer LIST_PACKED */
 #define CMF_ROWS     (1<<10)	/* prefer LIST_ROWS_FIRST */
+#define CMF_MULT     (1<<11)	/* string appears more than once */
+#define CMF_FMULT    (1<<12)	/* first of multiple equal strings */
 
 /* Stuff for completion matcher control. */
 
@@ -269,6 +271,7 @@ struct cldata {
     int nlines;			/* number of lines needed */
     int hidden;			/* != 0 if there are hidden matches */
     int onlyexpl;		/* != 0 if only explanations to print */
+    int showall;		/* != 0 if hidden matches should be shown */
 };
 
 typedef void (*CLPrintFunc)(Cmgroup, Cmatch *, int, int, int, int,

@@ -1101,7 +1101,7 @@ list_lines(void)
     oam = amatches;
     amatches = pmatches;
     listdat.valid = 0;
-    calclist();
+    calclist(0);
     listdat.valid = 0;
     amatches = oam;
 
@@ -1122,10 +1122,13 @@ comp_list(char *v)
 
 /**/
 Cmatch *
-skipnolist(Cmatch *p)
+skipnolist(Cmatch *p, int showall)
 {
-    while (*p && (((*p)->flags & (CMF_NOLIST | CMF_HIDE)) ||
-		  ((*p)->disp && ((*p)->flags & (CMF_DISPLINE | CMF_HIDE)))))
+    int mask = (showall ? 0 : (CMF_NOLIST | CMF_MULT)) | CMF_HIDE;
+
+    while (*p && (((*p)->flags & mask) ||
+		  ((*p)->disp &&
+		   ((*p)->flags & (CMF_DISPLINE | CMF_HIDE)))))
 	p++;
 
     return p;
@@ -1133,7 +1136,7 @@ skipnolist(Cmatch *p)
 
 /**/
 mod_export void
-calclist(void)
+calclist(int showall)
 {
     Cmgroup g;
     Cmatch *p, m;
@@ -1143,7 +1146,7 @@ calclist(void)
     VARARR(int, mlens, nmatches + 1);
 
     if (listdat.valid && onlyexpl == listdat.onlyexpl &&
-	menuacc == listdat.menuacc &&
+	menuacc == listdat.menuacc && showall == listdat.showall &&
 	lines == listdat.lines && columns == listdat.columns)
 	return;
 
@@ -1169,8 +1172,8 @@ calclist(void)
 		while ((sptr = *pp)) {
 		    while (sptr && *sptr) {
 			nlines += (nlptr = strchr(sptr, '\n'))
-			    ? 1 + (nlptr-sptr)/columns
-			    : strlen(sptr)/columns;
+			    ? 1 + (nlptr-sptr) / columns
+			    : strlen(sptr) / columns;
 			sptr = nlptr ? nlptr+1 : NULL;
 		    }
 		    nlines++;
@@ -1217,7 +1220,7 @@ calclist(void)
 			g->flags &= ~CGF_PACKED;
 		    if (!(m->flags & CMF_ROWS))
 			g->flags &= ~CGF_ROWS;
-		} else if (!(m->flags & CMF_NOLIST)) {
+		} else if (showall || !(m->flags & (CMF_NOLIST | CMF_MULT))) {
 		    l = niceztrlen(m->str);
 		    ndisp++;
 		    if (l > glong)
@@ -1290,7 +1293,8 @@ calclist(void)
 			    if (m->disp) {
 				if (!(m->flags & CMF_DISPLINE))
 				    glines += 1 + (mlens[m->gnum] / columns);
-			    } else if (!(m->flags & CMF_NOLIST))
+			    } else if (showall ||
+				       !(m->flags & (CMF_NOLIST | CMF_MULT)))
 				glines += 1 + ((mlens[m->gnum]) / columns);
 			}
 		}
@@ -1385,7 +1389,7 @@ calclist(void)
 
 		    for (tcols = columns / g->shortest; tcols > g->cols;
 			 tcols--) {
-			p = first = skipnolist(g->matches);
+			p = first = skipnolist(g->matches, showall);
 			for (maxlen = width = maxlines = llines = tcol = 0,
 				 count = g->dcount;
 			     count > 0; count--) {
@@ -1394,7 +1398,7 @@ calclist(void)
 			    if (addlen > maxlen)
 				maxlen = addlen;
 			    for (i = tcols; i && *p; i--)
-				p = skipnolist(p + 1);
+				p = skipnolist(p + 1, showall);
 
 			    llines++;
 			    if (!*p) {
@@ -1407,7 +1411,7 @@ calclist(void)
 				ws[tcol++] = maxlen;
 				maxlen = 0;
 
-				p = first = skipnolist(first + 1);
+				p = first = skipnolist(first + 1, showall);
 			    }
 			}
 			if (tlines) {
@@ -1421,6 +1425,8 @@ calclist(void)
 			tlines = maxlines;
 		} else {
 		    int addlen;
+		    int smask = ((showall ? 0 : (CMF_NOLIST | CMF_MULT)) |
+				 CMF_HIDE);
 
 		    for (tlines = ((g->totl + columns) / columns);
 			 tlines < g->lins; tlines++) {
@@ -1429,7 +1435,7 @@ calclist(void)
 			     (m = *p); p++, nth++) {
 			    if (!(m->flags &
 				  (m->disp ? (CMF_DISPLINE | CMF_HIDE) :
-				   (CMF_NOLIST | CMF_HIDE)))) {
+				   smask))) {
 				addlen = mlens[m->gnum] + add;
 				if (addlen > maxlen)
 				    maxlen = addlen;
@@ -1481,6 +1487,7 @@ calclist(void)
     listdat.onlyexpl = onlyexpl;
     listdat.columns = columns;
     listdat.lines = lines;
+    listdat.showall = showall;
 }
 
 /**/
@@ -1531,7 +1538,7 @@ int asklist(void)
 
 /**/
 mod_export int
-printlist(int over, CLPrintFunc printm)
+printlist(int over, CLPrintFunc printm, int showall)
 {
     Cmgroup g;
     Cmatch *p, m;
@@ -1628,7 +1635,8 @@ printlist(int over, CLPrintFunc printm)
 		    pp += ((g->flags & CGF_ROWS) ? g->cols : 1);
 		}
 	    }
-	} else if (!listdat.onlyexpl && g->lcount) {
+	} else if (!listdat.onlyexpl &&
+		   (g->lcount || (showall && g->mcount))) {
 	    int n = g->dcount, nl, nc, i, j, wid;
 	    Cmatch *q;
 
@@ -1662,7 +1670,7 @@ printlist(int over, CLPrintFunc printm)
 			tcout(TCCLEAREOD);
 		}
 	    }
-	    for (p = skipnolist(g->matches); n && nl--;) {
+	    for (p = skipnolist(g->matches, showall); n && nl--;) {
 		i = g->cols;
 		mc = 0;
 		q = p;
@@ -1693,7 +1701,7 @@ printlist(int over, CLPrintFunc printm)
 		    if (--n)
 			for (j = ((g->flags & CGF_ROWS) ? 1 : nc);
 			     j && *q; j--)
-			    q = skipnolist(q + 1);
+			    q = skipnolist(q + 1, showall);
 		    mc++;
 		}
 		while (i-- > 0) {
@@ -1712,11 +1720,11 @@ printlist(int over, CLPrintFunc printm)
 		    if (nl)
 			for (j = ((g->flags & CGF_ROWS) ? g->cols : 1);
 			     j && *p; j--)
-			    p = skipnolist(p + 1);
+			    p = skipnolist(p + 1, showall);
 		}
 	    }
 	}
-	if (g->lcount)
+	if (g->lcount || (showall && g->mcount))
 	    pnl = 1;
 	g = g->next;
     }
@@ -1776,7 +1784,7 @@ iprintm(Cmgroup g, Cmatch *mp, int mc, int ml, int lastc, int width,
 int
 ilistmatches(Hookdef dummy, Chdata dat)
 {
-    calclist();
+    calclist(0);
 
     if (!listdat.nlines) {
 	showinglist = listshown = 0;
@@ -1785,7 +1793,7 @@ ilistmatches(Hookdef dummy, Chdata dat)
     if (asklist())
 	return 0;
 
-    printlist(0, iprintm);
+    printlist(0, iprintm, 0);
 
     return 0;
 }

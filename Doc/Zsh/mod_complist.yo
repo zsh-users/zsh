@@ -149,10 +149,22 @@ After menu-selection is started, the matches will be listed. The
 matches to insert into the command line can be selected from this
 list. In the list one match is highlighted using the value for tt(ma)
 from the tt(ZLS_COLORS) or tt(ZLS_COLOURS) parameter. The default
-value for this it `tt(7)' which forces the selected match to be
+value for this is `tt(7)' which forces the selected match to be
 highlighted using standout mode on a vt100-compatible terminal. If
 neither tt(ZLS_COLORS) nor tt(ZLS_COLOURS) is set, the same terminal
 control sequence as for the `tt(%S)' escape in prompts is used.
+
+Normally, the completion code may decide to not show of the matches in 
+the list. These hidden matches are either matches for which the
+completion function which added them explicitly requested that they
+don't appear in the list (using the tt(-n) option of the tt(compadd)
+builtin command) or they are matches which show the the same string in 
+the list (because they differ only in things like prefixes or suffixes 
+that are never listed). In the list used for menu-selection, however,
+even these matches will be shown so that it is possible to select
+them. To be able to highlight such matches the tt(hi) and tt(mu)
+capabilities in the tt(ZLS_COLORS) and tt(ZLS_COLOURS) parameters are
+supported for hidden matches of the first and second kind, respectively.
 
 Selecting matches is done by moving the mark around using the zle movement
 functions. The zle functions tt(send-break) and tt(accept-line) can be used

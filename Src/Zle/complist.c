@@ -57,8 +57,10 @@ static Keymap mskeymap;
 #define COL_TC 13
 #define COL_SP 14
 #define COL_MA 15
+#define COL_HI 16
+#define COL_MU 17
 
-#define NUM_COLS 16
+#define NUM_COLS 18
 
 /* Maximum number of in-string colours supported. */
 
@@ -68,14 +70,14 @@ static Keymap mskeymap;
 
 static char *colnames[] = {
     "no", "fi", "di", "ln", "pi", "so", "bd", "cd", "ex", "mi",
-    "lc", "rc", "ec", "tc", "sp", "ma", NULL
+    "lc", "rc", "ec", "tc", "sp", "ma", "hi", "mu", NULL
 };
 
 /* Default values. */
 
 static char *defcols[] = {
     "0", "0", "1;34", "1;36", "33", "1;35", "1;33", "1;33", "1;32", NULL,
-    "\033[", "m", NULL, "0", "0", "7"
+    "\033[", "m", NULL, "0", "0", "7", "0", "0"
 };
 
 /* This describes a terminal string for a file type. */
@@ -654,7 +656,11 @@ clprintm(Cmgroup g, Cmatch *mp, int mc, int ml, int lastc, int width,
 	    mgtabp = mgtab + mm;
 	    mmlen = mcols;
 	    zcputs(&mcolors, g->name, COL_MA);
-	} else
+	} else if (m->flags & CMF_NOLIST)
+	    zcputs(&mcolors, g->name, COL_HI);
+	else if (mselect >= 0 && (m->flags & (CMF_MULT | CMF_FMULT)))
+	    zcputs(&mcolors, g->name, COL_MU);
+	else
 	    subcols = putmatchcol(&mcolors, g->name, m->disp);
 	if (subcols)
 	    clprintfmt(&mcolors, m->disp);
@@ -689,7 +695,11 @@ clprintm(Cmgroup g, Cmatch *mp, int mc, int ml, int lastc, int width,
 	    mgtabp = mgtab + mx + mm;
 	    mmlen = width;
 	    zcputs(&mcolors, g->name, COL_MA);
-	} else if (buf)
+	} else if (m->flags & CMF_NOLIST)
+	    zcputs(&mcolors, g->name, COL_HI);
+	else if (mselect >= 0 && (m->flags & (CMF_MULT | CMF_FMULT)))
+	    zcputs(&mcolors, g->name, COL_MU);
+	else if (buf)
 	    subcols = putfilecol(&mcolors, g->name, path, buf->st_mode);
 	else
 	    subcols = putmatchcol(&mcolors, g->name, (m->disp ? m->disp : m->str));
@@ -739,7 +749,7 @@ complistmatches(Hookdef dummy, Chdata dat)
     }
     getcols(&mcolors);
 
-    calclist();
+    calclist(mselect >= 0);
 
     if (!listdat.nlines || (mselect >= 0 &&
 			    (!(isset(USEZLE) && !termflags &&
@@ -749,10 +759,6 @@ complistmatches(Hookdef dummy, Chdata dat)
 	noselect = 1;
 	amatches = oamatches;
 	return 1;
-    }
-    if (listdat.hidden) {
-	noselect = 1;
-	mselect = -1;
     }
     if (inselect)
 	clearflag = 0;
@@ -777,7 +783,7 @@ complistmatches(Hookdef dummy, Chdata dat)
     last_cap = (char *) zhalloc(max_caplen + 1);
     *last_cap = '\0';
 
-    if (!printlist(1, clprintm) || listdat.nlines >= lines)
+    if (!printlist(1, clprintm, (mselect >= 0)) || listdat.nlines >= lines)
 	noselect = 1;
 
     amatches = oamatches;
@@ -1159,6 +1165,8 @@ domenuselect(Hookdef dummy, Chdata dat)
 	if (!noselect) {
 	    showinglist = -2;
 	    onlyexpl = oe;
+	    if (!smatches)
+		clearlist = 1;
 	    zrefresh();
 	}
 	fdat = NULL;

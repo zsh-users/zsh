@@ -2376,14 +2376,15 @@ makearray(LinkList l, int type, int flags, int *np, int *nlp, int *llp)
 		    /* Mark those, that would show the same string in the list. */
 		    for (; bp[1] && !(*ap)->disp && !(bp[1])->disp &&
 			     !strcmp((*ap)->str, (bp[1])->str); bp++)
-			(bp[1])->flags |= CMF_NOLIST;
+			(bp[1])->flags |= CMF_MULT;
+		    (*ap)->flags |= CMF_FMULT;
 		}
 		*cp = NULL;
 	    }
 	    for (ap = rp; *ap; ap++) {
 		if ((*ap)->disp && ((*ap)->flags & CMF_DISPLINE))
 		    ll++;
-		if ((*ap)->flags & CMF_NOLIST)
+		if ((*ap)->flags & (CMF_NOLIST | CMF_MULT))
 		    nl++;
 	    }
 	} else {
@@ -2404,14 +2405,15 @@ makearray(LinkList l, int type, int flags, int *np, int *nlp, int *llp)
 		    ap = bp;
 		    for (; bp[1] && !(*ap)->disp && !(bp[1])->disp &&
 			     !strcmp((*ap)->str, (bp[1])->str); bp++)
-			(bp[1])->flags |= CMF_NOLIST;
+			(bp[1])->flags |= CMF_MULT;
+		    (*ap)->flags |= CMF_FMULT;
 		}
 		*cp = NULL;
 	    }
 	    for (ap = rp; *ap; ap++) {
 		if ((*ap)->disp && ((*ap)->flags & CMF_DISPLINE))
 		    ll++;
-		if ((*ap)->flags & CMF_NOLIST)
+		if ((*ap)->flags & (CMF_NOLIST | CMF_MULT))
 		    nl++;
 	    }
 	}
