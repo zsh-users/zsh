@@ -9,6 +9,8 @@
 
 	* 11078: README: update download location for yodl
 
+2000-05-02  Tanaka Akira  <akr@m17n.org>
+
 	* 11075: install completion functions for AIX and BSD.
 
 2000-05-02  Andrew Main  <zefram@zsh.org>
