@@ -8,6 +8,7 @@ typeset -g prompt_theme
 
 promptinit () {
   emulate -L zsh
+  setopt extendedglob
   local ppath='' name
 
   # Autoload all prompt_*_setup functions in fpath
