@@ -1,3 +1,9 @@
+2000-10-13  Bart Schaefer  <schaefer@zsh.org>
+
+	* 13000: Doc/Zsh/jobs.yo: Document tty restoration when a stopped
+	job is resumed with fg.  This was previously documented only under
+	the STTY parameter, but it applies to all stopped jobs.
+
 2000-10-13  Sven Wischnowsky  <wischnow@zsh.org>
 
 	* 12995: Src/Zle/compmatch.c: two completion matching fixes; wrong
