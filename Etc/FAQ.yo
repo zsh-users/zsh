@@ -49,7 +49,7 @@ description(\
 mydit(Archive-Name:) unix-faq/shell/zsh
 mydit(Last-Modified:) 1999/07/24
 mydit(Submitted-By:) email(pws@ibmth.df.unipi.it (Peter Stephenson))
-mydit(Version:) $Id: FAQ.yo,v 1.1.1.8 1999/07/24 14:02:44 akr Exp $
+mydit(Version:) $Id: FAQ.yo,v 1.1.1.9 1999/09/17 02:58:59 akr Exp $
 mydit(Posting-Frequency:) Monthly
 mydit(Copyright:) (C) P.W. Stephenson, 1995--1999 (see end of document)
 )
@@ -299,19 +299,18 @@ sect(On what machines will it run?)
 
 sect(What's the latest version?)
 
-  Zsh 3.0.5 is the latest production version, however a test version of
-  3.0.6 is doing the rounds and should be released soon. The new major
-  number 3.0 largely reflects the considerable internal changes in zsh to
-  make it more reliable, consistent and (where possible) compatible.  Those
-  planning on upgrading their zsh installation should take a look at the
-  list of incompatibilities at the end of link(5.1)(51).  This is longer
-  than usual due to enhanced sh, ksh and POSIX compatibility.
+  Zsh 3.0.6 is the latest production version. The new major number 3.0
+  largely reflects the considerable internal changes in zsh to make it
+  more reliable, consistent and (where possible) compatible.  Those
+  planning on upgrading their zsh installation should take a look at
+  the list of incompatibilities at the end of link(5.1)(51).  This is
+  longer than usual due to enhanced sh, ksh and POSIX compatibility.
 
-  The beta version 3.1.5 is also available, and 3.1.6 should appear over
-  the summer.  Development of zsh is usually patch by patch, with each
-  intermediate version publicly available.  Note that this `open'
-  development system does mean bugs are sometimes introduced into the most
-  recent archived version.  These are usually fixed quickly.
+  The beta version 3.1.6 is also available, and has many new features.
+  Development of zsh is usually patch by patch, with each intermediate
+  version publicly available.  Note that this `open' development
+  system does mean bugs are sometimes introduced into the most recent
+  archived version.  These are usually fixed quickly.
 
   Note also that as the shell changes, it may become incompatible with
   older versions; see the end of question link(5.1)(51) for a partial list.
