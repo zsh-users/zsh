@@ -1,11 +1,8 @@
 #compdef -k complete-word \C-xh
 
 _complete_help() {
-  local _sort_tags=_help_sort_tags text i
-  typeset -A help_tags
-  typeset -U help_contexts
-
-  help_contexts=()
+  local _sort_tags=_help_sort_tags text i j
+  typeset -A help_funcs help_tags
 
   compadd() { return 1 }
 
@@ -13,9 +10,12 @@ _complete_help() {
 
   unfunction compadd
 
-  for i in "$help_contexts[@]"; do
+  for i in "${(@k)help_funcs}"; do
     text="${text}
-tags in context \`${i}': ${help_tags[$i]}"
+tags in context ${i}"
+    for j in "${(@s.:.)help_funcs[$i][2,-1]}"; do
+      text="${text}${help_tags[${i}${j}]}	(${j})"
+    done
   done
 
   compstate[list]='list force'
@@ -25,10 +25,13 @@ tags in context \`${i}': ${help_tags[$i]}"
 }
 
 _help_sort_tags() {
-  help_contexts=( "$help_contexts[@]" "$curcontext" )
-  help_tags[$curcontext]="${help_tags[$curcontext]}
-    ${argv}"
-  comptry "$@"
+  local f="${${${funcstack[3,(i)_(main_complete|complete|approximate|normal)]}% *}#_(wanted|requested) }"
+  if [[ "$help_funcs[$curcontext]" != *${f}* ]]; then
+    help_funcs[$curcontext]="${help_funcs[$curcontext]}:${f}"
+    help_tags[${curcontext}${f}]="${help_tags[$curcontext]}
+      ${argv}"
+    comptry "$@"
+  fi
 }
 
 _complete_help "$@"
