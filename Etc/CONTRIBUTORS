@@ -32,7 +32,7 @@ Version 3.1.7
 * Alexandre Duret-Lutz <duret_g@epita.fr>: design, testing and patches for
   completion system, documentation, various other fixes
 
-* Oliver Kiddle <opk@u.genie.co.uk>: AIX dynamic library support, various
+* Oliver Kiddle <opk@zsh.org>: AIX dynamic library support, various
   completion functions, web page maintenance, documentation fixes
 
 * Andrew Main <zefram@zsh.org>: configuration and module/DLL code, IPv6

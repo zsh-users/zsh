@@ -1,3 +1,7 @@
+2000-05-08  Oliver Kiddle  <opk@zsh.org>
+
+	* unposted: Etc/CONTRIBUTORS fix
+
 2000-05-08  Bart Schaefer  <schaefer@zsh.org>
 
 	* 11264: Doc/Zsh/compat.yo: Missed bit for 10771.
