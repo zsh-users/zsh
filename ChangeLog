@@ -1,3 +1,8 @@
+2000-06-17  Clint Adams  <schizo@debian.org>
+
+	* 11966: Completion/Core/_main_complete: use double brackets
+	around comparison to prevent 'command not found: no' error.
+
 2000-06-17  Bart Schaefer  <schaefer@zsh.org>
 
 	* 11961: Src/subst.c: 11959 was really a bug in magicequalsubst,
