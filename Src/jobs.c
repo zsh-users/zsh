@@ -1488,14 +1488,14 @@ bin_fg(char *name, char **argv, Options ops, int func)
 	    int curmaxjob, ignorejob;
 	    if (unset(MONITOR) && oldmaxjob) {
 		jobptr = oldjobtab;
-		curmaxjob = oldmaxjob;
+		curmaxjob = oldmaxjob ? oldmaxjob - 1 : 0;
 		ignorejob = 0;
 	    } else {
 		jobptr = jobtab;
 		curmaxjob = maxjob;
 		ignorejob = thisjob;
 	    }
-	    for (job = 0; job != curmaxjob; job++, jobptr++)
+	    for (job = 0; job <= curmaxjob; job++, jobptr++)
 		if (job != ignorejob && jobptr->stat) {
 		    if ((!OPT_ISSET(ops,'r') && !OPT_ISSET(ops,'s')) ||
 			(OPT_ISSET(ops,'r') && OPT_ISSET(ops,'s')) ||
