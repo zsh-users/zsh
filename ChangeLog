@@ -1,3 +1,8 @@
+2000-07-03  Adam Spiers  <adam@spiers.net>
+
+	* 12152: Completion/User/_perl: tweak completion of Perl script
+	parameters to perl.
+
 2000-07-03  Bart Schaefer  <schaefer@zsh.org>
 
 	* 12148: Completion/Core/_path_files: Followup to 12133 as
@@ -77,7 +82,7 @@
 	* 12105: Completion/Core/_main_complete: reset _comp_mesg (saying
  	whether there were messages) appropriately
 	
-	* Jan Fedak: 12097: Completion/Use/_ssh: use _ports when
+	* Jan Fedak: 12097: Completion/User/_ssh: use _ports when
 	completing remote ports
 
 	* Andrej: 12094: Doc/Zsh/compsys.yo: a bit of cleanup
