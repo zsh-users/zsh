@@ -1,3 +1,8 @@
+2002-06-14  Peter Stephenson  <pws@csr.com>
+
+	* 17318: Src/hist.c: ${(z)...} appended an extra space when the
+	lexical analyser failed.
+
 2002-06-07  Peter Stephenson  <pws@csr.com>
 
 	* 17304: Src/Zle/zle_main.c, Doc/Zsh/zle.yo: (suggested by Bart)
