@@ -3045,7 +3045,8 @@ comp_match(char *pfx, char *sfx, char *w, Patprog cp, Cline *clp, int qu,
 	    add_match_str(NULL, NULL, w + rpl, wl - rpl - rsl, 1);
 	    add_match_str(NULL, NULL, wpfx, wpl, 1);
 
-	    mli = bld_parts(w + rpl, wl - rpl - rsl, (mpl - rpl), &mlil);
+	    mli = bld_parts(w + rpl, wl - rpl - rsl,
+			    (mpl - rpl) + (msl - rsl), &mlil);
 	    mlil->flags |= CLF_MID;
 	    mlil->slen = msl - rsl;
 	    mlil->next = revert_cline(matchparts);
@@ -6846,10 +6847,11 @@ makecomplistflags(Compctl cc, char *s, int incmd, int compadd)
 	    if (brend) {
 		Brinfo bp;
 		char *p;
+		int bl;
 
 		for (bp = brend; bp; bp = bp->next) {
-		    p = lpsuf + (we - cs) - bp->qpos;
-		    strcpy(p, p + strlen(bp->str));
+		    p = lpsuf + (we - cs) - bp->qpos - (bl = strlen(bp->str));
+		    strcpy(p, p + bl);
 		}
 	    }
 	    if (!(lpsuf = strchr(lpsuf, '/')) && sf2)
@@ -8226,14 +8228,14 @@ static char *
 cline_str(Cline l, int ins, int *csp)
 {
     Cline s;
-    int ocs = cs, ncs, pcs, pm, pmax, pmm, sm, smax, smm, d, dm, mid;
-    int i, j, li = 0;
+    int ocs = cs, ncs, pcs, scs, pm, pmax, pmm, sm, smax, smm, d, dm, mid;
+    int i, j, li = 0, cbr;
     Brinfo brp, brs;
 
     l = cut_cline(l);
 
     pmm = smm = dm = 0;
-    pm = pmax = sm = smax = d = mid = -1;
+    pm = pmax = sm = smax = d = mid = cbr = -1;
 
     /* Get the information about the brace beginning and end we have
      * to re-insert. */
@@ -8259,6 +8261,8 @@ cline_str(Cline l, int ins, int *csp)
 	    brp = brp->next;
 	}
 	while (brs && !brs->curpos) {
+	    if (cbr < 0)
+		cbr = cs;
 	    inststrlen(brs->str, 1, -1);
 	    brs = brs->prev;
 	}
@@ -8277,6 +8281,8 @@ cline_str(Cline l, int ins, int *csp)
 		    inststrlen(s->line, 1, s->llen);
 		else
 		    inststrlen(s->word, 1, s->wlen);
+		scs = cs;
+
 		if ((s->flags & CLF_DIFF) && (!dm || (s->flags & CLF_MATCHED))) {
 		    d = cs; dm = s->flags & CLF_MATCHED;
 		}
@@ -8293,6 +8299,7 @@ cline_str(Cline l, int ins, int *csp)
 		inststrlen(brp->str, 1, bl);
 		cs = ocs + bl;
 		pcs += bl;
+		scs += bl;
 		brp = brp->next;
 	    }
 	}
@@ -8306,10 +8313,12 @@ cline_str(Cline l, int ins, int *csp)
 	if (ins) {
 	    int ocs, bl;
 
-	    while (brs && li > brs->curpos) {
+	    while (brs && li >= brs->curpos) {
 		ocs = cs;
 		bl = strlen(brs->str);
-		cs = pcs - (li - brs->curpos);
+		cs = scs - (li - brs->curpos);
+		if (cbr < 0)
+		    cbr = cs;
 		inststrlen(brs->str, 1, bl);
 		cs = ocs + bl;
 		pcs += bl;
@@ -8322,6 +8331,7 @@ cline_str(Cline l, int ins, int *csp)
 	    inststrlen(l->line, 1, l->llen);
 	else
 	    inststrlen(l->word, 1, l->wlen);
+	scs = cs;
 	if (ins) {
 	    int ocs, bl;
 
@@ -8334,6 +8344,7 @@ cline_str(Cline l, int ins, int *csp)
 		inststrlen(brp->str, 1, bl);
 		cs = ocs + bl;
 		pcs += bl;
+		scs += bl;
 		brp = brp->next;
 	    }
 	}
@@ -8354,7 +8365,9 @@ cline_str(Cline l, int ins, int *csp)
 	    while (brs && li >= brs->curpos) {
 		ocs = cs;
 		bl = strlen(brs->str);
-		cs = pcs + l->llen - (li - brs->curpos);
+		cs = scs - (li - brs->curpos);
+		if (cbr < 0)
+		    cbr = cs;
 		inststrlen(brs->str, 1, bl);
 		cs = ocs + bl;
 		pcs += bl;
@@ -8383,6 +8396,8 @@ cline_str(Cline l, int ins, int *csp)
 		    ocs = cs;
 		    bl = strlen(brs->str);
 		    cs = pcs + l->olen - (li - brs->curpos);
+		    if (cbr < 0)
+			cbr = cs;
 		    inststrlen(brs->str, 1, bl);
 		    cs = ocs + bl;
 		    pcs += bl;
@@ -8398,10 +8413,10 @@ cline_str(Cline l, int ins, int *csp)
 		pcs = cs;
 		if (s->flags & CLF_LINE) {
 		    inststrlen(s->line, 0, s->llen);
-		    i += s->llen; pcs = cs + s->llen;
+		    i += s->llen; scs = cs + s->llen;
 		} else {
 		    inststrlen(s->word, 0, s->wlen);
-		    i += s->wlen; pcs = cs + s->wlen;
+		    i += s->wlen; scs = cs + s->wlen;
 		}
 		if (ins) {
 		    int ocs, bl;
@@ -8411,16 +8426,19 @@ cline_str(Cline l, int ins, int *csp)
 		    while (brp && li >= brp->curpos) {
 			ocs = cs;
 			bl = strlen(brp->str);
-			cs = pcs - (li - brp->curpos);
+			cs = pcs + (li - brp->curpos);
 			inststrlen(brp->str, 1, bl);
 			cs = ocs + bl;
 			pcs += bl;
+			scs += bl;
 			brp = brp->next;
 		    }
 		    while (brs && li >= brs->curpos) {
 			ocs = cs;
 			bl = strlen(brs->str);
-			cs = pcs - (li - brs->curpos);
+			cs = scs - (li - brs->curpos);
+			if (cbr < 0)
+			    cbr = cs;
 			inststrlen(brs->str, 1, bl);
 			cs = ocs + bl;
 			pcs += bl;
@@ -8440,9 +8458,11 @@ cline_str(Cline l, int ins, int *csp)
 
 	for (; brp; brp = brp->next)
 	    inststrlen(brp->str, 1, -1);
-	for (; brs; brs = brs->prev)
+	for (; brs; brs = brs->prev) {
+	    if (cbr < 0)
+		cbr = cs;
 	    inststrlen(brs->str, 1, -1);
-
+	}
 	if (mid >= ocs)
 	    mid += cs - ocs;
 	if (pm >= ocs)
@@ -8456,7 +8476,9 @@ cline_str(Cline l, int ins, int *csp)
      * with missing characters, we take this, otherwise if we have a
      * prefix with missing characters, we take that, the same for a
      * suffix, and finally a place where the matches differ. */
-    ncs = (mid >= 0 ? mid : (pm >= 0 ? pm : (sm >= 0 ? sm : (d >= 0 ? d : cs))));
+    ncs = (cbr >= 0 ? cbr :
+	   (mid >= 0 ? mid :
+	    (pm >= 0 ? pm : (sm >= 0 ? sm : (d >= 0 ? d : cs)))));
 
     if (!ins) {
 	/* We always inserted the string in the line. If that was not

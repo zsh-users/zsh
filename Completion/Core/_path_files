@@ -284,8 +284,8 @@ for prepath in "$prepaths[@]"; do
 	break;
       elif [[ "$haspats" = no && -z "$tpre$tsuf" &&
 	"$pre" = */ && -z "$suf" ]]; then
-	PREFIX="${opre}${osuf}"
-	SUFFIX=""
+	PREFIX="${opre}"
+	SUFFIX="${osuf}"
         compadd -nQS '' - "$linepath$donepath$orig"
         tmp4=-
       fi
@@ -312,13 +312,15 @@ for prepath in "$prepaths[@]"; do
   # The next loop searches the first ambiguous component.
 
   tmp3="$pre$suf"
+  tpre="$pre"
+  tsuf="$suf"
   tmp1=( "${(@)tmp1#${prepath}${realpath}${testpath}}" )
 
   while true; do
 
     # First we check if some of the files match the original string
     # for this component. If there are some we remove all other
-    # names. This avoid having `foo' complete to `foo' and `foobar'.
+    # names. This avoids having `foo' complete to `foo' and `foobar'.
 
     if [[ "$tmp3" = */* ]]; then
       tmp4=( "${(@M)tmp1:#${tmp3%%/*}/*}" )
@@ -344,12 +346,12 @@ for prepath in "$prepaths[@]"; do
       # collected as the suffixes to make the completion code expand
       # it as far as possible.
 
-      if [[ "$tmp3" = */* ]]; then
-        PREFIX="${donepath}${linepath}${cpre}${tmp3%%/*}"
-	SUFFIX="/${tmp3#*/}"
+      if [[ "$tsuf" = */* ]]; then
+        PREFIX="${donepath}${linepath}${cpre}${tpre%%/*}"
+	SUFFIX="/${tsuf#*/}"
       else
-        PREFIX="${donepath}${linepath}${cpre}${tmp3}"
-	SUFFIX=""
+        PREFIX="${donepath}${linepath}${cpre}${tpre}"
+	SUFFIX="${tsuf}"
       fi
 
       if [[ -n $menu || "$compconfig[path_expand]" != *suffix* ]]; then
@@ -402,13 +404,24 @@ for prepath in "$prepaths[@]"; do
     testpath="${testpath}${tmp1[1]%%/*}/"
     tmp1=( "${(@)tmp1#*/}" )
 
-    cpre="${cpre}${tmp3%%/*}/"
     tmp3="${tmp3#*/}"
+
+    if [[ "$tpre" = */* ]]; then
+      cpre="${cpre}${tpre%%/*}/"
+      tpre="${tpre#*/}"
+    elif [[ "$tsuf" = */* ]]; then
+      cpre="${cpre}${tpre}/"
+      tpre="${tsuf#*/}"
+      tsuf=""
+    else
+      tpre=""
+      tsuf=""
+    fi
   done
 
   if [[ -z "$tmp4" ]]; then
-    PREFIX="${opre}${osuf}"
-    SUFFIX=""
+    PREFIX="${opre}"
+    SUFFIX="${osuf}"
     compadd -Qf -p "$linepath${testpath:q}" \
 	    -W "$prepath$realpath$testpath" "$ignore[@]" \
 	    "$addpfx[@]" "$addsfx[@]" "$remsfx[@]" \
@@ -425,8 +438,8 @@ exppaths=( "${(@)exppaths:#$orig}" )
 
 if [[ "$compconfig[path_expand]" = *prefix* &&
       $#exppaths -gt 0 && nm -eq compstate[nmatches] ]]; then
-  PREFIX="${opre}${osuf}"
-  SUFFIX=""
+  PREFIX="${opre}"
+  SUFFIX="${osuf}"
   compadd -Q -S '' "$group[@]" "$expl[@]" \
           -M "r:|/=* r:|=* $match" -p "$linepath" - "$exppaths[@]"
 fi
