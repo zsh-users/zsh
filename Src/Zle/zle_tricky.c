@@ -1404,6 +1404,12 @@ get_comp_string(void)
 	    qisuf = n;
 	}
 	autoq = ztrdup(q);
+
+        if (instring == 2) {
+            for (q = s; *q; q++)
+                if (*q == '\\' && q[1] == '!')
+                    *q = Bnull;
+        }
     }
     /* While building the quoted form, we also clean up the command line. */
     for (p = s, tt = qword, i = wb, j = 0; *p; p++, tt++, i++)

@@ -1,5 +1,9 @@
 2002-04-16  Sven Wischnowsky  <wischnow@zsh.org>
 
+	* 16990: Src/Zle/zle_tricky.c: treat backslashed bangs in
+	double quotes specially in get_comp_string(), they are more
+	like $s there
+
 	* 16988: Completion/Base/Utility/_store_cache,
 	Completion/Debian/Type/_deb_packages,
 	Completion/Redhat/Command/_rpm, Completion/Unix/Command/_cvs,
