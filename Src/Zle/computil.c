@@ -1006,7 +1006,7 @@ struct castate {
     int nopts;
     Caarg def, ddef;
     Caopt curopt;
-    int opt, arg, argbeg, optbeg, nargbeg, restbeg;
+    int opt, arg, argbeg, optbeg, nargbeg, restbeg, curpos;
     int inopt, inrest, inarg, nth, doff, singles;
     LinkList args;
     LinkList *oargs;
@@ -1055,6 +1055,7 @@ ca_parse_line(Cadef d)
     state.argbeg = state.optbeg = state.nargbeg = state.restbeg =
 	state.nth = state.inopt = state.inarg = state.opt = state.arg = 1;
     state.inrest = state.doff = state.singles = state.doff = 0;
+    state.curpos = compcurrent;
     PERMALLOC {
 	state.args = newlinklist();
 	state.oargs = (LinkList *) zalloc(d->nopts * sizeof(LinkList));
@@ -1409,9 +1410,13 @@ bin_comparguments(char *nam, char **args, char *ops, int func)
 	}
     case 'O':
 	if ((ca_laststate.opt || (ca_laststate.doff && ca_laststate.def) ||
-	     (ca_laststate.def && ca_laststate.def->type == CAA_OPT)) &&
+	     (ca_laststate.def &&
+	      (ca_laststate.def->type == CAA_OPT ||
+	       ca_laststate.def->type >= CAA_RARGS))) &&
 	    (!ca_laststate.def || ca_laststate.def->type < CAA_RARGS ||
-	     compcurrent == 1)) {
+	     (ca_laststate.def->type == CAA_RARGS ?
+	      (ca_laststate.curpos == ca_laststate.argbeg + 1) :
+	      (compcurrent == 1)))) {
 	    LinkList next = newlinklist();
 	    LinkList direct = newlinklist();
 	    LinkList odirect = newlinklist();
