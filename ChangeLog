@@ -1,3 +1,13 @@
+2004-05-28  Wayne Davison  <wayned@users.sourceforge.net>
+
+	* 19980: Src/glob.c, Src/hashtable.c, Src/jobs.c, Src/loop.c,
+	Src/params.c, Src/parse.c, Src/pattern.c, Src/Modules/datetime.c,
+	Src/prompt.c, Src/subst.c, Src/utils.c, Src/Modules/zftp.c,
+	Src/Zle/compcore.c, Src/Zle/compctl.c, Src/Zle/complete.c,
+	Src/Zle/computil.c, Src/Zle/zle_hist.c, Src/Zle/zle_refresh.c,
+	Src/Zle/zle_tricky.c:  Fixed some compiler warnings that gcc
+	outputs with -W.
+
 2004-05-28  Clint Adams  <clint@zsh.org>
 
 	* 19991: Completion/Unix/Command/_lynx: complete .htm files
