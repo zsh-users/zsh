@@ -863,8 +863,6 @@ ca_get_sopt(Cadef d, char *line, int full, char **end)
 	    } else if (!p || !p->active || (line[1] && p->args) ||
 		       p->name[0] != pre)
 		return NULL;
-	    else
-		p = NULL;
 	if (p && end)
 	    *end = line;
 	return p;
@@ -973,7 +971,7 @@ ca_parse_line(Cadef d)
 		    addlinknode(state.oargs[state.curopt->num], ztrdup(line));
 		} LASTALLOC;
 	    }
-	    state.opt = (state.def->type == CAA_OPT && line[0] && line[1]);
+	    state.opt = (state.def->type == CAA_OPT);
 
 	    if (state.def->type == CAA_REST || state.def->type == CAA_RARGS ||
 		state.def->type == CAA_RREST) {
@@ -984,13 +982,17 @@ ca_parse_line(Cadef d)
 		}
 	    } else if ((state.def = state.def->next))
 		state.argbeg = cur;
-	    else
+	    else {
 		state.curopt = NULL;
+		state.opt = 1;
+	    }
 	} else {
-	    state.opt = (line[0] ? (line[1] ? 2 : 1) : 0);
-	    state.arg = 1;
+	    state.opt = state.arg = 1;
 	    state.curopt = NULL;
 	}
+	if (state.opt)
+	    state.opt = (line[0] ? (line[1] ? 2 : 1) : 0);
+
 	pe = NULL;
 
 	if (state.opt == 2 && (state.curopt = ca_get_opt(d, line, 0, &pe))) {
@@ -1018,7 +1020,9 @@ ca_parse_line(Cadef d)
 		    addlinknode(state.oargs[state.curopt->num], ztrdup(pe));
 		} LASTALLOC;
 	    }
-	    if (!state.def)
+	    if (state.def)
+		state.opt = 0;
+	    else
 		state.curopt = NULL;
 	} else if (state.opt == 2 && d->single &&
 		   (state.curopt = ca_get_sopt(d, line, 0, &pe))) {
@@ -1051,7 +1055,9 @@ ca_parse_line(Cadef d)
 		    addlinknode(state.oargs[state.curopt->num], ztrdup(pe));
 		} LASTALLOC;
 	    }
-	    if (!state.def)
+	    if (state.def)
+		state.opt = 0;
+	    else
 		state.curopt = NULL;
 	} else if (state.arg) {
 	    if (state.inopt) {
@@ -1062,7 +1068,7 @@ ca_parse_line(Cadef d)
 		(state.def->type == CAA_RREST ||
 		 state.def->type == CAA_RARGS)) {
 		state.inrest = 0;
-		state.opt = 0;
+		state.opt = (cur == state.nargbeg + 1);
 		state.optbeg = state.nargbeg;
 		state.argbeg = cur - 1;
 
@@ -1111,9 +1117,10 @@ ca_parse_line(Cadef d)
 	    ca_laststate.ddef = NULL;
 	    ca_laststate.doff = 0;
 	} else if (cur == compcurrent && !ca_laststate.def) {
-	    if ((ca_laststate.def = ddef))
+	    if ((ca_laststate.def = ddef)) {
 		ca_laststate.doff = doff;
-	    else {
+		ca_laststate.opt = 0;
+	    } else {
 		ca_laststate.def = adef;
 		ca_laststate.ddef = NULL;
 		ca_laststate.optbeg = state.nargbeg;
