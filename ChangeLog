@@ -1,3 +1,9 @@
+2002-08-12  Peter Stephenson  <pws@csr.com>
+
+	* 17482 (Karl Tomlinson): Src/Modules/termcap.c,
+	Src/Modules/terminfo.c: resolve confusion over use of get/set
+	functions for special parameters.
+
 2002-08-10  Clint Adams  <clint@zsh.org>
 
 	* 17206 (Bruno Bonfils), 17207 (Oliver):

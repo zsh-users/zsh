@@ -236,10 +236,6 @@ gettermcap(HashTable ht, char *name)
     pm = (Param) zhalloc(sizeof(struct param));
     pm->nam = dupstring(name);
     pm->flags = PM_READONLY;
-    pm->sets.cfn = NULL;
-    pm->gets.cfn = strgetfn;
-    pm->sets.ifn = NULL;
-    pm->gets.ifn = intgetfn;
     pm->unsetfn = NULL;
     pm->ct = 0;
     pm->env = NULL;
@@ -251,10 +247,15 @@ gettermcap(HashTable ht, char *name)
     /* logic in the following cascade copied from echotc, above */
 
     if ((num = tgetnum(name)) != -1) {
+	pm->sets.ifn = NULL;
+	pm->gets.ifn = intgetfn;
 	pm->u.val = num;
 	pm->flags |= PM_INTEGER;
 	return (HashNode) pm;
     }
+
+    pm->sets.cfn = NULL;
+    pm->gets.cfn = strgetfn;
     switch (ztgetflag(name)) {
     case -1:
 	break;
@@ -338,10 +339,6 @@ scantermcap(HashTable ht, ScanFunc func, int flags)
 #endif
 
     pm = (Param) zhalloc(sizeof(struct param));
-    pm->sets.cfn = NULL;
-    pm->gets.cfn = strgetfn;
-    pm->sets.ifn = NULL;
-    pm->gets.ifn = intgetfn;
     pm->unsetfn = NULL;
     pm->ct = 0;
     pm->env = NULL;
@@ -350,6 +347,9 @@ scantermcap(HashTable ht, ScanFunc func, int flags)
     u = buf;
 
     pm->flags = PM_READONLY | PM_SCALAR;
+    pm->sets.cfn = NULL;
+    pm->gets.cfn = strgetfn;
+
     for (capcode = (char **)boolcodes; *capcode; capcode++) {
 	if ((num = ztgetflag(*capcode)) != -1) {
 	    pm->u.str = num ? dupstring("yes") : dupstring("no");
@@ -359,6 +359,9 @@ scantermcap(HashTable ht, ScanFunc func, int flags)
     }
 
     pm->flags = PM_READONLY | PM_INTEGER;
+    pm->sets.ifn = NULL;
+    pm->gets.ifn = intgetfn;
+
     for (capcode = (char **)numcodes; *capcode; capcode++) {
 	if ((num = tgetnum(*capcode)) != -1) {
 	    pm->u.val = num;
@@ -368,6 +371,9 @@ scantermcap(HashTable ht, ScanFunc func, int flags)
     }
 
     pm->flags = PM_READONLY | PM_SCALAR;
+    pm->sets.cfn = NULL;
+    pm->gets.cfn = strgetfn;
+
     for (capcode = (char **)strcodes; *capcode; capcode++) {
 	if ((tcstr = (char *)tgetstr(*capcode,&u)) != NULL &&
 	    tcstr != (char *)-1) {
