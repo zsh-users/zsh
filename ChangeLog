@@ -1,3 +1,10 @@
+2000-05-25  Sven Wischnowsky  <wischnow@zsh.org>
+
+	* 11565: Completion/Base/_in_vared, Completion/Commands/_complete_debug,
+ 	Src/Zle/complist.c: force listing in _complete_debug; make
+ 	complist with list-scrolling stopt at the end of the list when
+ 	prompt would scroll it out; fix _in_vared to handle `foo[bar]'
+	
 2000-05-24  Peter Stephenson  <pws@cambridgesiliconradio.com>
 
 	* 11561: Src/lex.c, Doc/Zsh/expn.yo: don't use RC_QUOTES in Posix

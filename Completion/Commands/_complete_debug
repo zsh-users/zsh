@@ -22,6 +22,7 @@ unsetopt xtrace
     # _message -r "Trace output left in $tmp (up-history to view)"
     # print -sR "${VISUAL:-${EDITOR:-${PAGER:-more}}} $tmp ;: $w"
     _message -r "Trace output left in $tmp"
+    compstate[list]='list force'
     print -zR "${VISUAL:-${EDITOR:-${PAGER:-more}}} $tmp ;: $w"
     exec 2>&3 3>&-
 }

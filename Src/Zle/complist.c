@@ -1302,36 +1302,41 @@ compprintlist(int showall)
     if (nlnct <= 1)
 	mscroll = 0;
     if (clearflag) {
+	int nl;
+
 	/* Move the cursor up to the prompt, if always_last_prompt *
 	 * is set and all that...                                  */
 	if (mlbeg >= 0) {
-	    if ((ml = listdat.nlines + nlnct) >= lines) {
+	    if ((nl = listdat.nlines + nlnct) >= lines) {
 		if (mhasstat) {
 		    putc('\n', shout);
 		    compprintfmt(NULL, 0, 1, 1, mline, NULL);
 		}
-		ml = lines - 1;
+		nl = lines - 1;
 	    } else
-		ml--;
-	    tcmultout(TCUP, TCMULTUP, ml);
+		nl--;
+	    tcmultout(TCUP, TCMULTUP, nl);
 	    showinglist = -1;
 
 	    lastlistlen = listdat.nlines;
-	} else if ((ml = listdat.nlines + nlnct - 1) < lines) {
+	} else if ((nl = listdat.nlines + nlnct - 1) < lines) {
 	    if (mlbeg >= 0 && tccan(TCCLEAREOL))
 		tcout(TCCLEAREOL);
-	    tcmultout(TCUP, TCMULTUP, ml);
+	    tcmultout(TCUP, TCMULTUP, nl);
 	    showinglist = -1;
 
 	    lastlistlen = listdat.nlines;
 	} else {
 	    clearflag = 0;
-	    if (!asked)
+	    if (!asked) {
+		mrestlines = (ml + nlnct > lines);
 		compprintnl(ml);
+	    }
 	}
-    } else if (!asked)
+    } else if (!asked) {
+	mrestlines = (ml + nlnct > lines);
 	compprintnl(ml);
-
+    }
     listshown = (clearflag ? 1 : -1);
     mnew = 0;
 
