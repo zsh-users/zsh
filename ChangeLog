@@ -1,3 +1,160 @@
+2000-02-02  Peter Stephenson  <pws@pwstephenson.fsnet.co.uk>
+
+	* Bart: 9533: Src/signals.c: make sure shell doesn't send itself
+	SIGHUP when exiting.
+
+	* Sven: 9528: Completion/Core/_files: missing variable
+	initialization.
+
+	* Sven: 9527: Doc/Zsh/compsys.yo: extra description for styles.
+
+	* Sven: 9526: Src/Zle/computil.c: missing tokenization in
+	completion listing.
+
+	* Sven: 9524: Src/text.c: wordcode bug outputting function
+	definitions.
+
+	* Sven: 9522: Src/utils.c: return on various conditions when
+	reading a character from the terminal.
+
+	* Sven: 9521: Src/exec.c: another job-waiting fix.
+
+2000-02-01  Peter Stephenson  <pws@pwstephenson.fsnet.co.uk>
+
+	* pws: 9518: Test/.distfiles, Test/10prompt.ztst: test for prompt
+	escapes.
+
+	* Clint/Sven: 9500 rewritten as 9505: Src/mem.c: more graceful exit
+	after mmap() failure when used for heap allocation.
+
+	* Alexandre: 9504: Completion/Builtins/_zstyle: complete name of
+	packageset style.
+
+	* Sven: 9503: Src/exec.c: problem updating job entry without any
+	processes.
+
+	* Alexandre: 9502: Completion/User/_urls,
+	Completion/Core/compinit, Completion/Core/_menu,
+	Completion/Core/_match, Completion/Base/_combination: fix 9463
+	to use ':completion:...' prefix with zstyle.
+
+2000-01-31  Peter Stephenson  <pws@pwstephenson.fsnet.co.uk>
+
+	* Sven: 9496: Src/loop.c: failure to check for return status in
+	for loop.
+
+	* Bart: 9495: Src/exec.c: re-block after waiting for jobs.
+
+	* Sven: 9494: Src/Zle/computil.c: extraneous space with option
+	description.
+
+	* Bart: 9493: Test/09funcdef.ztst: regression test for function
+	definition.
+
+	* Sven: 9489: Src/Zle/complist.c, Src/Zle/compresult.c: avoid menu
+	selection with no list and asking whether to list twice.
+
+	* Sven: 9488: Src/exec.c: remove unnecessary child_block().
+
+	* Sven: 9487: Src/exec.c: wordcode fix: expand names in function
+	definitions.
+
+	* Sven: 9486: Doc/Zsh/compwid.yo: fix docs for compadd -1 with -J
+
+2000-01-30  Peter Stephenson  <pws@pwstephenson.fsnet.co.uk>
+
+	* Tanaka Akira: 9476: Completion/User/_cvs,
+	Completion/User/_patch: prefer LC_ALL to LANG as the former
+	overrides the latter.
+
+	* Tanaka Akira: 9475: Completion/User/_telnet: simplify by using
+	(K) parameter flag.
+
+	* Tanaka Akira: 9473: Completion/User/_patch: improved support for
+	different versions of `patch'.
+
+	* Bart: 9472: Doc/Makefile.in: dependencies on texinfo files when
+	building out of source tree.
+
+	* Tanaka Akira: 9470: Completion/Debian/_deb_packages: updage
+	should be update throughout.
+
+	* Clint: 9469: Completion/Debian/_deb_packages,
+	Completion/Debian/_dpkg, Doc/Zsh/compsys.yo: new packageset style
+	to select Debian package.
+
+2000-01-29  Peter Stephenson  <pws@pwstephenson.fsnet.co.uk>
+
+	* Alexandre: 1684: Completion/User/.distfiles: add _diff and
+	_diff_options.
+
+	* Alexandre: 9463: Completion/User/_urls,
+	Completion/Core/compinit, Completion/Core/_menu,
+	Completion/Core/_match, Completion/Base/_combination: switch to
+	using zstyle instead of compstyle in various functions.
+
+	* Sven: 9458: Src/Zle/complete.c, Src/Zle/compresult.c: used freed
+	memory in completion; should have been using heaps all along.
+
+	* Sven: 9457: Src/params.c: tokenisation problem with patterns
+	using parameter flag (K).
+
+	* Sven: 9454: Completion/Core/_path_files: handling path prefixes
+	with patterns more cleverly.
+
+	* Sven: 9452: Completion/Base/_arguments: `--exclude=' shouldn't
+	show both argument list and completions of --exclude....
+
+	* Bart: 9448: Makefile.in: treat Test subdirectory along with
+	others in make procedures (notably distclean).
+
+	* Sven: 9442: Src/Zle/compresult.c: problems with suffixes when
+	cursor style set.
+
+	* Sven: 9441: Completion/Core/_files,
+	Completion/User/_diff_options: _files sometimes didn't use
+	ignored-patterns; use $(command diff) just in case, plus more
+	verbose descriptions.
+
+	* Alexandre: 9436: Completion/User/_prcs,
+	Completion/User/_diff_options, Completion/User/_diff: prcs
+	enhancements with builtin diff support, plus diff options for use
+	directly with GNU diff.
+
+2000-01-25  Peter Stephenson  <pws@pwstephenson.fsnet.co.uk>
+
+	* pws: Etc/FAQ.yo: updated from latest posted version.
+
+	* Sven: 9424: Src/Modules/parameter.c: problems with 9421 with
+	aliases and dir parameters.
+
+2000-01-24  Peter Stephenson  <pws@pwstephenson.fsnet.co.uk>
+
+	* pws: 9421: Src/params.c: PM_REMOVABLE parameters are freeable
+	since they were created by an ordinary createparam() (fixes
+	memory leak).
+
+	* Alexandre: 9419: Src/Zle/complist.c: more problems with
+	backreferences in list-colors: aborts after failed backref,
+	nested backrefs not handled.
+
+	* Sven: 9417: Src/Zle/compcore.c: prefix code confused by matcher
+	specifications.
+
+	* Sven: 9416: Completion/Core/_setup, Src/Zle/complist.c: problems
+	using backreferences in list-colors, check zsh/complist is loaded
+	if needed.
+
+	* Sven: 9415: Doc/Zsh/mod_complist.yo: typo in pattern example.
+
+	* Sven: 9414: Completion/Core/_path_files: use _comp_ignore.
+
+	* Sven: 9413: Functions/Zftp/zfinit, Src/Modules/zutil.c,
+	Src/loop.c: cleanups for module name, new completion test,
+	compilation warnings.
+
+	* Sven: 9361: Src/exec.c: simplifty getoutput() test.
+
 2000-01-23  Peter Stephenson  <pws@pwstephenson.fsnet.co.uk>
 
 	* pws: Config/version.mk, Src/Modules/.distfiles: 3.1.6-dev-16;
@@ -28,6 +185,8 @@
 	* Sven: 9401: Src/Modules/parameter.c, Src/exec.c, Src/zsh.h: use
 	list-based instead of function-based system for shell function
 	wrappers.
+
+	* Tanaka Akira: 9400: Completion/User/.distfiles: add _finger
 
 	* Sven: 9399: Functions/Zftp/zfinit: bad reverse index.
 
@@ -94,6 +253,8 @@
 
 2000-01-18  Peter Stephenson  <pws@pwstephenson.fsnet.co.uk>
 
+	* pws: 9354: Etc/MACHINES: problems reported on SPARC.
+	
 	* Sven: 9336: Src/signals.c: addition to 9332.
 
 	* Sven: 9332: Src/Modules/example.c, Src/Modules/parameter.c,
@@ -103,9 +264,6 @@
 	Src/glob.c, Src/hashtable.c, Src/init.c, Src/loop.c, Src/parse.c,
 	Src/signals.c, Src/text.c, Src/utils.c, Src/zsh.h: Use word code
 	instead of structs for passing executable chunks around.
-
-	* pws: 9357: Src/glob.c: speculative but harmless attempt to avoid
-	alignment problems on sparc/Linux.
 
 	* Sven: 9353: Completion/Base/_jobs: bad prefix test
 
@@ -712,6 +870,8 @@
 	* Sven: 2776: Completion/Core/_path_files: handling of . and .. in
 	path.
 
+	* Felix: 1 chunk of 9008: Doc/Zsh/mod_parameter.yo: docs for $jobdirs.
+	
 	* Felix: (most of) 9007: Src/Modules/parameter.c,
 	Src/modules/parameter.mdd, mod_parameter.yo: jobdirs special assoc
 	array.

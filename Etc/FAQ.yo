@@ -1,4 +1,4 @@
-mailto(pws@ifh.de)\
+mailto(pws@pwstephenson.fsnet.co.uk)\
 whentxt(notableofcontents())\
 COMMENT(-- mytt is like tt but adds quotes `like this' for plain text --)\
 def(mytt)(1)(\
@@ -34,7 +34,7 @@ def(myeit)(0)(\
     whentxt(eit()CHAR(41)))\
 def(myeitd)(0)(\
     whenlatex(eit())whenhtml(eit())whenman(eit())whenms(eit())whensgml(eit())\
-    whentxt(eit().))\
+    whentxt(.))\
 COMMENT(-- don't want headers for text, USENET headers must come first --)\
 def(myreport)(3)(\
 whentxt(report()()())\
@@ -43,15 +43,20 @@ whenlatex(report(ARG1)(ARG2)(ARG3))\
 whenman(report(ARG1)(ARG2)(ARG3))\
 whenms(report(ARG1)(ARG2)(ARG3))\
 whensgml(report(ARG1)(ARG2)(ARG3)))
-myreport(Z-Shell Frequently-Asked Questions)(Peter Stephenson)(1999/05/24)
+myreport(Z-Shell Frequently-Asked Questions)(Peter Stephenson)(2000/1/25)
 COMMENT(-- the following are for Usenet and must appear first)\
 description(\
 mydit(Archive-Name:) unix-faq/shell/zsh
-mydit(Last-Modified:) 1999/07/30
+mydit(Last-Modified:) 2000/11/25
 mydit(Submitted-By:) email(pws@ibmth.df.unipi.it (Peter Stephenson))
-mydit(Version:) $Id: FAQ.yo,v 1.1.1.19 1999/12/23 23:01:43 akr Exp $
+mydit(Version:) $Id: FAQ.yo,v 1.1.1.20 2000/02/03 01:21:45 akr Exp $
 mydit(Posting-Frequency:) Monthly
-mydit(Copyright:) (C) P.W. Stephenson, 1995--1999 (see end of document)
+mydit(Copyright:) (C) P.W. Stephenson, 1995--2000 (see end of document)
+)
+
+bf(Changes since issue posted December 1999:)
+description(
+mydit(   )  None.  Suggestions on a postcard.
 )
 
 This document contains a list of frequently-asked (or otherwise
@@ -290,7 +295,7 @@ sect(On what machines will it run?)
 
 sect(What's the latest version?)
 
-  Zsh 3.0.6 is the latest production version. The new major number 3.0
+  Zsh 3.0.7 is the latest production version. The new major number 3.0
   largely reflects the considerable internal changes in zsh to make it more
   reliable, consistent and (where possible) compatible.  Those planning on
   upgrading their zsh installation should take a look at the list of
@@ -301,7 +306,10 @@ sect(What's the latest version?)
   patch by patch, with each intermediate version publicly available.  Note
   that this `open' development system does mean bugs are sometimes
   introduced into the most recent archived version.  These are usually
-  fixed quickly.
+  fixed quickly.  If you are really interested in getting the latest
+  improvements, and less worried about providing a stable environment,
+  development versions are uploaded quite frequently to the archive in the
+  tt(development) subdirectory.
 
   Note also that as the shell changes, it may become incompatible with
   older versions; see the end of question link(5.1)(51) for a partial list.
@@ -338,8 +346,6 @@ label(16)
 (ftp://ftp.cenatls.cena.dgac.fr/pub/shells/zsh/)
     mydit(Germany)   url(ftp://ftp.fu-berlin.de/pub/unix/shells/zsh/)
 (ftp://ftp.fu-berlin.de/pub/unix/shells/zsh/)
-    mydit()          url(ftp://ftp.gmd.de/packages/zsh/)
-(ftp://ftp.gmd.de/packages/zsh/)
     mydit()          url(ftp://ftp.uni-trier.de/pub/unix/shell/zsh/)
 (ftp://ftp.uni-trier.de/pub/unix/shell/zsh/)
     mydit(Hungary)   url(ftp://ftp.cs.elte.hu/pub/zsh/)
@@ -1122,7 +1128,7 @@ sect(How do I automatically display the directory in my xterm title bar?)
   You should use the special function mytt(chpwd), which is called when
   the directory changes.  The following checks that standard output is
   a terminal, then puts the directory in the title bar if the terminal
-  is compatible with tt(xterm) or is a tt(sun-cmd).
+  is an tt(xterm) or some close relative, or a tt(sun-cmd).
   
   verb(
   chpwd() {
@@ -1130,7 +1136,7 @@ sect(How do I automatically display the directory in my xterm title bar?)
     case $TERM in
       sun-cmd+CHAR(41) print -Pn "\e]l%~\e\\"
         ;;
-      *xterm*|rxvt|dtterm|Eterm|kterm+CHAR(41) print -Pn "\e]2;%~\a"
+      *xterm*|rxvt|(dt|k|E)term+CHAR(41) print -Pn "\e]2;%~\a"
         ;;
     esac
   }
@@ -1719,8 +1725,12 @@ sect(How does zsh deal with ambiguous completions?)
       completions
    it() with tt(AUTO_LIST) set, when the completion is ambiguous you get a
       list without having to type tt(\C-D)
-   it() with tt(LIST_AMBIGOUS), this is modified so that nothing is listed if
-      there is an unambiguous prefix or suffix to be inserted
+   it() with tt(BASH_AUTO_LIST) set, the list only happens the second
+      time you hit tab on an ambiguous completion
+   it() with tt(LIST_AMBIGUOUS), this is modified so that nothing is listed if
+      there is an unambiguous prefix or suffix to be inserted --- this
+      can be combined with tt(BASH_AUTO_LIST), so that where both are
+      applicable you need to hit tab three times for a listing.
    it() with tt(MENU_COMPLETE) set, one completion is always inserted
       completely, then when you hit TAB it changes to the next, and so
       on until you get back to where you started
@@ -2197,7 +2207,7 @@ Wischnowsky).
 nsect(Copyright Information:)
 
 This document is copyright (C) P.W. Stephenson, 1995, 1996, 1997,
-1998, 1999. This text originates in the U.K. and the author asserts
+1998, 1999, 2000. This text originates in the U.K. and the author asserts
 his moral rights under the Copyrights, Designs and Patents Act, 1988.
 
 Permission is hereby granted, without written agreement and without

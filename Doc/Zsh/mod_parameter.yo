@@ -111,6 +111,10 @@ vindex(historywords)
 item(tt(historywords))(
 A special array containing the words stored in the history.
 )
+vindex(jobdirs)
+item(tt(jobdirs))(
+This association maps job numbers to the directories from which the job was started (which may not be the current directory of the job).
+)
 vindex(jobtexts)
 item(tt(jobtexts))(
 This association maps job numbers to the texts of the command lines
