@@ -1740,55 +1740,57 @@ addmatches(Cadata dat, char **argv)
 		    llpl -= gfl;
 		}
 	    }
-	    s = dat->ppre ? dat->ppre : dupstring("");
-	    if ((ml = match_str(lpre, s, &bpl, 0, NULL, 0, 0, 1)) >= 0) {
-		if (matchsubs) {
-		    Cline tmp = get_cline(NULL, 0, NULL, 0, NULL, 0, 0);
+	    if ((s = dat->ppre)) {
+		if ((ml = match_str(lpre, s, &bpl, 0, NULL, 0, 0, 1)) >= 0) {
+		    if (matchsubs) {
+			Cline tmp = get_cline(NULL, 0, NULL, 0, NULL, 0, 0);
 
-		    tmp->prefix = matchsubs;
-		    if (matchlastpart)
-			matchlastpart->next = tmp;
+			tmp->prefix = matchsubs;
+			if (matchlastpart)
+			    matchlastpart->next = tmp;
+			else
+			    matchparts = tmp;
+		    }
+		    pline = matchparts;
+		    lpre += ml;
+		    llpl -= ml;
+		    bcp = ml;
+		    bpadd = strlen(s) - ml;
+		} else {
+		    if (llpl <= lpl && strpfx(lpre, s))
+			lpre = dupstring("");
+		    else if (llpl > lpl && strpfx(s, lpre))
+			lpre += lpl;
 		    else
-			matchparts = tmp;
+			*argv = NULL;
+		    bcp = lpl;
 		}
-		pline = matchparts;
-		lpre += ml;
-		llpl -= ml;
-		bcp = ml;
-		bpadd = strlen(s) - ml;
-	    } else {
-		if (llpl <= lpl && strpfx(lpre, s))
-		    lpre = dupstring("");
-		else if (llpl > lpl && strpfx(s, lpre))
-		    lpre += lpl;
-		else
-		    *argv = NULL;
-		bcp = lpl;
 	    }
-	    s = dat->psuf ? dat->psuf : dupstring("");
-	    if ((ml = match_str(lsuf, s, &bsl, 0, NULL, 1, 0, 1)) >= 0) {
-		if (matchsubs) {
-		    Cline tmp = get_cline(NULL, 0, NULL, 0, NULL, 0, CLF_SUF);
+	    if ((s = dat->psuf)) {
+		if ((ml = match_str(lsuf, s, &bsl, 0, NULL, 1, 0, 1)) >= 0) {
+		    if (matchsubs) {
+			Cline tmp = get_cline(NULL, 0, NULL, 0, NULL, 0, CLF_SUF);
 
-		    tmp->suffix = matchsubs;
-		    if (matchlastpart)
-			matchlastpart->next = tmp;
+			tmp->suffix = matchsubs;
+			if (matchlastpart)
+			    matchlastpart->next = tmp;
+			else
+			    matchparts = tmp;
+		    }
+		    sline = revert_cline(matchparts);
+		    lsuf[llsl - ml] = '\0';
+		    llsl -= ml;
+		    bcs = ml;
+		    bsadd = strlen(s) - ml;
+		} else {
+		    if (llsl <= lsl && strsfx(lsuf, s))
+			lsuf = dupstring("");
+		    else if (llsl > lsl && strsfx(s, lsuf))
+			lsuf[llsl - lsl] = '\0';
 		    else
-			matchparts = tmp;
+			*argv = NULL;
+		    bcs = lsl;
 		}
-		sline = revert_cline(matchparts);
-		lsuf[llsl - ml] = '\0';
-		llsl -= ml;
-		bcs = ml;
-		bsadd = strlen(s) - ml;
-	    } else {
-		if (llsl <= lsl && strsfx(lsuf, s))
-		    lsuf = dupstring("");
-		else if (llsl > lsl && strsfx(s, lsuf))
-		    lsuf[llsl - lsl] = '\0';
-		else
-		    *argv = NULL;
-		bcs = lsl;
 	    }
 	    if (comppatmatch && *comppatmatch) {
 		int is = (*comppatmatch == '*');

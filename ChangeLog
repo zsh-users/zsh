@@ -1,3 +1,10 @@
+2000-05-17  Sven Wischnowsky  <wischnow@zsh.org>
+
+	* Felix: 11397 and my 11439: Doc/Zsh/compwid.yo, Src/Zle/comp.h,
+	Src/Zle/compcore.c, Src/Zle/compmatch.c, Test/.distfiles,
+	Test/54compmatch.ztst, Test/comptest: add Felix' completion
+	matching test; some fixes for bugs shown by it
+
 2000-05-17  Bart Schaefer  <schaefer@zsh.org>
 
 	* 11435: Test/53completion.ztst: Update for 11406.

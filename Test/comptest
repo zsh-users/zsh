@@ -1,13 +1,19 @@
 #!/usr/local/bin/zsh -f
 
-zmodload zsh/zpty
+[[ -d $ZTST_testdir/Modules/zsh ]] && module_path=( $ZTST_testdir/Modules )
+
+zmodload -i zsh/zpty
 setopt extendedglob
+
+fpath=( $ZTST_srcdir/../(Completion|Functions)/*~*/CVS(/) )
 
 debug=
 dump=(-D)
 code=
 zsh=${ZSH:-zsh}
+termcap_ce="$(echotc ce)"
 
+debug=yes
 while getopts Dd:c:z: opt; do
   case $opt in
     D) debug=yes;;
@@ -20,14 +26,18 @@ done
 
 input="$*"
 
-init=\
-'stty columns 80 rows 24
+tmp=/tmp/comptest.$$
+
+cat <<End >$tmp
+module_path=( $module_path )
+fpath=( $fpath )
+stty columns 80 rows 24
 LISTMAX=10000000
-'"ZLS_COLORS='no=<NO>:fi=<FI>:di=<DI>:ln=<LN>:pi=<PI>:so=<SO>:bd=<BD>:cd=<CD>:ex=<EX>:mi=<MI>:tc=<TC>:sp=<SP>:lc=<LC>:ec=<EC>\n:rc=<RC>'
+ZLS_COLORS='no=<NO>:fi=<FI>:di=<DI>:ln=<LN>:pi=<PI>:so=<SO>:bd=<BD>:cd=<CD>:ex=<EX>:mi=<MI>:tc=<TC>:sp=<SP>:lc=<LC>:ec=<EC>\n:rc=<RC>'
 bindkey -e
 autoload -U compinit
 compinit $dump
-"'zstyle ":completion:*" group-name ""
+zstyle ":completion:*" group-name ""
 zstyle ":completion*:messages" format "<MESSAGE>%d</MESSAGE>
 "
 zstyle ":completion*:descriptions" format "<DESCRIPTION>%d</DESCRIPTION>
@@ -39,7 +49,7 @@ zmodload zsh/complist
 expand-or-complete-with-report () {
   print -lr "<WIDGET><expand-or-complete>"
   zle expand-or-complete
-  print -lr - "<LBUFFER>$LBUFFER</LBUFFER>" "<RBUFFER>$RBUFFER</RBUFFER>"
+  print -lr - "<LBUFFER>\$LBUFFER</LBUFFER>" "<RBUFFER>\$RBUFFER</RBUFFER>"
   zle clear-screen
   zle -R
 }
@@ -51,6 +61,7 @@ list-choices-with-report () {
 }
 finish () {
   print "<WIDGET><finish>"
+  sleep 1
   exit 0
 }
 zle -N expand-or-complete-with-report
@@ -59,18 +70,33 @@ zle -N finish
 bindkey "^I" expand-or-complete-with-report
 bindkey "^D" list-choices-with-report
 bindkey "^Z" finish
-'"$code"
+$code
+End
 
 export PS1="<PROMPT>"
 zpty zsh "$zsh" -f
 
-zpty -r zsh log "*<PROMPT>*"
+zpty -r zsh log1 "*<PROMPT>*" || { 
+  print first prompt doesn\'t appered.
+  exit 1
+}
 
-zpty -w zsh "eval ${init:q}"
-zpty -r zsh log "*<PROMPT>*"
+zpty -w zsh ". $tmp"
+zpty -r zsh log2 "*<PROMPT>*" || {
+  print second prompt doesn\'t appered.
+  exit 1
+}
+rm $tmp
 
-zpty -w zsh "$input"$'\C-Z'
-zpty -r zsh log "*<WIDGET><finish>*"
+zpty -n -w zsh "$input"$'\C-Z'
+zpty -r zsh log "*<WIDGET><finish>*" || {
+  print finish widget doesn\'t invoked.
+  exit 1
+}
+
+if [[ -n "$debug" ]]; then
+  print -lr - "$log" > /tmp/comptest.debug
+fi
 
 logs=(${(s:<WIDGET>:)log})
 shift logs
@@ -79,16 +105,19 @@ for log in "$logs[@]"; do
   if [[ "$log" = (#b)*$'<LBUFFER>'(*)$'</LBUFFER>\r\n<RBUFFER>'(*)$'</RBUFFER>'* ]]; then
     print -lr "line: {$match[1]}{$match[2]}"
   fi
-  while (( ${(N)log#*(#b)(<LC><(??)><RC>(*)<EC>|<DESCRIPTION>(*)</DESCRIPTION>|<MESSAGE>(*)</MESSAGE>)} )); do
+  while (( ${(N)log#*(#b)(<LC><(??)><RC>(*)<EC>|<DESCRIPTION>(*)</DESCRIPTION>|<MESSAGE>(*)</MESSAGE>|<COMPADD>(*)</COMPADD>)} )); do
     log="${log[$mend[1]+1,-1]}"
     if (( 0 <= $mbegin[2] )); then
       if [[ $match[2] != TC && $match[3] != \ # ]]; then
-	print "$match[2]:{$match[3]}"
+	print -lr "$match[2]:{${match[3]%$termcap_ce}}"
       fi
     elif (( 0 <= $mbegin[4] )); then
-      print "DESCRIPTION:{$match[4]}"
+      print -lr "DESCRIPTION:{$match[4]}"
     elif (( 0 <= $mbegin[5] )); then
-      print "MESSAGE:{$match[5]}"
+      print -lr "MESSAGE:{$match[5]}"
+    elif (( 0 <= $mbegin[6] )); then
+      result=`echo $match[6] | tr -d '\012\015'`
+      print -lr "COMPADD:{$result}"
     fi
   done
 done

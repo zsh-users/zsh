@@ -411,7 +411,8 @@ add_match_sub(Cmatcher m, char *l, int ll, char *w, int wl)
 
     /* And add the cline. */
     if (wl || ll) {
-	n = get_cline(l, ll, w, wl, NULL, 0, flags);
+	n = get_cline(l, ll, w, wl, NULL, 0,
+		      flags | ((m && m->wlen == -2) ? CLF_SKIP : 0));
 	if (matchlastsub)
 	    matchlastsub->next = n;
 	else
@@ -1925,9 +1926,9 @@ join_clines(Cline o, Cline n)
 		Cline t, tn, tt, to = NULL;
 
 		for (t = n; (tn = t->next); t = tn)
-		    if (!(tn->flags & CLF_NEW)) {
+		    if (!(tn->flags & CLF_NEW) && (tn->flags & CLF_SKIP)) {
 			for (tt = o; (to = tt->next); tt = to)
-			    if (!(to->flags & CLF_NEW) &&
+			    if (!(to->flags & CLF_NEW) && (to->flags & CLF_SKIP) &&
 				cmp_anchors(tn, to, 1))
 				break;
 			if (to)
@@ -1953,8 +1954,9 @@ join_clines(Cline o, Cline n)
 		    n = n->next;
 		    continue;
 		} else {
-		    for (t = o; (to = t->next) && !cmp_anchors(n, to, 1);
-			 t = to);
+		    for (t = o; (to = t->next); t = to)
+			if ((to->flags & CLF_SKIP) && cmp_anchors(n, to, 1))
+			    break;
 
 		    if (to) {
 			diff = sub_join(n, o, to, 1);
@@ -1975,9 +1977,11 @@ join_clines(Cline o, Cline n)
 			continue;
 		    } else {
 			for (tt = NULL, t = n; (tn = t->next); t = tn) {
-			    for (tt = o;
-				 (to = tt->next) &&
-				     !cmp_anchors(tn, to, 1); tt = to);
+			    if (tn->flags & CLF_SKIP)
+				for (tt = o; (to = tt->next); tt = to)
+				    if ((to->flags & CLF_SKIP) &&
+					cmp_anchors(tn, to, 1))
+					break;
 			    if (to)
 				break;
 			}

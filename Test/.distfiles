@@ -5,5 +5,5 @@ DISTFILES_SRC='
     05command.ztst 06arith.ztst 07cond.ztst 08traps.ztst 09funcdef.ztst
     10prompt.ztst 11glob.ztst 12procsubst.ztst 13parameter.ztst
     50cd.ztst 51xtrace.ztst 52zregexparse.ztst
-    53completion.ztst
+    53completion.ztst 54compmatch.ztst
 '

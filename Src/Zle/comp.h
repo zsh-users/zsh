@@ -196,6 +196,7 @@ struct cline {
 #define CLF_LINE     32
 #define CLF_JOIN     64
 #define CLF_MATCHED 128
+#define CLF_SKIP    256
 
 /* Information for ambiguous completions. One for fignore ignored and   *
  * one for normal completion. */

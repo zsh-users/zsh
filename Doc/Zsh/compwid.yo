@@ -958,17 +958,21 @@ determined by a leading uppercase letter) or maybe one has to
 complete strings with trailing numbers. Here one could use the simple
 form with only one anchor as in:
 
-example(compadd -M 'r:|[A-Z0-9]=* r:|=*' LikeTHIS FooHoo foo123 bar234)
+example(compadd -M 'r:|[A-Z0-9]=* r:|=*' LikeTHIS FooHoo 5foo123 5bar234)
 
-But with this, the string `tt(H)' would be completed to `tt(FooHoo)'
-em(and) `tt(LikeTHIS)' and `tt(2)' would be completed to the other two
+But with this, the string `tt(H)' would neither complete to `tt(FooHoo)'
+nor to `tt(LikeTHIS)' because in each case there is an uppercase
+letter before the `tt(H)' and that is matched by the anchor. Likewise, 
+a `tt(2)' would not be completed. In both cases this could be changed
+by using `tt(r:|[A-Z0-9]=**)', but then `tt(H)' completes to both
+`tt(LikeTHIS)' and `tt(FooHoo)' and a `tt(2)' matches the other
 strings because characters can be inserted before every uppercase
 letter and digit. To avoid this one would use:
 
-example(compadd -M 'r:[^A-Z0-9]||[A-Z0-9]=* r:|=*' \ 
+example(compadd -M 'r:[^A-Z0-9]||[A-Z0-9]=** r:|=*' \ 
     LikeTHIS FooHoo foo123 bar234)
 
-By using these two anchors, a `tt(H)' matches only uppercase `H's that 
+By using these two anchors, a `tt(H)' matches only uppercase `tt(H)'s that 
 are immediately preceded by something matching the left anchor
 `tt([^A-Z0-9])'. The effect is, of course, that `tt(H)' matches only
 the string `tt(FooHoo)', a `tt(2)' matches only `tt(bar234)' and so on.
