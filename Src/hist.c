@@ -981,25 +981,19 @@ should_ignore_line(Eprog prog)
     }
 
     if (isset(HISTNOSTORE)) {
-	char *b = getpermtext(prog, NULL);
-	char *t = b;
+	char *b = getjobtext(prog, NULL);
 	if (*b == 'b' && strncmp(b, "builtin ", 8) == 0)
 	    b += 8;
 	if (*b == 'h' && strncmp(b, "history", 7) == 0
-	 && (!b[7] || b[7] == ' ')) {
-	    zsfree(t);
+	 && (!b[7] || b[7] == ' '))
 	    return 1;
-	}
 	if (*b == 'f' && b[1] == 'c' && b[2] == ' ' && b[3] == '-') {
 	    b += 3;
 	    do {
-		if (*++b == 'l') {
-		    zsfree(t);
+		if (*++b == 'l')
 		    return 1;
-		}
 	    } while (ialpha(*b));
 	}
-	zsfree(t);
     }
 
     return 0;
