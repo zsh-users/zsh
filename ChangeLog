@@ -1,3 +1,8 @@
+2001-07-31  Clint Adams  <clint@zsh.org>
+
+        * 15551: Completion/Unix/Command/_gzip: handle -l and -t
+        as done for -d; only complete presumably compressed files.
+
 2001-07-26  Oliver Kiddle  <opk@zsh.org>
 
 	* 15503: Test/E01options.ztst: fix posixbuiltins test so that it
