@@ -1,3 +1,8 @@
+2004-01-07  Clint Adams  <clint@zsh.org>
+
+	* 20649: Completion/Unix/Command/_cal:
+	completion for cal and ncal.
+
 2005-01-05  Peter Stephenson  <pws@csr.com>
 
 	* unposted: Completion/Unix/Command/_perforce: limit many
