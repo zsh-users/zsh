@@ -1,5 +1,13 @@
 2002-02-03  Clint Adams  <clint@zsh.org>
 
+        * Sven: 16507: Completion/Zsh/Type/_command_names: slight
+	improvement for 16500 to allow completion after ./<TAB> in
+	all cases
+
+        * 16500: Completion/Zsh/Type/_command_names:
+        don't complete executable files in the current directory
+        if "." is not in path.
+
 	* 16540: Completion/Unix/Command/_rsync: include short options and
 	local files.
 
