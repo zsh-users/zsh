@@ -980,9 +980,12 @@ execpline(Estate state, wordcode slcode, int how, int last1)
 		    jn->stat |= STAT_NOPRINT;
 		    makerunning(jn);
 		}
-		if (!(jn->stat & STAT_LOCKED)) {
-		    child_unblock();
+		if (!(jn->stat & STAT_LOCKED))
 		    waitjobs();
+
+		if (list_pipe_job && jobtab[list_pipe_job].procs &&
+		    !(jobtab[list_pipe_job].stat & STAT_STOPPED)) {
+		    child_unblock();
 		    child_block();
 		}
 		if (list_pipe_child &&
