@@ -1,16 +1,16 @@
 #autoload
 
-local opts opt type=file group
+local opts opt type=file glob group
 
 opts=()
 group=()
 while getopts "P:S:qr:R:W:F:J:V:X:f/g:M:12n" opt; do
   case "$opt" in
-  /)      [[ "$type" = file       ]] && type=dir       ;;
-  g)      [[ "$type" = (file|dir) ]] && type="$OPTARG" ;;
-  [qn12]) opts=("$opts[@]" "-$opt"          )          ;;
-  [JV])   group=(          "-$opt" "$OPTARG")          ;;
-  [^f])   opts=("$opts[@]" "-$opt" "$OPTARG")          ;;
+  /)      type="${type}dir"                   ;;
+  g)      type="${type}glob"; glob="$OPTARG"  ;;
+  [qn12]) opts=("$opts[@]" "-$opt"          ) ;;
+  [JV])   group=(          "-$opt" "$OPTARG") ;;
+  [^f])   opts=("$opts[@]" "-$opt" "$OPTARG") ;;
   esac
 done
 
@@ -20,9 +20,10 @@ if [[ "$group[2]" = files ]]; then
 fi
 
 case "$type" in
-file) _tags all-files                           ;;
-dir)  _tags directories all-files               ;;
-*)    _tags globbed-files directories all-files ;;
+*dir*glob*|*glob*dir) _tags globbed-files all-files             ;;
+*glob*)               _tags globbed-files directories all-files ;;
+*dir*)                _tags directories all-files               ;;
+*)                    _tags all-files                           ;;
 esac
 
 while _tags; do
@@ -39,7 +40,7 @@ while _tags; do
         group[2]=globbed-files
 	_setup globbed-files
       fi
-      _path_files "$opts[@]" -/g "$type" && return 0
+      _path_files "$opts[@]" -/g "$glob" && return 0
     else
       if (( $#group )); then
         group[2]=directories
@@ -52,7 +53,11 @@ while _tags; do
       group[2]=globbed-files
       _setup globbed-files
     fi
-    _path_files "$opts[@]" -g "$type" && return 0
+    if [[ "$type" = (*dir*glob*|*glob*dir*) ]]; then
+      _path_files "$opts[@]" -/g "$glob" && return 0
+    else
+      _path_files "$opts[@]" -g "$glob" && return 0
+    fi
   fi
 done
 

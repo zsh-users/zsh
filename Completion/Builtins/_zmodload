@@ -9,5 +9,5 @@ elif [[ "$fl" = -*u* ]]; then
   _wanted modules expl module && compadd "$expl[@]" - "${(@k)modules}"
 else
   _wanted files expl 'module file' &&
-      compadd "$expl[@]" - ${^module_path}/*.s[ol](N:t:r)
+      _files "$expl[@]" -W module_path -/g '*.s[ol](:r)'
 fi
