@@ -1,3 +1,8 @@
+2000-07-05  Bart Schaefer  <schaefer@zsh.org>
+
+	* 12167: Test/Makefile.in: Ignore failure exit from "for" loop
+	so that cleanup code following it will be executed.
+
 2000-07-04  Oliver Kiddle  <opk@zsh.org>
 
 	* 12165: Completion/User/_arp: new completion for arp
