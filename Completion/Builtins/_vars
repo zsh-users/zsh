@@ -1,4 +1,4 @@
-#compdef getopts read unset vared
+#compdef getopts unset vared
 
 # This will handle completion of keys of associative arrays, e.g. at
 # `vared foo[<TAB>'.  However, in this version the [ must be added
@@ -20,5 +20,5 @@ if [[ $PREFIX = *\[* ]]; then
         compadd $addclose -k "$var"
   fi
 else
-  _parameters
+  _parameters "$@"
 fi
