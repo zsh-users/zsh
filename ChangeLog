@@ -1,5 +1,8 @@
 2002-03-10  Clint Adams  <clint@zsh.org>
 
+	* 16789: Completion/Unix/Command/_netcat: completion for netcat,
+	courtesy of Matt Zimmerman.
+
 	* unposted: Etc/BUGS: mention that you can't time builtins.
 
 2002-03-07  Bart Schaefer  <schaefer@zsh.org>

@@ -1,0 +1,34 @@
+#compdef nc netcat
+
+local curcontext="$curcontext" state line expl
+typeset -A opt_args
+
+if (( ! $+_nc_args )); then
+  local help="$(_call_program options nc -h < /dev/null 2>&1)"
+  local -A optionmap
+  optionmap=(
+    '*-e prog*' '-e+[program to exec after connect]:prog:_command_names -e'
+     '*-g gateway*' '-g+[source-routing hop point]:gateway:_hosts'
+     '*-G num*' '-G[source-routing pointer: 4, 8, 12]'
+     '*-i secs*' '-i+[delay interval for lines sent or ports scanned]:secs:'
+     '*-l*' '-l[listen mode]'
+     '*-n*' '-n[numeric-only IP addresses, no DNS]'
+     '*-o file*' '-o+[hex dump of traffic]:file:_files'
+     '*-p port*' '-p+[local port number]:port:_ports'
+     '*-r*' '-r[randomize local and remote ports]'
+     '*-q secs*' '-q+[quit after EOF on stdin and delay of secs]:secs:'
+     '*-t*' '-t[answer TELNET negotiation]'
+     '*-u*' '-u[UDP mode]'
+     '*-v*' '-v[verbose]'
+     '*-w secs*' '-w+[timeout for connects and final net reads]:secs:'
+     '*-z*' '-z[zero-I/O mode]'
+     '*-x*' '-x'
+     '*-b*' '-b[allow broadcasts]'
+  )
+  _nc_args=($optionmap[(K)"$help"])
+fi
+
+_arguments -C -s \
+  "$_nc_args[@]" \
+  ':host:_hosts' \
+  ':port:_ports' && return 0
