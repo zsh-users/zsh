@@ -2,6 +2,21 @@
 
         * 18303: zshconfig.ac: fix some always-true test evaluations.
 
+2003-02-26  Oliver Kiddle  <opk@zsh.org>
+
+	* 18300: Completion/Unix/Command/_tar,
+	Completion/Unix/Type/_tar_archive: handle tar's -C option better
+
+2003-02-20  Oliver Kiddle  <opk@zsh.org>
+
+	* 18263: Src/glob.c: fix saving of glob state so that globs can
+	be used from the (e) glob qualifier
+
+2003-02-19  Oliver Kiddle  <opk@zsh.org>
+
+	* 18262: Completion/Base/Utility/_multi_parts: fix bug where only
+	the first match was added with expand style set to suffix
+
 2003-02-18  Oliver Kiddle  <opk@zsh.org>
 
 	* Doug Kearns: 18259: Completion/Unix/Command/_webbrowser,
@@ -404,7 +419,7 @@
         * Matt Zimmerman: 17211: Completion/Unix/Command/_cvs:
         respect $CVSIGNORE.
 
-2002-05-12 Andrej Borsenkow  <bor@zsh.org>
+2002-05-12  Andrej Borsenkow  <bor@zsh.org>
 
 	* unposted: Completion/Redhat/Command/_service: fix context
 	name for tag-order style. For now comment it out because it
@@ -1515,7 +1530,7 @@
 
 	* 14959: Src/signals.c: more renames for 14951.
 
-2001-06-18  Andrej Borsenkow <bor@zsh.org>
+2001-06-18  Andrej Borsenkow  <bor@zsh.org>
 
 	* unposted: zshconfig.ac:  forgot to change
 	zsh_cv_sys_dynamic_broken -> zsh_cv_shared_environ in one place

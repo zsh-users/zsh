@@ -181,9 +181,9 @@ static struct globdata curglobdata;
     (N).gd_pathpos = pathpos; \
     (N).gd_pathbuf = pathbuf; \
     (N).gd_pathbufsz = 0; \
-    (N).gd_pathbuf = NULL; \
     (N).gd_glob_pre = glob_pre; \
     (N).gd_glob_suf = glob_suf; \
+    pathbuf = NULL; \
   } while (0)
 
 #define restore_globstate(N) \
@@ -234,7 +234,7 @@ addpath(char *s)
 }
 
 /* stat the filename s appended to pathbuf.  l should be true for lstat,    *
- * false for stat.  If st is NULL, the file is only chechked for existance. *
+ * false for stat.  If st is NULL, the file is only checked for existance.  *
  * s == "" is treated as s == ".".  This is necessary since on most systems *
  * foo/ can be used to reference a non-directory foo.  Returns nonzero if   *
  * the file does not exists.                                                */
@@ -1421,6 +1421,7 @@ zglob(LinkList list, LinkNode np, int nountok)
 	} else if (isset(NOMATCH)) {
 	    zerr("no matches found: %s", ostr, 0);
 	    free(matchbuf);
+            restore_globstate(saved);
 	    return;
 	} else {
 	    /* treat as an ordinary string */
