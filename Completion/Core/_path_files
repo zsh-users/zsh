@@ -622,7 +622,7 @@ for prepath in "$prepaths[@]"; do
         compquote tmp4 tmp1
       fi
       if [[ -z "$_comp_correct" && -n "$compstate[pattern_match]" &&
-            "$PREFIX$SUFFIX" = (|*[^\\])[][*?#~^\|\<\>]* ]]; then
+            "${PREFIX#\~}$SUFFIX" = (|*[^\\])[][*?#~^\|\<\>]* ]]; then
         compadd -Qf -W "$prepath$realpath" "$pfxsfx[@]" "$mopts[@]" \
                 -M "r:|/=* r:|=*" - "$linepath$tmp4${(@)^tmp1}"
       else

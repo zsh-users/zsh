@@ -1,3 +1,8 @@
+2001-02-13  Sven Wischnowsky  <wischnow@zsh.org>
+
+	* 13459: Completion/Core/_path_files: wehn using glob_complete,
+ 	don't treat everything starting with a tilde as a pattern
+	
 2001-02-12  Bart Schaefer  <schaefer@zsh.org>
 
 	* 13457: Completion/Core/compinit: Add `glob' to $_comp_options.
