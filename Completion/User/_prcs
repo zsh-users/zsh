@@ -133,7 +133,7 @@ else
       '(--new)-N[compare new files against empty files]' \
       "(-P)--exclude-project-file[don't diff the project file]" \
       "(--exclude-project-file)-P[don't diff the project file]" \
-      '--[introduce diff options]:*:diff options: _diff_options' \
+      '--[introduce diff options]:*::diff options: _diff_options' \
       ':project name:_prcs_projects' \
       '*:file or directory:_files'
     ;;
