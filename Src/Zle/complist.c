@@ -1594,6 +1594,20 @@ domenuselect(Hookdef dummy, Chdata dat)
     mlines = 999999;
     mlbeg = 0;
     for (;;) {
+	if (mline < 0) {
+	    int x, y;
+	    Cmatch **p = mtab;
+
+	    for (y = 0; y < mlines; y++) {
+		for (x = mcols; x; x--, p++)
+		    if (*p && **p && mselect == (**p)->gnum)
+			break;
+		if (x)
+		    break;
+	    }
+	    if (y < mlines)
+		mline = y;
+	}
 	space = lines - nlnct - mhasstat;
 	while (mline < mlbeg)
 	    if ((mlbeg -= step) < 0)
@@ -1999,12 +2013,14 @@ domenuselect(Hookdef dummy, Chdata dat)
 	    do_menucmp(0);
 	    mselect = (*(minfo.cur))->gnum;
 	    setwish = 1;
+	    mline = -1;
 	    continue;
 	} else if (cmd == Th(z_reversemenucomplete) ||
 		   !strcmp(cmd->nam, "reverse-menu-complete")) {
 	    reversemenucomplete(zlenoargs);
 	    mselect = (*(minfo.cur))->gnum;
 	    setwish = 1;
+	    mline = -1;
 	    continue;
 	} else {
 	    ungetkeycmd();

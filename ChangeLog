@@ -1,5 +1,9 @@
 2000-04-25  Sven Wischnowsky  <wischnow@informatik.hu-berlin.de>
 
+	* 10916: Completion/Core/_main_complete, Src/Zle/complist.c:
+ 	re-calculate number of line with mark when needed; make default
+ 	prompts more consistent
+	
 	* 10915: Src/Zle/computil.c: forgotten fix for _arguments using
  	multiple actions
 	
