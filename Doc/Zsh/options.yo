@@ -603,6 +603,19 @@ completion widgets to return status 1 on an ambiguous completion, which
 causes the shell to beep if the option tt(BEEP) is also set; this may
 be modified if completion is called from a user-defined widget.
 )
+pindex(LIST_PACKED)
+cindex(completion, listing)
+item(tt(LIST_PACKED))(
+Try to make the completion list smaller (occupying less lines) by
+printing the matches in columns with different widths.
+)
+pindex(LIST_ROWS_FIRST)
+cindex(completion, listing order)
+item(tt(LIST_ROWS_FIRST))(
+Lay out the matches in completion lists sorted horizontally, that is,
+the second match is to the right of the first one, not under it as
+usual.
+)
 pindex(LIST_TYPES)
 cindex(marking file types)
 cindex(files, marking type of)

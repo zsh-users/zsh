@@ -142,6 +142,8 @@ static struct optname optns[] = {
 {NULL, "kshoptionprint",      OPT_EMULATE|OPT_KSH,	 KSHOPTIONPRINT},
 {NULL, "listambiguous",	      OPT_ALL,			 LISTAMBIGUOUS},
 {NULL, "listbeep",	      OPT_ALL,			 LISTBEEP},
+{NULL, "listpacked",	      0,			 LISTPACKED},
+{NULL, "listrowsfirst",	      0,			 LISTROWSFIRST},
 {NULL, "listtypes",	      OPT_ALL,			 LISTTYPES},
 {NULL, "localoptions",	      OPT_EMULATE|OPT_KSH,	 LOCALOPTIONS},
 {NULL, "localtraps",	      OPT_EMULATE|OPT_KSH,	 LOCALTRAPS},

@@ -195,6 +195,14 @@ struct cmgroup {
     LinkList lfmatches;		/* list of matches without fignore */
     LinkList lallccs;		/* list of used compctls */
     int num;			/* number of this group */
+    /* The following is collected/used during listing. */
+    int dcount;			/* number of matches to list in columns */
+    int cols;			/* number of columns */
+    int lins;			/* number of lines */
+    int width;			/* column width */
+    int *widths;		/* column widths for listpacked */
+    int totl;			/* total length */
+    int shortest;		/* length of shortest match */
 };
 
 
@@ -320,6 +328,22 @@ struct cadata {
     char *dpar;			/* array to delete non-matches in (-D) */
     char *disp;			/* array with display lists (-d) */
 };
+
+/* List data. */
+
+typedef struct cldata *Cldata;
+
+struct cldata {
+    int columns;		/* screen width */
+    int lines;			/* screen height */
+    int valid;			/* no need to calculate anew */
+    int nlist;			/* number of matches to list */
+    int nlines;			/* number of lines needed */
+    int hidden;			/* != 0 if there are hidden matches */
+};
+
+typedef void (*CLPrintFunc)(Cmgroup, Cmatch *, int, int, int, int,
+			    char *, struct stat *);
 
 /* Data given to hooks. */
 
