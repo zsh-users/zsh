@@ -2964,7 +2964,7 @@ bslashquote(const char *s, char **e, int instring)
 {
     const char *u, *tt;
     char *v;
-    char *buf = ncalloc(2 * strlen(s) + 1);
+    char *buf = ncalloc(3 * strlen(s) + 1);
     int sf = 0;
 
     tt = v = buf;
