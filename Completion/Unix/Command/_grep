@@ -30,7 +30,7 @@ arguments=( $arguments[@]
   '(--after-context -A)'{--after-context=,-A+}'[specify lines of trailing context]:lines'
   '(--text -a --binary-files -I)'{--text,-a}'[process binary file as if it were text]'
   '(--before-context -B)'{--before-context=,-B+}'[specify lines of leading context]:lines'
-  '(--context,-C)'{--context=,-C+}'[specify lines of context]:lines'
+  '(--context,-C)'{--context=,-C-}'[specify lines of context]:lines'
   '(--color --colour)--'{color,colour}'=-[distinguish matching string]::when:(always never auto)'
   '(--byte-offset -b -c)'{--byte-offset,-b}'[print the byte offset with output lines]'
   '(--text -a -I)--binary-files=[specify type to assume for binary files]:file type:(binary without-match text)'
