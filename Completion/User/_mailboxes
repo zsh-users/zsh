@@ -12,7 +12,7 @@ local maildirectory="${maildirectory:-~/Mail}"
 
 if (( ! $+_mailbox_cache )) then
 
-test ${~muttrc} && [[ -f ${~muttrc} ]] && muttboxes=( ${$(grep mailboxes ${~muttrc})[2,-1]} )
+[[ -f ${~muttrc:-.} ]] && muttboxes=( ${$(grep mailboxes ${~muttrc})[2,-1]} )
 
 mboxes=( ${~maildirectory}/*(^/) ${~pinedirectory}/**/*(.) )
 dirboxes=( ${~maildirectory}/*(/) )
@@ -33,7 +33,7 @@ do
     fi
 done
 
-[[ -n "$muttboxes" ]] || [[ -d ~/.elm ]] &&
+[[ -n "$muttboxes" || -d ~/.elm || -d ~/.mutt ]] &&
     _mailbox_cache=(\! \< \> $muttboxes)
 [[ -n "$mailpath" ]] &&
     _mailbox_cache=($_mailbox_cache ${mailpath//\?*/})
