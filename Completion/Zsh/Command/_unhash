@@ -1,0 +1,13 @@
+#compdef unhash
+
+local expl state line curcontext="$curcontext"
+
+_arguments -C -s -S \
+  '(-a -f *)-d[remove named directories]:*:named directory:->nameddir' \
+  '(-d -f *)-a[remove aliases]:*:aliases:_aliases' \
+  '(-d -a *)-f[remove functions]:*:functions:_functions' \
+  '-m[treat arguments as patterns]' \
+  '(-a -d -f -m)*:commands: _command_names -e' && return 0
+
+[[ "$state" = nameddir ]] &&
+  _wanted named-directories expl 'named directory' compadd -k nameddirs
