@@ -30,23 +30,12 @@
 #include "zsh.mdh"
 #include "utils.pro"
 
-/* Print an error */
-
-/**/
-void
-zwarnnam(const char *cmd, const char *fmt, const char *str, int num)
-{
-    int waserr;
-
-    waserr = errflag;
-    zerrnam(cmd, fmt, str, num);
-    errflag = waserr;
-}
-
 /* name of script being sourced */
 
 /**/
 char *scriptname;
+
+/* Print an error */
  
 /**/
 void
@@ -57,35 +46,60 @@ zerr(const char *fmt, const char *str, int num)
 	    errflag = 1;
 	return;
     }
+    zwarn(fmt, str, num);
     errflag = 1;
-    trashzle();
-    /*
-     * scriptname is set when sourcing scripts, so that we get the
-     * correct name instead of the generic name of whatever
-     * program/script is running.
-     */
-    nicezputs(isset(SHINSTDIN) ? "zsh" :
-	      scriptname ? scriptname : argzero, stderr);
-    fputs(": ", stderr);
-    zerrnam(NULL, fmt, str, num);
 }
 
 /**/
 void
 zerrnam(const char *cmd, const char *fmt, const char *str, int num)
 {
-    if (cmd) {
-	if (errflag || noerrs)
-	    return;
-	errflag = 1;
-	trashzle();
-	if(unset(SHINSTDIN)) {
-	    nicezputs(scriptname ? scriptname : argzero, stderr);
-	    fputs(": ", stderr);
-	}
-	nicezputs(cmd, stderr);
+    if (errflag || noerrs)
+	return;
+
+    zwarnnam(cmd, fmt, str, num);
+    errflag = 1;
+}
+
+/**/
+void
+zwarn(const char *fmt, const char *str, int num)
+{
+    if (errflag || noerrs)
+	return;
+    trashzle();
+    /*
+     * scriptname is set when sourcing scripts, so that we get the
+     * correct name instead of the generic name of whatever
+     * program/script is running.  It's also set in shell functions,
+     * so test locallevel, too.
+     */
+    nicezputs((isset(SHINSTDIN) && !locallevel) ? "zsh" :
+	      scriptname ? scriptname : argzero, stderr);
+    fputs(": ", stderr);
+    zerrmsg(fmt, str, num);
+}
+
+/**/
+void
+zwarnnam(const char *cmd, const char *fmt, const char *str, int num)
+{
+    if (errflag || noerrs)
+	return;
+    trashzle();
+    if (unset(SHINSTDIN) || locallevel) {
+	nicezputs(scriptname ? scriptname : argzero, stderr);
 	fputs(": ", stderr);
     }
+    nicezputs(cmd, stderr);
+    fputs(": ", stderr);
+    zerrmsg(fmt, str, num);
+}
+
+/**/
+void
+zerrmsg(const char *fmt, const char *str, int num)
+{
     while (*fmt)
 	if (*fmt == '%') {
 	    fmt++;
@@ -133,8 +147,8 @@ zerrnam(const char *cmd, const char *fmt, const char *str, int num)
 	    putc(*fmt == Meta ? *++fmt ^ 32 : *fmt, stderr);
 	    fmt++;
 	}
-    if (unset(SHINSTDIN) && lineno)
-	fprintf(stderr, " [%ld]\n", lineno);
+    if ((unset(SHINSTDIN) || locallevel) && lineno)
+	fprintf(stderr, " [%ld]\n", (long)lineno);
     else
 	putc('\n', stderr);
     fflush(stderr);
@@ -209,10 +223,9 @@ nicechar(int c)
     return buf;
 }
 
-#if 0
 /* Output a string's visible representation. */
 
-/**/
+#if 0 /**/
 void
 nicefputs(char *s, FILE *f)
 {
@@ -302,7 +315,7 @@ slashsplit(char *s)
 
 /**/
 static int
-xsymlinks(char *s, int flag)
+xsymlinks(char *s)
 {
     char **pp, **opp;
     char xbuf2[PATH_MAX*2], xbuf3[PATH_MAX*2];
@@ -325,15 +338,9 @@ xsymlinks(char *s, int flag)
 	    *p = '\0';
 	    continue;
 	}
-	if (unset(CHASELINKS)) {
-	    strcat(xbuf, "/");
-	    strcat(xbuf, *pp);
-	    zsfree(*pp);
-	    continue;
-	}
 	sprintf(xbuf2, "%s/%s", xbuf, *pp);
 	t0 = readlink(unmeta(xbuf2), xbuf3, PATH_MAX);
-	if (t0 == -1 || !flag) {
+	if (t0 == -1) {
 	    strcat(xbuf, "/");
 	    strcat(xbuf, *pp);
 	    zsfree(*pp);
@@ -342,9 +349,9 @@ xsymlinks(char *s, int flag)
 	    metafy(xbuf3, t0, META_NOALLOC);
 	    if (*xbuf3 == '/') {
 		strcpy(xbuf, "");
-		xsymlinks(xbuf3 + 1, flag);
+		xsymlinks(xbuf3 + 1);
 	    } else
-		xsymlinks(xbuf3, flag);
+		xsymlinks(xbuf3);
 	    zsfree(*pp);
 	}
     }
@@ -352,19 +359,19 @@ xsymlinks(char *s, int flag)
     return ret;
 }
 
-/* expand symlinks in s, and remove other weird things */
+/*
+ * expand symlinks in s, and remove other weird things:
+ * note that this always expands symlinks.
+ */
 
 /**/
 char *
 xsymlink(char *s)
 {
-    if (unset(CHASELINKS))
-	return ztrdup(s);
     if (*s != '/')
 	return NULL;
     *xbuf = '\0';
-    if (!xsymlinks(s + 1, 1))
-	return ztrdup(s);
+    xsymlinks(s + 1);
     if (!*xbuf)
 	return ztrdup("/");
     return ztrdup(xbuf);
@@ -374,15 +381,10 @@ xsymlink(char *s)
 void
 print_if_link(char *s)
 {
-    int chase;
-
     if (*s == '/') {
-	chase = opts[CHASELINKS];
-	opts[CHASELINKS] = 1;
 	*xbuf = '\0';
-	if (xsymlinks(s + 1, 1))
+	if (xsymlinks(s + 1))
 	    printf(" -> "), zputs(*xbuf ? xbuf : "/", stdout);
-	opts[CHASELINKS] = chase;
     }
 }
 
@@ -573,7 +575,8 @@ getnameddir(char *name)
 	/* Retrieve an entry from the password table/database for this user. */
 	struct passwd *pw;
 	if ((pw = getpwnam(name))) {
-	    char *dir = xsymlink(pw->pw_dir);
+	    char *dir = isset(CHASELINKS) ? xsymlink(pw->pw_dir)
+		: ztrdup(pw->pw_dir);
 	    adduserdir(name, dir, ND_USERNAME, 1);
 	    str = dupstring(dir);
 	    zsfree(dir);
@@ -775,6 +778,23 @@ checkmailpath(char **s)
     }
 }
 
+/* This prints the XTRACE prompt. */
+
+/**/
+void
+printprompt4(void)
+{
+    if (prompt4) {
+	int l;
+	char *s = dupstring(prompt4);
+
+	unmetafy(s, &l);
+	s = unmetafy(promptexpand(metafy(s, l, META_NOALLOC), 0, NULL, NULL), &l);
+
+	fprintf(stderr, "%s", s);
+    }
+}
+
 /**/
 void
 freestr(void *a)
@@ -853,27 +873,134 @@ int resetneeded;
 /**/
 int winchanged;
 #endif
- 
-/* check the size of the window and adjust if necessary */
+
+static int
+adjustlines(int signalled)
+{
+    int oldlines = lines;
+
+#ifdef TIOCGWINSZ
+    if (signalled || lines <= 0)
+	lines = shttyinfo.winsize.ws_row;
+    else
+	shttyinfo.winsize.ws_row = lines;
+#endif /* TIOCGWINSZ */
+    if (lines <= 0) {
+	DPUTS(signalled, "BUG: Impossible TIOCGWINSZ rows");
+	lines = tclines > 0 ? tclines : 24;
+    }
+
+    if (lines > 2)
+	termflags &= ~TERM_SHORT;
+    else
+	termflags |= TERM_SHORT;
+
+    return (lines != oldlines);
+}
+
+static int
+adjustcolumns(int signalled)
+{
+    int oldcolumns = columns;
+
+#ifdef TIOCGWINSZ
+    if (signalled || columns <= 0)
+	columns = shttyinfo.winsize.ws_col;
+    else
+	shttyinfo.winsize.ws_col = columns;
+#endif /* TIOCGWINSZ */
+    if (columns <= 0) {
+	DPUTS(signalled, "BUG: Impossible TIOCGWINSZ cols");
+	columns = tccolumns > 0 ? tccolumns : 80;
+    }
+
+    if (columns > 2)
+	termflags &= ~TERM_NARROW;
+    else
+	termflags |= TERM_NARROW;
+
+    return (columns != oldcolumns);
+}
+
+/* check the size of the window and adjust if necessary. *
+ * The value of from:					 *
+ *   0: called from update_job or setupvals		 *
+ *   1: called from the SIGWINCH handler		 *
+ *   2: called from the LINES parameter callback	 *
+ *   3: called from the COLUMNS parameter callback	 */
 
 /**/
 void
-adjustwinsize(void)
+adjustwinsize(int from)
 {
+    static int getwinsz = 1;
+    int ttyrows = shttyinfo.winsize.ws_row;
+    int ttycols = shttyinfo.winsize.ws_col;
+    int resetzle = 0;
+
+    if (getwinsz || from == 1) {
 #ifdef TIOCGWINSZ
-    int oldcols = columns, oldrows = lines;
+	if (SHTTY == -1)
+	    return;
+	if (ioctl(SHTTY, TIOCGWINSZ, (char *)&shttyinfo.winsize) == 0) {
+	    resetzle = (ttyrows != shttyinfo.winsize.ws_row ||
+			ttycols != shttyinfo.winsize.ws_col);
+	    if (from == 0 && resetzle && ttyrows && ttycols)
+		from = 1; /* Signal missed while a job owned the tty? */
+	    ttyrows = shttyinfo.winsize.ws_row;
+	    ttycols = shttyinfo.winsize.ws_col;
+	} else {
+	    /* Set to unknown on failure */
+	    shttyinfo.winsize.ws_row = 0;
+	    shttyinfo.winsize.ws_col = 0;
+	    resetzle = 1;
+	}
+#else
+	resetzle = from == 1;
+#endif /* TIOCGWINSZ */
+    } /* else
+	 return; */
 
-    if (SHTTY == -1)
-	return;
+    switch (from) {
+    case 0:
+    case 1:
+	getwinsz = 0;
+	/* Calling setiparam() here calls this function recursively, but  *
+	 * because we've already called adjustlines() and adjustcolumns() *
+	 * here, recursive calls are no-ops unless a signal intervenes.   *
+	 * The commented "else return;" above might be a safe shortcut,   *
+	 * but I'm concerned about what happens on race conditions; e.g., *
+	 * suppose the user resizes his xterm during `eval $(resize)'?    */
+	if (adjustlines(from) && zgetenv("LINES"))
+	    setiparam("LINES", lines);
+	if (adjustcolumns(from) && zgetenv("COLUMNS"))
+	    setiparam("COLUMNS", columns);
+	getwinsz = 1;
+	break;
+    case 2:
+	resetzle = adjustlines(0);
+	break;
+    case 3:
+	resetzle = adjustcolumns(0);
+	break;
+    }
 
-    ioctl(SHTTY, TIOCGWINSZ, (char *)&shttyinfo.winsize);
-    setiparam("COLUMNS", shttyinfo.winsize.ws_col);
-    setiparam("LINES", shttyinfo.winsize.ws_row);
-    if (zleactive && (oldcols != columns || oldrows != lines)) {
-	resetneeded = winchanged = 1;
+#ifdef TIOCGWINSZ
+    if (interact && from >= 2 &&
+	(shttyinfo.winsize.ws_row != ttyrows ||
+	 shttyinfo.winsize.ws_col != ttycols)) {
+	/* shttyinfo.winsize is already set up correctly */
+	ioctl(SHTTY, TIOCSWINSZ, (char *)&shttyinfo.winsize);
+    }
+#endif /* TIOCGWINSZ */
+
+    if (zleactive && resetzle) {
+#ifdef TIOCGWINSZ
+	winchanged =
+#endif /* TIOCGWINSZ */
+	    resetneeded = 1;
 	zrefresh();
     }
-#endif   /* TIOCGWINSZ */
 }
 
 /* Move a fd to a place >= 10 and mark the new fd in fdtable.  If the fd *
@@ -1060,15 +1187,15 @@ skipparens(char inpar, char outpar, char **s)
    return level;
 }
 
-/* Convert string to long.  This function (without the z) *
- * is contained in the ANSI standard C library, but a lot *
- * of them seem to be broken.                             */
+/* Convert string to zlong (see zsh.h).  This function (without the z) *
+ * is contained in the ANSI standard C library, but a lot of them seem *
+ * to be broken.                                                       */
 
 /**/
-long
+zlong
 zstrtol(const char *s, char **t, int base)
 {
-    long ret = 0;
+    zlong ret = 0;
     int neg;
 
     while (inblank(*s))
@@ -1122,7 +1249,7 @@ setblock_stdin(void)
     long mode;
 
     if (!fstat(0, &st) && !S_ISREG(st.st_mode)) {
-	mode = fcntl(0, F_GETFL);
+	mode = fcntl(0, F_GETFL, 0);
 	if (mode != -1 && (mode & NONBLOCK) &&
 	    !fcntl(0, F_SETFL, mode & ~NONBLOCK))
 	    return 1;
@@ -1611,10 +1738,11 @@ findsep(char **s, char *sep)
 	if (!*t)
 	    return i;
 	if (*(*s)++ == Meta) {
-	    (*s)++;
 #ifdef DEBUG
-	    if (! **s)
+	    if (! *(*s)++)
 		fprintf(stderr, "BUG: unexpected end of string in findsep()\n");
+#else
+	    (*s)++;
 #endif
 	}
     }
@@ -1697,13 +1825,12 @@ char *
 sepjoin(char **s, char *sep)
 {
     char *r, *p, **t;
-    int l, sl, elide = 0;
+    int l, sl;
     char sepbuf[3];
 
     if (!*s)
 	return "";
     if (!sep) {
-	elide = 1;
 	sep = sepbuf;
 	sepbuf[0] = *ifs;
 	sepbuf[1] = *ifs == Meta ? ifs[1] ^ 32 : '\0';
@@ -1817,329 +1944,21 @@ allocnode(int type)
 {
     struct node *n;
 
-    n = (struct node *) alloc(sizetab[type]);
+    n = (struct node *) ncalloc(sizetab[type]);
     memset((void *) n, 0, sizetab[type]);
     n->ntype = flagtab[type];
-    if (useheap)
-	n->ntype |= NT_HEAP;
 
     return (void *) n;
 }
+ 
+/* duplicate a syntax tree */
 
 /**/
 void *
 dupstruct(void *a)
 {
-    struct node *n, *r;
-
-    n = (struct node *) a;
-    if (!a || ((List) a) == &dummy_list)
-	return (void *) a;
-
-    if ((n->ntype & NT_HEAP) && !useheap) {
-	HEAPALLOC {
-	    n = (struct node *) dupstruct2((void *) n);
-	} LASTALLOC;
-	n = simplifystruct(n);
-    }
-    r = (struct node *)dupstruct2((void *) n);
-
-    if (!(n->ntype & NT_HEAP) && useheap)
-	r = expandstruct(r, N_LIST);
-
-    return (void *) r;
-}
-
-/**/
-static struct node *
-simplifystruct(struct node *n)
-{
-    if (!n || ((List) n) == &dummy_list)
-	return n;
-
-    switch (NT_TYPE(n->ntype)) {
-    case N_LIST:
-	{
-	    List l = (List) n;
-
-	    l->left = (Sublist) simplifystruct((struct node *)l->left);
-	    if ((l->type & Z_SYNC) && !l->right)
-		return (struct node *)l->left;
-	}
-	break;
-    case N_SUBLIST:
-	{
-	    Sublist sl = (Sublist) n;
-
-	    sl->left = (Pline) simplifystruct((struct node *)sl->left);
-	    if (sl->type == END && !sl->flags && !sl->right)
-		return (struct node *)sl->left;
-	}
-	break;
-    case N_PLINE:
-	{
-	    Pline pl = (Pline) n;
-
-	    pl->left = (Cmd) simplifystruct((struct node *)pl->left);
-	    if (pl->type == END && !pl->right)
-		return (struct node *)pl->left;
-	}
-	break;
-    case N_CMD:
-	{
-	    Cmd c = (Cmd) n;
-	    int i = 0;
-
-	    if (empty(c->args))
-		c->args = NULL, i++;
-	    if (empty(c->redir))
-		c->redir = NULL, i++;
-	    if (empty(c->vars))
-		c->vars = NULL, i++;
-
-	    c->u.list = (List) simplifystruct((struct node *)c->u.list);
-	    if (i == 3 && !c->flags &&
-		(c->type == CWHILE || c->type == CIF ||
-		 c->type == COND))
-		return (struct node *)c->u.list;
-	}
-	break;
-    case N_FOR:
-	{
-	    Forcmd f = (Forcmd) n;
-
-	    f->list = (List) simplifystruct((struct node *)f->list);
-	}
-	break;
-    case N_CASE:
-	{
-	    struct casecmd *c = (struct casecmd *)n;
-	    List *l;
-
-	    for (l = c->lists; *l; l++)
-		*l = (List) simplifystruct((struct node *)*l);
-	}
-	break;
-    case N_IF:
-	{
-	    struct ifcmd *i = (struct ifcmd *)n;
-	    List *l;
-
-	    for (l = i->ifls; *l; l++)
-		*l = (List) simplifystruct((struct node *)*l);
-	    for (l = i->thenls; *l; l++)
-		*l = (List) simplifystruct((struct node *)*l);
-	}
-	break;
-    case N_WHILE:
-	{
-	    struct whilecmd *w = (struct whilecmd *)n;
-
-	    w->cont = (List) simplifystruct((struct node *)w->cont);
-	    w->loop = (List) simplifystruct((struct node *)w->loop);
-	}
-    }
-
-    return n;
-}
-
-/**/
-struct node *
-expandstruct(struct node *n, int exp)
-{
-    struct node *m;
-
-    if (!n || ((List) n) == &dummy_list)
-	return n;
-
-    if (exp != N_COUNT && exp != NT_TYPE(n->ntype)) {
-	switch (exp) {
-	case N_LIST:
-	    {
-		List l;
-
-		m = (struct node *) allocnode(N_LIST);
-		l = (List) m;
-		l->type = Z_SYNC;
-		l->left = (Sublist) expandstruct(n, N_SUBLIST);
-
-		return (struct node *)l;
-	    }
-	case N_SUBLIST:
-	    {
-		Sublist sl;
-
-		m = (struct node *) allocnode(N_SUBLIST);
-		sl = (Sublist) m;
-		sl->type = END;
-		sl->left = (Pline) expandstruct(n, N_PLINE);
-
-		return (struct node *)sl;
-	    }
-	case N_PLINE:
-	    {
-		Pline pl;
-
-		m = (struct node *) allocnode(N_PLINE);
-		pl = (Pline) m;
-		pl->type = END;
-		pl->left = (Cmd) expandstruct(n, N_CMD);
-
-		return (struct node *)pl;
-	    }
-	case N_CMD:
-	    {
-		Cmd c;
-
-		m = (struct node *) allocnode(N_CMD);
-		c = (Cmd) m;
-		switch (NT_TYPE(n->ntype)) {
-		case N_WHILE:
-		    c->type = CWHILE;
-		    break;
-		case N_IF:
-		    c->type = CIF;
-		    break;
-		case N_COND:
-		    c->type = COND;
-		}
-		c->u.list = (List) expandstruct(n, NT_TYPE(n->ntype));
-		c->args = newlinklist();
-		c->vars = newlinklist();
-		c->redir = newlinklist();
-
-		return (struct node *)c;
-	    }
-	}
-    } else
-	switch (NT_TYPE(n->ntype)) {
-	case N_LIST:
-	    {
-		List l = (List) n;
-
-		l->left = (Sublist) expandstruct((struct node *)l->left,
-						 N_SUBLIST);
-		l->right = (List) expandstruct((struct node *)l->right,
-					       N_LIST);
-	    }
-	    break;
-	case N_SUBLIST:
-	    {
-		Sublist sl = (Sublist) n;
-
-		sl->left = (Pline) expandstruct((struct node *)sl->left,
-						N_PLINE);
-		sl->right = (Sublist) expandstruct((struct node *)sl->right,
-						   N_SUBLIST);
-	    }
-	    break;
-	case N_PLINE:
-	    {
-		Pline pl = (Pline) n;
-
-		pl->left = (Cmd) expandstruct((struct node *)pl->left,
-					      N_CMD);
-		pl->right = (Pline) expandstruct((struct node *)pl->right,
-						 N_PLINE);
-	    }
-	    break;
-	case N_CMD:
-	    {
-		Cmd c = (Cmd) n;
-
-		if (!c->args)
-		    c->args = newlinklist();
-		if (!c->vars)
-		    c->vars = newlinklist();
-		if (!c->redir)
-		    c->redir = newlinklist();
-
-		switch (c->type) {
-		case CFOR:
-		case CSELECT:
-		    c->u.list = (List) expandstruct((struct node *)c->u.list,
-						    N_FOR);
-		    break;
-		case CWHILE:
-		    c->u.list = (List) expandstruct((struct node *)c->u.list,
-						    N_WHILE);
-		    break;
-		case CIF:
-		    c->u.list = (List) expandstruct((struct node *)c->u.list,
-						    N_IF);
-		    break;
-		case CCASE:
-		    c->u.list = (List) expandstruct((struct node *)c->u.list,
-						    N_CASE);
-		    break;
-		case COND:
-		    c->u.list = (List) expandstruct((struct node *)c->u.list,
-						    N_COND);
-		    break;
-		case ZCTIME:
-		    c->u.list = (List) expandstruct((struct node *)c->u.list,
-						    N_SUBLIST);
-		    break;
-		case AUTOFN:
-		    c->u.list = (List) expandstruct((struct node *)c->u.list,
-						    N_AUTOFN);
-		    break;
-		default:
-		    c->u.list = (List) expandstruct((struct node *)c->u.list,
-						    N_LIST);
-		}
-	    }
-	    break;
-	case N_FOR:
-	    {
-		Forcmd f = (Forcmd) n;
-
-		f->list = (List) expandstruct((struct node *)f->list,
-					      N_LIST);
-	    }
-	    break;
-	case N_CASE:
-	    {
-		struct casecmd *c = (struct casecmd *)n;
-		List *l;
-
-		for (l = c->lists; *l; l++)
-		    *l = (List) expandstruct((struct node *)*l, N_LIST);
-	    }
-	    break;
-	case N_IF:
-	    {
-		struct ifcmd *i = (struct ifcmd *)n;
-		List *l;
-
-		for (l = i->ifls; *l; l++)
-		    *l = (List) expandstruct((struct node *)*l, N_LIST);
-		for (l = i->thenls; *l; l++)
-		    *l = (List) expandstruct((struct node *)*l, N_LIST);
-	    }
-	    break;
-	case N_WHILE:
-	    {
-		struct whilecmd *w = (struct whilecmd *)n;
-
-		w->cont = (List) expandstruct((struct node *)w->cont,
-					      N_LIST);
-		w->loop = (List) expandstruct((struct node *)w->loop,
-					      N_LIST);
-	    }
-	}
-
-    return n;
-}
-
-/* duplicate a syntax tree */
-
-/**/
-static void *
-dupstruct2(void *a)
-{
     void **onodes, **nnodes, *ret, *n, *on;
-    int type, heap;
+    int type;
     size_t nodeoffs;
 
     if (!a || ((List) a) == &dummy_list)
@@ -2147,53 +1966,33 @@ dupstruct2(void *a)
     type = *(int *)a;
     ret = alloc(sizetab[NT_TYPE(type)]);
     memcpy(ret, a, nodeoffs = offstab[NT_TYPE(type)]);
-    *(int*)ret = (type & ~NT_HEAP) | (useheap ? NT_HEAP : 0);
     onodes = (void **) ((char *)a + nodeoffs);
     nnodes = (void **) ((char *)ret + nodeoffs);
-    heap = type & NT_HEAP;
     for (type = (type & 0xffff00) >> 4; (type >>= 4); *nnodes++ = n) {
 	if (!(on = *onodes++))
 	    n = NULL;
 	else {
 	    switch (type & 0xf) {
 	    case NT_NODE:
-		n = dupstruct2(on);
+		n = dupstruct(on);
 		break;
 	    case NT_STR:
 		n = dupstring(on);
 		break;
 	    case NT_LIST | NT_NODE:
-		if (heap) {
-		    if (useheap)
-			n =  duplist(on, (VFunc) dupstruct2);
-		    else
-			n = list2arr(on, (VFunc) dupstruct2);
-		}
-		else if (useheap)
-		    n = arr2list(on, (VFunc) dupstruct2);
-		else
-		    n = duparray(on, (VFunc) dupstruct2);
+		n = duplist(on, (VFunc) dupstruct);
 		break;
 	    case NT_LIST | NT_STR:
-		if (heap) {
-		    if (useheap)
-			n = duplist(on, (VFunc) dupstring);
-		    else
-			n = list2arr(on, (VFunc) ztrdup);
-		}
-		else if (useheap)
-		    n = arr2list(on, (VFunc) dupstring);
-		else
-		    n = duparray(on, (VFunc) ztrdup);
+		n = duplist(on, (VFunc) (useheap ? dupstring : ztrdup));
 		break;
 	    case NT_NODE | NT_ARR:
-		n = duparray(on, (VFunc) dupstruct2);
+		n = duparray(on, (VFunc) dupstruct);
 		break;
 	    case NT_STR | NT_ARR:
 		n = duparray(on, (VFunc) (useheap ? dupstring : ztrdup));
 		break;
 	    default:
-		DPUTS(1, "BUG: bad node type in dupstruct2()");
+		DPUTS(1, "BUG: bad node type in dupstruct()");
 		abort();
 	    }
 	}
@@ -2201,19 +2000,46 @@ dupstruct2(void *a)
     return ret;
 }
 
-/* free a syntax tree */
+/* Free a syntax tree. Now, freestruct() only registers everything that
+ * has to be freed. Later, freestructs() will be called to do the real
+ * work. This is to avoid having functions that are currently executed
+ * free themselves by re-defining themselves. */
+
+static LinkList freeslist = NULL;
 
 /**/
 void
 freestruct(void *a)
 {
-    void **nodes, *n;
-    int type, size;
-
     if (!a || ((List) a) == &dummy_list)
 	return;
 
-    type = * (int *) a;
+    PERMALLOC {
+	if (!freeslist)
+	    freeslist = newlinklist();
+	addlinknode(freeslist, a);
+    } LASTALLOC;
+}
+
+/**/
+void
+freestructs(void)
+{
+    void *a;
+
+    if (freeslist)
+	while ((a = getlinknode(freeslist)))
+	    ifreestruct(a);
+}
+
+/**/
+static void
+ifreestruct(void *a)
+{
+    void **nodes, *n;
+    int type, size;
+
+    type = *(int *) a;
     nodes = (void **) ((char *)a + offstab[NT_TYPE(type)]);
     size = sizetab[NT_TYPE(type)];
     for (type = (type & 0xffff00) >> 4; (type >>= 4);) {
@@ -2226,6 +2052,8 @@ freestruct(void *a)
 		zsfree((char *) n);
 		break;
 	    case NT_LIST | NT_NODE:
+		freelinklist((LinkList) n, (FreeFunc) freestruct);
+		break;
 	    case NT_NODE | NT_ARR:
 	    {
 		void **p = (void **) n;
@@ -2236,6 +2064,8 @@ freestruct(void *a)
 		break;
 	    }
 	    case NT_LIST | NT_STR:
+		freelinklist((LinkList) n, (FreeFunc) zsfree);
+		break;
 	    case NT_STR | NT_ARR:
 		freearray((char **) n);
 		break;
@@ -2251,58 +2081,46 @@ freestruct(void *a)
 }
 
 /**/
+LinkList
+dupheaplist(LinkList l)
+{
+    if (!l)
+	return NULL;
+
+    return duplist(l, (VFunc) dupstruct);
+}
+
+/**/
 static LinkList
 duplist(LinkList l, VFunc func)
 {
-    LinkList ret;
-    LinkNode node;
+    if (l && nonempty(l)) {
+	LinkList ret;
+	LinkNode node;
 
-    ret = newlinklist();
-    for (node = firstnode(l); node; incnode(node))
-	addlinknode(ret, func(getdata(node)));
-    return ret;
+	ret = newlinklist();
+	for (node = firstnode(l); node; incnode(node))
+	    addlinknode(ret, func(getdata(node)));
+	return ret;
+    }
+    return NULL;
 }
 
 /**/
 char **
 duparray(char **arr, VFunc func)
 {
-    char **ret, **rr;
+    if (arr && *arr) {
+	char **ret, **rr, *p;
 
-    ret = (char **) alloc((arrlen(arr) + 1) * sizeof(char *));
-    for (rr = ret; *arr;)
-	*rr++ = (char *)func(*arr++);
-    *rr = NULL;
+	ret = (char **) alloc((arrlen(arr) + 1) * sizeof(char *));
+	for (rr = ret; (p = *arr++);)
+	    *rr++ = (char *)func(p);
+	*rr = NULL;
 
-    return ret;
-}
-
-/**/
-static char **
-list2arr(LinkList l, VFunc func)
-{
-    char **arr, **r;
-    LinkNode n;
-
-    arr = r = (char **) alloc((countlinknodes(l) + 1) * sizeof(char *));
-
-    for (n = firstnode(l); n; incnode(n))
-	*r++ = (char *)func(getdata(n));
-    *r = NULL;
-
-    return arr;
-}
-
-/**/
-static LinkList
-arr2list(char **arr, VFunc func)
-{
-    LinkList l = newlinklist();
-
-    while (*arr)
-	addlinknode(l, func(*arr++));
-
-    return l;
+	return ret;
+    }
+    return NULL;
 }
 
 /**/
@@ -2320,7 +2138,12 @@ mkarray(char *s)
 void
 zbeep(void)
 {
-    if (isset(BEEP))
+    char *vb;
+    if ((vb = getsparam("ZBEEP"))) {
+	int len;
+	vb = getkeystring(vb, &len, 2, NULL);
+	write(SHTTY, vb, len);
+    } else if (isset(BEEP))
 	write(SHTTY, "\07", 1);
 }
 
@@ -2346,28 +2169,6 @@ equalsplit(char *s, char **t)
 	return 1;
     }
     return 0;
-}
-
-/* see if the right side of a list is trivial */
-
-/**/
-void
-simplifyright(List l)
-{
-    Cmd c;
-
-    if (l == &dummy_list || !l->right)
-	return;
-    if (l->right->right || l->right->left->right ||
-	l->right->left->flags || l->right->left->left->right ||
-	l->left->flags)
-	return;
-    c = l->left->left->left;
-    if (c->type != SIMPLE || nonempty(c->args) || nonempty(c->redir)
-	|| nonempty(c->vars))
-	return;
-    l->right = NULL;
-    return;
 }
 
 /* the ztypes table */
@@ -2432,6 +2233,25 @@ arrdup(char **s)
 
     while ((*x++ = dupstring(*s++)));
     return y;
+}
+
+/* Duplicate a list of strings. */
+
+/**/
+LinkList
+listdup(LinkList l)
+{
+    if (!l)
+	return NULL;
+    else {
+	LinkList r = newlinklist();
+	LinkNode n;
+
+	for (n = firstnode(l); n; incnode(n))
+	    addlinknode(r, dupstring((char *) getdata(n)));
+
+	return r;
+    }
 }
 
 /**/
@@ -3343,10 +3163,9 @@ dquotedztrdup(char const *s)
     return ret;
 }
 
-#if 0
 /* Unmetafy and output a string, double quoting it in its entirety. */
 
-/**/
+#if 0 /**/
 int
 dquotedzputs(char const *s, FILE *stream)
 {
@@ -3358,22 +3177,42 @@ dquotedzputs(char const *s, FILE *stream)
 }
 #endif
 
+/*
+ * Decode a key string, turning it into the literal characters.
+ * The length is returned in len.
+ * fromwhere determines how the processing works.
+ *   0:  Don't handle keystring, just print-like escapes.
+ *       Expects misc to be present.
+ *   1:  Handle Emacs-like \C-X arguments etc., but not ^X
+ *       Expects misc to be present.
+ *   2:  Handle ^X as well as emacs-like keys; don't handle \c
+ *       for no newlines.
+ *   3:  As 1, but don't handle \c.
+ *   4:  Do $'...' quoting.  Overwrites the existing string instead of
+ *       zhalloc'ing 
+ *   5:  As 2, but \- is special.  Expects misc to be defined.
+ *   6:  As 2, but parses only one character and returns end-pointer
+ *       and parsed character in *misc
+ */
+
 /**/
 char *
 getkeystring(char *s, int *len, int fromwhere, int *misc)
 {
-    char *buf;
+    char *buf, tmp[1];
     char *t, *u = NULL;
     char svchar = '\0';
     int meta = 0, control = 0;
 
-    if (fromwhere != 4)
-	buf = zhalloc(strlen(s) + 1);
+    if (fromwhere == 6)
+	t = buf = tmp;
+    else if (fromwhere != 4)
+	t = buf = zhalloc(strlen(s) + 1);
     else {
-	buf = s;
+	t = buf = s;
 	s += 2;
     }
-    for (t = buf; *s; s++) {
+    for (; *s; s++) {
 	if (*s == '\\' && s[1]) {
 	    switch (*++s) {
 	    case 'a':
@@ -3472,7 +3311,8 @@ getkeystring(char *s, int *len, int fromwhere, int *misc)
 	} else if (fromwhere == 4 && *s == Snull) {
 	    for (u = t; (*u++ = *s++););
 	    return t + 1;
-	} else if (*s == '^' && (fromwhere == 2 || fromwhere == 5)) {
+	} else if (*s == '^' &&
+		   (fromwhere == 2 || fromwhere == 5 || fromwhere == 6)) {
 	    control = 1;
 	    continue;
 	} else if (*s == Meta)
@@ -3498,6 +3338,10 @@ getkeystring(char *s, int *len, int fromwhere, int *misc)
 	    *t = t[-1] ^ 32;
 	    t[-1] = Meta;
 	    t++;
+	}
+	if (fromwhere == 6 && t != tmp) {
+	    *misc = (int) tmp[0];
+	    return s + 1;
 	}
     }
     DPUTS(fromwhere == 4, "BUG: unterminated $' substitution");
