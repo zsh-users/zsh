@@ -1,5 +1,8 @@
 2000-10-05  Sven Wischnowsky  <wischnow@zsh.org>
 
+	* 12897: Src/Zle/computil.c: comparguments: don't use
+ 	rest-argument-specification if it was inactivated
+	
 	* 12896: Doc/Zsh/arith.yo, Doc/Zsh/builtins.yo, Doc/Zsh/compctl.yo,
  	Doc/Zsh/compsys.yo, Doc/Zsh/compwid.yo, Doc/Zsh/expn.yo,
  	Doc/Zsh/func.yo, Doc/Zsh/mod_complist.yo: cleanup

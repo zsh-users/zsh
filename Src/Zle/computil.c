@@ -1685,7 +1685,8 @@ ca_set_data(LinkList descr, LinkList act, LinkList subc,
 
 	if (!opt) {
 	    if (arg->num >= 0 && !arg->next && miss)
-		arg = ca_laststate.d->rest;
+		arg = (ca_laststate.d->rest && ca_laststate.d->rest->active ?
+		       ca_laststate.d->rest : NULL);
 	    else {
 		onum = arg->num;
 		rest = (onum != arg->min && onum == ca_laststate.nth);
@@ -1693,7 +1694,8 @@ ca_set_data(LinkList descr, LinkList act, LinkList subc,
 		    if (arg->num != onum + 1)
 			miss = 1;
 		} else if (rest || (oopt > 0 && !opt)) {
-		    arg = ca_laststate.d->rest;
+		    arg = (ca_laststate.d->rest && ca_laststate.d->rest->active ?
+			   ca_laststate.d->rest : NULL);
 		    oopt = -1;
 		}
 	    }
@@ -1711,7 +1713,8 @@ ca_set_data(LinkList descr, LinkList act, LinkList subc,
     }
     if (!opt && oopt > 0) {
 	oopt = -1;
-	arg = ca_laststate.d->rest;
+	arg = (ca_laststate.d->rest && ca_laststate.d->rest->active ?
+	       ca_laststate.d->rest : NULL);
 
 	goto rec;
     }
