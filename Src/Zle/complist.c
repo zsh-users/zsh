@@ -74,11 +74,33 @@ static char *defcols[] = {
     "\033[", "m", NULL, "0", "0", "7"
 };
 
+/* This describes a terminal string for a file type. */
+
+typedef struct filecol *Filecol;
+
+struct filecol {
+    Patprog prog;		/* group pattern */
+    char *col;			/* color string */
+    Filecol next;		/* next one */
+};
+
+/* This describes a terminal string for a pattern. */
+
+typedef struct patcol *Patcol;
+
+struct patcol {
+    Patprog prog;
+    Patprog pat;		/* pattern for match */
+    char *col;
+    Patcol next;
+};
+
 /* This describes a terminal string for a filename extension. */
 
 typedef struct extcol *Extcol;
 
 struct extcol {
+    Patprog prog;		/* group pattern or NULL */
     char *ext;			/* the extension */
     char *col;			/* the terminal color string */
     Extcol next;		/* the next one in the list */
@@ -89,7 +111,8 @@ struct extcol {
 typedef struct listcols *Listcols;
 
 struct listcols {
-    char *cols[NUM_COLS];	/* strings for file types */
+    Filecol files[NUM_COLS];	/* strings for file types */
+    Patcol pats;		/* strings for patterns */
     Extcol exts;		/* strings for extensions */
 };
 
@@ -152,8 +175,33 @@ getcolval(char *s)
 static char *
 getcoldef(Listcols c, char *s)
 {
+    Patprog gprog = NULL;
+
+    if (*s == '(') {
+	char *p;
+	int l = 0;
+
+	for (p = s + 1, l = 0; *p && (*p != ')' || l); p++)
+	    if (*p == '\\' && p[1])
+		p++;
+	    else if (*p == '(')
+		l++;
+	    else if (*p == ')')
+		l--;
+
+	if (*p == ')') {
+	    char sav = p[1];
+
+	    p[1] = '\0';
+	    tokenize(s);
+	    gprog = patcompile(s, 0, NULL);
+	    p[1]  =sav;
+
+	    s = p + 1;
+	}
+    }
     if (*s == '*') {
-	Extcol ec;
+	Extcol ec, eo;
 	char *n, *p;
 
 	/* This is for an extension. */
@@ -166,13 +214,50 @@ getcoldef(Listcols c, char *s)
 	*s++ = '\0';
 	p = getcolval(s);
 	ec = (Extcol) zhalloc(sizeof(*ec));
+	ec->prog = gprog;
 	ec->ext = n;
 	ec->col = s;
-	ec->next = c->exts;
-	c->exts = ec;
+	ec->next = NULL;
+	if ((eo = c->exts)) {
+	    while (eo->next)
+		eo = eo->next;
+	    eo->next = ec;
+	} else
+	    c->exts = ec;
 	if (*p)
 	    *p++ = '\0';
 	return p;
+    } else if (*s == '=') {
+	char *p = ++s, *t;
+	Patprog prog;
+
+	/* This is for a pattern. */
+
+	while (*s && *s != '=')
+	    s++;
+	if (!*s)
+	    return s;
+	*s++ = '\0';
+	t = getcolval(s);
+	tokenize(p);
+	if ((prog = patcompile(p, 0, NULL))) {
+	    Patcol pc, po;
+
+	    pc = (Patcol) zhalloc(sizeof(*pc));
+	    pc->prog = gprog;
+	    pc->pat = prog;
+	    pc->col = s;
+	    pc->next = NULL;
+	    if ((po = c->pats)) {
+		while (po->next)
+		    po = po->next;
+		po->next = pc;
+	    } else
+		c->pats = pc;
+	}
+	if (*t)
+	    *t++ = '\0';
+	return t;
     } else {
 	char *n = s, *p, **nn;
 	int i;
@@ -185,15 +270,41 @@ getcoldef(Listcols c, char *s)
 	    return s;
 	*s++ = '\0';
 	for (i = 0, nn = colnames; *nn; i++, nn++)
-	    if (!strcmp(n ,*nn))
+	    if (!strcmp(n, *nn))
 		break;
 	p = getcolval(s);
-	if (*nn)
-	    c->cols[i] = s;
+	if (*nn) {
+	    Filecol fc, fo;
+
+	    fc = (Filecol) zhalloc(sizeof(*fc));
+	    fc->prog = (i == COL_EC || i == COL_LC || i == COL_RC ?
+			NULL : gprog);
+	    fc->col = s;
+	    fc->next = NULL;
+	    if ((fo = c->files[i])) {
+		while (fo->next)
+		    fo = fo->next;
+		fo->next = fc;
+	    } else
+		c->files[i] = fc;
+	}
 	if (*p)
 	    *p++ = '\0';
 	return p;
     }
+}
+
+static Filecol
+filecol(char *col)
+{
+    Filecol fc;
+
+    fc = (Filecol) zhalloc(sizeof(*fc));
+    fc->prog = NULL;
+    fc->col = col;
+    fc->next = NULL;
+
+    return fc;
 }
 
 /* Combined length of LC and RC, maximum length of capability strings. */
@@ -211,17 +322,18 @@ getcols(Listcols c)
     if (!(s = getsparam("ZLS_COLORS")) &&
 	!(s = getsparam("ZLS_COLOURS"))) {
 	for (i = 0; i < NUM_COLS; i++)
-	    c->cols[i] = "";
+	    c->files[i] = filecol("");
+	c->pats = NULL;
 	c->exts = NULL;
 	
-	if (!(c->cols[COL_MA] = tcstr[TCSTANDOUTBEG]) ||
-	    !c->cols[COL_MA][0])
-	    c->cols[COL_MA] = "";
-	else
-	    c->cols[COL_EC] = tcstr[TCSTANDOUTEND];
+	if ((s = tcstr[TCSTANDOUTBEG]) && s[0]) {
+	    c->files[COL_MA] = filecol(s);
+	    c->files[COL_EC] = filecol(tcstr[TCSTANDOUTEND]);
+	} else
+	    c->files[COL_MA] = filecol("");
 	lr_caplen = 0;
-	if ((max_caplen = strlen(c->cols[COL_MA])) <
-	    (l = strlen(c->cols[COL_EC])))
+	if ((max_caplen = strlen(c->files[COL_MA]->col)) <
+	    (l = strlen(c->files[COL_EC]->col)))
 	    max_caplen = l;
 	return;
     }
@@ -234,16 +346,17 @@ getcols(Listcols c)
     /* Use default values for those that aren't set explicitly. */
     max_caplen = lr_caplen = 0;
     for (i = 0; i < NUM_COLS; i++) {
-	if (!c->cols[i])
-	    c->cols[i] = defcols[i];
-	if (c->cols[i] && (l = strlen(c->cols[i])) > max_caplen)
+	if (!c->files[i] || !c->files[i]->col)
+	    c->files[i] = filecol(defcols[i]);
+	if (c->files[i] && c->files[i]->col &&
+	    (l = strlen(c->files[i]->col)) > max_caplen)
 	    max_caplen = l;
     }
-    lr_caplen = strlen(c->cols[COL_LC]) + strlen(c->cols[COL_RC]);
+    lr_caplen = strlen(c->files[COL_LC]->col) + strlen(c->files[COL_RC]->col);
 
     /* Default for missing files. */
-    if (!c->cols[COL_MI])
-	c->cols[COL_MI] = c->cols[COL_FI];
+    if (!c->files[COL_MI] || !c->files[COL_MI]->col)
+	c->files[COL_MI] = c->files[COL_FI];
 
     return;
 }
@@ -258,30 +371,36 @@ static struct listcols mcolors;
 
 /* The last color used. */
 
-static int last_col = COL_NO;
+static char *last_cap;
 
 static void
 zlrputs(Listcols c, char *cap)
 {
-    VARARR(char, buf, lr_caplen + max_caplen + 1);
+    if (strcmp(last_cap, cap)) {
+	VARARR(char, buf, lr_caplen + max_caplen + 1);
 
-    strcpy(buf, c->cols[COL_LC]);
-    strcat(buf, cap);
-    strcat(buf, c->cols[COL_RC]);
+	strcpy(buf, c->files[COL_LC]->col);
+	strcat(buf, cap);
+	strcat(buf, c->files[COL_RC]->col);
 
-    tputs(buf, 1, putshout);
+	tputs(buf, 1, putshout);
+
+	strcpy(last_cap, cap);
+    }
 }
 
 static void
-zcputs(Listcols c, int colour)
+zcputs(Listcols c, char *group, int colour)
 {
-    if (colour != last_col
-	&& (last_col < COL_NO
-	    || strcmp(c->cols[last_col], c->cols[colour]))) {
-	zlrputs(c, c->cols[colour]);
-	last_col = colour;
-    }
-    return;
+    Filecol fc;
+
+    for (fc = c->files[colour]; fc; fc = fc->next)
+	if (fc->col &&
+	    (!fc->prog || !group || pattry(fc->prog, group))) {
+	    zlrputs(c, fc->col);
+
+	    return;
+	}
 }
 
 /* Turn off colouring. */
@@ -289,28 +408,52 @@ zcputs(Listcols c, int colour)
 static void
 zcoff(void)
 {
-    if (mcolors.cols[COL_EC])
-	tputs(mcolors.cols[COL_EC], 1, putshout);
+    if (mcolors.files[COL_EC] && mcolors.files[COL_EC]->col)
+	tputs(mcolors.files[COL_EC]->col, 1, putshout);
     else
-	zcputs(&mcolors, COL_NO);
+	zcputs(&mcolors, NULL, COL_NO);
+}
+
+/* Get the terminal color string for the given match. */
+
+static void
+putmatchcol(Listcols c, char *group, char *n)
+{
+    Patcol pc;
+
+    for (pc = c->pats; pc; pc = pc->next)
+	if ((!pc->prog || !group || pattry(pc->prog, group)) &&
+	    pattry(pc->pat, n)) {
+	    zlrputs(c, pc->col);
+
+	    return;
+	}
+
+    zcputs(c, group, COL_NO);
 }
 
 /* Get the terminal color string for the file with the given name and
  * file modes. */
 
 static void
-putcolstr(Listcols c, char *n, mode_t m)
+putfilecol(Listcols c, char *group, char *n, mode_t m)
 {
     int colour;
-    Extcol e;
+    Extcol ec;
+    Patcol pc;
 
-    for (e = c->exts; e; e = e->next)
-	if (strsfx(e->ext, n)) {	/* XXX: unoptimised if used */
-	    if (last_col < COL_NO
-		|| strcmp(c->cols[last_col], e->col))
-		zlrputs(c, e->col);
+    for (ec = c->exts; ec; ec = ec->next)
+	if (strsfx(ec->ext, n) &&
+	    (!ec->prog || !group || pattry(ec->prog, group))) {
+	    zlrputs(c, ec->col);
 
-	    last_col = COL_NO - 1;
+	    return;
+	}
+    for (pc = c->pats; pc; pc = pc->next)
+	if ((!pc->prog || !group || pattry(pc->prog, group)) &&
+	    pattry(pc->pat, n)) {
+	    zlrputs(c, pc->col);
+
 	    return;
 	}
 
@@ -331,8 +474,7 @@ putcolstr(Listcols c, char *n, mode_t m)
     else
 	colour = COL_FI;
 
-    zcputs(c, colour);
-    return;
+    zcputs(c, group, colour);
 }
 
 static void
@@ -340,10 +482,10 @@ clprintm(Cmgroup g, Cmatch *mp, int mc, int ml, int lastc, int width,
 	 char *path, struct stat *buf)
 {
     Cmatch m;
-    int len, cc;
+    int len;
 
     if (!mp) {
-	zcputs(&mcolors, COL_MI);
+	zcputs(&mcolors, g->name, COL_MI);
 	len = width - 2;
 	while (len-- > 0)
 	    putc(' ', shout);
@@ -367,10 +509,9 @@ clprintm(Cmgroup g, Cmatch *mp, int mc, int ml, int lastc, int width,
 	    mmtabp = mtab + mm;
 	    mgtabp = mgtab + mm;
 	    mmlen = mcols;
-	    cc = COL_MA;
+	    zcputs(&mcolors, g->name, COL_MA);
 	} else
-	    cc = COL_NO;
-	zcputs(&mcolors, cc);
+	    putmatchcol(&mcolors, g->name, m->disp);
 	printfmt(m->disp, 0, 1, 0);
 	zcoff();
     } else {
@@ -400,11 +541,11 @@ clprintm(Cmgroup g, Cmatch *mp, int mc, int ml, int lastc, int width,
 	    mmtabp = mtab + mx + mm;
 	    mgtabp = mgtab + mx + mm;
 	    mmlen = width;
-	    zcputs(&mcolors, COL_MA);
+	    zcputs(&mcolors, g->name, COL_MA);
 	} else if (buf)
-	    putcolstr(&mcolors, path, buf->st_mode);
+	    putfilecol(&mcolors, g->name, path, buf->st_mode);
 	else
-	    zcputs(&mcolors, COL_NO);
+	    putmatchcol(&mcolors, g->name, (m->disp ? m->disp : m->str));
 
 	nicezputs((m->disp ? m->disp : m->str), shout);
 	len = niceztrlen(m->disp ? m->disp : m->str);
@@ -412,7 +553,7 @@ clprintm(Cmgroup g, Cmatch *mp, int mc, int ml, int lastc, int width,
 	 if (isset(LISTTYPES) && buf) {
 	    if (m->gnum != mselect) {
 		zcoff();
-		zcputs(&mcolors, COL_TC);
+		zcputs(&mcolors, g->name, COL_TC);
 	    }
 	    putc(file_type(buf->st_mode), shout);
 	    len++;
@@ -420,14 +561,14 @@ clprintm(Cmgroup g, Cmatch *mp, int mc, int ml, int lastc, int width,
 	if ((len = width - len - 2) > 0) {
 	    if (m->gnum != mselect) {
 		zcoff();
-		zcputs(&mcolors, COL_SP);
+		zcputs(&mcolors, g->name, COL_SP);
 	    }
 	    while (len-- > 0)
 		putc(' ', shout);
 	}
 	zcoff();
 	if (!lastc) {
-	    zcputs(&mcolors, COL_NO);
+	    zcputs(&mcolors, g->name, COL_NO);
 	    fputs("  ", shout);
 	    zcoff();
 	}
@@ -483,7 +624,8 @@ complistmatches(Hookdef dummy, Chdata dat)
 	mcols = columns;
 	mlines = listdat.nlines;
     }
-    last_col = COL_NO - 1;
+    last_cap = (char *) zhalloc(max_caplen + 1);
+    *last_cap = '\0';
 
     if (!printlist(1, clprintm) || listdat.nlines >= lines)
 	noselect = 1;

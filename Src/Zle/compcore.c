@@ -445,9 +445,8 @@ before_complete(Hookdef dummy, int *lst)
     /* We may have to reset the cursor to its position after the   *
      * string inserted by the last completion. */
 
-    if (fromcomp & FC_INWORD)
-	if ((cs = lastend) > ll)
-	    cs = ll;
+    if ((fromcomp & FC_INWORD) && (cs = lastend) > ll)
+	cs = ll;
 
     /* Check if we have to start a menu-completion (via automenu). */
 
@@ -2512,6 +2511,7 @@ permmatches(int last)
 	n->mcount = g->mcount;
 	n->matches = p = (Cmatch *) ncalloc((n->mcount + 1) *
 					    sizeof(Cmatch));
+	n->name = ztrdup(g->name);
 	for (q = g->matches; *q; q++, p++)
 	    *p = dupmatch(*q, nbrbeg, nbrend);
 	*p = NULL;
@@ -2609,6 +2609,7 @@ freematches(Cmgroup g)
 	    }
 	    free(g->expls);
 	}
+	zsfree(g->name);
 	free(g);
 
 	g = n;

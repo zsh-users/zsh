@@ -76,6 +76,24 @@ enditem()
 Apart from these strings, the var(name) may also be an asterisk
 (`tt(*)') followed by any string. The var(value) given for such a
 string will be used for all files whose name ends with the string.
+The var(name) may also be a equal sign (`tt(=)') followed by a
+pattern. The var(value) given for this pattern will be used for all
+matches (not only filenames) that whose display string are matched by
+the pattern. Definitions for both of these take precedence over the
+values defined for file types and the form with the leading asterisk 
+takes precedence over the form with the leading equal sign.
+
+All three forms of var(name) may be preceded by a pattern in
+parentheses. If such a pattern is given, the var(value) will be used
+only for matches in groups whose names are matched by the pattern
+given in the parentheses. E.g. `tt((g*)~m*=43)' says to highlight all
+matches beginning with `tt(m)' in groups whose names  begin with
+`tt(g)' using the color code `tt(43)'. In case of the `tt(lc)',
+`tt(rc)', and `tt(ec)' codes, the group pattern is ignored.
+
+Note also that all patterns are tried in the order in which they
+appear in the parameter value until the first one matches which is
+then used.
 
 When printing a match, the code prints the value of tt(lc), the value
 for the file-type or the last matching specification with a `tt(*)',
