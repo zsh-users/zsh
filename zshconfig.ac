@@ -1608,7 +1608,7 @@ char *argv[];
     DLLDARG=""
   fi
   if test -n "$GCC"; then
-    DLCFLAGS="${DLCFLAGS=-fpic}"
+    DLCFLAGS="${DLCFLAGS=-fPIC}"
   else
     case "$host_os" in
       hpux*)                 DLCFLAGS="${DLCFLAGS=+z}" ;;

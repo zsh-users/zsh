@@ -1,3 +1,8 @@
+2001-06-17  Bart Schaefer  <schaefer@zsh.org>
+
+	* unposted (see users/3930,3931, cvs.netbsd.org): Use -fPIC for
+	gcc dynamic linking rather than -fpic.
+
 2001-06-16  Wayne Davison  <wayned@users.sourceforge.net>
 
 	* unposted: Src/utils.c: Revert the mkstemp() change since it was not
