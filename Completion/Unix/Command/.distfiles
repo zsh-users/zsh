@@ -22,7 +22,8 @@ _aap          _ant          _antiword     _apm          _attr
 _baz          _bogofilter
 _cal          _chmod        _du           _ecasound     _elinks       _figlet
 _getent       _global       _gpg          _gphoto2      _less         _lsof
-_mencal       _mt           _mtr          _netcat       _nice         _nmap
+_mencal       _mpc          _mt           _mtr
+_netcat       _nice         _nmap
 _perforce     _php          _postfix      _printenv     _python
 _raggle       _rar	    _renice
 _sablotron    _screen       _sed          _subversion
