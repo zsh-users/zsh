@@ -92,6 +92,10 @@ tt(ftp://foad.org/pub/zsh/)
 tt(http://foad.org/zsh/))
 )
 enditem()
+
+The up-to-date source code is available via anonymous CVS from Sourceforge.
+See tt(http://sourceforge.net/projects/zsh/) for details.
+
 texinode(Mailing Lists)(The Zsh FAQ)(Availability)(Introduction)
 sect(Mailing Lists)
 cindex(mailing lists)
