@@ -34,7 +34,7 @@ BEGIN {limidx = 0}
 	    if (limnam == "NPROC")   { msg[limnum] = "Nmaxproc" }
 	    if (limnam == "OFILE")   { msg[limnum] = "Ndescriptors" }
 	    if (limnam == "RSS")     { msg[limnum] = "Mresident" }
-	    if (limnam == "SBSIZE")  { msg[limnum] = "Msktbuffersize" }
+	    if (limnam == "SBSIZE")  { msg[limnum] = "Msockbufsize" }
 	    if (limnam == "STACK")   { msg[limnum] = "Mstacksize" }
 	    if (limnam == "TCACHE")  { msg[limnum] = "Ncachedthreads" }
 	    if (limnam == "VMEM")    { msg[limnum] = "Mvmemorysize" }
