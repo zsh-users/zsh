@@ -194,7 +194,7 @@ AC_ARG_ENABLE(ansi2knr,
 dnl Do you want to disable restricted on r* commands
 undefine([restricted-r])dnl
 AC_ARG_ENABLE(restricted-r,
-[  --disable-restricted-r      turn off restricted shell if the invoked command is r*],
+[  --disable-restricted-r     turn off restricted shell if the invoked command is r*],
 [if test x$enableval = xyes; then
   AC_DEFINE(RESTRICTED_R)
 fi],
@@ -212,7 +212,7 @@ AC_DEFINE(CONFIG_LOCALE)
 
 undefine([fndir])dnl
 AC_ARG_ENABLE(fndir,
-[  --enable-fndir=DIR        where functions go (default DATADIR/zsh/functions)],
+[  --enable-fndir=DIR         where functions go (default DATADIR/zsh/functions)],
 [if test $enableval = yes; then
   fndir=${datadir}/zsh/functions
 else
@@ -245,7 +245,7 @@ AC_SUBST(FUNCTIONS_SUBDIRS)dnl
 dnl Do you want maildir support?
 undefine([maildir_support])dnl
 AC_ARG_ENABLE(maildir-support,
-[  --enable-maildir-support      Enable maildir support in MAIL and MAILPATH],
+[  --enable-maildir-support   Enable maildir support in MAIL and MAILPATH],
 [if test x$enableval = xyes; then
   AC_DEFINE(MAILDIR_SUPPORT)
 fi])
