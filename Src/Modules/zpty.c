@@ -211,7 +211,7 @@ get_pty(int *master, int *slave)
     return 0;
 }
 
-#else /* ! (defined(__SVR4) || defind(sinix)) */
+#else /* ! (defined(__SVR4) || defined(sinix)) */
 
 static int
 get_pty(int *master, int *slave)

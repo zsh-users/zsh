@@ -70,8 +70,9 @@ _arguments -C -s \
   '--erase:*:uninstall:->uninstall' \
   -'b+[build mode (spec file)]:build stage:((p\:execute\ \%prep\ stage l\:do\ a\ list\ check c\:execute\ build\ stage i\:execute\ install\ stage b\:build\ a\ binary\ package a\:build\ binary\ and\ source\ packages)):*:build:->build_b' \
   -'t+[build mode (tar file)]:build stage:((p\:execute\ \%prep\ stage l\:do\ a\ list\ check c\:execute\ build\ stage i\:execute\ install\ stage b\:build\ a\ binary\ package a\:build\ binary\ and\ source\ packages)):*:build:->build_t' \
-  --{rebuild,rmsource,recompile,resign,addsign}':*:RPM package:->package' \
-  '-K+[signature check mode]:*:sigcheck:->sigcheck' \
+  --{rmsource,recompile,resign,addsign}':*:RPM package:->package' \
+  '--rebuild:*:Src RPM files:->package_src' \
+    '-K+[signature check mode]:*:sigcheck:->sigcheck' \
   '--checksig:*:sigcheck:->sigcheck' \
   '--rebuilddb:*:rebuild:->rebuild' && ret=0
 
@@ -201,6 +202,9 @@ while [[ -n "$state" ]]; do
 	  'prefixes:ftp URL prefix:compadd ftp://' && ret=0
     fi
     ;;
+  package_src)
+    _files -g \*.src\(\#i\).rpm
+   ;&
   tags)
     if compset -P '*%*\{'; then
       _wanted tags expl 'RPM tag' \

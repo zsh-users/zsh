@@ -1,3 +1,10 @@
+2000-04-07  Bart Schaefer <schaefer@zsh.org>
+
+	* 10581: Etc/BUGS, Src/Modules/zpty.c: Note a fixed bug; typo.
+
+	* Chmouel Boudjnah: 10562: Completion/Linux/_rpm: Complete
+	only .src.rpm files for "rpm --rebuild".
+
 2000-04-07  Sven Wischnowsky <wischnow@informatik.hu-berlin.de>
 
 	* 10579: Completion/Base/_arguments, Completion/Base/_values,
