@@ -49,7 +49,7 @@
 /* Hashtable of thingies.  Enabled nodes are those that refer to widgets. */
 
 /**/
-HashTable thingytab;
+mod_export HashTable thingytab;
 
 /**********************************/
 /* hashtable management functions */
@@ -64,6 +64,7 @@ createthingytab(void)
     thingytab->hash        = hasher;
     thingytab->emptytable  = emptythingytab;
     thingytab->filltable   = NULL;
+    thingytab->cmpnodes    = strcmp;
     thingytab->addnode     = addhashnode;
     thingytab->getnode     = gethashnode;
     thingytab->getnode2    = gethashnode2;
@@ -133,7 +134,7 @@ freethingynode(HashNode hn)
  * correctly.                                                          */
 
 /**/
-Thingy
+mod_export Thingy
 refthingy(Thingy th)
 {
     if(th)
@@ -244,7 +245,10 @@ unbindwidget(Thingy t, int override)
 static void
 freewidget(Widget w)
 {
-    if(!(w->flags & WIDGET_INT))
+    if (w->flags & WIDGET_NCOMP) {
+	zsfree(w->u.comp.wid);
+	zsfree(w->u.comp.func);
+    } else if(!(w->flags & WIDGET_INT))
 	zsfree(w->u.fnnam);
     zfree(w, sizeof(*w));
 }
@@ -257,7 +261,7 @@ freewidget(Widget w)
  * returned.                                                            */
 
 /**/
-Widget
+mod_export Widget
 addzlefunction(char *name, ZleIntFunc ifunc, int flags)
 {
     VARARR(char, dotn, strlen(name) + 2);
@@ -282,13 +286,11 @@ addzlefunction(char *name, ZleIntFunc ifunc, int flags)
     return w;
 }
 
-#ifdef DYNAMIC
-
 /* Delete an internal widget provided by a module.  Don't try to delete *
  * a widget from the fixed table -- it would be bad.  (Thanks, Egon.)   */
 
 /**/
-void
+mod_export void
 deletezlefunction(Widget w)
 {
     Thingy p, n;
@@ -305,8 +307,6 @@ deletezlefunction(Widget w)
     }
 }
 
-#endif /* DYNAMIC */
-
 /***************/
 /* zle builtin */
 /***************/
@@ -314,9 +314,10 @@ deletezlefunction(Widget w)
 /*
  * The available operations are:
  *
- *   -l   list user-defined widgets (no arguments)
+ *   -l   list widgets/test for existence
  *   -D   delete widget names
  *   -A   link the two named widgets (2 arguments)
+ *   -C   create completion widget (3 arguments)
  *   -N   create new user-defined widget (1 or 2 arguments)
  *        invoke a widget (1 argument)
  */
@@ -330,36 +331,36 @@ bin_zle(char *name, char **args, char *ops, int func)
 	int (*func) _((char *, char **, char *, char));
 	int min, max;
     } const opns[] = {
-	{ 'l', bin_zle_list, 0,  0 },
+	{ 'l', bin_zle_list, 0, -1 },
 	{ 'D', bin_zle_del,  1, -1 },
 	{ 'A', bin_zle_link, 2,  2 },
 	{ 'N', bin_zle_new,  1,  2 },
+	{ 'C', bin_zle_complete, 3, 3 },
+	{ 'R', bin_zle_refresh, 0, -1 },
+	{ 'M', bin_zle_mesg, 1, 1 },
+	{ 'U', bin_zle_unget, 1, 1 },
 	{ 0,   bin_zle_call, 0, -1 },
     };
     struct opn const *op, *opp;
     int n;
 
     /* select operation and ensure no clashing arguments */
-    for(op = opns; op->o && !ops[op->o]; op++) ;
+    for(op = opns; op->o && !ops[STOUC(op->o)]; op++) ;
     if(op->o)
 	for(opp = op; (++opp)->o; )
-	    if(ops[opp->o]) {
-		zerrnam(name, "incompatible operation selection options",
+	    if(ops[STOUC(opp->o)]) {
+		zwarnnam(name, "incompatible operation selection options",
 		    NULL, 0);
 		return 1;
 	    }
 
     /* check number of arguments */
     for(n = 0; args[n]; n++) ;
-    if(!op->o && n != 1) {
-	zerrnam(name, "wrong number of arguments", NULL, 0);
-	return 1;
-    }
     if(n < op->min) {
-	zerrnam(name, "not enough arguments for -%c", NULL, op->o);
+	zwarnnam(name, "not enough arguments for -%c", NULL, op->o);
 	return 1;
     } else if(op->max != -1 && n > op->max) {
-	zerrnam(name, "too many arguments for -%c", NULL, op->o);
+	zwarnnam(name, "too many arguments for -%c", NULL, op->o);
 	return 1;
     }
 
@@ -371,7 +372,96 @@ bin_zle(char *name, char **args, char *ops, int func)
 static int
 bin_zle_list(char *name, char **args, char *ops, char func)
 {
-    scanhashtable(thingytab, 1, 0, DISABLED, scanlistwidgets, ops['L']);
+    if (!*args) {
+	scanhashtable(thingytab, 1, 0, DISABLED, scanlistwidgets,
+		      (ops['a'] ? -1 : ops['L']));
+	return 0;
+    } else {
+	int ret = 0;
+	Thingy t;
+
+	for (; *args && !ret; args++) {
+	    if (!(t = (Thingy) thingytab->getnode2(thingytab, *args)) ||
+		(!ops['a'] && (t->widget->flags & WIDGET_INT)))
+		ret = 1;
+	}
+	return ret;
+    }
+}
+
+/**/
+static int
+bin_zle_refresh(char *name, char **args, char *ops, char func)
+{
+    char *s = statusline;
+    int sl = statusll, ocl = clearlist;
+
+    if (!zleactive) {
+	zwarnnam(name, "can only be called from widget function", NULL, 0);
+	return 1;
+    }
+    statusline = NULL;
+    statusll = 0;
+    if (*args) {
+	if (**args) {
+	    statusline = *args;
+	    statusll = strlen(statusline);
+	}
+	if (*++args) {
+	    LinkList l = newlinklist();
+	    int zmultsav = zmult;
+
+	    for (; *args; args++)
+		addlinknode(l, *args);
+
+	    zmult = 1;
+	    listlist(l);
+	    if (statusline)
+		lastlistlen++;
+	    showinglist = clearlist = 0;
+	    zmult = zmultsav;
+	} else if (ops['c']) {
+	    clearlist = 1;
+	    lastlistlen = 0;
+	}
+    } else if (ops['c']) {
+	clearlist = listshown = 1;
+	lastlistlen = 0;
+    }
+    zrefresh();
+
+    clearlist = ocl;
+    statusline = s;
+    statusll = sl;
+    return 0;
+}
+
+/**/
+static int
+bin_zle_mesg(char *name, char **args, char *ops, char func)
+{
+    if (!zleactive) {
+	zwarnnam(name, "can only be called from widget function", NULL, 0);
+	return 1;
+    }
+    showmsg(*args);
+    if (sfcontext != SFC_WIDGET)
+	zrefresh();
+    return 0;
+}
+
+/**/
+static int
+bin_zle_unget(char *name, char **args, char *ops, char func)
+{
+    char *b = *args, *p = b + strlen(b);
+
+    if (!zleactive) {
+	zwarnnam(name, "can only be called from widget function", NULL, 0);
+	return 1;
+    }
+    while (p > b)
+	ungetkey((int) *--p);
     return 0;
 }
 
@@ -382,20 +472,34 @@ scanlistwidgets(HashNode hn, int list)
     Thingy t = (Thingy) hn;
     Widget w = t->widget;
 
+    if(list < 0) {
+	printf("%s\n", hn->nam);
+	return;
+    }
     if(w->flags & WIDGET_INT)
 	return;
     if(list) {
-	fputs("zle -N ", stdout);
+	printf("zle -%c ", (w->flags & WIDGET_NCOMP) ? 'C' : 'N');
 	if(t->nam[0] == '-')
 	    fputs("-- ", stdout);
 	quotedzputs(t->nam, stdout);
-	if(strcmp(t->nam, w->u.fnnam)) {
+	if (w->flags & WIDGET_NCOMP) {
+	    fputc(' ', stdout);
+	    quotedzputs(w->u.comp.wid, stdout);
+	    fputc(' ', stdout);
+	    quotedzputs(w->u.comp.func, stdout);
+	} else if(strcmp(t->nam, w->u.fnnam)) {
 	    fputc(' ', stdout);
 	    quotedzputs(w->u.fnnam, stdout);
 	}
     } else {
 	nicezputs(t->nam, stdout);
-	if(strcmp(t->nam, w->u.fnnam)) {
+	if (w->flags & WIDGET_NCOMP) {
+	    fputs(" -C ", stdout);
+	    nicezputs(w->u.comp.wid, stdout);
+	    fputc(' ', stdout);
+	    nicezputs(w->u.comp.func, stdout);
+	} else if(strcmp(t->nam, w->u.fnnam)) {
 	    fputs(" (", stdout);
 	    nicezputs(w->u.fnnam, stdout);
 	    fputc(')', stdout);
@@ -430,10 +534,10 @@ bin_zle_link(char *name, char **args, char *ops, char func)
     Thingy t = (Thingy) thingytab->getnode(thingytab, args[0]);
 
     if(!t) {
-	zerrnam(name, "no such widget `%s'", args[0], 0);
+	zwarnnam(name, "no such widget `%s'", args[0], 0);
 	return 1;
     } else if(bindwidget(t->widget, rthingy(args[1]))) {
-	zerrnam(name, "widget name `%s' is protected", args[1], 0);
+	zwarnnam(name, "widget name `%s' is protected", args[1], 0);
 	return 1;
     }
     return 0;
@@ -452,8 +556,40 @@ bin_zle_new(char *name, char **args, char *ops, char func)
     if(!bindwidget(w, rthingy(args[0])))
 	return 0;
     freewidget(w);
-    zerrnam(name, "widget name `%s' is protected", args[0], 0);
+    zwarnnam(name, "widget name `%s' is protected", args[0], 0);
     return 1;
+}
+
+/**/
+static int
+bin_zle_complete(char *name, char **args, char *ops, char func)
+{
+    Thingy t;
+    Widget w, cw;
+
+    if (!require_module(name, "zsh/complete", 0, 0)) {
+	zwarnnam(name, "can't load complete module", NULL, 0);
+	return 1;
+    }
+    t = rthingy((args[1][0] == '.') ? args[1] : dyncat(".", args[1]));
+    cw = t->widget;
+    unrefthingy(t);
+    if (!cw || !(cw->flags & ZLE_ISCOMP)) {
+	zwarnnam(name, "invalid widget `%s'", args[1], 0);
+	return 1;
+    }
+    w = zalloc(sizeof(*w));
+    w->flags = WIDGET_NCOMP|ZLE_MENUCMP|ZLE_KEEPSUFFIX;
+    w->first = NULL;
+    w->u.comp.fn = cw->u.fn;
+    w->u.comp.wid = ztrdup(args[1]);
+    w->u.comp.func = ztrdup(args[2]);
+    if (bindwidget(w, rthingy(args[0]))) {
+	freewidget(w);
+	zwarnnam(name, "widget name `%s' is protected", args[0], 0);
+	return 1;
+    }
+    return 0;
 }
 
 /**/
@@ -461,18 +597,63 @@ static int
 bin_zle_call(char *name, char **args, char *ops, char func)
 {
     Thingy t;
+    struct modifier modsave;
+    int ret, saveflag = 0;
+    char *wname = *args++;
 
-    if(!zleactive || incompctlfunc) {
-	zerrnam(name, "widgets can only be called when ZLE is active",
+    if (!wname) {
+	if (saveflag)
+	    zmod = modsave;
+	return (!zleactive || incompctlfunc || incompfunc ||
+		sfcontext != SFC_WIDGET);
+    }
+    if(!zleactive || incompctlfunc || incompfunc || sfcontext != SFC_WIDGET) {
+	zwarnnam(name, "widgets can only be called when ZLE is active",
 	    NULL, 0);
 	return 1;
     }
-    t = rthingy(args[0]);
-    PERMALLOC {
-      execzlefunc(t);
-    } LASTALLOC;
+
+    while (*args && **args == '-') {
+	char *num;
+	if (!args[0][1] || args[0][1] == '-') {
+	    args++;
+	    break;
+	}
+	while (*++(*args)) {
+	    switch (**args) {
+	    case 'n':
+		num = args[0][1] ? args[0]+1 : args[1];
+		if (!num) {
+		    zwarnnam(name, "number expected after -%c", NULL, **args);
+		    return 1;
+		}
+		if (!args[0][1])
+		    *++args = "" - 1;
+		modsave = zmod;
+		saveflag = 1;
+		zmod.mult = atoi(num);
+		zmod.flags |= MOD_MULT;
+		break;
+	    case 'N':
+		modsave = zmod;
+		saveflag = 1;
+		zmod.mult = 1;
+		zmod.flags &= ~MOD_MULT;
+		break;
+	    default:
+		zwarnnam(name, "unknown option: %s", *args, 0);
+		return 1;
+	    }
+	}
+	args++;
+    }
+
+    t = rthingy(wname);
+    ret = execzlefunc(t, args);
     unrefthingy(t);
-    return 0;
+    if (saveflag)
+	zmod = modsave;
+    return ret;
 }
 
 /*******************/
