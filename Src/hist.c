@@ -2129,23 +2129,22 @@ lockhistfile(char *fn, int keep_trying)
 	return 0;
     if (!lockhistct++) {
 	struct stat sb;
-	int fd, len;
+	int fd;
 	char *lockfile;
 #ifdef HAVE_LINK
 	char *tmpfile;
 #endif
 
-	fn = unmeta(fn);
-	len = strlen(fn);
-	lockfile = zalloc(len + 5 + 1);
-	sprintf(lockfile, "%s.LOCK", fn);
+	lockfile = bicat(unmeta(fn), ".LOCK");
 #ifdef HAVE_LINK
-	tmpfile = zalloc(len + 10 + 1);
-	sprintf(tmpfile, "%s.%ld", fn, (long)mypid);
-	unlink(tmpfile); /* NFS's O_EXCL is often broken... */
+	tmpfile = gettempname(fn, 0);
 	if ((fd = open(tmpfile, O_WRONLY|O_CREAT|O_EXCL, 0644)) >= 0) {
-	    write(fd, tmpfile+len+1, strlen(tmpfile+len+1));
-	    close(fd);
+	    FILE *out = fdopen(fd, "w");
+	    if (out) {
+		fprintf(out, "%ld %s\n", (long)getpid(), getsparam("HOST"));
+		fclose(out);
+	    } else
+		close(fd);
 	    while (link(tmpfile, lockfile) < 0) {
 		if (errno != EEXIST || !keep_trying)
 		    ;
@@ -2183,10 +2182,12 @@ lockhistfile(char *fn, int keep_trying)
 	if (fd < 0)
 	    lockhistct--;
 	else {
-	    char buf[16];
-	    sprintf(buf, "%ld", (long)mypid);
-	    write(fd, buf, strlen(buf));
-	    close(fd);
+	    FILE *out = fdopen(fd, "w");
+	    if (out) {
+		fprintf(out, "%ld %s\n", (long)mypid, getsparam("HOST"));
+		fclose(out);
+	    } else
+		close(fd);
 	}
 #endif /* not HAVE_LINK */
 	free(lockfile);
