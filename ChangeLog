@@ -1,3 +1,9 @@
+2003-06-16  Peter Stephenson  <pws@csr.com>
+
+	* 17967, 17985 (Bart Schaefer <schaefer@zsh.org>):
+	Test/B02typeset.ztst: adjust hiding/tagging test so it no
+	longer fails.
+
 2003-06-05  Oliver Kiddle  <opk@zsh.org>
 
 	* 18607: Completion/Unix/Command/_rlogin: correctly handle
