@@ -635,11 +635,6 @@ struct savetrap {
 
 static LinkList savetraps;
 
-/* Flag to unsettrap not to free the structs, which we're keeping */
-
-/**/
-int notrapfree;
-
 /*
  * Save the current trap and unset it.
  */
@@ -651,7 +646,6 @@ dosavetrap(int sig, int level)
     st = (struct savetrap *)zalloc(sizeof(*st));
     st->sig = sig;
     st->local = level;
-    notrapfree++;
     if ((st->flags = sigtrapped[sig]) & ZSIG_FUNC) {
 	/*
 	 * Get the old function: this assumes we haven't added
@@ -667,10 +661,7 @@ dosavetrap(int sig, int level)
     } else {
 	st->list = sigfuncs[sig];
 	sigfuncs[sig] = NULL;
-	unsettrap(sig);
     }
-    sigtrapped[sig] = 0;
-    notrapfree--;
     PERMALLOC {
 	if (!savetraps)
 	    savetraps = newlinklist();
@@ -691,16 +682,13 @@ settrap(int sig, List l)
         zerr("can't trap SIG%s in interactive shells", sigs[sig], 0);
         return 1;
     }
+
     /*
-     * Note that we save the trap here even if there isn't an existing
-     * one, to aid in removing this one.  However, if there's
-     * already one at the current locallevel we just overwrite it.
+     * Call unsettrap() unconditionally, to make sure trap is saved
+     * if necessary.
      */
-    if (isset(LOCALTRAPS) && locallevel &&
-	(!sigtrapped[sig] || locallevel > (sigtrapped[sig] >> ZSIG_SHIFT))) {
-	dosavetrap(sig, locallevel);
-    } else if (sigfuncs[sig])
-	unsettrap(sig);
+    unsettrap(sig);
+
     sigfuncs[sig] = l;
     if (!l) {
 	sigtrapped[sig] = ZSIG_IGNORED;
@@ -734,23 +722,23 @@ unsettrap(int sig)
 {
     int trapped;
 
-    if (sig == -1 || !(trapped = sigtrapped[sig]) ||
-	(jobbing && (sig == SIGTTOU || sig == SIGTSTP || sig == SIGTTIN))) {
-        return;
-    }
-    if (isset(LOCALTRAPS) && locallevel &&
-	sigtrapped[sig] && locallevel > (sigtrapped[sig] >> ZSIG_SHIFT)) {
-	/*
-	 * This calls unsettrap recursively to do any dirty work, so
-	 * make sure this bit doesn't happen:  a bit messy, but hard
-	 * to avoid.
-	 */
-	int oldlt = opts[LOCALTRAPS];
-	opts[LOCALTRAPS] = 0;
-	dosavetrap(sig, locallevel);
-	opts[LOCALTRAPS] = oldlt;
+    if (sig == -1 ||
+	(jobbing && (sig == SIGTTOU || sig == SIGTSTP || sig == SIGTTIN)))
 	return;
-    }
+
+    trapped = sigtrapped[sig];
+    /*
+     * Note that we save the trap here even if there isn't an existing
+     * one, to aid in removing this one.  However, if there's
+     * already one at the current locallevel we just overwrite it.
+     */
+    if (isset(LOCALTRAPS) && locallevel &&
+	(!trapped || locallevel > (sigtrapped[sig] >> ZSIG_SHIFT)))
+	dosavetrap(sig, locallevel);
+
+    if (!trapped)
+        return;
+
     sigtrapped[sig] = 0;
     if (sig == SIGINT && interact) {
 	/* PWS 1995/05/16:  added test for interactive, also noholdintr() *
@@ -765,14 +753,24 @@ unsettrap(int sig)
 #endif
              sig != SIGCHLD)
         signal_default(sig);
-    if (notrapfree)
-	return;
+
+    /*
+     * At this point we free the appropriate structs.  If we don't
+     * want that to happen (e.g. we are saving the trap), then
+     * either the function should already have been removed from shfunctab,
+     * or the entry in sigfuncs should have been set to NULL, and then
+     * we're laughing, in a sort of vague virtual sense.
+     */
     if (trapped & ZSIG_FUNC) {
 	char func[20];
 	HashNode hn;
 
 	sprintf(func, "TRAP%s", sigs[sig]);
-	if ((hn = shfunctab->removenode(shfunctab, func)))
+	/*
+	 * As in dosavetrap(), don't call removeshfuncnode() because
+	 * that calls back into unsettrap();
+	 */
+	if ((hn = removehashnode(shfunctab, func)))
 	    shfunctab->freenode(hn);
     } else if (sigfuncs[sig]) {
 	freestruct(sigfuncs[sig]);
@@ -786,10 +784,14 @@ starttrapscope(void)
 {
     /*
      * SIGEXIT needs to be restored at the current locallevel,
-     * so give it the next higher one.
+     * so give it the next higher one. dosavetrap() is called
+     * automatically where necessary.
      */
-    if (sigtrapped[SIGEXIT])
-	dosavetrap(SIGEXIT, locallevel+1);
+    if (sigtrapped[SIGEXIT]) {
+	locallevel++;
+	unsettrap(SIGEXIT);
+	locallevel--;
+    }
 }
 
 /*
@@ -811,14 +813,13 @@ endtrapscope(void)
      * after all the other traps have been put back.
      */
     if ((exittr = sigtrapped[SIGEXIT])) {
-	notrapfree++;
 	if (exittr & ZSIG_FUNC) {
-	    exitfn = shfunctab->removenode(shfunctab, "TRAPEXIT");
+	    exitfn = removehashnode(shfunctab, "TRAPEXIT");
 	} else {
 	    exitfn = sigfuncs[SIGEXIT];
-	    unsettrap(SIGEXIT);
+	    sigfuncs[SIGEXIT] = NULL;
 	}
-	notrapfree--;
+	unsettrap(SIGEXIT);
     }
 
     if (savetraps) {

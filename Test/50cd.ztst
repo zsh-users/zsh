@@ -17,11 +17,10 @@
 # of spaces and/or tabs, to differentiate it from tags with a special
 # meaning to the test harness.  Note that this is true even in sections
 # where there are no such tags.  Also note that file descriptor 9
-# is reserved for input from the test script; if ZTST_verbose is set,
-# output is sent to the original stdout via fd 8.  Option settings
-# are preserved between the execution of different code chunks;
-# initially, all standard zsh options (the effect of `emulate -R zsh')
-# are set.
+# is reserved for input from the test script, and file descriptor 8
+# preserves the original stdout.  Option settings are preserved between the
+# execution of different code chunks; initially, all standard zsh options
+# (the effect of `emulate -R zsh') are set.
 
 %prep
 # This optional section prepares the test, creating directories and files
