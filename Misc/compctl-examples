@@ -11,15 +11,15 @@
 # page.
 #
 #------------------------------------------------------------------------------
-hosts=("${(@)${(@s: :)${(@s:	:)${(@)${(@f)$(</etc/hosts)}%%\#*}#*[ 	]*}}:#}")
+hosts=( ${(s: :)${(ps:\t:)${${(f)"$(</etc/hosts)"}%%\#*}##[:blank:]#[^[:blank:]]#}} )
 ports=( "${(@)${(@)${(@f)$(</etc/services)}:#\#*}%%[ 	]*}" )
 
 # groups=( $(cut -d: -f1 /etc/group) )
 # groups=( $(ypcat group.byname | cut -d: -f1) ) # if you use NIS
 
 # It can be done without forking, but it used too much memory in old zsh's:
-groups=( "${(@)${(@f)$(</etc/group)}%%:*}" )
-#groups=( "${(@)${(@f)$(ypcat groups)}%%:*}" ) # if you use NIS
+groups=( ${${(s: :)$(</etc/group)}%%:*} )
+#groups=( ${${(s: :)$(ypcat groups)}%%:*} ) # if you use NIS
 
 # Completion for zsh builtins.
 compctl -z -P '%' bg
@@ -563,7 +563,7 @@ cvsprefix() {
 cvsentries() {
     setopt localoptions nullglob unset
     if [[ -f ${pref}CVS/Entries ]]; then
-	reply=( "${pref}${^${(@)${(@)${(f@)$(<${pref}CVS/Entries)}:#D*}#/}%%/*}" )
+	reply=( "${pref}${(@)^${(@)${(@)${(f@)$(<${pref}CVS/Entries)}:#D*}#/}%%/*}" )
     fi
 }
 
