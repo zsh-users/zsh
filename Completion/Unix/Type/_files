@@ -37,12 +37,25 @@ if zstyle -a ":completion:${curcontext}:" file-patterns tmp; then
   done
 else
   if [[ "$type" = *g* ]]; then
-    if [[ "$type" = */* ]]; then
-      pats=( " ${glob//:/\\:}:globbed-files *(-/):directories" '*:all-files ' )
-    else
-      pats=( " ${glob//:/\\:}:globbed-files "
-             '*(-/):directories ' '*:all-files ' )
-    fi
+
+  # People prefer to have directories shown on first try as default.
+  # Even if the calling function didn't use -/.
+  #
+  # if [[ "$type" = */* ]]; then
+
+    pats=( " ${glob//:/\\:}:globbed-files *(-/):directories" '*:all-files '
+
+    ### We could allow _next_tags to offer only globbed-files or directories
+    ### by adding:
+    ###   " ${glob//:/\\:}:only-globbed-files " ' *(-/):only-directories '
+
+      )
+
+  # else
+  #   pats=( " ${glob//:/\\:}:globbed-files "
+  #          '*(-/):directories ' '*:all-files ' )
+  # fi
+
   elif [[ "$type" = */* ]]; then
     pats=( '*(-/):directories ' '*:all-files ' )
   else
@@ -53,14 +66,15 @@ fi
 tried=()
 for def in "$pats[@]"; do
   eval "def=( ${${def:gs/\\:/\\\\\\\\\\\\:}//(#b)([][()|*?^#~<>])/\\${match[1]}} )"
+
+  tmp="${(@M)def#*[^\\]:}"
+  (( $tried[(I)${(q)tmp}] )) && continue
+  tried=( "$tried[@]" "$tmp" )
+
   for sdef in "$def[@]"; do
 
     tag="${${sdef#*[^\\]:}%%:*}"
     pat="${${sdef%%:${tag}*}//\\:/:}"
-
-    (( $tried[(I)${(q)pat}] )) && continue
-
-    tried=( "$tried[@]" "$pat" )
 
     if [[ "$sdef" = *:${tag}:* ]]; then
       descr="${(Q)sdef#*:${tag}:}"
@@ -86,7 +100,13 @@ for def in "$pats[@]"; do
       done
       (( ret )) || break
     done
+
+    ### For that _next_tags change mentioned above we would have to
+    ### comment out the following line. (Or not, depending on the order
+    ### of the patterns.)
+
     [[ "$pat" = '*' ]] && return ret
+
   done
   (( ret )) || return 0
 done

@@ -1111,10 +1111,12 @@ kindex(file-patterns, completion style)
 item(tt(file-patterns))(
 In most places where filenames are completed, the function tt(_files)
 is used which can be configured with this style.  If the style is
-unset, tt(_files) offers, one after another, up to three tags:
+unset, tt(_files) offers, up to three tags:
 `tt(globbed-files)',
 `tt(directories)' and `tt(all-files)', depending on the types of files
-expected by the caller of tt(_files).
+expected by the caller of tt(_files).  The first two
+(`tt(globbed-files)' and `tt(directories)') are normally offered
+together to make it easier to complete files in sub-directories.
 
 If the tt(file-patterns) style is set, the default tags are not
 used.  Instead, the value of the style says which tags and which
@@ -1149,15 +1151,15 @@ the string on the line, one would do:
 example(zstyle ':completion:*:*:rm:*' file-patterns \ 
     '*.o:object-files' '%p:all-files')
 
-Another interesting example is to change the default behaviour that
-makes completion first offer files matching the patterns given by the
-calling function, then directories and then all files.  Many people 
-prefer to get both the files matching the given patterns and the
-directories in the first try and all files at the second try.  To
-achieve this, one could do:
+Another interesting example is to change the default behaviour in a
+way that makes completion first offer files matching the patterns
+given by the calling function, then directories and then all files. 
+Some people prefer this over getting both the files matching the given
+patterns and the directories in the first try and all files at the
+second try.  To achieve this, one could do:
 
 example(zstyle ':completion:*' file-patterns \ 
-    '%p:globbed-files *(-/):directories' '*:all-files')
+    '%p:globbed-files' '*(-/):directories' '*:all-files')
 
 This works even for contexts in which all files would be completed,
 because tt(_files) will not try a pattern more than once and it stops
