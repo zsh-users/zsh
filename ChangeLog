@@ -1,3 +1,9 @@
+2002-04-17  Peter Stephenson  <pws@csr.com>
+
+	* Alexandre Duret-Lutz: 16930: Src/cond.c, Test/C02cond.ztst:
+	Careful with long filenames in internal condition test; fix block
+	file test for `-f'.
+
 2002-04-17  Wayne Davison  <wayned@users.sourceforge.net>
 
 	* unposted: Src/params.c: HISTSIZE can now get set to 1 line
