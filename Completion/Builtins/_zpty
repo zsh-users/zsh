@@ -4,15 +4,24 @@ local state line list names expl curcontext="$curcontext"
 typeset -A opt_args
 
 _arguments -C -s \
-  '(-d -w -r -L)-e[echo input characters]' \
-  '(-d -w -r -L)-b[io to pseudo-terminal blocking]' \
-  '(-e -b -w -r -L)-d[delete command]:*:name:->name' \
-  '(-e -b -d -r -L)-w[send string to command]:name:->name:*:strings to write' \
-  '(-e -b -d -w -L *)-r[read string from command]:name:->name:param:_parameters' \
-  '(-e -b -d -w -r)-L[list defined commands as calls]' \
-  '(-r)*::args:_normal' && return 0
+  '(-r)*::args:_normal' \
+ - eb \
+  '-e[echo input characters]' \
+  '-b[io to pseudo-terminal blocking]' \
+ - d \
+  '-d[delete command]:*:name:->name' \
+ - w \
+  '-w[send string to command]:name:->name:*:strings to write' \
+ - L \
+  '-L[list defined commands as calls]' \
+ - r \
+  '(*)-r[read string from command]:name:->name:param:_parameters' && return 0
 
 if [[ $state = name ]]; then
+  if ! zmodload -e zsh/zpty; then
+    _message "zpty module not loaded"
+    return 1
+  fi
   list=( ${${(f)"$(zpty)"}#*\) } )
   names=( ${list%%:*} )
   if zstyle -T ":completion:${curcontext}" verbose; then

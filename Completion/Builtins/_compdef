@@ -6,13 +6,18 @@ typeset -A opt_args
 _arguments -C -s \
   '(-d)-a[make function autoloadable]' \
   '(-d -p -P)-n[leave existing definitions intact]' \
-  '(-a -n -p -P -k -K)-d[delete]:*:completed command:->ccom' \
-  '(-n -d -P -k -K)-p[completion for command matching pattern]:completion function:->cfun:pattern' \
-  '(-n -d -p -k -K)-P[as -p for commands without own completion]:completion function:->cfun:pattern' \
-  '(-d -p -P -K)-k[define widget and key binding]:completion function:->cfun:style:->style:*:key' \
-  '(-d -p -P -k)-K[define multiple widgets based on function]:*::: :->multi' \
   ':completion function:->cfun' \
-  '*:commands: _command_names' && return 0
+  '*:commands: _command_names' \
+ - d \
+  '(-a -n)-d[delete]:*:completed command:->ccom' \
+ - p \
+  '(-n)-p[completion for command matching pattern]:completion function:->cfun:pattern' \
+ - P \
+  '(-n)-P[as -p for commands without own completion]:completion function:->cfun:pattern' \
+ - k \
+  '-k[define widget and key binding]:completion function:->cfun:style:->style:*:key' \
+ - K \
+  '-K[define multiple widgets based on function]:*::: :->multi' && return 0
 
 if [[ $state = multi ]]; then
   case $(( CURRENT % 3 )) in

@@ -1,3 +1,8 @@
+2000-05-25  Oliver Kiddle  <opk@u.genie.co.uk>
+
+	* 11579: Completion/Builtins/_compdef, Completion/Builtins/_zpty:
+	Split _arguments calls into sets to avoid long mutex lists
+
 2000-05-25  Sven Wischnowsky  <wischnow@zsh.org>
 
 	* 11576: Completion/Core/compdump, Completion/Core/compinit:
