@@ -572,8 +572,28 @@ bin_pwd(char *name, char **argv, char *ops, int func)
     if (ops['r'] || ops['P'] || (isset(CHASELINKS) && !ops['L']))
 	printf("%s\n", zgetcwd());
     else {
-	zputs(pwd, stdout);
-	putchar('\n');
+	struct stat stdot, stpwd;
+	char *tmppwd;
+	/*
+	 * We could print nothing and return status 1 if we can't
+	 * stat ., but that's incompatible with both ksh and what
+	 * we used to do.
+	 */
+	if (stat(".", &stdot) < 0 ||
+	    stat(pwd, &stpwd) >= 0 && stpwd.st_ino == stdot.st_ino) {
+	    zputs(pwd, stdout);
+	    putchar('\n');
+	} else {
+	    /*
+	     * The directory has changed without us noticing it.  We
+	     * need to change pwd, since directory changing commands
+	     * are liable to fail otherwise.
+	     */
+	    zsfree(pwd);
+	    printf("%s\n", tmppwd = zgetcwd());
+	    pwd = metafy(tmppwd, -1, META_DUP);
+	    set_pwd_env();
+	}
     }
     return 0;
 }
