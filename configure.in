@@ -802,22 +802,33 @@ zsh_STRUCT_MEMBER([
 #include <netinet/in.h>
 ], struct sockaddr_in6, sin6_scope_id)
 
-dnl need to integrate this function
-dnl AC_FUNC_STRFTIME
-
-AC_CHECK_FUNCS(lchown memcpy memmove \
-              strftime waitpid select poll tcsetpgrp tcgetattr strstr lstat \
-              getlogin setpgid gettimeofday gethostname mkfifo wait3 difftime \
-              sigblock sigsetmask sigrelse sighold killpg sigaction getrlimit \
-              sigprocmask setuid seteuid setreuid setresuid setsid strerror \
-              nis_list initgroups fchdir cap_get_proc readlink nice \
-	      getgrgid getgrnam getpwent getpwnam getpwuid setpgrp \
-	      inet_aton inet_pton inet_ntop getipnodebyname gethostbyname2 \
-	      fseeko ftello mmap munmap msync ftruncate setlocale _mktemp)
-
 dnl ---------------
 dnl CHECK FUNCTIONS
 dnl ---------------
+
+dnl need to integrate this function
+dnl AC_FUNC_STRFTIME
+
+AC_CHECK_FUNCS(strftime difftime gettimeofday \
+	       select poll \
+	       readlink lstat lchown faccessx fchdir ftruncate \
+	       fseeko ftello \
+	       mkfifo _mktemp \
+	       waitpid wait3 \
+	       sigaction sigblock sighold sigrelse sigsetmask sigprocmask \
+	       killpg setpgid setpgrp tcsetpgrp tcgetattr nice \
+	       gethostname gethostbyname2 getipnodebyname \
+	       inet_aton inet_pton inet_ntop \
+	       getlogin getpwent getpwnam getpwuid getgrgid getgrnam \
+	       initgroups nis_list \
+	       setuid seteuid setreuid setresuid setsid \
+	       memcpy memmove strstr strerror \
+	       mmap munmap msync \
+	       cap_get_proc \
+	       getrlimit \
+	       setlocale)
+AC_FUNC_STRCOLL
+
 if test $ac_cv_func_setpgrp = yes; then
   AC_FUNC_GETPGRP
 else
@@ -828,7 +839,6 @@ else
   ac_cv_func_getpgrp_void=yes
   AC_DEFINE(GETPGRP_VOID)
 fi
-AC_FUNC_STRCOLL
 
 if test $dynamic = yes; then
   AC_CHECK_FUNCS(dlopen dlerror dlsym dlclose load loadquery loadbind unload \

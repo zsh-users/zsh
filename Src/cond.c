@@ -310,9 +310,10 @@ evalcond(Estate state)
 static int
 doaccess(char *s, int c)
 {
+#ifdef HAVE_FACCESSX
     if (!strncmp(s, "/dev/fd/", 8))
 	return !faccessx(atoi(s + 8), c, ACC_SELF);
-
+#endif
     return !access(unmeta(s), c);
 }
 
