@@ -1095,7 +1095,7 @@ hend(Eprog prog)
 	    if (isset(HISTREDUCEBLANKS))
 		histreduceblanks();
 	}
-	newflags = save > 0? 0 : HIST_OLD | HIST_TMPSTORE;
+	newflags = save > 0? 0 : HIST_TMPSTORE;
 	if ((isset(HISTIGNOREDUPS) || isset(HISTIGNOREALLDUPS)) && save > 0
 	 && hist_ring && histstrcmp(chline, hist_ring->text) == 0) {
 	    /* This history entry compares the same as the previous.
