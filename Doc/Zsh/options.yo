@@ -239,6 +239,14 @@ This also has the effect of tt(CHASE_DOTS), i.e. a `tt(..)' path segment
 will be treated as referring to the physical parent, even if the preceeding
 path segment is a symbolic link.
 )
+pindex(CHECK_JOBS)
+cindex(exiting, checking jobs when)
+cindex(logging out, checking jobs when)
+item(tt(CHECK_JOBS) <Z>)(
+Report the status of background and suspended jobs before exiting a shell
+with job control.  tt(NO_CHECK_JOBS) is best used only in combination with
+tt(NO_HUP), else such jobs will be killed automatically.
+)
 pindex(CLOBBER)
 cindex(clobbering, of files)
 cindex(file clobbering, allowing)
