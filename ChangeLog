@@ -1,5 +1,8 @@
 2000-11-12  Clint Adams  <schizo@debian.org>
 
+	* unposted: Completion/Debian/_bug: fix thinkos, add new options
+	for reportbug.
+
 	* unposted: Completion/Debian/_bug: complete files for --include=,
 	completion for querybts.
 
