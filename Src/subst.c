@@ -1028,7 +1028,7 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int ssub)
 
 	if (!(v = fetchvalue((subexp ? &ov : &s), (wantt ? -1 :
 				  ((unset(KSHARRAYS) || inbrace) ? 1 : -1)),
-			     hkeys|hvals)) ||
+			     hkeys|hvals|(arrasg ? SCANPM_ASSIGNING : 0))) ||
 	    (v->pm && (v->pm->flags & PM_UNSET)))
 	    vunset = 1;
 

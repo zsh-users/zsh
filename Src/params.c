@@ -1217,7 +1217,8 @@ fetchvalue(char **pptr, int bracks, int flags)
 		*pptr = s;
 		return v;
 	    }
-	} else if (v->isarr && iident(*t) && isset(KSHARRAYS))
+	} else if (!(flags & SCANPM_ASSIGNING) && v->isarr &&
+		   iident(*t) && isset(KSHARRAYS))
 	    v->b = 0, v->isarr = 0;
     }
     if (!bracks && *s)
@@ -1649,7 +1650,7 @@ setaparam(char *s, char **val)
 	}
 	v = NULL;
     } else {
-	if (!(v = getvalue(&s, 1)))
+	if (!(v = fetchvalue(&s, 1, SCANPM_ASSIGNING)))
 	    createparam(t, PM_ARRAY);
 	else if (!(PM_TYPE(v->pm->flags) & (PM_ARRAY|PM_HASHED)) &&
 		 !(v->pm->flags & (PM_SPECIAL|PM_TIED))) {
@@ -1660,11 +1661,8 @@ setaparam(char *s, char **val)
 	}
     }
     if (!v)
-	if (!(v = getvalue(&t, 1)))
+	if (!(v = fetchvalue(&t, 1, SCANPM_ASSIGNING)))
 	    return NULL;
-    if (isset(KSHARRAYS) && !ss)
-	/* the whole array should be set instead of only the first element */
-	v->b = -1;
     setarrvalue(v, val);
     return v->pm;
 }
@@ -1688,7 +1686,7 @@ sethparam(char *s, char **val)
 	errflag = 1;
 	return NULL;
     } else {
-	if (!(v = getvalue(&s, 1)))
+	if (!(v = fetchvalue(&s, 1, SCANPM_ASSIGNING)))
 	    createparam(t, PM_HASHED);
 	else if (!(PM_TYPE(v->pm->flags) & PM_HASHED) &&
 		 !(v->pm->flags & PM_SPECIAL)) {
@@ -1697,14 +1695,9 @@ sethparam(char *s, char **val)
 	    v = NULL;
 	}
     }
-    if (!v) {
-	int k = opts[KSHARRAYS];	/* Remember the value of KSHARRAYS */
-	opts[KSHARRAYS] = 0;		/* and clear it to avoid special-  */
-	v = getvalue(&t, 1);		/* case of $array --> ${array[0]}. */
-	opts[KSHARRAYS] = k;		/* OK because we can't assign to a */
-	if (!v)				/* slice of an association anyway, */
-	    return NULL;		/* so ANY subscript will be wrong. */
-    }
+    if (!v)
+	if (!(v = fetchvalue(&t, 1, SCANPM_ASSIGNING)))
+	    return NULL;
     setarrvalue(v, val);
     return v->pm;
 }

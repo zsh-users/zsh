@@ -622,7 +622,7 @@ isreallycom(Cmdnam cn)
     else if (!cn->u.name)
 	return 0;
     else {
-	strcpy(fullnam, cn->u.name);
+	strcpy(fullnam, *(cn->u.name));
 	strcat(fullnam, "/");
 	strcat(fullnam, cn->nam);
     }

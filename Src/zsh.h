@@ -1045,6 +1045,7 @@ struct param {
 #define SCANPM_MATCHKEY   (1<<3)
 #define SCANPM_MATCHVAL   (1<<4)
 #define SCANPM_MATCHMANY  (1<<5)
+#define SCANPM_ASSIGNING  (1<<6)
 #define SCANPM_ISVAR_AT   ((-1)<<15)	/* Only sign bit is significant */
 
 /*
