@@ -1,5 +1,8 @@
 2000-10-10  Sven Wischnowsky  <wischnow@zsh.org>
 
+	* 12948: Completion/Core/_expand: follow-up to 12942, only a
+ 	missing redirection
+	
 	* 12946: Completion/Base/_math, Completion/Base/_subscript,
  	Completion/Builtins/_vars, Completion/Builtins/_zstyle,
  	Completion/Core/_parameters, Doc/Zsh/compsys.yo: add
