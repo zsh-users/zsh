@@ -1,4 +1,4 @@
 DISTFILES_SRC='
-    .distfiles history-search-end incremental-complete-word insert-files
-    predict-on
+    .distfiles history-search-end incremental-complete-word
+    incarg insert-files predict-on
 '

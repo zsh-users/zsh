@@ -1,7 +1,6 @@
 DISTFILES_SRC='
     .distfiles 
-    _arguments _brace_parameter _command_names
-    _condition _default _equal _first
-    _math _parameter _precommand _redirect _regex_arguments _subscript
-    _tilde _values _vars 
+    _arg_compile _arguments _brace_parameter _command_names _condition
+    _default _describe _equal _first _math _parameter _precommand _redirect
+    _regex_arguments _subscript _tilde _values _vars
 '

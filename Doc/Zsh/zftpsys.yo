@@ -107,7 +107,7 @@ recorded for later re-opening, either by a tt(zfopen) with no arguments, or
 automatically (see below).  With the option `tt(-1)', no information is
 stored.  Also, if an open command with arguments failed, the parameters
 will not be retained (and any previous parameters will also be deleted).
-A tt(zfopen) on its own, or a tt(zftopen -1), never alters the stored
+A tt(zfopen) on its own, or a tt(zfopen -1), never alters the stored
 parameters.
 
 Both tt(zfopen) and tt(zfanon) (but not tt(zfparams)) understand URLs of

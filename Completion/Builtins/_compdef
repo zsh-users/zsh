@@ -1,0 +1,22 @@
+#compdef compdef
+
+local func base=2
+
+while [[ $words[base] = -* ]]; do
+  case $words[base] in
+    -d) delete=yes ;;
+    -p) type=pattern ;;
+    -k) type=key ;;
+  esac  
+  (( base++ ))
+done
+
+if [ "$delete" ]; then
+  compadd ${(k)_comps}
+else
+  if [[ CURRENT -eq base  ]]; then
+    for func in ${^~fpath:/.}/_(|*[^~])(N:t); compadd -P_ - ${func#_}
+  else
+    compgen -c
+  fi
+fi

@@ -47,19 +47,11 @@ myreport(Z-Shell Frequently-Asked Questions)(Peter Stephenson)(1999/05/24)
 COMMENT(-- the following are for Usenet and must appear first)\
 description(\
 mydit(Archive-Name:) unix-faq/shell/zsh
-mydit(Last-Modified:) 1999/07/24
+mydit(Last-Modified:) 1999/07/30
 mydit(Submitted-By:) email(pws@ibmth.df.unipi.it (Peter Stephenson))
-mydit(Version:) $Id: FAQ.yo,v 1.1.1.9 1999/09/17 02:58:59 akr Exp $
+mydit(Version:) $Id: FAQ.yo,v 1.1.1.10 1999/09/22 12:36:12 akr Exp $
 mydit(Posting-Frequency:) Monthly
 mydit(Copyright:) (C) P.W. Stephenson, 1995--1999 (see end of document)
-)
-
-bf(Changes since issue posted June 1999:)
-description(
-mydit(1.6)  FTP site changes
-mydit(3.9)  delete bogus claim that ttyctl code may be updated some day;
-     add note about possible termcap deinitialization sequences
-mydit(5.1)  80-column display bug.
 )
 
 This document contains a list of frequently-asked (or otherwise
@@ -300,17 +292,17 @@ sect(On what machines will it run?)
 sect(What's the latest version?)
 
   Zsh 3.0.6 is the latest production version. The new major number 3.0
-  largely reflects the considerable internal changes in zsh to make it
-  more reliable, consistent and (where possible) compatible.  Those
-  planning on upgrading their zsh installation should take a look at
-  the list of incompatibilities at the end of link(5.1)(51).  This is
-  longer than usual due to enhanced sh, ksh and POSIX compatibility.
+  largely reflects the considerable internal changes in zsh to make it more
+  reliable, consistent and (where possible) compatible.  Those planning on
+  upgrading their zsh installation should take a look at the list of
+  incompatibilities at the end of link(5.1)(51).  This is longer than usual
+  due to enhanced sh, ksh and POSIX compatibility.
 
-  The beta version 3.1.6 is also available, and has many new features.
-  Development of zsh is usually patch by patch, with each intermediate
-  version publicly available.  Note that this `open' development
-  system does mean bugs are sometimes introduced into the most recent
-  archived version.  These are usually fixed quickly.
+  The beta version 3.1.6 is also available.  Development of zsh is usually
+  patch by patch, with each intermediate version publicly available.  Note
+  that this `open' development system does mean bugs are sometimes
+  introduced into the most recent archived version.  These are usually
+  fixed quickly.
 
   Note also that as the shell changes, it may become incompatible with
   older versions; see the end of question link(5.1)(51) for a partial list.
@@ -365,18 +357,20 @@ url(http://www.math.technion.ac.il/mirror/ftp.zsh.org/pub/zsh/)
 (http://www.math.technion.ac.il/mirror/ftp.zsh.org/pub/zsh/)
     mydit(Italy)     url(ftp://ftp.unina.it/pub/Unix/pkgs/shell/zsh/)
 (ftp://ftp.unina.it/pub/Unix/pkgs/shell/zsh/)
-    mydit(Japan)     url(ftp://ftp.tohoku.ac.jp/mirror/zsh/)
-(ftp://ftp.tohoku.ac.jp/mirror/zsh/)
-    mydit()          url(ftp://ftp.nisiq.net/pub/shells/zsh/)
+    mydit(Japan)     url(ftp://ftp.nisiq.net/pub/shells/zsh/)
 (ftp://ftp.nis.co.jp/pub/shells/zsh/)
     mydit()          url(ftp://ftp.win.ne.jp/pub/shell/zsh/)
 (ftp://ftp.win.ne.jp/pub/shell/zsh/)
     mydit(Norway)    url(ftp://ftp.uit.no/pub/unix/shells/zsh/)
 (ftp://ftp.uit.no/pub/unix/shells/zsh/)
+    mydit(Poland)    url(ftp://sunsite.icm.edu.pl/pub/unix/shells/zsh/)
+(ftp://sunsite.icm.edu.pl/pub/unix/shells/zsh/)
     mydit(Romania)   url(ftp://ftp.roedu.net/pub/mirrors/ftp.zsh.org/pub/zsh/)
 (ftp://ftp.roedu.net/pub/mirrors/ftp.zsh.org/pub/zsh/)
-    mydit(Slovenia)  url(ftp://ftp.siol.net/pub/unix/shells/zsh/)
-(ftp://ftp.siol.net/pub/unix/shells/zsh/)
+    mydit()          url(ftp://ftp.kappa.ro/pub/mirrors/ftp.zsh.org/pub/zsh/)
+(ftp://ftp.kappa.ro/pub/mirrors/ftp.zsh.org/pub/zsh/)
+    mydit(Slovenia)  url(ftp://ftp.siol.net/mirrors/zsh/)
+(ftp://ftp.siol.net/mirrors/zsh/)
     mydit(Sweden)    url(ftp://ftp.lysator.liu.se/pub/unix/zsh/)
 (ftp://ftp.lysator.liu.se/pub/unix/zsh/)
     mydit(UK)        url(ftp://ftp.net.lut.ac.uk/zsh/)
@@ -384,9 +378,7 @@ url(http://www.math.technion.ac.il/mirror/ftp.zsh.org/pub/zsh/)
     mydit()          (also by FSP at port 21)
     mydit()          url(ftp://sunsite.org.uk/packages/zsh/)
 (ftp://sunsite.org.uk/packages/zsh/)
-    mydit(USA)       url(ftp://ftp.math.gatech.edu/pub/zsh/)
-(ftp://ftp.math.gatech.edu/pub/zsh/)
-    mydit()          url(ftp://uiarchive.uiuc.edu/pub/packages/shells/zsh/)
+    mydit(USA)       url(ftp://uiarchive.uiuc.edu/pub/packages/shells/zsh/)
 (ftp://uiarchive.uiuc.edu/pub/packages/shells/zsh/)
     mydit()          url(ftp://ftp.rge.com/pub/shells/zsh/)
 (ftp://ftp.rge.com/pub/shells/zsh/)
@@ -645,7 +637,7 @@ link(2.3)(23).
   )
     it() Traps and signals:
   itemize(
-    it()* Traps are not local to functions.  The option LOCAL_TRAPS will
+    it()* Traps are not local to functions.  The option LOCAL_TRAPS is
           be available from 3.1.6.
     it()  TRAPERR has become TRAPZERR (this was forced by UNICOS which
         has SIGERR).
@@ -661,8 +653,8 @@ link(2.3)(23).
         release either.)
     it()  Management of histories in multiple shells is different:
         the history list is not saved and restored after each command.
-        (The option tt(SHARE_HISTORY) will appear in 3.1.6 and will be
-        set in ksh compatibility mode to remedy this.)
+        The option tt(SHARE_HISTORY) appeared in 3.1.6 and is set in ksh
+        compatibility mode to remedy this.
     it()  mytt(\) does not escape editing chars (use mytt(^V)).
     it()  Not all ksh bindings are set (e.g. mytt(<ESC>#); try mytt(<ESC>q)).
     it()* mytt(#) in an interactive shell is not treated as a comment by
@@ -1368,13 +1360,14 @@ label(313)
   mytt(unsetopt cshjunkiequotes) and mytt(setopt cshjunkiequotes), or put it
   in your tt(.zshrc) before the option is set.
 
-  Arguably the prompt code should handle `print'-like escapes.  Feel
-  free to write this :-CHAR(41).  Otherwise, you can use
+  In all recent versions of zsh, there is a form of quoting which will
+  interpret print sequences like `tt(\n)' but otherwise acts like single
+  quotes: surround the string with tt($'...').  Hence:
   verb(
-    PROMPT=$(print "Hi Joe,\nwhat now?%# ")
+    PROMPT=$'Hi Joe,\nwhat now?%# '
   )
-  in your initialisation file.
-
+  is a neat way of doing what you want.  Note that it is the quotes, not
+  the prompt expansion, which turns the `tt(\n)' into a newline.
 
 sect(Why does mytt(bindkey ^a command-name) or mytt(stty intr ^-) do something funny?)
 
@@ -1543,7 +1536,7 @@ sect(How do I get a variable's value to be evaluated as another variable?)
   )
   produces the same result.
 
-  Versions 3.1.6 of zsh will allow you to do this directly with a new flag;
+  Versions 3.1.6 of allows you to do this directly with a new flag;
   mytt(${(P)E}).
 
   As a slight aside, sometimes people note that the syntax mytt(${${E}})
@@ -1591,8 +1584,8 @@ sect(What's wrong with cut and paste on my xterm?)
      which was used only on systems where the problem was known to exist,
      so it is possible some other systems were not handled (for example,
      certain versions of IRIX, it appears); also, continuation lines were
-     not handled properly.  A more reliable approach will appear in
-     versions 3.0.6 and 3.1.6.
+     not handled properly.  A more reliable approach appears from versions
+     3.0.6 and 3.1.6.
   myeit() When the shell is waiting for input, and you paste in a chunk of
      text consisting of more than one complete set of commands.
      Unfortunately, this is a much harder problem: the line editor is
@@ -1931,7 +1924,7 @@ this applies
      are mostly fixed in 3.1.6.
   it() Zsh's notion of the current line number (via tt($LINENO)) is
      sometimes not well handled, particularly when using functions and traps.
-     This should also work reliably from 3.1.6.
+     This should also work reliably from 3.0.6 and 3.1.6.
   it() In vi mode, mytt(u) can go past the original modification point.
   it() The singlelinezle option has problems with prompts containing escapes.
   it() The mytt(r) command does not work inside mytt($(...)) or mytt(`...`)
@@ -1971,9 +1964,9 @@ this applies
      mytt(compress file) any more.  For this reason, mytt(\M-n) and
      mytt(\M-p) use tt(history-beginning-search-{forward,backward}) which
      search for a line with the same prefix up to the cursor position.
-     From 3.1.6, there will be a different implementation which
-     makes this closer (though not identical) to the old behaviour.
-     The story for the tt({up,down}-line-or-search) commands is similar.
+     From 3.1.6, there is a different implementation which makes this
+     closer (though not identical) to the old behaviour. The story for the
+     tt({up,down}-line-or-search) commands is similar.
   it() In vi insert mode, the cursor keys no longer work.  The following
      will bind them:
       COMMENT(-- note space after backslash --)
@@ -2110,8 +2103,7 @@ sect(What's on the wish-list?)
   lexing/parsing/execution might also be an advantage.  Volunteers are
   particularly welcome for these tasks.
 
-  Here are some things which are definitely happening, and will probably
-  appear in zsh 3.1.6.
+  Here are the latest changes, which appeared in zsh 3.1.6.
   itemize(
   it() Even more powerful new completion system, based on shell functions,
      allowing much more detailed control both over generation of matches

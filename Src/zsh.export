@@ -19,6 +19,7 @@ arrlen
 attachtty
 bangchar
 bin_notavail
+bltinmodules
 breaks
 bslashquote
 bufstack
@@ -33,6 +34,7 @@ compctlreadptr
 cond_match
 cond_str
 cond_val
+condtab
 convbase
 coprocin
 coprocout
@@ -50,6 +52,7 @@ deletehookfunc
 deleteparamdefs
 deleteparamtable
 deletewrapper
+dirstack
 dosetopt
 doshfunc
 down_histent
@@ -78,6 +81,7 @@ findcmd
 freearray
 freeheap
 freelinklist
+freestr
 freestruct
 getaparam
 gethashnode
@@ -149,6 +153,7 @@ metadiffer
 metafy
 metalen
 mode_to_octal
+modules
 movefd
 movehistent
 mypgrp
@@ -195,6 +200,7 @@ pushheap
 putshout
 pwd
 quietgethist
+quietgethistent
 quotedzputs
 readoutput
 realparamtab

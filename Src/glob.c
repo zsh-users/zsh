@@ -2001,7 +2001,7 @@ getmatcharr(char ***ap, char *pat, int fl, int n, char *replstr)
 static int
 igetmatch(char **sp, Patprog p, int fl, int n, char *replstr)
 {
-    char *s = *sp, *t, *start, sav;
+    char *s = *sp, *t, sav;
     int i, l = strlen(*sp), ml = ztrlen(*sp), matched = 1;
 
     MUSTUSEHEAP("igetmatch");	/* presumably covered by prefork() test */
@@ -2210,7 +2210,7 @@ igetmatch(char **sp, Patprog p, int fl, int n, char *replstr)
 	LinkNode nd;
 	Repldata rd;
 	int lleft = 0;		/* size of returned string */
-	char *ptr;
+	char *ptr, *start;
 
 	i = 0;			/* start of last chunk we got from *sp */
 	for (nd = firstnode(repllist); nd; incnode(nd)) {

@@ -159,6 +159,10 @@ int validlist;
 
 static int ispattern, haspattern;
 
+/* Non-zero if at least one match was added without -U. */
+
+static int hasmatched;
+
 /* Two patterns used when doing glob-completion.  The first one is built *
  * from the whole word we are completing and the second one from that    *
  * part of the word that was identified as a possible filename.          */
@@ -230,6 +234,10 @@ static int unambig_mnum;
 
 static int mflags;
 
+/* Length of longest/shortest match. */
+
+static int maxmlen, minmlen;
+
 /* This holds the explanation strings we have to print in this group and *
  * a pointer to the current cexpl structure. */
 
@@ -287,6 +295,7 @@ struct cline {
     int olen;
     int slen;
     Cline prefix, suffix;
+    int min, max;
 };
 
 #define CLF_MISS  1
@@ -2003,6 +2012,39 @@ cp_cline(Cline l)
     return r;
 }
 
+/* Calculate the length of a cline and its sub-lists. */
+
+static int
+cline_sublen(Cline l)
+{
+    int len = ((l->flags & CLF_LINE) ? l->llen : l->wlen);
+
+    if (l->olen && !((l->flags & CLF_SUF) ? l->suffix : l->prefix))
+	len += l->olen;
+    else {
+	Cline p;
+
+	for (p = l->prefix; p; p = p->next)
+	    len += ((p->flags & CLF_LINE) ? p->llen : p->wlen);
+	for (p = l->suffix; p; p = p->next)
+	    len += ((p->flags & CLF_LINE) ? p->llen : p->wlen);
+    }
+    return len;
+}
+
+/* Set the lengths in the cline lists. */
+
+static void
+cline_setlens(Cline l, int both)
+{
+    while (l) {
+	l->max = cline_sublen(l);
+	if (both)
+	    l->min = l->max;
+	l = l->next;
+    }
+}
+
 /* This reverts the order of the elements of the given cline list and
  * returns a pointer to the new head. */
 
@@ -2217,8 +2259,8 @@ add_match_part(Cmatcher m, char *l, char *w, int wl,
     if (!strncmp(l, w, wl))
 	l = NULL;
 
-    /* Split the new part into parts and turn the last one into a `suffix'
-     * if we have a left anchor. */
+    /* Split the new part into parts and turn the last one into a
+     * `suffix' if we have a left anchor. */
 
     p = bld_parts(s, sl, osl, &lp);
 
@@ -2234,8 +2276,21 @@ add_match_part(Cmatcher m, char *l, char *w, int wl,
 	p = revert_cline(lp = p);
     /* Now add the sub-clines we already had. */
     if (matchsubs) {
-	matchlastsub->next = p->prefix;
-	p->prefix = matchsubs;
+	if (sfx) {
+	    Cline q;
+
+	    if ((q = lp->prefix)) {
+		while (q->next)
+		    q = q->next;
+		q->next = matchsubs;
+	    } else
+		lp->prefix = matchsubs;
+
+	    matchlastsub->next = NULL;
+	} else {
+	    matchlastsub->next = p->prefix;
+	    p->prefix = matchsubs;
+	}
 	matchsubs = matchlastsub = NULL;
     }
     /* Store the arguments in the last part-cline. */
@@ -2284,13 +2339,15 @@ add_match_sub(Cmatcher m, char *l, int ll, char *w, int wl)
  * matched prefix or suffix, not including the stuff before or after
  * the last anchor is given. When sfx is non-zero matching is done from
  * the ends of the strings backward, if test is zero, the global variables
- * above are used to build the string for the match and the cline. */
+ * above are used to build the string for the match and the cline. If
+ * part is non-zero, we are satisfied if only a part of the line-string
+ * is used (and return the length used). */
 
 static int
-match_str(char *l, char *w, int *bp, int *rwlp, int sfx, int test)
+match_str(char *l, char *w, int *bp, int *rwlp, int sfx, int test, int part)
 {
     int ll = strlen(l), lw = strlen(w), oll = ll, olw = lw;
-    int il = 0, iw = 0, t, ind, add, bc = (bp ? *bp : 0);
+    int il = 0, iw = 0, t, ind, add, bc = (bp ? *bp : 0), he = 0;
     VARARR(unsigned char, ea, ll + 1);
     char *ow;
     Cmlist ms;
@@ -2368,7 +2425,8 @@ match_str(char *l, char *w, int *bp, int *rwlp, int sfx, int test)
 		    if (ap) {
 			if (!pattern_match(ap, l + aoff, NULL, NULL) ||
 			    (both && (!pattern_match(ap, w + aoff, NULL, NULL) ||
-				      !match_parts(l + aoff, w + aoff, alen))))
+				      !match_parts(l + aoff, w + aoff, alen,
+						   part))))
 				continue;
 		    } else if (!both || il || iw)
 			continue;
@@ -2382,18 +2440,21 @@ match_str(char *l, char *w, int *bp, int *rwlp, int sfx, int test)
 		    for (t = 0, tp = w, ct = 0, ict = lw - alen + 1;
 			 ict;
 			 tp += add, ct++, ict--) {
-			if (both ||
-			    (pattern_match(ap, tp - moff, NULL, NULL) &&
-			     match_parts(l + aoff , tp - moff, alen))) {
+			if ((both &&
+			     (!ap || !test ||
+			      !pattern_match(ap, tp + aoff, NULL, NULL))) ||
+			    (!both &&
+			     pattern_match(ap, tp - moff, NULL, NULL) &&
+			     match_parts(l + aoff , tp - moff, alen, part))) {
 			    if (sfx) {
 				savw = tp[-zoff];
 				tp[-zoff] = '\0';
 				t = match_str(l - ll, w - lw,
-					      NULL, NULL, 1, 2);
+					      NULL, NULL, 1, 2, part);
 				tp[-zoff] = savw;
 			    } else
 				t = match_str(l + llen + moff, tp + moff,
-					      NULL, NULL, 0, 1);
+					      NULL, NULL, 0, 1, part);
 			    if (t || !both)
 				break;
 			}
@@ -2409,7 +2470,7 @@ match_str(char *l, char *w, int *bp, int *rwlp, int sfx, int test)
 
 		    /* Yes, add the strings and clines if this is a 
 		     * top-level call. */
-		    if (!test) {
+		    if (!test && (!he || (llen + alen))) {
 			char *op, *lp, *map, *wap, *wmp;
 			int ol;
 
@@ -2469,16 +2530,21 @@ match_str(char *l, char *w, int *bp, int *rwlp, int sfx, int test)
 		    lw -= alen; iw += alen;
 		    bc -= llen;
 
-		    if (!test && bc <= 0 && bp) {
+		    if (!test && bp && bc <= 0) {
 			*bp = matchbufadded + bc;
 			bp = NULL;
 		    }
 		    ow = w;
 
-		    if (!llen && !alen)
+		    if (!llen && !alen) {
 			lm = mp;
-		    else
-			lm = NULL;
+			if (he)
+			    mp = NULL;
+			else
+			    he = 1;
+		    } else {
+			lm = NULL; he = 0;
+		    }
 		    break;
 		} else if (ll >= mp->llen && lw >= mp->wlen) {
 		    /* Non-`*'-pattern. */
@@ -2561,12 +2627,13 @@ match_str(char *l, char *w, int *bp, int *rwlp, int sfx, int test)
 		    ll -= mp->llen; lw -= mp->wlen;
 		    bc -= mp->llen;
 
-		    if (!test && bc <= 0 && bp) {
+		    if (!test && bp && bc <= 0) {
 			*bp = matchbufadded + bc;
 			bp = NULL;
 		    }
 		    ow = w;
 		    lm = NULL;
+		    he = 0;
 		    break;
 		}
 	    }
@@ -2586,6 +2653,7 @@ match_str(char *l, char *w, int *bp, int *rwlp, int sfx, int test)
 		bp = NULL;
 	    }
 	    lm = NULL;
+	    he = 0;
 	} else {
 	    /* No matcher and different characters: l does not match w. */
 	    if (test)
@@ -2598,7 +2666,10 @@ match_str(char *l, char *w, int *bp, int *rwlp, int sfx, int test)
     }
     /* If this is a recursive call, we just return if l matched w or not. */
     if (test)
-	return !ll;
+	return (part || !ll);
+
+    if (part)
+	return il;
 
     /* In top-level calls, if ll is non-zero (unmatched portion in l),
      * we have to free the collected clines. */
@@ -2643,13 +2714,13 @@ match_str(char *l, char *w, int *bp, int *rwlp, int sfx, int test)
 
 /**/
 static int
-match_parts(char *l, char *w, int n)
+match_parts(char *l, char *w, int n, int part)
 {
     char lsav = l[n], wsav = w[n];
     int ret;
 
     l[n] = w[n] = '\0';
-    ret = match_str(l, w, NULL, NULL, 0, 1);
+    ret = match_str(l, w, NULL, NULL, 0, 1, part);
     l[n] = lsav;
     w[n] = wsav;
 
@@ -2704,7 +2775,7 @@ comp_match(char *pfx, char *sfx, char *w, Patprog cp,
 	/* Always try to match the prefix. */
 
 	*bpl = (qu ? qbrpl : brpl);
-	if ((mpl = match_str(pfx, w, bpl, &rpl, 0, 0)) < 0)
+	if ((mpl = match_str(pfx, w, bpl, &rpl, 0, 0, 0)) < 0)
 	    return NULL;
 
 	if (sfx && *sfx) {
@@ -2729,7 +2800,7 @@ comp_match(char *pfx, char *sfx, char *w, Patprog cp,
 
 	    /* The try to match the suffix. */
 	    *bsl = (qu ? qbrsl : brsl);
-	    if ((msl = match_str(sfx, w + mpl, bsl, &rsl, 1, 0)) < 0) {
+	    if ((msl = match_str(sfx, w + mpl, bsl, &rsl, 1, 0, 0)) < 0) {
 		free_cline(pli);
 
 		return NULL;
@@ -3398,6 +3469,7 @@ sub_join(Cline a, Cline b, Cline e, int anew)
 {
     if (!e->suffix && a->prefix) {
 	Cline op = e->prefix, n = NULL, *p = &n, t, ca;
+	int min = 0, max = 0;
 
 	for (; b != e; b = b->next) {
 	    if ((*p = t = b->prefix)) {
@@ -3407,6 +3479,8 @@ sub_join(Cline a, Cline b, Cline e, int anew)
 	    }
 	    b->suffix = b->prefix = NULL;
 	    b->flags &= ~CLF_SUF;
+	    min += b->min;
+	    max += b->max;
 	    *p = b;
 	    p = &(b->next);
 	}
@@ -3419,13 +3493,22 @@ sub_join(Cline a, Cline b, Cline e, int anew)
 
 	    if (anew) {
 		join_psfx(e, a, NULL, NULL, 0);
-		if (e->prefix)
+		if (e->prefix) {
+		    e->min += min;
+		    e->max += max;
 		    break;
+		}
 	    } else {
 		join_psfx(e, a, NULL, NULL, 0);
-		if (a->prefix)
+		if (a->prefix) {
+		    a->min += min;
+		    a->max += max;
 		    break;
+		}
 	    }
+	    min -= n->min;
+	    max -= n->max;
+
 	    n = n->next;
 	}
     }
@@ -3437,6 +3520,8 @@ sub_join(Cline a, Cline b, Cline e, int anew)
 static Cline
 join_clines(Cline o, Cline n)
 {
+    cline_setlens(n, 1);
+
     /* First time called, just return the new list. On further invocations
      * we will get it as the first argument. */
     if (!o)
@@ -3562,7 +3647,17 @@ join_clines(Cline o, Cline n)
 		    }
 		}
 	    }
-	    /* Ok, they are equal, now join the sub-lists. */
+	    /* Ok, they are equal, now copy the information about the
+             * original string if needed, calculate minimum and maximum
+	     * lengths, and join the sub-lists. */
+	    if (!o->orig && !o->olen) {
+		o->orig = n->orig;
+		o->olen = n->olen;
+	    }
+	    if (n->min < o->min)
+		o->min = n->min;
+	    if (n->max > o->max)
+		o->max = n->max;
 	    if (o->flags & CLF_MID)
 		join_mid(o, n);
 	    else
@@ -3599,6 +3694,7 @@ add_match_data(int alt, char *str, Cline line,
     Cmatch cm;
     Aminfo ai = (alt ? fainfo : ainfo);
     int palen, salen, qipl, ipl, pl, ppl, qisl, isl, psl;
+    int sl, lpl, lsl, ml;
 
     palen = salen = qipl = ipl = pl = ppl = qisl = isl = psl = 0;
 
@@ -3791,6 +3887,16 @@ add_match_data(int alt, char *str, Cline line,
     if (!ai->firstm)
 	ai->firstm = cm;
 
+    sl = strlen(str);
+    lpl = (cm->ppre ? strlen(cm->ppre) : 0);
+    lsl = (cm->psuf ? strlen(cm->psuf) : 0);
+    ml = sl + lpl + lsl;
+
+    if (ml < minmlen)
+	minmlen = ml;
+    if (ml > maxmlen)
+	maxmlen = ml;
+
     /* Do we have an exact match? More than one? */
     if (exact) {
 	if (!ai->exact) {
@@ -3799,13 +3905,10 @@ add_match_data(int alt, char *str, Cline line,
 		/* If a completion widget is active, we make the exact
 		 * string available in `compstate'. */
 
-		int sl = strlen(str);
-		int lpl = (cm->ppre ? strlen(cm->ppre) : 0);
-		int lsl = (cm->psuf ? strlen(cm->psuf) : 0);
 		char *e;
 
 		zsfree(compexactstr);
-		compexactstr = e = (char *) zalloc(lpl + sl + lsl + 1);
+		compexactstr = e = (char *) zalloc(ml + 1);
 		if (cm->ppre) {
 		    strcpy(e, cm->ppre);
 		    e += lpl;
@@ -3854,7 +3957,8 @@ addmatches(Cadata dat, char **argv)
     char *s, *ms, *lipre = NULL, *lisuf = NULL, *lpre = NULL, *lsuf = NULL;
     char **aign = NULL, **dparr = NULL, oaq = autoq, *oppre = dat->ppre;
     char *oqp = qipre, *oqs = qisuf, qc, **disp = NULL;
-    int lpl, lsl, pl, sl, bpl, bsl, llpl = 0, llsl = 0, nm = mnum;
+    int lpl, lsl, pl, sl, bpl, bsl, bppl = -1, bssl = -1;
+    int llpl = 0, llsl = 0, nm = mnum;
     int oisalt = 0, isalt, isexact, doadd, ois = instring, oib = inbackt;
     Cline lc = NULL;
     Cmatch cm;
@@ -3886,7 +3990,9 @@ addmatches(Cadata dat, char **argv)
      * was invoked. */
     SWITCHHEAPS(compheap) {
 	HEAPALLOC {
-	    doadd = (!dat->apar && !dat->opar && !dat->dpar);
+	    if ((doadd = (!dat->apar && !dat->opar && !dat->dpar)) &&
+		(dat->aflags & CAF_MATCH))
+		hasmatched = 1;
 	    if (dat->apar)
 		aparl = newlinklist();
 	    if (dat->opar)
@@ -3993,20 +4099,35 @@ addmatches(Cadata dat, char **argv)
 	    } else
 		lsl = 0;
 	    if (dat->aflags & CAF_MATCH) {
+		int ml;
+
 		s = dat->ppre ? dat->ppre : "";
-		if (llpl <= lpl && strpfx(lpre, s))
-		    lpre = "";
-		else if (llpl > lpl && strpfx(s, lpre))
-		    lpre += lpl;
-		else
-		    *argv = NULL;
+		bppl = brpl;
+		if ((ml = match_str(lpre, s, &bppl, NULL, 0, 0, 1)) >= 0)
+		    lpre += ml;
+		else {
+		    bppl = -1;
+		    if (llpl <= lpl && strpfx(lpre, s))
+			lpre = "";
+		    else if (llpl > lpl && strpfx(s, lpre))
+			lpre += lpl;
+		    else
+			*argv = NULL;
+		}
+
 		s = dat->psuf ? dat->psuf : "";
-		if (llsl <= lsl && strsfx(lsuf, s))
-		    lsuf = "";
-		else if (llsl > lsl && strsfx(s, lsuf))
-		    lsuf[llsl - lsl] = '\0';
-		else
-		    *argv = NULL;
+		bssl = brsl;
+		if ((ml = match_str(lsuf, s, &bssl, NULL, 0, 0, 1)) >= 0)
+		    lsuf[llsl - ml] = '\0';
+		else {
+		    bssl = -1;
+		    if (llsl <= lsl && strsfx(lsuf, s))
+			lsuf = "";
+		    else if (llsl > lsl && strsfx(s, lsuf))
+			lsuf[llsl - lsl] = '\0';
+		    else
+			*argv = NULL;
+		}
 	    }
 	    if (*argv) {
 		if (dat->pre)
@@ -4090,7 +4211,9 @@ addmatches(Cadata dat, char **argv)
 		    cm = add_match_data(isalt, ms, lc, dat->ipre, NULL,
 					dat->isuf, dat->pre, dat->prpre,
 					dat->ppre, dat->psuf, dat->suf,
-					bpl, bsl, dat->flags, isexact);
+					(bppl >= 0 ? bppl : bpl),
+					(bssl >= 0 ? bssl : bsl),
+					dat->flags, isexact);
 		    cm->rems = dat->rems;
 		    cm->remf = dat->remf;
 		    if (disp)
@@ -4587,6 +4710,9 @@ docompletion(char *s, int lst, int incmd)
 				"yes" : "");
 	movetoend = ((cs == we || isset(ALWAYSTOEND)) ? 2 : 1);
 	showinglist = 0;
+	hasmatched = 0;
+	minmlen = 1000000;
+	maxmlen = -1;
 
 	/* Make sure we have the completion list and compctl. */
 	if (makecomplist(s, incmd, lst)) {
@@ -6255,6 +6381,9 @@ makecomplistflags(Compctl cc, char *s, int incmd, int compadd)
     untokenize(lpre);
     untokenize(lsuf);
 
+    if (!(cc->mask & CC_DELETE))
+	hasmatched = 1;
+
     /* Handle completion of files specially (of course). */
 
     if ((cc->mask & (CC_FILES | CC_DIRS | CC_COMMPATH)) || cc->glob) {
@@ -7458,6 +7587,86 @@ inststrlen(char *str, int move, int len)
     return len;
 }
 
+/* This cuts the cline list before the stuff that isn't worth
+ * inserting in the line. */
+
+static Cline
+cut_cline(Cline l)
+{
+    Cline p, e = NULL, maxp = NULL;
+    int sum = 0, max = 0, tmp, ls = 0;
+
+    /* If no match was added with matching, we don't really know
+     * which parts of the unambiguous string are worth keeping,
+     * so for now we keep everything (in the hope that this
+     * produces a string containing at least everything that was 
+     * originally on the line). */
+
+    if (!hasmatched) {
+	cline_setlens(l, 0);
+	return l;
+    }
+    e = l = cp_cline(l);
+
+    /* First, search the last struct for which we have something on
+     * the line. Anything before that is kept. */
+
+    for (p = l; p; p = p->next)
+	if (p->orig || p->olen)
+	    e = p->next;
+
+    /* Then keep all structs without missing characters. */
+
+    while (e && !(e->flags & CLF_MISS))
+	e = e->next;
+
+    if (e) {
+	/* Then we see if there is another struct with missing
+	 * characters. If not, we keep the whole list. */
+
+	for (p = e->next; p && !(p->flags & CLF_MISS); p = p->next);
+
+	if (p) {
+	    for (p = e; p; p = p->next) {
+		if (!(p->flags & CLF_MISS))
+		    sum += p->max;
+		else {
+		    tmp = cline_sublen(p);
+		    if (tmp > 2 && tmp > ((p->max + p->min) >> 1))
+			sum += tmp - (p->max - tmp);
+		    else if (tmp < p->min)
+			sum -= (((p->max + p->min) >> 1) - tmp) << (tmp < 2);
+		}
+		if (sum > max) {
+		    max = sum;
+		    maxp = p;
+		}
+	    }
+	    if (max)
+		e = maxp;
+	    else {
+		int len = 0;
+
+		cline_setlens(l, 0);
+		ls = 1;
+
+		for (p = e; p; p = p->next)
+		    len += p->max;
+
+		if (len > ((minmlen << 1) / 3))
+		    return l;
+	    }
+	    e->line = e->word = NULL;
+	    e->llen = e->wlen = e->olen = 0;
+	    e->next = NULL;
+	}
+    }
+    if (!ls)
+	cline_setlens(l, 0);
+
+    return l;
+}
+
 /* This builds the unambiguous string. If ins is non-zero, it is
  * immediatly inserted in the line. Otherwise csp is used to return
  * the relative cursor position in the string returned. */
@@ -7466,11 +7675,13 @@ static char *
 cline_str(Cline l, int ins, int *csp)
 {
     Cline s;
-    int ocs = cs, ncs, pcs, pm, sm, d, b, i, j, li = 0;
+    int ocs = cs, ncs, pcs, pm, pmax, sm, smax, d, b, i, j, li = 0;
     int pl, sl, hasp, hass, ppos, spos, plen, slen;
 
+    l = cut_cline(l);
+
     ppos = spos = plen = slen = hasp = hass = 0;
-    pm = sm = d = b = pl = sl = -1;
+    pm = pmax = sm = smax = d = b = pl = sl = -1;
 
     /* Get the information about the brace beginning and end we have
      * to re-insert. */
@@ -7532,8 +7743,10 @@ cline_str(Cline l, int ins, int *csp)
 	}
 	/* Remember the position if this is the first prefix with
 	 * missing characters. */
-	if ((l->flags & CLF_MISS) && !(l->flags & CLF_SUF))
-	    pm = cs;
+	if ((l->flags & CLF_MISS) && !(l->flags & CLF_SUF) &&
+	    (pmax < (l->min - l->max))) {
+	    pm = cs; pmax = l->min - l->max;
+	}
 	pcs = cs;
 	/* Insert the anchor. */
 	if (l->flags & CLF_LINE)
@@ -7553,8 +7766,9 @@ cline_str(Cline l, int ins, int *csp)
 	if (l->flags & CLF_MISS) {
 	    if (l->flags & CLF_MID)
 		b = cs;
-	    else if (l->flags & CLF_SUF)
-		sm = cs;
+	    else if ((l->flags & CLF_SUF) && smax < (l->min - l->max)) {
+		sm = cs; smax = l->min - l->max;
+	    }
 	}
 	/* And now insert the suffix or the original string. */
 	if (l->olen && (l->flags & CLF_SUF) && !l->suffix) {

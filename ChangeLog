@@ -1,4 +1,214 @@
+1999-09-20  Peter Stephenson  <pws@ibmth.df.unipi.it>
+
+	* pws: Config/version.mk: version 3.1.6-pws-5
+
+	* Sven: 7953: Completion/Commands/_expand_word,
+	  Completion/Core/_expand, Doc/Zsh/compsys.yo: expand_completions
+	  configuration key.
+
+	* pws: 7952: Completion/X/_xutils: xrdb should complete file
+	  arguments.
+
+	* Sven: 7951: Src/subst.c, Doc/Zsh/expn.yo: parameter expansion flags
+	  for quoting with single or double quotes.
+
+	* Sven: 7950: Src/utils.c, Src/Zle/complist.c: more careful
+	  with VARARR's.
+
+	* Sven: 7949: 7949: Completion/X/_x_color,
+	  Completion/X/_x_extension, Completion/X/_x_window,
+	  Completion/X/_xutils: completion for standard X utilities.
+
+	* pws: 7948: Src/glob.c, Src/pattern.c: indexes weren't
+	  calculate properly in $mbegin, $mend, $MBEGIN, $MEND because
+	  of Meta bytes.
+
+	* Sven: 7947: Src/Zle/zle_tricky.c, Doc/Zsh/compwid.yo:
+	  compstate[insert] can be all to insert all matches.
+
+	* Sven: 7944: Src/Zle/zle_tricky.c, Completion/Core/_multi_parts,
+	  Completion/Core/_path_files, Completion/Core/_sep_parts:
+	  new heuristic for deciding whether to add strings under match
+	  control or if they are too ambiguous to be useful.
+
+	* Sven: 7943: Doc/Zsh/compsys.yo: docs for long args syntax
+	  in _arguments.
+
+	* Bart: zsh-users/2610: Completion/Builtins/_kill,
+	  Completion/Builtins/_wait, Completion/User/_gdb: split words
+	  for ps arguments (replaces 2609).
+
+	* Bart: 7938: Completion/Base/_arg_compile, Completion/Base/_describe:
+	  pre-compiler for _arguments and typo in describe.
+
+	* Tanaka Akira: 7937: Completion/User/_cvs, Completion/User/_lynx,
+	  Completion/User/_wget: it's good to have _values.
+
+	* Bart: 7934: Completion/User/_telnet: improvement.
+
+	* Bart: 7932: Completion/User/_mailboxes: more generic.
+
+	* Bart: 7929: Src/hist.c, Src/Zle/zle_tricky.c: handle gaps
+	  in history when scanning through it.
+
+	* Bart: 7928: Doc/Zsh/builtins.yo: typo in float stuff.
+
+	* Bart: 7925: Functions/Misc/run-help: various functions and
+	  builtins in manual pages other than zshbuiltins.
+
+	* Adam: 7923: Completion/Core/compinit: compconf quoting tweak.
+
+1999-09-17  Peter Stephenson  <pws@ibmth.df.unipi.it>
+
+	* pws: 7921: Src/glob.c: bad test in rarely used
+	  (string/)# globbing construct.
+
+	* Oliver: 7919: Completion/User/_man: try to find a manpath if
+	  none (slightly adapted).
+
+	* Sven: 7917: Src/loop.c: hunk missed from 7915.
+
+	* pws: 7915: Doc/Zsh/arith.yo, Doc/Zsh/builtins.yo,
+	  Src/Modules/parameter.c, Src/builtin.c, Src/cond.c, Src/exec.c,
+	  Src/math.c, Src/mem.c, Src/params.c, Src/subst.c, Src/zsh.h,
+	  configure.in:  Floating point support via typeset -F and
+	  typeset -E for variables and in matheval().  mnumber struct
+	  passes around float or integer.
+
+	* Sven: 7903: Completion/Builtins/_cd: more careful with
+	  things from cdablevars.
+
+	* Sven: 7902, 7912: Completion/Base/_arguments,
+	  Doc/Zsh/compsys.yo: autodescribe_options.
+
+	* Sven: 7900: Completion/Commands/_history_complete_word,
+	  Doc/Zsh/compsys.yo:  history_stop config opt stops history
+	  cycling past end.
+
+	* Sven: 7896: Src/Zle/zle_tricky.c: cursor positioning.
+
+	* Adam: 7892: Completion/User/_webbrowser: initial
+	  implementation of completion for web browsers.
+
+	* Adam: 7891: Completion/Core/compinit: error message in compdef.
+
+	* Tanaka Akira: 7888: Completion/User/_wget: completion for wget.
+
+	* Tanaka Akira; 7887: Completion/User/_telnet: try to get
+	  valid telnet options.
+
+	* Tanaka Akira: 7886: Completion/Base/_describe,
+	  Completion/Debian/_apt, Completion/User/_cvs: -d option for
+	  descriptions.
+
+	* Adam: 7882: Doc/Zsh/expn.yo: parentheses.
+
+1999-09-16  Peter Stephenson  <pws@ibmth.df.unipi.it>
+
+	* Adam: 7871: Completion/User/_perl_basepods,
+	  Completion/User/_perl_builtin_funcs,
+	  Completion/User/_perl_modules, Completion/User/_perldoc:
+	  perl completion.
+
+	* Sven: 7864: Src/Zle/zle_tricky.c: crash when browsing
+	  directory hierarchies with select and selecting an entry.
+
+	* Sven: 7863: Doc/Zsh/mod_parameter.yo, Src/Modules/parameter.c,
+	  Src/Modules/parameter.mdd: $dirstack and $modules special
+	  parameters.
+	
+	* Sven: 7866: Doc/Zsh/compsys.yo, Completion/User/_mutt:
+	  action necessary.
+
+	* Sven: 7862: Completion/Base/_arguments, Completion/User/_gcc,
+	  Doc/Zsh/compsys.yo, Src/Zle/zle_tricky.c: completion for gcc,
+	  -M match spec for _arguments, remove duplicate matches.
+
+	* Clint: 7860: Completion/User/_mailboxes, Completion/User/_mutt:
+	  mutt support.
+
+1999-09-15  Peter Stephenson  <pws@ibmth.df.unipi.it>
+
+	* pws: 7855: Doc/Zsh/zftpsys.yo, Functions/Zftp/zfopen:
+	  failed zfopen with arguments deletes the stored open parameters.
+
+	* Oliver: 7852: Completion/Builtins/_compdef,
+	  Completion/User/_man: new compdef support, _man works for whatis
+	  and apropos.
+
+	* Sven: 7850: Completion/Base/_arguments: minor cleanup.
+
+	* Sven: 7844: Src/Zle/complist.c, Src/Zle/zle_tricky.c,
+	  Doc/Zsh/compsys.yo, Etc/completion-style-guide,
+	  Completion/Base/_arguments, Completion/Base/_describe,
+	  Completion/Base/_subscript, Completion/Base/_tilde,
+	  Completion/Base/_values, Completion/Builtins/_cd,
+	  Completion/Builtins/_kill, Completion/Builtins/_wait,
+	  Completion/Core/_approximate, Completion/Core/_expand,
+	  Completion/User/_gdb: various matching display bugs
+	  (with compadd -d) and enhancements to correction and
+	  approximation keys.
+
+	* Tanaka Akira: 7840: Completion/Base/_tilde,
+	  Completion/Builtins/_cd: use compadd -d.
+
+	* pws: 7836: Src/Modules/zftp.c: bug from 7767: zftp rmsession
+	  incremented node pointer wrongly and assigned new session
+	  wrongly.
+
+	* pws: 7834: Src/pattern.c: bug from 7825, pure string path
+	  segments wouldn't approximate.
+
+1999-09-14  Peter Stephenson  <pws@ibmth.df.unipi.it>
+
+	* Sven: 7827: Src/Zle/comp.h, Src/Zle/compctl.c,
+	  Src/Zle/complist.c, Src/Zle/zle_tricky.c, Doc/Zsh/compsys.yo,
+	  Doc/Zsh/compwid.yo, Completion/Base/_arguments,
+	  Completion/Base/_values, Completion/Core/_display,
+	  Completion/User/_mount: compadd -d for list of elements
+	  to display instead of matches, -l to show one per line,
+	  plus changes in _display and uses thereof; typos in _mount.
+
+	* pws: 7825, 7848: Doc/Zsh/expn.yo, Src/glob.c, Src/pattern.c,
+	  Src/subst.c, Src/zsh.h: (#b) and (#m) globbing flags and
+	  inverses; speed up compilation of pure string patterns.
+
+	* Sven: 7823: Src/Zle/zle_tricky.c: improve joining of completion
+	  strings with different match control behaviour.
+
+	* Sven: 7824: Completion/Base/_arguments, Completion/Core/_message:
+	  improve `no more arguments' message.
+
+	* Sven: 7819: Completion/Base/_arguments, Doc/Zsh/compsys.yo:
+	  use of $options for single character options.
+
+	* Tanaka Akira: 7817: Completion/Debian/_apt,
+	  Completion/User/_socket, Completion/User/_perl_builtin_funcs:
+	  several improvements.
+
+	* Tanaka Akira: 7815: Completion/User/_combination,
+	  Completion/User/_ports, Completion/User/_socket,
+	  Completion/User/_telnet: more sophisticated port/user
+	  combinations via general combination mechanism.
+
+	* Bart: 7813: Src/subst.c: correct incorrect application of
+	  correction in 7697.
+
+	* Tanaka Akira: 7740: Completion/User/_man: handle gzipped and
+	  SGML manual pages.
+
 1999-09-13  Peter Stephenson  <pws@ibmth.df.unipi.it>
+
+	* pws: zsh-users/2598: Functions/Zle/incarg: zle function to
+	  increment number under cursor.
+
+	* pws: 7812: Completion/X/_xrdb: now exists.
+
+	* Tanaka Akira: 7809: Completion/Debian/_apt, Completion/User/_patch:
+	  new apt options and typo in _patch.
+
+	* Sven: 7808: Completion/Base/_arguments: don't add long options
+	  sometimes.
 
 	* pws: Config/version.mk: 3.1.6-pws-4.
 

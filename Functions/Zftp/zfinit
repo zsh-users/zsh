@@ -43,7 +43,7 @@ if [[ ${#_patcomps} -eq 0 || ${_patcomps[(i)zf*]} -gt ${#_patcomps} ]]; then
     -x 'W[1,-*n*]' \
     -s '$(awk -F, '\''NR > 2 { print $1 }'\'' ~/.ncftp/bookmarks)' -- \
     zfgoto zfmark
-  compctl -s '${$(zftp session):#$ZFTP_SESSION}' -- zfsession
+  compctl -s '${$(zftp session):#$ZFTP_SESSION}' zfsession
   # in _zftp for new completion, but hard to inline into a compctl
   zftransfer_match() {
     local sess=${1%%:*} oldsess=$ZFTP_SESSION
