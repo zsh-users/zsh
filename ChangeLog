@@ -1,3 +1,12 @@
+2001-08-13  Bart Schaefer  <schaefer@brasslantern.com>
+
+	* 15613 (plus unposted additions): Test/B02typeset.ztst: Tests for
+	correct behavior of typeset options and arguments.
+
+	* 15611: Src/builtin.c, Test/D06subscript.ztst: Fix crash bug when
+	assigning to array elements in a function in the arguments of
+	typeset or local.  Change test for new typeset restrictions.
+
 2001-08-12  Bart Schaefer  <schaefer@zsh.org>
 
 	* Peter Breitenlohner: 14956: Makefile.in, Doc/Makefile.in,
