@@ -635,6 +635,8 @@ dosetopt(int optno, int value, int force)
 	}
     } else if(!force && (optno == INTERACTIVE || optno == SHINSTDIN ||
 	    optno == SINGLECOMMAND)) {
+	if (opts[optno] == value)
+	    return 0;
 	/* it is not permitted to change the value of these options */
 	return -1;
     } else if(!force && optno == USEZLE && value) {
