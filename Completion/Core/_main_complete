@@ -25,7 +25,7 @@ setopt localtraps noerrexit ; trap - ZERR
 
 local func funcs ret=1 tmp _compskip format nm call match min max i num\
       _completers _completer _completer_num curtag _comp_force_list \
-      _matchers _matcher _matcher_num _comp_tags _comp_mesg \
+      _matchers _matcher _matcher_num _comp_tags _comp_mesg mesg str \
       context state line opt_args val_args curcontext="$curcontext" \
       _last_nmatches=-1 _last_menu_style _def_menu_style _menu_style sel \
       _saved_exact="${compstate[exact]}" \
@@ -266,23 +266,17 @@ elif [[ nm -eq 0 &&
   compstate[list]='list force'
   compstate[insert]=''
 
-  if [[ "$format" = *%d* ]]; then
-    local str mesg
+  tmp=( "\`${(@)^_lastdescr:#}'" )
 
-    _lastdescr=( "\`${(@)^_lastdescr:#}'" )
+  case $#tmp in
+  1) str="$tmp[1]";;
+  2) str="$tmp[1] or $tmp[2]";;
+  *) str="${(j:, :)tmp[1,-2]}, or $tmp[-1]";;
+  esac
 
-    case $#_lastdescr in
-    1) str="$_lastdescr[1]";;
-    2) str="$_lastdescr[1] or $_lastdescr[2]";;
-    *) str="${(j:, :)_lastdescr[1,-2]}, or $_lastdescr[-1]";;
-    esac
-
-    zformat -f mesg "$format" "d:$str"
-    compadd -UX "$mesg" -n - ''
-  else
-    _setup warnings
-    compadd -UQX "$format" -V warnings - "${(@)_lastdescr:#}"
-  fi
+  _setup warnings
+  zformat -f mesg "$format" "d:$str" "D:${(F)${(@)_lastdescr:#}}"
+  compadd -x "$mesg"
 fi
 
 [[ "$_comp_force_list" = always ||

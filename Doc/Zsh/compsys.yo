@@ -1143,12 +1143,9 @@ replaced with the message given by the completion function.
 
 Finally, when set with the tt(warnings) tag, the format string is printed
 when no matches could be generated at all.  In this case the `tt(%d)' is
-replaced with the descriptions for the matches that were expected.  If the
-value does not contain a `tt(%d)', then those descriptions are added in the
-same way as matches are added, i.e. they appear below the value for the
-tt(format) style laid out in columns.  The descriptions are added as if for
-the tag tt(warnings) so that you can use the tt(list-colors) style for that
-tag to highlight them.
+replaced with the descriptions for the matches that were expected
+separated by spaces and the sequence `tt(%D)' is replaced with those
+descriptions separated by newlines.
 
 The `tt(%)' for the sequences that are replaced by strings provided by 
 the completion functions like the `tt(%d)' may be followed by field

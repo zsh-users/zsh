@@ -267,7 +267,11 @@ select the next match to insert into the line
 item(tt(accept-and-infer-next-history))(
 accepts the current match and then tries completion with
 menu-selection again;  in the case of files this allows one to select
-a directory and immediately attempt to complete files in it
+a directory and immediately attempt to complete files in it;  if there 
+are no matches, a message is shown and one can use tt(undo) to go back 
+to completion on the previous level, every other key leaves menu
+selection (including the other zle functions which are otherwise
+special during menu selection)
 )
 item(tt(undo))(
 removes matches inserted during the menu selection by one of the three 

@@ -1632,6 +1632,7 @@ domenuselect(Hookdef dummy, Chdata dat)
     Menustack u = NULL;
     int i = 0, acc = 0, wishcol = 0, setwish = 0, oe = onlyexpl, wasnext = 0;
     int space, lbeg = 0, step = 1, wrap, pl = nlnct, broken = 0, first = 1;
+    int nolist = 0;
     char *s;
 
     if (fdat || (dummy && (!(s = getsparam("MENUSELECT")) ||
@@ -1639,6 +1640,7 @@ domenuselect(Hookdef dummy, Chdata dat)
 	if (fdat) {
 	    fdat->matches = dat->matches;
 	    fdat->num = dat->num;
+	    fdat->nmesg = dat->nmesg;
 	}
 	return 0;
     }
@@ -1753,8 +1755,13 @@ domenuselect(Hookdef dummy, Chdata dat)
 	}
 	setwish = wasnext = 0;
 
+    getk:
+
 	if (!(cmd = getkeycmd()) || cmd == Th(z_sendbreak)) {
 	    zbeep();
+	    break;
+	} else if (nolist && cmd != Th(z_undo)) {
+	    ungetkeycmd();
 	    break;
 	} else if (cmd == Th(z_acceptline)) {
 	    acc = 1;
@@ -1794,10 +1801,24 @@ domenuselect(Hookdef dummy, Chdata dat)
 	    iforcemenu = 0;
 
 	    if (dat->num < 1 || !minfo.cur || !*(minfo.cur)) {
-		noselect = clearlist = listshown = 1;
-		onlyexpl = 0;
-		zrefresh();
-		break;
+		nolist = 1;
+		if (dat->nmesg || nmessages) {
+		    showinglist = -2;
+		    zrefresh();
+		} else {
+		    trashzle();
+		    zsetterm();
+		    if (tccan(TCCLEAREOD))
+			tcout(TCCLEAREOD);
+		    fputs("no matches\r", shout);
+		    fflush(shout);
+		    tcmultout(TCUP, TCMULTUP, nlnct);
+		    showinglist = clearlist = 0;
+		    clearflag = 1;
+		    zrefresh();
+		    showinglist = clearlist = 0;
+		}
+		goto getk;
 	    }
 	    clearlist = listshown = 1;
 	    mselect = (*(minfo.cur))->gnum;
@@ -1861,7 +1882,7 @@ domenuselect(Hookdef dummy, Chdata dat)
 		break;
 
 	    handleundo();
-	    cs = 0;
+	    cs = nolist = 0;
 	    foredel(ll);
 	    spaceinline(l = strlen(u->line));
 	    strncpy((char *) line, u->line, l);
@@ -1879,7 +1900,7 @@ domenuselect(Hookdef dummy, Chdata dat)
 		lastmatches = u->lastmatches;
 		lastlmatches = u->lastlmatches;
 		nmatches = u->nmatches;
-		hasoldlist = 1;
+		hasoldlist = validlist = 1;
 	    }
 	    freebrinfo(brbeg);
 	    freebrinfo(brend);

@@ -350,8 +350,9 @@ do_completion(Hookdef dummy, Compldat dat)
     if (comppatmatch && *comppatmatch && comppatmatch != opm)
 	haspattern = 1;
     if (iforcemenu) {
-	do_ambig_menu();
-	ret = 0;
+	if (nmatches)
+	    do_ambig_menu();
+	ret = !nmatches;
     } else if (useline < 0)
 	ret = selfinsert(zlenoargs);
     else if (!useline && uselist) {
@@ -511,6 +512,7 @@ after_complete(Hookdef dummy, int *dat)
 
 	cdat.matches = amatches;
 	cdat.num = nmatches;
+	cdat.nmesg = nmessages;
 	cdat.cur = NULL;
 	if ((ret = runhookdef(MENUSTARTHOOK, (void *) &cdat))) {
 	    dat[1] = 0;

@@ -388,6 +388,7 @@ typedef struct chdata *Chdata;
 struct chdata {
     Cmgroup matches;		/* the matches generated */
     int num;			/* the number of matches */
+    int nmesg;			/* the number of messages */
     Cmatch cur;			/* current match or NULL */
 };
 
