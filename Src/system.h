@@ -418,7 +418,7 @@ struct timezone {
  * converted to printable decimal form including the sign and the     *
  * terminating null character. Below 0.30103 > lg 2.                  *
  * BDIGBUFSIZE is for a number converted to printable binary form.    */
-#define DIGBUFSIZE ((int)(((sizeof(zlong) * 8) - 1) * 0.30103) + 3)
+#define DIGBUFSIZE ((int)(((sizeof(zlong) * 8) - 1) * 30103/100000) + 3)
 #define BDIGBUFSIZE ((int)((sizeof(zlong) * 8) + 4))
 
 /* If your stat macros are broken, we will *
