@@ -266,6 +266,10 @@ install.info: texi
 		$(INSTALL_DATA) $$file $(DESTDIR)$(infodir) || exit 1; \
 	    done \
 	); then \
+	    if $(SHELL) -c 'install-info --version' >/dev/null 2>&1; then \
+	      install-info --dir-file=$(DESTDIR)$(infodir)/dir \
+	        $(infodir)/$(tzsh).info; \
+	    else true; fi; \
 	    rm -rf infodir; \
 	    exit 0; \
 	else \

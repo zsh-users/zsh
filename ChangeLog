@@ -1,5 +1,8 @@
 2000-07-03  Peter Stephenson  <pws@cambridgesiliconradio.com>
 
+	* 12146: Doc/Makefile.in: reintroduce mysteriously disappeared
+	code do install info files in directory.
+
 	* 12140: Completion/Core/compinit, Completion/Core/compinstall,
 	Doc/Zsh/compsys.yo: compinstall calls compinit after styles
 	are defined; compinit checks for _expand completer and if
