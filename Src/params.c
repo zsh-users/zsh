@@ -2743,7 +2743,7 @@ randomsetfn(UNUSED(Param pm), zlong v)
 
 /**/
 zlong
-intsecondsgetfn(Param pm)
+intsecondsgetfn(UNUSED(Param pm))
 {
     struct timeval now;
     struct timezone dummy_tz;
@@ -2758,7 +2758,7 @@ intsecondsgetfn(Param pm)
 
 /**/
 void
-intsecondssetfn(Param pm, zlong x)
+intsecondssetfn(UNUSED(Param pm), zlong x)
 {
     struct timeval now;
     struct timezone dummy_tz;
