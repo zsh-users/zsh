@@ -1,6 +1,7 @@
 #autoload
 
 local opts opt type=file glob group gopts dopts aopts tmp _file_pat_checked=yes
+local hasign ign
 
 opts=()
 group=()
@@ -9,11 +10,12 @@ dopts=(-/)
 aopts=(-f)
 while getopts "P:S:qr:R:W:F:J:V:X:f/g:M:12n" opt; do
   case "$opt" in
-  /)      type="${type}dir"                        ;;
-  g)      type="${type}glob"; gopts=(-g "$OPTARG") ;;
-  [qn12]) opts=("$opts[@]" "-$opt"          )      ;;
-  [JV])   group=(          "-$opt" "$OPTARG")      ;;
-  [^f])   opts=("$opts[@]" "-$opt" "$OPTARG")      ;;
+  /)      type="${type}dir"                               ;;
+  g)      type="${type}glob"; gopts=(-g "$OPTARG")        ;;
+  [qn12]) opts=("$opts[@]" "-$opt"          )             ;;
+  [JV])   group=(          "-$opt" "$OPTARG")             ;;
+  F)      opts=("$opts[@]" "-$opt" "$OPTARG"); hasign=yes ;;
+  [^f])   opts=("$opts[@]" "-$opt" "$OPTARG")             ;;
   esac
 done
 
@@ -60,32 +62,44 @@ while _tags; do
     if (( $#group )); then
       group[2]=all-files
       _setup all-files
+      [[ -z "$hasign" ]] &&
+        zstyle -a ":completion${curcontext}:all-files" ignored-patterns _comp_ignore &&
+	  ign=(-F _comp_ignore)
     fi
-    _path_files "$opts[@]" "$aopts[@]"
+    _path_files "$opts[@]" "$ign[@]" "$aopts[@]"
     return
   elif _requested directories; then
     if _requested globbed-files; then
       if (( $#group )); then
         group[2]=globbed-files
 	_setup globbed-files
+        [[ -z "$hasign" ]] &&
+          zstyle -a ":completion${curcontext}:all-files" ignored-patterns _comp_ignore &&
+	    ign=(-F _comp_ignore)
       fi
-      _path_files "$opts[@]" "$dopts[@]" "$gopts[@]" && return 0
+      _path_files "$opts[@]" "$ign[@]" "$dopts[@]" "$gopts[@]" && return 0
     else
       if (( $#group )); then
         group[2]=directories
 	_setup directories
+        [[ -z "$hasign" ]] &&
+          zstyle -a ":completion${curcontext}:all-files" ignored-patterns _comp_ignore &&
+	    ign=(-F _comp_ignore)
       fi
-      _path_files "$opts[@]" "$dopts[@]" && return 0
+      _path_files "$opts[@]" "$ign[@]" "$dopts[@]" && return 0
     fi
   elif _requested globbed-files; then
     if (( $#group )); then
       group[2]=globbed-files
       _setup globbed-files
+      [[ -z "$hasign" ]] &&
+        zstyle -a ":completion${curcontext}:all-files" ignored-patterns _comp_ignore &&
+	  ign=(-F _comp_ignore)
     fi
     if [[ "$type" = (*dir*glob*|*glob*dir*) ]]; then
-      _path_files "$opts[@]" "$dopts[@]" "$gopts[@]" && return 0
+      _path_files "$opts[@]" "$ign[@]" "$dopts[@]" "$gopts[@]" && return 0
     else
-      _path_files "$opts[@]" "$gopts[@]" && return 0
+      _path_files "$opts[@]" "$ign[@]" "$gopts[@]" && return 0
     fi
   fi
 done
