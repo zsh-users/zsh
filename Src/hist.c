@@ -2139,11 +2139,13 @@ lockhistfile(char *fn, int keep_trying)
 	    write(fd, tmpfile+len+1, strlen(tmpfile+len+1));
 	    close(fd);
 	    while (link(tmpfile, lockfile) < 0) {
-		if (stat(lockfile, &sb) < 0) {
+		if (errno != EEXIST || !keep_trying)
+		    ;
+		else if (stat(lockfile, &sb) < 0) {
 		    if (errno == ENOENT)
 			continue;
 		}
-		else if (keep_trying) {
+		else {
 		    if (time(NULL) - sb.st_mtime < 10)
 			sleep(1);
 		    else
