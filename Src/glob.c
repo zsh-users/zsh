@@ -813,7 +813,7 @@ qgetmodespec(char **s)
 	    }
 	    if (how == '=' || how == '-')
 		no |= val & mask;
-	} else {
+	} else if (!(end && c == end) && c != ',' && c) {
 	    t = 07777;
 	    while ((c = *p) == '?' || c == Quest ||
 		   (c >= '0' && c <= '7')) {
@@ -837,7 +837,10 @@ qgetmodespec(char **s)
 		yes |= val;
 	    else
 		no |= val;
-	}
+	} else {
+	    zerr("invalid mode specification", NULL, 0);
+	    return 0;
+        }
     } while (end && c != end);
 
     *s = p;

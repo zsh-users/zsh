@@ -4,6 +4,10 @@
 	18916 to use space to join if unset, as per POSIX; set IFS locally
 	in completion just in case.
 
+2003-08-01  Oliver Kiddle  <opk@zsh.org>
+
+	* 18922: Src/glob.c: fix minor bug with f glob qualifier
+
 2003-08-01  Peter Stephenson  <pws@csr.com>
 
 	* 18916: Src/utils.c: Unsetting IFS could cause segmentation
