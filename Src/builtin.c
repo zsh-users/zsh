@@ -951,8 +951,11 @@ cd_try_chdir(char *pfix, char *dest, int hard)
     else
 	unmetafy(buf, &dlen);
 
-    if (lchdir(dest, NULL, hard))	/* Try plain relative first */
-    if (lchdir(buf, NULL, hard)) {
+    /* We try the full path first.  If that fails, try the
+     * argument to cd relatively.  This is useful if the cwd
+     * or a parent directory is renamed in the interim.
+     */
+    if (lchdir(buf, NULL, hard) && lchdir(dest, NULL, hard)) {
 	free(buf);
 	return NULL;
     }
