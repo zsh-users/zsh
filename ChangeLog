@@ -1,3 +1,8 @@
+2002-01-23  Peter Stephenson  <pws@csr.com>
+
+	* 16489: Test/C01arith.ztst: default output for whole numbers
+	as floats now has `.' at the end, c.f. 16423.
+
 2002-01-22  Peter Stephenson  <pws@csr.com>
 
 	* 16487: Src/glob.c: bug in 16486 when a qualifier in a set

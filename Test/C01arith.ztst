@@ -16,7 +16,7 @@
   print -- $(( rnd = there * 10000 ))
 # save rounding problems by converting to integer
 0:basic floating point arithmetic
->31415
+>31415.
 
   print $(( 0x10 + 0X01 + 2#1010 ))
 0:base input
