@@ -50,7 +50,7 @@ shift
 if [[ -n "$showd" ]]; then
   compdescribe -I ' -- ' "$@"
 else
-  compdescribe -i ' -- ' "$@"
+  compdescribe -i "$@"
 fi
 
 [[ -n "$isopt" && "$compconfig[option_prefix]" = hide* ]] && hide=yes

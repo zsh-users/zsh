@@ -1,3 +1,5 @@
 moddeps="compctl zle"
 
 objects="computil.o"
+
+autobins="compdisplay compdescribe comparguments compvalues"

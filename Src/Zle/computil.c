@@ -291,9 +291,11 @@ bin_compdescribe(char *nam, char **args, char *ops, int func)
     }
     switch (args[0][1]) {
     case 'i':
+	cd_parsed = 1;
+	return cd_init(nam, "", args + 1, 0);
     case 'I':
 	cd_parsed = 1;
-	return cd_init(nam, args[1], args + 2, (args[0][1] == 'I'));
+	return cd_init(nam, args[1], args + 2, 1);
     case 'g':
 	if (cd_parsed) {
 	    int n = arrlen(args);

@@ -1,4 +1,4 @@
-texinode(The complist Module)(The deltochar Module)(The compctl Module)(Zsh Modules)
+texinode(The complist Module)(The computil Module)(The compctl Module)(Zsh Modules)
 sect(The complist Module)
 cindex(completion, listing)
 cindex(completion, coloured listings)

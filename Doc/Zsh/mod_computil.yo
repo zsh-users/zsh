@@ -1,0 +1,51 @@
+texinode(The computil Module)(The deltochar Module)(The complist Module)(Zsh Modules)
+sect(The computil Module)
+cindex(completion, utility)
+The tt(computil) module adds four builtin commands that are used by
+some of the completion functions in the shell function based
+completions system (see
+ifzman(zmanref(zshcompsys))\
+ifnzman(noderef(Completion System))
+). Except for tt(compdisplay) these builtin commands are very
+specialised and thus not very interesting when writing your own
+completion functions. In short, these builtin commands are:
+
+startitem()
+item(tt(compdisplay) var(name) var(string) var(defs) ...)(
+The var(defs) are strings should be of the form
+`var(str)tt(:)var(descr)' (the intended use is that the var(descr)
+describes the var(str)) and tt(compdisplay) will convert them to
+strings in which the colon is replaced by the var(string) given as the 
+second argument and spaces are inserted before that so that they are
+aligned over all strings. These resultings strings are then assigned
+to an array with the var(name) given as the first argument.
+)
+item(tt(compdescribe))(
+This is used by the tt(_describe) function to build the displays for
+the matches and to get the strings to add as matches with their
+options. The first call has to give the tt(-i) or tt(-I) option as the 
+first argument. In the first case, display strings without the
+descriptions will be generated, inthe second case, the string used to
+separate the matches from their descriptions has to be given as the
+second argument and the descriptions (if any) will be shown. All other 
+arguments are like the definition arguments to tt(_describe) itself.
+
+Once tt(compdescribe) has been called with either the tt(-i) or the
+tt(-I) option, it can be repeatedly called with the tt(-g) option and
+the names of five arrays as its arguments. This will step through the
+different sets of matches and store the options in the first array,
+the strings with descriptions in the second, the matches for these in
+the third, the strings without descriptions in the fourth, and the
+matches for them in the fifth array. These are then directly given to
+tt(compadd) to register the matches with the completion code.
+)
+item(tt(comparguments))(
+This is used by the tt(_arguments) function to do the argument and
+command line parsing. Like tt(compdescribe) it has an option tt(-i) to 
+do the parsing and initialize some internal state and various options
+to access the state information to decide what should be completed.
+)
+item(tt(compvalues))(
+Like tt(comparguments), but for the tt(_values) function.
+)
+enditem()

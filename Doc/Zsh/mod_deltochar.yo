@@ -1,4 +1,4 @@
-texinode(The deltochar Module)(The example Module)(The complist Module)(Zsh Modules)
+texinode(The deltochar Module)(The example Module)(The computil Module)(Zsh Modules)
 sect(The deltochar Module)
 The tt(deltochar) module makes available two ZLE functions:
 

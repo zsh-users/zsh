@@ -25,6 +25,10 @@ completion widgets.
 item(tt(complist))(
 Completion listing extensions.
 )
+item(tt(computil))(
+A module with utility builtins needed for the shell function based
+completion system.
+)
 item(tt(deltochar))(
 A ZLE function duplicating EMACS' tt(zap-to-char).
 )
@@ -62,6 +66,7 @@ menu(The clone Module)
 menu(The comp1 Module)
 menu(The compctl Module)
 menu(The complist Module)
+menu(The computil Module)
 menu(The deltochar Module)
 menu(The example Module)
 menu(The files Module)
@@ -78,6 +83,7 @@ includefile(Zsh/mod_clone.yo)
 includefile(Zsh/mod_comp1.yo)
 includefile(Zsh/mod_compctl.yo)
 includefile(Zsh/mod_complist.yo)
+includefile(Zsh/mod_computil.yo)
 includefile(Zsh/mod_deltochar.yo)
 includefile(Zsh/mod_example.yo)
 includefile(Zsh/mod_files.yo)

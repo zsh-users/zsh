@@ -82,13 +82,8 @@ if compvalues -i "$@"; then
 
       eval ws\=\( "${action[3,-3]}" \)
 
-      if [[ -n "$compconfig[describe_values]" &&
-            "$compconfig[describe_values]" != *\!${cmd}* ]] &&
-         compdisplay tmp ' -- ' "$ws[@]"; then
-	compadd "$expl[@]" -M 'r:|[_-]=* r:|=*' -ld tmp - "${(@)ws%%:*}"
-      else
-	compadd "$expl[@]" - "${(@)ws%%:*}"
-      fi
+      _describe "$descr" ws -M 'r:|[_-]=* r:|=*'
+
     elif [[ "$action" = \(*\) ]]; then
 
       # Anything inside `(...)' is added directly.
