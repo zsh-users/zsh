@@ -1,0 +1,24 @@
+#autoload
+
+local expl
+
+if (( ! $+_color_cache )); then
+  local file
+
+  # Cache of color names doesn't exist yet, create it.
+
+  file=( /usr/{lib,{{X11R6,openwin},local{,/X11{,R6}}}/lib}/X11/rgb.txt(N) )
+
+  if (( $#file )); then
+    _color_cache=( "${(@)${(@f)$(< $file[1])}[2,-1]##*		}" )
+  else
+
+    # Stupid default value.
+
+    _color_cache=(white black gray red blue green)
+  fi
+fi
+
+_description expl 'color specification'
+compadd "$@" "$expl[@]" -M 'm:{a-z}={A-Z} m:-=\  r:|[ A-Z0-9]=* r:|=*' - \
+        "$_color_cache[@]"
