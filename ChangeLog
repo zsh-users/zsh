@@ -1,6 +1,6 @@
 2005-02-02  Peter Stephenson  <pws@csr.com>
 
-	* 2077: Test/A06assign.ztst, Test/C02cond.ztst: tests for
+	* 20777: Test/A06assign.ztst, Test/C02cond.ztst: tests for
 	users/8422 and 20774.
 
 	* unposted: README, Config/version.mk, Etc/FAQ.yo: update version
