@@ -1,0 +1,8 @@
+#autoload
+
+local expl
+
+: ${(A)ports:=${${(M)${${(f)"$(</etc/services)"}:#\#*}#*/tcp}%%[ 	]*}}
+
+_description expl port
+compadd "$@" "$expl[@]" - "$ports[@]"

@@ -2,9 +2,11 @@
 
 # Parameter used:
 #
-#  telnet_ports
-#    The associative array that maps a host name to a space-separated list of
-#    ports.
+#  telnet_hosts_ports_users
+#    The array that contains 3-tuples `host:port:user'.
+
+local state line expl
+typeset -A options
 
 _arguments -s \
   -{F,f,x} \
@@ -19,9 +21,33 @@ _arguments -s \
   '-d[debug mode]' \
   '-e+[specify escape character]:escape character:' \
   '-k+:realm:' \
-  '-l+[specify user]:user:' \
+  '-l+[specify user]:user:->users' \
   '-n+[specify tracefile]:tracefile:_files' \
   '-r[rlogin like user interface]' \
-  ':host:{ compadd "$expl[@]" - ${(k)telnet_ports} || _hosts "$expl[@]" }' \
-  ':port:{ if (( $+telnet_ports )); then compadd "$expl[@]" - ${=telnet_ports[$line[2]]}; else _message "port"; fi }'
+  ':host:->hosts' \
+  ':port:->ports'
 
+case "$state" in
+hosts)
+  _description expl 'host'
+  _combination telnet_hosts_ports_users \
+    ${options[-l]:+users=${options[-l]:q}} \
+    hosts "$expl[@]"
+  ;;
+
+ports)
+  _description expl 'port'
+  _combination telnet_hosts_ports_users \
+    ${options[-l]:+users=${options[-l]:q}} \
+    hosts="${line[2]:q}" \
+    ports "$expl[@]"
+  ;;
+
+users)
+  _description expl 'user'
+  _combination telnet_hosts_ports_users \
+    ${line[2]:+hosts="${line[2]:q}"} \
+    ${line[3]:+ports="${line[3]:q}"} \
+    users "$expl[@]"
+  ;;
+esac

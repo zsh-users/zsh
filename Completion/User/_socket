@@ -2,10 +2,8 @@
 
 # Parameter used:
 #
-#  socket_ports
-#    The associative array that maps a host name to a space-separated list of 
-#    ports.
-
+#  socket_hosts_ports
+#    The array that contains paris `host:port'.
 
 local state line expl
 typeset -A options
@@ -28,18 +26,14 @@ arg1)
     _message 'port to listen'
   else
     _description expl 'host'
-    compadd "$expl[@]" - ${(k)socket_ports} || _hosts "$expl[@]"
+    _combination socket_hosts_ports hosts "$expl[@]"
   fi
   ;;
 
 arg2)
   if (( ! $+options[-s] )); then
     _description expl 'port to connect'
-    if (( $+socket_ports )); then
-      compadd "$expl[@]" - ${=socket_ports[$line[2]]};
-    else
-      _message 'port to connect';
-    fi
+    _combination socket_hosts_ports hosts="${line[2]:q}" ports "$expl[@]"
   fi
   ;;
 esac
