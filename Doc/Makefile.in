@@ -78,9 +78,9 @@ zsh.dvi: zsh.texi
 $(sdir)/zsh.texi.in: $(sdir)/zsh.yo
 	$(YODL) -o $(sdir)/zsh.texi.in -I$(sdir) -w ztexi.yo version.yo zsh.yo
 
-zsh.texi: zsh.texi.in
-	@test -f $(sdir)/zsh.texi.in -a -s $(sdir)/zsh.texi.in
-	sed '/@setfilename/{; s/@setfilename //; $(transform) ; s/^/@setfilename /;}' < $(sdir)/zsh.texi > zsh.texi
+zsh.texi: $(sdir)/zsh.texi.in
+	@test -f $< -a -s $<
+	sed '/@setfilename/{; s/@setfilename //; $(transform) ; s/^/@setfilename /;}' < $< > zsh.texi
 
 .yo.1:
 	case $@ in \
