@@ -168,9 +168,11 @@ if [[ $compstate[old_list] = keep || nm -gt 1 ]]; then
   if [[ "$compstate[insert]" = *menu* ]]; then
     if [[ -n "$_menu_style[(r)no-select*]" ]]; then
       unset MENUSELECT
-    elif [[ -n "$_menu_style[(r)select=long*]" && tmp -gt LINES ]]; then
-      zmodload -i zsh/complist
-      MENUSELECT=0
+    elif [[ -n "$_menu_style[(r)select=long*]" ]]; then
+      if [[ tmp -gt LINES ]]; then
+        zmodload -i zsh/complist
+        MENUSELECT=0
+      fi
     else
       sel=( "${(@M)_menu_style:#select*}" )
 
@@ -191,6 +193,8 @@ if [[ $compstate[old_list] = keep || nm -gt 1 ]]; then
 
         zmodload -i zsh/complist
         MENUSELECT="$min"
+      else
+        unset MENUSELECT
       fi
     fi
   fi

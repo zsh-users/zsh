@@ -1,5 +1,10 @@
 2000-05-16  Sven Wischnowsky  <wischnow@zsh.org>
 
+	* 11408: Completion/Core/_main_complete, Completion/Core/_normal,
+ 	Doc/Zsh/compsys.yo: fixed configuration of menu-selection with
+ 	menu style; pseudo-context `-command-line-', handy for completion
+ 	in vared
+	
 	* 11407: Completion/Base/_tilde, Completion/Core/_path_files:
  	avoid tilde- and parameter-completion in quotes
 	

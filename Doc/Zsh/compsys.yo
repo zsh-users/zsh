@@ -2096,7 +2096,11 @@ named `tt(_tilde)').
 Before trying to find a function for a specific context, tt(_complete) 
 checks if the parameter `tt(compcontext)' is set to a non-empty
 value. If it is, the value is taken as the name of the context to use
-and the function defined for that context will be called.
+and the function defined for that context will be called. For this
+purpose, there is a special context named tt(-command-line-) that
+completes whole command lines (commands and their arguments) and is
+not used by the completion system itself, but has a function handling
+completion for it.
 )
 findex(_approximate)
 item(tt(_approximate))(
