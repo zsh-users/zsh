@@ -1,3 +1,7 @@
+2001-10-08  Peter Stephenson  <pws@csr.com>
+
+	* unposted: LICENCE: wording change from ages ago.
+
 2001-10-08  Oliver Kiddle  <opk@zsh.org>
 
 	* 15973: Completion/Zsh/Command/_print, Doc/Zsh/builtins.yo,
