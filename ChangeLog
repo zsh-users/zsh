@@ -1,3 +1,9 @@
+2000-05-02  Sven Wischnowsky  <wischnow@informatik.hu-berlin.de>
+
+	* 11047: Completion/Core/_sort_tags, Doc/Zsh/compsys.yo,
+ 	Doc/Zsh/compwid.yo: completion doc fixes and cleanup; _sort_tags
+ 	updated
+	
 2000-05-01  Bart Schaefer  <schaefer@zsh.org>
 
 	* 11043: Completion/Core/_expand, Completion/User/_nedit: Catch

@@ -1,28 +1,19 @@
 #autoload
 
-comptry arguments values
+comptry -m '(|*-)argument-* (|*-)option-* values'
 comptry options
 
-case "$contexts" in
 # Some silly examples commented out:
 #
-# *p[bgpn]m*)           # change the order for file-completion
-#   comptry globbed-files directories
-#   comptry all-files
-#   ;;
-# *:dvips,-o*)          # automatic context set by _arguments
-#   comptry all-files
-#   return
-#   ;;
-# *:kill,*)
+# case "$curcontext" in
+# *:*:*:kill:*)
 #   comptry processes
-#   return              # this return ensures that we use only processes
+#   return 1                 # this return ensures that we use only processes
 #   ;;
-*)
-  comptry globbed-files
-  comptry directories
-  comptry all-files
-  ;;
-esac
+# *:*:*:-command-*)
+#   comptry commands functions
+#   comptry builtins aliases
+#   ;;                       # no return, reserved-words and params after this
+# esac
 
-comptry "$@"
+return 0

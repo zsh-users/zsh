@@ -255,7 +255,7 @@ item(tt(list_lines))(
 This gives the number of lines that are needed to display the full
 list of completions. Note that to calculate the total number of lines
 to display you need to add the number of lines needed for the command
-line to this value, this is available as the value of the tt(BLINES)
+line to this value, this is available as the value of the tt(BUFFERLINES)
 special parameter.
 )
 vindex(last_prompt, compstate)
@@ -272,9 +272,9 @@ line.  On entry to the widget function, if it is unset the command line is
 not to be changed; if set to tt(unambiguous), any prefix common to all
 matches is to be inserted; if set to tt(automenu-unambiguous), the
 common prefix is to be inserted and the next invocation of the
-completion code may start menu-completion (due to the tt(AUTO_MENU)
-option being set); if set to tt(menu) or tt(automenu) menu-completion
-will be started for the matches currently generated due to (in the
+completion code may start menucompletion (due to the tt(AUTO_MENU)
+option being set); if set to tt(menu) or tt(automenu) menucompletion
+will be started for the matches currently generated (in the
 latter case this will happen because the tt(AUTO_MENU) is set).
 
 On exit it may be set to any of the values above (where setting it to
@@ -282,14 +282,14 @@ the empty string is the same as unsetting it), or to a number, in which
 case the match whose number is given will be inserted into the command line.
 Negative numbers count backward from the last match (with `tt(-1)'
 selecting the last match) and out-of-range values are wrapped
-around, so that a value of zero selects the last match group and a value
+around, so that a value of zero selects the last match and a value
 one more than the maximum selects the first. Unless the value of this
-key ends in a space, the match is inserted as in a menu-completion,
+key ends in a space, the match is inserted as in a menucompletion,
 i.e. without automatically appending a space.
 
 Both tt(menu) and tt(automenu) may also specify the the number of the
 match to insert, given after a colon.  For example, `tt(menu:2)' says
-to start menu-completion, beginning with the second match.
+to start menucompletion, beginning with the second match.
 
 Finally, it may also be set to tt(all), which makes all matches
 generated be inserted into the line.
@@ -339,6 +339,9 @@ item(tt(exact))(
 Controls the behaviour when the tt(REC_EXACT) option is set.  It will be
 set to tt(accept) if an exact match would be accepted, and will be unset
 otherwise.
+
+If it was set when at least one match equal to the string on the line
+was generated, the match is accepted.
 )
 vindex(exact_string, compstate)
 item(tt(exact_string))(
@@ -348,21 +351,21 @@ vindex(pattern_match, compstate)
 item(tt(pattern_match))(
 Locally controls the behaviour given by the tt(GLOB_COMPLETE) option.
 Initially it is set to `tt(*)' if and only if the option is set.
-The completion widget may set it to either of these two values, or to any
+The completion widget may set it to this value, to an empty string
+(which has the same effect as unsetting it), or to any
 other non-empty string.  If it is non-empty, unquoted metacharacters on the
 command line will be treated as patterns; if it is `tt(*)', then
 additionally a wildcard `tt(*)' is assumed at the cursor position; if
 it is empty or unset, metacharacters will be treated literally.
 
-Note that the matcher specifications given globally or to one of the
-builtin commands adding matches are not used if this is set to a
-non-empty string.
+Note that the matcher specifications given to the tt(compadd) builtin
+command are not used if this is set to a non-empty string.
 )
 vindex(pattern_insert, compstate)
 item(tt(pattern_insert))(
-Normally this is set to tt(menu), which specifies that menu-completion will
+Normally this is set to tt(menu), which specifies that menucompletion will
 be used whenever the matches were generated using pattern matching. If it
-is set to any other non-empty string by the user and menu-completion is
+is set to any other non-empty string by the user and menucompletion is
 not selected by other option settings, the code will insert an
 unambiguous string for the generated matches as with normal completion.
 )
@@ -394,8 +397,8 @@ xitem([ tt(-i) var(ignored-prefix) ] [ tt(-I) var(ignored-suffix) ])
 xitem([ tt(-W) var(file-prefix) ] [ tt(-d) var(array) ])
 xitem([ tt(-J) var(name) ] [ tt(-V) var(name) ] [ tt(-X) var(explanation) ])
 xitem([ tt(-r) var(remove-chars) ] [ tt(-R) var(remove-func) ])
-xitem([ tt(-M) var(match-spec) ] [ tt(-O) var(array) ] [ tt(-A) var(array) ])
-item([ tt(-D) var(array) ] [ tt(--) ] [ var(words) ... ])(
+xitem([ tt(-D) var(array) ] [ tt(-O) var(array) ] [ tt(-A) var(array) ])
+item([ tt(-M) var(match-spec) ] [ tt(--) ] [ var(words) ... ])(
 
 This builtin command can be used to add matches directly and control
 all the information the completion code stores with each possible
@@ -417,7 +420,7 @@ that is considered part of the match but that should not be shown when
 listing completions, given with the tt(-p) option; for example,
 functions that do filename generation might specify
 a common path prefix this way. var(<word>) is the part of the match that
-should appear in the list of completions, one of the tt(words) given at the
+should appear in the list of completions, one of the var(words) given at the
 end. The suffixes var(<hsuf>), var(<asuf>) and var(<isuf>) correspond to
 the prefixes var(<hpre>), var(<apre>) and var(<ipre>) and are given by the
 options tt(-s), tt(-S) and tt(-I), respectively.
@@ -431,7 +434,7 @@ string given is not considered as part of the match and any shell
 metacharacters in it will not be quoted when the string is inserted.
 )
 item(tt(-S) var(suffix))(
-Like tt(-P) but gives a string to be inserted after the match.
+Like tt(-P), but gives a string to be inserted after the match.
 )
 item(tt(-p) var(hidden-prefix))(
 This gives a string that should be inserted into the command line before the
@@ -744,9 +747,11 @@ characters in the string to be completed (referred to here as the
 command line) map onto the characters in the list of matches produced by
 the completion code (referred to here as the trial completions). Note
 that this is not used if the command line contains a glob pattern and
-the tt(GLOB_COMPLETE) option is set.
+the tt(GLOB_COMPLETE) option is set or the tt(pattern_match) of the
+tt(compstate) special association is set to a non-empty string.
 
-The var(spec) consists of one or more matching descriptions separated by
+The var(spec) given as argument to the tt(-m) option consists of one
+or more matching descriptions separated by
 whitespace. Each description consists of a letter followed by a colon,
 then the patterns describing which character sequences on the line match
 which character sequences in the trial completion.  Any sequence of characters not
@@ -777,7 +782,7 @@ anchor can occur anywhere, but must match in both the command line and
 trial completion strings.
 
 If no var(lpat) is given, but a var(ranchor), this matches the gap
-between substrings matched by var(lanchor) an var(ranchor). Unlike
+between substrings matched by var(lanchor) and var(ranchor). Unlike
 var(lanchor), the var(ranchor) only needs to match the trial
 completion string.
 )
@@ -862,25 +867,25 @@ To make uppercase letters match the lowercase forms as well:
 example(compadd -M 'm:{a-zA-Z}={A-Za-z}' ... )
 
 A nice example for the use of tt(*) patterns is partial word
-completion. Sometimes you would like to make strings like tt(c.s.u)
-complete to strings like tt(comp.source.unix), i.e. the word on the
+completion. Sometimes you would like to make strings like `tt(c.s.u)'
+complete to strings like `tt(comp.source.unix)', i.e. the word on the
 command line consists of multiple parts, separated by a dot in this
 example, where each part should be completed separately --- note,
-however, that the case where each part of the word, i.e. tt(comp),
-tt(source) and tt(unix) in this example, is to be completed separately
-is a different problem to be solved by extended completion.  The
-example can be handled by:
+however, that the case where each part of the word, i.e. `tt(comp)',
+`tt(source)' and `tt(unix)' in this example, is to be completed separately
+is a different problem to be solved by the implementation of the
+completion widget.  The example can be handled by:
 
 example(compadd -M 'r:|.=* r:|=*' \ 
   - comp.sources.unix comp.sources.misc ...)
 
-The first specification says that tt(lpat) is the empty string, while
-tt(anchor) is a dot; tt(tpat) is tt(*), so this can match anything
+The first specification says that var(lpat) is the empty string, while
+var(anchor) is a dot; var(tpat) is tt(*), so this can match anything
 except for the `tt(.)' from the anchor in
-the trial completion word.  So in tt(c.s.u), the matcher sees tt(c),
+the trial completion word.  So in `tt(c.s.u)', the matcher sees `tt(c)',
 followed by the empty string, followed by the anchor `tt(.)', and
 likewise for the second dot, and replaces the empty strings before the
-anchors, giving tt(c)[tt(omp)]tt(.s)[tt(ources)]tt(.u)[tt(nix)], where
+anchors, giving `tt(c)[tt(omp)]tt(.s)[tt(ources)]tt(.u)[tt(nix)]', where
 the last part of the completion is just as normal.
 
 With the pattern shown above, the string `tt(c.u)' could not be
@@ -898,7 +903,7 @@ normally try to match trial completions that end with the string as
 typed so far, i.e. it will only insert new characters at the cursor
 position rather then at the end.  However in our example we would like
 the code to recognise matches which contain extra characters after the
-string on the line (the tt(nix) in the example).  Hence we say that the
+string on the line (the `tt(nix)' in the example).  Hence we say that the
 empty string at the end of the string on the line matches any characters
 at the end of the trial completion.
 
@@ -913,7 +918,7 @@ with the above in effect, you can just type tt(very.c) before attempting
 completion.
 
 The specifications with both a left and a right anchor are useful to
-complete partial words whose parts are not really separated by some
+complete partial words whose parts are not separated by some
 special character. For example, in some places strings have to be
 completed that are formed `tt(LikeThis)' (i.e. the separate parts are
 determined by a leading uppercase letter) or maybe one has to
@@ -923,11 +928,11 @@ form with only one anchor as in:
 example(compadd -M 'r:|[A-Z0-9]=* r:|=*' LikeTHIS FooHoo foo123 bar234)
 
 But with this, the string `tt(H)' would be completed to `tt(FooHoo)'
-em(and) tt(LikeTHIS) and `tt(2)' would be completed to the other two
+em(and) `tt(LikeTHIS)' and `tt(2)' would be completed to the other two
 strings because characters can be inserted before every uppercase
 letter and digit. To avoid this one would use:
 
-example(compadd -M 'r:[^A-Z0-9]||[A-Z0-9]=* r:|=*' \
+example(compadd -M 'r:[^A-Z0-9]||[A-Z0-9]=* r:|=*' \ 
     LikeTHIS FooHoo foo123 bar234)
 
 By using these two anchors, a `tt(H)' matches only uppercase `H's that 
@@ -939,9 +944,8 @@ When using the completion system (see
 ifzman(zmanref(zshcompsys))\
 ifnzman(noderef(Completion System))\
 ), users can define match specifications that are to be used for
-specific contexts by using the tt(matcher) style and match
-specifications that are to be used everywhere can be defined by the
-use of the tt(_matcher) completer.
+specific contexts by using the tt(matcher) and tt(matcher-list)
+styles. The values for the latter will be used everywhere.
 
 texinode(Examples)()(Matching Control)(Completion Widgets)
 sect(Examples)
