@@ -1,5 +1,8 @@
 2001-11-15  Clint Adams  <clint@zsh.org>
 
+	* unposted: Functions/Prompts/prompt_clint_setup:
+	typo that I didn't notice for four months.
+
 	* 16257: Completion/Debian/Command/.distfiles,
 	Completion/Debian/Command/_dput: completion for
 	dput as contributed by Tollef Fog Heen <tollef@add.no>.

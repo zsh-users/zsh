@@ -67,7 +67,7 @@ prompt_clint_apm_precmd () {
   local bat
 
   bat=${${="$(</proc/apm)"}[7]/%/%%}
-  [[ $bat == ("100%"|"-1%") ]] && psvar[3]=() || psvar[2]=$bat
+  [[ $bat == ("100%"|"-1%") ]] && psvar[2]=() || psvar[2]=$bat
 }
 
 prompt_clint_setup "$@"
