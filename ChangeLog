@@ -1,5 +1,10 @@
 2002-02-03  Clint Adams  <clint@zsh.org>
 
+        * 16514: Completion/Unix/Command/_init_d: do not attempt
+        to read file if it doesn't exist, match pipe-separated lists
+        and characters following the parenthesis, and don't wantonly
+        remove hyphens from completions.
+
         * Sven: 16507: Completion/Zsh/Type/_command_names: slight
 	improvement for 16500 to allow completion after ./<TAB> in
 	all cases
