@@ -1,3 +1,8 @@
+2000-05-02  Peter Stephenson  <pws@cambridgesiliconradio.com>
+
+	* 11066: Src/exec.c: suppress doing in and/or when at the end
+	of a sequence of &&/|| when another sublist follows.
+
 2000-05-02  Oliver Kiddle  <opk@zsh.org>
 
 	* 11065: Completion/Commands/_complete_debug: small fix to avoid
