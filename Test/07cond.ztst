@@ -11,6 +11,7 @@
   touch	unmodified
 
   touch zerolength
+  chgrp $EGID zerolength
   print 'Garbuglio' >nonzerolength
 
   mkdir modish
@@ -97,8 +98,6 @@
   [[ -O zerolength ]]
 0:-O cond
 
-# there may be strange cases where this doesn't work, e.g.
-# inherited funny groups for directories via setgid.
   [[ -G zerolength ]]
 0:-G cond
 
