@@ -7,7 +7,7 @@ local tmp=${TMPPREFIX}${$}${words[1]:t}$[++_debug_count]
 local w="${(qq)words}"
 
 exec 3>&-	# Too bad if somebody else is using it ...
-[[ -t 2 ]] && exec 3>&2 2>| $tmp
+[[ -t 2 ]] && { exec 3>&2 2>| $tmp ; trap 'exec 2>&3 3>&-' EXIT INT }
 
 setopt xtrace
 _main_complete
@@ -19,7 +19,6 @@ unsetopt xtrace
     _message -r "Trace output left in $tmp (up-history to view)"
     [[ $compstate[nmatches] -le 1 && $compstate[list] != *force* ]] &&
         compstate[list]='list force messages'
-    exec 2>&3 3>&-
 }
 
 return ret

@@ -35,10 +35,12 @@ _complete_help() {
       builtin zstyle "$@"
     fi
   }
+  trap 'unfunction compadd zstyle' EXIT INT
 
   _main_complete
 
   unfunction compadd zstyle
+  trap - EXIT INT
 
   for i in "${(@ok)help_funcs}"; do
     text="${text}
