@@ -1,6 +1,6 @@
 #compdef netscape
 
-local curcontext="$curcontext" state line ret=1
+local curcontext="$curcontext" state line ret=1 suf
 typeset -A opt_args
 
 _x_arguments -C \
@@ -27,24 +27,27 @@ _x_arguments -C \
 [[ "$state" = "urls" ]] &&
   _files "$@" && return 0
 
-
 # Handle netscape remote commands
 if [[ "$state" = "remote" ]]; then  
   local -a remote_commands
   remote_commands=(openURL openFile saveAs mailto addBookmark)
 
-  [[ $compstate[quoting] = (double|single) ]] && compset -q
   compset -P '*\('
+  if compset -S '(|\\)\)*'; then
+    set - -S "" "$@"
+  else
+    set - -S"${${QIPREFIX:+)}:-\)}$compstate[quote] " "$@"
+  fi
   case $IPREFIX in
     openURL*|addBookmark*) state=urls;;
-    openFile*) _files -W ~;;
+    openFile*) _files "$@" -W ~;;
     saveAs*) 
       if compset -P "*,"; then
         _wanted types expl 'data type' \
-            compadd -s")" -M 'm:{a-zA-Z}={A-Za-z}' HTML Text PostScript &&
-                ret=0
+            compadd "$@" -M 'm:{a-zA-Z}={A-Za-z}' HTML Text PostScript && ret=0
       else
-        _files -W ~ && ret=0
+        compset -S ",*" || suf=","
+        _files -qS "$suf" -W ~ && ret=0
       fi
     ;;
     mailto*)
@@ -52,12 +55,14 @@ if [[ "$state" = "remote" ]]; then
       if compset -P '*@'; then
         _wanted hosts expl 'remote host name' _hosts -q -S, && ret=0
       else
-        _wanted users expl 'login name' _users -q -S@ && ret=0
+        compset -S "@*" || suf="@"
+        _wanted users expl 'login name' _users -q -S "$suf" && ret=0
       fi
     ;;
     *)
+      compset -S '(|\\)\(*' || suf="${${QIPREFIX:+(}:-\(}"
       _wanted commands expl 'remote commands' \
-  	  compadd -qS "${${QIPREFIX:+(}:-\(}" -M 'm:{a-zA-Z}={A-Za-z}' - \
+          compadd -qS "$suf" -M 'm:{a-zA-Z}={A-Za-z}' - \
                   $remote_commands && ret=0
     ;;
   esac
@@ -67,14 +72,15 @@ if [[ "$state" = "urls" ]]; then
   # Complete netscape urls
   if compset -P about: ; then
     _wanted values expl 'about what' \
-        compadd authors blank cache document fonts global hype image-cache \
+        compadd "$@" authors blank cache document fonts global hype image-cache \
             license logo memory-cache mozilla plugins && ret=0
   else
     _tags prefixes
     while _tags; do
       while _next_label prefixes expl 'URL prefix'; do
-        compadd "$expl[@]" -S '' about: mocha: javascript: && ret=0
         _urls "$@" && ret=0
+	compset -S '[^:]*'
+        compadd "$expl[@]" -S '' about: mocha: javascript: && ret=0
       done
       (( ret )) || return 0
     done

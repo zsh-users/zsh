@@ -57,7 +57,7 @@ ipre="$IPREFIX"
 if ! compset -P '(#b)([-+.a-z0-9]#):'; then
   _tags -C argument prefixes
   while _tags; do
-    while _next_label prefixes expl 'URL prefix' "$@"; do
+    while _next_label prefixes expl 'URL prefix'; do
       [[ -d $urls_path/bookmark ]] &&
         compadd "$expl[@]" -S '' bookmark: && ret=0
       compadd "$expl[@]" -S '' file: ftp:// gopher:// http:// && ret=0
@@ -79,7 +79,7 @@ case "$scheme" in
     if ! compset -P //; then
       _tags -C file files
       while _tags; do
-        while _next_label files expl 'local file' "$@"; do
+        while _next_label files expl 'local file'; do
           if [[ -prefix / ]]; then
 	    _path_files "$expl[@]" -S '' -g '*(^/)' && ret=0
 	    _path_files "$expl[@]" -S/ -r '/' -/ && ret=0
@@ -119,7 +119,7 @@ if ! compset -P '(#b)([^/]#)/'; then
 
   _tags hosts
   while _tags; do
-    while _next_label hosts expl host "$@"; do
+    while _next_label hosts expl host; do
       (( $#uhosts )) || _hosts -S/ && ret=0
       [[ "$scheme" = http ]] && uhosts=($uhosts $localhttp_servername)
       compadd "$expl[@]" -S/ - $uhosts && ret=0
@@ -143,7 +143,7 @@ if [[ "$localhttp_servername" = "$host" ]]; then
     user="$match[1]"
     while _tags; do
       while _next_label files expl 'local file'; do
-        _path_files "$expl[@]" -W ~$user/$localhttp_userdir -g '*(^/)' && ret=0
+        _path_files "$expl[@]" "$@" -W ~$user/$localhttp_userdir -g '*(^/)' && ret=0
         _path_files "$expl[@]" -W ~$user/$localhttp_userdir -S/ -r '/' -/ && ret=0
       done
       (( ret )) || return 0
@@ -151,7 +151,7 @@ if [[ "$localhttp_servername" = "$host" ]]; then
   else
     while _tags; do
       while _next_label files expl 'local file'; do
-        _path_files "$expl[@]" -W $localhttp_documentroot -g '*(^/)' && ret=0
+        _path_files "$expl[@]" "$@" -W $localhttp_documentroot -g '*(^/)' && ret=0
         _path_files "$expl[@]" -W $localhttp_documentroot -S/ -r '/' -/ && ret=0
       done
       (( ret )) || return 0
@@ -160,7 +160,7 @@ if [[ "$localhttp_servername" = "$host" ]]; then
 else
   while _tags; do
     while _next_label files expl 'local file'; do
-      _path_files "$expl[@]" -W $urls_path/$scheme/$host -g '*(^/)' && ret=0
+      _path_files "$expl[@]" "$@" -W $urls_path/$scheme/$host -g '*(^/)' && ret=0
       _path_files "$expl[@]" -W $urls_path/$scheme/$host -S/ -r '/' -/ && ret=0
     done
     (( ret )) || return 0
