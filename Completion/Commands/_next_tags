@@ -3,8 +3,7 @@
 # Main widget.
 
 _next_tags() {
-  setopt localoptions nullglob rcexpandparam extendedglob unset
-  unsetopt markdirs globsubst shwordsplit shglob ksharrays cshnullglob
+  setopt localoptions $_comp_options
 
   local ins ops="$PREFIX$SUFFIX"
 

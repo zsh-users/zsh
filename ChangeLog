@@ -1,5 +1,15 @@
 2000-10-19  Sven Wischnowsky  <wischnow@zsh.org>
 
+	* 13036: Completion/Commands/_bash_completions,
+ 	Completion/Commands/_complete_debug,
+ 	Completion/Commands/_complete_help,
+ 	Completion/Commands/_correct_word,
+ 	Completion/Commands/_expand_word,
+ 	Completion/Commands/_history_complete_word,
+ 	Completion/Commands/_next_tags, Completion/Core/_main_complete,
+ 	Completion/Core/compinit: simplify setting standard completion
+ 	system options using $_comp_options
+	
 	* 13035: Doc/Zsh/mod_zpty.yo, Functions/Misc/nslookup, Src/utils.c,
  	Src/Modules/zpty.c, Test/comptest: make non-blocking IO on ptys
  	work again; add -t option to test if command is still alive

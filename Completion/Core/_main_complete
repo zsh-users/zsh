@@ -16,8 +16,8 @@
 # which makes the output of setopt and unsetopt reflect a different
 # state than the global one for which you are completing.
 
-setopt localoptions nullglob rcexpandparam extendedglob unset
-unsetopt markdirs globsubst shwordsplit shglob ksharrays cshnullglob
+setopt localoptions $_comp_options
+
 exec </dev/null	# ZLE closes stdin, which can cause errors
 
 # Failed returns from this code are not real errors

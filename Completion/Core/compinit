@@ -120,6 +120,21 @@ else
   _comp_dumpfile="${ZDOTDIR:-$HOME}/.zcompdump"
 fi
 
+# The standard options set in completion functions.
+
+_comp_options=(
+       nullglob
+       rcexpandparam
+       extendedglob
+       unset
+    NO_markdirs
+    NO_globsubst
+    NO_shwordsplit
+    NO_shglob
+    NO_ksharrays
+    NO_cshnullglob
+)
+
 # These can hold names of functions that are to be called before/after all
 # matches have been generated.
 

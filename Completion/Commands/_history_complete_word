@@ -16,8 +16,7 @@
 #   range -- range of history words to complete
 
 _history_complete_word () {
-  setopt localoptions nullglob rcexpandparam extendedglob unset
-  unsetopt markdirs globsubst shwordsplit shglob ksharrays cshnullglob
+  setopt localoptions $_comp_options
 
   local expl direction stop curcontext="$curcontext"
   local max slice hmax=$#historywords

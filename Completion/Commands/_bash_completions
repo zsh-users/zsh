@@ -25,8 +25,7 @@
 # that will not have been overridden, so you should add '~' to the
 # list of keys at the top of the for-loop.
 
-setopt localoptions nullglob rcexpandparam extendedglob unset
-unsetopt markdirs globsubst shwordsplit shglob ksharrays cshnullglob
+setopt localoptions $_comp_options
 
 local key=$KEYS[-1] expl
 
