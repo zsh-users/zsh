@@ -1,3 +1,8 @@
+2000-08-02  Sven Wischnowsky  <wischnow@zsh.org>
+
+	* 12475: Completion/Base/_arguments: prefer user-defined specs
+ 	over ones derived from --help output
+	
 2000-08-01  Sven Wischnowsky  <wischnow@zsh.org>
 
 	* Jan Fedak: 12463: Completion/User/_slrn: new completion function

@@ -70,7 +70,18 @@ if (( long )); then
     lopts=("--${(@)^${(@)${(@)${(@M)${(@ps:\n:j:\n:)${(@)${(@M)${(@f)$(_call options ${~words[1]} --help 2>&1)//\[--/
 --}:#[ 	]#-*}//,/
 }}:#[ 	]#--*}#*--}%%[]	 ]*}:#}")
-    lopts=( "${(@)lopts:#--}" )
+
+    # Remove options also described by user-defined specs.
+
+    tmp=()
+    for opt in "${(@)lopts:#--}"; do
+
+      # Using (( ... )) gives a parse error.
+
+      let "$tmpargv[(I)(|\([^\)]#\))${opt}(|[-+=])(|\[*\])(|:*)]" ||
+          tmp=( "$tmp[@]" "$opt" )
+    done
+    lopts=( "$tmp[@]" )
 
     # Now remove all ignored options ...
 
