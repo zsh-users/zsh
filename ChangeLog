@@ -1,3 +1,8 @@
+2004-02-12  Doug Kearns  <djkea2@mugca.its.monash.edu.au>
+
+	* unposted: Completion/X/Command/_acroread: capitalize PDF
+	abbreviation in the file match descriptions
+
 2004-02-10  Oliver Kiddle  <opk@zsh.org>
 
 	* 19415: Doc/Zsh/options.yo: fix documentation to indicate that
