@@ -33,9 +33,9 @@ if [[ -z "$_comp_no_ignore" ]]; then
   if zstyle -a ":completion:${curcontext}:$1" ignored-patterns _comp_ignore; then
     opts=( $opts -F _comp_ignore )
     zstyle -t ":completion:${curcontext}:$1" ignore-line &&
-        _comp_ignore=( "$_comp_ignore[@]" "$words[@]}" )
+        _comp_ignore=( "$_comp_ignore[@]" "$words[@]" )
   elif zstyle -t ":completion:${curcontext}:$1" ignore-line; then
-    _comp_ignore=( "$words[@]}]" )
+    _comp_ignore=( "$words[@]" )
   else
     _comp_ignore=()
   fi

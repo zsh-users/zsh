@@ -1,3 +1,7 @@
+2000-05-15  Tanaka Akira  <akr@zsh.org>
+
+	* 11392: Completion/Core/_description: ignore-line fix.
+
 2000-05-15  Clint Adams  <schizo@debian.org>
 
 	* 11387: Doc/Zsh/options.yo, Src/math.c, Src/options.c,
