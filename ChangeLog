@@ -1,3 +1,9 @@
+2003-09-10  Wayne Davison  <wayned@users.sourceforge.net>
+
+	* users/6529 + unposted: StartupFiles/zshenv: updated the comments
+	to no longer suggest that setting the PATH here (without proper
+	precautions) is a safe thing to do.
+
 2003-09-08  Peter Stephenson  <pws@csr.com>
 
 	* 19044: Src/Modules/parameter.c: several typos in code
