@@ -293,7 +293,8 @@ for prepath in "$prepaths[@]"; do
       else
         tmp1=( ${^tmp1}${skipped}${^~pats} )
       fi
-      if [[ "$sopt" = *[/f]* && ( -o globdots || "$PREFIX" = .* ) ]] &&
+      if [[ ( "$sopt" = *[/f]* || "$pats" = *\([^[:blank:]]#/[^[:blank:]]#\)* ) &&
+            ( -o globdots || "$PREFIX" = .* ) ]] &&
 	  zstyle -s ":completion:${curcontext}:paths" special-dirs atmp; then
 	if [[ "$atmp" = (yes|true|1|on) ]]; then
 	  tmp1=( "$tmp1[@]" . .. )
