@@ -1,3 +1,8 @@
+2002-04-25  Sven Wischnowsky  <wischnow@zsh.org>
+
+	* 17035: Src/Modules/zutil.c: remove one half of 17029; the
+	part for zstyle wasn't right
+
 2002-04-24  Sven Wischnowsky  <wischnow@zsh.org>
 
 	* 17029: Src/Modules/zutil.c, Src/Zle/complete.c: fix two
