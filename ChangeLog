@@ -1,3 +1,8 @@
+2002-01-14  Oliver Kiddle  <opk@zsh.org>
+
+	* 16449: Completion/Unix/Command/_chkconfig: new completion for
+	both the IRIX and RedHat chkconfig commands
+
 2002-01-14  Peter Stephenson  <pws@csr.com>
 
 	* 16448: Src/math.c: 15291, 15292 introduced bug that assignment
