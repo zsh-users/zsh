@@ -16,7 +16,7 @@ comptestinit () {
   (( OPTIND > 1 )) && shift $(( OPTIND - 1 ))
 
   export PS1="<PROMPT>"
-  zpty -b zsh "$comptest_zsh" -f
+  zpty -b zsh "$comptest_zsh -f +Z"
 
   zpty -r zsh log1 "*<PROMPT>*" || { 
     print "first prompt hasn't appeared."
@@ -29,6 +29,7 @@ comptestinit () {
 "fpath=( $fpath )" \
 'LISTMAX=10000000
 stty columns 80 rows 24
+setopt zle
 bindkey -e
 autoload -U compinit
 compinit -u

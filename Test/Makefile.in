@@ -46,7 +46,7 @@ check test:
 	  $(MAKE) MODDIR=`pwd`/$(subdir)/Modules install.modules > /dev/null; \
 	fi
 	-for f in $(sdir)/$(TESTNUM)*.ztst; do \
-	  $(dir_top)/Src/zsh -f $(sdir)/ztst.zsh $$f; \
+	  $(dir_top)/Src/zsh +Z -f $(sdir)/ztst.zsh $$f; \
 	done
 	rm -rf Modules .zcompdump
 
