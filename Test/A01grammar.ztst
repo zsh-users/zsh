@@ -233,10 +233,11 @@
 
 ## Select now reads from stdin if the shell is not interactive.
 ## Its own output goes to stderr.
+  (COLUMNS=80
   PS3="input> "
   select name in one two three; do
     print $name
-  done
+  done)
 0:`select' loop
 <2
 ?1) one     2) two     3) three   

@@ -1,3 +1,9 @@
+2003-04-01  Peter Stephenson  <pws@csr.com>
+
+	* 18418: Test/A01grammar.ztst, Test/D04parameter.ztst:
+	fix select test from 18389 and add tests for $MATCH and $match
+	and related parameters.
+
 2003-03-31  Felix Rosencrantz <f_rosencrantz@yahoo.com>
 
 	* unposted: Functions/TCP/.distfiles: Removed zgprintf, file was

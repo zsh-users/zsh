@@ -555,3 +555,25 @@
 >/here:/there
 >0
 >/elsewhere /somewhere
+
+  string='look for a match in here'
+  if [[ ${string%%(#b)(match)*} = "look for a " ]]; then
+    print $match[1] $mbegin[1] $mend[1] $string[$mbegin[1],$mend[1]]
+    print $#match $#mbegin $#mend
+  else
+    print That didn\'t work.
+  fi
+0:Parameters associated with backreferences
+>match 12 16 match
+>1 1 1
+
+  string='and look for a MATCH in here'
+  if [[ ${(S)string%%(#m)M*H} = "and look for a  in here" ]]; then
+    print $MATCH $MBEGIN $MEND $string[$MBEGIN,$MEND]
+    print $#MATCH
+  else
+    print Oh, dear.  Back to the drawing board.
+  fi
+0:Parameters associated with (#m) flag
+>MATCH 16 20 MATCH
+>5
