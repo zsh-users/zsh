@@ -113,7 +113,7 @@ while true; do
 
 	if [[ $#imm -ne 0 && $#matches -eq 1 ]] ||
            zstyle -t ":completion:${curcontext}:" expand suffix; then
-	  compadd "$group[@]" "$expl[@]" "$opts[@]" \
+	  compadd "$group[@]" "$expl[@]" "$sopts[@]" \
                   -M "r:|${sep}=* r:|=* $matcher" - "$pref$matches[1]"
         else
 	  if (( $matches[(I)${tmp1[1]}${sep}*] )); then
@@ -235,7 +235,7 @@ while true; do
     SUFFIX=""
 
     if [[ -n "$pref" && "$orig" != "$pref" ]]; then
-      if [[ "$pref" = *${sep} ]]; then
+      if [[ "$pref" = *${sep}*${sep} ]]; then
         compadd "$group[@]" "$expl[@]" "$opts[@]" \
                 -p "${pref%${sep}*${sep}}${sep}" -S "$sep" \
                 -M "r:|${sep}=* r:|=* $matcher" - "${${pref%${sep}}##*${sep}}"
