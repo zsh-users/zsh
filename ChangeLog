@@ -1,3 +1,7 @@
+2001-03-15  Sven Wischnowsky  <wischnow@zsh.org>
+
+	* user/3674: Src/Zle/complist.c: fix default colour for directories
+	
 2001-03-14  Peter Stephenson  <pws@csr.com>
 
 	* 13633: Src/Zle/zle_keymap.c: lastest in saga: don't use
