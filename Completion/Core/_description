@@ -30,15 +30,19 @@ zstyle -s ":completion:${curcontext}:$1" matcher match &&
 [[ -n "$_matcher" ]] && opts=($opts -M "$_matcher")
 
 if [[ -z "$_comp_no_ignore" ]]; then
-  if zstyle -a ":completion:${curcontext}:$1" ignored-patterns _comp_ignore; then
-    opts=( $opts -F _comp_ignore )
-    zstyle -t ":completion:${curcontext}:$1" ignore-line &&
-        _comp_ignore=( "$_comp_ignore[@]" "$words[@]" )
-  elif zstyle -t ":completion:${curcontext}:$1" ignore-line; then
-    _comp_ignore=( "$words[@]" )
-  else
+  zstyle -a ":completion:${curcontext}:$1" ignored-patterns _comp_ignore ||
     _comp_ignore=()
-  fi
+
+  zstyle -s ":completion:${curcontext}:$1" ignore-line hidden &&
+    case "$hidden" in
+    true|yes|on|1) _comp_ignore=( "$_comp_ignore[@]" "$words[@]" );;
+    current)       _comp_ignore=( "$_comp_ignore[@]" "$words[CURRENT]" );;
+    other)         _comp_ignore=( "$_comp_ignore[@]"
+                                  "${(@)words[1,CURRENT-1]}"
+				  "${(@)words[CURRENT+1,-1]}" );;
+    esac
+
+  (( $#_comp_ignore )) && opts=( $opts -F _comp_ignore )
 else
   _comp_ignore=()
 fi

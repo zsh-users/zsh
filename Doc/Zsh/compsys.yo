@@ -1187,9 +1187,17 @@ kindex(ignore-line, completion style)
 item(tt(ignore-line))(
 This style is tested for the tags used when generating matches.  If it
 is set to `true', then none of the words that are already on the line
-will be considered possible completions.
+will be considered possible completions.  If it is set to
+`tt(current)', the word the cursor is on will not be considered a
+possible completion and if it is set to `tt(other)' all words except
+the current one will not be considered to be a possible completion.
 
-Note that you almost certainly don't want to set this for a general
+The value `tt(current)' is a bit like the opposite of the
+tt(accept-exact). It means that only strings with missing characters
+will be completed.
+
+Note that you almost certainly don't want to set this to `true' or
+`tt(other)' for a general
 context such as `tt(:completion:*)'.  This is because it would disallow
 completion of, for example, options multiple times even if the command
 in question accepts the option more than once.

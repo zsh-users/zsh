@@ -1,5 +1,8 @@
 2000-06-16  Sven Wischnowsky  <wischnow@zsh.org>
 
+	* 11938: Completion/Core/_description, Doc/Zsh/compsys.yo: enhance
+ 	ignore-line to ignore all/current/other word(s)
+	
 	* 11937: Completion/Core/_expand, Completion/Core/_list,
  	Doc/Zsh/compsys.yo, Doc/Zsh/mod_zutil.yo, Src/Modules/zutil.c:
  	zstyle -e option; change math-styles to boolean ones; change
