@@ -1,0 +1,1563 @@
+texinode(User Contributions)()(Zftp Function System)(Top)
+chapter(User Contributions)
+cindex(user contributions)
+sect(Description)
+
+The Zsh source distribution includes a number of items contributed by the
+user community.  These are not inherently a part of the shell, and some
+may not be available in every zsh installation.  The most significant of
+these are documented here.  For documentation on other contributed items
+such as shell functions, look for comments in the function source files.
+
+startmenu()
+menu(Utilities)
+menu(Prompt Themes)
+menu(ZLE Functions)
+menu(MIME Functions)
+menu(Other Functions)
+endmenu()
+
+texinode(Utilities)(Prompt Themes)()(User Contributions)
+sect(Utilities)
+
+subsect(Accessing On-Line Help)
+cindex(helpfiles utility)
+
+The key sequence tt(ESC h) is normally bound by ZLE to execute the
+tt(run-help) widget (see
+ifzman(zmanref(zshzle))\
+ifnzman(noderef(Zsh Line Editor))\
+).  This invokes the tt(run-help) command with the command word from the
+current input line as its argument.  By default, tt(run-help) is an alias
+for the tt(man) command, so this often fails when the command word is a
+shell builtin or a user-defined function.  By redefining the tt(run-help)
+alias, one can improve the on-line help provided by the shell.
+
+The tt(helpfiles) utility, found in the tt(Util) directory of the
+distribution, is a Perl program that can be used to process the zsh manual
+to produce a separate help file for each shell builtin and for many other
+shell features as well.  The autoloadable tt(run-help) function, found in
+tt(Functions/Misc), searches for these helpfiles and performs several
+other tests to produce the most complete help possible for the command.
+
+There may already be a directory of help files on your system; look in
+tt(/usr/share/zsh) or tt(/usr/local/share/zsh) and subdirectories below
+those, or ask your system administrator.
+
+To create your own help files with tt(helpfiles), choose or create a
+directory where the individual command help files will reside.  For
+example, you might choose tt(~/zsh_help).  If you unpacked the zsh
+distribution in your home directory, you would use the commands:
+
+example(mkdir ~/zsh_help
+cd ~/zsh_help
+man zshall | colcrt - | \ 
+perl ~/zsh-version()/Util/helpfiles)
+
+findex(run-help, use of)
+Next, to use the tt(run-help) function, you need to add lines something
+like the following to your tt(.zshrc) or equivalent startup file:
+
+example(unalias run-help
+autoload run-help
+HELPDIR=~/zsh_help)
+
+vindex(HELPDIR)
+The tt(HELPDIR) parameter tells tt(run-help) where to look for the help
+files.  If your system already has a help file directory installed, set
+tt(HELPDIR) to the path of that directory instead.
+
+Note that in order for `tt(autoload run-help)' to work, the tt(run-help)
+file must be in one of the directories named in your tt(fpath) array (see
+ifzman(zmanref(zshparam))\
+ifnzman(noderef(Parameters Used By The Shell))\
+).  This should already be the case if you have a standard zsh
+installation; if it is not, copy tt(Functions/Misc/run-help) to an
+appropriate directory.
+
+subsect(Recompiling Functions)
+cindex(functions, recompiling)
+cindex(zrecompile utility)
+
+If you frequently edit your zsh functions, or periodically update your zsh
+installation to track the latest developments, you may find that function
+digests compiled with the tt(zcompile) builtin are frequently out of date
+with respect to the function source files.  This is not usually a problem,
+because zsh always looks for the newest file when loading a function, but
+it may cause slower shell startup and function loading.  Also, if a digest
+file is explicitly used as an element of tt(fpath), zsh won't check whether
+any of its source files has changed.
+
+The tt(zrecompile) autoloadable function, found in tt(Functions/Misc), can
+be used to keep function digests up to date.
+
+startitem()
+findex(zrecompile)
+xitem(tt(zrecompile) [ tt(-qt) ] [ var(name) ... ])
+item(tt(zrecompile) [ tt(-qt) ] tt(-p) var(args) [ tt(-)tt(-) var(args) ... ])(
+This tries to find tt(*.zwc) files and automatically re-compile them if at
+least one of the original files is newer than the compiled file.  This
+works only if the names stored in the compiled files are full paths or are
+relative to the directory that contains the tt(.zwc) file.
+
+In the first form, each var(name) is the name of a compiled file or a
+directory containing tt(*.zwc) files that should be checked.  If no
+arguments are given, the directories and tt(*.zwc) files in tt(fpath) are
+used.
+
+When tt(-t) is given, no compilation is performed, but a return status of
+zero (true) is set if there are files that need to be re-compiled and
+non-zero (false) otherwise.  The tt(-q) option quiets the chatty output
+that describes what tt(zrecompile) is doing.
+
+Without the tt(-t) option, the return status is zero if all files that
+needed re-compilation could be compiled and non-zero if compilation for at
+least one of the files failed.
+
+If the tt(-p) option is given, the var(args) are interpreted as one
+or more sets of arguments for tt(zcompile), separated by `tt(-)tt(-)'.
+For example:
+
+example(zrecompile -p \ 
+           -R ~/.zshrc -- \ 
+           -M ~/.zcompdump -- \ 
+           ~/zsh/comp.zwc ~/zsh/Completion/*/_*)
+
+This compiles tt(~/.zshrc) into tt(~/.zshrc.zwc) if that doesn't exist or
+if it is older than tt(~/.zshrc). The compiled file will be marked for
+reading instead of mapping. The same is done for tt(~/.zcompdump) and
+tt(~/.zcompdump.zwc), but this compiled file is marked for mapping. The
+last line re-creates the file tt(~/zsh/comp.zwc) if any of the files
+matching the given pattern is newer than it.
+
+Without the tt(-p) option, tt(zrecompile) does not create function digests
+that do not already exist, nor does it add new functions to the digest.
+)
+enditem()
+
+The following shell loop is an example of a method for creating function
+digests for all functions in your tt(fpath), assuming that you have write
+permission to the directories:
+
+example(for ((i=1; i <= $#fpath; ++i)); do
+  dir=$fpath[i]
+  zwc=${dir:t}.zwc
+  if [[ $dir == (.|..) || $dir == (.|..)/* ]]; then
+    continue
+  fi
+  files=($dir/*(N-.))
+  if [[ -w $dir:h && -n $files ]]; then
+    files=(${${(M)files%/*/*}#/})
+    if ( cd $dir:h &&
+         zrecompile -p -U -z $zwc $files ); then
+      fpath[i]=$fpath[i].zwc
+    fi
+  fi
+done)
+
+The tt(-U) and tt(-z) options are appropriate for functions in the default
+zsh installation tt(fpath); you may need to use different options for your
+personal function directories.
+
+Once the digests have been created and your tt(fpath) modified to refer to
+them, you can keep them up to date by running tt(zrecompile) with no
+arguments.
+
+subsect(Keyboard Definition)
+cindex(keyboard definition)
+
+findex(zkbd)
+The large number of possible combinations of keyboards, workstations,
+terminals, emulators, and window systems makes it impossible for zsh to
+have built-in key bindings for every situation.  The tt(zkbd) utility,
+found in Functions/Misc, can help you quickly create key bindings for your
+configuration.
+
+Run tt(zkbd) either as an autoloaded function, or as a shell script:
+
+example(zsh -f ~/zsh-version()/Functions/Misc/zkbd)
+
+When you run tt(zkbd), it first asks you to enter your terminal type; if
+the default it offers is correct, just press return.  It then asks you to
+press a number of different keys to determine characteristics of your
+keyboard and terminal; tt(zkbd) warns you if it finds anything out of the
+ordinary, such as a Delete key that sends neither tt(^H) nor tt(^?).
+
+The keystrokes read by tt(zkbd) are recorded as a definition for an
+associative array named tt(key), written to a file in the subdirectory
+tt(.zkbd) within either your tt(HOME) or tt(ZDOTDIR) directory.  The name
+of the file is composed from the tt(TERM), tt(VENDOR) and tt(OSTYPE)
+parameters, joined by hyphens.
+
+You may read this file into your tt(.zshrc) or another startup file with
+the "source" or "." commands, then reference the tt(key) parameter in
+bindkey commands, like this:
+
+example(source ${ZDOTDIR:-$HOME}/.zkbd/$TERM-$VENDOR-$OSTYPE
+[[ -n ${key[Left]} ]] && bindkey "${key[Left]}" backward-char
+[[ -n ${key[Right]} ]] && bindkey "${key[Right]}" forward-char
+# etc.)
+
+Note that in order for `tt(autoload zkbd)' to work, the tt(zkdb) file must
+be in one of the directories named in your tt(fpath) array (see
+ifzman(zmanref(zshparam))\
+ifnzman(noderef(Parameters Used By The Shell))\
+).  This should already be the case if you have a standard zsh
+installation; if it is not, copy tt(Functions/Misc/zkbd) to an
+appropriate directory.
+
+subsect(Dumping Shell State)
+cindex(reporter utility)
+
+Occasionally you may encounter what appears to be a bug in the shell,
+particularly if you are using a beta version of zsh or a development
+release.  Usually it is sufficient to send a description of the
+problem to one of the zsh mailing lists (see
+ifzman(zmanref(zsh))\
+ifnzman(noderef(Mailing Lists))\
+), but sometimes one of the zsh developers will need to recreate your
+environment in order to track the problem down.
+
+The script named tt(reporter), found in the tt(Util) directory of the
+distribution, is provided for this purpose.  (It is also possible to
+tt(autoload reporter), but tt(reporter) is not installed in tt(fpath)
+by default.)  This script outputs a detailed dump of the shell state,
+in the form of another script that can be read with `tt(zsh -f)' to
+recreate that state.
+
+To use tt(reporter), read the script into your shell with the `tt(.)'
+command and redirect the output into a file:
+
+example(. ~/zsh-version()/Util/reporter > zsh.report)
+
+You should check the tt(zsh.report) file for any sensitive information
+such as passwords and delete them by hand before sending the script to the
+developers.  Also, as the output can be voluminous, it's best to wait for
+the developers to ask for this information before sending it.
+
+You can also use tt(reporter) to dump only a subset of the shell state.
+This is sometimes useful for creating startup files for the first time.
+Most of the output from reporter is far more detailed than usually is
+necessary for a startup file, but the tt(aliases), tt(options), and
+tt(zstyles) states may be useful because they include only changes from
+the defaults.  The tt(bindings) state may be useful if you have created
+any of your own keymaps, because tt(reporter) arranges to dump the keymap
+creation commands as well as the bindings for every keymap.
+
+As is usual with automated tools, if you create a startup file with
+tt(reporter), you should edit the results to remove unnecessary commands.
+Note that if you're using the new completion system, you should em(not)
+dump the tt(functions) state to your startup files with tt(reporter); use
+the tt(compdump) function instead (see
+ifzman(zmanref(zshcompsys))\
+ifnzman(noderef(Completion System))\
+).
+
+startitem()
+item(tt(reporter) [ var(state) ... ])(
+findex(reporter)
+Print to standard output the indicated subset of the current shell state.
+The var(state) arguments may be one or more of:
+
+startsitem()
+sitem(tt(all))(Output everything listed below.)
+sitem(tt(aliases))(Output alias definitions.)
+sitem(tt(bindings))(Output ZLE key maps and bindings.)
+sitem(tt(completion))(Output old-style tt(compctl) commands.
+New completion is covered by tt(functions) and tt(zstyles).)
+sitem(tt(functions))(Output autoloads and function definitions.)
+sitem(tt(limits))(Output tt(limit) commands.)
+sitem(tt(options))(Output tt(setopt) commands.)
+sitem(tt(styles))(Same as tt(zstyles).)
+sitem(tt(variables))(Output shell parameter assignments, plus tt(export)
+commands for any environment variables.)
+sitem(tt(zstyles))(Output tt(zstyle) commands.)
+endsitem()
+
+If the var(state) is omitted, tt(all) is assumed.
+)
+
+With the exception of `tt(all)', every var(state) can be abbreviated by
+any prefix, even a single letter; thus tt(a) is the same as tt(aliases),
+tt(z) is the same as tt(zstyles), etc.
+enditem()
+
+texinode(Prompt Themes)(ZLE Functions)(Utilities)(User Contributions)
+sect(Prompt Themes)
+
+subsect(Installation)
+
+You should make sure all the functions from the tt(Functions/Prompts)
+directory of the source distribution are available; they all begin with
+the string `tt(prompt_)' except for the special function`tt(promptinit)'.
+You also need the `tt(colors)' function from tt(Functions/Misc).  All of
+these functions may already have been installed on your system; if not,
+you will need to find them and copy them.  The directory should appear as
+one of the elements of the tt(fpath) array (this should already be the
+case if they were installed), and at least the function tt(promptinit)
+should be autoloaded; it will autoload the rest.  Finally, to initialize
+the use of the system you need to call the tt(promptinit) function.  The
+following code in your tt(.zshrc) will arrange for this; assume the
+functions are stored in the directory tt(~/myfns):
+
+example(fpath=(~/myfns $fpath)
+autoload -U promptinit
+promptinit)
+
+subsect(Theme Selection)
+
+Use the tt(prompt) command to select your preferred theme.  This command
+may be added to your tt(.zshrc) following the call to tt(promptinit) in
+order to start zsh with a theme already selected.
+
+startitem()
+xitem(tt(prompt) [ tt(-c) | tt(-l) ])
+xitem(tt(prompt) [ tt(-p) | tt(-h) ] [ var(theme) ... ])
+item(tt(prompt) [ tt(-s) ] var(theme) [ var(arg) ... ])(
+Set or examine the prompt theme.  With no options and a var(theme)
+argument, the theme with that name is set as the current theme.  The
+available themes are determined at run time; use the tt(-l) option to see
+a list.  The special var(theme) `tt(random)' selects at random one of the
+available themes and sets your prompt to that.
+
+In some cases the var(theme) may be modified by one or more arguments,
+which should be given after the theme name.  See the help for each theme
+for descriptions of these arguments.
+
+Options are:
+
+startsitem()
+sitem(tt(-c))(Show the currently selected theme and its parameters, if any.)
+sitem(tt(-l))(List all available prompt themes.)
+sitem(tt(-p))(Preview the theme named by var(theme), or all themes if no
+var(theme) is given.)
+sitem(tt(-h))(Show help for the theme named by var(theme), or for the
+tt(prompt) function if no var(theme) is given.)
+sitem(tt(-s))(Set var(theme) as the current theme and save state.)
+endsitem()
+)
+item(tt(prompt_)var(theme)tt(_setup))(
+Each available var(theme) has a setup function which is called by the
+tt(prompt) function to install that theme.  This function may define
+other functions as necessary to maintain the prompt, including functions
+used to preview the prompt or provide help for its use.  You should not
+normally call a theme's setup function directly.
+)
+enditem()
+
+texinode(ZLE Functions)(MIME Functions)(Prompt Themes)(User Contributions)
+sect(ZLE Functions)
+
+subsect(Widgets)
+
+These functions all implement user-defined ZLE widgets (see
+ifzman(zmanref(zshzle))\
+ifnzman(noderef(Zsh Line Editor))\
+) which can be bound to keystrokes in interactive shells.  To use them,
+your tt(.zshrc) should contain lines of the form
+
+example(autoload var(function)
+zle -N var(function))
+
+followed by an appropriate tt(bindkey) command to associate the function
+with a key sequence.  Suggested bindings are described below.
+
+startitem()
+item(bash-style word functions)(
+If you are looking for functions to implement moving over and editing
+words in the manner of bash, where only alphanumeric characters are
+considered word characters, you can use the functions described in
+the next section.  The following is sufficient:
+
+example(autoload -U select-word-style
+select-word-style bash)
+
+)
+tindex(forward-word-match)
+tindex(backward-word-match)
+tindex(kill-word-match)
+tindex(backward-kill-word-match)
+tindex(transpose-words-match)
+tindex(capitalize-word-match)
+tindex(up-case-word-match)
+tindex(down-case-word-match)
+tindex(select-word-style)
+tindex(match-words-by-style)
+xitem(tt(forward-word-match), tt(backward-word-match))
+xitem(tt(kill-word-match), tt(backward-kill-word-match))
+xitem(tt(transpose-words-match), tt(capitalize-word-match))
+xitem(tt(up-case-word-match), tt(down-case-word-match))
+item(tt(select-word-style), tt(match-words-by-style))(
+The eight `tt(-match)' functions are drop-in replacements for the
+builtin widgets without the suffix.  By default they behave in a similar
+way.  However, by the use of styles and the function tt(select-word-style),
+the way words are matched can be altered.
+
+The simplest way of configuring the functions is to use
+tt(select-word-style), which can either be called as a normal function with
+the appropriate argument, or invoked as a user-defined widget that will
+prompt for the first character of the word style to be used.  The first
+time it is invoked, the eight tt(-match) functions will automatically
+replace the builtin versions, so they do not need to be loaded explicitly.
+
+The word styles available are as follows.  Only the first character
+is examined.
+
+startitem()
+item(tt(bash))(
+Word characters are alphanumeric characters only.
+)
+item(tt(normal))(
+As in normal shell operation:  word characters are alphanumeric characters
+plus any characters present in the string given by the parameter
+tt($WORDCHARS).
+)
+item(tt(shell))(
+Words are complete shell command arguments, possibly including complete
+quoted strings, or any tokens special to the shell.
+)
+item(tt(whitespace))(
+Words are any set of characters delimited by whitespace.
+)
+item(tt(default))(
+Restore the default settings; this is usually the same as `tt(normal)'.
+)
+enditem()
+
+More control can be obtained using the tt(zstyle) command, as described in
+ifzman(zmanref(zshmodules))\
+ifnzman(noderef(The zsh/zutil Module)).  Each style is looked up in the
+context tt(:zle:)var(widget) where var(widget) is the name of the
+user-defined widget, not the name of the function implementing it, so in
+the case of the definitions supplied by tt(select-word-style) the
+appropriate contexts are tt(:zle:forward-word), and so on.  The function
+tt(select-word-style) itself always defines styles for the context
+`tt(:zle:*)' which can be overridden by more specific (longer) patterns as
+well as explicit contexts.
+
+The style tt(word-style) specifies the rules to use.  This may have the
+following values.
+
+startitem()
+item(tt(normal))(
+Use the standard shell rules, i.e. alphanumerics and tt($WORDCHARS), unless
+overridden by the styles tt(word-chars) or tt(word-class).
+)
+item(tt(specified))(
+Similar to tt(normal), but em(only) the specified characters, and not also
+alphanumerics, are considered word characters.
+)
+item(tt(unspecified))(
+The negation of specified.  The given characters are those which will
+em(not) be considered part of a word.
+)
+item(tt(shell))(
+Words are obtained by using the syntactic rules for generating shell
+command arguments.  In addition, special tokens which are never command
+arguments such as `tt(())' are also treated as words.
+)
+item(tt(whitespace))(
+Words are whitespace-delimited strings of characters.
+)
+enditem()
+
+The first three of those styles usually use tt($WORDCHARS), but the value
+in the parameter can be overridden by the style tt(word-chars), which works
+in exactly the same way as tt($WORDCHARS).  In addition, the style
+tt(word-class) uses character class syntax to group characters and takes
+precedence over tt(word-chars) if both are set.  The tt(word-class) style
+does not include the surrounding brackets of the character class; for
+example, `tt(-:[:alnum:])' is a valid tt(word-class) to include all
+alphanumerics plus the characters `tt(-)' and `tt(:)'.  Be careful
+including `tt(])', `tt(^)' and `tt(-)' as these are special inside
+character classes.
+
+The final style is tt(skip-chars).  This is mostly useful for
+tt(transpose-words) and similar functions.  If set, it gives a count of
+characters starting at the cursor position which will not be considered
+part of the word and are treated as space, regardless of what they actually
+are.  For example, if
+
+example(zstyle ':zle:transpose-words' skip-chars 1)
+
+has been set, and tt(transpose-words-match) is called with the cursor on
+the var(X) of tt(foo)var(X)tt(bar), where var(X) can be any character, then
+the resulting expression is tt(bar)var(X)tt(foo).
+
+Here are some examples of use of the styles, actually taken from the
+simplified interface in tt(select-word-style):
+
+example(zstyle ':zle:*' word-style standard
+zstyle ':zle:*' word-chars '')
+
+Implements bash-style word handling for all widgets, i.e. only
+alphanumerics are word characters; equivalent to setting
+the parameter tt(WORDCHARS) empty for the given context.
+
+example(style ':zle:*kill*' word-style space)
+
+Uses space-delimited words for widgets with the word `kill' in the name.
+Neither of the styles tt(word-chars) nor tt(word-class) is used in this case.
+
+The word matching and all the handling of tt(zstyle) settings is actually
+implemented by the function tt(match-words-by-style).  This can be used to
+create new user-defined widgets.  The calling function should set the local
+parameter tt(curcontext) to tt(:zle:)var(widget), create the local
+parameter tt(matched_words) and call tt(match-words-by-style) with no
+arguments.  On return, tt(matched_words) will be set to an array with the
+elements: (1) the start of the line (2) the word before the cursor (3) any
+non-word characters between that word and the cursor (4) any non-word
+character at the cursor position plus any remaining non-word characters
+before the next word, including all characters specified by the
+tt(skip-chars) style, (5) the word at or following the cursor (6) any
+non-word characters following that word (7) the remainder of the line.  Any
+of the elements may be an empty string; the calling function should test
+for this to decide whether it can perform its function.
+
+It is possible to pass options with arguments to tt(match-words-by-style)
+to override the use of styles.  The options are:
+startsitem()
+sitem(tt(-w))(var(word-style))
+sitem(tt(-s))(var(skip-chars))
+sitem(tt(-c))(var(word-class))
+sitem(tt(-C))(var(word-chars))
+endsitem()
+
+For example, tt(match-words-by-style -w shell -c 0) may be used to
+extract the command argument around the cursor.
+)
+tindex(delete-whole-word-match)
+item(tt(delete-whole-word-match))(
+This is another function which works like the tt(-match) functions
+described immediately above, i.e. using styles to decide the word
+boundaries.  However, it is not a replacement for any existing function.
+
+The basic behaviour is to delete the word around the cursor.  There is no
+numeric prefix handling; only the single word around the cursor is
+considered.  If the widget contains the string tt(kill), the removed text
+will be placed in the cutbuffer for future yanking.  This can be obtained
+by defining tt(kill-whole-word-match) as follows:
+
+example(zle -N kill-whole-word-match delete-whole-word-match)
+
+and then binding the widget tt(kill-whole-word-match).
+)
+tindex(copy-earlier-word)
+item(tt(copy-earlier-word))(
+This widget works like a combination of tt(insert-last-word) and
+tt(copy-prev-shell-word).  Repeated invocations of the widget retrieve
+earlier words on the relevant history line.  With a numeric argument
+var(N), insert the var(N)th word from the history line; var(N) may be
+negative to count from the end of the line.
+
+If tt(insert-last-word) has been used to retrieve the last word on a
+previous history line, repeated invocations will replace that word with
+earlier words from the same line.
+
+Otherwise, the widget applies to words on the line currently being edited.
+The tt(widget) style can be set to the name of another widget that should
+be called to retrieve words.  This widget must accept the same three
+arguments as tt(insert-last-word).
+)
+tindex(cycle-completion-positions)
+item(tt(cycle-completion-positions))(
+After inserting an unambiguous string into the command line, the new
+function based completion system may know about multiple places in
+this string where characters are missing or differ from at least one
+of the possible matches.  It will then place the cursor on the
+position it considers to be the most interesting one, i.e. the one
+where one can disambiguate between as many matches as possible with as 
+little typing as possible.
+
+This widget allows the cursor to be easily moved to the other interesting
+spots.  It can be invoked repeatedly to cycle between all positions
+reported by the completion system.
+)
+tindex(edit-command-line)
+item(tt(edit-command-line))(
+Edit the command line using your visual editor, as in tt(ksh).
+
+example(bindkey -M vicmd v edit-command-line)
+)
+tindex(history-beginning-search-backward-end)
+tindex(history-beginning-search-forward-end)
+item(tt(history-search-end))(
+This function implements the widgets
+tt(history-beginning-search-backward-end) and
+tt(history-beginning-search-forward-end).  These commands work by first
+calling the corresponding builtin widget (see
+ifzman(`History Control' in zmanref(zshzle))\
+ifnzman(noderef(History Control))\
+) and then moving the cursor to the end of the line.  The original cursor
+position is remembered and restored before calling the builtin widget a
+second time, so that the same search is repeated to look farther through
+the history.
+
+Although you tt(autoload) only one function, the commands to use it are
+slightly different because it implements two widgets.
+
+example(zle -N history-beginning-search-backward-end \ 
+       history-search-end
+zle -N history-beginning-search-forward-end \ 
+       history-search-end
+bindkey '\e^P' history-beginning-search-backward-end
+bindkey '\e^N' history-beginning-search-forward-end)
+)
+tindex(history-pattern-search)
+tindex(history-pattern-search-backward)
+tindex(history-pattern-search-forward)
+item(tt(history-pattern-search))(
+The function tt(history-pattern-search) implements widgets which prompt
+for a pattern with which to search the history backwards or forwards.  The
+pattern is in the usual zsh format, however the first character may be
+tt(^) to anchor the search to the start of the line, and the last character
+may be tt($) to anchor the search to the end of the line.  If the
+search was not anchored to the end of the line the cursor is positioned
+just after the pattern found.
+
+The commands to create bindable widgets are similar to those in the
+example immediately above:
+
+example(autoload -U history-pattern-search
+zle -N history-pattern-search-backward history-pattern-search
+zle -N history-pattern-search-forward history-pattern-search)
+)
+tindex(up-line-or-beginning-search)
+tindex(down-line-or-beginning-search)
+item(tt(up-line-or-beginning-search), tt(down-line-or-beginning-search))(
+These widgets are similar to the builtin functions tt(up-line-or-search)
+and tt(down-line-or-search):  if in a multiline buffer they move up or
+down within the buffer, otherwise they search for a history line matching
+the start of the current line.  In this case, however, they search for
+a line which matches the current line up to the current cursor position, in
+the manner of tt(history-beginning-search-backward) and tt(-forward), rather
+than the first word on the line.
+)
+tindex(incarg)
+vindex(incarg, use of)
+item(tt(incarg))(
+Typing the keystrokes for this widget with the cursor placed on or to the
+left of an integer causes that integer to be incremented by one.  With a
+numeric prefix argument, the number is incremented by the amount of the
+argument (decremented if the prefix argument is negative).  The shell
+parameter tt(incarg) may be set to change the default increment to
+something other than one.
+
+example(bindkey '^X+' incarg)
+)
+tindex(incremental-complete-word)
+item(tt(incremental-complete-word))(
+This allows incremental completion of a word.  After starting this
+command, a list of completion choices can be shown after every character
+you type, which you can delete with tt(^H) or tt(DEL).  Pressing return
+accepts the completion so far and returns you to normal editing (that is,
+the command line is em(not) immediately executed).  You can hit tt(TAB) to
+do normal completion, tt(^G) to abort back to the state when you started,
+and tt(^D) to list the matches.
+
+This works only with the new function based completion system.
+
+example(bindkey '^Xi' incremental-complete-word)
+)
+tindex(insert-files)
+item(tt(insert-files))(
+This function allows you type a file pattern, and see the results of the
+expansion at each step.  When you hit return, all expansions are inserted
+into the command line.
+
+example(bindkey '^Xf' insert-files)
+)
+tindex(narrow-to-region)
+tindex(narrow-to-region-invisible)
+xitem(tt(narrow-to-region [ -p) var(pre) tt(] [ -P) var(post) tt(]))
+xitem(    tt([ -S) var(statepm) tt(| -R) var(statepm) tt(] [ -n ] [) var(start) var(end) tt(])))
+item(tt(narrow-to-region-invisible))(
+Narrow the editable portion of the buffer to the region between the cursor
+and the mark, which may be in either order.  The region may not be empty.
+
+tt(narrow-to-region) may be used as a widget or called as a function from a
+user-defined widget; by default, the text outside the editable area remains
+visible.  A tt(recursive-edit) is performed and the original widening
+status is then restored.  Various options and arguments are available when
+it is called as a function.
+
+The options tt(-p) var(pretext) and tt(-P) var(posttext) may be
+used to replace the text before and after the display for the duration of
+the function; either or both may be an empty string.
+
+If the option tt(-n) is also given, var(pretext) or var(posttext) will only
+be inserted if there is text before or after the region respectively which
+will be made invisible.
+
+Two numeric arguments may be given which will be used instead of the cursor
+and mark positions.
+
+The option tt(-S) var(statepm) is used to narrow according to the other
+options while saving the original state in the parameter with name
+var(statepm), while the option tt(-R) var(statepm) is used to restore the
+state from the parameter; note in both cases the em(name) of the parameter
+is required.  In the second case, other options and arguments are
+irrelevant.  When this method is used, no tt(recursive-edit) is performed;
+the calling widget should call this function with the option tt(-S),
+perform its own editing on the command line or pass control to the user
+via `tt(zle recursive-edit)', then call this function with the option
+tt(-R).  The argument var(statepm) must be a suitable name for an ordinary
+parameter, except that parameters beginning with the prefix tt(_ntr_) are
+reserved for use within tt(narrow-to-region).  Typically the parameter will
+be local to the calling function.
+
+tt(narrow-to-region-invisible) is a simple widget which calls
+tt(narrow-to-region) with arguments which replace any text outside the
+region with `tt(...)'.
+
+The display is restored (and the widget returns) upon any zle command
+which would usually cause the line to be accepted or aborted.  Hence an
+additional such command is required to accept or abort the current line.
+
+The return status of both widgets is zero if the line was accepted, else
+non-zero.
+
+Here is a trivial example of a widget using this feature.
+example(local state
+narrow-to-region -p $'Editing restricted region\n' \ 
+  -P '' -S state
+zle recursive-edit
+narrow-to-region -R state)
+)
+tindex(predict-on)
+tindex(predict-off)
+item(tt(predict-on))(
+This set of functions implements predictive typing using history search.
+After tt(predict-on), typing characters causes the editor to look backward
+in the history for the first line beginning with what you have typed so
+far.  After tt(predict-off), editing returns to normal for the line found.
+In fact, you often don't even need to use tt(predict-off), because if the
+line doesn't match something in the history, adding a key performs
+standard completion, and then inserts itself if no completions were found.
+However, editing in the middle of a line is liable to confuse prediction;
+see the tt(toggle) style below.
+
+With the function based completion system (which is needed for this), you
+should be able to type tt(TAB) at almost any point to advance the cursor
+to the next ``interesting'' character position (usually the end of the
+current word, but sometimes somewhere in the middle of the word).  And of
+course as soon as the entire line is what you want, you can accept with
+return, without needing to move the cursor to the end first.
+
+The first time tt(predict-on) is used, it creates several additional
+widget functions:
+
+startsitem()
+sitem(tt(delete-backward-and-predict))(Replaces the tt(backward-delete-char)
+widget.  You do not need to bind this yourself.)
+sitem(tt(insert-and-predict))(Implements predictive typing by replacing the
+tt(self-insert) widget.  You do not need to bind this yourself.)
+sitem(tt(predict-off))(Turns off predictive typing.)
+endsitem()
+
+Although you tt(autoload) only the tt(predict-on) function, it is
+necessary to create a keybinding for tt(predict-off) as well.
+
+example(zle -N predict-on
+zle -N predict-off
+bindkey '^X^Z' predict-on
+bindkey '^Z' predict-off)
+)
+tindex(read-from-minibuffer)
+item(tt(read-from-minibuffer))(
+This is most useful when called as a function from inside a widget, but will
+work correctly as a widget in its own right.  It prompts for a value
+below the current command line; a value may be input using all of the
+standard zle operations (and not merely the restricted set available
+when executing, for example, tt(execute-named-cmd)).  The value is then
+returned to the calling function in the parameter tt($REPLY) and the
+editing buffer restored to its previous state.  If the read was aborted
+by a keyboard break (typically tt(^G)), the function returns status 1
+and tt($REPLY) is not set.
+
+If one argument is supplied to the function it is taken as a prompt,
+otherwise `tt(? )' is used.  If two arguments are supplied, they are the
+prompt and the initial value of tt($LBUFFER), and if a third argument is
+given it is the initial value of tt($RBUFFER).  This provides a default
+value and starting cursor placement.  Upon return the entire buffer is the
+value of tt($REPLY).
+
+One option is available: `tt(-k) var(num)' specifies that var(num)
+characters are to be read instead of a whole line.  The line editor is not
+invoked recursively in this case, so depending on the terminal settings
+the input may not be visible, and only the input keys are placed in
+tt($REPLY), not the entire buffer.  Note that unlike the tt(read) builtin
+var(num) must be given; there is no default.
+
+The name is a slight misnomer, as in fact the shell's own minibuffer is
+not used.  Hence it is still possible to call tt(executed-named-cmd) and
+similar functions while reading a value.
+)
+tindex(replace-string)
+tindex(replace-pattern)
+item(tt(replace-string), tt(replace-pattern))(
+The function tt(replace-string) implements two widgets.
+If defined under the same name as the function, it prompts for two
+strings; the first (source) string will be replaced by the second
+everywhere it occurs in the line editing buffer.
+
+If the widget name contains the word `tt(pattern)', for example by
+defining the widget using the command `tt(zle -N replace-pattern
+replace-string)', then the replacement is done by pattern matching.  All
+zsh extended globbing patterns can be used in the source string; note
+that unlike filename generation the pattern does not need to match an
+entire word, nor do glob qualifiers have any effect.  In addition, the
+replacement string can contain parameter or command substitutions.
+Furthermore, a `tt(&)' in the replacement string will be replaced with
+the matched source string, and a backquoted digit `tt(\)var(N)' will be
+replaced by the var(N)th parenthesised expression matched.  The form
+`tt(\{)var(N)tt(})' may be used to protect the digit from following
+digits.
+
+For example, starting from the line:
+
+example(print This line contains fan and fond)
+
+and invoking tt(replace-pattern) with the source string `tt(f(?)n)' and
+the replacment string `tt(c\1r)' produces the not very useful line:
+
+example(print This line contains car and cord)
+
+The range of the replacement string can be limited by using the
+tt(narrow-to-region-invisible) widget.  One limitation of the current
+version is that tt(undo) will cycle through changes to the replacement
+and source strings before undoing the replacement itself.
+)
+tindex(smart-insert-last-word)
+item(tt(smart-insert-last-word))(
+This function may replace the tt(insert-last-word) widget, like so:
+
+example(zle -N insert-last-word smart-insert-last-word)
+
+With a numeric prefix, or when passed command line arguments in a call
+from another widget, it behaves like tt(insert-last-word), except that
+words in comments are ignored when tt(INTERACTIVE_COMMENTS) is set.
+
+Otherwise, the rightmost ``interesting'' word from the previous command is
+found and inserted.  The default definition of ``interesting'' is that the
+word contains at least one alphabetic character, slash, or backslash.
+This definition may be overridden by use of the tt(match) style.  The
+context used to look up the style is the widget name, so usually the
+context is tt(:insert-last-word).  However, you can bind this function to
+different widgets to use different patterns:
+
+example(zle -N insert-last-assignment smart-insert-last-word
+zstyle :insert-last-assignment match '[[:alpha:]][][[:alnum:]]#=*'
+bindkey '\e=' insert-last-assignment)
+)
+enditem()
+
+subsect(Styles)
+
+The behavior of several of the above widgets can be controlled by the use
+of the tt(zstyle) mechanism.  In particular, widgets that interact with
+the completion system pass along their context to any completions that
+they invoke.
+
+startitem()
+kindex(break-keys, widget style)
+item(tt(break-keys))(
+This style is used by the tt(incremental-complete-word) widget. Its value
+should be a pattern, and all keys matching this pattern will cause the
+widget to stop incremental completion without the key having any further
+effect. Like all styles used directly by
+tt(incremental-complete-word), this style is looked up using the
+context `tt(:incremental)'.
+)
+kindex(completer, completion style)
+item(tt(completer))(
+The tt(incremental-complete-word) and tt(insert-and-predict) widgets set
+up their top-level context name before calling completion.  This allows
+one to define different sets of completer functions for normal completion
+and for these widgets.  For example, to use completion, approximation and
+correction for normal completion, completion and correction for
+incremental completion and only completion for prediction one could use:
+
+example(zstyle ':completion:*' completer \ 
+        _complete _correct _approximate
+zstyle ':completion:incremental:*' completer \ 
+        _complete _correct
+zstyle ':completion:predict:*' completer \ 
+        _complete)
+
+It is a good idea to restrict the completers used in prediction, because
+they may be automatically invoked as you type.  The tt(_list) and
+tt(_menu) completers should never be used with prediction.  The
+tt(_approximate), tt(_correct), tt(_expand), and tt(_match) completers may
+be used, but be aware that they may change characters anywhere in the word
+behind the cursor, so you need to watch carefully that the result is what
+you intended.
+)
+kindex(cursor, completion style)
+item(tt(cursor))(
+The tt(insert-and-predict) widget uses this style, in the context
+`tt(:predict)', to decide where to place the cursor after completion has
+been tried.  Values are:
+
+startitem()
+item(tt(complete))(
+The cursor is left where it was when completion finished, but only if
+it is after a character equal to the one just inserted by the user.  If 
+it is after another character, this value is the same as `tt(key)'.
+)
+item(tt(key))(
+The cursor is left
+after the var(n)th occurrence of the character just inserted, where
+var(n) is the number of times that character appeared in the word
+before completion was attempted.  In short, this has the effect of
+leaving the cursor after the character just typed even if the
+completion code found out that no other characters need to be inserted 
+at that position.
+)
+enditem()
+
+Any other value for this style unconditionally leaves the cursor at the
+position where the completion code left it.
+)
+kindex(list, widget style)
+item(tt(list))(
+When using the tt(incremental-complete-word) widget, this style says
+if the matches should be listed on every key press (if they fit on the 
+screen).  Use the context prefix `tt(:completion:incremental)'.
+
+The tt(insert-and-predict) widget uses this style to decide if the
+completion should be shown even if there is only one possible completion.
+This is done if the value of this style is the string tt(always).  In this
+case the context is `tt(:predict)' (em(not) `tt(:completion:predict)').
+)
+kindex(match, widget style)
+item(tt(match))(
+This style is used by tt(smart-insert-last-word) to provide a pattern
+(using full tt(EXTENDED_GLOB) syntax) that matches an interesting word.
+The context is the name of the widget to which tt(smart-insert-last-word)
+is bound (see above).  The default behavior of tt(smart-insert-last-word)
+is equivalent to:
+
+example(zstyle :insert-last-word match '*[[:alpha:]/\\]*')
+
+However, you might want to include words that contain spaces:
+
+example(zstyle :insert-last-word match '*[[:alpha:][:space:]/\\]*')
+
+Or include numbers as long as the word is at least two characters long:
+
+example(zstyle :insert-last-word match '*([[:digit:]]?|[[:alpha:]/\\])*')
+
+The above example causes redirections like "2>" to be included.
+)
+kindex(prompt, widget style)
+item(tt(prompt))(
+The tt(incremental-complete-word) widget shows the value of this
+style in the status line during incremental completion.  The string
+value may contain any of the following substrings in the manner of
+the tt(PS1) and other prompt parameters:
+
+startitem()
+item(tt(%c))(
+Replaced by the name of the completer function that generated the
+matches (without the leading underscore).
+)
+item(tt(%l))(
+When the tt(list) style is set,
+replaced by `tt(...)' if the list of matches is too long to fit on the
+screen and with an empty string otherwise.  If the tt(list) style is
+`false' or not set, `tt(%l)' is always removed.
+)
+item(tt(%n))(
+Replaced by the number of matches generated.
+)
+item(tt(%s))(
+Replaced by `tt(-no match-)', `tt(-no prefix-)', or an empty string
+if there is no completion matching the word on the line, if the
+matches have no common prefix different from the word on the line, or
+if there is such a common prefix, respectively.
+)
+item(tt(%u))(
+Replaced by the unambiguous part of all matches, if there
+is any, and if it is different from the word on the line.
+)
+enditem()
+
+Like `tt(break-keys)', this uses the `tt(:incremental)' context.
+)
+kindex(stop-keys, widget style)
+item(tt(stop-keys))(
+This style is used by the tt(incremental-complete-word) widget.  Its value
+is treated similarly to the one for the tt(break-keys) style (and uses 
+the same context: `tt(:incremental)').  However, in
+this case all keys matching the pattern given as its value will stop
+incremental completion and will then execute their usual function.
+)
+kindex(toggle, widget style)
+item(tt(toggle))(
+This boolean style is used by tt(predict-on) and its related widgets in
+the context `tt(:predict)'.  If set to one of the standard `true' values,
+predictive typing is automatically toggled off in situations where it is
+unlikely to be useful, such as when editing a multi-line buffer or after
+moving into the middle of a line and then deleting a character.  The
+default is to leave prediction turned on until an explicit call to
+tt(predict-off).
+)
+kindex(verbose, widget style)
+item(tt(verbose))(
+This boolean style is used by tt(predict-on) and its related widgets in
+the context `tt(:predict)'.  If set to one of the standard `true' values,
+these widgets display a message below the prompt when the predictive state
+is toggled.  This is most useful in combination with the tt(toggle) style.
+The default does not display these messages.
+)
+kindex(widget, widget style)
+item(tt(widget))(
+This style is similar to the tt(command) style: For widget functions that
+use tt(zle) to call other widgets, this style can sometimes be used to
+override the widget which is called.  The context for this style is the
+name of the calling widget (em(not) the name of the calling function,
+because one function may be bound to multiple widget names).
+
+example(zstyle :copy-earlier-word widget smart-insert-last-word)
+
+Check the documentation for the calling widget or function to determine
+whether the tt(widget) style is used.
+)
+enditem()
+
+texinode(MIME Functions)(Other Functions)(ZLE Functions)(User Contributions)
+sect(MIME Functions)
+
+Three functions are available to provide handling of files recognised by
+extension, for example to dispatch a file tt(text.ps) when executed as a
+command to an appropriate viewer.
+
+startitem()
+xitem(tt(zsh-mime-setup [-flv]))
+item(tt(zsh-mime-handler))(
+These two functions use the files tt(~/.mime.types) and tt(/etc/mime.types),
+which associate types and extensions, as well as tt(~/.mailcap) and
+tt(/etc/mailcap) files, which associate types and the programs that
+handle them.  These are provided on many systems with the Multimedia
+Internet Mail Extensions.
+
+To enable the system, the function tt(zsh-mime-setup) should be
+autoloaded and run.  This allows files with extensions to be treated
+as executable; such files be completed by the function completion system.
+The function tt(zsh-mime-handler) should not need to be called by the
+user.
+
+The system works by setting up suffix aliases with `tt(alias -s)'.
+Suffix aliases already installed by the user will not be overwritten.
+
+Repeated calls to tt(zsh-mime-setup) do not override the existing
+mapping between suffixes and executable files unless the option tt(-f)
+is given.  Note, however, that this does not override existing suffix
+aliases assigned to handlers other than tt(zsh-mime-handler).
+Calling tt(zsh-mime-setup) with the option tt(-l) lists the existing
+mappings without altering them.  Calling tt(zsh-mime-setup) with the option
+tt(-v) causes verbose output to be shown during the setup operation.
+
+The system respects the tt(mailcap) flags tt(needsterminal) and
+tt(copiousoutput), see manref(mailcap)(4).
+
+The functions use the following styles, which are defined with the
+tt(zstyle) builtin command (\
+ifzman(see zmanref(zshmodules))\
+ifnzman(noderef(The zsh/zutil Module))).  They should be defined
+before tt(zsh-mime-setup) is run.  The contexts used all
+start with tt(:mime:), with additional components in some cases.
+It is recommended that a trailing tt(*) (suitably quoted) be appended
+to style patterns in case the system is extended in future.  Some
+examples are given below.
+startitem()
+item(mime-types)(
+A list of files in the format of tt(~/.mime.types) and
+tt(/etc/mime.types) to be read during setup, replacing the default list
+which consists of those two files.  The context is tt(:mime:).
+A tt(PLUS()) in the list will be replaced by the default files.
+)
+item(mailcap)(
+A list of files in the format of tt(~/.mailcap) and
+tt(/etc/mailcap) to be read during setup, replacing the default list
+which consists of those two files.  The context is tt(:mime:).
+A tt(PLUS()) in the list will be replaced by the default files.
+)
+item(handler)(
+Specifies a handler for a suffix; the suffix is given by the context as
+tt(:mime:.)var(suffix)tt(:), and the format of the handler is exactly
+that in tt(mailcap).  Note in particular the `tt(.)' and trailing colon
+to distinguish this use of the context.  This overrides any handler
+specified by the tt(mailcap) files.  If the handler requires a terminal,
+the tt(flags) style should be set to include the word tt(needsterminal),
+or if the output is to be displayed through a pager (but not if the
+handler is itself a pager), it should include tt(copiousoutput).
+)
+item(flags)(
+Defines flags to go with a handler; the context is as for the
+tt(handler) style, and the format is as for the flags in tt(mailcap).
+)
+item(pager)(
+If set, will be used instead of tt($PAGER) or tt(more) to handle
+suffixes where the tt(copiousoutput) flag is set.  The context is
+as for tt(handler), i.e. tt(:mime:.)var(suffix)tt(:) for handling
+a file with the given var(suffix).
+)
+enditem()
+
+Examples:
+
+example(zstyle ':mime:*' mailcap ~/.mailcap /usr/local/etc/mailcap
+zstyle ':mime:.txt:' handler less %s
+zstyle ':mime:.txt:' flags needsterminal)
+
+When tt(zsh-mime-setup) is subsequently run, it will look for
+tt(mailcap) entries in the two files given.  Files of suffix tt(.txt)
+will be handled by running `tt(less) var(file.txt)'.  The flag
+tt(needsterminal) is set to show that this program must run attached to a
+terminal.
+
+As there are several steps to dispatching a command, the following
+should be checked if attempting to execute a file by extension
+tt(.)var(ext) does not have the expected effect.
+
+startitem()
+item()(
+The command `tt(alias -s) var(ext)' should show
+`tt(ps=zsh-mime-handler)'.  If it shows something else, another suffix
+alias was already installed and was not overwritten.  If it shows
+nothing, no handler was installed:  this is most likely because no
+handler was found in the tt(.mime.types) and tt(mailcap) combination for
+tt(.ext) files.  In that case, appropriate handling should be added to
+tt(~/.mime.types) and tt(mailcap).
+)
+item()(
+If the extension is handled by tt(zsh-mime-handler) but the file is
+not opened correctly, either the handler defined for the type is
+incorrect, or the flags associated with it are in appropriate.  Running
+tt(zsh-mime-setup -l) will show the handler and, if there are any, the
+flags.  A tt(%s) in the handler is replaced by the file (suitably quoted
+if necessary).  Check that the handler program listed lists and can
+be run in the way shown.  Also check that the flags tt(needsterminal) or
+tt(copiousoutput) are set if the handler needs to be run under a
+terminal; the second flag is used if the output should be sent to a pager.
+An example of a suitable tt(mailcap) entry for such a program is:
+
+example(text/html; /usr/bin/lynx '%s'; needsterminal)
+)
+enditem()
+)
+item(tt(pick-web-browser))(
+This function is separate from the two MIME functions described above
+and can be assigned directly to a suffix:
+
+example(autoload -U pick-web-browser
+alias -s html=pick-web-browser)
+
+It is provided as an intelligent front end to dispatch a web browser.
+It will check if an X Windows display is available, and if so
+if there is already a browser running which can accept a remote
+connection.  In that case, the file will be displayed in that browser;
+you should check explicitly if it has appeared in the running browser's
+window.  Otherwise, it will start a new browser according to a builtin
+set of preferences.
+
+Alternatively, tt(pick-web-browser) can be run as a zsh script.
+
+Two styles are available to customize the choice of browsers:
+tt(x-browsers) when running under the X Windows System, and
+tt(tty-browsers) otherwise.  These are arrays in decreasing order
+of preference consiting of the command name under which to start the
+browser.  They are looked up in the context tt(:mime:) (which may
+be extended in future, so appending `tt(*)' is recommended).  For
+example,
+
+example(zstyle ':mime:*' x-browsers opera konqueror netscape)
+
+specifies that tt(pick-web-browser) should first look for a runing
+instance of Opera, Konqueror or Netscape, in that order, and if it
+fails to find any should attempt to start Opera.
+)
+enditem()
+
+texinode(Other Functions)()(MIME Functions)(User Contributions)
+sect(Other Functions)
+
+There are a large number of helpful functions in the tt(Functions/Misc)
+directory of the zsh distribution.  Most are very simple and do not
+require documentation here, but a few are worthy of special mention.
+
+subsect(Descriptions)
+
+startitem()
+findex(colors)
+item(tt(colors))(
+This function initializes several associative arrays to map color names to
+(and from) the ANSI standard eight-color terminal codes.  These are used
+by the prompt theme system (ifzman(see above)\
+ifnzman(noderef(Prompt Themes))).  You seldom should need to run
+tt(colors) more than once.
+
+The eight base colors are: black, red, green, yellow, blue, magenta, cyan,
+and white.  Each of these has codes for foreground and background.  In
+addition there are eight intensity attributes: bold, faint, standout,
+underline, blink, reverse, and conceal.  Finally, there are six codes used
+to negate attributes: none (reset all attributes to the defaults), normal
+(neither bold nor faint), no-standout, no-underline, no-blink, and
+no-reverse.
+
+Some terminals do not support all combinations of colors and intensities.
+
+The associative arrays are:
+
+startitem()
+xitem(color)
+item(colour)(
+Map all the color names to their integer codes, and integer codes to the
+color names.  The eight base names map to the foreground color codes, as
+do names prefixed with `tt(fg-)', such as `tt(fg-red)'.  Names prefixed
+with `tt(bg-)', such as `tt(bg-blue)', refer to the background codes.  The
+reverse mapping from code to color yields base name for foreground codes
+and the tt(bg-) form for backgrounds.
+
+Although it is a misnomer to call them `colors', these arrays also map the
+other fourteen attributes from names to codes and codes to names.
+)
+xitem(fg)
+xitem(fg_bold)
+item(fg_no_bold)(
+Map the eight basic color names to ANSI terminal escape sequences that set
+the corresponding foreground text properties.  The tt(fg) sequences change
+the color without changing the eight intensity attributes.
+)
+xitem(bg)
+xitem(bg_bold)
+item(bg_no_bold)(
+Map the eight basic color names to ANSI terminal escape sequences that set
+the corresponding background properties.  The tt(bg) sequences change the
+color without changing the eight intensity attributes.
+)
+enditem()
+
+In addition, the scalar parameters tt(reset_color) and tt(bold_color) are
+set to the ANSI terminal escapes that turn off all attributes and turn on
+bold intensity, respectively.
+)
+findex(fned)
+item(tt(fned) var(name))(
+Same as tt(zed -f).  This function does not appear in the zsh
+distribution, but can be created by linking tt(zed) to the name tt(fned)
+in some directory in your tt(fpath).
+)
+findex(is-at-least)
+item(tt(is-at-least) var(needed) [ var(present) ])(
+Perform a greater-than-or-equal-to comparison of two strings having the
+format of a zsh version number; that is, a string of numbers and text with
+segments separated by dots or dashes.  If the var(present) string is not
+provided, tt($ZSH_VERSION) is used.  Segments are paired left-to-right in
+the two strings with leading non-number parts ignored.  If one string has
+fewer segments than the other, the missing segments are considered zero.
+
+This is useful in startup files to set options and other state that are
+not available in all versions of zsh.
+
+example(is-at-least 3.1.6-15 && setopt NO_GLOBAL_RCS
+is-at-least 3.1.0 && setopt HIST_REDUCE_BLANKS
+is-at-least 2.6-17 || print "You can't use is-at-least here.")
+)
+findex(nslookup)
+item(tt(nslookup) [ var(arg) ... ])(
+This wrapper function for the tt(nslookup) command requires the
+tt(zsh/zpty) module (see
+ifzman(zmanref(zshmodules))\
+ifnzman(noderef(The zsh/zpty Module))\
+).  It behaves exactly like the standard tt(nslookup)
+except that it provides customizable prompts (including a right-side
+prompt) and completion of nslookup commands, host names, etc. (if you use
+the function-based completion system).  Completion styles may be set with
+the context prefix `tt(:completion:nslookup)'.
+
+See also the tt(pager), tt(prompt) and tt(rprompt) styles below.
+)
+item(tt(run-help))(
+See `Accessing On-Line Help'
+ifzman(above)\
+ifnzman((noderef(Utilities))).
+)
+item(tt(tetris))(
+Zsh was once accused of not being as complete as Emacs,
+because it lacked a Tetris game.  This function was written to
+refute this vicious slander.
+
+This function must be used as a ZLE widget:
+
+example(autoload -U tetris
+zle -N tetris
+bindkey var(keys) tetris)
+
+To start a game, execute the widget by typing the var(keys).  Whatever command
+line you were editing disappears temporarily, and your keymap is also
+temporarily replaced by the Tetris control keys.  The previous editor state
+is restored when you quit the game (by pressing `tt(q)') or when you lose.
+
+If you quit in the middle of a game, the next invocation of the tt(tetris)
+widget will continue where you left off.  If you lost, it will start a new
+game.
+)
+findex(zargs)
+item(tt(zargs) [ var(option) ... tt(-)tt(-) ] [ var(input) ... ] [ tt(-)tt(-) var(command) [ var(arg) ... ] ])(
+This function works like GNU xargs, except that instead of reading lines
+of arguments from the standard input, it takes them from the command line.
+This is useful because zsh, especially with recursive glob operators,
+often can construct a command line for a shell function that is longer
+than can be accepted by an external command.
+
+The var(option) list represents options of the tt(zargs) command itself,
+which are the same as those of tt(xargs).  The var(input) list is the
+collection of strings (often file names) that become the arguments of the
+tt(command), analogous to the standard input of tt(xargs).  Finally, the
+var(arg) list consists of those arguments (usually options) that are
+passed to the var(command) each time it runs.  The var(arg) list precedes
+the elements from the tt(input) list in each run.  If no var(command) is
+provided, then no var(arg) list may be provided, and in that event the
+default command is `tt(print)' with arguments `tt(-r -)tt(-)'.
+
+For example, to get a long tt(ls) listing of all plain files in the
+current directory or its subdirectories:
+
+example(autoload -U zargs
+zargs -- **/*(.) -- ls -l)
+
+Note that `tt(-)tt(-)' is used both to mark the end of the var(option)
+list and to mark the end of the var(input) list, so it must appear twice
+whenever the var(input) list may be empty.  If there is guaranteed to be
+at least one var(input) and the first var(input) does not begin with a
+`tt(-)', then the first `tt(-)tt(-)' may be omitted.
+
+In the event that the string `tt(-)tt(-)' is or may be an var(input), the
+tt(-e) option may be used to change the end-of-inputs marker.  Note that
+this does em(not) change the end-of-options marker.  For example, to use
+`tt(..)' as the marker:
+
+example(zargs -e.. -- **/*(.) .. ls -l)
+
+This is a good choice in that example because no plain file can be named
+`tt(..)', but the best end-marker depends on the circumstances.
+
+For details of the other tt(zargs) options, see zmanref(xargs) or run
+tt(zargs) with the tt(-)tt(-help) option.
+)
+findex(zcalc)
+item(tt(zcalc) [ var(expression) ... ])(
+A reasonably powerful calculator based on zsh's arithmetic evaluation
+facility.  The syntax is similar to that of formulae in most programming
+languages; see
+ifzman(the section `Arithmetic Evaluation' in zmanref(zshmisc))\
+ifnzman(noderef(Arithmetic Evaluation)) for details.  The mathematical
+library tt(zsh/mathfunc) will be loaded if it is available; see
+ifzman(the section `The zsh/mathfunc Module' in zmanref(zshmodules))\
+ifnzman(noderef(The zsh/mathfunc Module)).  The mathematical functions
+correspond to the raw system libraries, so trigonometric functions are
+evaluated using radians, and so on.
+
+Each line typed is evaluated as an expression.  The prompt shows a number,
+which corresponds to a positional parameter where the result of that
+calculation is stored.  For example, the result of the calculation on the
+line preceded by `tt(4> )' is available as tt($4).  Full command line
+editing, including the history of previous calculations, is available; the
+history is saved in the file tt(~/.zcalc_history).  To exit, enter a blank
+line or type `tt(q)' on its own.
+
+If arguments are given to tt(zcalc) on start up, they are used to prime the
+first few positional parameters.  A visual indication of this is given when
+the calculator starts.
+
+The constants tt(PI) (3.14159...) and tt(E) (2.71828...) are provided.
+Parameter assignment is possible, but note that all parameters will be put
+into the global namespace.
+
+An extra facility is provided for changing the default output base.  Use,
+for example, `tt([#16])' to display hexadecimal output preceded by an
+indication of the base, or `tt([##16])' just to display the raw number in
+the given base.  Bases themselves are always specified in decimal.
+`tt([#])' restores the normal output format.
+
+The output base can be initialised by passing the option `tt(-#)var(base)',
+for example `tt(zcalc -#16)' (the `tt(#)' may have to be quoted, depending
+on the globbing options set).
+
+The prompt is configurable via the parameter tt(ZCALCPROMPT), which
+undergoes standard prompt expansion.  The index of the current entry is
+stored locally in the first element of the array tt(psvar), which can be
+referred to in tt(ZCALCPROMPT) as `tt(%1v)'.  The default prompt is
+`tt(%1v> )'.
+
+See the comments in the function for a few extra tips.
+)
+findex(zed)
+xitem(tt(zed) [ tt(-f) ] var(name))
+item(tt(zed -b))(
+This function uses the ZLE editor to edit a file or function.
+
+Only one var(name) argument is allowed.
+If the tt(-f) option is given, the name is taken to be that of
+a function; if the function is marked for autoloading, tt(zed) searches
+for it in the tt(fpath) and loads it.  Note that functions edited this way
+are installed into the current shell, but em(not) written back to the
+autoload file.
+
+Without tt(-f), var(name) is the path name of the file to edit, which need
+not exist; it is created on write, if necessary.
+
+While editing, the function sets the main keymap to tt(zed) and the
+vi command keymap to tt(zed-vicmd).  These will be copied from the existing
+tt(main) and tt(vicmd) keymaps if they do not exist the first time tt(zed)
+is run.  They can be used to provide special key bindings used only in zed.
+
+If it creates the keymap, tt(zed) rebinds the return key to insert a line
+break and `tt(^X^W)' to accept the edit in the tt(zed) keymap, and binds
+`tt(ZZ)' to accept the edit in the tt(zed-vicmd) keymap.
+
+The bindings alone can be installed by running `tt(zed -b)'.  This is
+suitable for putting into a startup file.  Note that, if rerun,
+this will overwrite the existing tt(zed) and tt(zed-vicmd) keymaps.
+
+Completion is available, and styles may be set with the context prefix
+`tt(:completion:zed)'.
+
+A zle widget tt(zed-set-file-name) is available.  This can be called by
+name from within zed using `tt(\ex zed-set-file-name)' (note, however, that
+because of zed's rebindings you will have to type tt(^j) at the end instead
+of the return key), or can be bound to a key in either of the tt(zed) or
+tt(zed-vicmd) keymaps after `tt(zed -b)' has been run.  When the widget is
+called, it prompts for a new name for the file being edited.  When zed
+exits the file will be written under that name and the original file will
+be left alone.  The widget has no effect with `tt(zed -f)'.
+
+While tt(zed-set-file-name) is running, zed uses the keymap
+tt(zed-normal-keymap), which is linked from the main keymap in effect
+at the time zed initialised its bindings.  (This is to make the return key
+operate normally.)  The result is that if the main keymap has been changed,
+the widget won't notice.  This is not a concern for most users.
+)
+findex(zcp)
+findex(zln)
+xitem(tt(zcp) [ tt(-finqQvwW) ] var(srcpat) var(dest))
+item(tt(zln) [ tt(-finqQsvwW) ] var(srcpat) var(dest))(
+Same as tt(zmv -C) and tt(zmv -L), respectively.  These functions do not
+appear in the zsh distribution, but can be created by linking tt(zmv) to
+the names tt(zcp) and tt(zln) in some directory in your tt(fpath).
+)
+item(tt(zkbd))(
+See `Keyboard Definition'
+ifzman(above)\
+ifnzman((noderef(Utilities))).
+)
+findex(zmv)
+item(tt(zmv) [ tt(-finqQsvwW) ] [ -C | -L | -M | -p var(program) ] [ -o var(optstring) ] var(srcpat) var(dest) )(
+Move (usually, rename) files matching the pattern var(srcpat) to
+corresponding files having names of the form given by var(dest), where
+var(srcpat) contains parentheses surrounding patterns which will be
+replaced in turn by $1, $2, ... in var(dest).  For example,
+
+example(zmv '(*).lis' '$1.txt')
+
+renames `tt(foo.lis)' to `tt(foo.txt)', `tt(my.old.stuff.lis)' to
+`tt(my.old.stuff.txt)', and so on.
+
+The pattern is always treated as an tt(EXTENDED_GLOB) pattern.  Any file
+whose name is not changed by the substitution is simply ignored.  Any
+error (a substitution resulted in an empty string, two substitutions gave
+the same result, the destination was an existing regular file and tt(-f)
+was not given) causes the entire function to abort without doing anything.
+
+Options:
+
+startsitem()
+sitem(tt(-f))(Force overwriting of destination files.  Not currently
+passed down to the tt(mv)/tt(cp)/tt(ln) command due to vagaries of
+implementations (but you can use tt(-o-f) to do that).)
+sitem(tt(-i))(Interactive: show each line to be executed and ask the user
+whether to execute it.  `Y' or `y' will execute it, anything else will
+skip it.  Note that you just need to type one character.)
+sitem(tt(-n))(No execution: print what would happen, but don't do it.)
+sitem(tt(-q))(Turn bare glob qualifiers off: now assumed by default, so
+this has no effect.)
+sitem(tt(-Q))(Force bare glob qualifiers on.  Don't turn this on unless
+you are actually using glob qualifiers in a pattern.)
+sitem(tt(-s))(Symbolic, passed down to tt(ln); only works with tt(-L).)
+sitem(tt(-v))(Verbose: print each command as it's being executed.)
+sitem(tt(-w))(Pick out wildcard parts of the pattern, as described above,
+and implicitly add parentheses for referring to them.)
+sitem(tt(-W))(Just like tt(-w), with the addition of turning wildcards in
+the replacement pattern into sequential ${1} .. ${N} references.)
+sxitem(tt(-C))
+sxitem(tt(-L))
+sitem(tt(-M))(Force tt(cp), tt(ln) or tt(mv), respectively, regardless of
+the name of the function.)
+sitem(tt(-p) var(program))(Call var(program) instead of tt(cp), tt(ln) or
+tt(mv).  Whatever it does, it should at least understand the form
+ifzman(`var(program) tt(-)tt(-) var(oldname) var(newname)')\
+ifnzman(example(var(program) tt(-)tt(-) var(oldname) var(newname)))
+where var(oldname) and var(newname) are filenames generated by tt(zmv).)
+sitem(tt(-o) var(optstring))(The var(optstring) is split into words and
+passed down verbatim to the tt(cp), tt(ln) or tt(mv) command called to
+perform the work.  It should probably begin with a `tt(-)'.)
+endsitem()
+
+For more complete examples and other implementation details, see the
+tt(zmv) source file, usually located in one of the directories named in
+your tt(fpath), or in tt(Functions/Misc/zmv) in the zsh distribution.
+)
+item(tt(zrecompile))(
+See `Recompiling Functions'
+ifzman(above)\
+ifnzman((noderef(Utilities))).
+)
+findex(zstyle+)
+item(tt(zstyle+) var(context) var(style) var(value) [ + var(subcontext) var(style) var(value) ... ])(
+This makes defining styles a bit simpler by using a single `tt(+)' as a
+special token that allows you to append a context name to the previously
+used context name.  Like this:
+
+example(zstyle+ ':foo:bar' style1 value1 \ 
+      + ':baz'     style2 value2 \ 
+      + ':frob'    style3 value3)
+
+This defines `style1' with `value1' for the context tt(:foo:bar) as usual,
+but it also defines `style2' with `value2' for the context
+tt(:foo:bar:baz) and `style3' with `value3' for tt(:foo:bar:frob).  Any
+var(subcontext) may be the empty string to re-use the first context
+unchanged.
+)
+enditem()
+
+subsect(Styles)
+
+startitem()
+kindex(insert-tab, completion style)
+item(tt(insert-tab))(
+The tt(zed) function em(sets) this style in context `tt(:completion:zed:*)'
+to turn off completion when tt(TAB) is typed at the beginning of a line.
+You may override this by setting your own value for this context and style.
+)
+kindex(pager, nslookup style)
+item(tt(pager))(
+The tt(nslookup) function looks up this style in the context
+`tt(:nslookup)' to determine the program used to display output that does
+not fit on a single screen.
+)
+kindex(prompt, nslookup style)
+kindex(rprompt, nslookup style)
+xitem(tt(prompt))
+item(tt(rprompt))(
+The tt(nslookup) function looks up this style in the context
+`tt(:nslookup)' to set the prompt and the right-side prompt, respectively.
+The usual expansions for the tt(PS1) and tt(RPS1) parameters may be used
+(see
+ifzman(zmanref(zshmisc))\
+ifnzman(noderef(Prompt Expansion))\
+).
+)
+enditem()
