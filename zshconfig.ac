@@ -482,6 +482,13 @@ AC_HEADER_STDC
 AC_HEADER_TIME
 AC_HEADER_STAT
 AC_HEADER_SYS_WAIT
+
+oldcflags="$CFLAGS"
+AC_CHECK_PROG([PCRECONF], pcre-config, pcre-config)
+if test "x$ac_cv_prog_PCRECONF" = xpcre-config; then
+  CFLAGS="$CFLAGS `pcre-config --cflags`"
+fi
+
 AC_CHECK_HEADERS(sys/time.h sys/times.h sys/select.h termcap.h termio.h \
 		 termios.h sys/param.h sys/filio.h string.h memory.h \
 		 limits.h fcntl.h libc.h sys/utsname.h sys/resource.h \
