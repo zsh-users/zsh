@@ -1793,7 +1793,7 @@ zjoin(char **arr, int delim, int heap)
     for (s = arr; *s; s++)
 	len += strlen(*s) + 1;
     if (!len)
-	return "";
+	return heap? "" : ztrdup("");
     ptr = ret = (heap ? (char *) hcalloc(len) : (char *) zcalloc(len));
     for (s = arr; *s; s++) {
 	strucpy(&ptr, *s);
