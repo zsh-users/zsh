@@ -1,3 +1,8 @@
+2002-10-05  Clint Adams  <clint@zsh.org>
+
+	* 17765: Completion/Debian/Command/_apt: add some missing apt-get
+	options.
+
 2002-09-26  Oliver Kiddle  <opk@zsh.org>
 
 	* unposted: Completion/Unix/Command/_bzip2: recognise also .tbz

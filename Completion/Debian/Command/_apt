@@ -411,7 +411,12 @@ _apt-get () {
     --reinstall:bool \
     -c,--config-file:configfile \
     -o,--option:arbitem \
-    -t:release \
+    -t,--target-release,--default-release:release \
+    --trivial-only:bool \
+    --no-remove:bool \
+    --only-source:bool \
+    --diff-only:bool \
+    --tar-only:bool \
     -- \
     /$'update\0'/ \| \
     /$'upgrade\0'/ \| \
