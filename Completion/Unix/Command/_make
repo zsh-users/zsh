@@ -17,7 +17,7 @@ expandVars() {
 		open='{'
 		close='}'
 		;;
-	    ([[:alnum:]]*)
+	    ([[:alpha:]]*)
 		open=''
 		close=''
 		var=${(s::)var[1]}
