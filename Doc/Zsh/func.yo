@@ -193,6 +193,24 @@ The signal number will be passed as the first parameter to the function.
 
 If a function of this form is defined and null,
 the shell and processes spawned by it will ignore tt(SIG)var(NAL).
+
+The return value from the function is handled specially.  If it is
+zero, the signal is assumed to have been handled, and execution continues
+normally.  Otherwise, the normal effect of the signal is produced;
+if this causes execution to terminate, the status returned to the shell is
+the status returned from the function.
+
+Programs terminated by uncaught signals typically return the status 128
+plus the signal number.  Hence the following causes the handler for
+tt(SIGINT) to print a message, then mimic the usual effect of the signal.
+
+example(TRAPINT() {
+  print "Caught SIGINT, aborting."
+  return $(( 128 + $1 ))
+})
+
+The functions tt(TRAPZERR), tt(TRAPDEBUG) and tt(TRAPEXIT) are never
+executed inside other traps.
 )
 findex(TRAPDEBUG)
 item(tt(TRAPDEBUG))(
