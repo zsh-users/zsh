@@ -1,8 +1,13 @@
+2000-06-27  Bart Schaefer  <schaefer@brasslantern.com>
+
+	* 12086: Doc/Zsh/compsys.yo: Move _use_lo doc into alphabetical
+	order; separate _files and _path_files for same reason.
+
 2000-06-27  Sven Wischnowsky  <wischnow@zsh.org>
 
-	* 3219: Completion/Core/_main_complete, Doc/Zsh/compsys.yo: menu
- 	style accepts yes=x to start menu completion if there are at least
- 	x matches
+	* users/3219: Completion/Core/_main_complete, Doc/Zsh/compsys.yo:
+	menu style accepts yes=x to start menu completion if there are at
+	least x matches
 	
 	* Andrej: 12084: Src/Modules/zpty.c: don't close slave if not yet open
 
@@ -37,8 +42,8 @@
 
 2000-06-26  Sven Wischnowsky  <wischnow@zsh.org>
 
-	* 3208: Completion/User/_use_lo: default completion even if there
- 	are options
+	* users/3208: Completion/User/_use_lo: default completion even if
+	there are options
 	
 	* 12070: Completion/Core/_ignored: fix for completer lookup in
  	_ignored
