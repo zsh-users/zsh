@@ -1091,7 +1091,12 @@ gettempname(void)
     if (!(s = getsparam("TMPPREFIX")))
 	s = DEFAULT_TMPPREFIX;
  
+#ifdef HAVE__MKTEMP
+    /* Zsh uses mktemp() safely, so silence the warnings */
+    return ((char *) _mktemp(dyncat(unmeta(s), "XXXXXX")));
+#else
     return ((char *) mktemp(dyncat(unmeta(s), "XXXXXX")));
+#endif
 }
 
 /* Check if a string contains a token */

@@ -813,7 +813,7 @@ AC_CHECK_FUNCS(lchown memcpy memmove \
               nis_list initgroups fchdir cap_get_proc readlink nice \
 	      getgrgid getgrnam getpwent getpwnam getpwuid setpgrp \
 	      inet_aton inet_pton inet_ntop getipnodebyname gethostbyname2 \
-	      fseeko ftello mmap munmap msync ftruncate setlocale)
+	      fseeko ftello mmap munmap msync ftruncate setlocale _mktemp)
 
 dnl ---------------
 dnl CHECK FUNCTIONS
