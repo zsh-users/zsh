@@ -21,6 +21,11 @@
         Completion/X/Command/.distfiles, Completion/X/Command/_mozilla:
         completion for mozilla, some more web browsers in _webbrowser.
 
+2001-12-11  Oliver Kiddle  <opk@zsh.org>
+
+	* 16322: Completion/Unix/Command/_mtools,
+	Completion/Unix/Command/.distfiles: new mtools completion
+
 2001-12-09  Clint Adams  <clint@zsh.org>
 
         * 16315: Completion/Unix/Command/.distfiles,
