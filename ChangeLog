@@ -1,5 +1,8 @@
 2000-06-29  Sven Wischnowsky  <wischnow@zsh.org>
 
+	* 12125: Src/parse.c, Test/09funcdef.ztst: fix for `foo () print
+ 	bar' (function definitions without braces)
+	
 	* 12122: Completion/Core/_main_complete: reverse meaning of yes=num
  	again
 

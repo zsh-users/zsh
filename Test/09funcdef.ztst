@@ -6,3 +6,8 @@
   f$$
 0:Regression test: `function f$$ () { ... }'
 >regress expansion of function names
+
+  function foo () print bar
+  foo
+0:Function definition without braces
+>bar
