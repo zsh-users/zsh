@@ -10,15 +10,10 @@ defs=(
   'commands:external command:compadd -k commands'
 )
 
-if [[ -n "$path[(r).]" ]]; then
+[[ -n "$path[(r).]" || $PREFIX = */* ]] &&
   defs=( "$defs[@]"
          'executables:executable file or directory:_path_files -/g \*\(-\*\)'
   )
-else
-  defs=( "$defs[@]"
-         'executables:executable file or directory:_files -P/ -W/ -/g \*\(-\*\)'
-  )
-fi
 
 if [[ "$1" = -e ]]; then
   shift
