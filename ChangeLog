@@ -1,3 +1,13 @@
+2000-04-04  Peter Stephenson  <pws@pwstephenson.fsnet.co.uk>
+
+	* Clint: 10477: Functions/Zftp/zfcd_match: some awks don't like
+	index zero.
+
+	* Clint: 10448: Completion/Debian/_dpkg: complete after -S.
+
+	* Chmouel: 10440: Completion/Linux/_rpm: rpm tags should have %
+	in front.
+
 2000-04-03  Sven Wischnowsky <wischnow@informatik.hu-berlin.de>
 
 	* 10471: Completion/User/_imagemagick: new completion function
@@ -44,6 +54,10 @@
 	Completion/User/_netscape, Completion/User/_tiff,
 	Completion/User/_urls, Completion/X/_xmodmap,
 	Doc/Zsh/compsys.yo, Src/Zle/computil.c: Various completion fixes.
+
+2000-04-03  Peter Stephenson  <pws@pwstephenson.fsnet.co.uk>
+
+	* Clint: 10424: Completion/Debian/_dpkg: reported -i=irs failure.
 
 2000-04-02  Peter Stephenson  <pws@pwstephenson.fsnet.co.uk>
 

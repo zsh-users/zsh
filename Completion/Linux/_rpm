@@ -202,7 +202,7 @@ while [[ -n "$state" ]]; do
     fi
     ;;
   tags)
-    if compset -P '*\{'; then
+    if compset -P '*%*\{'; then
       _wanted tags expl 'RPM tag' \
           compadd -M 'm:{a-z}={A-Z}' -S '\}' - \
                   "${(@)${(@f)$(_call tags rpm --querytags)}#RPMTAG_}" && ret=0
