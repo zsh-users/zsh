@@ -372,7 +372,7 @@ yankpop(char **args)
     int cc, kctstart = kct;
     Cutbuffer buf;
 
-    if (!(lastcmd & ZLE_YANK))
+    if (!(lastcmd & ZLE_YANK) || !kring)
 	return 1;
     do {
 	/*

@@ -1,3 +1,8 @@
+2003-02-27  Peter Stephenson  <pws@csr.com>
+
+	* 18313: Src/Zle/zle_misc.c: After a single yank (hence
+	no kill ring), yank-pop	did unpleasant things with a NULL pointer.
+
 2003-02-27  Oliver Kiddle  <opk@zsh.org>
 
 	* unposted: Completion/Unix/Command/_tar: correct my typo
