@@ -61,7 +61,8 @@ Zsh/mod_deltochar.yo Zsh/mod_example.yo Zsh/mod_files.yo \
 Zsh/mod_mapfile.yo Zsh/mod_mathfunc.yo Zsh/mod_parameter.yo Zsh/mod_pcre.yo \
 Zsh/mod_sched.yo Zsh/mod_stat.yo Zsh/mod_termcap.yo Zsh/mod_terminfo.yo \
 Zsh/mod_zftp.yo Zsh/mod_zle.yo Zsh/mod_zleparameter.yo \
-Zsh/mod_zprof.yo Zsh/mod_zpty.yo Zsh/mod_zutil.yo Zsh/mod_tcp.yo
+Zsh/mod_zprof.yo Zsh/mod_zpty.yo Zsh/mod_zselect.yo \
+Zsh/mod_zutil.yo Zsh/mod_tcp.yo
 
 YODLSRC = zmacros.yo zman.yo ztexi.yo Zsh/arith.yo Zsh/builtins.yo \
 Zsh/compat.yo Zsh/compctl.yo Zsh/compsys.yo Zsh/compwid.yo Zsh/cond.yo \
@@ -83,31 +84,27 @@ everything: all dvi ps html
 dvi: zsh.dvi
 .PHONY: dvi
 
-zsh.dvi: $(sdir)/zsh.texi
-	$(TEXI2DVI) $(sdir)/zsh.texi
+zsh.dvi: zsh.texi
+	$(TEXI2DVI) zsh.texi
 
-texi: $(sdir)/zsh.texi
+texi: zsh.texi
 .PHONY: texi
 
-$(sdir)/zsh.texi:
+zsh.texi:
 	$(YODL) -o $@ -I$(sdir) -w ztexi.yo version.yo zsh.yo; \
 	test -f $@
 
 info: zsh.info
 .PHONY: info
 
-zsh.info: $(sdir)/zsh.texi
-	$(MAKEINFO) $(sdir)/zsh.texi
+zsh.info: zsh.texi
+	$(MAKEINFO) zsh.texi
 
 .yo.1:
-	case $@ in \
-	  */*) target=$@ ;; \
-	  *) target=$(sdir)/$@ ;; \
-	esac; \
 	case '$(YODL)' in :*) ;; *) \
-	    $(YODL) -I$(sdir) -w zman.yo version.yo $< | sed -e '1s/\\-/-/g' -e '/^\.'\''/d' > $$target \
+	    $(YODL) -I$(sdir) -w zman.yo version.yo $< | sed -e '1s/\\-/-/g' -e '/^\.'\''/d' > $@ \
 	;; esac; \
-	test -f $$target
+	test -f $@
 
 ps: us_ps a4_ps
 .PHONY: ps
@@ -127,28 +124,24 @@ zsh_a4.ps: zsh.dvi
 html: zsh_toc.html
 .PHONY: html
 
-zsh_toc.html: $(sdir)/zsh.texi
-	$(TEXI2HTML) $(sdir)/zsh.texi
+zsh_toc.html: zsh.texi
+	$(TEXI2HTML) zsh.texi
 
 zshall.1: zsh.yo
-	case $@ in \
-	  */*) target=$@ ;; \
-	  *) target=$(sdir)/$@ ;; \
-	esac; \
 	case '$(YODL)' in :*) ;; *) \
-	    $(YODL) -I$(sdir) -DZSHALL -w zman.yo version.yo zsh.yo | sed -e '1s/\\-/-/g' -e '/^\.'\''/d' > $$target \
+	    $(YODL) -I$(sdir) -DZSHALL -w zman.yo version.yo zsh.yo | sed -e '1s/\\-/-/g' -e '/^\.'\''/d' > $@ \
 	;; esac; \
-	test -f $$target
+	test -f $@
 
 ../META-FAQ: META-FAQ.yo Zsh/metafaq.yo
 	case '$(YODL)' in :*) ;; *) \
-	    $(YODL) -I$(sdir) META-FAQ.yo | sed -e '/NEXTLINE/N' -e '/DELLINE/d' -e '/^SECTHEAD$$/{N;s/^SECTHEAD.//;h;s/./-/g;H;g;}' -e 's/  *$$//' > $(sdir_top)/META-FAQ \
+	    $(YODL) -I$(sdir) META-FAQ.yo | sed -e '/NEXTLINE/N' -e '/DELLINE/d' -e '/^SECTHEAD$$/{N;s/^SECTHEAD.//;h;s/./-/g;H;g;}' -e 's/  *$$//' > $@ \
 	;; esac
-	test -f $(sdir_top)/META-FAQ
+	test -f $@
 
 $(YODLDOC): version.yo
 
-$(sdir)/zsh.texi: $(YODLSRC)
+zsh.texi: $(YODLSRC)
 
 man: $(MAN)
 .PHONY: man
@@ -190,7 +183,7 @@ version.yo: $(sdir_top)/Config/version.mk
 	  echo 'def(version)(0)('$(VERSION)')'; \
 	  echo 'def(date)(0)('$(VERSION_DATE)')'; \
 	  echo 'ENDDEF()#' | tr '#' '\\'; \
-	) > $(sdir)/version.yo
+	) > $@
 
 Zsh/modlist.yo: $(MODDOCSRC)
 	( \
@@ -218,7 +211,7 @@ Zsh/modlist.yo: $(MODDOCSRC)
 		mod1=$$mod2; \
 		mod2=$$mod3; \
 	    done \
-	) > $(sdir)/Zsh/modlist.yo
+	) > $@
 
 Zsh/modmenu.yo: $(MODDOCSRC)
 	( \
@@ -228,7 +221,7 @@ Zsh/modmenu.yo: $(MODDOCSRC)
 		    < $(sdir)/$$modfile; \
 	    done; \
 	    echo "endmenu()" \
-	) > $(sdir)/Zsh/modmenu.yo
+	) > $@
 
 Zsh/manmodmenu.yo: $(MODDOCSRC)
 	( \
@@ -236,7 +229,7 @@ Zsh/manmodmenu.yo: $(MODDOCSRC)
 		sed -n '1{s|^COMMENT(!MOD!\(.*\)$$|menu(The \1 Module)|;p;q;}' \
 		    < $(sdir)/$$modfile; \
 	    done \
-	) > $(sdir)/Zsh/manmodmenu.yo
+	) > $@
 
 # ========== DEPENDENCIES FOR INSTALLING ==========
 
@@ -252,7 +245,7 @@ uninstall: uninstall.man
 install.man: man
 	${SHELL} $(sdir_top)/mkinstalldirs $(DESTDIR)$(mandir)/man1
 	for file in $(MAN); do \
-	    $(INSTALL_DATA) $(sdir)/$$file $(DESTDIR)$(mandir)/man1/`echo $$file | sed 's|zsh|$(tzsh)|'` || exit 1; \
+	    $(INSTALL_DATA) $$file $(DESTDIR)$(mandir)/man1/`echo $$file | sed 's|zsh|$(tzsh)|'` || exit 1; \
 	done
 .PHONY: install.man
 
@@ -263,7 +256,7 @@ install.info: texi
 	mkdir infodir
 	if ( \
 	    sed '/^@setfilename/s|zsh|$(tzsh)|' \
-		< $(sdir)/zsh.texi > infodir/tzsh.texi && \
+		< zsh.texi > infodir/tzsh.texi && \
 	    (cd infodir && $(MAKEINFO) tzsh.texi) && \
 	    for file in infodir/$(tzsh).info*; do \
 		$(INSTALL_DATA) $$file $(DESTDIR)$(infodir) || exit 1; \
@@ -321,8 +314,8 @@ distclean-here: clean-here
 .PHONY: distclean-here
 
 realclean-here: distclean-here
-	cd $(sdir) && rm -f Zsh/modlist.yo Zsh/modmenu.yo Zsh/manmodmenu.yo
-	cd $(sdir) && rm -f version.yo ../META-FAQ zsh.texi $(MAN)
+	rm -f Zsh/modlist.yo Zsh/modmenu.yo Zsh/manmodmenu.yo
+	rm -f version.yo ../META-FAQ zsh.texi $(MAN)
 .PHONY: realclean-here
 
 @CLEAN_MK@

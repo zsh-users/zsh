@@ -1,3 +1,9 @@
+2002-05-08  Peter Stephenson  <pws@csr.com>
+
+	* 17081: Src/Modules/zselect.c, Src/Modules/zselect.mdd,
+	Doc/Zsh/mod_zselect.yo:  zsh/zselect module provides zselect
+	builtin as front-end to select system call.
+
 2002-05-08  Andrej Borsenkow  <bor@zsh.org>
 
 	* 17080: Doc/Zsh/compsys.yo: clarify tag-order style usage
