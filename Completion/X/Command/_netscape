@@ -7,7 +7,7 @@ _x_arguments -C \
   '-xrm:resource:_x_resource' \
   '-help[show usage message]' \
   '-version[show the version number and build date]' \
-  '-visual[use a specific server visual]:id-or-number:' \
+  '-visual[use a specific server visual]:visual:_x_visual -b' \
   '-install[install a private colormap]' \
   '-no-install[use the default colormap]' \
   '-ncols[max no. of colors to allocate for images]:n:' \

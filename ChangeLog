@@ -1,3 +1,12 @@
+2002-01-02  Oliver Kiddle  <opk@zsh.org>
+
+	* 16384: Completion/X/Type/.distfiles, Completion/X/Type/_x_visual,
+	Completion/X/Command/.distfiles, Completion/X/Command/_xloadimage,
+	Completion/X/Command/_netscape, Completion/X/Command/_x_utils,
+	Completion/X/Command/_xfig, Completion/X/Command/_xv:
+	new completion for xli/xloadimage and factor out completion
+	of X visuals
+
 2001-12-26  Clint Adams  <clint@zsh.org>
 
 	* 16375: Completion/Unix/Command/.distfiles,

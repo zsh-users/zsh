@@ -29,6 +29,6 @@ _x_arguments \
   '-starttextstep:text step:' \
   '-userscale:scale factor:' \
   '-userunit:unit string:' \
-  '-visual:visual:(TrueColor StaticColor DirectColor StaticGray GrayScale PseudoColor)' \
+  '-visual:visual:_x_visual' \
   '-zoom:zoom scale:' \
   '*:xfig file:_files -g \*.\(\#i\)\(\|x\)fig'

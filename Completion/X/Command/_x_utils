@@ -138,7 +138,7 @@ xwud)
     '-in:input file:_files -g \*.\(\#i\)xwd' \
     '-plane:image plane to display:' \
     '-std:standard colormap:(best default gray red blue green)' \
-    '-vis:visual class:(StaticGray GrayScale StaticColor PseudoColor DirectColor TrueColor)'
+    '-vis:visual:_x_visual'
   ;;
 xrdb)
   _x_arguments \

@@ -29,7 +29,7 @@ _x_arguments \
   '-white:'"'"'white'"'"' color:_x_color' \
   '-black:'"'"'black'"'"' color:_x_color' \
   '-wait:seconds to wait:' \
-  '-visual:visual:(TrueColor StaticColor DirectColor StaticGray GrayScale PseudoColor)' \
+  '-visual:visual:_x_visual' \
   '-cursor:cursor character number:' \
   '-icgeometry:icon geometry:_x_geometry' \
   '-dir:directory:_files -/' \
