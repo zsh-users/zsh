@@ -1131,6 +1131,12 @@
         * unposted: Etc/BUGS, Etc/TODO: update relevant
 	issues.
 
+2002-03-07  Bart Schaefer  <schaefer@zsh.org>
+
+	* 16737 (tweaked): Src/parse.c: fix parsing of binary infix
+	operators of builtin `test' when there are more than three
+	arguments.
+
 2002-03-07  Clint Adams  <clint@zsh.org>
 
         * 16778: Completion/Unix/Command/.distfiles,

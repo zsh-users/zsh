@@ -1841,9 +1841,9 @@ par_cond_2(void)
 	    condlex();
 	    return par_cond_double(dupstring("-n"), s1);
 	}
-	if (testargs[1] && !testargs[2]) {
+	if (testargs[1]) {
 	    /* three arguments: if the second argument is a binary operator, *
-	     * perform that binary test on the first and the trird argument  */
+	     * perform that binary test on the first and the third argument  */
 	    if (!strcmp(*testargs, "=")  ||
 		!strcmp(*testargs, "==") ||
 		!strcmp(*testargs, "!=") ||
