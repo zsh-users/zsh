@@ -1,0 +1,31 @@
+#autoload
+
+# This function is called from functions that do matching whenever they
+# need to build a pattern that is used to match possible completions.
+# It gets the name of the calling function and two names of parameters
+# as arguments. The first one is used in the calling function to build
+# the pattern used for matching possible completions. The content of this
+# parameter on entry to this function is the string taken from the line.
+# Here it parameter should be changed to a pattern that matches words as
+# the match specs currently in use do.
+# In the calling function this pattern may be changed again or used only 
+# in parts. The second parameter whose name is given as the third argument
+# allows to give pattern flags liek `(#l)' that are to be used whenever
+# matching is done.
+#
+# As an example, if you have global match specifications like:
+#
+#  compctl -M 'm:{a-z}={A-Z}' 'm:{a-z}={A-Z} r:|[.-]=* r:|=*'
+#
+# This function would look like:
+#
+#   eval "${3}='(#l)'"
+#   [[ MATCHER -eq 2 ]] && eval "$1='${(P)2:gs/./*./:gs/-/*-/}'"
+#
+# The first line makes sure that matching is done case-insensitive as
+# specified by `m:{a-z}={A-Z}'. The second line replaces dots and hyphens
+# in the given string by patterns matching any characters before them,
+# like the `r:|[.-]=* r:|=*'. To make this work, the function `_match_test'
+# would have to be changed to `(( MATCHERS <= 2 ))'
+#
+# The default implementation of this function is empty.

@@ -1,0 +1,2 @@
+#array limit unlimit
+__limits=(-k "(${(j: :)${(f)$(limit)}%% *})")

@@ -1,0 +1,50 @@
+#defpatcomp zf*
+
+# Don't try any more completion after this.
+_compskip=1
+
+# Completion for zftp builtin and zf* functions.  The functions
+# zfcd_match and zfget_match (used for old-style completion)
+# need to be installed for remote file and directory completion to work.
+
+local subcom
+
+if [[ $COMMAND = zftp ]]; then
+  if [[ $CURRENT -eq 1 ]]; then
+    compadd -m open params user login type ascii binary mode put \
+      putat get getat append appendat ls dir local remote mkdir rmdir
+    return
+  fi
+  subcom=$1
+else
+  subcom=$COMMAND
+fi
+
+case $subcom in
+  *(cd|ls|dir))
+   # complete remote directories; we could be smarter about hiding prefixes
+   zfcd_match $PREFIX $SUFFIX
+   (( $#reply )) && compadd -m -S/ -q $reply
+   ;;
+
+  *(get(|at)|gcp|delete|remote))
+   # complete remote files
+   zfget_match $PREFIX $SUFFIX
+   (( $#reply )) && compadd -F fignore -m $reply
+   ;;
+
+  *(put(|at)|pcp))
+   # complete local files
+   _files
+   ;;
+
+  *(open|anon|params))
+  # complete hosts:  should do cleverer stuff with user names
+  complist -k hosts
+  ;;
+
+  *)
+  # dunno... try ordinary completion after all.
+  unset _compskip   
+  ;;
+esac

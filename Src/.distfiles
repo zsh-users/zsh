@@ -1,0 +1,11 @@
+DISTFILES_SRC='
+    .cvsignore .distfiles .exrc .indent.pro
+    Makefile.in Makemod.in.in
+    ansi2knr.c
+    builtin.c compat.c cond.c exec.c glob.c hashtable.c hashtable.h
+    hist.c init.c input.c jobs.c lex.c linklist.c loop.c main.c makepro.awk
+    math.c mem.c mkbltnmlst.sh mkmakemod.sh mkmodindex.sh
+    module.c options.c params.c parse.c prompt.c prototypes.h
+    signals.c signals.h signames.awk subst.c system.h text.c utils.c
+    watch.c xmods.conf zsh.h zsh.mdd ztype.h
+'

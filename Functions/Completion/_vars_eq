@@ -1,0 +1,3 @@
+#defcomp declare export integer local readonly typeset
+
+complist -v -q -S '='

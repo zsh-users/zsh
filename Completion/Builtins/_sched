@@ -1,0 +1,3 @@
+#defcomp sched
+
+[[ -position 2 -1 ]] && _normal "$@"

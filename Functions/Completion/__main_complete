@@ -1,0 +1,48 @@
+#helper
+
+# The main loop of the completion code. This is what is called when 
+# completion is attempted from the command line.
+# The completion code gives us the special variables and the arguments
+# from the command line are given as positional parameters.
+
+local comp name
+
+setopt localoptions nullglob rcexpandparam globdots
+unsetopt markdirs globsubst shwordsplit nounset
+
+# An entry for `--first--' is the replacement for `compctl -T'
+# The `|| return 1' is used throughout: if a function producing matches
+# returns non-zero this is interpreted as `do not try to produce more matches'
+# (this is the replacement for `compctl -t').
+
+comp="$comps[--first--]"
+[[ -z "$comp" ]] || callcomplete comps --first-- "$@" || return 1
+
+# For arguments we use the `__normal' function called via the convenience
+# alias `compsub'.
+
+if [[ $CONTEXT == argument || $CONTEXT == command ]]; then
+  compsub
+else
+  # Let's see if we have a special completion definition for the other
+  # possible contexts.
+
+  comp=''
+
+  case $CONTEXT in
+  redirect)  name=--redirect--;;
+  math)      name=--math--;;
+  subscript) name=--subscript--;;
+  value)     name=--value--;;
+  condition) name=--condition--;;
+  esac
+
+  # If not, we use default completion, if any.
+
+  comp="$comps[$name]"
+  if [[ -z "$comp" ]]; then
+     name=--default--
+     comp="$comps[--default--]"
+  fi
+  [[ -z "$comp" ]] || callcomplete comps "$name" "$@" || return 1
+fi

@@ -1,0 +1,121 @@
+#
+# Generic .zshrc file for zsh 2.7
+#
+# .zshrc is sourced in interactive shells.  It
+# should contain commands to set up aliases, functions,
+# options, key bindings, etc.
+#
+
+# Search path for the cd command
+cdpath=(.. ~ ~/src ~/zsh)
+
+# Use hard limits, except for a smaller stack and no core dumps
+unlimit
+limit stack 8192
+limit core 0
+limit -s
+
+umask 022
+
+# Set up aliases
+alias mv='nocorrect mv'       # no spelling correction on mv
+alias cp='nocorrect cp'       # no spelling correction on cp
+alias mkdir='nocorrect mkdir' # no spelling correction on mkdir
+alias j=jobs
+alias pu=pushd
+alias po=popd
+alias d='dirs -v'
+alias h=history
+alias grep=egrep
+alias ll='ls -l'
+alias la='ls -a'
+
+# List only directories and symbolic
+# links that point to directories
+alias lsd='ls -ld *(-/DN)'
+
+# List only file beginning with "."
+alias lsa='ls -ld .*'
+
+# Shell functions
+setenv() { export $1=$2 }  # csh compatibility
+
+# Where to look for autoloaded function definitions
+fpath=(~/.zfunc)
+
+# Autoload all shell functions from all directories
+# in $fpath that have the executable bit on
+# (the executable bit is not necessary, but gives
+# you an easy way to stop the autoloading of a
+# particular shell function).
+for dirname in $fpath
+do
+  autoload $dirname/*(.x:t)
+done
+
+# Global aliases -- These do not have to be
+# at the beginning of the command line.
+alias -g M='|more'
+alias -g H='|head'
+alias -g T='|tail'
+
+manpath=($X11HOME/man /usr/man /usr/lang/man /usr/local/man)
+export MANPATH
+
+# Filename suffixes to ignore during completion
+fignore=(.o .c~ .old .pro)
+
+# Hosts to use for completion
+hosts=(`hostname` ftp.math.gatech.edu prep.ai.mit.edu wuarchive.wustl.edu)
+
+# Set prompts
+PROMPT='%m%# '    # default prompt
+RPROMPT=' %~'     # prompt for right side of screen
+
+# Some environment variables
+export MAIL=/var/spool/mail/$USERNAME
+export LESS=-cex3M
+export HELPDIR=/usr/local/lib/zsh/help  # directory for run-help function to find docs
+
+MAILCHECK=300
+HISTSIZE=200
+DIRSTACKSIZE=20
+
+# Watch for my friends
+#watch=($(cat ~/.friends))      # watch for people in .friends file
+watch=(notme)                   # watch for everybody but me
+LOGCHECK=300                    # check every 5 min for login/logout activity
+WATCHFMT='%n %a %l from %m at %t.'
+
+# Set/unset  shell options
+setopt   notify globdots correct pushdtohome cdablevars autolist
+setopt   correctall autocd recexact longlistjobs
+setopt   autoresume histignoredups pushdsilent noclobber
+setopt   autopushd pushdminus extendedglob rcquotes mailwarning
+unsetopt bgnice autoparamslash
+
+# Setup some basic programmable completions.  To see more examples
+# of these, check Misc/compctl-examples in the zsh distribution.
+compctl -g '*(-/)' cd pushd
+compctl -g '*(/)' rmdir dircmp
+compctl -j -P % -x 's[-] p[1]' -k signals -- kill
+compctl -j -P % fg bg wait jobs disown
+compctl -A shift
+compctl -caF type whence which
+compctl -F unfunction
+compctl -a unalias
+compctl -v unset typeset declare vared readonly export integer
+compctl -e disable
+compctl -d enable
+
+# Some nice key bindings
+#bindkey '^X^Z' universal-argument ' ' magic-space
+#bindkey '^X^A' vi-find-prev-char-skip
+#bindkey '^Z' accept-and-hold
+#bindkey -s '\M-/' \\\\
+#bindkey -s '\M-=' \|
+
+# bindkey -v             # vi key bindings
+
+bindkey -e               # emacs key bindings
+bindkey ' ' magic-space  # also do history expansino on space

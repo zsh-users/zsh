@@ -1,0 +1,25 @@
+Makefile
+Makemod.in Makemod
+*.pro
+*.o
+*.o.c
+*.so
+*.mdh
+*.mdhi
+*.mdhs
+*.mdh.tmp
+modules.index
+modules.index.tmp
+modules.stamp
+modules-bltin
+stamp-modobjs
+stamp-modobjs.tmp
+ansi2knr
+zsh
+libzsh.so*
+sigcount.h
+signames.c
+zshpaths.h
+zshxmods.h
+bltinmods.list
+tags TAGS

@@ -1,0 +1,2 @@
+#array --math-- getopts read unset vared
+__vars=(-v)

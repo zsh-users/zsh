@@ -1,0 +1,3 @@
+#function rmdir df du dircmp
+
+__files -/ '*(-/)'

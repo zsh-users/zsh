@@ -1,0 +1,3 @@
+autobins="ln mkdir mv rm rmdir sync"
+
+objects="files.o"

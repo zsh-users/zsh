@@ -1,0 +1,4 @@
+DISTFILES_SRC='
+    .distfiles
+    helpfiles mkdisttree.sh reporter zsh-development-guide
+'

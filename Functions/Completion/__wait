@@ -1,0 +1,4 @@
+#function wait
+
+complist -P '%' -j
+complist -y __kill_helper -s '`ps 2>/dev/null | tail +2 | cut -c1-5`'

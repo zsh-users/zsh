@@ -1,0 +1,7 @@
+#function  set
+
+if [[ -mcurrent -1 [-+]o ]]; then
+  complist -o
+elif [[ -current -1 -A ]]; then
+  complist -A
+fi

@@ -1,0 +1,3 @@
+#defcomp  gs ghostview gview psnup psselect pswrap pstops pstruct lpr
+
+_files -g '*([pP][sS]|eps)'

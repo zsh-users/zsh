@@ -1,0 +1,3 @@
+#function tex latex slitex
+
+__files -g '*.(tex|TEX|texinfo|texi)'

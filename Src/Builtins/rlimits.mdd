@@ -1,0 +1,18 @@
+autobins="limit ulimit unlimit"
+
+objects="rlimits.o"
+
+:<<\Make
+rlimits.o rlimits..o: rlimits.h
+
+# this file will not be made if limits are unavailable:
+# silent so the warning doesn't appear unless necessary
+rlimits.h: rlimits.awk @RLIMITS_INC_H@
+	@echo '$(AWK) -f $(sdir)/rlimits.awk @RLIMITS_INC_H@ > rlimits.h'; \
+	$(AWK) -f $(sdir)/rlimits.awk @RLIMITS_INC_H@ > rlimits.h || \
+	    echo WARNING: unknown limits:  mail rlimits.h to developers
+
+clean-here: clean.rlimits
+clean.rlimits:
+	rm -f rlimits.h
+Make

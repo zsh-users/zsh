@@ -1,0 +1,9 @@
+#defcomp rlogin rsh ssh
+
+if [[ -position 1 ]]; then
+  complist -k hosts
+elif [[ -position 2 ]]; then
+  complist -k '(-l)'
+else
+  complist -u
+fi

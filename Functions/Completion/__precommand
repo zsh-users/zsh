@@ -1,0 +1,15 @@
+#function - nohup nice eval time rusage noglob nocorrect exec
+
+# We just change the special completion parameters, to make the first
+# argument be treated as the command name and removing it from the 
+# positional parameters.
+
+COMMAND="$1"
+shift
+(( CURRENT-- ))
+if [[ CURRENT -eq 0 ]]; then
+  CONTEXT=command
+else
+  CONTEXT=argument
+fi
+compsub

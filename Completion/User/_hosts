@@ -1,0 +1,3 @@
+#defcomp ftp ncftp ping rwho rup xping traceroute nslookup
+
+complist -k hosts

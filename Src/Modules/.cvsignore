@@ -1,0 +1,10 @@
+Makefile
+Makefile.in
+*.pro
+*.o
+*.o.c
+*.so
+*.mdh
+*.mdhi
+*.mdhs
+*.mdh.tmp

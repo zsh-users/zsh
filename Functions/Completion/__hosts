@@ -1,0 +1,2 @@
+#array ftp ncftp ping rwho rup xping traceroute nslookup
+__hosts=(-k hosts)

@@ -1,0 +1,17 @@
+#
+# Generic .zshenv file for zsh 2.7
+#
+# .zshenv is sourced on all invocations of the
+# shell, unless the -f option is set.  It should
+# contain commands to set the command search path,
+# plus other important environment variables.
+# .zshenv should not contain commands that product
+# output or assume the shell is attached to a tty.
+#
+
+export X11HOME=/usr/X11
+
+path=($X11HOME/bin)
+path=($path /usr/ucb /usr/bin /usr/etc)
+path=($path /usr/local/bin)
+path=($path ~ .)

@@ -1,0 +1,22 @@
+#defcomp a2ps
+
+if [[ -prefix -- ]]; then
+  _comp_parts '(--borders --compact --truncate-lines --interpret
+                --print-anyway --delegate)' '=' '(yes no)'
+  _comp_parts '(--major)' '=' '(rows columns)'
+  _comp_parts '(--end-of-line)' '=' '(r n nr rn any)'
+
+  complist -S= -k '(--medium --columns --rows --line-numbers
+                    --font-size --lines-per-page --chars-per-line
+ 		    --tabsize --non-printable-format --encoding
+		    --title --stdin --prologue --highlight-level
+		    --strip-level --output --version-control --suffix
+		    --printer --copies --sides --page-prefeed
+		    --no-page-prefeed)'
+  complist -qS= -k '(--margin --header --underlay --left-title
+                     --right-title --left-footer --footer --right-footer
+		     --pages --pretty-print)'
+  complist -k '(--landscape --portrait --catman --no-header)'
+else
+  _files -F fignore -g "*~*.ps"
+fi

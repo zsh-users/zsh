@@ -1,0 +1,107 @@
+The subdirectories contain code for the new function-based completion
+system.  Broadly speaking, this uses shell functions defined for each
+command to determine how the arguments of a command should be completed.
+
+You should copy all the files you need or want to a directory of your own,
+which should be included in your autoload path as defined by $fpath.  Then
+in your .zshrc you should source the file which appears here in
+Core/compinit.  It is recommnded that you use the -d option, which outputs
+a file containing the necessary variables, bindkeys etc., making later
+loading much faster.  For example,
+  [[ -f ~/completion/compinit ]] && . ~/completion/compinit -d
+This will rebind any keys which do completion to use the new system.
+For more detailed instructions, including how to add new completions, see
+the top of Core/compinit .
+
+The subdirectories contain:
+
+Core:
+  The basic functions and files to be sourced.  You will certainly need
+  these, and will most likely not feel like altering them (or, in some
+  cases, even reading them, unless you are a shell wizard).  The files are:
+  compinit
+    As already described, this is not a function, but is sourced once
+    (with the `source' or `.' commands) to set up the completion system.
+  compdump
+    This dumps the completions status for faster initialisation.  The
+    easiest way of doing this is to use the -d option to compinit rather
+    than calling compdump directly.
+  _comp_parts
+    Utility used for completing words with multiple separate parts, such as
+    `<user>@<host>'
+  _compalso
+    Utility for calling a function to add additional completions to an
+    already existing set.
+  _files
+    A frontend to _path_files which will default to any old file if the
+    specified file was not found.
+  _main_complete
+    The main entry point called by the key bindings which compinit sets
+    up (the main `completion widget' in zsh jargon).
+  _normal
+    The function called by _main_complete to handle the most common
+    cases, such as completing a command name or its arguments.  This
+    function dispatches to the various other functions for individual
+    commands.  (Actually, the system is fairly context-sensitive, so
+    it is wider than just command+argument.)
+  _path_files
+    The function usually called to complete filenames and directories.  It
+    replaces the standard -f and -/ options for the basic completion
+    commands:  it can do various extra tricks, such as expanding a whole
+    path at once, e.g. F/C/C/_p<TAB> -> Functions/Completion/Core/_path_files
+Base:
+  You will almost certainly want these files, too, which handle standard
+  tasks like completing files.  However, you may want to edit them for
+  your own particular setup.  Files are:
+  _command_names
+    This handles completion of the command word, i.e. the first thing
+    on the command line.  You may want to alter this, for example,
+    to complete parameters to assign to.
+  _condition
+    This handles completing inside [[ ... ]] .
+  _default
+    This handles completion of command arguments when no special function
+    exists.  Usually this means completing files, but you can modify this
+    as you wish.
+  _match_pattern
+  _match_test
+    These are used by Base/_path_files (and hence also Base/_files) for
+    file completion with control over matching (whether to complete
+    case-insensitively, or to allow insertion before `.', etc.)  See
+    _match_test for instructions.  Note _path_files expects these files
+    to be present.
+  _precommand
+    Allows completion when the first word on the line has to be ignored,
+    for example `noglob ...' should ignore the noglob and just complete
+    as if it wasn't there.  Add other such commands to the top line.
+  _redirect
+    Completes after `<' or `<': this version calls _files.
+  _subscript
+    For completion in subscripts of parameters, e.g $foo[...].
+  _vars
+    Completion for commands which need variables (so this could also be in
+    the Builtins directory), but also in math environments such as ((...)).
+Builtins:
+  Define completions for various shell builtins.  The top line of each file
+  says which builtins they apply to; in many cases you can guess from the
+  name.  Note in particular that _zftp defines completions for all commands
+  beginning `zf', not just for the module command zftp.  This is only
+  really useful if you use zftp with the zf* function suite (zfopen, zfget,
+  ...).
+User:
+  This contains a pot pourri of completions for various external commands.
+  Not all will work unmodified on your system.
+Commands:
+  These functions define separate completion commands which do not use
+  the usual context information, and hence have to be bound separately
+  to keys.  As they appear, they have bindings which you can change or
+  delete by altering the top line of the file.  To bind a function
+  (strictly speaking, the corresponding completion widget) yourself
+  after completion is loaded, use `bindkey '<key-string>' <_function_name>'.
+  The files are:
+  _correct_filename, bound to \C-xc
+    Correct the word under the cursor as a filename.  This is significantly
+    more powerful than the standard \e$ (spell-word) binding.
+  _most_recent_file, bound to \C-xm
+    Insert the name of the most recent file matching the pattern
+    so far on the command line.

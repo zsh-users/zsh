@@ -1,0 +1,4 @@
+#defcomp wait
+
+complist -P '%' -j
+complist -y _kill_helper -s '`ps 2>/dev/null | tail +2 | cut -c1-5`'

@@ -1,0 +1,89 @@
+# This is a file to be sourced to dump the definitions for new-style
+# completion defined by 'init' in the same directory.  For best results,
+# it should be run immediately after init, before any of the completions
+# have been autoloaded.  The output should be directed into the "init.dump"
+# in the same directory as init.  If you rename init, just stick .dump onto
+# the end of whatever you have called it and put it in the same directory.
+#
+# You will need to update the dump every time you add a new completion.
+# To do this, simply remove the .dump file, start a new shell, and
+# create the .dump file as before.
+#
+# It relies on KSH_ARRAYS not being set.
+
+# Print the number of files used for completion. This is used in init
+# to see if auto-dump should re-dump the dump-file.
+
+_d_file=${COMPDUMP-${0:h}/init.dump}
+
+_d_files=( ${^~fpath}/_*~*~ )
+
+print "#files: $#_d_files" > $_d_file
+
+unset _d_files
+
+# First dump the arrays comps and patcomps.  The quoting hieroglyphyics
+# ensure that a single quote inside a variable is itself correctly quoted.
+
+print "comps=(" >> $_d_file
+for _d_f in ${(k)comps}; do
+    print -r - "'${_d_f//\'/'\\''}'" "'${comps[$_d_f]//\'/'\\''}'"
+done  >> $_d_file
+print ")" >> $_d_file
+
+if (( $#patcomps )); then
+  print "\npatcomps=(" >> $_d_file
+  for _d_f in "$patcomps[@]"; do
+    print -r - "'${_d_f//\'/'\\''}'"
+  done >> $_d_file
+  print ")" >> $_d_file
+fi
+
+print >> $_d_file
+
+# Now dump the key bindings. We dump all bindings for zle widgets
+# whose names start with a underscore.
+# We need both the zle -C's and the bindkey's to recreate.
+
+_d_bks=()
+zle -lL |
+  while read -rA _d_line; do
+    if [[ ${_d_line[5]} = _* ]]; then
+      print -r - ${_d_line}
+      _d_bks=($_d_bks ${_d_line[3]})
+    fi
+  done >> $_d_file
+bindkey |
+  while read -rA _d_line; do
+    if [[ ${_d_line[2]} = (${(j.|.)~_d_bks}) ]]; then
+      print -r "bindkey '${_d_line[1][2,-2]}' ${_d_line[2]}"
+    fi
+  done >> $_d_file
+
+print >> $_d_file
+
+
+# Autoloads: whence -w produces "_d_foo: function", so look for
+# all functions beginning with `_'.
+
+_d_als=($(whence -wm '_*' |
+while read -rA _d_line; do
+  [[ ${_d_line[2]} = function ]] && print -r - ${_d_line[1]%:}
+done))
+
+# print them out:  about six to a line looks neat
+
+while (( $#_d_als )); do
+  print -n autoload
+  for (( _i = 0; _i < 6; _i++ )); do
+    if (( $#_d_als )); then
+      print -n " $_d_als[1]"
+      shift _d_als
+    fi
+  done
+  print
+done >> $_d_file
+
+print >> $_d_file
+
+unset _d_line _d_zle _d_bks _d_als _d_f _f_file

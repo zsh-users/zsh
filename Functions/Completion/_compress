@@ -1,0 +1,3 @@
+#defcomp compress
+
+_files -g '*~*.Z'

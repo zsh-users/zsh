@@ -1,0 +1,3 @@
+#defcomp gunzip zcat
+
+_files -g '*.[gG][z]'

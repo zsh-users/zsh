@@ -1,0 +1,14 @@
+Makefile
+Makefile.in
+*.pro
+*.o
+*.o.c
+*.so
+*.mdh
+*.mdhi
+*.mdhs
+*.mdh.tmp
+thingies.list
+widgets.list
+zle_things.h
+zle_widget.h

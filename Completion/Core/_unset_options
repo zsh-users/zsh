@@ -1,0 +1,7 @@
+#autoload
+
+# Complete all unset options. This relies on `_main_complete' to store the
+# names of the options that were set when it was called in the array
+# `_set_options'.
+
+compadd "$@" -M 'L:|[nN][oO]= M:_= M:{A-Z}={a-z}' - $=_unset_options

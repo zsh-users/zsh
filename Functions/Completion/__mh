@@ -1,0 +1,70 @@
+#function folder comp inc mark refile repl scan show next prev rmm pick whom mhn mhpath mhpatch
+
+# Completion for all possible MH commands.
+# Alter the following two to your own mh directory and the directory
+# where standard mh library files live.  (It works anyway, but this
+# will save a little time.)
+local mymhdir=~/Mail
+local mhlib=/usr/lib/mh
+
+# To be on the safe side, check this exists and if not, get it anyway.
+[[ -d $mymhdir ]] || mymhdir=$(mhpath +)
+
+if [[ -iprefix - ]]; then
+  # get list of options, which MH commands can generate themselves
+  # awk is just too icky to use for this, sorry.  send me one if
+  # you come up with it.
+  compadd -m $($COMMAND -help | perl -ne 'if (/^\s*-\(?(\S+)/) {
+    $n = $1;
+    $n =~ s/\)//g;
+    print $n =~ s/^\[([a-z]+)\]// ? "$n\n$1$n\n" : "$n\n";
+  }')
+  return
+elif [[ -iprefix '+' || -iprefix '@' || -current -1 -draftfolder ]]; then
+  # Complete folder names.
+  local mhpath
+  if [[ $IPREFIX != '@' ]]; then
+    [[ $IPREFIX = '+' ]] || IPREFIX=+
+    mhpath=$mymhdir
+  else
+    mhpath=$(mhpath)
+  fi
+
+  # painless, or what?
+  complist -W mhpath -/
+elif [[ -mcurrent -1 -(editor|(whatnow|rmm|show|more)proc) ]]; then
+  complist -c
+elif [[ -current -1 -file ]]; then
+  complist -f
+elif [[ -mcurrent -1 -(form|audit|filter) ]]; then
+  # Need some MH template file, which may be in our own MH directory
+  # or with the standard library.
+  local mhfpath
+  # This is the only place we need mhlib, so leave the test till here.
+  [[ -d $mhlib ]] || { mhlib=$(mhparam mhlproc); mhlib=$mhlib:h; }
+  mhfpath=($mymhdir $mhlib)
+
+  complist -W mhfpath -g '*(.)'
+elif [[ -mcurrent -1 -(no|)cc ]]; then
+  compadd -m all to cc me
+elif [[ -mcurrent -1 -[rw]cache ]]; then
+  compadd -m public private never ask
+else
+  # Generate sequences.
+  local foldnam folddir f
+  for f in $argv; do
+    [[ $f = [@+]* ]] && foldnam=$f
+  done
+  if [[ $foldnam = '+'* ]]; then
+    folddir=$mymhdir/${foldnam#+}
+  elif [[ $foldnam = '@'* ]]; then
+    folddir=$(mhpath)/${foldnam#@}
+  else
+    folddir=$(mhpath)
+    # leaving foldnam empty works here
+  fi
+
+  complist -s '$(mark $foldnam | awk -F: '\''{ print $1 }'\'')'
+  compadd -m reply next cur prev first last all unseen
+  complist -W folddir -g '<->'
+fi

@@ -1,0 +1,3 @@
+autobins="zftp"
+
+objects="zftp.o"

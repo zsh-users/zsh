@@ -1,0 +1,11 @@
+DISTFILES_SRC='
+    .distfiles
+ __aliases __arrays __autoload __bg_jobs __bindkey __builtin __cd __command
+ __command_names __compress __condition __configure __dd __default __dirs
+ __disable __dvi __echotc __enable __fc __files __find __functions __gunzip
+ __gzip __hash __hosts __jobs __kill __kill_helper __limits __main_complete
+ __main_key_complete __make __man __mh __most_recent_file __normal __path_files
+ __pdf __precommand __ps __rcs __rlogin __sched __set __setopt __source __strip
+ __stty __subscript __tar __tex __trap __uncompress __unhash __unsetopt __vars
+ __vars_eq __wait __which __x_options __xfig __zle __zmodload init 
+'

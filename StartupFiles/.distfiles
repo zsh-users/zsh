@@ -1,0 +1,4 @@
+DISTFILES_SRC='
+    .distfiles
+    zlogin zshenv zshrc
+'

@@ -1,0 +1,14 @@
+#function tar
+
+local nm=$NMATCHES tf="$2"
+compsave
+
+if [[ ( -mword 1 *t*f* || -mword 1 *x*f* ) && -position 3 100000 ]]; then
+  complist -k "( $(tar tf $tf) )"
+  compreset
+elif [[ -mword 1 *c*f* && -position 3 100000 ]]; then
+  __files
+  compreset
+elif [[ -mcurrent -1 *f* && -position 2 ]]; then
+  __files -g '*.(tar|TAR)'
+fi
