@@ -1,0 +1,8 @@
+name=zsh/terminfo
+link=either
+load=yes
+
+autobins="echoti"
+autoparams="terminfo"
+
+objects="terminfo.o"

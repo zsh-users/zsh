@@ -1,0 +1,7 @@
+name=zsh/termcap
+link=either
+load=yes
+
+autobins="echotc"
+
+objects="termcap.o"

@@ -55,7 +55,6 @@ static struct builtin builtins[] =
     BUILTIN("disable", 0, bin_enable, 0, -1, BIN_DISABLE, "afmr", NULL),
     BUILTIN("disown", 0, bin_fg, 0, -1, BIN_DISOWN, NULL, NULL),
     BUILTIN("echo", BINF_PRINTOPTS | BINF_ECHOPTS, bin_print, 0, -1, BIN_ECHO, "neE", "-"),
-    BUILTIN("echotc", 0, bin_echotc, 1, -1, 0, NULL, NULL),
     BUILTIN("emulate", 0, bin_emulate, 1, 1, 0, "LR", NULL),
     BUILTIN("enable", 0, bin_enable, 0, -1, BIN_ENABLE, "afmr", NULL),
     BUILTIN("eval", BINF_PSPECIAL, bin_eval, 0, -1, BIN_EVAL, NULL, NULL),
@@ -2896,76 +2895,6 @@ bin_print(char *name, char **args, char *ops, int func)
 	fputc(ops['N'] ? '\0' : '\n', fout);
     if (fout != stdout)
 	fclose(fout);
-    return 0;
-}
-
-/* echotc: output a termcap */
-
-/**/
-int
-bin_echotc(char *name, char **argv, char *ops, int func)
-{
-    char *s, buf[2048], *t, *u;
-    int num, argct;
-
-    s = *argv++;
-    if (termflags & TERM_BAD)
-	return 1;
-    if ((termflags & TERM_UNKNOWN) && (isset(INTERACTIVE) || !init_term()))
-	return 1;
-    /* if the specified termcap has a numeric value, display it */
-    if ((num = tgetnum(s)) != -1) {
-	printf("%d\n", num);
-	return 0;
-    }
-    /* if the specified termcap is boolean, and set, say so  *
-     * ncurses can tell if an existing boolean capability is *
-     * off so in this case we print "no".                    */
-#if !defined(NCURSES_VERSION) || !defined(COLOR_PAIR)
-    if (tgetflag(s) > 0) {
-	puts("yes");
-	return (0);
-    }
-#else /* NCURSES_VERSION && COLOR_PAIR */
-    switch (tgetflag(s)) {
-    case -1:
-	break;
-    case 0:
-	puts("no");
-	return 0;
-    default:
-	puts("yes");
-	return 0;
-    }
-#endif /* NCURSES_VERSION && COLOR_PAIR */
-    /* get a string-type capability */
-    u = buf;
-    t = tgetstr(s, &u);
-    if (!t || !*t) {
-	/* capability doesn't exist, or (if boolean) is off */
-	zwarnnam(name, "no such capability: %s", s, 0);
-	return 1;
-    }
-    /* count the number of arguments required */
-    for (argct = 0, u = t; *u; u++)
-	if (*u == '%') {
-	    if (u++, (*u == 'd' || *u == '2' || *u == '3' || *u == '.' ||
-		      *u == '+'))
-		argct++;
-	}
-    /* check that the number of arguments provided is correct */
-    if (arrlen(argv) != argct) {
-	zwarnnam(name, (arrlen(argv) < argct) ? "not enough arguments" :
-		 "too many arguments", NULL, 0);
-	return 1;
-    }
-    /* output string, through the proper termcap functions */
-    if (!argct)
-	tputs(t, 1, putraw);
-    else {
-	num = (argv[1]) ? atoi(argv[1]) : atoi(*argv);
-	tputs(tgoto(t, atoi(*argv), num), num, putraw);
-    }
     return 0;
 }
 

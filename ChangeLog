@@ -1,6 +1,14 @@
+2000-12-03  Clint Adams  <schizo@debian.org>
+
+	* 13215: Src/builtin.c, Src/Modules/termcap.c,
+	Src/Modules/termcap.mdd, Src/Modules/terminfo.c,
+	Src/Modules/terminfo.mdd: move echotc builtin to termcap
+	module, add echoti builtin and terminfo parameter in
+	terminfo module.
+
 2000-11-27  Bart Schaefer  <schaefer@zsh.org>
 
-	* 132xx: Completion/Builtins/_zstyle: Add missing quote.
+	* 13203: Completion/Builtins/_zstyle: Add missing quote.
 
 2000-11-27  Sven Wischnowsky  <wischnow@zsh.org>
 
