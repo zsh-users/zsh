@@ -3407,7 +3407,7 @@ getkeystring(char *s, int *len, int fromwhere, int *misc)
 	    t++;
 	}
 	if (fromwhere == 6 && t != tmp) {
-	    *misc = (int) tmp[0];
+	    *misc = STOUC(tmp[0]);
 	    return s + 1;
 	}
     }
