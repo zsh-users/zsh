@@ -1,5 +1,8 @@
 2001-08-17  Sven Wischnowsky  <wischnow@zsh.org>
 
+	* 15653: Completion/Base/Core/_main_complete: make insert-tab
+	really default to `true'
+
 	* 15650: Completion/Unix/Type/_path_files, Src/Zle/compcore.c: fix 
 	test for expanded paths in _path_files; more intelligently move
 	glob flags (in particular those added by _approximate) after a
