@@ -5,6 +5,10 @@
 
 2001-11-21  Bart Schaefer  <schaefer@zsh.org>
 
+	* 16269: Src/Zle/compctl.c: Use allocated strings when adding
+	matches for hash table entries, as the pattern match code may
+	attempt to modify them.  (Fixes crash reported in 16235.)
+
 	* Sven: 16249: Src/parse.c: Clear pending here-documents upon a
 	parse error.
 

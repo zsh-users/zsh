@@ -2096,7 +2096,7 @@ dumphashtable(HashTable ht, int what)
 
     for (i = 0; i < ht->hsize; i++)
 	for (hn = ht->nodes[i]; hn; hn = hn->next)
-	    addmatch(hn->nam, (char *) hn);
+	    addmatch(dupstring(hn->nam), (char *) hn);
 }
 
 /* ScanFunc used by maketildelist() et al. */
