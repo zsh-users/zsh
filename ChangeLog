@@ -1,5 +1,9 @@
 2001-08-07  Peter Stephenson  <pws@csr.com>
 
+	* 15585: Doc/Zsh/contrib.yo, Functions/Zle/bash-down-case-word,
+	Functions/Zle/bash-up-case-word: two new Zle functions with
+	bash-style word boundaries.
+
 	* 15583: Config/installfns.sh: ignore CVS directories for
 	all function installations, not just with subdirectories.
 
