@@ -242,7 +242,7 @@ singsub(char **s)
 }
 
 /* Perform substitution on a single word. Unlike with singsub, the      *
- * result can have more than one words. A single word result is sroted  *
+ * result can have more than one words. A single word result is stored  *
  * in *s and *isarr is set to zero; otherwise *isarr is set to 1 and    *
  * the result is stored in *a. If `a' is zero a multiple word result is *
  * joined using sep or the IFS parameter if sep is zero and the result  *
