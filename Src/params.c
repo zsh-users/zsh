@@ -56,7 +56,6 @@ char **path,		/* $path        */
 /**/
 char *argzero,		/* $0           */
      *home,		/* $HOME        */
-     *hostnam,		/* $HOST        */
      *nullcmd,		/* $NULLCMD     */
      *oldpwd,		/* $OLDPWD      */
      *zoptarg,		/* $OPTARG      */
@@ -458,7 +457,7 @@ createparamtable(void)
     Param ip, pm;
     char **new_environ, **envp, **envp2, **sigptr, **t;
     char **old_environ = environ;
-    char buf[50], *str, *iname;
+    char buf[50], *str, *iname, *hostnam;
     int num_env, oae = opts[ALLEXPORT];
 #ifdef HAVE_UNAME
     struct utsname unamebuf;
@@ -494,7 +493,12 @@ createparamtable(void)
     setsparam("TMPPREFIX", ztrdup(DEFAULT_TMPPREFIX));
     setsparam("TIMEFMT", ztrdup(DEFAULT_TIMEFMT));
     setsparam("WATCHFMT", ztrdup(default_watchfmt));
+
+    hostnam = (char *)zalloc(256);
+    gethostname(hostnam, 256);
     setsparam("HOST", ztrdup(hostnam));
+    zfree(hostnam, 256);
+
     setsparam("LOGNAME", ztrdup((str = getlogin()) && *str ? str : cached_username));
 
     /* Copy the environment variables we are inheriting to dynamic *

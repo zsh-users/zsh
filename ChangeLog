@@ -1,5 +1,8 @@
 2000-07-13  Peter Stephenson  <pws@cambridgesiliconradio.com>
 
+	* 12247: Src/init.c, Src/params.c, Src/prompt.c: remove hostnam
+	internal variable and use $HOST wherever hostname is needed.
+
 	* 12242: Fr. Br. George (George V Kouryachy) and pws:
 	Doc/Zsh/prompt.yo, Src/prompt.c: negative integers in prompt
 	escapes count from the other end of the appropriate string.

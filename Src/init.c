@@ -595,9 +595,6 @@ setupvals(void)
     gettimeofday(&shtimer, &dummy_tz);	/* init $SECONDS */
     srand((unsigned int)(shtimer.tv_sec + shtimer.tv_usec)); /* seed $RANDOM */
 
-    hostnam     = (char *) zalloc(256);
-    gethostname(hostnam, 256);
-
     /* Set default path */
     path    = (char **) zalloc(sizeof(*path) * 5);
     path[0] = ztrdup("/bin");

@@ -201,7 +201,7 @@ promptexpand(char *s, int ns, char *rs, char *Rs)
 static int
 putpromptchar(int doprint, int endchar)
 {
-    char *ss, *tmbuf = NULL;
+    char *ss, *tmbuf = NULL, *hostnam;
     int t0, arg, test, sep;
     struct tm *tm;
     time_t timet;
@@ -372,11 +372,14 @@ putpromptchar(int doprint, int endchar)
 		bp += strlen(bp);
 		break;
 	    case 'M':
-		stradd(hostnam);
+		if ((hostnam = getsparam("HOST")))
+		    stradd(hostnam);
 		break;
 	    case 'm':
 		if (!arg)
 		    arg++;
+		if (!(hostnam = getsparam("HOST")))
+		    break;
 		if (arg < 0) {
 		    for (ss = hostnam + strlen(hostnam); ss > hostnam; ss--)
 			if (ss[-1] == '.' && !++arg)
