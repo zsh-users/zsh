@@ -1,3 +1,7 @@
+2003-02-26  Clint Adams  <clint@zsh.org>
+
+        * 18303: zshconfig.ac: fix some always-true test evaluations.
+
 2003-02-18  Oliver Kiddle  <opk@zsh.org>
 
 	* Doug Kearns: 18259: Completion/Unix/Command/_webbrowser,
