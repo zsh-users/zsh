@@ -159,7 +159,8 @@ eorig="$orig"
 
 # If given no `-F' option, we may want to use $fignore, turned into patterns.
 
-[[ $#ignore -eq 0 && -z $gopt ]] && ignore=( "?*${^fignore[@]}" )
+[[ $#ignore -eq 0 && -z $gopt && -n $FIGNORE ]] && 
+   ignore=( "?*${^fignore[@]}" )
 
 if (( $#ignore )); then
   _comp_ignore=( "$_comp_ignore[@]" "$ignore[@]" )

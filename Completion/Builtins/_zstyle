@@ -27,7 +27,7 @@ styles=(
   hosts			 c:_hosts
   hosts-ports		 c:host-port
   hosts-ports-users	 c:host-port-user
-  ignored-suffixes	 c:
+  ignored-patterns	 c:
   insert-unambiguous	 c:bool
   last-prompt		 c:bool
   list			 c:listwhen
