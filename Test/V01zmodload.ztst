@@ -27,9 +27,9 @@
 1:Test reloading an already-loaded module
 ?ZTST_execchunk:zmodload:2: module zsh/main already loaded.
 
-# Loop over the modules fond above and attempt to load each one.  Use
+# Loop over the modules found above and attempt to load each one.  Use
 # the -i flag in case dependencies cause multiple modules to be loaded,
-# or in case some previous test loaded a module.
+# or in case some previous test suite loaded a module.
 
  for m in $mods
  do
@@ -74,7 +74,7 @@
    zmodload -ab zsh/example example
    builtin example
    zmodload -e zsh/example
- else :
+ else print -u8 Warning: zsh/example not linked: not checking autoloading
  fi
 0d:Autoload a module via a builtin
 

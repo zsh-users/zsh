@@ -1,3 +1,11 @@
+2001-05-18  Bart Schaefer  <schaefer@zsh.org>
+
+	* 14385: Test/V01zmodload.ztst, Test/ztst.zsh: Fix typo in a
+	comment; print a warning when unable to test zsh/example; make
+	sure the file descriptor for that warning (and others in other
+	test files) is available even if ZTST_verbose has an unexpected
+	value.
+
 2001-05-18  Peter Stephenson  <pws@csr.com>
 
 	* 14382: Src/module.c: zmodload -uf wouldn't work even if the

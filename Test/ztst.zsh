@@ -115,7 +115,7 @@ ZTST_hashmark() {
 
 [[ ! -r $ZTST_testname ]] && ZTST_testfailed "can't read test file."
 
-[[ -n $ZTST_verbose && $ZTST_verbose -ge 0 ]] && exec 8>&1
+exec 8>&1
 exec 9<$ZTST_testname
 
 # The current line read from the test file.
