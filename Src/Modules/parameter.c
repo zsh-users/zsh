@@ -1465,9 +1465,9 @@ setpmnameddirs(Param pm, HashTable ht)
 #endif
 	    if (!(val = getstrvalue(&v)) || *val != '/' ||
 #ifdef HAVE_PATHCONF
-		strlen(val) >= PATH_MAX)
-#else
                 ((strlen(val) >= pathmax)) && pathmax != -1)
+#else
+		strlen(val) >= PATH_MAX)
 #endif
 		zwarn("invalid value: %s", val, 0);
 	    else

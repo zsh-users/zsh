@@ -1,6 +1,6 @@
 #compdef -k complete-word \C-x?
 
-setopt localoptions nullglob rcexpandparam extendedglob
+setopt localoptions nullglob rcexpandparam extendedglob noshglob
 unsetopt markdirs globsubst shwordsplit nounset ksharrays
 
 setopt localtraps noerrexit ; trap - ZERR

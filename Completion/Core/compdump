@@ -14,7 +14,7 @@
 # to see if auto-dump should re-dump the dump-file.
 
 emulate -L zsh
-setopt extendedglob
+setopt extendedglob noshglob
 
 typeset _d_file _d_f _d_bks _d_line _d_als _d_files
 

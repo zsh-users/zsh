@@ -1,7 +1,7 @@
 #compdef -k complete-word \C-xh
 
 _complete_help() {
-  setopt localoptions nullglob rcexpandparam extendedglob
+  setopt localoptions nullglob rcexpandparam extendedglob noshglob
   unsetopt markdirs globsubst shwordsplit nounset ksharrays
   exec </dev/null	# ZLE closes stdin, which can cause errors
 

@@ -2388,6 +2388,7 @@ tokenize(char *s)
 	case ')':
 	    if (isset(SHGLOB))
 		break;
+	case '>':
 	case '^':
 	case '#':
 	case '~':

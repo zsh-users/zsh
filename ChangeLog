@@ -5,6 +5,18 @@
 
 2000-08-03  Sven Wischnowsky  <wischnow@zsh.org>
 
+	* 12503: Completion/Commands/_bash_completions,
+ 	Completion/Commands/_complete_debug,
+ 	Completion/Commands/_complete_help,
+ 	Completion/Commands/_correct_word,
+ 	Completion/Commands/_expand_word,
+ 	Completion/Commands/_history_complete_word,
+ 	Completion/Commands/_next_tags, Completion/Core/_expand,
+ 	Completion/Core/_main_complete, Completion/Core/_path_files,
+ 	Completion/Core/compdump, Src/glob.c, Src/Modules/parameter.c:
+	try to get quoting of special character (`>' and `\') right; fix
+ 	for pathmax in parameter.c
+	
 	* 12497: Doc/Zsh/builtins.yo: small fix for `read -r' doc
 	
 	* 12496: Completion/Core/_path_files: one more problem with
