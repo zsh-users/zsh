@@ -1,0 +1,5 @@
+#compdef limit unlimit
+
+local expl
+
+_wanted limits expl 'process limits' compadd ${${(f)"$(limit)"}%% *}
