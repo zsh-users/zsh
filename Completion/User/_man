@@ -4,6 +4,10 @@ setopt localoptions rcexpandparam
 
 local rep expl star approx mrd
 
+if [[ $words[1] == man ]] && (( $words[(I)-l] + $words[(I)--local-file] )); then
+  _files || return 0
+fi
+
 if [[ $compstate[pattern_match] != [^*] ]]; then
   # If a string other than *, we just want correction, so no `*'.
   star='*'
