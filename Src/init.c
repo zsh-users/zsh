@@ -135,15 +135,23 @@ loop(int toplevel, int justonce)
 	    if (toplevel && (preprog = getshfunc("preexec")) != &dummy_eprog) {
 		LinkList args;
 		int osc = sfcontext;
+		char *cmdstr;
 
 		args = znewlinklist();
 		zaddlinknode(args, "preexec");
-		if (hist_ring)
+		/* If curline got dumped from the history, we don't know
+		 * what the user typed. */
+		if (hist_ring && curline.histnum == curhist)
 		    zaddlinknode(args, hist_ring->text);
+		else
+		    zaddlinknode(args, "");
+		zaddlinknode(args, getjobtext(prog, NULL));
+		zaddlinknode(args, cmdstr = getpermtext(prog, NULL));
 
 		sfcontext = SFC_HOOK;
 		doshfunc("preexec", preprog, args, 0, 1);
 		sfcontext = osc;
+		zsfree(cmdstr);
 		freelinklist(args, (FreeFunc) NULL);
 		errflag = 0;
 	    }
