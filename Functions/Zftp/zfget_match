@@ -10,18 +10,27 @@ fi
 local tmpf=${TMPPREFIX}zfgm$$
 
 if [[ $ZFTP_SYSTEM == UNIX* && $1 == */* ]]; then
-  # On the first argument to ls, we usually get away with a glob.
-  zftp ls "$1*$2" >$tmpf
-  reply=($(<$tmpf))
-  rm -f $tmpf
-else
-  if (( $#zftp_fcache == 0 )); then
-    # Always cache the current directory and use it
-    # even if the system is UNIX.
-    zftp ls >$tmpf
-    zftp_fcache=($(<$tmpf))
+  if [[ -n $WIDGET ]]; then
+    local dir=${1:h}
+    [[ $dir = */ ]] || dir="$dir/"
+    zftp ls -LF $dir >$tmpf
+    local reply
+    reply=(${${${(f)"$(<$tmpf)"}##$dir}%\*})
+    rm -f $tmpf
+    _all_labels files expl 'remote file' compadd -P $dir - $reply
+  else
+    # On the first argument to ls, we usually get away with a glob.
+    zftp ls "$1*$2" >$tmpf
+    reply=($(<$tmpf))
     rm -f $tmpf
   fi
-  reply=($zftp_fcache);
+else
+  local fcache_name
+  zffcache
+  if [[ -n $WIDGET ]]; then
+    _all_labels files expl 'remote file' compadd -F fignore - ${(P)fcache_name}
+  else
+    reply=(${(P)fcache_name});
+  fi
 fi
 # }

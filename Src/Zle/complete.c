@@ -1,5 +1,5 @@
 /*
- * complete.c - the complete module
+ * complete.c - the complete module, interface part
  *
  * This file is part of zsh, the Z shell.
  *
@@ -29,12 +29,50 @@
 
 #include "complete.mdh"
 #include "complete.pro"
-#define GLOBAL_PROTOTYPES
-#include "zle_tricky.pro"
-#undef GLOBAL_PROTOTYPES
+
+/* global variables for shell parameters in new style completion */
 
 /**/
-void
+mod_export zlong compcurrent;
+/**/
+zlong complistmax,
+      complistlines,
+      compignored;
+
+/**/
+mod_export
+char **compwords,
+     *compprefix,
+     *compsuffix,
+     *compisuffix,
+     *compqiprefix,
+     *compqisuffix,
+     *compquote,
+     *compqstack,
+     *comppatmatch,
+     *complastprompt;
+/**/
+char *compiprefix,
+     *compcontext,
+     *compparameter,
+     *compredirect,
+     *compquoting,
+     *comprestore,
+     *complist,
+     *compinsert,
+     *compexact,
+     *compexactstr,
+     *comppatinsert,
+     *comptoend,
+     *compoldlist,
+     *compoldins,
+     *compvared;
+
+/**/
+Param *comprpms, *compkpms;
+
+/**/
+mod_export void
 freecmlist(Cmlist l)
 {
     Cmlist n;
@@ -51,7 +89,7 @@ freecmlist(Cmlist l)
 }
 
 /**/
-void
+mod_export void
 freecmatcher(Cmatcher m)
 {
     Cmatcher n;
@@ -86,29 +124,10 @@ freecpattern(Cpattern p)
     }
 }
 
-/* Copy a list of completion matchers. */
-
-static Cmlist
-cpcmlist(Cmlist l)
-{
-    Cmlist r = NULL, *p = &r, n;
-
-    while (l) {
-	*p = n = (Cmlist) zalloc(sizeof(struct cmlist));
-	n->next = NULL;
-	n->matcher = cpcmatcher(l->matcher);
-	n->str = ztrdup(l->str);
-
-	p = &(n->next);
-	l = l->next;
-    }
-    return r;
-}
-
 /* Copy a completion matcher list. */
 
 /**/
-Cmatcher
+mod_export Cmatcher
 cpcmatcher(Cmatcher m)
 {
     Cmatcher r = NULL, *p = &r, n;
@@ -155,37 +174,10 @@ cpcpattern(Cpattern o)
     return r;
 }
 
-/* Set the global match specs. */
-
-/**/
-int
-set_gmatcher(char *name, char **argv)
-{
-    Cmlist l = NULL, *q = &l, n;
-    Cmatcher m;
-
-    while (*argv) {
-	if ((m = parse_cmatcher(name, *argv)) == pcm_err)
-	    return 1;
-	*q = n = (Cmlist) zhalloc(sizeof(struct cmlist));
-	n->next = NULL;
-	n->matcher = m;
-	n->str = *argv++;
-
-	q = &(n->next);
-    }
-    freecmlist(cmatcher);
-    PERMALLOC {
-	cmatcher = cpcmlist(l);
-    } LASTALLOC;
-
-    return 1;
-}
-
 /* Parse a string for matcher control, containing multiple matchers. */
 
 /**/
-Cmatcher
+mod_export Cmatcher
 parse_cmatcher(char *name, char *s)
 {
     Cmatcher ret = NULL, r = NULL, n;
@@ -262,8 +254,11 @@ parse_cmatcher(char *name, char *s)
 		return pcm_err;
 	    }
 	    word = NULL;
-	    wl = -1;
-	    s++;
+	    if (*++s == '*') {
+		s++;
+		wl = -2;
+	    } else
+		wl = -1;
 	} else {
 	    word = parse_pattern(name, &s, &wl, 0, &err);
 
@@ -389,17 +384,17 @@ static int
 bin_compadd(char *name, char **argv, char *ops, int func)
 {
     struct cadata dat;
-    char *p, **sp, *e, *m = NULL;
+    char *p, **sp, *e, *m = NULL, *mstr = NULL;
     int dm;
     Cmatcher match = NULL;
 
     if (incompfunc != 1) {
-	zerrnam(name, "can only be called from completion function", NULL, 0);
+	zwarnnam(name, "can only be called from completion function", NULL, 0);
 	return 1;
     }
     dat.ipre = dat.isuf = dat.ppre = dat.psuf = dat.prpre =
 	dat.pre = dat.suf = dat.group = dat.rems = dat.remf = dat.disp = 
-	dat.ign = dat.exp = dat.apar = dat.opar = dat.dpar = dat.ylist = NULL;
+	dat.ign = dat.exp = dat.apar = dat.opar = dat.dpar = NULL;
     dat.match = NULL;
     dat.flags = 0;
     dat.aflags = CAF_MATCH;
@@ -462,10 +457,6 @@ bin_compadd(char *name, char **argv, char *ops, int func)
 		if (!(dat.aflags & CAF_UNIQALL))
 		    dat.aflags |= CAF_UNIQCON;
 		break;
-	    case 'y':
-		sp = &(dat.ylist);
-		e = "string expected after -%c";
-		break;
 	    case 'i':
 		sp = &(dat.ipre);
 		e = "string expected after -%c";
@@ -485,9 +476,6 @@ bin_compadd(char *name, char **argv, char *ops, int func)
 	    case 'W':
 		sp = &(dat.prpre);
 		e = "string expected after -%c";
-		break;
-	    case 'a':
-		dat.aflags |= CAF_ALT;
 		break;
 	    case 'M':
 		sp = &m;
@@ -531,7 +519,7 @@ bin_compadd(char *name, char **argv, char *ops, int func)
 		argv++;
 		goto ca_args;
 	    default:
-		zerrnam(name, "bad option: -%c", NULL, *p);
+		zwarnnam(name, "bad option: -%c", NULL, *p);
 		return 1;
 	    }
 	    if (sp) {
@@ -545,18 +533,29 @@ bin_compadd(char *name, char **argv, char *ops, int func)
 			*sp = *argv;
 		    p = "" - 1;
 		} else {
-		    zerrnam(name, e, NULL, *p);
+		    zwarnnam(name, e, NULL, *p);
 		    return 1;
 		}
-		if (dm && (match = parse_cmatcher(name, m)) == pcm_err) {
-		    match = NULL;
-		    return 1;
+		if (dm) {
+		    if (mstr)
+			mstr = tricat(mstr, " ", m);
+		    else
+			mstr = ztrdup(m);
+		    m = NULL;
 		}
 	    }
 	}
     }
+    if (mstr && (match = parse_cmatcher(name, mstr)) == pcm_err) {
+	zsfree(mstr);
+	return 1;
+    }
+    zsfree(mstr);
+
  ca_args:
-    if (!*argv)
+
+    if (!*argv && !dat.group &&
+	!(dat.aflags & (CAF_NOSORT|CAF_UNIQALL|CAF_UNIQCON)))
 	return 1;
 
     dat.match = match = cpcmatcher(match);
@@ -574,7 +573,7 @@ bin_compadd(char *name, char **argv, char *ops, int func)
 #define CVT_SUFPAT   5
 
 /**/
-void
+mod_export void
 ignore_prefix(int l)
 {
     if (l) {
@@ -598,7 +597,7 @@ ignore_prefix(int l)
 }
 
 /**/
-void
+mod_export void
 ignore_suffix(int l)
 {
     if (l) {
@@ -621,7 +620,7 @@ ignore_suffix(int l)
 }
 
 /**/
-void
+mod_export void
 restrict_range(int b, int e)
 {
     int wl = arrlen(compwords) - 1;
@@ -644,6 +643,7 @@ restrict_range(int b, int e)
     }
 }
 
+/**/
 static int
 do_comp_vars(int test, int na, char *sa, int nb, char *sb, int mod)
 {
@@ -740,7 +740,7 @@ do_comp_vars(int test, int na, char *sa, int nb, char *sb, int mod)
 		char *p, sav;
 
 		if (!(l = strlen(compprefix)))
-		    return 0;
+		    return ((na == 1 || na == -1) && pattry(pp, compprefix));
 		if (na < 0) {
 		    p = compprefix + l;
 		    na = -na;
@@ -766,7 +766,7 @@ do_comp_vars(int test, int na, char *sa, int nb, char *sb, int mod)
 		char *p;
 
 		if (!(ol = l = strlen(compsuffix)))
-		    return 0;
+		    return ((na == 1 || na == -1) && pattry(pp, compsuffix));
 		if (na < 0) {
 		    p = compsuffix;
 		    na = -na;
@@ -798,11 +798,11 @@ bin_compset(char *name, char **argv, char *ops, int func)
     char *sa = NULL, *sb = NULL;
 
     if (incompfunc != 1) {
-	zerrnam(name, "can only be called from completion function", NULL, 0);
+	zwarnnam(name, "can only be called from completion function", NULL, 0);
 	return 1;
     }
     if (argv[0][0] != '-') {
-	zerrnam(name, "missing option", NULL, 0);
+	zwarnnam(name, "missing option", NULL, 0);
 	return 1;
     }
     switch (argv[0][1]) {
@@ -814,7 +814,7 @@ bin_compset(char *name, char **argv, char *ops, int func)
     case 'S': test = CVT_SUFPAT; break;
     case 'q': return set_comp_sep();
     default:
-	zerrnam(name, "bad option -%c", NULL, argv[0][1]);
+	zwarnnam(name, "bad option -%c", NULL, argv[0][1]);
 	return 1;
     }
     if (argv[0][2]) {
@@ -823,7 +823,7 @@ bin_compset(char *name, char **argv, char *ops, int func)
 	na = 2;
     } else {
 	if (!(sa = argv[1])) {
-	    zerrnam(name, "missing string for option -%c", NULL, argv[0][1]);
+	    zwarnnam(name, "missing string for option -%c", NULL, argv[0][1]);
 	    return 1;
 	}
 	sb = argv[2];
@@ -831,7 +831,7 @@ bin_compset(char *name, char **argv, char *ops, int func)
     }
     if (((test == CVT_PRENUM || test == CVT_SUFNUM) ? !!sb :
 	 (sb && argv[na]))) {
-	zerrnam(name, "too many arguments", NULL, 0);
+	zwarnnam(name, "too many arguments", NULL, 0);
 	return 1;
     }
     switch (test) {
@@ -841,11 +841,9 @@ bin_compset(char *name, char **argv, char *ops, int func)
 	break;
     case CVT_RANGEPAT:
 	tokenize(sa);
-	sa = rembslash(sa);
 	remnulargs(sa);
 	if (sb) {
 	    tokenize(sb);
-	    sb = rembslash(sb);
 	    remnulargs(sb);
 	}
 	break;
@@ -861,7 +859,6 @@ bin_compset(char *name, char **argv, char *ops, int func)
 	} else
 	    na = -1;
 	tokenize(sa);
-	sa = rembslash(sa);
 	remnulargs(sa);
 	break;
     }
@@ -892,9 +889,6 @@ static struct compparam comprparams[] = {
 
 static struct compparam compkparams[] = {
     { "nmatches", PM_INTEGER | PM_READONLY, NULL, NULL, VAL(get_nmatches) },
-    { "matcher", PM_INTEGER, VAL(compmatcher), NULL, NULL },
-    { "matcher_string", PM_SCALAR, VAL(compmatcherstr), NULL, NULL },
-    { "total_matchers", PM_INTEGER, VAL(compmatchertot), NULL, NULL },
     { "context", PM_SCALAR, VAL(compcontext), NULL, NULL },
     { "parameter", PM_SCALAR, VAL(compparameter), NULL, NULL },
     { "redirect", PM_SCALAR, VAL(compredirect), NULL, NULL },
@@ -902,7 +896,6 @@ static struct compparam compkparams[] = {
     { "quoting", PM_SCALAR | PM_READONLY, VAL(compquoting), NULL, NULL },
     { "restore", PM_SCALAR, VAL(comprestore), NULL, NULL },
     { "list", PM_SCALAR, NULL, VAL(set_complist), VAL(get_complist) },
-    { "force_list", PM_SCALAR, VAL(compforcelist), NULL, NULL },
     { "insert", PM_SCALAR, VAL(compinsert), NULL, NULL },
     { "exact", PM_SCALAR, VAL(compexact), NULL, NULL },
     { "exact_string", PM_SCALAR, VAL(compexactstr), NULL, NULL },
@@ -917,8 +910,9 @@ static struct compparam compkparams[] = {
     { "old_list", PM_SCALAR, VAL(compoldlist), NULL, NULL },
     { "old_insert", PM_SCALAR, VAL(compoldins), NULL, NULL },
     { "vared", PM_SCALAR, VAL(compvared), NULL, NULL },
-    { "alternate_nmatches", PM_INTEGER | PM_READONLY, NULL, NULL, VAL(get_anmatches) },
     { "list_lines", PM_INTEGER | PM_READONLY, NULL, NULL, VAL(get_listlines) },
+    { "all_quotes", PM_SCALAR | PM_READONLY, VAL(compqstack), NULL, NULL },
+    { "ignored", PM_INTEGER | PM_READONLY, VAL(compignored), NULL, NULL },
     { NULL, 0, NULL, NULL, NULL }
 };
 
@@ -976,7 +970,7 @@ makecompparams(void)
 
     comprpms[CPN_COMPSTATE] = cpm;
     tht = paramtab;
-    cpm->level = locallevel;
+    cpm->level = locallevel + 1;
     cpm->gets.hfn = get_compstate;
     cpm->sets.hfn = set_compstate;
     cpm->unsetfn = compunsetfn;
@@ -1029,14 +1023,7 @@ set_compstate(Param pm, HashTable ht)
 static zlong
 get_nmatches(Param pm)
 {
-    return num_matches(1);
-}
-
-/**/
-static zlong
-get_anmatches(Param pm)
-{
-    return num_matches(0);
+    return (permmatches(0) ? 0 : nmatches);
 }
 
 /**/
@@ -1083,14 +1070,37 @@ static void
 compunsetfn(Param pm, int exp)
 {
     if (exp) {
-	if (PM_TYPE(pm->flags) == PM_SCALAR) {
-	    zsfree(*((char **) pm->u.data));
-	    *((char **) pm->u.data) = ztrdup("");
-	} else if (PM_TYPE(pm->flags) == PM_ARRAY) {
-	    freearray(*((char ***) pm->u.data));
-	    *((char ***) pm->u.data) = zcalloc(sizeof(char *));
+	if (pm->u.data) {
+	    if (PM_TYPE(pm->flags) == PM_SCALAR) {
+		zsfree(*((char **) pm->u.data));
+		*((char **) pm->u.data) = ztrdup("");
+	    } else if (PM_TYPE(pm->flags) == PM_ARRAY) {
+		freearray(*((char ***) pm->u.data));
+		*((char ***) pm->u.data) = zcalloc(sizeof(char *));
+	    } else if (PM_TYPE(pm->flags) == PM_HASHED) {
+		deleteparamtable(pm->u.hash);
+		pm->u.hash = NULL;
+	    }
 	}
-	pm->flags |= PM_UNSET;
+    } else if (PM_TYPE(pm->flags) == PM_HASHED) {
+	Param *p;
+	int i;
+
+	deletehashtable(pm->u.hash);
+	pm->u.hash = NULL;
+
+	for (p = compkpms, i = CP_KEYPARAMS; i--; p++)
+	    *p = NULL;
+    }
+    if (!exp) {
+	Param *p;
+	int i;
+
+	for (p = comprpms, i = CP_REALPARAMS; i; p++, i--)
+	    if (*p == pm) {
+		*p = NULL;
+		break;
+	    }
     }
 }
 
@@ -1102,31 +1112,35 @@ comp_setunset(int rset, int runset, int kset, int kunset)
 
     if (comprpms && (rset >= 0 || runset >= 0)) {
 	for (p = comprpms; rset || runset; rset >>= 1, runset >>= 1, p++) {
-	    if (rset & 1)
-		(*p)->flags &= ~PM_UNSET;
-	    if (runset & 1)
-		(*p)->flags |= PM_UNSET;
+	    if (*p) {
+		if (rset & 1)
+		    (*p)->flags &= ~PM_UNSET;
+		if (runset & 1)
+		    (*p)->flags |= PM_UNSET;
+	    }
 	}
     }
-    if (comprpms && (kset >= 0 || kunset >= 0)) {
+    if (compkpms && (kset >= 0 || kunset >= 0)) {
 	for (p = compkpms; kset || kunset; kset >>= 1, kunset >>= 1, p++) {
-	    if (kset & 1)
-		(*p)->flags &= ~PM_UNSET;
-	    if (kunset & 1)
-		(*p)->flags |= PM_UNSET;
+	    if (*p) {
+		if (kset & 1)
+		    (*p)->flags &= ~PM_UNSET;
+		if (kunset & 1)
+		    (*p)->flags |= PM_UNSET;
+	    }
 	}
     }
 }
 
 /**/
 static int
-comp_wrapper(List list, FuncWrap w, char *name)
+comp_wrapper(Eprog prog, FuncWrap w, char *name)
 {
     if (incompfunc != 1)
 	return 1;
     else {
 	char *orest, *opre, *osuf, *oipre, *oisuf, **owords;
-	char *oqipre, *oqisuf, *oq, *oqi;
+	char *oqipre, *oqisuf, *oq, *oqi, *oqs, *oaq;
 	zlong ocur;
 	unsigned int runset = 0, kunset = 0, m, sm;
 	Param *pp;
@@ -1142,52 +1156,65 @@ comp_wrapper(List list, FuncWrap w, char *name)
 	orest = comprestore;
 	comprestore = ztrdup("auto");
 	ocur = compcurrent;
-	opre = dupstring(compprefix);
-	osuf = dupstring(compsuffix);
-	oipre = dupstring(compiprefix);
-	oisuf = dupstring(compisuffix);
-	oqipre = dupstring(compqiprefix);
-	oqisuf = dupstring(compqisuffix);
-	oq = dupstring(compquote);
-	oqi = dupstring(compquoting);
+	opre = ztrdup(compprefix);
+	osuf = ztrdup(compsuffix);
+	oipre = ztrdup(compiprefix);
+	oisuf = ztrdup(compisuffix);
+	oqipre = ztrdup(compqiprefix);
+	oqisuf = ztrdup(compqisuffix);
+	oq = ztrdup(compquote);
+	oqi = ztrdup(compquoting);
+	oqs = ztrdup(compqstack);
+	oaq = ztrdup(autoq);
+	owords = zarrdup(compwords);
 
-	HEAPALLOC {
-	    owords = arrdup(compwords);
-	} LASTALLOC;
-
-	runshfunc(list, w, name);
+	runshfunc(prog, w, name);
 
 	if (comprestore && !strcmp(comprestore, "auto")) {
 	    compcurrent = ocur;
 	    zsfree(compprefix);
-	    compprefix = ztrdup(opre);
+	    compprefix = opre;
 	    zsfree(compsuffix);
-	    compsuffix = ztrdup(osuf);
+	    compsuffix = osuf;
 	    zsfree(compiprefix);
-	    compiprefix = ztrdup(oipre);
+	    compiprefix = oipre;
 	    zsfree(compisuffix);
-	    compisuffix = ztrdup(oisuf);
+	    compisuffix = oisuf;
 	    zsfree(compqiprefix);
-	    compqiprefix = ztrdup(oqipre);
+	    compqiprefix = oqipre;
 	    zsfree(compqisuffix);
-	    compqisuffix = ztrdup(oqisuf);
+	    compqisuffix = oqisuf;
 	    zsfree(compquote);
-	    compquote = ztrdup(oq);
+	    compquote = oq;
 	    zsfree(compquoting);
-	    compquoting = ztrdup(oqi);
+	    compquoting = oqi;
+	    zsfree(compqstack);
+	    compqstack = oqs;
+	    zsfree(autoq);
+	    autoq = oaq;
 	    freearray(compwords);
-	    PERMALLOC {
-		compwords = arrdup(owords);
-	    } LASTALLOC;
+	    compwords = owords;
 	    comp_setunset(CP_COMPSTATE |
 			  (~runset & (CP_WORDS | CP_CURRENT | CP_PREFIX |
 				     CP_SUFFIX | CP_IPREFIX | CP_ISUFFIX |
 				     CP_QIPREFIX | CP_QISUFFIX)),
 			  (runset & CP_ALLREALS),
 			  (~kunset & CP_RESTORE), (kunset & CP_ALLKEYS));
-	} else
+	} else {
 	    comp_setunset(CP_COMPSTATE, 0, (~kunset & CP_RESTORE),
 			  (kunset & CP_RESTORE));
+	    zsfree(opre);
+	    zsfree(osuf);
+	    zsfree(oipre);
+	    zsfree(oisuf);
+	    zsfree(oqipre);
+	    zsfree(oqisuf);
+	    zsfree(oq);
+	    zsfree(oqi);
+	    zsfree(oqs);
+	    zsfree(oaq);
+	    freearray(owords);
+	}
 	zsfree(comprestore);
 	comprestore = orest;
 
@@ -1228,42 +1255,6 @@ cond_range(char **a, int id)
 			(id ? cond_str(a, 1, 1) : NULL), 0);
 }
 
-/**/
-static void
-cmsetfn(Param pm, char **v)
-{
-    set_gmatcher(pm->nam, v);
-}
-
-/**/
-static char **
-cmgetfn(Param pm)
-{
-    int num;
-    Cmlist p;
-    char **ret, **q;
-
-    for (num = 0, p = cmatcher; p; p = p->next, num++);
-
-    ret = (char **) zhalloc((num + 1) * sizeof(char *));
-
-    for (q = ret, p = cmatcher; p; p = p->next, q++)
-	*q = dupstring(p->str);
-    *q = NULL;
-
-    return ret;
-}
-
-/**/
-static void
-cmunsetfn(Param pm, int exp)
-{
-    char *dummy[1];
-
-    dummy[0] = NULL;
-    set_gmatcher(pm->nam, dummy);
-}
-
 static struct builtin bintab[] = {
     BUILTIN("compadd", 0, bin_compadd, 0, -1, 0, NULL, NULL),
     BUILTIN("compset", 0, bin_compset, 1, 3, 0, NULL, NULL),
@@ -1280,53 +1271,108 @@ static struct funcwrap wrapper[] = {
     WRAPDEF(comp_wrapper),
 };
 
-static struct paramdef patab[] = {
-    PARAMDEF("compmatchers", PM_ARRAY|PM_SPECIAL, NULL, cmsetfn, cmgetfn, cmunsetfn)
+/* The order of the entries in this table has to match the *HOOK
+ * macros in comp.h */
+
+/**/
+struct hookdef comphooks[] = {
+    HOOKDEF("insert_match", NULL, HOOKF_ALL),
+    HOOKDEF("menu_start", NULL, HOOKF_ALL),
+    HOOKDEF("compctl_make", NULL, 0),
+    HOOKDEF("compctl_cleanup", NULL, 0),
+    HOOKDEF("comp_list_matches", ilistmatches, 0),
 };
 
 /**/
 int
-setup_complete(Module m)
+setup_(Module m)
 {
-    makecompparamsptr = makecompparams;
-    comp_setunsetptr = comp_setunset;
+    hasperm = 0;
+
+    comprpms = compkpms = NULL;
+    compwords = NULL;
+    compprefix = compsuffix = compiprefix = compisuffix = 
+	compqiprefix = compqisuffix =
+	compcontext = compparameter = compredirect = compquote =
+	compquoting = comprestore = complist = compinsert =
+	compexact = compexactstr = comppatmatch = comppatinsert =
+	complastprompt = comptoend = compoldlist = compoldins =
+	compvared = compqstack = NULL;
+
+    hascompmod = 1;
 
     return 0;
 }
 
 /**/
 int
-boot_complete(Module m)
+boot_(Module m)
 {
+    addhookfunc("complete", (Hookfn) do_completion);
+    addhookfunc("before_complete", (Hookfn) before_complete);
+    addhookfunc("after_complete", (Hookfn) after_complete);
+    addhookfunc("accept_completion", (Hookfn) accept_last);
+    addhookfunc("reverse_menu", (Hookfn) reverse_menu);
+    addhookfunc("list_matches", (Hookfn) list_matches);
+    addhookfunc("invalidate_list", (Hookfn) invalidate_list);
+    addhookdefs(m->nam, comphooks, sizeof(comphooks)/sizeof(*comphooks));
     if (!(addbuiltins(m->nam, bintab, sizeof(bintab)/sizeof(*bintab)) |
 	  addconddefs(m->nam, cotab, sizeof(cotab)/sizeof(*cotab)) |
-	  addparamdefs(m->nam, patab, sizeof(patab)/sizeof(*patab)) |
 	  !addwrapper(m, wrapper)))
 	return 1;
     return 0;
 }
 
-#ifdef MODULE
-
 /**/
 int
-cleanup_complete(Module m)
+cleanup_(Module m)
 {
+    deletehookfunc("complete", (Hookfn) do_completion);
+    deletehookfunc("before_complete", (Hookfn) before_complete);
+    deletehookfunc("after_complete", (Hookfn) after_complete);
+    deletehookfunc("accept_completion", (Hookfn) accept_last);
+    deletehookfunc("reverse_menu", (Hookfn) reverse_menu);
+    deletehookfunc("list_matches", (Hookfn) list_matches);
+    deletehookfunc("invalidate_list", (Hookfn) invalidate_list);
+    deletehookdefs(m->nam, comphooks, sizeof(comphooks)/sizeof(*comphooks));
     deletebuiltins(m->nam, bintab, sizeof(bintab)/sizeof(*bintab));
     deleteconddefs(m->nam, cotab, sizeof(cotab)/sizeof(*cotab));
-    deleteparamdefs(m->nam, patab, sizeof(patab)/sizeof(*patab));
     deletewrapper(m, wrapper);
     return 0;
 }
 
 /**/
 int
-finish_complete(Module m)
+finish_(Module m)
 {
-    makecompparamsptr = NULL;
-    comp_setunsetptr = NULL;
+    if (compwords)
+	freearray(compwords);
+    zsfree(compprefix);
+    zsfree(compsuffix);
+    zsfree(compiprefix);
+    zsfree(compisuffix);
+    zsfree(compqiprefix);
+    zsfree(compqisuffix);
+    zsfree(compcontext);
+    zsfree(compparameter);
+    zsfree(compredirect);
+    zsfree(compquote);
+    zsfree(compqstack);
+    zsfree(compquoting);
+    zsfree(comprestore);
+    zsfree(complist);
+    zsfree(compinsert);
+    zsfree(compexact);
+    zsfree(compexactstr);
+    zsfree(comppatmatch);
+    zsfree(comppatinsert);
+    zsfree(complastprompt);
+    zsfree(comptoend);
+    zsfree(compoldlist);
+    zsfree(compoldins);
+    zsfree(compvared);
+
+    hascompmod = 0;
 
     return 0;
 }
-
-#endif

@@ -1,4 +1,4 @@
-# $Id: is-at-least,v 1.1 2000/02/11 19:46:46 akr Exp $ -*- shell-script -*-
+# $Id: is-at-least,v 1.2 2000/04/01 20:49:47 pws Exp $ -*- shell-script -*-
 #
 # Test whether $ZSH_VERSION (or some value of your choice, if a second argument
 # is provided) is greater than or equal to x.y.z-r (in argument one). In fact,

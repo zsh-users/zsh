@@ -1,7 +1,21 @@
 # Tests for globbing
 
 %prep
+  mkdir glob.tmp
+  mkdir glob.tmp/dir1
+  mkdir glob.tmp/dir2
+  : >glob.tmp/{,{dir1,dir2}/}{a,b,c}
+
   globtest () { $ZTST_testdir/../Src/zsh -f $ZTST_srcdir/../Misc/$1 }
+
+  regress_absolute_path_and_core_dump() {
+    local absolute_dir=$(cd glob.tmp && pwd -P)
+    [[ -n $absolute_dir ]] || return 1
+    setopt localoptions extendedglob nullglob
+    print $absolute_dir/**/*~/*
+    setopt nonullglob nomatch
+    print glob.tmp/**/*~(.)#
+  }
 
 %test
 
@@ -234,3 +248,8 @@
 >0:  [[ FOO = @(bar|(#i)foo) ]]
 >0:  [[ Modules = (#i)*m* ]]
 >0 tests failed.
+
+  ( regress_absolute_path_and_core_dump )
+0:exclusions regression test
+>
+>glob.tmp/a glob.tmp/b glob.tmp/c glob.tmp/dir1 glob.tmp/dir1/a glob.tmp/dir1/b glob.tmp/dir1/c glob.tmp/dir2 glob.tmp/dir2/a glob.tmp/dir2/b glob.tmp/dir2/c

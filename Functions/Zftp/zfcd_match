@@ -15,7 +15,7 @@ local tmpf=${TMPPREFIX}zfcm$$
 
 if [[ $ZFTP_SYSTEM = UNIX* ]]; then
   # hoo, aren't we lucky: this makes things so much easier
-  setopt localoptions rcexpandparam
+  setopt rcexpandparam
   local dir
   if [[ $1 = ?*/* ]]; then
     dir=${1%/*}
@@ -25,13 +25,15 @@ if [[ $ZFTP_SYSTEM = UNIX* ]]; then
   # If we're using -F, we get away with using a directory
   # to list, but not a glob.  Don't ask me why.
   # I hate having to rely on awk here.
-  zftp ls -F $dir >$tmpf
+  zftp ls -LF $dir >$tmpf
   reply=($(awk '/\/$/ { print substr($1, 0, length($1)-1) }' $tmpf))
   rm -f $tmpf
-  if [[ $dir = / ]]; then
-    reply=(${dir}$reply)
+  [[ -n $dir && $dir != */ ]] && dir="$dir/"
+  if [[ -n $WIDGET ]]; then
+    _all_labels directories expl 'remote directory'
+        compadd -S/ -q -P "$dir" - $reply
   elif [[ -n $dir ]]; then
-    reply=($dir/$reply)
+    reply=(${dir}$reply)
   fi
 else
   # I simply don't know what to do here.

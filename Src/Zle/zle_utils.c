@@ -53,7 +53,7 @@ struct cutbuffer vibuf[35];
 /**/
 char *lastline;
 /**/
-int lastlinesz, lastll;
+int lastlinesz, lastll, lastcs;
 
 /* size of line buffer */
 
@@ -73,7 +73,7 @@ sizeline(int sz)
 /* insert space for ct chars at cursor position */
 
 /**/
-void
+mod_export void
 spaceinline(int ct)
 {
     int i;
@@ -105,7 +105,7 @@ shiftchars(int to, int cnt)
 }
 
 /**/
-void
+mod_export void
 backkill(int ct, int dir)
 {
     int i = (cs -= ct);
@@ -115,7 +115,7 @@ backkill(int ct, int dir)
 }
 
 /**/
-void
+mod_export void
 forekill(int ct, int dir)
 {
     int i = cs;
@@ -191,14 +191,14 @@ cut(int i, int ct, int dir)
 }
 
 /**/
-void
+mod_export void
 backdel(int ct)
 {
     shiftchars(cs -= ct, ct);
 }
 
 /**/
-void
+mod_export void
 foredel(int ct)
 {
     shiftchars(cs, ct);
@@ -283,7 +283,7 @@ hstrnstr(char *haystack, int pos, char *needle, int len, int dir, int sens)
  * characters are read.  Case is folded.                        */
 
 /**/
-int
+mod_export int
 getzlequery(void)
 {
     int c;
@@ -409,19 +409,11 @@ showmsg(char const *msg)
 /* handle the error flag */
 
 /**/
-void
-feep(void)
+int
+handlefeep(char **args)
 {
-    feepflag = 1;
-}
-
-/**/
-void
-handlefeep(void)
-{
-    if(feepflag)
-	beep();
-    feepflag = 0;
+    zbeep();
+    return 0;
 }
 
 /***************/
@@ -446,6 +438,7 @@ initundo(void)
     curchange->del = curchange->ins = NULL;
     lastline = zalloc(lastlinesz = linesz);
     memcpy(lastline, line, lastll = ll);
+    lastcs = cs;
 }
 
 /**/
@@ -519,6 +512,8 @@ mkundoent(void)
     ch->next = NULL;
     ch->hist = histline;
     ch->off = pre;
+    ch->old_cs = lastcs;
+    ch->new_cs = cs;
     if(suf + pre == lastll)
 	ch->del = NULL;
     else
@@ -549,32 +544,36 @@ setlastline(void)
     if(lastlinesz != linesz)
 	lastline = realloc(lastline, lastlinesz = linesz);
     memcpy(lastline, line, lastll = ll);
+    lastcs = cs;
 }
 
 /* move backwards through the change list */
 
 /**/
-void
-undo(void)
+int
+undo(char **args)
 {
     handleundo();
     do {
-	if(!curchange->prev) {
-	    feep();
-	    return;
-	}
-	unapplychange(curchange = curchange->prev);
+	if(!curchange->prev)
+	    return 1;
+	if (unapplychange(curchange->prev))
+	    curchange = curchange->prev;
+	else
+	    break;
     } while(curchange->flags & CH_PREV);
     setlastline();
+    return 0;
 }
 
 /**/
-static void
+static int
 unapplychange(struct change *ch)
 {
     if(ch->hist != histline) {
-	remember_edits();
-	setline(zle_get_event(histline = ch->hist));
+	zle_setline(quietgethist(ch->hist));
+	cs = ch->new_cs;
+	return 0;
     }
     cs = ch->off;
     if(ch->ins)
@@ -589,33 +588,37 @@ unapplychange(struct change *ch)
 	    else
 		line[cs++] = STOUC(*c);
     }
+    cs = ch->old_cs;
+    return 1;
 }
 
 /* move forwards through the change list */
 
 /**/
-void
-redo(void)
+int
+redo(char **args)
 {
     handleundo();
     do {
-	if(!curchange->next) {
-	    feep();
-	    return;
-	}
-	applychange(curchange);
-	curchange = curchange->next;
+	if(!curchange->next)
+	    return 1;
+	if (applychange(curchange))
+	    curchange = curchange->next;
+	else
+	    break;
     } while(curchange->prev->flags & CH_NEXT);
     setlastline();
+    return 0;
 }
 
 /**/
-static void
+static int
 applychange(struct change *ch)
 {
     if(ch->hist != histline) {
-	remember_edits();
-	setline(zle_get_event(histline = ch->hist));
+	zle_setline(quietgethist(ch->hist));
+	cs = ch->old_cs;
+	return 0;
     }
     cs = ch->off;
     if(ch->del)
@@ -630,13 +633,15 @@ applychange(struct change *ch)
 	    else
 		line[cs++] = STOUC(*c);
     }
+    cs = ch->new_cs;
+    return 1;
 }
 
 /* vi undo: toggle between the end of the undo list and the preceding point */
 
 /**/
-void
-viundochange(void)
+int
+viundochange(char **args)
 {
     handleundo();
     if(curchange->next) {
@@ -645,6 +650,7 @@ viundochange(void)
 	    curchange = curchange->next;
 	} while(curchange->next);
 	setlastline();
+	return 0;
     } else
-	undo();
+	return undo(args);
 }

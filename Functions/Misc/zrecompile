@@ -18,8 +18,8 @@
 #       seperated by `--'. For example:
 #
 #         zrecompile -p \
-#                    -r ~/.zshrc -- \
-#                    -m ~/.zcompdump -- \
+#                    -R ~/.zshrc -- \
+#                    -M ~/.zcompdump -- \
 #                    ~/zsh/comp.zwc ~/zsh/Completion/*/_* \
 #
 #       This makes ~/.zshrc be compiled into ~/.zshrc.zwc if that doesn't
@@ -33,8 +33,7 @@
 # that needed re-compilation could be compiled and non-zero if compilation
 # for at least one of the files failed.
 
-emulate -L zsh
-setopt extendedglob
+setopt localoptions extendedglob
 
 local opt check quiet zwc files re file pre ret map tmp mesg pats
 
@@ -68,7 +67,7 @@ if [[ -n $pats ]]; then
     fi
 
     files=( ${files:#*(.zwc|~)} )
-    if [[ $files[1] = -[rm] ]]; then
+    if [[ $files[1] = -[RM] ]]; then
       map=( $files[1] )
       shift 1 files
     else
@@ -146,10 +145,10 @@ for zwc; do
   # See if the wordcode file will be mapped.
 
   if [[ $files[1] = *\(mapped\)* ]]; then
-    map=-m
+    map=-M
     mesg='succeeded (old saved)'
   else
-    map=-r
+    map=-R
     mesg=succeeded
   fi
 

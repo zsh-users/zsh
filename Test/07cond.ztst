@@ -11,10 +11,11 @@
   touch	unmodified
 
   touch zerolength
+  chgrp $EGID zerolength
   print 'Garbuglio' >nonzerolength
 
-  touch modish
-  chmod g+s modish
+  mkdir modish
+  chmod g+xs modish
   chmod u+s modish
   chmod +t modish
 
@@ -26,7 +27,11 @@
 0:-a cond
 
   # Find a block special file system.  This is a little tricky.
-  block=$(df / | tail -1 | awk '{ print $1 }') &&
+  block=$(df / | awk '
+    $NF == "/" {print $1}
+    $1 == "/" && substr($2,0,1) == "(" {
+      if((l = index($2,")") - 2) < 0) l = length($2) - 1;
+      print substr($2,2,l)}') &&
   [[ -b $block && ! -b zerolength ]]
 0:-b cond
 
@@ -61,7 +66,11 @@
   [[ -o rcs && ! -o norcs && -o noerrexit && ! -o errexit ]]
 0:-o cond
 
-  mknod pipe p
+  if whence mkfifo >/dev/null; then
+    mkfifo pipe
+  else
+    mknod pipe p
+  fi
   [[ -p pipe && ! -p zerolength ]]
 0:-p cond
 
@@ -76,7 +85,7 @@
   [[ -u modish && ! -u zerolength ]]
 0:-u cond
 
-  [[ -x $ZTST_testdir/ztst.zsh && ! -x zerolength ]]
+  [[ -x $ZTST_srcdir/ztst.zsh && ! -x zerolength ]]
 0:-x cond
 
   [[ -z $bar && -z '' && ! -z $foo ]]
@@ -89,8 +98,6 @@
   [[ -O zerolength ]]
 0:-O cond
 
-# there may be strange cases where this doesn't work, e.g.
-# inherited funny groups for directories via setgid.
   [[ -G zerolength ]]
 0:-G cond
 
@@ -132,4 +139,16 @@
 0:|| and && in conds
 
   [[ -e /dev/fd/0 ]]
-0:/dev/fd support in conds
+0:/dev/fd support in conds handled by access
+
+  [[ -O /dev/fd/0 ]]
+0:/dev/fd support in conds handled by stat
+
+  [[ ( -z foo && -z foo ) || -z foo ]]
+1:complex conds with skipping
+
+  [ '' != bar -a '' = '' ]
+0:strings with `[' builtin
+
+  [ `echo 0` -lt `echo 1` ]
+0:substituion in `[' builtin
