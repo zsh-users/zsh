@@ -3749,7 +3749,10 @@ makecomplistflags(Compctl cc, char *s, int incmd, int compadd)
 	dumphashtable(aliastab, t | (cc->mask & (CC_DISCMDS|CC_EXCMDS)));
     if (keypm && cc == &cc_dummy) {
 	/* Add the keys of the parameter in keypm. */
-	scanhashtable(keypm->gets.hfn(keypm), 0, 0, PM_UNSET, addhnmatch, 0);
+	HashTable t = keypm->gets.hfn(keypm);
+
+	if (t)
+	    scanhashtable(t, 0, 0, PM_UNSET, addhnmatch, 0);
 	keypm = NULL;
 	cc_dummy.suffix = NULL;
     }

@@ -1,3 +1,8 @@
+2001-01-16  Sven Wischnowsky  <wischnow@zsh.org>
+
+	* 13364: Src/Zle/compctl.c: fix for ol' compctl when completing
+ 	hash keys
+	
 2001-01-15  Sven Wischnowsky  <wischnow@zsh.org>
 
 	* 13349: Src/Zle/compmatch.c, Src/Zle/compresult.c: two more fixes
