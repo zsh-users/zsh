@@ -1189,11 +1189,11 @@ execpline2(Estate state, wordcode pcode,
 	execcmd(state, input, output, how, last1 ? 1 : 2);
     else {
 	int old_list_pipe = list_pipe;
-	Wordcode next = state->pc + (*state->pc);
+	Wordcode next = state->pc + (*state->pc), pc;
 	wordcode code;
 
 	state->pc++;
-	code = *state->pc;
+	for (pc = state->pc; wc_code(code = *pc) == WC_REDIR; pc += 3);
 
 	mpipe(pipes);
 
