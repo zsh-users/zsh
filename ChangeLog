@@ -1,3 +1,9 @@
+2002-12-18  Peter Stephenson  <pws@csr.com>
+
+	* 18013: Src/builtin.c, Src/exec.c: let and (( ... )) should
+	return zero status on floating point only if the value compares
+	equal to 0 as a floating point number.
+
 2002-12-11  Peter Stephenson  <pws@csr.com>
 
 	* 17996: Src/builtin.c: Improve formatting with `print -C' by

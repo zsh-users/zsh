@@ -3087,7 +3087,7 @@ static int
 execarith(Estate state, int do_exec)
 {
     char *e;
-    zlong val = 0;
+    mnumber val = zero_mnumber;
     int htok = 0;
 
     if (isset(XTRACE)) {
@@ -3101,7 +3101,7 @@ execarith(Estate state, int do_exec)
     if (isset(XTRACE))
 	fprintf(xtrerr, " %s", e);
 
-    val = mathevali(e);
+    val = matheval(e);
 
     cmdpop();
 
@@ -3110,7 +3110,8 @@ execarith(Estate state, int do_exec)
 	fflush(xtrerr);
     }
     errflag = 0;
-    return !val;
+    /* should test for fabs(val.u.d) < epsilon? */
+    return (val.type == MN_INTEGER) ? val.u.l == 0 : val.u.d == 0.0;
 }
 
 /* perform time ... command */
