@@ -2,7 +2,7 @@
 
 if compset -N --; then
   if [[ CURRENT -eq 1 ]]; then
-    _ps
+    _pspdf
   else
     _message 'userdict ARGUMENTS'
     return 1
@@ -18,7 +18,7 @@ else
     '-I[add search paths]:search paths:_dir_list' \
     \*-{d,D}'-[define name with definition]:def:->dname' \
     \*-{s,S}'-[define name with value]:def:->sname' \
-    '*:PostScript file:_ps' && ret=0
+    '*:PostScript or PDF file:_pspdf' && ret=0
 
   case "$state" in
   dname)
