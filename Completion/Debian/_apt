@@ -113,7 +113,7 @@ compadd "$expl_opt[@]" - $tmp2
 tmp2=($_ra_left${(M)^short_hasarg:#$~tmp1} $_ra_left${(M)^short_configfile:#$~tmp1} $_ra_left${(M)^short_arbitem:#$~tmp1})
 compadd "$expl_opt[@]" -S= - $tmp2'
 
-  comp_opt='[[ -prefix - || -z "$compconfig[option_prefix]" ]]'" && { $comp_short; $comp_long }"
+  comp_opt='[[ -prefix - || -z "$compconfig[option_prefix]" || "$compconfig[option_prefix]" = *\!$words[1]* ]]'" && { $comp_short; $comp_long }"
 
   regex_short=()
   regex_long=()

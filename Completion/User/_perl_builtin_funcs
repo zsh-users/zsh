@@ -12,13 +12,13 @@ if [[ ${+_perl_builtin_funcs} -eq 0 ]]; then
   typeset -agU _perl_builtin_funcs
   local perlfunc
 
-  if perlfunc=`man -w perlfunc 2>&1`; then
+  if [[ -n "${perlfunc:=$(man -w perlfunc 2>/dev/null; print -l ${^manpath}/man1/perlfunc.1(N) {/usr/man,/usr/local/man}/man1/perlfunc.1(N))}" ]]; then
     _perl_builtin_funcs=( `perl -lne '
                              $in_funcs++, next if /Alphabetical/;     \
                              next unless $in_funcs;                   \
                              if (/^\.Ip "(\w+)/) {                    \
                                print $1 unless $func{$1}; $func{$1}++ \
-                             }' $perlfunc`
+                             }' $=perlfunc`
                )
   else
     echo "Couldn't find perlfunc man page; giving up."

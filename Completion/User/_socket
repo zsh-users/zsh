@@ -8,22 +8,42 @@
 local state line expl
 typeset -A options
 
+if [[ $CURRENT -eq 2 && (
+  -z "$compconfig[option_prefix]" ||
+  "$compconfig[option_prefix]" = *\!${words[1]}* ||
+  "$PREFIX" = -* ) ]]; then
+  _description expl option
+  compadd -M 'r:|[_-]=* r:|=*' "$expl[@]" - -version
+fi
+
 _arguments -s \
-  -{b,c,f,q,r,v,w} \
-  -{s,l} \
-  '-p:command:->command' \
+  '-b[background]' \
+  '-c[crlf]' \
+  '-f[fork]' \
+  '-q[quit]' \
+  '-r[read only]' \
+  '-v[verbose]' \
+  '-w[write only]' \
+  '-s[server]' \
+  '-l[loop]' \
+  '-p[program]:command:->command' \
   ':arg1:->arg1' \
   ':arg2:->arg2'
 
 case "$state" in
 command)
   compset -q
-  _normal
+  if [[ $CURRENT -eq 1 ]]; then
+    _command_names -e "$@"
+  else
+    _normal
+  fi
   ;;
 
 arg1)
   if (( $+options[-s] )); then
-    _message 'port to listen'
+    _description expl 'port to listen'
+    _ports "$expl[@]"
   else
     _description expl 'host'
     _combination socket_hosts_ports hosts "$expl[@]"
