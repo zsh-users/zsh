@@ -1,11 +1,20 @@
 #compdef -P */X11/*
 
-local ret
+local ret long xargs
 
-_arguments \
-  '-display:display:_x_display' \
-  '-geometry:geometry:_x_geometry' \
-  "$@"
+xargs=(
+  '-display:display:_x_display'
+  '-geometry:geometry:_x_geometry'
+)
+
+long=$argv[(I)--]
+if (( long )); then
+  argv[long]=( "$xargs[@]" -- )
+else
+  set -- "$@" "$xargs[@]"
+fi
+
+_arguments "$@"
 
 ret=$?
 

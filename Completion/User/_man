@@ -22,7 +22,7 @@ if (( ! $#manpath )); then
 fi
 
 (( $#manpath )) || manpath=( ${(s.:.)$(manpath 2>/dev/null)} ) ||
-  manpath=( /usr/man(-/N) /(opt|usr)/(dt|share|X11R6|local)/(cat|)man(-/N) )
+    manpath=( /usr/man(-/N) /(opt|usr)/(dt|share|X11R6|local)/(cat|)man(-/N) )
 
 # `sman' is the SGML manual directory for Solaris 7.
 
@@ -33,5 +33,5 @@ else
   rep=( $manpath/(sman|man|cat)*/${~approx}$PREFIX${~star}$SUFFIX.<->*(N:t) )
 fi
 
-_description expl 'manual page'
-(( $#rep )) && compadd "$expl[@]" - ${rep%%.[^.]##(.gz|)}
+(( $#rep )) && _wanted manuals expl 'manual page' &&
+    compadd "$expl[@]" - ${rep%%.[^.]##(.gz|)}

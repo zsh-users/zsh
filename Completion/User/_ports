@@ -2,9 +2,6 @@
 
 local expl
 
-_tags any ports || return 1
-
 : ${(A)ports:=${${(M)${${(f)"$(</etc/services)"}:#\#*}#*/tcp}%%[ 	]*}}
 
-_description expl port
-compadd "$@" "$expl[@]" - "$ports[@]"
+_wanted ports expl port && compadd "$@" "$expl[@]" - "$ports[@]"

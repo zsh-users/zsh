@@ -37,10 +37,10 @@ if [[ "$words[2]" = *[txcdruA]*~-* ]]; then
 elif [[ $_tar_cmd != *[txcdruA]* && CURRENT -gt 2 ]]; then
   # look for more obscure long options: these aren't all handled.
   (( $words[(I)--(diff|compare)] )) && _tar_cmd="d$_tar_cmd"
-  (( $words[(I)--append] )) && _tar_cmd="r$_tar_cmd"
-  (( $words[(I)--update] )) && _tar_cmd="u$_tar_cmd"
+  (( $words[(I)--append] ))         && _tar_cmd="r$_tar_cmd"
+  (( $words[(I)--update] ))         && _tar_cmd="u$_tar_cmd"
   (( $words[(I)--(con|)catenate] )) && _tar_cmd="A$_tar_cmd"
-  (( $words[(I)--delete] )) && del=1
+  (( $words[(I)--delete] ))         && del=1
 fi
 
 # Next, we try to find the archive name and store it in `tf'. The name 
@@ -107,8 +107,8 @@ elif [[ ( "$_tar_cmd" = *[xt]* || -n $del ) && -n "$tf" ]]; then
     _tar_cache_name=$tf
   fi
 
-  _description expl 'file from archive'
-  _multi_parts "$expl[@]" / _tar_cache_list
+  _wanted archived-files expl 'file from archive' &&
+      _multi_parts "$expl[@]" / _tar_cache_list
 else
   
   # See if we should use a path prefix.  We have to use eval as the dir can

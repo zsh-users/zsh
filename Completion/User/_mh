@@ -17,12 +17,12 @@ if compset -P 1 -; then
   # get list of options, which MH commands can generate themselves
   # awk is just too icky to use for this, sorry.  send me one if
   # you come up with it.
-  _description expl option
-  compadd "$expl[@]" - $($words[1] -help | perl -ne 'if (/^\s*-\(?(\S+)/) {
-    $n = $1;
-    $n =~ s/\)//g;
-    print $n =~ s/^\[([a-z]+)\]// ? "$n\n$1$n\n" : "$n\n";
-  }')
+  _wanted options expl option &&
+      compadd "$expl[@]" - $($words[1] -help | perl -ne 'if (/^\s*-\(?(\S+)/) {
+            $n = $1;
+            $n =~ s/\)//g;
+            print $n =~ s/^\[([a-z]+)\]// ? "$n\n$1$n\n" : "$n\n";
+          }')
   return
 elif compset -P 1 '[+@]' || [[ "$prev" = -draftfolder ]]; then
   # Complete folder names.
@@ -53,11 +53,11 @@ elif [[ "$prev" = -(form|audit|filter) ]]; then
   _description expl 'MH template file'
   _files "$expl[@]" -W mhfpath -g '*(.)'
 elif [[ "$prev" = -(no|)cc ]]; then
-  _description expl 'CC address'
-  compadd "$expl[@]" all to cc me
+  _wanted -C "$prev" values expl 'CC address' &&
+      compadd "$expl[@]" all to cc me
 elif [[ "$prev" = -[rw]cache ]]; then
-  _description expl cache
-  compadd "$expl[@]" public private never ask
+  _wanted -C "$prev" values expl cache &&
+      compadd "$expl[@]" public private never ask
 else
   # Generate sequences.
   local foldnam folddir f ret
@@ -74,11 +74,11 @@ else
     # leaving foldnam empty works here
   fi
 
-  _description expl sequence
-  compadd "$expl[@]" $(mark $foldnam 2>/dev/null | awk -F: '{ print $1 }') &&
-      ret=0
-  compadd "$expl[@]" reply next cur prev first last all unseen && ret=0
-  _files "$expl[@]" -W folddir -g '<->' && ret=0
-
+  if _wanted sequences expl sequence; then
+    compadd "$expl[@]" $(mark $foldnam 2>/dev/null | awk -F: '{ print $1 }') &&
+        ret=0
+    compadd "$expl[@]" reply next cur prev first last all unseen && ret=0
+    _files "$expl[@]" -W folddir -g '<->' && ret=0
+  fi
   return ret
 fi

@@ -12,4 +12,4 @@ args=()
 [[ "$prev" != -* ]]  &&
     tags=( 'builtins:builtin command:compadd - ${(@k)dis_builtins} )
 
-_alternative any "$args[@]"
+_alternative "$args[@]"

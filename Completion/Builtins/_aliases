@@ -2,6 +2,6 @@
 
 local expl
 
-_alternative any:argument \
+_alternative \
   'aliases:regular alias:compadd - ${(@k)aliases}' \
   'global-aliases:global alias:compadd - ${(@k)galiases}'

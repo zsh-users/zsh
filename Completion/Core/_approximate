@@ -7,6 +7,7 @@
 
 local _comp_correct _correct_prompt comax
 local cfgacc cfgorig cfgps cfgins
+local curcontext="$curcontext" oldcontext
 
 # Only if all global matchers have been tried.
 
@@ -16,20 +17,16 @@ local cfgacc cfgorig cfgps cfgins
 
 [[ "${#:-$PREFIX$SUFFIX}" -le 1 ]] && return 1
 
-# Get the configuration values, using either the prefix `correct' or
-# `approximate'.
+# Probably set initial context.
 
-if [[ "$compstate[pattern_match]" = (|\**) ]]; then
-  cfgacc="${compconfig[approximate_accept]:-$compconfig[correct_accept]}"
-  cfgorig="${compconfig[approximate_original]:-$compconfig[correct_original]}"
-  cfgps="${compconfig[approximate_prompt]:-$compconfig[correct_prompt]}"
-  cfgins="${compconfig[approximate_insert]:-$compconfig[correct_insert]}"
-else
-  cfgacc="$compconfig[correct_accept]"
-  cfgorig="$compconfig[correct_original]"
-  cfgps="$compconfig[correct_prompt]"
-  cfgins="$compconfig[correct_insert]"
-fi
+[[ -z "$curcontext" ]] && curcontext=':approximate'
+
+oldcontext="$curcontext"
+
+_style -s '' accept cfgacc
+_style -s '' original cfgorig
+_style -s '' prompt cfgps
+_style -s '' insert cfgins
 
 # Get the number of errors to accept.
 
@@ -86,16 +83,18 @@ _correct_prompt="${cfgps//\\%e/1}"
 [[ -z "$compstate[pattern_match]" ]] && compstate[pattern_match]='*'
 
 while [[ _comp_correct -le comax ]]; do
+  curcontext="${oldcontext}:$_comp_correct"
+
   if _complete; then
     if [[ "$cfgins" = unambig* &&
           "${#compstate[unambiguous]}" -ge "${#:-$PREFIX$SUFFIX}" ]]; then
       compstate[pattern_insert]=unambiguous
     elif [[ compstate[nmatches] -gt 1 || "$cfgorig" = *always* ]]; then
-      local expl
+      local expl format
 
       if [[ "$cfgorig" = *show* ]]; then
-        if [[ -n "$compconfig[description_format]" ]]; then
-	  expl=(-X "${compconfig[description_format]//\\%d/original}")
+        if _style -s descriptions format format; then
+	  expl=(-X "${format//\\%d/original}")
         else
 	  expl=()
         fi

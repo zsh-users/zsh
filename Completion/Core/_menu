@@ -1,10 +1,16 @@
 #autoload
 
+local curcontext="$curcontext"
+
+# Probably set initial context.
+
+[[ -z "$curcontext" ]] && curcontext=':menu'
+
 # This completer is an example showing how menucompletion can be
 # implemented with the new completion system.
 # Use this one before the normal _complete completer, as in:
 #
-#   compconf completer=_menu:_complete
+#   compstyle "*" completer _menu _complete
 
 if [[ -n "$compstate[old_list]" ]]; then
 

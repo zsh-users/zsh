@@ -6,7 +6,6 @@
 
 local expl
 
-_tags any zsh-options || return 1
-
-_description expl 'set zsh option'
-compadd "$expl[@]" "$@" -M 'L:|[nN][oO]= M:_= M:{A-Z}={a-z}' - $=_set_options
+_wanted zsh-options expl 'set zsh option' &&
+    compadd "$expl[@]" "$@" -M 'L:|[nN][oO]= M:_= M:{A-Z}={a-z}' - \
+            $=_set_options

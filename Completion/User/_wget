@@ -1,11 +1,11 @@
 #compdef wget
 
-local context state line
+local curcontext="$curcontext" state line
 typeset -A opt_args
 
 local tmp1 tmp2
 
-_arguments -s \
+_arguments -C -s \
   '(--version)-V[version]' '(-V)--version' \
   '(--help)-h[help]' '(-h)--help' \
   '(--background)-b[background]' '(-b)--background' \

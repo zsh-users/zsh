@@ -1,50 +1,44 @@
 #autoload
 
-local all get val i
+local val ret
 
 # Should we return the value?
 
-if [[ "$1" = -g ]]; then
-  get=yes
-  shift
-fi
+case "$1" in
+-b)
+  compstyles -S "$context" "$2" val
+  ret="$?"
 
-# Get all styles defined for this context.
-
-all=()
-for i in "${(s.:.)_cur_contexts}"; do
-  all=("$all[@]" "${(@)_compstyles[(K)${i},${1}]}" )
-done
-all=":${(j.:.)${(@o)all:#}##??}:"
-
-if [[ "$all" = *:${2}[:\=]* ]]; then
-
-  # We have a definition for the style.
-
-  if [[ $# -eq 3 ]]; then
-    if [[ -n "$get" ]]; then
-
-      # We have to return the value.
-
-      if [[ "$all" = *,${2}\=* ]]; then
-        eval "${3}=\"${${all#*:${2}\=}%%:*}\""
-      else
-        eval "${3}=''"
-      fi
-    else
-
-      # We have to test the value.
-
-      if [[ "$all" = *:${2}\=* ]]; then
-        [[ "${${all#*:${2}\=}%%:*}" = ${~3} ]]
-      else
-        [[ '' -eq ${~3} ]]
-      fi
-
-      return
-    fi
+  if [[ "$val" = (#I)(yes|true|1|on) ]]; then
+    eval "${3}=yes"
+  else
+    eval "${3}=no"
   fi
-  return 0
-fi
 
-return 1
+  return ret;
+  ;;
+-s)
+  compstyles -S "${curcontext}${2:+:${2}}" "$3" "$4"
+  return
+  ;;
+-a)
+  compstyles -A "${curcontext}${2:+:${2}}" "$3" "$4"
+  return
+  ;;
+-h)
+  compstyles -H "${curcontext}${2:+:${2}}" "$3" "$4"
+  return
+  ;;
+esac
+
+[[ "$1" = -(|-) ]] && shift
+
+if compstyles -S "${curcontext}${1:+:${1}}" "$2" val; then
+  if [[ $# -eq 3 ]]; then
+    [[ "$val" = ${~3} ]]
+  else
+    [[ "$val" = (#I)(yes|true|1|on) ]]
+  fi
+else
+  return 1
+fi

@@ -10,13 +10,9 @@
 local expl
 
 if [[ "$words[2]" = -*[DAN]* || "$words[CURRENT-1]" = -*M ]]; then
-  _tags -M keymaps || return 1
-
-  _description expl keymap
-  compadd "$expl[@]" - "$keymaps[@]"
+  _wanted -C -M keymaps expl keymap &&
+      compadd "$expl[@]" - "$keymaps[@]"
 else
-  _tags any:argument widgets || return 1
-
-  _description expl widget
-  compadd "$expl[@]" -M 'r:|-=* r:|=*' - "${(@k)widgets}"
+  _wanted widgets expl widget &&
+      compadd "$expl[@]" -M 'r:|-=* r:|=*' - "${(@k)widgets}"
 fi

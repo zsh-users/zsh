@@ -6,8 +6,6 @@ if [[ CURRENT -ge 3 ]]; then
 else
   local expl
 
-  _tags any:command commands || return 1
-
-  _description expl 'external command'
-  compadd "$expl[@]" "$@" - "${(k@)commands}"
+  _wanted commands expl 'external command' &&
+      compadd "$expl[@]" "$@" - "${(k@)commands}"
 fi

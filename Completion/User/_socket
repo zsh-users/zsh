@@ -5,19 +5,14 @@
 #  socket_hosts_ports
 #    The array that contains paris `host:port'.
 
-local context state line expl
+local curcontext="$curcontext" state line expl
 typeset -A opt_args
 
-if _tags any options &&
-   [[ $CURRENT -eq 2 && (
-      -z "$compconfig[option_prefix]" ||
-      "$compconfig[option_prefix]" = *\!${words[1]}* ||
-      "$PREFIX" = -* ) ]]; then
-  _description expl option
-  compadd -M 'r:|[_-]=* r:|=*' "$expl[@]" - -version
-fi
+[[ $CURRENT -eq 2 ]] && _wanted options expl option &&
+    { ! _style options prefix-needed || [[ "$PREFIX" = -* ]] } &&
+    compadd -M 'r:|[_-]=* r:|=*' "$expl[@]" - -version
 
-_arguments -s \
+_arguments -C -s \
   '-b[background]' \
   '-c[crlf]' \
   '-f[fork]' \
@@ -43,24 +38,17 @@ command)
 
 arg1)
   if (( $+opt_args[-s] )); then
-    _tags "$context" ports || return 1
-
-    _description expl 'port to listen'
-    _ports "$expl[@]"
+    _wanted ports expl 'port to listen' && _ports "$expl[@]"
   else
-    _tags "$context" hosts || return 1
-
-    _description expl 'host'
-    _combination socket_hosts_ports hosts "$expl[@]"
+    _wanted hosts expl 'host' &&
+        _combination socket_hosts_ports hosts "$expl[@]"
   fi
   ;;
 
 arg2)
   if (( ! $+opt_args[-s] )); then
-    _tags "$context" ports || return 1
-
-    _description expl 'port to connect'
-    _combination socket_hosts_ports hosts="${line[2]:q}" ports "$expl[@]"
+    _wanted ports expl 'port to connect' &&
+        _combination socket_hosts_ports hosts="${line[2]:q}" ports "$expl[@]"
   fi
   ;;
 esac

@@ -15,8 +15,9 @@ if (( ! $+_color_cache )); then
 
   # Cache of color names doesn't exist yet, create it.
 
-  if [[ -n "$compconfig[colors_path]" ]]; then
-    _color_cache=( "${(@)${(@f)$(< $compconfig[colors_path])}[2,-1]##*		}" )
+  _style -s colors path file
+  if [[ -n "$file" ]]; then
+    _color_cache=( "${(@)${(@f)$(< $file)}[2,-1]##*		}" )
   else
     file=( /usr/{lib,{{X11R6,openwin},local{,/X11{,R6}}}/lib}/X11/rgb.txt(N) )
 
@@ -29,8 +30,6 @@ if (( ! $+_color_cache )); then
   (( $#_color_cache )) || _color_cache=(white black gray red blue green)
 fi
 
-_tags any colors || return 1
-
-_description expl 'color specification'
-compadd "$@" "$expl[@]" -M 'm:{a-z}={A-Z} m:-=\  r:|[ A-Z0-9]=* r:|=*' - \
-        "$_color_cache[@]"
+_wanted colors expl 'color specification' &&
+    compadd "$@" "$expl[@]" -M 'm:{a-z}={A-Z} m:-=\  r:|[ A-Z0-9]=* r:|=*' - \
+            "$_color_cache[@]"

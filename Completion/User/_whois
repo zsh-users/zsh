@@ -102,7 +102,7 @@ _whois_setup () {
       if (( $#opts )); then opts="($opts)"; else opts=; fi
       if [[ $opt = h ]]; then
 	_whois_arguments=("$_whois_arguments[@]"
-	  "${opts}${hostopt}[specify host]:host:_whois_hosts")
+	  "${opts}${hostopt}:host:_whois_hosts")
       else
 	_whois_arguments=("$_whois_arguments[@]"
 	  "${opts}-${opt}[${${(@M)_whois_servers:#*:$opt}%:?}]")
@@ -112,11 +112,11 @@ _whois_setup () {
 }
 
 _whois_single () {
-  local context state line expl
+  local curcontext="$curcontext" state line expl
   typeset -A opt_args
   local tmp host
 
-  _arguments \
+  _arguments -C \
     "$_whois_arguments[@]" \
     ':identifier:->identifier'
 
@@ -144,11 +144,11 @@ _whois_single () {
 }
 
 _whois_multi () {
-  local state line expl
+  local curcontext="$curcontext" state line expl
   typeset -A opt_args
   local tmp host
 
-  _arguments \
+  _arguments -C \
     "$_whois_arguments[@]" \
     '*::identifier:->identifier'
 
@@ -189,14 +189,14 @@ _whois_fwhois () {
 }
 
 _whois_hosts () {
-  _tags any hosts &&
+  _tags hosts &&
     compadd "$@" \
       -M 'm:{a-zA-Z}={A-Za-z} r:|.=* r:|=*' \
       - ${_whois_servers%:?} || _hosts "$@"
 }
 
 _whois_ports () {
-  _tags any ports && compadd "$@" - whois || _ports "$@"
+  _tags ports && compadd "$@" - whois || _ports "$@"
 }
 
 (( $+functions[_whois:whois.internic.net] )) ||
@@ -204,10 +204,7 @@ _whois:whois.internic.net () {
   if (( CURRENT == 1 )); then
     local expl
 
-    _tags any string || return 1
-
-    _description expl string
-    compadd "$expl[@]" HELP DOMAIN HOST
+    _wanted string expl string && compadd "$expl[@]" HELP DOMAIN HOST
   else
     _message 'string'
   fi
@@ -218,10 +215,7 @@ _whois:whois.nic.ad.jp () {
   if (( CURRENT == 1 )); then
     local expl
 
-    _tags any string || return 1
-
-    _description expl string
-    compadd HELP DOM NET HOST PERSON CONN COM
+    _wanted string expl string && compadd HELP DOM NET HOST PERSON CONN COM
   else
     _message 'string'
   fi

@@ -14,10 +14,9 @@ local expl
 
 # compcall || return 0
 
-_tags any files || return 1
+_tags files || return 1
 
-_description expl file
-_files "$expl[@]" && return
+_files && return 0
 
 # magicequalsubst allows arguments like <any-old-stuff>=~/foo to do
 # file name expansion after the =.  In that case, it's natural to

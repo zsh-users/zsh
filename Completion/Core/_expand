@@ -7,12 +7,16 @@
 # the expansions done produce no result or do not change the original
 # word from the line.
 
-local exp word="$PREFIX$SUFFIX" group=-V expl expl2 disp
+local exp word="$PREFIX$SUFFIX" group=-V expl expl2 disp orig menu prompt
+local curcontext="$curcontext" expr descr
+
+# Probably set initial context.
+
+[[ -z "$curcontext" ]] && curcontext=':expand'
 
 # First, see if we should insert all *completions*.
 
-if [[ -n "$compconfig[expand_completions]" &&
-      "${(e):-\$[$compconfig[expand_substitute]]}" -eq 1 ]]; then
+if _style -s '' completions expr && [[ "${(e):-\$[$expr]}" -eq 1 ]]; then
   compstate[insert]=all
   return 1
 fi
@@ -28,8 +32,7 @@ exp=("$word")
 # First try substitution. That weird thing spanning multiple lines
 # changes quoted spaces, tabs, and newlines into spaces.
 
-[[ -z "$compconfig[expand_substitute]" ||
-   "${(e):-\$[$compconfig[expand_substitute]]}" -eq 1 ]] &&
+_style -s '' substitute expr && [[ "${(e):-\$[$expr]}" -eq 1 ]] &&
     exp=( "${(e)exp//\\[ 	
 ]/ }" )
 
@@ -39,8 +42,7 @@ exp=("$word")
 
 # Now try globbing.
 
-[[ -z "$compconfig[expand_glob]" ||
-   "${(e):-\$[$compconfig[expand_glob]]}" -eq 1 ]] &&
+_style -s '' glob expr && [[ "${(e):-\$[$expr]}" -eq 1 ]] &&
     exp=( ${~exp}(N) )
 
 # If we don't have any expansions or only one and that is the same
@@ -51,9 +53,14 @@ exp=("$word")
 
 # Get the options for adding the original string and `all'-string.
 
-if [[ "$compconfig[expand_original]" = *show* ]]; then
-  if [[ -n "$compconfig[description_format]" ]]; then
-    expl=(-X "${compconfig[description_format]//\\%d/original}")
+_style -s '' original orig
+_style -s '' menu menu
+_style -s '' prompt prompt
+_style -s descriptions format descr
+
+if [[ "$orig" = *show* ]]; then
+  if [[ -n "$descr" ]]; then
+    expl=(-X "${descr//\\%d/original}")
   else
     expl=()
   fi
@@ -61,11 +68,9 @@ else
   expl=(-n)
 fi
 
-if [[ -n "$compconfig[expand_menu]" &&
-      "$compconfig[expand_menu]" != *only* &&
-      "$compconfig[expand_menu]" = *showall* ]]; then
-  if [[ -n "$compconfig[description_format]" ]]; then
-    expl2=(-ld disp -X "${compconfig[description_format]//\\%d/all words}")
+if [[ -n "$menu" && "$menu" != *only* && "$menu" = *showall* ]]; then
+  if [[ -n "$descr" ]]; then
+    expl2=(-ld disp -X "${descr//\\%d/all words}")
   else
     expl2=(-ld disp )
   fi
@@ -83,7 +88,7 @@ fi
 
 # We have expansions, should we menucomplete them?
 
-if [[ -z "$compconfig[expand_menu]" ]]; then
+if [[ -z "$menu" ]]; then
 
   # No, so if the user only wants a list, we add the strings
   # separately. Otherwise we add the whole array as one string,
@@ -92,14 +97,12 @@ if [[ -z "$compconfig[expand_menu]" ]]; then
   if [[ -z "$compstate[insert]" ]]; then
     compadd -U -V _expand -Q - "$exp[@]"
   else
-    [[ -n "$compconfig[expand_original]" && 
-       "$compconfig[expand_original]" != *last* ]] &&
+    [[ -n "$orig" && "$orig" != *last* ]] &&
         compadd "$expl[@]" -UQ -V _expand_original - "$word"
 
     compadd -UQ -V _expand - "$exp"
 
-    [[ -n "$compconfig[expand_original]" && 
-       "$compconfig[expand_original]" = *last* ]] &&
+    [[ -n "$orig" && "$orig" = *last* ]] &&
         compadd "$expl[@]" -UQ -V _expand_original - "$word"
 
     compstate[insert]=menu
@@ -107,31 +110,27 @@ if [[ -z "$compconfig[expand_menu]" ]]; then
 else
   # Sorting? We just use a different group type then.
 
-  [[ "$compconfig[expand_menu]" = *sort* ]] && group=-J
+  [[ "$menu" = *sort* ]] && group=-J
 
   # Now add the expansion string, probably also adding the original
   # and/or the string containing all expanded string.
 
-  [[ -n "$compconfig[expand_original]" && 
-     "$compconfig[expand_original]" != *last* ]] &&
+  [[ -n "$orig" && "$orig" != *last* ]] &&
       compadd "$expl[@]" -UQ -V _expand_original - "$word"
 
-  [[ $#exp -ne 1 && "$compconfig[expand_menu]" = *last* &&
-     "$compconfig[expand_menu]" != *only* ]] &&
+  [[ $#exp -ne 1 && "$menu" = *last* && "$menu" != *only* ]] &&
       compadd "$expl2[@]" -UQ -V _expand_all - "$exp"
 
-  if [[ -z "$compconfig[expand_prompt]" ]]; then
+  if [[ -z "$prompt" ]]; then
     compadd -UQ $group _expand - "$exp[@]"
   else
-    compadd -UQ -X "${compconfig[expand_prompt]//\\%o/$word}" \
+    compadd -UQ -X "${prompt//\\%o/$word}" \
             $group _expand - "$exp[@]"
   fi
-  [[ $#exp -ne 1 && "$compconfig[expand_menu]" != *last* &&
-     "$compconfig[expand_menu]" != *only* ]] &&
+  [[ $#exp -ne 1 && "$menu" != *last* && "$menu" != *only* ]] &&
       compadd "$expl2[@]" -UQ -V _expand_all - "$exp"
 
-  [[ -n "$compconfig[expand_original]" && 
-     "$compconfig[expand_original]" = *last* ]] &&
+  [[ -n "$orig" && "$orig" = *last* ]] &&
       compadd "$expl[@]" -UQ -V _expand_original - "$word"
 
   compstate[insert]=menu

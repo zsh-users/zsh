@@ -39,7 +39,7 @@
 #       "assign"  as loose, but must follow an "=" in the same word ("=")
 #     HOW should be suffixed with a colon if the following argument is
 #      _not_ required to appear.
-#     STR is to be displayed based on compconfig[describe_options].
+#     STR is to be displayed based on style `description'
 #     XOR is another option in combination with which OPT may not appear.
 #      It may be ":" to disable non-option completions when OPT is present.
 #     MSG is a string to be displayed above the matches in a listing.

@@ -2,9 +2,7 @@
 
 local expl
 
-_tags any hosts || return 1
-
 : ${(A)hosts:=${(s: :)${(ps:\t:)${${(f)"$(</etc/hosts)"}%%\#*}##[:blank:]#[^[:blank:]]#}}}
 
-_description expl host
-compadd -M 'm:{a-zA-Z}={A-Za-z} r:|.=* r:|=*' "$@" "$expl[@]" - "$hosts[@]"
+_wanted hosts expl host &&
+    compadd -M 'm:{a-zA-Z}={A-Za-z} r:|.=* r:|=*' "$@" "$expl[@]" - "$hosts[@]"

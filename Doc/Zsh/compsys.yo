@@ -949,6 +949,17 @@ first description. The string will be used as the match specification
 when completing option names and values instead of the default
 `tt(r:|[_-]=* r:|=*)'. 
 
+Finally, the option tt(-C) can be given to make tt(_arguments) modify
+the tt(curcontext) parameter when a action of the form
+`tt(->)var(state)' is used. This parameter is used to keep track of
+the current context and in this case it (and not the parameter
+tt(context) as explained above) has to be made local to make sure that 
+calling functions don't use the modified value. Also, the local
+version of tt(curcontext) has to be initialised with the old value as
+in:
+
+example(local curcontext="$curcontext")
+
 The function can also be made to automatically complete long options
 for commands that support the `tt(-)tt(-help)' option as, for example,
 most of the GNU commands do. For this, the string `tt(-)tt(-)' must be
@@ -1100,6 +1111,10 @@ typeset -A val_args)
 when using an action of the form `tt(->)var(string)'. With this
 function the tt(context) parameter will be set to the name of the
 value whose argument is to be completed.
+
+Like tt(_arguments', tt(_values) also supports the tt(-C) option in
+which case you have to make the parameter tt(curcontext) local instead 
+of tt(context) (as described above).
 )
 item(tt(_regex_arguments))(
 This function is a compiler to generate a completion function.  The

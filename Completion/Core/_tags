@@ -1,40 +1,26 @@
 #autoload
 
-# We use the funcstack names to communicate to neighboring functions.
-
-local tname="$funcstack[2,-1]"
-
 if (( $# )); then
 
   # We have arguments: the tags supported in this context.
 
-  local command="${_tag_context:-${words[1]}}" _tags contexts name
+  local curcontext="$curcontext"
 
-  # We are given the `-c command-name' option.
-
-  if [[ "$1" = -c?* ]]; then
-    command="${1[3,-1]}"
+  if [[ "$1" = -C?* ]]; then
+    curcontext="${curcontext}:${1[3,-1]}"
     shift
-  elif [[ "$1" = -c ]]; then
-    command="$2"
+  elif [[ "$1" = -C ]]; then
+    curcontext="${curcontext}:${2}"
     shift 2
+  else
+    targs=()
   fi
 
   [[ "$1" = -(|-) ]] && shift
 
-  # Get the context names.
+  # Set and remember offered tags.
 
-  if [[ -n "$_sub_context" ]]; then
-    contexts="${1}:${_sub_context}"
-  else
-    contexts="${1}"
-  fi
-  contexts=":${command},${${contexts//::/:}//:/:${command},}:"
-  shift
-
-  _tags=()
-
-  # Remember offered tags.
+  comptags -i "$curcontext" "$@"
 
   _offered_tags=( "$_offered_tags[@]" "$@" )
   _last_tags=()
@@ -43,46 +29,35 @@ if (( $# )); then
 
   "${_sort_tags:-_sort_tags}" "$@"
 
-  # The sets are reported in $_tags, one element per set. Remove 
-  # tags that weren't requested.
-
-  _tags=( "${(M@)_tags:#*:(${(j:|:)~argv}):*}" )
-
-  # Store the sets in a `hidden' array.
-
-  name="_prio_arr$(( _prio_num++ ))"
-  _prio_names[$tname]="$name"
-  eval "${name}=( \"\$_tags[@]\" )"
-
   # Also store the context (used below and in _requested).
 
-  _cur_contexts="$contexts[2,-2]"
-  _tag_contexts[$tname]="$_cur_contexts"
+  _cur_context="$curcontext"
 
   # Return non-zero if at least one set of tags should be used.
 
-  return \!$#_tags
+  comptags -T
+
+  return
 fi
 
 # The other mode: switch to the next set of tags.
 
-local prios="$_prio_names[$tname]"
+local tags
 
 # Reset the current context.
 
-_cur_contexts="${_tag_contexts[$tname]}"
+comptags -C _cur_context
 
-_failed_tags=( "$_failed_tags[@]" "$_last_tags" )
+_failed_tags=( "$_failed_tags[@]" "$_last_tags[@]" )
 
 # Return failure if no sets remaining.
 
-(( ${(P)#prios} )) || return 1
+comptags -N || return 1
 
 # Otherwise get the next tags.
 
-_cur_tags[$tname]="${(@)${(@P)prios}[1]}:"
+comptags -S _last_tags
 
-_last_tags=( "${(@)${(@s.:.)${(@P)prios}[1]}:#}" )
 _tried_tags=( "$_tried_tags[@]" "$_last_tags[@]" )
 
 shift 1 "$prios"

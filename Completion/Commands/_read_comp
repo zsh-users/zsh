@@ -22,8 +22,8 @@
 # Global variables used:
 #  _read_comp         Last completion string read from user
 
-emulate -L zsh
-setopt extendedglob nobadpattern # xtrace promptsubst
+# emulate -L zsh
+setopt localoptions extendedglob nobadpattern # xtrace promptsubst
 # local PS4='%N:%i:$((#key))> '
 
 # Took me ages to work this out.  If we're not on the first global

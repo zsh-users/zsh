@@ -91,26 +91,13 @@ _postpatcomps=()
 
 typeset -gA _lastcomp
 
-# This is the associative array used for configuration.
-
-typeset -gA compconfig
-
-# Standard initialisation for `compconfig'.
+# Remember dumpfile.
 if [[ -n $_i_dumpfile ]]; then
   # Explicitly supplied dumpfile.
-  compconfig[dumpfile]="$_i_dumpfile"
+  _comp_dumpfile="$_i_dumpfile"
 else
-  compconfig[dumpfile]="${ZDOTDIR:-$HOME}/.zcompdump"
+  _comp_dumpfile="${ZDOTDIR:-$HOME}/.zcompdump"
 fi
-
-(( ${+compconfig[correct_accept]} )) || compconfig[correct_accept]=2n
-(( ${+compconfig[correct_prompt]} )) ||
-  compconfig[correct_prompt]='correct to:'
-(( ${+compconfig[completer]} )) || compconfig[completer]=_complete
-
-# This holds the style definitions.
-
-typeset -gA _compstyles
 
 # This can hold names of functions that are to be called after all
 # matches have been generated.
@@ -321,119 +308,181 @@ compdef() {
   fi
 }
 
-# Functional interface to configuration. This takes its arguments
-# and sets the according values in `compconfig'.
-# Arguments may be `foo=bar' to set key `foo' to `bar' or `baz' to
-# set key `baz' to the empty string.
-# If no arguments are given, all configurations keys set are displayed.
-# With the option `-l' as the first argument, the other arguments are
-# taken to be key names and the values for theses keys are printed, one
-# per line.
-# When listing is done and the `-L' option is given, the keys and
-# values are printed as invocations for this function, usable to be put
-# inte a setup script.
+# Do *not* use this...
 
 compconf() {
-  local i opt list
 
-  while getopts "lL" opt; do
-    if [[ "$opt" = l ]]; then
-      [[ -z "$list" ]] && list=yes
-    else
-      list=long
-    fi
-  done
-  shift OPTIND-1
+  local style name val i tmp cmt
 
-  if (( $# )); then
-    if [[ -n $list ]]; then
-      for i; do
-        if [[ $list = long ]]; then
-	  (( ${+compconfig[$i]} )) && print "compconf $i='$compconfig[$i]'"
-	else
-          print $compconfig[$i]
-	fi
-      done
-    else
-      for i; do
-        if [[ "$i" = *\=* ]]; then
-          compconfig[${i%%\=*}]="${i#*\=}"
-        else
-          compconfig[$i]=''
-        fi
-      done
-    fi
-  else
-    for i in ${(ok)compconfig}; do
-      if [[ $list = long ]]; then
-	print "compconf $i='$compconfig[$i]'"
-      else
-        print ${(r:25:)i} "$compconfig[$i]"
-      fi
-    done
+  if [[ -z "$_compconf_warn" ]]; then
+    _compconf_warn=yep
+
+    print "
+
+Hello
+
+\`compconf' will be removed in the near future. The \`styles' form of
+your setup should be available in the file:
+
+    \`${HOME}/.zsh-styles'
+
+
+Have fun
+
+   Sven
+" 1>&2
+    command rm -f ${HOME}/.zsh-styles
   fi
+
+  for i; do
+    name="${i%%\=*}"
+    val="${i#*\=}"
+
+    tmp=''
+    cmt=''
+
+    case "$name" in
+    urls_path)
+      tmp="'*:urls' path '$val'"
+      ;;
+    urls_localhttp)
+      tmp="'*:urls' local '${val//:/ }'"
+      ;;
+    describe_options)
+      tmp="'*:options' description '$val'"
+      ;;
+    describe_values)
+      tmp="'*:values' description '$val'"
+      ;;
+    autodescribe_options)
+      tmp="'*:options' auto-description '$val'"
+      ;;
+    description_format)
+      tmp="'*:descriptions' format '$val'"
+      ;;
+    message_format)
+      tmp="'*:messages' format '$val'"
+      ;;
+    warning_format)
+      tmp="'*:warnings' format '$val'"
+      ;;
+    option_prefix)
+      tmp="'*:options' prefix-needed yes"
+      [[ "$val" = hide* ]] &&
+          tmp="$tmp
+compstyle '*:options' prefix-hidden yes"
+      ;;    
+    group_matches)
+      tmp="'*:matches' group 'yes'"
+      ;;
+    colors_path)
+      tmp="'*:colors' path '$val'"
+      ;;
+    path_expand)
+      tmp="'*:paths' expand '$val'"
+      ;;
+    path_cursor)
+      tmp="'*:paths' cursor '$val'"
+      ;;
+    (approximate|incremental|predict|list|oldlist|match)_*)
+      tmp="':${name%%_*}' ${${name#*_}//_/-} '$val'"
+      ;;
+    correct_*)
+      cmt="# This one is a bit ugly. You may want to use only \`*:correct'
+# if you also have the \`correctword_*' or \`approximate_*' keys.
+"
+      tmp="':(correct(|-word)|approximate)' ${name#*_} '$val'"
+      ;;
+    correctword_*)
+      tmp="':correct-word' ${name#correctword_} '$val'"
+      ;;
+    expand_*)
+      cmt="# This one is a bit ugly. You may want to use only \`*:expand'
+# if you also have the \`expandword_*' keys.
+"
+      tmp="':expand(|expand-word)' ${name#*_} '$val'"
+      ;;
+    expandword_*)
+      tmp="':expand-word' ${name#expandword_} '$val'"
+      ;;
+    history_*)
+      tmp="'*:history-entries' ${name#history_} '$val'"
+      ;;
+    completer)
+      tmp="'*' completer ${val//:/ }"
+      ;;
+    last_prompt)
+      tmp="'*' last-prompt '$val'"
+      ;;
+    esac
+    [[ -n "$tmp" ]] && style="${style}${cmt}compstyle ${tmp}
+"
+  done
+
+  eval "${style}"
+
+  print "$style" >> ${HOME}/.zsh-styles
 }
 
 # Very simple interface for setting styles:
 #
 #   compstyle context -styles... context -styles ...
 #
-# Where context is of the form cmd-pat:ctxt-pat:tag-pat.
+# Where context is of the form :ctxt-pats:...:tag-pat.
 #
 # This will be improved if needed. Promised.
 
 compstyle() {
   if (( ! $# )); then
-    local pat
+    local pats styles vals pat style
 
-    for pat in "${(@k)_compstyles}"; do
-      print -- "${(r:20:: :)pat} -- ${_compstyles[$pat]#??}"
+    compstyles -G pats
+
+    for pat in "$pats[@]"; do
+      print "$pat"
+      compstyles -G styles "$pat"
+      for style in "$styles[@]"; do
+        compstyles -G vals "$pat" "$style"
+        print "    $style = $vals"
+      done
     done
 
     return 0
   fi
 
-  local sep pat test
-  typeset -Z 2 num
+  if [[ "$1" = -d ]]; then
+    case "$#" in
+    1) compstyles -d ;;
+    2) compstyles -d "$2" ;;
+    *) 
+      local pat="$2" style
 
-  while (( $# )); do
-    num=0
-    for pat in "${(s:,:)1}"; do
-      if [[ "$pat" = \* ]]; then
-        (( num += 3 ))
-      elif [[ "$pat" = any ]]; then
-        (( num += 2 ))
-      elif [[ "$pat" != "$pat:q" ]]; then
-        (( num++ ))
-      fi
-    done
+      shift
 
-    pat="$1"
-    shift
+      for style; do
+        compstyles -d "$pat" "$style"
+      done
+      ;;
+    esac
 
-    sep=$argv[(I)[^-]*]
+    return 0
+  fi
 
-    if (( sep )); then
-      _compstyles[$pat]="${num}${(j.:.)${(@)argv[1,sep-1]#-}}"
-      shift sep-1
-    else
-      _compstyles[$pat]="${num}${(j.:.)${(@)argv#-}}"
-      break
-    fi
-  done
+  [[ "$1" = -(|-) ]] && shift
+
+  compstyles -a "$@"
 
   return 0
 }
 
-# Default styles.
+# Default styles. This should be executed conditionally somehow.
 
-compstyle '*,*,*' -description=yes -prefix-needed=yes -prefix-hidden=no
-
-# Helper function for `_tags'. Will be moved into C-code.
-
-comptry() {
-  _tags=( "$_tags[@]" ":${(j.:.)argv}:" )
-}
+compstyle '*'        description   'yes'
+compstyle '*'        prefix-needed 'yes'
+compstyle '*'        prefix-hidden 'no'
+compstyle ':correct' accept        '2n'
+compstyle ':correct' prompt        'correct to:'
+compstyle '*'        completer     '_complete'
 
 # Utility function to call a function if it exists.
 #
@@ -506,10 +555,10 @@ autoload -U compdump compinstall
 
 # If we have a dump file, load it.
 
-if [[ -f "$compconfig[dumpfile]" ]]; then
-  read -rA _i_line < "$compconfig[dumpfile]"
+if [[ -f "$_comp_dumpfile" ]]; then
+  read -rA _i_line < "$_comp_dumpfile"
   if [[ _i_autodump -eq 1 && $_i_line[2] -eq $#_i_files ]]; then
-    builtin . "$compconfig[dumpfile]"
+    builtin . "$_comp_dumpfile"
     _i_done=yes
   fi
 fi

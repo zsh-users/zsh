@@ -17,11 +17,12 @@ if (( ! $+_deb_cache_dpkg_get_selections )); then
   )
 fi
 
-local command="$1"
+local command="$1" expl
 shift
 
-case "$command" in
-  installed) compadd "$@" - $_deb_cache_installed;;
-  uninstalled) compadd "$@" - $_deb_cache_uninstalled;;
-  avail) compadd "$@" - $_deb_cache_avail;;
-esac
+_wanted packages expl packages &&
+    case "$command" in
+    installed) compadd "$@" - $_deb_cache_installed;;
+    uninstalled) compadd "$@" - $_deb_cache_uninstalled;;
+    avail) compadd "$@" - $_deb_cache_avail;;
+    esac

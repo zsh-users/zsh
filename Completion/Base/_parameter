@@ -1,6 +1,6 @@
 #compdef -parameter-
 
-_tags any parameters && _parameters -e
+_tags parameters && _parameters -e
 
 # Without the `-e' option, we would use the following (see the file
 # Core/_parameters for more enlightenment).

@@ -7,14 +7,13 @@
 
 setopt extendedglob nonomatch
 
-_tags any directory-stack || return 1
-
-! _style directory-stack prefix-needed yes ||
-    [[ $PREFIX = [-+]* ]] || return 1
-
 local expl list lines revlines disp
 
-if _style directory-stack description yes; then
+_wanted directory-stack -V expl 'directory stack' || return 1
+
+! _style directory-stack prefix-needed || [[ $PREFIX = [-+]* ]] || return 1
+
+if _style directory-stack description; then
   # get the list of directories with their canonical number
   # and turn the lines into an array, removing the current directory
   lines=("${PWD}" "${dirstack[@]}")
@@ -39,5 +38,4 @@ else
   disp=()
 fi
 
-_description -V expl 'directory stack index'
 compadd "$expl[@]" "$@" -qS/ "$disp[@]" -Q - "$list[@]"

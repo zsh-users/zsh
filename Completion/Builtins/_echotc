@@ -2,8 +2,7 @@
 
 local expl
 
-_tags any:argument capabilities || return 1
-
-_description expl 'terminal capability'
-compadd "$expl[@]" \
-        al dc dl do le up al bl cd ce cl cr dc dl do ho is le ma nd nl se so up
+_wanted capabilities expl 'terminal capability' &&
+    compadd "$expl[@]" \
+            al dc dl do le up al bl cd ce cl cr \
+            dc dl do ho is le ma nd nl se so up

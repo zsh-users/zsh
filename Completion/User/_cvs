@@ -33,8 +33,11 @@ _cvs_command () {
 	watchers "")
 
   if (( CURRENT == 1 )); then
-    compadd "$@" ${(k)cmds} || compadd "$@" ${(kv)=cmds}
+    _tags commands && { compadd "$@" ${(k)cmds} || compadd "$@" ${(kv)=cmds} }
   else
+    local curcontext="$curcontext"
+
+    curcontext="${curcontext%:*}:$words[1]"
     _cvs_"${${(k)cmds[(R)* $words[1] *]}:-${(k)cmds[(i)$words[1]]}}"
   fi
 }
@@ -351,22 +354,24 @@ _cvs_update () {
 
 (( $+functions[_cvs_watch] )) ||
 _cvs_watch () {
+  local expl
+
   if (( CURRENT == 2 )); then
-    compadd on off add remove
+    _wanted values expl 'watch comamnd' && compadd on off add remove
   else
     case "$words[2]" in
       on|off) # "+lR"
 	_arguments -s \
-	-{l,R} \
-	':watch command:' \
-	':*:file:_cvs_files'
+	    -{l,R} \
+	    ':watch command:' \
+	    ':*:file:_cvs_files'
 	;;
       add|remove) # "+lRa:"
 	_arguments -s \
-	-{l,R} \
-	'*-a+:action:(edit unedit commit all none)' \
-	':watch command:' \
-	':*:file:_cvs_files'
+	    -{l,R} \
+	    '*-a+:action:(edit unedit commit all none)' \
+	    ':watch command:' \
+	    ':*:file:_cvs_files'
 	;;
     esac
   fi
@@ -376,18 +381,18 @@ _cvs_watch () {
 _cvs_watchers () {
   # "+lR"
   _arguments -s \
-    -{l,R} \
-    ':*:file:_cvs_files'
+      -{l,R} \
+      ':*:file:_cvs_files'
 }
 
 (( $+functions[_cvs_root] )) ||
 _cvs_root () {
-  compadd "$@" $_cvs_roots || _files "$@" -/
+  _tags files && { compadd "$@" $_cvs_roots || _files "$@" -/ }
 }
 
 (( $+functions[_cvs_tempdir] )) ||
 _cvs_tempdir () {
-  compadd "$@" $TMPPREFIX:h $TMPDIR /tmp
+  _tags directories && compadd "$@" $TMPPREFIX:h $TMPDIR /tmp
 }
 
 (( $+functions[_cvs_user_variable] )) ||
@@ -403,29 +408,29 @@ _cvs_user_variable () {
 
 (( $+functions[_cvs_bindir] )) ||
 _cvs_bindir () {
-  compadd "$@" /usr/local/bin || _files "$@" -/
+  _tags directories && { compadd "$@" /usr/local/bin || _files "$@" -/ }
 }
 
 (( $+functions[_cvs_editor] )) ||
 _cvs_editor () {
-  compadd "$@" vi
+  _tags commands && compadd "$@" vi
 }
 
 (( $+functions[_cvs_gzip_level] )) ||
 _cvs_gzip_level () {
-  compadd "$@" 9
+  _tags values && compadd "$@" 9
 }
 
 # define completion functions for cvs common options and arguments.
 
 (( $+functions[_cvs_D] )) ||
 _cvs_D () {
-  compadd "$@" today yesterday week\ ago month\ ago
+  _tags values && compadd "$@" today yesterday week\ ago month\ ago
 }
 
 (( $+functions[_cvs_k] )) ||
 _cvs_k () {
-  compadd "$@" kv kvl k o b v
+  _tags values && compadd "$@" kv kvl k o b v
 }
 
 (( $+functions[_cvs_m] )) ||
@@ -435,21 +440,26 @@ _cvs_m () {
 
 (( $+functions[_cvs_modules] )) ||
 _cvs_modules () {
-  local root=$CVSROOT
+  local root=$CVSROOT expl
+
   [[ -f CVS/Root ]] && root=$(<CVS/Root)
 
   if [[ $root = :* || ! -d $root ]]; then
     _message "module name"
   else
-    compadd - \
-      $root/^CVSROOT(:t) \
-      ${${(M)${(f)"$(<$root/CVSROOT/modules)"}:#[^#]*}%%[ 	]*}
+    _wanted modules expl module &&
+        compadd "$expl[@]" - \
+            $root/^CVSROOT(:t) \
+            ${${(M)${(f)"$(<$root/CVSROOT/modules)"}:#[^#]*}%%[ 	]*}
   fi
 }
 
 (( $+functions[_cvs_revisions] )) ||
 _cvs_revisions () {
-  compadd - ${${${(M)${(f)"$(cvs -q status -vl .)"}:#	*}##[ 	]##}%%[ 	]*}
+  local expl
+
+  _wanted values expl revision &&
+      compadd - ${${${(M)${(f)"$(cvs -q status -vl .)"}:#	*}##[ 	]##}%%[ 	]*}
 }
 
 # define completion functions for files maintained by cvs.
@@ -477,8 +487,7 @@ _cvs_extract_file_entries () {
 
 (( $+functions[_cvs_extract_modifiedfile_entries] )) ||
 _cvs_extract_modifiedfile_entries () {
-  if [[ -n "$compconfig[cvs_disable_stat]" ]] ||
-    ! { zmodload -e stat || zmodload stat }; then
+  if _style cvs disable-stat || ! { zmodload -e stat || zmodload stat }; then
     _cvs_extract_file_entries
     return
   fi
@@ -566,7 +575,7 @@ _cvs_files_removed () {
     local omit
     omit=(${pref}*(D:t))
     eval 'entries=(${entries:#('${(j:|:)${(@)omit:q}}')})'
-    compadd "$@" -P "$qpref" - ${entries:q} ||
+    _tags direcories && compadd "$@" -P "$qpref" - ${entries:q} ||
     _cvs_directories "$@"
   else
     _files "$@"

@@ -3,30 +3,25 @@
 local expl
 
 if [[ "$PREFIX" = :* ]]; then
-  _tags any char-classes || return 1
-
-  _description expl 'character class'
-  compadd "$expl[@]" -p: -S ':]' alnum alpha blank cntrl digit graph \
-                                 lower print punct space upper xdigit
+  _wanted char-classes expl 'character class' &&
+      compadd "$expl[@]" -p: -S ':]' alnum alpha blank cntrl digit graph \
+                                     lower print punct space upper xdigit
 elif [[ ${(Pt)${compstate[parameter]}} = assoc* ]]; then
-  _tags any association-keys || return 1
-
-  _description expl 'association key'
-  if [[ "$RBUFFER" = \]* ]]; then
-    compadd "$expl[@]" -S '' - "${(@kP)${compstate[parameter]}}"
-  else
-    compadd "$expl[@]" -S ']' - "${(@kP)${compstate[parameter]}}"
-  fi
+  _wanted association-keys expl 'association key' &&
+      if [[ "$RBUFFER" = \]* ]]; then
+        compadd "$expl[@]" -S '' - "${(@kP)${compstate[parameter]}}"
+      else
+        compadd "$expl[@]" -S ']' - "${(@kP)${compstate[parameter]}}"
+      fi
 elif [[ ${(Pt)${compstate[parameter]}} = array* ]]; then
   local list i j ret=1 disp
 
-  _tags any indexes parameters
+  _tags indexes parameters
 
   while _tags; do
-    if _requested indexes; then
-      _description -V expl 'array index'
+    if _requested indexes -V expl 'array index'; then
       ind=( {1..${#${(P)${compstate[parameter]}}}} )
-      if _style indexes description yes; then
+      if _style indexes description; then
         list=()
         for i in "$ind[@]"; do
           [[ "$i" = ${PREFIX}*${SUFFIX} ]] &&

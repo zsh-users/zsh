@@ -1,9 +1,9 @@
 #compdef lynx
 
-local context state line
+local curcontext="$curcontext" state line
 typeset -A opt_args
 
-_arguments \
+_arguments -C \
   '-accept_all_cookies' \
   '-anonymous' \
   '-assume_charset=:MIMENAME:' \

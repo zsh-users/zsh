@@ -61,4 +61,10 @@ to access the state information to decide what should be completed.
 item(tt(compvalues))(
 Like tt(comparguments), but for the tt(_values) function.
 )
+item(tt(compstyle))(
+This builtin implements the internals of the style mechanism.
+)
+item(tt(comptags), tt(comptry))(
+This implements the internals of the tags mechanism.
+)
 enditem()

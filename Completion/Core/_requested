@@ -1,9 +1,9 @@
 #autoload
 
-# Reset the current context.
+comptags -C _cur_context
 
-_cur_contexts="${_tag_contexts[$tname]}"
-
-# Test if the tag given as argument was requested.
-
-[[ "${_cur_tags[${funcstack[2,-1]}]}" = *:${1}:* ]]
+comptags -R "$1" &&
+    if [[ $# -gt 1 ]]; then
+      _description "${(@)argv[2,-1]}"
+      return 0
+    fi

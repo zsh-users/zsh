@@ -2,7 +2,5 @@
 
 local expl
 
-_tags any:argument limits || return 1
-
-_description expl 'process limits'
-compadd "$expl[@]" ${${(f)"$(limit)"}%% *}
+_wanted limits expl 'process limits' &&
+    compadd "$expl[@]" ${${(f)"$(limit)"}%% *}

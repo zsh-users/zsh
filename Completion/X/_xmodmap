@@ -1,9 +1,9 @@
 #compdef xmodmap
 
-local context state line ret=1
+local curcontext="$curcontext" state line ret=1
 typeset -A opt_args
 
-_x_arguments \
+_x_arguments -C \
   -{help,grammar,verbose,quiet} \
   '-n[only show what would be done]' \
   '*-e[specify expression]:expression:->expr' \
@@ -82,8 +82,7 @@ if [[ -n "$state" ]]; then
     [[ "$what" = *ksym* ]] && _x_keysym "$suf[@]" && ret=0
 
   else
-    if _tags any commands; then
-      _description expl command
+    if _wanted commands expl command; then
       compadd "$expl[@]" -S ' ' keycode keysym clear add remove && ret=0
       compadd "$expl[@]" -S ' = ' pointer && ret=0
     fi

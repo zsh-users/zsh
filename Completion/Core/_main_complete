@@ -17,10 +17,9 @@
 # state than the global one for which you are completing.
 
 
-local comp post ret=1 _compskip _prio_num=1 _tag_context _cur_contexts
-local context state line opt_args val_args
+local comp post ret=1 _compskip _prio_num=1 _cur_context format
+local context state line opt_args val_args curcontext
 typeset -U _offered_tags _tried_tags _failed_tags _used_tags _unused_tags
-typeset -A _prio_names _prio_contexts _cur_tags _tag_contexts
 
 _offered_tags=()
 _tried_tags=()
@@ -42,7 +41,12 @@ fi
 
 # Get the names of the completers to use in the positional parameters.
 
-(( $# )) || set ${(s.:.)compconfig[completer]}
+if (( ! $# )); then
+  local tmp
+
+  _style -a '' completer tmp
+  set -- "$tmp[@]"
+fi
 
 # And now just call the completer functions defined.
 
@@ -66,9 +70,12 @@ done
 comppostfuncs=()
 
 _lastdescr=( "\`${(@)^_lastdescr:#}'" )
+
+_style -s warnings format format
+
 if [[ compstate[nmatches] -eq 0 &&
       compstate[matcher] -eq compstate[total_matchers] &&
-      -n "$compconfig[warning_format]" && $#_lastdescr -ne 0 ]]; then
+      -n "$format" && $#_lastdescr -ne 0 ]]; then
   local str
 
   compstate[list]=list
@@ -81,10 +88,10 @@ if [[ compstate[nmatches] -eq 0 &&
   *) str="${(j:, :)_lastdescr[1,-2]}, or $_lastdescr[-1]";;
   esac
 
-  compadd -UX "${compconfig[warning_format]//\\%d/$str}" -n ''
+  compadd -UX "${format//\\%d/$str}" -n ''
 fi
 
-[[ "$compconfig[last_prompt]" = always ]] && compstate[last_prompt]=yes
+_style '' last-prompt always && compstate[last_prompt]=yes
 
 _lastcomp=( "${(@kv)compstate}" )
 _lastcomp[completer]="$comp"

@@ -2,7 +2,7 @@
 
 local expl
 
-_tags any fonts || return 1
+_wanted fonts expl font || return 1
 
 # This *has* to be improved some day...
 
@@ -12,5 +12,4 @@ if (( ! $+_font_cache )); then
  _font_cache=( "${(@)^${(@f)$(xlsfonts)}%%--*}--" )
 fi
 
-_description expl font
 compadd -M 'r:|-=* r:|=*' "$expl[@]" "$@" -S '' - "$_font_cache[@]"

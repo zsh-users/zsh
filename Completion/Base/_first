@@ -50,7 +50,7 @@
 #       # We first search in the last ten words, then in the last
 #       # twenty words, and so on...
 #       while [[ i -le max ]]; do
-#         if [[ -n "$compconfig[history_sort]" ]]; then
+#         if _style history-entries sort; then
 #           _description expl "history ($n)"
 #         else
 #           _description -V expl "history ($n)"

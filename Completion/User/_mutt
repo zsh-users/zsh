@@ -1,8 +1,8 @@
 #compdef mutt
 
-local context state line muttrc="~/.muttrc" ret=1
+local curcontext="$curcontext" state line muttrc="~/.muttrc" ret=1
 
- _arguments \
+ _arguments -C \
  '::recipient:->userhost' \
  '-a:MIME attachment:_files' \
  '-b:BCC recipient:->userhost' \
@@ -25,7 +25,7 @@ local context state line muttrc="~/.muttrc" ret=1
  '-Z+:open first mailbox with new mail:' && ret=0
 
 if [[ "$state" = userhost ]]; then
-  _tags "$context" hosts || return 1
+  _tags hosts || return 1
 
   if compset -P '*@'; then
     _description expl 'remote host name'

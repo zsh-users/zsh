@@ -13,9 +13,9 @@ while getopts "P:S:qr:R:W:F:J:V:X:f/g:M:" opt; do
 done
 
 case "$type" in
-file) _tags any all-files                           ;;
-dir)  _tags any directories all-files               ;;
-*)    _tags any globbed-files directories all-files ;;
+file) _tags all-files                           ;;
+dir)  _tags directories all-files               ;;
+*)    _tags globbed-files directories all-files ;;
 esac
 
 while _tags; do

@@ -1,8 +1,8 @@
 #compdef getopts read unset vared
 
 # This will handle completion of keys of associative arrays, e.g. at
-# `vared compconfig[<TAB>'.  However, in this version the [ must be
-# added by hand.
+# `vared foo[<TAB>'.  However, in this version the [ must be added
+# by hand.
 
 if [[ $PREFIX = *\[* ]]; then
   local var=${PREFIX%%\[*}
@@ -16,13 +16,9 @@ if [[ $PREFIX = *\[* ]]; then
   if [[ ${(tP)var} = assoc* ]]; then
     local expl
 
-    _tags subscript association-keys || return 1
-
-    _description expl 'association key'
-    compadd "$expl[@]" $addclose - ${(kP)var}
+    _wanted -C subscript association-keys expl 'association key' &&
+        compadd "$expl[@]" $addclose - ${(kP)var}
   fi
 else
-  _tags any parameters || return 1
-
-  _parameters
+  _tags parameters && _parameters
 fi

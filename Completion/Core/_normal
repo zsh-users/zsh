@@ -1,7 +1,7 @@
 #autoload
 
 local comp command cmd1 cmd2 pat val name i ret=1 _compskip="$_compskip"
-local _sub_context
+local curcontext="$curcontext"
 
 # If we get the option `-s', we don't reset `_compskip'. This ensures
 # that a value set in the function for the `-first-' context is kept,
@@ -16,19 +16,24 @@ local _sub_context
 
 command="$words[1]"
 if [[ CURRENT -eq 1 ]]; then
+  curcontext="${curcontext}:-command-"
+
   comp="$_comps[-command-]"
   [[ -z "$comp" ]] || "$comp" && ret=0
 
   return ret
-elif [[ "$command[1]" == '=' ]]; then
-  eval cmd1\=$command
-  cmd2="$command[2,-1]"
-elif [[ "$command" == */* ]]; then
-  cmd1="$command"
-  cmd2="${command:t}"
 else
-  cmd1="$command"
-  cmd2="$commands[$command]"
+  if [[ "$command[1]" == '=' ]]; then
+    eval cmd1\=$command
+    cmd2="$command[2,-1]"
+  elif [[ "$command" == */* ]]; then
+    cmd1="$command"
+    cmd2="${command:t}"
+  else
+    cmd1="$command"
+    cmd2="$commands[$command]"
+  fi
+  curcontext="${curcontext}:${cmd1}"
 fi
 
 # See if there are any matching pattern completions.

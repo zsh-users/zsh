@@ -4,9 +4,9 @@
 # Options:
 #  -f : complete files first.
 #
-# Configuration keys used:
+# Configuration styles used:
 #
-#  urls_path
+#  urls:path
 #    The path to a directory containing a URL database, such as:
 #
 #      % cd ~/.zsh/urls
@@ -29,90 +29,91 @@
 #      % cat bookmark/zsh/meta
 #      http://www.zsh.org/
 #
-#  urls_localhttp
-#    Specify a local web server in the form:
-#      hostname:doc root:user area
+#  urls:local
+#    Specify a local web server as an array with three elements:
+#      <hostname> <doc root> <user area>
 #    where hostname is the name of the web server, doc root is the path to
 #    the default web pages for the server and user area is the directory
 #    name used by a user placing web pages within their home area.
-#    e.g. compconf urls_localhttp=www:/usr/local/apache/htdocs:public_html
+#    E.g.:
+#      compstyle '*:urls:local' www /usr/local/apache/htdocs public_html
 
 local ipre scheme host user uhosts ret=1 expl
-local urls_path="${compconfig[urls_path]:-${ZDOTDIR:-$HOME}/.zsh/urls}"
-local localhttp_servername="${${(@s.:.)compconfig[urls_localhttp]}[1]}"
-local localhttp_documentroot="${${(@s.:.)compconfig[urls_localhttp]}[2]}"
-local localhttp_userdir="${${(@s.:.)compconfig[urls_localhttp]}[3]}"
+local urls_path localhttp
+_style -s urls path urls_path || urls_path="${ZDOTDIR:-$HOME}/.zsh/urls"
+_style -a urls local localhttp
+local localhttp_servername="$localhttp[1]"
+local localhttp_documentroot="$localhttp[2]"
+local localhttp_userdir="$localhttp[3]"
 
 if [[ "$1" = -f ]]; then
   shift
-  _tags argument:-f files && _files "$@" && return
+  _tags -C -f files && _files "$@" && return
 fi
 
 ipre="$IPREFIX"
 
 if ! compset -P '(#b)([-+.a-z0-9]#):' &&
-   _tags argument prefixes; then
-  _description expl 'URL prefix'
+   _wanted argument prefixes expl 'URL prefix'; then
   [[ -d $urls_path/bookmark ]] &&
     compadd "$@" "$expl[@]" -S '' bookmark: && ret=0
   compadd "$@" "$expl[@]" -S '' file: ftp:// gopher:// http:// && ret=0
-  return $ret
+  return ret
 fi
 scheme="$match[1]"
 
 case "$scheme" in
   http|ftp|gopher)
     if ! compset -P //; then
-      _tags "$scheme" slashes && compadd "$@" -S '' //
+      _wanted -C "$scheme" slashes expl 'end of prefix' &&
+          compadd "$expl[@]" "$@" -S '' //
       return
     fi
   ;;
   file)
     if ! compset -P //; then
-      _tags file files || return 1
+      _wanted -C file files expl 'local file' || return 1
 
       if [[ -prefix / ]]; then
-	_path_files "$@" -S '' -g '*(^/)' && ret=0
-	_path_files "$@" -S/ -r '/' -/ && ret=0
+	_path_files "$expl[@]" "$@" -S '' -g '*(^/)' && ret=0
+	_path_files "$expl[@]" "$@" -S/ -r '/' -/ && ret=0
       elif [[ -z "$PREFIX" ]]; then
-	compadd -S '/' -r '/' - "${PWD%/}"
-	ret=0
+	compadd "$expl[@]" -S '/' -r '/' - "${PWD%/}" && ret=0
       fi
-      return $ret
+      return ret
     fi
   ;;
   bookmark)
     if [[ -f "$urls_path/$scheme/$PREFIX$SUFFIX" &&
 	  -s "$urls_path/$scheme/$PREFIX$SUFFIX" ]]; then
-      _tags bookmark caches || return 1
-
-      compadd "$@" -QU -- "$ipre$(<"$urls_path/$scheme/$PREFIX$SUFFIX")" && ret=0
+      _wanted -C bookmark caches expl biikmarks &&
+          compadd "$expl[@]" "$@" -QU - \
+              "$ipre$(<"$urls_path/$scheme/$PREFIX$SUFFIX")" && ret=0
     else
-      _tags bookmark files || return 1
-
-      _description expl 'bookmark'
-      _path_files -W "$urls_path/$scheme" "$expl[@]" -S '' -g '*(^/)' && ret=0
-      _path_files -W "$urls_path/$scheme" -S/ -r '/' -/ && ret=0
+      if _wanted -C bookmark files 'bookmark'; then
+        _path_files -W "$urls_path/$scheme" "$expl[@]" -S '' -g '*(^/)' && 
+            ret=0
+        _path_files -W "$urls_path/$scheme" -S/ -r '/' -/ && ret=0
+      fi
     fi
-    return $ret
+    return ret
   ;;
 esac
 
 # Complete hosts
 if ! compset -P '(#b)([^/]#)/' &&
-   _tags argument hosts; then
+   _wanted hosts expl host; then
   uhosts=($urls_path/$scheme/$PREFIX*$SUFFIX(/:t))
   (( $#uhosts )) || _hosts -S/ && ret=0
   [[ "$scheme" = http ]] && uhosts=($uhosts $localhttp_servername)
-  _description expl host
   compadd "$expl[@]" "$@" -QS/ - $uhosts && ret=0
-  return $ret
+  return ret
 fi
 host="$match[1]"
 
 # Complete part after hostname
 
-_tags local files || return 1
+_wanted -C local files expl 'local file' || return 1
 
 if [[ "$localhttp_servername" = "$host" ]]; then
   if compset -P \~; then
@@ -121,14 +122,14 @@ if [[ "$localhttp_servername" = "$host" ]]; then
       return
     fi
     user="$match[1]"
-    _path_files -W ~$user/$localhttp_userdir -g '*(^/)' && ret=0
-    _path_files -W ~$user/$localhttp_userdir -S/ -r '/' -/ && ret=0
+    _path_files "$expl[@]" -W ~$user/$localhttp_userdir -g '*(^/)' && ret=0
+    _path_files "$expl[@]" -W ~$user/$localhttp_userdir -S/ -r '/' -/ && ret=0
   else
-    _path_files -W $localhttp_documentroot -g '*(^/)' && ret=0
-    _path_files -W $localhttp_documentroot -S/ -r '/' -/ && ret=0
+    _path_files "$expl[@]" -W $localhttp_documentroot -g '*(^/)' && ret=0
+    _path_files "$expl[@]" -W $localhttp_documentroot -S/ -r '/' -/ && ret=0
   fi
 else
-  _path_files -W $urls_path/$scheme/$host -g '*(^/)' && ret=0
-  _path_files -W $urls_path/$scheme/$host -S/ -r '/' -/ && ret=0
+  _path_files "$expl[@]" -W $urls_path/$scheme/$host -g '*(^/)' && ret=0
+  _path_files "$expl[@]" -W $urls_path/$scheme/$host -S/ -r '/' -/ && ret=0
 fi
 return $ret

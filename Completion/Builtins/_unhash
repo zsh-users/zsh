@@ -11,4 +11,4 @@ args=()
 [[ "$fl != -* ]] &&
     args=( 'commands:: _command_names -e' )
 
-_alternative any:argument "$args[@]"
+_alternative "$args[@]"

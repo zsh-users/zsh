@@ -3,11 +3,8 @@
 local expl
 
 if [[ "$words[2]" = -N && CURRENT -eq 3 ]]; then
-  _tags any:argument functions || return 1
-  _description expl 'widget shell function'
-  compadd "$expl[@]" "$@" - "${(k@)functions}" && ret=0
+  _wanted -C -N functions expl 'widget shell function' &&
+      compadd "$expl[@]" "$@" - "${(k@)functions}" && ret=0
 else
-  _tags any:argument widgets || return 1
-  _description expl widget
-  compadd "$expl[@]" - "${(@k)widgets}"
+  _wanted widgets expl widget && compadd "$expl[@]" - "${(@k)widgets}"
 fi

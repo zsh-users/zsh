@@ -4,15 +4,14 @@ local expl lines disp
 
 if [[ CURRENT -eq 2 ]]; then
   if compset -P -; then
-    _tags - - entries || return 1
+    _wanted -C - entries expl 'scheduled jobs' || return 1
 
     lines=(${(f)"$(sched)"})
-    if _style entries description yes; then
+    if _style entries description; then
       disp=( -ld lines )
     else
       disp=()
     fi
-    _description expl 'scheduled jobs'
     [[ -z $lines ]] || compadd "$expl[@]" "$disp[@]" - {1..$#lines}
   else
     _message 'time specification'

@@ -5,7 +5,9 @@
 # arguments for the `mount' command for different operating systems
 # are below these table.
 
-local context state line ret=1 args fss deffs=iso9660 descr tmp
+local curcontext="$curcontext" state line ret=1
+local args fss deffs=iso9660 descr tmp
+
 typeset -A opt_args
 
 if (( ! $+_fs_any )); then
@@ -209,13 +211,13 @@ if [[ "$words[1]" = mount ]]; then
     ;;
   esac
 
-  _arguments "$args[@]" && ret=0
+  _arguments -C "$args[@]" && ret=0
 
 else
 
   # Completion for umount.
 
-  _arguments -s \
+  _arguments -C -s \
     '-h[show help]' \
     '-V[show version]' \
     '-v[verbose mode]' \
@@ -228,14 +230,13 @@ fi
 
 case "$state" in
 fstype)
-  _tags "$context" types || return 1
-
   compset -P '*,'
-  _description expl 'file system type'
-  compadd "$expl[@]" -qS, -M 'L:|no=' - "$fss[@]" && ret=0
+
+  _wanted types expl 'file system type' &&
+      compadd "$expl[@]" -qS, -M 'L:|no=' - "$fss[@]" && ret=0
   ;;
 fsopt)
-  _tags "$context" options || return 1
+  _tags options || return 1
 
   eval 'tmp=(' '"$_fs_'${(s:,:)^${opt_args[-t]:-${deffs}}}'[@]"' ')'
   tmp=( "$_fs_any[@]" "${(@)tmp:#}" )
@@ -245,7 +246,7 @@ devordir)
   if (( $+opt_args[-a] )); then
     _message "no device or directory with option \`-a'"
   else
-    _alternative "$context" \
+    _alternative \
         'devices:device:compadd /dev/\*' \
 	'directories:mount point:_files -/' && ret=0
   fi
@@ -260,7 +261,7 @@ udevordir)
     dev_tmp=( "${(@)${(@)tmp%% *}:#none}" )
     mp_tmp=( "${(@)${(@)tmp#* }%% *}" )
 
-    _alternative "$context" \
+    _alternative \
         'devices:device:compadd - $dev_tmp[@]' \
 	'directories:mount point:compadd - $mp_tmp[@]' && ret=0
   fi

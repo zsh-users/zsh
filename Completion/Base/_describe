@@ -2,54 +2,54 @@
 
 # This can be used to add options or values with descriptions as matches.
 
-local cmd opt expl tmps tmpd tmpmd tmpms ret=1 showd _nm hide args
-local type=values
+local _cmd _opt _expl _tmps _tmpd _tmpmd _tmpms _ret=1 _showd _nm _hide _args
+local _type=values
 
-cmd="$words[1]"
+_cmd="$words[1]"
 
 # Get the options.
 
-while getopts 'oc:' opt; do
-  if [[ "$opt" = o ]]; then
-    type=options
+while getopts 'oc:' _opt; do
+  if [[ "$_opt" = o ]]; then
+    _type=options
   else
-    cmd="$OPTARG"
+    _cmd="$OPTARG"
   fi
 done
 shift OPTIND-1
 
 # Do the tests. `showd' is set if the descriptions should be shown.
 
-_tags -c "$cmd" any "$type" || return 1
+_tags "$_type" || return 1
 
-_style "$type" description yes && showd=yes
+_style "$_type" description && _showd=yes
 
-_description expl "$1"
+_description _expl "$1"
 shift
 
-if [[ -n "$showd" ]]; then
+if [[ -n "$_showd" ]]; then
   compdescribe -I ' -- ' "$@"
 else
   compdescribe -i "$@"
 fi
 
-[[ "$type" = options ]] && _style options prefix-hidden yes && hide=yes
+[[ "$_type" = options ]] && _style options prefix-hidden && _hide=yes
 
-while compdescribe -g args tmpd tmpmd tmps tmpms; do
+while compdescribe -g _args _tmpd _tmpmd _tmps _tmpms; do
 
   # See if we should remove the option prefix characters.
 
-  if [[ -n "$hide" ]]; then
+  if [[ -n "$_hide" ]]; then
     if [[ "$PREFIX" = --* ]]; then
-      tmpd=( "${(@)tmpd#--}" )
-      tmps=( "${(@)tmps#--}" )
+      _tmpd=( "${(@)_tmpd#--}" )
+      _tmps=( "${(@)_tmps#--}" )
     elif [[ "$PREFIX" = [-+]* ]]; then
-      tmpd=( "${(@)tmpd#[-+]}" )
-      tmps=( "${(@)tmps#[-+]}" )
+      _tmpd=( "${(@)_tmpd#[-+]}" )
+      _tmps=( "${(@)_tmps#[-+]}" )
     fi
   fi
-  compadd "$args[@]" "$expl[@]" -ld tmpd - "$tmpmd[@]" && ret=0
-  compadd "$args[@]" "$expl[@]" -d tmps - "$tmpms[@]" && ret=0
+  compadd "$_args[@]" "$_expl[@]" -ld _tmpd - "$_tmpmd[@]" && _ret=0
+  compadd "$_args[@]" "$_expl[@]" -d _tmps  - "$_tmpms[@]" && _ret=0
 done
 
-return ret
+return _ret

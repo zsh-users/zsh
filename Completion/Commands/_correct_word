@@ -7,19 +7,8 @@
 # If configurations keys with the prefix `correctword_' are
 # given they override those starting with `correct_'.
 
-local oca="$compconfig[correct_accept]"
-local oco="$compconfig[correct_original]"
-local ocp="$compconfig[correct_prompt]"
-local oci="$compconfig[correct_insert]"
+local curcontext="$curcontext"
 
-compconfig[correct_accept]="${compconfig[correctword_accept]-6n}"
-compconfig[correct_original]="${compconfig[correctword_original]-$oco}"
-compconfig[correct_prompt]="${compconfig[correctword_prompt]-$ocp}"
-compconfig[correct_insert]="${compconfig[correctword_insert]}"
+[[ -z "$curcontext" ]] && curcontext=":correct-word"
 
 _main_complete _correct
-
-compconfig[correct_accept]="$oca"
-compconfig[correct_original]="$oco"
-compconfig[correct_prompt]="$ocp"
-compconfig[correct_insert]="$oci"

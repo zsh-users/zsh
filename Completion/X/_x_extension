@@ -2,11 +2,9 @@
 
 local expl
 
-_tags any extensions || return 1
+_wanted extensions expl 'X extensions' || return 1
 
 (( $+_xe_cache )) || _xe_cache=( "${(@)${(@f)$(xdpyinfo)}[(r)number of extensions:*,-1][2,(r)default screen number:*][1,-2]//[      ]}" )
-
-_description expl 'X extension'
 
 if [[ "$1" = -a ]]; then
   shift

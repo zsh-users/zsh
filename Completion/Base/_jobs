@@ -2,11 +2,11 @@
 
 local expl disp jobs job jids pfx='%' desc
 
-_tags any jobs || return 1
+_tags jobs || return 1
 
-_style jobs prefix-needed yes && [[ "$PREFIX" != %* ]] && return 1
-_style jobs prefix-hidden yes && pfx=''
-_style jobs description yes   && desc=yes
+_style jobs prefix-needed && [[ "$PREFIX" != %* ]] && return 1
+_style jobs prefix-hidden && pfx=''
+_style jobs description   && desc=yes
 
 if [[ "$1" = -r ]]; then
   jids=( "${(@k)jobstates[(R)running*]}" )

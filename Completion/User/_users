@@ -5,9 +5,7 @@
 
 local expl
 
-_tags any users || return 1
-
-_description expl user
+_wanted users expl user || return 1
 
 [[ "${(t)users}" = *array* ]] &&
     compadd "$expl[@]" "$@" - "$users[@]" && return 0

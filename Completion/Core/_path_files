@@ -331,11 +331,11 @@ for prepath in "$prepaths[@]"; do
 	SUFFIX="${tsuf}"
       fi
 
-tmp4="$testpath"
-compquote tmp1 tmp4
+      tmp4="$testpath"
+      compquote tmp1 tmp4
 
-      if [[ -n $menu || "$compconfig[path_expand]" != *suffix* ]]; then
-        [[ -n "$compconfig[path_cursor]" ]] && compstate[to_end]=''
+      if [[ -n $menu ]] || ! _style paths expand '*suffix*'; then
+        _style paths cursor && compstate[to_end]=''
         if [[ "$tmp3" = */* ]]; then
 	  compadd -Qf -p "$linepath$tmp4" -s "/${tmp3#*/}" \
 	          -W "$prepath$realpath$testpath" "$ignore[@]" \
@@ -423,8 +423,8 @@ done
 
 exppaths=( "${(@)exppaths:#$orig}" )
 
-if [[ "$compconfig[path_expand]" = *prefix* &&
-      $#exppaths -gt 0 && nm -eq compstate[nmatches] ]]; then
+if _style paths expand '*prefix*' &&
+   [[ $#exppaths -gt 0 && nm -eq compstate[nmatches] ]]; then
   PREFIX="${opre}"
   SUFFIX="${osuf}"
   compadd -Q -S '' "$group[@]" "$expl[@]" \

@@ -4,7 +4,7 @@ local args
 
 args=( "$@" )
 
-_alternative -O args any:argument \
+_alternative -O args \
   'commands:external command:compadd - ${(k@)commands}' \
   'builtins:builtin command:compadd - ${(k@)builtins}' \
   'functions:shell function:compadd - ${(k@)functions}' \

@@ -1,7 +1,7 @@
 #autoload
 
 # This is intended to be used as a completer function after the normal
-# completer as in: `compconf completer=_complete:_match'.
+# completer as in: `compstyle "*" completer _complete _match'.
 # It temporarily switches on pattern matching, allowing you to try 
 # completion on patterns without having to setopt glob_complete.
 #
@@ -9,7 +9,8 @@
 # expand-or-complete function because otherwise the pattern will
 # be expanded using globbing.
 
-local tmp opm="$compstate[pattern_match]" ret=0
+local tmp opm="$compstate[pattern_match]" ret=0 curcontext="$curcontext"
+local orig ins
 
 # Do nothing if we don't have a pattern or there are still global
 # match specifications to try.
@@ -18,9 +19,16 @@ tmp="${${:-$PREFIX$SUFFIX}#[~=]}"
 [[ "$tmp:q" = "$tmp" ||
    compstate[matcher] -ne compstate[total_matchers] ]] && return 1
 
+# Probably set initial context.
+
+[[ -z "$curcontext" ]] && curcontext=':match'
+
+_style -s '' original orig
+_style -s '' insert ins
+
 # Try completion without inserting a `*'?
 
-if [[ -n "$compconfig[match_original]" ]]; then
+if [[ -n "$orig" ]]; then
   compstate[matcher]=-1
   compstate[pattern_match]='-'
   _complete && ret=1
@@ -28,7 +36,7 @@ if [[ -n "$compconfig[match_original]" ]]; then
   compstate[matcher]="$compstate[total_matchers]"
 
   if (( ret )); then
-    [[ "$compconfig[match_insert]" = unambig* &&
+    [[ "$ins" = unambig* &&
        $#compstate[unambiguous] -ge ${#:-${PREFIX}${SUFFIX}} ]] && 
         compstate[pattern_insert]=unambiguous
     return 0
@@ -37,7 +45,7 @@ fi
 
 # No completion with inserting `*'?
 
-[[ "$compconfig[match_original]" = only ]] && return 1
+[[ "$orig" = only ]] && return 1
 
 compstate[matcher]=-1
 compstate[pattern_match]='*'
@@ -45,7 +53,7 @@ _complete && ret=1
 compstate[pattern_match]="$opm"
 compstate[matcher]="$compstate[total_matchers]"
 
-[[ ret -eq 1 && "$compconfig[match_insert]" = unambig* &&
+[[ ret -eq 1 && "$ins" = unambig* &&
    $#compstate[unambiguous] -ge ${#:-${PREFIX}${SUFFIX}} ]] && 
     compstate[pattern_insert]=unambiguous
 

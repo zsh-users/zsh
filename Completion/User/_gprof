@@ -1,9 +1,9 @@
 #compdef gprof
 
-local context state line ret=1
+local curcontext="$curcontext" state line ret=1
 typeset -A opt_args
 
-_arguments -s -{a,b,c,D,h,i,l,L,s,T,v,w,x,y,z} \
+_arguments -C -s -{a,b,c,D,h,i,l,L,s,T,v,w,x,y,z} \
            -{A,C,e,E,f,F,J,n,N,O,p,P,q,Q,Z}:'function name:->funcs' \
 	   '-I:directory:_dir_list' \
 	   '-d-:debug level:' '-k:function names:->pair' \
@@ -17,7 +17,7 @@ _arguments -s -{a,b,c,D,h,i,l,L,s,T,v,w,x,y,z} \
 if [[ -n "$state" ]]; then
   local cmd pair expl
 
-  _tags "${context}" functions || return 1
+  _tags functions || return 1
 
   [[ "$state" = pair ]] && pair=yes
 

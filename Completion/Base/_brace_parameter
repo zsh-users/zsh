@@ -1,6 +1,6 @@
 #compdef -brace-parameter-
 
-_tags any parameters && _parameters -e
+_requested -t parameters && _parameters -e
 
 
 # Without the `-e' option, we would use the following (see the file

@@ -29,7 +29,7 @@ emulate -L zsh
 
 typeset _ci_options _ci_f _ci_fdir _ci_files _ci_dumpfile _ci_lines
 typeset _ci_type _ci_completer _ci_accept _ci_cprompt _ci_startline
-typeset _ci_endline _ci_ifile _ci_tmpf _ci_compconf _ci_warn
+typeset _ci_endline _ci_ifile _ci_tmpf _ci_compstyle _ci_warn
 typeset _ci_dtype _ci_existing _ci_line _ci_end
 
 # Look for the defaults.
@@ -45,14 +45,14 @@ typeset -A _ci_defaults
 if [[ -f $_ci_ifile ]]; then
   # This assumes the lines haven't been altered by the user too much
   # after they were added.
-  _ci_compconf=0
+  _ci_compstyle=0
   sed -n "/^$_ci_startline/,/^$_ci_endline/p" $_ci_ifile |
   while read -rA _ci_line; do
-    if (( $_ci_compconf )); then
-      # parse a compconf component as first argument
+    if (( $_ci_compstyle )); then
+      # parse a compstyle component as first argument
       if [[ $_ci_line[-1] != \\ ]]; then
 	_ci_end=-1
-	_ci_compconf=0
+	_ci_compstyle=0
       else
 	_ci_end=-2
       fi
@@ -72,11 +72,11 @@ if [[ -f $_ci_ifile ]]; then
       [[ $_ci_line[-2] = -d ]] && _ci_dumpfile=$_ci_line[-1]
     elif [[ $_ci_line[1] = _compdir=* ]]; then
       _ci_fdir=${_ci_line[1]##_compdir=}
-    elif [[ $_ci_line[1] = compconf ]]; then
-      # parse a compconf component as second argument (should be completer)
-      [[ $_ci_line[2] = completer=* ]] &&
-        _ci_completer=${_ci_line[2]#completer=}
-      [[ $_ci_line[-1] == \\ ]] && _ci_compconf=1
+    elif [[ $_ci_line[1] = compstyle ]]; then
+      # parse a compstyle component as second argument (should be completer)
+      [[ $_ci_line[3] = completer ]] &&
+        _ci_completer=${_ci_line[3,-1]}
+      [[ $_ci_line[-1] == \\ ]] && _ci_compstyle=1
       _ci_existing="${_ci_existing}$_ci_line
 "
     elif [[ $_ci_line[1] != \#* && $_ci_line[1] != (autoload|\[\[) ]]; then
@@ -208,7 +208,7 @@ approximate completion if that fails.  Would you like:
   A:  Approximate completion
   B:  Both"
   if [[ -n $_ci_completer ]]; then
-    print "  Default: use the current completer:\n$_ci_completer"
+    print "  Default: use the current completers:\n$_ci_completer"
   else
     print "Please type one of the keys above."
   fi
@@ -218,13 +218,13 @@ approximate completion if that fails.  Would you like:
       0*) _ci_completer=_complete
 	  break
 	  ;;
-      [cC]*) _ci_completer=_complete:_correct
+      [cC]*) _ci_completer='_complete _correct'
 	     break
 	     ;;
-      [aA]*) _ci_completer=_complete:_approximate
+      [aA]*) _ci_completer='_complete _approximate'
 	     break;
 	     ;;
-      [bB]*) _ci_completer=_complete:_correct:_approximate
+      [bB]*) _ci_completer='_complete _correct _approximate'
 	     break
 	     ;;
       *) [[ -n $_ci_completer ]] && break
@@ -233,7 +233,7 @@ approximate completion if that fails.  Would you like:
     esac
   done
 
-  _ci_lines="${_ci_lines}compconf completer=$_ci_completer"
+  _ci_lines="${_ci_lines}compstyle '*' completer $_ci_completer"
 
 
   if [[ $_ci_completer = *(correct|approx)* ]]; then

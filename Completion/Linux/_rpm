@@ -43,14 +43,14 @@ local ret=1 tmp expl
 
 # Used by `_arguments', made local here.
 
-local context state lstate line
+local curcontext="$curcontext" state lstate line
 typeset -A opt_args
 
 state=''
 
 # Do simple completions or get the first state.
 
-_arguments -s \
+_arguments -C -s \
   '--rcfile:resource file:_files' \
   '--ftpproxy:FTP proxy server:_hosts' \
   '--ftpport:FTP port number:' \
@@ -187,32 +187,23 @@ while [[ -n "$state" ]]; do
     state=package_file
     ;&
   package)
-    _tags "$context" packages || return 1
-
-    _description expl 'RPM package'
-    compadd "$expl[@]" -M 'r:|-=* r:|=*' - $(rpm -qa) && ret=0
+    _wanted packages expl 'RPM package' &&
+        compadd "$expl[@]" -M 'r:|-=* r:|=*' - $(rpm -qa) && ret=0
     ;;
   package_file)
     if compset -P ftp://; then
-      _tags "$context" hosts || return 1
-
-      _hosts -S/ && ret=0
+      _tags hosts && _hosts -S/ && ret=0
     else
-      _tags "$context" files || return 1
-
-      _description expl 'RPM package file'
-      _files "$expl[@]" -g '*.(#i)rpm' && ret=0
-      _description expl 'ftp URL prefix'
-      compadd "$expl[@]" ftp://
+      _alternative \
+          'files:RPM package file:_files -g \*.\(\#i\)rpm' \
+	  'prefixes:ftp URL prefix:compadd ftp://' && ret=0
     fi
     ;;
   tags)
     if compset -P '*\{'; then
-      _tags "$context" tags || return 1
-
-      _description expl 'RPM tag'
-      compadd "$expl[@]" -M 'm:{a-z}={A-Z}' -S '}' - \
-              "${(@)${(@f)$(rpm --querytags)}#RPMTAG_}" && ret=0
+      _wanted tags expl 'RPM tag' &&
+          compadd "$expl[@]" -M 'm:{a-z}={A-Z}' -S '}' - \
+                  "${(@)${(@f)$(rpm --querytags)}#RPMTAG_}" && ret=0
     else
       _message 'RPM format'
     fi
@@ -227,7 +218,7 @@ while [[ -n "$state" ]]; do
       _description expl 'old path'
     fi
 
-    _tags "$context" directories || return 1
+    _tags directories || return 1
 
     _files "$expl[@]" -/ && ret=0
     ;;

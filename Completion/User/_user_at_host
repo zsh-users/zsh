@@ -1,17 +1,13 @@
 #autoload
 
 if [[ -prefix 1 *@ ]]; then
-
-  _tags any:user-at hosts || return 1
-
   local user=${PREFIX/@}
 
   compset -P 1 '*@'
-  _description expl "hostnames for $user"
-  _combination accounts_users_hosts users="$user" hosts "$expl[@]" "$@"
-else
-  _tags any users || return 1
 
-  _description expl "usernames"
-  _combination accounts_users_hosts users -S@ -q "$expl[@]" "$@"
+  _wanted -C user-at hosts expl "hostnames for $user" &&
+      _combination accounts_users_hosts users="$user" hosts "$expl[@]" "$@"
+else
+  _wanted users expl "usernames" &&
+      _combination accounts_users_hosts users -S@ -q "$expl[@]" "$@"
 fi

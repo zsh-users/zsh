@@ -38,25 +38,21 @@ _rlogin () {
     return ret
     ;;
   rcp)
-    local state line ret=1
+    local curcontext="$curcontext" state line ret=1
     typeset -A opt_args
 
-    _arguments -s \
+    _arguments -C -s \
       '-p[preserve modification times]' \
       '-r[recursively copy directories]' \
       '*:files:->files' && ret=0
 
     if [[ -n "$state" ]]; then
       if compset -P '*:'; then
-        _tags "$context" files || return 1
-
 	_files && ret=0
       elif compset -P '*@'; then
-        _tags "$context" hosts || return 1
-
-	_rlogin_hosts -S: -q && ret=0
+        _tags hosts && _rlogin_hosts -S: -q && ret=0
       else
-        _alternative "$context" \
+        _alternative \
 	    'files:: _files' \
 	    'hosts:: _rlogin_all_hosts -qS:' \
 	    'users:: _rlogin_users -qS@' && ret=0
@@ -68,24 +64,21 @@ _rlogin () {
 }
 
 _rlogin_users () {
-  _tags any users && _combination accounts_users_hosts users "$@"
+  _tags users && _combination accounts_users_hosts users "$@"
 }
 
 _rlogin_hosts () {
-  _tags any hosts || return 1
-
-  if [[ "$IPREFIX" == *@ ]]; then
-    _combination accounts_users_hosts "users=${IPREFIX/@}" hosts "$@"
-  else
-    _combination accounts_users_hosts \
-      ${opt_args[-l]:+"users=${opt_args[-l]:q}"} hosts "$@"
-  fi
+  _tags hosts &&
+      if [[ "$IPREFIX" == *@ ]]; then
+        _combination accounts_users_hosts "users=${IPREFIX/@}" hosts "$@"
+      else
+        _combination accounts_users_hosts \
+            ${opt_args[-l]:+"users=${opt_args[-l]:q}"} hosts "$@"
+      fi
 }
 
 _rlogin_all_hosts () {
-  _tags any hosts || return 1
-
-  _combination accounts_users_hosts hosts "$@"
+  _tags hosts && _combination accounts_users_hosts hosts "$@"
 }
 
 _rlogin "$@"

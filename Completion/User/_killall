@@ -1,6 +1,4 @@
 #compdef killall
 
-if compset -P 1 -; then
-  _description expl signal
-  compadd "$expl[@]" $signals[1,-3]
-fi
+compset -P 1 - && _wanted -C - signals expl signal &&
+    compadd "$expl[@]" $signals[1,-3]

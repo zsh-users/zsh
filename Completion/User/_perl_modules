@@ -42,5 +42,5 @@ if [[ ${+_perl_modules} -eq 0 ]]; then
 fi
 
 local expl
-_description expl "Perl modules"
-compadd "$expl[@]" - $_perl_modules
+
+_wanted modules expl 'Perl modules' && compadd "$expl[@]" - $_perl_modules

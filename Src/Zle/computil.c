@@ -127,7 +127,7 @@ static struct cdstate cd_state;
 static int cd_parsed = 0;
 
 static void
-free_cdsets(Cdset p)
+freecdsets(Cdset p)
 {
     Cdset n;
 
@@ -151,7 +151,7 @@ cd_init(char *nam, char *sep, char **args, int disp)
 
     if (cd_parsed) {
 	zsfree(cd_state.sep);
-	free_cdsets(cd_state.sets);
+	freecdsets(cd_state.sets);
     }
     setp = &(cd_state.sets);
     cd_state.sep = ztrdup(sep);
@@ -270,7 +270,7 @@ cd_get(char **params)
 
 	cd_state.sets = set->next;
 	set->next = NULL;
-	free_cdsets(set);
+	freecdsets(set);
 
 	return 0;
     }
@@ -387,7 +387,7 @@ arrcmp(char **a, char **b)
 }
 
 static void
-free_caargs(Caarg a)
+freecaargs(Caarg a)
 {
     Caarg n;
 
@@ -402,7 +402,7 @@ free_caargs(Caarg a)
 }
 
 static void
-free_cadef(Cadef d)
+freecadef(Cadef d)
 {
     if (d) {
 	Caopt p, n;
@@ -415,11 +415,11 @@ free_cadef(Cadef d)
 	    zsfree(p->name);
 	    zsfree(p->descr);
 	    freearray(p->xor);
-	    free_caargs(p->args);
+	    freecaargs(p->args);
 	    zfree(p, sizeof(*p));
 	}
-	free_caargs(d->args);
-	free_caargs(d->rest);
+	freecaargs(d->args);
+	freecaargs(d->rest);
 	if (d->single)
 	    zfree(d->single, 256 * sizeof(Caopt));
 	zfree(d, sizeof(*d));
@@ -561,7 +561,7 @@ parse_cadef(char *nam, char **args)
 		*p = sav;
 	    }
 	    if (*p != ')') {
-		free_cadef(ret);
+		freecadef(ret);
 		zerrnam(nam, "invalid argument: %s", *args, 0);
 		return NULL;
 	    }
@@ -599,7 +599,7 @@ parse_cadef(char *nam, char **args)
 		    p++;
 	    }
 	    if (!p[1]) {
-		free_cadef(ret);
+		freecadef(ret);
 		zerrnam(nam, "invalid argument: %s", *args, 0);
 		return NULL;
 	    }
@@ -627,7 +627,7 @@ parse_cadef(char *nam, char **args)
 			p++;
 
 		if (!*p) {
-		    free_cadef(ret);
+		    freecadef(ret);
 		    zerrnam(nam, "invalid option definition: %s", *args, 0);
 		    return NULL;
 		}
@@ -637,7 +637,7 @@ parse_cadef(char *nam, char **args)
 		descr = NULL;
 
 	    if (c && c != ':') {
-		free_cadef(ret);
+		freecadef(ret);
 		zerrnam(nam, "invalid option definition: %s", *args, 0);
 		return NULL;
 	    }
@@ -667,8 +667,8 @@ parse_cadef(char *nam, char **args)
 				    p++;
 			}
 			if (*p != ':') {
-			    free_cadef(ret);
-			    free_caargs(oargs);
+			    freecadef(ret);
+			    freecaargs(oargs);
 			    zerrnam(nam, "invalid option definition: %s",
 				    *args, 0);
 			    return NULL;
@@ -726,12 +726,12 @@ parse_cadef(char *nam, char **args)
 	    int type = CAA_REST;
 
 	    if (*++p != ':') {
-		free_cadef(ret);
+		freecadef(ret);
 		zerrnam(nam, "invalid rest argument definition: %s", *args, 0);
 		return NULL;
 	    }
 	    if (ret->rest) {
-		free_cadef(ret);
+		freecadef(ret);
 		zerrnam(nam, "doubled rest argument definition: %s", *args, 0);
 		return NULL;
 	    }
@@ -758,7 +758,7 @@ parse_cadef(char *nam, char **args)
 		anum++;
 
 	    if (*p != ':') {
-		free_cadef(ret);
+		freecadef(ret);
 		zerrnam(nam, "invalid argument: %s", *args, 0);
 		return NULL;
 	    }
@@ -773,8 +773,8 @@ parse_cadef(char *nam, char **args)
 		 pre = tmp, tmp = tmp->next);
 
 	    if (tmp && tmp->num == anum - 1) {
-		free_cadef(ret);
-		free_caargs(arg);
+		freecadef(ret);
+		freecaargs(arg);
 		zerrnam(nam, "doubled argument definition: %s", *args, 0);
 		return NULL;
 	    }
@@ -808,7 +808,7 @@ get_cadef(char *nam, char **args)
     if (i)
 	min = p;
     if ((new = parse_cadef(nam, args))) {
-	free_cadef(*min);
+	freecadef(*min);
 	*min = new;
     }
     return new;
@@ -1412,7 +1412,7 @@ struct cvval {
 static Cvdef cvdef_cache[MAX_CVCACHE];
 
 static void
-free_cvdef(Cvdef d)
+freecvdef(Cvdef d)
 {
     if (d) {
 	Cvval p, n;
@@ -1425,7 +1425,7 @@ free_cvdef(Cvdef d)
 	    zsfree(p->name);
 	    zsfree(p->descr);
 	    freearray(p->xor);
-	    free_caargs(p->arg);
+	    freecaargs(p->arg);
 	    zfree(p, sizeof(*p));
 	}
 	zfree(d, sizeof(*d));
@@ -1493,7 +1493,7 @@ parse_cvdef(char *nam, char **args)
 		*p = sav;
 	    }
 	    if (*p != ')') {
-		free_cvdef(ret);
+		freecvdef(ret);
 		zerrnam(nam, "invalid argument: %s", *args, 0);
 		return NULL;
 	    }
@@ -1514,7 +1514,7 @@ parse_cvdef(char *nam, char **args)
 		p++;
 
 	if (hassep && !sep && name + 1 != p) {
-	    free_cvdef(ret);
+	    freecvdef(ret);
 	    zerrnam(nam, "no multi-letter values with empty separator allowed", NULL, 0);
 	    return NULL;
 	}
@@ -1525,7 +1525,7 @@ parse_cvdef(char *nam, char **args)
 		    p++;
 
 	    if (!*p) {
-		free_cvdef(ret);
+		freecvdef(ret);
 		zerrnam(nam, "invalid value definition: %s", *args, 0);
 		return NULL;
 	    }
@@ -1536,7 +1536,7 @@ parse_cvdef(char *nam, char **args)
 	    descr = NULL;
 	}
 	if (c && c != ':') {
-	    free_cvdef(ret);
+	    freecvdef(ret);
 	    zerrnam(nam, "invalid value definition: %s", *args, 0);
 	    return NULL;
 	}
@@ -1549,7 +1549,7 @@ parse_cvdef(char *nam, char **args)
 	}
 	if (c == ':') {
 	    if (hassep && !sep) {
-		free_cvdef(ret);
+		freecvdef(ret);
 		zerrnam(nam, "no value with argument with empty separator allowed", NULL, 0);
 		return NULL;
 	    }
@@ -1594,7 +1594,7 @@ get_cvdef(char *nam, char **args)
     if (i)
 	min = p;
     if ((new = parse_cvdef(nam, args))) {
-	free_cvdef(*min);
+	freecvdef(*min);
 	*min = new;
     }
     return new;
@@ -1977,12 +1977,592 @@ bin_compquote(char *nam, char **args, char *ops, int func)
     return 0;
 }
 
+typedef struct cspat *Cspat;
+typedef struct cstyle *Cstyle;
+
+struct cspat {
+    Cspat next;
+    char *pat;
+    Patprog prog;
+    int weight;
+    Cstyle styles, lstyles;
+};
+    
+struct cstyle {
+    Cstyle next;
+    char *name;
+    char **vals;
+};
+
+/* List of styles. */
+
+static Cspat compstyles, lcompstyles;
+
+static void
+freecstyle(Cstyle s)
+{
+    Cstyle n;
+
+    while (s) {
+	n = s->next;
+
+	zsfree(s->name);
+	freearray(s->vals);
+	zfree(s, sizeof(*s));
+
+	s = n;
+    }
+}
+
+static void
+freecspat(Cspat p)
+{
+    Cspat n;
+
+    while (p) {
+	n = p->next;
+
+	zsfree(p->pat);
+	freepatprog(p->prog);
+	zfree(p, sizeof(*p));
+
+	p = n;
+    }
+}
+
+static Cspat
+getcspat(char *pat)
+{
+    Cspat p;
+
+    for (p = compstyles; p; p = p->next)
+	if (!strcmp(pat, p->pat))
+	    return p;
+
+    return NULL;
+}
+
+static Cstyle
+getcstyle(Cspat p, char *name)
+{
+    Cstyle s;
+
+    for (s = p->styles; s; s=  s->next)
+	if (!strcmp(name, s->name))
+	    return s;
+
+    return NULL;
+}
+
+static void
+setcstyle(Cspat p, char *name, char **vals)
+{
+    Cstyle s;
+
+    for (s = p->styles; s; s = s->next)
+	if (!strcmp(name, s->name)) {
+	    freearray(s->vals);
+	    PERMALLOC {
+		s->vals = arrdup(vals);
+	    } LASTALLOC;
+
+	    return;
+	}
+    s = (Cstyle) zalloc(sizeof(*s));
+
+    s->name = ztrdup(name);
+    PERMALLOC {
+	s->vals = arrdup(vals);
+    } LASTALLOC;
+    s->next = NULL;
+
+    if (p->lstyles)
+	p->lstyles->next = s;
+    else
+	p->styles = s;
+    p->lstyles = s;
+}
+
+static Cspat
+addcspat(char *pat, Patprog prog)
+{
+    Cspat p, q, qq;
+    int weight, tmp, first;
+    char *s;
+
+    for (weight = 0, tmp = 2, first = 1, s = pat; *s; s++) {
+	if (first && *s == '*' && (!s[1] || s[1] == ':')) {
+	    tmp = 0;
+	    continue;
+	}
+	first = 0;
+
+	if (*s == '(' || *s == '|' || *s == '*' || *s == '[' || *s == '<' ||
+	    *s == '?' || *s == '#' || *s == '^')
+	    tmp = 1;
+
+	if (*s == ':') {
+	    first = 1;
+	    weight += tmp;
+	    tmp = 2;
+	}
+    }
+    weight += tmp;
+
+    p = (Cspat) zalloc(sizeof(*p));
+
+    p->pat = ztrdup(pat);
+    p->weight = weight;
+    p->prog = prog;
+    p->styles = p->lstyles = NULL;
+
+    for (qq = NULL, q = compstyles; q && q->weight >= weight;
+	 qq = q, q = q->next);
+
+    p->next = q;
+    if (qq)
+	qq->next = p;
+    else
+	compstyles = p;
+    if (!q)
+	lcompstyles = p;
+
+    return p;
+}
+
+static void
+deletecstyle(Cspat p, char *name)
+{
+    Cstyle ps, s;
+
+    for (ps = NULL, s = p->styles; s; ps = s, s = s->next)
+	if (!strcmp(name, s->name)) {
+	    if (ps)
+		ps->next = s->next;
+	    else
+		p->styles = s->next;
+	    if (s == p->lstyles)
+		p->lstyles = ps;
+
+	    s->next = NULL;
+	    freecstyle(s);
+
+	    return;
+	}
+}
+
+static void
+deletecspat(Cspat pat)
+{
+    Cspat pp, p;
+
+    for (pp = NULL, p = compstyles; p; pp = p, p = p->next)
+	if (p == pat) {
+	    if (pp)
+		pp->next = p->next;
+	    else
+		compstyles = p->next;
+	    if (p == lcompstyles)
+		lcompstyles = pp;
+
+	    p->next = NULL;
+	    zsfree(p->pat);
+	    freepatprog(p->prog);
+	    freecstyle(p->styles);
+	    zfree(p, sizeof(*p));
+
+	    return;
+	}
+}
+
+static Cstyle
+lookupcstyle(char *ctxt, char *style)
+{
+    Cspat p;
+    Cstyle s;
+
+    for (p = compstyles; p; p = p->next)
+	if (pattry(p->prog, ctxt))
+	    for (s = p->styles; s; s = s->next)
+		if (!strcmp(style, s->name))
+		    return s;
+
+    return NULL;
+}
+
+static int
+bin_compstyles(char *nam, char **args, char *ops, int func)
+{
+    int min, max, n;
+
+    if (args[0][0] != '-' || !args[0][1] || args[0][2]) {
+	zerrnam(nam, "invalid argument: %s", args[0], 0);
+	return 1;
+    }
+    switch (args[0][1]) {
+    case 'a': min = 3; max = -1; break;
+    case 'd': min = 0; max =  2; break;
+    case 'S': min = 3; max =  3; break;
+    case 'A': min = 3; max =  3; break;
+    case 'H': min = 3; max =  3; break;
+    case 'T': min = 2; max =  2; break;
+    case 'G': min = 1; max =  3; break;
+    default:
+	zerrnam(nam, "invalid option: %s", args[0], 0);
+	return 1;
+    }
+    n = arrlen(args) - 1;
+    if (n < min) {
+	zerrnam(nam, "not enough arguments", NULL, 0);
+	return 1;
+    } else if (max >= 0 && n > max) {
+	zerrnam(nam, "too many arguments", NULL, 0);
+	return 1;
+    }
+    switch (args[0][1]) {
+    case 'a':
+	{
+	    Cspat p;
+
+	    if (!(p = getcspat(args[1]))) {
+		Patprog prog;
+		char *pat = dupstring(args[1]);
+
+		tokenize(pat);
+
+		if (!(prog = patcompile(pat, PAT_ZDUP, NULL))) {
+		    zerrnam(nam, "invalid pattern: %s", args[1], 0);
+		    return 1;
+		}
+		p = addcspat(args[1], prog);
+	    }
+	    setcstyle(p, args[2], args + 3);
+	}
+	break;
+    case 'd':
+	{
+	    Cspat p;
+
+	    if (args[1]) {
+		if ((p = getcspat(args[1]))) {
+		    if (args[2]) {
+			deletecstyle(p, args[2]);
+			if (!p->styles)
+			    deletecspat(p);
+		    } else
+			deletecspat(p);
+		}
+	    } else {
+		freecspat(compstyles);
+		compstyles = lcompstyles = NULL;
+	    }
+	}
+	break;
+    case 'S':
+	{
+	    Cstyle s;
+	    char *ret;
+	    int val;
+
+	    if ((s = lookupcstyle(args[1], args[2])) && s->vals[0]) {
+		PERMALLOC {
+		    ret = sepjoin(s->vals, NULL);
+		} LASTALLOC;
+		val = 0;
+	    } else {
+		ret = ztrdup("");
+		val = 1;
+	    }
+	    setsparam(args[3], ret);
+
+	    return val;
+	}
+	break;
+    case 'A':
+    case 'H':
+	{
+	    Cstyle s;
+	    char **ret;
+	    int val;
+
+	    if ((s = lookupcstyle(args[1], args[2]))) {
+		PERMALLOC {
+		    ret = arrdup(s->vals);
+		} LASTALLOC;
+		val = 0;
+	    } else {
+		char *dummy = NULL;
+
+		PERMALLOC {
+		    ret = arrdup(&dummy);
+		} LASTALLOC;
+		val = 1;
+	    }
+	    if (args[0][1] == 'A')
+		setaparam(args[3], ret);
+	    else
+		sethparam(args[3], ret);
+
+	    return val;
+	}
+	break;
+    case 'T':
+	return !lookupcstyle(args[1], args[2]);
+    case 'G':
+	{
+	    LinkList l = newlinklist();
+	    int ret = 1;
+	    Cspat p;
+
+	    if (args[2]) {
+		if ((p = getcspat(args[2]))) {
+		    Cstyle s;
+
+		    if (args[3]) {
+			if ((s = getcstyle(p, args[3]))) {
+			    char **v = s->vals;
+
+			    while (*v)
+				addlinknode(l, *v++);
+
+			    ret = 0;
+			}
+		    } else {
+			for (s = p->styles; s; s = s->next)
+			    addlinknode(l, s->name);
+
+			ret = 0;
+		    }
+		}
+	    } else {
+		for (p = compstyles; p; p = p->next)
+		    addlinknode(l, p->pat);
+
+		ret = 0;
+	    }
+	    set_list_array(args[1], l);
+
+	    return ret;
+	}
+    }
+    return 0;
+}
+
+typedef struct ctags *Ctags;
+typedef struct ctset *Ctset;
+
+struct ctags {
+    char **all;
+    char *context;
+    int init;
+    Ctset sets;
+};
+
+struct ctset {
+    Ctset next;
+    char **tags;
+};
+
+/* Array of tag-set infos. Index is the locallevel. */
+
+#define MAX_TAGS 256
+static Ctags comptags[MAX_TAGS];
+
+/* locallevel at last comptags -i */
+
+static int lasttaglevel;
+
+static void
+freectset(Ctset s)
+{
+    Ctset n;
+
+    while (s) {
+	n = s->next;
+
+	freearray(s->tags);
+	zfree(s, sizeof(*s));
+
+	s = n;
+    }
+}
+
+static void
+freectags(Ctags t)
+{
+    if (t) {
+	freearray(t->all);
+	zsfree(t->context);
+	freectset(t->sets);
+	zfree(t, sizeof(*t));
+    }
+}
+
+static void
+settags(char **tags)
+{
+    Ctags t;
+
+    if (comptags[locallevel])
+	freectags(comptags[locallevel]);
+
+    comptags[locallevel] = t = (Ctags) zalloc(sizeof(*t));
+
+    PERMALLOC {
+	t->all = arrdup(tags + 1);
+    } LASTALLOC;
+    t->context = ztrdup(*tags);
+    t->sets = NULL;
+    t->init = 1;
+}
+
+static int
+arrcontains(char **a, char *s)
+{
+    while (*a)
+	if (!strcmp(s, *a++))
+	    return 1;
+
+    return 0;
+}
+
+static int
+bin_comptags(char *nam, char **args, char *ops, int func)
+{
+    int min, max, n;
+
+    if (incompfunc != 1) {
+	zerrnam(nam, "can only be called from completion function", NULL, 0);
+	return 1;
+    }
+    if (args[0][0] != '-' || !args[0][1] || args[0][2]) {
+	zerrnam(nam, "invalid argument: %s", args[0], 0);
+	return 1;
+    }
+    if (locallevel >= MAX_TAGS) {
+	zerrnam(nam, "nesting level too deep", NULL, 0);
+	return 1;
+    }
+    if (args[0][1] != 'i' && !comptags[locallevel]) {
+	zerrnam(nam, "no tags registered", NULL, 0);
+	return 1;
+    }
+    switch (args[0][1]) {
+    case 'i': min = 2; max = -1; break;
+    case 'C': min = 1; max =  1; break;
+    case 'T': min = 0; max =  0; break;
+    case 'N': min = 0; max =  0; break;
+    case 'R': min = 1; max =  1; break;
+    case 'S': min = 1; max =  1; break;
+    default:
+	zerrnam(nam, "invalid option: %s", args[0], 0);
+	return 1;
+    }
+    n = arrlen(args) - 1;
+    if (n < min) {
+	zerrnam(nam, "not enough arguments", NULL, 0);
+	return 1;
+    } else if (max >= 0 && n > max) {
+	zerrnam(nam, "too many arguments", NULL, 0);
+	return 1;
+    }
+    switch (args[0][1]) {
+    case 'i':
+	settags(args + 1);
+	lasttaglevel = locallevel;
+	break;
+    case 'C':
+	setsparam(args[1], ztrdup(comptags[locallevel]->context));
+	break;
+    case 'T':
+	return !comptags[locallevel]->sets;
+    case 'N':
+	{
+	    Ctset s;
+
+	    if (comptags[locallevel]->init)
+		comptags[locallevel]->init = 0;
+	    else if ((s = comptags[locallevel]->sets)) {
+		comptags[locallevel]->sets = s->next;
+		s->next = NULL;
+		freectset(s);
+	    }
+	    return !comptags[locallevel]->sets;
+	}
+    case 'R':
+	{
+	    Ctset s;
+
+	    return !((s = comptags[locallevel]->sets) &&
+		     arrcontains(s->tags, args[1]));
+	}
+    case 'S':
+	if (comptags[locallevel]->sets) {
+	    char **ret;
+
+	    PERMALLOC {
+		ret = arrdup(comptags[locallevel]->sets->tags);
+	    } LASTALLOC;
+
+	    setaparam(args[1], ret);
+	} else
+	    return 1;
+
+	break;
+    }
+    return 0;
+}
+
+static int
+bin_comptry(char *nam, char **args, char *ops, int func)
+{
+    if (incompfunc != 1) {
+	zerrnam(nam, "can only be called from completion function", NULL, 0);
+	return 1;
+    }
+    if (!lasttaglevel || !comptags[lasttaglevel]) {
+	zerrnam(nam, "no tags registered", NULL, 0);
+	return 1;
+    }
+    if (*args) {
+	char **p, **q, **all;
+
+	args = arrdup(args);
+
+	for (p = q = args, all = comptags[lasttaglevel]->all; *p; p++)
+	    if (arrcontains(all, *p))
+		*q++ = *p;
+	*q = NULL;
+
+	if (*args) {
+	    Ctset s = (Ctset) zalloc(sizeof(*s)), l;
+
+	    PERMALLOC {
+		s->tags = arrdup(args);
+	    } LASTALLOC;
+	    s->next = NULL;
+
+	    if ((l = comptags[lasttaglevel]->sets)) {
+		while (l->next)
+		    l = l->next;
+
+		l->next = s;
+	    } else
+		comptags[lasttaglevel]->sets = s;
+	}
+    }
+    return 0;
+}
+
 static struct builtin bintab[] = {
     BUILTIN("compdisplay", 0, bin_compdisplay, 2, -1, 0, NULL, NULL),
     BUILTIN("compdescribe", 0, bin_compdescribe, 3, -1, 0, NULL, NULL),
     BUILTIN("comparguments", 0, bin_comparguments, 1, -1, 0, NULL, NULL),
     BUILTIN("compvalues", 0, bin_compvalues, 1, -1, 0, NULL, NULL),
     BUILTIN("compquote", 0, bin_compquote, 1, -1, 0, NULL, NULL),
+    BUILTIN("compstyles", 0, bin_compstyles, 1, -1, 0, NULL, NULL),
+    BUILTIN("comptags", 0, bin_comptags, 1, -1, 0, NULL, NULL),
+    BUILTIN("comptry", 0, bin_comptry, 0, -1, 0, NULL, NULL),
 };
 
 
@@ -1992,6 +2572,12 @@ setup_computil(Module m)
 {
     memset(cadef_cache, 0, sizeof(cadef_cache));
     memset(cvdef_cache, 0, sizeof(cvdef_cache));
+
+    compstyles = NULL;
+
+    memset(comptags, 0, sizeof(comptags));
+
+    lasttaglevel = 0;
 
     return 0;
 }
@@ -2020,9 +2606,14 @@ finish_computil(Module m)
     int i;
 
     for (i = 0; i < MAX_CACACHE; i++)
-	free_cadef(cadef_cache[i]);
+	freecadef(cadef_cache[i]);
     for (i = 0; i < MAX_CVCACHE; i++)
-	free_cvdef(cvdef_cache[i]);
+	freecvdef(cvdef_cache[i]);
+
+    freecspat(compstyles);
+
+    for (i = 0; i < MAX_TAGS; i++)
+	freectags(comptags[i]);
 
     return 0;
 }

@@ -2,9 +2,9 @@
 
 local format
 
-_tags any messages || return 1
+_tags messages || return 1
 
-format="${compconfig[message_format]:-$compconfig[description_format]}"
+_style -s messages format format || _style -s descriptions format format
 
 if [[ -n "$format" ]]; then
   if [[ $compstate[nmatches] -eq 0 ]]; then

@@ -14,19 +14,17 @@ else
   suf=(-qS/)
 fi
 
-_tags any users named-directoriess directory-stack
+_tags users named-directories directory-stack
 
 while _tags; do
   _requested users && _users "$suf[@]" "$@" && ret=0
-  if _requested named-directories; then
-    _description expl 'named directory'
-    compadd "$suf[@]" "$expl[@]" "$@" - "${(@k)nameddirs}"
-  fi
+  _requested named-directories expl 'named directory' &&
+      compadd "$suf[@]" "$expl[@]" "$@" - "${(@k)nameddirs}"
 
-  if _requested directory-stack &&
-     { ! _style directory-stack prefix-needed yes ||
+  if _requested directory-stack -V expl 'directory stack' &&
+     { ! _style directory-stack prefix-needed ||
        [[ "$PREFIX" = [-+]* ]] }; then
-    if _style directory-stack description yes; then
+    if _style directory-stack description; then
       integer i
 
       lines=("${PWD}" "${dirstack[@]}")
@@ -48,8 +46,6 @@ while _tags; do
       list=( ${PREFIX[1]}{0..${#dirstack}} )
       disp=()
     fi
-
-    _description -V expl 'directory stack'
     compadd "$expl[@]" "$suf[@]" "$disp[@]" -Q - "$list[@]" && ret=0
   fi
   (( ret )) || return 0

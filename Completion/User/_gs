@@ -8,10 +8,10 @@ if compset -N --; then
     return 1
   fi
 else
-  local context state line ret=1
+  local curcontext="$curcontext" state line ret=1
   typeset -A opt_args
 
-  _x_arguments \
+  _x_arguments -C \
     '-q[quiet startup]' \
     '-g-[set device size]:device size (<width>x<height>):' \
     '-r-[set resolution]:resolution (<val> or <x>x<y>):' \
@@ -25,38 +25,31 @@ else
     if [[ "$PREFIX" = *\=* ]]; then
       _message 'systemdict definition value'
     else
-      _tags "$context" names || return 1
-
-      _description expl 'systemdict definition name'
-      compadd "$expl[@]" -M 'm:{a-z}={A-Z}' - \
-              DISKFONTS NOCACHE NOBIND NODISPLAY NOPAUSE PLATFONTS SAFER \
-              WRITESYSTEMDICT && ret=0
+      _wanted names expl 'systemdict definition name' &&
+          compadd "$expl[@]" -M 'm:{a-z}={A-Z}' - \
+                  DISKFONTS NOCACHE NOBIND NODISPLAY NOPAUSE PLATFONTS SAFER \
+                  WRITESYSTEMDICT && ret=0
     fi
     ;;
   sname)
     if compset -P '*\='; then
       case "$IPREFIX" in
       *DEVICE\=)
-        _tags "$context" devices || return 1
-
-        _description expl 'ghostscript device'
-        compadd "$expl[@]" - "${(@)${=${$(gs -h)##* devices:}%%Search path:*}:#}" && ret=0
+        _wanted devices expl 'ghostscript device' &&
+            compadd "$expl[@]" - "${(@)${=${$(gs -h)##* devices:}%%Search path:*}:#}" && ret=0
         ;;
       *OutputFile\=)
-        _tags "$context" files || return 1
-
         _description expl 'output file'
-        _files && ret=0
+        _files "$expl[@]" && ret=0
         ;;
       *)
         _message 'systemdict value'
         return 1
       esac
     else
-      _tags "$context" names || return 1
-
-      _description expl 'systemdict name'
-      compadd "$expl[@]" -S\= -M 'm:{a-z}={A-Z}' - DEVICE OutputFile && ret=0
+      _wanted names expl 'systemdict name' &&
+          compadd "$expl[@]" -S\= -M 'm:{a-z}={A-Z}' - DEVICE OutputFile &&
+              ret=0
     fi
     ;;
   esac

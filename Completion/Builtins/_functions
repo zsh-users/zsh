@@ -2,7 +2,5 @@
 
 local expl
 
-_tags argument:any functions || return 1
-
-_description expl 'shell function'
-compadd "$expl[@]" "$@" - "${(k@)functions}"
+_wanted functions expl 'shell function' &&
+    compadd "$expl[@]" "$@" - "${(k@)functions}"

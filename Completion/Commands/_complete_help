@@ -1,0 +1,35 @@
+#compdef -k complete-word \C-xh
+
+_complete_help() {
+  local _sort_tags=_help_sort_tags text i
+  typeset -A help_tags
+  typeset -U help_contexts
+
+  help_contexts=()
+
+  compadd() { return 1 }
+
+  _main_complete
+
+  unfunction compadd
+
+  for i in "$help_contexts[@]"; do
+    text="${text}
+tags in context \`${i}': ${help_tags[$i]}"
+  done
+
+  compstate[list]=list
+  compstate[force_list]=yes
+  compstate[insert]=''
+
+  compadd -UX "$text[2,-1]" -n ''
+}
+
+_help_sort_tags() {
+  help_contexts=( "$help_contexts[@]" "$curcontext" )
+  help_tags[$curcontext]="${help_tags[$curcontext]}
+    ${argv}"
+  comptry "$@"
+}
+
+_complete_help "$@"

@@ -5,25 +5,8 @@
 # If configurations keys with the prefix `expandword_' are
 # given they override those starting with `expand_'.
 
-local oes="$compconfig[expand_substitute]"
-local oeg="$compconfig[expand_glob]"
-local oem="$compconfig[expand_menu]"
-local oeo="$compconfig[expand_original]"
-local oep="$compconfig[expand_prompt]"
-local oec="$compconfig[expand_completions]"
+local curcontext="$curcontext"
 
-compconfig[expand_substitute]="${compconfig[expandword_substitute]}"
-compconfig[expand_glob]="${compconfig[expandword_glob]-$oeg}"
-compconfig[expand_menu]="${compconfig[expandword_menu]-$oem}"
-compconfig[expand_original]="${compconfig[expandword_original]-$oeo}"
-compconfig[expand_prompt]="${compconfig[expandword_prompt]-$oep}"
-compconfig[expand_completions]="${compconfig[expandword_completions]-$oec}"
+[[ -z "$curcontext" ]] && curcontext=":expand-word"
 
 _main_complete _expand
-
-compconfig[expand_substitute]="$oes"
-compconfig[expand_glob]="$oeg"
-compconfig[expand_menu]="$oem"
-compconfig[expand_original]="$oeo"
-compconfig[expand_prompt]="$oep"
-compconfig[expand_completions]="$oec"

@@ -329,7 +329,9 @@ _regex_arguments () {
   local regex index first last nullable
   local i state next
 
-  local cache_dir="${compconfig[regex_arguments_path]:-$HOME/.zsh/regex_arguments}"
+  local cache_dir
+  _style -s regex argument-path cache_dir
+  [[ -z "$cache_dir" ]] && cache_dir="$HOME/.zsh/regex_arguments"
   local cache_file="$cache_dir/$1"
   local cache_test
 

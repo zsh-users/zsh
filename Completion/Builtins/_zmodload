@@ -3,15 +3,11 @@
 local fl="$words[2]" expl
 
 if [[ "$fl" = -*(a*u|u*a)* || "$fl" = -*a* && CURRENT -ge 4 ]]; then
-  _tags any:argument builtins || return 1
-  _description expl 'builtin command'
-  compadd "$expl[@]" "$@" - "${(k@)builtins}" && ret=0
+  _wanted builtins expl 'builtin command' &&
+      compadd "$expl[@]" "$@" - "${(k@)builtins}"
 elif [[ "$fl" = -*u* ]]; then
-  _tags any:argument modules || return 1
-  _description expl module
-  compadd "$expl[@]" - "${(@k)modules}"
+  _wanted modules expl module && compadd "$expl[@]" - "${(@k)modules}"
 else
-  _tags any:argument files || return 1
-  _description expl 'module file'
-  compadd "$expl[@]" - ${^module_path}/*.s[ol](N:t:r)
+  _wanted files expl 'module file' &&
+      compadd "$expl[@]" - ${^module_path}/*.s[ol](N:t:r)
 fi

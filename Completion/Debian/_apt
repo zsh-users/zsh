@@ -75,7 +75,7 @@ _apt_arguments () {
   nul=$'\0'
   qnul="\$'\\0'"
 
-  comp_bool='compadd "$expl_bool[@]" '"$bool"
+  comp_bool='_tags values && compadd "$expl_bool[@]" '"$bool"
   comp_intlevel= #"_message 'intlevel'"
   comp_configfile='_files "$expl_configfile[@]"'
   comp_arbitem= #"_message 'Foo::Bar=bar'"
@@ -106,7 +106,7 @@ tmp2=("$tmp2[@]" $_ra_left${(M)^short_bool:#$~tmp1} $_ra_left${(M)^short_intleve
 tmp3=("$tmp3[@]" $_ra_left${(M)^short_hasarg:#$~tmp1} $_ra_left${(M)^short_configfile:#$~tmp1} $_ra_left${(M)^short_arbitem:#$~tmp1})
 _describe -o option tmp2 -- tmp3 -S='
 
-  comp_opt='[[ -prefix - || -z "$compconfig[option_prefix]" || "$compconfig[option_prefix]" = *\!$words[1]* ]]'" && { $comp_short; $comp_long }"
+  comp_opt='{ ! _style options prefix-needed || [[ "$PREFIX" = -* ]] } && { $comp_short; $comp_long }"
 
   regex_short=()
   regex_long=()
@@ -384,7 +384,7 @@ _apt-get () {
     /$'check\0'/ \| \
     /$'source\0'/ /$'[^\0]#\0'/ :'_deb_packages avail "$expl_packages[@]"' \# \| \
     /$'help\0/' \| \
-    /"[]"/	:'compadd "$expl_action[@]" update upgrade install remove dist-upgrade dselect-upgrade clean autoclean check source help'
+    /"[]"/	:'_tags actions && compadd "$expl_action[@]" update upgrade install remove dist-upgrade dselect-upgrade clean autoclean check source help'
 
   _apt-get () {
     local expl_action expl_packages
@@ -422,7 +422,7 @@ _apt-cache () {
     /$'search\0'/ \| \
     /$'show\0'/ /$'[^\0]#\0'/ :'_deb_packages avail "$expl_packages[@]"' \# \| \
     /$'depends\0'/ \| \
-    /"[]"/ :'compadd "$expl_action[@]" help add gencaches showpkg stats dump dumpavail unmet check search show depends'
+    /"[]"/ :'_tags actions && compadd "$expl_action[@]" help add gencaches showpkg stats dump dumpavail unmet check search show depends'
 
   _apt-cache () {
     local expl_action expl_packages expl_pkg_cache expl_src_cache
@@ -451,7 +451,7 @@ _apt-cdrom () {
     -o,--option:arbitem \
     -- \
     /$'add\0'/ \| \
-    /"[]"/	:'compadd "$expl_action[@]" add'
+    /"[]"/	:'_tags actions && compadd "$expl_action[@]" add'
 
   _apt-cdrom () {
     local expl_action expl_mount_point
@@ -473,11 +473,11 @@ _apt-config () {
     -- \
     /$'shell\0'/ \
       \( \
-	/$'[^\0]#\0'/ :'compadd "$expl_shell_var[@]" - "${(@k)parameters}"' \
-	/$'[^\0]#\0'/ :'compadd "$expl_config_key[@]" - ${${(f)"$(apt-config dump 2>&1)"}% *}' \
+	/$'[^\0]#\0'/ :'_tags parameters && compadd "$expl_shell_var[@]" - "${(@k)parameters}"' \
+	/$'[^\0]#\0'/ :'_tags configuration-keys && compadd "$expl_config_key[@]" - ${${(f)"$(apt-config dump 2>&1)"}% *}' \
       \) \# \| \
     /$'dump\0'/ \| \
-    /"[]"/	:'compadd "$expl_action[@]" shell dump'
+    /"[]"/	:'_tags actions && compadd "$expl_action[@]" shell dump'
 
   _apt-config () {
     local expl_action expl_shell_var expl_config_key

@@ -20,30 +20,39 @@
 
 # cf. XrmParseCommand(3X11), X11R6.4/xc/lib/Xt/Initialize.c, X(5)
 
-local ret
+local ret long xargs
 
-_arguments \
-  -+{rv,synchronous} \
-  -{reverse,iconic} \
-  '-background:background color:_x_color' \
-  '-bd:border color:_x_color' \
-  '-bg:background color:_x_color' \
-  '-bordercolor:border color:_x_color' \
-  '-borderwidth:border width:_x_borderwidth' \
-  '-bw:border width:_x_borderwidth' \
-  '-display:display:_x_display' \
-  '-fg:foreground color:_x_color' \
-  '-font:font:_x_font' \
-  '-fn:font:_x_font' \
-  '-foreground:foreground color:_x_color' \
-  '-geometry:geometry:_x_geometry' \
-  '-name:name:_x_name' \
-  '-selectionTimeout:selection timeout (milliseconds):_x_selection_timeout' \
-  '-title:title:_x_title' \
-  '-xnllanguage:locale:_x_locale' \
-  '-xrm:resource:_x_resource' \
-  '-xtsessionID:session ID:_xt_session_id' \
-  "$@"
+xargs=(
+  -+{rv,synchronous}
+  -{reverse,iconic}
+  '-background:background color:_x_color'
+  '-bd:border color:_x_color'
+  '-bg:background color:_x_color'
+  '-bordercolor:border color:_x_color'
+  '-borderwidth:border width:_x_borderwidth'
+  '-bw:border width:_x_borderwidth'
+  '-display:display:_x_display'
+  '-fg:foreground color:_x_color'
+  '-font:font:_x_font'
+  '-fn:font:_x_font'
+  '-foreground:foreground color:_x_color'
+  '-geometry:geometry:_x_geometry'
+  '-name:name:_x_name'
+  '-selectionTimeout:selection timeout (milliseconds):_x_selection_timeout'
+  '-title:title:_x_title'
+  '-xnllanguage:locale:_x_locale'
+  '-xrm:resource:_x_resource'
+  '-xtsessionID:session ID:_xt_session_id'
+)
+
+long=$argv[(I)--]
+if (( long )); then
+  argv[long]=( "$xargs[@]" -- )
+else
+  set -- "$@" "$xargs[@]"
+fi
+
+_arguments "$@"
 
 ret=$?
 

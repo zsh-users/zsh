@@ -3,11 +3,8 @@
 local list expl
 
 if compset -P 1 -; then
-
-  _tags - -:signal signals || return 1
-
-  _description expl signal
-  compadd "$expl[@]" $signals[1,-3]
+  _wanted -C - expl signal &&
+      compadd "$expl[@]" $signals[1,-3]
 else
-  _alternative argument 'jobs:: _jobs' 'processes:: _pids'
+  _alternative -C argument 'jobs:: _jobs' 'processes:: _pids'
 fi

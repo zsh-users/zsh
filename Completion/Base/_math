@@ -9,4 +9,4 @@ if [[ "$SUFFIX" = *[^a-zA-Z0-9_]* ]]; then
   SUFFIX="${SUFFIX%%[^a-zA-Z0-9_]*}"
 fi
 
-_tags any parameters && _parameters
+_tags parameters && _parameters

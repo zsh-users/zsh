@@ -1,27 +1,28 @@
 #autoload
 
-local subopts
+local subopts opt usecc
 
-if [[ "$1" = -O?* ]]; then
-  subopts=( "${(@P)1[3,-1]}" )
-  shift
-if [[ "$1" = -O ]]; then
-  subopts=( "${(@P)1}" )
-  shift 2
-else
-  subopts=()
-fi
+subopts=()
+while getopts ':O:C' opt; do
+  if [[ "$opt" = O ]]; then
+    subopts=( "${(@P)OPTARG}" )
+  else
+    usecc=yes
+  fi
+done
+
+shift OPTIND-1
 
 if compvalues -i "$@"; then
 
-  local noargs args opts descr action expl sep _sub_context oldsc="$_sub_context"
+  local noargs args opts descr action expl sep subc
+  local oldcontext="$curcontext"
 
   if ! compvalues -D descr action; then
 
-    compvalues -C _sub_context
-    _sub_context="${oldsc}:${oldsc+${oldsc}-}${_sub_context}"
+    _tags values || return 1
 
-    _tags "${_sub_context}" values || return 1
+    curcontext="${oldcontext}:values"
 
     compvalues -V noargs args opts
 
@@ -47,8 +48,8 @@ if compvalues -i "$@"; then
         PREFIX="$prefix"
 	SUFFIX="$suffix"
         IPREFIX="${IPREFIX}${args[1]%%:*}="
-	compvalues -L "${args[1]%%:*}" descr action _sub_context
-        _sub_context="${oldsc}:${oldsc+${oldsc}-}${_sub_context}"
+	compvalues -L "${args[1]%%:*}" descr action subc
+	curcontext="${oldcontext}:$subc"
       fi
     else
       compvalues -d descr
@@ -63,14 +64,19 @@ if compvalues -i "$@"; then
         args -S= -M 'r:|[_-]=* r:|=*' -- \
         opts -qS= -M 'r:|[_-]=* r:|=*'
 
+      curcontext="$oldcontext"
+
       return
     fi
   else
-    compvalues -C _sub_context
-    _sub_context="${oldsc}:${oldsc+${oldsc}-}${_sub_context}"
+    compvalues -C subc
+    curcontext="${oldcontext}:$subc"
   fi
 
-  _tags "${oldsc}:any" arguments || return 1
+  if ! _tags arguments; then
+    curcontext="$oldcontext"
+    return 1
+  fi
 
   _description expl "$descr"
 
@@ -83,6 +89,11 @@ if compvalues -i "$@"; then
   if [[ "$action" = -\>* ]]; then
     compvalues -v val_args
     state="${${action[3,-1]##[ 	]#}%%[ 	]#}"
+    if [[ -n "$usecc" ]]; then
+      curcontext="$subc"
+    else
+      context="$subc"
+    fi
     compstate[restore]=''
     return 1
   else
@@ -131,7 +142,11 @@ if compvalues -i "$@"; then
     fi
   fi
 
+  curcontext="$oldcontext"
+
   [[ nm -ne "$compstate[nmatches]" ]]
 else
+  curcontext="$oldcontext"
+
   return 1;
 fi

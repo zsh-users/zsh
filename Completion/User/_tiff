@@ -19,12 +19,12 @@ fi
 
 local _in_tiff=yes
 
-local context state line ret=1
+local curcontext="$curcontext" state line ret=1
 typeset -A opt_args
 
 case "$words[1]" in
 tiff2bw)
-  _arguments \
+  _arguments -C \
     '-c[specify compression scheme]:compression scheme:->compress' \
     '-r[specify rows per strip]:rows per strip:' \
     '-R[specify percentage of red channel]:percentage of red channel:' \
@@ -59,7 +59,7 @@ tiffcmp)
     ':second input TIFF file:_files -g \*.\(\#i\)' && ret=0
   ;;
 tiffcp)
-  _arguments \
+  _arguments -C \
     '-B[write output in bin-endian byte order]' \
     '-c[specify compression scheme]:compression scheme:->compress' \
     '-o[set initial TIFF directory (file offset)]:file offset:' \
@@ -74,7 +74,7 @@ tiffcp)
     '*:input TIFF file:_files -g \*.\(\#i\)' && ret=0
   ;;
 tiffdither)
-  _arguments \
+  _arguments -C \
     '-c[specify compression scheme]:compression scheme:->compress' \
     '-f[specify fill order]:fill order:(lsb2msb msb2lsb)' \
     '-r[specify rows per strip]:rows per strip:' \
@@ -102,7 +102,7 @@ tiffinfo)
     '*:input TIFF file:_files -g \*.\(\#i\)' && ret=0
   ;;
 tiffmedian)
-  _arguments \
+  _arguments -C \
     '-r[specify rows per strip]:rows per strip:' \
     '-C[specify number of colormap entries]:number of colormap entries:' \
     '-c[specify compression scheme]:compression scheme:->compress' \
@@ -135,14 +135,14 @@ fax2tiff)
     ':FAX input file:_files -g \*.\(\#i\)\(g\[34\]\|fax\)' && ret=0
   ;;
 gif2tiff)
-  _arguments \
+  _arguments -C \
     '-r[specify rows per strip]:rows per strip:' \
     '-c[specify compression scheme]:compression scheme:->compress' \
     ':input GIF file:_files -g \*.\(\#i\)gif' \
     ':output file:_files -g \*.\(\#i\)tiff' && ret=0
   ;;
 ppm2tiff)
-  _arguments \
+  _arguments -C \
     '-r[specify rows per strip]:rows per strip:' \
     '-c[specify compression scheme]:compression scheme:->compress' \
     '-R[specify resolution]:resolution:' \
@@ -150,14 +150,14 @@ ppm2tiff)
     ':output file:_files -g \*.\(\#i\)tiff' && ret=0
   ;;
 ras2tiff)
-  _arguments \
+  _arguments -C \
     '-r[specify rows per strip]:rows per strip:' \
     '-c[specify compression scheme]:compression scheme:->compress' \
     ':input raster image file:_files -g \*.\(\#i\)ras\(\|t\)' \
     ':output file:_files -g \*.\(\#i\)tiff' && ret=0
   ;;
 pal2rgb)
-  _arguments \
+  _arguments -C \
     '-C[specify number of bits for colormap entries]:bits for colormap entries:(8 16)' \
     '-p[set sample packing]:sample packing:(contig separate)' \
     '-c[specify compression scheme]:compression scheme:->compress' \
@@ -194,11 +194,10 @@ if [[ -n "$state" ]]; then
       ;;
     esac
   else
-    _tags "$context" values || return 1
-
-    _description expl 'compression scheme'
-    compadd "$expl[@]" - none g4 packbits && ret=0
-    compadd "$expl[@]" -qS: - lzw zip jpeg g3 && ret=0
+    if _wanted values expl 'compression scheme'; then
+      compadd "$expl[@]" - none g4 packbits && ret=0
+      compadd "$expl[@]" -qS: - lzw zip jpeg g3 && ret=0
+    fi
   fi
 fi
 

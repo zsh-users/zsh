@@ -27,4 +27,4 @@ fi
 
 args=( "$@" )
 
-_alternative -O args any "$defs[@]"
+_alternative -O args "$defs[@]"

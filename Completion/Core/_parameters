@@ -5,14 +5,11 @@
 
 local pars expl
 
-_tags any parameters || return 1
-
-_description expl parameter
+_wanted parameters expl parameter || return 1
 
 pars=( ${(k)parameters[(R)^*local*]} )
 
 compadd "$expl[@]" "$@" - $pars
-
 
 
 # The `-e' option does everything for parameter expansions of us. If

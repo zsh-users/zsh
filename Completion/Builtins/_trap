@@ -6,8 +6,5 @@ if [[ CURRENT -eq 2 ]]; then
   compset -q
   _normal
 else
-  _tags any:argument signals || return 1
-
-  _description expl signal
-  compadd "$expl[@]" - "$signals[@]"
+  _wanted signals expl signal && compadd "$expl[@]" - "$signals[@]"
 fi

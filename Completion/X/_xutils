@@ -49,9 +49,9 @@ xhost)
   local expl type ret=1
 
   if compset -P '-'; then
-    _description expl 'disallow access'
-    compadd "$expl[@]" -M 'm:{a-z}={A-Z} r:|[:.]=* r:|=*' - \
-        "${${(@M)${(@f)$(xhost)}[2,-1]:#LOCAL:*}#INET:}"
+    _wanted displays expl 'disallow access' &&
+        compadd "$expl[@]" -M 'm:{a-z}={A-Z} r:|[:.]=* r:|=*' - \
+                "${${(@M)${(@f)$(xhost)}[2,-1]:#LOCAL:*}#INET:}"
   else
     compset -P +
 
@@ -66,9 +66,9 @@ xhost)
       krb)  _message 'Kerberos V5 principal';;
       esac
     else
-      _description expl 'name family'
-      compadd -S: - inet dnet nis krb && ret=0
-      _hosts && ret=0
+      _alternative \
+          'families:name family:compadd -S: - inet dnet nis krb' \
+	  'hosts:: _hosts' && ret=0
     fi
     return ret
   fi

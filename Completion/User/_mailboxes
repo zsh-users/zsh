@@ -1,7 +1,7 @@
 #autoload
 
-emulate -L zsh
-setopt nullglob
+#emulate -L zsh
+setopt localoptions nullglob
 
 # This is still needlessly mutt-biased and should be fixed.
 
@@ -12,35 +12,31 @@ local maildirectory="${maildirectory:-~/Mail}"
 
 if (( ! $+_mailbox_cache )) then
 
-[[ -f ${~muttrc:-.} ]] && muttboxes=( ${$(grep mailboxes ${~muttrc})[2,-1]} )
+  [[ -f ${~muttrc:-.} ]] && muttboxes=( ${$(grep mailboxes ${~muttrc})[2,-1]} )
 
-mboxes=( ${~maildirectory}/*(^/) ${~pinedirectory}/**/*(.) )
-dirboxes=( ${~maildirectory}/*(/) )
+  mboxes=( ${~maildirectory}/*(^/) ${~pinedirectory}/**/*(.) )
+  dirboxes=( ${~maildirectory}/*(/) )
 
-while (( $#dirboxes ))
-do 
+  while (( $#dirboxes )); do
     i=$dirboxes[1]
     shift dirboxes
-    if [[ -d "$i/cur" ]]
-    then
-	maildirboxes=( $maildirboxes $i )
-    elif j=( $i/<1-> ) && [[ -n "$j" ]]
-    then
-	MHboxes=( $MHboxes $i )
+    if [[ -d "$i/cur" ]]; then
+      maildirboxes=( $maildirboxes $i )
+    elif j=( $i/<1-> ) && [[ -n "$j" ]]; then
+      MHboxes=( $MHboxes $i )
     else
-	mboxes=( $mboxes $i/*(.) )
-	dirboxes=( $dirboxes $i/*(/) )
+      mboxes=( $mboxes $i/*(.) )
+      dirboxes=( $dirboxes $i/*(/) )
     fi
-done
+  done
 
-[[ -n "$muttboxes" || -d ~/.elm || -d ~/.mutt ]] &&
-    _mailbox_cache=(\! \< \> $muttboxes)
-[[ -n "$mailpath" ]] &&
-    _mailbox_cache=($_mailbox_cache ${mailpath//\?*/})
+  [[ -n "$muttboxes" || -d ~/.elm || -d ~/.mutt ]] &&
+      _mailbox_cache=(\! \< \> $muttboxes)
+  [[ -n "$mailpath" ]] &&
+      _mailbox_cache=($_mailbox_cache ${mailpath//\?*/})
 
-_mailbox_cache=($_mailbox_cache $mboxes $maildirboxes $MHboxes)
-
+  _mailbox_cache=($_mailbox_cache $mboxes $maildirboxes $MHboxes)
 fi
 
-_description expl 'mailbox specification'
-compadd "$@" "$expl[@]" - "$_mailbox_cache[@]"
+_wanted files expl 'mailbox specification' &&
+    compadd "$@" "$expl[@]" - "$_mailbox_cache[@]"

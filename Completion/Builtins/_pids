@@ -3,23 +3,25 @@
 # If given the `-m <pattern>' option, this tries to complete only pids
 # of processes whose command line match the `<pattern>'.
 
-local list expl match desc
+local list expl match desc listargs args
 
-_tags any processes || return 1
+_wanted processes expl 'process ID' || return 1
 
 if [[ "$1" = -m ]]; then
   match="${2}*"
   shift 2
 fi
 
-_description expl 'process ID'
+_style -a ps list-arguments listargs
+_style -a ps arguments args
+(( $#listargs )) || listargs=( "$args[@]" )
 
-if _style processes description yes; then
-  list=("${(@Mr:COLUMNS-1:)${(f@)$(ps ${=compconfig[ps_listargs]:-$=compconfig[ps_args]} 2>/dev/null)}[2,-1]:#[ 	]#${PREFIX}[0-9]#${SUFFIX}[ 	]*${~match}}")
+if _style processes description; then
+  list=("${(@Mr:COLUMNS-1:)${(f@)$(ps $listargs 2>/dev/null)}[2,-1]:#[ 	]#${PREFIX}[0-9]#${SUFFIX}[ 	]*${~match}}")
   desc=(-ld list)
 else
   desc=()
 fi
 
 compadd "$expl[@]" "$@" "$desc[@]" - \
-  ${${${(M)${(f)"$(ps $=compconfig[ps_args] 2>/dev/null)"}[2,-1]:#*${~match}}## #}%% *}
+    ${${${(M)${(f)"$(ps $args 2>/dev/null)"}[2,-1]:#*${~match}}## #}%% *}
