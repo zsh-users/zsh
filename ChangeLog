@@ -1,3 +1,8 @@
+2005-03-21  Peter Stephenson  <pws@csr.com>
+
+	* 21045: Src/Zle/compcore.c, Src/Zle/complete.c: more places
+	where completion didn't handled Meta characters.
+
 2005-03-21  Oliver Kiddle  <opk@zsh.org>
 
 	* Stephen Rüger: 21019: Completion/Unix/Command/_mpc:

@@ -1532,8 +1532,8 @@ set_comp_sep(void)
 	    untokenize(ss);
 	    compsuffix = ztrdup(ss);
 	}
-        if ((i = strlen(compprefix)) &&
-            compprefix[i - 1] == '\\' && compprefix[i - 2] != '\\')
+        if ((i = strlen(compprefix)) > 1 && compprefix[i - 1] == '\\' &&
+	    compprefix[i - 2] != '\\' && compprefix[i - 2] != Meta)
             compprefix[i - 1] = '\0';
         
 	tmp = tricat(compqiprefix, compiprefix, multiquote(qp, 1));

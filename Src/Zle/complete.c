@@ -821,18 +821,32 @@ do_comp_vars(int test, int na, char *sa, int nb, char *sb, int mod)
 		    add = -1;
 		} else {
 		    p = compprefix + 1;
+		    if (*p == Meta)
+			p++;
 		    add = 1;
 		}
-		for (; l; l--, p += add) {
+		for (;;) {
 		    sav = *p;
 		    *p = '\0';
 		    test = pattry(pp, compprefix);
 		    *p = sav;
 		    if (test && !--na)
 			break;
+		    if (add > 0) {
+			if (p == compprefix + l)
+			    return 0;
+			if (*p == Meta)
+			    p += 2;
+			else
+			    p++;
+		    } else {
+			if (p == compprefix)
+			    return 0;
+			p--;
+			if (p > compprefix && p[-1] == Meta)
+			    p--;
+		    }
 		}
-		if (!l)
-		    return 0;
 		if (mod)
 		    ignore_prefix(p - compprefix);
 	    } else {
@@ -847,14 +861,30 @@ do_comp_vars(int test, int na, char *sa, int nb, char *sb, int mod)
 		    add = 1;
 		} else {
 		    p = compsuffix + l - 1;
+		    if (p > compsuffix && p[-1] == Meta)
+			p--;
 		    add = -1;
 		}
-		for (; l; l--, p += add)
+		for (;;) {
 		    if (pattry(pp, p) && !--na)
 			break;
 
-		if (!l)
-		    return 0;
+		    if (add > 0) {
+			if (p == compsuffix + l)
+			    return 0;
+			if (*p == Meta)
+			    p += 2;
+			else
+			    p++;
+		    } else {
+			if (p == compsuffix)
+			    return 0;
+			p--;
+			if (p > compsuffix && p[-1] == Meta)
+			    p--;
+		    }
+		}
+
 		if (mod)
 		    ignore_suffix(ol - (p - compsuffix));
 	    }
