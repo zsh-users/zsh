@@ -236,16 +236,8 @@ undefine([function_subdirs])
 AC_ARG_ENABLE(function-subdirs,
 [  --enable-function-subdirs  install functions in subdirectories])
 
-if test "x${FUNCTIONS_INSTALL+set}" != xset; then
-  FUNCTIONS_INSTALL="Core/* Base/* Builtins/* User/* Commands/* Debian/* Linux/* Bsd/* AIX/* X/* Zle/* Prompts/* Misc/*"
-  if test $dynamic != no; then
-    FUNCTIONS_INSTALL="${FUNCTIONS_INSTALL} Zftp/*"
-  fi
-fi
-
 if test "x${enable_function_subdirs}" != x -a \
-  "x${enable_function_subdirs}" != xno -a \
-  "x$FUNCTIONS_INSTALL" != x; then
+  "x${enable_function_subdirs}" != xno; then
   FUNCTIONS_SUBDIRS=yes
 else
   FUNCTIONS_SUBDIRS=no
@@ -253,7 +245,6 @@ fi
 
 AC_SUBST(fndir)dnl
 AC_SUBST(sitefndir)dnl
-AC_SUBST(FUNCTIONS_INSTALL)dnl
 AC_SUBST(FUNCTIONS_SUBDIRS)dnl
 
 dnl Do you want maildir support?
@@ -1733,15 +1724,19 @@ echo "# Values of \`auto' are \`yes' or \`no'. configure sets the value to"
 echo "# \`yes'.  If you set it by hand to \`no', the line will be retained"
 echo "# when the file is regenerated in future."
 echo "#"
+echo "# Note that the \`functions' entry extends to the end of the line."
+echo "# It should not be quoted; it is used verbatim to find files to install."
+echo "#"
 echo "# You will need to run \`config.status --recheck' if you add a new"
 echo "# module."
 echo "#"
 echo "# You should not change the values for the pseudo-module zsh/main,"
-echo "# which is the main shell."
+echo "# which is the main shell (apart from the functions entry)."
 for modfile in `cd ${srcdir}; echo */*.mdd */*/*.mdd`; do
   name=
   link=
   load=
+  functions=
   . ${srcdir}/$modfile
   if test x$name != x -a x"$link" != x; then
     case "$userlist" in
@@ -1758,26 +1753,32 @@ for modfile in `cd ${srcdir}; echo */*.mdd */*/*.mdd`; do
 	 *) load=" load=no"
 	    ;;
        esac
+       if test "x$functions" != x; then
+         # N.B. no additional quotes
+         f=" functions=$functions"
+       else
+         f=
+       fi
        case "$link" in
-	 static) echo "name=$name modfile=$modfile link=static auto=yes${load}"
+	 static) echo "name=$name modfile=$modfile link=static auto=yes${load}$f"
 	         ;;
 	 dynamic) if test $dynamic != no; then
 		    echo "name=$name modfile=$modfile link=dynamic\
- auto=yes${load}"
+ auto=yes${load}$f"
 		  else
 		    echo "name=$name modfile=$modfile link=no\
- auto=yes load=no"
+ auto=yes load=no$f"
 		  fi
 		  ;;
 	 either) if test $dynamic != no; then
 		   echo "name=$name modfile=$modfile link=dynamic\
- auto=yes${load}"
+ auto=yes${load}$f"
 		 else
 		   echo "name=$name modfile=$modfile link=static\
- auto=yes${load}"
+ auto=yes${load}$f"
 		 fi
 		 ;;
-	      *) echo "name=$name modfile=$modfile link=no auto=yes load=no"
+	      *) echo "name=$name modfile=$modfile link=no auto=yes load=no$f"
 		 ;;
        esac
        ;;
@@ -1803,7 +1804,7 @@ real_no_create=$no_create
 no_create=yes
 
 AC_OUTPUT(Config/defs.mk Makefile Doc/Makefile Etc/Makefile Src/Makefile \
-Test/Makefile Completion/Makefile Functions/Makefile, \
+Test/Makefile, \
 [test -z "$CONFIG_HEADERS" || echo > stamp-h])
 
 dnl The standard config.status is missing some essential features.
@@ -1848,7 +1849,7 @@ binary install path       : ${zshbin2}
 man page install path     : ${zshman}
 info install path         : ${zshinfo}"
 if test "$zshfndir" != no; then
-echo "functions install path    : ${zshfndir}
-installed functions       : ${FUNCTIONS_INSTALL}
-"
+  echo "functions install path    : ${zshfndir}"
 fi
+echo "See config.modules for installed modules and functions.
+"

@@ -77,14 +77,25 @@ install.man uninstall.man:
 
 # install/uninstall just the shell functions
 install.fns:
-	test x$(sitefndir) != xno && $(sdir_top)/mkinstalldirs $(DESTDIR)$(sitefndir)
-	@cd Completion && $(MAKE) $(MAKEDEFS) $@
-	@cd Functions && $(MAKE) $(MAKEDEFS) $@
+	if test x$(fndir) != x && test x$(fndir) != xno; then \
+	  test x$(sitefndir) != xno && \
+	    $(sdir_top)/mkinstalldirs $(DESTDIR)$(sitefndir); \
+	  sdir_top="$(sdir_top)" fndir="$(fndir)" dir_top="$(dir_top)" \
+	  FUNCTIONS_SUBDIRS="$(FUNCTIONS_SUBDIRS)" \
+	  INSTALL_DATA="$(INSTALL_DATA)" \
+	  DESTDIR="$(DESTDIR)" VERSION="$(VERSION)" \
+	  $(SHELL) $(sdir_top)/Config/installfns.sh || exit 1; \
+	fi; \
+	exit 0
 
 uninstall.fns:
-	# never attempt to remove $(sitefndir)
-	@cd Completion && $(MAKE) $(MAKEDEFS) $@
-	@cd Functions && $(MAKE) $(MAKEDEFS) $@
+	if test x$(fndir) != x && test x$(fndir) != xno; then \
+	  fndir="$(fndir)" dir_top="$(dir_top)" \
+	  FUNCTIONS_SUBDIRS="$(FUNCTIONS_SUBDIRS)" \
+	  DESTDIR="$(DESTDIR)" VERSION="$(VERSION)" \
+	  $(SHELL) $(sdir_top)/Config/uninstallfns.sh || exit 1; \
+	fi; \
+	exit 0
 
 # install/uninstall just the info pages
 install.info uninstall.info:

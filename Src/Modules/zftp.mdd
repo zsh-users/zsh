@@ -1,6 +1,7 @@
 name=zsh/zftp
 link=dynamic
 load=no
+functions='Functions/Zftp/*'
 
 autobins="zftp"
 

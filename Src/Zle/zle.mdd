@@ -1,6 +1,7 @@
 name=zsh/zle
 link=either
 load=yes
+functions='Functions/Zle/*'
 
 autobins="bindkey vared zle"
 
