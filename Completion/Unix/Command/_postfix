@@ -1,0 +1,20 @@
+#compdef postsuper
+
+_postfix_queue_id() {
+compadd ${${(M)${(f)"$(postqueue -p)"}:#(#s)([0-9A-F]##)*}/(#s)(#b)([0-9A-F]##)*/$match[1]}
+}
+
+case $service in
+	(postsuper)
+	_arguments -C \
+	'-p[purge old tempfiles]' \
+	'-s[structure check and repair]' \
+	'-v[verbose]' \
+	'-c[configdir]:config dir:_files -/' \
+	'-d[delete]:queue id:_postfix_queue_id' \
+	'-h[hold]:queue id:_postfix_queue_id' \
+	'-H[release]:queue id:_postfix_queue_id' \
+	'-r[requeue]:queue id:_postfix_queue_id' \
+	'1:queue:(hold incoming active deferred)'
+	;;
+esac

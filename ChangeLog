@@ -1,3 +1,8 @@
+2004-12-24  Clint Adams  <clint@zsh.org>
+
+	* 20634: Completion/Unix/Command/_postfix: completion
+	for postsuper.
+
 2004-12-15  Clint Adams  <clint@zsh.org>
 
 	* 20626: Completion/Unix/Command/_baz: completion
