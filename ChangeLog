@@ -1,3 +1,8 @@
+2000-04-24  Bart Schaefer  <schaefer@zsh.org>
+
+	* 10900: Src/Makefile.in: Replace a dependency on Makefile with a
+	more accurate dependency on config.status.
+
 2000-04-20  Sven Wischnowsky  <wischnow@informatik.hu-berlin.de>
 
 	* 10881: Functions/Misc/zrecompile: don't remove *all* .zwc files,
