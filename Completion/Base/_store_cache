@@ -1,0 +1,36 @@
+#autoload
+#
+# Storage component of completions caching layer
+
+local _cache_ident
+_cache_ident="$1"
+
+if zstyle -t ":completion:${curcontext}:" use-cache; then
+  # Decide which directory to cache to, and ensure it exists
+  zstyle -s ":completion:${curcontext}:" cache-path _cache_dir
+  : ${_cache_dir:=${ZDOTDIR:-$HOME}/.zcompcache}
+  if [[ ! -d "$_cache_dir" ]]; then
+    if [[ -e "$_cache_dir" ]]; then
+      _message "cache-dir style points to a non-directory\!"
+    else
+      mkdir -p "$_cache_dir"
+      if [[ ! -d "$_cache_dir" ]]; then
+        _message "Couldn't create cache-dir $_cache_dir"
+        return 1
+      fi
+    fi
+  fi
+
+  shift
+  for var; do
+    case ${(Pt)var} in
+    (*readonly*) ;;
+    (*(association|array)*) print -r "$var=( ${(kv@Pqq)^^var} )";;
+    (*)                     print -r "$var=${(Pqq)^^var}";;
+    esac
+  done >! "$_cache_dir/$_cache_ident"
+else
+  return 1
+fi
+
+return 0

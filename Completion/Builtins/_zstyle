@@ -15,6 +15,7 @@ styles=(
   assign-list            c:
   auto-description	 c:
   break-keys             c:
+  cache-path		 'c:_wanted directories expl directory _path_files -/'
   command                c:command
   completer		 c:completer
   completions		 c:bool
@@ -80,6 +81,7 @@ styles=(
   suffix		 c:bool
   tag-order		 c:tag
   try-to-use-pminst	 c:bool
+  use-cache		 c:bool
   use-compctl		 c:urgh
   users			 c:_users
   users-hosts		 c:user-host

@@ -1,3 +1,10 @@
+2000-08-02  Adam Spiers  <adam@spiers.net>
+
+	* 12486: Completion/Base/{.distfiles,_cache_invalid,_retrieve_cache,
+	_store_cache}, Completion/Builtins/_zstyle, Completion/Linux/_rpm,
+	Completion/User/_perl_modules, Doc/Zsh/compsys.yo: new completion
+	caching layer
+
 2000-08-02  Sven Wischnowsky  <wischnow@zsh.org>
 
 	* 12483: Completion/Base/_arguments, Completion/Core/_complete,

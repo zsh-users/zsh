@@ -914,6 +914,13 @@ should be a pattern and all keys matching this pattern will cause the
 widget to stop incremental completion without the key having any
 further effect.
 )
+kindex(cache-path, completion style)
+item(tt(cache-path))(
+This style defines the path where any cache files containing dumped
+completion data are stored.  Defaults to `tt($DOTDIR/.zcompcache)', or
+`tt($HOME/.zcompcache)' if tt($DOTDIR) is not defined.  The completion
+layer will not be used unless the tt(use-cache) style is set.
+)
 kindex(command, completion style)
 item(tt(command))(
 In many places, completion functions need to call external commands to
@@ -2083,6 +2090,13 @@ sensible default behavior that causes arguments (whether normal command
 arguments or arguments of options) to be completed before option names for
 most commands.
 )
+kindex(use-cache, completion style)
+item(tt(use-cache))(
+If this is set, the completion caching layer is activated for any completions
+which use it (via the tt(_store_cache), tt(_retrieve_cache), and
+tt(_cache_invalid) functions).  The directory containing the cache
+files can be changed with the tt(cache-path) style.
+)
 kindex(use-compctl, completion style)
 item(tt(use-compctl))(
 If this style is set to a string em(not) equal to tt(false), tt(0),
@@ -3189,6 +3203,22 @@ arguments. The first one describes the first argument as a
 be completed. The last description says that all other arguments are
 `var(page numbers)' but does not give possible completions.
 )
+findex(_cache_invalid)
+item(tt(_cache_invalid) var(cache_identifier))(
+This function returns 0 if the completions cache corresponding to the
+given cache identifier needs rebuilding.  It determines this by
+looking up the tt(cache-policy) style for the current context, and
+if it exists, runs the function of the same name, supplying the full
+path to the relevant cache file as the only argument.
+
+Example:
+
+example(_example_caching_policy () {
+    # rebuild if cache is more than a week old
+    oldp=( "$1"(Nmw+1) )
+    (( $#oldp ))
+})
+)
 findex(_call)
 item(tt(_call) var(tag) var(string) ...)(
 This function is used in places where a command is called, making it
@@ -3595,6 +3625,18 @@ while _tags; do
   (( ret )) || break
 done)
 )
+findex(_retrieve_cache)
+item(tt(_retrieve_cache) var(cache_identifier))(
+This function retrieves completion information from the file given by
+var(cache_identifier), stored in a directory specified by the
+tt(cache-path) style (defaults to tt(~/.zsh/cache)).  The return value
+is zero if retrieval was successful.  It will only attempt retrieval
+if the tt(use-cache) style is set, so you can call this function
+without worrying about whether the user wanted to use the caching
+layer.
+
+See tt(_store_cache) below for more details.
+)
 findex(_sep_parts)
 item(tt(_sep_parts))(
 This function is passed alternating arrays and separators as arguments.
@@ -3717,6 +3759,36 @@ With the tt(-s) option, each tag given to tt(comptry) will be put in a
 separate set. With the tt(-m) option, the arguments are treated in the 
 same way as the the values for the tt(tag-order) style (except for the 
 `tt(!...)', `tt(-)' and `tt(foo())' forms).
+)
+findex(_store_cache)
+item(tt(_store_cache) var(cache_identifier) var(vars) ...)(
+This function, when combined with tt(_retrieve_cache) and
+tt(_cache_invalid), makes it easy to implement a caching layer for
+your completion functions.  If a completion function needs to perform
+a costly operation in order to generate data which is used to
+calculate completions, you can store that data in variables, and use
+this function to dump the values of those variables to a file.  Then,
+if they are needed in subsequent shell invocations, they can be
+retrieved quickly from that file via tt(_retrieve_cache), avoiding the
+needly for repeating the costly operation.
+
+The var(cache_identifier) specifies the file which the data should be
+dumped to, and is stored in a directory specified by the
+tt(cache-path) style (defaults to tt(~/.zsh/cache)).  The remaining
+var(vars) arguments are the variables to dump to the file.
+
+The return value is zero if storage was successful.  The function will
+only attempt storage if the tt(use-cache) style is set, so you can
+call this function without worrying about whether the user wanted to
+use the caching layer.
+
+If your completion function avoids calling _retrieve_cache when it
+already has the completion data in the environment, it should probably
+at least call tt(_cache_invalid) to check whether this data and the
+data cached on disk is still valid.
+
+See the _perl_modules completion function for a simple example of
+usage of this caching layer.
 )
 findex(_tags)
 item(tt(_tags) [ tt(-C) var(name) [ var(tags) ... ] ])(
