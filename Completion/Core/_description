@@ -16,17 +16,19 @@ _setup "$1"
 
 name="$2"
 
-_style -s "$1" format format || _style -s descriptions format format
+zstyle -s ":completion${curcontext}:$1" format format ||
+    zstyle -s ":completion${curcontext}:descriptions" format format
 
-_style -s "$1" hidden hidden
+zstyle -s ":completion${curcontext}:$1" hidden hidden
 if [[ "$hidden" = (all|yes|true|1|on) ]]; then
   [[ "$hidden" = all ]] && format=''
   hide=(-n)
 fi
-_style -s "$1" group-name gname && [[ -z "$gname" ]] && gname="$1"
+zstyle -s ":completion${curcontext}:$1" group-name gname &&
+    [[ -z "$gname" ]] && gname="$1"
 
 shift 2
-[[ -n "$format" ]] && compfmt format "$format" "d:$1" "${(@)argv[2,-1]}"
+[[ -n "$format" ]] && zformat -f format "$format" "d:$1" "${(@)argv[2,-1]}"
 
 if [[ -n "$gname" ]]; then
   if [[ -n "$format" ]]; then

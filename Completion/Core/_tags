@@ -18,7 +18,7 @@ if (( $# )); then
 
   [[ "$1" = -(|-) ]] && shift
 
-  if _style -a '' group-order order; then
+  if zstyle -a ":completion${curcontext}" group-order order; then
     local name
 
     for name in "$order[@]"; do
@@ -42,10 +42,6 @@ if (( $# )); then
 
   "${_sort_tags:-_sort_tags}" "$@"
 
-  # Also store the context (used below and in _requested).
-
-  _cur_context="$curcontext"
-
   # Return non-zero if at least one set of tags should be used.
 
   comptags -T
@@ -56,10 +52,6 @@ fi
 # The other mode: switch to the next set of tags.
 
 local tags
-
-# Reset the current context.
-
-comptags -C _cur_context
 
 _failed_tags=( "$_failed_tags[@]" "$_last_tags[@]" )
 

@@ -50,7 +50,7 @@
 #       # We first search in the last ten words, then in the last
 #       # twenty words, and so on...
 #       while [[ i -le max ]]; do
-#         if _style history-words sort; then
+#         if zstyle -t ":completion${curcontext}:history-words" sort; then
 #           _description history-words expl "history ($n)"
 #         else
 #           _description -V history-words expl "history ($n)"

@@ -8,8 +8,6 @@ else
   tag="$1"
 fi
 
-comptags -C _cur_context
-
 comptags -R "$tag" &&
     if [[ $# -gt 1 ]]; then
       _description "$@"

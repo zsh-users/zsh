@@ -9,7 +9,8 @@ else
 
   while _tags; do
     _requested options expl 'inode element' &&
-        { ! _style options prefix-needed || [[ "$PREFIX[1]" = + ]] } &&
+        { ! zstyle -t ":completion${curcontext}:options" prefix-needed ||
+          [[ "$PREFIX[1]" = + ]] } &&
         compadd "$expl[@]" - +device +inode +mode +nlink +uid +gid +rdev \
                              +size +atime +mtime +ctime +blksize +block +link
     fi

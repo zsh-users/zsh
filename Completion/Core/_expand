@@ -13,7 +13,8 @@ local exp word="$PREFIX$SUFFIX" sort expr expl curcontext="${curcontext}"
 
 # First, see if we should insert all *completions*.
 
-if _style -s '' completions expr && [[ "${(e):-\$[$expr]}" -eq 1 ]]; then
+if zstyle -s ":completion${curcontext}:" completions expr &&
+   [[ "${(e):-\$[$expr]}" -eq 1 ]]; then
   compstate[insert]=all
   return 1
 fi
@@ -29,7 +30,8 @@ exp=("$word")
 # First try substitution. That weird thing spanning multiple lines
 # changes quoted spaces, tabs, and newlines into spaces.
 
-_style -s '' substitute expr && [[ "${(e):-\$[$expr]}" -eq 1 ]] &&
+zstyle -s ":completion${curcontext}:" substitute expr &&
+    [[ "${(e):-\$[$expr]}" -eq 1 ]] &&
     exp=( "${(e)exp//\\[ 	
 ]/ }" )
 
@@ -39,7 +41,8 @@ _style -s '' substitute expr && [[ "${(e):-\$[$expr]}" -eq 1 ]] &&
 
 # Now try globbing.
 
-_style -s '' glob expr && [[ "${(e):-\$[$expr]}" -eq 1 ]] &&
+zstyle -s ":completion${curcontext}:" glob expr &&
+    [[ "${(e):-\$[$expr]}" -eq 1 ]] &&
     exp=( ${~exp}(N) )
 
 # If we don't have any expansions or only one and that is the same
@@ -50,7 +53,7 @@ _style -s '' glob expr && [[ "${(e):-\$[$expr]}" -eq 1 ]] &&
 
 # Now add as matches whatever the user requested.
 
-_style -s '' sort sort
+zstyle -s ":completion${curcontext}:" sort sort
 
 [[ "$sort" = (yes|true|1|on) ]] && exp=( "${(@o)exp}" )
 

@@ -1,0 +1,109 @@
+texinode(The zutil Module)(The complete Module)(The clone Module)(Zsh Modules)
+sect(The zutil Module)
+cindex(builtins, utility)
+The tt(zutil) module only adds some builtins:
+
+startitem()
+xitem(tt(zstyle) [ tt(-L) ])
+xitem(tt(zstyle) [ tt(-) | tt(-)tt(-) ] var(pattern) var(style) var(strings) ...)
+xitem(tt(zstyle -d) [ var(pattern) [ var(styles) ... ] ])
+xitem(tt(zstyle -g) var(name) [ var(pattern) [ var(style) ] ])
+xitem(tt(zstyle -s) var(context) var(style) var(name) [ var(sep) ])
+xitem(tt(zstyle -b) var(context) var(style) var(name))
+xitem(tt(zstyle -a) var(context) var(style) var(name))
+xitem(tt(zstyle -h) var(context) var(style) var(name))
+xitem(tt(zstyle -t) var(context) var(style) [ var(strings) ...])
+item(tt(zstyle -m) var(context) var(style) var(pattern))(
+This builtin command is used to define and lookup styles. Styles are
+pairs of names and values, where the values consist of any number of
+strings. They are stored together with patterns and lookup is done by
+giving a string, called the `context', which is compared to the
+patterns. The definition stored for the first matching pattern will be 
+returned. For this, the patterns are ordered from most specific to
+less specific and patterns that are equally specific keep the order in 
+which they were defined. A pattern is considered to be more specific
+than another if it contains more components (substrings separated by
+colons) or if the patterns for the components are more specific, where 
+simple strings are considered to be more specific than patterns and
+complex patterns are considered to be more specific than the pattern
+`tt(*)'.
+
+The first form (without arguments) lists the definitions in the order
+tt(zstyle) will test them. If the tt(-L) option is given, listing is
+done in the form of calls to tt(zstyle).
+
+In the second form this defines the given var(style) for the
+var(pattern) with the var(strings) as the value.
+
+The third form can be used to delete such definitions. Without
+arguments all definitions are deleted, with a var(pattern) all
+definitions for that pattern are deleted and if any var(styles) are
+given, then only those styles are deleted for the var(pattern).
+
+The fourth form allows to retrieve definitions. The var(name) will be
+used as the name of an array in which the results are stored. Without
+any further arguments, all var(patterns) defined are returned. With a
+var(pattern) the styles defined for that pattern are returned and with 
+both a var(pattern) and a var(style), the value strings of that
+combination is returned.
+
+The other forms can be used to look up or test patterns. With the
+tt(-s) option, the value of the style is returned as a string in the
+parameter var(name). For this, the strings from the value are
+concatenated with spaces (or the var(sep) string if that is given)
+between them. The tt(-b) option makes the value be returned as a
+boolean, i.e. as the string tt(yes) if the value has only one string
+and that is equal to one of tt(yes), tt(true), tt(on), or tt(1). If
+the value has more than one string or only one but that is different
+from the strings mentioned, the parameter will be set to tt(no). The
+tt(-a) option makes the value be returned as an array and the tt(-h)
+makes it be returned as an associative array (with the first, third,
+etc. string being used as the keys and the other strings being used as 
+the values).
+
+The tt(-t) option can be used to test the value of a style, i.e. it
+only sets the return value. Without any var(strings) arguments it is
+zero if the style is defined for at least one matching pattern, has
+only one string in its value and that is equal to one of tt(true),
+tt(yes), tt(on) or tt(1). If any var(strings) are given the return
+zero if and only if at least one of the var(strings) is equal to at
+least one of the strings in the value.
+
+The tt(-m) option can be used to match a value. It returns zero if the 
+var(pattern) matches at least one of the strings in the value.
+)
+xitem(tt(zformat -f) var(param) var(format) var(specs) ...)
+item(tt(zformat -a) var(array) var(sep) var(specs) ...)(
+This builtin provides to different forms of formatting. The first form 
+is selected with the tt(-f) option. If this is given, the var(format)
+string will be modified by replacing sequences starting with a percent 
+sign in it with strings from the var(specs). Each var(spec) has to be
+of the form `var(char)tt(:)var(string)' and this will make every
+appearence of the sequence `tt(%)var(char)' in var(format) be replaced 
+with the var(string). The `tt(%)' sequence may also contain optional
+minimum and maximum field width specifications between the `tt(%)' and 
+the `var(char)' in the form `tt(%)var(min)tt(.)var(max)tt(c)',
+i.e. the minimum field width is given first and if the maximum field
+width is used, it has to be preceded by a dot. Giving a minimum field
+width makes the result be padded with spaces to the right if the
+var(string) is shorter than the requested width. Padding to the left
+can be achieved by giving a negative minimum field width. If a maximum 
+field width is given, the var(string) will be truncated after that
+many characters. After all `tt(%)' sequences for the given var(specs)
+have been processed, the resulting string is stored in the parameter
+var(param).
+
+The second form, using the tt(-a) option, can be used to get aligned
+strings. Here, the var(specs) are of the form
+`var(left)tt(:)var(right)' where `var(left)' and `var(right)' are
+arbitrary strings. These strings are modified by replacing the colons
+with the var(sep) string and padding the var(left) strings with spaces 
+to the right so that the var(sep) strings in the result (and hence the 
+var(right) strings after them) are all aligned if the strings are
+printed below each other. All strings without a colon are left
+unchanged and all strings with a empty var(right) string have the
+trailing colon removed. In both cases the lengths of the strings
+are not used to determine how the other strings have to be aligned.
+The resulting strings are stored in the var(array).
+)
+enditem()

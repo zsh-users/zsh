@@ -22,9 +22,9 @@ while _tags; do
       compadd "$suf[@]" "$expl[@]" "$@" - "${(@k)nameddirs}"
 
   if _requested -V directory-stack expl 'directory stack' &&
-     { ! _style directory-stack prefix-needed ||
+     { ! zstyle -t ":completion${curcontext}:directory-stack" prefix-needed ||
        [[ "$PREFIX" = [-+]* ]] }; then
-    if _style directory-stack verbose; then
+    if zstyle -t ":completion${curcontext}:directory-stack" verbose; then
       integer i
 
       lines=("${PWD}" "${dirstack[@]}")

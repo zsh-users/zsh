@@ -258,37 +258,6 @@ In each of the forms supporting it the tt(-a) option makes the
 var(function) autoloadable (exactly equivalent to
 tt(autoload -U )var(function)).
 )
-findex(compstyle)
-cindex(completion system, configuring)
-xitem(tt(compstyle) var(pattern) var(style) var(strings ...))
-xitem(tt(compstyle -d) [ var(pattern) [ var(styles ...) ] ])
-item(tt(compstyle) [ tt(-L) ] )(
-Several aspects of the completion system can be configured by the
-user. This function allows to define so-called styles that are used by 
-various completion functions. These styles are associated with
-patterns that are compared to context names used by the completion
-system. The possible ways to configure the completion system are
-explained in detail in
-ifzman(the section `Completion System Configuration' below)\
-ifnzman(noderef(Completion System Configuration))\
-.
-
-In the first form a new var(style) is defined for a certain
-var(pattern), setting it to the value given by the var(strings). If there 
-was already a definition for the same var(pattern)/var(style) pair,
-only the value is changed.
-
-The second form with the tt(-d) option can be used to delete
-definitions made by previous calls with the first form. Without any
-arguments all definitions are removed. If a var(pattern) is given, all 
-styles defined for it are removed and if a var(pattern) and any number 
-of var(styles) are given, only those styles are removed for the
-pattern.
-
-In the last form (without arguments) all definitions are listed. If
-the tt(-L) option is given this is done in the form of calls to
-tt(compstyle).
-)
 enditem()
 
 texinode(Completion System Configuration)(Control Functions)(Initialization)(Completion System)
@@ -452,16 +421,17 @@ information needed to change the tt(_sort_tags) function when one
 wants to change the way matches are generated for that context.
 
 But the completion system can not only be configured by supplying a
-specialized tt(_sort_tags) function. There are also the
-`styles' defined with the tt(compstyle) function mentioned in
-ifzman(the section `Initialization' above)\
-ifnzman(noderef(Initialization))\
-.
+specialized tt(_sort_tags) function. It also uses `styles' defined
+with the tt(zstyle) builtin command (see
+ifzman(zmanref(zshmodules))\
+ifnzman(noderef(The zutil Module))\
+) using the prefix `tt(:completion)' and the context name when testing 
+and retrieving values.
 
 For some tags the completion functions look up the definition of
 certain styles set for the current context. These styles can have any
 number of strings as their values and specify, for example, how the
-matches are generated. The tt(compstyle) function defines mappings
+matches are generated. The tt(zstyle) builtin command defines mappings
 between patterns and style names with their values. Whenever a
 completion function looks up the value of a style it uses the name of
 the current context followed by a colon and the name of a tag. This
@@ -473,11 +443,11 @@ simple and a verbose form and use the tt(verbose) style to decide
 which form should be used. To make all such functions always use the
 verbose form one can simply call
 
-example(compstyle '*' verbose yes)
+example(zstyle ':completion:*' verbose yes)
 
-in one of the startup files like tt(.zshrc) (after the call to the
-tt(compinit) function). This definition simply means that the
-tt(verbose) style has tt(yes) as its value in every context.
+in one of the startup files like tt(.zshrc). This definition simply
+means that the tt(verbose) style has tt(yes) as its value in every
+context.
 
 The completion function for the tt(kill) builtin command uses this
 style to decide if jobs and processes are listed only as job numbers
@@ -486,7 +456,7 @@ and the command lines of the processes (the latter is achieved by
 calling the tt(ps) command). To make this builtin list the matches
 only as numbers one could call:
 
-example(compstyle '*::kill:*' verbose no)
+example(zstyle ':completion:*::kill:*' verbose no)
 
 And if one wants to see the command lines for processes but not the
 job texts one could use the fact that the tag name is appended to the
@@ -494,21 +464,12 @@ context name when styles are looked up and instead of the previous
 call use (remember that the function for the tt(kill) builtin command
 uses the tags tt(jobs) and tt(processes)): 
 
-example(compstyle '*::kill:*:jobs' verbose no)
+example(zstyle ':completion:*::kill:*:jobs' verbose no)
 
-As said above, the patterns given to the tt(compstyle) function are
-tested in the order in which they were given. But that isn't
-completely true. In fact, this function roughly sorts the patterns so
-that more specialized patterns are compared before more general
-patterns. Due to this, the last two examples could be defined after
-the first one because both `tt(*::kill:*)' and `tt(*::kill:*:jobs)' are
-considered to be more specific then the pattern `tt(*)' from the first
-example. To decide how specific a pattern is, the function looks at 
-the number of colons (corresponding to the number of components) used
-in the pattern, and if these components are actual patterns (like the
-`tt(*)') or simple strings (like the `tt(jobs)' in the last
-example). Patterns with fewer colons and fewer simple strings are
-considered to be less specific.
+Due to the ordering tt(zstyle) does with the patterns defined, the
+last two examples could be defined after the first one because both
+`tt(*::kill:*)' and `tt(*::kill:*:jobs)' are considered to be more
+specific then the pattern `tt(*)' from the first example.
 
 As for tags, completion functions can use any number of styles, so
 there can't be a complete list. However, the following two sections
@@ -807,9 +768,9 @@ example, to use completion, approximation and correction for normal
 completion, completion and correction for incremental completion and
 only completion for prediction one could use:
 
-example(compstyle '*' completer _complete _correct _approximate
-compstyle ':incremental' completer _complete _correct
-compstyle ':predict' completer _complete)
+example(zstyle ':completion:*' completer _complete _correct _approximate
+zstyle ':completion:incremental' completer _complete _correct
+zstyle ':completion:predict' completer _complete)
 )
 item(tt(completions))(
 This style is used by the tt(_expand) completer function.
@@ -830,7 +791,7 @@ should be set to an expression usable inside a `tt($((...)))'
 arithmetical expression. In this case, delaying will be done if the
 expression evaluates to `tt(1)'. For example, with
 
-example(compstyle ':list' condition 'NUMERIC != 1')
+example(zstyle ':completion:list' condition 'NUMERIC != 1')
 
 delaying will be done only if given an explicit numeric argument
 other than `tt(1)'.
@@ -882,6 +843,14 @@ replaced with the message given by the completion function.
 Finally, for the tt(warnings) tag, it is printed when no matches could 
 be generated at all. In this case the `tt(%d)' is replaced with the
 descriptions for the matches that were expected.
+
+Here and in all other cases where the completion system uses `tt(%)'
+sequences, the `tt(%)' may be followed by field with specifications as 
+described for the tt(zformat) builtin command from the tt(zutil)
+module, see
+ifzman(zmanref(zshmodules))\
+ifnzman(noderef(The zutil Module))\
+.
 )
 item(tt(glob))(
 Like tt(complete), this is used by the tt(_expand) completer.
@@ -901,8 +870,8 @@ aliases and shell functions and reserved words as possible
 completions. To have the external commands and shell functions listed
 separately, one can set:
 
-example(compstyle '*:-command-:commands' group-name commands
-compstyle '*:-command-:functions' group-name functions)
+example(zstyle ':completion:*:-command-:commands' group-name commands
+zstyle ':completion:*:-command-:functions' group-name functions)
 
 This also means that if the same name is used for different types of
 matches, then those matches will be displayed together in the same
@@ -912,7 +881,7 @@ If the name given is the empty string, then the name of the tag for
 the matches will be used as the name of the group. So, to have all
 different types of matches displayed separately, one can just set:
 
-example(compstyle '*' group-name '')
+example(zstyle ':completion:*' group-name '')
 
 All matches for which no group name is defined will be put in a group
 named tt(-default-).
@@ -931,7 +900,7 @@ For example, to have names of builtin commands, shell functions and
 external commands appear in this order when completing in command
 position one would set:
 
-example(compstyle '*:-command-' group-order builtins functions commands)
+example(zstyle ':completion:*:-command-' group-order builtins functions commands)
 )
 item(tt(groups))(
 A style holding the names of the groups that should be completed. If
@@ -1046,7 +1015,7 @@ the type described by the tag.
 To be able to share the same specifications one has set up for the GNU
 version of the tt(ls) command one can use:
 
-example(compstyle '*:default' list-colors ${(s.:.)LS_COLORS})
+example(zstyle ':completion:*:default' list-colors ${(s.:.)LS_COLORS})
 
 And to get the default colors (which are the same as for the GNU
 tt(ls) command) one should set the style to an empty value.
@@ -1082,7 +1051,7 @@ If the value for this style contains the string tt(numeric), the
 completer function will take any numeric argument as the
 maximum number of errors allowed. For example, with
 
-example(compstyle ':approximate' accept 2 numeric)
+example(zstyle ':completion:approximate' accept 2 numeric)
 
 two errors will be allowed if no numeric argument is given. However,
 with a numeric argument of six (as in `tt(ESC-6 TAB)'), up to six
@@ -1241,7 +1210,7 @@ non-empty string it should be an expression usable inside a `tt($((...)))'
 arithmetical expression. In this case, expansion of substitutions will
 be done if the expression evaluates to `tt(1)'. For example, with
 
-example(compstyle ':expand' substitute '${NUMERIC:-1} != 1')
+example(zstyle ':completion:expand' substitute '${NUMERIC:-1} != 1')
 
 substitution will be performed only if given an explicit numeric
 argument other than `tt(1)', as by typing `tt(ESC 2 TAB)'.
@@ -1295,7 +1264,7 @@ arguments are given, the set of functions to try is taken from the
 tt(completer) style. For example, to use normal completion and
 correction if that doesn't generate any matches:
 
-example(compstyle '*' completer _complete _correct)
+example(zstyle ':completion:*' completer _complete _correct)
 
 after calling tt(compinit). The default value for this style set up
 in tt(compinit) is `tt(_complete)', i.e. normally only ordinary
@@ -1407,7 +1376,7 @@ counted. The resulting list of corrected and completed strings is then
 presented to the user. The intended use of this completer function is to
 try after the normal tt(_complete) completer by setting:
 
-example(compstyle '*' completer _complete _approximate)
+example(zstyle ':completion:*' completer _complete _approximate)
 
 This will give correcting completion if and only if
 normal completion doesn't yield any possible completions. When
@@ -1436,9 +1405,9 @@ different top-level context name.
 
 For example, with:
 
-example(compstyle '*' completer _complete _correct _approximate
-compstyle ':correct' accept 2 not-numeric
-compstyle ':approximate' accept 3 numeric)
+example(zstyle ':completion:*' completer _complete _correct _approximate
+zstyle ':completion:correct' accept 2 not-numeric
+zstyle ':completion:approximate' accept 3 numeric)
 
 correction will accept up to two errors. If a numeric argument is
 given, correction will not be performed, but correcting completion
@@ -1836,48 +1805,6 @@ generated by the tt(_users) and tt(_hosts) functions respectively).
 
 Like tt(_tags) this function supports the tt(-C) option to give an
 additional context name component.
-)
-findex(_style)
-item(tt(_style))(
-This function is used to look up the values of styles defined by the
-user. In its simplest form, it is called with two arguments: a tag and 
-a style-name. The tag (if non-empty) is temporarily appended to the
-current context name (preceded by a colon) and the patterns defined by 
-the user with the tt(compstyle) function will be compared to that
-combined name. If any of those patterns match the name and the given
-style is defined for it and its boolean value is `true' (i.e. its
-value is one of `tt(true)', `tt(on)', `tt(yes)', and `tt(1)'), tt(_style)
-returns zero and non-zero otherwise. If you want to test the style not 
-only for a boolean value, you can give a third argument which is then
-used as a pattern and tt(_style) returns zero if the pattern matches
-the value defined for the style.
-
-If you want to retrieve the value defined for the style, you can use
-one of the options tt(-b) (to retrieve it as a boolean value, i.e. one 
-of tt(yes) or tt(no)), tt(-s) (to get it as a scalar, i.e. a string
-concatenated from the value strings defined by the user, separated by
-spaces), tt(-a) (to get it as an array), and tt(-h) (to get it as an
-associative array; in this case the first, third, etc. strings from the 
-value are used as the keys and the others as their values). In each of
-these cases the arguments after the option are the tag, the style-name
-and the name of the parameter into which the result will be stored.
-
-For example, to test if the tt(description) style is set to `true' for 
-the current context and the tag tt(foo):
-
-example(if _style foo description; then
-  ... # style is true
-fi)
-
-And to get the value of the tt(path) style for the tag tt(foo) as an
-array into the parameter tt(tmp):
-
-example(local tmp
-_style -a foo path tmp)
-
-In any case, the return value of this function is zero if a
-definition for the style was found and non-zero if no definition was
-found.
 )
 findex(_describe)
 item(tt(_describe) var(descr) var(name1) [ var(name2) ] var(opts) ... tt(-)tt(-) ...)(

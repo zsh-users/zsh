@@ -15,6 +15,10 @@ Builtins for manipulating POSIX.1e (POSIX.6) capability (privilege) sets.
 item(tt(clone))(
 A builtin that can clone a running shell onto another terminal.
 )
+item(tt(zutil))(
+Some utility builtins, e.g. the one for supporting configuration via 
+styles.
+)
 item(tt(complete))(
 The basic completion code.
 )
@@ -66,6 +70,7 @@ enditem()
 startmenu()
 menu(The cap Module)
 menu(The clone Module)
+menu(The zutil Module)
 menu(The complete Module)
 menu(The compctl Module)
 menu(The complist Module)
@@ -84,6 +89,7 @@ menu(The zleparameter Module)
 endmenu()
 includefile(Zsh/mod_cap.yo)
 includefile(Zsh/mod_clone.yo)
+includefile(Zsh/mod_zutil.yo)
 includefile(Zsh/mod_complete.yo)
 includefile(Zsh/mod_compctl.yo)
 includefile(Zsh/mod_complist.yo)

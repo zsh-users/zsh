@@ -2,7 +2,7 @@
 
 local expl hosts
 
-if ! _style -a hosts hosts hosts; then
+if ! zstyle -a ":completion${curcontext}:hosts" hosts hosts; then
   (( $+_cache_hosts )) ||
       : ${(A)_cache_hosts:=${(s: :)${(ps:\t:)${${(f)"$(</etc/hosts)"}%%\#*}##[:blank:]#[^[:blank:]]#}}}
 

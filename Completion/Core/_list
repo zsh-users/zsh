@@ -8,7 +8,7 @@ local pre suf curcontext="${curcontext}:list" expr
 
 # Get the strings to compare.
 
-if _style '' word; then
+if zstyle -t ":completion${curcontext}:" word; then
   pre="$HISTNO$LBUFFER"
   suf="$RBUFFER"
 else
@@ -18,7 +18,7 @@ fi
 
 # Should we only show a list now?
 
-_style -s '' condition expr
+zstyle -s ":completion${curcontext}:" condition expr
 if [[ ( -z "$expr" || "${(e):-\$[$expr]}" -eq 1 ) &&
       ( "$pre" != "$_list_prefix" || "$suf" != "$_list_suffix" ) ]]; then
 

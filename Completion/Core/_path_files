@@ -116,7 +116,7 @@ orig="${PREFIX}${SUFFIX}"
 # If given no `-F' option, we want to use the `ignored-suffixes'-style.
 
 if (( ! $#ignore )); then
-  if _style -a files ignored-suffixes ignore; then
+  if zstyle -a ":completion${curcontext}:files" ignored-suffixes ignore; then
     ignore=(-F "( $ignore )")
   else
 
@@ -347,8 +347,10 @@ for prepath in "$prepaths[@]"; do
       tmp4="$testpath"
       compquote tmp1 tmp4
 
-      if [[ -n $menu ]] || ! _style paths expand '*suffix*'; then
-        _style paths cursor && compstate[to_end]=''
+      if [[ -n $menu ]] ||
+         ! zstyle -t ":completion${curcontext}:paths" expand suffix; then
+        zstyle -t ":completion${curcontext}:paths" cursor &&
+            compstate[to_end]=''
         if [[ "$tmp3" = */* ]]; then
 	  compadd -Qf "$mopts[@]" -p "$linepath$tmp4" -s "/${tmp3#*/}" \
 	          -W "$prepath$realpath$testpath" "$ignore[@]" \
@@ -436,7 +438,7 @@ done
 
 exppaths=( "${(@)exppaths:#$orig}" )
 
-if _style paths expand '*prefix*' &&
+if zstyle -t ":completion${curcontext}:paths" expand prefix &&
    [[ $#exppaths -gt 0 && nm -eq compstate[nmatches] ]]; then
   PREFIX="${opre}"
   SUFFIX="${osuf}"

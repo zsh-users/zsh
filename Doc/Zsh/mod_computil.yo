@@ -6,8 +6,7 @@ some of the completion functions in the shell function based
 completions system (see
 ifzman(zmanref(zshcompsys))\
 ifnzman(noderef(Completion System))
-). Except for tt(compquote) and tt(compdisplay) these builtin
-commands are very
+). Except for tt(compquote) these builtin commands are very
 specialised and thus not very interesting when writing your own
 completion functions. In short, these builtin commands are:
 
@@ -23,22 +22,6 @@ and the values of these parameters are quoted as needed for the
 innermost quoting level.
 
 The return value is non-zero in case of an error and zero otherwise.
-)
-item(tt(compfmt) var(name) var(string) var(defs) ...)(
-The var(defs) ar of the form `var(char)tt(;)var(string)' and
-tt(compfmt) will replace every occurance of the sequence
-`tt(%)var(char)' for each of the var(char)s with the corresponding
-var(string). The resulting string will be placed in the parameter
-var(name).
-)
-item(tt(compdisplay) var(name) var(string) var(defs) ...)(
-The var(defs) are strings which should be of the form
-`var(str)tt(:)var(descr)' (the intended use is that the var(descr)
-describes the var(str)) and tt(compdisplay) will convert them to
-strings in which the colon is replaced by the var(string) given as the 
-second argument and spaces are inserted before that so that they are
-aligned over all strings. These resultings strings are then assigned
-to an array with the var(name) given as the first argument.
 )
 item(tt(compdescribe))(
 This is used by the tt(_describe) function to build the displays for
@@ -67,9 +50,6 @@ to access the state information to decide what should be completed.
 )
 item(tt(compvalues))(
 Like tt(comparguments), but for the tt(_values) function.
-)
-item(tt(compstyle))(
-This builtin implements the internals of the style mechanism.
 )
 item(tt(comptags), tt(comptry))(
 This implements the internals of the tags mechanism.

@@ -25,9 +25,9 @@ _history_complete_word () {
     direction=older
   fi
 
-  _style -s history-words stop stop
+  zstyle -s ":completion${curcontext}:history-words" stop stop
 
-  _style history-words list || compstate[list]=''
+  zstyle -t ":completion${curcontext}:history-words" list || compstate[list]=''
 
   if [[ -n "$compstate[old_list]" &&
         ( -n "$stop" || "$compstate[insert]" = menu ) ]] ; then
@@ -67,14 +67,14 @@ _history_complete_word () {
 }
 
 _history_complete_word_gen_matches () {
-  if _style history-words list; then
-    if _style history-words sort; then
+  if zstyle -t ":completion${curcontext}:history-words" list; then
+    if zstyle -t ":completion${curcontext}:history-words" sort; then
       _description history-words expl 'history word'
     else
       _description -V history-words expl 'history word'
     fi
   else
-    if _style history-words sort; then
+    if zstyle -t ":completion${curcontext}:history-words" sort; then
       expl=()
     else
       expl=('-V' '')
@@ -84,7 +84,7 @@ _history_complete_word_gen_matches () {
   [[ -n "$_hist_stop" ]] && PREFIX="$_hist_old_prefix"
 
   local rem_dups
-  if _style history-words remove-all-dups; then
+  if zstyle -t ":completion${curcontext}:history-words" remove-all-dups; then
     rem_dups=''
   else
     rem_dups='-1'

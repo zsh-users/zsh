@@ -4,10 +4,11 @@ local format
 
 _tags messages || return 1
 
-_style -s messages format format || _style -s descriptions format format
+zstyle -s ":completion${curcontext}:messages" format format ||
+    zstyle -s ":completion${curcontext}:descriptions" format format
 
 if [[ -n "$format" ]]; then
-  compfmt format "$format" "d:$1" "${(@)argv[2,-1]}"
+  zformat -f format "$format" "d:$1" "${(@)argv[2,-1]}"
   if [[ $compstate[nmatches] -eq 0 ]]; then
     compstate[list]='list force'
     compstate[insert]=''

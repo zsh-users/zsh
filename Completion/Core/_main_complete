@@ -17,7 +17,7 @@
 # state than the global one for which you are completing.
 
 
-local comp post ret=1 _compskip _prio_num=1 _cur_context format \
+local comp post ret=1 _compskip _prio_num=1 format \
       context state line opt_args val_args curcontext="$curcontext" \
       _last_nmatches=-1 _last_menu_style _def_menu_style _menu_style sel \
       _saved_exact="$compstate[exact]" \
@@ -56,7 +56,7 @@ _last_menu_style=()
 if (( ! $# )); then
   local tmp
 
-  _style -a '' completer tmp
+  zstyle -a ":completion${curcontext}:" completer tmp
   set -- "$tmp[@]"
 fi
 
@@ -139,7 +139,7 @@ fi
 if [[ compstate[nmatches] -eq 0 &&
       compstate[matcher] -eq compstate[total_matchers] &&
       $#_lastdescr -ne 0 ]] &&
-   _style -s warnings format format; then
+   zstyle -s ":completion${curcontext}:warnings" format format; then
   local str
 
   compstate[list]='list force'
@@ -151,7 +151,8 @@ if [[ compstate[nmatches] -eq 0 &&
   *) str="${(j:, :)_lastdescr[1,-2]}, or $_lastdescr[-1]";;
   esac
 
-  compadd -UX "${format//\\%d/$str}" -n ''
+  zformat -f format "$format" "d:$str"
+  compadd -UX "$format" -n ''
 fi
 
 _lastcomp=( "${(@kv)compstate}" )

@@ -440,19 +440,19 @@ compstyle() {
   if (( ! $# )); then
     local pats styles vals pat style pre eq
 
-    compstyles -G pats
+    zstyle -g pats
 
-    for pat in "$pats[@]"; do
+    for pat in "${(@M)pats:#:completion*}"; do
       if [[ -n "$long" ]]; then
-        pre="compstyle ${(qq)pat} "
+        pre="compstyle ${(qq)pat#:completion} "
       else
-        print "$pat"
+        print "${pat#:completion}"
 	pre='    '
 	eq=' ='
       fi
-      compstyles -G styles "$pat"
+      zstyle -g styles "$pat"
       for style in "$styles[@]"; do
-        compstyles -G vals "$pat" "$style"
+        zstyle -g vals "$pat" "$style"
         print "${pre}${style}${eq}" "${(@qq)vals}"
       done
     done
@@ -461,26 +461,24 @@ compstyle() {
   fi
 
   if [[ "$1" = -d ]]; then
-    case "$#" in
-    1) compstyles -d ;;
-    2) compstyles -d "$2" ;;
-    *) 
-      local pat="$2" style
+    if [[ $# -gt 1 ]]; then
+      zstyle -d ":completion$2" "${(@)argv[3,-1]}"
+    else
+      local pats
 
-      shift
+      zstyle -g pats
 
-      for style; do
-        compstyles -d "$pat" "$style"
+      for pat in "${(@M)pats:#:completion}"; do
+        zstyle -d "$pat"
       done
-      ;;
-    esac
+    fi
 
     return 0
   fi
 
   [[ "$1" = -(|-) ]] && shift
 
-  compstyles -a "$@"
+  zstyle - ":completion$1" "${(@)argv[2,-1]}"
 
   return 0
 }

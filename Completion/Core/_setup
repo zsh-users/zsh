@@ -2,7 +2,7 @@
 
 local val nm="$compstate[nmatches]"
 
-if _style -a "$1" list-colors val; then
+if zstyle -a ":completion${curcontext}:$1" list-colors val; then
   if [[ "$1" = default ]]; then
     ZLS_COLORS="${(j.:.)${(@)val:gs/:/\\\:}}"
   else
@@ -10,7 +10,7 @@ if _style -a "$1" list-colors val; then
   fi
 fi
 
-if _style -s "$1" list-packed val; then
+if zstyle -s ":completion${curcontext}:$1" list-packed val; then
   if [[ "$val" = (yes|true|1|on) ]]; then
     compstate[list]="${compstate[list]} packed"
   else
@@ -20,7 +20,7 @@ else
   compstate[list]="$_saved_list"
 fi
 
-if _style -s "$1" list-rows-first val; then
+if zstyle -s ":completion${curcontext}:$1" list-rows-first val; then
   if [[ "$val" = (yes|true|1|on) ]]; then
     compstate[list]="${compstate[list]} rows"
   else
@@ -30,7 +30,7 @@ else
   compstate[list]="$_saved_list"
 fi
 
-if _style -s "$1" last-prompt val; then
+if zstyle -s ":completion${curcontext}:$1" last-prompt val; then
   if [[ "$val" = (yes|true|1|on) ]]; then
     compstate[last_prompt]=yes
   else
@@ -40,7 +40,7 @@ else
   compstate[last_prompt]="$_saved_lastprompt"
 fi
 
-if _style -s "$1" accept-exact val; then
+if zstyle -s ":completion${curcontext}:$1" accept-exact val; then
   if [[ "$val" = (yes|true|1|on) ]]; then
     compstate[exact]=accept
   else
@@ -53,7 +53,7 @@ fi
 [[ _last_nmatches -ge 0 && _last_nmatches -ne nm ]] &&
     _menu_style=( "$_last_menu_style[@]" "$_menu_style[@]" )
 
-if _style -a "$1" menu val; then
+if zstyle -a ":completion${curcontext}:$1" menu val; then
   _last_nmatches="$nm"
   _last_menu_style=( "$val[@]" )
 else

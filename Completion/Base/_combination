@@ -78,7 +78,7 @@ key="${1%:*}"
 num="${${1##*:}:-1}"
 shift
 
-if _style -a "$tag" "$style" tmp; then
+if zstyle -a ":completion${curcontext}:$tag" "$style" tmp; then
   eval "tmp=( \"\${(@M)tmp:#\${(j($sep))~pats}}\" )"
   if (( keys[(in:num:)$key] != 1 )); then
     eval "tmp=( \${tmp#\${(j(${sep}))~\${(@)\${(@)keys[2,(rn:num:)\$key]}/*/*}}$sep} )"

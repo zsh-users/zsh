@@ -19,8 +19,8 @@ tmp="${${:-$PREFIX$SUFFIX}#[~=]}"
 [[ "$tmp:q" = "$tmp" ||
    compstate[matcher] -ne compstate[total_matchers] ]] && return 1
 
-_style -s '' original orig
-_style -b '' insert-unambiguous ins
+zstyle -s ":completion${curcontext}:" original orig
+zstyle -b ":completion${curcontext}:" insert-unambiguous ins
 
 # Try completion without inserting a `*'?
 

@@ -187,40 +187,48 @@ Styles
 Users can associate patterns for hierarchical context names with
 certain styles using the `compstyle' function. The completion code
 should then use these styles to decide how matches should be added and 
-to get user-configured values. This is done using the function
-`_style'.
+to get user-configured values. This is done using the builtin `zstyle'.
 
 Basically styles map names to a bunch of strings (the `value'). In
 many cases you want to treat the value as a boolean, so let's start
 with that. To test if, for example, the style `verbose' is set for 
 the tag `options' in the context you are currently in, you can just do:
 
-  if _style options verbose; then
+  if zstyle -t ":completion${curcontext}:options" verbose; then
     # yes, it is set...
   fi
 
-I.e. with two arguments `_style' takes the first one as a tag and the
-second one as a style name and returns zero if that style has the
-boolean value `true'. Internally it checks if the style is set to one
-of `yes', `true', `on', or `1' and interprets that as `true' and every 
-other value as `false'.
+I.e. with the -t option and two arguments `zstyle' takes the first one
+as a tag and the second one as a style name and returns zero if that
+style has the boolean value `true'. Internally it checks if the style
+is set to one of `yes', `true', `on', or `1' and interprets that as
+`true' and every other value as `false'.
 
 For more complicated style for which you want to test if the value
-matches a certain pattern, you can use `_style' with three arguments:
+matches a certain pattern, you can use `zstyle' with the -m option and
+three arguments:
 
-  if _style foo bar '*baz*'; then
+  if zstyle -m ":completion${curcontext}:foo" bar '*baz*'; then
     ...
   fi
 
 This tests if the value of the style `bar' for the tag `foo' matches
 the pattern `*baz*' and returns zero if it does.
 
+If you just want to see if one of the strings in the value is exactly
+equal to any of a number of a strings, you can use the -t option and
+give the strings after the style name:
+
+  if zstyle -t ":completion${curcontext}:foo" bar str1 str2; then
+    ...
+  fi
+
 But sometimes you want to actually get the value stored for a certain
-style instead of just testing it. For this `_style' supports four
+style instead of just testing it. For this `zstyle' supports four
 options: `-b', `-s', `-a', and `-h'. After these options, three
-arguments are expected, namely the tag, the style, and a parameter
-name. The parameter will then be set to the value of the style and the 
-option says how the strings stored as a value will be stored in the
+arguments are expected, the tag, the style, and a parameter name. The
+parameter will then be set to the value of the style and the option
+says how the strings stored as a value will be stored in the
 parameter:
 
   - `-b': the parameter will be set to a either `yes' or `no'
@@ -232,13 +240,6 @@ parameter:
           from the value being interpreted alternatingly as keys and
 	  values
 
-Note that if you want to test or get styles for a certain context
-name which you have to build yourself, you have to call `_style' after 
-the call to `_tags', `_wanted', or whatever. When you are using
-utility functions like `_alternate' or `_arguments' the context will
-automatically be set up appropriately at the time when you have a
-chance to call `_style'.
-
 Some random comments about style names. Use the ones already in use if 
 possible. Especially, use the `verbose' style if you can add
 matches in a simple and a verbose way. Use the verbose form only if
@@ -249,15 +250,11 @@ one says if the user has to give the prefix on the line to make these
 matches be added and the second one says if the prefix should be
 visible in the list.
 
-But, I think, using any number of new style names is ok -- different
-from tag-names where I would like to keep the number of names used
-small.
-
 And finally, if you need a style whose value can sensibly be
 interpreted as a list of words, use array or association styles with
-the `-a' or `-h' options to `_style'. Otherwise you should only make
+the `-a' or `-h' options to `zstyle'. Otherwise you should only make
 sure that an empty value for a style is treated in the same way as if
-the style wasn't set at all (this is use elsewhere and we want to
+the style wasn't set at all (this is used elsewhere and we want to
 keep things consistent).
 
 

@@ -2,4 +2,4 @@ moddeps="complete zle"
 
 objects="computil.o"
 
-autobins="compdisplay compdescribe comparguments compvalues compquote compstyles comptags comptry"
+autobins="compdescribe comparguments compvalues compquote comptags comptry"

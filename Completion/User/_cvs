@@ -488,7 +488,8 @@ _cvs_extract_file_entries () {
 
 (( $+functions[_cvs_extract_modifiedfile_entries] )) ||
 _cvs_extract_modifiedfile_entries () {
-  if _style cvs disable-stat || ! { zmodload -e stat || zmodload stat }; then
+  if zstyle -t ":completion${curcontext}:cvs" disable-stat ||
+     ! { zmodload -e stat || zmodload stat }; then
     _cvs_extract_file_entries
     return
   fi

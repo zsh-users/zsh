@@ -40,8 +40,9 @@
 
 local ipre scheme host user uhosts ret=1 expl
 local urls_path localhttp
-_style -s urls path urls_path || urls_path="${ZDOTDIR:-$HOME}/.zsh/urls"
-_style -a urls local localhttp
+zstyle -s ":completion${curcontext}:urls" path urls_path ||
+    urls_path="${ZDOTDIR:-$HOME}/.zsh/urls"
+zstyle -a ":completion${curcontext}:urls" local localhttp
 local localhttp_servername="$localhttp[1]"
 local localhttp_documentroot="$localhttp[2]"
 local localhttp_userdir="$localhttp[3]"

@@ -1,4 +1,4 @@
-texinode(The clone Module)(The complete Module)(The cap Module)(Zsh Modules)
+texinode(The clone Module)(The zutil Module)(The cap Module)(Zsh Modules)
 sect(The clone Module)
 The tt(clone) module makes available one builtin command:
 

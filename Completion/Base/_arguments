@@ -162,7 +162,7 @@ while [[ "$1" = -(O*|C) ]]; do
   esac
 done
 
-_style -s options auto-description autod
+zstyle -s ":completion${curcontext}:options" auto-description autod
 
 if (( $# )) && comparguments -i "$autod" "$@"; then
   local nm="$compstate[nmatches]" action noargs aret expl local
@@ -258,7 +258,7 @@ if (( $# )) && comparguments -i "$autod" "$@"; then
       fi
 
       if [[ -z "$matched" ]] && _requested options &&
-          { ! _style options prefix-needed ||
+          { ! zstyle -t ":completion${curcontext}:options" prefix-needed ||
             [[ "$origpre" = [-+]* ]] } ; then
 	local prevpre="$PREFIX" previpre="$IPREFIX"
 

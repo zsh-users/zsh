@@ -21,14 +21,14 @@ elif [[ ${(Pt)${compstate[parameter]}} = array* ]]; then
   while _tags; do
     if _requested -V indexes expl 'array index'; then
       ind=( {1..${#${(P)${compstate[parameter]}}}} )
-      if _style indexes verbose; then
+      if zstyle -t ":completion${curcontext}:indexes" verbose; then
         list=()
         for i in "$ind[@]"; do
           [[ "$i" = ${PREFIX}*${SUFFIX} ]] &&
               list=( "$list[@]" 
 	             "${i}:$(print -D ${(P)${compstate[parameter]}[$i]})" )
         done
-        compdisplay list ' -- ' "$list[@]"
+        zformat -a list ' -- ' "$list[@]"
 	disp=( -d list)
       else
         disp=()

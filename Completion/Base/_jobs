@@ -4,9 +4,10 @@ local expl disp jobs job jids pfx='%' desc
 
 _tags jobs || return 1
 
-_style jobs prefix-needed && [[ "$PREFIX" != %* ]] && return 1
-_style jobs prefix-hidden && pfx=''
-_style jobs verbose       && desc=yes
+zstyle -t ":completion${curcontext}:jobs" prefix-needed &&
+    [[ "$PREFIX" != %* ]] && return 1
+zstyle -t ":completion${curcontext}:jobs" prefix-hidden && pfx=''
+zstyle -t ":completion${curcontext}:jobs" verbose       && desc=yes
 
 if [[ "$1" = -r ]]; then
   jids=( "${(@k)jobstates[(R)running*]}" )
@@ -30,7 +31,7 @@ if [[ -n "$desc" ]]; then
   done
 fi
 
-if _style jobs strings; then
+if zstyle -t ":completion${curcontext}:jobs" strings; then
   local texts i text str tmp
 
   # Find shortest unambiguous strings.
