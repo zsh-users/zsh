@@ -1,3 +1,12 @@
+2003-10-26  Bart Schaefer  <schaefer@zsh.org>
+
+	* zsh-users/6738: Functions/Zle/url-quote-magic: replacement for
+	self-insert that quotes shell metacharacters when they appear in a
+	word that looks like a URL.
+
+	* zsh-users/6736: Functions/Zle/quote-and-complete-word: widget
+	that puts double-quotes around words before invoking completion.
+
 2003-10-24  Clint Adams  <clint@zsh.org>
 
 	* 19202: Doc/Makefile.in, Doc/Zsh/mod_datetime.yo:
@@ -30,6 +39,12 @@
 	* 19169: Src/Modules/datetime.c: change SECS parameter to
 	EPOCHSECONDS.
 
+2003-10-07  Bart Schaefer  <schaefer@zsh.org>
+
+	* users/6663: Completion/compaudit: follow symlinks when checking
+	permissions on directories in the fpath; also in case of symlinks,
+	find parent with ${^fpath:h} rather than ${^fpath}/..
+	
 2003-10-06  Peter Stephenson  <pws@pwstephenson.fsnet.co.uk>
 
 	* 19168: Src/prompt.c, Src/utils.c, Src/Modules/datetime.c:
