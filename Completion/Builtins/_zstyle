@@ -61,7 +61,7 @@ styles=(
   squeeze-slashes	 c:bool
   stop			 c:stop
   stop-keys		 c:
-  subst-glob-only        c:
+  subst-globs-only       c:
   substitute		 c:
   tag-order		 c:tag
   users			 c:_users

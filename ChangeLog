@@ -1,3 +1,8 @@
+2000-04-09  Bart Schaefer  <schaefer@brasslantern.com>
+
+	* 10598: Completion/Builtins/_zstyle, Doc/Zsh/compsys.yo:
+	Fix typo; reformat styles documentation for readability.
+
 2000-04-09  Peter Stephenson  <pws@pwstephenson.fsnet.co.uk>
 
 	* Config/version.mk: 3.1.6-dev-22.
