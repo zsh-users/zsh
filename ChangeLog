@@ -1,3 +1,12 @@
+2004-04-23  Peter Stephenson  <pws@csr.com>
+
+	* 19810: Src/exec.c: avoid setting flag on Eprog which may
+	no longer be valid.  Had no feedback, so don't know if
+	it helps, but at worst harmless.
+
+	* 19812: Src/builtin.c: avoid race with autoloaded trap functions.
+	However, I think these still need substantial improvement.
+
 2004-04-21  Peter Stephenson  <pws@csr.com>
 
 	* 19809: Src/jobs.c, Src/signals.c, Src/signals.h: improve

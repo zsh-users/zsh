@@ -3546,9 +3546,9 @@ doshfunc(char *name, Eprog prog, LinkList doshargs, int flags, int noreturnval)
     if (prog->flags & EF_RUN) {
 	Shfunc shf;
 
-	runshfunc(prog, NULL, fstack.name);
-
 	prog->flags &= ~EF_RUN;
+
+	runshfunc(prog, NULL, fstack.name);
 
 	if (!(shf = (Shfunc) shfunctab->getnode(shfunctab,
 						(name = fname)))) {

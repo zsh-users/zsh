@@ -2515,12 +2515,13 @@ bin_functions(char *name, char **argv, Options ops, int func)
 	    shf = (Shfunc) zshcalloc(sizeof *shf);
 	    shf->flags = on;
 	    shf->funcdef = mkautofn(shf);
+	    shfunctab->addnode(shfunctab, ztrdup(*argv), shf);
 
 	    if (!strncmp(*argv, "TRAP", 4) &&
 		(signum = getsignum(*argv + 4)) != -1) {
 		if (settrap(signum, shf->funcdef)) {
-		    freeeprog(shf->funcdef);
-		    zfree(shf, sizeof(*shf));
+		    shfunctab->removenode(shfunctab, *argv);
+		    shfunctab->freenode((HashNode)shf);
 		    returnval = 1;
 		    ok = 0;
 		}
@@ -2528,12 +2529,9 @@ bin_functions(char *name, char **argv, Options ops, int func)
 		    sigtrapped[signum] |= ZSIG_FUNC;
 	    }
 
-	    if (ok) {
-		shfunctab->addnode(shfunctab, ztrdup(*argv), shf);
-		if (OPT_ISSET(ops,'X') &&
-		    eval_autoload(shf, shf->nam, ops, func))
-		    returnval = 1;
-	    }
+	    if (ok && OPT_ISSET(ops,'X') &&
+		eval_autoload(shf, shf->nam, ops, func))
+		returnval = 1;
 	} else
 	    returnval = 1;
     }
