@@ -1,3 +1,7 @@
+2001-02-02  Andrej Borsenkow <Andrej.Borsenkow@mow.siemens.ru>
+
+	* unposted: Src/mkmakemod.sh: patterns in 13412 were wrong.
+
 2001-02-02  Sven Wischnowsky  <wischnow@zsh.org>
 
 	* Peter: 13427: Completion/Core/_expand: fix for handling quoting

@@ -132,8 +132,7 @@ if $first_stage; then
 	    $the_subdir/$lastsub/*) ;;
 	    $the_subdir/*/*)
 		lastsub=`echo $modfile | sed 's,^'$the_subdir'/,,;s,/[^/]*$,,'`
-		case "$all_subdirs" in
-		    *" $lastsub"* ) ;;
+		case "$all_subdirs " in
 		    *" $lastsub "* ) ;;
 		    * )
 			all_subdirs="$all_subdirs $lastsub"
