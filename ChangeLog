@@ -1,3 +1,8 @@
+2001-10-08  Peter Stephenson  <pws@csr.com>
+
+	* 15965: Src/exec.c, Src/glob.c, Src/subst.c: rename glob() to
+	zglob() to avoid clashes with library function.
+
 2001-10-06  Clint Adams  <clint@zsh.org>
 
         * Norbert Koch: 15954: Doc/Zsh/arith.yo:
