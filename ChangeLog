@@ -1,5 +1,8 @@
 2000-05-04  Sven Wischnowsky  <wischnow@informatik.hu-berlin.de>
 
+	* 11144: Src/Modules/zpty.c: make pty the controlling terminal of
+	their commands
+
 	* 11142: Src/lex.c: save and restore `len' in lexsave/restore
 	
 	* 11140: Completion/Builtins/_zstyle, Completion/Core/_main_complete,

@@ -155,33 +155,29 @@ getptycmd(char *name)
 /**** maybe we should use configure here */
 /**** and we certainly need more/better #if tests */
 
-#ifdef __osf__
-
-static int
-get_pty(int *master, int *slave)
-{
-    return openpty(master, slave, NULL, NULL, NULL);
-}
-
-#else /* ! __osf__ */
-
 #if defined(__SVR4) || defined(sinix)
 
 #include <sys/stropts.h>
 
 static int
-get_pty(int *master, int *slave)
+get_pty(int master, int *retfd)
 {
-    int mfd, sfd;
-    char *name;
+    static char *name;
+    static int mfd, sfd;
+
     int ret;
 
-    if ((mfd = open("/dev/ptmx", O_RDWR)) < 0)
-	return 1;
+    if (master) {
+	if ((mfd = open("/dev/ptmx", O_RDWR)) < 0)
+	    return 1;
 
-    if (grantpt(mfd) || unlockpt(mfd) || !(name = ptsname(mfd))) {
-	close(mfd);
-	return 1;
+	if (grantpt(mfd) || unlockpt(mfd) || !(name = ptsname(mfd))) {
+	    close(mfd);
+	    return 1;
+	}
+	*retfd = mfd;
+
+	return 0;
     }
     if ((sfd = open(name, O_RDWR)) < 0) {
 	close(mfd);
@@ -205,8 +201,8 @@ get_pty(int *master, int *slave)
 	   close(sfd);
 	   return 1;
        }
-    *master = mfd;
-    *slave = sfd;
+
+    *retfd = sfd;
 
     return 0;
 }
@@ -214,7 +210,7 @@ get_pty(int *master, int *slave)
 #else /* ! (defined(__SVR4) || defined(sinix)) */
 
 static int
-get_pty(int *master, int *slave)
+get_pty(int master, int *retfd)
 {
 
 #ifdef __linux
@@ -225,33 +221,37 @@ get_pty(int *master, int *slave)
     static char char2[] = "0123456789abcdef";
 #endif /* __linux */
 
-    char name[11], *p1, *p2;
-    int mfd, sfd;
+    static char name[11];
+    static int mfd, sfd;
+    char *p1, *p2;
 
-    strcpy(name, "/dev/ptyxx");
+    if (master) {
+	strcpy(name, "/dev/ptyxx");
 
-    for (p1 = char1; *p1; p1++) {
-	name[8] = *p1;
-	for (p2 = char2; *p2; p2++) {
-	    name[9] = *p2;
-	    if ((mfd = open(name, O_RDWR)) >= 0) {
-		name[5] = 't';
-		if ((sfd = open(name, O_RDWR)) >= 0) {
-		    *master = mfd;
-		    *slave = sfd;
+	for (p1 = char1; *p1; p1++) {
+	    name[8] = *p1;
+	    for (p2 = char2; *p2; p2++) {
+		name[9] = *p2;
+		if ((mfd = open(name, O_RDWR)) >= 0) {
+		    *retfd = mfd;
 
 		    return 0;
 		}
-		name[5] = 'p';
-		close(mfd);
 	    }
 	}
     }
+    name[5] = 't';
+    if ((sfd = open(name, O_RDWR)) >= 0) {
+	*retfd = sfd;
+
+	return 0;
+    }
+    close(mfd);
+
     return 1;
 }
 
 #endif /* __SVR4 */
-#endif /* __osf__ */
 
 static int
 newptycmd(char *nam, char *pname, char **args, int echo, int block)
@@ -264,7 +264,7 @@ newptycmd(char *nam, char *pname, char **args, int echo, int block)
 	zwarnnam(nam, "unknown command: %s", *args, 0);
 	return 1;
     }
-    if (get_pty(&master, &slave)) {
+    if (get_pty(1, &master)) {
 	zwarnnam(nam, "can't open pseudo terminal", NULL, 0);
 	return 1;
     }
@@ -274,6 +274,42 @@ newptycmd(char *nam, char *pname, char **args, int echo, int block)
 	zwarnnam(nam, "couldn't create pty command: %s", pname, 0);
 	return 1;
     } else if (!pid) {
+
+	pid = getpid();
+
+#ifdef HAVE_SETSID
+	setsid();
+#else
+#ifdef TIOCNOTTY
+	{
+	    int t = open("/dev/tty", O_RDWR);
+
+	    ioctl(t, TIOCNOTTY, 0);
+	    close(t);
+	}
+#endif
+#endif
+
+	if (get_pty(0, &slave))
+	    exit(1);
+
+#ifdef TIOCSCTTY
+	ioctl(slave, TIOCSCTTY, 0);
+#endif
+
+	/* This is taken from attachtty(). Should we exit in case of
+	 * failure? */
+
+#ifdef HAVE_TCSETPGRP
+	tcsetpgrp(slave, pid);
+#else
+# if ardent
+	setpgrp();
+# else
+	ioctl(slave, TIOCSPGRP, &pid);
+# endif
+#endif
+
 	if (!echo) {
 	    struct ttyinfo info;
 
@@ -317,13 +353,13 @@ newptycmd(char *nam, char *pname, char **args, int echo, int block)
 
 	close(slave);
 
-	setpgrp(0L, getpid());
+	if (SHTTY != -1)
+	    close(SHTTY);
 
 	execve(cmd, args, environ);
 	exit(0);
     }
     master = movefd(master);
-    close(slave);
 
     p = (Ptycmd) zalloc(sizeof(*p));
 
@@ -539,7 +575,6 @@ bin_zpty(char *nam, char **args, char *ops, int func)
 	    zwarnnam(nam, "no such pty command: %s", *args, 0);
 	    return 1;
 	}
-	checkptycmd(p);
 	if (p->fin)
 	    return 1;
 	return (ops['r'] ?
