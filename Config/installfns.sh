@@ -1,6 +1,6 @@
 #!/bin/sh
 
-if test -d $fndir.old; then
+if test -d $DESTDIR$fndir.old; then
   add_old=1
 fi
 
@@ -22,27 +22,27 @@ for file in $install; do
     if test x$FUNCTIONS_SUBDIRS != x -a x$FUNCTIONS_SUBDIRS != xno; then
       subfile="$file"
       subdir="`echo $file | sed -e 's%/[^/]*$%%'`"
-      olddir="$fndir.old/$subdir"
-      instdir="$fndir/$subdir"
+      olddir="$DESTDIR$fndir.old/$subdir"
+      instdir="$DESTDIR$fndir/$subdir"
     else
       subfile="`echo $file | sed -e 's%^.*/%%'`"
-      olddir="$fndir.old"
-      instdir="$fndir"
+      olddir="$DESTDIR$fndir.old"
+      instdir="$DESTDIR$fndir"
     fi
-    if test -f $fndir/$subfile; then
-      if cmp $fndir/$subfile $sdir/$file >/dev/null; then :; else
+    if test -f $DESTDIR$fndir/$subfile; then
+      if cmp $DESTDIR$fndir/$subfile $sdir/$file >/dev/null; then :; else
 	$sdir_top/mkinstalldirs $olddir
-        mv $fndir/$subfile $olddir
+        mv $DESTDIR$fndir/$subfile $olddir
         : ${add_old:=1}
       fi
     fi
-    $sdir_top/mkinstalldirs $DESTDIR$instdir || exit 1
-    $INSTALL_DATA $sdir/$file $DESTDIR$instdir || exit 1
+    $sdir_top/mkinstalldirs $instdir || exit 1
+    $INSTALL_DATA $sdir/$file $instdir || exit 1
   fi
 done
 
 if test x$add_old != x1; then
-  rm -rf $fndir.old
+  rm -rf $DESTDIR$fndir.old
 fi
 
 exit 0
