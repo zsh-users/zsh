@@ -205,18 +205,18 @@ uninstall.info:
 
 # ========== DEPENDENCIES FOR CLEANUP ==========
 
-@CLEAN_MK@
-
 clean-here:
 	rm -f *.html *.info* *.dvi *.ps
 	rm -f *.aux *.cp *.cps *.fn *.fns *.ky *.log
 	rm -f *.pg *.pgs *.toc *.tp *.tps *.vr *.vrs
 
-distclean-here:
-	rm -f Makefile
+distclean-here: clean-here
+	rm -f Makefile *.1 *.texi
 
-realclean-here:
-	cd $(sdir) && rm -f version.yo *.1 *.texi ../META-FAQ
+realclean-here: distclean-here
+	cd $(sdir) && rm -f version.yo ../META-FAQ
+
+@CLEAN_MK@
 
 # ========== DEPENDENCIES FOR MAINTENANCE ==========
 

@@ -96,7 +96,9 @@ install.html uninstall.html:
 @CLEAN_MK@
 
 distclean-here:
-	rm -f Makefile config.h config.status config.log config.cache stamp-h
+	@cd Completion && $(MAKE) $(MAKEDEFS) $@
+	@cd Functions && $(MAKE) $(MAKEDEFS) $@
+	rm -f Makefile config.h config.status config.log config.cache stamp-h Config/defs.mk
 
 realclean-here:
 	cd $(sdir) && rm -f config.h.in stamp-h.in configure

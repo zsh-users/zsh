@@ -52,13 +52,14 @@ uninstall: uninstall.fns
 
 # ========== DEPENDENCIES FOR CLEANUP ==========
 
-@CLEAN_MK@
-
 mostlyclean-here:
 
 distclean-here:
+	rm -f Makefile
 
 realclean-here:
+
+@CLEAN_MK@
 
 # ========== DEPENDENCIES FOR MAINTENANCE ==========
 
