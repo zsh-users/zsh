@@ -1,0 +1,76 @@
+#autoload
+
+# This builds a display-list for the `-y' option of `compadd' and
+# `compgen' out of the arguments it gets. The first argument is
+# taken as the name of a parameter and the string built is stored
+# into it.
+# The second argument is the name of an array whose elements each
+# contains a string to complete, optionally followed by a colon
+# and a description. The display list created will contain one
+# line per string with the description after it, all nicely
+# aligned. Strings without descriptions are put at the end in a
+# column-oriented fashion.
+# All arguments after the second one are given as arguments to
+# `compadd'.
+# This function will also do the matching required to find out
+# which strings will be included in the list. All elements that
+# don't match will be removed from the array. This means that the
+# special parameters `PREFI' and `SUFFIX' have to be set up 
+# correctly before this function is called.
+
+local _param="$1" _arr _len _i _tmp _simple
+
+# Remove all descriptions not matched by the string on the line.
+
+if [[ "${2[1]}" = \( ]]; then
+  _arr=( ${(o)=2[2,-2]} )
+else
+  _arr=( "${(@Po)2}" )
+fi
+
+compadd -D _arr "${(@)argv[3,-1]}" - "${(@)_arr%%:*}"
+
+[[ "${2[1]}" != \( ]] && eval "${2}=( \"\$_arr[@]\" )"
+
+if (( $#_arr )); then
+
+  # There are strings left, first get the length of the longest of
+  # them (to be able to align them) and collect all strings without
+  # descriptions.
+
+  _simple=()
+  _len=1
+  for _i in "$_arr[@]";  do
+    _tmp="${#_i%%:*}"
+    if [[ "$_i" = *:?* ]]; then
+      [[ _tmp -gt _len ]] && _len="$_tmp"
+    else
+      _simple=( "$_simple[@]" "${_i%:}" )
+    fi
+  done
+
+  # Now we build the list in `_tmp', adding one line per string.
+
+  _tmp=''
+  for _i in "$_arr[@]"; do
+    [[ "$_i" = *:?* ]] && _tmp="$_tmp
+${(r:_len:: :)_i%%:*} -- ${_i#*:}"
+  done
+
+  # If there were strings without descriptions, we just add them by
+  # calling `print -c'.
+
+  (( $#_simple )) && _tmp="${_tmp}
+$(print -c - $_simple)"
+
+  eval "${_param}=${(q)_tmp[2,-1]}"
+
+  return 0
+else
+
+  # None of the strings matches what's on the line, signal this by
+  # setting the parameter to an empty string and by the return value.
+
+  eval "${_param}=''"
+  return 1
+fi
