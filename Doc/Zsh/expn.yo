@@ -643,7 +643,7 @@ setting of the tt(PROMPT_PERCENT), tt(PROMPT_SUBST) and
 tt(PROMPT_BANG) options.
 )
 item(tt(X))(
-With this flag parsing errors occuring with the tt(Q) flag or the
+With this flag parsing errors occuring with the tt(Q) and tt(e) flags or the
 pattern matching forms such as `tt(${)var(name)tt(#)var(pattern)tt(})' 
 are reported. Without the flag they are silently ignored.
 )

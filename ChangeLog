@@ -1,3 +1,8 @@
+2000-06-06  Sven Wischnowsky  <wischnow@zsh.org>
+
+	* 11768: Doc/Zsh/expn.yo, Src/lex.c, Src/subst.c: make (e) flag be
+ 	silent unless (X) is given, too
+	
 2000-06-05  Oliver Kiddle  <opk@zsh.org>
 
 	* 11756: Completion/User/_urls, Completion/Linux/_rpm: accept -g

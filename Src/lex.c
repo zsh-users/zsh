@@ -1419,6 +1419,22 @@ dquote_parse(char endchar, int sub)
 mod_export int
 parsestr(char *s)
 {
+    int err;
+
+    if ((err = parsestrnoerr(s))) {
+	untokenize(s);
+	if (err > 32 && err < 127)
+	    zerr("parse error near `%c'", NULL, err);
+	else
+	    zerr("parse error", NULL, 0);
+    }
+    return err;
+}
+
+/**/
+mod_export int
+parsestrnoerr(char *s)
+{
     int l = strlen(s), err;
 
     lexsave();
@@ -1434,13 +1450,6 @@ parsestr(char *s)
     inpop();
     DPUTS(cmdsp, "BUG: parsestr: cmdstack not empty.");
     lexrestore();
-    if (err) {
-	untokenize(s);
-	if (err > 32 && err < 127)
-	    zerr("parse error near `%c'", NULL, err);
-	else
-	    zerr("parse error", NULL, 0);
-    }
     return err;
 }
 
