@@ -8,26 +8,26 @@ typeset -A opt_args
 _arguments \
   '(- *)'{-V,--version}'[print version information and exit]' \
   '(- *)'{-h,--help}'[print help information and exit]' \
-  {-v,--verbose}'[print more information]' \
-  {-s,--silent}'[print less information]' \
-  {-d,--debug=}'[debug the specified items]:flags:' \
+  '(-v --verbose)'{-v,--verbose}'[print more information]' \
+  '(-s --silent)'{-s,--silent}'[print less information]' \
+  '(-d --debug)'{-d,--debug=}'[debug the specified items]:flags:' \
   '--profile=[profile A-A-P execution and write results in specified file]:output file:_files' \
-  {-n,--nobuild}'[print the build commands but do not execute them]' \
+  '(-n --nobuild)'{-n,--nobuild}'[print the build commands but do not execute them]' \
   '--changed=[consider specified file changed]:changed file:_files' \
-  {-t,--touch}'[update target signatures, do not build]' \
-  {-F,--force}'[force rebuilding]' \
-  {-C,--contents}'[only build when file contents changed]' \
+  '(-t --touch)'{-t,--touch}'[update target signatures, do not build]' \
+  '(-F --force)'{-F,--force}'[force rebuilding]' \
+  '(-C --contents)'{-C,--contents}'[only build when file contents changed]' \
   \*{-c,--command=}'[execute a command after reading the recipe]:aap command:' \
-  {-k,--continue}'[continue building after an error]' \
-  {-S,--stop}'[stop building at first error (default)]' \
-  {-R,--fetch-recipe}'[fetch recipe file and child recipes]' \
-  {-N,--nofetch-recipe}'[do not fetch recipes for "fetch" target]' \
-  {-a,--nocache}"[always download files, don't use the cache]" \
-  {-l,--local}'[do not recurse into subdirectories]' \
-  {-j,--jobs=}'[maximum number of parallel jobs]:number of jobs:' \
-  {-u,--search-up,--up}'[search directory tree upwards for main.aap recipe]' \
+  '(-k --continue)'{-k,--continue}'[continue building after an error]' \
+  '(-S --stop)'{-S,--stop}'[stop building at first error (default)]' \
+  '(-R --fetch-recipe)'{-R,--fetch-recipe}'[fetch recipe file and child recipes]' \
+  '(-N --nofetch-recipe)'{-N,--nofetch-recipe}'[do not fetch recipes for "fetch" target]' \
+  '(-a --nocache)'{-a,--nocache}"[always download files, don't use the cache]" \
+  '(-l --local)'{-l,--local}'[do not recurse into subdirectories]' \
+  '(-j --jobs)'{-j,--jobs=}'[maximum number of parallel jobs]:number of jobs:' \
+  '(-u --search-up --up)'{-u,--search-up,--up}'[search directory tree upwards for main.aap recipe]' \
   \*{-I,--include=}'[directory to search for included recipes]:include directory:_files -/' \
-  {-f,--recipe=}'[recipe file to be executed]:recipe file:_files -g \*.aap\(-.\)' \
+  '(-f --recipe)'{-f,--recipe=}'[recipe file to be executed]:recipe file:_files -g \*.aap\(-.\)' \
   '--install=[install specified package]:package name:' \
   '--[end of options, targets and assignments follow]' \
   '*:aap target:->target' && ret=0

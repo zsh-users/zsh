@@ -1,3 +1,8 @@
+2004-04-26  Doug Kearns  <djkea2@mugca.its.monash.edu.au>
+
+	* unposted: Completion/Unix/Command/_aap: short and long options
+	are mutually exclusive
+
 2004-04-23  Peter Stephenson  <pws@csr.com>
 
 	* 19825: Completion/Unix/Command/_perforce: suggested by Michael
@@ -65,7 +70,7 @@
 2004-04-17  Doug Kearns  <djkea2@mugca.its.monash.edu.au>
 
 	* 19775: Completion/Unix/Command/_php: new completion for php
-	* unposted: Completion/Unix/Commmand/_elinks: declare and initialise
+	* unposted: Completion/Unix/Command/_elinks: declare and initialise
 	return value parameter
 
 2004-04-15  Peter Stephenson  <pws@csr.com>
