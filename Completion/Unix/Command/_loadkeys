@@ -1,9 +1,8 @@
 #compdef loadkeys
 
-if [[ $OSTYPE == linux* ]]
-then
-
-_arguments \
+case $OSTYPE in
+  linux*)
+    _arguments \
 	'(--clearcompose)-c[clearcompose]' \
 	'(-c)--clearcompose' \
 	'(--default)-d[default]' \
@@ -17,10 +16,10 @@ _arguments \
 	'(--verbose)-v[verbose]' \
 	'(-v)--verbose' \
 	':keymap:_files -W /usr/share/keymaps'
-
-elif [[ $OSTYPE == solaris* ]]
-then
-
+  ;;
+  solaris*)
 	_files -W /usr/share/lib/keytables
+  ;;
 
-fi
+  *) _default;;
+esac

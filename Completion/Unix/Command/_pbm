@@ -398,7 +398,7 @@ pnmpad)
     '-l-[specify left border width]:left border width:' \
     '-r-[specify right border width]:right border width:' \
     '-t-[specify top border width]:top border width:' \
-    '-b-[specify bottom border width]:bottom border width:' \
+    '-b-[specify bottom border width]:bottom border width:_guard "[0-9]#"' \
     ':file: _pbm'
   ;;
 

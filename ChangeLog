@@ -1,3 +1,10 @@
+2001-05-03  Oliver Kiddle  <opk@zsh.org>
+
+	* 14216: Completion/Unix/Command/.distfiles,
+        Completion/Unix/Command/_loadkeys, Completion/Unix/Command/_lp,
+        Completion/Unix/Command/_pbm, Completion/Unix/Command/_w3m: minor
+	completion changes
+
 2001-05-03  Sven Wischnowsky  <wischnow@zsh.org>
 
 	* 14214: Src/Zle/computil.c: ignore errors when removing quotes

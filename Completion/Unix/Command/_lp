@@ -2,7 +2,7 @@
 
 local expl ret=1 printer list disp strs shown
 
-if compset -P -P || [[ "$words[CURRENT-1]" = -P ]]; then
+if compset -P -[dP] || [[ "$words[CURRENT-1]" = -[dP] ]]; then
   _printers
 else
   if [[ "$service" = (lpq|lprm) ]]; then

@@ -14,22 +14,22 @@ _arguments \
   '-v[visual startup mode]' \
   '-M[monochrome display]' \
   '-F[automatically render frame]' \
-  '-dump' \
+  '(-dump_source -dump_head)-dump' \
   '-cols:column width:' \
-  '-dump_source' \
-  '-dump_head' \
+  '(-dump -dump_head)-dump_source' \
+  '(-dump -dump_source)-dump_head' \
   '+:goto line:' \
   '-num[show line number]' \
   '-no-proxy' \
   '-no-mouse' \
-  '-cookie' \
-  '-no-cookie' \
+  '(-no-cookie)-cookie' \
+  '(-cookie)-no-cookie' \
   '-no-graph' \
   '-S[squeeze multiple blank lines]' \
   '-W[toggle wrap search mode]' \
   '-X[do not use termcap init/deinit]' \
   '-o[option]:option-value:' \
-  '-config:configfile:_files' \
+  '-config:config file:_files' \
   '-debug' \
   ':url:->url' && return 0
 
