@@ -1,5 +1,7 @@
 2001-07-09  Peter Stephenson  <pws@csr.com>
 
+	* unposted: Config/version.mk: 4.1.0-dev-1.
+
 	* 15329: Test/A01grammar.ztst, Test/A02alias.ztst,
 	Test/A04redirect.ztst, Test/A05execution.ztst, Test/C01arith.ztst,
 	Test/D04parameter.ztst, Test/D06subscript.ztst,
