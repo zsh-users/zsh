@@ -1,3 +1,7 @@
+2001-01-10  Geoff Wing  <gcw@zsh.org>
+
+	* unposted: Etc/MACHINES: format leading spaces to tabs
+
 2001-01-10  Sven Wischnowsky  <wischnow@zsh.org>
 
 	* 13336: Src/Zle/compmatch.c, Src/Zle/compresult.c,
