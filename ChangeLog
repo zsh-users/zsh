@@ -1,3 +1,9 @@
+2000-10-13  Sven Wischnowsky  <wischnow@zsh.org>
+
+	* 12995: Src/Zle/compmatch.c: two completion matching fixes; wrong
+ 	(path) prefix matching (removed path components) and reverse order
+ 	of sub-strings in match-strings
+	
 2000-10-12  Sven Wischnowsky  <wischnow@zsh.org>
 
 	* 12974: Completion/Core/_tags, Completion/Core/_sort_tags,

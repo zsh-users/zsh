@@ -498,7 +498,7 @@ match_str(char *l, char *w, Brinfo *bpp, int bc, int *rwlp,
 	 */
 
 	bslash = 0;
-	if (!sfx && lw &&
+	if (!sfx && lw && (!part || test) &&
 	    (l[ind] == w[ind] ||
 	     (bslash = (lw > 1 && w[ind] == '\\' &&
 			(ind ? (w[0] == l[0]) : (w[1] == l[0])))))) {
@@ -784,10 +784,10 @@ match_str(char *l, char *w, Brinfo *bpp, int bc, int *rwlp,
 		    /* Probably add the matched strings. */
 		    if (!test) {
 			if (sfx)
-			    add_match_str(NULL, NULL, w, ow - w, 0);
+			    add_match_str(NULL, NULL, w, ow - w, sfx);
 			else
-			    add_match_str(NULL, NULL, ow, w - ow, 0);
-			add_match_str(mp, tl, tw, mp->wlen, 0);
+			    add_match_str(NULL, NULL, ow, w - ow, sfx);
+			add_match_str(mp, tl, tw, mp->wlen, sfx);
 			if (sfx)
 			    add_match_sub(NULL, NULL, 0, w, ow - w);
 			else
@@ -846,7 +846,7 @@ match_str(char *l, char *w, Brinfo *bpp, int bc, int *rwlp,
 	    if (!lw)
 		break;
 
-	    if (exact) {
+	    if (exact && !part) {
 		/* If we just accepted some characters directly (at the
 		 * beginning of the loop) and now can't match any further,
 		 * we go back to before those characters and try again,
