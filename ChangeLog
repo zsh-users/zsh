@@ -3,6 +3,8 @@
 	* 11956: Src/loop.c: Fix off-by-one error in wordcode pc executing
 	case statement fall-through.
 
+	* unposted: Test/01grammar.ztst: Add a test for 11956.
+
 2000-06-16  Clint Adams  <schizo@debian.org>
 
 	* 11951: Completion/Debian/_dpkg: replaced _arguments -A

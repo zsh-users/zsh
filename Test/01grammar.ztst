@@ -184,6 +184,22 @@
 0:`case' loop, new syntax
 >2
 
+  word=Hilary
+  case $word in
+    (Michaelmas) print 0
+                ;;
+    (Hilary) print 1
+            ;&
+    (Trinity) print 2
+             ;&
+    (*) print 3
+       ;;
+  esac
+0:`case' loop, new syntax, cascaded
+>1
+>2
+>3
+
 ## This doesn't work, because zsh tries to read from the terminal
 ## even in a non-interactive shell.  The manual implies it always reads
 ## from stdin, even in an interactive shell.
