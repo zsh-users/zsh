@@ -1,3 +1,8 @@
+2001-06-18  Sven Wischnowsky  <wischnow@zsh.org>
+
+	* 14951: Src/signals.c, Src/signals.h: rename handler() to
+	zhandler() because it's now exported to modules
+
 2001-06-14  Peter Stephenson  <pws@csr.com>
 
 	* 14921: Completion/Zsh/_zftp: autoload zfcd_match and zfget_match
