@@ -3,10 +3,9 @@
 local opts opt type=file glob group gopts dopts aopts tmp _file_pat_checked=yes
 local hasign ign
 
-zparseopts \
-    /tmp ftmp g+tmp \
-    qopts nopts 1opts 2opts P:opts S:opts r:opts R:opts W:opts X:opts M:opts \
-    F:opts J:group V:group
+zparseopts -a opts \
+    '/=tmp' 'f=tmp' 'g+:-=tmp' q n 1 2 P: S: r: R: W: X: M: F: \
+    'J:=group' 'V:=group'
 
 type="${(@j::M)${(@)tmp#-}#?}"
 [[ -n "$type" ]] || type=f
@@ -15,12 +14,14 @@ if (( $tmp[(I)-g*] )); then
 else
   gopts=()
 fi
-(( $opts[(I)-F*] )) && hasign=yes
+(( $opts[(I)-F] )) && hasign=yes
 
-if [[ "$group[1]" = -?files ]]; then
+if [[ "$group[2]" = files ]]; then
   opts=("$opts[@]" "$group[@]")
   group=()
 fi
+
+ign=()
 
 if zstyle -s ":completion:${curcontext}:all-files" file-patterns tmp &&
    [[ -n "$tmp" ]]; then
@@ -58,7 +59,7 @@ esac
 while _tags; do
   if _requested all-files; then
     if (( $#group )); then
-      group[1]="${group[1][1,2]}all-files"
+      group[2]=all-files
       _setup all-files
       [[ -z "$hasign" ]] &&
         zstyle -a ":completion:${curcontext}:all-files" ignored-patterns _comp_ignore &&
@@ -69,7 +70,7 @@ while _tags; do
   elif _requested directories; then
     if _requested globbed-files; then
       if (( $#group )); then
-        group[1]="${group[1][1,2]}globbed-files"
+        group[2]=globbed-files
 	_setup globbed-files
         [[ -z "$hasign" ]] &&
           zstyle -a ":completion:${curcontext}:all-files" ignored-patterns _comp_ignore &&
@@ -78,7 +79,7 @@ while _tags; do
       _path_files "$opts[@]" "$ign[@]" "$dopts[@]" "$gopts[@]" && return 0
     else
       if (( $#group )); then
-        group[1]="${group[1][1,2]}directories"
+        group[2]=directories
 	_setup directories
         [[ -z "$hasign" ]] &&
           zstyle -a ":completion:${curcontext}:all-files" ignored-patterns _comp_ignore &&
@@ -88,7 +89,7 @@ while _tags; do
     fi
   elif _requested globbed-files; then
     if (( $#group )); then
-      group[1]="${group[1][1,2]}globbed-files"
+      group[2]=globbed-files
       _setup globbed-files
       [[ -z "$hasign" ]] &&
         zstyle -a ":completion:${curcontext}:all-files" ignored-patterns _comp_ignore &&

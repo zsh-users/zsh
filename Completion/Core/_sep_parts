@@ -22,13 +22,11 @@ local matchflags opt group expl nm=$compstate[nmatches] opre osuf opts match
 
 # Get the options.
 
-zparseopts -D \
-    J:group V:group \
-    P:opts F:opts S:opts r:opts R:opts qopts 1opts 2opts nopts \
-    X:expl M:match
+zparseopts -D -a opts \
+    'J:=group' 'V=:group' P: F: S: r: R: q 1 2 n 'X:=expl' 'M:=match'
 
 if (( $#match )); then
-  match="${match[1][3,-1]}"
+  match="${match[2]}"
 else
   match=''
 fi

@@ -1160,26 +1160,58 @@ typedef struct zoptarr *Zoptarr;
 typedef struct zoptval *Zoptval;
 
 struct zoptdesc {
-    int arg;
+    Zoptdesc next;
+    char *name;
+    int flags;
     Zoptarr arr;
+    Zoptval vals, last;
 };
 
+#define ZOF_ARG  1
+#define ZOF_OPT  2
+#define ZOF_MULT 4
+#define ZOF_SAME 8
+
 struct zoptarr {
+    Zoptarr next;
     char *name;
     Zoptval vals, last;
-    Zoptarr next;
     int num;
 };
 
-#define ZOF_ARG 1
-#define ZOF_ADD 2
-
 struct zoptval {
+    Zoptval next, onext;
+    char *name;
+    char *arg;
     char *str;
-    Zoptval next;
 };
 
+static Zoptdesc opt_descs;
 static Zoptarr opt_arrs;
+
+static Zoptdesc
+get_opt_desc(char *name)
+{
+    Zoptdesc p;
+
+    for (p = opt_descs; p; p = p->next)
+	if (!strcmp(name, p->name))
+	    return p;
+
+    return NULL;
+}
+
+static Zoptdesc
+lookup_opt(char *str)
+{
+    Zoptdesc p;
+
+    for (p = opt_descs; p; p = p->next) {
+	if ((p->flags & ZOF_ARG) ? strpfx(p->name, str) : !strcmp(p->name, str))
+	    return p;
+    }
+    return NULL;
+}
 
 static Zoptarr
 get_opt_arr(char *name)
@@ -1193,102 +1225,296 @@ get_opt_arr(char *name)
     return NULL;
 }
 
+static void
+add_opt_val(Zoptdesc d, char *arg)
+{
+    Zoptval v = NULL;
+    char *n = dyncat("-", d->name);
+    int new = 0;
+
+    if (!(d->flags & ZOF_MULT))
+	v = d->vals;
+    if (!v) {
+	v = (Zoptval) zhalloc(sizeof(*v));
+	v->next = v->onext = NULL;
+	v->name = n;
+	new = 1;
+    }
+    v->arg = arg;
+    if ((d->flags & ZOF_ARG) && !(d->flags & (ZOF_OPT | ZOF_SAME))) {
+	v->str = NULL;
+	if (d->arr)
+	    d->arr->num += (arg ? 2 : 1);
+    } else if (arg) {
+	char *s = (char *) zhalloc(strlen(d->name) + strlen(arg) + 2);
+
+	*s = '-';
+	strcpy(s + 1, d->name);
+	strcat(s, arg);
+	v->str = s;
+	if (d->arr)
+	    d->arr->num += 1;
+    } else {
+	v->str = NULL;
+	if (d->arr)
+	    d->arr->num += 1;
+    }
+    if (new) {
+	if (d->arr) {
+	    if (d->arr->last)
+		d->arr->last->next = v;
+	    else
+		d->arr->vals = v;
+	    d->arr->last = v;
+	}
+	if (d->last)
+	    d->last->onext = v;
+	else
+	    d->vals = v;
+	d->last = v;
+    }
+}
+
 static int
 bin_zparseopts(char *nam, char **args, char *ops, int func)
 {
-    char *o, *n, **pp, *str, **aval;
-    Zoptdesc opts[256], d;
-    Zoptarr a;
+    char *o, *p, *n, **pp, **aval, **ap, *assoc = NULL;
+    int del = 0, f;
+    Zoptdesc sopts[256], d;
+    Zoptarr a, defarr = NULL;
     Zoptval v;
 
-    memset(opts, 0, 256 * sizeof(Zoptdesc));
+    opt_descs = NULL;
     opt_arrs = NULL;
+    memset(sopts, 0, 256 * sizeof(Zoptdesc));
 
     while ((o = *args++)) {
-	if (opts[STOUC(*o)]) {
-	    zerrnam(nam, "option described more than once: %s", o, 0);
+	if (*o == '-') {
+	    switch (o[1]) {
+	    case '\0':
+		o = NULL;
+		break;
+	    case '-':
+		if (o[2])
+		    args--;
+		o = NULL;
+		break;
+	    case 'D':
+		if (o[2]) {
+		    args--;
+		    o = NULL;
+		    break;
+		}
+		del = 1;
+		break;
+	    case 'a':
+		if (defarr) {
+		    zerrnam(nam, "default array given more than once", NULL, 0);
+		    return 1;
+		}
+		if (o[2])
+		    n = o + 2;
+		else if (*args)
+		    n = *args++;
+		else {
+		    zerrnam(nam, "missing array name", NULL, 0);
+		    return 1;
+		}
+		defarr = (Zoptarr) zhalloc(sizeof(*defarr));
+		defarr->name = n;
+		defarr->num = 0;
+		defarr->vals = defarr->last = NULL;
+		defarr->next = NULL;
+		opt_arrs = defarr;
+		break;
+	    case 'A':
+		if (o[2]) 
+		    assoc = o + 2;
+		else if (*args)
+		    assoc = *args++;
+		else {
+		    zerrnam(nam, "missing array name", NULL, 0);
+		    return 1;
+		}
+		break;
+	    }
+	    if (!o)
+		break;
+	} else {
+	    args--;
+	    break;
+	}
+    }
+    while ((o = dupstring(*args++))) {
+	if (!*o) {
+	    zerrnam(nam, "invalid option description: %s", o, 0);
+	    return 1;
+	}
+	f = 0;
+	for (p = o; *p; p++) {
+	    if (*p == '\\' && p[1])
+		p++;
+	    else if (*p == '+') {
+		f |= ZOF_MULT;
+		*p = '\0';
+		p++;
+		break;
+	    } else if (*p == ':' || *p == '=')
+		break;
+	}
+	if (*p == ':') {
+	    f |= ZOF_ARG;
+	    *p = '\0';
+	    if (*++p == ':') {
+		p++;
+		f |= ZOF_OPT;
+	    }
+	    if (*p == '-') {
+		p++;
+		f |= ZOF_SAME;
+	    }
+	}
+	a = NULL;
+	if (*p == '=') {
+	    *p++ = '\0';
+	    if (!(a = get_opt_arr(p))) {
+		a = (Zoptarr) zhalloc(sizeof(*a));
+		a->name = p;
+		a->num = 0;
+		a->vals = a->last = NULL;
+		a->next = opt_arrs;
+		opt_arrs = a;
+	    }
+	} else if (*p) {
+	    zerrnam(nam, "invalid option description: %s", args[-1], 0);
+	    return 1;
+	} else if (!(a = defarr) && !assoc) {
+	    zerrnam(nam, "no default array defined: %s", args[-1], 0);
+	    return 1;
+	}
+	for (p = n = o; *p; p++) {
+	    if (*p == '\\' && p[1])
+		p++;
+	    *n++ = *p;
+	}
+	if (get_opt_desc(o)) {
+	    zerrnam(nam, "option defined more than once: %s", o, 0);
 	    return 1;
 	}
 	d = (Zoptdesc) zhalloc(sizeof(*d));
-	d->arg = (o[1] == ':' ? ZOF_ARG : (o[1] == '+' ? ZOF_ADD : 0));
-	if (!(a = get_opt_arr((n = o + (d->arg ? 2 : 1))))) {
-	    a = (Zoptarr) zhalloc(sizeof(*a));
-	    a->name = n;
-	    a->num = 0;
-	    a->vals = a->last = NULL;
-	    a->next = opt_arrs;
-	    opt_arrs = a;
-	}
+	d->name = o;
+	d->flags = f;
 	d->arr = a;
-	opts[STOUC(*o)] = d;
+	d->next = opt_descs;
+	d->vals = d->last = NULL;
+	opt_descs = d;
+	if (!o[1])
+	    sopts[STOUC(*o)] = d;
     }
     for (pp = pparams; (o = *pp); pp++) {
 	if (*o != '-')
 	    break;
-	while (*++o) {
-	    if (!(d = opts[STOUC(*o)]))
-		break;
-	    if (d->arg) {
-		if (o[1]) {
-		    str = (char *) zhalloc(strlen(o) + 2);
-		    str[0] = '-';
-		    strcpy(str + 1, o);
-		} else if (!pp[1]) {
-		    zerrnam(nam, "missing argument for option: -%c", NULL, *o);
-		    return 1;
-		} else {
-		    str = (char *) zhalloc(strlen(pp[1]) + 3);
-		    str[0] = '-';
-		    str[1] = *o;
-		    strcpy(str + 2, pp[1]);
-		    pp++;
+	if (!o[1] || (o[1] == '-' && !o[2])) {
+	    pp++;
+	    break;
+	}
+	if (!(d = lookup_opt(o + 1))) {
+	    while (*++o) {
+		if (!(d = sopts[STOUC(*o)])) {
+		    o = NULL;
+		    break;
 		}
-		o = "" - 1;
-	    } else {
-		str = (char *) zhalloc(3);
-		str[0] = '-';
-		str[1] = *o;
-		str[2] = '\0';
-	    }
-	    if (d->arg != ZOF_ADD) {
-		for (v = d->arr->vals; v; v = v->next) {
-		    if (str[1] == v->str[1]) {
-			v->str = str;
-			str = NULL;
+		if (d->flags & ZOF_ARG) {
+		    if (o[1]) {
+			add_opt_val(d, o + 1);
 			break;
-		    }
-		}
+		    } else if (!(d->flags & ZOF_OPT)) {
+			if (!pp[1]) {
+			    zerrnam(nam, "missing argument for option: %s",
+				    d->name, 0);
+			    return 1;
+			}
+			add_opt_val(d, *++pp);
+		    } else
+			add_opt_val(d, NULL);
+		} else
+		    add_opt_val(d, NULL);
 	    }
-	    if (str) {
-		v = (Zoptval) zhalloc(sizeof(*v));
-		v->str = str;
-		v->next = NULL;
+	    if (!o)
+		break;
+	} else {
+	    if (d->flags & ZOF_ARG) {
+		char *e = o + strlen(d->name) + 1;
 
-		if (d->arr->last)
-		    d->arr->last->next = v;
-		else
-		    d->arr->vals = v;
-		d->arr->last = v;
-		d->arr->num++;
+		if (*e)
+		    add_opt_val(d, e);
+		else if (!(d->flags & ZOF_OPT)) {
+		    if (!pp[1]) {
+			zerrnam(nam, "missing argument for option: %s",
+				d->name, 0);
+			return 1;
+		    }
+		    add_opt_val(d, *++pp);
+		} else
+		    add_opt_val(d, NULL);
+	    } else
+		add_opt_val(d, NULL);
+	}
+    }
+    for (a = opt_arrs; a; a = a->next) {
+	aval = (char **) zalloc((a->num + 1) * sizeof(char *));
+	for (ap = aval, v = a->vals; v; ap++, v = v->next) {
+	    if (v->str)
+		*ap = ztrdup(v->str);
+	    else {
+		*ap = ztrdup(v->name);
+		if (v->arg)
+		    *++ap = ztrdup(v->arg);
 	    }
 	}
-	if (*o)
-	    break;
+	*ap = NULL;
+	setaparam(a->name, aval);
     }
-    if (ops['D']) {
+    if (assoc) {
+	int num;
+
+	for (num = 0, d = opt_descs; d; d = d->next)
+	    if (d->vals)
+		num++;
+
+	aval = (char **) zalloc(((num * 2) + 1) * sizeof(char *));
+	for (ap = aval, d = opt_descs; d; d = d->next) {
+	    if (d->vals) {
+		*ap++ = n = (char *) zalloc(strlen(d->name) + 2);
+		*n = '-';
+		strcpy(n + 1, d->name);
+
+		for (num = 1, v = d->vals; v; v = v->onext) {
+		    num += (v->arg ? strlen(v->arg) : 0);
+		    if (v->next)
+			num++;
+		}
+		*ap++ = n = (char *) zalloc(num);
+		for (v = d->vals; v; v = v->onext) {
+		    if (v->arg) {
+			strcpy(n, v->arg);
+			n += strlen(v->arg);
+		    }
+		    *n = ' ';
+		}
+		*n = '\0';
+	    }
+	}
+	*ap = NULL;
+	sethparam(assoc, aval);
+    }
+    if (del) {
 	PERMALLOC {
 	    pp = arrdup(pp);
 	} LASTALLOC;
 
 	freearray(pparams);
 	pparams = pp;
-    }
-    for (a = opt_arrs; a; a = a->next) {
-	aval = (char **) zalloc((a->num + 1) * sizeof(char *));
-	for (pp = aval, v = a->vals; v; pp++, v = v->next)
-	    *pp = ztrdup(v->str);
-	*pp = NULL;
-	setaparam(a->name, aval);
     }
     return 0;
 }
@@ -1297,7 +1523,7 @@ static struct builtin bintab[] = {
     BUILTIN("zstyle", 0, bin_zstyle, 0, -1, 0, NULL, NULL),
     BUILTIN("zformat", 0, bin_zformat, 3, -1, 0, NULL, NULL),
     BUILTIN("zregexparse", 0, bin_zregexparse, 3, -1, 0, "c", NULL),
-    BUILTIN("zparseopts", 0, bin_zparseopts, 1, -1, 0, "D", NULL),
+    BUILTIN("zparseopts", 0, bin_zparseopts, 1, -1, 0, NULL, NULL),
 };
 
 

@@ -17,11 +17,10 @@ exppaths=()
 
 # Get the options.
 
-zparseopts \
-    P:pfxsfx S:pfxsfx qpfxsfx r:pfxsfx R:pfxsfx \
-    W:prepaths F:ignore M+matcher \
-    J:mopts V:mopts X:mopts 1:mopts 2:mopts n:mopts \
-    ftmp1 /tmp1 g+tmp1
+zparseopts -a mopts \
+    'P:=pfxsfx' 'S:=pfxsfx' 'q=pfxsfx' 'r:=pfxsfx' 'R:=pfxsfx' \
+    'W:=prepaths' 'F:=ignore' 'M+=matcher' \
+    J: V: X: 1: 2: n: 'f=tmp1' '/=tmp1' 'g+:-=tmp1'
 
 sopt="-${(@j::M)${(@)tmp1#-}#?}"
 (( $tmp1[(I)-[/g]*] )) && haspats=yes
@@ -33,7 +32,7 @@ else
 fi
 
 if (( $#prepaths )); then
-  tmp1="${prepaths[1][3,-1]}"
+  tmp1="${prepaths[2]}"
   if [[ "$tmp1[1]" = '(' ]]; then
     prepaths=( ${^=tmp1[2,-2]%/}/ )
   elif [[ "$tmp1[1]" = '/' ]]; then
@@ -48,15 +47,14 @@ else
 fi
 
 if (( $#ignore )); then
-  tmp1="${ignore[1][3,-1]}"
-  if [[ "$tmp1[1]" = '(' ]]; then
-    ignore=( ${=tmp1[2,-2]} )
+  if [[ "${ignore[2]}" = \(* ]]; then
+    ignore=( ${=ignore[2][2,-2]} )
   else
-    ignore=( ${(P)tmp1} )
+    ignore=( ${(P)ignore[2]} )
   fi
 fi  
 
-(( $#matcher )) && mspec="${matcher[1][3,-1]}"
+(( $#matcher )) && mspec="${matcher[2]}"
 
 if [[ -z "$_file_pat_checked" ]] &&
    zstyle -s ":completion:${curcontext}:files" file-patterns tmp1 &&
@@ -84,7 +82,7 @@ if [[ "$sopt" = -(f|) ]]; then
   fi
 fi
 
-if (( ! $mopts[(I)-[JVX]*] )); then
+if (( ! $mopts[(I)-[JVX]] )); then
   local expl
 
   if [[ -z "$gopt" && "$sopt" = -/ ]]; then
@@ -165,7 +163,7 @@ eorig="$orig"
 
 if (( $#ignore )); then
   _comp_ignore=( "$_comp_ignore[@]" "$ignore[@]" )
-  (( $mopts[(I)-F*] )) || mopts=( "$mopts[@]" -F _comp_ignore )
+  (( $mopts[(I)-F] )) || mopts=( "$mopts[@]" -F _comp_ignore )
 fi
 
 # Now let's have a closer look at the string to complete.
@@ -371,7 +369,7 @@ for prepath in "$prepaths[@]"; do
 	  [[ "$i" -ef "$PWD" ]] && _comp_ignore=( "$_comp_ignore[@]" "${(q)i}" )
 	done
       fi
-      (( $#_comp_ignore && $mopts[(I)-F*] )) || mopts=( "$mopts[@]" -F _comp_ignore )
+      (( $#_comp_ignore && $mopts[(I)-F] )) || mopts=( "$mopts[@]" -F _comp_ignore )
     fi
 
     # Step over to the next component, if any.

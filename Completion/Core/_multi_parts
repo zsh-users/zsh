@@ -13,15 +13,13 @@ typeset -U tmp2
 
 # Get the options.
 
-zparseopts -D \
-    J:group V:group X:expl \
-    P:opts F:opts \
-    S:sopts r:sopts R:sopts qsopts 1sopts 2sopts nsopts \
-    M:match
+zparseopts -D -a sopts \
+    'J:=group' 'V:=group' 'X:=expl' 'P:=opts' 'F:=opts' \
+    S: r: R: q 1 2 n 'M:=match'
 
 sopts=( "$sopts[@]" "$opts[@]" )
 if (( $#match )); then
-  match="${match[1][3,-1]}"
+  match="${match[2]}"
 else
   match=''
 fi
