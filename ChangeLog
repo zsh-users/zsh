@@ -1,3 +1,9 @@
+2003-02-06  Peter Stephenson  <pws@csr.com>
+
+	* Greg Klanderman <gak@klanderman.net>: 18191:
+	Src/Zle/compresult.c: `compctl -y' didn't obey the listpacked
+	and listrowsfirst options.
+
 2003-02-05  Peter Stephenson  <pws@csr.com>
 
 	* 18195: Doc/Zsh/builtins.yo Src/builtin.c Src/utils.c

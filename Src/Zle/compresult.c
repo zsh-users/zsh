@@ -1408,6 +1408,13 @@ calclist(int showall)
 	g->flags |= CGF_PACKED | CGF_ROWS;
 
 	if (!onlyexpl && pp) {
+            if (*pp) {
+                if (!isset(LISTPACKED))
+                    g->flags &= ~CGF_PACKED;
+                if (!isset(LISTROWSFIRST))
+                    g->flags &= ~CGF_ROWS;
+            }
+
 	    /* We have an ylist, lets see, if it contains newlines. */
 	    hidden = 1;
 	    while (!nl && *pp) {
