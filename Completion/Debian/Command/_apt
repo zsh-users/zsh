@@ -449,7 +449,10 @@ _apt-cache () {
     -q,--quiet:intlevel \
     -i,--important:bool \
     -f,--full:bool \
+    -g,--generate:bool \
     --names-only:bool \
+    --all-names:bool \
+    --recurse:bool \
     -c,--config-file:configfile \
     -o,--option:arbitem \
     -- \
@@ -465,7 +468,10 @@ _apt-cache () {
     /$'search\0'/ /$'[^\0]#\0'/ ':strings:pattern:' \| \
     /$'show\0'/ /$'[^\0]#\0'/ ':packages::_deb_packages "$expl_packages[@]" avail' \# \| \
     /$'depends\0'/ \| \
-    /"[]"/ ':argument-1::compadd "$expl_action[@]" help add gencaches showpkg stats dump dumpavail unmet check search show depends'
+    /$'pkgnames\0'/ \| \
+    /$'dotty\0'/ \| \
+    /$'policy\0'/ \| \
+    /"[]"/ ':argument-1::compadd "$expl_action[@]" help add gencaches showpkg stats dump dumpavail unmet check search show depends pkgnames dotty policy'
 
   _apt-cache () {
     local expl_action expl_packages expl_pkg_cache expl_src_cache
