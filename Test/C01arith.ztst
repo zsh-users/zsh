@@ -1,0 +1,90 @@
+# Tests corresponding to the texinfo node `Arithmetic Evaluation'
+
+%test
+
+  integer light there
+  (( light = 42 )) &&
+  let 'there = light' &&
+  print $(( there ))
+0:basic integer arithmetic
+>42
+
+  float light there
+  integer rnd
+  (( light = 3.1415 )) &&
+  let 'there = light' &&
+  print -- $(( rnd = there * 10000 ))
+# save rounding problems by converting to integer
+0:basic floating point arithmetic
+>31415
+
+  print $(( 0x10 + 0X01 + 2#1010 ))
+0:base input
+>27
+
+  float light
+  (( light = 4 ))
+  print $light
+  typeset -F light
+  print $light
+0:conversion to float
+>4.000000000e+00
+>4.0000000000
+
+  integer i
+  (( i = 32.5 ))
+  print $i
+0:conversion to int
+>32
+
+  integer i
+  (( i = 4 - - 3 * 7 << 1 & 7 ^ 1 | 16 ** 2 ))
+  print $i
+0:precedence (arithmetic)
+>1591
+
+  print $(( 1 < 2 || 2 < 2 && 3 > 4 ))
+0:precedence (logical)
+>1
+
+  print $(( 1 + 4 ? 3 + 2 ? 4 + 3 ? 5 + 6 ? 4 * 8 : 0 : 0 : 0 : 0 ))
+0:precedence (ternary)
+>32
+
+  print $(( 3 ? 2 ))
+1:parsing ternary (1)
+?ZTST_execchunk:2: ':' expected
+
+  print $(( 3 ? 2 : 1 : 4 ))
+1:parsing ternary (2)
+?ZTST_execchunk:2: ':' without '?'
+
+  print $(( 0, 4 ? 3 : 1, 5 ))
+0:comma operator
+>5
+
+  foo=000
+  print $(( ##A + ##\C-a + #foo + $#foo ))
+0:#, ## and $#
+>117
+
+  integer i
+  (( i = 3 + 5 * 1.75 ))
+  print $i
+0:promotion to float
+>11
+
+  typeset x      &&
+  (( x = 3.5 ))  &&
+  print $x       &&
+  (( x = 4 ))    &&
+  print $x
+0:use of scalars to store integers and floats
+>3.5
+>4
+
+  (( newarray[unsetvar]++ ))
+  (( newarray[unsetvar]++ ))
+  print ${(t)newarray} ${#newarray} ${newarray[1]}
+0:setting array elements in math context
+>array 1 2
