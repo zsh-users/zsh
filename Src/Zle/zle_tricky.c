@@ -4482,7 +4482,7 @@ docompletion(char *s, int lst, int incmd)
 
 	hasunqu = 0;
 	useline = (lst != COMP_LIST_COMPLETE);
-	useexact = (isset(RECEXACT) && usemenu != 1);
+	useexact = isset(RECEXACT);
 	uselist = (useline ?
 		   ((isset(AUTOLIST) && !isset(BASHAUTOLIST)) ? 
 		    (isset(LISTAMBIGUOUS) ? 3 : 2) : 0) : 1);
