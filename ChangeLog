@@ -1,3 +1,11 @@
+2004-10-18  Peter Stephenson  <pws@csr.com>
+
+	* 20500: Misc/globtests, Src/glob.c, Src/pattern.c, Src/zsh.h,
+	Src/Zle/complist.c, Test/D02glob.ztst: Use unmetafied strings
+	in patterns more; improve glob.c/pattern.c interface; fix
+	minor <num-> issue; add bogus quotation from Proust (it's
+	my file and I'll do what I like with it).
+
 2004-10-17  Wayne Davison  <wayned@users.sourceforge.net>
 
 	* 20496: Src/utils.c: made zclose() not call close() when the

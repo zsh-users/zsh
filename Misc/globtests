@@ -134,6 +134,9 @@ t 633           <1-1000>33
 t 633           <-1000>33
 t 633           <1->33
 t 633           <->33
+# An open top end of a range will match any integer, even
+# if not representable in the internal integer type.
+t 12345678901234567890123456789012345678901234567890123456789012345678901234567890foo <42->foo
 # Approximate matching
 t READ.ME       (#ia1)readme
 f READ..ME      (#ia1)readme

@@ -1088,10 +1088,10 @@ struct patprog {
     long		startoff;  /* length before start of programme */
     long		size;	   /* total size from start of struct */
     long		mustoff;   /* offset to string that must be present */
+    long		patmlen;   /* length of pure string or longest match */
     int			globflags; /* globbing flags to set at start */
     int			globend;   /* globbing flags set after finish */
     int			flags;	   /* PAT_* flags */
-    int			patmlen;   /* length of pure string or longest match */
     int			patnpar;   /* number of active parentheses */
     char		patstartch;
 };
