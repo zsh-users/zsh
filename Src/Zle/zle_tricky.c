@@ -5529,11 +5529,33 @@ strbpcmp(char **aa, char **bb)
 	if (*b == '\\')
 	    b++;
 	if (*a != *b)
-	    return (int)(*a - *b);
+	    break;
 	if (*a)
 	    a++;
 	if (*b)
 	    b++;
+    }
+    if (isset(NUMERICGLOBSORT) && (idigit(*a) || idigit(*b))) {
+	for (; a > *aa && idigit(a[-1]); a--, b--);
+	if (idigit(*a) && idigit(*b)) {
+	    while (*a == '0')
+		a++;
+	    while (*b == '0')
+		b++;
+	    for (; idigit(*a) && *a == *b; a++, b++);
+	    if (idigit(*a) || idigit(*b)) {
+		int cmp = (int) STOUC(*a) - (int) STOUC(*b);
+
+		while (idigit(*a) && idigit(*b))
+		    a++, b++;
+		if (idigit(*a) && !idigit(*b))
+		    return 1;
+		if (idigit(*b) && !idigit(*a))
+		    return -1;
+
+		return cmp;
+	    }
+	}
     }
     return (int)(*a - *b);
 }
