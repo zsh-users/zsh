@@ -1485,8 +1485,11 @@ ca_parse_line(Cadef d, int multi, int first)
 		state.nargbeg = cur - 1;
 		state.argend = argend;
 	    }
-	    if (!d->args && !d->rest && *line && *line != '-' && *line != '+')
+	    if (!d->args && !d->rest && *line && *line != '-' && *line != '+') {
+		if (!multi && cur > compcurrent)
+		    break;
 		return 1;
+	    }
 	    if ((adef = state.def = ca_get_arg(d, state.nth)) &&
 		(state.def->type == CAA_RREST ||
 		 state.def->type == CAA_RARGS)) {

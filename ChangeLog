@@ -1,3 +1,8 @@
+2000-10-17  Sven Wischnowsky  <wischnow@zsh.org>
+
+	* 13005: Src/Zle/computil.c: make _arguments ignore unspecified
+ 	non-option arguments to the right of the cursor
+	
 2000-10-17  Peter Stephenson  <pws@csr.com>
 
 	* Config/version.mk, Functions/Zle/.distfiles,
@@ -8,7 +13,7 @@
 	
 2000-10-16  Sven Wischnowsky  <wischnow@zsh.org>
 
-	* ?????: Test/54compmatch.ztst: add tests for the stuff in 12995
+	* 13003: Test/54compmatch.ztst: add tests for the stuff in 12995
 	
 2000-10-13  Bart Schaefer  <schaefer@zsh.org>
 
