@@ -1,5 +1,8 @@
 2004-03-25  Peter Stephenson  <pws@csr.com>
 
+	* 19683: Src/utils.c: Work around occasional problem on
+	Cygwin with dllwrap.
+
 	* 19682: Doc/Zsh/builtins.yo, Etc/NEWS, Src/signals.c: Don't
 	run ZERR, DEBUG or EXIT traps inside other traps; caused confusion
 	and incompatibility.

@@ -110,6 +110,19 @@ zwarnnam(const char *cmd, const char *fmt, const char *str, int num)
     zerrmsg(fmt, str, num);
 }
 
+#ifdef __CYGWIN__
+/*
+ * This works around an occasional problem with dllwrap on Cygwin, seen
+ * on at least two installations.  It fails to find the last symbol
+ * exported in alphabetical order (in our case zwarnnam).  Until this is
+ * properly categorised and fixed we add a dummy symbol at the end.
+ */
+mod_export void
+zz_plural_z_alpha(void)
+{
+}
+#endif
+
 /**/
 void
 zerrmsg(const char *fmt, const char *str, int num)
