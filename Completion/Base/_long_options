@@ -2,9 +2,12 @@
 
 # This function tries to automatically complete long option names. For 
 # this it invokes the command from the line with the `--help' option
-# and then parses the output to find possible option names. For
-# options that get an argument after a `=', the function also tries to 
-# automatically find out what should be complete as the argument.
+# and then parses the output to find possible option names, so you
+# should be careful to make sure that this function is not called for
+# a command that does not support this option.
+#
+# For options that get an argument after a `=', the function also tries
+# to automatically find out what should be complete as the argument.
 # The possible completions for option-arguments can be described with
 # the arguments to this function. This is done by giving pairs of
 # patterns and actions as consecutive arguments. The actions specify

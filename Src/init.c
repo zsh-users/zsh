@@ -743,7 +743,7 @@ run_init_scripts(void)
 	    char *s = getsparam("ENV");
 	    if (islogin)
 		sourcehome(".profile");
-	    noerrs = 1;
+	    noerrs = 2;
 	    if (s && !parsestr(s)) {
 		singsub(&s);
 		noerrs = 0;

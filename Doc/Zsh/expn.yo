@@ -464,10 +464,11 @@ item(tt(${=)var(spec)tt(}))(
 pindex(SH_WORD_SPLIT, use of)
 cindex(field splitting, sh style)
 cindex(sh, field splitting style)
-Turn on the tt(SH_WORD_SPLIT) option for the
-evaluation of var(spec); if the `tt(=)' is doubled, turn it off.
+Perform word splitting using the rules for tt(SH_WORD_SPLIT) during the
+evaluation of var(spec), but regardless of whether the parameter appears in
+double quotes; if the `tt(=)' is doubled, turn it off.
 vindex(IFS, use of)
-When this option is set, parameter expansions are split into
+This forces parameter expansions to be split into
 separate words before substitution, using tt(IFS) as a delimiter.
 This is done by default in most other shells.
 
@@ -494,6 +495,12 @@ possible to perform nested operations:  tt(${${foo#head}%tail})
 substitues the value of tt($foo) with both tt(head) and tt(tail)
 deleted.  The form with tt($LPAR())...tt(RPAR()) is often useful in
 combination with the flags described next; see the example below.
+
+Note that when nested parameter expansion takes place the flags are em(not)
+propagated back.  Each level of expansion uses three factors: whether it
+is in double quotes, what flags it has been provided with, and whether the
+value it has is a scalar or an array.  Some examples are given below.
+
 subsect(Parameter Expansion Flags)
 cindex(parameter expansion flags)
 cindex(flags, parameter expansion)
@@ -693,7 +700,64 @@ item(tt(N))(
 Include the length of the match in the result.
 )
 enditem()
-subsect(Example)
+
+subsect(Rules)
+
+Here is a summary of the rules for substitution.  Some particular examples
+are given below.  Note that the Zsh Development Group accepts em(no
+responsibility) for any brain damage which may occur during the reading of
+the following rules.
+
+startitem()
+item(tt(1.))(
+If multiple nested tt(${...}) forms are present, substitution is
+performed from the inside outwards.  At each level, the substitution takes
+account of whether the current value is a scalar or an array, whether the
+whole substitution is in double quotes, and what flags are supplied to the
+current level of substitution.  If the value is a raw parameter reference
+with a subscript, such as tt(${)var(var)tt([3]}), the effect of
+subscripting is applied directly to the parameter.  The value passed back
+to an enclosing substitution is always an array, which however will consist
+of one word if the value was not itself an array.
+)
+item(tt(2.))(
+If the value after this process is an array, and the substitution
+appears in double quotes, and no tt((@)) flag is present at the current
+level, the words of the value are joined with the first character of the
+parameter tt($IFS), by default a space, between each word (single word
+arrays are not modified).  If the tt((j)) flag is present, that is used for
+joining instead of tt($IFS). Any remaining subscript is evaluated at
+this point, based on whether the value is an array or a scalar.
+)
+item(tt(3.))(
+Any modifiers, as specified by a trailing tt(#), tt(%), tt(/)
+(possibly doubled) or by a set of modifiers of the form tt(:...) (see
+noderef(Modifiers) in noderef(History Expansion)), are applied to the words
+of the value at this level.
+)
+item(tt(4.))(
+If the tt((j)) flag is present, or no tt((j)) flag is present but
+the string is to be split as given by rules tt(5.) or tt(6.), and joining
+did not take place at step tt(2.), any words in the value are joined
+together using the given string or the first character of tt($IFS) if none.
+Note that the tt((F)) flag implicitly supplies a string for joining in this
+manner.
+)
+item(tt(5.))(
+If one of the tt((s)) or tt((f)) flags are present, or the tt(=)
+specifier was present (e.g. tt(${=)var(var)tt(})), the word is joined on
+occurrences of the specified string, or (for tt(=) with neither of the two
+flags present) any of the characters in tt($IFS).
+)
+item(tt(6.))(
+If no tt((s)), tt((f)) or tt(=) was given, but the word is not
+quoted and the option tt(SH_WORD_SPLIT) is set, the word is split on
+occurrences of any of the characters in tt($IFS).  Note that all steps,
+including this one, take place at all levels of a nested substitution.
+)
+enditem()
+
+subsect(Examples)
 The flag tt(f) is useful to split a double-quoted substitution line by
 line.  For example, `tt("${(f)$LPAR()<)var(file)tt(RPAR()}")'
 substitutes the contents of var(file) divided so that each line is
@@ -701,6 +765,48 @@ an element of the resulting array.  Compare this with the effect of
 `tt($)tt(LPAR()<)var(file)tt(RPAR())' alone, which divides the file
 up by words, or the same inside double quotes, which makes the entire
 content of the file a single string.
+
+The following illustrates the rules for nested parameter expansions.
+Suppose that tt($foo) contains the array tt(LPAR()bar baz)tt(RPAR()):
+
+startitem()
+item(tt("${(@)${foo}[1]}"))(
+This produces the result tt(bar baz).  First, the inner substitution
+tt("${foo}"), which has no array (tt(@)) flag, produces a single word
+result.  The outer substitution tt("${(@)...[1]}") acts on this result as
+if it were a one word array, because of the array flag, so the result is
+just that single word.
+)
+item(tt("${${(@)foo}[1]}"))(
+The produces the result tt(b).  In this case, the inner substitution
+tt("${(@)foo}") produces the array tt(LPAR()bar baz)tt(RPAR()).  The outer
+substitution tt("${...[1]}"), however, has no array flag, so that it joins
+the array it has to a single word and indexes as if it were a string.  Note
+that this is not identical to the case tt("${foo[1]}"), since here the
+expression tt(foo[1]) is recognised immediately as an index into an array,
+so that the result in that case is tt(bar).
+)
+enditem()
+
+As an example of the rules for word splitting and joining, suppose tt($foo)
+contains the array tt(LPAR()ax1 bx1)tt(RPAR()).  Then
+
+startitem()
+item(tt(${(s/x/)foo}))(
+produces the words `tt(a)', `tt(1 b)' and `tt(1)'.
+)
+item(tt(${(j/x/s/x/)foo}))(
+produces `tt(a)', `tt(1)', `tt(b)' and `tt(1)'.
+)
+item(tt(${(s/x/)foo%%1*}))(
+produces `tt(a)' and `tt( b)' (note the extra space).  As substitution
+occurs before either joining or splitting, the operation  first generates
+the modified array tt(LPAR()ax bx)tt(RPAR()), which is joined to give
+tt("ax bx"), and then split to give `tt(a)', `tt( b)' and `'.  The final
+empty string will then be elided, as it is not in double quotes.
+)
+enditem()
+
 texinode(Command Substitution)(Arithmetic Expansion)(Parameter Expansion)(Expansion)
 sect(Command Substitution)
 cindex(command substitution)

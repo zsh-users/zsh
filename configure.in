@@ -847,8 +847,8 @@ dnl CHECK FOR SYSTEMS REQUIRING GETCWD
 AC_CACHE_CHECK(whether we should use the native getcwd,
 zsh_cv_use_getcwd,
 [case "${host_cpu}-${host_vendor}-${host_os}" in
-    *QNX*) zsh_cv_use_getcwd=no ;;
-    *) zsh_cv_use_getcwd=yes ;;
+    *QNX*) zsh_cv_use_getcwd=yes ;;
+    *) zsh_cv_use_getcwd=no ;;
  esac])
 if test $zsh_cv_use_getcwd = yes; then
   AC_DEFINE(USE_GETCWD)
@@ -893,7 +893,7 @@ dnl system names directly.
 dnl The doubled square brackets are necessary because autoconf uses m4.
 AC_CACHE_CHECK(if typeahead needs FIONREAD, zsh_cv_sys_clobbers_typeahead,
 [case x-$host_vendor-$host_os in
-    x-*-ultrix* | x-*-dgux* | x-sni-sysv4*)
+    x-*-ultrix* | x-*-dgux* | x-sni-sysv4* | x-*-irix*)
 	zsh_cv_sys_clobbers_typeahead=yes;;
     *)
 	zsh_cv_sys_clobbers_typeahead=no;;

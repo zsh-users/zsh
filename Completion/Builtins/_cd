@@ -59,7 +59,7 @@ elif [[ $words[1] = pu* && $PREFIX = [-+]* ]]; then
 
   return ret
 elif [[ $PREFIX != (\~|/|./|../)* && $#cdpath -ne 0 ]]; then
-  _path_files -W cdpath -/
+  _path_files -W "(. $cdpath)" -/
 else
   _path_files -/
 fi

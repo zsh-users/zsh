@@ -766,3 +766,40 @@ _long_options into Base and mentioned it in Completion/README.
 
 Geoff: 5779: correct mistakes some bozo (guess who) made testing rlim_t for
 long long.
+
+  pws-13
+
+pws: 5780: Completion/Base/_brace_parameter change
+
+Sven (reposted by Bart): 5783: zerr() sets errflag even if noerrs is set
+
+Sven: 5795: parsing change for assignment and arrays in nested
+substitution.
+
+Sven: 5796: globcomplete shouldn't always turn on menucompletion
+
+pws: 5797: set CLOBBERS_TYPEAHEAD for Irix; old config.guess change for
+Reliant UNIX and Apple Rhapsody re-imported from old config.guess.
+
+Sven: 5800: _path_files; path altered when no possible match
+
+Sven: 5804: _pdf
+
+Sven: 5811: put back _multi_parts which got left out when it was moved into
+Core.
+
+Sven: 5818: parameter name in subscript which looks math-like; _subscript.
+
+Sven: 5829: clear the completion list in more zle functions
+
+Sven: 5830: in ${#:-stuff}, stuff is treated as a single word (unless split
+for some other reason).
+
+Sven: 5831: in subscripts and math environments, the whole string is always
+passed down to the function handler.
+
+Sven: 5852: warnings about _long_options
+
+pws: 5854: man page dependencies in Doc/Makefile.in
+
+Sven: 5862: _path_files (turning on menu) and _cd (include . in path)

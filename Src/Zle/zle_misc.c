@@ -135,6 +135,7 @@ killbuffer(void)
 {
     cs = 0;
     forekill(ll, 0);
+    clearlist = 1;
 }
 
 /**/
@@ -157,6 +158,7 @@ backwardkillline(void)
 		cs--, i++;
     }
     forekill(i, 1);
+    clearlist = 1;
 }
 
 /**/
@@ -288,6 +290,7 @@ killline(void)
 		cs++, i++;
     }
     backkill(i, 0);
+    clearlist = 1;
 }
 
 /**/

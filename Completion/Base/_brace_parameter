@@ -2,4 +2,4 @@
 
 # Simple but without spiffy suffix handling: compgen -v -S '} '
 
-compadd -S '} ' -r '-:?#%+=[/'  - "${(@)${${${(f)$(typeset)}%%\=*}##* }:gs/'//}"
+compadd -S '} ' -r '-:?#%+=[/'  - "${(@)${(@)${(@f)$(set)}%%\=*}:gs/'//}"

@@ -955,9 +955,17 @@ par_simple(Cmd c)
 	    nocorrect = 1;
 	else if (tok == ENVSTRING) {
 	    struct varasg *v = (struct varasg *)make_varnode();
+	    char *p;
 
 	    v->type = PM_SCALAR;
-	    equalsplit(v->name = tokstr, &v->str);
+	    v->name = tokstr;
+	    for (p = tokstr; *p && *p != Inbrack && *p != '='; p++);
+	    if (*p == Inbrack && !skipparens(Inbrack, Outbrack, &p) &&
+		*p == '=') {
+		*p = '\0';
+		v->str = p + 1;
+	    } else
+		equalsplit(tokstr, &v->str);
 	    addlinknode(c->vars, v);
 	    isnull = 0;
 	} else if (tok == ENVARRAY) {

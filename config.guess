@@ -767,6 +767,9 @@ EOF
     RM*:SINIX-*:*:*)
 	echo mips-sni-sysv4
 	exit 0 ;;
+    RM*:ReliantUNIX-*:*:*)
+       echo mips-sni-sysv4
+       exit 0 ;;
     *:SINIX-*:*:*)
 	if uname -p 2>/dev/null >/dev/null ; then
 		UNAME_MACHINE=`(uname -p) 2>/dev/null`
@@ -800,6 +803,12 @@ EOF
 	else
 	        echo mips-unknown-sysv${UNAME_RELEASE}
 	fi
+        exit 0 ;;
+    Power*:Rhapsody:*:*)
+        echo powerpc-apple-rhapsody${UNAME_RELEASE}
+        exit 0 ;;
+    *:Rhapsody:*:*)
+        echo ${UNAME_MACHINE}-apple-rhapsody${UNAME_RELEASE}
         exit 0 ;;
     BeBox:BeOS:*:*)	# BeOS running on hardware made by Be, PPC only.
 	echo powerpc-be-beos

@@ -941,6 +941,7 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int ssub)
 	} else if ((*s == '#' || *s == Pound) &&
 		   (iident(s[1])
 		    || s[1] == '*' || s[1] == Star || s[1] == '@'
+		    || s[1] == '-' || (s[1] == ':' && s[2] == '-')
 		    || (isstring(s[1]) && (s[2] == Inbrace || s[2] == Inpar))))
 	    getlen = 1 + whichlen, s++;
 	else if (*s == '~' || *s == Tilde) {
@@ -976,7 +977,7 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int ssub)
 	skipparens(*s, *s == Inpar ? Outpar : Outbrace, &s);
 	sav = *s;
 	*s = 0;
-	if (multsub(&val, (((quoted || aspar) && !nojoin) ? NULL : &aval),
+	if (multsub(&val, ((!aspar && (!quoted || nojoin)) ? &aval : NULL),
 		    &isarr, NULL) &&
 	    quoted) {
 	    isarr = -1;
@@ -1272,7 +1273,7 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int ssub)
 	case '-':
 	    if (vunset) {
 		val = dupstring(s);
-		multsub(&val, &aval, &isarr, NULL);
+		multsub(&val, NULL, &isarr, NULL);
 		copied = 1;
 	    }
 	    break;

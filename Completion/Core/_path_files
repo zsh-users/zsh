@@ -111,7 +111,7 @@ orig="${PREFIX}${SUFFIX}"
 
 [[ $compstate[insert] = *menu || -n "$_comp_correct" ||
    ( $#compstate[pattern_match] -ne 0 &&
-     "$orig" != "${orig:q}" ) ]] && menu=yes
+     "${orig#\~}" != "${${orig#\~}:q}" ) ]] && menu=yes
 
 
 # We will first try normal completion called with `compgen', but only if we
@@ -405,6 +405,7 @@ for prepath in "$prepaths[@]"; do
     # No match, insert the expanded path and add the original tail.
 
     [[ "$testpath[-1]" = / ]] && testpath="$testpath[1,-2]"
+    [[ -z "$testpath" && "$linepath[-1]" = / ]] && linepath="$linepath[1,-2]"
     [[ -n "$ostr" && -n "$linepath$testpath" ]] && ostr="/$ostr"
 
     # But only if something changed.

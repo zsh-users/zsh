@@ -413,7 +413,7 @@ createparamtable(void)
 
     argvparam = (Param) paramtab->getnode(paramtab, "*");
 
-    noerrs = 1;
+    noerrs = 2;
 
     HEAPALLOC {
 	/* Add the standard non-special parameters which have to    *

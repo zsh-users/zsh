@@ -52,8 +52,11 @@ char *scriptname;
 void
 zerr(const char *fmt, const char *str, int num)
 {
-    if (errflag || noerrs)
+    if (errflag || noerrs) {
+	if (noerrs < 2)
+	    errflag = 1;
 	return;
+    }
     errflag = 1;
     trashzle();
     /*
@@ -1306,7 +1309,7 @@ spckword(char **s, int hist, int cmd, int ask)
 		return;
 	    guess = dupstring(guess);
 	    ne = noerrs;
-	    noerrs = 1;
+	    noerrs = 2;
 	    singsub(&guess);
 	    noerrs = ne;
 	    if (!guess)

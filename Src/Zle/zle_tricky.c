@@ -1322,18 +1322,17 @@ get_comp_string(void)
 	 * as being in math.                                              */
 	if (inwhat != IN_MATH) {
 	    int i = 0;
-	    char *nb = (iident(*s) ? s : s + 1), *ne = NULL;
+	    char *nnb = (iident(*s) ? s : s + 1), *nb = NULL, *ne = NULL;
 
 	    for (tt = s; ++tt < s + cs - wb;)
 		if (*tt == Inbrack) {
 		    i++;
+		    nb = nnb;
 		    ne = tt;
 		} else if (i && *tt == Outbrack)
 		    i--;
-		else if (!iident(*tt)) {
-		    nb = tt + 1;
-		    ne = NULL;
-		}
+		else if (!iident(*tt))
+		    nnb = tt + 1;
 	    if (i) {
 		inwhat = IN_MATH;
 		insubscr = 1;
@@ -1347,12 +1346,35 @@ get_comp_string(void)
 	    }
 	}
 	if (inwhat == IN_MATH) {
-	    /* In mathematical expression, we complete parameter names (even *
-	     * if they don't have a `$' in front of them).  So we have to    *
-	     * find that name.                                               */
-	    for (we = cs; iident(line[we]); we++);
-	    for (wb = cs; --wb >= 0 && iident(line[wb]););
-	    wb++;
+	    if (compfunc) {
+		int lev;
+		char *p;
+
+		for (wb = cs - 1, lev = 0; wb > 0; wb--)
+		    if (line[wb] == ']' || line[wb] == ')')
+			lev++;
+		    else if (line[wb] == '[') {
+			if (!lev--)
+			    break;
+		    } else if (line[wb] == '(') {
+			if (!lev && line[wb - 1] == '(')
+			    break;
+			if (lev)
+			    lev--;
+		    }
+		wb++;
+		p = (char *) line + wb;
+		if (wb && (*p == '[' || *p == '(') &&
+		    !skipparens(*p, (*p == '[' ? ']' : ')'), &p))
+			we = p - (char *) line;
+	    } else {
+		/* In mathematical expression, we complete parameter names  *
+		 * (even if they don't have a `$' in front of them).  So we *
+		 * have to find that name.                                  */
+		for (we = cs; iident(line[we]); we++);
+		for (wb = cs; --wb >= 0 && iident(line[wb]););
+		wb++;
+	    }
 	    zsfree(s);
 	    s = zalloc(we - wb + 1);
 	    strncpy(s, (char *) line + wb, we - wb);
@@ -5032,6 +5054,7 @@ static void
 docompletion(char *s, int lst, int incmd)
 {
     HEAPALLOC {
+	char *opm;
 	LinkNode n;
 
 	pushheap();
@@ -5045,7 +5068,7 @@ docompletion(char *s, int lst, int incmd)
 		   ((isset(AUTOLIST) && !isset(BASHAUTOLIST)) ? 
 		    (isset(LISTAMBIGUOUS) ? 3 : 2) : 0) : 1);
 	zsfree(comppatmatch);
-	comppatmatch = ztrdup(useglob ? "yes" : "");
+	opm = comppatmatch = ztrdup(useglob ? "yes" : "");
 	zsfree(compforcelist);
 	compforcelist = ztrdup("");
 	haspattern = 0;
@@ -5057,7 +5080,7 @@ docompletion(char *s, int lst, int incmd)
 	    clearlist = 1;
 	    goto compend;
 	}
-	if (comppatmatch && *comppatmatch)
+	if (comppatmatch && *comppatmatch && comppatmatch != opm)
 	    haspattern = 1;
 	if (!useline && uselist)
 	    /* All this and the guy only wants to see the list, sigh. */
@@ -5240,14 +5263,20 @@ callcompfunc(char *s, char *fn)
 	zsfree(compprefix);
 	zsfree(compsuffix);
 	if (unset(COMPLETEINWORD)) {
-	    tmp = quotename(s, NULL, NULL, NULL);
+	    if (inwhat == IN_MATH)
+		tmp = s;
+	    else
+		tmp = quotename(s, NULL, NULL, NULL);
 	    untokenize(tmp);
 	    compprefix = ztrdup(tmp);
 	    compsuffix = ztrdup("");
 	} else {
 	    char *ss = s + offs, sav;
 	    
-	    tmp = quotename(s, &ss, NULL, NULL);
+	    if (inwhat == IN_MATH)
+		tmp = s;
+	    else
+		tmp = quotename(s, &ss, NULL, NULL);
 	    sav = *ss;
 	    *ss = '\0';
 	    untokenize(tmp);

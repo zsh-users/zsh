@@ -535,6 +535,7 @@ viopenlinebelow(void)
     spaceinline(1);
     line[cs++] = '\n';
     startvitext(1);
+    clearlist = 1;
 }
 
 /**/
@@ -545,6 +546,7 @@ viopenlineabove(void)
     spaceinline(1);
     line[cs] = '\n';
     startvitext(1);
+    clearlist = 1;
 }
 
 /**/

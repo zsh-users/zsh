@@ -221,12 +221,11 @@ compdef() {
 # set key `baz' to the empty string.
 
 compconf() {
-  local i name
+  local i
 
   for i; do
     if [[ "$i" = *\=* ]]; then
-      name="${i%%\=*}"
-      compconfig[$name]="${i#*\=}"
+      compconfig[${i%%\=*}]="${i#*\=}"
     else
       compconfig[$i]=''
     fi

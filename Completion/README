@@ -74,7 +74,10 @@ Base:
     This handles options beginning with `--', as in many GNU commands.
     The command must accept the --help option to list the possible options.
     __long_options can also take arguments to help it decide what to
-    complete as the value of the option.
+    complete as the value of the option.  Note that this is potentially
+    dangerous because the command from the line will be called with the
+    --help option and hence could cause damage if used with a command
+    that does not support it.
   _match_pattern
   _match_test
     These are used by Base/_path_files (and hence also Base/_files)

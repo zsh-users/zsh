@@ -498,6 +498,7 @@ zle_goto_hist(int ev)
     histline = ev;
     setline(t);
     setlastline();
+    clearlist = 1;
     return 1;
 }
 
@@ -515,6 +516,7 @@ pushline(void)
     stackcs = cs;
     *line = '\0';
     ll = cs = 0;
+    clearlist = 1;
 }
 
 /**/
@@ -537,9 +539,9 @@ pushlineoredit(void)
 	cs += ics;
     }
     pushline();
-    if (!isfirstln) {
+    if (!isfirstln)
 	errflag = done = 1;
-    }
+    clearlist = 1;
 }
 
 /**/
@@ -571,6 +573,7 @@ getline(void)
 	memcpy((char *)line + cs, s, cc);
 	cs += cc;
 	free(s);
+	clearlist = 1;
     }
 }
 
