@@ -1,5 +1,8 @@
 2004-09-21  Peter Stephenson  <pws@csr.com>
 
+	* unposted: Completion/Unix/Command/_perforce: updated for
+	Perforce release 2004.2.
+
 	* 20398: Src/Zle/zle_main.c: allow clean exit from within
 	a zle widget function.
 
