@@ -92,7 +92,7 @@ upline(void)
 
     if (n < 0) {
 	zmult = -zmult;
-	n = downline();
+	n = -downline();
 	zmult = -zmult;
 	return n;
     }
@@ -176,7 +176,7 @@ downline(void)
 
     if (n < 0) {
 	zmult = -zmult;
-	n = upline();
+	n = -upline();
 	zmult = -zmult;
 	return n;
     }
