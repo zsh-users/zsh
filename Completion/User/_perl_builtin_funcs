@@ -1,0 +1,29 @@
+#autoload
+#
+# _perl_builtin_funcs - zsh completion function
+#
+# Adam Spiers <adam@spiers.net>
+#
+# Calculate all built-in Perl functions.  The result is cached
+# for future use.
+#
+
+if [[ ${+_perl_builtin_funcs} -eq 0 ]]; then
+  typeset -agU _perl_builtin_funcs
+  local perlfunc
+
+  if perlfunc=`man -w perlfunc 2>&1`; then
+    _perl_builtin_funcs=( `perl -lne '
+                             $in_funcs++, next if /Alphabetical/;     \
+                             next unless $in_funcs;                   \
+                             if (/^\.Ip "(\w+)/) {                    \
+                               print $1 unless $func{$1}; $func{$1}++ \
+                             }' $perlfunc`
+               )
+  else
+    echo "Couldn't find perlfunc man page; giving up."
+    return 1
+  fi
+fi
+
+compadd - $_perl_builtin_funcs
