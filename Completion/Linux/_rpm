@@ -211,12 +211,12 @@ while [[ -n "$state" ]]; do
         _files -g \*.spec && ret=0
     ;;
   package_file)
-    if compset -P ftp://; then
+    if compset -P '(f|ht)tp://'; then
       _hosts -S/ && ret=0
     else
       _alternative \
           'files:RPM package file:_files -g \*.\(\#i\)rpm' \
-          'prefixes:ftp URL prefix:compadd ftp://' && ret=0
+          'prefixes:URL prefix:compadd ftp:// http://' && ret=0
     fi
     ;;
   package_src)
