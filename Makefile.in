@@ -134,7 +134,11 @@ config.status: $(sdir)/configure
 $(sdir)/configure: $(sdir)/aclocal.m4 $(sdir)/aczsh.m4 $(sdir)/configure.ac
 	cd $(sdir) && autoconf
 
-config.h config.modules: $(sdir)/config.h.in config.status
+config.h: stamp-h
+stamp-h: $(sdir)/config.h.in config.status
+	cd $(dir_top) && $(SHELL) ./config.status config.h $@
+
+config.modules: $(sdir)/config.h.in config.status
 	cd $(dir_top) && $(SHELL) ./config.status $@
 
 $(sdir)/config.h.in: $(sdir)/stamp-h.in
