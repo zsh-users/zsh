@@ -1,0 +1,24 @@
+#autoload
+
+if (( ! $+_color_cache )); then
+  local file
+
+  # Cache of color names doesn't exist yet, create it.
+
+  if [[ -f /usr/lib/X11/rgb.txt ]]; then
+    file=/usr/lib/X11/rgb.txt
+  elif [[ -f /usr/local/lib/X11/rgb.txt ]]; then
+    file=/usr/local/lib/X11/rgb.txt
+  fi
+
+  if [[ -n "$file" ]]; then
+    _color_cache=( "${(@)${(@f)$(< $file)}[2,-1]##*		}" )
+  else
+
+    # Stupid default value.
+
+    _color_cache=(white black gray red blue green)
+  fi
+fi
+
+compadd - "$_color_cache[@]"
