@@ -24,6 +24,10 @@
         * 19201: Completion/Unix/Command/_screen: patch from
         Yasuhiro Hayase to complete normal commands after screen.
 
+2003-10-09  Oliver Kiddle  <opk@zsh.org>
+
+	* unposted: Completion/Unix/Command/_nmap: update for nmap 3.48
+
 2003-10-07  Bart Schaefer  <schaefer@zsh.org>
 
 	* users/6663: Completion/compaudit: follow symlinks when checking

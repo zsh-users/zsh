@@ -5,9 +5,10 @@ local curcontext="$curcontext" state line suf ret=1
 _arguments -C \
   '!-sI:zombie host:_hosts' \
   '!-P'{T,S,U}'+:port list' \
-  '*-s-[specify scan type]:scan type:((S\:TCP\ SYN\ scan T\:TCP\ connect\(\)\ scan F\:stealth\ FIN\ scan X\:stealth\ Xmas\ tree\ scan N\:stealth\ null\ scan P\:ping\ scanning U\:UDP\ scan O\:IP\ prototocol\ scan I\:idle\ scan A\:ACK\ scan W\:window\ scan R\:RPC\ scan L\:list\ scan))' \
+  '*-s-[specify scan type]:scan type:((S\:TCP\ SYN\ scan T\:TCP\ connect\(\)\ scan F\:stealth\ FIN\ scan X\:stealth\ Xmas\ tree\ scan N\:stealth\ null\ scan P\:ping\ scanning U\:UDP\ scan O\:IP\ prototocol\ scan I\:idle\ scan A\:ACK\ scan W\:window\ scan R\:RPC\ scan L\:list\ scan V\:version\ detection))' \
   '-b[specify ftp relay host]:ftp relay host:_hosts' \
   '*-P-[specify probe types and options]:probe type/options:->probe-opts' \
+  '-A[enable OS detection and version scanning]' \
   '-O[enable remote OS identification]' \
   '-6[enable IPv6 support]' \
   '-I[enable TCP reverse ident scanning]' \
@@ -33,6 +34,7 @@ _arguments -C \
   '--randomize_hosts[scan hosts in random order]' \
   '-M[specify maximum number of parallel TCP connects]:maximum TCP connects' \
   '--packet_trace[show all packets sent in tcpdump-like format]' \
+  '--version_trace[show packets related to version scanning]' \
   '--datadir[specify directory containing data files]:directory:_directories' \
   '-T[specify timing policy]:timing policy:(Paranoid Sneaky Polite Normal Aggressive Insane)' \
   '--host_timeout[specify maximum time for scanning a single host]:timeout (ms)' \
