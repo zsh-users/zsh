@@ -13,27 +13,21 @@ _urpmi_cache_policy() {
 _urpmi() {
     local state context line ret=1
     typeset -A opt_args
-    local update_policy
-
-    zstyle -s ":completion:*:*:urpmi:*" cache-policy update_policy
-    if [[ -z "$update_policy" ]]; then
-	zstyle ":completion:*:*:urpmi:*" cache-policy _urpmi_cache_policy
-    fi
 
     case "$service" in
 	urpmi.addmedia )
 	    _arguments -A '-*' \
 		"(--wget)--curl[use curl to retrieve distant files]" \
-		"--distrib[automatically create all media from an installation medium]" \
+		"(:)--distrib[automatically create all media from an installation medium]:media URL:->media_url" \
 		"--update[mark as update media]" \
 		"(--curl)--wget[use wget to retrieve distant files]" \
 		"-c[clean headers cache directory]" \
 		"-f[force generation of hdlist files]" \
 		"-h[try to find and use synthesis or hdlist file]" \
-		":name of media: " \
-		":media URL:->media_url" \
-		": :(with)" \
-		":relative path to hdlist file: " \
+		"(--distrib):name of media: " \
+		"(--distrib):media URL:->media_url" \
+		"(--distrib): :(with)" \
+		"(--distrib):relative path to hdlist file: " \
 	     && ret=0
 	;;
 	urpmi.removemedia )
@@ -120,5 +114,12 @@ _urpmi() {
 
     return $ret
 }
+
+local update_policy
+
+zstyle -s ":completion:*:*:urpmi:*" cache-policy update_policy
+if [[ -z "$update_policy" ]]; then
+    zstyle ":completion:*:*:urpmi:*" cache-policy _urpmi_cache_policy
+fi
 
 _urpmi "$@"

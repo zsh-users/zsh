@@ -1,3 +1,8 @@
+2002-01-14  Andrej Borsenkow  <bor@zsh.org>
+
+	* 16443: Completion/Mandrake/Command/_urpmi: fix
+	urpmi.addmedia --distrib. Set cache policy on just the first call.
+
 2002-01-13  Andrej Borsenkow  <bor@zsh.org>
 
 	* 16437: Completion/Mandrake/Command/_urpmi: adapt
