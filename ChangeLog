@@ -1,5 +1,10 @@
 2004-01-14  Oliver Kiddle  <opk@zsh.org>
 
+	* 19369: Completion/Unix/Command/_getent,
+	Completion/Debian/Command/_aptitude,
+	Completion/Zsh/Command/_precommand: complete for getent,
+	aptitude and catchsegv
+
 	* spotted by Bart: 19365: Completion/Unix/Type/_perl_modules:
 	avoid use of $words[0]
 

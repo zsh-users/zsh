@@ -1,0 +1,50 @@
+#compdef aptitude
+
+local curcontext="$curcontext" state line cmds ret=1
+
+_arguments -C \
+  '(- 1 *)'{-h,--help}'[display help information]' \
+  '(- 1 *)--version[display version information]' \
+  '(-s --simulate)'{-s,--simulate}'[print actions without performing them]' \
+  '(-d --download-only)'{-d,--download-only}"[just download packages - don't install]" \
+  '(-P --prompt)'{-P,--prompt}'[always display a prompt]' \
+  '(-y --assume-yes)'{-y,--assume-yes}'[assume yes answer to questions]' \
+  '(-F --display-format)'{-F,--display-format}'[specify output format for search command]:format' \
+  '(-U --sort)'{-U,--sort}'[specify sort order]:sort order:()' \
+  '(-w --width)'{-w,--width}'[specify output width]:width' \
+  '-f[aggressivley try to fix dependencies of broken packages]' \
+  '(--without-recommends)--with-recommends[install recommended packages when installing new packages]' \
+  '(--without-suggests)--with-suggests[install suggested packages when installing new packages]' \
+  '(--with-recommends)--without-recommends[ignore recommended packages when installing new packages]' \
+  '(--with-suggests)--without-suggests[ignore suggested packages when installing new packages]' \
+  '1: :->cmds' \
+  '*: :->args' && ret=0
+
+case $state in
+  cmds)
+    cmds=( ${${(M)${(f)"$(aptitude -h 2>/dev/null)"}:#* - *}/(#b) (*[^ ]) #- (*)/$match[1]:$match[2]:l})
+
+    _describe -t commands 'aptitude command' cmds && ret=0
+  ;;
+  args)
+    case $line[1] in
+      search)
+        _message -e patterns pattern
+      ;;
+      download)
+        _deb_packages avail
+      ;;
+      remove|purge|hold)
+        _deb_packages installed
+      ;;
+      install|markauto|unmarkauto)
+        _deb_packages uninstalled
+      ;;
+      *)
+        (( ret )) && _message 'no more arguments'
+      ;;
+    esac
+  ;;
+esac
+
+return ret
