@@ -97,8 +97,14 @@ AC_ARG_ENABLE(zsh-hash-debug,
   AC_DEFINE(ZSH_HASH_DEBUG)
 fi])
 
+dnl Do you want large file support, if available?
+undefine([lfs])dnl
+AC_ARG_ENABLE(lfs,
+[  --disable-lfs              turn off support for large files],
+[lfs="$enableval"], [lfs=yes])
+
 dnl Pathnames for global zsh scripts
-undefine([zshenv])dnl
+undefine([etcdir])dnl
 AC_ARG_ENABLE(etcdir,
 [  --enable-etcdir=directory  default directory for global zsh scripts],
 [etcdir="$enableval"], [etcdir=/etc])
@@ -177,8 +183,8 @@ AC_SUBST(zlogout)dnl
 dnl Do you want dynamically loaded binary modules.
 undefine([dynamic])dnl
 AC_ARG_ENABLE(dynamic,
-[  --enable-dynamic           allow dynamically loaded binary modules],
-[dynamic="$enableval"], [dynamic=no])
+[  --disable-dynamic          turn off dynamically loaded binary modules],
+[dynamic="$enableval"], [dynamic=yes])
 
 dnl Do you want to compile as K&R C.
 AC_ARG_ENABLE(ansi2knr,
@@ -195,6 +201,38 @@ fi],
 AC_DEFINE(RESTRICTED_R)
 )
 
+undefine([fndir])dnl
+AC_ARG_ENABLE(fndir,
+[  --enable-fndir=DIR        where functions go (default DATADIR/zsh/functions)],
+[if test $enableval = yes; then
+  fndir=${datadir}/zsh/functions
+else
+  fndir="$enableval"
+fi], [fndir=${datadir}/zsh/functions])
+
+undefine([function_subdirs])
+AC_ARG_ENABLE(function-subdirs,
+[  --enable-function-subdirs  install functions in subdirectories])
+
+if test "x${FUNCTIONS_INSTALL+set}" != xset; then
+  FUNCTIONS_INSTALL="Core/* Base/* Builtins/* User/* Commands/* Zle/*"
+  if test $dynamic != no; then
+    FUNCTIONS_INSTALL="${FUNCTIONS_INSTALL} Zftp/*"
+  fi
+fi
+
+if test "x${enable_function_subdirs}" != x -a \
+  "x${enable_function_subdirs}" != xno -a \
+  "x$FUNCTIONS_INSTALL" != x; then
+  FUNCTIONS_SUBDIRS=yes
+else
+  FUNCTIONS_SUBDIRS=no
+fi
+
+AC_SUBST(fndir)dnl
+AC_SUBST(FUNCTIONS_INSTALL)dnl
+AC_SUBST(FUNCTIONS_SUBDIRS)dnl
+
 dnl ------------------
 dnl CHECK THE COMPILER
 dnl ------------------
@@ -204,13 +242,19 @@ test -z "${LDFLAGS+set}" && LDFLAGS= auto_ldflags=1
 
 AC_PROG_CC
 
+dnl Check for large file support.
+dnl This needs to be done early to get the stuff into the flags.
+if test $lfs != no; then
+zsh_LARGE_FILE_SUPPORT
+fi
+
 dnl if the user hasn't specified CFLAGS, then
 dnl   if compiler is gcc, then use -O2 and some warning flags
 dnl   else use -O
 if test -n "$auto_cflags"; then
   if test "${enable_zsh_debug}" = yes; then
     if test -n "$GCC"; then
-      CFLAGS="$CFLAGS -Wall -Wno-implicit -Wmissing-prototypes -pedantic -ggdb"
+      CFLAGS="$CFLAGS -Wall -Wno-implicit -Wmissing-prototypes -ggdb"
     else
       CFLAGS="$CFLAGS -g"
     fi
@@ -321,7 +365,7 @@ if test $zsh_cv_c_broken_signed_to_unsigned_casting = yes; then
 fi
 
 dnl Checking if the compiler supports variable-length arrays
-AC_CACHE_CHECK(if the compiler supports variable-lenth arrays,
+AC_CACHE_CHECK(if the compiler supports variable-length arrays,
 zsh_cv_c_variable_length_arrays,
 [AC_TRY_COMPILE([int foo();], [int i[foo()];],
   zsh_cv_c_variable_length_arrays=yes,
@@ -350,7 +394,7 @@ AC_CHECK_HEADERS(sys/time.h sys/times.h sys/select.h termcap.h termio.h \
 		 termios.h sys/param.h sys/filio.h string.h memory.h \
 		 limits.h fcntl.h libc.h sys/utsname.h sys/resource.h \
 		 locale.h errno.h stdlib.h unistd.h sys/capability.h \
-		 utmp.h utmpx.h sys/types.h pwd.h grp.h poll.h)
+		 utmp.h utmpx.h sys/types.h pwd.h grp.h poll.h sys/mman.h)
 if test $dynamic = yes; then
   AC_CHECK_HEADERS(dlfcn.h)
   AC_CHECK_HEADERS(dl.h)
@@ -507,9 +551,90 @@ dnl --------------
 AC_TYPE_SIGNAL
 AC_TYPE_PID_T
 AC_TYPE_OFF_T
+AC_CHECK_TYPE(ino_t, unsigned long)
 AC_TYPE_MODE_T
 AC_TYPE_UID_T
 AC_TYPE_SIZE_T
+
+dnl ------------------------------------------------
+dnl Check size of long and try to find a 64-bit type
+dnl ------------------------------------------------
+dnl AC_CHECK_SIZEOF is no good, because we need the result here,
+dnl and that doesn't seem to define a shell parameter.
+AC_CACHE_CHECK(if long is 64 bits, zsh_cv_long_is_64_bit,
+[AC_TRY_RUN([int main() { return sizeof(long) < 8; }],
+zsh_cv_long_is_64_bit=yes,
+zsh_cv_long_is_64_bit=no,
+zsh_cv_long_is_64_bit=no)])
+
+if test $zsh_cv_long_is_64_bit = yes; then
+  AC_DEFINE(LONG_IS_64_BIT)
+else
+  AC_CACHE_CHECK(if off_t is 64 bit, zsh_cv_off_t_is_64_bit,
+  [AC_TRY_RUN([
+#include <sys/types.h>
+
+main() { return sizeof(off_t) < 8; }
+],
+  zsh_cv_off_t_is_64_bit=yes,
+  zsh_cv_off_t_is_64_bit=no,
+  zsh_cv_off_t_is_64_bit=no)])
+  if test $zsh_cv_off_t_is_64_bit = yes; then
+    AC_DEFINE(OFF_T_IS_64_BIT)
+  fi
+
+  AC_CACHE_CHECK(if ino_t is 64 bit, zsh_cv_ino_t_is_64_bit,
+  [AC_TRY_RUN([
+#include <sys/types.h>
+
+main() { return sizeof(ino_t) < 8; }
+],
+  zsh_cv_ino_t_is_64_bit=yes,
+  zsh_cv_ino_t_is_64_bit=no,
+  zsh_cv_ino_t_is_64_bit=no)])
+  if test $zsh_cv_ino_t_is_64_bit = yes; then
+    AC_DEFINE(INO_T_IS_64_BIT)
+  fi
+
+  if test $lfs != no -o $zsh_cv_off_t_is_64_bit = yes \
+  -o $zsh_cv_ino_t_is_64_bit = yes; then
+    AC_CACHE_CHECK(if compiler has a 64 bit type, zsh_cv_64_bit_type,
+    [if test $lfs != yes -a $lfs != no; then
+      zsh_64_BIT_TYPE(${lfs}, zsh_cv_64_bit_type, force)
+     else
+       zsh_64_BIT_TYPE(long long, zsh_cv_64_bit_type)
+       if test "$zsh_cv_64_bit_type" = no; then
+         zsh_64_BIT_TYPE(quad_t, zsh_cv_64_bit_type)
+       fi
+       if test "$zsh_cv_64_bit_type" = no; then
+         zsh_64_BIT_TYPE(__int64_t, zsh_cv_64_bit_type)
+       fi
+       dnl As a last resort, if we know off_t has 64 bits, use that as
+       dnl the 64-bit integer type.  I don't dare try ino_t since there's
+       dnl probably nothing to stop that being unsigned.
+       if test "$zsh_cv_64_bit_type" = no -a \
+       "$zsh_cv_off_t_is_64_bit" = yes; then
+         zsh_64_BIT_TYPE(off_t, zsh_cv_64_bit_type)
+       fi
+     fi])
+    if test "$zsh_cv_64_bit_type" != no; then
+      AC_DEFINE_UNQUOTED(ZSH_64_BIT_TYPE, $zsh_cv_64_bit_type)
+
+      dnl Handle cases where unsigned type cannot be simply
+      dnl `unsigned ZSH_64_BIT_TYPE'.  More tests may be required.
+      AC_CACHE_CHECK(for a corresponding unsigned 64 bit type,
+      zsh_cv_64_bit_utype,
+      [zsh_64_BIT_TYPE(unsigned $zsh_cv_64_bit_type, zsh_cv_64_bit_utype,
+       force)
+       if test "$zsh_cv_64_bit_utype" = no; then
+         zsh_64_BIT_TYPE(__uint64_t, zsh_cv_64_bit_utype)
+       fi])
+      if test "$zsh_cv_64_bit_utype" != no; then
+        AC_DEFINE_UNQUOTED(ZSH_64_BIT_UTYPE, $zsh_cv_64_bit_utype)
+      fi
+    fi
+  fi
+fi
 
 dnl Check for sigset_t.  Currently I'm looking in
 dnl <sys/types.h> and <signal.h>.  Others might need
@@ -637,7 +762,8 @@ AC_CHECK_FUNCS(memcpy memmove \
               sigblock sigsetmask sigrelse sighold killpg sigaction getrlimit \
               sigprocmask setuid seteuid setreuid setresuid setsid strerror \
               nis_list initgroups fchdir cap_get_proc readlink nice \
-	      getgrgid getgrnam getpwent getpwnam getpwuid setpgrp)
+	      getgrgid getgrnam getpwent getpwnam getpwuid setpgrp \
+	      fseeko ftello mmap munmap msync ftruncate)
 
 dnl ---------------
 dnl CHECK FUNCTIONS
@@ -1045,8 +1171,10 @@ char *argv[];
   DL_EXT="${DL_EXT=so}"
   if test $zsh_cv_sys_elf = yes; then
     DLLD="${DLLD=$CC}"
+    DLLDARG="${LDARG}"
   else
     DLLD="${DLLD=ld}"
+    DLLDARG=""
   fi
   if test -n "$GCC"; then
     DLCFLAGS="${DLCFLAGS=-fpic}"
@@ -1059,16 +1187,16 @@ char *argv[];
   fi
   case "$host_os" in
     hpux*)        DLLDFLAGS="${DLLDFLAGS=-b}" ;;
-    linux*|irix*|osf*) DLLDFLAGS="${DLLDFLAGS=-shared}" ;;
+    freebsd*|linux*|irix*|osf*) DLLDFLAGS="${DLLDFLAGS=-shared}" ;;
     sunos*)       DLLDFLAGS="${DLLDFLAGS=-assert nodefinitions}" ;;
     sysv4*|esix*) DLLDFLAGS="${DLLDFLAGS=-G $ldflags}" ;;
-    netbsd*)      DLLDFLAGS="${DLLDFLAGS=-x -shared --whole-archive}" ;;
+    netbsd*)      DLLDFLAGS="${DLLDFLAGS=${DLLDARG}-x -shared --whole-archive}" ;;
     aix*)         DLLDFLAGS="${DLLDFLAGS=-G -bexpall -lc}" ;;
     solaris*|sysv4*|esix*) DLLDFLAGS="${DLLDFLAGS=-G}" ;;
   esac
   case "$host" in
     *-hpux*)  EXTRA_LDFLAGS="${EXTRA_LDFLAGS=-Wl,-E}" ;;
-    *-linux*) EXTRA_LDFLAGS="${EXTRA_LDFLAGS=-rdynamic}" ;;
+    *-freebsd3*|*-freebsd4*|*-linux*) EXTRA_LDFLAGS="${EXTRA_LDFLAGS=-rdynamic}" ;;
     mips-sni-sysv4)
       #
       # unfortunately, we have different compilers
@@ -1210,30 +1338,33 @@ AC_SUBST(IMPOPT)dnl
 AC_SUBST(L)dnl
 AC_SUBST(RTLD_GLOBAL_OK)dnl
 
+CLEAN_MK="${srcdir}/Config/clean.mk"
+CONFIG_MK="${srcdir}/Config/config.mk"
+dnl defs.mk is in the build tree, not the source tree
+DEFS_MK="Config/defs.mk"
+FUNCINST_MK="${srcdir}/Config/funcinst.mk"
+VERSION_MK="${srcdir}/Config/version.mk"
+
+AC_SUBST_FILE(CLEAN_MK)dnl
+AC_SUBST_FILE(CONFIG_MK)dnl
+AC_SUBST_FILE(DEFS_MK)dnl
+AC_SUBST_FILE(FUNCINST_MK)dnl
+AC_SUBST_FILE(VERSION_MK)dnl
+
 real_no_create=$no_create
 no_create=yes
-AC_OUTPUT(Makefile Doc/Makefile Etc/Makefile Src/Makefile, \
+
+AC_OUTPUT(Config/defs.mk Makefile Doc/Makefile Etc/Makefile Src/Makefile \
+Completion/Makefile Functions/Makefile, \
 [test -z "$CONFIG_HEADERS" || echo > stamp-h])
 
 dnl The standard config.status is missing some essential features.
 dnl So add them now.
-[(
-  echo '1,$s@^#( *ac_file_inputs=#).*$@#1`echo $ac_file_in | sed -e "s%^%:%" -e "s%:##([^!]##)% $ac_given_srcdir/##1%g" -e "s%:!% %"`@'
-  echo '/ac_sed_cmds=cat/+a'
-  echo ''
-  echo 'ac_sed_inc_cmds="'
-  quote_sed='s,\.,#.,g'
-  for name in `echo '' ${srcdir}/Config/*.mk | sed "s, ${srcdir}/Config/, ,g"`; do
-    echo '/^@@'`echo $name | sed -e "$quote_sed"`'@@#$/{r $ac_given_srcdir/Config/'$name
-    echo 'd;}'
-  done
-  echo '"'
-  echo '.'
-  echo '1,$s@^#( *#)#(sed -e "#$ac_comsub *#)$@#1sed -e "$ac_sed_inc_cmds" $ac_file_inputs | #2@'
-  echo '1,$s@^#( *"#)  *$ac_file_inputs |@#1 |@'
-  echo 'w'
-  echo 'q'
-) | tr '#' '\\' | ed $CONFIG_STATUS >/dev/null 2>/dev/null]
+[rm -f $CONFIG_STATUS.old
+cp $CONFIG_STATUS $CONFIG_STATUS.old
+sed '1,$s@^\( *ac_file_inputs=\).*$@\1`echo $ac_file_in | sed -e "s%^%:%" -e "s%:\\([^!]\\)% $ac_given_srcdir/\\1%g" -e "s%:!% %"`@' \
+ $CONFIG_STATUS.old >$CONFIG_STATUS
+ rm -f $CONFIG_STATUS.old]
 
 test "$real_no_create" = yes || ${CONFIG_SHELL-/bin/sh} $CONFIG_STATUS || exit 1
 
@@ -1241,6 +1372,7 @@ eval "zshbin1=${bindir}"
 eval "zshbin2=${zshbin1}"
 eval "zshman=${mandir}"
 eval "zshinfo=${infodir}"
+eval "zshfndir=${fndir}"
 
 echo "
 zsh configuration
@@ -1249,6 +1381,7 @@ zsh version               : ${VERSION}
 host operating system     : ${host_cpu}-${host_vendor}-${host_os}
 source code location      : ${srcdir}
 compiler                  : ${CC}
+preprocessor flags        : ${CPPFLAGS}
 executable compiler flags : ${CFLAGS}"
 if test "$dynamic" = yes; then
   echo "\
@@ -1264,5 +1397,9 @@ echo "\
 library flags             : ${LIBS}
 binary install path       : ${zshbin2}
 man page install path     : ${zshman}
-info install path         : ${zshinfo}
+info install path         : ${zshinfo}"
+if test "$zshfndir" != no; then
+echo "functions install path    : ${zshfndir}
+installed functions       : ${FUNCTIONS_INSTALL}
 "
+fi
