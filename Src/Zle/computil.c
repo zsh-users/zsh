@@ -1083,7 +1083,7 @@ ca_get_sopt(Cadef d, char *line, char **end, LinkList *lp)
     LinkList l = NULL;
 
     *lp = NULL;
-    for (p = NULL; *line; line++)
+    for (p = NULL; *line; line++) {
 	if ((p = d->single[STOUC(*line)]) && p->active &&
 	    p->args && p->name[0] == pre) {
 	    if (p->type == CAO_NEXT) {
@@ -1100,8 +1100,10 @@ ca_get_sopt(Cadef d, char *line, char **end, LinkList *lp)
 		}
 		break;
 	    }
-	} else if (!p || (!p->active && p->name[0] != pre))
+	} else if (p && !p->active)
 	    return NULL;
+	p = NULL;
+    }
     if (p && end)
 	*end = line;
     return p;
@@ -1444,7 +1446,14 @@ ca_parse_line(Cadef d, int multi, int first)
 		state.opt = 0;
 	    else
 		state.curopt = NULL;
-	} else if (multi && (*line == '-' || *line == '+') && cur != compcurrent)
+	} else if (multi && (*line == '-' || *line == '+') && cur != compcurrent
+#if 0
+		   /**** Ouch. Using this will disable the mutual exclusion
+			 of different sets. Not using it will make the -A
+			 pattern be effectively ignored with multiple sets. */
+		   && (!napat || !pattry(napat, line))
+#endif
+		   )
 	    return 1;
 	else if (state.arg && (!napat || !pattry(napat, line))) {
 	    /* Otherwise it's a normal argument. */
