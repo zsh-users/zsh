@@ -1,3 +1,8 @@
+2002-05-10  Peter Stephenson  <pws@csr.com>
+
+	* users/4951: Doc/Zsh/builtins.yo: make it clearer that ulimit
+	defaults to soft limits.
+
 2002-05-08  Andrej Borsenkow  <bor@zsh.org>
 
         * 17080: Doc/Zsh/compsys.yo: clarify tag-order style usage
