@@ -81,10 +81,11 @@ Use prompt -h <theme> for help on specific themes.'
        print $prompt_themes
        return
        ;;
-    p) if (( ! $+prompt_theme )); then
-         print "Cannot preview; current prompt is non-themeable and would"
-         print "be destroyed."
-         return
+    p) if [[ -z "$prompt_theme[1]" ]]; then
+         # Not using a prompt theme; save settings
+         prompt_non_theme=( "$PS1" "$PS2" "$PS3" "$PS4" "$RPS1" )
+         prompt_old_precmd="$(functions precmd)"
+         prompt_old_preexec="$(functions preexec)"
        fi
        preview=( $prompt_themes )
        (( $#* > 1 )) && preview=( "$@[2,-1]" )
@@ -97,10 +98,10 @@ Use prompt -h <theme> for help on specific themes.'
          fi
          print
 
-	 # The next line is a bit ugly.  It (perhaps unnecessarily)
-	 # runs the prompt theme setup function to ensure that if
-	 # the theme has a _preview function that it's been autoloaded.
-	 prompt_${theme_args[1]}_setup
+         # The next line is a bit ugly.  It (perhaps unnecessarily)
+         # runs the prompt theme setup function to ensure that if
+         # the theme has a _preview function that it's been autoloaded.
+         prompt_${theme_args[1]}_setup
 
          if functions prompt_${theme_args[1]}_preview >&/dev/null; then
            prompt_${theme_args[1]}_preview "${(@)theme_args[2,-1]}"
@@ -109,7 +110,25 @@ Use prompt -h <theme> for help on specific themes.'
          fi
        done
        print
-       prompt_${prompt_theme[1]}_setup "${(@)prompt_theme[2,-1]}"
+       if [[ -z "$prompt_theme[1]" ]]; then
+         PS1="$prompt_non_theme[1]"
+         PS2="$prompt_non_theme[2]"
+         PS3="$prompt_non_theme[3]"
+         PS4="$prompt_non_theme[4]"
+         RPS1="$prompt_non_theme[5]"
+         if [[ -z "$prompt_old_precmd" ]]; then
+           precmd () { }
+         else
+           eval "$prompt_old_precmd"
+         fi
+         if [[ -z "$prompt_old_preexec" ]]; then
+           preexec () { }
+         else
+           eval "$prompt_old_preexec"
+         fi
+       else
+         prompt_${prompt_theme[1]}_setup "${(@)prompt_theme[2,-1]}"
+       fi
        ;;
     s) print "Set and save not yet implemented.  Please ensure your ~/.zshrc"
        print "contains something similar to the following:\n"
@@ -118,12 +137,12 @@ Use prompt -h <theme> for help on specific themes.'
        print "  prompt $*[2,-1]"
        ;;
     *) if [[ "$1" == 'random' ]]; then
-	 local random_themes
-	 if (( $#* == 1 )); then
-	   random_themes=( $prompt_themes )
-	 else
-	   random_themes=( "$@[2,-1]" )
-	 fi
+         local random_themes
+         if (( $#* == 1 )); then
+           random_themes=( $prompt_themes )
+         else
+           random_themes=( "$@[2,-1]" )
+         fi
          local i=$(( ( $RANDOM % $#random_themes ) + 1 ))
          argv=( "${=random_themes[$i]}" )
        fi

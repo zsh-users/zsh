@@ -46,20 +46,17 @@ prompt_adam2_setup () {
   # This is a cute hack.  Well I like it, anyway.
   prompt_gfx_bbox_to_mbox=$(print -n "%{\e[A\r$fg_bold[$prompt_adam2_color1]${prompt_gfx_mlc}$fg_no_bold[$prompt_adam2_color1]${prompt_gfx_hyphen}\e[B%}")
 
-  prompt_l_paren=$'%{$fg_bold[grey]%}('
-  prompt_r_paren=$'%{$fg_bold[grey]%})'
-
-  prompt_l_bracket=$'%{$fg_bold[grey]%}['
-  prompt_r_bracket=$'%{$fg_bold[grey]%}]'
+  prompt_l_paren="%{$fg_bold[grey]%}("
+  prompt_r_paren="%{$fg_bold[grey]%})"
 
   prompt_machine="%{$fg_no_bold[$prompt_adam2_color3]%}%n%{$fg_bold[$prompt_adam2_color3]%}@%{$fg_no_bold[$prompt_adam2_color3]%}%m"
 
   prompt_padding_text=`perl -e "print qq{${prompt_gfx_hyphen}} x 200"`
 
   prompt_line_1a="$prompt_gfx_tbox$prompt_l_paren%{$fg_bold[$prompt_adam2_color2]%}%~$prompt_r_paren%{$fg_no_bold[$prompt_adam2_color1]%}"
-  prompt_line_1a_no_color=$(echo "$prompt_line_1a" | perl -pe "s/%{.*?%}//g")
+  prompt_line_1a_no_color=$(echo "$prompt_line_1a" | perl -pe 's/%{.*?%}//g')
   prompt_line_1b="$prompt_l_paren$prompt_machine$prompt_r_paren%{$fg_no_bold[$prompt_adam2_color1]%}${prompt_gfx_hyphen}"
-  prompt_line_1b_no_color=$(echo "$prompt_line_1b" | perl -pe "s/%{.*?%}//g")
+  prompt_line_1b_no_color=$(echo "$prompt_line_1b" | perl -pe 's/%{.*?%}//g')
 
   prompt_line_2="$prompt_gfx_bbox${prompt_gfx_hyphen}%{$fg_bold[white]%}"
 
