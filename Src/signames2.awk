@@ -63,7 +63,10 @@ END {
     printf "#include %czsh.mdh%c\n", 34, 34
     printf "\n"
     printf "/**/\n"
-    printf "mod_export char *sigmsg[SIGCOUNT+2] = {\n"
+    printf "#define sigmsg(sig) ((sig) <= SIGCOUNT ? sig_msg[sig] : %c%s%c)", 34, "unknown signal", 34
+    printf "\n"
+    printf "/**/\n"
+    printf "mod_export char *sig_msg[SIGCOUNT+2] = {\n"
     printf "\t%c%s%c,\n", 34, "done", 34
 
     for (i = 1; i <= 0 + max; i++)

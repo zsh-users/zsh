@@ -615,7 +615,7 @@ printjob(Job jn, int lng, int synch)
 	if (pn->status != SP_RUNNING) {
 	    if (WIFSIGNALED(pn->status)) {
 		sig = WTERMSIG(pn->status);
-		llen = strlen(sigmsg[sig]);
+		llen = strlen(sigmsg(sig));
 		if (WCOREDUMP(pn->status))
 		    llen += 14;
 		if (llen > len)
@@ -626,8 +626,8 @@ printjob(Job jn, int lng, int synch)
 		    doputnl = 1;
 	    } else if (WIFSTOPPED(pn->status)) {
 		sig = WSTOPSIG(pn->status);
-		if ((int)strlen(sigmsg[sig]) > len)
-		    len = strlen(sigmsg[sig]);
+		if ((int)strlen(sigmsg(sig)) > len)
+		    len = strlen(sigmsg(sig));
 		if (job == thisjob && sig == SIGTSTP)
 		    doputnl = 1;
 	    } else if (isset(PRINTEXITVALUE) && isset(SHINSTDIN) &&
@@ -695,13 +695,13 @@ printjob(Job jn, int lng, int synch)
 		else
 		    fprintf(fout, "done%*s", len - 4 + 2, "");
 	    } else if (WIFSTOPPED(pn->status))
-		fprintf(fout, "%-*s", len + 2, sigmsg[WSTOPSIG(pn->status)]);
+		fprintf(fout, "%-*s", len + 2, sigmsg(WSTOPSIG(pn->status)));
 	    else if (WCOREDUMP(pn->status))
 		fprintf(fout, "%s (core dumped)%*s",
-			sigmsg[WTERMSIG(pn->status)],
-			(int)(len - 14 + 2 - strlen(sigmsg[WTERMSIG(pn->status)])), "");
+			sigmsg(WTERMSIG(pn->status)),
+			(int)(len - 14 + 2 - strlen(sigmsg(WTERMSIG(pn->status)))), "");
 	    else
-		fprintf(fout, "%-*s", len + 2, sigmsg[WTERMSIG(pn->status)]);
+		fprintf(fout, "%-*s", len + 2, sigmsg(WTERMSIG(pn->status)));
 	    for (; pn != qn; pn = pn->next)
 		fprintf(fout, (pn->next) ? "%s | " : "%s", pn->text);
 	    putc('\n', fout);

@@ -1230,12 +1230,12 @@ pmjobstate(int job)
 	    else
 		state = "done";
 	} else if (WIFSTOPPED(pn->status))
-	    state = sigmsg[WSTOPSIG(pn->status)];
+	    state = sigmsg(WSTOPSIG(pn->status));
 	else if (WCOREDUMP(pn->status))
 	    sprintf((state = buf2), "%s (core dumped)",
-		    sigmsg[WTERMSIG(pn->status)]);
+		    sigmsg(WTERMSIG(pn->status)));
 	else
-	    state = sigmsg[WTERMSIG(pn->status)];
+	    state = sigmsg(WTERMSIG(pn->status));
 
 	sprintf(buf, ":%d=%s", pn->pid, state);
 
