@@ -1,3 +1,8 @@
+2005-01-10  Peter Stephenson  <pws@csr.com>
+
+	* 20661: Doc/Zsh/expn.yo, Src/glob.c: allow (+func) as shorthand
+	for (e:func:) in glob qualifier.
+
 2005-01-10  Oliver Kiddle  <opk@zsh.org>
 
 	* 20662: Completion/X/Command/_nedit: update for nedit 5.5

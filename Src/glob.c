@@ -1426,22 +1426,43 @@ zglob(LinkList list, LinkNode np, int nountok)
 		    s++;
 		    break;
 		}
+		case '+':
 		case 'e':
 		{
-		    char sav, *tt = get_strarg(s);
+		    char sav, *tt;
+		    int plus;
 
-		    if (!*tt) {
-			zerr("missing end of string", NULL, 0);
+		    if (s[-1] == '+') {
+			plus = 0;
+			tt = s;
+			while (iident(*tt))
+			    tt++;
+			if (tt == s)
+			{
+			    zerr("missing identifier after `+'", NULL, 0);
+			    tt = NULL;
+			}
+		    } else {
+			plus = 1;
+			tt = get_strarg(s);
+			if (!*tt)
+			{
+			    zerr("missing end of string", NULL, 0);
+			    tt = NULL;
+			}
+		    }
+
+		    if (tt == NULL) {
 			data = 0;
 		    } else {
 			sav = *tt;
 			*tt = '\0';
 			func = qualsheval;
-			sdata = dupstring(s + 1);
+			sdata = dupstring(s + plus);
 			untokenize(sdata);
 			*tt = sav;
 			if (sav)
-			    s = tt + 1;
+			    s = tt + plus;
 			else
 			    s = tt;
 		    }

@@ -1739,7 +1739,8 @@ the owner and the other members of the group have at least write
 permission, and for which other users don't have read or execute
 permission.
 )
-item(tt(e)var(string))(
+xitem(tt(e)var(string))
+item(tt(PLUS())var(cmd))(
 The var(string) will be executed as shell code.  The filename will be
 included in the list if and only if the code returns a zero status (usually
 the status of the last command).  The first character after the `tt(e)'
@@ -1762,6 +1763,19 @@ For example, suppose a directory contains a single file `tt(lonely)'.  Then
 the expression `tt(*(e:'reply=(${REPLY}{1,2})':))' will cause the words
 `tt(lonely1 lonely2)' to be inserted into the command line.  Note the
 quotation marks.
+
+The form tt(PLUS())var(cmd) has the same effect, but no delimiters appear
+around var(cmd).  Instead, var(cmd) is taken as the longest sequence of
+characters following the tt(PLUS()) that are alphanumeric or underscore.
+Typically var(cmd) will be the name of a shell function that contains the
+appropriate test.  For example,
+
+example(nt() { [[ $REPLY -nt $NTREF ]] }
+NTREF=reffile
+ls -l *(+nt))
+
+lists all files in the directory that have been modified more recently than
+tt(reffile).
 )
 item(tt(d)var(dev))(
 files on the device var(dev)
