@@ -1,0 +1,27 @@
+#autoload
+
+local expl disp jobs job jids
+
+if [[ "$1" = -r ]]; then
+  jids=( "${(@k)jobstates[(R)running*]}" )
+  shift
+  _description expl 'running job'
+elif [[ "$1" = -s ]]; then
+  jids=( "${(@k)jobstates[(R)running*]}" )
+  shift
+  _description expl 'suspended job'
+else
+  [[ "$1" = - ]] && shift
+  jids=( "${(@k)jobtexts}" )
+  _description expl job
+fi
+
+disp=()
+jobs=()
+for job in "$jids[@]"; do
+  disp=( "$disp[@]" "${(l:3:: ::%:)job} -- ${jobtexts[$job]}" )
+  jobs=( "$jobs[@]" "$job" )
+done
+
+compadd "$@" "$expl[@]" -ld disp - "%$^jobs[@]"
+
