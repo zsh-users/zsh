@@ -129,10 +129,10 @@ case "$state" in
   ;;
   compare_versions)
         _call_function ret _dpkg_$state && return ret
-        _arguments -C -A "-*" -s "$_dpkg_options[@]" \
-	'2:version A:' \
-	'3:operator:(lt le eq ne ge gt lt-nl le-nl ge-nl gt-nl)' \
-	'4:version B:'
+        _arguments -C -A "-*" -s \
+	'1:version A:' \
+	'2:operator:(lt le eq ne ge gt lt-nl le-nl ge-nl gt-nl)' \
+	'3:version B:'
   ;;
   configure)
         _call_function ret _dpkg_$state && return ret

@@ -1,3 +1,8 @@
+2001-05-28  Clint Adams  <schizo@debian.org>
+
+	* 14512: Completion/Debian/Command/_dpkg: tweak --compare-versions
+	behavior.
+
 2001-05-28  Bart Schaefer  <schaefer@zsh.org>
 
 	* unposted: Src/Modules/zprof.c: Silence bogus compiler warnings
