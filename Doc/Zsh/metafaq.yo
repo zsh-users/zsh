@@ -40,9 +40,6 @@ nofill(tt(ftp://sunsite.dk/pub/unix/shells/zsh/))
 item(Finland)(
 nofill(tt(ftp://ftp.funet.fi/pub/unix/shells/zsh/))
 )
-item(France)(
-nofill(tt(ftp://ftp.cenatls.cena.dgac.fr/shells/zsh/))
-)
 item(Germany)(
 nofill(tt(ftp://ftp.fu-berlin.de/pub/unix/shells/zsh/)  em((H))
 tt(ftp://ftp.gmd.de/packages/zsh/)
@@ -63,6 +60,9 @@ tt(ftp://ftp.ayamura.org/pub/zsh/))
 )
 item(Korea)(
 nofill(tt(ftp://linux.sarang.net/mirror/system/shell/zsh/))
+)
+item(Netherlands)(
+nofill(tt(ftp://ftp.demon.nl/pub/mirrors/zsh/))
 )
 item(Norway)(
 nofill(tt(ftp://ftp.uit.no/pub/unix/shells/zsh/))
