@@ -1,5 +1,9 @@
 2002-07-04  Peter Stephenson  <pws@csr.com>
 
+	* 17410: Doc/Zsh/contrib.yo, Functions/Zle/narrow-to-region,
+	Functions/Zle/narrow-to-region-invisible: use 17390/17405 to
+	create narrow-to-region widget/function.
+
 	* 17405: Src/Zle/zle_main.c, Src/Zle/zle_params.c, Doc/Zsh/zle.yo:
 	adapt 17390 so that PREDISPLAY and POSTDISPLAY are reset when zle
 	is entered.

@@ -475,6 +475,40 @@ into the command line.
 
 example(bindkey '^Xf' insert-files)
 )
+tindex(narrow-to-region)
+tindex(narrow-to-region-invisible)
+xitem(tt(narrow-to-region [ -p) var(pre) tt(] [ -P) var(post) tt(] [ -n ] [) var(start) var(end) tt(]))
+item(tt(narrow-to-region-invisible))(
+Narrow the editable portion of the buffer to the region between the cursor
+and the mark, which may be in either order.  The region may not be empty.
+
+tt(narrow-to-region) may be used as a widget or called as a function from a
+user-defined widget; by default, the text outside the editable area remains
+visible.  Various options and arguments are available when it is called as
+a function.
+
+The options tt(-p) var(pretext) and tt(-P) var(posttext) may be
+used to replace the text before and after the display for the duration of
+the function; either or both may be an empty string.
+
+If the option tt(-n) is also given, var(pretext) or var(posttext) will only
+be inserted if there is text before or after the region respectively which
+will be made invisible.
+
+Two numeric arguments may be given which will be used instead of the cursor
+and mark positions.
+
+tt(narrow-to-region-invisible) is a simple widget which calls
+tt(narrow-to-region) with arguments which replace any text outside the
+region with `tt(...)'.
+
+On return from both widgets, the display is restored by any zle command
+which would usually cause the line to be accepted or aborted.  Hence an
+additional such command is required to accept or abort the current line.
+
+The return status of both widgets is zero if the line was accepted, else
+non-zero.
+)
 tindex(predict-on)
 tindex(predict-off)
 item(tt(predict-on))(

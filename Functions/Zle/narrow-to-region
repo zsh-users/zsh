@@ -1,0 +1,82 @@
+# Restrict the start of the editable line to the region between cursor
+# and mark (including the character at the end).  Can be bound used as
+# a zle widget, or called as a function from another widget.
+#
+# Optionally accepts exactly two arguments, which are used instead of
+# $CURSOR and $MARK as limits to the range.
+#
+# Other options:
+#   -p pretext   show `pretext' instead of the buffer text before the region.
+#   -P posttext  show  `posttext' instead of the buffer text after the region.
+#   -n           Only replace the text before or after the region with
+#                the -p or -P options if the text was not empty.
+# Either or both may be empty.
+
+emulate -L zsh
+setopt extendedglob
+
+local lbuffer rbuffer predisplay=$PREDISPLAY postdisplay=$POSTDISPLAY
+integer start end swap cursor=$CURSOR mark=$MARK stat
+
+local opt pretext posttext usepretext useposttext nonempty
+
+while getopts "np:P:" opt; do
+  case $opt in
+    (n) nonempty=1
+	;;
+    (p) pretext=$OPTARG usepretext=1
+	;;
+    (P) posttext=$OPTARG useposttext=1
+	;;
+    (*) [[ $opt != '?' ]] && print "$0: unhandled option: $opt" >&2
+	return 1
+	;;
+  esac
+done
+(( OPTIND > 1 )) && shift $(( OPTIND - 1 ))
+
+if (( $# )); then
+  if (( $# != 2 )); then
+    zle -M "$0: supply zero or two arguments"
+    return 1
+  fi
+  start=$1
+  end=$2
+else
+  start=$MARK
+  end=$CURSOR
+fi
+
+if (( start == end )); then
+  return 1
+elif (( start > end )); then
+  swap=start
+  start=end
+  end=swap
+fi
+
+(( end++, cursor -= start, mark -= start ))
+
+lbuffer=${BUFFER[1,start]}
+if [[ -z $usepretext || ( -n $nonempty && -z $lbuffer ) ]]; then
+  pretext=$lbuffer
+fi
+rbuffer=${BUFFER[end,-1]}
+if [[ -z $useposttext || ( -n $nonempty && -z $rbuffer ) ]]; then
+  posttext=$rbuffer
+fi
+PREDISPLAY="$predisplay$pretext"
+POSTDISPLAY="$posttext$postdisplay"
+BUFFER=${BUFFER[start+1,end-1]}
+CURSOR=$cursor
+MARK=$mark
+
+zle recursive-edit
+stat=$?
+
+PREDISPLAY=$predisplay
+POSTDISPLAY=$postdisplay
+LBUFFER="$lbuffer$LBUFFER"
+RBUFFER="$RBUFFER$rbuffer"
+
+return $stat
