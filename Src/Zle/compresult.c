@@ -1588,214 +1588,142 @@ calclist(int showall)
 			ylens[i] = ztrlen(*pp) + add;
 
 		    if (g->flags & CGF_ROWS) {
-			int count, tcol, first, maxlines = 0, llines;
-			int beg = columns / g->shortest, end = g->cols;
+                        int nth, tcol, len;
 
-			while (1) {
-			    tcols = (beg + end) >> 1;
+                        for (tcols = columns / (g->shortest + add); tcols > g->cols;
+                             tcols--) {
 
-			    for (nth = first = maxlen = width = maxlines =
-				     llines = tcol = 0,
-				     count = g->dcount;
-				 count > 0; count--) {
-				if (ylens[nth] > maxlen)
-				    maxlen = ylens[nth];
-				nth += tcols;
-				tlines++;
-				if (nth >= g->dcount) {
-				    if ((width += maxlen) >= columns)
-					break;
-				    ws[tcol++] = maxlen;
-				    maxlen = 0;
-				    nth = ++first;
-				    if (llines > maxlines)
-					maxlines = llines;
-				    llines = 0;
-				}
-			    }
-			    if (nth < yl) {
-				ws[tcol++] = maxlen;
-				width += maxlen;
-			    }
-			    if (!count && width <= columns &&
-				(tcols <= 0 || beg == end))
-				break;
+                            memset(ws, 0, tcols * sizeof(int));
 
-			    if (beg == end) {
-				beg--;
-				end--;
-			    } else if (width < columns) {
-				if ((end = tcols) == beg - 1)
-				    end++;
-			    } else {
-				if ((beg = tcols) - 1 == end)
-				    end++;
-			    }
-			}
-			if (tcols > g->cols)
-			    tlines = maxlines;
+                            for (width = nth = tcol = 0, tlines = 1;
+                                 width < columns && nth < g->dcount;
+                                 nth++, tcol++) {
+
+                                m = *p;
+
+                                if (tcol == tcols) {
+                                    tcol = 0;
+                                    tlines++;
+                                }
+                                len = ylens[nth];
+
+                                if (len > ws[tcol]) {
+                                    width += len - ws[tcol];
+                                    ws[tcol] = len;
+                                }
+                            }
+                            if (width < columns)
+                                break;
+                        }
 		    } else {
-			int beg = ((g->totl + columns) / columns);
-			int end = g->lins;
+                        int nth, tcol, tline, len;
 
-			while (1) {
-			    tlines = (beg + end) >> 1;
+                        for (tcols = columns / (g->shortest + add); tcols > g->cols;
+                             tcols--) {
 
-			    for (pp = g->ylist, nth = tline = width =
-				     maxlen = tcols = 0;
-				 *pp; pp++) {
-				if (ylens[nth] > maxlen)
-				    maxlen = ylens[nth];
-				if (++tline == tlines) {
-				    if ((width += maxlen) >= columns)
-					break;
-				    ws[tcols++] = maxlen;
-				    maxlen = tline = 0;
-				}
-				nth++;
-			    }
-			    if (tline) {
-				ws[tcols++] = maxlen;
-				width += maxlen;
-			    }
-			    if (nth == yl && width <= columns &&
-				(beg == end || tlines >= g->lins))
-				break;
+                            if ((tlines = (g->dcount + tcols - 1) / tcols) <= 0)
+                                tlines = 1;
 
-			    if (beg == end) {
-				beg++;
-				end++;
-			    } else if (width < columns) {
-				if ((end = tlines) == beg + 1)
-				    end--;
-			    } else {
-				if ((beg = tlines) + 1 == end)
-				    end--;
-			    }
-			}
-			if (tlines > g->lins)
-			    tlines = g->lins;
+                            memset(ws, 0, tcols * sizeof(int));
+
+                            for (width = nth = tcol = tline = 0;
+                                 width < columns && nth < g->dcount;
+                                 nth++, tline++) {
+
+                                m = *p;
+
+                                if (tline == tlines) {
+                                    tcol++;
+                                    tline = 0;
+                                }
+                                if (tcol == tcols) {
+                                    tcol = 0;
+                                    tlines++;
+                                }
+                                len = ylens[nth];
+
+                                if (len > ws[tcol]) {
+                                    width += len - ws[tcol];
+                                    ws[tcol] = len;
+                                }
+                            }
+                            if (width < columns)
+                                break;
+                        }
 		    }
 		}
 	    } else if (g->width) {
 		if (g->flags & CGF_ROWS) {
-		    int addlen, count, tcol, maxlines = 0, llines, i;
-		    int beg = columns / g->shortest, end = g->cols, fe = 1;
-		    Cmatch *first;
+                    int nth, tcol, len;
 
-		    while (1) {
-			tcols = (beg + end) >> 1;
+                    for (tcols = columns / (g->shortest + add); tcols > g->cols;
+                         tcols--) {
 
-			p = first = skipnolist(g->matches, showall);
-			for (maxlen = width = maxlines = llines = tcol = 0,
-				 count = g->dcount;
-			     count > 0; count--) {
-			    m = *p;
-			    addlen = (mlens[m->gnum] +
-                                      (tcol == tcols - 1 ? 0 : add));
-			    if (addlen > maxlen)
-				maxlen = addlen;
-			    for (i = tcols; i && *p; i--)
-				p = skipnolist(p + 1, showall);
+                        memset(ws, 0, tcols * sizeof(int));
 
-			    llines++;
-			    if (!*p) {
-				if (llines > maxlines)
-				    maxlines = llines;
-				llines = 0;
+                        for (width = nth = tcol = 0, tlines = 1,
+                             p = skipnolist(g->matches, showall);
+                             *p && width < columns && nth < g->dcount;
+                             nth++, p = skipnolist(p + 1, showall), tcol++) {
 
-				if ((width += maxlen) >= columns)
-				    break;
-				ws[tcol++] = maxlen;
-				maxlen = 0;
+                            m = *p;
 
-				p = first = skipnolist(first + 1, showall);
-			    }
-			}
-			if (tlines) {
-			    ws[tcol++] = maxlen;
-			    width += maxlen;
-			}
-			if (!count && width <= columns &&
-			    (tcols <= 0 || beg == end))
-			    break;
-
-			if (beg == end) {
-                            if (fe) {
-                                beg += 2;
-                                end += 2;
-                                fe = 0;
-                            } else {
-                                beg--;
-                                end--;
+                            if (tcol == tcols) {
+                                tcol = 0;
+                                tlines++;
                             }
-			} else if (width < columns) {
-			    if ((end = tcols) == beg - 1)
-				end++;
-			} else {
-			    if ((beg = tcols) - 1 == end)
-				end++;
+                            len = (mlens[m->gnum] +
+                                   (tcol == tcols - 1 ? 0 : add));
+
+                            if (len > ws[tcol]) {
+                                width += len - ws[tcol];
+                                ws[tcol] = len;
+                            }
                         }
-		    }
-		    if (tcols > g->cols)
-			tlines = maxlines;
+                        if (width < columns)
+                            break;
+                    }
 		} else {
-		    int addlen;
-		    int smask = ((showall ? 0 : (CMF_NOLIST | CMF_MULT)) |
-				 CMF_HIDE);
-		    int beg = ((g->totl + columns) / columns);
-		    int end = g->lins, fe = 1;
+                    int nth, tcol, tline, len;
 
-		    while (1) {
-			tlines = (beg + end) >> 1;
+                    for (tcols = columns / (g->shortest + add); tcols > g->cols;
+                         tcols--) {
 
-			for (p = g->matches, nth = tline = width =
-				 maxlen = tcols = 0;
-			     (m = *p); p++) {
-			    if (!(m->flags &
-				  (m->disp ? (CMF_DISPLINE | CMF_HIDE) :
-				   smask))) {
-				addlen = mlens[m->gnum] + add;
-				if (addlen > maxlen)
-				    maxlen = addlen;
-				if (++tline == tlines) {
-				    if ((width += maxlen) >= columns)
-					break;
-				    ws[tcols++] = maxlen;
-				    maxlen = tline = 0;
-				}
-				nth++;
-			    }
-			}
-			if (tline) {
-			    ws[tcols++] = maxlen;
-			    width += maxlen;
-			}
-			if (nth == g->dcount && width <= columns &&
-			    (beg == end || tlines >= g->lins))
-			    break;
+                        if ((tlines = (g->dcount + tcols - 1) / tcols) <= 0)
+                            tlines = 1;
 
-			if (beg == end) {
-                            if (fe) {
-                                beg -= 2;
-                                end -= 2;
-                                fe = 0;
-                            } else {
-                                beg++;
-                                end++;
+                        memset(ws, 0, tcols * sizeof(int));
+
+                        for (width = nth = tcol = tline = 0,
+                             p = skipnolist(g->matches, showall);
+                             *p && width < columns && nth < g->dcount;
+                             nth++, p = skipnolist(p + 1, showall), tline++) {
+
+                            m = *p;
+
+                            if (tline == tlines) {
+                                tcol++;
+                                tline = 0;
                             }
-			} else if (width < columns) {
-			    if ((end = tlines) == beg + 1)
-				end--;
-			} else {
-			    if ((beg = tlines) + 1 == end)
-				end--;
-			}
-		    }
-		    if (tlines > g->lins)
-			tlines = g->lins;
+                            if (tcol == tcols) {
+                                tcol = 0;
+                                tlines++;
+                            }
+                            len = (mlens[m->gnum] +
+                                   (tcol == tcols - 1 ? 0 : add));
+
+                            if (len > ws[tcol]) {
+                                width += len - ws[tcol];
+                                ws[tcol] = len;
+                            }
+                        }
+                        if (width < columns)
+                            break;
+                    }
 		}
 	    }
+            if (tcols <= g->cols)
+                tlines = g->lins;
 	    if (tlines == g->lins) {
 		zfree(ws, columns * sizeof(int));
 		g->widths = NULL;

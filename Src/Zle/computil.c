@@ -74,6 +74,7 @@ struct cdrun {
 #define CRT_DESC   1
 #define CRT_SPEC   2
 #define CRT_DUMMY  3
+#define CRT_EXPL   4
 
 struct cdset {
     Cdset next;			/* guess what */
@@ -199,7 +200,9 @@ cd_prep()
         VARARR(Cdstr, grps, lines);
         VARARR(int, wids, cd_state.maxg);
         Cdstr gs, gp, gn, *gpp;
-        int i, j;
+        int i, j, d;
+        Cdrun expl;
+        Cdstr *strp2;
 
         memset(wids, 0, cd_state.maxg * sizeof(int));
         strp = grps;
@@ -236,22 +239,59 @@ cd_prep()
 
         qsort(grps, lines, sizeof(Cdstr), cd_sort);
 
-        for (i = lines, strp = grps; i; i--, strp++) {
-            for (j = 0, gs = *strp; gs->other; gs = gs->other, j++) {
-                *runp = run = (Cdrun) zalloc(sizeof(*run));
-                runp = &(run->next);
-                run->type = CRT_SPEC;
-                run->strs = gs;
-                gs->run = NULL;
-                run->count = 1;
-            }
+        expl =  (Cdrun) zalloc(sizeof(*run));
+        expl->type = CRT_EXPL;
+        expl->strs = grps[0];
+        expl->count = lines;
+
+        for (i = lines, strp = grps, strp2 = NULL; i; i--, strp++) {
+            str = *strp;
+            *strp = str->other;
+            if (strp2)
+                *strp2 = str;
+            strp2 = &(str->run);
+
             *runp = run = (Cdrun) zalloc(sizeof(*run));
             runp = &(run->next);
-            run->type = CRT_DUMMY + cd_state.maxg - j - 1;
-            run->strs = gs;
-            gs->run = NULL;
+            run->type = CRT_SPEC;
+            run->strs = str;
             run->count = 1;
         }
+        *strp2 = NULL;
+
+        for (i = cd_state.maxg - 1; i; i--) {
+            for (d = 0, j = lines, strp = grps; j; j--, strp++) {
+                if ((str = *strp)) {
+                    if (d) {
+                        *runp = run = (Cdrun) zalloc(sizeof(*run));
+                        runp = &(run->next);
+                        run->type = CRT_DUMMY;
+                        run->strs = expl->strs;
+                        run->count = d;
+                        d = 0;
+                    }
+                    *runp = run = (Cdrun) zalloc(sizeof(*run));
+                    runp = &(run->next);
+                    run->type = CRT_SPEC;
+                    run->strs = str;
+                    run->strs->run = NULL;
+                    run->count = 1;
+
+                    *strp = str->other;
+                } else
+                    d++;
+            }
+            if (d) {
+                *runp = run = (Cdrun) zalloc(sizeof(*run));
+                runp = &(run->next);
+                run->type = CRT_DUMMY;
+                run->strs = expl->strs;
+                run->count = d;
+            }
+        }
+        *runp = expl;
+        runp = &(expl->next);
+
         for (set = cd_state.sets; set; set = set->next) {
             for (i = 0, gs = NULL, gpp = &gs, str = set->strs;
                  str; str = str->next) {
@@ -528,6 +568,7 @@ cd_get(char **params)
                 opts[0] = ztrdup("-l");
                 break;
             }
+
         case CRT_SPEC:
             mats = (char **) zalloc(2 * sizeof(char *));
             dpys = (char **) zalloc(2 * sizeof(char *));
@@ -549,39 +590,56 @@ cd_get(char **params)
                 
             } else
                 opts[0] = ztrdup("-2V-default-");
-            csl = "packed rows";
+            csl = "packed";
             break;
-
-        default:
+  
+        case CRT_DUMMY:
             {
-                int dlen = columns - cd_state.gpre - cd_state.slen;
-                VARARR(char, dbuf, dlen + cd_state.slen);
                 char buf[20];
-                int i = run->type - CRT_DUMMY;
 
-                sprintf(buf, "-E%d", i + 1);
+                sprintf(buf, "-E%d", run->count);
 
-                mats = (char **) zalloc(2 * sizeof(char *));
-                dpys = (char **) zalloc((3 + i) * sizeof(char *));
-                mats[0] = ztrdup(run->strs->match);
-                dpys[0] = ztrdup(run->strs->str);
-                for (dp = dpys + 1; i; i--, dp++)
-                    *dp = ztrdup("");
-                memset(dbuf + cd_state.slen, ' ', dlen - 1);
-                dbuf[dlen + cd_state.slen - 1] = '\0';
-                strcpy(dbuf, cd_state.sep);
-                memcpy(dbuf + cd_state.slen,
-                       run->strs->desc,
-                       (strlen(run->strs->desc) >= dlen ? dlen - 1 :
-                        strlen(run->strs->desc)));
-                *dp++ = ztrdup(dbuf);
-                mats[1] = *dp = NULL;
+                mats = (char **) zalloc(sizeof(char *));
+                dpys = (char **) zalloc(sizeof(char *));
+                mats[0] = dpys[0] = NULL;
 
                 opts = cd_arrdup(run->strs->set->opts);
                 opts[0] = ztrdup(buf);
 
-                csl = "packed rows";
+                csl = "packed";
             }
+            break;
+
+        case CRT_EXPL:
+            {
+                int dlen = columns - cd_state.gpre - cd_state.slen;
+                VARARR(char, dbuf, dlen + cd_state.slen);
+                char buf[20];
+                int i = run->count;
+
+                sprintf(buf, "-E%d", i);
+
+                mats = (char **) zalloc(sizeof(char *));
+                dpys = (char **) zalloc((i + 1) * sizeof(char *));
+
+                for (dp = dpys, str = run->strs; str; str = str->run) {
+                    memset(dbuf + cd_state.slen, ' ', dlen - 1);
+                    dbuf[dlen + cd_state.slen - 1] = '\0';
+                    strcpy(dbuf, cd_state.sep);
+                    memcpy(dbuf + cd_state.slen,
+                           str->desc,
+                           (strlen(str->desc) >= dlen ? dlen - 1 :
+                            strlen(str->desc)));
+                    *dp++ = ztrdup(dbuf);
+                }
+                mats[0] = *dp = NULL;
+
+                opts = cd_arrdup(run->strs->set->opts);
+                opts[0] = ztrdup(buf);
+
+                csl = "packed";
+            }
+            break;
         }
         setsparam(params[0], ztrdup(csl));
         setaparam(params[1], opts);

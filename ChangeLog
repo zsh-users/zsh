@@ -1,3 +1,10 @@
+2001-07-27  Sven Wischnowsky  <wischnow@zsh.org>
+
+	* 15509: Completion/Base/Utility/_describe, Src/Zle/compresult.c,
+	Src/Zle/computil.c: improve grouped listings some more, so that
+	TABs walk along the first column first; improve list_packed
+	code
+
 2001-07-27  Peter Stephenson  <pws@csr.com>
 
 	* 15508: Completion/Unix/Command/_cvs: cvs tag told you it was

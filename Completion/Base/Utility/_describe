@@ -78,9 +78,9 @@ while _tags; do
         fi
     
         if [[ -n $_mats ]]; then
-          compadd "$_opts[@]" "$_expl[@]" -O $_strs -D $_mats -s $_strs
+          compadd "$_opts[@]" "${(@)_expl:/-J/-2V}" -O $_strs -D $_mats -s $_strs
         else
-          compadd "$_opts[@]" "$_expl[@]" -O $_strs -a $_strs
+          compadd "$_opts[@]" "${(@)_expl:/-J/-2V}" -O $_strs -a $_strs
         fi
       done
       set - "$_argv[@]"
@@ -97,6 +97,7 @@ while _tags; do
     while compdescribe -g csl2 _args _tmpm _tmpd; do
 
       compstate[list]="$csl $csl2"
+      [[ -n "$csl2" ]] && compstate[list]="${compstate[list]:s/rows//}"
 
       compadd "$_args[@]" -d _tmpd -a _tmpm && _ret=0
     done
