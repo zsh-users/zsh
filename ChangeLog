@@ -1,3 +1,8 @@
+2001-04-05  Sven Wischnowsky  <wischnow@zsh.org>
+
+	* 13907: Src/params.c: fix for reverse subscripting of strings
+	as second part of subscript ($a[x,(r)..])
+
 2001-04-04  Sven Wischnowsky  <wischnow@zsh.org>
 
 	* 13902: Completion/Base/Utility/_arguments,

@@ -1113,6 +1113,8 @@ getarg(char **str, int *inv, Value v, int a2, zlong *w)
 		if (beg < 0)
 		    beg += len;
 		if (beg >= 0 && beg < len) {
+                    char *de = d + len;
+
 		    if (a2) {
 			if (down) {
 			    if (!hasbeg)
@@ -1128,7 +1130,7 @@ getarg(char **str, int *inv, Value v, int a2, zlong *w)
 				*t = sav;
 			    }
 			} else
-			    for (r = beg, t = d + beg; *t; r++, t++) {
+			    for (r = beg, t = d + beg; t <= de; r++, t++) {
 				sav = *t;
 				*t = '\0';
 				if (pattry(pprog, d) &&
@@ -1148,7 +1150,7 @@ getarg(char **str, int *inv, Value v, int a2, zlong *w)
 				    return r;
 			    }
 			} else
-			    for (r = beg + 1, t = d + beg; *t; r++, t++)
+			    for (r = beg + 1, t = d + beg; t <= de; r++, t++)
 				if (pattry(pprog, t) &&
 				    !--num)
 				    return r;
