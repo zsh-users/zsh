@@ -1,5 +1,8 @@
 2001-06-06  Clint Adams  <clint@zsh.org>
 
+	* unposted: Src/Modules/.distfiles: add
+	tcp.* files.
+
 	* 14778: Src/Modules/tcp.mdd, Src/Modules/zftp.mdd:
 	rename zsh/tcp to zsh/net/tcp.
 

@@ -8,6 +8,7 @@ DISTFILES_SRC='
     mathfunc.mdd mathfunc.c
     parameter.mdd parameter.c
     stat.mdd stat.c
+    tcp.mdd tcp.c tcp.h
     termcap.mdd termcap.c
     terminfo.mdd terminfo.c
     zftp.mdd zftp.c
