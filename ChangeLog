@@ -1,3 +1,12 @@
+2000-12-04  Clint Adams  <schizo@debian.org>
+
+	* 13227: configure.in, Src/Modules/terminfo.c,
+	Src/Modules/terminfo.mdd: do not build terminfo
+	module if tigetstr() is not found in the same library
+	as tgetent(), indentation fix, use tputs() in echoti
+	builtin for outputting string capabilities, use
+	setupterm() for module boot.
+
 2000-12-04  Peter Stephenson  <pws@csr.com>
 
 	* 13226: configure.in, Config/defs.mk, Config/installfns.sh,

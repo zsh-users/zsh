@@ -848,7 +848,8 @@ AC_CHECK_FUNCS(strftime difftime gettimeofday \
 	       signgam \
 	       putenv getenv \
 	       brk sbrk \
-	       pathconf sysconf)
+	       pathconf sysconf \
+	       tigetflag tigetnum tigetstr)
 AC_FUNC_STRCOLL
 
 AC_FUNC_MMAP

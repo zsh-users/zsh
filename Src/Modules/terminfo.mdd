@@ -1,5 +1,5 @@
 name=zsh/terminfo
-link=either
+link=`if test "x$ac_cv_have_tigetstr" = xyes; then echo either; else echo no; fi`
 load=yes
 
 autobins="echoti"

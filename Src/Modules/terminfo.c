@@ -39,46 +39,47 @@ static Param terminfo_pm;
 int
 bin_echoti(char *name, char **argv, char *ops, int func)
 {
-    char *s, buf[2048], *t, *u;
-    int num, argct;
+    char *s, *t;
+    int num;
     
     s = *argv++;
+    /* This depends on the termcap stuff in init.c */
     if (termflags & TERM_BAD)
 	return 1;
     if ((termflags & TERM_UNKNOWN) && (isset(INTERACTIVE) || !init_term()))
 	return 1;
     /* if the specified capability has a numeric value, display it */
     if (((num = tigetnum(s)) != -1) && (num != -2)) {
-    printf("%d\n", num);
+	printf("%d\n", num);
+	return 0;
+    }
+    
+    switch (tigetflag(s)) {
+    case -1:
+	break;
+    case 0:
+	puts("no");
+	return 0;
+    default:
+	puts("yes");
+	return 0;
+    }
+    
+/* get a string-type capability */
+    t = (char *)tigetstr(s);
+    if (!t || !*t) {
+	/* capability doesn't exist, or (if boolean) is off */
+	zwarnnam(name, "no such terminfo capability: %s", s, 0);
+	return 1;
+    }
+    
+    tputs(t, 1, putchar);
     return 0;
 }
 
-switch (tigetflag(s)) {
- case -1:
-     break;
- case 0:
-     puts("no");
-     return 0;
- default:
-     puts("yes");
-     return 0;
-}
-
-/* get a string-type capability */
-t = tigetstr(s);
-if (!t || !*t) {
-    /* capability doesn't exist, or (if boolean) is off */
-    zwarnnam(name, "no such terminfo capability: %s", s, 0);
-    return 1;
-}
-
-printf("%s", t);
-return 0;
-}
-
 static struct builtin bintab[] = {
-BUILTIN("echoti", 0, bin_echoti, 1, -1, 0, NULL, NULL),
-    };
+    BUILTIN("echoti", 0, bin_echoti, 1, -1, 0, NULL, NULL),
+};
 
 /* This says if we are cleaning up when the module is unloaded. */
 
@@ -100,7 +101,7 @@ createtihash()
 {
     Param pm;
     HashTable ht;
-
+    
     unsetparam(terminfo_nam);
     
     if (!(pm = createparam(terminfo_nam, PM_SPECIAL|PM_HIDE|PM_HIDEVAL|
@@ -136,13 +137,14 @@ getterminfo(HashTable ht, char *name)
     char *tistr;
     Param pm = NULL;
 
+    /* This depends on the termcap stuff in init.c */
     if (termflags & TERM_BAD)
-	return 1;
+	return NULL;
     if ((termflags & TERM_UNKNOWN) && (isset(INTERACTIVE) || !init_term()))
-	return 1;
-
+	return NULL;
+    
     unmetafy(name, &len);
-
+    
     pm = (Param) zhalloc(sizeof(struct param));
     pm->nam = dupstring(name);
     pm->flags = PM_READONLY;
@@ -154,7 +156,7 @@ getterminfo(HashTable ht, char *name)
     pm->ename = NULL;
     pm->old = NULL;
     pm->level = 0;
-
+    
     if (((num = tigetnum(name)) != -1) && (num != -2)) {
 	pm->u.val = num;
 	pm->flags |= PM_INTEGER;
@@ -163,26 +165,25 @@ getterminfo(HashTable ht, char *name)
 	pm->u.str = num ? dupstring("yes") : dupstring("no");
 	pm->flags |= PM_SCALAR;
     }
-    else if ((tistr = tigetstr(name)) != NULL)
+    else if ((tistr = (char *)tigetstr(name)) != NULL)
     {
 	pm->u.str = dupstring(tistr);
 	pm->flags |= PM_SCALAR;
     }
     else
     {
-    zwarn("no such capability: %s", name, 0);
-    pm->u.str = dupstring("");
-    pm->flags |= PM_UNSET;
+	zwarn("no such capability: %s", name, 0);
+	pm->u.str = dupstring("");
+	pm->flags |= PM_UNSET;
     }
     return (HashNode) pm;
-
+    
 }
 
 /**/
 static void
 scanterminfo(HashTable ht, ScanFunc func, int flags)
 {
-return 0;	    
 }
 
 /**/
@@ -190,7 +191,7 @@ int
 setup_(Module m)
 {
     incleanup = 0;
-
+    
     return 0;
 }
 
@@ -198,6 +199,8 @@ setup_(Module m)
 int
 boot_(Module m)
 {
+    setupterm((char *)0, 1, (int *)0);
+
     return !createtihash() || !addbuiltins(m->nam, bintab, sizeof(bintab)/sizeof(*bintab));
 }
 
@@ -206,14 +209,14 @@ int
 cleanup_(Module m)
 {
     Param pm;
-
+    
     incleanup = 1;
-
-	if ((pm = (Param) paramtab->getnode(paramtab, terminfo_nam)) &&
-	    pm == terminfo_pm) {
-	    pm->flags &= ~PM_READONLY;
-	    unsetparam_pm(pm, 0, 1);
-	}
+    
+    if ((pm = (Param) paramtab->getnode(paramtab, terminfo_nam)) &&
+	pm == terminfo_pm) {
+	pm->flags &= ~PM_READONLY;
+	unsetparam_pm(pm, 0, 1);
+    }
     deletebuiltins(m->nam, bintab, sizeof(bintab)/sizeof(*bintab));
     return 0;
 }
@@ -224,3 +227,7 @@ finish_(Module m)
 {
     return 0;
 }
+
+
+
+
