@@ -1,3 +1,8 @@
+2002-06-06  Peter Stephenson  <pws@csr.com>
+
+	* 17293: Src/Zle/zle_main.c, Doc/Zsh/zle.yo: support poll()
+	as a (preferred) alternative to select() in zle.
+
 2002-06-06  Clint Adams  <clint@zsh.org>
 
 	* 17297: Src/Modules/zpty.c: 17265 continued.

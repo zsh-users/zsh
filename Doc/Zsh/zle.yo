@@ -413,8 +413,8 @@ within this invocation of ZLE.  Any following invocation (e.g., the next
 command line) will start as usual with the `tt(main)' keymap selected.
 )
 item(tt(-F) [ tt(-L) ] [ var(fd) [ var(handler) ] ])(
-Only available if your system support the `select' system call; most
-modern systems do.
+Only available if your system supports one of the `poll' or `select' system
+calls; most modern systems do.
 
 Installs var(handler) (the name of a shell function) to handle input from
 file descriptor var(fd).  When zle is attempting to read data, it will
