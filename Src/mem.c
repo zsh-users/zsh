@@ -56,17 +56,11 @@
 	attempting to free this memory may result in a core dump.
 	The pair of pointers ncalloc and alloc may point to either
 	zalloc & zcalloc or zhalloc & hcalloc; permalloc() sets them to the
-	former, and heapalloc() sets them to the latter. This can be useful.
-	For example, the dupstruct() routine duplicates a syntax tree,
-	allocating the new memory for the tree using alloc().  If you want
-	to duplicate a structure for a one-time use (i.e. to execute the list
-	in a for loop), call heapalloc(), then dupstruct().  If you want
-	to duplicate a structure in order to preserve it (i.e. a function
-	definition), call permalloc(), then dupstruct().
+	former, and heapalloc() sets them to the latter.
 
 	If possible, the heaps are allocated using mmap() so that the
 	(*real*) heap isn't filled up with empty zsh heaps. If mmap()
-	is not available and zsh's own allocator we use a simple trick
+	is not available and zsh's own allocator is used, we use a simple trick
 	to avoid that: we allocate a large block of memory before allocating
 	a heap pool, this memory is freed again immediately after the pool
 	is allocated. If there are only small blocks on the free list this

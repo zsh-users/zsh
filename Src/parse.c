@@ -1934,6 +1934,8 @@ ecstr(char *s)
 }
 
 #define ec(N) ecomp((struct node *) (N))
+#define ecsave(N) \
+  do { int u = ecused; ec(N); if (u == ecused) ecadd(WCB_END()); } while (0)
 
 #define _Cond(X) ((Cond) (X))
 #define _Cmd(X) ((Cmd) (X))
@@ -2024,7 +2026,7 @@ ecomp(struct node *n)
 		break;
 	    case SUBSH:
 		ecadd(WCB_SUBSH());
-		ec(nn->u.list);
+		ecsave(nn->u.list);
 		break;
 	    case ZCTIME:
 		ecadd(WCB_TIMED(nn->u.pline ? WC_TIMED_PIPE : WC_TIMED_EMPTY));
@@ -2034,7 +2036,7 @@ ecomp(struct node *n)
 	    case FUNCDEF:
 		{
 		    LinkNode np;
-		    int num, sbeg, oecu, onp;
+		    int num, sbeg, onp;
 		    Eccstr ostrs;
 
 		    /* Defined functions and their strings are stored
@@ -2057,10 +2059,7 @@ ecomp(struct node *n)
 		    onp = ecnpats;
 		    ecnpats = 0;
 
-		    oecu = ecused;
-		    ec(nn->u.list);
-		    if (oecu == ecused)
-			ecadd(WCB_END());
+		    ecsave(nn->u.list);
 
 		    ecbuf[p + num + 2] = ecused - num - p;
 		    ecbuf[p + num + 3] = ecnpats;
@@ -2088,7 +2087,7 @@ ecomp(struct node *n)
 		break;
 	    case CURSH:
 		ecadd(WCB_CURSH());
-		ec(nn->u.list);
+		ecsave(nn->u.list);
 		break;
 	    case CFOR:
 		{
@@ -2118,7 +2117,7 @@ ecomp(struct node *n)
 			} else
 			    type = WC_FOR_PPARAM;
 		    }
-		    ec(nn->u.forcmd->list);
+		    ecsave(nn->u.forcmd->list);
 
 		    ecbuf[p] = WCB_FOR(type, ecused - 1 - p);
 		}
@@ -2145,7 +2144,7 @@ ecomp(struct node *n)
 		    } else
 			type = WC_SELECT_PPARAM;
 
-		    ec(nn->u.forcmd->list);
+		    ecsave(nn->u.forcmd->list);
 
 		    ecbuf[p] = WCB_SELECT(type, ecused - 1 - p);
 		}
@@ -2160,14 +2159,14 @@ ecomp(struct node *n)
 		    for (i = nn->u.ifcmd->ifls, t = nn->u.ifcmd->thenls;
 			 *i; i++, t++) {
 			p = ecadd(0);
-			ec(*i);
-			ec(*t);
+			ecsave(*i);
+			ecsave(*t);
 			ecbuf[p] = WCB_IF(type, ecused - 1 - p);
 			type = WC_IF_ELIF;
 		    }
 		    if (*t) {
 			p = ecadd(0);
-			ec(*t);
+			ecsave(*t);
 			ecbuf[p] = WCB_IF(WC_IF_ELSE, ecused - 1 - p);
 		    }
 		    ecbuf[c] = WCB_IF(WC_IF_HEAD, ecused - 1 - c);
@@ -2185,7 +2184,7 @@ ecomp(struct node *n)
 			c = ecadd(0);
 			ecstr(*pp + 1);
 			ecadd(ecnpats++);
-			ec(*l);
+			ecsave(*l);
 			ecbuf[c] = WCB_CASE((**pp == ';' ?
 					     WC_CASE_OR : WC_CASE_AND),
 					    ecused - 1 - c);
@@ -2203,13 +2202,13 @@ ecomp(struct node *n)
 	    case CREPEAT:
 		p = ecadd(0);
 		ecstr((char *) getdata(firstnode(nn->args)));
-		ec(nn->u.list);
+		ecsave(nn->u.list);
 		ecbuf[p] = WCB_REPEAT(ecused - 1 - p);
 		break;
 	    case CWHILE:
 		p = ecadd(0);
-		ec(nn->u.whilecmd->cont);
-		ec(nn->u.whilecmd->loop);
+		ecsave(nn->u.whilecmd->cont);
+		ecsave(nn->u.whilecmd->loop);
 		ecbuf[p] = WCB_WHILE((nn->u.whilecmd->cond ?
 				      WC_WHILE_UNTIL : WC_WHILE_WHILE),
 				     ecused - 1 - p);

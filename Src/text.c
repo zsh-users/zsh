@@ -685,7 +685,11 @@ gettext2(Estate state)
 	    taddstr("))");
 	    stack = 1;
 	    break;
+	case WC_END:
+	    stack = 1;
+	    break;
 	default:
+	    DPUTS(1, "unknown word code in gettext2()");
 	    return;
 	}
     }

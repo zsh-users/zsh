@@ -842,9 +842,6 @@ sublist_done:
 	    break;
 	code = *state->pc++;
     }
-    if (wc_code(code) == WC_END)
-	state->pc--;
-
     pline_level = old_pline_level;
     list_pipe = old_list_pipe;
     lineno = oldlineno;

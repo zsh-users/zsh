@@ -361,7 +361,7 @@ setfunction(char *name, char *val, int dis)
 	if (!strncmp(name, "TRAP", 4) &&
 	    (sn = getsignum(name + 4)) != -1) {
 	    if (settrap(sn, shf->funcdef)) {
-		freestruct(shf->funcdef);
+		freeeprog(shf->funcdef);
 		zfree(shf, sizeof(*shf));
 		zsfree(val);
 		LASTALLOC_RETURN;
