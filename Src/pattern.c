@@ -179,6 +179,7 @@ typedef union upat *Upat;
 #define P_ISEXCLUDE(p)	(((p)->l & 0x30) == 0x30)
 #define P_NOTDOT(p)	((p)->l & 0x40)
 
+/* Flags needed when pattern is executed */
 #define P_SIMPLE        0x01	/* Simple enough to be #/## operand. */
 #define P_HSTART        0x02	/* Starts with # or ##'d pattern. */
 #define P_PURESTR	0x04	/* Can be matched with a strcmp */
@@ -197,6 +198,7 @@ typedef union upat *Upat;
 
 #if defined(ZSH_64_BIT_TYPE) || defined(LONG_IS_64_BIT)
 typedef zlong zrange_t;
+#define ZRANGE_T_IS_SIGNED	(1)
 #else
 typedef unsigned long zrange_t;
 #endif
@@ -442,7 +444,7 @@ patcompile(char *exp, int inflags, char **endexp)
      * The pattern was compiled in a fixed buffer:  unless told otherwise,
      * we stick the compiled pattern on the heap.  This is necessary
      * for files where we will often be compiling multiple segments at once.
-     * But if we get the ZDUP flag w always put it in zalloc()ed memory.
+     * But if we get the ZDUP flag we always put it in zalloc()ed memory.
      */
     if (patflags & PAT_ZDUP) {
 	Patprog newp = (Patprog)zalloc(patsize);
@@ -523,13 +525,20 @@ patcompswitch(int paren, int *flagp)
 	     * we need to do this here as otherwise the code compiling
 	     * the exclusion doesn't know if the flags have really
 	     * changed if the error count gets restored.
-	     *
-	     * At top level (paren == 0) in a file glob !(patflags &PAT_FILET)
-	     * do the exclusion prepending the file path so far, else don't.
 	     */
 	    patglobflags &= ~0xff;
-	    br = patnode(!(patflags & PAT_FILET) || paren ?
-			 P_EXCLUDE : P_EXCLUDP);
+	    if (!(patflags & PAT_FILET) || paren) {
+		br = patnode(P_EXCLUDE);
+	    } else {
+		/*
+		 * At top level (paren == 0) in a file glob !(patflags
+		 * &PAT_FILET) do the exclusion prepending the file path
+		 * so far.  We need to flag this to avoid unnecessarily
+		 * copying the path.
+		 */
+		br = patnode(P_EXCLUDP);
+		patflags |= PAT_HAS_EXCLUDP;
+	    }
 	    up.p = NULL;
 	    patadd((char *)&up, 0, sizeof(up), 0);
 	    /* / is not treated as special if we are at top level */
@@ -1299,12 +1308,11 @@ static void patoptail(long p, long val)
  * Run a pattern.
  */
 static char *patinstart;	/* Start of input string */
+static char *patinend;		/* End of input string */
+static char *patinpath;		/* Full path for use with ~ exclusions */
 
 /**/
 char *patinput;		/* String input pointer */
-
-/* Length of input string, plus null byte, if needed */
-static int patinlen;
 
 /*
  * Offset of string at which we are trying to match.
@@ -1354,7 +1362,7 @@ pattry(Patprog prog, char *string)
 mod_export int
 pattryrefs(Patprog prog, char *string, int *nump, int *begp, int *endp)
 {
-    int i, maxnpos = 0;
+    int i, maxnpos = 0, ret;
     char **sp, **ep;
     char *progstr = (char *)prog + prog->startoff;
 
@@ -1367,12 +1375,51 @@ pattryrefs(Patprog prog, char *string, int *nump, int *begp, int *endp)
 	string++;
 
     patinstart = patinput = string;
+    patinend = patinstart + strlen(patinstart);
+    /*
+     * From now on we do not require NULL termination of
+     * the test string.  It is still metafied, as is string
+     * data in the prog.
+     */
 
     if (prog->flags & (PAT_PURES|PAT_ANY)) {
-	if ((prog->flags & PAT_ANY) ||
-	    ((prog->flags & PAT_NOANCH) ? 
-	     !strncmp(progstr, string, prog->patmlen)
-	     : !strcmp(progstr, string))) {
+	/*
+	 * Either we are testing against a pure string,
+	 * or we can match anything at all.
+	 */
+	int ret;
+	if (prog->flags & PAT_ANY) {
+	    /*
+	     * Optimisation for a single "*": always matches
+	     * (except for no_glob_dots, see below).
+	     */
+	    ret = 1;
+	} else {
+	    /*
+	     * Testing a pure string.  See if initial
+	     * components match.
+	     */
+	    int lendiff = (patinend - patinstart) - prog->patmlen;
+	    if (lendiff < 0) {
+		/* No, the pattern string is too long. */
+		ret = 0;
+	    } else if (!memcmp(progstr, string, prog->patmlen)) {
+		/*
+		 * Initial component matches.  Matches either
+		 * if lengths are the same or we are not anchored
+		 * to the end of the string.
+		 */
+		ret = !lendiff || (prog->flags & PAT_NOANCH);
+	    } else {
+		/* No match. */
+		ret = 0;
+	    }
+	}
+	if (ret) {
+	    /*
+	     * For files, we won't match initial "."s unless
+	     * glob_dots is set.
+	     */
 	    if ((prog->flags & PAT_NOGLD) && *string == '.')
 		return 0;
 	    /* in case used for ${..#..} etc. */
@@ -1387,11 +1434,32 @@ pattryrefs(Patprog prog, char *string, int *nump, int *begp, int *endp)
 	 * Test for a `must match' string, unless we're scanning for a match
 	 * in which case we don't need to do this each time.
 	 */
-	if (!(prog->flags & PAT_SCAN) && prog->mustoff &&
-	    !strstr(string, (char *)prog + prog->mustoff))
-	    return 0;
+	if (!(prog->flags & PAT_SCAN) && prog->mustoff)
+	{
+	    char *testptr;	/* start pointer into test string */
+	    char *teststop;	/* last point from which we can match */
+	    char *patptr = (char *)prog + prog->mustoff;
+	    int patlen = strlen(patptr);
+	    int found = 0;
 
-	patinlen = 0;		/* don't calculate length unless needed */
+	    if (patlen > patinend - patinstart) {
+		/* Too long, can't match. */
+		return 0;
+	    }
+	    teststop = patinend - patlen;
+
+	    for (testptr = patinstart; testptr <= teststop; testptr++)
+	    {
+		if (!memcmp(testptr, patptr, patlen)) {
+		    found = 1;
+		    break;
+		}
+	    }
+
+	    if (!found)
+		return 0;
+	}
+
 	patflags = prog->flags;
 	patglobflags = prog->globflags;
 	if (!(patflags & PAT_FILE)) {
@@ -1400,6 +1468,27 @@ pattryrefs(Patprog prog, char *string, int *nump, int *begp, int *endp)
 	}
 	globdots = !(patflags & PAT_NOGLD);
 	parsfound = 0;
+
+	if ((patflags & PAT_HAS_EXCLUDP) && pathpos) {
+	    /*
+	     * For a top-level ~-exclusion, we will need the full
+	     * path to exclude, so copy the path so far and append the
+	     * current test string.
+	     *
+	     * There are some advantages in making patinstart etc.
+	     * point into this new string; however, that gets confusing
+	     * if we need patinput outside this file.  That's
+	     * not likely for files but I don't think it's worth
+	     * the risk.
+	     */
+	    int len = patinend - patinstart;
+
+	    patinpath = (char *)zalloc(pathpos + len);
+	    memcpy(patinpath, pathbuf, pathpos);
+	    memcpy(patinpath + pathpos, patinstart, len);
+	} else {
+	    patinpath = NULL;
+	}
 
 	if (patmatch((Upat)progstr)) {
 	    /*
@@ -1504,9 +1593,16 @@ pattryrefs(Patprog prog, char *string, int *nump, int *begp, int *endp)
 		setaparam("mbegin", mbeginarr);
 		setaparam("mend", mendarr);
 	    }
-	    return 1;
+	    ret = 1;
 	} else
-	    return 0;
+	    ret = 0;
+
+	if (patinpath) {
+	    zfree(patinpath, pathpos + (patinend - patinstart));
+	    patinpath = NULL;
+	}
+
+	return ret;
     }
 }
 
@@ -1520,6 +1616,12 @@ pattryrefs(Patprog prog, char *string, int *nump, int *begp, int *endp)
 	  (isupper(chpa) ? tolower(chpa) : chpa)) : \
 	 (patglobflags & GF_LCMATCHUC) ? \
 	 (islower(chpa) && toupper(chpa) == chin) : 0))
+/*
+ * The same but caching an expression from the first argument,
+ * Requires local charmatch_cache definition.
+ */
+#define CHARMATCH_EXPR(expr, chpa) \
+	(charmatch_cache = (expr), CHARMATCH(charmatch_cache, chpa))
 
 /*
  * exactpos is used to remember how far down an exact string we have
@@ -1541,7 +1643,7 @@ patmatch(Upat prog)
 {
     /* Current and next nodes */
     Upat scan = prog, next, opnd;
-    char *start, *save, *chrop;
+    char *start, *save, *chrop, *compend;
     int savglobflags, op, no, min, nextch, fail = 0, saverrsfound;
     zrange_t from, to, comp;
 
@@ -1549,12 +1651,12 @@ patmatch(Upat prog)
 	next = PATNEXT(scan);
 
 	if (!globdots && P_NOTDOT(scan) && patinput == patinstart &&
-	    *patinput == '.')
+	    patinput < patinend && *patinput == '.')
 	    return 0;
 
 	switch (P_OP(scan)) {
 	case P_ANY:
-	    if (!*patinput)
+	    if (patinput == patinend)
 		fail = 1;
 	    else
 		METAINC(patinput);
@@ -1566,7 +1668,7 @@ patmatch(Upat prog)
 	     */
 	    chrop = exactpos ? exactpos : (char *)P_OPERAND(scan);
 	    exactpos = NULL;
-	    while (*chrop && *patinput) {
+	    while (*chrop && patinput < patinend) {
 		int chin = STOUC(UNMETA(patinput));
 		int chpa = STOUC(UNMETA(chrop));
 		if (!CHARMATCH(chin, chpa)) {
@@ -1582,7 +1684,7 @@ patmatch(Upat prog)
 	    }
 	    break;
 	case P_ANYOF:
-	    if (!*patinput ||
+	    if (patinput == patinend ||
 		!patmatchrange((char *)P_OPERAND(scan),
 			       STOUC(UNMETA(patinput))))
 		fail = 1;
@@ -1590,7 +1692,7 @@ patmatch(Upat prog)
 		METAINC(patinput);
 	    break;
 	case P_ANYBUT:
-	    if (!*patinput ||
+	    if (patinput == patinend ||
 		patmatchrange((char *)P_OPERAND(scan),
 			      STOUC(UNMETA(patinput))))
 		fail = 1;
@@ -1602,7 +1704,7 @@ patmatch(Upat prog)
 	case P_NUMTO:
 	    /*
 	     * To do this properly, we really have to treat numbers as
-	     * closures:  that's so things like like <1-1000>33 will
+	     * closures:  that's so things like <1-1000>33 will
 	     * match 633 (they didn't up to 3.1.6).  To avoid making this
 	     * too inefficient, we see if there's an exact match next:
 	     * if there is, and it's not a digit, we return 1 after
@@ -1627,13 +1729,43 @@ patmatch(Upat prog)
 		to = *((zrange_t *) start);
 #endif
 	    }
-	    start = patinput;
-	    comp = (zrange_t) zstrtol(patinput, &save, 10);
-	    patinput = save;
+	    start = compend = patinput;
+	    comp = 0;
+	    while (patinput < patinend && idigit(*patinput)) {
+		if (comp)
+		    comp *= 10;
+		comp += *patinput - '0';
+		patinput++;
+		compend++;
+
+		if (comp & ((zrange_t)1 << (sizeof(comp)*8 -
+#ifdef ZRANGE_T_IS_SIGNED
+					    2
+#else
+					    1
+#endif
+				))) {
+		    /*
+		     * Out of range (allowing for signedness, which
+		     * we need if we are using zlongs).
+		     * This is as far as we can go.
+		     * If we're doing a range "from", skip all the
+		     * remaining numbers.  Otherwise, we can't
+		     * match beyond the previous point anyway.
+		     * Leave the pointer to the last calculated
+		     * position (compend) where it was before.
+		     */
+		    if (op == P_NUMFROM) {
+			while (patinput < patinend && idigit(*patinput))
+			    patinput++;
+		    }
+		}
+	    }
+	    save = patinput;
 	    no = 0;
 	    while (patinput > start) {
 		/* if already too small, no power on earth can save it */
-		if (comp < from)
+		if (comp < from && patinput <= compend)
 		    break;
 		if ((op == P_NUMFROM || comp <= to) && patmatch(next)) {
 		    return 1;
@@ -1644,7 +1776,14 @@ patmatch(Upat prog)
 		    return 0;
 		patinput = --save;
 		no++;
-		comp /= 10;
+		/*
+		 * With a range start and an unrepresentable test
+		 * number, we just back down the test string without
+		 * changing the number until we get to a representable
+		 * one.
+		 */
+		if (patinput < compend)
+		    comp /= 10;
 	    }
 	    patinput = start;
 	    fail = 1;
@@ -1652,7 +1791,7 @@ patmatch(Upat prog)
 	case P_NUMANY:
 	    /* This is <->: any old set of digits, don't bother comparing */
 	    start = patinput;
-	    while (idigit(STOUC(*patinput)))
+	    while (patinput < patinend && idigit(STOUC(*patinput)))
 		patinput++;
 	    save = patinput;
 	    no = 0;
@@ -1760,7 +1899,7 @@ patmatch(Upat prog)
 	     * to the end of the asserted pattern; the endpoint
 	     * in the target string is nulled out.
 	     */
-	    if (!(fail = (*patinput != '\0')))
+	    if (!(fail = (patinput < patinend)))
 		return 1;
 	    break;
 	case P_BRANCH:
@@ -1780,7 +1919,8 @@ patmatch(Upat prog)
 			/*
 			 * The strategy is to test the asserted pattern,
 			 * recording via P_EXCSYNC how far the part to
-			 * be excluded matched.  We then null out that
+			 * be excluded matched.  We then set the
+			 * length of the test string to that
 			 * point and see if the exclusion as far as
 			 * P_EXCEND also matches that string.
 			 * We need to keep testing the asserted pattern
@@ -1794,10 +1934,15 @@ patmatch(Upat prog)
 			 * The pointer also tells us where the asserted
 			 * pattern matched for use by the exclusion.
 			 *
+			 * It's hard to allocate space for this
+			 * beforehand since we may need to do it
+			 * recursively.
+			 *
 			 * P.S. in case you were wondering, this code
 			 * is horrible.
 			 */
 			Upat syncstrp;
+			char *origpatinend;
 			unsigned char *oldsyncstr;
 			char *matchpt = NULL;
 			int ret, savglobdots, matchederrs = 0;
@@ -1813,13 +1958,13 @@ patmatch(Upat prog)
 			 * of view, so we use a different sync string.
 			 */
 			oldsyncstr = syncstrp->p;
-			if (!patinlen)
-			    patinlen = strlen(patinstart)+1;
-			syncstrp->p = (unsigned char *)zshcalloc(patinlen);
+			syncstrp->p = (unsigned char *)
+			    zshcalloc((patinend - patinstart) + 1);
+			origpatinend = patinend;
 			while ((ret = patmatch(P_OPERAND(scan)))) {
 			    unsigned char *syncpt;
-			    char *savpatinstart, *origsave, *origpatinstart;
-			    int savforce = forceerrs, savpatinlen = patinlen;
+			    char *savpatinstart, *savpatinend;
+			    int savforce = forceerrs;
 			    int savpatflags = patflags, synclen;
 			    forceerrs = -1;
 			    savglobdots = globdots;
@@ -1837,40 +1982,25 @@ patmatch(Upat prog)
 			    for (syncpt = syncstrp->p; !*syncpt; syncpt++)
 				;
 			    synclen = syncpt - syncstrp->p;
-			    if (patinstart[synclen]) {
+			    if (patinstart + synclen != patinend) {
 				/*
-				 * We need to truncate the string at
-				 * this point.  Copy a whole load of
-				 * stuff to avoid modifying the string.
-				 * This includes (at least) patinstart,
-				 * patinput and save.
+				 * Temporarily mark the string as
+				 * ending at this point.
 				 */
-				origsave = save;
-				origpatinstart = patinstart;
-
 				DPUTS(patinstart + synclen > matchpt,
 				      "BUG: EXCSYNC failed");
 
-				savpatinstart = patinstart =
-				    ztrduppfx(patinstart, synclen);
-				patinput = patinstart +
-				    (patinput - origpatinstart);
-				save = patinstart + (save - origpatinstart);
+				patinend = patinstart + synclen;
 				/*
 				 * If this isn't really the end of the string,
 				 * remember this for the (#e) assertion.
 				 */
 				patflags |= PAT_NOTEND;
 			    }
-			    else
-			    {
-				/* Don't need to copy, already right length */
-				origsave = origpatinstart = NULL;
-				savpatinstart = patinstart;
-			    }
+			    savpatinstart = patinstart;
+			    savpatinend = patinend;
 			    next = PATNEXT(scan);
 			    while (next && P_ISEXCLUDE(next)) {
-				char *buf = NULL;
 				patinput = save;
 				/*
 				 * turn off approximations in exclusions:
@@ -1881,7 +2011,7 @@ patmatch(Upat prog)
 				patglobflags &= ~0xff;
 				errsfound = 0;
 				opnd = P_OPERAND(next) + 1;
-				if (P_OP(next) == P_EXCLUDP && pathpos) {
+				if (P_OP(next) == P_EXCLUDP && patinpath) {
 				    /*
 				     * top level exclusion with a file,
 				     * applies to whole path so add the
@@ -1889,12 +2019,9 @@ patmatch(Upat prog)
 				     */
 				    DPUTS(patinput != patinstart,
 					  "BUG: not at start excluding path");
-				    buf = (char *)
-					zalloc(pathpos + patinlen);
-				    strcpy(buf, pathbuf);
-				    strcpy(buf + pathpos, patinput);
-				    patinput = patinstart = buf;
-				    patinlen += pathpos;
+				    patinend = patinpath + pathpos +
+					(patinend - patinstart);
+				    patinput = patinstart = patinpath;
 				}
 				if (patmatch(opnd)) {
 				    ret = 0;
@@ -1905,26 +2032,20 @@ patmatch(Upat prog)
 				     */
 				    parsfound = savparsfound;
 				}
-				if (buf) {
+				if (patinpath) {
+				    patinput = savpatinstart +
+					(patinput - patinstart);
 				    patinstart = savpatinstart;
-				    patinlen = savpatinlen;
-				    zfree(buf, pathpos + patinlen);
+				    patinend = savpatinend;
 				}
 				if (!ret)
 				    break;
 				next = PATNEXT(next);
 			    }
 			    /*
-			     * Free copied string and restore if
-			     * we needed to truncate.
+			     * Restore original end position.
 			     */
-			    if (origpatinstart) {
-				patinput = origpatinstart +
-				    (patinput - patinstart);
-				zfree(patinstart, synclen+1);
-				patinstart = origpatinstart;
-				save = origsave;
-			    }
+			    patinend = origpatinend;
 			    patflags = savpatflags;
 			    globdots = savglobdots;
 			    forceerrs = savforce;
@@ -1934,7 +2055,8 @@ patmatch(Upat prog)
 			    patglobflags = savglobflags;
 			    errsfound = saverrsfound;
 			}
-			zfree((char *)syncstrp->p, patinlen);
+			zfree((char *)syncstrp->p,
+			      (patinend - patinstart) + 1);
 			syncstrp->p = oldsyncstr;
 			if (ret) {
 			    patinput = matchpt;
@@ -1967,9 +2089,8 @@ patmatch(Upat prog)
 			    opnd = P_OPERAND(scan);
 			    ptrp = opnd++;
 			    if (!ptrp->p) {
-				if (!patinlen)
-				    patinlen = strlen((char *)patinstart)+1;
-				ptrp->p = (unsigned char *)zshcalloc(patinlen);
+				ptrp->p = (unsigned char *)
+				    zshcalloc((patinend - patinstart) + 1);
 				pfree = 1;
 			    }
 			    ptr = ptrp->p + (patinput - patinstart);
@@ -1993,7 +2114,8 @@ patmatch(Upat prog)
 			if (ret)
 			    ret = patmatch(opnd);
 			if (pfree) {
-			    zfree((char *)ptrp->p, patinlen);
+			    zfree((char *)ptrp->p,
+				  (patinend - patinstart) + 1);
 			    ptrp->p = NULL;
 			}
 			if (ret)
@@ -2024,7 +2146,7 @@ patmatch(Upat prog)
 	    /* Note that no counts possibly metafied characters */
 	    start = patinput;
 	    if (op == P_STAR) {
-		for (no = 0; *patinput; METAINC(patinput))
+		for (no = 0; patinput < patinend; METAINC(patinput))
 		    no++;
 		/* simple optimization for reasonably common case */
 		if (P_OP(next) == P_END)
@@ -2033,7 +2155,8 @@ patmatch(Upat prog)
 		DPUTS(patglobflags & 0xff,
 		      "BUG: wrong backtracking with approximation.");
 		if (!globdots && P_NOTDOT(P_OPERAND(scan)) &&
-		    patinput == patinstart && *patinput == '.')
+		    patinput == patinstart && patinput < patinend &&
+		    *patinput == '.')
 		    return 0;
 		no = patrepeat(P_OPERAND(scan));
 	    }
@@ -2051,11 +2174,11 @@ patmatch(Upat prog)
 		 */
 		if (P_OP(PATNEXT(next)) == P_END &&
 		    !(patflags & PAT_NOANCH)) {
-		    int ptlen = strlen(patinput);
+		    int ptlen = patinend - patinput;
 		    int oplen = strlen(nextop);
+		    int lenmatch = patinend - (min ? METANEXT(start) : start);
 		    /* Are we in the right range? */
-		    if (oplen > (int)strlen(min ? METANEXT(start) : start) ||
-			oplen < ptlen)
+		    if (oplen > lenmatch || oplen < ptlen)
 			return 0;
 		    /* Yes, just position appropriately and test. */
 		    patinput += ptlen - oplen;
@@ -2073,11 +2196,13 @@ patmatch(Upat prog)
 	    savglobflags = patglobflags;
 	    saverrsfound = errsfound;
 	    while (no >= min) {
-		int chin;
-		if ((nextch < 0 || (chin = STOUC(UNMETA(patinput)),
-				    CHARMATCH(chin, nextch))) &&
-		    patmatch(next))
-		    return 1;
+		int charmatch_cache;
+		if (nextch < 0 ||
+		    (patinput < patinend &&
+		     CHARMATCH_EXPR(STOUC(UNMETA(patinput)), nextch))) {
+		    if (patmatch(next))
+			return 1;
+		}
 		no--;
 		save--;
 		if (save > start && save[-1] == Meta)
@@ -2097,11 +2222,11 @@ patmatch(Upat prog)
 		fail = 1;
 	    break;
 	case P_ISEND:
-	    if (*patinput || (patflags & PAT_NOTEND))
+	    if (patinput < patinend || (patflags & PAT_NOTEND))
 		fail = 1;
 	    break;
 	case P_END:
-	    if (!(fail = (*patinput && !(patflags & PAT_NOANCH))))
+	    if (!(fail = (patinput < patinend && !(patflags & PAT_NOANCH))))
 		return 1;
 	    break;
 #ifdef DEBUG
@@ -2144,7 +2269,7 @@ patmatch(Upat prog)
 		      "BUG: non-exact match has set exactpos");
 
 		/* Try omitting a character from the input string */
-		if (*patinput) {
+		if (patinput < patinend) {
 		    METAINC(patinput);
 		    /* If we are not on an exact match, then this is
 		     * our last gasp effort, so we can optimize out
@@ -2162,7 +2287,7 @@ patmatch(Upat prog)
 			  "BUG: exact match has not set exactpos");
 		    METAINC(nextexact);
 
-		    if (*save) {
+		    if (save < patinend) {
 			char *nextin = save;
 			METAINC(nextin);
 			patglobflags = savglobflags;
@@ -2173,7 +2298,8 @@ patmatch(Upat prog)
 			 * Try swapping two characters in patinput and
 			 * exactpos
 			 */
-			if (*save && *nextin && *nextexact) {
+			if (save < patinend && nextin < patinend &&
+			    *nextexact) {
 			    int cin0 = UNMETA(save);
 			    int cpa0 = UNMETA(exactpos);
 			    int cin1 = UNMETA(nextin);
@@ -2319,7 +2445,7 @@ patmatchrange(char *range, int ch)
 /**/
 static int patrepeat(Upat p)
 {
-    int count = 0, tch, inch;
+    int count = 0, tch, charmatch_cache;
     char *scan, *opnd;
 
     scan = patinput;
@@ -2334,19 +2460,20 @@ static int patrepeat(Upat p)
 #endif
     case P_EXACTLY:
 	tch = STOUC(UNMETA(opnd));
-	while (*scan && (inch = STOUC(UNMETA(scan)), CHARMATCH(inch, tch))) {
+	while (scan < patinend &&
+	       CHARMATCH_EXPR(STOUC(UNMETA(scan)), tch)) {
 	    count++;
 	    METAINC(scan);
 	}
 	break;
     case P_ANYOF:
-	while (*scan && patmatchrange(opnd, STOUC(UNMETA(scan)))) {
+	while (scan < patinend && patmatchrange(opnd, STOUC(UNMETA(scan)))) {
 	    count++;
 	    METAINC(scan);
     	}
 	break;
     case P_ANYBUT:
-	while (*scan && !patmatchrange(opnd, STOUC(UNMETA(scan)))) {
+	while (scan < patinend && !patmatchrange(opnd, STOUC(UNMETA(scan)))) {
 	    count++;
 	    METAINC(scan);
     	}

@@ -1109,6 +1109,7 @@ struct patprog {
 #define PAT_ZDUP        0x0100  /* Copy pattern in real memory */
 #define PAT_NOTSTART	0x0200	/* Start of string is not real start */
 #define PAT_NOTEND	0x0400	/* End of string is not real end */
+#define PAT_HAS_EXCLUDP	0x0800	/* (internal): top-level path1~path2. */
 
 /* Globbing flags: lower 8 bits gives approx count */
 #define GF_LCMATCHUC	0x0100

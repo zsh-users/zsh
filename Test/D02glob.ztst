@@ -302,3 +302,8 @@
  print glob.tmp/*(/^F)
 0:Just empty dirs
 >glob.tmp/dir4
+
+ setopt extendedglob
+ print glob.tmp/**/*~*/dir3(/*|(#e))(/)
+0:Exclusions with complicated path specifications
+>glob.tmp/dir1 glob.tmp/dir2 glob.tmp/dir4
