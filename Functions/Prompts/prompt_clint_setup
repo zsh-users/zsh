@@ -39,7 +39,7 @@ prompt_clint_setup () {
   [[ -f /proc/apm ]] && p_apm="%(2v.-%2v-.)"
 
   p_shlvlhist="%{$reset_color%}zsh%(2L./$SHLVL.) %B%h%b "
-  p_rc="%(?..[%?%v1] )"
+  p_rc="%(?..[%?%1v] )"
   p_end="%{$reset_color%}%B%#%b %{$fg_no_bold[$pcc[2]]%}"
 
   POSTEDIT="$reset_color"
