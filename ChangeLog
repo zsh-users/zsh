@@ -1,3 +1,8 @@
+2001-05-09  Bart Schaefer  <schaefer@zsh.org>
+
+	* 14290: configure.in: Use a different cache variable for the
+	Solaris-curses.h-mistake-fix from 14275.
+
 2001-05-09  Oliver Kiddle  <opk@zsh.org>
 
 	* 14266, 14283: Etc/FEATURES, StartupFiles/zshrc: update; in
