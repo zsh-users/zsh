@@ -1,6 +1,6 @@
 #!/usr/local/bin/zsh -f
 
-zmodload zsh/zpty
+zmodload -i zsh/zpty
 setopt extendedglob
 
 debug=

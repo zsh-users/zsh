@@ -128,7 +128,10 @@ FORCE:
 
 # ========== LINKING IN MODULES ==========
 
-modules-bltin: Makefile
+mymods.conf:
+	@echo Linking with the standard modules.
+
+modules-bltin: Makefile $(sdir)/xmods.conf mymods.conf
 	if test -f mymods.conf; then \
 	    cat mymods.conf > $@; \
 	elif test @D@ = N; then \

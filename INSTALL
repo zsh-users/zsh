@@ -97,6 +97,13 @@ with the list of modules which are to be compiled into the main binary, one
 module name per line with no punctuation and no suffix.  See the zshmodules
 manual page for the list of available modules.
 
+Note that mymods.conf replaces the standard list of linked-in modules from
+Src/xmods.conf.  If you wish to add to the standard list, copy the lines
+that begin with "L " from xmods.conf into mymods.conf and remove the "L "
+from each such line in mymods.conf.  Then add the names of other modules
+that you want to link.  Module names typically must begin with "zsh/";
+only modules appearing in Src/Aliases/*.mdd may omit the "zsh/" prefix.
+
 Note that the modules depending on zle or complete (e.g.: complist and
 deltochar) cannot be loaded dynamically on systems which do not allow symbols
 in one dynamically loaded library to be visible from another; this is true,
