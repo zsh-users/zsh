@@ -1,5 +1,5 @@
 dnl
-dnl  configure.in: Configure template for zsh.
+dnl  zshconfig.ac: Configure template for zsh.
 dnl  Process this file with autoconf to produce a configure script.
 dnl
 dnl  Copyright (c) 1995-1997 Richard Coleman
@@ -1999,7 +1999,7 @@ AC_SUBST_FILE(DEFS_MK)dnl
 AC_SUBST_FILE(VERSION_MK)dnl
 
 AC_OUTPUT(Config/defs.mk Makefile Doc/Makefile Etc/Makefile Src/Makefile \
-Test/Makefile, \
+Test/Makefile,
 [test -z "$CONFIG_HEADERS" || echo > stamp-h])
 
 eval "zshbin1=${bindir}"
