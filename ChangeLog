@@ -1,3 +1,8 @@
+2001-05-18  Clint Adams  <clint@zsh.org>
+
+	* 14378: Completion/Unix/Type/_tex: also work for
+	pdflatex, jadetex, and pdfjadetex.
+
 2001-05-17  Tanaka Akira  <akr@zsh.org>
 
 	* 14377: Completion/Unix/Command/_cvs: support new .cvspass format

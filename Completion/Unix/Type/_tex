@@ -1,4 +1,4 @@
-#compdef tex latex slitex
+#compdef tex latex slitex pdflatex jadetex pdfjadetex
 
 local expl
 
