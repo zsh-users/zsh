@@ -1,0 +1,25 @@
+# Tests for process substitution: <(...), >(...) and =(...).
+
+%prep
+  mkdir procsubst.tmp
+  cd procsubst.tmp
+  print 'First\tSecond\tThird\tFourth' >FILE1
+  print 'Erste\tZweite\tDritte\tVierte' >FILE2
+
+%test
+  paste <(cut -f1 FILE1) <(cut -f3 FILE2)
+0:<(...) substitution
+>First	Dritte
+
+  paste <(cut -f2 FILE1) <(cut -f4 FILE2) > >(sed 's/e/E/g' >OUTFILE)
+  sleep 1	# since the sed is asynchronous
+  cat OUTFILE
+0:>(...) substitution
+>SEcond	ViErtE
+
+  diff =(cat FILE1) =(cat FILE2)
+1:=(...) substituion
+>1c1
+>< First	Second	Third	Fourth
+>---
+>> Erste	Zweite	Dritte	Vierte

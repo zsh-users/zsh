@@ -1,3 +1,10 @@
+2000-04-19  Peter Stephenson  <pws@pwstephenson.fsnet.co.uk>
+
+	* Config/version.mk: 3.1.7-pre-1
+
+	* Test/.distfiles, Test/12procsubst.ztst, Test/13parameter.ztst,
+	Test/ztst.zsh: new tests; use null glob clearing up.
+
 2000-04-19  Peter Stephenson  <pws@cambridgesiliconradio.com>
 
 	* Ollivier Robert: 10844: prefer curses to termcap on HPUX 11

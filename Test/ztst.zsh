@@ -71,7 +71,8 @@ ZTST_terr=${TMPPREFIX}.ztst.terr.$$
 
 ZTST_cleanup() {
   cd $ZTST_testdir
-  rm -rf $ZTST_testdir/dummy.tmp $ZTST_testdir/*.tmp ${TMPPREFIX}.ztst*$$
+  rm -rf $ZTST_testdir/dummy.tmp $ZTST_testdir/*.tmp(N) \
+    ${TMPPREFIX}.ztst*$$(N)
 }
 
 # This cleanup always gets performed, even if we abort.  Later,
