@@ -39,13 +39,7 @@ sdir_top        = @top_srcdir@
 INSTALL         = @INSTALL@
 
 @DEFS_MK@
-
-.PHONY: all modobjs modules headers proto prep FORCE install uninstall \
-	install.bin uninstall.bin install.modules uninstall.modules \
-	install.bin-here uninstall.bin-here install.modules-here \
-	uninstall.modules-here mostlyclean-here clean-here distclean-here \
 	
-
 sdir_src      = $(sdir_top)/Src
 dir_src       = $(dir_top)/Src
 
@@ -96,11 +90,13 @@ PROTODEPS = $(sdir_src)/makepro.awk
 # ========== DEPENDENCIES FOR BUILDING ==========
 
 all: modobjs modules
+.PHONY: all
 
 modobjs: $(MODOBJS)
 modules: $(MODULES)
 headers: $(MDHS)
 proto: $(PROTOS)
+.PHONY: modobjs modules headers proto
 
 prep:
 	@case $(sdir_top) in \
@@ -116,25 +112,31 @@ prep:
 	    $(SHELL) $$top_srcdir/Src/mkmakemod.sh $$dir Makefile || exit 1; \
 	    ( cd $$dir && $(MAKE) $(MAKEDEFS) $@ ) || exit 1; \
 	done
+.PHONY: prep
 
 headers prep: $(dir_src)/modules.stamp
 $(dir_src)/modules.stamp: $(MDDS)
 	echo 'timestamp for *.mdd files' > $@
+.PHONY: headers
 
 FORCE:
+.PHONY: FORCE
 
 # ========== DEPENDENCIES FOR INSTALLING ==========
 
 install: install.bin install.modules
 uninstall: uninstall.bin uninstall.modules
+.PHONY: install uninstall
 
 install.bin: install.bin-here
 uninstall.bin: uninstall.bin-here
 install.modules: install.modules-here
 uninstall.modules: uninstall.modules-here
+.PHONY: install.bin uninstall.bin install.modules uninstall.modules
 
 install.bin-here uninstall.bin-here:
 install.modules-here uninstall.modules-here:
+.PHONY: install.bin-here install.modules-here
 
 # ========== DEPENDENCIES FOR CLEANUP ==========
 
@@ -142,12 +144,15 @@ install.modules-here uninstall.modules-here:
 
 mostlyclean-here:
 	rm -f *.o *.export *.$(DL_EXT)
+.PHONY: mostlyclean-here
 
 clean-here:
 	rm -f *.o.c *.syms *.pro *.epro *.mdh *.mdhi *.mdhs *.mdh.tmp
+.PHONY: clean-here
 
 distclean-here:
 	rm -f $(makefile) $(makefile).in
+.PHONY: distclean-here
 
 # ========== RECURSIVE MAKES ==========
 

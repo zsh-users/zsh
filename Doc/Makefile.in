@@ -37,10 +37,6 @@ INSTALL         = @INSTALL@
 
 @DEFS_MK@
 
-.PHONY: all everything install uninstall install.man uninstall.man \
-	install.info uninstall.info install.html uninstall.html \
-	clean-here distclean-here realclean-here
-
 MAKEINFO = makeinfo
 TEXI2DVI = texi2dvi
 DVIPS = dvips -D 300
@@ -78,8 +74,10 @@ Zsh/seealso.yo Zsh/zftpsys.yo Zsh/zle.yo
 # ========== DEPENDENCIES FOR BUILDING ==========
 
 all: $(MAN) zsh.texi ../META-FAQ
+.PHONY: all
 
 everything: all zsh.dvi zsh_us.ps zsh_a4.ps zsh_toc.html
+.PHONY: everything
 
 zsh.dvi: zsh.texi
 	$(TEXI2DVI) $(sdir)/zsh.texi
@@ -212,9 +210,11 @@ Zsh/modmenu.yo: $(MODDOCSRC)
 
 # install just installs the manual pages
 install: install.man
+.PHONY: install
 
 # uninstall just unistalls the manual pages
 uninstall: uninstall.man
+.PHONY: uninstall
 
 # install man pages, creating install directory if necessary
 install.man: $(MAN)
@@ -222,6 +222,7 @@ install.man: $(MAN)
 	for file in $(MAN); do \
 	    $(INSTALL_DATA) $(sdir)/$$file $(DESTDIR)$(mandir)/man1/`echo $$file | sed 's|zsh|$(tzsh)|'` || exit 1; \
 	done
+.PHONY: install.man
 
 # install info pages, creating install directory if necessary
 install.info: zsh.texi
@@ -242,17 +243,20 @@ install.info: zsh.texi
 	    rm -rf infodir; \
 	    exit 1; \
 	fi
+.PHONY: install.info
 
 # uninstall man pages
 uninstall.man:
 	for file in $(MAN); do \
 	    rm -f $(DESTDIR)$(mandir)/man1/`echo $$file | sed 's|zsh|$(tzsh)|'`; \
 	done
+.PHONY: uninstall.man
 
 # uninstall info pages
 uninstall.info:
 	rm -f $(DESTDIR)$(infodir)/$(tzsh).info
 	rm -f $(DESTDIR)$(infodir)/$(tzsh).info-[1-9]*
+.PHONY: uninstall.info
 
 # install HTML manual
 install.html: zsh_toc.html
@@ -260,10 +264,12 @@ install.html: zsh_toc.html
 	for file in zsh_*.html; do \
 	    $(INSTALL_DATA) $$file $(DESTDIR)$(htmldir) || exit 1; \
 	done
+.PHONY: install.html
 
 # uninstall HTML manual
 uninstall.html:
 	rm -f $(DESTDIR)$(htmldir)/zsh_*.html
+.PHONY: uninstall.html
 
 # ========== DEPENDENCIES FOR CLEANUP ==========
 
@@ -272,13 +278,16 @@ clean-here:
 	rm -f *.aux *.cp *.cps *.fn *.fns *.ky *.log
 	rm -f *.pg *.pgs *.toc *.tp *.tps *.vr *.vrs
 	rm -rf infodir
+.PHONY: clean-here
 
 distclean-here: clean-here
 	rm -f Makefile
+.PHONY: distclean-here
 
 realclean-here: distclean-here
 	cd $(sdir) && rm -f Zsh/modlist.yo Zsh/modmenu.yo
 	cd $(sdir) && rm -f version.yo ../META-FAQ zsh.texi $(MAN)
+.PHONY: realclean-here
 
 @CLEAN_MK@
 

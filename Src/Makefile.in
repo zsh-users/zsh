@@ -39,12 +39,6 @@ LN		= @LN@
 
 @DEFS_MK@
 
-.PHONY: all bin headers modules modobjs modules prep rm-modobjs-tmp \
-	FORCE mostlyclean-here clean-here distclean-here mostlyclean \
-	clean distclean realclean mostlyclean-modules clean-modules \
-	distclean-modules realclean-modules install.modules \
-	uninstall.modules proto
-
 sdir_src      = $(sdir)
 dir_src       = .
 
@@ -54,10 +48,13 @@ LINK        = $(CC) $(LDFLAGS) $(EXELDFLAGS) $(EXTRA_LDFLAGS) -o $@
 DLLINK      = $(DLLD) $(LDFLAGS) $(LIBLDFLAGS) $(DLLDFLAGS) -o $@
 
 all: bin modules
+.PHONY: all
 
 bin: zsh
+.PHONY: bin
 
 modules: headers
+.PHONY: modules
 
 MAIN_OBJS = main.o
 
@@ -95,9 +92,11 @@ stamp-modobjs: modobjs
 	fi
 
 modobjs: headers rm-modobjs-tmp
+.PHONY: modobjs
 
 rm-modobjs-tmp:
 	rm -f stamp-modobjs.tmp
+.PHONY: rm-modobjs-tmp
 
 @CONFIG_MK@
 
@@ -121,8 +120,10 @@ Makemod modules.index prep: modules-bltin $(CONFIG_INCS)
 	cd $(dir_top) && \
 	    $(SHELL) $$top_srcdir/$(subdir)/mkmakemod.sh $(subdir) Makemod
 	@$(MAKE) -f Makemod $(MAKEDEFS) prep || rm -f Makemod
+.PHONY: prep
 
 FORCE:
+.PHONY: FORCE
 
 # ========== LINKING IN MODULES ==========
 
@@ -158,9 +159,11 @@ ansi2knr: ansi2knr.o
 
 install: install.bin install.modules
 uninstall: uninstall.bin uninstall.modules
+.PHONY: install uninstall
 
 install.bin: install.bin-here
 uninstall.bin: uninstall.bin-here
+.PHONY: install.bin uninstall.bin
 
 # install binary, creating install directory if necessary
 install.bin-here: zsh install.bin-@L@
@@ -173,19 +176,23 @@ install.bin-here: zsh install.bin-@L@
 	rm -f $(DESTDIR)$(bindir)/$(tzsh).new
 	$(LN) $(DESTDIR)$(bindir)/$(tzsh)-$(VERSION) $(DESTDIR)$(bindir)/$(tzsh).new
 	mv $(DESTDIR)$(bindir)/$(tzsh).new $(DESTDIR)$(bindir)/$(tzsh)
+.PHONY: install.bin-here
 
 install.bin-N:
 install.bin-L: $(LIBZSH)
 	$(sdir_top)/mkinstalldirs $(DESTDIR)$(libdir)/$(tzsh)
 	$(INSTALL_PROGRAM) $(LIBZSH) $(DESTDIR)$(libdir)/$(tzsh)/$(LIBZSH)
+.PHONY: install.bin-N install.bin-L
 
 # uninstall binary
 uninstall.bin-here: uninstall.bin-@L@
 	rm -f $(DESTDIR)$(bindir)/$(tzsh)-$(VERSION) $(DESTDIR)$(bindir)/$(tzsh)
+.PHONY: uninstall.bin-here uninstall.bin-@L@
 
 uninstall.bin-N:
 uninstall.bin-L:
 	rm -f $(DESTDIR)$(libdir)/$(tzsh)/$(LIBZSH)
+.PHONY: uninstall.bin-N uninstall.bin-L
 
 # ========== DEPENDENCIES FOR CLEANUP ==========
 
@@ -195,20 +202,24 @@ uninstall.bin-L:
 
 mostlyclean-here:
 	rm -f stamp-modobjs stamp-modobjs.tmp
+.PHONY: mostlyclean-here
 
 clean-here:
 	rm -f modules.index.tmp modules.stamp zsh ansi2knr.o ansi2knr
 	rm -f modules.index modules-bltin
 	rm -f libzsh-*.$(DL_EXT)
+.PHONY: clean-here
 
 distclean-here:
 	rm -f TAGS tags
 	rm -f Makefile mymods.conf
+.PHONY: distclean-here
 
 mostlyclean: mostlyclean-modules
 clean: clean-modules
 distclean: distclean-modules
 realclean: realclean-modules
+.PHONY: mostlyclean clean distclean realclean
 
 # Don't remake Makemod just to delete things, even if it doesn't exist.
 mostlyclean-modules clean-modules distclean-modules realclean-modules: modules.index
@@ -216,6 +227,8 @@ mostlyclean-modules clean-modules distclean-modules realclean-modules: modules.i
 	  $(MAKE) -f Makemod $(MAKEDEFS) `echo $@ | sed 's/-modules//'`; \
 	fi; \
 	exit 0
+.PHONY: mostlyclean-modules clean-modules distclean-modules \
+	realclean-modules
 
 @CLEAN_MK@
 
@@ -224,5 +237,6 @@ mostlyclean-modules clean-modules distclean-modules realclean-modules: modules.i
 install.modules uninstall.modules \
 modobjs modules headers proto $(MAIN_OBJS) zsh.export: Makemod
 	@$(MAKE) -f Makemod $(MAKEDEFS) $@
+.PHONY: install.modules uninstall.modules
 
 $(MAIN_OBJS): $(sdir)/zsh.h
