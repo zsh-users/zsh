@@ -1,4 +1,9 @@
-2000-09-14  Bart Schaefer  <schaefer@brasslantern.com>
+2000-09-15  Bart Schaefer  <schaefer@zsh.org>
+
+	* unposted: Doc/Zsh/contrib.yo: Missing hunk from 12765 (replace
+	another use of "wordcode").
+
+2000-09-14  Bart Schaefer  <schaefer@zsh.org>
 
 	* 12804: Src/builtin.c: "typeset -m" implies "-g".
 
@@ -11,7 +16,7 @@
 	Quote the file name pushed onto the history, in case the command
 	word has strange characters in it.  (Slighty edited.)
 
-2000-09-11  Bart Schaefer  <schaefer@brasslantern.com>
+2000-09-11  Bart Schaefer  <schaefer@zsh.org>
 
 	* 12793: Completion/Builtins/_zle, Doc/Zsh/compwid.yo,
 	Doc/Zsh/mod_zle.yo: Convert _zle to use _arguments; fix typos.
