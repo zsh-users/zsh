@@ -2,14 +2,14 @@
 # You may want to alter chpwd to call this when $ZFTP_USER is set.
 
 # If the directory really changed...
-if [[ $ZFTP_PWD != $zflastdir ]]; then
-  # Cancel the filename cache for the current directory.
-  zftp_fcache=()
+if [[ $ZFTP_PWD != $zfconfig[lastdir_$ZFTP_SESSION] ]]; then
   # ...and also empty the stored directory listing cache.
   # As this function is called when we close the connection, this
   # is the only place we need to do these two things.
-  [[ -n $zfcurdir && -f $zfcurdir ]] && rm -f $zfcurdir
-  zfotherargs=
+  local curdir=$zfconfig[curdir_$ZFTP_SESSION]
+  [[ -n $curdir && -f $curdir ]] && rm -f $curdir
+  zfconfig[otherargs_$ZFTP_SESSION]=
+  zffcache -d
 fi
 
 if [[ -z $ZFTP_USER ]]; then
@@ -18,24 +18,24 @@ if [[ -z $ZFTP_USER ]]; then
   # delete the non-current cached directory
   [[ -n $zfotherdir && -f $zfotherdir ]] && rm -f $zfotherdir
 
-  # don't keep zflastdir between opens (do keep zflastsession)
-  zflastdir=
+  # don't keep lastdir between opens (do keep lastloc)
+  zfconfig[lastdir_$ZFTP_SESSION]=
 
   # return the display to standard
   # uncomment the following line if you have a chpwd which shows directories
-  # chpwd
+  chpwd
 else
-  [[ -n $ZFTP_PWD ]] && zflastdir=$ZFTP_PWD
-  zflastsession="$ZFTP_HOST:$ZFTP_PWD"
-  zflastuser="$ZFTP_USER"
+  [[ -n $ZFTP_PWD ]] && zfconfig[lastdir_$ZFTP_SESSION]=$ZFTP_PWD
+  zfconfig[lastloc_$ZFTP_SESSION]="$ZFTP_HOST:$ZFTP_PWD"
+  zfconfig[lastuser_$ZFTP_SESSION]="$ZFTP_USER"
   local args
   if [[ -t 1 && -t 2 ]]; then
-    local str=$zflastsession
+    local str=$zfconfig[lastloc_$ZFTP_SESSION]
     [[ ${#str} -lt 70 ]] && str="%m: %~  $str"
     case $TERM in
       sun-cmd) print -n -P "\033]l$str\033\\"
 	       ;;
-      xterm) print -n -P "\033]2;$str\a"
+      xterm|aixterm) print -n -P "\033]2;$str\a"
 	     ;;
     esac
   fi

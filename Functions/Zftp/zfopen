@@ -7,25 +7,13 @@
 
 emulate -L zsh
 
-local optlist opt once dir
+local opt dir opt_1
 
-while [[ $1 = -* ]]; do
-  if [[ $1 = - || $1 = -- ]]; then
-    shift;
-    break;
-  fi
-  optlist=${1#-}
-  for (( i = 1; i <= $#optlist; i++)); do
-    opt=$optlist[$i]
-    case $optlist[$i] in
-      1) once=1
-	 ;;
-      *) print option $opt not recognised >&2
-	 ;;
-    esac
-  done
-  shift
+while getopts :1 opt; do
+  [[ $opt = "?" ]] && print "zfopen: bad option: -$OPTARG" >&2 && return 1
+  eval "opt_$opt=1"
 done
+(( OPTIND > 1 )) && shift $(( OPTIND - 1 ))
 
 # This is where we should try and do same name-lookupage in
 # both .netrc and .ncftp/bookmarks .  We could even try saving
@@ -37,8 +25,14 @@ if [[ $1 = */* ]]; then
   1=${1%%/*}
 fi
 
-if [[ $once = 1 ]]; then
+if [[ $opt_1 = 1 ]]; then
   zftp open $* || return 1
+  if [[ $# = 1 ]]; then
+    if ! zftp login; then
+      zftp close
+      return 1
+    fi
+  fi
 else
   # set parameters, but only if there was at least a host
   (( $# > 0 )) && zfparams $*

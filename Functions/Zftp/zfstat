@@ -6,25 +6,15 @@
 setopt localoptions unset
 unsetopt ksharrays
 
-local i stat=0 opt optlist verbose
+local i stat=0 opt opt_v
 
-while [[ $1 = -* ]]; do
-  if [[ $1 = - || $1 = -- ]]; then
-    shift;
-    break;
-  fi
-  optlist=${1#-}
-  for (( i = 1; i <= $#optlist; i++)); do
-    opt=$optlist[$i]
-    case $opt in
-      v) verbose=1
-	 ;;
-      *) print option $opt not recognised >&2
-	 ;;
-    esac
-  done
-  shift
+while getopts :v opt; do
+  [[ $opt = "?" ]] && print "zfstat: bad option: -$OPTARG" >&2 && return 1
+  eval "opt_$opt=1"
 done
+(( OPTIND > 1 )) && shift $(( OPTIND - 1 ))
+
+[[ -n $ZFTP_SESSION ]] && print "Session:\t$ZFTP_SESSION"
 
 if [[ -n $ZFTP_HOST ]]; then
   print "Host:\t\t$ZFTP_HOST"
@@ -55,7 +45,8 @@ if [[ -n $ZFTP_HOST ]]; then
   fi
 else
   print "Not connected."
-  [[ -n $zflastsession ]] && print "Last session:\t$zflastsession"
+  [[ -n $zfconfig[lastloc_$ZFTP_SESSION] ]] &&
+  print "Last location:\t$zfconfig[lastloc_$ZFTP_SESSION]"
   stat=1
 fi
 
@@ -77,7 +68,7 @@ for (( i = 1; i <= ${#ZFTP_PREFS}; i++ )); do
 done
 print
 
-if [[ -n $ZFTP_HOST && $verbose = 1 ]]; then
+if [[ -n $ZFTP_HOST && $opt_v = 1 ]]; then
   zfautocheck -d
   print "Status of remote server:"
   # make sure we print the reply

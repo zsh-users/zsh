@@ -1,11 +1,13 @@
 #compdef -p zf*
 
+# Completion for zftp builtin and zf* functions.  The functions
+# zfcd_match and zfget_match (also used for old-style completion)
+# need to be installed for remote file and directory completion to work.
+
+emulate -L zsh
+
 # Don't try any more completion after this.
 _compskip=all
-
-# Completion for zftp builtin and zf* functions.  The functions
-# zfcd_match and zfget_match (used for old-style completion)
-# need to be installed for remote file and directory completion to work.
 
 local subcom expl
 
@@ -13,7 +15,8 @@ if [[ $words[1] = zftp ]]; then
   if [[ $CURRENT -eq 2 ]]; then
     _description expl sub-command
     compadd "$expl[@]" open params user login type ascii binary mode put \
-      putat get getat append appendat ls dir local remote mkdir rmdir
+      putat get getat append appendat ls dir local remote mkdir rmdir \
+      session rmsession
     return
   fi
   subcom=$words[2]
@@ -23,17 +26,13 @@ fi
 
 case $subcom in
   *(cd|ls|dir))
-    # complete remote directories; we could be smarter about hiding prefixes
+    # complete remote directories
     zfcd_match $PREFIX $SUFFIX
-    _description expl 'remote directory'
-    (( $#reply )) && compadd "$expl[@]" -S/ -q - $reply
     ;;
 
   *(get(|at)|gcp|delete|remote))
     # complete remote files
     zfget_match $PREFIX $SUFFIX
-    _description expl 'remote file'
-    (( $#reply )) && compadd "$expl[@]" -F fignore - $reply
     ;;
 
   *(put(|at)|pcp))
@@ -57,6 +56,28 @@ case $subcom in
       if [[ -f ${ZFTP_BMFILE:=${ZDOTDIR:-$HOME}/.zfbkmarks} ]]; then
         compadd "$expl[@]" - $(awk '{print $1}' $ZFTP_BMFILE)
       fi
+    fi
+    ;;
+
+  *session)
+    # complete sessions, excluding the current one.
+    _description expl 'another FTP session'
+    compadd "$expl[@]" - ${$(zftp session):#$ZFTP_SESSION}
+    ;;
+
+  *transfer)
+    # complete arguments like sess1:file1 sess2:file2
+    if [[ $PREFIX = *:* ]]; then
+      # complete file in the given session
+      local sess=${PREFIX%%:*} oldsess=$ZFTP_SESSION
+      compset -p $(( $#sess + 1 ))
+      [[ -n $sess ]] && zftp session $sess
+      zfget_match $PREFIX $SUFFIX
+      [[ -n $sess && -n $oldsess ]] && zftp session $oldsess
+    else
+      # note here we can complete the current session
+      _description expl 'FTP session'
+      compadd "$expl[@]" -S : - $(zftp session)
     fi
     ;;
 

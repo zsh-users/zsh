@@ -57,14 +57,10 @@ else
     rm -f $tmpf
   else
     # we just have to do an ls and hope that's right
+    local fcache_name
+    zffcache
     nondir=$pat
-    if (( $#zftp_fcache == 0 )); then
-      # Why does `zftp_fcache=($(zftp ls))' sometimes not work?
-      zftp ls >$tmpf
-      zftp_fcache=($(<$tmpf))
-      rm -f $tmpf
-    fi
-    files=($zftp_fcache)
+    files=(${(P)fcache_name})
   fi
   # now we want to see which of the $files match $nondir:
   # ${...:/foo} deletes occurrences of foo matching a complete word,

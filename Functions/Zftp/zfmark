@@ -37,8 +37,9 @@ fi
 
 if [[ -n $ZFTP_HOST ]]; then
   bkmarks[$1]="${ZFTP_USER}@${ZFTP_HOST}:${ZFTP_PWD}"
-elif [[ -n $zflastsession ]]; then
-  bkmarks[$1]="${zflastuser}@${zflastsession}"
+elif [[ -n $zfconfig[lastloc_$ZFTP_SESSION] ]]; then
+  bkmarks[$1]="${zfconig[lastuser_$ZFTP_SESSION]}@\
+${zfconfig[lastloc_$ZFTP_SESSION]}"
 else
   print "No current or recent ZFTP session to bookmark." >&2
   return 1

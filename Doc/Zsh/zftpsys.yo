@@ -54,7 +54,7 @@ following code in your tt(.zshrc) will arrange for this; assume the
 functions are stored in the directory tt(~/myfns):
 
 example(fpath=(~/myfns $fpath)
-autoload zfinit
+autoload -U zfinit
 zfinit)
 
 Note that tt(zfinit) assumes you are using the tt(zmodload) method to
@@ -67,7 +67,10 @@ texinode(Zftp Functions)(Miscellaneous Features)(Installation)(Zftp Function Sys
 sect(Functions)
 
 The sequence of operations in performing a file transfer is essentially the
-same as that in a standard FTP client.
+same as that in a standard FTP client.  Note that, due to a quirk of the
+shell's tt(getopts) builtin, for those functions that handle options you
+must use `tt(-)tt(-)' rather than `tt(-)' to ensure the remaining arguments
+are treated literally (a single `tt(-)' is treated as an argument).
 
 subsect(Opening a connection)
 startitem()
@@ -77,16 +80,20 @@ Set or show the parameters for a future tt(zfopen) with no arguments.  If
 no arguments are given, the current parameters are displayed (the password
 will be shown as a line of asterisks).  If a host is given, and either the
 var(user) or var(password) is not, they will be prompted for; also, any
-parameter given as `tt(?)' will be prompted for.
+parameter given as `tt(?)' will be prompted for, and if the `tt(?)' is
+followed by a string, that will be used as the prompt.  As tt(zfopen) calls
+tt(zfparams) to store the parameters, this usually need not be called
+directly.
 
-As tt(zfopen) calls tt(zfparams) to store the parameters, this usually need
-not be called directly.
+A single argument `tt(-)' will delete the stored parameters.  This will
+also cause the memory of the last directory (and so on) on the other host
+to be deleted.
 )
 findex(zfopen)
 item(tt(zfopen [ -1 ] [ var(host) [ var(user) [ var(password) [ var(account) ] ] ] ]))(
 If var(host) is present, open a connection to that host under username
 var(user) with password var(password) (and, on the rare occasions when it
-is necessary account var(account)).  If a necessary parameter is missing or
+is necessary, account var(account)).  If a necessary parameter is missing or
 given as `tt(?)' it will be prompted for.  If var(host) is not present, use
 a previously stored set of parameters.
 
@@ -106,12 +113,12 @@ var(host), then change directory to var(path) (which must be a directory,
 not a file).  The `tt(ftp://)' can be omitted; the trailing `tt(/)' is enough
 to trigger recognition of the var(path).  Note prefixes other than
 `tt(ftp:)' are not recognized, and that all characters after the first
-slash beyond tt(host) are significant in var(path).
+slash beyond var(host) are significant in var(path).
 )
 findex(zfanon)
 item(tt(zfanon [ -1 ] var(host)))(
 Open a connection var(host) for anonymous FTP.  The username used is
-tt(anonymous).  The password (which will be reported the first time) is
+`tt(anonymous)'.  The password (which will be reported the first time) is
 generated as var(user)tt(@)var(host); this is then stored in the shell
 parameter tt($EMAIL_ADDR) which can alternatively be set manually to a
 suitable string.
@@ -143,12 +150,12 @@ expected, the string which on the local host corresponds to `tt(~)' is
 converted back to a `tt(~)' before being passed to the remote machine.
 This is convenient because of the way expansion is performed on the command
 line before tt(zfcd) receives a string.  For example, suppose the command
-is `tt(zfcd ~/foo)'.  The shell will expand this to a full path as in
+is `tt(zfcd ~/foo)'.  The shell will expand this to a full path such as
 `tt(zfcd /home/user2/pws/foo)'.  At this stage, tt(zfcd) recognises the
-initial path as `tt(~)', and the directory sent to the remote host is
-tt(~/foo), so that the `tt(~)' will be expanded by the server to the
-correct remote host directory.  Other named directories of the form
-`tt(~name)' are not treated in this fashion.
+initial path as corresponding to `tt(~)' and will send the directory to
+the remote host as tt(~/foo), so that the `tt(~)' will be expanded by the
+server to the correct remote host directory.  Other named directories of
+the form `tt(~name)' are not treated in this fashion.
 )
 findex(zfhere)
 item(tt(zfhere))(
@@ -162,21 +169,23 @@ item(tt(zfdir [ -rfd ] [ - ] [ var(dir-options) ] [ var(dir) ]))(
 Produce a long directory listing.  The arguments var(dir-options) and
 var(dir) are passed directly to the server and their effect is
 implementation dependent, but specifying a particular remote directory
-var(dir) is usually possible.  The output is passed through pager.
+var(dir) is usually possible.  The output is passed through a pager
+given by the environment variable tt($PAGER) or defaulting to `tt(more)'.
 
 The directory is usually cached for re-use.  In fact, two caches are
 maintained.  One is for use when there is no var(dir-options) or var(dir),
 i.e. a full listing of the current remote directory; it is flushed
 when the current remote directory changes.  The other is
 kept for repeated use of tt(zfdir) with the same arguments; for example,
-repeated use of tt(zfdir /pub/gnu) will only require the directory to be
+repeated use of `tt(zfdir /pub/gnu)' will only require the directory to be
 retrieved on the first call.  Alternatively, this cache can be re-viewed with
 the tt(-r) option.  As relative directories will confuse
-tt(zfdir), the tt(-f) option can be used to force the cache to be flushed.
-Also, the option tt(-d) will delete both caches without showing a directory
-listing.
+tt(zfdir), the tt(-f) option can be used to force the cache to be flushed
+before the directory is listed.  The option tt(-d) will delete both
+caches without showing a directory listing; it will also delete the cache
+of file names in the current remote directory, if any.
 )
-findex(zfdir)
+findex(zfls)
 item(tt(zfls) [ var(ls-options) ] [ var(dir) ])(
 List files on the remote server.  With no arguments, this will produce a
 simple list of file names for the current remote directory.  Any arguments
@@ -311,6 +320,49 @@ Close the connection.
 )
 enditem()
 
+subsect(Session management)
+startitem()
+findex(zfsession)
+item(tt(zfsession) [ tt(-lvod) ] [ var(sessname) ])(
+Allows you to manage multiple FTP sessions at once.  By default,
+connections take place in a session called `tt(default)'; by giving the
+command `tt(zfsession) var(sessname)' you can change to a new or existing
+session with a name of your choice.  The new session remembers its own
+connection, as well as associated shell parameters, and also the host/user
+parameters set by tt(zfparams).  Hence you can have different sessions set
+up to connect to different hosts, each remembering the appropriate host,
+user and password.
+
+With no arguments, tt(zfsession) prints the name of the current session;
+with the option tt(-l) it lists all sessions which currently exist, and
+with the option tt(-v) it gives a verbose list showing the host and
+directory for each session, where the current session is marked with an
+asterisk.  With tt(-o), it will switch to the most recent previous session.
+
+With tt(-d), the given session (or else the current one) is removed;
+everything to do with it is completely forgotten.  If it was the only
+session, a new session called `tt(default)' is created and made current.
+It is safest not to delete sessions while background commands using
+tt(zftp) are active.
+)
+findex(zftransfer)
+item(tt(zftransfer) var(sess1)tt(:)var(file1) var(sess2)tt(:)var(file2))(
+Transfer files between two sessions; no local copy is made.  The file
+is read from the session var(sess1) as var(file1) and written to session
+var(sess1) as file var(file2); var(file1) and var(file2) may be relative to
+the current directories of the sesssion.  Either var(sess1) or var(sess2)
+may be omitted (though the colon should be retained if there is a
+possibility of a colon appearing in the file name) and defaults to the
+current session; var(file2) may be omitted or may end with a slash, in
+which case the basename of var(file1) will be added.  The sessions
+var(sess1) and var(sess2) must be distinct.
+
+The operation is performed using pipes, so it is required that the
+connections still be valid in a subshell, which is not the case under some
+operating systems.
+)
+enditem()
+
 subsect(Bookmarks)
 The two functions tt(zfmark) and tt(zfgoto) allow you to `bookmark' the
 present location (host, user and directory) of the current FTP connection
@@ -329,16 +381,18 @@ closed; it is an error if there is none.  Any existing bookmark
 under the same name will be silently replaced.
 
 If not given an argument, list the existing bookmarks and the points to
-which they refer in the form var(user)tt(@)var(host)tt(:)var(directory).
+which they refer in the form var(user)tt(@)var(host)tt(:)var(directory);
+this is the format in which they are stored, and the file may be edited
+directly.
 )
 findex(zfgoto)
 item(tt(zfgoto [ -n ] )var(bookmark))(
 Return to the location given by var(bookmark), as previously set by
 tt(zfmark).  If the location has user `tt(ftp)' or `tt(anonymous)', open
 the connection with tt(zfanon), so that no password is required.  If the
-user and host parameters match those currently stored, those will be used,
-and again no password is required.  Otherwise a password will be prompted
-for.
+user and host parameters match those stored for the current session, if
+any, those will be used, and again no password is required.  Otherwise a
+password will be prompted for.
 
 With the option tt(-n), the bookmark is taken to be a nickname stored by
 the tt(ncftp) program in its bookmark file, which is assumed to be
@@ -434,6 +488,11 @@ error, as standard output may be a file being received.  The form of the
 progess meter, or whether it is used at all, can be configured without
 altering the function, as described in the next section.
 )
+findex(zffcache)
+item(tt(zffcache))(
+This is used to implement caching of files in the current directory for
+each session separately.  It is used by tt(zfget_match) and tt(zfrglob).
+)
 enditem()
 
 texinode(Miscellaneous Features)()(Zftp Functions)(Zftp Function System)
@@ -446,7 +505,10 @@ pindex(zfconfig)
 The tt(zfinit) function defines an associative array tt(zfconfig).
 Elements of this may subsequently be set to change the behaviour of the
 tt(zftp) functions using standard syntax (for example,
-`tt(zfconfig[progress]=percent)'.  The following keys are understood.
+`tt(zfconfig[progress]=percent)'.  tt(zfconfig) may also contain
+various other values used by the function system, so it should not be used
+as the target of an assignment for a complete array.  The following keys
+are understood.
 
 startitem()
 item(tt(progress))(
@@ -525,7 +587,8 @@ never close the connection automatically.
 Information about the previous connection is given by the tt(zfstat)
 function.  So, for example, if that reports:
 
-example(Not connected.
+example(Session:        default
+Not connected.
 Last session:   ftp.bar.com:/pub/textfiles)
 
 then the command tt(zfget file.txt) will attempt to reopen a connection to
@@ -533,10 +596,14 @@ tt(ftp.bar.com), retrieve the file tt(/pub/textfiles/file.txt), and
 immediately close the connection again.  On the other hand, tt(zfcd ..)
 will open the connection in the directory tt(/pub) and leave it open.
 
+Note that all the above is local to each session; if you return to a
+previous session, the connection for that session is the one which will be
+reopened.
+
 subsect(Completion)
 
-Completion of local and remote files, directories and bookmarks is
-supported.  The older, tt(compctl)-style completion is defined when
+Completion of local and remote files, directories, sessions and bookmarks
+is supported.  The older, tt(compctl)-style completion is defined when
 tt(zfinit) is called; support for the new widget-based completion system is
 provided in the function tt(Completion/Builtins/_zftp), which should be
 installed with the other functions of the completion system and hence

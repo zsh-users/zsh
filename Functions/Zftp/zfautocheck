@@ -11,9 +11,12 @@
 # command, which implies we are looking for something so should stay open
 # for it.
 
-# Remember the old session:  zflastsession will be overwritten by
+# Remember the old location:  will be overwritten by
 # a successful open.
-local lastsession=$zflastsession
+local lastloc=$zfconfig[lastloc_$ZFTP_SESSION]
+
+# Don't print out user messages when re-opening the connection.
+local ZFTP_VERBOSE=${ZFTP_VERBOSE//0}
 
 # Unset the delay counter from the progress meter in case there was an
 # abnormal exit.
@@ -30,8 +33,9 @@ fi
 
 if [[ $1 = *n* ]]; then
   return 0
-elif [[ -n $lastsession && $ZFTP_HOST = ${lastsession%%:*} ]]; then
-  zfcd ${lastsession#*:}
+elif [[ -n $lastloc && $ZFTP_HOST = ${lastloc%%:*} ]]; then
+  # don't print directory since we're just going back where we were.
+  zfcd ${lastloc#*:} >& /dev/null
 fi
 
 # }

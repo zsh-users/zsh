@@ -12,35 +12,21 @@
 
 emulate -L zsh
 
-local loc rem stat=0 optlist opt nglob remlist locst remst
-local tmpfile=${TMPPREFIX}zfcget$$ rstat tsize time
+local loc rem stat=0 opt opt_G opt_t remlist locst remst
+local tmpfile=${TMPPREFIX}zfcget$$ rstat tsize
 
-while [[ $1 = -* ]]; do
-  if [[ $1 = - || $1 = -- ]]; then
-    shift;
-    break;
-  fi
-  optlist=${1#-}
-  for (( i = 1; i <= $#optlist; i++)); do
-    opt=$optlist[$i]
-    case $optlist[$i] in
-      G) nglob=1
-	 ;;
-      t) time=1
-	 ;;
-      *) print option $opt not recognised >&2
-	 ;;
-    esac
-  done
-  shift
+while getopts :Gt opt; do
+  [[ $opt = '?' ]] && print "zfcget: bad option: -$OPTARG" && return 1
+  eval "opt_$opt=1"
 done
+(( OPTIND > 1 )) && shift $(( OPTIND - 1 ))
 
 for remlist in $*; do
   # zfcd directory hack to put the front back to ~
   if [[ $remlist = $HOME || $remlist = $HOME/* ]]; then
     remlist="~${remlist#$HOME}"
   fi
-  if [[ $nglob != 1 ]]; then
+  if [[ $opt_G != 1 ]]; then
     zfrglob remlist
   fi
   if (( $#remlist )); then
@@ -73,7 +59,7 @@ for remlist in $*; do
 	  continue
 	else
 	  if zftp getat $rem $locst[1] >>$loc; then
-	    [[ $time = 1 ]] && zfrtime $loc $rem $remst[2]
+	    [[ $opt_t = 1 ]] && zfrtime $loc $rem $remst[2]
 	  else
 	    stat=1
 	  fi

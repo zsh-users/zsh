@@ -4,7 +4,7 @@ emulate -L zsh
 
 if [[ ${+zfconfig} = 0 ]]; then
   typeset -gA zfconfig
-  zfconfig=(progress bar update 1)
+  zfconfig=(progress bar update 1 lastsession default)
 fi
 
 alias zfcd='noglob zfcd'
@@ -14,9 +14,9 @@ alias zfdir='noglob zfdir'
 alias zfuget='noglob zfuget'
 
 autoload -U zfanon zfautocheck zfcd zfcd_match zfcget zfclose zfcput
-autoload -U zfdir zfgcp zfget zfget_match zfgoto zfhere zfinit zfls
-autoload -U zfmark zfopen zfparams zfpcp zfput zfrglob zfrtime zfstat
-autoload -U zftp_chpwd zftp_progress zftype zfuget zfuput
+autoload -U zfdir zffcache zfgcp zfget zfget_match zfgoto zfhere zfinit zfls
+autoload -U zfmark zfopen zfparams zfpcp zfput zfrglob zfrtime zfsession
+autoload -U zfstat zftp_chpwd zftp_progress zftransfer zftype zfuget zfuput
 
 #
 # zftp completions: only use these if new-style completion is not
@@ -33,7 +33,8 @@ if [[ ${#_patcomps} -eq 0 || ${_patcomps[(i)zf*]} -gt ${#_patcomps} ]]; then
     close quit)'  - \
     'w[1,cd][1,ls][1,dir][1,rmdir]' -K zfcd_match -S/ -q - \
     'W[1,get*]' -K zfget_match - 'w[1,delete][1,remote]' -K zfget_match - \
-    'w[1,open][1,params]' -k hosts -- zftp
+    'w[1,open][1,params]' -k hosts - \
+    'w[1,session]' -s '${$(zftp session):#$ZFTP_SESSION}' -- zftp
   compctl -K zfcd_match -S/ -q zfcd zfdir zfls
   compctl -K zfget_match zfget zfgcp zfuget zfcget
   compctl -k hosts zfanon zfopen zfparams
@@ -42,4 +43,15 @@ if [[ ${#_patcomps} -eq 0 || ${_patcomps[(i)zf*]} -gt ${#_patcomps} ]]; then
     -x 'W[1,-*n*]' \
     -s '$(awk -F, '\''NR > 2 { print $1 }'\'' ~/.ncftp/bookmarks)' -- \
     zfgoto zfmark
+  compctl -s '${$(zftp session):#$ZFTP_SESSION}' -- zfsession
+  # in _zftp for new completion, but hard to inline into a compctl
+  zftransfer_match() {
+    local sess=${1%%:*} oldsess=$ZFTP_SESSION
+    [[ -n $sess ]] && zftp session $sess
+    zfget_match ${1#*:} $2
+    [[ -n $sess && -n $oldsess ]] && zftp session $oldsess
+    reply=(${sess}:${^reply})
+  }
+  compctl -s '$(zftp session)' -S : -x 'C[0,*:*]' \
+    -K zftransfer_match -- zftransfer
 fi

@@ -26,17 +26,19 @@ if [[ -n $ZFTP_TRANSFER ]]; then
   # avoid a `parameter unset' message
   [[ $ZFTP_TRANSFER != *F ]] &&
     (( ${+zftpseconds} )) && (( SECONDS - zftpseconds < update )) && return
-  if [[ -n $ZFTP_SIZE ]]; then
-    local frac="$(( ZFTP_COUNT * 100 / ZFTP_SIZE ))%"
+  # size is usually ZFTP_SIZE, but zftransfer may set ZFTP_TSIZE
+  local size=${ZFTP_TSIZE:-$ZFTP_SIZE}
+  if [[ -n $size ]]; then
+    local frac="$(( ZFTP_COUNT * 100 / size ))%"
     if [[ $style = bar && ${+COLUMNS} = 1 && $COLUMNS -gt 0 ]]; then
       if (( ! ${+zftpseconds} )); then
-	print "$ZFTP_FILE ($ZFTP_SIZE bytes): $ZFTP_TRANSFER" 1>&2
+	print "$ZFTP_FILE ($size bytes): $ZFTP_TRANSFER" 1>&2
       fi
       integer maxwidth=$(( COLUMNS - 7 ))
-      local width="$(( ZFTP_COUNT * maxwidth / ZFTP_SIZE ))"
+      local width="$(( ZFTP_COUNT * maxwidth / size ))"
       print -nP "\r%S${(l:width:):-}%s${(l:maxwidth-width:):-}: ${frac}%%" 1>&2
     else
-      print -n "\r$ZFTP_FILE ($ZFTP_SIZE bytes): $ZFTP_TRANSFER $frac" 1>&2
+      print -n "\r$ZFTP_FILE ($size bytes): $ZFTP_TRANSFER $frac" 1>&2
     fi
   else
     print -n "\r$ZFTP_FILE: $ZFTP_TRANSFER $ZFTP_COUNT" 1>&2
