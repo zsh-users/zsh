@@ -1018,7 +1018,7 @@ bld_parts(char *str, int len, int plen, Cline *lp)
 		 * is set if the characters before the anchor were not
 		 * on the line. */
 		*q = n = get_cline(NULL, mp->ralen, str, mp->ralen, NULL, 0,
-				   ((plen < 0) ? CLF_NEW : 0));
+				   ((plen <= 0) ? CLF_NEW : 0));
 
 		/* If there were any characters before the anchor, add
 		 * them as a cline struct. */
@@ -1046,7 +1046,7 @@ bld_parts(char *str, int len, int plen, Cline *lp)
     }
     /* This is the cline struct for the remaining string at the end. */
 
-    *q = n = get_cline(NULL, 0, NULL, 0, NULL, 0, (plen < 0 ? CLF_NEW : 0));
+    *q = n = get_cline(NULL, 0, NULL, 0, NULL, 0, (plen <= 0 ? CLF_NEW : 0));
     if (p != str) {
 	int olen = str - p, llen = (op < 0 ? 0 : op);
 
@@ -1843,9 +1843,25 @@ join_clines(Cline o, Cline n)
 	    }
 	    /* Now see if they have matching anchors. If not, cut the list. */
 	    if (!(o->flags & CLF_MID) && !cmp_anchors(o, n, 1)) {
-		Cline t, tn;
+		Cline t, tn, tt, to = NULL;
 
-		for (t = n; (tn = t->next) && !cmp_anchors(o, tn, 1); t = tn);
+		for (t = n; (tn = t->next); t = tn)
+		    if (!(tn->flags & CLF_NEW)) {
+			for (tt = o; (to = tt->next); tt = to)
+			    if (!(to->flags & CLF_NEW) &&
+				cmp_anchors(tn, to, 1))
+				break;
+			if (to)
+			    break;
+		    }
+		if (tn) {
+		    if (po)
+			po->next = to;
+		    else
+			oo = to;
+		    o = to;
+		} else
+		    for (t = n; (tn = t->next) && !cmp_anchors(o, tn, 1); t = tn);
 
 		if (tn) {
 		    diff = sub_join(o, n, tn, 0);
@@ -1864,8 +1880,6 @@ join_clines(Cline o, Cline n)
 		    n = n->next;
 		    continue;
 		} else {
-		    Cline to;
-
 		    for (t = o; (to = t->next) && !cmp_anchors(n, to, 1);
 			 t = to);
 
@@ -1887,9 +1901,7 @@ join_clines(Cline o, Cline n)
 			}
 			continue;
 		    } else {
-			Cline tt = NULL;
-
-			for (t = n; (tn = t->next); t = tn) {
+			for (tt = NULL, t = n; (tn = t->next); t = tn) {
 			    for (tt = o;
 				 (to = tt->next) &&
 				     !cmp_anchors(tn, to, 1); tt = to);

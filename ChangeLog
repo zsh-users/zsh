@@ -1,5 +1,8 @@
 2000-04-26  Sven Wischnowsky  <wischnow@informatik.hu-berlin.de>
 
+	* 10924: Src/Zle/compmatch.c: fix for matching control; improve
+ 	merging cline lists
+	
 	* 10923: Completion/Core/_main_complete: better default value for
  	list-prompt style
 	
