@@ -1173,6 +1173,7 @@ fallback_zleread(char **lp, UNUSED(char **rp), UNUSED(int ha), UNUSED(int con))
     return (unsigned char *)shingetline();
 }
 
+/**/
 #ifdef UNLINKED_XMOD_zshQszle
 
 /**/
@@ -1184,6 +1185,7 @@ autoload_zlesetkeymap(int mode)
     (*zlesetkeymapptr)(mode);
 }
 
+/**/
 #endif
 
 /* compctl entry point pointers.  Similar to the ZLE ones. */
