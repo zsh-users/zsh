@@ -1,3 +1,7 @@
+2001-05-17  Peter Stephenson  <pws@csr.com>
+
+	* 14376: Completion/Unix/Command/_lp: type with compset.
+
 2001-05-17  Bart Schaefer  <schaefer@zsh.org>
 
 	* 14375: Src/Zle/zle_main.c: Permit signals to be handled during
